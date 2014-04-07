@@ -29,8 +29,6 @@
 #include <analysis/KFit/KFitTrack.h>
 
 
-using namespace std;
-using namespace CLHEP;
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY
 typedef HepGeom::Point3D<double> HepPoint3D;
 #endif
@@ -65,12 +63,12 @@ namespace Belle2 {
        * @param q charge of the track
        * @return error code (zero if success)
        */
-      enum KFitError::ECode               addTrack(const HepLorentzVector& p, const HepPoint3D& x, const HepSymMatrix& e, const double q);
+      enum KFitError::ECode               addTrack(const CLHEP::HepLorentzVector& p, const HepPoint3D& x, const CLHEP::HepSymMatrix& e, const double q);
       /** Set a correlation matrix.  Not intended for end user's use.
        * @param c (7x7) correlation matrix
        * @return error code (zero if success)
        */
-      virtual enum KFitError::ECode       setCorrelation(const HepMatrix& c);
+      virtual enum KFitError::ECode       setCorrelation(const CLHEP::HepMatrix& c);
       /** Indicate no correlation between tracks.  Not intended for end user's use.
        * @return error code (zero if success)
        */
@@ -111,7 +109,7 @@ namespace Belle2 {
        * @param id track id
        * @return Lorentz vector of the track
        */
-      const HepLorentzVector              getTrackMomentum(const int id) const;
+      const CLHEP::HepLorentzVector              getTrackMomentum(const int id) const;
       /** Get a position of the track.
        * @param id track id
        * @return position of the track
@@ -121,7 +119,7 @@ namespace Belle2 {
        * @param id track id
        * @return error matrix of the track
        */
-      const HepSymMatrix                  getTrackError(const int id) const;
+      const CLHEP::HepSymMatrix                  getTrackError(const int id) const;
       /** Get a specified track object.
        * @param id track id
        * @return specified track object
@@ -133,7 +131,7 @@ namespace Belle2 {
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return (7x7) correlation matrix
        */
-      virtual const HepMatrix             getCorrelation(const int id1, const int id2, const int flag = KFitConst::kAfterFit) const;
+      virtual const CLHEP::HepMatrix             getCorrelation(const int id1, const int id2, const int flag = KFitConst::kAfterFit) const;
 
 
     public:
@@ -149,27 +147,27 @@ namespace Belle2 {
        * @param e (6x6) error matrix
        * @return (7x7) error matrix
        */
-      const HepSymMatrix makeError1(const HepLorentzVector& p, const HepMatrix& e) const;
+      const CLHEP::HepSymMatrix makeError1(const CLHEP::HepLorentzVector& p, const CLHEP::HepMatrix& e) const;
       /** Rebuild an error matrix from a pair of Lorentz vectors and an error matrix.
        * @param p1 first Lorentz vector
        * @param p2 second Lorentz vector
        * @param e (6x6) error matrix
        * @return (7x7) error matrix
        */
-      const HepMatrix    makeError1(const HepLorentzVector& p1, const HepLorentzVector& p2, const HepMatrix& e) const;
+      const CLHEP::HepMatrix    makeError1(const CLHEP::HepLorentzVector& p1, const CLHEP::HepLorentzVector& p2, const CLHEP::HepMatrix& e) const;
       /** Rebuild an error matrix from a Lorentz vector and an error matrix.
        * @param p Lorentz vector
        * @param e (3x6) error matrix
        * @return (3x7) error matrix
        */
-      const HepMatrix    makeError2(const HepLorentzVector& p, const HepMatrix& e) const;
+      const CLHEP::HepMatrix    makeError2(const CLHEP::HepLorentzVector& p, const CLHEP::HepMatrix& e) const;
       /** Rebuild an error matrix from a Lorentz vector and an error matrix.
        * @param p Lorentz vector
        * @param e (7x7) error matrix
        * @param is_fix_mass true to recalculate energy term from other parameters, false to do nothing
        * @return (7x7) error matrix
        */
-      const HepSymMatrix makeError3(const HepLorentzVector& p, const HepMatrix& e, const bool is_fix_mass) const;
+      const CLHEP::HepSymMatrix makeError3(const CLHEP::HepLorentzVector& p, const CLHEP::HepMatrix& e, const bool is_fix_mass) const;
       /** Rebuild an error matrix from a pair of Lorentz vectors and an error matrix.
        * @param p1 first Lorentz vector
        * @param p2 second Lorentz vector
@@ -177,13 +175,13 @@ namespace Belle2 {
        * @param is_fix_mass true to recalculate energy term from other parameters, false to do nothing
        * @return (7x7) error matrix
        */
-      const HepMatrix    makeError3(const HepLorentzVector& p1, const HepLorentzVector& p2, const HepMatrix& e, const bool is_fix_mass1, const bool is_fix_mass2) const;
+      const CLHEP::HepMatrix    makeError3(const CLHEP::HepLorentzVector& p1, const CLHEP::HepLorentzVector& p2, const CLHEP::HepMatrix& e, const bool is_fix_mass1, const bool is_fix_mass2) const;
       /** Rebuild an error matrix from a Lorentz vector and an error matrix.
        * @param p Lorentz vector
        * @param e (3x7) error matrix
        * @return (7x7) error matrix
        */
-      const HepMatrix    makeError4(const HepLorentzVector& p, const HepMatrix& e) const;
+      const CLHEP::HepMatrix    makeError4(const CLHEP::HepLorentzVector& p, const CLHEP::HepMatrix& e) const;
 
 
       /** Build grand matrices for minimum search from input-track properties.
@@ -233,7 +231,7 @@ namespace Belle2 {
        * @param p Lorentz vector
        * @return true for non-zero energy, false for otherwise
        */
-      bool isNonZeroEnergy(const HepLorentzVector& p) const;
+      bool isNonZeroEnergy(const CLHEP::HepLorentzVector& p) const;
 
 
       /** Error code. */
@@ -243,49 +241,49 @@ namespace Belle2 {
 
 
       /** Container of input tracks. */
-      vector<KFitTrack> m_Tracks;
+      std::vector<KFitTrack> m_Tracks;
       /** Container of input correlation matrices. */
-      vector<HepMatrix> m_BeforeCorrelation;
+      std::vector<CLHEP::HepMatrix> m_BeforeCorrelation;
 
 
       /** See J.Tanaka Ph.D (2001) p137 for definition. */
-      HepSymMatrix m_V_al_0;
+      CLHEP::HepSymMatrix m_V_al_0;
       /** See J.Tanaka Ph.D (2001) p136 for definition. */
-      HepMatrix    m_al_0;
+      CLHEP::HepMatrix    m_al_0;
       /** See J.Tanaka Ph.D (2001) p136 for definition. */
-      HepMatrix    m_al_1;
+      CLHEP::HepMatrix    m_al_1;
       /** See J.Tanaka Ph.D (2001) p137 for definition. */
-      HepMatrix    m_al_a;
+      CLHEP::HepMatrix    m_al_a;
       /** Container of charges and masses. */
-      HepMatrix    m_property;
+      CLHEP::HepMatrix    m_property;
 
       /** See J.Tanaka Ph.D (2001) p137 for definition. */
-      HepMatrix    m_D;
+      CLHEP::HepMatrix    m_D;
       /** See J.Tanaka Ph.D (2001) p137 for definition. */
-      HepMatrix    m_d;
+      CLHEP::HepMatrix    m_d;
 
       /** See J.Tanaka Ph.D (2001) p138 for definition. */
-      HepMatrix    m_V_D;
+      CLHEP::HepMatrix    m_V_D;
 
       /** See J.Tanaka Ph.D (2001) p138 for definition. */
-      HepMatrix    m_V_al_1;
+      CLHEP::HepMatrix    m_V_al_1;
       /** See J.Tanaka Ph.D (2001) p137 for definition. */
-      HepMatrix    m_lam;
+      CLHEP::HepMatrix    m_lam;
 
       /** See J.Tanaka Ph.D (2001) p137 for definition. */
-      HepMatrix    m_E;
+      CLHEP::HepMatrix    m_E;
       /** See J.Tanaka Ph.D (2001) p138 for definition. */
-      HepMatrix    m_V_E;
+      CLHEP::HepMatrix    m_V_E;
       /** See J.Tanaka Ph.D (2001) p138 for definition. */
-      HepMatrix    m_lam0;
+      CLHEP::HepMatrix    m_lam0;
       /** See J.Tanaka Ph.D (2001) p137 for definition. */
-      HepMatrix    m_v;
+      CLHEP::HepMatrix    m_v;
       /** See J.Tanaka Ph.D (2001) p137 for definition. */
-      HepMatrix    m_v_a;
+      CLHEP::HepMatrix    m_v_a;
       /** See J.Tanaka Ph.D (2001) p138 for definition. */
-      HepMatrix    m_V_Dt;
+      CLHEP::HepMatrix    m_V_Dt;
       /** See J.Tanaka Ph.D (2001) p137 for definition. */
-      HepMatrix    m_Cov_v_al_1;
+      CLHEP::HepMatrix    m_Cov_v_al_1;
 
 
       /** NDF of the fit. */
@@ -307,7 +305,6 @@ namespace Belle2 {
       /** Magnetic field. */
       double   m_MagneticField;
     };
-
 
   } // namespace analysis
 

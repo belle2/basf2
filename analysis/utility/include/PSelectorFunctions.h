@@ -488,25 +488,9 @@ namespace Belle2 {
      * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
      *
      * @param part const pointer to Particle
-     * @return number of remaining ECL showers as given by the related RestOfEvent object
+     * @return number of remaining ECL clusters as given by the related RestOfEvent object
      */
-    double nROEShowers(const Particle* particle);
-
-    /**
-     * function for PSelector
-     * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
-     *
-     * @param part const pointer to Particle
-     * @return number of remaining ECL gammas as given by the related RestOfEvent object
-     */
-    double nROEGammas(const Particle* particle);
-
-    /**
-     * function for PSelector
-     * @param part const pointer to Particle
-     * @return number of remaining pi0s as given by the related RestOfEvent object
-     */
-    double nROEPi0s(const Particle* particle);
+    double nROEClusters(const Particle* particle);
 
     /**
      * function for PSelector
@@ -553,9 +537,9 @@ namespace Belle2 {
      * function for PSelector
      *
      * @param part const pointer to Particle
-     * @return 1/2/3 if the ECL Shower is detected in the forward/barrel/backward region
+     * @return 1/2/3 if the ECL Cluster is detected in the forward/barrel/backward region
      */
-    double eclShowerDetectionRegion(const Particle* particle);
+    double eclClusterDetectionRegion(const Particle* particle);
 
     /**
      * function for PSelector
@@ -563,23 +547,23 @@ namespace Belle2 {
      * @param part const pointer to Particle
      * @return ratio of energies in inner 3x3 and 5x5 cells
      */
-    double eclShowerE9E25(const Particle* particle);
+    double eclClusterE9E25(const Particle* particle);
 
     /**
      * function for PSelector
      *
      * @param part const pointer to Particle
-     * @return number of hits associated to this shower
+     * @return number of hits associated to this cluster
      */
-    double eclShowerNHits(const Particle* particle);
+    double eclClusterNHits(const Particle* particle);
 
     /**
      * function for PSelector
      *
      * @param part const pointer to Particle
-     * @return 1/0 if charged track is/is not Matched to this shower
+     * @return 1/0 if charged track is/is not Matched to this cluster
      */
-    double eclShowerTrackMatched(const Particle* particle);
+    double eclClusterTrackMatched(const Particle* particle);
 
     /**
      * function for PSelector

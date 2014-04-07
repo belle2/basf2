@@ -2,6 +2,7 @@
 #include <analysis/NtupleTools/NtupleToolList.h>
 #include <analysis/NtupleTools/NtupleKinematicsTool.h>
 #include <analysis/NtupleTools/NtupleCMSKinematicsTool.h>
+#include <analysis/NtupleTools/NtupleMassBeforeFitTool.h>
 #include <analysis/NtupleTools/NtupleEventMetaDataTool.h>
 #include <analysis/NtupleTools/NtupleDeltaEMbcTool.h>
 #include <analysis/NtupleTools/NtupleMCTruthTool.h>
@@ -9,7 +10,7 @@
 #include <analysis/NtupleTools/NtupleMCKinematicsTool.h>
 #include <analysis/NtupleTools/NtuplePIDTool.h>
 #include <analysis/NtupleTools/NtupleTrackTool.h>
-#include <analysis/NtupleTools/NtupleShowerTool.h>
+#include <analysis/NtupleTools/NtupleClusterTool.h>
 #include <analysis/NtupleTools/NtupleECLPi0Tool.h>
 #include <analysis/NtupleTools/NtupleRecoStatsTool.h>
 #include <analysis/NtupleTools/NtupleDetectorStatsRecTool.h>
@@ -55,6 +56,7 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
 
   if (strToolName.compare("Kinematics") == 0) return new NtupleKinematicsTool(tree, d);
   else if (strToolName.compare("CMSKinematics") == 0) return new NtupleCMSKinematicsTool(tree, d);
+  else if (strToolName.compare("MassBeforeFit") == 0) return new NtupleMassBeforeFitTool(tree, d);
   else if (strToolName.compare("EventMetaData") == 0) return new NtupleEventMetaDataTool(tree, d);
   else if (strToolName.compare("DeltaEMbc") == 0) return new NtupleDeltaEMbcTool(tree, d);
   else if (strToolName.compare("MCTruth") == 0) return new NtupleMCTruthTool(tree, d);
@@ -66,7 +68,7 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName.compare("DetectorStatsSim") == 0) return new NtupleDetectorStatsSimTool(tree, d);
   else if (strToolName.compare("MCReconstructible") == 0) return new NtupleMCReconstructibleTool(tree, d);
   else if (strToolName.compare("Track") == 0) return new NtupleTrackTool(tree, d);
-  else if (strToolName.compare("Shower") == 0) return new NtupleShowerTool(tree, d);
+  else if (strToolName.compare("Cluster") == 0) return new NtupleClusterTool(tree, d);
   else if (strToolName.compare("ECLPi0") == 0) return new NtupleECLPi0Tool(tree, d);
   else if (strToolName.compare("Vertex") == 0) return new NtupleVertexTool(tree, d);
   else if (strToolName.compare("MCVertex") == 0) return new NtupleMCVertexTool(tree, d);

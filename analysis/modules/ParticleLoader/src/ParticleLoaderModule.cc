@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Anze Zupanc                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -23,16 +23,13 @@
 #include <framework/logging/Logger.h>
 
 // dataobjects
+#include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
-#include <ecl/dataobjects/ECLGamma.h>
-#include <ecl/dataobjects/ECLPi0.h>
-#include <ecl/dataobjects/ECLShower.h>
+
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
-
-#include <utility>
 
 using namespace std;
 
@@ -130,9 +127,7 @@ namespace Belle2 {
   void ParticleLoaderModule::loadFromReconstruction()
   {
     StoreArray<Track> Tracks;
-    StoreArray<ECLGamma> Gammas;
-    StoreArray<ECLPi0> Pi0s;
-    StoreArray<ECLShower> ECLShowers;
+    StoreArray<ECLCluster> Clusters;
     StoreArray<Particle> Particles;
 
     const Const::ChargedStable charged[] = {Const::electron,
@@ -143,7 +138,6 @@ namespace Belle2 {
                                            };
 
     // load reconstructed tracks as e, mu, pi, K, p
-
     for (int i = 0; i < Tracks.getEntries(); i++) {
       const Track* track = Tracks[i];
       const PIDLikelihood* pid = track->getRelated<PIDLikelihood>();
@@ -152,61 +146,34 @@ namespace Belle2 {
         Particle particle(track, charged[k]);
         if (particle.getParticleType() == Particle::c_Track) { // should always hold but...
           Particle* newPart = Particles.appendNew(particle);
-          newPart->addRelationTo(pid);
-          newPart->addRelationTo(mcParticle);
+          if (pid)
+            newPart->addRelationTo(pid);
+          if (mcParticle)
+            newPart->addRelationTo(mcParticle);
         }
       }
     }
 
-    // load reconstructed gamma's
+    // load reconstructed neutral ECL cluster's as photons
+    for (int i = 0; i < Clusters.getEntries(); i++) {
+      const ECLCluster* cluster      = Clusters[i];
 
-    vector< pair<int, int> > gammaShowerId; // needed to set pi0 daughters
+      if (!cluster->isNeutral())
+        continue;
 
-    for (int i = 0; i < Gammas.getEntries(); i++) {
-      const ECLGamma* gamma = Gammas[i];
-      const ECLShower* eclshower   = gamma->getRelated<ECLShower>();
-      const MCParticle* mcParticle = eclshower->getRelated<MCParticle>();
-      Particle particle(gamma);
-      if (particle.getParticleType() == Particle::c_ECLShower) { // should always hold but...
+      const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
+
+      Particle particle(cluster);
+
+      if (particle.getParticleType() == Particle::c_ECLCluster) { // should always hold but...
         Particle* newPart = Particles.appendNew(particle);
-        if (mcParticle) {
+
+        if (mcParticle)
           newPart->addRelationTo(mcParticle);
-        }
-        int lastIndex = Particles.getEntries() - 1;
-        int showerId = gamma->getShowerId();
-        gammaShowerId.push_back(make_pair(lastIndex, showerId));
-      }
-    }
-
-    // load reconstructed pi0's
-
-    for (int i = 0; i < Pi0s.getEntries(); i++) {
-      const ECLPi0* pi0 = Pi0s[i];
-      Particle particle(pi0);
-
-      int showerId1 = pi0->getShowerId1();
-      int showerId2 = pi0->getShowerId2();
-      //find corresponding gamma Particles from shower ID
-      for (unsigned k = 0; k < gammaShowerId.size(); k++) {
-        int showerId = gammaShowerId[k].second;
-        if (showerId == showerId1 || showerId == showerId2) {
-          particle.appendDaughter(gammaShowerId[k].first);
-        }
-      }
-      Particle* newPart = Particles.appendNew(particle);
-
-      const MCParticle* gammaMc1 = ECLShowers[showerId1]->getRelated<MCParticle>();
-      const MCParticle* gammaMc2 = ECLShowers[showerId2]->getRelated<MCParticle>();
-      if (gammaMc1 and gammaMc2 and gammaMc1->getMother() == gammaMc2->getMother()) {
-        //both ECLShowers have same mother, save MC info
-        newPart->addRelationTo(gammaMc1->getMother());
       }
     }
 
     B2INFO("ParticleLoader::loadFromReconstruction size=" << Particles.getEntries());
-
   }
-
-
 } // end Belle2 namespace
 

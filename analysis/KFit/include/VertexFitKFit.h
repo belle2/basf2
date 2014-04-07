@@ -19,9 +19,6 @@
 #include <analysis/KFit/KFitError.h>
 #include <analysis/KFit/KFitBase.h>
 
-
-using namespace std;
-using namespace CLHEP;
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY
 typedef HepGeom::Point3D<double> HepPoint3D;
 #endif
@@ -53,7 +50,7 @@ namespace Belle2 {
        * @param ipe error matrix of the IP
        * @return error code (zero if success)
        */
-      enum KFitError::ECode       setIpProfile(const HepPoint3D& ip, const HepSymMatrix& ipe);
+      enum KFitError::ECode       setIpProfile(const HepPoint3D& ip, const CLHEP::HepSymMatrix& ipe);
       /** Set a virtual IP-tube track for the vertex-vertex constraint fit.
        * @param p virtual IP-tube track
        * @return error code (zero if success)
@@ -80,7 +77,7 @@ namespace Belle2 {
       /** Get a fitted vertex error matrix.
        * @return vertex error matrix
        */
-      const HepSymMatrix          getVertexError(void) const;
+      const CLHEP::HepSymMatrix          getVertexError(void) const;
       double                      getCHIsq(void) const;
       /** Get a chi-square of the fit excluding IP-constraint part.
        * @return chi-square of the fit excluding IP-constraint part.
@@ -91,7 +88,7 @@ namespace Belle2 {
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return vertex error matrix
        */
-      const HepMatrix             getTrackVertexError(const int id) const;
+      const CLHEP::HepMatrix             getTrackVertexError(const int id) const;
       double                      getTrackCHIsq(const int id) const;
       /** Get a sum of the chi-square associated to the input tracks.
        *  The return value should be the same as the one from getCHIsqVertex().
@@ -159,14 +156,14 @@ namespace Belle2 {
       /** Vertex position after the fit. */
       HepPoint3D             m_AfterVertex;
       /** Vertex error matrix after the fit. */
-      HepSymMatrix           m_AfterVertexError;
+      CLHEP::HepSymMatrix           m_AfterVertexError;
       /** Array of vertex error matrices after the fit. */
-      vector<HepMatrix> m_AfterTrackVertexError;
+      std::vector<CLHEP::HepMatrix> m_AfterTrackVertexError;
 
       /** Flag if to perform IP-ellipsoid constraint fit. */
       bool         m_FlagBeam;
       /** Error matrix modeling the IP ellipsoid. */
-      HepSymMatrix m_BeamError;
+      CLHEP::HepSymMatrix m_BeamError;
 
       /** Flag controlled by setKnownVertex(). */
       bool m_FlagKnownVertex;

@@ -19,8 +19,6 @@
 #include <utility>
 #include <vector>
 
-using namespace Belle2;
-
 namespace Belle2 {
 
   /** NtupleTool to write a custom set of float variables to a tree. */

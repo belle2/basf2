@@ -10,6 +10,10 @@
 
 #include <analysis/NtupleTools/NtupleKinematicsTool.h>
 #include <TBranch.h>
+
+using namespace Belle2;
+using namespace std;
+
 void NtupleKinematicsTool::setupTree()
 {
   vector<string> strNames = m_decaydescriptor.getSelectionNames();

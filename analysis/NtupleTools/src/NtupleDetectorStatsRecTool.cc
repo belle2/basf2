@@ -33,6 +33,9 @@
 #include <top/dataobjects/TOPLikelihood.h>
 #include <genfit/Track.h>
 
+using namespace Belle2;
+using namespace std;
+
 void NtupleDetectorStatsRecTool::setupTree()
 {
   m_iARICHAeroHits = -1;

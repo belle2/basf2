@@ -12,6 +12,9 @@
 #include <TBranch.h>
 #include <boost/algorithm/string.hpp>
 
+using namespace Belle2;
+using namespace std;
+
 void NtupleCustomFloatsTool::setupTree()
 {
 

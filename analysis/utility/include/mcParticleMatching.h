@@ -11,10 +11,6 @@
 
 #include <vector>
 
-using namespace Belle2;
-using namespace std;
-
-
 /**
  * This is the main function of MC matching algorithm. When executed the algorithm
  * searches for first common generated mother (MCParticle) of this particle's daughters.
@@ -26,7 +22,7 @@ using namespace std;
  *
  * @return returns true if relation is set and false otherwise
  */
-bool setMCTruth(const Particle* particle);
+bool setMCTruth(const Belle2::Particle* particle);
 
 /**
  * Returns the status (quality indicator) of the match. The status is given as a bit pattern,
@@ -48,7 +44,7 @@ bool setMCTruth(const Particle* particle);
  *
  * @return status (bit pattern) of the mc match
  */
-int getMCTruthStatus(const Particle* particle, const MCParticle* mcParticle);
+int getMCTruthStatus(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle);
 
 /**
  * Fills vector with array (1-based) indices of all generator ancestors of given MCParticle.
@@ -56,7 +52,7 @@ int getMCTruthStatus(const Particle* particle, const MCParticle* mcParticle);
  * @param pointer to the MCParticle
  * @param reference to the vector of integers to hold the results
  */
-void fillGenMothers(const MCParticle* mcP, vector<int>& genMCPMothers);
+void fillGenMothers(const Belle2::MCParticle* mcP, std::vector<int>& genMCPMothers);
 
 /**
  * Finds index of a MCParticle that represents the first common mother (ancestor) of all daughter particles.
@@ -67,7 +63,7 @@ void fillGenMothers(const MCParticle* mcP, vector<int>& genMCPMothers);
  *
  * @return index of the first common mother
  */
-int findCommonMother(unsigned nChildren, vector<int> firstMothers, vector<int> otherMothers);
+int findCommonMother(unsigned nChildren, std::vector<int> firstMothers, std::vector<int> otherMothers);
 
 /**
  * Appends final state particle (FSP) to the vector of Particles.
@@ -75,7 +71,7 @@ int findCommonMother(unsigned nChildren, vector<int> firstMothers, vector<int> o
  * @param pointer to the particle
  * @param vector of FSPs that are used to reconstruct specified particle
  */
-void appendFSP(const Particle* p,     vector<const Particle*>&   children);
+void appendFSP(const Belle2::Particle* p,     std::vector<const Belle2::Particle*>&   children);
 
 /**
  * Appends final state particle (FSP) to the vector of MCParticles.
@@ -83,14 +79,14 @@ void appendFSP(const Particle* p,     vector<const Particle*>&   children);
  * @param pointer to the MCParticle
  * @param vector of FSPs that can be found in the generated decay chain of specified MCParticle
  */
-void appendFSP(const MCParticle* gen, vector<const MCParticle*>& children);
+void appendFSP(const Belle2::MCParticle* gen, std::vector<const Belle2::MCParticle*>& children);
 
 /**
  * Returns true if given MCParticle is FSP or not.
  *
  * @return true if MCParticle is FSP and false otherwise
  */
-int isFSP(const MCParticle* P);
+int isFSP(const Belle2::MCParticle* P);
 
 /**
  * Finds final stat particles given in vector of generated particles that
@@ -102,7 +98,8 @@ int isFSP(const MCParticle* P);
  * @param vector of generated final state particles
  * @param vector of indices of the missing generated final state particles (holds results of this algorithm)
  */
-void findMissingGeneratedParticles(vector<const Particle*> reconstructed, vector<const MCParticle*> generated, std::vector<int>& missP);
+void findMissingGeneratedParticles(std::vector<const Belle2::Particle*> reconstructed,
+                                   std::vector<const Belle2::MCParticle*> generated, std::vector<int>& missP);
 
 /**
  * Determines whether (true) or not (false) the reconstructed particle misses generated Final State Radiation (FSR) photon.
@@ -112,7 +109,7 @@ void findMissingGeneratedParticles(vector<const Particle*> reconstructed, vector
  *
  * @return whether (true) or not (false) the reconstructed particle misses generated Final State Radiation (FSR) photon
  */
-bool missingFSRPhoton(vector<const MCParticle*> generated, std::vector<int> missP);
+bool missingFSRPhoton(std::vector<const Belle2::MCParticle*> generated, std::vector<int> missP);
 
 /**
  * Determines whether (true) or not (false) the reconstructed particle misses generated radiative photon.
@@ -122,7 +119,7 @@ bool missingFSRPhoton(vector<const MCParticle*> generated, std::vector<int> miss
  *
  * @return whether (true) or not (false) the reconstructed particle misses radiative photon
  */
-bool missingRadiativePhoton(vector<const MCParticle*> generated, std::vector<int> missP);
+bool missingRadiativePhoton(std::vector<const Belle2::MCParticle*> generated, std::vector<int> missP);
 
 /**
  * Determines whether (true) or not (false) the reconstructed particle misses generated neutrino.
@@ -132,7 +129,7 @@ bool missingRadiativePhoton(vector<const MCParticle*> generated, std::vector<int
  *
  * @return whether (true) or not (false) the reconstructed particle misses neutrino
  */
-bool missingNeutrino(vector<const MCParticle*> generated, std::vector<int> missP);
+bool missingNeutrino(std::vector<const Belle2::MCParticle*> generated, std::vector<int> missP);
 
 /**
  * Determines whether (true) or not (false) the reconstructed particle misses massive particle.
@@ -142,7 +139,7 @@ bool missingNeutrino(vector<const MCParticle*> generated, std::vector<int> missP
  *
  * @return whether (true) or not (false) the reconstructed particle misses massive particle
  */
-bool missingMassiveParticle(vector<const MCParticle*> generated, std::vector<int> missP);
+bool missingMassiveParticle(std::vector<const Belle2::MCParticle*> generated, std::vector<int> missP);
 
 /**
  * Determines whether (true) or not (false) the reconstructed particle misses Klong.
@@ -152,7 +149,7 @@ bool missingMassiveParticle(vector<const MCParticle*> generated, std::vector<int
  *
  * @return whether (true) or not (false) the reconstructed particle misses Klong
  */
-bool missingKlong(vector<const MCParticle*> generated, std::vector<int> missP);
+bool missingKlong(std::vector<const Belle2::MCParticle*> generated, std::vector<int> missP);
 
 /**
  * Determines whether (true) or not (false) any of the final state particles is mis-identified.
@@ -162,6 +159,6 @@ bool missingKlong(vector<const MCParticle*> generated, std::vector<int> missP);
  *
  * @return whether (true) or not (false) any of the final state particles is mis-identified
  */
-bool isMisidentified(vector<const Particle*> reconstructed, vector<const MCParticle*> generated);
+bool isMisidentified(std::vector<const Belle2::Particle*> reconstructed, std::vector<const Belle2::MCParticle*> generated);
 
 #endif // MCPARTICLEMATCHING

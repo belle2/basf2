@@ -12,10 +12,8 @@
 
 #include <framework/datastore/StoreArray.h>
 
-#include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLGamma.h>
-#include <ecl/dataobjects/ECLPi0.h>
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/ECLCluster.h>
 
 #include <framework/logging/Logger.h>
 #include <iostream>
@@ -27,39 +25,19 @@ void RestOfEvent::addTrack(const Track* track)
   m_trackIndices.insert(track->getArrayIndex());
 }
 
-void RestOfEvent::addECLShower(const ECLShower* shower)
-{
-  m_eclShowerIndices.insert(shower->getArrayIndex());
-}
-
-void RestOfEvent::addECLPi0(const ECLPi0* pi0)
-{
-  m_eclPi0Indices.insert(pi0->getArrayIndex());
-}
-
-void RestOfEvent::addECLGamma(const ECLGamma* gamma)
-{
-  m_eclGammaIndices.insert(gamma->getArrayIndex());
-}
-
 void RestOfEvent::addTracks(const std::vector<int>& indices)
 {
   addIndices(indices, m_trackIndices);
 }
 
-void RestOfEvent::addECLShowers(const std::vector<int>& indices)
+void RestOfEvent::addECLCluster(const ECLCluster* shower)
 {
-  addIndices(indices, m_eclShowerIndices);
+  m_eclClusterIndices.insert(shower->getArrayIndex());
 }
 
-void RestOfEvent::addECLGammas(const std::vector<int>& indices)
+void RestOfEvent::addECLClusters(const std::vector<int>& indices)
 {
-  addIndices(indices, m_eclGammaIndices);
-}
-
-void RestOfEvent::addECLPi0s(const std::vector<int>& indices)
-{
-  addIndices(indices, m_eclPi0Indices);
+  addIndices(indices, m_eclClusterIndices);
 }
 
 const std::vector<Belle2::Track*> RestOfEvent::getTracks() const
@@ -79,67 +57,29 @@ const std::vector<Belle2::Track*> RestOfEvent::getTracks() const
   return remainTracks;
 }
 
-const std::vector<Belle2::ECLShower*> RestOfEvent::getECLShowers() const
+const std::vector<Belle2::ECLCluster*> RestOfEvent::getECLClusters() const
 {
-  std::vector<ECLShower*> remainECLShowers(getNECLShowers());
-  StoreArray<ECLShower> allECLShowers;
+  std::vector<ECLCluster*> remainECLClusters(getNECLClusters());
+  StoreArray<ECLCluster> allECLClusters;
 
-  if (allECLShowers.getEntries() < getNECLShowers())
-    B2ERROR("[RestOfEvent::getAllECLShowers] Number of remaining ECL showers in the RestOfEvent > number of all tracks in StoreArray<ECLShower>!");
+  if (allECLClusters.getEntries() < getNECLClusters())
+    B2ERROR("[RestOfEvent::getAllECLClusters] Number of remaining ECL showers in the RestOfEvent > number of all tracks in StoreArray<ECLCluster>!");
 
   int i = 0;
-  for (const int index : m_eclShowerIndices) {
-    remainECLShowers[i] = allECLShowers[index];
+  for (const int index : m_eclClusterIndices) {
+    remainECLClusters[i] = allECLClusters[index];
     i++;
   }
 
-  return remainECLShowers;
-}
-
-const std::vector<Belle2::ECLGamma*> RestOfEvent::getECLGammas() const
-{
-  std::vector<ECLGamma*> remainECLGammas(getNECLGammas());
-  StoreArray<ECLGamma> allECLGammas;
-
-  if (allECLGammas.getEntries() < getNECLGammas())
-    B2ERROR("[RestOfEvent::getAllECLGammas] Number of remaining ECL gammas in the RestOfEvent > number of all tracks in StoreArray<ECLGamma>!");
-
-  int i = 0;
-  for (const int index : m_eclGammaIndices) {
-    remainECLGammas[i] = allECLGammas[index];
-    i++;
-  }
-
-  return remainECLGammas;
-}
-
-const std::vector<Belle2::ECLPi0*> RestOfEvent::getECLPi0s() const
-{
-  std::vector<ECLPi0*> remainECLPi0s(getNECLPi0s());
-  StoreArray<ECLPi0> allECLPi0s;
-
-  if (allECLPi0s.getEntries() < getNECLPi0s())
-    B2ERROR("[RestOfEvent::getAllECLPi0s] Number of remaining ECL gammas in the RestOfEvent > number of all tracks in StoreArray<ECLPi0>!");
-
-  int i = 0;
-  for (const int index : m_eclPi0Indices) {
-    remainECLPi0s[i] = allECLPi0s[index];
-    i++;
-  }
-
-  return remainECLPi0s;
+  return remainECLClusters;
 }
 
 void RestOfEvent::print() const
 {
   B2INFO(" - Tracks[" << m_trackIndices.size() << "] : ");
   printIndices(m_trackIndices);
-  B2INFO(" - ECLShower[" << m_eclShowerIndices.size() << "] : ");
-  printIndices(m_eclShowerIndices);
-  B2INFO(" - ECLGamma[" << m_eclGammaIndices.size() << "] : ");
-  printIndices(m_eclGammaIndices);
-  B2INFO(" - ECLPi0[" << m_eclPi0Indices.size() << "] : ");
-  printIndices(m_eclPi0Indices);
+  B2INFO(" - ECLCluster[" << m_eclClusterIndices.size() << "] : ");
+  printIndices(m_eclClusterIndices);
 }
 
 void RestOfEvent::printIndices(std::set<int> indices) const

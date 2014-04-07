@@ -13,9 +13,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 
 #include <mdst/dataobjects/Track.h>
-#include <ecl/dataobjects/ECLGamma.h>
-#include <ecl/dataobjects/ECLPi0.h>
-#include <ecl/dataobjects/ECLShower.h>
+#include <mdst/dataobjects/ECLCluster.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -47,10 +45,7 @@ RestOfEventBuilderModule::RestOfEventBuilderModule() : Module()
 
   //std::vector<std::string> defaultSelection;
   //addParam("trackSelection",     m_trackSelection,     "Remaining track(s) selection criteria",      defaultSelection);
-  //addParam("eclShowerSelection", m_eclShowerSelection, "Remaining ECL shower(s) selection criteria", defaultSelection);
-  //addParam("eclGammaSelection",  m_eclGammaSelection,  "Remaining ECL gamma(s) selection criteria",  defaultSelection);
-  //addParam("eclPi0Selection",    m_eclPi0Selection,    "Remaining ECL pi0(s) selection criteria",    defaultSelection);
-
+  //addParam("eclClusterSelection", m_eclClusterSelection, "Remaining ECL shower(s) selection criteria", defaultSelection);
 }
 
 void RestOfEventBuilderModule::initialize()
@@ -86,7 +81,7 @@ void RestOfEventBuilderModule::event()
 
     // fill RestOfEvent with content
     addRemainingTracks(particle, roe);
-    addRemainingECLObjects(particle, roe);
+    addRemainingECLClusters(particle, roe);
   }
 }
 
@@ -113,126 +108,77 @@ void RestOfEventBuilderModule::addRemainingTracks(const Particle* particle, Rest
   }
 }
 
-void RestOfEventBuilderModule::addRemainingECLObjects(const Particle* particle, RestOfEvent* roe)
+void RestOfEventBuilderModule::addRemainingECLClusters(const Particle* particle, RestOfEvent* roe)
 {
-  StoreArray<ECLGamma>  eclGammas;
-  StoreArray<ECLPi0>    eclPi0s;
-  StoreArray<ECLShower> eclShowers;
-  StoreArray<Track>     tracks;
+  StoreArray<ECLCluster> eclClusters;
+  StoreArray<Track>      tracks;
 
   // vector of all final state particle daughters created from energy cluster or charged track
-  std::vector<int> eclFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_ECLShower);
+  std::vector<int> eclFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_ECLCluster);
   std::vector<int> trackFSPs = particle->getMdstArrayIndices(Particle::EParticleType::c_Track);
 
-  // Add remaining ECLGammas
-  for (int i = 0; i < eclGammas.getEntries(); i++) {
-    const ECLGamma* gamma = eclGammas[i];
+  // Add remaining ECLClusters
+  for (int i = 0; i < eclClusters.getEntries(); i++) {
+    const ECLCluster* shower = eclClusters[i];
 
-    bool remainingGamma = true;
+    bool remainingCluster = true;
     for (unsigned j = 0; j < eclFSPs.size(); j++) {
-      if (gamma->getShowerId() == eclFSPs[j]) {
-        remainingGamma = false;
+      if (shower->getArrayIndex() == eclFSPs[j]) {
+        remainingCluster = false;
         break;
       }
     }
 
-    if (remainingGamma)
-      roe->addECLGamma(gamma);
-  }
-
-  // Add remaining ECLPi0s
-  for (int i = 0; i < eclPi0s.getEntries(); i++) {
-    const ECLPi0* pi0 = eclPi0s[i];
-
-    bool remainingPi0 = true;
-    for (unsigned j = 0; j < eclFSPs.size(); j++) {
-      if (pi0->getShowerId1() == eclFSPs[j]
-          || pi0->getShowerId2() == eclFSPs[j]) {
-        remainingPi0 = false;
-        break;
-      }
-    }
-
-    if (remainingPi0)
-      roe->addECLPi0(pi0);
-  }
-
-  // Add remaining ECLShowers
-  for (int i = 0; i < eclShowers.getEntries(); i++) {
-    const ECLShower* shower = eclShowers[i];
-
-    bool remainingShower = true;
-    for (unsigned j = 0; j < eclFSPs.size(); j++) {
-      if (shower->getShowerId() == eclFSPs[j]) {
-        remainingShower = false;
-        break;
-      }
-    }
-
-    if (!remainingShower)
+    if (!remainingCluster)
       continue;
 
-    // check if the ECLShower is matched to any track used in reconstruction
+    // check if the ECLCluster is matched to any track used in reconstruction
     for (unsigned j = 0; j < trackFSPs.size(); j++) {
       const Track* track = tracks[trackFSPs[j]];
-      const ECLShower* trackShower = DataStore::getRelated<ECLShower>(track);
+      const ECLCluster* trackCluster = DataStore::getRelated<ECLCluster>(track);
 
-      if (!trackShower)
+      if (!trackCluster)
         continue;
 
-      if (shower->getShowerId() == trackShower->getShowerId()) {
-        remainingShower = false;
+      if (shower->getArrayIndex() == trackCluster->getArrayIndex()) {
+        remainingCluster = false;
         break;
       }
     }
 
-    if (remainingShower)
-      roe->addECLShower(shower);
+    if (remainingCluster)
+      roe->addECLCluster(shower);
   }
 }
 
 void RestOfEventBuilderModule::printEvent()
 {
-  StoreArray<ECLGamma>  eclGammas;
-  StoreArray<ECLPi0>    eclPi0s;
-  StoreArray<ECLShower> eclShowers;
-  StoreArray<Track>     tracks;
+  StoreArray<ECLCluster> eclClusters;
+  StoreArray<Track>      tracks;
 
   B2INFO("[RestOfEventBuilderModule] *** Print Event ***");
   B2INFO("[RestOfEventBuilderModule] Tracks: " << tracks.getEntries());
   for (int i = 0; i < tracks.getEntries(); i++) {
     const Track* track = tracks[i];
-    const ECLShower* trackShower = DataStore::getRelated<ECLShower>(track);
-    if (trackShower) {
-      B2INFO("[RestOfEventBuilderModule]  -> track " << track->getArrayIndex() << " -> ECLShower " << trackShower->getArrayIndex());
+    const ECLCluster* trackCluster = DataStore::getRelated<ECLCluster>(track);
+    if (trackCluster) {
+      B2INFO("[RestOfEventBuilderModule]  -> track " << track->getArrayIndex() << " -> ECLCluster " << trackCluster->getArrayIndex());
     } else {
-      B2INFO("[RestOfEventBuilderModule]  -> track " << track->getArrayIndex() << " -> ECLShower (NO RELATION)");
+      B2INFO("[RestOfEventBuilderModule]  -> track " << track->getArrayIndex() << " -> ECLCluster (NO RELATION)");
     }
   }
 
-  B2INFO("[RestOfEventBuilderModule] ECLPi0: " << eclPi0s.getEntries());
-  for (int i = 0; i < eclPi0s.getEntries(); i++) {
-    const ECLPi0* eclPi0 = eclPi0s[i];
+  B2INFO("[RestOfEventBuilderModule] ECLCluster: " << eclClusters.getEntries());
+  for (int i = 0; i < eclClusters.getEntries(); i++) {
+    const ECLCluster* eclCluster = eclClusters[i];
 
-    B2INFO("[RestOfEventBuilderModule]  -> pi0 " << eclPi0->getArrayIndex()
-           << " -> ECLShower1 " << eclPi0->getShowerId1()
-           << " + ECLShower2 " << eclPi0->getShowerId2());
+    B2INFO("[RestOfEventBuilderModule]  -> cluster " << eclCluster->getArrayIndex());
   }
-
-  B2INFO("[RestOfEventBuilderModule] ECLGamma: " << eclGammas.getEntries());
-  for (int i = 0; i < eclGammas.getEntries(); i++) {
-    const ECLGamma* eclGamma = eclGammas[i];
-
-    B2INFO("[RestOfEventBuilderModule]  -> gamma " << eclGamma->getArrayIndex()
-           << " -> ECLShower " << eclGamma->getShowerId());
-  }
-
-  B2INFO("[RestOfEventBuilderModule] ECLShower: " << eclShowers.getEntries());
 }
 
 void RestOfEventBuilderModule::printParticle(const Particle* particle)
 {
-  std::vector<int> eclFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_ECLShower);
+  std::vector<int> eclFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_ECLCluster);
   std::vector<int> trackFSPs = particle->getMdstArrayIndices(Particle::EParticleType::c_Track);
 
   B2INFO("[RestOfEventBuilderModule] tracks  : ");

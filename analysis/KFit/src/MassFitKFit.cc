@@ -17,7 +17,7 @@
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::analysis;
-
+using namespace CLHEP;
 
 MassFitKFit::MassFitKFit(void)
 {

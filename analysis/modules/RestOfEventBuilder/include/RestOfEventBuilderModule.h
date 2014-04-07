@@ -65,13 +65,13 @@ namespace Belle2 {
     void addRemainingTracks(const Particle* particle, RestOfEvent* roe);
 
     /**
-     * Adds all ECL objects (ECLShower, ECLGamma and ECLPi0) from StoreArray<ECLXYZ> that are not used in reconstruction of given particle.
+     * Adds all ECL clusters from StoreArray<ECLCluster> that are not used in reconstruction of given particle.
      *
      * @param reconstructed particle for which RestOfEvent is determined
-     * @param pointer to the RestOfEvent to be filled with remaining ECL objects
+     * @param pointer to the RestOfEvent to be filled with remaining ECL clusters
      * @param selection criteria for the remaining ECL objects
      */
-    void addRemainingECLObjects(const Particle* particle, RestOfEvent* roe);
+    void addRemainingECLClusters(const Particle* particle, RestOfEvent* roe);
 
     /**
      * for debugging purposes

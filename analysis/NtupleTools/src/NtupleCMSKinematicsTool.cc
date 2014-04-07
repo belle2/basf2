@@ -13,6 +13,7 @@
 #include <TBranch.h>
 
 using namespace Belle2;
+using namespace std;
 
 void NtupleCMSKinematicsTool::setupTree()
 {

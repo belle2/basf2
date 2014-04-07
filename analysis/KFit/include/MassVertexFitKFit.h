@@ -20,8 +20,6 @@
 #include <analysis/KFit/KFitBase.h>
 
 
-using namespace std;
-using namespace CLHEP;
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY
 typedef HepGeom::Point3D<double> HepPoint3D;
 #endif
@@ -63,7 +61,7 @@ namespace Belle2 {
        * @return error code (zero if success)
        */
       enum KFitError::ECode       unfixMass(void);
-      enum KFitError::ECode       setCorrelation(const HepMatrix& m);
+      enum KFitError::ECode       setCorrelation(const CLHEP::HepMatrix& m);
       enum KFitError::ECode       setZeroCorrelation(void);
 
 
@@ -75,7 +73,7 @@ namespace Belle2 {
       /** Get a fitted vertex error matrix.
        * @return vertex error matrix
        */
-      const HepSymMatrix          getVertexError(void) const;
+      const CLHEP::HepSymMatrix          getVertexError(void) const;
       /** Get an invariant mass.
        * @return invariant mass
        */
@@ -86,9 +84,9 @@ namespace Belle2 {
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return vertex error matrix
        */
-      const HepMatrix             getTrackVertexError(const int id) const;
+      const CLHEP::HepMatrix             getTrackVertexError(const int id) const;
       double                      getTrackCHIsq(const int id) const;
-      const HepMatrix             getCorrelation(const int id1, const int id2, const int flag = KFitConst::kAfterFit) const;
+      const CLHEP::HepMatrix             getCorrelation(const int id1, const int id2, const int flag = KFitConst::kAfterFit) const;
 
 
     public:
@@ -114,14 +112,14 @@ namespace Belle2 {
       /** Vertex position after the fit. */
       HepPoint3D             m_AfterVertex;
       /** Vertex error matrix after the fit. */
-      HepSymMatrix           m_AfterVertexError;
+      CLHEP::HepSymMatrix           m_AfterVertexError;
       /** array of vertex error matrices after the fit. */
-      vector<HepMatrix> m_AfterTrackVertexError;
+      std::vector<CLHEP::HepMatrix> m_AfterTrackVertexError;
 
       /** Invariant mass. */
       double m_InvariantMass;
       /** Array of flags whether the track property is fixed at the mass. */
-      vector<int> m_IsFixMass;
+      std::vector<int> m_IsFixMass;
     };
 
   } // namespace analysis

@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric . Luigi Li Gioi                             *
+ * Contributors: Marko Staric, Luigi Li Gioi, Anze Zupanc                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -100,19 +100,103 @@ namespace Belle2 {
     bool doVertexFit(Particle* p);
 
     /**
-     * Unconstrained fit using Kfitter
+     * Unconstrained vertex fit using Kfitter
      * @param p pointer to particle
      * @return true for successfull fit
      */
-    bool doKvFit(Particle* p);
+    bool doKVertexFit(Particle* p, bool ipProfileConstraint, bool ipTubeConstraint);
 
     /**
-     * Make mother using Kfitter
-     * @param kv reference to Kfitter object
+     * Mass-constrained vertex fit using Kfitter
+     * @param p pointer to particle
+     * @return true for successfull fit
+     */
+    bool doKMassVertexFit(Particle* p);
+
+    /**
+     * Mass fit using Kfitter
+     * @param p pointer to particle
+     * @return true for successfull fit
+     */
+    bool doKMassFit(Particle* p);
+
+    /**
+     * Update mother particle after unconstrained vertex fit using Kfitter
+     * @param kv reference to Kfitter VertexFit object
      * @param p pointer to particle
      * @return true for successfull construction of mother
      */
-    bool makeKvMother(analysis::VertexFitKFit& kv, Particle* p);
+    bool makeKVertexMother(analysis::VertexFitKFit& kv, Particle* p);
+
+
+    /**
+     * Update mother particle after mass-constrained vertex fit using Kfitter
+     * @param kv reference to Kfitter MassVertexFit object
+     * @param p pointer to particle
+     * @return true for successfull construction of mother
+     */
+    bool makeKMassVertexMother(analysis::MassVertexFitKFit& kv, Particle* p);
+
+
+    /**
+     * Update mother particle after mass fit using Kfitter
+     * @param kv reference to Kfitter MassFit object
+     * @param p pointer to particle
+     * @return true for successfull construction of mother
+     */
+    bool makeKMassMother(analysis::MassFitKFit& kv, Particle* p);
+
+    /**
+     * Adds given particle to the VertexFitKFit.
+     * @param kv reference to Kfitter VertexFit object
+     * @param particle pointer to particle
+     */
+    void addParticleToKfitter(analysis::VertexFitKFit& kv, const Particle* particle);
+
+    /**
+     * Adds given particle to the MassVertexFitKFit.
+     * @param kv reference to Kfitter MassVertexFit object
+     * @param particle pointer to particle
+     */
+    void addParticleToKfitter(analysis::MassVertexFitKFit& kv, const Particle* particle);
+
+    /**
+     * Adds given particle to the MassFitKFit.
+     * @param kv reference to Kfitter MassFit object
+     * @param particle pointer to particle
+     */
+    void addParticleToKfitter(analysis::MassFitKFit& kv, const Particle* particle);
+
+    /**
+     * Returns particle's 4-momentum as a HepLorentzVector
+     */
+    CLHEP::HepLorentzVector getCLHEPLorentzVector(const Particle* particle);
+
+    /**
+     * Returns particle's position as a HepPoint3D
+     */
+    HepPoint3D getCLHEPPoint3D(const Particle* particle);
+
+    /**
+     * Returns particle's 7x7 momentum-vertex-error matrix as a HepSymMatrix
+     */
+    CLHEP::HepSymMatrix getCLHEPSymMatrix(const Particle* particle);
+
+    /**
+     * Adds IPProfile constraint to the vertex fit using kfitter.
+     */
+    void addIPProfileToKFitter(analysis::VertexFitKFit& kv);
+
+    /**
+     * Fills valid particle's children (with valid error matrix) in the vector of Particles that will enter the fit.
+     * Pi0 particles are treated separately so they are filled to another vector.
+     */
+    bool fillFitParticles(const Particle* mother, std::vector<const Particle*>& fitChildren, std::vector<const Particle*>& pi0Children);
+
+    /**
+     * Performs mass refit of pi0 assuming that pi0 originates from the point given by VertexFit.
+     */
+    bool redoPi0MassFit(Particle* pi0Temp, const Particle* pi0Orig, const analysis::VertexFitKFit kv) ;
 
     /**
      * Fit using Rave

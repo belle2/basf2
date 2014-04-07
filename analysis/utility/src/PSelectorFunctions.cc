@@ -23,17 +23,18 @@
 
 // dataobjects
 #include <analysis/dataobjects/RestOfEvent.h>
+
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
-
 #include <mdst/dataobjects/Track.h>
-#include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLGamma.h>
+#include <mdst/dataobjects/ECLCluster.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+
+#include <TLorentzVector.h>
 
 #include <iostream>
 #include <math.h>
@@ -564,38 +565,14 @@ namespace Belle2 {
       return result;
     }
 
-    double nROEShowers(const Particle* particle)
+    double nROEClusters(const Particle* particle)
     {
       double result = -1.0;
 
       const RestOfEvent* roe = DataStore::getRelated<RestOfEvent>(particle);
 
       if (roe)
-        result = roe->getNECLShowers();
-
-      return result;
-    }
-
-    double nROEGammas(const Particle* particle)
-    {
-      double result = -1.0;
-
-      const RestOfEvent* roe = DataStore::getRelated<RestOfEvent>(particle);
-
-      if (roe)
-        result = roe->getNECLGammas();
-
-      return result;
-    }
-
-    double nROEPi0s(const Particle* particle)
-    {
-      double result = -1.0;
-
-      const RestOfEvent* roe = DataStore::getRelated<RestOfEvent>(particle);
-
-      if (roe)
-        result = roe->getNECLPi0s();
+        result = roe->getNECLClusters();
 
       return result;
     }
@@ -652,25 +629,26 @@ namespace Belle2 {
       if (!roe)
         return result;
 
-      const std::vector<ECLGamma*> remainECLGammas = roe->getECLGammas();
+      const std::vector<ECLCluster*> remainECLClusters = roe->getECLClusters();
       result = 0.0;
-      for (unsigned i = 0; i < remainECLGammas.size(); i++)
-        result += remainECLGammas[i]->getEnergy();
+      for (unsigned i = 0; i < remainECLClusters.size(); i++)
+        result += remainECLClusters[i]->getEnergy();
 
       return result;
     }
 
-    // ECLShower related variables -----------------------------------------
+    // ECLCluster related variables -----------------------------------------
 
-    double eclShowerDetectionRegion(const Particle* particle)
+    double eclClusterDetectionRegion(const Particle* particle)
     {
       double result = 0.0;
 
-      if (particle->getParticleType() == Particle::c_ECLShower) {
-        StoreArray<ECLShower> ECLShowers;
-        const ECLShower* shower = ECLShowers[particle->getMdstArrayIndex()];
+      if (particle->getParticleType() == Particle::c_ECLCluster) {
+        StoreArray<ECLCluster> ECLClusters;
+        const ECLCluster* shower = ECLClusters[particle->getMdstArrayIndex()];
 
-        float theta = shower->getTheta();
+        /// TODO: check if ECLCluster will provide this on its own
+        float theta = shower->getMomentum().Theta();
         if (theta < 0.555) {
           result = 1.0;
         } else if (theta < 2.26) {
@@ -683,39 +661,39 @@ namespace Belle2 {
       return result;
     }
 
-    double eclShowerE9E25(const Particle* particle)
+    double eclClusterE9E25(const Particle* particle)
     {
       double result = 0.0;
 
-      if (particle->getParticleType() == Particle::c_ECLShower) {
-        StoreArray<ECLShower> ECLShowers;
-        const ECLShower* shower = ECLShowers[particle->getMdstArrayIndex()];
+      if (particle->getParticleType() == Particle::c_ECLCluster) {
+        StoreArray<ECLCluster> ECLClusters;
+        const ECLCluster* shower = ECLClusters[particle->getMdstArrayIndex()];
 
         result = shower->getE9oE25();
       }
       return result;
     }
 
-    double eclShowerNHits(const Particle* particle)
+    double eclClusterNHits(const Particle* particle)
     {
       double result = 0.0;
 
-      if (particle->getParticleType() == Particle::c_ECLShower) {
-        StoreArray<ECLShower> ECLShowers;
-        const ECLShower* shower = ECLShowers[particle->getMdstArrayIndex()];
+      if (particle->getParticleType() == Particle::c_ECLCluster) {
+        StoreArray<ECLCluster> ECLClusters;
+        const ECLCluster* shower = ECLClusters[particle->getMdstArrayIndex()];
 
-        result = shower->getNHits();
+        result = shower->getNofCrystals();
       }
       return result;
     }
 
-    double eclShowerTrackMatched(const Particle* particle)
+    double eclClusterTrackMatched(const Particle* particle)
     {
       double result = 0.0;
 
-      if (particle->getParticleType() == Particle::c_ECLShower) {
-        StoreArray<ECLShower> ECLShowers;
-        const ECLShower* shower = ECLShowers[particle->getMdstArrayIndex()];
+      if (particle->getParticleType() == Particle::c_ECLCluster) {
+        StoreArray<ECLCluster> ECLClusters;
+        const ECLCluster* shower = ECLClusters[particle->getMdstArrayIndex()];
         const Track* track = DataStore::getRelated<Track>(shower);
 
         if (track)
@@ -837,9 +815,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("mcStatus", particleMCMatchStatus,  "The bit pattern indicating the quality of MC match");
 
     REGISTER_VARIABLE("nROETracks",  nROETracks,  "number of remaining tracks as given by the related RestOfEvent object");
-    REGISTER_VARIABLE("nROEShowers", nROEShowers, "number of remaining ECL showers as given by the related RestOfEvent object");
-    REGISTER_VARIABLE("nROEGammas",  nROEGammas,  "number of remaining ECL gammas as given by the related RestOfEvent object");
-    REGISTER_VARIABLE("nROEPi0s",    nROEPi0s,    "number of remaining ECL pi0s as given by the related RestOfEvent object");
+    REGISTER_VARIABLE("nROEClusters", nROEClusters, "number of remaining ECL clusters as given by the related RestOfEvent object");
 
     REGISTER_VARIABLE("pRecoil",  recoilMomentum,    "magnitude of 3-momentum recoiling against given Particle");
     REGISTER_VARIABLE("eRecoil",  recoilEnergy,      "energy recoiling against given Particle");
@@ -848,10 +824,10 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("eextra", extraEnergy, "extra energy in the calorimeter that is not associated to the given Particle");
 
-    REGISTER_VARIABLE("showerReg",        eclShowerDetectionRegion, "detection region in the ECL [1 - forward, 2 - barrel, 3 - backward]");
-    REGISTER_VARIABLE("showerE9E25",      eclShowerE9E25,           "ratio of energies in inner 3x3 and 5x5 cells");
-    REGISTER_VARIABLE("showerNHits",      eclShowerNHits,           "number of hits associated to this shower");
-    REGISTER_VARIABLE("showerTrackMatch", eclShowerTrackMatched,    "1/0 if charged track is/is not Matched to this shower");
+    REGISTER_VARIABLE("clusterReg",        eclClusterDetectionRegion, "detection region in the ECL [1 - forward, 2 - barrel, 3 - backward]");
+    REGISTER_VARIABLE("clusterE9E25",      eclClusterE9E25,           "ratio of energies in inner 3x3 and 5x5 cells");
+    REGISTER_VARIABLE("clusterNHits",      eclClusterNHits,           "number of hits associated to this cluster");
+    REGISTER_VARIABLE("clusterTrackMatch", eclClusterTrackMatched,    "number of charged track matched to this cluster");
 
     REGISTER_VARIABLE("decayAngle", particleDecayAngle, "cosine of the angle between the mother momentum vector and the direction of the first daughter in the mother's rest frame");
   }

@@ -20,8 +20,6 @@
 #include <analysis/KFit/KFitBase.h>
 
 
-using namespace std;
-using namespace CLHEP;
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY
 typedef HepGeom::Point3D<double> HepPoint3D;
 #endif
@@ -52,7 +50,7 @@ namespace Belle2 {
        * @param e vertex error matrix
        * @return error code (zero if success)
        */
-      enum KFitError::ECode       setVertexError(const HepSymMatrix& e);
+      enum KFitError::ECode       setVertexError(const CLHEP::HepSymMatrix& e);
       /** Set an invariant mass for the mass-constraint fit.
        * @param m invariant mass
        * @return error code (zero if success)
@@ -77,12 +75,12 @@ namespace Belle2 {
        * @param e (3x7) vertex error matrix
        * @return error code (zero if success)
        */
-      enum KFitError::ECode       setTrackVertexError(const HepMatrix& e);
+      enum KFitError::ECode       setTrackVertexError(const CLHEP::HepMatrix& e);
       /** Indicate no vertex uncertainty in the child particle in the addTrack'ed order.
        * @return error code (zero if success)
        */
       enum KFitError::ECode       setTrackZeroVertexError(void);
-      enum KFitError::ECode       setCorrelation(const HepMatrix& m);
+      enum KFitError::ECode       setCorrelation(const CLHEP::HepMatrix& m);
       enum KFitError::ECode       setZeroCorrelation(void);
 
 
@@ -95,7 +93,7 @@ namespace Belle2 {
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return vertex error matrix
        */
-      const HepSymMatrix          getVertexError(const int flag = KFitConst::kAfterFit) const;
+      const CLHEP::HepSymMatrix          getVertexError(const int flag = KFitConst::kAfterFit) const;
       /** Get an invariant mass.
        * @return invariant mass
       */
@@ -114,9 +112,9 @@ namespace Belle2 {
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return vertex error matrix
        */
-      const HepMatrix             getTrackVertexError(const int id, const int flag = KFitConst::kAfterFit) const;
+      const CLHEP::HepMatrix             getTrackVertexError(const int id, const int flag = KFitConst::kAfterFit) const;
       double                      getTrackCHIsq(const int id) const;
-      const HepMatrix             getCorrelation(const int id1, const int id2, const int flag = KFitConst::kAfterFit) const;
+      const CLHEP::HepMatrix             getCorrelation(const int id1, const int id2, const int flag = KFitConst::kAfterFit) const;
 
 
     public:
@@ -139,16 +137,16 @@ namespace Belle2 {
       /** Vertex position before the fit. */
       HepPoint3D             m_BeforeVertex;
       /** Vertex error matrix before the fit. */
-      HepSymMatrix           m_BeforeVertexError;
+      CLHEP::HepSymMatrix           m_BeforeVertexError;
       /** array of vertex error matrices before the fit. */
-      vector<HepMatrix> m_BeforeTrackVertexError;
+      std::vector<CLHEP::HepMatrix> m_BeforeTrackVertexError;
 
       /** Vertex position after the fit. */
       HepPoint3D             m_AfterVertex;
       /** Vertex error matrix after the fit. */
-      HepSymMatrix           m_AfterVertexError;
+      CLHEP::HepSymMatrix           m_AfterVertexError;
       /** array of vertex error matrices after the fit. */
-      vector<HepMatrix> m_AfterTrackVertexError;
+      std::vector<CLHEP::HepMatrix> m_AfterTrackVertexError;
 
       /** Flag to indicate if the vertex error matrix of the child particle is preset. */
       bool m_FlagTrackVertexError;
@@ -160,7 +158,7 @@ namespace Belle2 {
       /** Invariant mass. */
       double m_InvariantMass;
       /** Array of flags whether the track property is fixed at the mass. */
-      vector<int> m_IsFixMass;
+      std::vector<int> m_IsFixMass;
     };
 
   } // namespace analysis

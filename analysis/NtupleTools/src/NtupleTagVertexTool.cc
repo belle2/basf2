@@ -15,6 +15,9 @@
 #include <TLorentzVector.h>
 #include <TVector3.h>
 
+using namespace Belle2;
+using namespace std;
+
 void NtupleTagVertexTool::setupTree()
 {
   vector<string> strNames = m_decaydescriptor.getSelectionNames();

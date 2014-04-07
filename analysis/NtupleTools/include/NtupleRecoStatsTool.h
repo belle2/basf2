@@ -16,19 +16,12 @@
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
-using namespace std;
-using namespace Belle2;
-
 namespace Belle2 {
   /** Tool for NtupleMaker to write out container summaries to flat ntuple. */
   class NtupleRecoStatsTool : public NtupleFlatTool {
   private:
     /** N ECL showers */
-    int m_iShowers;
-    /** N ECL gammas */
-    int m_iPhotons;
-    /** N ECL pi0s */
-    int m_iPi0s;
+    int m_iClusters;
     /** N Tracks*/
     int m_iTracks;
     /** N MCParticles*/

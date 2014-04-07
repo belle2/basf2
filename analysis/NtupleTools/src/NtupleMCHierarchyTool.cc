@@ -12,6 +12,9 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <TBranch.h>
 
+using namespace Belle2;
+using namespace std;
+
 void NtupleMCHierarchyTool::setupTree()
 {
   vector<string> strNames = m_decaydescriptor.getSelectionNames();

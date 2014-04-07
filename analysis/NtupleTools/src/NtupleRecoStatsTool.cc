@@ -12,23 +12,20 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <TBranch.h>
 #include <mdst/dataobjects/Track.h>
-#include <ecl/dataobjects/ECLGamma.h>
-#include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLPi0.h>
+#include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/MCParticle.h>
 
+using namespace Belle2;
+using namespace std;
+
 void NtupleRecoStatsTool::setupTree()
 {
-  m_iShowers = -1;
-  m_iPhotons = -1;
-  m_iPi0s = -1;
+  m_iClusters = -1;
   m_iTracks = -1;
   m_iMCParticles = -1;
   m_iParticles = -1;
-  m_tree->Branch("nECLShowers",  &m_iShowers,     "nECLShowers/I");
-  m_tree->Branch("nECLGammas",   &m_iPhotons,     "nECLGammas/I");
-  m_tree->Branch("nECLPi0s",     &m_iPi0s,        "nECLPi0s/I");
+  m_tree->Branch("nECLClusters",  &m_iClusters,     "nECLClusters/I");
   m_tree->Branch("nTracks" ,     &m_iTracks,      "nTracks/I");
   m_tree->Branch("nMCParticles", &m_iMCParticles, "nMCParticles/I");
   m_tree->Branch("nParticles" ,  &m_iParticles,   "nParticles/I");
@@ -37,14 +34,8 @@ void NtupleRecoStatsTool::setupTree()
 
 void NtupleRecoStatsTool::eval(const  Particle*)
 {
-  StoreArray<ECLShower>    eclshowers;
-  m_iShowers = (int) eclshowers.getEntries();
-
-  StoreArray<ECLGamma>    eclgammas;
-  m_iPhotons = (int) eclgammas.getEntries();
-
-  StoreArray<ECLPi0>   pi0s;
-  m_iPi0s = (int) pi0s.getEntries();
+  StoreArray<ECLCluster>    eclshowers;
+  m_iClusters = (int) eclshowers.getEntries();
 
   StoreArray<Track>  tracks;
   m_iTracks = tracks.getEntries();

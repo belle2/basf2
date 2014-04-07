@@ -28,9 +28,6 @@
 #include <analysis/KFit/KFitError.h>
 #include <analysis/KFit/KFitTrack.h>
 
-
-using namespace std;
-using namespace CLHEP;
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY
 typedef HepGeom::Point3D<double> HepPoint3D;
 #endif
@@ -64,7 +61,7 @@ namespace Belle2 {
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return error code (zero if success)
        */
-      enum KFitError::ECode       addTrack(const HepLorentzVector& p, const HepPoint3D& x, const HepSymMatrix& e, const double q, const int flag = KFitConst::kAfterFit);
+      enum KFitError::ECode       addTrack(const CLHEP::HepLorentzVector& p, const HepPoint3D& x, const CLHEP::HepSymMatrix& e, const double q, const int flag = KFitConst::kAfterFit);
       /** Change a magnetic field from the default value KFitConst::kDefaultMagneticField.
        * @param mf magnetic field to set
        * @return error code (zero if success)
@@ -79,12 +76,12 @@ namespace Belle2 {
        * @param e (3x3) vertex error matrix
        * @return error code (zero if success)
        */
-      enum KFitError::ECode       setVertexError(const HepSymMatrix& e);
+      enum KFitError::ECode       setVertexError(const CLHEP::HepSymMatrix& e);
       /** Set a vertex error matrix of the child particle in the addTrack'ed order.
        * @param e (3x7) vertex error matrix
        * @return error code (zero if success)
        */
-      enum KFitError::ECode       setTrackVertexError(const HepMatrix& e);
+      enum KFitError::ECode       setTrackVertexError(const CLHEP::HepMatrix& e);
       /** Indicate no vertex uncertainty in the child particle in the addTrack'ed order.
        * @return error code (zero if success)
        */
@@ -93,7 +90,7 @@ namespace Belle2 {
        * @param e (7x7) correlation matrix
        * @return error code (zero if success)
        */
-      enum KFitError::ECode       setCorrelation(const HepMatrix& e);
+      enum KFitError::ECode       setCorrelation(const CLHEP::HepMatrix& e);
       /** Indicate no correlation between tracks.
        * @return error code (zero if success)
        */
@@ -120,7 +117,7 @@ namespace Belle2 {
       /** Get a Lorentz vector of the mother particle.
        * @return Lorentz vector of the mother particle
        */
-      const HepLorentzVector      getMotherMomentum(void) const;
+      const CLHEP::HepLorentzVector      getMotherMomentum(void) const;
       /** Get a position of the mother particle.
        * @return position of the mother particle
        */
@@ -128,7 +125,7 @@ namespace Belle2 {
       /** Get an error matrix of the mother particle.
        * @return error matrix of the mother particle
        */
-      const HepSymMatrix          getMotherError(void) const;
+      const CLHEP::HepSymMatrix          getMotherError(void) const;
 
       /** Perform a reconstruction of mother particle
        * @return error code (zero if success)
@@ -140,11 +137,11 @@ namespace Belle2 {
       /** Make a matrix to calculate error matrix of the mother particle.
        * @param e error matrix container
        */
-      void calculateError(HepSymMatrix* Ec) const;
+      void calculateError(CLHEP::HepSymMatrix* Ec) const;
       /** Make delMdelC to calculate error matrix of the mother particle.
        * @param e delMdelC container
        */
-      void calculateDELMDELC(HepMatrix* e) const;
+      void calculateDELMDELC(CLHEP::HepMatrix* e) const;
 
 
     private:
@@ -169,17 +166,17 @@ namespace Belle2 {
 
 
       /** Array of track objects of the child particles. */
-      vector<KFitTrack> m_Tracks;
+      std::vector<KFitTrack> m_Tracks;
       /** Array of vertex error matrices of the child particles. */
-      vector<HepMatrix> m_TrackVertexError;
+      std::vector<CLHEP::HepMatrix> m_TrackVertexError;
       /** Array of correlation matrices among the child particles. */
-      vector<HepMatrix> m_Correlation;
+      std::vector<CLHEP::HepMatrix> m_Correlation;
 
 
       /** Vertex position of the mother particle. */
-      Hep3Vector   m_Vertex;
+      CLHEP::Hep3Vector   m_Vertex;
       /** Vertex error matrix of the mother particle. */
-      HepSymMatrix m_VertexError;
+      CLHEP::HepSymMatrix m_VertexError;
 
 
       /** Charge of the mother particle. */

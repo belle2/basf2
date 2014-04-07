@@ -20,9 +20,6 @@
 #include <TFile.h>
 #include <TMatrix.h>
 
-using namespace Belle2;
-
-
 namespace Belle2 {
 
   /** This module summarises the ParticleLists in the event.

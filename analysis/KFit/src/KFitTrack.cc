@@ -13,7 +13,7 @@
 
 #include <analysis/KFit/KFitTrack.h>
 
-
+using namespace CLHEP;
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::analysis;

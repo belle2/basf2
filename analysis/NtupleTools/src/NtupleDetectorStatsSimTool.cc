@@ -30,6 +30,9 @@
 #include <top/dataobjects/TOPSimHit.h>
 #include <top/dataobjects/TOPSimPhoton.h>
 
+using namespace Belle2;
+using namespace std;
+
 void NtupleDetectorStatsSimTool::setupTree()
 {
   m_iARICHDigits = -1;

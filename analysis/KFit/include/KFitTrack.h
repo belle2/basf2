@@ -25,9 +25,6 @@
 
 #include <analysis/KFit/KFitConst.h>
 
-
-using namespace std;
-using namespace CLHEP;
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY
 typedef HepGeom::Point3D<double> HepPoint3D;
 #endif
@@ -48,11 +45,11 @@ namespace Belle2 {
        */
       struct KFitPXE {
         /** Lorentz vector of the track */
-        HepLorentzVector   m_P;
+        CLHEP::HepLorentzVector   m_P;
         /** Position of the track */
         HepPoint3D         m_X;
         /** (7x7) error matrix of the track */
-        HepSymMatrix       m_E;
+        CLHEP::HepSymMatrix       m_E;
       };
 
       /** Construct an object with no argument. */
@@ -67,9 +64,9 @@ namespace Belle2 {
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        */
       KFitTrack(
-        const HepLorentzVector& p,
+        const CLHEP::HepLorentzVector& p,
         const HepPoint3D&       x,
-        const HepSymMatrix&     e,
+        const CLHEP::HepSymMatrix&     e,
         const double           q,
         const int              flag = KFitConst::kBeforeFit
       );
@@ -88,7 +85,7 @@ namespace Belle2 {
        * @param p Lorentz vector of the track
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        */
-      void setMomentum(const HepLorentzVector& p, const int flag = KFitConst::kBeforeFit);
+      void setMomentum(const CLHEP::HepLorentzVector& p, const int flag = KFitConst::kBeforeFit);
       /** Set a position of the track.
        * @param x position of the track
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
@@ -98,7 +95,7 @@ namespace Belle2 {
        * @param e error matrix of the track
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        */
-      void setError(const HepSymMatrix& e,     const int flag = KFitConst::kBeforeFit);
+      void setError(const CLHEP::HepSymMatrix& e,     const int flag = KFitConst::kBeforeFit);
       /** Set a charge of the track.
        * @param q charge of the track
        */
@@ -110,13 +107,13 @@ namespace Belle2 {
       /** Set a vertex error matrix associated to the track.
        * @param ve vertex error matrix associated to the track
        */
-      void setVertexError(const HepSymMatrix& ve);
+      void setVertexError(const CLHEP::HepSymMatrix& ve);
 
       /** Get a Lorentz vector of the track.
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return Lorentz vector of the track
        */
-      const HepLorentzVector getMomentum(const int flag = KFitConst::kAfterFit) const;
+      const CLHEP::HepLorentzVector getMomentum(const int flag = KFitConst::kAfterFit) const;
       /** Get a position of the track.
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return position of the track
@@ -126,7 +123,7 @@ namespace Belle2 {
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return error matrix of the track
        */
-      const HepSymMatrix     getError(const int flag = KFitConst::kAfterFit) const;
+      const CLHEP::HepSymMatrix     getError(const int flag = KFitConst::kAfterFit) const;
       /** Get a charge of the track.
        */
       double                 getCharge(void) const;
@@ -138,7 +135,7 @@ namespace Belle2 {
       const HepPoint3D       getVertex(void) const;
       /** Get a vertex error matrix associated to the track.
        */
-      const HepSymMatrix     getVertexError(void) const;
+      const CLHEP::HepSymMatrix     getVertexError(void) const;
 
       /** Get a parameter of the track.  Not intended for end user's use.
        * @param which (0,1,2,3,4,5) = (Px,Py,Pz,Xx,Xy,Xz)
@@ -150,17 +147,17 @@ namespace Belle2 {
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return array of getFitParameter(0,flag) ... getFitParameter(5,flag)
        */
-      const HepMatrix        getFitParameter(const int flag) const;
+      const CLHEP::HepMatrix        getFitParameter(const int flag) const;
       /** Get an error matrix of the track.  Not intended for end user's use.
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return fitted error matrix
        */
-      const HepSymMatrix     getFitError(const int flag) const;
+      const CLHEP::HepSymMatrix     getFitError(const int flag) const;
       /** Get a combination of Lorentz vector and position of the track.  Not intended for end user's use.
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
        * @return combination of Lorentz vector and position
        */
-      const HepMatrix        getMomPos(const int flag) const;
+      const CLHEP::HepMatrix        getMomPos(const int flag) const;
 
 
     private:
@@ -175,7 +172,7 @@ namespace Belle2 {
        * @param m matrix to be tested
        * @param dim size of the matrix
        */
-      inline void checkMatrixDimension(const HepSymMatrix& m, const int dim) const {
+      inline void checkMatrixDimension(const CLHEP::HepSymMatrix& m, const int dim) const {
         if (m.num_row() != dim) B2FATAL("checkMatrixDimension");
       }
 
@@ -195,11 +192,10 @@ namespace Belle2 {
       /** Vertex position associated to the track. */
       HepPoint3D     m_Vertex;
       /** Vertex error matrix associated to the track. */
-      HepSymMatrix   m_VertexError;
+      CLHEP::HepSymMatrix   m_VertexError;
     };
 
   } // namespace analysis
-
 } // namespace Belle2
 
 #endif /* KFITTRACK_H */

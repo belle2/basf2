@@ -25,9 +25,7 @@ class TClonesArray;
 namespace Belle2 {
 
   // forward declarations
-  class ECLShower;
-  class ECLGamma;
-  class ECLPi0;
+  class ECLCluster;
   class Track;
   class MCParticle;
 
@@ -36,10 +34,10 @@ namespace Belle2 {
    * This class is a common representation of all particle types, e.g.:
    *  - final state particles (FS particles):
    *    - charged kaons/pions/electrons/muons/protons reconstructed as Track
-   *    - photons reconstructed as ECLGamma
+   *    - photons reconstructed as ECLCluster (without associated Track)
    *    - long lived neutral kaons reconstructed in KLM
    *  - composite particles:
-   *    - pre-reconstructed pi0, Kshort, Lambda, ...
+   *    - pre-reconstructed Kshort, Lambda, ...
    *    - reconstructed in decays (via combinations)
    *
    * Private members are limited to those which completely define the
@@ -75,7 +73,7 @@ namespace Belle2 {
     /**
      * particle type enumerators (to be completed when all Mdst dataobjects are defined)
      */
-    enum EParticleType {c_Undefined, c_Track, c_ECLShower, c_KLong , c_MCParticle, c_Composite};
+    enum EParticleType {c_Undefined, c_Track, c_ECLCluster, c_KLong , c_MCParticle, c_Composite};
 
     /** describes flavor type, see getFlavorType(). */
     enum EFlavorType {
@@ -147,16 +145,10 @@ namespace Belle2 {
              const Const::ChargedStable& chargedStable);
 
     /**
-     * Constructor from a reconstructed gamma candidate (mdst object ECLGamma)
-     * @param gamma pointer to ECLGamma object
+     * Constructor of a photon from a reconstructed ECL cluster that is not matched to any charged track.
+     * @param eclCluster pointer to ECLCluster object
      */
-    Particle(const ECLGamma* gamma);
-
-    /**
-     * Constructor from a reconstructed pi0 candidate (mdst object ECLPi0)
-     * @param pi0 pointer to ECLPi0 object
-     */
-    Particle(const ECLPi0* pi0);
+    Particle(const ECLCluster* eclCluster);
 
     /**
      * Constructor from MC particle (mdst object MCParticle)
@@ -578,7 +570,7 @@ namespace Belle2 {
      */
     void setFlavorType();
 
-    ClassDef(Particle, 5); /**< Class to store reconstructed particles. */
+    ClassDef(Particle, 6); /**< Class to store reconstructed particles. */
   };
 
 } // end namespace Belle2

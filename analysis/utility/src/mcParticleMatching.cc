@@ -12,8 +12,8 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 
-// dataobjects
-#include <mdst/dataobjects/MCParticle.h>
+using namespace Belle2;
+using namespace std;
 
 void fillGenMothers(const MCParticle* mcP, vector<int>& genMCPMothers)
 {

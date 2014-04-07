@@ -17,8 +17,6 @@
 #include <string>
 #include <utility>
 
-using namespace Belle2;
-
 namespace Belle2 {
 
   /** NtupleTool to write the kinematics of a Particle

@@ -16,9 +16,6 @@
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
-using namespace std;
-using namespace Belle2;
-
 namespace Belle2 {
   /** Tool for NtupleMaker to write out container summaries to flat ntuple. */
   class NtupleDetectorStatsSimTool : public NtupleFlatTool {

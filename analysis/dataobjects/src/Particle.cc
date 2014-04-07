@@ -14,9 +14,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLGamma.h>
-#include <ecl/dataobjects/ECLPi0.h>
+#include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
@@ -174,63 +172,32 @@ Particle::Particle(const Track* track,
   storeErrorMatrix(errMatrix);
 }
 
-
-Particle::Particle(const ECLGamma* gamma) :
+Particle::Particle(const ECLCluster* eclCluster) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(0)
 {
-  if (!gamma) return;
+  if (!eclCluster) return;
 
+  // TODO: avoid hard coded values
   m_pdgCode = 22;
-  m_px = gamma->getPx();
-  m_py = gamma->getPy();
-  m_pz = gamma->getPz();
-  //  setVertex(gamma->getPosition());
-  setVertex(gamma->getPositon()); // TODO: report this typo to ECL
 
-  m_particleType = c_ECLShower;
-  m_mdstIndex = gamma->getShowerId();
+  m_px = eclCluster->getPx();
+  m_py = eclCluster->getPy();
+  m_pz = eclCluster->getPz();
 
-  // set Chi^2 probability:
-  m_pValue = 1; //TODO: gamma quality can be written here
+  setVertex(eclCluster->getPosition());
 
-  // set error matrix
-  TMatrixFSym errMatrix(c_DimMatrix);
-  gamma->getErrorMatrix7x7(errMatrix);
-  storeErrorMatrix(errMatrix);
-}
-
-
-Particle::Particle(const ECLPi0* pi0) :
-  m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(0)
-{
-  if (!pi0) return;
-
-  m_pdgCode = 111;
-  m_mass = pi0->getMassFit();
-  m_px = pi0->getPx();
-  m_py = pi0->getPy();
-  m_pz = pi0->getPz();
-  // position: TODO obtain the values that are used for gamma momentum construction
-
-  // The state is undefined only temporarly
-  // as soon as photon daughter Particles are
-  // appendet the state is changed to c_Composite
-  m_particleType = c_Undefined;
-  m_mdstIndex = pi0->getArrayIndex();
+  m_particleType = c_ECLCluster;
+  m_mdstIndex = eclCluster->getArrayIndex();
 
   // set Chi^2 probability:
-  m_pValue = pi0->getPValue();
+  //TODO: gamma quality can be written here
+  m_pValue = 1;
 
   // set error matrix
-  TMatrixFSym errMatrix(c_DimMatrix);
-  pi0->getErrorMatrix7x7(errMatrix);
-  storeErrorMatrix(errMatrix);
+  storeErrorMatrix(eclCluster->getError7x7());
 }
-
 
 Particle::Particle(const MCParticle* mcParticle) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),

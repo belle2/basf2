@@ -33,10 +33,10 @@ def outputMdst(filename, path=analysis_main):
     path.add_module(rooutput)
 
 
-def generateEvents(noEvents, decayTable, path=analysis_main):
+def generateY4S(noEvents, decayTable, path=analysis_main):
     """                                                                                                                                   
-    Generated events with EvtGen event generator according to the user 
-    specifed decay table. 
+    Generated e+e- -> Y(4S) events with EvtGen event generator.
+    The Y(4S) decays according to the user specifed decay table. 
 
     The experiment and run numbers are set to 1. 
 
@@ -60,6 +60,44 @@ def generateEvents(noEvents, decayTable, path=analysis_main):
     path.add_module(evtgeninput)
 
 
+def generateContinuum(
+    noEvents,
+    inclusiveP,
+    decayTable,
+    inclusiveT=2,
+    path=analysis_main,
+    ):
+    """
+    Generated e+e- -> gamma* -> qq-bar where light quarks hadronize 
+    and decay in user specified way (via specified decay table).
+
+    The experiment and run numbers are set to 1. 
+
+    If the simulation and reconstruction is not performed in the sam job,
+    then the Gearbox needs to be loaded. Use loadGearbox(path) function
+    for this purpose.
+    
+    @param noEvents   number of events to be generated
+    @param inclusiveP each event will contain this particle
+    @param decayTable file name of the decay table to be used
+    @param inclusiveT whether (2) or not (1) charge conjugated inclusive Particles should be included
+    @param path       modules are added to this path
+    """
+
+    evtnumbers = register_module('EventInfoSetter')
+    evtnumbers.param('evtNumList', [noEvents])
+    evtnumbers.param('runList', [1])
+    evtnumbers.param('expList', [1])
+    evtgeninput = register_module('EvtGenInput')
+    evtgeninput.param('userDECFile', decayTable)
+    evtgeninput.param('ParentParticle', 'vpho')
+    evtgeninput.param('InclusiveParticle', inclusiveP)
+    evtgeninput.param('InclusiveType', inclusiveT)
+    evtgeninput.param('boost2LAB', True)
+    path.add_module(evtnumbers)
+    path.add_module(evtgeninput)
+
+
 def loadGearbox(path=analysis_main):
     """
     Loads Gearbox module to the path. 
@@ -72,6 +110,15 @@ def loadGearbox(path=analysis_main):
 
     paramloader = register_module('Gearbox')
     path.add_module(paramloader)
+
+
+def printPrimaryMCParticles(path=analysis_main):
+    """
+    Prints all primary MCParticles.
+    """
+
+    mcparticleprinter = register_module('PrintMCParticles')
+    path.add_module(mcparticleprinter)
 
 
 def loadMCParticles(path=analysis_main):
@@ -133,33 +180,126 @@ def makeParticle(
 
 def fitVertex(
     list_name,
-    confidenceLevel,
+    conf_level,
     decay_string='',
     fitter='rave',
     fit_type='vertex',
-    with_constraint='',
+    constraint='',
     path=analysis_main,
     ):
     """
-    Perform the vertex fit for each Particle in the given ParticleList:
+    Perform the specified kinematic fit for each Particle in the given ParticleList.
     
-    @param list_name: name of the input ParticleList
-    @param ConfidenceLevel: minimum value of the confidencelevel to accept the fit
-    @param VertexFitter: rave or kfit
-    @param withConstraint: no, mass or beam spot constraint
-    @param  decayString: select particles used for the vertex fit
-    @param path   modules are added to this path
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param decay_string select particles used for the vertex fit
+    @param fitter       rave or kfitter
+    @param fit_type     type of the kinematic fit (valid options are vertex/massvertex/mass)
+    @param constraint   type of additional constraints (valid options are empty string/ipprofile/iptube)
+    @param path         modules are added to this path
     """
 
     pvfit = register_module('ParticleVertexFitter')
     pvfit.set_name('ParticleVertexFitter_' + list_name)
     pvfit.param('ListName', list_name)
-    pvfit.param('ConfidenceLevel', confidenceLevel)
+    pvfit.param('ConfidenceLevel', conf_level)
     pvfit.param('VertexFitter', fitter)
     pvfit.param('fitType', fit_type)
-    pvfit.param('withConstraint', with_constraint)
+    pvfit.param('withConstraint', constraint)
     pvfit.param('decayString', decay_string)
     path.add_module(pvfit)
+
+
+def vertexKFit(
+    list_name,
+    conf_level,
+    decay_string='',
+    constraint='',
+    path=analysis_main,
+    ):
+    """
+    Perform vertex fit using the kfitter for each Particle in the given ParticleList. 
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param constraint   add aditional constraint to the fit (valid options are ipprofile or iptube)
+    @param path         modules are added to this path
+    @param decay_string select particles used for the vertex fit
+    """
+
+    fitVertex(
+        list_name,
+        conf_level,
+        decay_string,
+        'kfitter',
+        'vertex',
+        constraint,
+        path,
+        )
+
+
+def massVertexKFit(
+    list_name,
+    conf_level,
+    decay_string='',
+    path=analysis_main,
+    ):
+    """
+    Perform mass-constrained vertex fit using the kfitter for each Particle in the given ParticleList. 
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param path         modules are added to this path
+    @param decay_string select particles used for the vertex fit
+    """
+
+    fitVertex(
+        list_name,
+        conf_level,
+        decay_string,
+        'kfitter',
+        'massvertex',
+        '',
+        path,
+        )
+
+
+def massKFit(
+    list_name,
+    conf_level,
+    decay_string='',
+    path=analysis_main,
+    ):
+    """
+    Perform vertex fit using the kfitter for each Particle in the given ParticleList. 
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param path         modules are added to this path
+    @param decay_string select particles used for the vertex fit
+    """
+
+    fitVertex(
+        list_name,
+        conf_level,
+        decay_string,
+        'kfitter',
+        'mass',
+        '',
+        path,
+        )
+
+
+def printDataStore(path=analysis_main):
+    """
+    Prints the contents of DataStore in each event, 
+    listing all objects and arrays (including size).
+    
+    @param path   modules are added to this path 
+    """
+
+    printDS = register_module('PrintCollections')
+    path.add_module(printDS)
 
 
 def printList(list_name, full, path=analysis_main):

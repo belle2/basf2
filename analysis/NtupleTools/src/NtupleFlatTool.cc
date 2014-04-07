@@ -11,6 +11,8 @@
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 
 using namespace Belle2;
+using namespace std;
+
 NtupleFlatTool::NtupleFlatTool(TTree* tree, DecayDescriptor& decaydescriptor)
 {
   m_tree = tree;

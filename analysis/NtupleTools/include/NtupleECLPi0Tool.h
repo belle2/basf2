@@ -17,9 +17,6 @@
 #include <string>
 #include <utility>
 
-using namespace std;
-using namespace Belle2;
-
 namespace Belle2 {
 
   /**

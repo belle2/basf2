@@ -17,9 +17,6 @@
 #include <TTree.h>
 #include <string>
 
-using namespace std;
-using namespace Belle2;
-
 namespace Belle2 {
   /** Interface for tools to create flat n-tuples. */
   class NtupleFlatTool {

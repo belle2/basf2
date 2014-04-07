@@ -16,9 +16,6 @@
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
-using namespace std;
-using namespace Belle2;
-
 namespace Belle2 {
   /** Tool for NtupleMaker to write exp_no, run_no, evt_no to flat ntuple. */
   class NtupleEventMetaDataTool : public NtupleFlatTool {

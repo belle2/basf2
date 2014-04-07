@@ -13,6 +13,9 @@
 #include <framework/gearbox/Const.h>
 #include <TBranch.h>
 
+using namespace Belle2;
+using namespace std;
+
 void NtuplePIDTool::setupTree()
 {
   vector<string> strNames = m_decaydescriptor.getSelectionNames();

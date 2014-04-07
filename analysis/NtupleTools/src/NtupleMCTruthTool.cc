@@ -15,6 +15,9 @@
 
 #include <TBranch.h>
 
+using namespace Belle2;
+using namespace std;
+
 void NtupleMCTruthTool::setupTree()
 {
   vector<string> strNames = m_decaydescriptor.getSelectionNames();

@@ -15,6 +15,9 @@
 #include <TParameter.h>
 #include <string>
 
+using namespace Belle2;
+using namespace std;
+
 void NtupleEventMetaDataTool::setupTree()
 {
   m_iExperiment = -1;

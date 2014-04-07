@@ -21,9 +21,6 @@
 #include <TTree.h>
 #include <TFile.h>
 
-using namespace Belle2;
-
-
 namespace Belle2 {
 
   /** This module writes the properties of given Particle objects

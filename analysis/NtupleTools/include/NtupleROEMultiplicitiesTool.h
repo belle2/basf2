@@ -20,25 +20,19 @@
 #include <string>
 #include <utility>
 
-using namespace std;
-using namespace Belle2;
-
 namespace Belle2 {
 
   /**
    * NtupleTool to write the multiplicities of RestOfEvent for given reconstructed Particle
    * to a flat ntuple. The tool writes out the number of remaining tracks (Track), ECL showers,
-   * (ECLShower), photons (ECLGamma), and pi0 candidates (ECLPi0), form the RestOfEvent object.
+   * (ECLCluster).
    */
   class NtupleROEMultiplicitiesTool : public NtupleFlatTool {
 
   private:
 
     int* m_nTracks;     /**< Number of remaining tracks. */
-    int* m_nECLShowers; /**< Number of remaining ECL showers. */
-    int* m_nECLGammas;  /**< Number of remaining ECL gammas. */
-    int* m_nECLPi0s;    /**< Number of remaining ECL pi0s. */
-
+    int* m_nECLClusters; /**< Number of remaining ECL showers. */
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();

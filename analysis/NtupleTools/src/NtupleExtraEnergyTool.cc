@@ -14,6 +14,9 @@
 
 #include <TBranch.h>
 
+using namespace std;
+using namespace Belle2;
+
 void NtupleExtraEnergyTool::setupTree()
 {
   vector<string> strNames = m_decaydescriptor.getSelectionNames();

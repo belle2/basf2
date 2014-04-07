@@ -12,9 +12,9 @@ myMain = create_path()
 # Y(4S) -> Btag- Bsig+
 # Btag- -> D0 pi-; D0 -> K- pi+
 # Bsig+ -> pi0 e+ nu_e
-generateEvents(20, os.environ['BELLE2_LOCAL_DIR']
-               + '/analysis/examples/exampleEvtgenDecayFiles/Btag2Dpi_Bsig2pi0enu.dec'
-               , myMain)
+generateY4S(20, os.environ['BELLE2_LOCAL_DIR']
+            + '/analysis/examples/exampleEvtgenDecayFiles/Btag2Dpi_Bsig2pi0enu.dec'
+            , myMain)
 
 # simulation
 add_simulation(myMain)

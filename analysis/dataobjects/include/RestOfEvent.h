@@ -19,10 +19,9 @@
 namespace Belle2 {
 
   // forward declarations
-  class ECLShower;
-  class ECLGamma;
-  class ECLPi0;
+  class ECLCluster;
   class Track;
+
   // TODO: Add support for the MdstVee and MDSTKlong dataobjects when they become available.
 
   /** \addtogroup dataobjects
@@ -45,7 +44,7 @@ namespace Belle2 {
    * module and are related between each other with the BASF2 relation.
    *
    * Internally, the RestOfEvent class holds only StoreArray indices of all unused MDST dataobjects:
-   * Tracks, ECLPi0, ECLGamma, ECLShower, MDSTVee and MDSTKlong. Indices are stored in std::set
+   * Tracks, ECLCluster, MDSTVee and MDSTKlong. Indices are stored in std::set
    * and not std::vector, since the former ensures uniqueness of all its elements.
    */
 
@@ -75,46 +74,18 @@ namespace Belle2 {
     void addTracks(const std::vector<int>& indices);
 
     /**
-     * Add StoreArray index of given ECLShower to the list of unused ECL showers in the event.
+     * Add StoreArray index of given ECLCluster to the list of unused ECL showers in the event.
      *
-     * @param Pointer to the unused ECLShower
+     * @param Pointer to the unused ECLCluster
      */
-    void addECLShower(const ECLShower* shower);
+    void addECLCluster(const ECLCluster* shower);
 
     /**
      * Add given StoreArray indices to the list of unused ECL Showers in the event.
      *
      * @param vector of SoreArray indices of unused Showers
      */
-    void addECLShowers(const std::vector<int>& indices);
-
-    /**
-     * Add StoreArray index of given ECLGamma to the list of unused ECL gammas in the event.
-     *
-     * @param Pointer to the unused ECLGamma
-     */
-    void addECLGamma(const ECLGamma* gamma);
-
-    /**
-     * Add given StoreArray indices to the list of unused ECL Gammas in the event.
-     *
-     * @param vector of SoreArray indices of unused Gammas
-     */
-    void addECLGammas(const std::vector<int>& indices);
-
-    /**
-     * Add StoreArray index of given ECLPi0 to the list of unused ECL pi0s in the event.
-     *
-     * @param Pointer to the unused ECLPi0
-     */
-    void addECLPi0(const ECLPi0* pi0);
-
-    /**
-    * Add given StoreArray indices to the list of unused ECL Pi0s in the event.
-    *
-    * @param vector of SoreArray indices of unused Pi0s
-    */
-    void addECLPi0s(const std::vector<int>& indices);
+    void addECLClusters(const std::vector<int>& indices);
 
     // getters
     /**
@@ -125,25 +96,11 @@ namespace Belle2 {
     const std::vector<Belle2::Track*> getTracks() const;
 
     /**
-     * Get vector of all unused ECLShowers.
+     * Get vector of all unused ECLClusters.
      *
-     * @return vector of pointers to unused ECLShowers
+     * @return vector of pointers to unused ECLClusters
      */
-    const std::vector<Belle2::ECLShower*> getECLShowers() const;
-
-    /**
-     * Get vector of all unused ECLGammas.
-     *
-     * @return vector of pointers to unused ECLGammas
-     */
-    const std::vector<Belle2::ECLGamma*> getECLGammas() const;
-
-    /**
-     * Get vector of all unused ECLPi0s.
-     *
-     * @return vector of pointers to unused ECLPi0s
-     */
-    const std::vector<Belle2::ECLPi0*> getECLPi0s() const;
+    const std::vector<Belle2::ECLCluster*> getECLClusters() const;
 
     /**
      * Get number of all remaining tracks.
@@ -159,26 +116,8 @@ namespace Belle2 {
      *
      * @return number of all remaining ECL showers
      */
-    int getNECLShowers(void) const {
-      return int(m_eclShowerIndices.size());
-    }
-
-    /**
-     * Get number of all remaining ECL gammas.
-     *
-     * @return number of all remaining ECL gammas
-     */
-    int getNECLGammas(void) const {
-      return int(m_eclGammaIndices.size());
-    }
-
-    /**
-     * Get number of all remaining ECL pi0s.
-     *
-     * @return number of all remaining ECL pi0s
-     */
-    int getNECLPi0s(void) const {
-      return int(m_eclPi0Indices.size());
+    int getNECLClusters(void) const {
+      return int(m_eclClusterIndices.size());
     }
 
     /**
@@ -190,10 +129,8 @@ namespace Belle2 {
   private:
 
     // persistent data members
-    std::set<int> m_trackIndices;  /**< StoreArray indices to unused tracks */
-    std::set<int> m_eclPi0Indices;  /**< StoreArray indices to unused ECLPi0s */
-    std::set<int> m_eclGammaIndices;  /**< StoreArray indices to unused ECLGammas */
-    std::set<int> m_eclShowerIndices;  /**< StoreArray indices to unused ECLShowers */
+    std::set<int> m_trackIndices;       /**< StoreArray indices to unused tracks */
+    std::set<int> m_eclClusterIndices;  /**< StoreArray indices to unused ECLClusters */
     // TODO: add support for vee and Klong
 
     /**
@@ -209,7 +146,7 @@ namespace Belle2 {
         to.insert(from[i]);
     }
 
-    ClassDef(RestOfEvent, 1) /**< class definition */
+    ClassDef(RestOfEvent, 2) /**< class definition */
 
   };
 

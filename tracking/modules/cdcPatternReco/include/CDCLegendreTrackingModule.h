@@ -35,6 +35,7 @@ namespace Belle2 {
   class CDCLegendreTrackMerger;
   class CDCLegendreTrackCreator;
   class CDCLegendreTrackDrawer;
+  class CDCLegendreQuadTree;
 
   class CDCNiceDrawingModule;
 
@@ -98,6 +99,7 @@ namespace Belle2 {
     CDCLegendreFastHough* m_cdcLegendreFastHough;
     CDCLegendreTrackMerger* m_cdcLegendreTrackMerger;
     CDCLegendreTrackCreator* m_cdcLegendreTrackCreator;
+    CDCLegendreQuadTree* m_cdcLegendreQuadTree;
 
     int m_threshold; /**< Threshold for votes in the legendre plane, parameter of the module*/
     double m_thresholdUnique; /**< Threshold of unique TrackHits for track building*/

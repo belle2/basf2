@@ -136,6 +136,10 @@ namespace Belle2 {
      */
     void clearPointers();
 
+    /*    inline bool operator==(const CDCLegendreTrackHit& lhs, const CDCLegendreTrackHit& rhs){
+          return lhs.getStoreIndex() == rhs.getStoreIndex();
+        }
+    */
   private:
 
     int m_storeID;                     /**< ID of the original CDCHit in the store array*/

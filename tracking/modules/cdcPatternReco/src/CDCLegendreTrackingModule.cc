@@ -24,6 +24,7 @@
 #include <tracking/cdcLegendreTracking/CDCLegendrePatternChecker.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreFastHough.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackDrawer.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreQuadTree.h>
 
 #include "genfit/TrackCand.h"
 
@@ -132,6 +133,8 @@ void CDCLegendreTrackingModule::initialize()
   m_cdcLegendreTrackDrawer->initialize();
 
   m_cdcLegendreTrackCreator = new CDCLegendreTrackCreator(m_AxialHitList, m_trackList, m_appendHits, m_cdcLegendreTrackFitter, m_cdcLegendreTrackDrawer);
+
+//  m_cdcLegendreQuadTree = new CDCLegendreQuadTree(-1.*m_rc, m_rc, 0, m_nbinsTheta, 0, NULL);
 }
 
 void CDCLegendreTrackingModule::beginRun()
@@ -233,12 +236,14 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
     } else {
       std::vector< std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > > candidates;
 
+      int level = 0;
+
       m_cdcLegendreFastHough->initializeCandidatesVector(&candidates);
       m_cdcLegendreFastHough->setLimit(limit);
       m_cdcLegendreFastHough->setAxialHits(hits_vector);
       m_cdcLegendreFastHough->MaxFastHough(hits_vector, 0, 0, m_nbinsTheta, m_rMin, m_rMax);
-//      m_cdcLegendreFastHough->MaxFastHoughHighPt(hits_vector, 0, m_nbinsTheta, m_rMin, m_rMax);
-
+//      m_cdcLegendreFastHough->MaxFastHoughHighPtHeap(hits_vector, 0, m_nbinsTheta, m_rMin, m_rMax, level);
+//      m_cdcLegendreFastHough->MaxFastHoughHighPtStack(hits_vector, 0, m_nbinsTheta, -0.01667, 0.01667, level);
       if (candidates.size() == 0) {
         limit *= m_stepScale;
         n_hits = 999;

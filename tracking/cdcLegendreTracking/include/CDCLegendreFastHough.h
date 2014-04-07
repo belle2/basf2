@@ -66,23 +66,12 @@ namespace Belle2 {
      * Same logic as in MaxFastHough, but looks only for HighPt tracks;
      * starts with 2x2 binning, but when reached desired dr resolution (which defined as 2*Rcell) makes 1xN binning and finish algorithm in one iteration
      */
-    void MaxFastHoughHighPtHeap(const std::vector<CDCLegendreTrackHit*>& hits, const int theta_min, const int theta_max,
-                                double r_min, double r_max, int level);
-
     /**
      * Same logic as in MaxFastHough, but looks only for HighPt tracks;
      * starts with 2x2 binning, but when reached desired dr resolution (which defined as 2*Rcell) makes 1xN binning and finish algorithm in one iteration
      */
-    void MaxFastHoughHighPtStack(const std::vector<CDCLegendreTrackHit*>& hits, const int theta_min, const int theta_max,
-                                 double r_min, double r_max, int level);
-
-
-    /**
-     * Same logic as in MaxFastHough, but looks only for HighPt tracks;
-     * starts with 2x2 binning, but when reached desired dr resolution (which defined as 2*Rcell) makes 1xN binning and finish algorithm in one iteration
-     */
-    void MaxFastHoughHighPtTree(const std::vector<CDCLegendreTrackHit*>& hits, const int theta_min, const int theta_max,
-                                double r_min, double r_max, int level);
+    void MaxFastHoughHighPt(const std::vector<CDCLegendreTrackHit*>& hits, const int theta_min, const int theta_max,
+                            double r_min, double r_max, int level);
 
 
     /** Set limitation on number of hits in candidate */

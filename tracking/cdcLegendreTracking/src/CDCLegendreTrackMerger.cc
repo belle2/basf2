@@ -309,7 +309,7 @@ bool CDCLegendreTrackMerger::earlyCandidateMerge(std::pair < std::vector<CDCLege
     double x0_cand = cos(candidate.second.first) / candidate.second.second + ref_point.first;
     double y0_cand = sin(candidate.second.first) / candidate.second.second + ref_point.second;
 
-    bool make_merge = false;
+    bool make_merge __attribute__((unused)) = false;
 
     double chi2_track;
     //loop over all candidates

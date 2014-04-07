@@ -12,6 +12,7 @@
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreFastHough.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreQuadTreeCandidateCreator.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreConformalPosition.h>
 
 #include <cmath>
 #include <cstdlib>
@@ -264,15 +265,17 @@ void CDCLegendreQuadTree::fillChildren(/*const std::vector<CDCLegendreTrackHit*>
     if (hit->isUsed() != CDCLegendreTrackHit::not_used) continue;
     for (int t_index = 0; t_index < m_nbins_theta + 1; ++t_index) {
 
-      if (hit->checkRValue(m_thetaBin[t_index])) r_temp = hit->getRValue(m_thetaBin[t_index]);
+      /*if (hit->checkRValue(m_thetaBin[t_index])) r_temp = hit->getRValue(m_thetaBin[t_index]);
       else {
         r_temp = hit->getConformalX() * s_cos_theta[m_thetaBin[t_index]] +
                  hit->getConformalY() * s_sin_theta[m_thetaBin[t_index]];
         hit->setRValue(m_thetaBin[t_index], r_temp);
       }
-      /*      r_temp = hit->getConformalX() * s_cos_theta[m_thetaBin[t_index]] +
+            r_temp = hit->getConformalX() * s_cos_theta[m_thetaBin[t_index]] +
                      hit->getConformalY() * s_sin_theta[m_thetaBin[t_index]];
       */
+
+      r_temp = CDCLegendreConformalPosition::InstanceTrusted().getConformalR(hit->getLayerId(), hit->getWireId(), m_thetaBin[t_index]);
       r_1 = r_temp + hit->getConformalDriftTime();
       r_2 = r_temp - hit->getConformalDriftTime();
 

@@ -258,9 +258,8 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
       m_cdcLegendreFastHough->initializeCandidatesVector(&candidates);
       m_cdcLegendreFastHough->setLimit(limit);
       m_cdcLegendreFastHough->setAxialHits(hits_vector);
-//      m_cdcLegendreFastHough->MaxFastHough(hits_vector, 0, 0, m_nbinsTheta, m_rMin, m_rMax);
-//      m_cdcLegendreFastHough->MaxFastHoughHighPtHeap(hits_vector, 0, m_nbinsTheta, m_rMin, m_rMax, level);
-      m_cdcLegendreFastHough->MaxFastHoughHighPtStack(hits_vector, 0, m_nbinsTheta, -0.01667, 0.01667, level);
+      m_cdcLegendreFastHough->MaxFastHough(hits_vector, 0, 0, m_nbinsTheta, m_rMin, m_rMax);
+//      m_cdcLegendreFastHough->MaxFastHoughHighPt(hits_vector, 0, m_nbinsTheta, -0.01667, 0.01667, level);
       if (candidates.size() == 0) {
         limit *= m_stepScale;
         n_hits = 999;
@@ -396,6 +395,8 @@ void CDCLegendreTrackingModule::endRun()
 
 void CDCLegendreTrackingModule::terminate()
 {
+  delete m_cdcLegendreQuadTree;
+  delete m_cdcLegendreQuadTreeCandidateCreator;
   delete m_cdcLegendreConformalPosition;
 //  delete m_cdcLegendreTrackFitter;
   delete m_cdcLegendreTrackDrawer;

@@ -118,13 +118,13 @@ void CDCLegendreTrackingModule::initialize()
   //StoreArray for genfit::TrackCandidates
   StoreArray<genfit::TrackCand>::registerPersistent(m_gfTrackCandsColName);
 
-  m_nbinsTheta = static_cast<int>(std::pow(2.0, m_maxLevel + 3)); //+3 needed for make bin overlapping;
+  m_nbinsTheta = 8192; //hardcoded value!!! temporary solution, for avoiding segfaults only  //static_cast<int>(std::pow(2.0, m_maxLevel + 3)); //+3 needed for make bin overlapping;
 
   m_cdcLegendreTrackFitter = new CDCLegendreTrackFitter(m_nbinsTheta, m_rMax, m_rMin, m_fitTracks);
   m_cdcLegendrePatternChecker = new CDCLegendrePatternChecker();
 
-  m_AxialHitList.reserve(1024);
-  m_StereoHitList.reserve(1024);
+  m_AxialHitList.reserve(2048);
+  m_StereoHitList.reserve(2048);
 
   m_cdcLegendreFastHough = new CDCLegendreFastHough(m_useHitPrecalculatedR, m_reconstructCurler, m_maxLevel, m_nbinsTheta, m_rMin, m_rMax);
 

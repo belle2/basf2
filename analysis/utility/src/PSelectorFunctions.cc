@@ -35,6 +35,7 @@
 #include <framework/logging/Logger.h>
 
 #include <TLorentzVector.h>
+#include <TVectorF.h>
 
 #include <iostream>
 #include <math.h>
@@ -198,6 +199,31 @@ namespace Belle2 {
       }
 
       return result;
+    }
+
+    double particleInvariantMassError(const Particle* part)
+    {
+      float result = 0.0;
+
+      float invMass = part->getMass();
+
+      TMatrixFSym covarianceMatrix(Particle::c_DimMomentum);
+      for (unsigned i = 0; i < part->getNDaughters(); i++) {
+        covarianceMatrix += part->getDaughter(i)->getMomentumErrorMatrix();
+      }
+
+      TVectorF    jacobian(Particle::c_DimMomentum);
+      jacobian[0] = -1.0 * part->getPx() / invMass;
+      jacobian[1] = -1.0 * part->getPy() / invMass;
+      jacobian[2] = -1.0 * part->getPz() / invMass;
+      jacobian[3] =  1.0 * part->getEnergy() / invMass;
+
+      result = jacobian * (covarianceMatrix * jacobian);
+
+      if (result < 0.0)
+        result = 0.0;
+
+      return TMath::Sqrt(result);
     }
 
     // released energy --------------------------------------------------
@@ -755,6 +781,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("deltaE", particleDeltaE, "energy difference");
 
     REGISTER_VARIABLE("invM", particleInvariantMass, "invariant mass (determined from particle's daughter 4-momentum vectors)");
+    REGISTER_VARIABLE("ErrM", particleInvariantMassError, "uncertainty of invariant mass (determined from particle's daughter 4-momentum vectors)");
 
     REGISTER_VARIABLE("eid", particleElectronId, "electron identification probability");
     REGISTER_VARIABLE("muid", particleMuonId, "muon identification probability");

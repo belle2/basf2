@@ -288,10 +288,11 @@ namespace Belle2 {
     }
 
     /**
-     * Returns mass error (not implemented yet!)
+     * Returns uncertaint on the invariant mass
+     * (requiers valid momentum error matrix)
      * @return mass error
      */
-    float getMassError() const { return 0.0; }; // TODO
+    //float getMassError() const;
 
     /**
      * Returns particle nominal mass

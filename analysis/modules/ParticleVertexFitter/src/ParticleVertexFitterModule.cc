@@ -285,6 +285,9 @@ namespace Belle2 {
   {
     if (mother->getNDaughters() < 2) return false;
 
+    if (ipTubeConstraint)
+      B2ERROR("[ParticleVertexFitterModule::doKVertexFit] ipTubeConstraint is not supported yet!");
+
     std::vector<const Particle*> fitChildren;
     std::vector<const Particle*> pi0Children;
 

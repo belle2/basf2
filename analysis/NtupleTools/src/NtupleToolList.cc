@@ -2,6 +2,7 @@
 #include <analysis/NtupleTools/NtupleToolList.h>
 #include <analysis/NtupleTools/NtupleKinematicsTool.h>
 #include <analysis/NtupleTools/NtupleCMSKinematicsTool.h>
+#include <analysis/NtupleTools/NtupleMomentumUncertaintyTool.h>
 #include <analysis/NtupleTools/NtupleMassBeforeFitTool.h>
 #include <analysis/NtupleTools/NtupleEventMetaDataTool.h>
 #include <analysis/NtupleTools/NtupleDeltaEMbcTool.h>
@@ -55,6 +56,7 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
 
   if (strToolName.compare("Kinematics") == 0) return new NtupleKinematicsTool(tree, d);
   else if (strToolName.compare("CMSKinematics") == 0) return new NtupleCMSKinematicsTool(tree, d);
+  else if (strToolName.compare("MomentumUncertainty") == 0) return new NtupleMomentumUncertaintyTool(tree, d);
   else if (strToolName.compare("MassBeforeFit") == 0) return new NtupleMassBeforeFitTool(tree, d);
   else if (strToolName.compare("EventMetaData") == 0) return new NtupleEventMetaDataTool(tree, d);
   else if (strToolName.compare("DeltaEMbc") == 0) return new NtupleDeltaEMbcTool(tree, d);

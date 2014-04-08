@@ -182,6 +182,13 @@ namespace Belle2 {
     /**
      * function for PSelector
      * @param part const pointer to Particle
+     * @return uncertainty of the invariant mass (determined from particle's daughter 4-momentum vectors)
+     */
+    double particleInvariantMassError(const Particle* part);
+
+    /**
+     * function for PSelector
+     * @param part const pointer to Particle
      * @return released energy in decay
      */
     double particleQ(const Particle* part);

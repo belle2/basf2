@@ -1,6 +1,6 @@
 !-------------------------------------------------------------------------
 ! TOP counter for Belle: Reconstruction - basic functions to construct PDF 
-! M. Staric, nov-2008, jun-2009, jan-2010, oct-2011, feb-2013
+! M. Staric, nov-2008, jun-2009, jan-2010, oct-2011, feb-2013, apr-2014
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 !-------------------------------------------------------------------------
 
@@ -547,35 +547,40 @@ c--   solve for cos(fic), sin(fic), kx, ky, kz; if OK, increment nt; store @ nt
       LOGICAL OK                ! status [out]
 #include "TOP_GEO.fi"
 #include "TOP_TRACK.fi"
-      REAL AH, XM1, XM2 
-      REAL DX, DX1, DX2
+      REAL AH, X, X1, X2 
+      REAL Y, Y0, Y1, Y2
       REAL XMIRR_REFLECT_2D
       INTEGER I
 
       XM=0
       ZM=QBAR_ZCMI(MODUL)+QBAR_MIPOS(MODUL)*QBAR_RMI(MODUL)
       AH=QBAR_A(MODUL)/2
-      XM1=-AH
-      XM2=AH
-      DX1=XMIRR_REFLECT_2D(XE,ZE,XM1,ZD,OK)-XD
+      X1=-AH
+      X2=AH
+      Y1=XMIRR_REFLECT_2D(XE,ZE,X1,ZD,OK)-XD
       IF(.NOT.OK) RETURN
-      DX2=XMIRR_REFLECT_2D(XE,ZE,XM2,ZD,OK)-XD
+      Y2=XMIRR_REFLECT_2D(XE,ZE,X2,ZD,OK)-XD
       IF(.NOT.OK) RETURN
-      OK=DX1*DX2.LT.0
+      OK=Y1*Y2.LT.0
       IF(.NOT.OK) RETURN
+      Y=Y1
       DO I=1,40
-         XM=(XM1+XM2)/2
-         DX=XMIRR_REFLECT_2D(XE,ZE,XM,ZD,OK)-XD
+         Y0=Y
+         X=X1-(X2-X1)/(Y2-Y1)*Y1
+         Y=XMIRR_REFLECT_2D(XE,ZE,X,ZD,OK)-XD
          IF(.NOT.OK) RETURN
-         IF(DX*DX1.LT.0) THEN
-            XM2=XM
-            DX2=DX
+         IF(Y.EQ.0) EXIT
+         IF(Y.EQ.Y0) EXIT
+         IF(Y*Y1.LT.0) THEN
+            X2=X
+            Y2=Y
          ELSE
-            XM1=XM
-            DX1=DX
+            X1=X
+            Y1=Y
+            IF(Y1.EQ.Y2) EXIT
          ENDIF
-         IF(XM2.EQ.XM1) EXIT
       ENDDO
+      XM=X
       ZM=QBAR_ZCMI(MODUL)+QBAR_MIPOS(MODUL)*
      &     SQRT(QBAR_RMI(MODUL)**2-(XM-QBAR_XCMI(MODUL))**2)
 

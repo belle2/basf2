@@ -21,6 +21,7 @@
 
 // stl:
 #include <vector>
+#include <utility> // std::pair
 #include <math.h>
 
 namespace Belle2 {
@@ -39,8 +40,8 @@ namespace Belle2 {
      *
      * first parameter is reference to cluster
      * second is the index number of the cluster in its storeArray.
-     * If there is a sensorInfo at hand, it can be passed as a third parameter
-     *  (if no sensorInfo is passed, it will be created within the constructor)
+     * third parameter, a sensorInfo can be passed for testing purposes.
+     *  If no sensorInfo is passed, the constructor gets its own pointer to it.
      */
     SpacePoint(const PXDCluster& pxdCluster, unsigned int indexNumber, const VXD::SensorInfoBase* aSensorInfo = NULL);
 
@@ -50,17 +51,51 @@ namespace Belle2 {
     /** return the position vector in global coordinates */
     const TVector3& getPosition() const { return m_position; }
 
+
     /** return the hitErrors in sigma of the global position */
     const TVector3& getPositionError() const { return m_positionError; }
+
 
     /** return the VxdID of the sensor inhabiting the Cluster of the SpacePoint */
     VxdID::baseType getVxdID() const { return m_vxdID; }
 
+
     /** return the normalized local coordinates of the cluster in u (0 <= posU <= 1) */
-    float getNormalizedLocalU() const { return m_normalizedLocal[0]; }
+    float getNormalizedLocalU() const { return m_normalizedLocal.first/*m_normalizedLocal[0]*/; }
+
 
     /** return the normalized local coordinates of the cluster in v (0 <= posV <= 1) */
-    float getNormalizedLocalV() const { return m_normalizedLocal[1]; }
+    float getNormalizedLocalV() const { return m_normalizedLocal.second/*m_normalizedLocal[1]*/; }
+
+
+    /** converts a local hit into sensor-independent relative coordinates.
+     *
+     * first parameter is the local hit stored as a pair of floats.
+     * second parameter is the coded vxdID, which carries the sensorID.
+     * third parameter, a sensorInfo can be passed for testing purposes.
+     *  If no sensorInfo is passed, the member gets its own pointer to it.
+     */
+    static std::pair<float, float> convertToNormalizedCoordinates(const std::pair<float, float>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
+
+
+    /** converts a hit in sensor-independent relative coordinates into local coordinate of given sensor.
+     *
+     * first parameter is the hit in sensor-independent normalized coordinates stored as a pair of floats.
+     * second parameter is the coded vxdID, which carries the sensorID.
+     * third parameter, a sensorInfo can be passed for testing purposes.
+     *  If no sensorInfo is passed, the member gets its own pointer to it.
+     */
+    static std::pair<float, float> convertToLocalCoordinates(const std::pair<float, float>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
+
+
+    /** converts a local hit on a given sensor into global coordinates.
+     *
+     * first parameter is the local hit stored as a pair of floats.
+     * second parameter is the coded vxdID, which carries the sensorID.
+     * third parameter, a sensorInfo can be passed for testing purposes.
+     *  If no sensorInfo is passed, the member gets its own pointer to it.
+     */
+    static TVector3 getGlobalCoordinates(const std::pair<float, float>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
   protected:
@@ -80,7 +115,8 @@ namespace Belle2 {
      *
      *  First entry is u, second is v
      */
-    float m_normalizedLocal[2];
+    std::pair<float, float> m_normalizedLocal;
+//     float m_normalizedLocal[2];
 
     /** stores the vxdID */
     VxdID::baseType m_vxdID;

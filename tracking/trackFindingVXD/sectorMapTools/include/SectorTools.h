@@ -46,7 +46,7 @@ namespace Belle2 {
 
     /** for a given point  */
     static RelCoords calcRelativeSectorPoint(const std::vector<float>& uConfig, const std::vector<float>& vConfig, uShort secID, RelCoords coords) {
-      return make_pair(0, 0); /*dummy*/
+      return std::make_pair(0, 0); /*dummy*/
     }
 
   protected:

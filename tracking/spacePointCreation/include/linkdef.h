@@ -8,5 +8,6 @@
 
 
 #pragma link C++ class Belle2::SpacePoint+;
+#pragma link C++ class pair <float, float >+;
 
 #endif

@@ -152,7 +152,7 @@ void GenFitterModule::initialize()
   }
 
   RelationArray::registerPersistent<genfit::Track, MCParticle>(m_gfTracksColName, m_mcParticlesColName);
-  RelationArray::registerPersistent<MCParticle, Track> ();
+  RelationArray::registerPersistent<Track, MCParticle> ();
   RelationArray::registerPersistent<genfit::Track, TrackFitResult>(m_gfTracksColName, "");
   RelationArray::registerPersistent<genfit::TrackCand, TrackFitResult>(m_gfTrackCandsColName, "");
   RelationArray::registerPersistent<genfit::TrackCand, genfit::Track>(m_gfTrackCandsColName, m_gfTracksColName);
@@ -264,7 +264,7 @@ void GenFitterModule::event()
   gfTracks.create();
 
   //Relations for Tracks
-  RelationArray mcParticlesToTracks(mcParticles, tracks);
+  RelationArray tracksToMcParticles(tracks, mcParticles);
   RelationArray gfTracksToTrackFitResults(gfTracks, trackFitResults);
   RelationArray gfTrackCandidatesTogfTracks(trackCandidates, gfTracks);
 
@@ -521,7 +521,7 @@ void GenFitterModule::event()
                           */
             //Create relations
             if (aTrackCandPointer->getMcTrackId() >= 0) {
-              mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
+              tracksToMcParticles.add(trackCounter, aTrackCandPointer->getMcTrackId());
             }
             //else B2WARNING("No MCParticle contributed to this track! No MCParticle<->Track relation will be created!");
             //FIXME: disabled, makes no sense with real data.
@@ -579,7 +579,7 @@ void GenFitterModule::event()
             tracks[trackCounter]->setTrackFitResultIndex(chargedStable, trackFitResultCounter);
             //Create relations
             if (aTrackCandPointer->getMcTrackId() >= 0) {
-              mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
+              tracksToMcParticles.add(trackCounter, aTrackCandPointer->getMcTrackId());
             }
 
             genfit::KalmanFitStatus* fs = gfTrack.getKalmanFitStatus();
@@ -664,7 +664,7 @@ void GenFitterModule::event()
             B2WARNING("Something went wrong during the extrapolation of fit results!");
             //Create relations
             if (aTrackCandPointer->getMcTrackId() >= 0) {
-              mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
+              tracksToMcParticles.add(trackCounter, aTrackCandPointer->getMcTrackId());
             }
             //else B2WARNING("No MCParticle contributed to this track! No MCParticle<->Track relation will be created!");
             //FIXME: disabled, makes no sense for real data

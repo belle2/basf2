@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="SVD" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <!-- TODO:
+       - Check thickness/material of kapton cables
+       - Add readout boards
+  -->
+  <Creator library="svd">SVDCreator</Creator>
+  <Content>
+    <!-- Set the default Material for the Envelope and Components which do not have a Material assigned -->
+    <DefaultMaterial>Air</DefaultMaterial>
+    <!--If this is true, all dead Material will be ignored and only the active
+        Material will be placed and the rest of the Detector will be filled
+        with DefaultMaterial -->
+    <OnlyActiveMaterial>false</OnlyActiveMaterial>
+    <!-- Set the  stepsize to be used in senistive volumes -->
+    <ActiveStepSize unit="um">5</ActiveStepSize>
+    <!-- If this is true, TrueHits will only be created for primary particles,
+         secondaries produced by Geant4 will not create TrueHits -->
+    <OnlyPrimaryTrueHits>false</OnlyPrimaryTrueHits>
+    <!--Settings for background and exposure studies -->
+    <ActiveChips desc="Set to true to make chips on sensors sensitive">false</ActiveChips>
+    <SeeNeutrons desc="Set to true to make sensitive detectors see neutrons">false</SeeNeutrons>
+    <SensitiveThreshold desc="Minimum deposited energy per geant4 step" unit="eV">1.0</SensitiveThreshold>
+    <!-- Include Alignment information -->
+    <xi:include href="misalignmentVXD.xml"/>
+    <!-- Include definition of logical volume encapsulating the SVD -->
+    <xi:include href="../svd/SVD-Envelope.xml"/>
+    <!-- Include the definition of the mechanical support -->
+    <xi:include href="../svd/SVD-Support.xml"/>
+    <!-- Include the definition of all the components like ladders, sensors and
+         chips -->
+    <xi:include href="../svd/SVD-Components.xml"/>
+
+    <!-- Only for testing: Each layer with only one ladder to check module positions -->
+    <!--<HalfShell name="Pat">
+      <shellAngle unit="deg">0</shellAngle>
+      <Layer id="3">
+        <Ladder id="1"> <phi unit="deg"> 60</phi></Ladder>
+      </Layer>
+      <Layer id="4">
+        <Ladder id="1"> <phi unit="deg"> 120</phi></Ladder>
+      </Layer>
+      <Layer id="5">
+        <Ladder id="1"> <phi unit="deg"> 180</phi></Ladder>
+      </Layer>
+      <Layer id="6">
+        <Ladder id="1"> <phi unit="deg"> 240</phi></Ladder>
+      </Layer>
+    </HalfShell>
+    -->
+
+    <!-- For more information about the meaning of these parameter see pxd/PXD.xml -->
+    <HalfShell name="Pat">
+      <shellAngle unit="deg">0</shellAngle>
+      <Layer id="3">
+        <Ladder id="1">  <phi unit="deg"> 48.624</phi></Ladder>
+        <Ladder id="2">  <phi unit="deg">100.053</phi></Ladder>
+        <Ladder id="6">  <phi unit="deg">305.767</phi></Ladder>
+        <Ladder id="7">  <phi unit="deg">357.195</phi></Ladder>
+      </Layer>
+      <Layer id="4">
+        <Ladder id="1">  <phi unit="deg"> 18.000</phi></Ladder>
+        <Ladder id="2">  <phi unit="deg"> 54.000</phi></Ladder>
+        <Ladder id="3">  <phi unit="deg"> 90.000</phi></Ladder>
+        <Ladder id="9">  <phi unit="deg">306.000</phi></Ladder>
+        <Ladder id="10"> <phi unit="deg">342.000</phi></Ladder>
+      </Layer>
+      <Layer id="5">
+        <Ladder id="1">  <phi unit="deg">  0.000</phi></Ladder>
+        <Ladder id="2">  <phi unit="deg"> 30.000</phi></Ladder>
+        <Ladder id="3">  <phi unit="deg"> 60.000</phi></Ladder>
+        <Ladder id="4">  <phi unit="deg"> 90.000</phi></Ladder>
+        <Ladder id="11"> <phi unit="deg">300.000</phi></Ladder>
+        <Ladder id="12"> <phi unit="deg">330.000</phi></Ladder>
+      </Layer>
+      <Layer id="6">
+        <Ladder id="1">  <phi unit="deg">  0.000</phi></Ladder>
+        <Ladder id="2">  <phi unit="deg"> 22.500</phi></Ladder>
+        <Ladder id="3">  <phi unit="deg"> 45.000</phi></Ladder>
+        <Ladder id="4">  <phi unit="deg"> 67.500</phi></Ladder>
+        <Ladder id="5">  <phi unit="deg"> 90.000</phi></Ladder>
+        <Ladder id="14"> <phi unit="deg">292.500</phi></Ladder>
+        <Ladder id="15"> <phi unit="deg">315.000</phi></Ladder>
+        <Ladder id="16"> <phi unit="deg">337.500</phi></Ladder>
+      </Layer>
+    </HalfShell>
+    <HalfShell name="Mat">
+      <shellAngle unit="deg">180</shellAngle>
+      <Layer id="3">
+        <Ladder id="3">  <phi unit="deg">151.481</phi></Ladder>
+        <Ladder id="4">  <phi unit="deg">202.910</phi></Ladder>
+        <Ladder id="5">  <phi unit="deg">254.338</phi></Ladder>
+      </Layer>
+      <Layer id="4">
+        <Ladder id="4">  <phi unit="deg">126.000</phi></Ladder>
+        <Ladder id="5">  <phi unit="deg">162.000</phi></Ladder>
+        <Ladder id="6">  <phi unit="deg">198.000</phi></Ladder>
+        <Ladder id="7">  <phi unit="deg">234.000</phi></Ladder>
+        <Ladder id="8">  <phi unit="deg">270.000</phi></Ladder>
+      </Layer>
+      <Layer id="5">
+        <Ladder id="5">  <phi unit="deg">120.000</phi></Ladder>
+        <Ladder id="6">  <phi unit="deg">150.000</phi></Ladder>
+        <Ladder id="7">  <phi unit="deg">180.000</phi></Ladder>
+        <Ladder id="8">  <phi unit="deg">210.000</phi></Ladder>
+        <Ladder id="9">  <phi unit="deg">240.000</phi></Ladder>
+        <Ladder id="10"> <phi unit="deg">270.000</phi></Ladder>
+      </Layer>
+      <Layer id="6">
+        <Ladder id="6">  <phi unit="deg">112.500</phi></Ladder>
+        <Ladder id="7">  <phi unit="deg">135.000</phi></Ladder>
+        <Ladder id="8">  <phi unit="deg">157.500</phi></Ladder>
+        <Ladder id="9">  <phi unit="deg">180.000</phi></Ladder>
+        <Ladder id="10"> <phi unit="deg">202.500</phi></Ladder>
+        <Ladder id="11"> <phi unit="deg">225.000</phi></Ladder>
+        <Ladder id="12"> <phi unit="deg">247.500</phi></Ladder>
+        <Ladder id="13"> <phi unit="deg">270.000</phi></Ladder>
+      </Layer>
+    </HalfShell>
+  </Content>
+</DetectorComponent>

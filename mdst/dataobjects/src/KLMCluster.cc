@@ -21,7 +21,7 @@ KLMCluster::KLMCluster()
 {
 }
 
-KLMCluster::KLMCluster(ROOT::Math::XYZPointF coordinates, float time, int nLayers, int nInnermostLayer, TVector3 momentum)
+KLMCluster::KLMCluster(ROOT::Math::XYZPointF coordinates, float time, int nLayers, int nInnermostLayer, TVector3 momentum, TMatrixFSym errormatrix = TMatrixFSym(7))
 {
   m_globalX = coordinates.X();
   m_globalY = coordinates.Y();
@@ -34,6 +34,7 @@ KLMCluster::KLMCluster(ROOT::Math::XYZPointF coordinates, float time, int nLayer
   m_pZ = momentum.Pz();
   m_eclClusterFound = false;
   m_trackFound = false;
+  m_momentumErrorMatrix = errormatrix;
 }
 
 

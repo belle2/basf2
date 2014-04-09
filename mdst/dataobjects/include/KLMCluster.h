@@ -20,6 +20,7 @@
 
 // dependence on root is allowed
 #include <TVector3.h>
+#include <TMatrixFSym.h>
 #include "TLorentzVector.h"
 #include <Math/Point3D.h>
 
@@ -42,7 +43,7 @@ namespace Belle2 {
     /**
      * Constructor with all information
      */
-    KLMCluster(ROOT::Math::XYZPointF coordinates, float time, int nLayers, int nInnermostLayer, TVector3 momentum);
+    KLMCluster(ROOT::Math::XYZPointF coordinates, float time, int nLayers, int nInnermostLayer, TVector3 momentum, TMatrixFSym errormatrix);
 
     /**
      * Constructor with all information in floats
@@ -107,6 +108,13 @@ namespace Belle2 {
     bool getAssociatedEclClusterFlag() const
     {return m_eclClusterFound;}
 
+    /**
+     * Get KL Cluster momentum error matrix
+     * @return 7x7 KL Cluster momentum error matrix
+     */
+    TMatrixFSym getErrorMatrix()
+    {return m_momentumErrorMatrix;}
+
 
     /**
      * Get  track flag,
@@ -166,6 +174,9 @@ namespace Belle2 {
 
     /** Momentum Z component. */
     float m_pZ;
+
+    /** error matrix 7x7 for KL momentum */
+    TMatrixFSym m_momentumErrorMatrix;
 
     /** True if associated track is found */
     bool m_trackFound;

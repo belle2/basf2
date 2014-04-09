@@ -31,7 +31,7 @@ PXDRecoHit::PXDRecoHit():
   m_energyDep(0)//, m_energyDepError(0)
 {}
 
-PXDRecoHit::PXDRecoHit(const PXDTrueHit* hit, const genfit::TrackCandHit* trackCandHit, float sigmaU, float sigmaV):
+PXDRecoHit::PXDRecoHit(const PXDTrueHit* hit, const genfit::TrackCandHit*, float sigmaU, float sigmaV):
   genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit), m_cluster(0),
   m_energyDep(0)//, m_energyDepError(0)
 {
@@ -83,7 +83,7 @@ PXDRecoHit::PXDRecoHit(const PXDCluster* hit, float sigmaU, float sigmaV, float 
 }
 
 
-PXDRecoHit::PXDRecoHit(const PXDCluster* hit, const genfit::TrackCandHit* trackCandHit):
+PXDRecoHit::PXDRecoHit(const PXDCluster* hit, const genfit::TrackCandHit*):
   genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_cluster(hit),
   m_energyDep(0)//, m_energyDepError(0)
 {

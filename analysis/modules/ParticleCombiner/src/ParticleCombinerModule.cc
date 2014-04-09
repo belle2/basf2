@@ -74,6 +74,13 @@ namespace Belle2 {
     for (unsigned i = 0; i < m_inputListNames.size(); i++) {
       StoreObjPtr<ParticleList>::required(m_inputListNames[i]);
     }
+
+    // printout with B2INFO
+    std::string decay;
+    for (unsigned i = 0; i < m_inputListNames.size(); i++) {
+      decay = decay + " " + m_inputListNames[i];
+    }
+    B2INFO("ParticleCombiner: " << m_pdg << " " << m_listName << "->" << decay);
   }
 
   void ParticleCombinerModule::beginRun()
@@ -114,28 +121,6 @@ namespace Belle2 {
 
     combination(outputList, plists, 0);
     if (outputList->getFlavorType() == 1) combination(outputList, plists, 1);
-
-    // printout with B2INFO
-    std::string decay;
-    for (unsigned i = 0; i < m_inputListNames.size(); i++) {
-      decay = decay + " " + m_inputListNames[i];
-    }
-    switch (outputList->getFlavorType()) {
-      case 0:
-        B2INFO("ParticleCombiner: " << m_pdg << " " << m_listName << "->" << decay
-               << " size=" << outputList->getList(0).size());
-        break;
-      case 1:
-        B2INFO("ParticleCombiner: " << m_pdg << " " << m_listName << "->" << decay
-               << " size="
-               << outputList->getList(0).size() << "+" << outputList->getList(1).size());
-        break;
-      default:
-        B2ERROR("ParticleCombiner: " << m_pdg << " " << m_listName << "->" << decay
-                << " ***invalid FlavorType: "
-                << outputList->getFlavorType());
-    }
-
   }
 
 

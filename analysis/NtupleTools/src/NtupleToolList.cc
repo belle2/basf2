@@ -35,24 +35,26 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   string strOption("");
   string strToolName("");
 
-  B2INFO(strName);
-  B2INFO("Length : " << strName.size());
-  B2INFO("Position of ( : " << iPosBracket1);
-  B2INFO("Position of ) : " << strName.find(")"));
+  //B2INFO("Length : " << strName.size());
+  //B2INFO("Position of ( : " << iPosBracket1);
+  //B2INFO("Position of ) : " << strName.find(")"));
 
   if (iPosBracket1 != string::npos) {
     if (strName.find(")") == strName.size() - 1) {
       strToolName = strName.substr(0, iPosBracket1);
       strOption = strName.substr(iPosBracket1 + 1, strName.size() - iPosBracket1 - 2);
     } else {
-      B2WARNING("Incorrect NtupleTool name: " << strName);
+      B2ERROR("Incorrect NtupleTool name: " << strName);
       return NULL;
     }
   } else {
     strToolName = strName;
   }
 
-  B2INFO("Options : " << strOption);
+  B2INFO(" -> creating Ntuple tool: " << strToolName);
+  if (strOption.compare(std::string("")) != 0) {
+    B2INFO("   -> using these options: " << strOption);
+  }
 
   if (strToolName.compare("Kinematics") == 0) return new NtupleKinematicsTool(tree, d);
   else if (strToolName.compare("CMSKinematics") == 0) return new NtupleCMSKinematicsTool(tree, d);

@@ -65,6 +65,12 @@ namespace Belle2 {
     StoreObjPtr<ParticleExtraInfoMap>::registerPersistent("", DataStore::c_Event, false); //allow reregistration
     RelationArray::registerPersistent<Particle, PIDLikelihood>();
     RelationArray::registerPersistent<Particle, MCParticle>();
+
+    if (m_useMCParticles) {
+      B2INFO("ParticleLoader: Loading Particle(s) from final state primary MCParticle(s)");
+    } else {
+      B2INFO("ParticleLoader: Loading Particle(s) from reconstructed Track(s) (as e/mu/pi/K/p) and neutral ECLCluster(s) (as photons)");
+    }
   }
 
   void ParticleLoaderModule::beginRun()
@@ -121,7 +127,7 @@ namespace Belle2 {
         }
       }
     }
-    B2INFO("ParticleLoader::loadFromMCParticles size=" << Particles.getEntries());
+    //B2INFO("ParticleLoader::loadFromMCParticles size=" << Particles.getEntries());
   }
 
   void ParticleLoaderModule::loadFromReconstruction()
@@ -173,7 +179,7 @@ namespace Belle2 {
       }
     }
 
-    B2INFO("ParticleLoader::loadFromReconstruction size=" << Particles.getEntries());
+    //B2INFO("ParticleLoader::loadFromReconstruction size=" << Particles.getEntries());
   }
 } // end Belle2 namespace
 

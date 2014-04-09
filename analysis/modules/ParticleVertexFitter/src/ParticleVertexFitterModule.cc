@@ -78,6 +78,13 @@ namespace Belle2 {
 
     if (m_decayString.compare(std::string("")) != 0)
       m_decaydescriptor.init(m_decayString);
+
+    B2INFO("ParticleVertexFitter: Performing " << m_fitType << " fit on " << m_listName << " using " << m_vertexFitter);
+    if (m_decayString.compare(std::string("")) != 0)
+      B2INFO("ParticleVertexFitter: Using specified decay string: " << m_decayString);
+    if (m_withConstraint.compare(std::string("")) != 0)
+      B2INFO("ParticleVertexFitter: Additional " << m_withConstraint << " will be applied");
+
   }
 
   void ParticleVertexFitterModule::beginRun()
@@ -99,25 +106,6 @@ namespace Belle2 {
       if (!ok) plist->markToRemove(i);
     }
     plist->removeMarked();
-
-    // printout with B2INFO
-
-    int pdg = plist->getPDG();
-    switch (plist->getFlavorType()) {
-      case 0:
-        B2INFO("ParticleVertexFitter: " << pdg << " " << m_listName
-               << " size=" << plist->getList(0).size());
-        break;
-      case 1:
-        B2INFO("ParticleVertexFitter: " << pdg << " " << m_listName
-               << " size="
-               << plist->getList(0).size() << "+" << plist->getList(1).size());
-        break;
-      default:
-        B2ERROR("ParticleVertexFitter: " << pdg << " " << m_listName << " ***invalid flavor type "
-                << plist->getFlavorType());
-    }
-
   }
 
 

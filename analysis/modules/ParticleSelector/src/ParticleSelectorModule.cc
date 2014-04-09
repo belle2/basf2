@@ -125,6 +125,7 @@ namespace Belle2 {
     }
 
 
+    /*
     switch (plist->getFlavorType()) {
       case 0:
         B2INFO("ParticleSelector: " << m_pdg << " " << m_listName << " size="
@@ -138,7 +139,7 @@ namespace Belle2 {
         B2ERROR("ParticleSelector: " << m_pdg << " " << m_listName << " ***invalid Type "
                 << plist->getFlavorType());
     }
-
+    */
   }
 
 

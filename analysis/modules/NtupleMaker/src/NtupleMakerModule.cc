@@ -60,6 +60,7 @@ void NtupleMakerModule::initialize()
   m_tree = new TTree(m_strTreeName.c_str(), m_strComment.c_str());
   m_nTrees++;
 
+  B2INFO("NtupleMaker: Creating tree with name " << m_strTreeName << " for the ParticleList " << m_strListName << " filled with the following tools:");
   int nTools = m_strTools.size();
   for (int iTool =  0; iTool < (nTools - 1); iTool = iTool + 2) {
     // Create decay descriptors with selected particles from string

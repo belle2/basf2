@@ -26,6 +26,7 @@ namespace Belle2 {
 
   // forward declarations
   class ECLCluster;
+  class KLMCluster;
   class Track;
   class MCParticle;
 
@@ -35,7 +36,7 @@ namespace Belle2 {
    *  - final state particles (FS particles):
    *    - charged kaons/pions/electrons/muons/protons reconstructed as Track
    *    - photons reconstructed as ECLCluster (without associated Track)
-   *    - long lived neutral kaons reconstructed in KLM
+   *    - long lived neutral kaons reconstructed in KLM (as KLMCluster without associated Track)
    *  - composite particles:
    *    - pre-reconstructed Kshort, Lambda, ...
    *    - reconstructed in decays (via combinations)
@@ -73,7 +74,7 @@ namespace Belle2 {
     /**
      * particle type enumerators (to be completed when all Mdst dataobjects are defined)
      */
-    enum EParticleType {c_Undefined, c_Track, c_ECLCluster, c_KLong , c_MCParticle, c_Composite};
+    enum EParticleType {c_Undefined, c_Track, c_ECLCluster, c_KLMCluster, c_MCParticle, c_Composite};
 
     /** describes flavor type, see getFlavorType(). */
     enum EFlavorType {
@@ -149,6 +150,12 @@ namespace Belle2 {
      * @param eclCluster pointer to ECLCluster object
      */
     Particle(const ECLCluster* eclCluster);
+
+    /**
+     * Constructor of a KLong from a reconstructed KLM cluster that is not matched to any charged track.
+     * @param klmCluster pointer to KLMCluster object
+     */
+    Particle(const KLMCluster* klmCluster);
 
     /**
      * Constructor from MC particle (mdst object MCParticle)
@@ -571,7 +578,7 @@ namespace Belle2 {
      */
     void setFlavorType();
 
-    ClassDef(Particle, 6); /**< Class to store reconstructed particles. */
+    ClassDef(Particle, 7); /**< Class to store reconstructed particles. */
   };
 
 } // end namespace Belle2

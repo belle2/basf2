@@ -24,6 +24,7 @@
 
 // dataobjects
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
@@ -69,7 +70,7 @@ namespace Belle2 {
     if (m_useMCParticles) {
       B2INFO("ParticleLoader: Loading Particle(s) from final state primary MCParticle(s)");
     } else {
-      B2INFO("ParticleLoader: Loading Particle(s) from reconstructed Track(s) (as e/mu/pi/K/p) and neutral ECLCluster(s) (as photons)");
+      B2INFO("ParticleLoader: Loading Particle(s) from reconstructed Track(s) (as e/mu/pi/K/p), neutral ECLCluster(s) (as photons) and neutral KLMClusters (as Klongs)");
     }
   }
 
@@ -87,8 +88,10 @@ namespace Belle2 {
     }
 
     Particles.create();
-    if (m_useMCParticles) {loadFromMCParticles();}
-    else {loadFromReconstruction();}
+    if (m_useMCParticles)
+      loadFromMCParticles();
+    else
+      loadFromReconstruction();
 
   }
 
@@ -133,7 +136,8 @@ namespace Belle2 {
   void ParticleLoaderModule::loadFromReconstruction()
   {
     StoreArray<Track> Tracks;
-    StoreArray<ECLCluster> Clusters;
+    StoreArray<ECLCluster> ECLClusters;
+    StoreArray<KLMCluster> KLMClusters;
     StoreArray<Particle> Particles;
 
     const Const::ChargedStable charged[] = {Const::electron,
@@ -161,8 +165,8 @@ namespace Belle2 {
     }
 
     // load reconstructed neutral ECL cluster's as photons
-    for (int i = 0; i < Clusters.getEntries(); i++) {
-      const ECLCluster* cluster      = Clusters[i];
+    for (int i = 0; i < ECLClusters.getEntries(); i++) {
+      const ECLCluster* cluster      = ECLClusters[i];
 
       if (!cluster->isNeutral())
         continue;
@@ -172,6 +176,25 @@ namespace Belle2 {
       Particle particle(cluster);
 
       if (particle.getParticleType() == Particle::c_ECLCluster) { // should always hold but...
+        Particle* newPart = Particles.appendNew(particle);
+
+        if (mcParticle)
+          newPart->addRelationTo(mcParticle);
+      }
+    }
+
+    // load reconstructed neutral KLM cluster's as photons
+    for (int i = 0; i < KLMClusters.getEntries(); i++) {
+      const KLMCluster* cluster      = KLMClusters[i];
+
+      if (cluster->getAssociatedTrackFlag())
+        continue;
+
+      const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
+
+      Particle particle(cluster);
+
+      if (particle.getParticleType() == Particle::c_KLMCluster) { // should always hold but...
         Particle* newPart = Particles.appendNew(particle);
 
         if (mcParticle)

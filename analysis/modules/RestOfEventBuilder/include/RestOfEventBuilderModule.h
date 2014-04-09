@@ -52,8 +52,6 @@ namespace Belle2 {
 
     //std::vector<std::string> m_trackSelection; /**< Selection criteria for the remaining tracks */
     //std::vector<std::string> m_eclShowerSelection; /**< Selection criteria for the remaining ECL showers */
-    //std::vector<std::string> m_eclGammaSelection; /**< Selection criteria for the remaining ECL gammas */
-    //std::vector<std::string> m_eclPi0Selection; /**< Selection criteria for the remaining ECL pi0s */
 
     /**
      * Adds all tracks from StoreArray<Track> that are not used in reconstruction of given particle.
@@ -72,6 +70,15 @@ namespace Belle2 {
      * @param selection criteria for the remaining ECL objects
      */
     void addRemainingECLClusters(const Particle* particle, RestOfEvent* roe);
+
+    /**
+     * Adds all KLM clusters from StoreArray<KLMCluster> that are not used in reconstruction of given particle.
+     *
+     * @param reconstructed particle for which RestOfEvent is determined
+     * @param pointer to the RestOfEvent to be filled with remaining KLM clusters
+     * @param selection criteria for the remaining KLM objects
+     */
+    void addRemainingKLMClusters(const Particle* particle, RestOfEvent* roe);
 
     /**
      * for debugging purposes

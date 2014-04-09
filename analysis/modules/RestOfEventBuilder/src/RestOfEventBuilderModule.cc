@@ -14,6 +14,7 @@
 
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KLMCluster.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -82,6 +83,7 @@ void RestOfEventBuilderModule::event()
     // fill RestOfEvent with content
     addRemainingTracks(particle, roe);
     addRemainingECLClusters(particle, roe);
+    addRemainingKLMClusters(particle, roe);
   }
 }
 
@@ -151,20 +153,70 @@ void RestOfEventBuilderModule::addRemainingECLClusters(const Particle* particle,
   }
 }
 
+void RestOfEventBuilderModule::addRemainingKLMClusters(const Particle* particle, RestOfEvent* roe)
+{
+  StoreArray<KLMCluster> klmClusters;
+  StoreArray<Track>      tracks;
+
+  // vector of all final state particle daughters created from energy cluster or charged track
+  std::vector<int> klmFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_KLMCluster);
+  std::vector<int> trackFSPs = particle->getMdstArrayIndices(Particle::EParticleType::c_Track);
+
+  // Add remaining KLMClusters
+  for (int i = 0; i < klmClusters.getEntries(); i++) {
+    const KLMCluster* cluster = klmClusters[i];
+
+    bool remainingCluster = true;
+    for (unsigned j = 0; j < klmFSPs.size(); j++) {
+      if (cluster->getArrayIndex() == klmFSPs[j]) {
+        remainingCluster = false;
+        break;
+      }
+    }
+
+    if (!remainingCluster)
+      continue;
+
+    // check if the KLMCluster is matched to any track used in reconstruction
+    for (unsigned j = 0; j < trackFSPs.size(); j++) {
+      const Track* track = tracks[trackFSPs[j]];
+      const KLMCluster* trackCluster = DataStore::getRelated<KLMCluster>(track);
+
+      if (!trackCluster)
+        continue;
+
+      if (cluster->getArrayIndex() == trackCluster->getArrayIndex()) {
+        remainingCluster = false;
+        break;
+      }
+    }
+
+    if (remainingCluster)
+      roe->addKLMCluster(cluster);
+  }
+}
+
 void RestOfEventBuilderModule::printEvent()
 {
   StoreArray<ECLCluster> eclClusters;
+  StoreArray<KLMCluster> klmClusters;
   StoreArray<Track>      tracks;
 
   B2INFO("[RestOfEventBuilderModule] *** Print Event ***");
   B2INFO("[RestOfEventBuilderModule] Tracks: " << tracks.getEntries());
   for (int i = 0; i < tracks.getEntries(); i++) {
     const Track* track = tracks[i];
-    const ECLCluster* trackCluster = DataStore::getRelated<ECLCluster>(track);
-    if (trackCluster) {
-      B2INFO("[RestOfEventBuilderModule]  -> track " << track->getArrayIndex() << " -> ECLCluster " << trackCluster->getArrayIndex());
+    const ECLCluster* trackECLCluster = DataStore::getRelated<ECLCluster>(track);
+    const KLMCluster* trackKLMCluster = DataStore::getRelated<KLMCluster>(track);
+    if (trackECLCluster) {
+      B2INFO("[RestOfEventBuilderModule]  -> track " << track->getArrayIndex() << " -> ECLCluster " << trackECLCluster->getArrayIndex());
     } else {
       B2INFO("[RestOfEventBuilderModule]  -> track " << track->getArrayIndex() << " -> ECLCluster (NO RELATION)");
+    }
+    if (trackKLMCluster) {
+      B2INFO("[RestOfEventBuilderModule]  -> track " << track->getArrayIndex() << " -> KLMCluster " << trackKLMCluster->getArrayIndex());
+    } else {
+      B2INFO("[RestOfEventBuilderModule]  -> track " << track->getArrayIndex() << " -> KLMCluster (NO RELATION)");
     }
   }
 
@@ -174,11 +226,19 @@ void RestOfEventBuilderModule::printEvent()
 
     B2INFO("[RestOfEventBuilderModule]  -> cluster " << eclCluster->getArrayIndex());
   }
+
+  B2INFO("[RestOfEventBuilderModule] KLMCluster: " << klmClusters.getEntries());
+  for (int i = 0; i < klmClusters.getEntries(); i++) {
+    const KLMCluster* klmCluster = klmClusters[i];
+
+    B2INFO("[RestOfEventBuilderModule]  -> cluster " << klmCluster->getArrayIndex());
+  }
 }
 
 void RestOfEventBuilderModule::printParticle(const Particle* particle)
 {
   std::vector<int> eclFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_ECLCluster);
+  std::vector<int> klmFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_KLMCluster);
   std::vector<int> trackFSPs = particle->getMdstArrayIndices(Particle::EParticleType::c_Track);
 
   B2INFO("[RestOfEventBuilderModule] tracks  : ");
@@ -190,5 +250,11 @@ void RestOfEventBuilderModule::printParticle(const Particle* particle)
   for (unsigned i = 0; i < eclFSPs.size(); i++)
     std::cout << eclFSPs[i] << " ";
   std::cout << std::endl;
+
+  B2INFO("[RestOfEventBuilderModule] klmFSPs : ");
+  for (unsigned i = 0; i < klmFSPs.size(); i++)
+    std::cout << klmFSPs[i] << " ";
+  std::cout << std::endl;
+
 }
 

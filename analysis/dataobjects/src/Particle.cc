@@ -15,6 +15,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
@@ -212,6 +213,30 @@ Particle::Particle(const ECLCluster* eclCluster) :
 
   // set error matrix
   storeErrorMatrix(eclCluster->getError7x7());
+}
+
+Particle::Particle(const KLMCluster* klmCluster) :
+  m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_arrayPointer(0)
+{
+  if (!klmCluster) return;
+
+  // TODO: avoid hard coded values
+  m_pdgCode = 130;
+
+  set4Vector(klmCluster->getMomentum());
+  setVertex(klmCluster->getPosition());
+
+  m_particleType = c_KLMCluster;
+  m_mdstIndex = klmCluster->getArrayIndex();
+
+  // set Chi^2 probability:
+  //TODO: gamma quality can be written here
+  m_pValue = -1;
+
+  // TODO: set error matrix
+  //storeErrorMatrix(klmCluster->???);
 }
 
 Particle::Particle(const MCParticle* mcParticle) :

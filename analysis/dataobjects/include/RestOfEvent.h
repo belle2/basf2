@@ -20,9 +20,10 @@ namespace Belle2 {
 
   // forward declarations
   class ECLCluster;
+  class KLMCluster;
   class Track;
 
-  // TODO: Add support for the MdstVee and MDSTKlong dataobjects when they become available.
+  // TODO: Add support for the MdstVee dataobjects when they become available.
 
   /** \addtogroup dataobjects
    * @{
@@ -44,7 +45,7 @@ namespace Belle2 {
    * module and are related between each other with the BASF2 relation.
    *
    * Internally, the RestOfEvent class holds only StoreArray indices of all unused MDST dataobjects:
-   * Tracks, ECLCluster, MDSTVee and MDSTKlong. Indices are stored in std::set
+   * Tracks, ECLCluster, MDSTVee and KLMCluster. Indices are stored in std::set
    * and not std::vector, since the former ensures uniqueness of all its elements.
    */
 
@@ -87,6 +88,20 @@ namespace Belle2 {
      */
     void addECLClusters(const std::vector<int>& indices);
 
+    /**
+     * Add StoreArray index of given KLMCluster to the list of unused KLM clusters in the event.
+     *
+     * @param Pointer to the unused KLMCluster
+     */
+    void addKLMCluster(const KLMCluster* cluster);
+
+    /**
+     * Add given StoreArray indices to the list of unused KLM Clusters in the event.
+     *
+     * @param vector of SoreArray indices of unused Clusters
+     */
+    void addKLMClusters(const std::vector<int>& indices);
+
     // getters
     /**
      * Get vector of all unused Tracks.
@@ -101,6 +116,13 @@ namespace Belle2 {
      * @return vector of pointers to unused ECLClusters
      */
     const std::vector<Belle2::ECLCluster*> getECLClusters() const;
+
+    /**
+     * Get vector of all unused KLMClusters.
+     *
+     * @return vector of pointers to unused KLMClusters
+     */
+    const std::vector<Belle2::KLMCluster*> getKLMClusters() const;
 
     /**
      * Get number of all remaining tracks.
@@ -121,6 +143,15 @@ namespace Belle2 {
     }
 
     /**
+     * Get number of all remaining KLM clusters.
+     *
+     * @return number of all remaining KLM clusters
+     */
+    int getNKLMClusters(void) const {
+      return int(m_eclClusterIndices.size());
+    }
+
+    /**
      * Prints the contents of a RestOfEvent object to screen
      */
     void print() const;
@@ -131,7 +162,8 @@ namespace Belle2 {
     // persistent data members
     std::set<int> m_trackIndices;       /**< StoreArray indices to unused tracks */
     std::set<int> m_eclClusterIndices;  /**< StoreArray indices to unused ECLClusters */
-    // TODO: add support for vee and Klong
+    std::set<int> m_klmClusterIndices;  /**< StoreArray indices to unused KLMClusters */
+    // TODO: add support for vee
 
     /**
      * Prints indices in the given set in a single line
@@ -146,7 +178,7 @@ namespace Belle2 {
         to.insert(from[i]);
     }
 
-    ClassDef(RestOfEvent, 2) /**< class definition */
+    ClassDef(RestOfEvent, 3) /**< class definition */
 
   };
 

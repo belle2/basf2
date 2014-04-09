@@ -87,16 +87,16 @@ namespace Belle2 {
     };
 
   protected :
-    // number of words of buffer
+    /// number of words of buffer
     int m_nwords;
 
-    // number of nodes in this object
+    /// number of nodes in this object
     int m_num_nodes;
 
-    // number of events in this object
+    /// number of events in this object
     int m_num_events;
 
-    // Buffer
+    /// Buffer
     int* m_buffer; //[m_nwords]
 
     //! flag for deleting m_buffer in destructer(1:delete, 0: not delete)

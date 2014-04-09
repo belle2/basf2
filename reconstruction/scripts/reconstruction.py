@@ -57,10 +57,6 @@ def add_posttracking_reconstruction(path, components=None):
         eklm_rec = register_module('EKLMReconstructor')
         path.add_module(eklm_rec)
 
-        # Muon reconstruction
-        eklm_muon_rec = register_module('EKLMMuonReconstructor')
-        path.add_module(eklm_muon_rec)
-
         # K0L reconstruction
         eklm_k0l_rec = register_module('EKLMK0LReconstructor')
         path.add_module(eklm_k0l_rec)
@@ -190,20 +186,15 @@ def add_mdst_output(path, mc=True, filename='mdst.root'):
         'TrackFitResults',
         'PIDLikelihoods',
         'TracksToPIDLikelihoods',
-        'ECLShowers',
-        'TracksToECLShowers',
-        'ECLGammas',
-        'ECLGammasToECLShowers',
-        'ECLPi0s',
-        'ECLPi0sToECLGammas',
         'ECLClusters',
         'ECLClustersToTracks',
-        'K0Ls',
+        'KLMClusters',
+        'KLMClustersToTracks',
         'TRGSummary',
         ]
     if mc:
-        branches += ['MCParticles', 'MCParticlesToTracks',
-                     'ECLShowersToMCParticles', 'ECLClustersToMCParticles']
+        branches += ['MCParticles', 'TracksToMCParticles',
+                     'ECLClustersToMCParticles', 'KLMClustersToMCParticles']
     output.param('branchNames', branches)
     path.add_module(output)
 

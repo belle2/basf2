@@ -78,11 +78,19 @@ namespace Belle2 {
     {return ROOT::Math::XYZPointF(m_globalX, m_globalY, m_globalZ);}
 
     /**
-     * Get global position (TVector3 version, for visualization).
+     * Get global position (TVector3 version).
      * @return Hit coordinates.
      */
-    inline TVector3 getPosition() const
+    inline TVector3 getClusterPosition() const
     {return TVector3(m_globalX, m_globalY, m_globalZ);}
+
+    /**
+     * Get global position (TVector3 version) of the origin of K0L (always return (0,0,0) since we believe all K0Ls to originate at or near primary vertex).
+     * @return K0L origin coordinates.
+     */
+    inline TVector3 getPosition() const
+    {return TVector3(0, 0, 0);}
+
 
     /**
      * Get momentum,

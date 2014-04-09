@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from basf2 import *
+from modularAnalysis import *
+from stdFSParticles import *
+
+import sys
+
+# ----------------------------------------------------------------------------------
+# This example loads Particle(s) from specified ROOT files and makes standard pi-
+# reconstruction (performed in stdFSParticles.py)
+# ----------------------------------------------------------------------------------
+
+if len(sys.argv) != 2:
+    sys.exit('Must provide one input parameter:[input_root_file_name]')
+
+inputMdstFileName = sys.argv[1]
+
+# load the input MDST file
+inputMdst(inputMdstFileName)
+
+# load reconstructed particles
+# Track(s) as e/mu/pi/k/p
+# neutral ECLCluster(s) as photons
+loadReconstructedParticles()
+
+# fetch the standard photon (input for standard pi0 reconstruction)
+# the reconstructed photon Particles are collected in the StdPhoton ParticleList
+stdPhoton()
+
+# make  standard pi0 reconstruction
+# the reconstructed pi0 Particles are collected in the StdPi0 ParticleList
+stdPi0()
+
+matchMCTruth('StdPi0')
+
+toolsPI0 = ['MCTruth', '^pi0']
+toolsPI0 += ['Kinematics', '^pi0']
+toolsPI0 += ['MassBeforeFit', '^pi0']
+toolsPI0 += ['MCKinematics', '^pi0']
+toolsPI0 += ['EventMetaData', '^pi0']
+toolsPI0 += ['MomentumUncertainty', '^pi0']
+toolsPI0 += ['Cluster', 'pi0 -> ^gamma ^gamma']
+
+# write flat ntuples
+ntupleFile('StandardPi0_example_output.root')
+ntupleTree('pi0Tree', 'StdPi0', toolsPI0)
+
+# ----> start processing of modules
+process(analysis_main)
+
+# ----> Print call statistics
+print statistics

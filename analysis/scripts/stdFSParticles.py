@@ -4,8 +4,8 @@
 from basf2 import *
 from modularAnalysis import *
 
-# Prepare all standard final state particles
 
+# Prepare all standard final state particles
 
 def stdFSParticles(path=analysis_main):
 
@@ -14,8 +14,10 @@ def stdFSParticles(path=analysis_main):
     stdPi(path)
 
   # MDST standard
-    stdPi0(path)
     stdPhoton(path)
+
+  # reconstruct standard pi0
+    stdPi0(path)
 
   # Egamma > 1.5 GeV
     stdHighEPhoton(path)
@@ -32,7 +34,16 @@ def stdK(path=analysis_main):
 
 
 def stdPi0(path=analysis_main):
-    selectParticle('StdPi0', 111, [''], True, path)
+    makeParticle(
+        'StdPi0',
+        111,
+        ['StdPhoton', 'StdPhoton'],
+        0.100,
+        0.160,
+        True,
+        path,
+        )
+    massKFit('StdPi0', 0.0, '', path)
 
 
 def stdPhoton(path=analysis_main):

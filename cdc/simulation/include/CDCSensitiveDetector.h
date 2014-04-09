@@ -43,8 +43,8 @@ namespace Belle2 {
       //! Process each step and calculate variables defined in CDCB4VHit
       bool step(G4Step* aStep, G4TouchableHistory* history);
 
-      //! Do what you want to do at the end of each event
-      void EndOfEvent(G4HCofThisEvent*);
+      //  Do what you want to do at the end of each event
+      //      void EndOfEvent(G4HCofThisEvent*);
 
       //! Save CDCSimHit into datastore
       int saveSimHit(const G4int layerId,

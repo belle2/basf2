@@ -489,9 +489,9 @@ namespace Belle2 {
   }
 
 
-  void CDCSensitiveDetector::EndOfEvent(G4HCofThisEvent*)
-  {
-  }
+  //  void CDCSensitiveDetector::EndOfEvent(G4HCofThisEvent*)
+  //  {
+  //  }
 
   int
   CDCSensitiveDetector::saveSimHit(const G4int layerId,

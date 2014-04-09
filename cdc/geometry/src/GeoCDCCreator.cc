@@ -42,15 +42,16 @@ namespace Belle2 {
   using namespace geometry;
 
   namespace CDC {
-//-----------------------------------------------------------------
-//                 Register the GeoCreator
-//-----------------------------------------------------------------
+
+    /**
+     * Register the GeoCreator.
+     */
 
     geometry::CreatorFactory<GeoCDCCreator> GeoCDCFactory("CDCCreator");
 
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
+    //-----------------------------------------------------------------
+    //                 Implementation
+    //-----------------------------------------------------------------
 
     GeoCDCCreator::GeoCDCCreator()
     {

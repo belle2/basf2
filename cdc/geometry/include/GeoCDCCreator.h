@@ -49,7 +49,10 @@ namespace Belle2 {
 
     private:
 
+      //! CDC G4 logical volume.
       G4LogicalVolume* logical_cdc;
+
+      //! CDC G4 physical volume.
       G4VPhysicalVolume* physical_cdc;
 
       //! Sensitive detector

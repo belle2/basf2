@@ -1,0 +1,35 @@
+Cfiles
+ipVXD.mille ! file with binary data (one per line)
+cosmicsVXD.mille ! file with binary data (one per line)
+
+Parameter ! fix some parameters
+1 0. -1. ! fix parameter 1
+2 0. -1. ! fix parameter 2
+3 0. -1. ! fix parameter 3
+4 0. -1. ! fix parameter 4
+5 0. -1. ! fix parameter 5
+6 0. -1. ! fix parameter 6
+
+! This would fix one PXD
+!84801 0. -1.
+!84802 0. -1.
+!84803 0. -1.
+!84804 0. -1.
+!84805 0. -1.
+!84806 0. -1.
+
+Fortranfiles
+constraints.txt ! automatically generated file from MP2alignment module with geometry constraints
+
+printrecord 150 -1
+!maxrecords 5000 ! Number of records to be processed
+!memorydebug
+!entries 50
+!chiscut 30. 6. ! Outlier removal. Comment this in heavily misaligned geometry
+outlierdownweighting 3 ! Down-weighting of outliers - number of iterations
+dwfractioncut 0.1
+method inversion  3  0.01   ! solution by inversion
+!method diagonalization  4  0.01 ! solution with diagonalization -> computes eigenvectors
+!histprint
+
+end ! Nothing after this command will be processed

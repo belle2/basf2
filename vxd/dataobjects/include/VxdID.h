@@ -31,6 +31,7 @@ namespace Belle2 {
    */
   class VxdID {
   public:
+    /** The base integer type for VxdID */
     typedef unsigned short baseType;
     enum {
       /** Number of bits available to represent a layer */

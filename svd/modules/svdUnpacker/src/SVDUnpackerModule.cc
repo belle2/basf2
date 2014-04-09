@@ -40,7 +40,7 @@ SVDUnpackerModule::SVDUnpackerModule() : Module()
 {
   //Set module properties
   setDescription("Produce SVDDigits from RawSVD. NOTE: only zero-suppressed mode is currently supported!");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("rawSVDListName", m_rawSVDListName, "Name of the raw SVD List", string(""));
   addParam("svdDigitListName", m_svdDigitListName, "Name of the SVD Digits List", string(""));

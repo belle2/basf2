@@ -63,7 +63,7 @@ SVDRecoHit::SVDRecoHit(const SVDTrueHit* hit, bool uDirection, float sigma):
   setDetectorPlane();
 }
 
-SVDRecoHit::SVDRecoHit(const SVDCluster* hit, const genfit::TrackCandHit* trackCandHit):
+SVDRecoHit::SVDRecoHit(const SVDCluster* hit, const genfit::TrackCandHit*):
   genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0),
   m_cluster(hit), m_energyDep(0), m_rotationPhi(0)
 {

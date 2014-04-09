@@ -86,7 +86,7 @@ void SVDBackgroundModule::initialize()
   m_relDigitsTrueHitsName = relDigitsTrueHits.getName();
 
   // Initialize m_data:
-  for (int iComp = 0; iComp < m_componentNames.size(); ++iComp) {
+  for (unsigned int iComp = 0; iComp < m_componentNames.size(); ++iComp) {
     string componentName = m_componentNames[iComp];
     m_data[componentName].m_componentName = componentName;
     m_data[componentName].m_componentTime = 1.0 * m_componentTimes[iComp] * Unit::us / Unit::s;

@@ -30,7 +30,7 @@ SVDRecoHit2D::SVDRecoHit2D():
   m_energyDep(0)//, m_energyDepError(0)
 {}
 
-SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, const genfit::TrackCandHit* trackCandHit, float sigmaU, float sigmaV):
+SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, const genfit::TrackCandHit*, float sigmaU, float sigmaV):
   genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit),
   m_energyDep(0)//, m_energyDepError(0)
 {

@@ -19,8 +19,12 @@ double eToADU(double charge)
 
 int main(int argc, const char* argv[])
 {
-  int input = atof(argv[1]);
-  std::cout << "Electrons: " << input << " ADU: " << eToADU(input) << std::endl;
+  if (argc) {
+    int input = atof(argv[1]);
+    std::cout << "Electrons: " << input << " ADU: " << eToADU(input) << std::endl;
+  } else {
+    std::cout << "Give charge in electrons as command-line parameter" << std::endl;
+  }
   return 0;
 }
 

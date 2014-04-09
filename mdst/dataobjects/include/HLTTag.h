@@ -17,10 +17,14 @@
 
 namespace Belle2 {
 
+  /**
+   * The HLTTag class
+   * Contains the information of Highlevel trigger
+   */
   class HLTTag : public TObject {
 
   public:
-    // Trigger algorism
+    /// Trigger algorism
     enum HLTTrigAlgo { Global, Level3,
                        Hadronic, Tautau, LowMulti,
                        Bhabha, Mumu,
@@ -74,13 +78,13 @@ namespace Belle2 {
     void SetAlgoInfo(HLTTrigAlgo algo, int infobits);
 
   private:
-    // Event number put by HLT
+    /// Event number put by HLT
     int m_HLTEventID;
 
-    // HLT unit ID
+    /// HLT unit ID
     int m_HLTUnitID;
 
-    // Time
+    /// Time
     time_t m_HLTtime;
 
     // HLT Summary
@@ -92,15 +96,15 @@ namespace Belle2 {
     // Bit 4:  algorithm 4 : taken = 1 / discarded = 0
     //        .....
     // Bit MAXALGO: argorithm MAXALGO : taken = 1, discard = 0
-    // .......
+    /// .......
     int m_HLTSummary;
 
     // Detailed info on selection
     //  * 32bit info for each of selection algorithm
-    //  * Usage dependent on each algorithm
+    ///  * Usage dependent on each algorithm
     int m_HLTAlgoInfo[MAXALGO];
 
-    // To derive from TObject
+    /// To derive from TObject
     ClassDef(HLTTag, 1);
   };
 }

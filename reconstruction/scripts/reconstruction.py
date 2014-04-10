@@ -183,6 +183,7 @@ def add_mdst_output(path, mc=True, filename='mdst.root'):
     output.param('outputFileName', filename)
     branches = [
         'Tracks',
+        'V0s',
         'TrackFitResults',
         'PIDLikelihoods',
         'TracksToPIDLikelihoods',

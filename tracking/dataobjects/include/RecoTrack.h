@@ -59,10 +59,12 @@ namespace Belle2 {
               const SorterBaseCDCHit sorterBaseCDCHit = SorterBaseCDCHit(),
               const SorterBaseVXDHit sorterBaseVXDHit = SorterBaseVXDHit());
 
+    //--- Definitions for compile time configuration ------------------------------------
+    //-----------------------------------------------------------------------------------
     /** Define, use of clusters or true hits for SVD.
      *
      *  You have to decide, if you want to use Clusters or true hits at compile-time.
-     *  In the real experiment, we want to use clusters without overhead from checking everytime,
+     *  In the real experiment, we want to use clusters without overhead from checking every time,
      *  if we should use true hits instead.
      */
     typedef SVDCluster SVDHit;
@@ -266,7 +268,11 @@ namespace Belle2 {
     /** Name of array of CDCHits to be accessed. */
     std::string m_cdcHitsName;
 
-    /** Assume, that TrackFinders take care of sorting already, e.g. by replacing the vector. */
+    /** Assume, that TrackFinders take care of sorting already, e.g. by replacing the vector.
+     *
+     *  FIXME Can't we handle this by having a Sorter, that does nothing?
+     *  E.g. by having things always return true.
+     */
     bool m_assumeSortedCDC;
 
     /** Functor for sorting the CDC hits. */

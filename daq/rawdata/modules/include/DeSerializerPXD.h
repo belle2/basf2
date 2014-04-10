@@ -52,21 +52,27 @@ namespace Belle2 {
     // Data members
   private:
 
+    // DataStore interface
+    StoreArray<RawPXD> rawpxdary;
+
     // Parallel processing parameters
 
     // Event Meta Data
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
+    //! # of connections
+    int m_num_connections;
+
     //! Receiver Port
-    int m_port;
+    std::vector<int> m_ports;
 
-    //Sender Name
-    std::string m_host;
+    //! Sender Names
+    std::vector<std::string> m_hosts;
 
-    //! Reciever Socket
-    EvtSocketSend* m_recv;
+    //! Receiver Sockets
+    std::vector<EvtSocketSend*> m_recvs;
 
-    //! Messaage handler
+    //! Message handler
     MsgHandler* m_msghandler;
 
     //! Compression Level

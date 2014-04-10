@@ -40,11 +40,11 @@ const std::bitset<64> HitPatternCDC::s_infoLayerMask = infoLayer;
 const std::vector<unsigned short> HitPatternCDC::s_indexMin = {0, 8, 14, 20, 26, 32, 38, 44, 50};
 const std::vector<unsigned short> HitPatternCDC::s_indexMax = {7, 13, 19, 25, 31, 37, 43, 49, 55};
 
-void HitPatternCDC::layerRangeCheck(const unsigned short layer) const
+void HitPatternCDC::layerRangeCheck(const unsigned short /*layer*/) const
 {
   return;
 }
-void HitPatternCDC::sLayerRangeCheck(const unsigned short slayer) const
+void HitPatternCDC::sLayerRangeCheck(const unsigned short /*slayer*/) const
 {
   return;
 }

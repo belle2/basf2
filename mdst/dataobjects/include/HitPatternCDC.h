@@ -242,7 +242,7 @@ namespace Belle2 {
      * @TODO: Decide to throw an exception or return a number such as 999
      * @param layer
      */
-    void layerRangeCheck(const unsigned short layer) const;
+    void layerRangeCheck(const unsigned short /*layer*/) const;
 
     /**
      * This function implements the super layer range check for the public functions which use a range check.

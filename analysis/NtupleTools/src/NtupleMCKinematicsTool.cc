@@ -39,7 +39,7 @@ void NtupleMCKinematicsTool::eval(const Particle* particle)
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
   int nDecayProducts = selparticles.size();
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    const MCParticle* mcparticle = DataStore::getRelated<MCParticle>(selparticles[iProduct]);
+    const MCParticle* mcparticle = selparticles[iProduct]->getRelatedTo<MCParticle>();
 
     if (mcparticle) {
       const TLorentzVector mcparticle_4vec = mcparticle->get4Vector();

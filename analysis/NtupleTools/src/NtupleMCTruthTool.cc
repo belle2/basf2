@@ -40,7 +40,7 @@ void NtupleMCTruthTool::eval(const Particle* particle)
     m_iTruthID[iProduct] = 0;
     m_iTruthIDMatch[iProduct] = 0;
 
-    const MCParticle* mcparticle = DataStore::getRelated<MCParticle>(selparticles[iProduct]);
+    const MCParticle* mcparticle = selparticles[iProduct]->getRelatedTo<MCParticle>();
 
     if (mcparticle) {
       m_iTruthID[iProduct]      = mcparticle->getPDG();

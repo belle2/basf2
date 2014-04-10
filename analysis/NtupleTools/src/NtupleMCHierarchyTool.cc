@@ -42,7 +42,7 @@ void NtupleMCHierarchyTool::eval(const Particle* particle)
   int nDecayProducts = selparticles.size();
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
 
-    const MCParticle* mcparticle = DataStore::getRelated<MCParticle>(selparticles[iProduct]);
+    const MCParticle* mcparticle = selparticles[iProduct]->getRelated<MCParticle>();
 
     if (!mcparticle) {
       m_iMotherID[iProduct] = 0;

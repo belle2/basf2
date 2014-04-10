@@ -40,7 +40,7 @@ void NtupleROEMultiplicitiesTool::eval(const Particle* particle)
     m_nTracks[iProduct]     = -1;
     m_nECLClusters[iProduct] = -1;
 
-    const RestOfEvent* roe = DataStore::getRelated<RestOfEvent>(selparticles[iProduct]);
+    const RestOfEvent* roe = selparticles[iProduct]->getRelatedTo<RestOfEvent>();
 
     if (roe) {
       m_nTracks[iProduct]      = roe->getNTracks();

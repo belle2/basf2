@@ -137,7 +137,7 @@ void RestOfEventBuilderModule::addRemainingECLClusters(const Particle* particle,
     // check if the ECLCluster is matched to any track used in reconstruction
     for (unsigned j = 0; j < trackFSPs.size(); j++) {
       const Track* track = tracks[trackFSPs[j]];
-      const ECLCluster* trackCluster = DataStore::getRelated<ECLCluster>(track);
+      const ECLCluster* trackCluster = track->getRelated<ECLCluster>();
 
       if (!trackCluster)
         continue;
@@ -180,7 +180,7 @@ void RestOfEventBuilderModule::addRemainingKLMClusters(const Particle* particle,
     // check if the KLMCluster is matched to any track used in reconstruction
     for (unsigned j = 0; j < trackFSPs.size(); j++) {
       const Track* track = tracks[trackFSPs[j]];
-      const KLMCluster* trackCluster = DataStore::getRelated<KLMCluster>(track);
+      const KLMCluster* trackCluster = track->getRelated<KLMCluster>();
 
       if (!trackCluster)
         continue;
@@ -206,8 +206,8 @@ void RestOfEventBuilderModule::printEvent()
   B2INFO("[RestOfEventBuilderModule] Tracks: " << tracks.getEntries());
   for (int i = 0; i < tracks.getEntries(); i++) {
     const Track* track = tracks[i];
-    const ECLCluster* trackECLCluster = DataStore::getRelated<ECLCluster>(track);
-    const KLMCluster* trackKLMCluster = DataStore::getRelated<KLMCluster>(track);
+    const ECLCluster* trackECLCluster = track->getRelated<ECLCluster>();
+    const KLMCluster* trackKLMCluster = track->getRelated<KLMCluster>();
     if (trackECLCluster) {
       B2INFO("[RestOfEventBuilderModule]  -> track " << track->getArrayIndex() << " -> ECLCluster " << trackECLCluster->getArrayIndex());
     } else {

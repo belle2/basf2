@@ -410,7 +410,7 @@ namespace Belle2 {
     double NeuroBayesifyARICH(const Particle* particle)
     {
 
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(particle);
+      const PIDLikelihood* pid = particle->getRelatedTo<PIDLikelihood>();
       if (!pid)
         return -999;
 
@@ -429,7 +429,7 @@ namespace Belle2 {
     double NeuroBayesifyTOP(const Particle* particle)
     {
 
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(particle);
+      const PIDLikelihood* pid = particle->getRelated<PIDLikelihood>();
       if (!pid)
         return -999;
 

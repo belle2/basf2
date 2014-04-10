@@ -61,7 +61,7 @@ void NtupleMCReconstructibleTool::eval(const Particle* particle)
     m_iSeenInECL[iProduct] = 0;
     m_iSeenInKLM[iProduct] = 0;
 
-    const MCParticle* mcparticle = DataStore::getRelated<MCParticle>(selparticles[iProduct]);
+    const MCParticle* mcparticle = selparticles[iProduct]->getRelated<MCParticle>();
     if (selparticles[iProduct]->getParticleType() == 6/*c_Composite*/) {
       B2INFO(boost::format("[NtupleMCReconstructibleTool]: this tool does not currently return the truth ID for composite particles : %d") % selparticles[iProduct]->getParticleType());
     } else if (!mcparticle) {

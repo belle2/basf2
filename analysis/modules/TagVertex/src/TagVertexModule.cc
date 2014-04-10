@@ -351,7 +351,7 @@ namespace Belle2 {
   bool TagVertexModule::getTagTracks(Particle* Breco)
   {
 
-    const RestOfEvent* roe = DataStore::getRelated<RestOfEvent>(Breco);
+    const RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
 
     if (roe) {
       tagTracks = roe->getTracks();

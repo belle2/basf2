@@ -18,7 +18,6 @@
 #include <analysis/utility/MCMatchStatus.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 
 // dataobjects
@@ -271,7 +270,7 @@ namespace Belle2 {
 
     double particleElectronId(const Particle* part)
     {
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid) return 0.5;
 
       return pid->getProbability(Const::electron, Const::pion);
@@ -280,7 +279,7 @@ namespace Belle2 {
 
     double particleElectrondEdxId(const Particle* part)
     {
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid) return 0.5;
 
       Const::PIDDetectorSet set = Const::CDC + Const::SVD;
@@ -289,7 +288,7 @@ namespace Belle2 {
 
     double particleElectronTOPId(const Particle* part)
     {
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid) return 0.5;
 
       Const::PIDDetectorSet set = Const::TOP;
@@ -299,7 +298,7 @@ namespace Belle2 {
 
     double particleElectronARICHId(const Particle* part)
     {
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid) return 0.5;
 
       Const::PIDDetectorSet set = Const::ARICH;
@@ -309,7 +308,7 @@ namespace Belle2 {
 
     double particleMuonId(const Particle* part)
     {
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid) return 0.5;
 
       return pid->getProbability(Const::muon, Const::pion);
@@ -317,7 +316,7 @@ namespace Belle2 {
 
     double particleMuondEdxId(const Particle* part)
     {
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid) return 0.5;
 
       Const::PIDDetectorSet set = Const::CDC + Const::SVD;
@@ -327,7 +326,7 @@ namespace Belle2 {
 
     double particleMuonTOPId(const Particle* part)
     {
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid) return 0.5;
 
       Const::PIDDetectorSet set = Const::TOP;
@@ -337,7 +336,7 @@ namespace Belle2 {
 
     double particleMuonARICHId(const Particle* part)
     {
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid) return 0.5;
 
       Const::PIDDetectorSet set = Const::ARICH;
@@ -347,7 +346,7 @@ namespace Belle2 {
 
     double particlePionId(const Particle* part)
     {
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid) return 0.5;
 
       return pid->getProbability(Const::pion, Const::kaon);
@@ -356,7 +355,7 @@ namespace Belle2 {
 
     double particlePiondEdxId(const Particle* part)
     {
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid) return 0.5;
 
       Const::PIDDetectorSet set = Const::CDC + Const::SVD;
@@ -366,7 +365,7 @@ namespace Belle2 {
 
     double particlePionTOPId(const Particle* part)
     {
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid) return 0.5;
 
       Const::PIDDetectorSet set = Const::TOP;
@@ -376,7 +375,7 @@ namespace Belle2 {
 
     double particlePionARICHId(const Particle* part)
     {
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid) return 0.5;
 
       Const::PIDDetectorSet set = Const::ARICH;
@@ -386,7 +385,7 @@ namespace Belle2 {
 
     double particleKaonId(const Particle* part)
     {
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid) return 0.5;
 
       return pid->getProbability(Const::kaon, Const::pion);
@@ -395,7 +394,7 @@ namespace Belle2 {
 
     double particleKaondEdxId(const Particle* part)
     {
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid) return 0.5;
 
       Const::PIDDetectorSet set = Const::CDC + Const::SVD;
@@ -405,7 +404,7 @@ namespace Belle2 {
 
     double particleKaonTOPId(const Particle* part)
     {
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid) return 0.5;
 
       Const::PIDDetectorSet set = Const::TOP;
@@ -415,7 +414,7 @@ namespace Belle2 {
 
     double particleKaonARICHId(const Particle* part)
     {
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid) return 0.5;
 
       Const::PIDDetectorSet set = Const::ARICH;
@@ -425,7 +424,7 @@ namespace Belle2 {
 
     double particleProtonId(const Particle* part)
     {
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid) return 0.5;
 
       return pid->getProbability(Const::proton, Const::pion);
@@ -433,7 +432,7 @@ namespace Belle2 {
 
     double particleProtondEdxId(const Particle* part)
     {
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid) return 0.5;
 
       Const::PIDDetectorSet set = Const::CDC + Const::SVD;
@@ -443,7 +442,7 @@ namespace Belle2 {
 
     double particleProtonTOPId(const Particle* part)
     {
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid) return 0.5;
 
       Const::PIDDetectorSet set = Const::TOP;
@@ -453,7 +452,7 @@ namespace Belle2 {
 
     double particleProtonARICHId(const Particle* part)
     {
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid) return 0.5;
 
       Const::PIDDetectorSet set = Const::ARICH;
@@ -463,7 +462,7 @@ namespace Belle2 {
 
     double particleMissingARICHId(const Particle* part)
     {
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid)
         return 1.0;
 
@@ -476,7 +475,7 @@ namespace Belle2 {
 
     double particleMissingTOPId(const Particle* part)
     {
-      const PIDLikelihood* pid = DataStore::getRelated<PIDLikelihood>(part);
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid)
         return 1.0;
 
@@ -529,7 +528,7 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const MCParticle* mcparticle = DataStore::getRelated<MCParticle>(part);
+      const MCParticle* mcparticle = part->getRelated<MCParticle>();
 
       if (mcparticle == nullptr)
         return result;
@@ -552,7 +551,7 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const MCParticle* mcparticle = DataStore::getRelated<MCParticle>(part);
+      const MCParticle* mcparticle = part->getRelated<MCParticle>();
 
       if (mcparticle == nullptr)
         return result;
@@ -569,7 +568,7 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const MCParticle* mcparticle = DataStore::getRelated<MCParticle>(part);
+      const MCParticle* mcparticle = part->getRelated<MCParticle>();
 
       if (mcparticle == nullptr)
         return result;
@@ -583,7 +582,7 @@ namespace Belle2 {
     {
       double result = -1.0;
 
-      const RestOfEvent* roe = DataStore::getRelated<RestOfEvent>(particle);
+      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
       if (roe)
         result = roe->getNTracks();
@@ -595,7 +594,7 @@ namespace Belle2 {
     {
       double result = -1.0;
 
-      const RestOfEvent* roe = DataStore::getRelated<RestOfEvent>(particle);
+      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
       if (roe)
         result = roe->getNECLClusters();
@@ -651,7 +650,7 @@ namespace Belle2 {
     {
       double result = -1.0;
 
-      const RestOfEvent* roe = DataStore::getRelated<RestOfEvent>(particle);
+      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
       if (!roe)
         return result;
 
@@ -720,7 +719,7 @@ namespace Belle2 {
       if (particle->getParticleType() == Particle::c_ECLCluster) {
         StoreArray<ECLCluster> ECLClusters;
         const ECLCluster* shower = ECLClusters[particle->getMdstArrayIndex()];
-        const Track* track = DataStore::getRelated<Track>(shower);
+        const Track* track = shower->getRelated<Track>();
 
         if (track)
           result = 1.0;

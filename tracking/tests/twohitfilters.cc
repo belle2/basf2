@@ -82,19 +82,19 @@ namespace Belle2 {
     EXPECT_DOUBLE_EQ(-0.95531661812450927816, aFilter.calcSlopeRZ());
   }
 
-  /** Test Setters and Getters when filling extremely big values. */
-  TEST_F(TwoHitFiltersTest, testVeryLargeFilter)  //approx 1.8e308 ... largest possible value of a double
+
+  /** testing out of range behavior */
+  TEST_F(TwoHitFiltersTest, testOutOfRangeFilter) //approx 1.8e308 ... largest possible value of a double
   {
     TVector3 innerHit(1e300, 0, 0);
     TVector3 outerHit(0, 0, 0);
 
     TwoHitFilters aFilter = TwoHitFilters(outerHit, innerHit); // correct order
 
-    EXPECT_DOUBLE_EQ(1e600, aFilter.calcDist3D()); // does calc dist (outer - innerHit)^2!
+//     EXPECT_DOUBLE_EQ(1e600, aFilter.calcDist3D()); // does calc dist (outer - innerHit)^2!
+    EXPECT_DOUBLE_EQ(innerHit * innerHit, aFilter.calcDist3D()); // does calc dist (outer - innerHit)^2!
 
   }
-
-
 //       TEST_F(TwoHitFiltersTest, testVeryLargeNormedDistFilter) //FAILS, because both calcDistXY() and calcDist3D() are too large to be stored in a double.
 //       {
 //  TVector3 innerHit(1e300, 0, 1e300);

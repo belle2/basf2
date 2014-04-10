@@ -29,6 +29,8 @@ namespace Belle2 {
   /** SectorTools - contains often needed transformer-functions.
    **/
   class SectorTools {
+
+
   public:
     /** .first is uValue, .second is vValue (both defined between 0-1) */
     typedef std::pair<float, float> NormCoords;
@@ -56,8 +58,8 @@ namespace Belle2 {
      */
     static uShort calcSecID(const std::vector<float>& uConfig, const std::vector<float>& vConfig, NormCoords coords) {
       // safety checks
-      throwBoundary(coords.first);
-      throwBoundary(coords.second);
+      throwBoundary(float(coords.first));
+      throwBoundary(float(coords.second));
       throwBoundaryVector(uConfig);
       throwBoundaryVector(vConfig);
 
@@ -70,6 +72,8 @@ namespace Belle2 {
       unsigned int uMax = uConfig.size() - 1,
                    vMax = vConfig.size() - 1;
 
+//       B2INFO("uMax: " << uMax << ", vMax: " << vMax);
+
       // searching for sector-slot in u-direction:
       for (; uCount < uMax; ++uCount) {
         if (coords.first > uConfig[uCount] and coords.first < uConfig[uCount + 1]) {
@@ -79,15 +83,22 @@ namespace Belle2 {
       }
 
       // searching for sector-slot in v-direction:
-      for (; vCount < uMax; ++vCount) {
+      for (; vCount < vMax; ++vCount) {
         if (coords.second > vConfig[vCount] and coords.second < vConfig[vCount + 1]) {
-          foundSectorU = true;
+          foundSectorV = true;
           break;
         }
       }
 
+//       B2INFO("foundSectorU: " << foundSectorU << ", foundSectorV: " << foundSectorV);
+//       B2INFO("uCount: " << uCount << ", vCount: " << vCount);
+
       // on a sensor represented as a matrix, the uCount carries the lineID and the vCount the rowID
-      if (foundSectorU == true and foundSectorV == true) { secID = vCount + 1 + uCount * vMax; }
+      if (foundSectorU == true and foundSectorV == true) {
+        secID = vCount + 1 + uCount * vMax;
+      }
+
+//       B2INFO("secID: " << secID );
 
       return secID;
     }
@@ -106,36 +117,46 @@ namespace Belle2 {
      */
     static NormCoords calcNormalizedSectorPoint(const std::vector<float>& uConfig, const std::vector<float>& vConfig, uShort secID, NormCoords coords) {
       // safety checks
-      throwBoundary(coords.first);
-      throwBoundary(coords.second);
+      throwBoundary(float(coords.first));
+      throwBoundary(float(coords.second));
       throwBoundaryVector(uConfig);
       throwBoundaryVector(vConfig);
+
+//       B2INFO ("SECID: " << secID);
 
       uInt vMax = vConfig.size() - 1 ;
 //       // reconstructing indices for the u and v cuts by using the sectorID:
       uInt vIndex = (secID - 1) % vMax ;
       uInt uIndex = (secID - 1 - vIndex) / vMax;
 
-      float uPosInSector = (uConfig[uIndex + 1] - uConfig[uIndex]) * coords.first;
+//        B2INFO ("vIndex: " << vIndex << ", uIndex: " << uIndex);
+
+
+      float uPosInSector = (uConfig.at(uIndex + 1) - uConfig.at(uIndex)) * coords.first;
       throwBoundary(uPosInSector);
-      float vPosInSector = (vConfig[vIndex + 1] - vConfig[vIndex]) * coords.second;
+      float vPosInSector = (vConfig.at(vIndex + 1) - vConfig.at(vIndex)) * coords.second;
       throwBoundary(vPosInSector);
 
-      return std::make_pair(uConfig[uIndex] + uPosInSector, vConfig[vIndex] + vPosInSector);
+      return std::make_pair(uConfig.at(uIndex) + uPosInSector, vConfig.at(vIndex) + vPosInSector);
     }
-
-
 
   protected:
     /** returns true if value is between 0-1, false if not */
     static void throwBoundary(float value) {
-      if (value > 1 or value < 0) throw Out_of_bounds;
+      if (value > 1 or value < 0) {
+
+        // TO DO: Activate
+//   throw Out_of_bounds;
+      }
     }
 
 
     /** returns true if value is between 0-1, false if not */
-    static void throwBoundaryVector(std::vector<float>& vec) {
+    static void throwBoundaryVector(const std::vector<float>& vec) {
       for (float value : vec) throwBoundary(value);
     }
+
+
+
   };
 } //Belle2 namespace

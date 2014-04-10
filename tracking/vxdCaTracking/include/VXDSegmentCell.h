@@ -90,7 +90,10 @@ namespace Belle2 {
     void addInnerNeighbour(VXDSegmentCell* aSegment) { m_innerNeighbours.push_back(aSegment); } /**< adds an inner neighbour-cell */
     void addOuterNeighbour(VXDSegmentCell* aSegment) { m_outerNeighbours.push_back(aSegment); } /**< adds an outer neighbour-cell */
 
+    /** returns the clusterID in the collectorTFinfo-class */
     int getCollectorID() { return m_collector_id; }
+
+    /** sets the clusterID for the collectorTFinfo-class */
     void setCollectorID(int value) { m_collector_id = value; }
 
   protected:

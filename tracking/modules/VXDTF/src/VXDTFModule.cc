@@ -27,7 +27,7 @@
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
 
-#include "tracking/vxdCaTracking/FilterID.h"
+#include "tracking/dataobjects/FilterID.h"
 
 //genfit
 
@@ -4730,7 +4730,8 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
 
       aVxdID = aClusterInfo.getPXDCluster()->getSensorID();
       aLayerID = aVxdID.getLayerNumber();
-      const VXD::SensorInfoBase& aSensorInfo = dynamic_cast<const VXD::SensorInfoBase&>(VXD::GeoCache::get(aVxdID));
+//       const VXD::SensorInfoBase& aSensorInfo = dynamic_cast<const VXD::SensorInfoBase&>(VXD::GeoCache::get(aVxdID));
+      const VXD::SensorInfoBase& aSensorInfo = VXD::GeoCache::get(aVxdID);
       newPosition.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
       newPosition.hitSigma = aSensorInfo.vectorToGlobal(sigmaVec);
       B2DEBUG(10, " baselineTF: pxdluster got global pos X/Y/Z: " << newPosition.hitPosition.X() << "/" << newPosition.hitPosition.Y() << "/" << newPosition.hitPosition.Z() << ", global var X/Y/Z: " << newPosition.hitSigma.X() << "/" << newPosition.hitSigma.Y() << "/" << newPosition.hitSigma.Z()) /// WARNING TODO: set to debug level 100

@@ -16,7 +16,7 @@ namespace Belle2 {
   protected:
   };
 
-  /** Test simple Setters and Getters. */
+  /** Test Setters and Getters by filling empty values. */
   TEST_F(TwoHitFiltersTest, testEmptyFilter)
   {
     TwoHitFilters aFilter = TwoHitFilters();
@@ -33,6 +33,7 @@ namespace Belle2 {
 
   }
 
+  /** Test Setters and Getters by filling simple values */
   TEST_F(TwoHitFiltersTest, testFilledFilter)
   {
     TVector3 innerHit(1, 2, 3);
@@ -45,8 +46,6 @@ namespace Belle2 {
     EXPECT_DOUBLE_EQ(2., aFilter.calcDistXY()); // does calc dist (outer - innerHit)^2!
 
     EXPECT_DOUBLE_EQ(1., aFilter.calcDistZ());
-
-    EXPECT_DOUBLE_EQ(2., aFilter.calcSlopeRZ());
 
     EXPECT_DOUBLE_EQ(2. / 3., aFilter.calcNormedDist3D());
 
@@ -64,4 +63,48 @@ namespace Belle2 {
 
     EXPECT_DOUBLE_EQ(aFilter.calcNormedDist3D(), bFilter.calcNormedDist3D());
   }
+
+//Thomas 4.2.14
+
+  /** Test Setters and Getters when filling dangerously big values. */
+  TEST_F(TwoHitFiltersTest, testLargeFilter)
+  {
+    TVector3 innerHit(1e150, 0, 0);
+    TVector3 outerHit(0, 0, 0);
+    TVector3 innerHit2(1, 2, 3);
+    TVector3 outerHit2(2, 3, 4);
+
+    TwoHitFilters aFilter = TwoHitFilters(outerHit, innerHit); // correct order
+
+    EXPECT_DOUBLE_EQ(1e300, aFilter.calcDist3D()); // does calc dist (outer - innerHit)^2!
+
+    aFilter.resetValues(innerHit2, outerHit2);
+    EXPECT_DOUBLE_EQ(-0.95531661812450927816, aFilter.calcSlopeRZ());
+  }
+
+  /** Test Setters and Getters when filling extremely big values. */
+  TEST_F(TwoHitFiltersTest, testVeryLargeFilter)  //approx 1.8e308 ... largest possible value of a double
+  {
+    TVector3 innerHit(1e300, 0, 0);
+    TVector3 outerHit(0, 0, 0);
+
+    TwoHitFilters aFilter = TwoHitFilters(outerHit, innerHit); // correct order
+
+    EXPECT_DOUBLE_EQ(1e600, aFilter.calcDist3D()); // does calc dist (outer - innerHit)^2!
+
+  }
+
+
+//       TEST_F(TwoHitFiltersTest, testVeryLargeNormedDistFilter) //FAILS, because both calcDistXY() and calcDist3D() are too large to be stored in a double.
+//       {
+//  TVector3 innerHit(1e300, 0, 1e300);
+//  TVector3 outerHit(0, 0, 0);
+//
+//  TwoHitFilters aFilter = TwoHitFilters(outerHit, innerHit); // correct order
+//
+//  EXPECT_DOUBLE_EQ(1. / 2., aFilter.calcNormedDist3D());
+//
+//  EXPECT_GT(1./0.,5.);
+//       }
+
 }  // namespace

@@ -135,7 +135,10 @@ namespace Belle2 {
     void removeTrackCandidate() { m_attachedTrackCandidates--; } /**< decrease number of TCs using this hit */
 
 
+    /** returns the clusterID in the collectorTFinfo-class */
     int getCollectorID() { return m_collector_id; }
+
+    /** sets the clusterID for the collectorTFinfo-class */
     void setCollectorID(int value) { m_collector_id = value; }
 
 

@@ -25,7 +25,7 @@
 
 #include "tracking/dataobjects/FullSecID.h"
 
-#include "tracking/vxdCaTracking/FilterID.h"
+#include "tracking/dataobjects/FilterID.h"
 
 
 //C++ std lib

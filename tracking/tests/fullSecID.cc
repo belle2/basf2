@@ -108,7 +108,7 @@ namespace Belle2 {
   }
 
 
-
+  /** testing the overloaded operators of the FullSecID-class */
   TEST_F(FullSecIDTest, overloadedOperatorTests)
   {
     //preparing stuff (procedures copied from constructorAndGetterTest):
@@ -169,7 +169,7 @@ namespace Belle2 {
   }
 
 
-
+  /** Unfinished test - shall test bufferOverflows... */
   TEST_F(FullSecIDTest, bufferOverflowTest)
   {
     B2WARNING("TODO: FullSecIDTest:bufferOverflowTest should catch cases of bad user input")

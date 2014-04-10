@@ -14,7 +14,7 @@
 #include <tracking/dataobjects/VXDTFRawSecMap.h> // needed for rootImport
 #include "tracking/dataobjects/FullSecID.h"
 #include <framework/gearbox/Const.h>
-#include "tracking/vxdCaTracking/FilterID.h"
+#include "tracking/dataobjects/FilterID.h"
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Stream.h> // to be able to stream TObjects into xml-coded files
 

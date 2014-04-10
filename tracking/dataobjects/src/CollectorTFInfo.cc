@@ -23,7 +23,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 
-#include "tracking/vxdCaTracking/FilterID.h"
+#include "tracking/dataobjects/FilterID.h"
 #include "tracking/dataobjects/FullSecID.h"
 #include <vxd/geometry/GeoCache.h>
 

@@ -44,6 +44,7 @@ namespace Belle2 {
 
     /** constructor */
     Sector():
+      m_myActiveSector(NULL),
       m_sectorID(0),
       m_distance2Origin(0),
       m_useDistance4sort(false)
@@ -52,6 +53,7 @@ namespace Belle2 {
 
     /** useful constructor for cases where sectors are treated by fullSecID (parameter 1) */
     Sector(unsigned int secID):
+      m_myActiveSector(NULL),
       m_sectorID(secID),
       m_distance2Origin(0),
       m_useDistance4sort(false)
@@ -63,6 +65,7 @@ namespace Belle2 {
      * sorting by distance is activated automatically but can be set by parameter 3
      */
     Sector(unsigned int secID, float distance2origin, bool sortByDistance = true):
+      m_myActiveSector(NULL),
       m_sectorID(secID),
       m_distance2Origin(distance2origin),
       m_useDistance4sort(sortByDistance)
@@ -71,6 +74,7 @@ namespace Belle2 {
 
     /** overloaded assignment operator */
     Sector& operator=(const Sector& aSector) {
+      m_myActiveSector = aSector.getMyActiveSector(),
       m_sectorID = aSector.getSecID();
       m_distance2Origin = aSector.getDistance();
       m_useDistance4sort = aSector.useDistance4sort();
@@ -108,7 +112,7 @@ namespace Belle2 {
 
 
     /** getter - returns a pointer to the currently connected activatedSector */
-    ActivatedSector* getMyActiveSector() { return m_myActiveSector; }
+    ActivatedSector* getMyActiveSector() const { return m_myActiveSector; }
 
 
     /** setter - set distance of sector to origin defined by sectorMap */

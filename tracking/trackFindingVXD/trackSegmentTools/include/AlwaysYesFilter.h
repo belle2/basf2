@@ -37,13 +37,6 @@ namespace Belle2 {
 
   protected:
 
-
-    /** if value is lower than cutoff, the value will be neglected */
-    float m_minCutoff;
-
-    /** if value is higher than cutoff, the value will be neglected */
-    float m_maxCutoff;
-
     ClassDef(AlwaysYesFilter, 1)
   };
 } //Belle2 namespace

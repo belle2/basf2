@@ -15,7 +15,7 @@
 #include "tracking/vxdCaTracking/TwoHitFilters.h"
 #include "tracking/vxdCaTracking/ThreeHitFilters.h"
 #include "tracking/vxdCaTracking/FourHitFilters.h"
-#include "tracking/vxdCaTracking/FilterID.h"
+#include "tracking/dataobjects/FilterID.h"
 #include "tracking/dataobjects/FullSecID.h"
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
@@ -407,6 +407,7 @@ namespace Belle2 {
     template<class Tmpl>
     bool createSectorAndHit(Belle2::Const::EDetector detectorID, int pdg, const Tmpl* aSiTrueHitPtr, VXDTrack& newTrack, MapOfSectors* thisSecMap); /**< internal member - takes hit, calculates sector (and creates it if it is not existing yet) and creates internal VXDHit for further calculation. If return value is true, everything worked fine. If not, then hit was not created (no info about the sector-creation) */
 
+    /** return chosen origin for secMap-creation */
     TVector3 getOrigin() { return m_origin; }
   protected:
     MapOfSectors m_sectorMap; /**< sectormap contains full info about sectors (will always be calculated) */

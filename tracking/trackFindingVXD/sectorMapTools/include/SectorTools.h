@@ -71,12 +71,11 @@ namespace Belle2 {
            foundSectorV = false;
       unsigned int uMax = uConfig.size() - 1,
                    vMax = vConfig.size() - 1;
-
 //       B2INFO("uMax: " << uMax << ", vMax: " << vMax);
 
       // searching for sector-slot in u-direction:
       for (; uCount < uMax; ++uCount) {
-        if (coords.first > uConfig[uCount] and coords.first < uConfig[uCount + 1]) {
+        if (coords.first > uConfig.at(uCount) and coords.first < uConfig.at(uCount + 1)) {
           foundSectorU = true;
           break;
         }
@@ -84,7 +83,7 @@ namespace Belle2 {
 
       // searching for sector-slot in v-direction:
       for (; vCount < vMax; ++vCount) {
-        if (coords.second > vConfig[vCount] and coords.second < vConfig[vCount + 1]) {
+        if (coords.second > vConfig.at(vCount) and coords.second < vConfig.at(vCount + 1)) {
           foundSectorV = true;
           break;
         }
@@ -97,7 +96,6 @@ namespace Belle2 {
       if (foundSectorU == true and foundSectorV == true) {
         secID = vCount + 1 + uCount * vMax;
       }
-
 //       B2INFO("secID: " << secID );
 
       return secID;

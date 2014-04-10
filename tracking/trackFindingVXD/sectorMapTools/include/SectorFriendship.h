@@ -40,10 +40,15 @@ namespace Belle2 {
     typedef std::vector<std::vector<CompatibilityValue> > CompatibilityTable;
 
     /** constructor */
-    SectorFriendship() {}
+    SectorFriendship() :
+      m_mainSector(NULL),
+      m_friendSector(NULL) {}
 
     /** returns friend sector */
     Sector* getFriend() { return m_friendSector; }
+
+    /** creates a compatibility-table so that the filters can use it */
+    void prepareCompatibilityTable();
 
     /** applies SegmentFilters on each spacepoint of this sector-sector-combination */
     void applySegmentFilters();
@@ -61,7 +66,7 @@ namespace Belle2 {
     /** This vector carries a pointer to all filters allowed for this sector-combination */
     std::vector<FilterBase*> m_myFilters;
 
-    /** This table carries the compatibility for each combination of hits or segments */
+    /** This table carries the compatibility for each combination of hits or segments. First dimension maps iD of hit on mainSector, second one maps iD on friendSector */
     std::vector<std::vector<CompatibilityValue> > m_compatibilityTable;
 
     ClassDef(SectorFriendship, 1)

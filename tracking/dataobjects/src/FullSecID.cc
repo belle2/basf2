@@ -111,11 +111,14 @@ FullSecID::FullSecID(unsigned int layerID, bool subLayerID, unsigned int sensorI
 
 std::string FullSecID::getFullSecString() const
 {
-  return (boost::format("%1%%2%_%3%_%4%") % getLayerID() % getSubLayerID() % getUniID() % getSecID()).str();  // WARNING this bypasses the following code - intended?
   if (getLayerID() == 0) {
-    return (boost::format("%1%%2%_0.0.0_%3%") % getLayerID() % getSubLayerID() % getSecID()).str();
+    return (boost::format("0%1%_000_%2%") % getLayerID() % getSubLayerID() % getSecID()).str();
   }
-  return (boost::format("%1%%2%_%3%.%4%.%5%_%6%") % getLayerID() % getSubLayerID() % getVxdID().getLayerNumber() % getVxdID().getLadderNumber() % getVxdID().getSensorNumber() % getSecID()).str();
+  return (boost::format("%1%%2%_%3%_%4%") % getLayerID() % getSubLayerID() % getUniID() % getSecID()).str();  // WARNING this bypasses the following code - intended?
+//   if (getLayerID() == 0) {
+//     return (boost::format("%1%%2%_0.0.0_%3%") % getLayerID() % getSubLayerID() % getSecID()).str();
+//   }
+//   return (boost::format("%1%%2%_%3%.%4%.%5%_%6%") % getLayerID() % getSubLayerID() % getVxdID().getLayerNumber() % getVxdID().getLadderNumber() % getVxdID().getSensorNumber() % getSecID()).str();
 }
 
 

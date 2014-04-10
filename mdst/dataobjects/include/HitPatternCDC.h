@@ -13,6 +13,7 @@
 
 #include <bitset>
 #include <algorithm>
+#include <vector>
 
 namespace Belle2 {
   /** Hit pattern of CDC hits within a track and efficient getters.
@@ -30,6 +31,9 @@ namespace Belle2 {
    *  COMMENT: Most member function are implemented as normal and fast version. Be sure what
    *           you are doing if you use the fast version, they do not contain range checks
    *           for perfoming reasons.
+   *  TODO: Get rid of code duplication in fast and not fast functions via inline functions.
+   *  TODO: How handle out of range access? Exception or some return value to indicate out of range?
+   *  TODO: Think about a better getLongestContRunInSL algorithm.
    */
   class HitPatternCDC : public TObject {
   public:
@@ -183,28 +187,55 @@ namespace Belle2 {
               & m_pattern).any();
     }
 
-    /** Getter for longest run of consecutive layers with hits in the Super-Layer.
-     *
-     *  @TODO Not yet implemented, perhaps having statics of the Super-Layer boundaries
-     *        is vastly superior to bit logic here?
-     */
-    unsigned short getLongestContRunInSL(const unsigned short /*sLayer*/) const {
-      return 0; //FIXME
+    /** Getter for longest run of consecutive layers with hits in the Super-Layer. */
+    unsigned short getLongestContRunInSL(const unsigned short sLayer) const {
+      sLayerRangeCheck(sLayer);
+
+      //TODO: Improve algorithm and clean up code...
+      //NOTE: perhaps having statics of the Super-Layer boundaries is vastly superior to bit logic here
+      unsigned short max = 0;
+      unsigned short counter = 0;
+
+      for (unsigned short i = s_indexMin[sLayer]; i <= s_indexMax[sLayer]; ++i) {
+        counter += m_pattern[i];
+        if (m_pattern[i] == 0) {
+          if (counter > max) {
+            max = counter;
+          }
+          counter = 0;
+        }
+      }
+      // To take care of the last count, if the slayer ends with a 1.
+      return std::max(max, counter);
     }
 
-    /** Getter for longest run of consecutive layers with hits in the Super-Layer.
-     *
-     *  @TODO Not yet implemented, perhaps having statics of the Super-Layer boundaries
-     *        is vastly superior to bit logic here?
-     */
-    unsigned short getLongestContRunInSLFast(const unsigned short /*sLayer*/) const {
-      return 0; //FIXME
+    /** Getter for longest run of consecutive layers with hits in the Super-Layer. */
+    unsigned short getLongestContRunInSLFast(const unsigned short sLayer) const {
+      //TODO: Improve algorithm and clean up code...
+      //NOTE: perhaps having statics of the Super-Layer boundaries is vastly superior to bit logic here
+      unsigned short max = 0;
+      unsigned short counter = 0;
+
+      for (unsigned short i = s_indexMin[sLayer]; i <= s_indexMax[sLayer]; ++i) {
+        counter += m_pattern[i];
+        if (m_pattern[i] == 0) {
+          if (counter > max) {
+            max = counter;
+          }
+          counter = 0;
+        }
+      }
+      // To take care of the last count, if the slayer ends with a 1.
+      return std::max(max, counter);
     }
 
   private:
     std::bitset<64> m_pattern;                     /**<  Saves the actual pattern.*/
     static const std::bitset<64> s_sLayerMasks[9]; /**<  Masks to zero out all bits from other layers.*/
     static const std::bitset<64> s_infoLayerMask;  /**<  Mask to zero out all bits from other layers. */
+
+    static const std::vector<unsigned short> s_indexMin; /**< Holds the min indices for super layer access. */
+    static const std::vector<unsigned short> s_indexMax; /**< Holds the max indices for super layer access. */
 
     /**
      * This function implements the layer range check for the public functions which use a range check.
@@ -218,7 +249,7 @@ namespace Belle2 {
      * @TODO: Decide to throw an exception or return a number such as 999
      * @param slayer
      */
-    void sLayerRangeCheck(const unsigned short slayer) const;
+    void sLayerRangeCheck(const unsigned short /*slayer*/) const;
 
     //-----------------------------------------------------------------------------------
     /** Make it a ROOT object.

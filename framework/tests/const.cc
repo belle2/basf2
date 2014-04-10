@@ -137,6 +137,29 @@ namespace Belle2 {
     EXPECT_DOUBLE_EQ(antiproton.getParticlePDG()->Charge(), -3);
     EXPECT_EQ(antiproton.getParticlePDG()->PdgCode(), -2212);
 
+    //Spin and lifetime are added manually to TDatabasePDG, test this
+    EXPECT_DOUBLE_EQ(1.0, Const::photon.getParticlePDG()->Spin());
+    EXPECT_DOUBLE_EQ(0.5, Const::proton.getParticlePDG()->Spin());
+    EXPECT_DOUBLE_EQ(0.5, Const::electron.getParticlePDG()->Spin());
+
+    EXPECT_DOUBLE_EQ(0.0, Const::proton.getParticlePDG()->Lifetime());
+    //lifetime (about 881s for neutron, 2.197e-6s for muon)
+    EXPECT_TRUE(Const::neutron.getParticlePDG()->Lifetime() > 800);
+    EXPECT_TRUE(Const::neutron.getParticlePDG()->Lifetime() < 900);
+    EXPECT_TRUE(Const::muon.getParticlePDG()->Lifetime() < 2.2e-6);
+    EXPECT_TRUE(Const::muon.getParticlePDG()->Lifetime() > 2.1e-6);
+
+    //AntiParticle is non-const...
+    TParticlePDG* protonnonconst = const_cast<TParticlePDG*>(Const::proton.getParticlePDG());
+    TParticlePDG* photonnonconst = const_cast<TParticlePDG*>(Const::photon.getParticlePDG());
+
+    //test that AntiParticle() works as expected (not the case for previous implementation)
+    EXPECT_DOUBLE_EQ(protonnonconst->AntiParticle()->Charge(), -3);
+    EXPECT_EQ(protonnonconst->AntiParticle()->PdgCode(), -2212);
+
+    EXPECT_TRUE(photonnonconst->AntiParticle() == photonnonconst);
+
+
     EXPECT_TRUE(Const::invalidParticle.getParticlePDG() == NULL);
   }
 

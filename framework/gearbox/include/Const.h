@@ -468,22 +468,7 @@ namespace Belle2 {
     ~Const() {};
     /** @} */
 
-    /**
-     * Helper class for loading the particle properties from EvtGen.
-     */
-    class EvtGenDatabasePDG {
-    public:
-      static TDatabasePDG* instance();  /**< Instance method that loads the EvtGen table. */
-    private:
-      /**
-       * @{
-       * no instances allowed.
-       */
-      EvtGenDatabasePDG();
-      /** @} */
-    };
   };
-
 }
 
 /**

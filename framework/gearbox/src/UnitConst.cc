@@ -9,7 +9,7 @@
  **************************************************************************/
 
 /**************************************************************************
- * This file contains the implemantations for Unit.h and Const.h to avoid *
+ * This file contains the implementations for Unit.h and Const.h to avoid *
  * problems with the order of the initialization of constants.            *
  **************************************************************************/
 
@@ -20,11 +20,201 @@
 #include <TMath.h>
 #include <TDatabasePDG.h>
 #include <TParticlePDG.h>
+#include <THashList.h>
+#include <TExMap.h>
 
 #include <algorithm>
+#include <fstream>
 
 using namespace Belle2;
 using namespace std;
+
+namespace {
+  /** Helper class for setting additional TParticlePDG attributes. */
+  class ParticlePDG : public TParticlePDG {
+  public:
+    ParticlePDG(const char* name, const char* title,
+                Double_t mass, Bool_t stable,
+                Double_t width, Double_t charge,
+                const char* ParticleClass,
+                Int_t PDGcode,
+                Int_t Anti,
+                Int_t TrackingCode,
+                Double_t Lifetime,
+                Double_t Spin): TParticlePDG(name, title, mass, stable, width, charge, ParticleClass, PDGcode, Anti, TrackingCode) {
+      //and finally overwrite base class members
+      fLifetime = Lifetime;
+      fSpin = Spin;
+    }
+  };
+
+  /**
+   * Helper class for loading the particle properties from EvtGen.
+   * This should be instantiated once (statically, in this file) to replace
+   * the global TDatabasePDG instance with ourselves
+   */
+  class EvtGenDatabasePDG : public TDatabasePDG {
+  public:
+    static TDatabasePDG* Instance();  /**< Instance method that loads the EvtGen table. */
+    void ReadEvtGenTable(const char* filename);
+
+    /** copy&paste, except we create ParticlePDG to set lifetime and spin. */
+    TParticlePDG* AddParticle(const char* name, const char* title,
+                              Double_t mass, Bool_t stable,
+                              Double_t width, Double_t charge,
+                              const char* ParticleClass,
+                              Int_t PDGcode,
+                              Int_t Anti,
+                              Int_t TrackingCode,
+                              Double_t Lifetime,
+                              Double_t Spin
+                             ) {
+      //
+      //  Particle definition normal constructor. If the particle is set to be
+      //  stable, the decay width parameter does have no meaning and can be set to
+      //  any value. The parameters granularity, LowerCutOff and HighCutOff are
+      //  used for the construction of the mean free path look up tables. The
+      //  granularity will be the number of logwise energy points for which the
+      //  mean free path will be calculated.
+      //
+
+      TParticlePDG* old = GetParticle(PDGcode);
+
+      if (old) {
+        printf(" *** TDatabasePDG::AddParticle: particle with PDGcode=%d already defined\n", PDGcode);
+        return 0;
+      }
+
+      TParticlePDG* p = new ParticlePDG(name, title, mass, stable, width,
+                                        charge, ParticleClass, PDGcode, Anti,
+                                        TrackingCode,
+                                        Lifetime, Spin);
+      fParticleList->Add(p);
+      if (fPdgMap)
+        fPdgMap->Add((Long_t)PDGcode, (Long_t)p);
+
+      TParticleClassPDG* pclass = GetParticleClass(ParticleClass);
+
+      if (!pclass) {
+        pclass = new TParticleClassPDG(ParticleClass);
+        fListOfClasses->Add(pclass);
+      }
+
+      pclass->AddParticle(p);
+
+      return p;
+    }
+
+  private:
+    /** singleton. */
+    EvtGenDatabasePDG() { }
+  };
+}
+
+TDatabasePDG* EvtGenDatabasePDG::Instance()
+{
+  static bool instanceCreated = false;
+  if (!instanceCreated) {
+    if (fgInstance) {
+      B2ERROR("TDatabasePDG instance found? Replacing existing instance...")
+    }
+    //let's set the instance pointer to ourselves
+    fgInstance = new EvtGenDatabasePDG();
+
+    //ok, now load the data
+    std::string fileName = std::getenv("BELLE2_EXTERNALS_DIR");
+    fileName += "/share/evtgen/evt.pdl";
+    fgInstance->ReadEvtGenTable(fileName.c_str());
+    instanceCreated = true;
+  }
+  return TDatabasePDG::Instance();
+}
+
+void EvtGenDatabasePDG::ReadEvtGenTable(const char* filename)
+{
+  // read list of particles from an EvtGen pdl file
+  // if the particle list does not exist, it is created, otherwise
+  // particles are added to the existing list
+
+  // the code for reading the evt.pdl file is copied from EvtPartPropDb::readPDT
+
+  if (fParticleList == 0) {
+    fParticleList  = new THashList;
+    fListOfClasses = new TObjArray;
+  }
+
+  std::ifstream indec(filename);
+
+  char cmnd[100], xxxx[100], pname[100];
+  int  stdhepid; //aka PDG code
+  double mass, pwidth, pmaxwidth;
+  int    chg3, spin2;
+  double ctau;
+  int    lundkc;
+
+  if (!indec) {
+    B2FATAL("EvtGenDatabasePDG::ReadPDGTable: Could not open PDG particle file " << filename);
+    return;
+  }
+
+  std::map<int, TParticlePDG*> pdgToPartMap;
+  do {
+
+    char ch, ch1;
+
+    do {
+
+      indec.get(ch);
+      if (ch == '\n') indec.get(ch);
+      if (ch != '*') {
+        indec.putback(ch);
+      } else {
+        while (indec.get(ch1), ch1 != '\n');
+      }
+    } while (ch == '*');
+
+    indec >> cmnd;
+
+    if (strcmp(cmnd, "end")) {
+
+      if (!strcmp(cmnd, "add")) {
+
+        indec >> xxxx >> xxxx >> pname >> stdhepid;
+        indec >> mass >> pwidth >> pmaxwidth >> chg3 >> spin2 >> ctau >> lundkc;
+
+        const double c_mm_per_s = Const::speedOfLight / (Unit::mm / Unit::s);
+        TParticlePDG* part = AddParticle(pname,
+                                         pname,
+                                         mass,
+                                         0,
+                                         pwidth,
+                                         chg3,
+                                         "Unknown",
+                                         stdhepid,
+                                         0, 0, //anti, trackigCode
+                                         ctau / c_mm_per_s, // in seconds
+                                         spin2 / 2.0);
+        pdgToPartMap[stdhepid] = part;
+      }
+    }
+  } while (strcmp(cmnd, "end"));
+
+  //fix up particle <-> antiparticle settings
+  for (auto entry : pdgToPartMap) {
+    int pdg = entry.first;
+    TParticlePDG* part = entry.second;
+
+    const auto& antiPartIter = pdgToPartMap.find(-pdg);
+    if (antiPartIter != pdgToPartMap.end()) {
+      //set anti-particle
+      part->SetAntiParticle(antiPartIter->second);
+    } else {
+      //we are our own antiparticle
+      part->SetAntiParticle(part);
+    }
+  }
+}
+
 
 /*** The implementation of the Unit class defined in Unit.h starts here ***/
 
@@ -244,7 +434,7 @@ Const::ParticleType Const::ParticleType::operator++(int)
 
 const TParticlePDG* Const::ParticleType::getParticlePDG() const
 {
-  return EvtGenDatabasePDG::instance()->GetParticle(m_pdgCode);
+  return EvtGenDatabasePDG::Instance()->GetParticle(m_pdgCode);
 }
 
 double Const::ParticleType::getMass() const
@@ -305,16 +495,3 @@ const double Const::fineStrConst   = 1.0 / 137.036;
 const double Const::permSi         = 11.9 * 8.8542 * 1e-18 * Unit::C / Unit::V / Unit::um;
 const double Const::uTherm         = 0.026 * Unit::V;
 const double Const::eMobilitySi    = 1415 * Unit::cm2 / Unit::V / Unit::s;
-
-
-TDatabasePDG* Const::EvtGenDatabasePDG::instance()
-{
-  static bool instanceCreated = false;
-  if (!instanceCreated) {
-    std::string fileName = std::getenv("BELLE2_EXTERNALS_DIR");
-    fileName += "/share/evtgen/evt.pdl";
-    TDatabasePDG::Instance()->ReadEvtGenTable(fileName.c_str());
-    instanceCreated = true;
-  }
-  return TDatabasePDG::Instance();
-}

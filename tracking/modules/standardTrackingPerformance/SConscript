@@ -4,7 +4,6 @@ env['LIBS'] = [
     'framework',
     'mdst_dataobjects',
     'genfit2',
-    'tracking_dataobjects',
     ]
 
 Return('env')

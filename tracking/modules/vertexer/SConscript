@@ -1,5 +1,7 @@
 Import('env')
 
 #env.Append(CPPDEFINES = {'RaveDllExport':''})
-env['LIBS'] = ['framework','geometry','tracking','genfit2', '$ROOT_LIBS']
+env['LIBS'] = ['framework','geometry',
+#'tracking',
+'genfit2', '$ROOT_LIBS']
 Return('env')

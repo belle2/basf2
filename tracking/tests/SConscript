@@ -12,7 +12,6 @@ env['LIBS'] = [
     'simulation_dataobjects',
     'framework',
     'Geom',
-    'geometry',
 #   'genfit2',
     '$ROOT_LIBS',
     'boost_chrono',

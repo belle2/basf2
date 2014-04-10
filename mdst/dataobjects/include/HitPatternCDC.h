@@ -15,7 +15,6 @@
 #include <algorithm>
 
 namespace Belle2 {
-
   /** Hit pattern of CDC hits within a track and efficient getters.
    *
    *  The pattern is stored using a std::bitset. This allows to use some stuff from the
@@ -28,6 +27,9 @@ namespace Belle2 {
    *  Note, that super Layer counting goes from 0 to 8.
    *  GENERAL COMMENT: I think the non-static members and the interface are largely OK,
    *                   but the back-end implementation maybe not so great.
+   *  COMMENT: Most member function are implemented as normal and fast version. Be sure what
+   *           you are doing if you use the fast version, they do not contain range checks
+   *           for perfoming reasons.
    */
   class HitPatternCDC : public TObject {
   public:
@@ -50,6 +52,7 @@ namespace Belle2 {
 
     /** Get the approximate total Number of CDC hits in the fit. */
     unsigned short getNHits() const {
+
       // Shift the 8 MSBs to the right and return their value as integer.
       return static_cast<unsigned short int>((m_pattern >> 56).to_ulong());
     }
@@ -68,6 +71,10 @@ namespace Belle2 {
       m_pattern = numberOfHits | m_pattern;
     }
 
+    // ----------------------------------------------------------------
+    // ---------------- LAYER FUNCTIONS -------------------------------
+    // ----------------------------------------------------------------
+
     /** Set bit corresponding to layer to true.
      *
      *  This function may throw an out-of-range exception.
@@ -75,10 +82,15 @@ namespace Belle2 {
      *          e.g. to set double occupation bit.
      */
     bool setLayer(const unsigned short layer) {
-      //The return value may be nonsense, if out-of range...
+      layerRangeCheck(layer);
       bool valueBefore = m_pattern[layer];
       m_pattern.set(layer);
       return valueBefore;
+    }
+
+    /** Set bit without range check or readout. */
+    void setLayerFast(const unsigned short layer, const bool value = true) {
+      m_pattern[layer] = value;
     }
 
     /** Set bit corresponding to layer to false.
@@ -88,32 +100,61 @@ namespace Belle2 {
      *          e.g. to set double occupation bit.
      */
     bool resetLayer(const unsigned short layer) {
+      layerRangeCheck(layer);
       bool valueBefore = m_pattern[layer];
       m_pattern.reset(layer);
       return valueBefore;
     }
 
-    /** Set bit without range check or readout. */
-    void setLayerFast(const unsigned short layer, const bool value = true) {
-      m_pattern[layer] = value;
+    /** Set bit corresponding to layer to false without range check or readout. */
+    void resetLayerFast(const unsigned short layer) {
+      m_pattern.reset(layer);
     }
 
     /** Getter for single layer.*/
     bool hasLayer(const unsigned short layer) const {
+      layerRangeCheck(layer);
       return m_pattern[layer];
     }
 
+    /** Getter for single layer without range check.*/
+    bool hasLayerFast(const unsigned short layer) const {
+      return m_pattern[layer];
+    }
+
+    // ----------------------------------------------------------------
+    // ---------------- SUPER LAYER FUNCTIONS -------------------------
+    // ----------------------------------------------------------------
+
     /** Getter for Super-Layer match.*/
     bool hasSLayer(const unsigned short sLayer) const {
+      sLayerRangeCheck(sLayer);
+      return ((m_pattern & s_sLayerMasks[sLayer]).any());
+    }
+
+    /** Getter for Super-Layer match without range check.*/
+    bool hasSLayerFast(const unsigned short sLayer) const {
       return ((m_pattern & s_sLayerMasks[sLayer]).any());
     }
 
     /** Reset complete superLayer, e.g. because segment shouldn't belong to that track.*/
     void resetSLayer(const unsigned short sLayer) {
+      sLayerRangeCheck(sLayer);
       for (unsigned short int ii = 0; ii < m_pattern.size(); ++ii) {
         if ((s_sLayerMasks[sLayer])[ii]) {resetLayer(ii);}
       }
     }
+
+    /** Reset complete superLayer without range check, e.g. because segment shouldn't belong to that track.*/
+    void resetSLayerFast(const unsigned short sLayer) {
+      for (unsigned short int ii = 0; ii < m_pattern.size(); ++ii) {
+        if ((s_sLayerMasks[sLayer])[ii]) {resetLayer(ii);}
+      }
+    }
+
+    // ----------------------------------------------------------------
+    // ---------------- Others ----------------------------------------
+    // ----------------------------------------------------------------
 
     /** Reset the complete hit pattern. */
     void resetPattern() {
@@ -126,6 +167,7 @@ namespace Belle2 {
      *  any layers with more than two hits leads to under-counting.
      */
     unsigned short getSLayerNHits(const unsigned short sLayer) const {
+      sLayerRangeCheck(sLayer);
       return static_cast<unsigned short>((m_pattern & s_sLayerMasks[sLayer]).count());
     }
 
@@ -147,13 +189,36 @@ namespace Belle2 {
      *        is vastly superior to bit logic here?
      */
     unsigned short getLongestContRunInSL(const unsigned short /*sLayer*/) const {
-      return 0;
+      return 0; //FIXME
+    }
+
+    /** Getter for longest run of consecutive layers with hits in the Super-Layer.
+     *
+     *  @TODO Not yet implemented, perhaps having statics of the Super-Layer boundaries
+     *        is vastly superior to bit logic here?
+     */
+    unsigned short getLongestContRunInSLFast(const unsigned short /*sLayer*/) const {
+      return 0; //FIXME
     }
 
   private:
     std::bitset<64> m_pattern;                     /**<  Saves the actual pattern.*/
     static const std::bitset<64> s_sLayerMasks[9]; /**<  Masks to zero out all bits from other layers.*/
     static const std::bitset<64> s_infoLayerMask;  /**<  Mask to zero out all bits from other layers. */
+
+    /**
+     * This function implements the layer range check for the public functions which use a range check.
+     * @TODO: Decide to throw an exception or return a number such as 999
+     * @param layer
+     */
+    void layerRangeCheck(const unsigned short layer) const;
+
+    /**
+     * This function implements the super layer range check for the public functions which use a range check.
+     * @TODO: Decide to throw an exception or return a number such as 999
+     * @param slayer
+     */
+    void sLayerRangeCheck(const unsigned short slayer) const;
 
     //-----------------------------------------------------------------------------------
     /** Make it a ROOT object.

@@ -35,3 +35,13 @@ const std::bitset<64> HitPatternCDC::s_sLayerMasks[9] = {sLayerZer, sLayerOne, s
 std::bitset<64> infoLayer(static_cast<std::string>("1111111100000000000000000000000000000000000000000000000000000000"));
 
 const std::bitset<64> HitPatternCDC::s_infoLayerMask = infoLayer;
+
+
+void HitPatternCDC::layerRangeCheck(const unsigned short layer) const
+{
+  return;
+}
+void HitPatternCDC::sLayerRangeCheck(const unsigned short slayer) const
+{
+  return;
+}

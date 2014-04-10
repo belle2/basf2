@@ -21,6 +21,7 @@
 
 #include <string>
 #include <fstream>
+#include <string.h>
 
 #include <TLorentzRotation.h>
 

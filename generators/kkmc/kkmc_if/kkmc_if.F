@@ -21,7 +21,7 @@ C   Input environment
       Print *,'KK DATAX_1 : '//DatX_u
       Print *,'KK DATAX_P : '//DatX_p
 
-      open(1,FILE=DatX_u)
+      open(1,FILE=DatX_u,ACTION='read')
 
 C   Input beam momentum for boost
 C      read(1,*) Pb1(1), Pb1(2), Pb1(3), Pb1(4)
@@ -66,7 +66,7 @@ c     switch for long lived particle
          call PYGIVE('MSTJ(22)=2!No decay for long lived particle')
       endif
 c     input particle data file for pythia
-      open(1,FILE=DatX_p,ERR=101)
+      open(1,FILE=DatX_p,ACTION='read',ERR=101)
       call PYUPDA(3,1)
       close(1)
       goto 100

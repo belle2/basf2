@@ -43,10 +43,18 @@ int KKGenInterface::setup(const std::string& KKdefaultFileName, const std::strin
 {
   B2INFO("Begin initialisation of KKGen Interface.");
 
-
+  // This is to avoid character corruption of TAUOLA output
+  char DatX_d[132], DatX_u[132], DatX_p[132];
+  for (int i = 0; i < 132; ++i) {
+    DatX_d[i] = ' ';
+    DatX_u[i] = ' ';
+    DatX_p[i] = ' ';
+  }
+  strcpy(DatX_d, KKdefaultFileName.c_str());
+  strcpy(DatX_u, tauinputFileName.c_str());
+  strcpy(DatX_p, taudecaytableFileName.c_str());
   int irand = 0;
-  kk_init_(KKdefaultFileName.c_str(), tauinputFileName.c_str(),
-           taudecaytableFileName.c_str(), &irand);
+  kk_init_(DatX_d, DatX_u, DatX_p, &irand);
 
 
   // seed of random generator should be set here

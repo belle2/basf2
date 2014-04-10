@@ -51,8 +51,14 @@ int KKGenInterface::setup(const std::string& KKdefaultFileName, const std::strin
     DatX_p[i] = ' ';
   }
   strcpy(DatX_d, KKdefaultFileName.c_str());
+  int length = strlen(DatX_d);
+  DatX_d[length] = ' ';
   strcpy(DatX_u, tauinputFileName.c_str());
+  length = strlen(DatX_u);
+  DatX_u[length] = ' ';
   strcpy(DatX_p, taudecaytableFileName.c_str());
+  length = strlen(DatX_p);
+  DatX_p[length] = ' ';
   int irand = 0;
   kk_init_(DatX_d, DatX_u, DatX_p, &irand);
 

@@ -5,7 +5,7 @@ import os
 import random
 from basf2 import *
 
-#change to True if you want to use PXD hits (fairly small benefit, if any)
+# change to True if you want to use PXD hits (fairly small benefit, if any)
 use_pxd = False
 
 # register necessary modules
@@ -61,7 +61,7 @@ genfit.param('UseClusters', True)
 main.add_module(genfit)
 
 dedx = register_module('DedxPID')
-dedx_params = {
+dedx_params = {  # 'pdfFile': 'YourPDFFile.root',
     'useIndividualHits': True,
     'removeLowest': 0.0,
     'removeHighest': 0.8,
@@ -71,7 +71,6 @@ dedx_params = {
     'useCDC': True,
     'trackDistanceThreshold': 4.0,
     'enableDebugOutput': True,
-    #'pdfFile': 'YourPDFFile.root',
     'ignoreMissingParticles': False,
     }
 dedx.param(dedx_params)

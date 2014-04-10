@@ -5,7 +5,6 @@ import os
 import random
 from basf2 import *
 
-
 print os.getcwd()
 
 # create geometry
@@ -15,7 +14,7 @@ geometry.param('excludedComponents', ['EKLM'])
 
 input = register_module('RootInput')
 input.param('inputFileName', '../EvtGenSimRec.root')
-#original file already contains dE/dx info, but we want other options
+# original file already contains dE/dx info, but we want other options
 input.param('excludeBranchNames', ['DedxLikelihoods', 'DedxTracks'])
 
 dedx = register_module('DedxPID')

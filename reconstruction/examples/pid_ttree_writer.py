@@ -18,8 +18,7 @@ from ROOT import Belle2
 from ROOT import gROOT, AddressOf
 
 # Define a ROOT struct to hold output data in the TTree.
-gROOT.ProcessLine(
-'struct TreeStruct {\
+gROOT.ProcessLine('struct TreeStruct {\
     float lld_dedx;\
     float lld_top;\
     float p;\
@@ -27,12 +26,14 @@ gROOT.ProcessLine(
     float costheta;\
     float trackmomentum;\
     int iskaon;\
-};')
+};'
+                  )
 
 from ROOT import TreeStruct
 
 
 class TreeWriterModule(Module):
+
     """
     This module writes its output to a ROOT tree.
     Adapted from pxd/validation/PXDValidationTTreeSimHit.py
@@ -40,11 +41,11 @@ class TreeWriterModule(Module):
 
     def __init__(self):
         """Initialize the module"""
+
         super(TreeWriterModule, self).__init__()
 
         ## Output ROOT file.
-        self.file = ROOT.TFile('PID_TTree.root',
-            'recreate')
+        self.file = ROOT.TFile('PID_TTree.root', 'recreate')
         ## TTree for output data
         self.tree = ROOT.TTree('tree', '')
         ## Instance of EventData class
@@ -55,16 +56,16 @@ class TreeWriterModule(Module):
                 formstring = '/F'
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
-                self.tree.Branch(key, AddressOf(self.data, key),
-                                 key + formstring)
+                self.tree.Branch(key, AddressOf(self.data, key), key
+                                 + formstring)
 
     def event(self):
         """Store TOP and dE/dx info in tree"""
 
-        pids = Belle2.PyStoreArray("PIDLikelihoods")
+        pids = Belle2.PyStoreArray('PIDLikelihoods')
         for pid in pids:
-            track = pid.getRelatedFrom("Tracks")
-            mcpart = track.getRelatedFrom("MCParticles")
+            track = pid.getRelatedFrom('Tracks')
+            mcpart = track.getRelatedFrom('MCParticles')
             try:
                 pdg = abs(mcpart.getPDG())
                 if pdg != 211 and pdg != 321:
@@ -81,7 +82,7 @@ class TreeWriterModule(Module):
                 else:
                     trackmomentum = 0.0
 
-                #particle to compare with pions
+                # particle to compare with pions
                 selectedpart = Belle2.Const.kaon
                 pid_dedx = Belle2.Const.DetectorSet(Belle2.Const.CDC)
                 pid_top = Belle2.Const.DetectorSet(Belle2.Const.TOP)
@@ -99,17 +100,17 @@ class TreeWriterModule(Module):
                 self.data.phi = phi
                 self.data.costheta = costheta
                 self.data.trackmomentum = trackmomentum
-                self.data.iskaon = (pdg == 321)
+                self.data.iskaon = pdg == 321
 
                 # Fill tree
                 self.file.cd()
                 self.tree.Fill()
-
             except:
-                #some tracks don't have an mcparticle (fixed now)
-                B2WARNING("problems with track <-> mcparticle relations")
-                event = Belle2.PyStoreObj("EventMetaData").obj().getEvent()
-                print "event: %d, track: %d" % (event, track.getArrayIndex())
+
+                # some tracks don't have an mcparticle (fixed now)
+                B2WARNING('problems with track <-> mcparticle relations')
+                event = Belle2.PyStoreObj('EventMetaData').obj().getEvent()
+                print 'event: %d, track: %d' % (event, track.getArrayIndex())
 
     def terminate(self):
         """ Close the output file."""
@@ -117,6 +118,7 @@ class TreeWriterModule(Module):
         self.file.cd()
         self.file.Write()
         self.file.Close()
+
 
 main = create_path()
 

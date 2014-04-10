@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <mdst/dataobjects/V0.h>
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 using namespace std;

@@ -19,8 +19,23 @@ using namespace Belle2;
 
 ClassImp(SectorFriendship)
 
+void SectorFriendship::prepareCompatibilityTable()
+{
+  m_compatibilityTable.clear();
+
+  uint nHitsOnMainSector = m_mainSector->getMyActiveSector()->size();
+  uint nHitsOnFriendSector = m_friendSector->getMyActiveSector()->size();
+  std::vector<CompatibilityValue> compatibility(nHitsOnFriendSector, 0);  // TODO: concept for compatibilityTable needed. shall the filters check for a threshold value or something else?
+  for (uint i = 0 ; i < nHitsOnMainSector; ++i) {
+    m_compatibilityTable.push_back(compatibility);
+  }
+}
+
+
 void SectorFriendship::applySegmentFilters()
 {
+  prepareCompatibilityTable();
+
   for (FilterBase * aFilter : m_myFilters) {
     aFilter->checkSpacePoints(this, m_compatibilityTable);
     if (checkCombinationsAlive() == 0) { break; }
@@ -37,3 +52,4 @@ unsigned int SectorFriendship::checkCombinationsAlive() const
   }
   return counter;
 }
+

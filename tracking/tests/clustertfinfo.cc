@@ -17,18 +17,17 @@ namespace Belle2 {
   };
 
 
-  /** Test simple Setters and Getters. */
+  /** Tests empty ClusterTFInfo */
   TEST_F(ClusterTFInfoTest, testEmptyFilter)
   {
     ClusterTFInfo aCluster = ClusterTFInfo();
 
     ASSERT_EQ(-1., aCluster.getRealClusterID());
-
   }
 
+  /** Test simple Setters and Getters of ClusterTFInfo */
   TEST_F(ClusterTFInfoTest, testFilledFilter)
   {
-
     ClusterTFInfo aCluster = ClusterTFInfo();
     aCluster.setRealClusterID(12);
     aCluster.setPDG(11);
@@ -43,10 +42,10 @@ namespace Belle2 {
     ASSERT_EQ(1., aCluster.getParticleID());
     ASSERT_EQ(1., aCluster.getDetectorType());
     ASSERT_EQ(2., aCluster.getRelativeClusterID());
-
   }
 
 
+  /** Test Overlapped Logic of ClusterTFInfo */
   TEST_F(ClusterTFInfoTest, testOverlapped)
   {
     bool false_item = false;

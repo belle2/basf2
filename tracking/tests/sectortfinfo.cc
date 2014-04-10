@@ -16,9 +16,6 @@ namespace Belle2 {
   protected:
   };
 
-
-
-
   /** Test simple Setters and Getters. */
   TEST_F(SectorTFInfoTest, testEmptyFilter)
   {
@@ -28,6 +25,7 @@ namespace Belle2 {
 
   }
 
+  /** Tests the points of the sector */
   TEST_F(SectorTFInfoTest, testPoints)
   {
     TVector3 testPoint(2, 1, 3);
@@ -41,6 +39,7 @@ namespace Belle2 {
 
   }
 
+  /** Tests the friends of the sector */
   TEST_F(SectorTFInfoTest, testFriends)
   {
     std::vector<unsigned int> testFriends = {1, 2, 3};
@@ -57,7 +56,7 @@ namespace Belle2 {
   }
 
 
-
+  /** Tests the overlapped logic of a sector*/
   TEST_F(SectorTFInfoTest, testOverlapped)
   {
     bool false_item = false;
@@ -82,6 +81,7 @@ namespace Belle2 {
   }
 
 
+  /** Tests the display options of a sector */
   TEST_F(SectorTFInfoTest, testDisplay)
   {
     TVector3 testPoint(2, 1, 3);

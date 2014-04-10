@@ -30,6 +30,7 @@ namespace Belle2 {
     EXPECT_DOUBLE_EQ(-1., aBase.getPassIndex());
   }
 
+  /** Tests setter/getter and the Accepted/Rejected Filters of BaseTFInfoTest Object */
   TEST_F(BaseTFInfoTest, testFilledFilter)
   {
     BaseTFInfo aBase = BaseTFInfo();
@@ -48,8 +49,5 @@ namespace Belle2 {
     ASSERT_EQ(12, aBase.getRejected()[1]);
 
     ASSERT_EQ(1, aBase.getPassIndex());
-
-
-
   }
 }  // namespace

@@ -47,7 +47,7 @@ ECLShowertoClusterModule::ECLShowertoClusterModule() : Module()
 {
   // Set module properties
   setDescription("To create ECLCluster (mdst data object) from ECLShower.  To be used for root file created without mdst format. ");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
   // Parameter definitions
 
 }

@@ -14,6 +14,7 @@
 #include <tracking/dataobjects/MuidHit.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/KLMCluster.h>
 #include <genfit/Track.h>
 #include <genfit/DetPlane.h>
 #include <genfit/FieldManager.h>
@@ -90,10 +91,12 @@ MuidModule::MuidModule() : Module(), m_ExtMgr(NULL)    // no ExtManager yet
   addParam("TracksColName", m_TracksColName, "Name of collection holding the reconstructed tracks", string(""));
   addParam("MuidsColName", m_MuidsColName, "Name of collection holding the muon identification information from the extrapolation", string(""));
   addParam("MuidHitsColName", m_MuidHitsColName, "Name of collection holding the muidHits from the extrapolation", string(""));
+  addParam("KLMClustersColName", m_KLMClustersColName, "Name of collection holding the KLMClusters", string(""));
   addParam("MinPt", m_MinPt, "[GeV/c] Minimum transverse momentum of a particle that will be extrapolated.", double(0.1));
   addParam("MinKE", m_MinKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation.", double(0.002));
   addParam("MaxStep", m_MaxStep, "[cm] Maximum step size during extrapolation (use 0 for infinity).", double(25.0));
   addParam("MaxDistSigma", m_MaxDistSqInVariances, "[#sigmas] Maximum hit-to-extrapolation difference.", double(7.5));
+  addParam("MaxKLMClusterDistance", m_MaxKLMClusterDistSq, "[cm] Maximum distance between track and KLM cluster.", double(50.0));
   addParam("Cosmic", m_Cosmic, "Particle source (0 = beam, 1 = cosmic ray.", 0);
 }
 
@@ -110,6 +113,10 @@ void MuidModule::initialize()
 
   // Square user's input value to get max number of variances for hit-to-extrapolation squared difference
   m_MaxDistSqInVariances *= m_MaxDistSqInVariances;
+
+  // Convert and square user's input value to get max distance^2 in mm^2 between KLM cluster and (straight-line) projected track
+  m_MaxKLMClusterDistSq *= cm;
+  m_MaxKLMClusterDistSq *= m_MaxKLMClusterDistSq;
 
   // Define the list of BKLM/EKLM sensitive volumes in the geant4 geometry
   registerVolumes();
@@ -255,6 +262,7 @@ void MuidModule::initialize()
   StoreArray<MuidHit>::registerPersistent();
   RelationArray::registerPersistent<Track, Muid>();
   RelationArray::registerPersistent<Track, MuidHit>();
+  RelationArray::registerPersistent<Track, KLMCluster>();
 
   return;
 
@@ -281,6 +289,11 @@ void MuidModule::beginRun()
 void MuidModule::event()
 {
 
+  // Put geant4 in proper state (in case this module is in a separate process)
+  if (m_ExtMgr->PrintG4State() == "G4State_Idle") {
+    G4StateManager::GetStateManager()->SetNewState(G4State_GeomClosed);
+  }
+
   // Disable simulation-specific actions temporarily while we extrapolate
   if (m_RunMgr) {
     m_RunMgr->SetUserAction((G4UserTrackingAction*)NULL);
@@ -293,8 +306,10 @@ void MuidModule::event()
   StoreArray<Track> tracks(m_TracksColName);
   StoreArray<Muid> muids(m_MuidsColName);
   StoreArray<MuidHit> muidHits(m_MuidHitsColName);
+  StoreArray<KLMCluster> klmClusters(m_KLMClustersColName);
   RelationArray trackToMuid(tracks, muids);
   RelationArray trackToMuidHits(tracks, muidHits);
+  RelationArray trackToKLMCluster(tracks, klmClusters);
 
   G4Point3D position;
   G4Vector3D momentum;
@@ -302,6 +317,7 @@ void MuidModule::event()
 
   for (int t = 0; t < tracks.getEntries(); ++t) {
 
+    // Typically, only the muon hypothesis is used.  Others are for debugging.
     for (unsigned int hypothesis = 0; hypothesis < m_ChargedStable.size(); ++hypothesis) {
 
       Const::ChargedStable chargedStable = m_ChargedStable[hypothesis];
@@ -356,6 +372,7 @@ void MuidModule::event()
         }
         // Reached the target boundary?
         if (m_Target->GetDistanceFromPoint(track->GetPosition()) < 0.0) {
+          m_Escaped = true;  // this detects radial escapes from the endcap
           break;
         }
       } // track-extrapolation "infinite" loop
@@ -365,6 +382,17 @@ void MuidModule::event()
       delete state;
 
       finishTrack(muid, int(gfTrack->getFittedState().getCharge()));
+
+      // Find the matching KLMCluster(s)
+      G4Vector3D direction = momentum.unit();
+      for (int c = 0; c < klmClusters.getEntries(); ++c) {
+        G4Point3D diff(klmClusters[c]->getPosition().X() * cm - position.x(),
+                       klmClusters[c]->getPosition().Y() * cm - position.y(),
+                       klmClusters[c]->getPosition().Z() * cm - position.z());
+        if ((diff - (diff * direction) * direction).mag2() < m_MaxKLMClusterDistSq) {
+          trackToKLMCluster.add(t, c);
+        }
+      }
 
     } // hypothesis loop
 
@@ -523,12 +551,9 @@ void MuidModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
   }
 
   // Keep track of geometrical state during one track's extrapolation
-  for (int layer = 0; layer <= NLAYER; ++layer) {
-    m_EnteredBarrelSensitiveVolume[layer] = false;
-    m_EnteredEndcapSensitiveVolume[layer] = false;
-  }
   m_FirstBarrelLayer = 0;   // ratchets outward when looking for matching barrel hits
   m_FirstEndcapLayer = 0;   // ratchets outward when looking for matching endcap hits
+  m_Escaped = false;
 
   // Quantities that will be written to StoreArray<Muid> at end of track
   m_ExtLayerPattern = 0x00000000;
@@ -631,6 +656,8 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, int trackID, int pdgCode
     G4Vector3D newMom(point.momentum.X()*GeV, point.momentum.Y()*GeV, point.momentum.Z()*GeV);
     state->SetMomentum(newMom);
     state->SetError(fromPhasespaceToG4e(point.momentum, point.covariance));
+    m_Chi2 += point.chi2;
+    m_NPoint += 2; // two (orthogonal) independent hits per detector layer
     return true;
   }
 
@@ -659,6 +686,7 @@ bool MuidModule::findBarrelIntersection(const TVector3& oldPosition, Point& poin
     if (newR <  m_BarrelModuleMiddleRadius[layer]) break;
     if (oldR <= m_BarrelModuleMiddleRadius[layer]) {
       m_FirstBarrelLayer = layer + 1; // ratchet outward for next call's loop starting value
+      if (m_FirstBarrelLayer > m_OutermostActiveBarrelLayer) m_Escaped = true;
       point.inBarrel = true;
       point.isForward = point.position.Z() > m_OffsetZ;
       point.layer = layer;
@@ -688,6 +716,7 @@ bool MuidModule::findEndcapIntersection(const TVector3& oldPosition, Point& poin
     if (newZ <  m_EndcapModuleMiddleZ[layer]) break;
     if (oldZ <= m_EndcapModuleMiddleZ[layer]) {
       m_FirstEndcapLayer = layer + 1; // ratchet outward for next call's loop starting value
+      if (m_FirstEndcapLayer > m_OutermostActiveEndcapLayer) m_Escaped = true;
       point.inBarrel = false;
       point.isForward = point.position.Z() > m_OffsetZ;
       point.layer = layer;
@@ -738,14 +767,9 @@ bool MuidModule::findMatchingBarrelHit(Point& point)
       localVariance[1] = m_BarrelZStripVariance[point.layer];
     }
     adjustIntersection(point, localVariance, bestHit->getGlobalPosition());
-    if (point.chi2 >= 0.0) {
-      m_Chi2 += point.chi2;
-      m_NPoint++;
-      bestHit->setStatus(STATUS_ONTRACK);
-      return true;
-    }
+    if (point.chi2 >= 0.0) bestHit->setStatus(STATUS_ONTRACK);
   }
-  return false;
+  return point.chi2 >= 0.0;
 
 }
 
@@ -777,14 +801,9 @@ bool MuidModule::findMatchingEndcapHit(Point& point)
     point.time = bestHit->getTime();
     double localVariance[2] = {m_EndcapScintVariance, m_EndcapScintVariance};
     adjustIntersection(point, localVariance, bestHit->getPosition());
-    if (point.chi2 >= 0.0) {
-      m_Chi2 += point.chi2;
-      m_NPoint++;
-      // DIVOT no setStatus() bestHit->setStatus(STATUS_ONTRACK);
-      return true;
-    }
+    // if (point.chi2 >= 0.0) bestHit->setStatus(STATUS_ONTRACK); // DIVOT: no setStatus()
   }
-  return false;
+  return point.chi2 >= 0.0;
 
 }
 
@@ -942,12 +961,10 @@ void MuidModule::finishTrack(Muid* muid, int charge)
 
   // Done with this track: compute likelihoods and fill the muid object
 
-  m_NPoint += m_NPoint; // 2 independent measurements per detector plane
-
   int outcome(0);
   int layerExt(m_LastBarrelExtLayer);
   if ((m_LastBarrelExtLayer >= 0) || (m_LastEndcapExtLayer >= 0)) {
-    if ((m_FirstBarrelLayer > m_OutermostActiveBarrelLayer) || (m_FirstEndcapLayer > m_OutermostActiveEndcapLayer)) {
+    if (m_Escaped) {
       outcome = 3;
       if (m_LastEndcapExtLayer >= 0) {
         outcome = 4;
@@ -1010,8 +1027,8 @@ void MuidModule::finishTrack(Muid* muid, int charge)
     logL_K    = (kaon > 0.0 ? log(kaon) : -1.0E200);
     logL_p    = (proton > 0.0 ? log(proton) : -1.0E200);
     logL_e    = (electron > 0.0 ? log(electron) : -1.0E200);
-    // now normalize the PDF values for the muon vs *meson* hypotheses
-    double denom = muon + pion + kaon;
+    // normalize the PDF values
+    double denom = muon + pion + kaon + proton + electron;
     if (denom < 1.0E-20) {
       junk = 1.0; // anomaly: should be very rare
     } else {

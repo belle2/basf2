@@ -67,18 +67,18 @@ using namespace Belle2;
 
 REG_MODULE(Ext)
 
-ExtModule::ExtModule() : Module(), m_extMgr(NULL)  // no ExtManager yet
+ExtModule::ExtModule() : Module(), m_ExtMgr(NULL)  // no ExtManager yet
 {
-  m_pdgCode.clear();
+  m_PDGCode.clear();
   setDescription("Extrapolates tracks from CDC to outer detectors using geant4e");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("pdgCodes", m_pdgCode, "Positive-charge PDG codes for extrapolation hypotheses", m_pdgCode);
+  addParam("pdgCodes", m_PDGCode, "Positive-charge PDG codes for extrapolation hypotheses", m_PDGCode);
   addParam("TracksColName", m_TracksColName, "Name of collection holding the reconstructed tracks", string("Tracks"));
-  addParam("ExtHitsColName", m_extHitsColName, "Name of collection holding the ExtHits from the extrapolation", string("ExtHits"));
-  addParam("MinPt", m_minPt, "[GeV/c] Minimum transverse momentum of a particle that will be extrapolated.", double(0.0));
-  addParam("MinKE", m_minKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation.", double(0.002));
-  addParam("MaxStep", m_maxStep, "[cm] Maximum step size during extrapolation (use 0 for infinity).", double(25.0));
-  addParam("Cosmic", m_cosmic, "Particle source (0 = beam, 1 = cosmic ray.", 0);
+  addParam("ExtHitsColName", m_ExtHitsColName, "Name of collection holding the ExtHits from the extrapolation", string("ExtHits"));
+  addParam("MinPt", m_MinPt, "[GeV/c] Minimum transverse momentum of a particle that will be extrapolated.", double(0.0));
+  addParam("MinKE", m_MinKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation.", double(0.002));
+  addParam("MaxStep", m_MaxStep, "[cm] Maximum step size during extrapolation (use 0 for infinity).", double(25.0));
+  addParam("Cosmic", m_Cosmic, "Particle source (0 = beam, 1 = cosmic ray.", 0);
 }
 
 ExtModule::~ExtModule()
@@ -89,23 +89,23 @@ void ExtModule::initialize()
 {
 
   // Convert from GeV to GEANT4 energy units (MeV); avoid negative values
-  m_minPt = max(0.0, m_minPt) * GeV;
-  m_minKE = max(0.0, m_minKE) * GeV;
+  m_MinPt = max(0.0, m_MinPt) * GeV;
+  m_MinKE = max(0.0, m_MinKE) * GeV;
 
   // Define the list of volumes that will have their entry and/or
   // exit points stored during the extrapolation.
   registerVolumes();
 
   // Define the geant4e extrapolation Manager.
-  m_extMgr = Simulation::ExtManager::GetManager();
+  m_ExtMgr = Simulation::ExtManager::GetManager();
 
   // See if ext will coexist with geant4 simulation and/or muid extrapolation
-  if (m_extMgr->PrintG4State() == G4String("G4State_PreInit")) {
+  if (m_ExtMgr->PrintG4State() == G4String("G4State_PreInit")) {
     B2INFO("ext::initialize:  I will run without simulation")
-    m_runMgr = NULL;
-    m_trk    = NULL;
-    m_stp    = NULL;
-    if (m_extMgr->PrintExtState() == G4String("G4ErrorState_PreInit")) {
+    m_RunMgr = NULL;
+    m_TrackingAction    = NULL;
+    m_SteppingAction    = NULL;
+    if (m_ExtMgr->PrintExtState() == G4String("G4ErrorState_PreInit")) {
       B2INFO("ext::initialize:  I will call InitGeant4e")
       // Create the magnetic field for the geant4e extrapolation
       Simulation::MagneticField* magneticField = new Simulation::MagneticField();
@@ -113,22 +113,22 @@ void ExtModule::initialize()
       fieldManager->SetDetectorField(magneticField);
       fieldManager->CreateChordFinder(magneticField);
       // Tell geant4e about the detector and bare-bones physics list
-      m_extMgr->SetUserInitialization(new DetectorConstruction());
+      m_ExtMgr->SetUserInitialization(new DetectorConstruction());
       G4Region* region = (*(G4RegionStore::GetInstance()))[0];
       region->SetProductionCuts(G4ProductionCutsTable::GetProductionCutsTable()->GetDefaultProductionCuts());
-      m_extMgr->SetUserInitialization(new Simulation::ExtPhysicsList);
-      m_extMgr->InitGeant4e();
+      m_ExtMgr->SetUserInitialization(new Simulation::ExtPhysicsList);
+      m_ExtMgr->InitGeant4e();
     } else {
       B2INFO("ext::initialize:  I will not call InitGeant4e since it has already been initialized")
     }
   } else {
     B2INFO("ext::initialize:  I will coexist with simulation")
-    m_runMgr = G4RunManager::GetRunManager();
-    m_trk    = const_cast<G4UserTrackingAction*>(m_runMgr->GetUserTrackingAction());
-    m_stp    = const_cast<G4UserSteppingAction*>(m_runMgr->GetUserSteppingAction());
-    if (m_extMgr->PrintExtState() == G4String("G4ErrorState_PreInit")) {
+    m_RunMgr = G4RunManager::GetRunManager();
+    m_TrackingAction    = const_cast<G4UserTrackingAction*>(m_RunMgr->GetUserTrackingAction());
+    m_SteppingAction    = const_cast<G4UserSteppingAction*>(m_RunMgr->GetUserSteppingAction());
+    if (m_ExtMgr->PrintExtState() == G4String("G4ErrorState_PreInit")) {
       B2INFO("ext::initialize:  I will call InitGeant4e")
-      m_extMgr->InitGeant4e();
+      m_ExtMgr->InitGeant4e();
       G4StateManager::GetStateManager()->SetNewState(G4State_Idle);
     } else {
       B2INFO("ext::initialize:  I will not call InitGeant4e since it has already been initialized")
@@ -138,7 +138,7 @@ void ExtModule::initialize()
   // Redefine ext's step length, magnetic field step limitation (fraction of local curvature radius),
   // and kinetic energy loss limitation (maximum fractional energy loss) by communicating with
   // the geant4 UI.  (Commands were defined in ExtMessenger when physics list was set up.)
-  G4double maxStep = ((m_maxStep == 0.0) ? 10.0 : std::min(10.0, m_maxStep)) * cm;
+  G4double maxStep = ((m_MaxStep == 0.0) ? 10.0 : std::min(10.0, m_MaxStep)) * cm;
   char stepSize[80];
   std::sprintf(stepSize, "/geant4e/limits/stepLength %8.2f mm", maxStep);
   G4UImanager::GetUIpointer()->ApplyCommand(stepSize);
@@ -149,16 +149,16 @@ void ExtModule::initialize()
   double offsetZ = strContent.getLength("OffsetZ") * cm;
   double rMax = strContent.getLength("Cryostat/Rmin") * cm;
   double halfLength = strContent.getLength("Cryostat/HalfLength") * cm;
-  m_target = new Simulation::ExtCylSurfaceTarget(rMax, offsetZ - halfLength, offsetZ + halfLength);
-  G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_target);
+  m_Target = new Simulation::ExtCylSurfaceTarget(rMax, offsetZ - halfLength, offsetZ + halfLength);
+  G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_Target);
 
   // Hypotheses for extrapolation
-  if (m_pdgCode.empty()) {
-    m_chargedStable.push_back(Const::pion);
-    m_chargedStable.push_back(Const::electron);
-    m_chargedStable.push_back(Const::muon);
-    m_chargedStable.push_back(Const::kaon);
-    m_chargedStable.push_back(Const::proton);
+  if (m_PDGCode.empty()) {
+    m_ChargedStable.push_back(Const::pion);
+    m_ChargedStable.push_back(Const::electron);
+    m_ChargedStable.push_back(Const::muon);
+    m_ChargedStable.push_back(Const::kaon);
+    m_ChargedStable.push_back(Const::proton);
   } else { // user defined
     std::vector<Const::ChargedStable> stack;
     stack.push_back(Const::pion);
@@ -166,21 +166,21 @@ void ExtModule::initialize()
     stack.push_back(Const::muon);
     stack.push_back(Const::kaon);
     stack.push_back(Const::proton);
-    for (unsigned i = 0; i < m_pdgCode.size(); ++i) {
+    for (unsigned i = 0; i < m_PDGCode.size(); ++i) {
       for (unsigned k = 0; k < stack.size(); ++k) {
-        if (abs(m_pdgCode[i]) == stack[k].getPDGCode()) {
-          m_chargedStable.push_back(stack[k]);
+        if (abs(m_PDGCode[i]) == stack[k].getPDGCode()) {
+          m_ChargedStable.push_back(stack[k]);
           stack.erase(stack.begin() + k);
           --k;
         }
       }
     }
-    if (m_chargedStable.empty()) B2ERROR("Ext initialize(): no valid PDG codes for extrapolation")
+    if (m_ChargedStable.empty()) B2ERROR("Ext initialize(): no valid PDG codes for extrapolation")
     }
 
-  for (unsigned i = 0; i < m_chargedStable.size(); ++i) {
+  for (unsigned i = 0; i < m_ChargedStable.size(); ++i) {
     B2INFO("Module ext initialize(): hypothesis for PDG code "
-           << m_chargedStable[i].getPDGCode() << " and its antiparticle will be extrapolated");
+           << m_ChargedStable[i].getPDGCode() << " and its antiparticle will be extrapolated");
   }
 
   // Register output and relation arrays
@@ -200,10 +200,15 @@ void ExtModule::beginRun()
 void ExtModule::event()
 {
 
+  // Put geant4 in proper state (in case this module is in a separate process)
+  if (m_ExtMgr->PrintG4State() == "G4State_Idle") {
+    G4StateManager::GetStateManager()->SetNewState(G4State_GeomClosed);
+  }
+
   // Disable simulation-specific actions temporarily while we extrapolate
-  if (m_runMgr) {
-    m_runMgr->SetUserAction((G4UserTrackingAction*)NULL);
-    m_runMgr->SetUserAction((G4UserSteppingAction*)NULL);
+  if (m_RunMgr) {
+    m_RunMgr->SetUserAction((G4UserTrackingAction*)NULL);
+    m_RunMgr->SetUserAction((G4UserSteppingAction*)NULL);
   }
 
   // Loop over the reconstructed tracks.
@@ -213,7 +218,7 @@ void ExtModule::event()
   // Other hypotheses: extrapolate up to but not including calorimeter
 
   StoreArray<Track> Tracks(m_TracksColName);
-  StoreArray<ExtHit> extHits(m_extHitsColName);
+  StoreArray<ExtHit> extHits(m_ExtHitsColName);
   RelationArray TrackToExtHits(Tracks, extHits);
 
   G4ThreeVector position;
@@ -222,9 +227,9 @@ void ExtModule::event()
 
   for (int t = 0; t < Tracks.getEntries(); ++t) {
 
-    for (unsigned int hypothesis = 0; hypothesis < m_chargedStable.size(); ++hypothesis) {
+    for (unsigned int hypothesis = 0; hypothesis < m_ChargedStable.size(); ++hypothesis) {
 
-      Const::ChargedStable chargedStable = m_chargedStable[hypothesis];
+      Const::ChargedStable chargedStable = m_ChargedStable[hypothesis];
 
       const TrackFitResult* trackFit = Tracks[t]->getTrackFitResult(chargedStable);
       if (!trackFit) {
@@ -245,16 +250,16 @@ void ExtModule::event()
       if (chargedStable == Const::electron || chargedStable == Const::muon) pdgCode = -pdgCode;
 
       getStartPoint(gfTrack, pdgCode, position, momentum, covG4e);
-      if (momentum.perp() <= m_minPt) continue;
-      if (m_target->GetDistanceFromPoint(position) < 0.0) continue;
+      if (momentum.perp() <= m_MinPt) continue;
+      if (m_Target->GetDistanceFromPoint(position) < 0.0) continue;
       G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode);
       string g4eName = "g4e_" + particle->GetParticleName();
       double mass = particle->GetPDGMass();
-      double minP = sqrt((mass + m_minKE) * (mass + m_minKE) - mass * mass);
+      double minP = sqrt((mass + m_MinKE) * (mass + m_MinKE) - mass * mass);
       G4ErrorFreeTrajState* state = new G4ErrorFreeTrajState(g4eName, position, momentum, covG4e);
-      m_extMgr->InitTrackPropagation();
+      m_ExtMgr->InitTrackPropagation();
       while (true) {
-        const G4int    errCode    = m_extMgr->PropagateOneStep(state, G4ErrorMode_PropForwards);
+        const G4int    errCode    = m_ExtMgr->PropagateOneStep(state, G4ErrorMode_PropForwards);
         G4Track*       track      = state->GetG4Track();
         const G4Step*  step       = track->GetStep();
         const G4double length     = step->GetStepLength();
@@ -269,7 +274,7 @@ void ExtModule::event()
           if (preStatus == fGeomBoundary) {      // first step in this volume?
             createHit(state, EXT_ENTER, t, pdgCode, extHits, TrackToExtHits);
           }
-          m_tof += step->GetDeltaTime();
+          m_TOF += step->GetDeltaTime();
           // Last step in this volume?
           if (postStatus == fGeomBoundary) {
             createHit(state, EXT_EXIT, t, pdgCode, extHits, TrackToExtHits);
@@ -280,13 +285,13 @@ void ExtModule::event()
           createHit(state, EXT_STOP, t, pdgCode, extHits, TrackToExtHits);
           break;
         }
-        if (m_target->GetDistanceFromPoint(track->GetPosition()) < 0.0) {
+        if (m_Target->GetDistanceFromPoint(track->GetPosition()) < 0.0) {
           createHit(state, EXT_ESCAPE, t, pdgCode, extHits, TrackToExtHits);
           break;
         }
       } // track-extrapolation "infinite" loop
 
-      m_extMgr->EventTermination();
+      m_ExtMgr->EventTermination();
 
       delete state;
 
@@ -294,9 +299,9 @@ void ExtModule::event()
 
   } // track loop
 
-  if (m_runMgr) {
-    m_runMgr->SetUserAction(m_trk);
-    m_runMgr->SetUserAction(m_stp);
+  if (m_RunMgr) {
+    m_RunMgr->SetUserAction(m_TrackingAction);
+    m_RunMgr->SetUserAction(m_SteppingAction);
   }
 
 }
@@ -308,13 +313,13 @@ void ExtModule::endRun()
 void ExtModule::terminate()
 {
 
-  if (m_runMgr) {
-    m_runMgr->SetUserAction(m_trk);
-    m_runMgr->SetUserAction(m_stp);
+  if (m_RunMgr) {
+    m_RunMgr->SetUserAction(m_TrackingAction);
+    m_RunMgr->SetUserAction(m_SteppingAction);
   }
-  delete m_target;
-  delete m_enter;
-  delete m_exit;
+  delete m_Target;
+  delete m_Enter;
+  delete m_Exit;
 
 }
 
@@ -327,35 +332,35 @@ void ExtModule::registerVolumes()
     B2FATAL("Module ext registerVolumes(): No geometry defined. Please create the geometry first.")
   }
 
-  m_enter = new vector<G4VPhysicalVolume*>;
-  m_exit  = new vector<G4VPhysicalVolume*>;
+  m_Enter = new vector<G4VPhysicalVolume*>;
+  m_Exit  = new vector<G4VPhysicalVolume*>;
   for (vector<G4VPhysicalVolume*>::iterator iVol = pvStore->begin();
        iVol != pvStore->end(); ++iVol) {
     const G4String name = (*iVol)->GetName();
     // TOP doesn't have one envelope; it has several "PlacedTOPModule"s
     if (name == "PlacedTOPModule") {
-      m_enter->push_back(*iVol);
-      m_exit->push_back(*iVol);
+      m_Enter->push_back(*iVol);
+      m_Exit->push_back(*iVol);
     }
     // TOP quartz bar (=sensitive) has an automatically generated PV name
     // av_WWW_impr_XXX_YYY_ZZZ because it is an imprint of a G4AssemblyVolume;
     // YYY is cuttest.
     if (name.find("_cuttest_") != string::npos) {
-      m_enter->push_back(*iVol);
-      m_exit->push_back(*iVol);
+      m_Enter->push_back(*iVol);
+      m_Exit->push_back(*iVol);
     }
     if (name == "ARICH.AerogelSupportPlate") {
-      m_enter->push_back(*iVol);
-      m_exit->push_back(*iVol);
+      m_Enter->push_back(*iVol);
+      m_Exit->push_back(*iVol);
     }
     if (name == "moduleSensitive") {
-      m_enter->push_back(*iVol);
-      m_exit->push_back(*iVol);
+      m_Enter->push_back(*iVol);
+      m_Exit->push_back(*iVol);
     }
     // ECL
     if (name == "physicalECL") {
-      m_enter->push_back(*iVol);
-      m_exit->push_back(*iVol);
+      m_Enter->push_back(*iVol);
+      m_Exit->push_back(*iVol);
     }
     // ECL crystal (=sensitive) has an automatically generated PV name
     // av_WWW_impr_XXX_YYY_ZZZ because it is an imprint of a G4AssemblyVolume;
@@ -364,16 +369,16 @@ void ExtModule::registerVolumes()
     // ZZZ is n_pv_m where n is 1..46 for Br, 1..72 for Fw, and 73..132 for Bw
     // CopyNo() encodes XXX and n.
     if (name.find("_logicalEclBrCrystal_") != string::npos) {
-      m_enter->push_back(*iVol);
-      m_exit->push_back(*iVol);
+      m_Enter->push_back(*iVol);
+      m_Exit->push_back(*iVol);
     }
     if (name.find("_logicalEclFwCrystal_") != string::npos) {
-      m_enter->push_back(*iVol);
-      m_exit->push_back(*iVol);
+      m_Enter->push_back(*iVol);
+      m_Exit->push_back(*iVol);
     }
     if (name.find("_logicalEclBwCrystal_") != string::npos) {
-      m_enter->push_back(*iVol);
-      m_exit->push_back(*iVol);
+      m_Enter->push_back(*iVol);
+      m_Exit->push_back(*iVol);
     }
   }
 
@@ -497,7 +502,7 @@ void ExtModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
     }
     double mass = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode)->GetPDGMass() / GeV;
     // time of flight from I.P. (ns) at the last point on the Genfit track
-    m_tof = pathLength * (sqrt(lastMomMag * lastMomMag + mass * mass) / (lastMomMag * c_light / (cm / ns)));
+    m_TOF = pathLength * (sqrt(lastMomMag * lastMomMag + mass * mass) / (lastMomMag * c_light / (cm / ns)));
 
     covG4e = fromPhasespaceToG4e(lastMomentum, lastCov); // in Geant4e units (GeV/c, cm)
     position.setX(lastPosition.X()*cm); // in Geant4 units (mm)
@@ -640,9 +645,9 @@ void ExtModule::createHit(const G4ErrorFreeTrajState* state, ExtHitStatus status
 
   // Perhaps no hit will be stored?
   if (status == EXT_ENTER) {
-    if (find(m_enter->begin(), m_enter->end(), preVol) == m_enter->end()) { return; }
+    if (find(m_Enter->begin(), m_Enter->end(), preVol) == m_Enter->end()) { return; }
   } else if (status == EXT_EXIT) {
-    if (find(m_exit->begin(), m_exit->end(), preVol) == m_exit->end()) { return; }
+    if (find(m_Exit->begin(), m_Exit->end(), preVol) == m_Exit->end()) { return; }
     stepPoint = state->GetG4Track()->GetStep()->GetPostStepPoint();
   }
 
@@ -651,7 +656,7 @@ void ExtModule::createHit(const G4ErrorFreeTrajState* state, ExtHitStatus status
   ExtDetectorID detID(EXT_UNKNOWN);
   int copyID(0);
   getVolumeID(preTouch, detID, copyID);
-  new(extHits.nextFreeAddress()) ExtHit(pdgCode, detID, copyID, status, m_tof, pos, mom, fromG4eToPhasespace(state));
+  new(extHits.nextFreeAddress()) ExtHit(pdgCode, detID, copyID, status, m_TOF, pos, mom, fromG4eToPhasespace(state));
   TrackToExtHits.add(trackID, extHits.getEntries() - 1);
 
 }

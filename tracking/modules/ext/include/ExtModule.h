@@ -75,22 +75,22 @@ namespace Belle2 {
   protected:
 
     //! Minimum transverse momentum in GeV/c for extrapolation to be started
-    double m_minPt;
+    double m_MinPt;
 
     //! Minimum kinetic energy in GeV for extrapolation to continue
-    double m_minKE;
+    double m_MinKE;
 
     //! Maximum step size in cm (0 for no upper limit)
-    double m_maxStep;
+    double m_MaxStep;
 
     //! Flag for source (0 = beam, 1 = cosmic ray)
-    int    m_cosmic;
+    int    m_Cosmic;
 
     //! Name of the Track collection of the reconstructed tracks to be extrapolated
     std::string m_TracksColName;
 
     //! Name of the extHit collection of the extrapolation hits
-    std::string m_extHitsColName;
+    std::string m_ExtHitsColName;
 
   private:
 
@@ -114,34 +114,34 @@ namespace Belle2 {
     void createHit(const G4ErrorFreeTrajState*, ExtHitStatus, int, int, StoreArray<ExtHit>&, RelationArray&);
 
     //! Pointer to the ExtManager singleton
-    Simulation::ExtManager* m_extMgr;
+    Simulation::ExtManager* m_ExtMgr;
 
     //! Pointer to the simulation's G4RunManager (if any)
-    G4RunManager* m_runMgr;
+    G4RunManager* m_RunMgr;
 
     //! Pointer to the simulation's TrackingAction (if any)
-    G4UserTrackingAction* m_trk;
+    G4UserTrackingAction* m_TrackingAction;
 
     //! Pointer to the simulation's SteppingAction (if any)
-    G4UserSteppingAction* m_stp;
+    G4UserSteppingAction* m_SteppingAction;
 
     //! PDG codes for the particleID hypotheses
-    std::vector<int> m_pdgCode;
+    std::vector<int> m_PDGCode;
 
     //!  ChargedStable hypotheses
-    std::vector<Const::ChargedStable> m_chargedStable;
+    std::vector<Const::ChargedStable> m_ChargedStable;
 
     //! Pointers to geant4 physical volumes whose entry points will be saved
-    std::vector<G4VPhysicalVolume*>* m_enter;
+    std::vector<G4VPhysicalVolume*>* m_Enter;
 
     //! Pointers to geant4 physical volumes whose exit points will be saved
-    std::vector<G4VPhysicalVolume*>* m_exit;
+    std::vector<G4VPhysicalVolume*>* m_Exit;
 
     //! Time of flight (ns) along the track from the interaction point
-    double m_tof;
+    double m_TOF;
 
     //! virtual "target" cylinder (boundary beyond which extrapolation ends)
-    Simulation::ExtCylSurfaceTarget* m_target;
+    Simulation::ExtCylSurfaceTarget* m_Target;
 
   };
 

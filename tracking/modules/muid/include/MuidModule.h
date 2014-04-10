@@ -123,6 +123,9 @@ namespace Belle2 {
     //! Name of the muidHit collection of the extrapolation hits
     std::string m_MuidHitsColName;
 
+    //! Name of the KLMCluster collection
+    std::string m_KLMClustersColName;
+
     //! Name of the BKLM 2D hits collection
     std::string m_BKLMHitsColName;
 
@@ -225,6 +228,9 @@ namespace Belle2 {
     //! user-defined maximum squared-distance (#variances) for matching hit to extrapolation
     double m_MaxDistSqInVariances;
 
+    //! user-defined maximum distance (cm) between KLMCluster and associated track
+    double m_MaxKLMClusterDistSq;
+
     //! BKLM RPC phi-measuring strip position variance (cm^2) by layer
     double m_BarrelPhiStripVariance[NLAYER + 1];
 
@@ -249,12 +255,6 @@ namespace Belle2 {
     //! azimuthal unit vector of each barrel sector
     TVector3 m_BarrelSectorPhi[NSECTOR + 1];
 
-    //! flags to indicate that the extrapolated track had entered a barrel sensitive volume
-    bool m_EnteredBarrelSensitiveVolume[NLAYER + 1];
-
-    //! flags to indicate that the extrapolated track had entered an endcap sensitive volume
-    bool m_EnteredEndcapSensitiveVolume[NLAYER + 1];
-
     //! outermost barrel layer encountered by the extrapolated track in the prior steps
     int m_FirstBarrelLayer;
 
@@ -266,6 +266,9 @@ namespace Belle2 {
 
     //! accumulated bit pattern of layers with matching hits
     int m_HitLayerPattern;
+
+    //! flag to indicate that the extrapolated track escaped from the KLM
+    bool m_Escaped;
 
     //! accumulated chi-squared of all in-plane transverse deviations between extrapolation and matching hit
     double m_Chi2;

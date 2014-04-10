@@ -20,7 +20,7 @@ namespace Belle2 {
    *
    *  Members:
    *    m_points (TVector3[4]) = 4 Points of the Sector
-   *    m_sectorID (int) = real Sector ID
+   *    m_sectorID (unsigned int) = real Sector ID
    *    m_isOnlyFriend (bool) = true if = sector is only loaded as friend-sector
    *    m_friends (< int >) =  all IDs of the Sector Friends
    *    m_useCounter (int) = Countes the Hits using this cell (alive and connected)
@@ -42,7 +42,7 @@ namespace Belle2 {
       m_points[1].SetXYZ(0., 0., 0.);
       m_points[2].SetXYZ(0., 0., 0.);
       m_points[3].SetXYZ(0., 0., 0.);
-      m_sectorID = -1;
+      m_sectorID = 0;
       m_friends.clear();
       m_useCounter = 0;
       m_maxCounter = 0;
@@ -64,27 +64,33 @@ namespace Belle2 {
     }
 
     /** getter - getPoint Point int (from POINT 0 to POINT 3 */
-    TVector3 getPoint(int valuePoint)  { return m_points[valuePoint]; }
+    TVector3 getPoint(int valuePoint)  {
+      if (valuePoint < 0 or valuePoint > 3) { throw 10; }
+      return m_points[valuePoint];
+    }
 
     /** setter - Point */
-    void setPoint(int valuePoint, TVector3 value) { m_points[valuePoint] = value; }
+    void setPoint(int valuePoint, TVector3 value) {
+      if (valuePoint < 0 or valuePoint > 3) { throw 10; }
+      m_points[valuePoint] = value;
+    }
 
     /** getter - Sector ID */
-    int getSectorID()  { return m_sectorID; }
+    unsigned int getSectorID()  { return m_sectorID; }
 
     /** setter - Sector ID */
-    void setSectorID(int value) { m_sectorID = value; }
+    void setSectorID(unsigned int value) { m_sectorID = value; }
 
     /** getter - getFriends*/
-    std::vector<int>& getFriends()  { return m_friends; }
+    std::vector<unsigned int>& getFriends()  { return m_friends; }
 
     /** add new int to Friends */
-    void push_back_Friends(int newMember) {
+    void push_back_Friends(unsigned int newMember) {
       m_friends.push_back(newMember);
     }
 
     /** set all Friends */
-    void setAllFriends(std::vector<int> parFriends) {
+    void setAllFriends(std::vector<unsigned int> parFriends) {
       m_friends = parFriends;
     }
 
@@ -133,7 +139,7 @@ namespace Belle2 {
     /** returns the String for the display - Information */
     TString getDisplayInformation() {
 
-      return TString::Format("Point 1: (%.3f, %.3f, %.3f)\n Point 2: (%.3f, %.3f, %.3f)\n Point 3: (%.3f, %.3f, %.3f)\n Point 4: (%.3f, %.3f, %.3f)\n Friend Only: %s\n Died_ID: %d ", m_points[0].X(), m_points[0].Y(), m_points[0].Z(), m_points[1].X(), m_points[1].Y(), m_points[1].Z(), m_points[2].X(), m_points[2].Y(), m_points[2].Z(), m_points[3].X(), m_points[3].Y(), m_points[3].Z(), m_isOnlyFriend ? "true" : "false", getDiedID());
+      return TString::Format("Point 1: (%.3f, %.3f, %.3f) Point 2: (%.3f, %.3f, %.3f) Point 3: (%.3f, %.3f, %.3f) Point 4: (%.3f, %.3f, %.3f)\n Friend Only: %s\n Died_ID: %d ", m_points[0].X(), m_points[0].Y(), m_points[0].Z(), m_points[1].X(), m_points[1].Y(), m_points[1].Z(), m_points[2].X(), m_points[2].Y(), m_points[2].Z(), m_points[3].X(), m_points[3].Y(), m_points[3].Z(), m_isOnlyFriend ? "true" : "false", getDiedID());
 
     }
 
@@ -163,10 +169,10 @@ namespace Belle2 {
 
     TVector3 m_points[4]; /**< m_points (TVector3[4]) = 4 Points of the Sector **/
 
-    int m_sectorID;   /**< real Sector ID **/
+    unsigned int m_sectorID;   /**< real Sector ID **/
     bool m_isOnlyFriend;  /**< true if = sector is only loaded as friend-sector **/
 
-    std::vector<int> m_friends;  /**< all IDs of the Sector Friends **/
+    std::vector<unsigned int> m_friends;  /**< all IDs of the Sector Friends **/
 
     int m_useCounter;  /**< Countes the Hits (alive and connected) */
     int m_maxCounter;  /**<  Max. Counts of Hits (max. m_useCounter)  */

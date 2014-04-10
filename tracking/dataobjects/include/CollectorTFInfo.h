@@ -81,7 +81,7 @@ namespace Belle2 {
     void setOutputFlag(int value) { m_outputFlag = value; }
 
     /** Sectors safe for all events */
-    virtual void initSectors(const std::vector< std::pair< std::pair<unsigned int, unsigned int>, std::vector<int> > >& sectors, const std::vector<double>& secConfigU, const std::vector<double>& secConfigV);
+    virtual void initSectors(const std::vector< std::pair< std::pair<unsigned int, unsigned int>, std::vector<unsigned int> > >& sectors, const std::vector<double>& secConfigU, const std::vector<double>& secConfigV);
 
     /** registerPersistence (StoreArrays & RelationArray) for the Collector */
     virtual void initPersistent();  // Init Persistence
@@ -95,7 +95,7 @@ namespace Belle2 {
     /** Sectors update after update / import Hit
     Reload Sector if not in current Sectors
     Also checks Friends sectors (possible reload) */
-    virtual void updateSectors(int sectorID, int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, int deltaUseCounter);  //Sector update
+    virtual void updateSectors(unsigned int sectorID, int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, int deltaUseCounter);  //Sector update
 
     /** Cluster Update */
     virtual void updateClusters(int clusterId, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, int deltaUseCounter);   //Cluster Update

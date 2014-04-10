@@ -42,7 +42,7 @@ namespace Belle2 {
   public:
 
     typedef std::pair<unsigned int, unsigned int> KeyClusters;  /**< Key of Cluster */
-
+    typedef std::pair<unsigned int, unsigned int> KeySectors;     /**< Key to Sectors */
 
     /** Default constructor for the ROOT IO. */
     AnalizerCollectorTFInfo();

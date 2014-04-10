@@ -47,13 +47,13 @@ namespace Belle2 {
     HitTFInfo();
 
     /** Standard constructor */
-    HitTFInfo(int parPassIndex, int parSecId, TVector3 parPosition, TVector3 parHitsigma);
+    HitTFInfo(int parPassIndex, unsigned int parSecId, TVector3 parPosition, TVector3 parHitsigma);
 
     /** getter - getsectorID SectorID */
-    int getSectorID()  { return m_sectorID; }
+    unsigned int getSectorID()  { return m_sectorID; }
 
     /** setter - sectorID */
-    void setSectorID(int value) { m_sectorID = value; }
+    void setSectorID(unsigned int value) { m_sectorID = value; }
 
     /** getter - getAssignedCluster*/
     std::vector<int>& getAssignedCluster()  { return m_assignedClusterIDs; }
@@ -208,7 +208,7 @@ namespace Belle2 {
 
 
   protected:
-    int m_sectorID; /**< Sector ID */
+    unsigned int m_sectorID; /**< Sector ID */
 
     std::vector<int> m_assignedClusterIDs;      /**<  IDs of the assigned clusters, 1-2 x int */
 

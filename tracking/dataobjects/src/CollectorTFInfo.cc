@@ -75,14 +75,14 @@ CollectorTFInfo::~CollectorTFInfo()
 
 // Run at End of beginn-Run / 1 x RUN
 /** Sectors safe for all events */
-void CollectorTFInfo::initSectors(const std::vector< std::pair <std::pair<unsigned int, unsigned int>, std::vector<int> > >& sectors, const std::vector<double>& secConfigU, const std::vector<double>& secConfigV)
+void CollectorTFInfo::initSectors(const std::vector< std::pair <std::pair<unsigned int, unsigned int>, std::vector<unsigned int> > >& sectors, const std::vector<double>& secConfigU, const std::vector<double>& secConfigV)
 {
 
   B2DEBUG(100, "CollectorTFInfo: initSectors");
 
   double sectorEdgeV1 = 0, sectorEdgeV2 = 0, uSizeAtv1 = 0, uSizeAtv2 = 0, sectorEdgeU1OfV1 = 0, sectorEdgeU1OfV2 = 0, sectorEdgeU2OfV1 = 0, sectorEdgeU2OfV2 = 0;
 
-  uint aSecID;
+  uint aSecID = 0;
 
   VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
 
@@ -90,61 +90,96 @@ void CollectorTFInfo::initSectors(const std::vector< std::pair <std::pair<unsign
 
   B2DEBUG(100, "CollectorTFInfo: initSectors, sectorSize: " << sectorSize);
 
+  //in loop all sectors are initialized and their coordinates are set
   for (auto & currentSector : sectors)  {
 
     // NO Sector 0
-    if (currentSector.first.second != 0) {
+    if (currentSector.first.second == 0) { continue; }
 
 
-      SectorTFInfo newsector(currentSector.first.first, currentSector.first.second);
+    SectorTFInfo newsector(currentSector.first.first, currentSector.first.second);
 
-      // Friends store
-      newsector.setAllFriends(currentSector.second);
+    // Friends store
+    newsector.setAllFriends(currentSector.second);
 
 
-      FullSecID currentFullSectorID = FullSecID(currentSector.first.second);
+    /*
+            if (vCoord >= (m_PARAMsectorConfigV.at(k)*vSize1 * 2) && vCoord <= (m_PARAMsectorConfigV.at(k + 1)*vSize1 * 2)) {
+          aSecID = k + 1 + j * (m_PARAMsectorConfigV.size() - 1);
 
-      const VXD::SensorInfoBase& aSensorInfo = geometry.getSensorInfo(currentFullSectorID.getVxdID());
-
-      double vSize1 = 0.5 * aSensorInfo.getVSize();
-
-      for (uint j = 0; j != secConfigU.size() - 1; ++j) {
-        for (uint k = 0; k != secConfigV.size() - 1; ++k) {
-          aSecID = k + 1 + j * (secConfigV.size() - 1);
-          if (aSecID != (uint) currentFullSectorID.getSecID()) { continue; }
-
-          sectorEdgeV1 = secConfigV.at(k) * vSize1 * 2 - vSize1;
-          sectorEdgeV2 = secConfigV.at(k + 1) * vSize1 * 2 - vSize1;
+          sectorEdgeV1 = m_PARAMsectorConfigV.at(k) * vSize1 * 2 - vSize1;
+          sectorEdgeV2 = m_PARAMsectorConfigV.at(k + 1) * vSize1 * 2 - vSize1;
           uSizeAtv1 = 0.5 * aSensorInfo.getUSize(sectorEdgeV1);
           uSizeAtv2 = 0.5 * aSensorInfo.getUSize(sectorEdgeV2);
-          sectorEdgeU1OfV1 = secConfigU.at(j) * uSizeAtv1 * 2 - uSizeAtv1;
-          sectorEdgeU1OfV2 = secConfigU.at(j) * uSizeAtv2 * 2 - uSizeAtv2;
-          sectorEdgeU2OfV1 = secConfigU.at(j + 1) * uSizeAtv1 * 2 - uSizeAtv1;
-          sectorEdgeU2OfV2 = secConfigU.at(j + 1) * uSizeAtv2 * 2 - uSizeAtv2;
+          sectorEdgeU1OfV1 = m_PARAMsectorConfigU.at(j) * uSizeAtv1 * 2 - uSizeAtv1;
+          sectorEdgeU1OfV2 = m_PARAMsectorConfigU.at(j) * uSizeAtv2 * 2 - uSizeAtv2;
+          sectorEdgeU2OfV1 = m_PARAMsectorConfigU.at(j + 1) * uSizeAtv1 * 2 - uSizeAtv1;
+          sectorEdgeU2OfV2 = m_PARAMsectorConfigU.at(j + 1) * uSizeAtv2 * 2 - uSizeAtv2;
+          centerV = sectorEdgeV2 + 0.5 * (sectorEdgeV1 - sectorEdgeV2); /// WARNING Berechnung falsch!
+          centerU = aSensorInfo.getUSize(centerV); // uSizeAtCenterU
+          centerU = m_PARAMsectorConfigU.at(j) * centerU - m_PARAMsectorConfigU.at(j + 1) * centerU ;
+          centerOfSector.SetXYZ(centerU, centerV, 0);
+          centerOfSector = aSensorInfo.pointToGlobal(centerOfSector);
+          dist2Origin = (centerOfSector - m_origin).Mag();
 
-          // sectorEcken
-          TVector3 ecke1Lokal = TVector3(sectorEdgeV1, sectorEdgeU1OfV1, 0);
-          TVector3 ecke2Lokal = TVector3(sectorEdgeV1, sectorEdgeU2OfV1, 0);
-          TVector3 ecke3Lokal = TVector3(sectorEdgeV2, sectorEdgeU1OfV2, 0);
-          TVector3 ecke4Lokal = TVector3(sectorEdgeV2, sectorEdgeU2OfV2, 0);
+    */
 
-          TVector3 ecke1Global = aSensorInfo.pointToGlobal(ecke1Lokal);
-          TVector3 ecke2Global = aSensorInfo.pointToGlobal(ecke2Lokal);
-          TVector3 ecke3Global = aSensorInfo.pointToGlobal(ecke3Lokal);
-          TVector3 ecke4Global = aSensorInfo.pointToGlobal(ecke4Lokal);
+    // SectorID => Corners of the Sector
+    FullSecID currentFullSectorID = FullSecID(currentSector.first.second);
 
-          newsector.setPoint(0, ecke1Global);
-          newsector.setPoint(1, ecke2Global);
-          newsector.setPoint(2, ecke3Global);
-          newsector.setPoint(3, ecke4Global);
+    B2DEBUG(100, "CollectorTFInfo: initSectors, search for: " << currentFullSectorID);
 
-          break;
-        }
+    const VXD::SensorInfoBase& aSensorInfo = geometry.getSensorInfo(currentFullSectorID.getVxdID());
+
+    double vSize1 = 0.5 * aSensorInfo.getVSize();
+
+//     (aSensorInfo.getWidth(vClusterPtr->getPosition()) / aSensorInfo.getWidth(0)) * uClusterPtr->getPosition()
+
+    for (uint j = 0; j != secConfigU.size() - 1; ++j) {
+      for (uint k = 0; k != secConfigV.size() - 1; ++k) {
+        aSecID = k + 1 + j * (secConfigV.size() - 1);
+
+        if (aSecID != uint(currentFullSectorID.getSecID())) { continue; }
+
+        B2DEBUG(100, "initSectors aSecID: " << aSecID << ", k: " << k << ", j: " << j << ", vxdid: " << currentFullSectorID.getVxdID());
+
+        sectorEdgeV1 = secConfigV.at(k) * vSize1 * 2 - vSize1;
+        sectorEdgeV2 = secConfigV.at(k + 1) * vSize1 * 2 - vSize1;
+        uSizeAtv1 = 0.5 * aSensorInfo.getUSize(sectorEdgeV1);
+        uSizeAtv2 = 0.5 * aSensorInfo.getUSize(sectorEdgeV2);
+        sectorEdgeU1OfV1 = secConfigU.at(j) * uSizeAtv1 * 2 - uSizeAtv1;
+        sectorEdgeU1OfV2 = secConfigU.at(j) * uSizeAtv2 * 2 - uSizeAtv2;
+        sectorEdgeU2OfV1 = secConfigU.at(j + 1) * uSizeAtv1 * 2 - uSizeAtv1;
+        sectorEdgeU2OfV2 = secConfigU.at(j + 1) * uSizeAtv2 * 2 - uSizeAtv2;
+
+        // sectorCorners
+        TVector3 corner1Local = TVector3(sectorEdgeV1, sectorEdgeU1OfV1, 0);
+
+        B2DEBUG(100, "sectorEdgeV1: " << corner1Local.X() << "/" << corner1Local.Y() << "/" << corner1Local.Z());
+
+        TVector3 corner2Local = TVector3(sectorEdgeV1, sectorEdgeU2OfV1, 0);
+        TVector3 corner3Local = TVector3(sectorEdgeV2, sectorEdgeU1OfV2, 0);
+        TVector3 corner4Local = TVector3(sectorEdgeV2, sectorEdgeU2OfV2, 0);
+
+        TVector3 corner1Global = aSensorInfo.pointToGlobal(corner1Local);
+
+        B2DEBUG(100, "corner1Global: " << corner1Local.X() << "/" << corner1Local.Y() << "/" << corner1Local.Z());
+
+        TVector3 corner2Global = aSensorInfo.pointToGlobal(corner2Local);
+        TVector3 corner3Global = aSensorInfo.pointToGlobal(corner3Local);
+        TVector3 corner4Global = aSensorInfo.pointToGlobal(corner4Local);
+
+        newsector.setPoint(0, corner1Global);
+        newsector.setPoint(1, corner2Global);
+        newsector.setPoint(2, corner3Global);
+        newsector.setPoint(3, corner4Global);
+
+        break;
       }
-
-      m_sectorTFAll.insert(make_pair(KeySectors(currentSector.first.first, currentSector.first.second), newsector));
-
     }
+
+    m_sectorTFAll.insert(make_pair(KeySectors(currentSector.first.first, currentSector.first.second), newsector));
+
   }
 
 }
@@ -217,7 +252,7 @@ int CollectorTFInfo::importCluster(int passIndex, std::string diedAt, int diedId
 /** Sectors update after update / import Hit
  Reload Sector if not in current Sectors
  Also checks Friends sectors (possible reload) */
-void CollectorTFInfo::updateSectors(int sectorID, int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, int deltaUseCounter)
+void CollectorTFInfo::updateSectors(unsigned int sectorID, int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, int deltaUseCounter)
 {
   B2DEBUG(100, "CollectorTFInfo: updateSectors, sectorID: " << sectorID << ", Pass Index: " << passIndex << ", diet_at: " << diedAt << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size() << ", deltaUseCounter: " << deltaUseCounter);
 

@@ -958,8 +958,8 @@ void VXDTFModule::beginRun()
   if (m_PARAMdisplayCollector > 0) {
 
     //KeySectors dosn't function => so pair Int int
-    std::vector< std::pair<std::pair<unsigned int, unsigned int>, std::vector<int> > > sectorsDisplayAllPass;
-    std::vector<int> sectorsDisplayFriends;
+    std::vector< std::pair<std::pair<unsigned int, unsigned int>, std::vector<unsigned int> > > sectorsDisplayAllPass;
+    std::vector<unsigned int> sectorsDisplayFriends;
 
     for (uint i = 0; i < m_passSetupVector.size(); i++) {
       B2DEBUG(10, "PassNr. " << i << "Size of Sector Map: " << m_passSetupVector.at(i)->sectorMap.size());
@@ -981,6 +981,13 @@ void VXDTFModule::beginRun()
       m_collector.initSectors(sectorsDisplayAllPass, m_passSetupVector.at(i)->secConfigU,
                               m_passSetupVector.at(i)->secConfigV);
 
+      for (auto infosector : m_passSetupVector.at(i)->secConfigU) {
+        B2DEBUG(100, "InitSector secConfigU: " << infosector);
+      }
+
+      for (auto infosector : m_passSetupVector.at(i)->secConfigV) {
+        B2DEBUG(100, "InitSector secConfigV: " << infosector);
+      }
     }
 
 
@@ -1076,6 +1083,8 @@ void VXDTFModule::the_real_event()
   unsigned int centerSector = FullSecID().getFullSecID(); // automatically produces secID of centerSector
   VxdID centerVxdID = VxdID(0, 0, 0); // dummy VxdID for virtual IP
   int passNumber = m_passSetupVector.size() - 1;
+
+
   BOOST_REVERSE_FOREACH(PassData * currentPass, m_passSetupVector) {
     currentPass->centerSector = centerSector;
     vertexInfo.hitPosition = currentPass->origin;
@@ -1309,7 +1318,8 @@ void VXDTFModule::the_real_event()
     uCoord = hitLocal[0] + uSizeAtHit; // *0,5 putting (0,0) from the center to the edge of the plane (considers the trapeziodal shape)
     vCoord = hitLocal[1] + vSize;
     transformedHitLocal.SetXYZ(uCoord, vCoord, 0);
-    localSensorSize.SetXYZ(uSizeAtHit, vSize, 0);
+//   localSensorSize.SetXYZ(uSizeAtHit, vSize, 0);
+    localSensorSize.SetXYZ(uSizeAtHit * 2., vSize * 2., 0); /// Reset after Warning
 
     B2DEBUG(175, "local pxd hit coordinates (u,v): (" << hitLocal[0] << "," << hitLocal[1] << ")");
 
@@ -1334,6 +1344,9 @@ void VXDTFModule::the_real_event()
 
           // no hitid is saved because Hit is not used
           B2DEBUG(100, "Hit imported = died at hitfinder (highestAllowedLayer): " << hitID);
+
+//    B2DEBUG(100, "hitInfo: (" << hitInfo.hitPosition.X() << "/" << hitInfo.hitPosition.Y() << "/" << hitInfo.hitPosition.Z());
+//    B2DEBUG(100, "transformedHitLocal: (" << transformedHitLocal.X() << "/" << transformedHitLocal.Y() << "/" << transformedHitLocal.Z());
 
         }
 
@@ -1391,6 +1404,8 @@ void VXDTFModule::the_real_event()
 
         // Connection Hit <=> Hit in Collector
         pTFHit->setCollectorID(hitId);
+
+        B2DEBUG(100, "Coor asecid: " << aSecID << ", position Hit: " << hitInfo.hitPosition.X() << "/" << hitInfo.hitPosition.Y() << "/" << hitInfo.hitPosition.Z() << ", uCoord: " << uCoord << ", vCoord: " << vCoord);
 
       }
 
@@ -1497,7 +1512,7 @@ void VXDTFModule::the_real_event()
       }
 
       transformedHitLocal.SetXYZ(uCoord, vCoord, 0);
-      localSensorSize.SetXYZ(uSizeAtHit, vSize, 0);
+      localSensorSize.SetXYZ(uSizeAtHit * 2., vSize * 2., 0); /// Reset ater Warning
 
       B2DEBUG(175, "local svd hit coordinates (u,v): (" << hitLocal[0] << "," << hitLocal[1] << ")");
 
@@ -1564,6 +1579,17 @@ void VXDTFModule::the_real_event()
         // importHits 6.
         if (m_PARAMdisplayCollector > 0) {
 
+//              for(auto infosector : currentPass->secConfigU) {
+//  B2DEBUG(100, "2 InitSector secConfigU: " << infosector);
+//       }
+//
+//       for(auto infosector : currentPass->secConfigV) {
+//  B2DEBUG(100, "2 InitSector secConfigV: " << infosector);
+//       }
+//
+//
+//
+
           std::vector<int> assignedIDs;
 
           assignedIDs.push_back(clusterIndexU);
@@ -1573,6 +1599,14 @@ void VXDTFModule::the_real_event()
 
           // Connect Hit <=> Collector Hit
           pTFHit->setCollectorID(hit_id);
+
+//     B2DEBUG(100, "COOR: X transformedHitLocal/localSensorSize: " << transformedHitLocal.X() << "/" << localSensorSize.X() << ", HitPosition: " << hitInfo.hitPosition.X());
+
+          B2DEBUG(100, "Coor asecid: " << aSecID << ", position Hit: " << hitInfo.hitPosition.X() << "/" << hitInfo.hitPosition.Y() << "/" << hitInfo.hitPosition.Z() << ", uCoord: " << uCoord << ", vCoord: " << vCoord << ", aVxdID: " << aVxdID.getID());
+
+          B2DEBUG(100, "getUSize: " << aSensorInfo.getUSize());
+          B2DEBUG(100, "getVSize: " << aSensorInfo.getVSize());
+          B2DEBUG(100, "getThickness: " << aSensorInfo.getThickness());
 
         }
 
@@ -3035,19 +3069,35 @@ Belle2::SectorNameAndPointerPair VXDTFModule::searchSector4Hit(VxdID aVxdID,
   int aSecID;
   unsigned int aFullSecID = numeric_limits<unsigned int>::max();
 
+//   if (m_PARAMdisplayCollector > 0) {
+//     B2DEBUG(100, "Find SecID LocalHit: " << localHit.X() << "/" << localHit.Y() << "/" << localHit.Z());
+//     B2DEBUG(100, "Find SecID sensorSize: " << sensorSize.X() << "/" << sensorSize.Y() << "/" << sensorSize.Z());
+//   }
+
   for (int j = 0; j != int(uConfig.size() - 1); ++j) {
     B2DEBUG(175, "uCuts(j)*uSize: " << uConfig.at(j)*sensorSize[0] << " uCuts(j+1)*uSize: " << uConfig.at(j + 1)*sensorSize[0]);
 
-    if (localHit[0] >= (uConfig[j]*sensorSize[0] * 2.) && localHit[0] <= (uConfig[j + 1]*sensorSize[0] * 2.)) {
+    // Changed by Stefan F, no * 2
+    // if (localHit[0] >= (uConfig[j]*sensorSize[0] * 2.) && localHit[0] <= (uConfig[j + 1]*sensorSize[0] * 2.)) {
+    if (localHit[0] >= (uConfig[j]*sensorSize[0]) && localHit[0] <= (uConfig[j + 1]*sensorSize[0])) {
       for (int k = 0; k != int(vConfig.size() - 1); ++k) {
         B2DEBUG(175, " vCuts(k)*vSize: " << vConfig.at(k)*sensorSize[1] << " vCuts(k+1)*vSize: " << vConfig.at(k + 1)*sensorSize[1]);
 
-        if (localHit[1] >= (vConfig[k]*sensorSize[1] * 2.) && localHit[1] <= (vConfig[k + 1]*sensorSize[1] * 2.)) {
+//         if (localHit[1] >= (vConfig[k]*sensorSize[1] * 2.) && localHit[1] <= (vConfig[k + 1]*sensorSize[1] * 2.)) {
+        if (localHit[1] >= (vConfig[k]*sensorSize[1]) && localHit[1] <= (vConfig[k + 1]*sensorSize[1])) {
           aSecID = k + 1 + j * (vConfig.size() - 1);
+
+//    if (m_PARAMdisplayCollector > 0) {
+//      B2DEBUG(100, "LocalHit_aSecID_aVxdID: " << localHit.X() << ";" << localHit.Y() << ";" << localHit.Z() << ";" << aSecID << "; " << aVxdID.getID());
+//    }
 
           aFullSecID = FullSecID(aVxdID, false, aSecID).getFullSecID();
           B2DEBUG(150, "searchSector4Hit: calculated secID: " << aFullSecID << "/" << FullSecID(aFullSecID).getFullSecString())
           secMapIter = m_sectorMap.find(aFullSecID);
+
+//     if (m_PARAMdisplayCollector > 0) {
+//      B2DEBUG(100, "aFullSecID: " << aFullSecID);
+//    }
 
           if (secMapIter == m_sectorMap.end()) {
             aFullSecID = FullSecID(aVxdID, true, aSecID).getFullSecID();

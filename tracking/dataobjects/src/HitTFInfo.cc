@@ -25,7 +25,7 @@ ClassImp(HitTFInfo)
 
 HitTFInfo::HitTFInfo()
 {
-  m_sectorID = -1;
+  m_sectorID = 0;
   m_useCounter = 0;
   m_maxCounter = 0;
   m_useCounterCell.clear();
@@ -35,7 +35,7 @@ HitTFInfo::HitTFInfo()
   m_hitSigma.SetXYZ(0., 0., 0.);
 };
 
-HitTFInfo::HitTFInfo(int parPassIndex, int parSecId, TVector3 parPosition, TVector3 parHitsigma): BaseTFInfo(parPassIndex)
+HitTFInfo::HitTFInfo(int parPassIndex, unsigned int parSecId, TVector3 parPosition, TVector3 parHitsigma): BaseTFInfo(parPassIndex)
 {
   m_sectorID = parSecId;
   m_useCounter = 0;

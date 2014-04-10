@@ -23,6 +23,8 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 
+#include "tracking/dataobjects/FullSecID.h"
+
 #include "tracking/vxdCaTracking/FilterID.h"
 
 
@@ -387,6 +389,13 @@ void AnalizerCollectorTFInfo::storeHitInformation(std::string filename, int part
   uint nCount = hitTFInfo.getEntries();
   if (nCount == 0) {B2DEBUG(100, "VXDTF: Display: hitTFInfo is empty!");}
 
+
+  // TEMP
+  StoreArray<SectorTFInfo> sectorTFInfo("");
+  nCount = sectorTFInfo.getEntries();
+  if (nCount == 0) {B2DEBUG(100, "AnalizerCollectorTFInfo: Display: sectorTFInfo is empty!");}
+  // TEMP
+
   // Info for Debug
   uint counterNotRealHits = 0, counterRealHits = 0;
 
@@ -402,76 +411,113 @@ void AnalizerCollectorTFInfo::storeHitInformation(std::string filename, int part
   B2DEBUG(100, "Filename (storeHitInformation): " << filename);
 
   myfile << "hitid" << m_fileSeparator << "passIndex" << m_fileSeparator << "sector_id" << m_fileSeparator << "diet_at" << m_fileSeparator << "diet_ID" << m_fileSeparator << "real" << m_fileSeparator << particleText <<
-         m_fileSeparator << "Purity" << m_fileSeparator << "Hit_Position" << m_fileSeparator << "Hit_Sigma" << m_fileSeparator << "FilterID::anglesRZ" << m_fileSeparator << "FilterID::anglesXY" << m_fileSeparator << "FilterID::distance3D" << m_fileSeparator << "FilterID::distanceXY" << m_fileSeparator << "FilterID::distanceZ" << m_fileSeparator << "FilterID::helixFit" << m_fileSeparator << "FilterID::slopeRZ" << m_fileSeparator << "FilterID::deltaSlopeRZ" << m_fileSeparator <<  "FilterID::pT" << m_fileSeparator << "FilterID::deltapT" << m_fileSeparator << "FilterID::normedDistance3D" << m_fileSeparator << "FilterID::distance2IP" << m_fileSeparator << "FilterID::deltaDistance2IP" << m_fileSeparator << "FilterID::silentSegFinder" << m_fileSeparator << "FilterID::silentTcc" << m_fileSeparator << "Clusters_Size" << m_fileSeparator << "ClusterID_1" << m_fileSeparator << "ClusterID_2" << endl;
+         m_fileSeparator << "Purity" << m_fileSeparator << "Hit_Position" << m_fileSeparator << "Hit_Sigma" << m_fileSeparator << "FilterID::angles3D" << m_fileSeparator << "FilterID::anglesRZ" << m_fileSeparator << "FilterID::anglesXY" << m_fileSeparator << "FilterID::distance3D" << m_fileSeparator << "FilterID::distanceXY" << m_fileSeparator << "FilterID::distanceZ" << m_fileSeparator << "FilterID::helixFit" << m_fileSeparator << "FilterID::slopeRZ" << m_fileSeparator << "FilterID::deltaSlopeRZ" << m_fileSeparator <<  "FilterID::pT" << m_fileSeparator << "FilterID::deltapT" << m_fileSeparator << "FilterID::normedDistance3D" << m_fileSeparator << "FilterID::distance2IP" << m_fileSeparator << "FilterID::deltaDistance2IP" << m_fileSeparator << "FilterID::silentSegFinder" << m_fileSeparator << "FilterID::silentTcc" << m_fileSeparator << "Clusters_Size" << m_fileSeparator << "ClusterID_1" << m_fileSeparator << "ClusterID_2" << endl;
 
 
   for (int i = 0; i <  hitTFInfo.getEntries(); i++) {
 
     // particleIdFilter == -1 => all Entries
-    if (particleIdFilter == -1 || hitTFInfo[i]->containsParticle(particleIdFilter)) {
+    if (particleIdFilter > -1 and hitTFInfo[i]->containsParticle(particleIdFilter) == false) { continue; }
 
-      myfile << i << m_fileSeparator << hitTFInfo[i]->getPassIndex() << m_fileSeparator << hitTFInfo[i]->getSectorID() << m_fileSeparator << hitTFInfo[i]->getDiedAt() << m_fileSeparator << hitTFInfo[i]->getDiedID() << m_fileSeparator << hitTFInfo[i]->getIsReal();
+    /*const */HitTFInfo* aHit = hitTFInfo[i];
 
-      if (hitTFInfo[i]->getIsReal() == 0) { counterNotRealHits++; } else { counterRealHits++; }
+    myfile << i << m_fileSeparator << aHit->getPassIndex() << m_fileSeparator << aHit->getSectorID() << m_fileSeparator << aHit->getDiedAt() << m_fileSeparator << aHit->getDiedID() << m_fileSeparator << aHit->getIsReal();
 
-      // Main Particle & Purity
-      if (particleIdFilter == -1) {
-        myfile << m_fileSeparator << hitTFInfo[i]->getMainParticle().first << m_fileSeparator << hitTFInfo[i]->getMainParticle().second;
-      } else {
-        myfile << m_fileSeparator << hitTFInfo[i]->getInfoParticle(particleIdFilter).first << m_fileSeparator << hitTFInfo[i]->getInfoParticle(particleIdFilter).second;
-      }
+    if (aHit->getIsReal() == 0) { counterNotRealHits++; } else { counterRealHits++; }
 
-      myfile << m_fileSeparator << hitTFInfo[i]->getPosition().X() << "/" << hitTFInfo[i]->getPosition().Y() << "/" << hitTFInfo[i]->getPosition().Z();
-
-      myfile << m_fileSeparator << hitTFInfo[i]->getHitSigma().X() << "/" << hitTFInfo[i]->getHitSigma().Y() << "/" << hitTFInfo[i]->getHitSigma().Z();
-
-      std::vector<int> accepted = hitTFInfo[i]->getAccepted();
-      std::vector<int> rejected = hitTFInfo[i]->getRejected();
-
-      B2DEBUG(100, "SaveHitInformation: i: " << i << ", pass index: " << hitTFInfo[i]->getPassIndex() << ", size accepted: " << accepted.size() << ", size rejected: " << rejected.size());
-
-      /*    for (auto &currentFilter: rejected) {
-          B2DEBUG(100,"rejected: " << currentFilter);
-          }
-      */
-      for (uint u = 0; u < searchfilters.size(); u++) {
-        //B2DEBUG(100,"Filter ?: " << searchfilters.at(u));
-        myfile << m_fileSeparator;
-        //B2DEBUG(100,"searchfilters: " << searchfilters.at(u));
-
-        if (std::find(accepted.begin(), accepted.end(), searchfilters.at(u)) != accepted.end()) {
-          myfile << 1;      //true = accepted
-        } else if (std::find(rejected.begin(), rejected.end(), searchfilters.at(u)) != rejected.end()) {
-          myfile << 0;      //false = rejected
-        } else {
-          //myfile << 2;     //not found
-        }
-
-      }
-
-
-      std::vector<int> assignedclusters = hitTFInfo[i]->getAssignedCluster();
-
-      myfile << m_fileSeparator << assignedclusters.size();
-
-      // all the time max 2 Cluster IDs
-      for (uint m = 0; m < 2; m++) {
-
-        if (m < assignedclusters.size()) {
-          myfile << m_fileSeparator << assignedclusters.at(m);
-        } else {
-          myfile << m_fileSeparator;
-        }
-
-      }
-
-
-
-      myfile << endl;
+    // Main Particle & Purity
+    if (particleIdFilter == -1) {
+      myfile << m_fileSeparator << aHit->getMainParticle().first << m_fileSeparator << aHit->getMainParticle().second;
+    } else {
+      myfile << m_fileSeparator << aHit->getInfoParticle(particleIdFilter).first << m_fileSeparator << aHit->getInfoParticle(particleIdFilter).second;
     }
+
+    myfile << m_fileSeparator << aHit->getPosition().X() << "/" << aHit->getPosition().Y() << "/" << aHit->getPosition().Z();
+
+    myfile << m_fileSeparator << aHit->getHitSigma().X() << "/" << aHit->getHitSigma().Y() << "/" << aHit->getHitSigma().Z();
+
+    std::vector<int> accepted = aHit->getAccepted();
+    std::vector<int> rejected = aHit->getRejected();
+
+    B2DEBUG(100, "SaveHitInformation: i: " << i << ", pass index: " << aHit->getPassIndex() << ", size accepted: " << accepted.size() << ", size rejected: " << rejected.size());
+
+//     for (auto &currentFilter: rejected) {
+//  B2DEBUG(100,"rejected: " << currentFilter);
+//  }
+//
+//     for (auto &currentFilter: accepted) {
+//  B2DEBUG(100,"accepted: " << currentFilter);
+//  }
+
+    for (uint u = 0; u < searchfilters.size(); u++) {
+      //B2DEBUG(100,"Filter ?: " << searchfilters.at(u));
+      myfile << m_fileSeparator;
+      // B2DEBUG(100,"searchfilters: " << searchfilters.at(u));
+
+      if (std::find(accepted.begin(), accepted.end(), searchfilters.at(u)) != accepted.end()) {
+        myfile << "1";      //true = accepted
+        //B2DEBUG(100,"FOUND accepted");
+      } else if (std::find(rejected.begin(), rejected.end(), searchfilters.at(u)) != rejected.end()) {
+        myfile << "0";      //false = rejected
+        //B2DEBUG(100,"FOUND rejected");
+      } else {
+        //myfile << 2;     //not found
+      }
+
+    }
+
+
+    std::vector<int> assignedclusters = aHit->getAssignedCluster();
+
+    myfile << m_fileSeparator << assignedclusters.size();
+
+    // all the time max 2 Cluster IDs
+    for (uint m = 0; m < 2; m++) {
+
+      if (m < assignedclusters.size()) {
+        myfile << m_fileSeparator << assignedclusters.at(m);
+      } else {
+        myfile << m_fileSeparator;
+      }
+
+    }
+
+    myfile << endl;
+
+    //TEMP
+    uint currentSectorID = aHit->getSectorID();
+
+    if (aHit->getPassIndex() == 0) {
+      B2DEBUG(100, "COR - HIT: " << i << " Coordinate: " << aHit->getPosition().X() << "/" << aHit->getPosition().Y() << "/" << aHit->getPosition().Z());
+
+      for (auto & currentSector : sectorTFInfo) {
+
+        if (currentSector.getSectorID() == currentSectorID && currentSector.getPassIndex() == aHit->getPassIndex()) {
+
+          int countX = 0, countY = 0, countZ = 0; // counts cases where difference of hit - sectorEdge was positive. If value is != 2, there was something wrong
+          for (int nEdge = 0 ; nEdge < 4 ; ++nEdge) {
+            if ((aHit->getPosition().X() - currentSector.getPoint(nEdge).X()) > 0) countX++;
+            if ((aHit->getPosition().Y() - currentSector.getPoint(nEdge).Y()) > 0) countY++;
+            if ((aHit->getPosition().Z() - currentSector.getPoint(nEdge).Z()) > 0) countZ++;
+          }
+
+          if (countX != 2 or countY != 2 or countZ != 2) {
+            B2ERROR("ERRORCASE: sector-edges of sector " << FullSecID(currentSectorID) << " do not match to hit-position! x/y/z: " << countX << "/" << countY << "/" << countZ);
+          } else {
+            B2WARNING("GOODCASE: sector-edges of sector " << FullSecID(currentSectorID) << " do match to hit-position! x/y/z: " << countX << "/" << countY << "/" << countZ);
+          }
+
+          TString tempString = currentSector.getDisplayInformation();
+          B2DEBUG(100, "COR - SectorID: " << FullSecID(currentSectorID) << ": " << tempString);
+        }
+      }
+    }
+    //TEMP
+
+//     }
   }
 
-// B2INFO("RealHits: " << counterRealHits << "/ notRealHits: " << counterNotRealHits);
+  B2DEBUG(100, "RealHits: " << counterRealHits << "/ notRealHits: " << counterNotRealHits);
 
   myfile.close();
 }
@@ -538,8 +584,8 @@ void AnalizerCollectorTFInfo::storeCellInformation(std::string filename, int par
   }
 
 
-  myfile << "cellid" << m_fileSeparator << "passIndex" << m_fileSeparator << "state" << m_fileSeparator << "diet_at" << m_fileSeparator << "diet_ID" << m_fileSeparator << " real" << m_fileSeparator << particleText <<
-         m_fileSeparator << "Purity" << m_fileSeparator << "FilterID::distance3D" << m_fileSeparator << "FilterID::anglesXY" << m_fileSeparator << "FilterID::anglesRZ" << m_fileSeparator << "FilterID::distance2IP" << m_fileSeparator << "FilterID::deltaSlopeRZ" << m_fileSeparator << "FilterID::pT" << m_fileSeparator << "FilterID::helixFit" << m_fileSeparator << "FilterID::nbFinderLost" << m_fileSeparator <<  "FilterID::cellularAutomaton" << m_fileSeparator << "FilterID::silentTcc" << m_fileSeparator << "outer hit" << m_fileSeparator << "inner Hit" << endl;
+  myfile << "cellid" << m_fileSeparator << "passIndex" << m_fileSeparator << "state" << m_fileSeparator << "diet_at" << m_fileSeparator << "diet_ID" << m_fileSeparator << "real" << m_fileSeparator << particleText <<
+         m_fileSeparator << "Purity" << m_fileSeparator << "FilterID::distance3D" << m_fileSeparator << "FilterID::anglesXY" << m_fileSeparator << "FilterID::anglesRZ" << m_fileSeparator << "FilterID::distance2IP" << m_fileSeparator << "FilterID::deltaSlopeRZ" << m_fileSeparator << "FilterID::pT" << m_fileSeparator << "FilterID::helixFit" << m_fileSeparator << "FilterID::nbFinderLost" << m_fileSeparator <<  "FilterID::cellularAutomaton" << m_fileSeparator << "FilterID::silentTcc" << m_fileSeparator << "outer_hit" << m_fileSeparator << "inner_Hit" << endl;
 
   for (int i = 0; i <  cellTFInfo.getEntries(); i++) {
 
@@ -566,9 +612,9 @@ void AnalizerCollectorTFInfo::storeCellInformation(std::string filename, int par
         myfile << m_fileSeparator;
 
         if (std::find(accepted.begin(), accepted.end(), searchfilters.at(u)) != accepted.end()) {
-          myfile << 1;      //true = accepted
+          myfile << "1";      //true = accepted
         } else if (std::find(rejected.begin(), rejected.end(), searchfilters.at(u)) != rejected.end()) {
-          myfile << 0;      //false = rejected
+          myfile << "0";      //false = rejected
         } else {
           //myfile << 2;     //not found
         }
@@ -666,8 +712,8 @@ void AnalizerCollectorTFInfo::storeTCInformation(std::string filename, int parti
   }
 
   myfile << "tcid" << m_fileSeparator << "passIndex" << m_fileSeparator << "ownid" << m_fileSeparator << "diet_at" << m_fileSeparator << "diet_ID" << m_fileSeparator << "real" << m_fileSeparator << particleText <<
-         m_fileSeparator << "Purity" << m_fileSeparator << "FilterID::hopfield" << m_fileSeparator << "FilterID::greedy" << m_fileSeparator << "FilterID::tcDuel" << m_fileSeparator << "FilterID::tcFinderCurr" << m_fileSeparator << "FilterID::ziggZaggXY" << m_fileSeparator << "FilterID::deltapT" << m_fileSeparator << "FilterID::deltaDistance2IP" << m_fileSeparator << "FilterID::ziggZaggRZ" << m_fileSeparator <<  "FilterID::calcQIbyKalman" << m_fileSeparator << "FilterID::overlapping" << m_fileSeparator << "FilterID::circlefit" << m_fileSeparator << "Count Asso. Cell IDs" << m_fileSeparator << "Cell ID 1" << m_fileSeparator << "Cell ID 2" << m_fileSeparator << "Cell ID 3" << m_fileSeparator << "Cell ID 4" << m_fileSeparator << "Cell ID 5" << m_fileSeparator << "Cell ID 6" << m_fileSeparator
-         << "Cell ID 7" << m_fileSeparator << "Cell ID 8" << m_fileSeparator << "Cell ID 9" << m_fileSeparator << "Cell ID 10" << endl;
+         m_fileSeparator << "Purity" << m_fileSeparator << "FilterID::hopfield" << m_fileSeparator << "FilterID::greedy" << m_fileSeparator << "FilterID::tcDuel" << m_fileSeparator << "FilterID::tcFinderCurr" << m_fileSeparator << "FilterID::ziggZaggXY" << m_fileSeparator << "FilterID::deltapT" << m_fileSeparator << "FilterID::deltaDistance2IP" << m_fileSeparator << "FilterID::ziggZaggRZ" << m_fileSeparator <<  "FilterID::calcQIbyKalman" << m_fileSeparator << "FilterID::overlapping" << m_fileSeparator << "FilterID::circlefit" << m_fileSeparator << "Count_Asso_Cell_IDs" << m_fileSeparator << "Cell_ID_1" << m_fileSeparator << "Cell_ID_2" << m_fileSeparator << "Cell_ID_3" << m_fileSeparator << "Cell_ID_4" << m_fileSeparator << "Cell_ID_5" << m_fileSeparator << "Cell_ID_6" << m_fileSeparator
+         << "Cell_ID_7" << m_fileSeparator << "Cell_ID_8" << m_fileSeparator << "Cell_ID_9" << m_fileSeparator << "Cell_ID_10" << endl;
 
   for (int i = 0; i <  tfcandTFInfo.getEntries(); i++) {
 
@@ -694,9 +740,9 @@ void AnalizerCollectorTFInfo::storeTCInformation(std::string filename, int parti
         myfile << m_fileSeparator;
 
         if (std::find(accepted.begin(), accepted.end(), searchfilters.at(u)) != accepted.end()) {
-          myfile << 1;      //true = accepted
+          myfile << "1";      //true = accepted
         } else if (std::find(rejected.begin(), rejected.end(), searchfilters.at(u)) != rejected.end()) {
-          myfile << 0;      //false = rejected
+          myfile << "0";      //false = rejected
         } else {
           //myfile << 2;     //not found
         }
@@ -768,7 +814,7 @@ void AnalizerCollectorTFInfo::storeClustersInformation(std::string filename)
 
 /** Stores Sector Information in a file */
 // Information of the Sector:
-// 0  SectorID    int
+// 0  SectorID    uint
 // 1  passIndex    int
 // 2  Real Sector ID    int
 // 3  diet_at     string
@@ -793,7 +839,7 @@ void AnalizerCollectorTFInfo::storeSectorInformation(std::string filename, bool 
   myfile << "SectorID" << m_fileSeparator << "passIndex" << m_fileSeparator << "Real_Sector_ID" << m_fileSeparator << "diet_at" << m_fileSeparator << "diet_ID" << m_fileSeparator << "Friends_only" << m_fileSeparator << "Point_1" << m_fileSeparator << "Point_2" << m_fileSeparator << "Point_3" << m_fileSeparator << "Point_4" << m_fileSeparator << "Friends_Sector_IDs";
 
   for (uint m = 0; m < 15; m++) {
-    myfile << m_fileSeparator << "Sector ID " << (m + 1);
+    myfile << m_fileSeparator << "Sector_ID_" << (m + 1);
   }
 
   myfile << endl;
@@ -804,7 +850,7 @@ void AnalizerCollectorTFInfo::storeSectorInformation(std::string filename, bool 
 
       myfile << i << m_fileSeparator << sectorTFInfo[i]->getPassIndex() << m_fileSeparator << sectorTFInfo[i]->getSectorID() << m_fileSeparator << sectorTFInfo[i]->getDiedAt() << m_fileSeparator << sectorTFInfo[i]->getDiedID() << m_fileSeparator << sectorTFInfo[i]->getIsOnlyFriend() << m_fileSeparator <<  sectorTFInfo[i]->getPoint(0).X() << "/" << sectorTFInfo[i]->getPoint(0).Y() << "/" << sectorTFInfo[i]->getPoint(0).Z() << m_fileSeparator << sectorTFInfo[i]->getPoint(1).X() << "/" << sectorTFInfo[i]->getPoint(1).Y() << "/" << sectorTFInfo[i]->getPoint(1).Z() << m_fileSeparator <<  sectorTFInfo[i]->getPoint(2).X() << "/" << sectorTFInfo[i]->getPoint(2).Y() << "/" << sectorTFInfo[i]->getPoint(2).Z() << m_fileSeparator << sectorTFInfo[i]->getPoint(3).X() << "/" << sectorTFInfo[i]->getPoint(3).Y() << "/" << sectorTFInfo[i]->getPoint(3).Z();
 
-      std::vector<int> friendSectors = sectorTFInfo[i]->getFriends();
+      std::vector<unsigned int> friendSectors = sectorTFInfo[i]->getFriends();
 
       myfile << m_fileSeparator << friendSectors.size();
 

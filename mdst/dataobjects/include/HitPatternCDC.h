@@ -48,13 +48,24 @@ namespace Belle2 {
       return m_pattern;
     }
 
-    /** Get the approximate total Number of CDC hits in the fit.
-     *
-     *  If in a Super-Layer there are more than two layers with two or more hits,
-     *  this results in undercounting of the number of hits.
-     */
+    /** Get the approximate total Number of CDC hits in the fit. */
     unsigned short getNHits() const {
-      return static_cast<unsigned short>(m_pattern.count());
+      // Shift the 8 MSBs to the right and return their value as integer.
+      return static_cast<unsigned short int>((m_pattern >> 56).to_ulong());
+    }
+
+    /** Sets the 8 MSBs to the total number of hits in the CDC.
+     * TODO: If more than 255 hits are in the CDC (e.g. curlers), the number of hits is set to 255.
+     */
+    void setNHits(const unsigned short nHits) {
+      // Reset the 8 MSBs to zero.
+      m_pattern = m_pattern & ~s_infoLayerMask;
+      // Set the total number of hits as the 8 MSBs
+      std::bitset<64> numberOfHits(nHits);
+      numberOfHits <<= 56;
+      // Set the 8 MSBs to the total number of hits.
+      // The 8 MSBs have to be zero, otherwise this breaks.
+      m_pattern = numberOfHits | m_pattern;
     }
 
     /** Set bit corresponding to layer to true.
@@ -142,6 +153,7 @@ namespace Belle2 {
   private:
     std::bitset<64> m_pattern;                     /**<  Saves the actual pattern.*/
     static const std::bitset<64> s_sLayerMasks[9]; /**<  Masks to zero out all bits from other layers.*/
+    static const std::bitset<64> s_infoLayerMask;  /**<  Mask to zero out all bits from other layers. */
 
     //-----------------------------------------------------------------------------------
     /** Make it a ROOT object.

@@ -32,3 +32,6 @@ const std::bitset<64> HitPatternCDC::s_sLayerMasks[9] = {sLayerZer, sLayerOne, s
                                                          sLayerFiv, sLayerSix, sLayerSev, sLayerEig
                                                         };
 
+std::bitset<64> infoLayer(static_cast<std::string>("1111111100000000000000000000000000000000000000000000000000000000"));
+
+const std::bitset<64> HitPatternCDC::s_infoLayerMask = infoLayer;

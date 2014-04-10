@@ -47,5 +47,23 @@ namespace Belle2 {
     hitPatternCDC3.resetSLayer(1);
     hitPatternCDC3.resetSLayer(3);
     EXPECT_EQ(0, hitPatternCDC3.getNHits());
+  } // settersNGetters
+
+  /// This tests if the
+  TEST_F(HitPatternCDCTest, SetNGetTotalNumberOfHits)
+  {
+    unsigned long int initValue = 12297829382473034410U; //101010...101010
+    HitPatternCDC myHitPatternCDC(initValue);
+    EXPECT_EQ(170, myHitPatternCDC.getNHits());
+    unsigned short int nHits1 = 255;
+    myHitPatternCDC.setNHits(nHits1);
+    EXPECT_EQ(nHits1, myHitPatternCDC.getNHits());
+    unsigned short int nHits2 = 0;
+    myHitPatternCDC.setNHits(nHits2);
+    EXPECT_EQ(nHits2, myHitPatternCDC.getNHits());
+    unsigned short int nHits3 = 93;
+    myHitPatternCDC.setNHits(nHits3);
+    EXPECT_EQ(nHits3, myHitPatternCDC.getNHits());
   }
-}
+
+} // namespace Belle2

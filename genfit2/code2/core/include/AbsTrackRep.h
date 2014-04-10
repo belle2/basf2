@@ -83,8 +83,9 @@ class AbsTrackRep : public TObject {
    * If state has a covariance, jacobian and noise matrices will be calculated and the covariance will be propagated.
    * If state has no covariance, jacobian and noise will only be calculated if calcJacobianNoise == true.
    */
-  virtual double extrapolateToPlane(StateOnPlane& state,
-      const SharedPlanePtr& plane,
+  virtual double extrapolateToPlane(
+      StateOnPlane& state,
+      const genfit::SharedPlanePtr& plane,
       bool stopAtBoundary = false,
       bool calcJacobianNoise = false) const = 0;
 
@@ -146,6 +147,21 @@ class AbsTrackRep : public TObject {
    */
   virtual double extrapolateToPoint(StateOnPlane& state,
       const TVector3& point,
+      bool stopAtBoundary = false,
+      bool calcJacobianNoise = false) const = 0;
+
+  /**
+   * @brief Extrapolates the state to the POCA to a point in the metric of G, and returns the extrapolation length
+   *        and, via reference, the extrapolated state.
+   *
+   * If stopAtBoundary is true, the extrapolation stops as soon as a material boundary is encountered.
+   *
+   * If state has a covariance, jacobian and noise matrices will be calculated and the covariance will be propagated.
+   * If state has no covariance, jacobian and noise will only be calculated if calcJacobianNoise == true.
+   */
+  virtual double extrapolateToPoint(StateOnPlane& state,
+      const TVector3& point,
+      const TMatrixDSym& G, // weight matrix (metric)
       bool stopAtBoundary = false,
       bool calcJacobianNoise = false) const = 0;
 
@@ -266,7 +282,7 @@ class AbsTrackRep : public TObject {
    */
   void calcJacobianNumerically(const genfit::StateOnPlane& origState,
                                    const genfit::SharedPlanePtr destPlane,
-                                   TMatrixD& jacobian);
+                                   TMatrixD& jacobian) const;
 
   //! Set position and momentum of state.
   virtual void setPosMom(StateOnPlane& state, const TVector3& pos, const TVector3& mom) const = 0;

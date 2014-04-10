@@ -26,7 +26,7 @@ namespace Belle2 {
    */
   class Track : public RelationsObject {
   public:
-    /** Constuctor without arguments; needed for I/O.
+    /** Constructor without arguments; needed for I/O.
      *
      *  The array with the indices for the TrackFitResults is initialized with -1,
      *  which is an invalid index.

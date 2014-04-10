@@ -100,7 +100,7 @@ void RecoTrack::fillHitPatternCDC(const short pseudoCharge)
   m_hitPatternCDCInitializer = hitPatternCDC.getInteger();
 }
 
-void RecoTrack::fillHitPatternVXD(const short pseudoCharge)
+void RecoTrack::fillHitPatternVXD(const short /*pseudoCharge*/)
 {
   //Do something similar as for the CDC
 }

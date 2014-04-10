@@ -8,6 +8,8 @@ from ROOT import Belle2
 class MinModule(Module):
     """
     Example module to drop into ipython and create some objects to look at.
+    If you just want to start IPython and create PyStoreArray etc.
+    interactively, the Interactive module might be  of interest.
     """
 
     def event(self):
@@ -18,11 +20,11 @@ class MinModule(Module):
         particles = Belle2.PyStoreArray("MCParticles")
         B2INFO(80 * '=')
         B2INFO("Dropping into interactive python shell. Try:"
-        "\n  print evtmetadata.obj().getEvent()"
-        "\n  particles[0].Dump()"
-        "\n  help(particles[0])"
-        "\nTo continue non-interactively, press Ctrl+D."
-        "\nPress Ctrl+C first to exit basf2.")
+               "\n  print evtmetadata.obj().getEvent()"
+               "\n  particles[0].Dump()"
+               "\n  help(particles[0])"
+               "\nTo continue non-interactively, press Ctrl+D."
+               "\nPress Ctrl+C first to exit basf2.")
         B2INFO(80 * '=')
         interactive.embed()
 

@@ -74,10 +74,21 @@ std::pair<float, float> SpacePoint::convertToNormalizedCoordinates(const std::pa
   // to normalize all positions to numbers between [0,1],
   // where the middle will be 0.5,
   // we need to do some calculation.
-  float sensorSizeU =  aSensorInfo->getUSize(hitLocal.second);
-  float sensorSizeV = 0.5 *  aSensorInfo->getVSize();
+
+
+  float sensorSizeU =  aSensorInfo->getUSize();
+  float sensorSizeV =  aSensorInfo->getVSize();
+
+  // changed by Stefan F
   float localUPosition = hitLocal.first +  0.5 * sensorSizeU;
   float localVPosition = hitLocal.second +  0.5 * sensorSizeV;
+
+  // old ones:
+  // float sensorSizeU =  aSensorInfo->getUSize(hitLocal.second);
+  // float sensorSizeV = 0.5 * aSensorInfo->getVSize();
+
+//   B2INFO("localUPosition: " << localUPosition);
+//   B2INFO("localVPosition: " << localVPosition);
 
   return make_pair(localUPosition / sensorSizeU, localVPosition / sensorSizeV);
 }
@@ -92,8 +103,13 @@ std::pair<float, float> SpacePoint::convertToLocalCoordinates(const std::pair<fl
     aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID);
   }
 
-  float localVPosition = (hitNormalized.second - 0.5) * aSensorInfo->getVSize();
-  float localUPosition = (hitNormalized.first - 0.5) * aSensorInfo->getUSize();
+  // Changed by Stefan F
+  float localUPosition = hitNormalized.first - (0.5 * aSensorInfo->getUSize());
+  float localVPosition = hitNormalized.second - (0.5 * aSensorInfo->getVSize());
+
+  // old ones:
+  //   float localVPosition = (hitNormalized.second - 0.5) * aSensorInfo->getVSize();
+  //   float localUPosition = (hitNormalized.first - 0.5) * aSensorInfo->getUSize();
 
   return (make_pair(localUPosition, localVPosition));
 }

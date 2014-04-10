@@ -19,6 +19,8 @@
 //svd
 #include <svd/dataobjects/SVDCluster.h>
 
+#include <framework/logging/Logger.h>
+
 // stl:
 #include <vector>
 #include <utility> // std::pair

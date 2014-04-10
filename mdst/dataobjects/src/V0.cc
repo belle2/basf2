@@ -21,10 +21,10 @@ V0::V0():
   m_trackFitResultIndexPositive(-1),
   m_trackFitResultIndexNegative(-1)
 {}
-V0::V0(const pair<Track, TrackFitResult>& trackPairPositive,
-       const pair<Track, TrackFitResult>& trackPairNegative) :
-  m_trackIndexPositive(trackPairPositive.first.getArrayIndex()),
-  m_trackIndexNegative(trackPairNegative.first.getArrayIndex()),
-  m_trackFitResultIndexPositive(trackPairPositive.second.getArrayIndex()),
-  m_trackFitResultIndexNegative(trackPairNegative.second.getArrayIndex())
+V0::V0(const pair<Track*, TrackFitResult*>& trackPairPositive,
+       const pair<Track*, TrackFitResult*>& trackPairNegative) :
+  m_trackIndexPositive(trackPairPositive.first->getArrayIndex()),
+  m_trackIndexNegative(trackPairNegative.first->getArrayIndex()),
+  m_trackFitResultIndexPositive(trackPairPositive.second->getArrayIndex()),
+  m_trackFitResultIndexNegative(trackPairNegative.second->getArrayIndex())
 {}

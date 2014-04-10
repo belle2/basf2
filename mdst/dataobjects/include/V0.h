@@ -33,8 +33,8 @@ namespace Belle2 {
      *  @param trackPairPositive  A pair of the Track forming one part of the V0 and the result of the refitting.
      *  @param trackPairNegative  @sa trackPairPositive
      */
-    V0(const std::pair<Track, TrackFitResult>& trackPairPositive,
-       const std::pair<Track, TrackFitResult>& trackPairNegative);
+    V0(const std::pair<Track*, TrackFitResult*>& trackPairPositive,
+       const std::pair<Track*, TrackFitResult*>& trackPairNegative);
 
     /** Get pair of Tracks, that are part of the V0 particle.*/
     std::pair<Track*, Track*> getTrackPtrs() {

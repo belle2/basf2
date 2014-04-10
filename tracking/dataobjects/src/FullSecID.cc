@@ -112,7 +112,7 @@ FullSecID::FullSecID(unsigned int layerID, bool subLayerID, unsigned int sensorI
 std::string FullSecID::getFullSecString() const
 {
   if (getLayerID() == 0) {
-    return (boost::format("0%1%_000_%2%") % getLayerID() % getSubLayerID() % getSecID()).str();
+    return (boost::format("0%1%_000_%2%") % getLayerID() % getSecID()).str();
   }
   return (boost::format("%1%%2%_%3%_%4%") % getLayerID() % getSubLayerID() % getUniID() % getSecID()).str();  // WARNING this bypasses the following code - intended?
 //   if (getLayerID() == 0) {

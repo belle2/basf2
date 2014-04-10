@@ -21,7 +21,6 @@
 
 #include <Exception.h>
 #include <RKTrackRep.h>
-#include <Tools.h>
 #include <HMatrixUV.h>
 
 #include <cassert>
@@ -30,20 +29,15 @@
 namespace genfit {
 
 SpacepointMeasurement::SpacepointMeasurement(int nDim)
-  : AbsMeasurement(nDim), weightedPlaneContruction_(false)
+  : AbsMeasurement(nDim)
 {
   assert(nDim >= 3);
-
-  //this->initG();
 }
 
-SpacepointMeasurement::SpacepointMeasurement(const TVectorD& rawHitCoords, const TMatrixDSym& rawHitCov, int detId, int hitId, TrackPoint* trackPoint, bool weightedPlaneContruction)
-  : AbsMeasurement(rawHitCoords, rawHitCov, detId, hitId, trackPoint), weightedPlaneContruction_(weightedPlaneContruction)
+SpacepointMeasurement::SpacepointMeasurement(const TVectorD& rawHitCoords, const TMatrixDSym& rawHitCov, int detId, int hitId, TrackPoint* trackPoint)
+  : AbsMeasurement(rawHitCoords, rawHitCov, detId, hitId, trackPoint)
 {
   assert(rawHitCoords_.GetNrows() >= 3);
-
-  if (weightedPlaneContruction_)
-    this->initG();
 }
 
 
@@ -54,12 +48,12 @@ SharedPlanePtr SpacepointMeasurement::constructPlane(const StateOnPlane& state) 
 
   const TVector3 point(rawHitCoords_(0), rawHitCoords_(1), rawHitCoords_(2));
 
-  if (weightedPlaneContruction_)
-    st.extrapolateToPoint(point, G_);
-  else
-    st.extrapolateToPoint(point);
+  const AbsTrackRep* rep = state.getRep();
+  rep->extrapolateToPoint(st, point);
 
-  return st.getPlane();
+  const TVector3& dirInPoca = rep->getMom(st);
+
+  return SharedPlanePtr(new DetPlane(point, dirInPoca));
 }
 
 
@@ -113,28 +107,6 @@ const AbsHMatrix* SpacepointMeasurement::constructHMatrix(const AbsTrackRep* rep
   }
 
   return new HMatrixUV();
-}
-
-
-void SpacepointMeasurement::initG() {
-  rawHitCov_.GetSub(0, 2, G_);
-  tools::invertMatrix(G_);
-}
-
-
-// Modified from auto-generated Streamer to account for non-persistent G_
-void SpacepointMeasurement::Streamer(TBuffer &R__b)
-{
-   // Stream an object of class genfit::SpacepointMeasurement.
-
-   if (R__b.IsReading()) {
-      R__b.ReadClassBuffer(genfit::SpacepointMeasurement::Class(),this);
-
-      if (weightedPlaneContruction_)
-        this->initG();
-   } else {
-      R__b.WriteClassBuffer(genfit::SpacepointMeasurement::Class(),this);
-   }
 }
 
 

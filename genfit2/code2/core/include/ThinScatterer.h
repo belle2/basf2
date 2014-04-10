@@ -51,7 +51,7 @@ class ThinScatterer : public TObject {
 
  private:
 
-  SharedPlanePtr sharedPlane_; //! Material boundary.  '!' shuts up ROOT.
+  SharedPlanePtr sharedPlane_; // Material boundary
   MaterialProperties material_; // Material properties
 
 

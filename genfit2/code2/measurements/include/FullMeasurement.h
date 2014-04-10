@@ -56,7 +56,7 @@ class FullMeasurement : public AbsMeasurement {
   virtual const AbsHMatrix* constructHMatrix(const AbsTrackRep*) const;
 
  protected:
-  SharedPlanePtr plane_;   //! This is persistent, but '!' makes ROOT shut up.
+  SharedPlanePtr plane_;
 
  public:
 

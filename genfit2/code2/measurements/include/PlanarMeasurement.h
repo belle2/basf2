@@ -70,7 +70,7 @@ class PlanarMeasurement : public AbsMeasurement {
   void setStripV(bool v = true) {stripV_ = v;}
 
  protected:
-  SharedPlanePtr physicalPlane_;   //! This is persistent, but '!' makes ROOT shut up.
+  SharedPlanePtr physicalPlane_;
   int planeId_; // planeId id is -1 per default
   bool stripV_;
 

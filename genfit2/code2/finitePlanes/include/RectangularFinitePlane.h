@@ -44,7 +44,7 @@ class RectangularFinitePlane : public AbsFinitePlane {
   bool isInActive(double u, double v) const;
   void Print(const Option_t* = "") const;
 
-  RectangularFinitePlane* clone() const {
+  AbsFinitePlane* clone() const {
     return new RectangularFinitePlane(*this);
   }
 

@@ -90,7 +90,7 @@ class AbsFitterInfo : public TObject {
    */
   const AbsTrackRep* rep_; //! No ownership
 
-  SharedPlanePtr sharedPlane_; //! Shared ownership.  '!' shuts up ROOT.
+  SharedPlanePtr sharedPlane_; // Shared ownership.
 
 
  private:

@@ -54,7 +54,8 @@ void StateOnPlane::Streamer(TBuffer &R__b)
       //TObject::Streamer(R__b);
       state_.Streamer(R__b);
       auxInfo_.Streamer(R__b);
-      sharedPlane_.reset();  // needs to be set by owner;
+      sharedPlane_.reset(new DetPlane());
+      sharedPlane_->Streamer(R__b);
       rep_ = NULL;  // needs to be set by owner
       R__b.CheckByteCount(R__s, R__c, thisClass::IsA());
    } else {
@@ -62,6 +63,7 @@ void StateOnPlane::Streamer(TBuffer &R__b)
       //TObject::Streamer(R__b);
       state_.Streamer(R__b);
       auxInfo_.Streamer(R__b);
+      sharedPlane_->Streamer(R__b);
       R__b.SetByteCount(R__c, kTRUE);
    }
 }

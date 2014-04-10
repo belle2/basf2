@@ -63,7 +63,7 @@ ECLReconstructorModule::ECLReconstructorModule() : Module()
 {
   //Set module properties
   setDescription("Creates ECLRecShower from ECLDigi.");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 

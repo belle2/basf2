@@ -64,7 +64,7 @@ ECLMCMatchingModule::ECLMCMatchingModule() : Module()
 //  setDescription("ECLHitMakerModule");
 
   setDescription("ECLMCMatchingModule");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 
 }
 

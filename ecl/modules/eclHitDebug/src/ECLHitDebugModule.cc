@@ -57,7 +57,7 @@ ECLHitDebugModule::ECLHitDebugModule() : Module()
 //  setDescription("ECLDebugHitMakerModule");
 
   setDescription("ECLHitDebugModule");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 
 }
 

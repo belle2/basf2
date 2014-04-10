@@ -44,7 +44,7 @@ ECLGammaReconstructorModule::ECLGammaReconstructorModule() : Module()
 {
   //Set module properties
   setDescription("Creates ECLGamma from ECLShower.");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("gammaEnergyCut", m_ecut, "gamma enegy threshold ", 0.02);
   addParam("gammaE9o25Cut", m_e925cut, "gamma E9o25 threshold ", 0.75);

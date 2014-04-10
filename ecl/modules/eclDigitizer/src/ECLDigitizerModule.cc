@@ -54,7 +54,7 @@ ECLDigitizerModule::ECLDigitizerModule() : Module()
 {
   //Set module properties
   setDescription("Creates ECLDigiHits from ECLHits.");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 
 //  addParam("RandomSeed", m_randSeed, "User-supplied random seed; Default 0 for ctime", (unsigned int)(0));
 

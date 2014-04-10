@@ -52,7 +52,7 @@ ECLPi0ReconstructorModule::ECLPi0ReconstructorModule() : Module()
 {
   //Set module properties
   setDescription("Creates ECL_pi0 from ECL_gamma.");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 

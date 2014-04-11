@@ -59,16 +59,16 @@ namespace {
     void ReadEvtGenTable(const char* filename);
 
     /** copy&paste, except we create ParticlePDG to set lifetime and spin. */
-    TParticlePDG* AddParticle(const char* name, const char* title,
-                              Double_t mass, Bool_t stable,
-                              Double_t width, Double_t charge,
-                              const char* ParticleClass,
-                              Int_t PDGcode,
-                              Int_t Anti,
-                              Int_t TrackingCode,
-                              Double_t Lifetime,
-                              Double_t Spin
-                             ) {
+    TParticlePDG* AddParticleWithLifetimeAndSpin(const char* name, const char* title,
+                                                 Double_t mass, Bool_t stable,
+                                                 Double_t width, Double_t charge,
+                                                 const char* ParticleClass,
+                                                 Int_t PDGcode,
+                                                 Int_t Anti,
+                                                 Int_t TrackingCode,
+                                                 Double_t Lifetime,
+                                                 Double_t Spin
+                                                ) {
       //
       //  Particle definition normal constructor. If the particle is set to be
       //  stable, the decay width parameter does have no meaning and can be set to
@@ -119,12 +119,13 @@ TDatabasePDG* EvtGenDatabasePDG::Instance()
       B2ERROR("TDatabasePDG instance found? Replacing existing instance...")
     }
     //let's set the instance pointer to ourselves
-    fgInstance = new EvtGenDatabasePDG();
+    EvtGenDatabasePDG* instance = new EvtGenDatabasePDG();
+    fgInstance = instance;
 
     //ok, now load the data
     std::string fileName = std::getenv("BELLE2_EXTERNALS_DIR");
     fileName += "/share/evtgen/evt.pdl";
-    fgInstance->ReadEvtGenTable(fileName.c_str());
+    instance->ReadEvtGenTable(fileName.c_str());
     instanceCreated = true;
   }
   return TDatabasePDG::Instance();
@@ -183,17 +184,17 @@ void EvtGenDatabasePDG::ReadEvtGenTable(const char* filename)
         indec >> mass >> pwidth >> pmaxwidth >> chg3 >> spin2 >> ctau >> lundkc;
 
         const double c_mm_per_s = Const::speedOfLight / (Unit::mm / Unit::s);
-        TParticlePDG* part = AddParticle(pname,
-                                         pname,
-                                         mass,
-                                         0,
-                                         pwidth,
-                                         chg3,
-                                         "Unknown",
-                                         stdhepid,
-                                         0, 0, //anti, trackigCode
-                                         ctau / c_mm_per_s, // in seconds
-                                         spin2 / 2.0);
+        TParticlePDG* part = AddParticleWithLifetimeAndSpin(pname,
+                                                            pname,
+                                                            mass,
+                                                            0,
+                                                            pwidth,
+                                                            chg3,
+                                                            "Unknown",
+                                                            stdhepid,
+                                                            0, 0, //anti, trackigCode
+                                                            ctau / c_mm_per_s, // in seconds
+                                                            spin2 / 2.0);
         pdgToPartMap[stdhepid] = part;
       }
     }

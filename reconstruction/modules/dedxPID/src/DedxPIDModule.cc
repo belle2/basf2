@@ -237,7 +237,7 @@ void DedxPIDModule::event()
     if (m_enableDebugOutput or m_onlyPrimaryParticles) {
       if (num_mcparticles != 0) {
         //find MCParticle corresponding to this track
-        const MCParticle* mcpart = track->getRelatedFrom<MCParticle>();
+        const MCParticle* mcpart = track->getRelatedTo<MCParticle>();
 
         if (mcpart) {
           if (m_onlyPrimaryParticles && !mcpart->hasStatus(MCParticle::c_PrimaryParticle)) {

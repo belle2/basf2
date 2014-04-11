@@ -1,7 +1,11 @@
 Import('env')
 
-env['LIBS'] = ['$ROOT_LIBS', 'EG', 'XMLIO',
+env['LIBS'] = ['$ROOT_LIBS',
+               'EG', # for TDatabasePDG
+               'XMLIO', # for TBufferXML
                'boost_python', 'boost_filesystem', 'boost_regex', 'boost_iostreams',
-               '$PYTHON_LIBS', '$XML_LIBS', '$SQLITE_LIBS', '$MYSQL_LIBS' , '$PGSQL_LIBS','$ROOTSQL_LIBS', 'rt']
+               '$PYTHON_LIBS', '$XML_LIBS', '$SQLITE_LIBS', '$MYSQL_LIBS' , '$PGSQL_LIBS',
+               'rt' # for clock_gettime() on some systems
+               ]
 
 Return('env')

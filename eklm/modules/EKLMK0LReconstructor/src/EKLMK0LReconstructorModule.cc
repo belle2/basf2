@@ -250,7 +250,6 @@ static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
   RelationArray EKLMClustersToHits2d(k0lArray, hits2d);
   for (const EKLMHit2d * eklmHit : cluster) {
     k0l->addRelationTo(eklmHit);
-    std::cout << k0lArray.getEntries() << std::endl;
   }
 
 }

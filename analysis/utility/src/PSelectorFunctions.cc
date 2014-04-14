@@ -566,13 +566,7 @@ namespace Belle2 {
 
     double particleMCMatchStatus(const Particle* part)
     {
-      double result = 0.0;
-
       const MCParticle* mcparticle = part->getRelated<MCParticle>();
-
-      if (mcparticle == nullptr)
-        return result;
-
       return getMCTruthStatus(part, mcparticle);
     }
 

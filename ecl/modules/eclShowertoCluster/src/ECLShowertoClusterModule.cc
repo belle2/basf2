@@ -107,6 +107,9 @@ void ECLShowertoClusterModule::event()
     ECLShower* eclShower = eclShowerArray[i_Shower];
 
     StoreArray<ECLCluster> eclMdstArray;
+
+    if (i_Shower == 0) eclMdstArray.clear(); // This clar the previous
+    // stored data object of ECLCluster
     if (!eclMdstArray) eclMdstArray.create();
     new(eclMdstArray.nextFreeAddress()) ECLCluster();
     int i_Mdst = eclMdstArray.getEntries() - 1;
@@ -119,6 +122,7 @@ void ECLShowertoClusterModule::event()
       0,
       eclShower->getThetaError()
     };
+
     eclMdstArray[i_Mdst]->setEnedepSum(eclShower->getUncEnergy());
     eclMdstArray[i_Mdst]->setEnergy(eclShower->getEnergy());
     eclMdstArray[i_Mdst]->setTheta(eclShower->getTheta());
@@ -127,22 +131,29 @@ void ECLShowertoClusterModule::event()
     eclMdstArray[i_Mdst]->setE9oE25(eclShower->getE9oE25());
     eclMdstArray[i_Mdst]->setTiming(eclShower->getTime());
     eclMdstArray[i_Mdst]->setError(Mdst_Error);
-    RelationArray ECLClustertoShower(eclMdstArray, eclShowerArray);
-    ECLClustertoShower.add(i_Mdst, i_Shower);
 
+    //Problem in making relation from ECLCluster to ECLShower
+    // Guess: May be due to earlier ECLClustertoShower.
+    // To be work on Future: Vishal
+    /*
+    std::cout << i_Mdst << "\t" << i_Shower << endl;
+    std::cout << eclMdstArray[i_Mdst]->getEnergy() << "\t"
+        << eclShowerArray[i_Shower]->getEnergy() << "\n";
+    */
+    //    eclMdstArray[i_Mdst]->addRelationTo(eclShowerArray[i_Shower]);
+
+
+    const MCParticle* mcparticle = eclShower->getRelated<MCParticle>();
 
     // Relation of ECLClusterto MCParticle using ArrayIndex
-    // Giving error when running on charged for ECLClustertoMCParticle
-    //
-
-
-    RelationArray ECLClustertoMCParticle(eclMdstArray, MCArray);
-    for (auto MCpart : eclShower->getRelationsTo<MCParticle>()) {
-      const MCParticle* mcc =  eclShower->getRelatedTo<MCParticle>();
-      int mc_index = mcc->getArrayIndex();
-      //std::cout << " MCPart " << mcc->getPDG() <<"\t" <<  mcc->getArrayIndex() << endl;
+    if (mcparticle) {
+      RelationArray ECLClustertoMCParticle(eclMdstArray, MCArray);
+      int mc_index = mcparticle->getArrayIndex();
+      // std::cout << i_Mdst << "\t" << mc_index << endl;
       ECLClustertoMCParticle.add(i_Mdst, mc_index);
+      //eclMdstArray[i_Mdst]->addRelationTo(mcparticle);
     }
+
 
 
 
@@ -150,22 +161,24 @@ void ECLShowertoClusterModule::event()
     bool v_TrackHit = false;
     for (int i_track = 0; i_track < TrackArray.getEntries(); ++i_track) {
       Track* track = TrackArray[i_track];
-      i_eclShower = -99;
 
+      i_eclShower = -99;
       // Loop over the tracks and check for the ECLShower relation
       // If there is relation, get the showerId of ECLShower,
       // if the ShowerId matches with the above ECLShower loop
       // use it to get the ECLClustertoTracks
-      for (auto eclpart : track->getRelationsTo<ECLShower>()) {
-        const ECLShower* sho = track->getRelatedTo<ECLShower>();
+      const ECLShower* sho = track->getRelated<ECLShower>();
+
+      if (sho) {
         i_eclShower = sho->getShowerId();
         if (i_eclShower == eclShower->getShowerId()) {
-          //std::cout <<  i_track << "\t ECLShower " <<  i_eclShower <<  "\t" << eclShower->getShowerId()<< endl;
           RelationArray ECLClustertoTracks(eclMdstArray, TrackArray);
+          //  std::cout << i_Mdst << "\t" << i_track << endl;
           ECLClustertoTracks.add(i_Mdst, i_track);
+          //eclMdstArray[i_Mdst]->addRelationTo(track);
           v_TrackHit = true;
         } // logic to check the index of i_Shower and i_eclShower
-      } // eclpart
+      } // sho is not NULL
     } // i_track
     eclMdstArray[i_Mdst]->setisTrack(v_TrackHit);
   }// i_Shower

@@ -16,8 +16,10 @@ main = create_path()
 showertocluster = register_module('ECLShowertoCluster')
 
 rootinput = register_module('RootInput')
-# inFileROOT='/home/belle2/harat/MCsample/charged_e0001r0001_s00_BGx1.mdst.root'
-inFileROOT = '/home/belle2/harat/MCsample/mixed_e0001r0001_s00_BGx1.mdst.root'
+# now both files below work
+inFileROOT = \
+    '/home/belle2/harat/MCsample/charged_e0001r0001_s00_BGx1.mdst.root'
+# inFileROOT = '/home/belle2/harat/MCsample/mixed_e0001r0001_s00_BGx1.mdst.root'
 
 rootinput.param('inputFileName', inFileROOT)
 main.add_module(rootinput)

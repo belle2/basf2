@@ -84,6 +84,11 @@ class Function(object):
 
 
 class Sequence(object):
+    """
+    The Sequence contains all the Actors (Functions and Resources).
+    On run, the sequence solves the dependencies between the Actors
+    and calls them in the correct order.
+    """
 
     def __init__(self):
         """ Create a new Sequence """

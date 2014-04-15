@@ -79,7 +79,9 @@ namespace Belle2 {
     EXPECT_DOUBLE_EQ(1e300, aFilter.calcDist3D()); // does calc dist (outer - innerHit)^2!
 
     aFilter.resetValues(innerHit2, outerHit2);
-    EXPECT_DOUBLE_EQ(-0.95531661812450927816, aFilter.calcSlopeRZ());
+
+    EXPECT_DOUBLE_EQ(-atan(sqrt(2.)), aFilter.calcSlopeRZ());
+//     EXPECT_DOUBLE_EQ(-0.95531661812450927816, aFilter.calcSlopeRZ());
   }
 
 

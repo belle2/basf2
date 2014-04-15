@@ -74,7 +74,7 @@ namespace Belle2 {
 
     /** overloaded assignment operator */
     Sector& operator=(const Sector& aSector) {
-      m_myActiveSector = aSector.getMyActiveSector(),
+      m_myActiveSector = aSector.getMyActiveSector();
       m_sectorID = aSector.getSecID();
       m_distance2Origin = aSector.getDistance();
       m_useDistance4sort = aSector.useDistance4sort();

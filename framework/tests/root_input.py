@@ -15,8 +15,7 @@ class NoopModule(Module):
 
 # copy input file into current dir to avoid having the full path in .out file
 try:
-    shutil.copy(os.getenv('BELLE2_LOCAL_DIR')
-                + '/framework/tests/root_input.root', '.')
+    shutil.copy(Belle2.FileSystem.findFile('framework/tests/root_input.root'), '.')
 except:
     pass  # we're probably in tests/ directory, no copy necessary
 
@@ -32,8 +31,7 @@ input.param('branchNames', [
     'PXDClustersToPXDTrueHits',
     'PXDDigits',
     'PXDTrueHits',
-    'PXDClusters',
-    ])
+    'PXDClusters', ])
 input.param('excludeBranchNames', ['PXDClusters'])
 
 main = create_path()

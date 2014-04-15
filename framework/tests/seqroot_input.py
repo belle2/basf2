@@ -25,14 +25,12 @@ class TestModule(Module):
         for hit in simhits:
             relations = hit.getRelationsFrom("PXDTrueHits")
             for truehit in relations:
-                print 'truehit (edep: %g) => hit(edep: %g)' % \
-                           (truehit.getEnergyDep(), hit.getEnergyDep())
+                print 'truehit (edep: %g) => hit(edep: %g)' % (truehit.getEnergyDep(), hit.getEnergyDep())
 
 
 # copy input file into current dir to avoid having the full path in .out file
 try:
-    shutil.copy(os.getenv('BELLE2_LOCAL_DIR')
-                + '/framework/tests/seqroot_input.sroot', '.')
+    shutil.copy(Belle2.FileSystem.findFile('framework/tests/seqroot_input.sroot'), '.')
 except:
     pass  # we're probably in tests/ directory, no copy necessary
 

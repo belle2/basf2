@@ -54,12 +54,20 @@ void ModuleManager::addModuleSearchPath(const string& path)
     fullPath = boost::filesystem::system_complete(boost::filesystem::path(path));
     boost::filesystem::directory_iterator endIter;
 
+
+    map<string, string> moduleNameLibMap;
     for (boost::filesystem::directory_iterator dirItr(fullPath); dirItr != endIter; ++dirItr) {
       //Only files in the given folder are taken, subfolders are not used.
       if (boost::filesystem::is_regular_file(dirItr->status())) {
         if (boost::filesystem::extension(dirItr->path()) == MAP_FILE_EXTENSION) {
-          fillModuleNameLibMap(*dirItr);
+          fillModuleNameLibMap(moduleNameLibMap, *dirItr);
         }
+      }
+    }
+    //put modules into central map, if they haven't been  added yet
+    for (auto & entry : moduleNameLibMap) {
+      if (m_moduleNameLibMap.count(entry.first) == 0) {
+        m_moduleNameLibMap[entry.first] = entry.second;
       }
     }
 
@@ -152,7 +160,7 @@ ModulePtrList ModuleManager::getModulesByProperties(const ModulePtrList& moduleP
 //                              Private methods
 //============================================================================
 
-void ModuleManager::fillModuleNameLibMap(boost::filesystem::directory_entry& mapPath)
+void ModuleManager::fillModuleNameLibMap(std::map<std::string, std::string>& moduleNameLibMap, const boost::filesystem::directory_entry& mapPath)
 {
   //Check if the associated shared library file exists
   string sharedLibPath = boost::filesystem::change_extension(mapPath, LIB_FILE_EXTENSION).string();
@@ -181,8 +189,8 @@ void ModuleManager::fillModuleNameLibMap(boost::filesystem::directory_entry& map
     if (matchResult.size() == 2) {
       string moduleName(matchResult[1].first, matchResult[1].second);
       //Add result to map
-      if (m_moduleNameLibMap.count(moduleName) == 0) {
-        m_moduleNameLibMap.insert(make_pair(moduleName, sharedLibPath));
+      if (moduleNameLibMap.count(moduleName) == 0) {
+        moduleNameLibMap.insert(make_pair(moduleName, sharedLibPath));
       } else {
         B2ERROR("There seems to more than one module called '" << moduleName << "'. Since module names are unique, you must rename one of them!");
       }

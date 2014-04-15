@@ -84,6 +84,7 @@ namespace Belle2 {
      * If a module is requested by the method registerModule(), all module search paths
      * are scanned for the first occurrence of a shared library carrying the module
      * name in its filename.
+     * E.g modules in the path added with the first call to addModuleSearchPath() will take precedence over those added later on.
      *
      * @param path The module search path which should be added to the list of paths.
      */
@@ -156,9 +157,12 @@ namespace Belle2 {
     /**
      * Adds the module names defined in the map file to the list of known module names.
      *
+     * If the given map already contains this module, an error is raised
+     *
+     * @param moduleNameLibMap map to be filled.
      * @param mapPath The filename (path+name) of the map file which should be parsed for module names.
      */
-    void fillModuleNameLibMap(boost::filesystem::directory_entry& mapPath);
+    static void fillModuleNameLibMap(std::map<std::string, std::string>& moduleNameLibMap, const boost::filesystem::directory_entry& mapPath);
 
     /**
      * The constructor is hidden to avoid that someone creates an instance of this class.

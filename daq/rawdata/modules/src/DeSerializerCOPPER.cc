@@ -7,6 +7,7 @@
 //-
 
 #include <daq/rawdata/modules/DeSerializerCOPPER.h>
+#include <rawdata/CRCCalculator.h>
 
 #define CHECKEVT 10000
 //#define CHECK_SUM
@@ -624,6 +625,8 @@ void DeSerializerCOPPERModule::waitRestart()
 
 void DeSerializerCOPPERModule::event()
 {
+
+
 
 #ifdef NONSTOP
   if (g_run_recovery == 1) {

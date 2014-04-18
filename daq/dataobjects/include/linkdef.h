@@ -7,9 +7,5 @@
 
 #pragma link C++ class Belle2::SendHeader+;
 #pragma link C++ class Belle2::SendTrailer+;
-#pragma link C++ class Belle2::ReducedRawCOPPER+;
-#pragma link C++ class Belle2::ReducedRawHeader+;
-#pragma link C++ class Belle2::ReducedRawTrailer+;
-#pragma link C++ class Belle2::PreRawCOPPER+;
 
 #endif

@@ -26,7 +26,7 @@ set_log_level(LogLevel.ERROR)
 # input
 input = register_module('RootInput')
 # input = register_module('SeqRootInput')
-# input.param('inputFileName', 'RootOutput1.root')
+input.param('inputFileName', 'e0000r000366.sroot')
 
 # output
 output = register_module('PrintDataTemplate')
@@ -45,7 +45,7 @@ main = create_path()
 main.add_module(input)
 main.add_module(output)
 # main.add_module(hist)
-# main.add_module(dump)
+main.add_module(dump)
 
 # Process all events
 process(main)

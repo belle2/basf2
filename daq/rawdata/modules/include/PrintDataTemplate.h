@@ -41,7 +41,7 @@
 #include <daq/rawdata/modules/DAQConsts.h>
 #ifndef REDUCED_RAWCOPPER
 #else
-#include <daq/dataobjects/ReducedRawCOPPER.h>
+#include <rawdata/dataobjects/ReducedRawCOPPER.h>
 #endif
 
 #include <daq/dataobjects/SendHeader.h>

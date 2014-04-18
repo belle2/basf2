@@ -33,8 +33,8 @@
 #include <rawdata/dataobjects/RawBPID.h>
 #include <rawdata/dataobjects/RawKLM.h>
 #else
-#include <daq/dataobjects/PreRawCOPPER.h>
-#include <daq/dataobjects/ReducedRawCOPPER.h>
+#include <rawdata/dataobjects/PreRawCOPPER.h>
+#include <rawdata/dataobjects/ReducedRawCOPPER.h>
 #endif
 
 #include <rawdata/dataobjects/RawFTSW.h>

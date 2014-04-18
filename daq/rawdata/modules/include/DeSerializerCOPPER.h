@@ -33,7 +33,7 @@
 #ifndef REDUCED_RAWCOPPER
 #include <rawdata/dataobjects/RawCOPPER.h>
 #else
-#include <daq/dataobjects/PreRawCOPPER.h>
+#include <rawdata/dataobjects/PreRawCOPPER.h>
 #endif
 
 

@@ -9,7 +9,7 @@
 #ifndef DAQCONSTS_H
 #define DAQCONSTS_H
 
-#define REDUCED_RAWCOPPER
+//#define REDUCED_RAWCOPPER
 //#define NONSTOP
 //#define NONSTOP_DEBUG
 

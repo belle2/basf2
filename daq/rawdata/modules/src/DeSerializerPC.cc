@@ -15,7 +15,7 @@
 #define CHECKEVT 5000
 
 //#define DEBUG
-#define NO_DATA_CHECK
+//#define NO_DATA_CHECK
 //#define DUMHSLB
 
 using namespace std;

@@ -305,10 +305,16 @@ void PrintDataTemplateModule::event()
   //
   StoreArray<RawSVD> raw_svdarray;
   for (int i = 0; i < raw_svdarray.getEntries(); i++) {
+
+
     for (int j = 0; j < raw_svdarray[ i ]->GetNumEntries(); j++) {
-      printf("\n===== DataBlock(RawSVD) : Block # %d ", i);
+//       printf("\n===== DataBlock(RawSVD) : Block # %d : tempval %d", i,
+//       raw_svdarray[ i ]->m_temp_value );
+      printf("\n===== DataBlock(RawSVD) : Block # %d\n", i);
+
       printCOPPEREvent(raw_svdarray[ i ], j);
     }
+    //    raw_svdarray[ i ]->m_temp_value = 12345678 + i ;
   }
 
   //

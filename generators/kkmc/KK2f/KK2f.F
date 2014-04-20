@@ -83,7 +83,7 @@
          ENDDO
       ENDIF
       ninp = 13
-      OPEN(ninp,file=DiskFile,ACTION='read')
+      OPEN(ninp,file=DiskFile,STATUS='old',ACTION='read')
       IF(iTalk .EQ. 1) THEN
          WRITE(  *,*) '****************************'
          WRITE(  *,*) '*    KK2f_ReaDataX Starts  *'

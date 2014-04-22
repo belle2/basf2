@@ -92,24 +92,24 @@ void MonitorDataModule::event()
 
   for (int j = 0; j < ncpr; j++) {
     for (int i = 0; i < rawcprarray[ j ]->GetNumEntries(); i++) {
-      RawHeader rawhdr;
+
       int* buf;
       int size_byte = 0;
       buf = rawcprarray[ j ]->GetBuffer(i);
-      rawhdr.SetBuffer(rawcprarray[ j ]->GetRawHdrBufPtr(i));
+
       size_byte = rawcprarray[ j ]->GetBlockNwords(i) * sizeof(int);
       h_size->Fill((float)size_byte);
       h_size2d->Fill((float)size_byte, (float)j);
 
-      /*
-      printf("=== event====\n exp %d run %d eve %d copperNode %d type %d size %d byte\n",
-       rawhdr.GetExpNo(),
-       rawhdr.GetRunNo(),
-       rawhdr.GetEveNo(),
-       rawhdr.GetSubsysId(),
-       rawhdr.GetDataType(),
-       size_byte);
-      */
+
+//       printf("=== event====\n exp %d run %d eve %d copperNode %d type %d size %d byte\n",
+//        rawcprarray[ j ]->GetExpNo( i ),
+//        rawcprarray[ j ]->GetRunNo( i ),
+//        rawcprarray[ j ]->GetEveNo( i ),
+//        rawcprarray[ j ]->GetSubsysId( i ),
+//        rawcprarray[ j ]->GetDataType( i ),
+//        size_byte);
+
 
       int* finesse_buf_1st = rawcprarray[ j ]->Get1stFINESSEBuffer(i);
       int* finesse_buf_2nd = rawcprarray[ j ]->Get2ndFINESSEBuffer(i);

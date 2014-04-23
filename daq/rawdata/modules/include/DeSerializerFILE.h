@@ -50,9 +50,10 @@ namespace Belle2 {
     //! read data from file
     virtual int* readfromFILE(FILE* fp_in, const int size_word, const int start_word, const int stop_word);
 
+#ifndef REDUCED_RAWCOPPER
     //! read data from file
     virtual int* modify131213SVDdata(int* buf_in, int* buf_in_nwords, int* malloc_flag, unsigned int evenum);
-
+#endif
 
 
   protected :

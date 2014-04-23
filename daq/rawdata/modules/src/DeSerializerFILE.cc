@@ -7,6 +7,9 @@
 //-
 
 #include <daq/rawdata/modules/DeSerializerFILE.h>
+#ifdef REDUCED_RAWCOPPER
+#include <rawdata/dataobjects/RawCOPPERFormat_v1.h>
+#endif
 using namespace std;
 using namespace Belle2;
 
@@ -131,16 +134,31 @@ int* DeSerializerFILEModule::readOneDataBlock(int* malloc_flag, int* size_word, 
   if (temp_size_word == 0x7fff0008) {
     // 0x7fff0008 -> 2.1Gword. So this is too large for the length of one RawDataBlock.
     *data_type = COPPER_DATABLOCK;
-    int pos_data_length = RawCOPPER::POS_DATA_LENGTH;
+
+    int pos_data_length;
+#ifdef REDUCED_RAWCOPPER
+    pos_data_length = RawCOPPERFormat_v1::POS_DATA_LENGTH;
+#else
+    pos_data_length = RawCOPPER::POS_DATA_LENGTH;
+#endif
     start_word = 0;
     stop_word = pos_data_length;
     int* length_buf = readfromFILE(m_fp_in, pos_data_length, start_word, stop_word);
 
+#ifdef REDUCED_RAWCOPPER
+    *size_word = length_buf[ pos_data_length - 1 ] +
+                 RawCOPPERFormat_v1::SIZE_COPPER_DRIVER_HEADER + RawCOPPERFormat_v1::SIZE_COPPER_DRIVER_TRAILER
+                 + RawCOPPERFormat_v1::RAWHEADER_NWORDS + RawCOPPERFormat_v1::RAWTRAILER_NWORDS;
+    start_word = 1 + pos_data_length + RawCOPPERFormat_v1::RAWHEADER_NWORDS;
+    stop_word = *size_word - RawCOPPERFormat_v1::RAWTRAILER_NWORDS;
+#else
     *size_word = length_buf[ pos_data_length - 1 ] +
                  RawCOPPER::SIZE_COPPER_DRIVER_HEADER + RawCOPPER::SIZE_COPPER_DRIVER_TRAILER
                  + RawHeader::RAWHEADER_NWORDS + RawTrailer::RAWTRAILER_NWORDS;
     start_word = 1 + pos_data_length + RawHeader::RAWHEADER_NWORDS;
     stop_word = *size_word - RawTrailer::RAWTRAILER_NWORDS;
+#endif
+
     temp_buf = readfromFILE(m_fp_in, *size_word, start_word, stop_word);
 
     temp_buf[ RawHeader::RAWHEADER_NWORDS ] = 0x7fff0008;
@@ -196,7 +214,7 @@ int* DeSerializerFILEModule::readfromFILE(FILE* fp_in, const int size_word, cons
 }
 
 
-
+#ifndef REDUCED_RAWCOPPER
 int* DeSerializerFILEModule::modify131213SVDdata(int* buf_in, int* buf_in_nwords, int* malloc_flag, unsigned int evenum)
 {
 
@@ -303,7 +321,7 @@ int* DeSerializerFILEModule::modify131213SVDdata(int* buf_in, int* buf_in_nwords
 
   return buf_out;
 }
-
+#endif
 
 
 void DeSerializerFILEModule::event()
@@ -358,12 +376,14 @@ void DeSerializerFILEModule::event()
       //
       // To make a RawSVD dummy file from data sent by Nakamura-san on Dec. 13, 2013
       //
+#ifndef REDUCED_RAWCOPPER
       {
         int* temp_temp_buf = modify131213SVDdata(temp_buf, &size_word, &malloc_flag, m_dummy_evenum);
         delete temp_buf;
         temp_buf = temp_temp_buf;
         m_dummy_evenum++;
       }
+#endif
 
       if (data_type == COPPER_DATABLOCK) {
 

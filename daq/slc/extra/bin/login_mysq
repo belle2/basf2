@@ -1,0 +1,3 @@
+#!/bin/bash
+
+mysql -u slcdaq -h ropc01.kek.jp -p -D b2slow_test

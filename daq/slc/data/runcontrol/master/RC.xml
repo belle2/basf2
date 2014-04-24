@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object name="RC" revision="6" >
+  <int name="EXPRECO" value="1" synchronized="false" />
+  <int name="DSR" value="1" synchronized="false" />
+  <int name="HLT" value="1" synchronized="false" />
+  <int name="SVD" value="1" synchronized="false" />
+  <int name="PXD" value="1" synchronized="false" />
+  <object name="TTD" class="TTD" host="ttd3" ftsw="48" synchronized="true" />
+</object>

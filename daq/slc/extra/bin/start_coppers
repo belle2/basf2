@@ -1,0 +1,15 @@
+#!/bin/bash
+
+label=`date +%Y-%m-%d`
+
+restartBySSH() {
+  mkdir -p ~/run/$2/$1
+  ssh $1 "killall $2; killall basf2"
+  ssh $1 "source ~/belle2/release/daq/slc/extra/bin/setup.sh ~/belle2 release local $2 $3 $4 " &
+}
+
+source ~/belle2/release/daq/slc/extra/bin/setup.sh ~/belle2 release local rocontrold ROPC01 svd
+
+restartBySSH cpr010 cprcontrold CPR010 svd
+restartBySSH cpr011 cprcontrold CPR011 svd
+

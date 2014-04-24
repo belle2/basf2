@@ -1,0 +1,12 @@
+Import('env')
+
+env['TOOLS_LIBS']['envmonitord'] = ['pthread', 'dl', '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['dbmond'] = ['pthread', '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+
+env['TOOLS_LIBS']['datasender'] = ['pthread', 'dl', 'daq', 
+ 				   'framework', 'nsm2_b2lib', 'nsm2_corelib']
+
+env['TOOLS_LIBS']['nsmsender'] = ['pthread', 'dl', 'daq', 
+ 			          'framework', 'nsm2_b2lib', 'nsm2_corelib']
+
+Return('env')

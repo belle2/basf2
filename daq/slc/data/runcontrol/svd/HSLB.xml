@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object class="HSLB" revision="1" >
+  <text name="firmware" value="hslb.bit" />
+  <enum name="trigger_mode" options="SIMPLE:7,VERBOSE:8" value="SIMPLE" />
+</object>

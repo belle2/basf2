@@ -1,0 +1,56 @@
+#include "daq/slc/nsm/NSMCallback.h"
+
+#include "daq/slc/system/LogFile.h"
+
+#include "daq/slc/nsm/NSMCommunicator.h"
+
+#include <signal.h>
+#include <string.h>
+#include <cstdlib>
+
+using namespace Belle2;
+
+NSMCallback::NSMCallback(const NSMNode& node, int timeout) throw()
+  : _node(node), _comm(NULL)
+{
+  add(NSMCommand::OK);
+  add(NSMCommand::ERROR);
+  add(NSMCommand::FATAL);
+  add(NSMCommand::LOG);
+  add(NSMCommand::STATE);
+  _timeout = timeout;
+}
+
+bool NSMCallback::isReady() const throw()
+{
+  return _comm != NULL && _comm->isOnline();
+}
+
+bool NSMCallback::perform(const NSMMessage& msg)
+throw()
+{
+  const NSMCommand cmd = msg.getRequestName();
+  if (cmd == NSMCommand::OK) {
+    return ok();
+  } else if (cmd == NSMCommand::ERROR) {
+    return error();
+  } else if (cmd == NSMCommand::FATAL) {
+    return fatal();
+  } else if (cmd == NSMCommand::LOG) {
+    return error();
+  } else if (cmd == NSMCommand::STATE) {
+    return state();
+  }
+  return false;
+}
+
+NSMMessage& NSMCallback::getMessage()
+{
+  return _comm->getMessage();
+}
+
+void NSMCallback::setMessage(NSMMessage& msg)
+{
+  _comm->setMessage(msg);
+}
+

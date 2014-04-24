@@ -1,0 +1,30 @@
+#ifndef _Belle2_LogListener_hh
+#define _Belle2_LogListener_hh
+
+namespace Belle2 {
+
+  class ProcessController;
+
+  class LogListener {
+
+  public:
+    LogListener(ProcessController* con, int pipe[2])
+      : _con(con) {
+      _pipe[0] = pipe[0];
+      _pipe[1] = pipe[1];
+    }
+    ~LogListener() {}
+
+  public:
+    void run();
+
+  private:
+    ProcessController* _con;
+    int _pipe[2];
+
+  };
+
+}
+
+#endif
+

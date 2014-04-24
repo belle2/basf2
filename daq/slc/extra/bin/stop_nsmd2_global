@@ -1,0 +1,10 @@
+#!/bin/bash
+
+stopBySSH() {
+  ssh $1 "~/belle2/release/daq/slc/extra/bin/kill_nsmd2.sh $2"
+}
+
+stopBySSH belle-rpc2 global
+sleep 2
+stopBySSH belle-reco global
+

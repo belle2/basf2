@@ -1,0 +1,4 @@
+#!/bin/bash
+
+java -Xms2048m -Xmx2048m -classpath ~/belle2/release/daq/slc/extra/javalib/b2gui/jars/b2gui-exe.jar\
+ b2dqm.java.Belle2DQMBrowser belle-rpc2 50100 >& dqmgui.log &

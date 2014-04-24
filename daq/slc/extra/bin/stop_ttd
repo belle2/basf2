@@ -1,4 +1,0 @@
-#!/bin/bash
-
-ssh ttd10 "killall pocket_ttd"
-

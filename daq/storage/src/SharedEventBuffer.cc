@@ -1,6 +1,5 @@
 #include "daq/storage/SharedEventBuffer.h"
 
-#include <daq/slc/base/Debugger.h>
 #include <daq/slc/system/LogFile.h>
 
 #include <cstring>
@@ -21,7 +20,7 @@ bool SharedEventBuffer::open(const std::string& nodename,
   _nword = nword;
   std::string username = getenv("USER");
   _path = "/storage_info_" + username + "_" + nodename;
-  Belle2::debug("%s", _path.c_str());
+  LogFile::debug("%s", _path.c_str());
   if (recreate) SharedMemory::unlink(_path);
   if (!_memory.open(_path, size())) {
     perror("shm_open");

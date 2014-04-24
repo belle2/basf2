@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<object class="ROPC" revision="1" >
-  <text name="script" value="RecvSendCOPPER.py" priority="BOOT" /> 
-  <text name="hosts" value="" priority="BOOT" /> 
-</object>

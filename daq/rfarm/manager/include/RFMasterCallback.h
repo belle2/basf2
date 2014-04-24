@@ -11,12 +11,14 @@ namespace Belle2 {
   class RFMasterCallback : public NSMCallback {
 
   public:
-    RFMasterCallback(NSMNode* node, NSMData* data, RFMaster* master);
+    RFMasterCallback(const NSMNode& node,
+                     const NSMData& data,
+                     RFMaster* master);
     virtual ~RFMasterCallback() throw();
 
   public:
-    virtual bool perform(const Command& command, NSMMessage& msg)
-    throw(NSMHandlerException);
+    virtual bool perform(const NSMMessage& msg)
+    throw();
     virtual void init() throw();
     virtual bool ok() throw();
     virtual bool error() throw();
@@ -30,7 +32,7 @@ namespace Belle2 {
     virtual bool status() throw();
 
   private:
-    NSMData* _data;
+    NSMData _data;
     RFMaster* _master;
 
   };

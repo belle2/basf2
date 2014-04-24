@@ -1,6 +1,0 @@
-#!/bin/bash
-
-label=`date +%Y-%m-%d-%H-%M`
-
-ssh belle-rpc1 "source ~/belle2/release/daq/slc/extra/bin/setup.sh ~/belle2 release global nsmd2 -m 2 &> /dev/null &" 
-

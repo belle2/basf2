@@ -1,5 +1,0 @@
-Import('env')
-
-env['TOOLS_LIBS']['tempd'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib', 'pthread']
-
-Return('env')

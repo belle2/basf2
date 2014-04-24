@@ -1,8 +1,0 @@
-Import('env')
-
-env['TOOLS_LIBS']['rocontrold'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib', 'pthread']
-env['TOOLS_LIBS']['dummy_basf2'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib', 'pthread']
-env['TOOLS_LIBS']['run_log_receive'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib', 'pthread']
-env['TOOLS_LIBS']['run_log_send'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib', 'pthread']
-
-Return('env')

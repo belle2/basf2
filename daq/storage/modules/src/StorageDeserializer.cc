@@ -15,7 +15,6 @@
 
 #include <rawdata/dataobjects/RawPXD.h>
 
-#include <daq/slc/base/Debugger.h>
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/system/Time.h>
 

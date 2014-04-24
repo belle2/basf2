@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<object class="CDC_Readout" revision="1" extends="HSLB" >
-  <int name="window" address="0x63" value="4" />
-  <int name="delay" address="0x64" value="4" />
-  <int name="tdc" address="0x65" value="3700" size="2" />
-  <int name="adc" address="0x61" value="-1" size="2" />
-  <int_array name="pedestal" address="0x01" length="48" size="2" value="-1" />
-</object>

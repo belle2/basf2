@@ -18,8 +18,6 @@
 #include "daq/slc/system/TCPServerSocket.h"
 #include "daq/slc/system/Time.h"
 
-#include "daq/slc/base/Debugger.h"
-
 using namespace Belle2;
 using namespace std;
 
@@ -28,7 +26,7 @@ using namespace std;
 int main(int argc, char** argv)
 {
   if (argc < 4) {
-    Belle2::debug("ds_socket2rb : filename hostname port\n");
+    printf("ds_socket2rb : filename hostname port\n");
     return 1;
   }
 

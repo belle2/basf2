@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<object class="TTD" revision="2" >
-  <text name="host" value="" priority="BOOT" /> 
-  <int name="port" value="33000" priority="BOOT" /> 
-  <object name="ftsw" class="FTSW" channel="48" priority="BOOT" />
-</object>

@@ -1,13 +1,13 @@
 #ifndef _Belle2_RFCommand_hh
 #define _Belle2_RFCommand_hh
 
-#include "daq/slc/base/Command.h"
+#include "daq/slc/nsm/NSMCommand.h"
 
 namespace Belle2 {
 
   class State;
 
-  class RFCommand : public Command {
+  class RFCommand : public NSMCommand {
 
   public:
     static const RFCommand RF_CONFIGURE;
@@ -21,15 +21,15 @@ namespace Belle2 {
 
   public:
     RFCommand() throw() {}
-    RFCommand(const Enum& e) throw() : Command(e) {}
-    RFCommand(const Command& cmd) throw() : Command(cmd) {}
-    RFCommand(const RFCommand& cmd) throw() : Command(cmd) {}
+    RFCommand(const Enum& e) throw() : NSMCommand(e) {}
+    RFCommand(const NSMCommand& cmd) throw() : NSMCommand(cmd) {}
+    RFCommand(const RFCommand& cmd) throw() : NSMCommand(cmd) {}
     RFCommand(const char* label) throw() { *this = label; }
     ~RFCommand() throw() {}
 
   protected:
-    RFCommand(int id, const char* label, const char* alias)
-    throw() : Command(id, label, alias) {}
+    RFCommand(int id, const char* label)
+    throw() : NSMCommand(id, label) {}
 
   public:
     //virtual int isAvailable(const State& state) const throw();

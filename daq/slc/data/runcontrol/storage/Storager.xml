@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<object class="Storager" revision="1" >
-  <text name="fromhost" value="ropc02" />
-  <int name="fromport" value="3333" />
-  <text name="tohost" value="ropc02" />
-  <int name="toport" value="3334" />
-  <text name="script" value="DataStorager.py" /> 
-</object>

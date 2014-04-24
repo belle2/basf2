@@ -20,7 +20,6 @@
 #include <daq/slc/system/TCPSocket.h>
 #include <daq/slc/system/TCPSocketReader.h>
 #include <daq/slc/system/Time.h>
-#include <daq/slc/base/Debugger.h>
 
 using namespace Belle2;
 

@@ -1,7 +1,6 @@
 #include "daq/storage/ONSENBinData.h"
 
 #include <daq/slc/base/StringUtil.h>
-#include <daq/slc/base/Debugger.h>
 
 #include <arpa/inet.h>
 #include <cstring>

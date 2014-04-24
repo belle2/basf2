@@ -1,8 +1,0 @@
-Import('env')
-
-env['TOOLS_LIBS']['storagerd'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
-env['TOOLS_LIBS']['storagemonitor'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
-env['TOOLS_LIBS']['storagemonitor_dummy'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
-env['TOOLS_LIBS']['storagemonitor_read'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
-
-Return('env')

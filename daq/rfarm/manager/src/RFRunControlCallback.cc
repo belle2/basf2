@@ -4,15 +4,14 @@
 #include "daq/rfarm/manager/RFMasterCallback.h"
 
 #include <daq/slc/nsm/NSMCommunicator.h>
-#include <daq/slc/base/Debugger.h>
 #include <daq/slc/base/StringUtil.h>
-#include <daq/slc/base/State.h>
 
 #include <unistd.h>
 
 using namespace Belle2;
 
-RFRunControlCallback::RFRunControlCallback(NSMNode* node, RFMaster* master,
+RFRunControlCallback::RFRunControlCallback(const NSMNode& node,
+                                           RFMaster* master,
                                            RFMasterCallback* callback)
   : RCCallback(node), _master(master), _callback(callback)
 {
@@ -25,7 +24,6 @@ RFRunControlCallback::~RFRunControlCallback() throw()
 
 bool RFRunControlCallback::boot() throw()
 {
-  Belle2::debug("BOOT");
   NSMmsg* msg = getCommunicator()->getMessage().getMsg();
   NSMcontext* nsmc =  _callback->getCommunicator()->getContext();
   b2nsm_context(nsmc);
@@ -35,7 +33,6 @@ bool RFRunControlCallback::boot() throw()
 
 bool RFRunControlCallback::load() throw()
 {
-  Belle2::debug("LOAD");
   NSMcontext* nsmc =  _callback->getCommunicator()->getContext();
   b2nsm_context(nsmc);
   return true;
@@ -43,7 +40,6 @@ bool RFRunControlCallback::load() throw()
 
 bool RFRunControlCallback::start() throw()
 {
-  Belle2::debug("START");
   NSMmsg* msg = getCommunicator()->getMessage().getMsg();
   NSMcontext* nsmc =  _callback->getCommunicator()->getContext();
   b2nsm_context(nsmc);
@@ -53,7 +49,6 @@ bool RFRunControlCallback::start() throw()
 
 bool RFRunControlCallback::stop() throw()
 {
-  Belle2::debug("STOP");
   NSMmsg* msg = getCommunicator()->getMessage().getMsg();
   NSMcontext* nsmc =  _callback->getCommunicator()->getContext();
   b2nsm_context(nsmc);
@@ -63,7 +58,6 @@ bool RFRunControlCallback::stop() throw()
 
 bool RFRunControlCallback::recover() throw()
 {
-  Belle2::debug("RECOVER");
   NSMcontext* nsmc =  _callback->getCommunicator()->getContext();
   b2nsm_context(nsmc);
   return (abort() && boot() && load());
@@ -71,7 +65,6 @@ bool RFRunControlCallback::recover() throw()
 
 bool RFRunControlCallback::abort() throw()
 {
-  Belle2::debug("ABORT");
   NSMmsg* msg = getCommunicator()->getMessage().getMsg();
   NSMcontext* nsmc =  _callback->getCommunicator()->getContext();
   b2nsm_context(nsmc);

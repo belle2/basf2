@@ -5,15 +5,15 @@
 #include "daq/rfarm/manager/RFNSM.h"
 
 #include <daq/slc/nsm/NSMCommunicator.h>
-#include <daq/slc/base/Debugger.h>
+
 #include <daq/slc/base/StringUtil.h>
-#include <daq/slc/base/State.h>
 
 #include <unistd.h>
 
 using namespace Belle2;
 
-RFMasterCallback::RFMasterCallback(NSMNode* node, NSMData* data, RFMaster* master)
+RFMasterCallback::RFMasterCallback(const NSMNode& node, const NSMData& data,
+                                   RFMaster* master)
   : NSMCallback(node), _data(data), _master(master)
 {
 }
@@ -23,13 +23,13 @@ RFMasterCallback::~RFMasterCallback() throw()
 
 }
 
-bool RFMasterCallback::perform(const Command& cmd, NSMMessage&)
-throw(NSMHandlerException)
+bool RFMasterCallback::perform(const NSMMessage& msg) throw()
 {
+  RFCommand cmd(msg.getRequestName());
   setReply("");
-  if (cmd == Command::OK) {
+  if (cmd == NSMCommand::OK) {
     return ok();
-  } else if (cmd == Command::ERROR) {
+  } else if (cmd == NSMCommand::ERROR) {
     return error();
   }
   bool result = false;
@@ -52,18 +52,18 @@ throw(NSMHandlerException)
     result = status();
   }
   if (result) {
-    com->replyOK(_node, _reply);
+    com->replyOK(getNode());
     return true;
   } else {
-    _node->setState(State::ERROR_ES);
-    com->replyError(_reply);
+    //getNode().setState(NSMState::ERROR_ES);
+    com->replyError(getReply());
   }
   return false;
 }
 
 void RFMasterCallback::init() throw()
 {
-  _master->SetNodeInfo((RfNodeInfo*)_data->get());
+  _master->SetNodeInfo((RfNodeInfo*)_data.get());
 }
 
 bool RFMasterCallback::ok() throw()

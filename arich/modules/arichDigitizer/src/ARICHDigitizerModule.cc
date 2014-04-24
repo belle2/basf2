@@ -37,7 +37,7 @@ namespace Belle2 {
   //                 Register the Module
   //-----------------------------------------------------------------
 
-  REG_MODULE(ARICHDigitizer);
+  REG_MODULE(ARICHDigitizer)
 
 
   //-----------------------------------------------------------------

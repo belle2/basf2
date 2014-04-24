@@ -27,11 +27,14 @@ namespace Belle2 {
 
   public:
 
-
-    //! Constructor.
+    /**
+     * Constructor.
+     */
     ARICHDigitizerModule();
 
-    //! Destructor.
+    /**
+     *   Destructor.
+     */
     virtual ~ARICHDigitizerModule();
 
     /**

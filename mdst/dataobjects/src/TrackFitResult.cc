@@ -122,9 +122,10 @@ void TrackFitResult::cartesianToPerigee(const TVector3& position, const TVector3
   const double positionPerp = position.Perp();
   const double momentumPerp2 = momentum.Perp2();
   const double momentumPerp3 = std::pow(momentum.Perp(), 3);
+  const double signD0 = m_tau[0] > 0 ? 1 : -1;
 
-  A(0, 0) = position.X() / positionPerp;
-  A(0, 1) = position.Y() / positionPerp;
+  A(0, 0) = signD0 * position.X() / positionPerp;
+  A(0, 1) = signD0 * position.Y() / positionPerp;
   A(1, 3) = -momentum.Py() / momentumPerp2;
   A(1, 4) = momentum.Px() / momentumPerp2;
   A(2, 3) = -momentum.Px() / (alpha * momentumPerp3);

@@ -17,6 +17,11 @@ namespace Belle2 {
     uint32 nnodes;
     uint32 state;
     uint32 configid;
+    uint32 expno;
+    uint32 runno;
+    uint32 subno;
+    uint32 stime;
+    uint32 ctime;
   };
 
 }

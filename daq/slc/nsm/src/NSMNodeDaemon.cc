@@ -44,13 +44,15 @@ void NSMNodeDaemon::init() throw(NSMHandlerException)
     _callback[0]->init();
     if (_callback[1] != NULL) _callback[1]->init();
   } catch (const NSMHandlerException& e) {
-    LogFile::fatal("Failed to connect NSM network (%s:%d). Terminating process ",
+    LogFile::fatal("Failed to connect NSM network (%s:%d). "
+                   "Terminating process ",
                    _host.c_str(), _port);
     delete _nsm_comm;
     _nsm_comm = NULL;
     exit(1);
   }
-  LogFile::debug("Connected to NSM2 daemon (%s:%d)", _host.c_str(), _port);
+  LogFile::debug("Connected to NSM2 daemon (%s:%d)",
+                 _host.c_str(), _port);
 }
 
 void NSMNodeDaemon::run() throw()

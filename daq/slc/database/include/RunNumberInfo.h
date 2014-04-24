@@ -19,7 +19,7 @@ namespace Belle2 {
     int getRunNumber() const throw() { return m_runno; }
     int getSubNumber() const throw() { return m_subno; }
     int getId() const throw() { return m_id; }
-    long long setRecordTime() const throw() { return m_record_time; }
+    long long getRecordTime() const throw() { return m_record_time; }
     void setExpNumber(int expno) throw() { m_expno = expno; }
     void setRunNumber(int runno) throw() { m_runno = runno; }
     void setSubNumber(int subno) throw() { m_subno = subno; }

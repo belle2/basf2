@@ -69,7 +69,8 @@ RunNumberInfoList RunNumberInfoTable::getList(int expno, int runno, int subno)
       if (runno > 0) ss << " and runno = " << runno;
       if (subno > 0) ss << " and subno = " << subno;
       m_db->execute("select id, expno, runno, subno from runnumberinfo "
-                    "where %s order by id desc, expno desc, runno desc, subno desc;",
+                    "where %s order by id desc, expno desc, runno desc, "
+                    "subno desc;",
                     ss.str().c_str());
       DBRecordList record_v(m_db->loadRecords());
       for (size_t i = 0; i < record_v.size(); i++) {

@@ -33,10 +33,11 @@ DBObject::~DBObject() throw()
 
 void DBObject::print() const throw()
 {
+  std::cout << getTable() << ":" << getRevision() << std::endl;
   const FieldNameList& name_v(getFieldNames());
   for (size_t ii = 0; ii < m_name_v.size(); ii++) {
     std::string name = name_v.at(ii);
-    std::cout << name << " ";
+    std::cout << name << " : ";
     FieldInfo::Type type = getProperty(name).getType();
     switch (type) {
       case FieldInfo::BOOL:   std::cout << getBool(name); break;
@@ -49,7 +50,7 @@ void DBObject::print() const throw()
       case FieldInfo::TEXT:   std::cout << getText(name); break;
       case FieldInfo::OBJECT: {
         size_t nobj = getNObjects(name);
-        for (size_t i = 0; i < nobj; i++) getObject(name).print();
+        for (size_t i = 0; i < nobj; i++) getObject(name, i).print();
         break;
       }
       case FieldInfo::ENUM:   std::cout << getEnum(name); break;
@@ -65,7 +66,8 @@ void DBObject::print() const throw()
       case FieldInfo::NSM_DOUBLE: std::cout << getDouble(name); break;
       case FieldInfo::NSM_OBJECT: {
         size_t nobj = getNObjects(name);
-        for (size_t i = 0; i < nobj; i++) getObject(name).print();
+        std::cout << std::endl;
+        for (size_t i = 0; i < nobj; i++) getObject(name, i).print();
         break;
       }
     }

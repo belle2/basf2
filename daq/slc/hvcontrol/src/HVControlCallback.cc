@@ -4,6 +4,7 @@
 #include "daq/slc/hvcontrol/hv_status.h"
 
 #include <daq/slc/database/ConfigObjectTable.h>
+#include <daq/slc/database/LoggerObjectTable.h>
 
 #include <daq/slc/nsm/NSMCommunicator.h>
 
@@ -137,6 +138,9 @@ void HVControlCallback::monitor() throw()
              (count >= 10 && s != HVState::OFF_S)) {
     getCommunicator()->replyOK(getNode());
   }
+  m_db->connect();
+  LoggerObjectTable(m_db).add(m_data);
+  m_db->close();
   if (count >= 10) count = 0;
 }
 

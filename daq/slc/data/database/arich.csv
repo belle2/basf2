@@ -1,0 +1,10 @@
+nodename, config,  crate,  slot,  channel,  turnon,  rampup_speed,  rampdown_speed,  voltage_limit,  current_limit, voltage_demand_0, voltage_demand_1, voltage_demand_2, voltage_demand_3, reserved_0, reserved_1, reserved_2, reserved_3
+ARICH_HV,default,0,1,1,true,10,10,0,300,1000,1200,1500,2000,0,0,0,0
+ARICH_HV,default,0,2,1,true,10,10,0,300,1000,1200,1500,2000,0,0,0,0
+ARICH_HV,default,0,3,1,true,10,10,0,300,1000,1200,1500,2000,0,0,0,0
+ARICH_HV,default,0,4,1,true,10,10,0,300,1000,1200,1500,2000,0,0,0,0
+ARICH_HV,default,0,5,1,true,10,10,0,300,1000,1200,1500,2000,0,0,0,0
+ARICH_HV,default,0,6,1,true,10,10,0,300,1000,1200,1500,2000,0,0,0,0
+ARICH_HV,default,0,7,1,true,10,10,0,300,1000,1200,1500,2000,0,0,0,0
+ARICH_HV,default,0,8,1,true,10,10,0,300,1000,1200,1500,2000,0,0,0,0
+ARICH_HV,default,0,9,1,true,10,10,0,300,1000,1200,1500,2000,0,0,0,0

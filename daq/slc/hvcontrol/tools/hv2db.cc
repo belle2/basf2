@@ -99,9 +99,9 @@ public:
       rewind(stdout);
       ftruncate(1, 0);
       nsmget(m_hvnode.getName(), (hv_status*)m_data.get());
-      m_db->connect();
-      LoggerObjectTable(m_db).add(m_data);
-      m_db->close();
+      //m_db->connect();
+      //LoggerObjectTable(m_db).add(m_data, true);
+      //m_db->close();
       sleep(5);
     }
   }
@@ -139,7 +139,7 @@ int main(int argc, char** argv)
   ConfigInfo cinfo = ConfigInfoTable(db).get(status->configid);
   ConfigObjectTable table(db);
   ConfigObject obj = table.get(cinfo.getName(), hvnodename);
-  LoggerObjectTable(db).add(data);
+  //LoggerObjectTable(db).add(data);
   db->close();
 
   NSMListener(comm, node, hvnode, data, db).run();

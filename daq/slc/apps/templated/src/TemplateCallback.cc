@@ -49,10 +49,9 @@ bool TemplateCallback::load() throw()
 bool TemplateCallback::start() throw()
 {
   NSMMessage& msg(getMessage());
-  std::cout << msg.getNParams() << std::endl;
-  std::cout << msg.getParam(0) << std::endl;
-  std::cout << msg.getParam(1) << std::endl;
-  std::cout << msg.getParam(2) << std::endl;
+  LogFile::debug("run # = %04d.%04d.%03d",
+                 msg.getParam(0), msg.getParam(1),
+                 msg.getParam(2));
   return true;
 }
 

@@ -80,19 +80,19 @@ $$ language plpgsql;
 
 
 create table groupinfo (
-  record_time timestamp not null default current_timestamp,
+  record_time timestamp with time zone not null default current_timestamp,
   id serial primary key, name text not null unique
 );
 
 create table nodeinfo (
-  record_time timestamp not null default current_timestamp,
+  record_time timestamp with time zone not null default current_timestamp,
   id serial primary key, name text not null, 
   groupid int not null references groupinfo(id), 
   unique (name, groupid)
 );
 
 create table runnumberinfo (
-  record_time timestamp not null default current_timestamp,
+  record_time timestamp with time zone not null default current_timestamp,
   id serial primary key not null,
   expno int not null, 
   runno int not null, 
@@ -104,7 +104,7 @@ create table runnumberinfo (
 );
 
 create table tableinfo (
-  record_time timestamp not null default current_timestamp,
+  record_time timestamp with time zone not null default current_timestamp,
   id serial primary key, 
   name text not null, 
   isconfig boolean not null,
@@ -114,7 +114,7 @@ create table tableinfo (
 );
 
 create table fieldinfo (
-  record_time timestamp not null default current_timestamp,
+  record_time timestamp with time zone not null default current_timestamp,
   id serial primary key, 
   name text not null, 
   tableid int references tableinfo(id), 
@@ -158,7 +158,7 @@ create table "fieldinfo.type.enum" (
 );
 
 create table configinfo (
-  record_time timestamp not null default current_timestamp, 
+  record_time timestamp with time zone not null default current_timestamp, 
   id serial primary key, 
   name text not null, 
   nodeid int references nodeinfo(id) not null, 
@@ -167,7 +167,7 @@ create table configinfo (
 );
 
 create table loggerinfo (
-  record_time timestamp not null default current_timestamp, 
+  record_time timestamp with time zone not null default current_timestamp, 
   id bigserial primary key, 
   runnumberid int references runnumberinfo(id), 
   nodeid int references nodeinfo(id), 
@@ -277,7 +277,7 @@ create or replace function fieldalias(int) returns text as $$
 $$ language sql;
 
 create table fieldinfo_names (
-  record_time timestamp,
+  record_time timestamp with time zone,
   id int references fieldinfo(id),
   "table" text,
   revision int,
@@ -287,7 +287,7 @@ create table fieldinfo_names (
 );
 
 create table fieldinfo_names2 (
-  record_time timestamp,
+  record_time timestamp with time zone,
   id int references fieldinfo(id),
   "table" text,
   revision int,
@@ -360,7 +360,7 @@ create or replace function configid(text, text) returns int as $$
 $$ language sql;
 
 create table configinfo_names (
-  record_time timestamp,
+  record_time timestamp with time zone,
   id int references configinfo(id),
   name text,
   node text,
@@ -427,7 +427,7 @@ create or replace function addlogger(text, text) returns bigint as $$
 $$ language sql;
 
 create table loggerinfo_names (
-  record_time timestamp, 
+  record_time timestamp with time zone, 
   id bigint references loggerinfo(id),
   node text,
   "table" text

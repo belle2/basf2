@@ -1,0 +1,3 @@
+  nodename,  config,  copper_id,    host,  productid,             script,     hslb
+    CPR010, default,          1,  cpr001,     100001,  RecvSendCOPPER.py,  default
+    CPR011, default,          2,  cpr002,     100002,  RecvSendCOPPER.py,  default

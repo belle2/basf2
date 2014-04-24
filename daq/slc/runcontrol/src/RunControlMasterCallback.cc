@@ -178,7 +178,11 @@ bool RunControlMasterCallback::send(NSMMessage msg) throw()
       msg.setParam(0, m_info.getExpNumber());
       msg.setParam(1, m_info.getRunNumber());
       msg.setParam(2, m_info.getSubNumber());
-
+      rc_status* status = (rc_status*)m_data.get();
+      status->expno = m_info.getExpNumber();
+      status->runno = m_info.getRunNumber();
+      status->subno = m_info.getSubNumber();
+      status->stime = m_info.getRecordTime();
       m_setting.setRunNumber(m_info);
       if (msg.getLength() > 0) {
         StringList str_v = StringUtil::split(msg.getData(), ' ', 2);
@@ -201,6 +205,8 @@ bool RunControlMasterCallback::send(NSMMessage msg) throw()
       summary.setRunSetting(m_setting);
       summary.setNodeState(m_node_v);
       summary.setNodeData(m_data_v);
+      rc_status* status = (rc_status*)m_data.get();
+      status->stime = 0;
       ltable.add(summary, true);
       getDB()->close();
     }

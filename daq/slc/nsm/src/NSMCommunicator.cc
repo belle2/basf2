@@ -48,8 +48,8 @@ throw(NSMHandlerException)
   if (_nsmc == NULL) {
     _id = -1;
     throw (NSMHandlerException("Error during init2 (%s=>%s:%d): %s",
-                               node.getName().c_str(), host.c_str(), _port,
-                               b2nsm_strerror()));
+                               node.getName().c_str(), host.c_str(),
+                               _port, b2nsm_strerror()));
   }
   nsmlib_usesig(_nsmc, 0);
   //b2nsm_logging(stdout);
@@ -83,7 +83,6 @@ void NSMCommunicator::sendRequest(const NSMMessage& msg) throw(NSMHandlerExcepti
 {
   const char* nodename = msg.getNodeName();
   const char* reqname = msg.getRequestName();
-  std::cerr << nodename << " " << reqname << std::endl;
   if (nodename != NULL && reqname != NULL &&
       strlen(nodename) > 0 && strlen(reqname) > 0) {
     sendRequest(nodename, reqname,

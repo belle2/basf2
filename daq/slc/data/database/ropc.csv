@@ -1,0 +1,2 @@
+nodename,  config, id,      host,          script, from_hosts
+ROPC01,   default,  0, localhost, RecvStrream1.py,    default

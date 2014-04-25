@@ -1,22 +1,16 @@
 #include "daq/slc/apps/dqmviewd/DQMPackageUpdater.h"
 
-#include "daq/slc/apps/dqmviewd/DQMFileReader.h"
-#include "daq/slc/apps/dqmviewd/DQMViewCallback.h"
 #include "daq/slc/apps/dqmviewd/DQMViewMaster.h"
 
-#include "daq/slc/apps/PackageManager.h"
-
 #include <daq/slc/system/LogFile.h>
-
-#include <daq/slc/base/ConfigFile.h>
 
 using namespace Belle2;
 
 void DQMPackageUpdater::run()
 {
-  std::vector<DQMFileReader>& reader_v(_master.getReaders());
+  std::vector<DQMFileReader>& reader_v(m_master.getReaders());
   while (true) {
-    _master.lock();
+    m_master.lock();
     for (size_t index = 0; index < reader_v.size(); index++) {
       DQMFileReader& reader(reader_v[index]);
       std::string filename = reader.getFileName();
@@ -28,8 +22,8 @@ void DQMPackageUpdater::run()
         reader.update();
       }
     }
-    _master.notify();
-    _master.unlock();
+    m_master.notify();
+    m_master.unlock();
     sleep(10);
   }
 }

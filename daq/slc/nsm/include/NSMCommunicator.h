@@ -46,28 +46,28 @@ namespace Belle2 {
     void sendState(const NSMNode& node) throw(NSMHandlerException);
 
   public:
-    NSMcontext* getContext() throw() { return _nsmc; }
-    int getId() const throw() { return _id; }
-    bool isOnline() const throw() { return (_id >= 0); }
-    NSMMessage& getMessage() throw() { return _message; }
-    const NSMMessage& getMessage() const throw() { return _message; }
-    void setMessage(const NSMMessage& msg) throw() { _message = msg; }
-    void setId(int id) throw() { _id = id; }
-    const NSMNode& getNode() const throw() { return _node; }
-    const NSMNode& getMaster() const throw() { return _master_node; }
+    NSMcontext* getContext() throw() { return m_nsmc; }
+    int getId() const throw() { return m_id; }
+    bool isOnline() const throw() { return (m_id >= 0); }
+    NSMMessage& getMessage() throw() { return m_message; }
+    const NSMMessage& getMessage() const throw() { return m_message; }
+    void setMessage(const NSMMessage& msg) throw() { m_message = msg; }
+    void setId(int id) throw() { m_id = id; }
+    const NSMNode& getNode() const throw() { return m_node; }
+    const NSMNode& getMaster() const throw() { return m_master_node; }
     int getNodeIdByName(const std::string& name) throw(NSMHandlerException);
     int getNodePidByName(const std::string& name) throw(NSMHandlerException);
     void setContext(NSMcontext* nsmc) throw(NSMHandlerException);
     bool isConnected(const NSMNode& node) throw();
 
   private:
-    int _id;
-    NSMMessage _message;
-    NSMcontext* _nsmc;
-    std::string _host;
-    int _port;
-    NSMNode _master_node;
-    NSMNode _node;
+    int m_id;
+    NSMMessage m_message;
+    NSMcontext* m_nsmc;
+    std::string m_host;
+    int m_port;
+    NSMNode m_master_node;
+    NSMNode m_node;
 
   };
 

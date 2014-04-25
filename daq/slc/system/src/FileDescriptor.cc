@@ -11,17 +11,17 @@ using namespace Belle2;
 
 FileDescriptor::FileDescriptor() throw()
 {
-  _fd = -1;
+  m_fd = -1;
 }
 
 FileDescriptor::FileDescriptor(const FileDescriptor& fd) throw()
 {
-  _fd = fd._fd;
+  m_fd = fd.m_fd;
 }
 
 FileDescriptor::FileDescriptor(int fd) throw()
 {
-  _fd = fd;
+  m_fd = fd;
 }
 
 FileDescriptor::~FileDescriptor() throw()
@@ -31,17 +31,17 @@ FileDescriptor::~FileDescriptor() throw()
 
 int FileDescriptor::get_fd() const throw()
 {
-  return _fd;
+  return m_fd;
 }
 
 bool FileDescriptor::select(int sec, int usec) throw(IOException)
 {
-  if (_fd <= 0) {
+  if (m_fd <= 0) {
     return false;
   }
   fd_set fds;
   FD_ZERO(&fds);
-  FD_SET(_fd, &fds);
+  FD_SET(m_fd, &fds);
   int ret;
   if (sec >= 0 && usec >= 0) {
     timeval t = {sec, usec};
@@ -53,7 +53,7 @@ bool FileDescriptor::select(int sec, int usec) throw(IOException)
     perror("select");
     throw (IOException("Failed to select"));
   }
-  if (FD_ISSET(_fd, &fds)) {
+  if (FD_ISSET(m_fd, &fds)) {
     return true;
   } else {
     return false;
@@ -62,11 +62,11 @@ bool FileDescriptor::select(int sec, int usec) throw(IOException)
 
 bool FileDescriptor::close() throw()
 {
-  if (_fd > 0) {
-    if (::close(_fd) != 0) {
+  if (m_fd > 0) {
+    if (::close(m_fd) != 0) {
       return false;
     }
   }
-  _fd = -1;
+  m_fd = -1;
   return true;
 }

@@ -1,5 +1,5 @@
-#ifndef _Belle2_TabbedPanel_hh
-#define _Belle2_TabbedPanel_hh
+#ifndef _Belle2_TabbedPanel_h
+#define _Belle2_TabbedPanel_h
 
 #include "daq/slc/dqm/Panel.h"
 
@@ -9,9 +9,6 @@ namespace Belle2 {
 
   public:
     static const std::string ELEMENT_TAG;
-
-  private:
-    std::vector<std::string> _sub_title_v;
 
   public:
     TabbedPanel() throw();
@@ -23,6 +20,9 @@ namespace Belle2 {
     virtual void add(Panel* panel) throw();
     virtual std::string getTag() const throw() { return ELEMENT_TAG; }
     virtual std::string toXML() const throw();
+
+  private:
+    std::vector<std::string> m_sub_title_v;
 
   };
 

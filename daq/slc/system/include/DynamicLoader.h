@@ -19,7 +19,7 @@ namespace Belle2 {
     void close() throw();
 
   private:
-    void* _handle;
+    void* m_handle;
 
   };
 

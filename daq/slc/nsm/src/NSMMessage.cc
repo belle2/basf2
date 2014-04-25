@@ -22,9 +22,9 @@ const unsigned int NSMMessage::DATA_SIZE = NSM_TCPDATSIZ;
 
 void NSMMessage::init() throw()
 {
-  _nsmc = NULL;
-  memset(&_nsm_msg, 0, sizeof(NSMmsg));
-  memset(_data, 0, sizeof(_data));
+  m_nsmc = NULL;
+  memset(&m_nsm_msg, 0, sizeof(NSMmsg));
+  memset(m_data, 0, sizeof(m_data));
 }
 
 NSMMessage::NSMMessage() throw()
@@ -35,15 +35,15 @@ NSMMessage::NSMMessage() throw()
 NSMMessage::NSMMessage(const NSMNode& node) throw()
 {
   init();
-  _nodename = node.getName();
+  m_nodename = node.getName();
 }
 
 NSMMessage::NSMMessage(const NSMNode& node,
                        const NSMCommand& cmd) throw()
 {
   init();
-  _nodename = node.getName();
-  _reqname = cmd.getLabel();
+  m_nodename = node.getName();
+  m_reqname = cmd.getLabel();
 }
 
 NSMMessage::NSMMessage(const NSMNode& node,
@@ -51,10 +51,10 @@ NSMMessage::NSMMessage(const NSMNode& node,
                        int npar, int* pars) throw()
 {
   init();
-  _nodename = node.getName();
-  _reqname = cmd.getLabel();
-  _nsm_msg.npar = npar;
-  memcpy(_nsm_msg.pars, pars, sizeof(int) * npar);
+  m_nodename = node.getName();
+  m_reqname = cmd.getLabel();
+  m_nsm_msg.npar = npar;
+  memcpy(m_nsm_msg.pars, pars, sizeof(int) * npar);
 }
 
 NSMMessage::NSMMessage(const NSMNode& node,
@@ -62,10 +62,10 @@ NSMMessage::NSMMessage(const NSMNode& node,
                        int par, const Serializable& obj) throw()
 {
   init();
-  _nodename = node.getName();
-  _reqname = cmd.getLabel();
-  _nsm_msg.npar = 1;
-  _nsm_msg.pars[0] = par;
+  m_nodename = node.getName();
+  m_reqname = cmd.getLabel();
+  m_nsm_msg.npar = 1;
+  m_nsm_msg.pars[0] = par;
   setData(obj);
 }
 
@@ -74,10 +74,10 @@ NSMMessage::NSMMessage(const NSMNode& node,
                        int par, const std::string& obj) throw()
 {
   init();
-  _nodename = node.getName();
-  _reqname = cmd.getLabel();
-  _nsm_msg.npar = 1;
-  _nsm_msg.pars[0] = par;
+  m_nodename = node.getName();
+  m_reqname = cmd.getLabel();
+  m_nsm_msg.npar = 1;
+  m_nsm_msg.pars[0] = par;
   setData(obj);
 }
 
@@ -86,8 +86,8 @@ NSMMessage::NSMMessage(const NSMNode& node,
                        const Serializable& obj) throw()
 {
   init();
-  _nodename = node.getName();
-  _reqname = cmd.getLabel();
+  m_nodename = node.getName();
+  m_reqname = cmd.getLabel();
   setData(obj);
 }
 
@@ -96,15 +96,15 @@ NSMMessage::NSMMessage(const NSMNode& node,
                        const std::string& data) throw()
 {
   init();
-  _nodename = node.getName();
-  _reqname = cmd.getLabel();
+  m_nodename = node.getName();
+  m_reqname = cmd.getLabel();
   setData(data);
 }
 
 NSMMessage::NSMMessage(const NSMCommand& cmd) throw()
 {
   init();
-  _reqname = cmd.getLabel();
+  m_reqname = cmd.getLabel();
 }
 
 NSMMessage::NSMMessage(const NSMMessage& msg) throw()
@@ -114,23 +114,23 @@ NSMMessage::NSMMessage(const NSMMessage& msg) throw()
 
 const NSMMessage& NSMMessage::operator=(const NSMMessage& msg) throw()
 {
-  _nsmc = msg._nsmc;
-  memcpy(&_nsm_msg, &(msg._nsm_msg), sizeof(_nsm_msg));
-  memcpy(_data, msg._data, sizeof(_data));
-  _nodename = msg._nodename;
-  _reqname = msg._reqname;
+  m_nsmc = msg.m_nsmc;
+  memcpy(&m_nsm_msg, &(msg.m_nsm_msg), sizeof(m_nsm_msg));
+  memcpy(m_data, msg.m_data, sizeof(m_data));
+  m_nodename = msg.m_nodename;
+  m_reqname = msg.m_reqname;
   return *this;
 }
 
 const char* NSMMessage::getRequestName() const throw()
 {
-  if (_reqname.size() > 0) return _reqname.c_str();
-  if (_nsmc != NULL) {
-    const char* reqname = nsmlib_reqname(_nsmc, _nsm_msg.req);
+  if (m_reqname.size() > 0) return m_reqname.c_str();
+  if (m_nsmc != NULL) {
+    const char* reqname = nsmlib_reqname(m_nsmc, m_nsm_msg.req);
     if (reqname != NULL) {
-      _reqname = reqname;
+      m_reqname = reqname;
     }
-    return _reqname.c_str();
+    return m_reqname.c_str();
   } else {
     return NULL;
   }
@@ -138,151 +138,151 @@ const char* NSMMessage::getRequestName() const throw()
 
 void NSMMessage::setRequestName() throw()
 {
-  if (_nsmc != NULL) {
-    const char* reqname = nsmlib_reqname(_nsmc, _nsm_msg.req);
+  if (m_nsmc != NULL) {
+    const char* reqname = nsmlib_reqname(m_nsmc, m_nsm_msg.req);
     if (reqname != NULL) {
-      _reqname = reqname;
+      m_reqname = reqname;
     }
   }
 }
 
 void NSMMessage::setRequestName(const std::string& reqname) throw()
 {
-  _reqname = reqname;
+  m_reqname = reqname;
 }
 
 void NSMMessage::setRequestName(const NSMCommand& cmd) throw()
 {
-  _reqname = cmd.getLabel();
+  m_reqname = cmd.getLabel();
 }
 
 void NSMMessage::setNodeName(const std::string& nodename) throw()
 {
-  _nodename = nodename;
+  m_nodename = nodename;
 }
 
 void NSMMessage::setNodeName(const NSMNode& node) throw()
 {
-  _nodename = node.getName();
+  m_nodename = node.getName();
 }
 
 const char* NSMMessage::getNodeName() const throw()
 {
-  if (_nodename.size() > 0) return _nodename.c_str();
-  if (_nsmc != NULL)
-    return nsmlib_nodename(_nsmc, _nsm_msg.node);
+  if (m_nodename.size() > 0) return m_nodename.c_str();
+  if (m_nsmc != NULL)
+    return nsmlib_nodename(m_nsmc, m_nsm_msg.node);
   else
     return NULL;
 }
 
 unsigned short NSMMessage::getRequestId() const throw()
 {
-  return _nsm_msg.req;
+  return m_nsm_msg.req;
 }
 
 unsigned short NSMMessage::getSequenceId() const throw()
 {
-  return _nsm_msg.seq;
+  return m_nsm_msg.seq;
 }
 
 unsigned short NSMMessage::getNodeId() const throw()
 {
-  return _nsm_msg.node;
+  return m_nsm_msg.node;
 }
 
 unsigned short NSMMessage::getNParams() const throw()
 {
-  return _nsm_msg.npar;
+  return m_nsm_msg.npar;
 }
 
 int NSMMessage::getParam(int i) const throw()
 {
-  return _nsm_msg.pars[i];
+  return m_nsm_msg.pars[i];
 }
 
 #if NSM_PACKAGE_VERSION >= 1914
 const int* NSMMessage::getParams() const throw()
 {
-  return _nsm_msg.pars;
+  return m_nsm_msg.pars;
 }
 
 int* NSMMessage::getParams() throw()
 {
-  return _nsm_msg.pars;
+  return m_nsm_msg.pars;
 }
 #else
 const unsigned int* NSMMessage::getParams() const throw()
 {
-  return _nsm_msg.pars;
+  return m_nsm_msg.pars;
 }
 
 unsigned int* NSMMessage::getParams() throw()
 {
-  return _nsm_msg.pars;
+  return m_nsm_msg.pars;
 }
 #warning "Wrong version of nsm2. try source daq/slc/extra/nsm2/export.sh"
 #endif
 
 unsigned int NSMMessage::getLength() const throw()
 {
-  return _nsm_msg.len;
+  return m_nsm_msg.len;
 }
 
 void NSMMessage::setLength(unsigned int len) throw()
 {
-  _nsm_msg.len = len;
+  m_nsm_msg.len = len;
 }
 
 const char* NSMMessage::getData() const throw()
 {
-  if (_nsm_msg.len > 0) return (const char*)_data;
+  if (m_nsm_msg.len > 0) return (const char*)m_data;
   else return NULL;
 }
 
 void NSMMessage::setRequestId(unsigned short id) throw()
 {
-  _nsm_msg.req = id;
+  m_nsm_msg.req = id;
 }
 
 void NSMMessage::setSequenceId(unsigned short id) throw()
 {
-  _nsm_msg.seq = id;
+  m_nsm_msg.seq = id;
 }
 
 void NSMMessage::setNodeId(unsigned short id) throw()
 {
-  _nsm_msg.node = id;
+  m_nsm_msg.node = id;
 }
 
 void NSMMessage::setNParams(unsigned short npar) throw()
 {
-  _nsm_msg.npar = npar;
+  m_nsm_msg.npar = npar;
 }
 
 void NSMMessage::setParam(int i, unsigned int v) throw()
 {
-  _nsm_msg.pars[i] = v;
+  m_nsm_msg.pars[i] = v;
 }
 
 void NSMMessage::getData(Serializable& obj) const throw(IOException)
 {
-  BufferedReader reader(sizeof(_data), (unsigned char*)_data);
+  BufferedReader reader(sizeof(m_data), (unsigned char*)m_data);
   reader.readObject(obj);
 }
 
 void NSMMessage::setData(const Serializable& obj) throw(IOException)
 {
-  BufferedWriter writer(sizeof(_data), (unsigned char*)_data);
+  BufferedWriter writer(sizeof(m_data), (unsigned char*)m_data);
   writer.writeObject(obj);
-  _nsm_msg.len = writer.count();
+  m_nsm_msg.len = writer.count();
 }
 
 void NSMMessage::setData(int len, const char* data)  throw()
 {
-  memset(_data, 0, sizeof(_data));
+  memset(m_data, 0, sizeof(m_data));
   if (len > 0 && data != NULL) {
-    _nsm_msg.len = len;
-    memcpy(_data, data, len);
+    m_nsm_msg.len = len;
+    memcpy(m_data, data, len);
   }
 }
 
@@ -308,7 +308,7 @@ int NSMMessage::try_read(int sock, char* buf, int datalen)
 size_t NSMMessage::read(NSMcontext* nsmc) throw(NSMHandlerException)
 {
   if (nsmc == NULL) return 0;
-  _nsmc = nsmc;
+  m_nsmc = nsmc;
   int sock = nsmc->sock;
   size_t count = 0;
   int ret = 0;
@@ -318,28 +318,28 @@ size_t NSMMessage::read(NSMcontext* nsmc) throw(NSMHandlerException)
     throw (NSMHandlerException("Failed to read header"));
   }
   count += ret;
-  _nsm_msg.req  = ntohs(hp.req);
-  _nsm_msg.seq  = ntohs(hp.seq);
-  _nsm_msg.node = ntohs(hp.src);
-  _nsm_msg.npar = hp.npar;
-  _nsm_msg.len  = ntohs(hp.len);
-  _nsm_msg.pars[0] = _nsm_msg.pars[1] = 0;
+  m_nsm_msg.req  = ntohs(hp.req);
+  m_nsm_msg.seq  = ntohs(hp.seq);
+  m_nsm_msg.node = ntohs(hp.src);
+  m_nsm_msg.npar = hp.npar;
+  m_nsm_msg.len  = ntohs(hp.len);
+  m_nsm_msg.pars[0] = m_nsm_msg.pars[1] = 0;
 
-  datalen = sizeof(int32) * _nsm_msg.npar;
+  datalen = sizeof(int32) * m_nsm_msg.npar;
   if (datalen > 0) {
-    if ((ret = try_read(sock, (char*)(_nsm_msg.pars), datalen)) < 0) {
+    if ((ret = try_read(sock, (char*)(m_nsm_msg.pars), datalen)) < 0) {
       throw (NSMHandlerException("Failed to read params"));
     }
     count += ret;
-    for (int i = 0; i < _nsm_msg.npar; i++) {
-      _nsm_msg.pars[i] = ntohl(_nsm_msg.pars[i]);
+    for (int i = 0; i < m_nsm_msg.npar; i++) {
+      m_nsm_msg.pars[i] = ntohl(m_nsm_msg.pars[i]);
     }
   }
 
-  datalen = _nsm_msg.len;
+  datalen = m_nsm_msg.len;
   if (datalen > 0) {
-    memset(_data, 0, sizeof(_data));
-    if ((ret = try_read(sock, (char*)_data, datalen)) < 0) {
+    memset(m_data, 0, sizeof(m_data));
+    if ((ret = try_read(sock, (char*)m_data, datalen)) < 0) {
       throw (NSMHandlerException("Failed to read data"));
     }
     count += ret;
@@ -349,13 +349,13 @@ size_t NSMMessage::read(NSMcontext* nsmc) throw(NSMHandlerException)
 
 void NSMMessage::readObject(Reader& reader) throw(IOException)
 {
-  _reqname = reader.readString();
+  m_reqname = reader.readString();
   setNParams(reader.readInt());
   for (int i = 0; i < getNParams(); i++) {
     setParam(i, reader.readInt());
   }
   setLength(reader.readInt());
-  reader.read(_data, getLength());
+  reader.read(m_data, getLength());
 }
 
 void NSMMessage::writeObject(Writer& writer) const throw(IOException)
@@ -366,5 +366,5 @@ void NSMMessage::writeObject(Writer& writer) const throw(IOException)
     writer.writeInt(getParam(i));
   }
   writer.writeInt(getLength());
-  writer.write(_data, getLength());
+  writer.write(m_data, getLength());
 }

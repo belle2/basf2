@@ -28,8 +28,8 @@ namespace Belle2 {
     throw(DBHandlerException);
 
   private:
-    PGconn* _sq_conn;
-    PGresult* _sq_result;
+    PGconn* m_sq_conn;
+    PGresult* m_sq_result;
 
   };
 

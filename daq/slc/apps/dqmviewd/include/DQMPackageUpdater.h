@@ -14,7 +14,7 @@ namespace Belle2 {
   public:
     DQMPackageUpdater(DQMViewCallback* callback,
                       DQMViewMaster& master)
-      : _callback(callback), _master(master) {}
+      : m_callback(callback), m_master(master) {}
     ~DQMPackageUpdater() {}
 
   public:
@@ -24,8 +24,8 @@ namespace Belle2 {
     void run();
 
   private:
-    DQMViewCallback* _callback;
-    DQMViewMaster& _master;
+    DQMViewCallback* m_callback;
+    DQMViewMaster& m_master;
 
   };
 

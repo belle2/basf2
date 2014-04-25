@@ -28,20 +28,20 @@ bool MMutex::init() throw()
   pthread_mutexattr_t attr;
   pthread_mutexattr_init(&attr);
   pthread_mutexattr_setpshared(&attr, PTHREAD_PROCESS_SHARED);
-  pthread_mutex_init(_mu, &attr);
+  pthread_mutex_init(m_mu, &attr);
   pthread_mutexattr_destroy(&attr);
   return true;
 }
 
 bool MMutex::set(void* addr) throw()
 {
-  _mu = (pthread_mutex_t*)addr;
+  m_mu = (pthread_mutex_t*)addr;
   return true;
 }
 
 bool MMutex::lock() throw()
 {
-  if (pthread_mutex_lock(_mu) != 0) {
+  if (pthread_mutex_lock(m_mu) != 0) {
     return false;
   } else {
     return true;
@@ -50,7 +50,7 @@ bool MMutex::lock() throw()
 
 bool MMutex::trylock() throw()
 {
-  if (pthread_mutex_lock(_mu) != 0) {
+  if (pthread_mutex_lock(m_mu) != 0) {
     return false;
   }
   return true;
@@ -58,7 +58,7 @@ bool MMutex::trylock() throw()
 
 bool MMutex::unlock() throw()
 {
-  if (pthread_mutex_unlock(_mu) != 0) {
+  if (pthread_mutex_unlock(m_mu) != 0) {
     return true;
   } else {
     return false;
@@ -67,7 +67,7 @@ bool MMutex::unlock() throw()
 
 bool MMutex::destroy() throw()
 {
-  if (pthread_mutex_destroy(_mu) != 0) {
+  if (pthread_mutex_destroy(m_mu) != 0) {
     return true;
   } else {
     return false;
@@ -76,6 +76,6 @@ bool MMutex::destroy() throw()
 
 const MMutex& MMutex::operator=(const MMutex& mutex) throw()
 {
-  _mu = mutex._mu;
+  m_mu = mutex.m_mu;
   return *this;
 }

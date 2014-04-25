@@ -1,5 +1,5 @@
-#ifndef _Belle2_MonCircle_hh
-#define _Belle2_MonCircle_hh
+#ifndef _Belle2_MonCircle_h
+#define _Belle2_MonCircle_h
 
 #include "daq/slc/dqm/MonShape.h"
 
@@ -14,24 +14,24 @@ namespace Belle2 {
 
   public:
     virtual void reset() throw();
-    virtual void readConfig(Belle2::Reader& reader) throw(Belle2::IOException);
-    virtual void readContents(Belle2::Reader& reader) throw(Belle2::IOException);
-    virtual void writeConfig(Belle2::Writer& writer) const throw(Belle2::IOException);
-    virtual void writeContents(Belle2::Writer& writer) const throw(Belle2::IOException);
+    virtual void readConfig(Reader& reader) throw(IOException);
+    virtual void readContents(Reader& reader) throw(IOException);
+    virtual void writeConfig(Writer& writer) const throw(IOException);
+    virtual void writeContents(Writer& writer) const throw(IOException);
     virtual std::string getDataType() const throw() { return "MCC"; }
 
   public:
-    void setX(float x) { _x = x; }
-    float getX() { return _x; }
-    void setRX(float rx) { _r_x = rx; }
-    float getRX() { return _r_x; }
-    void setY(float y) { _y = y; }
-    float getY() { return _y; }
-    void setRY(float ry) { _r_y = ry; }
-    float getRY() { return _r_y; }
+    void setX(float x) { m_x = x; }
+    float getX() { return m_x; }
+    void setRX(float rx) { m_r_x = rx; }
+    float getRX() { return m_r_x; }
+    void setY(float y) { m_y = y; }
+    float getY() { return m_y; }
+    void setRY(float ry) { m_r_y = ry; }
+    float getRY() { return m_r_y; }
 
   private:
-    float _x, _y, _r_x, _r_y;
+    float m_x, m_y, m_r_x, m_r_y;
 
   };
 

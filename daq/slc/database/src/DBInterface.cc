@@ -1,6 +1,6 @@
 #include "daq/slc/database/DBInterface.h"
 
-#include <daq/slc/system/LogFile.h>
+//#include <daq/slc/system/LogFile.h>
 
 #include <cstdarg>
 #include <cstdio>
@@ -12,11 +12,11 @@ DBInterface::DBInterface(const std::string& host,
                          const std::string& user,
                          const std::string& password, int port) throw()
 {
-  _host = host;
-  _database = database;
-  _user = user;
-  _password = password;
-  _port = port;
+  m_host = host;
+  m_database = database;
+  m_user = user;
+  m_password = password;
+  m_port = port;
 }
 
 DBInterface::~DBInterface() throw()

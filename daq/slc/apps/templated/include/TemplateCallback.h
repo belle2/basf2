@@ -25,10 +25,6 @@ namespace Belle2 {
     virtual bool recover() throw();
     virtual bool abort() throw();
 
-  private:
-    ProcessController _con;
-    std::string _path;
-
   };
 
 }

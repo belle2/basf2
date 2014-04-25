@@ -17,16 +17,16 @@ const HVCommand HVCommand::RECOVER(121, "RECOVER");
 
 const HVCommand& HVCommand::operator=(const std::string& label) throw()
 {
-  if (label == CONFIGURE._label) *this = CONFIGURE;
-  else if (label == TURNON._label) *this = TURNON;
-  else if (label == TURNOFF._label) *this = TURNOFF;
-  else if (label == RAMPUP._label) *this = RAMPUP;
-  else if (label == RAMPDOWN._label) *this = RAMPDOWN;
-  else if (label == STANDBY._label) *this = STANDBY;
-  else if (label == STANDBY2._label) *this = STANDBY2;
-  else if (label == STANDBY3._label) *this = STANDBY3;
-  else if (label == PEAK._label) *this = PEAK;
-  else if (label == RECOVER._label) *this = RECOVER;
+  if (label == CONFIGURE.getLabel()) *this = CONFIGURE;
+  else if (label == TURNON.getLabel()) *this = TURNON;
+  else if (label == TURNOFF.getLabel()) *this = TURNOFF;
+  else if (label == RAMPUP.getLabel()) *this = RAMPUP;
+  else if (label == RAMPDOWN.getLabel()) *this = RAMPDOWN;
+  else if (label == STANDBY.getLabel()) *this = STANDBY;
+  else if (label == STANDBY2.getLabel()) *this = STANDBY2;
+  else if (label == STANDBY3.getLabel()) *this = STANDBY3;
+  else if (label == PEAK.getLabel()) *this = PEAK;
+  else if (label == RECOVER.getLabel()) *this = RECOVER;
   else if (label == NSMCommand::OK.getLabel()) *this = NSMCommand::OK;
   else if (label == NSMCommand::ERROR.getLabel()) *this = NSMCommand::ERROR;
   else if (label == NSMCommand::NSMGET.getLabel()) *this = NSMCommand::NSMGET;

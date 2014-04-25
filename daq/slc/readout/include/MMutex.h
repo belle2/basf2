@@ -41,7 +41,7 @@ namespace Belle2 {
 
     // data members;
   private:
-    pthread_mutex_t* _mu;
+    pthread_mutex_t* m_mu;
 
   };
 

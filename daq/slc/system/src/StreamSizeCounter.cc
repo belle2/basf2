@@ -5,6 +5,6 @@ using namespace Belle2;
 size_t StreamSizeCounter::write(const void*, size_t count)
 throw(IOException)
 {
-  _count += count;
+  m_count += count;
   return count;
 }

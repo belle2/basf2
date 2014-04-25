@@ -16,7 +16,7 @@ const NSMCommand NSMCommand::DBGET(404, "DBGET");
 
 const NSMCommand& NSMCommand::operator=(const std::string& label) throw()
 {
-  if (label == LOG._label) *this = LOG;
+  if (label == LOG.getLabel()) *this = LOG;
   else if (label == OK.getLabel()) *this = OK;
   else if (label == ERROR.getLabel()) *this = ERROR;
   else if (label == FATAL.getLabel()) *this = FATAL;
@@ -32,7 +32,7 @@ const NSMCommand& NSMCommand::operator=(const std::string& label) throw()
 
 const NSMCommand& NSMCommand::operator=(int id) throw()
 {
-  if (id == LOG._id) *this = LOG;
+  if (id == LOG.getId()) *this = LOG;
   else if (id == OK.getId()) *this = OK;
   else if (id == ERROR.getId()) *this = ERROR;
   else if (id == FATAL.getId()) *this = FATAL;

@@ -20,53 +20,53 @@ Date::~Date() throw() {}
 
 void Date::set() throw()
 {
-  _time = time(NULL);
-  _tm = localtime(&_time);
+  m_time = time(NULL);
+  m_tm = localtime(&m_time);
 }
 
 void Date::set(time_t time) throw()
 {
-  _time = time;
-  _tm = localtime(&_time);
+  m_time = time;
+  m_tm = localtime(&m_time);
 }
 
 int Date::getSecond() const throw()
 {
-  return _tm->tm_sec;
+  return m_tm->tm_sec;
 }
 
 int Date::getMinitue() const throw()
 {
-  return _tm->tm_min;
+  return m_tm->tm_min;
 }
 
 int Date::getHour() const throw()
 {
-  return _tm->tm_hour;
+  return m_tm->tm_hour;
 }
 
 int Date::getDay() const throw()
 {
-  return _tm->tm_mday;
+  return m_tm->tm_mday;
 }
 
 int Date::getMonth() const throw()
 {
-  return _tm->tm_mon + 1;
+  return m_tm->tm_mon + 1;
 }
 
 int Date::getYear() const throw()
 {
-  return _tm->tm_year + 1900;
+  return m_tm->tm_year + 1900;
 }
 
 const char* Date::toString(const char* format) const throw()
 {
   static char ss[256];
   if (format == NULL) {
-    strftime(ss, 255, "%Y-%m-%d %H:%M:%S", _tm);
+    strftime(ss, 255, "%Y-%m-%d %H:%M:%S", m_tm);
   } else {
-    strftime(ss, 255, format, _tm);
+    strftime(ss, 255, format, m_tm);
   }
   return ss;
 }

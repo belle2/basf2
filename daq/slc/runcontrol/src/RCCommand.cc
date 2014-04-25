@@ -18,16 +18,16 @@ const RCCommand RCCommand::TRIGFT(301, "TRIGFT");
 const RCCommand& RCCommand::operator=(const std::string& label) throw()
 {
   if (NSMCommand::operator=(label) != Enum::UNKNOWN) return *this;
-  else if (label == BOOT._label) *this = BOOT;
-  else if (label == LOAD._label) *this = LOAD;
-  else if (label == START._label) *this = START;
-  else if (label == STOP._label) *this = STOP;
-  else if (label == RECOVER._label) *this = RECOVER;
-  else if (label == RESUME._label) *this = RESUME;
-  else if (label == PAUSE._label) *this = PAUSE;
-  else if (label == ABORT._label) *this = ABORT;
-  else if (label == STATECHECK._label) *this = STATECHECK;
-  else if (label == TRIGFT._label) *this = TRIGFT;
+  else if (label == BOOT.getLabel()) *this = BOOT;
+  else if (label == LOAD.getLabel()) *this = LOAD;
+  else if (label == START.getLabel()) *this = START;
+  else if (label == STOP.getLabel()) *this = STOP;
+  else if (label == RECOVER.getLabel()) *this = RECOVER;
+  else if (label == RESUME.getLabel()) *this = RESUME;
+  else if (label == PAUSE.getLabel()) *this = PAUSE;
+  else if (label == ABORT.getLabel()) *this = ABORT;
+  else if (label == STATECHECK.getLabel()) *this = STATECHECK;
+  else if (label == TRIGFT.getLabel()) *this = TRIGFT;
   else *this = Enum::UNKNOWN;
   return *this;
 }
@@ -35,16 +35,16 @@ const RCCommand& RCCommand::operator=(const std::string& label) throw()
 const RCCommand& RCCommand::operator=(int id) throw()
 {
   if (NSMCommand::operator=(id) != Enum::UNKNOWN) return *this;
-  else if (id == BOOT._id) *this = BOOT;
-  else if (id == LOAD._id) *this = LOAD;
-  else if (id == START._id) *this = START;
-  else if (id == STOP._id) *this = STOP;
-  else if (id == RECOVER._id) *this = RECOVER;
-  else if (id == RESUME._id) *this = RESUME;
-  else if (id == PAUSE._id) *this = PAUSE;
-  else if (id == ABORT._id) *this = ABORT;
-  else if (id == STATECHECK._id) *this = STATECHECK;
-  else if (id == TRIGFT._id) *this = TRIGFT;
+  else if (id == BOOT.getId()) *this = BOOT;
+  else if (id == LOAD.getId()) *this = LOAD;
+  else if (id == START.getId()) *this = START;
+  else if (id == STOP.getId()) *this = STOP;
+  else if (id == RECOVER.getId()) *this = RECOVER;
+  else if (id == RESUME.getId()) *this = RESUME;
+  else if (id == PAUSE.getId()) *this = PAUSE;
+  else if (id == ABORT.getId()) *this = ABORT;
+  else if (id == STATECHECK.getId()) *this = STATECHECK;
+  else if (id == TRIGFT.getId()) *this = TRIGFT;
   else *this = Enum::UNKNOWN;
   return *this;
 }

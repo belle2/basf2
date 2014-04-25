@@ -1,5 +1,5 @@
-#ifndef _Belle2_Pad_hh
-#define _Belle2_Pad_hh
+#ifndef _Belle2_Pad_h
+#define _Belle2_Pad_h
 
 #include "daq/slc/dqm/Rect.h"
 

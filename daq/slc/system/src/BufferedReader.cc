@@ -5,74 +5,74 @@
 using namespace Belle2;
 
 BufferedReader::BufferedReader() throw()
-  : _memory(NULL), _size(0), _pos(0), _allocated(false) {}
+  : m_memory(NULL), m_size(0), m_pos(0), m_allocated(false) {}
 
 BufferedReader::BufferedReader(const BufferedReader& reader) throw()
-  : _memory(NULL), _size(reader._size),
-    _pos(reader._pos), _allocated(reader._allocated)
+  : m_memory(NULL), m_size(reader.m_size),
+    m_pos(reader.m_pos), m_allocated(reader.m_allocated)
 {
-  if (_allocated) {
-    _memory = new unsigned char [reader._size];
-    ::memcpy(_memory, reader._memory, reader._size);
+  if (m_allocated) {
+    m_memory = new unsigned char [reader.m_size];
+    ::memcpy(m_memory, reader.m_memory, reader.m_size);
   } else {
-    _memory = reader._memory;
+    m_memory = reader.m_memory;
   }
-  _size = reader._size;
-  _pos = reader._pos;
+  m_size = reader.m_size;
+  m_pos = reader.m_pos;
 }
 
 BufferedReader::BufferedReader(size_t size, unsigned char* memory) throw()
-  : _memory(memory), _size(size), _pos(0), _allocated(false)
+  : m_memory(memory), m_size(size), m_pos(0), m_allocated(false)
 {
   if (memory == NULL) {
-    _memory = new unsigned char[size];
-    _allocated = true;
+    m_memory = new unsigned char[size];
+    m_allocated = true;
   }
 }
 
 BufferedReader::~BufferedReader() throw()
 {
-  if (_allocated && _memory != NULL) {
-    delete [] _memory;
+  if (m_allocated && m_memory != NULL) {
+    delete [] m_memory;
   }
 }
 
 const BufferedReader& BufferedReader::operator=(const BufferedReader& reader) throw()
 {
-  if (_allocated) {
-    delete [] _memory;
+  if (m_allocated) {
+    delete [] m_memory;
   }
-  _allocated = reader._allocated;
-  if (_allocated) {
-    _memory = new unsigned char [reader._size];
-    ::memcpy(_memory, reader._memory, reader._size);
+  m_allocated = reader.m_allocated;
+  if (m_allocated) {
+    m_memory = new unsigned char [reader.m_size];
+    ::memcpy(m_memory, reader.m_memory, reader.m_size);
   } else {
-    _memory = reader._memory;
+    m_memory = reader.m_memory;
   }
-  _size = reader._size;
-  _pos = reader._pos;
+  m_size = reader.m_size;
+  m_pos = reader.m_pos;
   return *this;
 }
 
 void BufferedReader::copy(const void* buffer, size_t count) throw(IOException)
 {
-  if (count < _size) {
-    memcpy(_memory, buffer, count);
-    _pos = 0;
+  if (count < m_size) {
+    memcpy(m_memory, buffer, count);
+    m_pos = 0;
   } else {
     throw (IOException("Out of buffer range: %d > %d",
-                       (int)count, (int)_size));
+                       (int)count, (int)m_size));
   }
 }
 
 size_t BufferedReader::read(void* buf, const size_t count) throw(IOException)
 {
-  if (_pos + count > size()) {
+  if (m_pos + count > size()) {
     throw (IOException("Out of buffer range: %d + %d > %d",
-                       (int)_pos, (int)count, (int)_size));
+                       (int)m_pos, (int)count, (int)m_size));
   }
-  memcpy(buf, (_memory + _pos), count);
-  _pos += count;
+  memcpy(buf, (m_memory + m_pos), count);
+  m_pos += count;
   return count;
 }
 

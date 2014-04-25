@@ -1,5 +1,5 @@
-#ifndef _Belle2_TimedGraph_hh
-#define _Belle2_TimedGraph_hh
+#ifndef _Belle2_TimedGraph_h
+#define _Belle2_TimedGraph_h
 
 #include "daq/slc/dqm/Histo.h"
 #include "daq/slc/dqm/LongArray.h"
@@ -7,10 +7,6 @@
 namespace Belle2 {
 
   class TimedGraph1 : public Histo {
-
-  protected:
-    int _iter;
-    LongArray _time_v;
 
   public :
     TimedGraph1();
@@ -22,8 +18,8 @@ namespace Belle2 {
   public:
     void reset() throw();
     int getDim() const throw() { return 1; }
-    double getMaximum() const throw() { return _axis_y.getMax(); }
-    double getMinimum() const throw() { return _axis_y.getMin(); }
+    double getMaximum() const throw() { return m_axis_y.getMax(); }
+    double getMinimum() const throw() { return m_axis_y.getMin(); }
     void setMaximum(double data) throw();
     void setMinimum(double data) throw();
     void fixMaximum(double data) throw();
@@ -36,16 +32,20 @@ namespace Belle2 {
     void addPoint(double data) throw();
     double getLatestPoint() const throw();
     long getLatestTime() const throw();
-    void readObject(Belle2::Reader& reader) throw(Belle2::IOException);
-    void readUpdate(Belle2::Reader& reader) throw(Belle2::IOException);
-    void readConfig(Belle2::Reader& reader) throw(Belle2::IOException);
-    void readContents(Belle2::Reader& reader) throw(Belle2::IOException);
-    void writeObject(Belle2::Writer& writer) const throw(Belle2::IOException);
-    void writeUpdate(Belle2::Writer& writer) const throw(Belle2::IOException);
-    void writeConfig(Belle2::Writer& writer) const throw(Belle2::IOException);
-    void writeContents(Belle2::Writer& writer) const throw(Belle2::IOException);
-    int getIter() const throw() { return _iter; }
+    void readObject(Reader& reader) throw(IOException);
+    void readUpdate(Reader& reader) throw(IOException);
+    void readConfig(Reader& reader) throw(IOException);
+    void readContents(Reader& reader) throw(IOException);
+    void writeObject(Writer& writer) const throw(IOException);
+    void writeUpdate(Writer& writer) const throw(IOException);
+    void writeConfig(Writer& writer) const throw(IOException);
+    void writeContents(Writer& writer) const throw(IOException);
+    int getIter() const throw() { return m_iter; }
     std::string toString() const throw();
+
+  protected:
+    int m_iter;
+    LongArray m_time_v;
 
   };
 

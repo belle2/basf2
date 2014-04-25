@@ -19,7 +19,7 @@ namespace Belle2 {
 
   public:
     HistSender(TCPSocket& socket, DQMViewMaster& master)
-      : _master(master), _socket(socket) {}
+      : m_master(master), m_socket(socket) {}
     ~HistSender();
 
   public:
@@ -31,8 +31,8 @@ namespace Belle2 {
 
 
   private:
-    DQMViewMaster& _master;
-    TCPSocket _socket;
+    DQMViewMaster& m_master;
+    TCPSocket m_socket;
 
   };
 

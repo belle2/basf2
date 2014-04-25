@@ -19,14 +19,14 @@ const unsigned long Inotify::FILE_ATTRIB(IN_ATTRIB);
 
 void Inotify::open() throw(IOException)
 {
-  if ((_fd = ::inotify_init()) < 0) {
+  if ((m_fd = ::inotify_init()) < 0) {
     throw (IOException("Failed to initialize inotify."));
   }
 }
 
 int Inotify::add(const std::string& path, unsigned long mask) throw(IOException)
 {
-  int wd = inotify_add_watch(_fd, path.c_str(), mask);
+  int wd = inotify_add_watch(m_fd, path.c_str(), mask);
   if (wd < 0) {
     throw (IOException("Failed to add a path"));
   }
@@ -35,7 +35,7 @@ int Inotify::add(const std::string& path, unsigned long mask) throw(IOException)
 
 void Inotify::remove(int wd) throw(IOException)
 {
-  if (::inotify_rm_watch(_fd, wd) < 0) {
+  if (::inotify_rm_watch(m_fd, wd) < 0) {
     throw (IOException("Failed to remove a path"));
   }
 }
@@ -46,7 +46,7 @@ InotifyEventList Inotify::wait(int sec) throw(IOException)
   //try {
   if (select(sec, 0)) {
     char buf[16384];
-    int r = read(_fd, buf, 16384);
+    int r = read(m_fd, buf, 16384);
     if (r <= 0) return ievent_v;
     int index = 0;
     while (index < r) {

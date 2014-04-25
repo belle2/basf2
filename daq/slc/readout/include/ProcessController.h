@@ -30,34 +30,34 @@ namespace Belle2 {
     bool start();
     bool stop();
     bool abort();
-    const std::string& getName() { return _name; }
-    const std::string& getExecutable() { return _exename; }
-    RunInfoBuffer& getInfo() { return _info; }
-    RCCallback* getCallback() { return _callback; }
-    const Fork& getFork() const { return  _fork; }
-    void setCallback(RCCallback* callback) { _callback = callback; }
-    void setName(const std::string& name) { _name = name; }
-    void setExecutable(const std::string& exe) { _exename = exe; }
-    void addArgument(const std::string& arg) { _arg_v.push_back(arg); }
-    void clearArguments() { _arg_v = std::vector<std::string>(); }
-    const RCState& getState() const { return _state; }
-    void setState(const RCState& state) { _state = state; }
+    const std::string& getName() { return m_name; }
+    const std::string& getExecutable() { return m_exename; }
+    RunInfoBuffer& getInfo() { return m_info; }
+    RCCallback* getCallback() { return m_callback; }
+    const Fork& getFork() const { return  m_fork; }
+    void setCallback(RCCallback* callback) { m_callback = callback; }
+    void setName(const std::string& name) { m_name = name; }
+    void setExecutable(const std::string& exe) { m_exename = exe; }
+    void addArgument(const std::string& arg) { m_arg_v.push_back(arg); }
+    void clearArguments() { m_arg_v = std::vector<std::string>(); }
+    const RCState& getState() const { return m_state; }
+    void setState(const RCState& state) { m_state = state; }
 
   public:
-    void lock() { _mutex.lock(); }
-    void unlock() { _mutex.unlock(); }
+    void lock() { m_mutex.lock(); }
+    void unlock() { m_mutex.unlock(); }
 
   private:
-    RunInfoBuffer _info;
-    std::string _name;
-    RCCallback* _callback;
-    std::string _exename;
-    std::vector<std::string> _arg_v;
-    Fork _fork;
-    PThread _thread;
-    Mutex _mutex;
-    std::string _message;
-    RCState _state;
+    RunInfoBuffer m_info;
+    std::string m_name;
+    RCCallback* m_callback;
+    std::string m_exename;
+    std::vector<std::string> m_arg_v;
+    Fork m_fork;
+    PThread m_thread;
+    Mutex m_mutex;
+    std::string m_message;
+    RCState m_state;
 
   };
 
@@ -65,17 +65,17 @@ namespace Belle2 {
 
   public:
     ProcessSubmitter(ProcessController* con, int iopipe[2])
-      : _con(con) {
-      _iopipe[0] = iopipe[0];
-      _iopipe[1] = iopipe[1];
+      : m_con(con) {
+      m_iopipe[0] = iopipe[0];
+      m_iopipe[1] = iopipe[1];
     }
 
   public:
     void run();
 
   private:
-    ProcessController* _con;
-    int _iopipe[2];
+    ProcessController* m_con;
+    int m_iopipe[2];
 
   };
 

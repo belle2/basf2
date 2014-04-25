@@ -9,14 +9,14 @@ namespace Belle2 {
 
   public:
     ProcessListener(ProcessController* con)
-      : _con(con) {}
+      : m_con(con) {}
     ~ProcessListener() {}
 
   public:
     void run();
 
   private:
-    ProcessController* _con;
+    ProcessController* m_con;
 
   };
 

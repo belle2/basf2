@@ -13,16 +13,15 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
-  if (argc < 3) {
-    LogFile::debug("Usage : ./rocontrold <name> <config>");
+  if (argc < 2) {
+    LogFile::debug("Usage : %s <name>", argv[0]);
     return 1;
   }
   daemon(0, 0);
   LogFile::open("rocontrold");
   const char* name = argv[1];
-  const char* config = argv[2];
   NSMNode node(name);
-  ROCallback* callback = new ROCallback(node, config);
+  ROCallback* callback = new ROCallback(node);
   NSMNodeDaemon* daemon = new NSMNodeDaemon(callback);
   daemon->run();
 

@@ -16,9 +16,9 @@ namespace Belle2 {
     ~DBRecord() throw() {};
 
   public:
-    std::vector<std::string>& getFieldNames() throw() { return _name_v; }
-    DBFieldList& getFieldValues() throw() { return _value_m; }
-    size_t getNFields() const throw() { return _name_v.size(); }
+    std::vector<std::string>& getFieldNames() throw() { return m_name_v; }
+    DBFieldList& getFieldValues() throw() { return m_value_m; }
+    size_t getNFields() const throw() { return m_name_v.size(); }
     const std::string get(const std::string& name) const throw();
     const std::string get(int i) const throw();
     int getInt(const std::string& name) const throw();
@@ -38,8 +38,8 @@ namespace Belle2 {
     void add(std::string name, std::string value) throw();
 
   private:
-    std::vector<std::string> _name_v;
-    mutable DBFieldList _value_m;
+    std::vector<std::string> m_name_v;
+    mutable DBFieldList m_value_m;
 
   };
 

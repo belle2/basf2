@@ -8,14 +8,14 @@ using namespace Belle2;
 
 const std::string DBRecord::get(const std::string& name) const throw()
 {
-  if (_value_m.find(name) != _value_m.end()) return _value_m[name];
+  if (m_value_m.find(name) != m_value_m.end()) return m_value_m[name];
   else return "";
 }
 
 const std::string DBRecord::get(int i) const throw()
 {
-  if (i >= 0 && i < (int)_name_v.size())
-    return _value_m[_name_v[i]];
+  if (i >= 0 && i < (int)m_name_v.size())
+    return m_value_m[m_name_v[i]];
   else return "";
 }
 
@@ -103,13 +103,13 @@ std::vector<float> DBRecord::getFloatArray(int i) const throw()
 
 void DBRecord::add(std::string name, std::string value) throw()
 {
-  _name_v.push_back(name);
-  _value_m.insert(DBFieldList::value_type(name, value));
+  m_name_v.push_back(name);
+  m_value_m.insert(DBFieldList::value_type(name, value));
 }
 
 const std::string DBRecord::getFieldName(int i) const throw()
 {
-  if (i >= 0 && i < (int) _name_v.size()) return _name_v[i];
+  if (i >= 0 && i < (int) m_name_v.size()) return m_name_v[i];
   return "";
 }
 

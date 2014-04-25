@@ -22,7 +22,7 @@ namespace Belle2 {
     bool destroy() throw();
 
   private:
-    pthread_cond_t _cond_t;
+    pthread_cond_t m_cond_t;
 
   };
 };

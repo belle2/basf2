@@ -15,40 +15,40 @@ namespace Belle2 {
 
   protected:
     Enum(int id, const std::string& label)
-    throw() : _id(id), _label(label) {}
+    throw() : m_id(id), m_label(label) {}
     Enum(const Enum& e) throw() :
-      _id(e._id), _label(e._label) {}
-    Enum() throw() : _id(UNKNOWN._id),
-      _label(UNKNOWN._label) {}
+      m_id(e.m_id), m_label(e.m_label) {}
+    Enum() throw() : m_id(UNKNOWN.m_id),
+      m_label(UNKNOWN.m_label) {}
 
   public:
-    int getId() const throw() { return _id; }
-    const char* getLabel() const throw() { return _label.c_str(); }
-    const std::string& getLabelString() const throw() { return _label; }
+    int getId() const throw() { return m_id; }
+    const char* getLabel() const throw() { return m_label.c_str(); }
+    const std::string& getLabelString() const throw() { return m_label; }
 
   public:
     bool operator==(const Enum& e) const throw();
     bool operator!=(const Enum& e) const throw();
     const Enum& operator=(const Enum& e) throw();
 
-  protected:
-    int _id;
-    std::string _label;
+  private:
+    int m_id;
+    std::string m_label;
 
   };
 
   inline bool Enum::operator==(const Enum& e) const throw()
   {
-    return (_id == e._id);
+    return (m_id == e.m_id);
   }
   inline bool Enum::operator!=(const Enum& e) const throw()
   {
-    return (_id != e._id);
+    return (m_id != e.m_id);
   }
   inline const Enum& Enum::operator=(const Enum& e) throw()
   {
-    _id = e._id;
-    _label = e._label;
+    m_id = e.m_id;
+    m_label = e.m_label;
     return *this;
   }
 

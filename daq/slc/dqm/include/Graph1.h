@@ -1,5 +1,5 @@
-#ifndef _Belle2_Graph1_hh
-#define _Belle2_Graph1_hh
+#ifndef _Belle2_Graph1_h
+#define _Belle2_Graph1_h
 
 #include "daq/slc/dqm/Histo.h"
 
@@ -32,8 +32,8 @@ namespace Belle2 {
     virtual int getDim() const throw() { return 1; }
 
   public:
-    virtual void readConfig(Belle2::Reader& reader) throw(Belle2::IOException);
-    virtual void writeConfig(Belle2::Writer& writer) const throw(Belle2::IOException);
+    virtual void readConfig(Reader& reader) throw(IOException);
+    virtual void writeConfig(Writer& writer) const throw(IOException);
 
   };
 

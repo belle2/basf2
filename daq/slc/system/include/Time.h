@@ -9,11 +9,6 @@ namespace Belle2 {
 
   class Time : public Serializable {
 
-    // member data
-  private:
-    long _s;
-    long _us;
-
     // constructors & destructors
   public:
     explicit Time() throw();
@@ -46,6 +41,11 @@ namespace Belle2 {
     bool operator == (const Time&) const throw();
     Time operator + (const Time&) const throw();
     Time operator - (const Time&) const throw();
+
+    // member data
+  private:
+    long m_s;
+    long m_us;
 
   };
 

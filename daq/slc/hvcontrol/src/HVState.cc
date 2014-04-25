@@ -16,26 +16,26 @@ const HVState HVState::TRIP_ES(42, "TRIP");
 const HVState HVState::OVER_CURRENT_ES(43, "OVER_CURRENT");
 const HVState HVState::OVER_VOLTAGE_ES(44, "OVER_VOLTAGE");
 
-bool HVState::isOff() const { return _id > 0 && _id < 10; }
-bool HVState::isOn() const { return _id > 10 && _id < 20; }
-bool HVState::isTransition() const { return _id > 30 && _id < 40; }
-bool HVState::isError() const { return _id > 40; }
+bool HVState::isOff() const { return getId() > 0 && getId() < 10; }
+bool HVState::isOn() const { return getId() > 10 && getId() < 20; }
+bool HVState::isTransition() const { return getId() > 30 && getId() < 40; }
+bool HVState::isError() const { return getId() > 40; }
 
 const HVState& HVState::operator=(const std::string& label) throw()
 {
-  if (label == OFF_S._label) *this = OFF_S;
-  else if (label == STABLE_S._label) *this = STABLE_S;
-  else if (label == STANDBY_S._label) *this = STANDBY_S;
-  else if (label == STANDBY2_S._label) *this = STANDBY2_S;
-  else if (label == STANDBY3_S._label) *this = STANDBY3_S;
-  else if (label == PEAK_S._label) *this = PEAK_S;
-  else if (label == TRANSITION_TS._label) *this = TRANSITION_TS;
-  else if (label == RAMPINGUP_TS._label) *this = RAMPINGUP_TS;
-  else if (label == RAMPINGDOWN_TS._label) *this = RAMPINGDOWN_TS;
-  else if (label == ERROR_ES._label) *this = ERROR_ES;
-  else if (label == TRIP_ES._label) *this = TRIP_ES;
-  else if (label == OVER_CURRENT_ES._label) *this = OVER_CURRENT_ES;
-  else if (label == OVER_VOLTAGE_ES._label) *this = OVER_VOLTAGE_ES;
+  if (label == OFF_S.getLabel()) *this = OFF_S;
+  else if (label == STABLE_S.getLabel()) *this = STABLE_S;
+  else if (label == STANDBY_S.getLabel()) *this = STANDBY_S;
+  else if (label == STANDBY2_S.getLabel()) *this = STANDBY2_S;
+  else if (label == STANDBY3_S.getLabel()) *this = STANDBY3_S;
+  else if (label == PEAK_S.getLabel()) *this = PEAK_S;
+  else if (label == TRANSITION_TS.getLabel()) *this = TRANSITION_TS;
+  else if (label == RAMPINGUP_TS.getLabel()) *this = RAMPINGUP_TS;
+  else if (label == RAMPINGDOWN_TS.getLabel()) *this = RAMPINGDOWN_TS;
+  else if (label == ERROR_ES.getLabel()) *this = ERROR_ES;
+  else if (label == TRIP_ES.getLabel()) *this = TRIP_ES;
+  else if (label == OVER_CURRENT_ES.getLabel()) *this = OVER_CURRENT_ES;
+  else if (label == OVER_VOLTAGE_ES.getLabel()) *this = OVER_VOLTAGE_ES;
   else *this = Enum::UNKNOWN;
   return *this;
 }
@@ -49,19 +49,19 @@ const HVState& HVState::operator=(const char* label) throw()
 
 const HVState& HVState::operator=(int id) throw()
 {
-  if (id == OFF_S._id) *this = OFF_S;
-  else if (id == STABLE_S._id) *this = STABLE_S;
-  else if (id == STANDBY_S._id) *this = STANDBY_S;
-  else if (id == STANDBY2_S._id) *this = STANDBY2_S;
-  else if (id == STANDBY3_S._id) *this = STANDBY3_S;
-  else if (id == PEAK_S._id) *this = PEAK_S;
-  else if (id == TRANSITION_TS._id) *this = TRANSITION_TS;
-  else if (id == RAMPINGUP_TS._id) *this = RAMPINGUP_TS;
-  else if (id == RAMPINGDOWN_TS._id) *this = RAMPINGDOWN_TS;
-  else if (id == ERROR_ES._id) *this = ERROR_ES;
-  else if (id == TRIP_ES._id) *this = TRIP_ES;
-  else if (id == OVER_CURRENT_ES._id) *this = OVER_CURRENT_ES;
-  else if (id == OVER_VOLTAGE_ES._id) *this = OVER_VOLTAGE_ES;
+  if (id == OFF_S.getId()) *this = OFF_S;
+  else if (id == STABLE_S.getId()) *this = STABLE_S;
+  else if (id == STANDBY_S.getId()) *this = STANDBY_S;
+  else if (id == STANDBY2_S.getId()) *this = STANDBY2_S;
+  else if (id == STANDBY3_S.getId()) *this = STANDBY3_S;
+  else if (id == PEAK_S.getId()) *this = PEAK_S;
+  else if (id == TRANSITION_TS.getId()) *this = TRANSITION_TS;
+  else if (id == RAMPINGUP_TS.getId()) *this = RAMPINGUP_TS;
+  else if (id == RAMPINGDOWN_TS.getId()) *this = RAMPINGDOWN_TS;
+  else if (id == ERROR_ES.getId()) *this = ERROR_ES;
+  else if (id == TRIP_ES.getId()) *this = TRIP_ES;
+  else if (id == OVER_CURRENT_ES.getId()) *this = OVER_CURRENT_ES;
+  else if (id == OVER_VOLTAGE_ES.getId()) *this = OVER_VOLTAGE_ES;
   else *this = Enum::UNKNOWN;
   return *this;
 }

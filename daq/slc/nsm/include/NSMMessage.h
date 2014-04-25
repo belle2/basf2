@@ -92,17 +92,17 @@ namespace Belle2 {
 
   public:
     size_t read(NSMcontext* nsmc) throw(NSMHandlerException);
-    NSMmsg* getMsg() { return &_nsm_msg; }
+    NSMmsg* getMsg() { return &m_nsm_msg; }
 
   private:
     int try_read(int sock, char* buf, int datalen);
 
   private:
-    mutable NSMcontext* _nsmc;
-    NSMmsg _nsm_msg;
-    int _data[NSM_TCPDATSIZ];
-    mutable std::string _nodename;
-    mutable std::string _reqname;
+    mutable NSMcontext* m_nsmc;
+    NSMmsg m_nsm_msg;
+    int m_data[NSM_TCPDATSIZ];
+    mutable std::string m_nodename;
+    mutable std::string m_reqname;
 
   };
 

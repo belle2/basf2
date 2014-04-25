@@ -17,11 +17,11 @@ namespace Belle2 {
     virtual ~StoragerCallback() throw();
 
   public:
-    size_t getNControllers() const { return _con.size(); }
-    ProcessController& getController(int n) { return _con[n]; }
-    std::vector<ProcessController>& getControllers() { return _con; }
-    NSMData& getData() throw() { return _data; }
-    const NSMData& getData() const throw() { return _data; }
+    size_t getNControllers() const { return m_con.size(); }
+    ProcessController& getController(int n) { return m_con[n]; }
+    std::vector<ProcessController>& getControllers() { return m_con; }
+    NSMData& getData() throw() { return m_data; }
+    const NSMData& getData() const throw() { return m_data; }
 
   public:
     virtual void init() throw();
@@ -36,8 +36,8 @@ namespace Belle2 {
     virtual bool abort() throw();
 
   private:
-    std::vector<ProcessController> _con;
-    NSMData _data;
+    std::vector<ProcessController> m_con;
+    NSMData m_data;
 
   };
 

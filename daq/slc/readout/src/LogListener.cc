@@ -27,34 +27,34 @@ using namespace Belle2;
 
 void LogListener::run()
 {
-  File fd(_pipe[0]);
+  File fd(m_pipe[0]);
   PipeReader preader(fd);
   char c;
   std::stringstream ss;
   std::string s;
   SystemLog::Priority priority = SystemLog::UNKNOWN;
-  NSMCommunicator* comm = _con->getCallback()->getCommunicator();
-  NSMNode& node(_con->getCallback()->getNode());
+  NSMCommunicator* comm = m_con->getCallback()->getCommunicator();
+  NSMNode& node(m_con->getCallback()->getNode());
   try {
     int count = 0;
     while (true) {
       c = preader.readChar();
       if (c == '\n' && count > 0) {
-        s = _con->getName() + " : " + ss.str();
+        s = m_con->getName() + " : " + ss.str();
         ss.str("");
-        _con->lock();
+        m_con->lock();
         LogFile::put(priority, s);
         if (priority == SystemLog::ERROR) {
           comm->sendError(s);
-          _con->setState(RunInfoBuffer::ERROR);
+          m_con->setState(RunInfoBuffer::ERROR);
         } else if (priority == SystemLog::FATAL) {
           comm->sendError(s);
-          _con->setState(RunInfoBuffer::ERROR);
+          m_con->setState(RunInfoBuffer::ERROR);
         }
         if (priority >= SystemLog::NOTICE) {
           comm->sendLog(SystemLog(node.getName(), priority, s));
         }
-        _con->unlock();
+        m_con->unlock();
         count = 0;
         priority = SystemLog::UNKNOWN;
       } else if (isprint(c)) {
@@ -92,5 +92,5 @@ void LogListener::run()
   } catch (const IOException& e) {
     //LogFile::debug("failed to read pipe: %s", e.what());
   }
-  close(_pipe[0]);
+  close(m_pipe[0]);
 }

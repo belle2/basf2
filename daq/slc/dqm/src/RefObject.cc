@@ -9,15 +9,15 @@ const std::string RefObject::ELEMENT_TAG = "ref-object";
 std::string RefObject::toXML() const throw()
 {
   std::stringstream ss;
-  if (_histo != NULL) {
+  if (m_histo != NULL) {
     ss << "<" << ELEMENT_TAG << " "
-       << "data-type='" << _histo->getDataType() << "' ";
-    if (_histo->getName().size() > 0) ss << "name='" << _histo->getName() << "' ";
-    if (_histo->getTitle().size() > 0) ss << "title='" << _histo->getTitle() << "' ";
-    if (_histo->getLine() != NULL) ss << _histo->getLine()->toString();
-    if (_histo->getFill() != NULL) ss << _histo->getFill()->toString();
-    if (_histo->getFont() != NULL) ss << _histo->getFont()->toString();
-    ss << "data='" << _histo->getData().toString() << "' ";
+       << "data-type='" << m_histo->getDataType() << "' ";
+    if (m_histo->getName().size() > 0) ss << "name='" << m_histo->getName() << "' ";
+    if (m_histo->getTitle().size() > 0) ss << "title='" << m_histo->getTitle() << "' ";
+    if (m_histo->getLine() != NULL) ss << m_histo->getLine()->toString();
+    if (m_histo->getFill() != NULL) ss << m_histo->getFill()->toString();
+    if (m_histo->getFont() != NULL) ss << m_histo->getFont()->toString();
+    ss << "data='" << m_histo->getData().toString() << "' ";
     ss << "/>\n";
   }
   return ss.str();

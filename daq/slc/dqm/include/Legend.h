@@ -1,5 +1,5 @@
-#ifndef _Belle2_Legend_hh
-#define _Belle2_Legend_hh
+#ifndef _Belle2_Legend_h
+#define _Belle2_Legend_h
 
 #include "daq/slc/dqm/Histo.h"
 #include "daq/slc/dqm/Rect.h"
@@ -23,7 +23,7 @@ namespace Belle2 {
     virtual std::string toXML() const throw();
 
   private:
-    std::vector<Histo*> _object_v;
+    std::vector<Histo*> m_object_v;
 
   };
 

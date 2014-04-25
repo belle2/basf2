@@ -1,5 +1,5 @@
-#ifndef _Belle2_PackageStreamer_hh
-#define _Belle2_PackageStreamer_hh
+#ifndef _Belle2_PackageStreamer_h
+#define _Belle2_PackageStreamer_h
 
 #include <system/Writer.h"
 #include <system/Reader.h"
@@ -15,12 +15,12 @@ namespace Belle2 {
     ~PackageStreamer() throw() {}
 
   public:
-    void writeConfig(const HistoPackage& pack, Belle2::Writer& writer) throw(Belle2::IOException);
-    void writeHistory(const HistoPackage& pack, Belle2::Writer& writer) throw(Belle2::IOException);
-    void writeUpdate(const HistoPackage& pack, Belle2::Writer& writer) throw(Belle2::IOException);
-    void readConfig(HistoPackage& pack, Belle2::Reader& reader) throw(Belle2::IOException);
-    void readHistory(HistoPackage& pack, Belle2::Reader& reader) throw(Belle2::IOException);
-    void readUpdate(HistoPackage& pack, Belle2::Reader& reader) throw(Belle2::IOException);
+    void writeConfig(const HistoPackage& pack, Writer& writer) throw(IOException);
+    void writeHistory(const HistoPackage& pack, Writer& writer) throw(IOException);
+    void writeUpdate(const HistoPackage& pack, Writer& writer) throw(IOException);
+    void readConfig(HistoPackage& pack, Reader& reader) throw(IOException);
+    void readHistory(HistoPackage& pack, Reader& reader) throw(IOException);
+    void readUpdate(HistoPackage& pack, Reader& reader) throw(IOException);
 
   };
 

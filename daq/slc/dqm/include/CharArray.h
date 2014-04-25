@@ -1,5 +1,5 @@
-#ifndef CharArray_hh
-#define CharArray_hh
+#ifndef _Belle2_CharArray_h
+#define _Belle2_CharArray_h
 
 #include "daq/slc/dqm/NumberArray.h"
 
@@ -16,8 +16,8 @@ namespace Belle2 {
 
   public:
     virtual double get(size_t n) const throw();
-    virtual void* ptr() throw() { return _value_v; }
-    virtual const void* ptr() const throw() { return _value_v; }
+    virtual void* ptr() throw() { return m_value_v; }
+    virtual const void* ptr() const throw() { return m_value_v; }
     virtual void set(size_t n, double v) throw();
     virtual void resize(int s) throw();
     virtual std::string toScript() const throw();
@@ -38,7 +38,7 @@ namespace Belle2 {
 
     // member data
   private:
-    char* _value_v;
+    char* m_value_v;
 
   };
 

@@ -5,12 +5,12 @@
 using namespace Belle2;
 
 Exception::Exception() throw()
-  : _comment("")
+  : m_comment("")
 {
 }
 
 Exception::Exception(const std::string& comment) throw()
-  : _comment(comment)
+  : m_comment(comment)
 {
 }
 
@@ -22,7 +22,7 @@ Exception::~Exception() throw()
 
 const char* Exception::what() const throw()
 {
-  return _comment.c_str();
+  return m_comment.c_str();
   /*
   static std::string str =
   std::stringstream ss;

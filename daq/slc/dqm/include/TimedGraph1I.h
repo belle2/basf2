@@ -1,5 +1,5 @@
-#ifndef _Belle2_TimedGraph1I_hh
-#define _Belle2__TimedGraph1I_hh
+#ifndef _Belle2_TimedGraph1I_h
+#define _Belle2_TimedGraph1I_h
 
 #include "daq/slc/dqm/TimedGraph1.h"
 

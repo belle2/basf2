@@ -18,17 +18,17 @@ namespace Belle2 {
 
     // member methods implemented
   public:
-    void* getCompBuffer() const throw() { return _comp_buf; }
-    size_t getBufferSize() const throw() { return _comp_buf_size; }
-    size_t getCompSize() const throw() { return _comp_size; }
+    void* getCompBuffer() const throw() { return m_comp_buf; }
+    size_t getBufferSize() const throw() { return m_comp_buf_size; }
+    size_t getCompSize() const throw() { return m_comp_size; }
     void deflate(int level = 1) throw(IOException);
     void writeObject(Writer&) throw(IOException);
 
     // member data
   private:
-    unsigned char* _comp_buf;
-    uLongf _comp_buf_size;
-    uLongf _comp_size;
+    unsigned char* m_comp_buf;
+    uLongf m_comp_buf_size;
+    uLongf m_comp_size;
 
   };
 

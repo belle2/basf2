@@ -5,21 +5,21 @@
 using namespace Belle2;
 
 Axis::Axis()
-  : _nbins(1), _min(0), _max(1), _title(""),
-    _fixed_min(false), _fixed_max(false) {}
+  : m_nbins(1), m_min(0), m_max(1), m_title(""),
+    m_fixed_min(false), m_fixed_max(false) {}
 
 Axis::Axis(int nbin, double min, double max,
            const std::string& title)
-  : _nbins(nbin), _min(min), _max(max), _title(title),
-    _fixed_min(false), _fixed_max(false) {}
+  : m_nbins(nbin), m_min(min), m_max(max), m_title(title),
+    m_fixed_min(false), m_fixed_max(false) {}
 
 Axis::Axis(int nbin, double min, double max)
-  : _nbins(nbin), _min(min), _max(max),
-    _title(""), _fixed_min(false), _fixed_max(false) {}
+  : m_nbins(nbin), m_min(min), m_max(max),
+    m_title(""), m_fixed_min(false), m_fixed_max(false) {}
 
 Axis::Axis(const Axis& axis)
-  : _nbins(axis._nbins), _min(axis._min), _max(axis._max),
-    _title(axis._title), _fixed_min(false), _fixed_max(false) {}
+  : m_nbins(axis.m_nbins), m_min(axis.m_min), m_max(axis.m_max),
+    m_title(axis.m_title), m_fixed_min(false), m_fixed_max(false) {}
 
 Axis::~Axis() throw() {}
 
@@ -36,17 +36,17 @@ void Axis::set(int nbin, double min, double max, const std::string& title)
   setTitle(title);
 }
 
-void Axis::readObject(Belle2::Reader& reader) throw(Belle2::IOException)
+void Axis::readObject(Reader& reader) throw(IOException)
 {
-  _title = reader.readString();
+  m_title = reader.readString();
   setNbins(reader.readInt());
   setMin(reader.readDouble());
   setMax(reader.readDouble());
 }
 
-void Axis::writeObject(Belle2::Writer& writer) const throw(Belle2::IOException)
+void Axis::writeObject(Writer& writer) const throw(IOException)
 {
-  writer.writeString(_title);
+  writer.writeString(m_title);
   writer.writeInt(getNbins());
   writer.writeDouble(getMin());
   writer.writeDouble(getMax());
@@ -54,9 +54,9 @@ void Axis::writeObject(Belle2::Writer& writer) const throw(Belle2::IOException)
 
 const Axis& Axis::operator=(const Axis& axis)
 {
-  _nbins = axis._nbins;
-  _min = axis._min;
-  _max = axis._max;
-  _title = axis._title;
+  m_nbins = axis.m_nbins;
+  m_min = axis.m_min;
+  m_max = axis.m_max;
+  m_title = axis.m_title;
   return *this;
 }

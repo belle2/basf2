@@ -1,5 +1,5 @@
-#ifndef _Belle2_MonLine_hh
-#define _Belle2_MonLine_hh
+#ifndef _Belle2_MonLine_h
+#define _Belle2_MonLine_h
 
 #include "daq/slc/dqm/MonShape.h"
 #include "daq/slc/dqm/DoubleArray.h"
@@ -16,19 +16,19 @@ namespace Belle2 {
 
   public:
     void set(double x1, double y1, double x2, double y2) throw() {
-      _x1 = x1; _y1 = y1; _x2 = x2; _y2 = y2;
+      m_x1 = x1; m_y1 = y1; m_x2 = x2; m_y2 = y2;
     }
 
   public:
     virtual void reset() throw();
-    virtual void readConfig(Belle2::Reader& reader) throw(Belle2::IOException);
-    virtual void readContents(Belle2::Reader& reader) throw(Belle2::IOException);
-    virtual void writeConfig(Belle2::Writer& writer) const throw(Belle2::IOException);
-    virtual void writeContents(Belle2::Writer& writer) const throw(Belle2::IOException);
+    virtual void readConfig(Reader& reader) throw(IOException);
+    virtual void readContents(Reader& reader) throw(IOException);
+    virtual void writeConfig(Writer& writer) const throw(IOException);
+    virtual void writeContents(Writer& writer) const throw(IOException);
     std::string getDataType() const throw() { return "MLN"; }
 
   private:
-    double _x1, _y1, _x2, _y2;
+    double m_x1, m_y1, m_x2, m_y2;
 
   };
 

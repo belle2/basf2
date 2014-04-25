@@ -17,32 +17,32 @@ namespace Belle2 {
   public:
     DQMFileReader(const std::string& name,
                   const std::string& file_path)
-      : _name(name), _hist_m(file_path), _file(NULL),
-        _ready(false), _updateid(0) {}
+      : m_name(name), m_hist_m(file_path), m_file(NULL),
+        m_ready(false), m_updateid(0) {}
     ~DQMFileReader();
 
   public:
     bool init();
     int update();
-    int getUpdateId() { return _updateid; }
-    const std::string& getName() { return _name; }
-    const std::string& getFileName() { return _hist_m.getFileName(); }
+    int getUpdateId() { return m_updateid; }
+    const std::string& getName() { return m_name; }
+    const std::string& getFileName() { return m_hist_m.getFileName(); }
     TH1* getHist(const std::string& name);
-    TH1Map& getHists() { return _hist_m.getHists(); }
-    const TH1Map& getHists() const { return _hist_m.getHists(); }
-    bool isReady() const { return _ready; }
+    TH1Map& getHists() { return m_hist_m.getHists(); }
+    const TH1Map& getHists() const { return m_hist_m.getHists(); }
+    bool isReady() const { return m_ready; }
     bool dump(const std::string& dir,
               unsigned int expno, unsigned int runno);
-    void lock() { _mutex.lock(); }
-    void unlock() { _mutex.unlock(); }
+    void lock() { m_mutex.lock(); }
+    void unlock() { m_mutex.unlock(); }
 
   private:
-    std::string _name;
-    DQMHistMap _hist_m;
-    TMapFile* _file;
-    bool _ready;
-    int _updateid;
-    Mutex _mutex;
+    std::string m_name;
+    DQMHistMap m_hist_m;
+    TMapFile* m_file;
+    bool m_ready;
+    int m_updateid;
+    Mutex m_mutex;
 
   };
 

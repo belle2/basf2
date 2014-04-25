@@ -39,15 +39,17 @@ void ConfigFile::read(const std::string& filename, bool overload)
   while (fin && getline(fin, s)) {
     if (s.size() == 0 || s.at(0) == '#') continue;
     if (s.find("!cd") != std::string::npos) {
-      dir = StringUtil::replace(StringUtil::replace(StringUtil::replace(s, "!cd", ""), " ", ""), "\t", "");
+      dir = StringUtil::replace(StringUtil::replace(StringUtil::replace(s, "!cd", ""),
+                                                    " ", ""), "\t", "");
       if (dir.size() > 0) {
-        _dir_v.push_back(dir);
+        m_dir_v.push_back(dir);
       }
       continue;
     }
     std::vector<std::string> str_v = StringUtil::split(s, ':');
     if (str_v.size() >= 2) {
-      std::string label = StringUtil::replace(StringUtil::replace(str_v[0], " ", ""), "\t", "");
+      std::string label = StringUtil::replace(StringUtil::replace(str_v[0],
+                                                                  " ", ""), "\t", "");
       std::string value = "";
       if (str_v.size() > 2) {
         for (size_t i = 2; i < str_v.size(); i++) {
@@ -76,8 +78,8 @@ void ConfigFile::read(const std::string& filename, bool overload)
           const char* env = getenv(value.c_str());
           if (env != NULL) {
             value = env;
-          } else if (_value_m.find(value) != _value_m.end()) {
-            value = _value_m[value];
+          } else if (m_value_m.find(value) != m_value_m.end()) {
+            value = m_value_m[value];
           }
           continue;
         }
@@ -86,11 +88,11 @@ void ConfigFile::read(const std::string& filename, bool overload)
       if (dir.size() > 0) {
         label = dir + "." + label;
       }
-      if (_value_m.find(label) == _value_m.end()) {
-        _value_m.insert(ValueList::value_type(label, value));
-        _label_v.push_back(label);
+      if (m_value_m.find(label) == m_value_m.end()) {
+        m_value_m.insert(ValueList::value_type(label, value));
+        m_label_v.push_back(label);
       } else if (overload) {
-        _value_m[label] = value;
+        m_value_m[label] = value;
       }
     }
   }
@@ -99,19 +101,19 @@ void ConfigFile::read(const std::string& filename, bool overload)
 
 void ConfigFile::clear()
 {
-  _value_m.clear();
+  m_value_m.clear();
 }
 
 const std::string ConfigFile::get(const std::string& label)
 {
-  std::string label_in = (_dir.size() > 0) ? _dir + "." + label : label;
-  if (_value_m.find(label_in) != _value_m.end()) {
-    return _value_m[label_in];
+  std::string label_in = (m_dir.size() > 0) ? m_dir + "." + label : label;
+  if (m_value_m.find(label_in) != m_value_m.end()) {
+    return m_value_m[label_in];
   } else {
     const char* env = getenv(label_in.c_str());
     if (env != NULL) {
       std::string value = env;
-      _value_m.insert(ValueList::value_type(label_in, value));
+      m_value_m.insert(ValueList::value_type(label_in, value));
       return value;
     }
   }
@@ -134,8 +136,8 @@ double ConfigFile::getFloat(const std::string& label)
 
 void ConfigFile::add(const std::string& label, const std::string& value)
 {
-  _value_m.insert(ValueList::value_type(label, value));
-  _label_v.push_back(label);
+  m_value_m.insert(ValueList::value_type(label, value));
+  m_label_v.push_back(label);
 }
 
 void ConfigFile::write(const std::string& path)
@@ -145,10 +147,10 @@ void ConfigFile::write(const std::string& path)
      << "#" << std::endl
      << "#" << std::endl
      << "" << std::endl;
-  for (std::vector<std::string>::iterator it = _label_v.begin();
-       it != _label_v.end(); it++) {
+  for (std::vector<std::string>::iterator it = m_label_v.begin();
+       it != m_label_v.end(); it++) {
     std::string& label(*it);
-    std::string& value(_value_m[label]);
+    std::string& value(m_value_m[label]);
     ss << label << " : " << value << std::endl;
   }
   ss << "" << std::endl

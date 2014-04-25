@@ -28,9 +28,9 @@ namespace Belle2 {
     void* map(size_t, size_t);
     void* map();
     bool isOpened() throw();
-    const std::string& getPath() const throw() { return _path; }
-    size_t size() const throw() { return _size; }
-    int getfd() const throw() { return _fd; }
+    const std::string& getPath() const throw() { return m_path; }
+    size_t size() const throw() { return m_size; }
+    int getfd() const throw() { return m_fd; }
 
     // operators
   public:
@@ -38,10 +38,10 @@ namespace Belle2 {
 
     // data members;
   private:
-    int _fd;
-    std::string _path;
-    size_t _size;
-    void* _addr;
+    int m_fd;
+    std::string m_path;
+    size_t m_size;
+    void* m_addr;
 
   };
 

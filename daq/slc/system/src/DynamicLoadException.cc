@@ -13,6 +13,6 @@ DynamicLoadException::DynamicLoadException(const std::string& format, ...) throw
   va_start(ap, format);
   vsprintf(ss, format.c_str(), ap);
   va_end(ap);
-  _comment = ss;
+  m_comment = ss;
 }
 

@@ -1,5 +1,5 @@
-#ifndef _Belle2_FillProperty_hh
-#define _Belle2_FillProperty_hh
+#ifndef _Belle2_FillProperty_h
+#define _Belle2_FillProperty_h
 
 #include "daq/slc/dqm/Property.h"
 
@@ -9,9 +9,6 @@ namespace Belle2 {
 
   class FillProperty : public Property {
 
-  private:
-    double _transparency;
-
   public:
     FillProperty(const MonColor& color,
                  double transparency = -1) throw();
@@ -19,11 +16,14 @@ namespace Belle2 {
     virtual ~FillProperty() throw() {}
 
   public:
-    double getTransparency() const throw() { return _transparency; }
+    double getTransparency() const throw() { return m_transparency; }
     void setTransparency(double transparency) throw() {
-      _transparency = transparency;
+      m_transparency = transparency;
     }
     virtual std::string toString() const throw();
+
+  private:
+    double m_transparency;
 
   };
 

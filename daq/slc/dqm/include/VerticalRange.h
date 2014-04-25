@@ -1,5 +1,5 @@
-#ifndef _Belle2_VerticalRange_hh
-#define _Belle2_VerticalRange_hh
+#ifndef _Belle2_VerticalRange_h
+#define _Belle2_VerticalRange_h
 
 #include "daq/slc/dqm/Range.h"
 

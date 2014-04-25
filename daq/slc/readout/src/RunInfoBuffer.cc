@@ -8,99 +8,99 @@ using namespace Belle2;
 
 size_t RunInfoBuffer::size() throw()
 {
-  return _mutex.size() + _cond.size() +
-         sizeof(unsigned int) * (5 + _nreserved);
+  return m_mutex.size() + m_cond.size() +
+         sizeof(unsigned int) * (5 + m_nreserved);
 }
 
 bool RunInfoBuffer::open(const std::string& nodename,
                          int nreserved, bool recreate)
 {
-  _nodename = nodename;
-  _nreserved = nreserved;
+  m_nodename = nodename;
+  m_nreserved = nreserved;
   std::string username = getenv("USER");
-  _path = "/run_info_" + username + "_" + nodename;
+  m_path = "/run_info_" + username + "_" + nodename;
   //if (recreate) SharedMemory::unlink(_path);
-  if (!_memory.open(_path, size())) {
+  if (!m_memory.open(m_path, size())) {
     perror("shm_open");
-    LogFile::fatal("Failed to open %s", _path.c_str());
+    LogFile::fatal("Failed to open %s", m_path.c_str());
     return false;
   }
-  char* buf = (char*) _memory.map(0, size());
+  char* buf = (char*)m_memory.map(0, size());
   if (buf == NULL) {
     return false;
   }
-  _mutex = MMutex(buf);
-  buf += _mutex.size();
-  _cond = MCond(buf);
-  buf += _cond.size();
-  _buf = (unsigned int*)buf;
+  m_mutex = MMutex(buf);
+  buf += m_mutex.size();
+  m_cond = MCond(buf);
+  buf += m_cond.size();
+  m_buf = (unsigned int*)buf;
   if (recreate) init();
   return true;
 }
 
 bool RunInfoBuffer::init()
 {
-  if (_buf == NULL) return false;
-  _mutex.init();
-  _cond.init();
-  memset(_buf, 0, sizeof(unsigned int) * (5 + _nreserved));
+  if (m_buf == NULL) return false;
+  m_mutex.init();
+  m_cond.init();
+  memset(m_buf, 0, sizeof(unsigned int) * (5 + m_nreserved));
   return true;
 }
 
 void RunInfoBuffer::clear()
 {
-  if (_buf == NULL) return;
-  _mutex.lock();
-  memset(_buf, 0, sizeof(unsigned int) * (5 + _nreserved));
-  _mutex.unlock();
+  if (m_buf == NULL) return;
+  m_mutex.lock();
+  memset(m_buf, 0, sizeof(unsigned int) * (5 + m_nreserved));
+  m_mutex.unlock();
 }
 
 bool RunInfoBuffer::close()
 {
-  _memory.close();
+  m_memory.close();
   return true;
 }
 
 bool RunInfoBuffer::unlink()
 {
-  _memory.unlink();
-  _memory.close();
+  m_memory.unlink();
+  m_memory.close();
   return true;
 }
 
 bool RunInfoBuffer::lock() throw()
 {
-  if (_buf == NULL) return false;
-  return _mutex.lock();
+  if (m_buf == NULL) return false;
+  return m_mutex.lock();
 }
 
 bool RunInfoBuffer::unlock() throw()
 {
-  if (_buf == NULL) return false;
-  return _mutex.unlock();
+  if (m_buf == NULL) return false;
+  return m_mutex.unlock();
 }
 
 bool RunInfoBuffer::wait() throw()
 {
-  if (_buf == NULL) return false;
-  return _cond.wait(_mutex);
+  if (m_buf == NULL) return false;
+  return m_cond.wait(m_mutex);
 }
 
 bool RunInfoBuffer::wait(int time) throw()
 {
-  if (_buf == NULL) return false;
-  return _cond.wait(_mutex, time, 0);
+  if (m_buf == NULL) return false;
+  return m_cond.wait(m_mutex, time, 0);
 }
 
 bool RunInfoBuffer::notify() throw()
 {
-  if (_buf == NULL) return false;
-  return _cond.broadcast();
+  if (m_buf == NULL) return false;
+  return m_cond.broadcast();
 }
 
 bool RunInfoBuffer::waitRunning(int timeout)
 {
-  if (_buf == NULL) return false;
+  if (m_buf == NULL) return false;
   lock();
   if (getState() != RunInfoBuffer::RUNNING) {
     if (!wait(timeout)) {
@@ -114,7 +114,7 @@ bool RunInfoBuffer::waitRunning(int timeout)
 
 bool RunInfoBuffer::reportRunning()
 {
-  if (_buf == NULL) return false;
+  if (m_buf == NULL) return false;
   lock();
   setState(RunInfoBuffer::RUNNING);
   notify();
@@ -124,7 +124,7 @@ bool RunInfoBuffer::reportRunning()
 
 bool RunInfoBuffer::reportError()
 {
-  if (_buf == NULL) return false;
+  if (m_buf == NULL) return false;
   lock();
   setState(RunInfoBuffer::ERROR);
   notify();
@@ -134,7 +134,7 @@ bool RunInfoBuffer::reportError()
 
 bool RunInfoBuffer::reportReady()
 {
-  if (_buf == NULL) return false;
+  if (m_buf == NULL) return false;
   lock();
   setState(RunInfoBuffer::READY);
   notify();
@@ -144,7 +144,7 @@ bool RunInfoBuffer::reportReady()
 
 bool RunInfoBuffer::reportNotReady()
 {
-  if (_buf == NULL) return false;
+  if (m_buf == NULL) return false;
   lock();
   setState(RunInfoBuffer::NOTREADY);
   notify();

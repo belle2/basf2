@@ -14,9 +14,9 @@ COPPERCallback::COPPERCallback(const NSMNode& node,
                                const std::string& configname)
   : RCCallback(node)
 {
-  _con.setCallback(this);
+  m_con.setCallback(this);
   ConfigFile config(configname);
-  _path = config.get("copper.basf2.dir") + "/";
+  m_path = config.get("copper.basf2.dir") + "/";
 }
 
 COPPERCallback::~COPPERCallback() throw()
@@ -25,13 +25,13 @@ COPPERCallback::~COPPERCallback() throw()
 
 void COPPERCallback::init() throw()
 {
-  _con.init("basf2");
+  m_con.init("basf2");
 }
 
 void COPPERCallback::term() throw()
 {
-  _con.abort();
-  _con.getInfo().unlink();
+  m_con.abort();
+  m_con.getInfo().unlink();
 }
 
 bool COPPERCallback::boot() throw()
@@ -47,20 +47,20 @@ bool COPPERCallback::load() throw()
   for (size_t i = 0; i < hslb_v.size(); i++) {
     if (hslb_v[i].getBool("used")) {
       flag += 1 << i;
-      _hslbcon_v[i].reset();
-      if (!_hslbcon_v[i].load(hslb_v[i])) {
+      m_hslbcon_v[i].reset();
+      if (!m_hslbcon_v[i].load(hslb_v[i])) {
         return false;
       }
     }
   }
-  _con.clearArguments();
-  _con.addArgument(_path + copper.getText("basf2script"));
-  _con.addArgument(copper.getText("hostname"));
-  _con.addArgument(StringUtil::form("%d", copper.getInt("copper_id")));
-  _con.addArgument(StringUtil::form("%d", flag));
-  _con.addArgument("1");
-  _con.addArgument("basf2");
-  if (_con.load(30)) {
+  m_con.clearArguments();
+  m_con.addArgument(m_path + copper.getText("basf2script"));
+  m_con.addArgument(copper.getText("hostname"));
+  m_con.addArgument(StringUtil::form("%d", copper.getInt("copper_id")));
+  m_con.addArgument(StringUtil::form("%d", flag));
+  m_con.addArgument("1");
+  m_con.addArgument("basf2");
+  if (m_con.load(30)) {
     LogFile::debug("load succeded");
     return true;
   }
@@ -70,12 +70,12 @@ bool COPPERCallback::load() throw()
 
 bool COPPERCallback::start() throw()
 {
-  return _con.start();
+  return m_con.start();
 }
 
 bool COPPERCallback::stop() throw()
 {
-  return _con.stop();
+  return m_con.stop();
 }
 
 bool COPPERCallback::resume() throw()
@@ -99,7 +99,7 @@ bool COPPERCallback::recover() throw()
 
 bool COPPERCallback::abort() throw()
 {
-  _con.abort();
+  m_con.abort();
   getNode().setState(RCState::INITIAL_S);
   return true;
 }

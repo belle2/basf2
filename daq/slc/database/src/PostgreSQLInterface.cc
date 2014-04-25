@@ -10,18 +10,18 @@ PostgreSQLInterface::PostgreSQLInterface(const std::string& host,
                                          const std::string& password,
                                          int port) throw()
   : DBInterface(host, database, user, password, port),
-    _sq_conn(NULL), _sq_result(NULL)
+    m_sq_conn(NULL), m_sq_result(NULL)
 {
 }
 
 void PostgreSQLInterface::connect() throw(DBHandlerException)
 {
-  _sq_conn = PQconnectdb(StringUtil::form("host=%s dbname=%s user=%s password=%s",
-                                          _host.c_str(), _database.c_str(),
-                                          _user.c_str(), _password.c_str()).c_str());
-  if (PQstatus(_sq_conn) == CONNECTION_BAD) {
+  m_sq_conn = PQconnectdb(StringUtil::form("host=%s dbname=%s user=%s password=%s",
+                                           m_host.c_str(), m_database.c_str(),
+                                           m_user.c_str(), m_password.c_str()).c_str());
+  if (PQstatus(m_sq_conn) == CONNECTION_BAD) {
     throw (DBHandlerException("Failed to connect to the database : (%s)",
-                              PQerrorMessage(_sq_conn)));
+                              PQerrorMessage(m_sq_conn)));
   }
 }
 
@@ -29,52 +29,52 @@ void PostgreSQLInterface::execute_imp(const std::string& command)
 throw(DBHandlerException)
 {
   clear();
-  _sq_result = PQexec(_sq_conn, command.c_str());
-  ExecStatusType status = PQresultStatus(_sq_result);
+  m_sq_result = PQexec(m_sq_conn, command.c_str());
+  ExecStatusType status = PQresultStatus(m_sq_result);
   if (status == PGRES_FATAL_ERROR) {
     throw (DBHandlerException("Failed to execute command : %s (%s)",
-                              command.c_str(), PQerrorMessage(_sq_conn)));
+                              command.c_str(), PQerrorMessage(m_sq_conn)));
   }
 }
 
 DBRecordList PostgreSQLInterface::loadRecords() throw(DBHandlerException)
 {
-  if (PQresultStatus(_sq_result) != PGRES_TUPLES_OK) {
+  if (PQresultStatus(m_sq_result) != PGRES_TUPLES_OK) {
     throw (DBHandlerException("DB records are not ready for reading"));
   }
-  const size_t nrecords = PQntuples(_sq_result);
-  const size_t nfields = PQnfields(_sq_result);
-  _record_v = DBRecordList();
+  const size_t nrecords = PQntuples(m_sq_result);
+  const size_t nfields = PQnfields(m_sq_result);
+  m_record_v = DBRecordList();
   std::vector<std::string> name_v;
   for (size_t ifield = 0; ifield < nfields; ifield++) {
-    const char* name = PQfname(_sq_result, ifield);
+    const char* name = PQfname(m_sq_result, ifield);
     if (name != NULL) name_v.push_back(name);
   }
   for (size_t irecord = 0; irecord < nrecords; irecord++) {
     DBRecord record;
     for (size_t ifield = 0; ifield < nfields; ifield++) {
-      const char* value = PQgetvalue(_sq_result, irecord, ifield);
+      const char* value = PQgetvalue(m_sq_result, irecord, ifield);
       if (value != NULL) {
         record.add(name_v[ifield], value);
       }
     }
-    _record_v.push_back(record);
+    m_record_v.push_back(record);
   }
-  return _record_v;
+  return m_record_v;
 }
 
 void PostgreSQLInterface::clear() throw()
 {
-  if (_sq_result != NULL) {
-    PQclear(_sq_result);
+  if (m_sq_result != NULL) {
+    PQclear(m_sq_result);
   }
-  _sq_result = NULL;
+  m_sq_result = NULL;
 }
 
 void PostgreSQLInterface::close() throw(DBHandlerException)
 {
   clear();
-  PQfinish(_sq_conn);
+  PQfinish(m_sq_conn);
 }
 
 bool PostgreSQLInterface::checkTable(const std::string& tablename) throw(DBHandlerException)

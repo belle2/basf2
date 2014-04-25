@@ -1,5 +1,5 @@
-#ifndef _Belle2_MonitorConnection_hh
-#define _Belle2_MonitorConnection_hh
+#ifndef _Belle2_MonitorConnection_h
+#define _Belle2_MonitorConnection_h
 
 #include <string>
 
@@ -11,10 +11,6 @@ namespace Belle2 {
     static const MonitorConnection UNKNOWN;
     static const MonitorConnection ON;
     static const MonitorConnection OFF;
-
-  private:
-    int _value;
-    std::string _text;
 
   private:
     MonitorConnection(int value, const std::string& text);
@@ -36,10 +32,14 @@ namespace Belle2 {
     }
 
   public:
-    int getValue() const throw() { return _value; }
-    const std::string& getText() const throw() { return _text; }
-    void setValue(int value) throw() { _value = value; }
-    void setText(const std::string& text) throw() { _text = text; }
+    int getValue() const throw() { return m_value; }
+    const std::string& getText() const throw() { return m_text; }
+    void setValue(int value) throw() { m_value = value; }
+    void setText(const std::string& text) throw() { m_text = text; }
+
+  private:
+    int m_value;
+    std::string m_text;
 
   };
 

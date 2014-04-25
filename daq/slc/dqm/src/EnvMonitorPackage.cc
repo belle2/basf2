@@ -8,11 +8,11 @@ EnvMonitorPackage::~EnvMonitorPackage() throw()
 
 NSMData* EnvMonitorPackage::getData()
 {
-  return _data;
+  return m_data;
 }
 
 void EnvMonitorPackage::setData(NSMData* data)
 {
-  _data = data;
+  m_data = data;
 }
 

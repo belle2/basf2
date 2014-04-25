@@ -21,37 +21,37 @@ namespace Belle2 {
   public:
     void add(const std::string& pack_name, int port,
              const std::string& file_path) {
-      _reader_v.push_back(DQMFileReader(pack_name, file_path));
-      _port_v.push_back(port);
+      m_reader_v.push_back(DQMFileReader(pack_name, file_path));
+      m_port_v.push_back(port);
     }
     void init();
     bool boot();
     bool abort();
-    std::vector<DQMFileReader>& getReaders() { return _reader_v; }
+    std::vector<DQMFileReader>& getReaders() { return m_reader_v; }
     void setRunNumbers(unsigned int expno, unsigned int runno) {
-      _expno = expno;
-      _runno = runno;
+      m_expno = expno;
+      m_runno = runno;
     }
-    RCState& getState() { return _state; }
-    void setState(RCState state) { _state = state; }
-    unsigned int getExpNumber() const { return _expno; }
-    unsigned int getRunNumber() const { return _runno; }
-    void setCallback(RCCallback* callback) { _callback = callback; }
-    void notify() { _cond.broadcast(); }
-    void wait() { _cond.wait(_mutex); }
-    void lock() { _mutex.lock(); }
-    void unlock() { _mutex.unlock(); }
+    RCState& getState() { return m_state; }
+    void setState(RCState state) { m_state = state; }
+    unsigned int getExpNumber() const { return m_expno; }
+    unsigned int getRunNumber() const { return m_runno; }
+    void setCallback(RCCallback* callback) { m_callback = callback; }
+    void notify() { m_cond.broadcast(); }
+    void wait() { m_cond.wait(m_mutex); }
+    void lock() { m_mutex.lock(); }
+    void unlock() { m_mutex.unlock(); }
 
   private:
-    Mutex _mutex;
-    Cond _cond;
-    RCState _state;
-    unsigned int _expno;
-    unsigned int _runno;
-    std::vector<DQMFileReader> _reader_v;
-    std::vector<ProcessController> _con_v;
-    std::vector<int> _port_v;
-    RCCallback* _callback;
+    Mutex m_mutex;
+    Cond m_cond;
+    RCState m_state;
+    unsigned int m_expno;
+    unsigned int m_runno;
+    std::vector<DQMFileReader> m_reader_v;
+    std::vector<ProcessController> m_con_v;
+    std::vector<int> m_port_v;
+    RCCallback* m_callback;
 
   };
 

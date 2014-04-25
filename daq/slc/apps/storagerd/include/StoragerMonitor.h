@@ -9,7 +9,7 @@ namespace Belle2 {
 
   public:
     StoragerMonitor(StoragerCallback* callback)
-      : _callback(callback) {}
+      : m_callback(callback) {}
     ~StoragerMonitor() {}
 
   public:
@@ -17,7 +17,7 @@ namespace Belle2 {
     int checkConnection(const std::string& proc_name, int port);
 
   private:
-    StoragerCallback* _callback;
+    StoragerCallback* m_callback;
 
   };
 

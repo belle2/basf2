@@ -11,19 +11,19 @@
 using namespace Belle2;
 
 NSMCallback::NSMCallback(const NSMNode& node, int timeout) throw()
-  : _node(node), _comm(NULL)
+  : m_node(node), m_comm(NULL)
 {
   add(NSMCommand::OK);
   add(NSMCommand::ERROR);
   add(NSMCommand::FATAL);
   add(NSMCommand::LOG);
   add(NSMCommand::STATE);
-  _timeout = timeout;
+  m_timeout = timeout;
 }
 
 bool NSMCallback::isReady() const throw()
 {
-  return _comm != NULL && _comm->isOnline();
+  return m_comm != NULL && m_comm->isOnline();
 }
 
 bool NSMCallback::perform(const NSMMessage& msg)
@@ -46,11 +46,11 @@ throw()
 
 NSMMessage& NSMCallback::getMessage()
 {
-  return _comm->getMessage();
+  return m_comm->getMessage();
 }
 
 void NSMCallback::setMessage(NSMMessage& msg)
 {
-  _comm->setMessage(msg);
+  m_comm->setMessage(msg);
 }
 

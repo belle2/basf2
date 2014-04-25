@@ -3,7 +3,7 @@
 using namespace Belle2;
 
 Property::Property(const MonColor& color) throw()
-  : _color(color), _label(""), _use_color(true) {}
+  : m_color(color), m_label(""), m_use_color(true) {}
 
 Property::Property() throw()
-  : _color(), _label(""), _use_color(false) {}
+  : m_color(), m_label(""), m_use_color(false) {}

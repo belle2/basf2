@@ -1,5 +1,5 @@
-#ifndef _Belle2_Range_hh
-#define _Belle2_Range_hh
+#ifndef _Belle2_Range_h
+#define _Belle2_Range_h
 
 #include "daq/slc/dqm/Histo1D.h"
 #include "daq/slc/dqm/DoubleArray.h"
@@ -26,12 +26,12 @@ namespace Belle2 {
 
   public:
     virtual void reset() throw();
-    virtual void readConfig(Belle2::Reader& reader) throw(Belle2::IOException);
-    virtual void writeConfig(Belle2::Writer& writer) const throw(Belle2::IOException);
-    virtual void readUpdate(Belle2::Reader& reader) throw(Belle2::IOException);
-    virtual void writeUpdate(Belle2::Writer& writer) const throw(Belle2::IOException);
-    virtual void readUpdateFull(Belle2::Reader& reader) throw(Belle2::IOException);
-    virtual void writeUpdateFull(Belle2::Writer& writer) const throw(Belle2::IOException);
+    virtual void readConfig(Reader& reader) throw(IOException);
+    virtual void writeConfig(Writer& writer) const throw(IOException);
+    virtual void readUpdate(Reader& reader) throw(IOException);
+    virtual void writeUpdate(Writer& writer) const throw(IOException);
+    virtual void readUpdateFull(Reader& reader) throw(IOException);
+    virtual void writeUpdateFull(Writer& writer) const throw(IOException);
 
   };
 

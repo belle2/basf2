@@ -17,7 +17,7 @@ namespace Belle2 {
 
   public:
     DQMViewCallback(const NSMNode& node, DQMViewMaster& master)
-      : RCCallback(node), _master(master) {}
+      : RCCallback(node), m_master(master) {}
     virtual ~DQMViewCallback() throw() {}
 
   public:
@@ -29,15 +29,15 @@ namespace Belle2 {
     virtual bool pause() throw();
     virtual bool recover() throw();
     virtual bool abort() throw();
-    void lock() { _mutex.lock(); }
-    void unlock() { _mutex.unlock(); }
+    void lock() { m_mutex.lock(); }
+    void unlock() { m_mutex.unlock(); }
 
   private:
-    DQMViewMaster& _master;
-    unsigned int _expno;
-    unsigned int _runno;
-    unsigned int _count;
-    Mutex _mutex;
+    DQMViewMaster& m_master;
+    unsigned int m_expno;
+    unsigned int m_runno;
+    unsigned int m_count;
+    Mutex m_mutex;
 
   };
 

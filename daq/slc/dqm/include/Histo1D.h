@@ -1,5 +1,5 @@
-#ifndef _Belle2_Histo1D_hh
-#define _Belle2_Histo1D_hh
+#ifndef _Belle2_Histo1D_h
+#define _Belle2_Histo1D_h
 
 #include "daq/slc/dqm/Histo1.h"
 #include "daq/slc/dqm/DoubleArray.h"

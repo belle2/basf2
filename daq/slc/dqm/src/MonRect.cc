@@ -4,8 +4,8 @@ using namespace Belle2;
 
 void MonRect::reset() throw()
 {
-  _x = _y = 0;
-  _width = _height = 1;
+  m_x = m_y = 0;
+  m_width = m_height = 1;
 }
 
 void MonRect::readConfig(Belle2::Reader& reader)
@@ -18,10 +18,10 @@ void MonRect::readContents(Belle2::Reader& reader)
 throw(Belle2::IOException)
 {
   MonShape::readContents(reader);
-  _x = reader.readFloat();
-  _y = reader.readFloat();
-  _width = reader.readFloat();
-  _height = reader.readFloat();
+  m_x = reader.readFloat();
+  m_y = reader.readFloat();
+  m_width = reader.readFloat();
+  m_height = reader.readFloat();
 }
 
 void MonRect::writeConfig(Belle2::Writer& writer)
@@ -34,8 +34,8 @@ void MonRect::writeContents(Belle2::Writer& writer)
 const throw(Belle2::IOException)
 {
   MonShape::writeContents(writer);
-  writer.writeFloat(_x);
-  writer.writeFloat(_y);
-  writer.writeFloat(_width);
-  writer.writeFloat(_height);
+  writer.writeFloat(m_x);
+  writer.writeFloat(m_y);
+  writer.writeFloat(m_width);
+  writer.writeFloat(m_height);
 }

@@ -5,13 +5,13 @@
 using namespace Belle2;
 
 NumberArray::NumberArray() throw()
-  : _size(0) {}
+  : m_size(0) {}
 
 NumberArray::NumberArray(size_t len) throw()
-  : _size(len) {}
+  : m_size(len) {}
 
 NumberArray::NumberArray(const NumberArray& v) throw()
-  : _size(v._size) {}
+  : m_size(v.m_size) {}
 
 NumberArray::~NumberArray() throw() {}
 

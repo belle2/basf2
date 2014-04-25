@@ -9,14 +9,14 @@ namespace Belle2 {
 
   public:
     COPPERMonitor(COPPERCallback* callback)
-      : _callback(callback) {}
+      : m_callback(callback) {}
     ~COPPERMonitor() {}
 
   public:
     void run();
 
   private:
-    COPPERCallback* _callback;
+    COPPERCallback* m_callback;
 
   };
 

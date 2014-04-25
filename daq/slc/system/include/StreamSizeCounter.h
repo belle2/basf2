@@ -8,17 +8,17 @@ namespace Belle2 {
   class StreamSizeCounter : public Writer {
 
   public:
-    StreamSizeCounter() : _count(0) {}
+    StreamSizeCounter() : m_count(0) {}
     virtual ~StreamSizeCounter() throw() {}
 
   public:
     virtual size_t write(const void*, size_t) throw(IOException);
     virtual bool available() throw() { return true; }
-    void reset() throw() { _count = 0; }
-    int count() const throw() { return _count; }
+    void reset() throw() { m_count = 0; }
+    int count() const throw() { return m_count; }
 
   private:
-    size_t _count;
+    size_t m_count;
 
   };
 

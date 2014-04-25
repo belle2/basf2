@@ -1,5 +1,5 @@
-#ifndef _Belle2_MonShape_hh
-#define _Belle2_MonShape_hh
+#ifndef _Belle2_MonShape_h
+#define _Belle2_MonShape_h
 
 #include "daq/slc/dqm/MonObject.h"
 #include "daq/slc/dqm/MonColor.h"
@@ -19,26 +19,26 @@ namespace Belle2 {
   public:
     void setBounds(float x, float y, float width, float height) throw();
     void setFillColor(int r, int g, int b) throw() {
-      _fill_color = MonColor(r, g, b);
+      m_fill_color = MonColor(r, g, b);
     }
-    void setFillColor(const MonColor& color) throw() { _fill_color = color; }
+    void setFillColor(const MonColor& color) throw() { m_fill_color = color; }
     void setLineColor(int r, int g, int b) throw() {
-      _line_color = MonColor(r, g, b);
+      m_line_color = MonColor(r, g, b);
     }
-    void setLineColor(const MonColor& color) throw() { _line_color = color; }
-    const MonColor& getFillColor() const throw() { return _fill_color; }
-    const MonColor& getLineColor() const throw() { return _line_color; }
+    void setLineColor(const MonColor& color) throw() { m_line_color = color; }
+    const MonColor& getFillColor() const throw() { return m_fill_color; }
+    const MonColor& getLineColor() const throw() { return m_line_color; }
     virtual std::string getTag() const throw() { return ELEMENT_TAG; }
     virtual std::string toXML() const throw();
-    virtual void writeConfig(Belle2::Writer& writer) const throw(Belle2::IOException);
-    virtual void writeContents(Belle2::Writer& writer) const throw(Belle2::IOException);
-    virtual void readConfig(Belle2::Reader& reader) throw(Belle2::IOException);
-    virtual void readContents(Belle2::Reader& reader) throw(Belle2::IOException);
+    virtual void writeConfig(Writer& writer) const throw(IOException);
+    virtual void writeContents(Writer& writer) const throw(IOException);
+    virtual void readConfig(Reader& reader) throw(IOException);
+    virtual void readContents(Reader& reader) throw(IOException);
 
   protected:
-    MonColor _fill_color;
-    MonColor _line_color;
-    float _x, _y, _width, _height;
+    MonColor m_fill_color;
+    MonColor m_line_color;
+    float m_x, m_y, m_width, m_height;
 
   };
 

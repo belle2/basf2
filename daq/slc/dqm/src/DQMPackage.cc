@@ -13,9 +13,9 @@ using namespace Belle2;
 void DQMPackage::setHistMap(DQMHistMap* hist_m)
 {
   HistoPackage* pack = getPackage();
-  _hist_m = hist_m;
-  for (TH1Map::iterator it = _hist_m->getHists().begin();
-       it != _hist_m->getHists().end(); it++) {
+  m_hist_m = hist_m;
+  for (TH1Map::iterator it = m_hist_m->getHists().begin();
+       it != m_hist_m->getHists().end(); it++) {
     TH1* h = it->second;
     TString class_name = h->ClassName();
     if (class_name.Contains("TH1") ||  class_name.Contains("TH2")) {

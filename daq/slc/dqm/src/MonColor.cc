@@ -24,7 +24,7 @@ const MonColor MonColor::RUNNING_GREEN(0, 204, 102);
 
 bool MonColor::isNon() const throw()
 {
-  if (_red < 0 || _green < 0 || _blue < 0) {
+  if (m_red < 0 || m_green < 0 || m_blue < 0) {
     return true;
   } else {
     return false;
@@ -33,14 +33,14 @@ bool MonColor::isNon() const throw()
 
 void MonColor::setRGB(int red, int green, int blue) throw()
 {
-  _red = (red > 255) ? 255 : red;
-  _green = (green > 255) ? 255 : green;
-  _blue = (blue > 255) ? 255 : blue;
+  m_red = (red > 255) ? 255 : red;
+  m_green = (green > 255) ? 255 : green;
+  m_blue = (blue > 255) ? 255 : blue;
 }
 
 const MonColor& MonColor::operator=(const MonColor& c) throw()
 {
-  setRGB(c._red, c._green, c._blue);
+  setRGB(c.m_red, c.m_green, c.m_blue);
   return *this;
 }
 
@@ -51,14 +51,14 @@ std::string MonColor::toString() const throw()
     ss << "none";
   } else {
     ss << "#" << std::hex;
-    if (_red > 25) ss  << _red;
-    else if (_red > 0) ss << "0" << _red;
+    if (m_red > 25) ss  << m_red;
+    else if (m_red > 0) ss << "0" << m_red;
     else  ss << "00";
-    if (_green > 25) ss  << _green;
-    else if (_green > 0) ss << "0" << _green;
+    if (m_green > 25) ss  << m_green;
+    else if (m_green > 0) ss << "0" << m_green;
     else  ss << "00";
-    if (_blue > 25) ss  << _blue;
-    else if (_blue > 0) ss << "0" << _blue;
+    if (m_blue > 25) ss  << m_blue;
+    else if (m_blue > 0) ss << "0" << m_blue;
     else  ss << "00";
   }
   std::string s = ss.str();

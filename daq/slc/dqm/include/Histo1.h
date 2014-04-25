@@ -1,5 +1,5 @@
-#ifndef _Belle2_Histo1_hh
-#define _Belle2_Histo1_hh
+#ifndef _Belle2_Histo1_h
+#define _Belle2_Histo1_h
 
 #include "daq/slc/dqm/Histo.h"
 
@@ -30,8 +30,8 @@ namespace Belle2 {
     virtual void setMinimum(double data) throw();
     virtual void fixMaximum(double data) throw();
     virtual void fixMinimum(double data) throw();
-    virtual void readConfig(Belle2::Reader& reader) throw(Belle2::IOException);
-    virtual void writeConfig(Belle2::Writer& writer) const throw(Belle2::IOException);
+    virtual void readConfig(Reader& reader) throw(IOException);
+    virtual void writeConfig(Writer& writer) const throw(IOException);
 
   };
 

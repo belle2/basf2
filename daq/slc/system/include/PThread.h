@@ -43,20 +43,20 @@ namespace Belle2 {
     static void exit() { pthread_exit(NULL); }
 
   public:
-    PThread() throw() : _th(-1) {}
+    PThread() throw() : m_th(-1) {}
 
     template<class WORKER>
     PThread(WORKER* worker, bool destroy = true, bool detached = true) throw() {
-      _th = -1;
+      m_th = -1;
       if (destroy) {
-        if (pthread_create(&_th, NULL, PThread::create_destroy<WORKER>,
+        if (pthread_create(&m_th, NULL, PThread::create_destroy<WORKER>,
                            (void*)worker) != 0) {
-          _th = -1;
+          m_th = -1;
         }
       } else {
-        if (pthread_create(&_th, NULL, PThread::create<WORKER>,
+        if (pthread_create(&m_th, NULL, PThread::create<WORKER>,
                            (void*)worker) != 0) {
-          _th = -1;
+          m_th = -1;
         }
       }
       if (detached) detach();
@@ -64,27 +64,27 @@ namespace Belle2 {
     ~PThread() throw() {}
 
   public:
-    pthread_t get_id() { return _th; }
+    pthread_t get_id() { return m_th; }
     bool kill(int signo) {
-      if (_th != 0) return false;
-      return ::pthread_kill(_th, signo) == 0;
+      if (m_th != 0) return false;
+      return ::pthread_kill(m_th, signo) == 0;
     }
     bool is_alive() { return kill(0); }
     bool detach() {
-      if (_th != 0) return false;
-      return ::pthread_detach(_th) == 0;
+      if (m_th != 0) return false;
+      return ::pthread_detach(m_th) == 0;
     }
     bool join() {
-      if (_th != 0) return false;
-      return ::pthread_join(_th, NULL) == 0;
+      if (m_th != 0) return false;
+      return ::pthread_join(m_th, NULL) == 0;
     }
     bool cancel() {
-      if (_th <= 0) return false;
-      return ::pthread_cancel(_th) == 0;
+      if (m_th <= 0) return false;
+      return ::pthread_cancel(m_th) == 0;
     }
 
   private:
-    pthread_t _th;
+    pthread_t m_th;
 
   };
 

@@ -1,5 +1,5 @@
-#ifndef BevelRange_hh
-#define BevelRange_hh
+#ifndef BevelRange_h
+#define BevelRange_h
 
 #include "daq/slc/dqm/Range.h"
 

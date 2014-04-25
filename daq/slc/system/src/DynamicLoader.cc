@@ -12,9 +12,9 @@ DynamicLoader::~DynamicLoader() throw()
 
 void DynamicLoader::close() throw()
 {
-  if (_handle != NULL) {
-    dlclose(_handle);
-    _handle = NULL;
+  if (m_handle != NULL) {
+    dlclose(m_handle);
+    m_handle = NULL;
   }
 }
 
@@ -25,7 +25,7 @@ throw(DynamicLoadException)
   if (!handle) {
     throw (DynamicLoadException("dlopen: %s", dlerror()));
   }
-  _handle = handle;
+  m_handle = handle;
   return handle;
 }
 
@@ -33,7 +33,7 @@ void* DynamicLoader::load(const std::string& funcname)
 throw(DynamicLoadException)
 {
   char* error = NULL;
-  void* func = dlsym(_handle, funcname.c_str());
+  void* func = dlsym(m_handle, funcname.c_str());
   if ((error = dlerror()) != NULL) {
     throw (DynamicLoadException("dlopen: %s", error));
   }

@@ -4,38 +4,38 @@
 
 using namespace Belle2;
 
-ShortArray::ShortArray() throw() : NumberArray(0), _value_v(NULL) {}
+ShortArray::ShortArray() throw() : NumberArray(0), m_value_v(NULL) {}
 
-ShortArray::ShortArray(size_t size) throw() : NumberArray(), _value_v(NULL)
+ShortArray::ShortArray(size_t size) throw() : NumberArray(), m_value_v(NULL)
 {
   resize(size);
 }
 
-ShortArray::ShortArray(const NumberArray& v) throw() : NumberArray(), _value_v(NULL)
+ShortArray::ShortArray(const NumberArray& v) throw() : NumberArray(), m_value_v(NULL)
 {
   resize(v.size());
-  for (size_t n = 0; n < size(); n++) set(n, _value_v[n]);
+  for (size_t n = 0; n < size(); n++) set(n, m_value_v[n]);
 }
 
 ShortArray::~ShortArray() throw()
 {
-  if (_value_v != NULL) delete [] _value_v;
+  if (m_value_v != NULL) delete [] m_value_v;
 }
 
 double ShortArray::get(size_t n) const throw()
 {
-  if (n < size()) return _value_v[n];
+  if (n < size()) return m_value_v[n];
   else return -1;
 }
 void ShortArray::set(size_t n, double v) throw()
 {
-  if (n < size()) _value_v[n] = (short)v;
+  if (n < size()) m_value_v[n] = (short)v;
 }
 void ShortArray::resize(int s) throw()
 {
-  if (_value_v != NULL) delete [] _value_v;
-  _value_v = new short [s];
-  _size = s;
+  if (m_value_v != NULL) delete [] m_value_v;
+  m_value_v = new short [s];
+  m_size = s;
   for (size_t n = 0; n < size(); n++) set(n, 0);
 }
 
@@ -51,13 +51,13 @@ std::string ShortArray::toScript() const throw()
 
 short& ShortArray::operator[](size_t n) throw()
 {
-  if (n < size()) return _value_v[n];
-  return _value_v[0];
+  if (n < size()) return m_value_v[n];
+  return m_value_v[0];
 }
 
 short ShortArray::operator[](size_t n) const throw()
 {
-  if (n < size()) return _value_v[n];
+  if (n < size()) return m_value_v[n];
   return 0;
 }
 
@@ -65,7 +65,7 @@ void ShortArray::readObject(Belle2::Reader& reader)
 throw(Belle2::IOException)
 {
   for (size_t n = 0; n < size(); n++) {
-    _value_v[n] = reader.readShort();
+    m_value_v[n] = reader.readShort();
   }
 }
 
@@ -73,7 +73,7 @@ void ShortArray::writeObject(Belle2::Writer& writer)
 const throw(Belle2::IOException)
 {
   for (size_t n = 0; n < size(); n++) {
-    writer.writeShort(_value_v[n]);
+    writer.writeShort(m_value_v[n]);
   }
 }
 

@@ -8,28 +8,28 @@ Range::Range(const std::string& name) : Histo1D(name, name, 2, 0, 1) {}
 
 Range::Range(const std::string& name, double min, double max) : Histo1D(name, name, 2, 0, 1)
 {
-  _data->set(0, min);
-  _data->set(1, max);
+  m_data->set(0, min);
+  m_data->set(1, max);
 }
 
 Range::~Range() throw() {}
 
 void Range::set(double min, double max) throw()
 {
-  _data->set(0, min);
-  _data->set(1, max);
+  m_data->set(0, min);
+  m_data->set(1, max);
 }
 
 void Range::reset() throw() {}
 
 void Range::fixMaximum(double data, bool) throw()
 {
-  _data->set(1, data);
+  m_data->set(1, data);
 }
 
 void Range::fixMinimum(double data, bool) throw()
 {
-  _data->set(0, data);
+  m_data->set(0, data);
 }
 
 int Range::getDim() const throw()
@@ -39,22 +39,22 @@ int Range::getDim() const throw()
 
 double Range::getMaximum() const throw()
 {
-  return _data->get(1);
+  return m_data->get(1);
 }
 
 double Range::getMinimum() const throw()
 {
-  return _data->get(0);
+  return m_data->get(0);
 }
 
 void Range::setMaximum(double data) throw()
 {
-  _data->set(1, data);
+  m_data->set(1, data);
 }
 
 void Range::setMinimum(double data) throw()
 {
-  _data->set(0, data);
+  m_data->set(0, data);
 }
 
 void Range::readConfig(Belle2::Reader& reader) throw(Belle2::IOException)

@@ -22,10 +22,10 @@ namespace Belle2 {
     void init() throw(NSMHandlerException);
 
   private:
-    NSMCallback* _callback[2];
-    std::string _host;
-    int _port;
-    NSMCommunicator* _nsm_comm;
+    NSMCallback* m_callback[2];
+    std::string m_host;
+    int m_port;
+    NSMCommunicator* m_nsm_comm;
 
   };
 

@@ -16,7 +16,7 @@ namespace Belle2 {
     };
 
   public:
-    static std::string __hostname;
+    static std::string g_hostname;
 
   public:
     SystemLog(const std::string& node_name = "", Priority priority = DEBUG,
@@ -25,31 +25,31 @@ namespace Belle2 {
 
   public:
     const std::string toString() const;
-    void setPriority(Priority priority) { _priority = priority; }
-    void setNodeName(const std::string& name) { _node_name = name; }
-    void setGroupName(const std::string& name) { _group_name = name; }
-    void setHostName(const std::string& name) { _hostname = name; }
-    void setMessage(const std::string& message) { _message = message; }
-    void setDate() { _log_date = Date(); }
-    void setDate(int date) { _log_date = Date(date); }
-    void setDate(const Date& date) { _log_date = date; }
-    Priority getPriority() const { return _priority; }
-    const std::string& getNodeName() const { return _node_name; }
-    const std::string& getGroupName() const { return _group_name; }
-    const std::string& getHostName() const { return _hostname; }
-    const std::string& getMessage() const { return _message; }
-    const Date& getDate() const { return _log_date; }
+    void setPriority(Priority priority) { m_priority = priority; }
+    void setNodeName(const std::string& name) { m_node_name = name; }
+    void setGroupName(const std::string& name) { m_group_name = name; }
+    void setHostName(const std::string& name) { m_hostname = name; }
+    void setMessage(const std::string& message) { m_message = message; }
+    void setDate() { m_log_date = Date(); }
+    void setDate(int date) { m_log_date = Date(date); }
+    void setDate(const Date& date) { m_log_date = date; }
+    Priority getPriority() const { return m_priority; }
+    const std::string& getNodeName() const { return m_node_name; }
+    const std::string& getGroupName() const { return m_group_name; }
+    const std::string& getHostName() const { return m_hostname; }
+    const std::string& getMessage() const { return m_message; }
+    const Date& getDate() const { return m_log_date; }
     virtual void readObject(Reader& reader) throw(IOException);
     virtual void writeObject(Writer& writer) const throw(IOException);
 
   private:
-    Priority _priority;
-    Date _log_date;
-    std::string _group_name;
-    std::string _hostname;
-    std::string _node_name;
-    std::string _message;
-    int _ref_no;
+    Priority m_priority;
+    Date m_log_date;
+    std::string m_group_name;
+    std::string m_hostname;
+    std::string m_node_name;
+    std::string m_message;
+    int m_ref_no;
 
   };
 

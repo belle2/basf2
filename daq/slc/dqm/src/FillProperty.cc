@@ -5,16 +5,16 @@
 using namespace Belle2;
 
 FillProperty::FillProperty(double transparency) throw()
-  : Property(), _transparency(transparency) {}
+  : Property(), m_transparency(transparency) {}
 
 FillProperty::FillProperty(const MonColor& color,
                            double transparency) throw()
-  : Property(color),  _transparency(transparency) {}
+  : Property(color),  m_transparency(transparency) {}
 
 std::string FillProperty::toString() const throw()
 {
   std::stringstream ss;
-  if (_use_color) ss << "fill-color='" << _color.toString() << "' ";
-  if (_transparency >= 0) ss << "fill-transparency='" << _transparency << "' ";
+  if (m_use_color) ss << "fill-color='" << m_color.toString() << "' ";
+  if (m_transparency >= 0) ss << "fill-transparency='" << m_transparency << "' ";
   return ss.str();
 }

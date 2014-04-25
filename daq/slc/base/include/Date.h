@@ -8,10 +8,6 @@ namespace Belle2 {
 
   class Date {
 
-  private:
-    time_t _time;
-    struct tm* _tm;
-
   public:
     Date(time_t time);
     Date();
@@ -20,7 +16,7 @@ namespace Belle2 {
   public:
     void set() throw();
     void set(time_t time) throw();
-    time_t get() const throw() { return _time; }
+    time_t get() const throw() { return m_time; }
     int getSecond() const throw();
     int getMinitue() const throw();
     int getHour() const throw();
@@ -28,7 +24,10 @@ namespace Belle2 {
     int getMonth() const throw();
     int getYear() const throw();
     const char* toString(const char* format = NULL) const throw();
-    //std::string toString(const char* format = NULL) const throw();
+
+  private:
+    time_t m_time;
+    struct tm* m_tm;
 
   };
 

@@ -15,37 +15,37 @@
 
 using namespace Belle2;
 
-bool LogFile::__opened = false;
-std::string LogFile::__filepath;
-std::ofstream LogFile::__stream;
-unsigned int LogFile::__filesize = 0;
-Mutex LogFile::__mutex;
-SystemLog::Priority LogFile::__threshold;
+bool LogFile::g_opened = false;
+std::string LogFile::g_filepath;
+std::ofstream LogFile::g_stream;
+unsigned int LogFile::g_filesize = 0;
+Mutex LogFile::g_mutex;
+SystemLog::Priority LogFile::g_threshold;
 
 void LogFile::open(const std::string& filename, SystemLog::Priority threshold)
 {
-  if (!__opened) {
+  if (!g_opened) {
     ConfigFile config("slowcontrol");
-    __filepath = config.get("logfile.dir") + "/" + filename + "." +  Date().toString("%Y.%m.%d") + ".log";
-    __threshold = threshold;
-    __opened = true;
+    g_filepath = config.get("logfile.dir") + "/" + filename + "." +  Date().toString("%Y.%m.%d") + ".log";
+    g_threshold = threshold;
+    g_opened = true;
     open();
   }
 }
 
 void LogFile::open()
 {
-  if (!__opened) return;
+  if (!g_opened) return;
   struct stat st;
-  if (stat(__filepath.c_str(), &st) == 0) {
-    __filesize = st.st_blksize;
-    __stream.open(__filepath.c_str(), std::ios::out | std::ios::app);
+  if (stat(g_filepath.c_str(), &st) == 0) {
+    g_filesize = st.st_blksize;
+    g_stream.open(g_filepath.c_str(), std::ios::out | std::ios::app);
   } else {
-    __filesize = 0;
-    __stream.open(__filepath.c_str(), std::ios::out);
+    g_filesize = 0;
+    g_stream.open(g_filepath.c_str(), std::ios::out);
   }
   debug("/* ---------- log file opened ---------- */");
-  debug("log file : %s", __filepath.c_str());
+  debug("log file : %s", g_filepath.c_str());
 }
 
 void LogFile::debug(const std::string& msg, ...)
@@ -107,17 +107,17 @@ void LogFile::put(SystemLog::Priority priority, const std::string& msg, ...)
 
 int LogFile::put_impl(const std::string& msg, SystemLog::Priority priority, va_list ap)
 {
-  __mutex.lock();
-  if (__threshold > priority) {
-    __mutex.unlock();
+  g_mutex.lock();
+  if (g_threshold > priority) {
+    g_mutex.unlock();
     return 0;
   }
   Date date;
-  if (__filesize >= 1024 * 1024 * 2) {
+  if (g_filesize >= 1024 * 1024 * 2) {
     /*
-    __stream.close();
-    rename(__filepath.c_str(),
-           (__filepath + "." + date.toString("%Y.%m.%d.%H.%M")).c_str());
+    g_stream.close();
+    rename(g_filepath.c_str(),
+           (g_filepath + "." + date.toString("%Y.%m.%d.%H.%M")).c_str());
     open();
     */
   }
@@ -138,11 +138,11 @@ int LogFile::put_impl(const std::string& msg, SystemLog::Priority priority, va_l
   ss << s << std::endl;
   std::string str = ss.str();
   std::cerr << color << str << "\x1b[49m\x1b[39m";
-  if (__opened) {
-    __stream << str;
-    __stream.flush();
-    __filesize += str.size();
+  if (g_opened) {
+    g_stream << str;
+    g_stream.flush();
+    g_filesize += str.size();
   }
-  __mutex.unlock();
+  g_mutex.unlock();
   return (int) str.size();
 }

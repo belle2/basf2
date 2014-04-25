@@ -22,7 +22,7 @@ throw(IOException)
       mode = O_RDWR;
     }
   }
-  if ((_fd = ::open(path.c_str(), mode)) < 0) {
+  if ((m_fd = ::open(path.c_str(), mode)) < 0) {
     perror("open");
     throw (IOException("Failed to open fifo."));
   }
@@ -42,7 +42,7 @@ size_t File::write(const void* buf, size_t count) throw(IOException)
   int ret;
   errno = 0;
   while (c < count) {
-    ret = ::write(_fd, ((unsigned char*)buf + c), (count - c));
+    ret = ::write(m_fd, ((unsigned char*)buf + c), (count - c));
     if (ret <= 0) {
       switch (errno) {
         case EINTR: continue;
@@ -66,7 +66,7 @@ size_t File::read(void* buf, size_t count) throw(IOException)
   int ret;
   errno = 0;
   while (c < count) {
-    ret = ::read(_fd, ((unsigned char*)buf + c), (count - c));
+    ret = ::read(m_fd, ((unsigned char*)buf + c), (count - c));
     if (ret <= 0) {
       switch (errno) {
         case EINTR: continue;

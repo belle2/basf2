@@ -16,21 +16,21 @@ namespace Belle2 {
   public:
     DQMPackage(const std::string& name,
                const std::string file_name)
-      : MonitorPackage(name), _file_name(file_name) {}
+      : MonitorPackage(name), m_file_name(file_name) {}
     virtual ~DQMPackage() throw() {}
 
   public:
-    const std::string& getFileName() { return _file_name; }
+    const std::string& getFileName() { return m_file_name; }
     void setHistMap(DQMHistMap* hist_m);
-    DQMHistMap* getHistMap() { return _hist_m; }
+    DQMHistMap* getHistMap() { return m_hist_m; }
 
   private:
     Histo* makeHisto(TH1* h) throw();
     MonColor makeColor(int num) throw();
 
   private:
-    std::string _file_name;
-    DQMHistMap* _hist_m;
+    std::string m_file_name;
+    DQMHistMap* m_hist_m;
 
   };
 

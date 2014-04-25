@@ -1,5 +1,5 @@
-#ifndef _Belle2_MonArrow_hh
-#define _Belle2_MonArrow_hh
+#ifndef _Belle2_MonArrow_h
+#define _Belle2_MonArrow_h
 
 #include "daq/slc/dqm/MonShape.h"
 
@@ -26,25 +26,25 @@ namespace Belle2 {
     virtual std::string getDataType() const throw() { return "MAW"; }
 
   public:
-    void setPositionX(float x) { _x = x; }
-    float getPositionX() { return _x; }
-    void setPositionY(float y) { _y = y; }
-    float getPositionY() { return _y; }
-    void setWidth(float width) { _width = width; }
-    float getWidth() { return _width; }
-    void setLength(float length) { _height = length; }
-    float getLength() { return _height; }
-    void setHeadWidth(float width) { _head_width = width; }
-    float getHeadWidth() { return _head_width; }
-    void setHeadLength(float length) { _head_length = length; }
-    float getHeadLength() { return _head_length; }
-    void setDirection(int direction) { _direction = direction; }
-    int getDirection() const { return  _direction; }
+    void setPositionX(float x) { m_x = x; }
+    float getPositionX() { return m_x; }
+    void setPositionY(float y) { m_y = y; }
+    float getPositionY() { return m_y; }
+    void setWidth(float width) { m_width = width; }
+    float getWidth() { return m_width; }
+    void setLength(float length) { m_height = length; }
+    float getLength() { return m_height; }
+    void setHeadWidth(float width) { m_head_width = width; }
+    float getHeadWidth() { return m_head_width; }
+    void setHeadLength(float length) { m_head_length = length; }
+    float getHeadLength() { return m_head_length; }
+    void setDirection(int direction) { m_direction = direction; }
+    int getDirection() const { return  m_direction; }
 
   private:
-    float _head_width;
-    float _head_length;
-    int _direction;
+    float m_head_width;
+    float m_head_length;
+    int m_direction;
 
   };
 

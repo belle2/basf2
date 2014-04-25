@@ -14,7 +14,7 @@
 using namespace Belle2;
 
 HSLBController::HSLBController()
-  : _mgt(NULL)
+  : m_mgt(NULL)
 {
 
 }
@@ -23,26 +23,26 @@ HSLBController::~HSLBController() throw() {}
 
 bool HSLBController::reset() throw()
 {
-  if (_mgt != NULL) {
-    mgt_close(_mgt);
-    _mgt = NULL;
+  if (m_mgt != NULL) {
+    mgt_close(m_mgt);
+    m_mgt = NULL;
   }
   return true;
 }
 
 bool HSLBController::load(const ConfigObject& obj) throw()
 {
-  if (_mgt == NULL) {
+  if (m_mgt == NULL) {
     int board_type, firmware, hardware;
     const char* firm_path = NULL;
-    _mgt = mgt_boot(obj.getIndex(), firm_path,
-                    &board_type, &firmware, &hardware);
-    if (_mgt == NULL) {
+    m_mgt = mgt_boot(obj.getIndex(), firm_path,
+                     &board_type, &firmware, &hardware);
+    if (m_mgt == NULL) {
       LogFile::error("Failed to HSLB:%c", 'a' + obj.getIndex());
       return false;
     }
   }
-  mgt_execute(_mgt, CTL_LINK);
+  mgt_execute(m_mgt, CTL_LINK);
   int triggermode = 0;
   if (obj.getEnum("triggermode") == "verbose") {
     triggermode = CTL_VERBOSE;
@@ -50,11 +50,11 @@ bool HSLBController::load(const ConfigObject& obj) throw()
     triggermode = CTL_SIMPLE;
   }
   if (triggermode > 0) {
-    mgt_execute(_mgt, triggermode);
+    mgt_execute(m_mgt, triggermode);
     LogFile::debug("Selected trigger mode = %d", triggermode);
   } else {
     LogFile::error("trigger mode was not selected");
-    mgt_close(_mgt);
+    mgt_close(m_mgt);
     return false;
   }
   int address = 0;
@@ -72,12 +72,12 @@ bool HSLBController::load(const ConfigObject& obj) throw()
       if (address == 0) {
         LogFile::error("No address was found for %s",
                        cobj.getText("name").c_str());
-        mgt_close(_mgt);
+        mgt_close(m_mgt);
         return false;
       }
       int value = cobj.getInt("value");
-      if (size == 1)  mgt_set_param(_mgt, address, value);
-      else if (size == 2) mgt_set_param2(_mgt, address, value);
+      if (size == 1)  mgt_set_param(m_mgt, address, value);
+      else if (size == 2) mgt_set_param2(m_mgt, address, value);
       address += size;
       LogFile::debug("Register write to address = 0x%x with value = %d",
                      address, value);

@@ -5,61 +5,61 @@
 using namespace Belle2;
 
 BufferedWriter::BufferedWriter()
-throw() : _memory(NULL), _size(0), _pos(0), _allocated(false) {}
+throw() : m_memory(NULL), m_size(0), m_pos(0), m_allocated(false) {}
 
 BufferedWriter::BufferedWriter(size_t size, unsigned char* memory) throw()
-  : _memory(memory), _size(size), _pos(0), _allocated(false)
+  : m_memory(memory), m_size(size), m_pos(0), m_allocated(false)
 {
   if (memory == NULL) {
-    _memory = new unsigned char[size];
-    _allocated = true;
+    m_memory = new unsigned char[size];
+    m_allocated = true;
   }
 }
 
 BufferedWriter::BufferedWriter(const BufferedWriter& writer) throw()
-  : _memory(NULL), _size(writer._size),
-    _pos(writer._pos), _allocated(writer._allocated)
+  : m_memory(NULL), m_size(writer.m_size),
+    m_pos(writer.m_pos), m_allocated(writer.m_allocated)
 {
-  if (_allocated) {
-    _memory = new unsigned char [writer._size];
-    ::memcpy(_memory, writer._memory, writer._size);
+  if (m_allocated) {
+    m_memory = new unsigned char [writer.m_size];
+    ::memcpy(m_memory, writer.m_memory, writer.m_size);
   } else {
-    _memory = writer._memory;
+    m_memory = writer.m_memory;
   }
-  _size = writer._size;
-  _pos = writer._pos;
+  m_size = writer.m_size;
+  m_pos = writer.m_pos;
 }
 
 BufferedWriter::~BufferedWriter() throw()
 {
-  if (_allocated && _memory != NULL) delete [] _memory;
+  if (m_allocated && m_memory != NULL) delete [] m_memory;
 }
 
 const BufferedWriter& BufferedWriter::operator=(const BufferedWriter& writer) throw()
 {
-  if (_allocated) {
-    delete [] _memory;
+  if (m_allocated) {
+    delete [] m_memory;
   }
-  _allocated = writer._allocated;
-  if (_allocated) {
-    _memory = new unsigned char [writer._size];
-    ::memcpy(_memory, writer._memory, writer._size);
+  m_allocated = writer.m_allocated;
+  if (m_allocated) {
+    m_memory = new unsigned char [writer.m_size];
+    ::memcpy(m_memory, writer.m_memory, writer.m_size);
   } else {
-    _memory = writer._memory;
+    m_memory = writer.m_memory;
   }
-  _size = writer._size;
-  _pos = writer._pos;
+  m_size = writer.m_size;
+  m_pos = writer.m_pos;
   return *this;
 }
 
 size_t BufferedWriter::write(const void* buf, const size_t count) throw(IOException)
 {
-  if (_pos + count > _size) {
+  if (m_pos + count > m_size) {
     throw (IOException("out of buffer range: %d+%d>%d",
-                       (int)_pos, (int)count, (int)_size));
+                       (int)m_pos, (int)count, (int)m_size));
   }
-  memcpy((_memory + _pos), buf, count);
-  _pos += count;
+  memcpy((m_memory + m_pos), buf, count);
+  m_pos += count;
   return count;
 }
 

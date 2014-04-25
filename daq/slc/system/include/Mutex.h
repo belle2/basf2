@@ -9,11 +9,6 @@ namespace Belle2 {
 
     friend class Cond;
 
-    // member data
-  private:
-    pthread_mutex_t _mu;
-    pthread_mutexattr_t _attr;
-
     // constructors & destructors
   public:
     Mutex() throw();
@@ -23,6 +18,11 @@ namespace Belle2 {
   public:
     bool lock() throw();
     bool unlock() throw();
+
+    // member data
+  private:
+    pthread_mutex_t m_mu;
+    pthread_mutexattr_t m_attr;
 
   };
 

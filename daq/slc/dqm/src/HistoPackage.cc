@@ -13,54 +13,54 @@ const char HistoPackage::ObjectFlag = 0xDC;
 
 HistoPackage::HistoPackage()
 {
-  _name = "";
-  _update_id = 0;
+  m_name = "";
+  m_update_id = 0;
 }
 
 HistoPackage::HistoPackage(const std::string& name)
 {
-  _name = name;
-  _update_id = 0;
+  m_name = name;
+  m_update_id = 0;
 }
 
 HistoPackage::~HistoPackage() throw()
 {
-  for (size_t n = 0; n < _histo_v.size(); n++) {
-    delete _histo_v.at(n);
+  for (size_t n = 0; n < m_histo_v.size(); n++) {
+    delete m_histo_v.at(n);
   }
 }
 
 MonObject* HistoPackage::setMonObject(int index, MonObject* h)
 {
-  _histo_v.at(index) = h;
+  m_histo_v.at(index) = h;
   return h;
 }
 
 MonObject* HistoPackage::addMonObject(MonObject* h)
 {
-  _histo_v.push_back(h);
+  m_histo_v.push_back(h);
   return h;
 }
 
 Histo* HistoPackage::setHisto(int index, Histo* h)
 {
-  _histo_v.at(index) = h;
+  m_histo_v.at(index) = h;
   return h;
 }
 
 Histo* HistoPackage::addHisto(Histo* h)
 {
-  _histo_v.push_back(h);
+  m_histo_v.push_back(h);
   return h;
 }
 
 Histo* HistoPackage::getHisto(const std::string& name) throw()
 {
-  for (size_t n = 0; n < _histo_v.size(); n++) {
-    if (_histo_v[n]->getName() == name &&
-        (_histo_v[n]->getDataType().find("H1") != std::string::npos ||
-         _histo_v[n]->getDataType().find("H2") != std::string::npos)) {
-      return (Histo*)_histo_v[n];
+  for (size_t n = 0; n < m_histo_v.size(); n++) {
+    if (m_histo_v[n]->getName() == name &&
+        (m_histo_v[n]->getDataType().find("H1") != std::string::npos ||
+         m_histo_v[n]->getDataType().find("H2") != std::string::npos)) {
+      return (Histo*)m_histo_v[n];
     }
   }
   return NULL;
@@ -68,26 +68,26 @@ Histo* HistoPackage::getHisto(const std::string& name) throw()
 
 void HistoPackage::reset() throw()
 {
-  _update_id = 0;
+  m_update_id = 0;
   for (int n = 0; n < getNHistos(); n++) {
-    _histo_v.at(n)->reset();
+    m_histo_v.at(n)->reset();
   }
 }
 
 void HistoPackage::clear() throw()
 {
   reset();
-  _name = "";
-  for (size_t n = 0; n < _histo_v.size(); n++) {
-    delete _histo_v.at(n);
+  m_name = "";
+  for (size_t n = 0; n < m_histo_v.size(); n++) {
+    delete m_histo_v.at(n);
   }
-  _histo_v = std::vector<MonObject*>();
+  m_histo_v = std::vector<MonObject*>();
 }
 
 bool HistoPackage::hasHisto(const std::string& name) throw()
 {
-  for (size_t n = 0; n < _histo_v.size(); n++) {
-    if (_histo_v.at(n)->getName() == name) return true;
+  for (size_t n = 0; n < m_histo_v.size(); n++) {
+    if (m_histo_v.at(n)->getName() == name) return true;
   }
   return false;
 }

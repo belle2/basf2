@@ -1,15 +1,8 @@
 #include "daq/slc/apps/envmonitord/EnvMonitorMaster.h"
 
-#include "daq/slc/apps/PackageManager.h"
-
-#include <daq/slc/nsm/NSMCommunicator.h>
-
 #include <daq/slc/database/LoggerObjectTable.h>
 
 #include <daq/slc/system/LogFile.h>
-
-#include <daq/slc/base/StringUtil.h>
-#include <daq/slc/base/ConfigFile.h>
 
 #include <unistd.h>
 

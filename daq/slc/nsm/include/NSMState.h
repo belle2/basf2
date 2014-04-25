@@ -19,8 +19,7 @@ namespace Belle2 {
 
   public:
     inline const NSMState& operator=(const NSMState& e) throw() {
-      _id = e._id;
-      _label = e._label;
+      *this = Enum::operator=(e);
       return *this;
     }
 

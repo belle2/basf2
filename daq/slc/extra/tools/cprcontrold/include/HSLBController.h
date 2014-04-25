@@ -18,7 +18,7 @@ namespace Belle2 {
     bool load(const ConfigObject& obj) throw();
 
   private:
-    Mgt_t* _mgt;
+    Mgt_t* m_mgt;
 
   };
 

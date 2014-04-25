@@ -19,9 +19,9 @@ std::string ScrollPanel::toXML() const throw()
 {
   std::stringstream ss;
   ss << "<" << ELEMENT_TAG << " "
-     << "name='" << _name << "' >\n";
-  for (size_t n = 0; n < _sub_panel_v.size(); n++) {
-    ss << _sub_panel_v[n]->toXML();
+     << "name='" << m_name << "' >\n";
+  for (size_t n = 0; n < m_sub_panel_v.size(); n++) {
+    ss << m_sub_panel_v[n]->toXML();
   }
   ss << "</" << ELEMENT_TAG << ">\n";
   return ss.str();

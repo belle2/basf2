@@ -10,12 +10,12 @@ std::string Pad::toXML() const throw()
 {
   std::stringstream ss;
   ss << "<" << ELEMENT_TAG << " ";
-  if (_name.size() > 0) ss << "name='" << _name << "' ";
-  ss << "x='" << _x << "' y='" << _y << "' "
-     << "width='" << _width << "' height='" << _height << "' ";
-  if (_line_pro != NULL) ss << _line_pro->toString();
-  if (_fill_pro != NULL) ss << _fill_pro->toString();
-  if (_font_pro != NULL) ss << _font_pro->toString();
+  if (m_name.size() > 0) ss << "name='" << m_name << "' ";
+  ss << "x='" << m_x << "' y='" << m_y << "' "
+     << "width='" << m_width << "' height='" << m_height << "' ";
+  if (m_line_pro != NULL) ss << m_line_pro->toString();
+  if (m_fill_pro != NULL) ss << m_fill_pro->toString();
+  if (m_font_pro != NULL) ss << m_font_pro->toString();
   ss << "/>" << std::endl;
 
   return ss.str();

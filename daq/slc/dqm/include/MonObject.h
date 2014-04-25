@@ -1,5 +1,5 @@
-#ifndef _Belle2_MonObject_hh
-#define _Belle2_MonObject_hh
+#ifndef _Belle2_MonObject_h
+#define _Belle2_MonObject_h
 
 #include "daq/slc/dqm/Shape.h"
 
@@ -18,31 +18,31 @@ namespace Belle2 {
     virtual ~MonObject() throw();
 
   public:
-    bool isUpdated() const throw() { return _updated; }
-    int getUpdateId() const throw() { return _update_id; }
-    int getPositionId() const throw() { return _position_id; }
-    int getTabId() const throw() { return _tab_id; }
-    void setUpdated(bool updated) throw() { _updated = updated; }
-    void setUpdateId(int uid) throw() { _update_id = uid; }
-    void setPositionId(int pid) throw() { _position_id = pid; }
-    void setTabId(int tid) throw() { _tab_id = tid; }
+    bool isUpdated() const throw() { return m_updated; }
+    int getUpdateId() const throw() { return m_update_id; }
+    int getPositionId() const throw() { return m_position_id; }
+    int getTabId() const throw() { return m_tab_id; }
+    void setUpdated(bool updated) throw() { m_updated = updated; }
+    void setUpdateId(int uid) throw() { m_update_id = uid; }
+    void setPositionId(int pid) throw() { m_position_id = pid; }
+    void setTabId(int tid) throw() { m_tab_id = tid; }
 
   public:
     virtual void reset() throw() = 0;
     virtual std::string getDataType() const throw() = 0;
-    virtual void readObject(Belle2::Reader& reader) throw(Belle2::IOException);
-    virtual void readConfig(Belle2::Reader& reader) throw(Belle2::IOException);
-    virtual void readContents(Belle2::Reader& reader) throw(Belle2::IOException) = 0;
-    virtual void writeObject(Belle2::Writer& writer) const throw(Belle2::IOException);
-    virtual void writeConfig(Belle2::Writer& writer) const throw(Belle2::IOException);
-    virtual void writeContents(Belle2::Writer& writer) const throw(Belle2::IOException) = 0;
+    virtual void readObject(Reader& reader) throw(IOException);
+    virtual void readConfig(Reader& reader) throw(IOException);
+    virtual void readContents(Reader& reader) throw(IOException) = 0;
+    virtual void writeObject(Writer& writer) const throw(IOException);
+    virtual void writeConfig(Writer& writer) const throw(IOException);
+    virtual void writeContents(Writer& writer) const throw(IOException) = 0;
     virtual std::string toString() const throw();
 
   protected:
-    bool _updated;
-    int _update_id;
-    char _position_id;
-    char _tab_id;
+    bool m_updated;
+    int m_update_id;
+    char m_position_id;
+    char m_tab_id;
 
   };
 

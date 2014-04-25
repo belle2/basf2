@@ -1,5 +1,5 @@
-#ifndef _Belle2_Graph1F_hh
-#define _Belle2_Graph1F_hh
+#ifndef _Belle2_Graph1F_h
+#define _Belle2_Graph1F_h
 
 #include "daq/slc/dqm/Graph1.h"
 #include "daq/slc/dqm/FloatArray.h"

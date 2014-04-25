@@ -27,7 +27,7 @@ namespace Belle2 {
 
     // data members;
   private:
-    pthread_rwlock_t _lock;
+    pthread_rwlock_t m_lock;
 
   };
 

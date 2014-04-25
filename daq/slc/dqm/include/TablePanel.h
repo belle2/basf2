@@ -1,5 +1,5 @@
-#ifndef _Belle2_TablePanel_hh
-#define _Belle2_TablePanel_hh
+#ifndef _Belle2_TablePanel_h
+#define _Belle2_TablePanel_h
 
 #include "daq/slc/dqm/Panel.h"
 
@@ -16,25 +16,25 @@ namespace Belle2 {
     virtual ~TablePanel() throw();
 
   public:
-    void setCols(int cols) throw() { _cols = cols; }
-    void setRows(int rows) throw() { _rows = rows; }
-    int getCols() const throw() { return _cols; }
-    int getRows() const throw() { return _rows; }
+    void setCols(int cols) throw() { m_cols = cols; }
+    void setRows(int rows) throw() { m_rows = rows; }
+    int getCols() const throw() { return m_cols; }
+    int getRows() const throw() { return m_rows; }
     void setWidthRatio(const std::string& width_ratio) throw() {
-      _width_ratio = width_ratio;
+      m_width_ratio = width_ratio;
     }
     void setHeightRatio(const std::string& height_ratio) throw() {
-      _height_ratio = height_ratio;
+      m_height_ratio = height_ratio;
     }
-    const std::string& getWidthRatio() const throw() { return _width_ratio; }
-    const std::string& setHeightRatio()const throw() { return _height_ratio; }
+    const std::string& getWidthRatio() const throw() { return m_width_ratio; }
+    const std::string& setHeightRatio()const throw() { return m_height_ratio; }
     virtual std::string getTag() const throw() { return ELEMENT_TAG; }
     virtual std::string toXML() const throw();
 
   private:
-    int _cols, _rows;
-    std::string _width_ratio;
-    std::string _height_ratio;
+    int m_cols, m_rows;
+    std::string m_width_ratio;
+    std::string m_height_ratio;
 
   };
 

@@ -10,7 +10,7 @@ const MonitorState MonitorState::RUNNING(3, "RUNNNING");
 const MonitorState MonitorState::ERROR(101, "ERROR");
 
 MonitorState::MonitorState(int value, const std::string& text)
-  : _value(value), _text(text) {}
+  : m_value(value), m_text(text) {}
 
 MonitorState::~MonitorState() throw() {}
 
@@ -40,19 +40,19 @@ const MonitorState& MonitorState::operator=(int value) throw()
 const MonitorState& MonitorState::operator=(const MonitorState& state)
 throw()
 {
-  _value = state.getValue();
-  _text = state.getText();
+  m_value = state.getValue();
+  m_text = state.getText();
   return *this;
 }
 
 bool MonitorState::operator==(int value) const throw()
 {
-  return _value == value;
+  return m_value == value;
 }
 
 bool MonitorState::operator==(const MonitorState& state) const throw()
 {
-  return _value == state._value;
+  return m_value == state.m_value;
 }
 
 namespace Belle2 {

@@ -10,23 +10,23 @@ namespace Belle2 {
 
   public:
     TCPServerSocket()
-      : _ip(""), _port(0) {}
+      : m_ip(""), m_port(0) {}
     TCPServerSocket(const std::string& ip, unsigned short port)
-      : _ip(ip), _port(port) {}
+      : m_ip(ip), m_port(port) {}
     virtual ~TCPServerSocket() throw() {}
 
   public:
-    void setIP(const std::string& ip) throw() { _ip = ip; }
-    void setPort(unsigned short port) throw() { _port = port; }
-    const std::string& getIP() const throw() { return _ip; }
-    unsigned short getPort() const throw() { return _port; }
+    void setIP(const std::string& ip) throw() { m_ip = ip; }
+    void setPort(unsigned short port) throw() { m_port = port; }
+    const std::string& getIP() const throw() { return m_ip; }
+    unsigned short getPort() const throw() { return m_port; }
     int open() throw(IOException);
     int open(const std::string& ip, unsigned short port) throw(IOException);
     TCPSocket accept() throw(IOException);
 
   private:
-    std::string _ip;
-    unsigned short _port;
+    std::string m_ip;
+    unsigned short m_port;
 
   };
 

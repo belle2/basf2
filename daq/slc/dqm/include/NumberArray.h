@@ -1,5 +1,5 @@
-#ifndef _Belle2_NumberArray_hh
-#define _Belle2_NumberArray_hh
+#ifndef _Belle2_NumberArray_h
+#define _Belle2_NumberArray_h
 
 #include "daq/slc/base/Reader.h"
 #include "daq/slc/base/Writer.h"
@@ -17,7 +17,7 @@ namespace Belle2 {
 
     // constructors & destructors
   public:
-    size_t size() const throw() { return _size; }
+    size_t size() const throw() { return m_size; }
     virtual double get(size_t n) const throw() = 0;
     virtual void* ptr() throw() = 0;
     virtual const void* ptr() const throw() = 0;
@@ -31,14 +31,14 @@ namespace Belle2 {
     const NumberArray& operator=(const NumberArray& v) throw();
 
   public:
-    virtual void writeObject(Belle2::Writer& writer) const throw(Belle2::IOException) = 0;
-    virtual void writeElement(double value, Belle2::Writer& writer) const throw(Belle2::IOException) = 0;
-    virtual void readObject(Belle2::Reader& reader) throw(Belle2::IOException) = 0;
-    virtual double readElement(Belle2::Reader& reader) throw(Belle2::IOException) = 0;
+    virtual void writeObject(Writer& writer) const throw(IOException) = 0;
+    virtual void writeElement(double value, Writer& writer) const throw(IOException) = 0;
+    virtual void readObject(Reader& reader) throw(IOException) = 0;
+    virtual double readElement(Reader& reader) throw(IOException) = 0;
 
     // member data
   protected:
-    size_t _size;
+    size_t m_size;
 
   };
 

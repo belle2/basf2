@@ -1,5 +1,5 @@
-#ifndef _Belle2_CanvasPanel_hh
-#define _Belle2_CanvasPanel_hh
+#ifndef _Belle2_CanvasPanel_h
+#define _Belle2_CanvasPanel_h
 
 #include "daq/slc/dqm/GAxis.h"
 #include "daq/slc/dqm/Shape.h"
@@ -35,26 +35,26 @@ namespace Belle2 {
     void setTitlePosition(const std::string& title_position) throw();
     virtual std::string getTag() const throw() { return ELEMENT_TAG; }
     virtual std::string toXML() const throw();
-    std::vector<Shape*>& getObjects() throw() { return _object_v; }
-    Shape* getObject(size_t n) throw() { return _object_v[n]; }
+    std::vector<Shape*>& getObjects() throw() { return m_object_v; }
+    Shape* getObject(size_t n) throw() { return m_object_v[n]; }
     Graph1* addGraph(int npoints) throw();
-    GAxis* getXAxis() throw() { return _x_axis; }
-    GAxis* getYAxis() throw() { return _y_axis; }
-    GAxis* getY2Axis() throw() { return _y2_axis; }
-    GAxis* getColorAxis() throw() { return _color_axis; }
+    GAxis* getXAxis() throw() { return m_x_axis; }
+    GAxis* getYAxis() throw() { return m_y_axis; }
+    GAxis* getY2Axis() throw() { return m_y2_axis; }
+    GAxis* getColorAxis() throw() { return m_color_axis; }
 
   private:
-    FillProperty* _fill;
-    std::vector<Shape*> _object_v;
-    GAxis* _x_axis;
-    GAxis* _y2_axis;
-    GAxis* _y_axis;
-    GAxis* _color_axis;
-    Pad* _pad;
-    Legend* _legend;
-    std::string _title;
-    std::string _title_position;
-    std::vector<Graph1*> _graph_v;
+    FillProperty* m_fill;
+    std::vector<Shape*> m_object_v;
+    GAxis* m_x_axis;
+    GAxis* m_y2_axis;
+    GAxis* m_y_axis;
+    GAxis* m_color_axis;
+    Pad* m_pad;
+    Legend* m_legend;
+    std::string m_title;
+    std::string m_title_position;
+    std::vector<Graph1*> m_graph_v;
 
   };
 

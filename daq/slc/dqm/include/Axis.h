@@ -1,5 +1,5 @@
-#ifndef _Belle2_Axis_hh
-#define _Belle2_Axis_hh
+#ifndef _Belle2_Axis_h
+#define _Belle2_Axis_h
 
 #include "daq/slc/base/Serializable.h"
 #include "daq/slc/base/Writer.h"
@@ -20,33 +20,33 @@ namespace Belle2 {
     void set(int nbin, double min, double max);
     void set(int nbin, double min, double max, const std::string& title);
 
-    int getNbins() const throw() { return _nbins; }
-    double getMax() const throw() { return _max; }
-    double getMin() const throw() { return _min; }
-    bool isFixedMax() const throw() { return _fixed_max; }
-    bool isFixedMin() const throw() { return _fixed_min; }
-    const std::string& getTitle() const throw() { return _title; }
+    int getNbins() const throw() { return m_nbins; }
+    double getMax() const throw() { return m_max; }
+    double getMin() const throw() { return m_min; }
+    bool isFixedMax() const throw() { return m_fixed_max; }
+    bool isFixedMin() const throw() { return m_fixed_min; }
+    const std::string& getTitle() const throw() { return m_title; }
 
-    void setNbins(int nbins) throw() { _nbins = nbins; }
-    void setMax(double max) throw() { _max = max; }
-    void setMin(double min) throw() { _min = min; }
-    void fixMax(bool fixed) throw() { _fixed_max = fixed; }
-    void fixMin(bool fixed) throw() { _fixed_min = fixed; }
-    void setTitle(const std::string& title) { _title = title; }
+    void setNbins(int nbins) throw() { m_nbins = nbins; }
+    void setMax(double max) throw() { m_max = max; }
+    void setMin(double min) throw() { m_min = min; }
+    void fixMax(bool fixed) throw() { m_fixed_max = fixed; }
+    void fixMin(bool fixed) throw() { m_fixed_min = fixed; }
+    void setTitle(const std::string& title) { m_title = title; }
 
-    virtual void readObject(Belle2::Reader& reader) throw(Belle2::IOException);
-    virtual void writeObject(Belle2::Writer& writer) const throw(Belle2::IOException);
+    virtual void readObject(Reader& reader) throw(IOException);
+    virtual void writeObject(Writer& writer) const throw(IOException);
 
   public:
     const Axis& operator=(const Axis& a);
 
   protected:
-    int _nbins;
-    double _min;
-    double _max;
-    std::string _title;
-    bool _fixed_min;
-    bool _fixed_max;
+    int m_nbins;
+    double m_min;
+    double m_max;
+    std::string m_title;
+    bool m_fixed_min;
+    bool m_fixed_max;
 
   };
 

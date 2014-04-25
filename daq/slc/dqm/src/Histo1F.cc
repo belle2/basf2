@@ -6,18 +6,18 @@ using namespace Belle2;
 
 Histo1F::Histo1F() throw() : Histo1()
 {
-  _data = new FloatArray(0);
+  m_data = new FloatArray(0);
 }
 
 Histo1F::Histo1F(const Histo1F& h) throw() : Histo1(h)
 {
-  _data = new FloatArray(h._data->size());
+  m_data = new FloatArray(h.m_data->size());
 }
 
 Histo1F::Histo1F(const std::string& name, const std::string& title, int nbinx, double min, double max)
 throw() : Histo1(name, title, nbinx, min, max)
 {
-  _data = new FloatArray(nbinx + 2);
+  m_data = new FloatArray(nbinx + 2);
 }
 
 Histo1F::~Histo1F() throw() {}

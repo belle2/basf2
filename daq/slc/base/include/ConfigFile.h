@@ -33,11 +33,11 @@ namespace Belle2 {
     const std::string get(const std::string& label);
     int getInt(const std::string& label);
     double getFloat(const std::string& label);
-    void cd() { _dir = ""; }
+    void cd() { m_dir = ""; }
     void cd(const std::string& dir);
-    ValueList& getValues() { return _value_m; }
-    std::vector<std::string>& getLabels() { return _label_v; }
-    std::vector<std::string>& getDirectories() { return _dir_v; }
+    ValueList& getValues() { return m_value_m; }
+    std::vector<std::string>& getLabels() { return m_label_v; }
+    std::vector<std::string>& getDirectories() { return m_dir_v; }
     void add(const std::string& label, const std::string& value);
     void write(const std::string& path);
 
@@ -45,21 +45,22 @@ namespace Belle2 {
     const std::string getFilePath(const std::string& filename);
 
   private:
-    ValueList _value_m;
-    std::vector<std::string> _dir_v;
-    std::vector<std::string> _label_v;
-    std::string _dir;
+    ValueList m_value_m;
+    std::vector<std::string> m_dir_v;
+    std::vector<std::string> m_label_v;
+    std::string m_dir;
 
   };
 
   inline bool ConfigFile::hasKey(const std::string& label)
   {
-    return _value_m.find((_dir.size() > 0) ? _dir + "." + label : label) != _value_m.end();
+    return m_value_m.find((m_dir.size() > 0) ? m_dir + "." + label : label)
+           != m_value_m.end();
   }
 
   inline void ConfigFile::cd(const std::string& dir)
   {
-    _dir = (_dir.size() > 0) ? _dir + "." + dir : dir;
+    m_dir = (m_dir.size() > 0) ? m_dir + "." + dir : dir;
   }
 
 };

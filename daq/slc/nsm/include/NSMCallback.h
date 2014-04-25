@@ -39,27 +39,27 @@ namespace Belle2 {
   public:
     NSMMessage& getMessage();
     void setMessage(NSMMessage& msg);
-    NSMCommunicator* getCommunicator() { return _comm; }
-    NSMNode& getNode() throw() { return _node; }
-    const NSMNode& getNode() const throw() { return _node; }
-    void setCommunicator(NSMCommunicator* comm) { _comm = comm; }
-    int getTimeout() const { return _timeout; }
+    NSMCommunicator* getCommunicator() { return m_comm; }
+    NSMNode& getNode() throw() { return m_node; }
+    const NSMNode& getNode() const throw() { return m_node; }
+    void setCommunicator(NSMCommunicator* comm) { m_comm = comm; }
+    int getTimeout() const { return m_timeout; }
 
   public:
-    void setReply(const std::string& reply) throw() { _reply = reply; }
-    const std::string& getReply() const throw() { return _reply; }
-    void add(const NSMCommand& cmd) throw() { _cmd_v.push_back(cmd); }
+    void setReply(const std::string& reply) throw() { m_reply = reply; }
+    const std::string& getReply() const throw() { return m_reply; }
+    void add(const NSMCommand& cmd) throw() { m_cmd_v.push_back(cmd); }
     virtual bool perform(const NSMMessage& msg) throw();
 
   private:
-    NSMRequestList& getRequestList() throw() { return _cmd_v; }
+    NSMRequestList& getRequestList() throw() { return m_cmd_v; }
 
   private:
-    std::string _reply;
-    NSMNode _node;
-    NSMCommunicator* _comm;
-    NSMRequestList _cmd_v;
-    int _timeout;
+    std::string m_reply;
+    NSMNode m_node;
+    NSMCommunicator* m_comm;
+    NSMRequestList m_cmd_v;
+    int m_timeout;
 
   };
 

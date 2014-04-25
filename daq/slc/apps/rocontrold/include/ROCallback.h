@@ -10,7 +10,7 @@ namespace Belle2 {
   class ROCallback : public RCCallback {
 
   public:
-    ROCallback(const NSMNode& node, const std::string& config);
+    ROCallback(const NSMNode& node);
     virtual ~ROCallback() throw();
 
   public:
@@ -26,8 +26,7 @@ namespace Belle2 {
     virtual bool abort() throw();
 
   private:
-    ProcessController _con;
-    std::string _path;
+    ProcessController m_con;
 
   };
 

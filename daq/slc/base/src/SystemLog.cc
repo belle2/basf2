@@ -9,30 +9,30 @@
 
 using namespace Belle2;
 
-std::string SystemLog::__hostname = "";
+std::string SystemLog::g_hostname = "";
 
 SystemLog::SystemLog(const std::string& node_name, Priority priority,
                      const std::string& message, int ref_no)
-  : _priority(priority), _log_date(), _hostname(),
-    _node_name(node_name), _message(message), _ref_no(ref_no)
+  : m_priority(priority), m_log_date(), m_hostname(),
+    m_node_name(node_name), m_message(message), m_ref_no(ref_no)
 {
-  if (__hostname.size() == 0) {
+  if (g_hostname.size() == 0) {
     const char* hostname = getenv("HOSTNAME");
     if (hostname != NULL) {
-      __hostname = hostname;
+      g_hostname = hostname;
     }
   }
-  if (__hostname.size() > 0) {
-    _hostname = __hostname;
+  if (g_hostname.size() > 0) {
+    m_hostname = g_hostname;
   }
 }
 
 const std::string SystemLog::toString() const
 {
   std::stringstream ss;
-  ss << "[from=" << _hostname << "/" << _node_name
-     << "] [date=" << _log_date.toString();
-  switch (_priority) {
+  ss << "[from=" << m_hostname << "/" << m_node_name
+     << "] [date=" << m_log_date.toString();
+  switch (m_priority) {
     case DEBUG:   ss << "] [DEBUG] "; break;
     case INFO:    ss << "] [INFO] "; break;
     case NOTICE:  ss << "] [NOTICE] "; break;
@@ -41,29 +41,29 @@ const std::string SystemLog::toString() const
     case FATAL:   ss << "] [FATAL] "; break;
     default:      ss << "] [UNKNOWN] "; break;
   }
-  ss << _message;
+  ss << m_message;
   return ss.str();
 }
 
 void SystemLog::readObject(Reader& reader) throw(IOException)
 {
-  _priority = (Priority)reader.readInt();
-  _log_date = Date((time_t)reader.readInt());
-  _ref_no = reader.readInt();
-  _group_name = reader.readString();
-  _hostname = reader.readString();
-  _node_name = reader.readString();
-  _message = reader.readString();
+  m_priority = (Priority)reader.readInt();
+  m_log_date = Date((time_t)reader.readInt());
+  m_ref_no = reader.readInt();
+  m_group_name = reader.readString();
+  m_hostname = reader.readString();
+  m_node_name = reader.readString();
+  m_message = reader.readString();
 }
 
 void SystemLog::writeObject(Writer& writer) const throw(IOException)
 {
-  writer.writeInt((int)_priority);
-  writer.writeInt((int)_log_date.get());
-  writer.writeInt(_ref_no);
-  writer.writeString(_group_name);
-  writer.writeString(_hostname);
-  writer.writeString(_node_name);
-  writer.writeString(_message);
+  writer.writeInt((int)m_priority);
+  writer.writeInt((int)m_log_date.get());
+  writer.writeInt(m_ref_no);
+  writer.writeString(m_group_name);
+  writer.writeString(m_hostname);
+  writer.writeString(m_node_name);
+  writer.writeString(m_message);
 }
 

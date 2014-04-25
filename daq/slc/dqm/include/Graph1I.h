@@ -1,5 +1,5 @@
-#ifndef _Belle2_Graph1I_hh
-#define _Belle2_Graph1I_hh
+#ifndef _Belle2_Graph1I_h
+#define _Belle2_Graph1I_h
 
 #include "daq/slc/dqm/Graph1.h"
 

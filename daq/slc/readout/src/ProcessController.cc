@@ -15,9 +15,9 @@ using namespace Belle2;
 bool ProcessController::init(const std::string& name_in,
                              int nreserved)
 {
-  _name = (name_in.size() > 0) ? name_in : _callback->getNode().getName();
-  LogFile::open(_name);
-  if (!_info.open(_name, nreserved, true)) {
+  m_name = (name_in.size() > 0) ? name_in : m_callback->getNode().getName();
+  LogFile::open(m_name);
+  if (!m_info.open(m_name, nreserved, true)) {
     return false;
   }
   return true;
@@ -25,24 +25,24 @@ bool ProcessController::init(const std::string& name_in,
 
 void ProcessController::clear()
 {
-  _info.clear();
+  m_info.clear();
 }
 
 bool ProcessController::load(int timeout)
 {
-  _info.clear();
-  _fork.cancel();
+  m_info.clear();
+  m_fork.cancel();
   int iopipe[2];
   if (pipe(iopipe) < 0) {
     perror("pipe");
   }
-  _fork = Fork(new ProcessSubmitter(this, iopipe));
+  m_fork = Fork(new ProcessSubmitter(this, iopipe));
   PThread(new LogListener(this, iopipe));
   PThread(new ProcessListener(this));
   close(iopipe[1]);
   if (timeout > 0) {
-    if (!_info.waitRunning(timeout)) {
-      _callback->setReply("Failed to boot " + _name);
+    if (!m_info.waitRunning(timeout)) {
+      m_callback->setReply("Failed to boot " + m_name);
       return false;
     }
   }
@@ -51,20 +51,20 @@ bool ProcessController::load(int timeout)
 
 bool ProcessController::start()
 {
-  _info.lock();
-  NSMMessage& msg(_callback->getMessage());
+  m_info.lock();
+  NSMMessage& msg(m_callback->getMessage());
   if (msg.getNParams() > 2) {
-    _info.setExpNumber(msg.getParam(0));
-    _info.setRunNumber(msg.getParam(1));
-    _info.setSubNumber(msg.getParam(2));
+    m_info.setExpNumber(msg.getParam(0));
+    m_info.setRunNumber(msg.getParam(1));
+    m_info.setSubNumber(msg.getParam(2));
   }
   //_info.setNodeId(_callback->getNode()->getData()->getId());
-  if (_info.getState() != RunInfoBuffer::RUNNING) {
-    _callback->setReply(_name + " is not running");
-    _info.unlock();
+  if (m_info.getState() != RunInfoBuffer::RUNNING) {
+    m_callback->setReply(m_name + " is not running");
+    m_info.unlock();
     return false;
   }
-  _info.unlock();
+  m_info.unlock();
   return true;
 }
 
@@ -75,27 +75,27 @@ bool ProcessController::stop()
 
 bool ProcessController::abort()
 {
-  _info.clear();
-  _fork.cancel();
+  m_info.clear();
+  m_fork.cancel();
   return true;
 }
 
 void ProcessSubmitter::run()
 {
   close(1);
-  dup2(_iopipe[1], 1);
+  dup2(m_iopipe[1], 1);
   close(2);
-  dup2(_iopipe[1], 2);
-  close(_iopipe[0]);
+  dup2(m_iopipe[1], 2);
+  close(m_iopipe[0]);
   Executor executor;
-  if (_con->getExecutable().size() == 0) {
-    _con->setExecutable("basf2");
+  if (m_con->getExecutable().size() == 0) {
+    m_con->setExecutable("basf2");
   }
-  executor.setExecutable(_con->getExecutable());
-  for (size_t i = 0; i < _con->_arg_v.size(); i++) {
-    executor.addArg(_con->_arg_v[i]);
+  executor.setExecutable(m_con->getExecutable());
+  for (size_t i = 0; i < m_con->m_arg_v.size(); i++) {
+    executor.addArg(m_con->m_arg_v[i]);
   }
-  if (_con->getExecutable() == "basf2") {
+  if (m_con->getExecutable() == "basf2") {
     executor.addArg("--no-stats");
   }
   executor.execute();

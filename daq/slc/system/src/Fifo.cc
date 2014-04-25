@@ -29,7 +29,7 @@ throw(IOException)
       mode = O_RDWR;
     }
   }
-  if ((_fd = ::open(path.c_str(), mode)) < 0) {
+  if ((m_fd = ::open(path.c_str(), mode)) < 0) {
     perror("open");
     throw (IOException("Failed to open fifo."));
   }
@@ -45,10 +45,10 @@ void Fifo::unlink(const std::string& path) throw(IOException)
 
 size_t Fifo::write(const void* buf, size_t count) throw(IOException)
 {
-  return ::write(_fd, buf, count);
+  return ::write(m_fd, buf, count);
 }
 
 size_t Fifo::read(void* buf, size_t count) throw(IOException)
 {
-  return ::read(_fd, buf, count);
+  return ::read(m_fd, buf, count);
 }

@@ -1,5 +1,5 @@
-#ifndef _Belle2_COPPERCallback_hh
-#define _Belle2_COPPERCallback_hh
+#ifndef _Belle2_COPPERCallback_h
+#define _Belle2_COPPERCallback_h
 
 #include "HSLBController.h"
 
@@ -29,11 +29,11 @@ namespace Belle2 {
     virtual bool abort() throw();
 
   private:
-    ProcessController _con;
-    HSLBController _hslbcon_v[4];
-    int _confno;
-    std::string _path;
-    std::string _hostname;
+    ProcessController m_con;
+    HSLBController m_hslbcon_v[4];
+    int m_confno;
+    std::string m_path;
+    std::string m_hostname;
 
   };
 

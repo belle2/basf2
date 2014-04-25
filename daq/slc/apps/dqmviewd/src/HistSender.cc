@@ -19,19 +19,19 @@ const int HistSender::FLAG_UPDATE = 3;
 
 HistSender::~HistSender()
 {
-  _socket.close();
+  m_socket.close();
   LogFile::debug("GUI disconnected.");
 }
 
 void HistSender::run()
 {
-  TCPSocketWriter socket_writer(_socket);
-  TCPSocketReader socket_reader(_socket);
+  TCPSocketWriter socket_writer(m_socket);
+  TCPSocketReader socket_reader(m_socket);
 
   while (true) {
-    std::vector<DQMFileReader>& reader_v(_master.getReaders());
+    std::vector<DQMFileReader>& reader_v(m_master.getReaders());
     size_t nready = 0;
-    _master.lock();
+    m_master.lock();
     for (size_t i = 0; i < reader_v.size(); i++) {
       if (reader_v[i].isReady()) nready++;
     }
@@ -44,10 +44,10 @@ void HistSender::run()
       }
       socket_writer.writeInt(0x7FFF);
     } catch (const IOException& e) {
-      _master.unlock();
+      m_master.unlock();
       return;
     }
-    _master.unlock();
+    m_master.unlock();
 
     std::vector<bool> monitored_v;
     int npacks = 0;
@@ -55,9 +55,9 @@ void HistSender::run()
     try {
       for (size_t i = 0; i < reader_v.size(); i++) {
         DQMFileReader& reader(reader_v[i]);
-        _master.lock();
+        m_master.lock();
         bool ready = reader.isReady();
-        _master.unlock();
+        m_master.unlock();
         if (ready) {
           bool monitored = (bool)socket_reader.readChar();
           monitored_v.push_back(monitored);
@@ -72,13 +72,13 @@ void HistSender::run()
     }
     if (npacks == 0) {
       LogFile::debug("HistoSender: No package selected.");
-      _socket.close();
+      m_socket.close();
       return;
     }
     try {
       socket_writer.writeInt(FLAG_CONFIG);
       socket_writer.writeInt(npacks);
-      _master.lock();
+      m_master.lock();
       for (size_t i = 0; i < reader_v.size(); i++) {
         if (monitored_v[i]) {
           DQMFileReader& reader(reader_v[i]);
@@ -109,16 +109,16 @@ void HistSender::run()
         }
       }
       socket_writer.writeInt(0x7FFF);
-      _master.unlock();
+      m_master.unlock();
     } catch (const IOException& e) {
-      _master.unlock();
-      _socket.close();
+      m_master.unlock();
+      m_socket.close();
       return;
     }
 
     std::vector<int> updateid_v;
     int buf_size = 0;
-    _master.lock();
+    m_master.lock();
     for (size_t i = 0; i < reader_v.size(); i++) {
       updateid_v.push_back(reader_v[i].getUpdateId());
       if (monitored_v[i]) {
@@ -127,17 +127,17 @@ void HistSender::run()
         if (counter.count() > buf_size) buf_size = counter.count();
       }
     }
-    _master.unlock();
+    m_master.unlock();
     ZipDeflater buf(buf_size, buf_size * 1.01 + 12);
 
     try {
       while (true) {
-        bool revised = false;
-        _master.lock();
+        //bool revised = false;
+        m_master.lock();
         socket_writer.writeInt(FLAG_UPDATE);
-        socket_writer.writeInt(_master.getExpNumber());
-        socket_writer.writeInt(_master.getRunNumber());
-        socket_writer.writeInt(_master.getState().getId());
+        socket_writer.writeInt(m_master.getExpNumber());
+        socket_writer.writeInt(m_master.getRunNumber());
+        socket_writer.writeInt(m_master.getState().getId());
         int ic = 0;
         for (size_t i = 0; i < reader_v.size(); i++) {
           if (monitored_v[i]) {
@@ -153,12 +153,12 @@ void HistSender::run()
           }
         }
         socket_writer.writeInt(-1);
-        _master.wait();
-        _master.unlock();
+        m_master.wait();
+        m_master.unlock();
       }
     } catch (const IOException& e) {
-      _master.unlock();
-      _socket.close();
+      m_master.unlock();
+      m_socket.close();
       return;
     }
   }

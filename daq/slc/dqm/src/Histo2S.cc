@@ -6,13 +6,13 @@ using namespace Belle2;
 
 Histo2S::Histo2S() : Histo2()
 {
-  _data = new ShortArray();
+  m_data = new ShortArray();
 }
 
 Histo2S::Histo2S(const Histo2S& h) : Histo2(h)
 {
-  if (h._data != NULL) _data = new ShortArray(*h._data);
-  else _data = new ShortArray();
+  if (h.m_data != NULL) m_data = new ShortArray(*h.m_data);
+  else m_data = new ShortArray();
 }
 
 Histo2S::Histo2S(const std::string& name, const std::string& title,
@@ -20,7 +20,7 @@ Histo2S::Histo2S(const std::string& name, const std::string& title,
                  int nbiny, double ymin, double ymax)
   : Histo2(name, title, nbinx, xmin, xmax, nbiny, ymin, ymax)
 {
-  _data = new ShortArray((nbinx + 2) * (nbiny + 2));
+  m_data = new ShortArray((nbinx + 2) * (nbiny + 2));
 }
 
 std::string Histo2S::getDataType() const throw()

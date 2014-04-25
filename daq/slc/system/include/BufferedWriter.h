@@ -7,13 +7,6 @@ namespace Belle2 {
 
   class BufferedWriter : public Writer {
 
-    // member data
-  protected:
-    unsigned char* _memory;
-    size_t _size;
-    size_t _pos;
-    bool _allocated;
-
     // constructors & destructors
   public:
     BufferedWriter() throw();
@@ -23,16 +16,23 @@ namespace Belle2 {
 
     // member methods implemented
   public:
-    void seekTo(size_t pos) throw() { _pos = pos; }
-    unsigned char* ptr() throw() { return _memory; }
-    size_t count() const throw() { return _pos; }
-    size_t size() const throw() { return _size; }
+    void seekTo(size_t pos) throw() { m_pos = pos; }
+    unsigned char* ptr() throw() { return m_memory; }
+    size_t count() const throw() { return m_pos; }
+    size_t size() const throw() { return m_size; }
     virtual size_t write(const void*, size_t) throw(IOException);
     virtual bool available() throw() { return true; }
 
     // operators
   public:
     const BufferedWriter& operator = (const BufferedWriter&) throw();
+
+    // member data
+  protected:
+    unsigned char* m_memory;
+    size_t m_size;
+    size_t m_pos;
+    bool m_allocated;
 
   };
 

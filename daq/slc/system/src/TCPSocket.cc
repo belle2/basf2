@@ -25,29 +25,29 @@ using namespace Belle2;
 int TCPSocket::connect(const std::string& ip, unsigned short port)
 throw (IOException)
 {
-  _ip = ip;
-  _port = port;
+  m_ip = ip;
+  m_port = port;
   return connect();
 }
 
 int TCPSocket::connect() throw (IOException)
 {
-  if (_fd > 0) {
+  if (m_fd > 0) {
     throw (IOException("Socket is working already."));
   }
   sockaddr_in addr;
   memset(&addr, 0, sizeof(sockaddr_in));
   addr.sin_family = AF_INET;
   addr.sin_addr.s_addr = INADDR_ANY;
-  addr.sin_port = htons(_port);
+  addr.sin_port = htons(m_port);
 
-  if ((_fd = ::socket(PF_INET, SOCK_STREAM, 0)) < 0) {
+  if ((m_fd = ::socket(PF_INET, SOCK_STREAM, 0)) < 0) {
     throw (IOException("Failed to create socket"));
   }
   struct hostent* host = NULL;
-  host = gethostbyname(_ip.c_str());
+  host = gethostbyname(m_ip.c_str());
   if (host == NULL) {
-    unsigned long ip_address = inet_addr(_ip.c_str());
+    unsigned long ip_address = inet_addr(m_ip.c_str());
     if ((signed long) ip_address < 0) {
       throw (std::exception());
       throw (IOException("Wrong host name or ip"));
@@ -57,22 +57,22 @@ int TCPSocket::connect() throw (IOException)
   }
   addr.sin_addr.s_addr = (*(unsigned long*) host->h_addr_list[0]);
 
-  if (::connect(_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+  if (::connect(m_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
     close();
     throw (IOException("Failed to connect host %s:%d",
-                       _ip.c_str(), _port));
+                       m_ip.c_str(), m_port));
   }
 
-  return _fd;
+  return m_fd;
 }
 
 void TCPSocket::setBufferSize(int size) throw(IOException)
 {
   if (size > 0) {
-    if (setsockopt(_fd, SOL_SOCKET, SO_SNDBUF, &size, sizeof(size)) != 0) {
+    if (setsockopt(m_fd, SOL_SOCKET, SO_SNDBUF, &size, sizeof(size)) != 0) {
       throw (IOException("failed to SO_SNDBUF: %s\n", strerror(errno)));
     }
-    if (setsockopt(_fd, SOL_SOCKET, SO_RCVBUF, &size, sizeof(size)) != 0) {
+    if (setsockopt(m_fd, SOL_SOCKET, SO_RCVBUF, &size, sizeof(size)) != 0) {
       throw (IOException("error on SO_RCVBUF: %s\n", strerror(errno)));
     }
   }
@@ -84,7 +84,7 @@ size_t TCPSocket::write(const void* buf, size_t count) throw(IOException)
   int ret;
   errno = 0;
   while (c < count) {
-    ret = send(_fd, ((unsigned char*)buf + c), (count - c), MSG_NOSIGNAL);
+    ret = send(m_fd, ((unsigned char*)buf + c), (count - c), MSG_NOSIGNAL);
     if (ret <= 0) {
       switch (errno) {
         case EINTR: continue;
@@ -108,7 +108,7 @@ size_t TCPSocket::read(void* buf, size_t count) throw(IOException)
   int ret;
   errno = 0;
   while (c < count) {
-    ret = recv(_fd, ((unsigned char*)buf + c), (count - c), 0);
+    ret = recv(m_fd, ((unsigned char*)buf + c), (count - c), 0);
     if (ret <= 0) {
       switch (errno) {
         case EINTR: continue;

@@ -17,12 +17,12 @@ namespace Belle2 {
     ~LogFile() {}
 
   private:
-    static bool __opened;
-    static std::string __filepath;
-    static std::ofstream __stream;
-    static unsigned int __filesize;
-    static Mutex __mutex;
-    static SystemLog::Priority __threshold;
+    static bool g_opened;
+    static std::string g_filepath;
+    static std::ofstream g_stream;
+    static unsigned int g_filesize;
+    static Mutex g_mutex;
+    static SystemLog::Priority g_threshold;
 
     // member functions
   public:

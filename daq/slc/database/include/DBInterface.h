@@ -32,21 +32,21 @@ namespace Belle2 {
     virtual bool checkTable(const std::string& tablename) throw(DBHandlerException) = 0;
     virtual DBFieldTypeList getTableContents(const std::string& tablename)
     throw(DBHandlerException) = 0;
-    void clearRecords() throw(DBHandlerException) { _record_v.resize(0); }
-    DBRecordList& getRecords() throw(DBHandlerException) { return _record_v; }
-    const std::string& getHostName() const throw() { return _host; }
-    const std::string& getDatabase() const throw() { return _database; }
-    const std::string& getUserName() const throw() { return _user; }
-    const std::string& getPassword() const throw() { return _password; }
-    int getPort() const throw() { return _port; }
+    void clearRecords() throw(DBHandlerException) { m_record_v.resize(0); }
+    DBRecordList& getRecords() throw(DBHandlerException) { return m_record_v; }
+    const std::string& getHostName() const throw() { return m_host; }
+    const std::string& getDatabase() const throw() { return m_database; }
+    const std::string& getUserName() const throw() { return m_user; }
+    const std::string& getPassword() const throw() { return m_password; }
+    int getPort() const throw() { return m_port; }
 
   protected:
-    DBRecordList _record_v;
-    std::string _host;
-    std::string _database;
-    std::string _user;
-    std::string _password;
-    int _port;
+    DBRecordList m_record_v;
+    std::string m_host;
+    std::string m_database;
+    std::string m_user;
+    std::string m_password;
+    int m_port;
 
   };
 

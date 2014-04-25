@@ -1,5 +1,5 @@
-#ifndef _Belle2_MonColor_hh
-#define _Belle2_MonColor_hh
+#ifndef _Belle2_MonColor_h
+#define _Belle2_MonColor_h
 
 #include <string>
 
@@ -33,19 +33,19 @@ namespace Belle2 {
   public:
     bool isNon() const throw();
     void setRGB(int red, int green, int blue) throw();
-    int getRed() const throw() { return _red; }
-    int getGreen() const throw() { return _green; }
-    int getBlue() const throw() { return _blue; }
+    int getRed() const throw() { return m_red; }
+    int getGreen() const throw() { return m_green; }
+    int getBlue() const throw() { return m_blue; }
     std::string toString() const throw();
 
   public:
     const MonColor& operator=(const MonColor& c) throw();
     bool operator==(const MonColor& c) const throw() {
-      return _red == c._red && _green == c._green && _blue == c._blue;
+      return m_red == c.m_red && m_green == c.m_green && m_blue == c.m_blue;
     };
 
   private:
-    int _red, _blue, _green;
+    int m_red, m_blue, m_green;
 
   };
 

@@ -1,5 +1,5 @@
-#ifndef _Belle2_Histo_hh
-#define _Belle2_Histo_hh
+#ifndef _Belle2_Histo_h
+#define _Belle2_Histo_h
 
 #include "daq/slc/dqm/MonObject.h"
 
@@ -22,30 +22,30 @@ namespace Belle2 {
     virtual ~Histo() throw();
 
   protected:
-    std::string _title;
-    Axis _axis_x;
-    Axis _axis_y;
-    Axis _axis_z;
-    NumberArray* _data;
-    std::string _draw_option;
-    GAxis* _linked_axis;
+    std::string m_title;
+    Axis m_axis_x;
+    Axis m_axis_y;
+    Axis m_axis_z;
+    NumberArray* m_data;
+    std::string m_draw_option;
+    GAxis* m_linked_axis;
 
   protected:
     void init(const std::string& title) throw();
 
   public:
-    const std::string& getTitle() const throw() {  return _title;  }
-    const Axis& getAxisX() const throw() {  return _axis_x;  }
-    const Axis& getAxisY() const throw() {  return _axis_y;  }
-    const Axis& getAxisZ() const throw() {  return _axis_z;  }
-    Axis& getAxisX() throw() {  return _axis_x;  }
-    Axis& getAxisY() throw() {  return _axis_y;  }
-    Axis& getAxisZ() throw() {  return _axis_z;  }
+    const std::string& getTitle() const throw() {  return m_title;  }
+    const Axis& getAxisX() const throw() {  return m_axis_x;  }
+    const Axis& getAxisY() const throw() {  return m_axis_y;  }
+    const Axis& getAxisZ() const throw() {  return m_axis_z;  }
+    Axis& getAxisX() throw() {  return m_axis_x;  }
+    Axis& getAxisY() throw() {  return m_axis_y;  }
+    Axis& getAxisZ() throw() {  return m_axis_z;  }
 
-    void setTitle(const std::string& title) throw() { _title = title;  }
-    void setAxisX(const Axis& axis) throw() { _axis_x = axis;  }
-    void setAxisY(const Axis& axis) throw() { _axis_y = axis;  }
-    void setAxisZ(const Axis& axis) throw() { _axis_z = axis;  }
+    void setTitle(const std::string& title) throw() { m_title = title;  }
+    void setAxisX(const Axis& axis) throw() { m_axis_x = axis;  }
+    void setAxisY(const Axis& axis) throw() { m_axis_y = axis;  }
+    void setAxisZ(const Axis& axis) throw() { m_axis_z = axis;  }
 
     void fill(double v) throw();
     void fill(double vx, double vy) throw();
@@ -81,12 +81,12 @@ namespace Belle2 {
     virtual void setUnderFlowX(int, double) throw() {}
     virtual void setUnderFlowY(int, double) throw() {}
 
-    virtual void readObject(Belle2::Reader& reader) throw(Belle2::IOException);
-    virtual void readContents(Belle2::Reader& reader) throw(Belle2::IOException);
-    virtual void readConfig(Belle2::Reader& reader) throw(Belle2::IOException);
-    virtual void writeObject(Belle2::Writer& writer) const throw(Belle2::IOException);
-    virtual void writeContents(Belle2::Writer& writer) const throw(Belle2::IOException);
-    virtual void writeConfig(Belle2::Writer& writer) const throw(Belle2::IOException);
+    virtual void readObject(Reader& reader) throw(IOException);
+    virtual void readContents(Reader& reader) throw(IOException);
+    virtual void readConfig(Reader& reader) throw(IOException);
+    virtual void writeObject(Writer& writer) const throw(IOException);
+    virtual void writeContents(Writer& writer) const throw(IOException);
+    virtual void writeConfig(Writer& writer) const throw(IOException);
 
     virtual double getMaximum() const throw() = 0;
     virtual double getMinimum() const throw() = 0;
@@ -95,18 +95,18 @@ namespace Belle2 {
     virtual void fixMaximum(double data) throw() = 0;
     virtual void fixMinimum(double data) throw() = 0;
     virtual int getDim() const throw() = 0;
-    NumberArray& getData() throw() { return *_data; }
-    const NumberArray& getData() const throw() { return *_data; }
+    NumberArray& getData() throw() { return *m_data; }
+    const NumberArray& getData() const throw() { return *m_data; }
 
   public:
     virtual std::string getTag() const throw();
     virtual std::string toXML() const throw();
     virtual std::string toString() const throw();
     void setDrawOption(const std::string& option) {
-      _draw_option = option;
+      m_draw_option = option;
     }
     void setLinkedAxis(GAxis* axis) {
-      _linked_axis = axis;
+      m_linked_axis = axis;
     }
 
   };

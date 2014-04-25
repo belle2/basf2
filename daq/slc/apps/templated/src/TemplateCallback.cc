@@ -5,9 +5,6 @@
 #include <daq/slc/system/LogFile.h>
 
 #include <daq/slc/base/StringUtil.h>
-#include <daq/slc/base/ConfigFile.h>
-
-#include <iostream>
 
 using namespace Belle2;
 
@@ -81,7 +78,6 @@ bool TemplateCallback::recover() throw()
 
 bool TemplateCallback::abort() throw()
 {
-  _con.abort();
   getNode().setState(RCState::INITIAL_S);
   return true;
 }

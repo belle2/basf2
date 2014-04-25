@@ -7,28 +7,28 @@
 using namespace Belle2;
 
 ZipDeflater::ZipDeflater() throw():
-  BufferedWriter(1024), _comp_buf(new unsigned char[1200]),
-  _comp_buf_size(1200), _comp_size(0)
+  BufferedWriter(1024), m_comp_buf(new unsigned char[1200]),
+  m_comp_buf_size(1200), m_comp_size(0)
 {
 }
 
 ZipDeflater::ZipDeflater(size_t size, size_t comp_buf_size)
 throw() :  BufferedWriter(size),
-  _comp_buf(new unsigned char[comp_buf_size]),
-  _comp_buf_size(comp_buf_size), _comp_size(0)
+  m_comp_buf(new unsigned char[comp_buf_size]),
+  m_comp_buf_size(comp_buf_size), m_comp_size(0)
 {
 }
 
 ZipDeflater::~ZipDeflater() throw()
 {
-  delete [] _comp_buf;
+  delete [] m_comp_buf;
 }
 
 void ZipDeflater::deflate(int level) throw(IOException)
 {
-  _comp_size = _comp_buf_size;
+  m_comp_size = m_comp_buf_size;
   int e = 0;
-  if ((e =::compress2(_comp_buf, &_comp_size, ptr(), count(), level))
+  if ((e =::compress2(m_comp_buf, &m_comp_size, ptr(), count(), level))
       != Z_OK) {
     std::string emsg;
     switch (e) {
@@ -44,7 +44,7 @@ void ZipDeflater::deflate(int level) throw(IOException)
 
 void ZipDeflater::writeObject(Writer& writer) throw(IOException)
 {
-  writer.writeInt(_comp_buf_size);
-  writer.writeInt(_comp_size);
-  writer.write(_comp_buf, _comp_size);
+  writer.writeInt(m_comp_buf_size);
+  writer.writeInt(m_comp_size);
+  writer.write(m_comp_buf, m_comp_size);
 }

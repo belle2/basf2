@@ -11,13 +11,13 @@ using namespace Belle2;
 
 void DQMViewMaster::init()
 {
-  for (size_t i = 0; i < _reader_v.size(); i++) {
-    _con_v.push_back(ProcessController());
+  for (size_t i = 0; i < m_reader_v.size(); i++) {
+    m_con_v.push_back(ProcessController());
   }
-  for (size_t i = 0; i < _reader_v.size(); i++) {
-    const std::string name = _reader_v[i].getName();
-    _con_v[i].setCallback(_callback);
-    _con_v[i].init("hserver_" + name);
+  for (size_t i = 0; i < m_reader_v.size(); i++) {
+    const std::string name = m_reader_v[i].getName();
+    m_con_v[i].setCallback(m_callback);
+    m_con_v[i].init("hserver_" + name);
   }
 }
 
@@ -28,22 +28,22 @@ bool DQMViewMaster::boot()
   const std::string mappath = config.get("DQM_MAP_PATH");
   LogFile::debug("DQM_DUMP_PATH=%s", dumppath.c_str());
   LogFile::debug("DQM_MAP_PATH=%s", mappath.c_str());
-  for (size_t i = 0; i < _reader_v.size(); i++) {
-    const std::string filename = _reader_v[i].getFileName();
-    LogFile::debug("booting hserver %d %s", _port_v[i], filename.c_str());
-    _con_v[i].clearArguments();
-    _con_v[i].setExecutable("hserver");
-    _con_v[i].addArgument(StringUtil::form("%d", _port_v[i]));
-    _con_v[i].addArgument(filename);
-    _con_v[i].load(-1);
+  for (size_t i = 0; i < m_reader_v.size(); i++) {
+    const std::string filename = m_reader_v[i].getFileName();
+    LogFile::debug("booting hserver %d %s", m_port_v[i], filename.c_str());
+    m_con_v[i].clearArguments();
+    m_con_v[i].setExecutable("hserver");
+    m_con_v[i].addArgument(StringUtil::form("%d", m_port_v[i]));
+    m_con_v[i].addArgument(filename);
+    m_con_v[i].load(-1);
   }
   return true;
 }
 
 bool DQMViewMaster::abort()
 {
-  for (size_t i = 0; i < _reader_v.size(); i++) {
-    _con_v[i].abort();
+  for (size_t i = 0; i < m_reader_v.size(); i++) {
+    m_con_v[i].abort();
   }
   return true;
 }

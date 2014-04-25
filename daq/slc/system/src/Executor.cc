@@ -16,12 +16,12 @@ void Executor::setExecutable(const char* format, ...)
   va_start(ap, format);
   vsprintf(ss, format, ap);
   va_end(ap);
-  _path = ss;
+  m_path = ss;
 }
 
 void Executor::setExecutable(const std::string& path)
 {
-  _path = path;
+  m_path = path;
 }
 
 void Executor::addArg(const char* format, ...)
@@ -31,26 +31,26 @@ void Executor::addArg(const char* format, ...)
   va_start(ap, format);
   vsprintf(ss, format, ap);
   va_end(ap);
-  _arg_v.push_back(ss);
+  m_arg_v.push_back(ss);
 }
 
 void Executor::addArg(const std::string& arg)
 {
-  _arg_v.push_back(arg);
+  m_arg_v.push_back(arg);
 }
 
 bool Executor::execute()
 {
   char* argv[30];
-  argv[0] = (char*)_path.c_str();
+  argv[0] = (char*)m_path.c_str();
   std::cerr << "" << argv[0] << " ";
-  for (size_t i = 0; i < _arg_v.size(); i++) {
-    argv[i + 1] = (char*)_arg_v[i].c_str();
+  for (size_t i = 0; i < m_arg_v.size(); i++) {
+    argv[i + 1] = (char*)m_arg_v[i].c_str();
     std::cerr << "" << argv[i + 1] << " ";
   }
   std::cerr << std::endl;
-  argv[_arg_v.size() + 1] = NULL;
-  if (execvp(_path.c_str(), argv) == -1) {
+  argv[m_arg_v.size() + 1] = NULL;
+  if (execvp(m_path.c_str(), argv) == -1) {
     LogFile::error("Faield to start receiver basf2 script");
     return false;
   }

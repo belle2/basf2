@@ -16,8 +16,9 @@ namespace Belle2 {
     bool execute();
 
   private:
-    std::string _path;
-    std::vector<std::string> _arg_v;
+    std::string m_path;
+    std::vector<std::string> m_arg_v;
+
   };
 
 }

@@ -17,7 +17,7 @@ namespace Belle2 {
     virtual const char* what() const throw();
 
   protected:
-    std::string _comment;
+    std::string m_comment;
 
   };
 

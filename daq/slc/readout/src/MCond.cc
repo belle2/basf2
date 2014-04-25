@@ -30,38 +30,38 @@ bool MCond::init() throw()
   pthread_condattr_t attr;
   pthread_condattr_init(&attr);
   pthread_condattr_setpshared(&attr, PTHREAD_PROCESS_SHARED);
-  pthread_cond_init(_cond, &attr);
+  pthread_cond_init(m_cond, &attr);
   pthread_condattr_destroy(&attr);
   return true;
 }
 
 bool MCond::set(void* addr) throw()
 {
-  _cond = (pthread_cond_t*)addr;
+  m_cond = (pthread_cond_t*)addr;
   return true;
 }
 
 bool MCond::destroy() throw()
 {
-  pthread_cond_destroy(_cond);
+  pthread_cond_destroy(m_cond);
   return true;
 }
 
 bool MCond::signal() throw()
 {
-  if (pthread_cond_signal(_cond) == 0) return true;
+  if (pthread_cond_signal(m_cond) == 0) return true;
   else return false;
 }
 
 bool MCond::broadcast() throw()
 {
-  if (pthread_cond_broadcast(_cond) == 0) return true;
+  if (pthread_cond_broadcast(m_cond) == 0) return true;
   else return false;
 }
 
 bool MCond::wait(MMutex& cond) throw()
 {
-  if (pthread_cond_wait(_cond, cond._mu) != 0) {
+  if (pthread_cond_wait(m_cond, cond.m_mu) != 0) {
     return false;
   }
   return true;
@@ -76,7 +76,7 @@ bool MCond::wait(MMutex& mutex, const unsigned int sec,
   gettimeofday(&now, NULL);
   timeout.tv_sec = now.tv_sec + sec;
   timeout.tv_nsec = now.tv_usec * 1000 + msec;
-  if (pthread_cond_timedwait(_cond, mutex._mu, &timeout) != 0) {
+  if (pthread_cond_timedwait(m_cond, mutex.m_mu, &timeout) != 0) {
     return false;
   }
   return true;
@@ -84,6 +84,6 @@ bool MCond::wait(MMutex& mutex, const unsigned int sec,
 
 const MCond& MCond::operator=(const MCond& cond) throw()
 {
-  _cond = cond._cond;
+  m_cond = cond.m_cond;
   return *this;
 }

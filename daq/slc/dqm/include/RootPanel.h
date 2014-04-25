@@ -1,5 +1,5 @@
-#ifndef _Belle2_RootPanel_hh
-#define _Belle2_RootPanel_hh
+#ifndef _Belle2_RootPanel_h
+#define _Belle2_RootPanel_h
 
 #include "daq/slc/dqm/Panel.h"
 

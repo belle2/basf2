@@ -1,5 +1,5 @@
-#ifndef _Belle2_ScrollPanel_hh
-#define _Belle2_ScrollPanel_hh
+#ifndef _Belle2_ScrollPanel_h
+#define _Belle2_ScrollPanel_h
 
 #include "daq/slc/dqm/Panel.h"
 

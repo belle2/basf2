@@ -23,7 +23,7 @@ namespace Belle2 {
     void setData(NSMData* data);
 
   private:
-    NSMData* _data;
+    NSMData* m_data;
 
   };
 

@@ -7,7 +7,7 @@ const MonitorConnection MonitorConnection::ON(1, "ON");
 const MonitorConnection MonitorConnection::OFF(0, "OFF");
 
 MonitorConnection::MonitorConnection(int value, const std::string& text)
-  : _value(value), _text(text) {}
+  : m_value(value), m_text(text) {}
 
 MonitorConnection::~MonitorConnection() throw() {}
 
@@ -31,19 +31,19 @@ const MonitorConnection& MonitorConnection::operator=(int value) throw()
 const MonitorConnection& MonitorConnection::operator=(const MonitorConnection& connection)
 throw()
 {
-  _value = connection.getValue();
-  _text = connection.getText();
+  m_value = connection.getValue();
+  m_text = connection.getText();
   return *this;
 }
 
 bool MonitorConnection::operator==(int value) const throw()
 {
-  return _value == value;
+  return m_value == value;
 }
 
 bool MonitorConnection::operator==(const MonitorConnection& connection) const throw()
 {
-  return _value == connection._value;
+  return m_value == connection.m_value;
 }
 
 namespace Belle2 {

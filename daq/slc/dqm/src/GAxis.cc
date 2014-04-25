@@ -9,29 +9,29 @@ using namespace Belle2;
 GAxis::GAxis(const std::string& name, const std::string& title,
              int nbin, double min, double max)
   : Axis(nbin, min, max, title), Shape(name),
-    _tick_line_pro(NULL), _tick_font_pro(NULL), _label_font_pro(NULL),
-    _log_scale(false), _title_offset(-1), _label_offset(-1),
-    _time_format(""), _position(""), _tick_length(-1),
-    _x(-1), _y(-1), _padding_x(-1), _padding_y(-1) {}
+    m_tick_line_pro(NULL), m_tick_font_pro(NULL), m_label_font_pro(NULL),
+    m_log_scale(false), m_title_offset(-1), m_label_offset(-1),
+    m_time_format(""), m_position(""), m_tick_length(-1),
+    m_x(-1), m_y(-1), m_padding_x(-1), m_padding_y(-1) {}
 
 GAxis::~GAxis() throw() {}
 
 void GAxis::setTickLine(LineProperty* pro) throw()
 {
-  _tick_line_pro = pro;
-  _tick_line_pro->setLabel("tick-");
+  m_tick_line_pro = pro;
+  m_tick_line_pro->setLabel("tick-");
 }
 
 void GAxis::setTickFont(FontProperty* pro) throw()
 {
-  _tick_font_pro = pro;
-  _tick_font_pro->setLabel("tick-");
+  m_tick_font_pro = pro;
+  m_tick_font_pro->setLabel("tick-");
 }
 
 void GAxis::setLabelFont(FontProperty* pro) throw()
 {
-  _label_font_pro = pro;
-  _label_font_pro->setLabel("label-");
+  m_label_font_pro = pro;
+  m_label_font_pro->setLabel("label-");
 }
 
 void GAxis::setLabels(const std::vector<std::string>& label,
@@ -48,9 +48,9 @@ void GAxis::setLabels(const std::vector<std::string>& label,
       s2 << ",";
     }
     s1 << ":" << s2.str();
-    _labels = s1.str();
+    m_labels = s1.str();
   } else {
-    _labels = "";
+    m_labels = "";
   }
 }
 
@@ -68,9 +68,9 @@ void GAxis::setLabels(int nlabels, const std::string* label,
       s2 << ",";
     }
     s1 << ":" << s2.str();
-    _labels = s1.str();
+    m_labels = s1.str();
   } else {
-    _labels = "";
+    m_labels = "";
   }
 }
 
@@ -83,7 +83,7 @@ void GAxis::setColorPattern(const std::vector<MonColor>& pattern) throw()
     if (n >= pattern.size()) break;
     ss << ",";
   }
-  _color_pattern = ss.str();
+  m_color_pattern = ss.str();
 }
 
 void GAxis::setColorPattern(int ncolors, const MonColor* pattern) throw()
@@ -95,44 +95,44 @@ void GAxis::setColorPattern(int ncolors, const MonColor* pattern) throw()
     if (n >= ncolors) break;
     ss << ",";
   }
-  _color_pattern = ss.str();
+  m_color_pattern = ss.str();
 }
 
 std::string GAxis::toXML() const throw()
 {
   std::stringstream ss;
-  if (_tag.size() == 0) ss << "<axis ";
-  else ss << "<" << _tag << " ";
-  if (_name.size() > 0) ss << "name='" << _name << "' ";
-  if (_line_pro != NULL) ss << _line_pro->toString();
-  if (_fill_pro != NULL) ss << _fill_pro->toString();
-  if (_font_pro != NULL) ss << _font_pro->toString();
+  if (m_tag.size() == 0) ss << "<axis ";
+  else ss << "<" << m_tag << " ";
+  if (m_name.size() > 0) ss << "name='" << m_name << "' ";
+  if (m_line_pro != NULL) ss << m_line_pro->toString();
+  if (m_fill_pro != NULL) ss << m_fill_pro->toString();
+  if (m_font_pro != NULL) ss << m_font_pro->toString();
   if (isFixedMin()) ss << "minimum='" << getMin() << "' ";
   if (isFixedMax()) ss << "maximum='" << getMax() << "' ";
-  if (_labels.size() > 0) ss << "label='" << _labels << "' ";
-  if (_color_pattern.size() > 0) ss << "color-pattern='" << _color_pattern << "' ";
-  if (_log_scale) ss << "log-scale='on' ";
-  if (_title_offset >= 0) ss << "title-offset='" << _title_offset << "' ";
-  if (_label_offset >= 0) ss << "label-offset='" << _label_offset << "' ";
-  if (_label_font_pro != NULL) ss << _label_font_pro->toString();
-  if (_time_format.size() > 0) ss << "time-format='" << _time_format << "' ";
-  if (_position.size() > 0) ss << "position='" << _position << "' ";
-  if (_tick_length >= 0) ss << "tick-length='" << _tick_length << "' ";
-  if (_tick_line_pro != NULL) ss << _tick_line_pro->toString();
-  if (_tick_font_pro != NULL) ss << _tick_font_pro->toString();
-  if (_x >= 0) ss << "x='" << _x << "' ";
-  if (_y >= 0) ss << "y='" << _y << "' ";
-  if (_padding_x >= 0) ss << "padding-x='" << _padding_x << "' ";
-  if (_padding_y >= 0) ss << "padding-y='" << _padding_y << "' ";
+  if (m_labels.size() > 0) ss << "label='" << m_labels << "' ";
+  if (m_color_pattern.size() > 0) ss << "color-pattern='" << m_color_pattern << "' ";
+  if (m_log_scale) ss << "log-scale='on' ";
+  if (m_title_offset >= 0) ss << "title-offset='" << m_title_offset << "' ";
+  if (m_label_offset >= 0) ss << "label-offset='" << m_label_offset << "' ";
+  if (m_label_font_pro != NULL) ss << m_label_font_pro->toString();
+  if (m_time_format.size() > 0) ss << "time-format='" << m_time_format << "' ";
+  if (m_position.size() > 0) ss << "position='" << m_position << "' ";
+  if (m_tick_length >= 0) ss << "tick-length='" << m_tick_length << "' ";
+  if (m_tick_line_pro != NULL) ss << m_tick_line_pro->toString();
+  if (m_tick_font_pro != NULL) ss << m_tick_font_pro->toString();
+  if (m_x >= 0) ss << "x='" << m_x << "' ";
+  if (m_y >= 0) ss << "y='" << m_y << "' ";
+  if (m_padding_x >= 0) ss << "padding-x='" << m_padding_x << "' ";
+  if (m_padding_y >= 0) ss << "padding-y='" << m_padding_y << "' ";
   ss << ">" << std::endl;
 
-  if (_title.size() > 0) {
+  if (m_title.size() > 0) {
     ss << "<title><![CDATA["
-       << StringUtil::replace(_title, "\n", "<br/>")
+       << StringUtil::replace(m_title, "\n", "<br/>")
        << "]]></title>" << std::endl;
   }
-  if (_tag.size() == 0) ss << "</axis>";
-  else ss << "</" << _tag << ">";
+  if (m_tag.size() == 0) ss << "</axis>";
+  else ss << "</" << m_tag << ">";
   ss << std::endl;
   return ss.str();
 }

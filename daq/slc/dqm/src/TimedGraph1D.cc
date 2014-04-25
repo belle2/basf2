@@ -6,20 +6,20 @@ using namespace Belle2;
 
 TimedGraph1D::TimedGraph1D() throw() : TimedGraph1()
 {
-  _data = new DoubleArray(0);
+  m_data = new DoubleArray(0);
 }
 
 TimedGraph1D::TimedGraph1D(const TimedGraph1D& h) throw() : TimedGraph1(h)
 {
-  _data = new DoubleArray(h._data->size());
+  m_data = new DoubleArray(h.m_data->size());
 }
 
 TimedGraph1D::TimedGraph1D(const std::string& name, const std::string& title,
                            int nbinx, double xmin, double xmax)
 throw() : TimedGraph1(name, title, nbinx, xmin, xmax)
 {
-  _data = new DoubleArray(nbinx);
-  _time_v.resize(nbinx);
+  m_data = new DoubleArray(nbinx);
+  m_time_v.resize(nbinx);
 }
 
 TimedGraph1D::~TimedGraph1D() throw() {}

@@ -36,7 +36,7 @@ namespace Belle2 {
 
     // data members;
   private:
-    pthread_cond_t* _cond;
+    pthread_cond_t* m_cond;
 
   };
 

@@ -7,13 +7,10 @@
 
 using namespace Belle2;
 
-ROCallback::ROCallback(const NSMNode& node,
-                       const std::string& configname)
+ROCallback::ROCallback(const NSMNode& node)
   : RCCallback(node)
 {
-  _con.setCallback(this);
-  ConfigFile config(configname);
-  _path = config.get("rocp.basf2.dir");
+  m_con.setCallback(this);
 }
 
 ROCallback::~ROCallback() throw()
@@ -22,13 +19,13 @@ ROCallback::~ROCallback() throw()
 
 void ROCallback::init() throw()
 {
-  _con.init("basf2");
+  m_con.init("basf2");
 }
 
 void ROCallback::term() throw()
 {
-  _con.abort();
-  _con.getInfo().unlink();
+  m_con.abort();
+  m_con.getInfo().unlink();
 }
 
 bool ROCallback::boot() throw()
@@ -38,12 +35,14 @@ bool ROCallback::boot() throw()
 
 bool ROCallback::load() throw()
 {
-  _con.clearArguments();
-  _con.addArgument(_path);
-  _con.addArgument("1");
-  _con.addArgument("5101");
-  _con.addArgument("basf2");
-  if (_con.load(30)) {
+  const DBObject& obj(getConfig().getObject());
+  std::string script = obj.getText("script");
+  m_con.clearArguments();
+  m_con.addArgument(script);
+  m_con.addArgument("1");
+  m_con.addArgument("5101");
+  m_con.addArgument("basf2");
+  if (m_con.load(30)) {
     LogFile::debug("load succeded");
     return true;
   } else {
@@ -54,13 +53,13 @@ bool ROCallback::load() throw()
 
 bool ROCallback::start() throw()
 {
-  _con.start();
+  m_con.start();
   return true;
 }
 
 bool ROCallback::stop() throw()
 {
-  _con.stop();
+  m_con.stop();
   return true;
 }
 
@@ -85,7 +84,7 @@ bool ROCallback::recover() throw()
 
 bool ROCallback::abort() throw()
 {
-  _con.abort();
+  m_con.abort();
   getNode().setState(RCState::INITIAL_S);
   return true;
 }

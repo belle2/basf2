@@ -13,22 +13,22 @@ namespace Belle2 {
 
   public:
     InotifyEvent()
-      : _wd(-1), _mask(-1), _name() {}
+      : m_wd(-1), m_mask(-1), m_name() {}
     ~InotifyEvent() throw() {}
 
   private:
     InotifyEvent(int wd, unsigned long mask, const std::string& name)
-      : _wd(wd), _mask(mask), _name(name) {}
+      : m_wd(wd), m_mask(mask), m_name(name) {}
 
   public:
-    int get_wd() const throw() { return _wd;}
-    unsigned long getMask() const throw() { return _mask; }
-    const std::string& getName() const throw() { return _name; }
+    int get_wd() const throw() { return m_wd;}
+    unsigned long getMask() const throw() { return m_mask; }
+    const std::string& getName() const throw() { return m_name; }
 
   private:
-    int _wd;
-    unsigned long _mask;
-    std::string _name;
+    int m_wd;
+    unsigned long m_mask;
+    std::string m_name;
 
   };
 

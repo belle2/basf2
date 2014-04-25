@@ -38,10 +38,10 @@ namespace Belle2 {
     throw() : NSMState(id, label) {}
 
   public:
-    bool isStable() const throw() { return _id > 1 && _id < 7; }
-    bool isTransition() const throw() { return _id > 6 && _id < 11; }
-    bool isError() const throw() { return _id > 10 && _id < 13; }
-    bool isRecovering() const throw() { return _id > 12 && _id < 15; }
+    bool isStable() const throw() { return getId() > 1 && getId() < 7; }
+    bool isTransition() const throw() { return getId() > 6 && getId() < 11; }
+    bool isError() const throw() { return getId() > 10 && getId() < 13; }
+    bool isRecovering() const throw() { return getId() > 12 && getId() < 15; }
     RCState next() const throw();
 
   public:
@@ -49,8 +49,7 @@ namespace Belle2 {
     const RCState& operator=(const char* msg) throw();
     const RCState& operator=(int id) throw();
     inline const RCState& operator=(const RCState& e) throw() {
-      _id = e._id;
-      _label = e._label;
+      *this = Enum::operator=(e);
       return *this;
     }
 

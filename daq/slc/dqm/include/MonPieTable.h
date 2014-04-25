@@ -1,5 +1,5 @@
-#ifndef _Belle2_MonPieTable_hh
-#define _Belle2_MonPieTable_hh
+#ifndef _Belle2_MonPieTable_h
+#define _Belle2_MonPieTable_h
 
 #include "daq/slc/dqm/MonShape.h"
 #include "daq/slc/dqm/FloatArray.h"
@@ -15,18 +15,18 @@ namespace Belle2 {
 
   public:
     virtual void reset() throw();
-    virtual void readConfig(Belle2::Reader& reader) throw(Belle2::IOException);
-    virtual void readContents(Belle2::Reader& reader) throw(Belle2::IOException);
-    virtual void writeConfig(Belle2::Writer& writer) const throw(Belle2::IOException);
-    virtual void writeContents(Belle2::Writer& writer) const throw(Belle2::IOException);
+    virtual void readConfig(Reader& reader) throw(IOException);
+    virtual void readContents(Reader& reader) throw(IOException);
+    virtual void writeConfig(Writer& writer) const throw(IOException);
+    virtual void writeContents(Writer& writer) const throw(IOException);
     virtual std::string getDataType() const throw() { return "MPT"; }
 
   public:
-    float getData(int index) const throw() { return _array.get(index); }
-    void setData(int index, float data) throw() { _array.set(index, data); }
+    float getData(int index) const throw() { return m_array.get(index); }
+    void setData(int index, float data) throw() { m_array.set(index, data); }
 
   private:
-    FloatArray _array;
+    FloatArray m_array;
 
   };
 

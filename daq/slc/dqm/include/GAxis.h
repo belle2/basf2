@@ -1,5 +1,5 @@
-#ifndef _Belle2_GAxis_hh
-#define _Belle2_GAxis_hh
+#ifndef _Belle2_GAxis_h
+#define _Belle2_GAxis_h
 
 #include "daq/slc/dqm/Axis.h"
 #include "daq/slc/dqm/Shape.h"
@@ -17,7 +17,7 @@ namespace Belle2 {
     virtual ~GAxis() throw();
 
   public:
-    std::string getTag() const throw() { return _tag; }
+    std::string getTag() const throw() { return m_tag; }
     std::string toXML() const throw();
 
   public:
@@ -30,36 +30,36 @@ namespace Belle2 {
                    const std::vector<double>& value) throw();
     void setLabels(int nlabels, const std::string* label,
                    const double* value) throw();
-    void setTag(const std::string& tag) throw() { _tag = tag; }
-    void setLogScale(bool log_scale) throw() { _log_scale = log_scale; }
-    void setTickLength(float length) throw() { _tick_length = length; }
-    void setTitleOffset(float offset) throw() { _title_offset = offset; }
-    void setLabelOffset(float offset) throw() { _label_offset = offset; }
+    void setTag(const std::string& tag) throw() { m_tag = tag; }
+    void setLogScale(bool log_scale) throw() { m_log_scale = log_scale; }
+    void setTickLength(float length) throw() { m_tick_length = length; }
+    void setTitleOffset(float offset) throw() { m_title_offset = offset; }
+    void setLabelOffset(float offset) throw() { m_label_offset = offset; }
     void setTimeFormat(const std::string& time_format) throw() {
-      _time_format = time_format;
+      m_time_format = time_format;
     }
     void setPosition(const std::string& position) throw() {
-      _position = position;
+      m_position = position;
     }
-    void setX(float x) throw() { _x = x; }
-    void setY(float y) throw() { _y = y; }
-    void setPaddingX(float padding_x) throw() { _padding_x = padding_x; }
-    void setPaddingY(float padding_y) throw() { _padding_y = padding_y; }
+    void setX(float x) throw() { m_x = x; }
+    void setY(float y) throw() { m_y = y; }
+    void setPaddingX(float padding_x) throw() { m_padding_x = padding_x; }
+    void setPaddingY(float padding_y) throw() { m_padding_y = padding_y; }
 
   private:
-    LineProperty* _tick_line_pro;
-    FontProperty* _tick_font_pro;
-    FontProperty* _label_font_pro;
-    std::string _tag;
-    std::string _color_pattern;
-    std::string _labels;
-    bool _log_scale;
-    float _title_offset;
-    float _label_offset;
-    std::string _time_format;
-    std::string _position;
-    float _tick_length;
-    float _x, _y, _padding_x, _padding_y;
+    LineProperty* m_tick_line_pro;
+    FontProperty* m_tick_font_pro;
+    FontProperty* m_label_font_pro;
+    std::string m_tag;
+    std::string m_color_pattern;
+    std::string m_labels;
+    bool m_log_scale;
+    float m_title_offset;
+    float m_label_offset;
+    std::string m_time_format;
+    std::string m_position;
+    float m_tick_length;
+    float m_x, m_y, m_padding_x, m_padding_y;
 
   };
 

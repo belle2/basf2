@@ -1,5 +1,5 @@
-#ifndef _Belle2_LineProperty_hh
-#define _Belle2_LineProperty_hh
+#ifndef _Belle2_LineProperty_h
+#define _Belle2_LineProperty_h
 
 #include "daq/slc/dqm/Property.h"
 
@@ -9,9 +9,6 @@ namespace Belle2 {
 
   class LineProperty : public Property {
 
-  private:
-    int _width;
-
   public:
     LineProperty(const MonColor& color,
                  int width = -1) throw();
@@ -19,9 +16,12 @@ namespace Belle2 {
     virtual ~LineProperty() throw() {}
 
   public:
-    int getWidth() const throw() { return _width; }
-    void setWidth(double width) throw() { _width = width; }
+    int getWidth() const throw() { return m_width; }
+    void setWidth(double width) throw() { m_width = width; }
     virtual std::string toString() const throw();
+
+  private:
+    int m_width;
 
   };
 

@@ -34,16 +34,16 @@ namespace Belle2 {
 
   inline bool Connection::operator==(const Connection& st) const throw()
   {
-    return (_id == st._id);
+    return (getId() == st.getId());
   }
+
   inline bool Connection::operator!=(const Connection& st) const throw()
   {
-    return (_id != st._id);
+    return (getId() != st.getId());
   }
   inline const Connection& Connection::operator=(const Connection& st) throw()
   {
-    _id = st._id;
-    _label = st._label;
+    *this = Enum::operator=(st);
     return *this;
   }
 

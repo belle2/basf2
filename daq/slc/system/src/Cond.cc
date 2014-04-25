@@ -12,7 +12,7 @@ Cond::Cond()
 
 Cond::Cond(const Cond& cond)
 {
-  _cond_t = cond._cond_t;
+  m_cond_t = cond.m_cond_t;
 }
 
 bool Cond::init() throw()
@@ -20,7 +20,7 @@ bool Cond::init() throw()
   pthread_condattr_t mattr;
   pthread_condattr_init(&mattr);
   pthread_condattr_setpshared(&mattr, PTHREAD_PROCESS_SHARED);
-  if (pthread_cond_init(&_cond_t, &mattr) != 0) {
+  if (pthread_cond_init(&m_cond_t, &mattr) != 0) {
     return false;
   }
   pthread_condattr_destroy(&mattr);
@@ -30,19 +30,19 @@ bool Cond::init() throw()
 
 bool Cond::signal() throw()
 {
-  if (pthread_cond_signal(&_cond_t) == 0) return true;
+  if (pthread_cond_signal(&m_cond_t) == 0) return true;
   else return false;
 }
 
 bool Cond::broadcast() throw()
 {
-  if (pthread_cond_broadcast(&_cond_t) == 0) return true;
+  if (pthread_cond_broadcast(&m_cond_t) == 0) return true;
   else return false;
 }
 
 bool Cond::wait(Mutex& mutex) throw()
 {
-  if (pthread_cond_wait(&_cond_t, &mutex._mu) != 0) {
+  if (pthread_cond_wait(&m_cond_t, &mutex.m_mu) != 0) {
     return false;
   }
   return true;
@@ -57,7 +57,7 @@ bool Cond::wait(Mutex& mutex, const unsigned int sec, const unsigned int msec) t
   timeout.tv_sec = now.tv_sec + sec;
   timeout.tv_nsec = now.tv_usec * 1000 + msec;
   int stat = 0;
-  if ((stat = pthread_cond_timedwait(&_cond_t, &mutex._mu, &timeout)) != 0) {
+  if ((stat = pthread_cond_timedwait(&m_cond_t, &mutex.m_mu, &timeout)) != 0) {
     return false;
   }
   return true;
@@ -65,6 +65,6 @@ bool Cond::wait(Mutex& mutex, const unsigned int sec, const unsigned int msec) t
 
 bool Cond::destroy() throw()
 {
-  if (pthread_cond_destroy(&_cond_t) == 0) return true;
+  if (pthread_cond_destroy(&m_cond_t) == 0) return true;
   else return false;
 }

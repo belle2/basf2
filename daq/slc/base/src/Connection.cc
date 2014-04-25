@@ -17,7 +17,7 @@ Connection::Connection(const Enum& st) throw()
 }
 
 Connection::Connection(const Connection& st) throw()
-  : Enum(st._id, st._label)
+  : Enum(st.getId(), st.getLabel())
 {
 
 }
@@ -35,8 +35,8 @@ Connection::~Connection() throw()
 
 const Connection& Connection::operator=(const std::string& msg) throw()
 {
-  if (msg == ONLINE._label) *this = ONLINE;
-  else if (msg == OFFLINE._label) *this = OFFLINE;
+  if (msg == ONLINE.getLabel()) *this = ONLINE;
+  else if (msg == OFFLINE.getLabel()) *this = OFFLINE;
   else *this = UNKNOWN;
   return *this;
 }
@@ -50,8 +50,8 @@ const Connection& Connection::operator=(const char* msg) throw()
 
 const Connection& Connection::operator=(int i) throw()
 {
-  if (i == ONLINE._id) *this = ONLINE;
-  else if (i == OFFLINE._id) *this = OFFLINE;
+  if (i == ONLINE.getId()) *this = ONLINE;
+  else if (i == OFFLINE.getId()) *this = OFFLINE;
   else *this = UNKNOWN;
   return *this;
 }

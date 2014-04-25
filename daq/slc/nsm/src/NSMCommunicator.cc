@@ -81,6 +81,7 @@ void NSMCommunicator::setCallback(NSMCallback* callback) throw(NSMHandlerExcepti
 
 void NSMCommunicator::sendRequest(const NSMMessage& msg) throw(NSMHandlerException)
 {
+#if NSM_PACKAGE_VERSION >= 1914
   const char* nodename = msg.getNodeName();
   const char* reqname = msg.getRequestName();
   if (nodename != NULL && reqname != NULL &&
@@ -88,6 +89,9 @@ void NSMCommunicator::sendRequest(const NSMMessage& msg) throw(NSMHandlerExcepti
     sendRequest(nodename, reqname, msg.getNParams(), msg.getParams(),
                 msg.getLength(), msg.getData());
   }
+#else
+#warning "Wrong version of nsm2. try source daq/slc/extra/nsm2/export.sh"
+#endif
 }
 
 void NSMCommunicator::sendRequest(const std::string& node, const std::string& cmd,
@@ -126,6 +130,7 @@ bool NSMCommunicator::sendLog(const SystemLog& log)
 
 bool NSMCommunicator::sendLog(const NSMNode& node, const SystemLog& log)
 {
+#if NSM_PACKAGE_VERSION >= 1914
   try {
     if (node.getName().size() > 0 &&
         b2nsm_nodeid(node.getName().c_str()) >= 0) {
@@ -134,6 +139,9 @@ bool NSMCommunicator::sendLog(const NSMNode& node, const SystemLog& log)
   } catch (const NSMHandlerException& e) {
     return false;
   }
+#else
+#warning "Wrong version of nsm2. try source daq/slc/extra/nsm2/export.sh"
+#endif
   return true;
 }
 

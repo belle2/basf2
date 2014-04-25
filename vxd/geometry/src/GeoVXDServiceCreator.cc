@@ -26,6 +26,7 @@ namespace Belle2 {
   using namespace geometry;
   namespace VXD {
 
+    /** Create factory instance so that the framework can instantiate the VXDServiceCreator */
     geometry::CreatorFactory<GeoVXDServiceCreator> GeoVXDServiceFactory("VXDServiceCreator");
 
 

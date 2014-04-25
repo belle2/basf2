@@ -25,7 +25,6 @@ namespace Belle2 {
   public:
     bool operator==(const Connection& st) const throw();
     bool operator!=(const Connection& st) const throw();
-    const Connection& operator=(const Connection& st) throw();
     const Connection& operator=(const std::string& msg) throw();
     const Connection& operator=(const char* msg) throw();
     const Connection& operator=(int i) throw();
@@ -40,11 +39,6 @@ namespace Belle2 {
   inline bool Connection::operator!=(const Connection& st) const throw()
   {
     return (getId() != st.getId());
-  }
-  inline const Connection& Connection::operator=(const Connection& st) throw()
-  {
-    *this = Enum::operator=(st);
-    return *this;
   }
 
 }

@@ -12,12 +12,12 @@ BinData::BinData(void* buf)
 {
   if (buf != NULL) {
     setBuffer(buf);
-    _header->nword_in_header = sizeof(BinHeader) / 4;
-    _header->nword = (sizeof(BinHeader) + sizeof(BinTrailer)) / 4;
-    _header->nevent_nboard = 0;
-    _header->exp_run = 0;
-    _header->event_number = 0;
-    _header->node_id = 0;
+    m_header->nword_in_header = sizeof(BinHeader) / 4;
+    m_header->nword = (sizeof(BinHeader) + sizeof(BinTrailer)) / 4;
+    m_header->nevent_nboard = 0;
+    m_header->exp_run = 0;
+    m_header->event_number = 0;
+    m_header->node_id = 0;
   }
 }
 
@@ -29,33 +29,33 @@ BinData::~BinData() throw()
 void BinData::setBuffer(void* buf)
 {
   if (buf != NULL) {
-    _buf = (int*)buf;
-    _header = (BinHeader*)buf;
-    _body = (unsigned int*)(((char*)buf) + sizeof(BinHeader));
+    m_buf = (int*)buf;
+    m_header = (BinHeader*)buf;
+    m_body = (unsigned int*)(((char*)buf) + sizeof(BinHeader));
   } else {
-    _buf = NULL;
+    m_buf = NULL;
   }
 }
 
 unsigned int BinData::recvEvent(TCPSocket& socket)
 throw(IOException)
 {
-  unsigned int count = socket.read(_header, sizeof(BinHeader));
-  if (_header->nword_in_header * 4 != sizeof(BinHeader)) {
+  unsigned int count = socket.read(m_header, sizeof(BinHeader));
+  if (m_header->nword_in_header * 4 != sizeof(BinHeader)) {
     throw (IOException("unexpected header size %d words",
-                       _header->nword_in_header));
+                       m_header->nword_in_header));
   }
   const int nbytes_remains = getByteSize() - sizeof(BinHeader);
-  count += socket.read(_body, nbytes_remains);
-  _trailer = (BinTrailer*)(((char*)_body) + nbytes_remains - sizeof(BinTrailer));
-  if (_trailer->magic != TRAILER_MAGIC) {
+  count += socket.read(m_body, nbytes_remains);
+  m_trailer = (BinTrailer*)(((char*)m_body) + nbytes_remains - sizeof(BinTrailer));
+  if (m_trailer->magic != TRAILER_MAGIC) {
     throw (IOException("unexpected header trailer magic %08x",
-                       _trailer->magic));
+                       m_trailer->magic));
   }
   return count;
 }
 
 unsigned int BinData::sendEvent(TCPSocket& socket) const throw(IOException)
 {
-  return socket.write(_buf, getByteSize());
+  return socket.write(m_buf, getByteSize());
 }

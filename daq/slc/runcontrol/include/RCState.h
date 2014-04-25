@@ -48,10 +48,6 @@ namespace Belle2 {
     const RCState& operator=(const std::string& msg) throw();
     const RCState& operator=(const char* msg) throw();
     const RCState& operator=(int id) throw();
-    inline const RCState& operator=(const RCState& e) throw() {
-      *this = Enum::operator=(e);
-      return *this;
-    }
 
   };
 

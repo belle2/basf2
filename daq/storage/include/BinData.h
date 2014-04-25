@@ -30,63 +30,63 @@ namespace Belle2 {
     ~BinData() throw();
 
   public:
-    int getExpNumber() const { return (_header->exp_run >> 22) & 0x3FF; };
-    int getRunNumber() const { return (_header->exp_run & 0x3FFFFF) >> 8; };
-    int getSubNumber() const { return (_header->exp_run & 0x3FFFFF) & 0xFF; };
-    int getEventNumber() const { return _header->event_number; };
-    int setEventNumber(int number) { return _header->event_number = number; };
+    int getExpNumber() const { return (m_header->exp_run >> 22) & 0x3FF; };
+    int getRunNumber() const { return (m_header->exp_run & 0x3FFFFF) >> 8; };
+    int getSubNumber() const { return (m_header->exp_run & 0x3FFFFF) & 0xFF; };
+    int getEventNumber() const { return m_header->event_number; };
+    int setEventNumber(int number) { return m_header->event_number = number; };
     int setExpNumber(int exp_no) {
-      _header->exp_run = ((exp_no & 0x3FF) << 22) | (_header->exp_run & 0x3FFFFF);
+      m_header->exp_run = ((exp_no & 0x3FF) << 22) | (m_header->exp_run & 0x3FFFFF);
       return getExpNumber();
     };
     int setRunNumber(int run_no, int sub_no) {
-      _header->exp_run = (_header->exp_run & 0xFFC00000) |
-                         (run_no & 0x3FFFFF) << 8 | (sub_no & 0xFF);
+      m_header->exp_run = (m_header->exp_run & 0xFFC00000) |
+                          (run_no & 0x3FFFFF) << 8 | (sub_no & 0xFF);
       return getRunNumber();
     };
-    int getNEvent() const { return (_header->nevent_nboard >> 16); };
-    int getNBoard() const { return (_header->nevent_nboard & 0xFFFF); };
+    int getNEvent() const { return (m_header->nevent_nboard >> 16); };
+    int getNBoard() const { return (m_header->nevent_nboard & 0xFFFF); };
     int setNEvent(int nev) {
-      _header->nevent_nboard = ((nev & 0xFFFF) << 16) | (_header->nevent_nboard & 0xFFFF);
+      m_header->nevent_nboard = ((nev & 0xFFFF) << 16) | (m_header->nevent_nboard & 0xFFFF);
       return getNEvent();
     };
     int setNBoard(int nb) {
-      _header->nevent_nboard = (_header->nevent_nboard & 0xFFFF0000) | (nb & 0xFFFF);
+      m_header->nevent_nboard = (m_header->nevent_nboard & 0xFFFF0000) | (nb & 0xFFFF);
       return getNBoard();
     };
-    int getWordSize() const { return _header->nword; };
-    int getByteSize() const { return _header->nword * 4; };
-    int getHeaderWordSize() const { return _header->nword_in_header; };
-    int getHeaderByteSize() const { return _header->nword_in_header * 4; };
+    int getWordSize() const { return m_header->nword; };
+    int getByteSize() const { return m_header->nword * 4; };
+    int getHeaderWordSize() const { return m_header->nword_in_header; };
+    int getHeaderByteSize() const { return m_header->nword_in_header * 4; };
     int getBodyByteSize() const {
       return getByteSize() - sizeof(BinHeader) - sizeof(BinTrailer);
     }
     int getBodyWordSize() const { return (getBodyByteSize() / 4); };
     unsigned int getTrailerMagic() {
-      _trailer = (BinTrailer*)(_body + getBodyWordSize());
-      return _trailer->magic;
+      m_trailer = (BinTrailer*)(m_body + getBodyWordSize());
+      return m_trailer->magic;
     }
 
   public:
     unsigned int recvEvent(TCPSocket& socket) throw(IOException);
     unsigned int sendEvent(TCPSocket& socket) const throw(IOException);
-    int* getBuffer() { return _buf; }
-    const int* getBuffer() const { return _buf; }
+    int* getBuffer() { return m_buf; }
+    const int* getBuffer() const { return m_buf; }
     void setBuffer(void* buf);
 
   public:
-    BinHeader* getHeader() { return _header; };
-    const BinHeader* getHeader() const { return _header; };
-    BinTrailer* getTrailer() { return _trailer; }
-    const BinTrailer* getTrailer() const { return _trailer; }
-    unsigned int* getBody() { return _body; };
-    const unsigned int* getBody() const { return _body; };
+    BinHeader* getHeader() { return m_header; };
+    const BinHeader* getHeader() const { return m_header; };
+    BinTrailer* getTrailer() { return m_trailer; }
+    const BinTrailer* getTrailer() const { return m_trailer; }
+    unsigned int* getBody() { return m_body; };
+    const unsigned int* getBody() const { return m_body; };
 
   protected:
-    BinTrailer* _trailer;
-    BinHeader* _header;
-    unsigned int* _body;
-    mutable int* _buf;
+    BinTrailer* m_trailer;
+    BinHeader* m_header;
+    unsigned int* m_body;
+    mutable int* m_buf;
 
   };
 

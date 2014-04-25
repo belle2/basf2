@@ -160,6 +160,55 @@ RunControlMasterCallback::synchronize(NSMNode& node) throw()
   return m_node_v.end();
 }
 
+void RunControlMasterCallback::prepareRun(NSMMessage& msg) throw()
+{
+  getDB()->connect();
+  // load from runnumberDB table
+  size_t expno = (msg.getNParams() > 0) ? msg.getParam(0) : 0;
+  size_t runno = (msg.getNParams() > 1) ? msg.getParam(1) : 0;
+  size_t subno = (msg.getNParams() > 2) ? msg.getParam(2) : 0;
+  RunNumberInfoTable table(getDB());
+  m_info = table.add(expno, runno, subno);
+  msg.setNParams(3);
+  msg.setParam(0, m_info.getExpNumber());
+  msg.setParam(1, m_info.getRunNumber());
+  msg.setParam(2, m_info.getSubNumber());
+  rc_status* status = (rc_status*)m_data.get();
+  status->expno = m_info.getExpNumber();
+  status->runno = m_info.getRunNumber();
+  status->subno = m_info.getSubNumber();
+  status->stime = m_info.getRecordTime();
+  m_setting.setRunNumber(m_info);
+  if (msg.getLength() > 0) {
+    StringList str_v = StringUtil::split(msg.getData(), ' ', 2);
+    m_setting.setOperators(str_v[0]);
+    m_setting.setComment(str_v[1]);
+  }
+  m_setting.setRunControl(getConfig().getObject());
+  LoggerObjectTable(getDB()).add(m_setting);
+  getDB()->close();
+}
+
+void RunControlMasterCallback::postRun(NSMMessage& msg) throw()
+{
+  getDB()->connect();
+  RunNumberInfoTable(getDB()).add(m_info);
+  LoggerObjectTable ltable(getDB());
+  for (size_t i = 0; i < m_data_v.size(); i++) {
+    ltable.add(m_data_v[i], true);
+  }
+  RunSummary summary(getNode());
+  summary.setState(getNode());
+  summary.setCause(RunSummary::MANUAL);
+  summary.setRunSetting(m_setting);
+  summary.setNodeState(m_node_v);
+  summary.setNodeData(m_data_v);
+  rc_status* status = (rc_status*)m_data.get();
+  status->stime = 0;
+  ltable.add(summary, true);
+  getDB()->close();
+}
+
 bool RunControlMasterCallback::send(NSMMessage msg) throw()
 {
   NSMCommunicator& com(*getCommunicator());
@@ -167,48 +216,9 @@ bool RunControlMasterCallback::send(NSMMessage msg) throw()
   if (msg.getNodeName() == com.getMaster().getName()) {
     msg.setNodeName(m_node_v[0]);
     if (cmd == RCCommand::START) {
-      getDB()->connect();
-      // load from runnumberDB table
-      size_t expno = (msg.getNParams() > 0) ? msg.getParam(0) : 0;
-      size_t runno = (msg.getNParams() > 1) ? msg.getParam(1) : 0;
-      size_t subno = (msg.getNParams() > 2) ? msg.getParam(2) : 0;
-      RunNumberInfoTable table(getDB());
-      m_info = table.add(expno, runno, subno);
-      msg.setNParams(3);
-      msg.setParam(0, m_info.getExpNumber());
-      msg.setParam(1, m_info.getRunNumber());
-      msg.setParam(2, m_info.getSubNumber());
-      rc_status* status = (rc_status*)m_data.get();
-      status->expno = m_info.getExpNumber();
-      status->runno = m_info.getRunNumber();
-      status->subno = m_info.getSubNumber();
-      status->stime = m_info.getRecordTime();
-      m_setting.setRunNumber(m_info);
-      if (msg.getLength() > 0) {
-        StringList str_v = StringUtil::split(msg.getData(), ' ', 2);
-        m_setting.setOperators(str_v[0]);
-        m_setting.setComment(str_v[1]);
-      }
-      m_setting.setRunControl(getConfig().getObject());
-      LoggerObjectTable(getDB()).add(m_setting);
-      getDB()->close();
-    } else if (cmd == RCCommand::STOP) {
-      getDB()->connect();
-      RunNumberInfoTable(getDB()).add(m_info);
-      LoggerObjectTable ltable(getDB());
-      for (size_t i = 0; i < m_data_v.size(); i++) {
-        ltable.add(m_data_v[i], true);
-      }
-      RunSummary summary(getNode());
-      summary.setState(getNode());
-      summary.setCause(RunSummary::MANUAL);
-      summary.setRunSetting(m_setting);
-      summary.setNodeState(m_node_v);
-      summary.setNodeData(m_data_v);
-      rc_status* status = (rc_status*)m_data.get();
-      status->stime = 0;
-      ltable.add(summary, true);
-      getDB()->close();
+      prepareRun(msg);
+    } else if (cmd == RCCommand::STOP || cmd == RCCommand::ABORT) {
+      postRun(msg);
     }
     m_msg_tmp = msg;
   }
@@ -230,7 +240,7 @@ bool RunControlMasterCallback::send(NSMMessage msg) throw()
       RCState tstate = cmd.nextTState();
       if (tstate != Enum::UNKNOWN) m_node_v[i].setState(tstate);
       com.sendRequest(msg);
-      if (i < nobj - 1 && getConfig().getObject().getObject("node", i).getBool("sequential")) {
+      if (i < nobj - 1 && getConfig().getObject().getObject("node", i + 1).getBool("sequential")) {
         break;
       }
     }

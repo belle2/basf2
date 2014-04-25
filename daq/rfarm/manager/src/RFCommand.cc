@@ -13,14 +13,14 @@ const RFCommand RFCommand::RF_STATUS(608, "RF_STATUS");
 
 const RFCommand& RFCommand::operator=(const std::string& label) throw()
 {
-  if (label == RF_CONFIGURE._label) *this = RF_CONFIGURE;
-  else if (label == RF_UNCONFIGURE._label) *this = RF_UNCONFIGURE;
-  else if (label == RF_START._label) *this = RF_START;
-  else if (label == RF_STOP._label) *this = RF_STOP;
-  else if (label == RF_RESTART._label) *this = RF_RESTART;
-  else if (label == RF_PAUSE._label) *this = RF_PAUSE;
-  else if (label == RF_RESUME._label) *this = RF_RESUME;
-  else if (label == RF_STATUS._label) *this = RF_STATUS;
+  if (label == RF_CONFIGURE.getLabel()) *this = RF_CONFIGURE;
+  else if (label == RF_UNCONFIGURE.getLabel()) *this = RF_UNCONFIGURE;
+  else if (label == RF_START.getLabel()) *this = RF_START;
+  else if (label == RF_STOP.getLabel()) *this = RF_STOP;
+  else if (label == RF_RESTART.getLabel()) *this = RF_RESTART;
+  else if (label == RF_PAUSE.getLabel()) *this = RF_PAUSE;
+  else if (label == RF_RESUME.getLabel()) *this = RF_RESUME;
+  else if (label == RF_STATUS.getLabel()) *this = RF_STATUS;
   else if (label == NSMCommand::OK.getLabel()) *this = NSMCommand::OK;
   else if (label == NSMCommand::ERROR.getLabel()) *this = NSMCommand::ERROR;
   else *this = Enum::UNKNOWN;

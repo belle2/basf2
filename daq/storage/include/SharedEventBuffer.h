@@ -24,11 +24,11 @@ namespace Belle2 {
 
   public:
     SharedEventBuffer() {
-      _buf = NULL;
-      _nword = 0;
+      m_buf = NULL;
+      m_nword = 0;
     }
     ~SharedEventBuffer() {
-      if (_buf != NULL) _memory.close();
+      if (m_buf != NULL) m_memory.close();
     }
 
   public:
@@ -46,22 +46,22 @@ namespace Belle2 {
     void clear();
 
   public:
-    const std::string getPath() const throw() { return _path; }
-    Header* getHeader() throw() { return _header; }
-    int* getBuffer() throw() { return _buf; }
+    const std::string getPath() const throw() { return m_path; }
+    Header* getHeader() throw() { return m_header; }
+    int* getBuffer() throw() { return m_buf; }
     bool isWritable(int nword) throw();
     bool isReadable(int nword) throw();
     unsigned int write(const int* buf, unsigned int nword, unsigned int serial = 0);
     unsigned int read(int* buf);
 
   private:
-    std::string _path;
-    SharedMemory _memory;
-    MMutex _mutex;
-    MCond _cond;
-    Header* _header;
-    int* _buf;
-    unsigned int _nword;
+    std::string m_path;
+    SharedMemory m_memory;
+    MMutex m_mutex;
+    MCond m_cond;
+    Header* m_header;
+    int* m_buf;
+    unsigned int m_nword;
 
   };
 

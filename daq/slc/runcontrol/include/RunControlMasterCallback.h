@@ -46,6 +46,8 @@ namespace Belle2 {
     virtual bool stateCheck() throw() { return true; }
 
   protected:
+    void prepareRun(NSMMessage& msg) throw();
+    void postRun(NSMMessage& msg) throw();
     NSMNodeIterator find(const std::string& nodename) throw();
     NSMNodeIterator synchronize(NSMNode& node) throw();
     virtual bool isManual() { return true; }

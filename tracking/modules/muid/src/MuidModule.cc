@@ -170,6 +170,10 @@ void MuidModule::initialize()
   G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/magField 0.001");
   G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/energyLoss 0.05");
 
+  GearDir strContent = GearDir("Detector/DetectorComponent[@name=\"COIL\"]/Content/");
+  double rMaxCoil = strContent.getLength("Cryostat/Rmin") * cm;
+  m_MinRadiusSq = (rMaxCoil * 0.25) * (rMaxCoil * 0.25); // roughly 40 cm
+
   GearDir bklmContent = GearDir("/Detector/DetectorComponent[@name=\"BKLM\"]/Content/");
   GearDir eklmContent = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/");
   m_BarrelHalfLength = bklmContent.getLength("HalfLength") * cm; // in G4 units (mm)
@@ -177,16 +181,17 @@ void MuidModule::initialize()
   m_OffsetZ = bklmContent.getLength("OffsetZ") * cm; // in G4 units (mm)
   double minZ = m_OffsetZ - (m_BarrelHalfLength + 2.0 * m_EndcapHalfLength);
   double maxZ = m_OffsetZ + (m_BarrelHalfLength + 2.0 * m_EndcapHalfLength);
-  double rMax = bklmContent.getLength("OuterRadius") * cm / cos(M_PI / bklmContent.getNumberNodes("Sectors/Forward/Sector"));
-  m_Target = new Simulation::ExtCylSurfaceTarget(rMax, minZ, maxZ);
+  m_BarrelMaxR = bklmContent.getLength("OuterRadius") * cm / cos(M_PI / bklmContent.getNumberNodes("Sectors/Forward/Sector"));
+  m_Target = new Simulation::ExtCylSurfaceTarget(m_BarrelMaxR, minZ, maxZ);
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_Target);
 
   m_BarrelHalfLength /= cm;  // in G4e units (cm)
   m_EndcapHalfLength /= cm;  // in G4e units (cm)
   m_OffsetZ /= cm;           // in G4e units (cm)
   m_BarrelMinR = bklmContent.getLength("Layers/InnerRadius");  // in G4e units (cm)
-  m_EndcapMinR = eklmContent.getLength("Endcap/InnerR");       // in G4e units (cm) 125.0 cm --> 130.5 cm
-  m_EndcapMaxR = eklmContent.getLength("Endcap/OuterR");       // in G4e units (cm) 290.0 cm --> 332.0 cm
+  m_BarrelMaxR /= cm;                                          // in G4e units (cm)
+  m_EndcapMinR = eklmContent.getLength("Endcap/InnerR");       // in G4e units (cm)
+  m_EndcapMaxR = eklmContent.getLength("Endcap/OuterR");       // in G4e units (cm)
   m_EndcapMiddleZ = m_BarrelHalfLength + m_EndcapHalfLength;   // in G4e units (cm)
 
   // Measurement uncertainties and acceptance windows
@@ -350,31 +355,34 @@ void MuidModule::event()
       G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode);
       string g4eName = "g4e_" + particle->GetParticleName();
       double mass = particle->GetPDGMass();
-      double minP = sqrt((mass + m_MinKE) * (mass + m_MinKE) - mass * mass);
+      double minPSq = (mass + m_MinKE) * (mass + m_MinKE) - mass * mass;
       G4ErrorFreeTrajState* state = new G4ErrorFreeTrajState(g4eName, position, momentum, covG4e);
       m_ExtMgr->InitTrackPropagation();
       while (true) {
+
         const G4int    errCode    = m_ExtMgr->PropagateOneStep(state, G4ErrorMode_PropForwards);
         G4Track*       track      = state->GetG4Track();
         const G4Step*  step       = track->GetStep();
-        const G4double length     = step->GetStepLength();
         // Ignore the zero-length step by PropagateOneStep() at each boundary
-        if (length > 0.0) {
+        if (step->GetStepLength() > 0.0) {
           m_TOF += step->GetDeltaTime();
           if (createHit(state, t, pdgCode, muidHits, trackToMuidHits)) {
             // Force geant4e to update its G4Track from the Kalman-updated state
             m_ExtMgr->GetPropagator()->SetStepN(0);
           }
         }
-        // Post-step momentum too low?
-        if (errCode || (track->GetMomentum().mag() < minP)) {
-          break;
-        }
-        // Reached the target boundary?
-        if (m_Target->GetDistanceFromPoint(track->GetPosition()) < 0.0) {
-          m_Escaped = true;  // this detects radial escapes from the endcap
-          break;
-        }
+
+        // Detect radial escapes from the EKLM.  (Longitudinal escapes from
+        // EKLM and BKLM are detected elsewhere.)
+        if (m_Target->GetDistanceFromPoint(track->GetPosition()) < 0.0) m_Escaped = true;
+
+        // Stop extrapolating as soon as the track escapes KLM or curls inward too much
+        // or the momentum is too low
+        if (m_Escaped) break;
+        if (track->GetPosition().perp2() < m_MinRadiusSq) break;
+        if (track->GetMomentum().mag2() < minPSq) break;
+        if (errCode) break;
+
       } // track-extrapolation "infinite" loop
 
       m_ExtMgr->EventTermination();
@@ -543,7 +551,7 @@ void MuidModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
   }
 
   catch (genfit::Exception& e) {
-    B2WARNING("Ext::getStartPoint() caught genfit exception for " << (firstLast ? "first" : "last") << " point on track; will not extrapolate. " << e.what())
+    B2WARNING("Muid::getStartPoint() caught genfit exception for " << (firstLast ? "first" : "last") << " point on track; will not extrapolate. " << e.what())
     // Do not extrapolate this track by forcing minPt cut to fail in caller
     momentum.setX(0.0);
     momentum.setY(0.0);
@@ -590,7 +598,7 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, int trackID, int pdgCode
   double z = fabs(point.position.Z() - m_OffsetZ);
 
   // Is the track in the barrel?
-  if ((r > m_BarrelMinR) && (z < m_BarrelHalfLength)) {
+  if ((r > m_BarrelMinR) && (r < m_BarrelMaxR) && (z < m_BarrelHalfLength)) {
     // Did the track cross the inner midplane of a detector module?
     if (findBarrelIntersection(oldPosition, point)) {
       point.covariance.ResizeTo(6, 6);
@@ -603,6 +611,12 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, int trackID, int pdgCode
         m_HitLayerPattern |= (0x00000001 << point.layer);
         if (m_LastBarrelHitLayer < point.layer) {
           m_LastBarrelHitLayer = point.layer;
+        }
+        // Is the updated point still in the barrel?
+        r = point.position.Perp();
+        z = fabs(point.position.Z() - m_OffsetZ);
+        if ((r <= m_BarrelMinR) || (r >= m_BarrelMaxR) || (z >= m_BarrelHalfLength)) {
+          point.chi2 = -1.0;
         }
       } else {
         // Record a no-hit track crossing if this step is strictly within a barrel sensitive volume
@@ -631,6 +645,11 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, int trackID, int pdgCode
         m_HitLayerPattern |= (0x00008000 << point.layer);
         if (m_LastEndcapHitLayer < point.layer) {
           m_LastEndcapHitLayer = point.layer;
+        }
+        r = point.position.Perp();
+        z = fabs(point.position.Z() - m_OffsetZ);
+        if ((r <= m_EndcapMinR) || (r >= m_EndcapMaxR) || (fabs(z - m_EndcapMiddleZ) >= m_EndcapHalfLength)) {
+          point.chi2 = -1.0;
         }
       } else {
         // Record a no-hit track crossing if this step is strictly within an endcap sensitive volume
@@ -743,15 +762,17 @@ bool MuidModule::findMatchingBarrelHit(Point& point)
 
   StoreArray<BKLMHit2d> bklmHits(m_BKLMHitsColName);
   BKLMHit2d* bestHit = NULL;
+  int matchingLayer = point.layer + 1;
+  TVector3 n(m_BarrelSectorPerp[point.sector]);
   for (int h = 0; h < bklmHits.getEntries(); ++h) {
     BKLMHit2d* hit = bklmHits[h];
-    if (hit->getLayer() - 1 != point.layer) continue;
+    if (hit->getLayer() != matchingLayer) continue;
     if (hit->getStatus() & STATUS_OUTOFTIME) continue;
-    TVector3 extDir(point.momentum.Unit());
-    TVector3 n(m_BarrelSectorPerp[hit->getSector() - 1]);
     TVector3 diff(hit->getGlobalPosition() - point.position);
-    if (fabs(extDir * n) > 1.0E-6) diff -= extDir * ((diff * n) / (extDir * n));
-    if (diff.Mag() < diffBest.Mag()) {
+    double dn = diff * n; // in cm
+    if (fabs(dn) > 2.0) continue;
+    diff -= n * dn;
+    if (diff.Mag2() < diffBest.Mag2()) {
       diffBest = diff;
       bestHit = hit;
     }
@@ -780,23 +801,29 @@ bool MuidModule::findMatchingEndcapHit(Point& point)
 
   StoreArray<EKLMHit2d> eklmHits(m_EKLMHitsColName);
   EKLMHit2d* bestHit = NULL;
+  int matchingLayer = point.layer + 1;
+  TVector3 n(0.0, 0.0, (point.isForward ? 1.0 : -1.0));
   for (int h = 0; h < eklmHits.getEntries(); ++h) {
     EKLMHit2d* hit = eklmHits[h];
-    if (hit->getLayer() - 1 != point.layer) continue;
+    if (hit->getLayer() != matchingLayer) continue;
+    if (point.isForward) {
+      if (hit->getEndcap() != 2) continue;
+    } else {
+      if (hit->getEndcap() != 1) continue;
+    }
     // DIVOT no getStatus() if (hit->getStatus() & STATUS_OUTOFTIME) continue;
-    TVector3 hitPos(hit->getGlobalPosition());
-    TVector3 extDir(point.momentum.Unit());
-    TVector3 n(0.0, 0.0, (point.isForward ? 1.0 : -1.0));
     TVector3 diff(hit->getPosition() - point.position);
-    if (fabs(extDir * n) > 1.0E-6) diff -= extDir * ((diff * n) / (extDir * n));
-    if (diff.Mag() < diffBest.Mag()) {
+    double dn = diff * n; // in cm
+    if (fabs(dn) > 2.0) continue;
+    diff -= n * dn;
+    if (diff.Mag2() < diffBest.Mag2()) {
       diffBest = diff;
       bestHit = hit;
     }
   }
 
   if (bestHit != NULL) {
-    point.isForward = (bestHit->getEndcap() == 1);
+    point.isForward = (bestHit->getEndcap() == 2);
     point.sector = bestHit->getSector() - 1;
     point.time = bestHit->getTime();
     double localVariance[2] = {m_EndcapScintVariance, m_EndcapScintVariance};
@@ -864,10 +891,20 @@ void MuidModule::adjustIntersection(Point& point, const double localVariance[2],
   double extDirCA = extDir * nC / extDirA;
 
 // Move the extrapolated coordinate (at most a tiny amount!) to the plane of the hit.
+// If the moved point is outside the KLM, don't do Kalman filtering.
 
-  TVector3 move = extDir * ((diffPos * nA) / (extDir * nA));
+  TVector3 move = extDir * ((diffPos * nA) / extDirA);
   extPos += move;
   diffPos -= move;
+  if (point.inBarrel) {
+    if (fabs(extPos.Z() - m_OffsetZ) >= m_BarrelHalfLength) return;
+    double r = extPos.Perp();
+    if ((r <= m_BarrelMinR) || (r >= m_BarrelMaxR)) return;
+  } else {
+    if (fabs(fabs(extPos.Z() - m_OffsetZ) - m_EndcapMiddleZ) >= m_EndcapHalfLength) return;
+    double r = extPos.Perp();
+    if ((r <= m_EndcapMinR) || (r >= m_EndcapMaxR)) return;
+  }
   point.positionAtHitPlane.SetX(extPos.X());
   point.positionAtHitPlane.SetY(extPos.Y());
   point.positionAtHitPlane.SetZ(extPos.Z());
@@ -909,14 +946,18 @@ void MuidModule::adjustIntersection(Point& point, const double localVariance[2],
   correction.Invert(&determinant);
   if (determinant == 0.0) return;
 
-  // Matrix inversion succeeeded
+// Matrix inversion succeeeded and is reasonable.
+// Evaluate chi-squared increment assuming that the Kalman filter
+// won't be able to adjust the extrapolated track's position (fall-back).
+
+  point.chi2 = correction.Similarity(residual);
+
+// Do the Kalman filtering
 
   TMatrixD gain(6, 2);
   gain.MultT(extCov, jacobian);
   gain *= correction;
   TMatrixDSym HRH(correction.SimilarityT(jacobian));
-
-// Do the Kalman filtering
 
   extCov -= HRH.Similarity(extCov);
   extPar += gain * residual;
@@ -927,7 +968,7 @@ void MuidModule::adjustIntersection(Point& point, const double localVariance[2],
   extMom.SetY(extPar[4]);
   extMom.SetZ(extPar[5]);
 
-// Calculate chi-squared increment
+// Calculate the chi-squared increment using the Kalman-filtered state
 
   correction = extCov;
   correction = hitCov - correction.Similarity(jacobian);
@@ -939,14 +980,11 @@ void MuidModule::adjustIntersection(Point& point, const double localVariance[2],
   residual[1] = diffPos.X() * jacobian[1][0] + diffPos.Y() * jacobian[1][1] + diffPos.Z() * jacobian[1][2];
   point.chi2 = correction.Similarity(residual);
 
-// Project the corrected extrapolation to the plane that is tangent
-// to the hit-point's plane but at the original extrapolation's position
-// to leave it in the same geometrical volume as it was originally.  Also,
-// the momentum magnitude is left unchanged (otherwise, it would vary by ~1%).
+// Project the corrected extrapolation to the plane of the original
+// extrapolation position.  Also, leave the momentum magnitude unchanged.
 
-  extDir = extMom.Unit();
-  extPos += extDir * (((point.position - extPos) * nA) / (extDir * nA));
-  extMom = point.momentum.Mag() * extDir;
+  extPos += extDir * (((point.position - extPos) * nA) / extDirA);
+  extMom = point.momentum.Mag() * extMom.Unit();
 
 // Update the position, momentum and covariance of the point
 
@@ -1049,8 +1087,8 @@ void MuidModule::finishTrack(Muid* muid, int charge)
   muid->setLogL_mu(logL_mu);
   muid->setLogL_pi(logL_pi);
   muid->setLogL_K(logL_K);
-  muid->setLogL_K(logL_p);
-  muid->setLogL_K(logL_e);
+  muid->setLogL_p(logL_p);
+  muid->setLogL_e(logL_e);
 
 }
 

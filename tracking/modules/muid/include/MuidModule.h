@@ -195,6 +195,9 @@ namespace Belle2 {
     //! Time of flight (ns) along the track from the interaction point
     double m_TOF;
 
+    //! Minimum squared radius (cm) outside of which extrapolation will continue
+    double m_MinRadiusSq;
+
     //! virtual "target" cylinder (boundary beyond which extrapolation ends)
     Simulation::ExtCylSurfaceTarget* m_Target;
 
@@ -207,8 +210,11 @@ namespace Belle2 {
     //! minimum radius (cm) of the endcaps
     double m_EndcapMinR;
 
-    //! mininum radius (cm) of the barrel
+    //! minimum radius (cm) of the barrel
     double m_BarrelMinR;
+
+    //! maximum radius (cm) of the barrel
+    double m_BarrelMaxR;
 
     //! half-length (cm) of either endcap
     double m_EndcapHalfLength;

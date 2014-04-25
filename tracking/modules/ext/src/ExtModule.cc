@@ -147,10 +147,11 @@ void ExtModule::initialize()
 
   GearDir strContent = GearDir("Detector/DetectorComponent[@name=\"COIL\"]/Content/");
   double offsetZ = strContent.getLength("OffsetZ") * cm;
-  double rMax = strContent.getLength("Cryostat/Rmin") * cm;
+  double rMaxCoil = strContent.getLength("Cryostat/Rmin") * cm;
   double halfLength = strContent.getLength("Cryostat/HalfLength") * cm;
-  m_Target = new Simulation::ExtCylSurfaceTarget(rMax, offsetZ - halfLength, offsetZ + halfLength);
+  m_Target = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_Target);
+  m_MinRadiusSq = (rMaxCoil * 0.25) * (rMaxCoil * 0.25); // roughly 40 cm
 
   // Hypotheses for extrapolation
   if (m_PDGCode.empty()) {
@@ -262,7 +263,6 @@ void ExtModule::event()
         const G4int    errCode    = m_ExtMgr->PropagateOneStep(state, G4ErrorMode_PropForwards);
         G4Track*       track      = state->GetG4Track();
         const G4Step*  step       = track->GetStep();
-        const G4double length     = step->GetStepLength();
         const G4int    preStatus  = step->GetPreStepPoint()->GetStepStatus();
         const G4int    postStatus = step->GetPostStepPoint()->GetStepStatus();
         // First step on this track?
@@ -270,7 +270,7 @@ void ExtModule::event()
           createHit(state, EXT_FIRST, t, pdgCode, extHits, TrackToExtHits);
         }
         // Ignore the zero-length step by PropagateOneStep() at each boundary
-        if (length > 0.0) {
+        if (step->GetStepLength() > 0.0) {
           if (preStatus == fGeomBoundary) {      // first step in this volume?
             createHit(state, EXT_ENTER, t, pdgCode, extHits, TrackToExtHits);
           }
@@ -289,6 +289,8 @@ void ExtModule::event()
           createHit(state, EXT_ESCAPE, t, pdgCode, extHits, TrackToExtHits);
           break;
         }
+        // Stop extrapolating as soon as the track curls inward too much
+        if (track->GetPosition().perp2() < m_MinRadiusSq) break;
       } // track-extrapolation "infinite" loop
 
       m_ExtMgr->EventTermination();

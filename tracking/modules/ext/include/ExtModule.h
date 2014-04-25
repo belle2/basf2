@@ -140,6 +140,9 @@ namespace Belle2 {
     //! Time of flight (ns) along the track from the interaction point
     double m_TOF;
 
+    //! Minimum squared radius (cm) outside of which extrapolation will continue
+    double m_MinRadiusSq;
+
     //! virtual "target" cylinder (boundary beyond which extrapolation ends)
     Simulation::ExtCylSurfaceTarget* m_Target;
 

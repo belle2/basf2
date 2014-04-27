@@ -126,6 +126,7 @@ namespace Belle2 {
       double m_temperature;
       /** The bulk doping of the Silicon sensor */
       double m_hallFactor;
+      /** Doping concentration of the silicon bulk */
       double m_bulkDoping;
       /** The voltage at the backside of the sensor */
       double m_backVoltage;

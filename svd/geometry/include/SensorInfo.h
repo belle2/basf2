@@ -162,10 +162,6 @@ namespace Belle2 {
       double m_interstripCapacitance;
       /** The coupling capacitance for the sensor. */
       double m_couplingCapacitance;
-      /** The electron Lorentz factor. */
-      double m_electronLorentzFactor;
-      /** The hole Lorentz factor. */
-      double m_holeLorentzFactor;
     }; // Class SVD::SensorInfo
 
   } // SVD namespace

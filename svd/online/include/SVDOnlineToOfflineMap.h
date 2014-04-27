@@ -34,6 +34,7 @@ namespace Belle2 {
     public:
       /** Typedefs of the compound id type and chip number types */
       typedef unsigned short baseType;
+      /** Type of chip numbers */
       typedef unsigned char chipNumberType;
       /** Constructor taking a compound id */
       ChipID(baseType id = 0) { m_id.id = id; }
@@ -52,18 +53,24 @@ namespace Belle2 {
       bool operator==(const ChipID& other) const { return (m_id.id == other.m_id.id); }
       /** ordering */
       bool operator<(const ChipID& other) const { return (m_id.id < other.m_id.id); }
-      /** Getters */
+      /** Get chip ID */
       baseType getID() const { return m_id.id; }
+      /** Get FADC number */
       chipNumberType getFADC() const {return m_id.parts.FADC; }
+      /** Get APV25 number */
       chipNumberType getAPV25() const {return m_id.parts.APV25; }
-      /** Setters */
-      void setID(baseType id) { m_id.id = id; }
+      /** Set chip ID */
+      void setID(baseType id) {  m_id.id = id; }
+      /** Set FADC number */
       void setFADC(chipNumberType FADC) { m_id.parts.FADC = FADC; }
+      /** Set APV25 number */
       void setAPV25(chipNumberType APV25) { m_id.parts.APV25 = APV25; }
     private:
+      /** Union type representing the ChipID compound */
       union {
         /** unique id */
         baseType id : 8 * sizeof(baseType);
+        /** Alternative struct representation */
         struct {
           chipNumberType FADC : 8 * sizeof(chipNumberType);
           chipNumberType APV25: 8 * sizeof(chipNumberType);

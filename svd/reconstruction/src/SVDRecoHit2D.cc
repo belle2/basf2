@@ -60,8 +60,8 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, const genfit::TrackCandHit*, f
   setDetectorPlane();
 }
 
-SVDRecoHit2D::SVDRecoHit2D(const VxdID vxdid, const double u, const double v, double sigmaU, double sigmaV):
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(vxdid.getID()), m_trueHit(NULL),
+SVDRecoHit2D::SVDRecoHit2D(VxdID::baseType vxdid, const double u, const double v, double sigmaU, double sigmaV):
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(vxdid), m_trueHit(NULL),
   m_energyDep(0)//, m_energyDepError(0)
 {
   //If no error is given, estimate the error by dividing the pixel size by sqrt(12)

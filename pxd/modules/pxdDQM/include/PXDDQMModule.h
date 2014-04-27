@@ -49,12 +49,15 @@ namespace Belle2 {
     virtual void defineHisto();
 
   private:
-    /** Utility functions to convert indices to plane numbers and v.v.,
+    /** Utility function to convert index to plane number
      * and to protect against range errors.
      */
     inline int indexToPlane(int index) const {
       return c_firstPXDPlane + index;
     }
+    /** Utility function to convert plane number to index
+     * and to protect against range errors.
+     */
     inline int planeToIndex(int iPlane) const {
       return iPlane - c_firstPXDPlane;
     }
@@ -85,12 +88,12 @@ namespace Belle2 {
     TH1F* m_sizeV[c_nPXDPlanes];          /**< v size by plane */
     TH1F* m_size[c_nPXDPlanes];           /**< size by plane */
     TH1F* m_startRow[c_nPXDPlanes];       /**< start row by plane */
-    TH1F* m_chargeByStartRow[c_nPXDPlanes]; /** average seed charge by distance from start row */
-    TH1F* m_chargeByStartRowCount[c_nPXDPlanes]; /** seed charge count by distance from start row */
-    TH1F* m_averageSeedByU[c_nPXDPlanes]; /** average seed charge by u */
-    TH1F* m_seedCountsByU[c_nPXDPlanes];  /** seed charge count by u */
-    TH1F* m_averageSeedByV[c_nPXDPlanes]; /** average seed charge by v */
-    TH1F* m_seedCountsByV[c_nPXDPlanes];  /** seed charge count by v */
+    TH1F* m_chargeByStartRow[c_nPXDPlanes]; /**< average seed charge by distance from start row */
+    TH1F* m_chargeByStartRowCount[c_nPXDPlanes]; /**< seed charge count by distance from start row */
+    TH1F* m_averageSeedByU[c_nPXDPlanes]; /**< average seed charge by u */
+    TH1F* m_seedCountsByU[c_nPXDPlanes];  /**< seed charge count by u */
+    TH1F* m_averageSeedByV[c_nPXDPlanes]; /**< average seed charge by v */
+    TH1F* m_seedCountsByV[c_nPXDPlanes];  /**< seed charge count by v */
   };
 
   inline const PXD::SensorInfo& PXDDQMModule::getInfo(int index) const

@@ -70,7 +70,7 @@ namespace Belle2 {
      * @param sigmaU Error of the Hit along u
      * @param sigmaV Error of the Hit along v
      */
-    SVDRecoHit2D(const VxdID vxdid, const double u, const double v, double sigmaU = -1, double sigmaV = -1);
+    SVDRecoHit2D(VxdID::baseType vxdid, const double u, const double v, double sigmaU = -1, double sigmaV = -1);
 
     /** Construct SVDRecoHit from a u- and v- SVDCluster.
      * @param uHit the u-type SVDCluster

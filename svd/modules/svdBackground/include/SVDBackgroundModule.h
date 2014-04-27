@@ -34,33 +34,41 @@ namespace Belle2 {
 
     public:
 
-      /** Struct to hold data of a SVD layer */
+      /** Struct to hold data of an SVD layer */
       struct LayerData {
-        /* and some numbers */
+        /** Dose (Gy) */
         double m_dose;
+        /** Exposition */
         double m_expo;
+        /** Fired pixels in U */
         double m_firedU;
+        /** Fired pixels in V */
         double m_firedV;
       };
       /** Struct to hold data of a background component */
-      /** FIXME: Toto by sme nevedeli nadrbat do TTree? */
       struct BackgroundData {
+        /** Name of the component */
         std::string m_componentName;
+        /** Time equivalent of background sample */
         double m_componentTime;
+        /** Data by layer */
         std::map<VxdID, LayerData> m_layerData;
-        /* and some numbers */
       };
 
       /** Constructor */
       SVDBackgroundModule();
-      /* Destructor */
+      /** Destructor */
       virtual ~SVDBackgroundModule();
 
-      /** Module functions */
+      /* Initialize module */
       virtual void initialize();
+      /* Start-of-run initializations */
       virtual void beginRun();
+      /* Event processing */
       virtual void event();
+      /* End-of-run tasks */
       virtual void endRun();
+      /* Final summary and cleanup */
       virtual void terminate();
 
       /**
@@ -71,15 +79,17 @@ namespace Belle2 {
 
     private:
 
-      const double c_densitySi = 2.3290 * Unit::g_cm3;
-      const double c_smy = 1.0e7 * Unit::s;
+      const double c_densitySi = 2.3290 * Unit::g_cm3;  /**< Density of crystalline Silicon */
+      const double c_smy = 1.0e7 * Unit::s;             /**< Seconds in snowmass year */
 
       /** This is a shortcut to getting SVD::SensorInfo from the GeoCache.
        * @param sensorID VxdID of the sensor
        * @return SensorInfo object for the desired sensor.
        */
       inline const SVD::SensorInfo& getInfo(VxdID sensorID) const;
+      /** Return mass of the sensor with the given sensor ID */
       inline double getSensorMass(VxdID sensorID) const;
+      /** Return area of the sensor with the given sensor ID */
       inline double getSensorArea(VxdID sensorID) const;
 
       std::string m_storeMCParticlesName; /**< MCParticles StoreArray name */
@@ -98,7 +108,7 @@ namespace Belle2 {
       bool m_componentChanged; /**< True if the component name changed in current event */
 
       std::map<std::string, BackgroundData> m_data; /**< containter for collected data and histograms. */
-      TTree* m_tree;
+      // TTree* m_tree; /**< TTree containing aggregated background data */
 
     };
 

@@ -40,14 +40,14 @@ namespace Belle2 {
        */
       Sample():
         m_arrayIndex(0), m_cellID(0), m_iTime(0), m_charge(0) {}
-      /** Comparison operator */
+      /** Less-than operator */
       bool operator<(const Sample& b)  const {
         return (m_cellID < b.getCellID()) || (m_cellID == b.getCellID() && m_iTime < b.getSampleIndex());
       }
+      /** Greater-than operator */
       bool operator>(const Sample& b)  const {
         return (m_cellID > b.getCellID()) || (m_cellID == b.getCellID() && m_iTime > b.getSampleIndex());
       }
-      /** Greater than operator */
       /** Equality operator */
       bool operator==(const Sample& b) const {
         return m_cellID == b.getCellID() && m_iTime == b.getSampleIndex();

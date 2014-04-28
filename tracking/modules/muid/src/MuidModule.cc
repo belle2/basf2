@@ -612,7 +612,7 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, int trackID, int pdgCode
         if (m_LastBarrelHitLayer < point.layer) {
           m_LastBarrelHitLayer = point.layer;
         }
-        // Is the updated point still in the barrel?
+        // If the updated point is outside the barrel, discard it and the Kalman-fitter adjustment
         r = point.position.Perp();
         z = fabs(point.position.Z() - m_OffsetZ);
         if ((r <= m_BarrelMinR) || (r >= m_BarrelMaxR) || (z >= m_BarrelHalfLength)) {
@@ -646,6 +646,7 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, int trackID, int pdgCode
         if (m_LastEndcapHitLayer < point.layer) {
           m_LastEndcapHitLayer = point.layer;
         }
+        // If the updated point is outside the endcap, discard it and the Kalman-fitter adjustment
         r = point.position.Perp();
         z = fabs(point.position.Z() - m_OffsetZ);
         if ((r <= m_EndcapMinR) || (r >= m_EndcapMaxR) || (fabs(z - m_EndcapMiddleZ) >= m_EndcapHalfLength)) {
@@ -758,10 +759,11 @@ bool MuidModule::findMatchingBarrelHit(Point& point)
 
 {
 
-  TVector3 diffBest(1.0E12, 1.0E12, 1.0E12);
+  TVector3 extPos0(point.position);
 
   StoreArray<BKLMHit2d> bklmHits(m_BKLMHitsColName);
-  BKLMHit2d* bestHit = NULL;
+  double diffBestMagSq = 1.0E60;
+  int bestHit = -1;
   int matchingLayer = point.layer + 1;
   TVector3 n(m_BarrelSectorPerp[point.sector]);
   for (int h = 0; h < bklmHits.getEntries(); ++h) {
@@ -770,25 +772,51 @@ bool MuidModule::findMatchingBarrelHit(Point& point)
     if (hit->getStatus() & STATUS_OUTOFTIME) continue;
     TVector3 diff(hit->getGlobalPosition() - point.position);
     double dn = diff * n; // in cm
-    if (fabs(dn) > 2.0) continue;
-    diff -= n * dn;
-    if (diff.Mag2() < diffBest.Mag2()) {
-      diffBest = diff;
-      bestHit = hit;
+    if (fabs(dn) < 2.0) {
+      // Hit and extrapolated point are in the same sector
+      diff -= n * dn;
+      if (diff.Mag2() < diffBestMagSq) {
+        diffBestMagSq = diff.Mag2();
+        bestHit = h;
+        extPos0 = point.position;
+      }
+    } else {
+      // Accept a nearby hit in adjacent sector
+      if (fabs(dn) > 50.0) continue;
+      int dSector = abs(point.sector - hit->getSector() + 1);
+      if ((dSector != 1) && (dSector != 7)) continue;
+      // Use the normal vector of the adjacent (hit's) sector
+      TVector3 nHit(m_BarrelSectorPerp[hit->getSector() - 1]);
+      double dn2 = point.position * nHit - m_BarrelModuleMiddleRadius[point.layer];
+      dn = diff * nHit + dn2;
+      if (fabs(dn) > 1.0) continue;
+      // Project extrapolated track to the hit's plane in the adjacent sector
+      TVector3 extDir(point.momentum.Unit());
+      double extDirA = extDir * nHit;
+      if (fabs(extDirA) < 1.0E-6) continue;
+      TVector3 projection = extDir * (dn2 / extDirA);
+      if (projection.Mag() > 15.0) continue;
+      diff += projection - nHit * dn;
+      if (diff.Mag2() < diffBestMagSq) {
+        diffBestMagSq = diff.Mag2();
+        bestHit = h;
+        extPos0 = point.position - projection;
+      }
     }
   }
 
-  if (bestHit != NULL) {
-    point.isForward = bestHit->isForward();
-    point.sector = bestHit->getSector() - 1;
-    point.time = bestHit->getTime();
+  if (bestHit >= 0) {
+    BKLMHit2d* hit = bklmHits[bestHit];
+    point.isForward = hit->isForward();
+    point.sector = hit->getSector() - 1;
+    point.time = hit->getTime();
     double localVariance[2] = {m_BarrelScintVariance, m_BarrelScintVariance};
-    if (bestHit->isInRPC()) {
+    if (hit->isInRPC()) {
       localVariance[0] = m_BarrelPhiStripVariance[point.layer];
       localVariance[1] = m_BarrelZStripVariance[point.layer];
     }
-    adjustIntersection(point, localVariance, bestHit->getGlobalPosition());
-    if (point.chi2 >= 0.0) bestHit->setStatus(STATUS_ONTRACK);
+    adjustIntersection(point, localVariance, hit->getGlobalPosition(), extPos0);
+    if (point.chi2 >= 0.0) hit->setStatus(STATUS_ONTRACK);
   }
   return point.chi2 >= 0.0;
 
@@ -797,10 +825,9 @@ bool MuidModule::findMatchingBarrelHit(Point& point)
 bool MuidModule::findMatchingEndcapHit(Point& point)
 {
 
-  TVector3 diffBest(1.0E12, 1.0E12, 1.0E12);
-
   StoreArray<EKLMHit2d> eklmHits(m_EKLMHitsColName);
-  EKLMHit2d* bestHit = NULL;
+  double diffBestMagSq = 1.0E60;
+  int bestHit = -1;
   int matchingLayer = point.layer + 1;
   TVector3 n(0.0, 0.0, (point.isForward ? 1.0 : -1.0));
   for (int h = 0; h < eklmHits.getEntries(); ++h) {
@@ -816,25 +843,26 @@ bool MuidModule::findMatchingEndcapHit(Point& point)
     double dn = diff * n; // in cm
     if (fabs(dn) > 2.0) continue;
     diff -= n * dn;
-    if (diff.Mag2() < diffBest.Mag2()) {
-      diffBest = diff;
-      bestHit = hit;
+    if (diff.Mag2() < diffBestMagSq) {
+      diffBestMagSq = diff.Mag2();
+      bestHit = h;
     }
   }
 
-  if (bestHit != NULL) {
-    point.isForward = (bestHit->getEndcap() == 2);
-    point.sector = bestHit->getSector() - 1;
-    point.time = bestHit->getTime();
+  if (bestHit >= 0) {
+    EKLMHit2d* hit = eklmHits[bestHit];
+    point.isForward = (hit->getEndcap() == 2);
+    point.sector = hit->getSector() - 1;
+    point.time = hit->getTime();
     double localVariance[2] = {m_EndcapScintVariance, m_EndcapScintVariance};
-    adjustIntersection(point, localVariance, bestHit->getPosition());
-    // if (point.chi2 >= 0.0) bestHit->setStatus(STATUS_ONTRACK); // DIVOT: no setStatus()
+    adjustIntersection(point, localVariance, hit->getPosition(), point.position);
+    // if (point.chi2 >= 0.0) hit->setStatus(STATUS_ONTRACK); // DIVOT: no setStatus()
   }
   return point.chi2 >= 0.0;
 
 }
 
-void MuidModule::adjustIntersection(Point& point, const double localVariance[2], const TVector3& hitPos)
+void MuidModule::adjustIntersection(Point& point, const double localVariance[2], const TVector3& hitPos, const TVector3& extPos0)
 {
 
 // Use the gain matrix formalism to get the corrected track parameters.
@@ -853,7 +881,10 @@ void MuidModule::adjustIntersection(Point& point, const double localVariance[2],
 // r_k = residual[] 2 elements after filtering
 // Use the relation K*H*C = (C*H^T*R^-1)*H*C = C*(H^T*R^-1*H)*C^T
 
-  TVector3 extPos(point.position);
+// In most cases, extPos0 is the same as point.position.  They differ only when
+// the nearest BKLM hit is in the sector adjacent to that of point.position.
+
+  TVector3 extPos(extPos0);
   TVector3 extMom(point.momentum);
   TVector3 extDir(extMom.Unit());
   TVector3 diffPos(hitPos - extPos);
@@ -896,15 +927,6 @@ void MuidModule::adjustIntersection(Point& point, const double localVariance[2],
   TVector3 move = extDir * ((diffPos * nA) / extDirA);
   extPos += move;
   diffPos -= move;
-  if (point.inBarrel) {
-    if (fabs(extPos.Z() - m_OffsetZ) >= m_BarrelHalfLength) return;
-    double r = extPos.Perp();
-    if ((r <= m_BarrelMinR) || (r >= m_BarrelMaxR)) return;
-  } else {
-    if (fabs(fabs(extPos.Z() - m_OffsetZ) - m_EndcapMiddleZ) >= m_EndcapHalfLength) return;
-    double r = extPos.Perp();
-    if ((r <= m_EndcapMinR) || (r >= m_EndcapMaxR)) return;
-  }
   point.positionAtHitPlane.SetX(extPos.X());
   point.positionAtHitPlane.SetY(extPos.Y());
   point.positionAtHitPlane.SetZ(extPos.Z());
@@ -980,16 +1002,15 @@ void MuidModule::adjustIntersection(Point& point, const double localVariance[2],
   residual[1] = diffPos.X() * jacobian[1][0] + diffPos.Y() * jacobian[1][1] + diffPos.Z() * jacobian[1][2];
   point.chi2 = correction.Similarity(residual);
 
-// Project the corrected extrapolation to the plane of the original
-// extrapolation position.  Also, leave the momentum magnitude unchanged.
-
-  extPos += extDir * (((point.position - extPos) * nA) / extDirA);
-  extMom = point.momentum.Mag() * extMom.Unit();
-
 // Update the position, momentum and covariance of the point
+// Project the corrected extrapolation to the plane of the original
+// extrapolation's point.position. (Note: point.position is the same as
+// extPos0 in all cases except when nearest BKLM hit is in adjacent
+// sector, for which extPos0 is a projected position to the hit's plane.)
+// Also, leave the momentum magnitude unchanged.
 
-  point.position = extPos;
-  point.momentum = extMom;
+  point.position = extPos + extDir * (((point.position - extPos) * nA) / extDirA);
+  point.momentum = point.momentum.Mag() * extMom.Unit();
   point.covariance = extCov;
 
 }

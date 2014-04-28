@@ -42,33 +42,35 @@ namespace {
     }
   }
 
-  void printPart(const MCParticle* p, int depth = 0)
-  {
-    stringstream s("");
-    for (int i = 0; i < depth; i++) {
-      s << "    ";
+  /*
+    void printPart(const MCParticle* p, int depth = 0)
+    {
+      stringstream s("");
+      for (int i = 0; i < depth; i++) {
+        s << "    ";
+      }
+      s  << p->getPDG();
+      B2WARNING(s.str() << " id: " << p->getIndex() << " status: " << p->getStatus());
+      for (const auto * daughter : p->getDaughters()) {
+        printPart(daughter, depth + 1);
+      }
     }
-    s  << p->getPDG();
-    B2WARNING(s.str() << " id: " << p->getIndex() << " status: " << p->getStatus());
-    for (const auto * daughter : p->getDaughters()) {
-      printPart(daughter, depth + 1);
-    }
-  }
 
-  void printPart(const Particle* p, int depth = 0)
-  {
-    stringstream s("");
-    for (int i = 0; i < depth; i++) {
-      s << "    ";
+    void printPart(const Particle* p, int depth = 0)
+    {
+      stringstream s("");
+      for (int i = 0; i < depth; i++) {
+        s << "    ";
+      }
+      s  << p->getPDGCode();
+      const MCParticle* mcp = p->getRelated<MCParticle>();
+      int mcpdg = mcp ? mcp->getPDG() : 0;
+      B2WARNING(s.str() << " " << " -> mcpart " << mcpdg << " id " << (mcp ? mcp->getIndex() : 0));
+      for (const auto * daughter : p->getDaughters()) {
+        printPart(daughter, depth + 1);
+      }
     }
-    s  << p->getPDGCode();
-    const MCParticle* mcp = p->getRelated<MCParticle>();
-    int mcpdg = mcp ? mcp->getPDG() : 0;
-    B2WARNING(s.str() << " " << " -> mcpart " << mcpdg << " id " << (mcp ? mcp->getIndex() : 0));
-    for (const auto * daughter : p->getDaughters()) {
-      printPart(daughter, depth + 1);
-    }
-  }
+    */
 
   /** Helper for constructing MCParticle trees and reconstructing them. */
   struct Decay {

@@ -283,9 +283,6 @@ void PrintDataModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
 
   raw_cdc.SetBuffer(buf, nwords, malloc_flag, num_events, num_nodes);
 
-  RawHeader rawhdr;
-  rawhdr.SetBuffer(raw_copper->GetRawHdrBufPtr(i));
-
 #ifdef DEBUG
   printf(": Event # %d \n", raw_copper->GetEveNo(i));
 #endif

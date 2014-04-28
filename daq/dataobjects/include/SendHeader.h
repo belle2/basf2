@@ -10,10 +10,16 @@
 #define SENDHEADER_H
 
 #include <string.h>
-
 #include <framework/datastore/DataStore.h>
-
 #include <TObject.h>
+#include <daq/rawdata/modules/DAQConsts.h>
+
+#ifdef REDUCED_RAWCOPPER
+#include "rawdata/dataobjects/RawHeader_v1.h"
+#else
+#include "rawdata/dataobjects/RawHeader.h"
+#endif
+
 
 
 namespace Belle2 {
@@ -62,6 +68,10 @@ namespace Belle2 {
     int GetSubRunNum(); //!
     int GetExpNum(); //!
     int GetRunNumSubRunNum(); //!
+
+#ifdef REDUCED_RAWCOPPER
+    RawHeader_v1 tmp_header; //!
+#endif
 
     /* Data Format : Node info */
     enum {

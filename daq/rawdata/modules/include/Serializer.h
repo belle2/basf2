@@ -33,7 +33,7 @@
 #ifndef REDUCED_RAWCOPPER
 #include <rawdata/dataobjects/RawHeader.h>
 #else
-#include <rawdata/dataobjects/ReducedRawHeader.h>
+#include <rawdata/dataobjects/RawHeader_v1.h>
 #endif
 //#include <rawdata/dataobjects/RawCOPPER.h>
 
@@ -204,6 +204,11 @@ namespace Belle2 {
     //! for nonstop DAQ
     virtual void waitRestart();
 
+#endif
+
+#ifdef REDUCED_RAWCOPPER
+    //! which format is used
+    RawHeader_v1 tmp_header;
 #endif
 
   };

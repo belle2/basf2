@@ -148,9 +148,9 @@ int* DeSerializerFILEModule::readOneDataBlock(int* malloc_flag, int* size_word, 
 #ifdef REDUCED_RAWCOPPER
     *size_word = length_buf[ pos_data_length - 1 ] +
                  RawCOPPERFormat_v1::SIZE_COPPER_DRIVER_HEADER + RawCOPPERFormat_v1::SIZE_COPPER_DRIVER_TRAILER
-                 + RawCOPPERFormat_v1::RAWHEADER_NWORDS + RawCOPPERFormat_v1::RAWTRAILER_NWORDS;
-    start_word = 1 + pos_data_length + RawCOPPERFormat_v1::RAWHEADER_NWORDS;
-    stop_word = *size_word - RawCOPPERFormat_v1::RAWTRAILER_NWORDS;
+                 + m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS + m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS;
+    start_word = 1 + pos_data_length + m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS;
+    stop_word = *size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS;
 #else
     *size_word = length_buf[ pos_data_length - 1 ] +
                  RawCOPPER::SIZE_COPPER_DRIVER_HEADER + RawCOPPER::SIZE_COPPER_DRIVER_TRAILER
@@ -158,12 +158,19 @@ int* DeSerializerFILEModule::readOneDataBlock(int* malloc_flag, int* size_word, 
     start_word = 1 + pos_data_length + RawHeader::RAWHEADER_NWORDS;
     stop_word = *size_word - RawTrailer::RAWTRAILER_NWORDS;
 #endif
-
     temp_buf = readfromFILE(m_fp_in, *size_word, start_word, stop_word);
 
+#ifdef REDUCED_RAWCOPPER
+    temp_buf[ m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS ] = 0x7fff0008;
+    memcpy((temp_buf + m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS + 1),
+           length_buf, sizeof(int) * pos_data_length);
+#else
     temp_buf[ RawHeader::RAWHEADER_NWORDS ] = 0x7fff0008;
     memcpy((temp_buf + RawHeader::RAWHEADER_NWORDS + 1),
            length_buf, sizeof(int) * pos_data_length);
+#endif
+
+
     delete length_buf;
   } else {
     *data_type = RAW_DATABLOCK;

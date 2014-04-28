@@ -41,7 +41,7 @@
 #include <daq/rawdata/modules/DAQConsts.h>
 #ifndef REDUCED_RAWCOPPER
 #else
-#include <rawdata/dataobjects/ReducedRawCOPPER.h>
+//#include <rawdata/dataobjects/ReducedRawCOPPER.h>
 #endif
 
 #include <daq/dataobjects/SendHeader.h>
@@ -84,7 +84,7 @@ namespace Belle2 {
 
 #ifndef REDUCED_RAWCOPPER
 #else
-    void printReducedCOPPEREvent(ReducedRawCOPPER* reduced_raw_copper, int i);
+    //    void printReducedCOPPEREvent(ReducedRawCOPPER* reduced_raw_copper, int i);
 #endif
 
   protected :

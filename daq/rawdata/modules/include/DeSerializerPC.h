@@ -24,8 +24,8 @@
 #include <daq/rawdata/modules/DeSerializer.h>
 #include <daq/dataflow/EvtSocket.h>
 
-#ifndef REDUCED_RAWCOPPER
 #include <rawdata/dataobjects/RawCOPPER.h>
+#ifndef REDUCED_RAWCOPPER
 #include <rawdata/dataobjects/RawCDC.h>
 #include <rawdata/dataobjects/RawSVD.h>
 #include <rawdata/dataobjects/RawECL.h>
@@ -33,8 +33,9 @@
 #include <rawdata/dataobjects/RawBPID.h>
 #include <rawdata/dataobjects/RawKLM.h>
 #else
-#include <rawdata/dataobjects/PreRawCOPPER.h>
-#include <rawdata/dataobjects/ReducedRawCOPPER.h>
+#include <rawdata/dataobjects/PreRawCOPPERFormat_v1.h>
+/* #include <rawdata/dataobjects/PreRawCOPPER.h> */
+/* #include <rawdata/dataobjects/ReducedRawCOPPER.h> */
 #endif
 
 #include <rawdata/dataobjects/RawFTSW.h>
@@ -86,12 +87,6 @@ namespace Belle2 {
     //! check data contents
     virtual void checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0);
 
-#ifdef REDUCED_RAWCOPPER
-    //! check data contents
-    virtual void reduceData(RawDataBlock* raw_datablk, const int malloc_flag_from,
-                            int* malloc_flag_to);
-#endif
-
     //! # of connections
     int m_num_connections;
 
@@ -109,9 +104,11 @@ namespace Belle2 {
 
     StoreArray<RawFTSW> raw_ftswarray;
 
+    StoreArray<RawCOPPER> rawcprarray;
+
 #ifndef REDUCED_RAWCOPPER
     //    StoreArray<RawDataBlock> raw_dblkarray;
-    StoreArray<RawCOPPER> rawcprarray;
+
     StoreArray<RawCDC> raw_cdcarray;
     StoreArray<RawSVD> raw_svdarray;
     StoreArray<RawBPID> raw_bpidarray;
@@ -119,7 +116,11 @@ namespace Belle2 {
     StoreArray<RawEPID> raw_epidarray;
     StoreArray<RawKLM> raw_klmarray;
 #else
-    StoreArray<ReducedRawCOPPER> rawcprarray;
+
+    //    StoreArray<ReducedRawCOPPER> rawcprarray;
+    ///
+    PreRawCOPPERFormat_v1 m_pre_rawcpr_v1;
+
 #endif
 
     int event_diff;

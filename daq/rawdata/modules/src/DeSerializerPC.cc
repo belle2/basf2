@@ -370,72 +370,6 @@ void DeSerializerPCModule::setRecvdBuffer(RawDataBlock* temp_raw_datablk, int* m
 
 }
 
-#ifdef REDUCED_RAWCOPPER
-void DeSerializerPCModule::reduceData(RawDataBlock* raw_datablk,
-                                      int malloc_flag_from, int* malloc_flag_to)
-{
-  int* buf_from = raw_datablk->GetWholeBuffer();
-
-  //
-  // Calculate reduced length
-  //
-  int reduced_nwords = 0;
-  for (int k = 0; k < raw_datablk->GetNumEvents(); k++) {
-    int num_nodes_in_sendblock = raw_datablk->GetNumNodes();
-    for (int l = 0; l < num_nodes_in_sendblock; l++) {
-      int entry_id = l + k * num_nodes_in_sendblock;
-      if (raw_datablk->CheckFTSWID(entry_id) ||
-          raw_datablk->CheckTLUID(entry_id)) {
-        reduced_nwords += raw_datablk->GetBlockNwords(entry_id);
-      } else {
-        PreRawCOPPER temp_prerawcpr;
-        ReducedRawCOPPER temp_redrawcpr;
-        int temp_malloc_flag = 0, temp_num_eve = 1, temp_num_nodes = 1;
-
-        temp_prerawcpr.SetBuffer(raw_datablk->GetBuffer(entry_id),
-                                 raw_datablk->GetBlockNwords(entry_id),
-                                 temp_malloc_flag, temp_num_eve,
-                                 temp_num_nodes);
-        reduced_nwords += temp_prerawcpr.CalcReducedNwords(0);
-      }
-    }
-  }
-  //
-  // allocate buffer
-  //
-  int* buf_to = getBuffer(reduced_nwords, malloc_flag_to);
-
-  //
-  // Reduce the buffer length
-  //
-  int pos_nwords_to = 0;
-  for (int k = 0; k < raw_datablk->GetNumEvents(); k++) {
-    int num_nodes_in_sendblock = raw_datablk->GetNumNodes();
-    for (int l = 0; l < num_nodes_in_sendblock; l++) {
-      int entry_id = l + k * num_nodes_in_sendblock;
-      if (raw_datablk->CheckFTSWID(entry_id) ||
-          raw_datablk->CheckTLUID(entry_id)) {
-        raw_datablk->CopyBlock(entry_id, buf_to + pos_nwords_to);
-        pos_nwords_to += raw_datablk->GetBlockNwords(entry_id);
-
-      } else {
-        PreRawCOPPER temp_prerawcpr;
-        temp_prerawcpr.SetBuffer(raw_datablk->GetBuffer(entry_id),
-                                 raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
-        pos_nwords_to += temp_prerawcpr.CopyReducedBuffer(0, buf_to + pos_nwords_to);
-
-      }
-    }
-  }
-  raw_datablk->SetBuffer(buf_to, pos_nwords_to, 0,
-                         raw_datablk->GetNumEvents(), raw_datablk->GetNumNodes());
-
-  if (malloc_flag_from == 1) { delete buf_from;}
-
-  return ;
-
-}
-#endif // REDUCED_RAWCOPPER
 
 
 void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0)
@@ -524,20 +458,16 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ev
 #endif
         delete temp_rawtlu;
       } else {
+
+
         //
         // RawCOPPER
         //
         int block_id = 0;
 
-#ifndef REDUCED_RAWCOPPER
         RawCOPPER* temp_rawcopper = new RawCOPPER;
-#else
-        PreRawCOPPER* temp_rawcopper = new PreRawCOPPER;
-#endif
         temp_rawcopper->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
                                   raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
-
-
 
 #ifdef DUMHSLB
 #ifndef REDUCED_RAWCOPPER
@@ -545,9 +475,11 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ev
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader::POS_TTCTIME_TRGTYPE ] = ctime_trgtype_ftsw;
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader::POS_TTUTIME ] = utime_ftsw;
 #else
-        (temp_rawcopper->GetBuffer(block_id))[ ReducedRawHeader::POS_EXP_RUN_NO ] = exp_run_ftsw;
-        (temp_rawcopper->GetBuffer(block_id))[ ReducedRawHeader::POS_TTCTIME_TRGTYPE ] = ctime_trgtype_ftsw;
-        (temp_rawcopper->GetBuffer(block_id))[ ReducedRawHeader::POS_TTUTIME ] = utime_ftsw;
+
+        (temp_rawcopper->GetBuffer(block_id))[ RawHeader_v1::POS_EXP_RUN_NO ] = exp_run_ftsw;
+        (temp_rawcopper->GetBuffer(block_id))[ RawHeader_v1::POS_TTCTIME_TRGTYPE ] = ctime_trgtype_ftsw;
+        (temp_rawcopper->GetBuffer(block_id))[ RawHeader_v1::POS_TTUTIME ] = utime_ftsw;
+
 #endif
 #endif
 
@@ -562,6 +494,7 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ev
           exit(1);
         }
 #endif
+
         utime_array[ entry_id ] = temp_rawcopper->GetTTUtime(0);
         ctime_type_array[ entry_id ] = temp_rawcopper->GetTTCtimeTRGType(0);
 
@@ -573,7 +506,10 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ev
         }
         cpr_num++;
         delete temp_rawcopper;
+
+
       }
+
     }
 
 #ifndef NO_DATA_CHECK
@@ -659,10 +595,21 @@ void DeSerializerPCModule::event()
     int malloc_flag_from = 0, malloc_flag_to = 0;
     RawDataBlock temp_rawdatablk;
     setRecvdBuffer(&temp_rawdatablk, &malloc_flag_from);
+
+
+
     checkData(&temp_rawdatablk, &eve_copper_0);
 
 #ifdef REDUCED_RAWCOPPER
-    reduceData(&temp_rawdatablk, malloc_flag_from, &malloc_flag_to);
+    //
+    // Copy reduced buffer
+    //
+    ;
+    int* buf_to = getBuffer(m_pre_rawcpr_v1.CalcReducedDataSize(&temp_rawdatablk),
+                            &malloc_flag_to);
+
+    m_pre_rawcpr_v1.CopyReducedData(&temp_rawdatablk, buf_to, malloc_flag_from);
+
 #else
     malloc_flag_to = malloc_flag_from;
 #endif
@@ -704,7 +651,8 @@ void DeSerializerPCModule::event()
   if (max_nevt >= 0 || max_seconds >= 0.) {
     if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC >= max_nevt && max_nevt > 0)
         || (getTimeSec() - m_start_time > max_seconds && max_seconds > 0.)) {
-      printf("[DEBUG] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n", max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, getTimeSec() - m_start_time);
+      printf("[DEBUG] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n",
+             max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, getTimeSec() - m_start_time);
       m_eventMetaDataPtr->setEndOfData();
     }
   }

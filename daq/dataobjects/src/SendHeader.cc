@@ -7,7 +7,6 @@
 //-
 
 #include "daq/dataobjects/SendHeader.h"
-#include "rawdata/dataobjects/RawHeader.h"
 
 using namespace std;
 using namespace Belle2;
@@ -88,27 +87,50 @@ void SendHeader::SetNodeID(int node_id)
 
 void SendHeader::SetRunNum(int run_num)
 {
+
+#ifdef REDUCED_RAWCOPPER
+  unsigned int inv_mask = ~((unsigned int)(tmp_header.RUNNO_MASK));
+  m_buffer[ POS_EXP_RUN_NUM ] =
+    ((unsigned int)m_buffer[ POS_EXP_RUN_NUM ] & inv_mask) |
+    (((unsigned int)run_num << tmp_header.RUNNO_SHIFT) & tmp_header.RUNNO_MASK);
+#else
   unsigned int inv_mask = ~((unsigned int)(RawHeader::RUNNO_MASK));
   m_buffer[ POS_EXP_RUN_NUM ] =
     ((unsigned int)m_buffer[ POS_EXP_RUN_NUM ] & inv_mask) |
     (((unsigned int)run_num << RawHeader::RUNNO_SHIFT) & RawHeader::RUNNO_MASK);
+#endif
+
   return;
 }
 
 void SendHeader::SetSubRunNum(int subrun_num)
 {
+#ifdef REDUCED_RAWCOPPER
+  unsigned int inv_mask = ~((unsigned int)(tmp_header.SUBRUNNO_MASK));
+  m_buffer[ POS_EXP_RUN_NUM ] =
+    ((unsigned int)m_buffer[ POS_EXP_RUN_NUM ] & inv_mask) | ((unsigned int)subrun_num & tmp_header.SUBRUNNO_MASK);
+#else
   unsigned int inv_mask = ~((unsigned int)(RawHeader::SUBRUNNO_MASK));
   m_buffer[ POS_EXP_RUN_NUM ] =
     ((unsigned int)m_buffer[ POS_EXP_RUN_NUM ] & inv_mask) | ((unsigned int)subrun_num & RawHeader::SUBRUNNO_MASK);
+#endif
   return;
 }
 
 void SendHeader::SetExpNum(int exp_num)
 {
+#ifdef REDUCED_RAWCOPPER
+  unsigned int inv_mask = ~((unsigned int)(tmp_header.EXP_MASK));
+  m_buffer[ POS_EXP_RUN_NUM ] =
+    ((unsigned int)m_buffer[ POS_EXP_RUN_NUM ] & inv_mask) |
+    (((unsigned int)exp_num << tmp_header.EXP_SHIFT) & tmp_header.EXP_MASK);
+#else
   unsigned int inv_mask = ~((unsigned int)(RawHeader::EXP_MASK));
   m_buffer[ POS_EXP_RUN_NUM ] =
     ((unsigned int)m_buffer[ POS_EXP_RUN_NUM ] & inv_mask) |
     (((unsigned int)exp_num << RawHeader::EXP_SHIFT) & RawHeader::EXP_MASK);
+#endif
+
   return;
 }
 
@@ -132,24 +154,41 @@ int SendHeader::GetNodeID() { return m_buffer[ POS_NODE_ID ]; }
 
 int SendHeader::GetRunNum()
 {
+#ifdef REDUCED_RAWCOPPER
+  return (((unsigned int)(m_buffer[ POS_EXP_RUN_NUM ]) & tmp_header.RUNNO_MASK) >> tmp_header.RUNNO_SHIFT);
+#else
   return (((unsigned int)(m_buffer[ POS_EXP_RUN_NUM ]) & RawHeader::RUNNO_MASK) >> RawHeader::RUNNO_SHIFT);
+#endif
 }
 
 int SendHeader::GetSubRunNum()
 {
+#ifdef REDUCED_RAWCOPPER
+  return ((unsigned int)(m_buffer[ POS_EXP_RUN_NUM ]) & tmp_header.SUBRUNNO_MASK);
+#else
   return ((unsigned int)(m_buffer[ POS_EXP_RUN_NUM ]) & RawHeader::SUBRUNNO_MASK);
+#endif
 }
 
 int SendHeader::GetRunNumSubRunNum()
 {
+#ifdef REDUCED_RAWCOPPER
+  return ((unsigned int)(m_buffer[ POS_EXP_RUN_NUM ]) &
+          (tmp_header.RUNNO_MASK | tmp_header.SUBRUNNO_MASK));
+#else
   return ((unsigned int)(m_buffer[ POS_EXP_RUN_NUM ]) &
           (RawHeader::RUNNO_MASK | RawHeader::SUBRUNNO_MASK));
+#endif
 }
 
 
 int SendHeader::GetExpNum()
 {
+#ifdef REDUCED_RAWCOPPER
+  return (((unsigned int)(m_buffer[ POS_EXP_RUN_NUM ]) & tmp_header.EXP_MASK) >> tmp_header.EXP_SHIFT);
+#else
   return (((unsigned int)(m_buffer[ POS_EXP_RUN_NUM ]) & RawHeader::EXP_MASK) >> RawHeader::EXP_SHIFT);
+#endif
 }
 
 

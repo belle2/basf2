@@ -94,6 +94,10 @@ namespace Belle2 {
     //!
     std::string m_fname_in;
 
+    //! a class to handle data from a file
+#ifdef REDUCED_RAWCOPPER
+    RawCOPPERFormat_v1 m_tmp_header;
+#endif
 
   };
 

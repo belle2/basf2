@@ -33,7 +33,9 @@
 #ifndef REDUCED_RAWCOPPER
 #include <rawdata/dataobjects/RawCOPPER.h>
 #else
-#include <rawdata/dataobjects/PreRawCOPPER.h>
+//#include <rawdata/dataobjects/PreRawCOPPER.h>
+#include <rawdata/dataobjects/PreRawCOPPERFormat_v1.h>
+#include <rawdata/dataobjects/RawCOPPERFormat_v1.h>
 #endif
 
 
@@ -73,6 +75,14 @@ namespace Belle2 {
     virtual void waitRestart();
 #endif
 
+  protected:
+
+#ifdef REDUCED_RAWCOPPER
+    //! Handle to data from HSLBs
+    const PreRawCOPPERFormat_v1 m_pre_rawcpr;
+#endif
+
+
   private:
 
 #ifndef REDUCED_RAWCOPPER
@@ -82,9 +92,9 @@ namespace Belle2 {
     StoreArray<RawCOPPER> rawcprarray;
 #else
     //! data
-    StoreObjPtr<PreRawCOPPER> m_rawcopper;
+    /*     StoreObjPtr<PreRawCOPPER> m_rawcopper; */
 
-    StoreArray<PreRawCOPPER> rawcprarray;
+    /*     StoreArray<PreRawCOPPER> rawcprarray; */
 #endif
 
     StoreArray<RawDataBlock> raw_dblkarray;
@@ -118,8 +128,6 @@ namespace Belle2 {
 
     //! run #
     int m_run;
-
-
 
 
   };

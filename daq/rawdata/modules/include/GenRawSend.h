@@ -11,15 +11,20 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/DataStore.h>
-
-#include <rawdata/dataobjects/RawCOPPER.h>
-#include <rawdata/dataobjects/RawHeader.h>
-#include <daq/rawdata/modules/DAQConsts.h>
-
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
+#include <daq/rawdata/modules/DAQConsts.h>
 #include <daq/dataflow/EvtSocket.h>
+
+#include <rawdata/dataobjects/RawCOPPER.h>
+
+#ifdef REDUCED_RAWCOPPER
+#include <rawdata/dataobjects/RawHeader_v1.h>
+#else
+#include <rawdata/dataobjects/RawHeader.h>
+#endif
+
 
 namespace Belle2 {
 

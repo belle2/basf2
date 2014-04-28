@@ -228,6 +228,7 @@ void DeSerializerModule::printData(int* buf, int nwords)
 
 int* DeSerializerModule::getBuffer(int nwords, int* malloc_flag)
 {
+
   int* temp_buf = NULL;
   // Prepare buffer
   //  printf( "[DEBUG] ############ %d %d %d %d\n", nwords, BUF_SIZE_WORD, m_num_usedbuf, NUM_PREALLOC_BUF );
@@ -245,6 +246,7 @@ int* DeSerializerModule::getBuffer(int nwords, int* malloc_flag)
       *malloc_flag = 0;
     }
   }
+
   return temp_buf;
 
 }

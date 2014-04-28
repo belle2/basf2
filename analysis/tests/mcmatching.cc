@@ -14,6 +14,15 @@
 using namespace std;
 using namespace Belle2;
 
+#if defined(__ICC) || defined(__INTEL_COMPILER)
+namespace {
+  TEST(MCMatchingTest, TestsDisabled)
+  {
+    EXPECT_TRUE(false) << "MC matching test disabled on intel compiler (version < 14 sp1 update2), please see https://software.intel.com/en-us/forums/topic/475378";
+  }
+}
+#else
+
 namespace {
   MCParticleGraph gParticleGraph;
 
@@ -515,3 +524,4 @@ namespace {
 //[ERROR] isSignal=1, status=0, for |PDG| = 421, idx 4: 413 [ 421 [ -321 [ ] 211 [ ] 111 [ 22 22 ] ] 211 [ ] ]   { module: VariablesToNtuple }
 
 }  // namespace
+#endif

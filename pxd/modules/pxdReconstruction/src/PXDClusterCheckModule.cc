@@ -50,7 +50,7 @@ namespace {
     //They should have the same number of elements
     assert_eq(std::distance(begin(a), end(a)), std::distance(begin(b), end(b)));
     //Loop over both ranges and compare index and weights
-    for (auto ita = begin(a), itb = begin(b); ita != end(a) && itb != end(b); ++ita, ++itb) {
+    for (decltype(begin(a)) ita = begin(a), itb = begin(b); ita != end(a) && itb != end(b); ++ita, ++itb) {
       assert_eq(ita->indexTo, itb->indexTo);
       assert_float(ita->weight, itb->weight);
     }

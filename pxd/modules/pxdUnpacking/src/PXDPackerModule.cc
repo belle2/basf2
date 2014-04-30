@@ -55,7 +55,7 @@ REG_MODULE(PXDPacker)
 
 using boost::crc_optimal;
 typedef crc_optimal<32, 0x04C11DB7, 0, 0, false, false> dhh_crc_32_type;
-const unsigned int CRC_INIT = 0x00000000;
+// const unsigned int CRC_INIT = 0x00000000;
 
 ///******************************************************************
 ///*********************** Main packer code *************************

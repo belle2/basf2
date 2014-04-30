@@ -201,7 +201,8 @@
     <AreaTubeBwd>
         <R1 unit="cm">12</R1>
         <D1 unit="cm">50.2</D1>
-        <D2 unit="cm">62.725</D2>
+        <!--<D2 unit="cm">62.725</D2>-->
+        <D2 unit="cm">62.73</D2>
     </AreaTubeBwd>
 
     <Lv1TaHERUp>

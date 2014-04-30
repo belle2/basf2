@@ -72,7 +72,7 @@ namespace Belle2 {
       m_sensitive.clear();
     }
 
-    void GeoBeamPipeCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes type)
+    void GeoBeamPipeCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes)
     {
 
       //########## Index ##########
@@ -106,10 +106,10 @@ namespace Belle2 {
       GearDir cSafety(content, "Safety/");
       double SafetyLength = cSafety.getLength("L1") / Unit::mm;
 
-//      double stepMax = 5.0 * Unit::mm;
-//      double stepMax = 50.0 * Unit::mm;
-      double stepMax = 500.0 * Unit::mm;
-      bool flag_limitStep = true;
+      double stepMax = 5.0 * Unit::mm;
+      bool flag_limitStep = false;
+      //bool flag_limitStep = true;
+
       double A11 = 0.03918;
 
       ////==========
@@ -272,7 +272,7 @@ namespace Belle2 {
       double Lv2Vacuum_R1 = cLv2Vacuum.getLength("R1") / Unit::mm;
       double Lv2Vacuum_R2 = cLv2Vacuum.getLength("R2") / Unit::mm;
       double Lv2Vacuum_R3 = cLv2Vacuum.getLength("R3") / Unit::mm;
-      double Lv2Vacuum_A1 = cLv2Vacuum.getAngle("A1");
+      //double Lv2Vacuum_A1 = cLv2Vacuum.getAngle("A1");
       double Lv2Vacuum_A2 = cLv2Vacuum.getAngle("A2");
       //
       string strMat_Lv2Vacuum = cLv2Vacuum.getString("Material");

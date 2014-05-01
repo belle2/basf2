@@ -33,6 +33,7 @@ namespace Belle2 {
     virtual bool send(const NSMMessage msg) throw();
     virtual bool ok() throw();
     virtual bool error() throw();
+    virtual bool log() throw();
 
   public:
     virtual bool boot() throw() { return send(getMessage()); }

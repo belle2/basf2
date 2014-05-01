@@ -123,12 +123,13 @@ throw(NSMHandlerException)
   sendRequest(NSMMessage(m_master_node, NSMCommand::ERROR, message));
 }
 
-bool NSMCommunicator::sendLog(const SystemLog& log)
+bool NSMCommunicator::sendLog(const DAQLogMessage& log)
 {
   return sendLog(m_master_node, log);
 }
 
-bool NSMCommunicator::sendLog(const NSMNode& node, const SystemLog& log)
+bool NSMCommunicator::sendLog(const NSMNode& node,
+                              const DAQLogMessage& log)
 {
 #if NSM_PACKAGE_VERSION >= 1914
   try {

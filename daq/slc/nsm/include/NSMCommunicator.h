@@ -5,7 +5,8 @@
 #include "daq/slc/nsm/NSMMessage.h"
 #include "daq/slc/nsm/NSMNode.h"
 
-#include <daq/slc/base/SystemLog.h>
+#include <daq/slc/database/DAQLogMessage.h>
+
 #include <daq/slc/base/Serializable.h>
 
 extern "C" {
@@ -39,8 +40,8 @@ namespace Belle2 {
                      int len, const char* data) throw(NSMHandlerException);
     void replyOK(const NSMNode& node) throw(NSMHandlerException);
     void replyError(const std::string& message = "") throw(NSMHandlerException);
-    bool sendLog(const SystemLog& log);
-    bool sendLog(const NSMNode& node, const SystemLog& log);
+    bool sendLog(const DAQLogMessage& log);
+    bool sendLog(const NSMNode& node, const DAQLogMessage& log);
     bool sendError(const std::string& message);
     bool sendFatal(const std::string& message);
     void sendState(const NSMNode& node) throw(NSMHandlerException);

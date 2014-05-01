@@ -33,7 +33,6 @@ DBObject::~DBObject() throw()
 
 void DBObject::print() const throw()
 {
-  std::cout << getTable() << ":" << getRevision() << std::endl;
   const FieldNameList& name_v(getFieldNames());
   for (size_t ii = 0; ii < m_name_v.size(); ii++) {
     std::string name = name_v.at(ii);
@@ -50,7 +49,17 @@ void DBObject::print() const throw()
       case FieldInfo::TEXT:   std::cout << getText(name); break;
       case FieldInfo::OBJECT: {
         size_t nobj = getNObjects(name);
-        for (size_t i = 0; i < nobj; i++) getObject(name, i).print();
+        if (nobj > 0) {
+          const DBObject& obj(getObject(name));
+          std::cout << obj.getTable() << " (" << obj.getRevision()
+                    << ")" << std::endl;
+          std::cout << "-------------------------" << std::endl;
+          for (size_t i = 0; i < nobj; i++) {
+            std::cout << "index : " << i << std::endl;
+            getObject(name, i).print();
+            std::cout << "-------------------------" << std::endl;
+          }
+        }
         break;
       }
       case FieldInfo::ENUM:   std::cout << getEnum(name); break;
@@ -67,11 +76,15 @@ void DBObject::print() const throw()
       case FieldInfo::NSM_OBJECT: {
         size_t nobj = getNObjects(name);
         std::cout << std::endl;
-        for (size_t i = 0; i < nobj; i++) getObject(name, i).print();
+        std::cout << "-------------------------" << std::endl;
+        for (size_t i = 0; i < nobj; i++) {
+          getObject(name, i).print();
+          std::cout << "-------------------------" << std::endl;
+        }
         break;
       }
     }
-    std::cout << std::endl;
+    if (!hasObject(name)) std::cout << std::endl;
   }
 }
 
@@ -217,6 +230,20 @@ int DBObject::getEnumId(const std::string& name) const throw()
 {
   if (!hasEnum(name)) return 0;
   return m_enum_m_m[name][getEnum(name)];
+}
+
+void DBObject::setEnum(const std::string& name, int value) throw()
+{
+  if (hasEnum(name)) {
+    EnumList& enum_m(m_enum_m_m[name]);
+    for (EnumList::iterator it = enum_m.begin();
+         it != enum_m.end(); it++) {
+      if (value == it->second) {
+        setEnum(name, it->first);
+        return;
+      }
+    }
+  }
 }
 
 void DBObject::addEnumList(const std::string& name,

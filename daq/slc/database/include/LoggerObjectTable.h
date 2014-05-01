@@ -3,6 +3,7 @@
 
 #include <daq/slc/database/DBInterface.h>
 #include <daq/slc/database/LoggerObject.h>
+#include <daq/slc/database/ConfigObject.h>
 
 namespace Belle2 {
 
@@ -13,6 +14,9 @@ namespace Belle2 {
     ~LoggerObjectTable() throw() {}
 
   public:
+    ConfigObject getLast(const std::string& nodename,
+                         const std::string& tablename_in,
+                         int revision) throw();
     int add(DBObject& obj, bool isroot = true)
     throw(DBHandlerException);
 

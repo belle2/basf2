@@ -53,6 +53,7 @@ namespace Belle2 {
     void setValue(const std::string& name, const std::string& value) throw();
     void setText(const std::string& name, const std::string& value) throw() { addText(name, value); }
     void setEnum(const std::string& name, const std::string& value) throw() { addEnum(name, value); }
+    void setEnum(const std::string& name, int value) throw();
     bool isConfig() const throw() { return m_isconfig; }
 
   public:

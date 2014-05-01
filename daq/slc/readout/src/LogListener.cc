@@ -32,7 +32,7 @@ void LogListener::run()
   char c;
   std::stringstream ss;
   std::string s;
-  SystemLog::Priority priority = SystemLog::UNKNOWN;
+  LogFile::Priority priority = LogFile::UNKNOWN;
   NSMCommunicator* comm = m_con->getCallback()->getCommunicator();
   NSMNode& node(m_con->getCallback()->getNode());
   try {
@@ -44,19 +44,19 @@ void LogListener::run()
         ss.str("");
         m_con->lock();
         LogFile::put(priority, s);
-        if (priority == SystemLog::ERROR) {
+        if (priority == LogFile::ERROR) {
           comm->sendError(s);
           m_con->setState(RunInfoBuffer::ERROR);
-        } else if (priority == SystemLog::FATAL) {
+        } else if (priority == LogFile::FATAL) {
           comm->sendError(s);
           m_con->setState(RunInfoBuffer::ERROR);
         }
-        if (priority >= SystemLog::NOTICE) {
-          comm->sendLog(SystemLog(node.getName(), priority, s));
+        if (priority >= LogFile::NOTICE) {
+          comm->sendLog(DAQLogMessage(node.getName(), priority, s));
         }
         m_con->unlock();
         count = 0;
-        priority = SystemLog::UNKNOWN;
+        priority = LogFile::UNKNOWN;
       } else if (isprint(c)) {
         if (count == 0 && c == '[') {
           ss << c;
@@ -65,17 +65,17 @@ void LogListener::run()
             if (c == ']') {
               ss << c;
               s = ss.str();
-              if (s == "[DEBUG]") priority = SystemLog::DEBUG;
-              else if (s == "[INFO]") priority = SystemLog::INFO;
-              else if (s == "[NOTICE]") priority = SystemLog::NOTICE;
-              else if (s == "[WARNING]") priority = SystemLog::WARNING;
-              else if (s == "[ERROR]") priority = SystemLog::ERROR;
-              else if (s == "[FATAL]") priority = SystemLog::FATAL;
+              if (s == "[DEBUG]") priority = LogFile::DEBUG;
+              else if (s == "[INFO]") priority = LogFile::INFO;
+              else if (s == "[NOTICE]") priority = LogFile::NOTICE;
+              else if (s == "[WARNING]") priority = LogFile::WARNING;
+              else if (s == "[ERROR]") priority = LogFile::ERROR;
+              else if (s == "[FATAL]") priority = LogFile::FATAL;
               if (priority > 0) {
                 count = 0;
                 ss.str("");
               } else {
-                priority = SystemLog::DEBUG;
+                priority = LogFile::DEBUG;
               }
               break;
             }

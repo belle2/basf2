@@ -20,8 +20,8 @@ addParamConfig ARICH copper.hslb ${DIR}/copper.hslb.csv
 addParamConfig ARICH copper ${DIR}/copper.csv
 addParamConfig ARICH ropc.from_hosts ${DIR}/ropc.from_hosts.csv 
 addParamConfig ARICH ropc ${DIR}/ropc.csv
-addParamConfig ARICH runcontrol.node ${DIR}/runcontrol.node.csv
-addParamConfig ARICH runcontrol.nsmdata ${DIR}/runcontrol.nsmdata.csv
-addParamConfig ARICH runcontrol ${DIR}/runcontrol.csv
+addParamConfig DAQ runcontrol.node ${DIR}/runcontrol.node.csv
+addParamConfig DAQ runcontrol.nsmdata ${DIR}/runcontrol.nsmdata.csv
+addParamConfig DAQ runcontrol ${DIR}/runcontrol.csv
 addParamConfig ARICH hvconfig.channel ${DIR}/arich.csv
 addParamConfig ARICH hvconfig ${DIR}/arich.hvconfig.csv

@@ -9,8 +9,6 @@
 #include <daq/slc/system/TCPServerSocket.h>
 #include <daq/slc/system/Mutex.h>
 
-#include <daq/slc/base/SystemLog.h>
-
 #include <list>
 
 namespace Belle2 {

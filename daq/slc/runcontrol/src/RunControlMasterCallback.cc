@@ -53,6 +53,7 @@ void RunControlMasterCallback::init() throw()
       m_node_v.push_back(NSMNode(obj.getNode()));
     }
   }
+  getNode().setState(Enum::UNKNOWN);
   timeout();
 }
 
@@ -103,6 +104,11 @@ void RunControlMasterCallback::timeout() throw()
     }
   }
   update();
+}
+
+bool RunControlMasterCallback::log() throw()
+{
+  NSMMessage& msg(getMessage());
 }
 
 bool RunControlMasterCallback::ok() throw()
@@ -196,7 +202,7 @@ void RunControlMasterCallback::prepareRun(NSMMessage& msg) throw()
   status->stime = m_info.getRecordTime();
   m_setting.setRunNumber(m_info);
   if (msg.getLength() > 0) {
-    StringList str_v = StringUtil::split(msg.getData(), ' ', 2);
+    StringList str_v = StringUtil::split(msg.getData(), '\n', 2);
     m_setting.setOperators(str_v[0]);
     m_setting.setComment(str_v[1]);
   }

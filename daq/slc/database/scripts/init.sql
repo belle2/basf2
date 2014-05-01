@@ -3,7 +3,7 @@ drop function if exists groupname_by_node(int);
 drop function if exists nodename(int);
 drop function if exists tablename(int);
 drop function if exists tablename_by_field(int);
-drop function if exists tablename_by_configinfo(text);
+drop function if exists tablename_by_configinfo(text, text);
 drop function if exists fieldname(int);
 drop function if exists fieldtype(int);
 drop function if exists fieldalias(int);

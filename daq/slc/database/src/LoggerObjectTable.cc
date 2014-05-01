@@ -14,6 +14,14 @@
 
 using namespace Belle2;
 
+ConfigObject LoggerObjectTable::getLast(const std::string& nodename,
+                                        const std::string& tablename_in,
+                                        int revision) throw()
+{
+  ConfigObject obj;
+  return obj;
+}
+
 int LoggerObjectTable::add(DBObject& obj, bool isroot)
 throw(DBHandlerException)
 {

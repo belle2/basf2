@@ -37,7 +37,7 @@ throw()
   } else if (cmd == NSMCommand::FATAL) {
     return fatal();
   } else if (cmd == NSMCommand::LOG) {
-    return error();
+    return log();
   } else if (cmd == NSMCommand::STATE) {
     return state();
   }

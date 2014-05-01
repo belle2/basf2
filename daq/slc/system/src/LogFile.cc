@@ -20,13 +20,14 @@ std::string LogFile::g_filepath;
 std::ofstream LogFile::g_stream;
 unsigned int LogFile::g_filesize = 0;
 Mutex LogFile::g_mutex;
-SystemLog::Priority LogFile::g_threshold;
+LogFile::Priority LogFile::g_threshold;
 
-void LogFile::open(const std::string& filename, SystemLog::Priority threshold)
+void LogFile::open(const std::string& filename, Priority threshold)
 {
   if (!g_opened) {
     ConfigFile config("slowcontrol");
-    g_filepath = config.get("logfile.dir") + "/" + filename + "." +  Date().toString("%Y.%m.%d") + ".log";
+    g_filepath = config.get("logfile.dir") + "/" + filename
+                 + "." +  Date().toString("%Y.%m.%d") + ".log";
     g_threshold = threshold;
     g_opened = true;
     open();
@@ -52,7 +53,7 @@ void LogFile::debug(const std::string& msg, ...)
 {
   va_list ap;
   va_start(ap, msg);
-  put_impl(msg, SystemLog::DEBUG, ap);
+  put_impl(msg, DEBUG, ap);
   va_end(ap);
 }
 
@@ -60,7 +61,7 @@ void LogFile::info(const std::string& msg, ...)
 {
   va_list ap;
   va_start(ap, msg);
-  put_impl(msg, SystemLog::INFO, ap);
+  put_impl(msg, INFO, ap);
   va_end(ap);
 }
 
@@ -68,7 +69,7 @@ void LogFile::notice(const std::string& msg, ...)
 {
   va_list ap;
   va_start(ap, msg);
-  put_impl(msg, SystemLog::NOTICE, ap);
+  put_impl(msg, NOTICE, ap);
   va_end(ap);
 }
 
@@ -76,7 +77,7 @@ void LogFile::warning(const std::string& msg, ...)
 {
   va_list ap;
   va_start(ap, msg);
-  put_impl(msg, SystemLog::WARNING, ap);
+  put_impl(msg, WARNING, ap);
   va_end(ap);
 }
 
@@ -84,7 +85,7 @@ void LogFile::error(const std::string& msg, ...)
 {
   va_list ap;
   va_start(ap, msg);
-  put_impl(msg, SystemLog::ERROR, ap);
+  put_impl(msg, ERROR, ap);
   va_end(ap);
 }
 
@@ -92,12 +93,12 @@ void LogFile::fatal(const std::string& msg, ...)
 {
   va_list ap;
   va_start(ap, msg);
-  put_impl(msg, SystemLog::FATAL, ap);
+  put_impl(msg, FATAL, ap);
   va_end(ap);
 }
 
 
-void LogFile::put(SystemLog::Priority priority, const std::string& msg, ...)
+void LogFile::put(Priority priority, const std::string& msg, ...)
 {
   va_list ap;
   va_start(ap, msg);
@@ -105,7 +106,7 @@ void LogFile::put(SystemLog::Priority priority, const std::string& msg, ...)
   va_end(ap);
 }
 
-int LogFile::put_impl(const std::string& msg, SystemLog::Priority priority, va_list ap)
+int LogFile::put_impl(const std::string& msg, Priority priority, va_list ap)
 {
   g_mutex.lock();
   if (g_threshold > priority) {
@@ -125,12 +126,12 @@ int LogFile::put_impl(const std::string& msg, SystemLog::Priority priority, va_l
   ss << "[" << date.toString();
   std::string color = "\x1b[49m\x1b[39m";
   switch (priority) {
-    case SystemLog::DEBUG:   color = "\x1b[49m\x1b[39m"; ss << "] [DEBUG] "; break;
-    case SystemLog::INFO:    color = "\x1b[49m\x1b[32m"; ss << "] [INFO] "; break;
-    case SystemLog::NOTICE:  color = "\x1b[49m\x1b[34m"; ss << "] [NOTICE] "; break;
-    case SystemLog::WARNING: color = "\x1b[49m\x1b[35m"; ss << "] [WARNING] "; break;
-    case SystemLog::ERROR:   color = "\x1b[49m\x1b[31m"; ss << "] [ERROR] "; break;
-    case SystemLog::FATAL:   color = "\x1b[41m\x1b[37m"; ss << "] [FATAL] "; break;
+    case DEBUG:   color = "\x1b[49m\x1b[39m"; ss << "] [DEBUG] "; break;
+    case INFO:    color = "\x1b[49m\x1b[32m"; ss << "] [INFO] "; break;
+    case NOTICE:  color = "\x1b[49m\x1b[34m"; ss << "] [NOTICE] "; break;
+    case WARNING: color = "\x1b[49m\x1b[35m"; ss << "] [WARNING] "; break;
+    case ERROR:   color = "\x1b[49m\x1b[31m"; ss << "] [ERROR] "; break;
+    case FATAL:   color = "\x1b[41m\x1b[37m"; ss << "] [FATAL] "; break;
     default:                 ss << "] [UNKNOWN] "; break;
   }
   static char s[1024 * 100];

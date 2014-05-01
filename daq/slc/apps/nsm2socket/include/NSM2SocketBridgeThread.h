@@ -10,8 +10,6 @@
 #include <daq/slc/system/TCPSocketReader.h>
 #include <daq/slc/system/Mutex.h>
 
-#include <daq/slc/base/SystemLog.h>
-
 namespace Belle2 {
 
   class NSM2SocketBridge;

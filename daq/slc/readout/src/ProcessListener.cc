@@ -39,9 +39,9 @@ void ProcessListener::run()
     case RunInfoBuffer::NOTREADY:
     default:
       LogFile::debug("Forked process %s was finished", process_name.c_str());
-      comm->sendLog(SystemLog(node.getName(), SystemLog::INFO,
-                              StringUtil::form("Foked process %s was finished",
-                                               process_name.c_str())));
+      comm->sendLog(DAQLogMessage(node.getName(), LogFile::INFO,
+                                  StringUtil::form("Foked process %s was finished",
+                                                   process_name.c_str())));
       break;
   }
   m_con->unlock();

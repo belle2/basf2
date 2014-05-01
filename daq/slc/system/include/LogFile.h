@@ -1,7 +1,6 @@
 #ifndef _Belle2_LogFile_h
 #define  _Belle2_LogFile_h
 
-#include <daq/slc/base/SystemLog.h>
 #include <daq/slc/system/Mutex.h>
 
 #include <string>
@@ -11,6 +10,11 @@
 namespace Belle2 {
 
   struct LogFile {
+
+  public:
+    enum Priority {
+      UNKNOWN = 0, DEBUG, INFO, NOTICE, WARNING, ERROR, FATAL
+    };
 
   private:
     LogFile() {}
@@ -22,11 +26,12 @@ namespace Belle2 {
     static std::ofstream g_stream;
     static unsigned int g_filesize;
     static Mutex g_mutex;
-    static SystemLog::Priority g_threshold;
+    static Priority g_threshold;
 
     // member functions
   public:
-    static void open(const std::string& filename, SystemLog::Priority priority = SystemLog::UNKNOWN);
+    static void open(const std::string& filename,
+                     Priority priority = UNKNOWN);
     static void open();
     static void debug(const std::string& msg, ...);
     static void info(const std::string& msg, ...);
@@ -34,10 +39,10 @@ namespace Belle2 {
     static void warning(const std::string& msg, ...);
     static void error(const std::string& msg, ...);
     static void fatal(const std::string& msg, ...);
-    static void put(SystemLog::Priority priority, const std::string& msg, ...);
+    static void put(Priority priority, const std::string& msg, ...);
 
   private:
-    static int put_impl(const std::string& msg, SystemLog::Priority priority, va_list ap);
+    static int put_impl(const std::string& msg, Priority priority, va_list ap);
 
   };
 

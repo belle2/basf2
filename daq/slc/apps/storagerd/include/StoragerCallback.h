@@ -4,7 +4,10 @@
 #include <daq/slc/readout/ProcessController.h>
 
 #include <daq/slc/runcontrol/RCCallback.h>
+
 #include <daq/slc/nsm/NSMData.h>
+
+#include <daq/slc/system/PThread.h>
 
 #include <vector>
 
@@ -38,6 +41,7 @@ namespace Belle2 {
   private:
     std::vector<ProcessController> m_con;
     NSMData m_data;
+    PThread m_thread;
 
   };
 

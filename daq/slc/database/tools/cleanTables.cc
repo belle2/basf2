@@ -1,23 +1,23 @@
-#include <daq/slc/database/FieldInfoTable.h>
+#include "daq/slc/database/TableInfoTable.h"
+
 #include <daq/slc/database/PostgreSQLInterface.h>
-#include <daq/slc/database/DBObjectLoader.h>
 
 #include <daq/slc/system/LogFile.h>
+
 #include <daq/slc/base/ConfigFile.h>
 #include <daq/slc/base/StringUtil.h>
+
+#include <fstream>
+#include <iostream>
 
 using namespace Belle2;
 
 int main(int argc, char** argv)
 {
-  if (argc < 3) {
-    LogFile::debug("usage: %s <tablename> <dir>", argv[0]);
+  if (argc < 1) {
+    LogFile::debug("usage: %s", argv[0]);
     return 1;
   }
-  std::string path = argv[2];
-  std::string tablename = argv[1];
-  ConfigObject obj = DBObjectLoader::load(path, tablename);
-  bool isroot = (tablename.find(".") == std::string::npos);
   ConfigFile dbconfig("slowcontrol");
   DBInterface* db = new PostgreSQLInterface(dbconfig.get("database.host"),
                                             dbconfig.get("database.dbname"),
@@ -25,7 +25,15 @@ int main(int argc, char** argv)
                                             dbconfig.get("database.password"),
                                             dbconfig.getInt("database.port"));
   db->connect();
-  FieldInfoTable(db).createTable(obj, isroot);
+  TableInfoList info_v = TableInfoTable(db).getList();
+  for (size_t i = 0; i < info_v.size(); i++) {
+    try {
+      db->execute("drop table \"%s:%s:%d\"",
+                  (info_v[i].isConfig() ? "configinfo" : "loggerinfo"),
+                  info_v[i].getName().c_str(), info_v[i].getRevision());
+    } catch (const DBHandlerException& e) {
+    }
+  }
   db->close();
   return 0;
 }

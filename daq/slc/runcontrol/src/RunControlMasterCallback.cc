@@ -56,18 +56,44 @@ void RunControlMasterCallback::init() throw()
   timeout();
 }
 
-void RunControlMasterCallback::timeout() throw()
+void RunControlMasterCallback::update() throw()
 {
   rc_status* status = (rc_status*)m_data.get();
   status->state = getNode().getState().getId();
   status->configid = getConfig().getObject().getId();
   status->nnodes = m_node_v.size();
   ConfigObjectList& obj_v(getConfig().getObject().getObjects("node"));
+  for (size_t i = 0; i < m_data_v.size(); i++) {
+    NSMData& data(m_data_v[i]);
+    if (!data.isAvailable()) {
+      try {
+        data.open(getCommunicator());
+        LogFile::debug("Opened nsm data : %s ", data.getName().c_str());
+      } catch (const NSMHandlerException& e) {
+        LogFile::warning("Failed to open nsm data : %s", data.getName().c_str());
+      }
+    }
+  }
+  for (size_t i = 0; i < m_node_v.size(); i++) {
+    status->node[i].state = m_node_v[i].getState().getId();
+    DBObject& obj(obj_v[i].getObject("runtype"));
+    status->node[i].configid = obj.getId();
+  }
+}
+
+void RunControlMasterCallback::timeout() throw()
+{
   NSMCommunicator& com(*getCommunicator());
+  m_msg_tmp.setRequestName(Enum::UNKNOWN);
   for (size_t i = 0; i < m_node_v.size(); i++) {
     NSMNode& node(m_node_v[i]);
-    if (com.getMaster().getName().size() > 0 &&
-        !RCState(node.getState()).isStable()) {
+    RCState state(node.getState());
+    if (!com.isConnected(node)) {
+      node.setState(Enum::UNKNOWN);
+      continue;
+    }
+    if (state == Enum::UNKNOWN ||
+        (state.isStable() && state != RCState::RUNNING_S)) {
       try {
         com.sendRequest(NSMMessage(node, RCCommand::STATECHECK));
       } catch (const NSMHandlerException& e) {
@@ -75,23 +101,8 @@ void RunControlMasterCallback::timeout() throw()
                          node.getName().c_str());
       }
     }
-    status->node[i].state = node.getState().getId();
-    DBObject& obj(obj_v[i].getObject("runtype"));
-    status->node[i].configid = obj.getId();
   }
-  for (size_t i = 0; i < m_data_v.size(); i++) {
-    NSMData& data(m_data_v[i]);
-    if (!data.isAvailable()) {
-      try {
-        data.open(getCommunicator());
-        LogFile::debug("Opened nsm data : %s ",
-                       data.getName().c_str());
-      } catch (const NSMHandlerException& e) {
-        LogFile::warning("Failed to open nsm data : %s",
-                         data.getName().c_str());
-      }
-    }
-  }
+  update();
 }
 
 bool RunControlMasterCallback::ok() throw()
@@ -100,7 +111,7 @@ bool RunControlMasterCallback::ok() throw()
   if (msg.getLength() > 0) {
     RCState state(msg.getData());
     const std::string nodename = msg.getNodeName();
-    LogFile::debug("From %s", nodename.c_str());
+    LogFile::debug("%s >> OK (%s)", nodename.c_str(), msg.getData());
     NSMNodeIterator it = find(nodename);
     if (it != m_node_v.end()) {
       NSMCommunicator& com(*getCommunicator());
@@ -109,13 +120,18 @@ bool RunControlMasterCallback::ok() throw()
       com.sendState(node);
       NSMNodeIterator it = synchronize(node);
       if (state.isStable() && it == m_node_v.end()) {
+        RCState state_org(getNode().getState());
         getNode().setState(state);
-        timeout();
-        com.replyOK(getNode());
+        update();
+        if (state != state_org)
+          com.replyOK(getNode());
+        m_msg_tmp.setRequestName(Enum::UNKNOWN);
       } else if (it != m_node_v.end()) {
         m_msg_tmp.setNodeName(*it);
-        timeout();
-        send(m_msg_tmp);
+        update();
+        RCCommand cmd(m_msg_tmp.getRequestName());
+        if (cmd.isAvailable(it->getState()))
+          send(m_msg_tmp);
       }
     } else {
       LogFile::error("OK request from Unknown node: %s",
@@ -224,10 +240,10 @@ bool RunControlMasterCallback::send(NSMMessage msg) throw()
   }
   const size_t nobj = getConfig().getObject().getNObjects("node");
   for (size_t i = 0; i < nobj; i++) {
-    const DBObject& obj(getConfig().getObject().getObject("node", i));
     if (msg.getNodeName() == m_node_v[i].getName()) {
       if (cmd == RCCommand::LOAD) {
         msg.setNParams(1);
+        const DBObject& obj(getConfig().getObject().getObject("node", i));
         const DBObject& cobj(obj.getObject("runtype"));
         if (obj.getEnum("dbmode") == "get") {
           msg.setParam(0, NSMCommand::DBGET.getId());
@@ -237,12 +253,19 @@ bool RunControlMasterCallback::send(NSMMessage msg) throw()
           msg.setData(cobj);
         }
       }
-      RCState tstate = cmd.nextTState();
-      if (tstate != Enum::UNKNOWN) m_node_v[i].setState(tstate);
-      com.sendRequest(msg);
-      if (i < nobj - 1 && getConfig().getObject().getObject("node", i + 1).getBool("sequential")) {
-        break;
+      if (cmd.isAvailable(m_node_v[i].getState())) {
+        LogFile::debug("%s >> %s", msg.getRequestName(),
+                       m_node_v[i].getName().c_str());
+        com.sendRequest(msg);
+        RCState tstate = cmd.nextTState();
+        if (tstate != Enum::UNKNOWN) m_node_v[i].setState(tstate);
       }
+      if (i < nobj - 1 &&
+          !getConfig().getObject().getObject("node", i + 1).getBool("sequential")) {
+        msg.setNodeName(m_node_v[i + 1]);
+        send(msg);
+      }
+      break;
     }
   }
   return true;

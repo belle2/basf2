@@ -29,6 +29,7 @@ namespace Belle2 {
   public:
     virtual void init() throw();
     virtual void timeout() throw();
+    virtual void update() throw();
     virtual bool send(const NSMMessage msg) throw();
     virtual bool ok() throw();
     virtual bool error() throw();

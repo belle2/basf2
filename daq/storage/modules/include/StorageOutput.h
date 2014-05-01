@@ -67,7 +67,8 @@ namespace Belle2 {
     DataStoreStreamer* m_streamer;
 
     //! Ring Buffer to dump sampled output stream
-    std::string m_obufname;
+    std::string m_obuf_name;
+    int m_obuf_size;
     SharedEventBuffer m_obuf;
 
     //! Exp number, Run number

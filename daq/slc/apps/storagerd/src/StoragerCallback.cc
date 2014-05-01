@@ -1,5 +1,6 @@
 #include "daq/slc/apps/storagerd/StoragerCallback.h"
 #include "daq/slc/apps/storagerd/StoragerMonitor.h"
+#include "daq/slc/apps/storagerd/storage_info_all.h"
 
 #include "daq/storage/storage_info.h"
 
@@ -22,22 +23,17 @@ StoragerCallback::~StoragerCallback() throw()
 void StoragerCallback::init() throw()
 {
   LogFile::open("storage");
-  ConfigFile config;
-  size_t nproc = config.getInt("NUM_OF_BASF2_PROCESS");
-  m_con.resize(3 + nproc);
-  for (size_t i = 0; i < m_con.size(); i++) {
-    m_con[i].setCallback(this);
-  }
-  m_con[0].init("storagein", sizeof(storage_info) / sizeof(int));
-  m_con[1].init("storagerecord", sizeof(storage_info) / sizeof(int));
-  m_con[2].init("storageout", sizeof(storage_info) / sizeof(int));
-  for (size_t i = 3; i < m_con.size(); i++) {
-    m_con[i].init(StringUtil::form("basf2_%d", i - 3),
-                  sizeof(storage_info) / sizeof(int));
-  }
-  m_data = NSMData("STORAGE_DATA", "storage_info_all", 1);
+  ConfigFile config("storage");
+  std::string runtype = config.get("runtype");
+  NSMMessage msg(getNode(), NSMCommand::DBGET, runtype);
+  msg.setNParams(1);
+  msg.setParam(0, NSMCommand::DBGET.getId());
+  msg.setData(runtype);
+  preload(msg);
+
+  m_data = NSMData("STORAGE_DATA", "storage_info_all",
+                   storage_info_all_revision);
   m_data.allocate(getCommunicator());
-  PThread(new StoragerMonitor(this));
 }
 
 void StoragerCallback::term() throw()
@@ -50,15 +46,35 @@ void StoragerCallback::term() throw()
 
 bool StoragerCallback::boot() throw()
 {
-  ConfigFile config;
-  const std::string ibuf_name = getNode().getName() + "_IN";
-  const std::string rbuf_name = getNode().getName() + "_RECORD";
-  const std::string obuf_name = getNode().getName() + "_OUT";
+  if (m_thread.is_alive()) m_thread.cancel();
+
+  ConfigObject& obj(getConfig().getObject());
+  const size_t nproc = obj.getInt("nworkers");
+  m_con = std::vector<ProcessController>();
+  for (size_t i = 0; i < 3 + nproc; i++) {
+    m_con.push_back(ProcessController(this));
+  }
+  m_con[0].init("storagein", sizeof(storage_info) / sizeof(int));
+  m_con[1].init("storagerecord", sizeof(storage_info) / sizeof(int));
+  m_con[2].init("storageout", sizeof(storage_info) / sizeof(int));
+  for (size_t i = 3; i < m_con.size(); i++) {
+    m_con[i].init(StringUtil::form("basf2_%d", i - 3),
+                  sizeof(storage_info) / sizeof(int));
+  }
+
+  const std::string ibuf_name = obj.getText("ibuf_name");
+  const std::string rbuf_name = obj.getText("rbuf_name");
+  const std::string obuf_name = obj.getText("obuf_name");
+  const std::string ibuf_size = obj.getValueText("ibuf_size");
+  const std::string rbuf_size = obj.getValueText("rbuf_size");
+  const std::string obuf_size = obj.getValueText("obuf_size");
+
   m_con[0].clearArguments();
   m_con[0].setExecutable("storagein");
   m_con[0].addArgument(ibuf_name);
-  m_con[0].addArgument(config.get("DATA_STORAGE_FROM_HOST"));
-  m_con[0].addArgument(config.get("DATA_STORAGE_FROM_PORT"));
+  m_con[0].addArgument(ibuf_size);
+  m_con[0].addArgument(obj.getText("storagein_host"));
+  m_con[0].addArgument(obj.getValueText("storagein_port"));
   m_con[0].addArgument("storagein");
   m_con[0].addArgument("1");
   if (!m_con[0].load(20)) {
@@ -72,8 +88,10 @@ bool StoragerCallback::boot() throw()
   m_con[1].clearArguments();
   m_con[1].setExecutable("storagerecord");
   m_con[1].addArgument(rbuf_name);
-  m_con[1].addArgument(config.get("DATA_STORAGE_DIR"));
+  m_con[1].addArgument(rbuf_size);
+  m_con[1].addArgument(obj.getText("storagerecord_dir"));
   m_con[1].addArgument(obuf_name);
+  m_con[1].addArgument(obuf_size);
   m_con[1].addArgument("storagerecord");
   m_con[1].addArgument("2");
   if (!m_con[1].load(10)) {
@@ -87,8 +105,8 @@ bool StoragerCallback::boot() throw()
   m_con[2].clearArguments();
   m_con[2].setExecutable("storageout");
   m_con[2].addArgument(obuf_name);
-  m_con[2].addArgument(config.get("DATA_STORAGE_TO_HOST"));
-  m_con[2].addArgument(config.get("DATA_STORAGE_TO_PORT"));
+  m_con[2].addArgument(obuf_size);
+  m_con[2].addArgument(obj.getValueText("storageout_port"));
   m_con[2].addArgument("storageout");
   m_con[2].addArgument("3");
   if (!m_con[2].load(10)) {
@@ -97,19 +115,21 @@ bool StoragerCallback::boot() throw()
   }
   LogFile::debug("Booted storageout");
 
+  m_thread = PThread(new StoragerMonitor(this));
   return true;
 }
 
 bool StoragerCallback::load() throw()
 {
-  ConfigFile config;
-  const std::string ibuf_name = getNode().getName() + "_IN";
-  const std::string rbuf_name = getNode().getName() + "_RECORD";
+  ConfigObject& obj(getConfig().getObject());
   for (size_t i = 3; i < m_con.size(); i++) {
     m_con[i].clearArguments();
-    m_con[i].addArgument(config.get("BASF2_SCRIPT_PATH"));
-    m_con[i].addArgument(ibuf_name);
-    m_con[i].addArgument(rbuf_name);
+    m_con[i].setExecutable("basf2");
+    m_con[i].addArgument(obj.getText("scriptpath"));
+    m_con[i].addArgument(obj.getText("ibuf_name"));
+    m_con[i].addArgument(obj.getValueText("ibuf_size"));
+    m_con[i].addArgument(obj.getText("rbuf_name"));
+    m_con[i].addArgument(obj.getValueText("rbuf_size"));
     m_con[i].addArgument(StringUtil::form("basf2_%d", i - 3));
     m_con[i].addArgument(StringUtil::form("%d", i + 1));
     m_con[i].addArgument("1");

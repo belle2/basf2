@@ -20,8 +20,13 @@ namespace Belle2 {
     friend class ProcessSubmitter;
 
   public:
-    ProcessController() {}
-    ~ProcessController() throw() {}
+    ProcessController() throw() {}
+    ProcessController(RCCallback* callback) throw() {
+      m_callback = callback;
+    }
+    ~ProcessController() throw() {
+      m_info.close();
+    }
 
   public:
     bool init(const std::string& name, int nreserved = 0);

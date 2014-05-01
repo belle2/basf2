@@ -42,6 +42,7 @@ StorageDeserializerModule::StorageDeserializerModule() : Module()
 
   addParam("CompressionLevel", m_compressionLevel, "Compression level", 0);
   addParam("InputBufferName", m_ibuf_name, "Input buffer name", std::string(""));
+  addParam("InputBufferSize", m_ibuf_size, "Input buffer size", 100000000);
   addParam("NodeName", m_nodename, "Node(subsystem) name", std::string(""));
   addParam("NodeID", m_nodeid, "Node(subsystem) ID", 0);
   addParam("UseShmFlag", m_shmflag, "Use shared memory to communicate with Runcontroller", 0);
@@ -59,7 +60,12 @@ StorageDeserializerModule::~StorageDeserializerModule()
 void StorageDeserializerModule::initialize()
 {
   B2INFO("StorageDeserializer: initialize() started.");
-  m_ibuf.open(m_ibuf_name, 20000000);
+  if (m_ibuf_name.size() > 0 && m_ibuf_size > 0) {
+    m_ibuf.open(m_ibuf_name, m_ibuf_size);
+  } else {
+    B2ERROR("Failed to load arguments for shared buffer (" <<
+            m_ibuf_name.c_str() << ":" << m_ibuf_size << ")");
+  }
   if (m_shmflag > 0) {
     if (m_nodename.size() == 0 || m_nodeid < 0) {
       m_shmflag = 0;

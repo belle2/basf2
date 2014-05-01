@@ -19,26 +19,28 @@
 
 #include <daq/slc/readout/RunInfoBuffer.h>
 
+#include <daq/slc/system/LogFile.h>
 #include <daq/slc/system/Time.h>
 
 using namespace Belle2;
 
 int main(int argc, char** argv)
 {
-  if (argc < 4) {
-    printf("rawfile2rb : rbufname interval port [nodename, nodeid]\n");
+  if (argc < 3) {
+    LogFile::debug("usage: %s bufname bufsize "
+                   "port [nodename, nodeid]", argv[0]);
     return 1;
   }
   RunInfoBuffer info;
   storage_info* sinfo = NULL;
   bool use_info = (argc > 5);
   if (use_info) {
-    info.open(argv[4], atoi(argv[5]), argc > 6);
+    info.open(argv[4], sizeof(storage_info) / sizeof(int), argc > 6);
     sinfo = (storage_info*)info.getReserved();
     sinfo->nodeid = atoi(argv[5]);
   }
   SharedEventBuffer ibuf;
-  ibuf.open(argv[1], 10000000);
+  ibuf.open(argv[1], atoi(argv[2]));
   int* evtbuf = new int[1000000];
   unsigned long long datasize = 0;
   unsigned int count = 0;

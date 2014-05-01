@@ -39,15 +39,16 @@ int StoragerMonitor::checkConnection(const std::string& proc_name, int port)
 void StoragerMonitor::run()
 {
   NSMNode& node(m_callback->getNode());
-  ConfigFile config("storage");
-  int port_in = config.getInt("DATA_STORAGE_FROM_PORT");
-  int port_out = config.getInt("DATA_STORAGE_TO_PORT");
+  ConfigObject& obj(m_callback->getConfig().getObject());
+  int port_in = obj.getInt("storagein_port");
+  int port_out = obj.getInt("storageout_port");
   const int interval = 2;
   std::vector<RunInfoBuffer*> info_v;
   for (size_t i = 0; i < m_callback->getControllers().size(); i++) {
     info_v.push_back(&(m_callback->getController(i).getInfo()));
   }
-  storage_info_all* sinfo_out = (storage_info_all*)(m_callback->getData().get());
+  storage_info_all* sinfo_out =
+    (storage_info_all*)(m_callback->getData().get());
   storage_info* sinfo_v = new storage_info[info_v.size()];
   sinfo_out->nnodes = info_v.size();
   for (size_t i = 0; i < info_v.size(); i++) {

@@ -2,7 +2,9 @@
 
 DIR=${BELLE2_LOCAL_DIR}/daq/slc/data/database
 
-psql -U b2daq -d b2slow < init.sql
+cleanTables
+
+psql -U b2daq -d b2slow < ${BELLE2_LOCAL_DIR}/daq/slc/database/scripts/init.sql
 
 createParamTable copper ${DIR}/
 createParamTable copper.hslb ${DIR}/

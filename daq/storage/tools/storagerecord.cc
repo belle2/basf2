@@ -32,17 +32,17 @@ int main(int argc, char** argv)
   const unsigned interval = 10;
   RunInfoBuffer info;
   storage_info* sinfo = NULL;
-  bool use_info = (argc > 4);
+  const bool use_info = (argc > 7);
   if (use_info) {
-    info.open(argv[4], sizeof(storage_info) / sizeof(int), argc > 6);
+    info.open(argv[6], sizeof(storage_info) / sizeof(int), argc > 6);
     sinfo = (storage_info*)info.getReserved();
-    sinfo->nodeid = atoi(argv[5]);
+    sinfo->nodeid = atoi(argv[7]);
   }
   SharedEventBuffer ibuf;
-  ibuf.open(argv[1], 25000000, true);
-  std::string dir = argv[2];
+  ibuf.open(argv[1], atoi(argv[2]), true);
+  const std::string dir = argv[3];
   SharedEventBuffer obuf;
-  obuf.open(argv[3], 10000000, true);
+  obuf.open(argv[4], atoi(argv[5]), true);
   B2INFO("storagerecord: started recording.");
   info.reportRunning();
   int* evtbuf = new int[1000000];

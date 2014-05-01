@@ -4,5 +4,6 @@ env['TOOLS_LIBS']['createParamTable'] = ['daq', 'framework', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['addParamConfig'] = ['daq', 'framework', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['addRunConfig'] = ['daq', 'framework', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['testRunSetting'] = ['daq', 'framework', '$PGSQL_LIBS']
+env['TOOLS_LIBS']['cleanTables'] = ['daq', 'framework', '$PGSQL_LIBS']
 
 Return('env')

@@ -9,7 +9,7 @@ TableInfoList TableInfoTable::getList() throw()
   TableInfoList info_v;
   if (m_db != NULL) {
     try {
-      m_db->execute("select name, type, revision, isroot, id from tableinfo;");
+      m_db->execute("select name, isconfig, revision, isroot, id from tableinfo;");
       DBRecordList record_v(m_db->loadRecords());
       for (DBRecordList::iterator it = record_v.begin();
            it != record_v.end(); it++) {

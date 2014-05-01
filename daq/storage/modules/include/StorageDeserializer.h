@@ -58,6 +58,7 @@ namespace Belle2 {
   private:
     DataStorePackage m_package;
     std::string m_ibuf_name;
+    int m_ibuf_size;
     SharedEventBuffer m_ibuf;
     RunInfoBuffer m_info;
     storage_info* m_sinfo;

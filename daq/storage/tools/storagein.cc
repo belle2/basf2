@@ -19,26 +19,28 @@
 #include <daq/slc/system/TCPSocket.h>
 #include <daq/slc/system/TCPSocketReader.h>
 #include <daq/slc/system/Time.h>
+#include <daq/slc/system/LogFile.h>
 
 using namespace Belle2;
 
 int main(int argc, char** argv)
 {
   if (argc < 4) {
-    printf("rawfile2rb : rbufname hostname port [nodename, nodeid]\n");
+    LogFile::debug("%s : bufname bufsize hostname port "
+                   "[nodename, nodeid]", argv[0]);
     return 1;
   }
   RunInfoBuffer info;
   storage_info* sinfo = NULL;
-  bool use_info = (argc > 4);
+  bool use_info = (argc > 6);
   if (use_info) {
-    info.open(argv[4], sizeof(storage_info) / sizeof(int), argc > 6);
+    info.open(argv[5], sizeof(storage_info) / sizeof(int), argc > 6);
     sinfo = (storage_info*)info.getReserved();
-    sinfo->nodeid = atoi(argv[5]);
+    sinfo->nodeid = atoi(argv[6]);
   }
   SharedEventBuffer ibuf;
-  ibuf.open(argv[1], 20000000, true);
-  TCPSocket socket(argv[2], atoi(argv[3]));
+  ibuf.open(argv[1], atoi(argv[2]) * 1000000, true);
+  TCPSocket socket(argv[3], atoi(argv[4]));
   B2INFO("storagein: Connected to eb2.");
   info.reportRunning();
   int* evtbuf = new int[1000000];
@@ -70,9 +72,10 @@ int main(int argc, char** argv)
         reader.read(evtbuf, sizeof(int));
         reader.read((evtbuf + 1), (evtbuf[0] - 1) * sizeof(int));
         if (expno > data.getExpNumber() || runno > data.getRunNumber()) {
-          B2INFO("storagein: old run event detected : exp=" << data.getExpNumber() <<
-                 " runno=" << data.getRunNumber() <<
-                 " current = (" << expno << "," << runno << ")");
+          B2INFO("storagein: old run event detected : exp="
+                 << data.getExpNumber() << " runno="
+                 << data.getRunNumber() << " current = ("
+                 << expno << "," << runno << ")");
           continue;
         } else if (expno < data.getExpNumber() || runno < data.getRunNumber()) {
           expno = data.getExpNumber();

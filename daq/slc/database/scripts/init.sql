@@ -1,22 +1,3 @@
-drop table if exists "configinfo:copper:1";
-drop table if exists "configinfo:copper.hslb:1";
-drop table if exists "configinfo:ropc:1";
-drop table if exists "configinfo:ropc.from_hosts:1";
-drop table if exists "configinfo:runcontrol:1";
-drop table if exists "configinfo:runcontrol.node:1";
-drop table if exists "configinfo:runcontrol.nsmdata:1";
-drop table if exists "configinfo:hvconfig.channel:1";
-drop table if exists "configinfo:hvconfig:1";
-drop table if exists "loggerinfo:hv_status.channel_status:1";
-drop table if exists "loggerinfo:hv_status:1";
-drop table if exists "loggerinfo:cpr_status:1";
-drop table if exists "loggerinfo:ropc_status.node_status:1";
-drop table if exists "loggerinfo:ropc_status:1";
-drop table if exists "loggerinfo:runsetting:1";
-drop table if exists "loggerinfo:runsummary.data:1";
-drop table if exists "loggerinfo:runsummary.node:1";
-drop table if exists "loggerinfo:runsummary:1";
-
 drop function if exists groupname(int);
 drop function if exists groupname_by_node(int);
 drop function if exists nodename(int);

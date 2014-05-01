@@ -203,7 +203,10 @@ bool NSMCommunicator::wait(int sec) throw(NSMHandlerException)
     m_message.read(m_nsmc);
     m_message.setRequestName();
     const char* master_name = m_message.getNodeName();
-    if (strlen(master_name) > 0 && m_master_node.getName().size() == 0) {
+    NSMCommand cmd(m_message.getRequestName());
+    if (m_master_node.getName().size() == 0 &&
+        cmd != NSMCommand::OK && cmd != NSMCommand::ERROR &&
+        strlen(master_name) > 0) {
       m_master_node = NSMNode(master_name);
     }
     b2nsm_context(m_nsmc);

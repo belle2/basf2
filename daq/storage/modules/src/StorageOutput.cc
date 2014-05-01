@@ -34,7 +34,8 @@ StorageOutputModule::StorageOutputModule() : Module()
 
   //Parameter definition
   addParam("compressionLevel", m_compressionLevel, "Compression Level", 1);
-  addParam("OutputBufferName", m_obufname, "Name of Ring Buffer for express reco", string(""));
+  addParam("OutputBufferName", m_obuf_name, "Output buffer name", string(""));
+  addParam("OutputBufferSize", m_obuf_size, "Output buffer size", 100000000);
   B2DEBUG(1, "StorageOutput: Constructor done.");
 }
 
@@ -47,8 +48,11 @@ void StorageOutputModule::initialize()
   m_streamer = new DataStoreStreamer(m_compressionLevel);
   m_expno = m_runno = -1;
   m_count = m_count_0 = 0;
-  if (m_obufname.size() > 0) {
-    m_obuf.open(m_obufname.c_str(), 25000000);
+  if (m_obuf_name.size() > 0 && m_obuf_size > 0) {
+    m_obuf.open(m_obuf_name.c_str(), m_obuf_size);
+  } else {
+    B2ERROR("Failed to load arguments for shared buffer (" <<
+            m_obuf_name.c_str() << ":" << m_obuf_size << ")");
   }
   B2INFO("StorageOutput: initialized.");
 }

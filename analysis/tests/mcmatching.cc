@@ -502,7 +502,6 @@ namespace {
   {
     {
       Decay d(-413, {{ -411, {321, -211, -211}}, {111, {22, 22}}});
-      d.finalize();
 
       Decay& pi0 = d[1];
       Decay& pi2 = d[0][2];
@@ -540,7 +539,6 @@ namespace {
     /** B0 -> phi [K+ K-] phi [K+ K-] with Ks from both sides switched*/
     {
       Decay d(511, {{333, {321, -321}}, {333, {321, -321}}});
-      d.finalize();
 
       Decay* k1 = &(d[0][1]);
       Decay* k2 = &(d[1][1]);
@@ -564,7 +562,6 @@ namespace {
   {
     {
       Decay d(300533, {{511, {321, -211, {111, {22, 22}}}}, { -511, { -321, 211, {111, {22, 22}}}}});
-      d.finalize();
 
       Decay* pi1 = &(d[0][2]);
       Decay* pi2 = &(d[1][2]);

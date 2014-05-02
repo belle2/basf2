@@ -3,7 +3,7 @@
  * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck                                              *
+ * Contributors: Martin Heck, Marco Staric                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,6 +14,7 @@
 #include <framework/datastore/RelationsObject.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <algorithm>
+#include <bitset>
 
 namespace genfit { class Track; }
 
@@ -79,12 +80,14 @@ namespace Belle2 {
     }
 
   private:
-    /** Index list of the TrackFitResults associated with this Track.
-     *
-     *  \sa ChargedStable
-     */
-//    short int m_trackFitIndices[Const::chargedStableSet.size()]; // This non-magic number dependent declaration could be used with C++11 const expression.
-    short int m_trackFitIndices[5];
+    /** Index list of the TrackFitResults associated with this Track. */
+    short int m_trackFitIndices[Const::ChargedStable::c_SetSize];
+
+    /** This shall save a key with which sets the Track is compatible. */
+    //std::bitset<48>
+
+    /** Quality estimator for */
+    //short mass hypothesis for which the quality estimator was done.
 
     /** Second version; doesn't store the name of the TrackFitResults, as default will be taken.
      */

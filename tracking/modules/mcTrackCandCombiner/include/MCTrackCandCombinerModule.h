@@ -83,8 +83,8 @@ namespace Belle2 {
     int m_nIgnoredCdcTcs;                         /**< counts the number of CDC track candidates that would not be combined with a VXD track candidate */
     int m_nCdcTcs;                                /**< total number of input CDC TCs processed by the module */
     int m_nVxdTcs;                                /**< total number of input VXD TCs processed by the module */
-    int m_nGoodCdcTcs;                            /**< Number of CDC track candidates where at least a ratio of m_hitsRatio of the hits is coming from the same MCParticle*/
-    int m_nGoodVxdTcs;                            /**< Number of VXD track candidates where at least a ratio of m_hitsRatio of the hits is coming from the same MCParticle*/
+//    int m_nGoodCdcTcs;                            /**< Number of CDC track candidates where at least a ratio of m_hitsRatio of the hits is coming from the same MCParticle*/
+//    int m_nGoodVxdTcs;                            /**< Number of VXD track candidates where at least a ratio of m_hitsRatio of the hits is coming from the same MCParticle*/
     int m_nOutputTcs;                             /**< total number of output TCs created by the module */
     int m_nCdcTcsWithoutPartner;                  /**< total number of output TCs that have only hits in the CDC */
     int m_nVxdTcsWithoutPartner;                  /**< total number of output TCs that have only hits in the VXD */

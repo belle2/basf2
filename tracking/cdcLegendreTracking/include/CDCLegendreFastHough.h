@@ -86,14 +86,14 @@ namespace Belle2 {
 
   private:
 
-    bool m_useHitPrecalculatedR; /**< To store r values inside hit objects or recalculate it each step */
+//    bool m_useHitPrecalculatedR; /**< To store r values inside hit objects or recalculate it each step */
     bool m_reconstructCurler;
     int m_maxLevel; /**< Maximum Level of FastHough Algorithm*/
 
     static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
     static constexpr double m_rc = 0.01667; /**< threshold of r, which defines curlers */
     int m_nbinsTheta; /**< Number of bins in theta, derived from m_maxLevel */
-    double m_rMin; /**< Minimum in r direction, initialized in initializer list of the module */
+//    double m_rMin; /**< Minimum in r direction, initialized in initializer list of the module */
     double m_rMax; /**< Maximum in r direction, initialized in initializer list of the module */
     double* m_sin_theta; /**< Lookup array for calculation of sin */
     double* m_cos_theta; /**< Lookup array for calculation of cos */

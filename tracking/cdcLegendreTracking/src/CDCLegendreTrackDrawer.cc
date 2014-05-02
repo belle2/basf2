@@ -276,8 +276,11 @@ void CDCLegendreTrackDrawer::drawLegendreHits(std::vector<CDCLegendreTrackHit*> 
     for (CDCLegendreTrackHit * hit : trackHitList) {
       TF1* funct1 = new TF1("funct", "[0]*cos(x)+[1]*sin(x)+[2]", 0, m_PI);
       TF1* funct2 = new TF1("funct", "[0]*cos(x)+[1]*sin(x)-[2]", 0, m_PI);
+      /**
+      //TODO This seems wrong. The compiler says line width function takes short as argument, not float.
       funct1->SetLineWidth(0.25);
       funct2->SetLineWidth(0.25);
+      */
       x0 = hit->getConformalX();
       y0 = hit->getConformalY();
       R = hit->getConformalDriftTime();

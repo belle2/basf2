@@ -59,7 +59,7 @@ namespace Belle2 {
 
     bool m_drawMCSignal;
 
-    double m_zReference;
+//    double m_zReference;
 
     bool m_drawCands;
 

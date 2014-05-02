@@ -256,8 +256,8 @@ namespace Belle2 {
 
     int m_innermostAxialSLayer; //Innermost axial superlayer;
     int m_outermostAxialSLayer; //Outermost axial superlayer;
-    int m_innermostAxialLayer; //Innermost axial layer;
-    int m_outermostAxialLayer; //Outermost axial layer;
+//    int m_innermostAxialLayer; //Innermost axial layer;
+//    int m_outermostAxialLayer; //Outermost axial layer;
 
     double m_chi2;
     /**

@@ -50,33 +50,40 @@ void ProgressBarModule::event()
     double time_per_event = double(elapsedSec) / m_evtNr;
     int remainingSeconds = (m_nTotal - m_evtNr) * time_per_event;
 
-    std::cerr << "\r"; //carriage return
+    if (remainingSeconds >= 0) {
+      std::cerr << "\r"; //carriage return
 
-    const int bar_length = 50; //characters for bar
-    cerr << '[';
-    bool arrow_drawn = false;
-    for (int i = 0; i < bar_length; i++) {
-      char c = ' ';
-      if (double(i) / bar_length < ratio) {
-        c = '=';
-      } else if (!arrow_drawn) {
-        c = '>';
-        arrow_drawn = true;
+      const int bar_length = 50; //characters for bar
+      cerr << '[';
+      bool arrow_drawn = false;
+      for (int i = 0; i < bar_length; i++) {
+        char c = ' ';
+        if (double(i) / bar_length < ratio) {
+          c = '=';
+        } else if (!arrow_drawn) {
+          c = '>';
+          arrow_drawn = true;
+        }
+        cerr << c;
+
       }
-      cerr << c;
+      cerr << "] " << int(ratio * 100) << "% ";
+      if (remainingSeconds > 3600) {
+        int hours = remainingSeconds / 3600;
+        remainingSeconds %= 3600;
+        cerr << hours << "h";
+      }
+      if (remainingSeconds > 60) {
+        int minutes = remainingSeconds / 60;
+        remainingSeconds %= 60;
+        cerr << minutes << "m";
+      }
+      cerr << remainingSeconds << "s remaining";
+      //some spaces to overwrite other stuff
+      cerr << "          " << flush;
 
+      m_lastPrint = clockSec;
     }
-    cerr << "] " << int(ratio * 100) << "% ";
-    if (remainingSeconds > 60) {
-      int minutes = remainingSeconds / 60;
-      remainingSeconds %= 60;
-      cerr << minutes << "m";
-    }
-    cerr << remainingSeconds << "s remaining";
-    //some spaces to overwrite other stuff
-    cerr << "          " << flush;
-
-    m_lastPrint = clockSec;
   }
 
   ++m_evtNr;

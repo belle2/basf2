@@ -23,8 +23,8 @@ using namespace Belle2;
 
 CDCLegendreFastHough::CDCLegendreFastHough(bool reconstructCurler, bool useHitPrecalculatedR,
                                            int maxLevel, int nbinsTheta, double rMin, double rMax):
-  m_useHitPrecalculatedR(useHitPrecalculatedR), m_reconstructCurler(reconstructCurler), m_maxLevel(maxLevel),
-  m_nbinsTheta(nbinsTheta), m_rMin(rMin), m_rMax(rMax)
+/*m_useHitPrecalculatedR(useHitPrecalculatedR),*/ m_reconstructCurler(reconstructCurler), m_maxLevel(maxLevel),
+  m_nbinsTheta(nbinsTheta), /*m_rMin(rMin),*/ m_rMax(rMax)
 {
 
   //Initialize look-up table

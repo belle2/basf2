@@ -267,8 +267,7 @@ bool DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, i
   const string& relationsName = relationName(fromEntry->name, toEntry->name);
   const StoreObjConstIter& it = m_storeObjMap[c_Event].find(relationsName);
   if (it == m_storeObjMap[c_Event].end()) {
-    B2ERROR("No relation '" << relationsName << "' found. Please register it (using RelationArray::registerPersistent()) before trying to add relations.");
-    return false;
+    B2FATAL("No relation '" << relationsName << "' found. Please register it (using RelationArray::registerPersistent()) before trying to add relations.");
   }
   StoreEntry* entry = it->second;
 

@@ -110,6 +110,23 @@ namespace {
     EXPECT_B2FATAL(RelationArray(profileData, evtData, "test").getModified());
   }
 
+  /** */
+  TEST_F(RelationTest, RegistrationWithDefaultNames)
+  {
+    //not registered yet
+    EXPECT_B2FATAL(relObjData[0]->addRelationTo(profileData[3]));
+    EXPECT_B2FATAL(DataStore::Instance().addRelationFromTo((evtData)[0], (profileData)[1], 2.0));
+
+    DataStore::Instance().setInitializeActive(true);
+    RelationArray::registerPersistent<RelationsObject, ProfileInfo>(relObjData.getName(), "");
+    RelationArray::registerPersistent<EventMetaData, ProfileInfo>(evtData.getName(), "");
+    DataStore::Instance().setInitializeActive(false);
+
+    //profileData has default name, so this should be ok now
+    EXPECT_TRUE(relObjData[0]->addRelationTo(profileData[4]));
+    EXPECT_TRUE(DataStore::Instance().addRelationFromTo((evtData)[0], (profileData)[3], 2.0));
+  }
+
   /** Some events may have default constructed relations (i.e. nothing
    *  was inserted and create() was never called). For those, we don't
    *  want the construction of the array fail with a FATAL.

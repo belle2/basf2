@@ -53,9 +53,12 @@ namespace Belle2 {
     StoreArray<PIDLikelihood>::registerPersistent();
     RelationArray::registerPersistent<Track, PIDLikelihood>();
 
+    StoreArray<Track>::required();
     StoreArray<TOPLikelihood>::optional();
     StoreArray<ARICHLikelihood>::optional();
     StoreArray<DedxLikelihood>::optional();
+    StoreArray<ECLPidLikelihood>::optional();
+    StoreArray<Muid>::optional();
   }
 
 
@@ -111,11 +114,6 @@ namespace Belle2 {
 
     }
 
-  }
-
-
-  void MdstPIDModule::printModuleParams() const
-  {
   }
 
 

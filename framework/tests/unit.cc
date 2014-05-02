@@ -7,8 +7,9 @@
 #include <cmath>
 
 using namespace std;
+using namespace Belle2;
 
-namespace Belle2 {
+namespace {
   /** check manual conversion. */
   TEST(UnitTest, MultiplyDivide)
   {

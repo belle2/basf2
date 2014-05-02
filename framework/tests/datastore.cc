@@ -10,8 +10,9 @@
 #include <algorithm>
 
 using namespace std;
+using namespace Belle2;
 
-namespace Belle2 {
+namespace {
   /** Set up a few arrays and objects in the datastore */
   class DataStoreTest : public ::testing::Test {
   protected:

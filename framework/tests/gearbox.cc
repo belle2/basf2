@@ -12,8 +12,9 @@
 #include <boost/foreach.hpp>
 
 using namespace std;
+using namespace Belle2;
 
-namespace Belle2 {
+namespace {
 
   /** Test opening Belle2.xml and accessing nodes from Gearbox */
   TEST(GearBox, Open)

@@ -10,8 +10,9 @@
 
 #include <iostream>
 using namespace std;
+using namespace Belle2;
 
-namespace Belle2 {
+namespace {
   /** test relations. */
   class RelationTest : public ::testing::Test {
   protected:

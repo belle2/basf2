@@ -6,8 +6,9 @@
 #include <boost/foreach.hpp>
 #include <iostream>
 using namespace std;
+using namespace Belle2;
 
-namespace Belle2 {
+namespace {
   /** test relation consolidation. */
   class RelationConsolidateTest : public ::testing::Test {
   protected:

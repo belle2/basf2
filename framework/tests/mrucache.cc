@@ -4,9 +4,9 @@
 #include <string>
 
 using namespace std;
+using namespace Belle2;
 
-namespace Belle2 {
-
+namespace {
   /** check constructing and retrieving data from MRUCache */
   TEST(MRUCache, Constructor)
   {

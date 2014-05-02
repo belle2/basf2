@@ -12,8 +12,9 @@
 #include <gtest/gtest.h>
 
 using namespace std;
+using namespace Belle2;
 
-namespace Belle2 {
+namespace {
   /** create a more or less complex RelationContainer. */
   RelationContainer* createObject()
   {

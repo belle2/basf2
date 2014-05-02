@@ -7,9 +7,9 @@
 #include <math.h>
 
 using namespace std;
+using namespace Belle2;
 
-namespace Belle2 {
-
+namespace {
   /** Check basics. */
   TEST(ConstTest, ParticleBasics)
   {

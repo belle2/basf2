@@ -66,11 +66,12 @@ void ROIpayload::setPayloadLength()
 void ROIpayload::setHeader()
 {
 
-  m_data32[1] = htobe32(0xCAFE8000);
+  //  m_data32[1] = htobe32(0xCAFE8000);
   //  TODO
   //  warning: use of logical '||' with constant operand [-Wconstant-logical-operand]
   //
   //  m_data32[1] = htonl(0xCAFE8000 || 1 << 13);
+  m_data32[1] = htonl(0xCAFE8000 << 13);
 
 };
 

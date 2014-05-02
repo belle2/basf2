@@ -101,6 +101,20 @@ namespace Belle2 {
 #define B2FATAL(streamText) \
   B2LOGMESSAGE(LogConfig::c_Fatal, 0, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__)
 
+#ifdef LOG_NO_B2ASSERT
+#define B2ASSERT(message, condition)
+#else
+  /**
+   * if 'condition' is false, abort execution with a B2FATAL.
+   * If the LOG_NO_B2ASSERT macro is defined when framework/logging/Logger.h is included (e.g. via -DLOG_NO_B2ASSERT), these are compiled out.
+   */
+#define B2ASSERT(message, condition) { \
+    if (!(condition)) { \
+      B2LOGMESSAGE(LogConfig::c_Fatal, 0, message, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__) \
+    } \
+  }
+#endif
+
   /**
    * \def B2METHOD()
    * scoped logging for entering/leaving methods.

@@ -521,6 +521,27 @@ namespace {
       EXPECT_EQ(c_MisID, getMCTruthStatus(d.m_particle, d.m_mcparticle)) << d.getString();
     }
   }
+  /** decay correctly reconstructed, but we messed up the assignment of pion tracks */
+  TEST_F(MCMatchingTest, CorrectDecayParticlesSwitched)
+  {
+    {
+      Decay d(-413, {{ -421, {321, -211, {111, {22, 22}}}}, -211});
+      d.finalize();
+
+      Decay& pi1 = d[0][1];
+      Decay& pi2 = d[1];
+
+      ASSERT_TRUE(pi1.m_pdg == pi2.m_pdg);
+
+      d.reconstruct({ -413, {{ -421, {321, { -211, {}, Decay::c_ReconstructFrom, &pi2}, {111, {22, 22}}}}, { -211, {}, Decay::c_ReconstructFrom, &pi1}}});
+
+
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
+      //TODO: doesn't have a flag yet, but shouldn't be 0
+      EXPECT_NE(0, getMCTruthStatus(d.m_particle, d.m_mcparticle)) << d.getString();
+    }
+  }
 
   //what's going on here?
 //[ERROR] isSignal=1, status=0, for |PDG| = 421, idx 4: 413 [ 421 [ -321 [ ] 211 [ ] 111 [ 22 22 ] ] 211 [ ] ]   { module: VariablesToNtuple }

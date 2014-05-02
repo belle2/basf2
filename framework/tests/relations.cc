@@ -123,8 +123,8 @@ namespace {
     DataStore::Instance().setInitializeActive(false);
 
     //profileData has default name, so this should be ok now
-    EXPECT_TRUE(relObjData[0]->addRelationTo(profileData[4]));
-    EXPECT_TRUE(DataStore::Instance().addRelationFromTo((evtData)[0], (profileData)[3], 2.0));
+    relObjData[0]->addRelationTo(profileData[4]);
+    DataStore::Instance().addRelationFromTo((evtData)[0], (profileData)[3], 2.0);
   }
 
   /** Some events may have default constructed relations (i.e. nothing
@@ -458,18 +458,20 @@ namespace {
     RelationArray(relObjData, profileData).registerAsPersistent();
     DataStore::Instance().setInitializeActive(false);
 
-    bool ret = (relObjData)[0]->addRelationTo((profileData)[0], -42.0);
-    EXPECT_TRUE(ret);
+    (relObjData)[0]->addRelationTo((profileData)[0], -42.0);
 
     RelationVector<ProfileInfo> rels = (relObjData)[0]->getRelationsTo<ProfileInfo>();
     EXPECT_TRUE(rels.size() == 1);
     EXPECT_TRUE(rels.object(0) == (profileData)[0]);
     EXPECT_DOUBLE_EQ(rels.weight(0), -42.0);
 
-    //should be safe
-    EXPECT_FALSE((relObjData)[0]->addRelationTo(static_cast<TObject*>(nullptr)));
+    //adding relations to NULL is safe and doesn't do anything
+    (relObjData)[0]->addRelationTo(static_cast<TObject*>(nullptr));
+    (relObjData)[0]->addRelationTo(static_cast<ProfileInfo*>(nullptr));
+
+    //if we cannot create a relation to an actual object given, this is obivously wrong
     ProfileInfo notInArray;
-    EXPECT_FALSE((relObjData)[0]->addRelationTo(&notInArray));
+    EXPECT_B2FATAL((relObjData)[0]->addRelationTo(&notInArray));
   }
 
   /** Test updating of index after using addRelation. */
@@ -482,8 +484,7 @@ namespace {
     //not yet set
     EXPECT_FALSE((relObjData)[0]->getRelated<ProfileInfo>() != NULL);
 
-    bool ret = (relObjData)[0]->addRelationTo((profileData)[0], -42.0);
-    EXPECT_TRUE(ret);
+    (relObjData)[0]->addRelationTo((profileData)[0], -42.0);
 
     //now it should be found (index updated because RelationContainer was just created)
     EXPECT_TRUE((relObjData)[0]->getRelated<ProfileInfo>() != NULL);
@@ -491,8 +492,7 @@ namespace {
     //test again with different object
     EXPECT_FALSE((relObjData)[1]->getRelated<ProfileInfo>() != NULL);
 
-    ret = (relObjData)[1]->addRelationTo((profileData)[0], -42.0);
-    EXPECT_TRUE(ret);
+    (relObjData)[1]->addRelationTo((profileData)[0], -42.0);
 
     //now it should be found (index updated because addRelation marks RelationContainer as modified)
     EXPECT_TRUE((relObjData)[1]->getRelated<ProfileInfo>() != NULL);

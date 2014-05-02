@@ -110,9 +110,9 @@ bool setMCTruth(const Particle* particle)
 
   MCParticle* mcMatch = mcParticles[motherIndex - 1];
 
-  bool result = particle->addRelationTo(mcMatch);
+  particle->addRelationTo(mcMatch);
 
-  return result;
+  return true;
 }
 
 int getMCTruthStatus(const Particle* particle, const MCParticle* mcParticle)

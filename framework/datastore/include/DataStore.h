@@ -238,9 +238,8 @@ namespace Belle2 {
      *  @param toEntry        Data store entry that contains the toObject. Used for caching. Will be set if NULL.
      *  @param toIndex        Index in TClonesArray that contains the toObject. Used for caching. Will be set if < 0.
      *  @param weight         Weight of the relation.
-     *  @return               True if the relation was created, false otherwise.
      */
-    bool addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject, StoreEntry*& toEntry, int& toIndex, double weight);
+    void addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject, StoreEntry*& toEntry, int& toIndex, double weight);
 
     /** Add a relation from an object in a store array to another object in a store array.
      *
@@ -249,12 +248,11 @@ namespace Belle2 {
      *  @param fromIndex      Index in TClonesArray that contains the fromObject. Used for caching. Will be set if < 0.
      *  @param toObject       Pointer to the object to which the relation points.
      *  @param weight         Weight of the relation.
-     *  @return               True if the relation was created, false otherwise.
      */
-    inline bool addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject, double weight) {
+    inline void addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject, double weight) {
       StoreEntry* toEntry = nullptr;
       int toIndex = -1;
-      return addRelation(fromObject, fromEntry, fromIndex, toObject, toEntry, toIndex, weight);
+      addRelation(fromObject, fromEntry, fromIndex, toObject, toEntry, toIndex, weight);
     }
 
 
@@ -295,12 +293,11 @@ namespace Belle2 {
      *  @param fromObject     Pointer to the object from which the relation points.
      *  @param toObject       Pointer to the object to which the relation points.
      *  @param weight         Weight of the relation.
-     *  @return               True if the relation was created, false otherwise.
      */
-    static bool addRelationFromTo(const TObject* fromObject, const TObject* toObject, double weight = 1) {
-      DataStore::StoreEntry* storeEntry = NULL;
+    static void addRelationFromTo(const TObject* fromObject, const TObject* toObject, double weight = 1.0) {
+      DataStore::StoreEntry* storeEntry = nullptr;
       int index = -1;
-      return Instance().addRelation(fromObject, storeEntry, index, toObject, weight);
+      Instance().addRelation(fromObject, storeEntry, index, toObject, weight);
     }
 
     /** Get the relations from an object to other objects in a store array.
@@ -316,14 +313,14 @@ namespace Belle2 {
      *  @return               Vector of relation entry objects.
      */
     template <class TO> static RelationVector<TO> getRelationsFromObj(const TObject* fromObject, const std::string& toName = "") {
-      StoreEntry* storeEntry = 0;
+      StoreEntry* storeEntry = nullptr;
       int index = -1;
       return RelationVector<TO>(Instance().getRelationsWith(c_ToSide, fromObject, storeEntry, index, TO::Class(), toName));
     }
 
     /** Get the relations to an object from other objects in a store array.
      *
-     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching.
+     *  @note If at all possible, use RelationsObject members instead, as they allow more efficent caching.
      *
      *  @sa RelationsInterface::getRelationsFrom
      *  @param toObject       Pointer to the object to which the relations point.
@@ -334,7 +331,7 @@ namespace Belle2 {
      *  @return               Vector of relation entry objects.
      */
     template <class FROM> static RelationVector<FROM> getRelationsToObj(const TObject* toObject, const std::string& fromName = "") {
-      StoreEntry* storeEntry = 0;
+      StoreEntry* storeEntry = nullptr;
       int index = -1;
       return RelationVector<FROM>(Instance().getRelationsWith(c_FromSide, toObject, storeEntry, index, FROM::Class(), fromName));
     }
@@ -354,7 +351,7 @@ namespace Belle2 {
      *  @return               Vector of relation entry objects.
      */
     template <class T> static RelationVector<T> getRelationsWithObj(const TObject* object, const std::string& name = "") {
-      StoreEntry* storeEntry = 0;
+      StoreEntry* storeEntry = nullptr;
       int index = -1;
       return RelationVector<T>(Instance().getRelationsWith(c_BothSides, object, storeEntry, index, T::Class(), name));
     }
@@ -371,8 +368,8 @@ namespace Belle2 {
      *  @return        The related object or a null pointer.
      */
     template <class TO> static TO* getRelatedFromObj(const TObject* fromObject, const std::string& toName = "") {
-      if (!fromObject) return 0;
-      StoreEntry* storeEntry = 0;
+      if (!fromObject) return nullptr;
+      StoreEntry* storeEntry = nullptr;
       int index = -1;
       return static_cast<TO*>(DataStore::Instance().getRelationWith(c_ToSide, fromObject, storeEntry, index, TO::Class(), toName).object);
     }
@@ -389,8 +386,8 @@ namespace Belle2 {
      *  @return         The related object or a null pointer.
      */
     template <class FROM> static FROM* getRelatedToObj(const TObject* toObject, const std::string& fromName = "") {
-      if (!toObject) return 0;
-      StoreEntry* storeEntry = 0;
+      if (!toObject) return nullptr;
+      StoreEntry* storeEntry = nullptr;
       int index = -1;
       return static_cast<FROM*>(DataStore::Instance().getRelationWith(c_FromSide, toObject, storeEntry, index, FROM::Class(), fromName).object);
     }
@@ -405,8 +402,8 @@ namespace Belle2 {
      *  @return        The related object or a null pointer.
      */
     template <class T> static T* getRelated(const TObject* object, const std::string& name = "") {
-      if (!object) return 0;
-      StoreEntry* storeEntry = 0;
+      if (!object) return nullptr;
+      StoreEntry* storeEntry = nullptr;
       int index = -1;
       return static_cast<T*>(DataStore::Instance().getRelationWith(c_BothSides, object, storeEntry, index, T::Class(), name).object);
     }

@@ -255,13 +255,20 @@ void DataStore::getArrayNames(std::vector<std::string>& names, const std::string
   }
 }
 
-bool DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject, StoreEntry*& toEntry, int& toIndex, double weight)
+void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject, StoreEntry*& toEntry, int& toIndex, double weight)
 {
+  if (!fromObject or !toObject)
+    return;
+
   // get entry from which the relation points
-  if (!findStoreEntry(fromObject, fromEntry, fromIndex)) return false;
+  if (!findStoreEntry(fromObject, fromEntry, fromIndex)) {
+    B2FATAL("Couldn't find from-side entry for relation between " << fromObject->ClassName() << " and " << toObject->ClassName());
+  }
 
   // get entry to which the relation points
-  if (!findStoreEntry(toObject, toEntry, toIndex)) return false;
+  if (!findStoreEntry(toObject, toEntry, toIndex)) {
+    B2FATAL("Couldn't find to-side entry for relation between " << fromObject->ClassName() << " and " << toObject->ClassName());
+  }
 
   // get the relations from -> to
   const string& relationsName = relationName(fromEntry->name, toEntry->name);
@@ -296,8 +303,6 @@ bool DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, i
     //mark for rebuilding later on
     relContainer->setModified(true);
   }
-
-  return true;
 }
 
 std::vector<RelationEntry> DataStore::getRelationsWith(ESearchSide searchSide, const TObject* object, DataStore::StoreEntry*& entry, int& index, const TClass* withClass, const std::string& withName)

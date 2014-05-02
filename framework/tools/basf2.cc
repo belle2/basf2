@@ -288,6 +288,9 @@ int main(int argc, char* argv[])
 
     if (varMap.count("visualize-dataflow")) {
       Environment::Instance().setVisualizeDataFlow(true);
+      if (Environment::Instance().getNumberProcesses() > 0) {
+        B2WARNING("--visualize-dataflow cannot be used with parallel processing, no graphs will be saved!");
+      }
     }
 
     if (varMap.count("module-io")) {

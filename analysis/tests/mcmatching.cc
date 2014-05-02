@@ -517,24 +517,69 @@ namespace {
       EXPECT_EQ(c_MisID, getMCTruthStatus(d.m_particle, d.m_mcparticle)) << d.getString();
     }
   }
-  /** decay correctly reconstructed, but we messed up the assignment of pion tracks */
-  TEST_F(MCMatchingTest, CorrectDecayParticlesSwitched)
+  /** Correctly reconstructed decay, except we switched some tracks around. */
+  TEST_F(MCMatchingTest, WrongCombination)
   {
+    /** decay correctly reconstructed, but we messed up the assignment of pion tracks */
     {
       Decay d(-413, {{ -421, {321, -211, {111, {22, 22}}}}, -211});
-      d.finalize();
 
-      Decay& pi1 = d[0][1];
-      Decay& pi2 = d[1];
+      Decay* pi1 = &(d[0][1]);
+      Decay* pi2 = &(d[1]);
+      ASSERT_TRUE(pi1->m_pdg == pi2->m_pdg);
 
-      ASSERT_TRUE(pi1.m_pdg == pi2.m_pdg);
-
-      d.reconstruct({ -413, {{ -421, {321, { -211, {}, Decay::c_ReconstructFrom, &pi2}, {111, {22, 22}}}}, { -211, {}, Decay::c_ReconstructFrom, &pi1}}});
+      d.reconstruct({ -413, {{ -421, {321, { -211, {}, Decay::c_ReconstructFrom, pi2}, {111, {22, 22}}}}, { -211, {}, Decay::c_ReconstructFrom, pi1}}});
 
 
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
       //TODO: doesn't have a flag yet, but shouldn't be 0
+      EXPECT_NE(0, getMCTruthStatus(d.m_particle, d.m_mcparticle)) << d.getString();
+    }
+
+    /** B0 -> phi [K+ K-] phi [K+ K-] with Ks from both sides switched*/
+    {
+      Decay d(511, {{333, {321, -321}}, {333, {321, -321}}});
+      d.finalize();
+
+      Decay* k1 = &(d[0][1]);
+      Decay* k2 = &(d[1][1]);
+      ASSERT_TRUE(k1->m_pdg == k2->m_pdg);
+
+      d.reconstruct({511, {
+          {333, {321, { -321, {}, Decay::c_ReconstructFrom, k2}}},
+          {333, {321, { -321, {}, Decay::c_ReconstructFrom, k1}}}
+        }
+      });
+
+
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
+      //TODO: doesn't have a flag yet, but shouldn't be 0
+      EXPECT_NE(0, getMCTruthStatus(d.m_particle, d.m_mcparticle)) << d.getString();
+    }
+  }
+  /** Reconstruct both Bs, but switch pi0 to other B */
+  TEST_F(MCMatchingTest, SelfCrossFeed)
+  {
+    {
+      Decay d(300533, {{511, {321, -211, {111, {22, 22}}}}, { -511, { -321, 211, {111, {22, 22}}}}});
+      d.finalize();
+
+      Decay* pi1 = &(d[0][2]);
+      Decay* pi2 = &(d[1][2]);
+      ASSERT_TRUE(pi1->m_pdg == pi2->m_pdg);
+
+      d.reconstruct({300533, {
+          {511, {321, -211, {111, {22, 22}, Decay::c_ReconstructFrom, pi2}}},
+          { -511, { -321, 211, {111, {22, 22}, Decay::c_ReconstructFrom, pi1}}}
+        }
+      });
+
+
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
+      //TODO: doesn't have a flag yet, but shouldn't be 0 (same as for WrongCombination? does this warrant an own flag?)
       EXPECT_NE(0, getMCTruthStatus(d.m_particle, d.m_mcparticle)) << d.getString();
     }
   }

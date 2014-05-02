@@ -31,7 +31,7 @@ TelRecoHit::TelRecoHit():
   m_energyDep(0)//, m_energyDepError(0)
 {}
 
-TelRecoHit::TelRecoHit(const TelTrueHit* hit, const genfit::TrackCandHit* trackCandHit, float sigmaU, float sigmaV):
+TelRecoHit::TelRecoHit(const TelTrueHit* hit, const genfit::TrackCandHit*, float sigmaU, float sigmaV):
   genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit), m_cluster(0),
   m_energyDep(0)//, m_energyDepError(0)
 {
@@ -83,7 +83,7 @@ TelRecoHit::TelRecoHit(const TelCluster* hit, float sigmaU, float sigmaV, float 
 }
 
 
-TelRecoHit::TelRecoHit(const TelCluster* hit, const genfit::TrackCandHit* trackCandHit):
+TelRecoHit::TelRecoHit(const TelCluster* hit, const genfit::TrackCandHit*):
   genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_cluster(hit),
   m_energyDep(0)//, m_energyDepError(0)
 {

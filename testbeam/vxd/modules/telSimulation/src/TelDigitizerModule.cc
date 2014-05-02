@@ -42,12 +42,12 @@ REG_MODULE(TelDigitizer)
 
 TelDigitizerModule::TelDigitizerModule() : Module(),
   m_elNoise(300.0), m_SNThreshold(5), m_noiseFraction(0), m_currentHit(0),
-  m_currentParticle(0), m_currentSensor(0), m_currentSensorInfo(0),
-  m_currentTrueHit(0)
+  m_currentParticle(0), m_currentTrueHit(0), m_currentSensor(0),
+  m_currentSensorInfo(0)
 {
   //Set module properties
   setDescription("Digitize TelSimHits");
-  setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("ElectronicNoise", m_elNoise,
            "Noise added by the electronics, set in ENC", 300.0);

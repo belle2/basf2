@@ -25,7 +25,7 @@ release = str(os.getenv('BELLE2_LOCAL_DIR')) + '/'
 # -------------------------------------------------
 
 # Geometry file: _v1 for GeoID=0, _v2 for GeoID=1
-geometry = 'testbeam/vxd/FullTelescopeVXDTB_v2.xml'  # Gear path
+geometry_file = 'testbeam/vxd/FullTelescopeVXDTB_v2.xml'  # Gear path
 # geometry = 'testbeam/vxd/FullTelescopeVXDTB_v1.xml' # Gear path
 
 # Custom alignment must be set at the very begining as it modifies main xml
@@ -73,11 +73,11 @@ histo = register_module('HistoManager')
 histo.param('histoFileName', output_dqm)
 
 # Set the custom alignment
-set_alignment = SetAlignment(release + 'data/' + geometry, alignment)
+set_alignment = SetAlignment(release + 'data/' + geometry_file, alignment)
 
 # Load parameters from xml
 gearbox = register_module('Gearbox')
-gearbox.param('fileName', geometry)
+gearbox.param('fileName', geometry_file)
 
 # Create geometry
 geometry = register_module('Geometry')

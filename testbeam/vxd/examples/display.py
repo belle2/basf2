@@ -9,7 +9,7 @@ events = 100  # Number of events to simulate
 momentum = 6.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
-theta_spread = 0.005  # # degrees (sigma of gaussian)
+theta_spread = 0.005  ## degrees (sigma of gaussian)
 phi = 180.0  # degrees
 phi_spread = 0.005  # degrees (sigma of gaussian)
 gun_x_position = 100.  # cm ... 100cm ... outside magnet + plastic shielding
@@ -60,7 +60,7 @@ progress = register_module('Progress')
 # Load parameters from xml
 gearbox = register_module('Gearbox')
 # This file contains the VXD (no Telescopes) beam test geometry including
-#the real PCMAG magnetic field
+# the real PCMAG magnetic field
 gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB_v2.xml')
 
 # Create geometry
@@ -74,7 +74,7 @@ geometry.param('components', ['MagneticField', 'TB'])
 simulation = register_module('FullSim')
 simulation.logging.log_level = LogLevel.ERROR
 # and make it store the particle trajectories so we can draw them
-simulation.param("trajectoryStore", 2)
+simulation.param('trajectoryStore', 2)
 
 # Uncomment the following lines to get particle tracks visualization
 # simulation.param('EnableVisualization', True)
@@ -88,7 +88,7 @@ PXDDigi = register_module('PXDDigitizer')
 SVDDigi = register_module('SVDDigitizer')
 # PXD/SVD clusterizer
 PXDClust = register_module('PXDClusterizer')
-#PXDClust.param('ClusterCacheSize', 576)
+# PXDClust.param('ClusterCacheSize', 576)
 SVDClust = register_module('SVDClusterizer')
 # Save output of simulation
 output = register_module('RootOutput')

@@ -9,20 +9,20 @@ from alignment_tools import *
 
 # Set the log level to show only warning, error and, fatal messages
 # otherwise there's gonna be a segfault when python exits
-set_log_level(LogLevel.WARNING)
+set_log_level(LogLevel.ERROR)
 release = str(os.getenv('BELLE2_LOCAL_DIR')) + '/'
 
 # ----------------------------------------------------------------
 #                  IMPORTANT SIMULATION SETTINGS
 # ----------------------------------------------------------------
 
-events = 10000
+events = 50000
 event_tracks = 1
 
-momentum = 3.0  # GeV/c
+momentum = 5.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
-theta_spread = 0.005  # # degrees (sigma of gaussian)
+theta_spread = 0.005  ## degrees (sigma of gaussian)
 phi = 180.0  # degrees
 phi_spread = 0.005  # degrees (sigma of gaussian)
 gun_x_position = 100.  # cm ... 100cm ... outside magnet + plastic shielding + Al scatterer (air equiv.)
@@ -105,13 +105,45 @@ if PCMAG_ON:
 else:
     teldigi.param('tanLorentz', 0.)
 
+# PXD clusterizer
+PXDClust = register_module('PXDClusterizer')
+if PCMAG_ON:
+    PXDClust.param('TanLorentz', 0.1625)  # value scaled from 0.25 for 1.5T to 0.975T
+else:
+    PXDClust.param('TanLorentz', 0.)
+
+# SVD clusterizer
+SVDClust = register_module('SVDClusterizer')
+if PCMAG_ON:
+    SVDClust.param('TanLorentz_holes', 0.052)  # value scaled from 0.08 for 1.5T to 0.975T
+    SVDClust.param('TanLorentz_electrons', 0.)
+else:
+    SVDClust.param('TanLorentz_holes', 0.)
+    SVDClust.param('TanLorentz_electrons', 0.)
+
+# EUDET clusterizer
+TelClust = register_module('TelClusterizer')
+TelClust.param('Clusters', 'TelClusters')
+
+mctf = register_module('TrackFinderMCTruth')
+param_mctrackfinder = {
+    'UseCDCHits': 0,
+    'UseSVDHits': 1,
+    'UsePXDHits': 1,
+    'Smearing': 0,
+    'UseClusters': True,
+    'WhichParticles': ['primary'],
+    }
+mctf.param(param_mctrackfinder)
+mctf.logging.log_level = LogLevel.ERROR
+
 dataWriter = register_module('RootOutput')
-dataWriter.param('outputFileName', 'MergedDigits.root')
+dataWriter.param('outputFileName', 'SimulatedDigits.root')
 # Here you can state which branches you want to output
 # Using this branches, you remove Monte Carlo information and the resulting
 # file will look exactly as merged digits from real testbeam data
-dataWriter.param('branchNames', ['EventMetaData', 'TelEventInfo', 'PXDDigits',
-                 'SVDDigits', 'TelDigits'])
+# dataWriter.param('branchNames', ['EventMetaData', 'TelEventInfo', 'PXDDigits',
+#                 'SVDDigits', 'TelDigits'])
 
 progress = register_module('Progress')
 
@@ -126,7 +158,19 @@ main.add_module(particlegun)
 main.add_module(simulation)
 main.add_module(pxddigi)
 main.add_module(svddigi)
-main.add_module(teldigi)
+# main.add_module(teldigi)
+main.add_module(PXDClust)
+main.add_module(SVDClust)
+# main.add_module(TelClust)
+main.add_module(mctf)
+gbl = register_module('GBLfit')
+gbl.logging.log_level = LogLevel.ERROR
+# gbl.param('noEffects', True)
+gbl.param('UseClusters', True)
+gbl.param('enableIntermediateScatterer', True)
+main.add_module(gbl)
+# d = register_module('Display')
+# main.add_module(d)
 main.add_module(dataWriter)
 main.add_module(progress)
 

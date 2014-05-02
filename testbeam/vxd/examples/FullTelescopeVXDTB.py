@@ -6,11 +6,11 @@
 
 # Important parameters of the simulation:
 events = 1000  # Number of events to simulate
-fieldOn = False  # Turn field on or off (changes geometry components and digi/clust params)
+fieldOn = True  # Turn field on or off (changes geometry components and digi/clust params)
 momentum = 6.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
-theta_spread = 0.005  # # degrees (sigma of gaussian)
+theta_spread = 0.005  ## degrees (sigma of gaussian)
 phi = 180.0  # degrees
 phi_spread = 0.005  # degrees (sigma of gaussian)
 gun_x_position = 100.  # cm ... 100cm ... outside magnet + plastic shielding + Al scatterer (air equiv.)
@@ -104,7 +104,7 @@ else:
 
 SVDClust = register_module('SVDClusterizer')
 if fieldOn:
-    SVDClust.param('TanLorentz_holes', 0.052)
+    SVDClust.param('TanLorentz_holes', 0.)  # 0.052
     SVDClust.param('TanLorentz_electrons', 0.)
 else:
     SVDClust.param('TanLorentz_holes', 0.)  # value scaled from 0.08 for 1.5T to 0.975T
@@ -139,7 +139,7 @@ mctrackfinder.param(param_mctrackfinder)
 gblfitter = register_module('GBLfit')
 gblfitter.logging.log_level = LogLevel.WARNING
 gblfitter.param('UseClusters', True)
-# gblfitter.param('FilterId', 'GBL')
+# gblfitter.param('noEffects', True)
 
 # Check track fitting results
 trackfitchecker = register_module('TrackFitChecker')
@@ -166,14 +166,16 @@ main.add_module(PXDDigi)
 # This module changes specified PXD sensors to binary readout: EUDET emulation
 # It must be before PXDClusterizer in the path!
 EUDET_emulator = register_module('ChangePXDDigitsToBinary')
-main.add_module(EUDET_emulator)
+# main.add_module(EUDET_emulator)
 
 main.add_module(SVDDigi)
 main.add_module(PXDClust)
 main.add_module(SVDClust)
 main.add_module(mctrackfinder)
+gf = register_module('GenFitter')
+main.add_module(gf)
 main.add_module(gblfitter)
-main.add_module(trackfitchecker)
+# main.add_module(trackfitchecker)
 main.add_module(geosaver)
 main.add_module(output)
 main.add_module(display)

@@ -12,6 +12,7 @@
 #include <framework/core/Path.h>
 #include <framework/core/Environment.h>
 #include <framework/core/ModuleManager.h>
+#include <framework/logging/LogConfig.h>
 
 #include <boost/filesystem/path.hpp>
 
@@ -81,6 +82,7 @@ Environment::Environment() :
   m_inputFilesOverride(),
   m_outputFileOverride(""),
   m_numberProcessesOverride(-1),
+  m_logLevelOverride(LogConfig::c_Default),
   m_visualizeDataFlow(false),
   m_noStats(false),
   m_dryRun(false)

@@ -17,6 +17,8 @@
 #include <framework/logging/LogConnectionTxtFile.h>
 #include <framework/logging/LogConnectionIOStream.h>
 
+#include <framework/core/Environment.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace boost::python;
@@ -24,6 +26,10 @@ using namespace boost::python;
 
 void LogPythonInterface::setLogLevel(LogConfig::ELogLevel level)
 {
+  LogConfig::ELogLevel overrideLevel = (LogConfig::ELogLevel)Environment::Instance().getLogLevelOverride();
+  if (overrideLevel != LogConfig::c_Default)
+    level = overrideLevel;
+
   LogSystem::Instance().getLogConfig()->setLogLevel(level);
 }
 
@@ -117,6 +123,7 @@ void LogPythonInterface::exposePythonAPI()
 
   scope global;
 
+  //needed to get line numbers etc. when using B2INFO() and friends in Python
   global.attr("inspect") = import("inspect");
 
   //Interface LogLevel enum

@@ -67,9 +67,7 @@ namespace Belle2 {
     void resetLogConnections();
 
     /**
-     * Returns the log system configuration.
-     *
-     * @return The log system configuration.
+     * Returns global log system configuration.
      */
     LogConfig* getLogConfig() {return &m_logConfig;}
 

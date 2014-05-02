@@ -1,5 +1,8 @@
+#include <analysis/utility/mcParticleMatching.h>
+#include <analysis/utility/MCMatchStatus.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
+
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <framework/datastore/StoreArray.h>
@@ -7,8 +10,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 
-#include <analysis/utility/mcParticleMatching.h>
-#include <analysis/utility/MCMatchStatus.h>
 #include <gtest/gtest.h>
 
 using namespace std;
@@ -79,11 +80,10 @@ namespace {
     enum EBehavior {
       c_Default, /**< for FSPs, relate with corresponding particle in created decay. */
       c_CreateNewMCParticle, /**< Create a new MCParticle and relate this particle with it. */
-      c_RelateWithFirst, /**< Relate with mcparticles[0]. */
-      c_RelateWith, /**< Relate with specified MCParticle. */
-      c_ReconstructFrom, /**< Create Particle from given MCParticle (and associated daughters). */
+      c_RelateWith, /**< Relate with specified MCParticle (but reconstruct from same particle as usually). */
+      c_ReconstructFrom, /**< Create Particle from given Decay (and associated daughters). */
     };
-    /** create MCParticles for decay of particle with 'pdg' to given daguhterPDG codes. */
+    /** create MCParticles for decay of particle with 'pdg' to given daughter PDG codes. */
     Decay(int pdg, std::vector<Decay> daughters = std::vector<Decay>()):
       m_pdg(pdg), m_daughterDecays(daughters), m_mcparticle(nullptr), m_particle(nullptr) {
       m_graphParticle = &gParticleGraph.addParticle();
@@ -162,8 +162,7 @@ namespace {
      *
      * Particle creation can be skipped by specifying PDG=0 in a specific place.
      *
-     * TODO: things like _other_ photon being the true one?
-     * TODO: additional Particles?
+     * TODO: adding additional Particles (i.e. more than MCParticles) doesn't work yet
      */
     void reconstruct(ReconstructedDecay decay) {
       if (!m_mcparticle) {
@@ -173,10 +172,6 @@ namespace {
         m_graphParticle = &gParticleGraph.addParticle();
         m_graphParticle->setPDG(decay.m_pdg);
         finalize(); //overwrites m_mcparticle with the new particle
-      } else if (decay.m_behavior == c_RelateWithFirst) {
-        StoreArray<MCParticle> mcparticles;
-        m_mcparticle = mcparticles[0];
-        ASSERT_TRUE(m_mcparticle != nullptr);
       } else if (decay.m_behavior == c_RelateWith) {
         m_mcparticle = decay.m_optMcPart;
         ASSERT_TRUE(m_mcparticle != nullptr);
@@ -452,7 +447,8 @@ namespace {
   {
     {
       Decay d(521, {211, {421, {321, -211, {111, {22, 22}}}}});
-      d.reconstruct({521, {211, {421, {321, -211, {111, {22, {22, {}, Decay::c_RelateWithFirst}}}}}}});
+      d.finalize();
+      d.reconstruct({521, {211, {421, {321, -211, {111, {{22}, {22, {}, Decay::c_RelateWith, d.getMCParticle(521)}}}}}}});
       //result: pi0 gets MC match 521
       const Particle* p = d.getParticle(421);
       const MCParticle* mc = d.getMCParticle(421);
@@ -542,9 +538,6 @@ namespace {
       EXPECT_NE(0, getMCTruthStatus(d.m_particle, d.m_mcparticle)) << d.getString();
     }
   }
-
-  //what's going on here?
-//[ERROR] isSignal=1, status=0, for |PDG| = 421, idx 4: 413 [ 421 [ -321 [ ] 211 [ ] 111 [ 22 22 ] ] 211 [ ] ]   { module: VariablesToNtuple }
 
 }  // namespace
 #endif

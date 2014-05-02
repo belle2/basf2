@@ -10,6 +10,7 @@ env['LIBS'] = [
     'testbeam_vxd_dataobjects',
     'cdc', 'cdc_dataobjects',
     'genfit2',
+    'geometry', 'pxd', 'svd', 'testbeam'
     ]
 Return('env')
 

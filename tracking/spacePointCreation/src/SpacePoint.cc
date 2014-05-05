@@ -52,17 +52,17 @@ SpacePoint::SpacePoint(const PXDCluster& pxdCluster, unsigned int indexNumber, c
   }
 
   m_normalizedLocal = convertToNormalizedCoordinates(make_pair(pxdCluster.getU(), pxdCluster.getV()), m_vxdID, aSensorInfo);
-//   float halfSensorSizeU = 0.5 *  aSensorInfo->getUSize();
-//   float halfSensorSizeV = 0.5 *  aSensorInfo->getVSize();
-//   float localUPosition = pxdCluster.getU() + halfSensorSizeU;
-//   float localVPosition = pxdCluster.getV() + halfSensorSizeV;
+//   double halfSensorSizeU = 0.5 *  aSensorInfo->getUSize();
+//   double halfSensorSizeV = 0.5 *  aSensorInfo->getVSize();
+//   double localUPosition = pxdCluster.getU() + halfSensorSizeU;
+//   double localVPosition = pxdCluster.getV() + halfSensorSizeV;
 //   m_normalizedLocal[0] = localUPosition / aSensorInfo->getUSize();
 //   m_normalizedLocal[1] = localVPosition / aSensorInfo->getVSize();
 }
 
 
 
-std::pair<float, float> SpacePoint::convertToNormalizedCoordinates(const std::pair<float, float>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo)
+std::pair<double, double> SpacePoint::convertToNormalizedCoordinates(const std::pair<double, double>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo)
 {
   //We need some handle to translate IDs to local and global
   // coordinates.
@@ -76,26 +76,30 @@ std::pair<float, float> SpacePoint::convertToNormalizedCoordinates(const std::pa
   // we need to do some calculation.
 
 
-  float sensorSizeU =  aSensorInfo->getUSize();
-  float sensorSizeV =  aSensorInfo->getVSize();
+  double sensorSizeU =  aSensorInfo->getUSize(hitLocal.second); // this deals with the case of trapezoidal sensors too
+  double sensorSizeV =  aSensorInfo->getVSize();
 
-  // changed by Stefan F
-  float localUPosition = hitLocal.first +  0.5 * sensorSizeU;
-  float localVPosition = hitLocal.second +  0.5 * sensorSizeV;
+  double localUPosition = hitLocal.first +  0.5 * sensorSizeU;
+  localUPosition /= sensorSizeU;
+  boundaryCheck(localUPosition, 0, 1);
+  double localVPosition = hitLocal.second +  0.5 * sensorSizeV;
+  localVPosition /= sensorSizeV;
+  boundaryCheck(localVPosition, 0, 1);
 
   // old ones:
-  // float sensorSizeU =  aSensorInfo->getUSize(hitLocal.second);
-  // float sensorSizeV = 0.5 * aSensorInfo->getVSize();
+  // double sensorSizeU =  aSensorInfo->getUSize(hitLocal.second);
+  // double sensorSizeV = 0.5 * aSensorInfo->getVSize();
 
 //   B2INFO("localUPosition: " << localUPosition);
 //   B2INFO("localVPosition: " << localVPosition);
 
-  return make_pair(localUPosition / sensorSizeU, localVPosition / sensorSizeV);
+
+  return make_pair(localUPosition, localVPosition);
 }
 
 
 
-std::pair<float, float> SpacePoint::convertToLocalCoordinates(const std::pair<float, float>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo)
+std::pair<double, double> SpacePoint::convertToLocalCoordinates(const std::pair<double, double>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo)
 {
   //We need some handle to translate IDs to local and global
   // coordinates.
@@ -104,19 +108,19 @@ std::pair<float, float> SpacePoint::convertToLocalCoordinates(const std::pair<fl
   }
 
   // Changed by Stefan F
-  float localUPosition = hitNormalized.first - (0.5 * aSensorInfo->getUSize());
-  float localVPosition = hitNormalized.second - (0.5 * aSensorInfo->getVSize());
+  double localUPosition = hitNormalized.first - (0.5 * aSensorInfo->getUSize());
+  double localVPosition = hitNormalized.second - (0.5 * aSensorInfo->getVSize());
 
   // old ones:
-  //   float localVPosition = (hitNormalized.second - 0.5) * aSensorInfo->getVSize();
-  //   float localUPosition = (hitNormalized.first - 0.5) * aSensorInfo->getUSize();
+  //   double localVPosition = (hitNormalized.second - 0.5) * aSensorInfo->getVSize();
+  //   double localUPosition = (hitNormalized.first - 0.5) * aSensorInfo->getUSize();
 
   return (make_pair(localUPosition, localVPosition));
 }
 
 
 
-TVector3 SpacePoint::getGlobalCoordinates(const std::pair<float, float>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo)
+TVector3 SpacePoint::getGlobalCoordinates(const std::pair<double, double>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo)
 {
   //We need some handle to translate IDs to local and global
   // coordinates.

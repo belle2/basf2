@@ -63,41 +63,52 @@ namespace Belle2 {
 
 
     /** return the normalized local coordinates of the cluster in u (0 <= posU <= 1) */
-    float getNormalizedLocalU() const { return m_normalizedLocal.first/*m_normalizedLocal[0]*/; }
+    double getNormalizedLocalU() const { return m_normalizedLocal.first/*m_normalizedLocal[0]*/; }
 
 
     /** return the normalized local coordinates of the cluster in v (0 <= posV <= 1) */
-    float getNormalizedLocalV() const { return m_normalizedLocal.second/*m_normalizedLocal[1]*/; }
+    double getNormalizedLocalV() const { return m_normalizedLocal.second/*m_normalizedLocal[1]*/; }
 
 
     /** converts a local hit into sensor-independent relative coordinates.
      *
-     * first parameter is the local hit stored as a pair of floats.
+     * first parameter is the local hit stored as a pair of doubles.
      * second parameter is the coded vxdID, which carries the sensorID.
      * third parameter, a sensorInfo can be passed for testing purposes.
      *  If no sensorInfo is passed, the member gets its own pointer to it.
      */
-    static std::pair<float, float> convertToNormalizedCoordinates(const std::pair<float, float>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
+    static std::pair<double, double> convertToNormalizedCoordinates(const std::pair<double, double>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
     /** converts a hit in sensor-independent relative coordinates into local coordinate of given sensor.
      *
-     * first parameter is the hit in sensor-independent normalized coordinates stored as a pair of floats.
+     * first parameter is the hit in sensor-independent normalized coordinates stored as a pair of doubles.
      * second parameter is the coded vxdID, which carries the sensorID.
      * third parameter, a sensorInfo can be passed for testing purposes.
      *  If no sensorInfo is passed, the member gets its own pointer to it.
      */
-    static std::pair<float, float> convertToLocalCoordinates(const std::pair<float, float>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
+    static std::pair<double, double> convertToLocalCoordinates(const std::pair<double, double>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
     /** converts a local hit on a given sensor into global coordinates.
      *
-     * first parameter is the local hit stored as a pair of floats.
+     * first parameter is the local hit stored as a pair of doubles.
      * second parameter is the coded vxdID, which carries the sensorID.
      * third parameter, a sensorInfo can be passed for testing purposes.
      *  If no sensorInfo is passed, the member gets its own pointer to it.
      */
-    static TVector3 getGlobalCoordinates(const std::pair<float, float>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
+    static TVector3 getGlobalCoordinates(const std::pair<double, double>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
+
+
+    /** checks first parameter for boundaries.
+     *
+     * does take second/third argument for checking for lower/upper boundary.
+     * if boundary is crossed, value gets reset to boundary value
+     * */
+    static void boundaryCheck(double& value, double lower = 0, double higher = 1) {
+      if (value < lower) { value = lower; }
+      if (value > higher) { value = higher; }
+    }
 
 
   protected:
@@ -117,8 +128,8 @@ namespace Belle2 {
      *
      *  First entry is u, second is v
      */
-    std::pair<float, float> m_normalizedLocal;
-//     float m_normalizedLocal[2];
+    std::pair<double, double> m_normalizedLocal;
+//     double m_normalizedLocal[2];
 
     /** stores the vxdID */
     VxdID::baseType m_vxdID;

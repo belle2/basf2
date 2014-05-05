@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# test saving of invariant mass histograms
+# test saving of invariant mass histograms -- output of a) (PreCutHistMaker) and b) (ParticleCombiner -> MCMatching) should be identical
 
 import os
 from basf2 import *
@@ -23,18 +23,14 @@ main.add_module(register_module('ParticleLoader'))
 selectParticle('K-', -321, [], path=main)
 selectParticle('pi+', 211, [], path=main)
 
-# not necessary?
 selectParticle('g', 22, [], path=main)
 makeParticle('pi0', 111, ['g', 'g'], 0.110, 0.150, path=main)
 matchMCTruth('pi0', path=main)
-#selectParticle('pi0', 111, [], path=main)
-
-#makeParticle('D0', 421, ['K-', 'pi+', 'pi0'], 1.700, 2.000, path=main)
-#matchMCTruth('D0', path=main)
 
 combinedlist = 'D0'
 #daughters = ['K-', 'pi+', 'pi0']
 daughters = ['K-', 'pi+', 'pi0']
+
 #a) save signal invariant mass using PreCutHistMaker
 histmaker = register_module('PreCutHistMaker')
 histmaker.param('PDG', 421)
@@ -57,39 +53,6 @@ ntupler.param('variables', ['M', 'isSignal'])
 ntupler.param('particleList', combinedlist)
 main.add_module(ntupler)
 
-
-class TestModule(Module):
-    """print some debug info"""
-
-    def initialize(self):
-        """reimplementation of Module::initialize()."""
-
-    def event(self):
-        """reimplementation of Module::event()."""
-
-        particles = Belle2.PyStoreArray('Particles')
-        for p in particles:
-            mc = p.getRelated("MCParticles")
-            mcidx = ''
-            mcpdg = ''
-            more = ''
-            if mc is not None:
-                mcidx = mc.getArrayIndex()
-                mcpdg = mc.getPDG()
-                status = int(Belle2.analysis.particleMCMatchStatus(p))
-                more = 'status=' + str(status) + ' '
-                mom = mc.getMother()
-                if mom is not None:
-                    more = more + 'mom: ' + str(mom.getArrayIndex())
-                daughters = p.getDaughterIndices()
-                if daughters:
-                    more = more + ' daughter IDs:'
-                for d in daughters:
-                    more = more + ' ' + str(d)
-            print repr(p.getArrayIndex()).rjust(6), repr(p.getPDGCode()).rjust(6), repr(mcidx).rjust(6), repr(mcpdg).rjust(6), more
-
-
-#main.add_module(TestModule())
 #main.add_module(register_module('Interactive'))
 
 process(main)

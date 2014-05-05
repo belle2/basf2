@@ -10,16 +10,14 @@
 
 #include <analysis/modules/PreCutHistMaker/PreCutHistMakerModule.h>
 
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
-
-// dataobjects
-#include <mdst/dataobjects/MCParticle.h>
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/PSelectorFunctions.h>
 #include <analysis/utility/mcParticleMatching.h>
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <analysis/dataobjects/Particle.h>
+
+#include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
 
 #include <TH1F.h>
 
@@ -48,7 +46,7 @@ PreCutHistMakerModule::PreCutHistMakerModule()
 
 
   addParam("PDG", m_pdg, "PDG code of particle to reconstruct (anti-particles reconstructed implicitly)");
-  addParam("channelName", m_channelName, "Optional name for the channel which is used to name the histograms", string(""));
+  addParam("channelName", m_channelName, "Optional name for the channel which is used to name the histograms (e.g. 'signal'+channelName)", string(""));
   addParam("inputListNames", m_inputListNames, "Particle lists of the daughter particles to be combined. MCMatching should be run on these lists beforehand.");
 
   HistParams defaultHistParams = std::make_tuple(100, 0, 6);
@@ -144,14 +142,14 @@ void PreCutHistMakerModule::clearParticleLists()
 bool PreCutHistMakerModule::fillParticleLists(const std::vector<MCParticle*>& mcDaughters)
 {
   for (const MCParticle * mcPart : mcDaughters) {
-    B2WARNING("fillParticleLists: mc " << mcPart->getIndex() << " " << mcPart->getPDG());
+    //B2WARNING("fillParticleLists: mc " << mcPart->getIndex() << " " << mcPart->getPDG());
     const auto& particles = mcPart->getRelationsWith<Particle>();
     for (const Particle & p : particles) {
-      B2WARNING("fillParticleLists: adding p " << p.getArrayIndex() << " " << p.getPDGCode());
-      //TODO: do we want _all_ particles? or only correctly identified ones? (e.g. same pdg as mcPart)
+      //B2WARNING("fillParticleLists: adding p " << p.getArrayIndex() << " " << p.getPDGCode());
 
       //add particles into corresponding temporary lists
       for (auto & plist : m_tmpLists) {
+        //TODO: are there cases where we want misID-ed Particles? (e.g. pdg different mcPart)
         if (abs(p.getPDGCode()) == abs(plist->getPDG())) {
           plist->addParticle(&p);
         }
@@ -172,7 +170,7 @@ void PreCutHistMakerModule::saveCombinationsForSignal()
   vector<string> tmplistNames;
   for (const auto & list : m_tmpLists) {
     tmplistNames.push_back(list.getName());
-    list->print();
+    //list->print();
   }
 
   StoreArray<Particle> particles;
@@ -193,13 +191,13 @@ void PreCutHistMakerModule::saveCombinationsForSignal()
                                          indices);
 
     setMCTruth(part);
-    B2WARNING("combined Particle created.");
+    //B2WARNING("combined Particle created.");
     if (analysis::isSignal(part) < 0.5) {
-      B2WARNING("mcMatching says No. (status: " << getMCTruthStatus(part, part->getRelated<MCParticle>()));
-      part->print();
+      //B2WARNING("mcMatching says No. (status: " << getMCTruthStatus(part, part->getRelated<MCParticle>()));
+      //part->print();
       continue;
     }
-    B2WARNING("passed");
+    //B2WARNING("passed");
 
     //add invariant mass to histogram
     double mass = vec.M();
@@ -230,10 +228,7 @@ void PreCutHistMakerModule::saveAllCombinations()
 void PreCutHistMakerModule::event()
 {
   vector<StoreObjPtr<ParticleList> > plists;
-  std::multiset<int> expectedDaughterPDGs;
-  std::multiset<int> expectedDaughterPDGsBar;
   std::multiset<int> expectedDaughterPDGsAbs;
-  //for (string name : m_inputListNames) {
   for (unsigned i = 0; i < m_inputListNames.size(); i++) {
     const string name = m_inputListNames[i];
     StoreObjPtr<ParticleList> list(name);
@@ -247,8 +242,6 @@ void PreCutHistMakerModule::event()
       return;
     }
     plists.push_back(list);
-    expectedDaughterPDGs.insert(list->getPDG());
-    expectedDaughterPDGsBar.insert(list->getPDGbar());
     expectedDaughterPDGsAbs.insert(abs(list->getPDG()));
 
     //create temporary output lists (and replace any existing object)
@@ -269,12 +262,14 @@ void PreCutHistMakerModule::event()
       //compare PDG codes with what we expect from particlelists (absolute values only, as we might not know the flavour of reconstructed Particles)
       std::vector<MCParticle*> mcDaughters;
       if (getMatchingDaughters(mcparticle, mcDaughters, expectedDaughterPDGsAbs)) {
-        B2WARNING("mcdecay found");
+        //B2WARNING("mcdecay found");
         if (mcDaughters.size() < m_inputListNames.size()) {
+          /*
           B2WARNING("size mismatch, discarding " << mcparticle.getIndex());
           for (auto m : mcDaughters) {
             B2WARNING("" << m->getPDG());
           }
+          */
           continue;
         }
 
@@ -282,7 +277,7 @@ void PreCutHistMakerModule::event()
 
         //we found a true decay, collect all Particles associated with the daughters
         if (!fillParticleLists(mcDaughters)) {
-          B2WARNING("not all hypotheses found!");
+          //B2WARNING("not all hypotheses found!");
           continue;
         }
 

@@ -19,17 +19,14 @@
 #include <unordered_set>
 #include <algorithm>
 
-//Hack: allow access to m_bits to define hash function
-#define BOOST_DYNAMIC_BITSET_DONT_USE_FRIENDS
-#include <boost/dynamic_bitset.hpp>
 #include <boost/functional/hash.hpp>
 
 namespace std {
-  /** Define hash for dynamic_bitset. */
-  template<> struct hash<boost::dynamic_bitset<> > {
-    /** Create hash by accessing the raw bits (m_bits). */
-    std::size_t operator()(const boost::dynamic_bitset<>& bs) const {
-      return boost::hash_value(bs.m_bits);
+  /** Hash function used by unordered_set. */
+  template<> struct hash<std::set<int>> {
+    /** Actual work done by boost. */
+    std::size_t operator()(const std::set<int>& v) const {
+      return boost::hash_value(v);
     }
   };
 }
@@ -121,7 +118,7 @@ namespace Belle2 {
     std::vector<StoreObjPtr<ParticleList> > plists;
     std::vector<Particle*> m_particles;
     std::vector<int> m_indices;
-    std::unordered_set<boost::dynamic_bitset<> > indexStack;
+    std::unordered_set<std::set<int>> m_usedCombinations; /**< already used combinations (as sets of indices). */
 
     unsigned int numberOfLists;
 

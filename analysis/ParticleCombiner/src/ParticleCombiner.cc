@@ -128,7 +128,7 @@ namespace Belle2 {
       listCombiner.init((ParticleList::EParticleType)(iType));
       while (listCombiner.loadNext()) {
 
-        indexStack.clear();
+        m_usedCombinations.clear();
         const auto& types = listCombiner.getCurrentTypes();
         std::vector<unsigned int> sizes(numberOfLists);
         for (unsigned int i = 0; i < numberOfLists; ++i) {
@@ -198,7 +198,8 @@ namespace Belle2 {
 
     StoreArray<Particle> Particles;
     std::vector<Particle*> stack = getCurrentParticles();
-    std::vector<int> sources; // stack for particle sources
+    static std::vector<int> sources; // stack for particle sources
+    sources.clear();
 
     while (!stack.empty()) {
       Particle* p = stack.back();
@@ -221,17 +222,12 @@ namespace Belle2 {
   bool ParticleCombiner::currentCombinationIsUnique()
   {
     const std::vector<int>& indices = getCurrentIndices();
-    int max_element = *std::max_element(indices.begin(), indices.end());
-    boost::dynamic_bitset<> indicesBits(max_element + 1); //all zeroes
-    for (int idx : indices) {
-      indicesBits[idx] = 1;
-    }
+    const std::set<int> indexSet(indices.begin(), indices.end());
 
-    if (indexStack.find(indicesBits) != indexStack.end())
-      return false;
+    bool elementInserted = m_usedCombinations.insert(indexSet).second;
 
-    indexStack.insert(indicesBits);
-    return true;
+    //if it was not inserted, index combination was already used
+    return elementInserted;
   }
 
   bool ParticleCombiner::isDecaySelfConjugated(std::vector<StoreObjPtr<ParticleList> >& plists)

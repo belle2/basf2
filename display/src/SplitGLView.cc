@@ -11,6 +11,7 @@
 #include "TGButton.h"
 #include "TGMenu.h"
 #include "TGStatusBar.h"
+#include "TGTab.h"
 #include "TGLPhysicalShape.h"
 #include "TGLLogicalShape.h"
 #include "TGeoManager.h"
@@ -215,10 +216,16 @@ void SplitGLView::onClicked(TObject* obj)
     TGListTreeItem* eventItem = gEve->GetListTree()->FindItemByPathname("Event");
     TGListTreeItem* item = gEve->GetListTree()->FindItemByObj(eventItem, elem);
     if (item) {
+      //focus Eve tab
+      gEve->GetBrowser()->GetTabLeft()->SetTab("Eve");
+
       //open all parent nodes
       TGListTreeItem* parent = item;
       while ((parent = parent->GetParent()) != nullptr)
         gEve->GetListTree()->OpenItem(parent);
+
+      //scroll to clicked item
+      gEve->GetListTree()->AdjustPosition(item);
     }
   } else {
     m_statusBar->SetText("", 1);

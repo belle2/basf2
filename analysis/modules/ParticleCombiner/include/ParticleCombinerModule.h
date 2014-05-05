@@ -91,6 +91,18 @@ namespace Belle2 {
   private:
 
     /**
+     * Checks if given daughter particles are self conjugated
+     * @param plists refernce to vector of input particle lists StoreObjPtr's
+     */
+    bool isDecaySelfConjugated(std::vector<StoreObjPtr<ParticleList> >& plists);
+
+    /**
+     * Checks if the particle itself is self conjugated
+     * @param outputList reference to output particle list StoreObjPtr
+     */
+    bool isParticleSelfConjugated(StoreObjPtr<ParticleList>& outputList);
+
+    /**
      * Main routine for making combinations
      * @param plist reference to output particle list StoreObjPtr
      * @param plists refernce to vector of input particle lists StoreObjPtr's
@@ -98,7 +110,7 @@ namespace Belle2 {
      */
     void combination(StoreObjPtr<ParticleList>& plist,
                      std::vector<StoreObjPtr<ParticleList> >& plists,
-                     std::vector<ParticleList::EParticleType>& typeList,
+                     const std::vector<bool>& useSelfConjugatedDaughter,
                      ParticleList::EParticleType particleType);
 
     /**

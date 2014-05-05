@@ -101,54 +101,19 @@ namespace Belle2 {
       plists.push_back(list);
     }
 
-    {
-      vector<int> decay, decaybar;
-      for (unsigned i = 0; i < plists.size(); i++) {
-        decay.push_back(plists[i]->getPDG());
-        decaybar.push_back(plists[i]->getPDGbar());
-      }
-      std::sort(decay.begin(), decay.end());
-      std::sort(decaybar.begin(), decaybar.end());
+    unsigned int numberOfDaughters = plists.size();
+    unsigned int nCombinations = (1 << numberOfDaughters) - 1;
+    bool isSelfConjugated = isDecaySelfConjugated(plists) or isParticleSelfConjugated(outputList);
 
-      if (decay == decaybar or outputList->getPDG() == outputList->getPDGbar()) {
-        unsigned int nCombinations = (1 << plists.size()) - 1;
-        for (unsigned int i = 0; i < nCombinations; ++i) {
-          std::vector<ParticleList::EParticleType> typeList;
-          for (unsigned int j = 0; j < plists.size(); ++j) {
-            typeList.push_back((i & (1 << j)) ? ParticleList::c_SelfConjugatedParticle : ParticleList::c_Particle);
-          }
-          combination(outputList, plists, typeList, ParticleList::c_SelfConjugatedParticle);
-        }
-        for (unsigned int i = 0; i < nCombinations; ++i) {
-          std::vector<ParticleList::EParticleType> typeList;
-          for (unsigned int j = 0; j < plists.size(); ++j) {
-            typeList.push_back((i & (1 << j)) ? ParticleList::c_SelfConjugatedParticle : ParticleList::c_AntiParticle);
-          }
-          combination(outputList, plists, typeList, ParticleList::c_SelfConjugatedParticle);
-        }
-        std::vector<ParticleList::EParticleType> typeList(plists.size(), ParticleList::c_SelfConjugatedParticle);
-        combination(outputList, plists, typeList, ParticleList::c_SelfConjugatedParticle);
-      } else {
-        // Loop over all allowed combinations of (Anti-)Particles and Self-Conjugated Particles
-        unsigned int nCombinations = (1 << plists.size()) - 1;
-        for (unsigned int i = 0; i < nCombinations; ++i) {
-          std::vector<ParticleList::EParticleType> typeList;
-          for (unsigned int j = 0; j < plists.size(); ++j) {
-            typeList.push_back((i & (1 << j)) ? ParticleList::c_SelfConjugatedParticle : ParticleList::c_Particle);
-          }
-          combination(outputList, plists, typeList, ParticleList::c_Particle);
-        }
-        for (unsigned int i = 0; i < nCombinations; ++i) {
-          std::vector<ParticleList::EParticleType> typeList;
-          for (unsigned int j = 0; j < plists.size(); ++j) {
-            typeList.push_back((i & (1 << j)) ? ParticleList::c_SelfConjugatedParticle : ParticleList::c_AntiParticle);
-          }
-          combination(outputList, plists, typeList, ParticleList::c_AntiParticle);
-        }
-        std::vector<ParticleList::EParticleType> typeList(plists.size(), ParticleList::c_SelfConjugatedParticle);
-        combination(outputList, plists, typeList, ParticleList::c_SelfConjugatedParticle);
+    for (unsigned int i = 0; i < nCombinations; ++i) {
+      std::vector<bool> useSelfConjugatedDaughter;
+      for (unsigned int j = 0; j < numberOfDaughters; ++j) {
+        useSelfConjugatedDaughter.push_back((i & (1 << j)));
       }
+      combination(outputList, plists, useSelfConjugatedDaughter, isSelfConjugated ? ParticleList::c_SelfConjugatedParticle : ParticleList::c_Particle);
+      combination(outputList, plists, useSelfConjugatedDaughter, isSelfConjugated ? ParticleList::c_SelfConjugatedParticle : ParticleList::c_AntiParticle);
     }
+    combination(outputList, plists, std::vector<bool>(numberOfDaughters, true), ParticleList::c_SelfConjugatedParticle);
 
     // printout with B2INFO
     std::string decay;
@@ -163,6 +128,24 @@ namespace Belle2 {
 
   }
 
+  bool ParticleCombinerModule::isDecaySelfConjugated(std::vector<StoreObjPtr<ParticleList> >& plists)
+  {
+
+    std::vector<int> decay, decaybar;
+    for (unsigned i = 0; i < plists.size(); i++) {
+      decay.push_back(plists[i]->getPDG());
+      decaybar.push_back(plists[i]->getPDGbar());
+    }
+    std::sort(decay.begin(), decay.end());
+    std::sort(decaybar.begin(), decaybar.end());
+    return decay == decaybar;
+
+  }
+
+  bool ParticleCombinerModule::isParticleSelfConjugated(StoreObjPtr<ParticleList>& outputList)
+  {
+    return outputList->getPDG() == outputList->getPDGbar();
+  }
 
   void ParticleCombinerModule::endRun()
   {
@@ -174,7 +157,7 @@ namespace Belle2 {
 
   void ParticleCombinerModule::combination(StoreObjPtr<ParticleList>& outputList,
                                            vector<StoreObjPtr<ParticleList> >& plists,
-                                           vector<ParticleList::EParticleType>& typeList,
+                                           const vector<bool>& useSelfConjugatedDaughter,
                                            ParticleList::EParticleType particleType)
   {
     StoreArray<Particle> Particles;
@@ -191,7 +174,8 @@ namespace Belle2 {
     // SelfConjugatedParticles
     int nLoop = 1;
     for (int i = 0; i < N; i++) {
-      n[i] = plists[i]->getList(typeList[i]).size();
+      ParticleList::EParticleType type = useSelfConjugatedDaughter[i] ? ParticleList::c_SelfConjugatedParticle : particleType;
+      n[i] = plists[i]->getList(type).size();
       if (n[i] == 0) return;
       k[i] = 0;
       nLoop *= n[i];
@@ -220,7 +204,8 @@ namespace Belle2 {
       vector<Particle*> particleStack;
       vector<int> indices;
       for (int i = 0; i < N; i++) {
-        int ii = plists[i]->getList(typeList[i])[k[i]];
+        ParticleList::EParticleType type = useSelfConjugatedDaughter[i] ? ParticleList::c_SelfConjugatedParticle : particleType;
+        int ii = plists[i]->getList(type)[k[i]];
         particleStack.push_back(Particles[ii]);
         indices.push_back(ii);
       }

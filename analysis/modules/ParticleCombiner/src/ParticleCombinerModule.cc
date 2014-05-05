@@ -110,10 +110,10 @@ namespace Belle2 {
       for (unsigned int j = 0; j < numberOfDaughters; ++j) {
         useSelfConjugatedDaughter.push_back((i & (1 << j)));
       }
-      combination(outputList, plists, useSelfConjugatedDaughter, isSelfConjugated ? ParticleList::c_SelfConjugatedParticle : ParticleList::c_Particle);
-      combination(outputList, plists, useSelfConjugatedDaughter, isSelfConjugated ? ParticleList::c_SelfConjugatedParticle : ParticleList::c_AntiParticle);
+      combination(outputList, plists, useSelfConjugatedDaughter, ParticleList::c_Particle, isSelfConjugated ? ParticleList::c_SelfConjugatedParticle : ParticleList::c_Particle);
+      combination(outputList, plists, useSelfConjugatedDaughter, ParticleList::c_AntiParticle, isSelfConjugated ? ParticleList::c_SelfConjugatedParticle : ParticleList::c_AntiParticle);
     }
-    combination(outputList, plists, std::vector<bool>(numberOfDaughters, true), ParticleList::c_SelfConjugatedParticle);
+    combination(outputList, plists, std::vector<bool>(numberOfDaughters, true), ParticleList::c_SelfConjugatedParticle, ParticleList::c_SelfConjugatedParticle);
 
     // printout with B2INFO
     std::string decay;
@@ -155,10 +155,13 @@ namespace Belle2 {
   {
   }
 
+#include<iostream>
+
   void ParticleCombinerModule::combination(StoreObjPtr<ParticleList>& outputList,
                                            vector<StoreObjPtr<ParticleList> >& plists,
                                            const vector<bool>& useSelfConjugatedDaughter,
-                                           ParticleList::EParticleType particleType)
+                                           ParticleList::EParticleType inputType,
+                                           ParticleList::EParticleType outputType)
   {
     StoreArray<Particle> Particles;
 
@@ -170,16 +173,21 @@ namespace Belle2 {
 
     // initialize arrays and list indices
 
-    // TODO Implement correct combination of Particles, AntiParticles and
-    // SelfConjugatedParticles
     int nLoop = 1;
+    std::cout << "Make combinations for input: " << static_cast<int>(inputType) << " and output: " << static_cast<int>(outputType);
     for (int i = 0; i < N; i++) {
-      ParticleList::EParticleType type = useSelfConjugatedDaughter[i] ? ParticleList::c_SelfConjugatedParticle : particleType;
+      ParticleList::EParticleType type = useSelfConjugatedDaughter[i] ? ParticleList::c_SelfConjugatedParticle : inputType;
       n[i] = plists[i]->getList(type).size();
-      if (n[i] == 0) return;
+      std::cout << " " << n[i] << ":" << static_cast<int>(type);
+      if (n[i] == 0) {
+        std::cout << " -> encountered Zero List. Nothing to do here";
+        std::cout << std::endl;
+        return;
+      }
       k[i] = 0;
       nLoop *= n[i];
     }
+    std::cout << " -> generating " << nLoop << " or less candidates (depending on unique combinations)." << std::endl;
 
     // stack needed to check for unique combination
 
@@ -204,7 +212,7 @@ namespace Belle2 {
       vector<Particle*> particleStack;
       vector<int> indices;
       for (int i = 0; i < N; i++) {
-        ParticleList::EParticleType type = useSelfConjugatedDaughter[i] ? ParticleList::c_SelfConjugatedParticle : particleType;
+        ParticleList::EParticleType type = useSelfConjugatedDaughter[i] ? ParticleList::c_SelfConjugatedParticle : inputType;
         int ii = plists[i]->getList(type)[k[i]];
         particleStack.push_back(Particles[ii]);
         indices.push_back(ii);
@@ -228,11 +236,11 @@ namespace Belle2 {
 
       // store combination
       new(Particles.nextFreeAddress()) Particle(vec,
-                                                particleType == ParticleList::c_AntiParticle ? outputList->getPDGbar() :  outputList->getPDG(),
-                                                particleType == ParticleList::c_SelfConjugatedParticle ? Particle::c_Unflavored : Particle::c_Flavored,
+                                                outputType == ParticleList::c_AntiParticle ? outputList->getPDGbar() :  outputList->getPDG(),
+                                                outputType == ParticleList::c_SelfConjugatedParticle ? Particle::c_Unflavored : Particle::c_Flavored,
                                                 indices);
       int iparticle = Particles.getEntries() - 1;
-      outputList->addParticle(iparticle, particleType);
+      outputList->addParticle(iparticle, outputType);
 
     }
 

@@ -106,12 +106,12 @@ namespace Belle2 {
      * Main routine for making combinations
      * @param plist reference to output particle list StoreObjPtr
      * @param plists refernce to vector of input particle lists StoreObjPtr's
-     * @param chargeState charge state (0=unflavored or 1=flavored)
      */
     void combination(StoreObjPtr<ParticleList>& plist,
                      std::vector<StoreObjPtr<ParticleList> >& plists,
                      const std::vector<bool>& useSelfConjugatedDaughter,
-                     ParticleList::EParticleType particleType);
+                     ParticleList::EParticleType inputType,
+                     ParticleList::EParticleType outputType);
 
     /**
      * Check that all FS particles of a combination differ

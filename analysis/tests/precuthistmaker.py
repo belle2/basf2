@@ -35,8 +35,8 @@ matchMCTruth('pi0', path=main)
 combinedlist = 'D0'
 #daughters = ['K-', 'pi+', 'pi0']
 daughters = ['K-', 'pi+', 'pi0']
-#a) save signal invariant mass using MCDecayHistMaker
-histmaker = register_module('MCDecayHistMaker')
+#a) save signal invariant mass using PreCutHistMaker
+histmaker = register_module('PreCutHistMaker')
 histmaker.param('PDG', 421)
 histmaker.param('fileName', 'test_D0signalHist.root')
 hist_params = (100, 0, 6.2)
@@ -96,7 +96,7 @@ process(main)
 
 print statistics
 
-#compare MCDecayHistMaker output to that saved directly
+#compare PreCutHistMaker output to that saved directly
 
 from ROOT import TFile
 from ROOT import TNtuple
@@ -122,7 +122,7 @@ def checkHistograms(name, selection):
         B2FATAL("No events found. Reconstruction broken? Too few events in sample?")
 
     if trueSignals != hmSignals:
-        B2FATAL("Mismatch in number of entries! (ParticleCombiner + MCMatching: " + str(trueSignals) + ", MCDecayHistMaker: " + str(hmSignals))
+        B2FATAL("Mismatch in number of entries! (ParticleCombiner + MCMatching: " + str(trueSignals) + ", PreCutHistMaker: " + str(hmSignals))
 
     hist_from_ntuple = TH1F("ntuplehist", "ntuplehist", hist_params[0], hist_params[1], hist_params[2])
     ntuple.Project("ntuplehist", "M", selection)

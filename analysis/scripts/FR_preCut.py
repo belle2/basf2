@@ -177,8 +177,8 @@ def CreatePreCutMassHistogram(path, name, particle, daughterLists):
     else:
         # Combine all the particles according to the decay channels
         mass = pdg.get(pdg.from_name(particle.name)).Mass()
-        pmake = register_module('MCDecayHistMaker')
-        pmake.set_name('DecayHistMaker_' + name)
+        pmake = register_module('PreCutHistMaker')
+        pmake.set_name('PreCutHistMaker_' + name)
         pmake.param('fileName', filename)
         pmake.param('channelName', name)
         pmake.param('PDG', pdg.from_name(particle.name))

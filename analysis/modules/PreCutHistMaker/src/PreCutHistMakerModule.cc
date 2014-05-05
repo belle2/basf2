@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <analysis/modules/MCDecayHistMaker/MCDecayHistMakerModule.h>
+#include <analysis/modules/PreCutHistMaker/PreCutHistMakerModule.h>
 
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
@@ -35,13 +35,13 @@ using namespace Belle2;
 //                 Register module
 //-----------------------------------------------------------------
 
-REG_MODULE(MCDecayHistMaker)
+REG_MODULE(PreCutHistMaker)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-MCDecayHistMakerModule::MCDecayHistMakerModule()
+PreCutHistMakerModule::PreCutHistMakerModule()
 {
   setDescription("Saves invariant mass distribution of combined particles (from input ParticleLists) into histogram 'all'. If the daughters in the given particle lists can be combined into a correctly reconstructed (!) particle of specified PDG code, save invariant mass for this combination to a histogram called 'signal'. This is equivalent to running ParticleCombiner on the given lists and saving the inv. mass of Particles with isSignal == 1 and everything else, but much faster (since Particles don't need to be saved, .");
   setPropertyFlags(c_ParallelProcessingCertified); //histograms are saved through HistModule, so this is ok
@@ -57,11 +57,11 @@ MCDecayHistMakerModule::MCDecayHistMakerModule()
 
 }
 
-MCDecayHistMakerModule::~MCDecayHistMakerModule()
+PreCutHistMakerModule::~PreCutHistMakerModule()
 {
 }
 
-void MCDecayHistMakerModule::initialize()
+void PreCutHistMakerModule::initialize()
 {
   setFilename(m_fileName);
 
@@ -132,7 +132,7 @@ bool hasAntiParticle(int pdg)
   return true;
 }
 
-void MCDecayHistMakerModule::clearParticleLists()
+void PreCutHistMakerModule::clearParticleLists()
 {
   for (auto & list : m_tmpLists) {
     int pdg = list->getPDG();
@@ -141,7 +141,7 @@ void MCDecayHistMakerModule::clearParticleLists()
   }
 }
 
-bool MCDecayHistMakerModule::fillParticleLists(const std::vector<MCParticle*>& mcDaughters)
+bool PreCutHistMakerModule::fillParticleLists(const std::vector<MCParticle*>& mcDaughters)
 {
   for (const MCParticle * mcPart : mcDaughters) {
     B2WARNING("fillParticleLists: mc " << mcPart->getIndex() << " " << mcPart->getPDG());
@@ -167,7 +167,7 @@ bool MCDecayHistMakerModule::fillParticleLists(const std::vector<MCParticle*>& m
   return true;
 }
 
-void MCDecayHistMakerModule::saveCombinationsForSignal()
+void PreCutHistMakerModule::saveCombinationsForSignal()
 {
   vector<string> tmplistNames;
   for (const auto & list : m_tmpLists) {
@@ -208,7 +208,7 @@ void MCDecayHistMakerModule::saveCombinationsForSignal()
 
 }
 
-void MCDecayHistMakerModule::saveAllCombinations()
+void PreCutHistMakerModule::saveAllCombinations()
 {
   StoreArray<Particle> particles;
   ParticleCombiner combiner(m_inputListNames, !hasAntiParticle(m_pdg));
@@ -227,7 +227,7 @@ void MCDecayHistMakerModule::saveAllCombinations()
   }
 }
 
-void MCDecayHistMakerModule::event()
+void PreCutHistMakerModule::event()
 {
   vector<StoreObjPtr<ParticleList> > plists;
   std::multiset<int> expectedDaughterPDGs;
@@ -293,7 +293,7 @@ void MCDecayHistMakerModule::event()
   }
 }
 
-void MCDecayHistMakerModule::terminate()
+void PreCutHistMakerModule::terminate()
 {
   saveHists();
 
@@ -301,7 +301,7 @@ void MCDecayHistMakerModule::terminate()
   delete m_histogramSignal;
 }
 
-void MCDecayHistMakerModule::writeHists()
+void PreCutHistMakerModule::writeHists()
 {
   m_histogramSignal->Write();
   m_histogramAll->Write();

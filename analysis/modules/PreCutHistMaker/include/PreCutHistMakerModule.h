@@ -31,19 +31,19 @@ namespace Belle2 {
   /**
    * If the daughters in the given particle lists can be combined into a correctly reconstructed (!) particle of specified PDG code, save invariant mass for this combination to a histogram
    */
-  class MCDecayHistMakerModule : public HistModule {
+  class PreCutHistMakerModule : public HistModule {
 
   public:
 
     /**
      * Constructor
      */
-    MCDecayHistMakerModule();
+    PreCutHistMakerModule();
 
     /**
      * Destructor
      */
-    virtual ~MCDecayHistMakerModule();
+    virtual ~PreCutHistMakerModule();
 
     /**
      * Initialize the Module.

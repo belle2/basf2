@@ -3,26 +3,22 @@
 
 # Thomas Keck 2014
 
-from full_reconstruction import *
+from FullReconstruction import *
 from basf2 import *
 
 chargedTrackVars = [
-    'eid',
     'eid_dEdx',
-    'eid_TOP',
-    'eid_ARICH',
-    'Kid',
+    'NB_eid_TOP',
+    'NB_eid_ARICH',
     'Kid_dEdx',
-    'Kid_TOP',
-    'Kid_ARICH',
-    'prid',
+    'NB_Kid_TOP',
+    'NB_Kid_ARICH',
     'prid_dEdx',
-    'prid_TOP',
-    'prid_ARICH',
-    'muid',
+    'NB_prid_TOP',
+    'NB_prid_ARICH',
     'muid_dEdx',
-    'muid_TOP',
-    'muid_ARICH',
+    'NB_muid_TOP',
+    'NB_muid_ARICH',
     'p',
     'pt',
     'chiProb',
@@ -31,63 +27,60 @@ chargedTrackVars = [
 DVars = ['prodChildProb', 'p', 'pt', 'p_CMS', 'pt_CMS']
 BVars = ['prodChildProb', 'p', 'pt', 'p_CMS', 'pt_CMS']
 
-methods = [
-    (
-        'BDTGradient_100', 'BDT',
-        '!H:CreateMVAPdfs:!V:NTrees=100:BoostType=Grad:Shrinkage=0.10:'
-        'UseBaggedGrad:GradBaggingFraction=0.5:nCuts=10:MaxDepth=2'
-    ),
-    #('NeuroBayes', 'NeuroBayes',
-    #'!H:CreateMVAPdfs:V:NTrainingIter=50:TrainingMethod=BFGS')
-]
-# old syntax, needs to be updated
-# 'BDTGradient_1000_20_5': '!H:CreateMVAPdfs:!V:NTrees=1000:BoostType=Grad:
-# Shrinkage=0.10:UseBaggedGrad:GradBaggingFraction=0.5:nCuts=20:MaxDepth=5',
+method = (
+    'BDTGradient_100', 'BDT',
+    '!H:CreateMVAPdfs:!V:NTrees=100:BoostType=Grad:Shrinkage=0.10:'
+    'UseBaggedGrad:GradBaggingFraction=0.5:nCuts=10:MaxDepth=2'
+)
+#method = (
+#        'NeuroBayes', 'Plugin',
+#        '!H:CreateMVAPdfs:V:NTrainingIter=50:TrainingMethod=BFGS'
+#)
 
-fr = FullReconstruction()
 
 # Add FSP
-fr.addParticle(Particle('gamma', ['p', 'pt'], methods))
-fr.addParticle(Particle('pi0', ['p', 'pt'], methods))
-fr.addParticle(Particle('pi+', chargedTrackVars, methods))
-fr.addParticle(Particle('K+', chargedTrackVars, methods))
+particles = []
+particles.append(Particle('gamma', ['p', 'pt'], method))
+particles.append(Particle('pi0', ['p', 'pt', 'M'], method))
+particles.append(Particle('pi+', chargedTrackVars, method))
+particles.append(Particle('K+', chargedTrackVars, method))
 
-p = Particle('D0', DVars, methods)
+p = Particle('D0', DVars, method)
 p.addChannel(['K-', 'pi+'])
 p.addChannel(['K-', 'pi+', 'pi+', 'pi-'])
 p.addChannel(['K-', 'pi+', 'pi0'])
-fr.addParticle(p)
+particles.append(p)
 
-p = Particle('D+', DVars, methods)
+p = Particle('D+', DVars, method)
 p.addChannel(['K-', 'pi+', 'pi+'])
 p.addChannel(['K-', 'K+', 'pi+'])
 p.addChannel(['K-', 'pi+', 'pi+', 'pi0'])
 p.addChannel(['K-', 'K+', 'pi+', 'pi0'])
-fr.addParticle(p)
+particles.append(p)
 
-p = Particle('D*+', DVars, methods)
+p = Particle('D*+', DVars, method)
 p.addChannel(['D0', 'pi+'])
 p.addChannel(['D+', 'pi0'])
-fr.addParticle(p)
+particles.append(p)
 
-p = Particle('D*0', DVars, methods)
+p = Particle('D*0', DVars, method)
 p.addChannel(['D0', 'pi0'])
 p.addChannel(['D0', 'gamma'])
-fr.addParticle(p)
+particles.append(p)
 
-p = Particle('B+', BVars, methods)
+p = Particle('B+', BVars, method)
 p.addChannel(['D0', 'pi+'])
 p.addChannel(['D+', 'pi0'])
 p.addChannel(['D*-', 'pi+', 'pi+'])
-fr.addParticle(p)
+particles.append(p)
 
-p = Particle('B0', BVars, methods)
+p = Particle('B0', BVars, method)
 p.addChannel(['D0', 'pi0'])
 p.addChannel(['D-', 'pi+'])
 p.addChannel(['D-', 'pi0', 'pi+'])
 p.addChannel(['D*-', 'pi+', 'pi+', 'pi-'])
 p.addChannel(['D*-', 'pi+', 'pi+', 'pi-', 'pi0'])
-fr.addParticle(p)
+particles.append(p)
 
 main = create_path()
 main.add_module(register_module('RootInput'))
@@ -95,7 +88,7 @@ main.add_module(register_module('ProgressBar'))
 
 main.add_module(register_module('ParticleLoader'))
 
-fr.run(main)
+FullReconstruction(main, particles)
 
 # ntupler = register_module('VariableNtuple')
 # ntupler.param('particleList', 'B+')

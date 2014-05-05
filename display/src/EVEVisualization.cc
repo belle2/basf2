@@ -60,6 +60,7 @@
 #include <TEveScene.h>
 #include <TEvePointSet.h>
 #include <TEveProjectionManager.h>
+#include <TEveSelection.h>
 #include <TEveStraightLineSet.h>
 #include <TEveTriangleSet.h>
 #include <TEveText.h>
@@ -142,6 +143,10 @@ EVEVisualization::EVEVisualization():
   m_calo3d->SetMaxValAbs(2.1);
   m_calo3d->SetRnrFrame(false, false); //don't show crystal grid
   m_calo3d->IncDenyDestroy();
+
+  //Stop eve from deleting contents... (which might already be deleted)
+  gEve->GetSelection()->IncDenyDestroy();
+  gEve->GetHighlight()->IncDenyDestroy();
 
   clearEvent();
 }
@@ -1223,6 +1228,8 @@ void EVEVisualization::clearEvent()
   delete m_unassignedRecoHits;
   m_unassignedRecoHits = 0;
 
+  gEve->GetSelection()->RemoveElements();
+  gEve->GetHighlight()->RemoveElements();
   //other things are cleaned up by TEve...
 }
 

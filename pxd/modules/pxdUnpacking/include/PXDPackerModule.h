@@ -30,7 +30,10 @@ namespace Belle2 {
 
     /** The PXDPacker module.
      *
-     * This module is responsible for packing the Raw PXD data to Pixels
+     * This module is responsible for packing (simulated) Pixels back to
+     * Raw PXD data. This is usefull as input for ONSEN as well
+     * as for rechecking the unpacking process with well defined data.
+     * Not yet ready for MC Production, only lab use recommended.
      */
     class PXDPackerModule : public Module {
 
@@ -97,15 +100,16 @@ namespace Belle2 {
        */
       void endian_swap_frame(unsigned short* data, int len);
 
-      void start_frame(void);
-      void add_int16(unsigned short w);
-      void add_int32(unsigned int w);
-      void add_frame_to_payload(void);
+      void start_frame(void);//! Start with a new Frame
+      void add_int16(unsigned short w);//! cat 16bit value to frame
+      void add_int32(unsigned int w);//! cat 32value value to frame
+      void add_frame_to_payload(void);//! Add Frame to Event payload
 
       /** Store start of Vxd Detetcor related digits */
       std::map <VxdID , int> startOfVxdID;
 
-      unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS];
+      unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS];//! temporary hitmap buffer for pixel to raw data conversion
+
       // ignore common mode for now...
 
     };//end class declaration

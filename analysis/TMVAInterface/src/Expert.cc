@@ -9,6 +9,7 @@
 
 
 #include <analysis/TMVAInterface/Expert.h>
+#include <analysis/TMVAInterface/Method.h>
 #include <analysis/dataobjects/Particle.h>
 #include <framework/logging/Logger.h>
 
@@ -40,7 +41,7 @@ namespace Belle2 {
       std::string configfile = prefix + ".config";
       std::ifstream configstream(configfile);
       if (not configstream.good()) {
-        B2ERROR("Couldn't open configfile" << configfile)
+        B2ERROR("Couldn't open config file '" << configfile << "'")
       }
 
       // Read out configfile
@@ -107,6 +108,10 @@ namespace Belle2 {
         }
       } catch (const std::exception& ex) {
         B2ERROR("There was an error while scanning the stream of the file for the used variables and the used method: " << ex.what())
+      }
+
+      if (m_methods.empty()) {
+        B2FATAL("Method '" << methodName << "' not found, aborting.");
       }
 
       // Change back to old directory

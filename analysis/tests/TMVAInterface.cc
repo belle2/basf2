@@ -92,21 +92,35 @@ namespace Belle2 {
       // EXPECT_DEATH(Method("DOES_NOT_EXIST", "Plugin", "!H:!V:CreateMVAPdfs:NTrees=100", std::vector<std::string>({"p", "pt", "eid"})),".*");
     }
 
+    TEST(TMVAInterface, ExpertErrorHandling)
+    {
+
+      EXPECT_B2FATAL(Expert expert("electron", FileSystem::findFile("/analysis/tests/"), "THISISNOTAVALIDMETHOD", 1));
+      EXPECT_B2FATAL(Expert expert("electron", FileSystem::findFile("/analysis/tests/"), "BDTGradient", 123));
+      EXPECT_B2FATAL(Expert expert("NONEXISTINGPREFIX", FileSystem::findFile("/analysis/tests/"), "BDTGradient", 1));
+
+    }
     TEST(TMVAInterface, ExpertRunAnalysisCorrectly)
     {
+      //network only expects 'eid' and 'p' as input
+      //eid isn't set (-> 0.5), we'll just change p
 
-      //Expert expert(FileSystem::findFile("/analysis/tests/weights/electron.weights.xml"));
-      //Particle particle({ 1.1 , 1.0, 0.0, 0.0 }, 11);
-      //EXPECT_DOUBLE_EQ(expert.analyse(&particle), 1.0537381456288131e-07);
-
-    }
-
-    TEST(TMVAInterface, TeacherTrainsCorrectly)
-    {
-
-      // TODO Hwot test the teacher?
+      Expert expert("electron", FileSystem::findFile("/analysis/tests/"), "BDTGradient", 1);
+      Particle p({ 1.1 , 1.0, 0.0, 0.0 }, 11);
+      EXPECT_DOUBLE_EQ(0.11980155110359192, expert.analyse(&p));
+      Particle q({ 0.0 , 0.2, 0.0, 0.0 }, 11);
+      EXPECT_DOUBLE_EQ(0.048413272947072983, expert.analyse(&q));
 
     }
+
+    /*
+        TEST(TMVAInterface, TeacherTrainsCorrectly)
+        {
+
+          // TODO how to test the teacher?
+
+        }
+        */
 
   }
 }

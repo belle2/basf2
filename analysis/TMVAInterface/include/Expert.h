@@ -9,10 +9,9 @@
 
 #pragma once
 
-#include <analysis/TMVAInterface/Method.h>
-
 #include <vector>
 #include <string>
+#include <map>
 
 /**
  * Forward declaration
@@ -26,6 +25,7 @@ namespace Belle2 {
   class Particle;
 
   namespace TMVAInterface {
+    class Method;
 
     /**
      * Interface to ROOT TMVA Reader.

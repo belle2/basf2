@@ -81,5 +81,5 @@ process(main)
 print statistics
 
 B2INFO("")
-B2INFO("Training completed. Run 'show_tmva_results TMVA.root' to view detailed"
+B2INFO("Training completed. Run 'show_tmva_results TMVA_1_vs_0.root' to view detailed"
        " information about the trained methods.")

@@ -137,29 +137,41 @@ std::pair<double, double> VXDTFRawSecMap::calcCutoff(CutoffValues& sample, std::
 {
   double lowerCutoff = 0, upperCutoff = 0;
   int sampleSize = sample.size();
+  int sampleSizeMinusOne = sampleSize - 1;
+  int reverseIndex = -1;
+  if (sampleSizeMinusOne < 0) { sampleSizeMinusOne = 0; }
   double sampleSizeD = double(sampleSize);
-  pair<int, int> quantileIndex; // stores indexPosition of chosen quantile. first is lower cutoff, .second is higher one
-
-  B2DEBUG(100, "calcCutoff: quantiles.first: " << quantiles.first << ", quantiles.second: " << quantiles.second << ", sampleSize: " << sampleSize)
-
-  // determine which entries we want to export: calculates index position using sampleSize and does boundary-checks
-  quantileIndex.first = int(round(sampleSizeD * quantiles.first));
-  checkBiggerThan(quantileIndex.first, sampleSize - 1);
-  checkSmallerThan(quantileIndex.first, 0);
-  quantileIndex.second = int(round(sampleSizeD * quantiles.second));
-  checkBiggerThan(quantileIndex.second, sampleSize - 1);
-  checkSmallerThan(quantileIndex.second, 0);
-  B2DEBUG(100, "calcCutoff: quantileIndex.first: " << quantileIndex.first << ", quantileIndex.second: " << quantileIndex.second)
+  pair<int, int> quantileIndex = make_pair(-1, -1); // stores indexPosition of chosen quantile. first is lower cutoff, .second is higher one
 
   CutoffValues::iterator firstIndex = sample.begin(); // points at first entry
   CutoffValues::reverse_iterator secondIndex = sample.rbegin(); //points at last entry
 
-  for (int i = 0; i < quantileIndex.first; ++i) { ++firstIndex; } // move iterator to position
+  // determine which entries we want to export: calculates index position using sampleSize and does boundary-checks
+  if (quantiles.first != 0) {
+    quantileIndex.first = static_cast<int>(sampleSizeD * quantiles.first + 0.5);
+//     quantileIndex.first = int(round(sampleSizeD * quantiles.first));
+    checkBiggerThan(quantileIndex.first, sampleSizeMinusOne);
+    checkSmallerThan(quantileIndex.first, 0);
 
-  int reverseIndex = sampleSize - quantileIndex.first; // we use a reverse_iterator to move backwards through the list, therefore do a boundary check beforehand:
-  checkBiggerThan(reverseIndex, sampleSize - 1); // should not occur, but safety first ;)
-  checkSmallerThan(reverseIndex, 0);
-  for (int i = 0; i < reverseIndex; ++i) { ++secondIndex; } // move iterator to position
+    for (int i = 0; i < quantileIndex.first; ++i) { ++firstIndex; } // move iterator to position of the first cutoff
+  }
+
+  if (quantiles.second != 1) {
+    // maxIndex is sampleSize - 1, therefore -0.5:
+    quantileIndex.second = static_cast<int>(sampleSizeD * quantiles.second - 0.5);
+//     quantileIndex.second = int(round(sampleSizeD * quantiles.second));
+    checkBiggerThan(quantileIndex.second, sampleSizeMinusOne);
+    checkSmallerThan(quantileIndex.second, 0);
+
+    reverseIndex = sampleSizeMinusOne - quantileIndex.second; // tells the reverse_iterator how many slots back shall be moved within the list
+
+    // we use a reverse_iterator to move backwards through the list, therefore do a boundary check beforehand:
+    checkBiggerThan(reverseIndex, sampleSizeMinusOne);
+    checkSmallerThan(reverseIndex, 0);
+    for (int i = 0; i < reverseIndex; ++i) { ++secondIndex; } // move iterator to position
+  }
+
+  B2DEBUG(50, "calcCutoff: quantiles.first: " << quantiles.first << ", quantiles.second: " << quantiles.second << ", sampleSize: " << sampleSize << ", quantileIndex.first/index: " << quantileIndex.first << ", quantileIndex.second: " << quantileIndex.second << ", reverseIndex: " << reverseIndex << " (all indizes are only set if quantiles.first != 0 and quantiles.second != 1, standardValue = -1)")
 
   if ((*firstIndex) < (*secondIndex)) {  // give the lower value to lowerCutoff and higher value to upperCutoff
     lowerCutoff = (*firstIndex);
@@ -170,8 +182,10 @@ std::pair<double, double> VXDTFRawSecMap::calcCutoff(CutoffValues& sample, std::
   }
   B2DEBUG(100, "calcCutoff: lowerCutoff: " << lowerCutoff << ", upperCutoff: " << upperCutoff)
 
-  lowerCutoff = addExtraGain(lowerCutoff, (-1.) * stretchFactor); // we want to lower that value
-  upperCutoff = addExtraGain(upperCutoff, stretchFactor);
+  if (stretchFactor != 0) {
+    lowerCutoff = addExtraGain(lowerCutoff, (-1.) * stretchFactor); // we want to lower that value, therefore -1
+    upperCutoff = addExtraGain(upperCutoff, stretchFactor);
+  }
 
   B2DEBUG(100, "calcCutoff: after adding gain (of " << stretchFactor << "): lowerCutoff: " << lowerCutoff << ", upperCutoff: " << upperCutoff)
 
@@ -183,6 +197,10 @@ std::pair<double, double> VXDTFRawSecMap::calcCutoff(CutoffValues& sample, std::
 /** checks sector-combination whether it is allowed or not (checks: isSameSensor, isUncommonCombination, isTooManyLayersAway), return value is true, if sectorCombi is valid */
 bool VXDTFRawSecMap::filterBadSectorCombis(SectorPack& aSector)
 {
+  if (int(aSector.second.size()) == 0) {
+    B2DEBUG(20, "filterBadSectorCombis: sector " << FullSecID(aSector.first) << " has no friends, validation failed")
+    return false;
+  }
   int layerCorrectionFactor = 0; // is 0 for PXD and VXD, but 2 for SVD only
   if (m_detectorType == "SVD") { layerCorrectionFactor = 2; }  // takes care of the case when there is no layer 2 and 1 WARNING hardcoded number of layers!
   int centerSectorID = FullSecID().getFullSecID();
@@ -191,14 +209,18 @@ bool VXDTFRawSecMap::filterBadSectorCombis(SectorPack& aSector)
   IDVector badIDs; // collecting bad friends here to be killed afterwards
   bool upgradeSecID = false; // collecting secIDs which get higher subLayerID
   int nFriends = aSector.second.size(); // number of friendsectors before doing anything
+  double rarenessThreshold = 0; // if secCombi is occuring even more seldom than this threshold, it will be filtered (value will be set later)
   int nTotalValues = 0; // counts total number of occurrences of all sector-combinations of current sector
   for (FriendPack & aCombination : aSector.second) {
     for (CutoffPack & aCutoff : aCombination.second) {
       nTotalValues += aCutoff.second.size();
     }
   }
-  B2DEBUG(20, "filterBadSectorCombis: sector (id/name) " << aSector.first << "/" << mainSector.getFullSecString() << " got total number of values: " << nTotalValues)
-  double rarenessThreshold = double(nTotalValues) / m_rareSectorCombinations.second; // calculated once (even if it is not needed), since the result can be used several times
+
+  if (m_rareSectorCombinations.second > 0) { rarenessThreshold = double(nTotalValues) / m_rareSectorCombinations.second; }
+  // calculated once (even if it is not needed), since the result can be used several times
+
+  B2DEBUG(20, "filterBadSectorCombis: sector " << mainSector << " got total number of values: " << nTotalValues << " and calculated rarenessThreshold of " << rarenessThreshold)
 
   for (FriendPack & aCombination : aSector.second) {
     friendSector = FullSecID(aCombination.first);
@@ -207,12 +229,12 @@ bool VXDTFRawSecMap::filterBadSectorCombis(SectorPack& aSector)
     // first: if friendLayer > sectorLayer -> kick (WARNING if sectormap shall contain curler-compatibility, then this part should be overhauled!)
     if (mainSector.getLayerNumber() < friendSector.getLayerNumber()) {
       badIDs.push_back(aCombination.first);
-      B2DEBUG(30, "filterBadSectorCombis: friend (id/name) " << aCombination.first << "/" << friendSector.getFullSecString() << " of sector (id/name) " << aSector.first << "/" << mainSector.getFullSecString() << " got kicked because of bad layer number (sector/friend): " << mainSector.getLayerNumber() << "/" << friendSector.getLayerNumber())
+      B2DEBUG(30, "filterBadSectorCombis: friend " << friendSector << " of sector " << mainSector << " got kicked because of bad layer number (sector/friend): " << mainSector.getLayerNumber() << "/" << friendSector.getLayerNumber())
       continue;
     }
     if (mainSector.getVxdID() == friendSector.getVxdID()) {
       badIDs.push_back(aCombination.first);
-      B2DEBUG(30, "filterBadSectorCombis: friend (id/name) " << aCombination.first << "/" << friendSector.getFullSecString() << " of sector (id/name) " << aSector.first << "/" << mainSector.getFullSecString() << " got kicked because of being on the same sensor (sector/friend): " << mainSector.getLayerNumber() << "/" << friendSector.getLayerNumber())
+      B2DEBUG(30, "filterBadSectorCombis: friend " << friendSector << " of sector " << mainSector << " got kicked because of being on the same sensor (sector/friend): " << mainSector.getLayerNumber() << "/" << friendSector.getLayerNumber())
       continue;
     }
 
@@ -225,7 +247,7 @@ bool VXDTFRawSecMap::filterBadSectorCombis(SectorPack& aSector)
           // everything is fine -> do nothing...
         } else {
           badIDs.push_back(aCombination.first);
-          B2DEBUG(30, "filterBadSectorCombis: friend (id/name) " << aCombination.first << "/" << friendSector.getFullSecString() << " of sector (id/name) " << aSector.first << "/" << mainSector.getFullSecString() << " got kicked because of bad layer number (sector/friend): " << mainSector.getLayerNumber() << "/" << friendSector.getLayerNumber() << " (layer difference of " << m_maxLayerLevelDifference.second << " allowed)")
+          B2DEBUG(30, "filterBadSectorCombis: friend " << friendSector << " of sector " << mainSector << " got kicked because of bad layer number (sector/friend): " << mainSector.getLayerNumber() << "/" << friendSector.getLayerNumber() << " (layer difference of " << m_maxLayerLevelDifference.second << " allowed)")
           continue;
         }
       }
@@ -239,7 +261,7 @@ bool VXDTFRawSecMap::filterBadSectorCombis(SectorPack& aSector)
       }
       if (rarenessThreshold > double(nFriendValues)) {
         badIDs.push_back(aCombination.first);
-        B2DEBUG(30, "filterBadSectorCombis: friend (id/name) " << aCombination.first << "/" << friendSector.getFullSecString() << " of sector (id/name) " << aSector.first << "/" << mainSector.getFullSecString() << " got kicked because of rare sector combination (nFriendValues/nTotalValues/rarenessThreshold): " << nFriendValues << "/" << nTotalValues << "/" << rarenessThreshold)
+        B2DEBUG(30, "filterBadSectorCombis: friend " << friendSector << " of sector " << mainSector << " got kicked because of rare sector combination (nFriendValues/nTotalValues/rarenessThreshold): " << nFriendValues << "/" << nTotalValues << "/" << rarenessThreshold)
         continue;
       }
     }
@@ -248,22 +270,23 @@ bool VXDTFRawSecMap::filterBadSectorCombis(SectorPack& aSector)
     if (mainSector.getLayerNumber() == friendSector.getLayerNumber()) {
       if (mainSector.getVxdID() == friendSector.getVxdID()) {
         badIDs.push_back(aCombination.first);
-        B2DEBUG(30, "filterBadSectorCombis: friend (id/name) " << aCombination.first << "/" << friendSector.getFullSecString() << " of sector (id/name) " << aSector.first << "/" << mainSector.getFullSecString() << " got kicked because of bad layer number (sector/friend): " << mainSector.getLayerNumber() << "/" << friendSector.getLayerNumber() << " and bad VxdID: (sector/friend) " << mainSector.getVxdID() << "/" << friendSector.getVxdID())
+        B2DEBUG(30, "filterBadSectorCombis: friend " << friendSector << " of sector " << mainSector << " got kicked because of bad layer number (sector/friend): " << mainSector.getLayerNumber() << "/" << friendSector.getLayerNumber() << " and bad VxdID: (sector/friend) " << mainSector.getVxdID() << "/" << friendSector.getVxdID())
         continue;
       } else {
         upgradeSecID = true; // that's why this check is done last
-        B2DEBUG(30, "filterBadSectorCombis: friend (id/name) " << aCombination.first << "/" << friendSector.getFullSecString() << " of sector (id/name) " << aSector.first << "/" << mainSector.getFullSecString() << " has marked sector for subLayerID-upgrade")
+        B2DEBUG(30, "filterBadSectorCombis: friend " << friendSector << " of sector " << mainSector << " has marked sector for subLayerID-upgrade")
       }
     }
   }
 
+  B2DEBUG(30, "filterBadSectorCombis: friend " << friendSector << " of sector " << mainSector << " has got " << badIDs.size() << " badIDs after safety checks")
   if (int(badIDs.size()) == 0) { return upgradeSecID; }
 
   searchForBadEntries(aSector.second, badIDs);        /// kicking friend having no values stored
 
   if ((nFriends - int(badIDs.size())) != int(aSector.second.size())) { B2FATAL("filterBadSectorCombis: deleting bad friends went wrong! (nBadfriends/nFriends@begin/nFriendsNow): " << badIDs.size() << "/" << nFriends << "/" << aSector.second.size()) }
 
-  if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 20, PACKAGENAME()) == true) {
+  if (int(badIDs.size()) != 0) {
     stringstream badFriends;
     for (int iD : badIDs) {
       badFriends << iD << "/" << FullSecID(iD).getFullSecString() << " ";
@@ -300,11 +323,11 @@ void VXDTFRawSecMap::repairSecMap()
     bool upgradeMe = filterBadSectorCombis((*sectorIt));                  /// filterBadSectorCombis
     int nFriendsAfter = sectorIt->second.size();
     nKilledFriends += (nFriendsBefore - nFriendsAfter);
-    B2DEBUG(20, "repairSecMap: at sector (id/name): " << sectorIt->first << "/" << currentSecID.getFullSecString() << ", had friends before/after: " << nFriendsBefore << "/" << nFriendsAfter)
+    B2DEBUG(25, "repairSecMap: at sector (id/name): " << sectorIt->first << "/" << currentSecID.getFullSecString() << ", had friends before/after: " << nFriendsBefore << "/" << nFriendsAfter)
 
     if (nFriendsAfter == 0) {
       killedSectors.push_back(sectorIt->first);
-      B2DEBUG(20, "repairSecMap: at sector (id/name): " << sectorIt->first << "/" << currentSecID.getFullSecString() << ", got killed because of no friends")
+      B2DEBUG(15, "repairSecMap: at sector (id/name): " << sectorIt->first << "/" << currentSecID.getFullSecString() << ", got killed because of no friends")
       sectorIt = m_sectorMap.erase(sectorIt);
       continue; // no need for iter++, since it already points at new sector
     }
@@ -333,7 +356,7 @@ void VXDTFRawSecMap::repairSecMap()
   }
 
   if ((m_removeDeadSectorChains == true) and (int(killedSectors.size()) != 0)) {
-    B2DEBUG(20, " removeDeadSectorChains is true and there were " << killedSectors.size() << " sectors killed, starting to clean friends too...")
+    B2DEBUG(15, " removeDeadSectorChains is true and there were " << killedSectors.size() << " sectors killed, starting to clean friends too...")
     int oldNSectors = 0;
     int oldNFriends = 0;
     int newNSectors = getNumOfSectors();
@@ -343,11 +366,15 @@ void VXDTFRawSecMap::repairSecMap()
       ++nTimesRepeated;
       int nNewSectorsKilled = 0; // number of new sectors killed
       for (SectorPack & aSector : m_sectorMap) { // kill dead friends
+        if (aSector.first == centerSectorID) {
+          B2DEBUG(1, "repairSecMap @ removeDeadSectorChains: centerSector found. skipping it...")
+          continue;
+        }
         int nFriendsBefore = aSector.second.size();
         searchForBadEntries(aSector.second, killedSectors);       /// remove all friend which are already dead sectors
 
         int nFriendsAfter = aSector.second.size();
-        B2DEBUG(20, "repairSecMap: after killing dead friends of sector " << FullSecID(aSector.first).getFullSecString() << " there are " << nFriendsAfter << " friends left (there were " << nFriendsBefore << " friend before)")
+        B2DEBUG(20, "repairSecMap: after killing dead friends of sector " << FullSecID(aSector.first) << " there are " << nFriendsAfter << " friends left (there were " << nFriendsBefore << " friend before)")
         if (nFriendsAfter == 0) {
           killedSectors.push_back(aSector.first);  // marked for killing later (can't be done now since all friends have to be checked again anyway) -> leads to some redundancy because of using the killedSectors-container for it, but the information of killed sectors is needed anyway and speed should not be an issue for calculating sectormaps
           ++nNewSectorsKilled;
@@ -373,7 +400,7 @@ void VXDTFRawSecMap::repairSecMap()
     for (int iD : killedSectors) {
       badSectors << iD << "/" << FullSecID(iD).getFullSecString() << " ";
     }
-    B2DEBUG(20, "repairSecMap: secMap " << getMapName() << " had the following bad sectors (id/name): " << badSectors.str())
+    B2DEBUG(15, "repairSecMap: secMap " << getMapName() << " had the following bad sectors (id/name): " << badSectors.str())
   }
 }
 

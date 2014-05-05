@@ -25,6 +25,8 @@ void VXDTFSecMap::importRawSectorMap(Belle2::VXDTFRawSecMap& rawMap)
   SectorValue vectorOfFriends;
   FriendValue vectorOfFilterTypes;
   CutoffValue pairOfCutoffs;
+  stringstream infoOutput;
+  infoOutput << "importRawSectorMap: now converting rawMap " << rawMap.getMapName() << ":\n";
   int acceptedFriends = 0, acceptedCutoffs = 0, rejectedSectors = 0, rejectedFriends = 0, rejectedCutoffs = 0, countNormalSamples = 0, countSmallSamples = 0, sampleThreshold = rawMap.getSampleThreshold();
 
   for (auto aSector : rawMap.getSectorMap()) {
@@ -55,8 +57,10 @@ void VXDTFSecMap::importRawSectorMap(Belle2::VXDTFRawSecMap& rawMap)
     m_sectorMap.push_back(make_pair(aSector.first, vectorOfFriends));
   }
 
-  B2DEBUG(1, "importRawSectorMap: imported sectors/friends/cutoffs: " << size() << "/" << acceptedFriends << "/" << acceptedCutoffs << ", rejected sectors/friends/cutoffs: " << rejectedSectors << "/" << rejectedFriends << "/" << rejectedCutoffs);
-  B2DEBUG(1, "importRawSectorMap: with small sample threshold of " << sampleThreshold << ", " << countSmallSamples << "/" << countNormalSamples << " small/normal samples were accepted");
+  infoOutput << "imported sectors/friends/cutoffs: " << size() << "/" << acceptedFriends << "/" << acceptedCutoffs << ", rejected sectors/friends/cutoffs: " << rejectedSectors << "/" << rejectedFriends << "/" << rejectedCutoffs << endl;
+  infoOutput << "with small sample threshold of " << sampleThreshold << ", " << countSmallSamples << "/" << countNormalSamples << " small/normal samples were accepted" << endl;
+
+  B2INFO(infoOutput.str());
 
   setMapName(rawMap.getMapName());
 

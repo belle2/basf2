@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef VXDTFRawSecMap_H
-#define VXDTFRawSecMap_H
+#pragma once
 
 // stl:
 #include <vector>
@@ -335,7 +334,13 @@ namespace Belle2 {
 
 
 
-    /** internal member - using quantiles to determine cutoffs of given sample. If returned values are both  == 0, then sample was rejected */
+    /** internal member - using quantiles to determine cutoffs of given sample.
+     *
+     * If returned values are both  == 0, then sample was rejected.
+     * first parameter: the sample of values for which the cutoffs shall be determined, has to be sorted beforehand.
+     * second parameter: the lower (.first) and the upper quantile (.second) to determine the cutoffs of given sample. values have to be between 0 and 1. WARNING check
+     * third parameter: the stretchFactor scales the cutoffs by its value (increases value for higher and decreases them for lower cutoffs). WARNING check
+     **/
     std::pair<double, double> calcCutoff(CutoffValues& sample, std::pair<double, double>& quantiles, double stretchFactor);
 
 
@@ -367,10 +372,10 @@ namespace Belle2 {
       bool foundID = false; // is set true, if a badID has been found
       typename Tmpl::iterator entryIt = entryVector.begin(); // typename is needed for the compiler recognizing this as a template
       IDVector::iterator badIDit = badIDs.begin();
-      while (entryIt != entryVector.end()) { // enters infinite loop when iterator runs rampage
+      while (entryIt != entryVector.end()) { // enters infinite loop when iterator runs rampage, used as a primitive boundary check
         foundID = false;
 
-        for (badIDit = badIDs.begin() ; badIDit != badIDs.end() ; ++badIDit) { // enters infinite loop when iterator runs rampage, could be done more safely (but a tick slower) with c++11 for ( : )-loop, but not supported yet by root
+        for (badIDit = badIDs.begin() ; badIDit != badIDs.end() ; ++badIDit) { // enters infinite loop when iterator runs rampage, could be done in a safer way with c++11 for ( : )-loop, but not supported yet by root
           if ((*badIDit) == entryIt->first) {
             foundID = true;
             break;
@@ -381,7 +386,8 @@ namespace Belle2 {
           entryIt = entryVector.erase(entryIt); // entryIt points at first entry after erased one
         } else { ++entryIt; }
       }
-    }/**< compares secID of each given sector/friend with given list of bad IDs and kicks every bad sector/friend found */
+    }/**< compares secID of each given sector/friend with given list of bad IDs and kicks every bad sector/friend found.
+    */
 
 
 
@@ -411,4 +417,3 @@ namespace Belle2 {
 
   /** @}*/
 } //Belle2 namespace
-#endif

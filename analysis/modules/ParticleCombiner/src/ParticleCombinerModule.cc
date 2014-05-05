@@ -109,11 +109,44 @@ namespace Belle2 {
       }
       std::sort(decay.begin(), decay.end());
       std::sort(decaybar.begin(), decaybar.end());
+
       if (decay == decaybar or outputList->getPDG() == outputList->getPDGbar()) {
-        combination(outputList, plists, ParticleList::c_SelfConjugatedParticle);
+        unsigned int nCombinations = (1 << plists.size()) - 1;
+        for (unsigned int i = 0; i < nCombinations; ++i) {
+          std::vector<ParticleList::EParticleType> typeList;
+          for (unsigned int j = 0; j < plists.size(); ++j) {
+            typeList.push_back((i & (1 << j)) ? ParticleList::c_SelfConjugatedParticle : ParticleList::c_Particle);
+          }
+          combination(outputList, plists, typeList, ParticleList::c_SelfConjugatedParticle);
+        }
+        for (unsigned int i = 0; i < nCombinations; ++i) {
+          std::vector<ParticleList::EParticleType> typeList;
+          for (unsigned int j = 0; j < plists.size(); ++j) {
+            typeList.push_back((i & (1 << j)) ? ParticleList::c_SelfConjugatedParticle : ParticleList::c_AntiParticle);
+          }
+          combination(outputList, plists, typeList, ParticleList::c_SelfConjugatedParticle);
+        }
+        std::vector<ParticleList::EParticleType> typeList(plists.size(), ParticleList::c_SelfConjugatedParticle);
+        combination(outputList, plists, typeList, ParticleList::c_SelfConjugatedParticle);
       } else {
-        combination(outputList, plists, ParticleList::c_Particle);
-        combination(outputList, plists, ParticleList::c_AntiParticle);
+        // Loop over all allowed combinations of (Anti-)Particles and Self-Conjugated Particles
+        unsigned int nCombinations = (1 << plists.size()) - 1;
+        for (unsigned int i = 0; i < nCombinations; ++i) {
+          std::vector<ParticleList::EParticleType> typeList;
+          for (unsigned int j = 0; j < plists.size(); ++j) {
+            typeList.push_back((i & (1 << j)) ? ParticleList::c_SelfConjugatedParticle : ParticleList::c_Particle);
+          }
+          combination(outputList, plists, typeList, ParticleList::c_Particle);
+        }
+        for (unsigned int i = 0; i < nCombinations; ++i) {
+          std::vector<ParticleList::EParticleType> typeList;
+          for (unsigned int j = 0; j < plists.size(); ++j) {
+            typeList.push_back((i & (1 << j)) ? ParticleList::c_SelfConjugatedParticle : ParticleList::c_AntiParticle);
+          }
+          combination(outputList, plists, typeList, ParticleList::c_AntiParticle);
+        }
+        std::vector<ParticleList::EParticleType> typeList(plists.size(), ParticleList::c_SelfConjugatedParticle);
+        combination(outputList, plists, typeList, ParticleList::c_SelfConjugatedParticle);
       }
     }
 
@@ -141,6 +174,7 @@ namespace Belle2 {
 
   void ParticleCombinerModule::combination(StoreObjPtr<ParticleList>& outputList,
                                            vector<StoreObjPtr<ParticleList> >& plists,
+                                           vector<ParticleList::EParticleType>& typeList,
                                            ParticleList::EParticleType particleType)
   {
     StoreArray<Particle> Particles;
@@ -157,7 +191,7 @@ namespace Belle2 {
     // SelfConjugatedParticles
     int nLoop = 1;
     for (int i = 0; i < N; i++) {
-      n[i] = plists[i]->getList(particleType).size();
+      n[i] = plists[i]->getList(typeList[i]).size();
       if (n[i] == 0) return;
       k[i] = 0;
       nLoop *= n[i];
@@ -186,7 +220,7 @@ namespace Belle2 {
       vector<Particle*> particleStack;
       vector<int> indices;
       for (int i = 0; i < N; i++) {
-        int ii = plists[i]->getList(particleType)[k[i]];
+        int ii = plists[i]->getList(typeList[i])[k[i]];
         particleStack.push_back(Particles[ii]);
         indices.push_back(ii);
       }

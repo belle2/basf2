@@ -98,6 +98,7 @@ namespace Belle2 {
      */
     void combination(StoreObjPtr<ParticleList>& plist,
                      std::vector<StoreObjPtr<ParticleList> >& plists,
+                     std::vector<ParticleList::EParticleType>& typeList,
                      ParticleList::EParticleType particleType);
 
     /**

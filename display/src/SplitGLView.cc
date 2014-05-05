@@ -207,8 +207,23 @@ void SplitGLView::onClicked(TObject* obj)
 
   if (obj) {
     m_statusBar->SetText(Form("User clicked on: \"%s\"", obj->GetName()), 1);
-  } else
+
+    TEveElement* elem = dynamic_cast<TEveElement*>(obj);
+    if (!elem)
+      return;
+
+    TGListTreeItem* eventItem = gEve->GetListTree()->FindItemByPathname("Event");
+    TGListTreeItem* item = gEve->GetListTree()->FindItemByObj(eventItem, elem);
+    if (item) {
+      //open all parent nodes
+      TGListTreeItem* parent = item;
+      while ((parent = parent->GetParent()) != nullptr)
+        gEve->GetListTree()->OpenItem(parent);
+    }
+  } else {
     m_statusBar->SetText("", 1);
+  }
+
 
   // change the active GL viewer to the one who emitted the signal
   TGLEmbeddedViewer* sender = dynamic_cast<TGLEmbeddedViewer*>(static_cast<TQObject*>(gTQSender));
@@ -323,11 +338,11 @@ void SplitGLView::itemClicked(TGListTreeItem* item, Int_t, Int_t, Int_t)
   // Item has been clicked, based on mouse button do:
 
   static const TEveException eh("SplitGLView::itemClicked ");
-  TEveElement* re = (TEveElement*)item->GetUserData();
+  TEveElement* re = static_cast<TEveElement*>(item->GetUserData());
   if (re == 0) return;
   TObject* obj = re->GetObject(eh);
   if (obj->InheritsFrom("TEveViewer")) {
-    TGLViewer* v = ((TEveViewer*)obj)->GetGLViewer();
+    TGLViewer* v = static_cast<TEveViewer*>(obj)->GetGLViewer();
     //v->Activated();
     if (v->InheritsFrom("TGLEmbeddedViewer")) {
       TGLEmbeddedViewer* ev = (TGLEmbeddedViewer*)v;

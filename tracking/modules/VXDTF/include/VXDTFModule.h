@@ -240,7 +240,7 @@ namespace Belle2 {
     void tcDuel(TCsOfEvent& tcVector);
 
 
-    /** searches for sectors fitting current hit coordinates, returns blank string if nothing could be found */
+    /** searches for sectors fitting current hit coordinates, returns fullSecID with value uIntMax and pointer to end of SecMap if nothing could be found */
     Belle2::SectorNameAndPointerPair searchSector4Hit(VxdID aVxdID,
                                                       TVector3 localHit,
                                                       TVector3 sensorSize,
@@ -248,6 +248,14 @@ namespace Belle2 {
                                                       std::vector<double>& uConfig,
                                                       std::vector<double>& vConfig); // -> TODO: generally usefull for VXD-related modules
     /// VXDTFModule::SectorNameAndPointerPair searchSector4Hit(VxdID aVxdID, FIXME alternative version needed?
+
+    // only temp for testing
+    Belle2::SectorNameAndPointerPair searchSector4HitOld(VxdID aVxdID,
+                                                         TVector3 localHit,
+                                                         TVector3 sensorSize,
+                                                         Belle2::MapOfSectors& m_sectorMap,
+                                                         std::vector<double>& uConfig,
+                                                         std::vector<double>& vConfig);
 
     /** needed for sorting sectorSequence and compares strings... */
     static bool compareSecSequence(Belle2::SectorNameAndPointerPair& lhs, Belle2::SectorNameAndPointerPair& rhs); // -> TODO: dirty little helper

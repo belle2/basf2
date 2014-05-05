@@ -1016,7 +1016,7 @@ namespace Belle2 {
     v1.push_back(&hit3);
     aFilter.resetValues(&v1);       //hits 1 2 3
 
-    EXPECT_ANY_THROW(aFilter.simpleLineFit3D().first);
+    EXPECT_ANY_THROW(aFilter.simpleLineFit3D()/*.first*/);
 
     hit11.hitPosition = TVector3(1., 0., 0.); hit11.hitSigma = TVector3(.1, .1, .1);
     hit12.hitPosition = TVector3(2., 0., 0.); hit12.hitSigma = TVector3(.1, .1, .1);
@@ -1365,7 +1365,7 @@ namespace Belle2 {
     v1.push_back(&hit7);
     aFilter.resetValues(&v1);       //hits 5 6 7
 
-    EXPECT_ANY_THROW(aFilter.helixFit().first);
+    EXPECT_ANY_THROW(aFilter.helixFit()/*.first*/);
 
     hit5.hitPosition = TVector3(1., 1., 0.);  hit5.hitSigma = TVector3(.1, .1, .1); //a straight line with slope 0
     hit6.hitPosition = TVector3(2., 1., 0.);  hit6.hitSigma = TVector3(.1, .1, .1);
@@ -1377,7 +1377,7 @@ namespace Belle2 {
     v1.push_back(&hit7);
     aFilter.resetValues(&v1);       //hits 5 6 7
 
-    EXPECT_ANY_THROW(aFilter.helixFit().first);
+    EXPECT_ANY_THROW(aFilter.helixFit()/*.first*/);
 
     hit5.hitPosition = TVector3(1., 1., 0.);  hit5.hitSigma = TVector3(.91, .1, .1); //a straight line with slope 0
     hit6.hitPosition = TVector3(2.2, 1., 0.); hit6.hitSigma = TVector3(.1, .21, .1);
@@ -1389,7 +1389,7 @@ namespace Belle2 {
     v1.push_back(&hit7);
     aFilter.resetValues(&v1);       //hits 5 6 7
 
-    EXPECT_ANY_THROW(aFilter.helixFit().first);
+    EXPECT_ANY_THROW(aFilter.helixFit()/*.first*/);
   }
 
 

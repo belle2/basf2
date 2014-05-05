@@ -67,7 +67,7 @@ methods = [
 ]
 
 teacher = register_module('TMVATeacher')
-teacher.param('identifier', 'TMVA')
+teacher.param('prefix', 'TMVA')
 teacher.param('methods', methods)
 teacher.param('variables', variables)
 teacher.param('target', 'isSignal')

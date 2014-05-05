@@ -210,6 +210,9 @@ void SplitGLView::onClicked(TObject* obj)
     m_statusBar->SetText(Form("User clicked on: \"%s\"", obj->GetName()), 1);
 
     TEveElement* elem = dynamic_cast<TEveElement*>(obj);
+    if (TEveProjected* projected = dynamic_cast<TEveProjected*>(obj)) {
+      elem = dynamic_cast<TEveElement*>(projected->GetProjectable());
+    }
     if (!elem)
       return;
 

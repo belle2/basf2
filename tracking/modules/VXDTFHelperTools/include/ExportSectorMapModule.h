@@ -121,6 +121,7 @@ namespace Belle2 {
     std::vector<double> m_PARAMsampleQuantiles; /**< only needed if importROOTorXML = true:  behiavior of normal sample sizes, exactly two entries allowed: first: lower quantile, second: upper quantile. only values between 0-1 are allowed */
     std::vector<double> m_PARAMstretchFactor; /**< only needed if importROOTorXML = true:  exactly two entries allowed: first: stretchFactor for small sample size for sector-combination, second: stretchFactor for normal sample size for sector-combination: WARNING if you simply want to produce wider cutoffs in the VXDTF, please use the tuning parameters there! This parameter here is only if you know what you are doing, since it changes the values in the XML-file directly */
     std::string m_PARAMrootFileName; /**< only needed if importROOTorXML = true: sets the root filename */
+    bool m_PARAMprintFinalMaps; /**< if true, a complete list of sectors (B2INFO) and its friends (B2DEBUG-1) will be printed on screen */
   private:
 
   };

@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef VXDSIMPLECLUSTERIZERMODULE_H_
-#define VXDSIMPLECLUSTERIZERMODULE_H_
+
+#pragma once
 
 
 #include <framework/core/Module.h>
@@ -66,9 +66,8 @@ namespace Belle2 {
     double m_setMeasSigma; /**< if positive value (in cm) is given it will be used as the sigma to smear the Clusters otherwise pitch/uniSigma will be used */
     int m_weakSVDHitCtr; /**< counts SVDHits whose energy deposit is lower than energyThreshold */
     int m_weakPXDHitCtr; /**< counts PXDHits whose energy deposit is lower than energyThreshold */
+    int m_fakeSVDHitCtr; /**< counts SVDHits which were not caused by a primary partice */
+    int m_fakePXDHitCtr; /**< counts PXDHits which were not caused by a primary partice */
 
   };
 } // end namespace Belle2
-
-#endif /* VXDSIMPLECLUSTERIZERMODULE_H_ */
-

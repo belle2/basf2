@@ -103,6 +103,8 @@ ExportSectorMapModule::ExportSectorMapModule() : Module()
   addParam("stretchFactor", m_PARAMstretchFactor, "only needed if importROOTorXML = true: exactly two entries allowed: first: stretchFactor for small sample size for sector-combination, second: stretchFactor for normal sample size for sector-combination: WARNING if you simply want to produce wider cutoffs in the VXDTF, please use the tuning parameters there! This parameter here is only if you know what you are doing, since it changes the values in the XML-file directly", stretchFactor);
 
   addParam("rootFileName", m_PARAMrootFileName, "only needed if importROOTorXML = true: sets the root filename", rootFileName);
+
+  addParam("printFinalMaps", m_PARAMprintFinalMaps, "if true, a complete list of sectors (B2INFO) and its friends (B2DEBUG-1) will be printed on screen", bool(true));
 }
 
 
@@ -173,7 +175,7 @@ void ExportSectorMapModule::terminate()
     pair<int, int> countedStuff = importROOTMap();              /// importROOTMap
 
     for (auto & aMap : m_importedSectorMaps) {
-      B2INFO("Imported via ROOT-file: of a total of " << countedStuff.first << "/" << countedStuff.second << " sectors/totalEntries, to XML converted number of Sector-Entries: " << aMap.size() << ", of friend-entries: " << aMap.getNumOfFriends() << ", of final cutoffValues: " << aMap.getNumOfValues() << ", mField: " << aMap.getMagneticFieldStrength() << "T, and additional Info:\n" << aMap.getAdditionalInfo())
+      B2INFO("Imported via ROOT-file of a total of " << countedStuff.first << "/" << countedStuff.second << " sectors/totalEntries, to XML converted number of Sector-Entries: " << aMap.size() << ", of friend-entries: " << aMap.getNumOfFriends() << ", of final cutoffValues: " << aMap.getNumOfValues() << ", mField: " << aMap.getMagneticFieldStrength() << "T, and additional Info:\n" << aMap.getAdditionalInfo())
     }
   }
 
@@ -181,7 +183,7 @@ void ExportSectorMapModule::terminate()
   boostClock::time_point stopTimer = boostClock::now();
   m_fillStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
 
-  B2INFO("ExportSectorMapModule::terminate: importing the map took " << (m_fillStuff.count()) << " nanoseconds")
+  B2INFO("ExportSectorMapModule::terminate: importing the map took " << (m_fillStuff.count()) << "/" << int(m_fillStuff.count() * 0.000001) << " nano-/milliseconds")
 }
 
 
@@ -485,7 +487,41 @@ std::pair<int, int> ExportSectorMapModule::importROOTMap()
     string  endTagName = "\n</" + newMap.getMapName() + ">\n";
 
     file << tagName << Stream::escapeXML(Stream::serializeXML(&newMap)) << endTagName;
+
+    if (m_PARAMprintFinalMaps == true) {
+      unsigned sectorCtr = 0, friendCtr = 0, cutoffTypesCtr = 0;
+      const VXDTFSecMap::FriendValue* currentCutOffTypes; // used only for counting cutoffTypes
+
+      for (const VXDTFSecMap::Sector & sectorEntry : newMap.getSectorMap()) { // looping through sectors
+        const VXDTFSecMap::SectorValue& currentFriends = sectorEntry.second;
+        int nFriends = currentFriends.size();
+
+        B2INFO("Opening sector " << FullSecID(sectorEntry.first) << " which has got " << nFriends << " friends");
+
+        for (const VXDTFSecMap::Friend & friendEntry : currentFriends) { // looping through friends
+          currentCutOffTypes = &friendEntry.second;
+          B2DEBUG(1, " > Opening sectorFriend " << FullSecID(friendEntry.first) << " having " << currentCutOffTypes->size() << " cutoffTypes.");
+          cutoffTypesCtr += currentCutOffTypes->size();
+          ++friendCtr;
+        }
+        ++sectorCtr;
+      }
+      B2INFO("printFinalMaps: secMap " << newMap.getMapName() << ": manually counted a total of " << sectorCtr << "/" << friendCtr << "/" << cutoffTypesCtr << " setors/friends/cutoffs in sectorMap");
+    }
   }
 
   return (make_pair(countSectors, countTotalValues));
 }
+
+
+// tracking/modules/VXDTFHelperTools/src/ExportSectorMapModule.cc:502:38: error: cannot convert ‘const std::vector<std::pair<unsigned int, std::vector<std::pair<unsigned int, std::pair<double, double> > > > >*’ to ‘const FriendValue* {aka const std::vector<std::pair<unsigned int, std::pair<double, double> > >*}’ in assignment
+//
+// const std::vector<std::pair<unsigned int, std::vector<std::pair<unsigned int, std::pair<double, double> > > > >*
+//             const std::vector<std::pair<unsigned int, std::pair<double, double> > >*
+// typedef std::pair< double, double> CutoffValue; /**< .first is minValue, .second is maxValue */
+//     typedef std::pair<unsigned int, CutoffValue> Cutoff; /**< .first is code of filter, .second is CutoffValue */
+//     typedef std::vector< Cutoff > FriendValue; /**< stores all Cutoffs */
+//     typedef std::pair<unsigned int, FriendValue > Friend; /**< .first is secID of current Friend, second is FriendValue */
+//     typedef std::vector< Friend > SectorValue; /**< stores all Friends */
+//     typedef std::pair<unsigned int, SectorValue> Sector; /**< .first is secID of current sector, second is SectorValue */
+//     typedef std::vector < Sector > SecMapCopy; /**< stores all Sectors */

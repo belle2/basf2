@@ -52,13 +52,11 @@ using std::endl;
 
 using namespace Belle2;
 
-//disabled because of duplication (macro string split because there is a regular expression parsing these)
-//RE
-//G_MODULE(VXDSimpleClusterizer)
+REG_MODULE(VXDSimpleClusterizer)
 
 VXDSimpleClusterizerModule::VXDSimpleClusterizerModule() : Module()
 {
-  setDescription("The VXDSimpleClusterizerModule generates PXD/SVD Clusters using TrueHits, energy threshold and gaussian smearing as well. Its purpose is fast clusterizing for tracking test procedures, using standardized PXD/SVD-Cluster");
+  setDescription("The VXDSimpleClusterizerModule generates PXD/SVD Clusters using TrueHits. Energy-deposit threshold and gaussian smearing can be chosen, non-primary-particles can be filtered as well. Its purpose is fast clusterizing for tracking test procedures, using standardized PXD/SVD-Cluster");
 
   addParam("energyThresholdU", m_energyThresholdU, "particles with energy deposit in U lower than this will not create a cluster in SVD (GeV)", double(17.4E-6));
   addParam("energyThresholdV", m_energyThresholdV, "particles with energy deposit in V lower than this will not create a cluster in SVD (GeV)", double(28.6E-6));
@@ -97,13 +95,20 @@ void VXDSimpleClusterizerModule::beginRun()
   string paramValue;
   if (m_onlyPrimaries == true) { paramValue = "true, means that there are no secondary hits (for 1-track events this means no ghost hits guaranteed)"; } else { paramValue = "false, means that secondary hits can occur and increase the rate of ghost hits"; }
   B2INFO("VXDSimpleClusterizer: parameter onlyPrimaries is set to " << paramValue)
+  m_weakPXDHitCtr = 0;
+  m_weakSVDHitCtr = 0;
+  m_fakePXDHitCtr = 0;
+  m_fakeSVDHitCtr = 0;
 }
 
 void VXDSimpleClusterizerModule::event()
 {
+  // counter for cases when a trueHit god discarded:
+  int discardedPXDEdeposit = 0, discardedSVDEdeposit = 0, discardedPXDFake = 0, discardedSVDFake = 0;
+
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
 
-  B2DEBUG(1, "*******  VXDSimpleClusterizerModule processing event number: " << eventMetaDataPtr->getEvent() << " *******");
+  B2DEBUG(5, "*******  VXDSimpleClusterizerModule processing event number: " << eventMetaDataPtr->getEvent() << " *******");
   //all the input containers. First: MCParticles
   StoreArray<MCParticle> mcParticles("");
   int nMcParticles = mcParticles.getEntries();
@@ -159,11 +164,14 @@ void VXDSimpleClusterizerModule::event()
     if (energy < m_energyThreshold) { //ignore hit if energy deposit is too small
       B2DEBUG(100, " PXD, TrueHit discarded because of energy deposit too small")
       m_weakPXDHitCtr++;
+      discardedPXDEdeposit++;
       continue;
     }
 
     if (m_onlyPrimaries == true) { // ingore hits not comming from primary particles (e.g material effects particles)
       if (relIndexPxdTH2McP.getFirstElementTo(aPxdTrueHit)->from->hasStatus(MCParticle::c_PrimaryParticle) == false) {
+        m_fakePXDHitCtr++;
+        discardedPXDFake++;
         continue; // jump to next pxdTrueHit
       }
     }
@@ -181,8 +189,19 @@ void VXDSimpleClusterizerModule::event()
     }
     B2DEBUG(1000, "sigU sigV: " << sigmaU << " " << sigmaV);
 
-    u = gRandom->Gaus(uTrue, sigmaU);
-    v = gRandom->Gaus(vTrue, sigmaV);
+    if (m_setMeasSigma != 0) {
+      u = gRandom->Gaus(uTrue, sigmaU);
+      v = gRandom->Gaus(vTrue, sigmaV);
+    } else {
+      u = uTrue;
+      v = vTrue;
+    }
+
+    if (m_setMeasSigma == 0 and m_uniSigma == 0) {
+      // in this case, the hits will not be smeared, but still we need some measurement error-values to be able to do some fitting... WARNING currently arbritary values here, better solution recommended!
+      sigmaU = 0.000001;
+      sigmaV = 0.000001;
+    }
 
     /** Constructor.
      * @param sensorID Sensor compact ID.
@@ -221,12 +240,15 @@ void VXDSimpleClusterizerModule::event()
     B2DEBUG(100, " SVD, current TrueHit has an energy deposit of " << energy * 1000.0 << "MeV ")
     if (energy < (m_energyThresholdU + m_energyThresholdV)) { //ignore hit if energy deposity is too snall
       m_weakSVDHitCtr++;
+      discardedSVDEdeposit++;
       B2DEBUG(100, " SVD, TrueHit discarded because of energy deposit too small")
       continue;
     }
 
     if (m_onlyPrimaries == true) { // ingore hits not comming from primary particles (e.g material effects particles)
       if (relIndexSvdTH2McP.getFirstElementTo(aSvdTrueHit)->from->hasStatus(MCParticle::c_PrimaryParticle) == false) {
+        m_fakeSVDHitCtr++;
+        discardedSVDFake++;
         continue; // jump to next svdTrueHit
       }
     }
@@ -244,8 +266,19 @@ void VXDSimpleClusterizerModule::event()
     }
     B2DEBUG(1000, "sigU sigV: " << sigmaU << " " << sigmaV);
 
-    u = gRandom->Gaus(uTrue, sigmaU);
-    v = gRandom->Gaus(vTrue, sigmaV);
+    if (m_setMeasSigma != 0) {
+      u = gRandom->Gaus(uTrue, sigmaU);
+      v = gRandom->Gaus(vTrue, sigmaV);
+    } else {
+      u = uTrue;
+      v = vTrue;
+    }
+
+    if (m_setMeasSigma == 0) {
+      // in this case, the hits will not be smeared, but still we need some measurement error-values to be able to do some fitting... WARNING currently arbritary values here, better solution recommended!
+      sigmaU = 0.000001;
+      sigmaV = 0.000001;
+    }
 
     // Save as two new 1D-SVD-clusters
     unsigned int clusterIndex = svdClusters.getEntries();
@@ -305,11 +338,13 @@ void VXDSimpleClusterizerModule::event()
   B2DEBUG(10, "relationMapMcP2PxdCls.size()" << relationMapMcP2PxdCls.size());
   B2DEBUG(10, "relationMapMcP2SvdCls.size()" << relationMapMcP2SvdCls.size());
   B2DEBUG(10, "------------------------------------------------------");
+
+  B2DEBUG(1, "VXDSimpleClusterizer - event " << eventMetaDataPtr->getEvent() << ":\n" << "of " << nPxdTrueHits << "/" << nSvdTrueHits << " PXD-/SVDTrueHits, " << discardedPXDEdeposit << "/" << discardedSVDEdeposit << " hits were discarded bec. of low E-deposit & " << discardedPXDFake << "/" << discardedSVDFake << " hits were discarded bec. of being a fake. " << pxdClusters.getEntries() << "/" << svdClusters.getEntries() << " Clusters were stored.\n");
 }
 
 void VXDSimpleClusterizerModule::endRun()
 {
-  B2DEBUG(1, "EndRun: SimpleClusterizerModule discarded " << m_weakPXDHitCtr << " PXDTrueHits and " << m_weakSVDHitCtr << " SVDTrueHits total");
+  B2INFO("VXDSimpleClusterizerModule::EndRun:\nSimpleClusterizerModule discarded " << m_weakPXDHitCtr << " PXDTrueHits and " << m_weakSVDHitCtr << " SVDTrueHits because of low E-deposit-threshold and discarded "  << m_fakePXDHitCtr << " PXDTrueHits and " << m_fakeSVDHitCtr << " SVDTrueHits because they were fake");
 }
 
 void VXDSimpleClusterizerModule::terminate()

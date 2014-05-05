@@ -481,6 +481,8 @@ namespace Belle2 {
 
     bool m_PARAMexportSectorCoords; /**< set true if you want to export coordinates of the sectors too */
 
+    bool m_PARAMuseOldSecCalc; /**< WARNING DEBUG - if true, old way to calc secID is used April15th-2014 */
+
     std::string m_PARAMsectorSetupFileName; /**< enables personal sector setups (can be loaded by the vxd track finder) */
     std::vector<std::string> m_PARAMsecMapNames; /**< enables personal sector setups (can be loaded by the vxd track finder), import one for each chosen momentum range */
 

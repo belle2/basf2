@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/FullSecID.h"
+#include "tracking/dataobjects/FullSecID.h"
 #include <framework/logging/Logger.h>
 #include <limits> // needed for numeric_limits<t>::max()
 #include <assert.h> // testing purposes

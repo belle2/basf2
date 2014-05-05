@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/TwoHitFilters.h"
+#include "tracking/vxdCaTracking/TwoHitFilters.h"
 #include <boost/math/special_functions/fpclassify.hpp>
 
 

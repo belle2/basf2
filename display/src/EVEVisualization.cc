@@ -1077,8 +1077,10 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
 
     //set track title (for popup)
     TString momLabel = "";
-    if (particle->getMother())
+    if (particle->getMother()) {
       momLabel = TString::Format("\nMother: Idx=%d, PDG=%d)", particle->getMother()->getIndex() - 1, particle->getMother()->getPDG());
+      m_mcparticleTracks[particle].parentParticle = particle->getMother();
+    }
 
     if (!hasTrajectory) {
       //Hijack the mother label to show that the track position is only
@@ -1130,7 +1132,6 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
     m_mcparticleTracks[particle].simhits->SetMarkerStyle(6);
     m_mcparticleTracks[particle].simhits->SetMainColor(m_mcparticleTracks[particle].track->GetLineColor());
     //m_mcparticleTracks[particle].simhits->SetMainTransparency(50);
-    m_mcparticleTracks[particle].track->AddElement(m_mcparticleTracks[particle].simhits);
     addObject(particle, m_mcparticleTracks[particle].track);
   }
   return &m_mcparticleTracks[particle];
@@ -1141,10 +1142,22 @@ void EVEVisualization::makeTracks()
   std::map<const MCParticle*, MCTrack>::iterator it = m_mcparticleTracks.begin();
   const std::map<const MCParticle*, MCTrack>::iterator& end = m_mcparticleTracks.end();
   for (; it != end; ++it) {
-    if (it->second.track)
+    if (it->second.track) {
+      if (it->second.simhits->Size() > 0)
+        it->second.track->AddElement(it->second.simhits);
+
+      if (it->second.parentParticle) {
+        const auto& parentIt = m_mcparticleTracks.find(it->second.parentParticle);
+        if (parentIt != m_mcparticleTracks.end()) {
+          parentIt->second.track->AddElement(it->second.track);
+          continue; //next item
+        }
+        //if not found, add to tracklist
+      }
       m_tracklist->AddElement(it->second.track);
-    else //add simhits directly
+    } else { //add simhits directly
       gEve->AddElement(it->second.simhits);
+    }
   }
   gEve->AddElement(m_tracklist);
   m_tracklist->MakeTracks();
@@ -1191,8 +1204,6 @@ void EVEVisualization::clearEvent()
   m_gftracklist->DestroyElements();
   if (m_trackcandlist)
     m_trackcandlist->DestroyElements();
-
-
 
 
   //remove ECL data from event

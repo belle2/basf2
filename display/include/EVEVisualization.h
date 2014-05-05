@@ -70,6 +70,7 @@ namespace Belle2 {
     struct MCTrack {
       TEveTrack* track; /**< the actual MC track. */
       TEvePointSet* simhits; /**< simhit positions. */
+      MCParticle* parentParticle; /**< parent particle, or nullptr. */
     };
 
     /** Provide magnetic field values for TEveTrackPropagator. */

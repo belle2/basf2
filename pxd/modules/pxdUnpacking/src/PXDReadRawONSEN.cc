@@ -1,10 +1,10 @@
 //+
 // File : PXDReadRawONSEN.cc
-// Description : Module to receive PXD Data from external socket and store it as RawPXD in Data Store.
+// Description : Module to Load Raw PXD Data from ONSEN network-dump file and store it as RawPXD in Data Store
 // This is meant for lab use (standalone testing, debugging) without an event builder.
 //
-// Author : Bjoern Spruck / Klemens Lautenbach
-// Date : 13 - Aug - 2013
+// Author : Bjoern Spruck
+// Date : 15 - Apr - 2014
 //-
 
 #include <pxd/modules/pxdUnpacking/PXDReadRawONSEN.h>

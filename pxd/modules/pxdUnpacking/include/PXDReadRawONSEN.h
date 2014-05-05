@@ -1,10 +1,10 @@
 //+
 // File : PXDReadRawONSEN.h
-// Description : Module to receive PXD Data from external socket and store it as RawPXD in Data Store
+// Description : Module to Load Raw PXD Data from ONSEN network-dump file and store it as RawPXD in Data Store
 // This is meant for lab use (standalone testing, debugging) without an event builder.
-
-// Author : Bjoern Spruck / Klemens Lautenbach
-// Date : 13 - Aug - 2013
+//
+// Author : Bjoern Spruck
+// Date : 15 - Apr - 2014
 //-
 
 #ifndef PXDREADRAWONSEN_H
@@ -56,13 +56,13 @@ namespace Belle2 {
 
       // Parallel processing parameters
 
-      // Event Meta Data
+      //! Event Meta Data
       StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
-      //Sender Name
+      //! File Name
       std::string m_filename;
 
-      //! Messaage handler
+      //! Message handler
       MsgHandler* m_msghandler;
 
       //! Compression Level
@@ -74,13 +74,11 @@ namespace Belle2 {
       //! buffer
       int* m_buffer;
 
-      // For monitoring
-      // int events_processed;
-
+      //! File handle
       FILE* fh;
 
-      int readOneEvent(void);
-      int read_data(char* data, size_t len);
+      int readOneEvent(void);//! Read data of one Event from File
+      int read_data(char* data, size_t len);//! Read amount of data (len bytes) from file to ptr data
     };
 
   } // end namespace PXD

@@ -159,29 +159,32 @@ def FullReconstruction(path, particles):
             # 1. Create Histograms with the invariant mass or signal probability distribution for each channel, as soon as all daughter ParticleLists and daughter SignalProbabilities are available.
             # 2. If the Histogram is available calculate the PreCuts with the PreCutDetermination function. As soon as the PreCuts are available the particle can be reconstructed.
             if particle.channels != []:
-                daughters = set([daughter for channel in particle.channels for daughter in channel.daughters])
                 if args.cp:
-                    seq.addFunction(CreatePreCutProbHistogram,
-                                    path='Path',
-                                    particle='Particle_' + particle.name,
-                                    daughterLists=['ParticleList_' + daughter for daughter in daughters],
-                                    daughterSignalProbabilities=['SignalProbability_' + daughter for daughter in daughters])
+                    for channel in particle.channels:
+                        seq.addFunction(CreatePreCutProbHistogram,
+                                        path='Path',
+                                        particle='Particle_' + particle.name,
+                                        name='Name_' + channel.name,
+                                        daughterLists=['ParticleList_' + daughter for daughter in channel.daughters],
+                                        daughterSignalProbabilities=['SignalProbability_' + daughter for daughter in channel.daughters])
                     seq.addFunction(PreCutProbDetermination,
                                     name='Name_' + particle.name,
                                     pdgcode='PDG_' + particle.name,
                                     channels=['Name_' + channel.name for channel in particle.channels],
-                                    preCut_Histogram='PreCutHistogram_' + particle.name,
+                                    preCut_Histograms=['PreCutHistogram_' + channel.name for channel in particle.channels],
                                     efficiency='Efficiency_' + particle.name)
                 else:
-                    seq.addFunction(CreatePreCutMassHistogram,
-                                    path='Path',
-                                    particle='Particle_' + particle.name,
-                                    daughterLists=['ParticleList_' + daughter for daughter in daughters])
+                    for channel in particle.channels:
+                        seq.addFunction(CreatePreCutMassHistogram,
+                                        path='Path',
+                                        particle='Particle_' + particle.name,
+                                        name='Name_' + channel.name,
+                                        daughterLists=['ParticleList_' + daughter for daughter in channel.daughters])
                     seq.addFunction(PreCutMassDetermination,
                                     name='Name_' + particle.name,
                                     pdgcode='PDG_' + particle.name,
                                     channels=['Name_' + channel.name for channel in particle.channels],
-                                    preCut_Histogram='PreCutHistogram_' + particle.name,
+                                    preCut_Histograms=['PreCutHistogram_' + channel.name for channel in particle.channels],
                                     efficiency='Efficiency_' + particle.name)
                 if args.verbose:
                     seq.addFunction(PrintPreCuts,

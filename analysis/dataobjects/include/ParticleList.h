@@ -43,7 +43,8 @@ namespace Belle2 {
      * Default constructor
      */
     ParticleList():
-      m_pdg(NULL),
+      m_pdg(0),
+      m_pdgbar(0),
       m_particleStore("Particles")
     {}
 
@@ -99,20 +100,13 @@ namespace Belle2 {
      * Returns PDG code
      * @return PDG code
      */
-    int getPDG() const {return m_pdg ? m_pdg->PdgCode() : 0;}
+    int getPDG() const {return m_pdg; }
 
     /**
      * Returns PDG code of anti-particle
      * @return PDG code of anti-particle
      */
-    int getPDGbar() const {
-      if (not m_pdg)
-        return 0;
-      if (m_pdg->AntiParticle())
-        return m_pdg->AntiParticle()->PdgCode();
-      else
-        return m_pdg->PdgCode();
-    }
+    int getPDGbar() const { return m_pdgbar; }
 
     /**
      * Returns list of StoreArray<Particle> indices.
@@ -154,7 +148,16 @@ namespace Belle2 {
 
   private:
 
-    TParticlePDG* m_pdg;               /**< PDG code */
+    /**
+     * Checks if the given pdg code particle has an anti particle
+     * We can't use TDatabase here because of a bug in our patch of ROOT!
+     */
+    bool hasAntiParticle(int pdg);
+
+  private:
+
+    int m_pdg;               /**< PDG code of Particle */
+    int m_pdgbar;               /**< PDG code of antiparticle */
     std::vector<int> m_list[3];        /**< list of 0-based indices of Particles */
     std::string m_particleStore;       /**< name of Particle store array */
 

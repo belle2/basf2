@@ -46,7 +46,31 @@ void ParticleList::addParticle(const Particle* particle)
 
 void ParticleList::setPDG(int pdg)
 {
-  m_pdg = TDatabasePDG::Instance()->GetParticle(pdg);
+  auto* particlePDG = TDatabasePDG::Instance()->GetParticle(pdg);
+  if (not particlePDG) {
+    B2WARNING("ParticleList::setPDG Couldn't find given PDG Code in TDatabasePDG: " << pdg)
+    return;
+  }
+
+  m_pdg = particlePDG->PdgCode();
+  m_pdgbar = hasAntiParticle(m_pdg) ? -m_pdg : m_pdg;
+
+}
+
+bool ParticleList::hasAntiParticle(int pdg)
+{
+
+  if (pdg < 0) return true;
+  if (pdg == 22) return false;
+  if (pdg == 310) return false;
+  if (pdg == 130) return false;
+  int nnn = pdg / 10;
+  int q3 = nnn % 10; nnn /= 10;
+  int q2 = nnn % 10; nnn /= 10;
+  int q1 = nnn % 10;
+  if (q1 == 0 && q2 == q3) return false;
+
+  return true;
 }
 
 void ParticleList::addParticle(unsigned iparticle, int pdg, unsigned type)

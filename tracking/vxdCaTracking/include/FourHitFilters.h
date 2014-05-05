@@ -8,9 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef FOURHITFILTERS_H
-#define FOURHITFILTERS_H
+#pragma once
 
 #include <TVector3.h>
 #include "ThreeHitFilters.h"
@@ -58,13 +56,21 @@ namespace Belle2 {
     /** Overrides Constructor-Setup for magnetic field. if no value is given, magnetic field is assumed to be Belle2-Detector standard of 1.5T */
     void resetMagneticField(double magneticFieldStrength = 1.5) { m_threeHitFilter.resetMagneticField(magneticFieldStrength); }
 
+
     /** calculates dpt-value (dpt= difference in transverse momentum of 2 subsets of the hits), returning unit: GeV/c */
-    double deltapT(); // TODO rename! ->calcDeltapT
+    double calcDeltapT();
+
+
+    /** legacy - compatibility for old cases */
+    double deltapT() { return calcDeltapT(); }
+
 
     /** calculates ddist2IP-value directly (ddist2IP= difference in magnitude of the points of closest approach of two circles calculated using 2 subsets of the hits) */
-    double deltaDistCircleCenter();
+    double calcDeltaDistCircleCenter();
 
 
+    /** legacy - compatibility for old cases */
+    double deltaDistCircleCenter() { return calcDeltaDistCircleCenter(); }
   protected:
 
     /** calculates an estimation of circleCenter position including an estimation for the circle radius */
@@ -89,7 +95,3 @@ namespace Belle2 {
     bool m_circleCalculated; /**< initially set to false, will be set true if calcCircle() is used at least once */
   }; //end class FourHitFilters
 } //end namespace Belle2
-
-#endif //FOURHITFILTERS
-
-

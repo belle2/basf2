@@ -70,6 +70,8 @@ namespace Belle2 {
     std::pair<int, int> importSectorMap(const SecMapCopy& rawSecMap);
 
 
+    /** fills in standard-settings for all filters */
+    void activateAllFilters();
 
     /** for streching the limits of the cutoff values for finetuning */
     double addExtraGain(double prefix, double cutOff, double specialTune) {

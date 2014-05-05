@@ -19,7 +19,7 @@ bool SegFinderFilters::checkDist3D(int nameDist3D)
   const Cutoff* pCutoff = m_thisSector->getCutoff(nameDist3D, m_friendID);
   if (pCutoff != NULL) {
     double aResult = TwoHitFilters::calcDist3D();
-    if (aResult > pCutoff->getMinValue() && aResult < pCutoff->getMaxValue()) {   // min & max
+    if (aResult > pCutoff->getMinValue() and aResult < pCutoff->getMaxValue()) {   // min & max
       m_dist3DCtr.first++;
       return true;
     }
@@ -33,7 +33,7 @@ bool SegFinderFilters::checkDistXY(int nameDistXY)
   const Cutoff* pCutoff = m_thisSector->getCutoff(nameDistXY, m_friendID);
   if (pCutoff != NULL) {
     double aResult = TwoHitFilters::calcDistXY();
-    if (aResult > pCutoff->getMinValue() && aResult < pCutoff->getMaxValue()) {   // min & max
+    if (aResult > pCutoff->getMinValue() and aResult < pCutoff->getMaxValue()) {   // min & max
       m_distXYCtr.first++;
       return true;
     }

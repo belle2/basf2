@@ -31,7 +31,7 @@ namespace Belle2 {
       m_min(0),
       m_max(0) {}
 
-    /** constructor **/
+    /** constructor, first entry of pair is lower cutoff value, the second one is the higher one **/
     Cutoff(int type, std::pair<double, double> values):
       m_type(type),
       m_min(values.first),

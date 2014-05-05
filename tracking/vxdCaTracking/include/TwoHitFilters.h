@@ -8,11 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef TWOHITFILTERS_H
-#define TWOHITFILTERS_H
+#pragma once
 
 #include <TVector3.h>
+#include <math.h>
 
 
 
@@ -49,31 +48,38 @@ namespace Belle2 {
     }
 
     /** calculates the distance between the hits (3D), returning unit: cm^2 for speed optimization */
-    double calcDist3D() { return (m_x2 + m_y2 + m_z2); } // return unit: cm^2
+    double calcDist3D() const { return (m_x2 + m_y2 + m_z2); } // return unit: cm^2
+
+    /** calculates the real distance between the hits (3D), returning unit: cm */
+    double fullDist3D() const { return sqrt(calcDist3D()); } // return unit: cm
 
     /** calculates the distance between the hits (XY), returning unit: cm^2 for speed optimization */
-    double calcDistXY() { return (m_x2 + m_y2); } // return unit: cm^2
+    double calcDistXY() const { return (m_x2 + m_y2); } // return unit: cm^2
+
+    /** calculates the real distance between the hits (XY), returning unit: cm */
+    double fullDistXY() const { return sqrt(calcDistXY()); } // return unit: cm
 
     /** calculates the distance between the hits (Z only), returning unit: cm */
-    double calcDistZ() { return m_dz; } // return unit: cm
+    double calcDistZ() const { return m_dz; } // return unit: cm
 
-    /** calculates the slope of the hits in RZ, return unit: cm (cm^2/cm = cm) */
-    double calcSlopeRZ() {
-      double slope = calcDistXY() / m_dz;
+    /** calculates the angle of the slope of the hits in RZ, returnValue = theta = atan(r/z) */
+    double calcSlopeRZ() const {
+      //double slope = atan (calcDistXY() / m_dz) ;
+      double slope = atan(fullDistXY() / m_dz) ;    //since calcDistXY() returns cm ^2
       return filterNan(slope);
-    } // return unit: cm  (cm^2/cm = cm)
+    } // return unit: radians
 
-    /** calculates the real slope of the hits in RZ, return unit: (sqrt(cm^2)/cm = none) */
-    double fullSlopeRZ();
+    /** calculates the angle of the slope of the hits in RZ, returnValue = theta = atan(r/z) */
+    double fullSlopeRZ() const { return calcSlopeRZ(); }
 
     /** calculates the normed distance between the hits (3D), return unit: none */
-    double calcNormedDist3D() {
+    double calcNormedDist3D() const {
       double normedVal = calcDistXY() / calcDist3D();
       return filterNan(normedVal);
     } // return unit: none
 
-    /** nice little nanChecker returns 0 if value was nan, else returns value itself */
-    double filterNan(double value);
+    /** nice little nanChecker returns 0 if value was nan or inf, else returns value itself */
+    double filterNan(double value) const;
 
   protected:
 
@@ -83,7 +89,7 @@ namespace Belle2 {
       m_y2 = outerHit[1] - innerHit[1];
       m_dz = outerHit[2] - innerHit[2];
 
-      m_x2 *= m_x2;
+      m_x2 *= m_x2; // now it's x2...
       m_y2 *= m_y2;
       m_z2 = m_dz * m_dz;
     }
@@ -97,7 +103,3 @@ namespace Belle2 {
 
   }; //end class TwoHitFilters
 } //end namespace Belle2
-
-#endif //TWOHITFILTERS
-
-

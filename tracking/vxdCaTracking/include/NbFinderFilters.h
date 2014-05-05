@@ -8,10 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-
-#ifndef NBFINDERFILTERS_H
-#define NBFINDERFILTERS_H
+#pragma once
 
 #include "TObject.h"
 #include <TVector3.h>
@@ -38,7 +35,7 @@ namespace Belle2 {
       m_circleDist2IPCtr(std::make_pair(0, 0)),
       m_deltaSlopeRZCtr(std::make_pair(0, 0)),
       m_pTCtr(std::make_pair(0, 0)),
-      m_helixFitCtr(std::make_pair(0, 0)) {}
+      m_helixParameterFitCtr(std::make_pair(0, 0)) {}
 
     /** Constructor. use this one, when having a sectormap (e.g. during track finding), use ThreeHitFilters when no sectormap is available, optional parameter sets strength of magnetic field (standard is 1.5T) */
     NbFinderFilters(TVector3 outerHit, TVector3 centerHit, TVector3 innerHit, VXDSector* thisSector, unsigned int friendID, double magneticFieldStrength = 1.5):
@@ -51,7 +48,7 @@ namespace Belle2 {
       m_circleDist2IPCtr(std::make_pair(0, 0)),
       m_deltaSlopeRZCtr(std::make_pair(0, 0)),
       m_pTCtr(std::make_pair(0, 0)),
-      m_helixFitCtr(std::make_pair(0, 0)) {}
+      m_helixParameterFitCtr(std::make_pair(0, 0)) {}
 
 
     /** Destructor. */
@@ -157,15 +154,15 @@ namespace Belle2 {
 
 
     /** simply checks whether helixparameter-value is accepted by the given cutoffs */
-    bool checkHelixFit(int nameHelixFit);
+    bool checkHelixParameterFit(int nameHelixParameterFit);
 
 
     /** calculates the helixparameter describing the deviation in z per unit angle, returning unit: none */
-    double calcHelixFit() { return ThreeHitFilters::calcHelixFit(); }
+    double calcHelixParameterFit() { return ThreeHitFilters::calcHelixParameterFit(); }
 
 
     /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
-    SuccessAndFailCounter getAcceptanceRateHelixFit() { return m_helixFitCtr; }
+    SuccessAndFailCounter getAcceptanceRateHelixParameterFit() { return m_helixParameterFitCtr; }
 
 
     /** returns cutoff-values of given filter */
@@ -186,10 +183,7 @@ namespace Belle2 {
     SuccessAndFailCounter m_circleDist2IPCtr; /**< counts number of successful (.first) and neglected (.second) tests for circleDist2IP */
     SuccessAndFailCounter m_deltaSlopeRZCtr; /**< counts number of successful (.first) and neglected (.second) tests for deltaSlopeRZ */
     SuccessAndFailCounter m_pTCtr; /**< counts number of successful (.first) and neglected (.second) tests for pT */
-    SuccessAndFailCounter m_helixFitCtr; /**< counts number of successful (.first) and neglected (.second) tests for helixFit */
+    SuccessAndFailCounter m_helixParameterFitCtr; /**< counts number of successful (.first) and neglected (.second) tests for helixParameterFit */
   }; //end class NbFinderFilters
 } //end namespace Belle2
-
-#endif //NBFINDERFILTERS
-
 

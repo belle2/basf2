@@ -8,18 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/TwoHitFilters.h"
-#include <boost/math/special_functions/fpclassify.hpp>
-
+// #include "../include/ExporterHitInfo.h"
+#include "../include/ExporterTcInfo.h"
 
 
 using namespace std;
 using namespace Belle2;
-
-
-double TwoHitFilters::filterNan(double value) const
-{
-  if (std::isnan(value) == true) { return 0; }
-  if (std::isinf(value) == true) { return 0; }
-  return value;
-}
+// using namespace Belle2::Tracking;

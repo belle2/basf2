@@ -8,14 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef THREEHITFILTERS_H
-#define THREEHITFILTERS_H
+#pragma once
 
 #include <TVector3.h>
 #include "TwoHitFilters.h"
+#include "FilterExceptions.h"
 #include <framework/logging/Logger.h>
-
 
 namespace Belle2 {
 
@@ -75,31 +73,60 @@ namespace Belle2 {
       m_z2 = m_vecAB[2] * m_vecBC[2]; /// z-part of m_vecAB.Dot(m_vecBC)
     }
 
-    /** Overrides Constructor-Setup for magnetic field. if no value is given, magnetic field is assumed to be Belle2-Detector standard of 1.5T */
-    void resetMagneticField(double magneticFieldStrength = 1.5) { m_magneticFieldFactor = magneticFieldStrength * 0.00299710; } // pT[GeV/c] = 0.299710*B[T]*r[m] = 0.299710*B[T]*r[cm]/100 = 0.00299710B[T]*r[cm]
+
+
+    /** Overrides Constructor-Setup for magnetic field.
+     *
+     * If no value is given, magnetic field is assumed to be Belle2-Detector standard of 1.5T.
+     * pT[GeV/c] = 0.299710*B[T]*r[m] = 0.299710*B[T]*r[cm]/100 = 0.00299710B[T]*r[cm]
+     */
+    void resetMagneticField(double magneticFieldStrength = 1.5) { m_magneticFieldFactor = magneticFieldStrength * 0.00299710; }
+
+
 
     /** returns the set value of the magnetic field in Tesla */
-
     double getMagneticField() { return m_magneticFieldFactor / 0.00299710; }
+
+
+
+    /** returns zero if value is nan or inf */
+    double filterNan(double value) { return m_twoHitFilter.filterNan(value); }
+
+
+
     /** calculates the angle between the hits/vectors (3D), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngle3D instead) */
     double calcAngle3D() {
       double angle = ((m_x2 + m_y2 + m_z2) / (m_vecAB.Mag2() * m_vecBC.Mag2())); // fullCalc would be acos(m_vecAB.Dot(m_vecBC) / m_vecAB.Mag()*m_vecBC.Mag())
-      return m_twoHitFilter.filterNan(angle);
+      return filterNan(angle);
     } // return unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngle3D instead)
 
 
-    /** calculates the angle between the hits/vectors (3D), returning unit: angle in radians */
-    double fullAngle3D();
+
+    /** calculates the angle between the hits/vectors (3D), returning unit: angle in degrees */
+    double fullAngle3D() {
+      double angle = acos(m_vecAB.Dot(m_vecBC) / (m_vecAB.Mag() * m_vecBC.Mag())); // 0-pi
+      angle = (angle * (180. / M_PI));
+      return filterNan(angle);
+    } // return unit: ° (0 - 180°)
+
+
 
     /** calculates the angle between the hits/vectors (XY), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngleXY instead) */
     double calcAngleXY() {
       double angle = ((m_x2 + m_y2) / (m_vecAB.Perp2() * m_vecBC.Perp2())); // fullAngle:
-      return m_twoHitFilter.filterNan(angle);
+      return filterNan(angle);
     } // return unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngleXY instead)
 
 
-    /** calculates the angle between the hits/vectors (XY), returning unit: angle in radians */
-    double fullAngleXY();
+
+    /** calculates the angle between the hits/vectors (XY), returning unit: angle in degrees */
+    double fullAngleXY() {
+      double angle = fullAngle2D(m_vecAB, m_vecBC); // 0-pi
+      angle = (angle * (180. / M_PI));
+      return filterNan(angle);
+    } // return unit: ° (0 - 180°)
+
+
 
     /** calculates the angle between the hits/vectors (RZ), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngleRZ instead) */
     double calcAngleRZ() {
@@ -109,28 +136,44 @@ namespace Belle2 {
     } // return unit: none (calculation for degrees is incomplete, if you want readable numbers, use fullAngleRZ instead)
 
 
-    /** calculates the angle between the hits/vectors (RZ), returning unit: angle in radians */
-    double fullAngleRZ();
+
+    /** calculates the angle between the hits/vectors (RZ), returning unit: angle in degrees */
+    double fullAngleRZ() {
+      TVector3 rzVecAB(m_vecAB.Perp(), m_vecAB[2], 0.);
+      TVector3 rzVecBC(m_vecBC.Perp(), m_vecBC[2], 0.);
+      double angle = fullAngle2D(rzVecAB, rzVecBC); // 0-pi
+      angle = (angle * (180. / M_PI));
+      return filterNan(angle);
+    } // return unit: ° (0 - 180°)
+
+
 
     /** calculates the distance of the point of closest approach of circle to the IP, returning unit: cm */
-    double calcCircleDist2IP();
+    double calcCircleDist2IP() {
+      checkCalcRadius();
+
+      return (fabs(m_centerABC.Perp() - m_radius)); // distance of closest approach of circle to the IP
+    } // return unit: cm
+
+
 
     /** calculates the estimation of the transverse momentum of the 3-hit-tracklet, returning unit: GeV/c */
     double calcPt() {
-      if (m_circleCenterCalculated == false) {
-        calcCircleCenter(m_hitA, m_hitB, m_hitC, m_centerABC);
-        m_circleCenterCalculated = true;
-      }
-      if (m_radiusCalculated == false) {
-        m_radius = calcRadius(m_hitA, m_hitB, m_hitC, m_centerABC);
-        m_radiusCalculated = true;
-      }
-      //        return (0.00449565 * m_radius); // pT[GeV/c] = 0.299710*B[T]*r[m] = 0.449565*r[cm]/100 = 0.00449565*r[cm]
-      return (m_magneticFieldFactor * m_radius);
+      checkCalcRadius();
+
+      return calcPt(m_radius);
     } // return unit: GeV/c
 
+
+
     /** calculates the estimation of the transverse momentum of given radius using defined strength of magnetic field, returning unit: GeV/c */
-    double calcPt(double radius) { return (m_magneticFieldFactor * radius); } // return unit: GeV/c
+    double calcPt(double radius) {
+      sanityCheckRadius(radius);
+
+      return (m_magneticFieldFactor * radius);
+    } // return unit: GeV/c
+
+
 
     /** calculates deviations in the slope of the inner segment and the outer segment, returning unit: none */
     double calcDeltaSlopeRZ() {
@@ -139,67 +182,164 @@ namespace Belle2 {
       m_twoHitFilter.resetValues(m_hitB, m_hitC);
       double slopeBC = m_twoHitFilter.calcSlopeRZ();
 
-      return m_twoHitFilter.filterNan(slopeBC / slopeAB); // value should be near 1
+      return filterNan(slopeBC - slopeAB);
     } // return unit: none
 
+
+
+    /** calculates the helixparameter describing the deviation in z per unit angle.
+     *
+     * returning unit: radians*cm
+     */
+    double calcDeltaSOverZ() {
+      checkCalcCircleCenter();
+
+      TVector3 points2hitA = m_hitA - m_centerABC;
+      TVector3 points2hitB = m_hitB - m_centerABC;
+      TVector3 points2hitC = m_hitC - m_centerABC;
+      double alfaAB = fullAngle2D(points2hitA, points2hitB);
+      double alfaBC = fullAngle2D(points2hitB, points2hitC);
+      //return filterNan( (alfaAB * m_vecBC[2]) - (alfaBC *m_vecAB[2]) );
+      return (alfaAB * m_vecBC[2]) - (alfaBC * m_vecAB[2]); // equals to alfaAB/dZAB and alfaBC/dZBC, but this solution here can not produce a division by zero
+    } // return unit: radians*cm
+
+
+
+    /** compares the "slopes" z over arc length. calcDeltaSlopeZOverS is invariant under rotations in the r-z plane. */
+    double calcDeltaSlopeZOverS() {
+      checkCalcRadius();
+
+      TVector3 points2hitA = m_hitA - m_centerABC;
+      TVector3 points2hitB = m_hitB - m_centerABC;
+      TVector3 points2hitC = m_hitC - m_centerABC;
+      double alfaABr = fullAngle2D(points2hitA, points2hitB) * m_radius;
+      double alfaBCr = fullAngle2D(points2hitB, points2hitC) * m_radius;
+
+      return filterNan((asin(m_vecAB[2] / alfaABr)) - asin(m_vecBC[2] / alfaBCr)); // Beware of z>r!
+    }
+
+
+
     /** calculates the helixparameter describing the deviation in z per unit angle, returning unit: none */
-    double calcHelixFit() {
-      if (m_circleCenterCalculated == false) { calcCircleCenter(m_hitA, m_hitB, m_hitC, m_centerABC); }
+    double calcHelixParameterFit() {
+      checkCalcCircleCenter();
       TVector3 points2hitA = m_hitA - m_centerABC;
       TVector3 points2hitB = m_hitB - m_centerABC;
       TVector3 points2hitC = m_hitC - m_centerABC;
       double alfaAB = calcAngle2D(points2hitA, points2hitB);
       double alfaBC = calcAngle2D(points2hitB, points2hitC);
       // real calculation: ratio is (m_vecij[2] = deltaZ): alfaAB/deltaZab : alfaBC/deltaZbc, the following equation saves two times '/'
-      return m_twoHitFilter.filterNan((alfaAB * m_vecBC[2]) / (alfaBC * m_vecAB[2]));
+      return filterNan((alfaAB * m_vecBC[2]) / (alfaBC * m_vecAB[2]));
     } // return unit: none
+
+
+
+    /** reverse compatibility, calls calcHelixParameterFit */
+    double calcHelixFit() { return calcHelixParameterFit(); }
+
+
 
     /** calculates the angle between the hits/vectors (2D), generalized, returning unit: none. used by calcAngleRZ and calcHelixFit (angleXY could use it too, but this one profits from other optimizations instead) */
     double calcAngle2D(TVector3& vecA, TVector3& vecB) {
-      double angle = ((vecA[0] * vecB[0] + vecA[1] * vecB[1]) / (vecA.Perp2() * vecB.Perp2()));
-      return m_twoHitFilter.filterNan(angle);
+      double angle = ((vecA[0] * vecB[0] + vecA[1] * vecB[1]) / sqrt(vecA.Perp2() * vecB.Perp2()));
+      return filterNan(angle);
     }
 
-    /** calculates the angle between the hits/vectors (2D), generalized, returning unit: angle in radians */
-    double fullAngle2D(TVector3& vecA, TVector3& vecB);
+    /** calculates the angle between the hits/vectors (2D), generalized, returning unit: angle in radians
+     * WARNING it is radians, which is incompatible to fullAngle3D (°))
+     */
+    double fullAngle2D(TVector3& vecA, TVector3& vecB) {
+      return acos(calcAngle2D(vecA, vecB));
+      //return filterNan(angle);
+    }
+
+
 
     /** calculates an estimation of the radius of given hits and existing estimation of circleCenter, returning unit: radius in [cm] (positive value)*/
-    double calcRadius(TVector3& a, TVector3& b, TVector3& c, TVector3& circleCenter); // used by calcPt() and calcCircleDist2IP()
+    double calcRadius(TVector3& a, TVector3& b, TVector3& c, TVector3& circleCenter) {
+      return ((circleCenter - a).Perp() + (circleCenter - b).Perp() + (circleCenter - c).Perp()) / 3.;   // = radius in [cm], sign here not needed. normally: signKappaAB/normAB1
+    } // used by calcPt() and calcCircleDist2IP()
 
-    /** calculates an estimation of circleCenter position, result is written into the 4th input-parameter, is an alternative/old version to calcCircleCenter which is less robust than calcCircleCenter. Therefore please use calcCircleCenterV2 only for testing purposes! */
-    void calcCircleCenterV2(TVector3& a, TVector3& b, TVector3& c, TVector3& circleCenter) {
-      TVector3 b2c = b - c;
-      TVector3 a2b = a - b;
-      TVector3 cAB = 0.5 * a2b + b; //([kx ky]  -[jx jy])/2 + [jx jy] = central point of outer segment (k-j)/2+j
-      TVector3 cBC = 0.5 * b2c + c; // = central point of inner segment (l-k)/2+k
-      TVector3 nAB(-a2b(1), a2b(0), 0.); //normal vector of m_vecAB
-      TVector3 nBC(-b2c(1), b2c(0), 0.); //normal vector of m_vecBC
-      double muVal = (((cAB(1) - cBC(1)) / nBC(1)) + (((cBC(0) - cAB(0)) / nAB(0)) * nAB(1) / nBC(1))) / (1. - ((nBC(0) / nAB(0)) * (nAB(1) / nBC(1))));
-      circleCenter.SetXYZ(cBC(0) + muVal * nBC(0), cBC(1) + muVal * nBC(1), 0.); // coords of intersection point
-    }
+
 
     /** calculates an estimation of circleCenter position, result is written into the 4th input-parameter */
     void calcCircleCenter(TVector3& a, TVector3& b, TVector3& c, TVector3& circleCenter) {
-      // using normal equation for the lines and calculate the intersection point using Cramer's rule. Is producing valid values as long as these 3 hits are along a straight line
-      TVector3 b2c = b - c; // normal vector of the line 2
-      TVector3 a2b = a - b; // normal vector of the line 1
-      double constLine1 = (0.5 * a2b + b) * a2b; // constant of the normal equation of line 1 (first part of the scalar product is the central point between hit a and b)
-      double constLine2 = (0.5 * b2c + c) * b2c;
-      double det1 = constLine1 * b2c(1) - a2b(1) * constLine2; // first determinant
-      double det2 = a2b(0) * constLine2 - constLine1 * b2c(0);
-      double det3 = a2b(0) * b2c(1) - a2b(1) * b2c(0);
+      // calculates the intersection point using Cramer's rule.
+      // x_1+s*n_1==x_2+t*n_2 --> n_1 *s - n_2 *t == x_2 - x_1 --> http://en.wikipedia.org/wiki/Cramer%27s_rule
+      double inX = b[0] - c[0]; // x value of the normal vector of the inner segment (b-c)
+      double inY = b[1] - c[1]; // y value of the normal vector of the inner segment (b-c)
+      double outX = a[0] - b[0]; // x value of the normal vector of the outer segment (a-b)
+      double outY = a[1] - b[1]; // y value of the normal vector of the outer segment (a-b)
 
-      if (det3 == 0) {
-        circleCenter.SetXYZ(0., 0., 0.); // this is of course wrong, TODO: shall this produce a warning?
-      } else {
-        circleCenter.SetXYZ(det1 / det3, det2 / det3, 0.);
-      }
+      //searching solution for Ax = b, aij are the matrix elements of A, bi are elements of b
+      double a11 = inY;
+      double a12 = -inX;
+      double a21 = -outY;
+      double a22 = outX;
+      double b1 = b[0] + outX * 0.5 - (c[0] + inX * 0.5);
+      double b2 = b[1] + outY * 0.5 - (c[1] + inY * 0.5);
+
+      if (a11 * a22 == a12 * a21) { throw FilterExceptions::Straight_Line(); }
+
+      double s = (b1 * a22 - b2 * a21) / (a11 * a22 - a12 * a21); //the determinant is zero iff the three hits are on a line in (x,y).
+
+      circleCenter.SetXYZ(c[0] + inX * 0.5 + s * inY, c[1] + inY * 0.5 - s * inX, 0.);
     }
+
+
 
     /** calculates calculates the sign of the curvature of given 3-hit-tracklet. a positive value represents a left-oriented curvature, a negative value means having a right-oriented curvature. first vector should be outer hit, second = center hit, third is inner hit*/
     int calcSign(TVector3& a, TVector3& b, TVector3& c);
 
+
+
+    /** calculates calculates the sign of the curvature of given 3-hit-tracklet. +1 represents a left-oriented curvature, -1 means having a right-oriented curvature. 0 means it is approximately straight. first vector should be outer hit, second = center hit, third is inner hit*/
+    int calcSign(TVector3& a, TVector3& b, TVector3& c, TVector3& sigma_a, TVector3& sigma_b, TVector3& sigma_c) {
+      TVector3 c2b = b - c;   c2b.SetZ(0.);
+      TVector3 b2a = a - b;   b2a.SetZ(0.);
+      double angle = atan2(b2a[0], b2a[1]) - atan2(c2b[0], c2b[1]);
+      double sigmaan = (sigma_a.Mag() + sigma_b.Mag() + sigma_c.Mag()) / (3.*(c2b.Mag() + b2a.Mag())); //TODO 1/3...mean of the sigmas. Possible improvement: Use a parameter instead, and determine with simulated events.
+      if (angle < (-sigmaan)) { return -1; }
+      else if (angle > sigmaan)  {return 1; }
+      else  { return 0; }
+    }
+
+
+
   protected:
+
+
+    /** checks whether the calcCircleCenter()-Member has been executed already and executes it if not */
+    void checkCalcCircleCenter() {
+      if (m_circleCenterCalculated == false) {
+        calcCircleCenter(m_hitA, m_hitB, m_hitC, m_centerABC);
+        m_circleCenterCalculated = true;
+      }
+    }
+
+
+    /** checks whether the calcRadius()-Member has been executed already and executes it if not */
+    void checkCalcRadius() {
+      checkCalcCircleCenter();
+      if (m_radiusCalculated == false) {
+        m_radius = calcRadius(m_hitA, m_hitB, m_hitC, m_centerABC);
+        sanityCheckRadius(m_radius);
+        m_radiusCalculated = true;
+      }
+    }
+
+
+    /** check Radius for bad values and throw exception if the value is bad */
+    void sanityCheckRadius(double radius) {
+      if (fabs(radius) < 0.0000001) { // WARNING hardcoded value, is there a quasi-global value for such cases (this case, minimal accepted radius)
+        m_radiusCalculated = false;
+        m_circleCenterCalculated = false;
+        m_radius = 0.;
+        throw FilterExceptions::Circle_too_small();
+      }
+    }
+
+
 
     TwoHitFilters m_twoHitFilter; /**< instance of TwoHitFilters-class used for some internal calculations */
 
@@ -219,7 +359,3 @@ namespace Belle2 {
 
   }; //end class ThreeHitFilters
 } //end namespace Belle2
-
-#endif //THREEHITFILTERS
-
-

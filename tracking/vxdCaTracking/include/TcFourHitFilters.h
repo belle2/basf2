@@ -8,9 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef TCFOURHITFILTERS_H
-#define TCFOURHITFILTERS_H
+#pragma once
 
 #include "TObject.h"
 #include <TVector3.h>
@@ -82,7 +80,3 @@ namespace Belle2 {
     SuccessAndFailCounter m_deltaDistCircleCenterCtr; /**< counts number of successful (.first) and neglected (.second) tests for deltaDistCircleCenter */
   }; //end class TcFourHitFilters
 } //end namespace Belle2
-
-#endif //TCFOURHITFILTERS
-
-

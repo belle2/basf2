@@ -19,7 +19,7 @@ bool TcFourHitFilters::checkDeltapT(int nameDeltapT)
 {
   const Cutoff* pCutoff = m_thisSector->getCutoff(nameDeltapT, m_friendID);
   if (pCutoff != NULL) {
-    double aResult = FourHitFilters::deltapT();
+    double aResult = FourHitFilters::calcDeltapT();
     if (/*aResult > pCutoff->getMinValue() &&*/ aResult < pCutoff->getMaxValue()) {
       m_deltaPtCtr.first++;
       return true;

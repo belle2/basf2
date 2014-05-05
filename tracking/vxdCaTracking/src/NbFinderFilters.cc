@@ -105,17 +105,17 @@ bool NbFinderFilters::checkPt(int namePt)
 }
 
 
-bool NbFinderFilters::checkHelixFit(int nameHelixFit)
+bool NbFinderFilters::checkHelixParameterFit(int nameHelixParameterFit)
 {
-  const Cutoff* pCutoff = m_thisSector->getCutoff(nameHelixFit, m_friendID);
+  const Cutoff* pCutoff = m_thisSector->getCutoff(nameHelixParameterFit, m_friendID);
   if (pCutoff != NULL) {
     double aResult = this->calcHelixFit();
     if (aResult > pCutoff->getMinValue() && aResult < pCutoff->getMaxValue()) {
-      m_helixFitCtr.first++;
+      m_helixParameterFitCtr.first++;
       return true;
     }
   }
-  m_helixFitCtr.second++;
+  m_helixParameterFitCtr.second++;
   return false;
 }
 

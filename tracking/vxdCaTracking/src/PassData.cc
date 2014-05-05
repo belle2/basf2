@@ -27,12 +27,12 @@ std::pair<int, int> Belle2::PassData::importSectorMap(const Belle2::SecMapCopy& 
   pair<double, double> cutoff; // will be rewritten for each cutoff to be imported
 
   for (const SectorPack & aSector : rawSecMap) {
-    B2DEBUG(110, "PassData::importSectorMap: importing sector: " << FullSecID(aSector.first).getFullSecString() << " (named " << aSector.first << " as an int) including " << aSector.second.size() << " friends. ");
+    B2DEBUG(110, "PassData::importSectorMap: importing sector: " << FullSecID(aSector.first) << " (named " << aSector.first << " as an int) including " << aSector.second.size() << " friends. ");
     totalFriendCounter += aSector.second.size();
     VXDSector* pSector = new VXDSector(aSector.first);
 
     for (const FriendPack & aFriend : aSector.second) { // Friend.first is friendID
-      B2DEBUG(120, "PassData::importSectorMap: importing friend: " << FullSecID(aFriend.first).getFullSecString() << " (named " << aFriend.first << " as an int) including " << aFriend.second.size() << " filters. ");
+      B2DEBUG(120, "PassData::importSectorMap: importing friend: " << FullSecID(aFriend.first) << " (named " << aFriend.first << " as an int) including " << aFriend.second.size() << " filters. ");
 
       for (const CutoffPack & aFilter : aFriend.second) {
         B2DEBUG(130, "PassData::importSectorMap: importing filter: " << FilterID().getFilterString(aFilter.first) << " (named " << aFilter.first << " as an int) including Min/Max: " << aFilter.second.first << "/" << aFilter.second.second);
@@ -153,4 +153,46 @@ std::pair<int, int> Belle2::PassData::importSectorMap(const Belle2::SecMapCopy& 
   B2DEBUG(10, "PassData::importSectorMap: adding virtual centerSector with " << this->sectorMap.find(centerSecID)->second->getFriends().size() << " friends. SecMap got " << this->sectorMap.size() << " entries now");
 
   return make_pair(totalFriendCounter, storedCutoffCtr);
+}
+
+
+
+void PassData::activateAllFilters()
+{
+  Filter standardValue = make_pair(true, 0); // type pair<bool isActivated, double tuningParameter>
+  distance3D = standardValue;
+  distanceXY = standardValue;
+  distanceZ = standardValue;
+  slopeRZ = standardValue;
+  normedDistance3D = standardValue;
+  activatedSegFinderTests = 5;
+
+  anglesHighOccupancy3D = standardValue;
+  anglesHighOccupancyXY = standardValue;
+  anglesHighOccupancyRZ = standardValue;
+  deltaSlopeHighOccupancyRZ = standardValue;
+  pTHighOccupancy = standardValue;
+  distanceHighOccupancy2IP = standardValue;
+  helixHighOccupancyFit = standardValue;
+  activatedHighOccupancySegFinderTests = 7;
+
+  angles3D = standardValue;
+  anglesXY = standardValue;
+  anglesRZ = standardValue;
+  deltaSlopeRZ = standardValue;
+  pT = standardValue;
+  distance2IP = standardValue;
+  helixFit = standardValue;
+  activatedNbFinderTests = 7;
+
+  deltaPtHighOccupancy = standardValue;
+  deltaDistanceHighOccupancy2IP = standardValue;
+  activatedHighOccupancyNbFinderTests = 2;
+
+  zigzagXY = standardValue;
+  zigzagRZ = standardValue;
+  deltaPt = standardValue;
+  deltaDistance2IP = standardValue;
+  circleFit = standardValue;
+  activatedTccFilterTests = 5;
 }

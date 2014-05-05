@@ -9,7 +9,7 @@
  **************************************************************************/
 
 //fw
-#include "../include/TrackletFilters.h"
+#include "tracking/vxdCaTracking/TrackletFilters.h"
 #include <framework/logging/Logger.h>
 
 // c++-base/stl:

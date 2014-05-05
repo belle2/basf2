@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/NbFinderFilters.h"
-#include "../include/Cutoff.h"
+#include "tracking/vxdCaTracking/NbFinderFilters.h"
+#include "tracking/vxdCaTracking/Cutoff.h"
 
 using namespace std;
 using namespace Belle2;

@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/TcFourHitFilters.h"
-#include "../include/Cutoff.h"
+#include "tracking/vxdCaTracking/TcFourHitFilters.h"
+#include "tracking/vxdCaTracking/Cutoff.h"
 
 using namespace std;
 using namespace Belle2;

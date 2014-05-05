@@ -30,8 +30,8 @@ namespace Belle2 {
 /// logic = VXDTFModule
   unsigned short searchSector4Hit(TVector3 localHit,
                                   TVector3 sensorSize,
-                                  vector<float>& uConfig,
-                                  vector<float>& vConfig)
+                                  vector<double>& uConfig,
+                                  vector<double>& vConfig)
   {
     unsigned short aSecID = numeric_limits<unsigned short>::max();;
 
@@ -51,7 +51,7 @@ namespace Belle2 {
           if (localHit[1] >= (vConfig[k]*sensorSize[1]) && localHit[1] <= (vConfig[k + 1]*sensorSize[1])) {
 
             // Calculate Sector ID
-            aSecID = k + 1 + j * (vConfig.size() - 1);
+            aSecID = k /*+ 1*/ + j * (vConfig.size() - 1); // zero-based secIDs now!
           }
         }
       }
@@ -81,7 +81,7 @@ namespace Belle2 {
   {
 
     TVector3 testPoint, testPointGlobal;
-    std::pair<float, float> hitLocalTest;
+    std::pair<double, double> hitLocalTest;
 
     //Coor asecid: 990511105, position Hit: 3.02141/2.42389/-4.97057, uCoord: 1.66035, vCoord: 4.43043, aVxdID: 24896
     hitLocalTest.first = 1.66035;
@@ -106,14 +106,14 @@ namespace Belle2 {
     SectorTools aTool = SectorTools();
 
     // Config from the TrackFinder
-    std::vector<float> uConfigTest = {0, 0.5, 1};
-    std::vector<float> vConfigTest = {0, 0.33, 0.67, 1};
+    std::vector<double> uConfigTest = {0, 0.5, 1};
+    std::vector<double> vConfigTest = {0, 0.33, 0.67, 1};
 
     //  getUSize: 3.852
     //  getVSize: 12.002
     TVector3 sensorSize(3.852, 12.002, 0);
 
-    std::pair<float, float> aRelCoor2;
+    std::pair<double, double> aRelCoor2;
     unsigned short aSecID;
 
     // Test Cases / Values
@@ -127,9 +127,9 @@ namespace Belle2 {
 
     std::vector<unsigned short> compareID = {24896, 24896, 25152, 25888, 26144, 26144};
 
-    std::vector<std::pair<float, float>> aRelCoor = {{3.65526, 4.43185}, {3.65526, 8.22384}, {2.4668, 11.7496}, {3.26142, 2.25991}, {1.88061, 1.92809}, {1.88061, 5.65315}};
+    std::vector<std::pair<double, double> > aRelCoor = {{3.65526, 4.43185}, {3.65526, 8.22384}, {2.4668, 11.7496}, {3.26142, 2.25991}, {1.88061, 1.92809}, {1.88061, 5.65315}};
 
-    std::vector<unsigned short> compareSecID = {5, 6, 6, 4, 1, 2};
+    std::vector<unsigned short> compareSecID = {4, 5, 5, 3, 0, 1}; //{5, 6, 6, 4, 1, 2};
 
     // Compares the values for each test
     for (uint currentTest = 0; currentTest < compareID.size(); currentTest++) {
@@ -176,18 +176,18 @@ namespace Belle2 {
   {
     SectorTools aTool = SectorTools();
 
-    //  std::pair<float, float> = RelCoords;
+    //  std::pair<double, double> = RelCoords;
     // Parameters to get the different corners
-    std::pair<float, float> aRelCoor_corner1 = {0, 0};
-    std::pair<float, float> aRelCoor_corner2 = {0, 1};
-    std::pair<float, float> aRelCoor_corner3 = {1, 0};
-    std::pair<float, float> aRelCoor_corner4 = {1, 1};
+    std::pair<double, double> aRelCoor_corner1 = {0, 0};
+    std::pair<double, double> aRelCoor_corner2 = {0, 1};
+    std::pair<double, double> aRelCoor_corner3 = {1, 0};
+    std::pair<double, double> aRelCoor_corner4 = {1, 1};
 
-    std::pair<float, float> aRelCoor = {3.65526, 4.43185}, aRelCoor2;
+    std::pair<double, double> aRelCoor = {3.65526, 4.43185}, aRelCoor2;
     unsigned short aSectorID;
 
-    std::vector<float> uConfigTest = {0, 0.5, 1};
-    std::vector<float> vConfigTest = {0, 0.33, 0.67, 1};
+    std::vector<double> uConfigTest = {0, 0.5, 1};
+    std::vector<double> vConfigTest = {0, 0.33, 0.67, 1};
 
     // Coor asecid: 990511105
     // Point 1: (7.325, -1.367, -5.326) Point 2: (7.325, -1.367, -3.400) Point 3: (4.353, 1.251, -5.326) Point 4: (4.353, 1.251, -3.400)
@@ -206,23 +206,23 @@ namespace Belle2 {
 
     // 1. Corner Calculate
     aRelCoor = aTool.calcNormalizedSectorPoint(uConfigTest, vConfigTest, aSecID, aRelCoor_corner1);
-    ASSERT_EQ(float(0.5), aRelCoor.first);
-    ASSERT_EQ(float(0.33), aRelCoor.second);
+    EXPECT_DOUBLE_EQ(0.5, aRelCoor.first);
+    EXPECT_DOUBLE_EQ(0.33, aRelCoor.second);
 
     // 2. Corner Calculate
     aRelCoor = aTool.calcNormalizedSectorPoint(uConfigTest, vConfigTest, aSecID, aRelCoor_corner2);
-    ASSERT_EQ(float(0.5), aRelCoor.first);
-    ASSERT_EQ(float(0.67), aRelCoor.second);
+    EXPECT_DOUBLE_EQ(0.5, aRelCoor.first);
+    EXPECT_DOUBLE_EQ(0.67, aRelCoor.second);
 
     // 3. Corner Calculate
     aRelCoor = aTool.calcNormalizedSectorPoint(uConfigTest, vConfigTest, aSecID, aRelCoor_corner3);
-    ASSERT_EQ(float(1.), aRelCoor.first);
-    ASSERT_EQ(float(0.33), aRelCoor.second);
+    EXPECT_DOUBLE_EQ(1., aRelCoor.first);
+    EXPECT_DOUBLE_EQ(0.33, aRelCoor.second);
 
     // 4. Corner Calculate
     aRelCoor = aTool.calcNormalizedSectorPoint(uConfigTest, vConfigTest, aSecID, aRelCoor_corner4);
-    ASSERT_EQ(float(1.), aRelCoor.first);
-    ASSERT_EQ(float(0.67), aRelCoor.second);
+    EXPECT_DOUBLE_EQ(1., aRelCoor.first);
+    EXPECT_DOUBLE_EQ(0.67, aRelCoor.second);
 
   }
 

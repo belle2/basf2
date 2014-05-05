@@ -49,6 +49,7 @@ namespace Belle2 {
 
     PXDCluster aCluster = PXDCluster(aVxdID, 0., 0., 0.1, 0.1, 0, 0, 1, 1, 1, 1, 1, 1);
     SpacePoint testPoint = SpacePoint(aCluster, 3, &sensorInfoBase);
+//     SpacePoint testPoint = SpacePoint(aCluster, 3);
 
     EXPECT_DOUBLE_EQ(aVxdID, testPoint.getVxdID());
 

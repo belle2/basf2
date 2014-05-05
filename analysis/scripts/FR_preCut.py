@@ -83,14 +83,18 @@ def LoadHistogramsFromFiles(files, variable, channels):
     @param variable the variable which defines the x-axis of the histograms
     @param channels the channels for which the histograms are loaded
     """
-    signal = dict([(channel, file.Get('{channel}_{variable}_signal_histogram'.format(channel=channel, variable=variable))) for channel, file in zip(channels, files)])
-    bckgrd = dict([(channel, file.Get('{channel}_{variable}_background_histogram'.format(channel=channel, variable=variable))) for channel, file in zip(channels, files)])
-    ratio = dict([(channel, value.Clone('{channel}_{variable}_ratio_histogram'.format(channel=channel, variable=variable))) for (channel, value) in signal.iteritems()])
+    signal = dict([(channel, file.Get('signal' + channel)) for channel, file in zip(channels, files)])
+    all = dict([(channel, file.Get('all' + channel)) for channel, file in zip(channels, files)])
+    bckgrd = dict([(channel, value.Clone('bckgrd' + channel)) for (channel, value) in all.iteritems()])
+    ratio = dict([(channel, value.Clone('ratio' + channel)) for (channel, value) in signal.iteritems()])
 
-    if not all(signal.values() + bckgrd.values() + ratio.values()):
+    if any([hist is None for hist in signal.values() + all.values() + bckgrd.values() + ratio.values()]):
         raise RuntimeError('Error while opening ROOT file with preCut Histograms')
 
-    for channel in channels:
+    for channel, file in zip(channels, files):
+        file.cd()
+        bckgrd[channel].Add(signal[channel], -1)
+        bckgrd[channel].Write('', ROOT.TObject.kOverwrite)
         ratio[channel].Divide(bckgrd[channel])
         ratio[channel].Write('', ROOT.TObject.kOverwrite)
     return (signal, bckgrd, ratio)
@@ -167,7 +171,7 @@ def CreatePreCutMassHistogram(path, name, particle, daughterLists):
     # the HistMaker Module and return Nothing. If a function is called which depends on
     # the PreCutHistogram, the process will stop, because the PreCutHistogram isn't provided.
     hash = createHash(name, particle.name, daughterLists)
-    filename = 'Reconstruction_{pname}_{cname}_{hash}.root'.format(pname=particle.name, cname=name, hash=hash)
+    filename = 'CutHistograms_{pname}_{cname}_{hash}.root'.format(pname=particle.name, cname=name, hash=hash)
     if os.path.isfile(filename):
         return {'PreCutHistogram_' + name: filename}
     else:
@@ -176,9 +180,10 @@ def CreatePreCutMassHistogram(path, name, particle, daughterLists):
         pmake = register_module('MCDecayHistMaker')
         pmake.set_name('DecayHistMaker_' + name)
         pmake.param('fileName', filename)
+        pmake.param('channelName', name)
         pmake.param('PDG', pdg.from_name(particle.name))
         pmake.param('inputListNames', daughterLists)
-        pmake.param('histParams', (100, mass - mass * 3.0 / 4.0, mass + mass * 2))
+        pmake.param('histParams', (200, mass / 2, mass + mass / 2))
         path.add_module(pmake)
     return {}
 
@@ -198,7 +203,7 @@ def CreatePreCutProbHistogram(path, particle, name, daughterLists, daughterSigna
     # the HistMaker Module and return Nothing. If a function is called which depends on
     # the PreCutHistogram, the process will stop, because the PreCutHistogram isn't provided.
     hash = createHash(name, particle.name, daughterLists, daughterSignalProbabilities)
-    filename = 'Reconstruction_{pname}_{cname}_{hash}.root'.format(pname=particle.name, cname=name, hash=hash)
+    filename = 'CutHistograms_{pname}_{cname}_{hash}.root'.format(pname=particle.name, cname=name, hash=hash)
     if os.path.isfile(filename):
         return {'PreCutHistogram_' + particle.name: filename}
     else:

@@ -48,6 +48,7 @@ MCDecayHistMakerModule::MCDecayHistMakerModule()
 
 
   addParam("PDG", m_pdg, "PDG code of particle to reconstruct (anti-particles reconstructed implicitly)");
+  addParam("channelName", m_channelName, "Optional name for the channel which is used to name the histograms", string(""));
   addParam("inputListNames", m_inputListNames, "Particle lists of the daughter particles to be combined. MCMatching should be run on these lists beforehand.");
 
   HistParams defaultHistParams = std::make_tuple(100, 0, 6);
@@ -76,8 +77,8 @@ void MCDecayHistMakerModule::initialize()
   int nbins;
   double xlow, xhigh;
   std::tie(nbins, xlow, xhigh) = m_histParams;
-  m_histogramSignal = new TH1F("signal", "signal", nbins, xlow, xhigh);
-  m_histogramAll = new TH1F("all", "all", nbins, xlow, xhigh);
+  m_histogramSignal = new TH1F((std::string("signal") + m_channelName).c_str(), "signal", nbins, xlow, xhigh);
+  m_histogramAll = new TH1F((std::string("all") + m_channelName).c_str(), "all", nbins, xlow, xhigh);
 }
 
 

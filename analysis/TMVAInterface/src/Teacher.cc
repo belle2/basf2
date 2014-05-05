@@ -100,6 +100,11 @@ namespace Belle2 {
         pt.add_child("Setup.Clusters.Cluster", node);
       }
 
+      if (m_cluster_count.size() <= 1) {
+        B2ERROR("Found less than two clusters in sample, no training necessary!")
+        return;
+      }
+
       // Train the found clusters against each other
       for (auto & x : m_cluster_count) {
         for (auto & y : m_cluster_count) {

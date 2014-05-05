@@ -69,6 +69,7 @@ namespace Belle2 {
 
     int m_pdg;                /**< PDG code of combined particles */
     std::string m_fileName; /**< save histograms in this file. */
+    std::string m_channelName; /**< name of the channel which is reconstructed */
     std::string m_histName; /**< name for the histogram. */
     std::vector<std::string> m_inputListNames; /**< input particle list names */
     typedef std::tuple<int, double, double> HistParams; /**< Tuple holding amount of bins, lower and upper boundary of a histogram */

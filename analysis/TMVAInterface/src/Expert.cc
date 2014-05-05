@@ -67,7 +67,7 @@ namespace Belle2 {
             std::string _methodName = g.second.get<std::string>("MethodName");
             if (_methodName != methodName) continue;
 
-            // Now check if the signalCluster was used ad signal or background in this training
+            // Now check if the signalCluster was used as signal or background in this training
             int signalID = g.second.get<int>("SignalID");
             int backgroundID = g.second.get<int>("BackgroundID");
             if (signalID == signalCluster or backgroundID == signalCluster) {
@@ -134,7 +134,7 @@ namespace Belle2 {
 
       // Now calculate the signal probability with the mva outputs
       float result = m_clusters[m_signalCluster];
-      for (unsigned int i = 0; i < m_clusters.size(); ++i) {
+      for (unsigned int i = 0; i < m_clusters.size() - 1; ++i) {
         if (m_reverse[i])
           result +=  m_clusters[ m_against[i] ] * mva_results[i] / (1.0 - mva_results[i]);
         else

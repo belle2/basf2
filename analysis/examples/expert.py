@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Meant to be run after analysis/examples/teacher.py, attaches expert
-# output to each Particle (as extra info), produces some plots in files
-# $Method_hist.root
+# output to each Particle (as extra info) and saves the result in a file
 
 import sys
 import os
@@ -37,12 +36,9 @@ for method in methods:
     expert.param('signalProbabilityName', method + '_Probability')
     main.add_module(expert)
 
-    histMaker = register_module('HistMaker')
-    histMaker.param('file', method + '_hist.root')
-    histMaker.param('histVariables', [(method + '_Probability', 100, 0, 1)])
-    histMaker.param('truthVariable', 'isSignal')
-    histMaker.param('listNames', ['e-'])
-    main.add_module(histMaker)
+output = register_module('RootOutput')
+output.param('outputFileName', 'mdstWithSignalProbabilities.root')
+main.add_module(output)
 
 # ----> start processing of modules
 process(main)

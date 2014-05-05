@@ -81,8 +81,6 @@ namespace Belle2 {
       c_HistogramManager            = 8, /**< This module is used to manage histograms accumulated by other modules */
       c_InternalSerializer          = 16,  /**< This module is an internal serializer/deserializer for parallel processing */
     };
-    const static int c_InitializeInProcess __attribute__((deprecated))  = 0;  /**< Obsolete, has no effect. */
-    const static int c_InitializeInMain      __attribute__((deprecated))       = 0;  /**< Obsolete, has no effect. */
 
     /** Different options for behaviour _after_ a conditional path was executed. */
     enum class EAfterConditionPath {

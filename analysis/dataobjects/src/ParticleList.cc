@@ -123,7 +123,7 @@ void ParticleList::print() const
   std::cout << " PDGCode=" << getPDG();
   std::cout << " size=" << m_list[0].size() << "+" << m_list[1].size() << "+" <<  m_list[2].size();
   std::cout << " arrayIndices: ";
-  for (unsigned k = 0; k < 2; k++) {
+  for (unsigned k = 0; k < 3; k++) {
     for (unsigned i = 0; i < m_list[k].size(); i++) {
       std::cout << m_list[k][i] << ", ";
     }

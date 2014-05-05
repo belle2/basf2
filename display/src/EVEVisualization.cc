@@ -1148,18 +1148,22 @@ void EVEVisualization::makeTracks()
   const std::map<const MCParticle*, MCTrack>::iterator& end = m_mcparticleTracks.end();
   for (; it != end; ++it) {
     if (it->second.track) {
-      if (it->second.simhits->Size() > 0)
+      if (it->second.simhits->Size() > 0) {
         it->second.track->AddElement(it->second.simhits);
+      } else {
+        //if we don't add it, remove empty collection
+        it->second.simhits->Destroy();
+        it->second.simhits = nullptr;
+      }
 
+      TEveElement* parent = m_tracklist;
       if (it->second.parentParticle) {
         const auto& parentIt = m_mcparticleTracks.find(it->second.parentParticle);
         if (parentIt != m_mcparticleTracks.end()) {
-          parentIt->second.track->AddElement(it->second.track);
-          continue; //next item
+          parent = parentIt->second.track;
         }
-        //if not found, add to tracklist
       }
-      m_tracklist->AddElement(it->second.track);
+      parent->AddElement(it->second.track);
     } else { //add simhits directly
       gEve->AddElement(it->second.simhits);
     }

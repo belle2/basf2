@@ -157,9 +157,13 @@ void EVEVisualization::setErrScale(double errScale) { m_errorScale = errScale; }
 
 EVEVisualization::~EVEVisualization()
 {
+  //my objects
+  delete m_visualRepMap;
+
   if (!gEve)
     return; //objects are probably already freed by Eve
 
+  //Eve objects
   delete m_eclsimhitdata;
   delete m_unassignedRecoHits;
   delete m_tracklist;
@@ -168,7 +172,6 @@ EVEVisualization::~EVEVisualization()
   delete m_trackpropagator;
   delete m_gftrackpropagator;
   delete m_calo3d;
-  delete m_visualRepMap;
 }
 
 void EVEVisualization::enableVolume(const char* name, bool only_daughters, bool enable)

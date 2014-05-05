@@ -78,8 +78,8 @@ namespace Belle2 {
   {
     for (auto & listName : m_listNames) {
       StoreObjPtr<ParticleList> list(listName);
-      // Calculate Signal Probability for Particles [0, N_PARTICLE] and AntiParticles [N_PARTICLE, N_PARTICLE + N_ANTIPARTICLE]
-      for (unsigned i = 0; i < list->getNumofParticles() + list->getNumofAntiParticles(); ++i) {
+      // Calculate Signal Probability for Particles
+      for (unsigned i = 0; i < list->getListSize(); ++i) {
         const Particle* particle = list->getParticle(i);
         m_teacher->addSample(particle);
       }

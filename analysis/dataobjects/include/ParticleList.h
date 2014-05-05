@@ -12,6 +12,7 @@
 #define PARTICLELIST_H
 
 #include <TObject.h>
+#include <TParticlePDG.h>
 #include <vector>
 
 namespace Belle2 {
@@ -22,22 +23,27 @@ namespace Belle2 {
    * @{
    */
 
+
   /**
-   * Class to hold a list of particles and anti-particles. The list is implemented
-   * as two std::vector<int> holding the indices of particles in StoreArray<Particle>.
-   * Particles in the list can only be of the same kind (according to PDG code and
-   * flavor type) and from the same Particle store array.
+   * Class to hold a list of particles, anti-particles and self-conjugated particles.
+   * The list is implemented as three std::vector<int> holding the indices of particles in StoreArray<Particle>.
+   * Particles in the list can only be of the same kind (according to PDG code) and from the same Particle store array.
    */
 
   class ParticleList : public TObject {
   public:
 
+    enum EParticleType {
+      c_Particle = 0,
+      c_AntiParticle,
+      c_SelfConjugatedParticle
+    };
+
     /**
      * Default constructor
      */
     ParticleList():
-      m_pdg(0),
-      m_flavorType(0),
+      m_pdg(NULL),
       m_particleStore("Particles")
     {}
 
@@ -45,18 +51,13 @@ namespace Belle2 {
      * Sets PDG code
      * @param pdg PDG code
      */
-    void setPDG(int pdg) {m_pdg = pdg; setFlavorType();}
+    void setPDG(int pdg);
 
     /**
      * Sets Particle store array name to which particle list refers
      * @param name name of the Particle store array
      */
     void setParticleCollectionName(std::string name) {m_particleStore = name;}
-
-    /**
-     * Swaps flavor type
-     */
-    void swapFlavorType() {m_flavorType = (m_flavorType == 0) ? 1 : 0;}
 
     /**
      * Adds a new particle to the list (safe method)
@@ -77,33 +78,16 @@ namespace Belle2 {
      * Particle must be of the kind the list is constructed for.
      * To be used in ParticleCombiner only.
      * @param iparticle index of the particle in the StoreArray<Particle>
-     * @param K 0=particle, 1=anti-particle
+     * @param K ParticleType - Particle, AntiParticle or SelfConjugatedParticle
      */
-    void addParticle(unsigned iparticle, unsigned K) {
-      K = K < m_flavorType ? K : m_flavorType;
+    void addParticle(unsigned iparticle, EParticleType K) {
       m_list[K].push_back(iparticle);
-      m_good[K].push_back(true);
     }
 
     /**
-    * Mark element i in vector m_list[K] for removal from the list.
-    * Marked elements are removed afterwards by calling removeMarked().
-    * @param i list element
-    * @param K vector index 0 or 1
-    */
-    void markToRemove(unsigned i, unsigned K);
-
-    /**
-    * Mark i-th particle for removal from the list.
-    * Marked elements are removed afterwards by calling removeMarked().
-    * @param i list index (i<getListSize())
-    */
-    void markToRemove(unsigned i);
-
-    /**
-     * Remove marked elements from list
+     * Remove given elements from list
      */
-    void removeMarked();
+    void removeParticles(const std::vector<unsigned int>& toRemove);
 
     /**
      * Returns Particle store array name to which particle list refers
@@ -115,34 +99,27 @@ namespace Belle2 {
      * Returns PDG code
      * @return PDG code
      */
-    int getPDG() const {return m_pdg;}
+    int getPDG() const {return m_pdg ? m_pdg->PdgCode() : 0;}
 
     /**
      * Returns PDG code of anti-particle
      * @return PDG code of anti-particle
      */
-    int getPDGbar() const {return m_flavorType == 0 ? m_pdg : -m_pdg;}
-
-    /**
-     * Returns PDG code of particle or anti-particle according to the value of K
-     * @param K selector (0=particle, 1=anti-particle)
-     * @return PDG code
-     */
-    int getPDG(unsigned K) const {return K == 0 ? getPDG() : getPDGbar();}
-
-    /**
-     * Returns flavor type
-     * @return flavor type
-     */
-    unsigned getFlavorType() const {return m_flavorType;}
+    int getPDGbar() const {
+      if (not m_pdg)
+        return 0;
+      if (m_pdg->AntiParticle())
+        return m_pdg->AntiParticle()->PdgCode();
+      else
+        return m_pdg->PdgCode();
+    }
 
     /**
      * Returns list of StoreArray<Particle> indices.
-     * @param K selector (0=particle, 1=anti-particle)
+     * @param K ParticleType - Particle, AntiParticle or SelfConjugatedParticle
      * @return const reference to vector of indices
      */
-    const std::vector<int>& getList(unsigned K) const {
-      K = K < m_flavorType ? K : m_flavorType;
+    const std::vector<int>& getList(EParticleType K) const {
       return m_list[K];
     }
 
@@ -151,7 +128,7 @@ namespace Belle2 {
      * @return list size
      */
     unsigned getListSize() const {
-      return m_list[0].size() + m_list[1].size();
+      return m_list[0].size() + m_list[1].size() + m_list[2].size();
     }
 
     /**
@@ -162,19 +139,12 @@ namespace Belle2 {
     Particle* getParticle(unsigned i) const;
 
     /**
-     * Returns number of particles in the list
-     * @return number of particles
+     * Returns number of particles, antiparticles or self-conjugated particles in the list
+     * @param K ParticleType - Particle, AntiParticle or SelfConjugatedParticle
+     * @return number of particles, antiparticles or self-conjugated particles
      */
-    unsigned getNumofParticles() const {
-      return m_list[0].size();
-    }
-
-    /**
-     * Returns number of anti-particles in the list
-     * @return number of anti-particles
-     */
-    unsigned getNumofAntiParticles() const {
-      return m_list[1].size();
+    unsigned getNumOf(EParticleType K) const {
+      return m_list[K].size();
     }
 
     /**
@@ -184,16 +154,9 @@ namespace Belle2 {
 
   private:
 
-    int m_pdg;                         /**< PDG code */
-    unsigned m_flavorType;             /**< 0 unflavored, 1 flavored */
-    std::vector<int> m_list[2];        /**< list of 0-based indices of Particles */
-    std::vector<bool> m_good[2];       /**< flag for 'good' element */
+    TParticlePDG* m_pdg;               /**< PDG code */
+    std::vector<int> m_list[3];        /**< list of 0-based indices of Particles */
     std::string m_particleStore;       /**< name of Particle store array */
-
-    /**
-     * sets m_flavorType using m_pdg
-     */
-    void setFlavorType();
 
     ClassDef(ParticleList, 2); /**< ClassDef */
 

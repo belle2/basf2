@@ -38,7 +38,7 @@ void ParticleStatsModule::initialize()
   B2INFO("Number of ParticleLists studied " << nParticleLists << " ");
 
   m_PassMatrix = new TMatrix(nParticleLists, nParticleLists + 1);
-  m_MultiplicityMatrix = new TMatrix(nParticleLists, 3); // 0 All particles; 1 Negative; 2 Positive
+  m_MultiplicityMatrix = new TMatrix(nParticleLists, 4); // 0 All particles; 1 Negative; 2 Positive; 3 SelfConjugated
 
   m_nEvents = 0;
 
@@ -69,14 +69,15 @@ void ParticleStatsModule::event()
       (*m_MultiplicityMatrix)(iList, 0) = (*m_MultiplicityMatrix)(iList, 0) + particlelist->getListSize();
 
       // Particles
-      if (particlelist->getNumofParticles())
-        (*m_MultiplicityMatrix)(iList, 1) = (*m_MultiplicityMatrix)(iList, 1) + particlelist->getNumofParticles();
+      if (particlelist->getNumOf(ParticleList::c_Particle))
+        (*m_MultiplicityMatrix)(iList, 1) = (*m_MultiplicityMatrix)(iList, 1) + particlelist->getNumOf(ParticleList::c_Particle);
 
       // Anti-Particles
-      if (particlelist->getNumofAntiParticles())
-        (*m_MultiplicityMatrix)(iList, 2) = (*m_MultiplicityMatrix)(iList, 2) + particlelist->getNumofAntiParticles();
+      if (particlelist->getNumOf(ParticleList::c_AntiParticle))
+        (*m_MultiplicityMatrix)(iList, 2) = (*m_MultiplicityMatrix)(iList, 2) + particlelist->getNumOf(ParticleList::c_AntiParticle);
 
-
+      if (particlelist->getNumOf(ParticleList::c_SelfConjugatedParticle))
+        (*m_MultiplicityMatrix)(iList, 3) = (*m_MultiplicityMatrix)(iList, 3) + particlelist->getNumOf(ParticleList::c_SelfConjugatedParticle);
 
 
       for (int jList = 0; jList < nParticleLists; ++jList) {
@@ -145,7 +146,7 @@ void ParticleStatsModule::terminate()
   for (int iList = 0; iList < nParticleLists; ++iList) {
     std::cout << Form("%14s(%2d)", m_strParticleLists[iList].c_str(), iList) << "\t|";
 
-    for (int iFlav = 0; iFlav < 3; ++iFlav) {
+    for (int iFlav = 0; iFlav < 4; ++iFlav) {
       std::cout << "\t" << Form("%8.4f", (*m_MultiplicityMatrix)(iList, iFlav) / m_nEvents);
       std::cout << "\t" << Form("%8.4f", (*m_MultiplicityMatrix)(iList, iFlav) / m_nEvents / (*m_PassMatrix)(iList, iList));
     }

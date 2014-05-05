@@ -117,29 +117,20 @@ namespace Belle2 {
         }
       }
     } else { // existing particle list: apply selections and remove unselected
+      std::vector<unsigned int> toRemove;
       for (unsigned i = 0; i < plist->getListSize(); i++) {
         const Particle* part = plist->getParticle(i);
-        if (!m_pSelector.select(part)) plist->markToRemove(i);
+        if (!m_pSelector.select(part)) toRemove.push_back(i);
       }
-      plist->removeMarked();
+      plist->removeParticles(toRemove);
     }
 
 
-    /*
-    switch (plist->getFlavorType()) {
-      case 0:
-        B2INFO("ParticleSelector: " << m_pdg << " " << m_listName << " size="
-               << plist->getList(0).size());
-        break;
-      case 1:
-        B2INFO("ParticleSelector: " << m_pdg << " " << m_listName << " size="
-               << plist->getList(0).size() << "+" << plist->getList(1).size());
-        break;
-      default:
-        B2ERROR("ParticleSelector: " << m_pdg << " " << m_listName << " ***invalid Type "
-                << plist->getFlavorType());
-    }
-    */
+    B2INFO("ParticleSelector: " << m_pdg << " " << m_listName << " size="
+           << plist->getList(ParticleList::c_Particle).size()
+           << "+" << plist->getList(ParticleList::c_AntiParticle).size()
+           << "+" << plist->getList(ParticleList::c_SelfConjugatedParticle).size());
+
   }
 
 

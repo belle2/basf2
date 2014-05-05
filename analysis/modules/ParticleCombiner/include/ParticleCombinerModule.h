@@ -98,7 +98,7 @@ namespace Belle2 {
      */
     void combination(StoreObjPtr<ParticleList>& plist,
                      std::vector<StoreObjPtr<ParticleList> >& plists,
-                     unsigned chargeState);
+                     ParticleList::EParticleType particleType);
 
     /**
      * Check that all FS particles of a combination differ

@@ -168,7 +168,7 @@ namespace Belle2 {
     for (auto & name : m_listNames) {
       StoreObjPtr<ParticleList> list(name);
 
-      for (unsigned i = 0; i < list->getNumofParticles() + list->getNumofAntiParticles(); ++i) {
+      for (unsigned i = 0; i < list->getListSize(); ++i) {
         const Particle* particle = list->getParticle(i);
         float truth = m_truth->function(particle);
 

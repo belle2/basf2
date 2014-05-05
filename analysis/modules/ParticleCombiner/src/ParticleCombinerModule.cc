@@ -74,13 +74,6 @@ namespace Belle2 {
     for (unsigned i = 0; i < m_inputListNames.size(); i++) {
       StoreObjPtr<ParticleList>::required(m_inputListNames[i]);
     }
-
-    // printout with B2INFO
-    std::string decay;
-    for (unsigned i = 0; i < m_inputListNames.size(); i++) {
-      decay = decay + " " + m_inputListNames[i];
-    }
-    B2INFO("ParticleCombiner: " << m_pdg << " " << m_listName << "->" << decay);
   }
 
   void ParticleCombinerModule::beginRun()
@@ -108,7 +101,7 @@ namespace Belle2 {
       plists.push_back(list);
     }
 
-    if (outputList->getFlavorType() == 1) {
+    {
       vector<int> decay, decaybar;
       for (unsigned i = 0; i < plists.size(); i++) {
         decay.push_back(plists[i]->getPDG());
@@ -116,11 +109,25 @@ namespace Belle2 {
       }
       std::sort(decay.begin(), decay.end());
       std::sort(decaybar.begin(), decaybar.end());
-      if (decay == decaybar) outputList->swapFlavorType();
+      if (decay == decaybar or outputList->getPDG() == outputList->getPDGbar()) {
+        combination(outputList, plists, ParticleList::c_SelfConjugatedParticle);
+      } else {
+        combination(outputList, plists, ParticleList::c_Particle);
+        combination(outputList, plists, ParticleList::c_AntiParticle);
+      }
     }
 
-    combination(outputList, plists, 0);
-    if (outputList->getFlavorType() == 1) combination(outputList, plists, 1);
+    // printout with B2INFO
+    std::string decay;
+    for (unsigned i = 0; i < m_inputListNames.size(); i++) {
+      decay = decay + " " + m_inputListNames[i];
+    }
+
+    B2INFO("ParticleCombiner: " << m_pdg << " " << m_listName << " size="
+           << outputList->getList(ParticleList::c_Particle).size()
+           << "+" << outputList->getList(ParticleList::c_AntiParticle).size()
+           << "+" << outputList->getList(ParticleList::c_SelfConjugatedParticle).size());
+
   }
 
 
@@ -134,7 +141,7 @@ namespace Belle2 {
 
   void ParticleCombinerModule::combination(StoreObjPtr<ParticleList>& outputList,
                                            vector<StoreObjPtr<ParticleList> >& plists,
-                                           unsigned chargeState)
+                                           ParticleList::EParticleType particleType)
   {
     StoreArray<Particle> Particles;
 
@@ -146,9 +153,11 @@ namespace Belle2 {
 
     // initialize arrays and list indices
 
+    // TODO Implement correct combination of Particles, AntiParticles and
+    // SelfConjugatedParticles
     int nLoop = 1;
     for (int i = 0; i < N; i++) {
-      n[i] = plists[i]->getList(chargeState).size();
+      n[i] = plists[i]->getList(particleType).size();
       if (n[i] == 0) return;
       k[i] = 0;
       nLoop *= n[i];
@@ -177,7 +186,7 @@ namespace Belle2 {
       vector<Particle*> particleStack;
       vector<int> indices;
       for (int i = 0; i < N; i++) {
-        int ii = plists[i]->getList(chargeState)[k[i]];
+        int ii = plists[i]->getList(particleType)[k[i]];
         particleStack.push_back(Particles[ii]);
         indices.push_back(ii);
       }
@@ -200,11 +209,11 @@ namespace Belle2 {
 
       // store combination
       new(Particles.nextFreeAddress()) Particle(vec,
-                                                outputList->getPDG(chargeState),
-                                                static_cast<Particle::EFlavorType>(outputList->getFlavorType()),
+                                                particleType == ParticleList::c_AntiParticle ? outputList->getPDGbar() :  outputList->getPDG(),
+                                                particleType == ParticleList::c_SelfConjugatedParticle ? Particle::c_Unflavored : Particle::c_Flavored,
                                                 indices);
       int iparticle = Particles.getEntries() - 1;
-      outputList->addParticle(iparticle, chargeState);
+      outputList->addParticle(iparticle, particleType);
 
     }
 

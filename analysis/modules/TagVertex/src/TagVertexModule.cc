@@ -90,16 +90,14 @@ namespace Belle2 {
 
     StoreArray<Particle> Particles(plist->getParticleCollectionName());
 
-    for (unsigned k = 0; k < plist->getFlavorType() + 1; k++) {
-      for (unsigned i = 0; i < plist->getList(k).size(); i++) {
-        unsigned index = plist->getList(k)[i];
-        Particle* particle = Particles[index];
-        bool ok = doVertexFit(particle);
-        if (ok) BtagMCVertex(particle);
-        if (!ok) plist->markToRemove(i, k);
-      }
+    std::vector<unsigned int> toRemove;
+    for (unsigned i = 0; i < plist->getListSize(); i++) {
+      Particle* particle =  plist->getParticle(i);
+      bool ok = doVertexFit(particle);
+      if (ok) BtagMCVertex(particle);
+      if (!ok) toRemove.push_back(i);
     }
-    plist->removeMarked();
+    plist->removeParticles(toRemove);
 
   }
 

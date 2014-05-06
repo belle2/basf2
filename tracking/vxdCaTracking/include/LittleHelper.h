@@ -9,8 +9,7 @@
  **************************************************************************/
 
 
-#ifndef LITTLEHELPER_H
-#define LITTLEHELPER_H
+#pragma once
 
 #include <TVector3.h>
 
@@ -94,7 +93,3 @@ namespace Belle2 {
     double m_sigmaValue; /**< delivers preset for a sigma value to determine the degree of smearing */
   }; //end class LittleHelper
 } //end namespace Belle2
-
-#endif //LITTLEHELPER
-
-

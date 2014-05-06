@@ -12,8 +12,7 @@
 * and will be changed and corrected in later stages of developement. So please ignore them.
 */
 
-#ifndef EventCounterModule_H_
-#define EventCounterModule_H_
+#pragma once
 
 #include <framework/core/Module.h>
 // #include <fstream>
@@ -73,5 +72,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif /* EventCounterModule_H_ */

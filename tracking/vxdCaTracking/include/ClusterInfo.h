@@ -9,8 +9,7 @@
  **************************************************************************/
 
 
-#ifndef CLUSTERINFO_H
-#define CLUSTERINFO_H
+#pragma once
 
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
@@ -128,5 +127,3 @@ namespace Belle2 {
 
   }; //end class ClusterInfo
 } //end namespace Belle2
-
-#endif //CLUSTERINFO

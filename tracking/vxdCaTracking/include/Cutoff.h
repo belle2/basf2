@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CUTOFF_H
-#define CUTOFF_H
+#pragma once
 
 #include <algorithm>
 #include <string>
@@ -59,4 +58,3 @@ namespace Belle2 {
 
 
 } //Belle2 namespace
-#endif

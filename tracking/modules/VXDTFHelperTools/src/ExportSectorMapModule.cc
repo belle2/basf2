@@ -395,6 +395,7 @@ std::pair<int, int> ExportSectorMapModule::importROOTMap()
   TFile importedRootFile(fileName.c_str());
   if (importedRootFile.IsZombie()) { B2ERROR("file could not be reopened!"); }
   else {
+    int countNumberOfComparisons = 0, countMatches = 0, countMaps = 0, countSecMapVectors = 0;
     SecMapVector* retrievedVector; // pointer to current vector of secMaps in the root file
 
     TIter next(importedRootFile.GetListOfKeys());
@@ -408,29 +409,26 @@ std::pair<int, int> ExportSectorMapModule::importROOTMap()
         continue;
       }
 
-      B2INFO(" current secMapVector has " << retrievedVector->size() << " secMaps stored!")
+      countSecMapVectors++;
+      B2INFO(" current secMapVector has " << retrievedVector->size() << " secMaps stored, this vector is number " << countSecMapVectors << "!")
       countExternalMaps += retrievedVector->size();
 //      std::vector< Belle2::SecMapVector::MapPack>
       for (SecMapVector::MapPack & tempSecMap : retrievedVector->getFullVector()) { // full VXDTFRawSecMap including name
-        B2INFO("opening new map " << tempSecMap.second.getMapName() <<  ", with " <<
+        countMaps++;
+        B2INFO("opening new map " << tempSecMap.second.getMapName() <<  " (number " << countMaps << " so far), with " <<
                tempSecMap.second.getNumOfSectors() << " sectors, " << tempSecMap.second.getNumOfFriends() << " friends and " << tempSecMap.second.getNumOfValues() << " total values" << endl;)
 
 
         /// merging intermediate maps to one map of each type:
         bool partnerMapFound = false;
         for (SecMapVector::MapPack & anotherMap : importedMaps.getFullVector()) { // loop over already existing maps
-          B2INFO("current retrieved map: " << tempSecMap.first << ", current imported map: " << anotherMap.first)
-          B2WARNING("tempSecMap.second, anotherMap.second:\ndetectorType: " << tempSecMap.second.getDetectorType() << ", " << anotherMap.second.getDetectorType() << ",  size: " << tempSecMap.second.size() << ", " << anotherMap.second.size() << ",  MapName: " << tempSecMap.second.getMapName() << ", " << anotherMap.second.getMapName() << ",  MagneticField: " << tempSecMap.second.getMagneticFieldStrength() << ", " << anotherMap.second.getMagneticFieldStrength() << ",  origin: " << tempSecMap.second.getOrigin().Mag() << ", " << anotherMap.second.getOrigin().Mag())
-          for (VXDTFRawSecMap::SectorDistance aVal : tempSecMap.second.getDistances()) {
-            B2WARNING(" tempSecMap.entry f/s: " << aVal.first << "/" << aVal.second)
-          }
-          for (VXDTFRawSecMap::SectorDistance aVal : anotherMap.second.getDistances()) {
-            B2WARNING(" anotherMap.entry f/s: " << aVal.first << "/" << aVal.second)
-          }
+          ++countNumberOfComparisons;
+          B2INFO("Iteration " << countNumberOfComparisons << "current retrieved map: " << tempSecMap.first << ", current imported map: " << anotherMap.first << " taken from SecMapVector with size of " << importedMaps.size())
+          B2DEBUG(5, "tempSecMap.second, anotherMap.second:\ndetectorType: " << tempSecMap.second.getDetectorType() << ", " << anotherMap.second.getDetectorType() << ",  size: " << tempSecMap.second.size() << ", " << anotherMap.second.size() << ",  MapName: " << tempSecMap.second.getMapName() << ", " << anotherMap.second.getMapName() << ",  MagneticField: " << tempSecMap.second.getMagneticFieldStrength() << ", " << anotherMap.second.getMagneticFieldStrength() << ",  origin: " << tempSecMap.second.getOrigin().Mag() << ", " << anotherMap.second.getOrigin().Mag())
+
           if (tempSecMap.second == anotherMap.second) {  // compares VXDTFRawSecMaps
-            B2WARNING("bla1")
-            anotherMap.second.addSectorMap(tempSecMap.second.getSectorMap()); // INFO: removes entries from imported map and adds it to existing one ( more precisely: if sector-friend-combination already exists and current filterType too, then all values of added map will be moved to the existing one. If the sector, or the sector-friend-combination or the filterType in that combi does not exist yet, then the data gets copied, not moved)
-            B2WARNING("bla2")
+            countMatches++;
+            B2INFO("Partner found for " << anotherMap.first << " and will now be merged " << tempSecMap.first << ", there were " << countMatches << " matches for maps so far")            anotherMap.second.addSectorMap(tempSecMap.second.getSectorMap()); // INFO: removes entries from imported map and adds it to existing one ( more precisely: if sector-friend-combination already exists and current filterType too, then all values of added map will be moved to the existing one. If the sector, or the sector-friend-combination or the filterType in that combi does not exist yet, then the data gets copied, not moved)
             anotherMap.second.addDistances(tempSecMap.second.getDistances()); // after adding sectors, the sector-distaces are added separately
             B2INFO("Map: " << anotherMap.first << " has been merged with " << tempSecMap.first)
             partnerMapFound = true;

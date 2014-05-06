@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef ExporterEventInfo_H
-#define ExporterEventInfo_H
+
+#pragma once
 
 #include <vector>
 
@@ -80,6 +80,3 @@ namespace Belle2 {
 //     int m_nSVDClusters;
   }; //end class EventInfo
 } //end namespace Belle2
-
-#endif //ExporterEventInfo
-

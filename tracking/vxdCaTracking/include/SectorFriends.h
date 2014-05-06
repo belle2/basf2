@@ -7,10 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-// NOTE:These Classes are needed by dataobjects, but shall not be compatible to the datastore for performance reasons,
-// therefore not inheriting from T-object (compare to VXDID)
-#ifndef SECTORFRIENDS_H
-#define SECTORFRIENDS_H
+
+#pragma once
 
 #include <vector>
 #include <algorithm>
@@ -44,4 +42,3 @@ namespace Belle2 {
     unsigned int m_sectorName; /**< the name of the sector having this friend. Info is encoded as an int, if you want to have human readable values, you have to convert it using FullSecId */
   };
 } //Belle2 namespace
-#endif

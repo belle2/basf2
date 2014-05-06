@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef FilterCalculatorModule_H_
-#define FilterCalculatorModule_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include "tracking/vxdCaTracking/TwoHitFilters.h"
@@ -504,4 +503,3 @@ namespace Belle2 {
   private:
   };
 }
-#endif /* FilterCalculatorModule_H_ */

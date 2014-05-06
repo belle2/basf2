@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef VXDTFModule_H_
-#define VXDTFModule_H_
+#pragma once
 
 //framework:
 #include <framework/core/Module.h>
@@ -587,5 +586,3 @@ namespace Belle2 {
 
   };
 } // Belle2 namespace
-
-#endif /* VXDTFModule_H_ */

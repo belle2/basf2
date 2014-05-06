@@ -9,8 +9,7 @@
  **************************************************************************/
 
 
-#ifndef GLOBALNAMES_H
-#define GLOBALNAMES_H
+#pragma once
 
 #include <string>
 
@@ -52,7 +51,3 @@ namespace Belle2 {
 
   }; //end class GlobalNames
 } //end namespace Belle2
-
-#endif //GLOBALNAMES
-
-

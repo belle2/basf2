@@ -7,13 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-/* Additional Info:
-* This Module is in an early stage of developement. The comments are mainly for temporal purposes
-* and will be changed and corrected in later stages of developement. So please ignore them.
-*/
 
-#ifndef NonRootDataExportModule_H_
-#define NonRootDataExportModule_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include "tracking/vxdCaTracking/HitExporter.h"
@@ -102,5 +97,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif /* NonRootDataExportModule_H_ */

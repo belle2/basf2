@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TFAnalizerModule_H_
-#define TFAnalizerModule_H_
+#pragma once
 
 //framework-stuff
 #include <framework/core/Module.h>
@@ -321,5 +320,3 @@ namespace Belle2 {
     };
   } // Tracking namespace
 }
-
-#endif /* TFAnalizerModule_H_ */

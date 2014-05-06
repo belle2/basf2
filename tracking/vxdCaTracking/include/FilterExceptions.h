@@ -1,5 +1,14 @@
-#ifndef FILTEREXCEPTIONS_H
-#define FILTEREXCEPTIONS_H
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2011 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Jakob Lettenbichler, Stefan Ferstl, Thomas Fabian        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#pragma once
 
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/logging/Logger.h>
@@ -28,4 +37,3 @@ namespace Belle2 {
   };
 
 }
-#endif //FilerExceptions

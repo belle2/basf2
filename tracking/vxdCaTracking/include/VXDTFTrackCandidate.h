@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef VXDTFTRACKCANDIDATE_H
-#define VXDTFTRACKCANDIDATE_H
+
+#pragma once
 
 #include <framework/gearbox/Const.h>
 
@@ -313,4 +313,3 @@ namespace Belle2 {
     int m_collector_id; /**< ID of the TC in the Collector*/
   };
 } //Belle2 namespace
-#endif

@@ -8,9 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef VXDSEGMENTCELL_H
-#define VXDSEGMENTCELL_H
-
+#pragma once
 
 
 #include <list>
@@ -117,4 +115,3 @@ namespace Belle2 {
 
   /** @}*/
 } //Belle2 namespace
-#endif

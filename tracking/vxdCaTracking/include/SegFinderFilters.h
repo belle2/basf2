@@ -9,8 +9,7 @@
  **************************************************************************/
 
 
-#ifndef SEGFINDERFILTERS_H
-#define SEGFINDERFILTERS_H
+#pragma once
 
 #include "TObject.h"
 #include <TVector3.h>
@@ -110,7 +109,3 @@ namespace Belle2 {
     SuccessAndFailCounter m_slopeRZCtr; /**< counts number of successful (.first) and neglected (.second) tests for slopeRZ */
   }; //end class SegFinderFilters
 } //end namespace Belle2
-
-#endif //SEGFINDERFILTERS
-
-

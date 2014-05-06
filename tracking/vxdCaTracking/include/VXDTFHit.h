@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef VXDTFHIT_H
-#define VXDTFHIT_H
+#pragma once
 
 #include <TVector3.h>
 #include "SharedFunctions.h"
@@ -164,4 +163,3 @@ namespace Belle2 {
     int m_collector_id; /**< ID of the hit in the Collector */
   };
 } //Belle2 namespace
-#endif

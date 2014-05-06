@@ -9,8 +9,7 @@
  **************************************************************************/
 
 
-#ifndef ExporterHitInfo_H
-#define ExporterHitInfo_H
+#pragma once
 
 #include <vector>
 #include <string>
@@ -101,5 +100,3 @@ namespace Belle2 {
     int m_pdg; /**< pdgCode of particle causing hit */
   }; //end class ExporterHitInfo
 } //end namespace Belle2
-
-#endif //ExporterHitInfo

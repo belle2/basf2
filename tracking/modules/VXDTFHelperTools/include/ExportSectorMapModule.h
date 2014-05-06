@@ -9,8 +9,7 @@
  **************************************************************************/
 
 
-#ifndef ExportSectorMapModule_H_
-#define ExportSectorMapModule_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/gearbox/GearDir.h> // needed for reading xml-files
@@ -127,5 +126,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif /* ExportSectorMapModule_H_ */

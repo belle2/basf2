@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SecMapVector_H
-#define SecMapVector_H
+#pragma once
 
 #include "VXDTFRawSecMap.h"
 
@@ -57,4 +56,3 @@ namespace Belle2 {
 
   /** @}*/
 } //Belle2 namespace
-#endif

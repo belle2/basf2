@@ -124,8 +124,8 @@ histBins = 2000  # number of bins for the analysis histogram
 MADtoSigma = 1.4826  # sigma = 1.4826*MAD (for gaussian distributions)
 outlierCut = 4.  # distance from median in terms of MAD std when to count as outlier
 
-# compute mean, RMS, median, MAD, number of outliers --------------------------------------------------------------------------------------------
 
+# compute mean, RMS, median, MAD, number of outliers --------------------------------------------------------------------------------------------
 
 def getMedian(histo):
     nbins = histo.GetNbinsX()

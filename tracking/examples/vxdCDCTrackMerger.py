@@ -167,11 +167,11 @@ trackMergerAnalysis_param = {  # (in cm) use cdc inner wall
                                #    'CDC_wall_radius':        16.29,  #(in cm) use cdc outer wall
                                # default False
                                # 'MCParticlesColName': 'mcParticlesTruth',
-    'SiGFTracksColName': 'VXDTracks',
+                               #    'CDC_wall_radius': 16.25,
+    'VXDGFTracksColName': 'VXDTracks',
     'CDCGFTracksColName': 'CDCTracks',
     'GFTracksColName': 'GFTracks',
     'TrackCandColName': 'TracksCand',
-    'CDC_wall_radius': 16.25,
     'root_output_filename': 'VXD_CDC_trackmerger_test.root',
     }
 svd_cdcTracksMergerAnalysis.param(trackMergerAnalysis_param)

@@ -125,7 +125,7 @@ namespace Belle2 {
     int nTypes;
     int iType;
 
-    bool isCombinedParticleSelfConjugated;
+    bool m_isCombinedParticleSelfConjugated;
 
 
   };

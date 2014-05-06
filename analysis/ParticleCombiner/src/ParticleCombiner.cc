@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-  ListCombiner::ListCombiner(unsigned int numberOfLists) : numberOfLists(numberOfLists), iCombination(0), nCombinations(0), types(numberOfLists) {  }
+  ListCombiner::ListCombiner(unsigned int numberOfLists) : numberOfLists(numberOfLists), iCombination(0), nCombinations(0), currentType(ParticleList::c_Particle), types(numberOfLists) {  }
 
   void ListCombiner::init(ParticleList::EParticleType _currentType)
   {
@@ -91,7 +91,7 @@ namespace Belle2 {
   }
 
 
-  ParticleCombiner::ParticleCombiner(const std::vector<std::string>& inputListNames, bool isCombinedParticleSelfConjugated) : listCombiner(inputListNames.size()), indexCombiner(inputListNames.size()), isCombinedParticleSelfConjugated(isCombinedParticleSelfConjugated)
+  ParticleCombiner::ParticleCombiner(const std::vector<std::string>& inputListNames, bool isCombinedParticleSelfConjugated) : listCombiner(inputListNames.size()), indexCombiner(inputListNames.size()), m_isCombinedParticleSelfConjugated(isCombinedParticleSelfConjugated)
   {
 
     for (unsigned i = 0; i < inputListNames.size(); i++) {
@@ -115,7 +115,7 @@ namespace Belle2 {
     nTypes = 3;
     iType = -1;
 
-    isCombinedParticleSelfConjugated = isCombinedParticleSelfConjugated || isDecaySelfConjugated(plists);
+    m_isCombinedParticleSelfConjugated = isCombinedParticleSelfConjugated || isDecaySelfConjugated(plists);
 
   }
 
@@ -173,7 +173,7 @@ namespace Belle2 {
 
   ParticleList::EParticleType ParticleCombiner::getCurrentType() const
   {
-    if (isCombinedParticleSelfConjugated)
+    if (m_isCombinedParticleSelfConjugated)
       return ParticleList::c_SelfConjugatedParticle;
     return getCurrentCombinationType();
   }

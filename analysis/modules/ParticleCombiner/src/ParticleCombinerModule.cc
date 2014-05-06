@@ -117,12 +117,6 @@ namespace Belle2 {
 
     }
 
-    // printout with B2INFO
-    std::string decay;
-    for (unsigned i = 0; i < m_inputListNames.size(); i++) {
-      decay = decay + " " + m_inputListNames[i];
-    }
-
     B2INFO("ParticleCombiner: " << m_pdg << " " << m_listName << " size="
            << outputList->getList(ParticleList::c_Particle).size()
            << "+" << outputList->getList(ParticleList::c_AntiParticle).size()

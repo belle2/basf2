@@ -351,7 +351,7 @@ void AnalizerCollectorTFInfo::storeAllHitInformation(std::string filename)
 // 12 FilterID::distance3D,
 // 13 FilterID::distanceXY,
 // 14 FilterID::distanceZ,
-// 15 FilterID::helixFit,
+// 15 FilterID::helixParameterFit,
 // 16 FilterID::slopeRZ,
 // 17   FilterID::deltaSlopeRZ,
 // 18 FilterID::pT,
@@ -375,11 +375,9 @@ void AnalizerCollectorTFInfo::storeHitInformation(std::string filename, int part
                                      FilterID::distance3D,
                                      FilterID::distanceXY,
                                      FilterID::distanceZ,
-                                     FilterID::helixFit,
-
-//             FilterID::deltaSOverZ,
-//             FilterID::deltaSlopeZOverS,
-
+                                     FilterID::helixParameterFit,
+                                     FilterID::deltaSOverZ,
+                                     FilterID::deltaSlopeZOverS,
                                      FilterID::slopeRZ,
                                      FilterID::deltaSlopeRZ,
                                      FilterID::pT,
@@ -417,9 +415,9 @@ void AnalizerCollectorTFInfo::storeHitInformation(std::string filename, int part
   B2DEBUG(100, "Filename (storeHitInformation): " << filename);
 
 
-  myfile << "hitid" << m_fileSeparator << "passIndex" << m_fileSeparator << "sector_ID" << m_fileSeparator << "died_at" << m_fileSeparator << "died_ID" << m_fileSeparator << "real" << m_fileSeparator << particleText << m_fileSeparator << "Purity" << m_fileSeparator << "Hit_Position" << m_fileSeparator << "Hit_Sigma" << m_fileSeparator << "F_overHighestAllowedLayer" << m_fileSeparator << "F_outOfSectorRange" << m_fileSeparator << "F_angles3D" << m_fileSeparator << "F_anglesRZ" << m_fileSeparator << "F_anglesXY" << m_fileSeparator << "F_distance3D" << m_fileSeparator << "F_distanceXY" << m_fileSeparator << "F_distanceZ" << m_fileSeparator << "F_helixFit";
+  myfile << "hitid" << m_fileSeparator << "passIndex" << m_fileSeparator << "sector_ID" << m_fileSeparator << "died_at" << m_fileSeparator << "died_ID" << m_fileSeparator << "real" << m_fileSeparator << particleText << m_fileSeparator << "Purity" << m_fileSeparator << "Hit_Position" << m_fileSeparator << "Hit_Sigma" << m_fileSeparator << "F_overHighestAllowedLayer" << m_fileSeparator << "F_outOfSectorRange" << m_fileSeparator << "F_angles3D" << m_fileSeparator << "F_anglesRZ" << m_fileSeparator << "F_anglesXY" << m_fileSeparator << "F_distance3D" << m_fileSeparator << "F_distanceXY" << m_fileSeparator << "F_distanceZ" << m_fileSeparator << "F_helixParameterFit";
 
-//   myfile << m_fileSeparator << "F_deltaSOverZ" << m_fileSeparator <<  "F_deltaSlopeZOverS";
+  myfile << m_fileSeparator << "F_deltaSOverZ" << m_fileSeparator <<  "F_deltaSlopeZOverS";
 
 
   myfile << m_fileSeparator << "F_slopeRZ" << m_fileSeparator << "F_deltaSlopeRZ" << m_fileSeparator <<  "F_pT" << m_fileSeparator << "F_deltapT" << m_fileSeparator << "F_normedDistance3D" << m_fileSeparator << "F_distance2IP" << m_fileSeparator << "F_deltaDistance2IP" << m_fileSeparator << "F_silentSegFinder" << m_fileSeparator << "F_silentTcc" << m_fileSeparator <<
@@ -581,7 +579,7 @@ void AnalizerCollectorTFInfo::storeAllCellInformation(std::string filename)
 // 14 FilterID::deltaSlopeRZ,
 // 15 FilterID::normedDistance3D (add)
 // 16 FilterID::pT,
-// 17 FilterID::helixFit
+// 17 FilterID::helixParameterFit
 
 //             FilterID::deltaSOverZ,
 //             FilterID::deltaSlopeZOverS,
@@ -607,11 +605,9 @@ void AnalizerCollectorTFInfo::storeCellInformation(std::string filename, int par
                                      FilterID::deltaSlopeRZ,
                                      FilterID::normedDistance3D,
                                      FilterID::pT,
-                                     FilterID::helixFit,
-
-//             FilterID::deltaSOverZ,
-//             FilterID::deltaSlopeZOverS,
-
+                                     FilterID::helixParameterFit,
+                                     FilterID::deltaSOverZ,
+                                     FilterID::deltaSlopeZOverS,
                                      FilterID::nbFinderLost,
                                      FilterID::cellularAutomaton,
                                      FilterID::silentTcc
@@ -633,7 +629,7 @@ void AnalizerCollectorTFInfo::storeCellInformation(std::string filename, int par
 
   myfile << "cellid" << m_fileSeparator << "passIndex" << m_fileSeparator << "state" << m_fileSeparator << "died_at" << m_fileSeparator << "died_ID" << m_fileSeparator << "real" << m_fileSeparator << particleText << m_fileSeparator << "Purity" << m_fileSeparator;
 
-  myfile << "F_distance3D" << m_fileSeparator <<  "F_distanceZ" << m_fileSeparator << "F_anglesXY" << m_fileSeparator << "F_anglesRZ" << m_fileSeparator << "F_slopeRZ" << m_fileSeparator << "F_distance2IP" << m_fileSeparator << "F_deltaSlopeRZ" << m_fileSeparator << "F_normedDistance3D" << m_fileSeparator << "F_pT" << m_fileSeparator << "F_helixFit";
+  myfile << "F_distance3D" << m_fileSeparator <<  "F_distanceZ" << m_fileSeparator << "F_anglesXY" << m_fileSeparator << "F_anglesRZ" << m_fileSeparator << "F_slopeRZ" << m_fileSeparator << "F_distance2IP" << m_fileSeparator << "F_deltaSlopeRZ" << m_fileSeparator << "F_normedDistance3D" << m_fileSeparator << "F_pT" << m_fileSeparator << "F_helixParameterFit";
 
 //   myfile << m_fileSeparator << "F_deltaSOverZ" << m_fileSeparator <<  "F_deltaSlopeZOverS";
 

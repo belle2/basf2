@@ -22,10 +22,10 @@ namespace Belle2 {
   {
     // provides a usefull filterType
     Belle2::FilterID aFilterIDTranslator;
-    Belle2::FilterID::filterTypes aFilterType = aFilterIDTranslator.getFilterType(Belle2::FilterID::nameHelixFit);
-    EXPECT_EQ(Belle2::FilterID::nameHelixFit, aFilterIDTranslator.getFilterString(aFilterType));
+    Belle2::FilterID::filterTypes aFilterType = aFilterIDTranslator.getFilterType(Belle2::FilterID::nameHelixParameterFit);
+    EXPECT_EQ(Belle2::FilterID::nameHelixParameterFit, aFilterIDTranslator.getFilterString(aFilterType));
 
-    EXPECT_EQ(aFilterType, aFilterIDTranslator.getFilterType(Belle2::FilterID::nameHelixFit));
+    EXPECT_EQ(aFilterType, aFilterIDTranslator.getFilterType(Belle2::FilterID::nameHelixParameterFit));
 
   }
 }

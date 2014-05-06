@@ -822,7 +822,7 @@ void FilterCalculatorModule::event()
             helixFit = m_threeHitFilterBox.calcHelixFit();
             if (std::isnan(helixFit) == false) {
               B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated helixFit-Value: " << helixFit << " gets stored in sector " << thisSectorPos->second.getSectorID())
-              thisSectorPos->second.addValue(friendSector, FilterID::helixFit, helixFit);
+              thisSectorPos->second.addValue(friendSector, FilterID::helixParameterFit, helixFit);
             } else {
               m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated helixFit-Value: " << helixFit << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print();

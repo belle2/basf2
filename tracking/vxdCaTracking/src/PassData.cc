@@ -78,7 +78,7 @@ std::pair<int, int> Belle2::PassData::importSectorMap(const Belle2::SecMapCopy& 
           cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->pT.second);
           cutoffMaxValue = addExtraGain(+1, aFilter.second.second, this->pT.second);
 
-        } else if (filterID == FilterID::helixFit &&  this->helixFit.first == true) {
+        } else if (filterID == FilterID::helixParameterFit &&  this->helixFit.first == true) {
           cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->helixFit.second);
           cutoffMaxValue = addExtraGain(+1, aFilter.second.second, this->helixFit.second);
 

@@ -288,7 +288,7 @@ std::pair<int, int> ExportSectorMapModule::importXMLMap()
           cutoffMinValue = getXMLValue(cuts, min, aFilterName);
           cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
 
-        } else if (aFilterName == FilterID::nameHelixFit) {
+        } else if (aFilterName == FilterID::nameHelixParameterFit) {
           cutoffMinValue = getXMLValue(cuts, min, aFilterName);
           cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
 

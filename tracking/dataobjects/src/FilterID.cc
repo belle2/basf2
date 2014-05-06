@@ -21,7 +21,7 @@ const string FilterID::nameAnglesXY = "anglesXY";
 const string FilterID::nameDistance3D = "distance3D";
 const string FilterID::nameDistanceXY = "distanceXY";
 const string FilterID::nameDistanceZ = "distanceZ";
-const string FilterID::nameHelixFit = "helixFit";
+const string FilterID::nameHelixParameterFit = "helixParameterFit";
 const string FilterID::nameSlopeRZ = "slopeRZ";
 const string FilterID::nameDeltaSlopeRZ = "deltaSlopeRZ";
 const string FilterID::namePT = "pT";
@@ -63,6 +63,14 @@ const string FilterID::nameAlwaysTrue = "alwaysTrue";
 const string FilterID::nameAlwaysFalse = "alwaysFalse";
 const string FilterID::nameRandomTrue = "randomTrue";
 
+const string FilterID::nameDeltaSOverZ = "deltaSOverZ";
+const string FilterID::nameDeltaSlopeZOverS = "deltaSlopeZOverS";
+
+const string FilterID::nameOverHighestAllowedLayer = "overHighestAllowedLayer";
+const string FilterID::nameOutOfSectorRange = "outOfSectorRange";
+
+
+
 const boost::array<string, FilterID::numFilters> FilterID::nameVector = { {
     nameAngles3D,
     nameAnglesRZ,
@@ -70,7 +78,7 @@ const boost::array<string, FilterID::numFilters> FilterID::nameVector = { {
     nameDistance3D,
     nameDistanceXY,
     nameDistanceZ,
-    nameHelixFit,
+    nameHelixParameterFit,
     nameSlopeRZ,
     nameDeltaSlopeRZ,
     namePT,
@@ -105,7 +113,13 @@ const boost::array<string, FilterID::numFilters> FilterID::nameVector = { {
 
     nameAlwaysTrue,
     nameAlwaysFalse,
-    nameRandomTrue
+    nameRandomTrue,
+
+    nameDeltaSOverZ,
+    nameDeltaSlopeZOverS,
+
+    nameOverHighestAllowedLayer,
+    nameOutOfSectorRange
   }
 };
 
@@ -117,7 +131,7 @@ const boost::array<FilterID::filterTypes, FilterID::numFilters> FilterID::enumVe
     FilterID::distance3D,
     FilterID::distanceXY,
     FilterID::distanceZ,
-    FilterID::helixFit,
+    FilterID::helixParameterFit,
     FilterID::slopeRZ,
     FilterID::deltaSlopeRZ,
     FilterID::pT,
@@ -153,7 +167,14 @@ const boost::array<FilterID::filterTypes, FilterID::numFilters> FilterID::enumVe
 
     FilterID::alwaysTrue,
     FilterID::alwaysFalse,
-    FilterID::randomTrue
+    FilterID::randomTrue,
+
+    FilterID::deltaSOverZ,
+    FilterID::deltaSlopeZOverS,
+
+    FilterID::overHighestAllowedLayer,
+    FilterID::outOfSectorRange
+
   }
 };
 
@@ -172,8 +193,8 @@ FilterID::filterTypes FilterID::getFilterType(std::string filterString)
   {return distanceXY;}
   else if (filterString == nameDistanceZ)
   {return distanceZ;}
-  else if (filterString == nameHelixFit)
-  {return helixFit;}
+  else if (filterString == nameHelixParameterFit)
+  {return helixParameterFit;}
   else if (filterString == nameSlopeRZ)
   {return slopeRZ;}
   else if (filterString == nameDeltaSlopeRZ)
@@ -246,6 +267,16 @@ FilterID::filterTypes FilterID::getFilterType(std::string filterString)
   {return alwaysFalse;}
   else if (filterString == nameRandomTrue)
   {return randomTrue;}
+
+  else if (filterString == nameDeltaSOverZ)
+  {return deltaSOverZ;}
+  else if (filterString == nameDeltaSlopeZOverS)
+  {return deltaSlopeZOverS;}
+
+  else if (filterString == nameOverHighestAllowedLayer)
+  {return overHighestAllowedLayer;}
+  else if (filterString == nameOutOfSectorRange)
+  {return outOfSectorRange;}
 
   else {
     B2DEBUG(1, " FilterID::getFilterType. Input string is out of range, please check that...")

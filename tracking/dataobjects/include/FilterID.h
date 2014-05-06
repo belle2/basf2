@@ -33,7 +33,7 @@ namespace Belle2 {
       distance3D, /**< string name of filter d3D */
       distanceXY, /**< string name of filter dXY */
       distanceZ, /**< string name of filter dZ */
-      helixFit, /**< string name of filter hFit */
+      helixParameterFit, /**< string name of filter helix Paramater Fit */
       slopeRZ, /**< string name of filter slopeRZ */
       deltaSlopeRZ, /**< string name of filter dslopeRZ */
       pT, /**< string name of filter pT */
@@ -76,7 +76,14 @@ namespace Belle2 {
       alwaysFalse, /**< a filter with this ID will always say no */
       randomTrue,  /**< a filter with this ID will say yes or no by random choice */
 
+      overHighestAllowedLayer, /**< OverHighestAllowedLayer Filter */
+      outOfSectorRange, /**< out of sector range filter */
+
+      deltaSOverZ,  /**< deltaSOverZ Filter */
+      deltaSlopeZOverS, /**< deltaSlopeZOverS Filter */
+
       numFilters /**< knows number of filters existing. If a member returns this value, the input-value was wrong */
+
     };
 
     const static std::string nameAngles3D;/**< string name of filter a3D */
@@ -85,7 +92,7 @@ namespace Belle2 {
     const static std::string nameDistance3D; /**< string name of filter d3D */
     const static std::string nameDistanceXY; /**< string name of filter dXY */
     const static std::string nameDistanceZ; /**< string name of filter dZ */
-    const static std::string nameHelixFit; /**< string name of filter hFit */
+    const static std::string nameHelixParameterFit; /**< string name of filter helix Parameter Fit */
     const static std::string nameSlopeRZ; /**< string name of filter slopeRZ */
     const static std::string nameDeltaSlopeRZ; /**< string name of filter dslopeRZ */
     const static std::string namePT; /**< string name of filter pT */
@@ -125,6 +132,18 @@ namespace Belle2 {
     const static std::string nameAlwaysTrue; /**< string name of a filter which will always say yes */
     const static std::string nameAlwaysFalse; /**< string name of a filter which will always say no */
     const static std::string nameRandomTrue;  /**< string name of a filter which will say yes or no by random choice */
+
+
+    const static std::string nameDeltaSOverZ;     /**< string name deltaSOverZ Filter */
+    const static std::string nameDeltaSlopeZOverS;  /**< string name deltaSlopeZOverS Filter */
+
+
+
+
+    const static std::string nameOverHighestAllowedLayer; /**< string name of OverHighestAllowedLayer Filter */
+    const static std::string nameOutOfSectorRange; /**< string name out of sector range filter */
+
+
 
     const static boost::array<std::string, numFilters> nameVector; /**< array storing all the strings where the enums can be used to access their position */
 

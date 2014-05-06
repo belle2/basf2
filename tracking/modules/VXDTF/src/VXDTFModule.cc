@@ -3845,24 +3845,24 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
 
         if (currentPass->helixFit.first == true) { // min & max!
           try {
-            accepted = currentPass->threeHitFilterBox.checkHelixParameterFit(FilterID::helixFit);
+            accepted = currentPass->threeHitFilterBox.checkHelixParameterFit(FilterID::helixParameterFit);
           } catch (FilterExceptions::Straight_Line& anException) {
-            B2WARNING("Exception caught: " << FilterID::helixFit << " failed with exception: " << anException.what() << " test-result is set negative...")
+            B2WARNING("Exception caught: " << FilterID::helixParameterFit << " failed with exception: " << anException.what() << " test-result is set negative...")
             accepted = false;
           } catch (FilterExceptions::Circle_too_small& anException) {
-            B2WARNING("Exception caught: " << FilterID::helixFit << " failed with exception: " << anException.what() << " test-result is set negative...")
+            B2WARNING("Exception caught: " << FilterID::helixParameterFit << " failed with exception: " << anException.what() << " test-result is set negative...")
             accepted = false;
           }
 
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " helixFit: segment approved!")
-            acceptedRejectedFilters.push_back(make_pair(FilterID::helixFit, true));
+            acceptedRejectedFilters.push_back(make_pair(FilterID::helixParameterFit, true));
           } else {
             B2DEBUG(150, " helixFit: segment discarded!")
-            acceptedRejectedFilters.push_back(make_pair(FilterID::helixFit, false));
+            acceptedRejectedFilters.push_back(make_pair(FilterID::helixParameterFit, false));
             if (m_PARAMDebugMode == true) {
-              pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::helixFit);
+              pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::helixParameterFit);
               B2WARNING("helixFit - SectorCombi: " << FullSecID(mainSecIter->first) << "/" << FullSecID(currentFriendID) << ", minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcHelixFit() << ", maxCutoff: " << cutoffs.second)
             }
           } // else segment not approved

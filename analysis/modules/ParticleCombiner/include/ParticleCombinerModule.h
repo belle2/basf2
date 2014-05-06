@@ -11,10 +11,11 @@
 #ifndef PARTICLECOMBINERMODULE_H
 #define PARTICLECOMBINERMODULE_H
 
+#include <framework/core/Module.h>
+
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
 
-#include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 

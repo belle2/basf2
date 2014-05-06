@@ -10,9 +10,13 @@
 
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
 
+#include <analysis/dataobjects/Particle.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/logging/Logger.h>
+
 namespace Belle2 {
 
-  ListCombiner::ListCombiner(unsigned int numberOfLists) : iCombination(0), nCombinations(0), numberOfLists(numberOfLists), types(numberOfLists) {  }
+  ListCombiner::ListCombiner(unsigned int numberOfLists) : numberOfLists(numberOfLists), iCombination(0), nCombinations(0), types(numberOfLists) {  }
 
   void ListCombiner::init(ParticleList::EParticleType _currentType)
   {

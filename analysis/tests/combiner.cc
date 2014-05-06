@@ -8,6 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
+
+#include <analysis/dataobjects/Particle.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>

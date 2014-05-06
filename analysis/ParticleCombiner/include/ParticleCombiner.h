@@ -8,12 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <analysis/dataobjects/Particle.h>
+#pragma once
+
 #include <analysis/dataobjects/ParticleList.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/logging/Logger.h>
 
 #include <vector>
 #include <unordered_set>
@@ -32,6 +31,7 @@ namespace std {
 }
 
 namespace Belle2 {
+  class Particle;
 
   class ListCombiner {
   public:
@@ -41,7 +41,7 @@ namespace Belle2 {
     const std::vector<ParticleList::EParticleType>& getCurrentTypes() const;
 
   private:
-    unsigned int numberOfLists;
+    const unsigned int numberOfLists;
     unsigned int iCombination;
     unsigned int nCombinations;
     ParticleList::EParticleType currentType;
@@ -60,7 +60,7 @@ namespace Belle2 {
 
 
   private:
-    unsigned int numberOfLists;
+    const unsigned int numberOfLists;
     unsigned int iCombination;
     unsigned int nCombinations;
     std::vector<unsigned int> indices;

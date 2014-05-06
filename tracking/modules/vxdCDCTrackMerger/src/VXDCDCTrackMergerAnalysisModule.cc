@@ -8,26 +8,19 @@
 
 #include "genfit/TrackCand.h"
 #include "genfit/RKTrackRep.h"
-//#include "genfit/AbsTrackRep.h"
 #include <mdst/dataobjects/MCParticle.h>
 
-//avoid having to wrap everything in the namespace explicitly
-//only permissible in .cc files!
 using namespace Belle2;
 
-//this line registers the module with the framework and actually makes it available
-//in steering files or the the module list (basf2 -m).
-//Note that the 'Module' part of the class name is missing, this is also the way it
-//will be called in the module list.
 REG_MODULE(VXDCDCTrackMergerAnalysis)
 
 VXDCDCTrackMergerAnalysisModule::VXDCDCTrackMergerAnalysisModule() : Module()
 {
   setDescription("Analysis module for VXDCDCTrackMerger. This module merges tracks which are reconstructed, separately, in the silicon (PXD+VXD) and in the CDC and creates a root file.");
-  addParam("CDC_wall_radius",    m_CDC_wall_radius,    "This parameters stands for either the inner or the outer CDC wall radius", double(100.0));
+  //addParam("CDC_wall_radius",    m_CDC_wall_radius,    "This parameters stands for either the inner or the outer CDC wall radius", double(100.0));
   //input tracks
   addParam("GFTracksColName",  m_GFTracksColName,  "Originary GFTrack collection");
-  addParam("SiGFTracksColName",  m_SiGFTracksColName,  "Silicon GFTrack collection");
+  addParam("VXDGFTracksColName",  m_VXDGFTracksColName,  "Silicon GFTrack collection");
   addParam("CDCGFTracksColName", m_CDCGFTracksColName, "CDC GFTrack collection");
   //addParam("MCParticlesColName", m_mcParticlesColName, "MCParticles collection");
   addParam("TrackCandColName", m_TrackCandColName, "CDC Track Cand collection");
@@ -51,6 +44,7 @@ void VXDCDCTrackMergerAnalysisModule::initialize()
 
   //std::map<genfit::Track*, genfit::Track*>* matched_tracks_map = new std::map<genfit::Track*, genfit::Track*>();
 
+  m_CDC_wall_radius = 16.25;
   //for global merging efficiency
   m_total_pairs         = 0;
   m_total_matched_pairs = 0;
@@ -80,7 +74,7 @@ void VXDCDCTrackMergerAnalysisModule::initialize()
 
   m_ttree->Branch("npair",     &m_npair,                  "npair/I");
   m_ttree->Branch("ncdc_trk",  &m_ncdc_trk,               "ncdc_trk/I");
-  m_ttree->Branch("nsi_trk",   &m_nsi_trk,                "nsi_trk/I");
+  m_ttree->Branch("nVXD_trk",   &m_nVXD_trk,                "nVXD_trk/I");
   m_ttree->Branch("mrg_eff",   &m_trk_mrg_eff,            "mrg_eff/D");
   m_ttree->Branch("match",     "std::vector<int>",        &m_match_vec);
   m_ttree->Branch("pre_match",     "std::vector<int>",        &m_pre_match_vec);
@@ -133,36 +127,36 @@ void VXDCDCTrackMergerAnalysisModule::event()
   //}
 
   //get silicon tracks
-  StoreArray<genfit::Track> si_mcGFTracks(m_SiGFTracksColName);
-  unsigned int nSiTracks = si_mcGFTracks.getEntries();
+  StoreArray<genfit::Track> VXDGFTracks(m_VXDGFTracksColName);
+  unsigned int nVXDTracks = VXDGFTracks.getEntries();
 
-  B2INFO("VXDCDCTrackMerger: input Number of Silicon Tracks: " << nSiTracks);
-  if (nSiTracks == 0) B2WARNING("SiCDCTrackMerger: SiGFTracksCollection is empty!");
+  B2INFO("VXDCDCTrackMerger: input Number of Silicon Tracks: " << nVXDTracks);
+  if (nVXDTracks == 0) B2WARNING("VXDCDCTrackMerger: VXDGFTracksCollection is empty!");
 
   //get CDC tracks
-  StoreArray<genfit::Track> cdc_mcGFTracks(m_CDCGFTracksColName);
-  unsigned int nCDCTracks = cdc_mcGFTracks.getEntries();
+  StoreArray<genfit::Track> CDCGFTracks(m_CDCGFTracksColName);
+  unsigned int nCDCTracks = CDCGFTracks.getEntries();
 
   B2INFO("VXDCDCTrackMerger: input Number of CDC Tracks: " << nCDCTracks);
   if (nCDCTracks == 0) B2WARNING("VXDCDCTrackMerger: CDCGFTracksCollection is empty!");
 
-  StoreArray<genfit::Track> mcGFTracks(m_GFTracksColName);
-  //unsigned int nTracks = mcGFTracks.getEntries();
+  StoreArray<genfit::Track> GFTracks(m_GFTracksColName);
+  //unsigned int nTracks = GFTracks.getEntries();
 
   const StoreArray<genfit::TrackCand> TrackCand(m_TrackCandColName);
 
   TVector3 position(0., 0., 0.);
   TVector3 momentum(0., 0., 1.);
-  TVectorD si_trk_state;
-  TMatrixDSym si_trk_covmtrx(6);
+  TVectorD VXD_trk_state;
+  TMatrixDSym VXD_trk_covmtrx(6);
   TVectorD cdc_trk_state;
   TMatrixDSym cdc_trk_covmtrx(6);
   TVector3 pos;
   TVector3 mom;
-  unsigned int si_trk_it[nSiTracks];
+  unsigned int VXD_trk_it[nVXDTracks];
   unsigned int cdc_trk_it[nCDCTracks];
   int mtch = 0;
-  int si_trk_idx = 0;
+  int VXD_trk_idx = 0;
   //int cdc_trk_idx=0;
 
   std::map<genfit::Track*, genfit::Track*>* matched_tracks_map = new std::map<genfit::Track*, genfit::Track*>();
@@ -172,7 +166,7 @@ void VXDCDCTrackMergerAnalysisModule::event()
   //loop on CDC tracks
   for (unsigned int itrack = 0; itrack < nCDCTracks; itrack++) { //extrapolate to the CDC wall
     try {
-      genfit::MeasuredStateOnPlane cdc_sop = cdc_mcGFTracks[itrack]->getFittedState();
+      genfit::MeasuredStateOnPlane cdc_sop = CDCGFTracks[itrack]->getFittedState();
       cdc_sop.extrapolateToCylinder(m_CDC_wall_radius, position, momentum);
       cdc_sop.get6DStateCov(cdc_trk_state, cdc_trk_covmtrx);
       //cdc_trk_covmtrx=cdc_sop.get6DCov();
@@ -189,29 +183,29 @@ void VXDCDCTrackMergerAnalysisModule::event()
     mtch = 0;
 
     //loop on VXD Tracks
-    for (unsigned int jtrack = 0; jtrack < nSiTracks; jtrack++) {
+    for (unsigned int jtrack = 0; jtrack < nVXDTracks; jtrack++) {
       try {
-        genfit::MeasuredStateOnPlane si_sop = si_mcGFTracks[jtrack]->getFittedState();
-        si_sop.extrapolateToCylinder(m_CDC_wall_radius, position, momentum);
-        si_sop.get6DStateCov(si_trk_state, si_trk_covmtrx);
+        genfit::MeasuredStateOnPlane VXD_sop = VXDGFTracks[jtrack]->getFittedState();
+        VXD_sop.extrapolateToCylinder(m_CDC_wall_radius, position, momentum);
+        VXD_sop.get6DStateCov(VXD_trk_state, VXD_trk_covmtrx);
 
       } catch (...) {
-        B2WARNING("SiTrack extrapolation to cylinder failed!");
+        B2WARNING("VXDTrack extrapolation to cylinder failed!");
         continue;
       }
       //Match Tracks
-      TMatrixDSym inv_covmtrx = (cdc_trk_covmtrx + si_trk_covmtrx).Invert(); //.Invert() ndr
-      TVectorD state_diff = cdc_trk_state - si_trk_state;
-      //double raw_diff = (cdc_trk_state-si_trk_state)*(cdc_trk_state-si_trk_state);
+      TMatrixDSym inv_covmtrx = (cdc_trk_covmtrx + VXD_trk_covmtrx).Invert(); //.Invert() ndr
+      TVectorD state_diff = cdc_trk_state - VXD_trk_state;
+      //double raw_diff = (cdc_trk_state-VXD_trk_state)*(cdc_trk_state-VXD_trk_state);
       state_diff *= inv_covmtrx;
-      double chi_2 = state_diff * (cdc_trk_state - si_trk_state);
+      double chi_2 = state_diff * (cdc_trk_state - VXD_trk_state);
       if ((chi_2 < CHI2_MAX) && (chi_2 > 0)) {
         mtch = 1;
         CHI2_MAX = chi_2;
         matched_track = jtrack;
       }
 
-      genfit::Track* GFTrk = mcGFTracks[itrack];
+      genfit::Track* GFTrk = GFTracks[itrack];
       const genfit::TrackCand* cdc_TrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(GFTrk, m_TrackCandColName);
       if (cdc_TrkCandPtr == NULL) {
         //  B2WARNING("CDC track candidate pointer is NULL (VXDCDCTrackMerger)");
@@ -220,19 +214,19 @@ void VXDCDCTrackMergerAnalysisModule::event()
       }
       int cdc_mcp_index = cdc_TrkCandPtr->getMcTrackId();
 
-      GFTrk = mcGFTracks[jtrack + nCDCTracks];
-      const genfit::TrackCand* si_TrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(GFTrk, m_TrackCandColName);
-      if (si_TrkCandPtr == NULL) {
-        //  B2WARNING("Si track candidate pointer is NULL (VXDCDCTrackMerger)");
+      GFTrk = GFTracks[jtrack + nCDCTracks];
+      const genfit::TrackCand* VXD_TrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(GFTrk, m_TrackCandColName);
+      if (VXD_TrkCandPtr == NULL) {
+        //  B2WARNING("VXD track candidate pointer is NULL (VXDCDCTrackMerger)");
         //  n_cdc++;
         continue;
       }
-      int si_mcp_index = si_TrkCandPtr->getMcTrackId();
-      //if (cdc_mcp_index == si_mcp_index) {
+      int VXD_mcp_index = VXD_TrkCandPtr->getMcTrackId();
+      //if (cdc_mcp_index == VXD_mcp_index) {
       //  true_match++;
       //}
 
-      if (cdc_mcp_index == si_mcp_index) {
+      if (cdc_mcp_index == VXD_mcp_index) {
         m_pre_match_vec->push_back(1);
       } //else {
       //m_pre_match_vec->push_back(-1);
@@ -241,11 +235,11 @@ void VXDCDCTrackMergerAnalysisModule::event()
 
     } //save matched tracks
     if (mtch == 1) {
-      std::pair<genfit::Track*, genfit::Track*> matched_track_pair(cdc_mcGFTracks[itrack], si_mcGFTracks[matched_track]);
+      std::pair<genfit::Track*, genfit::Track*> matched_track_pair(CDCGFTracks[itrack], VXDGFTracks[matched_track]);
       matched_tracks_map->insert(matched_track_pair);
-      si_trk_it[si_trk_idx] = matched_track + nCDCTracks;
-      cdc_trk_it[si_trk_idx] = itrack;
-      si_trk_idx++;
+      VXD_trk_it[VXD_trk_idx] = matched_track + nCDCTracks;
+      cdc_trk_it[VXD_trk_idx] = itrack;
+      VXD_trk_idx++;
     }
   }
 
@@ -266,20 +260,20 @@ void VXDCDCTrackMergerAnalysisModule::event()
     //TVector3 cdc_trk_position   = cdc_trk->getCardinalRep()->getPos();
     //TVectorD cdc_trk_state      = cdc_trk->getCardinalRep()->getState();
     //TMatrixDSym cdc_trk_covmtrx = cdc_trk->getCardinalRep()->getCov();
-    genfit::Track* si_trk = trk_it->second;
-    genfit::MeasuredStateOnPlane si_sop = si_trk->getFittedState();
-    si_sop.extrapolateToCylinder(m_CDC_wall_radius, position, momentum);
-    si_sop.get6DStateCov(si_trk_state, si_trk_covmtrx);
-    TVector3 si_trk_position = si_sop.getPos();
-    TVector3 si_trk_momentum = si_sop.getMom();
+    genfit::Track* VXD_trk = trk_it->second;
+    genfit::MeasuredStateOnPlane VXD_sop = VXD_trk->getFittedState();
+    VXD_sop.extrapolateToCylinder(m_CDC_wall_radius, position, momentum);
+    VXD_sop.get6DStateCov(VXD_trk_state, VXD_trk_covmtrx);
+    TVector3 VXD_trk_position = VXD_sop.getPos();
+    TVector3 VXD_trk_momentum = VXD_sop.getMom();
 
-    TMatrixDSym inv_covmtrx = (cdc_trk_covmtrx + si_trk_covmtrx).Invert(); //.Invert() ndr
-    TVectorD state_diff = cdc_trk_state - si_trk_state;
-    //double raw_diff = (cdc_trk_state-si_trk_state)*(cdc_trk_state-si_trk_state);
+    TMatrixDSym inv_covmtrx = (cdc_trk_covmtrx + VXD_trk_covmtrx).Invert(); //.Invert() ndr
+    TVectorD state_diff = cdc_trk_state - VXD_trk_state;
+    //double raw_diff = (cdc_trk_state-VXD_trk_state)*(cdc_trk_state-VXD_trk_state);
     state_diff *= inv_covmtrx;
-    double chi_2 = state_diff * (cdc_trk_state - si_trk_state);
+    double chi_2 = state_diff * (cdc_trk_state - VXD_trk_state);
 
-    genfit::Track* GFTrk = mcGFTracks[cdc_trk_it[n_cdc]];
+    genfit::Track* GFTrk = GFTracks[cdc_trk_it[n_cdc]];
     const genfit::TrackCand* cdc_TrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(GFTrk, m_TrackCandColName);
     if (cdc_TrkCandPtr == NULL) {
       B2WARNING("CDC track candidate pointer is NULL (VXDCDCTrackMerger)");
@@ -288,17 +282,17 @@ void VXDCDCTrackMergerAnalysisModule::event()
     }
     int cdc_mcp_index = cdc_TrkCandPtr->getMcTrackId();
 
-    GFTrk = mcGFTracks[si_trk_it[n_cdc]];
-    const genfit::TrackCand* si_TrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(GFTrk, m_TrackCandColName);
-    if (si_TrkCandPtr == NULL) {
-      B2WARNING("Si track candidate pointer is NULL (VXDCDCTrackMerger)");
+    GFTrk = GFTracks[VXD_trk_it[n_cdc]];
+    const genfit::TrackCand* VXD_TrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(GFTrk, m_TrackCandColName);
+    if (VXD_TrkCandPtr == NULL) {
+      B2WARNING("VXD track candidate pointer is NULL (VXDCDCTrackMerger)");
       n_cdc++;
       continue;
     }
-    int si_mcp_index = si_TrkCandPtr->getMcTrackId();
-    //const MCParticle* si_mcparticle = DataStore::getRelatedFromObj<MCParticle>(si_trk);
-    //unsigned int si_mcp_index = si_mcparticle->getIndex();
-    if (cdc_mcp_index == si_mcp_index) {
+    int VXD_mcp_index = VXD_TrkCandPtr->getMcTrackId();
+    //const MCParticle* VXD_mcparticle = DataStore::getRelatedFromObj<MCParticle>(VXD_trk);
+    //unsigned int VXD_mcp_index = VXD_mcparticle->getIndex();
+    if (cdc_mcp_index == VXD_mcp_index) {
       true_match++;
     }
     n_cdc++;
@@ -306,34 +300,34 @@ void VXDCDCTrackMergerAnalysisModule::event()
     //root tree stuff
     //if (m_produce_root_file) {
     //matching status variable
-    if (cdc_mcp_index == si_mcp_index) {
+    if (cdc_mcp_index == VXD_mcp_index) {
       m_match_vec->push_back(1);
     } else {
       m_match_vec->push_back(0);
     }
     //chi-square and residuals
     m_chi2_vec->push_back(chi_2);
-    m_dist_vec->push_back((cdc_trk_position - si_trk_position).Mag());
-    m_dx_vec->push_back(cdc_trk_position.X() - si_trk_position.X());
-    m_dy_vec->push_back(cdc_trk_position.Y() - si_trk_position.Y());
-    m_dz_vec->push_back(cdc_trk_position.Z() - si_trk_position.Z());
-    m_x_vec->push_back((cdc_trk_position.X() + si_trk_position.X()) / 2);
-    m_y_vec->push_back((cdc_trk_position.Y() + si_trk_position.Y()) / 2);
-    m_z_vec->push_back((cdc_trk_position.Z() + si_trk_position.Z()) / 2);
-    m_dmom_vec->push_back((cdc_trk_momentum - si_trk_momentum).Mag());
-    m_dmomx_vec->push_back(cdc_trk_momentum.X() - si_trk_momentum.X());
-    m_dmomy_vec->push_back(cdc_trk_momentum.Y() - si_trk_momentum.Y());
-    m_dmomz_vec->push_back(cdc_trk_momentum.Z() - si_trk_momentum.Z());
-    m_momx_vec->push_back((cdc_trk_momentum.X() + si_trk_momentum.X()) / 2);
-    m_momy_vec->push_back((cdc_trk_momentum.Y() + si_trk_momentum.Y()) / 2);
-    m_momz_vec->push_back((cdc_trk_momentum.Z() + si_trk_momentum.Z()) / 2);
+    m_dist_vec->push_back((cdc_trk_position - VXD_trk_position).Mag());
+    m_dx_vec->push_back(cdc_trk_position.X() - VXD_trk_position.X());
+    m_dy_vec->push_back(cdc_trk_position.Y() - VXD_trk_position.Y());
+    m_dz_vec->push_back(cdc_trk_position.Z() - VXD_trk_position.Z());
+    m_x_vec->push_back((cdc_trk_position.X() + VXD_trk_position.X()) / 2);
+    m_y_vec->push_back((cdc_trk_position.Y() + VXD_trk_position.Y()) / 2);
+    m_z_vec->push_back((cdc_trk_position.Z() + VXD_trk_position.Z()) / 2);
+    m_dmom_vec->push_back((cdc_trk_momentum - VXD_trk_momentum).Mag());
+    m_dmomx_vec->push_back(cdc_trk_momentum.X() - VXD_trk_momentum.X());
+    m_dmomy_vec->push_back(cdc_trk_momentum.Y() - VXD_trk_momentum.Y());
+    m_dmomz_vec->push_back(cdc_trk_momentum.Z() - VXD_trk_momentum.Z());
+    m_momx_vec->push_back((cdc_trk_momentum.X() + VXD_trk_momentum.X()) / 2);
+    m_momy_vec->push_back((cdc_trk_momentum.Y() + VXD_trk_momentum.Y()) / 2);
+    m_momz_vec->push_back((cdc_trk_momentum.Z() + VXD_trk_momentum.Z()) / 2);
     //}// end of if (m_produce_root_file)
     n_trk_pair++;
   }
 
   //if (m_produce_root_file) {
-  //number of si tracks, number of cdc tracks before merging and number of track pairs after merging
-  m_nsi_trk = nSiTracks;
+  //number of VXD tracks, number of cdc tracks before merging and number of track pairs after merging
+  m_nVXD_trk = nVXDTracks;
   m_ncdc_trk = nCDCTracks;
   m_npair = n_trk_pair;
   //that's the number of correctly merged tracks over all merged tracks per event

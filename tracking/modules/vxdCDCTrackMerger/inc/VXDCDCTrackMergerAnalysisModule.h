@@ -12,41 +12,15 @@
 
 
 namespace Belle2 {
-  /** A module siCDCTrackMerger.
-   *
-   *  A detailed description of your module.
-   */
   class VXDCDCTrackMergerAnalysisModule : public Module {
   public:
     /** Constructor, for setting module description and parameters. */
     VXDCDCTrackMergerAnalysisModule();
-
     /** Use to clean up anything you created in the constructor. */
     virtual ~VXDCDCTrackMergerAnalysisModule();
-
-    /** Use this to initialize resources or memory your module needs.
-     *
-     *  Also register any outputs of your module (StoreArrays, RelationArrays,
-     *  StoreObjPtrs) here, see the respective class documentation for details.
-     */
     virtual void initialize();
-
-    /** Called once before a new run begins.
-     *
-     * This method gives you the chance to change run dependent constants like alignment parameters, etc.
-     */
     virtual void beginRun();
-
-    /** Called once for each event.
-     *
-     * This is most likely where your module will actually do anything.
-     */
     virtual void event();
-
-    /** Called once when a run ends.
-     *
-     *  Use this method to save run information, which you aggregated over the last run.
-     */
     virtual void endRun();
 
     /** Clean up anything you created in initialize(). */
@@ -56,7 +30,7 @@ namespace Belle2 {
     //void insertTrackAndPositionInGrid(TVector3 position, genfit::Track* gftrack, std::vector<std::vector<std::vector<TVector3>*>*>* positions_grid,
     //                                   std::vector<std::vector<std::vector<genfit::Track*>*>*>* tracks_grid);
     double m_CDC_wall_radius;
-    std::string m_SiGFTracksColName;
+    std::string m_VXDGFTracksColName;
     std::string m_CDCGFTracksColName;
     std::string m_GFTracksColName;
     std::string m_TrackCandColName;
@@ -79,7 +53,7 @@ namespace Belle2 {
     //root tree variables
     int m_npair;
     int m_ncdc_trk;
-    int m_nsi_trk;
+    int m_nVXD_trk;
     double m_trk_mrg_eff;
     std::vector<int>* m_match_vec;
     std::vector<int>* m_pre_match_vec;

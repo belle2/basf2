@@ -2397,9 +2397,9 @@ void VXDTFModule::findTCs(TCsOfEvent& tcList,  VXDTFTrackCandidate* currentTC, s
   VXDSegmentCell* pLastSeg = currentTC->getSegments().back(); // get last entry in segList of TC
   if (FullSecID(pLastSeg->getOuterHit()->getSectorName()).getLayerID() != maxLayer) { pLastSeg->setSeed(false); }
 
-  const std::list<VXDSegmentCell*>& neighbours = pLastSeg->getAllInnerNeighbours();
-  std::list<VXDSegmentCell*>::const_iterator nbIter = neighbours.begin();
-  int nbSize = neighbours.size();
+  const std::list<VXDSegmentCell*>* neighbours = pLastSeg->getAllInnerNeighbours();
+  std::list<VXDSegmentCell*>::const_iterator nbIter = neighbours->begin();
+  int nbSize = pLastSeg->sizeOfAllInnerNeighbours();
 
   if (nbSize == 0)  { // currentTC is complete
     currentTC->setTrackNumber(tcList.size());
@@ -2412,7 +2412,7 @@ void VXDTFModule::findTCs(TCsOfEvent& tcList,  VXDTFTrackCandidate* currentTC, s
 
   } else { // nbSize > 1
     ++nbIter; // iterator points to the second entry of the list of neighbours!
-    for (; nbIter != neighbours.end(); ++nbIter) {
+    for (; nbIter != neighbours->end(); ++nbIter) {
       VXDSegmentCell* pNextSeg =  *nbIter;
       VXDTFTrackCandidate* pTCCopy = new VXDTFTrackCandidate(currentTC);   // make a clone of old TC
       pTCCopy->addSegments(pNextSeg);
@@ -2422,7 +2422,7 @@ void VXDTFModule::findTCs(TCsOfEvent& tcList,  VXDTFTrackCandidate* currentTC, s
     } // makes clones of current TC for each neighbour (excluding the first one) and adds it to the TCs if neighbour fits in the scheme...
 
     //separate step for the first neighbour in line (has to be done after the cloning parts)...
-    VXDSegmentCell* pNextSeg =  *(neighbours.begin());
+    VXDSegmentCell* pNextSeg =  *(neighbours->begin());
     currentTC->addSegments(pNextSeg);
     currentTC->addHits(pNextSeg->getInnerHit());
 
@@ -3911,7 +3911,7 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
   int countedSegments = 0;
   ActiveSegmentsOfEvent newActiveList;
   for (VXDSegmentCell * currentSeg : currentPass->activeCellList) {
-    if (currentSeg->getInnerNeighbours().size() == 0 && currentSeg->getOuterNeighbours().size() == 0) {
+    if (currentSeg->sizeOfInnerNeighbours() == 0 && currentSeg->sizeOfAllInnerNeighbours() == 0) {
       currentSeg->setActivationState(false);
 
       // Collector Cell died at NBFinder-lost
@@ -3927,7 +3927,7 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
       currentSeg->copyNeighbourList(); /// IMPORTANT, without this step, no TCs can be found since all neighbours of each cell are erased from current list
       newActiveList.push_back(currentSeg);
       countedSegments++;
-      if (currentSeg->getInnerNeighbours().size() != 0) {
+      if (currentSeg->sizeOfInnerNeighbours() != 0) {
         currentSeg->increaseState();
       }
       if (currentSeg->isSeed() == true) { activatedSeedsCounter++; }
@@ -4069,11 +4069,11 @@ int VXDTFModule::cellularAutomaton(PassData* currentPass)
       if (currentSeg->isActivated() == false) { continue; }
 
       goodNeighbours = 0;
-      list<VXDSegmentCell*>& currentNeighbourList = currentSeg->getInnerNeighbours();
-      B2DEBUG(50, "CAstep: cell with outer/inner hit at sectors: " << currentSeg->getOuterHit()->getSectorString() << "/" << currentSeg->getInnerHit()->getSectorString() << " has inner/outer friend at " << currentSeg->getInnerNeighbours().size() << "/" << currentSeg->getOuterNeighbours().size() << ", only innerNeighbours count!")
+      list<VXDSegmentCell*>* currentNeighbourList = currentSeg->getInnerNeighbours();
+      B2DEBUG(50, "CAstep: cell with outer/inner hit at sectors: " << currentSeg->getOuterHit()->getSectorString() << "/" << currentSeg->getInnerHit()->getSectorString() << " has inner/outer friend at " << currentSeg->sizeOfInnerNeighbours() << "/" << currentSeg->sizeOfOuterNeighbours() << ", only innerNeighbours count!")
 
-      list<VXDSegmentCell*>::iterator currentNeighbour = currentNeighbourList.begin();
-      while (currentNeighbour != currentNeighbourList.end()) {
+      list<VXDSegmentCell*>::iterator currentNeighbour = currentNeighbourList->begin();
+      while (currentNeighbour != currentNeighbourList->end()) {
         //TODO probably outdated: can't deal with cells of special shape (e.g. two-layer cells) in some uncommon scenario yet -> search for test scenario
         if (currentSeg->getState() == (*currentNeighbour)->getState()) {
           goodNeighbours++;
@@ -4109,7 +4109,7 @@ int VXDTFModule::cellularAutomaton(PassData* currentPass)
 
     /// Updatestep:
     for (VXDSegmentCell * currentSeg : currentPass->activeCellList) {
-      B2DEBUG(50, "Updatestep: cell with outer/inner hit at sectors: " << currentSeg->getOuterHit()->getSectorString() << "/" << currentSeg->getInnerHit()->getSectorString() << " has inner/outer friend at " << currentSeg->getInnerNeighbours().size() << "/" << currentSeg->getOuterNeighbours().size() << "!")
+      B2DEBUG(50, "Updatestep: cell with outer/inner hit at sectors: " << currentSeg->getOuterHit()->getSectorString() << "/" << currentSeg->getInnerHit()->getSectorString() << " has inner/outer friend at " << currentSeg->sizeOfInnerNeighbours() << "/" << currentSeg->sizeOfOuterNeighbours() << "!")
       if (currentSeg->isUpgradeAllowed() == false) { continue; }
 
       currentSeg->allowStateUpgrade(false);
@@ -4138,7 +4138,7 @@ int VXDTFModule::cellularAutomaton(PassData* currentPass)
     countedSegments = 0;
     for (VXDSegmentCell * currentSeg : currentPass->activeCellList) {
       B2DEBUG(100, "Post CA - Current state of cell: " << currentSeg->getState() << " with outer/inner hit at sectors: " << currentSeg->getOuterHit()->getSectorString() << "/" << currentSeg->getInnerHit()->getSectorString());
-      if (currentSeg->getInnerNeighbours().size() == 0 and currentSeg->getOuterNeighbours().size() == 0) { continue; }
+      if (currentSeg->sizeOfInnerNeighbours() == 0 and currentSeg->sizeOfOuterNeighbours() == 0) { continue; }
       countedSegments++;
     }
     B2DEBUG(10, "CA - " << countedSegments << " segments have at least one friend");

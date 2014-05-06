@@ -69,9 +69,9 @@ namespace Belle2 {
     VXDTFHit* getInnerHit() const { return m_pInnerHit; } /**< returns inner hit of current Cell */
     VXDTFHit* getOuterHit() const { return m_pOuterHit; } /**< returns outer hit of current Cell */
 
-    std::list<Belle2::VXDSegmentCell*>& getInnerNeighbours() { return m_innerNeighbours; } /**< returns list of inner Neighbours (CA-feature and needed by TC-Collector), does deliver different results depending on when you call that function */
-    const std::list<Belle2::VXDSegmentCell*>& getAllInnerNeighbours() const { return m_allInnerNeighbours; } /**< returns list of all inner neighbours (does not change during event) */
-    std::list<Belle2::VXDSegmentCell*>& getOuterNeighbours() { return m_outerNeighbours; } /**< returns list of outer Neighbours */
+    std::list<Belle2::VXDSegmentCell*>* getInnerNeighbours() { return &m_innerNeighbours; } /**< returns list of inner Neighbours (CA-feature and needed by TC-Collector), does deliver different results depending on when you call that function */
+    const std::list<Belle2::VXDSegmentCell*>* getAllInnerNeighbours() const { return &m_allInnerNeighbours; } /**< returns list of all inner neighbours (does not change during event) */
+    std::list<Belle2::VXDSegmentCell*>* getOuterNeighbours() { return &m_outerNeighbours; } /**< returns list of outer Neighbours */
 
     /** incompatible neighbours get kicked when new information about the situation recommends that step */
     std::list<Belle2::VXDSegmentCell*>::iterator eraseInnerNeighbour(std::list<VXDSegmentCell*>::iterator it) {
@@ -93,6 +93,15 @@ namespace Belle2 {
 
     /** sets the clusterID for the collectorTFinfo-class */
     void setCollectorID(int value) { m_collector_id = value; }
+
+    /** returns current number of inner neighbours */
+    int sizeOfInnerNeighbours() const { return m_innerNeighbours.size(); }
+
+    /** returns total number of inner neighbours (including those which already got killed)*/
+    int sizeOfAllInnerNeighbours() const { return m_allInnerNeighbours.size(); }
+
+    /** returns total number of inner neighbours (including those which already got killed)*/
+    int sizeOfOuterNeighbours() const { return m_outerNeighbours.size(); }
 
   protected:
     VXDTFHit* m_pOuterHit; /**< pointer to hit forming the outer end of the SegmentCell. */

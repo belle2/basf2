@@ -1855,13 +1855,12 @@ void VXDTFModule::the_real_event()
 
     /** Section 9 - check overlap */
     timeStamp = boostClock::now();
-    bool  isOB = false;
     int countOverbookedClusters = 0, clustersReserved = 0;
     m_tcVectorOverlapped.clear(); // July13: should be filled freshly for each pass
     /// each clusterInfo knows which TCs are using it, following loop therefore checks each for overlapping ones
     B2DEBUG(3, " checking overlaps now: there are " << clustersOfEvent.size() << " clusters ...")
     for (ClusterInfo & aCluster : clustersOfEvent) {
-      isOB = aCluster.isOverbooked();
+      bool isOB = aCluster.isOverbooked();
       if (isOB == true) { countOverbookedClusters++; }
       if (aCluster.isReserved() == true) { clustersReserved++; }
     } // now each TC knows whether it is overbooked or not (aCluster.isOverbooked() implicitly checked this)
@@ -1974,11 +1973,10 @@ void VXDTFModule::the_real_event()
     /** redo overlapping check - necessary since condition changed through cleanOverlappingSet! */
     /** Section 9b - check overlap 2 */
     timeStamp = boostClock::now();
-    isOB = false;
     countOverbookedClusters = 0;
     // each clusterInfo knows which TCs are using it, following loop therefore checks each for overlapping ones
     for (ClusterInfo & aCluster : clustersOfEvent) {
-      isOB = aCluster.isOverbooked();
+      bool isOB = aCluster.isOverbooked();
       if (isOB == true) { countOverbookedClusters++; }
     } // now each TC knows whether it is overbooked or not (aCluster.isOverbooked() implicitly checked this)
 
@@ -2048,11 +2046,10 @@ void VXDTFModule::the_real_event()
     passNumber++;
   } /// /// /// WARNING WARNING WARNING --- pass loop end --- WARNING WARNING WARNING
 
-  bool isOB = false;
   int countOverbookedClusters = 0;
   /// each clusterInfo knows which TCs are using it, following loop therefore checks each for overlapping ones
   for (ClusterInfo & aCluster : clustersOfEvent) {
-    isOB = aCluster.isOverbooked();
+    bool isOB = aCluster.isOverbooked();
     if (isOB == true) { countOverbookedClusters++; }
   } // now each TC knows whether it is overbooked or not (aCluster.isOverbooked() implicitly checked this)
   if (countOverbookedClusters != 0 and m_filterOverlappingTCs != 0) {
@@ -2278,9 +2275,9 @@ void VXDTFModule::endRun()
 
   string printOccupancy;
   int h1 = 0, h2t4 = 0, h5t9 = 0, h10t16 = 0, h17t25 = 0, h26t50 = 0, h51t100 = 0, h101t200 = 0, h201t300 = 0, h301t400 = 0, h401t500 = 0, h501t600 = 0, h601t700 = 0, h701t800 = 0, h800plus = 0;
-  int thisValue = 0, nTotalHits = 0;
+  int nTotalHits = 0;
   for (int nHitsMinus1 = 0; nHitsMinus1 < int(m_TESTERSVDOccupancy.size()); ++ nHitsMinus1) {
-    thisValue = m_TESTERSVDOccupancy.at(nHitsMinus1);
+    int thisValue = m_TESTERSVDOccupancy.at(nHitsMinus1);
     if (thisValue == 0) { continue; }
     nTotalHits += thisValue;
     printOccupancy = printOccupancy + " got " + boost::lexical_cast<string>(thisValue) + " times a sensor with " + boost::lexical_cast<string>(nHitsMinus1 + 1) + " hits\n";
@@ -2488,9 +2485,9 @@ void VXDTFModule::hopfieldVectorized(TCsOfEvent& tcVector, double omega)
   if (countCasesWhen2NeuronsAreCompatible == 0) {
     B2DEBUG(2, "VXDTF event " << m_eventCounter << ": hopfield: no compatible neurons found, chosing TC by best QI...");
     int tempIndex = 0;
-    double tempQI = tcVector[0]->getTrackQuality(), tempQI2 = 0;
+    double tempQI = tcVector[0]->getTrackQuality();
     for (int i = 1; i < numOfTCs; i++) {
-      tempQI2 = tcVector[i]->getTrackQuality();
+      double tempQI2 = tcVector[i]->getTrackQuality();
       if (tempQI < tempQI2) { tempIndex = i; }
     }
     for (int i = 0; i < numOfTCs; i++) {
@@ -2513,10 +2510,9 @@ void VXDTFModule::hopfieldVectorized(TCsOfEvent& tcVector, double omega)
   }
 
   vector<int> sequenceVector(numOfTCs, 0);
-  double rNum;
 
   for (int i = 0; i < numOfTCs; i++) {
-    rNum = gRandom->Uniform(1.0);
+    double rNum = gRandom->Uniform(1.0);
     xMatrix(0, i) = rNum;
     sequenceVector[i] = i;
   }
@@ -2750,9 +2746,9 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
   if (countCasesWhen2NeuronsAreCompatible == 0) {
     B2DEBUG(2, "VXDTF event " << m_eventCounter << ": hopfield: no compatible neurons found, chosing TC by best QI...");
     int tempIndex = 0;
-    double tempQI = tcVector[0]->getTrackQuality(), tempQI2 = 0;
+    double tempQI = tcVector[0]->getTrackQuality();
     for (int i = 1; i < numOfTCs; i++) {
-      tempQI2 = tcVector[i]->getTrackQuality();
+      double tempQI2 = tcVector[i]->getTrackQuality();
       if (tempQI < tempQI2) { tempIndex = i; }
     }
     for (int i = 0; i < numOfTCs; i++) {
@@ -2777,10 +2773,9 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
   }
 
   vector<int> sequenceVector(numOfTCs, 0);
-  double rNum;
 
   for (int i = 0; i < numOfTCs; i++) {
-    rNum = gRandom->Uniform(1.0);
+    double rNum = gRandom->Uniform(1.0);
     xMatrix(0, i) = rNum;
     sequenceVector[i] = i;
   }
@@ -2979,9 +2974,8 @@ void VXDTFModule::reserveHits(TCsOfEvent& tcVector, PassData* currentPass)
   B2DEBUG(3, "reserveHits - pass " << currentPass->sectorSetup << ": threshold " << threshold << ", total number of TCs " << tcVector.size() << ", alive " << countAlive << ", & unreserved " << tcsRunreserved << ", results in " << limit2Go << " TCs to be allowed to reserve their hits")
 
   list< pair< double, VXDTFTrackCandidate*> >::iterator currentTC = allTCs.begin();
-  bool succeeded;
   while (count2Limit < limit2Go) {
-    succeeded = currentTC->second->setReserved();
+    bool succeeded = currentTC->second->setReserved();
     if (succeeded == true) ++countSucceeded;
     ++currentTC;
     ++count2Limit;
@@ -3171,8 +3165,7 @@ Belle2::SectorNameAndPointerPair VXDTFModule::searchSector4Hit(VxdID aVxdID,
     B2DEBUG(100, "Sec ID not found")
   }
 
-  SectorNameAndPointerPair result;
-  return make_pair(aFullSecID, secMapIter);
+  return make_pair(aFullSecID, secMapIter); // SectorNameAndPointerPair
 }
 
 
@@ -3236,8 +3229,7 @@ Belle2::SectorNameAndPointerPair VXDTFModule::searchSector4HitOld(VxdID aVxdID,
       }
     }
   } //sector-searching loop
-  SectorNameAndPointerPair result;
-  return make_pair(aFullSecID, secMapIter);
+  return make_pair(aFullSecID, secMapIter); // SectorNameAndPointerPair
 }
 
 
@@ -3908,7 +3900,6 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
   } // iterating through all active sectors - friendFinder
 
   //filtering lost segments (those without neighbours left):
-  int countedSegments = 0;
   ActiveSegmentsOfEvent newActiveList;
   for (VXDSegmentCell * currentSeg : currentPass->activeCellList) {
     if (currentSeg->sizeOfInnerNeighbours() == 0 && currentSeg->sizeOfAllInnerNeighbours() == 0) {
@@ -3926,7 +3917,6 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
     } else {
       currentSeg->copyNeighbourList(); /// IMPORTANT, without this step, no TCs can be found since all neighbours of each cell are erased from current list
       newActiveList.push_back(currentSeg);
-      countedSegments++;
       if (currentSeg->sizeOfInnerNeighbours() != 0) {
         currentSeg->increaseState();
       }

@@ -49,7 +49,6 @@ void VXDTFRawSecMap::addSectorMap(StrippedRawSecMap& newMap)
    * -> imported map is not empty in that case!
    * */
 
-  bool foundSector, foundFriend, foundCutoff;
   int addedSectorCtr = 0, addedFriendCtr = 0, addedCutoffCtr = 0, addedValuesCtr = 0, // counters for mentioned types
       internalBefore = 0, importedBefore = 0; // store info of values before import to be able to compare it with the values coming afterwards
 
@@ -60,19 +59,19 @@ void VXDTFRawSecMap::addSectorMap(StrippedRawSecMap& newMap)
   importedBefore = getNumOfValues(newMap);
 
   for (SectorPack & newSector : newMap) {
-    foundSector = false;
+    bool foundSector = false;
     for (SectorPack & oldSector : m_sectorMap) {
       if (oldSector.first != newSector.first) { continue; }// compares ID of sectors
       foundSector = true;
 
       for (FriendPack & newFriend : newSector.second) {
-        foundFriend = false;
+        bool foundFriend = false;
         for (FriendPack & oldFriend : oldSector.second) {
           if (oldFriend.first != newFriend.first) { continue; } // compares ID of sectorfriends
           foundFriend = true;
 
           for (CutoffPack & newCutoffType : newFriend.second) {
-            foundCutoff = false;
+            bool foundCutoff = false;
             for (CutoffPack & oldCutoffType : oldFriend.second) {
               if (oldCutoffType.first != newCutoffType.first) { continue; } // compares ID of cutoffType
               foundCutoff = true;
@@ -289,9 +288,9 @@ bool VXDTFRawSecMap::filterBadSectorCombis(SectorPack& aSector)
   if (int(badIDs.size()) != 0) {
     stringstream badFriends;
     for (int iD : badIDs) {
-      badFriends << iD << "/" << FullSecID(iD).getFullSecString() << " ";
+      badFriends << iD << "/" << FullSecID(iD) << " ";
     }
-    B2DEBUG(20, "filterBadSectorCombis: sector (id/name) " << aSector.first << "/" << mainSector.getFullSecString() << " had the following sectors as bad friends: " << badFriends.str())
+    B2DEBUG(20, "filterBadSectorCombis: sector (id/name) " << aSector.first << "/" << mainSector << " had the following sectors as bad friends: " << badFriends.str())
   }
 
   return upgradeSecID;
@@ -306,7 +305,6 @@ void VXDTFRawSecMap::repairSecMap()
   B2DEBUG(1, "repairSecMap: before starting process: there are " << getNumOfSectors() << "/" << getNumOfFriends() << "/" << getNumOfValues() << " sectors/friends/values in map")
   vector< pair<unsigned int, unsigned int> > updatedSubLayerIDs; // .first is old ID, .second is new one
   IDVector killedSectors; // collects names of killed sectors
-  int nKilledFriends = 0; // counts number of friends died
   unsigned int centerSectorID = FullSecID().getFullSecID();
 
   // first: check all sectors for security issues, collect subLayerIDs of sectors/friends to be renamed (renames sectors directly, friends later), kills empty sectors
@@ -322,12 +320,11 @@ void VXDTFRawSecMap::repairSecMap()
     int nFriendsBefore = sectorIt->second.size();
     bool upgradeMe = filterBadSectorCombis((*sectorIt));                  /// filterBadSectorCombis
     int nFriendsAfter = sectorIt->second.size();
-    nKilledFriends += (nFriendsBefore - nFriendsAfter);
-    B2DEBUG(25, "repairSecMap: at sector (id/name): " << sectorIt->first << "/" << currentSecID.getFullSecString() << ", had friends before/after: " << nFriendsBefore << "/" << nFriendsAfter)
+    B2DEBUG(25, "repairSecMap: at sector (id/name): " << sectorIt->first << "/" << currentSecID << ", had friends before/after: " << nFriendsBefore << "/" << nFriendsAfter)
 
     if (nFriendsAfter == 0) {
       killedSectors.push_back(sectorIt->first);
-      B2DEBUG(15, "repairSecMap: at sector (id/name): " << sectorIt->first << "/" << currentSecID.getFullSecString() << ", got killed because of no friends")
+      B2DEBUG(15, "repairSecMap: at sector (id/name): " << sectorIt->first << "/" << currentSecID << ", got killed because of no friends")
       sectorIt = m_sectorMap.erase(sectorIt);
       continue; // no need for iter++, since it already points at new sector
     }
@@ -336,7 +333,7 @@ void VXDTFRawSecMap::repairSecMap()
       unsigned int oldID = sectorIt->first;
       unsigned int newID = FullSecID(currentSecID.getLayerID(), true, currentSecID.getVxdID(), currentSecID.getSecID()).getFullSecID();
       updatedSubLayerIDs.push_back(make_pair(oldID, newID));
-      B2DEBUG(20, "repairSecMap: sector with old name (id/name): " << oldID << "/" << currentSecID.getFullSecString() << ", got upgrade to (id/name): " << newID << "/" << FullSecID(newID).getFullSecString())
+      B2DEBUG(20, "repairSecMap: sector with old name (id/name): " << oldID << "/" << currentSecID << ", got upgrade to (id/name): " << newID << "/" << FullSecID(newID))
       sectorIt->first = newID; // replacing old sectorID with new one
     }
 
@@ -398,7 +395,7 @@ void VXDTFRawSecMap::repairSecMap()
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 20, PACKAGENAME()) == true) {
     stringstream badSectors;
     for (int iD : killedSectors) {
-      badSectors << iD << "/" << FullSecID(iD).getFullSecString() << " ";
+      badSectors << iD << "/" << FullSecID(iD) << " ";
     }
     B2DEBUG(15, "repairSecMap: secMap " << getMapName() << " had the following bad sectors (id/name): " << badSectors.str())
   }

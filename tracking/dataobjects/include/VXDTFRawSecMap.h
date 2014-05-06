@@ -369,11 +369,10 @@ namespace Belle2 {
     template<class Tmpl>
     void searchForBadEntries(Tmpl& entryVector, IDVector& badIDs) {
       // now kick bad entries (friends/sectors) (INFO that following part is pretty inefficient towards time consumption, if anyone thinks about optimizing this, using a list instead of a vector could do the job...)
-      bool foundID = false; // is set true, if a badID has been found
       typename Tmpl::iterator entryIt = entryVector.begin(); // typename is needed for the compiler recognizing this as a template
       IDVector::iterator badIDit = badIDs.begin();
       while (entryIt != entryVector.end()) { // enters infinite loop when iterator runs rampage, used as a primitive boundary check
-        foundID = false;
+        bool foundID = false; // is set true, if a badID has been found
 
         for (badIDit = badIDs.begin() ; badIDit != badIDs.end() ; ++badIDit) { // enters infinite loop when iterator runs rampage, could be done in a safer way with c++11 for ( : )-loop, but not supported yet by root
           if ((*badIDit) == entryIt->first) {

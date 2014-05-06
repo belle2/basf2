@@ -21,6 +21,7 @@
 #include <analysis/dataobjects/Particle.h>
 
 #include <TDatabasePDG.h>
+#include <TParticlePDG.h>
 
 #include <iostream>
 #include <algorithm>

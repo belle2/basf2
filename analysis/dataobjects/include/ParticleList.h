@@ -12,17 +12,11 @@
 #define PARTICLELIST_H
 
 #include <TObject.h>
-#include <TParticlePDG.h>
 #include <vector>
 
 namespace Belle2 {
 
   class Particle;
-
-  /** \addtogroup dataobjects
-   * @{
-   */
-
 
   /**
    * Class to hold a list of particles, anti-particles and self-conjugated particles.
@@ -33,6 +27,7 @@ namespace Belle2 {
   class ParticleList : public TObject {
   public:
 
+    /** Identifies the type of Particle (and in which of our three lists it is stored). */
     enum EParticleType {
       c_Particle = 0,
       c_AntiParticle,
@@ -92,19 +87,16 @@ namespace Belle2 {
 
     /**
      * Returns Particle store array name to which particle list refers
-     * @return name of the Particle store array
      */
-    std::string getParticleCollectionName() {return m_particleStore;}
+    std::string getParticleCollectionName() const {return m_particleStore;}
 
     /**
      * Returns PDG code
-     * @return PDG code
      */
     int getPDG() const {return m_pdg; }
 
     /**
      * Returns PDG code of anti-particle
-     * @return PDG code of anti-particle
      */
     int getPDGbar() const { return m_pdgbar; }
 
@@ -118,8 +110,7 @@ namespace Belle2 {
     }
 
     /**
-     * Returns list size
-     * @return list size
+     * Returns total number of particles in this list (all three EParticleTypes)
      */
     unsigned getListSize() const {
       return m_list[0].size() + m_list[1].size() + m_list[2].size();
@@ -152,7 +143,7 @@ namespace Belle2 {
      * Checks if the given pdg code particle has an anti particle
      * We can't use TDatabase here because of a bug in our patch of ROOT!
      */
-    bool hasAntiParticle(int pdg);
+    static bool hasAntiParticle(int pdg);
 
   private:
 
@@ -161,11 +152,9 @@ namespace Belle2 {
     std::vector<int> m_list[3];        /**< list of 0-based indices of Particles */
     std::string m_particleStore;       /**< name of Particle store array */
 
-    ClassDef(ParticleList, 2); /**< ClassDef */
+    ClassDef(ParticleList, 2); /**< Class to hold a list of particles, anti-particles and self-conjugated particles. */
 
   };
-
-  /** @}*/
 
 } // end namespace Belle2
 

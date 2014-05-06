@@ -57,12 +57,13 @@ namespace Belle2 {
     //                                   std::vector<std::vector<std::vector<genfit::Track*>*>*>* tracks_grid);
     double m_CDC_wall_radius;
     double m_chi2_max;
-    std::string m_mergedSiGFTracksColName;
-    std::string m_mergedCDCGFTracksColName;
-    std::string m_SiGFTracksColName;
+    //std::string m_mergedVXDGFTracksColName;
+    //std::string m_mergedCDCGFTracksColName;
+    std::string m_VXDGFTracksColName;
     std::string m_CDCGFTracksColName;
     std::string m_GFTracksColName;
     std::string m_TrackCandColName;
+    std::string m_relMatchedTracks;
     //std::string m_mcParticlesColName;
     //position at which a cdc track crosses  the cdc wall
     //std::vector<std::vector<std::vector<TVector3>*>*>* m_cdc_tracks_position;

@@ -12,7 +12,6 @@
 
 #include <framework/pcore/HistModule.h>
 
-// framework - DataStore
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
@@ -30,6 +29,9 @@ namespace Belle2 {
 
   /**
    * If the daughters in the given particle lists can be combined into a correctly reconstructed (!) particle of specified PDG code, save invariant mass for this combination to a histogram
+   */
+  /**
+   * Saves invariant mass distribution of combined particles (from input ParticleLists) into histogram 'all'. If the daughters in the given particle lists can be combined into a correctly reconstructed (!) particle of specified PDG code, save invariant mass for this combination to a histogram called 'signal'. This is equivalent to running ParticleCombiner on the given lists and saving the inv. mass of Particles with isSignal == 1 and everything else, but much faster (since Particles don't need to be saved).
    */
   class PreCutHistMakerModule : public HistModule {
 
@@ -62,10 +64,18 @@ namespace Belle2 {
 
   private:
 
+    /** reset m_tmpLists. */
     void clearParticleLists();
-    void saveCombinationsForSignal();
-    void saveAllCombinations();
+
+    /** fills m_tmpLists with Particles related to given MCParticles.
+     *
+     * Returns true if and only if all lists have entries (i.e. there's a chance of reconstructing this decay)
+     */
     bool fillParticleLists(const std::vector<MCParticle*>& mcDaughters);
+    /** Make Particle combinations using m_tmpLists, check MC truth and save true signals in histogram. */
+    void saveCombinationsForSignal();
+    /** Make all Particle combinations for given PDG and input lists, save into 'all' histogram. */
+    void saveAllCombinations();
 
     int m_pdg;                /**< PDG code of combined particles */
     std::string m_fileName; /**< save histograms in this file. */

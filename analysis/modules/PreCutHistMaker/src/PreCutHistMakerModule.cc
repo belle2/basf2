@@ -41,7 +41,7 @@ REG_MODULE(PreCutHistMaker)
 
 PreCutHistMakerModule::PreCutHistMakerModule()
 {
-  setDescription("Saves invariant mass distribution of combined particles (from input ParticleLists) into histogram 'all'. If the daughters in the given particle lists can be combined into a correctly reconstructed (!) particle of specified PDG code, save invariant mass for this combination to a histogram called 'signal'. This is equivalent to running ParticleCombiner on the given lists and saving the inv. mass of Particles with isSignal == 1 and everything else, but much faster (since Particles don't need to be saved, .");
+  setDescription("Saves invariant mass distribution of combined particles (from input ParticleLists) into histogram 'all'. If the daughters in the given particle lists can be combined into a correctly reconstructed (!) particle of specified PDG code, save invariant mass for this combination to a histogram called 'signal'. This is equivalent to running ParticleCombiner on the given lists and saving the inv. mass of Particles with isSignal == 1 and everything else, but much faster (since Particles don't need to be saved).");
   setPropertyFlags(c_ParallelProcessingCertified); //histograms are saved through HistModule, so this is ok
 
 
@@ -212,12 +212,10 @@ void PreCutHistMakerModule::saveAllCombinations()
   ParticleCombiner combiner(m_inputListNames, !hasAntiParticle(m_pdg));
   while (combiner.loadNext()) {
     vector<Particle*> particleStack = combiner.getCurrentParticles();
-    vector<int> indices = combiner.getCurrentIndices();
 
     TLorentzVector vec(0., 0., 0., 0.);
-    for (unsigned i = 0; i < particleStack.size(); i++) {
-      vec = vec + particleStack[i]->get4Vector();
-    }
+    for (const Particle * p : particleStack)
+      vec += p->get4Vector();
 
     //add invariant mass to histogram
     double mass = vec.M();

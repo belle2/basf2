@@ -7,8 +7,9 @@
 #include <gtest/gtest.h>
 
 using namespace std;
+using namespace Belle2;
 
-namespace Belle2 {
+namespace {
   /** Test fixture. */
   class ParticleTest : public ::testing::Test {
   protected:

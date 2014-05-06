@@ -7,20 +7,15 @@
 #include <gtest/gtest.h>
 
 using namespace std;
+using namespace Belle2;
 
-namespace Belle2 {
-  /** Test Variable class. */
-  class VariableTest : public ::testing::Test {
-  protected:
-
-  };
-
+namespace {
 
   /** Return correct answer. */
   double dummyVar(const Particle*) { return 42.0; }
 
   /** test VariableManager. */
-  TEST_F(VariableTest, VariableManager)
+  TEST(VariableTest, VariableManager)
   {
     const VariableManager::Var* v = VariableManager::Instance().getVariable("THISDOESNTEXIST");
     EXPECT_TRUE(v == nullptr);

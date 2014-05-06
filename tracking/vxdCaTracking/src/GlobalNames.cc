@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/GlobalNames.h"
+#include "tracking/vxdCaTracking/GlobalNames.h"
 
 
 using namespace std;

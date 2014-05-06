@@ -74,7 +74,7 @@ si_mctrackfinder_param = {  # ---        'MinimalNDF': 6,
     'UseCDCHits': 0,
     'UseSVDHits': 1,
     'UsePXDHits': 1,
-    'GFTrackCandidatesColName': 'Si_mcTracksCand',
+    'GFTrackCandidatesColName': 'VXDTracksCand',
     }
         # 'Force2DSVDClusters': 1,
         # 'forceExisting2DClusters4SVD': 0
@@ -90,16 +90,16 @@ cdc_mctrackfinder_param = {  # ---        'MinimalNDF': 6,
     'UseCDCHits': 1,
     'UseSVDHits': 0,
     'UsePXDHits': 0,
-    'GFTrackCandidatesColName': 'CDC_mcTracksCand',
+    'GFTrackCandidatesColName': 'CDCTracksCand',
     }
         # 'Force2DSVDClusters': 1,
         # 'forceExisting2DClusters4SVD': 0
 cdc_mctrackfinder.param(cdc_mctrackfinder_param)
 
 cand_merger = register_module('TrackCandMerger')
-cand_merger_param = {'SiTrackCandidatesColName': 'Si_mcTracksCand',
-                     'CDCTrackCandidatesColName': 'CDC_mcTracksCand',
-                     'TrackCandidatesCollection': 'mcTracksCand'}
+cand_merger_param = {'SiTrackCandidatesColName': 'VXDTracksCand',
+                     'CDCTrackCandidatesColName': 'CDCTracksCand',
+                     'TrackCandidatesCollection': 'TracksCand'}
 cand_merger.param(cand_merger_param)
 
 # fitting
@@ -121,8 +121,8 @@ fitting_param = {  # ---    'FilterId': 1,
                    # 'MCParticlesColName': 'mcParticlesTruth',
                    # 'TracksColName': 'cdc_mcTracks',
                    # 'PDGCodes': [],
-    'GFTrackCandidatesColName': 'mcTracksCand',
-    'GFTracksColName': 'mcGFTracks',
+    'GFTrackCandidatesColName': 'TracksCand',
+    'GFTracksColName': 'GFTracks',
     'NMaxIterations': 10,
     'ProbCut': 0.001,
     }
@@ -131,10 +131,10 @@ fitting.param(fitting_param)
 
 track_splitter = register_module('GFTrackSplitter')
 track_splitter_param = {
-    'SiGFTracksColName': 'Si_mcTracks',
-    'CDCGFTracksColName': 'CDC_mcTracks',
-    'GFTracksColName': 'mcGFTracks',
-    'storeTrackCandName': 'mcTracksCand',
+    'SiGFTracksColName': 'VXDTracks',
+    'CDCGFTracksColName': 'CDCTracks',
+    'GFTracksColName': 'GFTracks',
+    'storeTrackCandName': 'TracksCand',
     }
 # 'CDCHitColName' :
 track_splitter.param(track_splitter_param)
@@ -146,13 +146,14 @@ trackMerger_param = {  # (in cm) use cdc inner wall
                        #    'CDC_wall_radius':        16.29,  #(in cm) use cdc outer wall
                        # default False
                        # 'MCParticlesColName': 'mcParticlesTruth',
-    'SiGFTracksColName': 'Si_mcTracks',
-    'CDCGFTracksColName': 'CDC_mcTracks',
-    'GFTracksColName': 'mcGFTracks',
-    'TrackCandColName': 'mcTracksCand',
-    'mergedCDCGFTracksColName': 'mergedCDC_Tracks',
-    'mergedSiGFTracksColName': 'mergedSi_Tracks',
-    'CDC_wall_radius': 16.25,
+                       #    'mergedCDCGFTracksColName': 'mergedCDC_Tracks',
+                       #    'mergedVXDGFTracksColName': 'mergedSi_Tracks',
+                       #    'CDC_wall_radius': 16.25,
+    'VXDGFTracksColName': 'VXDTracks',
+    'CDCGFTracksColName': 'CDCTracks',
+    'GFTracksColName': 'GFTracks',
+    'TrackCandColName': 'TracksCand',
+    'relMatchedTracks': 'MatchedTracksIdx',
     'chi2_max': 100,
     }
 #    'root_output_filename': 'VXD_CDC_trackmerger_test.root',
@@ -166,10 +167,10 @@ trackMergerAnalysis_param = {  # (in cm) use cdc inner wall
                                #    'CDC_wall_radius':        16.29,  #(in cm) use cdc outer wall
                                # default False
                                # 'MCParticlesColName': 'mcParticlesTruth',
-    'SiGFTracksColName': 'Si_mcTracks',
-    'CDCGFTracksColName': 'CDC_mcTracks',
-    'GFTracksColName': 'mcGFTracks',
-    'TrackCandColName': 'mcTracksCand',
+    'SiGFTracksColName': 'VXDTracks',
+    'CDCGFTracksColName': 'CDCTracks',
+    'GFTracksColName': 'GFTracks',
+    'TrackCandColName': 'TracksCand',
     'CDC_wall_radius': 16.25,
     'root_output_filename': 'VXD_CDC_trackmerger_test.root',
     }

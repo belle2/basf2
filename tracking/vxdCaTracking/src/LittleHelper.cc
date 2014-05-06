@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/LittleHelper.h"
+#include "tracking/vxdCaTracking/LittleHelper.h"
 #include <framework/logging/Logger.h>
 #include <math.h>       /* floor */
 #include <TRandom.h>

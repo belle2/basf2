@@ -8,10 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/VXDTFHit.h"
+#include "tracking/vxdCaTracking/VXDTFHit.h"
 #include "tracking/dataobjects/FullSecID.h"
 #include <framework/gearbox/Const.h>
-#include "../include/ClusterInfo.h"
+#include "tracking/vxdCaTracking/ClusterInfo.h"
 #include <framework/logging/Logger.h>
 
 using namespace std;

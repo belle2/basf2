@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/VXDSegmentCell.h"
+#include "tracking/vxdCaTracking/VXDSegmentCell.h"
 #include <framework/logging/Logger.h>
 
 using namespace std;

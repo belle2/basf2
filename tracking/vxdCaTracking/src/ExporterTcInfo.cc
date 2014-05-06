@@ -8,10 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-// #include "../include/ExporterHitInfo.h"
-#include "../include/ExporterTcInfo.h"
+#include "tracking/vxdCaTracking/ExporterTcInfo.h"
 
 
 using namespace std;
 using namespace Belle2;
-// using namespace Belle2::Tracking;

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/ExporterHitInfo.h"
+#include "tracking/vxdCaTracking/ExporterHitInfo.h"
 #include <boost/lexical_cast.hpp>
 #include <tracking/dataobjects/FullSecID.h>
 

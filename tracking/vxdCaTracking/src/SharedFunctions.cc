@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/SharedFunctions.h"
+#include "tracking/vxdCaTracking/SharedFunctions.h"
 #include <vxd/geometry/GeoCache.h> // for getGlobalizedHiterrors, getHitErrors
 #include <vxd/geometry/SensorInfoBase.h> // for getGlobalizedHiterrors, getHitErrors
 #include <vxd/dataobjects/VxdID.h> // for getGlobalizedHiterrors, VxdID

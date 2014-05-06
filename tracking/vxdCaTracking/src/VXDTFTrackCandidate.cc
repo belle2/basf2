@@ -8,10 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/VXDTFTrackCandidate.h"
+#include "tracking/vxdCaTracking/VXDTFTrackCandidate.h"
 #include <math.h>
 #include <framework/logging/Logger.h>
-#include "../include/ClusterInfo.h"
+#include "tracking/vxdCaTracking/ClusterInfo.h"
 
 
 using namespace std;

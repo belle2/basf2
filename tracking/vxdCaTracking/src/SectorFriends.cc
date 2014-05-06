@@ -8,7 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include "../include/SectorFriends.h"
+#include "tracking/vxdCaTracking/SectorFriends.h"
 #include "tracking/dataobjects/FullSecID.h"
 #include <iostream>
 #include <boost/foreach.hpp>

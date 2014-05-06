@@ -12,8 +12,8 @@
 
 #include <vector>
 
-#include "../include/ExporterHitInfo.h"
-#include "../include/ExporterTcInfo.h"
+#include "tracking/vxdCaTracking/ExporterHitInfo.h"
+#include "tracking/vxdCaTracking/ExporterTcInfo.h"
 
 
 namespace Belle2 {

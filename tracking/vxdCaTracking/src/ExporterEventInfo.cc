@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/ExporterEventInfo.h"
+#include "tracking/vxdCaTracking/ExporterEventInfo.h"
 
 
 using namespace std;

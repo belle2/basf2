@@ -8,18 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-// #include "../include/VXDTFTrackCandidate.h"
-#include "../include/ClusterInfo.h"
+#include "tracking/vxdCaTracking/ClusterInfo.h"
 #include <framework/logging/Logger.h>
 
-// #include <boost/foreach.hpp>
 
 using namespace std;
 using namespace Belle2;
 
-
-
-// void Belle2::ClusterInfo::addTrackCandidate(VXDTFTrackCandidate* aTC)
 
 
 

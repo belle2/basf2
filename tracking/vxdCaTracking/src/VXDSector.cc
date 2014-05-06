@@ -8,11 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/VXDSector.h"
-#include "../include/Cutoff.h"
-#include "../include/SectorFriends.h"
-#include "../include/VXDTFHit.h"
-#include "../include/VXDSegmentCell.h"
+#include "tracking/vxdCaTracking/VXDSector.h"
+#include "tracking/vxdCaTracking/Cutoff.h"
+#include "tracking/vxdCaTracking/SectorFriends.h"
+#include "tracking/vxdCaTracking/VXDTFHit.h"
+#include "tracking/vxdCaTracking/VXDSegmentCell.h"
 #include "tracking/dataobjects/FullSecID.h"
 
 #include <framework/logging/Logger.h>

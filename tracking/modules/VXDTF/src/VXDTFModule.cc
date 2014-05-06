@@ -1342,7 +1342,9 @@ void VXDTFModule::the_real_event()
 
           assignedIDs.push_back(clustersOfEvent[iPart].getCollectorID());
 
-          int hitID = m_collector.importHit(passNumber, CollectorTFInfo::m_nameHitFinder, CollectorTFInfo::m_idHitFinder, vector<int>(), vector<int>(), assignedIDs, -1, hitInfo.hitPosition, hitInfo.hitSigma);
+          std::vector<int> rejectedFilters = {FilterID::overHighestAllowedLayer};
+
+          int hitID = m_collector.importHit(passNumber, CollectorTFInfo::m_nameHitFinder, CollectorTFInfo::m_idHitFinder, vector<int>(), rejectedFilters, assignedIDs, -1, hitInfo.hitPosition, hitInfo.hitSigma);
 
           // no hitid is saved because Hit is not used
           B2DEBUG(100, "Hit imported = died at hitfinder (highestAllowedLayer): " << hitID);
@@ -1364,6 +1366,26 @@ void VXDTFModule::the_real_event()
                                                                   currentPass->sectorMap,
                                                                   currentPass->secConfigU,
                                                                   currentPass->secConfigV);
+
+
+      // Test only
+      if (m_PARAMdisplayCollector > 0) {
+
+        SectorNameAndPointerPair activatedSector2 = searchSector4HitOld(aVxdID,
+                                                    transformedHitLocal,
+                                                    localSensorSize,
+                                                    currentPass->sectorMap,
+                                                    currentPass->secConfigU,
+                                                    currentPass->secConfigV);
+
+        if (activatedSector2.first != activatedSector.first) {
+          B2DEBUG(100, "NO MATCH in searchSector4HitOld: FIRST: " << activatedSector2.first
+                  << ", (new):" << activatedSector.first);
+        }
+
+      }
+
+
 
       aSecID = activatedSector.first;
       MapOfSectors::iterator secMapIter =  activatedSector.second;
@@ -1530,7 +1552,9 @@ void VXDTFModule::the_real_event()
             assignedIDs.push_back(clusterIndexU);
             assignedIDs.push_back(clusterIndexV);
 
-            int hitID = m_collector.importHit(passNumber, CollectorTFInfo::m_nameHitFinder, CollectorTFInfo::m_idHitFinder, vector<int>(), vector<int>(), assignedIDs, -1, hitInfo.hitPosition, hitInfo.hitSigma);
+            std::vector<int> rejectedFilters = {FilterID::overHighestAllowedLayer};
+
+            int hitID = m_collector.importHit(passNumber, CollectorTFInfo::m_nameHitFinder, CollectorTFInfo::m_idHitFinder, vector<int>(), rejectedFilters, assignedIDs, -1, hitInfo.hitPosition, hitInfo.hitSigma);
 
             // no hitid is saved because Hit is not used
             B2DEBUG(100, "Hit imported = died at hitfinder (highestAllowedLayer): " << hitID);
@@ -1547,6 +1571,34 @@ void VXDTFModule::the_real_event()
                                                                     currentPass->sectorMap,
                                                                     currentPass->secConfigU,
                                                                     currentPass->secConfigV);
+
+        // Test only
+        if (m_PARAMdisplayCollector > 0) {
+
+          SectorNameAndPointerPair activatedSector2 = searchSector4HitOld(aVxdID,
+                                                      transformedHitLocal,
+                                                      localSensorSize,
+                                                      currentPass->sectorMap,
+                                                      currentPass->secConfigU,
+                                                      currentPass->secConfigV);
+
+          if (activatedSector2.first != activatedSector.first) {
+            B2DEBUG(100, "NO MATCH in searchSector4HitOld: FIRST: " << activatedSector2.first <<
+                    ", (new):" << activatedSector.first);
+          }
+
+//   if ( activatedSector2.second != activatedSector.second)
+//   {
+//     B2DEBUG(100, "NO MATCH in searchSector4HitOld: SECOND: " << activatedSector2.second <<
+//     ", (new):" << activatedSector.second);
+//   }
+
+
+
+        }
+
+
+
         aSecID = activatedSector.first;
 
         MapOfSectors::iterator secMapIter =  activatedSector.second;
@@ -1564,7 +1616,9 @@ void VXDTFModule::the_real_event()
             assignedIDs.push_back(clusterIndexU);
             assignedIDs.push_back(clusterIndexV);
 
-            int hitID = m_collector.importHit(passNumber, CollectorTFInfo::m_nameHitFinder, CollectorTFInfo::m_idHitFinder, vector<int>(), vector<int>(), assignedIDs, aSecID, hitInfo.hitPosition, hitInfo.hitSigma);
+            std::vector<int> rejectedFilters = {FilterID::outOfSectorRange};
+
+            int hitID = m_collector.importHit(passNumber, CollectorTFInfo::m_nameHitFinder, CollectorTFInfo::m_idHitFinder, vector<int>(), rejectedFilters, assignedIDs, aSecID, hitInfo.hitPosition, hitInfo.hitSigma);
 
             // no hitid is saved because Hit is not used
             B2DEBUG(100, "Hit imported = died at hitfinder: " << hitID);

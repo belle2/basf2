@@ -120,6 +120,23 @@ std::pair<double, double> SpacePoint::convertToLocalCoordinates(const std::pair<
 
 
 
+std::pair<double, double> SpacePoint::convertToLocalCoordinatesNormalized(const std::pair<double, double>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo)
+{
+  //We need some handle to translate IDs to local and global
+  // coordinates.
+  if (aSensorInfo == NULL) {
+    aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID);
+  }
+
+  double localVPosition = (hitNormalized.second - 0.5) * aSensorInfo->getVSize();
+  double localUPosition = (hitNormalized.first - 0.5) * aSensorInfo->getUSize();
+
+  return (make_pair(localUPosition, localVPosition));
+}
+
+
+
+
 TVector3 SpacePoint::getGlobalCoordinates(const std::pair<double, double>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo)
 {
   //We need some handle to translate IDs to local and global

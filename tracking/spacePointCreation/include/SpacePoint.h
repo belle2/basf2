@@ -82,7 +82,7 @@ namespace Belle2 {
 
     /** converts a hit in sensor-independent relative coordinates into local coordinate of given sensor.
      *
-     * first parameter is the hit in sensor-independent normalized coordinates stored as a pair of doubles.
+     * first parameter is the hit in sensor-independent (real) coordinates stored as a pair of floats.
      * second parameter is the coded vxdID, which carries the sensorID.
      * third parameter, a sensorInfo can be passed for testing purposes.
      *  If no sensorInfo is passed, the member gets its own pointer to it.
@@ -98,6 +98,16 @@ namespace Belle2 {
      *  If no sensorInfo is passed, the member gets its own pointer to it.
      */
     static TVector3 getGlobalCoordinates(const std::pair<double, double>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
+
+
+    /** converts a hit in sensor-independent relative coordinates into local coordinate of given sensor.
+    *
+    * first parameter is the hit in sensor-independent normalized ! coordinates stored as a pair of floats.
+    * second parameter is the coded vxdID, which carries the sensorID.
+    * third parameter, a sensorInfo can be passed for testing purposes.
+    *  If no sensorInfo is passed, the member gets its own pointer to it.
+    */
+    static std::pair<double, double> convertToLocalCoordinatesNormalized(const std::pair<double, double>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
     /** checks first parameter for boundaries.

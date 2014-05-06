@@ -25,7 +25,9 @@
 
 #include "tracking/dataobjects/FilterID.h"
 #include "tracking/dataobjects/FullSecID.h"
-#include <vxd/geometry/GeoCache.h>
+#include <tracking/spacePointCreation/SpacePoint.h>
+#include <tracking/trackFindingVXD/sectorMapTools/SectorTools.h>
+
 
 //C++ std lib
 #include <utility>
@@ -80,11 +82,13 @@ void CollectorTFInfo::initSectors(const std::vector< std::pair <std::pair<unsign
 
   B2DEBUG(100, "CollectorTFInfo: initSectors");
 
-  double sectorEdgeV1 = 0, sectorEdgeV2 = 0, uSizeAtv1 = 0, uSizeAtv2 = 0, sectorEdgeU1OfV1 = 0, sectorEdgeU1OfV2 = 0, sectorEdgeU2OfV1 = 0, sectorEdgeU2OfV2 = 0;
+  // Parameters to get the different corners
+  std::pair<double, double> aRelCoor_corner1 = {0, 0};
+  std::pair<double, double> aRelCoor_corner2 = {0, 1};
+  std::pair<double, double> aRelCoor_corner3 = {1, 0};
+  std::pair<double, double> aRelCoor_corner4 = {1, 1};
 
-  uint aSecID = 0;
-
-  VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
+  SectorTools aTool = SectorTools();
 
   int sectorSize = sectors.size();
 
@@ -93,51 +97,71 @@ void CollectorTFInfo::initSectors(const std::vector< std::pair <std::pair<unsign
   //in loop all sectors are initialized and their coordinates are set
   for (auto & currentSector : sectors)  {
 
-    // NO Sector 0
+    // NO Sector 0 => CHANGE with the new Secmap !!!
     if (currentSector.first.second == 0) { continue; }
-
 
     SectorTFInfo newsector(currentSector.first.first, currentSector.first.second);
 
     // Friends store
     newsector.setAllFriends(currentSector.second);
 
+    B2DEBUG(100, "CollectorTFInfo: initSectors, currentSector.first.second: " << currentSector.first.second);
 
-    /*
-            if (vCoord >= (m_PARAMsectorConfigV.at(k)*vSize1 * 2) && vCoord <= (m_PARAMsectorConfigV.at(k + 1)*vSize1 * 2)) {
-          aSecID = k + 1 + j * (m_PARAMsectorConfigV.size() - 1);
-
-          sectorEdgeV1 = m_PARAMsectorConfigV.at(k) * vSize1 * 2 - vSize1;
-          sectorEdgeV2 = m_PARAMsectorConfigV.at(k + 1) * vSize1 * 2 - vSize1;
-          uSizeAtv1 = 0.5 * aSensorInfo.getUSize(sectorEdgeV1);
-          uSizeAtv2 = 0.5 * aSensorInfo.getUSize(sectorEdgeV2);
-          sectorEdgeU1OfV1 = m_PARAMsectorConfigU.at(j) * uSizeAtv1 * 2 - uSizeAtv1;
-          sectorEdgeU1OfV2 = m_PARAMsectorConfigU.at(j) * uSizeAtv2 * 2 - uSizeAtv2;
-          sectorEdgeU2OfV1 = m_PARAMsectorConfigU.at(j + 1) * uSizeAtv1 * 2 - uSizeAtv1;
-          sectorEdgeU2OfV2 = m_PARAMsectorConfigU.at(j + 1) * uSizeAtv2 * 2 - uSizeAtv2;
-          centerV = sectorEdgeV2 + 0.5 * (sectorEdgeV1 - sectorEdgeV2); /// WARNING Berechnung falsch!
-          centerU = aSensorInfo.getUSize(centerV); // uSizeAtCenterU
-          centerU = m_PARAMsectorConfigU.at(j) * centerU - m_PARAMsectorConfigU.at(j + 1) * centerU ;
-          centerOfSector.SetXYZ(centerU, centerV, 0);
-          centerOfSector = aSensorInfo.pointToGlobal(centerOfSector);
-          dist2Origin = (centerOfSector - m_origin).Mag();
-
-    */
 
     // SectorID => Corners of the Sector
     FullSecID currentFullSectorID = FullSecID(currentSector.first.second);
 
     B2DEBUG(100, "CollectorTFInfo: initSectors, search for: " << currentFullSectorID);
 
-    const VXD::SensorInfoBase& aSensorInfo = geometry.getSensorInfo(currentFullSectorID.getVxdID());
+    VxdID aVxdID = currentFullSectorID.getVxdID();
+    unsigned short aSecID = currentFullSectorID.getSecID();
 
+    B2DEBUG(100, "CollectorTFInfo: initSectors, aSecID: " << aSecID);
+
+    // 1. Corner Calculate
+    std::pair<float, float> aRelCoor = aTool.calcNormalizedSectorPoint(secConfigU, secConfigV, aSecID, aRelCoor_corner1);
+
+//     B2DEBUG(100, "CollectorTFInfo: initSectors, calcNormalizedSectorPoints: " << aSecID);
+
+    aRelCoor = SpacePoint::convertToLocalCoordinatesNormalized(aRelCoor, aVxdID);
+
+//     B2DEBUG(100, "CollectorTFInfo: initSectors, convertToLocalCoordinatesNormalized: " << aSecID);
+
+    TVector3 corner1Global = SpacePoint::getGlobalCoordinates(aRelCoor, aVxdID);
+
+//     B2DEBUG(100, "CollectorTFInfo: initSectors, getGlobalCoordinates: " << aSecID);
+
+    newsector.setPoint(0, corner1Global);
+
+    // 2. Corner Calculate
+    aRelCoor = aTool.calcNormalizedSectorPoint(secConfigU, secConfigV, aSecID, aRelCoor_corner2);
+    aRelCoor = SpacePoint::convertToLocalCoordinatesNormalized(aRelCoor, aVxdID);
+    TVector3 corner2Global = SpacePoint::getGlobalCoordinates(aRelCoor, aVxdID);
+    newsector.setPoint(1, corner2Global);
+
+    // 3. Corner Calculate
+    aRelCoor = aTool.calcNormalizedSectorPoint(secConfigU, secConfigV, aSecID, aRelCoor_corner3);
+    aRelCoor = SpacePoint::convertToLocalCoordinatesNormalized(aRelCoor, aVxdID);
+    TVector3 corner3Global = SpacePoint::getGlobalCoordinates(aRelCoor, aVxdID);
+    newsector.setPoint(2, corner3Global);
+
+    // 4. Corner Calculate
+    aRelCoor = aTool.calcNormalizedSectorPoint(secConfigU, secConfigV, aSecID, aRelCoor_corner4);
+    aRelCoor = SpacePoint::convertToLocalCoordinatesNormalized(aRelCoor, aVxdID);
+    TVector3 corner4Global = SpacePoint::getGlobalCoordinates(aRelCoor, aVxdID);
+    newsector.setPoint(3, corner4Global);
+
+    B2DEBUG(100, "CollectorTFInfo: initSectors, all Corners set: " << aSecID);
+
+    // OLD CALCULATION
+    /*
     double vSize1 = 0.5 * aSensorInfo.getVSize();
-
-//     (aSensorInfo.getWidth(vClusterPtr->getPosition()) / aSensorInfo.getWidth(0)) * uClusterPtr->getPosition()
 
     for (uint j = 0; j != secConfigU.size() - 1; ++j) {
       for (uint k = 0; k != secConfigV.size() - 1; ++k) {
+    B2DEBUG(100, "vor secid : " << aSecID);
         aSecID = k + 1 + j * (secConfigV.size() - 1);
+    B2DEBUG(100, "vor secid : " << aSecID);
 
         if (aSecID != uint(currentFullSectorID.getSecID())) { continue; }
 
@@ -154,17 +178,11 @@ void CollectorTFInfo::initSectors(const std::vector< std::pair <std::pair<unsign
 
         // sectorCorners
         TVector3 corner1Local = TVector3(sectorEdgeV1, sectorEdgeU1OfV1, 0);
-
-        B2DEBUG(100, "sectorEdgeV1: " << corner1Local.X() << "/" << corner1Local.Y() << "/" << corner1Local.Z());
-
         TVector3 corner2Local = TVector3(sectorEdgeV1, sectorEdgeU2OfV1, 0);
         TVector3 corner3Local = TVector3(sectorEdgeV2, sectorEdgeU1OfV2, 0);
         TVector3 corner4Local = TVector3(sectorEdgeV2, sectorEdgeU2OfV2, 0);
 
         TVector3 corner1Global = aSensorInfo.pointToGlobal(corner1Local);
-
-        B2DEBUG(100, "corner1Global: " << corner1Local.X() << "/" << corner1Local.Y() << "/" << corner1Local.Z());
-
         TVector3 corner2Global = aSensorInfo.pointToGlobal(corner2Local);
         TVector3 corner3Global = aSensorInfo.pointToGlobal(corner3Local);
         TVector3 corner4Global = aSensorInfo.pointToGlobal(corner4Local);
@@ -177,6 +195,8 @@ void CollectorTFInfo::initSectors(const std::vector< std::pair <std::pair<unsign
         break;
       }
     }
+    */
+//   B2DEBUG(100, "Sector von init: " << newsector.getDisplayInformation());
 
     m_sectorTFAll.insert(make_pair(KeySectors(currentSector.first.first, currentSector.first.second), newsector));
 

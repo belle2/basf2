@@ -8,12 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/ExporterHitInfo.h"
-#include "../include/ExporterTcInfo.h"
-#include "../include/ExporterEventInfo.h"
-#include "../include/HitExporter.h"
-#include "../include/ThreeHitFilters.h"
-#include "../include/LittleHelper.h"
+#include "tracking/vxdCaTracking/ExporterHitInfo.h"
+#include "tracking/vxdCaTracking/ExporterTcInfo.h"
+#include "tracking/vxdCaTracking/ExporterEventInfo.h"
+#include "tracking/vxdCaTracking/HitExporter.h"
+#include "tracking/vxdCaTracking/ThreeHitFilters.h"
+#include "tracking/vxdCaTracking/LittleHelper.h"
 
 // #include <TMathBase.h>
 #include <math.h>

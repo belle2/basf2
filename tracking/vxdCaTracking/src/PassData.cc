@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/PassData.h"
+#include "tracking/vxdCaTracking/PassData.h"
 #include <framework/logging/Logger.h> // for B2WARNING
 
 #include "tracking/dataobjects/FullSecID.h"

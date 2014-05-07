@@ -9,12 +9,13 @@
 **************************************************************************/
 #pragma once
 
+#include <framework/logging/Logger.h>
+
 #include <TObject.h>
 
 #include <bitset>
 #include <algorithm>
 #include <vector>
-#include <cassert>
 
 namespace Belle2 {
   /** Hit pattern of CDC hits within a track and efficient getters.
@@ -80,7 +81,7 @@ namespace Belle2 {
      *  This function may throw an out-of-range exception.
      */
     void setLayer(const unsigned short layer) {
-      assert(layer <= 55);
+      B2ASSERT("Layer is out of range.", layer <= 55);
       m_pattern.set(layer);
     }
 
@@ -89,13 +90,13 @@ namespace Belle2 {
      *  This function may throw an out-of-range exception.
      */
     void resetLayer(const unsigned short layer) {
-      assert(layer <= 55);
+      B2ASSERT("Layer is out of range.", layer <= 55);
       m_pattern.reset(layer);
     }
 
     /** Getter for single layer.*/
     bool hasLayer(const unsigned short layer) const {
-      assert(layer <= 55);
+      B2ASSERT("Layer is out of range.", layer <= 55);
       return m_pattern[layer];
     }
 
@@ -105,13 +106,13 @@ namespace Belle2 {
 
     /** Getter for Super-Layer match.*/
     bool hasSLayer(const unsigned short sLayer) const {
-      assert(sLayer <= 8);
+      B2ASSERT("Super layer outof range.", sLayer <= 8);
       return ((m_pattern & s_sLayerMasks[sLayer]).any());
     }
 
     /** Reset complete superLayer, e.g. because segment shouldn't belong to that track.*/
     void resetSLayer(const unsigned short sLayer) {
-      assert(sLayer <= 8);
+      B2ASSERT("Super layer outof range.", sLayer <= 8);
       for (unsigned short int ii = 0; ii < m_pattern.size(); ++ii) {
         if ((s_sLayerMasks[sLayer])[ii]) {resetLayer(ii);}
       }
@@ -128,19 +129,16 @@ namespace Belle2 {
      *  any layers with more than two hits leads to under-counting.
      */
     unsigned short getSLayerNHits(const unsigned short sLayer) const {
-      assert(sLayer <= 8);
+      B2ASSERT("Super layer outof range.", sLayer <= 8);
       return static_cast<unsigned short>((m_pattern & s_sLayerMasks[sLayer]).count());
     }
 
-    /** Getter for longest run of consecutive layers with hits in the Super-Layer. */
+    /** Getter for longest run of consecutive layers with hits in the Super-Layer.
+     * TODO: Maybe a better solution can be found here*/
     unsigned short getLongestContRunInSL(const unsigned short sLayer) const {
-      assert(sLayer <= 8);
-
-      //TODO: Improve algorithm and clean up code...
-      //NOTE: perhaps having statics of the Super-Layer boundaries is vastly superior to bit logic here
+      B2ASSERT("Super layer outof range.", sLayer <= 8);
       unsigned short max = 0;
       unsigned short counter = 0;
-
       for (unsigned short i = s_indexMin[sLayer]; i <= s_indexMax[sLayer]; ++i) {
         counter += m_pattern[i];
         if (m_pattern[i] == 0) {
@@ -150,7 +148,6 @@ namespace Belle2 {
           counter = 0;
         }
       }
-      // To take care of the last count, if the slayer ends with a 1.
       return std::max(max, counter);
     }
 

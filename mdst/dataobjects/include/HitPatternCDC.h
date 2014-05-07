@@ -3,7 +3,7 @@
 * Copyright(C) 2013 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Martin Heck                                              *
+* Contributors: Martin Heck, Markus Prim                                 *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -14,6 +14,7 @@
 #include <bitset>
 #include <algorithm>
 #include <vector>
+#include <cassert>
 
 namespace Belle2 {
   /** Hit pattern of CDC hits within a track and efficient getters.
@@ -28,12 +29,6 @@ namespace Belle2 {
    *  Note, that super Layer counting goes from 0 to 8.
    *  GENERAL COMMENT: I think the non-static members and the interface are largely OK,
    *                   but the back-end implementation maybe not so great.
-   *  COMMENT: Most member function are implemented as normal and fast version. Be sure what
-   *           you are doing if you use the fast version, they do not contain range checks
-   *           for perfoming reasons.
-   *  TODO: Get rid of code duplication in fast and not fast functions via inline functions.
-   *  TODO: How handle out of range access? Exception or some return value to indicate out of range?
-   *  TODO: Think about a better getLongestContRunInSL algorithm.
    */
   class HitPatternCDC : public TObject {
   public:
@@ -45,26 +40,27 @@ namespace Belle2 {
     {}
 
     /** Getter for underlying integer type. */
-    unsigned long getInteger() {
+    unsigned long getInteger() const {
       return m_pattern.to_ulong();
     }
 
     /** Getter for underlying bit set. */
-    std::bitset<64> getBitSet() {
+    std::bitset<64> getBitSet() const {
       return m_pattern;
     }
 
     /** Get the approximate total Number of CDC hits in the fit. */
     unsigned short getNHits() const {
-
       // Shift the 8 MSBs to the right and return their value as integer.
       return static_cast<unsigned short int>((m_pattern >> 56).to_ulong());
     }
 
-    /** Sets the 8 MSBs to the total number of hits in the CDC.
-     * TODO: If more than 255 hits are in the CDC (e.g. curlers), the number of hits is set to 255.
-     */
-    void setNHits(const unsigned short nHits) {
+    /** Sets the 8 MSBs to the total number of hits in the CDC.*/
+    void setNHits(unsigned short nHits) {
+      if (nHits > 256) {
+        // Maximum with 8 available bits
+        nHits = 255;
+      }
       // Reset the 8 MSBs to zero.
       m_pattern = m_pattern & ~s_infoLayerMask;
       // Set the total number of hits as the 8 MSBs
@@ -82,47 +78,24 @@ namespace Belle2 {
     /** Set bit corresponding to layer to true.
      *
      *  This function may throw an out-of-range exception.
-     *  @return Value of the bit before setting. This maybe relevant
-     *          e.g. to set double occupation bit.
      */
-    bool setLayer(const unsigned short layer) {
-      layerRangeCheck(layer);
-      bool valueBefore = m_pattern[layer];
+    void setLayer(const unsigned short layer) {
+      assert(layer <= 55);
       m_pattern.set(layer);
-      return valueBefore;
-    }
-
-    /** Set bit without range check or readout. */
-    void setLayerFast(const unsigned short layer, const bool value = true) {
-      m_pattern[layer] = value;
     }
 
     /** Set bit corresponding to layer to false.
      *
      *  This function may throw an out-of-range exception.
-     *  @return Value of the bit before setting. This maybe relevant
-     *          e.g. to set double occupation bit.
      */
-    bool resetLayer(const unsigned short layer) {
-      layerRangeCheck(layer);
-      bool valueBefore = m_pattern[layer];
-      m_pattern.reset(layer);
-      return valueBefore;
-    }
-
-    /** Set bit corresponding to layer to false without range check or readout. */
-    void resetLayerFast(const unsigned short layer) {
+    void resetLayer(const unsigned short layer) {
+      assert(layer <= 55);
       m_pattern.reset(layer);
     }
 
     /** Getter for single layer.*/
     bool hasLayer(const unsigned short layer) const {
-      layerRangeCheck(layer);
-      return m_pattern[layer];
-    }
-
-    /** Getter for single layer without range check.*/
-    bool hasLayerFast(const unsigned short layer) const {
+      assert(layer <= 55);
       return m_pattern[layer];
     }
 
@@ -132,28 +105,48 @@ namespace Belle2 {
 
     /** Getter for Super-Layer match.*/
     bool hasSLayer(const unsigned short sLayer) const {
-      sLayerRangeCheck(sLayer);
-      return ((m_pattern & s_sLayerMasks[sLayer]).any());
-    }
-
-    /** Getter for Super-Layer match without range check.*/
-    bool hasSLayerFast(const unsigned short sLayer) const {
+      assert(sLayer <= 8);
       return ((m_pattern & s_sLayerMasks[sLayer]).any());
     }
 
     /** Reset complete superLayer, e.g. because segment shouldn't belong to that track.*/
     void resetSLayer(const unsigned short sLayer) {
-      sLayerRangeCheck(sLayer);
+      assert(sLayer <= 8);
       for (unsigned short int ii = 0; ii < m_pattern.size(); ++ii) {
         if ((s_sLayerMasks[sLayer])[ii]) {resetLayer(ii);}
       }
     }
 
-    /** Reset complete superLayer without range check, e.g. because segment shouldn't belong to that track.*/
-    void resetSLayerFast(const unsigned short sLayer) {
-      for (unsigned short int ii = 0; ii < m_pattern.size(); ++ii) {
-        if ((s_sLayerMasks[sLayer])[ii]) {resetLayer(ii);}
+    /** Getter for the approximate number of hits in one super-layer.
+     *
+     *  In case of multiple layers with two or more hits or
+     *  any layers with more than two hits leads to under-counting.
+     */
+    unsigned short getSLayerNHits(const unsigned short sLayer) const {
+      assert(sLayer <= 8);
+      return static_cast<unsigned short>((m_pattern & s_sLayerMasks[sLayer]).count());
+    }
+
+    /** Getter for longest run of consecutive layers with hits in the Super-Layer. */
+    unsigned short getLongestContRunInSL(const unsigned short sLayer) const {
+      assert(sLayer <= 8);
+
+      //TODO: Improve algorithm and clean up code...
+      //NOTE: perhaps having statics of the Super-Layer boundaries is vastly superior to bit logic here
+      unsigned short max = 0;
+      unsigned short counter = 0;
+
+      for (unsigned short i = s_indexMin[sLayer]; i <= s_indexMax[sLayer]; ++i) {
+        counter += m_pattern[i];
+        if (m_pattern[i] == 0) {
+          if (counter > max) {
+            max = counter;
+          }
+          counter = 0;
+        }
       }
+      // To take care of the last count, if the slayer ends with a 1.
+      return std::max(max, counter);
     }
 
     // ----------------------------------------------------------------
@@ -163,16 +156,6 @@ namespace Belle2 {
     /** Reset the complete hit pattern. */
     void resetPattern() {
       m_pattern.reset();
-    }
-
-    /** Getter for the approximate number of hits in one super-layer.
-     *
-     *  In case of multiple layers with two or more hits or
-     *  any layers with more than two hits leads to under-counting.
-     */
-    unsigned short getSLayerNHits(const unsigned short sLayer) const {
-      sLayerRangeCheck(sLayer);
-      return static_cast<unsigned short>((m_pattern & s_sLayerMasks[sLayer]).count());
     }
 
     /** True, if at least one axial layer is true.*/
@@ -187,47 +170,6 @@ namespace Belle2 {
               & m_pattern).any();
     }
 
-    /** Getter for longest run of consecutive layers with hits in the Super-Layer. */
-    unsigned short getLongestContRunInSL(const unsigned short sLayer) const {
-      sLayerRangeCheck(sLayer);
-
-      //TODO: Improve algorithm and clean up code...
-      //NOTE: perhaps having statics of the Super-Layer boundaries is vastly superior to bit logic here
-      unsigned short max = 0;
-      unsigned short counter = 0;
-
-      for (unsigned short i = s_indexMin[sLayer]; i <= s_indexMax[sLayer]; ++i) {
-        counter += m_pattern[i];
-        if (m_pattern[i] == 0) {
-          if (counter > max) {
-            max = counter;
-          }
-          counter = 0;
-        }
-      }
-      // To take care of the last count, if the slayer ends with a 1.
-      return std::max(max, counter);
-    }
-
-    /** Getter for longest run of consecutive layers with hits in the Super-Layer. */
-    unsigned short getLongestContRunInSLFast(const unsigned short sLayer) const {
-      //TODO: Improve algorithm and clean up code...
-      //NOTE: perhaps having statics of the Super-Layer boundaries is vastly superior to bit logic here
-      unsigned short max = 0;
-      unsigned short counter = 0;
-
-      for (unsigned short i = s_indexMin[sLayer]; i <= s_indexMax[sLayer]; ++i) {
-        counter += m_pattern[i];
-        if (m_pattern[i] == 0) {
-          if (counter > max) {
-            max = counter;
-          }
-          counter = 0;
-        }
-      }
-      // To take care of the last count, if the slayer ends with a 1.
-      return std::max(max, counter);
-    }
 
   private:
     std::bitset<64> m_pattern;                     /**<  Saves the actual pattern.*/
@@ -236,20 +178,6 @@ namespace Belle2 {
 
     static const std::vector<unsigned short> s_indexMin; /**< Holds the min indices for super layer access. */
     static const std::vector<unsigned short> s_indexMax; /**< Holds the max indices for super layer access. */
-
-    /**
-     * This function implements the layer range check for the public functions which use a range check.
-     * @TODO: Decide to throw an exception or return a number such as 999
-     * @param layer
-     */
-    void layerRangeCheck(const unsigned short /*layer*/) const;
-
-    /**
-     * This function implements the super layer range check for the public functions which use a range check.
-     * @TODO: Decide to throw an exception or return a number such as 999
-     * @param slayer
-     */
-    void sLayerRangeCheck(const unsigned short /*slayer*/) const;
 
     //-----------------------------------------------------------------------------------
     /** Make it a ROOT object.

@@ -13,7 +13,7 @@ namespace Belle2 {
     // Test proper initialization.
     unsigned long initValue = 66560; // python >>> 2 ** 16 + 2 ** 10
     HitPatternCDC hitPatternCDC(initValue);
-    //EXPECT_EQ(2,  hitPatternCDC.getNHits()); //NOTE: Test is not compatible anymore
+    EXPECT_EQ(initValue, hitPatternCDC.getInteger());
 
     HitPatternCDC hitPatternCDC2;
     //EXPECT_EQ(0,  hitPatternCDC2.getNHits());
@@ -21,7 +21,6 @@ namespace Belle2 {
     // Test setting and getting individual bits
     short layer = 5;
     hitPatternCDC2.setLayer(layer);
-    //EXPECT_EQ(1,    hitPatternCDC2.getNHits()); //NOTE: Test is not compatible anymore
     EXPECT_EQ(true, hitPatternCDC2.hasLayer(5));
 
     // Test of SuperLayer getters; setters don't make sense.
@@ -52,7 +51,7 @@ namespace Belle2 {
   /// This tests if the total number of hits is set and read correctly.
   TEST_F(HitPatternCDCTest, SetNGetTotalNumberOfHits)
   {
-    unsigned long int initValue = 12297829382473034410U; //101010...101010
+    unsigned long int initValue = static_cast<unsigned long int>(12297829382473034410); //101010...101010
     HitPatternCDC myHitPatternCDC(initValue);
     EXPECT_EQ(170, myHitPatternCDC.getNHits());
     unsigned short int nHits1 = 255;
@@ -69,7 +68,7 @@ namespace Belle2 {
   /// Test if the longest run in a superlayer is returned correctly.
   TEST_F(HitPatternCDCTest, getLongestContRunInSL)
   {
-    unsigned long int initValue = 67253754435399406U; // 11101110...11101110
+    unsigned long int initValue = static_cast<unsigned long int>(67253754435399406); // 11101110...11101110
     HitPatternCDC myHitPatternCDC(initValue);
     EXPECT_EQ(3, myHitPatternCDC.getLongestContRunInSL(0));
     EXPECT_EQ(3, myHitPatternCDC.getLongestContRunInSL(1));

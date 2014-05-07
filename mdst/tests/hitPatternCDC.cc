@@ -51,7 +51,7 @@ namespace Belle2 {
   /// This tests if the total number of hits is set and read correctly.
   TEST_F(HitPatternCDCTest, SetNGetTotalNumberOfHits)
   {
-    unsigned long int initValue = static_cast<unsigned long int>(12297829382473034410); //101010...101010
+    unsigned long int initValue = static_cast<unsigned long long int>(0xAAAAAAAAAAAAAAAAL); //101010...101010
     HitPatternCDC myHitPatternCDC(initValue);
     EXPECT_EQ(170, myHitPatternCDC.getNHits());
     unsigned short int nHits1 = 255;
@@ -68,7 +68,7 @@ namespace Belle2 {
   /// Test if the longest run in a superlayer is returned correctly.
   TEST_F(HitPatternCDCTest, getLongestContRunInSL)
   {
-    unsigned long int initValue = static_cast<unsigned long int>(67253754435399406); // 11101110...11101110
+    unsigned long int initValue = static_cast<unsigned long long int>(0xEEEEEEEEEEEEEEL); // 11101110...11101110
     HitPatternCDC myHitPatternCDC(initValue);
     EXPECT_EQ(3, myHitPatternCDC.getLongestContRunInSL(0));
     EXPECT_EQ(3, myHitPatternCDC.getLongestContRunInSL(1));

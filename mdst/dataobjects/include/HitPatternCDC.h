@@ -117,6 +117,11 @@ namespace Belle2 {
       }
     }
 
+    /** Get the pattern in a specific super layer. */
+    std::bitset<64> getSLayerPattern(const unsigned short sLayer) {
+      return m_pattern & s_sLayerMasks[sLayer];
+    }
+
     /** Getter for the approximate number of hits in one super-layer.
      *
      *  In case of multiple layers with two or more hits or

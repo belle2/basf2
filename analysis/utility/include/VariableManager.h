@@ -33,11 +33,30 @@ namespace Belle2 {
    *
    *  Variables can then be accessed using getVariable(name) and getVariables().
    *
+   *
+   *  <h2>Python interface</h2>
+   *  This class is exported to Python, and can be used to use variables in Python basf2 modules:
+      \code
+      from variables import *
+      # for convenience, a VariableManager instance is already created (called 'variables')
+
+      from ROOT import TLorentzVector
+      someParticle = Belle2.Particle(TLorentzVector(1.0, 0, 0, 0), 321)
+      print variables.evaluate('E', someParticle)
+      \endcode
+   *
+   *
+   *  <h2>List of available variables</h2>
+   *  To simply get a list of all variables registered in the main analysis library,
+   *  run <tt>basf2 analysis/scripts/variables.py</tt> .
+   *
+   *
    *  \note All functions should be listed on
    *        https://belle2.cc.kek.jp/~twiki/bin/view/Physics/ParticleSelectorFunctions
    */
   class VariableManager {
   public:
+#ifndef __CINT__
     /** functions stored take a const Particle* and return double. */
     typedef std::function<double(const Particle*)> FunctionPtr;
     //typedef double(*FunctionPtr)(const Particle*);
@@ -51,11 +70,13 @@ namespace Belle2 {
       /** Constructor. */
       Var(std::string n, FunctionPtr f, std::string d) : name(n), function(f), description(d) { }
     };
+#endif
 
     /** get singleton instance. */
     static VariableManager& Instance();
 
 
+#ifndef __CINT__
     /** Get the variable belonging to the given key.
      *
      * Returns NULL if name not found.
@@ -67,10 +88,23 @@ namespace Belle2 {
 
     /** Register a variable. */
     void registerVariable(const std::string& name, VariableManager::FunctionPtr f, const std::string& description);
+#endif
 
-    /** Register a variable stored in the ExtraInfo of the Particle, the variable can be registered multiple times for convience, all additional registrations of the same variable are ignored  */
+    /** evaluate variable 'varName' on given Particle.
+     *
+     * Aborts with B2FATAL if variable isn't found. Assumes 'p' is != NULL.
+     */
+    double evaluate(const std::string& varName, const Particle* p) const;
+
+
+    /** Return list of all variable names (in order registered). */
+    std::vector<std::string> getNames() const;
+
+    /** Register a variable stored in the ExtraInfo of the Particle, the variable can be registered multiple times for convenience, all additional registrations of the same variable are ignored  */
     void registerParticleExtraInfoVariable(const std::string& name, const std::string& description);
 
+    /** Print list of all variables with description (in order registered). */
+    void printList() const;
 
   private:
     VariableManager() {};
@@ -78,15 +112,18 @@ namespace Belle2 {
     VariableManager(const VariableManager&);
     ~VariableManager();
 
+#ifndef __CINT__
     /** List of registered variables. */
     std::map<std::string, Var*> m_variables;
 
     /** List of variables in registration order. */
     std::vector<const Var*> m_variablesInRegistrationOrder;
+#endif
 
 
   };
 
+#ifndef __CINT__
   /** Internal class that registers a variable with VariableManager when constructed. */
   class VariableProxy {
   public:
@@ -95,6 +132,7 @@ namespace Belle2 {
       VariableManager::Instance().registerVariable(name, f, description);
     }
   };
+#endif
 
 
   /** \def VARMANAGER_CONCATENATE_DETAIL(x, y)

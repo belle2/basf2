@@ -1,10 +1,12 @@
 #include <analysis/utility/VariableManager.h>
+#include <analysis/dataobjects/Particle.h>
 
 #include <framework/logging/Logger.h>
 
 #include <boost/regex.hpp>
 
-#include <analysis/dataobjects/Particle.h>
+#include <iostream>
+#include <iomanip>
 
 using namespace Belle2;
 
@@ -70,4 +72,29 @@ void VariableManager::registerParticleExtraInfoVariable(const std::string& name,
     m_variablesInRegistrationOrder.push_back(var);
   }
 
+}
+std::vector<std::string> VariableManager::getNames() const
+{
+  std::vector<std::string> names;
+  for (const Var * var : m_variablesInRegistrationOrder) {
+    names.push_back(var->name);
+  }
+  return names;
+}
+
+void VariableManager::printList() const
+{
+  for (const Var * var : getVariables()) {
+    std::cout << std::setw(14) << var->name << "  " << var->description << std::endl;
+  }
+}
+
+double VariableManager::evaluate(const std::string& varName, const Particle* p) const
+{
+  const Var* var = getVariable(varName);
+  if (!var) {
+    B2FATAL("VariableManager::evaluate(): variable '" << varName << "' not found!");
+  }
+
+  return var->function(p);
 }

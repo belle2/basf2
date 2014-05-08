@@ -21,7 +21,6 @@
 #include <analysis/dataobjects/Particle.h>
 
 #include <iostream>
-#include <iomanip>
 #include <math.h>
 #include <vector>
 #include <string>
@@ -264,9 +263,7 @@ namespace Belle2 {
 
   void PSelector::listVariables() const
   {
-    for (const VariableManager::Var * var : VariableManager::Instance().getVariables()) {
-      cout << setw(12) << var->name << "  " << var->description << endl;
-    }
+    VariableManager::Instance().printList();
   }
 
 

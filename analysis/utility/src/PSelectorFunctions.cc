@@ -504,15 +504,6 @@ namespace Belle2 {
     }
 
 
-    double sumChildProb(const Particle* particle)
-    {
-      double signalProbabilitySum = 0.0;
-      for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
-        signalProbabilitySum += particle->getDaughter(j)->getExtraInfo("SignalProbability");
-      }
-      return signalProbabilitySum;
-    }
-
     double prodChildProb(const Particle* particle)
     {
       double signalProbabilityProduct = 1.0;
@@ -802,32 +793,31 @@ namespace Belle2 {
     REGISTER_VARIABLE("prid_ARICH", particleProtonARICHId, "proton identification probability from ARICH");
     REGISTER_VARIABLE("missing_ARICH", particleMissingARICHId, "1.0 if identification probability from ARICH is missing");
 
-    VariableProxy VariableProxy_NB_eid_TOP("NB_eid_TOP", NeuroBayesifyTOP<particleElectronTOPId>, "electron identification probability from TOP");
-    VariableProxy VariableProxy_NB_muid_TOP("NB_muid_TOP", NeuroBayesifyTOP<particleMuonTOPId>, "muon identification probability from TOP");
-    VariableProxy VariableProxy_NB_piid_TOP("NB_piid_TOP", NeuroBayesifyTOP<particlePionTOPId>, "pion identification probability from TOP");
-    VariableProxy VariableProxy_NB_Kid_TOP("NB_Kid_TOP", NeuroBayesifyTOP<particleKaonTOPId>, "kaon identification probability from TOP");
-    VariableProxy VariableProxy_NB_prid_TOP("NB_prid_TOP", NeuroBayesifyTOP<particleProtonTOPId>, "proton identification probability from TOP");
+    REGISTER_VARIABLE("NB_eid_TOP", NeuroBayesifyTOP<particleElectronTOPId>, "electron identification probability from TOP (returns -999 when not available)");
+    REGISTER_VARIABLE("NB_muid_TOP", NeuroBayesifyTOP<particleMuonTOPId>, "muon identification probability from TOP (returns -999 when not available)");
+    REGISTER_VARIABLE("NB_piid_TOP", NeuroBayesifyTOP<particlePionTOPId>, "pion identification probability from TOP (returns -999 when not available)");
+    REGISTER_VARIABLE("NB_Kid_TOP", NeuroBayesifyTOP<particleKaonTOPId>, "kaon identification probability from TOP (returns -999 when not available)");
+    REGISTER_VARIABLE("NB_prid_TOP", NeuroBayesifyTOP<particleProtonTOPId>, "proton identification probability from TOP (returns -999 when not available)");
 
-    VariableProxy VariableProxy_NB_eid_ARICH("NB_eid_ARICH", NeuroBayesifyARICH<particleElectronARICHId>, "electron identification probability from ARICH");
-    VariableProxy VariableProxy_NB_muid_ARICH("NB_muid_ARICH", NeuroBayesifyARICH<particleMuonARICHId>, "muon identification probability from ARICH");
-    VariableProxy VariableProxy_NB_piid_ARICH("NB_piid_ARICH", NeuroBayesifyARICH<particlePionARICHId>, "pion identification probability from ARICH");
-    VariableProxy VariableProxy_NB_Kid_ARICH("NB_Kid_ARICH", NeuroBayesifyARICH<particleKaonARICHId>, "kaon identification probability from ARICH");
-    VariableProxy VariableProxy_NB_prid_ARICH("NB_prid_ARICH", NeuroBayesifyARICH<particleProtonARICHId>, "proton identification probability from ARICH");
+    REGISTER_VARIABLE("NB_eid_ARICH", NeuroBayesifyARICH<particleElectronARICHId>, "electron identification probability from ARICH (returns -999 when not available)");
+    REGISTER_VARIABLE("NB_muid_ARICH", NeuroBayesifyARICH<particleMuonARICHId>, "muon identification probability from ARICH (returns -999 when not available)");
+    REGISTER_VARIABLE("NB_piid_ARICH", NeuroBayesifyARICH<particlePionARICHId>, "pion identification probability from ARICH (returns -999 when not available)");
+    REGISTER_VARIABLE("NB_Kid_ARICH", NeuroBayesifyARICH<particleKaonARICHId>, "kaon identification probability from ARICH (returns -999 when not available)");
+    REGISTER_VARIABLE("NB_prid_ARICH", NeuroBayesifyARICH<particleProtonARICHId>, "proton identification probability from ARICH (returns -999 when not available)");
 
     REGISTER_VARIABLE("chiProb", particlePvalue, "chi^2 probability of the fit");
     REGISTER_VARIABLE("nDaughters", particleNDaughters, "number of daughter particles");
     REGISTER_VARIABLE("flavor", particleFlavorType, "flavor type of decay (0=unflavored, 1=flavored)");
-    REGISTER_VARIABLE("sumChildProb", sumChildProb, "sum of signal probabilities of daughters");
     REGISTER_VARIABLE("prodChildProb", prodChildProb, "product of signal probabilities of daughters");
-    REGISTER_VARIABLE("childProb0", childProb<0>, "probability of daughters 0");
-    REGISTER_VARIABLE("childProb1", childProb<1>, "probability of daughters 1");
-    REGISTER_VARIABLE("childProb2", childProb<2>, "probability of daughters 2");
-    REGISTER_VARIABLE("childProb3", childProb<3>, "probability of daughters 3");
-    REGISTER_VARIABLE("childProb4", childProb<4>, "probability of daughters 4");
-    REGISTER_VARIABLE("childProb5", childProb<5>, "probability of daughters 5");
-    REGISTER_VARIABLE("childProb6", childProb<6>, "probability of daughters 6");
-    REGISTER_VARIABLE("childProb7", childProb<7>, "probability of daughters 7");
-    REGISTER_VARIABLE("childProb8", childProb<8>, "probability of daughters 8");
+    REGISTER_VARIABLE("childProb0", childProb<0>, "value of SignalProbability for daughter 0");
+    REGISTER_VARIABLE("childProb1", childProb<1>, "value of SignalProbability for daughter 1");
+    REGISTER_VARIABLE("childProb2", childProb<2>, "value of SignalProbability for daughter 2");
+    REGISTER_VARIABLE("childProb3", childProb<3>, "value of SignalProbability for daughter 3");
+    REGISTER_VARIABLE("childProb4", childProb<4>, "value of SignalProbability for daughter 4");
+    REGISTER_VARIABLE("childProb5", childProb<5>, "value of SignalProbability for daughter 5");
+    REGISTER_VARIABLE("childProb6", childProb<6>, "value of SignalProbability for daughter 6");
+    REGISTER_VARIABLE("childProb7", childProb<7>, "value of SignalProbability for daughter 7");
+    REGISTER_VARIABLE("childProb8", childProb<8>, "value of SignalProbability for daughter 8");
 
     REGISTER_VARIABLE("isSignal", isSignal,               "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
     REGISTER_VARIABLE("mcPDG",    particleMCMatchPDGCode, "The PDG code of matched MCParticle");

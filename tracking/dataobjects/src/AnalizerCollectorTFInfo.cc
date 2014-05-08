@@ -631,7 +631,7 @@ void AnalizerCollectorTFInfo::storeCellInformation(std::string filename, int par
 
   myfile << "F_distance3D" << m_fileSeparator <<  "F_distanceZ" << m_fileSeparator << "F_anglesXY" << m_fileSeparator << "F_anglesRZ" << m_fileSeparator << "F_slopeRZ" << m_fileSeparator << "F_distance2IP" << m_fileSeparator << "F_deltaSlopeRZ" << m_fileSeparator << "F_normedDistance3D" << m_fileSeparator << "F_pT" << m_fileSeparator << "F_helixParameterFit";
 
-//   myfile << m_fileSeparator << "F_deltaSOverZ" << m_fileSeparator <<  "F_deltaSlopeZOverS";
+  myfile << m_fileSeparator << "F_deltaSOverZ" << m_fileSeparator <<  "F_deltaSlopeZOverS";
 
   myfile << m_fileSeparator << "F_nbFinderLost" << m_fileSeparator <<  "F_cellularAutomaton" << m_fileSeparator << "F_silentTcc";
 

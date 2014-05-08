@@ -9,6 +9,7 @@
  **************************************************************************/
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <TMath.h>
+#include <TMatrixD.h>
 
 using namespace Belle2;
 
@@ -52,9 +53,7 @@ TVector3 TrackFitResult::getMomentum(const float bField) const
 
 float TrackFitResult::getTransverseMomentum(const float bField) const
 {
-  float px = calcPxFromPerigee(bField);
-  float py = calcPyFromPerigee(bField);
-  return std::sqrt(px * px + py * py);
+  return 1 / getAlpha(bField) / m_tau[0];
 }
 
 TMatrixF TrackFitResult::getCovariance5() const
@@ -107,37 +106,165 @@ TMatrixF TrackFitResult::getCovariance6(const float bField) const
   return transformCov5ToCov6(cov5, bField);
 }
 
+
 void TrackFitResult::cartesianToPerigee(const TVector3& position, const TVector3& momentum, const TMatrixDSym& covariance,
                                         const short int charge, const float bField)
 {
   const double alpha = getAlpha(bField);
 
-  m_tau.push_back(calcD0FromCartesian(position, momentum));
-  m_tau.push_back(calcPhiFromCartesian(momentum));
-  m_tau.push_back(calcOmegaFromCartesian(momentum, charge, bField));
-  m_tau.push_back(calcZ0FromCartesian(position));
-  m_tau.push_back(calcCotThetaFromCartesian(momentum));
+  // We allow for the case that position, momentum are not given
+  // exactly in the perigee.  Therefore we have to solve the
+  // equations.  Any point on the helix, using the perigee parameters
+  // as in "Fast vertex fitting with a local parametrization of tracks
+  // - Billoir, Pierre et al. Nucl.Instrum.Meth. A311 (1992) 139-150"
+  // named here d0, phi, omega, z0, cotTheta together with an angle
+  // chi, can be written:
+#if 0
+  px = cos(phi + chi) / alpha / omega;
+  py = sin(phi + chi) / alpha / omega;
+  pz = charge * cotTheta / alpha / omega;
+  x =  d0 * sin(phi) + charge / omega * (sin(phi + chi) - sin(phi));
+  y = -d0 * cos(phi) + charge / omega * (-cos(phi + chi) + cos(phi));
+  z = z0 + charge / omega * cotTheta * chi;
+#endif
+  double x = position.X(); double y = position.Y(); double z = position.Z();
+  double px = momentum.X(); double py = momentum.Y(); double pz = momentum.Z();
 
-  TMatrixF A(5, 6); // Matrix is invoked with zeros
-  const double positionPerp = position.Perp();
-  const double momentumPerp2 = momentum.Perp2();
-  const double momentumPerp3 = std::pow(momentum.Perp(), 3);
-  const double signD0 = m_tau[0] > 0 ? 1 : -1;
+  // We find the perigee parameters by inverting this system of
+  // equations and solving for the six variables d0, phi, omega, z0,
+  // cotTheta, chi.
 
-  A(0, 0) = signD0 * position.X() / positionPerp;
-  A(0, 1) = signD0 * position.Y() / positionPerp;
-  A(1, 3) = -momentum.Py() / momentumPerp2;
-  A(1, 4) = momentum.Px() / momentumPerp2;
-  A(2, 3) = -momentum.Px() / (alpha * momentumPerp3);
-  A(2, 4) = -momentum.Py() / (alpha * momentumPerp3);
-  A(3, 2) = 1.0;
-  A(4, 3) = -momentum.Px() * momentum.Pz() / momentumPerp3;
-  A(4, 4) = -momentum.Py() * momentum.Pz() / momentumPerp3;
-  A(4, 5) = 1.0 / momentum.Perp();
-  TMatrixF cov5(5, 5);
-  TMatrixF AT(6, 5);
-  AT.Transpose(A);
-  cov5 = A * TMatrixF(covariance) * AT;
+  const double ptinv = 1 / hypot(px, py);
+  const double omega = charge * ptinv / alpha;
+  const double cotTheta = ptinv * pz;
+
+  const double cosphichi = charge * ptinv * px;  // cos(phi + chi)
+  const double sinphichi = charge * ptinv * py;  // sin(phi + chi)
+
+  // Helix center in the (x, y) plane:
+  const double helX = x + charge * py * alpha;
+  const double helY = y - charge * px * alpha;
+  const double rhoHel = hypot(helX, helY);
+
+  const double d0 = charge * hypot(helX, helY) - 1 / omega;
+  const double phi = atan2(helY, helX) + charge * M_PI / 2;
+  const double sinchi = sinphichi * cos(phi) - cosphichi * sin(phi);
+  const double chi = asin(sinchi);
+  const double z0 = z + charge / omega * cotTheta * chi;
+
+  m_tau.reserve(5);
+  m_tau.push_back(d0);
+  m_tau.push_back(phi);
+  m_tau.push_back(omega);
+  m_tau.push_back(z0);
+  m_tau.push_back(cotTheta);
+
+  // Derivative of the helix parameters WRT the 6D parameters.
+  // We write down all the intermediate derivatives and then apply the
+  // chain rule to piece them together.  These derivatives were
+  // verified with numerical derivatives.
+  //
+  //tau, chi = d0, phi, omega, z0, cosTheta, chi
+
+  // Derivatives of the various subexpressions, naming convention:
+  // dab = d(a)/d(b)
+  const double dptinvpx = -px * pow(ptinv, 3);
+  const double dptinvpy = -py * pow(ptinv, 3);
+
+  const double domegaptinv = charge / alpha;
+  const double domegapx = domegaptinv * dptinvpx;
+  const double domegapy = domegaptinv * dptinvpy;
+
+  const double dcotThetaptinv = pz;
+  const double dcotThetapx = dcotThetaptinv * dptinvpx;
+  const double dcotThetapy = dcotThetaptinv * dptinvpy;
+  const double dcotThetapz = ptinv;
+
+  const double dcosphichiptinv = charge * px;
+  const double dcosphichipx = dcosphichiptinv * dptinvpx + charge * ptinv;
+  const double dcosphichipy = dcosphichiptinv * dptinvpy;
+
+  const double dsinphichiptinv = charge * py;
+  const double dsinphichipx = dsinphichiptinv * dptinvpx;
+  const double dsinphichipy = dsinphichiptinv * dptinvpy + charge * ptinv;
+
+  const double dhelXx = 1;
+  const double dhelXpy = charge * alpha;
+  const double dhelYy = 1;
+  const double dhelYpx = -charge * alpha;
+
+  const double dd0helX = charge * helX / rhoHel;
+  const double dd0helY = charge * helY / rhoHel;
+  const double dd0omega = 1 / omega / omega;
+  const double dd0x = dd0helX * dhelXx;
+  const double dd0y = dd0helY * dhelYy;
+  const double dd0px = dd0helY * dhelYpx + dd0omega * domegapx;
+  const double dd0py = dd0helX * dhelXpy + dd0omega * domegapy;
+
+  const double dphihelX = -helY / rhoHel / rhoHel;
+  const double dphihelY = helX / rhoHel / rhoHel;
+  const double dphix = dphihelX * dhelXx;
+  const double dphiy = dphihelY * dhelYy;
+  const double dphipx = dphihelY * dhelYpx;
+  const double dphipy = dphihelX * dhelXpy;
+
+  const double dsinchisinphichi = cos(phi);
+  const double dsinchiphi = -sinphichi * sin(phi) - cosphichi * cos(phi);
+  const double dsinchicosphichi = -sin(phi);
+  const double dsinchix = dsinchiphi * dphix;
+  const double dsinchiy = dsinchiphi * dphiy;
+  const double dsinchipx = dsinchisinphichi * dsinphichipx + dsinchiphi * dphipx + dsinchicosphichi * dcosphichipx;
+  const double dsinchipy = dsinchisinphichi * dsinphichipy + dsinchiphi * dphipy + dsinchicosphichi * dcosphichipy;
+  const double dchisinchi = 1 / sqrt(1 - sinchi * sinchi);
+  const double dchix = dchisinchi * dsinchix;
+  const double dchiy = dchisinchi * dsinchiy;
+  const double dchipx = dchisinchi * dsinchipx;
+  const double dchipy = dchisinchi * dsinchipy;
+
+  const double dz0omega = -charge / omega / omega * cotTheta * chi;
+  const double dz0cotTheta = charge / omega * chi;
+  const double dz0chi = charge / omega * cotTheta;
+  const double dz0x = dz0chi * dchix;
+  const double dz0y = dz0chi * dchiy;
+  const double dz0z = 1;
+  const double dz0px = dz0omega * domegapx + dz0cotTheta * dcotThetapx + dz0chi * dchipx;
+  const double dz0py = dz0omega * domegapy + dz0cotTheta * dcotThetapy + dz0chi * dchipy;
+  const double dz0pz = dz0cotTheta * dcotThetapz;
+
+  //tau, chi = d0, phi, omega, z0, cotTheta, chi
+  TMatrixD A(5, 6); // Rows (tau), cols (x, p)
+  A(0, 0) = dd0x;
+  A(0, 1) = dd0y;
+  A(0, 3) = dd0px;
+  A(0, 4) = dd0py;
+
+  A(1, 0) = dphix;
+  A(1, 1) = dphiy;
+  A(1, 3) = dphipx;
+  A(1, 4) = dphipy;
+
+  A(2, 3) = domegapx;
+  A(2, 4) = domegapy;
+
+  A(3, 0) = dz0x;
+  A(3, 1) = dz0y;
+  A(3, 2) = dz0z;
+  A(3, 3) = dz0px;
+  A(3, 4) = dz0py;
+  A(3, 5) = dz0pz;
+
+  A(4, 3) = dcotThetapx;
+  A(4, 4) = dcotThetapy;
+  A(4, 5) = dcotThetapz;
+  /* For the sake of completeness, not used, omitted:
+  A(5, 0) = dchix;
+  A(5, 1) = dchiy;
+  A(5, 3) = dchipx;
+  A(5, 4) = dchipy;
+  */
+
+  TMatrixDSym cov5(covariance);
+  cov5.Similarity(A);
 
   for (unsigned int i = 0; i < 5; ++i) {
     for (unsigned int j = i; j < 5; ++j) {
@@ -149,66 +276,35 @@ void TrackFitResult::cartesianToPerigee(const TVector3& position, const TVector3
 
 double TrackFitResult::getAlpha(const float bField) const
 {
-  return 1.0 / (bField * TMath::C()) * 10E10;
+  return 1.0 / (bField * TMath::C()) * 1E11;
 }
 
-float TrackFitResult::calcD0FromCartesian(const TVector3& position, const TVector3& momentum) const
+double TrackFitResult::calcXFromPerigee() const
 {
-  // see: Fast vertex fitting with a local parametrization of tracks - Billoir, Pierre et al. Nucl.Instrum.Meth. A311 (1992) 139-150
-  double positivePocaAngle(position.Phi() > 0 ? position.Phi() : 2 * TMath::Pi() + position.Phi());
-  double positivePtAngle(momentum.Phi() > 0 ? momentum.Phi() : 2 * TMath::Pi() + momentum.Phi());
-  double phiDiff(positivePtAngle - positivePocaAngle);
-  if (phiDiff < 0.0) phiDiff += 2 * TMath::Pi();
-  short int d0sign = phiDiff > TMath::Pi() ? -1 : 1;
-  return d0sign * std::sqrt(position.X() * position.X() + position.Y() * position.Y());
+  return m_tau.at(0) * std::sin((double)m_tau.at(1));
 }
 
-float TrackFitResult::calcPhiFromCartesian(const TVector3& momentum) const
+double TrackFitResult::calcYFromPerigee() const
 {
-  return momentum.Phi();
+  return -m_tau.at(0) * std::cos((double)m_tau.at(1));
 }
 
-float TrackFitResult::calcOmegaFromCartesian(const TVector3& momentum, const short int charge, const float bField) const
-{
-  return charge / (getAlpha(bField) * momentum.Perp());
-}
-
-float TrackFitResult::calcZ0FromCartesian(const TVector3& position) const
-{
-  return position.Z();
-}
-
-float TrackFitResult::calcCotThetaFromCartesian(const TVector3& momentum) const
-{
-  return momentum.Pz() / momentum.Perp();
-}
-
-float TrackFitResult::calcXFromPerigee() const
-{
-  return m_tau.at(0) * std::sin(m_tau.at(1));
-}
-
-float TrackFitResult::calcYFromPerigee() const
-{
-  return -m_tau.at(0) * std::cos(m_tau.at(1));
-}
-
-float TrackFitResult::calcZFromPerigee() const
+double TrackFitResult::calcZFromPerigee() const
 {
   return m_tau.at(3);
 }
 
-float TrackFitResult::calcPxFromPerigee(const float bField) const
+double TrackFitResult::calcPxFromPerigee(const float bField) const
 {
-  return std::cos(m_tau.at(1)) / (std::fabs(m_tau.at(2) * getAlpha(bField)));
+  return std::cos((double)m_tau.at(1)) / (std::fabs(m_tau.at(2) * getAlpha(bField)));
 }
 
-float TrackFitResult::calcPyFromPerigee(const float bField) const
+double TrackFitResult::calcPyFromPerigee(const float bField) const
 {
-  return std::sin(m_tau.at(1)) / (std::fabs(m_tau.at(2) * getAlpha(bField)));
+  return std::sin((double)m_tau.at(1)) / (std::fabs(m_tau.at(2) * getAlpha(bField)));
 }
 
-float TrackFitResult::calcPzFromPerigee(const float bField) const
+double TrackFitResult::calcPzFromPerigee(const float bField) const
 {
   return m_tau.at(4) / (std::fabs(m_tau.at(2) * getAlpha(bField)));
 }

@@ -187,14 +187,14 @@ namespace Belle2 {
      * @param momentum in cartesian coordinates
      * @return signed absolute value of d0
      */
-    float calcD0FromCartesian(const TVector3& position, const TVector3& momentum) const;
+    double calcD0FromCartesian(const TVector3& position, const TVector3& momentum) const;
 
     /**
      * Calculates the angle of the transverse momentum in the r-phi plane.
      * @param momentum in cartesian coordinates
      * @return phi in [-pi, [pi]
      */
-    float calcPhiFromCartesian(const TVector3& momentum) const;
+    double calcPhiFromCartesian(const TVector3& momentum) const;
 
     /**
      * Calculates the signed curvature of the track.
@@ -203,60 +203,60 @@ namespace Belle2 {
      * @param bField at the perigee point
      * @return q/omega
      */
-    float calcOmegaFromCartesian(const TVector3& momentum, const short int charge, const float bField) const;
+    double calcOmegaFromCartesian(const TVector3& momentum, const short int charge, const float bField) const;
 
     /**
      * Calculates the z component of the perigee vector.
      * @param position in cartesian coordinates
      * @return z0
      */
-    float calcZ0FromCartesian(const TVector3& position) const;
+    double calcZ0FromCartesian(const TVector3& position) const;
 
     /**
      * Calculates the inverse slope of the track in the r-z plane.
      * @param momentum in cartesian coordinates
      * @return cotTheta = pz/pt
      */
-    float calcCotThetaFromCartesian(const TVector3& momentum) const;
+    double calcCotThetaFromCartesian(const TVector3& momentum) const;
 
     /**
      * Calculates the x coordinates of the perigee point with the internal stored parameters.
      * @return
      */
-    float calcXFromPerigee() const;
+    double calcXFromPerigee() const;
 
     /**
      * Calculates the y coordinates of the perigee point with the internal stored parameters.
      * @return
      */
-    float calcYFromPerigee() const;
+    double calcYFromPerigee() const;
 
     /**
      * Calculates the z coordinates of the perigee point with the internal stored parameters.
      * @return
      */
-    float calcZFromPerigee() const;
+    double calcZFromPerigee() const;
 
     /**
      * Calculates the x momentum of the particle at the perigee point from the internal stored parameters.
      * @param bField: correction factor if different from original bField
      * @return
      */
-    float calcPxFromPerigee(const float bField) const;
+    double calcPxFromPerigee(const float bField) const;
 
     /**
      * Calculates the y momentum of the particle at the perigee point from the internal stored parameters.
      * @param bField: correction factor if different from original bField
      * @return
      */
-    float calcPyFromPerigee(const float bField) const;
+    double calcPyFromPerigee(const float bField) const;
 
     /**
      * Calculates the z momentum of the particle at the perigee point from the internal stored parameters.
      * @param bField: correction factor if different from original bField
      * @return
      */
-    float calcPzFromPerigee(const float bField) const;
+    double calcPzFromPerigee(const float bField) const;
 
     /**
      * Calculate the 6 dimensional covariance matrix from the internal 5 dimensional representation.

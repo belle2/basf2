@@ -732,6 +732,16 @@ namespace Belle2 {
       return result;
     }
 
+    double particleDaughterAngle(const Particle* particle)
+    {
+      if (particle->getNDaughters() != 2)
+        return 0.0;
+
+      const TVector3 a = particle->getDaughter(0)->getMomentum();
+      const TVector3 b = particle->getDaughter(1)->getMomentum();
+      return cos(a.Angle(b));
+    }
+
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
     REGISTER_VARIABLE("px", particlePx, "momentum component x");
@@ -840,6 +850,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("clusterTrackMatch", eclClusterTrackMatched,    "number of charged track matched to this cluster");
 
     REGISTER_VARIABLE("decayAngle", particleDecayAngle, "cosine of the angle between the mother momentum vector and the direction of the first daughter in the mother's rest frame");
+    REGISTER_VARIABLE("daughterAngle", particleDaughterAngle, "cosine of the angle between the first two daughters, in lab frame");
   }
 }
 

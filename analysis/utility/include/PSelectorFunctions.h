@@ -573,6 +573,14 @@ namespace Belle2 {
      */
     double particleDecayAngle(const Particle* particle);
 
+    /**
+     * function for PSelector
+     *
+     * @param part const pointer to Particle
+     * @return cosine of the angle between the first two daughters, in lab frame
+     */
+    double particleDaughterAngle(const Particle* particle);
+
   }
 } // Belle2 namespace
 

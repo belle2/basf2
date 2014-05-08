@@ -1,0 +1,6 @@
+Import('env')
+
+env['LIBS'] = ['framework', 'analysis_dataobjects', 'ecl_dataobjects', 'mdst_dataobjects']
+#env['LIBS'] = ['framework', 'analysis_dataobjects', 'ecl_dataobjects', 'mdst_dataobjects', 'analysis_utility']
+
+Return('env')

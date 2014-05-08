@@ -402,3 +402,18 @@ def TagV(list_name, confidenceLevel, path=analysis_main):
     path.add_module(tvfit)
 
 
+def buildContinuumSuppression(list_name, path=analysis_main):
+    """
+    Creates for each Particle in the given ParticleList a ContinuumSuppression 
+    dataobject and makes BASF2 relation between them.
+
+    @param list_name name of the input ParticleList
+    @param path      modules are added to this path
+    """
+
+    qqBuilder = register_module('ContinuumSuppressionBuilder')
+    qqBuilder.set_name('QQBuilder_' + list_name)
+    qqBuilder.param('particleList', list_name)
+    path.add_module(qqBuilder)
+
+

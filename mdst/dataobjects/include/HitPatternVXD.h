@@ -10,11 +10,12 @@
 
 #pragma once
 
+#include <framework/logging/Logger.h>
+
 #include <TObject.h>
 
 #include <bitset>
 #include <algorithm>
-#include <cassert>
 
 namespace Belle2 {
   /** Hit pattern of the VXD with efficient setters and getters.
@@ -54,9 +55,9 @@ namespace Belle2 {
      * This makes this function faster, but can result in ugly behaviour
      * if not used correctly. */
     void setLayer(const unsigned short layer, const unsigned short nHits) {
-      assert(layer < 8);
-      assert(m_pattern[s_layerBitOne[layer]] == 0);
-      assert(m_pattern[s_layerBitTwo[layer]] == 0);
+      B2ASSERT("Layer is out of range.", layer <= 8);
+      m_pattern[s_layerBitOne[layer]] = 0;
+      m_pattern[s_layerBitTwo[layer]] = 0;
       std::bitset<32> hit(nHits);
       hit <<= layer * 2;
       m_pattern = m_pattern | hit;
@@ -64,7 +65,7 @@ namespace Belle2 {
 
     /** Resetter for single layer.*/
     void resetLayer(const unsigned short layer) {
-      assert(layer < 8);
+      B2ASSERT("Layer is out of range.", layer <= 8);
       m_pattern.reset(s_layerBitOne[layer]);
       m_pattern.reset(s_layerBitTwo[layer]);
     }
@@ -74,7 +75,7 @@ namespace Belle2 {
      *  @return  True, if at lease one hit is in the layer specified in the argument.
      */
     bool hasLayer(const unsigned short layer) {
-      assert(layer < 8);
+      B2ASSERT("Layer is out of range.", layer <= 8);
       return (m_pattern & s_LayerMasks[layer]).any();
     }
 
@@ -83,7 +84,7 @@ namespace Belle2 {
      * @return Number of hits in the layer.
      * */
     unsigned short hitsInLayer(const unsigned short layer) {
-      assert(layer < 8);
+      B2ASSERT("Layer is out of range.", layer <= 8);
       short int bitOne = m_pattern[s_layerBitOne[layer]];
       short int bitTwo = m_pattern[s_layerBitTwo[layer]];
 

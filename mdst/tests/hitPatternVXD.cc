@@ -26,28 +26,19 @@ namespace Belle2 {
     unsigned int initValue = 0;
     HitPatternVXD myHitPattern(initValue);
 
-    for (unsigned int layer = 0; layer < 1 /*8*/; ++layer) {
-      for (short int nHits = 3; nHits >= 0; --nHits) {
+    short int aLayer = 3;
+    short int someHints = 2;
+    myHitPattern.setLayer(aLayer, someHints);
+    EXPECT_EQ(true, myHitPattern.hasLayer(aLayer));
+    myHitPattern.resetLayer(aLayer);
+    EXPECT_EQ(0, myHitPattern.hitsInLayer(aLayer));
+
+    for (unsigned int layer = 0; layer < 8; ++layer) {
+      for (short int nHits = 0; nHits < 4; ++nHits) {
         myHitPattern.setLayer(layer, nHits);
-        EXPECT_EQ(true, myHitPattern.hasLayer(layer));
         EXPECT_EQ(nHits, myHitPattern.hitsInLayer(layer));
-        --nHits;
-        myHitPattern.setLayer(layer, nHits);
-        EXPECT_EQ(true, myHitPattern.hasLayer(layer));
-        EXPECT_EQ(nHits, myHitPattern.hitsInLayer(layer));
-        --nHits;
-        myHitPattern.setLayer(layer, nHits);
-        EXPECT_EQ(true, myHitPattern.hasLayer(layer));
-        EXPECT_EQ(nHits, myHitPattern.hitsInLayer(layer));
-        --nHits;
-        myHitPattern.setLayer(layer, nHits);
-        EXPECT_EQ(false, myHitPattern.hasLayer(layer));
-        EXPECT_EQ(nHits, myHitPattern.hitsInLayer(layer));
-        unsigned int setForReset = 3;
-        myHitPattern.setLayer(layer, setForReset);
         myHitPattern.resetLayer(layer);
         EXPECT_EQ(0, myHitPattern.hitsInLayer(layer));
-
       }
     }
 

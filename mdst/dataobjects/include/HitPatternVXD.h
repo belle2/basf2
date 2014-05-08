@@ -49,10 +49,17 @@ namespace Belle2 {
     // ---------------- LAYER FUNCTIONS -------------------------------
     // ----------------------------------------------------------------
 
-    /** Setter for single layer. */
-    void setLayer(const unsigned short layer, const unsigned short /*nHits*/) {
+    /** Setter for single layer.
+     * NOTE: Each layer has to be resettet, before it can be set again.
+     * This makes this function faster, but can result in ugly behaviour
+     * if not used correctly. */
+    void setLayer(const unsigned short layer, const unsigned short nHits) {
       assert(layer < 8);
-      //COMMENT: Switch vs. int to binary
+      assert(m_pattern[s_layerBitOne[layer]] == 0);
+      assert(m_pattern[s_layerBitTwo[layer]] == 0);
+      std::bitset<32> hit(nHits);
+      hit <<= layer * 2;
+      m_pattern = m_pattern | hit;
     }
 
     /** Resetter for single layer.*/
@@ -77,7 +84,14 @@ namespace Belle2 {
      * */
     unsigned short hitsInLayer(const unsigned short layer) {
       assert(layer < 8);
-      return 0;
+      short int bitOne = m_pattern[s_layerBitOne[layer]];
+      short int bitTwo = m_pattern[s_layerBitTwo[layer]];
+
+      if (bitTwo == 0 && bitOne == 0) return 0;
+      if (bitTwo == 0 && bitOne == 1) return 1;
+      if (bitTwo == 1 && bitOne == 0) return 2;
+      if (bitTwo == 1 && bitOne == 1) return 3;
+      else return 0;
     }
 
 

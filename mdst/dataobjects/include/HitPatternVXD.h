@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck                                              *
+ * Contributors: Martin Heck, Markus Prim                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,6 +14,7 @@
 
 #include <bitset>
 #include <algorithm>
+#include <cassert>
 
 namespace Belle2 {
   /** Hit pattern of the VXD with efficient setters and getters.
@@ -23,6 +24,7 @@ namespace Belle2 {
    *  This class was developed after and is similar to
    *  @sa HitPatternCDC
    *  We only save hits from the outgoing arm.
+   *  GENERAL COMMENT: 32 Bits are reserved, but only 16 are used so far. Think about a application for them.
    */
   class HitPatternVXD : public TObject {
   public:
@@ -33,14 +35,51 @@ namespace Belle2 {
     HitPatternVXD(const unsigned int initValue) : m_pattern(initValue)
     {}
 
+    /** Getter for the underlying integer type.*/
+    unsigned int getInteger() const {
+      return m_pattern.to_ulong();
+    }
+
+    /** Getter for underlying bitset.*/
+    std::bitset<32> getBitset() const {
+      return m_pattern;
+    }
+
+    // ----------------------------------------------------------------
+    // ---------------- LAYER FUNCTIONS -------------------------------
+    // ----------------------------------------------------------------
+
+    /** Setter for single layer. */
+    void setLayer(const unsigned short layer, const unsigned short /*nHits*/) {
+      assert(layer < 8);
+      //COMMENT: Switch vs. int to binary
+    }
+
+    /** Resetter for single layer.*/
+    void resetLayer(const unsigned short layer) {
+      assert(layer < 8);
+      m_pattern.reset(s_layerBitOne[layer]);
+      m_pattern.reset(s_layerBitTwo[layer]);
+    }
+
     /** Getter for single Layer.
      *
-     *  FIXME This is not yet implemented.
      *  @return  True, if at lease one hit is in the layer specified in the argument.
      */
-    bool hasLayer(const unsigned short&) {
-      return 1;
+    bool hasLayer(const unsigned short layer) {
+      assert(layer < 8);
+      return (m_pattern & s_LayerMasks[layer]).any();
     }
+
+    /** Getter for hits in layer.
+     *
+     * @return Number of hits in the layer.
+     * */
+    unsigned short hitsInLayer(const unsigned short layer) {
+      assert(layer < 8);
+      return 0;
+    }
+
 
   private:
     /** Storing of actual hit pattern.
@@ -52,6 +91,12 @@ namespace Belle2 {
      *  1-4 = normal hit, 5-8 = rescue hit, 9-12 = normal gated mode, 13-16 = rescue during gated mode;
      */
     std::bitset<32> m_pattern;
+
+    static const std::bitset<32> s_LayerMasks[8]; /**<  Masks to zero out all bits from other layers.*/
+    static const std::bitset<32> s_infoLayerMask;  /**<  Mask to zero out all bits from other layers. */
+
+    static const std::vector<unsigned short> s_layerBitOne; /**< For the access of a specific layer.*/
+    static const std::vector<unsigned short> s_layerBitTwo; /**< For the access of a specific layer.*/
 
     //-----------------------------------------------------------------------------------
     /** ROOTification for python access, but without I/O. */

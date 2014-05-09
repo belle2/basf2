@@ -30,6 +30,7 @@ namespace Belle2 {
     //void insertTrackAndPositionInGrid(TVector3 position, genfit::Track* gftrack, std::vector<std::vector<std::vector<TVector3>*>*>* positions_grid,
     //                                   std::vector<std::vector<std::vector<genfit::Track*>*>*>* tracks_grid);
     double m_CDC_wall_radius;
+    double m_chi2_max;
     std::string m_VXDGFTracksColName;
     std::string m_CDCGFTracksColName;
     std::string m_GFTracksColName;
@@ -51,12 +52,16 @@ namespace Belle2 {
     double m_total_pairs;
     double m_total_matched_pairs;
     //root tree variables
+    //int nEv;
+    int m_nevent;
     int m_npair;
+    int m_ntruepair;
     int m_ncdc_trk;
     int m_nVXD_trk;
     double m_trk_mrg_eff;
     std::vector<int>* m_match_vec;
-    std::vector<int>* m_pre_match_vec;
+    std::vector<int>* m_true_match_vec;
+    std::vector<int>* m_right_match_vec;
     std::vector<float>* m_chi2_vec;
     std::vector<float>* m_dist_vec;
     std::vector<float>* m_dx_vec;
@@ -65,6 +70,7 @@ namespace Belle2 {
     std::vector<float>* m_x_vec;
     std::vector<float>* m_y_vec;
     std::vector<float>* m_z_vec;
+    std::vector<float>* m_pos_vec;
     std::vector<float>* m_dmom_vec;
     std::vector<float>* m_dmomx_vec;
     std::vector<float>* m_dmomy_vec;
@@ -72,6 +78,11 @@ namespace Belle2 {
     std::vector<float>* m_momx_vec;
     std::vector<float>* m_momy_vec;
     std::vector<float>* m_momz_vec;
+    std::vector<float>* m_mom_vec;
+    std::vector<float>* m_VXDmomx_vec;
+    std::vector<float>* m_VXDmomy_vec;
+    std::vector<float>* m_VXDmomz_vec;
+    std::vector<float>* m_VXDmom_vec;
   };
 }
 #endif

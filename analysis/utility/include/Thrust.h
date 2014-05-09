@@ -37,7 +37,7 @@ namespace Belle2 {
 // ----------------------------------------------------------------------
 // TODO: Find out if 'axis(0,0,0)' is correct. Belle code has 'axis(0)'.
   struct Thrust {
-    Thrust() : tmax(0), tmin(0), axis(0, 0, 0), thru(0) {}
+    Thrust() : tmax(0), tmin(0), obl(0), axis(0, 0, 0), thru(0) {}
     double tmax;   // TMA
     double tmin;   // TMI
     double obl;

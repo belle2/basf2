@@ -53,7 +53,7 @@ TVector3 TrackFitResult::getMomentum(const float bField) const
 
 float TrackFitResult::getTransverseMomentum(const float bField) const
 {
-  return 1 / getAlpha(bField) / m_tau[0];
+  return std::fabs(1 / getAlpha(bField) / m_tau.at(2));
 }
 
 TMatrixF TrackFitResult::getCovariance5() const

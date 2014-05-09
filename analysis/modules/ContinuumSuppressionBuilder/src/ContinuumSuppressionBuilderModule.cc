@@ -11,20 +11,13 @@
 #include <analysis/modules/ContinuumSuppressionBuilder/ContinuumSuppressionBuilderModule.h>
 
 #include <analysis/dataobjects/ParticleList.h>
-
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <ecl/dataobjects/ECLGamma.h>
-#include <ecl/dataobjects/ECLPi0.h>
-#include <ecl/dataobjects/ECLShower.h>
-
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
-
 #include <framework/logging/Logger.h>
-
 #include <iostream>
 
 using namespace Belle2;

@@ -12,11 +12,9 @@
 #define CONTINUUMSUPPRESSIONBUILDERMODULE_H
 
 #include <framework/core/Module.h>
-
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
-
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/Thrust.h>
 #include <analysis/utility/KsfwMoments.h>

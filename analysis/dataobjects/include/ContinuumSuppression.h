@@ -48,37 +48,37 @@ namespace Belle2 {
     void addThrustBm(float thrustBm);
 
     float getThrustBm(void) const {
-      return float(m_thrustBm);
+      return m_thrustBm;
     }
 
     void addThrustOm(float thrustOm);
 
     float getThrustOm(void) const {
-      return float(m_thrustOm);
+      return m_thrustOm;
     }
 
     void addCosTBTO(float cosTBTO);
 
     float getCosTBTO(void) const {
-      return float(m_cosTBTO);
+      return m_cosTBTO;
     }
 
     void addCosTBz(float cosTBz);
 
     float getCosTBz(void) const {
-      return float(m_cosTBz);
+      return m_cosTBz;
     }
 
     void addKsfwFS0(std::vector<float> ksfwFS0);
 
     std::vector<float> getKsfwFS0(void) const {
-      return std::vector<float>(m_ksfwFS0);
+      return m_ksfwFS0;
     }
 
     void addKsfwFS1(std::vector<float> ksfwFS1);
 
     std::vector<float> getKsfwFS1(void) const {
-      return std::vector<float>(m_ksfwFS1);
+      return m_ksfwFS1;
     }
 
 

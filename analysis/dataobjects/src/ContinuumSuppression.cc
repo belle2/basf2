@@ -9,14 +9,8 @@
  **************************************************************************/
 
 #include <analysis/dataobjects/ContinuumSuppression.h>
-
 #include <framework/datastore/StoreArray.h>
-
-#include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLGamma.h>
-#include <ecl/dataobjects/ECLPi0.h>
 #include <mdst/dataobjects/Track.h>
-
 #include <framework/logging/Logger.h>
 #include <iostream>
 

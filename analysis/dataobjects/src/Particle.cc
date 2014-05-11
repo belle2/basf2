@@ -124,8 +124,8 @@ Particle::Particle(const Track* track,
   m_pValue = trackFit->getPValue();
 
   // set error matrix
-  TMatrixF cov6 = trackFit->getCovariance6();
-  unsigned order[] = {c_X, c_Y, c_Z, c_Px, c_Py, c_Pz}; // TODO: is the order correct?
+  TMatrixF cov6(trackFit->getCovariance6());
+  unsigned order[] = {c_X, c_Y, c_Z, c_Px, c_Py, c_Pz};
 
   TMatrixFSym errMatrix(c_DimMatrix);
   for (int i = 0; i < 6; i++) {

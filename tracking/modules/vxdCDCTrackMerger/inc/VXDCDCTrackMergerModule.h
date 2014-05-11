@@ -61,7 +61,7 @@ namespace Belle2 {
     //std::string m_mergedCDCGFTracksColName;
     std::string m_VXDGFTracksColName;
     std::string m_CDCGFTracksColName;
-    std::string m_GFTracksColName;
+    //    std::string m_GFTracksColName;
     std::string m_TrackCandColName;
     std::string m_relMatchedTracks;
     //std::string m_mcParticlesColName;

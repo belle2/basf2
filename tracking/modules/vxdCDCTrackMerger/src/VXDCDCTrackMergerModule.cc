@@ -20,19 +20,19 @@ VXDCDCTrackMergerModule::VXDCDCTrackMergerModule() : Module()
   //addParam("CDC_wall_radius",    m_CDC_wall_radius,    "This parameters stands for either the inner or the outer CDC wall radius", double(100.0));
 
   //input tracks and candidates
-  addParam("GFTracksColName",  m_GFTracksColName,  "Originary GFTrack collection");
-  addParam("VXDGFTracksColName",  m_VXDGFTracksColName,  "VXDlicon GFTrack collection");
-  addParam("CDCGFTracksColName", m_CDCGFTracksColName, "CDC GFTrack collection");
-  addParam("TrackCandColName", m_TrackCandColName, "CDC Track Cand collection");
+  //addParam("GFTracksColName",  m_GFTracksColName,  "GFTrack collection");
+  addParam("VXDGFTracksColName",  m_VXDGFTracksColName,  "VXDl GFTrack collection (from GFTrackSplitter)");
+  addParam("CDCGFTracksColName", m_CDCGFTracksColName, "CDC GFTrack collection (from GFTrackSplitter)");
+  addParam("TrackCandColName", m_TrackCandColName, "Track Cand collection (from TrackFinder)");
 
   //addParam("mergedVXDGFTracksColName",  m_mergedVXDGFTracksColName,  "Succesfully merged Silicon GFTrack collection");
   //addParam("mergedCDCGFTracksColName", m_mergedCDCGFTracksColName, "Succesfully merged CDC GFTrack collection");
 
   //output relationArray
-  addParam("relMatchedTracks", m_relMatchedTracks, "Relation Array for Merged Tracks");
+  addParam("relMatchedTracks", m_relMatchedTracks, "Output RelationArray for Merged Tracks");
 
   //Chi2 Cut
-  addParam("chi2_max", m_chi2_max, "Maximum Chi^2 for matching", double(100.0));
+  addParam("chi2_max", m_chi2_max, "Chi^2 cut for matching", double(100.0));
 }
 
 
@@ -44,7 +44,7 @@ VXDCDCTrackMergerModule::~VXDCDCTrackMergerModule()
 void VXDCDCTrackMergerModule::initialize()
 {
   StoreArray<genfit::TrackCand>::required(m_TrackCandColName);
-  StoreArray<genfit::Track>::required(m_GFTracksColName);
+  //StoreArray<genfit::Track>::required(m_GFTracksColName);
   StoreArray<genfit::Track>::required(m_VXDGFTracksColName);
   StoreArray<genfit::Track>::required(m_CDCGFTracksColName);
 
@@ -77,7 +77,7 @@ void VXDCDCTrackMergerModule::event()
   B2INFO("VXDCDCTrackMerger: input Number of CDC Tracks: " << nCDCTracks);
   if (nCDCTracks == 0) B2WARNING("VXDCDCTrackMerger: CDCGFTracksCollection is empty!");
 
-  StoreArray<genfit::Track> mcGFTracks(m_GFTracksColName);
+  //StoreArray<genfit::Track> mcGFTracks(m_GFTracksColName);
   const StoreArray<genfit::TrackCand> TrackCand(m_TrackCandColName);
   //StoreArray<genfit::Track> mergedCDCGFTracks(m_mergedCDCGFTracksColName);
   //StoreArray<genfit::Track> mergedVXDGFTracks(m_mergedVXDGFTracksColName);

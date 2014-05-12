@@ -29,8 +29,8 @@ namespace Belle2 {
                    "See also https://belle2.cc.kek.jp/~twiki/bin/view/Software/TMVA for detailed instructions.");
     //setPropertyFlags(c_ParallelProcessingCertified);
 
-    addParam("listNames", m_listNames, "Input particle list names as list");
-    addParam("methods", m_methods, "Vector of Tuples with (Name, Type, Config) of the methods. Valid types are: BDT, KNN, NeuroBayes, Fisher. The Config is passed to the TMVA Method and is documented in the TMVA UserGuide.");
+    addParam("listNames", m_listNames, "Particles from these ParticleLists are used as input.");
+    addParam("methods", m_methods, "Vector of Tuples with (Name, Type, Config) of the methods. Valid types are: BDT, KNN, Fisher, Plugin. For type 'Plugin', the plugin matching the Name attribute will be loaded (e.g. NeuroBayes). The Config is passed to the TMVA Method and is documented in the TMVA UserGuide.");
     addParam("prefix", m_methodPrefix, "Prefix which is used by the TMVAInterface to store its configfile $prefix.config and by TMVA itself to write the files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml with additional information", std::string("TMVA"));
     addParam("workingDirectory", m_workingDirectory, "Working directory in which the config file and the weight file directory is created", std::string("."));
     addParam("variables", m_variables, "Input variables used by the TMVA method");

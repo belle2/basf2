@@ -61,11 +61,6 @@ namespace Belle2 {
      */
     virtual void terminate();
 
-    /**
-     * Prints module parameters.
-     */
-    void printModuleParams() const;
-
   private:
 
     std::vector<std::string> m_listNames; /**< input particle list names */

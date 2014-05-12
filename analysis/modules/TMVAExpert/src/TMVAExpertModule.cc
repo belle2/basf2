@@ -33,7 +33,7 @@ namespace Belle2 {
                    "See also https://belle2.cc.kek.jp/~twiki/bin/view/Software/TMVA for detailed instructions.");
     setPropertyFlags(c_ParallelProcessingCertified);
 
-    addParam("listNames", m_listNames, "Input particle list names as list");
+    addParam("listNames", m_listNames, "Particles from these ParticleLists are used as input.");
     addParam("method", m_methodName, "Method name specified in the training via TMVATeacher.");
     addParam("prefix", m_methodPrefix, "Common prefix for the methods trained by TMVATeacher. "
              "The prefix is used by the TMVAInterface to read its configfile $prefix.config "
@@ -91,10 +91,6 @@ namespace Belle2 {
         particle->addExtraInfo(m_signalProbabilityName, targetValue);
       }
     }
-  }
-
-  void TMVAExpertModule::printModuleParams() const
-  {
   }
 
 } // Belle2 namespace

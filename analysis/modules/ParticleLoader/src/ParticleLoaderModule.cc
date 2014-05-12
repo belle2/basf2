@@ -123,8 +123,7 @@ namespace Belle2 {
       if (!mc->hasStatus(bitmask)) continue;
       for (int k = 0; k < Npdg; k++) {
         if (abs(mc->getPDG()) == pdgCode[k]) {
-          Particle particle(mc);
-          Particle* newPart = Particles.appendNew(particle);
+          Particle* newPart = Particles.appendNew(mc);
           newPart->addRelationTo(mc);
           break;
         }

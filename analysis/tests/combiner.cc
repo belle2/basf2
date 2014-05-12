@@ -10,6 +10,7 @@
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
 
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
@@ -136,6 +137,39 @@ namespace {
     EXPECT_EQ(std::vector<unsigned int>({1, 3, 2}), indexCombiner.getCurrentIndices());
     EXPECT_FALSE(indexCombiner.loadNext());
 
+  }
+
+  TEST_F(ParticleCombinerTest, MuPlusMuMinus)
+  {
+    StoreObjPtr<ParticleList> inputA("a");
+    StoreObjPtr<ParticleList> inputB("b");
+
+    DataStore::Instance().setInitializeActive(true);
+    inputA.registerAsPersistent();
+    inputB.registerAsPersistent();
+    DataStore::Instance().setInitializeActive(false);
+
+    StoreArray<Particle> particles;
+    particles.appendNew(TLorentzVector(), 13, Particle::c_Flavored, Particle::c_MCParticle, 0);
+    particles.appendNew(TLorentzVector(), -13, Particle::c_Flavored, Particle::c_MCParticle, 1);
+
+    inputA.create();
+    inputA->setPDG(13);
+    inputA->addParticle(particles[0]);
+    inputA->addParticle(particles[1]);
+
+    inputB.create();
+    inputB->setPDG(-13);
+    inputB->addParticle(particles[0]);
+    inputB->addParticle(particles[1]);
+
+
+    ParticleCombiner combiner({"a", "b"}, true); //self-conjugated decay
+    int nCombinations = 0;
+    while (combiner.loadNext()) {
+      nCombinations++;
+    }
+    EXPECT_EQ(1, nCombinations);
 
   }
 

@@ -132,7 +132,6 @@ namespace Belle2 {
       listCombiner.init((ParticleList::EParticleType)(iType));
       while (listCombiner.loadNext()) {
 
-        m_usedCombinations.clear();
         const auto& types = listCombiner.getCurrentTypes();
         std::vector<unsigned int> sizes(numberOfLists);
         for (unsigned int i = 0; i < numberOfLists; ++i) {

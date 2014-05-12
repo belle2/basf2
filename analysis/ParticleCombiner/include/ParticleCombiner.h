@@ -119,7 +119,9 @@ namespace Belle2 {
   };
 
   /**
-   * ParticleCombiner combines ParticleLists to a new ParticleList using the ListCombiner and IndexCombiner
+   * ParticleCombiner combines ParticleLists to a new ParticleList using the ListCombiner and IndexCombiner.
+   *
+   * \note This class retains state, so create a new ParticleCombiner object for each event.
    */
   class ParticleCombiner {
 

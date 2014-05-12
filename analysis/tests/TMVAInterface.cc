@@ -13,7 +13,13 @@
 #include <analysis/dataobjects/Particle.h>
 #include <framework/utilities/FileSystem.h>
 #include <framework/utilities/TestHelpers.h>
+#include <analysis/dataobjects/ParticleExtraInfoMap.h>
+#include <framework/datastore/StoreObjPtr.h>
+
 #include <gtest/gtest.h>
+
+#include <TRandom3.h>
+
 #include <fstream>
 
 using namespace Belle2;
@@ -113,12 +119,64 @@ namespace {
 
   }
 
-  /*
-      TEST(TMVAInterface, TeacherTrainsCorrectly)
-      {
+  TEST(TMVAInterface, TeacherTrainsCorrectly)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
+    DataStore::Instance().setInitializeActive(false);
 
-        // TODO how to test the teacher?
+    std::vector<std::string> variables = {"p", "someInput"};
+    std::string target = "target";
+    VariableManager::Instance().registerParticleExtraInfoVariable("target", "target for TMVA Teacher unit test");
+    VariableManager::Instance().registerParticleExtraInfoVariable("someInput", "some input variable");
 
-      }
-      */
+    std::vector<TMVAInterface::Method> methods;
+    //methods.push_back(TMVAInterface::Method("NeuroBayes", "Plugin", "!H:CreateMVAPdfs:V:NTrainingIter=50:TrainingMethod=BFGS", variables));
+    //methods.push_back(TMVAInterface::Method("FastBDT", "Plugin", "!H:CreateMVAPdfs:V", variables));
+    methods.push_back(TMVAInterface::Method("BDTGradient", "BDT", "!H:CreateMVAPdfs:!V:NTrees=100:BoostType=Grad:Shrinkage=0.10:UseBaggedGrad:GradBaggingFraction=0.5:nCuts=10:MaxDepth=2", variables));
+    TMVAInterface::Teacher teacher("unittest", ".", target, methods);
+
+    std::string factoryOption = "!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification";
+    std::string prepareOption = "SplitMode=random:!V";
+
+    gRandom->SetSeed(23);
+
+    //add sample
+    int n = 20000;
+    for (int i = 0; i < n; i++) {
+      double target = (i < (n / 2) or (i % 13 == 0)) * 1.0;
+      TLorentzVector v;
+      v.SetPtEtaPhiM((i % 900) * 0.1, 0.1, i * 0.1, 0.139);
+      Particle p(v, 211);
+      p.addExtraInfo("someInput", gRandom->Gaus() + target * 0.5);
+
+      p.addExtraInfo("target", target);
+      teacher.addSample(&p);
+    }
+
+    teacher.train(factoryOption, prepareOption);
+
+    Expert expert("unittest", ".", methods[0].getName(), 1);
+    {
+      Particle p({ 1.1 , 1.0, 0.0, 0.0 }, 211);
+      p.addExtraInfo("someInput", -3.0);
+      EXPECT_TRUE(expert.analyse(&p) < 0.4);
+    }
+    {
+      //different p, should be similar to last one
+      Particle p({ 2.1 , 1.0, 0.0, 0.0 }, 211);
+      p.addExtraInfo("someInput", -3.0);
+      EXPECT_TRUE(expert.analyse(&p) < 0.4);
+    }
+    {
+      Particle p({ 1.1 , 1.0, 0.0, 0.0 }, 211);
+      p.addExtraInfo("someInput", 3.0);
+      EXPECT_TRUE(expert.analyse(&p) > 0.75);
+    }
+    {
+      Particle p({ 2.1 , 1.0, 0.0, 0.0 }, 211);
+      p.addExtraInfo("someInput", 3.0);
+      EXPECT_TRUE(expert.analyse(&p) > 0.75);
+    }
+  }
 }

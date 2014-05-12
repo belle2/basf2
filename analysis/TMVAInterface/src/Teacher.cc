@@ -39,7 +39,7 @@ namespace Belle2 {
       VariableManager& manager = VariableManager::Instance();
       m_target_var =  manager.getVariable(target);
       if (m_target_var == nullptr) {
-        B2ERROR("Couldn't find target variable " << target << " via the VariableManager. Check the name!")
+        B2FATAL("Couldn't find target variable " << target << " via the VariableManager. Check the name!")
       }
       m_target = 0;
 

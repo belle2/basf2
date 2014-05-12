@@ -15,6 +15,8 @@ createParamTable runcontrol.node ${DIR}/
 createParamTable runcontrol.nsmdata ${DIR}/
 createParamTable hvconfig ${DIR}/
 createParamTable hvconfig.channel ${DIR}/
+createParamTable hvconfig.valueset ${DIR}/
+createParamTable hvconfig.valueset.value ${DIR}/
 
 addParamConfig ARICH copper.hslb ${DIR}/copper.hslb.csv
 addParamConfig ARICH copper ${DIR}/copper.csv
@@ -23,5 +25,7 @@ addParamConfig ARICH ropc ${DIR}/ropc.csv
 addParamConfig DAQ runcontrol.node ${DIR}/runcontrol.node.csv
 addParamConfig DAQ runcontrol.nsmdata ${DIR}/runcontrol.nsmdata.csv
 addParamConfig DAQ runcontrol ${DIR}/runcontrol.csv
-addParamConfig ARICH hvconfig.channel ${DIR}/arich.csv
+addParamConfig ARICH hvconfig.valueset.value ${DIR}/arich.hvconfig.valueset.value.csv
+addParamConfig ARICH hvconfig.valueset ${DIR}/arich.hvconfig.valueset.csv
+addParamConfig ARICH hvconfig.channel ${DIR}/arich.hvconfig.channel.csv
 addParamConfig ARICH hvconfig ${DIR}/arich.hvconfig.csv

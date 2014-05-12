@@ -39,41 +39,14 @@ void HVControlCallback::init() throw()
     std::string nodename = getNode().getName();
     ConfigObject obj(table.get("default", nodename));
     status->configid = obj.getId();
-    ConfigObjectList& obj_v(obj.getObjects("channel"));
-    for (size_t i = 0; i < obj_v.size(); i++) {
-      m_config_v.push_back(HVChannelConfig(obj_v[i]));
+    m_config.set(obj);
+    for (size_t i = 0; i < m_config.getNChannels(); i++) {
       m_status_v.push_back(HVChannelStatus());
     }
     m_db->close();
   }
   PThread(new HVNodeMonitor(this));
   initialize();
-}
-
-bool HVControlCallback::rampup() throw()
-{
-  HVState state(getNode().getState());
-  if (state == HVState::STANDBY_S) {
-    return standby2();
-  } else if (state == HVState::STANDBY2_S) {
-    return standby3();
-  } else if (state == HVState::STANDBY3_S) {
-    return peak();
-  }
-  return true;
-}
-
-bool HVControlCallback::rampdown() throw()
-{
-  HVState state(getNode().getState());
-  if (state == HVState::STANDBY2_S) {
-    return standby();
-  } else if (state == HVState::STANDBY3_S) {
-    return standby2();
-  } else if (state == HVState::PEAK_S) {
-    return standby3();
-  }
-  return true;
 }
 
 bool HVControlCallback::config() throw()
@@ -87,11 +60,7 @@ bool HVControlCallback::config() throw()
       ConfigObject obj(table.get(configname, nodename));
       hv_status* status = (hv_status*)m_data.get();
       status->configid = obj.getId();
-      m_config_v = HVChannelConfigList();
-      ConfigObjectList& obj_v(obj.getObjects("channel"));
-      for (size_t i = 0; i < obj_v.size(); i++) {
-        m_config_v.push_back(HVChannelConfig(obj_v[i]));
-      }
+      m_config.set(obj);
     } catch (const DBHandlerException& e) {
       LogFile::debug("DB access error:%s", e.what());
       setReply("DB access error");
@@ -111,7 +80,7 @@ void HVControlCallback::monitor() throw()
   bool is_error = false;
   bool is_off = true;
   hv_status* status = (hv_status*)m_data.get();
-  for (size_t i = 0; i < m_config_v.size() && i < MAX_HVCHANNELS; i++) {
+  for (size_t i = 0; i < m_config.getNChannels() && i < MAX_HVCHANNELS; i++) {
     HVChannelStatus& ch_status(m_status_v[i]);
     if (ch_status.getState() != HVState::OFF_S) is_off = false;
     if (ch_status.getState().isTransition()) is_transition = true;
@@ -135,13 +104,13 @@ void HVControlCallback::monitor() throw()
     getCommunicator()->replyError(getReply());
   } else if ((s_org.isTransition() && s.isStable()) ||
              (s_org != HVState::OFF_S && s == HVState::OFF_S) ||
-             (count >= 10 && s != HVState::OFF_S)) {
+             (count >= 3 && s != HVState::OFF_S)) {
     getCommunicator()->replyOK(getNode());
   }
   m_db->connect();
   LoggerObjectTable(m_db).add(m_data);
   m_db->close();
-  if (count >= 10) count = 0;
+  if (count >= 3) count = 0;
 }
 
 void HVControlCallback::HVNodeMonitor::run()

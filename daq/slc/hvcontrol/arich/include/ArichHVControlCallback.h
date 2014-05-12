@@ -22,8 +22,7 @@ namespace Belle2 {
     virtual bool turnon() throw();
     virtual bool turnoff() throw();
     virtual bool standby() throw();
-    virtual bool standby2() throw();
-    virtual bool standby3() throw();
+    virtual bool shoulder() throw();
     virtual bool peak() throw();
 
   private:

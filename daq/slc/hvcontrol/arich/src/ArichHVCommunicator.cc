@@ -47,31 +47,29 @@ bool ArichHVCommunicator::configure() throw()
         msg.setSwitchOn(false);
         send(msg);
       }
-      for (size_t i = 0; i < m_callback->getNChannels(); i++) {
-        HVChannelConfig config = m_callback->getChannelConfig(i);
-        if (config.getCrate() != m_crateid) continue;
-        ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::ALL,
-                           config.getSlot(), config.getChannel());
-        msg.setVoltageLimit(config.getVoltageLimit());
-        msg.setCommand(ArichHVMessage::VOLTAGE_LIMIT);
-        send(msg);
-        msg.setCurrentLimit(config.getCurrentLimit());
-        msg.setCommand(ArichHVMessage::CURRENT_LIMIT);
-        send(msg);
-        msg.setRampUpSpeed(config.getRampUpSpeed());
-        msg.setCommand(ArichHVMessage::RAMPUP_SPEED);
-        send(msg);
-        msg.setRampDownSpeed(config.getRampDownSpeed());
-        msg.setCommand(ArichHVMessage::RAMPDOWN_SPEED);
-        send(msg);
-      }
-      for (int j = 0; j < 4; j++) {
+      const HVConfig& config(m_callback->getConfig());
+      for (size_t j = 0; j < config.getNValueSets(); j++) {
+        const HVValueSet& value_v(config.getValueSet(j));
         for (size_t i = 0; i < m_callback->getNChannels(); i++) {
-          HVChannelConfig config = m_callback->getChannelConfig(i);
-          if (config.getCrate() != m_crateid) continue;
-          ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::VOLTAGE_DEMAND,
-                             config.getSlot(), config.getChannel());
-          int voltage_demand = config.getVoltageDemand((HVDemand)j) * config.isTurnOn();
+          const HVChannel& channel(config.getChannel(i));
+          if (channel.getCrate() != m_crateid) continue;
+          const HVValue& value(value_v[i]);
+          ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::ALL,
+                             channel.getSlot(), channel.getChannel());
+          msg.setVoltageLimit(value.getVoltageLimit());
+          msg.setCommand(ArichHVMessage::VOLTAGE_LIMIT);
+          send(msg);
+          msg.setCurrentLimit(value.getCurrentLimit());
+          msg.setCommand(ArichHVMessage::CURRENT_LIMIT);
+          send(msg);
+          msg.setRampUpSpeed(value.getRampUpSpeed());
+          msg.setCommand(ArichHVMessage::RAMPUP_SPEED);
+          send(msg);
+          msg.setRampDownSpeed(value.getRampDownSpeed());
+          msg.setCommand(ArichHVMessage::RAMPDOWN_SPEED);
+          send(msg);
+          msg.setCommand(ArichHVMessage::VOLTAGE_DEMAND);
+          int voltage_demand = value.getVoltageDemand() * channel.isTurnOn();
           msg.setVoltageDemand(voltage_demand);
           send(msg);
         }
@@ -93,7 +91,7 @@ bool ArichHVCommunicator::turnon() throw()
 {
   m_mutex.lock();
   ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::RECALL, 0, 0);
-  msg.setStoreId((int)HVDemand::STANDBY + 1);
+  msg.setStoreId(1);
   send(msg);
   m_mutex.unlock();
   msg.setCommand(ArichHVMessage::SWITCH);
@@ -111,28 +109,21 @@ bool ArichHVCommunicator::turnoff() throw()
 bool ArichHVCommunicator::standby() throw()
 {
   ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::RECALL, 0, 0);
-  msg.setStoreId((int)HVDemand::STANDBY + 1);
+  msg.setStoreId(1);
   return perform(msg, HVState::STANDBY_S);
 }
 
-bool ArichHVCommunicator::standby2() throw()
+bool ArichHVCommunicator::shoulder() throw()
 {
   ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::RECALL, 0, 0);
-  msg.setStoreId((int)HVDemand::STANDBY2 + 1);
-  return perform(msg, HVState::STANDBY2_S);
-}
-
-bool ArichHVCommunicator::standby3() throw()
-{
-  ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::RECALL, 0, 0);
-  msg.setStoreId((int)HVDemand::STANDBY3 + 1);
-  return perform(msg, HVState::STANDBY3_S);
+  msg.setStoreId(2);
+  return perform(msg, HVState::SHOULDER_S);
 }
 
 bool ArichHVCommunicator::peak() throw()
 {
   ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::RECALL, 0, 0);
-  msg.setStoreId((int)HVDemand::PEAK + 1);
+  msg.setStoreId(3);
   return perform(msg, HVState::PEAK_S);
 }
 
@@ -183,9 +174,10 @@ bool ArichHVCommunicator::perform(ArichHVMessage& msg, HVState state) throw()
   if (m_available) {
     try {
       send(msg);
+      const HVConfig& config(m_callback->getConfig());
       for (size_t i = 0; i < m_callback->getNChannels(); i++) {
-        HVChannelConfig config = m_callback->getChannelConfig(i);
-        if (config.getCrate() == m_crateid && config.isTurnOn()) {
+        const HVChannel& channel(config.getChannel(i));
+        if (channel.getCrate() != m_crateid && channel.isTurnOn()) {
           HVChannelStatus& status(m_callback->getChannelStatus(i));
           HVState state_org = status.getState();
           if (state_org.isStable()) {

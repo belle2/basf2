@@ -109,6 +109,11 @@ void RunControlMasterCallback::timeout() throw()
 bool RunControlMasterCallback::log() throw()
 {
   NSMMessage& msg(getMessage());
+  if (msg.getLength() > 0) {
+    DAQLogMessage log;
+    msg.getData(log);
+    LoggerObjectTable(getDB()).add(log, true);
+  }
 }
 
 bool RunControlMasterCallback::ok() throw()

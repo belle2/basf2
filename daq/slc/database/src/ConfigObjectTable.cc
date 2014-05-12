@@ -72,8 +72,12 @@ throw()
             obj.addEnum(name, record.get(name), enum_m_m[name]);
           } else if (it->getType() == FieldInfo::OBJECT) {
             StringList str_v = StringUtil::split(record.get(name), ',');
-            obj.addObjects(name, getList(str_v[0], str_v[1], str_v[2],
-                                         atoi(str_v[3].c_str())));
+            if (str_v.size() > 3) {
+              obj.addObjects(name, getList(str_v[0], str_v[1], str_v[2],
+                                           atoi(str_v[3].c_str())));
+            } else {
+              obj.addObject(name, ConfigObject());
+            }
           }
         }
         obj_v.push_back(obj);

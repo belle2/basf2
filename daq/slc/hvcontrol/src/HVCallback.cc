@@ -17,16 +17,13 @@ HVCallback::HVCallback(const NSMNode& node) throw()
   : NSMCallback(node)
 {
   add(HVCommand::CONFIGURE);
-  add(HVCommand::RAMPUP);
-  add(HVCommand::RAMPDOWN);
   add(HVCommand::STANDBY);
-  add(HVCommand::STANDBY2);
-  add(HVCommand::STANDBY3);
+  add(HVCommand::SHOULDER);
   add(HVCommand::PEAK);
   add(HVCommand::TURNON);
   add(HVCommand::TURNOFF);
   getNode().setState(HVState::OFF_S);
-  _state_demand = HVState::OFF_S;
+  m_state_demand = HVState::OFF_S;
 }
 
 bool HVCallback::perform(const NSMMessage& msg) throw()
@@ -38,7 +35,7 @@ bool HVCallback::perform(const NSMMessage& msg) throw()
   HVState state(getNode().getState());
   bool result = true;
   NSMCommunicator* com = getCommunicator();
-  _state_demand = HVState::UNKNOWN;
+  m_state_demand = HVState::UNKNOWN;
   if (cmd == HVCommand::TURNOFF) {
     getNode().setState(HVState::TRANSITION_TS);
     result = turnoff();
@@ -47,57 +44,27 @@ bool HVCallback::perform(const NSMMessage& msg) throw()
       result = config();
     } else if (cmd == HVCommand::TURNON) {
       getNode().setState(HVState::TRANSITION_TS);
-      _state_demand = HVState::STANDBY_S;
+      m_state_demand = HVState::STANDBY_S;
       result = turnon();
     }
   } else if (state.isOn()) {
-    if (cmd == HVCommand::RAMPUP) {
-      if (state != HVState::PEAK_S) {
-        getNode().setState(HVState::RAMPINGUP_TS);
-        if (state == HVState::STANDBY_S) {
-          _state_demand = HVState::STANDBY2_S;
-        } else if (state == HVState::STANDBY2_S) {
-          _state_demand = HVState::STANDBY3_S;
-        } else if (state == HVState::STANDBY3_S) {
-          _state_demand = HVState::PEAK_S;
-        }
-        result = rampup();
-      }
-    } else if (cmd == HVCommand::RAMPDOWN) {
+    if (cmd == HVCommand::STANDBY) {
       if (state != HVState::STANDBY_S) {
-        getNode().setState(HVState::RAMPINGDOWN_TS);
-        result = rampdown();
-        if (state == HVState::STANDBY2_S) {
-          _state_demand = HVState::STANDBY_S;
-        } else if (state == HVState::STANDBY3_S) {
-          _state_demand = HVState::STANDBY2_S;
-        } else if (state == HVState::PEAK_S) {
-          _state_demand = HVState::STANDBY3_S;
-        }
-      }
-    } else if (cmd == HVCommand::PEAK) {
-      getNode().setState(HVState::TRANSITION_TS);
-      if (state != HVState::PEAK_S) {
-        _state_demand = HVState::PEAK_S;
-        result = peak();
-      }
-    } else if (cmd == HVCommand::STANDBY) {
-      getNode().setState(HVState::TRANSITION_TS);
-      if (state != HVState::STANDBY_S) {
-        _state_demand = HVState::STANDBY_S;
+        getNode().setState(HVState::TRANSITION_TS);
+        m_state_demand = HVState::STANDBY_S;
         result = standby();
       }
-    } else if (cmd == HVCommand::STANDBY2) {
-      getNode().setState(HVState::TRANSITION_TS);
-      if (state != HVState::STANDBY2_S) {
-        _state_demand = HVState::STANDBY2_S;
-        result = standby2();
+    } else if (cmd == HVCommand::SHOULDER) {
+      if (state != HVState::SHOULDER_S) {
+        getNode().setState(HVState::TRANSITION_TS);
+        m_state_demand = HVState::SHOULDER_S;
+        result = shoulder();
       }
-    } else if (cmd == HVCommand::STANDBY3) {
-      getNode().setState(HVState::TRANSITION_TS);
-      if (state != HVState::STANDBY3_S) {
-        _state_demand = HVState::STANDBY3_S;
-        result = standby3();
+    } else if (cmd == HVCommand::PEAK) {
+      if (state != HVState::PEAK_S) {
+        getNode().setState(HVState::TRANSITION_TS);
+        m_state_demand = HVState::PEAK_S;
+        result = peak();
       }
     }
   }
@@ -110,3 +77,4 @@ bool HVCallback::perform(const NSMMessage& msg) throw()
   LogFile::debug(getNode().getState().getLabel());
   return result;
 }
+

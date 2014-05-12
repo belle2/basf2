@@ -211,6 +211,7 @@ int main(int argc, char** argv)
           std::cout << std::endl;
         }
       }
+      continue;
       //print(obj, edited);
     } else if (command == "EDIT") {
       std::vector<std::string> sarg_v = StringUtil::split(str, ' ', 2);

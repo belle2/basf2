@@ -11,11 +11,8 @@ namespace Belle2 {
 
   public:
     static const HVCommand CONFIGURE;
-    static const HVCommand RAMPUP;
-    static const HVCommand RAMPDOWN;
     static const HVCommand STANDBY;
-    static const HVCommand STANDBY2;
-    static const HVCommand STANDBY3;
+    static const HVCommand SHOULDER;
     static const HVCommand PEAK;
     static const HVCommand RECOVER;
     static const HVCommand TURNON;

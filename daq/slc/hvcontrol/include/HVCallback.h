@@ -18,21 +18,18 @@ namespace Belle2 {
   public:
     virtual bool turnon() throw() { return true; }
     virtual bool turnoff() throw() { return true; }
-    virtual bool rampup() throw() { return true; }
-    virtual bool rampdown() throw() { return true; }
     virtual bool standby() throw() { return true; }
-    virtual bool standby2() throw() { return true; }
-    virtual bool standby3() throw() { return true; }
+    virtual bool shoulder() throw() { return true; }
     virtual bool peak() throw() { return true; }
     virtual bool recover() throw() { return true; }
     virtual bool config() throw() { return true; }
-    const HVState& getStateDemand() const throw() { return _state_demand; }
+    const HVState& getStateDemand() const throw() { return m_state_demand; }
 
   protected:
     virtual bool perform(const NSMMessage& msg) throw();
 
   private:
-    HVState _state_demand;
+    HVState m_state_demand;
 
   };
 

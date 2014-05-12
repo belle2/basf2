@@ -27,11 +27,8 @@ throw() : NSMCallback(node, interval)
   add(RCCommand::STATECHECK);
   add(RCCommand::TRIGFT);
   add(HVCommand::CONFIGURE);
-  add(HVCommand::RAMPUP);
-  add(HVCommand::RAMPDOWN);
   add(HVCommand::STANDBY);
-  add(HVCommand::STANDBY2);
-  add(HVCommand::STANDBY3);
+  add(HVCommand::SHOULDER);
   add(HVCommand::PEAK);
   add(HVCommand::TURNON);
   add(HVCommand::TURNOFF);
@@ -60,7 +57,6 @@ void NSM2SocketCallback::init() throw()
     try {
       std::cout << "open NSM data (" << data.getName() << ")" << std::endl;
       data.open(comm);
-      data.parse();
     } catch (const NSMHandlerException& e) {
       std::cout << e.what() << std::endl;
     }
@@ -76,7 +72,6 @@ void NSM2SocketCallback::timeout() throw()
     if (!data.isAvailable()) {
       try {
         data.open(comm);
-        data.parse();
       } catch (const NSMHandlerException& e) {
         std::cout << e.what() << std::endl;
       }

@@ -1,0 +1,5 @@
+ nodename,  config,             value
+ ARICH_HV, default,   default:standby
+ ARICH_HV, default,  default:shoulder1
+ ARICH_HV, default,  default:shoulder2
+ ARICH_HV, default,      default:peak

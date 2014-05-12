@@ -7,12 +7,9 @@ using namespace Belle2;
 const HVCommand HVCommand::CONFIGURE(101, "CONFIGURE");
 const HVCommand HVCommand::TURNON(102, "TURNON");
 const HVCommand HVCommand::TURNOFF(103, "TURNOFF");
-const HVCommand HVCommand::RAMPUP(104, "RAMPUP");
-const HVCommand HVCommand::RAMPDOWN(105, "RAMPDOWN");
 const HVCommand HVCommand::STANDBY(111, "STANDBY");
-const HVCommand HVCommand::STANDBY2(112, "STANDBY2");
-const HVCommand HVCommand::STANDBY3(113, "STANDBY3");
-const HVCommand HVCommand::PEAK(114, "PEAK");
+const HVCommand HVCommand::SHOULDER(112, "SHOULDER");
+const HVCommand HVCommand::PEAK(113, "PEAK");
 const HVCommand HVCommand::RECOVER(121, "RECOVER");
 
 const HVCommand& HVCommand::operator=(const std::string& label) throw()
@@ -20,11 +17,8 @@ const HVCommand& HVCommand::operator=(const std::string& label) throw()
   if (label == CONFIGURE.getLabel()) *this = CONFIGURE;
   else if (label == TURNON.getLabel()) *this = TURNON;
   else if (label == TURNOFF.getLabel()) *this = TURNOFF;
-  else if (label == RAMPUP.getLabel()) *this = RAMPUP;
-  else if (label == RAMPDOWN.getLabel()) *this = RAMPDOWN;
   else if (label == STANDBY.getLabel()) *this = STANDBY;
-  else if (label == STANDBY2.getLabel()) *this = STANDBY2;
-  else if (label == STANDBY3.getLabel()) *this = STANDBY3;
+  else if (label == SHOULDER.getLabel()) *this = SHOULDER;
   else if (label == PEAK.getLabel()) *this = PEAK;
   else if (label == RECOVER.getLabel()) *this = RECOVER;
   else if (label == NSMCommand::OK.getLabel()) *this = NSMCommand::OK;

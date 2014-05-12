@@ -66,6 +66,7 @@ int main(int argc, char** argv)
         obj.setRevision(revision);
         continue;
       } else if (name == "config") {
+        if (configname != value) index = 0;
         configname = value;
         obj.setName(configname);
         continue;

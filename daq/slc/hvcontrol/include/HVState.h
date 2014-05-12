@@ -11,8 +11,7 @@ namespace Belle2 {
     static const HVState OFF_S;
     static const HVState STABLE_S;
     static const HVState STANDBY_S;
-    static const HVState STANDBY2_S;
-    static const HVState STANDBY3_S;
+    static const HVState SHOULDER_S;
     static const HVState PEAK_S;
     static const HVState TRANSITION_TS;
     static const HVState RAMPINGUP_TS;

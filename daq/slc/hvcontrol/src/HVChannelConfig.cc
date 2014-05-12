@@ -4,9 +4,9 @@
 
 using namespace Belle2;
 
-float HVChannelConfig::getVoltageDemand(HVDemand i) const
+float HVChannelConfig::getVoltageDemand(int i) const
 {
-  std::string name = StringUtil::form("voltage_demand_%d", (int)i);
+  std::string name = StringUtil::form("voltage_demand_%d", i);
   return m_obj.getFloat(name);
 }
 
@@ -16,9 +16,9 @@ float HVChannelConfig::getReserved(int i) const
   return m_obj.getFloat(name);
 }
 
-void HVChannelConfig::setVoltageDemand(HVDemand i, float v)
+void HVChannelConfig::setVoltageDemand(int i, float v)
 {
-  std::string name = StringUtil::form("voltage_demand_%d", (int)i);
+  std::string name = StringUtil::form("voltage_demand_%d", i);
   m_obj.setFloat(name, v);
 }
 

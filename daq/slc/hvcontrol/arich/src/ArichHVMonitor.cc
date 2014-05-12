@@ -20,13 +20,14 @@ void ArichHVMonitor::run()
     }
     while (true) {
       HVControlCallback* callback = m_comm->getCallback();
+      const HVConfig& config(callback->getConfig());
       try {
-        for (size_t i = 0; i < callback->getNChannels(); i++) {
-          HVChannelConfig& config(callback->getChannelConfig(i));
+        for (size_t i = 0; i < config.getNChannels(); i++) {
+          const HVChannel& channel(config.getChannel(i));
+          if (channel.getCrate() != m_comm->getId()) continue;
           HVChannelStatus& status(callback->getChannelStatus(i));
-          if (config.getCrate() != m_comm->getId()) continue;
-          ArichHVMessage msg =
-            m_comm->readParams(config.getSlot(), config.getChannel());
+          ArichHVMessage msg = m_comm->readParams(channel.getSlot(),
+                                                  channel.getChannel());
           status.setVoltageMon(msg.getVoltageMon());
           status.setCurrentMon(msg.getCurrentMon());
           switch (msg.getStatus()) {
@@ -56,9 +57,8 @@ void ArichHVMonitor::run()
           }
         }
       } catch (const IOException& e) {
-        for (size_t i = 0; i < callback->getNChannels(); i++) {
-          HVChannelConfig config = callback->getChannelConfig(i);
-          if (config.getCrate() != m_comm->getId()) continue;
+        for (size_t i = 0; i < config.getNChannels(); i++) {
+          if (config.getChannel(i).getCrate() != m_comm->getId()) continue;
           HVChannelStatus& status(callback->getChannelStatus(i));
           status.setState(Enum::UNKNOWN);
         }

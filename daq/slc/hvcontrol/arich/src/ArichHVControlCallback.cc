@@ -67,20 +67,11 @@ bool ArichHVControlCallback::standby() throw()
   return success;
 }
 
-bool ArichHVControlCallback::standby2() throw()
+bool ArichHVControlCallback::shoulder() throw()
 {
   bool success = true;
   for (size_t i = 0; i < m_comm_v.size(); i++) {
-    success &= m_comm_v[i]->standby2();
-  }
-  return success;
-}
-
-bool ArichHVControlCallback::standby3() throw()
-{
-  bool success = true;
-  for (size_t i = 0; i < m_comm_v.size(); i++) {
-    success &= m_comm_v[i]->standby3();
+    success &= m_comm_v[i]->shoulder();
   }
   return success;
 }

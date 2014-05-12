@@ -5,10 +5,6 @@
 
 namespace Belle2 {
 
-  enum HVDemand {
-    STANDBY = 0, STANDBY2, STANDBY3, PEAK
-  };
-
   class HVChannelConfig {
 
   public:
@@ -25,7 +21,7 @@ namespace Belle2 {
     bool  isTurnOn() const { return m_obj.getBool("turnon"); }
     float getRampUpSpeed() const { return m_obj.getFloat("rampup_speed"); }
     float getRampDownSpeed() const { return m_obj.getFloat("rampdown_speed"); }
-    float getVoltageDemand(HVDemand i) const;
+    float getVoltageDemand(int i) const;
     float getVoltageLimit() const { return m_obj.getFloat("voltage_limit"); }
     float getCurrentLimit() const { return m_obj.getFloat("current_limit"); }
     float getReserved(int i) const;
@@ -37,7 +33,7 @@ namespace Belle2 {
     void setTurnOn(bool turnon) { m_obj.setFloat("turnon", turnon); }
     void setRampUpSpeed(float rampup) { m_obj.setFloat("rampup_speed", rampup); }
     void setRampDownSpeed(float rampdown) { m_obj.setFloat("rampdown_speed", rampdown); }
-    void setVoltageDemand(HVDemand i, float voltage);
+    void setVoltageDemand(int i, float voltage);
     void setVoltageLimit(float voltage) { m_obj.setFloat("voltage_limit", voltage); }
     void setCurrentLimit(float current) { m_obj.setFloat("current_limit", current); }
     void setReserved(int i, float reserved);

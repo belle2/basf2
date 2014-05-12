@@ -1,5 +1,6 @@
 #include "daq/slc/hvcontrol/HVCommand.h"
 #include "daq/slc/hvcontrol/HVState.h"
+#include "daq/slc/hvcontrol/HVConfig.h"
 #include "daq/slc/hvcontrol/hv_status.h"
 
 #include <daq/slc/nsm/NSMCommunicator.h>
@@ -31,12 +32,15 @@ extern "C" {
 
 using namespace Belle2;
 
+HVConfig hvconfig;
+
 const char* getStateCode(const HVState& state)
 {
   if (state == HVState::PEAK_S) {
     return "\x1b[42m\x1b[37m";
   } else if (state == HVState::OFF_S) {
-    return "\x1b[47m\x1b[39m";
+    return "\x1b[49m\x1b[39m";
+    //return "\x1b[47m\x1b[39m";
   } else if (state.isStable()) {
     return "\x1b[44m\x1b[37m";
   } else if (state.isTransition()) {
@@ -49,7 +53,7 @@ const char* getStateCode(const HVState& state)
   return "\x1b[49m\x1b[39m";;
 }
 
-void print(ConfigObject& obj, bool edited)
+void print(bool edited)
 {
   std::stringstream ss, ss1;
   ss << StringUtil::form(" %5s | %4s | %4s | %6s | %10s | %10s | %10s | "
@@ -64,57 +68,95 @@ void print(ConfigObject& obj, bool edited)
   }
   ss1 << std::endl;
   ss << ss1.str();
-  ConfigObjectList& obj_v(obj.getObjects("channel"));
-  for (size_t i = 0; i < obj_v.size(); i++) {
-    ConfigObject& cobj(obj_v[i]);
-    ss << StringUtil::form(" %5d | %4d | %7d | %6s | %12s | %14s | %13s | "
-                           "%13s | %6s | %6s | %6s | %6s | %6s | "
-                           "%6s | %6s | %6s ", cobj.getInt("crate"),
-                           cobj.getInt("slot"), cobj.getInt("channel"),
-                           (cobj.getBool("turnon") ? "true" : "false"),
-                           StringUtil::form("%4.1f", cobj.getFloat("rampup_speed")).c_str(),
-                           StringUtil::form("%4.1f", cobj.getFloat("rampdown_speed")).c_str(),
-                           StringUtil::form("%4.1f", cobj.getFloat("voltage_limit")).c_str(),
-                           StringUtil::form("%4.1f", cobj.getFloat("current_limit")).c_str(),
-                           StringUtil::form("%4.1f", cobj.getFloat("voltage_demand_0")).c_str(),
-                           StringUtil::form("%4.1f", cobj.getFloat("voltage_demand_1")).c_str(),
-                           StringUtil::form("%4.1f", cobj.getFloat("voltage_demand_2")).c_str(),
-                           StringUtil::form("%4.1f", cobj.getFloat("voltage_demand_3")).c_str(),
-                           StringUtil::form("%4.1f", cobj.getFloat("reserved_0")).c_str(),
-                           StringUtil::form("%4.1f", cobj.getFloat("reserved_1")).c_str(),
-                           StringUtil::form("%4.1f", cobj.getFloat("reserved_2")).c_str(),
-                           StringUtil::form("%4.1f", cobj.getFloat("reserved_3")).c_str()) << std::endl;
+  for (size_t j = 0; j < hvconfig.getNValueSets(); j++) {
+    const HVValueSet& value_v(hvconfig.getValueSet(j));
+    for (size_t i = 0; i < hvconfig.getNChannels(); i++) {
+      const HVChannel& channel(hvconfig.getChannel(i));
+      const HVValue& value(value_v[i]);
+      ss << StringUtil::form(" %5d | %4d | %7d | %6s | %12s | %14s | %13s | "
+                             "%13s | %6s | %6s | %6s ",
+                             channel.getCrate(), channel.getSlot(), channel.getChannel(),
+                             (channel.isTurnOn() ? "true" : "false"),
+                             StringUtil::form("%4.1f", value.getRampUpSpeed()).c_str(),
+                             StringUtil::form("%4.1f", value.getRampDownSpeed()).c_str(),
+                             StringUtil::form("%4.1f", value.getVoltageLimit()).c_str(),
+                             StringUtil::form("%4.1f", value.getCurrentLimit()).c_str(),
+                             StringUtil::form("%4.1f", value.getVoltageDemand()).c_str())
+         << std::endl;
+    }
   }
-  std::cout << "modename = " << obj.getName()
+  std::cout << "modename = " << hvconfig.get().getName()
             << (edited ? "(edited)" : "") << std::endl
             << ss1.str() << ss.str() << ss1.str() << std::endl;
 }
 
-void edit(ConfigObject& obj, const std::string& str, bool& edited)
+void setValue(DBObject& obj, StringList str_v,
+              const std::string& value)
 {
-  std::vector<std::string> sarg_v = StringUtil::split(str, ' ');
-  if (sarg_v.size() >= 5) {
+  if (str_v.size() > 0) {
+    std::string name = str_v[0];
+    int index = 0;
+    if (name.find("[") != std::string::npos) {
+      StringList sstr_v = StringUtil::split(str_v[0], '[');
+      name = sstr_v[0];
+      index = atoi(sstr_v[1].c_str());
+    }
+    if (str_v.size() == 1) {
+      if (obj.hasObject(name, index)) {
+        obj.getObject(name, index).setName(value);
+      } else if (obj.hasField(name)) {
+        obj.setValueText(name, value);
+      }
+    } else {
+      if (obj.hasObject(name, index)) {
+        str_v.erase(str_v.begin());
+        setValue(obj.getObject(name, index), str_v, value);
+      }
+    }
+  }
+}
+
+void edit(const std::string& str, bool& edited)
+{
+  StringList sarg_v = StringUtil::split(str, ' ');
+  if (sarg_v.size() > 3 && sarg_v[0] == "valueset") {
+    int index = atoi(sarg_v[1].c_str());
+    DBObject& cobj(hvconfig.get().getObject("valueset", index));
+    cobj.setName(sarg_v[2]);
+  } else if (sarg_v.size() > 3 && sarg_v[0] == "extra") {
+    StringList str_v = StringUtil::split(sarg_v[1], '.');
+    setValue(hvconfig.get().getObject("extra"), str_v, sarg_v[2]);
+  } else if (sarg_v.size() > 4) {
     std::string name = sarg_v[0];
     if (name == "crate" || name == "slot" || name == "channel") return;
     int crate = (isdigit(sarg_v[1].at(0))) ? atoi(sarg_v[1].c_str()) : -1;
     int slot = (isdigit(sarg_v[2].at(0))) ? atoi(sarg_v[2].c_str()) : -1;
-    int channel = (isdigit(sarg_v[3].at(0))) ? atoi(sarg_v[3].c_str()) : -1;
-    std::string value = sarg_v[4];
-    ConfigObjectList& obj_v(obj.getObjects("channel"));
-    for (size_t i = 0; i < obj_v.size(); i++) {
-      ConfigObject& cobj(obj_v[i]);
-      if ((crate == -1 || crate == cobj.getInt("crate")) &&
-          (slot == -1 || slot == cobj.getInt("slot")) &&
-          (channel == -1 || channel == cobj.getInt("channel"))) {
-        if (cobj.hasValue(name)) {
-          cobj.setValueText(name, value);
-          std::cout << "Set " << name << "[" << cobj.getInt("crate") << "]["
-                    << cobj.getInt("slot") << "][" << cobj.getInt("channel") << "] = "
-                    << value << std::endl;
-          edited = true;
-        } else {
-          std::cout << "Unknown parameter : " << name << std::endl;
-          return;
+    int ch = (isdigit(sarg_v[3].at(0))) ? atoi(sarg_v[3].c_str()) : -1;
+    std::string configname = (sarg_v.size() > 5) ? sarg_v[4] : "";
+    std::string v = (sarg_v.size() > 5) ? sarg_v[5] : sarg_v[4];
+    for (size_t j = 0; j < hvconfig.getNValueSets(); j++) {
+      HVValueSet& value_v(hvconfig.getValueSet(j));
+      const DBObject& cobj(hvconfig.get().getObject("valueset", j));
+      if (configname.size() == 0 || configname == cobj.getName()) {
+        for (size_t i = 0; i < hvconfig.getNChannels(); i++) {
+          HVChannel& channel(hvconfig.getChannel(i));
+          HVValue& value(value_v[i]);
+          if ((crate == -1 || crate == channel.getCrate()) &&
+              (slot == -1 || slot == channel.getSlot()) &&
+              (ch == -1 || ch == channel.getChannel())) {
+            if (value.get().hasValue(name)) {
+              value.get().setValueText(name, v);
+              std::cout << "Set " << name << "["
+                        << channel.getCrate() << "]["
+                        << channel.getSlot() << "]["
+                        << channel.getChannel() << "] = "
+                        << v << std::endl;
+              edited = true;
+            } else {
+              std::cout << "Unknown parameter : " << name << std::endl;
+              return;
+            }
+          }
         }
       }
     }
@@ -147,13 +189,13 @@ void nsmget(const std::string& hvnodename, hv_status* status)
             << ss.str();
 }
 
-void dbget(const std::string& configname, const std::string& hvnodename,
-           DBInterface* db, ConfigObject& obj)
+void dbget(const std::string& configname,
+           const std::string& hvnodename, DBInterface* db)
 {
   ConfigObjectTable table(db);
   db->connect();
-  obj = table.get(configname, hvnodename);
-  print(obj, false);
+  hvconfig.set(table.get(configname, hvnodename));
+  print(false);
   db->close();
 }
 
@@ -221,7 +263,7 @@ int main(int argc, char** argv)
   db->connect();
   ConfigInfo cinfo = ConfigInfoTable(db).get(status->configid);
   ConfigObjectTable table(db);
-  ConfigObject obj = table.get(cinfo.getName(), hvnodename);
+  hvconfig.set(table.get(cinfo.getName(), hvnodename));
   db->close();
 
   HIST_ENTRY* history = NULL;
@@ -232,7 +274,7 @@ int main(int argc, char** argv)
   bool edited = false;
   while (true) {
     line = readline(prompt);
-    std::vector<std::string> str_v = StringUtil::split(line, ' ', 2);
+    StringList str_v = StringUtil::split(line, ' ', 2);
     add_history(line);
     nhistory++;
     if (nhistory >= 20) {
@@ -248,48 +290,52 @@ int main(int argc, char** argv)
     free(line);
     if (command == "PRINT") {
       std::cout << command << std::endl;
-      print(obj, edited);
+      print(edited);
     } else if (command == "EDIT") {
       std::cout << command << std::endl;
-      edit(obj, str, edited);
+      edit(str, edited);
     }
     HVCommand cmd = command;
-    if (cmd == Enum::UNKNOWN) continue;
+    if (cmd == Enum::UNKNOWN) {
+      std::cout << "Unknown command : " << command << std::endl;
+      continue;
+    }
     std::cout << cmd.getLabel() << std::endl;
     if (cmd == NSMCommand::NSMGET) {
       nsmget(hvnodename, status);
     } else if (cmd == NSMCommand::DBGET) {
-      std::vector<std::string> sarg_v = StringUtil::split(str, ' ');
+      StringList sarg_v = StringUtil::split(str, ' ');
       if (sarg_v.size() >= 1) {
         edited = false;
-        dbget(sarg_v[0], hvnodename, db, obj);
+        dbget(sarg_v[0], hvnodename, db);
       } else {
-        ConfigObject obj_tmp;
+        ConfigObject obj = hvconfig.get();
         db->connect();
         ConfigInfoTable table(db);
         ConfigInfoList info_v = table.getList(hvnodename);
         db->close();
         for (size_t i = 0; i < info_v.size(); i++) {
-          dbget(info_v[i].getName(), hvnodename, db, obj_tmp);
+          dbget(info_v[i].getName(), hvnodename, db);
         }
+        hvconfig.set(obj);
       }
     } else if (cmd == NSMCommand::DBSET) {
-      std::vector<std::string> sarg_v = StringUtil::split(str, ' ');
+      StringList sarg_v = StringUtil::split(str, ' ');
       if (sarg_v.size() >= 1) {
         db->connect();
-        obj.setName(sarg_v[0]);
-        table.add(obj, true);
+        hvconfig.get().setName(sarg_v[0]);
+        table.add(hvconfig.get(), true);
         edited = false;
         db->close();
       }
     } else {
       try {
         if (cmd == HVCommand::CONFIGURE) {
-          std::vector<std::string> sarg_v = StringUtil::split(str, ' ');
+          StringList sarg_v = StringUtil::split(str, ' ');
           if (sarg_v.size() >= 1) {
             comm->sendRequest(NSMMessage(hvnode, cmd, sarg_v[0]));
           } else {
-            comm->sendRequest(NSMMessage(hvnode, cmd, obj.getName()));
+            comm->sendRequest(NSMMessage(hvnode, cmd, hvconfig.get().getName()));
           }
         } else {
           comm->sendRequest(NSMMessage(hvnode, cmd));

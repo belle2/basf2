@@ -26,11 +26,20 @@ namespace Belle2 {
 
   namespace CDCLocalTracking {
 
+
+    /** Class to combine the run of the cellular automaton and the repeated path extraction.
+     *  Execute the cellular automaton and extracting paths interatively blocking the already used
+     *  knots until there is no more path fullfilling the minimal length / energy requirement given
+     *  as minStateToFollow to the constructor
+     */
     template<class Item>
     class  MultipassCellularPathFinder {
 
     private:
-      typedef WeightedNeighborhood<const Item> Neighborhood; // Type of the neighborhood of elements
+      /// Type for the neighborhood of elements in the algorithm
+      typedef WeightedNeighborhood<const Item> Neighborhood;
+
+      /// Type of the resulting
       typedef std::vector<const Item*> Path;
 
     public:
@@ -50,11 +59,11 @@ namespace Belle2 {
       ) const {
 
         // multiple passes of the cellular automat
-        // one segment is created at a time denying all the wire hits it picked up
-        // and apply the cellular automat again
+        // one segment is created at a time denying all knots it picked up,
+        // applying the cellular automaton again
         // and so on
         // no best candidate analysis needed
-        // (only makes sense with minimal clusters to avoid reweighting of uncommon paths )
+        // (only makes sense with minimal clusters to avoid evaluating of uncommon paths)
 
         bool created = false;
         B2DEBUG(100, "Apply multipass cellular automat");
@@ -90,8 +99,13 @@ namespace Belle2 {
       }
 
     private:
+      /// The minimal path length / energy to be followed.
       CellState m_minStateToFollow;
+
+      /// The cellular automaton to be used.
       CellularAutomaton<Item> m_cellularAutomaton;
+
+      /// The path follower used to extract the path from the graph processed by the cellular automaton.
       CellularPathFollower<Item> m_cellularPathFollower;
 
     }; // end class MultipassCellularPathFinder

@@ -21,9 +21,7 @@
 namespace Belle2 {
   namespace CDCLocalTracking {
 
-    /// A generic vector used for various aggregations
-    /** details */
-
+    /// A generic vector which keeps track if its elements are sorted and speeds up lookups accordingly.
     template<class T>
     class SortableVector : public UsedTObject {
 
@@ -48,50 +46,76 @@ namespace Belle2 {
       /// Type for a pair of iterators which are iterable with range based for.
       class range : public std::pair<iterator, iterator> {
       public:
+        /// Constructor translating a pair of iterators (as returned by equal_range) to a range usable with range based for.
         range(const std::pair<iterator, iterator>& iterator_pair) : std::pair<iterator, iterator>(iterator_pair) {;}
+
+        /// Constructor translating two iterators (e.g. lower_bound, upper_bound) to a range usable with range based for.
         range(const iterator& begin, const iterator& end) : std::pair<iterator, iterator>(begin, end) {;}
 
+        /// Begin of the range for range based for.
         iterator begin() const { return this->first;}
+
+        /// End of the range for range based for.
         iterator end() const { return this->second;}
       };
 
       /// Type for a pair of constant iterators which are iterable with range based for.
       class const_range : public std::pair<const_iterator, const_iterator> {
       public:
+        /// Constructor translating a pair of iterators (as returned by equal_range) to a range usable with range based for.
         const_range(const std::pair<const_iterator, const_iterator>& iterator_pair) : std::pair<const_iterator, const_iterator>(iterator_pair) {;}
+
+        /// Constructor translating two iterators (e.g. lower_bound, upper_bound) to a range usable with range based for.
         const_range(const const_iterator& begin, const const_iterator& end) : std::pair<const_iterator, const_iterator>(begin, end) {;}
 
+        /// Begin of the range for range based for.
         const_iterator begin() const { return this->first;}
+
+        /// End of the range for range based for.
         const_iterator end() const { return this->second;}
       };
 
 
+      /// Type for a pair of constant reverse iterators which are iterable with range based for.
       class const_reverse_range : public std::pair<const_reverse_iterator, const_reverse_iterator> {
       public:
+        /// Constructor translating a pair of iterators to a range usable with range based for.
         const_reverse_range(const std::pair<const_reverse_iterator, const_reverse_iterator>& iterator_reverse_pair) :
           std::pair<const_reverse_iterator, const_reverse_iterator>(iterator_reverse_pair) {;}
+
+        /// Constructor translating two iterators (e.g. rbegin, rend) to a range usable with range based for.
         const_reverse_range(const const_reverse_iterator& begin, const const_reverse_iterator& end) :
           std::pair<const_reverse_iterator, const_reverse_iterator>(begin, end) {;}
 
+        /// Begin of the range for range based for.
         const_reverse_iterator begin() const { return this->first;}
+
+        /// End of the range for range based for.
         const_reverse_iterator end() const { return this->second;}
       };
 
 
-      /// Input iterator type usable with stl algorithms
+      /// Input iterator type for the sortable vector usable with stl algorithms
       class input_iterator : public std::iterator<std::output_iterator_tag, void, void, void, void> {
       protected:
         SortableVector<T>& m_collection;
       public:
+        /// Constructor taking the sortable vector to be filled as a reference
         explicit input_iterator(SortableVector<T>& collection) : m_collection(collection) {}
 
-        input_iterator& operator= (T const& item) {
-          m_collection.push_back(item); return *this;
-        }
+        /// Assignment operator putting a new element into the sortable vector
+        input_iterator& operator= (T const& item)
+        { m_collection.push_back(item); return *this; }
+
+        /// Derefering returns the input iterator itself
         input_iterator& operator* ()
         { return *this; }
+
+        /// Increment operator, returns input iterator unchanged
         input_iterator& operator++ ()
         { return *this; }
+
+        /// Increment operator, returns input iterator unchanged
         input_iterator operator++ (int)
         { return *this; }
       };
@@ -109,7 +133,6 @@ namespace Belle2 {
       { return  m_items < rhs.m_items; }
 
       ///Swaps the items out of the other vector
-
       void swap(SortableVector<T>& rhs)
       { m_items.swap(rhs.m_items); std::swap(m_isSorted, rhs.m_isSorted); }
 
@@ -120,19 +143,25 @@ namespace Belle2 {
 
       /// The begin of the container
       iterator begin() { return m_items.begin(); }
+
       /// The begin of the constant container
       const_iterator begin() const { return m_items.begin(); }
+
       /// The end of the container
       iterator end() { return m_items.end(); }
+
       /// The end of the constant container
       const_iterator end() const { return m_items.end(); }
 
       /// The reverse begin of the container
       reverse_iterator rbegin() { return m_items.rbegin(); }
+
       /// The reverse begin of the constant container
       const_reverse_iterator rbegin() const { return m_items.rbegin(); }
+
       /// The reverse end of the container
       reverse_iterator rend() { return m_items.rend(); }
+
       /// The reverse end of the constant container
       const_reverse_iterator rend() const { return m_items.rend(); }
 
@@ -380,13 +409,10 @@ namespace Belle2 {
       }
 
 
-    private:
-
-
 
     protected:
-      bool m_isSorted; ///< Memory for the sort state of the vector
-      std::vector<T> m_items;
+      bool m_isSorted; ///< Memory for the sort state of the vector.
+      std::vector<T> m_items; ///< Memory of the wrapped vector containing the items.
 
     private:
       /// ROOT Macro to make SortableVector a ROOT class.

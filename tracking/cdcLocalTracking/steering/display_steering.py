@@ -5,6 +5,18 @@ import sys
 import os
 from optparse import OptionParser
 
+from basf2 import *
+set_log_level(LogLevel.INFO)
+
+import simulation
+
+# Add the path of the svg display module to the search path of python
+belle2_local_dir = os.environ['BELLE2_LOCAL_DIR']
+cdcdisplay_module_path = os.path.join(belle2_local_dir, 'tracking',
+                                      'cdcLocalTracking', 'python_code')
+sys.path.append(cdcdisplay_module_path)
+import cdcdisplay
+
 # Setup the options parser
 usage = \
     """Usage:
@@ -26,22 +38,11 @@ if args:
 else:
     use_simulation = True
 
-from basf2 import *
-import simulation
-
-# Add the path of the svg display module to the search path of python
-belle2_local_dir = os.environ['BELLE2_LOCAL_DIR']
-cdcdisplay_module_path = os.path.join(belle2_local_dir, 'tracking',
-                                      'cdcLocalTracking', 'python_code')
-sys.path.append(cdcdisplay_module_path)
-import cdcdisplay
-
-set_log_level(LogLevel.INFO)
-
 # set_random_seed(12345)
 
 components = ['MagneticFieldConstant4LimitedRCDC', 'BeamPipe', 'PXD', 'SVD',
               'CDC']
+
 main = create_path()
 
 if use_simulation:

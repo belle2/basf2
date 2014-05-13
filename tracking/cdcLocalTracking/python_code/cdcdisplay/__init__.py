@@ -39,10 +39,10 @@ class CDCSVGDisplayModule(Module):
         super(CDCSVGDisplayModule, self).__init__()
         # call constructor of base class, required!
 
-        # # Switch if the module shall show the event to the user and wait to continue or just generate the images
+        ## Switch if the module shall show the event to the user and wait to continue or just generate the images
         self.interactive = interactive
 
-        # # Folder the images shall be saved to
+        ## Folder the images shall be saved to
         self.output_folder = output_folder
 
         if not os.path.exists(output_folder):
@@ -52,117 +52,117 @@ class CDCSVGDisplayModule(Module):
             if answer == 'y':
                 os.makedirs(output_folder)
 
-        # # List of drawing options
+        ## List of drawing options
         # Animate the display by uncovering the drawn objects in order of their time of flight
         # This can be seen in most standard browsers. Note however that you should switch of
         # the wires in this case to reduce the rendering load.
-        # # Switch to make an animated event display by means of animated SVG.
+        ## Switch to make an animated event display by means of animated SVG.
         self.animate = False
 
         # The following options can be used independent of the track finder to view Monte Carlo information after the simulation is done
 
-        # # Switch to draw the wires. This is wrapped by an extra property, because it should always be deactivated in case the scene is animated
+        ## Switch to draw the wires. This is wrapped by an extra property, because it should always be deactivated in case the scene is animated
         self._draw_wires = True  # and False
 
-        # # Switch to draw the CDCHits. Default: active
+        ## Switch to draw the CDCHits. Default: active
         self.draw_hits = True  # and False
 
-        # # Switch to draw the superlayer boundaries. Default: active
+        ## Switch to draw the superlayer boundaries. Default: active
         self.draw_superlayer_boundaries = True  # and False
 
-        # # Switch to draw the interaction point. Default: active
+        ## Switch to draw the interaction point. Default: active
         self.draw_interactionpoint = True  # and False
 
-        # # Switch to draw the MCParticle::getArrayIndex property. Default: inactive
+        ## Switch to draw the MCParticle::getArrayIndex property. Default: inactive
         self.draw_mcparticle_id = True and False
 
-        # # Switch to draw the MCParticle::getPDGCode property. Default: inactive
+        ## Switch to draw the MCParticle::getPDGCode property. Default: inactive
         self.draw_mcparticle_pdgcodes = True and False
 
-        # # Switch to draw the MCParticle::hasStatus(c_PrimaryParticle) property. Default: inactive
+        ## Switch to draw the MCParticle::hasStatus(c_PrimaryParticle) property. Default: inactive
         self.draw_mcparticle_primary = True and False
 
-        # # Switch to draw the Monte Carlo segments as generated in CDCMCTrackStore. Default: inactive
+        ## Switch to draw the Monte Carlo segments as generated in CDCMCTrackStore. Default: inactive
         self.draw_mcsegments = True and False
 
-        # # Switch to draw the CDCSimHits with momentum information. Default: inactive
+        ## Switch to draw the CDCSimHits with momentum information. Default: inactive
         self.draw_simhits = True and False
 
-        # # Switch to draw the CDCSimHits color coded by their time of flight. Default: inactive
+        ## Switch to draw the CDCSimHits color coded by their time of flight. Default: inactive
         self.draw_simhit_tof = True and False
 
-        # # Switch to draw the CDCSimHits color coded by their getPosFlag() property. Default: inactive
+        ## Switch to draw the CDCSimHits color coded by their getPosFlag() property. Default: inactive
         self.draw_simhit_posflag = True and False
 
-        # # Switch to draw the CDCSimHits color coded by their getPDGCode() property. Default: inactive
+        ## Switch to draw the CDCSimHits color coded by their getPDGCode() property. Default: inactive
         self.draw_simhit_pdgcode = True and False
 
-        # # Switch to draw the CDCSimHits connected in the order of their getFlightTime for each Monte Carlo particle. Default: inactive
+        ## Switch to draw the CDCSimHits connected in the order of their getFlightTime for each Monte Carlo particle. Default: inactive
         self.draw_connect_tof = True and False
 
-        # # Switch to draw the CDCSimHits color coded by their local right left passage information. Default: inactive
+        ## Switch to draw the CDCSimHits color coded by their local right left passage information. Default: inactive
         self.draw_rlinfo = True and False
 
-        # # Switch to draw the CDCSimHits color coded by their reassignement information to a different MCParticle. Default: inactive
+        ## Switch to draw the CDCSimHits color coded by their reassignement information to a different MCParticle. Default: inactive
         self.draw_reassigned = True and False
 
-        # # Switch to draw the axial to axial segment pairs from Monte Carlo truth. Default: inactive
+        ## Switch to draw the axial to axial segment pairs from Monte Carlo truth. Default: inactive
         self.draw_mcaxialaxialpairs = True and False
 
-        # # Switch to draw the axial to stereo segment pairs from Monte Carlo truth. Default: inactive
+        ## Switch to draw the axial to stereo segment pairs from Monte Carlo truth. Default: inactive
         self.draw_mcaxialstereopairs = True and False
 
-        # # Switch to draw the segment triples from Monte Carlo truth. Default: inactive
+        ## Switch to draw the segment triples from Monte Carlo truth. Default: inactive
         self.draw_mcsegmenttriples = True and False
 
         # Those are only available if the local track finder is in the module chain
         # and specific compile time flags enable to transportation of this data
 
-        # # Switch to draw the clusters generated by the finder
+        ## Switch to draw the clusters generated by the finder
         self.draw_clusters = True and False
 
-        # # Switch to draw the segments generated by the finder
+        ## Switch to draw the segments generated by the finder
         self.draw_segments = True and False
 
-        # # Switch to draw the tangent segments generated by the finder
+        ## Switch to draw the tangent segments generated by the finder
         self.draw_tangentsegments = True and False
 
-        # # Switch to draw the segments generated by the finder colored with the Monte Carlo track id
+        ## Switch to draw the segments generated by the finder colored with the Monte Carlo track id
         self.draw_segments_mctrackid = True and False
 
-        # # Switch to draw the segments generated by the finder colored by the coalignment information (forward, backward, undetermined)
+        ## Switch to draw the segments generated by the finder colored by the coalignment information (forward, backward, undetermined)
         self.draw_segments_fbinfo = True and False
 
-        # # Switch to draw the segments generated by the finder colored by the frist in track hit id
+        ## Switch to draw the segments generated by the finder colored by the frist in track hit id
         self.draw_segments_firstInTrackId = True and False
 
-        # # Switch to draw the segments generated by the finder colored by the second in track hit id
+        ## Switch to draw the segments generated by the finder colored by the second in track hit id
         self.draw_segments_lastInTrackId = True and False
 
-        # # Switch to draw the segments generated by the finder colored by the number of passed superlayers assoziated to the first hit in the segment
+        ## Switch to draw the segments generated by the finder colored by the number of passed superlayers assoziated to the first hit in the segment
         self.draw_segments_firstNPassedSuperLayers = True and False
 
-        # # Switch to draw the segments generated by the finder colored by the number of passed superlayers assoziated to the last hit in the segment
+        ## Switch to draw the segments generated by the finder colored by the number of passed superlayers assoziated to the last hit in the segment
         self.draw_segments_lastNPassedSuperLayers = True and False
 
-        # # Switch to draw the segment triples generated by the finder
+        ## Switch to draw the segment triples generated by the finder
         self.draw_segmenttriples = True and False
 
-        # # Switch to draw the tracks generated by the finder
+        ## Switch to draw the tracks generated by the finder
         self.draw_tracks = True and False
 
-        # # Switch to draw the trajectories fitted to the segment triples generated by the finder
+        ## Switch to draw the trajectories fitted to the segment triples generated by the finder
         self.draw_segmenttriple_trajectories = True and False
 
-        # # Switch to draw the trajectories fitted to the segments generated by the finder
+        ## Switch to draw the trajectories fitted to the segments generated by the finder
         self.draw_segment_trajectories = True and False
 
         # Those are only available, if any track finder is in the module chain (not tested for others than the local track finder)
 
-        # # Draw the output Genfit tracks
+        ## Draw the output Genfit tracks
         self.draw_gftrackcands = True and False
 
-        # # Draw the trajectories stored in the output Genfit tracks
+        ## Draw the trajectories stored in the output Genfit tracks
         self.draw_gftrackcand_trajectories = True and False
 
     @property
@@ -262,9 +262,9 @@ class CDCSVGDisplayModule(Module):
         self.plotter = plotter
 
         # Construct additional information from basic Monte Carlo data, if it is available from the DataStore
-        Belle2.CDCLocalTracking.CDCMCHitLookUp.getInstance().fill()
+        # Belle2.CDCLocalTracking.CDCMCHitLookUp.getInstance().fill()
 
-        # ######### CDCWires ##########
+        ########## CDCWires ##########
         # Draw wires from cdcwire objects
         # Now prefered way of ploting the wires
         if self.draw_wires:
@@ -278,7 +278,7 @@ class CDCSVGDisplayModule(Module):
                     wire = wirelayer.getWireSafe(iWire)
                     plotter.append(wire, stroke='gray')
 
-        # ######### CDCHits ##########
+        ########## CDCHits ##########
         # Draw the raw CDCHits
         if self.draw_hits:
             styleDict = {'stroke': attributemaps.ZeroDriftLengthColorMap(),
@@ -390,14 +390,14 @@ class CDCSVGDisplayModule(Module):
                          'stroke': attributemaps.ReassignedSecondaryMap()}
             self.draw_storearray('CDCHits', styleDict)
 
-        # ######### CDCClusters
+        ########## CDCClusters
         # Draw clusters
         if self.draw_clusters:
             styleDict = {'stroke': attributemaps.listColors,
                          'stroke-width': '0.5'}
             self.draw_storearray('CDCWireHitClusters', styleDict)
 
-        # ######### CDCRecoSegments2D ##########
+        ########## CDCRecoSegments2D ##########
         # Draw Segments
 
         if self.draw_segments:
@@ -482,7 +482,7 @@ class CDCSVGDisplayModule(Module):
                 stereo_segments = [segment for segment in segment_storearray
                                    if segment.getAxialType() != 0]
 
-                # # Misuse this a bit but still does what we want
+                # Misuse this a bit but still does what we want
                 mc_axial_axial_segment_filter = \
                     Belle2.CDCLocalTracking.MCAxialAxialSegmentPairFilter()
 
@@ -526,7 +526,7 @@ class CDCSVGDisplayModule(Module):
                 stereo_segments = [segment for segment in segment_storearray
                                    if segment.getAxialType() != 0]
 
-                # # Misuse this a bit but still does what we want
+                # Misuse this a bit but still does what we want
                 mc_axial_axial_segment_filter = \
                     Belle2.CDCLocalTracking.MCAxialAxialSegmentPairFilter()
                 mc_segment_lookup = \

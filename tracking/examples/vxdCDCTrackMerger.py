@@ -11,7 +11,7 @@ eventinfosetter = register_module('EventInfoSetter')
 # generate one event
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
-eventinfosetter.param('evtNumList', [100])
+eventinfosetter.param('evtNumList', [1000])
 eventinfoprinter = register_module('EventInfoPrinter')
 
 # create geometry
@@ -34,10 +34,10 @@ pGun = register_module('ParticleGun')
 param_pGun = {  # ---    'momentumParams': [0.4, 1.6],
                 # fixed, uniform
     'pdgCodes': [13, -13],
-    'nTracks': 20,
+    'nTracks': 10,
     'varyNTracks': 0,
-    'momentumGeneration': 'uniform',
-    'momentumParams': [0, 5],
+    'momentumGeneration': 'fixed',
+    'momentumParams': [2],
     'thetaGeneration': 'uniform',
     'thetaParams': [60., 120.],
     'phiGeneration': 'uniform',
@@ -149,9 +149,9 @@ trackMerger_param = {  # (in cm) use cdc inner wall
                        #    'mergedCDCGFTracksColName': 'mergedCDC_Tracks',
                        #    'mergedVXDGFTracksColName': 'mergedSi_Tracks',
                        #    'CDC_wall_radius': 16.25,
+                       #    'GFTracksColName': 'GFTracks',
     'VXDGFTracksColName': 'VXDTracks',
     'CDCGFTracksColName': 'CDCTracks',
-    'GFTracksColName': 'GFTracks',
     'TrackCandColName': 'TracksCand',
     'relMatchedTracks': 'MatchedTracksIdx',
     'chi2_max': 100,
@@ -187,8 +187,8 @@ main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 main.add_module(gearbox)
 main.add_module(geometry)
-# main.add_module(pGun)
-main.add_module(evtgeninput)
+main.add_module(pGun)
+# main.add_module(evtgeninput)
 main.add_module(g4sim)
 main.add_module(pxdDigitizer)
 main.add_module(pxdClusterizer)

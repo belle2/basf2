@@ -52,7 +52,8 @@ namespace Belle2 {
       ~Clusterizer() {;}
 
     private:
-      typedef WeightedNeighborhood<const Item> Neighborhood; /// Neighborhood type
+      /// Type for the neighborhood of elements in the algorithm
+      typedef WeightedNeighborhood<const Item> Neighborhood;
 
     public:
 
@@ -86,6 +87,10 @@ namespace Belle2 {
         }
       }
 
+
+      /** Creates the clusters.
+       *  This is a variation of create() taking pointers to objects as vertices instead of references
+       */
       template<class PtrItemRange>
       void createFromPointers(const PtrItemRange& ptrItems,
                               const Neighborhood& neighborhood,
@@ -128,7 +133,7 @@ namespace Belle2 {
       }
 
 
-      // Setter for the cell state if the Item inherits from AutomatonCell - use the cell state internal to the AutomtonCell
+      /// Setter for the cell state if the Item inherits from AutomatonCell - use the cell state internal to the AutomtonCell.
       template<class ConvertableToAutomaton>
       typename boost::enable_if <
       boost::is_convertible<ConvertableToAutomaton, const AutomatonCell& >,
@@ -138,7 +143,7 @@ namespace Belle2 {
         automatonCell.setCellState(cellState);
       }
 
-      // Getter for the cell state if the Item inherits from Automaton cell - use the cell state internal to the AutomtonCell
+      /// Getter for the cell state if the Item inherits from Automaton cell - use the cell state internal to the AutomtonCell.
       template<class ConvertableToAutomaton>
       typename boost::enable_if <
       boost::is_convertible<ConvertableToAutomaton, const AutomatonCell& >,
@@ -148,7 +153,7 @@ namespace Belle2 {
         return automatonCell.getCellState();
       }
 
-      // Setter for the cell state if the Item does not inherit from Automaton cell
+      /// Setter for the cell state if the Item does not inherit from AutomatonCell.
       template<class NotConvertableToAutomaton>
       typename boost::disable_if <
       boost::is_convertible<NotConvertableToAutomaton, const AutomatonCell& >,
@@ -156,7 +161,7 @@ namespace Belle2 {
             setCellState(const NotConvertableToAutomaton& item, const CellState& cellState) const
       { m_cellStates[&item] = cellState; }
 
-      // Getter for the cell state if the Item does not inherit from AutomatonCell
+      /// Getter for the cell state if the Item does not inherit from AutomatonCell.
       template<class NotConvertableToAutomaton>
       typename boost::disable_if <
       boost::is_convertible<NotConvertableToAutomaton, const AutomatonCell& >,
@@ -227,7 +232,7 @@ namespace Belle2 {
       } // end  startCluster(...)
 
     private:
-      mutable std::map<const Item*, CellState> m_cellStates;
+      mutable std::map<const Item*, CellState> m_cellStates; /// Memory for the cell state, if the Item does not inherit from AutomatonCell.
 
     }; // end class Clusterizer
 

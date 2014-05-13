@@ -170,13 +170,13 @@ class Bound:
         @param right Right boundary
         """
 
-        # # The top boundary
+        ## The top boundary
         self.top = top
-        # # The bottom boundary
+        ## The bottom boundary
         self.bottom = bottom
-        # # The left boundary
+        ## The left boundary
         self.left = left
-        # # The right boundary
+        ## The right boundary
         self.right = right
 
     @property
@@ -234,7 +234,7 @@ class SVGDefsFactory:
     def __init__(self, elementFactory):
         """Constuction method receiving to fundamental element factory to be used to create the XML DOM elements"""
 
-        # # The fundamental factory to generate the DOM elements
+        ## The fundamental factory to generate the DOM elements
         self.elementFactory = elementFactory
 
     def createDefs(self, *defs):
@@ -271,7 +271,6 @@ class SVGDefsFactory:
 
 # original
 
-
 class SVGPrimitivesFactory:
 
     """Factory to compose geometric primitiv XML DOM elements"""
@@ -279,7 +278,7 @@ class SVGPrimitivesFactory:
     def __init__(self, elementFactory):
         """Constuction method receiving to fundamental element factory to be used to create the XML DOM elements"""
 
-        # # The fundamental factory to generate the DOM elements
+        ## The fundamental factory to generate the DOM elements
         self.elementFactory = elementFactory
 
     def createCircle(

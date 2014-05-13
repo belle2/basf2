@@ -24,22 +24,22 @@ import primitives
 class CDCDataobjectsConverter:
 
     """
-    Helper object to translate the various tracking objects from BASF2 to a XML-DOM representation
+    Helper object to translate the various tracking objects from BASF2 to a XML-DOM representation.
     """
 
     def __init__(self, elementFactory, animate=False):
         """
-        Construction method
+        Construction method, setting up a the XML-DOM element factory and a dispatch dictionary mapping tracking enties from BASF2 to their respective converted methods.
         """
 
-        # # Switch if an animated version of the elements shall be generated
+        ## Switch if an animated version of the elements shall be generated
         self.animate = animate
 
-        # # SVG primitive elements factory
+        ## SVG primitive elements factory
         self.svgElementFactory = \
             primitives.SVGPrimitivesFactory(elementFactory)
 
-        # # Dispatch map from tracking object types to specialised translator functions
+        ## Dispatch map from tracking object types to specialised translator functions
         self.toSVGFunctions_by_type = {  # for adhoc tangents
             tuple: self.TupleToSVG,
             Belle2.PyStoreObj: self.PyStoreObjToSVG,

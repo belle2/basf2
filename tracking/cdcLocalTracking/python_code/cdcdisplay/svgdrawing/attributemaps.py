@@ -107,7 +107,7 @@ class CDCHitColorMap:
     Base class for CDCHit to color map functional objects.
     """
 
-    # # Default color to be used
+    ## Default color to be used
     bkgHitColor = 'orange'
 
     def __call__(self, iCDCHit, cdcHit):
@@ -268,7 +268,7 @@ class MCParticleColorMap(CDCHitColorMap):
         as new during the event.
         """
 
-        # # Dictionary mapping the MCParticle ids to colors for consistent and contious use of the available colors
+        ## Dictionary mapping the MCParticle ids to colors for consistent and contious use of the available colors
         self.color_by_mcparticleId = {-1: self.bkgHitColor}
 
     def __call__(self, iCDCHit, cdcHit):
@@ -305,7 +305,7 @@ class MCPDGCodeColorMap(CDCHitColorMap):
     CDCHit to color map by the assoziated MCParticle::getPDG()
     """
 
-    # # Dictionary to define the color for the most relevant
+    ## Dictionary to define the color for the most relevant
     color_by_pdgcode = {
         -999: CDCHitColorMap.bkgHitColor,
         11: 'blue',
@@ -322,7 +322,7 @@ class MCPDGCodeColorMap(CDCHitColorMap):
         -2212: 'red',
         }
 
-    # # Color for the case a particle a pdg code not mentioned in the color_by_pdgcode map
+    ## Color for the case a particle a pdg code not mentioned in the color_by_pdgcode map
     missing_pdg_color = 'lime'
 
     def __call__(self, iCDCHit, cdcHit):
@@ -377,7 +377,7 @@ class MCPrimaryColorMap(CDCHitColorMap):
         Constuction method setting up a dictionary to count the hits for each secondary type.
         """
 
-        # # Dictionary keeping track of the number of hits with a specific secondary process type.
+        ## Dictionary keeping track of the number of hits with a specific secondary process type.
         self.n_hits_by_secondary_type = {}
 
     def __call__(self, iCDCHit, cdcHit):
@@ -432,7 +432,7 @@ class CDCSegmentColorMap:
     Base class for Segments to color  map functional objects.
     """
 
-    # # Default color to be used
+    ## Default color to be used
     bkgSegmentColor = 'orange'
 
     def __call__(self, iSegment, segment):

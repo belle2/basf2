@@ -26,7 +26,7 @@ class CDCSVGPlotter:
         default_height = 1120
         default_viewbox = default_bound.viewbox
 
-        # # Switch to indicating if an animated SVG should be generated
+        ## Switch to indicating if an animated SVG should be generated
         self.animate = animate
 
         # Create the xml.dom.minidom document object set up with the right headers
@@ -34,14 +34,14 @@ class CDCSVGPlotter:
         document = primitives.createSVGDocument(default_width, default_height,
                 default_viewbox)
 
-        # # xml.dom.minidom.Document which holds the linked representation of all svg elements to be written to file
+        ## xml.dom.minidom.Document which holds the linked representation of all svg elements to be written to file
         self.document = document
 
         # Create helper object to convert the various dataobjects to svg
         # primitive element objects
         # The document serves as a factory for the xml.dom.minidom elements
 
-        # # Helper object to translate the various tracking objects to xml.dom.minidom objects
+        ## Helper object to translate the various tracking objects to xml.dom.minidom objects
         self.converter = converter.CDCDataobjectsConverter(document,
                 animate=animate)
 

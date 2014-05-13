@@ -32,19 +32,20 @@ namespace Belle2 {
     class CellularAutomaton {
 
     private:
-      typedef WeightedNeighborhood<const Item> Neighborhood; // Type of the neighborhood of elements
+      /// Type for the neighborhood of elements in the algorithm
+      typedef WeightedNeighborhood<const Item> Neighborhood;
 
     public:
 
       /// Empty constructor
       CellularAutomaton() {;}
 
-      /// Emptz destructor
+      /// Empty deconstructor
       ~CellularAutomaton() {;}
 
 
       /// Applies the cellular automaton to the collection and its neighborhood
-      /** Applies the cellular automaton algorithm to the collection where the connections is given by
+      /** Applies the cellular automaton algorithm to the collection where the connections are given by
        *  the neighborhood.
        *  @param itemRange the range based iterable containing the items that should acquire the cell states
        *  @param neighborhood the weighted neighborhood of type WeightedNeighborhood<const Item> */
@@ -59,6 +60,12 @@ namespace Belle2 {
 
       }
 
+
+      /// Applies the cellular automaton to the collection and its neighborhood
+      /** Applies the cellular automaton algorithm to the collection where the connections are given by
+       *  the neighborhood.
+       *  @param itemRange the range based iterable containing the items that should acquire the cell states
+       *  @param neighborhood the weighted neighborhood of type WeightedNeighborhood<const Item> */
       template<class ItemRange>
       const Item*
       applyWithRecursion(

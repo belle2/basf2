@@ -40,7 +40,8 @@ namespace Belle2 {
     class NeighborhoodBuilder {
 
     private:
-      typedef WeightedNeighborhood<const Item> Neighborhood; /// type of the neighborhood to be filled
+      /// Type for the neighborhood of elements in the algorithm
+      typedef WeightedNeighborhood<const Item> Neighborhood;
 
     public:
       ///Empty constructor initialzing the default chooser
@@ -90,7 +91,7 @@ namespace Belle2 {
 
     }; // end class
 
-  } //end namespace CDCLocalTracking
-} //end namespace Belle2
+  } // end namespace CDCLocalTracking
+} // end namespace Belle2
 
 #endif //NEIGHBORHOODBUILDER_H_

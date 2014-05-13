@@ -49,23 +49,28 @@ bool AxialAxialSegmentPairFilterTree::setValues(const CellWeight& mcWeight, cons
   setValue < NAMED("mcWeight") > (mcWeight);
   setValue < NAMED("mcDecision") > (mcDecision);
 
+  // Collect decision criterions
+
+  // Sizes
   setValue < NAMED("startSegment_size") > (startSegment.size());
   setValue < NAMED("endSegment_size") > (endSegment.size());
 
+  // Super layers numbers of segments
   setValue < NAMED("startSegment_iSuperLayer") > (startSegment.getISuperLayer());
   setValue < NAMED("endSegment_iSuperLayer") > (endSegment.getISuperLayer());
 
+  // Super layers numbers of segments
   setValue < NAMED("startFit_startISuperLayer") > (startFit.getStartISuperLayer());
   setValue < NAMED("endFit_startISuperLayer") > (endFit.getStartISuperLayer());
 
+  // Super layer extrapolation
   setValue < NAMED("startFit_nextISuperLayer") > (startFit.getNextISuperLayer());
-  setValue < NAMED("endFit_previousISuperLayer") > (endFit.getPreviousISuperLayer());
-
   setValue < NAMED("startFit_nextAxialISuperLayer") > (startFit.getNextAxialISuperLayer());
+
+  setValue < NAMED("endFit_previousISuperLayer") > (endFit.getPreviousISuperLayer());
   setValue < NAMED("endFit_previousAxialISuperLayer") > (endFit.getPreviousAxialISuperLayer());
 
-
-
+  // Coalignment indicators
   setValue < NAMED("startSegment_isForwardTrajectory_startFit") > (startSegment.isForwardTrajectory(startFit));
   setValue < NAMED("startSegment_isForwardTrajectory_endFit") > (startSegment.isForwardTrajectory(endFit));
   setValue < NAMED("startSegment_isForwardTrajectory_commonFit") > (startSegment.isForwardTrajectory(commonFit));
@@ -74,6 +79,7 @@ bool AxialAxialSegmentPairFilterTree::setValues(const CellWeight& mcWeight, cons
   setValue < NAMED("endSegment_isForwardTrajectory_endFit") > (endSegment.isForwardTrajectory(endFit));
   setValue < NAMED("endSegment_isForwardTrajectory_commonFit") > (endSegment.isForwardTrajectory(commonFit));
 
+  // Total trajectory lengths - refinement of the former
   setValue < NAMED("startSegment_totalPerpS_startFit") > (startSegment.getTotalPerpS(startFit));
   setValue < NAMED("startSegment_totalPerpS_endFit") > (startSegment.getTotalPerpS(endFit));
   setValue < NAMED("startSegment_totalPerpS_commonFit") > (startSegment.getTotalPerpS(commonFit));
@@ -81,6 +87,7 @@ bool AxialAxialSegmentPairFilterTree::setValues(const CellWeight& mcWeight, cons
   setValue < NAMED("endSegment_totalPerpS_startFit") > (endSegment.getTotalPerpS(startFit));
   setValue < NAMED("endSegment_totalPerpS_endFit") > (endSegment.getTotalPerpS(endFit));
   setValue < NAMED("endSegment_totalPerpS_commonFit") > (endSegment.getTotalPerpS(commonFit));
+
 
   setValue < NAMED("perpS_gap_startFit") > (endSegment.getFrontPerpS(startFit) - startSegment.getBackPerpS(startFit));
   setValue < NAMED("perpS_gap_endFit") > (endSegment.getFrontPerpS(endFit) - startSegment.getBackPerpS(endFit));
@@ -155,6 +162,8 @@ bool AxialAxialSegmentPairFilterTree::setValues(const CellWeight& mcWeight, cons
 
   setValue < NAMED("start_to_end_mom_angle") > (startMomAtCenter.angleWith(endMomAtExtrapolation));
   setValue < NAMED("end_to_start_mom_angle") > (endMomAtCenter.angleWith(startMomAtExtrapolation));
+
+
 
   /*
   m_distanceAtStart = startCenter.distance(endExtrapolatedToStartCenter);

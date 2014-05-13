@@ -171,7 +171,6 @@ namespace Belle2 {
 
 
     private:
-
       /// Helper function. Starting a new cluster and iterativelly (not recursively) expands it.
       inline void startCluster(const Neighborhood& neighborhood,
                                Cluster& newCluster,

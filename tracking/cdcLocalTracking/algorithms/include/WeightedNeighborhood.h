@@ -52,13 +52,19 @@ namespace Belle2 {
        *  Secondly it also stores the weight for sorting, so that the neighbors to one item are
        *  sorted with increasing weights */
       struct WeightedItemPtr {
+
+        /// Constructor bundeling the original item and the weight of a relation
         WeightedItemPtr(const ItemPtr& itemPtr , const Weight& weight) :
           m_itemPtr(itemPtr)      , m_weight(weight) {;}
 
+        /// Comparison operator establishing a total ordering considering the pointer first and the weight second
         inline bool operator<(const WeightedItemPtr& other) const
         { return m_itemPtr < other.m_itemPtr or (m_itemPtr == other.m_itemPtr  and m_weight < other.m_weight); }
 
+        /// Getter for the pointer to the original item
         ItemPtr getItemPtr() const { return m_itemPtr; }
+
+        /// Getter for the weight
         Weight getWeight() const { return m_weight; }
 
       private:
@@ -90,17 +96,21 @@ namespace Belle2 {
        *  for the value parts in it */
       class iterator : public container_const_iterator {
       public:
+
+        /// Constructor taking the raw iterator to be wrapped
         iterator(const container_const_iterator& it) : container_const_iterator(it) {;}
 
-        ItemPtr getNeighbor() {
-          return (*this)->second;
-        }
-        ItemPtr getItem() {
-          return (*this)->first.getItemPtr();
-        }
-        Weight getWeight() {
-          return (*this)->first.getWeight();
-        }
+        /// Getter to the pointer to the neighboring item
+        ItemPtr getNeighbor()
+        { return (*this)->second; }
+
+        /// Getter to the pointer to the original item
+        ItemPtr getItem()
+        { return (*this)->first.getItemPtr(); }
+
+        /// Getter for the weight assoziated with the neighborhood relation
+        Weight getWeight()
+        { return (*this)->first.getWeight(); }
       };
 
       /// Iterator range type for a pair of iterators representing all the neighbors of a specific item.
@@ -343,9 +353,6 @@ namespace Belle2 {
         }
         return output;
       }
-
-
-
 
     }; //class
   } // end namespace WeightedNeighborhood

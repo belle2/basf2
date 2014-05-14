@@ -274,7 +274,6 @@ namespace Belle2 {
       if (!pid) return 0.5;
 
       return pid->getProbability(Const::electron, Const::pion);
-
     }
 
     double particleElectrondEdxId(const Particle* part)
@@ -293,7 +292,6 @@ namespace Belle2 {
 
       Const::PIDDetectorSet set = Const::TOP;
       return pid->getProbability(Const::electron, Const::pion, set);
-
     }
 
     double particleElectronARICHId(const Particle* part)
@@ -303,7 +301,15 @@ namespace Belle2 {
 
       Const::PIDDetectorSet set = Const::ARICH;
       return pid->getProbability(Const::electron, Const::pion, set);
+    }
 
+    double particleElectronIdECL(const Particle* part)
+    {
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
+      if (!pid) return 0.5;
+
+      Const::PIDDetectorSet set = Const::ECL;
+      return pid->getProbability(Const::electron, Const::pion, set);
     }
 
     double particleMuonId(const Particle* part)
@@ -331,7 +337,6 @@ namespace Belle2 {
 
       Const::PIDDetectorSet set = Const::TOP;
       return pid->getProbability(Const::muon, Const::pion, set);
-
     }
 
     double particleMuonARICHId(const Particle* part)
@@ -341,7 +346,6 @@ namespace Belle2 {
 
       Const::PIDDetectorSet set = Const::ARICH;
       return pid->getProbability(Const::muon, Const::pion, set);
-
     }
 
     double particlePionId(const Particle* part)
@@ -350,7 +354,6 @@ namespace Belle2 {
       if (!pid) return 0.5;
 
       return pid->getProbability(Const::pion, Const::kaon);
-
     }
 
     double particlePiondEdxId(const Particle* part)
@@ -360,7 +363,6 @@ namespace Belle2 {
 
       Const::PIDDetectorSet set = Const::CDC + Const::SVD;
       return pid->getProbability(Const::pion, Const::kaon, set);
-
     }
 
     double particlePionTOPId(const Particle* part)
@@ -370,7 +372,6 @@ namespace Belle2 {
 
       Const::PIDDetectorSet set = Const::TOP;
       return pid->getProbability(Const::pion, Const::kaon, set);
-
     }
 
     double particlePionARICHId(const Particle* part)
@@ -380,7 +381,6 @@ namespace Belle2 {
 
       Const::PIDDetectorSet set = Const::ARICH;
       return pid->getProbability(Const::pion, Const::kaon, set);
-
     }
 
     double particleKaonId(const Particle* part)
@@ -389,7 +389,6 @@ namespace Belle2 {
       if (!pid) return 0.5;
 
       return pid->getProbability(Const::kaon, Const::pion);
-
     }
 
     double particleKaondEdxId(const Particle* part)
@@ -399,7 +398,6 @@ namespace Belle2 {
 
       Const::PIDDetectorSet set = Const::CDC + Const::SVD;
       return pid->getProbability(Const::kaon, Const::pion, set);
-
     }
 
     double particleKaonTOPId(const Particle* part)
@@ -409,7 +407,6 @@ namespace Belle2 {
 
       Const::PIDDetectorSet set = Const::TOP;
       return pid->getProbability(Const::kaon, Const::pion, set);
-
     }
 
     double particleKaonARICHId(const Particle* part)
@@ -419,7 +416,6 @@ namespace Belle2 {
 
       Const::PIDDetectorSet set = Const::ARICH;
       return pid->getProbability(Const::kaon, Const::pion, set);
-
     }
 
     double particleProtonId(const Particle* part)
@@ -437,7 +433,6 @@ namespace Belle2 {
 
       Const::PIDDetectorSet set = Const::CDC + Const::SVD;
       return pid->getProbability(Const::proton, Const::pion, set);
-
     }
 
     double particleProtonTOPId(const Particle* part)
@@ -447,7 +442,6 @@ namespace Belle2 {
 
       Const::PIDDetectorSet set = Const::TOP;
       return pid->getProbability(Const::proton, Const::pion, set);
-
     }
 
     double particleProtonARICHId(const Particle* part)
@@ -457,7 +451,6 @@ namespace Belle2 {
 
       Const::PIDDetectorSet set = Const::ARICH;
       return pid->getProbability(Const::proton, Const::pion, set);
-
     }
 
     double particleMissingARICHId(const Particle* part)
@@ -480,6 +473,19 @@ namespace Belle2 {
         return 1.0;
 
       Const::PIDDetectorSet set = Const::TOP;
+      if (not pid->isAvailable(set))
+        return 1.0;
+
+      return 0;
+    }
+
+    double particleMissingECL(const Particle* part)
+    {
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
+      if (!pid)
+        return 1.0;
+
+      Const::PIDDetectorSet set = Const::ECL;
       if (not pid->isAvailable(set))
         return 1.0;
 
@@ -802,6 +808,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("Kid_ARICH", particleKaonARICHId, "kaon identification probability from ARICH");
     REGISTER_VARIABLE("prid_ARICH", particleProtonARICHId, "proton identification probability from ARICH");
     REGISTER_VARIABLE("missing_ARICH", particleMissingARICHId, "1.0 if identification probability from ARICH is missing");
+
+    REGISTER_VARIABLE("eid_ECL", particleElectronIdECL, "electron identification probability from ECL");
+    REGISTER_VARIABLE("missing_ECL", particleMissingECL, "1.0 if identification probability from ECL is missing");
 
     REGISTER_VARIABLE("NB_eid_TOP", NeuroBayesifyTOP<particleElectronTOPId>, "electron identification probability from TOP (returns -999 when not available)");
     REGISTER_VARIABLE("NB_muid_TOP", NeuroBayesifyTOP<particleMuonTOPId>, "muon identification probability from TOP (returns -999 when not available)");

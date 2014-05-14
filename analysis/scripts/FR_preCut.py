@@ -41,7 +41,6 @@ def PreCutMassDetermination(name, pdgcode, channels, preCut_Histograms, efficien
     for ignoredChannel in GetIgnoredChannels(signal, bckgrd, cuts):
         result['IsIgnored_' + ignoredChannel] = True
         B2WARNING("Ignoring channel " + ignoredChannel + "!")
-    result['Hash'] = createHash(name, pdgcode, channels, preCut_Histograms, efficiency)
     return result
 
 
@@ -71,7 +70,6 @@ def PreCutProbDetermination(name, pdgcode, channels, preCut_Histograms, efficien
     for ignoredChannel in GetIgnoredChannels(signal, bckgrd, cuts):
         result['IsIgnored_' + ignoredChannel] = True
         B2WARNING("Ignoring channel " + ignoredChannel + "!")
-    result['Hash'] = createHash(name, pdgcode, channels, preCut_Histogram, efficiency)
     return result
 
 

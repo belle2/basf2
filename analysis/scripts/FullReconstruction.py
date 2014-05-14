@@ -229,6 +229,7 @@ def FullReconstruction(path, particles):
                                         variables='Variables_' + channel.name,
                                         name='Name_' + channel.name,
                                         particleList='ParticleList_' + channel.name,
+                                        daughterSignalProbabilities=['SignalProbability_' + daughter for daughter in channel.daughters],
                                         isIgnored='IsIgnored_' + channel.name)
                     seq.addResource('SignalProbability_' + particle.name, 'Dummy', requires=['SignalProbability_' + channel.name for channel in particle.channels])
 

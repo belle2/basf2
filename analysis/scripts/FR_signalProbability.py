@@ -9,7 +9,7 @@ import FR_utility
 import os
 
 
-def SignalProbability(path, method, variables, name, particleList, isIgnored=False):
+def SignalProbability(path, method, variables, name, particleList, daughterSignalProbabilities=[], isIgnored=False):
     """
     Calculates the SignalProbability of a ParticleList. If the needed experts aren't available they're created.
         @param path the basf2 path
@@ -17,10 +17,11 @@ def SignalProbability(path, method, variables, name, particleList, isIgnored=Fal
         @param variables used for classification (see VariableManager)
         @param name of the particle or channel which is classified
         @param particleList the particleList which is used for training and classification
+        @param daughterSignalProbabilities all daughter particles need a SignalProbability
         @param true if the channel is ignored due to low statistics
     """
     # Create hash with all parameters on which this training depends
-    hash = FR_utility.createHash(method, variables, particleList, isIgnored)
+    hash = FR_utility.createHash(method, variables, particleList, daughterSignalProbabilities, isIgnored)
 
     if isIgnored:
         return {'SignalProbability_' + name: hash}

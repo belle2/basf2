@@ -229,7 +229,9 @@ namespace Belle2 {
       static bool ms_check_range;     /// Check the helix parameter's range.
       static bool ms_print_debug;     /// Debug option flag.
       static bool ms_throw_exception; /// Throw exception flag.
-
+      /**
+      ms_check_range : check the helix parameter's range
+      */
 
     public: // Operators
 

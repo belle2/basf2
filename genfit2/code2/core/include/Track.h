@@ -179,7 +179,7 @@ class Track : public TObject {
 
   void deletePoint(int id);
 
-  //! Creates a new TrackPoint contaioning the measurement, and adds it to the track
+  //! Creates a new TrackPoint containing the measurement, and adds it to the track
   void insertMeasurement(AbsMeasurement* measurement, int id = -1);
 
   /**
@@ -208,8 +208,29 @@ class Track : public TObject {
    */
   bool sort();
 
+  //! Try to set the fitted state as seed. Return if it was successfull.
+  //! Adapt the sign of all TrackReps' pdg to the actual fitted charge.
+  bool udpateSeed(int id = 0, AbsTrackRep* rep = NULL, bool biased = true);
+
   //! Flip the ordering of the TrackPoints
   void reverseTrackPoints();
+
+  //! Flip direction of momentum seed
+  void reverseMomSeed() {
+    stateSeed_(3) *= -1; stateSeed_(4) *= -1; stateSeed_(5) *= -1;
+  }
+
+  //! Switch the pdg signs of specified rep (of all reps if rep == NULL).
+  void switchPDGSigns(AbsTrackRep* rep = NULL);
+
+  //! Make track ready to be fitted in reverse direction
+  /**
+   * Flip the order of TrackPoints and the momentum direction of the seed state.
+   * If possible, take the smoothed state of the last hit as new seed state.
+   * Flip charge of the TrackReps.
+   */
+  void reverseTrack();
+
 
   void deleteForwardInfo(int startId = 0, int endId = -1, const AbsTrackRep* rep = NULL); // delete in range [startId, endId]. If rep == NULL, delete for ALL reps, otherwise only for rep.
   void deleteBackwardInfo(int startId = 0, int endId = -1, const AbsTrackRep* rep = NULL); // delete in range [startId, endId]. If rep == NULL, delete for ALL reps, otherwise only for rep.

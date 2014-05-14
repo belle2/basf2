@@ -19,6 +19,7 @@
 
 #include "AbsTrackRep.h"
 #include "StateOnPlane.h"
+#include "AbsMeasurement.h"
 
 #include <TDatabasePDG.h>
 
@@ -43,6 +44,15 @@ AbsTrackRep::AbsTrackRep(const AbsTrackRep& rep) :
   TObject(rep), pdgCode_(rep.pdgCode_), propDir_(rep.propDir_), debugLvl_(rep.debugLvl_)
 {
   ;
+}
+
+
+double AbsTrackRep::extrapolateToMeasurement(StateOnPlane& state,
+    const AbsMeasurement* measurement,
+    bool stopAtBoundary,
+    bool calcJacobianNoise) const {
+
+  return this->extrapolateToPlane(state, measurement->constructPlane(state), stopAtBoundary, calcJacobianNoise);
 }
 
 
@@ -77,6 +87,13 @@ void AbsTrackRep::get6DStateCov(const MeasuredStateOnPlane& state, TVectorD& sta
   stateVec(3) = mom.X();
   stateVec(4) = mom.Y();
   stateVec(5) = mom.Z();
+}
+
+
+double AbsTrackRep::getPDGCharge() const {
+  TParticlePDG* particle = TDatabasePDG::Instance()->GetParticle(pdgCode_);
+  assert(particle != NULL);
+  return particle->Charge()/(3.);
 }
 
 
@@ -161,6 +178,17 @@ void AbsTrackRep::calcJacobianNumerically(const genfit::StateOnPlane& origState,
     }
   }
 }
+
+
+bool AbsTrackRep::switchPDGSign() {
+  TParticlePDG* particle = TDatabasePDG::Instance()->GetParticle(-pdgCode_);
+  if(particle != NULL) {
+    pdgCode_ *= -1;
+    return true;
+  }
+  return false;
+}
+
 
 
 void AbsTrackRep::Print(const Option_t*) const {

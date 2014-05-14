@@ -1062,11 +1062,11 @@ void MuidModule::finishTrack(Muid* muid, int charge)
   double kaon = 0.0;
   double proton = 0.0;
   double electron = 0.0;
-  double logL_mu = -1.0E200;
-  double logL_pi = -1.0E200;
-  double logL_K = -1.0E200;
-  double logL_p = -1.0E200;
-  double logL_e = -1.0E200;
+  double logL_mu = -1.0E20;
+  double logL_pi = -1.0E20;
+  double logL_K = -1.0E20;
+  double logL_p = -1.0E20;
+  double logL_e = -1.0E20;
   if (outcome != 0) { // extrapolation reached KLM sensitive volume
     if (charge > 0.0) {
       muon = m_MuonPlusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
@@ -1081,11 +1081,11 @@ void MuidModule::finishTrack(Muid* muid, int charge)
       proton = m_AntiprotonPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
       electron = m_ElectronPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
     }
-    logL_mu   = (muon > 0.0 ? log(muon) : -1.0E200);
-    logL_pi   = (pion > 0.0 ? log(pion) : -1.0E200);
-    logL_K    = (kaon > 0.0 ? log(kaon) : -1.0E200);
-    logL_p    = (proton > 0.0 ? log(proton) : -1.0E200);
-    logL_e    = (electron > 0.0 ? log(electron) : -1.0E200);
+    if (muon > 0.0) logL_mu = log(muon);
+    if (pion > 0.0) logL_pi = log(pion);
+    if (kaon > 0.0) logL_K = log(kaon);
+    if (proton > 0.0) logL_p = log(proton);
+    if (electron > 0.0) logL_e = log(electron);
     // normalize the PDF values
     double denom = muon + pion + kaon + proton + electron;
     if (denom < 1.0E-20) {

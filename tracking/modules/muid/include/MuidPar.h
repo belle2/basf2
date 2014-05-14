@@ -13,11 +13,20 @@
 
 namespace Belle2 {
 
-//! Maximum layer-difference index for array size
-#define MUID_MaxRange 20
+//! Greatest value for lastExtLayer (range) coordinate
+#define MUID_MaxLastExtLayer 25
 
-//! Maximum reduced-chi-squared index for array size
-#define MUID_MaxReducedChiSquared 250
+//! Greatest value for ndof/2 (half of # of degrees of freedom in transverse-scattering chi-squared)
+#define MUID_MaxHalfNdof 18
+
+//! Greatest value for outcome (index of KLM section: barrel/endcap forward/backward)
+#define MUID_MaxOutcome 4
+
+//! Layer-difference array size
+#define MUID_RangeNbins 20
+
+//! Reduced-chi-squared array size
+#define MUID_ReducedChiSquaredNbins 250
 
 //! Maximum reduced-chi-squared value for transverse scattering
 #define MUID_ReducedChiSquaredLimit 50.0
@@ -60,19 +69,22 @@ namespace Belle2 {
     double getPDFRchisq(int, int, double) const;
 
     //! Range-difference (longitudinal) probability density function
-    double m_RangePDF[4][15][MUID_MaxRange];
+    double m_RangePDF[MUID_MaxOutcome + 1][MUID_MaxLastExtLayer + 1][MUID_RangeNbins];
 
     //! Reduced chi-squared (transverse) probability density function (overflows in last bin)
-    double m_ReducedChiSquaredPDF[4][19][MUID_MaxReducedChiSquared];
+    double m_ReducedChiSquaredPDF[MUID_MaxOutcome + 1][MUID_MaxHalfNdof + 1][MUID_ReducedChiSquaredNbins];
 
     //! First derivative of reduced chi-squared PDF (for spline interpolation)
-    double m_ReducedChiSquaredD1[4][19][MUID_MaxReducedChiSquared];
+    double m_ReducedChiSquaredD1[MUID_MaxOutcome + 1][MUID_MaxHalfNdof + 1][MUID_ReducedChiSquaredNbins];
 
     //! Second derivative of reduced chi-squared PDF (for spline interpolation)
-    double m_ReducedChiSquaredD2[4][19][MUID_MaxReducedChiSquared];
+    double m_ReducedChiSquaredD2[MUID_MaxOutcome + 1][MUID_MaxHalfNdof + 1][MUID_ReducedChiSquaredNbins];
 
     //! Third derivative of reduced chi-squared PDF (for spline interpolation)
-    double m_ReducedChiSquaredD3[4][19][MUID_MaxReducedChiSquared];
+    double m_ReducedChiSquaredD3[MUID_MaxOutcome + 1][MUID_MaxHalfNdof + 1][MUID_ReducedChiSquaredNbins];
+
+    //! Reduced chi-squared (transverse) probability density function's bin size
+    double m_ReducedChiSquaredDx;
 
     //! Status flag to indicate whether the PDF tables have been filled or not
     bool m_IsValid;

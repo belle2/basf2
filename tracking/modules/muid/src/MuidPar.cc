@@ -19,6 +19,8 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
+#include <TMath.h>
+
 using namespace std;
 
 namespace Belle2 {
@@ -49,39 +51,47 @@ namespace Belle2 {
     }
 
     m_IsValid = true;
-    for (int outcome = 1; outcome <= 4; ++outcome) {
-      sprintf(line, "/Outcome[@outcome=\"%d\"]", outcome);
+    m_ReducedChiSquaredDx = MUID_ReducedChiSquaredLimit / MUID_ReducedChiSquaredNbins;   // bin size
+    for (int outcome = 1; outcome <= MUID_MaxOutcome; ++outcome) {
+      sprintf(line, "Outcome[@outcome=\"%d\"]/", outcome);
       GearDir outcomeContent(content);
       outcomeContent.append(line);
       for (int layer = 0; layer <= 25; ++layer) {
         sprintf(line, "LongitudinalPDF/LastLayer[@layer=\"%d\"]", layer);
         std::vector<double> rangePDF = outcomeContent.getArray(line);
-        if (rangePDF.size() != MUID_MaxRange) {
+        if (rangePDF.size() != MUID_RangeNbins) {
           B2ERROR("muid::MuidPar::fillPDFs(): LongitudinalPDF vector for hypothesis " << hypothesisName << "  outcome " << outcome
-                  << " layer=" << layer << " has " << rangePDF.size() << " entries; should be " << MUID_MaxRange)
+                  << " layer=" << layer << " has " << rangePDF.size() << " entries; should be " << MUID_RangeNbins)
           m_IsValid = false;
         } else {
-          for (int i = 0; i < MUID_MaxRange; ++i) {
-            m_RangePDF[outcome - 1][layer][i] = rangePDF[i];
+          for (int i = 0; i < MUID_RangeNbins; ++i) {
+            m_RangePDF[outcome][layer][i] = rangePDF[i];
           }
         }
       }
-      for (int ndof = 2; ndof < 38; ndof += 2) {
-        sprintf(line, "TransversePDF/DegreesOfFreedom[@ndof=\"%d\"]", ndof);
+      for (int halfNdof = 1; halfNdof <= MUID_MaxHalfNdof; ++halfNdof) {
+        sprintf(line, "TransversePDF/DegreesOfFreedom[@ndof=\"%d\"]", 2 * halfNdof);
         std::vector<double> reducedChiSquaredPDF = outcomeContent.getArray(line);
-        if (reducedChiSquaredPDF.size() != MUID_MaxReducedChiSquared) {
+        if (reducedChiSquaredPDF.size() != MUID_ReducedChiSquaredNbins) {
           B2ERROR("muid::MuidPar::fillPDFs(): TransversePDF vector for hypothesis " << hypothesisName << "  outcome " << outcome
-                  << " has " << reducedChiSquaredPDF.size() << " entries; should be " << MUID_MaxReducedChiSquared)
+                  << " has " << reducedChiSquaredPDF.size() << " entries; should be " << MUID_ReducedChiSquaredNbins)
           m_IsValid = false;
         } else {
-          for (int i = 0; i < MUID_MaxReducedChiSquared; ++i) {
-            m_ReducedChiSquaredPDF[outcome - 1][ndof / 2][i] = reducedChiSquaredPDF[i];
+          double integral = 1.0E-30;
+          for (int i = 0; i < MUID_ReducedChiSquaredNbins; ++i) {
+            integral += reducedChiSquaredPDF[i];
           }
-          double dx = MUID_ReducedChiSquaredLimit / MUID_MaxReducedChiSquared;   // bin size
-          spline(MUID_MaxReducedChiSquared, dx, &m_ReducedChiSquaredPDF[outcome - 1][ndof / 2][0],
-                 &m_ReducedChiSquaredD1[outcome - 1][ndof / 2][0],
-                 &m_ReducedChiSquaredD2[outcome - 1][ndof / 2][0],
-                 &m_ReducedChiSquaredD3[outcome - 1][ndof / 2][0]);
+          for (int i = 0; i < MUID_ReducedChiSquaredNbins; ++i) {
+            m_ReducedChiSquaredPDF[outcome][halfNdof][i] = reducedChiSquaredPDF[i] / integral;
+          }
+          spline(MUID_ReducedChiSquaredNbins - 1, m_ReducedChiSquaredDx,
+                 &m_ReducedChiSquaredPDF[outcome][halfNdof][0],
+                 &m_ReducedChiSquaredD1[outcome][halfNdof][0],
+                 &m_ReducedChiSquaredD2[outcome][halfNdof][0],
+                 &m_ReducedChiSquaredD3[outcome][halfNdof][0]);
+          m_ReducedChiSquaredD1[outcome][halfNdof][MUID_ReducedChiSquaredNbins - 1] = 0.0;
+          m_ReducedChiSquaredD2[outcome][halfNdof][MUID_ReducedChiSquaredNbins - 1] = 0.0;
+          m_ReducedChiSquaredD3[outcome][halfNdof][MUID_ReducedChiSquaredNbins - 1] = 0.0;
         }
       }
     }
@@ -142,7 +152,7 @@ namespace Belle2 {
       return 0.0;
     }
 
-    if ((outcome <= 0) || (outcome > 4)) return 0.0;
+    if ((outcome <= 0) || (outcome > MUID_MaxOutcome)) return 0.0;
     return getPDFRange(outcome, lastExtLayer, layerDifference) * getPDFRchisq(outcome, ndof, chiSquared);
 
   }
@@ -150,34 +160,39 @@ namespace Belle2 {
   double MuidPar::getPDFRange(int outcome, int lastExtLayer, int layerDifference) const
   {
 
-    if ((lastExtLayer < 0) || (lastExtLayer  > 25)) return 0.0;
+    if ((lastExtLayer < 0) || (lastExtLayer > MUID_MaxLastExtLayer)) return 0.0;
 
     // Evaluate the longitudinal-coordinate PDF for this particleID hypothesis
 
-    if (layerDifference >= MUID_MaxRange) { layerDifference = MUID_MaxRange - 1; }
-    return m_RangePDF[outcome - 1][lastExtLayer][layerDifference];
+    if (layerDifference >= MUID_RangeNbins) layerDifference = MUID_RangeNbins - 1;
+    return m_RangePDF[outcome][lastExtLayer][layerDifference];
 
   }
 
   double MuidPar::getPDFRchisq(int outcome, int ndof, double chiSquared) const
   {
 
-    // Evaluate the transverse-coordinate PDF for this particleID hypothesis
+    // Evaluate the transverse-coordinate PDF for this particleID hypothesis.
     // Use spline interpolation of the PDF to avoid binning artifacts.
 
     if (ndof <= 0) return 1.0;
-    if (chiSquared < 0.0) return 0.0;
-    double reducedChiSquared = chiSquared / ndof;
-    if (reducedChiSquared >= MUID_ReducedChiSquaredLimit)
-      return m_ReducedChiSquaredPDF[outcome - 1][ndof / 2][MUID_MaxReducedChiSquared - 1];
-
-    int    i  = (int)(reducedChiSquared / (MUID_ReducedChiSquaredLimit / MUID_MaxReducedChiSquared));
-    double dx = reducedChiSquared - i * (MUID_ReducedChiSquaredLimit / MUID_MaxReducedChiSquared);
-    double pdf = m_ReducedChiSquaredPDF[outcome - 1][ndof / 2][i] +
-                 dx * (m_ReducedChiSquaredD1[outcome - 1][ndof / 2][i] +
-                       dx * (m_ReducedChiSquaredD2[outcome - 1][ndof / 2][i] +
-                             dx * m_ReducedChiSquaredD3[outcome - 1][ndof / 2][i]));
-    return max(0.0, pdf);
+    int halfNdof = (ndof >> 1);
+    double pdf = 0.0;
+    if ((chiSquared > 0.0) && (halfNdof <= MUID_MaxHalfNdof)) {
+      double x = chiSquared / ndof - 0.5 * m_ReducedChiSquaredDx;
+      if (x >= MUID_ReducedChiSquaredLimit - 0.5 * m_ReducedChiSquaredDx) {
+        pdf = m_ReducedChiSquaredPDF[outcome][halfNdof][MUID_ReducedChiSquaredNbins - 1];
+      } else {
+        int i  = (int)(x / m_ReducedChiSquaredDx);
+        pdf = m_ReducedChiSquaredPDF[outcome][halfNdof][i];
+        double dx = x - i * m_ReducedChiSquaredDx;
+        double corr = dx * (m_ReducedChiSquaredD1[outcome][halfNdof][i] +
+                            dx * (m_ReducedChiSquaredD2[outcome][halfNdof][i] +
+                                  dx * m_ReducedChiSquaredD3[outcome][halfNdof][i]));
+        if (corr > 0.0) pdf += corr;
+      }
+    }
+    return pdf;
   }
 
 } // end of namespace Belle2

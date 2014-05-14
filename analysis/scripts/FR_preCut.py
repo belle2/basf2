@@ -75,7 +75,7 @@ def PreCutProbDetermination(name, pdgcode, channels, preCut_Histograms, efficien
 
 def LoadHistogramsFromFiles(files, variable, channels):
     """
-    Load for every channel the signal and backgrund histogram of a variable from given ROOT file and
+    Load for every channel the signal and background histogram of a variable from given ROOT file and
     calculates the ratio S/B histogram.
     @param filename filename of the ROOT file containing the histograms
     @param variable the variable which defines the x-axis of the histograms

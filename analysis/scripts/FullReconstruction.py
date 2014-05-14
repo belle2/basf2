@@ -20,7 +20,7 @@
 # If no further Actors can be called without satisfying all their requirements, the FullReoncstruction function returns.
 # Therefore the end user has to run the FullReconstruction several times, until all Distributions, Classifiers, ... are created.
 #
-# To create an new Actor:
+# To create a new Actor:
 #   1. Write a normal function which takes the needed arguments and returns a dictonary of provided values . E.g. def foo(path, particleList) ... return {'Stuff': x}
 #   2. Make sure your return value depends on all the used arguments, easiest way to accomplish this is using the createHash function
 #   2. Add the function in the FullReonstruction method (at the end of the file) to the sequence like this: seq.addFunction(foo, path='Path', particleList='K+')
@@ -209,7 +209,7 @@ def FullReconstruction(path, particles):
                                     pdg='PDG_' + particle.name,
                                     particleList='ParticleList_' + particle.name)
 
-                # Other FSP: Other FSP like gammas and pi0, are trained with a single classifier.
+                # Other FSP: Other FSP like gammas are trained with a single classifier.
                 elif particle.channels == []:
                     seq.addFunction(SignalProbability,
                                     path='Path',

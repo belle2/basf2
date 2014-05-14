@@ -111,7 +111,7 @@ namespace Belle2 {
 
     //--------------------------------- default name stuff -----------------------------------------------------
     /** Return the default storage name for given class name. */
-    static const std::string defaultObjectName(std::string classname) {
+    static std::string defaultObjectName(std::string classname) {
       if (classname == "genfit::Track")
         return "GF2Track";
       //Strip qualifiers like namespaces
@@ -123,37 +123,37 @@ namespace Belle2 {
     }
 
     /** Return the default storage name for an object of the given type. */
-    template<class T> static const std::string defaultObjectName() {
+    template<class T> static std::string defaultObjectName() {
       return defaultObjectName(T::Class_Name());
     }
 
     /** Return the storage name for an object of the given type and name. */
-    template<class T> static const std::string objectName(const std::string& name) {
+    template<class T> static std::string objectName(const std::string& name) {
       return ((name.empty()) ? defaultObjectName<T>() : name);
     }
 
     /** Return the default storage name for an given class name. */
-    static const std::string defaultArrayName(const std::string& classname) {
+    static std::string defaultArrayName(const std::string& classname) {
       return defaultObjectName(classname) + 's';
     }
 
     /** Return the default storage name for an array of the given type. */
-    template<class T> static const std::string defaultArrayName() {
+    template<class T> static std::string defaultArrayName() {
       return defaultObjectName<T>() + 's';
     }
 
     /** Return the storage name for an object of the given type and name. */
-    template<class T> static const std::string arrayName(const std::string& name) {
+    template<class T> static std::string arrayName(const std::string& name) {
       return ((name.empty()) ? defaultArrayName<T>() : name);
     }
 
     /** Return the default storage name for a relation between the given types. */
-    template<class FROM, class TO> static const std::string defaultRelationName() {
+    template<class FROM, class TO> static std::string defaultRelationName() {
       return defaultArrayName<FROM>() + "To" + defaultArrayName<TO>();
     }
 
     /** Return the storage name for a relation with given name between the given types. */
-    template<class FROM, class TO> static const std::string relationName(const std::string& name) {
+    template<class FROM, class TO> static std::string relationName(const std::string& name) {
       return ((name.empty()) ? defaultArrayName<FROM, TO>() : name);
     }
 

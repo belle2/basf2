@@ -33,7 +33,7 @@ def PreCutMassDetermination(name, pdgcode, channels, preCut_Histograms, efficien
     splines = FitSplineFunctions(ratio)
 
     def ycut_to_xcuts(channel, cut):
-        return (splines[channel].GetX(cut, 0, maxima[channel]), splines[channel].GetX(cut, maxima[channel], 100))
+        return (splines[channel].GetX(cut, signal[channel].GetXaxis().GetXmin(), maxima[channel]), splines[channel].GetX(cut, maxima[channel], signal[channel].GetXaxis().GetXmax()))
     cuts = GetCuts(signal, efficiency, ycut_to_xcuts)
 
     result = {'PreCut_' + channel: {'variable': 'MassCut', 'range': cut} for (channel, cut) in cuts.iteritems()}
@@ -112,7 +112,16 @@ def FitSplineFunctions(histograms):
     @param histograms Histograms
     """
     splines = dict([(channel, ROOT.TSpline3(value)) for (channel, value) in histograms.iteritems()])
-    return dict([(channel, ROOT.TF1(hashlib.sha1(channel).hexdigest() + '_func', lambda x, spline=spline: spline.Eval(x[0]), 0, 100, 0)) for (channel, spline) in splines.iteritems()])
+    return dict([(
+                channel,
+                ROOT.TF1(
+                    hashlib.sha1(channel).hexdigest() + '_func',
+                    lambda x, spline=spline: spline.Eval(x[0]),
+                    histograms[channel].GetXaxis().GetXmin(),
+                    histograms[channel].GetXaxis().GetXmax(),
+                    0
+                )
+                ) for (channel, spline) in splines.iteritems()])
 
 
 def GetCuts(signal, efficiency, ycut_to_xcuts):

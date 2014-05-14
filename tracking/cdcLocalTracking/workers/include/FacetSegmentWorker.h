@@ -51,7 +51,7 @@ namespace Belle2 {
       void initialize() {
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
-        StoreArray < CDCRecoTangentCollection >::registerTransient("CDCRecoTangentSegments");
+        StoreArray < CDCRecoTangentVector >::registerTransient("CDCRecoTangentSegments");
         StoreArray < CDCRecoSegment2D >::registerTransient("CDCRecoHit2DSegmentsSelected");
         StoreArray < CDCWireHitCluster >::registerTransient("CDCWireHitClusters");
 #endif
@@ -138,19 +138,18 @@ namespace Belle2 {
             B2DEBUG(100, "  Created " << m_facetsNeighborhood.size()  << " FacetsNeighborhoods");
 
             //Apply the cellular automaton in a multipass manner
-            m_facetSegments.clear();
-            m_cellularPathFinder.apply(m_facets, m_facetsNeighborhood, m_facetSegments);
+            m_facetPaths.clear();
+            m_cellularPathFinder.apply(m_facets, m_facetsNeighborhood, m_facetPaths);
 
             //save the tangents for display only
 #ifdef CDCLOCALTRACKING_USE_ROOT
             B2DEBUG(100, "Reduce the CDCRecoFacetPtrSegment to RecoSegment2D");
-            m_tangentSegmentCreator.create(m_facetSegments, m_recoTangentSegments);
+            m_tangentSegmentCreator.create(m_facetPaths, m_recoTangentSegments);
 #endif
 
             // reduce the CDCRecoFacetPtrSegment directly to the selected vector
             B2DEBUG(100, "Reduce the CDCRecoFacetPtrSegment to RecoSegment2D");
-            m_segments2D.reserve(m_segments2D.size() + m_facetSegments.size());
-            m_recoSegmentCreator.create(m_facetSegments, m_segments2D);
+            m_recoSegmentCreator.create(m_facetPaths, m_segments2D);
 
             //TODO: combine matching segments here
 
@@ -192,10 +191,10 @@ namespace Belle2 {
 
         // IO segments with tangents
         B2DEBUG(100, "  Creating the StoreArray for the CDCRecoTangentSegment");
-        StoreArray < CDCRecoTangentCollection > storedTangentSegments("CDCRecoTangentSegments");
+        StoreArray < CDCRecoTangentVector > storedTangentSegments("CDCRecoTangentSegments");
         storedTangentSegments.create();
         B2DEBUG(100, "  Do creating the CDCRecoTangentSegment in the StoreArray");
-        for (const CDCRecoTangentCollection & tangentSegment : m_recoTangentSegments) {
+        for (const CDCRecoTangentVector & tangentSegment : m_recoTangentSegments) {
           storedTangentSegments.appendNew(tangentSegment);
         }
         B2DEBUG(100, "  Created " << storedTangentSegments.getEntries()  << " CDCRecoTangentSegment");
@@ -228,10 +227,10 @@ namespace Belle2 {
       typedef WeightedNeighborhood<const CDCRecoFacet> CDCRecoFacetNeighborhood;
       CDCRecoFacetNeighborhood m_facetsNeighborhood;
 
-      std::vector< CDCRecoFacetPtrSegment > m_facetSegments;
+      std::vector< std::vector<const CDCRecoFacet*> > m_facetPaths;
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
-      std::vector< CDCRecoTangentCollection > m_recoTangentSegments;
+      std::vector< CDCRecoTangentVector > m_recoTangentSegments;
 #endif
 
       std::vector<CDCRecoSegment2D> m_segments2D;
@@ -264,7 +263,7 @@ namespace Belle2 {
       NeighborhoodBuilder<CDCRecoFacet, FacetNeighborChooser>
       m_facetNeighborhoodBuilder;
 
-      //cellular automat
+      //cellular automaton
       MultipassCellularPathFinder<CDCRecoFacet> m_cellularPathFinder;
 
       RecoSegmentCreator m_recoSegmentCreator;

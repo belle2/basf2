@@ -31,8 +31,8 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     //some additional transient types for exchange between objects
-    typedef std::vector<const CDCRecoFacet*>  CDCRecoFacetPtrSegment;
-    typedef CDCRecoTangentVector CDCRecoTangentCollection; //for now just used for io to python
+    //typedef std::vector<const CDCRecoFacet*>  CDCRecoFacetPtrSegment;
+    //typedef CDCRecoTangentVector CDCRecoTangentCollection; //for now just used for io to python
 
   }
 } // namespace Belle2

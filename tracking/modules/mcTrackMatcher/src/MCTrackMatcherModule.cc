@@ -128,19 +128,38 @@ MCTrackMatcherModule::~MCTrackMatcherModule()
 void MCTrackMatcherModule::initialize()
 {
 
-  //Require both GFTrackCand arrays to be present in the DataStore
+  // Require both GFTrackCand arrays to be present in the DataStore
   StoreArray<genfit::TrackCand>::required(m_param_prGFTrackCandsColName);
   StoreArray<genfit::TrackCand>::required(m_param_mcGFTrackCandsColName);
   StoreArray<MCParticle>::required("");
 
-  //Purity relation - for each PRTrack to will store the purest MCTrack
-  RelationArray::registerPersistent< genfit::TrackCand, genfit::TrackCand>(m_param_prGFTrackCandsColName, m_param_mcGFTrackCandsColName);
 
-  //Efficiency relation - for each MCTrack to will store the most efficient PRTrack
-  RelationArray::registerPersistent< genfit::TrackCand, genfit::TrackCand>(m_param_mcGFTrackCandsColName, m_param_prGFTrackCandsColName);
+  // Actually retrieve the StoreArrays
+  StoreArray<genfit::TrackCand> storePRTrackCands(m_param_prGFTrackCandsColName);
+  StoreArray<genfit::TrackCand> storeMCTrackCands(m_param_mcGFTrackCandsColName);
+  StoreArray<MCParticle> storeMCParticles;
+
+
+  // Extract the default names for the case empty stings were given
+  m_param_prGFTrackCandsColName = storePRTrackCands.getName();
+  m_param_mcGFTrackCandsColName = storeMCTrackCands.getName();
+
+
+
+  //Purity relation - for each PRTrack to store the purest MCTrack
+  RelationArray mcToPRPurityRelation(storeMCTrackCands, storePRTrackCands);
+
+  //Efficiency relation - for each MCTrack to store the most efficient PRTrack
+  RelationArray prToMCEfficiencyRelation(storePRTrackCands, storeMCTrackCands);
 
   //MC matching relation
-  RelationArray::registerPersistent< genfit::TrackCand, MCParticle>(m_param_prGFTrackCandsColName, "");
+  RelationArray prToMCParticleRelation(storePRTrackCands, storeMCParticles);
+
+  //Register to save to the root output
+  mcToPRPurityRelation.registerAsPersistent();
+  prToMCEfficiencyRelation.registerAsPersistent();
+  prToMCParticleRelation.registerAsPersistent();
+
 
   //Require the hits or clusters in case they should be used
   //PXD

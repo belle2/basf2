@@ -111,16 +111,47 @@ class Sequence(object):
         to provide the required arguments of the following resources.
         """
         results = dict()
+        if verbose:
+            print "Saving dependency graph to FRgraph.dot"
+            dotfile = open("FRgraph.dot", "w")
+            dotfile.write("digraph FRdependencies {\n")
+
         while len(self.seq) != 0:
+            # all items that have their requirements satisfied now
             current = [item for item in self.seq if all(r in results for r in item.requires)]
+            # remaining unsatisfied items
             self.seq = [item for item in self.seq if not all(r in results for r in item.requires)]
             for item in current:
                 arguments = [results[r] for r in item.requires]
-                results.update(item(*arguments))
+                provides = item(*arguments)
+                results.update(provides)
+                if verbose:
+                    for provided in provides.keys():
+                        style = ''
+                        if provided.startswith('SignalProbability'):
+                            style = '[shape=box,style=filled,fillcolor=orange]'
+                        elif provided.startswith('ParticleList'):
+                            style = '[shape=box,style=filled,fillcolor=lightblue]'
+                        elif provided.startswith('PreCut'):
+                            style = '[shape=box,style=filled,fillcolor=darkolivegreen1]'
+
+                        # everything that's special (i.e. listed above) or is not a Resource gets a box
+                        if style != '' or not isinstance(item, Resource):
+                            if style == '':
+                                style = '[shape=box,style=filled,fillcolor=white]'
+                            dotfile.write('"' + provided + '" ' + style + ';\n')
+
+                        for r in set(item.requires):
+                            dotfile.write('"' + r + '" -> "' + provided + '";\n')
+
             if current == []:
                 break
 
         if verbose:
+            dotfile.write("}\n")
+            dotfile.close()
+
+            print "The following functors have missing dependencies:"
             for x in self.seq:
                 print x.name, 'needs', [r for r in x.requires if r not in results]
 

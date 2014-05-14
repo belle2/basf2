@@ -1,6 +1,6 @@
 !-----------------------------------------------------------------------
 ! TOP counter for Belle: Digitization - basic functions and inverse functions
-! M. Staric, sept-2008, sept-2011, 
+! M. Staric, sept-2008, sept-2011
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 !-----------------------------------------------------------------------
 
@@ -162,6 +162,6 @@
       INTEGER TDC               ! TDC time (digitized)
 #include "TOP_TDC.fi"
       
-      TDC_TO_T=(TDC+0.5)*TDC_DT
+      TDC_TO_T=(TDC+0.5)*TDC_DT+TDC_T0
       END
 

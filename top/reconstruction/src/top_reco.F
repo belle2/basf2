@@ -14,7 +14,7 @@
 #include "TOP_PMT.fi"
 #include "TOP_PIK.fi"
 
-      INTEGER MAXCH, ITRA, K, I
+      INTEGER ITRA, K, I
       REAL HLX(10)
       LOGICAL OK
 
@@ -217,6 +217,8 @@
       REAL SFOT(NHYP)           ! expected num of photons [out]
 
       INTEGER I
+      
+      CALL SET_PHTIMES(.FALSE.)
 
       DO I=1,NHYP
          CALL TOP_SET_PDF(MASS(I),T0)
@@ -429,6 +431,7 @@
 
 #include "TOP_RTRA.fi"     
 #include "TOP_PIK.fi"
+#include "TOP_PHTIM.fi"
       INTEGER NUMCH
       REAL SFOT, P
       REAL TOP_SIGNAL, TOP_BGR
@@ -440,13 +443,15 @@
       IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
 
       IF(BETA_RQ.GT.0) THEN
-         IF(BETA_RQ.NE.BETA) THEN
+         IF(BETA_RQ.NE.BETA.OR..NOT.FORCE_SCAN) THEN
             PRINT*,'construct PDF for Beta=',BETA_RQ
+            CALL SET_PHTIMES(.TRUE.)
             CALL TOP_SET_PDF(MASS,RTRA_T0(1))
          ENDIF
       ELSE
-         IF(MASS.NE.MASS_HYP) THEN
+         IF(MASS.NE.MASS_HYP.OR..NOT.FORCE_SCAN) THEN
             PRINT*,'construct PDF for Mass=',MASS
+            CALL SET_PHTIMES(.TRUE.)
             CALL TOP_SET_PDF(MASS,RTRA_T0(1))
          ENDIF
       ENDIF
@@ -466,4 +471,49 @@
       BETA_RQ=BT
 
       END
+
+
+      SUBROUTINE SET_PHTIMES(FORCE)
+
+      IMPLICIT NONE
+      LOGICAL FORCE             ! true to force y-scan
+#include "TOP_DATA.fi"
+#include "TOP_TRACK.fi"
+#include "TOP_PIK.fi"
+#include "TOP_TDC.fi"
+#include "TOP_PMT.fi"
+#include "TOP_PHTIM.fi"
+      DATA FORCE_SCAN /.TRUE./
+
+      INTEGER ICHX, NUMCH, I, M, ICH
+      INTEGER IX, IY, IPMTX, IPMTY, LR
+      REAL T
+
+      FORCE_SCAN=FORCE
+      IF(FORCE) RETURN
+
+      DO ICHX=0,NUM_CHX
+         NUM_PHOT(ICHX)=0
+      ENDDO
+
+      NUMCH=NCH(0)+NCH(1)
+      DO I=1,N_DATA
+         M=DATA_MOD(I)
+         IF(M.EQ.MODUL) THEN
+            ICH=DATA_ICH(I)
+            IF(ICH.LT.0.OR.ICH.GE.NUMCH) CYCLE
+            T=(DATA_TDC(I)+.5)*TDC_DT+TDC_T0
+            IF(T.LT.0.OR.T.GT.T_MAX) CYCLE
+            CALL ICHIII(ICH,M,IX,IY,IPMTX,IPMTY,LR)
+            IF(LR.LT.0) CYCLE
+            ICHX=IPMTX*PMT_NX+IX
+            IF(ICHX.GE.NUM_CHX) CYCLE
+            NUM_PHOT(ICHX)=NUM_PHOT(ICHX)+1
+            IF(NUM_PHOT(ICHX).GT.MAX_PHOT) CYCLE
+            PH_TIMES(NUM_PHOT(ICHX),ICHX)=T
+         ENDIF
+      ENDDO
+
+      END
+
 

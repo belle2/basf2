@@ -39,7 +39,6 @@
          DYDZ=F_KY(I,K)/F_KZ(I,K)
          F_YD(I,K)=Y0+DYDZ*(ZD-Z0)
          F_YB(I,K)=Y0+DYDZ*(ZB-Z0)
-         F_YY(I,K)=F_YB(I,K)
          F_YM(I,K)=0.
          F_NXM(I,K)=0
          F_NYM(I,K)=0
@@ -47,7 +46,7 @@
             AH=QBAR_A(MODUL)/2
             BH=QBAR_B(MODUL)/2
             TOTX=ABS(F_KX(I,K)).LT.PTOT.OR.ABS(XD).LT.AH
-            TOTY=ABS(F_KY(I,K)).LT.PTOT.OR.ABS(F_YY(I,K)).LT.BH
+            TOTY=ABS(F_KY(I,K)).LT.PTOT.OR.ABS(F_YB(I,K)).LT.BH
             F_OK(I)=F_TL(I,K).GT.0.AND.TOTX.AND.TOTY
          ENDIF
       ENDDO
@@ -74,7 +73,8 @@
       REAL X0, Y0, Z0, XM
       REAL DX, DZ, DXDZ, DYDZ, AH, BH
       LOGICAL OK, TOTX, TOTY
-
+      REAL YY
+      
       TOPF_CYL=0
 
       X0=T_R(1,IEP)
@@ -96,8 +96,8 @@
          F_YM(I,K)=Y0+DYDZ*(ZM-Z0)
          F_NXM(I,K)=NINT(XM/QBAR_A(MODUL))
          F_NYM(I,K)=NINT(F_YM(I,K)/QBAR_B(MODUL))
-         F_YY(I,K)=Y0+DYDZ*(ZB-Z0)
-         F_NY(I,K)=NINT(F_YY(I,K)/QBAR_B(MODUL))
+         YY=Y0+DYDZ*(ZB-Z0)
+         F_NY(I,K)=NINT(YY/QBAR_B(MODUL))
          IF(MOD(F_NYM(I,1),2).NE.0) DYDZ=-DYDZ
          F_YD(I,K)=QBAR_YCMI(MODUL)+DYDZ*(ZD-ZM)
          F_YB(I,K)=QBAR_YCMI(MODUL)+DYDZ*(ZB-ZM)
@@ -105,7 +105,7 @@
             AH=QBAR_A(MODUL)/2
             BH=QBAR_B(MODUL)/2
             TOTX=ABS(F_KX(I,K)).LT.PTOT.OR.ABS(XD).LT.AH
-            TOTY=ABS(F_KY(I,K)).LT.PTOT.OR.ABS(F_YY(I,K)).LT.BH
+            TOTY=ABS(F_KY(I,K)).LT.PTOT.OR.ABS(YY).LT.BH
             F_OK(I)=F_TL(I,K).GT.0.AND.TOTX.AND.TOTY
          ENDIF
       ENDDO
@@ -186,7 +186,6 @@
          ENDIF
          F_XD(I,K)=XD
          F_YD(I,K)=YD
-         F_YY(I,K)=YM+YB
          F_NYE(I,K)=0
       ENDDO
       OK=F_OK(1).OR.F_OK(2)
@@ -197,7 +196,7 @@
       END
 
 
-      INTEGER FUNCTION TOPF_RAYTR(K0,I0,DFICDX)
+      INTEGER FUNCTION TOPF_RAYTR(I0,K0,DFICDX)
 
       IMPLICIT NONE
       INTEGER I0, K0
@@ -206,14 +205,13 @@
 #include "TOP_TRACK.fi"
 #include "TOP_PIK.fi"
 #include "TOP_TOPF.fi"
-      REAL RF(3), DIR(3), KX, KY, KZ
-      REAL TL, XD, YD, YB, YM
-      INTEGER NX(3), NY(3)
-      LOGICAL OK
-      INTEGER K, I, LR
-      REAL FIC, D_XD, CFIC, SFIC, AA, BB
-      REAL FIC0, D_XD0
-      LOGICAL SPHERICAL
+      INTEGER I, K
+      REAL XD, X, Y, X1, Y1, X2, Y2, DELX, Y0
+      REAL TL1, TL2
+      REAL GET_XD_RAYTR
+      LOGICAL OK, TOT
+      REAL Y_PREC /0.01/
+      SAVE Y_PREC
 
       TOPF_RAYTR=0
       K=NT+1
@@ -221,47 +219,103 @@
          PRINT*,'topf_raytr: TOP_TOPF is full'
          RETURN
       ENDIF
+      F_X0(K)=F_X0(K0)
+      F_Y0(K)=F_Y0(K0)
+      F_Z0(K)=F_Z0(K0)
+      F_H(K)=0
 
-      LR=0
-      IF(F_KZ(I0,K0).GT.0) LR=1
-      SPHERICAL=LR_FLAG(LR).EQ.4
-      FIC=ATAN2(F_SFIC(I0,K0),F_CFIC(I0,K0))
-      CALL TO_FIRST_PERIOD(FIC)
-      D_XD0=1000
-      FIC0=FIC
-      DO I=1,11
-         RF(1)=F_X0(K0)
-         RF(2)=F_Y0(K0)
-         RF(3)=F_Z0(K0)
-         CFIC=COS(FIC)
-         SFIC=SIN(FIC)
-         AA=T_CTH(0)*S_THC(0)*CFIC+T_STH(0)*C_THC(0)
-         BB=S_THC(0)*SFIC
-         KX=AA*T_CFI(0)-BB*T_SFI(0)
-         KY=AA*T_SFI(0)+BB*T_CFI(0)
-         KZ=T_CTH(0)*C_THC(0)-T_STH(0)*S_THC(0)*CFIC
-         DIR(1)=KX
-         DIR(2)=KY
-         DIR(3)=KZ
-         CALL FAST_RAYTR(RF,DIR,MODUL,TL,NX,NY,XD,YD,YB,YM,OK)
+      XD=F_XD(I0,K0)
+      X=ATAN2(F_SFIC(I0,K0),F_CFIC(I0,K0))
+      Y=GET_XD_RAYTR(X,I0,K,OK,TOT)-XD
+      IF(.NOT.OK) RETURN
+      IF(ABS(Y).LT.Y_PREC) THEN
+         IF(TOT) TOPF_RAYTR=K
+         RETURN
+      ENDIF         
+      X1=X
+      Y1=Y
+      TL1=F_TL(I0,K)
+
+      I=0
+      DELX=DFICDX*Y1
+      DO WHILE(.TRUE.)
+         X=X-DELX
+         Y=GET_XD_RAYTR(X,I0,K,OK,TOT)-XD
          IF(.NOT.OK) RETURN
-         IF(SPHERICAL.AND.NX(2).NE.F_NXM(I0,K0)) RETURN
-         D_XD=XD-F_XD(I0,K0)
-         IF(ABS(D_XD).LT.0.1) EXIT
-         IF(ABS(D_XD).LT.D_XD0) THEN
-            D_XD0=ABS(D_XD)
-            FIC0=FIC
-         ENDIF
-         IF(I.GT.1) DFICDX=-DFICDX
-         FIC=FIC-DFICDX*D_XD
-         IF(I.EQ.10) FIC=FIC0
+         IF(ABS(Y).LT.Y_PREC) THEN
+            IF(TOT) TOPF_RAYTR=K
+            RETURN
+         ENDIF         
+         IF(Y1*Y.LT.0) EXIT
+         I=I+1
+         IF(I.GT.20) RETURN
+         X1=X
+         Y1=Y
+         TL1=F_TL(I0,K)
       ENDDO
+      X2=X
+      Y2=Y
+      TL2=F_TL(I0,K)
 
+      DO I=1,40
+         Y0=Y
+         X=X1-(X2-X1)/(Y2-Y1)*Y1
+         Y=GET_XD_RAYTR(X,I0,K,OK,TOT)-XD
+         IF(.NOT.OK) RETURN
+         IF(ABS(Y).LT.Y_PREC) THEN
+            IF(TOT) TOPF_RAYTR=K
+            RETURN
+         ENDIF         
+         IF(Y.EQ.Y0) EXIT
+         IF(Y*Y1.LT.0) THEN
+            X2=X
+            Y2=Y
+            TL2=F_TL(I0,K)
+         ELSE
+            X1=X
+            Y1=Y
+            TL1=F_TL(I0,K)
+         ENDIF
+      ENDDO
+      IF(ABS(Y).LT.5.AND.TOT) THEN
+         F_TL(I0,K)=TL1+(TL2-TL1)/(Y2-Y1)*(0-Y1)
+         TOPF_RAYTR=K
+      ENDIF
+
+      END
+
+
+
+      REAL FUNCTION GET_XD_RAYTR(FIC,I0,K,OK,TOT)
+
+      IMPLICIT NONE
+      REAL FIC
+      INTEGER I0, K
+      LOGICAL OK, TOT
+#include "TOP_TRACK.fi"
+#include "TOP_TOPF.fi"
+#include "TOP_PIK.fi"
+
+      REAL RF(3), CFIC, SFIC, AA, BB
+      REAL TL, XD, YD, YB, YM
+      INTEGER NX(3), NY(3)
+
+      RF(1)=F_X0(K)
+      RF(2)=F_Y0(K)
+      RF(3)=F_Z0(K)
+      CFIC=COS(FIC)
+      SFIC=SIN(FIC)
       F_CFIC(I0,K)=CFIC
       F_SFIC(I0,K)=SFIC
-      F_KX(I0,K)=KX
-      F_KY(I0,K)=KY
-      F_KZ(I0,K)=KZ
+      AA=T_CTH(0)*S_THC(0)*CFIC+T_STH(0)*C_THC(0)
+      BB=S_THC(0)*SFIC
+      F_DIR(1)=AA*T_CFI(0)-BB*T_SFI(0)
+      F_DIR(2)=AA*T_SFI(0)+BB*T_CFI(0)
+      F_DIR(3)=T_CTH(0)*C_THC(0)-T_STH(0)*S_THC(0)*CFIC
+      F_KX(I0,K)=F_DIR(1)
+      F_KY(I0,K)=F_DIR(2)
+      F_KZ(I0,K)=F_DIR(3)
+      CALL FAST_RAYTR(RF,F_DIR,MODUL,TL,NX,NY,XD,YD,YB,YM,OK,TOT)
       F_TL(I0,K)=TL
       F_XH(I0,K)=RF(1)
       F_YH(I0,K)=RF(2)
@@ -269,15 +323,14 @@
       F_YD(I0,K)=YD
       F_YB(I0,K)=YB
       F_YM(I0,K)=YM
-      F_YY(I0,K)=0
       F_NX(I0,K)=NX(1)
       F_NY(I0,K)=NY(1)
       F_NXM(I0,K)=NX(2)
       F_NYM(I0,K)=NY(2)
       F_NXE(I0,K)=NX(3)
       F_NYE(I0,K)=NY(3)
-
-      TOPF_RAYTR=K
+      
+      GET_XD_RAYTR=XD
 
       END
 
@@ -296,25 +349,6 @@
       ELSE
          TOPF_DTL=0.
          PRINT*,'topf_dtl: DELH=0',K1,K2
-      ENDIF
-
-      END
-
-
-      REAL FUNCTION TOPF_DYY(I,K1,K2)
-
-      IMPLICIT NONE
-      INTEGER I, K1, K2
-#include "TOP_TOPF.fi"
-      REAL DELH, DELF
-
-      DELF=F_YY(I,K2)-F_YY(I,K1)
-      DELH=F_H(K2)-F_H(K1)
-      IF(DELH.NE.0) THEN
-         TOPF_DYY=DELF/DELH
-      ELSE
-         TOPF_DYY=0.
-         PRINT*,'topf_dyy: DELH=0',K1,K2
       ENDIF
 
       END
@@ -631,7 +665,7 @@ c--   returns X at Z after reflection
 
 c--   routines for fast ray-tracing of a photon
 
-      SUBROUTINE FAST_RAYTR(RF,DIR,MDN,TLEN,NX,NY,XD,YD,YB,YM,OK)
+      SUBROUTINE FAST_RAYTR(RF,DIR,MDN,TLEN,NX,NY,XD,YD,YB,YM,OK,TOT)
 
 c--   propagate photon from emission point to detection plane
 
@@ -642,10 +676,13 @@ c--   propagate photon from emission point to detection plane
       INTEGER NX(3), NY(3)      ! number of reflections [out]
       REAL XD, YD, YB, YM       ! unfolded hit coordinates [out]
       LOGICAL OK                ! status [out]
+      LOGICAL TOT               ! total reflection [out]
 #include "TOP_GEO.fi" 
+#include "TOP_PIK.fi" 
       INTEGER TYP, I, ISNX, ISNY
       REAL XM, XB, XE, YE, TL
       INTEGER LR, NX1, NY1
+      LOGICAL TOTX, TOTY
       
       TLEN=0
       DO I=1,3
@@ -658,6 +695,7 @@ c--   propagate photon from emission point to detection plane
       ISNY=1
       IF(DIR(2).LT.0) ISNY=-1
       OK=.FALSE.
+      TOT=.TRUE.
 
       IF(DIR(3).GT.0) THEN
          TYP=QBAR_RSIDE(MDN)
@@ -670,8 +708,11 @@ c--   propagate photon from emission point to detection plane
 
       CALL UNFOLDED_RESET
       IF(TYP.GT.1) THEN
+         TOTX=ABS(DIR(1)).LT.PTOT
+         TOTY=ABS(DIR(2)).LT.PTOT
          CALL MIRR_RAYTR(RF,DIR,MDN,TL,NX1,NY1,XM,YM,OK)
          IF(.NOT.OK) RETURN
+         TOT=TOT.AND.(TOTX.OR.NX1.EQ.0).AND.(TOTY.OR.NY1.EQ.0)
          LR=1-LR
          CALL UNFOLDED_PUSH(2,RF,NX1,NY1,MDN,LR,TYP)
          TLEN=TLEN+TL
@@ -681,16 +722,22 @@ c--   propagate photon from emission point to detection plane
          NY(1)=NY(2)
       ENDIF
 
+      TOTX=ABS(DIR(1)).LT.PTOT
+      TOTY=ABS(DIR(2)).LT.PTOT
       CALL BAR_RAYTR(RF,DIR,MDN,TL,NX1,NY1,XB,YB,OK)
       IF(.NOT.OK) RETURN
+      TOT=TOT.AND.(TOTX.OR.NX1.EQ.0).AND.(TOTY.OR.NY1.EQ.0)
       CALL UNFOLDED_PUSH(1,RF,NX1,NY1,MDN,LR,0)
       TLEN=TLEN+TL
       NX(1)=NX(1)+SIGN(NX1,ISNX)
       NY(1)=NY(1)+SIGN(NY1,ISNY)
 
       IF(QBAR_EXT(LR,MDN).GT.0) THEN
+         TOTX=ABS(DIR(1)).LT.PTOT
+         TOTY=ABS(DIR(2)).LT.PTOT
          CALL EVOL_RAYTR(RF,DIR,MDN,TL,NX1,NY1,XE,YE,OK)
          IF(.NOT.OK) RETURN
+         TOT=TOT.AND.(TOTX.OR.NX1.EQ.0).AND.(TOTY.OR.NY1.EQ.0)
          CALL UNFOLDED_PUSH(3,RF,NX1,NY1,MDN,LR,0)
          TLEN=TLEN+TL
          NX(3)=SIGN(NX1,ISNX)

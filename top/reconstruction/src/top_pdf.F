@@ -1,6 +1,7 @@
 !-----------------------------------------------------------------------
 ! TOP counter for Belle: Reconstruction - construct TOP PDF
-! M. Staric, nov-2008, jun-2009, feb-2010, jun-2012, feb-2013
+! M. Staric, nov-2008, jun-2009, feb-2010, jun-2012, feb-2013, dec-2013
+!
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 !-----------------------------------------------------------------------
 
@@ -20,6 +21,7 @@
 #include "TOP_TRACK.fi"
       DATA NCH /3*0/
       DATA BETA_RQ /0./
+      DATA STORE_OPT /.TRUE./
       INTEGER NUMCH
       INTEGER NN, ICH, LR, L, K, I
       REAL ZW(0:1), ZD, ZB, ZM, DZEXT
@@ -185,10 +187,117 @@
                IF(TYP.EQ.0) THEN
                   CALL TOP_PATT_PMT(X,ZD,ZB,DXCH,LR,L,IPMTX,IX,K)
                ELSE IF(TYP.EQ.1) THEN
-                  CALL TOP_PATT_CYL(X,ZD,ZB,ZM,XCH,DXCH,LR,IPMTX,IX,K)
+                  CALL TOP_PATT_CYL(X,ZD,ZB,ZM,DXCH,LR,IPMTX,IX,K)
                ENDIF                  
             ENDDO
          ENDDO
+      ENDDO
+
+      END
+
+
+      SUBROUTINE TOP_PATT_PMT(XD,ZD,ZB,DXCH,LR,L,IPMTX,IX,NX1)
+
+      IMPLICIT NONE
+      REAL XD                   ! unfolded channel x-coordinate
+      REAL ZD                   ! PMT plane z-position 
+      REAL ZB                   ! bar-to-wedge z-position 
+      REAL DXCH                 ! channel width
+      INTEGER LR                ! position of PMT's (0=left, 1=right)
+      INTEGER L                 ! if different from LR: reflection from plane mirror
+      INTEGER IPMTX, IX         ! PMT number and PMT channel number in x 
+      INTEGER NX1               ! x-reflections
+#include "TOP_CONS.fi"
+#include "TOP_PIK.fi"
+#include "TOP_TRACK.fi"
+#include "TOP_PAR.fi"
+#include "TOP_TOPF.fi"
+      INTEGER TOPF_PMT
+      INTEGER I, K0, K1, K2, K3, TYP
+      REAL H, TIM
+
+c--   clear TOP_TOPF
+      NT=0
+c--   solve equations
+      H=0.
+      K0=TOPF_PMT(XD,ZD,ZB,0,0,H)
+      IF(K0.EQ.0) RETURN
+c--   for channel width
+      H=0.1
+      K1=TOPF_PMT(XD+H,ZD,ZB,0,0,H)
+      IF(K1.EQ.0) RETURN
+c--   for parallax
+      H=T_H
+      K2=TOPF_PMT(XD,ZD,ZB,1,0,H)
+      IF(K2.EQ.0) RETURN
+c--   for cromatic
+      H=D_E
+      K3=TOPF_PMT(XD,ZD,ZB,0,1,H)
+      IF(K3.EQ.0) RETURN
+
+      TYP=0
+      IF(LR.NE.L) TYP=1
+c--   calculate PDF parameters
+      DO I=1,2
+         IF(.NOT.F_OK(I)) CYCLE
+         TIM=F_TL(I,K0)*GRU_IND/C0+TOF
+         IF(TIM.GT.T_MAX) CYCLE
+
+         CALL PDF_YSKEN(I,K0,K1,K2,K3,XD,DXCH,ZB,ZD,IX,IPMTX,LR,TYP)
+
+      ENDDO
+
+      END
+
+
+      SUBROUTINE TOP_PATT_CYL(XD,ZD,ZB,ZM,DXCH,LR,IPMTX,IX,NX1)
+
+      IMPLICIT NONE
+      REAL XD                   ! unfolded channel x-coordinate
+      REAL ZD                   ! PMT plane z-position 
+      REAL ZB                   ! bar-to-wedge z-position 
+      REAL ZM                   ! mirror z-position 
+      REAL DXCH                 ! channel width
+      INTEGER LR                ! position of PMT's (0=left, 1=right)
+      INTEGER IPMTX, IX         ! PMT number and PMT channel number in x 
+      INTEGER NX1               ! x-reflections
+#include "TOP_CONS.fi"
+#include "TOP_PIK.fi"
+#include "TOP_TRACK.fi"
+#include "TOP_PAR.fi"
+#include "TOP_TOPF.fi"
+      INTEGER TOPF_CYL
+      INTEGER I, K0, K1, K2, K3, TYP
+      REAL H, TIM
+
+c--   clear TOP_TOPF
+      NT=0
+c--   solve equations
+      H=0.
+      K0=TOPF_CYL(XD,ZD,ZB,ZM,0,0,H)
+      IF(K0.EQ.0) RETURN
+c--   for channel width
+      H=0.1
+      K1=TOPF_CYL(XD+H,ZD,ZB,ZM,0,0,H)
+      IF(K1.EQ.0) RETURN
+c--   for parallax
+      H=T_H
+      K2=TOPF_CYL(XD,ZD,ZB,ZM,1,0,H)
+      IF(K2.EQ.0) RETURN
+c--   for cromatic
+      H=D_E
+      K3=TOPF_CYL(XD,ZD,ZB,ZM,0,1,H)
+      IF(K3.EQ.0) RETURN
+
+      TYP=2
+c--   calculate PDF parameters
+      DO I=1,2
+         IF(.NOT.F_OK(I)) CYCLE
+         TIM=F_TL(I,K0)*GRU_IND/C0+TOF
+         IF(TIM.GT.T_MAX) CYCLE
+
+         CALL PDF_YSKEN(I,K0,K1,K2,K3,XD,DXCH,ZB,ZD,IX,IPMTX,LR,TYP)
+
       ENDDO
 
       END
@@ -258,6 +367,7 @@ c--   loop over x-reflections before mirror
 #include "TOP_PIK.fi"
 #include "TOP_PAR.fi"
 #include "TOP_CONS.fi"
+#include "TOP_TOPF.fi"
       REAL X0, Z0, XD1, XD2, AH, XD, TL_MAX, TL1, TL2
       REAL UNFOLD
       REAL XMMI, XMMA
@@ -312,267 +422,6 @@ c--   loop over x-reflections after mirror and over channels
       END
 
 
-      SUBROUTINE TOP_PATT_PMT(XD,ZD,ZB,DXCH,LR,L,IPMTX,IX,NX1)
-
-      IMPLICIT NONE
-      REAL XD, ZD, ZB, DXCH
-      INTEGER LR, L, IPMTX, IX, NX1
-#include "TOP_CONS.fi"
-#include "TOP_GEO.fi"
-#include "TOP_EXT.fi"
-#include "TOP_PMT.fi"
-#include "TOP_PIK.fi"
-#include "TOP_TRACK.fi"
-#include "TOP_PAR.fi"
-#include "TOP_TOPF.fi"
-#include "TOP_YBUF.fi"
-      INTEGER TOPF_PMT, TOPF_RAYTR
-      REAL TOPF_DTL, TOPF_DYY, TOPF_DYD, TOPF_DYB, TOPF_DFIC
-
-      INTEGER I, K, K0, K1, K2, K3, K4, NX(3), NY(3)
-      REAL H, TL0, YD0, YB0, YY0, FIC0, DIR(3)
-
-      REAL DTLDX, DTLDL, DTLDE, DTDTHC
-      REAL DYDDX, DYDDL, DYDDE, DYDDZ
-      REAL DYBDX, DYBDL, DYBDE
-      REAL DYYDE, DFICDX, DFICDE
-
-      REAL DFI, DTDE, DTDL, DTDX, WID0, DEL_E, YY, YD
-      REAL TIM, WID, FOT, FIC
-      REAL GROUP_INDEX
-
-      DO I=1,3
-         NX(I)=0
-         NY(I)=0
-      ENDDO
-c--   clear TOP_TOPF
-      NT=0
-c--   solve equations
-      H=0.
-      K0=TOPF_PMT(XD,ZD,ZB,0,0,H)
-      IF(K0.EQ.0) RETURN
-c--   for channel width
-      H=0.1
-      K1=TOPF_PMT(XD+H,ZD,ZB,0,0,H)
-      IF(K1.EQ.0) RETURN
-c--   for parallax
-      H=T_H
-      K2=TOPF_PMT(XD,ZD,ZB,1,0,H)
-      IF(K2.EQ.0) RETURN
-c--   for cromatic
-      H=D_E
-      K3=TOPF_PMT(XD,ZD,ZB,0,1,H)
-      IF(K3.EQ.0) RETURN
-
-c--   calculate PDF parameters
-      DO I=1,2
-         IF(.NOT.F_OK(I)) CYCLE
-         TIM=F_TL(I,K0)*GRU_IND/C0+TOF
-         IF(TIM.GT.T_MAX) CYCLE
-
-         DFICDX=TOPF_DFIC(I,K0,K1)
-         K4=TOPF_RAYTR(K0,I,DFICDX)
-         IF(K4.EQ.0) CYCLE
-
-         FIC0=ATAN2(F_SFIC(I,K4),F_CFIC(I,K4))
-         IF(FIC0.LT.0) FIC0=FIC0+2*PI
-
-         TL0=F_TL(I,K4)
-         DTLDX=TOPF_DTL(I,K0,K1)
-         DTLDL=TOPF_DTL(I,K0,K2)
-         DTLDE=TOPF_DTL(I,K0,K3)
-
-         YY0=F_YY(I,K4)
-         DYYDE=TOPF_DYY(I,K0,K3)
-         DFICDE=TOPF_DFIC(I,K0,K3)
-
-         DFI=ABS(DFICDX)*DXCH
-         DTDE=(DTLDE+TL0*REL_DNGDE)*GRU_IND/C0 ! dispersion (cromatic)
-         DTDL=(DTLDL*GRU_IND+1/BETA)/C0 ! parallax
-         DTDX=DTLDX*GRU_IND/C0  ! channel x-size
-         DTDTHC=DTLDE*D_E/D_THC*GRU_IND/C0 ! multiple scattering in Q-bar
-         WID0=(DTDX*DXCH)**2/12.+(DTDL*SIG_TLEN)**2+(DTDTHC*TH0_SIP)**2
-
-         YD0=F_YD(I,K4)
-         DYDDX=TOPF_DYD(I,K0,K1)
-         DYDDL=TOPF_DYD(I,K0,K2)
-         DYDDE=TOPF_DYD(I,K0,K3)
-         IF(ZB.EQ.ZD) THEN
-            CALL YSKEN(IX,IPMTX,LR,MODUL,
-     &           YD0,DYDDE,DYDDL,DYDDX,
-     &           NBUF,SUM,E0,SIGE2,ICHA,ECPP,NP)
-         ELSE
-            YB0=F_YB(I,K4)
-            DYBDX=TOPF_DYB(I,K0,K1)
-            DYBDL=TOPF_DYB(I,K0,K2)
-            DYBDE=TOPF_DYB(I,K0,K3)
-            IF(EXT_SHAPE(QBAR_EXT(LR,MODUL)).EQ.2) THEN
-               DYDDZ=F_KY(I,K4)/F_KZ(I,K4)
-               IF(LR.NE.L) DYDDZ=-DYDDZ
-               CALL YSKENX(IX,IPMTX,LR,MODUL,
-     &              YD0,DYDDE,DYDDL,DYDDX,DYDDZ,
-     &              YB0,DYBDE,DYBDL,DYBDX,
-     &              NBUF,SUM,E0,SIGE2,ICHA,ECPP,NP)
-            ELSE
-               CALL YSKENE(IX,IPMTX,LR,MODUL,
-     &              YD0,DYDDE,DYDDL,DYDDX,
-     &              YB0,DYBDE,DYBDL,DYBDX,
-     &              NBUF,SUM,E0,SIGE2,ICHA,ECPP,NP)
-            ENDIF
-         ENDIF
-
-         DO K=1,NP
-            DEL_E=E0(K)-E_MEAN
-            TIM=(TL0+DTLDE*DEL_E)*GROUP_INDEX(E0(K))/C0+TOF
-            WID=WID0+SIGE2(K)*DTDE**2
-            FOT=FOT0*DFI*SUM(K)
-            FIC=FIC0+DFICDE*DEL_E
-            CALL TO_FIRST_PERIOD(FIC)
-            NX(1)=NX1
-            YY=YY0+DYYDE*DEL_E
-            NY(1)=NINT(YY/QBAR_B(MODUL))
-            YD=YD0+DYDDE*DEL_E
-            CALL PATT_PUSH(ICHA(K),TIM,WID,FOT,FIC,E0(K),SIGE2(K),
-     &           NX,NY,XD,YD)
-         ENDDO
-      ENDDO
-
-      END
-
-
-      SUBROUTINE TOP_PATT_CYL(XD,ZD,ZB,ZM,XCH,DXCH,LR,IPMTX,IX,NX1)
-
-      IMPLICIT NONE
-      REAL XD, ZD, ZB, ZM, XCH, DXCH
-      INTEGER LR, IPMTX, IX, NX1
-#include "TOP_CONS.fi"
-#include "TOP_GEO.fi"
-#include "TOP_EXT.fi"
-#include "TOP_PMT.fi"
-#include "TOP_PIK.fi"
-#include "TOP_TRACK.fi"
-#include "TOP_PAR.fi"
-#include "TOP_TOPF.fi"
-#include "TOP_YBUF.fi"
-      INTEGER TOPF_CYL, TOPF_RAYTR
-      REAL TOPF_DTL, TOPF_DYY, TOPF_DYD, TOPF_DYB, TOPF_DFIC
-
-      INTEGER I, K, K0, K1, K2, K3, K4, NX(3), NY(3)
-      REAL H, TL0, YD0, YB0, YY0, FIC0, DIR(3)
-
-      REAL DTLDX, DTLDL, DTLDE, DTDTHC
-      REAL DYDDX, DYDDL, DYDDE, DYDDZ
-      REAL DYBDX, DYBDL, DYBDE
-      REAL DYYDE, DFICDX, DFICDE
-
-      REAL DFI, DTDE, DTDL, DTDX, WFOC, WID0, DEL_E, YY, YD
-      REAL TIM, WID, FOT, FIC
-      REAL GROUP_INDEX
-
-      DO I=1,3
-         NX(I)=0
-         NY(I)=0
-      ENDDO
-c--   clear TOP_TOPF
-      NT=0
-c--   solve equations
-      H=0.
-      K0=TOPF_CYL(XD,ZD,ZB,ZM,0,0,H)
-      IF(K0.EQ.0) RETURN
-c--   for channel width
-      H=0.1
-      K1=TOPF_CYL(XD+H,ZD,ZB,ZM,0,0,H)
-      IF(K1.EQ.0) RETURN
-c--   for parallax
-      H=T_H
-      K2=TOPF_CYL(XD,ZD,ZB,ZM,1,0,H)
-      IF(K2.EQ.0) RETURN
-c--   for cromatic
-      H=D_E
-      K3=TOPF_CYL(XD,ZD,ZB,ZM,0,1,H)
-      IF(K3.EQ.0) RETURN
-     
-c--   calculate PDF parameters
-      DO I=1,2
-         IF(.NOT.F_OK(I)) CYCLE
-         TIM=F_TL(I,K0)*GRU_IND/C0+TOF
-         IF(TIM.GT.T_MAX) CYCLE
-
-         DFICDX=TOPF_DFIC(I,K0,K1)
-         K4=TOPF_RAYTR(K0,I,DFICDX)
-         IF(K4.EQ.0) CYCLE
-
-         FIC0=ATAN2(F_SFIC(I,K4),F_CFIC(I,K4))
-         IF(FIC0.LT.0) FIC0=FIC0+2*PI
-
-         DIR(1)=F_KX(I,K4)
-         DIR(2)=F_KY(I,K4)
-         DIR(3)=F_KZ(I,K4)
-
-         TL0=F_TL(I,K4)
-         DTLDX=TOPF_DTL(I,K0,K1)
-         DTLDL=TOPF_DTL(I,K0,K2)
-         DTLDE=TOPF_DTL(I,K0,K3)
-
-         YY0=F_YY(I,K4)
-         DYYDE=TOPF_DYY(I,K0,K3)
-         DFICDE=TOPF_DFIC(I,K0,K3)
-
-         DFI=ABS(DFICDX)*DXCH
-         DTDE=(DTLDE+TL0*REL_DNGDE)*GRU_IND/C0 ! dispersion (cromatic)
-         DTDL=(DTLDL*GRU_IND+1/BETA)/C0 ! parallax
-         DTDX=DTLDX*GRU_IND/C0  ! channel x-size
-         WFOC=2*QBAR_B(MODUL)*DIR(2)*GRU_IND/C0 ! focusing
-         DTDTHC=DTLDE*D_E/D_THC*GRU_IND/C0 ! multiple scattering in Q-bar
-         WID0=(DTDX*DXCH)**2/12.+(DTDL*SIG_TLEN)**2+WFOC**2/12.
-     &        +(DTDTHC*TH0_SIP)**2
-
-         YD0=F_YD(I,K4)
-         DYDDX=TOPF_DYD(I,K0,K1)
-         DYDDL=TOPF_DYD(I,K0,K2)
-         DYDDE=TOPF_DYD(I,K0,K3)
-         IF(ZB.EQ.ZD) THEN
-            CALL YSKEN(IX,IPMTX,LR,MODUL,
-     &           YD0,DYDDE,DYDDL,DYDDX,
-     &           NBUF,SUM,E0,SIGE2,ICHA,ECPP,NP)
-         ELSE
-            YB0=F_YB(I,K4)
-            DYBDX=TOPF_DYB(I,K0,K1)
-            DYBDL=TOPF_DYB(I,K0,K2)
-            DYBDE=TOPF_DYB(I,K0,K3)
-            IF(EXT_SHAPE(QBAR_EXT(LR,MODUL)).EQ.2) THEN
-               DYDDZ=-F_KY(I,K4)/F_KZ(I,K4)
-               CALL YSKENX(IX,IPMTX,LR,MODUL,
-     &              YD0,DYDDE,DYDDL,DYDDX,DYDDZ,
-     &              YB0,DYBDE,DYBDL,DYBDX,
-     &              NBUF,SUM,E0,SIGE2,ICHA,ECPP,NP)
-            ELSE
-               CALL YSKENE(IX,IPMTX,LR,MODUL,
-     &              YD0,DYDDE,DYDDL,DYDDX,
-     &              YB0,DYBDE,DYBDL,DYBDX,
-     &              NBUF,SUM,E0,SIGE2,ICHA,ECPP,NP)
-            ENDIF
-         ENDIF
-
-         DO K=1,NP
-            DEL_E=E0(K)-E_MEAN
-            TIM=(TL0+DTLDE*DEL_E)*GROUP_INDEX(E0(K))/C0+TOF
-            WID=WID0+SIGE2(K)*DTDE**2
-            FOT=FOT0*DFI*SUM(K)
-            FIC=FIC0+DFICDE*DEL_E
-            CALL TO_FIRST_PERIOD(FIC)
-            NX(1)=NX1
-            YY=YY0+DYYDE*DEL_E
-            NY(1)=NINT(YY/QBAR_B(MODUL))
-            YD=YD0+DYDDE*DEL_E
-            CALL PATT_PUSH(ICHA(K),TIM,WID,FOT,FIC,E0(K),SIGE2(K),
-     &           NX,NY,XD,YD)
-         ENDDO
-      ENDDO
-
-      END
-
-
       SUBROUTINE TOP_PATT_SPHER(XD,ZD,ZB,DXCH,LR,IPMTX,IX,NX1,NX2)
 
       IMPLICIT NONE
@@ -585,33 +434,14 @@ c--   calculate PDF parameters
       INTEGER NX1               ! x-reflections before mirror
       INTEGER NX2               ! x-reflections after mirror
 #include "TOP_CONS.fi"
-#include "TOP_GEO.fi"
-#include "TOP_EXT.fi"
-#include "TOP_PMT.fi"
 #include "TOP_PIK.fi"
 #include "TOP_TRACK.fi"
 #include "TOP_PAR.fi"
 #include "TOP_TOPF.fi"
-#include "TOP_YBUF.fi"
-      INTEGER TOPF_SPHER, TOPF_RAYTR
-      REAL TOPF_DTL, TOPF_DYY, TOPF_DYD, TOPF_DYB, TOPF_DFIC
+      INTEGER TOPF_SPHER
+      INTEGER I, K0, K1, K2, K3, TYP
+      REAL H, TIM
 
-      INTEGER I, K, K0, K1, K2, K3, K4, NX(3), NY(3)
-      REAL H, TL0, YD0, YB0, YY0, FIC0, DIR(3)
-
-      REAL DTLDX, DTLDL, DTLDE, DTDTHC
-      REAL DYDDX, DYDDL, DYDDE, DYDDZ
-      REAL DYBDX, DYBDL, DYBDE
-      REAL DYYDE, DFICDX, DFICDE
-
-      REAL DFI, DTDE, DTDL, DTDX, WFOCX, WFOCY, WID0, DEL_E, YY, YD
-      REAL TIM, WID, FOT, FIC
-      REAL GROUP_INDEX
-
-      DO I=1,3
-         NX(I)=0
-         NY(I)=0
-      ENDDO
 c--   clear TOP_TOPF
       NT=0
 c--   solve equations
@@ -631,206 +461,16 @@ c--   for cromatic
       K3=TOPF_SPHER(XD,ZD,ZB,NX1,0,1,H)
       IF(K3.EQ.0) RETURN
 
+      TYP=3
 c--   calculate PDF parameters
       DO I=1,2
          IF(.NOT.F_OK(I)) CYCLE
          TIM=F_TL(I,K0)*GRU_IND/C0+TOF
          IF(TIM.GT.T_MAX) CYCLE
 
-         DFICDX=TOPF_DFIC(I,K0,K1)
-         f_nx(i,k0)=nx1+nx2
-         K4=TOPF_RAYTR(K0,I,DFICDX)
-         IF(K4.EQ.0) CYCLE
+         CALL PDF_YSKEN(I,K0,K1,K2,K3,XD,DXCH,ZB,ZD,IX,IPMTX,LR,TYP)
 
-         FIC0=ATAN2(F_SFIC(I,K4),F_CFIC(I,K4))
-         IF(FIC0.LT.0) FIC0=FIC0+2*PI
-
-         DIR(1)=F_KX(I,K4)
-         DIR(2)=F_KY(I,K4)
-         DIR(3)=F_KZ(I,K4)
-
-         TL0=F_TL(I,K4)
-         DTLDX=TOPF_DTL(I,K0,K1)
-         DTLDL=TOPF_DTL(I,K0,K2)
-         DTLDE=TOPF_DTL(I,K0,K3)
-
-         YY0=F_YY(I,K4)
-         DYYDE=TOPF_DYY(I,K0,K3)
-         DFICDE=TOPF_DFIC(I,K0,K3)
-
-         DFI=ABS(DFICDX)*DXCH
-         DTDE=(DTLDE+TL0*REL_DNGDE)*GRU_IND/C0 ! dispersion (cromatic)
-         DTDL=(DTLDL*GRU_IND+1/BETA)/C0 ! parallax
-         DTDX=DTLDX*GRU_IND/C0  ! channel x-size
-         WFOCX=T_LEN*T_DIR(1)*DIR(1)*GRU_IND/C0 ! focusing in x
-         WFOCY=2*QBAR_B(MODUL)*DIR(2)*GRU_IND/C0 ! focusing in y
-         DTDTHC=DTLDE*D_E/D_THC*GRU_IND/C0 ! multiple scattering in Q-bar
-         WID0=(DTDX*DXCH)**2/12.+(DTDL*SIG_TLEN)**2+
-     &        (WFOCX**2+WFOCY**2)/12.+(DTDTHC*TH0_SIP)**2
-
-         YD0=F_YD(I,K4)
-         DYDDX=TOPF_DYD(I,K0,K1)
-         DYDDL=TOPF_DYD(I,K0,K2)
-         DYDDE=TOPF_DYD(I,K0,K3)
-         IF(ZB.EQ.ZD) THEN
-            CALL YSKEN(IX,IPMTX,LR,MODUL,
-     &           YD0,DYDDE,DYDDL,DYDDX,
-     &           NBUF,SUM,E0,SIGE2,ICHA,ECPP,NP)
-         ELSE
-            YB0=F_YB(I,K4)
-            DYBDX=TOPF_DYB(I,K0,K1)
-            DYBDL=TOPF_DYB(I,K0,K2)
-            DYBDE=TOPF_DYB(I,K0,K3)
-            IF(EXT_SHAPE(QBAR_EXT(LR,MODUL)).EQ.2) THEN
-               DYDDZ=-F_KY(I,K4)/F_KZ(I,K4)
-               CALL YSKENX(IX,IPMTX,LR,MODUL,
-     &              YD0,DYDDE,DYDDL,DYDDX,DYDDZ,
-     &              YB0,DYBDE,DYBDL,DYBDX,
-     &              NBUF,SUM,E0,SIGE2,ICHA,ECPP,NP)
-            ELSE
-               CALL YSKENE(IX,IPMTX,LR,MODUL,
-     &              YD0,DYDDE,DYDDL,DYDDX,
-     &              YB0,DYBDE,DYBDL,DYBDX,
-     &              NBUF,SUM,E0,SIGE2,ICHA,ECPP,NP)
-            ENDIF
-         ENDIF
-
-         DO K=1,NP
-            DEL_E=E0(K)-E_MEAN
-            TIM=(TL0+DTLDE*DEL_E)*GROUP_INDEX(E0(K))/C0+TOF
-            WID=WID0+SIGE2(K)*DTDE**2
-            FOT=FOT0*DFI*SUM(K)
-            FIC=FIC0+DFICDE*DEL_E
-            CALL TO_FIRST_PERIOD(FIC)
-            NX(1)=NX1+NX2
-            NX(2)=NX1
-            YY=YY0+DYYDE*DEL_E
-            NY(1)=NINT(YY/QBAR_B(MODUL))
-            YD=YD0+DYDDE*DEL_E
-            CALL PATT_PUSH(ICHA(K),TIM,WID,FOT,FIC,E0(K),SIGE2(K),
-     &           NX,NY,XD,YD)
-         ENDDO
       ENDDO
-
-      END
-
-
-      SUBROUTINE TOP_PATT_PMT_FAST(XD,ZD,ZB,DXCH,LR,IPMTX,IX,NX1)
-
-      IMPLICIT NONE
-      REAL XD, ZD, ZB, DXCH
-      INTEGER LR, IPMTX, IX, NX1
-#include "TOP_CONS.fi"
-#include "TOP_GEO.fi"
-#include "TOP_PMT.fi"
-#include "TOP_PIK.fi"
-#include "TOP_TRACK.fi"
-#include "TOP_PAR.fi"
-#include "TOP_TOPF.fi"
-
-      INTEGER TOPF_PMT
-      REAL TOPF_DTL, TOPF_DYY, TOPF_DYD, TOPF_DFIC
-      INTEGER K0, K1, K2, K3, I, IY, ICH, ICHAN, NX(3), NY(3), IPMTY
-      REAL H, TL, YD, DFI, DTDX, DTDL, DTDE, DTDTHC, DFICDX
-      REAL TIM, WID, FOT, FIC
-
-      IF(ZD.NE.ZB) PRINT*,'TOP_PATT_PMT_FAST: do not use it for i-TOP!'
-
-      DO I=1,3
-         NX(I)=0
-         NY(I)=0
-      ENDDO
-c--   clear TOP_TOPF
-      NT=0
-c--   solve equations
-      H=0.
-      K0=TOPF_PMT(XD,ZD,ZB,0,0,H)
-      IF(K0.EQ.0) RETURN
-c--   for channel width
-      H=0.1
-      K1=TOPF_PMT(XD+H,ZD,ZB,0,0,H)
-      IF(K1.EQ.0) RETURN
-c--   for parallax
-      H=T_H
-      K2=TOPF_PMT(XD,ZD,ZB,1,0,H)
-      IF(K2.EQ.0) RETURN
-c--   for cromatic
-      H=D_E
-      K3=TOPF_PMT(XD,ZD,ZB,0,1,H)
-      IF(K3.EQ.0) RETURN
-c--   calculate PDF parameters
-      DO I=1,2
-         IF(.NOT.F_OK(I)) CYCLE
-         TL=F_TL(I,K0)
-         TIM=TL*GRU_IND/C0+TOF
-         IF(TIM.GT.T_MAX) CYCLE
-         DTDX=TOPF_DTL(I,K0,K1) ! chanel width
-         DTDL=TOPF_DTL(I,K0,K2) ! paralax
-         DTDE=TOPF_DTL(I,K0,K3) ! cromatic
-         DTDTHC=DTDE*D_E/D_THC  ! multiple scattering in Q-bar
-         DTDX=DTDX*GRU_IND/C0
-         DTDL=(DTDL*GRU_IND+1/BETA)/C0
-         DTDE=(DTDE+TL*REL_DNGDE)*GRU_IND/C0
-         DTDTHC=DTDTHC*GRU_IND/C0
-         WID=(DTDX*DXCH)**2/12.+(DTDL*SIG_TLEN)**2+(DTDE*SIG_E)**2
-     &        +(DTDTHC*TH0_SIP)**2
-         DFICDX=TOPF_DFIC(I,K0,K1)
-         DFI=ABS(DFICDX)*DXCH
-         FIC=ATAN2(F_SFIC(I,K0),F_CFIC(I,K0))
-         IF(FIC.LT.0) FIC=FIC+2*PI
-         YD=F_YY(I,K0)
-         NX(1)=NX1
-         NY(1)=NINT(YD/QBAR_B(MODUL))
-         DO IPMTY=0,N_PMTY(LR,MODUL)-1
-            DO IY=0,PMT_NY-1
-               ICH=ICHAN(IX,IY,IPMTX,IPMTY,LR,MODUL)
-               FOT=FOT0*DFI*PIK_DYCH(ICH)/QBAR_B(MODUL)
-               CALL PATT_PUSH(ICH,TIM,WID,FOT,FIC,E_MEAN,SIG_E**2,
-     &              NX,NY,XD,YD)
-            ENDDO
-         ENDDO
-      ENDDO
-
-      END
-
-
-      SUBROUTINE PATT_PUSH(ICH,TIM,WID,FOT,FIC,E,SIGE2,NX,NY,XD,YD)
-
-      IMPLICIT NONE
-      INTEGER ICH
-      REAL TIM, WID, FOT
-      REAL FIC, E, SIGE2
-      INTEGER NX(3), NY(3)
-      REAL XD, YD
-#include "TOP_PIK.fi"
-#include "TOP_TDC.fi"
-      INTEGER N
-      
-      IF(TIM.LT.0.OR.TIM.GT.T_MAX) RETURN
-      IF(ICH.LT.0.OR.ICH.GE.NUM_CHA) RETURN
-      IF(WID.LE.0) RETURN
-      IF(FOT.LE.0) RETURN
-
-      N=NUM_PIK(ICH)+1
-      IF(N.GT.MAX_PIK) THEN
-         PIK_OVFL(ICH)=PIK_OVFL(ICH)+1
-         RETURN
-      ENDIF
-      PIK_POZ(N,ICH)=TIM
-      PIK_WID(N,ICH)=WID+TDC_DT**2/12.
-      PIK_NPH(N,ICH)=FOT
-      PIK_FIC(N,ICH)=FIC
-      PIK_E(N,ICH)=E
-      PIK_SIGE(N,ICH)=SQRT(SIGE2)
-      PIK_NX(N,ICH)=NX(1)
-      PIK_NY(N,ICH)=NY(1)
-      PIK_NXM(N,ICH)=NX(2)
-      PIK_NYM(N,ICH)=NY(2)
-      PIK_NXE(N,ICH)=NX(3)
-      PIK_NYE(N,ICH)=NY(3)
-      PIK_XD(N,ICH)=XD
-      PIK_YD(N,ICH)=YD
-      NUM_PIK(ICH)=N
 
       END
 
@@ -1127,4 +767,5 @@ c--   calculate PDF parameters
       OK=TLEN.GT.0
 
       END
+
 

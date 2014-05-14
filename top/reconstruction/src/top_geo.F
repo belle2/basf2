@@ -331,14 +331,19 @@ c--   returns module ID or -1 (=failure)
 #include "TOP_TDC.fi"
 #include "TOP_PAR.fi"
 #include "TOP_PIK.fi"
-      INTEGER I, MAXCH
+#include "TOP_PHTIM.fi"
+      INTEGER I, MAXCH, MAXCHX, LR
 
       NMA_PMT=0
+      MAXCHX=0
       DO I=0,NUM_MOD-1
          N_PMT(0,I)=N_PMTX(0,I)*N_PMTY(0,I)
          N_PMT(1,I)=N_PMTX(1,I)*N_PMTY(1,I)
          NMA_PMT=MAX(NMA_PMT,N_PMT(0,I)+N_PMT(1,I))
          QBAR_NCH0(I)=PMT_NX*PMT_NY*N_PMT(0,I)
+         DO LR=0,1
+            MAXCHX=MAX(MAXCHX,N_PMTX(LR,I)*PMT_NX)
+         ENDDO
       ENDDO
 
       IF(.NOT.PAR_INI) CALL SET_TOP_PAR(0.,1.)
@@ -356,6 +361,14 @@ c--   returns module ID or -1 (=failure)
          PRINT*,'*** Error (top_reco): MAXCH>NUM_CHA, MAXCH=',MAXCH
          PRINT*,'--> Increase parameter value ',
      &        'TOP_PIK.fi::NUM_CHA and recompile!'
+      ENDIF
+
+      TOP_INI=TOP_INI.AND.MAXCHX.LE.NUM_CHX
+
+      IF(MAXCHX.GT.NUM_CHX) THEN
+         PRINT*,'*** Error (top_reco): MAXCHX>NUM_CHX, MAXCHX=',MAXCHX
+         PRINT*,'--> Increase parameter value ',
+     &        'TOP_PHTIM.fi::NUM_CHX and recompile!'
       ENDIF
 
       IF(TOP_INI) THEN
@@ -637,15 +650,14 @@ C      PHIND_LAMBDA=1.44+8.20/(LAM-126.) ! T. Ijima (6-jul-2004)
 
       REAL FUNCTION ABSPT_LENG(E)
 
-c--   J. Va'vra (7-jul-2004)
-
       IMPLICIT NONE
       REAL E                    ! photon energy (eV)
 
       REAL LAM
 
       LAM=1240/E
-      ABSPT_LENG=50000.*(LAM/442)**4
+cc      ABSPT_LENG=50000.*(LAM/442)**4 ! J. Va'vra (7-jul-2004)
+      ABSPT_LENG=15100.*(LAM/405)**4 ! Alan, 2013
 
       END
 

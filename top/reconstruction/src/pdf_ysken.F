@@ -1,8 +1,285 @@
 !-----------------------------------------------------------------------
 ! TOP counter for Belle: Reconstruction - construct PDF in y-slices
-! M. Staric, nov-2008, jun-2009, feb-2010
+! M. Staric, nov-2008, jun-2009, feb-2010, dec-2013, apr-2014
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 !-----------------------------------------------------------------------
+
+
+      SUBROUTINE PDF_YSKEN(I0,K0,K1,K2,K3,XD,DXCH,ZB,ZD,IX,IPMTX,LR,TYP)
+      
+      IMPLICIT NONE
+      INTEGER I0, K0, K1, K2, K3
+      REAL XD, DXCH, ZB, ZD
+      INTEGER IX, IPMTX, LR
+      INTEGER TYP               ! 0=not reflected, 1=PLM, 2=CYL, 3=SPH
+#include "TOP_CONS.fi"
+#include "TOP_GEO.fi"
+#include "TOP_EXT.fi"
+#include "TOP_PMT.fi"
+#include "TOP_PIK.fi"
+#include "TOP_TRACK.fi"
+#include "TOP_PAR.fi"
+#include "TOP_TOPF.fi"
+#include "TOP_YBUF.fi"
+#include "TOP_QEFF.fi"
+      REAL TOPF_DTL, TOPF_DYD, TOPF_DYB, TOPF_DFIC
+      INTEGER TOPF_RAYTR
+
+      INTEGER K4, K, NX(3), NY(3)
+      REAL TL0, YD0, YB0, FIC0
+
+      REAL DTLDX, DTLDL, DTLDE, DTDTHC
+      REAL DYDDX, DYDDL, DYDDE, DYDDZ
+      REAL DYBDX, DYBDL, DYBDE
+      REAL DFICDX, DFICDE
+
+      REAL DELY, DELY_E
+      REAL DFI, DTDE, DTDL, DTDX, WID0, DEL_E, YD
+      REAL TL, TIM, WID, FOT, FIC, CTH
+      REAL GROUP_INDEX, GET_LOSSES
+
+      LOGICAL SCAN_FLAG, IS_SCAN
+
+      DFICDX=TOPF_DFIC(I0,K0,K1)
+      K4=TOPF_RAYTR(I0,K0,DFICDX)
+      IF(K4.EQ.0) RETURN
+
+      TL0=F_TL(I0,K4)
+      TIM=TL0*GRU_IND/C0+TOF
+      IF(TIM.GT.T_MAX) RETURN
+
+      DYDDX=TOPF_DYD(I0,K0,K1)
+      DYDDL=TOPF_DYD(I0,K0,K2)
+      DYDDE=TOPF_DYD(I0,K0,K3)
+      DELY_E=ABS(DYDDE*(EMAX-EMIN))
+      DELY=DELY_E+ABS(DYDDX*DXCH)+ABS(DYDDL*T_LEN)
+      IF(DELY.EQ.0) RETURN
+
+      SCAN_FLAG=DELY_E/DELY.GT.0.1.AND.DELY.LT.100*QBAR_B(MODUL)
+
+      DTLDE=TOPF_DTL(I0,K0,K3)
+      DTDE=(DTLDE+TL0*REL_DNGDE)*GRU_IND/C0 ! dispersion (cromatic)
+      DTLDX=TOPF_DTL(I0,K0,K1)
+      DTDX=DTLDX*GRU_IND/C0     ! channel x-size
+      DTLDL=TOPF_DTL(I0,K0,K2)
+      DTDL=(DTLDL*GRU_IND+1/BETA)/C0 ! parallax
+      DTDTHC=DTLDE*D_E/D_THC*GRU_IND/C0 ! multiple scattering in Q-bar
+      WID0=(DTDX*DXCH)**2/12.+(DTDL*SIG_TLEN)**2+(DTDTHC*TH0_SIP)**2
+      WID=WID0+(SIG_E*DTDE)**2
+      
+      IF(SCAN_FLAG) SCAN_FLAG=IS_SCAN(TIM,WID,IX,IPMTX)
+
+      IF(SCAN_FLAG) THEN
+         YD0=F_YD(I0,K4)
+         IF(ZB.EQ.ZD) THEN
+            CALL YSKEN(IX,IPMTX,LR,MODUL,
+     &           YD0,DYDDE,DYDDL,DYDDX,
+     &           NBUF,SUM,E0,SIGE2,ICHA,ECPP,NP)
+         ELSE
+            YB0=F_YB(I0,K4)
+            DYBDX=TOPF_DYB(I0,K0,K1)
+            DYBDL=TOPF_DYB(I0,K0,K2)
+            DYBDE=TOPF_DYB(I0,K0,K3)
+            IF(EXT_SHAPE(QBAR_EXT(LR,MODUL)).EQ.2) THEN
+               DYDDZ=F_KY(I0,K4)/F_KZ(I0,K4)
+               IF(TYP.GT.0) DYDDZ=-DYDDZ
+               CALL YSKENX(IX,IPMTX,LR,MODUL,
+     &              YD0,DYDDE,DYDDL,DYDDX,DYDDZ,
+     &              YB0,DYBDE,DYBDL,DYBDX,
+     &              NBUF,SUM,E0,SIGE2,ICHA,ECPP,NP)
+            ELSE
+               CALL YSKENE(IX,IPMTX,LR,MODUL,
+     &              YD0,DYDDE,DYDDL,DYDDX,
+     &              YB0,DYBDE,DYBDL,DYBDX,
+     &              NBUF,SUM,E0,SIGE2,ICHA,ECPP,NP)
+            ENDIF
+         ENDIF
+      ELSE
+         CALL NO_YSKEN(IX,IPMTX,LR,MODUL,
+     &        NBUF,SUM,E0,SIGE2,ICHA,ECPP,NP)
+      ENDIF
+
+      NX(1)=F_NX(I0,K4)
+      NX(2)=F_NXM(I0,K4)
+      NX(3)=F_NXE(I0,K4)
+      NY(1)=F_NY(I0,K4)
+      NY(2)=F_NYM(I0,K4)
+      NY(3)=F_NYE(I0,K4)
+
+      FIC0=ATAN2(F_SFIC(I0,K4),F_CFIC(I0,K4))
+      IF(FIC0.LT.0) FIC0=FIC0+2*PI
+
+      DFICDE=TOPF_DFIC(I0,K0,K3)
+      DFICDX=TOPF_DFIC(I0,K0,K1)
+      DFI=ABS(DFICDX)*DXCH
+
+      CTH=ABS(F_DIR(3))
+
+      DO K=1,NP
+         DEL_E=E0(K)-E_MEAN
+         TL=TL0+DTLDE*DEL_E
+         TIM=TL*GROUP_INDEX(E0(K))/C0+TOF
+         WID=WID0+SIGE2(K)*DTDE**2
+         FOT=FOT0*DFI*SUM(K)*GET_LOSSES(E0(K),TL,CTH,NX(1),NY(1),TYP)
+         FIC=FIC0+DFICDE*DEL_E
+         CALL TO_FIRST_PERIOD(FIC)
+         YD=YD0+DYDDE*DEL_E
+         CALL PATT_PUSH(ICHA(K),TIM,WID,FOT,FIC,E0(K),SIGE2(K),TYP,
+     &        NX,NY,XD,YD)
+      ENDDO
+
+      END
+
+
+      SUBROUTINE PATT_PUSH(ICH,TIM,WID,FOT,FIC,E,SIGE2,TYP,NX,NY,XD,YD)
+
+      IMPLICIT NONE
+      INTEGER ICH
+      REAL TIM, WID, FOT
+      REAL FIC, E, SIGE2
+      INTEGER TYP
+      INTEGER NX(3), NY(3)
+      REAL XD, YD
+#include "TOP_PIK.fi"
+#include "TOP_TDC.fi"
+      INTEGER N
+      
+      IF(TIM.LT.0.OR.TIM.GT.T_MAX) RETURN
+      IF(ICH.LT.0.OR.ICH.GE.NUM_CHA) RETURN
+      IF(WID.LE.0) RETURN
+      IF(FOT.LE.0) RETURN
+
+      N=NUM_PIK(ICH)+1
+      IF(N.GT.MAX_PIK) THEN
+         PIK_OVFL(ICH)=PIK_OVFL(ICH)+1
+         RETURN
+      ENDIF
+      PIK_POZ(N,ICH)=TIM
+      PIK_WID(N,ICH)=WID+TDC_DT**2/12.
+      PIK_NPH(N,ICH)=FOT
+      PIK_FIC(N,ICH)=FIC
+      NUM_PIK(ICH)=N
+
+      IF(STORE_OPT) RETURN
+
+      PIK_E(N,ICH)=E
+      PIK_SIGE(N,ICH)=SIGE2
+      PIK_NX(N,ICH)=NX(1)
+      PIK_NY(N,ICH)=NY(1)
+      PIK_NXM(N,ICH)=NX(2)
+      PIK_NYM(N,ICH)=NY(2)
+      PIK_NXE(N,ICH)=NX(3)
+      PIK_NYE(N,ICH)=NY(3)
+      PIK_XD(N,ICH)=XD
+      PIK_YD(N,ICH)=YD
+      PIK_TYP(N,ICH)=TYP
+
+      END
+
+
+      REAL FUNCTION GET_LOSSES(E,X,CTH,NX,NY,TYP)
+
+c--   get losses due to:
+c--   mirror reflectivity, total internal reflectivity, bulk absorption
+
+      IMPLICIT NONE
+      REAL E                    ! photon energy [eV]
+      REAL X                    ! propagation length [cm]
+      REAL CTH                  ! cos of impact angle to PMT
+      INTEGER NX, NY            ! number of reflections
+      INTEGER TYP               ! 0=not reflected, 1=PLM, 2=CYL, 3=SPH
+#include "TOP_PAR.fi"
+#include "TOP_CONS.fi"
+      REAL LOST
+
+      REAL MIRROR_REFL, ABSPT_LENG
+      REAL TOTREFL
+      DATA TOTREFL /0.9994/
+
+      LOST=TOTREFL**(ABS(NX)+ABS(NY))
+      IF(TYP.NE.0) LOST=LOST*MIRROR_REFL(E)
+      LOST=LOST*EXP(-X/ABSPT_LENG(E))
+
+      GET_LOSSES=LOST
+
+      END
+
+
+      LOGICAL FUNCTION IS_SCAN(TIM,WID,IX,IPMTX)
+
+      IMPLICIT NONE
+      REAL TIM, WID
+      INTEGER IX, IPMTX
+
+#include "TOP_PHTIM.fi"
+#include "TOP_PMT.fi"
+      INTEGER ICHX, K, I
+      REAL SIG, X
+
+      IS_SCAN=.TRUE.
+      IF(FORCE_SCAN) RETURN
+
+      ICHX=IPMTX*PMT_NX+IX
+      IF(ICHX.GE.NUM_CHX) RETURN
+      IF(NUM_PHOT(ICHX).GT.MAX_PHOT) RETURN
+
+      DO K=1,NUM_PHOT(ICHX)
+         DO I=1,TTS_NG
+            SIG=WID+TTS_SIG(I)**2
+            X=(PH_TIMES(K,ICHX)-TIM-TTS_T0(I))**2/SIG
+            IF(X.LT.10) RETURN
+         ENDDO
+      ENDDO
+
+      IS_SCAN=.FALSE.
+
+      END
+
+
+      SUBROUTINE NO_YSKEN(IX,IPMTX,LR,M,NB,SUM,E0,SIG2,ICHA,ECPP,NT)
+      
+      IMPLICIT NONE
+      INTEGER IX, IPMTX, LR, M
+      INTEGER NB
+      REAL SUM(NB), E0(NB), SIG2(NB)
+      INTEGER ICHA(NB), NT
+      REAL ECPP(NB)
+#include "TOP_PAR.fi" 
+#include "TOP_GEO.fi"
+#include "TOP_EXT.fi"
+#include "TOP_PMT.fi"
+#include "TOP_PIK.fi"
+#include "TOP_TRACK.fi"
+#include "TOP_QEFF.fi" 
+      INTEGER ICHAN
+      INTEGER IPMTY, IY, ICH, ID
+      REAL DY, WINDIM
+      
+      NT=0
+      WINDIM=QBAR_B(M)
+      ID=QBAR_EXT(LR,M)
+      IF(ID.NE.0) WINDIM=EXT_YUP(ID)-EXT_YDN(ID)
+      DO IPMTY=0,N_PMTY(LR,M)-1
+         DO IY=0,PMT_NY-1
+            ICH=ICHAN(IX,IY,IPMTX,IPMTY,LR,M)
+            DY=PIK_DYCH(ICH)
+            IF(DY.LE.0) CYCLE
+            IF(NT.GE.NB) GOTO 999
+            NT=NT+1
+            SUM(NT)=DY/WINDIM
+            E0(NT)=E_MEAN
+            SIG2(NT)=SIG_E**2
+            ICHA(NT)=ICH
+            ECPP(NT)=E_MEAN
+         ENDDO
+      ENDDO
+      RETURN
+
+ 999  CONTINUE
+      PRINT*,'NO_YSKEN: NT>NB ',NT,NB
+
+      END
+
 
 c--   Qbar without expansion volume at side LR
 

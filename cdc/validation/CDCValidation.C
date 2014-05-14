@@ -455,26 +455,39 @@ void FillHisto()
 
     Char_t Name[100], Title[100];
 
+    // CDC hit pattern.
+
     sprintf(Name, "hHitPatternSL%02d", iSL);
     sprintf(Title, "Hit Pattern (Super Layer %2d)", iSL);
     hHitPatternSL[iSL] = (TH1D*) hHitPattern[iLayer]->Clone();
     hHitPatternSL[iSL]->SetName(Name);
+
     hHitPatternSL[iSL]->GetListOfFunctions()->Add(new TNamed("Description", Title));
+    hHitPatternSL[iSL]->GetListOfFunctions()->Add(new TNamed("Check", "Flat distribution within statistics."));
+
 
     hHitPatternSL[iSL]->SetAxisRange(0, RangeADC);
     hHitPatternSL[iSL]->GetXaxis()->SetTitle("Cell");
     hHitPatternSL[iSL]->GetYaxis()->SetTitle("Entries");
 
+    // ADC dist.
 
     sprintf(Name, "hADCSL%02d", iSL);
     sprintf(Title, "ADC (Super Layer %2d)", iSL);
     hADCSL[iSL] = (TH1D*) hADC[iLayer]->Clone();
     hADCSL[iSL]->SetName(Name);
     hADCSL[iSL]->GetListOfFunctions()->Add(new TNamed("Description", Title));
+    if(iSL==0){
+      hADCSL[iSL]->GetListOfFunctions()->Add(new TNamed("Check", "Landau peak is around 50 ADC count."));
+    } else {
+      hADCSL[iSL]->GetListOfFunctions()->Add(new TNamed("Check", "Landau peak is around 100 ADC count."));
+    }
+
     hADCSL[iSL]->SetAxisRange(0, RangeADC);
     hADCSL[iSL]->GetXaxis()->SetTitle("ADC count");
     hADCSL[iSL]->GetYaxis()->SetTitle("Entries");
 
+    // TDC dist.
 
     sprintf(Name, "hTDCSL%02d", iSL);
     sprintf(Title, "TDC (Super Layer %2d)", iSL);
@@ -483,12 +496,27 @@ void FillHisto()
     hTDCSL[iSL]->GetXaxis()->SetTitle("TDC count");
     hTDCSL[iSL]->GetYaxis()->SetTitle("Entries");
     hTDCSL[iSL]->GetListOfFunctions()->Add(new TNamed("Description", Title));
+    if(iSL==0){
+      hTDCSL[iSL]->GetListOfFunctions()->Add(new TNamed("Check", "Width of TDC count is around 100 nsec."));
+    } else {
+      hTDCSL[iSL]->GetListOfFunctions()->Add(new TNamed("Check", "Width of TDC count is around 200 nsec."));
+    }
+
+
+    // ADC-TDC corr.
 
     sprintf(Name, "hADCTDCSL%02d", iSL);
     sprintf(Title, "ADC-TDC (Super Layer %2d)", iSL);
     hADCTDCSL[iSL] = (TH2D*) hADCTDC[iLayer]->Clone();
     hADCTDCSL[iSL]->SetName(Name);
+
     hADCTDCSL[iSL]->GetListOfFunctions()->Add(new TNamed("Description", Title));
+    if(iSL<2){
+      hADCTDCSL[iSL]->GetListOfFunctions()->Add(new TNamed("Check", "No correlation within a range of 0 to 100-120 nsec. TDC beyond the range correlated with smaller ADC count."));
+    } else {
+      hADCTDCSL[iSL]->GetListOfFunctions()->Add(new TNamed("Check", "No correlation within a range of 0 to 150-200 nsec. TDC beyond the range correlated with smaller ADC count."));
+    }
+
     hADCTDCSL[iSL]->GetXaxis()->SetTitle("ADC count");
     hADCTDCSL[iSL]->GetYaxis()->SetTitle("TDC count");
 
@@ -503,10 +531,13 @@ void FillHisto()
     }
   }
 
+  // Mean and Sigma of ADC dist.
   hmeanADC = new TH1D("hmeanADC", "Mean of Landau peak", MAXLAYER, -0.5, MAXLAYER-0.5);
   hsigmaADC =new TH1D("hsigmaADC", "Sigma of Landau peak", MAXLAYER, -0.5, MAXLAYER-0.5);
   hmeanADC->GetListOfFunctions()->Add(new TNamed("Description", "Mean of Landau peak")); 
+  hmeanADC->GetListOfFunctions()->Add(new TNamed("Check", "Small cell part (inner 8 layers) : 50 ADC count. Normal cell part (layer8 - 55) : 100-140 ADC count.")); 
   hsigmaADC->GetListOfFunctions()->Add(new TNamed("Description", "Sigma of Landau peak")); 
+  hsigmaADC->GetListOfFunctions()->Add(new TNamed("Check", "Small cell part (inner 8 layers) : ~16 ADC count. Normal cell part (layer8 - 55) : 20 - 30 ADC count.")); 
   for(iLayer = 0; iLayer < MAXLAYER; iLayer++){
     hmeanADC->Fill(Layer[iLayer], meanADC[iLayer]);
     hsigmaADC->Fill(Layer[iLayer], sigmaADC[iLayer]);

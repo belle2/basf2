@@ -26,8 +26,8 @@
 #include <tracking/cdcLocalTracking/mclookup/CDCMCManager.h>
 #include <tracking/cdcLocalTracking/mclookup/CDCMCHitLookUp.h>
 
-//typedefs
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
+
+#include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
 
 //out type
 #include "genfit/TrackCand.h"

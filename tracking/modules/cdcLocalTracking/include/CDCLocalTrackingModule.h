@@ -15,7 +15,7 @@
 
 #include <tracking/cdcLocalTracking/config/CDCLocalTrackingConfig.h>
 
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
+#include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
 
 #include <tracking/cdcLocalTracking/workers/FacetSegmentWorker.h>
 

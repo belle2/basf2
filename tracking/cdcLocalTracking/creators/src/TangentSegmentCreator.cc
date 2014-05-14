@@ -19,50 +19,69 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-TangentSegmentCreator::TangentSegmentCreator() {;}
 
-TangentSegmentCreator::~TangentSegmentCreator() {;}
 
-void
-TangentSegmentCreator::create(
-  const std::vector<FacetSegment>& facetSegments,
-  std::vector<TangentSegment>& tangentSegments
+
+
+TangentSegmentCreator::TangentSegmentCreator()
+{
+}
+
+
+
+
+
+TangentSegmentCreator::~TangentSegmentCreator()
+{
+}
+
+
+
+
+
+void TangentSegmentCreator::create(
+  const std::vector< std::vector<const CDCRecoFacet*> >& facetPaths,
+  std::vector< CDCRecoTangentVector >& recoTangentSegments
 ) const
 {
 
-  tangentSegments.reserve(tangentSegments.size() + facetSegments.size());
+  recoTangentSegments.reserve(recoTangentSegments.size() + facetPaths.size());
 
-  BOOST_FOREACH(const FacetSegment & facetSegment, facetSegments) {
+  for (const std::vector<const CDCRecoFacet*>& facetPath : facetPaths) {
 
     //create a new recoSegment2D
-    tangentSegments.push_back(TangentSegment());
-    TangentSegment& tangentSegment = tangentSegments.back();
+    recoTangentSegments.push_back(CDCRecoTangentVector());
+    CDCRecoTangentVector& recoTangentSegment = recoTangentSegments.back();
 
-    create(facetSegment, tangentSegment);
+    create(facetPath, recoTangentSegment);
 
-    tangentSegment.ensureUnique();
+    recoTangentSegment.ensureUnique();
 
-  } // next facetsegment
+  }
 
 }
 
 
-void
-TangentSegmentCreator::create(
-  const FacetSegment& facetSegment,
-  TangentSegment& tangentSegment
+
+
+
+void TangentSegmentCreator::create(
+  const std::vector<const CDCRecoFacet*>& facetPath,
+  CDCRecoTangentVector& recoTangentSegment
 ) const
 {
 
-  //tangentSegment.reserve(facetSegment.size() * 2 + 2);
+  recoTangentSegment.reserve(facetPath.size() * 3);
 
-  BOOST_FOREACH(const CDCRecoFacet * facet, facetSegment) {
+  for (const CDCRecoFacet * ptrFacet : facetPath) {
+    if (not ptrFacet) continue;
+
+    const CDCRecoFacet& facet = *ptrFacet;
 
     //the alignement of the tangents does not play a major role here
-    tangentSegment.insert(tangentSegment.end(), facet->getStartToMiddle());
-    tangentSegment.insert(tangentSegment.end(), facet->getStartToEnd());
-    tangentSegment.insert(tangentSegment.end(), facet->getMiddleToEnd());
+    recoTangentSegment.push_back(facet.getStartToMiddle());
+    recoTangentSegment.push_back(facet.getStartToEnd());
+    recoTangentSegment.push_back(facet.getMiddleToEnd());
 
   }
 }
-

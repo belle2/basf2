@@ -11,13 +11,15 @@
 #ifndef TANGENTSEGMENTCREATOR_H_
 #define TANGENTSEGMENTCREATOR_H_
 
-#include<vector>
+#include <vector>
 
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
+#include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoFacet.h>
+#include <tracking/cdcLocalTracking/eventdata/collections/CDCRecoTangentVector.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {
-    /// Class providing the reduction form facets sequences to reconstructed tangents
+    /// Class providing the reduction form facets sequences to reconstructed tangents.
+    /** This class is only meant to export facet paths a collections of tangents to the DataStore for monitoring from Python side */
     class TangentSegmentCreator {
 
     public:
@@ -28,20 +30,13 @@ namespace Belle2 {
       /** Destructor.*/
       ~TangentSegmentCreator();
 
+      /// Converts many paths of facets to collections of tangents.
+      void create(const std::vector< std::vector<const CDCRecoFacet*> >& facetPaths,
+                  std::vector<CDCRecoTangentVector>& recoTangentSegments) const;
 
-      typedef Belle2::CDCLocalTracking::CDCRecoFacet Item;
-
-      //in type
-      typedef Belle2::CDCLocalTracking::CDCRecoFacetPtrSegment FacetSegment;
-
-      //out type
-      typedef Belle2::CDCLocalTracking::CDCRecoTangentCollection TangentSegment;
-
-      void create(const std::vector<FacetSegment>& facetSegments,
-                  std::vector<TangentSegment>& tangentSegments) const;
-
-
-      void create(const FacetSegment& facetSegment, TangentSegment& recoSegment) const;
+      /// Converts a path of facets to a collection of tangents.
+      void create(const std::vector<const CDCRecoFacet*>& facetPath,
+                  CDCRecoTangentVector& recoTangentSegment) const;
 
     private:
 

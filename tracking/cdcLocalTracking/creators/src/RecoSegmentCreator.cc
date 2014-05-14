@@ -19,45 +19,69 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-RecoSegmentCreator::RecoSegmentCreator() {;}
 
-RecoSegmentCreator::~RecoSegmentCreator() {;}
 
-void RecoSegmentCreator::create(const std::vector<FacetSegment>& facetSegments,
-                                std::vector<RecoSegment2D>& recoSegments) const
+
+
+RecoSegmentCreator::RecoSegmentCreator()
 {
-
-  recoSegments.reserve(recoSegments.size() + facetSegments.size());
-
-  BOOST_FOREACH(const FacetSegment & facetSegment, facetSegments) {
-
-    //create a new recoSegment2D
-    recoSegments.push_back(RecoSegment2D());
-    RecoSegment2D& recoSegment = recoSegments.back();
-
-    create(facetSegment, recoSegment);
-
-  } // next facetsegment
 }
 
-void RecoSegmentCreator::create(const FacetSegment& facetSegment,
-                                RecoSegment2D& recoSegment) const
+
+
+
+
+RecoSegmentCreator::~RecoSegmentCreator()
+{
+}
+
+
+
+
+
+void RecoSegmentCreator::create(
+  const std::vector< std::vector<const CDCRecoFacet* > >& facetPaths,
+  std::vector<CDCRecoSegment2D>& recoSegments
+) const
 {
 
-  size_t nFacets = facetSegment.size();
+  recoSegments.reserve(recoSegments.size() + facetPaths.size());
+
+  for (const std::vector<const CDCRecoFacet* >& facetPath : facetPaths) {
+
+    //create a new recoSegment2D
+    recoSegments.push_back(CDCRecoSegment2D());
+    CDCRecoSegment2D& recoSegment = recoSegments.back();
+
+    create(facetPath, recoSegment);
+
+  }
+}
+
+
+
+
+
+void RecoSegmentCreator::create(
+  const std::vector<const CDCRecoFacet* >& facetPath,
+  CDCRecoSegment2D& recoSegment
+) const
+{
+
+  size_t nFacets = facetPath.size();
 
   recoSegment.reserve(nFacets + 2);
 
   if (nFacets == 0) return;
 
   else if (nFacets == 1) {
-    const CDCRecoFacet* onlyFacet = *(facetSegment.begin());
+    const CDCRecoFacet* onlyFacet = *(facetPath.begin());
     recoSegment.push_back(onlyFacet->getStartRecoHit2D());
     recoSegment.push_back(onlyFacet->getMiddleRecoHit2D());
     recoSegment.push_back(onlyFacet->getEndRecoHit2D());
 
   } else if (nFacets == 2) {
-    FacetSegment::const_iterator itFacets = facetSegment.begin();
+    vector<const CDCRecoFacet*>::const_iterator itFacets = facetPath.begin();
     const CDCRecoFacet* firstFacet = *itFacets++;
     const CDCRecoFacet* secondFacet =  *itFacets;
 
@@ -72,10 +96,10 @@ void RecoSegmentCreator::create(const FacetSegment& facetSegment,
 
 
   } else { // nFacets > 2
-    FacetSegment::const_iterator itFacets = facetSegment.begin();
-    const CDCRecoFacet* firstFacet  = *itFacets++;  // facetSegment[0];
-    const CDCRecoFacet* secondFacet = *itFacets++;  // facetSegment[1];
-    const CDCRecoFacet* thirdFacet  = *itFacets++;  // facetSegment[2];
+    vector<const CDCRecoFacet*>::const_iterator itFacets = facetPath.begin();
+    const CDCRecoFacet* firstFacet  = *itFacets++;  // facetPath[0];
+    const CDCRecoFacet* secondFacet = *itFacets++;  // facetPath[1];
+    const CDCRecoFacet* thirdFacet  = *itFacets++;  // facetPath[2];
 
     recoSegment.push_back(firstFacet->getStartRecoHit2D());
     recoSegment.push_back(CDCRecoHit2D::average(firstFacet->getMiddleRecoHit2D(),
@@ -84,11 +108,11 @@ void RecoSegmentCreator::create(const FacetSegment& facetSegment,
                                                 secondFacet->getMiddleRecoHit2D(),
                                                 thirdFacet->getStartRecoHit2D()));
 
-    while (itFacets != facetSegment.end()) {
+    while (itFacets != facetPath.end()) {
 
-      firstFacet = secondFacet; //facetSegment[iFacet];
-      secondFacet = thirdFacet; //facetSegment[iFacet+1];
-      thirdFacet = *itFacets++; //facetSegment[iFacet+2];
+      firstFacet = secondFacet; //facetPath[iFacet];
+      secondFacet = thirdFacet; //facetPath[iFacet+1];
+      thirdFacet = *itFacets++; //facetPath[iFacet+2];
 
       recoSegment.push_back(CDCRecoHit2D::average(firstFacet->getEndRecoHit2D(),
                                                   secondFacet->getMiddleRecoHit2D(),

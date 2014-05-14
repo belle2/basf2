@@ -11,9 +11,11 @@
 #ifndef RECOSEGMENTCREATOR_H_
 #define RECOSEGMENTCREATOR_H_
 
-#include<vector>
+#include <vector>
 
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
+#include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoFacet.h>
+#include <tracking/cdcLocalTracking/eventdata/segments/CDCRecoSegment2D.h>
+
 
 namespace Belle2 {
   namespace CDCLocalTracking {
@@ -28,20 +30,12 @@ namespace Belle2 {
       /** Destructor.*/
       ~RecoSegmentCreator();
 
-      typedef Belle2::CDCLocalTracking::CDCRecoFacet Item;
+      /// Converts many paths of facets to tracks of two dimensional reconstructed hits averaging the hits that are present more two or three.
+      void create(const std::vector< std::vector<const CDCRecoFacet* > >& facetPaths,
+                  std::vector<CDCRecoSegment2D>& recoSegments) const;
 
-      //in type
-      typedef Belle2::CDCLocalTracking::CDCRecoFacetPtrSegment FacetSegment;
-
-      //out type
-      typedef Belle2::CDCLocalTracking::CDCRecoSegment2D RecoSegment2D;
-      typedef Belle2::CDCLocalTracking::CDCRecoTangentCollection TangentSegment;
-
-      void create(const std::vector<FacetSegment>& facetSegments,
-                  std::vector<RecoSegment2D>& recoSegments) const;
-
-
-      void create(const FacetSegment& facetSegment, RecoSegment2D& recoSegment) const;
+      /// Convert a path of facets to a track of two dimensional reconstructed hits averaging the hits that are present more two or three.
+      void create(const std::vector<const CDCRecoFacet* >& facetPath, CDCRecoSegment2D& recoSegment) const;
 
     private:
 

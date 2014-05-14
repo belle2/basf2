@@ -11,10 +11,7 @@
 #ifndef SEGMENTREVERSER_H_
 #define SEGMENTREVERSER_H_
 
-#include <vector>
-
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
-#include<framework/datastore/StoreArray.h>
+#include <tracking/cdcLocalTracking/eventdata/segments/CDCRecoSegment2D.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

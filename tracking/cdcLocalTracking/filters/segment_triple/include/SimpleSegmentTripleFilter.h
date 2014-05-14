@@ -11,7 +11,7 @@
 #ifndef SIMPLESEGMENTTRIPLEFILTER_H_
 #define SIMPLESEGMENTTRIPLEFILTER_H_
 
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
+#include <tracking/cdcLocalTracking/eventdata/tracks/CDCSegmentTriple.h>
 
 #include <tracking/cdcLocalTracking/fitting/CDCRiemannFitter.h>
 #include <tracking/cdcLocalTracking/fitting/CDCSZFitter.h>

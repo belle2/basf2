@@ -11,13 +11,8 @@
 #ifndef SIMPLEAXIALAXIALSEGMENTPAIRFILTER_H_
 #define SIMPLEAXIALAXIALSEGMENTPAIRFILTER_H_
 
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
-
+#include <tracking/cdcLocalTracking/eventdata/tracks/CDCAxialAxialSegmentPair.h>
 #include <tracking/cdcLocalTracking/fitting/CDCRiemannFitter.h>
-#include <tracking/cdcLocalTracking/fitting/CDCSZFitter.h>
-
-#include "boost/tuple/tuple.hpp"
-#include "boost/tuple/tuple_comparison.hpp"
 
 namespace Belle2 {
   namespace CDCLocalTracking {

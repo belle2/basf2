@@ -19,9 +19,6 @@
 
 #include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
 
-#include <TVector2.h>
-#include <TObject.h>
-
 namespace Belle2 {
   namespace CDCLocalTracking {
 

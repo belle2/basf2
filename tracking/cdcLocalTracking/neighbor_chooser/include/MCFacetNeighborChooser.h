@@ -11,10 +11,6 @@
 #ifndef MCFACETNEIGHBORCHOOSER_H_
 #define MCFACETNEIGHBORCHOOSER_H_
 
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoFacet.h>
-
 #include <tracking/cdcLocalTracking/filters/facet/MCFacetFilter.h>
 #include "BaseFacetNeighborChooser.h"
 

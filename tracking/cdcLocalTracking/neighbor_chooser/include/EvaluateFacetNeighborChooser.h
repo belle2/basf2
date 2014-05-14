@@ -14,10 +14,6 @@
 #include <iostream>
 #include <fstream>
 
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
-
 #include "BaseFacetNeighborChooser.h"
 #include "MCFacetNeighborChooser.h"
 

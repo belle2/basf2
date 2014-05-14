@@ -13,7 +13,6 @@
 
 #include <vector>
 
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
@@ -24,6 +23,8 @@
 
 #include <tracking/cdcLocalTracking/algorithms/MultipassCellularPathFinder.h>
 #include <tracking/cdcLocalTracking/algorithms/Clusterizer.h>
+
+#include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
 
 #include <tracking/cdcLocalTracking/creators/FacetCreator.h>
 #include <tracking/cdcLocalTracking/creators/RecoSegmentCreator.h>

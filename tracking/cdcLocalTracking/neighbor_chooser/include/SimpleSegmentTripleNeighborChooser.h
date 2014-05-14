@@ -11,10 +11,6 @@
 #ifndef SIMPLESEGMENTTRIPLENEIGHBORCHOOSER_H_
 #define SIMPLESEGMENTTRIPLENEIGHBORCHOOSER_H_
 
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
-
 #include "BaseSegmentTripleNeighborChooser.h"
 
 namespace Belle2 {

@@ -13,8 +13,7 @@
 
 #include <vector>
 
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
-#include<framework/datastore/StoreArray.h>
+#include <tracking/cdcLocalTracking/eventdata/tracks/CDCTrack.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

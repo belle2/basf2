@@ -11,11 +11,7 @@
 #ifndef EVALUATEAXIALAXIALSEGMENTPAIRFILTER_H_
 #define EVALUATEAXIALAXIALSEGMENTPAIRFILTER_H_
 
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
-
 #include <TFile.h>
-#include <TTree.h>
-#include <TVector2.h>
 
 #include "MCAxialAxialSegmentPairFilter.h"
 #include "AxialAxialSegmentPairFilterTree.h"
@@ -45,9 +41,6 @@ namespace Belle2 {
 
       /// Forwards the modules initialize to the filter
       void terminate();
-
-
-
 
       /// Checks if a pair of axial segments is a good combination
       CellWeight isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair);

@@ -10,9 +10,6 @@
 
 #ifndef SIMPLEFACETNEIGHBORCHOOSER_H_
 #define SIMPLEFACETNEIGHBORCHOOSER_H_
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
 
 #include "BaseFacetNeighborChooser.h"
 

@@ -11,7 +11,7 @@
 #ifndef SIMPLEFACETFILTER_H_
 #define SIMPLEFACETFILTER_H_
 
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
+#include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoFacet.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

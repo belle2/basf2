@@ -11,7 +11,7 @@
 #ifndef GFTRACKCANDCREATOR_H_
 #define GFTRACKCANDCREATOR_H_
 
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
+#include <tracking/cdcLocalTracking/eventdata/tracks/CDCTrack.h>
 
 #include <framework/datastore/StoreArray.h>
 

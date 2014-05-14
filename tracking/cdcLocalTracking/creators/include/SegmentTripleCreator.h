@@ -11,13 +11,13 @@
 #ifndef SEGMENTTRIPLECREATOR_H_
 #define SEGMENTTRIPLECREATOR_H_
 
-#include <boost/foreach.hpp>
-
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
-
-#include <framework/datastore/StoreArray.h>
 
 #include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
+#include <tracking/cdcLocalTracking/eventdata/tracks/CDCSegmentTriple.h>
+
+#include <tracking/cdcLocalTracking/fitting/CDCRiemannFitter.h>
+#include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
+
 
 namespace Belle2 {
   namespace CDCLocalTracking {

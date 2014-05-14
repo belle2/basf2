@@ -11,7 +11,8 @@
 #ifndef SEGMENTSELECTER_H_
 #define SEGMENTSELECTER_H_
 
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
+#include <tracking/cdcLocalTracking/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/cdcLocalTracking/fitting/CDCRiemannFitter.h>
 
 //#include <set>
 //#include <vector>

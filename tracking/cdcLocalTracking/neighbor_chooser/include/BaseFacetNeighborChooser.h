@@ -17,8 +17,7 @@
 #include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
 
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCRLWireHitPair.h>
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
-
+#include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoFacet.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {

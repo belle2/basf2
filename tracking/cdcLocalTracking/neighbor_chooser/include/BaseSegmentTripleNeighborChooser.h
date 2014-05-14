@@ -15,7 +15,8 @@
 
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
+
+#include <tracking/cdcLocalTracking/eventdata/tracks/CDCSegmentTriple.h>
 
 
 namespace Belle2 {

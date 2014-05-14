@@ -13,8 +13,7 @@
 
 #include <vector>
 
-#include <tracking/cdcLocalTracking/typedefs/UsedDataHolders.h>
-#include<framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreArray.h>
 
 #include <tracking/cdcLocalTracking/algorithms/WeightedNeighborhood.h>
 #include <tracking/cdcLocalTracking/algorithms/NeighborhoodBuilder.h>
@@ -23,11 +22,14 @@
 #include <tracking/cdcLocalTracking/algorithms/Clusterizer.h>
 #include <tracking/cdcLocalTracking/algorithms/MultipassCellularPathFinder.h>
 
+#include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
+
 #include <tracking/cdcLocalTracking/creators/SegmentTripleCreator.h>
 #include <tracking/cdcLocalTracking/creators/TrackCreator.h> //no decisions to optimize
 #include <tracking/cdcLocalTracking/creators/SingleSegmentTrackCreator.h>
 #include <tracking/cdcLocalTracking/creators/TrackOrientator.h>
 #include <tracking/cdcLocalTracking/creators/GFTrackCandCreator.h>
+
 
 namespace Belle2 {
   namespace CDCLocalTracking {

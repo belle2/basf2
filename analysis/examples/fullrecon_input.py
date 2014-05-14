@@ -32,18 +32,25 @@ method = (
     '!H:CreateMVAPdfs:!V:NTrees=100:BoostType=Grad:Shrinkage=0.10:'
     'UseBaggedGrad:GradBaggingFraction=0.5:nCuts=10:MaxDepth=2'
 )
+#nb = (
+#    'NeuroBayes', 'Plugin',
+#    '!H:CreateMVAPdfs:V:NTrainingIter=50:TrainingMethod=BFGS'
+#)
 #method = (
-#        'NeuroBayes', 'Plugin',
-#        '!H:CreateMVAPdfs:V:NTrainingIter=50:TrainingMethod=BFGS'
+#    'FastBDT', 'Plugin',
+#    '!H:CreateMVAPdfs:V'
 #)
 
 
 # Add FSP
 particles = []
-particles.append(Particle('gamma', ['p', 'pt'], method))
-particles.append(Particle('pi0', ['p', 'pt', 'M'], method))
+particles.append(Particle('gamma', ['p', 'pt', 'clusterE9E25'], method))
 particles.append(Particle('pi+', chargedTrackVars, method))
 particles.append(Particle('K+', chargedTrackVars, method))
+
+p = Particle('pi0', ['E', 'p', 'pt', 'M', 'prodChildProb', 'daughterAngle'], method)
+p.addChannel(['gamma', 'gamma'])
+particles.append(p)
 
 p = Particle('D0', DVars, method)
 p.addChannel(['K-', 'pi+'])
@@ -79,22 +86,22 @@ p.addChannel(['D0', 'pi0'])
 p.addChannel(['D-', 'pi+'])
 p.addChannel(['D-', 'pi0', 'pi+'])
 p.addChannel(['D*-', 'pi+', 'pi+', 'pi-'])
-p.addChannel(['D*-', 'pi+', 'pi+', 'pi-', 'pi0'])
+#p.addChannel(['D*-', 'pi+', 'pi+', 'pi-', 'pi0']) # takes up most of the CPU time...
 particles.append(p)
 
 main = create_path()
 main.add_module(register_module('RootInput'))
-main.add_module(register_module('ProgressBar'))
 
 main.add_module(register_module('ParticleLoader'))
 
 FullReconstruction(main, particles)
 
-# ntupler = register_module('VariableNtuple')
-# ntupler.param('particleList', 'B+')
-# ntupler.param('variables', ['p', 'pt', 'M', 'dM', 'Q', 'dQ', 'Mbc', 'deltaE',
-# 'nDaughters', 'flavor', 'tmptruth'])
-# main.add_module(ntupler)
+#ntupler = register_module('VariablesToNtuple')
+#ntupler.param('particleList', 'K-')
+#ntupler.param('variables', chargedTrackVars + ['SignalProbability'])
+#main.add_module(ntupler)
+
+main.add_module(register_module('ProgressBar'))
 
 # show constructed path
 print main

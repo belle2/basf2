@@ -295,4 +295,11 @@ void RootOutputModule::fillTree(DataStore::EDurability durability)
     }
   }
   m_tree[durability]->Fill();
+
+  const bool writeError = m_file->TestBit(TFile::kWriteError);
+  if (writeError) {
+    //m_file deleted first so we have a chance of closing it (though that will probably fail)
+    delete m_file;
+    B2FATAL("A write error occured while saving '" << m_outputFileName  << "', please check if enough disk space is available.");
+  }
 }

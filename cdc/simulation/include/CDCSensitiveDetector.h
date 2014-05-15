@@ -309,6 +309,8 @@ namespace Belle2 {
 
       G4bool m_wireSag; /**< Switch to activate wire sag effect. */
 
+      G4double m_minTrackLength; /**< Min. track length (mm) required for saving in MCParticle. */
+
       int m_hitNumber; /**< The current number of created hits in an event. Used to fill the DataStore CDC array.*/
       int m_EBhitNumber; /**< The current number of created hits in an event. Used to fill the DataStore CDC EB array.*/
     };

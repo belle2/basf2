@@ -63,11 +63,15 @@ namespace Belle2 {
     GearDir gd = GearDir("/Detector/DetectorComponent[@name=\"CDC\"]/Content");
     gd.append("/SensitiveDetector");
     m_thresholdEnergyDeposit =  Unit::convertValue(gd.getDouble("EnergyDepositionThreshold"), "eV");
-    m_wireSag = gd.getBool("WireSag");
-    B2INFO("Sense wire sag in CDCSensitiveDetector on(=1)/off(=0):" << m_wireSag);
     m_thresholdEnergyDeposit *= GeV;  //GeV to MeV
     m_thresholdKineticEnergy = 0.0; // Dummy to avoid a warning (tentative).
     //    B2INFO("Threshold energy " << m_thresholdEnergyDeposit);
+
+    m_wireSag = gd.getBool("WireSag");
+    B2INFO("Sense wire sag in CDCSensitiveDetector on(=1)/off(=0):" << m_wireSag);
+
+    m_minTrackLength = gd.getDouble("MinTrackLength");
+    B2INFO("MinTrackLength in CDCSensitiveDetector:" << m_minTrackLength);
 
   }
 
@@ -99,6 +103,11 @@ namespace Belle2 {
 
     // Get step information
     const G4Track& t = * aStep->GetTrack();
+
+    // No save in MCParticle if track-length is short
+    if (t.GetTrackLength() > m_minTrackLength) {
+      Simulation::TrackInfo::getInfo(t).setIgnore(false);
+    }
 
     const G4double charge = t.GetDefinition()->GetPDGCharge();
 

@@ -7,6 +7,8 @@
       <EnergyDepositionThreshold desc="All hits with smaller energy will be dropped at SensitiveDetector level" unit="eV">0.0</EnergyDepositionThreshold>  
       <!-- Switch for sense wire sag -->
       <WireSag desc="true: on; false: off">false</WireSag>  
+      <!-- Min. track length -->
+      <MinTrackLength desc="Min. track length required for saving in MCParticle.; to be applied to all particles other than primaries and decay-daughters." unit="mm">150.0</MinTrackLength>  
     </SensitiveDetector>
     <Rotation desc="Rotation of the whole cdc detector (should be the same as beampipe)" unit="mrad">0.0</Rotation>
 

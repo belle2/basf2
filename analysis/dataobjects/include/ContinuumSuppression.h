@@ -43,7 +43,7 @@ namespace Belle2 {
      * Default constructor.
      * All private members are set to 0 (all vectors are empty).
      */
-    ContinuumSuppression() : m_thrustBm(0), m_thrustOm(0), m_cosTBTO(0), m_cosTBz(0) {};
+    ContinuumSuppression() : m_thrustBm(0.0), m_thrustOm(0.0), m_cosTBTO(0.0), m_cosTBz(0.0) {};
 
     void addThrustBm(float thrustBm);
 

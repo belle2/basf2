@@ -111,8 +111,9 @@ namespace Belle2 {
      * third parameter is the sectorID in which the normalized point is calculated
      * fourth parameter is the point for which the normalized sector point shall be calculated.
      *  WARNING: this value is normalized not within the boundaries of the sensor but within the boundaries of the sector!
-     *   Example: if coords are (0.5,0.5), the coordinate of the middle of the sector is calculated, not the coordinate of the middle of the sensor.
+     *   Example: if coords are (0.5,0.5), the coordinate of the middle of the _sector_ is calculated, not the coordinate of the middle of the _sensor_.
      *   Example2: the sector-edges can be retrieved by using e.g.: (0,0), (0,1), (1,0) and (1,1)
+     *  the return value is in normalized Coordinates of the _sensor_ again
      */
     static NormCoords calcNormalizedSectorPoint(const std::vector<double>& uConfig, const std::vector<double>& vConfig, uShort secID, NormCoords coords) {
       // safety checks
@@ -121,14 +122,39 @@ namespace Belle2 {
       throwBoundaryVector(uConfig);
       throwBoundaryVector(vConfig);
 
-//       B2INFO ("SECID: " << secID);
+      /**
+      uCount
+      |
+      V coding: secID(uIndex, vIndex):
+      vCount-> ----------------------------------------------
+      | 0(0,0) | 1(0,1) | 2(0,2) | 3(0,3) | 4(0,4) |
+      ----------------------------------------------
+      | 5(1,0) | 6(1,1) | 7(1,2) | 8(1,3) | 9(1,4) |
+      ----------------------------------------------
+      |10(2,0) |11(2,1) |12(2,2) |13(2,3) |14(2,4) |
+      ----------------------------------------------
 
+      case vConfig { 0, .2, .4, .6, .8, 1} = 6 entries
+      case uConfig { 0, .33, .67, 1} = 4 entries
+      therefore:
+      vMax = vConfig - 1 = 5,
+      uMax = uConfig - 1 = 3;
+
+      0-based-secID:
+      secID = vCount + uCount*vMax.
+      example 13 = 3 + 2*5, 6 = 1 + 1*5;
+
+      vCount = (secID % vMax).
+      example 3 = (13 % 5) = 3
+
+      uCount = (secID - vCount)/vMax;
+      */
       uInt vMax = 0;
       if (uInt(vConfig.size()) > 0) { vMax = vConfig.size() - 1 ; }
 
 //       // reconstructing indices for the u and v cuts by using the sectorID:
-      uInt vIndex = (secID /*- 1*/) % vMax ;
-      uInt uIndex = (secID /*- 1*/ - vIndex) / vMax;
+      uInt vIndex = (secID) % vMax ; // 1-based
+      uInt uIndex = (secID - vIndex) / vMax;
 
       B2DEBUG(100, "SECID: " << secID << ", vIndex: " << vIndex << ", uIndex: " << uIndex << ", vMax:" << vMax);
       B2DEBUG(100, "uConfig.at(uIndex + 1): " << uConfig.at(uIndex + 1) << ", uConfig.at(uIndex): " << uConfig.at(uIndex));
@@ -146,7 +172,7 @@ namespace Belle2 {
     /** returns true if value is between 0-1, false if not */
     static void throwBoundary(double value) {
       if (value > 1 or value < 0) {
-        //throw Out_of_bounds();
+        throw Out_of_bounds();
       }
     }
 

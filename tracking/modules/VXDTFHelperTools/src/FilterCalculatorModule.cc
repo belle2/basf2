@@ -473,7 +473,8 @@ void FilterCalculatorModule::event()
 
     string aCenterSectorName = FullSecID().getFullSecString(); // virtual sector for decay vertices.
     if (thisSecMap->find(aCenterSectorName) == thisSecMap->end()) { // fallback solution using one secMap for whole range of pT
-      Sector newCenterSector(0, 0, 0, 0, 0, 0, 0, aCenterSectorName);
+//       Sector newCenterSector(0, 0, 0, 0, 0, 0, 0, aCenterSectorName);
+      Sector newCenterSector(aCenterSectorName, {0, 0}, {0, 0}, {0, 0}, {0, 0}, 0);
       thisSecMap->insert(make_pair(aCenterSectorName, newCenterSector));
     }
     MCParticle* mcp = aMcParticleArray[newTrack.getParticleID()];
@@ -1217,7 +1218,7 @@ bool FilterCalculatorModule::createSectorAndHit(Belle2::Const::EDetector detecto
   string aSectorName;
   unsigned int aSecID = 0;
   double dist2Origin = 0;
-  int aUniID = aVxdID.getID();
+  VxdID::baseType aUniID = aVxdID.getID();
   int aLayerID = aVxdID.getLayerNumber();
 
 
@@ -1258,7 +1259,8 @@ bool FilterCalculatorModule::createSectorAndHit(Belle2::Const::EDetector detecto
             B2DEBUG(100, "Sector edges: O(" << sectorEdgeU1OfV1 << "," << sectorEdgeV1 << "), U(" << sectorEdgeU2OfV1 << "," << sectorEdgeV1 << "), V(" << sectorEdgeU1OfV2 << "," << sectorEdgeV2 << "), UV(" << sectorEdgeU2OfV2 << "," << sectorEdgeV2 << "), centerU/V: " << centerU << "/" << centerV)
 
             if (thisSecMap->find(aSectorName) == thisSecMap->end()) { // fallback solution using one secMap for whole range of pT
-              Sector newSector(sectorEdgeV1, sectorEdgeV2, sectorEdgeU1OfV1, sectorEdgeU1OfV2, sectorEdgeU2OfV1, sectorEdgeU2OfV2, dist2Origin, aSectorName);
+//               Sector newSector(sectorEdgeV1, sectorEdgeV2, sectorEdgeU1OfV1, sectorEdgeU1OfV2, sectorEdgeU2OfV1, sectorEdgeU2OfV2, dist2Origin, aSectorName);
+              Sector newSector(aSectorName, {sectorEdgeU1OfV1, sectorEdgeV1}, {sectorEdgeU2OfV1, sectorEdgeV1}, {sectorEdgeU1OfV2, sectorEdgeV2}, {sectorEdgeU2OfV2, sectorEdgeV2}, dist2Origin);
               thisSecMap->insert(make_pair(aSectorName, newSector));
             } else {
               thisSecMap->find(aSectorName)->second.increaseCounter();
@@ -1270,13 +1272,13 @@ bool FilterCalculatorModule::createSectorAndHit(Belle2::Const::EDetector detecto
   }
 
   else { // new way to calc sectorID
-    std::pair<double, double> aCoorNormalized, aRelCoor = {uCoord, vCoord};
-
-    // Convert to local Corrdinates for Normalization
-    std::pair<double, double> aCoorLocal = SpacePoint::convertToLocalCoordinates(aRelCoor, aVxdID, &aSensorInfo);
+    std::pair<double, double> aCoorNormalized,
+//            aCoorLocal = {uCoord, vCoord},
+        aCoorLocal = {hitLocal[0], hitLocal[1]},
+        aCornerCoordinate;
 
     // Normalization of the Coordinates
-    aCoorNormalized = SpacePoint::convertToNormalizedCoordinates(aCoorLocal, aVxdID, &aSensorInfo);
+    aCoorNormalized = SpacePoint::convertLocalToNormalizedCoordinates(aCoorLocal, aVxdID, &aSensorInfo);
 
     B2DEBUG(10, "local hit coordinates (u,v): (" << hitLocal[0] << "," << hitLocal[1] << "), in normalized:(" << aCoorNormalized.first << "," << aCoorNormalized.second << "), @layer: " << aLayerID << ", with sensorSizeU/V: " << aSensorInfo.getUSize() << "/" << aSensorInfo.getVSize());
 
@@ -1287,44 +1289,42 @@ bool FilterCalculatorModule::createSectorAndHit(Belle2::Const::EDetector detecto
     if (aSecID == std::numeric_limits<unsigned short>::max()) { return success; } // equals to false
 
     // 1. Corner Calculate
-    aRelCoor = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner1);
-    TVector3 corner1Global = TVector3((aRelCoor.first - 0.5) * aSensorInfo.getUSize(), (aRelCoor.second - 0.5) * aSensorInfo.getVSize(), 0);
+    aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner1);
+    pair<double, double> localCorner00 = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
 
     // 2. Corner Calculate
-    aRelCoor = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner2);
-    TVector3 corner2Global = TVector3((aRelCoor.first - 0.5) * aSensorInfo.getUSize(), (aRelCoor.second - 0.5) * aSensorInfo.getVSize(), 0);
+    aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner2);
+    pair<double, double> localCorner01 = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
 
     // 3. Corner Calculate
-    aRelCoor = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner3);
-    TVector3 corner3Global = TVector3((aRelCoor.first - 0.5) * aSensorInfo.getUSize(), (aRelCoor.second - 0.5) * aSensorInfo.getVSize(), 0);
+    aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner3);
+    pair<double, double> localCorner10 = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
 
     // 4. Corner Calculate
-    aRelCoor = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner4);
-    TVector3 corner4Global = TVector3((aRelCoor.first - 0.5) * aSensorInfo.getUSize(), (aRelCoor.second - 0.5) * aSensorInfo.getVSize(), 0);
+    aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner4);
+    pair<double, double> localCorner11 = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
 
     // Center
-    aRelCoor = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCenter);
+    aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCenter);
 
     B2DEBUG(20, "OOO SIZE: " << aSensorInfo.getUSize() << ", " << aSensorInfo.getVSize());
-    B2DEBUG(20, "OOO Center normalized: " << aRelCoor.first << ", " << aRelCoor.second);
-    B2DEBUG(20, "OOO Center real: " << (aRelCoor.first)*aSensorInfo.getUSize() << ", " << aRelCoor.second * aSensorInfo.getVSize());
+    B2DEBUG(20, "OOO Center normalized: " << aCornerCoordinate.first << ", " << aCornerCoordinate.second);
+    B2DEBUG(20, "OOO Center real: " << localCorner11.first << ", " << localCorner11.second);
 
-    TVector3 centerOfSector = TVector3((aRelCoor.first - 0.5) * aSensorInfo.getUSize(), (aRelCoor.second - 0.5) * aSensorInfo.getVSize(), 0);
+    pair<double, double> aCenterOfSector = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
+//     TVector3 centerOfSector = TVector3((aRelCoor.first - 0.5) * aSensorInfo.getUSize(), (aRelCoor.second - 0.5) * aSensorInfo.getVSize(), 0);
 
-    dist2Origin = (centerOfSector - m_origin).Mag();
+    dist2Origin = (aSensorInfo.pointToGlobal(TVector3(aCenterOfSector.first, aCenterOfSector.second, 0.)) - m_origin).Mag();
 
     aSectorName = (boost::format("%1%_%2%_%3%") % aLayerID % aUniID % aSecID).str();
 
-    B2DEBUG(20, "OOO I have found a SecID: " << aSectorName << " with centerU/V: " << centerOfSector.X() << "/" << centerOfSector.Y() << " for hit " << uCoord << "/" << vCoord);
-    B2DEBUG(100, "OOO Sector edges: O(" << corner1Global.X() << "," << corner1Global.Y() << "), U(" << corner3Global.X() << "," << corner1Global.Y() << "), V(" << corner2Global.X() << "," << corner2Global.Y() << "), UV(" << corner4Global.X() << "," << corner2Global.Y() << "), centerU/V: " << centerOfSector.X() << "/" << centerOfSector.Y())
-
-
-    // To do
-    B2DEBUG(100, "New Sector : " << corner1Global.Y() << "," << corner2Global.Y() << "," << corner1Global.X() << "," << corner2Global.X() << "," << corner3Global.X() << "," << corner4Global.X() << "," << dist2Origin << "," << aSectorName);
+    B2DEBUG(20, "OOO I have found a SecID: " << aSectorName << " with centerU/V: " << aCenterOfSector.first << "/" << aCenterOfSector.second << " for hit " << uCoord << "/" << vCoord);
+    B2DEBUG(100, "OOO Sector " << aSectorName << " - edges: O(" << localCorner00.first << "," << localCorner00.second << "), U(" << localCorner01.first << "," << localCorner01.second << "), V(" << localCorner10.first << "," << localCorner10.second << "), UV(" << localCorner11.first << "," << localCorner11.second << "), centerU/V: " << aCenterOfSector.first << "/" << aCenterOfSector.second)
 
 
     if (thisSecMap->find(aSectorName) == thisSecMap->end()) { // fallback solution using one secMap for whole range of pT
-      Sector newSector(corner1Global.Y(), corner2Global.Y(), corner1Global.X(), corner2Global.X(), corner3Global.X(), corner4Global.X(), dist2Origin, aSectorName);
+      Sector newSector(aSectorName, localCorner00, localCorner10, localCorner01, localCorner11, dist2Origin);
+//       (std::string myName, LocalCoordinates edge0, LocalCoordinates edgeU, LocalCoordinates edgeV, LocalCoordinates edgeUV, double distance)
 
       thisSecMap->insert(make_pair(aSectorName, newSector));
     } else {

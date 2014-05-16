@@ -291,15 +291,16 @@ namespace Belle2 {
   class Sector {
   public:
     typedef std::pair<std::string, FMSectorFriends> MapEntry;  /**< Entry of sectorMap */
+    typedef std::pair<double, double> LocalCoordinates; /**< stores u and v in local coordinates */
 
     /** constructor */
-    Sector(float v1, float v2, float u1v1, float u1v2, float u2v1, float u2v2, double distance, std::string myName):
+    Sector(std::string myName, LocalCoordinates edge0, LocalCoordinates edgeU, LocalCoordinates edgeV, LocalCoordinates edgeUV, double distance):
       m_usageCounter(1),
       m_secName(myName),
-      m_edgeO(std::make_pair(u1v1, v1)),
-      m_edgeU(std::make_pair(u2v1, v1)),
-      m_edgeV(std::make_pair(u1v2, v2)),
-      m_edgeUV(std::make_pair(u2v2, v2)),
+      m_edgeO(edge0),
+      m_edgeU(edgeU),
+      m_edgeV(edgeV),
+      m_edgeUV(edgeUV),
       m_distanceToOrigin(distance) {
       m_friendMap.clear();
     }

@@ -440,8 +440,8 @@ std::pair<int, int> ExportSectorMapModule::importROOTMap()
           B2INFO("Map: " << tempSecMap.first << " has no compatible pendant imported yet, storing directly ")
         }
 
-        B2INFO("ExportSectorMapModule::importROOTMap: finishing import of new map " << tempSecMap.second.getMapName() <<  ", with " <<
-               tempSecMap.second.getNumOfSectors() << " sectors, " << tempSecMap.second.getNumOfFriends() << " friends and " << tempSecMap.second.getNumOfValues() << " total values" << endl;)
+        B2INFO("ExportSectorMapModule::importROOTMap: finishing import of new map " << tempSecMap.second.getMapName())
+        B2DEBUG(5, ", with " << tempSecMap.second.getNumOfSectors() << " sectors, " << tempSecMap.second.getNumOfFriends() << " friends and " << tempSecMap.second.getNumOfValues() << " total values" << endl;)
       }
     }
     importedRootFile.Close();

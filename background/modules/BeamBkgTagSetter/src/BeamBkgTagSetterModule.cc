@@ -98,7 +98,8 @@ namespace Belle2 {
 
     StoreObjPtr<BackgroundMetaData> bkgMetaData("", DataStore::c_Persistent);
     bkgMetaData.registerAsPersistent();
-    bkgMetaData.create();
+    if (!bkgMetaData.isValid())
+      bkgMetaData.create();
     bkgMetaData->setBackgroundType(m_backgroundType);
     bkgMetaData->setBackgroundTag(m_backgroundTag);
     bkgMetaData->setRealTime(m_realTime);

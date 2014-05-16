@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PassData_H
-#define PassData_H
+#pragma once
 
 // #include <algorithm>
 #include <string>
@@ -185,4 +184,3 @@ namespace Belle2 {
     TCsOfEvent tcVector; /**< carries track candidates of current pass */
   }; //
 } //Belle2 namespace
-#endif

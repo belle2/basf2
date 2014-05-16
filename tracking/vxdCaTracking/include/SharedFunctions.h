@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SharedFunctions_H
-#define SharedFunctions_H
+#pragma once
 
 #include <algorithm>
 #include <string>
@@ -58,4 +57,3 @@ ss << std::endl;
     double sigmaV; /**< error of y-direction of hitPosition in global coordinates */
   }; /**< will be used by VXDTF to store information about the position of the hit. It is also in use for faster import of hit information for circleFitter (part of trackletFilter) */
 } //Belle2 namespace
-#endif

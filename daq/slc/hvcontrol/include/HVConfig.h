@@ -22,13 +22,16 @@ namespace Belle2 {
     ConfigObject& get() throw() { return m_obj; }
     void reset() throw();
     void set(const ConfigObject& obj) throw();
-    void setName(const std::string& name) throw() { m_obj.setName(name); }
+    void setName(const std::string& name) throw();
     size_t getNChannels() const throw() { return m_channel_v.size(); }
     size_t getNValueSets() const throw() { return m_valueset_v.size(); }
     const HVChannelList& getChannels() const throw() { return m_channel_v; }
     const HVChannel& getChannel(size_t i) const throw() { return m_channel_v[i]; }
     const HVValueSetList& getValueSets() const throw() { return m_valueset_v; }
     const HVValueSet& getValueSet(size_t i) const throw() { return m_valueset_v[i]; }
+    const std::string& getValueSetName(size_t i) const throw() {
+      return m_valueset_v[i][0].getConfigName();
+    }
     const DBObject& getExtra() const throw() { return m_obj.getObject("extra"); }
     HVChannelList& getChannels() throw() { return m_channel_v; }
     HVChannel& getChannel(size_t i) throw() { return m_channel_v[i]; }

@@ -17,6 +17,7 @@ using namespace Belle2;
 
 DBObject::DBObject() : m_index(0)
 {
+  m_id = 0;
   m_isconfig = true;
 }
 

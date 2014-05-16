@@ -35,7 +35,6 @@ bool HVCallback::perform(const NSMMessage& msg) throw()
   HVState state(getNode().getState());
   bool result = true;
   NSMCommunicator* com = getCommunicator();
-  m_state_demand = HVState::UNKNOWN;
   if (cmd == HVCommand::TURNOFF) {
     getNode().setState(HVState::TRANSITION_TS);
     result = turnoff();

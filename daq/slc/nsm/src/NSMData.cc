@@ -124,7 +124,8 @@ throw(NSMHandlerException)
   b2nsm_context(comm->getContext());
   if ((m_pdata = b2nsm_openmem(getName().c_str(), getFormat().c_str(),
                                getRevision())) == NULL) {
-    throw (NSMHandlerException("Failed to open data memory"));
+    throw (NSMHandlerException("Failed to open data memory %s",
+                               nsmlib_strerror(comm->getContext())));
   }
   setNode(comm->getNode().getName());
   parse();

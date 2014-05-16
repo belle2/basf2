@@ -3,7 +3,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
-#include <iostream>
 
 extern "C" {
 #include "nsm2/nsmlib2.h"
@@ -349,22 +348,28 @@ size_t NSMMessage::read(NSMcontext* nsmc) throw(NSMHandlerException)
 
 void NSMMessage::readObject(Reader& reader) throw(IOException)
 {
-  m_reqname = reader.readString();
+  setRequestName(reader.readString());
+  setNodeName(reader.readString());
   setNParams(reader.readInt());
   for (int i = 0; i < getNParams(); i++) {
     setParam(i, reader.readInt());
   }
   setLength(reader.readInt());
-  reader.read(m_data, getLength());
+  if (getLength() > 0) {
+    reader.read(m_data, getLength());
+  }
 }
 
 void NSMMessage::writeObject(Writer& writer) const throw(IOException)
 {
   writer.writeString(getRequestName());
+  writer.writeString(getNodeName());
   writer.writeInt(getNParams());
   for (int i = 0; i < getNParams(); i++) {
     writer.writeInt(getParam(i));
   }
   writer.writeInt(getLength());
-  writer.write(m_data, getLength());
+  if (getLength() > 0) {
+    writer.write(m_data, getLength());
+  }
 }

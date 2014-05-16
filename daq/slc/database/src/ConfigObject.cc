@@ -4,7 +4,8 @@
 #include <daq/slc/base/Reader.h>
 #include <daq/slc/base/Writer.h>
 
-#include <iostream>
+//#include <daq/slc/system/LogFile.h>
+
 #include <cstdlib>
 #include <cstring>
 
@@ -17,6 +18,25 @@ ConfigObject::ConfigObject()
 ConfigObject::ConfigObject(const ConfigObject& obj)
   : DBObject(obj)
 {
+  copy(obj);
+}
+
+const ConfigObject& ConfigObject::operator=(const ConfigObject& obj) throw()
+{
+  copy(obj);
+  return *this;
+}
+
+void ConfigObject::copy(const ConfigObject& obj)
+{
+  reset();
+  setIndex(obj.getIndex());
+  setId(obj.getId());
+  setRevision(obj.getRevision());
+  setName(obj.getName());
+  setNode(obj.getNode());
+  setTable(obj.getTable());
+  setConfig(obj.isConfig());
   for (FieldNameList::const_iterator it = obj.getFieldNames().begin();
        it != obj.getFieldNames().end(); it++) {
     const std::string& name(*it);
@@ -114,7 +134,6 @@ void ConfigObject::writeObject(Writer& writer) const throw(IOException)
   writer.writeInt(name_v.size());
   for (size_t ii = 0; ii < name_v.size(); ii++) {
     std::string name = name_v.at(ii);
-    std::cout << name << " ";
     FieldInfo::Type type = getProperty(name).getType();
     writer.writeString(name);
     writer.writeInt(type);
@@ -173,8 +192,9 @@ void ConfigObject::addValue(const std::string& name, const void* value,
   FieldInfo::Property pro(type, 0, 0);
   int size = pro.getTypeSize();
   if (size <= 0) return;
-  if (!hasField(name)) {
+  if (!hasValue(name)) {
     add(name, pro);
+    //LogFile::debug("malloc(%d) >> %s", size, name.c_str());
     void* v = malloc(size);
     memcpy(v, value, size);
     m_value_m.insert(FieldValueList::value_type(name, v));

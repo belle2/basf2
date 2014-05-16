@@ -21,11 +21,27 @@ FieldInfoList FieldInfoTable::getList(const std::string tablename,
     try {
       if (tablename.size() > 0) {
         m_db->execute("select id, name, \"table\", revision, "
-                      "type, length from fieldnames('%s', %d)",
+                      "type, length from fieldnames('%s', %d);",
                       tablename.c_str(), revision);
+        /*
+              m_db->execute("select fieldinfo.record_time as record_time, "
+                "fieldinfo.id as id, tableinfo.name as \"table\", "
+                "tableinfo.revision as revision, fieldinfo.name as name,"
+                "fieldinfo.type as type, fieldinfo.length as length "
+                "from fieldinfo, tableinfo where fieldinfo.tableid = tableinfo.id "
+                "and tableinfo.name = '%s' and tableinfo.revision = %d;",
+                            tablename.c_str(), revision);
+        */
       } else {
         m_db->execute("select id, name, \"table\", revision, "
-                      "type, length from fieldnames()");
+                      "type, length from fieldnames();");
+        /*
+        m_db->execute("select fieldinfo.record_time as record_time, "
+                "fieldinfo.id as id, tableinfo.name as \"table\", "
+                "tableinfo.revision as revision, fieldinfo.name as name, "
+                "fieldinfo.type as type, fieldinfo.length as length "
+                "from fieldinfo, tableinfo where fieldinfo.tableid = tableinfo.id");
+        */
       }
       DBRecordList record_v = m_db->loadRecords();
       for (DBRecordList::iterator it = record_v.begin();
@@ -122,7 +138,7 @@ int FieldInfoTable::createTable(const DBObject& obj, bool isroot)
           for (EnumList::const_iterator it = enum_m.begin();
                it != enum_m.end(); it++) {
             m_db->execute("insert into \"fieldinfo.type.enum\" "
-                          "(name, index, fieldid) values ('%s', %d, %d)",
+                          "(name, index, fieldid) values ('%s', %d, %d);",
                           it->first.c_str(), it->second, id);
           }
         }
@@ -140,7 +156,7 @@ throw(DBHandlerException)
 {
   EnumList enum_m;
   m_db->execute("select name, index from \"fieldinfo.type.enum\" "
-                "where fieldid = %d", info.getId());
+                "where fieldid = %d;", info.getId());
   DBRecordList record_v(m_db->loadRecords());
   for (size_t i = 0; i < record_v.size(); i++) {
     DBRecord& record(record_v[i]);

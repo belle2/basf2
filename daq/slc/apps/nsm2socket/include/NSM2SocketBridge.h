@@ -7,6 +7,8 @@
 #include <daq/slc/database/DBInterface.h>
 
 #include <daq/slc/system/TCPServerSocket.h>
+#include <daq/slc/system/TCPSocketWriter.h>
+#include <daq/slc/system/TCPSocketReader.h>
 #include <daq/slc/system/Mutex.h>
 
 #include <list>
@@ -14,7 +16,6 @@
 namespace Belle2 {
 
   class NSM2SocketCallback;
-  class NSM2SocketBridgeThread;
 
   class NSM2SocketBridge {
 
@@ -26,17 +27,17 @@ namespace Belle2 {
 
   public:
     void run() throw();
-    void sendMessage(NSMMessage& message) throw();
-    void add(NSM2SocketBridgeThread* thread);
-    void remove(NSM2SocketBridgeThread* thread);
+    bool sendMessage(const NSMMessage& msg) throw();
+    bool recieveMessage(NSMMessage& msg) throw();
     NSM2SocketCallback* getCallback() { return m_callback; }
 
   private:
     NSM2SocketCallback* m_callback;
     DBInterface* m_db;
     TCPServerSocket m_server_socket;
+    TCPSocketWriter m_writer;
+    TCPSocketReader m_reader;
     int m_timeout;
-    std::list<NSM2SocketBridgeThread*> m_thread_l;
     Mutex m_mutex;
 
   };

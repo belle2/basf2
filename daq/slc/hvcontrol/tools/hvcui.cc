@@ -33,6 +33,8 @@ extern "C" {
 using namespace Belle2;
 
 HVConfig hvconfig;
+bool edited = false;
+bool updated[10] = { false };
 
 const char* getStateCode(const HVState& state)
 {
@@ -53,36 +55,62 @@ const char* getStateCode(const HVState& state)
   return "\x1b[49m\x1b[39m";;
 }
 
-void print(bool edited)
+void print(const std::string& config_in = "")
 {
   std::stringstream ss, ss1;
-  ss << StringUtil::form(" %5s | %4s | %4s | %6s | %10s | %10s | %10s | "
-                         "%10s | %33s | %33s ", "crate",
-                         "slot", "channel", "turnon",
-                         "rampup_speed", "rampdown_speed",
-                         "voltage_limit", "current_limit",
-                         "voltage_demand", "reserved") << std::endl;
-  int len = ss.str().size() - 1;
-  for (int i = 0; i < len; i++) {
-    ss1 << "-";
-  }
-  ss1 << std::endl;
-  ss << ss1.str();
+  size_t configlength = 0;
   for (size_t j = 0; j < hvconfig.getNValueSets(); j++) {
-    const HVValueSet& value_v(hvconfig.getValueSet(j));
+    std::string configname = hvconfig.getValueSetName(j);
+    if (config_in.size() > 0 && configname != config_in) continue;
+    if (configlength < configname.size()) configlength = configname.size();
+  }
+  if (StringUtil::tolower(config_in) == "channel") {
+    ss << StringUtil::form(" %5s | %5s | %4s | %7s | %6s ", "index", "crate",
+                           "slot", "channel", "turnon") << std::endl;
+    int len = ss.str().size() - 1;
+    for (int i = 0; i < len; i++) {
+      ss1 << "-";
+    }
+    ss1 << std::endl;
+    ss << ss1.str();
     for (size_t i = 0; i < hvconfig.getNChannels(); i++) {
       const HVChannel& channel(hvconfig.getChannel(i));
-      const HVValue& value(value_v[i]);
-      ss << StringUtil::form(" %5d | %4d | %7d | %6s | %12s | %14s | %13s | "
-                             "%13s | %6s | %6s | %6s ",
+      ss << StringUtil::form(" %5d | %5d | %4d | %7d | %6s ", (int)i,
                              channel.getCrate(), channel.getSlot(), channel.getChannel(),
-                             (channel.isTurnOn() ? "true" : "false"),
-                             StringUtil::form("%4.1f", value.getRampUpSpeed()).c_str(),
-                             StringUtil::form("%4.1f", value.getRampDownSpeed()).c_str(),
-                             StringUtil::form("%4.1f", value.getVoltageLimit()).c_str(),
-                             StringUtil::form("%4.1f", value.getCurrentLimit()).c_str(),
-                             StringUtil::form("%4.1f", value.getVoltageDemand()).c_str())
+                             (channel.isTurnOn() ? "true" : "false"))
          << std::endl;
+    }
+  } else {
+    ss << StringUtil::form(StringUtil::form(" %%5s | %%%ds | ", configlength)
+                           + "%5s | %4s | %7s | %12s | %14s | "
+                           "%13s | %13s | %13s ", "index", "config", "crate",
+                           "slot", "channel", "rampup_speed", "rampdown_speed",
+                           "voltage_limit", "current_limit",
+                           "voltage_demand", "reserved") << std::endl;
+    int len = ss.str().size() - 1;
+    for (int i = 0; i < len; i++) {
+      ss1 << "-";
+    }
+    ss1 << std::endl;
+    ss << ss1.str();
+    for (size_t j = 0; j < hvconfig.getNValueSets(); j++) {
+      const HVValueSet& value_v(hvconfig.getValueSet(j));
+      std::string configname = hvconfig.getValueSetName(j);
+      if (config_in.size() > 0 && configname != config_in) continue;
+      for (size_t i = 0; i < hvconfig.getNChannels(); i++) {
+        const HVChannel& channel(hvconfig.getChannel(i));
+        const HVValue& value(value_v[i]);
+        ss << StringUtil::form(StringUtil::form(" %%5d | %%%ds | ", configlength)
+                               + "%5d | %4d | %7d | %12s | %14s | "
+                               "%13s | %13s | %13s ", (int)j, configname.c_str(),
+                               channel.getCrate(), channel.getSlot(), channel.getChannel(),
+                               StringUtil::form("%4.1f", value.getRampUpSpeed()).c_str(),
+                               StringUtil::form("%4.1f", value.getRampDownSpeed()).c_str(),
+                               StringUtil::form("%4.1f", value.getVoltageLimit()).c_str(),
+                               StringUtil::form("%4.1f", value.getCurrentLimit()).c_str(),
+                               StringUtil::form("%4.1f", value.getVoltageDemand()).c_str())
+           << std::endl;
+      }
     }
   }
   std::cout << "modename = " << hvconfig.get().getName()
@@ -116,32 +144,60 @@ void setValue(DBObject& obj, StringList str_v,
   }
 }
 
-void edit(const std::string& str, bool& edited)
+void edit(const std::string& str)
 {
   StringList sarg_v = StringUtil::split(str, ' ');
-  if (sarg_v.size() > 3 && sarg_v[0] == "valueset") {
+  if (sarg_v.size() > 2 && sarg_v[0] == "valueset") {
     int index = atoi(sarg_v[1].c_str());
-    DBObject& cobj(hvconfig.get().getObject("valueset", index));
-    cobj.setName(sarg_v[2]);
-  } else if (sarg_v.size() > 3 && sarg_v[0] == "extra") {
-    StringList str_v = StringUtil::split(sarg_v[1], '.');
-    setValue(hvconfig.get().getObject("extra"), str_v, sarg_v[2]);
+    HVValueSet& value_v(hvconfig.getValueSet(index));
+    for (size_t i = 0; i < hvconfig.getNChannels(); i++) {
+      value_v[i].setConfigName(sarg_v[2]);
+    }
+    edited = true;
   } else if (sarg_v.size() > 4) {
     std::string name = sarg_v[0];
     if (name == "crate" || name == "slot" || name == "channel") return;
     int crate = (isdigit(sarg_v[1].at(0))) ? atoi(sarg_v[1].c_str()) : -1;
     int slot = (isdigit(sarg_v[2].at(0))) ? atoi(sarg_v[2].c_str()) : -1;
     int ch = (isdigit(sarg_v[3].at(0))) ? atoi(sarg_v[3].c_str()) : -1;
-    std::string configname = (sarg_v.size() > 5) ? sarg_v[4] : "";
     std::string v = (sarg_v.size() > 5) ? sarg_v[5] : sarg_v[4];
-    for (size_t j = 0; j < hvconfig.getNValueSets(); j++) {
-      HVValueSet& value_v(hvconfig.getValueSet(j));
-      const DBObject& cobj(hvconfig.get().getObject("valueset", j));
-      if (configname.size() == 0 || configname == cobj.getName()) {
+    if (name == "turnon") {
+      for (size_t i = 0; i < hvconfig.getNChannels(); i++) {
+        HVChannel& channel(hvconfig.getChannel(i));
+        if ((crate == -1 || crate == channel.getCrate()) &&
+            (slot == -1 || slot == channel.getSlot()) &&
+            (ch == -1 || ch == channel.getChannel())) {
+          v = StringUtil::tolower(v);
+          if (v == "on") {
+            channel.setTurnOn(true);
+            edited = true;
+            std::cout << "Set " << name << "["
+                      << channel.getCrate() << "]["
+                      << channel.getSlot() << "]["
+                      << channel.getChannel() << "] = "
+                      << v << std::endl;
+          } else if (v == "off") {
+            channel.setTurnOn(false);
+            edited = true;
+            std::cout << "Set " << name << "["
+                      << channel.getCrate() << "]["
+                      << channel.getSlot() << "]["
+                      << channel.getChannel() << "] = "
+                      << v << std::endl;
+          }
+        }
+      }
+    } else {
+      std::string configname = (sarg_v.size() > 5) ? sarg_v[4] : "";
+      int index = (isdigit(configname.at(0))) ? atoi(configname.c_str()) : -1;
+      for (size_t j = 0; j < hvconfig.getNValueSets(); j++) {
+        HVValueSet& value_v(hvconfig.getValueSet(j));
         for (size_t i = 0; i < hvconfig.getNChannels(); i++) {
           HVChannel& channel(hvconfig.getChannel(i));
           HVValue& value(value_v[i]);
-          if ((crate == -1 || crate == channel.getCrate()) &&
+          if (((index >= 0 && index == j) ||
+               (configname.size() == 0 || configname == value.getConfigName())) &&
+              (crate == -1 || crate == channel.getCrate()) &&
               (slot == -1 || slot == channel.getSlot()) &&
               (ch == -1 || ch == channel.getChannel())) {
             if (value.get().hasValue(name)) {
@@ -195,7 +251,7 @@ void dbget(const std::string& configname,
   ConfigObjectTable table(db);
   db->connect();
   hvconfig.set(table.get(configname, hvnodename));
-  print(false);
+  print();
   db->close();
 }
 
@@ -249,7 +305,7 @@ int main(int argc, char** argv)
   std::string nodename = argv[1];
   std::string hvnodename = argv[2];
   NSMNode node(nodename);
-  NSMNode hvnode(hvnodename);//config.get("hv.nsm.name"));
+  NSMNode hvnode(hvnodename);
   NSMCommunicator* comm = new NSMCommunicator();
   comm->init(node, config.get("nsm.local.host"), config.getInt("nsm.local.port"));
   NSMData data(hvnodename + "_STATUS", "hv_status", 1);
@@ -271,7 +327,6 @@ int main(int argc, char** argv)
   char* prompt = (char*)malloc(nodename.size() + 3);
   strcpy(prompt, (nodename + "> ").c_str());
   char* line = NULL;
-  bool edited = false;
   while (true) {
     line = readline(prompt);
     StringList str_v = StringUtil::split(line, ' ', 2);
@@ -288,12 +343,28 @@ int main(int argc, char** argv)
     if (command == "QUIT") return 0;
     std::string str = (strlen(line) > command.size()) ? (line + command.size() + 1) : "";
     free(line);
-    if (command == "PRINT") {
+    if (command == "HELP") {
+      std::cout << "configure [<config>] " << std::endl
+                << "turnon " << std::endl
+                << "turnoff " << std::endl
+                << "standby " << std::endl
+                << "shoulder " << std::endl
+                << "peak " << std::endl
+                << "edit valueset <index> <new_config> " << std::endl
+                << "edit turnon <crate> <slot> <channel> on/off " << std::endl
+                << "edit <param_name> <crate> <slot> <channel> [<index>] <new_value> " << std::endl
+                << "dbset <new_config> " << std::endl
+                << "dbget <config> " << std::endl
+                << "nsmget " << std::endl;
+      continue;
+    } else if (command == "PRINT") {
       std::cout << command << std::endl;
-      print(edited);
+      print(str_v[1]);
+      continue;
     } else if (command == "EDIT") {
       std::cout << command << std::endl;
-      edit(str, edited);
+      edit(str);
+      continue;
     }
     HVCommand cmd = command;
     if (cmd == Enum::UNKNOWN) {
@@ -323,7 +394,23 @@ int main(int argc, char** argv)
       StringList sarg_v = StringUtil::split(str, ' ');
       if (sarg_v.size() >= 1) {
         db->connect();
-        hvconfig.get().setName(sarg_v[0]);
+        hvconfig.setName(sarg_v[0]);
+        {
+          ConfigObjectList& obj_v(hvconfig.get().getObjects("channel"));
+          for (size_t i = 0; i < obj_v.size(); i++) {
+            table.add(obj_v[i], false);
+          }
+        }
+        {
+          ConfigObjectList& obj_v(hvconfig.get().getObjects("valueset"));
+          for (size_t i = 0; i < obj_v.size(); i++) {
+            ConfigObjectList& cobj_v(obj_v[i].getObjects("value"));
+            for (size_t j = 0; j < cobj_v.size(); j++) {
+              table.add(cobj_v[j], false);
+            }
+            table.add(obj_v[i], false);
+          }
+        }
         table.add(hvconfig.get(), true);
         edited = false;
         db->close();

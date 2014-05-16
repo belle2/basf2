@@ -25,7 +25,7 @@ namespace Belle2 {
     void setCrate(int id) { m_obj->setInt("crate", id); }
     void setSlot(int id) { m_obj->setInt("slot", id); }
     void setChannel(int id) { m_obj->setInt("channel", id); }
-    void setTurnOn(bool turnon) { m_obj->setFloat("turnon", turnon); }
+    void setTurnOn(bool turnon) { m_obj->setBool("turnon", turnon); }
 
   private:
     ConfigObject* m_obj;

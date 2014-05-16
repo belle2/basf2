@@ -3,7 +3,10 @@
 
 #include <daq/slc/runcontrol/RCCommand.h>
 #include <daq/slc/hvcontrol/HVCommand.h>
+
 #include <daq/slc/nsm/NSMCommunicator.h>
+
+#include <daq/slc/system/LogFile.h>
 
 #include <daq/slc/base/StringUtil.h>
 
@@ -11,8 +14,7 @@
 
 using namespace Belle2;
 
-NSM2SocketCallback::NSM2SocketCallback(const NSMNode& node, int interval,
-                                       ConfigFile& file)
+NSM2SocketCallback::NSM2SocketCallback(const NSMNode& node, int interval)
 throw() : NSMCallback(node, interval)
 {
   add(RCCommand::BOOT);
@@ -32,13 +34,6 @@ throw() : NSMCallback(node, interval)
   add(HVCommand::PEAK);
   add(HVCommand::TURNON);
   add(HVCommand::TURNOFF);
-  std::vector<std::string> datname_v = StringUtil::split(file.get("nsmdata"), ',');
-  for (size_t i = 0; i < datname_v.size(); i++) {
-    std::string dataname = datname_v[i];
-    std::string format = file.get(StringUtil::form("%s.format", dataname.c_str()));
-    int revision = file.getInt(StringUtil::form("%s.revision", dataname.c_str()));
-    m_data_v.push_back(NSMData(dataname, format, revision));
-  }
 }
 
 bool NSM2SocketCallback::perform(NSMMessage& msg)
@@ -50,33 +45,24 @@ throw(NSMHandlerException)
 
 void NSM2SocketCallback::init() throw()
 {
-  NSMCommunicator* comm = getCommunicator();
-  for (NSMDataList::iterator it = m_data_v.begin();
-       it != m_data_v.end(); it++) {
-    NSMData& data(*it);
-    try {
-      std::cout << "open NSM data (" << data.getName() << ")" << std::endl;
-      data.open(comm);
-    } catch (const NSMHandlerException& e) {
-      std::cout << e.what() << std::endl;
-    }
+}
+
+NSMData& NSM2SocketCallback::getData(const std::string& name,
+                                     const std::string& format,
+                                     int revision) throw(NSMHandlerException)
+{
+  if (m_data_m.find(name) == m_data_m.end()) {
+    NSMData data(name, format, revision);
+    data.open(getCommunicator());
+    LogFile::debug("open NSM data (%s) ", data.getName().c_str());
+    m_data_m.insert(NSMDataList::value_type(name, data));
   }
+  return m_data_m[name];
 }
 
 void NSM2SocketCallback::timeout() throw()
 {
-  NSMCommunicator* comm = getCommunicator();
-  for (NSMDataList::iterator it = m_data_v.begin();
-       it != m_data_v.end(); it++) {
-    NSMData data(*it);
-    if (!data.isAvailable()) {
-      try {
-        data.open(comm);
-      } catch (const NSMHandlerException& e) {
-        std::cout << e.what() << std::endl;
-      }
-    }
-  }
+
 }
 
 bool NSM2SocketCallback::sendRequest(NSMMessage& msg) throw()

@@ -1,5 +1,5 @@
 Import('env')
 
-env['TOOLS_LIBS']['nsm2socket'] = ['pthread', '$MYSQL_LIBS' , '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['nsm2socket'] = ['pthread', '$PGSQL_LIBS' , 'daq', 'nsm2_b2lib', 'nsm2_corelib']
 
 Return('env')

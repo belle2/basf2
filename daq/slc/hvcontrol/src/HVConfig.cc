@@ -29,5 +29,21 @@ void HVConfig::set(const ConfigObject& obj) throw()
       m_valueset_v.push_back(value_v);
     }
   }
+}
 
+void HVConfig::setName(const std::string& name) throw()
+{
+  get().setName(name);
+  {
+    ConfigObjectList& obj_v(m_obj.getObjects("channel"));
+    for (size_t i = 0; i < obj_v.size(); i++) {
+      obj_v[i].setName(name);
+    }
+  }
+  {
+    ConfigObjectList& obj_v(m_obj.getObjects("valueset"));
+    for (size_t i = 0; i < obj_v.size(); i++) {
+      obj_v[i].setName(name);
+    }
+  }
 }

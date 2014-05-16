@@ -163,6 +163,15 @@ const std::string FieldInfo::setSQL() const throw()
     case OBJECT: {
       ss << StringUtil::form("tablename_by_configinfo(%s) "
                              "as \"%s\" ", name.c_str(), name.c_str());
+      /*
+      ss << StringUtil::form("(select configinfo.name||','||nodeinfo.name"
+           "||','||tableinfo.name||','||tableinfo.revision "
+           "as \"%s\" from configinfo, nodeinfo, tableinfo "
+           "where configinfo.nodeid = nodeinfo.id and "
+           "nodeinfo.name = '%s' and configinfo.tableid = tableinfo.id "
+           "and configinfo.name = '%s') ",
+           name.c_str(), name.c_str(), name.c_str());
+      */
     }; break;
     case ENUM:  {
       ss << "(select name from \"fieldinfo.type.enum\" where index = \""

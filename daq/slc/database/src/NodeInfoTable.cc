@@ -9,7 +9,7 @@ NodeInfoList NodeInfoTable::getNodeInfos()
   NodeInfoList info_v;
   if (m_db != NULL) {
     try {
-      m_db->execute("select * from nodenames()");
+      m_db->execute("select * from nodenames();");
       DBRecordList record_v(m_db->loadRecords());
       for (DBRecordList::iterator it = record_v.begin();
            it != record_v.end(); it++) {

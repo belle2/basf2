@@ -1,9 +1,10 @@
 #include "daq/slc/database/DBInterface.h"
 
-//#include <daq/slc/system/LogFile.h>
+#include <daq/slc/system/LogFile.h>
 
 #include <cstdarg>
 #include <cstdio>
+//#include <iostream>
 
 using namespace Belle2;
 
@@ -24,13 +25,13 @@ DBInterface::~DBInterface() throw()
 
 }
 
-void DBInterface::execute(const std::string& text, ...) throw(DBHandlerException)
+void DBInterface::execute(const char* text, ...) throw(DBHandlerException)
 {
   va_list ap;
-  static char ss[1024 * 100];
   va_start(ap, text);
-  vsprintf(ss, text.c_str(), ap);
+  vsprintf(m_buf, text, ap);
   va_end(ap);
   //LogFile::debug(ss);
-  execute_imp(ss);
+  //std::cout << m_buf << std::endl;
+  execute_imp(m_buf);
 }

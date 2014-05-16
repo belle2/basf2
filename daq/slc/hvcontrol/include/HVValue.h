@@ -15,6 +15,7 @@ namespace Belle2 {
 
   public:
     void print() throw() { m_obj->print(); }
+    const std::string& getConfigName() const { return m_obj->getName(); }
     float getRampUpSpeed() const { return m_obj->getFloat("rampup_speed"); }
     float getRampDownSpeed() const { return m_obj->getFloat("rampdown_speed"); }
     float getVoltageDemand() const { return m_obj->getFloat("voltage_demand"); }
@@ -23,6 +24,7 @@ namespace Belle2 {
     void set(ConfigObject* obj) throw() { m_obj = obj; }
     ConfigObject& get() throw() { return *m_obj; }
 
+    void setConfigName(const std::string& name) { m_obj->setName(name); }
     void setRampUpSpeed(float rampup) { m_obj->setFloat("rampup_speed", rampup); }
     void setRampDownSpeed(float rampdown) { m_obj->setFloat("rampdown_speed", rampdown); }
     void setVoltageDemand(float voltage) { m_obj->setFloat("voltage_demand", voltage); }

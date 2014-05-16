@@ -17,6 +17,8 @@ namespace Belle2 {
     ConfigObject();
     ConfigObject(const ConfigObject& obj);
     virtual ~ConfigObject() throw();
+    const ConfigObject& operator=(const ConfigObject& obj) throw();
+    void copy(const ConfigObject& obj);
 
   public:
     ConfigObjectList& getObjects(const std::string& name) throw();
@@ -55,7 +57,7 @@ namespace Belle2 {
 
   typedef std::vector<ConfigObject> ConfigObjectList;
 
-  inline int ConfigObject::ConfigObject::getNObjects(const std::string& name) const throw()
+  inline int ConfigObject::getNObjects(const std::string& name) const throw()
   {
     return m_obj_v_m[name].size();
   }

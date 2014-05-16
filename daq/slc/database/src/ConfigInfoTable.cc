@@ -14,6 +14,13 @@ const std::string ConfigInfo::getSQL() const throw()
   return StringUtil::form("select configid from configid('%s', '%s', '%s', %d)",
                           getName().c_str(), getNode().c_str(),
                           getTable().c_str(), getRevision());
+  /*
+  return StringUtil::form("select c.id from configinfo as c, nodeinfo as n, tableinfo as t "
+        "where c.nodeid = n.id and c.tableid = t.id and "
+        "c.name = '%s' and n.name = '%s' and t.name = '%s' and t.revision = %d",
+                          getName().c_str(), getNode().c_str(),
+                          getTable().c_str(), getRevision());
+  */
 }
 
 ConfigInfoList ConfigInfoTable::getList()
@@ -22,6 +29,12 @@ ConfigInfoList ConfigInfoTable::getList()
   if (m_db != NULL) {
     try {
       m_db->execute("select * from confignames();");
+      /*
+      m_db->execute("select c.record_time as record_time, c.id as id, "
+        "c.name as name, n.name as node, t.name as \"table\", "
+        "t.revision as revision from configinfo as c, nodeinfo as n, "
+        "tableinfo as t where c.nodeid = n.id and c.tableid = t.id;");
+      */
       DBRecordList record_v(m_db->loadRecords());
       for (DBRecordList::iterator it = record_v.begin();
            it != record_v.end(); it++) {
@@ -46,7 +59,16 @@ ConfigInfoList ConfigInfoTable::getList(const std::string& nodename)
   ConfigInfoList info_v;
   if (m_db != NULL) {
     try {
-      m_db->execute("select * from confignames('%s')", nodename.c_str());
+      m_db->execute("select * from confignames('%s');", nodename.c_str());
+      /*
+      m_db->execute("select c.record_time as record_time, c.id as id, "
+        "c.name as name, n.name as node, t.name as \"table\", "
+        "t.revision as revision from configinfo as c, "
+        "nodeinfo as n, tableinfo as t where "
+        "c.nodeid = n.id and c.tableid = t.id "
+        "and n.name = '%s' and t.isroot = true;",
+        nodename.c_str());
+      */
       DBRecordList record_v(m_db->loadRecords());
       for (DBRecordList::iterator it = record_v.begin();
            it != record_v.end(); it++) {
@@ -76,7 +98,7 @@ ConfigInfo ConfigInfoTable::get(int configid)
          "(select name from nodeinfo where id = nodeid) as node, "
          "(select name from tableinfo where id = tableid) as table "
          "from configinfo where id = " << configid << ";";
-      m_db->execute(ss.str());
+      m_db->execute(ss.str().c_str());
       DBRecordList record_v(m_db->loadRecords());
       for (DBRecordList::iterator it = record_v.begin();
            it != record_v.end(); it++) {

@@ -24,7 +24,7 @@ throw()
     std::string tablename = tablename_in;
     if (tablename_in.size() == 0 || revision <= 0) {
       m_db->execute("select name, \"table\", revision from "
-                    "confignames('%s', '%s')",
+                    "confignames('%s', '%s');",
                     configname.c_str(), nodename.c_str());
       DBRecordList record_v(m_db->loadRecords());
       if (record_v.size() > 0) {
@@ -50,7 +50,7 @@ throw()
       }
     }
     ConfigInfo cinfo(configname, nodename, tablename, revision);
-    ss << StringUtil::form("from %s where configid = (%s)",
+    ss << StringUtil::form("from %s where configid = (%s);",
                            tablename_imp.c_str(), cinfo.getSQL().c_str());
     try {
       m_db->execute(ss.str().c_str());
@@ -134,8 +134,12 @@ throw(DBHandlerException)
     ss1 << ", " << name_v[i];
     ss2 << ", " << FieldInfo::getSQL(obj, name_v[i]);
   }
-  m_db->execute("insert into \"configinfo:%s:%d\" (%s) values (%s);",
-                obj.getTable().c_str(), obj.getRevision(),
-                ss1.str().c_str(), ss2.str().c_str());
+  try {
+    m_db->execute("insert into \"configinfo:%s:%d\" (%s) values (%s);",
+                  obj.getTable().c_str(), obj.getRevision(),
+                  ss1.str().c_str(), ss2.str().c_str());
+  } catch (const DBHandlerException& e) {
+    //LogFile::warning("%s", e.what());
+  }
 }
 

@@ -1,8 +1,25 @@
+#include <daq/slc/database/ConfigInfoTable.h>
 #include <daq/slc/database/ConfigObjectTable.h>
 #include <daq/slc/database/LoggerObjectTable.h>
 #include <daq/slc/database/RunNumberInfoTable.h>
 
+#include "daq/slc/apps/nsm2socket/NSM2SocketBridgeThread.h"
+#include "daq/slc/apps/nsm2socket/NSM2SocketCallback.h"
+
+#include <daq/slc/nsm/NSMNodeDaemon.h>
+#include <daq/slc/nsm/NSMCommunicator.h>
+
+#include <daq/slc/system/TCPServerSocket.h>
+#include <daq/slc/system/TCPSocketWriter.h>
+#include <daq/slc/system/TCPSocketReader.h>
+#include <daq/slc/system/LogFile.h>
+#include <daq/slc/system/PThread.h>
+
 #include <daq/slc/database/PostgreSQLInterface.h>
+
+#include "daq/slc/runcontrol/RunSetting.h"
+
+#include "daq/slc/nsm/NSMNode.h"
 
 #include <daq/slc/system/LogFile.h>
 
@@ -12,49 +29,30 @@
 #include <iostream>
 #include <unistd.h>
 
-namespace Belle2 {
+using namespace Belle2;
 
-  class RunSetting : public ConfigObject {
-
-  public:
-    enum Cause {
-      MANUAL = 1, AUTO, RUNEND, ERROR, ERROR_MANUAL
-    };
-
-  public:
-    RunSetting() {
-      setConfig(false);
-      setTable("runsetting");
-      setRevision(1);
-      addInt("runnumberid", 0);
-      addEnumList("cause", "manual,auto,runend,error,error_manual");
-      addEnum("cause", "manual");
-      addText("operators", "");
-      addText("comment", "");
-      addObject("runcontrol", ConfigObject());
-    }
-    ~RunSetting() throw() {}
-
-  public:
-    void setRunNumber(RunNumberInfo info) { setInt("runnumberid", info.getId()); }
-    void setCause(Cause cause) {
-      switch (cause) {
-        case MANUAL: setEnum("cause", "manual"); break;
-        case AUTO: setEnum("cause", "auto"); break;
-        case RUNEND: setEnum("cause", "runend"); break;
-        case ERROR: setEnum("cause", "error"); break;
-        case ERROR_MANUAL: setEnum("cause", "error_manual"); break;
-      }
-    }
-    void setOperators(const std::string& operators) { setText("operators", operators); }
-    void setComment(const std::string& comment) { setText("comment", comment); }
-    void setRunControl(const ConfigObject& obj) { setObject("runcontrol", 0, obj); }
-
-  };
-
+bool send(Writer& writer, const NSMMessage& msg)
+{
+  try {
+    writer.writeObject(msg);
+    return true;
+  } catch (const IOException& e) {
+    LogFile::warning("Connection failed for writing");
+  }
+  return false;
 }
 
-using namespace Belle2;
+bool recieve(Reader& reader, NSMMessage& msg)
+{
+  try {
+    msg.init();
+    reader.readObject(msg);
+    return true;
+  } catch (const IOException& e) {
+    LogFile::warning("Connection failed for reading");
+  }
+  return false;
+}
 
 int main(int argc, char** argv)
 {
@@ -63,7 +61,6 @@ int main(int argc, char** argv)
     return 1;
   }
   const std::string nodename = argv[1];
-  const std::string configname = (argc > 2) ? argv[2] : "default";
 
   ConfigFile dbconfig("slowcontrol");
   DBInterface* db = new PostgreSQLInterface(dbconfig.get("database.host"),
@@ -71,15 +68,66 @@ int main(int argc, char** argv)
                                             dbconfig.get("database.user"),
                                             dbconfig.get("database.password"),
                                             dbconfig.getInt("database.port"));
-  db->connect();
-  ConfigObject obj = ConfigObjectTable(db).get(configname, nodename);
-  RunSetting setting;
-  setting.setOperators("KONNO:TOMOYUKI");
-  setting.setRunControl(obj);
-  setting.setCause(RunSetting::MANUAL);
-  LoggerObjectTable(db).add(setting);
+
+  TCPServerSocket server_socket("0.0.0.0", 9090);
+  server_socket.open();
+  TCPSocket socket;
+  NSMNode node(nodename);
+  NSM2SocketCallback callback(node, 2);
+  PThread(new NSMNodeDaemon(&callback));
   while (true) {
-    sleep(10);
+    socket = server_socket.accept();
+    LogFile::debug("Accepted new connection");
+    TCPSocketWriter writer(socket);
+    TCPSocketReader reader(socket);
+    NSMMessage msg;
+    while (true) {
+      NSMMessage msg_out;
+      if (!recieve(reader, msg)) {
+        socket.close();
+        break;
+      }
+      NSMCommand cmd(msg.getRequestName());
+      if (cmd == Enum::UNKNOWN) {
+        LogFile::warning("Unknown request : %s", msg.getRequestName());
+      } else if (cmd == NSMCommand::DBGET) {
+        try {
+          db->connect();
+          StringList str_v = StringUtil::split(msg.getData(), ' ', 5);
+          std::string nodename = str_v[1];
+          std::string configname = str_v[2];
+          if (msg.getNParams() > 0 && msg.getParam(0) > 0) {
+            configname = ConfigInfoTable(db).get(16).getName();
+          }
+          ConfigObject obj = ConfigObjectTable(db).get(configname, nodename);
+          msg_out.setRequestName(NSMCommand::DBSET);
+          msg_out.setData(obj);
+          send(writer, msg_out);
+          ConfigObjectTable(db).get(configname, nodename);
+          db->close();
+        } catch (const DBHandlerException& e) {
+          LogFile::error(e.what());
+        }
+      } else if (cmd == NSMCommand::NSMGET) {
+        StringList argv = StringUtil::split(msg.getData(), ' ', 2);
+        try {
+          int revision = (msg.getNParams() > 0) ? msg.getParam(0) : 0;
+          NSMData& data(callback.getData(argv[0], argv[1], revision));
+          if (data.isAvailable()) {
+            msg_out.setRequestName(NSMCommand::NSMSET);
+            msg_out.setData(data);
+            send(writer, msg_out);
+          }
+        } catch (const NSMHandlerException& e) {
+          LogFile::error(e.what());
+          msg_out.setRequestName(NSMCommand::LOG);
+          msg_out.setData(DAQLogMessage("NSM2Socket", LogFile::WARNING,
+                                        StringUtil::form("NSM data (%s) is not ready for read",
+                                                         argv[0].c_str())));
+          send(writer, msg_out);
+        }
+      }
+    }
   }
   return 0;
 }

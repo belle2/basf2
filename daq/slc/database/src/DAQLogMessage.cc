@@ -11,10 +11,26 @@ DAQLogMessage::DAQLogMessage() throw()
 {
   setConfig(false);
   addInt("date", Date().get());
+  addText("groupname", "");
   addText("nodename", "");
   addEnumList("priority", "DEBUG,INFO,NOTICE,WARNING,ERROR,FATAL");
   addEnum("priority", "");
   addText("message", "");
+}
+
+DAQLogMessage::DAQLogMessage(const std::string& nodename,
+                             const std::string& groupname,
+                             LogFile::Priority priority,
+                             const std::string& message) throw()
+{
+  setConfig(false);
+  addInt("date", Date().get());
+  addText("groupname", groupname);
+  addText("nodename", nodename);
+  addEnumList("priority", "DEBUG,INFO,NOTICE,WARNING,ERROR,FATAL");
+  addEnum("priority", "");
+  setPriority(priority);
+  addText("message", message);
 }
 
 DAQLogMessage::DAQLogMessage(const std::string& nodename,
@@ -23,6 +39,7 @@ DAQLogMessage::DAQLogMessage(const std::string& nodename,
 {
   setConfig(false);
   addInt("date", Date().get());
+  addText("groupname", "");
   addText("nodename", nodename);
   addEnumList("priority", "DEBUG,INFO,NOTICE,WARNING,ERROR,FATAL");
   addEnum("priority", "");
@@ -38,6 +55,11 @@ DAQLogMessage::DAQLogMessage(const DAQLogMessage& log) throw()
 void DAQLogMessage::setPriority(LogFile::Priority priority) throw()
 {
   setEnum("priority", (int)priority);
+}
+
+void DAQLogMessage::setGroupName(const std::string& name) throw()
+{
+  setText("groupname", name);
 }
 
 void DAQLogMessage::setNodeName(const std::string& name) throw()
@@ -68,6 +90,11 @@ void DAQLogMessage::setDate(const Date& date) throw()
 LogFile::Priority DAQLogMessage::getPriority() const throw()
 {
   return (LogFile::Priority) getInt("priority");
+}
+
+const std::string DAQLogMessage::getGroupName() const throw()
+{
+  return getText("groupname");
 }
 
 const std::string DAQLogMessage::getNodeName() const throw()

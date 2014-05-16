@@ -9,9 +9,9 @@ RunSetting::RunSetting(const NSMNode& node)
   setTable("runsetting");
   setRevision(1);
   addInt("runnumberid", 0);
+  //addInt("runcontrol", 0);
   addText("operators", "");
   addText("comment", "");
-  addInt("runcontrol", 0);
 }
 
 RunSetting::~RunSetting() throw()
@@ -25,5 +25,6 @@ void RunSetting::setRunNumber(RunNumberInfo info)
 
 void RunSetting::setRunControl(const ConfigObject& obj)
 {
-  setInt("runcontrol", obj.getId());
+  //setInt("runcontrol", obj.getId());
+  addObject("runcontrol", obj);
 }

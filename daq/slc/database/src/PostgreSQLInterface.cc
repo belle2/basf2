@@ -1,5 +1,7 @@
 #include "daq/slc/database/PostgreSQLInterface.h"
 
+#include <daq/slc/system/LogFile.h>
+
 #include <daq/slc/base/StringUtil.h>
 
 using namespace Belle2;
@@ -16,6 +18,7 @@ PostgreSQLInterface::PostgreSQLInterface(const std::string& host,
 
 void PostgreSQLInterface::connect() throw(DBHandlerException)
 {
+  //LogFile::debug("%s:%d", __FILE__, __LINE__);
   m_sq_conn = PQconnectdb(StringUtil::form("host=%s dbname=%s user=%s password=%s",
                                            m_host.c_str(), m_database.c_str(),
                                            m_user.c_str(), m_password.c_str()).c_str());
@@ -25,20 +28,22 @@ void PostgreSQLInterface::connect() throw(DBHandlerException)
   }
 }
 
-void PostgreSQLInterface::execute_imp(const std::string& command)
+void PostgreSQLInterface::execute_imp(const char* command)
 throw(DBHandlerException)
 {
+  //LogFile::debug("%s:%d", __FILE__, __LINE__);
   clear();
-  m_sq_result = PQexec(m_sq_conn, command.c_str());
+  m_sq_result = PQexec(m_sq_conn, command);
   ExecStatusType status = PQresultStatus(m_sq_result);
   if (status == PGRES_FATAL_ERROR) {
     throw (DBHandlerException("Failed to execute command : %s (%s)",
-                              command.c_str(), PQerrorMessage(m_sq_conn)));
+                              command, PQerrorMessage(m_sq_conn)));
   }
 }
 
 DBRecordList PostgreSQLInterface::loadRecords() throw(DBHandlerException)
 {
+  //LogFile::debug("%s:%d", __FILE__, __LINE__);
   if (PQresultStatus(m_sq_result) != PGRES_TUPLES_OK) {
     throw (DBHandlerException("DB records are not ready for reading"));
   }
@@ -65,6 +70,7 @@ DBRecordList PostgreSQLInterface::loadRecords() throw(DBHandlerException)
 
 void PostgreSQLInterface::clear() throw()
 {
+  //LogFile::debug("%s:%d", __FILE__, __LINE__);
   if (m_sq_result != NULL) {
     PQclear(m_sq_result);
   }
@@ -73,13 +79,18 @@ void PostgreSQLInterface::clear() throw()
 
 void PostgreSQLInterface::close() throw(DBHandlerException)
 {
+  //LogFile::debug("%s:%d", __FILE__, __LINE__);
   clear();
-  PQfinish(m_sq_conn);
+  if (m_sq_conn != NULL) {
+    PQfinish(m_sq_conn);
+    m_sq_conn = NULL;
+  }
 }
 
 bool PostgreSQLInterface::checkTable(const std::string& tablename) throw(DBHandlerException)
 {
-  execute("select relname from pg_stat_user_tables where relname='%s'",
+  //LogFile::debug("%s:%d", __FILE__, __LINE__);
+  execute("select relname from pg_stat_user_tables where relname='%s';",
           tablename.c_str());
   DBRecordList ret(loadRecords());
   return ret.size() > 0;
@@ -88,6 +99,7 @@ bool PostgreSQLInterface::checkTable(const std::string& tablename) throw(DBHandl
 DBFieldTypeList PostgreSQLInterface::getTableContents(const std::string& tablename)
 throw(DBHandlerException)
 {
+  //LogFile::debug("%s:%d", __FILE__, __LINE__);
   DBFieldTypeList name_m;
   execute("select attname, typname from pg_class, pg_attribute, pg_type "
           "where relkind ='r'and relname = '%s' and attrelid = relfilenode "

@@ -19,7 +19,11 @@ namespace Belle2 {
 
   public:
     DAQLogMessage() throw();
-    DAQLogMessage(const std::string& node_name,
+    DAQLogMessage(const std::string& nodename,
+                  const std::string& groupname,
+                  LogFile::Priority priority,
+                  const std::string& message) throw();
+    DAQLogMessage(const std::string& nodename,
                   LogFile::Priority priority,
                   const std::string& message) throw();
     DAQLogMessage(const DAQLogMessage& log) throw();
@@ -27,12 +31,14 @@ namespace Belle2 {
 
   public:
     void setPriority(LogFile::Priority priority) throw();
+    void setGroupName(const std::string& name) throw();
     void setNodeName(const std::string& name) throw();
     void setMessage(const std::string& message) throw();
     void setDate() throw();
     void setDate(int date) throw();
     void setDate(const Date& date) throw();
     LogFile::Priority getPriority() const throw();
+    const std::string getGroupName() const throw();
     const std::string getNodeName() const throw();
     const std::string getMessage() const throw();
     int getDateInt() const throw();

@@ -72,12 +72,12 @@ namespace Belle2 {
 
     /** converts a local hit into sensor-independent relative coordinates.
      *
-     * first parameter is the local hit stored as a pair of doubles.
+     * first parameter is the local hit (as provided by getU and getV!) stored as a pair of doubles.
      * second parameter is the coded vxdID, which carries the sensorID.
      * third parameter, a sensorInfo can be passed for testing purposes.
      *  If no sensorInfo is passed, the member gets its own pointer to it.
      */
-    static std::pair<double, double> convertToNormalizedCoordinates(const std::pair<double, double>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
+    static std::pair<double, double> convertLocalToNormalizedCoordinates(const std::pair<double, double>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
     /** converts a hit in sensor-independent relative coordinates into local coordinate of given sensor.
@@ -87,12 +87,13 @@ namespace Belle2 {
      * third parameter, a sensorInfo can be passed for testing purposes.
      *  If no sensorInfo is passed, the member gets its own pointer to it.
      */
-    static std::pair<double, double> convertToLocalCoordinates(const std::pair<double, double>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
+//     static std::pair<double, double> convertToLocalCoordinates(const std::pair<double, double>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
     /** converts a local hit on a given sensor into global coordinates.
      *
-     * first parameter is the local hit stored as a pair of doubles.
+     * so this practically does what sensorInfo::pointToGlobal is doing, the difference is, that you do not need to have the sensorInfo beforehand (it will be retrieved using the VxdID)
+     * first parameter is the local hit (as provided by getU and getV!) stored as a pair of doubles.
      * second parameter is the coded vxdID, which carries the sensorID.
      * third parameter, a sensorInfo can be passed for testing purposes.
      *  If no sensorInfo is passed, the member gets its own pointer to it.
@@ -107,7 +108,7 @@ namespace Belle2 {
     * third parameter, a sensorInfo can be passed for testing purposes.
     *  If no sensorInfo is passed, the member gets its own pointer to it.
     */
-    static std::pair<double, double> convertToLocalCoordinatesNormalized(const std::pair<double, double>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
+    static std::pair<double, double> convertNormalizedToLocalCoordinates(const std::pair<double, double>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
     /** checks first parameter for boundaries.

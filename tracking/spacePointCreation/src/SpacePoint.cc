@@ -51,7 +51,7 @@ SpacePoint::SpacePoint(const PXDCluster& pxdCluster, unsigned int indexNumber, c
     m_positionError[i] = sqrt(abs(globalizedVariances[i]));
   }
 
-  m_normalizedLocal = convertToNormalizedCoordinates(make_pair(pxdCluster.getU(), pxdCluster.getV()), m_vxdID, aSensorInfo);
+  m_normalizedLocal = convertLocalToNormalizedCoordinates(make_pair(pxdCluster.getU(), pxdCluster.getV()), m_vxdID, aSensorInfo);
 //   double halfSensorSizeU = 0.5 *  aSensorInfo->getUSize();
 //   double halfSensorSizeV = 0.5 *  aSensorInfo->getVSize();
 //   double localUPosition = pxdCluster.getU() + halfSensorSizeU;
@@ -62,7 +62,7 @@ SpacePoint::SpacePoint(const PXDCluster& pxdCluster, unsigned int indexNumber, c
 
 
 
-std::pair<double, double> SpacePoint::convertToNormalizedCoordinates(const std::pair<double, double>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo)
+std::pair<double, double> SpacePoint::convertLocalToNormalizedCoordinates(const std::pair<double, double>& hitLocal, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo)
 {
   //We need some handle to translate IDs to local and global
   // coordinates.
@@ -99,7 +99,28 @@ std::pair<double, double> SpacePoint::convertToNormalizedCoordinates(const std::
 
 
 
-std::pair<double, double> SpacePoint::convertToLocalCoordinates(const std::pair<double, double>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo)
+// std::pair<double, double> SpacePoint::convertToLocalCoordinates(const std::pair<double, double>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo)
+// {
+//   //We need some handle to translate IDs to local and global
+//   // coordinates.
+//   if (aSensorInfo == NULL) {
+//     aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID);
+//   }
+//
+//   // Changed by Stefan F
+//   double localUPosition = hitNormalized.first - (0.5 * aSensorInfo->getUSize());
+//   double localVPosition = hitNormalized.second - (0.5 * aSensorInfo->getVSize());
+//
+//   // old ones:
+//   //   double localVPosition = (hitNormalized.second - 0.5) * aSensorInfo->getVSize();
+//   //   double localUPosition = (hitNormalized.first - 0.5) * aSensorInfo->getUSize();
+//
+//   return (make_pair(localUPosition, localVPosition));
+// }
+
+
+
+std::pair<double, double> SpacePoint::convertNormalizedToLocalCoordinates(const std::pair<double, double>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo)
 {
   //We need some handle to translate IDs to local and global
   // coordinates.
@@ -107,29 +128,13 @@ std::pair<double, double> SpacePoint::convertToLocalCoordinates(const std::pair<
     aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID);
   }
 
-  // Changed by Stefan F
-  double localUPosition = hitNormalized.first - (0.5 * aSensorInfo->getUSize());
-  double localVPosition = hitNormalized.second - (0.5 * aSensorInfo->getVSize());
-
-  // old ones:
-  //   double localVPosition = (hitNormalized.second - 0.5) * aSensorInfo->getVSize();
-  //   double localUPosition = (hitNormalized.first - 0.5) * aSensorInfo->getUSize();
-
-  return (make_pair(localUPosition, localVPosition));
-}
-
-
-
-std::pair<double, double> SpacePoint::convertToLocalCoordinatesNormalized(const std::pair<double, double>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo)
-{
-  //We need some handle to translate IDs to local and global
-  // coordinates.
-  if (aSensorInfo == NULL) {
-    aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-  }
-
+  // normalized range is 0 to 1, but final coordinates are from - halfSensorSize to + halfSensorSize
   double localVPosition = (hitNormalized.second - 0.5) * aSensorInfo->getVSize();
-  double localUPosition = (hitNormalized.first - 0.5) * aSensorInfo->getUSize();
+  boundaryCheck(localVPosition, -0.5 * aSensorInfo->getVSize(), 0.5 * aSensorInfo->getVSize()); // restrain hits to sensor boundaries
+
+  double uSizeAtHit = aSensorInfo->getUSize(localVPosition);
+  double localUPosition = (hitNormalized.first - 0.5) * uSizeAtHit;
+  boundaryCheck(localUPosition, -0.5 * aSensorInfo->getUSize(), uSizeAtHit); // restrain hits to sensor boundaries
 
   return (make_pair(localUPosition, localVPosition));
 }

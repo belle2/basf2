@@ -186,7 +186,7 @@ std::string HitExporter::storeTrueHit(VXD::SensorInfoBase aSensorInfo, double u,
 
   unsigned int chosenID = 0;
   if (m_attachedPass != NULL) {   // is only attached, if we want to print the matlabOutput
-    SectorTools::NormCoords normCoords = SpacePoint::convertToNormalizedCoordinates(make_pair(u, v), aSensorInfo.getID(), &aSensorInfo);
+    SectorTools::NormCoords normCoords = SpacePoint::convertLocalToNormalizedCoordinates(make_pair(u, v), aSensorInfo.getID(), &aSensorInfo);
     unsigned int mySecID = SectorTools::calcSecID(m_attachedPass->secConfigU, m_attachedPass->secConfigV, normCoords);
 
     VxdID myVxdID = aSensorInfo.getID();

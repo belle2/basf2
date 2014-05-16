@@ -128,7 +128,7 @@ namespace Belle2 {
   protected:
     typedef T(*pfun)(T&);
   public:
-    ptr_to_self_func_from_iter() {};
+    ptr_to_self_func_from_iter() ptr(NULL) {};
     T operator()(Iter& it) const { return *it; };
     const T operator()(const Iter& it) const { return *it; };
   protected:

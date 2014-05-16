@@ -14,7 +14,7 @@ JARDIR     = ./jars
 JARFILE    = $(JARDIR)/b2gui.jar
 JAREXE     = $(JARDIR)/b2gui-exe.jar
 
-B2JAVA_PATH = $(BELLE2_LOCAL_DIR)/daq/slc/extra/backup.javalib
+B2JAVA_PATH = $(BELLE2_LOCAL_DIR)/daq/slc/extra/javalib
 
 CLASSPATH  = $(OUTDIR)
 SOURCEPATH = $(SRCDIR)

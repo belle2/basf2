@@ -84,15 +84,15 @@ namespace Belle2 {
 //-----------------------------------------------------------------
 
     G4Transform3D Global_offset;
+    // warned as unused 20140503 k_barNPhiSegs(144) ,
     const int
-    k_barNPhiSegs(144) ,
-                  k_forwNPhiSegs(16) ,
-                  k_backNPhiSegs(16) ;
+    k_forwNPhiSegs(16) ,
+                   k_backNPhiSegs(16) ;
 
-    const EclIdentifier
-    k_barNRings(46) ,
-                k_forwNRings(13) ,
-                k_backNRings(10) ;
+    // warned as unused 20140503 const EclIdentifier
+    // warned as unused 20140503 k_barNRings(46) ,
+    // warned as unused 20140503 k_forwNRings(13) ,
+    // warned as unused 20140503 k_backNRings(10) ;
 
     const double k_CLR(0.01   * cm);                 // clearance around outside
 //const double k_barCryPullOut    (  0.5   *cm ); // Barrel Crystal pullout

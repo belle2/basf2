@@ -38,17 +38,18 @@ namespace Belle2 {
     for (int j = 0; j != int(uConfig.size() - 1); ++j) {
 
       // old one (with Factor 2)
-      //  if (localHit[0] >= (uConfig[j]*sensorSize[0] * 2.) && localHit[0] <= (uConfig[j + 1]*sensorSize[0] * 2.)) {
+//       if (localHit[0] >= (uConfig[j]*sensorSize[0] * 2.) && localHit[0] <= (uConfig[j + 1]*sensorSize[0] * 2.)) {
 
       // new one:
-      if (localHit[0] >= (uConfig[j]*sensorSize[0]) && localHit[0] <= (uConfig[j + 1]*sensorSize[0])) {
+      if (localHit[0] >= ((uConfig[j] - 0.5)*sensorSize[0]) && localHit[0] <= ((uConfig[j + 1] - 0.5)*sensorSize[0])) {
+        // meaning of -0.5: local hits are in range -halfSensor to halfSensor -> 0-1 moves to -0.5 - +0.5
         for (int k = 0; k != int(vConfig.size() - 1); ++k) {
 
           // old one (with Factor 2)
-          // if (localHit[1] >= (vConfig[k]*sensorSize[1] * 2.) && localHit[1] <= (vConfig[k + 1]*sensorSize[1] * 2.)) {
+//           if (localHit[1] >= (vConfig[k]*sensorSize[1] * 2.) && localHit[1] <= (vConfig[k + 1]*sensorSize[1] * 2.)) {
 
           // new one:
-          if (localHit[1] >= (vConfig[k]*sensorSize[1]) && localHit[1] <= (vConfig[k + 1]*sensorSize[1])) {
+          if (localHit[1] >= ((vConfig[k] - 0.5)*sensorSize[1]) && localHit[1] <= ((vConfig[k + 1] - 0.5)*sensorSize[1])) {
 
             // Calculate Sector ID
             aSecID = k /*+ 1*/ + j * (vConfig.size() - 1); // zero-based secIDs now!
@@ -112,6 +113,7 @@ namespace Belle2 {
     //  getUSize: 3.852
     //  getVSize: 12.002
     TVector3 sensorSize(3.852, 12.002, 0);
+    std::pair<double, double> halfSensor = { sensorSize.X() * 0.5, sensorSize.Y() * 0.5 };
 
     std::pair<double, double> aRelCoor2;
     unsigned short aSecID;
@@ -141,19 +143,24 @@ namespace Belle2 {
       //  getThickness: 0.032
       VXD::SensorInfoBase sensorInfoBase(VXD::SensorInfoBase::PXD, aVxdID, 3.852, 12.002, 0.032, 0, 0);
 
-      //B2INFO ("aSecID Start: " << aRelCoor.first << "/" << aRelCoor.second);
+      // correcting sensor-position (sensorCenter at 0,0, therefore sector range from -halfSensor to halfSensor in u and v)
+      aRelCoor.at(currentTest).first -= halfSensor.first;
+      aRelCoor.at(currentTest).second -= halfSensor.second;
+      B2INFO("aSecID Start: " << aRelCoor.at(currentTest).first << "/" << aRelCoor.at(currentTest).second);
 
       // Convert to global Corrdinates for searchSector4Hit
-      TVector3 m_position = sensorInfoBase.pointToGlobal(TVector3(aRelCoor.at(currentTest).first, aRelCoor.at(currentTest).second, 0));
+      TVector3 localPosition(aRelCoor.at(currentTest).first, aRelCoor.at(currentTest).second, 0);
+//       TVector3 globalPosition = sensorInfoBase.pointToGlobal(localPosition);
 
       // searchSector4Hit logic from VXDTFModule
-      unsigned short withSearchHit = searchSector4Hit(m_position, sensorSize, uConfigTest, vConfigTest);
+      unsigned short withSearchHit = searchSector4Hit(localPosition, sensorSize, uConfigTest, vConfigTest);
 
       // Convert to local Corrdinates for Normalization
-      aRelCoor2 = SpacePoint::convertToLocalCoordinates(aRelCoor.at(currentTest), aVxdID, &sensorInfoBase);
+//       aRelCoor2 = SpacePoint::convertNormalizedToLocalCoordinates(aRelCoor.at(currentTest), aVxdID, &sensorInfoBase);
 
       // Normalization of the Coordinates
-      aRelCoor2 = SpacePoint::convertToNormalizedCoordinates(aRelCoor2, aVxdID, &sensorInfoBase);
+//       aRelCoor2 = SpacePoint::convertLocalToNormalizedCoordinates(aRelCoor2, aVxdID, &sensorInfoBase);
+      aRelCoor2 = SpacePoint::convertLocalToNormalizedCoordinates(aRelCoor.at(currentTest), aVxdID, &sensorInfoBase);
 
       // Calculate the SectorID (SectorTool-Object)
       aSecID = aTool.calcSecID(uConfigTest, vConfigTest, aRelCoor2);
@@ -183,8 +190,8 @@ namespace Belle2 {
     std::pair<double, double> aRelCoor_corner3 = {1, 0};
     std::pair<double, double> aRelCoor_corner4 = {1, 1};
 
-    std::pair<double, double> aRelCoor = {3.65526, 4.43185}, aRelCoor2;
-    unsigned short aSectorID;
+    std::pair<double, double> localCoordinates = {1.82763, 4.43185}, normalizedCoordinates, sectorCorner;
+    unsigned short aSensorID;
 
     std::vector<double> uConfigTest = {0, 0.5, 1};
     std::vector<double> vConfigTest = {0, 0.33, 0.67, 1};
@@ -192,38 +199,71 @@ namespace Belle2 {
     // Coor asecid: 990511105
     // Point 1: (7.325, -1.367, -5.326) Point 2: (7.325, -1.367, -3.400) Point 3: (4.353, 1.251, -5.326) Point 4: (4.353, 1.251, -3.400)
     // Coor asecid: 990511105, position Hit: 3.02134/2.42394/-4.96915, uCoord: 1.66044, vCoord: 4.43185, aVxdID: 24896
-    aSectorID = 24896;
-    VxdID aVxdID(aSectorID);
+    aSensorID = 24896;
+    VxdID aVxdID(aSensorID);
 
     VXD::SensorInfoBase sensorInfoBase(VXD::SensorInfoBase::PXD, aVxdID, 3.852, 12.002, 0.032, 0, 0);
 
+    /// ### first case, localCoordinates near the edge
+
     // convert to local and normalized Coordinates
-    aRelCoor2 = SpacePoint::convertToLocalCoordinates(aRelCoor, aVxdID, &sensorInfoBase);
-    aRelCoor2 = SpacePoint::convertToNormalizedCoordinates(aRelCoor2, aVxdID, &sensorInfoBase);
+    normalizedCoordinates = SpacePoint::convertLocalToNormalizedCoordinates(localCoordinates, aVxdID, &sensorInfoBase);
 
     // calculate Sector ID
-    unsigned short aSecID = aTool.calcSecID(uConfigTest, vConfigTest, aRelCoor2);
+    unsigned short aSecID = aTool.calcSecID(uConfigTest, vConfigTest, normalizedCoordinates);
 
+    B2INFO(" calculated secID: " << aSecID << " from coordinates " << localCoordinates.first << "," << localCoordinates.second)
     // 1. Corner Calculate
-    aRelCoor = aTool.calcNormalizedSectorPoint(uConfigTest, vConfigTest, aSecID, aRelCoor_corner1);
-    EXPECT_DOUBLE_EQ(0.5, aRelCoor.first);
-    EXPECT_DOUBLE_EQ(0.33, aRelCoor.second);
+    sectorCorner = aTool.calcNormalizedSectorPoint(uConfigTest, vConfigTest, aSecID, aRelCoor_corner1);
+    EXPECT_DOUBLE_EQ(0.5, sectorCorner.first);
+    EXPECT_DOUBLE_EQ(0.67, sectorCorner.second);
 
     // 2. Corner Calculate
-    aRelCoor = aTool.calcNormalizedSectorPoint(uConfigTest, vConfigTest, aSecID, aRelCoor_corner2);
-    EXPECT_DOUBLE_EQ(0.5, aRelCoor.first);
-    EXPECT_DOUBLE_EQ(0.67, aRelCoor.second);
+    sectorCorner = aTool.calcNormalizedSectorPoint(uConfigTest, vConfigTest, aSecID, aRelCoor_corner2);
+    EXPECT_DOUBLE_EQ(0.5, sectorCorner.first);
+    EXPECT_DOUBLE_EQ(1., sectorCorner.second);
 
     // 3. Corner Calculate
-    aRelCoor = aTool.calcNormalizedSectorPoint(uConfigTest, vConfigTest, aSecID, aRelCoor_corner3);
-    EXPECT_DOUBLE_EQ(1., aRelCoor.first);
-    EXPECT_DOUBLE_EQ(0.33, aRelCoor.second);
+    sectorCorner = aTool.calcNormalizedSectorPoint(uConfigTest, vConfigTest, aSecID, aRelCoor_corner3);
+    EXPECT_DOUBLE_EQ(1., sectorCorner.first);
+    EXPECT_DOUBLE_EQ(0.67, sectorCorner.second);
 
     // 4. Corner Calculate
-    aRelCoor = aTool.calcNormalizedSectorPoint(uConfigTest, vConfigTest, aSecID, aRelCoor_corner4);
-    EXPECT_DOUBLE_EQ(1., aRelCoor.first);
-    EXPECT_DOUBLE_EQ(0.67, aRelCoor.second);
+    sectorCorner = aTool.calcNormalizedSectorPoint(uConfigTest, vConfigTest, aSecID, aRelCoor_corner4);
+    EXPECT_DOUBLE_EQ(1., sectorCorner.first);
+    EXPECT_DOUBLE_EQ(1., sectorCorner.second);
 
+
+    /// ### second case, localCoordinates near the center
+
+    // convert to local and normalized Coordinates
+    localCoordinates.first -= 3.852 * 0.5;
+    localCoordinates.second -= 12.002 * 0.5;
+    normalizedCoordinates = SpacePoint::convertLocalToNormalizedCoordinates(localCoordinates, aVxdID, &sensorInfoBase);
+
+    // calculate Sector ID
+    aSecID = aTool.calcSecID(uConfigTest, vConfigTest, normalizedCoordinates);
+
+    B2INFO(" calculated secID: " << aSecID << " from coordinates " << localCoordinates.first << "," << localCoordinates.second)
+    // 1. Corner Calculate
+    sectorCorner = aTool.calcNormalizedSectorPoint(uConfigTest, vConfigTest, aSecID, aRelCoor_corner1);
+    EXPECT_DOUBLE_EQ(0.0, sectorCorner.first);
+    EXPECT_DOUBLE_EQ(0.33, sectorCorner.second);
+
+    // 2. Corner Calculate
+    sectorCorner = aTool.calcNormalizedSectorPoint(uConfigTest, vConfigTest, aSecID, aRelCoor_corner2);
+    EXPECT_DOUBLE_EQ(0.0, sectorCorner.first);
+    EXPECT_DOUBLE_EQ(0.67, sectorCorner.second);
+
+    // 3. Corner Calculate
+    sectorCorner = aTool.calcNormalizedSectorPoint(uConfigTest, vConfigTest, aSecID, aRelCoor_corner3);
+    EXPECT_DOUBLE_EQ(0.5, sectorCorner.first);
+    EXPECT_DOUBLE_EQ(0.33, sectorCorner.second);
+
+    // 4. Corner Calculate
+    sectorCorner = aTool.calcNormalizedSectorPoint(uConfigTest, vConfigTest, aSecID, aRelCoor_corner4);
+    EXPECT_DOUBLE_EQ(0.5, sectorCorner.first);
+    EXPECT_DOUBLE_EQ(0.67, sectorCorner.second);
   }
 
 }

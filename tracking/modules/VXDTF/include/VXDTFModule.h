@@ -394,7 +394,6 @@ namespace Belle2 {
     int importCollectorCell(int pass_index, std::string died_at, int died_id, std::vector<std::pair<int, bool>> acceptedRejectedFilters, int hit1, int hit2);  /** generates Information and imports a Cell for the Collector */
 
 
-
   protected:
     TCsOfEvent m_tcVector; /**< carries links to all track candidates found within event (during tcc filter, bad ones get kicked, lateron they simply get deactivated) */
     TCsOfEvent m_allTCsOfEvent; /**< carries links to really all track candidates found within event (used for deleting TrackCandidates at end of event) TODO: check whether use of m_tcVector can not be merged this one. Seems like redundant steps*/
@@ -490,7 +489,7 @@ namespace Belle2 {
     int m_totalPXDClusters; /**< counts total number of PXDClusters during run */
     int m_totalSVDClusters; /**< counts total number of SVdClusters during run */
     int m_totalSVDClusterCombis; /**< counts total number of possible combinations of SVDClusters during run */
-    int m_numOfSectorSetups; /**< stores info about number of sector setups loaded into the track finder */
+    int m_nSectorSetups; /**< stores info about number of sector setups loaded into the track finder */
     bool m_KFBackwardFilter; /**< determines whether the kalman filter moves inwards or backwards, bool means inwards */
     bool m_highOccupancyCase; /**< is determined by a userdefined threshold. If there are more hits in the event than threshold value, high occupancy filters are activated (segFinder and nbFinder only) */
     int m_PARAMhighOccupancyThreshold; /**< If there are more hits in a sensor than threshold value, high occupancy filters are activated (segFinder and nbFinder only) */
@@ -571,7 +570,7 @@ namespace Belle2 {
     TimeInfo m_TESTERtimeConsumption; /**< a struct to store amount of time needed for special blocks of the program */
     std::vector<EventInfoPackage> m_TESTERlogEvents; /**< a list containing some information about each event (time consumption and quality) */
     int m_TESTERbadSectorRangeCounterForClusters; /**< counts number of times when only 1 cluster has been found on a complete sensor (therefore no 2D hits possible) */
-    int m_TESTERclustersPersSectorNotMatching; /**< counts number of times when numofUclusters and numOfVclusters per sensor do not match */
+    int m_TESTERclustersPersSectorNotMatching; /**< counts number of times when numofUclusters and nVclusters per sensor do not match */
     int m_TESTERhighOccupancyCtr; /**< counts number of times when high occupancy mode was activated */
     int m_TESTERovercrowdedStrangeSensors; /**< counts number of times when there was a strange sensor (svd-only: mismatching number of u/v clusters) but too many hits on it to be able to try to rescue Clusters by forming 1D-VXDTFHits */
 

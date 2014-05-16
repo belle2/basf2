@@ -88,8 +88,6 @@ void CollectorTFInfo::initSectors(const std::vector< std::pair <std::pair<unsign
   std::pair<double, double> aRelCoor_corner3 = {1, 0};
   std::pair<double, double> aRelCoor_corner4 = {1, 1};
 
-  SectorTools aTool = SectorTools();
-
   int sectorSize = sectors.size();
 
   B2DEBUG(100, "CollectorTFInfo: initSectors, sectorSize: " << sectorSize);

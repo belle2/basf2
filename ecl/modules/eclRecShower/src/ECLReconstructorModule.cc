@@ -33,6 +33,8 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
+#include <framework/datastore/RelationsObject.h>
+
 
 #include <boost/foreach.hpp>
 #include <G4ParticleTable.hh>
@@ -162,6 +164,11 @@ void ECLReconstructorModule::event()
       new(eclMdstArray.nextFreeAddress()) ECLCluster();
       int i_Mdst = eclMdstArray.getEntries() - 1;
 
+      //Object for relation of ECLCluster to others
+      //.. 16-5-2k14
+      const ECLCluster* ecluster = eclMdstArray[i_Mdst];
+
+
 
       std::vector<MEclCFShowerHA> HAs = iSh.HitAssignment();
       for (std::vector<MEclCFShowerHA>::iterator iHA = HAs.begin();
@@ -183,8 +190,13 @@ void ECLReconstructorModule::event()
         //... Vishal
 
         RelationArray ECLClustertoTracks(eclMdstArray, Tracks);
-        if (m_TrackCellId[iHA->Id() + 1] >= 0) {
-          ECLClustertoTracks.add(i_Mdst, m_TrackCellId[iHA->Id() + 1]);
+        if (m_TrackCellId[iHA->Id()] >= 0) {
+
+          //.. 16-5-2k14
+          const Track*  v_track = Tracks[m_TrackCellId[iHA->Id()]];
+          ecluster->addRelationTo(v_track);
+
+
           ++v_NofTracks;
         }
 
@@ -271,7 +283,7 @@ void ECLReconstructorModule::event()
 
 
       //.. Fill ECLCluster here
-      RelationArray ECLClustertoShower(eclMdstArray, eclRecShowerArray);
+      //      RelationArray ECLClustertoShower(eclMdstArray, eclRecShowerArray);
       eclMdstArray[i_Mdst]->setError(Mdst_Error);
       eclMdstArray[i_Mdst]->setTiming((float) v_TIME);
       eclMdstArray[i_Mdst]->setEnergy((float) sEnergy);
@@ -289,8 +301,15 @@ void ECLReconstructorModule::event()
       eclMdstArray[i_Mdst]->setTiming((float) v_TIME);
       eclMdstArray[i_Mdst]->setHighestE((float)  HiEnergyinShower);
 
+      //Object for relation of ECLShower to ECLCLuster
+      //.. 16-5-2k14
+      const ECLShower* eclshower = eclRecShowerArray[m_hitNum];
+
+
+
       //... Relation of ECLCluster to ECLShower
-      ECLClustertoShower.add(i_Mdst, m_hitNum);
+      ecluster->addRelationTo(eclshower);
+
 
       //..... ECLCluster is completed here......
 

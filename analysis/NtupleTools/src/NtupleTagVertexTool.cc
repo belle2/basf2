@@ -29,6 +29,7 @@ void NtupleTagVertexTool::setupTree()
   m_fTagVex = 0;
   m_fTagVey = 0;
   m_fTagVez = 0;
+  m_TagVPvalue = 0;
   m_fDeltaT = 0;
 
   m_tree->Branch((strNames[0] + "_TagVx").c_str(), &m_fTagVx, (strNames[0] + "_TagVx/F").c_str());
@@ -37,6 +38,7 @@ void NtupleTagVertexTool::setupTree()
   m_tree->Branch((strNames[0] + "_TagVex").c_str(), &m_fTagVex, (strNames[0] + "_TagVex/F").c_str());
   m_tree->Branch((strNames[0] + "_TagVey").c_str(), &m_fTagVey, (strNames[0] + "_TagVey/F").c_str());
   m_tree->Branch((strNames[0] + "_TagVez").c_str(), &m_fTagVez, (strNames[0] + "_TagVez/F").c_str());
+  m_tree->Branch((strNames[0] + "_TagVPvalue").c_str(), &m_TagVPvalue, (strNames[0] + "_TagVPvalue/F").c_str());
   m_tree->Branch((strNames[0] + "_DeltaT").c_str(), &m_fDeltaT, (strNames[0] + "_DeltaT/F").c_str());
 }
 
@@ -59,6 +61,7 @@ void NtupleTagVertexTool::eval(const Particle* particle)
     m_fTagVex = TMath::Sqrt(Ver->getTagVertexErrMatrix()[0][0]);
     m_fTagVey = TMath::Sqrt(Ver->getTagVertexErrMatrix()[1][1]);
     m_fTagVez = TMath::Sqrt(Ver->getTagVertexErrMatrix()[2][2]);
+    m_TagVPvalue = Ver->getTagVertexPval();
     m_fDeltaT = Ver->getDeltaT();
   }
 }

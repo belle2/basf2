@@ -34,6 +34,8 @@ namespace Belle2 {
     float m_fTagVey;
     /** error of the reconstructed tag vertex z component. */
     float m_fTagVez;
+    /** Delta T : TBrec - TBtag. */
+    float m_fDeltaT;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
   public:
@@ -45,4 +47,4 @@ namespace Belle2 {
 
 } // namepspace Belle2
 
-#endif // NTUPLEDELTAEMBCTOOL_H
+#endif // NTUPLETAGVERTEXTOOL_H

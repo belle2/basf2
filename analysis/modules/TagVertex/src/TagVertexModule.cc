@@ -27,12 +27,16 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/RestOfEvent.h>
+#include <analysis/dataobjects/Vertex.h>
 
 // utilities
 #include <analysis/utility/PCmsLabTransform.h>
 
 // MC particle
 #include <mdst/dataobjects/MCParticle.h>
+
+// Magnetic field
+#include <geometry/bfieldmap/BFieldMap.h>
 
 using namespace std;
 
@@ -58,6 +62,10 @@ namespace Belle2 {
     addParam("ListName", m_listName, "name of particle list", string(""));
     addParam("ConfidenceLevel", m_confidenceLevel,
              "required confidence level of fit to keep particles in the list", 0.001);
+    addParam("MCAssociation", m_useBrecoMCassociation,
+             "true: use standard Breco MC association. false: use internal MC association", false);
+    addParam("UseConstraint", m_useConstraint,
+             "Choose spatial constraint for the Tag Vertex fit: boostcut,boost,breco,no ", string("boostcut"));
     //addParam("EventType", m_EventType, "Btag decay type", std::string(""));
 
   }
@@ -69,14 +77,25 @@ namespace Belle2 {
   void TagVertexModule::initialize()
   {
 
-    m_Bfield = 1.5; //TODO: get from gearbox
+    // magnetic field
+    m_Bfield = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
+    // RAVE setup
     analysis::RaveSetup::initialize(1, m_Bfield);
+    B2INFO("TagVertexModule : magnetic field = " << m_Bfield);
+
+
+    // output
+    StoreArray<Vertex>::registerPersistent();
+    RelationArray::registerPersistent<Particle, Vertex>();
+
 
 
   }
 
   void TagVertexModule::beginRun()
   {
+    //TODO: set magnetic field for each run
+    //m_Bfield = BFieldMap::Instance().getBField(TVector3(0,0,0)).Z();
   }
 
   void TagVertexModule::event()
@@ -88,17 +107,41 @@ namespace Belle2 {
       return;
     }
 
+
+    // input
     StoreArray<Particle> Particles(plist->getParticleCollectionName());
+    // output
+    StoreArray<Vertex> verArray;
+
 
     std::vector<unsigned int> toRemove;
     for (unsigned i = 0; i < plist->getListSize(); i++) {
       Particle* particle =  plist->getParticle(i);
       bool ok = doVertexFit(particle);
       if (ok) BtagMCVertex(particle);
+      if (ok) deltaT(particle);
+
       if (!ok) toRemove.push_back(i);
+
+      // save information in the Vertex StoreArray
+      if (ok) {
+        Vertex* ver = verArray.appendNew(Vertex());
+        // create relation: Particle <-> Vertex
+        particle->addRelationTo(ver);
+        // fill Vertex with content
+        ver->setTagVertex(m_tagV);
+        ver->setTagVertexErrMatrix(m_tagVErrMatrix);
+        ver->setTagVertexPval(m_fitPval);
+        ver->setDeltaT(m_deltaT);
+        ver->setMCTagVertex(m_MCtagV);
+        ver->setMCTagBFlavor(m_mcPDG);
+        ver->setMCDeltaT(m_MCdeltaT);
+
+      }
+
+
     }
     plist->removeParticles(toRemove);
-
   }
 
   void TagVertexModule::endRun()
@@ -112,25 +155,37 @@ namespace Belle2 {
   bool TagVertexModule::doVertexFit(Particle* Breco)
   {
 
+    if (m_useConstraint.compare(std::string("breco")) == 0) {
+
+    }
+
+
     m_fitPval = 0;
     bool ok = false;
 
-    ok = findConstraint(Breco);
-    if (!ok) return false;
+    if (m_Bfield == 0) {
+      B2ERROR("TagVertex: No magnetic field");
+      return false;
+    }
+
+    ok = false;
+    if (m_useConstraint.compare(std::string("breco")) == 0) ok = findConstraint(Breco);
+    if (m_useConstraint.compare(std::string("boostcut")) == 0) ok = findConstraintBoost(0.03);
+    if (m_useConstraint.compare(std::string("boost")) == 0) ok = findConstraintBoost(2);
+    if (m_useConstraint.compare(std::string("no")) == 0) ok = true;
+    if (!ok) {
+      B2ERROR("TagVertex: No correct fit constraint");
+      return false;
+    }
+
     ok = getTagTracks(Breco);
     if (!ok) return false;
-    ok = makeGeneralFit(Breco);
-
-
-    //ok = doSemilepFit(Breco);
-
+    ok = makeGeneralFit();
 
     if (!ok) return false;
 
-    // steering ends here
 
-    //get MC information
-
+    deltaT(Breco);
 
 
     if (m_fitPval < m_confidenceLevel) return false;
@@ -140,6 +195,7 @@ namespace Belle2 {
 
   bool TagVertexModule::findConstraint(Particle* Breco)
   {
+    if (Breco->getPValue() < 0.) return false;
 
     TVector3 beamSpot(0, 0, 0);
     TMatrixDSym beamSpotCov(3);
@@ -150,8 +206,6 @@ namespace Belle2 {
     double xmag = (Breco->getVertex() - beamSpot).Mag();
 
     TVector3 Pmom = (pmag / xmag) * (Breco->getVertex() - beamSpot);
-
-
 
     TMatrixDSym TerrMatrix = Breco->getMomentumVertexErrorMatrix();
     TMatrixDSym PerrMatrix(7);
@@ -169,14 +223,11 @@ namespace Belle2 {
 
     PerrMatrix(3, 3) = 0.;
 
-
     Particle* Breco2 = new Particle(Breco->get4Vector(), Breco->getPDGCode());
     Breco2->updateMomentum(Breco->get4Vector(), Breco->getVertex(), PerrMatrix, Breco->getPValue());
 
-
     analysis::RaveVertexFitter rsf;
     rsf.addTrack(Breco2);
-
 
     int nvert = rsf.fit("kalman");
 
@@ -260,7 +311,60 @@ namespace Belle2 {
     TMatrix TubePart(3, 3);  TubePart.Mult(r2t, TubeZ);
     TMatrix Tube(3, 3); Tube.Mult(TubePart, r2);
 
+    m_tube.ResizeTo(3, 3);
+
+    m_tube(0, 0) = Tube(0, 0);  m_tube(0, 1) = Tube(0, 1);  m_tube(0, 2) = Tube(0, 2);
+    m_tube(1, 0) = Tube(1, 0);  m_tube(1, 1) = Tube(1, 1);  m_tube(1, 2) = Tube(1, 2);
+    m_tube(2, 0) = Tube(2, 0);  m_tube(2, 1) = Tube(2, 1);  m_tube(2, 2) = Tube(2, 2);
+
     return true;
+
+  }
+
+
+  bool TagVertexModule::findConstraintBoost(double cut)
+  {
+
+    PCmsLabTransform T;
+
+    TVector3 boost = T.getBoostVector().BoostVector();
+    TVector3 boostDir = boost.Unit();
+
+    TVector3 beamSpot(0, 0, 0);
+    TMatrix beamSpotCov(3, 3);
+    beamSpotCov(0, 0) = 1e-03 * 1e-03; beamSpotCov(1, 1) = 5.9e-06 * 5.9e-06; beamSpotCov(2, 2) = cut * cut;
+    double thetab = boostDir.Theta();
+    double phib = boostDir.Phi();
+
+    double stb = TMath::Sin(thetab);
+    double ctb = TMath::Cos(thetab);
+    double spb = TMath::Sin(phib);
+    double cpb = TMath::Cos(phib);
+
+
+    TMatrix rz(3, 3);  rz(2, 2) = 1;
+    rz(0, 0) = cpb; rz(0, 1) = spb;
+    rz(1, 0) = -1 * spb; rz(1, 1) = cpb;
+
+    TMatrix ry(3, 3);  ry(1, 1) = 1;
+    ry(0, 0) = ctb; ry(0, 2) = -1 * stb;
+    ry(2, 0) = stb; ry(2, 2) = ctb;
+
+    TMatrix r(3, 3);  r.Mult(rz, ry);
+    TMatrix rt(3, 3); rt.Transpose(r);
+
+    TMatrix TubePart(3, 3);  TubePart.Mult(rt, beamSpotCov);
+    TMatrix Tube(3, 3); Tube.Mult(TubePart, r);
+
+
+    m_tube.ResizeTo(3, 3);
+
+    m_tube(0, 0) = Tube(0, 0);  m_tube(0, 1) = Tube(0, 1);  m_tube(0, 2) = Tube(0, 2);
+    m_tube(1, 0) = Tube(1, 0);  m_tube(1, 1) = Tube(1, 1);  m_tube(1, 2) = Tube(1, 2);
+    m_tube(2, 0) = Tube(2, 0);  m_tube(2, 1) = Tube(2, 1);  m_tube(2, 2) = Tube(2, 2);
+
+    return true;
+
 
   }
 
@@ -280,8 +384,20 @@ namespace Belle2 {
       MCParticle* mc = mcParticles[i];
       if (TMath::Abs(mc->getPDG()) == TMath::Abs(Breco->getPDGCode())) {
 
-        isBreco = compBrecoBgen(Breco, mc);
+        if (m_useBrecoMCassociation) {
+          StoreArray<MCParticle> mcParticles;
+          const MCParticle* mcBr = Breco->getRelated<MCParticle>();
+          m_MCVertReco = mcBr->getDecayVertex();
+          if (mcBr == mc) {
+            isBreco = true;
+          } else {
+            isBreco = false;
+          }
+        } else {
+          isBreco = compBrecoBgen(Breco, mc);
+        }
         if (isBreco) {
+          m_MCVertReco = mc->getDecayVertex();
           nReco++;
         } else {
           MCTagVert = mc->getDecayVertex();
@@ -297,20 +413,20 @@ namespace Belle2 {
         MCParticle* mc = mcParticles[i];
         if (TMath::Abs(mc->getPDG()) == TMath::Abs(Breco->getPDGCode())) {
           double dcalc = (mc->getDecayVertex() - Breco->getVertex()).Mag();
+          m_MCVertReco = mc->getDecayVertex();
           if (dcalc < dref) {
             dref = dcalc;
             MCTagVert = mc->getDecayVertex();
             mcPDG = mc->getPDG();
+          } else {
+            m_MCVertReco = mc->getDecayVertex();
           }
         }
       }
     }
 
-    Breco->addExtraInfo("MCTagVx", MCTagVert.X());
-    Breco->addExtraInfo("MCTagVy", MCTagVert.Y());
-    Breco->addExtraInfo("MCTagVz", MCTagVert.Z());
-    Breco->addExtraInfo("MCTagPDG", mcPDG);
-
+    m_MCtagV = MCTagVert;
+    m_mcPDG = mcPDG;
   }
 
 
@@ -366,16 +482,20 @@ namespace Belle2 {
   //}
 
 
-  bool TagVertexModule::makeGeneralFit(Particle* Breco)
+  bool TagVertexModule::makeGeneralFit()
   {
 
-    //StoreArray<Track> allTracks;
+    // apply constraint
+    analysis::RaveSetup::getInstance()->unsetBeamSpot();
+    TVector3 beamSpot(0, 0, 0); // TODO: use measured value when it will be available
+    if (m_useConstraint.compare(std::string("no")) != 0) analysis::RaveSetup::getInstance()->setBeamSpot(beamSpot, m_tube);
+
+
     analysis::RaveVertexFitter rFit;
 
     // Mpi and MKs
-    // TODO Avoid hard coded values
-    const double mpi = 0.13957018;
-    const double mks = 0.497614;
+    const double mpi = Const::pionMass;
+    const double mks = Const::K0Mass;
 
     // remove traks from KS
     for (unsigned int i = 0; i < tagTracks.size(); i++) {
@@ -410,35 +530,51 @@ namespace Belle2 {
       }
 
       if (!isKsDau) rFit.addTrack(trak1Res);
-
     }
+
+
 
     int isGoodFit = rFit.fit("avf");
     if (isGoodFit < 1) return false;
 
-    TVector3 pos = rFit.getPos(0);
-    TMatrixDSym cov = rFit.getCov(0);
+    m_tagV = rFit.getPos(0);
+    m_tagVErrMatrix.ResizeTo(rFit.getCov(0));
+    m_tagVErrMatrix = rFit.getCov(0);
 
     m_fitPval = rFit.getPValue();
-
-    Breco->addExtraInfo("TagVx", pos.X());
-    Breco->addExtraInfo("TagVy", pos.Y());
-    Breco->addExtraInfo("TagVz", pos.Z());
-
-    Breco->addExtraInfo("TagVcovXX", cov[0][0]);
-    Breco->addExtraInfo("TagVcovXY", cov[0][1]);
-    Breco->addExtraInfo("TagVcovXZ", cov[0][2]);
-    Breco->addExtraInfo("TagVcovYX", cov[1][0]);
-    Breco->addExtraInfo("TagVcovYY", cov[1][1]);
-    Breco->addExtraInfo("TagVcovYZ", cov[1][2]);
-    Breco->addExtraInfo("TagVcovZX", cov[2][0]);
-    Breco->addExtraInfo("TagVcovZY", cov[2][1]);
-    Breco->addExtraInfo("TagVcovZZ", cov[2][2]);
-
 
     return true;
 
   }
+
+
+
+  void TagVertexModule::deltaT(Particle* Breco)
+  {
+
+    PCmsLabTransform T;
+
+    TVector3 boost = T.getBoostVector().BoostVector();
+
+    double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
+
+    double c = Const::speedOfLight / 1000.; // cm ps-1
+
+    TVector3 dVert = Breco->getVertex() - m_tagV;
+    TVector3 MCdVert = m_MCVertReco - m_MCtagV;
+
+    TVector3 boostDir = boost.Unit();
+    double dl = dVert.Dot(boostDir);
+    double dt = dl / (bg * c);
+    double MCdl = MCdVert.Dot(boostDir);
+    double MCdt = MCdl / (bg * c);
+
+
+    m_deltaT = dt;
+    m_MCdeltaT = MCdt;
+
+  }
+
 
 
 } // end Belle2 namespace

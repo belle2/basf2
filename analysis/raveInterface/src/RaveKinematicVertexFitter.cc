@@ -19,7 +19,7 @@
 #include <rave/TransientTrackKinematicParticle.h>
 #include <rave/impl/RaveBase/Converters/interface/RaveStreamers.h>
 
-//#include <rave/KinematicTreeFactory.h>
+#include <rave/KinematicTreeFactory.h>
 #include <rave/KinematicConstraint.h>
 #include <rave/KinematicConstraintBuilder.h>
 
@@ -93,13 +93,9 @@ void RaveKinematicVertexFitter::addMother(const Particle* aMotherParticlePtr)
 {
   vector<Particle*> daughters = aMotherParticlePtr->getDaughters();
 
-  if (m_vertFit) {
-    int nDaughters = daughters.size();
-    for (int i = 0; i not_eq nDaughters; ++i) {
-      addTrack(daughters[i]);
-    }
-  } else {
-    addTrack(aMotherParticlePtr);
+  int nDaughters = daughters.size();
+  for (int i = 0; i not_eq nDaughters; ++i) {
+    addTrack(daughters[i]);
   }
 
   //store input pointer so fit results can be written to the mother particle after the fit
@@ -168,6 +164,7 @@ int RaveKinematicVertexFitter::fit()
           std::vector< rave::KinematicParticle > m_fittedResult2 = RaveSetup::s_instance->m_raveKinematicTreeFactory->useParticleFitter(parts, cs, "ppf:lppf");
           m_fittedParticle = m_fittedResult2[0];
         } catch (...) {
+          B2ERROR("[RaveKinematicVertexFitter]: Mass fit error ");
           nOfVertices = 0;
         }
       }
@@ -177,15 +174,44 @@ int RaveKinematicVertexFitter::fit()
     if (!m_vertFit && m_massConstFit) {
 
       try {
-        rave::KinematicConstraint cs = rave::KinematicConstraintBuilder().createMassKinematicConstraint(m_motherParticlePtr->getPDGMass(), 0.);
+
+        Particle* aParticlePtr = m_motherParticlePtr;
+
+        rave::Vector7D raveState(aParticlePtr->getX(), aParticlePtr->getY(), aParticlePtr->getZ(), aParticlePtr->getPx(), aParticlePtr->getPy(), aParticlePtr->getPz(), aParticlePtr->getMass());
+        TMatrixFSym cov = aParticlePtr->getMomentumVertexErrorMatrix();
+
+        float chi2 = 1;
+        float ndf = 1.;
+
+        rave::Covariance7D raveCov(cov(4, 4), cov(4, 5), cov(4, 6), // x x , x y, x z
+                                   cov(5, 5), cov(5, 6), cov(6, 6), // y y , y z, z z
+                                   cov(0, 4), cov(1, 4), cov(2, 4), // x px , x py, x pz
+                                   cov(0, 5), cov(1, 5), cov(2, 5), // y px , y py, y pz
+                                   cov(0, 6), cov(1, 6), cov(2, 6), // z px , z py, z pz
+                                   cov(0, 0), cov(1, 0), cov(2, 0), // px px , px py, px pz
+                                   cov(1, 1), cov(1, 2), cov(2, 2), // py py , py pz, pz pz
+                                   cov(4, 3), cov(5, 3), cov(6, 3), // x m , y m, z m
+                                   cov(0, 3), cov(1, 3), cov(2, 3), // px m, py m, pz m
+                                   cov(3, 3)); // mm
+
+        rave::TransientTrackKinematicParticle aRaveParticle(raveState, raveCov, rave::Charge(aParticlePtr->getCharge()), chi2, ndf);
+
+        std::vector< rave::KinematicParticle > parts; parts.push_back(aRaveParticle);
+
+        rave::KinematicConstraint constraint = rave::KinematicConstraintBuilder().createMassKinematicConstraint(m_motherParticlePtr->getPDGMass(), 0.);
+
         if (m_motherParticlePtr->getMomentumVertexErrorMatrix().Determinant() != 0) {
 
-          std::vector< rave::KinematicParticle > m_fittedResult2 = RaveSetup::s_instance->m_raveKinematicTreeFactory->useParticleFitter(m_inputParticles, cs, "ppf:lppf");
-          m_fittedParticle = m_fittedResult2[0];
+          std::vector< rave::KinematicParticle > refitted = RaveSetup::s_instance->m_raveKinematicTreeFactory->useParticleFitter(parts, constraint, "ppf:lppf");
+
+          m_fittedParticle = refitted[0];
+
         } else {
           B2ERROR("[RaveKinematicVertexFitter]: VertexException saying ParentParticleFitter::error inverting covariance matrix occured");
           nOfVertices = 0;
         }
+
+
       } catch (...) {
         nOfVertices = 0;
       }
@@ -273,16 +299,7 @@ int RaveKinematicVertexFitter::fit()
 
 void RaveKinematicVertexFitter::updateMother()
 {
-
-
   m_motherParticlePtr->updateMomentum(m_fitted4Vector, m_fittedPos, m_fitted7Cov, m_fittedPValue);
-
-  //cout<<"nOfVertices END = "<<nOfVertices<<endl;
-  //m_fitted7Cov.Print();
-  //m_fitted4Vector.Print();
-  //m_fittedPos.Print();
-  //cout<<m_fittedPValue<<endl;
-
 }
 
 Particle* RaveKinematicVertexFitter::getMother()

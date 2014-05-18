@@ -199,6 +199,13 @@ def fitVertex(
     @param path         modules are added to this path
     """
 
+    if 'Geometry' in [m.name() for m in path.modules()]:
+        print '[INFO] fitVertex: Geometry already in path'
+    else:
+        geometry = register_module('Geometry')
+        geometry.param('components', ['MagneticField'])
+        path.add_module(geometry)
+
     pvfit = register_module('ParticleVertexFitter')
     pvfit.set_name('ParticleVertexFitter_' + list_name)
     pvfit.param('ListName', list_name)
@@ -384,7 +391,13 @@ def buildRestOfEvent(list_name, path=analysis_main):
     path.add_module(roeBuilder)
 
 
-def TagV(list_name, confidenceLevel, path=analysis_main):
+def TagV(
+    list_name,
+    confidenceLevel,
+    MCassociation=True,
+    useConstraint='boostcut',
+    path=analysis_main,
+    ):
     """
     For each Particle in the given Breco ParticleList:
     perform the fit of tag side using the track list from the RestOfEvent dataobject
@@ -392,13 +405,24 @@ def TagV(list_name, confidenceLevel, path=analysis_main):
 
     @param list_name name of the input Breco ParticleList
     @param ConfidenceLevel minimum value of the ConfidenceLevel to accept the fit
+    @param MCassociation: use standard MC association or the internal one 
+    @param useConstraint: choose constraint for the tag vertes fit 
     @param path      modules are added to this path
     """
+
+    if 'Geometry' in [m.name() for m in path.modules()]:
+        print '[INFO] TAgV: Geometry already in path'
+    else:
+        geometry = register_module('Geometry')
+        geometry.param('components', ['MagneticField'])
+        path.add_module(geometry)
 
     tvfit = register_module('TagVertex')
     tvfit.set_name('TagVertex_' + list_name)
     tvfit.param('ListName', list_name)
     tvfit.param('ConfidenceLevel', confidenceLevel)
+    tvfit.param('MCAssociation', MCassociation)
+    tvfit.param('UseConstraint', useConstraint)
     path.add_module(tvfit)
 
 

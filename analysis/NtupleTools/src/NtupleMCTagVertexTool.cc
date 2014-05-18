@@ -10,6 +10,7 @@
 
 #include <analysis/NtupleTools/NtupleMCTagVertexTool.h>
 #include <analysis/utility/PSelectorFunctions.h>
+#include <analysis/dataobjects/Vertex.h>
 #include <cmath>
 #include <TBranch.h>
 #include <TLorentzVector.h>
@@ -26,12 +27,13 @@ void NtupleMCTagVertexTool::setupTree()
   m_fMCTagVy = 0;
   m_fMCTagVz = 0;
   m_fMCTagPDG = 0;
+  m_fTruthDeltaT = 0;
 
   m_tree->Branch((strNames[0] + "_TruthTagVx").c_str(), &m_fMCTagVx, (strNames[0] + "_TruthTagVx/F").c_str());
   m_tree->Branch((strNames[0] + "_TruthTagVy").c_str(), &m_fMCTagVy, (strNames[0] + "_TruthTagVy/F").c_str());
   m_tree->Branch((strNames[0] + "_TruthTagVz").c_str(), &m_fMCTagVz, (strNames[0] + "_TruthTagVz/F").c_str());
   m_tree->Branch((strNames[0] + "_mcTagPDG").c_str(), &m_fMCTagPDG, (strNames[0] + "_mcTagPDG/I").c_str());
-
+  m_tree->Branch((strNames[0] + "_TruthDeltaT").c_str(), &m_fTruthDeltaT, (strNames[0] + "_TruthDeltaT/F").c_str());
 }
 
 void NtupleMCTagVertexTool::eval(const Particle* particle)
@@ -44,11 +46,14 @@ void NtupleMCTagVertexTool::eval(const Particle* particle)
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
   if (selparticles.empty()) return;
 
-  m_fMCTagVx = selparticles[0]->getExtraInfo("MCTagVx");
-  m_fMCTagVy = selparticles[0]->getExtraInfo("MCTagVy");
-  m_fMCTagVz = selparticles[0]->getExtraInfo("MCTagVz");
-  m_fMCTagPDG = selparticles[0]->getExtraInfo("MCTagPDG");
-
+  Vertex* Ver = selparticles[0]->getRelatedTo<Vertex>();
+  if (Ver) {
+    m_fMCTagVx = Ver->getMCTagVertex().X();
+    m_fMCTagVy = Ver->getMCTagVertex().Y();
+    m_fMCTagVz = Ver->getMCTagVertex().Z();
+    m_fMCTagPDG = Ver->getMCTagBFlavor();
+    m_fTruthDeltaT = Ver->getMCDeltaT();
+  }
 }
 
 

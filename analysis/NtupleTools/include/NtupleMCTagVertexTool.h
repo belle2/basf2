@@ -30,6 +30,8 @@ namespace Belle2 {
     float m_fMCTagVz;
     /** PDG code of the MC particle */
     int m_fMCTagPDG;
+    /** generated DeltaT */
+    float m_fTruthDeltaT;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
   public:
@@ -41,4 +43,4 @@ namespace Belle2 {
 
 } // namepspace Belle2
 
-#endif // NTUPLEDELTAEMBCTOOL_H
+#endif // NTUPLEMCTAGVERTEXTOOL_H

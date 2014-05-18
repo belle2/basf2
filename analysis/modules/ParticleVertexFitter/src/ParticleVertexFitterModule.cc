@@ -24,6 +24,9 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
+// Magnetic field
+#include <geometry/bfieldmap/BFieldMap.h>
+
 #include <TMath.h>
 
 using namespace std;
@@ -64,8 +67,9 @@ namespace Belle2 {
 
   void ParticleVertexFitterModule::initialize()
   {
-    m_Bfield = 1.5;
+    m_Bfield = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
     analysis::RaveSetup::initialize(1, m_Bfield);
+    B2INFO("ParticleVertexFitterModule : magnetic field = " << m_Bfield);
 
     TVector3 beamSpot(0, 0, 0);
     TMatrixDSym beamSpotCov(3);
@@ -89,7 +93,8 @@ namespace Belle2 {
 
   void ParticleVertexFitterModule::beginRun()
   {
-    m_Bfield = 1.5; //TODO: get from gearbox
+    //TODO: set magnetic field for each run
+    //m_Bfield = BFieldMap::Instance().getBField(TVector3(0,0,0)).Z();
   }
 
   void ParticleVertexFitterModule::event()
@@ -126,6 +131,11 @@ namespace Belle2 {
   bool ParticleVertexFitterModule::doVertexFit(Particle* mother)
   {
     // steering starts here
+
+    if (m_Bfield == 0) {
+      B2ERROR("ParticleVertexFitter: No magnetic field");
+      return false;
+    }
 
     if (m_withConstraint.compare(std::string("ipprofile")) != 0 &&
         m_withConstraint.compare(std::string("iptube")) != 0 && m_withConstraint.compare(std::string("")) != 0) {

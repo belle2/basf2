@@ -52,7 +52,23 @@ namespace Belle2 {
 // ----------------------------------------------------------------------
   class KsfwMoments {
   public:
-    KsfwMoments() : m_uf(0) {};
+    KsfwMoments() : m_uf(0) {
+
+      for (int i = 0; i < 2; i++)
+        for (int j = 0; j < 3; j++)
+          for (int k = 0; k < 5; k++)
+            m_Hso[i][j][k] = 0.0;
+
+      for (int i = 0; i < 2; i++)
+        for (int j = 0; j < 5; j++)
+          m_Hoo[i][j] = 0.0;
+
+      for (int i = 0; i < 2; i++) {
+        m_et[i] = 0.0;
+        m_mm2[i] = 0.0;
+      }
+    };
+
     KsfwMoments(double Hso0_max,
                 std::vector<TVector3> p_cms_sigA,
                 std::vector<TVector3> p_cms_sigB,

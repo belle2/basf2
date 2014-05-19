@@ -509,16 +509,6 @@ namespace Belle2 {
       return part->getFlavorType();
     }
 
-
-    double prodChildProb(const Particle* particle)
-    {
-      double signalProbabilityProduct = 1.0;
-      for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
-        signalProbabilityProduct *= particle->getDaughter(j)->getExtraInfo("SignalProbability");
-      }
-      return signalProbabilityProduct;
-    }
-
     // MC related ------------------------------------------------------------
 
     double isSignal(const Particle* part)
@@ -827,16 +817,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("chiProb", particlePvalue, "chi^2 probability of the fit");
     REGISTER_VARIABLE("nDaughters", particleNDaughters, "number of daughter particles");
     REGISTER_VARIABLE("flavor", particleFlavorType, "flavor type of decay (0=unflavored, 1=flavored)");
-    REGISTER_VARIABLE("prodChildProb", prodChildProb, "product of signal probabilities of daughters");
-    REGISTER_VARIABLE("childProb0", childProb<0>, "value of SignalProbability for daughter 0");
-    REGISTER_VARIABLE("childProb1", childProb<1>, "value of SignalProbability for daughter 1");
-    REGISTER_VARIABLE("childProb2", childProb<2>, "value of SignalProbability for daughter 2");
-    REGISTER_VARIABLE("childProb3", childProb<3>, "value of SignalProbability for daughter 3");
-    REGISTER_VARIABLE("childProb4", childProb<4>, "value of SignalProbability for daughter 4");
-    REGISTER_VARIABLE("childProb5", childProb<5>, "value of SignalProbability for daughter 5");
-    REGISTER_VARIABLE("childProb6", childProb<6>, "value of SignalProbability for daughter 6");
-    REGISTER_VARIABLE("childProb7", childProb<7>, "value of SignalProbability for daughter 7");
-    REGISTER_VARIABLE("childProb8", childProb<8>, "value of SignalProbability for daughter 8");
 
     REGISTER_VARIABLE("isSignal", isSignal,               "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
     REGISTER_VARIABLE("mcPDG",    particleMCMatchPDGCode, "The PDG code of matched MCParticle");

@@ -41,7 +41,7 @@ REG_MODULE(PreCutHistMaker)
 
 PreCutHistMakerModule::PreCutHistMakerModule()
 {
-  setDescription("Saves invariant mass distribution of combined particles (from input ParticleLists) into histogram 'all'. If the daughters in the given particle lists can be combined into a correctly reconstructed (!) particle of specified PDG code, save invariant mass for this combination to a histogram called 'signal'. This is equivalent to running ParticleCombiner on the given lists and saving the inv. mass of Particles with isSignal == 1 and everything else, but much faster (since Particles don't need to be saved).");
+  setDescription("Saves distribution of a variable of combined particles (from input ParticleLists) into histogram 'all'. If the daughters in the given particle lists can be combined into a correctly reconstructed (!) particle of specified PDG code, save variable value for this combination to a histogram called 'signal'. This is equivalent to running ParticleCombiner on the given lists and saving the variable value of Particles with isSignal == 1 and everything else, but much faster (since Particles don't need to be saved).");
   setPropertyFlags(c_ParallelProcessingCertified); //histograms are saved through HistModule, so this is ok
 
 
@@ -50,8 +50,9 @@ PreCutHistMakerModule::PreCutHistMakerModule()
   addParam("inputListNames", m_inputListNames, "Particle lists of the daughter particles to be combined. MCMatching should be run on these lists beforehand.");
 
   HistParams defaultHistParams = std::make_tuple(100, 0, 6);
-  addParam("histParams", m_histParams, "Tuple specifying number of bins, lower and upper boundary (in GeV) of inv. mass histogram.", defaultHistParams);
+  addParam("histParams", m_histParams, "Tuple specifying number of bins, lower and upper boundary of the variable histogram. (for invariant mass M in GeV)", defaultHistParams);
   addParam("fileName", m_fileName, "Name of the TFile where the histograms are saved.");
+  addParam("variable", m_variable, "Variable for which the distributions are calculated");
 
 }
 
@@ -77,6 +78,12 @@ void PreCutHistMakerModule::initialize()
   std::tie(nbins, xlow, xhigh) = m_histParams;
   m_histogramSignal = new TH1F((std::string("signal") + m_channelName).c_str(), "signal", nbins, xlow, xhigh);
   m_histogramAll = new TH1F((std::string("all") + m_channelName).c_str(), "all", nbins, xlow, xhigh);
+
+  VariableManager& manager = VariableManager::Instance();
+  m_var = manager.getVariable(m_variable);
+  if (m_var == nullptr) {
+    B2ERROR("PreCutHistMaker: VariableManager doesn't have variable" <<  m_variable)
+  }
 }
 
 
@@ -175,33 +182,20 @@ void PreCutHistMakerModule::saveCombinationsForSignal()
 
   StoreArray<Particle> particles;
   ParticleCombiner combiner(tmplistNames, !hasAntiParticle(m_pdg));
+
   while (combiner.loadNext()) {
-    vector<Particle*> particleStack = combiner.getCurrentParticles();
-    vector<int> indices = combiner.getCurrentIndices();
 
-    TLorentzVector vec(0., 0., 0., 0.);
-    for (unsigned i = 0; i < particleStack.size(); i++) {
-      vec = vec + particleStack[i]->get4Vector();
-    }
-
-    ParticleList::EParticleType outputType = combiner.getCurrentType();
-    Particle* part = particles.appendNew(vec,
-                                         outputType == ParticleList::c_AntiParticle ? -m_pdg : m_pdg,
-                                         outputType == ParticleList::c_SelfConjugatedParticle ? Particle::c_Unflavored : Particle::c_Flavored,
-                                         indices);
-
+    const Particle particle = combiner.getCurrentParticle(m_pdg, -m_pdg);
+    Particle* part = particles.appendNew(particle);
     setMCTruth(part);
     //B2WARNING("combined Particle created.");
     if (analysis::isSignal(part) < 0.5) {
-      //B2WARNING("mcMatching says No. (status: " << getMCTruthStatus(part, part->getRelated<MCParticle>()));
       //part->print();
       continue;
+      //B2WARNING("mcMatching says No. (status: " << getMCTruthStatus(part, part->getRelated<MCParticle>()));
     }
     //B2WARNING("passed");
-
-    //add invariant mass to histogram
-    double mass = vec.M();
-    m_histogramSignal->Fill(mass);
+    m_histogramSignal->Fill(m_var->function(part));
   }
 
 }
@@ -210,16 +204,10 @@ void PreCutHistMakerModule::saveAllCombinations()
 {
   StoreArray<Particle> particles;
   ParticleCombiner combiner(m_inputListNames, !hasAntiParticle(m_pdg));
+
   while (combiner.loadNext()) {
-    vector<Particle*> particleStack = combiner.getCurrentParticles();
-
-    TLorentzVector vec(0., 0., 0., 0.);
-    for (const Particle * p : particleStack)
-      vec += p->get4Vector();
-
-    //add invariant mass to histogram
-    double mass = vec.M();
-    m_histogramAll->Fill(mass);
+    const Particle part = combiner.getCurrentParticle(m_pdg, -m_pdg);
+    m_histogramAll->Fill(m_var->function(&part));
   }
 }
 

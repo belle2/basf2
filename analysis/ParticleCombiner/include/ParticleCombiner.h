@@ -149,6 +149,13 @@ namespace Belle2 {
     const std::vector<int>& getCurrentIndices() const { return m_indices; }
 
     /**
+     * Returns the current particle created from the current combination
+     * @param pdg PDG of the Particle
+     * @param pdgbar PDG of the AntiParticle
+     */
+    Particle getCurrentParticle(int pdg, int pdgbar) const;
+
+    /**
      * Return the ParticleType of the current combination. If the Particle which is combined
      * is selfConjugated itself, all combinations have to be ParticleList::c_SelfConjugatedParticle.
      */

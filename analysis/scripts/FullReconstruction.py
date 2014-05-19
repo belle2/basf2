@@ -123,7 +123,7 @@ def FullReconstruction(path, particles):
                 seq.addResource('Variables_' + particle.name, particle.variables)
             for channel in particle.channels:
                 seq.addResource('Name_' + channel.name, channel.name)
-                seq.addResource('Variables_' + channel.name, particle.variables + ['childProb{i}'.format(i=i) for i in range(0, len(channel.daughters))])
+                seq.addResource('Variables_' + channel.name, particle.variables + ['daughter{i}(ExtraInfo(signalProbability))'.format(i=i) for i in range(0, len(channel.daughters))])
                 seq.addResource('IsIgnored_' + channel.name, False)
 
             ########### RECONSTRUCTION ACTORS ##########

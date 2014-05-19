@@ -36,7 +36,7 @@ def PreCutMassDetermination(name, pdgcode, channels, preCut_Histograms, efficien
         return (splines[channel].GetX(cut, signal[channel].GetXaxis().GetXmin(), maxima[channel]), splines[channel].GetX(cut, maxima[channel], signal[channel].GetXaxis().GetXmax()))
     cuts = GetCuts(signal, efficiency, ycut_to_xcuts)
 
-    result = {'PreCut_' + channel: {'variable': 'MassCut', 'range': cut} for (channel, cut) in cuts.iteritems()}
+    result = {'PreCut_' + channel: {'M': cut} for (channel, cut) in cuts.iteritems()}
     result.update({'IsIgnored_' + channel: False for channel in channels})
     for ignoredChannel in GetIgnoredChannels(signal, bckgrd, cuts):
         result['IsIgnored_' + ignoredChannel] = True
@@ -58,14 +58,14 @@ def PreCutProbDetermination(name, pdgcode, channels, preCut_Histograms, efficien
     """
 
     files = [ROOT.TFile(filename, 'UPDATE') for filename in preCut_Histograms]
-    signal, bckgrd, ratio = LoadHistogramsFromFiles(files, 'prodChildProb', channels)
+    signal, bckgrd, ratio = LoadHistogramsFromFiles(files, 'daughterProductOf(GetExtraInfo(SignalProbability))', channels)
     splines = FitSplineFunctions(ratio)
 
     def ycut_to_xcuts(channel, cut):
         return (splines[channel].GetX(cut, 0, 1), 1)
     cuts = GetCuts(signal, efficiency, ycut_to_xcuts)
 
-    result = {'PreCut_' + channel: {'variable': 'cutsOnProduct', 'range': ('SignalProbability',) + cut} for (channel, cut) in cuts.iteritems()}
+    result = {'PreCut_' + channel: {'daughterProductOf(GetExtraInfo(SignalProbability))': cut} for (channel, cut) in cuts.iteritems()}
     result.update({'IsIgnored_' + channel: False for channel in channels})
     for ignoredChannel in GetIgnoredChannels(signal, bckgrd, cuts):
         result['IsIgnored_' + ignoredChannel] = True
@@ -188,6 +188,7 @@ def CreatePreCutMassHistogram(path, name, particle, daughterLists):
         pmake.set_name('PreCutHistMaker_' + name)
         pmake.param('fileName', filename)
         pmake.param('channelName', name)
+        pmake.param('variable', 'M')
         pmake.param('PDG', pdg.from_name(particle.name))
         pmake.param('inputListNames', daughterLists)
         pmake.param('histParams', (200, mass / 2, mass + mass / 2))
@@ -214,7 +215,17 @@ def CreatePreCutProbHistogram(path, particle, name, daughterLists, daughterSigna
     if os.path.isfile(filename):
         return {'PreCutHistogram_' + particle.name: filename}
     else:
-        raise NotImplemented
+        # Combine all the particles according to the decay channels
+        mass = pdg.get(pdg.from_name(particle.name)).Mass()
+        pmake = register_module('PreCutHistMaker')
+        pmake.set_name('PreCutHistMaker_' + name)
+        pmake.param('fileName', filename)
+        pmake.param('channelName', name)
+        pmake.param('variable', 'daughterProductOf(GetExtraInfo(SignalProbability))')
+        pmake.param('PDG', pdg.from_name(particle.name))
+        pmake.param('inputListNames', daughterLists)
+        pmake.param('histParams', (200, mass / 2, mass + mass / 2))
+        path.add_module(pmake)
     return {}
 
 

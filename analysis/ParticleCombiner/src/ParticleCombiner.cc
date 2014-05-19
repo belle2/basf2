@@ -157,6 +157,19 @@ namespace Belle2 {
     return iType < nTypes;
   }
 
+  Particle ParticleCombiner::getCurrentParticle(int pdg, int pdgbar) const
+  {
+
+    TLorentzVector vec(0., 0., 0., 0.);
+    for (unsigned i = 0; i < m_particles.size(); i++) {
+      vec = vec + m_particles[i]->get4Vector();
+    }
+
+    ParticleList::EParticleType outputType = getCurrentType();
+    return Particle(vec, outputType == ParticleList::c_AntiParticle ? pdgbar :  pdg,
+                    outputType == ParticleList::c_SelfConjugatedParticle ? Particle::c_Unflavored : Particle::c_Flavored,
+                    m_indices);
+  }
 
   ParticleList::EParticleType ParticleCombiner::getCurrentCombinationType() const
   {

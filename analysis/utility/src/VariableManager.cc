@@ -41,7 +41,7 @@ const VariableManager::Var* VariableManager::createVariable(const std::string& n
   boost::match_results<std::string::const_iterator> results;
 
   if (boost::regex_match(name, results, allowedForm)) {
-    if (results[1] == "ExtraInfo") {
+    if (results[1] == "GetExtraInfo") {
       auto extraInfoName = results[2];
       func = [extraInfoName](const Particle * particle) -> double {
         return particle->getExtraInfo(extraInfoName);

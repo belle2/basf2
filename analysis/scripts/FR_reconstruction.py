@@ -45,9 +45,9 @@ def ParticleListFromChannel(path, pdgcode, name, preCut, inputLists, isIgnored):
     pmake.param('InputListNames', inputLists)
 
     if isIgnored:
-        pmake.param('MassCut', (1000, 1000))
+        pmake.param('cuts', {'M': (1000, 1000)})
     else:
-        pmake.param(preCut['variable'], preCut['range'])
+        pmake.param('cuts', preCut)
 
     path.add_module(pmake)
     modularAnalysis.matchMCTruth(list_name, path=path)

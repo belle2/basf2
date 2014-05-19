@@ -375,25 +375,6 @@ namespace Belle2 {
      */
     double particleFlavorType(const Particle* part);
 
-
-    /**
-     * function for PSelector
-     * @param part const pointer to Particle
-     * @return product of signal probabilities of daughters
-     */
-    double prodChildProb(const Particle* particle);
-
-    /**
-     * function for PSelector
-     * @param part const pointer to Particle
-     * @return signal probability of daughter particle
-     */
-    template<unsigned int N>
-    double childProb(const Particle* particle)
-    {
-      return particle->getDaughter(N)->getExtraInfo("SignalProbability");
-    }
-
     /**
      * NeuroBayesifys this function
      * @param part cconst pointer to Particle
@@ -415,7 +396,7 @@ namespace Belle2 {
 
     /**
      * NeuroBayesifys this function
-     * @param part cconst pointer to Particle
+     * @param part const pointer to Particle
      * @return function value, except if information from TOP is not available which is set to -999
      */
     template<double(*T)(const Particle*)>

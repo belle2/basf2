@@ -51,10 +51,8 @@ namespace Belle2 {
     vector<string> defaultList;
     addParam("InputListNames", m_inputListNames, "list of input particle list names",
              defaultList);
-    addParam("MassCut", m_massCut, "[GeV] tuple of lower and upper mass cut", std::make_tuple(0.0, 100.0));
     std::map<std::string, std::tuple<double, double>> defaultMap;
-    addParam("cutsOnProduct", m_productCuts, "Map of Variable and Cut Values. Cuts are performed on the product of the variable value of all daughter particles.", defaultMap);
-    addParam("cutsOnSum", m_sumCuts, "Map of Variable and Cut Values. Cuts are performed on the sum of the variable value of all daughter particles.", defaultMap);
+    addParam("cuts", m_cuts, "Map of Variable and Cut Values.", defaultMap);
     addParam("persistent", m_persistent,
              "toggle output particle list btw. transient/persistent", false);
 
@@ -88,32 +86,18 @@ namespace Belle2 {
     outputList.create();
     outputList->setPDG(m_pdg);
 
-    double massCutLow = 0.0;
-    double massCutHigh = 0.0;
-    std::tie(massCutLow, massCutHigh) = m_massCut;
-
     ParticleCombiner combiner(m_inputListNames, isParticleSelfConjugated(outputList));
+    int pdg = outputList->getPDG();
+    int pdgbar = outputList->getPDGbar();
+
     while (combiner.loadNext()) {
 
-      vector<Particle*> particleStack = combiner.getCurrentParticles();
-      vector<int> indices = combiner.getCurrentIndices();
+      const Particle particle = combiner.getCurrentParticle(pdg, pdgbar);
+      if (!checkCuts(&particle)) continue;
 
-      TLorentzVector vec(0., 0., 0., 0.);
-      for (unsigned i = 0; i < particleStack.size(); i++) {
-        vec = vec + particleStack[i]->get4Vector();
-      }
-      double mass = vec.M();
-      if (mass < massCutLow || mass > massCutHigh) continue;
-
-      if (!checkCuts(particleStack)) continue;
-
-      ParticleList::EParticleType outputType = combiner.getCurrentType();
-      new(Particles.nextFreeAddress()) Particle(vec,
-                                                outputType == ParticleList::c_AntiParticle ? outputList->getPDGbar() :  outputList->getPDG(),
-                                                outputType == ParticleList::c_SelfConjugatedParticle ? Particle::c_Unflavored : Particle::c_Flavored,
-                                                indices);
+      new(Particles.nextFreeAddress()) Particle(particle);
       int iparticle = Particles.getEntries() - 1;
-      outputList->addParticle(iparticle, outputType);
+      outputList->addParticle(iparticle, combiner.getCurrentType());
 
     }
 
@@ -138,41 +122,21 @@ namespace Belle2 {
   {
   }
 
-  bool ParticleCombinerModule::checkCuts(const std::vector<Particle*>& particleStack)
+  bool ParticleCombinerModule::checkCuts(const Particle* particle)
   {
 
     VariableManager& manager = VariableManager::Instance();
 
-    for (auto & cut : m_productCuts) {
-      // Now calculate the value by multiplying all decay product values,
-      double value = 1.0;
+    for (auto & cut : m_cuts) {
       auto var = manager.getVariable(cut.first);
       if (var == nullptr) {
         B2INFO("ParticleCombiner: VariableManager doesn't have variable" <<  cut.first)
         return false;
       }
-      for (unsigned i = 0; i < particleStack.size(); i++) {
-        value *= var->function(particleStack[i]);
-      }
+      double value = var->function(particle);
       if (value < std::get<0>(cut.second) || value > std::get<1>(cut.second)) return false;
     }
-
-    for (auto & cut : m_sumCuts) {
-      // Now calculate the value by adding all decay product values,
-      double value = 0.0;
-      auto var = manager.getVariable(cut.first);
-      if (var == nullptr) {
-        B2INFO("ParticleCombiner: VariableManager doesn't have variable" <<  cut.first)
-        return false;
-      }
-      for (unsigned i = 0; i < particleStack.size(); i++) {
-        value += var->function(particleStack[i]);
-      }
-      if (value < std::get<0>(cut.second) || value > std::get<1>(cut.second)) return false;
-    }
-
     return true;
-
   }
 
 

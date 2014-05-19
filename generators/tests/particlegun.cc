@@ -17,7 +17,9 @@ namespace Belle2 {
       parameters.thetaParams    = {1, 1};
       parameters.phiParams      = {1, 1};
     }
+    /** Variable of pgun */
     ParticleGun pgun;
+    /** Variable parameters */
     ParticleGun::Parameters parameters;
 
     /** check one of the variables given a list of allowed and excluded distributions */

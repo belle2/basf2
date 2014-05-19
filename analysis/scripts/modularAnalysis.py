@@ -34,11 +34,11 @@ def outputMdst(filename, path=analysis_main):
 
 
 def generateY4S(noEvents, decayTable, path=analysis_main):
-    """                                                                                                                                   
+    """
     Generated e+e- -> Y(4S) events with EvtGen event generator.
-    The Y(4S) decays according to the user specifed decay table. 
+    The Y(4S) decays according to the user specifed decay table.
 
-    The experiment and run numbers are set to 1. 
+    The experiment and run numbers are set to 1.
 
     If the simulation and reconstruction is not performed in the sam job,
     then the Gearbox needs to be loaded. Use loadGearbox(path) function
@@ -61,22 +61,21 @@ def generateY4S(noEvents, decayTable, path=analysis_main):
 
 
 def generateContinuum(
-    noEvents,
-    inclusiveP,
-    decayTable,
-    inclusiveT=2,
-    path=analysis_main,
-    ):
+        noEvents,
+        inclusiveP,
+        decayTable,
+        inclusiveT=2,
+        path=analysis_main):
     """
-    Generated e+e- -> gamma* -> qq-bar where light quarks hadronize 
+    Generated e+e- -> gamma* -> qq-bar where light quarks hadronize
     and decay in user specified way (via specified decay table).
 
-    The experiment and run numbers are set to 1. 
+    The experiment and run numbers are set to 1.
 
     If the simulation and reconstruction is not performed in the sam job,
     then the Gearbox needs to be loaded. Use loadGearbox(path) function
     for this purpose.
-    
+
     @param noEvents   number of events to be generated
     @param inclusiveP each event will contain this particle
     @param decayTable file name of the decay table to be used
@@ -100,11 +99,11 @@ def generateContinuum(
 
 def loadGearbox(path=analysis_main):
     """
-    Loads Gearbox module to the path. 
+    Loads Gearbox module to the path.
 
-    This is neccessary in a job with event generation only 
+    This is neccessary in a job with event generation only
     (without reconstruction and reconstruction).
-    
+
     @param path modules are added to this path
     """
 
@@ -134,12 +133,11 @@ def loadReconstructedParticles(path=analysis_main):
 
 
 def selectParticle(
-    list_name,
-    PDGcode,
-    criteria,
-    persistent=False,
-    path=analysis_main,
-    ):
+        list_name,
+        PDGcode,
+        criteria,
+        persistent=False,
+        path=analysis_main,):
 
     pselect = register_module('ParticleSelector')
     pselect.set_name('ParticleSelector_' + list_name)
@@ -159,37 +157,35 @@ def applyCuts(list_name, criteria, path=analysis_main):
 
 
 def makeParticle(
-    list_name,
-    PDGcode,
-    list_of_lists,
-    mL,
-    mH,
-    persistent=False,
-    path=analysis_main,
-    ):
+        list_name,
+        PDGcode,
+        list_of_lists,
+        mL,
+        mH,
+        persistent=False,
+        path=analysis_main,):
 
     pmake = register_module('ParticleCombiner')
     pmake.set_name('ParticleCombiner_' + list_name)
     pmake.param('PDG', PDGcode)
     pmake.param('ListName', list_name)
     pmake.param('InputListNames', list_of_lists)
-    pmake.param('MassCut', (mL, mH))
+    pmake.param('cuts', {'M': (mL, mH)})
     pmake.param('persistent', persistent)
     path.add_module(pmake)
 
 
 def fitVertex(
-    list_name,
-    conf_level,
-    decay_string='',
-    fitter='rave',
-    fit_type='vertex',
-    constraint='',
-    path=analysis_main,
-    ):
+        list_name,
+        conf_level,
+        decay_string='',
+        fitter='rave',
+        fit_type='vertex',
+        constraint='',
+        path=analysis_main,):
     """
     Perform the specified kinematic fit for each Particle in the given ParticleList.
-    
+
     @param list_name    name of the input ParticleList
     @param conf_level   minimum value of the confidence level to accept the fit
     @param decay_string select particles used for the vertex fit
@@ -218,14 +214,13 @@ def fitVertex(
 
 
 def vertexKFit(
-    list_name,
-    conf_level,
-    decay_string='',
-    constraint='',
-    path=analysis_main,
-    ):
+        list_name,
+        conf_level,
+        decay_string='',
+        constraint='',
+        path=analysis_main,):
     """
-    Perform vertex fit using the kfitter for each Particle in the given ParticleList. 
+    Perform vertex fit using the kfitter for each Particle in the given ParticleList.
 
     @param list_name    name of the input ParticleList
     @param conf_level   minimum value of the confidence level to accept the fit
@@ -241,18 +236,16 @@ def vertexKFit(
         'kfitter',
         'vertex',
         constraint,
-        path,
-        )
+        path,)
 
 
 def massVertexKFit(
-    list_name,
-    conf_level,
-    decay_string='',
-    path=analysis_main,
-    ):
+        list_name,
+        conf_level,
+        decay_string='',
+        path=analysis_main,):
     """
-    Perform mass-constrained vertex fit using the kfitter for each Particle in the given ParticleList. 
+    Perform mass-constrained vertex fit using the kfitter for each Particle in the given ParticleList.
 
     @param list_name    name of the input ParticleList
     @param conf_level   minimum value of the confidence level to accept the fit
@@ -267,18 +260,16 @@ def massVertexKFit(
         'kfitter',
         'massvertex',
         '',
-        path,
-        )
+        path,)
 
 
 def massKFit(
-    list_name,
-    conf_level,
-    decay_string='',
-    path=analysis_main,
-    ):
+        list_name,
+        conf_level,
+        decay_string='',
+        path=analysis_main,):
     """
-    Perform vertex fit using the kfitter for each Particle in the given ParticleList. 
+    Perform vertex fit using the kfitter for each Particle in the given ParticleList.
 
     @param list_name    name of the input ParticleList
     @param conf_level   minimum value of the confidence level to accept the fit
@@ -293,16 +284,15 @@ def massKFit(
         'kfitter',
         'mass',
         '',
-        path,
-        )
+        path,)
 
 
 def printDataStore(path=analysis_main):
     """
-    Prints the contents of DataStore in each event, 
+    Prints the contents of DataStore in each event,
     listing all objects and arrays (including size).
-    
-    @param path   modules are added to this path 
+
+    @param path   modules are added to this path
     """
 
     printDS = register_module('PrintCollections')
@@ -325,11 +315,10 @@ def ntupleFile(file_name, path=analysis_main):
 
 
 def ntupleTree(
-    tree_name,
-    list_name,
-    tools,
-    path=analysis_main,
-    ):
+        tree_name,
+        list_name,
+        tools,
+        path=analysis_main,):
 
     ntmaker = register_module('NtupleMaker')
     ntmaker.set_name('NtupleMaker_ntupleTree_' + list_name)
@@ -340,11 +329,10 @@ def ntupleTree(
 
 
 def findMCDecay(
-    list_name,
-    decay,
-    persistent=False,
-    path=analysis_main,
-    ):
+        list_name,
+        decay,
+        persistent=False,
+        path=analysis_main,):
 
     decayfinder = register_module('MCDecayFinder')
     decayfinder.set_name('MCDecayFinder_' + list_name)
@@ -362,11 +350,11 @@ def summaryOfLists(particleLists, path=analysis_main):
 
 def matchMCTruth(list_name, path=analysis_main):
     """
-    Performs MC matching (sets relation Particle<->MCParticle) for 
+    Performs MC matching (sets relation Particle<->MCParticle) for
     all particles (and its (grand)^N-daughter particles) in the specified
     ParticleList.
 
-    @param list_name name of the input ParticleList 
+    @param list_name name of the input ParticleList
     @param path      modules are added to this path
     """
 
@@ -378,7 +366,7 @@ def matchMCTruth(list_name, path=analysis_main):
 
 def buildRestOfEvent(list_name, path=analysis_main):
     """
-    Creates for each Particle in the given ParticleList a RestOfEvent 
+    Creates for each Particle in the given ParticleList a RestOfEvent
     dataobject and makes BASF2 relation between them.
 
     @param list_name name of the input ParticleList
@@ -392,21 +380,20 @@ def buildRestOfEvent(list_name, path=analysis_main):
 
 
 def TagV(
-    list_name,
-    confidenceLevel,
-    MCassociation=True,
-    useConstraint='boostcut',
-    path=analysis_main,
-    ):
+        list_name,
+        confidenceLevel,
+        MCassociation=True,
+        useConstraint='boostcut',
+        path=analysis_main,):
     """
     For each Particle in the given Breco ParticleList:
     perform the fit of tag side using the track list from the RestOfEvent dataobject
-    save the MC Btag in case of signal MC 
+    save the MC Btag in case of signal MC
 
     @param list_name name of the input Breco ParticleList
     @param ConfidenceLevel minimum value of the ConfidenceLevel to accept the fit
-    @param MCassociation: use standard MC association or the internal one 
-    @param useConstraint: choose constraint for the tag vertes fit 
+    @param MCassociation: use standard MC association or the internal one
+    @param useConstraint: choose constraint for the tag vertes fit
     @param path      modules are added to this path
     """
 
@@ -428,7 +415,7 @@ def TagV(
 
 def buildContinuumSuppression(list_name, path=analysis_main):
     """
-    Creates for each Particle in the given ParticleList a ContinuumSuppression 
+    Creates for each Particle in the given ParticleList a ContinuumSuppression
     dataobject and makes BASF2 relation between them.
 
     @param list_name name of the input ParticleList
@@ -439,5 +426,3 @@ def buildContinuumSuppression(list_name, path=analysis_main):
     qqBuilder.set_name('QQBuilder_' + list_name)
     qqBuilder.param('particleList', list_name)
     path.add_module(qqBuilder)
-
-

@@ -65,7 +65,7 @@ def PreCutProbDetermination(name, pdgcode, channels, preCut_Histograms, efficien
         return (splines[channel].GetX(cut, 0, 1), 1)
     cuts = GetCuts(signal, efficiency, ycut_to_xcuts)
 
-    result = {'PreCut_' + channel: {'daughterProductOf(GetExtraInfo(SignalProbability))': cut} for (channel, cut) in cuts.iteritems()}
+    result = {'PreCut_' + channel: {'daughterProductOf(getExtraInfo(SignalProbability))': cut} for (channel, cut) in cuts.iteritems()}
     result.update({'IsIgnored_' + channel: False for channel in channels})
     for ignoredChannel in GetIgnoredChannels(signal, bckgrd, cuts):
         result['IsIgnored_' + ignoredChannel] = True
@@ -221,7 +221,7 @@ def CreatePreCutProbHistogram(path, particle, name, daughterLists, daughterSigna
         pmake.set_name('PreCutHistMaker_' + name)
         pmake.param('fileName', filename)
         pmake.param('channelName', name)
-        pmake.param('variable', 'daughterProductOf(GetExtraInfo(SignalProbability))')
+        pmake.param('variable', 'daughterProductOf(getExtraInfo(SignalProbability))')
         pmake.param('PDG', pdg.from_name(particle.name))
         pmake.param('inputListNames', daughterLists)
         pmake.param('histParams', (200, mass / 2, mass + mass / 2))
@@ -235,5 +235,6 @@ def PrintPreCuts(name, channels, preCuts, ignoredChannels):
         if isIgnored:
             print 'Channel {channel} is ignored due to low statistics'.format(channel=channel)
         else:
-            print 'Channel {channel} has cut on {variable} with range {low} to {high}'.format(channel=channel, variable=preCut['variable'], low=preCut['range'][0], high=preCut['range'][1])
+            for variable, (low, high) in preCut.iteritems():
+                print 'Channel {channel} has cut on {variable} with range {low} to {high}'.format(channel=channel, variable=variable, low=low, high=high)
     return {}

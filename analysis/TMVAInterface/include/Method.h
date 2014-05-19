@@ -20,6 +20,11 @@ namespace Belle2 {
   namespace TMVAInterface {
 
     /**
+    * Remove () from variable names, because ROOT doesn't like them
+    */
+    std::string makeROOTCompatible(std::string str);
+
+    /**
      * Represents a TMVA Method, containing name, type, config and variables of the method.
      * If type is "plugin" the shared library of the plugin associated to the given name is loaded automatically.
      * If the type corresponds to a builtin TMVA method, the name can be arbirary.
@@ -27,11 +32,6 @@ namespace Belle2 {
     class Method {
 
     public:
-      /**
-       * Loads Method from an input xml-stream.
-       * @param istream stream of the xml weightfile created by the TMVATeacher
-       */
-      Method(std::istream& istream);
 
       /**
        * Constructs new Method from its defining elements (name, type, config, variables)
@@ -55,6 +55,12 @@ namespace Belle2 {
       TMVA::Types::EMVA getType() { return m_type; }
 
       /**
+       * Getter for type as string of the method
+       * @return type
+       */
+      std::string getTypeAsString() { return m_type_as_string; }
+
+      /**
        * Getter for config of the method
        * @return config
        */
@@ -67,20 +73,11 @@ namespace Belle2 {
       const std::vector<const VariableManager::Var*>& getVariables() { return m_variables; }
 
     private:
-      /**
-       * Initialise helper function. Loads plugins and gets Variables frmo the VariableManager
-       * @param name see Method Constructor
-       * @param type see Method Constructor
-       * @param config see Method Constructor
-       * @param variables see Method Constructor
-       */
-      void init(std::string name, std::string type, std::string config, std::vector<std::string> variables);
-
-    private:
       std::string m_name; /**< name of the method */
       std::string m_config; /**< config string given to the method */
       std::vector<const VariableManager::Var*> m_variables; /**< Pointers to the input variables loaded from VariableManager */
       TMVA::Types::EMVA m_type; /**< type of the method */
+      std::string m_type_as_string; /**< type of the method as string */
     };
 
   }

@@ -102,10 +102,6 @@ namespace Belle2 {
 
     /** Return list of all variable names (in order registered). */
     std::vector<std::string> getNames() const;
-
-    /** Register a variable stored in the ExtraInfo of the Particle, the variable can be registered multiple times for convenience, all additional registrations of the same variable are ignored  */
-    void registerParticleExtraInfoVariable(const std::string& name, const std::string& description);
-
     /** Print list of all variables with description (in order registered). */
     void printList() const;
 

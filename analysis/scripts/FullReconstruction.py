@@ -46,8 +46,8 @@ class Particle(object):
     In total this class contains: name, method, variables, efficiency (of preCuts) and all decay channels of a particle.
     """
 
-    ## Create new class called DecayChannel via namedtuple. namedtuples are like a struct in C with two members: name and daughters
-    DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters')
+    ## Create new class called DecayChannel via namedtuple. namedtuples are like a struct in C with three members: name, daughters and partial
+    DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, partial')
 
     def __init__(self, name, variables, method, efficiency=0.90):
         """
@@ -69,13 +69,30 @@ class Particle(object):
         ## Minimum signal efficiency of preCuts for this particle
         self.efficiency = efficiency
 
+    @property
+    def partial_channels(self):
+        return [channel for channel in self.channels if channel.partial]
+
+    @property
+    def complete_channels(self):
+        return [channel for channel in self.channels if not channel.partial]
+
     def addChannel(self, daughters):
         """
         Appends a new decay channel to the Particle object.
         @param daughters is a list of pdg particle names e.g. ['pi+','K-']
         """
         # Append a new DecayChannel two the channel member
-        self.channels.append(Particle.DecayChannel(name=self.name + ' ->' + ' '.join(daughters), daughters=daughters))
+        self.channels.append(Particle.DecayChannel(name=self.name + ' ->' + ' '.join(daughters), daughters=daughters, partial=False))
+        return self
+
+    def addPartialChannel(self, daughters):
+        """
+        Appends a new partial decay channel with one missing particle to the Particle object.
+        @param daughters is a list of pdg particle names e.g. ['pi+','K-']
+        """
+        # Append a new DecayChannel two the channel member
+        self.channels.append(Particle.DecayChannel(name=self.name + ' ->' + ' '.join(daughters), daughters=daughters, partial=True))
         return self
 
 
@@ -123,7 +140,7 @@ def FullReconstruction(path, particles):
                 seq.addResource('Variables_' + particle.name, particle.variables)
             for channel in particle.channels:
                 seq.addResource('Name_' + channel.name, channel.name)
-                seq.addResource('Variables_' + channel.name, particle.variables + ['daughter{i}(ExtraInfo(signalProbability))'.format(i=i) for i in range(0, len(channel.daughters))])
+                seq.addResource('Variables_' + channel.name, particle.variables + ['daughter{i}(getExtraInfo(SignalProbability))'.format(i=i) for i in range(0, len(channel.daughters))])
                 seq.addResource('IsIgnored_' + channel.name, False)
 
             ########### RECONSTRUCTION ACTORS ##########

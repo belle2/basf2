@@ -21,52 +21,15 @@
 namespace Belle2 {
   namespace TMVAInterface {
 
-    Method::Method(std::istream& istream)
+
+    std::string makeROOTCompatible(std::string str)
     {
-
-      // Read out the variables and the method used for the training from the given xml-stream.
-      // If the format of the TMVA xml-weightfile changes we need to change the code only in the next block
-      std::vector<std::string> variables;
-      std::string method;
-      try {
-        boost::property_tree::ptree pt;
-        boost::property_tree::xml_parser::read_xml(istream, pt);
-        for (const auto & f : pt.get_child("MethodSetup.Variables")) {
-          if (f.first.data() != std::string("Variable")) continue;
-          variables.push_back(f.second.get<std::string>("<xmlattr>.Expression"));
-        }
-        method = pt.get<std::string>("MethodSetup.<xmlattr>.Method");
-      } catch (const std::exception& ex) {
-        B2ERROR("There was an error while scanning the stream of the file for the used variables and the used method: " << ex.what())
-      }
-
-      // Set name and type of the method.
-      // If the method is of the form Plugins::* its a plugin method. -> (*, "Plugin")
-      // Else it's a builtin method -> therfore split method into (name, type) pair
-      std::string prefix("Plugins::");
-      std::string name;
-      std::string type;
-      if (method.compare(0,  prefix.size(), prefix) == 0) {
-        name = method.substr(prefix.size(), method.size());
-        type = "Plugin";
-      } else {
-        size_t pos = method.find(':');
-        if (pos == std::string::npos) {
-          B2ERROR("Couldn't read name of method out of given stream of the weightfile")
-        }
-        type = method.substr(0, pos);
-        name = method.substr(pos + 2, std::string::npos);
-      }
-      init(name, type, std::string(), variables);
-
+      str.erase(std::remove(str.begin(), str.end(), '('), str.end());
+      str.erase(std::remove(str.begin(), str.end(), ')'), str.end());
+      return str;
     }
 
     Method::Method(std::string name, std::string type, std::string config, std::vector<std::string> variables)
-    {
-      init(name, type, config, variables);
-    }
-
-    void Method::init(std::string name, std::string type, std::string config, std::vector<std::string> variables)
     {
 
       m_name = name;
@@ -83,6 +46,7 @@ namespace Belle2 {
       } else {
         m_type = TMVA::Types::Instance().GetMethodType(type);
       }
+      m_type_as_string = type;
 
       // Load variables from the VariableManager
       VariableManager& manager = VariableManager::Instance();

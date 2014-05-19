@@ -59,7 +59,7 @@ namespace Belle2 {
     }
 
     m_method = new TMVAInterface::Expert(m_methodPrefix, m_workingDirectory, m_methodName, m_signalCluster);
-    VariableManager::Instance().registerParticleExtraInfoVariable(m_signalProbabilityName, "TMVA Expert SignalProbability Variable");
+
   }
 
 

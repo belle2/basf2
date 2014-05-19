@@ -69,7 +69,6 @@ namespace Belle2 {
        */
       void train(std::string factoryOption = "!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification", std::string prepareOption = "SplitMode=random:!V");
 
-
     private:
       std::string m_prefix; /**< used to identify the outputted training files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml */
       std::string m_workingDirectory; /**< workingDirectory where the config file and weight file directory is stored */

@@ -32,8 +32,6 @@ namespace Belle2 {
     Teacher::Teacher(std::string prefix, std::string workingDirectory, std::string target, std::vector<Method> methods) : m_prefix(prefix), m_workingDirectory(workingDirectory), m_methods(methods)
     {
 
-      const auto& variables = m_methods[0].getVariables();
-      m_input.resize(variables.size());
 
       // Get Pointer to VariableManager::Var for the provided target name
       VariableManager& manager = VariableManager::Instance();
@@ -44,15 +42,18 @@ namespace Belle2 {
       m_target = 0;
 
       // Create new tree which stores the niput and target variable
+      const auto& variables = m_methods[0].getVariables();
+      m_input.resize(variables.size());
       m_tree = new TTree((m_prefix + "_tree").c_str(), (m_prefix + "_tree").c_str());
       for (unsigned int i = 0; i < variables.size(); ++i)
-        m_tree->Branch(variables[i]->name.c_str(), &m_input[i]);
-      m_tree->Branch(m_target_var->name.c_str(), &m_target);
+        m_tree->Branch(makeROOTCompatible(variables[i]->name).c_str(), &m_input[i]);
+      m_tree->Branch(makeROOTCompatible(m_target_var->name).c_str(), &m_target);
 
     }
 
     Teacher::~Teacher()
     {
+
       delete m_tree;
     }
 
@@ -100,6 +101,13 @@ namespace Belle2 {
         pt.add_child("Setup.Clusters.Cluster", node);
       }
 
+
+      for (auto & x : m_methods[0].getVariables()) {
+        boost::property_tree::ptree node;
+        node.put("Name", x->name);
+        pt.add_child("Setup.Variables.Variable", node);
+      }
+
       if (m_cluster_count.size() <= 1) {
         B2ERROR("Found less than two clusters in sample, no training necessary!")
         return;
@@ -128,12 +136,13 @@ namespace Belle2 {
 
             // Add variables to the factory
             for (auto & var : m_methods[0].getVariables()) {
-              factory.AddVariable(var->name);
+              factory.AddVariable(makeROOTCompatible(var->name));
             }
 
             factory.AddSignalTree(m_tree);
             factory.AddBackgroundTree(m_tree);
-            factory.PrepareTrainingAndTestTree(TCut((m_target_var->name + " == " + signal.str()).c_str()), TCut((m_target_var->name + " == " + bckgrd.str()).c_str()), prepareOption);
+            factory.PrepareTrainingAndTestTree(TCut((makeROOTCompatible(m_target_var->name) + " == " + signal.str()).c_str()),
+                                               TCut((makeROOTCompatible(m_target_var->name) + " == " + bckgrd.str()).c_str()), prepareOption);
 
             // Append the trained methods to the config xml file
             for (auto & method : m_methods) {
@@ -141,6 +150,7 @@ namespace Belle2 {
               method_node.put("SignalID", x.first);
               method_node.put("BackgroundID", y.first);
               method_node.put("MethodName", method.getName());
+              method_node.put("MethodType", method.getTypeAsString());
               method_node.put("Weightfile", std::string("weights/") + prefix + std::string("_") + method.getName() + std::string(".weights.xml"));
               factory.BookMethod(method.getType(), method.getName(), method.getConfig());
               node.add_child("Methods.Method", method_node);

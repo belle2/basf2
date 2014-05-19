@@ -49,6 +49,13 @@ namespace Belle2 {
         boost::property_tree::ptree pt;
         boost::property_tree::xml_parser::read_xml(configstream, pt);
 
+        std::vector<std::string> variables;
+        // First read out the different clusters
+        for (const auto & f : pt.get_child("Setup.Variables")) {
+          if (f.first.data() != std::string("Variable")) continue;
+          variables.push_back(f.second.get<std::string>("Name"));
+        }
+
         // First read out the different clusters
         for (const auto & f : pt.get_child("Setup.Clusters")) {
           if (f.first.data() != std::string("Cluster")) continue;
@@ -67,6 +74,7 @@ namespace Belle2 {
             // We're only interested in one of the methods! So skip the others
             std::string _methodName = g.second.get<std::string>("MethodName");
             if (_methodName != methodName) continue;
+            std::string methodType = g.second.get<std::string>("MethodType");
 
             // Now check if the signalCluster was used as signal or background in this training
             int signalID = g.second.get<int>("SignalID");
@@ -81,13 +89,12 @@ namespace Belle2 {
               if (not istream.good()) {
                 B2ERROR("Couldn't open weightfile" << weightfile)
               }
-              Method* method = new Method(istream);
+              Method* method = new Method(methodName, methodType, std::string(), variables);
 
-              // Set the variablaes
-              const auto& variables = method->getVariables();
-              m_input.resize(variables.size(), 0);
-              for (unsigned int i = 0; i < variables.size(); ++i) {
-                reader->AddVariable(variables[i]->name, &m_input[i]);
+              const auto& vars = method->getVariables();
+              m_input.resize(vars.size(), 0);
+              for (unsigned int i = 0; i < vars.size(); ++i) {
+                reader->AddVariable(makeROOTCompatible(vars[i]->name), &m_input[i]);
               }
 
               // Book the methoid

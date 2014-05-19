@@ -34,10 +34,10 @@ namespace {
     const VariableManager::Var* daughter1P = VariableManager::Instance().getVariable("daughter1(p)");
     EXPECT_TRUE(daughter1P != nullptr);
 
-    const VariableManager::Var* extraInfo = VariableManager::Instance().getVariable("ExtraInfo(signalProbability)");
+    const VariableManager::Var* extraInfo = VariableManager::Instance().getVariable("getExtraInfo(signalProbability)");
     EXPECT_TRUE(extraInfo != nullptr);
 
-    const VariableManager::Var* nested = VariableManager::Instance().getVariable("daughterSumOf(daughter1(ExtraInfo(signalProbability)))");
+    const VariableManager::Var* nested = VariableManager::Instance().getVariable("daughterSumOf(daughter1(getExtraInfo(signalProbability)))");
     EXPECT_TRUE(nested != nullptr);
 
     const VariableManager::Var* funcDoesNotExists = VariableManager::Instance().getVariable("funcDoesNotExist(p)");

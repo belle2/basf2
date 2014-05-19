@@ -41,7 +41,7 @@ const VariableManager::Var* VariableManager::createVariable(const std::string& n
   boost::match_results<std::string::const_iterator> results;
 
   if (boost::regex_match(name, results, allowedForm)) {
-    if (results[1] == "GetExtraInfo") {
+    if (results[1] == "getExtraInfo") {
       auto extraInfoName = results[2];
       func = [extraInfoName](const Particle * particle) -> double {
         return particle->getExtraInfo(extraInfoName);
@@ -58,12 +58,16 @@ const VariableManager::Var* VariableManager::createVariable(const std::string& n
         };
       } else if (results[1] == "daughterSumOf") {
         func = [var](const Particle * particle) -> double {
-          double sum = 1.0;
+          double sum = 0.0;
           for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
             sum += var->function(particle->getDaughter(j));
           }
           return sum;
         };
+      } else if (results[1] == "abs") {
+        func = [var](const Particle * particle) -> double { return std::abs(var->function(particle)); };
+      } else if (results[1] == "daughter0") {
+        func = [var](const Particle * particle) -> double { return var->function(particle->getDaughter(0)); };
       } else if (results[1] == "daughter1") {
         func = [var](const Particle * particle) -> double { return var->function(particle->getDaughter(1)); };
       } else if (results[1] == "daughter2") {
@@ -83,6 +87,11 @@ const VariableManager::Var* VariableManager::createVariable(const std::string& n
   } else {
     return nullptr;
   }
+
+  std::string escapedName = name;
+  std::replace(escapedName.begin(), escapedName.end(), '(', '_');
+  std::replace(escapedName.begin(), escapedName.end(), ')', '_');
+
   Var* var = new Var(name, func, name);
   m_variables[name] = var;
   m_variablesInRegistrationOrder.push_back(var);
@@ -111,25 +120,6 @@ void VariableManager::registerVariable(const std::string& name, VariableManager:
   }
 }
 
-void VariableManager::registerParticleExtraInfoVariable(const std::string& name, const std::string& description)
-{
-
-  const static boost::regex allowedNameRegex("^[a-zA-Z0-9_]*$");
-  if (!boost::regex_match(name, allowedNameRegex)) {
-    B2FATAL("Variable '" << name << "' contains forbidden characters! Only alphanumeric characters plus underscores (_) are allowed for variable names.");
-  }
-
-  auto mapIter = m_variables.find(name);
-  if (mapIter == m_variables.end()) {
-    auto func = [name](const Particle * particle) -> double {
-      return particle->getExtraInfo(name);
-    };
-    Var* var = new Var(name, func, description);
-    m_variables[name] = var;
-    m_variablesInRegistrationOrder.push_back(var);
-  }
-
-}
 std::vector<std::string> VariableManager::getNames() const
 {
   std::vector<std::string> names;

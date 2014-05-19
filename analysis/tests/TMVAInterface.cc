@@ -38,34 +38,19 @@ namespace {
     EXPECT_EQ(method.getVariables()[2]->name, "eid");
   }
 
-  TEST(TMVAInterface, BuiltinMethodIsLoadedCorrectly)
-  {
-    std::ifstream stream(FileSystem::findFile("/analysis/tests/weights/builtin_correct.weights.xml"));
-    auto method = Method(stream);
-    EXPECT_EQ(method.getName(), "BoostedDecisionTrees");
-    EXPECT_EQ(method.getType(), TMVA::Types::kBDT);
-    EXPECT_EQ(method.getConfig(), std::string());
-    EXPECT_EQ(method.getVariables().size(), 3u);
-    EXPECT_EQ(method.getVariables()[0]->name, "p");
-    EXPECT_EQ(method.getVariables()[1]->name, "pt");
-    EXPECT_EQ(method.getVariables()[2]->name, "eid");
-  }
 
   TEST(TMVAInterface, BuiltinMethodFailsCorrectly)
   {
-    std::ifstream stream_method(FileSystem::findFile("/analysis/tests/weights/builtin_incorrect_method.weights.xml"));
-    std::ifstream stream_variable(FileSystem::findFile("/analysis/tests/weights/builtin_incorrect_variable.weights.xml"));
-    EXPECT_DEATH(Method {stream_method}, ".*");
-    EXPECT_B2ERROR(Method {stream_variable});
     EXPECT_B2ERROR(Method("BoostedDecisionTree", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100", std::vector<std::string>({"p", "DOES_NOT_EXIST", "eid"})));
     EXPECT_DEATH(Method("BoostedDecisionTree", "DOES_NOT_EXIST", "!H:!V:CreateMVAPdfs:NTrees=100", std::vector<std::string>({"p", "pt", "eid"})), ".*");
   }
 
   TEST(TMVAInterface, PluginMethodIsConstructedCorrectly)
   {
-    auto method = Method("MyOwnBDT", "Plugin", "!H:!V:CreateMVAPdfs:NTrees=100", std::vector<std::string>({"p", "pt", "eid"}));
-    EXPECT_EQ(method.getName(), "MyOwnBDT");
+    auto method = Method("FastBDT", "Plugin", "!H:!V:CreateMVAPdfs:NTrees=100", std::vector<std::string>({"p", "pt", "eid"}));
+    EXPECT_EQ(method.getName(), "FastBDT");
     EXPECT_EQ(method.getType(), TMVA::Types::kPlugins);
+    EXPECT_EQ(method.getTypeAsString(), "Plugin");
     EXPECT_EQ(method.getConfig(), "!H:!V:CreateMVAPdfs:NTrees=100");
     EXPECT_EQ(method.getVariables().size(), 3u);
     EXPECT_EQ(method.getVariables()[0]->name, "p");
@@ -74,24 +59,8 @@ namespace {
   }
 
 
-  TEST(TMVAInterface, PluginMethodIsLoadedCorrectly)
-  {
-    std::ifstream stream(FileSystem::findFile("/analysis/tests/weights/plugin_correct.weights.xml"));
-    auto method = Method(stream);
-    EXPECT_EQ(method.getName(), "OwnBDT");
-    EXPECT_EQ(method.getType(), TMVA::Types::kPlugins);
-    EXPECT_EQ(method.getConfig(), std::string());
-    EXPECT_EQ(method.getVariables().size(), 3u);
-    EXPECT_EQ(method.getVariables()[0]->name, "p");
-    EXPECT_EQ(method.getVariables()[1]->name, "pt");
-    EXPECT_EQ(method.getVariables()[2]->name, "eid");
-  }
-
   TEST(TMVAInterface, PluginMethodFailsCorrectly)
   {
-    std::ifstream stream_method(FileSystem::findFile("/analysis/tests/weights/plugin_incorrect_method.weights.xml"));
-    std::ifstream stream_variable(FileSystem::findFile("/analysis/tests/weights/plugin_incorrect_variable.weights.xml"));
-    EXPECT_B2ERROR(Method {stream_variable});
     EXPECT_B2ERROR(Method("MyOwnBDT", "Plugin", "!H:!V:CreateMVAPdfs:NTrees=100", std::vector<std::string>({"p", "DOES_NOT_EXIST", "eid"})));
     // TODO Currently TPluginManager doesn't fail here if Method can't be loaed
     // EXPECT_DEATH(Method {stream_method}, ".*");
@@ -125,10 +94,8 @@ namespace {
     StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
     DataStore::Instance().setInitializeActive(false);
 
-    std::vector<std::string> variables = {"p", "someInput"};
-    std::string target = "target";
-    VariableManager::Instance().registerParticleExtraInfoVariable("target", "target for TMVA Teacher unit test");
-    VariableManager::Instance().registerParticleExtraInfoVariable("someInput", "some input variable");
+    std::vector<std::string> variables = {"p", "getExtraInfo(someInput)"};
+    std::string target = "getExtraInfo(target)";
 
     std::vector<TMVAInterface::Method> methods;
     //methods.push_back(TMVAInterface::Method("NeuroBayes", "Plugin", "!H:CreateMVAPdfs:V:NTrainingIter=50:TrainingMethod=BFGS", variables));

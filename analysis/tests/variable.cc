@@ -24,6 +24,28 @@ namespace {
     const VariableManager::Var* pvar = VariableManager::Instance().getVariable("p");
     EXPECT_TRUE(pvar != nullptr);
 
+    //test special variable operations
+    const VariableManager::Var* daughterProductP = VariableManager::Instance().getVariable("daughterProductOf(p)");
+    EXPECT_TRUE(daughterProductP != nullptr);
+
+    const VariableManager::Var* daughterSumP = VariableManager::Instance().getVariable("daughterSumOf(p)");
+    EXPECT_TRUE(daughterSumP != nullptr);
+
+    const VariableManager::Var* daughter1P = VariableManager::Instance().getVariable("daughter1(p)");
+    EXPECT_TRUE(daughter1P != nullptr);
+
+    const VariableManager::Var* extraInfo = VariableManager::Instance().getVariable("ExtraInfo(signalProbability)");
+    EXPECT_TRUE(extraInfo != nullptr);
+
+    const VariableManager::Var* nested = VariableManager::Instance().getVariable("daughterSumOf(daughter1(ExtraInfo(signalProbability)))");
+    EXPECT_TRUE(nested != nullptr);
+
+    const VariableManager::Var* funcDoesNotExists = VariableManager::Instance().getVariable("funcDoesNotExist(p)");
+    EXPECT_TRUE(funcDoesNotExists == nullptr);
+
+    const VariableManager::Var* nestedDoesNotExist = VariableManager::Instance().getVariable("daughterSumOf(daughter1(ExtraInfoWrongName(signalProbability)))");
+    EXPECT_TRUE(nestedDoesNotExist != nullptr);
+
     //re-registration not allowed
     EXPECT_B2FATAL(VariableManager::Instance().registerVariable("p", &dummyVar, "description"));
 

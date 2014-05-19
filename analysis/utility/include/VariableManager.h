@@ -81,21 +81,24 @@ namespace Belle2 {
      *
      * Returns NULL if name not found.
      */
-    const Var* getVariable(const std::string& name) const;
+    const Var* getVariable(const std::string& name);
 
     /** Return list of all variables (in order registered). */
     std::vector<const Var*> getVariables() const { return m_variablesInRegistrationOrder; }
 
     /** Register a variable. */
     void registerVariable(const std::string& name, VariableManager::FunctionPtr f, const std::string& description);
+
+    /** Creates and registers a variable of the form func(varname) */
+    const Var* createVariable(const std::string& name);
+
 #endif
 
     /** evaluate variable 'varName' on given Particle.
      *
      * Aborts with B2FATAL if variable isn't found. Assumes 'p' is != NULL.
      */
-    double evaluate(const std::string& varName, const Particle* p) const;
-
+    double evaluate(const std::string& varName, const Particle* p);
 
     /** Return list of all variable names (in order registered). */
     std::vector<std::string> getNames() const;

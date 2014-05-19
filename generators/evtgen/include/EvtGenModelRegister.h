@@ -72,6 +72,7 @@ namespace Belle2 {
     std::vector<ModelFactory*> m_models;
   };
 
+  /** Class to register B2_EVTGEN_REGISTER_MODEL */
 #define B2_EVTGEN_REGISTER_MODEL(classname) namespace {\
     Belle2::EvtGenModelRegister::Factory<classname> EvtGenModelFactory_##classname; \
   }

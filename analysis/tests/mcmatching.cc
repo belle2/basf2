@@ -15,7 +15,8 @@
 using namespace std;
 using namespace Belle2;
 
-#if defined(__ICC) || defined(__INTEL_COMPILER)
+//checks against update3
+#if defined(__INTEL_COMPILER) && ((__INTEL_COMPILER < 1400) || (__INTEL_COMPILER_BUILD_DATE < 20140422))
 namespace {
   TEST(MCMatchingTest, TestsDisabled)
   {

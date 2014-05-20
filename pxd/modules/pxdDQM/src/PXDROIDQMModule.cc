@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/modules/pxdDQM/pxdROIDQMModule.h>
+#include <pxd/modules/pxdDQM/PXDROIDQMModule.h>
 
 #include <string>
 
@@ -19,20 +19,20 @@ using namespace Belle2::PXD;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(pxdROIDQM)
+REG_MODULE(PXDROIDQM)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-pxdROIDQMModule::pxdROIDQMModule() : HistoModule() , m_storeROIs()
+PXDROIDQMModule::PXDROIDQMModule() : HistoModule() , m_storeROIs()
 {
   //Set module properties
   setDescription("Monitor ROIs");
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
-void pxdROIDQMModule::defineHisto()
+void PXDROIDQMModule::defineHisto()
 {
   hrawROIcount = new TH1F("hrawROIcount", "ROI count;Nr per Event", 256, 0, 256);
   hrawROItype = new TH1F("hrawROIytpe", "ROI type;Nr per Event", 2, 0, 2);
@@ -54,12 +54,12 @@ void pxdROIDQMModule::defineHisto()
   hrawROIDCcol2 = new TH1F("hrawROIDCcol2", "DATCON ROI col2;Nr per Event", 256, 0, 256);
 }
 
-void pxdROIDQMModule::initialize()
+void PXDROIDQMModule::initialize()
 {
   REG_HISTOGRAM
 }
 
-void pxdROIDQMModule::beginRun()
+void PXDROIDQMModule::beginRun()
 {
   // Just to make sure, reset all the histograms.
   hrawROIcount->Reset();
@@ -82,7 +82,7 @@ void pxdROIDQMModule::beginRun()
   hrawROIDCcol2->Reset();
 }
 
-void pxdROIDQMModule::event()
+void PXDROIDQMModule::event()
 {
   for (auto & it : m_storeROIs) {
     int nr;

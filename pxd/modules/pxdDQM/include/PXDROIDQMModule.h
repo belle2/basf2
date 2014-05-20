@@ -3,21 +3,19 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Klemens Lautenbach, Bjoern Spruck                        *
+ * Contributors: Bjoern Spruck                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef pxdRawDQMModule_H
-#define pxdRawDQMModule_H
+#ifndef PXDROIDQMModule_H
+#define PXDROIDQMModule_H
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <pxd/dataobjects/PXDRawHit.h>
-#include <rawdata/dataobjects/RawPXD.h>
+#include <pxd/dataobjects/PXDRawROIs.h>
 #include <string>
-//#include <map>
 #include <TH2.h>
 
 namespace Belle2 {
@@ -30,14 +28,14 @@ namespace Belle2 {
      *
      * Creates basic DQM for Raw PXD data and Pixels
      */
-    class pxdRawDQMModule : public HistoModule {
+    class PXDROIDQMModule : public HistoModule {
 
     public:
 
       /** Constructor defining the parameters */
-      pxdRawDQMModule();
+      PXDROIDQMModule();
 
-      // virtual ~pxdRawDQMModule();
+      // virtual ~PXDROIDQMModule();
 
       virtual void initialize();
 
@@ -47,25 +45,28 @@ namespace Belle2 {
 
     private:
 
-      /** Storearray for raw data packets  */
-      StoreArray<RawPXD> m_storeRawPxdrarray;
-      /** Storearray for raw pixels   */
-      StoreArray<PXDRawHit> m_storeRawHits;
+      /** Storearray for ROIs  */
+      StoreArray<PXDRawROIs> m_storeROIs;
 
-      /** Histogram number of raw packets */
-      TH1F* hrawPxdPackets;
-      /** Histogram raw packet size */
-      TH1F* hrawPxdPacketSize;
-      /** Histogram pixelcount/??? */
-      TH1F* hrawPxdHitsCount;
       /** Histogram 2d hitmap */
-      TH2F* hrawPxdHits[10];
-      /** Histogram raw pixel charge */
-      TH1F* hrawPxdHitsCharge[10];
-      /** Histogram raw pixel common mode */
-      TH1F* hrawPxdHitsCommonMode[10];
-      /** Histogram raw pixel trigger window */
-      TH1F* hrawPxdHitsTimeWindow[10];
+      TH1F* hrawROIcount;     /** Histogram  */
+      TH1F* hrawROItype;     /** Histogram  */
+
+      TH2F* hrawROIHLTmap;      /** Histogram  */
+      TH2F* hrawROIHLTsize;      /** Histogram  */
+      TH1F* hrawROIHLT_DHHID;     /** Histogram  */
+      TH1F* hrawROIHLTrow1;     /** Histogram  */
+      TH1F* hrawROIHLTrow2; /** Histogram  */
+      TH1F* hrawROIHLTcol1; /** Histogram  */
+      TH1F* hrawROIHLTcol2; /** Histogram  */
+
+      TH2F* hrawROIDCmap;      /** Histogram  */
+      TH2F* hrawROIDCsize;      /** Histogram  */
+      TH1F* hrawROIDC_DHHID;     /** Histogram  */
+      TH1F* hrawROIDCrow1;     /** Histogram  */
+      TH1F* hrawROIDCrow2; /** Histogram  */
+      TH1F* hrawROIDCcol1; /** Histogram  */
+      TH1F* hrawROIDCcol2; /** Histogram  */
 
       //map<int,int> sensor_to_histindex;
 
@@ -78,4 +79,4 @@ namespace Belle2 {
   } //end PXD namespace;
 } // end namespace Belle2
 
-#endif // pxdRawDQMModule_H
+#endif // PXDROIDQMModule_H

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/modules/pxdDQM/pxdRawDQMModule.h>
+#include <pxd/modules/pxdDQM/PXDRawDQMModule.h>
 
 #include <string>
 
@@ -19,20 +19,20 @@ using namespace Belle2::PXD;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(pxdRawDQM)
+REG_MODULE(PXDRawDQM)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-pxdRawDQMModule::pxdRawDQMModule() : HistoModule() , m_storeRawPxdrarray() , m_storeRawHits()
+PXDRawDQMModule::PXDRawDQMModule() : HistoModule() , m_storeRawPxdrarray() , m_storeRawHits()
 {
   //Set module properties
   setDescription("Monitor raw PXD");
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
-void pxdRawDQMModule::defineHisto()
+void PXDRawDQMModule::defineHisto()
 {
   hrawPxdPackets = new TH1F("hrawPxdPackets", "Pxd Raw Packet Nr;Nr per Event", 16, 0, 16);
   hrawPxdPacketSize = new TH1F("hrawPxdPacketSize", "Pxd Raw Packetsize;Words per packet", 1024, 0, 1024);
@@ -47,12 +47,12 @@ void pxdRawDQMModule::defineHisto()
   }
 }
 
-void pxdRawDQMModule::initialize()
+void PXDRawDQMModule::initialize()
 {
   REG_HISTOGRAM
 }
 
-void pxdRawDQMModule::beginRun()
+void PXDRawDQMModule::beginRun()
 {
   // Just to make sure, reset all the histograms.
   hrawPxdPackets->Reset();
@@ -66,7 +66,7 @@ void pxdRawDQMModule::beginRun()
   }
 }
 
-void pxdRawDQMModule::event()
+void PXDRawDQMModule::event()
 {
   hrawPxdPackets->Fill(m_storeRawPxdrarray.getEntries());
 

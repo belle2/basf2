@@ -83,10 +83,10 @@ void CollectorTFInfo::initSectors(const std::vector< std::pair <std::pair<unsign
   B2DEBUG(100, "CollectorTFInfo: initSectors");
 
   // Parameters to get the different corners
-  std::pair<double, double> aRelCoor_corner1 = {0, 0};
-  std::pair<double, double> aRelCoor_corner2 = {0, 1};
-  std::pair<double, double> aRelCoor_corner3 = {1, 0};
-  std::pair<double, double> aRelCoor_corner4 = {1, 1};
+//   std::pair<double, double> aRelCoor_corner1 = {0, 0};
+//   std::pair<double, double> aRelCoor_corner2 = {0, 1};
+//   std::pair<double, double> aRelCoor_corner3 = {1, 0};
+//   std::pair<double, double> aRelCoor_corner4 = {1, 1};
 
   int sectorSize = sectors.size();
 
@@ -116,39 +116,13 @@ void CollectorTFInfo::initSectors(const std::vector< std::pair <std::pair<unsign
 
     B2DEBUG(100, "CollectorTFInfo: initSectors, aSecID: " << aSecID);
 
+    // Error !!! : VXD Sensor * does not exist.
+    /*
     std::pair<float, float> aRelCoor; // reusage of temporal value
-//     // 1. Corner Calculate
-//     std::pair<float, float> aRelCoor = aTool.calcNormalizedSectorPoint(secConfigU, secConfigV, aSecID, aRelCoor_corner1);
-//
-// //     B2DEBUG(100, "CollectorTFInfo: initSectors, calcNormalizedSectorPoints: " << aSecID);
-//
-//     aRelCoor = SpacePoint::convertToLocalCoordinatesNormalized(aRelCoor, aVxdID);
-//
-// //     B2DEBUG(100, "CollectorTFInfo: initSectors, convertToLocalCoordinatesNormalized: " << aSecID);
-//
-//     TVector3 corner1Global = SpacePoint::getGlobalCoordinates(aRelCoor, aVxdID);
-//
-// //     B2DEBUG(100, "CollectorTFInfo: initSectors, getGlobalCoordinates: " << aSecID);
-//
-//     newsector.setPoint(0, corner1Global);
-//
-//     // 2. Corner Calculate
-//     aRelCoor = aTool.calcNormalizedSectorPoint(secConfigU, secConfigV, aSecID, aRelCoor_corner2);
-//     aRelCoor = SpacePoint::convertToLocalCoordinatesNormalized(aRelCoor, aVxdID);
-//     TVector3 corner2Global = SpacePoint::getGlobalCoordinates(aRelCoor, aVxdID);
-//     newsector.setPoint(1, corner2Global);
-//
-//     // 3. Corner Calculate
-//     aRelCoor = aTool.calcNormalizedSectorPoint(secConfigU, secConfigV, aSecID, aRelCoor_corner3);
-//     aRelCoor = SpacePoint::convertToLocalCoordinatesNormalized(aRelCoor, aVxdID);
-//     TVector3 corner3Global = SpacePoint::getGlobalCoordinates(aRelCoor, aVxdID);
-//     newsector.setPoint(2, corner3Global);
-//
-//     // 4. Corner Calculate
-//     aRelCoor = aTool.calcNormalizedSectorPoint(secConfigU, secConfigV, aSecID, aRelCoor_corner4);
-//     aRelCoor = SpacePoint::convertToLocalCoordinatesNormalized(aRelCoor, aVxdID);
-//
+
     // 1. Corner Calculate
+
+
     aRelCoor = SectorTools::calcNormalizedSectorPoint(secConfigU, secConfigV, aSecID, aRelCoor_corner1);
     pair<double, double> localCorner00 = SpacePoint::convertNormalizedToLocalCoordinates(aRelCoor, aSecID);
     TVector3 corner1Global = SpacePoint::getGlobalCoordinates(localCorner00, aVxdID);
@@ -171,7 +145,7 @@ void CollectorTFInfo::initSectors(const std::vector< std::pair <std::pair<unsign
     pair<double, double> localCorner11 = SpacePoint::convertNormalizedToLocalCoordinates(aRelCoor, aVxdID);
     TVector3 corner4Global = SpacePoint::getGlobalCoordinates(localCorner11, aVxdID);
     newsector.setPoint(3, corner4Global);
-
+    */
 
     B2DEBUG(100, "CollectorTFInfo: initSectors, all Corners set: " << aSecID);
 

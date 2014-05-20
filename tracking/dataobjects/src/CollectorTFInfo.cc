@@ -111,10 +111,12 @@ void CollectorTFInfo::initSectors(const std::vector< std::pair <std::pair<unsign
 
     B2DEBUG(100, "CollectorTFInfo: initSectors, search for: " << currentFullSectorID);
 
-    VxdID aVxdID = currentFullSectorID.getVxdID();
+//     VxdID aVxdID = currentFullSectorID.getVxdID();
     unsigned short aSecID = currentFullSectorID.getSecID();
 
     B2DEBUG(100, "CollectorTFInfo: initSectors, aSecID: " << aSecID);
+    B2DEBUG(100, "CollectorTFInfo: initSectors, secConfigU size: " << secConfigU.size());
+    B2DEBUG(100, "CollectorTFInfo: initSectors, secConfigV size: " << secConfigV.size());
 
     // Error !!! : VXD Sensor * does not exist.
     /*

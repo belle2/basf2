@@ -249,7 +249,6 @@ void TFAnalizerModule::event()
   vector<VXDTrackCandidate> mcTcVector;
 
 
-
   /// get info needed for comparison and coord-export:
   B2DEBUG(1, "importing " << numOfMcTCs << " mcTrackCandidates...")
 
@@ -444,8 +443,11 @@ void TFAnalizerModule::event()
   B2DEBUG(100, "m_display " << m_display);
 
 
-  if (m_display == 1 && m_collectorFilePath.size() > 0) {
+  if (m_display > 0) {
     ana_collector.setAllParticleIDs(m_collectorThreshold);
+  }
+
+  if (m_display == 1 && m_collectorFilePath.size() > 0) {
 
     std::ostringstream oss;
     oss << m_collectorFilePath;
@@ -474,6 +476,49 @@ void TFAnalizerModule::event()
     oss_sectors << m_collectorFilePath;
     oss_sectors << "all_my_sector_event_" << m_eventCounter << ".csv";
     ana_collector.storeSectorInformation(oss_sectors.str(), false);
+  }
+
+  if (m_display == 2) {
+    // Test Output for display
+    //StoreArray<TrackCandidateTFInfo> tfcandTFInfo("");
+
+    for (auto & currentTC : tfcandTFInfo) {
+      B2DEBUG(100, "TC: " << currentTC.getOwnID() << ", AlternativeBox: " << currentTC.getDisplayAlternativeBox() << ", DisplayInformation: " << currentTC.getDisplayInformation());
+
+      std::vector<TVector3> allPosistions = currentTC.getCoordinates();
+
+      for (auto & currentPosition : allPosistions) {
+        B2DEBUG(100, "TC Postion: X: " << currentPosition.X() << ", Y: " << currentPosition.Y() << ", Z: " << currentPosition.Z());
+      }
+
+    }
+
+    StoreArray<CellTFInfo> cellTFInfo("");
+
+    for (auto & currentCell : cellTFInfo) {
+      B2DEBUG(100, "Cell: AlternativeBox: " << currentCell.getDisplayAlternativeBox() << ", DisplayInformation: " << currentCell.getDisplayInformation());
+
+      std::vector<TVector3> allPosistions = currentCell.getCoordinates();
+
+      for (auto & currentPosition : allPosistions) {
+        B2DEBUG(100, "Cell Postion: X: " << currentPosition.X() << ", Y: " << currentPosition.Y() << ", Z: " << currentPosition.Z());
+      }
+
+    }
+
+    StoreArray<SectorTFInfo> sectorTFInfo("");
+
+    for (auto & currentSector : sectorTFInfo) {
+      B2DEBUG(100, "Sector: " << currentSector.getSectorID() << ", AlternativeBox: " << currentSector.getDisplayAlternativeBox() << ", DisplayInformation: " << currentSector.getDisplayInformation());
+
+      std::vector<TVector3> allPosistions = currentSector.getCoordinates();
+
+      for (auto & currentPosition : allPosistions) {
+        B2DEBUG(100, "Sector Postion: X: " << currentPosition.X() << ", Y: " << currentPosition.Y() << ", Z: " << currentPosition.Z());
+      }
+
+    }
+
 
   }
 

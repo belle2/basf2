@@ -11,6 +11,8 @@
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <framework/logging/Logger.h>
 
+#include <cmath>
+
 using namespace std;
 using namespace Belle2;
 
@@ -31,6 +33,10 @@ void PIDLikelihood::setLogLikelihood(Const::EDetector det,
   int index = Const::PIDDetectors::set().getIndex(det);
   if (index < 0) {
     B2ERROR("PIDLikelihood::setLogLikelihood: detector is not a PID device");
+    return;
+  }
+  if (!isfinite(logl)) {
+    B2ERROR("PIDLikelihood::setLogLikelihood: log-likelihood for detector " << det << " is not finite (i.e. infinite or NaN)! Ignoring this value.");
     return;
   }
   m_detectors += det;

@@ -20,12 +20,12 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <tracking/dataobjects/VXDTFInfoBoard.h>
 
-#include <tracking/dataobjects/AnalizerCollectorTFInfo.h>
+#include <tracking/trackFindingVXD/displayInterface/AnalizerCollectorTFInfo.h>
 
 //genfit-stuff
 #include <genfit/TrackCand.h>
 
-#include <tracking/dataobjects/TrackCandidateTFInfo.h>
+#include <tracking/trackFindingVXD/displayInterface/TrackCandidateTFInfo.h>
 
 
 //stl-stuff

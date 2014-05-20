@@ -29,8 +29,8 @@
 #include "tracking/vxdCaTracking/PassData.h"
 
 // Includes for the Collector/Display
-#include <tracking/trackFindingVXD/displayInterface/CollectorTFInfo.h>
-#include <tracking/trackFindingVXD/displayInterface/ClusterTFInfo.h>
+#include <tracking/trackFindingVXD/displayInterfaceTF/CollectorTFInfo.h>
+#include <tracking/trackFindingVXD/displayInterfaceTF/ClusterTFInfo.h>
 
 //C++ base / C++ stl:
 #include <fstream>

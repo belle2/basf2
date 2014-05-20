@@ -1,6 +1,6 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <tracking/dataobjects/SectorTFInfo.h>
+#include <tracking/trackFindingVXD/displayInterfaceTF/SectorTFInfo.h>
 // #include <TMatrixF.h>
 // #include <RKTrackRep.h>
 #include <gtest/gtest.h>

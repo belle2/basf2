@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/dataobjects/SectorTFInfo.h>
+#include <tracking/trackFindingVXD/displayInterface/SectorTFInfo.h>
 
 using namespace std;
 using namespace Belle2;

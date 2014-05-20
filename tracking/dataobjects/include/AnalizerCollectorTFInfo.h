@@ -14,11 +14,11 @@
 #include <vector>
 #include <algorithm>
 
-#include <tracking/dataobjects/SectorTFInfo.h>
-#include <tracking/dataobjects/ClusterTFInfo.h>
-#include <tracking/dataobjects/HitTFInfo.h>
-#include <tracking/dataobjects/CellTFInfo.h>
-#include <tracking/dataobjects/TrackCandidateTFInfo.h>
+#include <tracking/trackFindingVXD/displayInterface/SectorTFInfo.h>
+#include <tracking/trackFindingVXD/displayInterface/ClusterTFInfo.h>
+#include <tracking/trackFindingVXD/displayInterface/HitTFInfo.h>
+#include <tracking/trackFindingVXD/displayInterface/CellTFInfo.h>
+#include <tracking/trackFindingVXD/displayInterface/TrackCandidateTFInfo.h>
 
 #include <string>
 

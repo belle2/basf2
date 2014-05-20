@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/dataobjects/HitTFInfo.h>
+#include <tracking/trackFindingVXD/displayInterface/HitTFInfo.h>
 
 using namespace std;
 using namespace Belle2;

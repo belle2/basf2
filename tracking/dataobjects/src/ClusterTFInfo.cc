@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/dataobjects/ClusterTFInfo.h>
+#include <tracking/trackFindingVXD/displayInterface/ClusterTFInfo.h>
 
 using namespace std;
 using namespace Belle2;

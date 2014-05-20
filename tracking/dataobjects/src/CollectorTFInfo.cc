@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/dataobjects/CollectorTFInfo.h>
+#include <tracking/trackFindingVXD/displayInterface/CollectorTFInfo.h>
 
 #include <framework/gearbox/Const.h>
 

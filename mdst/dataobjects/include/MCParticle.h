@@ -252,6 +252,9 @@ namespace Belle2 {
     const std::vector<Belle2::MCParticle*> getDaughters() const;
     //Need namespace qualifier because ROOT CINT has troubles otherwise
 
+    /** Return number of daughter MCParticles. */
+    int getNDaughters() const;
+
     /**
      * Returns a pointer to the mother particle. NULL if the particle doesn't
      * have a mother.

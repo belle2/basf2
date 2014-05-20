@@ -66,6 +66,12 @@ const vector<MCParticle*> MCParticle::getDaughters() const
   return result;
 }
 
+int MCParticle::getNDaughters() const
+{
+  if (getFirstDaughter() == 0) //no daughters
+    return 0;
+  return getLastDaughter() - getFirstDaughter() + 1;
+}
 
 void MCParticle::fixParticleList() const
 {

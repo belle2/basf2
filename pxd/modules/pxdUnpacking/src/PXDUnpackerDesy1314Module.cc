@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/modules/pxdUnpacking/PXDUnpackerModule.h>
+#include <pxd/modules/pxdUnpacking/PXDUnpackerDesy1314Module.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
 #include <rawdata/dataobjects/RawFTSW.h>
@@ -40,9 +40,6 @@
 #define DHHC_FRAME_HEADER_DATA_TYPE_DHH_START   0x3
 #define DHHC_FRAME_HEADER_DATA_TYPE_DHH_END     0x4
 
-// Free IDs are 0x7 0x8 0xA (0xE)
-#define DHHC_FRAME_HEADER_DATA_TYPE_HLT_HEADER      0xE
-
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::PXD;
@@ -50,7 +47,9 @@ using namespace Belle2::PXD;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDUnpacker)
+REG_MODULE(PXDUnpackerDesy1314)
+
+unsigned int error_mask = 0;
 
 #define ONSEN_ERR_FLAG_FTSW_DHHC_MM 0x00000001ul
 #define ONSEN_ERR_FLAG_DHHC_DHH_MM  0x00000002ul
@@ -85,7 +84,7 @@ REG_MODULE(PXDUnpacker)
 #define ONSEN_ERR_FLAG_DHH_ACTIVE   0x40000000ul
 #define ONSEN_ERR_FLAG_DHP_ACTIVE   0x80000000ul
 
-const string error_name[ONSEN_MAX_TYPE_ERR] = {
+string error_name[ONSEN_MAX_TYPE_ERR] = {
   "FTSW/DHHC mismatch", "DHHC/DHH mismatch", "DHHC/DHP mismatch", "DHHC_START missing",
   "DHHC_END missing", "DHH_START missing", "DHHC Framecount mismatch", "DATA outside of DHH",
   "Second DHHC_START", "Second DHHC_END", "Fixed size frame wrong size", "DHH CRC Error:",
@@ -102,11 +101,21 @@ const string error_name[ONSEN_MAX_TYPE_ERR] = {
 using boost::crc_optimal;
 typedef crc_optimal<32, 0x04C11DB7, 0, 0, false, false> dhh_crc_32_type;
 
+
+unsigned int type_error = 0, crc_error = 0, magic_error = 0, zerodata_error = 0;
+unsigned int queue_error = 0, fnr_error = 0, wie_error = 0, end_error = 0, evt_skip_error = 0, start_error = 0, evtnr_error = 0;
+// unsigned long long evt_counter = 0;
+unsigned int stat_start = 0, stat_end = 0, stat_ghost = 0, stat_raw = 0, stat_zsd = 0;
+unsigned int dhp_size_error = 0, dhp_pixel_error = 0, dhp_warning = 0;
+bool verbose = true;
+bool error_flag = false;
+bool ignore_datcon_flag = true;
+
 ///*********************************************************************************
 ///***************************** DHHC Code starts here *****************************
 ///*********************************************************************************
 
-static char* dhhc_type_name[16] = {
+char* dhhc_type_name[16] = {
   (char*)"DHP_RAW",
   (char*)"FCE_RAW",
   (char*)"GHOST  ",
@@ -126,42 +135,66 @@ static char* dhhc_type_name[16] = {
 };
 
 
-struct dhhc_frame_header_word0 {
-  const unsigned short data;
+class dhhc_frame_header_word0 {
+public:
+  unsigned short data;
   /// fixed length
-  inline unsigned int getData(void) const {
-    return data;
-  };
-  inline unsigned int getFrameType(void) const {
+  unsigned int get_type(void) {
     return (data >> 11) & 0xF;
   };
-  inline unsigned int getErrorFlag(void) const {
+  unsigned int get_err(void) {
     return (data >> 15) & 0x1;
   };
-  inline unsigned int getMisc(void) const {
+  unsigned int get_misc(void) {
     return data & 0x3FF;
   };
   void print(void) {
-    B2INFO("DHHC FRAME TYP " << hex << getFrameType() << " -> " << dhhc_type_name[getFrameType()] << " ERR " << getErrorFlag() << " data " << data);
+    if (verbose)
+      B2INFO("DHHC FRAME TYP " << hex << get_type() << " -> " << dhhc_type_name[get_type()] << " ERR " << get_err() << " data " << data);
   };
 };
 
-struct dhhc_start_frame {
+class dhhc_start_frame {
+public:
   dhhc_frame_header_word0 word0;
-  const unsigned short trigger_nr_lo;
-  const unsigned short trigger_nr_hi;
-  const unsigned short time_tag_lo_and_type;
-  const unsigned short time_tag_mid;
-  const unsigned short time_tag_hi;
-  const unsigned short nr_frames_in_event;
-  const unsigned short crc32lo;/// Changed to 2*16 because of automatic compiler alignment
-  const unsigned short crc32hi;
-  /// fixed length, only for reading
+  unsigned short trigger_nr_lo;
+  unsigned short trigger_nr_hi;
+  unsigned short time_tag_lo_and_type;
+  unsigned short time_tag_mid;
+  unsigned short time_tag_hi;
+  unsigned short nr_frames_in_event;
+  unsigned short crc32lo;/// Changed to 2*16 because of automatic compiler alignment
+  unsigned short crc32hi;
+  /// fixed length
 
-  unsigned short getEventNrLo(void) const {
+  unsigned short get_evtnr_lo(void) {
     return trigger_nr_lo;
   };
-  bool isFakedData(void) const {
+  unsigned int calc_crc(void) {
+    unsigned char* d;
+    dhh_crc_32_type bocrc;
+    char crcbuffer[size()];
+    d = (unsigned char*)this;
+
+    for (unsigned int k = 0; k < (size() - 4); k += 2) {
+      crcbuffer[k] = d[k + 1];
+      crcbuffer[k + 1] = d[k];
+    }
+    bocrc.process_bytes(crcbuffer, (size() - 4));
+    unsigned int c;
+    c = htonl(bocrc.checksum());
+    unsigned int crc32 = (crc32hi << 16) | crc32lo;
+    if (c == crc32) {
+      if (verbose)
+        B2INFO("DHHC Start Frame CRC " << hex << c << " == " << hex << crc32);
+    } else {
+      crc_error++;
+      B2ERROR("DHHC Start Frame CRC FAIL " << hex << c << " != " << hex << crc32);
+      error_flag = true;
+    }
+    return c;
+  };
+  bool is_fake(void) {
     unsigned int crc32 = (crc32hi << 16) | crc32lo;
     if (word0.data != 0x5800) return false;
     if (trigger_nr_lo != 0) return false;
@@ -173,127 +206,157 @@ struct dhhc_start_frame {
     if (crc32 != 0x2DA167EF) return false;
     return true;
   };
-  inline unsigned int getFixedSize(void) const {
+  inline static unsigned int size(void) {
     return 18;// bytes
   };
   void print(void) {
     word0.print();
-    unsigned int crc32 = (crc32hi << 16) | crc32lo;
-    B2INFO("DHHC Start Frame TNRLO $" << hex << trigger_nr_lo << " TNRHI $" << hex << trigger_nr_hi << " TTLO $" << hex << time_tag_lo_and_type
-           << " TTMID $" << hex << time_tag_mid << " TTHI $" << hex << time_tag_hi << " Frames in Event " << dec << nr_frames_in_event
-           << " CRC $" << hex << crc32);
+    if (verbose) {
+      unsigned int crc32 = (crc32hi << 16) | crc32lo;
+      B2INFO("DHHC Start Frame TNRLO $" << hex << trigger_nr_lo << " TNRHI $" << hex << trigger_nr_hi << " TTLO $" << hex << time_tag_lo_and_type
+             << " TTMID $" << hex << time_tag_mid << " TTHI $" << hex << time_tag_hi << " Frames in Event " << dec << nr_frames_in_event
+             << " CRC $" << hex << crc32 << " (calc) $" << calc_crc());
+    }
   };
-  inline unsigned int get_active_dhh_mask(void) const {return word0.getMisc() & 0x1F;};
-  inline unsigned int get_dhhc_id(void) const {return (word0.getMisc() >> 5) & 0xF;};
-  inline unsigned int get_dhhc_nr_frames(void) const {return nr_frames_in_event;};
+  inline unsigned int get_active_dhh_mask(void) {return word0.get_misc() & 0x1F;};
+  inline unsigned int get_dhhc_id(void) {return (word0.get_misc() >> 5) & 0xF;};
+  inline unsigned int get_dhhc_nr_frames(void) {return nr_frames_in_event;};
 };
 
-struct dhhc_dhh_start_frame {
+class dhhc_dhh_start_frame {
+public:
   dhhc_frame_header_word0 word0;
-  const unsigned short trigger_nr_lo;
-  const unsigned short dhh_time_tag_lo;
-  const unsigned short dhh_time_tag_hi;
-  const unsigned short sfnr_offset;
-  const unsigned short crc32lo;/// Changed to 2*16bit because of automatic compiler alignment
-  const unsigned short crc32hi;
+  unsigned short trigger_nr_lo;
+  unsigned short dhh_time_tag_lo;
+  unsigned short dhh_time_tag_hi;
+  unsigned short sfnr_offset;
+  unsigned short crc32lo;/// Changed to 2*16 because of automatic compiler alignment
+  unsigned short crc32hi;
   /// fixed length
 
-  inline unsigned short getEventNrLo(void) const {
+  inline unsigned short get_evtnr_lo(void) {
     return trigger_nr_lo;
   };
-  inline unsigned short getStartFrameNr(void) const {// last DHP frame before trigger
+  inline unsigned short get_sfnr(void) {// last DHP fraem before trigger
     return (sfnr_offset >> 10) & 0x3F;
   };
-  inline unsigned short getTriggerOffsetRow(void) const {// and trigger row offset
+  inline unsigned short get_toffset(void) {// and trigger row offset
     return sfnr_offset & 0x3FF;
   };
-  inline unsigned int getFixedSize(void) const {
+  unsigned int calc_crc(void) {
+    unsigned char* d;
+    dhh_crc_32_type bocrc;
+    char crcbuffer[size()];
+    d = (unsigned char*)this;
+
+    for (unsigned int k = 0; k < (size() - 4); k += 2) {
+      crcbuffer[k] = d[k + 1];
+      crcbuffer[k + 1] = d[k];
+    }
+    bocrc.process_bytes(crcbuffer, (size() - 4));
+    unsigned int c;
+    c = htonl(bocrc.checksum());
+    unsigned int crc32 = (crc32hi << 16) | crc32lo;
+    if (c == crc32) {
+      if (verbose)
+        B2INFO("DHHC DHH Start Frame CRC " << hex << c << " == " << hex << crc32);
+    } else {
+      crc_error++;
+      B2ERROR("DHHC DHH Start CRC FAIL " << hex << c << " != " << hex << crc32);
+      error_flag = true;
+    }
+    return c;
+  };
+  inline static unsigned int size(void) {
     return 14;// 7 words
   };
   void print(void) {
     word0.print();
-    unsigned int crc32 = (crc32hi << 16) | crc32lo;
-    B2INFO("DHHC Event Frame TNRLO $" << hex << trigger_nr_lo  << " DTTLO $" << hex << dhh_time_tag_lo << " DTTHI $" << hex << dhh_time_tag_hi
-           << " DHHID $" << hex << getDHHId()
-           << " DHPMASK $" << hex << getActiveDHPMask()
-           << " SFNR $" << hex << getStartFrameNr()
-           << " OFF $" << hex << getTriggerOffsetRow()
-           << " CRC " << hex << crc32);
+    if (verbose) {
+      unsigned int crc32 = (crc32hi << 16) | crc32lo;
+      B2INFO("DHHC Event Frame TNRLO $" << hex << trigger_nr_lo  << " DTTLO $" << hex << dhh_time_tag_lo << " DTTHI $" << hex << dhh_time_tag_hi
+             << " DHHID $" << hex << get_dhh_id()
+             << " DHPMASK $" << hex << get_active_dhp_mask()
+             << " SFNR $" << hex << get_sfnr()
+             << " OFF $" << hex << get_toffset()
+             << " CRC " << hex << crc32 << " (calc)" << calc_crc());
+    }
   };
-  inline unsigned int getActiveDHPMask(void) const {return word0.getMisc() & 0xF;};
-  inline unsigned int getDHHId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
+  inline unsigned int get_active_dhp_mask(void) {return word0.get_misc() & 0xF;};
+  inline unsigned int get_dhh_id(void) {return (word0.get_misc() >> 4) & 0x3F;};
 };
 
-struct dhhc_commode_frame {
+class dhhc_commode_frame {
+public:
   dhhc_frame_header_word0 word0;
-  const unsigned short trigger_nr_lo;
-  const unsigned short data[96];
-  const unsigned int crc32;
+  unsigned short trigger_nr_lo;
+  unsigned short data[96];
+  unsigned int crc32;
   /// fixed length
 
-  inline unsigned short getEventNrLo(void) const {
+  inline unsigned short get_evtnr_lo(void) {
     return trigger_nr_lo;
   };
-  inline unsigned int getFixedSize(void) const {
+  inline static unsigned int size(void) {
     return (2 + 96 / 2) * 4;
   };
-  inline unsigned int getDHHId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
+  inline unsigned int get_dhh_id(void) {return (word0.get_misc() >> 4) & 0x3F;};
 };
 
-struct dhhc_direct_readout_frame {
+class dhhc_direct_readout_frame {
+public:
   dhhc_frame_header_word0 word0;
-  const unsigned short trigger_nr_lo;
+  unsigned short trigger_nr_lo;
   /// an unbelievable amount of words may follow
   /// and finally a 32 bit checksum
 
-  inline unsigned short getEventNrLo(void) const {
+  inline static unsigned int size(void) {
+    return 0;// size can vary
+  };
+  inline unsigned short get_evtnr_lo(void) {
     return trigger_nr_lo;
   };
   void print(void) {
     word0.print();
-    B2INFO("DHHC Direct Readout (Raw|ZSD|ONS) Frame TNRLO $" << hex << trigger_nr_lo << " DHH ID $" << getDHHId() << " DHP port $" << getDHPPort());
+    if (verbose)
+      B2INFO("DHHC Direct Readout (Raw|ZSD|ONS) Frame TNRLO $" << hex << trigger_nr_lo << " DHH ID $" << get_dhh_id() << " DHP port $" << get_dhp_port());
   };
-  inline unsigned short getDHHId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
-  inline unsigned short getDHPPort(void) const {return (word0.getMisc()) & 0x3;};
-  inline bool getDataReformattedFlag(void) const {return (word0.getMisc() >> 3) & 0x1;};
+  inline unsigned short get_dhh_id(void) {return (word0.get_misc() >> 4) & 0x3F;};
+  inline unsigned short get_dhp_port(void) {return (word0.get_misc()) & 0x3;};
+  inline bool get_reformat_flag(void) {return (word0.get_misc() >> 3) & 0x1;};
 };
 
-
-struct dhhc_direct_readout_frame_raw : public dhhc_direct_readout_frame {
+class dhhc_direct_readout_frame_raw : public dhhc_direct_readout_frame {
+public:
 };
 
-struct dhhc_direct_readout_frame_zsd : public dhhc_direct_readout_frame {
+class dhhc_direct_readout_frame_zsd : public dhhc_direct_readout_frame {
+public:
 };
 
-
-struct dhhc_trigger_frame {
-  dhhc_frame_header_word0 word0;
-  const unsigned short trignr0;
-  const unsigned int trignr1;
-  const unsigned int trigtag;
-};
-
-struct dhhc_onsen_frame {
+class dhhc_onsen_frame {
   dhhc_frame_header_word0 word0;/// mainly empty
-  const unsigned short trignr0;// not used
-  const unsigned int magic1;
-  const unsigned int trignr1;
-  const unsigned int magic2;
-  const unsigned int trignr2;
+  unsigned short trignr0;// not used
+  unsigned int magic1;
+  unsigned int trignr1;
+  unsigned int magic2;
+  unsigned int trignr2;
   /// plus n* ROIs (64 bit)
   /// plus checksum 32bit
-
-  inline unsigned short get_trig_nr0(void) const {
+public:
+  inline unsigned short get_trig_nr0(void) {
     return trignr0;
   };
-  inline unsigned short get_trig_nr1(void) const {
+  inline unsigned short get_trig_nr1(void) {
     return trignr1;
   };
-  inline unsigned short get_trig_nr2(void) const {
+  inline unsigned short get_trig_nr2(void) {
     return trignr2;
   };
-  unsigned int check_error(bool ignore_datcon_flag = false) {
-    unsigned int error_mask = 0;
+  void print(void) {
+    word0.print();
+    if (verbose)
+      B2INFO("DHHC HLT/ROI Frame " << hex << trignr1 << " ," << trignr2);
     if ((magic1 & 0xFFFF) != 0xCAFE) {
       B2ERROR("DHHC HLT/ROI Magic 1 error $" << hex << magic1);
       error_mask |= ONSEN_ERR_FLAG_HLTROI_MAGIC;
@@ -311,17 +374,16 @@ struct dhhc_onsen_frame {
         error_mask |= ONSEN_ERR_FLAG_MERGER_TRIGNR;
       }
     }
-    return error_mask;
   };
-  void print(void) {
-    word0.print();
-    B2INFO("DHHC HLT/ROI Frame for Trigger HLT, DATCON: $" << hex << trignr1 << ", $" << trignr2);
-  };
+//  inline static unsigned int size(void) {
+//    return 0;// siez can vary
+//  };
 
-  unsigned int check_inner_crc(unsigned int length) {
+  unsigned int calc_crc(unsigned int length) {
     if (length < 8) {
       B2ERROR("DHHC ONSEN HLT/ROI Frame too small!!!");
-      return ONSEN_ERR_FLAG_MERGER_CRC;
+      error_mask |= ONSEN_ERR_FLAG_MERGER_CRC;
+      return 0;
     }
     unsigned char* d;
     dhh_crc_32_type bocrc;
@@ -344,27 +406,26 @@ struct dhhc_onsen_frame {
     crc32 = *(unsigned int*)(crcbuffer + length - 8); /// -4
 
     if (c == crc32) {
-//       if (verbose)
-//         B2INFO("DHHC ONSEN HLT/ROI Frame CRC OK: " << hex << c << "==" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
-//                << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " len $" << length);
-      return 0;// O.K.
+      if (verbose)
+        B2INFO("DHHC ONSEN HLT/ROI Frame CRC OK: " << hex << c << "==" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
+               << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " len $" << length);
     } else {
-//       crc_error++;
-//       if (verbose) {
-      B2ERROR("DHHC ONSEN HLT/ROI Frame CRC FAIL: " << hex << c << "!=" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
-              << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " len $" << length);
-      /// others would be interessting but possible subjects to access outside of buffer
-      /// << " " << * (unsigned int*)(d + length - 2) << " " << * (unsigned int*)(d + length + 0) << " " << * (unsigned int*)(d + length + 2));
-      //if (length <= 64) {
-      //  for (unsigned int i = 0; i < length / 4; i++) {
-      //    B2ERROR("== " << i << "  $" << hex << ((unsigned int*)d)[i]);
-      //  }
-      //}
-//       };
-//       error_flag = true;
-      return ONSEN_ERR_FLAG_MERGER_CRC;
+      crc_error++;
+      error_mask |= ONSEN_ERR_FLAG_MERGER_CRC;
+      if (verbose) {
+        B2ERROR("DHHC ONSEN HLT/ROI Frame CRC FAIL: " << hex << c << "!=" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
+                << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " len $" << length);
+        /// others would be interessting but possible subjects to access outside of buffer
+        /// << " " << * (unsigned int*)(d + length - 2) << " " << * (unsigned int*)(d + length + 0) << " " << * (unsigned int*)(d + length + 2));
+        //if (length <= 64) {
+        //  for (unsigned int i = 0; i < length / 4; i++) {
+        //    B2ERROR("== " << i << "  $" << hex << ((unsigned int*)d)[i]);
+        //  }
+        //}
+      };
+      error_flag = true;
     }
-    return 0;// never reached
+    return c;
   };
   void save(StoreArray<PXDRawROIs>& sa, unsigned int length, unsigned int* data) {
     if (length < 4 + 4 + 4 * 4) {
@@ -379,38 +440,87 @@ struct dhhc_onsen_frame {
 
 };
 
-struct dhhc_ghost_frame {
+class dhhc_ghost_frame {
+public:
   dhhc_frame_header_word0 word0;
-  const unsigned short trigger_nr_lo;
-  const unsigned int crc32;
+  unsigned short trigger_nr_lo;
+  unsigned int crc32;
   /// fixed length
 
-  inline unsigned int getFixedSize(void) const {
+  unsigned int calc_crc(void) {
+    unsigned char* d;
+    dhh_crc_32_type bocrc;
+    char crcbuffer[size()];
+    d = (unsigned char*)this;
+
+    for (unsigned int k = 0; k < (size() - 4); k += 2) {
+      crcbuffer[k] = d[k + 1];
+      crcbuffer[k + 1] = d[k];
+    }
+    bocrc.process_bytes(crcbuffer, (size() - 4));
+    unsigned int c;
+    c = htonl(bocrc.checksum());
+    if (c == crc32) {
+      if (verbose)
+        B2INFO("DHHC Ghost Frame CRC " << hex << c << " == " << crc32);
+    } else {
+      crc_error++;
+      B2ERROR("DHHC Ghost Frame CRC FAIL " << hex << c << " != " << crc32);
+      error_flag = true;
+    }
+    return c;
+  };
+  inline static unsigned int size(void) {
     return 8;
   };
   void print(void) {
     word0.print();
-    B2INFO("DHHC Ghost Frame TNRLO " << hex << trigger_nr_lo << " DHH ID $" << getDHHId() << " DHP port $" << getDHPPort() << " CRC $");
+    if (verbose)
+      B2INFO("DHHC Ghost Frame TNRLO " << hex << trigger_nr_lo << " DHH ID $" << get_dhh_id() << " DHP port $" << get_dhp_port() << " CRC $"  << crc32 << " (calc) "  << calc_crc());
   };
-  inline unsigned short getDHHId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
-  inline unsigned short getDHPPort(void) const {return (word0.getMisc()) & 0x3;};
+  inline unsigned short get_dhh_id(void) {return (word0.get_misc() >> 4) & 0x3F;};
+  inline unsigned short get_dhp_port(void) {return (word0.get_misc()) & 0x3;};
 };
 
-struct dhhc_end_frame {
+class dhhc_end_frame {
+public:
   dhhc_frame_header_word0 word0;
-  const unsigned short trigger_nr_lo;
-  const unsigned int wordsinevent;
-  const unsigned int errorinfo;
-  const unsigned int crc32;
+  unsigned short trigger_nr_lo;
+  unsigned int wordsinevent;
+  unsigned int errorinfo;
+  unsigned int crc32;
   /// fixed length
 
-  unsigned int get_words(void) const {
+  unsigned int calc_crc(void) {
+    unsigned char* d;
+    dhh_crc_32_type bocrc;
+    char crcbuffer[size()];
+    d = (unsigned char*)this;
+
+    for (unsigned int k = 0; k < (size() - 4); k += 2) {
+      crcbuffer[k] = d[k + 1];
+      crcbuffer[k + 1] = d[k];
+    }
+    bocrc.process_bytes(crcbuffer, (size() - 4));
+    unsigned int c;
+    c = htonl(bocrc.checksum());
+    if (c == crc32) {
+      if (verbose)
+        B2INFO("DHHC End Frame CRC " << hex << c << "==" << crc32);
+    } else {
+      crc_error++;
+      B2ERROR("DHHC End Frame CRC " << hex << c << "!=" << crc32);
+      error_flag = true;
+    }
+    return c;
+  };
+  unsigned int get_words(void) {
     return wordsinevent;
   }
-  inline unsigned int getFixedSize(void) const {
+  inline static unsigned int size(void) {
     return 16;
   };
-  bool isFakedData(void) const {
+  bool is_fake(void) {
     if (word0.data != 0x6000) return false;
     if (trigger_nr_lo != 0) return false;
     if (wordsinevent != 0) return false;
@@ -420,49 +530,62 @@ struct dhhc_end_frame {
   };
   void print(void) {
     word0.print();
-    B2INFO("DHHC End Frame TNRLO " << hex << trigger_nr_lo << " WIEVT " << hex << wordsinevent << " ERR " << hex << errorinfo
-           << " CRC " << hex << crc32);
+    if (verbose)
+      B2INFO("DHHC End Frame TNRLO " << hex << trigger_nr_lo << " WIEVT " << hex << wordsinevent << " ERR " << hex << errorinfo
+             << " CRC " << hex << crc32 << " (calc) " << calc_crc());
   };
-  inline unsigned int get_dhhc_id(void) const {return (word0.getMisc() >> 5) & 0xF;};
+  inline unsigned int get_dhhc_id(void) {return (word0.get_misc() >> 5) & 0xF;};
 };
 
-struct dhhc_dhh_end_frame {
+class dhhc_dhh_end_frame {
+public:
   dhhc_frame_header_word0 word0;
-  const unsigned short trigger_nr_lo;
-  const unsigned int wordsinevent;
-  const unsigned int errorinfo;
-  const unsigned int crc32;
+  unsigned short trigger_nr_lo;
+  unsigned int wordsinevent;
+  unsigned int errorinfo;
+  unsigned int crc32;
   /// fixed length
 
-  unsigned int get_words(void) const {
+  unsigned int calc_crc(void) {
+    unsigned char* d;
+    dhh_crc_32_type bocrc;
+    char crcbuffer[size()];
+    d = (unsigned char*)this;
+
+    for (unsigned int k = 0; k < (size() - 4); k += 2) {
+      crcbuffer[k] = d[k + 1];
+      crcbuffer[k + 1] = d[k];
+    }
+    bocrc.process_bytes(crcbuffer, (size() - 4));
+    unsigned int c;
+    c = htonl(bocrc.checksum());
+    if (c == crc32) {
+      if (verbose)
+        B2INFO("DHHC DHH End Frame CRC " << hex << c << "==" << crc32);
+    } else {
+      crc_error++;
+      B2ERROR("DHHC DHH End Frame CRC " << hex << c << "!=" << crc32);
+      error_flag = true;
+    }
+    return c;
+  };
+  unsigned int get_words(void) {
     return wordsinevent;
   }
-  inline unsigned int getFixedSize(void) const {
+  inline static unsigned int size(void) {
     return 16;
   };
   void print(void) {
     word0.print();
-    B2INFO("DHHC DHH End Frame TNRLO " << hex << trigger_nr_lo << " WIEVT " << hex << wordsinevent << " ERR " << hex << errorinfo
-           << " CRC " << hex << crc32);
+    if (verbose)
+      B2INFO("DHHC DHH End Frame TNRLO " << hex << trigger_nr_lo << " WIEVT " << hex << wordsinevent << " ERR " << hex << errorinfo
+             << " CRC " << hex << crc32 << " (calc) " << calc_crc());
   };
-  inline unsigned int getDHHId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
+  inline unsigned int get_dhh_id(void) {return (word0.get_misc() >> 4) & 0x3F;};
 };
 
 class dhhc_frames {
-  union {
-    const void* data;
-    const dhhc_trigger_frame* data_trigger_frame;
-    const dhhc_start_frame* data_dhhc_start_frame;
-    const dhhc_end_frame* data_dhhc_end_frame;
-    const dhhc_dhh_start_frame* data_dhh_start_frame;
-    const dhhc_dhh_end_frame* data_dhh_end_frame;
-    const dhhc_commode_frame* data_commode_frame;
-    const dhhc_direct_readout_frame* data_direct_readout_frame;
-    const dhhc_direct_readout_frame_raw* data_direct_readout_frame_raw;
-    const dhhc_direct_readout_frame_zsd* data_direct_readout_frame_zsd;
-    const dhhc_onsen_frame* data_onsen_frame;
-    const dhhc_ghost_frame* data_ghost_frame;
-  };
+  void* data;
   unsigned int datasize;
   int type;
   int length;
@@ -475,7 +598,7 @@ public:
     length = 0;
     pad = false;
   };
-  int getFrameType(void) {
+  int get_type(void) {
     return type;
   };
   void set(void* d, unsigned int t) {
@@ -492,21 +615,21 @@ public:
   };
   void set(void* d) {
     data = d;
-    type = ((dhhc_frame_header_word0*)data)->getFrameType();
+    type = ((dhhc_frame_header_word0*)data)->get_type();
     length = 0;
     pad = false;
   };
-  unsigned int getEventNrLo(void) {
+  unsigned int get_evtnr_lo(void) {
     return ((unsigned short*)data)[1];
   };
-  unsigned int check_crc(void) {
+  unsigned int calc_crc(void) {
     unsigned char* d;
     dhh_crc_32_type bocrc;
     char crcbuffer[65536 * 16]; /// 1MB
     d = (unsigned char*)data;
 
     if (length > 65536 * 16) {
-      B2WARNING("DHHC Data Frame CRC not calculated because of too large packet (>1MB)!");
+      B2WARNING("DHHC Data Frame CRC FAIL bacause of too large packet (>1MB)!");
     } else {
       for (int k = 0; k < length - 4; k += 2) {
         crcbuffer[k] = d[k + 1];
@@ -525,69 +648,69 @@ public:
     }
 
     if (c == crc32) {
-//       if (verbose)
-      //         B2INFO("DHH Data Frame CRC: " << hex << c << "==" << crc32);
-//         B2INFO("DHHC Data Frame CRC OK: " << hex << c << "==" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
-//                << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " pad " << pad << " len $" << length);
+      if (verbose)
+        //         B2INFO("DHH Data Frame CRC: " << hex << c << "==" << crc32);
+        B2INFO("DHHC Data Frame CRC OK: " << hex << c << "==" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
+               << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " pad " << pad << " len $" << length);
     } else {
-//       crc_error++;
-//       if (verbose) {
-      B2ERROR("DHHC Data Frame CRC FAIL: " << hex << c << "!=" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
-              << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " pad " << pad << " len $" << length);
-      /// others would be interessting but possible subjects to access outside of buffer
-      /// << " " << * (unsigned int*)(d + length - 2) << " " << * (unsigned int*)(d + length + 0) << " " << * (unsigned int*)(d + length + 2));
-      //if (length <= 32) {
-      //  for (int i = 0; i < length / 4; i++) {
-      //    B2ERROR("== " << i << "  $" << hex << ((unsigned int*)d)[i]);
-      //  }
-      //}
-//       };
-//       error_flag = true;
-      return ONSEN_ERR_FLAG_DHH_CRC;
+      crc_error++;
+      error_mask |= ONSEN_ERR_FLAG_DHH_CRC;
+      if (verbose) {
+        B2ERROR("DHHC Data Frame CRC FAIL: " << hex << c << "!=" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
+                << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " pad " << pad << " len $" << length);
+        /// others would be interessting but possible subjects to access outside of buffer
+        /// << " " << * (unsigned int*)(d + length - 2) << " " << * (unsigned int*)(d + length + 0) << " " << * (unsigned int*)(d + length + 2));
+        //if (length <= 32) {
+        //  for (int i = 0; i < length / 4; i++) {
+        //    B2ERROR("== " << i << "  $" << hex << ((unsigned int*)d)[i]);
+        //  }
+        //}
+      };
+      error_flag = true;
     }
-    return 0;
+    return c;
   };
 
 
-  unsigned int getFixedSize(void) {
+  unsigned int size(void) {
     unsigned int s = 0;
-    switch (getFrameType()) {
+    switch (get_type()) {
       case DHHC_FRAME_HEADER_DATA_TYPE_DHP_RAW:
-        s = 0; /// size is not a fixed number
+        s = ((dhhc_direct_readout_frame_raw*)data)->size();
         break;
       case DHHC_FRAME_HEADER_DATA_TYPE_DHP_ONS:
       case DHHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD:
-        s = 0; /// size is not a fixed number
+        s = ((dhhc_direct_readout_frame_zsd*)data)->size();
         break;
       case DHHC_FRAME_HEADER_DATA_TYPE_FCE_RAW:
-        B2INFO("Error: FCE type not yet supported ");
-        s = 0; /// size is not a fixed number
-//         error_flag = true;
+        B2INFO("Error: FCE type no supported ");
+        s = 0;
+        error_flag = true;
         break;
       case DHHC_FRAME_HEADER_DATA_TYPE_COMMODE:
-        s = ((dhhc_commode_frame*)data)->getFixedSize();
+        s = ((dhhc_commode_frame*)data)->size();
         break;
       case DHHC_FRAME_HEADER_DATA_TYPE_GHOST:
-        s = ((dhhc_ghost_frame*)data)->getFixedSize();
+        s = ((dhhc_ghost_frame*)data)->size();
         break;
       case DHHC_FRAME_HEADER_DATA_TYPE_DHH_START:
-        s = ((dhhc_dhh_start_frame*)data)->getFixedSize();
+        s = ((dhhc_dhh_start_frame*)data)->size();
         break;
       case DHHC_FRAME_HEADER_DATA_TYPE_DHH_END:
-        s = ((dhhc_dhh_end_frame*)data)->getFixedSize();
+        s = ((dhhc_dhh_end_frame*)data)->size();
         break;
       case DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START:
-        s = ((dhhc_start_frame*)data)->getFixedSize();
+        s = ((dhhc_start_frame*)data)->size();
         break;
       case DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END:
-        s = ((dhhc_end_frame*)data)->getFixedSize();
+        s = ((dhhc_end_frame*)data)->size();
         break;
       case DHHC_FRAME_HEADER_DATA_TYPE_HLTROI:
-        s = 0; /// size is not a fixed number
+        s = 0;
         break;
       default:
         B2ERROR("Error: not a valid data frame!");
-//         error_flag = true;
+        error_flag = true;
         s = 0;
         break;
     }
@@ -602,16 +725,16 @@ public:
 };
 
 ///******************************************************************
-///*********************** Main inpacker code ***********************
+///*********************** Main unpacker code ***********************
 ///******************************************************************
 
-PXDUnpackerModule::PXDUnpackerModule() :
+PXDUnpackerDesy1314Module::PXDUnpackerDesy1314Module() :
   Module(),
   m_storeRawHits(),
   m_storeROIs()
 {
   //Set module properties
-  setDescription("Unpack Raw PXD Hits from ONSEN data stream");
+  setDescription("Unpack Raw PXD Hits from ONSEN data stream (Desy2013/14 test)");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("HeaderEndianSwap", m_headerEndianSwap, "Swap the endianess of the ONSEN header", true);
@@ -622,16 +745,11 @@ PXDUnpackerModule::PXDUnpackerModule() :
   addParam("IgnoreDHPPortDiffer", m_ignore_dhpportdiffer, "Ignore if DHP port differ in DHH and DHP header", true);
   addParam("IgnoreEmptyDHPWrongSize", m_ignore_empty_dhp_wrong_size, "Ignore empty. wrong sized DHP packets", true);
   addParam("DoNotStore", m_doNotStore, "only unpack and check, but do not store", false);
-//  addParam("UseFormat", m_useformat, "Use Format type (0) upto Feb 2014  (1) since Mai 2014", 1);
 
 }
 
-void PXDUnpackerModule::initialize()
+void PXDUnpackerDesy1314Module::initialize()
 {
-  B2ERROR("For unpacking data from Desy test 2013/14, please move to PXDUnpackerDesy1314Module !!!");
-  B2ERROR("PXDUnpackerModule will only unpack data recorded with latest DHHC and ONSEN firmware.");
-  exit(0);
-
   //Register output collections
   m_storeRawHits.registerAsPersistent();
   m_storeROIs.registerAsPersistent();
@@ -639,22 +757,20 @@ void PXDUnpackerModule::initialize()
   B2INFO("HeaderEndianSwap: " << m_headerEndianSwap);
   B2INFO("DHHCmode: " << m_DHHCmode);
   B2INFO("Ignore(missing)DATCON: " << m_ignoreDATCON);
-  //B2INFO("Use DHH(C) format type: " << m_useformat << " (0) upto Feb 2014  (1) since Mai 2014");
-
   ignore_datcon_flag = m_ignoreDATCON;
 
   unpacked_events = 0;
   for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) error_counter[i] = 0;
 }
 
-void PXDUnpackerModule::terminate()
+void PXDUnpackerDesy1314Module::terminate()
 {
   int flag = 0;
   string errstr = "Statistic ( ;";
   errstr += to_string(unpacked_events) + ";";
   for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) { errstr += to_string(error_counter[i]) + ";"; flag |= error_counter[i];}
   if (flag != 0) {
-    B2ERROR("PXD Unpacker --> Error Statistics (counted once per event!) in Events: " << unpacked_events);
+    B2ERROR("PXD UnpackerDesy1314 --> Error Statistics (counted once per event!) in Events: " << unpacked_events);
     B2ERROR(errstr + " )");
     for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
       if (error_counter[i]) {
@@ -663,18 +779,18 @@ void PXDUnpackerModule::terminate()
       }
     }
   } else {
-    B2INFO("PXD Unpacker --> No Error found in Events: " << unpacked_events);
+    B2INFO("PXD UnpackerDesy1314 --> No Error found in Events: " << unpacked_events);
   }
 }
 
-void PXDUnpackerModule::event()
+void PXDUnpackerDesy1314Module::event()
 {
   StoreArray<RawPXD> storeRaws;
   StoreArray<RawFTSW> storeFTSW;
 
   int nRaws = storeRaws.getEntries();
   if (verbose) {
-    B2INFO("PXD Unpacker --> RawPXD Objects in event: " << nRaws);
+    B2INFO("PXD UnpackerDesy1314 --> RawPXD Objects in event: " << nRaws);
   };
 
   error_mask = 0;
@@ -683,14 +799,14 @@ void PXDUnpackerModule::event()
   for (auto & it : storeFTSW) {
     ftsw_evt_nr = it.GetEveNo(0);
     ftsw_evt_mask = 0x7FFF;
-    B2INFO("PXD Unpacker --> FTSW Event Number: $" << hex << ftsw_evt_nr);
+    B2INFO("PXD UnpackerDesy1314 --> FTSW Event Number: $" << hex << ftsw_evt_nr);
     break;
   }
 
   int nsr = 0;
   for (auto & it : storeRaws) {
     if (verbose) {
-      B2INFO("PXD Unpacker --> Unpack Objects: ");
+      B2INFO("PXD UnpackerDesy1314 --> Unpack Objects: ");
     };
     unpack_event(it);
     nsr++;
@@ -705,7 +821,7 @@ void PXDUnpackerModule::event()
   }
 }
 
-void PXDUnpackerModule::endian_swap_frame(unsigned short* dataptr, int len)
+void PXDUnpackerDesy1314Module::endian_swap_frame(unsigned short* dataptr, int len)
 {
   /// swap endianess of all shorts in frame BUT not the CRC (2 shorts)
   for (int i = 0; i < len / 2 - 2; i++) {
@@ -713,7 +829,7 @@ void PXDUnpackerModule::endian_swap_frame(unsigned short* dataptr, int len)
   }
 }
 
-void PXDUnpackerModule::unpack_event(RawPXD& px)
+void PXDUnpackerDesy1314Module::unpack_event(RawPXD& px)
 {
   int last_wie = 0;
   static unsigned int last_evtnr = 0;
@@ -722,7 +838,7 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
   int datafullsize;
 
   if (px.size() <= 0 || px.size() > 16 * 1024 * 1024) {
-    B2ERROR("PXD Unpacker --> invalid packet size (32bit words) " << hex << px.size());
+    B2ERROR("PXD UnpackerDesy1314 --> invalid packet size (32bit words) " << hex << px.size());
     error_mask |= ONSEN_ERR_FLAG_PACKET_SIZE;
     return;
   }
@@ -751,12 +867,12 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
 
   /// NEW format
   if (verbose) {
-    B2INFO("PXD Unpacker --> data[0]: <-- Magic " << hex << data[0]);
-    B2INFO("PXD Unpacker --> data[1]: <-- #Frames " << hex << data[1]);
-    if (data[1] >= 1 && fullsize < 12) B2INFO("PXD Unpacker --> data[2]: <-- Frame 1 len " << hex << data[2]);
-    if (data[1] >= 2 && fullsize < 16) B2INFO("PXD Unpacker --> data[3]: <-- Frame 2 len " << hex << data[3]);
-    if (data[1] >= 3 && fullsize < 20) B2INFO("PXD Unpacker --> data[4]: <-- Frame 3 len " << hex << data[4]);
-    if (data[1] >= 4 && fullsize < 24) B2INFO("PXD Unpacker --> data[5]: <-- Frame 4 len " << hex << data[5]);
+    B2INFO("PXD UnpackerDesy1314 --> data[0]: <-- Magic " << hex << data[0]);
+    B2INFO("PXD UnpackerDesy1314 --> data[1]: <-- #Frames " << hex << data[1]);
+    if (data[1] >= 1 && fullsize < 12) B2INFO("PXD UnpackerDesy1314 --> data[2]: <-- Frame 1 len " << hex << data[2]);
+    if (data[1] >= 2 && fullsize < 16) B2INFO("PXD UnpackerDesy1314 --> data[3]: <-- Frame 2 len " << hex << data[3]);
+    if (data[1] >= 3 && fullsize < 20) B2INFO("PXD UnpackerDesy1314 --> data[4]: <-- Frame 3 len " << hex << data[4]);
+    if (data[1] >= 4 && fullsize < 24) B2INFO("PXD UnpackerDesy1314 --> data[5]: <-- Frame 4 len " << hex << data[5]);
   };
 
   unsigned int* tableptr;
@@ -801,7 +917,7 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
 
 }
 
-void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int dhh_first_readout_frame_id_lo, unsigned int dhh_ID, unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id)
+void PXDUnpackerDesy1314Module::unpack_dhp(void* data, unsigned int len2, unsigned int dhh_first_readout_frame_id_lo, unsigned int dhh_ID, unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id)
 {
   unsigned int anzahl = len2 / 2; // len2 in bytes!!!
   bool printflag = false;
@@ -820,7 +936,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
   if (anzahl < 4) {
     if (!m_ignore_empty_dhp_wrong_size) B2ERROR("DHP frame size error (too small) " << anzahl);
     error_mask |= ONSEN_ERR_FLAG_DHP_SIZE;
-//     dhp_size_error++;
+    dhp_size_error++;
     return;
     //return -1;
   }
@@ -873,7 +989,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
         if (!rowflag) {
           B2ERROR("DHP Unpacking: Pix without Row!!! skip dhp data ");
           error_mask |= ONSEN_ERR_FLAG_DHP_PIX_WO_ROW;
-//           dhp_pixel_error++;
+          dhp_pixel_error++;
           return;
         } else {
           dhp_row = (dhp_row & 0xFFE) | ((dhp_pix[i] >> 14) & 0x001);
@@ -915,7 +1031,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
   }
 };
 
-int PXDUnpackerModule::nr5bits(int i) const
+int nr5bits(int i)
 {
   /// too lazy to count the bits myself, thus using a small lookup table
   const int lut[32] = {
@@ -925,7 +1041,7 @@ int PXDUnpackerModule::nr5bits(int i) const
   return lut[i & 0x1F];
 }
 
-void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& last_wie, unsigned int& last_evtnr, int Frame_Number, int Frames_in_event)
+void PXDUnpackerDesy1314Module::unpack_dhhc_frame(void* data, int len, bool pad, int& last_wie, unsigned int& last_evtnr, int Frame_Number, int Frames_in_event)
 {
   static int nr_of_dhh_start_frame = 0; /// could put it as a class member, but is only needed within this function
   static int nr_of_dhh_end_frame = 0; /// could put it as a class member, but is only needed within this function
@@ -940,37 +1056,37 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
   static unsigned int dhh_first_offset = 0;
   static unsigned int current_dhh_id = 0xFFFFFFFF;
   static unsigned int currentVxdId = 0;
-  static bool isFakedData_event = false;
+  static bool is_fake_event = false;
 
 
   dhhc_frame_header_word0* hw = (dhhc_frame_header_word0*)data;
-//   error_flag = false;
+  error_flag = false;
 
   dhhc_frames dhhc;
-  dhhc.set(data, hw->getFrameType(), len, pad);
+  dhhc.set(data, hw->get_type(), len, pad);
   int s;
-  s = dhhc.getFixedSize();
+  s = dhhc.size();
   if (len != s && s != 0) {
     B2ERROR("Fixed frame type size does not match specs: expect " << len << " != " << s << " (in data) " << pad);
     error_mask |= ONSEN_ERR_FLAG_FIX_SIZE;
   }
 
-  unsigned int evtnr = dhhc.getEventNrLo();
-  int type = dhhc.getFrameType();
+  unsigned int evtnr = dhhc.get_evtnr_lo();
+  int type = dhhc.get_type();
 
   if (Frame_Number == 0) { /// We reset the counters on the first event
     nr_of_dhh_start_frame = 0;
     nr_of_dhh_end_frame = 0;
     if (type == DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START) {
-      isFakedData_event = ((dhhc_start_frame*)data)->isFakedData();
+      is_fake_event = ((dhhc_start_frame*)data)->is_fake();
     } else {
-      isFakedData_event = false;
+      is_fake_event = false;
     }
   }
 
 
   if ((evtnr & ftsw_evt_mask) != (ftsw_evt_nr & ftsw_evt_mask)) {
-    if (isFakedData_event) {
+    if (is_fake_event) {
       /// If ist a start, check if its a fake event, if its not a start, the fake flag is already (re)set. As long as the data structure is not messed up completly.
       /// no need to explicitly check the DHHC_END or HLT/ROI
       /// We have afake and shoudl set the trigger nr by hand to prevent further errors
@@ -993,15 +1109,15 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
     case DHHC_FRAME_HEADER_DATA_TYPE_DHP_RAW: {
       nr_of_frames_counted++;
 
-      if (verbose)((dhhc_direct_readout_frame_raw*)data)->print();
-      if (current_dhh_id != ((dhhc_direct_readout_frame_raw*)data)->getDHHId()) {
-        B2ERROR("DHH ID from DHH Start and this frame do not match $" << hex << current_dhh_id << " != $" << ((dhhc_direct_readout_frame_raw*)data)->getDHHId());
+      ((dhhc_direct_readout_frame_raw*)data)->print();
+      if (current_dhh_id != ((dhhc_direct_readout_frame_raw*)data)->get_dhh_id()) {
+        B2ERROR("DHH ID from DHH Start and this frame do not match $" << hex << current_dhh_id << " != $" << ((dhhc_direct_readout_frame_raw*)data)->get_dhh_id());
         error_mask |= ONSEN_ERR_FLAG_DHH_START_ID;
       }
-      error_mask |= dhhc.check_crc();
-      found_mask_active_dhp |= 1 << ((dhhc_direct_readout_frame*)data)->getDHPPort();
+      dhhc.calc_crc();
+      found_mask_active_dhp |= 1 << ((dhhc_direct_readout_frame*)data)->get_dhp_port();
 
-//       stat_raw++;
+      stat_raw++;
       dhhc.write_pedestal();
       break;
     };
@@ -1009,62 +1125,59 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
     case DHHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD: {
       nr_of_frames_counted++;
 
-      if (verbose)((dhhc_direct_readout_frame*)data)->print();
-
-      //error_mask |= ((dhhc_direct_readout_frame*)data)->check_error();
-
-      if (current_dhh_id != ((dhhc_direct_readout_frame_raw*)data)->getDHHId()) {
-        B2ERROR("DHH ID from DHH Start and this frame do not match $" << hex << current_dhh_id << " != $" << ((dhhc_direct_readout_frame_raw*)data)->getDHHId());
+      ((dhhc_direct_readout_frame*)data)->print();
+      if (current_dhh_id != ((dhhc_direct_readout_frame_raw*)data)->get_dhh_id()) {
+        B2ERROR("DHH ID from DHH Start and this frame do not match $" << hex << current_dhh_id << " != $" << ((dhhc_direct_readout_frame_raw*)data)->get_dhh_id());
         error_mask |= ONSEN_ERR_FLAG_DHH_START_ID;
       }
       if (m_ignore_empty_dhp_wrong_size && type == DHHC_FRAME_HEADER_DATA_TYPE_DHP_ONS && len == 10) {
         // Bug from Davids code ... ignore but count as error -> in unpack... ignore crc error
         // error_mask |= ONSEN_ERR_FLAG_DHH_CRC;
       } else {
-        error_mask |= dhhc.check_crc();
+        dhhc.calc_crc();
       }
-      found_mask_active_dhp |= 1 << ((dhhc_direct_readout_frame*)data)->getDHPPort();
-//       stat_zsd++;
+      found_mask_active_dhp |= 1 << ((dhhc_direct_readout_frame*)data)->get_dhp_port();
+      stat_zsd++;
 
       unpack_dhp(data, len - 4,
                  dhh_first_readout_frame_id_lo,
-                 ((dhhc_direct_readout_frame*)data)->getDHHId(),
-                 ((dhhc_direct_readout_frame*)data)->getDHPPort(),
-                 ((dhhc_direct_readout_frame*)data)->getDataReformattedFlag(),
+                 ((dhhc_direct_readout_frame*)data)->get_dhh_id(),
+                 ((dhhc_direct_readout_frame*)data)->get_dhp_port(),
+                 ((dhhc_direct_readout_frame*)data)->get_reformat_flag(),
                  dhh_first_offset, currentVxdId);
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_FCE_RAW: {
       nr_of_frames_counted++;
 
-      if (verbose) hw->print();
-      if (current_dhh_id != ((dhhc_direct_readout_frame_raw*)data)->getDHHId()) {
-        B2ERROR("DHH ID from DHH Start and this frame do not match $" << hex << current_dhh_id << " != $" << ((dhhc_direct_readout_frame_raw*)data)->getDHHId());
+      hw->print();
+      if (current_dhh_id != ((dhhc_direct_readout_frame_raw*)data)->get_dhh_id()) {
+        B2ERROR("DHH ID from DHH Start and this frame do not match $" << hex << current_dhh_id << " != $" << ((dhhc_direct_readout_frame_raw*)data)->get_dhh_id());
         error_mask |= ONSEN_ERR_FLAG_DHH_START_ID;
       }
-      error_mask |= dhhc.check_crc();
+      dhhc.calc_crc();
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_COMMODE: {
       nr_of_frames_counted++;
 
-      if (verbose) hw->print();
-      if (current_dhh_id != ((dhhc_commode_frame*)data)->getDHHId()) {
-        B2ERROR("DHH ID from DHH Start and this frame do not match $" << hex << current_dhh_id << " != $" << ((dhhc_commode_frame*)data)->getDHHId());
+      hw->print();
+      if (current_dhh_id != ((dhhc_commode_frame*)data)->get_dhh_id()) {
+        B2ERROR("DHH ID from DHH Start and this frame do not match $" << hex << current_dhh_id << " != $" << ((dhhc_commode_frame*)data)->get_dhh_id());
         error_mask |= ONSEN_ERR_FLAG_DHH_START_ID;
       }
-      error_mask |= dhhc.check_crc();
+      dhhc.calc_crc();
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START: {
-      if (isFakedData_event != ((dhhc_start_frame*)data)->isFakedData()) {
+      if (is_fake_event != ((dhhc_start_frame*)data)->is_fake()) {
         B2ERROR("DHHC START is but no Fake event OR Fake Event but DHH END is not.");
       }
-      if (((dhhc_start_frame*)data)->isFakedData()) {
+      if (((dhhc_start_frame*)data)->is_fake()) {
         B2WARNING("Faked DHHC START Data -> trigger without Data!");
         error_mask |= ONSEN_ERR_FLAG_FAKE_NO_DATA_TRIG;
       } else {
-        if (verbose)((dhhc_start_frame*)data)->print();
+        ((dhhc_start_frame*)data)->print();
       }
 
       last_evtnr = evtnr;
@@ -1072,8 +1185,8 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       currentVxdId = 0; /// invalid
       nr_of_frames_dhhc = ((dhhc_start_frame*)data)->get_dhhc_nr_frames();
       nr_of_frames_counted = 1;
-      error_mask |= dhhc.check_crc();
-//       stat_start++;
+      dhhc.calc_crc();
+      stat_start++;
 
       mask_active_dhh = ((dhhc_start_frame*)data)->get_active_dhh_mask();
       nr_active_dhh = nr5bits(mask_active_dhh);
@@ -1081,11 +1194,11 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_DHH_START: {
       nr_of_frames_counted++;
-      if (verbose)((dhhc_dhh_start_frame*)data)->print();
-      dhh_first_readout_frame_id_lo = ((dhhc_dhh_start_frame*)data)->getStartFrameNr();
-      dhh_first_offset = ((dhhc_dhh_start_frame*)data)->getTriggerOffsetRow();
-      current_dhh_id = ((dhhc_dhh_start_frame*)data)->getDHHId();
-      error_mask |= dhhc.check_crc();
+      ((dhhc_dhh_start_frame*)data)->print();
+      dhh_first_readout_frame_id_lo = ((dhhc_dhh_start_frame*)data)->get_sfnr();
+      dhh_first_offset = ((dhhc_dhh_start_frame*)data)->get_toffset();
+      current_dhh_id = ((dhhc_dhh_start_frame*)data)->get_dhh_id();
+      dhhc.calc_crc();
 
       if (nr_of_dhh_start_frame != nr_of_dhh_end_frame) {
         B2ERROR("DHHC_FRAME_HEADER_DATA_TYPE_DHH_START without DHHC_FRAME_HEADER_DATA_TYPE_DHH_END");
@@ -1094,7 +1207,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
       nr_of_dhh_start_frame++;
 
       found_mask_active_dhp = 0;
-      mask_active_dhp = ((dhhc_dhh_start_frame*)data)->getActiveDHPMask();
+      mask_active_dhp = ((dhhc_dhh_start_frame*)data)->get_active_dhp_mask();
       ///      nr_active_dhp = nr5bits(mask_active_dhp);// unused
 
       // calculate the VXDID for DHH and save them for DHP unpacking
@@ -1117,39 +1230,39 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_GHOST:
       nr_of_frames_counted++;
-      if (verbose)((dhhc_ghost_frame*)data)->print();
-      if (current_dhh_id != ((dhhc_ghost_frame*)data)->getDHHId()) {
-        B2ERROR("DHH ID from DHH Start and this frame do not match $" << hex << current_dhh_id << " != $" << ((dhhc_ghost_frame*)data)->getDHHId());
+      ((dhhc_ghost_frame*)data)->print();
+      if (current_dhh_id != ((dhhc_ghost_frame*)data)->get_dhh_id()) {
+        B2ERROR("DHH ID from DHH Start and this frame do not match $" << hex << current_dhh_id << " != $" << ((dhhc_ghost_frame*)data)->get_dhh_id());
         error_mask |= ONSEN_ERR_FLAG_DHH_START_ID;
       }
       /// Attention: Firmware might be changed such, that ghostframe come for all DHPs, not only active ones...
-      found_mask_active_dhp |= 1 << ((dhhc_ghost_frame*)data)->getDHPPort();
-      error_mask |= dhhc.check_crc();
-//       stat_ghost++;
+      found_mask_active_dhp |= 1 << ((dhhc_ghost_frame*)data)->get_dhp_port();
+      dhhc.calc_crc();
+      stat_ghost++;
 
       break;
     case DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END: {
-      if (((dhhc_end_frame*)data)->isFakedData() != isFakedData_event) {
+      if (((dhhc_end_frame*)data)->is_fake() != is_fake_event) {
         B2ERROR("DHHC END is but no Fake event OR Fake Event but DHH END is not.");
       }
       nr_of_frames_counted++;
       current_dhh_id = 0xFFFFFFFF;
       currentVxdId = 0; /// invalid
-      if (isFakedData_event) {
+      if (is_fake_event) {
         B2WARNING("Faked DHHC END Data -> trigger without Data!");
         error_mask |= ONSEN_ERR_FLAG_FAKE_NO_DATA_TRIG;
       } else {
-        if (verbose)((dhhc_end_frame*)data)->print();
+        ((dhhc_end_frame*)data)->print();
       }
-//       stat_end++;
+      stat_end++;
 
-      if (!isFakedData_event) {
+      if (!is_fake_event) {
         if (nr_of_frames_counted != nr_of_frames_dhhc) {
           if (!m_ignore_headernrframes) B2ERROR("Number of DHHC Frames in Header " << nr_of_frames_dhhc << " != " << nr_of_frames_counted << " Counted");
           error_mask |= ONSEN_ERR_FLAG_DHHC_FRAMECOUNT;
         }
       }
-      if (!isFakedData_event) {
+      if (!is_fake_event) {
         int w;
         w = ((dhhc_end_frame*)data)->get_words() * 2;
         last_wie += 2;
@@ -1160,26 +1273,26 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
           if (verbose) {
             B2INFO("Error: WIE " << hex << last_wie << " vs END " << hex << w << " pad " << pad);
           };
-//           error_flag = true;
-//           wie_error++;
+          error_flag = true;
+          wie_error++;
         } else {
           if (verbose)
             B2INFO("EVT END: WIE " << hex << last_wie << " == END " << hex << w << " pad " << pad);
         }
       }
-      error_mask |= dhhc.check_crc();
+      dhhc.calc_crc();
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_DHH_END: {
       nr_of_frames_counted++;
-      if (verbose)((dhhc_dhh_end_frame*)data)->print();
-      if (current_dhh_id != ((dhhc_dhh_end_frame*)data)->getDHHId()) {
-        B2ERROR("DHH ID from DHH Start and this frame do not match $" << hex << current_dhh_id << " != $" << ((dhhc_dhh_end_frame*)data)->getDHHId());
+      ((dhhc_dhh_end_frame*)data)->print();
+      if (current_dhh_id != ((dhhc_dhh_end_frame*)data)->get_dhh_id()) {
+        B2ERROR("DHH ID from DHH Start and this frame do not match $" << hex << current_dhh_id << " != $" << ((dhhc_dhh_end_frame*)data)->get_dhh_id());
         error_mask |= ONSEN_ERR_FLAG_DHH_START_END_ID;
       }
       current_dhh_id = 0xFFFFFFFF;
       currentVxdId = 0; /// invalid
-      error_mask |= dhhc.check_crc();
+      dhhc.calc_crc();
       if (found_mask_active_dhp != mask_active_dhp) {
         if (!m_ignore_dhpmask) B2ERROR("DHH_END: DHP active mask $" << hex << mask_active_dhp << " != $" << hex << found_mask_active_dhp << " mask of found dhp/ghost frames");
         error_mask |= ONSEN_ERR_FLAG_DHP_ACTIVE;
@@ -1194,26 +1307,25 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, bool pad, int& la
     case DHHC_FRAME_HEADER_DATA_TYPE_HLTROI:
       //nr_of_frames_counted++;/// DO NOT COUNT!!!!
       //((dhhc_onsen_frame*)data)->set_length(len - 4);
-      if (verbose)((dhhc_onsen_frame*)data)->print();
-      error_mask |= ((dhhc_onsen_frame*)data)->check_error(ignore_datcon_flag);
-      error_mask |= ((dhhc_onsen_frame*)data)->check_inner_crc(len - 4); /// CRC is without the DHHC header
-      error_mask |= dhhc.check_crc();
+      ((dhhc_onsen_frame*)data)->print();
+      ((dhhc_onsen_frame*)data)->calc_crc(len - 4); /// CRC is without the DHHC header
+      dhhc.calc_crc();
       if (!m_doNotStore)((dhhc_onsen_frame*)data)->save(m_storeROIs, len, (unsigned int*) data);
       break;
     default:
       B2ERROR("UNKNOWN DHHC frame type");
       error_mask |= ONSEN_ERR_FLAG_DHHC_UNKNOWN;
-//      type_error++;
-      if (verbose) hw->print();
-//       error_flag = true;
+      type_error++;
+      hw->print();
+      error_flag = true;
       break;
   }
 
   if (evtnr != last_evtnr) {
     B2ERROR("Frame TrigNr != DHHC Trig Nr $" << hex << evtnr << " != $" << last_evtnr);
     error_mask |= ONSEN_ERR_FLAG_DHHC_DHH_MM;
-//     evtnr_error++;
-//     error_flag = true;
+    evtnr_error++;
+    error_flag = true;
   }
 
   if (Frame_Number == 0) {

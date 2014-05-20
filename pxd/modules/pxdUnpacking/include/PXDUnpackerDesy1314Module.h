@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDUnpackerModule_H
-#define PXDUnpackerModule_H
+#ifndef PXDUnpackerDesy1314Module_H
+#define PXDUnpackerDesy1314Module_H
 
 #include <framework/core/Module.h>
 #include <pxd/dataobjects/PXDRawHit.h>
@@ -28,15 +28,15 @@ namespace Belle2 {
      * @{
      */
 
-    /** The PXDUnpacker module.
+    /** The PXDUnpackerDesy1314 module.
      *
      * This module is responsible for unpacking the Raw PXD data to Pixels
      */
-    class PXDUnpackerModule : public Module {
+    class PXDUnpackerDesy1314Module : public Module {
 
     public:
       /** Constructor defining the parameters */
-      PXDUnpackerModule();
+      PXDUnpackerDesy1314Module();
 
       /** Initialize the module */
       virtual void initialize();
@@ -63,8 +63,6 @@ namespace Belle2 {
       bool m_ignore_dhpportdiffer;
       /** Only unpack, but Do Not Store anything to file */
       bool m_doNotStore;
-//       /** use DHH(C) format type:  (0) from 2013 (up to DESY test Jan 2014)  (1) since Mai 2014 */
-//       int m_useformat;
       /** Event Number and compare mask grabbed from FTSW for now */
       unsigned int ftsw_evt_nr, ftsw_evt_mask;
       /** Event counter */
@@ -104,16 +102,6 @@ namespace Belle2 {
        */
       void unpack_dhp(void* data, unsigned int len, unsigned int dhh_first_readout_frame_lo, unsigned int dhh_ID, unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id);
 
-      int nr5bits(int i) const;/// helper function to "count" nr of set bits within lower 5 bits
-
-
-      /** Error Mask set per packet / event*/
-      unsigned int error_mask;
-      /** give verbose unpacking information -> will eb a parameter in next release */
-      bool verbose = true;
-      /** ignore missing datcon (dont show error) */
-      bool ignore_datcon_flag = true;
-
     };//end class declaration
 
     /** @}*/
@@ -121,4 +109,4 @@ namespace Belle2 {
   } //end PXD namespace;
 } // end namespace Belle2
 
-#endif // PXDUnpackerModule_H
+#endif // PXDUnpackerDesy1314Module_H

@@ -612,6 +612,24 @@ void Particle::print() const
 
 }
 
+bool Particle::hasExtraInfo(const std::string& name) const
+{
+  if (m_extraInfo.empty())
+    return false;
+
+  //get index for name
+  const unsigned int mapID = (unsigned int)m_extraInfo[0];
+  StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
+  if (!extraInfoMap) {
+    B2FATAL("ParticleExtraInfoMap not available, but needed for storing extra info in Particle!");
+  }
+  unsigned int index = extraInfoMap->getIndex(mapID, name);
+  if (index == 0 or index >= m_extraInfo.size()) //actualy indices start at 1
+    return false;
+
+  return true;
+}
+
 float Particle::getExtraInfo(const std::string& name) const
 {
   if (m_extraInfo.empty())
@@ -633,15 +651,7 @@ float Particle::getExtraInfo(const std::string& name) const
 
 void Particle::addExtraInfo(const std::string& name, float value)
 {
-  //check if var is set already, throw if it is
-  bool found = false;
-  try {
-    getExtraInfo(name);
-    found = true;
-  } catch (...) {
-    //not found. that's good.
-  }
-  if (found)
+  if (hasExtraInfo(name))
     throw std::runtime_error(std::string("addExtraInfo: Value '") + name + "' already set!");
 
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;

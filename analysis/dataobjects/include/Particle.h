@@ -509,6 +509,9 @@ namespace Belle2 {
      */
     float getExtraInfo(const std::string& name) const;
 
+    /** Return wether the extra info with the given name is set. */
+    bool hasExtraInfo(const std::string& name) const;
+
     /** Sets the user-defined data of given name to the given value.
      *
      * throws std::runtime_error if variable is already set.

@@ -38,6 +38,7 @@ histmaker.param('fileName', 'test_D0signalHist.root')
 hist_params = (100, 0, 6.2)
 histmaker.param('histParams', hist_params)
 histmaker.param('inputListNames', daughters)
+histmaker.param('variable', 'M')
 main.add_module(histmaker)
 
 

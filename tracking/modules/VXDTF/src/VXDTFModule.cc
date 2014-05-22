@@ -75,7 +75,7 @@
 #include <boost/lambda/casts.hpp>
 // #include <boost/chrono/chrono_io.hpp>
 
-#include <valgrind/callgrind.h>
+// #include <valgrind/callgrind.h>
 
 //Eigen
 #include <Eigen/Dense>
@@ -225,6 +225,7 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("activateDistanceZ", m_PARAMactivateDistanceZ, " set True/False for each setup individually", activateDistanceZ);
   addParam("activateSlopeRZ", m_PARAMactivateSlopeRZ, " set True/False for each setup individually", activateSlopeRZ);
   addParam("activateNormedDistance3D", m_PARAMactivateNormedDistance3D, " set True/False for each setup individually", activateNormedDistance3D);
+
   addParam("activateAngles3DHioC", m_PARAMactivateAngles3DHioC, " set True/False for each setup individually", activateAngles3DHioC);
   addParam("activateAnglesXYHioC", m_PARAMactivateAnglesXYHioC, " set True/False for each setup individually", activateAnglesXYHioC);
   addParam("activateAnglesRZHioC", m_PARAMactivateAnglesRZHioC, " set True/False for each setup individually", activateAnglesRZHioC);
@@ -232,6 +233,7 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("activateDistance2IPHioC", m_PARAMactivateDistance2IPHioC, " set True/False for each setup individually", activateDistance2IPHioC);
   addParam("activatePTHioC", m_PARAMactivatePTHioC, " set True/False for each setup individually", activatePTHioC);
   addParam("activateHelixParameterFitHioC", m_PARAMactivateHelixParameterFitHioC, " set True/False for each setup individually", activateHelixParameterFitHioC);
+
   addParam("tuneAngles3DHioC", m_PARAMtuneAngles3DHioC, " tune for each setup individually, in %", tuneAngles3DHioC);
   addParam("tuneAnglesXYHioC", m_PARAMtuneAnglesXYHioC, " tune for each setup individually, in %", tuneAnglesXYHioC);
   addParam("tuneAnglesRZHioC", m_PARAMtuneAnglesRZHioC, " tune for each setup individually, in %", tuneAnglesRZHioC);

@@ -128,7 +128,6 @@ std::pair<TVector3, int> TrackletFilters::calcMomentumSeed(bool useBackwards, do
   } catch (FilterExceptions::Straight_Line& anException) {
     B2WARNING("Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << anException.what())
     try {
-      std::pair<double, TVector3> helixResults = fitResults;
       fitResults = simpleLineFit3D(m_hits, useBackwards, setMomentumMagnitude);
       stringstream hitPositions, hitSigmas;
       for (PositionInfo * hit : *m_hits) {
@@ -137,16 +136,24 @@ std::pair<TVector3, int> TrackletFilters::calcMomentumSeed(bool useBackwards, do
       }
       B2WARNING("After catching straight line case in Helix fit, the lineFit has chi2 of " << fitResults.first  << "\nwhile using following hits:\n" << hitPositions.str() << "\nand following sigmas: " << hitSigmas.str() << "with seed: " << fitResults.second.X() << " " << fitResults.second.Y() << " " << fitResults.second.Z() << "\n")
 
-    } catch (FilterExceptions::Straight_Line& anException) {
-      B2FATAL("Exception caught: TrackletFilters::calcMomentumSeed - simpleLineFit3D said: " << anException.what())
+    } catch (FilterExceptions::Straight_Up& anException) {
+      try {
+        fitResults = circleFit(m_hits, useBackwards, setMomentumMagnitude);
+      } catch (FilterExceptions::Straight_Line& anException) {
+        B2FATAL("Exception caught: TrackletFilters::calcMomentumSeed - simpleLineFit3D said: " << anException.what())
+      }
     }
 
   } catch (FilterExceptions::Center_Is_Origin& anException) {
     B2WARNING("Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << anException.what())
     try {
       fitResults = simpleLineFit3D(m_hits, useBackwards, setMomentumMagnitude);
-    } catch (FilterExceptions::Straight_Line& anException) {
-      B2FATAL("Exception caught: TrackletFilters::calcMomentumSeed - simpleLineFit3D said: " << anException.what())
+    } catch (FilterExceptions::Straight_Up& anException) {
+      try {
+        fitResults = circleFit(m_hits, useBackwards, setMomentumMagnitude);
+      } catch (FilterExceptions::Straight_Line& anException) {
+        B2FATAL("Exception caught: TrackletFilters::calcMomentumSeed - simpleLineFit3D said: " << anException.what())
+      }
     }
   } catch (FilterExceptions::Invalid_result_Nan& anException) {
     stringstream hitPositions;
@@ -156,8 +163,12 @@ std::pair<TVector3, int> TrackletFilters::calcMomentumSeed(bool useBackwards, do
     B2WARNING("Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << anException.what() << "\nwhile using following hits:\n" << hitPositions.str())
     try {
       fitResults = simpleLineFit3D(m_hits, useBackwards, setMomentumMagnitude);
-    } catch (FilterExceptions::Straight_Line& anException) {
-      B2FATAL("Exception caught: TrackletFilters::calcMomentumSeed - simpleLineFit3D said: " << anException.what())
+    } catch (FilterExceptions::Straight_Up& anException) {
+      try {
+        fitResults = circleFit(m_hits, useBackwards, setMomentumMagnitude);
+      } catch (FilterExceptions::Straight_Line& anException) {
+        B2FATAL("Exception caught: TrackletFilters::calcMomentumSeed - simpleLineFit3D said: " << anException.what())
+      }
     }
   }
   B2DEBUG(10, "calcMomentumSeed: return values of Fit: first(radius): " << fitResults.first << ", second.Mag(): " << fitResults.second.Mag())
@@ -1101,12 +1112,32 @@ TVector3 pTVector = (pT / radiusInCm) * radialVector.Orthogonal();
 bool TrackletFilters::CalcCurvature()
 {
   if (m_hits == NULL) B2FATAL(" TrackletFilters::CalcCurvature: hits not set, therefore no calculation possible - please check that!")
-    int sumOfCurvature = 0;
+    double sumOfCurvature = 0.;
   for (int i = 0; i < m_numHits - 2; ++i) {
-    sumOfCurvature += m_3hitFilterBox.calcSign(m_hits->at(i)->hitPosition, m_hits->at(i + 1)->hitPosition, m_hits->at(i + 2)->hitPosition);
-    //We sum over the Signs: a positive value represents a left-oriented (from out to in) curvature, a negative value means having a right-oriented curvature.
+    TVector3 ab = m_hits->at(i)->hitPosition - m_hits->at(i + 1)->hitPosition;
+    ab.SetZ(0.);
+    TVector3 bc = m_hits->at(i + 1)->hitPosition - m_hits->at(i + 2)->hitPosition;
+    bc.SetZ(0.);
+    sumOfCurvature += bc.Orthogonal() * ab; //normal vector of m_vecBC times segment of ba
   }
-  if (sumOfCurvature == 0) { throw FilterExceptions::Calculating_Curvature_Failed(); }  //Maybe one should define a more suitable exception; TODO and one could try weighting the Curvature -1,0,1 by the 3D Distance. (if the ==0 case appears too often.)
-  if (sumOfCurvature > 0) { return true; }
+  //B2WARNING(sumOfCurvature);
+  if (sumOfCurvature == 0.) {
+    throw FilterExceptions::Calculating_Curvature_Failed();
+  }
+  if (sumOfCurvature > 0.) { return true; }
   else { return false; }
 }
+
+
+// bool TrackletFilters::CalcCurvature()
+// {
+//   if (m_hits == NULL) B2FATAL(" TrackletFilters::CalcCurvature: hits not set, therefore no calculation possible - please check that!")
+//     int sumOfCurvature = 0;
+//   for (int i = 0; i < m_numHits - 2; ++i) {
+//     sumOfCurvature += m_3hitFilterBox.calcSign(m_hits->at(i)->hitPosition, m_hits->at(i + 1)->hitPosition, m_hits->at(i + 2)->hitPosition);
+//     //We sum over the Signs: a positive value represents a left-oriented (from out to in) curvature, a negative value means having a right-oriented curvature.
+//   }
+//   if (sumOfCurvature == 0) { throw FilterExceptions::Calculating_Curvature_Failed(); }  //Maybe one should define a more suitable exception; TODO and one could try weighting the Curvature -1,0,1 by the 3D Distance. (if the ==0 case appears too often.)
+//   if (sumOfCurvature > 0) { return true; }
+//   else { return false; }
+// }

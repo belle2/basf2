@@ -17,30 +17,58 @@ using namespace std;
 using namespace Belle2;
 
 
-std::pair<int, int> Belle2::PassData::importSectorMap(const Belle2::SecMapCopy& rawSecMap)
+std::pair<int, int> PassData::importSectorMap(const VXDTFSecMapTypedef::SecMapCopy& rawSecMap, const  VXDTFRawSecMapTypedef::SectorDistancesMap& distancesMap, bool useDistances)
 {
   this->sectorMap.clear();
   int totalFriendCounter = 0;
   int storedCutoffCtr = 0;
 
   double cutoffMinValue, cutoffMaxValue;
-  pair<double, double> cutoff; // will be rewritten for each cutoff to be imported
+  VXDTFSecMapTypedef::CutoffValue cutoff; // will be rewritten for each cutoff to be imported
 
-  for (const SectorPack & aSector : rawSecMap) {
-    B2DEBUG(110, "PassData::importSectorMap: importing sector: " << FullSecID(aSector.first) << " (named " << aSector.first << " as an int) including " << aSector.second.size() << " friends. ");
+  for (const VXDTFSecMapTypedef::Sector & aSector : rawSecMap) {
+    FullSecID currentSecID = aSector.first, newSecID;
+
+    B2DEBUG(110, "PassData::importSectorMap: importing sector: " << currentSecID << " including " << aSector.second.size() << " friends. ");
     totalFriendCounter += aSector.second.size();
-    VXDSector* pSector = new VXDSector(aSector.first);
 
-    for (const FriendPack & aFriend : aSector.second) { // Friend.first is friendID
-      B2DEBUG(120, "PassData::importSectorMap: importing friend: " << FullSecID(aFriend.first) << " (named " << aFriend.first << " as an int) including " << aFriend.second.size() << " filters. ");
+    VXDSector* pSector;
+    if (useDistances == true) {
+      auto iterator = std::find_if(distancesMap.begin(),
+                                   distancesMap.end(),
+                                   [&currentSecID](VXDTFRawSecMapTypedef::SectorDistance const & elem)
+      { return elem.first == currentSecID; } // searching for current sector
+                                  );
 
-      for (const CutoffPack & aFilter : aFriend.second) {
+      if (iterator == distancesMap.end()) {
+        newSecID = FullSecID(currentSecID.getVxdID(), false, currentSecID.getSecID());
+        iterator = std::find_if(distancesMap.begin(),
+                                distancesMap.end(),
+                                [&newSecID](VXDTFRawSecMapTypedef::SectorDistance const & elem)
+        { return elem.first == newSecID; } // searching for current sector
+                               );
+      }
+      if (iterator == distancesMap.end()) { // if still not found, print warning...
+        B2WARNING("neither sector " << currentSecID << " nor " << newSecID << " found, initialising using 0 for distance")
+      }
+      pSector = new VXDSector(currentSecID, iterator->second, useDistances);
+    } else {
+      pSector = new VXDSector(currentSecID);
+    }
+
+    // importing friends and filters
+    for (const VXDTFSecMapTypedef::Friend & aFriend : aSector.second) {
+      FullSecID currentFriendID = aFriend.first;
+      B2DEBUG(120, "PassData::importSectorMap: importing friend: " << currentFriendID << " including " << aFriend.second.size() << " filters. ");
+
+      for (const VXDTFSecMapTypedef::Cutoff & aFilter : aFriend.second) {
         B2DEBUG(130, "PassData::importSectorMap: importing filter: " << FilterID().getFilterString(aFilter.first) << " (named " << aFilter.first << " as an int) including Min/Max: " << aFilter.second.first << "/" << aFilter.second.second);
         // aFilter.first is filterID, .second is cutoff, where .second.first is min, .second.second is max
         unsigned int filterID = aFilter.first;
         bool doNotStore = false;
         cutoffMinValue = 0, cutoffMaxValue = 0;
-        if (filterID >= int(FilterID::numFilters)) { B2FATAL("PassData::importSectorMap: Filter in XML-File does not exist! check FilterID-class!")}
+        if (filterID >= static_cast<unsigned int>(FilterID::numFilters)) { B2FATAL("PassData::importSectorMap: Filter in XML-File does not exist! check FilterID-class!")}
+
         // now, for each filter will be checked, whether it shall be stored or not and whether the cutoffs shall be modified:
         if (filterID == FilterID::distance3D && this->distance3D.first == true) {   // first: activateDistance3D, second: tuneDistance3D
           cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->distance3D.second);
@@ -78,9 +106,17 @@ std::pair<int, int> Belle2::PassData::importSectorMap(const Belle2::SecMapCopy& 
           cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->pT.second);
           cutoffMaxValue = addExtraGain(+1, aFilter.second.second, this->pT.second);
 
-        } else if (filterID == FilterID::helixParameterFit &&  this->helixFit.first == true) {
-          cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->helixFit.second);
-          cutoffMaxValue = addExtraGain(+1, aFilter.second.second, this->helixFit.second);
+        } else if (filterID == FilterID::helixParameterFit &&  this->helixParameterFit.first == true) {
+          cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->helixParameterFit.second);
+          cutoffMaxValue = addExtraGain(+1, aFilter.second.second, this->helixParameterFit.second);
+
+        } else if (filterID == FilterID::deltaSOverZ &&  this->deltaSOverZ.first == true) {
+          cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->deltaSOverZ.second);
+          cutoffMaxValue = addExtraGain(+1, aFilter.second.second, this->deltaSOverZ.second);
+
+        } else if (filterID == FilterID::deltaSlopeZOverS &&  this->deltaSlopeZOverS.first == true) {
+          cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->deltaSlopeZOverS.second);
+          cutoffMaxValue = addExtraGain(+1, aFilter.second.second, this->deltaSlopeZOverS.second);
 
         } else if (filterID == FilterID::distance2IP &&  this->distance2IP.first == true) {
           cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->distance2IP.second);
@@ -114,9 +150,9 @@ std::pair<int, int> Belle2::PassData::importSectorMap(const Belle2::SecMapCopy& 
           cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->pTHighOccupancy.second);
           cutoffMaxValue = addExtraGain(+1, aFilter.second.second, this->pTHighOccupancy.second);
 
-        } else if (filterID == FilterID::helixHighOccupancyFit &&  this->helixHighOccupancyFit.first == true) {
-          cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->helixHighOccupancyFit.second);
-          cutoffMaxValue = addExtraGain(+1, aFilter.second.second, this->helixHighOccupancyFit.second);
+        } else if (filterID == FilterID::helixParameterHighOccupancyFit &&  this->helixParameterHighOccupancyFit.first == true) {
+          cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->helixParameterHighOccupancyFit.second);
+          cutoffMaxValue = addExtraGain(+1, aFilter.second.second, this->helixParameterHighOccupancyFit.second);
 
         } else if (filterID == FilterID::distanceHighOccupancy2IP &&  this->distanceHighOccupancy2IP.first == true) {
           cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->distanceHighOccupancy2IP.second);
@@ -133,7 +169,7 @@ std::pair<int, int> Belle2::PassData::importSectorMap(const Belle2::SecMapCopy& 
         } else if (filterID == FilterID::deltaDistanceHighOccupancy2IP &&  this->deltaDistanceHighOccupancy2IP.first == true) {
           cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->deltaDistanceHighOccupancy2IP.second);
           cutoffMaxValue = addExtraGain(+1, aFilter.second.second, this->deltaDistanceHighOccupancy2IP.second);
-        } else { B2DEBUG(130, "PassData::importSectorMap: filter not accepted: sector/friend/filterID: " << FullSecID(aSector.first).getFullSecString() << "/" << FullSecID(aFriend.first).getFullSecString() << "/" << FilterID().getFilterString(aFilter.first) << "!"); doNotStore = true; }
+        } else { B2DEBUG(130, "PassData::importSectorMap: filter not accepted: sector/friend/filterID: " << currentSecID << "/" << currentFriendID << "/" << FilterID().getFilterString(aFilter.first) << "!"); doNotStore = true; }
 
         if (doNotStore == false) {
           cutoff = make_pair(cutoffMinValue, cutoffMaxValue);
@@ -152,6 +188,8 @@ std::pair<int, int> Belle2::PassData::importSectorMap(const Belle2::SecMapCopy& 
   this->sectorMap.insert(make_pair(centerSecID, pCenterSector));
   B2DEBUG(10, "PassData::importSectorMap: adding virtual centerSector with " << this->sectorMap.find(centerSecID)->second->getFriends().size() << " friends. SecMap got " << this->sectorMap.size() << " entries now");
 
+  linkSectorsToFriends();
+
   return make_pair(totalFriendCounter, storedCutoffCtr);
 }
 
@@ -159,7 +197,7 @@ std::pair<int, int> Belle2::PassData::importSectorMap(const Belle2::SecMapCopy& 
 
 void PassData::activateAllFilters()
 {
-  Filter standardValue = make_pair(true, 0); // type pair<bool isActivated, double tuningParameter>
+  PassDataTypedef::Filter standardValue = make_pair(true, 0); // type pair<bool isActivated, double tuningParameter>
   distance3D = standardValue;
   distanceXY = standardValue;
   distanceZ = standardValue;
@@ -173,7 +211,7 @@ void PassData::activateAllFilters()
   deltaSlopeHighOccupancyRZ = standardValue;
   pTHighOccupancy = standardValue;
   distanceHighOccupancy2IP = standardValue;
-  helixHighOccupancyFit = standardValue;
+  helixParameterHighOccupancyFit = standardValue;
   activatedHighOccupancySegFinderTests = 7;
 
   angles3D = standardValue;
@@ -182,7 +220,9 @@ void PassData::activateAllFilters()
   deltaSlopeRZ = standardValue;
   pT = standardValue;
   distance2IP = standardValue;
-  helixFit = standardValue;
+  helixParameterFit = standardValue;
+  deltaSOverZ = standardValue;
+  deltaSlopeZOverS = standardValue;
   activatedNbFinderTests = 7;
 
   deltaPtHighOccupancy = standardValue;

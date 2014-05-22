@@ -1391,7 +1391,7 @@ void VXDTFModule::the_real_event()
         continue;
       }  // PXD is included in 0 & -1
 
-      SectorNameAndPointerPair activatedSector = searchSector4Hit(aVxdID, transformedHitLocal, localSensorSize, currentPass->sectorMap, currentPass->secConfigU, currentPass->secConfigV);
+      SectorNameAndPointerPair activatedSector = searchSector4Hit(aVxdID, transformedHitLocal, /*localSensorSize,*/ currentPass->sectorMap, currentPass->secConfigU, currentPass->secConfigV);
 
       aSecID = activatedSector.first;
       MapOfSectors::iterator secMapIter = activatedSector.second;
@@ -1456,28 +1456,28 @@ void VXDTFModule::the_real_event()
       if (currentPass->usePXDHits == false) { continue; }  // PXD is included in 0 & -1
       SectorNameAndPointerPair activatedSector = searchSector4Hit(aVxdID,
                                                                   transformedHitLocal,
-                                                                  localSensorSize,
+//                                                                   localSensorSize,
                                                                   currentPass->sectorMap,
                                                                   currentPass->secConfigU,
                                                                   currentPass->secConfigV);
 
 
-      // Test only
-      if (m_PARAMdisplayCollector > 0) {
-
-        SectorNameAndPointerPair activatedSector2 = searchSector4HitOld(aVxdID,
-                                                    transformedHitLocal,
-                                                    localSensorSize,
-                                                    currentPass->sectorMap,
-                                                    currentPass->secConfigU,
-                                                    currentPass->secConfigV);
-
-        if (activatedSector2.first != activatedSector.first) {
-          B2DEBUG(100, "NO MATCH in searchSector4HitOld: FIRST: " << activatedSector2.first
-                  << ", (new):" << activatedSector.first);
-        }
-
-      }
+//       // Test only
+//       if (m_PARAMdisplayCollector > 0) {
+//
+//         SectorNameAndPointerPair activatedSector2 = searchSector4HitOld(aVxdID,
+//                                                     transformedHitLocal,
+//                                                     localSensorSize,
+//                                                     currentPass->sectorMap,
+//                                                     currentPass->secConfigU,
+//                                                     currentPass->secConfigV);
+//
+//         if (activatedSector2.first != activatedSector.first) {
+//           B2DEBUG(100, "NO MATCH in searchSector4HitOld: FIRST: " << activatedSector2.first
+//                   << ", (new):" << activatedSector.first);
+//         }
+//
+//       }
 
 
 
@@ -1669,35 +1669,35 @@ void VXDTFModule::the_real_event()
 
         SectorNameAndPointerPair activatedSector = searchSector4Hit(aVxdID,
                                                                     hitLocal,
-                                                                    localSensorSize,
+//                                                                     localSensorSize,
                                                                     currentPass->sectorMap,
                                                                     currentPass->secConfigU,
                                                                     currentPass->secConfigV);
 
-        // Test only
-        if (m_PARAMdisplayCollector > 0) {
-
-          SectorNameAndPointerPair activatedSector2 = searchSector4HitOld(aVxdID,
-                                                      transformedHitLocal,
-                                                      localSensorSize,
-                                                      currentPass->sectorMap,
-                                                      currentPass->secConfigU,
-                                                      currentPass->secConfigV);
-
-          if (activatedSector2.first != activatedSector.first) {
-            B2DEBUG(100, "NO MATCH in searchSector4HitOld: FIRST: " << activatedSector2.first <<
-                    ", (new):" << activatedSector.first);
-          }
-
-//   if ( activatedSector2.second != activatedSector.second)
-//   {
-//     B2DEBUG(100, "NO MATCH in searchSector4HitOld: SECOND: " << activatedSector2.second <<
-//     ", (new):" << activatedSector.second);
-//   }
-
-
-
-        }
+//         // Test only
+//         if (m_PARAMdisplayCollector > 0) {
+//
+//           SectorNameAndPointerPair activatedSector2 = searchSector4HitOld(aVxdID,
+//                                                       transformedHitLocal,
+//                                                       localSensorSize,
+//                                                       currentPass->sectorMap,
+//                                                       currentPass->secConfigU,
+//                                                       currentPass->secConfigV);
+//
+//           if (activatedSector2.first != activatedSector.first) {
+//             B2DEBUG(100, "NO MATCH in searchSector4HitOld: FIRST: " << activatedSector2.first <<
+//                     ", (new):" << activatedSector.first);
+//           }
+//
+// //   if ( activatedSector2.second != activatedSector.second)
+// //   {
+// //     B2DEBUG(100, "NO MATCH in searchSector4HitOld: SECOND: " << activatedSector2.second <<
+// //     ", (new):" << activatedSector.second);
+// //   }
+//
+//
+//
+//         }
 
 
 
@@ -3285,7 +3285,7 @@ void VXDTFModule::tcDuel(TCsOfEvent& tcVector)
 /// searches for sectors fitting current hit coordinates, returns blank string if nothing could be found
 Belle2::SectorNameAndPointerPair VXDTFModule::searchSector4Hit(VxdID aVxdID,
     TVector3 localHit,
-    TVector3 sensorSize, /// WARNING TODO: remove that entry, its not needed anymore
+//     TVector3 sensorSize, /// WARNING TODO: remove that entry, its not needed anymore
     Belle2::MapOfSectors& m_sectorMap,
     vector<double>& uConfig,
     vector<double>& vConfig)
@@ -3350,72 +3350,72 @@ Belle2::SectorNameAndPointerPair VXDTFModule::searchSector4Hit(VxdID aVxdID,
 
 /** ***** searchSector4Hit ***** **/
 /// searches for sectors fitting current hit coordinates, returns blank string if nothing could be found
-Belle2::SectorNameAndPointerPair VXDTFModule::searchSector4HitOld(VxdID aVxdID,
-    TVector3 localHit,
-    TVector3 sensorSize,
-    Belle2::MapOfSectors& m_sectorMap,
-    vector<double>& uConfig,
-    vector<double>& vConfig)
-{
-  Belle2::MapOfSectors::iterator secMapIter = m_sectorMap.begin();
+// // Belle2::SectorNameAndPointerPair VXDTFModule::searchSector4HitOld(VxdID aVxdID,
+// //     TVector3 localHit,
+// //     TVector3 sensorSize,
+// //     Belle2::MapOfSectors& m_sectorMap,
+// //     vector<double>& uConfig,
+// //     vector<double>& vConfig)
+// // {
+// //   Belle2::MapOfSectors::iterator secMapIter = m_sectorMap.begin();
+// //
+// //   unsigned int aSecID;
+// //   unsigned int aFullSecID = numeric_limits<unsigned int>::max();
+// //
+// // //   if (m_PARAMdisplayCollector > 0) {
+// // //     B2DEBUG(100, "Find SecID LocalHit: " << localHit.X() << "/" << localHit.Y() << "/" << localHit.Z());
+// // //     B2DEBUG(100, "Find SecID sensorSize: " << sensorSize.X() << "/" << sensorSize.Y() << "/" << sensorSize.Z());
+// // //   }
+// //
+// //   for (int j = 0; j < int(uConfig.size() - 1); ++j) {
+// //     B2DEBUG(175, "uCuts(j)*uSize: " << uConfig.at(j)*sensorSize[0] << " uCuts(j+1)*uSize: " << uConfig.at(j + 1)*sensorSize[0]);
+// //
+// //     // Changed by Stefan F, no * 2
+// //     // if (localHit[0] >= (uConfig[j]*sensorSize[0] * 2.) && localHit[0] <= (uConfig[j + 1]*sensorSize[0] * 2.)) {
+// //     if (localHit[0] >= (uConfig[j]*sensorSize[0]) && localHit[0] <= (uConfig[j + 1]*sensorSize[0])) {
+// //       for (int k = 0; k != int(vConfig.size() - 1); ++k) {
+// //         B2DEBUG(175, " vCuts(k)*vSize: " << vConfig.at(k)*sensorSize[1] << " vCuts(k+1)*vSize: " << vConfig.at(k + 1)*sensorSize[1]);
+// //
+// // //         if (localHit[1] >= (vConfig[k]*sensorSize[1] * 2.) && localHit[1] <= (vConfig[k + 1]*sensorSize[1] * 2.)) {
+// //         if (localHit[1] >= (vConfig[k]*sensorSize[1]) && localHit[1] <= (vConfig[k + 1]*sensorSize[1])) {
+// //           aSecID = k + 1 + j * (vConfig.size() - 1);
+// //
+// // //    if (m_PARAMdisplayCollector > 0) {
+// // //      B2DEBUG(100, "LocalHit_aSecID_aVxdID: " << localHit.X() << ";" << localHit.Y() << ";" << localHit.Z() << ";" << aSecID << "; " << aVxdID.getID());
+// // //    }
+// //
+// //           aFullSecID = FullSecID(aVxdID, false, aSecID).getFullSecID();
+// //           B2DEBUG(150, "searchSector4Hit: calculated secID: " << FullSecID(aFullSecID))
+// //           secMapIter = m_sectorMap.find(aFullSecID);
+// //
+// // //     if (m_PARAMdisplayCollector > 0) {
+// // //      B2DEBUG(100, "aFullSecID: " << aFullSecID);
+// // //    }
+// //
+// //           if (secMapIter == m_sectorMap.end()) {
+// //             aFullSecID = FullSecID(aVxdID, true, aSecID).getFullSecID();
+// //             B2DEBUG(150, "searchSector4Hit: secID not found, trying : " << FullSecID(aFullSecID))
+// //             secMapIter = m_sectorMap.find(aFullSecID);
+// //           }
+// //
+// //           if (secMapIter == m_sectorMap.end()) {
+// //             aFullSecID = numeric_limits<unsigned int>::max();
+// //             B2DEBUG(150, "searchSector4Hit: secID does not exist in secMap. Setting to: " << FullSecID(aFullSecID))
+// //           }
+// //         }
+// //       }
+// //     }
+// //   } //sector-searching loop
+// //   return make_pair(aFullSecID, secMapIter); // SectorNameAndPointerPair
+// // }
 
-  unsigned int aSecID;
-  unsigned int aFullSecID = numeric_limits<unsigned int>::max();
 
-//   if (m_PARAMdisplayCollector > 0) {
-//     B2DEBUG(100, "Find SecID LocalHit: " << localHit.X() << "/" << localHit.Y() << "/" << localHit.Z());
-//     B2DEBUG(100, "Find SecID sensorSize: " << sensorSize.X() << "/" << sensorSize.Y() << "/" << sensorSize.Z());
-//   }
-
-  for (int j = 0; j < int(uConfig.size() - 1); ++j) {
-    B2DEBUG(175, "uCuts(j)*uSize: " << uConfig.at(j)*sensorSize[0] << " uCuts(j+1)*uSize: " << uConfig.at(j + 1)*sensorSize[0]);
-
-    // Changed by Stefan F, no * 2
-    // if (localHit[0] >= (uConfig[j]*sensorSize[0] * 2.) && localHit[0] <= (uConfig[j + 1]*sensorSize[0] * 2.)) {
-    if (localHit[0] >= (uConfig[j]*sensorSize[0]) && localHit[0] <= (uConfig[j + 1]*sensorSize[0])) {
-      for (int k = 0; k != int(vConfig.size() - 1); ++k) {
-        B2DEBUG(175, " vCuts(k)*vSize: " << vConfig.at(k)*sensorSize[1] << " vCuts(k+1)*vSize: " << vConfig.at(k + 1)*sensorSize[1]);
-
-//         if (localHit[1] >= (vConfig[k]*sensorSize[1] * 2.) && localHit[1] <= (vConfig[k + 1]*sensorSize[1] * 2.)) {
-        if (localHit[1] >= (vConfig[k]*sensorSize[1]) && localHit[1] <= (vConfig[k + 1]*sensorSize[1])) {
-          aSecID = k + 1 + j * (vConfig.size() - 1);
-
-//    if (m_PARAMdisplayCollector > 0) {
-//      B2DEBUG(100, "LocalHit_aSecID_aVxdID: " << localHit.X() << ";" << localHit.Y() << ";" << localHit.Z() << ";" << aSecID << "; " << aVxdID.getID());
-//    }
-
-          aFullSecID = FullSecID(aVxdID, false, aSecID).getFullSecID();
-          B2DEBUG(150, "searchSector4Hit: calculated secID: " << FullSecID(aFullSecID))
-          secMapIter = m_sectorMap.find(aFullSecID);
-
-//     if (m_PARAMdisplayCollector > 0) {
-//      B2DEBUG(100, "aFullSecID: " << aFullSecID);
-//    }
-
-          if (secMapIter == m_sectorMap.end()) {
-            aFullSecID = FullSecID(aVxdID, true, aSecID).getFullSecID();
-            B2DEBUG(150, "searchSector4Hit: secID not found, trying : " << FullSecID(aFullSecID))
-            secMapIter = m_sectorMap.find(aFullSecID);
-          }
-
-          if (secMapIter == m_sectorMap.end()) {
-            aFullSecID = numeric_limits<unsigned int>::max();
-            B2DEBUG(150, "searchSector4Hit: secID does not exist in secMap. Setting to: " << FullSecID(aFullSecID))
-          }
-        }
-      }
-    }
-  } //sector-searching loop
-  return make_pair(aFullSecID, secMapIter); // SectorNameAndPointerPair
-}
-
-
-
+/*
 bool VXDTFModule::compareSecSequence(Belle2::SectorNameAndPointerPair& lhs, Belle2::SectorNameAndPointerPair& rhs)
 {
   if (lhs.first < rhs.first) { return true; }
   return false;
-}
+}*/
 
 
 

@@ -72,9 +72,6 @@ void ContinuumSuppressionBuilderModule::event()
     // Create relation: Particle <-> ContinuumSuppression
     particle->addRelationTo(qqVars);
 
-    // TODO: Not used below. Remove if still not used when module is finalized
-    std::vector<TLorentzVector> p_cms_sigA, p_cms_sigB, p_cms_roe;
-
     std::vector<TVector3> p3_cms_sigA, p3_cms_sigB, p3_cms_roe;
     std::vector<int> Q_sigA, Q_sigB, Q_roe;
 
@@ -109,7 +106,6 @@ void ContinuumSuppressionBuilderModule::event()
     for (unsigned i = 0; i < sigDau.size(); i++) {
       PCmsLabTransform T;
       TLorentzVector p_cms = T.rotateLabToCms() * sigDau[i]->get4Vector();
-      p_cms_sigA.push_back(p_cms);
       p3_cms_sigA.push_back(p_cms.Vect());
       Q_sigA.push_back(sigDau[i]->getCharge());
       p_cms_missA -= p_cms;
@@ -122,7 +118,6 @@ void ContinuumSuppressionBuilderModule::event()
     for (unsigned i = 0; i < sigFsp.size(); i++) {
       PCmsLabTransform T;
       TLorentzVector p_cms = T.rotateLabToCms() * sigFsp[i]->get4Vector();
-      p_cms_sigB.push_back(p_cms);
       p3_cms_sigB.push_back(p_cms.Vect());
       Q_sigB.push_back(sigFsp[i]->getCharge());
       p_cms_missB -= p_cms;
@@ -153,7 +148,6 @@ void ContinuumSuppressionBuilderModule::event()
           PCmsLabTransform T;
           TLorentzVector p_cms = T.rotateLabToCms() * particle.get4Vector();
           if (p_cms.Rho() > P_MAX) continue;
-          p_cms_roe.push_back(p_cms);
           p3_cms_roe.push_back(p_cms.Vect());
           Q_roe.push_back(particle.getCharge());
           p_cms_missA -= p_cms;
@@ -181,7 +175,6 @@ void ContinuumSuppressionBuilderModule::event()
           PCmsLabTransform T;
           TLorentzVector p_cms = T.rotateLabToCms() * p_lab;
           if (p_cms.Rho() > P_MAX) continue;
-          p_cms_roe.push_back(p_cms);
           p3_cms_roe.push_back(p_cms.Vect());
           Q_roe.push_back(0);
           p_cms_missA -= p_cms;

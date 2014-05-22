@@ -3,13 +3,26 @@
 <CATFParameters xmlns:xi="http://www.w3.org/2001/XInclude">
 	<!-- TODO: If you want to use the VXDTFModule, you have to uncomment the following lines! -->
 
-	<xi:include href="../tracking/sectorList_evtNormSecLOW_SVD.xml"/>
-	<xi:include href="../tracking/sectorList_evtNormSecHIGH_SVD.xml"/>
-	<xi:include href="../tracking/sectorList_evtNormSecMED_SVD.xml"/>
-	<xi:include href="../tracking/sectorList_evtNormSecLOW_VXD.xml"/>
-	<xi:include href="../tracking/sectorList_evtNormSecHIGH_VXD.xml"/>
-	<xi:include href="../tracking/sectorList_evtNormSecMED_VXD.xml"/>
+<!-- 	<xi:include href="../tracking/sectorList_evtNormSecLOW_SVD.xml"/> -->
+<!-- 	<xi:include href="../tracking/sectorList_evtNormSecHIGH_SVD.xml"/> -->
+<!-- 	<xi:include href="../tracking/sectorList_evtNormSecMED_SVD.xml"/> -->
+<!-- 	<xi:include href="../tracking/sectorList_evtNormSecLOW_VXD.xml"/> -->
+<!-- 	<xi:include href="../tracking/sectorList_evtNormSecHIGH_VXD.xml"/> -->
+<!-- 	<xi:include href="../tracking/sectorList_evtNormSecMED_VXD.xml"/> -->
 
+<!-- 	<xi:include href="../tracking/secMapEvtGenOnR10501May2014SVDStd-30to125MeV_SVD.xml"/> -->
+<!-- 	<xi:include href="../tracking/secMapEvtGenOnR10501May2014SVDStd-125to500MeV_SVD.xml"/> -->
+<!-- 	<xi:include href="../tracking/secMapEvtGenOnR10501May2014SVDStd-moreThan500MeV_SVD.xml"/> -->
+	
+	<xi:include href="../tracking/belle2SimpleCaseTet35t80phi0t360SVD-50to500MeV_SVD.xml"/>
+	
+	<xi:include href="../tracking/secMapEvtGenOnR10508May2014VXDStd-30to125MeV_PXDSVD.xml"/>
+	<xi:include href="../tracking/secMapEvtGenOnR10508May2014VXDStd-125to500MeV_PXDSVD.xml"/>
+	<xi:include href="../tracking/secMapEvtGenOnR10508May2014VXDStd-moreThan500MeV_PXDSVD.xml"/>
+	
+	<xi:include href="../tracking/secMapEvtGenOnR10508May2014SVDStd-30to125MeV_SVD.xml"/>
+	<xi:include href="../tracking/secMapEvtGenOnR10508May2014SVDStd-125to500MeV_SVD.xml"/>
+	<xi:include href="../tracking/secMapEvtGenOnR10508May2014SVDStd-moreThan500MeV_SVD.xml"/>
 <!-- 	<xi:include href="../tracking/miniSVD-moreThan30MeV_SVD.xml"/> -->
 <!-- 	<xi:include href="../tracking/miniVXD-moreThan30MeV_VXD.xml"/> -->
 	

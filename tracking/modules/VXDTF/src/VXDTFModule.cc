@@ -80,9 +80,9 @@
 //Eigen
 #include <Eigen/Dense>
 
-// #ifdef HAS_CALLGRIND
-// #include <valgrind/callgrind.h>
-// #endif
+#ifdef HAS_CALLGRIND
+#include <valgrind/callgrind.h>
+#endif
 
 
 using namespace std;

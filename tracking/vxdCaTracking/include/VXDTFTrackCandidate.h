@@ -139,6 +139,20 @@ namespace Belle2 {
     } /**< returns real indices of pxdClusters forming current TC */
 
 
+    const std::vector<int>& getTELHitIndices() {
+      m_telHitIndices.clear();
+      m_telHitIndices.reserve(m_attachedHits.size());
+      int index;
+      for (VXDTFHit * aHit : m_attachedHits) {
+        if (aHit->getDetectorType() == Const::TEST) { /* Telescope */
+          index = aHit->getClusterIndexUV();
+          if (index != -1) { m_telHitIndices.push_back(index); }
+        }
+      }
+      return m_telHitIndices;
+    } /**< returns real indices of telClusters forming current TC */
+
+
     //     std::list<int> getHopfieldHitIndices() { return m_hopfieldHitIndices; } /**< returns slightly adapted indices for hopfield use only (no real indices, but only unique ones...) */
     std::list<int> getHopfieldHitIndices(); /**< returns slightly adapted indices for hopfield use only (no real indices, but only unique ones...) */
 
@@ -210,6 +224,9 @@ namespace Belle2 {
 
 
     void addPXDClusterIndex(int anIndex) { m_pxdHitIndices.push_back(anIndex); } /**< add index number of PXDCluster attached to current TC */
+
+
+    void addTELClusterIndex(int anIndex) { m_telHitIndices.push_back(anIndex); } /**< add index number of TELCluster attached to current TC */
 
 
     void addBookingRival(VXDTFTrackCandidate* aTC) { /**< adds a TC sharing hits with current one */
@@ -287,10 +304,11 @@ namespace Belle2 {
   protected:
     std::vector<VXDTFHit*> m_attachedHits; /**< contains pointer to all VXDTFHits attached to current TC. Currently, the first hit in the vector is the outermost hit */
     std::vector<PositionInfo*> m_attachedPositionInfos; /**< contains positionInfos (coordinates, sigmaValues) for each hit */
-    std::vector<VXDSegmentCell*> m_attachedCells; /**< contains pointer to all VXDSegmentCells attached to current TC */
+    std::vector<VXDSegmentCell*> m_attachedCells; /**< contains pointer to all VXDSegmentCells attached to current TC, first cell is outermost cell */
     std::vector<VXDTFTrackCandidate*> m_bookingRivals; /**< contains all TCs sharing hits with current one */
     std::vector<int> m_svdHitIndices;  /**< to be able to export TCs */
     std::vector<int> m_pxdHitIndices;  /**< to be able to export TCs */
+    std::vector<int> m_telHitIndices;  /**< to be able to export TCs */
     std::list<int> m_hopfieldHitIndices;  /**< slightly adapted indices for hopfield use only (no real indices, but only unique ones...) */
 
     bool m_overlapping;  /**< defines whether TC shares Hits with another valid TC or not */

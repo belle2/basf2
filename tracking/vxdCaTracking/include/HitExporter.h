@@ -42,6 +42,7 @@ namespace Belle2 {
     /** Empty constructor. */
     HitExporter():
       m_eventNumber(0),
+      m_thisEvent(NULL),
       m_attachedPass(NULL) {}
 
     /** Destructor. */

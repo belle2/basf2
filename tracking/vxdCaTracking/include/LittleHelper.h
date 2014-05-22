@@ -41,6 +41,27 @@ namespace Belle2 {
       m_sigmaValue = sigma;
     }
 
+
+    template<class Tmpl>
+    static void checkSmallerThan(Tmpl& number, Tmpl threshold) { if (number < threshold) { number = threshold; } } /**< member - checks if given value is < threshold, if it is, reset to threshold */
+
+
+    template<class Tmpl>
+    static void checkBiggerThan(Tmpl& number, Tmpl threshold) { if (number > threshold) { number = threshold; } } /**< member - checks if given value is > threshold, if it is, reset to threshold */
+
+
+    template<class Tmpl>
+    static void checkBoundaries(Tmpl& number, Tmpl lowerThreshold, Tmpl higherThreshold) {
+      if (higherThreshold < lowerThreshold) {
+        Tmpl tempVal = lowerThreshold;
+        lowerThreshold = higherThreshold;
+        higherThreshold = tempVal;
+      }
+      if (number > higherThreshold) { number = higherThreshold; }
+      if (number < lowerThreshold) { number = lowerThreshold; }
+
+    } /**< member - checks if given value is between boundaries (second parameter is lower, third parameter is upper one) and resets values if value is out of bounds */
+
     /** use this member if you want to smear your value using gauss within a certain area (generalized). */
     double smearValueGauss(double low, double high, double mean, double sigma);
 

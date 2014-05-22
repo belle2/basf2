@@ -35,7 +35,9 @@ namespace Belle2 {
       m_circleDist2IPCtr(std::make_pair(0, 0)),
       m_deltaSlopeRZCtr(std::make_pair(0, 0)),
       m_pTCtr(std::make_pair(0, 0)),
-      m_helixParameterFitCtr(std::make_pair(0, 0)) {}
+      m_helixParameterFitCtr(std::make_pair(0, 0)),
+      m_deltaSOverZCtr(std::make_pair(0, 0)),
+      m_deltaSlopeZOverSCtr(std::make_pair(0, 0)) {}
 
     /** Constructor. use this one, when having a sectormap (e.g. during track finding), use ThreeHitFilters when no sectormap is available, optional parameter sets strength of magnetic field (standard is 1.5T) */
     NbFinderFilters(TVector3 outerHit, TVector3 centerHit, TVector3 innerHit, VXDSector* thisSector, unsigned int friendID, double magneticFieldStrength = 1.5):
@@ -48,7 +50,9 @@ namespace Belle2 {
       m_circleDist2IPCtr(std::make_pair(0, 0)),
       m_deltaSlopeRZCtr(std::make_pair(0, 0)),
       m_pTCtr(std::make_pair(0, 0)),
-      m_helixParameterFitCtr(std::make_pair(0, 0)) {}
+      m_helixParameterFitCtr(std::make_pair(0, 0)),
+      m_deltaSOverZCtr(std::make_pair(0, 0)),
+      m_deltaSlopeZOverSCtr(std::make_pair(0, 0)) {}
 
 
     /** Destructor. */
@@ -77,7 +81,7 @@ namespace Belle2 {
     double fullAngle3D() { return ThreeHitFilters::fullAngle3D(); }
 
 
-    /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
+    /** returns number of accepted (.first) and neglected (.second) filter tests using calcAngle3D */
     SuccessAndFailCounter getAcceptanceRateAngle3D() { return m_angle3DCtr; }
 
 
@@ -93,7 +97,7 @@ namespace Belle2 {
     double fullAngleXY() { return ThreeHitFilters::fullAngleXY(); }
 
 
-    /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
+    /** returns number of accepted (.first) and neglected (.second) filter tests using calcAngleXY */
     SuccessAndFailCounter getAcceptanceRateAngleXY() { return m_angleXYCtr; }
 
 
@@ -109,7 +113,7 @@ namespace Belle2 {
     double fullAngleRZ() { return ThreeHitFilters::fullAngleRZ(); }
 
 
-    /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
+    /** returns number of accepted (.first) and neglected (.second) filter tests using calcAngleRZ */
     SuccessAndFailCounter getAcceptanceRateAngleRZ() { return m_angleRZCtr; }
 
 
@@ -121,7 +125,7 @@ namespace Belle2 {
     double calcCircleDist2IP() { return ThreeHitFilters::calcCircleDist2IP(); }
 
 
-    /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
+    /** returns number of accepted (.first) and neglected (.second) filter tests using calcCircleDist2IP */
     SuccessAndFailCounter getAcceptanceRateCircleDist2IP() { return m_circleDist2IPCtr; }
 
 
@@ -133,7 +137,7 @@ namespace Belle2 {
     double calcDeltaSlopeRZ() { return ThreeHitFilters::calcDeltaSlopeRZ(); }
 
 
-    /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
+    /** returns number of accepted (.first) and neglected (.second) filter tests using calcDeltaSlopeRZ */
     SuccessAndFailCounter getAcceptanceRateDeltaSlopeRZ() { return m_deltaSlopeRZCtr; }
 
 
@@ -149,7 +153,7 @@ namespace Belle2 {
     double calcPt(double& pT) { return ThreeHitFilters::calcPt(pT); }
 
 
-    /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
+    /** returns number of accepted (.first) and neglected (.second) filter tests using calcPt */
     SuccessAndFailCounter getAcceptanceRatePt() { return m_pTCtr; }
 
 
@@ -161,9 +165,28 @@ namespace Belle2 {
     double calcHelixParameterFit() { return ThreeHitFilters::calcHelixParameterFit(); }
 
 
-    /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
+    /** returns number of accepted (.first) and neglected (.second) filter tests using helixparameter */
     SuccessAndFailCounter getAcceptanceRateHelixParameterFit() { return m_helixParameterFitCtr; }
 
+    /** simply checks whether deltaSOverZ-value is accepted by the given cutoffs */
+    bool checkDeltaSOverZ(int nameDeltaSOverZ);
+
+
+    /** calculates the deltaSOverZ describing the deviation in z per unit angle, returning unit: none */
+    double calcDeltaSOverZ() { return ThreeHitFilters::calcDeltaSOverZ(); }
+
+    /** returns number of accepted (.first) and neglected (.second) filter tests using deltaSOverZ3D */
+    SuccessAndFailCounter getAcceptanceRateDeltaSOverZ() { return m_deltaSOverZCtr; }
+
+    /** simply checks whether deltaSlopeZOverS-value is accepted by the given cutoffs */
+    bool checkDeltaSlopeZOverS(int nameDeltaSlopeZOverS);
+
+
+    /** calculates the deltaSlopeZOverS describing the deviation in z per unit angle, returning unit: none */
+    double calcDeltaSlopeZOverS() { return ThreeHitFilters::calcDeltaSlopeZOverS(); }
+
+    /** returns number of accepted (.first) and neglected (.second) filter tests using deltaSlopeZOverS */
+    SuccessAndFailCounter getAcceptanceRateDeltaSlopeZOverS() { return m_deltaSlopeZOverSCtr; }
 
     /** returns cutoff-values of given filter */
     std::pair <double, double> getCutoffs(int aFilter) {
@@ -184,6 +207,8 @@ namespace Belle2 {
     SuccessAndFailCounter m_deltaSlopeRZCtr; /**< counts number of successful (.first) and neglected (.second) tests for deltaSlopeRZ */
     SuccessAndFailCounter m_pTCtr; /**< counts number of successful (.first) and neglected (.second) tests for pT */
     SuccessAndFailCounter m_helixParameterFitCtr; /**< counts number of successful (.first) and neglected (.second) tests for helixParameterFit */
+    SuccessAndFailCounter m_deltaSOverZCtr; /**< counts number of successful (.first) and neglected (.second) tests for deltaSOverZ */
+    SuccessAndFailCounter m_deltaSlopeZOverSCtr; /**< counts number of successful (.first) and neglected (.second) tests for deltaSlopeZOverS */
   }; //end class NbFinderFilters
 } //end namespace Belle2
 

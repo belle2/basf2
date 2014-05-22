@@ -38,21 +38,31 @@ namespace Belle2 {
       m_clusterIndex(-1),
       m_ownPositionInIndex(-1),
       m_isPXD(false),
+      m_isSVD(false),
+      m_isTEL(false),
       m_reserved(false),
       m_pxdCluster(NULL),
       m_svdCluster(NULL),
-      m_collector_id(-1) {}
+      m_collector_id(-1)/*,
+      m_telCluster(NULL)*/ {}
 
     /** Constructor. use this one, when having a sectormap (e.g. during track finding), use ThreeHitFilters when no sectormap is available */
-    ClusterInfo(int clusterIndex, int ownIndex, bool isPXD, const PXDCluster* pCluster, const SVDCluster* sCluster):
+    ClusterInfo(int clusterIndex, int ownIndex, bool isPXD, bool isSVD, bool isTEL, const PXDCluster* pCluster, const SVDCluster* sCluster/*, const TELCluster* tCluster*/):
       m_bossTC(NULL),
       m_clusterIndex(clusterIndex),
       m_ownPositionInIndex(ownIndex),
       m_isPXD(isPXD),
+      m_isSVD(isSVD),
+      m_isTEL(isTEL),
       m_reserved(false),
       m_pxdCluster(pCluster),
       m_svdCluster(sCluster),
-      m_collector_id(-1) {}
+      m_collector_id(-1)/*,
+      m_telCluster(tCluster)*/ {/*
+        if ( pCluster != NULL ) { m_isPXD = true; }
+        else if ( sCluster != NULL ) { m_isSVD = true; }
+        else if ( tCluster != NULL ) { m_isTEL = true; }*/
+    }
 
 
     /** Destructor. */
@@ -80,14 +90,23 @@ namespace Belle2 {
     /** returns the index number of this intermediate class in the container which stores all the ClusterInfos */
     int getOwnIndex() const { return m_ownPositionInIndex; }
 
-    /** returns boolean wwhich says whether this intermediate class is attached to a PXD- or SVDCluster */
+    /** returns boolean wwhich says whether this intermediate class is attached to a PXDCluster or not */
     bool isPXD() const { return m_isPXD; }
 
-    /** returns pointer to the PXDCluster, is NULL if ->this is a SVDCluster */
+    /** returns boolean wwhich says whether this intermediate class is attached to a SVDCluster or not */
+    bool isSVD() const { return m_isSVD; }
+
+    /** returns boolean wwhich says whether this intermediate class is attached to a TELCluster or not */
+    bool isTEL() const { return m_isTEL; }
+
+    /** returns pointer to the PXDCluster, is NULL if ->this is _not_ a PXDCluster */
     const PXDCluster* getPXDCluster() const { return m_pxdCluster; }
 
-    /** returns pointer to the SVDCluster, is NULL if ->this is a SVDCluster */
+    /** returns pointer to the SVDCluster, is NULL if ->this is _not_ a SVDCluster */
     const SVDCluster* getSVDCluster() const { return m_svdCluster; }
+
+//     /** returns pointer to the TELCluster, is NULL if ->this is _not_ a TELCluster */
+//     const TELCluster* getTELCluster() const { return m_telCluster; }
 
     /** checks each TC whether it's alive or not. If there is more than one TC alive, it's overbooked and returned boolean is True*/
     bool isOverbooked();
@@ -119,9 +138,12 @@ namespace Belle2 {
     int m_clusterIndex; /**< real index number of Cluster */
     int m_ownPositionInIndex; /**< index number of its own in the container which stores all the ClusterInfos */
     bool m_isPXD; /**< is true if it's attached to an PXDCluster */
+    bool m_isSVD; /**< is true if it's attached to an SVDCluster */
+    bool m_isTEL; /**< is true if it's attached to an TELCluster */
     bool m_reserved; /**< means that an accepted TC uses this cluster and therefore no other TC is allowed to use it anymore */
     const PXDCluster* m_pxdCluster; /**< if isPXD = true, this member contains the pointer to the parenting PXDCluster */
-    const SVDCluster* m_svdCluster; /**< if isPXD = false, this member contains the pointer to the parenting SVDCluster */
+    const SVDCluster* m_svdCluster; /**< if isSVD = true, this member contains the pointer to the parenting SVDCluster */
+//     const TELCluster* m_telCluster; /**< if isTEL = true, this member contains the pointer to the parenting TELCluster */
 
     int m_collector_id; /**< Cluster in the Collector */
 

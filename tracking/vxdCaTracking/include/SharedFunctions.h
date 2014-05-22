@@ -14,13 +14,25 @@
 #include <string>
 #include <vector>
 #include <TVector3.h>
-// #include <TMatrixT.h>
 #include <TMatrixD.h>
 #include <Eigen/Dense>
 #include <iostream>
 #include <sstream> // stringstream
 
 namespace Belle2 {
+
+
+
+  /** will be used by VXDTF to store information about the position of the hit.
+   * It is also in use for faster import of hit information for circleFitter
+   * (part of trackletFilter)
+   */
+  struct PositionInfo {
+    TVector3 hitPosition; /**< contains global hitPosition */
+    TVector3 hitSigma; /**< contains errors in global coordinates */
+    double sigmaU; /**< error in (u-direction locally)x-direction of hitPosition in global coordinates */
+    double sigmaV; /**< error of y-direction of hitPosition in global coordinates */
+  };
 
 
   /**
@@ -50,10 +62,16 @@ ss << std::endl;
   /** simple printFunction for Eigen library Matrices */
   void printMyMatrix(Eigen::MatrixXd& aMatrix, std::stringstream& ss);
 
-  struct PositionInfo {
-    TVector3 hitPosition; /**< contains global hitPosition */
-    TVector3 hitSigma; /**< contains errors in global coordinates */
-    double sigmaU; /**< error in (u-direction locally)x-direction of hitPosition in global coordinates */
-    double sigmaV; /**< error of y-direction of hitPosition in global coordinates */
-  }; /**< will be used by VXDTF to store information about the position of the hit. It is also in use for faster import of hit information for circleFitter (part of trackletFilter) */
+
+
+  template<typename TEntry>
+  std::string printMyStdVector(const std::vector< TEntry >& aVector)
+  {
+    std::stringstream printOut;
+    for (const TEntry & anEntry : aVector) {
+      printOut << anEntry << '\t';
+    }
+    printOut << std::endl;
+    return printOut.str();
+  }/**< simple printFunction for vectors */
 } //Belle2 namespace

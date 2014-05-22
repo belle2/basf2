@@ -415,12 +415,12 @@ void AnalizerCollectorTFInfo::storeHitInformation(std::string filename, int part
   B2DEBUG(100, "Filename (storeHitInformation): " << filename);
 
 
-  myfile << "hitid" << m_fileSeparator << "passIndex" << m_fileSeparator << "sector_ID" << m_fileSeparator << "died_at" << m_fileSeparator << "died_ID" << m_fileSeparator << "real" << m_fileSeparator << particleText << m_fileSeparator << "Purity" << m_fileSeparator << "Hit_Position" << m_fileSeparator << "Hit_Sigma" << m_fileSeparator << "F_overHighestAllowedLayer" << m_fileSeparator << "F_outOfSectorRange" << m_fileSeparator << "F_angles3D" << m_fileSeparator << "F_anglesRZ" << m_fileSeparator << "F_anglesXY" << m_fileSeparator << "F_distance3D" << m_fileSeparator << "F_distanceXY" << m_fileSeparator << "F_distanceZ" << m_fileSeparator << "F_helixParameterFit";
+  myfile << "hitid" << m_fileSeparator << "passIndex" << m_fileSeparator << "sector_ID" << m_fileSeparator << "died_at" << m_fileSeparator << "died_ID" << m_fileSeparator << "real" << m_fileSeparator << particleText << m_fileSeparator << "Purity" << m_fileSeparator << "Hit_Position" << m_fileSeparator << "Hit_Sigma" << m_fileSeparator << "overHighestAllowedLayer" << m_fileSeparator << "outOfSectorRange" << m_fileSeparator << FilterID::nameAngles3D << m_fileSeparator << FilterID::nameAnglesRZ << m_fileSeparator << FilterID::nameAnglesXY << m_fileSeparator << FilterID::nameDistance3D << m_fileSeparator << FilterID::nameDistanceXY << m_fileSeparator << FilterID::nameDistanceZ << m_fileSeparator << FilterID::nameHelixParameterFit;
 
-  myfile << m_fileSeparator << "F_deltaSOverZ" << m_fileSeparator <<  "F_deltaSlopeZOverS";
+  myfile << m_fileSeparator << FilterID::nameDeltaSOverZ << m_fileSeparator <<  FilterID::nameDeltaSlopeZOverS;
 
 
-  myfile << m_fileSeparator << "F_slopeRZ" << m_fileSeparator << "F_deltaSlopeRZ" << m_fileSeparator <<  "F_pT" << m_fileSeparator << "F_deltapT" << m_fileSeparator << "F_normedDistance3D" << m_fileSeparator << "F_distance2IP" << m_fileSeparator << "F_deltaDistance2IP" << m_fileSeparator << "F_silentSegFinder" << m_fileSeparator << "F_silentTcc" << m_fileSeparator <<
+  myfile << m_fileSeparator << FilterID::nameSlopeRZ << m_fileSeparator << FilterID::nameDeltaSlopeRZ << m_fileSeparator <<  FilterID::namePT << m_fileSeparator << FilterID::nameDeltapT << m_fileSeparator << FilterID::nameNormedDistance3D << m_fileSeparator << FilterID::nameDistance2IP << m_fileSeparator << FilterID::nameDeltaDistance2IP << m_fileSeparator << FilterID::nameSilentSegFinder << m_fileSeparator << FilterID::nameSilentTcc << m_fileSeparator <<
          "Clusters_Size" << m_fileSeparator << "ClusterID_1" << m_fileSeparator << "ClusterID_2" << endl;
 
 
@@ -629,11 +629,11 @@ void AnalizerCollectorTFInfo::storeCellInformation(std::string filename, int par
 
   myfile << "cellid" << m_fileSeparator << "passIndex" << m_fileSeparator << "state" << m_fileSeparator << "died_at" << m_fileSeparator << "died_ID" << m_fileSeparator << "real" << m_fileSeparator << particleText << m_fileSeparator << "Purity" << m_fileSeparator;
 
-  myfile << "F_distance3D" << m_fileSeparator <<  "F_distanceZ" << m_fileSeparator << "F_anglesXY" << m_fileSeparator << "F_anglesRZ" << m_fileSeparator << "F_slopeRZ" << m_fileSeparator << "F_distance2IP" << m_fileSeparator << "F_deltaSlopeRZ" << m_fileSeparator << "F_normedDistance3D" << m_fileSeparator << "F_pT" << m_fileSeparator << "F_helixParameterFit";
+  myfile << FilterID::nameDistance3D << m_fileSeparator <<  FilterID::nameDistanceZ << m_fileSeparator << FilterID::nameAnglesXY << m_fileSeparator << FilterID::nameAnglesRZ << m_fileSeparator << FilterID::nameSlopeRZ << m_fileSeparator << FilterID::nameDistance2IP << m_fileSeparator << FilterID::nameDeltaSlopeRZ << m_fileSeparator << FilterID::nameNormedDistance3D << m_fileSeparator << FilterID::namePT << m_fileSeparator << FilterID::nameHelixParameterFit;
 
-  myfile << m_fileSeparator << "F_deltaSOverZ" << m_fileSeparator <<  "F_deltaSlopeZOverS";
+  myfile << m_fileSeparator << FilterID::nameDeltaSOverZ << m_fileSeparator <<  FilterID::nameDeltaSlopeZOverS;
 
-  myfile << m_fileSeparator << "F_nbFinderLost" << m_fileSeparator <<  "F_cellularAutomaton" << m_fileSeparator << "F_silentTcc";
+  myfile << m_fileSeparator << FilterID::nameNbFinderLost << m_fileSeparator <<  FilterID::nameCellularAutomaton << m_fileSeparator << FilterID::nameSilentTcc;
 
   myfile << m_fileSeparator << "outer_hit" << m_fileSeparator << "inner_Hit" << endl;
 
@@ -768,7 +768,7 @@ void AnalizerCollectorTFInfo::storeTCInformation(std::string filename, int parti
   }
 
   myfile << "tcid" << m_fileSeparator << "passIndex" << m_fileSeparator << "ownid" << m_fileSeparator << "died_at" << m_fileSeparator << "died_ID" << m_fileSeparator << "real" << m_fileSeparator << particleText <<
-         m_fileSeparator << "Purity" << m_fileSeparator << "F_hopfield" << m_fileSeparator << "F_greedy" << m_fileSeparator << "F_tcDuel" << m_fileSeparator << "F_tcFinderCurr" << m_fileSeparator << "F_ziggZaggXY" << m_fileSeparator << "F_deltapT" << m_fileSeparator << "F_deltaDistance2IP" << m_fileSeparator << "F_ziggZaggRZ" << m_fileSeparator <<  "F_calcQIbyKalman" << m_fileSeparator << "F_overlapping" << m_fileSeparator << "F_circlefit" << m_fileSeparator << "Count_Asso_Cell_IDs" << m_fileSeparator << "Cell_ID_1" << m_fileSeparator << "Cell_ID_2" << m_fileSeparator << "Cell_ID_3" << m_fileSeparator << "Cell_ID_4" << m_fileSeparator << "Cell_ID_5" << m_fileSeparator << "Cell_ID_6" << m_fileSeparator
+         m_fileSeparator << "Purity" << m_fileSeparator << FilterID::nameHopfield << m_fileSeparator << FilterID::nameGreedy << m_fileSeparator << FilterID::nameTcDuel << m_fileSeparator << FilterID::nameTcFinderCurr << m_fileSeparator << FilterID::nameZiggZaggXY << m_fileSeparator << FilterID::nameDeltapT << m_fileSeparator << FilterID::nameDeltaDistance2IP << m_fileSeparator << FilterID::nameZiggZaggRZ << m_fileSeparator <<  FilterID::nameCalcQIbyKalman << m_fileSeparator << FilterID::nameOverlapping << m_fileSeparator << FilterID::nameCirclefit << m_fileSeparator << "Count_Asso_Cell_IDs" << m_fileSeparator << "Cell_ID_1" << m_fileSeparator << "Cell_ID_2" << m_fileSeparator << "Cell_ID_3" << m_fileSeparator << "Cell_ID_4" << m_fileSeparator << "Cell_ID_5" << m_fileSeparator << "Cell_ID_6" << m_fileSeparator
          << "Cell_ID_7" << m_fileSeparator << "Cell_ID_8" << m_fileSeparator << "Cell_ID_9" << m_fileSeparator << "Cell_ID_10" << endl;
 
   for (int i = 0; i <  tfcandTFInfo.getEntries(); i++) {

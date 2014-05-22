@@ -25,6 +25,7 @@
 #include <svd/reconstruction/SVDRecoHit2D.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
+#include <testbeam/vxd/reconstruction/TelRecoHit.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
 
 #include "tracking/dataobjects/FilterID.h"
@@ -383,7 +384,7 @@ void VXDTFModule::initialize()
     m_collector.initPersistent();
   }
 
-  StoreArray<PXDCluster>::optional(m_PARAMtelClustersName);
+  StoreArray<TelCluster>::optional(m_PARAMtelClustersName);
   StoreArray<PXDCluster>::optional(m_PARAMpxdClustersName);
   StoreArray<SVDCluster>::optional(m_PARAMsvdClustersName);
 
@@ -1076,7 +1077,7 @@ void VXDTFModule::the_real_event()
   // importing hits
   int nTotalClustersThreshold = 0; // counts maximum number of allowed clusters to execute the baseline TF, is number of layers*2 (for svd it's number of Layers*4 because of 1D-Clusters)
 
-  StoreArray<PXDCluster> aTelClusterArray(m_PARAMtelClustersName);
+  StoreArray<TelCluster> aTelClusterArray(m_PARAMtelClustersName);
   int nTelClusters = 0;
   if (m_useTELHits == true) { nTelClusters = aTelClusterArray.getEntries(); nTotalClustersThreshold += 7; }
 
@@ -1162,7 +1163,7 @@ void VXDTFModule::the_real_event()
   vector<ClusterInfo> clustersOfEvent(nTelClusters + nPxdClusters + nSvdClusters); /// contains info which tc uses which clusters
 
   for (int i = 0; i < nTelClusters; ++i) {
-    ClusterInfo newCluster(i, i , false, false, true, aTelClusterArray[i], NULL);
+    ClusterInfo newCluster(i, i , false, false, true, NULL, NULL, aTelClusterArray[i]);
     B2DEBUG(50, "Tel clusterInfo: realIndex " << newCluster.getRealIndex() << ", ownIndex " << newCluster.getOwnIndex())
     clustersOfEvent[i] = newCluster;
     B2DEBUG(50, " TELcluster " << i << " in position " << i << " stores real Cluster " << clustersOfEvent.at(i).getRealIndex() << " at indexPosition of own list (clustersOfEvent): " << clustersOfEvent.at(i).getOwnIndex() << " withClustersOfeventSize: " << clustersOfEvent.size())
@@ -1352,7 +1353,7 @@ void VXDTFModule::the_real_event()
 
   /** WARNING: merge VXDTFHit-Creating process for at least Telescope and PXD hits, since they are practically identical */
   for (int iPart = 0; iPart < nTelClusters; ++iPart) { /// means: nTelClusters > 0 if at least one pass wants TEL hits
-    const PXDCluster* const aClusterPtr = aTelClusterArray[iPart];
+    const TelCluster* const aClusterPtr = aTelClusterArray[iPart];
 
     B2DEBUG(100, " telCluster has clusterIndexUV: " << iPart << " with collected charge: " << aClusterPtr->getCharge() << " and their infoClass is at: " << iPart << " with collected charge: " << aTelClusterArray[iPart]->getCharge())
 
@@ -2075,7 +2076,9 @@ void VXDTFModule::the_real_event()
       m_TESTERkalmanSkipped++;
     }
     if (m_calcQiType == 1 and allowKalman == true) {
-      calcQIbyKalman(m_tcVector, aPxdClusterArray, clustersOfEvent); /// calcQIbyKalman
+//      StoreArray<TelCluster>* telStoreArrayPtr = NULL;
+//      if ( nTelClusters != 0) { telStoreArrayPtr = &aTelClusterArray; }
+      calcQIbyKalman(m_tcVector/*, clustersOfEvent, &aPxdClusterArray, telStoreArrayPtr*/); /// calcQIbyKalman
     } else if (m_calcQiType == 0) {
       calcQIbyLength(m_tcVector, m_passSetupVector);                              /// calcQIbyLength
     } else if (m_calcQiType == 3) { // and if totalOverlaps > 500
@@ -2829,6 +2832,8 @@ void VXDTFModule::hopfieldVectorized(TCsOfEvent& tcVector, double omega)
         B2ERROR("Even more illegal result: hit " << hctr << " is attached to interaction point! Perp/secID " << hit->getHitCoordinates()->Perp() << "/" << hit->getSectorString())
       } else if (hit->getDetectorType() == Const::PXD) {
         B2WARNING("hit " << hctr << " is a PXD-hit with clusterIndexUV: " << hit->getClusterIndexUV())
+      } else if (hit->getDetectorType() == Const::TEST) {
+        B2WARNING("hit " << hctr << " is a TEL-hit with clusterIndexUV: " << hit->getClusterIndexUV())
       } else if (hit->getDetectorType() == Const::SVD) {
         B2WARNING("hit " << hctr << " is a SVD-hit with clusterIndexU/V: " << hit->getClusterIndexU() << "/" << hit->getClusterIndexV())
       } else {
@@ -3094,6 +3099,8 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
         B2ERROR("Even more illegal result: hit " << hctr << " is attached to interaction point! Perp/secID " << hit->getHitCoordinates()->Perp() << "/" << hit->getSectorString())
       } else if (hit->getDetectorType() == Const::PXD) {
         B2WARNING("hit " << hctr << " is a PXD-hit with clusterIndexUV: " << hit->getClusterIndexUV())
+      } else if (hit->getDetectorType() == Const::TEST) {
+        B2WARNING("hit " << hctr << " is a TEL-hit with clusterIndexUV: " << hit->getClusterIndexUV())
       } else if (hit->getDetectorType() == Const::SVD) {
         B2WARNING("hit " << hctr << " is a SVD-hit with clusterIndexU/V: " << hit->getClusterIndexU() << "/" << hit->getClusterIndexV())
       } else {
@@ -4727,10 +4734,10 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
         currentHit->getClusterInfoUV()->addTrackCandidate(currentTC);
       } else {
         if (currentHit->getClusterInfoU() != NULL) { currentHit->getClusterInfoU()->addTrackCandidate(currentTC); } else {
-          B2WARNING(m_PARAMnameOfInstance << " event " << m_eventCounter << ": currentSVDHit got no UCluster! " <<  aSecName << "/" << FullSecID(aSecName).getFullSecString())
+          B2WARNING(m_PARAMnameOfInstance << " event " << m_eventCounter << ": currentSVDHit got no UCluster! " <<  aSecName << "/" << FullSecID(aSecName))
         }
         if (currentHit->getClusterInfoV() != NULL) { currentHit->getClusterInfoV()->addTrackCandidate(currentTC); } else {
-          B2WARNING(m_PARAMnameOfInstance << " event " << m_eventCounter << ": currentSVDHit got no VCluster! " <<  aSecName << "/" << FullSecID(aSecName).getFullSecString())
+          B2WARNING(m_PARAMnameOfInstance << " event " << m_eventCounter << ": currentSVDHit got no VCluster! " <<  aSecName << "/" << FullSecID(aSecName))
         }
       }
     } // used for output and informing each cluster which TC is using it
@@ -4848,7 +4855,7 @@ void VXDTFModule::calcQIbyStraightLine(TCsOfEvent& tcVector)
 
 
 
-void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& pxdClusters, vector<ClusterInfo>& clusters)
+void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector/*, vector<ClusterInfo>& clusters, StoreArray<PXDCluster>* pxdClusters, StoreArray<TelCluster>* telClusters*/)
 {
   /// produce GFTrackCands for each currently living TC and calculate real kalman-QI's
   genfit::KalmanFitter kalmanFilter;
@@ -4875,7 +4882,12 @@ void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector, StoreArray<PXDCluster>& p
 
     for (VXDTFHit * tfHit : currentTC->getHits()) {
       if (tfHit->getDetectorType() == Const::PXD) {
-        PXDRecoHit* newRecoHit = new PXDRecoHit(pxdClusters[clusters[tfHit->getClusterIndexUV()].getRealIndex()]);
+//         PXDRecoHit* newRecoHit = new PXDRecoHit(pxdClusters->[clusters[tfHit->getClusterIndexUV()].getRealIndex()]);
+        PXDRecoHit* newRecoHit = new PXDRecoHit(tfHit->getClusterInfoUV()->getPXDCluster());
+        track.insertMeasurement(newRecoHit);
+      } else if (tfHit->getDetectorType() == Const::TEST) {
+//         TELRecoHit* newRecoHit = new TELRecoHit(telClusters->[clusters[tfHit->getClusterIndexUV()].getRealIndex()]);
+        TelRecoHit* newRecoHit = new TelRecoHit(tfHit->getClusterInfoUV()->getTELCluster());
         track.insertMeasurement(newRecoHit);
       } else if (tfHit->getDetectorType() == Const::SVD) {
 //         TVector3 pos = *(tfHit->getHitCoordinates()); // jan192014, old way, global coordinates
@@ -5204,6 +5216,7 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
 
   for (ClusterInfo & aClusterInfo : clusters) {
     bool isPXD = aClusterInfo.isPXD();
+    bool isTEL = aClusterInfo.isTEL();
     if (isPXD == true) { // there are pxdHits, only if PXDHits were allowed. pxd-hits are easy, can be stored right away
 
       hitLocal.SetXYZ(aClusterInfo.getPXDCluster()->getU(), aClusterInfo.getPXDCluster()->getV(), 0);
@@ -5222,6 +5235,22 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
       VXDTFHit newHit = VXDTFHit(newPosition, 1, NULL, NULL, &aClusterInfo, Const::PXD, aSecID.getFullSecID(), aVxdID, 0);
       passInfo->fullHitsVector.push_back(newHit);
 
+    } else if (isTEL == true) {
+      hitLocal.SetXYZ(aClusterInfo.getTELCluster()->getU(), aClusterInfo.getTELCluster()->getV(), 0);
+      sigmaVec.SetXYZ(aClusterInfo.getTELCluster()->getUSigma(), aClusterInfo.getTELCluster()->getVSigma(), 9);
+
+      aVxdID = aClusterInfo.getTELCluster()->getSensorID();
+      aLayerID = aVxdID.getLayerNumber();
+//       const VXD::SensorInfoBase& aSensorInfo = dynamic_cast<const VXD::SensorInfoBase&>(VXD::GeoCache::get(aVxdID));
+      const VXD::SensorInfoBase& aSensorInfo = VXD::GeoCache::get(aVxdID);
+      newPosition.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
+      newPosition.hitSigma = aSensorInfo.vectorToGlobal(sigmaVec);
+      B2DEBUG(100, " baselineTF: pxdluster got global pos X/Y/Z: " << newPosition.hitPosition.X() << "/" << newPosition.hitPosition.Y() << "/" << newPosition.hitPosition.Z() << ", global var X/Y/Z: " << newPosition.hitSigma.X() << "/" << newPosition.hitSigma.Y() << "/" << newPosition.hitSigma.Z())
+      newPosition.sigmaU = m_errorContainer.at(aLayerID - 1).first;
+      newPosition.sigmaV = m_errorContainer.at(aLayerID - 1).second;
+      FullSecID aSecID = FullSecID(aVxdID, false, 0);
+      VXDTFHit newHit = VXDTFHit(newPosition, 1, NULL, NULL, &aClusterInfo, Const::TEST, aSecID.getFullSecID(), aVxdID, 0);
+      passInfo->fullHitsVector.push_back(newHit);
     } else if ((m_useSVDHits == true) && (isPXD == false)) { // svd-hits are tricky, therefore several steps needed
       findSensor4Cluster(activatedSensors, aClusterInfo);                 /// findSensor4Cluster
     }

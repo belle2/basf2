@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'vxd', 'vxd_dataobjects', 'tracking_dataobjects', 'genfit2'] # 'tracking', 
+env['LIBS'] = ['framework', 'vxd', 'vxd_dataobjects', 'tracking_dataobjects', 'testbeam_vxd_dataobjects', 'genfit2'] # 'tracking', 
 
 Return('env')

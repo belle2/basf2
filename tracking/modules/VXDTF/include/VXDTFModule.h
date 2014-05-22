@@ -30,6 +30,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
+#include <testbeam/vxd/dataobjects/TelCluster.h> /// WARNING produces dependency of testbeam package
 #include <vxd/dataobjects/VxdID.h>
 
 //C++ base / C++ stl:
@@ -307,9 +308,10 @@ namespace Belle2 {
 
 
     /** calculate real kalman-QI's for each currently living TC */
-    void calcQIbyKalman(TCsOfEvent& tcVector,
-                        StoreArray<PXDCluster>& pxdClusters,
-                        std::vector<ClusterInfo>& clusters); // ->auslagern!
+    void calcQIbyKalman(TCsOfEvent& tcVector/*,
+                        std::vector<ClusterInfo>& clusters,
+                        StoreArray<PXDCluster>* pxdClusters,
+                        StoreArray<TelCluster>* telClusters = NULL*/);
 
 
     /** because of geometrical reasons and the multipass-support, it is a rather common situation that the same track will be recovered twice or more.

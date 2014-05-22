@@ -48,7 +48,7 @@ ExportSectorMapModule::ExportSectorMapModule() : Module()
 {
   //Set module properties
   setDescription("imports xml-files of sectorMaps and exports RAM-friendly versions of it");
-  setPropertyFlags(c_ParallelProcessingCertified);
+//   setPropertyFlags(c_ParallelProcessingCertified); /// WARNING this module should _not_ be used for parallel processing! Its task is to create the sector maps only once...
 
   /// setting standard values for steering parameters
   std::vector<double> defaultConfigU; // sector sizes
@@ -101,6 +101,8 @@ ExportSectorMapModule::ExportSectorMapModule() : Module()
   addParam("sampleQuantiles", m_PARAMsampleQuantiles, "only needed if importROOTorXML = true: behiavior of normal sample sizes, exactly two entries allowed: first: lower quantile, second: upper quantile. only values between 0-1 are allowed", sampleQuantiles);
 
   addParam("stretchFactor", m_PARAMstretchFactor, "only needed if importROOTorXML = true: exactly two entries allowed: first: stretchFactor for small sample size for sector-combination, second: stretchFactor for normal sample size for sector-combination: WARNING if you simply want to produce wider cutoffs in the VXDTF, please use the tuning parameters there! This parameter here is only if you know what you are doing, since it changes the values in the XML-file directly", stretchFactor);
+
+  addParam("sortByDistance2origin", m_PARAMsortByDistance2origin, "only needed if importROOTorXML = true: if set to true, sectors are not treated by layerID but by distance to origin. This has an effect on filtering bad sector combinations. Recommendation: use false for normal Belle2-VXD-case and true for beam test situations where layerIDs are mixed up", false);
 
   addParam("rootFileName", m_PARAMrootFileName, "only needed if importROOTorXML = true: sets the root filename", rootFileName);
 
@@ -292,6 +294,14 @@ std::pair<int, int> ExportSectorMapModule::importXMLMap()
           cutoffMinValue = getXMLValue(cuts, min, aFilterName);
           cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
 
+        } else if (aFilterName == FilterID::nameDeltaSOverZ) {
+          cutoffMinValue = getXMLValue(cuts, min, aFilterName);
+          cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
+
+        } else if (aFilterName == FilterID::nameDeltaSlopeZOverS) {
+          cutoffMinValue = getXMLValue(cuts, min, aFilterName);
+          cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
+
         } else if (aFilterName == FilterID::nameDistance2IP) {
           cutoffMinValue = getXMLValue(cuts, min, aFilterName);
           cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
@@ -324,7 +334,7 @@ std::pair<int, int> ExportSectorMapModule::importXMLMap()
           cutoffMinValue = getXMLValue(cuts, min, aFilterName);
           cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
 
-        } else if (aFilterName == FilterID::nameHelixHighOccupancyFit) {
+        } else if (aFilterName == FilterID::nameHelixParameterHighOccupancyFit) {
           cutoffMinValue = getXMLValue(cuts, min, aFilterName);
           cutoffMaxValue = getXMLValue(cuts, max, aFilterName);
 
@@ -373,7 +383,7 @@ std::pair<int, int> ExportSectorMapModule::importXMLMap()
   newSecMap.setAdditionalInfo(m_PARAMadditionalInfo);
   string  tagName = "<" + chosenSetup + ">\n";
   string  endTagName = "\n</" + chosenSetup + ">\n";
-  file << tagName << Stream::escapeXML(Stream::serializeXML(&newSecMap)) << endTagName;
+  file << tagName << Stream::escapeXML(Stream::serializeAndEncode(&newSecMap)) << endTagName;
 
   return (make_pair(countFriends, countFilters));
 }
@@ -470,6 +480,7 @@ std::pair<int, int> ExportSectorMapModule::importROOTMap()
     aRawMapPack.second.setMinSampleThreshold(m_PARAMsampleThreshold.at(0));
     aRawMapPack.second.setSmallStretchFactor(m_PARAMstretchFactor.at(0));
     aRawMapPack.second.setStretchFactor(m_PARAMstretchFactor.at(1));
+    aRawMapPack.second.setFilterByDistance2Origin(m_PARAMsortByDistance2origin);
     aRawMapPack.second.repairSecMap();
 
     VXDTFSecMap newMap;
@@ -484,7 +495,8 @@ std::pair<int, int> ExportSectorMapModule::importROOTMap()
     string  tagName = "<" + newMap.getMapName() + ">\n";
     string  endTagName = "\n</" + newMap.getMapName() + ">\n";
 
-    file << tagName << Stream::escapeXML(Stream::serializeXML(&newMap)) << endTagName;
+    file << tagName << Stream::escapeXML(Stream::serializeAndEncode(&newMap)) << endTagName;
+//     file << tagName << Stream::escapeXML(Stream::serializeXML(&newMap)) << endTagName;
 
     if (m_PARAMprintFinalMaps == true) {
       unsigned sectorCtr = 0, friendCtr = 0, cutoffTypesCtr = 0;
@@ -510,16 +522,3 @@ std::pair<int, int> ExportSectorMapModule::importROOTMap()
 
   return (make_pair(countSectors, countTotalValues));
 }
-
-
-// tracking/modules/VXDTFHelperTools/src/ExportSectorMapModule.cc:502:38: error: cannot convert ‘const std::vector<std::pair<unsigned int, std::vector<std::pair<unsigned int, std::pair<double, double> > > > >*’ to ‘const FriendValue* {aka const std::vector<std::pair<unsigned int, std::pair<double, double> > >*}’ in assignment
-//
-// const std::vector<std::pair<unsigned int, std::vector<std::pair<unsigned int, std::pair<double, double> > > > >*
-//             const std::vector<std::pair<unsigned int, std::pair<double, double> > >*
-// typedef std::pair< double, double> CutoffValue; /**< .first is minValue, .second is maxValue */
-//     typedef std::pair<unsigned int, CutoffValue> Cutoff; /**< .first is code of filter, .second is CutoffValue */
-//     typedef std::vector< Cutoff > FriendValue; /**< stores all Cutoffs */
-//     typedef std::pair<unsigned int, FriendValue > Friend; /**< .first is secID of current Friend, second is FriendValue */
-//     typedef std::vector< Friend > SectorValue; /**< stores all Friends */
-//     typedef std::pair<unsigned int, SectorValue> Sector; /**< .first is secID of current sector, second is SectorValue */
-//     typedef std::vector < Sector > SecMapCopy; /**< stores all Sectors */

@@ -18,6 +18,7 @@
 #include "tracking/dataobjects/FullSecID.h"
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
+#include <testbeam/vxd/dataobjects/TelTrueHit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <tracking/dataobjects/VXDTFRawSecMap.h> // needed for rootExport
@@ -113,15 +114,16 @@ namespace Belle2 {
     /** checks whether particle was flying towards the IR/origin or away from IR/origin when producing this hit*/
     void checkDirectionOfFlight(TVector3 origin, TVector3 hitPos, TVector3 momVec) {
       m_hitPos = hitPos;
-      origin -= hitPos; // vector hit <-> origin
-      double hitMag = origin.Mag();
-      double momMag = (origin + momVec).Mag();
+      TVector3 vectororiginToHit = hitPos - origin;
+//       origin -= hitPos; // vector hit <-> origin
+//       double hitMag = origin.Mag();
+      double momMag = (vectororiginToHit + momVec).Mag();
 //       if (hitMag > momMag) { m_points2IP = true; }
-      if (hitMag < momMag) { m_points2IP = true; }
+      if (momMag < vectororiginToHit.Mag()) { m_points2IP = true; }
       else { m_points2IP = false; }
     }
 
-    short int m_type;  /**< Const::PXD for PXD, Const::SVD for SVD, Const::IR for Primary vertex */
+    short int m_type;  /**< Const::PXD for PXD, Const::SVD for SVD, Const::IR for Primary vertex, Const::invalidDetector for Telescope */
     bool m_points2IP;  /**< true, if momentum vector of current hit points to the interaction point (particle is flying inwards at that moment), false if not*/
     std::string m_secID; /**< ID of sector containing this hit */
     int m_uniID; /**< ID of sensor containing this hit */
@@ -214,7 +216,7 @@ namespace Belle2 {
     std::string getFilterType() { return FilterID().getFilterString(m_filterName); }
 
     /** returns list of values */
-    VXDTFRawSecMap::CutoffValues getValues() { return m_valuePack; } // returns std::list<double>
+    VXDTFRawSecMapTypedef::CutoffValues getValues() { return m_valuePack; } // returns std::list<double>
 
     /** writes values in text File */
     void exportValues(std::string aFileName) {
@@ -264,9 +266,9 @@ namespace Belle2 {
     }
 
     /** export filters to root file (used at endrun) */
-    VXDTFRawSecMap::FriendValues exportFiltersRoot() {
+    VXDTFRawSecMapTypedef::FriendValues exportFiltersRoot() {
       //        std::vector< std::pair<unsigned int, std::list<double> > >
-      VXDTFRawSecMap::FriendValues completeInfoOfFriend;
+      VXDTFRawSecMapTypedef::FriendValues completeInfoOfFriend;
       for (MapEntry thisEntry : m_filterMap) {
         completeInfoOfFriend.push_back(make_pair(thisEntry.first, thisEntry.second->getValues()));
       }
@@ -330,8 +332,8 @@ namespace Belle2 {
     }
 
     /** exports Friends including info to root file */
-    VXDTFRawSecMap::SectorValues exportFriendsRoot() {
-      VXDTFRawSecMap::SectorValues completeInfoOfSector;
+    VXDTFRawSecMapTypedef::SectorValues exportFriendsRoot() {
+      VXDTFRawSecMapTypedef::SectorValues completeInfoOfSector;
       for (MapEntry thisEntry : m_friendMap) {
         completeInfoOfSector.push_back(make_pair(FullSecID(thisEntry.first).getFullSecID(), thisEntry.second.exportFiltersRoot()));
       }
@@ -417,8 +419,10 @@ namespace Belle2 {
 
     int m_PARAMtracksPerEvent; /**< contains number of tracks per event */
     int m_eventCounter; /**< knows current event number */
-    int m_PARAMdetectorType; /**< sets detector type -1 for VXD, Const::PXD for PXD and Const::SVD for SVD */
+//     int m_PARAMdetectorType; /**< sets detector type -1 for VXD, Const::PXD for PXD and Const::SVD for SVD */ WARNING OLD!
+    std::vector<std::string>  m_PARAMdetectorType; /**< defines which detector type has to be exported. Like geometry, simply add the detector types you want to include in the track candidates. Currently supported: PXD, SVD, VXD and TEL */
     int m_longTrackCounter; /**< counts number of tracks having more than 30 hits */
+    std::string m_detectorName; /**< string of accepted detector names */
     int m_longTrackletCounter; /**< counts tracklets having more than the theoretically possible number of hits (should therefore always be 0 )*/
     int m_badHitsCounter; /**< counts number of times, when when two hits with same direction of flight lie in the same sensor */
     int m_badTrackletCounter; /**< counts number of times, when Tracklet went postal */
@@ -437,6 +441,7 @@ namespace Belle2 {
     double m_PARAMmaxZvertexDistance; /**< allows to abort particles having their production vertex too far away from the origin (z-dist) */
     std::vector<double> m_PARAMsetOrigin; /**< allows to reset orign (e.g. usefull for special cases like testbeams), only valid if 3 entries are found */
     int m_PARAMtestBeam; /**< some things which are important for the real detector are a problem for testbeams, if you want to use the filterCalculator and the testBeam = false does not work, then try setting the parameter to true */
+    std::vector<double> m_PARAMacceptedRegionForSensors;  /**< accepts pair of input values. first one defines minimal distance for sectors to the origin and second one defines maximum accepted distance for sectors. If anyone of these values is above 0, sectors will be sorted using their distance2Origin parameter, not their layerID */
     double m_PARAMmagneticFieldStrength; /**< strength of magnetic field in Tesla, standard is 1.5T */
 
     bool m_PARAMsecMapWriteToAscii; /**< if true, secMap data is stored to ascii files (standard setting is true)*/
@@ -463,7 +468,9 @@ namespace Belle2 {
     bool m_PARAMlogAnglesRZ; /**< set 'true' if you want to log anglesRZ between segments */
     bool m_PARAMlogDeltaPt; /**< set 'true' if you want to log delta Pt between segments */
     bool m_PARAMlogDeltaSlopeRZ; /**< set 'true' if you want to log delta slopes in r-z-plane between segments */
-    bool m_PARAMlogHelixFit; /**< set 'true' if you want to log delta ((helix-circle-segment-angle) / deltaZ) */
+    bool m_PARAMlogHelixParameterFit; /**< set 'true' if you want to log delta ((helix-circle-segment-angle) / deltaZ) */
+    bool m_PARAMlogDeltaSOverZ; /**< set 'true' if you want to log Delta S (arc-length) over Z */
+    bool m_PARAMlogDeltaSlopeZOverS; /**< set 'true' if you want to log Delta of the slope Z over S */
     bool m_PARAMlogNormedDistance3D; /**< set 'true' to log improved 3D distance between trackHits */
     bool m_PARAMlogSlopeRZ; /**< set 'true' to log slope in r-z-plane for line of 2 trackHits */
     bool m_PARAMlogTRadiustoIPDistance; /**< set 'true' to log the difference between the radius of the track circle in x-y-plan and the distance of the center of the circle to the IP */
@@ -474,9 +481,11 @@ namespace Belle2 {
     bool m_PARAMlogAnglesHighOccupancyRZ; /**< set 'true' if you want to log anglesRZ between segments  - high occupancy mode */
     bool m_PARAMlogDeltaPtHighOccupancy; /**< set 'true' if you want to log delta Pt between segments  - high occupancy mode */
     bool m_PARAMlogDeltaSlopeHighOccupancyRZ; /**< set 'true' if you want to log delta slopes in r-z-plane between segments  - high occupancy mode */
-    bool m_PARAMlogHelixHighOccupancyFit; /**< set 'true' if you want to log delta ((helix-circle-segment-angle) / deltaZ)  - high occupancy mode */
-    bool m_PARAMlogSlopeHighOccupancyRZ; /**< set 'true' to log slope in r-z-plane for line of 2 trackHits  - high occupancy mode */
-    bool m_PARAMlogTRadiusHighOccupancytoIPDistance; /**< set 'true' to log the difference between the radius of the track circle in x-y-plan and the distance of the center of the circle to the IP  - high occupancy mode */
+    bool m_PARAMlogHelixParameterHighOccupancyFit; /**< set 'true' if you want to log delta ((helix-circle-segment-angle) / deltaZ)  - high occupancy mode */
+//     bool m_PARAMlogDeltaSOverZ; /**< set 'true' if you want to log Delta S (arc-length) over Z */
+//     bool m_PARAMlogDeltaSlopeZOverSHighOccupancy; /**< set 'true' if you want to log Delta of the slope Z over S */
+    bool m_PARAMlogSlopeHighOccupancyRZHighOccupancy; /**< set 'true' to log slope in r-z-plane for line of 2 trackHits  - high occupancy mode */
+    bool m_PARAMlogTRadiusHighOccupancytoIPDistance; /**< set 'true' to log the difference between the radius of the track circle in x-y-plan and the distance of the center of the circle tdeltaSOverZo the IP  - high occupancy mode */
     bool m_PARAMlogDeltaDistCircleCenterHighOccupancy; /**< set 'true' to compare the distance of the calculated centers of track circles  - high occupancy mode */
 
     bool m_PARAMexportSectorCoords; /**< set true if you want to export coordinates of the sectors too */
@@ -490,17 +499,18 @@ namespace Belle2 {
     ThreeHitFilters m_threeHitFilterBox; /**< includes all filters using 3 hits */
     FourHitFilters m_fourHitFilterBox; /**< includes all filters using 4 hits */
 
-    //    float m_percentageOfFMSectorFriends;
-    double m_totalLocalCoordValue; /**< for testing purposes, adds value of each local coordinate occured in the process */
-    double m_totalGlobalCoordValue; /**< for testing purposes, adds value of each global coordinate occured in the process */
     std::vector<double> m_PARAMsectorConfigU; /**< allows defining the the config of the sectors in U direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
     std::vector<double> m_PARAMsectorConfigV; /**< allows defining the the config of the sectors in V direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
     std::vector<int> m_trackletLengthCounter; /**< counts the number of tracklets of each possible tracklet-length occured during process */
     std::vector<int> m_trackLengthCounter; /**< counts the number of tracklets of each possible track-length occured during process */
     int m_pxdHitCounter; /**< counts total number of pxd true hits */
     int m_svdHitCounter; /**< counts total number of svd true hits */
+    int m_telHitCounter; /**< counts total number of telescope true hits */
     std::vector<int> m_trackletMomentumCounter;  /**< counts the number of tracklets for each sectorSetup */
     TVector3 m_origin; /**< this point in space is assumed to be the interaction point (no matter whether the real IP lies there) */
+    bool m_useTEL; /**< is set to true, if Telescope hits have to be used for tracking too */
+    bool m_usePXD; /**< is set to true, if PXD hits have to be used for tracking too */
+    bool m_useSVD; /**< is set to true, if SVD hits have to be used for tracking too */
   private:
   };
 }

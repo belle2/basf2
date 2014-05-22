@@ -19,15 +19,15 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/gearbox/Const.h>
-#include <pxd/geometry/SensorInfo.h>
-#include <svd/geometry/SensorInfo.h>
+// #include <pxd/geometry/SensorInfo.h>
+// #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-
-
+#include "tracking/vxdCaTracking/SharedFunctions.h"
+// #include <testbeam/vxd/geometry/SensorInfo.h>
 #include <TObject.h>
 
 // #include <boost/foreach.hpp>
@@ -74,9 +74,16 @@ FilterCalculatorModule::FilterCalculatorModule() : Module()
   originVec.push_back(0);
   originVec.push_back(0);
 
+  std::vector<double> acceptedRegionForSensorsVec;
+  acceptedRegionForSensorsVec.push_back(-1);
+  acceptedRegionForSensorsVec.push_back(-1);
+
   std::vector<std::string> rootFileNameVals;
   rootFileNameVals.push_back("FilterCalculatorResults");
   rootFileNameVals.push_back("UPDATE"); // RECREATE, UPDATE
+
+  std::vector<std::string> supportedDetectors;
+  supportedDetectors.push_back("SVD");
 
   addParam("exportSectorCoords", m_PARAMexportSectorCoords, "set true if you want to export coordinates of the sectors too", bool(true));
 
@@ -88,7 +95,8 @@ FilterCalculatorModule::FilterCalculatorModule() : Module()
 
   addParam("pTcuts", m_PARAMpTcuts, "minimal number of entries is 1. first entry defines lower threshold for pT in GeV/c. Each further value defines a momentum range for a new sectorMap", defaultpTcuts);
 
-  addParam("detectorType", m_PARAMdetectorType, "defines which detector type has to be exported. VXD: -1, PXD: 0, SVD: 1", int(1));
+//   addParam("detectorType", m_PARAMdetectorType, "defines which detector type has to be exported. VXD: -1, PXD: 0, SVD: 1", int(1));
+  addParam("detectorType", m_PARAMdetectorType, "defines which detector type has to be exported. Like geometry, simply add the detector types you want to include in the track candidates. Currently supported: PXD, SVD, VXD and TEL", supportedDetectors);
 
   addParam("maxXYvertexDistance", m_PARAMmaxXYvertexDistance, "allows to abort particles having their production vertex too far away from the origin (xy-plane) - WARNING for testbeam cases, this is a typical source for strange results!", double(0.5));
 
@@ -97,6 +105,8 @@ FilterCalculatorModule::FilterCalculatorModule() : Module()
   addParam("setOrigin", m_PARAMsetOrigin, "standard origin is (0,0,0). If you want to have the map calculated for another origin, set here(x,y,z) - WARNING for testbeam cases, this is a typical source for strange results", originVec);
 
   addParam("testBeam", m_PARAMtestBeam, "if normal mode does not produce a full sectormap, try setting it to testBeam-mode = 1 (testbeam 1 does not assume that the IP is at the origin and ignores curler) or even testBeam-mode = 2 (next to mode 1 features it ignores tracks jumping e.g. from layer 1 to 7 (telescopes), should only be used with care since some bad cases can not be caught that way)", int(0));
+
+  addParam("acceptedRegionForSensors", m_PARAMacceptedRegionForSensors, " accepts pair of input values. first one defines minimal distance for sectors to the origin and second one defines maximum accepted distance for sectors. If anyone of these values is above 0, sectors will be sorted using their distance2Origin parameter, not their layerID", acceptedRegionForSensorsVec);
 
   addParam("magneticFieldStrength", m_PARAMmagneticFieldStrength, "set strength of magnetic field in Tesla, standard is 1.5T", double(1.5));
 
@@ -138,7 +148,9 @@ FilterCalculatorModule::FilterCalculatorModule() : Module()
   addParam("logDeltaSlopeRZ", m_PARAMlogDeltaSlopeRZ, "set 'true' if you want to log delta slopes in r-z-plane between segments", bool(true));
   addParam("logPt", m_PARAMlogPt, "set 'true' if you want to log Pt between segments", bool(true));
   addParam("logTRadius2IPDistance", m_PARAMlogTRadiustoIPDistance, " set 'true' to log the difference between the radius of the track circle in x-y-plan and the distance of the center of the circle to the IP", bool(true));
-  addParam("logHelixFit", m_PARAMlogHelixFit, "set 'true' if you want to log delta ((helix-circle-segment-angle) / deltaZ)", bool(true));
+  addParam("logHelixParameterFit", m_PARAMlogHelixParameterFit, "set 'true' if you want to log delta ((helix-circle-segment-angle) / deltaZ)", bool(true));
+  addParam("logDeltaSOverZ", m_PARAMlogDeltaSOverZ, "set 'true' if you want to log Delta S (arc-length) over Z", bool(true));
+  addParam("logDeltaSlopeZOverS", m_PARAMlogDeltaSlopeZOverS, "set 'true' if you want to log Delta of the slope Z over S", bool(true));
 
   // 2+1 hit high occupancy filters:
   addParam("logAnglesHighOccupancy3D", m_PARAMlogAnglesHighOccupancy3D, "set 'true' if you want to log anglesHighOccupancy3D between segments", bool(true));
@@ -147,7 +159,7 @@ FilterCalculatorModule::FilterCalculatorModule() : Module()
   addParam("logDeltaSlopeHighOccupancyRZ", m_PARAMlogDeltaSlopeHighOccupancyRZ, "set 'true' if you want to log HighOccupancy delta slopes in r-z-plane between segments", bool(true));
   addParam("logPtHighOccupancy", m_PARAMlogPtHighOccupancy, "set 'true' if you want to log PtHighOccupancy between segments", bool(true));
   addParam("logTRadiusHighOccupancy2IPDistance", m_PARAMlogTRadiusHighOccupancytoIPDistance, " set 'true' to log the HighOccupancy difference between the radius of the track circle in x-y-plan and the distance of the center of the circle to the IP", bool(true));
-  addParam("logHelixHighOccupancyFit", m_PARAMlogHelixHighOccupancyFit, "set 'true' if you want to log HighOccupancy delta ((helix-circle-segment-angle) / deltaZ)", bool(true));
+  addParam("logHelixParameterHighOccupancyFit", m_PARAMlogHelixParameterHighOccupancyFit, "set 'true' if you want to log HighOccupancy delta ((helix-circle-segment-angle) / deltaZ)", bool(true));
 
   //4 hit filters;
   addParam("logDeltaPt", m_PARAMlogDeltaPt, "set 'true' if you want to log delta Pt between segments", bool(true));
@@ -186,6 +198,12 @@ void FilterCalculatorModule::initialize()
     m_PARAMminTrackletLength = 2;
   }
 
+  if (int(m_PARAMacceptedRegionForSensors.size()) != 2) {
+    B2ERROR("FilterCalculatorModule::initialize: acceptedRegionForSensor-parameter has got " << m_PARAMacceptedRegionForSensors.size() << " which is not allowed. Setting to standard value. If you do not know the correct choice, please type 'basf2 -m VXDTF' and read the description.")
+    m_PARAMacceptedRegionForSensors.clear();
+    m_PARAMacceptedRegionForSensors.push_back(-1);
+    m_PARAMacceptedRegionForSensors.push_back(-1);
+  }
 
   if (m_PARAMtestBeam < 0 or m_PARAMtestBeam > 2) {
     B2ERROR("FilterCalculatorModule::initialize: testbeam-parameter set to " << m_PARAMtestBeam << " which is not allowed. Setting to 0. If you do not know the correct choice, please type 'basf2 -m VXDTF' and read the description.")
@@ -208,7 +226,11 @@ void FilterCalculatorModule::initialize()
 
   m_sectorMap.clear();
   B2INFO("~~~~~~~~~~~FilterCalculator - initialize ~~~~~~~~~~")
-  B2INFO("chosen detectorType: " << m_PARAMdetectorType << ", highestAllowedLayer: " << m_PARAMhighestAllowedLayer << ", smearHits: " << m_PARAMsmearHits << ", noCurler: " << m_PARAMnoCurler << ", uniSigma: " << m_PARAMuniSigma)
+  std::stringstream supportedDetectorTypes;
+  for (string aDetector : m_PARAMdetectorType) {
+    supportedDetectorTypes << aDetector << " ";
+  }
+  B2INFO("chosen detectorTypes: " << supportedDetectorTypes.str() << ", highestAllowedLayer: " << m_PARAMhighestAllowedLayer << ", smearHits: " << m_PARAMsmearHits << ", noCurler: " << m_PARAMnoCurler << ", uniSigma: " << m_PARAMuniSigma)
   B2INFO("origin is set to: (x,y,z) (" << m_PARAMsetOrigin.at(0) << "," << m_PARAMsetOrigin.at(1) << "," << m_PARAMsetOrigin.at(2) << "), testBeam-mode is " << m_PARAMtestBeam << ", magnetic field set to " << m_PARAMmagneticFieldStrength << "T")
 
   StoreArray<MCParticle>::required();
@@ -225,35 +247,43 @@ void FilterCalculatorModule::beginRun()
 
 
 
-
+  m_useTEL = false;
+  m_usePXD = false;
+  m_useSVD = false;
 
   m_numOfLayers = 0;
-  string detectorName; // string version of detectortype used for output filename
-  if (m_PARAMdetectorType == -1) {
-    m_numOfLayers = 6;
-    detectorName = "VXD";
-  } else if (m_PARAMdetectorType == 0) {
-    m_PARAMdetectorType = Const::PXD;
-    m_numOfLayers = 2;
-    detectorName = "PXD";
-  } else {
-    m_numOfLayers = 4;
-    m_PARAMdetectorType = Const::SVD;
-    detectorName = "SVD";
+  stringstream detectorNames; // same as above but a little bit more readable for B2XY-output...
+  if (std::find(m_PARAMdetectorType.begin(), m_PARAMdetectorType.end(), "TEL") != m_PARAMdetectorType.end()) {
+    m_numOfLayers += 6; /// WARNING hardcoded values, is there a way to get this information automatically?
+    m_detectorName += "TEL";
+    detectorNames << "TEL ";
+    m_useTEL = true;
   }
+  if (std::find(m_PARAMdetectorType.begin(), m_PARAMdetectorType.end(), "PXD") != m_PARAMdetectorType.end()) {
+    m_numOfLayers += 2; /// WARNING hardcoded values, is there a way to get this information automatically?
+    m_detectorName += "PXD";
+    detectorNames << "PXD ";
+    m_usePXD = true;
+  }
+  if (std::find(m_PARAMdetectorType.begin(), m_PARAMdetectorType.end(), "SVD") != m_PARAMdetectorType.end()) {
+    m_numOfLayers += 4; /// WARNING hardcoded values, is there a way to get this information automatically?
+    m_detectorName += "SVD";
+    detectorNames << "SVD ";
+    m_useSVD = true;
+  }
+
   for (int i = 0; i <= m_numOfLayers * 2; i++) {
     m_trackletLengthCounter.push_back(0);
   }
-  bool useSVDonly = false;
-  if (m_PARAMdetectorType == Const::SVD) { useSVDonly = true; }
-  B2INFO("chosen detectorType: " << m_PARAMdetectorType << ", Const::PXD: " << Const::PXD << ", Const::SVD: " << Const::SVD << ", detectorType = SVD: " << useSVDonly << ", uniSigma: " << m_PARAMuniSigma)
+
+  B2INFO("chosen detectorTypes: " << detectorNames.str() << ", version 2: " << Belle2::printMyStdVector(m_PARAMdetectorType) << ", uniSigma: " << m_PARAMuniSigma)
 
 
 
   int numCuts = m_PARAMpTcuts.size();
 
   for (int i = 0; i < numCuts - 1; ++i) {
-    string secMapName = (boost::format("%1%$%2%to%3%MeV_%4%") % m_PARAMsectorSetupFileName % int(m_PARAMpTcuts.at(i) * 1000) % int(m_PARAMpTcuts.at(i + 1) * 1000) % detectorName).str();
+    string secMapName = (boost::format("%1%$%2%to%3%MeV_%4%") % m_PARAMsectorSetupFileName % int(m_PARAMpTcuts.at(i) * 1000) % int(m_PARAMpTcuts.at(i + 1) * 1000) % m_detectorName).str();
     for (int i = 0; i < int(secMapName.length()); ++i) {
       switch (secMapName.at(i)) {
         case '$':
@@ -265,7 +295,7 @@ void FilterCalculatorModule::beginRun()
     m_PARAMsecMapNames.push_back(secMapName);
     B2INFO("FilterCalculatorModule-start: will use " << secMapName << " for storing cutoffs")
   }
-  string secMapName = (boost::format("%1%$moreThan%2%MeV_%3%") % m_PARAMsectorSetupFileName % int(m_PARAMpTcuts.at(numCuts - 1) * 1000)  % detectorName).str();
+  string secMapName = (boost::format("%1%$moreThan%2%MeV_%3%") % m_PARAMsectorSetupFileName % int(m_PARAMpTcuts.at(numCuts - 1) * 1000)  % m_detectorName).str();
   for (int i = 0; i < int(secMapName.length()); ++i) {
     switch (secMapName.at(i)) {
       case '$':
@@ -316,12 +346,11 @@ void FilterCalculatorModule::beginRun()
   m_eventCounter = 0;
   m_badHitsCounter = 0;
   m_badTrackletCounter = 0;
-  m_totalLocalCoordValue = 0;
-  m_totalGlobalCoordValue = 0;
   m_totalHitCounter = 0;
   m_longTrackCounter = 0;
   m_pxdHitCounter = 0;
   m_svdHitCounter = 0;
+  m_telHitCounter = 0;
   m_badFilterValueCtr = 0;
 }
 
@@ -330,7 +359,7 @@ void FilterCalculatorModule::beginRun()
 /// /// /// /// /// /// /// /// EVENT /// /// /// /// /// /// /// ///
 void FilterCalculatorModule::event()
 {
-  double pMaxInMeV = 10000., pMinInMeV = 10.; /// WARNING hardcoded values!
+  double pMaxInMeV = 100000., pMinInMeV = 10.; /// WARNING hardcoded values!
 
   //get the data
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
@@ -344,20 +373,27 @@ void FilterCalculatorModule::event()
   int numOfPxdTrueHits = aPxdTrueHitArray.getEntries();
   StoreArray<SVDTrueHit> aSvdTrueHitArray("");
   int numOfSvdTrueHits = aSvdTrueHitArray.getEntries();
+  StoreArray<TelTrueHit> aTelTrueHitArray("");
+  int numOfTelTrueHits = aTelTrueHitArray.getEntries();
+
 
   if (numOfMcParticles == 0) {
     B2WARNING("event " << m_eventCounter << ": there is no MCParticle!")
     return;
-  } else if (numOfPxdTrueHits == 0 && m_PARAMdetectorType not_eq Const::SVD) { // WARNING needs to be updated for telescope support
+  } else if (numOfPxdTrueHits == 0 && m_usePXD == true) {
     B2WARNING("event " << m_eventCounter << ": there are no PXDTrueHits")
     return;
-  } else if (numOfSvdTrueHits == 0 && m_PARAMdetectorType not_eq Const::PXD) { // WARNING needs to be updated for telescope support
+  } else if (numOfSvdTrueHits == 0 && m_useSVD == true) {
     B2WARNING("event " << m_eventCounter << ": there are no SVDTrueHits")
+    return;
+  } else if (numOfTelTrueHits == 0 && m_useTEL == true) {
+    B2WARNING("event " << m_eventCounter << ": there are no TelTrueHits")
     return;
   }
 
   RelationIndex<MCParticle, PXDTrueHit> relationMcPxdTrueHit;
   RelationIndex<MCParticle, SVDTrueHit> relationMcSvdTrueHit;
+  RelationIndex<MCParticle, TelTrueHit> relationMcTelTrueHit;
 
   if (m_PARAMtracksPerEvent > numOfMcParticles) {
     B2ERROR("FilterCalculatorModule: input parameter wrong (tracks per event) - reset to maximum value")
@@ -425,8 +461,8 @@ void FilterCalculatorModule::event()
 
     VXDTrack newTrack(iPart); // will now filled with PXD and SVD-Hits from same particle
 
-    if (m_PARAMdetectorType not_eq Const::SVD) { // want PXDhits
-      B2DEBUG(20, "I'm in PXD and chosen detectorType is: " << m_PARAMdetectorType)
+    if (m_usePXD == true) { // want PXDhits
+      B2DEBUG(20, "I'm in PXD and chosen detectorType is: " << Belle2::printMyStdVector(m_PARAMdetectorType))
 
       RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcPxd = relationMcPxdTrueHit.getElementsFrom(aMcParticlePtr);
       for (const auto & relElement : iterPairMcPxd) {
@@ -441,8 +477,24 @@ void FilterCalculatorModule::event()
       } // now each hit knows in which direction the particle goes, in which sector it lies and where it is
     } // finished adding PXD-Hits
 
-    if (m_PARAMdetectorType not_eq Const::PXD) { // want SVDhits
-      B2DEBUG(20, "I'm in SVD and chosen detectorType is: " << m_PARAMdetectorType)
+    if (m_useTEL == true) { // want TELhits
+      B2DEBUG(20, "I'm in TEL and chosen detectorType is: " << Belle2::printMyStdVector(m_PARAMdetectorType))
+
+      RelationIndex<MCParticle, TelTrueHit>::range_from iterPairMcTel = relationMcTelTrueHit.getElementsFrom(aMcParticlePtr);
+      for (const auto & relElement : iterPairMcTel) {
+        const TelTrueHit* const aSiTrueHitPtr = relElement.to;
+
+        bool creatingHitSuccessfull = createSectorAndHit(Const::invalidDetector, pdg, aSiTrueHitPtr, newTrack, thisSecMap);/// createSectorAndHit
+
+        if (creatingHitSuccessfull == true) {
+          m_telHitCounter++;
+          B2DEBUG(20, "adding new TEL hit of track " << iPart)
+        }
+      } // now each hit knows in which direction the particle goes, in which sector it lies and where it is
+    } // finished adding TEL-Hits
+
+    if (m_useSVD == true) { // want SVDhits
+      B2DEBUG(20, "I'm in SVD and chosen detectorType is: " << Belle2::printMyStdVector(m_PARAMdetectorType))
 
       RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcSvd = relationMcSvdTrueHit.getElementsFrom(aMcParticlePtr);
       for (const auto & relElement : iterPairMcSvd) {
@@ -475,7 +527,7 @@ void FilterCalculatorModule::event()
     if (thisSecMap->find(aCenterSectorName) == thisSecMap->end()) { // fallback solution using one secMap for whole range of pT
 //       Sector newCenterSector(0, 0, 0, 0, 0, 0, 0, aCenterSectorName);
       Sector newCenterSector(aCenterSectorName, {0, 0}, {0, 0}, {0, 0}, {0, 0}, 0);
-      thisSecMap->insert(make_pair(aCenterSectorName, newCenterSector));
+      thisSecMap->insert({aCenterSectorName, newCenterSector});
     }
     MCParticle* mcp = aMcParticleArray[newTrack.getParticleID()];
 //      TVector3 mcvertex = mcp->getVertex();
@@ -525,8 +577,8 @@ void FilterCalculatorModule::event()
         }
       } else { // assumes that the interaction point is at the origin (or at least very near to it)
         if (riter != thisTrack.rend()) {
-          if (direction != riter->getParticleMovement() /*and riter->getSectorID() != aCenterSectorName*/) { continue; }
-          while (direction == riter->getParticleMovement() /*or riter->getSectorID() == aCenterSectorName*/) {
+          if (direction != riter->getParticleMovement()) { continue; }
+          while (direction == riter->getParticleMovement()) {
             if (riter == thisTrack.rend()) { break; }
             friendUniID = riter->getUniID();
             if (thisUniID != friendUniID) {
@@ -638,7 +690,7 @@ void FilterCalculatorModule::event()
   double deltaDistCircleCenter, deltapT;
 // 3hit-variables:
   TVector3 motherHitGlobal, grandMotherHitGlobal;
-  double dist2IP, angles3D, anglesXY, anglesRZ, helixFit, deltaSlopeRZ, pT;
+  double dist2IP, angles3D, anglesXY, anglesRZ, helixParameterFit, deltaSlopeZOverS, deltaSOverZ , deltaSlopeRZ, pT;
 // 2hit-variables:
   TVector3 segmentVector;
   double distanceXY, distanceZ, distance3D, normedDistance3D, slopeRZ;
@@ -653,11 +705,13 @@ void FilterCalculatorModule::event()
     list<VXDHit>::iterator it3HitsFilter = aTracklet.begin(); // -"- 3hit-Filters...m_PARAMlogTRadiusHighOccupancytoIPDistance
     list<VXDHit>::iterator it4HitsFilter = aTracklet.begin(); // -"- 4hit-Filters... "outermost Hit"
 
-    B2DEBUG(20, "executing " << i + 1 << "th tracklet with size " << aTracklet.size())
+    stringstream tcSectors;
     for (list<VXDHit>::iterator it = aTracklet.begin() ; it != aTracklet.end(); ++it) {
       currentSector = it->getSectorID();
-      B2DEBUG(20, "tracklet has a hit in the following sector: " << currentSector)
+      tcSectors << currentSector << " ";
+//       B2DEBUG(20, "tracklet has a hit in the following sector: " << currentSector)
     }
+    B2DEBUG(20, "executing " << i + 1 << "th tracklet with size " << aTracklet.size() << " and hits in the sectors:\n" << tcSectors.str() << endl)
 
     MapOfSectors::iterator thisSectorPos;
     for (; iter != aTracklet.end(); ++iter) {
@@ -689,10 +743,21 @@ void FilterCalculatorModule::event()
             m_fourHitFilterBox.resetValues(hitG, moHitG, graMoHitG, greGraMoHitG); // outerhit, centerhit, innerhit
 
             if (m_PARAMlogDeltaPt == true) {
-              deltapT = m_fourHitFilterBox.deltapT();
+              bool succeeded = true;
+              deltapT = 0;
+              try {
+                deltapT = m_fourHitFilterBox.deltapT();
+              } catch (FilterExceptions::Straight_Line& exception) {
+                B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating deltapT threw an exception: " << exception.what() << ", value discarded...")
+                succeeded = false;
+              }
               if (std::isnan(deltapT) == false) {
-                B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltapT-Value: " << deltapT << " gets stored in sector " << thisSectorPos->second.getSectorID())
-                thisSectorPos->second.addValue(friendSector, FilterID::deltapT, deltapT);
+                if (succeeded == true) {
+                  B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltapT-Value: " << deltapT << " gets stored in sector " << thisSectorPos->second.getSectorID())
+                  thisSectorPos->second.addValue(friendSector, FilterID::deltapT, deltapT);
+                } else {
+                  B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated deltapT-value got discarded")
+                }
               } else {
                 m_badFilterValueCtr++; B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculated deltapT-Value: " << deltapT << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
                 hitG.Print(); moHitG.Print(); graMoHitG.Print(); greGraMoHitG.Print();
@@ -700,10 +765,21 @@ void FilterCalculatorModule::event()
             }
 
             if (m_PARAMlogDeltaDistCircleCenter == true) {
-              deltaDistCircleCenter =  m_fourHitFilterBox.deltaDistCircleCenter();
+              bool succeeded = true;
+              deltaDistCircleCenter = 0;
+              try {
+                deltaDistCircleCenter =  m_fourHitFilterBox.deltaDistCircleCenter();
+              } catch (FilterExceptions::Straight_Line& exception) {
+                B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating deltaDistCircleCenter threw an exception: " << exception.what() << ", value discarded...")
+                succeeded = false;
+              }
               if (std::isnan(deltaDistCircleCenter) == false) {
-                B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenter-Value: " << deltaDistCircleCenter << " gets stored in sector " << thisSectorPos->second.getSectorID())
-                thisSectorPos->second.addValue(friendSector, FilterID::deltaDistance2IP, deltaDistCircleCenter);
+                if (succeeded == true) {
+                  B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenter-Value: " << deltaDistCircleCenter << " gets stored in sector " << thisSectorPos->second.getSectorID())
+                  thisSectorPos->second.addValue(friendSector, FilterID::deltaDistance2IP, deltaDistCircleCenter);
+                } else {
+                  B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenter-value got discarded")
+                }
               } else {
                 m_badFilterValueCtr++; B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenter-Value: " << deltaDistCircleCenter << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
                 hitG.Print(); moHitG.Print(); graMoHitG.Print(); greGraMoHitG.Print();
@@ -725,20 +801,42 @@ void FilterCalculatorModule::event()
           m_fourHitFilterBox.resetValues(hitGlobal, motherHitGlobal, grandMotherHitGlobal, m_origin); // outerhit, centerhit, innerhit
           B2DEBUG(50, "3-hit and hioc 3+1: outer -> innerHit Perp and SecID \n" << hitGlobal.Perp() << "/" << currentSector << " " << motherHitGlobal.Perp() << "/" << friendSector << " " << grandMotherHitGlobal.Perp() << "/" << iter->getSectorID() << " " << m_origin.Perp())
           if (m_PARAMlogDeltaPtHighOccupancy == true and lastRun == false) {
-            deltapT = m_fourHitFilterBox.deltapT();
+            bool succeeded = true;
+            deltapT = 0;
+            try {
+              deltapT = m_fourHitFilterBox.deltapT();
+            } catch (FilterExceptions::Straight_Line& exception) {
+              B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating deltapTHighOccupancy threw an exception: " << exception.what() << ", value discarded...")
+              succeeded = false;
+            }
             if (std::isnan(deltapT) == false) {
-              B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltapTHighOccupancy-Value: " << deltapT << " gets stored in sector " << thisSectorPos->second.getSectorID())
-              thisSectorPos->second.addValue(friendSector, FilterID::deltapTHighOccupancy, deltapT);
+              if (succeeded == true) {
+                B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltapTHighOccupancy-Value: " << deltapT << " gets stored in sector " << thisSectorPos->second.getSectorID())
+                thisSectorPos->second.addValue(friendSector, FilterID::deltapTHighOccupancy, deltapT);
+              } else {
+                B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltapTHighOccupancy-value got discarded")
+              }
             } else {
               m_badFilterValueCtr++; B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculated deltapTHighOccupancy-Value: " << deltapT << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print(); m_origin.Print();
             }
           }
           if (m_PARAMlogDeltaDistCircleCenterHighOccupancy == true and lastRun == false) {
-            deltaDistCircleCenter =  m_fourHitFilterBox.deltaDistCircleCenter();
+            bool succeeded = true;
+            deltaDistCircleCenter = 0;
+            try {
+              deltaDistCircleCenter =  m_fourHitFilterBox.deltaDistCircleCenter();
+            } catch (FilterExceptions::Straight_Line& exception) {
+              B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating deltaDistCircleCenterHighOccupancy threw an exception: " << exception.what() << ", value discarded...")
+              succeeded = false;
+            }
             if (std::isnan(deltaDistCircleCenter) == false) {
-              B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenterHighOccupancy-Value: " << deltaDistCircleCenter << " gets stored in sector " << thisSectorPos->second.getSectorID())
-              thisSectorPos->second.addValue(friendSector, FilterID::deltaDistanceHighOccupancy2IP, deltaDistCircleCenter);
+              if (succeeded == true) {
+                B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenterHighOccupancy-Value: " << deltaDistCircleCenter << " gets stored in sector " << thisSectorPos->second.getSectorID())
+                thisSectorPos->second.addValue(friendSector, FilterID::deltaDistanceHighOccupancy2IP, deltaDistCircleCenter);
+              } else {
+                B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenterHighOccupancy-value got discarded")
+              }
             } else {
               m_badFilterValueCtr++; B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenterHighOccupancy-Value: " << deltaDistCircleCenter << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print(); m_origin.Print();
@@ -749,10 +847,21 @@ void FilterCalculatorModule::event()
           m_threeHitFilterBox.resetValues(hitGlobal, motherHitGlobal, grandMotherHitGlobal); // outerhit, centerhit, innerhit
 
           if (m_PARAMlogTRadiustoIPDistance == true) {
-            dist2IP = m_threeHitFilterBox.calcCircleDist2IP();
+            bool succeeded = true;
+            dist2IP = 0;
+            try {
+              dist2IP = m_threeHitFilterBox.calcCircleDist2IP();
+            } catch (FilterExceptions::Straight_Line& exception) {
+              B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating dist2IP threw an exception: " << exception.what() << ", value discarded...")
+              succeeded = false;
+            }
             if (std::isnan(dist2IP) == false) {
-              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated dist2IP-Value: " << dist2IP << " gets stored in sector " << thisSectorPos->second.getSectorID())
-              thisSectorPos->second.addValue(friendSector, FilterID::distance2IP, dist2IP);
+              if (succeeded == true) {
+                B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated dist2IP-Value: " << dist2IP << " gets stored in sector " << thisSectorPos->second.getSectorID())
+                thisSectorPos->second.addValue(friendSector, FilterID::distance2IP, dist2IP);
+              } else {
+                B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated dist2IP-value got discarded")
+              }
             } else {
               m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated dist2IP-Value: " << dist2IP << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print(); m_origin.Print();
@@ -760,10 +869,21 @@ void FilterCalculatorModule::event()
           }
 
           if (m_PARAMlogPt == true) {
-            pT = m_threeHitFilterBox.calcPt();
+            bool succeeded = true;
+            pT = 0;
+            try {
+              pT = m_threeHitFilterBox.calcPt();
+            } catch (FilterExceptions::Straight_Line& exception) {
+              B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating pT threw an exception: " << exception.what() << ", value discarded...")
+              succeeded = false;
+            }
             if (std::isnan(pT) == false) {
-              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated pT-Value: " << pT << " gets stored in sector " << thisSectorPos->second.getSectorID())
-              thisSectorPos->second.addValue(friendSector, FilterID::pT, pT);
+              if (succeeded == true) {
+                B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated pT-Value: " << pT << " gets stored in sector " << thisSectorPos->second.getSectorID())
+                thisSectorPos->second.addValue(friendSector, FilterID::pT, pT);
+              } else {
+                B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated pT-value got discarded")
+              }
             } else {
               m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated pT-Value: " << pT << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print();
@@ -819,16 +939,73 @@ void FilterCalculatorModule::event()
             }
           }
 
-          if (m_PARAMlogHelixFit == true) {
-            helixFit = m_threeHitFilterBox.calcHelixFit();
-            if (std::isnan(helixFit) == false) {
-              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated helixFit-Value: " << helixFit << " gets stored in sector " << thisSectorPos->second.getSectorID())
-              thisSectorPos->second.addValue(friendSector, FilterID::helixParameterFit, helixFit);
+          if (m_PARAMlogHelixParameterFit == true) {
+            bool succeeded = true;
+            helixParameterFit = 0;
+            try {
+              helixParameterFit = m_threeHitFilterBox.calcHelixParameterFit();
+            } catch (FilterExceptions::Straight_Line& exception) {
+              B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating helixParameterFit threw an exception: " << exception.what() << ", value discarded...")
+              succeeded = false;
+            }
+            if (std::isnan(helixParameterFit) == false) {
+              if (succeeded == true) {
+                B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated helixParameterFit-Value: " << helixParameterFit << " gets stored in sector " << thisSectorPos->second.getSectorID())
+                thisSectorPos->second.addValue(friendSector, FilterID::helixParameterFit, helixParameterFit);
+              } else {
+                B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated helixParameterFit-value got discarded")
+              }
             } else {
-              m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated helixFit-Value: " << helixFit << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+              m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated helixParameterFit-Value: " << helixParameterFit << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print();
             }
           }
+
+          if (m_PARAMlogDeltaSOverZ == true) {
+            bool succeeded = true;
+            deltaSOverZ = 0;
+            try {
+              deltaSOverZ = m_threeHitFilterBox.calcDeltaSOverZ();
+            } catch (FilterExceptions::Straight_Line& exception) {
+              B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating deltaSOverZ threw an exception: " << exception.what() << ", value discarded...")
+              succeeded = false;
+            }
+            if (std::isnan(deltaSOverZ) == false) {
+              if (succeeded == true) {
+                B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated deltaSOverZ-Value: " << deltaSOverZ << " gets stored in sector " << thisSectorPos->second.getSectorID())
+                thisSectorPos->second.addValue(friendSector, FilterID::deltaSOverZ, deltaSOverZ);
+              } else {
+                B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated deltaSOverZ-value got discarded")
+              }
+            } else {
+              m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated deltaSOverZ-Value: " << deltaSOverZ << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+              hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print();
+            }
+          }
+
+          if (m_PARAMlogDeltaSlopeZOverS == true) {
+            bool succeeded = true;
+            deltaSlopeZOverS = 0;
+            try {
+              deltaSlopeZOverS = m_threeHitFilterBox.calcDeltaSlopeZOverS();
+            } catch (FilterExceptions::Straight_Line& exception) {
+              B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating deltaSlopeZOverS threw an exception: " << exception.what() << ", value discarded...")
+              succeeded = false;
+            }
+            if (std::isnan(deltaSlopeZOverS) == false) {
+              if (succeeded == true) {
+                B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated deltaSlopeZOverS-Value: " << deltaSlopeZOverS << " gets stored in sector " << thisSectorPos->second.getSectorID())
+                thisSectorPos->second.addValue(friendSector, FilterID::deltaSlopeZOverS, deltaSlopeZOverS);
+              } else {
+                B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated deltaSlopeZOverS-value got discarded")
+              }
+
+            } else {
+              m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated deltaSlopeZOverS-Value: " << deltaSlopeZOverS << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+              hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print();
+            }
+          }
+
 
           ++it3HitsFilter; /// -"- 3hit-Filters...
 
@@ -852,20 +1029,42 @@ void FilterCalculatorModule::event()
         /// high occupancy mode for 2+1 hits
         m_threeHitFilterBox.resetValues(hitGlobal, motherHitGlobal, m_origin); // outerhit, centerhit, innerhit
         if (m_PARAMlogTRadiusHighOccupancytoIPDistance == true and lastRun == false) {
-          dist2IP = m_threeHitFilterBox.calcCircleDist2IP();
+          bool succeeded = true;
+          dist2IP = 0;
+          try {
+            dist2IP = m_threeHitFilterBox.calcCircleDist2IP();
+          } catch (FilterExceptions::Straight_Line& exception) {
+            B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating distHighOccupancy2IP threw an exception: " << exception.what() << ", value discarded...")
+            succeeded = false;
+          }
           if (std::isnan(dist2IP) == false) {
-            B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated distHighOccupancy2IP-Value(FilterID " << FilterID::distanceHighOccupancy2IP << "): " << dist2IP << " for sector " << FullSecID(friendSector).getFullSecString() << " gets stored in sector " << thisSectorPos->second.getSectorID())
-            thisSectorPos->second.addValue(friendSector, FilterID::distanceHighOccupancy2IP, dist2IP);
+            if (succeeded == true) {
+              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated distHighOccupancy2IP-Value(FilterID " << FilterID::distanceHighOccupancy2IP << "): " << dist2IP << " for sector " << FullSecID(friendSector) << " gets stored in sector " << thisSectorPos->second.getSectorID())
+              thisSectorPos->second.addValue(friendSector, FilterID::distanceHighOccupancy2IP, dist2IP);
+            } else {
+              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated distHighOccupancy2IP-value got discarded")
+            }
           } else {
             m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated distHighOccupancy2IP-Value: " << dist2IP << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
             hitGlobal.Print(); motherHitGlobal.Print(); m_origin.Print();
           }
         }
         if (m_PARAMlogPtHighOccupancy == true and lastRun == false) {
-          pT = m_threeHitFilterBox.calcPt();
+          bool succeeded = true;
+          pT = 0;
+          try {
+            pT = m_threeHitFilterBox.calcPt();
+          } catch (FilterExceptions::Straight_Line& exception) {
+            B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating pTHighOccupancy threw an exception: " << exception.what() << ", value discarded...")
+            succeeded = false;
+          }
           if (std::isnan(pT) == false) {
-            B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated pTHighOccupancy-Value: " << pT << " gets stored in sector " << thisSectorPos->second.getSectorID())
-            thisSectorPos->second.addValue(friendSector, FilterID::pTHighOccupancy, pT);
+            if (succeeded == true) {
+              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated pTHighOccupancy-Value: " << pT << " gets stored in sector " << thisSectorPos->second.getSectorID())
+              thisSectorPos->second.addValue(friendSector, FilterID::pTHighOccupancy, pT);
+            } else {
+              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated distHighOccupancy2IP-value got discarded")
+            }
           } else {
             m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated pTHighOccupancy-Value: " << pT << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
             hitGlobal.Print(); motherHitGlobal.Print(); m_origin.Print();
@@ -911,16 +1110,59 @@ void FilterCalculatorModule::event()
             hitGlobal.Print(); motherHitGlobal.Print(); m_origin.Print();
           }
         }
-        if (m_PARAMlogHelixHighOccupancyFit == true and lastRun == false) {
-          helixFit = m_threeHitFilterBox.calcHelixFit();
-          if (std::isnan(helixFit) == false) {
-            B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated helixHighOccupancyFit-Value: " << helixFit << " gets stored in sector " << thisSectorPos->second.getSectorID())
-            thisSectorPos->second.addValue(friendSector, FilterID::helixHighOccupancyFit, helixFit);
+        if (m_PARAMlogHelixParameterHighOccupancyFit == true and lastRun == false) {
+          bool succeeded = true;
+          helixParameterFit = 0;
+          try {
+            helixParameterFit = m_threeHitFilterBox.calcHelixParameterFit();
+          } catch (FilterExceptions::Straight_Line& exception) {
+            B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating helixParameterHighOccupancyFit threw an exception: " << exception.what() << ", value discarded...")
+            succeeded = false;
+          }
+          if (std::isnan(helixParameterFit) == false) {
+            if (succeeded == true) {
+              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated helixParameterHighOccupancyFit-Value: " << helixParameterFit << " gets stored in sector " << thisSectorPos->second.getSectorID())
+              thisSectorPos->second.addValue(friendSector, FilterID::helixParameterHighOccupancyFit, helixParameterFit);
+            } else {
+              B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated helixParameterHighOccupancyFit-value got discarded")
+            }
           } else {
-            m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated helixHighOccupancyFit-Value: " << helixFit << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+            m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated helixHighOccupancyFit-Value: " << helixParameterFit << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
             hitGlobal.Print(); motherHitGlobal.Print(); m_origin.Print();
           }
         }
+// // // //         if (m_PARAMlogHelixParameterFit == true) {
+// // // //             helixParameterFit = m_threeHitFilterBox.calcHelixParameterFit();
+// // // //             if (std::isnan(helixParameterFit) == false) {
+// // // //               B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated helixParameterFit-Value: " << helixParameterFit << " gets stored in sector " << thisSectorPos->second.getSectorID())
+// // // //               thisSectorPos->second.addValue(friendSector, FilterID::helixParameterFit, helixParameterFit);
+// // // //             } else {
+// // // //               m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated helixParameterFit-Value: " << helixParameterFit << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+// // // //               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print();
+// // // //             }
+// // // //           }
+
+//         if (m_PARAMlogDeltaSOverZHighOccupancy == true and lastRun == false) {
+//             deltaSOverZ = m_threeHitFilterBox.calcDeltaSOverZ();
+//             if (std::isnan(deltaSOverZ) == false) {
+//               B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated deltaSOverZ-Value: " << deltaSOverZ << " gets stored in sector " << thisSectorPos->second.getSectorID())
+//               thisSectorPos->second.addValue(friendSector, FilterID::deltaSOverZ, deltaSOverZ);
+//             } else {
+//               m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated deltaSOverZ-Value: " << deltaSOverZ << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+//               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print();
+//             }
+//           }
+//
+//           if (m_PARAMlogDeltaSlopeZOverS == true) {
+//             deltaSlopeZOverS = m_threeHitFilterBox.calcDeltaSlopeZOverS();
+//             if (std::isnan(deltaSlopeZOverS) == false) {
+//               B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated deltaSlopeZOverS-Value: " << deltaSlopeZOverS << " gets stored in sector " << thisSectorPos->second.getSectorID())
+//               thisSectorPos->second.addValue(friendSector, FilterID::deltaSlopeZOverS, deltaSlopeZOverS);
+//             } else {
+//               m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated deltaSlopeZOverS-Value: " << deltaSlopeZOverS << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
+//               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print();
+//             }
+//           }
         /// high occupancy mode - end
 
         m_twoHitFilterBox.resetValues(hitGlobal, motherHitGlobal); // outerhit, innerhit
@@ -1014,10 +1256,9 @@ void FilterCalculatorModule::endRun()
   B2INFO(m_badHitsCounter << " hits had to be discarded because of double impact in same sensor having same direction of flight")
   B2INFO(m_badTrackletCounter << " tracklets had to be discarded because of crazy flight (forward and backward movement all the time)")
 
-  B2INFO(" there were " << float(totalTrackletCounter) / float(m_eventCounter) << "/" << float(m_pxdHitCounter) / float(m_eventCounter) << "/" << float(m_svdHitCounter) / float(m_eventCounter) << " tracklets/pxdHits/svdHits per event...")
+  B2INFO(" there were " << float(totalTrackletCounter) / float(m_eventCounter) << "/" << float(m_telHitCounter) / float(m_eventCounter) << "/" << float(m_pxdHitCounter) / float(m_eventCounter) << "/" << float(m_svdHitCounter) / float(m_eventCounter) << " tracklets/telHits/pxdHits/svdHits per event and " << m_totalHitCounter << " hits total")
   B2INFO(" there were " << m_longTrackCounter << " Tracks having more than " << m_numOfLayers * 2 << " hits...")
   B2INFO(" there were " << m_longTrackletCounter << " Tracklets having more than " << m_numOfLayers * 2 << " hits!!!")
-  B2INFO(" totalGlobalCoordValue: " << m_totalGlobalCoordValue << ", totalLocalCoordValue: " << m_totalLocalCoordValue << ", of " << totalHitCounter << " hits total (" << m_totalHitCounter << " counted manually) ")
   B2INFO(m_badFilterValueCtr << " times, a filter produced invalid results ('nan')")
 
 
@@ -1033,15 +1274,15 @@ void FilterCalculatorModule::endRun()
     ctr = 0;
     B2INFO("writing " << secMapSize << " entries of secmap " << m_PARAMsecMapNames.at(smCtr))
 
-    VXDTFRawSecMap::StrippedRawSecMap rootSecMap;
-    VXDTFRawSecMap::SectorDistancesMap distanceOfSectorsMap; // stores the secID in .first and the value for the distances in .second
+    VXDTFRawSecMapTypedef::StrippedRawSecMap rootSecMap;
+    VXDTFRawSecMapTypedef::SectorDistancesMap distanceOfSectorsMap; // stores the secID in .first and the value for the distances in .second
 
     for (SecMapEntry thisEntry : *thisMap) {
       if (secMapSize > 10) {
         if ((ctr % int(0.1 * float(secMapSize))) == 0 && secMapSize > 0) { // this check produces segfault if secMapSize < 10
           B2INFO("writing entry " << ctr << ": " << thisEntry.first)
         }
-      }
+      } else { B2INFO("writing entry " << ctr << ": " << thisEntry.first) }
 
       // doing typeCheck: if (Class* check = dynamic_cast<Class*>(aPtr)) != NULL) then aPtr isOfType Class*
 //      if ((Sector* derived = dynamic_cast<Sector*>(&thisEntry.second)) != NULL)
@@ -1065,13 +1306,19 @@ void FilterCalculatorModule::endRun()
 
     stringstream sectorDistances;
 
-    for (VXDTFRawSecMap::SectorDistance aValue : distanceOfSectorsMap) {
-      sectorDistances << FullSecID(aValue.first).getFullSecString() << "/" << aValue.second << "\n";
+    for (VXDTFRawSecMapTypedef::SectorDistance aValue : distanceOfSectorsMap) {
+      sectorDistances << FullSecID(aValue.first) << "/" << aValue.second << "\n";
     }
     B2DEBUG(1, "the following sectors had the following distances to the chosen origin:\n" << sectorDistances.str())
 
     if (m_PARAMsecMapWriteToRoot == true and rootSecMap.size() != 0) {
 
+      for (auto & aSector : rootSecMap) { // looping over sectors (VXDTFRawSecMapTypedef::StrippedRawSecMap)
+        B2DEBUG(10, "In Sector " << FullSecID(aSector.first) << " there are the following friends:")
+        for (auto & afriend : aSector.second) { // looping over friends
+          B2DEBUG(10, "..." << FullSecID(afriend.first) << " with " << afriend.second.size() << " cutoffTypes")
+        }
+      }
       bool doNotAddMapAgain = false;
       if (doNotAddMapAgain == false) {   /// TODO why shouldn't I add a map? ATM these two lines are pretty useless...
 
@@ -1079,21 +1326,15 @@ void FilterCalculatorModule::endRun()
         VXDTFRawSecMap newTemporarySecMap;
         newTemporarySecMap.addSectorMap(rootSecMap);
         newTemporarySecMap.setMapName(m_PARAMsecMapNames.at(smCtr));
-        if (m_PARAMdetectorType == Const::PXD) {
-          newTemporarySecMap.setDetectorType("PXD");
-        } else if (m_PARAMdetectorType == Const::SVD) {
-          newTemporarySecMap.setDetectorType("SVD");
-        } else if (m_PARAMdetectorType == -1) {  // -> VXD
-          newTemporarySecMap.setDetectorType("VXD");
-        } else {
-          B2FATAL("detectorType set wrong, could not export sector map! your value: " << m_PARAMdetectorType)
-        }
+        newTemporarySecMap.setDetectorType(m_detectorName);
         newTemporarySecMap.setSectorConfigU(m_PARAMsectorConfigU);
         newTemporarySecMap.setSectorConfigV(m_PARAMsectorConfigV);
         newTemporarySecMap.setOrigin(m_origin);
         newTemporarySecMap.setMagneticFieldStrength(m_PARAMmagneticFieldStrength);
         newTemporarySecMap.setLowerMomentumThreshold(m_PARAMpTcuts.at(smCtr));
         newTemporarySecMap.addDistances(distanceOfSectorsMap);
+        newTemporarySecMap.setMinDistance2origin(m_PARAMacceptedRegionForSensors.at(0));
+        newTemporarySecMap.setMaxDistance2origin(m_PARAMacceptedRegionForSensors.at(1));
         if (smCtr + 1 > int(m_PARAMpTcuts.size())) {
           newTemporarySecMap.setHigherMomentumThreshold(std::numeric_limits<double>::max());
         } else {
@@ -1131,7 +1372,7 @@ void FilterCalculatorModule::endRun()
     TFile secMapFile(fileNameOnly.c_str(), m_PARAMrootFileName.at(1).c_str());
     rawSectorMapVector.Write();
     secMapFile.Close();
-    B2INFO(" FilterCalculatorModule::terminate: exporting secMaps via " << fileNameOnly)
+    B2INFO(" FilterCalculatorModule::endRun: exporting secMaps via " << fileNameOnly)
   }
 
 
@@ -1173,8 +1414,8 @@ bool FilterCalculatorModule::createSectorAndHit(Belle2::Const::EDetector detecto
   std::pair<double, double> aRelCoordCenter = {0.5, 0.5};
 
   VxdID aVxdID = aSiTrueHitPtr->getSensorID();
-  VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
-  VXD::SensorInfoBase aSensorInfo = geometry.getSensorInfo(aVxdID);
+  const VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
+  const VXD::SensorInfoBase& aSensorInfo = geometry.getSensorInfo(aVxdID);
 
   // local(0,0,0) is the center of the sensorplane
   double vSize1 = 0.5 * aSensorInfo.getVSize();
@@ -1182,17 +1423,9 @@ bool FilterCalculatorModule::createSectorAndHit(Belle2::Const::EDetector detecto
 
   if (m_PARAMsmearHits == true) {
     double sigmaU = 0, sigmaV = 0;
-    if (detectorID == Const::PXD) {
-      const PXD::SensorInfo& geometryPXD = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(aVxdID));
-      sigmaU = geometryPXD.getUPitch(uTrue) * m_PARAMuniSigma;
-      sigmaV = geometryPXD.getVPitch(vTrue) * m_PARAMuniSigma;
+    sigmaU = aSensorInfo.getUPitch(uTrue) * m_PARAMuniSigma;
+    sigmaV = aSensorInfo.getVPitch(vTrue) * m_PARAMuniSigma;
 
-    } else if (detectorID == Const::SVD) {
-      const SVD::SensorInfo& geometrySVD = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(aVxdID));
-      sigmaU = geometrySVD.getUPitch(uTrue) * m_PARAMuniSigma;
-      sigmaV = geometrySVD.getVPitch(vTrue) * m_PARAMuniSigma;
-
-    }
     B2DEBUG(100, "smearing hits using sigU, sigV: " << sigmaU << " " << sigmaV << " at DetectorID: " << detectorID);
     u = gRandom->Gaus(uTrue, sigmaU);
     v = gRandom->Gaus(vTrue, sigmaV);
@@ -1211,8 +1444,6 @@ bool FilterCalculatorModule::createSectorAndHit(Belle2::Const::EDetector detecto
   double uCoord = hitLocal[0] + uSizeAtHit; // *0,5 putting (0,0) from the center to the edge of the plane (considers the trapeziodal shape)
   double vCoord = hitLocal[1] + vSize1;
 
-  m_totalGlobalCoordValue += hitGlobal[0] + hitGlobal[1] + hitGlobal[2];
-  m_totalLocalCoordValue += uCoord + vCoord;
   m_totalHitCounter++;
 
   string aSectorName;
@@ -1226,6 +1457,11 @@ bool FilterCalculatorModule::createSectorAndHit(Belle2::Const::EDetector detecto
     double sectorEdgeV1 = 0, sectorEdgeV2 = 0, uSizeAtv1 = 0, uSizeAtv2 = 0, sectorEdgeU1OfV1 = 0, sectorEdgeU1OfV2 = 0, sectorEdgeU2OfV1 = 0, sectorEdgeU2OfV2 = 0, centerU = 0, centerV = 0;
     TVector3 centerOfSector;
 
+    int aUniID = aVxdID.getID();
+    int aLayerID = aVxdID.getLayerNumber();
+    B2DEBUG(20, "local svd hit coordinates (u,v): (" << hitLocal[0] << "," << hitLocal[1] << ") @layer: " << aLayerID);
+    unsigned int aSecID = 0;
+    string aSectorName;
 
     // searching for sector:
     for (int j = 0; j != int(m_PARAMsectorConfigU.size() - 1); ++j) {
@@ -1247,16 +1483,24 @@ bool FilterCalculatorModule::createSectorAndHit(Belle2::Const::EDetector detecto
             sectorEdgeU1OfV2 = m_PARAMsectorConfigU.at(j) * uSizeAtv2 * 2 - uSizeAtv2;
             sectorEdgeU2OfV1 = m_PARAMsectorConfigU.at(j + 1) * uSizeAtv1 * 2 - uSizeAtv1;
             sectorEdgeU2OfV2 = m_PARAMsectorConfigU.at(j + 1) * uSizeAtv2 * 2 - uSizeAtv2;
-            centerV = sectorEdgeV2 + 0.5 * (sectorEdgeV1 - sectorEdgeV2); /// WARNING Berechnung falsch!
-            centerU = aSensorInfo.getUSize(centerV); // uSizeAtCenterU
-            centerU = m_PARAMsectorConfigU.at(j) * centerU - m_PARAMsectorConfigU.at(j + 1) * centerU ;
+//           centerV = sectorEdgeV1 + 0.5 * fabs(sectorEdgeV1 - sectorEdgeV2); /// WARNING Berechnung falsch!
+            //           centerU = aSensorInfo.getUSize(centerV); // uSizeAtCenterV
+            //           centerU = centerU*(m_PARAMsectorConfigU.at(j) * 2 - 1 + (m_PARAMsectorConfigU.at(j) + 0.5*fabs(m_PARAMsectorConfigU.at(j) - m_PARAMsectorConfigU.at(j+1))));
+            // calculating the intersection of two lines connecting the edges of the trapezoid. Therefore the first step is to calculate the slope parameter mu (deltaV & tempVal are used to make the code more readable):
+            double deltaV = sectorEdgeV2 - sectorEdgeV1;
+            double tempVal = deltaV / (sectorEdgeU2OfV2 - sectorEdgeU1OfV1);
+            double deltaU2112 = sectorEdgeU2OfV1 - sectorEdgeU1OfV2;
+            double mu = (deltaV - sectorEdgeU1OfV2 * tempVal + sectorEdgeU1OfV1 * tempVal) / (deltaV + deltaU2112 * tempVal); // TODO implement isInf or isNan-check....
+            centerU = sectorEdgeU1OfV2 + mu * deltaU2112;
+            centerV = sectorEdgeV2 - mu * deltaV;
             centerOfSector.SetXYZ(centerU, centerV, 0);
             centerOfSector = aSensorInfo.pointToGlobal(centerOfSector);
             dist2Origin = (centerOfSector - m_origin).Mag();
+            // [DEBUG] Sector edges: O(-6.144,-2.88), U(6.144,-2.88), V(-6.144,2.88), UV(6.144,2.88), centerU/V: inf/-inf  { module: FilterCalculator @tracking/modules/VXDTFHelperTools/src/FilterCalculatorModule.cc:1332 }
 
             aSectorName = (boost::format("%1%_%2%_%3%") % aLayerID % aUniID % aSecID).str();
-            B2DEBUG(20, "I have found a SecID: " << aSectorName << " with centerU/V: " << centerU << "/" << centerV << " for hit " << uCoord << "/" << vCoord);
-            B2DEBUG(100, "Sector edges: O(" << sectorEdgeU1OfV1 << "," << sectorEdgeV1 << "), U(" << sectorEdgeU2OfV1 << "," << sectorEdgeV1 << "), V(" << sectorEdgeU1OfV2 << "," << sectorEdgeV2 << "), UV(" << sectorEdgeU2OfV2 << "," << sectorEdgeV2 << "), centerU/V: " << centerU << "/" << centerV)
+            B2DEBUG(20, "I have found a SecID: " << aSectorName << " with centerU/V: " << centerU << "/" << centerV << " and tempvalues of deltaV/tempVal/deltaU2112/mu: " << deltaV << "/" << tempVal << "/" << deltaU2112 << "/" << mu);
+            B2DEBUG(50, "Sector edges: O(" << sectorEdgeU1OfV1 << "," << sectorEdgeV1 << "), U(" << sectorEdgeU2OfV1 << "," << sectorEdgeV1 << "), V(" << sectorEdgeU1OfV2 << "," << sectorEdgeV2 << "), UV(" << sectorEdgeU2OfV2 << "," << sectorEdgeV2 << "), centerU/V: " << centerU << "/" << centerV)
 
             if (thisSecMap->find(aSectorName) == thisSecMap->end()) { // fallback solution using one secMap for whole range of pT
 //               Sector newSector(sectorEdgeV1, sectorEdgeV2, sectorEdgeU1OfV1, sectorEdgeU1OfV2, sectorEdgeU2OfV1, sectorEdgeU2OfV2, dist2Origin, aSectorName);

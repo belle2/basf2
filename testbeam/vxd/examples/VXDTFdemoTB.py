@@ -9,28 +9,14 @@ from subprocess import call
 import datetime
 
 ### setup of the most important parts for the VXDTF ###
-# VXDtestBeam-moreThan1500MeV_VXD
-# testBeamVXD-moreThan1500MeV_VXD.xml"/>
-    # <xi:include href="testBeamSVD-moreThan1500MeV_SVD.xml
-# secSetup = ['testBeamFINE_VXD']  # use 'testBeamFINE_SVD' for svd-only
-# secSetup = ['testBeamFineVXD-moreThan1500MeV_VXD']  # use 'testBeamStdSVD-moreThan1500MeV_SVD' for svd-only
-# secSetup = ['testBeamFineSVD-moreThan1500MeV_SVD']  # use 'testBeamStdSVD-moreThan1500MeV_SVD' for svd-only
-# secSetup = ['testBeamStdVXD-moreThan1500MeV_VXD']  # use 'testBeamStdSVD-moreThan1500MeV_SVD' for svd-only
-# secSetup = ['testBeamStdSVD-moreThan1500MeV_SVD']  # use 'testBeamStdSVD-moreThan1500MeV_SVD' for svd-only
-# secSetup = ['testBeamMiniVXD-moreThan1500MeV_VXD']  # use 'testBeamStdSVD-moreThan1500MeV_SVD' for svd-only
-# secSetup = ['testBeamMiniSVD-moreThan1500MeV_SVD']  # use 'testBeamStdSVD-moreThan1500MeV_SVD' for svd-only
-secSetup = ['testBeamMini6GeVSVD-moreThan1500MeV_SVD']
-# or 'testBeamFINE_VXD' for full vxd reco.
-# and don't forget to set the clusters for the detector type you want in the
-# mcTrackFinder down below!
-qiType = 'circleFit'
+fieldOn = True  # Turn field on or off (changes geometry components and digi/clust params)
 filterOverlaps = 'hopfield'
 seed = 1  # 1, 5, 6
 numEvents = 250
 momentum = 6.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
-theta_spread = 0.005  # # degrees (sigma of gaussian)
+theta_spread = 0.005  ## degrees (sigma of gaussian)
 phi = 180.0  # degrees
 phi_spread = 0.005  # degrees (sigma of gaussian)
 gun_x_position = 100.  # cm ... 100cm ... outside magnet + plastic shielding + Al scatterer (air equiv.)
@@ -49,11 +35,22 @@ eventinfoprinter = register_module('EventInfoPrinter')
 
 gearbox = register_module('Gearbox')
 # use simple testbeam geometry
-gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB.xml')  # FullTelescopeVXDTB # FullVXDTB
+gearbox.param('fileName',
+              'testbeam/vxd/FullTelescopeVXDTB_v2_NOTAlignedAtAll.xml')
 
 geometry = register_module('Geometry')
 # only the tracking detectors will be simulated. Makes the example much faster
-geometry.param('Components', ['MagneticField', 'TB'])
+if fieldOn:
+    geometry.param('components', ['MagneticField', 'TB'])
+    secSetup = \
+        ['TB3GeVFullMagnetNoAlignedSource2014May22SVD-moreThan1500MeV_SVD']
+    qiType = 'circleFit'  # circleFit
+else:
+  # To turn off magnetic field:
+    geometry.param('components', ['TB'])
+    secSetup = ['TB4GeVNoMagnetNoAlignedSource2014May21SVD-moreThan1500MeV_SVD'
+                ]
+    qiType = 'straightLine'  # straightLine
 
 particlegun = register_module('ParticleGun')
 # number of primaries per event
@@ -76,9 +73,9 @@ particlegun.param('phiParams', [phi, phi_spread])
 # Plastic 1cm shielding is at 650mm
 # Aluminium target at 750mm to "simulate" 15m air between collimator and TB setup
 particlegun.param('vertexGeneration', 'normal')
-particlegun.param('xVertexParams', [gun_x_position, 0.0])
-particlegun.param('yVertexParams', [0.0, beamspot_size_y])
-particlegun.param('zVertexParams', [0.0, beamspot_size_z])
+particlegun.param('xVertexParams', [gun_x_position, 0.])
+particlegun.param('yVertexParams', [0., beamspot_size_y])
+particlegun.param('zVertexParams', [0., beamspot_size_z])
 particlegun.param('independentVertices', True)
 
 g4sim = register_module('FullSim')
@@ -90,13 +87,27 @@ SVDDIGI.param('PoissonSmearing', True)
 SVDDIGI.param('ElectronicEffects', True)
 
 SVDCLUST = register_module('SVDClusterizer')
+if fieldOn:
+    SVDCLUST.param('TanLorentz_holes', 0.)  # 0.052
+    SVDCLUST.param('TanLorentz_electrons', 0.)
+else:
+    SVDCLUST.param('TanLorentz_holes', 0.)  # value scaled from 0.08 for 1.5T to 0.975T
+    SVDCLUST.param('TanLorentz_electrons', 0.)
 
 PXDDIGI = register_module('PXDDigitizer')
 PXDDIGI.param('SimpleDriftModel', False)
 PXDDIGI.param('PoissonSmearing', True)
 PXDDIGI.param('ElectronicEffects', True)
+if fieldOn:
+    PXDDIGI.param('tanLorentz', 0.1625)
+else:
+    PXDDIGI.param('tanLorentz', 0.)  # value scaled from 0.25 for 1.5T to 0.975T
 
 PXDCLUST = register_module('PXDClusterizer')
+if fieldOn:
+    PXDCLUST.param('TanLorentz', 0.1625)
+else:
+    PXDCLUST.param('TanLorentz', 0.)  # value scaled from 0.25 for 1.5T to 0.975T
 
 vxdtf = register_module('VXDTF')
 vxdtf.logging.log_level = LogLevel.DEBUG
@@ -112,44 +123,59 @@ param_vxdtf = {  # normally we don't know the particleID, but in the case of the
                  # we can expect (anti-?)electrons...
                  # True
                  # 'artificialMomentum': 5., ## uncomment if there is no magnetic field!
+                 # 7
+                 # 'activateDistance3D': [False],
+                 # 'activateDistanceZ': [True],
+                 # 'activateAngles3D': [False],
+                 # 'activateAnglesXY': [True],  #### noMagnet
+                 # ### withMagnet
+                 # 'activateAnglesRZHioC': [True], #### noMagnet
+                 # ### withMagnet r51x
+                 # True
     'activateBaselineTF': 1,
+    'debugMode': 0,
     'tccMinState': [2],
     'tccMinLayer': [3],
+    'reserveHitsThreshold': [0.],
+    'highestAllowedLayer': [6],
     'standardPdgCode': -11,
+    'artificialMomentum': 3,
     'sectorSetup': secSetup,
     'calcQIType': qiType,
-    'killEventForHighOccupancyThreshold': 75,
-    'highOccupancyThreshold': 85,
+    'killEventForHighOccupancyThreshold': 500,
+    'highOccupancyThreshold': 111,
     'cleanOverlappingSet': False,
     'filterOverlappingTCs': filterOverlaps,
     'TESTERexpandedTestingRoutines': True,
     'qiSmear': False,
     'smearSigma': 0.000001,
     'GFTrackCandidatesColName': 'caTracks',
-    'tuneCutoffs': 5,
+    'tuneCutoffs': 0.51,
     'activateDistanceXY': [False],
     'activateDistance3D': [True],
-    'activateAngles3DHioC': [False],
-    'activateAnglesXYHioC': [False],
-    'activateDeltaSlopeRZHioC': [False],
-    'activateDistance2IPHioC': [False],
-    'activatePTHioC': [False],
-    'activateHelixFitHioC': [False],
-    'activateDeltaPtHioC': [False],
-    'activateDeltaDistance2IPHioC': [False],
+    'activateDistanceZ': [False],
+    'activateSlopeRZ': [False],
+    'activateNormedDistance3D': [False],
     'activateAngles3D': [True],
     'activateAnglesXY': [False],
     'activateAnglesRZ': [False],
     'activateDeltaSlopeRZ': [False],
     'activateDistance2IP': [False],
     'activatePT': [False],
-    'activateHelixFit': [False],
+    'activateHelixParameterFit': [False],
+    'activateAngles3DHioC': [True],
+    'activateAnglesXYHioC': [True],
+    'activateAnglesRZHioC': [False],
+    'activateDeltaSlopeRZHioC': [False],
+    'activateDistance2IPHioC': [False],
+    'activatePTHioC': [False],
+    'activateHelixParameterFitHioC': [False],
+    'activateDeltaPtHioC': [False],
+    'activateDeltaDistance2IPHioC': [False],
     'activateZigZagXY': [False],
-    'activateDeltaPt': [True],
+    'activateZigZagRZ': [False],
+    'activateDeltaPt': [False],
     'activateCircleFit': [False],
-    'tuneCircleFit': [0.00000001],
-    'tuneAngles3D': [-0.1],
-    'tuneDistance3D': [-0.1],
     }
 vxdtf.param(param_vxdtf)
 

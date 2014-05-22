@@ -463,13 +463,6 @@ namespace Belle2 {
     const Particle* getDaughter(unsigned i) const;
 
     /**
-     * Returns a pointer to the i-th daughter particle
-     * @param i 0-based index of daughter particle
-     * @return Pointer to i-th daughter particles
-     */
-    Particle* getDaughter(unsigned i);
-
-    /**
      * Returns a vector of pointers to daughter particles
      * @return vector of pointers to daughter particles
      */

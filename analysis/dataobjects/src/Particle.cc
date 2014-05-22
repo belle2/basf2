@@ -378,13 +378,6 @@ const Particle* Particle::getDaughter(unsigned i) const
   return static_cast<Particle*>(m_arrayPointer->At(m_daughterIndices[i]));
 }
 
-Particle* Particle::getDaughter(unsigned i)
-{
-  //reuse the const version
-  const Particle* constThis = this;
-  return const_cast<Particle*>(constThis->getDaughter(i));
-}
-
 const std::vector<Belle2::Particle*> Particle::getDaughters() const
 {
   std::vector<Particle*> daughters(getNDaughters());

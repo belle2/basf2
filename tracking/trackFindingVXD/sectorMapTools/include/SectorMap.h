@@ -38,7 +38,11 @@ namespace Belle2 {
     typedef std::vector< SectorDistance > SectorDistancesMap; /**< stores vector of SectorDistanceInfo */
 
     /** constructor */
-    SectorMap() {}
+    SectorMap():
+      m_magneticFieldStrength(0),
+      m_minDistance2origin(-1),
+      m_maxDistance2origin(-1),
+      m_sortByDistance2origin(false) {}
 
   protected:
 

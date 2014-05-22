@@ -43,7 +43,7 @@ namespace Belle2 {
     EXPECT_EQ(emptySectorArray.getEntries(), 0);
 
 //     string workingMapName = "sectorList_evtNormSecHIGH_SVD";
-    string workingMapName = "secMapEvtGenOnR10501May2014SVDStd-moreThan500MeV_SVD";
+    string workingMapName = "belle2SimpleCaseTet35t80phi0t360SVD-50to500MeV_SVD";
     SectorMapFactory workingFactory(workingMapName);
 
     // loading the same map as the factory:

@@ -238,22 +238,22 @@ namespace Belle2 {
     /** searches for sectors fitting current hit coordinates, returns fullSecID with value uIntMax and pointer to end of SecMap if nothing could be found */
     Belle2::SectorNameAndPointerPair searchSector4Hit(VxdID aVxdID,
                                                       TVector3 localHit,
-                                                      TVector3 sensorSize,
+//                                                       TVector3 sensorSize,
                                                       Belle2::MapOfSectors& m_sectorMap,
                                                       std::vector<double>& uConfig,
                                                       std::vector<double>& vConfig); // -> TODO: generally usefull for VXD-related modules
     /// VXDTFModule::SectorNameAndPointerPair searchSector4Hit(VxdID aVxdID, FIXME alternative version needed?
 
-    // only temp for testing
-    Belle2::SectorNameAndPointerPair searchSector4HitOld(VxdID aVxdID,
-                                                         TVector3 localHit,
-                                                         TVector3 sensorSize,
-                                                         Belle2::MapOfSectors& m_sectorMap,
-                                                         std::vector<double>& uConfig,
-                                                         std::vector<double>& vConfig);
+//     // only temp for testing
+//     Belle2::SectorNameAndPointerPair searchSector4HitOld(VxdID aVxdID,
+//                                                          TVector3 localHit,
+//                                                          TVector3 sensorSize,
+//                                                          Belle2::MapOfSectors& m_sectorMap,
+//                                                          std::vector<double>& uConfig,
+//                                                          std::vector<double>& vConfig);
 
-    /** needed for sorting sectorSequence and compares strings... */
-    static bool compareSecSequence(Belle2::SectorNameAndPointerPair& lhs, Belle2::SectorNameAndPointerPair& rhs); // -> TODO: dirty little helper
+//     /** needed for sorting sectorSequence and compares strings... */
+//     static bool compareSecSequence(Belle2::SectorNameAndPointerPair& lhs, Belle2::SectorNameAndPointerPair& rhs); // -> TODO: dirty little helper
 
 
     /** searches for segments in given pass and returns number of discarded segments */

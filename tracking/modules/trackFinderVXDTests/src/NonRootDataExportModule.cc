@@ -94,10 +94,10 @@ void NonRootDataExportModule::initialize()
   m_exportContainer.setOutputFormat(m_PARAMoutputFormat);
 
   if (m_PARAMExportTrueHits == "real" or m_PARAMExportTrueHits == "background" or m_PARAMExportTrueHits == "all") { // exportTrueHits
-    if (m_PARAMDetectorType == "PXD" or "VXD") {
+    if (m_PARAMDetectorType == "PXD" or m_PARAMDetectorType == "VXD") {
       StoreArray<PXDTrueHit>::required();
     }
-    if (m_PARAMDetectorType == "SVD" or "VXD") {
+    if (m_PARAMDetectorType == "SVD" or m_PARAMDetectorType == "VXD") {
       StoreArray<SVDTrueHit>::required();
     }
   } else {
@@ -355,7 +355,7 @@ void NonRootDataExportModule::loadSecMap(std::vector<std::string> secMaps)
     newPass->activateAllFilters();
 
     /// importing sectorMap including friend Information and friend specific cutoffs
-    std::pair<int, int> countedFriendsAndCutoffs = newPass->importSectorMap(newMap->getSectorMap());
+    std::pair<int, int> countedFriendsAndCutoffs = newPass->importSectorMap(newMap->getSectorMap(), newMap->getDistances(), false);
 
     B2INFO("NonRootDataExportModule::loadSecMap: Pass-setup " << aMapName << ": importing secMap with " << newMap->getSectorMap().size() << " sectors -> imported: " << newPass->sectorMap.size() << "/" << countedFriendsAndCutoffs.first << "/" << countedFriendsAndCutoffs.second << " sectors/friends/(friends w/o existing filters), a hitExporter has been attached to it...");
 

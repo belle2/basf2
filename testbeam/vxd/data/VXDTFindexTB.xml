@@ -1,19 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--This is the main index file for sectorMaps/fiendLists used by the VXDTFModule to support new ones, an entry within this list has to be added after adding the friendList-file to this directory-->
 <CATFParameters xmlns:xi="http://www.w3.org/2001/XInclude">
-	<xi:include href="testBeamStdVXD-moreThan1500MeV_VXD.xml"/>
-	<xi:include href="testBeamStdSVD-moreThan1500MeV_SVD.xml"/>
-	<xi:include href="testBeamMiniVXD-moreThan1500MeV_VXD.xml"/>
-	<xi:include href="testBeamMiniSVD-moreThan1500MeV_SVD.xml"/>
-	<xi:include href="testBeamFineVXD-moreThan1500MeV_VXD.xml"/>
-	<xi:include href="testBeamFineSVD-moreThan1500MeV_SVD.xml"/>
-	<xi:include href="testBeamMini6GeVVXD-moreThan1500MeV_VXD.xml"/>
-	<xi:include href="testBeamMini6GeVSVD-moreThan1500MeV_SVD.xml"/>
-	<xi:include href="TB6GeVNoMagnetSVD-moreThan1500MeV_SVD.xml"/>
+<!-- 	<xi:include href="testBeamStdVXD-moreThan1500MeV_VXD.xml"/> -->
+<!-- 	<xi:include href="testBeamStdSVD-moreThan1500MeV_SVD.xml"/> -->
+<!-- 	<xi:include href="testBeamMiniVXD-moreThan1500MeV_VXD.xml"/> -->
+<!-- 	<xi:include href="testBeamMiniSVD-moreThan1500MeV_SVD.xml"/> -->
+<!-- 	<xi:include href="testBeamFineVXD-moreThan1500MeV_VXD.xml"/> -->
+<!-- 	<xi:include href="testBeamFineSVD-moreThan1500MeV_SVD.xml"/> -->
+<!-- 	<xi:include href="testBeamMini6GeVVXD-moreThan1500MeV_VXD.xml"/> -->
+<!-- 	<xi:include href="testBeamMini6GeVSVD-moreThan1500MeV_SVD.xml"/> -->
+<!-- 	<xi:include href="TB6GeVNoMagnetSVD-moreThan1500MeV_SVD.xml"/> -->
 <!--	<xi:include href="TB6GeVNoMagnetFineSVD-moreThan1500MeV_SVD.xml"/> -->
-	<xi:include href="TB4GeV1TRun500SVD-moreThan1500MeV_SVD.xml"/>
-	<xi:include href="TB4GeV1TRun500VXD-moreThan1500MeV_VXD.xml"/>
+<!-- 	<xi:include href="TB4GeV1TRun500SVD-moreThan1500MeV_SVD.xml"/> -->
+<!-- 	<xi:include href="TB4GeV1TRun500VXD-moreThan1500MeV_VXD.xml"/> -->
 	
+<!-- 	<xi:include href="TB5GeVNoMagnetTestMay091TEL-moreThan1500MeV_TEL.xml"/> -->
+<!-- 	<xi:include href="TB5GeVNoMagnetTestMay092TEL-moreThan1500MeV_TEL.xml"/> -->
+<!-- 	<xi:include href="TB5GeVNoMagnetTestMay09PXDSVD-moreThan1500MeV_PXDSVD.xml"/> -->
+<!-- 	<xi:include href="TB5GeVNoMagnetTestMay09PXDSVDTEL-moreThan1500MeV_TELPXDSVD.xml"/> -->
+<!-- 	<xi:include href="TB5GeVNoMagnetTestMay16SVD-moreThan1500MeV_SVD.xml"/> -->
+<!-- 	<xi:include href="TB5GeVNoMagnetTestMay16PXDSVD-moreThan1500MeV_PXDSVD.xml"/> -->
+<!-- 	<xi:include href="TB5GeVNoMagnetTestMay16PXDSVDTEL-moreThan1500MeV_TELPXDSVD.xml"/> -->
+
+<!-- 	<xi:include href="TB4GeVFullMagnetBestAlignedSource2014May21PXDSVDTEL-moreThan1500MeV_TELPXDSVD.xml"/> -->
+<!-- 	<xi:include href="TB4GeVFullMagnetBestAlignedSource2014May21SVD-moreThan1500MeV_SVD.xml"/> -->
+
+	<xi:include href="TB4GeVFullMagnetNoAlignedSource2014May21PXDSVDTEL-moreThan1500MeV_TELPXDSVD.xml"/>
+	<xi:include href="TB4GeVFullMagnetNoAlignedSource2014May21SVD-moreThan1500MeV_SVD.xml"/>
+
+<!-- 	<xi:include href="TB4GeVNoMagnetBestAlignedSource2014May21PXDSVDTEL-moreThan1500MeV_TELPXDSVD.xml"/> -->
+<!-- 	<xi:include href="TB4GeVNoMagnetBestAlignedSource2014May21SVD-moreThan1500MeV_SVD.xml"/> -->
+
+	<xi:include href="TB4GeVNoMagnetNoAlignedSource2014May21PXDSVDTEL-moreThan1500MeV_TELPXDSVD.xml"/>
+	<xi:include href="TB4GeVNoMagnetNoAlignedSource2014May21SVD-moreThan1500MeV_SVD.xml"/>
+	
+	<xi:include href="TB3GeVFullMagnetNoAlignedSource2014May22SVD-moreThan1500MeV_SVD.xml"/>
 	
 <!-- 	<xi:include href="TBTelescope6GeVNoMagnetVXD-moreThan1500MeV_VXD.xml"/> -->
 <!-- 	<xi:include href="TBTelescope6GeVNoMagnetSVD-moreThan1500MeV_SVD.xml"/> -->

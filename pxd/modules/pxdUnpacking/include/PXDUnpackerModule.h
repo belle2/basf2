@@ -49,22 +49,16 @@ namespace Belle2 {
 
       /**  Swap the endianess of the ONSEN header yes/no */
       bool m_headerEndianSwap;
-      /**  Run in DHHC mode yes/no */
-      bool m_DHHCmode;
       /**  ignore missing DATCON */
       bool m_ignoreDATCON;
       /**  ignore wrong nr of frames info in DHHC Start*/
       bool m_ignore_headernrframes;
       /**  ignore missing DHPs from DHP mask in DHH Start*/
       bool m_ignore_dhpmask;
-      /**  ignore wrong DHP size for empty dhp frames (bug in Davids core) and checksum */
-      bool m_ignore_empty_dhp_wrong_size;
       /**  ignore wrong DHP ports in DHH header vs DHP header */
       bool m_ignore_dhpportdiffer;
       /** Only unpack, but Do Not Store anything to file */
       bool m_doNotStore;
-//       /** use DHH(C) format type:  (0) from 2013 (up to DESY test Jan 2014)  (1) since Mai 2014 */
-//       int m_useformat;
       /** Event Number and compare mask grabbed from FTSW for now */
       unsigned int ftsw_evt_nr, ftsw_evt_mask;
       /** Event counter */

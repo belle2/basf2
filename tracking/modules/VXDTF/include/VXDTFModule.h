@@ -10,15 +10,7 @@
 
 #pragma once
 
-//framework:
-#include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
-#include <pxd/dataobjects/PXDCluster.h>
-#include <svd/dataobjects/SVDCluster.h>
-#include <vxd/dataobjects/VxdID.h>
-
-#include "tracking/dataobjects/VXDTFInfoBoard.h"
-
+// tracking:
 #include "tracking/vxdCaTracking/VXDTFHit.h"
 #include "tracking/vxdCaTracking/VXDSegmentCell.h"
 #include "tracking/vxdCaTracking/VXDSector.h"
@@ -27,10 +19,18 @@
 #include "tracking/dataobjects/FullSecID.h"
 #include "tracking/vxdCaTracking/SharedFunctions.h"
 #include "tracking/vxdCaTracking/PassData.h"
+#include "tracking/dataobjects/VXDTFInfoBoard.h"
 
 // Includes for the Collector/Display
 #include <tracking/trackFindingVXD/displayInterfaceTF/CollectorTFInfo.h>
 #include <tracking/trackFindingVXD/displayInterfaceTF/ClusterTFInfo.h>
+
+//framework:
+#include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <pxd/dataobjects/PXDCluster.h>
+#include <svd/dataobjects/SVDCluster.h>
+#include <vxd/dataobjects/VxdID.h>
 
 //C++ base / C++ stl:
 #include <fstream>
@@ -62,15 +62,9 @@ namespace genfit { class TrackCand; }
 
 
 namespace Belle2 {
-  /**
-   *  \addtogroup modules
-   *  @{
-   *  \addtogroup tracking_modules
-   *  \ingroup modules
-   *  @{ VXDTFModule @} @}
-   */
-
-  /** The VXDTFModule is a low momentum Si-only trackfinder. It can use both VXD Detectors (SVD and PXD) to search for tracks.
+  /** The VXDTFModule is a low momentum Si-only trackfinder.
+   *
+   * It can use both VXD Detectors (SVD and PXD) to search for tracks.
    * It suports different momentum ranges which can be set via 'sectorSetup' Standard is a three pass setup covering the whole transverse momentum range above 50MeV/c.
    * lower momentum tracks can be found with reduced efficiency.
    * long term features like curling track support is currently not included
@@ -85,8 +79,8 @@ namespace Belle2 {
 
 
     typedef std::pair<unsigned int, VXDSector* > secMapEntry; /**< represents an entry of the MapOfSectors */
-    typedef std::map<int, SensorStruct> ActiveSensorsOfEvent; /**< is map where adresses to each activated sensor (key->int = uniID/vxdID) are stored and all clusters which can be found on them */
-    typedef std::list<int> BrokenSensorsOfEvent; /**< atm a list containing the keys to all sensors where number of u and v clusters don't fit */
+    typedef std::map<unsigned int, SensorStruct> ActiveSensorsOfEvent; /**< is map where adresses to each activated sensor (key->int = uniID/vxdID) are stored and all clusters which can be found on them */
+    typedef std::list<unsigned int> BrokenSensorsOfEvent; /**< atm a list containing the keys to all sensors where number of u and v clusters don't fit */
 
     typedef std::vector<PassData*> PassSetupVector; /**< contains all passes used for track reconstruction */
     typedef boost::chrono::high_resolution_clock boostClock; /**< used for measuring time comsumption */ // high_resolution_clock, process_cpu_clock
@@ -94,6 +88,7 @@ namespace Belle2 {
 
     typedef boost::tuple<double, double, VXDTFHit*> HitExtraTuple; /**< get<0>: distance to origin, get<1>: distance to seedHit, get<2> pointer to hit. SeedHit is outermost hit of detector and will be used for cosmic search */
 
+    /// will be moved to an extra file REDESIGN:
     /** SensorStruct needed for SVDCluster sorting, stores u and v clusters of Sensor  */
     struct SensorStruct {
       std::vector<ClusterInfo*> uClusters; /**< contains pointers to all uClusters(using ClusterInfo) on that sensor */
@@ -140,6 +135,7 @@ namespace Belle2 {
       /** clearing entries, nice after initialisation (TODO: convert into constructor for autoClear) */
       void clear() {
         numPXDCluster = 0;
+        numTELCluster = 0;
         numSVDCluster = 0;
         numSVDHits = 0;
         segFinderActivated = 0;
@@ -157,6 +153,7 @@ namespace Belle2 {
       TimeInfo sectionConsumption; /**< one-event-time-consumption */
       int evtNumber; /**< number of current event */
       int numPXDCluster; /**< number of pxdClusters (=number of pxd hits when tf in pxd is activated) */
+      int numTELCluster; /**< number of TELClusters (=number of TEL hits when tf in TEL is activated) */
       int numSVDCluster; /**< number of svdClusters */
       //
       int numSVDHits; /**< number of possible svd-cluster-combinations. every combination of any pass will be counted  */
@@ -298,7 +295,11 @@ namespace Belle2 {
 
     /** simplest way to determine QI of track candidates, calculating them by track length */
     void calcQIbyLength(TCsOfEvent& tcVector,
-                        PassSetupVector& passSetups); // -> auslagern!
+                        PassSetupVector& passSetups);
+
+
+    /** easy way to determine QI of track candidates, currently only suitable for testbeam cases since the calculation is sensitive for high slopes */
+    void calcQIbyStraightLine(TCsOfEvent& tcVector);
 
 
     /** produce GFTrackCand for current TC */
@@ -388,9 +389,58 @@ namespace Belle2 {
     //    ptrdiff_t rngWrapper(ptrdiff_t i);
 
 
+    void resetCountersAtBeginRun() {
+      m_eventCounter = 0;
+      m_badSectorRangeCounter = 0;
+      m_TESTERbadSectorRangeCounterForClusters = 0;
+      m_TESTERclustersPersSectorNotMatching = 0;
+      m_badFriendCounter = 0;
+      m_totalPXDClusters = 0;
+      m_totalTELClusters = 0;
+      m_totalSVDClusters = 0;
+      m_totalSVDClusterCombis = 0;
+      m_TESTERhighOccupancyCtr = 0;
+      m_TESTERtriggeredZigZagXY = 0;
+      m_TESTERtriggeredZigZagRZ = 0;
+      m_TESTERtriggeredDpT = 0;
+      m_TESTERtriggeredCircleFit = 0;
+      m_TESTERapprovedByTCC = 0;
+      m_TESTERcountTotalTCsAfterTCC = 0;
+      m_TESTERcountTotalTCsAfterTCCFilter = 0;
+      m_TESTERcountTotalTCsFinal = 0;
+      m_TESTERcountTotalUsedIndicesFinal = 0;
+      m_TESTERcountTotalUsedHitsFinal = 0;
+      m_TESTERbadHopfieldCtr = 0;
+      m_TESTERHopfieldLetsOverbookedTCsAliveCtr = 0;
+      m_TESTERfilteredOverlapsQI = 0;
+      m_TESTERNotFilteredOverlapsQI = 0;
+      m_TESTERfilteredOverlapsQICtr = 0;
+      m_TESTERcleanOverlappingSetStartedCtr = 0;
+      m_TESTERgoodFitsCtr = 0;
+      m_TESTERbadFitsCtr = 0;
+      m_TESTERbrokenEventsCtr = 0;
+      m_TESTERfilteredBadSeedTCs = 0;
+      m_TESTERdistortedHitCtr = 0;
+      m_TESTERtotalsegmentsSFCtr = 0;
+      m_TESTERtotalsegmentsNFCtr = 0;
+      m_TESTERdiscardedSegmentsSFCtr = 0;
+      m_TESTERdiscardedSegmentsNFCtr = 0;
+      m_TESTERbrokenCaRound = 0;
+      m_TESTERkalmanSkipped = 0;
+      m_TESTERovercrowdedStrangeSensors = 0;
+      m_TESTERstartedBaselineTF = 0;
+      m_TESTERsucceededBaselineTF = 0;
+      m_TESTERnoHitsAtEvent = 0;
+      m_TESTERacceptedBrokenHitsTrack = 0;
+      m_TESTERrejectedBrokenHitsTrack = 0;
+      m_tcVectorOverlapped.clear();
+      m_tcVector.clear();
+      m_allTCsOfEvent.clear();
+    }
 
     // Methodes for Collector
-    int importCollectorCell(int pass_index, std::string died_at, int died_id, std::vector<std::pair<int, bool>> acceptedRejectedFilters, int hit1, int hit2);  /** generates Information and imports a Cell for the Collector */
+    int importCollectorCell(int pass_index, std::string died_at, int died_id, std::vector<std::pair<int, bool>> acceptedRejectedFilters, int hit1, int hit2);  /**< generates Information and imports a Cell for the Collector */
+
 
 
   protected:
@@ -417,7 +467,9 @@ namespace Belle2 {
     std::vector<bool> m_PARAMactivateDeltaSlopeRZ; /**< activates/deactivates current filter dslopeRZ for each pass individually */
     std::vector<bool> m_PARAMactivateDistance2IP; /**< activates/deactivates current filter d2IP for each pass individually */
     std::vector<bool> m_PARAMactivatePT; /**< activates/deactivates current filter PT for each pass individually */
-    std::vector<bool> m_PARAMactivateHelixFit; /**< activates/deactivates current filter HelixFit for each pass individually */
+    std::vector<bool> m_PARAMactivateHelixParameterFit; /**< activates/deactivates current filter HelixParameterFit for each pass individually */
+    std::vector<bool> m_PARAMactivateDeltaSOverZ; /**< activates/deactivates current filter DeltaSOverZ for each pass individually */
+    std::vector<bool> m_PARAMactivateDeltaSlopeZOverS; /**< activates/deactivates current filter DeltaSlopeZOverS for each pass individually */
     std::vector<bool> m_PARAMactivateZigZagXY; /**< activates/deactivates current filter zzXY for each pass individually */
     std::vector<bool> m_PARAMactivateZigZagRZ; /**< activates/deactivates current filter zzRZ for each pass individually */
     std::vector<bool> m_PARAMactivateDeltaPt; /**< activates/deactivates current filter dPt for each pass individually */
@@ -429,7 +481,7 @@ namespace Belle2 {
     std::vector<bool> m_PARAMactivateDeltaSlopeRZHioC; /**< activates/deactivates current filter dslopeRZ (high occupancy mode) for each pass individually */
     std::vector<bool> m_PARAMactivateDistance2IPHioC; /**< activates/deactivates current filter d2IP (high occupancy mode) for each pass individually */
     std::vector<bool> m_PARAMactivatePTHioC; /**< activates/deactivates current filter PT (high occupancy mode) for each pass individually */
-    std::vector<bool> m_PARAMactivateHelixFitHioC; /**< activates/deactivates current filter HelixFit (high occupancy mode) for each pass individually */
+    std::vector<bool> m_PARAMactivateHelixParameterFitHioC; /**< activates/deactivates current filter HelixParameterFit (high occupancy mode) for each pass individually */
     std::vector<bool> m_PARAMactivateDeltaPtHioC; /**< activates/deactivates current filter dPt (high occupancy mode) for each pass individually */
     std::vector<bool> m_PARAMactivateDeltaDistance2IPHioC; /**< activates/deactivates current filter dd2IP (high occupancy mode) for each pass individually*/
 
@@ -444,7 +496,9 @@ namespace Belle2 {
     std::vector<double> m_PARAMtuneDeltaSlopeRZ; /**< tunes current filter dslopeRZ for each pass individually, same formula as in tuneDistance3D */
     std::vector<double> m_PARAMtuneDistance2IP; /**< tunes current filter d2IP for each pass individually, same formula as in tuneDistance3D */
     std::vector<double> m_PARAMtunePT; /**< tunes current filter PT for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneHelixFit; /**< tunes current filter HelixFit for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneHelixParameterFit; /**< tunes current filter HelixParameterFit for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneDeltaSOverZ; /**< tunes current filter DeltaSOverZ for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneDeltaSlopeZOverS; /**< tunes current filter DeltaSlopeZOverS for each pass individually, same formula as in tuneDistance3D */
     std::vector<double> m_PARAMtuneZigZagXY; /**< tunes current filter zzXY for each pass individually, same formula as in tuneDistance3D */
     std::vector<double> m_PARAMtuneZigZagRZ; /**< tunes current filter zzRZ for each pass individually, same formula as in tuneDistance3D */
     std::vector<double> m_PARAMtuneDeltaPt; /**< tunes current filter dPt for each pass individually, same formula as in tuneDistance3D */
@@ -457,7 +511,7 @@ namespace Belle2 {
     std::vector<double> m_PARAMtuneDistanceDeltaZHioC; /**< tunes current filter ddZ (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
     std::vector<double> m_PARAMtuneDistance2IPHioC; /**< tunes current filter d2IP (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
     std::vector<double> m_PARAMtunePTHioC; /**< tunes current filter PT (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
-    std::vector<double> m_PARAMtuneHelixFitHioC; /**< tunes current filter HelixFit (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneHelixParameterFitHioC; /**< tunes current filter HelixParameterFit (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
     std::vector<double> m_PARAMtuneDeltaPtHioC; /**< tunes current filter dPt (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
     std::vector<double> m_PARAMtuneDeltaDistance2IPHioC; /**< tunes current filter dd2IP (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
 
@@ -478,7 +532,10 @@ namespace Belle2 {
 
     std::vector< std::vector< std::pair<double, double> > > m_globalizedErrorContainer; /**< stores error of u coordinates of each ladder in the vxd converted to x and y global coordinates. These values are needed by the circleFitter. How to access: container[layerID][ladderID].first = sigmaX, container[layerID][ladderID].second = sigmaY */
     std::vector< std::pair<double, double> > m_errorContainer; /**< stores error of u and v coordinates of each layer in the vxd. These values are needed by the circleFitter. How to access: container[layerID].first = sigmaU, container[layerID].second = sigmaV */
-    int m_usePXDorSVDorVXDhits; /**< when having more than one pass per event, sector maps using PXD, SVD or VXD can be set independently. To produce TFHits only when needed, this value is set to -1,0 or 1 */
+//     int m_usePXDorSVDorVXDhits; /**< when having more than one pass per event, sector maps using PXD, SVD or VXD can be set independently. To produce TFHits only when needed, this value is set to -1,0 or 1 */
+    bool m_usePXDHits; /**< when having more than one pass per event, sector maps using PXD, SVD or TEL can be set independently. To produce TFHits for PXD, this value is set to true */
+    bool m_useSVDHits; /**< when having more than one pass per event, sector maps using PXD, SVD or TEL can be set independently. To produce TFHits for SVD, this value is set to true */
+    bool m_useTELHits; /**< when having more than one pass per event, sector maps using PXD, SVD or TEL can be set independently. To produce TFHits for TEL, this value is set to true */
 
     double m_PARAMtuneCutoffs; /**< for rapid changes of cutoffs (no personal xml files needed), reduces/enlarges the range of the cutoffs in percent (lower and upper values are changed by this value). Only valid in range -50% < x < +1000% */
 
@@ -486,6 +543,7 @@ namespace Belle2 {
     int m_badSectorRangeCounter; /**< counts number of hits which couldn't be attached to an existing sector of a pass */
     int m_badFriendCounter; /**< counts number of hits having no neighbour hits in friend sectors of current sector */
     int m_totalPXDClusters; /**< counts total number of PXDClusters during run */
+    int m_totalTELClusters; /**< counts total number of TELClusters during run */
     int m_totalSVDClusters; /**< counts total number of SVdClusters during run */
     int m_totalSVDClusterCombis; /**< counts total number of possible combinations of SVDClusters during run */
     int m_nSectorSetups; /**< stores info about number of sector setups loaded into the track finder */
@@ -526,8 +584,11 @@ namespace Belle2 {
 
     std::string m_PARAMcalcQIType; /**< allows you to chose the way, the QI's of the TC's shall be calculated. currently supported: 'kalman','trackLength', 'circleFit' */
     int m_calcQiType; /**< is set by m_PARAMcalcQIType and defines which qi type shall be calculated */
-    std::string m_PARAMgfTrackCandsColName;     /**< TrackCandidates collection name */
-    std::string m_PARAMinfoBoardName;           /**< InfoContainer collection name */
+    std::string m_PARAMgfTrackCandsColName;       /**< TrackCandidates collection name */
+    std::string m_PARAMinfoBoardName;             /**< InfoContainer collection name */
+    std::string m_PARAMpxdClustersName;         /** name of storeArray containing pxd clusters */
+    std::string m_PARAMtelClustersName;         /** name of storeArray containing tel clusters */
+    std::string m_PARAMsvdClustersName;         /** name of storeArray containing svd clusters */
     std::string m_PARAMnameOfInstance;           /**< Name of trackFinder, usefull, if there is more than one VXDTF running at the same time. Note: please choose short names */
     int m_PARAMactivateBaselineTF; /**< there is a baseline trackfinder which catches events with a very small number of hits, e.g. bhabha, cosmic and single-track-events. Settings: 0 = deactivate baseLineTF, 1=activate it and use normal TF as fallback, 2= baseline-TF-only */
 
@@ -547,6 +608,7 @@ namespace Belle2 {
     int m_TESTERcountTotalTCsAfterTCCFilter; /**< counts number of TCs which survived the tcc filter */
     int m_TESTERcountTotalTCsFinal; /**< counts number of TCs which survived until the end of event */
     int m_TESTERcountTotalUsedIndicesFinal; /**< counts number of indices used by TCs which survived until the end of event */
+    int m_TESTERcountTotalUsedHitsFinal; /**< counts number of indices used by TCs which survived until the end of event */
     int m_TESTERbadHopfieldCtr; /**< counts number of events, where no TC survived the Hopfield network */
     int m_TESTERHopfieldLetsOverbookedTCsAliveCtr;/**< counts number of times, where TC survived the Hopfield network although being still overbooked */
     int m_TESTERfilteredBadSeedTCs; /**< counts number of TCs which were filtered by calcInitialValues4TCs because of bad seed properties */

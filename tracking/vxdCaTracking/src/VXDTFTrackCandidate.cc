@@ -67,7 +67,7 @@ list<int> VXDTFTrackCandidate::getHopfieldHitIndices()
 {
   list<int> indices;
   for (VXDTFHit * aHit : m_attachedHits) {
-    if (aHit->getDetectorType() == Const::PXD) { /*PXD */
+    if ((aHit->getDetectorType() == Const::PXD) or (aHit->getDetectorType() == Const::TEST)) { /*PXD or Telescope */
       indices.push_back(aHit->getClusterInfoUV()->getOwnIndex());
     } else { /* SVD */
       indices.push_back(aHit->getClusterInfoU()->getOwnIndex());
@@ -150,7 +150,7 @@ bool VXDTFTrackCandidate::checkReserved()
   int countSuccessfull = 0, countTotal = 0, alreadyReservedByMe = 0, alreadyReservedByAnother = 0;
   bool successfull;
   for (VXDTFHit * aHit : m_attachedHits) {
-    if (aHit->getDetectorType() == Const::PXD) { /*PXD */
+    if ((aHit->getDetectorType() == Const::PXD) or (aHit->getDetectorType() == Const::TEST)) { /*PXD or Telescope*/
       countTotal++;
 
       successfull = aHit->getClusterInfoUV()->checkReserved(this);
@@ -204,6 +204,14 @@ bool VXDTFTrackCandidate::setReserved()
         if (successfull == true) { ++countSuccessfull; }
       } else {
         B2WARNING("aHit in sector " << aHit->getSectorString() << " has broken PXDCluster id/pointer" << aHit->getClusterIndexUV() << "/" << aHit->getClusterInfoUV())
+      }
+    } else if (aHit->getDetectorType() == Const::TEST) { /*Telescope */
+      countTotal++;
+      if (aHit->getClusterInfoUV() != NULL) {
+        successfull = aHit->getClusterInfoUV()->setReserved(this);
+        if (successfull == true) { ++countSuccessfull; }
+      } else {
+        B2WARNING("aHit in sector " << aHit->getSectorString() << " has broken TELCluster id/pointer" << aHit->getClusterIndexUV() << "/" << aHit->getClusterInfoUV())
       }
     } else { /* SVD */
       countTotal += 2;

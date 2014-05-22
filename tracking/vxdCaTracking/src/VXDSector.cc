@@ -11,8 +11,8 @@
 #include "tracking/vxdCaTracking/VXDSector.h"
 #include "tracking/vxdCaTracking/Cutoff.h"
 #include "tracking/vxdCaTracking/SectorFriends.h"
-#include "tracking/vxdCaTracking/VXDTFHit.h"
-#include "tracking/vxdCaTracking/VXDSegmentCell.h"
+// #include "tracking/vxdCaTracking/VXDTFHit.h"
+// #include "tracking/vxdCaTracking/VXDSegmentCell.h"
 #include "tracking/dataobjects/FullSecID.h"
 
 #include <framework/logging/Logger.h>
@@ -20,11 +20,7 @@
 using namespace std;
 using namespace Belle2;
 
-void VXDSector::addFriend(int newSector)
-{
-  m_friends.push_back(newSector);
-  m_friendMap.insert(make_pair(newSector, SectorFriends(newSector, m_sectorID)));
-} // should be called only at the beginning of a new run
+
 
 void VXDSector::addCutoff(int cutOffType, unsigned int friendName, pair<double, double> values)
 {
@@ -43,7 +39,7 @@ const vector<int> VXDSector::getSupportedCutoffs(unsigned int aFriend)
   FriendMap::iterator mapIter = m_friendMap.find(aFriend);
   if (mapIter == m_friendMap.end()) {
     FullSecID aFullSecID = FullSecID(aFriend);
-    B2FATAL("VXDSector::getSupportedCudoffs - friend int/string" << aFriend << "/" << aFullSecID.getFullSecString() << " not found!"); // includes a total break, therefore no return needed
+    B2FATAL("VXDSector::getSupportedCudoffs - friend int/string" << aFriend << "/" << aFullSecID << " not found!"); // includes a total break, therefore no return needed
   }
   vector<int> supportedCutoffs;
   mapIter->second.getSupportedCutoffs(supportedCutoffs);

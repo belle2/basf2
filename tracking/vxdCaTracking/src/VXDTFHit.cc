@@ -21,9 +21,10 @@ using namespace Belle2;
 bool Belle2::VXDTFHit::operator==(const VXDTFHit& b) const
 {
   B2FATAL("somebody is using the '=='-operator of VXDTFHit, although it does no valid comparison!");
-  if (getVxdID() != b.getVxdID()) { return false; }   /// ensures that hits are from the same sensor
+  if (FullSecID(getSectorName()).getUniID() != FullSecID(b.getSectorName()).getUniID()) { return false; }
+  /// ensures that hits are from the same sensor, VxdID can not be used directly, since unrecognized sensors (e.g. Virtual sector at IP) have strange output (bypassed by using the way above)
 
-  if (this->getDetectorType() == Const::PXD) {   // PXD
+  if (this->getDetectorType() == Const::PXD or this->getDetectorType() == Const::TEST) {   // PXD or TEL
     return getClusterIndexUV() == b.getClusterIndexUV();
   } else if (this->getDetectorType() == Const::SVD) {   // SVD
     return (getClusterIndexU() == b.getClusterIndexU() or getClusterIndexV() == b.getClusterIndexV());  // returns True if one of the cases are True
@@ -49,7 +50,7 @@ bool VXDTFHit::operator>(const VXDTFHit& b) const
 
 
 
-std::string VXDTFHit::getSectorString() { return FullSecID(m_papaSector).getFullSecString(); }
+std::string VXDTFHit::getSectorString() const { return FullSecID(m_papaSector).getFullSecString(); }
 
 
 
@@ -91,6 +92,7 @@ ClusterInfo* VXDTFHit::getClusterInfoUV() const { return m_clusterInfoUV; }  /**
 
 bool VXDTFHit::isReserved() const
 {
+  B2DEBUG(150, "VXDTFHit::isReserved in Sector " << getSectorString() << " cluterU/V/UV: " << m_clusterInfoU << "/" << m_clusterInfoV << "/" << m_clusterInfoUV)
   if (m_clusterInfoU != NULL) { if (m_clusterInfoU->isReserved() == true) { return true; } }
   if (m_clusterInfoV != NULL) { if (m_clusterInfoV->isReserved() == true) { return true; } }
   if (m_clusterInfoUV != NULL) { if (m_clusterInfoUV->isReserved() == true) { return true; } }

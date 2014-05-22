@@ -119,3 +119,31 @@ bool NbFinderFilters::checkHelixParameterFit(int nameHelixParameterFit)
   return false;
 }
 
+bool NbFinderFilters::checkDeltaSOverZ(int nameDeltaSOverZ)
+{
+  const Cutoff* pCutoff = m_thisSector->getCutoff(nameDeltaSOverZ, m_friendID);
+  if (pCutoff != NULL) {
+    double aResult = this->calcDeltaSOverZ();
+    if (aResult > pCutoff->getMinValue() && aResult < pCutoff->getMaxValue()) {
+      m_deltaSOverZCtr.first++;
+      return true;
+    }
+  }
+  m_deltaSOverZCtr.second++;
+  return false;
+}
+
+bool NbFinderFilters::checkDeltaSlopeZOverS(int nameDeltaSlopeZOverS)
+{
+  const Cutoff* pCutoff = m_thisSector->getCutoff(nameDeltaSlopeZOverS, m_friendID);
+  if (pCutoff != NULL) {
+    double aResult = this->calcDeltaSlopeZOverS();
+    if (aResult > pCutoff->getMinValue() && aResult < pCutoff->getMaxValue()) {
+      m_deltaSlopeZOverSCtr.first++;
+      return true;
+    }
+  }
+  m_deltaSlopeZOverSCtr.second++;
+  return false;
+}
+

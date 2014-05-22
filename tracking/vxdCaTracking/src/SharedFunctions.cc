@@ -92,6 +92,16 @@ namespace Belle2 {
     //      return printOut;
   }
 
+
+
+  /// WARNING TODO miniFkt für streamOutPut für vectoren schreiben -> template fkt, auch die Lambda-FKTs für trackletFilters dazu stopfen!
+//   h:
+//   template<class Tmpl>
+//     bool createSectorAndHit(Belle2::Const::EDetector detectorID, int pdg, const Tmpl* aSiTrueHitPtr, VXDTrack& newTrack, MapOfSectors* thisSecMap);
+//    template<class Tmpl>
+// bool FilterCalculatorModule::createSectorAndHit(Belle2::Const::EDetector detectorID, int pdg, const Tmpl* const aSiTrueHitPtr, VXDTrack& newTrack, MapOfSectors* thisSecMap)
+
+
 // void printMyMatrix(Eigen::MatrixXd& aMatrix, std::stringstream& ss) {
 //      std::stringstream printOut;
 //  for (int nRow = 0; nRow < aMatrix.GetNrows(); nRow++) {

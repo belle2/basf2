@@ -22,6 +22,8 @@ const string FilterID::nameDistance3D = "distance3D";
 const string FilterID::nameDistanceXY = "distanceXY";
 const string FilterID::nameDistanceZ = "distanceZ";
 const string FilterID::nameHelixParameterFit = "helixParameterFit";
+const string FilterID::nameDeltaSOverZ = "deltaSOverZ";
+const string FilterID::nameDeltaSlopeZOverS = "deltaSlopeZOverS";
 const string FilterID::nameSlopeRZ = "slopeRZ";
 const string FilterID::nameDeltaSlopeRZ = "deltaSlopeRZ";
 const string FilterID::namePT = "pT";
@@ -36,7 +38,7 @@ const string FilterID::nameAnglesHighOccupancyRZ  = "HioCanglesRZ";
 const string FilterID::nameDistanceHighOccupancy2IP = "HioCdist2IP";
 const string FilterID::nameDeltaSlopeHighOccupancyRZ = "HioCdeltaSlopeRZ";
 const string FilterID::namePTHighOccupancy = "HioCpT";
-const string FilterID::nameHelixHighOccupancyFit = "HioChelixFit";
+const string FilterID::nameHelixParameterHighOccupancyFit = "HioChelixFit";
 const string FilterID::nameDeltapTHighOccupancy  = "HioCdeltaPt";
 const string FilterID::nameDeltaDistanceHighOccupancy2IP  = "HioCdeltaDist2IP";
 
@@ -53,6 +55,8 @@ const string FilterID::nameZiggZaggRZ = "ZiggZaggRZ";
 const string FilterID::nameCalcQIbyKalman = "CalcQIbyKalman";
 const string FilterID::nameOverlapping = "Overlapping";
 const string FilterID::nameCirclefit = "Circlefit";
+const string FilterID::nameSimpleLineFit3D = "SimpleLineFit3D";
+const string FilterID::nameHelixfit = "Helixfit";
 
 
 const string FilterID::nameSilentTcc = "SilentTcc";
@@ -62,9 +66,6 @@ const string FilterID::nameSilentSegFinder = "SilentSegFinder";
 const string FilterID::nameAlwaysTrue = "alwaysTrue";
 const string FilterID::nameAlwaysFalse = "alwaysFalse";
 const string FilterID::nameRandomTrue = "randomTrue";
-
-const string FilterID::nameDeltaSOverZ = "deltaSOverZ";
-const string FilterID::nameDeltaSlopeZOverS = "deltaSlopeZOverS";
 
 const string FilterID::nameOverHighestAllowedLayer = "overHighestAllowedLayer";
 const string FilterID::nameOutOfSectorRange = "outOfSectorRange";
@@ -79,6 +80,8 @@ const boost::array<string, FilterID::numFilters> FilterID::nameVector = { {
     nameDistanceXY,
     nameDistanceZ,
     nameHelixParameterFit,
+    nameDeltaSOverZ,
+    nameDeltaSlopeZOverS,
     nameSlopeRZ,
     nameDeltaSlopeRZ,
     namePT,
@@ -92,7 +95,7 @@ const boost::array<string, FilterID::numFilters> FilterID::nameVector = { {
     nameDistanceHighOccupancy2IP,
     nameDeltaSlopeHighOccupancyRZ,
     namePTHighOccupancy,
-    nameHelixHighOccupancyFit,
+    nameHelixParameterHighOccupancyFit,
     nameDeltapTHighOccupancy,
     nameDeltaDistanceHighOccupancy2IP,
     nameNbFinderLost,
@@ -107,6 +110,8 @@ const boost::array<string, FilterID::numFilters> FilterID::nameVector = { {
     nameCalcQIbyKalman,
     nameOverlapping,
     nameCirclefit,
+    nameHelixfit,
+    nameSimpleLineFit3D,
     nameSilentTcc,
     nameSilentHitFinder,
     nameSilentSegFinder,
@@ -114,9 +119,6 @@ const boost::array<string, FilterID::numFilters> FilterID::nameVector = { {
     nameAlwaysTrue,
     nameAlwaysFalse,
     nameRandomTrue,
-
-    nameDeltaSOverZ,
-    nameDeltaSlopeZOverS,
 
     nameOverHighestAllowedLayer,
     nameOutOfSectorRange
@@ -145,7 +147,7 @@ const boost::array<FilterID::filterTypes, FilterID::numFilters> FilterID::enumVe
     FilterID::distanceHighOccupancy2IP,
     FilterID::deltaSlopeHighOccupancyRZ,
     FilterID::pTHighOccupancy,
-    FilterID::helixHighOccupancyFit,
+    FilterID::helixParameterHighOccupancyFit,
     FilterID::deltapTHighOccupancy,
     FilterID::deltaDistanceHighOccupancy2IP,
     FilterID::nbFinderLost,
@@ -160,6 +162,8 @@ const boost::array<FilterID::filterTypes, FilterID::numFilters> FilterID::enumVe
     FilterID::calcQIbyKalman,
     FilterID::overlapping,
     FilterID::circlefit,
+    FilterID::helixfit,
+    FilterID::simpleLineFit3D,
 
     FilterID::silentTcc,
     FilterID::silentHitFinder,
@@ -195,6 +199,10 @@ FilterID::filterTypes FilterID::getFilterType(std::string filterString)
   {return distanceZ;}
   else if (filterString == nameHelixParameterFit)
   {return helixParameterFit;}
+  else if (filterString == nameDeltaSOverZ)
+  {return deltaSOverZ;}
+  else if (filterString == nameDeltaSlopeZOverS)
+  {return deltaSlopeZOverS;}
   else if (filterString == nameSlopeRZ)
   {return slopeRZ;}
   else if (filterString == nameDeltaSlopeRZ)
@@ -221,8 +229,8 @@ FilterID::filterTypes FilterID::getFilterType(std::string filterString)
   {return deltaSlopeHighOccupancyRZ;}
   else if (filterString == namePTHighOccupancy)
   {return pTHighOccupancy;}
-  else if (filterString == nameHelixHighOccupancyFit)
-  {return helixHighOccupancyFit;}
+  else if (filterString == nameHelixParameterHighOccupancyFit)
+  {return helixParameterHighOccupancyFit;}
   else if (filterString == nameDeltapTHighOccupancy)
   {return deltapTHighOccupancy;}
   else if (filterString == nameDeltaDistanceHighOccupancy2IP)
@@ -253,6 +261,10 @@ FilterID::filterTypes FilterID::getFilterType(std::string filterString)
   {return overlapping;}
   else if (filterString == nameCirclefit)
   {return circlefit;}
+  else if (filterString == nameHelixfit)
+  {return helixfit;}
+  else if (filterString == nameSimpleLineFit3D)
+  {return simpleLineFit3D;}
 
   else if (filterString == nameSilentTcc)
   {return silentTcc;}
@@ -267,11 +279,6 @@ FilterID::filterTypes FilterID::getFilterType(std::string filterString)
   {return alwaysFalse;}
   else if (filterString == nameRandomTrue)
   {return randomTrue;}
-
-  else if (filterString == nameDeltaSOverZ)
-  {return deltaSOverZ;}
-  else if (filterString == nameDeltaSlopeZOverS)
-  {return deltaSlopeZOverS;}
 
   else if (filterString == nameOverHighestAllowedLayer)
   {return overHighestAllowedLayer;}

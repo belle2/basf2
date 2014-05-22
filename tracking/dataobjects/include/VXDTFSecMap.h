@@ -10,9 +10,13 @@
 
 #pragma once
 
-#include <vector>
+// typedefs:
+#include <tracking/dataobjects/TrackFinderVXDTypedefs.h>
+
+// stl:
 #include <string>
-#include <utility> // std::pair
+
+// root:
 
 #include <TVector3.h>
 #include <TObject.h>
@@ -47,12 +51,12 @@ namespace Belle2 {
 
 
     /** getter - returns full sectorMapInformation */
-    const SecMapCopy& getSectorMap() const { return m_sectorMap; }
+    const VXDTFSecMapTypedef::SecMapCopy& getSectorMap() const { return m_sectorMap; }
 
 
 
     /** getter - returns information for each sector carrying the distance between chosen origin and the center of the sector plane */
-    VXDTFRawSecMap::SectorDistancesMap& getDistances() { return m_dist2OriginMap; }
+    const VXDTFRawSecMapTypedef::SectorDistancesMap& getDistances() const { return m_dist2OriginMap; }
 
 
 
@@ -102,17 +106,32 @@ namespace Belle2 {
 
 
     /** returns total number of friends stored in SecMapCopy */
-    int getNumOfFriends() { return getNumOfFriends(m_sectorMap); }
+    int getNumOfFriends() const { return getNumOfFriends(m_sectorMap); }
 
 
 
     /** returns total number of friends stored in SecMapCopy */
-    int getNumOfValues() { return getNumOfValues(m_sectorMap); }
+    int getNumOfValues() const { return getNumOfValues(m_sectorMap); }
+
+
+
+    /** returns minimal accepted distance for sectors to the origin */
+    double getMinDistance2origin() const { return m_minDistance2origin; }
+
+
+
+    /** returns maximum accepted distance for sectors to the origin*/
+    double getMaxDistance2origin() const { return m_maxDistance2origin; }
+
+
+
+    /** if true hits are sorted by distance to origin and not by layerID */
+    bool isFilterByDistance2OriginActivated() const { return m_sortByDistance2origin; }
 
 
 
     /** setter - set the map itself */
-    void setSectorMap(SecMapCopy newMap) { m_sectorMap = newMap; }
+    void setSectorMap(VXDTFSecMapTypedef::SecMapCopy newMap) { m_sectorMap = newMap; }
 
 
 
@@ -122,7 +141,7 @@ namespace Belle2 {
 
 
     /** setter - set DistanceMap (full explanation in RawSecMap ) */
-    void setDistances(VXDTFRawSecMap::SectorDistancesMap aMap) { m_dist2OriginMap = aMap; }
+    void setDistances(VXDTFRawSecMapTypedef::SectorDistancesMap aMap) { m_dist2OriginMap = aMap; }
 
 
 
@@ -161,10 +180,24 @@ namespace Belle2 {
 
 
 
+    /** set minimal accepted distance for sectors to the origin */
+    void setMinDistance2origin(double newVal) { m_minDistance2origin = newVal; }
+
+
+
+    /** set maximum accepted distance for sectors to the origin*/
+    void setMaxDistance2origin(double newVal) { m_maxDistance2origin = newVal; }
+
+
+
+    /** set true if you want to sort secMap by distance instead of layerIDs */
+    void setFilterByDistance2Origin(bool val) { m_sortByDistance2origin = val; }
+
+
 
   protected:
     /** internal member counting total number of friends stored in SecMap and returns result */
-    int getNumOfFriends(SecMapCopy& newMap) {
+    int getNumOfFriends(const VXDTFSecMapTypedef::SecMapCopy& newMap) const {
       int result = 0;
       for (int i = 0; i < int(newMap.size()); ++i) {
         result += newMap[i].second.size();
@@ -174,10 +207,10 @@ namespace Belle2 {
 
 
     /** internal member counting total number of values stored in each friend of sectors in secMap and returns result, implemented in non-inlined way for better readability */
-    int getNumOfValues(SecMapCopy& secMap);
+    int getNumOfValues(const VXDTFSecMapTypedef::SecMapCopy& secMap) const;
 
 
-    SecMapCopy m_sectorMap; /**< contains full information of the sectorMap */
+    VXDTFSecMapTypedef::SecMapCopy m_sectorMap; /**< contains full information of the sectorMap */
     std::string m_nameOfSecMap; /**< Name of the sectorMap */
     std::string m_detectorType; /**< Name of the detectorType (PXD, SVD, VXD) */
     std::vector<double> m_sectorConfigU; /**< allows defining the the config of the sectors in U direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
@@ -185,8 +218,11 @@ namespace Belle2 {
     TVector3 m_origin; /**< defines the position of the assumed primary vertex */
     double m_magneticFieldStrength; /**< strength of magnetic field in Tesla, standard is 1.5T */
     std::string m_additionalInfo; /**< this variable is reserved for extra info which shall be stored in the container, e.g. date of production or other useful info for the user(it shall be formatted before storing it), this info will be displayed by the VXDTF on Info-level */
-    VXDTFRawSecMap::SectorDistancesMap m_dist2OriginMap; /**< stores the secID in .first and the value for the distances in .second */
+    VXDTFRawSecMapTypedef::SectorDistancesMap m_dist2OriginMap; /**< stores the secID in .first and the value for the distances in .second */
+    double m_minDistance2origin; /**< defines minimal accepted distance for sectors to the origin */
+    double m_maxDistance2origin; /**< defines maximum accepted distance for sectors to the origin */
+    bool m_sortByDistance2origin; /**< if true, filterBadSectorCombis filters sectors by origin not by layerID */
 
-    ClassDef(VXDTFSecMap, 2)
+    ClassDef(VXDTFSecMap, 3)
   };
 }

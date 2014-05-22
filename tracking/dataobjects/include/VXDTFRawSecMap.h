@@ -10,11 +10,11 @@
 
 #pragma once
 
+// typedefs:
+#include <tracking/dataobjects/TrackFinderVXDTypedefs.h>
+
 // stl:
-#include <vector>
-#include <list>
 #include <string>
-#include <utility> // std::pair
 
 // root
 #include <TVector3.h>
@@ -49,6 +49,7 @@ namespace Belle2 {
       m_magneticFieldStrength(1.5),
       m_lowPt(0.),
       m_highPt(0.),
+      m_sortByDistance2origin(false),
       m_smallSampleThreshold(1),
       m_minSampleThreshold(1),
       m_smallStretchFactor(0.),
@@ -104,12 +105,12 @@ namespace Belle2 {
 
 
     /** getter - returns full sectorMapInformation */
-    StrippedRawSecMap& getSectorMap() { return m_sectorMap; }
+    VXDTFRawSecMapTypedef::StrippedRawSecMap& getSectorMap() { return m_sectorMap; }
 
 
 
     /** getter - returns information for each sector carrying the distance between chosen origin and the center of the sector plane */
-    SectorDistancesMap& getDistances() { return m_dist2OriginMap; }
+    VXDTFRawSecMapTypedef::SectorDistancesMap& getDistances() { return m_dist2OriginMap; }
 
 
 
@@ -168,7 +169,7 @@ namespace Belle2 {
 
 
 
-    /** returns size of stored StrippedRawSecMap, same as size() */
+    /** returns size of stored VXDTFRawSecMapTypedef::StrippedRawSecMap, same as size() */
     int getNumOfSectors() { return size(); }
 
 
@@ -184,7 +185,7 @@ namespace Belle2 {
 
 
     /** getter - using cutoffQuantiles set with 'setCutoffQuantiles' to determine cutoffs of given sample. If returned values are both  == 0, then sample was rejected */
-    std::pair<double, double> calcCutoffs(CutoffValues& sample) {
+    std::pair<double, double> calcCutoffs(VXDTFRawSecMapTypedef::CutoffValues& sample) {
       if (int(sample.size() < m_minSampleThreshold)) { return std::make_pair(0, 0); } // catching case where sample size is too small
 
       sample.sort(); // in theory should not be necessary since all values have been sorted during import. But we want to be sure, that there are no errors on that part (and speed is not an issue for creating sectorMaps)
@@ -196,8 +197,38 @@ namespace Belle2 {
 
 
 
+    /** returns minimal accepted distance for sectors to the origin */
+    double getMinDistance2origin() { return m_minDistance2origin; }
+
+
+
+    /** returns maximum accepted distance for sectors to the origin*/
+    double getMaxDistance2origin() { return m_maxDistance2origin; }
+
+
+
     /** if true, not only sectors having no friends after first filtering iteration are deleted but also all combinations where dead sectors were friends. If these combinations can lead to kill more sectors and therefore the map gets holey but clean of non-existing cases */
     bool isRemovingDeadSectorChainsAllowed() { return m_removeDeadSectorChains; }
+
+
+
+    /** checks sector and friendSector for sector distance to origin based filter cases. If friend fails test, its secID is returned. -1 else */
+    int filterDistanceBased(unsigned int mainSecID, VXDTFRawSecMapTypedef::FriendPack& aCombination);
+
+
+
+    /** if true hits are sorted by distance to origin and not by layerID */
+    bool isFilterByDistance2OriginActivated() { return m_sortByDistance2origin; }
+
+
+
+    /** checks sector and friendSector for layer based filter cases. If friend fails test, its secID is returned. -1 else */
+    int filterLayerBased(unsigned int mainSecID, VXDTFRawSecMapTypedef::FriendPack& aCombination);
+
+
+
+    /** printing for each sector its complete friend list and their number of cutoffTypes stored */
+    void printDetailedInfo() { printDetailedInfo(m_sectorMap); }
 
 
 
@@ -206,8 +237,18 @@ namespace Belle2 {
 
 
 
+    /** set true if you want to sort secMap by distance instead of layerIDs */
+    void setFilterByDistance2Origin(bool val) { m_sortByDistance2origin = val; }
+
+
+
+    /** This member checks all entries of the sectorMap and stores all the layerIDs of the occuring sectors */
+    VXDTFRawSecMapTypedef::IDVector getLayersOfSecMap();
+
+
+
     /** setter - add new map to current one. If current one is empty, it will get replaced by new one */
-    void addSectorMap(StrippedRawSecMap& newMap);
+    void addSectorMap(VXDTFRawSecMapTypedef::StrippedRawSecMap& newMap);
 
 
 
@@ -247,7 +288,7 @@ namespace Belle2 {
 
 
     /** setter - add new distance map (nformation for each sector carrying the distance between chosen origin and the center of the sector plane) to current one. If current one is empty, it will get replaced by new one */
-    void addDistances(SectorDistancesMap& aMap);
+    void addDistances(VXDTFRawSecMapTypedef::SectorDistancesMap& aMap);
 
 
 
@@ -310,16 +351,33 @@ namespace Belle2 {
     void setRemoveDeadSectorChains(bool allowThis) { m_removeDeadSectorChains = allowThis; }
 
 
+    /** set minimal accepted distance for sectors to the origin */
+    void setMinDistance2origin(double newVal) { m_minDistance2origin = newVal; }
+
+
+    /** set maximum accepted distance for sectors to the origin*/
+    void setMaxDistance2origin(double newVal) { m_maxDistance2origin = newVal; }
+
+
+
+    template<class Tmpl>
+    static void checkSmallerThan(Tmpl& number, Tmpl threshold) { if (number < threshold) { number = threshold; } } /**< member - checks if given value is < threshold, if it is, reset to threshold */
+
+
+
+    template<class Tmpl>
+    static void checkBiggerThan(Tmpl& number, Tmpl threshold) { if (number > threshold) { number = threshold; } } /**< member - checks if given value is > threshold, if it is, reset to threshold */
+
 
 
   protected:
     /** sorts all values for each cutoffType for each sector stored (sorts sectors too) */
-    void sortMap(StrippedRawSecMap& newMap);
+    void sortMap(VXDTFRawSecMapTypedef::StrippedRawSecMap& newMap);
 
 
 
     /** internal member counting total number of friends stored in rawSecMap and returns result */
-    int getNumOfFriends(StrippedRawSecMap& newMap) {
+    int getNumOfFriends(VXDTFRawSecMapTypedef::StrippedRawSecMap& newMap) {
       int result = 0;
       for (int i = 0; i < int(newMap.size()); ++i) {
         result += newMap[i].second.size();
@@ -329,8 +387,13 @@ namespace Belle2 {
 
 
 
+    /** internal member printing for each sector its complete friend list and their number of cutoffTypes stored */
+    void printDetailedInfo(VXDTFRawSecMapTypedef::StrippedRawSecMap& secMap);
+
+
+
     /** internal member counting total number of friends stored in rawSecMap and returns result */
-    int getNumOfValues(StrippedRawSecMap& secMap);
+    int getNumOfValues(VXDTFRawSecMapTypedef::StrippedRawSecMap& secMap);
 
 
 
@@ -341,17 +404,8 @@ namespace Belle2 {
      * second parameter: the lower (.first) and the upper quantile (.second) to determine the cutoffs of given sample. values have to be between 0 and 1. WARNING check
      * third parameter: the stretchFactor scales the cutoffs by its value (increases value for higher and decreases them for lower cutoffs). WARNING check
      **/
-    std::pair<double, double> calcCutoff(CutoffValues& sample, std::pair<double, double>& quantiles, double stretchFactor);
+    VXDTFSecMapTypedef::CutoffValue calcCutoff(VXDTFRawSecMapTypedef::CutoffValues& sample, VXDTFSecMapTypedef::CutoffValue& quantiles, double stretchFactor);
 
-
-
-    template<class Tmpl>
-    void checkSmallerThan(Tmpl& number, Tmpl threshold) { if (number < threshold) { number = threshold; } } /**< internal member - checks if given value is < threshold, if it is, reset to threshold */
-
-
-
-    template<class Tmpl>
-    void checkBiggerThan(Tmpl& number, Tmpl threshold) { if (number > threshold) { number = threshold; } } /**< internal member - checks if given value is > threshold, if it is, reset to threshold */
 
 
     double addExtraGain(double cutOff, double gain) {
@@ -362,15 +416,15 @@ namespace Belle2 {
 
 
     /** checks sector-combination whether it is allowed or not (checks: isSameSensor, isUncommonCombination, isTooManyLayersAway), return value is true, if if main sector of the pack shall get a subLayerID-upgrade */
-    bool filterBadSectorCombis(SectorPack& aSector);
+    bool filterBadSectorCombis(VXDTFRawSecMapTypedef::SectorPack& aSector);
 
 
 
     template<class Tmpl>
-    void searchForBadEntries(Tmpl& entryVector, IDVector& badIDs) {
+    void searchForBadEntries(Tmpl& entryVector, VXDTFRawSecMapTypedef::IDVector& badIDs) {
       // now kick bad entries (friends/sectors) (INFO that following part is pretty inefficient towards time consumption, if anyone thinks about optimizing this, using a list instead of a vector could do the job...)
       typename Tmpl::iterator entryIt = entryVector.begin(); // typename is needed for the compiler recognizing this as a template
-      IDVector::iterator badIDit = badIDs.begin();
+      VXDTFRawSecMapTypedef::IDVector::iterator badIDit = badIDs.begin();
       while (entryIt != entryVector.end()) { // enters infinite loop when iterator runs rampage, used as a primitive boundary check
         bool foundID = false; // is set true, if a badID has been found
 
@@ -390,7 +444,7 @@ namespace Belle2 {
 
 
 
-    StrippedRawSecMap m_sectorMap; /**< contains full information of the sectorMap */
+    VXDTFRawSecMapTypedef::StrippedRawSecMap m_sectorMap; /**< contains full information of the sectorMap */
     std::string m_nameOfSecMap; /**< Name of the sectorMap */
     std::string m_detectorType; /**< Name of the detectorType (PXD, SVD, VXD) */
     std::vector<double> m_sectorConfigU; /**< allows defining the the config of the sectors in U direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
@@ -399,6 +453,9 @@ namespace Belle2 {
     double m_magneticFieldStrength; /**< strength of magnetic field in Tesla, standard is 1.5T */
     double m_lowPt; /**< lower threshold for transverse momentum stored in that map */
     double m_highPt; /**< set higher threshold for transverse momentum stored in that map */
+    double m_minDistance2origin; /**< defines minimal accepted distance for sectors to the origin */
+    double m_maxDistance2origin; /**< defines maximum accepted distance for sectors to the origin */
+    bool m_sortByDistance2origin; /**< if true, filterBadSectorCombis filters sectors by origin not by layerID */
 
     std::pair<double, double> m_cutoffQuantiles; /**< .first is lower quantile for cutoff, .second is higher quantile */
     std::pair<double, double> m_smallCutoffQuantiles; /**< same as for 'm_cutoffQuantiles' but for sector-combinations with small sample size */
@@ -409,9 +466,9 @@ namespace Belle2 {
     std::pair<bool, double> m_rareSectorCombinations; /**< .first allows check for rare sectorCombinations if true, .second is the rareness-threshold (examples: 1. = 100%, 0.001 = 0.1%) if a sector-friend-combination occurs less than threshold value compared to total occurrence of current sector, it gets deleted*/
     std::pair<bool, int> m_maxLayerLevelDifference; /**< .first allows check for maximum difference in level of layers for current sector-friend-combination, .second sets max level difference (example: .second is 2, layerID of sector is 6, of friend is 3 -> more than threshold -> friend gets kicked) missing layers by choice of detector type are considered */
     bool m_removeDeadSectorChains; /**< if true, not only sectors having no friends after first filtering iteration are deleted but also all combinations where dead sectors were friends. If these combinations can lead to kill more sectors and therefore the map gets holey but clean of non-existing cases */
-    SectorDistancesMap m_dist2OriginMap; /**< stores the secID in .first and the value for the distances in .second */
+    VXDTFRawSecMapTypedef::SectorDistancesMap m_dist2OriginMap; /**< stores the secID in .first and the value for the distances in .second */
 
-    ClassDef(VXDTFRawSecMap, 2)
+    ClassDef(VXDTFRawSecMap, 4)
   };
 
   /** @}*/

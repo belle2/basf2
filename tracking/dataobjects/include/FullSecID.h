@@ -134,7 +134,7 @@ namespace Belle2 {
 
 
     /** returns the FullSecID coded as integer for further use (can be reconverted to FullSecID by using FullSecID(value)) */
-    int getFullSecID() const { return m_fullSecID; }
+    unsigned int getFullSecID() const { return m_fullSecID; }
 
 
     /** returns the FullSecID coded as string compatible to secIDs stored in the xml-sectormaps */

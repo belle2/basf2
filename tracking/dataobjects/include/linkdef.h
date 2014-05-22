@@ -49,6 +49,9 @@
 // #pragma link C++ class Belle2::AnalizerCollectorTFInfo+;
 // #pragma link C++ class Belle2::TrackCandidateTFInfo+;
 // #pragma link C++ class Belle2::ClusterTFInfo+;
+// #pragma link C++ class Belle2::RootSectorMap+;
+#pragma link C++ namespace Belle2::VXDTFRawSecMapTypedef+;
+#pragma link C++ namespace Belle2::VXDTFSecMapTypedef+;
 
 // #pragma link C++ namespace Belle2::VXDTFRawSecMapTypedef+;
 // #pragma link C++ namespace Belle2::VXDTFSecMapTypedef+;

@@ -11,7 +11,7 @@
 #include <tracking/dataobjects/VXDTFRawSecMap.h>
 #include <framework/logging/Logger.h>
 
-#include <algorithm> // std::sort
+#include <algorithm> // std::sort, std::find
 
 #include <string> // 
 #include <iostream> // stringstream
@@ -27,7 +27,7 @@ using namespace Belle2;
 ClassImp(VXDTFRawSecMap);
 
 
-void VXDTFRawSecMap::addSectorMap(StrippedRawSecMap& newMap)
+void VXDTFRawSecMap::addSectorMap(VXDTFRawSecMapTypedef::StrippedRawSecMap& newMap)
 {
   // first: deal with trivial cases:
   if (int(newMap.size()) == 0) {
@@ -58,21 +58,21 @@ void VXDTFRawSecMap::addSectorMap(StrippedRawSecMap& newMap)
   internalBefore = getNumOfValues();
   importedBefore = getNumOfValues(newMap);
 
-  for (SectorPack & newSector : newMap) {
+  for (VXDTFRawSecMapTypedef::SectorPack & newSector : newMap) {
     bool foundSector = false;
-    for (SectorPack & oldSector : m_sectorMap) {
+    for (VXDTFRawSecMapTypedef::SectorPack & oldSector : m_sectorMap) {
       if (oldSector.first != newSector.first) { continue; }// compares ID of sectors
       foundSector = true;
 
-      for (FriendPack & newFriend : newSector.second) {
+      for (VXDTFRawSecMapTypedef::FriendPack & newFriend : newSector.second) {
         bool foundFriend = false;
-        for (FriendPack & oldFriend : oldSector.second) {
+        for (VXDTFRawSecMapTypedef::FriendPack & oldFriend : oldSector.second) {
           if (oldFriend.first != newFriend.first) { continue; } // compares ID of sectorfriends
           foundFriend = true;
 
-          for (CutoffPack & newCutoffType : newFriend.second) {
+          for (VXDTFRawSecMapTypedef::CutoffPack & newCutoffType : newFriend.second) {
             bool foundCutoff = false;
-            for (CutoffPack & oldCutoffType : oldFriend.second) {
+            for (VXDTFRawSecMapTypedef::CutoffPack & oldCutoffType : oldFriend.second) {
               if (oldCutoffType.first != newCutoffType.first) { continue; } // compares ID of cutoffType
               foundCutoff = true;
               addedValuesCtr += newCutoffType.second.size();
@@ -103,14 +103,15 @@ void VXDTFRawSecMap::addSectorMap(StrippedRawSecMap& newMap)
 }
 
 
-void VXDTFRawSecMap::sortMap(StrippedRawSecMap& newMap)
+
+void VXDTFRawSecMap::sortMap(VXDTFRawSecMapTypedef::StrippedRawSecMap& newMap)
 {
   std::sort(newMap.begin(), newMap.end()); // sorts sectors by value
-  for (SectorPack & newSector : newMap) {
+  for (VXDTFRawSecMapTypedef::SectorPack & newSector : newMap) {
     std::sort(newSector.second.begin(), newSector.second.end()); // sorts friends by value
-    for (FriendPack & newFriend : newSector.second) {
+    for (VXDTFRawSecMapTypedef::FriendPack & newFriend : newSector.second) {
       std::sort(newFriend.second.begin(), newFriend.second.end()); // sorts filterType by value
-      for (CutoffPack & newCutoffType : newFriend.second) {
+      for (VXDTFRawSecMapTypedef::CutoffPack & newCutoffType : newFriend.second) {
         newCutoffType.second.sort(); // sorts total cutoff values by value
       }
     }
@@ -119,12 +120,12 @@ void VXDTFRawSecMap::sortMap(StrippedRawSecMap& newMap)
 
 
 
-int VXDTFRawSecMap::getNumOfValues(StrippedRawSecMap& secMap)
+int VXDTFRawSecMap::getNumOfValues(VXDTFRawSecMapTypedef::StrippedRawSecMap& secMap)
 {
   int result = 0;
-  for (SectorPack & aSector : secMap) { // looping over sectors (StrippedRawSecMap)
-    for (FriendPack & afriend : aSector.second) { // looping over friends
-      for (CutoffPack & aCutoffType : afriend.second) { // looping over CutoffTypes
+  for (VXDTFRawSecMapTypedef::SectorPack & aSector : secMap) { // looping over sectors (VXDTFRawSecMapTypedef::StrippedRawSecMap)
+    for (VXDTFRawSecMapTypedef::FriendPack & afriend : aSector.second) { // looping over friends
+      for (VXDTFRawSecMapTypedef::CutoffPack & aCutoffType : afriend.second) { // looping over CutoffTypes
         result += aCutoffType.second.size();
       }
     }
@@ -132,7 +133,22 @@ int VXDTFRawSecMap::getNumOfValues(StrippedRawSecMap& secMap)
   return result;
 }
 
-std::pair<double, double> VXDTFRawSecMap::calcCutoff(CutoffValues& sample, std::pair<double, double>& quantiles, double stretchFactor)
+
+
+void VXDTFRawSecMap::printDetailedInfo(VXDTFRawSecMapTypedef::StrippedRawSecMap& secMap)
+{
+//   int result = 0;
+  for (VXDTFRawSecMapTypedef::SectorPack & aSector : secMap) { // looping over sectors (VXDTFRawSecMapTypedef::StrippedRawSecMap)
+    B2INFO("In Sector " << FullSecID(aSector.first) << " there are the following friends:")
+    for (VXDTFRawSecMapTypedef::FriendPack & afriend : aSector.second) { // looping over friends
+      B2INFO("..." << FullSecID(afriend.first) << " with " << afriend.second.size() << " cutoffTypes")
+    }
+  }
+}
+
+
+
+std::pair<double, double> VXDTFRawSecMap::calcCutoff(VXDTFRawSecMapTypedef::CutoffValues& sample, std::pair<double, double>& quantiles, double stretchFactor)
 {
   double lowerCutoff = 0, upperCutoff = 0;
   int sampleSize = sample.size();
@@ -194,24 +210,24 @@ std::pair<double, double> VXDTFRawSecMap::calcCutoff(CutoffValues& sample, std::
 
 
 /** checks sector-combination whether it is allowed or not (checks: isSameSensor, isUncommonCombination, isTooManyLayersAway), return value is true, if sectorCombi is valid */
-bool VXDTFRawSecMap::filterBadSectorCombis(SectorPack& aSector)
+bool VXDTFRawSecMap::filterBadSectorCombis(VXDTFRawSecMapTypedef::SectorPack& aSector)
 {
   if (int(aSector.second.size()) == 0) {
     B2DEBUG(20, "filterBadSectorCombis: sector " << FullSecID(aSector.first) << " has no friends, validation failed")
     return false;
   }
-  int layerCorrectionFactor = 0; // is 0 for PXD and VXD, but 2 for SVD only
-  if (m_detectorType == "SVD") { layerCorrectionFactor = 2; }  // takes care of the case when there is no layer 2 and 1 WARNING hardcoded number of layers!
-  int centerSectorID = FullSecID().getFullSecID();
+//   int layerCorrectionFactor = 0; // is 0 for PXD and VXD, but 2 for SVD only
+//   if (m_detectorType == "SVD") { layerCorrectionFactor = 2; }  // takes care of the case when there is no layer 2 and 1 WARNING hardcoded number of layers!
+//   int centerSectorID = FullSecID().getFullSecID();
   FullSecID mainSector = FullSecID(aSector.first);
   FullSecID friendSector;
-  IDVector badIDs; // collecting bad friends here to be killed afterwards
+  VXDTFRawSecMapTypedef::IDVector badIDs; // collecting bad friends here to be killed afterwards
   bool upgradeSecID = false; // collecting secIDs which get higher subLayerID
   int nFriends = aSector.second.size(); // number of friendsectors before doing anything
   double rarenessThreshold = 0; // if secCombi is occuring even more seldom than this threshold, it will be filtered (value will be set later)
   int nTotalValues = 0; // counts total number of occurrences of all sector-combinations of current sector
-  for (FriendPack & aCombination : aSector.second) {
-    for (CutoffPack & aCutoff : aCombination.second) {
+  for (VXDTFRawSecMapTypedef::FriendPack & aCombination : aSector.second) {
+    for (VXDTFRawSecMapTypedef::CutoffPack & aCutoff : aCombination.second) {
       nTotalValues += aCutoff.second.size();
     }
   }
@@ -221,41 +237,28 @@ bool VXDTFRawSecMap::filterBadSectorCombis(SectorPack& aSector)
 
   B2DEBUG(20, "filterBadSectorCombis: sector " << mainSector << " got total number of values: " << nTotalValues << " and calculated rarenessThreshold of " << rarenessThreshold)
 
-  for (FriendPack & aCombination : aSector.second) {
+  for (VXDTFRawSecMapTypedef::FriendPack & aCombination : aSector.second) {
     friendSector = FullSecID(aCombination.first);
 
     /// now let's do some security checks;
-    // first: if friendLayer > sectorLayer -> kick (WARNING if sectormap shall contain curler-compatibility, then this part should be overhauled!)
-    if (mainSector.getLayerNumber() < friendSector.getLayerNumber()) {
-      badIDs.push_back(aCombination.first);
-      B2DEBUG(30, "filterBadSectorCombis: friend " << friendSector << " of sector " << mainSector << " got kicked because of bad layer number (sector/friend): " << mainSector.getLayerNumber() << "/" << friendSector.getLayerNumber())
-      continue;
+    int badSecID = -1;
+    if (m_sortByDistance2origin == true) {
+      badSecID = filterDistanceBased(mainSector, aCombination); /// filterDistanceBased
+    } else {
+      badSecID = filterLayerBased(mainSector, aCombination);    /// filterLayerBased
     }
+    if (badSecID != -1) { badIDs.push_back(badSecID); continue; }
+
     if (mainSector.getVxdID() == friendSector.getVxdID()) {
       badIDs.push_back(aCombination.first);
       B2DEBUG(30, "filterBadSectorCombis: friend " << friendSector << " of sector " << mainSector << " got kicked because of being on the same sensor (sector/friend): " << mainSector.getLayerNumber() << "/" << friendSector.getLayerNumber())
       continue;
     }
 
-    // next: check for layerJumps
-    if (m_maxLayerLevelDifference.first == true) {
-      if ((friendSector.getLayerNumber() + m_maxLayerLevelDifference.second) < mainSector.getLayerNumber()) {
-
-        // catch case of SVD only
-        if ((friendSector.getFullSecID() == centerSectorID) and ((friendSector.getLayerNumber() + m_maxLayerLevelDifference.second + layerCorrectionFactor) >= mainSector.getLayerNumber())) {
-          // everything is fine -> do nothing...
-        } else {
-          badIDs.push_back(aCombination.first);
-          B2DEBUG(30, "filterBadSectorCombis: friend " << friendSector << " of sector " << mainSector << " got kicked because of bad layer number (sector/friend): " << mainSector.getLayerNumber() << "/" << friendSector.getLayerNumber() << " (layer difference of " << m_maxLayerLevelDifference.second << " allowed)")
-          continue;
-        }
-      }
-    }
-
     // next: check for rare sectorCombinations
     if (m_rareSectorCombinations.first == true) {
       int nFriendValues = 0;
-      for (CutoffPack & aCutoff : aCombination.second) {
+      for (VXDTFRawSecMapTypedef::CutoffPack & aCutoff : aCombination.second) {
         nFriendValues += aCutoff.second.size();
       }
       if (rarenessThreshold > double(nFriendValues)) {
@@ -298,17 +301,75 @@ bool VXDTFRawSecMap::filterBadSectorCombis(SectorPack& aSector)
 
 
 
+int VXDTFRawSecMap::filterLayerBased(unsigned int mainSecID, VXDTFRawSecMapTypedef::FriendPack& aCombination)
+{
+  FullSecID centerSectorID = FullSecID();
+  FullSecID mainSector = mainSecID;
+  FullSecID friendSector = aCombination.first;
+  // first: if friendLayer > sectorLayer -> kick (WARNING if sectormap shall contain curler-compatibility, then this part should be overhauled!)
+  if (mainSector.getLayerNumber() < friendSector.getLayerNumber()) {
+    B2DEBUG(20, "filterLayerBased: friend " << friendSector << " of sector " << mainSector << " got kicked because of bad layer number (sector/friend): " << mainSector.getLayerNumber() << "/" << friendSector.getLayerNumber())
+    return friendSector;
+  }
+
+  // next: check for layerJumps
+  if (m_maxLayerLevelDifference.first == true) {
+    if ((friendSector.getLayerNumber() + m_maxLayerLevelDifference.second) < mainSector.getLayerNumber()) {
+      int layerCorrectionFactor = 0; // is 0 for PXD and VXD, but 2 for SVD only
+      if (m_detectorType.find("PXD") == string::npos) { // means no PXD included  NOTE not very fast but atm it's not important...
+        layerCorrectionFactor += 2;
+      }  // takes care of the case when there is no layer 2 and 1 WARNING hardcoded number of layers!
+
+      // catch case of SVD only
+      if ((friendSector == centerSectorID) and ((friendSector.getLayerNumber() + m_maxLayerLevelDifference.second + layerCorrectionFactor) >= mainSector.getLayerNumber())) {
+        // everything is fine -> do nothing...
+      } else {
+        B2DEBUG(30, "filterLayerBased: friend" << friendSector << " of sector " << mainSector << " got kicked because of bad layer number (sector/friend): " << mainSector.getLayerNumber() << "/" << friendSector.getLayerNumber() << " (layer difference of " << m_maxLayerLevelDifference.second << " allowed)")
+        return friendSector;
+      }
+    }
+  }
+  return -1;
+}
+
+
+
+int VXDTFRawSecMap::filterDistanceBased(unsigned int mainSecID, VXDTFRawSecMapTypedef::FriendPack& aCombination)
+{
+  // getting distances NOTE not very fast but atm it's not important...
+  double distanceOfMainSector = 0;
+  for (VXDTFRawSecMapTypedef::SectorDistance & anEntry : m_dist2OriginMap) { if (anEntry.first == mainSecID) {distanceOfMainSector = anEntry.second; break; } }
+  FullSecID mainSector = mainSecID;
+  double distanceOfFriendSector = 0;
+  for (VXDTFRawSecMapTypedef::SectorDistance & anEntry : m_dist2OriginMap) { if (anEntry.first == aCombination.first) {distanceOfFriendSector = anEntry.second; break; } }
+  FullSecID friendSector = aCombination.first;
+
+  // first: if distanceOfFriendSector > distanceOfMainSector -> kick (WARNING if sectormap shall contain curler-compatibility, then this part should be overhauled!)
+  if (distanceOfMainSector < distanceOfFriendSector) {
+    B2DEBUG(20, "filterDistanceBased: friend " << friendSector << " of sector " << mainSector << " got kicked because of bad sector distances (sector/friend): " << distanceOfMainSector << "/" << distanceOfFriendSector)
+    return friendSector;
+  }
+
+  return -1;
+}
+
+
+
 void VXDTFRawSecMap::repairSecMap()
 {
   // WARNING: destroys order of map (because of changed subLayerIDs), if sorted map is essential, insert sort at the end!
 
   B2DEBUG(1, "repairSecMap: before starting process: there are " << getNumOfSectors() << "/" << getNumOfFriends() << "/" << getNumOfValues() << " sectors/friends/values in map")
+
+  if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 50, PACKAGENAME()) == true) {
+    printDetailedInfo();
+  }
   vector< pair<unsigned int, unsigned int> > updatedSubLayerIDs; // .first is old ID, .second is new one
-  IDVector killedSectors; // collects names of killed sectors
+  VXDTFRawSecMapTypedef::IDVector killedSectors; // collects names of killed sectors
   unsigned int centerSectorID = FullSecID().getFullSecID();
 
   // first: check all sectors for security issues, collect subLayerIDs of sectors/friends to be renamed (renames sectors directly, friends later), kills empty sectors
-  StrippedRawSecMap::iterator sectorIt = m_sectorMap.begin();
+  VXDTFRawSecMapTypedef::StrippedRawSecMap::iterator sectorIt = m_sectorMap.begin();
   while (sectorIt != m_sectorMap.end()) {
     FullSecID currentSecID = FullSecID(sectorIt->first);
     if (sectorIt->first == centerSectorID) {
@@ -331,18 +392,18 @@ void VXDTFRawSecMap::repairSecMap()
 
     if (upgradeMe == true) {
       unsigned int oldID = sectorIt->first;
-      unsigned int newID = FullSecID(currentSecID.getLayerID(), true, currentSecID.getVxdID(), currentSecID.getSecID()).getFullSecID();
+      FullSecID newID = FullSecID(currentSecID.getLayerID(), true, currentSecID.getVxdID(), currentSecID.getSecID()).getFullSecID();
       updatedSubLayerIDs.push_back(make_pair(oldID, newID));
-      B2DEBUG(20, "repairSecMap: sector with old name (id/name): " << oldID << "/" << currentSecID << ", got upgrade to (id/name): " << newID << "/" << FullSecID(newID))
+      B2DEBUG(20, "repairSecMap: sector with old name " << currentSecID << ", got upgrade to " << newID)
       sectorIt->first = newID; // replacing old sectorID with new one
     }
 
     ++sectorIt;
   }
 
-  // now doing second run where friendIDs are upgraded too TODO: maybe better to kick dead sectors as friends too, since they are a dead end anyway -> problem, in this case we have to redo these steps until no sector/friend has died anymore.
-  for (SectorPack & aSector : m_sectorMap) {
-    for (FriendPack & aFriend : aSector.second) {
+  // now doing second run where friendIDs are upgraded too TODO: maybe better to kick dead sectors as friends too, since they are a dead end anyway -> problem, in this case we have to redo these steps until no sector/friend has died anymore. -> recursive function? TODO-2: the next section is doing this or not?
+  for (VXDTFRawSecMapTypedef::SectorPack & aSector : m_sectorMap) {
+    for (VXDTFRawSecMapTypedef::FriendPack & aFriend : aSector.second) {
       for (auto newIDPack : updatedSubLayerIDs) {
         if (newIDPack.first == aFriend.first) {
           aFriend.first = newIDPack.second; // getting updated ID
@@ -362,7 +423,7 @@ void VXDTFRawSecMap::repairSecMap()
     while ((oldNSectors not_eq newNSectors) or (oldNFriends not_eq newNFriends)) {  // should restart if at least one of the conditions are fullfilled
       ++nTimesRepeated;
       int nNewSectorsKilled = 0; // number of new sectors killed
-      for (SectorPack & aSector : m_sectorMap) { // kill dead friends
+      for (VXDTFRawSecMapTypedef::SectorPack & aSector : m_sectorMap) { // kill dead friends
         if (aSector.first == centerSectorID) {
           B2DEBUG(1, "repairSecMap @ removeDeadSectorChains: centerSector found. skipping it...")
           continue;
@@ -402,8 +463,28 @@ void VXDTFRawSecMap::repairSecMap()
 }
 
 
+VXDTFRawSecMapTypedef::IDVector VXDTFRawSecMap::getLayersOfSecMap()
+{
+  VXDTFRawSecMapTypedef::IDVector layerIDs;
+  unsigned int currentID;
+  for (VXDTFRawSecMapTypedef::SectorPack & aSectorEntry : m_sectorMap) {
+    // check sector itself:
+    currentID = FullSecID(aSectorEntry.first).getLayerID();
+    if (std::find(layerIDs.begin(), layerIDs.end(), currentID) == layerIDs.end()) { layerIDs.push_back(currentID); }
+    // check friends:
+    for (VXDTFRawSecMapTypedef::FriendPack & aFriendEntry : aSectorEntry.second) {
+      currentID = FullSecID(aFriendEntry.first).getLayerID();
+      if (std::find(layerIDs.begin(), layerIDs.end(), currentID) == layerIDs.end()) { layerIDs.push_back(currentID); }
+    }
+  }
 
-void VXDTFRawSecMap::addDistances(SectorDistancesMap& aMap)
+  std::sort(layerIDs.begin(), layerIDs.end());
+
+  // WARNING TODO: better: for each sector, know distance to origin, store secID and distance as pair (sorted by distance) and return that (-> another function can find out which layer jumps are acceptable...)
+  return layerIDs;
+}
+
+void VXDTFRawSecMap::addDistances(VXDTFRawSecMapTypedef::SectorDistancesMap& aMap)
 {
   if (int(aMap.size()) == 0) {
     B2DEBUG(1, "addDistances: incoming map was empty");
@@ -426,9 +507,9 @@ void VXDTFRawSecMap::addDistances(SectorDistancesMap& aMap)
 
   // check old map (m_dist2OriginMap) for each entry of the new one whether there is already an entry. If there is not, add new entry
   bool entryFound = false;
-  for (SectorDistance aMapEntry : aMap) {
-    for (SectorDistance oldMapEntry : m_dist2OriginMap) {
-//       B2WARNING(" aMapEntry f/s: " << aMapEntry.first << "/" << aMapEntry.second << ", oldMapEntry f/s: " << oldMapEntry.first << "/" << oldMapEntry.second)
+  for (VXDTFRawSecMapTypedef::SectorDistance aMapEntry : aMap) {
+    for (VXDTFRawSecMapTypedef::SectorDistance oldMapEntry : m_dist2OriginMap) {
+      B2DEBUG(100, "addDistances: aMapEntry f/s: " << aMapEntry.first << "/" << aMapEntry.second << ", oldMapEntry f/s: " << oldMapEntry.first << "/" << oldMapEntry.second)
       if (aMapEntry == oldMapEntry) { entryFound = true; break; }
     }
 

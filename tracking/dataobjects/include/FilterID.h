@@ -48,7 +48,7 @@ namespace Belle2 {
       distanceHighOccupancy2IP, /**< string name of filter d2IP high occupancy */
       deltaSlopeHighOccupancyRZ, /**< string name of filter dslopeRZ high occupancy */
       pTHighOccupancy, /**< string name of filter pT high occupancy */
-      helixHighOccupancyFit, /**< string name of filter hFit high occupancy */
+      helixParameterHighOccupancyFit, /**< string name of filter hFit high occupancy */
       deltapTHighOccupancy, /**< string name of filter dPt high occupancy */
       deltaDistanceHighOccupancy2IP, /**< string name of filter dd2IP high occupancy */
 
@@ -62,10 +62,13 @@ namespace Belle2 {
       tcDuel,  /**< TC Duel filter */
       tcFinderCurr,  /**< TC Finder Curr filter */
       ziggZaggXY,  /**< ziggZaggXY filter */
+      ziggZaggXYWithSigma,  /**< ziggZaggXYWithSigma filter */
       ziggZaggRZ,  /**< ziggZaggRZ filter */
       calcQIbyKalman,  /**< calcQIbyKalman filter */
       overlapping,  /**< overlapping filter */
       circlefit,  /**< circlefit filter */
+      helixfit,  /**< Helix Fit filter */
+      simpleLineFit3D,  /**< simpleLineFit3D filter */
 
       silentTcc,  /**< Silent Kill TCC filter */
       silentHitFinder,  /**< Silent Kill HitFinder filter */
@@ -107,7 +110,7 @@ namespace Belle2 {
     const static std::string nameDistanceHighOccupancy2IP; /**< string name of filter d2IP high occupancy */
     const static std::string nameDeltaSlopeHighOccupancyRZ; /**< string name of filter dslopeRZ high occupancy */
     const static std::string namePTHighOccupancy; /**< string name of filter pT high occupancy */
-    const static std::string nameHelixHighOccupancyFit; /**< string name of filter hFit high occupancy */
+    const static std::string nameHelixParameterHighOccupancyFit; /**< string name of filter hFit high occupancy */
     const static std::string nameDeltapTHighOccupancy; /**< string name of filter dPt high occupancy */
     const static std::string nameDeltaDistanceHighOccupancy2IP; /**< string name of filter dd2IP high occupancy */
 
@@ -120,10 +123,13 @@ namespace Belle2 {
     const static std::string nameTcDuel;   /**< string name TC Duel filter */
     const static std::string nameTcFinderCurr;   /**< string name TC Finder Curr filter */
     const static std::string nameZiggZaggXY;   /**< string name ZiggZaggXY filter */
+    const static std::string nameZiggZaggXYWithSigma;   /**< string name ZiggZaggXYWithSigma filter */
     const static std::string nameZiggZaggRZ;    /**< string name ZiggZaggRZ filter */
     const static std::string nameCalcQIbyKalman;   /**< string name CalcQIbyKalman filter */
     const static std::string nameOverlapping;   /**< string name Overlapping filter */
     const static std::string nameCirclefit;     /**< string name Circlefit filter */
+    const static std::string nameHelixfit;     /**< string name Helix Fit filter */
+    const static std::string nameSimpleLineFit3D;     /**< string name SimpleLineFit3D filter */
 
     const static std::string nameSilentTcc;  /**< string name Silent Kill TCC filter */
     const static std::string nameSilentHitFinder;   /**< string name Silent Kill Hit Finder filter */

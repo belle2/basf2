@@ -2519,7 +2519,7 @@ void VXDTFModule::endRun()
     delete currentPass; // deleting struct itself
   }
 
-  if (m_PARAMactivateBaselineTF == true) {
+  if (m_PARAMactivateBaselineTF != 0) {
     for (secMapEntry aSector : m_baselinePass.sectorMap) { // dealing with the baseline pass separately
       delete aSector.second;
     }

@@ -27,7 +27,6 @@ chargedTrackVars = [
     'pt',
     'p_CMS',
     'pt_CMS',
-    'M',
     'chiProb']
 
 DVars = ['daughterProductOf(getExtraInfo(SignalProbability))', 'p', 'pt', 'p_CMS', 'pt_CMS', 'M']

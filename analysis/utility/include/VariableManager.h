@@ -66,9 +66,10 @@ namespace Belle2 {
       std::string name; /**< Unique identifier of the function, used as key. */
       FunctionPtr function; /**< Pointer to function. */
       std::string description; /**< Description of what this function does. */
+      std::string group; /**< Associated group. */
 
       /** Constructor. */
-      Var(std::string n, FunctionPtr f, std::string d) : name(n), function(f), description(d) { }
+      Var(std::string n, FunctionPtr f, std::string d, std::string g = "") : name(n), function(f), description(d), group(g) { }
     };
 #endif
 
@@ -85,6 +86,9 @@ namespace Belle2 {
 
     /** Return list of all variables (in order registered). */
     std::vector<const Var*> getVariables() const { return m_variablesInRegistrationOrder; }
+
+    /** All variables registered after VARIABLE_GROUP(groupName) will be added to this group. */
+    void setVariableGroup(const std::string& groupName);
 
     /** Register a variable. */
     void registerVariable(const std::string& name, VariableManager::FunctionPtr f, const std::string& description);
@@ -111,6 +115,8 @@ namespace Belle2 {
     VariableManager(const VariableManager&);
     ~VariableManager();
 
+    /** Group last set via VARIABLE_GROUP(). */
+    std::string m_currentGroup;
 #ifndef __CINT__
     /** List of registered variables. */
     std::map<std::string, Var*> m_variables;
@@ -118,8 +124,6 @@ namespace Belle2 {
     /** List of variables in registration order. */
     std::vector<const Var*> m_variablesInRegistrationOrder;
 #endif
-
-
   };
 
 #ifndef __CINT__
@@ -129,6 +133,15 @@ namespace Belle2 {
     /** constructor. */
     VariableProxy(const std::string& name, VariableManager::FunctionPtr f, const std::string& description) {
       VariableManager::Instance().registerVariable(name, f, description);
+    }
+  };
+
+  /** Internal class that registers a variable group with VariableManager when constructed. */
+  class VariableGroupProxy {
+  public:
+    /** constructor. */
+    VariableGroupProxy(const std::string& groupName) {
+      VariableManager::Instance().setVariableGroup(groupName);
     }
   };
 #endif
@@ -154,5 +167,13 @@ namespace Belle2 {
    */
 #define REGISTER_VARIABLE(name, function, description) \
   VariableProxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(name, &function, description);
+
+  /** \def VARIABLE_GROUP(groupName)
+   *
+   * All variables registered after this will be added to this group, which mainly affects the output when printing the variable list.
+   * \sa VariableManager
+   */
+#define VARIABLE_GROUP(groupName) \
+  VariableGroupProxy VARMANAGER_MAKE_UNIQUE(_variablegroupproxy)(groupName);
 
 }

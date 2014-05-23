@@ -733,6 +733,7 @@ namespace Belle2 {
       return cos(a.Angle(b));
     }
 
+    VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
     REGISTER_VARIABLE("px", particlePx, "momentum component x");
@@ -768,6 +769,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("invM", particleInvariantMass, "invariant mass (determined from particle's daughter 4-momentum vectors)");
     REGISTER_VARIABLE("ErrM", particleInvariantMassError, "uncertainty of invariant mass (determined from particle's daughter 4-momentum vectors)");
 
+    REGISTER_VARIABLE("decayAngle", particleDecayAngle, "cosine of the angle between the mother momentum vector and the direction of the first daughter in the mother's rest frame");
+    REGISTER_VARIABLE("daughterAngle", particleDaughterAngle, "cosine of the angle between the first two daughters, in lab frame");
+
+    VARIABLE_GROUP("PID");
     REGISTER_VARIABLE("eid", particleElectronId, "electron identification probability");
     REGISTER_VARIABLE("muid", particleMuonId, "muon identification probability");
     REGISTER_VARIABLE("piid", particlePionId, "pion identification probability");
@@ -797,6 +802,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("eid_ECL", particleElectronIdECL, "electron identification probability from ECL");
     REGISTER_VARIABLE("missing_ECL", particleMissingECL, "1.0 if identification probability from ECL is missing");
 
+    VARIABLE_GROUP("PID variables for NeuroBayes (-999 added)");
     REGISTER_VARIABLE("NB_eid_TOP", NeuroBayesifyTOP<particleElectronTOPId>, "electron identification probability from TOP (returns -999 when not available)");
     REGISTER_VARIABLE("NB_muid_TOP", NeuroBayesifyTOP<particleMuonTOPId>, "muon identification probability from TOP (returns -999 when not available)");
     REGISTER_VARIABLE("NB_piid_TOP", NeuroBayesifyTOP<particlePionTOPId>, "pion identification probability from TOP (returns -999 when not available)");
@@ -809,18 +815,22 @@ namespace Belle2 {
     REGISTER_VARIABLE("NB_Kid_ARICH", NeuroBayesifyARICH<particleKaonARICHId>, "kaon identification probability from ARICH (returns -999 when not available)");
     REGISTER_VARIABLE("NB_prid_ARICH", NeuroBayesifyARICH<particleProtonARICHId>, "proton identification probability from ARICH (returns -999 when not available)");
 
+    VARIABLE_GROUP("MC Matching");
     REGISTER_VARIABLE("chiProb", particlePvalue, "chi^2 probability of the fit");
     REGISTER_VARIABLE("nDaughters", particleNDaughters, "number of daughter particles");
     REGISTER_VARIABLE("flavor", particleFlavorType, "flavor type of decay (0=unflavored, 1=flavored)");
 
+    VARIABLE_GROUP("MC Matching");
     REGISTER_VARIABLE("isSignal", isSignal,               "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
     REGISTER_VARIABLE("mcPDG",    particleMCMatchPDGCode, "The PDG code of matched MCParticle");
     REGISTER_VARIABLE("abs_mcPDG",    particleAbsMCMatchPDGCode, "The absolute PDG code of matched MCParticle");
     REGISTER_VARIABLE("mcStatus", particleMCMatchStatus,  "The bit pattern indicating the quality of MC match");
 
+    VARIABLE_GROUP("Rest Of Event");
     REGISTER_VARIABLE("nROETracks",  nROETracks,  "number of remaining tracks as given by the related RestOfEvent object");
     REGISTER_VARIABLE("nROEClusters", nROEClusters, "number of remaining ECL clusters as given by the related RestOfEvent object");
 
+    VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("pRecoil",  recoilMomentum,    "magnitude of 3-momentum recoiling against given Particle");
     REGISTER_VARIABLE("eRecoil",  recoilEnergy,      "energy recoiling against given Particle");
     REGISTER_VARIABLE("mRecoil",  recoilMass,        "invariant mass of the system recoiling against given Particle");
@@ -832,9 +842,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("clusterE9E25",      eclClusterE9E25,           "ratio of energies in inner 3x3 and 5x5 cells");
     REGISTER_VARIABLE("clusterNHits",      eclClusterNHits,           "number of hits associated to this cluster");
     REGISTER_VARIABLE("clusterTrackMatch", eclClusterTrackMatched,    "number of charged track matched to this cluster");
-
-    REGISTER_VARIABLE("decayAngle", particleDecayAngle, "cosine of the angle between the mother momentum vector and the direction of the first daughter in the mother's rest frame");
-    REGISTER_VARIABLE("daughterAngle", particleDaughterAngle, "cosine of the angle between the first two daughters, in lab frame");
   }
 }
 

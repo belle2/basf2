@@ -32,6 +32,10 @@ const VariableManager::Var* VariableManager::getVariable(const std::string& name
     return mapIter->second;
   }
 }
+void VariableManager::setVariableGroup(const std::string& groupName)
+{
+  m_currentGroup = groupName;
+}
 
 const VariableManager::Var* VariableManager::createVariable(const std::string& name)
 {
@@ -112,7 +116,7 @@ void VariableManager::registerVariable(const std::string& name, VariableManager:
 
   auto mapIter = m_variables.find(name);
   if (mapIter == m_variables.end()) {
-    Var* var = new Var(name, f, description);
+    Var* var = new Var(name, f, description, m_currentGroup);
     m_variables[name] = var;
     m_variablesInRegistrationOrder.push_back(var);
   } else {
@@ -131,7 +135,13 @@ std::vector<std::string> VariableManager::getNames() const
 
 void VariableManager::printList() const
 {
+  std::string group;
   for (const Var * var : getVariables()) {
+    if (var->group != group) {
+      //group changed, print header
+      std::cout << "\n" << var->group << ":\n";
+      group = var->group;
+    }
     std::cout << std::setw(14) << var->name << "  " << var->description << std::endl;
   }
 }

@@ -60,10 +60,8 @@ void VXDTFTBAnalyzerModule::initialize()
 
 void VXDTFTBAnalyzerModule::beginRun()
 {
-  m_eventCounter = 0;
-  m_pxdClusterCounter = 0;
-  m_svdClusterCounter = 0;
-  B2INFO("################## eventCounter enabled, highlighting every " << m_stepSize << " event ######################");
+  resetCounters();
+  B2INFO("################## VXDTFTBAnalyzerModule enabled, highlighting every " << m_stepSize << " event ######################");
 }
 
 
@@ -134,14 +132,22 @@ void VXDTFTBAnalyzerModule::event()
   // collecting info about typical length of reference TCs
   int totalRefHits = 0, totalEvalHits = 0;
   for (genfit::TrackCand & aTC : tcsReference) {
-    int total = 0, svd = 0;
+    int total = 0, svd = 0, tel = 0, pxd = 0;
     total = aTC.getHitIDs().size();
     svd = aTC.getHitIDs(Const::SVD).size();
+    pxd = aTC.getHitIDs(Const::PXD).size();
+    tel = aTC.getHitIDs(Const::TEST).size();
     m_referenceTrackLengthTotal.push_back(total);
     m_countReferenceTrackLengthTotal += total;
     totalRefHits += total;
     m_referenceTrackLengthSvd.push_back(svd);
     m_countReferenceTrackLengthSvd += svd;
+
+    m_referenceTrackLengthPxd.push_back(pxd);
+    m_countReferenceTrackLengthPxd += pxd;
+
+    m_referenceTrackLengthTel.push_back(tel);
+    m_countReferenceTrackLengthTel += tel;
   }
   float meanRefTCHits = float(totalRefHits) / float(nReferenceTCs);
   if (std::isnan(meanRefTCHits) == true) { meanRefTCHits = 0; }
@@ -150,14 +156,23 @@ void VXDTFTBAnalyzerModule::event()
   // collecting info about typical length of evaluate TCs
   bool found8ClusterTCs = false;
   for (genfit::TrackCand & aTC : tcsEvaluate) {
-    int total = 0, svd = 0;
+    int total = 0, svd = 0, tel = 0, pxd = 0;
     total = aTC.getHitIDs().size();
     svd = aTC.getHitIDs(Const::SVD).size();
+    pxd = aTC.getHitIDs(Const::PXD).size();
+    tel = aTC.getHitIDs(Const::TEST).size();
     m_evaluateTrackLengthTotal.push_back(total);
     m_countEvaluateTrackLengthTotal += total;
     totalEvalHits += total;
     m_evaluateTrackLengthSvd.push_back(svd);
     m_countEvaluateTrackLengthSvd += svd;
+
+    m_evaluateTrackLengthPxd.push_back(pxd);
+    m_countEvaluateTrackLengthPxd += pxd;
+
+    m_evaluateTrackLengthTel.push_back(tel);
+    m_countEvaluateTrackLengthTel += tel;
+
     if (aTC.getHitIDs(Const::SVD).size() == 8) { found8ClusterTCs = true; }
   }
   float meanEvalTCHits = float(totalEvalHits) / float(nEvaluateTCs);
@@ -219,14 +234,18 @@ void VXDTFTBAnalyzerModule::endRun()
          << "\nEfficiency8Cluster ((caseBothYesOrNo+nCasesRefTCsFound)/nTotal): " << tunedEfficiencyFull);
 
   B2INFO("VXDTFTBAnalyzerModule: after " << m_eventCounter << " events typical TC-lengths are as follows:\n"
-         << "nClusters-total per TC added to reference source: "
+         << "nClusters-total per TC added to reference/evaluate source: "
          << float(m_countReferenceTrackLengthTotal) / float(m_referenceTrackLengthTotal.size())
-         << "\nnClusters-total per TC added to evaluate source: "
-         << float(m_countEvaluateTrackLengthTotal) / float(m_evaluateTrackLengthTotal.size())
-         << "\nnClusters-SVD per TC added to reference source: "
+         << "/" << float(m_countEvaluateTrackLengthTotal) / float(m_evaluateTrackLengthTotal.size())
+         << "\nnClusters-SVD per TC added to reference/evaluate source: "
          << float(m_countReferenceTrackLengthSvd) / float(m_referenceTrackLengthSvd.size())
-         << "\nnClusters-SVD per TC added to evaluate source: "
-         << float(m_countEvaluateTrackLengthSvd) / float(m_evaluateTrackLengthSvd.size()));
+         << "/" << float(m_countEvaluateTrackLengthSvd) / float(m_evaluateTrackLengthSvd.size())
+         << "\nnClusters-PXD per TC added to reference/evaluate source: "
+         << float(m_countReferenceTrackLengthPxd) / float(m_referenceTrackLengthPxd.size())
+         << "/" << float(m_countEvaluateTrackLengthPxd) / float(m_evaluateTrackLengthPxd.size())
+         << "\nnClusters-TEL per TC added to reference/evaluate source: "
+         << float(m_countReferenceTrackLengthTel) / float(m_referenceTrackLengthTel.size())
+         << "/" << float(m_countEvaluateTrackLengthTel) / float(m_evaluateTrackLengthTel.size()));
 
   stringstream printCombinations;
   printCombinations << "Found the following SVD-combinations:\n";

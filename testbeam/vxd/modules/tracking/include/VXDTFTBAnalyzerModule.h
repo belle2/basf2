@@ -62,7 +62,20 @@ namespace Belle2 {
     virtual void terminate();
 
   protected:
-
+    /** resetting counters*/
+    void resetCounters() {
+      m_countReferenceTrackLengthTotal = 0;
+      m_countReferenceTrackLengthSvd = 0;
+      m_countReferenceTrackLengthPxd = 0;
+      m_countReferenceTrackLengthTel = 0;
+      m_countEvaluateTrackLengthTotal = 0;
+      m_countEvaluateTrackLengthSvd = 0;
+      m_countEvaluateTrackLengthPxd = 0;
+      m_countEvaluateTrackLengthTel = 0;
+      m_eventCounter = 0;
+      m_pxdClusterCounter = 0;
+      m_svdClusterCounter = 0;
+    }
 
     int m_eventCounter; /**< knows current event number */
     int m_stepSize; /**< Informes the user that  event: (eventCounter-modulo(stepSize)) is currently executed */
@@ -80,12 +93,21 @@ namespace Belle2 {
     int m_countBothFalseFull; /**< counts events where none of the (reference and evaluate) sources produced TCs with 8 clusters */
     std::vector<int> m_referenceTrackLengthTotal; /**< collects the total number of cluster-indices of each reference TC */
     std::vector<int> m_referenceTrackLengthSvd; /**< collects the number of cluster-indices of the SVD of each reference TC */
+    std::vector<int> m_referenceTrackLengthPxd; /**< collects the number of cluster-indices of the PXD of each reference TC */
+    std::vector<int> m_referenceTrackLengthTel; /**< collects the number of cluster-indices of the TEL of each reference TC */
     std::vector<int> m_evaluateTrackLengthTotal; /**< collects the total number of cluster-indices of each evaluate TC */
     std::vector<int> m_evaluateTrackLengthSvd; /**< collects the total number of cluster-indices of the SVD of each evaluate TC */
+    std::vector<int> m_evaluateTrackLengthPxd; /**< collects the total number of cluster-indices of the PXD of each evaluate TC */
+    std::vector<int> m_evaluateTrackLengthTel; /**< collects the total number of cluster-indices of the TEL of each evaluate TC */
     int m_countReferenceTrackLengthTotal; /**< counts the total number of cluster-indices of each reference TC */
     int m_countReferenceTrackLengthSvd; /**< counts the number of cluster-indices of the SVD of each reference TC */
+    int m_countReferenceTrackLengthPxd; /**< counts the number of cluster-indices of the PXD of each reference TC */
+    int m_countReferenceTrackLengthTel; /**< counts the number of cluster-indices of the TEL of each reference TC */
     int m_countEvaluateTrackLengthTotal; /**< counts the total number of cluster-indices of each evaluate TC */
     int m_countEvaluateTrackLengthSvd; /**< counts the total number of cluster-indices of the SVD of each evaluate TC */
+    int m_countEvaluateTrackLengthPxd; /**< counts the total number of cluster-indices of the PXD of each evaluate TC */
+    int m_countEvaluateTrackLengthTel; /**< counts the total number of cluster-indices of the TEL of each evaluate TC */
+
 
     std::vector<SensorAndClusterCollection> m_overallCombinationsPerSensor; /**< collecting for each SVDsensor and event the number of clusterCombinations */
     std::vector<uShort> m_overallCombinationsCount; /**< collecting for each event the number of clusterCombinations */

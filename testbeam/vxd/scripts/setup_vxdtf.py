@@ -16,7 +16,7 @@ def setup_vxdtf(
     secSetup=['TB4GeVNoMagnetNoAlignedSource2014May21SVD-moreThan1500MeV_SVD'
               ],
     filterOverlaps='hopfield',
-    baseLineTF=1,
+    baseLineTF=0,
     ):
 
     # VXDTF:
@@ -24,8 +24,9 @@ def setup_vxdtf(
     qiType = 'circleFit'
     #
     vxdtf = register_module('VXDTF')
-    vxdtf.logging.log_level = LogLevel.INFO
-    vxdtf.logging.debug_level = 1
+    # vxdtf.logging.log_level = LogLevel.INFO
+    vxdtf.logging.log_level = LogLevel.DEBUG
+    vxdtf.logging.debug_level = 5
     param_vxdtf = {
         'activateBaselineTF': baseLineTF,
         'tccMinState': [2],
@@ -34,8 +35,8 @@ def setup_vxdtf(
         'artificialMomentum': 5.,
         'sectorSetup': secSetup,
         'calcQIType': qiType,
-        'killEventForHighOccupancyThreshold': 75,
-        'highOccupancyThreshold': 85,
+        'killEventForHighOccupancyThreshold': 100,
+        'highOccupancyThreshold': 1200,
         'cleanOverlappingSet': False,
         'filterOverlappingTCs': filterOverlaps,
         'TESTERexpandedTestingRoutines': False,
@@ -77,9 +78,10 @@ def setup_vxdtf(
 
 def setup_vxdtf1T(
     candName='',
-    secSetup=['TB4GeV1TRun500SVD-moreThan1500MeV_SVD'],
+    secSetup=['TB4GeVFullMagnetNoAlignedSource2014May21SVD-moreThan1500MeV_SVD'
+              ],
     filterOverlaps='hopfield',
-    baseLineTF=1,
+    baseLineTF=0,
     ):
 
     # VXDTF:
@@ -87,8 +89,9 @@ def setup_vxdtf1T(
     qiType = 'circleFit'
     #
     vxdtf = register_module('VXDTF')
-    vxdtf.logging.log_level = LogLevel.INFO
-    vxdtf.logging.debug_level = 1
+    # vxdtf.logging.log_level = LogLevel.INFO
+    vxdtf.logging.log_level = LogLevel.DEBUG
+    vxdtf.logging.debug_level = 5
     param_vxdtf = {  #   'artificialMomentum': 5.,
         'activateBaselineTF': baseLineTF,
         'tccMinState': [2],
@@ -96,15 +99,15 @@ def setup_vxdtf1T(
         'standardPdgCode': -11,
         'sectorSetup': secSetup,
         'calcQIType': qiType,
-        'killEventForHighOccupancyThreshold': 75,
-        'highOccupancyThreshold': 85,
+        'killEventForHighOccupancyThreshold': 125,
+        'highOccupancyThreshold': 1200,
         'cleanOverlappingSet': False,
         'filterOverlappingTCs': filterOverlaps,
         'TESTERexpandedTestingRoutines': False,
         'qiSmear': False,
         'smearSigma': 0.000001,
         'GFTrackCandidatesColName': candName,
-        'tuneCutoffs': 0.2,
+        'tuneCutoffs': 0.3,
         'activateDistanceXY': [False],
         'activateDistanceZ': [True],
         'activateDistance3D': [True],
@@ -113,7 +116,7 @@ def setup_vxdtf1T(
         'activateDeltaSlopeRZHioC': [False],
         'activateDistance2IPHioC': [False],
         'activatePTHioC': [False],
-        'activateHelixFitHioC': [False],
+        'activateHelixParameterFitHioC': [False],
         'activateDeltaPtHioC': [False],
         'activateDeltaDistance2IPHioC': [False],
         'activateAngles3D': [True],
@@ -122,7 +125,7 @@ def setup_vxdtf1T(
         'activateDeltaSlopeRZ': [False],
         'activateDistance2IP': [False],
         'activatePT': [False],
-        'activateHelixFit': [False],
+        'activateHelixParameterFit': [False],
         'activateZigZagXY': [False],
         'activateDeltaPt': [False],
         'activateCircleFit': [True],

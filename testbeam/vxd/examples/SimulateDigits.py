@@ -5,7 +5,7 @@
 # Its outpt can be directly used by Digits2Tracks.py like real data
 
 from basf2 import *
-from alignment_tools import *
+# from alignment_tools import *
 
 # Set the log level to show only warning, error and, fatal messages
 # otherwise there's gonna be a segfault when python exits
@@ -16,7 +16,7 @@ release = str(os.getenv('BELLE2_LOCAL_DIR')) + '/'
 #                  IMPORTANT SIMULATION SETTINGS
 # ----------------------------------------------------------------
 
-events = 50000
+events = 20
 event_tracks = 1
 
 momentum = 4.0  # GeV/c
@@ -48,7 +48,7 @@ eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [events], 'runList': [1]})
 
 # Set the custom alignment
-set_alignment = SetAlignment(release + 'data/' + geometry_file, alignment)
+# set_alignment = SetAlignment(release + 'data/' + geometry_file, alignment)
 
 # Load parameters from xml
 gearbox = register_module('Gearbox')
@@ -117,6 +117,7 @@ param_mctrackfinder = {
     'Smearing': 0,
     'UseClusters': False,
     'WhichParticles': ['primary'],
+    'GFTrackCandidatesColName': 'mcTracks',
     }
 mctf.param(param_mctrackfinder)
 mctf.logging.log_level = LogLevel.ERROR
@@ -135,7 +136,7 @@ progress = register_module('Progress')
 
 main = create_path()
 main.add_module(eventinfosetter)
-main.add_module(set_alignment)
+# main.add_module(set_alignment)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(particlegun)
@@ -152,10 +153,6 @@ main.add_module(mctf)
 # gbl.param('UseClusters', False)
 # gbl.param('enableIntermediateScatterer', True)
 # main.add_module(gbl)
-gf = register_module('GenFitterVXDTB')
-gf.logging.log_level = LogLevel.ERROR
-gf.param('UseClusters', False)
-main.add_module(gf)
 d = register_module('Display')
 d.param('fullGeometry', True)
 main.add_module(d)

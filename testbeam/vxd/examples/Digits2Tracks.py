@@ -14,7 +14,7 @@
 import sys
 from basf2 import *
 from setup_vxdtf import *
-from alignment_tools import *
+# from alignment_tools import *
 
 # Set the log level to show only warning, error and, fatal messages
 set_log_level(LogLevel.WARNING)
@@ -78,7 +78,7 @@ histo = register_module('HistoManager')
 histo.param('histoFileName', output_dqm)
 
 # Set the custom alignment
-set_alignment = SetAlignment(release + 'data/' + geometry_file, alignment)
+# set_alignment = SetAlignment(release + 'data/' + geometry_file, alignment)
 
 # Load parameters from xml
 gearbox = register_module('Gearbox')
@@ -144,9 +144,73 @@ telvxd_dqm = register_module('TelxVXD')
 
 # Track finding by VXDTF
 if PCMAG_ON:
-    VXDTF = setup_vxdtf1T('caTracks', sectormap)
+    VXDTF = setup_vxdtf1T('caTracks', sectormap, cellMinState=4)
 else:
-    VXDTF = setup_vxdtf('caTracks', sectormap)
+  # VXDTF = setup_vxdtf('caTracks', sectormap, cellMinState = 4)
+    qiType = 'straightLine'  # straightLine, circleFit
+    filterOverlaps = 'hopfield'
+
+    VXDTF = register_module('VXDTF')
+    VXDTF.logging.log_level = LogLevel.INFO
+    VXDTF.logging.debug_level = 2
+    param_vxdtf = {  # 7
+                     # 'activateAnglesXY': [True],  #### noMagnet
+                     # ### withMagnet
+                     # 'activateAnglesRZHioC': [True], #### noMagnet
+                     # ### withMagnet r51x
+                     # True
+        'activateBaselineTF': 0,
+        'debugMode': 0,
+        'tccMinState': [8],
+        'tccMinLayer': [7],
+        'reserveHitsThreshold': [0.],
+        'highestAllowedLayer': [7],
+        'telClustersName': '',
+        'standardPdgCode': -11,
+        'artificialMomentum': 4,
+        'sectorSetup': sectormap,
+        'calcQIType': qiType,
+        'killEventForHighOccupancyThreshold': 1250,
+        'highOccupancyThreshold': 70,
+        'cleanOverlappingSet': False,
+        'filterOverlappingTCs': filterOverlaps,
+        'TESTERexpandedTestingRoutines': True,
+        'qiSmear': False,
+        'smearSigma': 0.000001,
+        'GFTrackCandidatesColName': 'caTracks',
+        'tuneCutoffs': 0.2,
+        'activateDistanceXY': [False],
+        'activateDistance3D': [True],
+        'activateDistanceZ': [True],
+        'activateSlopeRZ': [False],
+        'activateNormedDistance3D': [False],
+        'activateAngles3D': [True],
+        'activateAnglesXY': [False],
+        'activateAnglesRZ': [False],
+        'activateDeltaSlopeRZ': [False],
+        'activateDistance2IP': [False],
+        'activatePT': [False],
+        'activateHelixParameterFit': [False],
+        'activateAngles3DHioC': [True],
+        'activateAnglesXYHioC': [True],
+        'activateAnglesRZHioC': [False],
+        'activateDeltaSlopeRZHioC': [False],
+        'activateDistance2IPHioC': [False],
+        'activatePTHioC': [False],
+        'activateHelixParameterFitHioC': [False],
+        'activateDeltaPtHioC': [False],
+        'activateDeltaDistance2IPHioC': [False],
+        'activateZigZagXY': [False],
+        'activateZigZagRZ': [False],
+        'activateDeltaPt': [False],
+        'activateCircleFit': [False],
+        }
+
+      # 'tuneCircleFit': [0.0000000001],
+      # 'tuneAngles3D': [0.1],
+      # 'tuneDistance3D': [0.1],
+      # 'tuneDistanceZ': [0.2],
+    VXDTF.param(param_vxdtf)
 
 # Track finding DQM
 vxdtfdqm = register_module('VXDTFDQM')
@@ -212,6 +276,13 @@ display.param('fullGeometry', True)
 display.param('GFTrackCandidatesColName', 'caTracks')
 display.param('options', 'DHMPS')
 
+# some additional output for the VXDTF
+TBAnalyzer = register_module('VXDTFTBAnalyzer')
+TBAnalyzer.param('nameContainerTCreference', 'caTracks')
+TBAnalyzer.param('nameContainerTCevaluate', 'caTracks')
+
+TBAnalyzer.logging.log_level = LogLevel.INFO
+
 # -----------------------------------------------
 #               Path construction
 # -----------------------------------------------
@@ -219,7 +290,7 @@ display.param('options', 'DHMPS')
 main = create_path()
 main.add_module(input)
 main.add_module(histo)
-main.add_module(set_alignment)
+# main.add_module(set_alignment)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(PXDDSort)
@@ -232,6 +303,7 @@ main.add_module(TelClust)
 main.add_module(tel_dqm)
 main.add_module(telvxd_dqm)
 main.add_module(VXDTF)
+main.add_module(TBAnalyzer)
 main.add_module(vxdtfdqm)
 main.add_module(trackfitter)
 main.add_module(tfdqm)

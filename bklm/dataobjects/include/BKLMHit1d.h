@@ -38,103 +38,67 @@ namespace Belle2 {
     //! Destructor
     virtual ~BKLMHit1d() {}
 
-    //! returns status word of this 1D hit
-    unsigned int getStatus() const { return m_Status; }
-
     //! returns flag whether this 1D hit is in RPC (true) or scintillator (false)
-    bool isInRPC() const { return ((m_Status & STATUS_INRPC) != 0); }
+    bool inRPC() const { return ((m_ModuleID & BKLM_INRPC_MASK) != 0); }
 
     //! returns end (TRUE=forward or FALSE=backward) of this 1D hit
-    bool isForward() const { return m_IsForward; }
+    bool isForward() const { return ((m_ModuleID & BKLM_END_MASK) != 0); }
 
     //! returns sector number (1..8) of this 1D hit
-    int getSector() const { return m_Sector; }
+    int getSector() const { return (((m_ModuleID & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1); }
 
     //! returns layer number (1..15) of this 1D hit
-    int getLayer() const { return m_Layer; }
+    int getLayer() const { return (((m_ModuleID & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1); }
 
-    //! returns layer number (1..15) of this 1D hit
-    bool isPhiReadout() const { return m_IsPhiReadout; }
-
-    //! returns lowest strip number of this 1D hit
-    int getStripMin() const { return m_StripMin; }
+    //! returns readout plane of this 1D hit
+    bool isPhiReadout() const { return ((m_ModuleID & BKLM_PLANE_MASK) != 0); }
 
     //! returns lowest strip number of this 1D hit
-    int getStripMax() const { return m_StripMax; }
+    int getStripMin() const { return (((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1); }
+
+    //! returns lowest strip number of this 1D hit
+    int getStripMax() const { return (((m_ModuleID & BKLM_MAXSTRIP_MASK) >> BKLM_MAXSTRIP_BIT) + 1); }
 
     //! returns average strip number of this 1D hit
-    double getStripAve() const { return m_StripAve; }
-
-    //! returns average strip uncertainty of this 1D hit
-    double getStripErr() const { return m_StripErr; }
+    float getStripAve() const;
 
     //! returns number of strips of this 1D hit
-    int getStripCount() const { return m_StripCount; }
+    int getStripCount() const;
 
     //! returns detector-module identifier
     int getModuleID() const { return m_ModuleID; }
 
     //! returns reconstructed hit time
-    double getTime() const { return m_Time; }
+    float getTime() const { return m_Time; }
 
     //! returns energy deposition
-    double getEDep() const { return m_EDep; }
-
-    //! sets status word
-    void setStatus(int status) { m_Status = status; }
-
-    //! sets some status bit(s)
-    void setStatusBits(unsigned int status) { m_Status |= status; }
-
-    //! clears status word (all bits)
-    void clearStatus(void) { m_Status = 0; }
-
-    //! clears some status bit(s)
-    void clearStatusBits(unsigned int status) { m_Status &= (~status); }
+    float getEDep() const { return m_EDep; }
 
   private:
 
-    //! status word
-    int m_Status;
-
-    //! axial end (true=forward or false=backward) of the 1D hit
-    bool m_IsForward;
-
-    //! sector number (1..8) of the 1D hit
-    int m_Sector;
-
-    //! layer number (1..15) of the 1D hit
-    int m_Layer;
-
-    //! phi-sensitive (true) or z-sensitive (false) strip(s)
-    bool m_IsPhiReadout;
-
-    //! unique detector-module identifier
+    //! detector-module identifier, internally calculated (see BKLMStatus)
+    //! bit 0      = end-1 [0..1]; forward is 0
+    //! bits 1-3   = sector-1 [0..7]
+    //! bits 4-7   = layer-1 [0..14]
+    //! bit 8      = plane-1 [0..1]; inner is 0 and phiReadout
+    //! bits 9-15  = strip-1 [0..95]
+    //! bits 16-22 = maxStrip-1 [0..95] for RPCs only
+    //! bit 23     = inRPC flag
+    //! bit 24     = MC-generated hit
+    //! bit 25     = MC decay-point hit
+    //! bit 26     = out-of-time hit (from BKLM hit reconstruction)
+    //! bit 27     = inefficient hit (from BKLM hit reconstruction)
+    //! bit 28     = pulse height above threshold (from BKLM scint hit reconstruction)
     int m_ModuleID;
 
-    //! lowest strip number of the 1D hit
-    int m_StripMin;
-
-    //! highest strip number of the 1D hit
-    int m_StripMax;
-
-    //! number of strip of the 1D hit
-    int m_StripCount;
-
-    //! average strip number of the 1D hit
-    double m_StripAve;
-
-    //! uncertainty in the average strip number of the 1D hit
-    double m_StripErr;
-
     //! reconstructed hit time (ns)
-    double m_Time;
+    float m_Time;
 
     //! reconstructed pulse height (MeV)
-    double m_EDep;
+    float m_EDep;
 
     //! Needed to make the ROOT object storable
-    ClassDef(BKLMHit1d, 2)
+    ClassDef(BKLMHit1d, 3)
 
   };
 

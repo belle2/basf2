@@ -75,7 +75,7 @@ void BKLMDigitizerModule::initialize()
   try {
     m_fitter = new EKLM::FPGAFitter(m_nDigitizations);
   } catch (std::bad_alloc& ba) {
-    B2FATAL("BKLMDigitizer:: Memory allocation error of FPGAFitter")
+    B2FATAL("Memory allocation error of FPGAFitter")
   }
 }
 
@@ -101,9 +101,9 @@ void BKLMDigitizerModule::event()
   std::map<int, std::vector<std::pair<int, BKLMSimHit*> > > volIDToSimHits;
   for (int h = 0; h < simHits.getEntries(); ++h) {
     BKLMSimHit* simHit = simHits[h];
-    if (simHit->isInRPC()) {
+    if (simHit->inRPC()) {
       indices.clear();
-      if (simHit->getStripMin() >= 0) {
+      if (simHit->getStripMin() > 0) {
         for (int s = simHit->getStripMin(); s <= simHit->getStripMax(); ++s) {
           BKLMDigit digit(simHit, s);
           for (d = 0; d < nDigit; ++d) {
@@ -120,7 +120,7 @@ void BKLMDigitizerModule::event()
       }
       simHitToDigit.add(h, indices);  // 1 RPC hit to many digits
     } else {
-      int volID = simHit->getModuleID() + simHit->getStrip();
+      int volID = simHit->getModuleID() & BKLM_MODULESTRIPID_MASK;
       std::map<int, std::vector<std::pair<int, BKLMSimHit*> > >::iterator it = volIDToSimHits.find(volID);
       if (it == volIDToSimHits.end()) {
         std::vector<std::pair<int, BKLMSimHit*> > firstHit(1, std::pair<int, BKLMSimHit*>(h, simHit));
@@ -159,7 +159,7 @@ void BKLMDigitizerModule::digitize(std::map<int, std::vector<std::pair<int, BKLM
     std::map<int, std::vector<BKLMSimHit*> > trackIDToSimHit;
     for (std::vector<std::pair<int, BKLMSimHit*> >::iterator iSimHit = iVolMap->second.begin(); iSimHit != iVolMap->second.end(); ++iSimHit) {
       simHitToDigit.add(iSimHit->first, d);
-      int trackID = (iSimHit->second)->getTrackID();
+      int trackID = 0; // DIVOT TrackID is not stored anymore (iSimHit->second)->getTrackID();
       std::map <int, std::vector<BKLMSimHit*> >::iterator iTrackMap = trackIDToSimHit.find(trackID);
       if (iTrackMap == trackIDToSimHit.end()) {
         trackIDToSimHit.insert(std::pair<int, std::vector<BKLMSimHit*> >(trackID, std::vector<BKLMSimHit*>(1, iSimHit->second)));
@@ -184,7 +184,7 @@ void BKLMDigitizerModule::digitize(std::map<int, std::vector<std::pair<int, BKLM
     digit->setSimNPixel(m_npe);
     digit->setNPixel(m_PEAttenuationFreq * m_FPGAParams.amplitude
                      * (0.5 * m_FPGAParams.peakTime + 1.0 / m_FPGAParams.attenuationFreq));
-    digit->isGood(m_npe > m_discriminatorThreshold);
+    digit->isAboveThreshold(m_npe > m_discriminatorThreshold);
 
   } // end of loop over VolIDToSimHit map
 
@@ -218,7 +218,7 @@ enum EKLM::FPGAFitStatus BKLMDigitizerModule::processEntry(std::vector<std::pair
 
     simHit = iHit->second;
     // calculate distance
-    double local_pos = simHit->getLocalPosition().x();
+    double local_pos = simHit->getLocalPositionX();
     m_hitDistDirect = half_len - local_pos;
     m_hitDistReflected = 3.0 * half_len + local_pos;
 

@@ -25,16 +25,6 @@ BKLMDigit::BKLMDigit() : RelationsObject()
 //! Constructor with initial values for an RPC hit
 BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
   RelationsObject(),
-  m_Status(simHit->getStatus()),
-  m_PDG(simHit->getPDG()),
-  m_IsForward(simHit->isForward()),
-  m_Sector(simHit->getSector()),
-  m_Layer(simHit->getLayer()),
-  m_IsPhiReadout(simHit->isPhiReadout()),
-  m_Strip(strip),
-  m_ModuleID(simHit->getModuleID()),
-  m_SimGlobalPosition(simHit->getGlobalPosition()),
-  m_SimLocalPosition(simHit->getLocalPosition()),
   m_SimTime(simHit->getTime()),
   m_Time(m_SimTime),
   m_SimEDep(simHit->getEDep()),
@@ -43,21 +33,15 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
   m_NPixel(0.0),
   m_FitStatus(0)
 {
+  m_ModuleID = simHit->getModuleID() & ~(BKLM_STRIP_MASK | BKLM_MAXSTRIP_MASK);
+  m_ModuleID |= ((strip - 1) << BKLM_STRIP_BIT);
+  m_ModuleID |= ((strip - 1) << BKLM_MAXSTRIP_BIT);
 }
 
 //! Constructor with initial values for a scint hit
 BKLMDigit::BKLMDigit(const BKLMSimHit* simHit) :
   RelationsObject(),
-  m_Status(simHit->getStatus()),
-  m_PDG(simHit->getPDG()),
-  m_IsForward(simHit->isForward()),
-  m_Sector(simHit->getSector()),
-  m_Layer(simHit->getLayer()),
-  m_IsPhiReadout(simHit->isPhiReadout()),
-  m_Strip(simHit->getStrip()),
   m_ModuleID(simHit->getModuleID()),
-  m_SimGlobalPosition(simHit->getGlobalPosition()),
-  m_SimLocalPosition(simHit->getLocalPosition()),
   m_SimTime(simHit->getTime()),
   m_Time(m_SimTime),
   m_SimEDep(simHit->getEDep()),
@@ -68,20 +52,10 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit) :
 {
 }
 
-
 //! Copy constructor
 BKLMDigit::BKLMDigit(const BKLMDigit& digit) :
   RelationsObject(digit),
-  m_Status(digit.m_Status),
-  m_PDG(digit.m_PDG),
-  m_IsForward(digit.m_IsForward),
-  m_Sector(digit.m_Sector),
-  m_Layer(digit.m_Layer),
-  m_IsPhiReadout(digit.m_IsPhiReadout),
-  m_Strip(digit.m_Strip),
   m_ModuleID(digit.m_ModuleID),
-  m_SimGlobalPosition(digit.m_SimGlobalPosition),
-  m_SimLocalPosition(digit.m_SimLocalPosition),
   m_SimTime(digit.m_SimTime),
   m_Time(digit.m_Time),
   m_SimEDep(digit.m_SimEDep),

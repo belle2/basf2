@@ -67,7 +67,7 @@ void BKLMReconstructorModule::initialize()
 void BKLMReconstructorModule::beginRun()
 {
   StoreObjPtr<EventMetaData> evtMetaData;
-  B2INFO("BKLMReconstructorModule::beginRun(): experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun())
+  B2INFO("Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun())
 }
 
 void BKLMReconstructorModule::event()
@@ -80,7 +80,7 @@ void BKLMReconstructorModule::event()
   std::map<int, int> volIDToDigits;
   for (int d = 0; d < digits.getEntries(); ++d) {
     BKLMDigit* digit = digits[d];
-    volIDToDigits.insert(std::pair<int, int>(digit->getModuleID() + digit->getStrip(), d));
+    volIDToDigits.insert(std::pair<int, int>(digit->getModuleID() & BKLM_MODULESTRIPID_MASK, d));
   }
   if (volIDToDigits.empty()) return;
 
@@ -116,11 +116,11 @@ void BKLMReconstructorModule::event()
   RelationArray hit2dToHit1d(hit2ds, hit1ds);
 
   for (int i = 0; i < hit1ds.getEntries(); ++i) {
-    int moduleID = hit1ds[i]->getModuleID() & ~MODULE_PLANE_MASK;
+    int moduleID = hit1ds[i]->getModuleID() & BKLM_MODULEID_MASK;
     bool isPhiReadout = hit1ds[i]->isPhiReadout();
     double time = hit1ds[i]->getTime();
-    for (int j = i; j < hit1ds.getEntries(); ++j) {
-      if (moduleID != (hit1ds[j]->getModuleID() & ~MODULE_PLANE_MASK)) continue;
+    for (int j = i + 1; j < hit1ds.getEntries(); ++j) {
+      if (moduleID != (hit1ds[j]->getModuleID() & BKLM_MODULEID_MASK)) continue;
       if (isPhiReadout == hit1ds[j]->isPhiReadout()) continue;
       if (std::fabs(time - hit1ds[j]->getTime()) > m_dtMax) continue;
       BKLMHit2d* hit2d = new(hit2ds.nextFreeAddress()) BKLMHit2d(hit1ds[i], hit1ds[j]);

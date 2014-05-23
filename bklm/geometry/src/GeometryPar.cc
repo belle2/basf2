@@ -27,7 +27,7 @@ namespace Belle2 {
     GeometryPar* GeometryPar::instance(void)
     {
       if (m_Instance) return m_Instance;
-      B2FATAL("GeometryPar::getInstance() called without initialization")
+      B2FATAL("getInstance() called without initialization")
       return NULL;  // never reached
     }
 
@@ -172,9 +172,9 @@ namespace Belle2 {
             m_PhiScintsOffsetSign[layer] = layerContent.getInt("PhiScintillators/OffsetSign", 1.0);
             m_ZScintsOffsetSign[layer] = layerContent.getInt("ZScintillators/OffsetSign", 1.0);
             Hep3Vector localOrigin(getActiveMiddleRadius(layer), 0.0, m_ModuleFrameThickness);
-            int moduleID = (isForward ? 0 : MODULE_END_MASK)
-                           + ((sector - 1) << MODULE_SECTOR_BIT)
-                           + ((layer - 1) << MODULE_LAYER_BIT);
+            int moduleID = (isForward ? BKLM_END_MASK : 0)
+                           | ((sector - 1) << BKLM_SECTOR_BIT)
+                           | ((layer - 1) << BKLM_LAYER_BIT);
             if (m_HasRPCs[layer]) {
               int phiStripNumber = layerContent.getInt("PhiStrips/NStrips");
               localOrigin.setZ(localOrigin.z() + m_ModuleGasSpacerWidth);
@@ -415,19 +415,18 @@ namespace Belle2 {
 
     const Module* GeometryPar::findModule(bool isForward, int sector, int layer) const
     {
-      int moduleID = (isForward ? 0 : MODULE_END_MASK)
-                     + ((sector - 1) << MODULE_SECTOR_BIT)
-                     + ((layer - 1) << MODULE_LAYER_BIT);
+      int moduleID = (isForward ? BKLM_END_MASK : 0)
+                     | ((sector - 1) << BKLM_SECTOR_BIT)
+                     | ((layer - 1) << BKLM_LAYER_BIT);
       map<int, Module*>::const_iterator iM = m_Modules.find(moduleID);
       return (iM == m_Modules.end() ? NULL : iM->second);
     }
 
     const Module* GeometryPar::findModule(int layer, bool hasChimney) const
     {
-      int moduleID = ((layer - 1) << MODULE_LAYER_BIT);
-      if (hasChimney) {
-        // Chimney module is in backward sector 3
-        moduleID += MODULE_END_MASK + ((3 - 1) << MODULE_SECTOR_BIT);
+      int moduleID = ((layer - 1) << BKLM_LAYER_BIT);
+      if (hasChimney) { // Chimney module is in backward sector 3
+        moduleID |= ((3 - 1) << BKLM_SECTOR_BIT);
       }
       map<int, Module*>::const_iterator iM = m_Modules.find(moduleID);
       return (iM == m_Modules.end() ? NULL : iM->second);

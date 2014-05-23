@@ -13,12 +13,11 @@
 
 #include <simulation/dataobjects/SimHitBase.h>
 #include <TVector3.h>
-#include <TLorentzVector.h>
 #include <framework/datastore/RelationsObject.h>
 #include <bklm/dataobjects/BKLMStatus.h>
 
-#define BKLM_INNER 1
-#define BKLM_OUTER 2
+//#define BKLM_INNER 1
+//#define BKLM_OUTER 2
 
 namespace Belle2 {
 
@@ -31,8 +30,7 @@ namespace Belle2 {
     BKLMSimHit();
 
     //! Constructor with initial values (from simulation step)
-    BKLMSimHit(unsigned int, int, int, int, bool, int, int, bool, int, int,
-               const TVector3&, const TVector3&, double, double, const TVector3&, double, double);
+    BKLMSimHit(int, double, double, double);
 
     //! Destructor
     virtual ~BKLMSimHit() {}
@@ -40,138 +38,76 @@ namespace Belle2 {
     //! Copy constructor
     BKLMSimHit(const BKLMSimHit&);
 
-    //! returns status word
-    unsigned int getStatus() const { return m_Status; }
-
     //! returns true if this hit is in an RPC
-    bool isInRPC() const { return ((m_Status & STATUS_INRPC) != 0); }
-
-    //! returns PDG code of leading particle
-    unsigned int getPDG() const { return m_PDG; }
-
-    //! returns GEANT4 track ID of leading particle
-    unsigned int getTrackID() const { return m_TrackID; }
-
-    //! returns GEANT4 track ID of parent particle
-    unsigned int getParentID() const { return m_ParentID; }
+    bool inRPC() const { return ((m_ModuleID & BKLM_INRPC_MASK) != 0); }
 
     //! returns axial end (TRUE=forward or FALSE=backward) of this hit
-    bool isForward() const { return m_IsForward; }
+    bool isForward() const { return ((m_ModuleID & BKLM_END_MASK) != 0); }
 
     //! returns sector number of this hit
-    int getSector() const { return m_Sector; }
+    int getSector() const { return (((m_ModuleID & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1); }
 
     //! returns layer number of this hit
-    int getLayer() const { return m_Layer; }
+    int getLayer() const { return (((m_ModuleID & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1); }
 
     //! returns plane (0=inner or 1=outer) of this hit
-    int getPlane() const { return (m_IsPhiReadout ? BKLM_INNER : BKLM_OUTER); }
+    //int getPlane() const { return (((m_ModuleID & BKLM_PLANE_MASK) != 0) ? BKLM_INNER : BKLM_OUTER); }
 
     //! returns readout-coordinate (TRUE=phi, FALSE=z) of this hit
-    bool isPhiReadout() const { return m_IsPhiReadout; }
+    bool isPhiReadout() const { return ((m_ModuleID & BKLM_PLANE_MASK) != 0); }
 
     //! returns unique readout strip number of this hit (assumes one hit)
-    int getStrip() const { return m_StripMin; }
+    int getStrip() const { return (((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1); }
 
     //! returns lowest readout strip number of this hit
-    int getStripMin() const { return m_StripMin; }
+    int getStripMin() const { return (((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1); }
 
     //! returns highest readout strip number of this hit
-    int getStripMax() const { return m_StripMax; }
+    int getStripMax() const { return (((m_ModuleID & BKLM_MAXSTRIP_MASK) >> BKLM_MAXSTRIP_BIT) + 1); }
 
     //! returns unique detector-module identifier
-    unsigned int getModuleID() const { return m_ModuleID; }
+    int getModuleID() const { return m_ModuleID; }
 
-    //! returns global position of the hit
-    TVector3 getGlobalPosition() const { return m_GlobalPosition; }
+    //! **DUMMY** returns global position of the hit (for EVEVisualization.cc)
+    TVector3 getHitPosition() const { return TVector3(); }
 
-    //! returns global position of the hit (alias for EVEVisualization.cc)
-    TVector3 getHitPosition() const { return m_GlobalPosition; }
-
-    //! returns local position of the hit
-    TVector3 getLocalPosition() const { return m_LocalPosition; }
+    //! returns x coordinate of the local position of the hit (for time-of-propagation)
+    float getLocalPositionX() const { return m_LocalX; }
 
     //! returns the event hit time
-    double getTime() const { return m_Time; }
+    double getTime() const { return (double)m_Time; }
 
     //! returns energy deposition
-    double getEDep() const { return m_EDep; }
-
-    //! returns momentum of throughgoing particle
-    TVector3 getMomentum() const { return m_Momentum; }
-
-    //! returns total energy of throughgoing particle
-    double getEnergy() const { return m_Energy; }
-
-    //! returns kinetic energy of throughgoing particle
-    double getKineticEnergy() const { return m_KineticEnergy; }
+    double getEDep() const { return (double)m_EDep; }
 
     //! increase energy deposition
     void increaseEDep(double eDep) { m_EDep += eDep; }
 
   private:
 
-    //! status word
-    unsigned int m_Status;
-
-    //! PDG code of leading particle
-    int m_PDG;
-
-    //! GEANT4 track identifier
-    int m_TrackID;
-
-    //! GEANT4 parent-track identifier
-    int m_ParentID;
-
-    //! axial end (TRUE=forward or FALSE=backward) of the hit
-    bool m_IsForward;
-
-    //! sector number of the hit
-    int m_Sector;
-
-    //! layer number of the hit
-    int m_Layer;
-
-    //! readout-coordinate (TRUE=phi, FALSE=z) of this hit
-    bool m_IsPhiReadout;
-
-    //! lowest readout strip number for this hit
-    int m_StripMin;
-
-    //! highest readout strip number for this hit
-    int m_StripMax;
-
-    //! detector-module identifier, internally calculated
-    //! bits 0-5   = 0; reserved bits for strip identifier
-    //! bit 6      = plane-1 [0..1]; inner is 0 and phiReadout
-    //! bits 7-10  = layer-1 [0..14]
-    //! bits 11-13 = sector-1 [0..7]
-    //! bit 14     = end-1 [0..1]; forward is 0
+    //! detector-module identifier, internally calculated (see BKLMStatus)
+    //! bit 0      = end-1 [0..1]; forward is 0
+    //! bits 1-3   = sector-1 [0..7]
+    //! bits 4-7   = layer-1 [0..14]
+    //! bit 8      = plane-1 [0..1]; inner is 0 and phiReadout
+    //! bits 9-15  = strip-1 [0..95]
+    //! bits 16-22 = maxStrip-1 [0..95] for RPCs only
+    //! bit 23     = inRPC flag
+    //! bit 24     = MC-generated hit
+    //! bit 25     = MC decay-point hit
     int m_ModuleID;
 
-    //! global-coordinates hit position (cm)
-    TVector3 m_GlobalPosition;
-
-    //! local-coordinates hit position (cm)
-    TVector3 m_LocalPosition;
-
     //! event hit time (ns)
-    double m_Time;
+    float m_Time;
 
     //! energy deposition (MeV)
-    double m_EDep;
+    float m_EDep;
 
-    //! momentum (MeV/c) of throughgoing particle
-    TVector3 m_Momentum;
-
-    //! total energy (MeV) of throughgoing particle
-    double m_Energy;
-
-    //! kinetic energy (MeV) of throughgoing particle
-    double m_KineticEnergy;
+    //! local x coordinate of hit position (cm) for time-of-propagation
+    float m_LocalX;
 
     //! Needed to make the ROOT object storable
-    ClassDef(BKLMSimHit, 2);
+    ClassDef(BKLMSimHit, 3);
 
   };
 

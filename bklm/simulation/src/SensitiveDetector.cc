@@ -14,6 +14,7 @@
 #include <bklm/geometry/GeometryPar.h>
 #include <bklm/geometry/Module.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
+#include <bklm/dataobjects/BKLMSimHitPosition.h>
 #include <bklm/dataobjects/BKLMStatus.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -54,10 +55,13 @@ namespace Belle2 {
       m_SimPar = NULL;  // dummy initializer
       StoreArray<MCParticle> particles;
       StoreArray<BKLMSimHit> simHits;
+      StoreArray<BKLMSimHitPosition> simHitPositions;
       RelationArray particleToSimHits(particles, simHits);
       registerMCParticleRelation(particleToSimHits);
       StoreArray<BKLMSimHit>::registerPersistent();
+      StoreArray<BKLMSimHitPosition>::registerPersistent();
       RelationArray::registerPersistent<MCParticle, BKLMSimHit>();
+      RelationArray::registerPersistent<BKLMSimHitPosition, BKLMSimHit>();
     }
 
     //-----------------------------------------------------
@@ -72,17 +76,20 @@ namespace Belle2 {
         m_GeoPar = GeometryPar::instance();
         m_SimPar = SimulationPar::instance();
         if (!(m_SimPar->isValid())) {
-          B2FATAL("BKLM SensitiveDetector: simulation-control parameters are not available from module BKLMParamLoader")
+          B2FATAL("Simulation-control parameters are not available from module BKLMParamLoader")
         }
         m_HitTimeMax = m_SimPar->getHitTimeMax();
         m_DoBackgroundStudy = m_SimPar->getDoBackgroundStudy();
         m_NeutronPDG = G4Neutron::Definition()->GetPDGEncoding(); // =2112
-        if (!gRandom) B2FATAL("BKLM SensitiveDetector: gRandom is not initialized; please set up gRandom first");
+        if (!gRandom) B2FATAL("gRandom is not initialized; please set up gRandom first");
       }
       StoreArray<BKLMSimHit> simHits;
       if (!simHits.isValid()) simHits.create();
+      StoreArray<BKLMSimHitPosition> simHitPositions;
+      if (!simHitPositions.isValid()) simHitPositions.create();
       StoreArray<MCParticle> particles;
       RelationArray particleToSimHits(particles, simHits);
+      RelationArray positionToSimHits(simHitPositions, simHits);
 
       // It is not necessary to detect motion from one volume to another (or track death
       // in the RPC gas volume).  Experimentation shows that most tracks pass through the
@@ -104,54 +111,56 @@ namespace Belle2 {
         const G4VTouchable* hist = preStep->GetTouchable();
         int baseDepth = hist->GetHistoryDepth() - DEPTH_RPC;
         if ((baseDepth < 0) || (baseDepth > DEPTH_SCINT - DEPTH_RPC)) {
-          B2WARNING("BKLM::SensitiveDetector::step():  Touchable History baseDepth = " << baseDepth + DEPTH_RPC << " (should be 9=RPC or 10=scint)")
+          B2WARNING("Touchable History baseDepth = " << baseDepth + DEPTH_RPC << " (should be 9=RPC or 10=scint)")
           return false;
         }
         int plane = hist->GetCopyNumber(baseDepth);
         int layer = hist->GetCopyNumber(baseDepth + 4);
         int sector = hist->GetCopyNumber(baseDepth + 6);
         bool isForward = (hist->GetCopyNumber(baseDepth + 7) == BKLM_FORWARD);
+        int moduleID = (isForward ? BKLM_END_MASK : 0)
+                       | ((sector - 1) << BKLM_SECTOR_BIT)
+                       | ((layer - 1) << BKLM_LAYER_BIT)
+                       | BKLM_MC_MASK;
         const CLHEP::Hep3Vector mom = 0.5 * (preStep->GetMomentum() + postStep->GetMomentum());  // GEANT4: in MeV/c
         const TVector3 momentum(mom.x(), mom.y(), mom.z());
-        double energy = 0.5 * (preStep->GetTotalEnergy() + postStep->GetTotalEnergy());  // GEANT4: in MeV
-        double kineticEnergy = 0.5 * (preStep->GetKineticEnergy() + postStep->GetKineticEnergy());  // GEANT4: in MeV
         double time = 0.5 * (preStep->GetGlobalTime() + postStep->GetGlobalTime());  // GEANT4: in ns
         const CLHEP::Hep3Vector gHitPos = 0.5 * (preStep->GetPosition() + postStep->GetPosition()) / cm; // in cm
         const Module* m = m_GeoPar->findModule(isForward, sector, layer);
         const CLHEP::Hep3Vector lHitPos = m->globalToLocal(gHitPos);
-        const TVector3 globalPos(gHitPos.x(), gHitPos.y(), gHitPos.z());
-        const TVector3 localPos(lHitPos.x(), lHitPos.y(), lHitPos.z());
-        unsigned int status = STATUS_MC;
         if (postStep->GetProcessDefinedStep() != 0) {
-          if (postStep->GetProcessDefinedStep()->GetProcessType() == fDecay) { status |= STATUS_DECAYED; }
+          if (postStep->GetProcessDefinedStep()->GetProcessType() == fDecay) { moduleID |= BKLM_DECAYED_MASK; }
         }
         int trackID = track->GetTrackID();
-        int parentID = track->GetParentID();
         if (baseDepth == 0) {
-          status |= STATUS_INRPC;
+          moduleID |= BKLM_INRPC_MASK;
           int phiStripLower = -1;
           int phiStripUpper = -1;
           int zStripLower = -1;
           int zStripUpper = -1;
           convertHitToRPCStrips(lHitPos, m, phiStripLower, phiStripUpper, zStripLower, zStripUpper);
-          if (phiStripLower >= 0) {
-            new(simHits.nextFreeAddress())
-            BKLMSimHit(status, pdg, trackID, parentID, isForward, sector, layer, true, phiStripLower, phiStripUpper,
-                       globalPos, localPos, time, eDep, momentum, energy, kineticEnergy);
+          if (zStripLower > 0) {
+            int moduleIDZ = moduleID | ((zStripLower - 1) << BKLM_STRIP_BIT) | ((zStripUpper - 1) << BKLM_MAXSTRIP_BIT);
+            new(simHits.nextFreeAddress()) BKLMSimHit(moduleIDZ, 0.0, time, eDep);
             particleToSimHits.add(trackID, simHits.getEntries() - 1);
+            new(simHitPositions.nextFreeAddress()) BKLMSimHitPosition(gHitPos.x(), gHitPos.y(), gHitPos.z());
+            positionToSimHits.add(simHitPositions.getEntries() - 1, simHits.getEntries() - 1);
           }
-          if (zStripLower >= 0) {
-            new(simHits.nextFreeAddress())
-            BKLMSimHit(status, pdg, trackID, parentID, isForward, sector, layer, false, zStripLower, zStripUpper,
-                       globalPos, localPos, time, eDep, momentum, energy, kineticEnergy);
+          if (phiStripLower > 0) {
+            moduleID |= ((phiStripLower - 1) << BKLM_STRIP_BIT) | ((phiStripUpper - 1) << BKLM_MAXSTRIP_BIT) | BKLM_PLANE_MASK;
+            new(simHits.nextFreeAddress()) BKLMSimHit(moduleID, 0.0, time, eDep);
             particleToSimHits.add(trackID, simHits.getEntries() - 1);
+            new(simHitPositions.nextFreeAddress()) BKLMSimHitPosition(gHitPos.x(), gHitPos.y(), gHitPos.z());
+            positionToSimHits.add(simHitPositions.getEntries() - 1, simHits.getEntries() - 1);
           }
         } else {
           int scint = hist->GetCopyNumber(0);
-          new(simHits.nextFreeAddress())
-          BKLMSimHit(status, pdg, trackID, parentID, isForward, sector, layer, (plane == BKLM_INNER), scint, scint,
-                     globalPos, localPos, time, eDep, momentum, energy, kineticEnergy);
+          moduleID |= ((scint - 1) << BKLM_STRIP_BIT) | ((scint - 1) << BKLM_MAXSTRIP_BIT);
+          if (plane == BKLM_INNER) moduleID |= BKLM_PLANE_MASK;
+          new(simHits.nextFreeAddress()) BKLMSimHit(moduleID, lHitPos.x(), time, eDep);
           particleToSimHits.add(trackID, simHits.getEntries() - 1);
+          new(simHitPositions.nextFreeAddress()) BKLMSimHitPosition(gHitPos.x(), gHitPos.y(), gHitPos.z());
+          positionToSimHits.add(simHitPositions.getEntries() - 1, simHits.getEntries() - 1);
         }
         return true;
       }

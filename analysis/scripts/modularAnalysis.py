@@ -27,10 +27,8 @@ def inputMdstList(filelist, path=analysis_main):
 
 
 def outputMdst(filename, path=analysis_main):
-    rooutput = register_module('RootOutput')
-    rooutput.param('outputFileName', filename)
-    rooutput.set_name('RootOutput_' + filename)
-    path.add_module(rooutput)
+    import reconstruction
+    reconstruction.add_mdst_output(path, mc=True, filename=filename)
 
 
 def generateY4S(noEvents, decayTable, path=analysis_main):

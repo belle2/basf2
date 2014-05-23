@@ -237,7 +237,8 @@ if useEvtGen:
 else:
   ## folgende Module nur für pGun:
     main.add_module(particlegun)
-    main.add_module(particlegun2)
+    if addBG:
+        main.add_module(particlegun2)
 
 main.add_module(g4sim)
 if addBG:

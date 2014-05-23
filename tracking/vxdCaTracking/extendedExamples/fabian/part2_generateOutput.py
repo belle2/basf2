@@ -175,8 +175,8 @@ exportXML.logging.log_level = LogLevel.DEBUG
 exportXML.logging.debug_level = 30
 exportXML.param('rootFileName', setupFileName)
 exportXML.param('stretchFactor', [0, 0])  # first for small quantiles, second for normal ones
-exportXML.param('sampleThreshold', [1, 10])  # first for small quantiles, second for normal ones
-exportXML.param('sampleQuantiles', [0, 1])  # first for min, second for max
+exportXML.param('sampleThreshold', [10, 1000])  # first for small quantiles, second for normal ones
+exportXML.param('sampleQuantiles', [0.001, 0.999])  # first for min, second for max
 exportXML.param('smallSampleQuantiles', [0, 1])  # first for min, second for max
 
 eventCounter = register_module('EventCounter')

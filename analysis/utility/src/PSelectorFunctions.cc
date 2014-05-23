@@ -819,21 +819,20 @@ namespace Belle2 {
     REGISTER_VARIABLE("NB_prid_ARICH", NeuroBayesifyARICH<particleProtonARICHId>, "proton identification probability from ARICH (returns -999 when not available)");
 
     VARIABLE_GROUP("MC Matching");
-    REGISTER_VARIABLE("chiProb", particlePvalue, "chi^2 probability of the fit");
-    REGISTER_VARIABLE("nDaughters", particleNDaughters, "number of daughter particles");
-    REGISTER_VARIABLE("flavor", particleFlavorType, "flavor type of decay (0=unflavored, 1=flavored)");
-
-    VARIABLE_GROUP("MC Matching");
     REGISTER_VARIABLE("isSignal", isSignal,               "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
     REGISTER_VARIABLE("mcPDG",    particleMCMatchPDGCode, "The PDG code of matched MCParticle");
-    REGISTER_VARIABLE("abs_mcPDG",    particleAbsMCMatchPDGCode, "The absolute PDG code of matched MCParticle");
-    REGISTER_VARIABLE("mcStatus", particleMCMatchStatus,  "The bit pattern indicating the quality of MC match");
+    REGISTER_VARIABLE("abs_mcPDG", particleAbsMCMatchPDGCode, "The absolute PDG code of matched MCParticle");
+    REGISTER_VARIABLE("mcStatus", particleMCMatchStatus,  "The bit pattern indicating the quality of MC match (see MCMatching::MCMatchStatus)");
 
     VARIABLE_GROUP("Rest Of Event");
     REGISTER_VARIABLE("nROETracks",  nROETracks,  "number of remaining tracks as given by the related RestOfEvent object");
     REGISTER_VARIABLE("nROEClusters", nROEClusters, "number of remaining ECL clusters as given by the related RestOfEvent object");
 
     VARIABLE_GROUP("Miscellaneous");
+    REGISTER_VARIABLE("chiProb", particlePvalue, "chi^2 probability of the fit");
+    REGISTER_VARIABLE("nDaughters", particleNDaughters, "number of daughter particles");
+    REGISTER_VARIABLE("flavor", particleFlavorType, "flavor type of decay (0=unflavored, 1=flavored)");
+
     REGISTER_VARIABLE("pRecoil",  recoilMomentum,    "magnitude of 3-momentum recoiling against given Particle");
     REGISTER_VARIABLE("eRecoil",  recoilEnergy,      "energy recoiling against given Particle");
     REGISTER_VARIABLE("mRecoil",  recoilMass,        "invariant mass of the system recoiling against given Particle");

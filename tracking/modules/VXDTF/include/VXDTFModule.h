@@ -560,6 +560,8 @@ namespace Belle2 {
 
     std::string m_PARAMcalcQIType; /**< allows you to chose the way, the QI's of the TC's shall be calculated. currently supported: 'kalman','trackLength', 'circleFit' */
     int m_calcQiType; /**< is set by m_PARAMcalcQIType and defines which qi type shall be calculated */
+    std::string m_PARAMcalcSeedType; /**< allows you to chose the way, the seed-mometa of the TC's shall be calculated. currently supported: 'helixFit', 'straightLine' */
+    int m_calcSeedType; /**< is set by m_PARAMcalcSeedType and defines which seed type shall be calculated */
     std::string m_PARAMgfTrackCandsColName;       /**< TrackCandidates collection name */
     std::string m_PARAMinfoBoardName;             /**< InfoContainer collection name */
     std::string m_PARAMpxdClustersName;         /** name of storeArray containing pxd clusters */

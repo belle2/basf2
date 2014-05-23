@@ -310,6 +310,7 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("smearSigma", m_PARAMsmearSigma, " when qiSmear = True, degree of perturbation can be set here", double(0.0001));
 
   addParam("calcQIType", m_PARAMcalcQIType, "allows you to chose the way, the QI's of the TC's shall be calculated. currently supported: 'kalman','trackLength', 'circleFit', 'straightLine'", string("circleFit"));
+  addParam("calcSeedType", m_PARAMcalcSeedType, "allows you to chose the way, the seed-mometa of the TC's shall be calculated. currently supported: 'helixFit', 'straightLine'", string("helixFit"));
   addParam("filterOverlappingTCs", m_PARAMfilterOverlappingTCs, "allows you to chose the which technique shall be used for filtering overlapping TCs, currently supported: 'hopfield', 'greedy', 'none'", string("hopfield"));
   addParam("storeBrokenQI", m_PARAMstoreBrokenQI, "if true, TC survives QI-calculation-process even if fit was not possible", bool(true));
   addParam("KFBackwardFilter", m_KFBackwardFilter, "determines whether the kalman filter moves inwards or backwards, 'True' means inwards", bool(false));
@@ -403,6 +404,17 @@ void VXDTFModule::initialize()
   } else {
     B2WARNING(m_PARAMnameOfInstance << "::initialize: chosen qiType '" << m_PARAMcalcQIType << "' is unknown, setting standard to circleFit...")
     m_calcQiType = 2;
+  }
+
+  if (m_PARAMcalcSeedType == "helixFit") {
+    B2DEBUG(1, m_PARAMnameOfInstance << "::initialize: chosen calcSeedType is '" << m_PARAMcalcSeedType << "'")
+    m_calcSeedType = 0;
+  } else if (m_PARAMcalcSeedType == "straightLine") {
+    B2DEBUG(1, m_PARAMnameOfInstance << "::initialize: chosen calcSeedType is '" << m_PARAMcalcSeedType << "'")
+    m_calcSeedType = 1;
+  } else {
+    B2WARNING(m_PARAMnameOfInstance << "::initialize: chosen seedType '" << m_PARAMcalcSeedType << "' is unknown, setting standard to helixFit...")
+    m_calcSeedType = 0;
   }
 
   if (m_PARAMfilterOverlappingTCs == "hopfield") {
@@ -2264,7 +2276,7 @@ void VXDTFModule::endRun()
   string lineHigh = "------------------------------------------------------------------------------------------";
   string lineApnd = "--------------------------";
   B2DEBUG(1, lineHigh << lineApnd << lineApnd)
-  B2DEBUG(1, m_PARAMnameOfInstance << " settings: number of passes: " << m_passSetupVector.size() << ", tuneCutoffs: " << m_PARAMtuneCutoffs << ", QIfilterMode: " << m_PARAMcalcQIType << ", filterOverlappingTCs: " << m_PARAMfilterOverlappingTCs << ", chosen settings: ")
+  B2DEBUG(1, m_PARAMnameOfInstance << " settings: number of passes: " << m_passSetupVector.size() << ", tuneCutoffs: " << m_PARAMtuneCutoffs << ", QIfilterMode: " << m_PARAMcalcQIType << ", way to calc Seed: " << m_PARAMcalcSeedType << ", filterOverlappingTCs: " << m_PARAMfilterOverlappingTCs << ", chosen settings: ")
   stringstream infoStuff2, secInfo;
 
   B2DEBUG(1, lineHigh << lineApnd << lineApnd)
@@ -4519,6 +4531,7 @@ void VXDTFModule::calcInitialValues4TCs(PassData* currentPass)
 {
   int pdgCode;
   pair<TVector3, int> seedValue; // first is momentum vector, second is signCurvature
+  pair<double, TVector3> returnValues; // first is chi2, second is momentum vector
 
   for (VXDTFTrackCandidate * aTC : currentPass->tcVector) {
 
@@ -4526,10 +4539,20 @@ void VXDTFModule::calcInitialValues4TCs(PassData* currentPass)
 
     const vector<PositionInfo*>* currentHits = aTC->getPositionInfos();
 
-    currentPass->trackletFilterBox.resetValues(currentHits);
-    seedValue = currentPass->trackletFilterBox.calcMomentumSeed(m_KFBackwardFilter, m_PARAMartificialMomentum);
+    if (m_calcSeedType == 0) { // helixFit
+      currentPass->trackletFilterBox.resetValues(currentHits);
+      seedValue = currentPass->trackletFilterBox.calcMomentumSeed(m_KFBackwardFilter, m_PARAMartificialMomentum);
+      pdgCode = seedValue.second * m_PARAMpdGCode * m_chargeSignFactor;
+    } else if (m_calcSeedType == 1) {
+      returnValues = currentPass->trackletFilterBox.simpleLineFit3D(currentHits, m_KFBackwardFilter, m_PARAMartificialMomentum);
+      pdgCode = m_PARAMpdGCode;
+      seedValue.first = returnValues.second; // storing the momentum vector at the right place
+    } else {
+      B2WARNING("calcInitialValues4TCs: unknown seedCalculating type set! Using helixFit instead...")
+    }
 
-    pdgCode = seedValue.second * m_PARAMpdGCode * m_chargeSignFactor;
+
+
 
     if (m_KFBackwardFilter == true) {
       aTC->setInitialValue((*currentHits)[0]->hitPosition, seedValue.first, pdgCode); // position, momentum, pdgCode

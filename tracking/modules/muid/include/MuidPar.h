@@ -86,9 +86,6 @@ namespace Belle2 {
     //! Reduced chi-squared (transverse) probability density function's bin size
     double m_ReducedChiSquaredDx;
 
-    //! Status flag to indicate whether the PDF tables have been filled or not
-    bool m_IsValid;
-
   };
 
 } // end of namespace Belle2

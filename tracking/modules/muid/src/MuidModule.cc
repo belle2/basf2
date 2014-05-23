@@ -126,12 +126,12 @@ void MuidModule::initialize()
 
   // See if muid will coexist with geant4 simulation and/or ext extrapolation
   if (m_ExtMgr->PrintG4State() == G4String("G4State_PreInit")) {
-    B2INFO("muid::initialize:  I will run without simulation")
+    B2INFO("Muid will run without simulation")
     m_RunMgr = NULL;
     m_TrackingAction = NULL;
     m_SteppingAction = NULL;
     if (m_ExtMgr->PrintExtState() == G4String("G4ErrorState_PreInit")) {
-      B2INFO("muid::initialize:  I will call InitGeant4e")
+      B2INFO("Muid will call InitGeant4e")
       // Create the magnetic field for the geant4e extrapolation
       Simulation::MagneticField* magneticField = new Simulation::MagneticField();
       G4FieldManager* fieldManager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
@@ -144,19 +144,19 @@ void MuidModule::initialize()
       m_ExtMgr->SetUserInitialization(new Simulation::ExtPhysicsList);
       m_ExtMgr->InitGeant4e();
     } else {
-      B2INFO("muid::initialize:  I will not call InitGeant4e since it has already been initialized")
+      B2INFO("Muid will not call InitGeant4e since it has already been initialized")
     }
   } else {
-    B2INFO("muid::initialize:  I will coexist with simulation")
+    B2INFO("Muid will coexist with simulation")
     m_RunMgr = G4RunManager::GetRunManager();
     m_TrackingAction = const_cast<G4UserTrackingAction*>(m_RunMgr->GetUserTrackingAction());
     m_SteppingAction = const_cast<G4UserSteppingAction*>(m_RunMgr->GetUserSteppingAction());
     if (m_ExtMgr->PrintExtState() == G4String("G4ErrorState_PreInit")) {
-      B2INFO("muid::initialize:  I will call InitGeant4e")
+      B2INFO("Muid will call InitGeant4e")
       m_ExtMgr->InitGeant4e();
       G4StateManager::GetStateManager()->SetNewState(G4State_Idle);
     } else {
-      B2INFO("muid::initialize:  I will not call InitGeant4e since it has already been initialized")
+      B2INFO("Muid will not call InitGeant4e since it has already been initialized")
     }
   }
 
@@ -254,12 +254,11 @@ void MuidModule::initialize()
         }
       }
     }
-    if (m_ChargedStable.empty()) B2ERROR("Module muid initialize(): no valid PDG codes for extrapolation")
+    if (m_ChargedStable.empty()) B2ERROR("No valid PDG codes for extrapolation")
     }
 
   for (unsigned i = 0; i < m_ChargedStable.size(); ++i) {
-    B2INFO("Module muid initialize(): hypothesis for PDG code "
-           << m_ChargedStable[i].getPDGCode() << " and its antiparticle will be extrapolated")
+    B2INFO("Hypothesis for PDG code " << m_ChargedStable[i].getPDGCode() << " and its antiparticle will be extrapolated")
   }
 
   // Register output and relation arrays' persistence
@@ -277,7 +276,7 @@ void MuidModule::beginRun()
 {
   StoreObjPtr<EventMetaData> evtMetaData;
   int expNo = evtMetaData->getExperiment();
-  B2INFO("Muid::beginRun(): experiment " << expNo << "  run " << evtMetaData->getRun())
+  B2INFO("Experiment " << expNo << "  run " << evtMetaData->getRun())
   m_MuonPlusPar = new MuidPar(expNo, "MuonPlus");
   m_MuonMinusPar = new MuidPar(expNo, "MuonMinus");
   m_PionPlusPar = new MuidPar(expNo, "PionPlus");
@@ -334,14 +333,14 @@ void MuidModule::event()
 
       const TrackFitResult* trackFit = tracks[t]->getTrackFitResult(chargedStable);
       if (!trackFit) {
-        B2ERROR("Muid::event(): no valid TrackFitResult for PDGcode " <<
+        B2ERROR("No valid TrackFitResult for PDGcode " <<
                 chargedStable.getPDGCode() << ": extrapolation not possible")
         continue;
       }
 
       const genfit::Track* gfTrack = DataStore::getRelated<genfit::Track>(trackFit);
       if (!gfTrack) {
-        B2ERROR("Muid::event(): no relation of TrackFitResult with genfit::Track for PDGcode " <<
+        B2ERROR("No relation of TrackFitResult with genfit::Track for PDGcode " <<
                 chargedStable.getPDGCode() << ": extrapolation not possible")
         continue;
       }
@@ -447,7 +446,7 @@ void MuidModule::registerVolumes()
 
   G4PhysicalVolumeStore* pvStore = G4PhysicalVolumeStore::GetInstance();
   if (pvStore->size() == 0) {
-    B2FATAL("Module muid registerVolumes(): No geometry defined. Please create the geometry first.")
+    B2FATAL("No geometry defined. Please create the geometry first.")
   }
 
   m_BKLMVolumes = new vector<G4VPhysicalVolume*>;
@@ -551,7 +550,7 @@ void MuidModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
   }
 
   catch (genfit::Exception& e) {
-    B2WARNING("Muid::getStartPoint() caught genfit exception for " << (firstLast ? "first" : "last") << " point on track; will not extrapolate. " << e.what())
+    B2WARNING("Caught genfit exception for " << (firstLast ? "first" : "last") << " point on track; will not extrapolate. " << e.what())
     // Do not extrapolate this track by forcing minPt cut to fail in caller
     momentum.setX(0.0);
     momentum.setY(0.0);
@@ -769,7 +768,7 @@ bool MuidModule::findMatchingBarrelHit(Point& point)
   for (int h = 0; h < bklmHits.getEntries(); ++h) {
     BKLMHit2d* hit = bklmHits[h];
     if (hit->getLayer() != matchingLayer) continue;
-    if (hit->getStatus() & STATUS_OUTOFTIME) continue;
+    if (hit->isOutOfTime()) continue;
     TVector3 diff(hit->getGlobalPosition() - point.position);
     double dn = diff * n; // in cm
     if (fabs(dn) < 2.0) {
@@ -811,12 +810,12 @@ bool MuidModule::findMatchingBarrelHit(Point& point)
     point.sector = hit->getSector() - 1;
     point.time = hit->getTime();
     double localVariance[2] = {m_BarrelScintVariance, m_BarrelScintVariance};
-    if (hit->isInRPC()) {
+    if (hit->inRPC()) {
       localVariance[0] = m_BarrelPhiStripVariance[point.layer];
       localVariance[1] = m_BarrelZStripVariance[point.layer];
     }
     adjustIntersection(point, localVariance, hit->getGlobalPosition(), extPos0);
-    if (point.chi2 >= 0.0) hit->setStatus(STATUS_ONTRACK);
+    if (point.chi2 >= 0.0) hit->isOnTrack(true);
   }
   return point.chi2 >= 0.0;
 
@@ -838,7 +837,7 @@ bool MuidModule::findMatchingEndcapHit(Point& point)
     } else {
       if (hit->getEndcap() != 1) continue;
     }
-    // DIVOT no getStatus() if (hit->getStatus() & STATUS_OUTOFTIME) continue;
+    // DIVOT no such function! if (hit->isOutOfTime()) continue;
     TVector3 diff(hit->getPosition() - point.position);
     double dn = diff * n; // in cm
     if (fabs(dn) > 2.0) continue;
@@ -856,7 +855,7 @@ bool MuidModule::findMatchingEndcapHit(Point& point)
     point.time = hit->getTime();
     double localVariance[2] = {m_EndcapScintVariance, m_EndcapScintVariance};
     adjustIntersection(point, localVariance, hit->getPosition(), point.position);
-    // if (point.chi2 >= 0.0) hit->setStatus(STATUS_ONTRACK); // DIVOT: no setStatus()
+    // DIVOT no such function! if (point.chi2 >= 0.0) hit->isOnTrack(true);
   }
   return point.chi2 >= 0.0;
 

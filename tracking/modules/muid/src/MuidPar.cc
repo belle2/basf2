@@ -25,14 +25,14 @@ using namespace std;
 
 namespace Belle2 {
 
-  MuidPar::MuidPar() : m_IsValid(false)
+  MuidPar::MuidPar() : m_ReducedChiSquaredDx(0.0)
   {
   }
 
-  MuidPar::MuidPar(int expNo, const char hypothesisName[]) : m_IsValid(false)
+  MuidPar::MuidPar(int expNo, const char hypothesisName[]) : m_ReducedChiSquaredDx(0.0)
   {
     fillPDFs(expNo, hypothesisName);
-    if (!m_IsValid) { B2ERROR("MuidPar::constructor:  Failed to read " << hypothesisName << " PDFs for experiment " << expNo) }
+    if (m_ReducedChiSquaredDx == 0.0) { B2ERROR("Failed to read " << hypothesisName << " PDFs for experiment " << expNo) }
   }
 
   MuidPar::~MuidPar()
@@ -47,10 +47,9 @@ namespace Belle2 {
     sprintf(line, "/Detector/Tracking/MuidParameters/Experiment[@exp=\"%d\"]/%s/", expNo, hypothesisName);
     GearDir content(line);
     if (!content) {
-      B2ERROR("muid:MuidPar::fillPDFs(): required XML content MuidParameters not found")
+      B2ERROR("Required XML content MuidParameters not found")
     }
 
-    m_IsValid = true;
     m_ReducedChiSquaredDx = MUID_ReducedChiSquaredLimit / MUID_ReducedChiSquaredNbins;   // bin size
     for (int outcome = 1; outcome <= MUID_MaxOutcome; ++outcome) {
       sprintf(line, "Outcome[@outcome=\"%d\"]/", outcome);
@@ -60,9 +59,9 @@ namespace Belle2 {
         sprintf(line, "LongitudinalPDF/LastLayer[@layer=\"%d\"]", layer);
         std::vector<double> rangePDF = outcomeContent.getArray(line);
         if (rangePDF.size() != MUID_RangeNbins) {
-          B2ERROR("muid::MuidPar::fillPDFs(): LongitudinalPDF vector for hypothesis " << hypothesisName << "  outcome " << outcome
+          B2ERROR("LongitudinalPDF vector for hypothesis " << hypothesisName << "  outcome " << outcome
                   << " layer=" << layer << " has " << rangePDF.size() << " entries; should be " << MUID_RangeNbins)
-          m_IsValid = false;
+          m_ReducedChiSquaredDx = 0.0; // invalidate the PDFs for this hypothesis
         } else {
           for (int i = 0; i < MUID_RangeNbins; ++i) {
             m_RangePDF[outcome][layer][i] = rangePDF[i];
@@ -73,9 +72,9 @@ namespace Belle2 {
         sprintf(line, "TransversePDF/DegreesOfFreedom[@ndof=\"%d\"]", 2 * halfNdof);
         std::vector<double> reducedChiSquaredPDF = outcomeContent.getArray(line);
         if (reducedChiSquaredPDF.size() != MUID_ReducedChiSquaredNbins) {
-          B2ERROR("muid::MuidPar::fillPDFs(): TransversePDF vector for hypothesis " << hypothesisName << "  outcome " << outcome
+          B2ERROR("TransversePDF vector for hypothesis " << hypothesisName << "  outcome " << outcome
                   << " has " << reducedChiSquaredPDF.size() << " entries; should be " << MUID_ReducedChiSquaredNbins)
-          m_IsValid = false;
+          m_ReducedChiSquaredDx = 0.0; // invalidate the PDFs for this hypothesis
         } else {
           double integral = 1.0E-30;
           for (int i = 0; i < MUID_ReducedChiSquaredNbins; ++i) {
@@ -95,8 +94,8 @@ namespace Belle2 {
         }
       }
     }
-    if (!m_IsValid) {
-      B2FATAL("muid::MuidPar::fillPDFs():  failed to read PDFs")
+    if (m_ReducedChiSquaredDx == 0.0) {
+      B2FATAL("Failed to read PDFs")
     }
   }
 
@@ -146,11 +145,6 @@ namespace Belle2 {
     // layerDifference:  difference between last Ext layer and last hit layer
     // reducedChiSquared: reduced chi**2 of the transverse deviations of all associated
     //           hits from the corresponding Ext track crossings
-
-    if (!m_IsValid) {
-      B2ERROR("MuidPar::getPDF():  PDFs have not been filled yet")
-      return 0.0;
-    }
 
     if ((outcome <= 0) || (outcome > MUID_MaxOutcome)) return 0.0;
     return getPDFRange(outcome, lastExtLayer, layerDifference) * getPDFRchisq(outcome, ndof, chiSquared);

@@ -46,7 +46,10 @@ namespace Belle2 {
     /** Default constructor for the ROOT IO. */
     VXDTFSecMap():
       m_magneticFieldStrength(1.5),
-      m_additionalInfo("") {}
+      m_additionalInfo(""),
+      m_minDistance2origin(-1),
+      m_maxDistance2origin(-1),
+      m_sortByDistance2origin(false) {}
 
 
 

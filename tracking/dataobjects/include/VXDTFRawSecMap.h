@@ -49,6 +49,8 @@ namespace Belle2 {
       m_magneticFieldStrength(1.5),
       m_lowPt(0.),
       m_highPt(0.),
+      m_minDistance2origin(-1),
+      m_maxDistance2origin(-1),
       m_sortByDistance2origin(false),
       m_smallSampleThreshold(1),
       m_minSampleThreshold(1),

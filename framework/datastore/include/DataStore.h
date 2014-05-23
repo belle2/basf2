@@ -124,7 +124,8 @@ namespace Belle2 {
 
     /** Return the default storage name for an object of the given type. */
     template<class T> static std::string defaultObjectName() {
-      return defaultObjectName(T::Class_Name());
+      const static std::string s = defaultObjectName(T::Class_Name());
+      return s;
     }
 
     /** Return the storage name for an object of the given type and name. */
@@ -139,7 +140,8 @@ namespace Belle2 {
 
     /** Return the default storage name for an array of the given type. */
     template<class T> static std::string defaultArrayName() {
-      return defaultObjectName<T>() + 's';
+      const static std::string s = defaultObjectName<T>() + 's';
+      return s;
     }
 
     /** Return the storage name for an object of the given type and name. */
@@ -149,7 +151,8 @@ namespace Belle2 {
 
     /** Return the default storage name for a relation between the given types. */
     template<class FROM, class TO> static std::string defaultRelationName() {
-      return defaultArrayName<FROM>() + "To" + defaultArrayName<TO>();
+      const static std::string s = defaultArrayName<FROM>() + "To" + defaultArrayName<TO>();
+      return s;
     }
 
     /** Return the storage name for a relation with given name between the given types. */

@@ -21,6 +21,8 @@
 #include <TClonesArray.h>
 #include <TClass.h>
 
+#include <unordered_map>
+
 using namespace std;
 using namespace Belle2;
 
@@ -240,7 +242,15 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
 void DataStore::getArrayNames(std::vector<std::string>& names, const std::string& arrayName, const TClass* arrayClass) const
 {
   if (arrayName.empty()) {
-    names.push_back(defaultArrayName(arrayClass->GetName()));
+    static std::unordered_map<const TClass*, string> classToArrayName;
+    const auto& it = classToArrayName.find(arrayClass);
+    if (it != classToArrayName.end()) {
+      names.push_back(it->second);
+    } else {
+      std::string result = defaultArrayName(arrayClass->GetName());
+      classToArrayName[arrayClass] = result;
+      names.push_back(result);
+    }
   } else if (arrayName == "ALL") {
     for (auto & mapEntry : m_storeObjMap[c_Event]) {
       if (mapEntry.second->ptr && mapEntry.second->isArray) {

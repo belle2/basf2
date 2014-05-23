@@ -11,9 +11,9 @@ from time import time
 useSimpleClusterizer = True  # <----------- hier umschalten zwischen simple(schnell) und full clusterizer(realistisch)!
 useEvtGen = False  # <----------- hier umschalten zwischen evtGen( realistische events) und pGun(einfache events)!
 useEDeposit = True  # <----- EnergyDeposit für Hits (zum debuggen) damit False funzt, pxd/data/PXD.xml und svd/data/SVD.xml see neutrons auf true setzen
-addBG = False  #  <---- adding Background - funzt noch net
+addBG = True  #  <---- adding Background - funzt noch net
 
-numEvents = 500
+numEvents = 20
 seed = 1
 
 # flags für die pGun
@@ -77,6 +77,12 @@ eventinfosetter.param('runList', [1])
 eventinfosetter.param('evtNumList', [numEvents])
 
 eventinfoprinter = register_module('EventInfoPrinter')
+
+# Mix some background to simulation data
+bgmixer = register_module('MixBkg')
+bgmixer.param('BackgroundFiles', ['rof*.root'])
+bgmixer.param('AnalysisMode', False)
+bgmixer.set_log_level(LogLevel.INFO)
 
 gearbox = register_module('Gearbox')
 # This file contains the VXD (no Telescopes) beam test geometry including the real PCMAG magnetic field
@@ -237,8 +243,8 @@ if useEvtGen:
 else:
   ## folgende Module nur für pGun:
     main.add_module(particlegun)
-    if addBG:
-        main.add_module(particlegun2)
+    # if addBG:
+        # main.add_module(particlegun2)
 
 main.add_module(g4sim)
 if addBG:

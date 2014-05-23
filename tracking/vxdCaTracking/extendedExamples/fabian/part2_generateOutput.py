@@ -12,9 +12,9 @@ generateSecMap = False  # <----------- hier umschalten zwischen secMapGenerierun
 useSimpleClusterizer = True  # <----------- hier umschalten zwischen simple(schnell) und full clusterizer(realistisch)!
 useEvtGen = False  # <----------- hier umschalten zwischen evtGen( realistische events) und pGun(einfache events)!
 useEDeposit = True  # <----- EnergyDeposit für Hits (zum debuggen) damit False funzt, pxd/data/PXD.xml und svd/data/SVD.xml see neutrons auf true setzen
-addBG = False  #  <---- adding Background - funzt noch net
+addBG = True  #  <---- adding Background - funzt noch net
 
-numEvents = 500
+numEvents = 20
 seed = 1
 
 # flags für die pGun

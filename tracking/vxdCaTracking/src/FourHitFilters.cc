@@ -22,7 +22,7 @@ using namespace Belle2;
 double FourHitFilters::calcDeltapT()
 {
   if (m_circleCalculated == false) { calcCircle(); }
-  return fabs(m_threeHitFilter.calcPt(m_radiusABC) * (m_radiusABC - m_radiusBCD)); // , or, pT[GeV/c] = 0.299710*B[T]*r[m] = 0,449565*r[cm]/100 = 0.00449565*r[cm]
+  return fabs(m_threeHitFilter.calcPt(m_radiusABC - m_radiusBCD)); // , or, pT[GeV/c] = 0.299710*B[T]*r[m] = 0,449565*r[cm]/100 = 0.00449565*r[cm]
 }
 
 

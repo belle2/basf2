@@ -10,8 +10,6 @@
 
 #include <analysis/modules/MCMatching/MCMatchingModule.h>
 
-#include <framework/core/ModuleManager.h>
-
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -57,6 +55,7 @@ namespace Belle2 {
   {
     StoreArray<Particle>::required();
     StoreArray<MCParticle>::required();
+    StoreObjPtr<ParticleList>::required(m_listName);
     RelationArray::registerPersistent<Particle, MCParticle>();
   }
 
@@ -76,7 +75,7 @@ namespace Belle2 {
     for (unsigned i = 0; i < plist->getListSize(); i++) {
       const Particle* part = plist->getParticle(i);
 
-      setMCTruth(part);
+      MCMatching::setMCTruth(part);
     }
   }
 

@@ -44,7 +44,7 @@ void NtupleMCTruthTool::eval(const Particle* particle)
 
     if (mcparticle) {
       m_iTruthID[iProduct]      = mcparticle->getPDG();
-      m_iTruthIDMatch[iProduct] = getMCTruthStatus(selparticles[iProduct], mcparticle);
+      m_iTruthIDMatch[iProduct] = MCMatching::getMCTruthStatus(selparticles[iProduct], mcparticle);
     }
   }
 }

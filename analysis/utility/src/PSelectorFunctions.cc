@@ -15,7 +15,6 @@
 
 #include <analysis/utility/VariableManager.h>
 #include <analysis/utility/mcParticleMatching.h>
-#include <analysis/utility/MCMatchStatus.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
@@ -37,7 +36,7 @@
 #include <TVectorF.h>
 
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
 using namespace std;
 
@@ -515,15 +514,15 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const MCParticle* mcparticle = part->getRelated<MCParticle>();
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
 
       if (mcparticle == nullptr)
         return result;
 
       int mcPDGCode = mcparticle->getPDG();
-      int status    = getMCTruthStatus(part, mcparticle);
+      int status    = MCMatching::getMCTruthStatus(part, mcparticle);
 
-      if (!(status == 0 || status == c_MissFSR))
+      if (!(status == MCMatching::c_Correct || status == MCMatching::c_MissFSR))
         return result;
 
       if (part->getFlavorType() == Particle::c_Flavored && mcPDGCode == part->getPDGCode())
@@ -536,12 +535,9 @@ namespace Belle2 {
 
     double particleMCMatchPDGCode(const Particle* part)
     {
-      double result = 0.0;
-
-      const MCParticle* mcparticle = part->getRelated<MCParticle>();
-
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return result;
+        return 0.0;
 
       return mcparticle->getPDG();
     }
@@ -553,8 +549,7 @@ namespace Belle2 {
 
     double particleMCMatchStatus(const Particle* part)
     {
-      const MCParticle* mcparticle = part->getRelated<MCParticle>();
-      return getMCTruthStatus(part, mcparticle);
+      return MCMatching::getMCTruthStatus(part);
     }
 
     // RestOfEvent related --------------------------------------------------

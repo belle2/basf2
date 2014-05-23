@@ -1,5 +1,4 @@
 #include <analysis/utility/mcParticleMatching.h>
-#include <analysis/utility/MCMatchStatus.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 
@@ -14,6 +13,7 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace Belle2::MCMatching;
 
 //checks against update3
 #if defined(__INTEL_COMPILER) && ((__INTEL_COMPILER < 1400) || (__INTEL_COMPILER_BUILD_DATE < 20140422))
@@ -38,6 +38,7 @@ namespace {
       case 13:
       case 2212:
       case 22:
+      case 130:
         return true;
       default:
         return false;
@@ -306,8 +307,11 @@ namespace {
     e.finalize();
     EXPECT_EQ(mcparticles.getEntries(), 6);
     EXPECT_EQ(mcparticles[3]->getPDG(), 111);
+    EXPECT_EQ(mcparticles[3]->getNDaughters(), 2);
     EXPECT_EQ(mcparticles[4]->getPDG(), 22);
     EXPECT_EQ(mcparticles[5]->getPDG(), 22);
+    EXPECT_EQ(mcparticles[4]->getNDaughters(), 0);
+    EXPECT_EQ(mcparticles[5]->getNDaughters(), 0);
     EXPECT_EQ(mcparticles[3]->getMother(), nullptr);
     EXPECT_EQ(mcparticles[4]->getMother(), mcparticles[3]);
     EXPECT_EQ(mcparticles[5]->getMother(), mcparticles[3]);
@@ -319,6 +323,7 @@ namespace {
 
     Decay g(421, {321, -211, {111, {22, 22}}});
     g.finalize();
+    EXPECT_EQ(3, g.m_mcparticle->getNDaughters());
     EXPECT_EQ(mcparticles.getEntries(), 13);
   }
 
@@ -348,14 +353,32 @@ namespace {
     EXPECT_TRUE(mcparticles[0]->getRelated<Particle>() == nullptr);
     EXPECT_TRUE(mcparticles[3]->getRelated<Particle>() == nullptr);
 
-    //with no related mcparticle, we should get an error
-    EXPECT_TRUE(getMCTruthStatus(d.m_particle, nullptr) == c_ERROR);
-
     //run MC matching (should be able to set a relation)
     ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
 
-    EXPECT_EQ(getMCTruthStatus(d.m_particle, d.m_mcparticle), 0) << d.getString();
+    EXPECT_EQ(c_Correct, getMCTruthStatus(d.m_particle)) << d.getString();
 
+  }
+
+  TEST_F(MCMatchingTest, SettingTruths)
+  {
+    Decay d(421, {321, -211, {111, {22, 22}}});
+    d.reconstruct({421, {211, -211, {111, {22, 22}}}});
+
+    //setMCTruth should set relation
+    EXPECT_EQ(nullptr, d.m_particle->getRelated<MCParticle>());
+    ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+    EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
+
+    //but no MCTruthStatus flags
+    ASSERT_FALSE(d.m_particle->hasExtraInfo("MCTruthStatus"));
+    ASSERT_FALSE(d.getParticle(111)->hasExtraInfo("MCTruthStatus"));
+
+    EXPECT_EQ(c_MisID, getMCTruthStatus(d.m_particle)) << d.getString();
+
+    //now it's set
+    ASSERT_TRUE(d.m_particle->hasExtraInfo("MCTruthStatus"));
+    ASSERT_TRUE(d.getParticle(111)->hasExtraInfo("MCTruthStatus"));
   }
 
   /** test misID flag. */
@@ -366,32 +389,33 @@ namespace {
       d.reconstruct({421, {211, -211, {111, {22, 22}}}});
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
-      EXPECT_EQ(getMCTruthStatus(d.m_particle, d.m_mcparticle), c_MisID) << d.getString();
+      EXPECT_EQ(c_MisID, getMCTruthStatus(d.m_particle)) << d.getString();
     }
     {
+      //+ wrong non-FSP
       Decay d(421, {321, -211, {111, {22, 22}}});
       d.reconstruct({413, {321, -13, {111, {22, 22}}}});
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
-      EXPECT_EQ(getMCTruthStatus(d.m_particle, d.m_mcparticle), c_MisID) << d.getString();
+      EXPECT_EQ(c_MisID | c_AddedWrongParticle, getMCTruthStatus(d.m_particle)) << d.getString();
     }
     {
       Decay d(421, {321, -211, {111, {22, 22}}});
       d.reconstruct({421, {321, 13, {111, {22, 22}}}});
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
-      EXPECT_EQ(getMCTruthStatus(d.m_particle, d.m_mcparticle), c_MisID) << d.getString();
+      EXPECT_EQ(c_MisID, getMCTruthStatus(d.m_particle)) << d.getString();
     }
     {
       Decay d(421, {321, -211, {111, {22, 22}}});
       d.reconstruct({421, {211, 13, {111, {22, 22}}}});
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
-      EXPECT_EQ(getMCTruthStatus(d.m_particle, d.m_mcparticle), c_MisID) << d.getString();
+      EXPECT_EQ(c_MisID, getMCTruthStatus(d.m_particle)) << d.getString();
     }
     {
       //pion and kaon switched
       Decay d(421, {321, -211, {111, {22, 22}}});
       d.reconstruct({421, { -211, 321, {111, {22, 22}}}});
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
-      EXPECT_EQ(getMCTruthStatus(d.m_particle, d.m_mcparticle), c_MisID) << d.getString();
+      EXPECT_EQ(c_MisID, getMCTruthStatus(d.m_particle)) << d.getString();
     }
   }
 
@@ -402,25 +426,42 @@ namespace {
       Decay d(421, {321, -211, {111, {22, 22}}});
       d.reconstruct({421, {321, -211, {0}}});
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
-      EXPECT_EQ(getMCTruthStatus(d.m_particle, d.m_mcparticle), c_MissMassiveParticle) << d.getString();
+      EXPECT_EQ(getMCTruthStatus(d.m_particle), c_MissMassiveParticle) << d.getString();
     }
     {
       Decay d(421, {321, -211, {111, {22, 22}}});
       d.reconstruct({421, {321, 0, {111, {22, 22}}}});
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
-      EXPECT_EQ(getMCTruthStatus(d.m_particle, d.m_mcparticle), c_MissMassiveParticle) << d.getString();
+      EXPECT_EQ(getMCTruthStatus(d.m_particle), c_MissMassiveParticle) << d.getString();
     }
     {
       Decay d(421, {321, -211, {111, {22, 22}}});
       d.reconstruct({421, {0, -211, {111, {22, 22}}}});
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
-      EXPECT_EQ(getMCTruthStatus(d.m_particle, d.m_mcparticle), c_MissMassiveParticle) << d.getString();
+      EXPECT_EQ(getMCTruthStatus(d.m_particle), c_MissMassiveParticle) << d.getString();
     }
     {
       Decay d(421, {321, -211, {111, {22, 22}}});
       d.reconstruct({421, {0, -13, {111, {22, 22}}}});
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
-      EXPECT_EQ(getMCTruthStatus(d.m_particle, d.m_mcparticle), c_MissMassiveParticle | c_MisID) << d.getString();
+      EXPECT_EQ(getMCTruthStatus(d.m_particle), c_MissMassiveParticle | c_MisID) << d.getString();
+    }
+  }
+  TEST_F(MCMatchingTest, KLong)
+  {
+    {
+      //correct
+      Decay d(431, { {323, {321, {111, {22, 22}} }}, { -311, {130}}});
+      d.reconstruct({431, { {323, {321, {111, {22, 22}} }}, {130, {}, Decay::c_ReconstructFrom, d.getDecay(130)}}});
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_Correct, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
+    {
+      //K0L not reconstructed
+      Decay d(431, { {323, {321, {111, {22, 22}} }}, { -311, {130}}});
+      d.reconstruct({431, { {323, {321, {111, {22, 22}} }}, 0}});
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_MissKlong | c_MissMassiveParticle, getMCTruthStatus(d.m_particle)) << d.getString();
     }
   }
   /** more missing particles. */
@@ -434,28 +475,34 @@ namespace {
       EXPECT_EQ(mcparticles.getEntries(), 6);
       EXPECT_EQ(particles.getEntries(), 5); //we added only 5 Particles
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
-      EXPECT_EQ(getMCTruthStatus(d.m_particle, d.m_mcparticle), c_MissGamma) << d.getString();
+      EXPECT_EQ(getMCTruthStatus(d.m_particle), c_MissGamma) << d.getString();
     }
     {
       Decay d(421, {321, -211, {111, {22, 22}}});
       d.reconstruct({421, {321, 0, {111, {0, 22}}}});
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
-      EXPECT_EQ(getMCTruthStatus(d.m_particle, d.m_mcparticle), c_MissMassiveParticle | c_MissGamma) << d.getString();
+      EXPECT_EQ(c_MissMassiveParticle | c_MissGamma, getMCTruthStatus(d.m_particle)) << d.getString();
     }
   }
-  /** misIDed particle combined into something else. */
-  TEST_F(MCMatchingTest, MisIDedPionInDReconstruction)
+  /** photon 'reconstructed' from a pi+ track, combined into other stuff. */
+  TEST_F(MCMatchingTest, WrongPhotonForPi0)
   {
     {
       Decay d(521, {211, {421, {321, -211, {111, {22, 22}}}}});
       d.finalize();
-      d.reconstruct({521, {211, {421, {321, -211, {111, {{22}, {22, {}, Decay::c_RelateWith, d.getMCParticle(521)}}}}}}});
-      //result: pi0 gets MC match 521
-      const Particle* p = d.getParticle(421);
-      const MCParticle* mc = d.getMCParticle(421);
+      d.reconstruct({521, {211, {421, {321, -211, {111, {{22}, {22, {}, Decay::c_RelateWith, d.getMCParticle(211)}}}}}}});
+      //result: pi0 gets MC match 521. Gets misID & c_AddedWrongParticle because of 'wrong' photon, plus c_MissMassiveParticle since the B's daughters are missing
+      Particle* p = d.getParticle(111);
+      Decay* pi0decay = d.getDecay(111);
+      ASSERT_TRUE(setMCTruth(p)) << pi0decay->getString();
+      EXPECT_EQ(521, p->getRelated<MCParticle>()->getPDG());
+      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissMassiveParticle, getMCTruthStatus(p)) << pi0decay->getString();
+
+      //flags migrate upstream
+      p = d.getParticle(421);
       Decay* d0decay = d.getDecay(421);
       ASSERT_TRUE(setMCTruth(p)) << d0decay->getString();
-      EXPECT_EQ(c_MisID , getMCTruthStatus(p, mc)) << d0decay->getString();
+      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissMassiveParticle, getMCTruthStatus(p)) << d0decay->getString();
     }
   }
 
@@ -468,7 +515,15 @@ namespace {
 
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
-      EXPECT_EQ(0, getMCTruthStatus(d.m_particle, d.m_mcparticle)) << d.getString();
+      EXPECT_EQ(c_Correct, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
+    {
+      Decay d(421, {{321, {11, -12, {111, {22,  22}}}}, -211, {111, {22, 22}}});
+      d.reconstruct({421, {321, -211, {111, {22, 22}}}});
+
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
+      EXPECT_EQ(c_Correct, getMCTruthStatus(d.m_particle)) << d.getString();
     }
   }
   /** pi+ decays into muon, muon track with pi+ hypothesis in reconstruction. */
@@ -483,7 +538,7 @@ namespace {
 
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
-      EXPECT_EQ(c_MisID, getMCTruthStatus(d.m_particle, d.m_mcparticle)) << d.getString();
+      EXPECT_EQ(c_MisID, getMCTruthStatus(d.m_particle)) << d.getString();
     }
     {
       Decay d(421, {321, { -211, {13}}, {111, {22, 22}}});
@@ -495,7 +550,7 @@ namespace {
 
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
-      EXPECT_EQ(c_MisID, getMCTruthStatus(d.m_particle, d.m_mcparticle)) << d.getString();
+      EXPECT_EQ(c_MisID, getMCTruthStatus(d.m_particle)) << d.getString();
     }
   }
   /** we reconstrcut D*+ -> D0 pi+, but it's actually D+ pi0. */
@@ -514,7 +569,7 @@ namespace {
 
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
-      EXPECT_EQ(c_MisID, getMCTruthStatus(d.m_particle, d.m_mcparticle)) << d.getString();
+      EXPECT_EQ(c_AddedWrongParticle, getMCTruthStatus(d.m_particle)) << d.getString();
     }
   }
   /** Correctly reconstructed decay, except we switched some tracks around. */
@@ -533,8 +588,7 @@ namespace {
 
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
-      //TODO: doesn't have a flag yet, but shouldn't be 0
-      EXPECT_NE(0, getMCTruthStatus(d.m_particle, d.m_mcparticle)) << d.getString();
+      EXPECT_EQ(c_AddedWrongParticle, getMCTruthStatus(d.m_particle)) << d.getString();
     }
 
     /** B0 -> phi [K+ K-] phi [K+ K-] with Ks from both sides switched*/
@@ -554,8 +608,7 @@ namespace {
 
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
-      //TODO: doesn't have a flag yet, but shouldn't be 0
-      EXPECT_NE(0, getMCTruthStatus(d.m_particle, d.m_mcparticle)) << d.getString();
+      EXPECT_EQ(c_AddedWrongParticle, getMCTruthStatus(d.m_particle)) << d.getString();
     }
   }
   /** Reconstruct both Bs, but switch pi0 to other B */
@@ -578,7 +631,7 @@ namespace {
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
       //TODO: doesn't have a flag yet, but shouldn't be 0 (same as for WrongCombination? does this warrant an own flag?)
-      EXPECT_NE(0, getMCTruthStatus(d.m_particle, d.m_mcparticle)) << d.getString();
+      EXPECT_EQ(c_AddedWrongParticle, getMCTruthStatus(d.m_particle)) << d.getString();
     }
   }
 

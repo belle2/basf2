@@ -187,12 +187,12 @@ void PreCutHistMakerModule::saveCombinationsForSignal()
 
     const Particle particle = combiner.getCurrentParticle(m_pdg, -m_pdg);
     Particle* part = particles.appendNew(particle);
-    setMCTruth(part);
+    MCMatching::setMCTruth(part);
     //B2WARNING("combined Particle created.");
     if (analysis::isSignal(part) < 0.5) {
       //part->print();
+      //B2WARNING("mcMatching says No. (status: " << MCMatching::getMCTruthStatus(part, part->getRelated<MCParticle>()));
       continue;
-      //B2WARNING("mcMatching says No. (status: " << getMCTruthStatus(part, part->getRelated<MCParticle>()));
     }
     //B2WARNING("passed");
     m_histogramSignal->Fill(m_var->function(part));

@@ -1,134 +1,165 @@
 // ******************************************************************
 // MC Matching
-// author: A. Zupanc (anze.zupanc@ijs.si)
+// authors: A. Zupanc (anze.zupanc@ijs.si), C. Pulvermacher (christian.pulvermacher@kit.edu)
 // ******************************************************************
 
 #include <analysis/utility/mcParticleMatching.h>
-#include <analysis/utility/MCMatchStatus.h>
+#include <analysis/dataobjects/Particle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
-#include <analysis/utility/VariableManager.h>
-
-// DataStore related
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 
 using namespace Belle2;
 using namespace std;
 
-void fillGenMothers(const MCParticle* mcP, vector<int>& genMCPMothers)
+void MCMatching::fillGenMothers(const MCParticle* mcP, vector<int>& genMCPMothers)
 {
-  if (!mcP)
-    return;
-
-  genMCPMothers.push_back(mcP->getIndex());
-  while (mcP->getMother()) {
-    mcP = mcP->getMother();
+  while (mcP) {
     genMCPMothers.push_back(mcP->getIndex());
+    mcP = mcP->getMother();
   }
 }
 
 
-int findCommonMother(unsigned nChildren, vector<int> firstMothers, vector<int> otherMothers)
+int MCMatching::findCommonMother(unsigned nChildren, const vector<int>& firstMothers, const vector<int>& otherMothers)
 {
-  if (firstMothers.size() == 0 || otherMothers.size() == 0)
+  if (firstMothers.empty() || otherMothers.empty())
     return -1;
 
-  for (unsigned i = 0; i < firstMothers.size(); ++i) {
+  for (int commonMotherCandidate : firstMothers) {
     unsigned counter = 0;
 
+    //if commonMotherCandidate is a common mother, it should occur (n-1) times in otherMothers
     for (unsigned j = 0; j < otherMothers.size(); ++j)
-      if (firstMothers[i] == otherMothers[j])
+      if (commonMotherCandidate == otherMothers[j])
         counter++;
 
     if (counter == nChildren - 1)
-      return firstMothers[i];
+      return commonMotherCandidate;
   }
 
   return -1;
 }
 
 
-bool setMCTruth(const Particle* particle)
+bool MCMatching::setMCTruth(const Particle* particle)
 {
+  //if MCTruthStatus is set, we already handled this particle
+  //TODO check wether this actually speeds things up or not
+  if (particle->hasExtraInfo("MCTruthStatus"))
+    return true;
 
-  // if Particle<->MCParticle relation already exists, there is nothing new to do
   const MCParticle* mcParticle = particle->getRelatedTo<MCParticle>();
-  if (mcParticle) {
+  if (mcParticle) { //nothing to do
     return true;
   }
 
   int nChildren = particle->getNDaughters();
-  if (nChildren < 2) {
-    // TODO: deal with this
+  if (nChildren == 0) {
+    //no daughters -> should be an FSP, but no related MCParticle. Probably background.
     return false;
   }
 
   // check, if for all daughter particles Particle <-> MCParticle relation exists
   for (int i = 0; i < nChildren; ++i) {
-    const Particle*    daugP   = particle->getDaughter(i);
-    const MCParticle*  daugMCP = daugP->getRelatedTo<MCParticle>();
+    const Particle* daugP = particle->getDaughter(i);
+    //returns quickly when found
+    bool daugMCTruth = setMCTruth(daugP);
+    if (!daugMCTruth)
+      return false;
+  }
 
-    if (!daugMCP) {
-      // Particle <-> MCParticle relation does not exist for this daughter; -> Set it!
-      bool daugMCTruth = setMCTruth(daugP);
-      if (!daugMCTruth)
-        return false;
+  int motherIndex = 0;
+  if (nChildren == 1) {
+    // assign mother of MCParticle related to our daughter
+    const Particle*    daugP   = particle->getDaughter(0);
+    const MCParticle*  daugMCP = daugP->getRelatedTo<MCParticle>();
+    if (!daugMCP)
+      return false;
+    const MCParticle* mom = daugMCP->getMother();
+    if (!mom)
+      return false;
+    motherIndex = mom->getIndex();
+
+  } else {
+    // at this stage for all daughters particles the  Particle <-> MCParticle relation exists
+    // 1st fill two vertices with indices of mother particles of the first daughters (1st vector)
+    // and with indices of mother particles of all other daughters (2nd vector)
+
+    vector<int> firstDaugMothers; // indices of generated mothers of first daughter
+    vector<int> otherDaugMothers; // indices of generated mothers of all other daughter
+
+    for (int i = 0; i < nChildren; ++i) {
+      const Particle*    daugP   = particle->getDaughter(i);
+      const MCParticle*  daugMCP = daugP->getRelatedTo<MCParticle>();
+
+      if (i == 0)
+        fillGenMothers(daugMCP, firstDaugMothers);
+      else
+        fillGenMothers(daugMCP, otherDaugMothers);
     }
+
+    // find first generated common mother of all linked daughter MCParticles
+    motherIndex = findCommonMother(nChildren, firstDaugMothers, otherDaugMothers);
   }
-
-  // at this stage for all daughters particles the  Particle <-> MCParticle relation exists
-  // 1st fill two vertices with indices of mother particles of the first daughters (1st vector)
-  // and with indices of mother particles of all other daughters (2nd vector)
-
-  vector<int> firstDaugMothers; // indices of generated mothers of first daughter
-  vector<int> otherDaugMothers; // indices of generated mothers of all other daughter
-
-  for (int i = 0; i < nChildren; ++i) {
-    const Particle*    daugP   = particle->getDaughter(i);
-    const MCParticle*  daugMCP = daugP->getRelatedTo<MCParticle>();
-
-    if (i == 0)
-      fillGenMothers(daugMCP, firstDaugMothers);
-    else
-      fillGenMothers(daugMCP, otherDaugMothers);
-  }
-
-  // find first generated common mother of all linked daughter MCParticles
-  int motherIndex = findCommonMother(nChildren, firstDaugMothers, otherDaugMothers);
 
   // if index is less than 1, the common mother particle was not found
   // remember: it's 1-based index
   if (motherIndex < 1)
     return false;
 
-  // finaly the relation can be set
+  // finally the relation can be set
   StoreArray<MCParticle> mcParticles;
 
   // sanity check
-  if (motherIndex > mcParticles.getEntries())
+  if (motherIndex > mcParticles.getEntries()) {
+    B2ERROR("setMCTruth(): sanity check failed!");
     return false;
+  }
 
-  MCParticle* mcMatch = mcParticles[motherIndex - 1];
-
+  const MCParticle* mcMatch = mcParticles[motherIndex - 1];
   particle->addRelationTo(mcMatch);
 
   return true;
 }
 
-int getMCTruthStatus(const Particle* particle, const MCParticle* mcParticle)
+int MCMatching::setMCTruthStatus(Particle* particle, const MCParticle* mcParticle)
 {
+  auto setStatus = [](Particle * particle, int s) -> int {
+    particle->addExtraInfo("MCTruthStatus", s);
+    return s;
+  };
+
   int status = 0;
 
-  if (!mcParticle)
-    return MCMatchStatus::c_ERROR;
+  if (!mcParticle) {
+    mcParticle = particle->getRelatedTo<MCParticle>();
+    if (mcParticle) {
+      B2ERROR("setMCTruthStatus: got mcparticle=NULL, but found one via relations...");
+    }
+    return setStatus(particle, status | MCMatchStatus::c_InternalError);
+  }
 
   unsigned nChildren = particle->getNDaughters();
-
-  if (nChildren == 0) {
+  if (nChildren == 0) { //FSP-like
     if (particle->getPDGCode() != mcParticle->getPDG())
       status |= MCMatchStatus::c_MisID;
-    return status;
+
+    //other checks concern daughters of particle, so we're done here
+    return setStatus(particle, status);
   }
+  if (particle->getPDGCode() != mcParticle->getPDG())
+    status |= MCMatchStatus::c_AddedWrongParticle;
+
+  //add up all (accepted) status flags we collected for our daughters
+  const int daughterStatusAcceptMask = c_MisID | c_AddedWrongParticle | c_InternalError;
+  int daughterStatus = 0;
+  for (unsigned i = 0; i < nChildren; ++i) {
+    const Particle* daughter = particle->getDaughter(i);
+    daughterStatus |= getMCTruthStatus(daughter);
+  }
+  status |= (daughterStatus & daughterStatusAcceptMask);
+
 
   //int genMotherPDG = mcParticle->getPDG();
   // TODO: fix this (aim for no hard coded values)
@@ -148,38 +179,34 @@ int getMCTruthStatus(const Particle* particle, const MCParticle* mcParticle)
   appendFSP(particle,   recFSPs);
   appendFSP(mcParticle, genFSPs);
 
-  vector<int> missingParticles;
+  vector<const MCParticle*> missingParticles;
   findMissingGeneratedParticles(recFSPs, genFSPs, missingParticles);
 
   // TODO: do something
-  if (genFSPs.size() == 0)
-    return MCMatchStatus::c_ERROR;
+  if (genFSPs.empty())
+    return setStatus(particle, status | MCMatchStatus::c_InternalError);
 
+  //This might happen with  e.g two ECLClusters from a charged track
   if (recFSPs.size() > genFSPs.size())
-    return MCMatchStatus::c_ERROR;
+    return setStatus(particle, status | MCMatchStatus::c_InternalError);
 
   // determine the status bits
   bool missFSR            = false;
-  bool misID              = false;
   bool missGamma          = false;
   bool missMasiveParticle = false;
   bool missKlong          = false;
   bool missNeutrino       = false;
 
-  if (missingParticles.size()) {
-    missFSR      = missingFSRPhoton(genFSPs, missingParticles);
-    missGamma    = missingRadiativePhoton(genFSPs, missingParticles);
-    missNeutrino = missingNeutrino(genFSPs, missingParticles);
-    missMasiveParticle = missingMassiveParticle(genFSPs, missingParticles);
-    missKlong    = missingKlong(genFSPs, missingParticles);
+  if (!missingParticles.empty()) {
+    missFSR      = missingFSRPhoton(missingParticles);
+    missGamma    = missingRadiativePhoton(missingParticles);
+    missNeutrino = missingNeutrino(missingParticles);
+    missMasiveParticle = missingMassiveParticle(missingParticles);
+    missKlong    = missingKlong(missingParticles);
   }
-
-  misID = isMisidentified(recFSPs, genFSPs);
 
   if (missFSR)
     status |= MCMatchStatus::c_MissFSR;
-  if (misID)
-    status |= MCMatchStatus::c_MisID;
   if (missGamma)
     status |= MCMatchStatus::c_MissGamma;
   if (missMasiveParticle)
@@ -189,11 +216,22 @@ int getMCTruthStatus(const Particle* particle, const MCParticle* mcParticle)
   if (missKlong)
     status |= MCMatchStatus::c_MissKlong;
 
-  return status;
+  return setStatus(particle, status);
+}
+
+int MCMatching::getMCTruthStatus(const Particle* particle, const MCParticle* mcParticle)
+{
+  if (particle->hasExtraInfo("MCTruthStatus")) {
+    return particle->getExtraInfo("MCTruthStatus");
+  } else {
+    if (!mcParticle)
+      mcParticle = particle->getRelatedTo<MCParticle>();
+    return setMCTruthStatus(const_cast<Particle*>(particle), mcParticle);
+  }
 }
 
 
-void appendFSP(const Particle* p, vector<const Particle*>& children)
+void MCMatching::appendFSP(const Particle* p, vector<const Particle*>& children)
 {
   for (unsigned i = 0; i < p->getNDaughters(); ++i) {
     const Particle* daug = p->getDaughter(i);
@@ -207,14 +245,14 @@ void appendFSP(const Particle* p, vector<const Particle*>& children)
   }
 }
 
-void appendFSP(const MCParticle* gen, vector<const MCParticle*>& children)
+void MCMatching::appendFSP(const MCParticle* gen, vector<const MCParticle*>& children)
 {
-  const vector<Belle2::MCParticle*> genDaughters = gen->getDaughters();
+  const vector<MCParticle*>& genDaughters = gen->getDaughters();
 
   for (unsigned i = 0; i < genDaughters.size(); ++i) {
     const MCParticle* daug = genDaughters[i];
 
-    int nDaughs = (daug->getLastDaughter() - daug->getFirstDaughter()) + 1;
+    int nDaughs = daug->getNDaughters();
     if (nDaughs && !isFSP(daug)) {
       appendFSP(daug, children);
     } else {
@@ -223,46 +261,32 @@ void appendFSP(const MCParticle* gen, vector<const MCParticle*>& children)
   }
 }
 
-int isFSP(const MCParticle* P)
+bool MCMatching::isFSP(const MCParticle* p)
 {
-  switch (abs(P->getPDG())) {
+  switch (abs(p->getPDG())) {
     case 211:
-      return 1;
     case 321:
-      return 1;
     case 11:
-      return 1;
     case 12:
-      return 1;
     case 13:
-      return 1;
     case 14:
-      return 1;
     case 16:
-      return 1;
     case 22:
-      return 1;
     case 2212:
-      return 1;
     case 111:
-      return 1;
     case 310:
-      return 1;
     case 130:
-      return 1;
     case 2112:
-      return 1;
+      return true;
     default:
-      return 0;
+      return false;
   }
 }
 
-void findMissingGeneratedParticles(vector<const Particle*>   reconstructed,
-                                   vector<const MCParticle*> generated,
-                                   std::vector<int>& missP)
+void MCMatching::findMissingGeneratedParticles(vector<const Particle*>   reconstructed,
+                                               vector<const MCParticle*> generated,
+                                               std::vector<const MCParticle*>& missP)
 {
-
-
   if (reconstructed.size() >= generated.size())
     return;
 
@@ -280,108 +304,73 @@ void findMissingGeneratedParticles(vector<const Particle*>   reconstructed,
     }
 
     if (!link)
-      missP.push_back(i);
+      missP.push_back(generated[i]);
   }
 }
 
-bool missingFSRPhoton(vector<const MCParticle*> generated, std::vector<int> missP)
+bool MCMatching::missingFSRPhoton(std::vector<const MCParticle*> missP)
 {
-  bool status = false;
-
-  for (int i = 0; i < (int)missP.size(); ++i) {
-    if (generated[missP[i]]->getPDG() == 22) {
-      if (generated[missP[i]]->getMother()) {
-        int ndaug = (generated[missP[i]]->getMother()->getLastDaughter() - generated[missP[i]]->getMother()->getFirstDaughter()) + 1;
+  for (const MCParticle * generated : missP) {
+    if (generated->getPDG() == 22) {
+      if (generated->getMother()) {
+        int ndaug = generated->getMother()->getNDaughters();
         if (ndaug > 2) {
-          status = true;
-          break;
+          return true;
         }
       }
     }
   }
-  return status;
+  return false;
 }
 
-bool missingRadiativePhoton(vector<const MCParticle*> generated, std::vector<int> missP)
+bool MCMatching::missingRadiativePhoton(std::vector<const MCParticle*> missP)
 {
-  bool status = false;
-
-  for (int i = 0; i < (int)missP.size(); ++i) {
-    if (generated[missP[i]]->getPDG() == 22) {
-      if (generated[missP[i]]->getMother()) {
-        int ndaug = (generated[missP[i]]->getMother()->getLastDaughter() - generated[missP[i]]->getMother()->getFirstDaughter()) + 1;
+  for (const MCParticle * generated : missP) {
+    if (generated->getPDG() == 22) {
+      if (generated->getMother()) {
+        int ndaug = generated->getMother()->getNDaughters();
         if (ndaug == 2) {
-          status = true;
-          break;
+          return true;
         }
       }
     }
   }
-  return status;
+  return false;
 }
 
-bool missingNeutrino(vector<const MCParticle*> generated, std::vector<int> missP)
+bool MCMatching::missingNeutrino(std::vector<const MCParticle*> missP)
 {
-  bool status = false;
-
-  for (int i = 0; i < (int)missP.size(); ++i) {
+  for (const MCParticle * generated : missP) {
     // TODO: avoid hard coded values
-    if (abs(generated[missP[i]]->getPDG()) == 12 || abs(generated[missP[i]]->getPDG()) == 14 || abs(generated[missP[i]]->getPDG()) == 16) {
-      status = true;
-      break;
+    if (abs(generated->getPDG()) == 12 || abs(generated->getPDG()) == 14 || abs(generated->getPDG()) == 16) {
+      return true;
     }
   }
-  return status;
+  return false;
 }
 
-bool missingMassiveParticle(vector<const MCParticle*> generated, std::vector<int> missP)
+bool MCMatching::missingMassiveParticle(std::vector<const MCParticle*> missP)
 {
-  bool status = false;
-
-  for (int i = 0; i < (int)missP.size(); ++i) {
+  for (const MCParticle * generated : missP) {
     // TODO: avoid hard coded values
-    if (abs(generated[missP[i]]->getPDG()) != 12
-        && abs(generated[missP[i]]->getPDG()) != 14
-        && abs(generated[missP[i]]->getPDG()) != 16
-        && generated[missP[i]]->getPDG() != 22) {
-      status = true;
-      break;
+    if (abs(generated->getPDG()) != 12
+        && abs(generated->getPDG()) != 14
+        && abs(generated->getPDG()) != 16
+        && generated->getPDG() != 22) {
+      return true;
     }
   }
-  return status;
+  return false;
 }
 
-bool missingKlong(vector<const MCParticle*> generated, std::vector<int> missP)
+bool MCMatching::missingKlong(std::vector<const MCParticle*> missP)
 {
-  bool status = false;
-
-  for (int i = 0; i < (int)missP.size(); ++i) {
+  for (const MCParticle * generated : missP) {
     // TODO: avoid hard coded values
-    if (abs(generated[missP[i]]->getPDG()) == 130) {
-      status = true;
-      break;
+    if (abs(generated->getPDG()) == 130) {
+      return true;
     }
   }
-  return status;
+  return false;
 }
-
-bool isMisidentified(vector<const Particle*> reconstructed, vector<const MCParticle*> generated)
-{
-  bool status = false;
-
-  for (int i = 0; i < (int)reconstructed.size(); ++i) {
-    const MCParticle* mcParticle = reconstructed[i]->getRelatedTo<MCParticle>();
-
-    for (int j = 0; j < (int)generated.size(); ++j) {
-      if (mcParticle->getIndex() == generated[j]->getIndex()) {
-        if (reconstructed[i]->getPDGCode() != generated[j]->getPDG()) {
-          status = true;
-          break;
-        }
-      }
-    }
-  }
-  return status;
-}
-
 

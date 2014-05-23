@@ -19,7 +19,7 @@ release = str(os.getenv('BELLE2_LOCAL_DIR')) + '/'
 events = 50000
 event_tracks = 1
 
-momentum = 5.0  # GeV/c
+momentum = 4.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
 theta_spread = 0.005  ## degrees (sigma of gaussian)
@@ -39,7 +39,7 @@ geometry_file = 'testbeam/vxd/FullTelescopeVXDTB_v2.xml'
 alignment = release + 'testbeam/vxd/data/nominal_alignment.xml'
 
 # Magnet ON/OFF
-PCMAG_ON = True  # Only 0T/1T
+PCMAG_ON = False  # Only 0T/1T
 
 # -----------------------------------------------------------------
 
@@ -91,6 +91,7 @@ particlegun.param('independentVertices', True)
 simulation = register_module('FullSim')
 simulation.param('StoreAllSecondaries', True)
 
+# -----------------------Digizers-------------------------
 # PXD digitizer
 pxddigi = register_module('PXDDigitizer')
 pxddigi.param('SimpleDriftModel', False)  # To load B-filed from memory
@@ -105,33 +106,16 @@ if PCMAG_ON:
 else:
     teldigi.param('tanLorentz', 0.)
 
-# PXD clusterizer
-PXDClust = register_module('PXDClusterizer')
-if PCMAG_ON:
-    PXDClust.param('TanLorentz', 0.1625)  # value scaled from 0.25 for 1.5T to 0.975T
-else:
-    PXDClust.param('TanLorentz', 0.)
+# --------------------------------------------------------
 
-# SVD clusterizer
-SVDClust = register_module('SVDClusterizer')
-if PCMAG_ON:
-    SVDClust.param('TanLorentz_holes', 0.052)  # value scaled from 0.08 for 1.5T to 0.975T
-    SVDClust.param('TanLorentz_electrons', 0.)
-else:
-    SVDClust.param('TanLorentz_holes', 0.)
-    SVDClust.param('TanLorentz_electrons', 0.)
-
-# EUDET clusterizer
-TelClust = register_module('TelClusterizer')
-TelClust.param('Clusters', 'TelClusters')
-
-mctf = register_module('TrackFinderMCTruth')
+mctf = register_module('TrackFinderMCVXDTB')
 param_mctrackfinder = {
     'UseCDCHits': 0,
+    'UseTelHits': 1,
     'UseSVDHits': 1,
     'UsePXDHits': 1,
     'Smearing': 0,
-    'UseClusters': True,
+    'UseClusters': False,
     'WhichParticles': ['primary'],
     }
 mctf.param(param_mctrackfinder)
@@ -142,8 +126,8 @@ dataWriter.param('outputFileName', 'SimulatedDigits.root')
 # Here you can state which branches you want to output
 # Using this branches, you remove Monte Carlo information and the resulting
 # file will look exactly as merged digits from real testbeam data
-# dataWriter.param('branchNames', ['EventMetaData', 'TelEventInfo', 'PXDDigits',
-#                 'SVDDigits', 'TelDigits'])
+dataWriter.param('branchNames', ['EventMetaData', 'TelEventInfo', 'PXDDigits',
+                 'SVDDigits', 'TelDigits'])
 
 progress = register_module('Progress')
 
@@ -158,19 +142,18 @@ main.add_module(particlegun)
 main.add_module(simulation)
 main.add_module(pxddigi)
 main.add_module(svddigi)
-# main.add_module(teldigi)
-main.add_module(PXDClust)
-main.add_module(SVDClust)
+main.add_module(teldigi)
+# main.add_module(PXDClust)
+# main.add_module(SVDClust)
 # main.add_module(TelClust)
 main.add_module(mctf)
-gbl = register_module('GBLfit')
-gbl.logging.log_level = LogLevel.ERROR
-# gbl.param('noEffects', True)
-gbl.param('UseClusters', True)
-gbl.param('enableIntermediateScatterer', True)
-main.add_module(gbl)
-# d = register_module('Display')
-# main.add_module(d)
+# gbl = register_module('GBLfit')
+# gbl.logging.log_level = LogLevel.ERROR
+# gbl.param('UseClusters', False)
+# gbl.param('enableIntermediateScatterer', True)
+# main.add_module(gbl)
+d = register_module('Display')
+main.add_module(d)
 main.add_module(dataWriter)
 main.add_module(progress)
 

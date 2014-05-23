@@ -32,14 +32,17 @@ geometry_file = 'testbeam/vxd/FullTelescopeVXDTB_v2.xml'  # Gear path
 # during execution of basf2
 # NOTE: You need a separated (from main xml) file for playing with alignment
 alignment = release + 'testbeam/vxd/data/nominal_alignment.xml'
+# alignment = '/mnt/win/577_alignment.xml'
 
 # Turn ON/OFF 1T constant mag. field, affects: geometry/tracking, clustering, track finding
-PCMAG_ON = True  # only 1T/0T supported this way
+PCMAG_ON = False  # only 1T/0T supported this way
 
 # This sector map must reflect field ON/OFF and nominal beam energy ... look for it or create your own
-sectormap = 'TB4GeV1TRun500VXD-moreThan1500MeV_VXD'
+# sectormap = 'TB4GeV1TRun500VXD-moreThan1500MeV_VXD'
 # sectormap = 'TB0T3GeVVXD-moreThan1500MeV_VXD'
-
+sectormap = \
+    ['TB4GeVNoMagnetNoAlignedSource2014May21PXDSVDTEL-moreThan1500MeV_TELPXDSVD'
+     ]
 # Masking for sensors
 pxd_mask = 'testbeam/vxd/data/PXD-IgnoredPixelsList.xml'  # Gear path
 svd_mask = 'testbeam/vxd/data/SVD-IgnoredStripsList.xml'  # Gear path
@@ -47,7 +50,9 @@ svd_mask = 'testbeam/vxd/data/SVD-IgnoredStripsList.xml'  # Gear path
 # ------------- INPUT/OUTPUT SETTINGS ------------
 
 # Input root file with merged digits + event data (nothing else)
-input_root = 'MRun_500.root'
+# input_root = '/mnt/win/alignment/SetBestCandidate607_1.root'
+input_root = 'SimulatedDigits.root'
+
 # Output file with added clusters and tracks
 output_root = 'Digits2Tracks.root'
 # Complete DQM for digits/clusters/correlations/track finding/Kalman fitting...
@@ -89,6 +94,7 @@ else:
 # input data
 input = register_module('RootInput')
 input.param('inputFileName', input_root)
+input.param('excludeBranchNames', ['caTracks'])
 
 # Masking in fact:
 PXDDSort = register_module('PXDDigitSorter')
@@ -138,22 +144,22 @@ telvxd_dqm = register_module('TelxVXD')
 
 # Track finding by VXDTF
 if PCMAG_ON:
-    VXDTF = setup_vxdtf1T('caTracks', [sectormap])
+    VXDTF = setup_vxdtf1T('caTracks')
 else:
-    VXDTF = setup_vxdtf('caTracks', [sectormap])
+    VXDTF = setup_vxdtf('caTracks')
 
 # Track finding DQM
 vxdtfdqm = register_module('VXDTFDQM')
 vxdtfdqm.param('GFTrackCandidatesColName', 'caTracks')
 
 # Track fitting wit GENFIT2
-trackfitter = register_module('GenFitter')
+trackfitter = register_module('GenFitterVXDTB')
 trackfitter.param('GFTrackCandidatesColName', 'caTracks')
 trackfitter.param('FilterId', 'Kalman')
 trackfitter.param('StoreFailedTracks', True)
 trackfitter.param('NMinIterations', 3)
 trackfitter.param('NMaxIterations', 8)
-trackfitter.logging.log_level = LogLevel.ERROR
+trackfitter.logging.log_level = LogLevel.DEBUG
 
 # Track fitting DQM
 tfdqm = register_module('TrackfitDQM')
@@ -164,8 +170,7 @@ gbl = register_module('GBLfit')
 gbl.param('GFTrackCandidatesColName', 'caTracks')
 # This removes cut on hit Chi squared. Use it if geometry is heavily misaligned
 # Default value is 50.    ... use this once first alignment step is finished
-gbl.param('chi2Cut', 0.)
-gbl.param('FilterId', 'Kalman')
+gbl.param('chi2Cut', 50.)
 gbl.param('internalIterations', '')
 gbl.param('milleFileName', alignment_binary)
 gbl.logging.log_level = LogLevel.ERROR
@@ -230,11 +235,12 @@ main.add_module(VXDTF)
 main.add_module(vxdtfdqm)
 main.add_module(trackfitter)
 main.add_module(tfdqm)
-#
-main.add_module(gbl)
-if do_alignment:
-    main.add_module(mp2)
-# main.add_module(display)
+
+# main.add_module(gbl)
+# if do_alignment:
+#    main.add_module(mp2)
+
+main.add_module(display)
 main.add_module(dataWriter)
 main.add_module(progress)
 
@@ -257,9 +263,9 @@ process(main)
 #      from alignment_tools import *
 #      write_alignment( sum_xmltxt_alignment( 'your_initial_alignment.xml', 'millepede.res' ) )
 #
-if do_alignment:
-    write_alignment(sum_xmltxt_alignment(alignment_xml_path=alignment,
-                    alignment_txt_path='millepede.res'), output_alignment)
+# if do_alignment:
+#    write_alignment(sum_xmltxt_alignment(alignment_xml_path=alignment,
+#                    alignment_txt_path='millepede.res'), output_alignment)
 
 # Or in this case (if you run MP2-module, you will have
 # the corrections as xml), you can use this:

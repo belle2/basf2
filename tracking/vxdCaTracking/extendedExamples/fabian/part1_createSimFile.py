@@ -17,7 +17,7 @@ numEvents = 500
 seed = 1
 
 # flags für die pGun
-numTracks = 10
+numTracks = 1
 # transverseMomentum:
 momentumMin = 0.25  # GeV/c
 momentumMax = 0.25  # %
@@ -79,9 +79,11 @@ eventinfosetter.param('evtNumList', [numEvents])
 eventinfoprinter = register_module('EventInfoPrinter')
 
 gearbox = register_module('Gearbox')
+# This file contains the VXD (no Telescopes) beam test geometry including the real PCMAG magnetic field
+# gearbox.param('fileName', 'testbeam/vxd/FullTelescopeVXDTB.xml')
 
 particlegun = register_module('ParticleGun')
-param_pGun = {  # 13: muons, 211: charged pions
+param_pGun = {  # 13: muons, 211: charged pions, 521: b+-Meson
                 # fixed, uniform, normal, polyline, uniformPt, normalPt, inversePt, polylinePt or discrete
     'pdgCodes': [13],
     'nTracks': numTracks,
@@ -97,6 +99,25 @@ param_pGun = {  # 13: muons, 211: charged pions
     'zVertexParams': [0., 0.],
     }
 particlegun.param(param_pGun)
+
+particlegun2 = register_module('ParticleGun')
+param_pGun2 = {  # 11, electrons, 13: muons, 211: charged pions, 521: b+-Meson, 511 b0-Meson, 300553 Y(4S)
+                 # fixed, uniform, normal, polyline, uniformPt, normalPt, inversePt, polylinePt or discrete
+                 # 'momentumParams': [momentumMin*10., momentumMax*10.],
+    'pdgCodes': [11],
+    'nTracks': 2,
+    'momentumGeneration': 'uniformPt',
+    'momentumParams': [momentumMin, momentumMax],
+    'thetaGeneration': 'uniform',
+    'thetaParams': [thetaMin, thetaMax],
+    'phiGeneration': 'uniform',
+    'phiParams': [phiMin, phiMax],
+    'vertexGeneration': 'fixed',
+    'xVertexParams': [0., 0.],
+    'yVertexParams': [0., 0.],
+    'zVertexParams': [0., 0.],
+    }
+particlegun2.param(param_pGun2)
 
 evtgeninput = register_module('EvtGenInput')
 evtgeninput.logging.log_level = LogLevel.WARNING
@@ -114,7 +135,7 @@ simpleClusterizer = register_module('VXDSimpleClusterizer')
 simpleClusterizer.logging.log_level = LogLevel.DEBUG
 simpleClusterizer.logging.debug_level = 1
 simpleClusterizer.param('setMeasSigma', 0)
-simpleClusterizer.param('onlyPrimaries', True)
+simpleClusterizer.param('onlyPrimaries', False)
 if useEDeposit is False:
     simpleClusterizer.param('energyThresholdU', -0.0001)
     simpleClusterizer.param('energyThresholdV', -0.0001)
@@ -216,6 +237,7 @@ if useEvtGen:
 else:
   ## folgende Module nur für pGun:
     main.add_module(particlegun)
+    main.add_module(particlegun2)
 
 main.add_module(g4sim)
 if addBG:

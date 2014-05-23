@@ -14,11 +14,11 @@ useEvtGen = False  # <----------- hier umschalten zwischen evtGen( realistische 
 useEDeposit = True  # <----- EnergyDeposit für Hits (zum debuggen) damit False funzt, pxd/data/PXD.xml und svd/data/SVD.xml see neutrons auf true setzen
 addBG = False  #  <---- adding Background - funzt noch net
 
-numEvents = 22
+numEvents = 500
 seed = 1
 
 # flags für die pGun
-numTracks = 10
+numTracks = 1
 # transverseMomentum:
 momentumMin = 0.25  # GeV/c
 momentumMax = 0.25  # %
@@ -42,13 +42,11 @@ secConfigV = [0., 0.33, 0.67, 1.0]
 qiType = 'circleFit'
 filterOverlaps = 'hopfield'
 collector_info = 1
-TFInfoOutputPath = 'daten/'
+# TFInfoOutputPath = 'datenDeltaSlopeZOverS/'
+TFInfoOutputPath = 'datenAngle3D/'
+activateCollector = 2  # 0 is aus, 2 is fullAnalyze
 
-param_vxdtf = {  # extended output for filters
-                 # segFinder:
-                 # nbFinder:
-                 # HighOccupancy-cases:
-                 # 'activateZigZagXY': [False, True, True], # WARNING: aktiviere den, wenn du die normalen 3 passes benimmst!
+param_vxdtf = {  # 'activateZigZagXY': [False, True, True], # WARNING: aktiviere den, wenn du die normalen 3 passes benimmst!
     'activateBaselineTF': 0,
     'tccMinState': [2],
     'tccMinLayer': [3],
@@ -65,33 +63,36 @@ param_vxdtf = {  # extended output for filters
     'smearSigma': 0.000001,
     'GFTrackCandidatesColName': 'caTracks',
     'tuneCutoffs': 0.0001,
-    'activateDistanceXY': [True],
-    'activateDistance3D': [True],
-    'activateDistanceZ': [True],
-    'activateSlopeRZ': [True],
-    'activateNormedDistance3D': [True],
+    'activateDistanceXY': [False],
+    'activateDistance3D': [False],
+    'activateDistanceZ': [False],
+    'activateSlopeRZ': [False],
+    'activateNormedDistance3D': [False],
     'activateAngles3D': [True],
-    'activateAnglesXY': [True],
+    'activateAnglesXY': [False],
     'activateAnglesRZ': [False],
-    'activateDeltaSlopeRZ': [True],
+    'activateDeltaSlopeRZ': [False],
     'activateDistance2IP': [False],
-    'activatePT': [True],
-    'activateHelixFit': [False],
-    'activateAngles3DHioC': [True],
+    'activatePT': [False],
+    'activateHelixParameterFit': [False],
+    'activateDeltaSOverZ': [False],
+    'activateDeltaSlopeZOverS': [False],
+    'activateDeltaPt': [False],
+    'activateDeltaDistance2IP': [False],
+    'activateAngles3DHioC': [False],
     'activateAnglesXYHioC': [False],
-    'activateAnglesRZHioC': [True],
-    'activateDeltaSlopeRZHioC': [True],
+    'activateAnglesRZHioC': [False],
+    'activateDeltaSlopeRZHioC': [False],
     'activateDistance2IPHioC': [False],
-    'activatePTHioC': [True],
-    'activateHelixFitHioC': [False],
+    'activatePTHioC': [False],
+    'activateHelixParameterFitHioC': [False],
     'activateDeltaPtHioC': [False],
     'activateDeltaDistance2IPHioC': [False],
-    'activateZigZagXY': [True],
-    'activateZigZagRZ': [True],
-    'activateDeltaPt': [True],
-    'activateDeltaDistance2IP': [True],
+    'activateZigZagXY': [False],
+    'activateZigZagRZ': [False],
     'activateCircleFit': [False],
     'tuneCircleFit': [0.00000001],
+    'displayCollector': activateCollector,
     }
 
 clusterType = 'fullClusterizer'
@@ -145,11 +146,8 @@ setupFileNamesvd = setupFileName + 'SVD'
 filterCalc2 = register_module('FilterCalculator')
 filterCalc2.logging.log_level = LogLevel.DEBUG
 filterCalc2.logging.debug_level = 1
-param_fCalc2 = {  # -1 = VXD, 0 = PXD, 1 = SVD
-                  # # completely different to values of Belle2-detector
-                  # arbitrary origin
-                  # 1
-    'detectorType': 1,
+param_fCalc2 = {
+    'detectorType': ['SVD'],
     'maxXYvertexDistance': 200.,
     'tracksPerEvent': numTracks,
     'useEvtgen': 1,

@@ -15,6 +15,7 @@ namespace Belle2 {
    *  an instance of the Variable class for this key. All variables take a
    *  const Particle* and return a double.
    *
+   *  <h2>Adding variables</h2>
    *  Variables will automatically register themselves when
    *  the library that contains them is loaded. They only need to be put in a .cc file,
    *  with a call to REGISTER_VARIABLE() to set a name and description.
@@ -99,6 +100,8 @@ namespace Belle2 {
 #endif
 
     /** evaluate variable 'varName' on given Particle.
+     *
+     * Mainly provided for the Python interface. For performance critical code, it is recommended to use getVariable() once and keep the Var* pointer around.
      *
      * Aborts with B2FATAL if variable isn't found. Assumes 'p' is != NULL.
      */

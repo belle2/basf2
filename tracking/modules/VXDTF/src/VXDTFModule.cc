@@ -2332,10 +2332,6 @@ void VXDTFModule::endRun()
 
   B2DEBUG(2, "Explanation: HSort: hit sorting, baseTF: baseline TF, sgFind: segment finder , nbFind: neighbouring segments finder, CA: cellular automaton, tcCol: track candidate collector, tcFlt: track candidate filter (e.g. circleFit), kalmn: kalman filter, chkOvr: checking track candidates for overlapping clusters, clnOvr: cleaning track candidates for overlapping clusters, neuNet: neuronal network of Hopfield type, others: everything which was not listed above")
 
-  B2ERROR(std::fixed << std::setprecision(2) << " time consumption in microseconds: \n " << "HSort\t|baseTF\t|sgFind\t|nbFind\t|CA \t|tcCol\t|tcFlt\t|kalmn\t|chkOvr\t|clnOvr\t|neuNet\t|others\t|\n" << (m_TESTERtimeConsumption.hitSorting.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.baselineTF.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.segFinder.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.nbFinder.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.cellularAutomaton.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.tcc.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.postCAFilter.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.kalmanStuff.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.checkOverlap.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.cleanOverlap.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.neuronalStuff.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.intermediateStuff.count() * 0.001) << "\t|\n\nmean time for kalmanStuff: " << double(m_TESTERtimeConsumption.kalmanStuff.count() / 1000) / double(m_eventCounter))
-
-  B2ERROR("Explanation: HSort: hit sorting, baseTF: baseline TF, sgFind: segment finder , nbFind: neighbouring segments finder, CA: cellular automaton, tcCol: track candidate collector, tcFlt: track candidate filter (e.g. circleFit), kalmn: kalman filter, chkOvr: checking track candidates for overlapping clusters, clnOvr: cleaning track candidates for overlapping clusters, neuNet: neuronal network of Hopfield type, others: everything which was not listed above")
-
   B2DEBUG(1, lineHigh << lineApnd << lineApnd)
 
   int numLoggedEvents = m_TESTERlogEvents.size();
@@ -3211,7 +3207,7 @@ int VXDTFModule::segFinder(PassData* currentPass)
   vector< pair < int, bool > > acceptedRejectedFilters; // collects for each filter whether it accepted or rejected the current segment. .first is filterID as int, .second is true if accepted, else false
   vector<pair <VXDTFHit*, VXDSector*> > allFriendHits; // collecting all hits of friend sectors and their sector for fast access
   bool accepted = false; // recycled return value of the filters
-  int simpleSegmentQI; // considers only min and max cutoff values, but could be weighed by order of relevance
+  int simpleSegmentQI = 0; // considers only min and max cutoff values, but could be weighed by order of relevance
   int discardedSegmentsCounter = 0;
   int activatedSegmentsCounter = 0;
 
@@ -3655,7 +3651,7 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
            nA/*normal vector of segment a*/,
            nB/*normal vector of segment b*/,
            intersectionAB;
-  int simpleSegmentQI; // better than segmentApproved, but still digital (only min and max cutoff values), but could be weighed by order of relevance
+  int simpleSegmentQI = 0; // better than segmentApproved, but still digital (only min and max cutoff values), but could be weighed by order of relevance
   unsigned int centerLayerIDNumber = 0;
 
 

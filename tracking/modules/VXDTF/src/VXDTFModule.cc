@@ -456,7 +456,7 @@ void VXDTFModule::beginRun()
   TVector3 origin;
   string detectorType;
   /// for each setup, fill parameters, calc numTotalLayers... TODO: failsafe implementation (currently no protection against bad user imputs) lacks of style, longterm goal, export that procedure into a function
-//   m_usePXDorSVDorVXDhits = 2; /// needed, since in theory some passes could use SVD+PXD and some SVD-only. =0, when only PXDhits, = 1, when only svd-hits, =-1 when both cases occur
+
   m_usePXDHits = false, m_useSVDHits = false, m_useTELHits = false;
 
   m_nSectorSetups = m_PARAMsectorSetup.size();
@@ -470,9 +470,7 @@ void VXDTFModule::beginRun()
     newPass->generalTune = m_PARAMtuneCutoffs; // for all passes the same
 
     VXDTFSecMap::Class(); // essential, needed for root, waiting for root 6 to be removed (hopefully)
-//     string chosenSetup = (boost::format("VXDtestBeam-%1%") % newPass->sectorSetup).str();
     string chosenSetup = newPass->sectorSetup;
-//     string chosenSetup = (boost::format("sectorList_%1%") % newPass->sectorSetup).str();
     string directory = "/Detector/Tracking/CATFParameters/" + chosenSetup;
     const VXDTFSecMap* newMap = NULL;
     try {
@@ -509,50 +507,14 @@ void VXDTFModule::beginRun()
     newPass->chosenDetectorType = detectorType;
     newPass->numTotalLayers = 0;
 
-    //     if (detectorType == "SVD") {
-//
-//       newPass->detectorType = Const::SVD;
-//       newPass->numTotalLayers = 4;
-//       if (m_usePXDorSVDorVXDhits == 0) { m_usePXDorSVDorVXDhits = -1; } else if (m_usePXDorSVDorVXDhits == -1) {/*do nothing*/} else {
-//         m_usePXDorSVDorVXDhits = 1;
-//       }  // cases 1,-1, don't do anything, since state is okay
-//
-//     } else if (detectorType == "PXD") {
-//
-//       newPass->detectorType = Const::PXD;
-//       newPass->numTotalLayers = 2;
-//       newPass->minLayer = 2; /// !!!
-//       newPass->minState = 1;
-//       if (m_usePXDorSVDorVXDhits == 1) { m_usePXDorSVDorVXDhits = -1; } else if (m_usePXDorSVDorVXDhits == -1) {/*do nothing*/} else {
-//         m_usePXDorSVDorVXDhits = 0;
-//       }  // cases 1,-1, don't do anything, since state is okay
-//
-//     } else if (detectorType == "VXD") {
-//
-//       newPass->numTotalLayers = 6;
-//       if (m_usePXDorSVDorVXDhits not_eq - 1) { m_usePXDorSVDorVXDhits = -1; }  // cases -1, don't do anything, since state is okay
-//       newPass->detectorType = Const::IR; // WARNING reusing Const::IR as Const::VXD as long as there is no real Const::VXD!
-//
-//     } else {
-//       B2ERROR(m_PARAMnameOfInstance << "Pass " << i << " with setting '" << chosenSetup << "': chosen detectorType via param 'detectorType' (" << detectorType << ") is invalid, resetting value to standard (=VXD,-1)")
-//       newPass->chosenDetectorType = "VXD";
-//       newPass->detectorType = Const::IR;
-//     }
-
     if (detectorType.find("SVD") != std::string::npos) {
       m_useSVDHits = true;
-//       newPass->detectorType = Const::SVD; // WARNING find where this is still used and replace by new method
       newPass->useSVDHits = true;
       newPass->numTotalLayers += 4; // WARNING hardcoded! can we get this info from the system itself? WARNING find where this is still used and find out its purpose (dangerous when some layers are missing?)
 
     }
     if (detectorType.find("PXD") != std::string::npos) {
       m_usePXDHits = true;
-//      if (newPass->detectorType == Const::SVD) {
-//        newPass->detectorType = Const::IR;
-//      } else {
-//        newPass->detectorType = Const::PXD; // WARNING find where this is still used and replace by new method
-//      }
       newPass->usePXDHits = true;
       newPass->numTotalLayers += 2; // WARNING hardcoded! can we get this info from the system itself? WARNING find where this is still used and find out its purpose (dangerous when some layers are missing?)
 
@@ -982,7 +944,6 @@ void VXDTFModule::beginRun()
     m_baselinePass.useSVDHits = m_passSetupVector.at(0)->useSVDHits;
     m_baselinePass.usePXDHits = m_passSetupVector.at(0)->usePXDHits;
     m_baselinePass.useTELHits = m_passSetupVector.at(0)->useTELHits;
-//  m_baselinePass.detectorType = m_passSetupVector.at(0)->detectorType;
     m_baselinePass.chosenDetectorType = m_passSetupVector.at(0)->chosenDetectorType;
     m_baselinePass.numTotalLayers = m_passSetupVector.at(0)->numTotalLayers;
     m_baselinePass.zigzagXY = m_passSetupVector.at(0)->zigzagXY;
@@ -996,7 +957,6 @@ void VXDTFModule::beginRun()
 
     /// WARNING TODO at the moment, copying the first pass set by the user means that the baselineTF can not be set at different behavior than first normal pass. Need new method to introduce independent steering too! (maybe first pass-entries are used for baselineTF if activated, and first pass is second entry in list?)
   }
-//   m_globalizedErrorContainer = Belle2::getGlobalizedHitErrors(); // storing errors of the vxd
   m_errorContainer = getHitErrors();
 
 
@@ -1035,9 +995,6 @@ void VXDTFModule::beginRun()
         B2DEBUG(100, "InitSector secConfigV: " << infosector);
       }
     }
-
-
-
   }
 
 
@@ -1125,8 +1082,6 @@ void VXDTFModule::the_real_event()
   VxdID centerVxdID = VxdID(0, 0, 0); // dummy VxdID for virtual IP
   int passNumber = m_passSetupVector.size() - 1;
 
-  //CALLGRIND_START_INSTRUMENTATION;
-
   BOOST_REVERSE_FOREACH(PassData * currentPass, m_passSetupVector) {
     currentPass->centerSector = centerSector;
     vertexInfo.hitPosition = currentPass->origin;
@@ -1152,8 +1107,6 @@ void VXDTFModule::the_real_event()
     passNumber--;
   }
 
-  // CALLGRIND_STOP_INSTRUMENTATION;
-  // CALLGRIND_DUMP_STATS;
 
   stopTimer = boostClock::now();
   m_TESTERtimeConsumption.intermediateStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
@@ -1457,29 +1410,9 @@ void VXDTFModule::the_real_event()
       if (currentPass->usePXDHits == false) { continue; }  // PXD is included in 0 & -1
       SectorNameAndPointerPair activatedSector = searchSector4Hit(aVxdID,
                                                                   transformedHitLocal,
-//                                                                   localSensorSize,
                                                                   currentPass->sectorMap,
                                                                   currentPass->secConfigU,
                                                                   currentPass->secConfigV);
-
-
-//       // Test only
-//       if (m_PARAMdisplayCollector > 0) {
-//
-//         SectorNameAndPointerPair activatedSector2 = searchSector4HitOld(aVxdID,
-//                                                     transformedHitLocal,
-//                                                     localSensorSize,
-//                                                     currentPass->sectorMap,
-//                                                     currentPass->secConfigU,
-//                                                     currentPass->secConfigV);
-//
-//         if (activatedSector2.first != activatedSector.first) {
-//           B2DEBUG(100, "NO MATCH in searchSector4HitOld: FIRST: " << activatedSector2.first
-//                   << ", (new):" << activatedSector.first);
-//         }
-//
-//       }
-
 
 
       aSecID = activatedSector.first;
@@ -1661,12 +1594,6 @@ void VXDTFModule::the_real_event()
         }   // skip particle if True
         if (currentPass->useSVDHits == false) { continue; }   // SVD is included in 1 & -1, but not in 0
 
-//         SectorNameAndPointerPair activatedSector = searchSector4Hit(aVxdID,
-//                                                                     transformedHitLocal,
-//                                                                     localSensorSize,
-//                                                                     currentPass->sectorMap,
-//                                                                     currentPass->secConfigU,
-//                                                                     currentPass->secConfigV);
 
         SectorNameAndPointerPair activatedSector = searchSector4Hit(aVxdID,
                                                                     hitLocal,
@@ -1674,32 +1601,6 @@ void VXDTFModule::the_real_event()
                                                                     currentPass->sectorMap,
                                                                     currentPass->secConfigU,
                                                                     currentPass->secConfigV);
-
-//         // Test only
-//         if (m_PARAMdisplayCollector > 0) {
-//
-//           SectorNameAndPointerPair activatedSector2 = searchSector4HitOld(aVxdID,
-//                                                       transformedHitLocal,
-//                                                       localSensorSize,
-//                                                       currentPass->sectorMap,
-//                                                       currentPass->secConfigU,
-//                                                       currentPass->secConfigV);
-//
-//           if (activatedSector2.first != activatedSector.first) {
-//             B2DEBUG(100, "NO MATCH in searchSector4HitOld: FIRST: " << activatedSector2.first <<
-//                     ", (new):" << activatedSector.first);
-//           }
-//
-// //   if ( activatedSector2.second != activatedSector.second)
-// //   {
-// //     B2DEBUG(100, "NO MATCH in searchSector4HitOld: SECOND: " << activatedSector2.second <<
-// //     ", (new):" << activatedSector.second);
-// //   }
-//
-//
-//
-//         }
-
 
 
         aSecID = activatedSector.first;
@@ -1738,17 +1639,6 @@ void VXDTFModule::the_real_event()
         // importHits 6.
         if (m_PARAMdisplayCollector > 0) {
 
-//              for(auto infosector : currentPass->secConfigU) {
-//  B2DEBUG(100, "2 InitSector secConfigU: " << infosector);
-//       }
-//
-//       for(auto infosector : currentPass->secConfigV) {
-//  B2DEBUG(100, "2 InitSector secConfigV: " << infosector);
-//       }
-//
-//
-//
-
           std::vector<int> assignedIDs;
 
           assignedIDs.push_back(clusterIndexU);
@@ -1758,8 +1648,6 @@ void VXDTFModule::the_real_event()
 
           // Connect Hit <=> Collector Hit
           pTFHit->setCollectorID(hit_id);
-
-//     B2DEBUG(100, "COOR: X transformedHitLocal/localSensorSize: " << transformedHitLocal.X() << "/" << localSensorSize.X() << ", HitPosition: " << hitInfo.hitPosition.X());
 
           B2DEBUG(100, "Coor asecid: " << aSecID << ", position Hit: " << hitInfo.hitPosition.X() << "/" << hitInfo.hitPosition.Y() << "/" << hitInfo.hitPosition.Z() << ", uCoord: " << uCoord << ", vCoord: " << vCoord << ", aVxdID: " << aVxdID.getID());
 
@@ -1772,7 +1660,6 @@ void VXDTFModule::the_real_event()
 
         currentPass->hitVector.push_back(pTFHit);
         secMapIter->second->addHit(pTFHit);
-//         currentPass->sectorSequence.push_back(activatedSector);
         currentPass->sectorVector.push_back(secMapIter->second);// should be a pointer to a sector
 
         B2DEBUG(150, "size of sectorVector: " << currentPass->sectorVector.size() << "size of hitVector: " << currentPass->hitVector.size());
@@ -1791,26 +1678,6 @@ void VXDTFModule::the_real_event()
 
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 3, PACKAGENAME()) == true) {
     B2DEBUG(3, "VXDTF- import hits: of " << nSvdClusters << " svdClusters, " << nClusterCombis << " svd2Dclusters, " << nPxdClusters  << " pxdClusters and " << nTelClusters  << " telClusters, " << badSectorRangeCtr << " hits had to be discarded because out of sector range")
-    /*
-        int nTotalActivatedSectorsSecSeq = 0, // counts total sectors activated in sectorSequence
-            nTotalActivatedSectorsSecVec = 0, // counts total sectors activated in sectorVector
-            nTotalHits = 0; // counts total number of Hits
-        passNumber = 0;
-
-        for (PassData * aPass : m_passSetupVector) {
-          B2DEBUG(5, "Pass: " << passNumber << " with name " << aPass->sectorSetup << ": got " << aPass->sectorSequence.size() << "/" << aPass->sectorVector.size() << " entries in sectorSequence/-Vector, and " << aPass->hitVector.size() << " VXDTFhits")
-          nTotalActivatedSectorsSecSeq += aPass->sectorSequence.size();
-          nTotalActivatedSectorsSecVec += aPass->sectorVector.size();
-          nTotalHits += aPass->hitVector.size();
-          passNumber++;
-
-          stringstream infoStream;
-          for ( const VXDSector* aSector : aPass->sectorVector ) {
-            infoStream << FullSecID(aSector->getSecID()) << ": " << aSector->getHits().size() << ",  ";
-          }
-          B2DEBUG(10, "Had following hits in sectors: " << endl << infoStream.str())
-        }
-        B2DEBUG(3, "all Passes: size of sectorSequence/-Vector: " << nTotalActivatedSectorsSecSeq << "/" << nTotalActivatedSectorsSecVec << ", nVXDTFhits: " << nTotalHits);*/
   }
   /** Section 3 - end **/
 
@@ -1833,10 +1700,6 @@ void VXDTFModule::the_real_event()
     int numPassHits = currentPass->hitVector.size();
     thisInfoPackage.numSVDHits += numPassHits;
     B2DEBUG(10, "Pass " << passNumber << ": sectorVector has got " << currentPass->sectorVector.size() << " entries before applying unique & sort");
-
-//     currentPass->sectorSequence.sort(compareSecSequence);
-//     currentPass->sectorSequence.unique();
-//     currentPass->sectorSequence.reverse();
 
     // inverse sorting and removing unique entries so we can get a list of activated sectors where the outermost sector is the first in the list:
     std::sort(currentPass->sectorVector.begin(), currentPass->sectorVector.end(),
@@ -2076,9 +1939,8 @@ void VXDTFModule::the_real_event()
       m_TESTERkalmanSkipped++;
     }
     if (m_calcQiType == 1 and allowKalman == true) {
-//      StoreArray<TelCluster>* telStoreArrayPtr = NULL;
-//      if ( nTelClusters != 0) { telStoreArrayPtr = &aTelClusterArray; }
-      calcQIbyKalman(m_tcVector/*, clustersOfEvent, &aPxdClusterArray, telStoreArrayPtr*/); /// calcQIbyKalman
+
+      calcQIbyKalman(m_tcVector); /// calcQIbyKalman
     } else if (m_calcQiType == 0) {
       calcQIbyLength(m_tcVector, m_passSetupVector);                              /// calcQIbyLength
     } else if (m_calcQiType == 3) { // and if totalOverlaps > 500
@@ -2261,8 +2123,6 @@ void VXDTFModule::the_real_event()
 
     if (m_TESTERexpandedTestingRoutines == true) {
 
-      //B2DEBUG(1, "m_TESTERexpandedTestingRoutines == true 2");
-
       VXDTFInfoBoard newBoard;
       StoreArray<VXDTFInfoBoard> extraInfo4GFTCs(m_PARAMinfoBoardName); // needed since I use it only within if-parenthesis
 
@@ -2274,8 +2134,6 @@ void VXDTFModule::the_real_event()
       newBoard.fitIsPossible(currentTC->getFitSucceeded());
       newBoard.setProbValue(currentTC->getTrackQuality());
       extraInfo4GFTCs.appendNew(newBoard);
-
-      //B2DEBUG(1, "OLD InfoBoard indexNumber: " << indexNumber << " ProbValue: " << currentTC->getTrackQuality() << "; isFitPossible: " << currentTC->getFitSucceeded());
 
     }
 
@@ -2548,14 +2406,7 @@ void VXDTFModule::terminate()
 void VXDTFModule::delFalseFriends(PassData* currentPass, TVector3 primaryVertex)
 {
   std::vector<VXDSegmentCell*> segmentsOfSector;
-//   OperationSequenceOfActivatedSectors::iterator secSequenceIter;
-//   for (secSequenceIter = currentPass->sectorSequence.begin(); secSequenceIter != currentPass->sectorSequence.end(); ++secSequenceIter) {
-//     MapOfSectors::const_iterator currentSectorIter = secSequenceIter->second;
-//     segmentsOfSector = currentSectorIter->second->getInnerSegmentCells(); // loading segments of sector
-//     for (VXDSegmentCell * segment : segmentsOfSector) {
-//       segment->kickFalseFriends(primaryVertex);
-//     }
-//   } // WARNING TODO update
+
   for (VXDSector * aSector : currentPass->sectorVector) {
     for (VXDSegmentCell * segment : aSector->getInnerSegmentCells()) {
       segment->kickFalseFriends(primaryVertex);
@@ -3311,12 +3162,6 @@ Belle2::SectorNameAndPointerPair VXDTFModule::searchSector4Hit(VxdID aVxdID,
   VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
   VXD::SensorInfoBase sensorInfoBase = geometry.getSensorInfo(aVxdID);
 
-//   B2DEBUG(100, "searchSector4Hit: aRelCoor: " << aRelCoor.first << "/ " << aRelCoor.second);
-
-  // Convert to local Corrdinates for Normalization WARNING what was that for? should not be needed!
-//   aCoorLocal = SpacePoint::convertNormalizedToLocalCoordinates(aRelCoor, aVxdID, &sensorInfoBase);
-
-//   B2DEBUG(100, "searchSector4Hit: aCoorLocal: " << aCoorLocal.first << "/ " << aCoorLocal.second);
 
   // Normalization of the Coordinates
   aCoorNormalized = SpacePoint::convertLocalToNormalizedCoordinates(aCoorLocal, aVxdID, &sensorInfoBase);
@@ -3351,78 +3196,6 @@ Belle2::SectorNameAndPointerPair VXDTFModule::searchSector4Hit(VxdID aVxdID,
 
   return make_pair(aFullSecID, secMapIter); // SectorNameAndPointerPair
 }
-
-
-
-
-/** ***** searchSector4Hit ***** **/
-/// searches for sectors fitting current hit coordinates, returns blank string if nothing could be found
-// // Belle2::SectorNameAndPointerPair VXDTFModule::searchSector4HitOld(VxdID aVxdID,
-// //     TVector3 localHit,
-// //     TVector3 sensorSize,
-// //     Belle2::MapOfSectors& m_sectorMap,
-// //     vector<double>& uConfig,
-// //     vector<double>& vConfig)
-// // {
-// //   Belle2::MapOfSectors::iterator secMapIter = m_sectorMap.begin();
-// //
-// //   unsigned int aSecID;
-// //   unsigned int aFullSecID = numeric_limits<unsigned int>::max();
-// //
-// // //   if (m_PARAMdisplayCollector > 0) {
-// // //     B2DEBUG(100, "Find SecID LocalHit: " << localHit.X() << "/" << localHit.Y() << "/" << localHit.Z());
-// // //     B2DEBUG(100, "Find SecID sensorSize: " << sensorSize.X() << "/" << sensorSize.Y() << "/" << sensorSize.Z());
-// // //   }
-// //
-// //   for (int j = 0; j < int(uConfig.size() - 1); ++j) {
-// //     B2DEBUG(175, "uCuts(j)*uSize: " << uConfig.at(j)*sensorSize[0] << " uCuts(j+1)*uSize: " << uConfig.at(j + 1)*sensorSize[0]);
-// //
-// //     // Changed by Stefan F, no * 2
-// //     // if (localHit[0] >= (uConfig[j]*sensorSize[0] * 2.) && localHit[0] <= (uConfig[j + 1]*sensorSize[0] * 2.)) {
-// //     if (localHit[0] >= (uConfig[j]*sensorSize[0]) && localHit[0] <= (uConfig[j + 1]*sensorSize[0])) {
-// //       for (int k = 0; k != int(vConfig.size() - 1); ++k) {
-// //         B2DEBUG(175, " vCuts(k)*vSize: " << vConfig.at(k)*sensorSize[1] << " vCuts(k+1)*vSize: " << vConfig.at(k + 1)*sensorSize[1]);
-// //
-// // //         if (localHit[1] >= (vConfig[k]*sensorSize[1] * 2.) && localHit[1] <= (vConfig[k + 1]*sensorSize[1] * 2.)) {
-// //         if (localHit[1] >= (vConfig[k]*sensorSize[1]) && localHit[1] <= (vConfig[k + 1]*sensorSize[1])) {
-// //           aSecID = k + 1 + j * (vConfig.size() - 1);
-// //
-// // //    if (m_PARAMdisplayCollector > 0) {
-// // //      B2DEBUG(100, "LocalHit_aSecID_aVxdID: " << localHit.X() << ";" << localHit.Y() << ";" << localHit.Z() << ";" << aSecID << "; " << aVxdID.getID());
-// // //    }
-// //
-// //           aFullSecID = FullSecID(aVxdID, false, aSecID).getFullSecID();
-// //           B2DEBUG(150, "searchSector4Hit: calculated secID: " << FullSecID(aFullSecID))
-// //           secMapIter = m_sectorMap.find(aFullSecID);
-// //
-// // //     if (m_PARAMdisplayCollector > 0) {
-// // //      B2DEBUG(100, "aFullSecID: " << aFullSecID);
-// // //    }
-// //
-// //           if (secMapIter == m_sectorMap.end()) {
-// //             aFullSecID = FullSecID(aVxdID, true, aSecID).getFullSecID();
-// //             B2DEBUG(150, "searchSector4Hit: secID not found, trying : " << FullSecID(aFullSecID))
-// //             secMapIter = m_sectorMap.find(aFullSecID);
-// //           }
-// //
-// //           if (secMapIter == m_sectorMap.end()) {
-// //             aFullSecID = numeric_limits<unsigned int>::max();
-// //             B2DEBUG(150, "searchSector4Hit: secID does not exist in secMap. Setting to: " << FullSecID(aFullSecID))
-// //           }
-// //         }
-// //       }
-// //     }
-// //   } //sector-searching loop
-// //   return make_pair(aFullSecID, secMapIter); // SectorNameAndPointerPair
-// // }
-
-
-/*
-bool VXDTFModule::compareSecSequence(Belle2::SectorNameAndPointerPair& lhs, Belle2::SectorNameAndPointerPair& rhs)
-{
-  if (lhs.first < rhs.first) { return true; }
-  return false;
-}*/
 
 
 
@@ -3876,18 +3649,19 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
   unsigned int currentFriendID; // not needed: outerLayerID, innerLayerID
   TVector3 outerVector, centerVector, innerVector, outerTempVector;
   TVector3* outerCoords, *centerCoords, *innerCoords;
-  TVector3 innerTempVector, cpA/*central point of innerSegment*/, cpB/*central point of mediumSegment*/, nA/*normal vector of segment a*/, nB/*normal vector of segment b*/, intersectionAB;
+  TVector3 innerTempVector,
+           cpA/*central point of innerSegment*/,
+           cpB/*central point of mediumSegment*/,
+           nA/*normal vector of segment a*/,
+           nB/*normal vector of segment b*/,
+           intersectionAB;
   int simpleSegmentQI; // better than segmentApproved, but still digital (only min and max cutoff values), but could be weighed by order of relevance
   unsigned int centerLayerIDNumber = 0;
 
-//   OperationSequenceOfActivatedSectors::const_iterator secSequenceIter;
-//   MapOfSectors::iterator mainSecIter;
-//   MapOfSectors::iterator friendSecIter;
-  for (VXDSector * mainSector : currentPass->sectorVector)
-    /*for (secSequenceIter = currentPass->sectorSequence.begin(); secSequenceIter != currentPass->sectorSequence.end(); ++secSequenceIter)*/ {
+
+  for (VXDSector * mainSector : currentPass->sectorVector) {
     FullSecID mainSecID = mainSector->getSecID();
     B2DEBUG(75, "neighbourFinder: SectorSequence is named " << mainSecID);
-//     mainSecIter = (*secSequenceIter).second;
 
     vector<VXDSegmentCell*> outerSegments = mainSector->getInnerSegmentCells(); // loading segments of sector
     int nOuterSegments = outerSegments.size();
@@ -4167,8 +3941,6 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
 
       }
 
-      // int cellID, std::string died_at, int died_id, std::vector<int> accepted, std::vector<int> rejected, int add_TCID, int remove_TCID, int cellstate, std::vector<int> neighbours
-
       m_collector.updateCell(currentSeg->getCollectorID(), "", CollectorTFInfo::m_idAlive, acceptedFilters, rejectedFilters, -1, -1, currentSeg->getState(), vector<int>());
 
     }
@@ -4329,10 +4101,8 @@ int VXDTFModule::cellularAutomaton(PassData* currentPass)
     if (caRound > 15) { /// WARNING: hardcoded value
       B2ERROR("event " << m_eventCounter << ": VXDTF-CA: more than 15 ca rounds! " << activeCells << " living cells remaining");
       stringstream currentSectors;
-      for (VXDSector * aSector : currentPass->sectorVector/*SectorNameAndPointerPair & key : currentPass->sectorSequence*/) {
-//         currentSectors += key.first;
+      for (VXDSector * aSector : currentPass->sectorVector) {
         currentSectors << FullSecID(aSector->getSecID()) << " ";
-//         currentSectors += space;
       }
       B2ERROR("event " << m_eventCounter << ": VXDTF-CA: activated sectors: " << currentSectors.str())
       m_TESTERbrokenCaRound++;
@@ -4363,17 +4133,13 @@ void VXDTFModule::tcCollector(PassData* currentPass)
   short int mayorLayerID/*, nSegmentsInSector*/;
   int findTCsCounter = 0;
   int tccMinState = currentPass->minState;
-//   OperationSequenceOfActivatedSectors::iterator secSequenceIter;
   for (VXDSector * aSector : currentPass->sectorVector)  {
-//   for (secSequenceIter = currentPass->sectorSequence.begin(); secSequenceIter != currentPass->sectorSequence.end(); ++secSequenceIter) {
     B2DEBUG(100, "TCC - entering sector " << FullSecID(aSector->getSecID()));
-//     MapOfSectors::const_iterator sectorOfSequIter = (*secSequenceIter).second;
 
     mayorLayerID = FullSecID(aSector->getSecID()).getLayerID();
     if (mayorLayerID < currentPass->minLayer) { continue; }
 
     vector<VXDSegmentCell*> segmentsOfSector = aSector->getInnerSegmentCells(); // loading segments of sector
-//     nSegmentsInSector = segmentsOfSector.size();
 
     B2DEBUG(50, "TCC - sector " << FullSecID(aSector->getSecID()) << " has got " << segmentsOfSector.size() << " segments in its area");
 
@@ -4855,7 +4621,7 @@ void VXDTFModule::calcQIbyStraightLine(TCsOfEvent& tcVector)
 
 
 
-void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector/*, vector<ClusterInfo>& clusters, StoreArray<PXDCluster>* pxdClusters, StoreArray<TelCluster>* telClusters*/)
+void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector)
 {
   /// produce GFTrackCands for each currently living TC and calculate real kalman-QI's
   genfit::KalmanFitter kalmanFilter;
@@ -4882,11 +4648,9 @@ void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector/*, vector<ClusterInfo>& cl
 
     for (VXDTFHit * tfHit : currentTC->getHits()) {
       if (tfHit->getDetectorType() == Const::PXD) {
-//         PXDRecoHit* newRecoHit = new PXDRecoHit(pxdClusters->[clusters[tfHit->getClusterIndexUV()].getRealIndex()]);
         PXDRecoHit* newRecoHit = new PXDRecoHit(tfHit->getClusterInfoUV()->getPXDCluster());
         track.insertMeasurement(newRecoHit);
       } else if (tfHit->getDetectorType() == Const::TEST) {
-//         TELRecoHit* newRecoHit = new TELRecoHit(telClusters->[clusters[tfHit->getClusterIndexUV()].getRealIndex()]);
         TelRecoHit* newRecoHit = new TelRecoHit(tfHit->getClusterInfoUV()->getTELCluster());
         track.insertMeasurement(newRecoHit);
       } else if (tfHit->getDetectorType() == Const::SVD) {
@@ -5064,25 +4828,6 @@ genfit::TrackCand VXDTFModule::generateGFTrackCand(VXDTFTrackCandidate* currentT
       }
     }
   }
-//   BOOST_REVERSE_FOREACH(int hitIndex, pxdHits) {  // order of hits within VXDTFTrackCandidate: outer->inner hits. GFTrackCand: inner->outer hits
-//     newGFTrackCand.addHit(Const::PXD, hitIndex);
-//     hitIDs.push_back(hitIndex);
-//   }
-//   std::sort(hitIDs.begin(), hitIDs.end());
-//   auto itPxd = std::unique(hitIDs.begin(), hitIDs.end());
-//   hitIDs.resize(std::distance(hitIDs.begin(), itPxd));
-//   if (pxdHits.size() != hitIDs.size()) { B2FATAL("generateGFTrackCand event " << m_eventCounter << ": tc got same PXDhit several times!")}
-//   hitIDs.clear();
-//
-//   BOOST_REVERSE_FOREACH(int hitIndex, svdHits) {  // order of hits within VXDTFTrackCandidate: outer->tcFilterinner hits. GFTrackCand: inner->outer hits
-//     newGFTrackCand.addHit(Const::SVD, hitIndex);
-//     hitIDs.push_back(hitIndex);
-//   }
-//   std::sort(hitIDs.begin(), hitIDs.end());
-//   auto itSvd = std::unique(hitIDs.begin(), hitIDs.end());
-//   hitIDs.resize(std::distance(hitIDs.begin(), itSvd));
-//   if (svdHits.size() != hitIDs.size()) { B2FATAL("generateGFTrackCand event " << m_eventCounter << ": tc got same SVDhit several times!")}
-//   hitIDs.clear();
 
   return newGFTrackCand;
 }
@@ -5094,7 +4839,6 @@ int VXDTFModule::cleanOverlappingSet(TCsOfEvent& tcVector)
   int nIHits = 0, nJHits = 0, nMergedHits = 0, killedTCs = 0;
   list<int> ihitIDs, jhitIDs, mergedHitIDs;
 
-//   TCsOfEvent rivals;
   for (VXDTFTrackCandidate * aTC : tcVector) {
     if (aTC->getCondition() == false) { continue; }
     ihitIDs = aTC->getHopfieldHitIndices();
@@ -5146,9 +4890,7 @@ int VXDTFModule::cleanOverlappingSet(TCsOfEvent& tcVector)
           m_collector.updateTC(bTC->getCollectorID(), "", CollectorTFInfo::m_idAlive, filter_overlapping, vector<int>());
         }
 
-
       }
-
 
     }
   }
@@ -5210,9 +4952,6 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
   ActiveSensorsOfEvent activatedSensors;
   vector<ClusterHit> clusterHitList;
   vector<VXDTFHit> singleSidedHits;
-//  vector<VXDTFHit> vxdHits, singleSidedHits;
-//   vxdHits.reserve(clusters.size() * 2);
-//   passInfo->fullHitsVector.reserve(clusters.size() * 2); // vector<VXDTFHit>: will carry all vxdHits in the end (all 1D (=SCDHits where no second partner was found) and 2D-VXDHits)
 
   for (ClusterInfo & aClusterInfo : clusters) {
     bool isPXD = aClusterInfo.isPXD();
@@ -5224,7 +4963,6 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
 
       aVxdID = aClusterInfo.getPXDCluster()->getSensorID();
       aLayerID = aVxdID.getLayerNumber();
-//       const VXD::SensorInfoBase& aSensorInfo = dynamic_cast<const VXD::SensorInfoBase&>(VXD::GeoCache::get(aVxdID));
       const VXD::SensorInfoBase& aSensorInfo = VXD::GeoCache::get(aVxdID);
       newPosition.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
       newPosition.hitSigma = aSensorInfo.vectorToGlobal(sigmaVec);
@@ -5241,7 +4979,6 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
 
       aVxdID = aClusterInfo.getTELCluster()->getSensorID();
       aLayerID = aVxdID.getLayerNumber();
-//       const VXD::SensorInfoBase& aSensorInfo = dynamic_cast<const VXD::SensorInfoBase&>(VXD::GeoCache::get(aVxdID));
       const VXD::SensorInfoBase& aSensorInfo = VXD::GeoCache::get(aVxdID);
       newPosition.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
       newPosition.hitSigma = aSensorInfo.vectorToGlobal(sigmaVec);
@@ -5277,7 +5014,6 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
     // now we check for each strange sensor whether it makes sense to generate 1D-VXDTFHits or not. we therefore filter by threshold to keep us from stumbling over messy sensors
     singleSidedHits = dealWithStrangeSensors(activatedSensors, brokenSensors);
 
-//    vxdHits.insert(vxdHits.end(), singleSidedHits.begin(), singleSidedHits.end());
     passInfo->fullHitsVector.insert(passInfo->fullHitsVector.end(), singleSidedHits.begin(), singleSidedHits.end());
     /// missing: could use the timeStamp to improve that situation -> if timestamp of both sides fit -> allowed to form a 2D-hit, else only 1D-option, for those who were allowed to form partners, they are also creating a 1D-hit (total number of possible combinations is reduced by forbidding to combine timing-incompatible hits ). This feature shall only be used, when there is a strange sensor (therefore can be combined with the find2DSVDHits-function as a possibility if strange sensor occurs) -> can not detect cases, where no u-cluster fits to a v-cluster (e.g. if they come from two track where each produced only one cluster)
   } else { B2DEBUG(3, m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: there are no broken sensors with strange cluster-behavior") }
@@ -5294,7 +5030,6 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
     hitsPerLayer.at(aLayerID - 1) += 1;
     if (hitsPerLayer[aLayerID - 1] > maxCounts) { maxCounts = hitsPerLayer[aLayerID - 1]; }
     listOfHitExtras.push_back(make_pair((*hit.getHitCoordinates() - passInfo->origin).Mag(),  &hit));    // first is distance of hit to chosen origin
-//    listOfHitExtras.push_back( boost::make_tuple( (*hit.getHitCoordinates() - passInfo->origin).Mag(), 0.,  &hit) ); // distance to seedHit can not be calculated yet, since we don't know the seed yet
   }
 
   if (int(listOfHitExtras.size()) == 0 or maxCounts < 1) {

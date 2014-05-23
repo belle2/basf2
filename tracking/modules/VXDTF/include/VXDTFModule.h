@@ -245,17 +245,6 @@ namespace Belle2 {
                                                       std::vector<double>& vConfig); // -> TODO: generally usefull for VXD-related modules
     /// VXDTFModule::SectorNameAndPointerPair searchSector4Hit(VxdID aVxdID, FIXME alternative version needed?
 
-//     // only temp for testing
-//     Belle2::SectorNameAndPointerPair searchSector4HitOld(VxdID aVxdID,
-//                                                          TVector3 localHit,
-//                                                          TVector3 sensorSize,
-//                                                          Belle2::MapOfSectors& m_sectorMap,
-//                                                          std::vector<double>& uConfig,
-//                                                          std::vector<double>& vConfig);
-
-//     /** needed for sorting sectorSequence and compares strings... */
-//     static bool compareSecSequence(Belle2::SectorNameAndPointerPair& lhs, Belle2::SectorNameAndPointerPair& rhs); // -> TODO: dirty little helper
-
 
     /** searches for segments in given pass and returns number of discarded segments */
     int segFinder(PassData* currentPass);
@@ -285,8 +274,7 @@ namespace Belle2 {
 
     /** filters TCs via deltaPt, ZigZag and deltaDistance2IP */
     int tcFilter(PassData* currentPass,
-                 int passNumber/*,
-               std::vector<ClusterInfo>& clustersOfEvent*/);
+                 int passNumber);
 
 
 
@@ -308,10 +296,7 @@ namespace Belle2 {
 
 
     /** calculate real kalman-QI's for each currently living TC */
-    void calcQIbyKalman(TCsOfEvent& tcVector/*,
-                        std::vector<ClusterInfo>& clusters,
-                        StoreArray<PXDCluster>* pxdClusters,
-                        StoreArray<TelCluster>* telClusters = NULL*/);
+    void calcQIbyKalman(TCsOfEvent& tcVector);
 
 
     /** because of geometrical reasons and the multipass-support, it is a rather common situation that the same track will be recovered twice or more.
@@ -377,18 +362,12 @@ namespace Belle2 {
     VXDTFHit deliverVXDTFHitWrappedSVDHit(ClusterInfo* uClusterInfo, ClusterInfo* vClusterInfo);
 
 
-    /** sorts that specific tuple using position 1, not position 0 (which can be done by using standard sorting algorithm) */
-    //       bool sortHitExtraTupleAtPosition1(const HitExtraTuple& t1, const HitExtraTuple& t2);
-
-
     /** executes the calculations needed for the circleFit */
     bool doTheCircleFit(PassData* thisPass, VXDTFTrackCandidate* aTc, int nHits, int tcCtr, int addDegreesOfFreedom = 1);
 
 
     /** reserves hits for the best TCs so far */
     void reserveHits(TCsOfEvent& tcVector, PassData* currentPass);
-    /** random generator function */
-    //    ptrdiff_t rngWrapper(ptrdiff_t i);
 
 
     void resetCountersAtBeginRun() {
@@ -534,7 +513,6 @@ namespace Belle2 {
 
     std::vector< std::vector< std::pair<double, double> > > m_globalizedErrorContainer; /**< stores error of u coordinates of each ladder in the vxd converted to x and y global coordinates. These values are needed by the circleFitter. How to access: container[layerID][ladderID].first = sigmaX, container[layerID][ladderID].second = sigmaY */
     std::vector< std::pair<double, double> > m_errorContainer; /**< stores error of u and v coordinates of each layer in the vxd. These values are needed by the circleFitter. How to access: container[layerID].first = sigmaU, container[layerID].second = sigmaV */
-//     int m_usePXDorSVDorVXDhits; /**< when having more than one pass per event, sector maps using PXD, SVD or VXD can be set independently. To produce TFHits only when needed, this value is set to -1,0 or 1 */
     bool m_usePXDHits; /**< when having more than one pass per event, sector maps using PXD, SVD or TEL can be set independently. To produce TFHits for PXD, this value is set to true */
     bool m_useSVDHits; /**< when having more than one pass per event, sector maps using PXD, SVD or TEL can be set independently. To produce TFHits for SVD, this value is set to true */
     bool m_useTELHits; /**< when having more than one pass per event, sector maps using PXD, SVD or TEL can be set independently. To produce TFHits for TEL, this value is set to true */
@@ -579,10 +557,6 @@ namespace Belle2 {
     double m_rootChi2; /**< used for storing chi2values in a root file */
     double m_rootCircleRadius; /**< used for storing the circle radii calculated by the circle fitter in a root file */
     int m_rootNdf; /**< used for storing numbers of degrees of freedom in a root file */
-//     std::vector<double>  m_rootVecPvalues; /**< used for storing grouped pValues in a root file */
-//     std::vector<double> m_rootVecChi2; /**< used for storing grouped chi2values in a root file */
-//     std::vector<double> m_rootVecCircleRadius; /**< used for storing grouped CircleRadius-values in a root file */
-//     std::vector<int> m_rootVecNdf; /**< used for storing grouped numbers of degrees of freedom in a root file */
 
     std::string m_PARAMcalcQIType; /**< allows you to chose the way, the QI's of the TC's shall be calculated. currently supported: 'kalman','trackLength', 'circleFit' */
     int m_calcQiType; /**< is set by m_PARAMcalcQIType and defines which qi type shall be calculated */

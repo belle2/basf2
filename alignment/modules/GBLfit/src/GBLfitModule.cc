@@ -35,12 +35,12 @@
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 
-//#define ALLOW_TELESCOPES_IN_GBLFITMODULE
-//#ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
-//#include <testbeam/vxd/dataobjects/TelCluster.h>
-//#include <testbeam/vxd/dataobjects/TelTrueHit.h>
-//#include <testbeam/vxd/reconstruction/TelRecoHit.h>
-//#endif
+#define ALLOW_TELESCOPES_IN_GBLFITMODULE
+#ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
+#include <testbeam/vxd/dataobjects/TelCluster.h>
+#include <testbeam/vxd/dataobjects/TelTrueHit.h>
+#include <testbeam/vxd/reconstruction/TelRecoHit.h>
+#endif
 
 #include <cdc/translators/LinearGlobalADCCountTranslator.h>
 #include <cdc/translators/SimpleTDCCountTranslator.h>
@@ -241,12 +241,12 @@ void GBLfitModule::event()
   if (pxdTrueHits.getEntries() == 0)
     B2DEBUG(100, "GBLfit: PXDHitsCollection is empty!");
 
-//#ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
-//  StoreArray < TelTrueHit > telTrueHits(m_telHitsColName);
-//  B2DEBUG(149, "GBLfit: Number of TelHits: " << telTrueHits.getEntries());
-//  if (telTrueHits.getEntries() == 0)
-//    B2DEBUG(100, "GBLfit: PXDHitsCollection is empty!");
-//#endif
+#ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
+  StoreArray < TelTrueHit > telTrueHits(m_telHitsColName);
+  B2DEBUG(149, "GBLfit: Number of TelHits: " << telTrueHits.getEntries());
+  if (telTrueHits.getEntries() == 0)
+    B2DEBUG(100, "GBLfit: PXDHitsCollection is empty!");
+#endif
 
   //PXD clusters
   StoreArray<PXDCluster> pxdClusters("");
@@ -254,13 +254,13 @@ void GBLfitModule::event()
   B2DEBUG(149, "GBLfit: Number of PXDClusters: " << nPXDClusters);
   if (nPXDClusters == 0) {B2DEBUG(100, "GBLfit: PXDClustersCollection is empty!");}
 
-//#ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
-//  //Telescope clusters
-//  StoreArray<TelCluster> telClusters("");
-//  int nTelClusters = telClusters.getEntries();
-//  B2DEBUG(149, "GBLfit: Number of TelClusters: " << nTelClusters);
-//  if (nTelClusters == 0) {B2DEBUG(100, "GBLfit: TelClustersCollection is empty!");}
-//#endif
+#ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
+  //Telescope clusters
+  StoreArray<TelCluster> telClusters("");
+  int nTelClusters = telClusters.getEntries();
+  B2DEBUG(149, "GBLfit: Number of TelClusters: " << nTelClusters);
+  if (nTelClusters == 0) {B2DEBUG(100, "GBLfit: TelClustersCollection is empty!");}
+#endif
 
   //SVD clusters
   StoreArray<SVDCluster> svdClusters("");
@@ -332,17 +332,17 @@ void GBLfitModule::event()
       genfit::MeasurementFactory<genfit::AbsMeasurement> factory;
 
       genfit::MeasurementProducer <PXDTrueHit, PXDRecoHit>* PXDProducer =  NULL;
-//#ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
-//      genfit::MeasurementProducer <TelTrueHit, TelRecoHit>* TelProducer =  NULL;
-//#endif
+#ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
+      genfit::MeasurementProducer <TelTrueHit, TelRecoHit>* TelProducer =  NULL;
+#endif
       genfit::MeasurementProducer <SVDTrueHit, SVDRecoHit2D>* SVDProducer =  NULL;
       //TODO: CDC
       // genfit::MeasurementProducer <CDCHit, CDCRecoHit>* CDCProducer =  NULL;
 
       genfit::MeasurementProducer <PXDCluster, PXDRecoHit>* pxdClusterProducer = NULL;
-//#ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
-//      genfit::MeasurementProducer <TelCluster, TelRecoHit>* telClusterProducer = NULL;
-//#endif
+#ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
+      genfit::MeasurementProducer <TelCluster, TelRecoHit>* telClusterProducer = NULL;
+#endif
       genfit::MeasurementProducer <SVDCluster, SVDRecoHit>* svdClusterProducer = NULL;
 
       //create MeasurementProducers for PXD, SVD and CDC and add producers to the factory with correct detector Id
@@ -351,12 +351,12 @@ void GBLfitModule::event()
           PXDProducer =  new genfit::MeasurementProducer <PXDTrueHit, PXDRecoHit> (pxdTrueHits.getPtr());
           factory.addProducer(Const::PXD, PXDProducer);
         }
-//#ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
-//        if (telTrueHits.getEntries()) {
-//          TelProducer =  new genfit::MeasurementProducer <TelTrueHit, TelRecoHit> (telTrueHits.getPtr());
-//          factory.addProducer(Const::TEST, TelProducer);
-//        }
-//#endif
+#ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
+        if (telTrueHits.getEntries()) {
+          TelProducer =  new genfit::MeasurementProducer <TelTrueHit, TelRecoHit> (telTrueHits.getPtr());
+          factory.addProducer(Const::TEST, TelProducer);
+        }
+#endif
         if (svdTrueHits.getEntries()) {
           SVDProducer =  new genfit::MeasurementProducer <SVDTrueHit, SVDRecoHit2D> (svdTrueHits.getPtr());
           factory.addProducer(Const::SVD, SVDProducer);
@@ -366,12 +366,12 @@ void GBLfitModule::event()
           pxdClusterProducer =  new genfit::MeasurementProducer <PXDCluster, PXDRecoHit> (pxdClusters.getPtr());
           factory.addProducer(Const::PXD, pxdClusterProducer);
         }
-//#ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
-//        if (nTelClusters) {
-//          telClusterProducer =  new genfit::MeasurementProducer <TelCluster, TelRecoHit> (telClusters.getPtr());
-//          factory.addProducer(Const::TEST, telClusterProducer);
-//        }
-//#endif
+#ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
+        if (nTelClusters) {
+          telClusterProducer =  new genfit::MeasurementProducer <TelCluster, TelRecoHit> (telClusters.getPtr());
+          factory.addProducer(Const::TEST, telClusterProducer);
+        }
+#endif
         if (nSVDClusters) {
           svdClusterProducer =  new genfit::MeasurementProducer <SVDCluster, SVDRecoHit> (svdClusters.getPtr());
           factory.addProducer(Const::SVD, svdClusterProducer);

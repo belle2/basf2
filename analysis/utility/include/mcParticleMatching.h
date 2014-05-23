@@ -21,7 +21,7 @@ namespace Belle2 {
   namespace MCMatching {
     /** Flags that describe different reconstruction errors. */
     enum MCMatchStatus {
-      c_Correct             = 0,  /**< This Particle and all its daughters are correctly reconstructed. */
+      c_Correct             = 0,  /**< This Particle and all its daughters are perfectly reconstructed. */
       c_MissFSR             = 1,  /**< bit 0: A Final State Radiation (FSR) photon is not reconstructed. */
       c_MisID               = 2,  /**< bit 1: One of the charged final state particles is mis-identified. */
       c_MissGamma           = 4,  /**< bit 2: A Photon (not FSR) is missing (not reconstructed). */
@@ -29,7 +29,8 @@ namespace Belle2 {
       c_MissNeutrino        = 16, /**< bit 4: A Neutrino is missing (not reconstructed). */
       c_MissKlong           = 32, /**< bit 5: A Klong is missing (not reconstructed). */
       c_AddedWrongParticle  = 64,  /**< bit 6: A non-FSP Particle has wrong PDG code, meaning one of the daughters (or their daughters) belongs to another Particle. */
-      c_InternalError       = 128,  /**< bit 7: There was an error in MC matching. Not a valid match. */
+      c_DecayInFlight       = 128,  /**< bit 7: A Particle was reconstructed from the secondary decay product of the actual particle. This means that a wrong hypothesis was used to reconstruct it, which e.g. for tracks might mean a pion hypothesis was used for a secondary electron. */
+      c_InternalError       = 256,  /**< bit 8: There was an error in MC matching. Not a valid match. */
     };
 
     /**

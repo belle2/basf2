@@ -90,6 +90,7 @@ namespace {
       m_pdg(pdg), m_daughterDecays(daughters), m_mcparticle(nullptr), m_particle(nullptr) {
       m_graphParticle = &gParticleGraph.addParticle();
       m_graphParticle->setPDG(m_pdg);
+      m_graphParticle->setStatus(MCParticle::c_PrimaryParticle);
       for (Decay & d : daughters) {
         gParticleGraph.addDecay(*m_graphParticle, *d.m_graphParticle);
       }
@@ -511,6 +512,9 @@ namespace {
   {
     {
       Decay d(421, {321, { -211, {13}}, {111, {22, 22}}});
+      d.finalize();
+      MCParticle* muon = d.getMCParticle(13);
+      muon->setStatus(muon->getStatus() & (~MCParticle::c_PrimaryParticle)); //remove c_PrimaryParticle
       d.reconstruct({421, {321, -211, {111, {22, 22}}}});
 
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
@@ -533,24 +537,26 @@ namespace {
       Decay d(-211, {13});
       d.finalize();
       MCParticle* muon = d.getMCParticle(13);
+      muon->setStatus(muon->getStatus() & (~MCParticle::c_PrimaryParticle)); //remove c_PrimaryParticle
       ASSERT_TRUE(muon != nullptr);
       d.reconstruct({ -211, {}, Decay::c_RelateWith, muon});
 
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
-      EXPECT_EQ(c_MisID, getMCTruthStatus(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_DecayInFlight, getMCTruthStatus(d.m_particle)) << d.getString();
     }
     {
       Decay d(421, {321, { -211, {13}}, {111, {22, 22}}});
       d.finalize();
       MCParticle* muon = d.getMCParticle(13);
+      muon->setStatus(muon->getStatus() & (~MCParticle::c_PrimaryParticle)); //remove c_PrimaryParticle
       ASSERT_TRUE(muon != nullptr);
       d.reconstruct({421, {321, { -211, {}, Decay::c_RelateWith, muon}, {111, {22, 22}}}});
 
 
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
-      EXPECT_EQ(c_MisID, getMCTruthStatus(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_DecayInFlight, getMCTruthStatus(d.m_particle)) << d.getString();
     }
   }
   /** we reconstrcut D*+ -> D0 pi+, but it's actually D+ pi0. */

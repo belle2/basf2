@@ -142,8 +142,25 @@ int MCMatching::setMCTruthStatus(Particle* particle, const MCParticle* mcParticl
 
   unsigned nChildren = particle->getNDaughters();
   if (nChildren == 0) { //FSP-like
-    if (particle->getPDGCode() != mcParticle->getPDG())
-      status |= MCMatchStatus::c_MisID;
+    if (particle->getPDGCode() != mcParticle->getPDG()) {
+      if (!mcParticle->hasStatus(MCParticle::c_PrimaryParticle)) {
+        //secondary particle, so the original particle probably decayed
+        status |= MCMatchStatus::c_DecayInFlight;
+        //find first primary mother
+        const MCParticle* primary = mcParticle->getMother();
+        while (primary and !primary->hasStatus(MCParticle::c_PrimaryParticle))
+          primary = primary->getMother();
+
+        if (!primary) {
+          status |= MCMatchStatus::c_InternalError;
+        } else if (particle->getPDGCode() != primary->getPDG()) {
+          //if primary particle also has wrong PDG code, we're actually MisIDed
+          status |= MCMatchStatus::c_MisID;
+        }
+      } else {
+        status |= MCMatchStatus::c_MisID;
+      }
+    }
 
     //other checks concern daughters of particle, so we're done here
     return setStatus(particle, status);
@@ -152,7 +169,7 @@ int MCMatching::setMCTruthStatus(Particle* particle, const MCParticle* mcParticl
     status |= MCMatchStatus::c_AddedWrongParticle;
 
   //add up all (accepted) status flags we collected for our daughters
-  const int daughterStatusAcceptMask = c_MisID | c_AddedWrongParticle | c_InternalError;
+  const int daughterStatusAcceptMask = c_MisID | c_AddedWrongParticle | c_DecayInFlight | c_InternalError;
   int daughterStatus = 0;
   for (unsigned i = 0; i < nChildren; ++i) {
     const Particle* daughter = particle->getDaughter(i);

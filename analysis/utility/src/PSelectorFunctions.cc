@@ -521,8 +521,11 @@ namespace Belle2 {
 
       int mcPDGCode = mcparticle->getPDG();
       int status    = MCMatching::getMCTruthStatus(part, mcparticle);
+      //remove the following bits, these are usually ok
+      status &= (~MCMatching::c_MissFSR);
+      //status &= (~MCMatching::c_DecayInFlight);
 
-      if (!(status == MCMatching::c_Correct || status == MCMatching::c_MissFSR))
+      if (status != MCMatching::c_Correct)
         return result;
 
       if (part->getFlavorType() == Particle::c_Flavored && mcPDGCode == part->getPDGCode())

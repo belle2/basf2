@@ -91,12 +91,12 @@ void getMatchingDaughters(const MCParticle& mcparticle, std::vector<MCParticle*>
 {
   const std::vector<MCParticle*>& mcDaughters = mcparticle.getDaughters();
   for (auto d : mcDaughters) {
-    if (!d->hasStatus(MCParticle::c_PrimaryParticle))
-      continue;
+    bool secondary = !d->hasStatus(MCParticle::c_PrimaryParticle);
     int abspdg = abs(d->getPDG());
     foundPDGs[abspdg]++;
 
-    if (expectedDaughterPDGsAbs.count(abspdg) != 0)
+    //we'll accept secondaries anyway because of decay in flight (depends on isSignal definition)
+    if (secondary or expectedDaughterPDGsAbs.count(abspdg) != 0)
       daughters.push_back(d);
 
     getMatchingDaughters(*d, daughters, expectedDaughterPDGsAbs, foundPDGs);

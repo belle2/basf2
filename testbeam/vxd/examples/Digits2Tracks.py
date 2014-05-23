@@ -144,9 +144,9 @@ telvxd_dqm = register_module('TelxVXD')
 
 # Track finding by VXDTF
 if PCMAG_ON:
-    VXDTF = setup_vxdtf1T('caTracks')
+    VXDTF = setup_vxdtf1T('caTracks', sectormap)
 else:
-    VXDTF = setup_vxdtf('caTracks')
+    VXDTF = setup_vxdtf('caTracks', sectormap)
 
 # Track finding DQM
 vxdtfdqm = register_module('VXDTFDQM')

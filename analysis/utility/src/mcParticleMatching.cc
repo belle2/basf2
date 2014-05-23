@@ -60,7 +60,7 @@ bool MCMatching::setMCTruth(const Particle* particle)
     return false;
   }
 
-  // check, if for all daughter particles Particle <-> MCParticle relation exists
+  // check, if for all daughter particles Particle -> MCParticle relation exists
   for (int i = 0; i < nChildren; ++i) {
     const Particle* daugP = particle->getDaughter(i);
     //returns quickly when found
@@ -132,13 +132,8 @@ int MCMatching::setMCTruthStatus(Particle* particle, const MCParticle* mcParticl
 
   int status = 0;
 
-  if (!mcParticle) {
-    mcParticle = particle->getRelatedTo<MCParticle>();
-    if (mcParticle) {
-      B2ERROR("setMCTruthStatus: got mcparticle=NULL, but found one via relations...");
-    }
+  if (!mcParticle)
     return setStatus(particle, status | MCMatchStatus::c_InternalError);
-  }
 
   unsigned nChildren = particle->getNDaughters();
   if (nChildren == 0) { //FSP-like

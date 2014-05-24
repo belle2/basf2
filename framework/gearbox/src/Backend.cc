@@ -1,5 +1,5 @@
-
-#include "framework/gearbox/Backend.h"
+#include <framework/gearbox/Backend.h>
+#include <framework/gearbox/GBResult.h>
 
 namespace Belle2 {
   namespace gearbox {

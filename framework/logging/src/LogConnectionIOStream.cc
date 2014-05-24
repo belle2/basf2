@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <framework/logging/LogConnectionIOStream.h>
+#include <framework/logging/LogMessage.h>
 
 using namespace Belle2;
 using namespace std;

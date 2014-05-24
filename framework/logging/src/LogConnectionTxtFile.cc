@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <framework/logging/LogConnectionTxtFile.h>
+#include <framework/logging/LogMessage.h>
 
 using namespace Belle2;
 using namespace std;

@@ -12,6 +12,7 @@
 #define LOGCONNECTIONFILTER_H_
 
 #include <framework/logging/LogConnectionBase.h>
+#include <framework/logging/LogMessage.h>
 
 
 namespace Belle2 {

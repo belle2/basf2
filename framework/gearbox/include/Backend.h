@@ -1,13 +1,10 @@
 #ifndef GEARBOX_BACKEND_H_
 #define GEARBOX_BACKEND_H_
 
-
 #include "framework/gearbox/types.h"
-#include "framework/gearbox/GBResult.h"
-
-#include <framework/logging/Logger.h>
 
 #include <boost/spirit/include/qi.hpp>
+
 #include <string>
 #include <map>
 #include <list>
@@ -16,6 +13,7 @@
 
 namespace Belle2 {
   namespace gearbox {
+    class GBResult;
 
     /**
      * key->value map for Backend Query Parameters

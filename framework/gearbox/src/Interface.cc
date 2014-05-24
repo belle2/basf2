@@ -10,6 +10,7 @@
 
 #include <framework/gearbox/Interface.h>
 #include <framework/gearbox/GearDir.h>
+#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 #include <boost/lexical_cast.hpp>

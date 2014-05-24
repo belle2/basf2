@@ -1,4 +1,6 @@
 #include "framework/gearbox/Backend_Xml.h"
+#include <framework/gearbox/GBResult.h>
+#include <framework/logging/Logger.h>
 
 #include <boost/regex.hpp>
 

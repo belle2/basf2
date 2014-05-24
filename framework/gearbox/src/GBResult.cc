@@ -1,7 +1,7 @@
-#include <boost/algorithm/string/find.hpp>
-
 #include "framework/gearbox/GBResult.h"
 #include "framework/logging/Logger.h"
+
+#include <boost/algorithm/string/find.hpp>
 
 
 namespace Belle2 {

@@ -10,7 +10,7 @@
 
 #include <framework/core/CondParser.h>
 
-#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/erase.hpp>
 #include <boost/lexical_cast.hpp>
 
 using namespace std;

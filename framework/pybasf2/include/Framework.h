@@ -20,7 +20,6 @@
 #include <framework/core/Path.h>
 
 #include <string>
-#include <list>
 
 namespace Belle2 {
   class PathManager;

@@ -11,11 +11,9 @@
 #ifndef LOGCONNECTIONTXTFILE_H_
 #define LOGCONNECTIONTXTFILE_H_
 
-#include <framework/logging/LogConfig.h>
 #include <framework/logging/LogConnectionBase.h>
 
 #include <string>
-#include <iostream>
 #include <fstream>
 
 namespace Belle2 {

@@ -9,4 +9,3 @@
  **************************************************************************/
 
 #include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Gearbox.h>

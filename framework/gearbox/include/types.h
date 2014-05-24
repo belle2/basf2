@@ -2,12 +2,10 @@
 #define GEARBOX_TYPES_H_
 
 #include <string>
-#include <vector>
 #include <map>
 #include <list>
 
 #include <boost/variant.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/property_tree/ptree.hpp>
 
 

@@ -11,11 +11,8 @@
 #ifndef LOGCONNECTIONBASE_H_
 #define LOGCONNECTIONBASE_H_
 
-#include <framework/logging/LogMessage.h>
-
-#include <string>
-
 namespace Belle2 {
+  class LogMessage;
 
   /**
    * Abstract base class for the different types of log connections.

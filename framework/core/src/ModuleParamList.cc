@@ -10,13 +10,10 @@
 
 #include <boost/python/object.hpp>
 #include <boost/python/list.hpp>
-#include <boost/python/dict.hpp>
-#include <boost/python/extract.hpp>
 
 #include <framework/core/ModuleParamList.h>
 
 #include <framework/core/ModuleParamInfoPython.h>
-#include <framework/core/PyObjConvUtils.h>
 
 using namespace std;
 using namespace Belle2;

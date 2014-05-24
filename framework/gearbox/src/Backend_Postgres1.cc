@@ -1,4 +1,6 @@
 #include "framework/gearbox/Backend_Postgres1.h"
+#include <framework/gearbox/GBResult.h>
+#include <framework/logging/Logger.h>
 
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>

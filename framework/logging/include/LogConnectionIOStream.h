@@ -11,10 +11,8 @@
 #ifndef LOGCONNECTIONIOSTREAM_H_
 #define LOGCONNECTIONIOSTREAM_H_
 
-#include <framework/logging/LogConfig.h>
 #include <framework/logging/LogConnectionBase.h>
 
-#include <string>
 #include <iostream>
 
 namespace Belle2 {

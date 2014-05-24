@@ -26,6 +26,7 @@
 #include <framework/utilities/FileSystem.h>
 #include <vxd/geometry/GeoCache.h>
 #include <ecl/geometry/ECLGeometryPar.h>
+#include <bklm/dataobjects/BKLMSimHitPosition.h>
 
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <genfit/AbsMeasurement.h>
@@ -935,7 +936,9 @@ void EVEVisualization::addSimHit(const SVDSimHit* hit, const MCParticle* particl
 }
 void EVEVisualization::addSimHit(const BKLMSimHit* hit, const MCParticle* particle)
 {
-  const TVector3& global_pos = hit->getHitPosition();
+  TVector3 global_pos;
+  BKLMSimHitPosition* p = hit->getRelatedFrom<BKLMSimHitPosition>();
+  if (p) global_pos = p->getPosition();
   addSimHit(global_pos, particle);
 }
 void EVEVisualization::addSimHit(const EKLMSimHit* hit, const MCParticle* particle)

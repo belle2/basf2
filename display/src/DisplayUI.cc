@@ -34,7 +34,6 @@
 #include <TGInputDialog.h>
 #include <TGTextEntry.h>
 #include <TGLViewer.h>
-#include <TMacro.h>
 #include <TObject.h>
 #include <TObjArray.h>
 #include <TObjString.h>
@@ -43,7 +42,6 @@
 
 #include <boost/scoped_ptr.hpp>
 
-#include <cmath>
 
 
 using namespace Belle2;

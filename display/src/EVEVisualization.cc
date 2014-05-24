@@ -24,23 +24,18 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
-#include <geometry/GeometryManager.h>
 #include <vxd/geometry/GeoCache.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <genfit/AbsMeasurement.h>
 #include <genfit/PlanarMeasurement.h>
-#include <genfit/ProlateSpacepointMeasurement.h>
 #include <genfit/SpacepointMeasurement.h>
 #include <genfit/WireMeasurement.h>
 #include <genfit/WirePointMeasurement.h>
 #include <genfit/AbsTrackRep.h>
-#include <genfit/ConstField.h>
 #include <genfit/DetPlane.h>
 #include <genfit/Exception.h>
-#include <genfit/FieldManager.h>
-#include <genfit/Tools.h>
 #include <genfit/KalmanFitterInfo.h>
 
 #include <genfit/AbsKalmanFitter.h>
@@ -48,18 +43,14 @@
 #include <genfit/DAF.h>
 #include <genfit/KalmanFitterRefTrack.h>
 
-#include <TApplication.h>
 #include <TEveArrow.h>
 #include <TEveBox.h>
 #include <TEveCalo.h>
 #include <TEveManager.h>
-#include <TEveEventManager.h>
 #include <TEveGeoNode.h>
 #include <TEveGeoShape.h>
 #include <TEveGeoShapeExtract.h>
-#include <TEveScene.h>
 #include <TEvePointSet.h>
-#include <TEveProjectionManager.h>
 #include <TEveSelection.h>
 #include <TEveStraightLineSet.h>
 #include <TEveTriangleSet.h>
@@ -78,17 +69,12 @@
 #include <TMath.h>
 #include <TMatrixT.h>
 #include <TMatrixDEigen.h>
-#include <TROOT.h>
-#include <TSystem.h>
-#include <TVector2.h>
-#include <TVectorD.h>
 
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/scoped_ptr.hpp>
 
 #include <assert.h>
 #include <cmath>
-#include <exception>
 
 
 using namespace Belle2;

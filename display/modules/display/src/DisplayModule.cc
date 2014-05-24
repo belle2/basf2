@@ -4,8 +4,6 @@
 #include <display/DisplayUI.h>
 #include <display/EVEVisualization.h>
 #include <geometry/GeometryManager.h>
-#include <vxd/geometry/GeoCache.h>
-#include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dataobjects/ECLGamma.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
 

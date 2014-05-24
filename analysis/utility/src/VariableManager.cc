@@ -151,6 +151,7 @@ double VariableManager::evaluate(const std::string& varName, const Particle* p)
   const Var* var = getVariable(varName);
   if (!var) {
     B2FATAL("VariableManager::evaluate(): variable '" << varName << "' not found!");
+    return 0.0; //never reached, suppresses cppcheck warning
   }
 
   return var->function(p);

@@ -17,11 +17,8 @@
 
 namespace Belle2 {
 
-  class Particle;
-  class MCParticle;
-
   /**
-   * MC matching module: module performs MC matching (sets the relation Particle <-> MCParticle) for all particles
+   * MC matching module: module performs MC matching (sets the relation Particle -> MCParticle) for all particles
    * and its (grand)^N-daughter particles in the user-specified ParticleList. The MC matching algorithm is implemented
    * in analysis/utility/mcParticleMatching.h
    */

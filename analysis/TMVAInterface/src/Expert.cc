@@ -10,12 +10,10 @@
 
 #include <analysis/TMVAInterface/Expert.h>
 #include <analysis/TMVAInterface/Method.h>
-#include <analysis/dataobjects/Particle.h>
 #include <framework/logging/Logger.h>
 
 #include <TMVA/Reader.h>
 #include <TMVA/Tools.h>
-#include <TString.h>
 #include <TSystem.h>
 
 #include <boost/property_tree/ptree.hpp>

@@ -18,7 +18,6 @@
 #include <framework/datastore/RelationArray.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
@@ -53,7 +52,7 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("UseMCParticles", m_useMCParticles, "use MCParticles", false);
+    addParam("UseMCParticles", m_useMCParticles, "use MCParticles instead of tracks, ECL clusters", false);
   }
 
   ParticleLoaderModule::~ParticleLoaderModule()
@@ -101,10 +100,6 @@ namespace Belle2 {
   }
 
   void ParticleLoaderModule::terminate()
-  {
-  }
-
-  void ParticleLoaderModule::printModuleParams() const
   {
   }
 

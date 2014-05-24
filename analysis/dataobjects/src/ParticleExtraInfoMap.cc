@@ -1,6 +1,5 @@
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 
-//#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 

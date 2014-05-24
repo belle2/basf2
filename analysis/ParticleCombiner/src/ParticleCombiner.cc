@@ -14,6 +14,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 
+#include <algorithm>
+
 namespace Belle2 {
 
   ListCombiner::ListCombiner(unsigned int numberOfLists) : numberOfLists(numberOfLists), iCombination(0), nCombinations(0), currentType(ParticleList::c_Particle), types(numberOfLists) {  }

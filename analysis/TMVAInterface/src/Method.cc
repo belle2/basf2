@@ -10,13 +10,9 @@
 #include <analysis/TMVAInterface/Method.h>
 #include <framework/logging/Logger.h>
 
-#include <TSystem.h>
-#include <TROOT.h>
 #include <TPluginManager.h>
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-#include <boost/algorithm/string.hpp>
+#include <algorithm>
 
 namespace Belle2 {
   namespace TMVAInterface {

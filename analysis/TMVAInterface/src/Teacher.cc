@@ -8,7 +8,6 @@
  **************************************************************************/
 
 #include <analysis/TMVAInterface/Teacher.h>
-#include <analysis/dataobjects/Particle.h>
 #include <framework/logging/Logger.h>
 
 #include <TMVA/Factory.h>
@@ -17,7 +16,6 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TString.h>
-#include <TROOT.h>
 #include <TSystem.h>
 
 #include <boost/property_tree/ptree.hpp>

@@ -22,11 +22,10 @@
 
 #include <TClonesArray.h>
 #include <TDatabasePDG.h>
-#include <TVectorF.h>
 
 #include <iostream>
 #include <iomanip>
-#include <exception>
+#include <stdexcept>
 
 using namespace Belle2;
 

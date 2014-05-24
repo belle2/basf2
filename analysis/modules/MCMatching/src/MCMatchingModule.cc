@@ -11,7 +11,6 @@
 #include <analysis/modules/MCMatching/MCMatchingModule.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
@@ -40,7 +39,7 @@ namespace Belle2 {
 
   MCMatchingModule::MCMatchingModule() : Module()
   {
-    setDescription("Module performs MC matching (sets relation Particle<->MCParticle) for all particles (and its (grand)^N-daughter particles) in the ParticleList.");
+    setDescription("Module performs MC matching (sets relation Particle->MCParticle) for all particles (and its (grand)^N-daughter particles) in the ParticleList. The relation can be used in conjuction with MCMatching::MCMatchStatus flags, e.g. using the isSignal or mcPDG & mcStatus variables.");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     addParam("ListName", m_listName, "Name of the input ParticleList.", string(""));

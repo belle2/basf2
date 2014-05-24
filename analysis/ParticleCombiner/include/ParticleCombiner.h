@@ -15,10 +15,10 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <vector>
+#include <set>
 #include <unordered_set>
-#include <algorithm>
 
-#include <boost/functional/hash.hpp>
+#include <boost/functional/hash/extensions.hpp>
 
 namespace std {
   /** Hash function used by unordered_set. */

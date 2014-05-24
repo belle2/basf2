@@ -150,7 +150,7 @@ main(int argc, char * argv[]) {
 	for (unsigned j = 0; j < inputBits.size(); j++) {
 	    while (1) {
 		char crep[10];
-		sprintf(crep, "%d", j);
+		sprintf(crep, "%d", (int)j);
 		string inp = inputBits[j];
 		string rep = crep;
                 string::size_type p = logic.find(inp);
@@ -168,7 +168,7 @@ main(int argc, char * argv[]) {
 	for (unsigned j = 0; j < inputBits.size(); j++) {
 	    while (1) {
 		char crep[10];
-		sprintf(crep, "i[%d]", j);
+		sprintf(crep, "i[%d]", (int)j);
 		string inp = inputBits[j];
 		string rep = crep;
                 string::size_type p = logic_cc.find(inp);

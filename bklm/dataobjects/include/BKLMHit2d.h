@@ -54,9 +54,6 @@ namespace Belle2 {
     //! returns highest phi-measuring strip number of this 2D hit
     int getPhiStripMax() const { return (((m_ModuleID & BKLM_MAXSTRIP_MASK) >> BKLM_MAXSTRIP_BIT) + 1); }
 
-    //! returns number of phi-measuring strips of this 2D hit
-    int getPhiStripCount() const;
-
     //! returns phi-measuring strip number of this 2D hit
     float getPhiStripAve() const;
 
@@ -65,9 +62,6 @@ namespace Belle2 {
 
     //! returns highest z-measuring strip number of this 2D hit
     int getZStripMax() const { return (((m_ZStrips & BKLM_ZMAXSTRIP_MASK) >> BKLM_ZMAXSTRIP_BIT) + 1); }
-
-    //! returns number of z-measuring strips of this 2D hit
-    int getZStripCount() const;
 
     //! returns z-measuring strip number of this 2D hit
     float getZStripAve() const;

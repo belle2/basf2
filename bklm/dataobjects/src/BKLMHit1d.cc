@@ -71,19 +71,3 @@ BKLMHit1d::BKLMHit1d(const BKLMHit1d& h) :
   m_EDep(h.m_EDep)
 {
 }
-
-//! Calculate the strip average
-float BKLMHit1d::getStripAve() const
-{
-  int stripMin = ((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1;
-  int stripMax = ((m_ModuleID & BKLM_MAXSTRIP_MASK) >> BKLM_MAXSTRIP_BIT) + 1;
-  return 0.5 * (stripMin + stripMax);
-}
-
-//! Calculate the strip count
-int BKLMHit1d::getStripCount() const
-{
-  int stripMin = ((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1;
-  int stripMax = ((m_ModuleID & BKLM_MAXSTRIP_MASK) >> BKLM_MAXSTRIP_BIT) + 1;
-  return stripMax - stripMin + 1;
-}

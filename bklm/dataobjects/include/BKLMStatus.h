@@ -54,6 +54,9 @@
 //! BKLM moduleID's bit position for used-on-track flag (from tracking muid reconstruction)
 #define BKLM_ONTRACK_BIT 27
 
+//! BKLM moduleID's bit position for ghost-hit flag (from tracking muid reconstruction)
+#define BKLM_GHOST_BIT 28
+
 //! BKLM moduleID's bit mask for strip-1 [0..47]
 #define BKLM_STRIP_MASK (63 << BKLM_STRIP_BIT)
 
@@ -89,6 +92,9 @@
 
 //! BKLM moduleID's bit mask for used-on-track flag (from tracking muid reconstruction)
 #define BKLM_ONTRACK_MASK (1 << BKLM_ONTRACK_BIT)
+
+//! BKLM moduleID's bit mask for ghost-hit flag (from tracking muid reconstruction)
+#define BKLM_GHOST_MASK (1 << BKLM_GHOST_BIT)
 
 //! BKLM moduleID's bit mask for above-threshold flag (scintillators only, from BKLM hit reconstruction)
 #define BKLM_ABOVETHRESHOLD_MASK (1 << BKLM_ABOVETHRESHOLD_BIT)

@@ -91,25 +91,10 @@ float BKLMHit2d::getPhiStripAve() const
   return 0.5 * (stripMin + stripMax);
 }
 
-//! Calculate the phi-strip count
-int BKLMHit2d::getPhiStripCount() const
-{
-  int stripMin = ((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1;
-  int stripMax = ((m_ModuleID & BKLM_MAXSTRIP_MASK) >> BKLM_MAXSTRIP_BIT) + 1;
-  return stripMax - stripMin + 1;
-}
 //! Calculate the z-strip average
 float BKLMHit2d::getZStripAve() const
 {
   int stripMin = ((m_ZStrips & BKLM_ZSTRIP_MASK) >> BKLM_ZSTRIP_BIT) + 1;
   int stripMax = ((m_ZStrips & BKLM_ZMAXSTRIP_MASK) >> BKLM_ZMAXSTRIP_BIT) + 1;
   return 0.5 * (stripMin + stripMax);
-}
-
-//! Calculate the z-strip count
-int BKLMHit2d::getZStripCount() const
-{
-  int stripMin = ((m_ZStrips & BKLM_ZSTRIP_MASK) >> BKLM_ZSTRIP_BIT) + 1;
-  int stripMax = ((m_ZStrips & BKLM_ZMAXSTRIP_MASK) >> BKLM_ZMAXSTRIP_BIT) + 1;
-  return stripMax - stripMin + 1;
 }

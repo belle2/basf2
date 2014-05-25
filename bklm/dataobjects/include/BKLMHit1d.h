@@ -59,12 +59,6 @@ namespace Belle2 {
     //! returns lowest strip number of this 1D hit
     int getStripMax() const { return (((m_ModuleID & BKLM_MAXSTRIP_MASK) >> BKLM_MAXSTRIP_BIT) + 1); }
 
-    //! returns average strip number of this 1D hit
-    float getStripAve() const;
-
-    //! returns number of strips of this 1D hit
-    int getStripCount() const;
-
     //! returns detector-module identifier
     int getModuleID() const { return m_ModuleID; }
 

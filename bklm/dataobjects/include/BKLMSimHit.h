@@ -12,7 +12,6 @@
 #define BKLMSIMHIT_H
 
 #include <simulation/dataobjects/SimHitBase.h>
-#include <TVector3.h>
 #include <framework/datastore/RelationsObject.h>
 #include <bklm/dataobjects/BKLMStatus.h>
 
@@ -67,9 +66,6 @@ namespace Belle2 {
 
     //! returns unique detector-module identifier
     int getModuleID() const { return m_ModuleID; }
-
-    //! **DUMMY** returns global position of the hit (for EVEVisualization.cc)
-    TVector3 getHitPosition() const { return TVector3(); }
 
     //! returns x coordinate of the local position of the hit (for time-of-propagation)
     float getLocalPositionX() const { return m_LocalX; }

@@ -4529,7 +4529,7 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
 
 void VXDTFModule::calcInitialValues4TCs(PassData* currentPass)
 {
-  int pdgCode;
+  int pdgCode = 0;
   pair<TVector3, int> seedValue; // first is momentum vector, second is signCurvature
   pair<double, TVector3> returnValues; // first is chi2, second is momentum vector
 
@@ -4539,13 +4539,13 @@ void VXDTFModule::calcInitialValues4TCs(PassData* currentPass)
 
     const vector<PositionInfo*>* currentHits = aTC->getPositionInfos();
 
+    pdgCode = m_PARAMpdGCode; // general setting
     if (m_calcSeedType == 0) { // helixFit
       currentPass->trackletFilterBox.resetValues(currentHits);
       seedValue = currentPass->trackletFilterBox.calcMomentumSeed(m_KFBackwardFilter, m_PARAMartificialMomentum);
-      pdgCode = seedValue.second * m_PARAMpdGCode * m_chargeSignFactor;
+      pdgCode = seedValue.second * m_PARAMpdGCode * m_chargeSignFactor; // improved one for curved tracks
     } else if (m_calcSeedType == 1) {
       returnValues = currentPass->trackletFilterBox.simpleLineFit3D(currentHits, m_KFBackwardFilter, m_PARAMartificialMomentum);
-      pdgCode = m_PARAMpdGCode;
       seedValue.first = returnValues.second; // storing the momentum vector at the right place
     } else {
       B2WARNING("calcInitialValues4TCs: unknown seedCalculating type set! Using helixFit instead...")

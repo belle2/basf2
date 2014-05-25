@@ -27,6 +27,10 @@ using namespace Belle2::Simulation;
 
 ExtPhysicsConstructor::ExtPhysicsConstructor() : G4VPhysicsConstructor("ExtPhysicsConstructor")
 {
+  if (false) {
+    ConstructParticle();
+    ConstructProcess();
+  }
 }
 
 ExtPhysicsConstructor::~ExtPhysicsConstructor()

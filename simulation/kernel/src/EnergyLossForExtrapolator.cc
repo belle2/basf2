@@ -240,9 +240,8 @@ void EnergyLossForExtrapolator::Initialisation()
   const G4MaterialTable* mtable = G4Material::GetMaterialTable();
   cuts = new G4ProductionCuts();
 
-  const G4MaterialCutsCouple* couple;
   for (G4int i = 0; i < nmat; i++) {
-    couple = new G4MaterialCutsCouple((*mtable)[i], cuts);
+    const G4MaterialCutsCouple* couple = new G4MaterialCutsCouple((*mtable)[i], cuts);
     couples.push_back(couple);
   }
 
@@ -324,7 +323,7 @@ const G4ParticleDefinition* EnergyLossForExtrapolator::FindParticle(const G4Stri
   if (name != currentParticleName) {
     p = G4ParticleTable::GetParticleTable()->FindParticle(name);
     if (!p) {
-      B2WARNING("EnergyLossForExtrapolator: FindParticle fails to find " << name)
+      B2WARNING("FindParticle fails to find " << name)
     }
   } else {
     p = currentParticle;

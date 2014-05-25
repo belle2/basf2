@@ -24,6 +24,10 @@ SteppingAction::SteppingAction()
 {
   //Default value for the maximum number of steps
   m_maxNumberSteps = 100000;
+  if (false) {
+    G4Step* aStep;
+    UserSteppingAction(aStep);
+  }
 }
 
 

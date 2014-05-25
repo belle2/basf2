@@ -25,7 +25,11 @@ using namespace Belle2::Simulation;
 EventAction::EventAction(const std::string& mcCollectionName, MCParticleGraph& mcParticleGraph):
   G4UserEventAction(), m_mcCollectionName(mcCollectionName),  m_mcParticleGraph(mcParticleGraph)
 {
-
+  if (false) {
+    G4Event* event;
+    BeginOfEventAction(event);
+    EndOfEventAction(event);
+  }
 }
 
 EventAction::~EventAction()

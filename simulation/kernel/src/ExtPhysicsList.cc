@@ -29,6 +29,7 @@ ExtPhysicsList::ExtPhysicsList() : G4VModularPhysicsList()
   //defaultCutValue = 1.0E+9 * cm; // set big step so that AlongStep computes all the energy
   RegisterPhysics(new G4EmStandardPhysics);
   RegisterPhysics(new Simulation::ExtPhysicsConstructor);
+  if (false) SetCuts();
 }
 
 ExtPhysicsList::~ExtPhysicsList()

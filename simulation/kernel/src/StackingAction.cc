@@ -25,7 +25,12 @@ using namespace Simulation;
 
 StackingAction::StackingAction(): m_photonFraction(1.0)
 {
-
+  if (false) {
+    G4Track* aTrack;
+    ClassifyNewTrack(aTrack);
+    NewStage();
+    PrepareNewEvent();
+  }
 }
 
 StackingAction::~StackingAction()

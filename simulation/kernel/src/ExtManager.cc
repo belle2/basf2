@@ -35,6 +35,7 @@ ExtManager::ExtManager()
   m_propagator = NULL;
   StartHelper();
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetState(G4ErrorState_PreInit);
+  if (false) InitFieldForBackwards();
 }
 
 ExtManager::~ExtManager()

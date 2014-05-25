@@ -27,6 +27,14 @@ ExtMagFieldLimitProcess::ExtMagFieldLimitProcess(const G4String& processName) :
 {
   m_stepLimit = kInfinity; // user may change this with a geant4 UI command
   m_field = G4TransportationManager::GetTransportationManager()->GetFieldManager()->GetDetectorField();
+  if (false) {
+    G4Track aTrack;
+    G4Step aStep;
+    G4ForceCondition* condition;
+    GetMeanFreePath(aTrack, 0.0, condition);
+    PostStepDoIt(aTrack, aStep);
+    PostStepGetPhysicalInteractionLength(aTrack, 0.0, condition);
+  }
 }
 
 ExtMagFieldLimitProcess::~ExtMagFieldLimitProcess()

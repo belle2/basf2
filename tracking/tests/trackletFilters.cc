@@ -196,13 +196,13 @@ namespace Belle2 {
     f3h.calcCircleCenter(hitA, hitB, hitC, circleCenter);
 
     aFilter.circleFit(pocaPtPhi, pocaR, estimatedCurvature);
-    EXPECT_FLOAT_EQ(1. / 14.511606, estimatedCurvature);
+    EXPECT_NEAR(1. / 14.511606, estimatedCurvature, 0.01); // one percent deviation should be enough
 
 //    B2WARNING("after comparison-test, chi2 is " << chi2 << ", pocaPtPhi,pocaR,estimatedRadius is: " << pocaPtPhi << "," << pocaR << "," << estimatedRadius)
 
     pair<double, TVector3> returnValues = aFilter.helixFit();
 
-    EXPECT_FLOAT_EQ(14.511622, returnValues.first);
+    EXPECT_NEAR(14.511622, returnValues.first, 0.14); // one percent deviation should be enough
 
     /// testing realistic values of b2fw:
 //    PositionInfo pos1, pos2, pos3, pos4, pos5, pos6;

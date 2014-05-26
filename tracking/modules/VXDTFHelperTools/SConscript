@@ -4,7 +4,7 @@ env['LIBS'] = [
     'boost_chrono',
     'framework',
     'mdst_dataobjects',
-    'geometry',
+    #'geometry',
     'pxd', 'pxd_dataobjects',
     'svd', 'svd_dataobjects',
     'vxd', 'vxd_dataobjects', 

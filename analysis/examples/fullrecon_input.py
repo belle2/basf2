@@ -46,8 +46,10 @@ particles = []
 particles.append(Particle('pi+', chargedTrackVars, method))
 particles.append(Particle('K+', chargedTrackVars, method))
 particles.append(Particle('gamma', ['p', 'pt', 'clusterE9E25'], method))
-particles.append(Particle('pi0', ['p', 'pt', 'daughterAngle', 'M'], method))
 
+p = Particle('pi0', ['p', 'pt', 'daughterAngle', 'M'], method)
+p.addChannel(['gamma', 'gamma'])
+particles.append(p)
 
 p = Particle('D0', DVars, method).addChannel(['K-', 'pi+'])
 p.addChannel(['K-', 'pi+', 'pi+', 'pi-'])

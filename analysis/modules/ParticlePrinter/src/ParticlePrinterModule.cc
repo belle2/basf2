@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Anze Zupanc                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -21,9 +21,11 @@
 #include <framework/logging/Logger.h>
 
 // dataobjects
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/utility/VariableManager.h>
 
+// utilities
+#include <analysis/utility/EvtPDLUtil.h>
 
 using namespace std;
 
@@ -48,7 +50,9 @@ namespace Belle2 {
 
     // Add parameters
     addParam("ListName", m_listName, "name of particle list", string(""));
-    addParam("FullPrint", m_fullPrint, "reduced or full printout", true);
+    addParam("FullPrint", m_fullPrint, "execute Particle's internal print() function", true);
+    vector<string> defaultVariables;
+    addParam("Variables", m_variables, "names of PSelector functions to be printed", defaultVariables);
 
   }
 
@@ -58,6 +62,19 @@ namespace Belle2 {
 
   void ParticlePrinterModule::initialize()
   {
+    if (!m_listName.empty()) {
+
+      // obtain the input and output particle lists from the decay string
+      bool valid = m_decaydescriptor.init(m_listName);
+      if (!valid)
+        B2ERROR("ParticlePrinterModule::initialize Invalid input DecayString: " << m_listName);
+
+      int nProducts = m_decaydescriptor.getNDaughters();
+      if (nProducts > 0)
+        B2ERROR("ParticlePrinterModule::initialize Invalid input DecayString " << m_listName
+                << ". DecayString should not contain any daughters, only the mother particle.");
+    } else
+      B2ERROR("ParticlePrinterModule::initialize Empty list name!");
   }
 
   void ParticlePrinterModule::beginRun()
@@ -66,21 +83,37 @@ namespace Belle2 {
 
   void ParticlePrinterModule::event()
   {
+    B2INFO("[ParticlePrinterModule] START ------------------------------");
+
     StoreObjPtr<ParticleList> plist(m_listName);
     if (!plist) {
       B2ERROR("ParticleList " << m_listName << " not found");
       return;
     }
 
-    std::cout << std::endl;
     plist->print();
-    if (!m_fullPrint) return;
 
-    std::cout << std::endl;
+    bool includingVars = !(m_variables.empty());
+
     for (unsigned i = 0; i < plist->getListSize(); i++) {
-      plist->getParticle(i)->print();
+      const Particle* particle = plist->getParticle(i);
+      if (m_fullPrint) {
+        particle->print();
+      }
+      if (includingVars) {
+        B2INFO(" - " << particle->getArrayIndex() << " = " << particle->getPDGCode() << "[" << i << "]");
+        if (particle->getParticleType() == Particle::EParticleType::c_Composite) {
+          std::cout << "[INFO]     o) daughter indices = ";
+          const std::vector<int> daughters = particle->getDaughterIndices();
+          for (unsigned j = 0; j < daughters.size(); ++j) {
+            std::cout << " " << daughters[j];
+          }
+          std::cout << std::endl;
+        }
+        printVariables(particle);
+      }
     }
-
+    B2INFO("[ParticlePrinterModule] END   ------------------------------");
   }
 
 
@@ -96,6 +129,20 @@ namespace Belle2 {
   {
   }
 
+  void ParticlePrinterModule::printVariables(const Particle* particle) const
+  {
+    VariableManager& manager = VariableManager::Instance();
+
+    for (auto & varName : m_variables) {
+      auto var = manager.getVariable(varName);
+      if (var == nullptr) {
+        B2INFO(
+          "ParticlePrinter: VariableManager doesn't have variable" << varName)
+      }
+      double value = var->function(particle);
+      B2INFO("     o) " << varName << " = " << value);
+    }
+  }
 
 } // end Belle2 namespace
 

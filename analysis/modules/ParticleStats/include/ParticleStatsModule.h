@@ -3,7 +3,7 @@
 * Copyright(C) 2010 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Phillip Urquijo                                          *
+* Contributors: Phillip Urquijo, Anze Zupanc                             *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -14,6 +14,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <string>
 #include <TTree.h>
@@ -39,6 +40,8 @@ namespace Belle2 {
     TMatrix*  m_PassMatrix;
     /** Particle multiplicity matrix for the particle lists. */
     TMatrix*  m_MultiplicityMatrix;
+    /**< Decay descriptor of the particle being selected */
+    DecayDescriptor m_decaydescriptor;
 
   public:
     /** Constructor. */

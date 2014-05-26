@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Anze Zupanc                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -17,28 +17,33 @@
 #include <framework/logging/Logger.h>
 
 // dataobjects
-#include <mdst/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/VariableManager.h>
 
-#include <algorithm>
+// decay descriptor
+#include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 
+// utilities
+#include <analysis/utility/EvtPDLUtil.h>
+
+#include <algorithm>
 
 using namespace std;
 
 namespace Belle2 {
 
-  //-----------------------------------------------------------------
-  //                 Register module
-  //-----------------------------------------------------------------
+//-----------------------------------------------------------------
+//                 Register module
+//-----------------------------------------------------------------
 
   REG_MODULE(ParticleCombiner)
 
-  //-----------------------------------------------------------------
-  //                 Implementation
-  //-----------------------------------------------------------------
+//-----------------------------------------------------------------
+//                 Implementation
+//-----------------------------------------------------------------
 
-  ParticleCombinerModule::ParticleCombinerModule() : Module()
+  ParticleCombinerModule::ParticleCombinerModule() :
+    Module()
 
   {
     // set module description (e.g. insert text)
@@ -46,16 +51,21 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("PDG", m_pdg, "PDG code", 0);
-    addParam("ListName", m_listName, "name of the output particle list", string(""));
-    vector<string> defaultList;
-    addParam("InputListNames", m_inputListNames, "list of input particle list names",
-             defaultList);
+    addParam("strDecayString", m_strDecay, "Input DecayDescriptor string.",
+             string(""));
+
     std::map<std::string, std::tuple<double, double>> defaultMap;
     addParam("cuts", m_cuts, "Map of Variable and Cut Values.", defaultMap);
     addParam("persistent", m_persistent,
              "toggle output particle list btw. transient/persistent", false);
 
+    // legacy parameters (can be used instead of strDecayString parameter)
+    addParam("PDG", m_pdgCode, "PDG code", 0);
+    addParam("ListName", m_listName, "name of the output particle list",
+             string(""));
+    vector<string> defaultList;
+    addParam("InputListNames", m_inputListNames,
+             "list of input particle list names", defaultList);
   }
 
   ParticleCombinerModule::~ParticleCombinerModule()
@@ -64,11 +74,78 @@ namespace Belle2 {
 
   void ParticleCombinerModule::initialize()
   {
+    if (m_strDecay.empty() && m_inputListNames.size() == 0)
+      B2ERROR("No decay descriptor string and no input lists provided.");
+
+    if (!m_strDecay.empty()) {
+      // clear everything
+      m_pdgCode = 0;
+      m_listName = "";
+      m_inputListNames.clear();
+      //m_daughterPDGCodes.clear();
+
+      // obtain the input and output particle lists from the decay string
+      bool valid = m_decaydescriptor.init(m_strDecay);
+      if (!valid)
+        B2ERROR("Invalid input DecayString: " << m_strDecay);
+
+      // Mother particle
+      const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
+
+      m_pdgCode = mother->getPDGCode();
+      m_listName = mother->getFullName();
+
+      m_isSelfConjugatedParticle = !(Belle2::EvtPDLUtil::hasAntiParticle(
+                                       m_pdgCode));
+      m_antiListName = Belle2::EvtPDLUtil::antiParticleListName(m_pdgCode,
+                                                                mother->getLabel());
+
+      // Daughters
+      int nProducts = m_decaydescriptor.getNDaughters();
+      for (int i = 0; i < nProducts; ++i) {
+        const DecayDescriptorParticle* daughter =
+          m_decaydescriptor.getDaughter(i)->getMother();
+        m_inputListNames.push_back(daughter->getFullName());
+        //m_daughterPDGCodes.push_back(daughter->getPDGCode());
+      }
+    } else {
+      // check if the mother and daughter list names are valid names
+      bool valid = m_decaydescriptor.init(m_listName);
+      if (!valid)
+        B2ERROR("Invalid output (mother) list name: " << m_listName);
+
+      // Mother particle
+      const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
+      if (m_pdgCode != mother->getPDGCode())
+        B2WARNING(
+          "Inconsistent list name and pdg code! Will use the pdg code determined from the list name.");
+
+      m_pdgCode = mother->getPDGCode();
+
+      m_isSelfConjugatedParticle = !(Belle2::EvtPDLUtil::hasAntiParticle(
+                                       m_pdgCode));
+      m_antiListName = Belle2::EvtPDLUtil::antiParticleListName(m_pdgCode,
+                                                                mother->getLabel());
+
+      // Daughters
+      unsigned nProducts = m_inputListNames.size();
+      for (unsigned i = 0; i < nProducts; ++i) {
+        valid = m_decaydescriptor.init(m_inputListNames[i]);
+        if (!valid)
+          B2ERROR("Invalid input (daughter) list name: " << m_inputListNames[i]);
+      }
+    }
+
     if (m_persistent) {
       StoreObjPtr<ParticleList>::registerPersistent(m_listName);
+      if (!m_isSelfConjugatedParticle)
+        StoreObjPtr<ParticleList>::registerPersistent(m_antiListName);
     } else {
       StoreObjPtr<ParticleList>::registerTransient(m_listName);
+      if (!m_isSelfConjugatedParticle)
+        StoreObjPtr<ParticleList>::registerTransient(m_antiListName);
     }
+
     for (unsigned i = 0; i < m_inputListNames.size(); i++) {
       StoreObjPtr<ParticleList>::required(m_inputListNames[i]);
     }
@@ -84,34 +161,44 @@ namespace Belle2 {
 
     StoreObjPtr<ParticleList> outputList(m_listName);
     outputList.create();
-    outputList->setPDG(m_pdg);
+    outputList->initialize(m_pdgCode, m_listName);
 
-    ParticleCombiner combiner(m_inputListNames, isParticleSelfConjugated(outputList));
-    int pdg = outputList->getPDG();
-    int pdgbar = outputList->getPDGbar();
+    if (!m_isSelfConjugatedParticle) {
+      StoreObjPtr<ParticleList> outputAntiList(m_antiListName);
+      outputAntiList.create();
+      outputAntiList->initialize(-1 * m_pdgCode, m_antiListName);
 
+      outputList->bindAntiParticleList(*(outputAntiList));
+    }
+
+    // Convert input ParticleList(s) to PCombinerList(s)
+    vector<PCombinerList> inputPCombinerLists;
+    for (unsigned i = 0; i < m_inputListNames.size(); i++) {
+      StoreObjPtr<ParticleList> list(m_inputListNames[i]);
+      PCombinerList plist;
+      convert(list, plist);
+      inputPCombinerLists.push_back(plist);
+    }
+
+    ParticleCombiner combiner(inputPCombinerLists, m_isSelfConjugatedParticle);
+    int pdg    = outputList->getPDGCode();
+    int pdgbar = outputList->getAntiParticlePDGCode();
+
+    B2INFO("[ParticleCombinerModule::event] OutputListName = " << m_listName << "(" << m_antiListName << ")" << "[" << pdg << "/" << pdgbar << "]");
+
+    int counter = 1;
     while (combiner.loadNext()) {
+      B2INFO("[ParticleCombinerModule::event] loaded Particle #" << counter++);
 
       const Particle particle = combiner.getCurrentParticle(pdg, pdgbar);
-      if (!checkCuts(&particle)) continue;
+      if (!checkCuts(&particle))
+        continue;
 
       new(Particles.nextFreeAddress()) Particle(particle);
       int iparticle = Particles.getEntries() - 1;
-      outputList->addParticle(iparticle, combiner.getCurrentType());
 
+      outputList->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
     }
-
-    B2INFO("ParticleCombiner: " << m_pdg << " " << m_listName << " size="
-           << outputList->getList(ParticleList::c_Particle).size()
-           << "+" << outputList->getList(ParticleList::c_AntiParticle).size()
-           << "+" << outputList->getList(ParticleList::c_SelfConjugatedParticle).size());
-
-  }
-
-
-  bool ParticleCombinerModule::isParticleSelfConjugated(StoreObjPtr<ParticleList>& outputList)
-  {
-    return outputList->getPDG() == outputList->getPDGbar();
   }
 
   void ParticleCombinerModule::endRun()
@@ -122,6 +209,24 @@ namespace Belle2 {
   {
   }
 
+  void ParticleCombinerModule::convert(const StoreObjPtr<ParticleList>& in,
+                                       PCombinerList& out)
+  {
+    std::vector<int> particles     = in->getList(ParticleList::c_FlavorSpecificParticle);
+    std::vector<int> antiParticles = in->getList(ParticleList::c_FlavorSpecificParticle, true);
+    std::vector<int> scParticles   = in->getList(ParticleList::c_SelfConjugatedParticle);
+
+    out.setPDG(in->getPDGCode());
+    out.setList(PCombinerList::c_Particle, particles);
+    out.setList(PCombinerList::c_AntiParticle, antiParticles);
+    out.setList(PCombinerList::c_SelfConjugatedParticle, scParticles);
+
+    B2INFO("[ParticleCombinerModule::convert] IN  list: ");
+    in->print();
+    B2INFO("[ParticleCombinerModule::convert] OUT list: ");
+    out.print();
+  }
+
   bool ParticleCombinerModule::checkCuts(const Particle* particle)
   {
 
@@ -130,16 +235,17 @@ namespace Belle2 {
     for (auto & cut : m_cuts) {
       auto var = manager.getVariable(cut.first);
       if (var == nullptr) {
-        B2INFO("ParticleCombiner: VariableManager doesn't have variable" <<  cut.first)
+        B2INFO(
+          "ParticleCombiner: VariableManager doesn't have variable" << cut.first)
         return false;
       }
       double value = var->function(particle);
-      if (value < std::get<0>(cut.second) || value > std::get<1>(cut.second)) return false;
+      if (value < std::get < 0 > (cut.second)
+          || value > std::get < 1 > (cut.second))
+        return false;
     }
     return true;
   }
-
-
 
 } // end Belle2 namespace
 

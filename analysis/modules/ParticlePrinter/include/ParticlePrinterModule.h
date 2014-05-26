@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Anze Zupanc                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,7 +12,10 @@
 #define PARTICLEPRINTERMODULE_H
 
 #include <framework/core/Module.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <string>
+
+#include <analysis/dataobjects/Particle.h>
 
 namespace Belle2 {
 
@@ -72,6 +75,11 @@ namespace Belle2 {
     std::string m_listName;   /**< particle list name */
     bool m_fullPrint;         /**< steering variable */
 
+    std::vector<std::string> m_variables;  /**< names of PSelector functions to be printed */
+
+    DecayDescriptor m_decaydescriptor; /**< Decay descriptor of the particle being selected */
+
+    void printVariables(const Particle* particle) const;
   };
 
 } // Belle2 namespace

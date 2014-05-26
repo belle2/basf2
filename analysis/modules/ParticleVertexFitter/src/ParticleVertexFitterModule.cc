@@ -108,8 +108,9 @@ namespace Belle2 {
 
     std::vector<unsigned int> toRemove;
     for (unsigned i = 0; i < plist->getListSize(); i++) {
-      bool ok = doVertexFit(plist->getParticle(i));
-      if (!ok) toRemove.push_back(i);
+      Particle* particle = plist->getParticle(i);
+      bool ok = doVertexFit(particle);
+      if (!ok) toRemove.push_back(particle->getArrayIndex());
     }
     plist->removeParticles(toRemove);
   }

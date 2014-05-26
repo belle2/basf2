@@ -3,7 +3,7 @@
 * Copyright(C) 2010 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: ParticleStats                                            *
+* Contributors: ParticleStats, Anze Zupanc                               *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -33,8 +33,18 @@ ParticleStatsModule::ParticleStatsModule() : Module()
 
 void ParticleStatsModule::initialize()
 {
+  unsigned nParticleLists = m_strParticleLists.size();
+  for (unsigned i = 0; i < nParticleLists; ++i) {
+    bool valid = m_decaydescriptor.init(m_strParticleLists[i]);
+    if (!valid)
+      B2ERROR("Invalid input list name: " << m_strParticleLists[i]);
 
-  int nParticleLists = m_strParticleLists.size();
+    int nProducts = m_decaydescriptor.getNDaughters();
+    if (nProducts > 0)
+      B2ERROR("ParticleStatsModule::initialize Invalid input DecayString " << m_strParticleLists[i]
+              << ". DecayString should not contain any daughters, only the mother particle.");
+  }
+
   B2INFO("Number of ParticleLists studied " << nParticleLists << " ");
 
   m_PassMatrix = new TMatrix(nParticleLists, nParticleLists + 1);
@@ -60,24 +70,31 @@ void ParticleStatsModule::event()
       B2INFO("ParticleListi " << m_strParticleLists[iList] << " not found");
       continue;
     } else {
-      //std::cout<<"particle list collection name"  <<    particlelist->getParticleCollectionName()<<std::endl;
-
       if (!particlelist->getListSize())continue;
 
       pass = true;
       // All Particles&Anti-Particles
-      (*m_MultiplicityMatrix)(iList, 0) = (*m_MultiplicityMatrix)(iList, 0) + particlelist->getListSize();
+      (*m_MultiplicityMatrix)(iList, 0) = (*m_MultiplicityMatrix)(iList, 0)
+                                          + particlelist->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle)
+                                          + particlelist->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true)
+                                          + particlelist->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle);
 
       // Particles
-      if (particlelist->getNumOf(ParticleList::c_Particle))
-        (*m_MultiplicityMatrix)(iList, 1) = (*m_MultiplicityMatrix)(iList, 1) + particlelist->getNumOf(ParticleList::c_Particle);
+      if (particlelist->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle)) {
+        (*m_MultiplicityMatrix)(iList, 1) = (*m_MultiplicityMatrix)(iList, 1)
+                                            + particlelist->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle);
+      }
 
       // Anti-Particles
-      if (particlelist->getNumOf(ParticleList::c_AntiParticle))
-        (*m_MultiplicityMatrix)(iList, 2) = (*m_MultiplicityMatrix)(iList, 2) + particlelist->getNumOf(ParticleList::c_AntiParticle);
+      if (particlelist->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true)) {
+        (*m_MultiplicityMatrix)(iList, 2) = (*m_MultiplicityMatrix)(iList, 2)
+                                            + particlelist->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true);
+      }
 
-      if (particlelist->getNumOf(ParticleList::c_SelfConjugatedParticle))
-        (*m_MultiplicityMatrix)(iList, 3) = (*m_MultiplicityMatrix)(iList, 3) + particlelist->getNumOf(ParticleList::c_SelfConjugatedParticle);
+      if (particlelist->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle)) {
+        (*m_MultiplicityMatrix)(iList, 3) = (*m_MultiplicityMatrix)(iList, 3)
+                                            + particlelist->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle);
+      }
 
 
       for (int jList = 0; jList < nParticleLists; ++jList) {

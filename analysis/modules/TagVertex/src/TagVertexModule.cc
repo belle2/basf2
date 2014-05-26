@@ -121,7 +121,7 @@ namespace Belle2 {
       if (ok) BtagMCVertex(particle);
       if (ok) deltaT(particle);
 
-      if (!ok) toRemove.push_back(i);
+      if (!ok) toRemove.push_back(particle->getArrayIndex());
 
       // save information in the Vertex StoreArray
       if (ok) {

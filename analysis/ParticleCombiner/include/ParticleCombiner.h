@@ -10,9 +10,7 @@
 
 #pragma once
 
-#include <analysis/dataobjects/ParticleList.h>
-
-#include <framework/datastore/StoreObjPtr.h>
+#include <analysis/ParticleCombiner/PCombinerList.h>
 
 #include <vector>
 #include <set>
@@ -57,9 +55,9 @@ namespace Belle2 {
 
     /**
      * Initialises the generator to produce the given type of sublist
-     * @param _currentType the type of sublist which is produced by the combination of ParticleLists
+     * @param _currentType the type of sublist which is produced by the combination of PCombinerLists
      */
-    void init(ParticleList::EParticleType _currentType);
+    void init(PCombinerList::EParticleType _currentType);
 
     /**
      * Loads the next combination. Returns false if there is no next combination
@@ -69,14 +67,18 @@ namespace Belle2 {
     /**
      * Returns the type of the sublist of the current loaded combination
      */
-    const std::vector<ParticleList::EParticleType>& getCurrentTypes() const;
+    const std::vector<PCombinerList::EParticleType>& getCurrentTypes() const;
 
   private:
+
+    // TODO: delete
+    void print() const;
+
     const unsigned int numberOfLists; /**< Number of lists which are combined */
     unsigned int iCombination; /**< The current position of the combination */
     unsigned int nCombinations; /**< The total amount of combinations */
-    ParticleList::EParticleType currentType; /**< The current type of sublist which is produced by the combination */
-    std::vector<ParticleList::EParticleType> types; /**< The current types of sublist of the ParticleLists for this combination */
+    PCombinerList::EParticleType currentType; /**< The current type of sublist which is produced by the combination */
+    std::vector<PCombinerList::EParticleType> types; /**< The current types of sublist of the PCombinerLists for this combination */
 
   };
 
@@ -111,16 +113,19 @@ namespace Belle2 {
 
 
   private:
-    const unsigned int numberOfLists; /**< Number of lists which are combined */
-    unsigned int iCombination; /**< The current position of the combination */
-    unsigned int nCombinations; /**< The total amount of combinations */
+
+    void print() const;
+
+    const unsigned int numberOfLists;  /**< Number of lists which are combined */
+    unsigned int iCombination;         /**< The current position of the combination */
+    unsigned int nCombinations;        /**< The total amount of combinations */
     std::vector<unsigned int> indices; /**< The indices of the current loaded combination */
-    std::vector<unsigned int> sizes; /**< The sizes of the particle lists which are combined */
+    std::vector<unsigned int> sizes;   /**< The sizes of the particle lists which are combined */
 
   };
 
   /**
-   * ParticleCombiner combines ParticleLists to a new ParticleList using the ListCombiner and IndexCombiner.
+   * ParticleCombiner combines PCombinerLists to a new PCombinerList using the ListCombiner and IndexCombiner.
    * 1. The particle combiner loops over the three types of the output particle. The output particle can
    *    be a particle, anti-particle or a self-conjugated particle
    * 2. For each output types there are a number of possible combinations of the input sublists. These combinations
@@ -146,10 +151,10 @@ namespace Belle2 {
   public:
     /**
      * Constructor
-     * @param inputListNames the names of the ParticleLists. These ParticleLists have to be in the DataStore
-     * @param isCombinedParticleSelfConjugated If the combined particle is self conjugated the produced ParticleList by this combiner is also SelfConjugated (so only the sublist SelfConjugatedParticle is filled)
+     * @param inputLists input PCombinerLists
+     * @param isCombinedParticleSelfConjugated If the combined particle is self conjugated the produced PCombinerList by this combiner is also SelfConjugated (so only the sublist SelfConjugatedParticle is filled)
      */
-    ParticleCombiner(const std::vector<std::string>& inputListNames, bool isCombinedParticleSelfConjugated);
+    ParticleCombiner(const std::vector<PCombinerList>& inputLists, bool isCombinedParticleSelfConjugated);
 
     /*
      * Loads the next combination. Returns false if there is no next combination
@@ -162,7 +167,7 @@ namespace Belle2 {
     const std::vector<Particle*>& getCurrentParticles() const { return m_particles; }
 
     /**
-     * Returns the current loaded combination of particles as indices which are found in the given ParticleLists
+     * Returns the current loaded combination of particles as indices which are found in the given PCombinerLists
      */
     const std::vector<int>& getCurrentIndices() const { return m_indices; }
 
@@ -175,22 +180,22 @@ namespace Belle2 {
 
     /**
      * Return the ParticleType of the current combination. If the Particle which is combined
-     * is selfConjugated itself, all combinations have to be ParticleList::c_SelfConjugatedParticle.
+     * is selfConjugated itself, all combinations have to be PCombinerList::c_SelfConjugatedParticle.
      */
-    ParticleList::EParticleType getCurrentType() const;
+    PCombinerList::EParticleType getCurrentType() const;
 
   private:
     /**
      * Returns the type of sublist which is currently produced, only difference to getCurrentType()
      * is that this function doesn't consider the isCombinedParticleSelfConjugated flag given in the constructor
      */
-    ParticleList::EParticleType getCurrentCombinationType() const;
+    PCombinerList::EParticleType getCurrentCombinationType() const;
 
     /**
      * Checks if given daughter particles are self conjugated
-     * @param plists refernce to vector of input particle lists StoreObjPtr's
+     * @param plists reference to vector of input PCombinerLists
      */
-    bool isDecaySelfConjugated(std::vector<StoreObjPtr<ParticleList> >& plists);
+    bool isDecaySelfConjugated(std::vector<PCombinerList>& plists);
 
     /**
      * Loads the next combination provided by the IndexCombiner
@@ -217,12 +222,15 @@ namespace Belle2 {
 
   private:
 
-    ListCombiner listCombiner; /**< ListCombiner makes the combinations of the types of sublists of the ParticleLists */
-    IndexCombiner indexCombiner; /**< IndexCombiner makes the combinations of indices stored in the sublists of the ParticleLists */
+    // TODO: delete
+    void printCombiner();
 
-    std::vector<StoreObjPtr<ParticleList> > plists; /**< Store array pointers to the ParticleLists which should be combined */
+    ListCombiner listCombiner;   /**< ListCombiner makes the combinations of the types of sublists of the PCombinerLists */
+    IndexCombiner indexCombiner; /**< IndexCombiner makes the combinations of indices stored in the sublists of the PCombinerLists */
+
+    std::vector<PCombinerList> plists;  /**< PCombinerLists which should be combined */
     std::vector<Particle*> m_particles; /**< Pointers to the particle objects of the current combination */
-    std::vector<int> m_indices; /**< Indices stored in the ParticleLists of the current combination */
+    std::vector<int> m_indices;         /**< Indices stored in the PCombinerLists of the current combination */
     std::unordered_set<std::set<int>> m_usedCombinations; /**< already used combinations (as sets of indices). */
 
     unsigned int numberOfLists; /**< Number of lists which are combined */

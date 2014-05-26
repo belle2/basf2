@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Anze Zupanc                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,9 +14,11 @@
 #include <TObject.h>
 #include <vector>
 
-namespace Belle2 {
+#include <analysis/dataobjects/Particle.h>
 
-  class Particle;
+#include <iostream>
+
+namespace Belle2 {
 
   /**
    * Class to hold a list of particles, anti-particles and self-conjugated particles.
@@ -27,10 +29,9 @@ namespace Belle2 {
   class ParticleList : public TObject {
   public:
 
-    /** Identifies the type of Particle (and in which of our three lists it is stored). */
+    /** Identifies the type of Particle (and in which of internal two lists it is stored). */
     enum EParticleType {
-      c_Particle = 0,
-      c_AntiParticle,
+      c_FlavorSpecificParticle = 0,
       c_SelfConjugatedParticle
     };
 
@@ -40,50 +41,62 @@ namespace Belle2 {
     ParticleList():
       m_pdg(0),
       m_pdgbar(0),
-      m_particleStore("Particles")
-    {}
+      m_particleStore("Particles"),
+      m_thisListName(""),
+      m_antiListName("") {
+    }
 
     /**
-     * Sets PDG code
-     * @param pdg PDG code
+     * Sets the PDG code and name of this ParticleList.
+     *
+     * At this point it is assumed that this is self-conjugated list (PDG code = anti-PDG code).
+     * To bind the particle and anti-particle ParticleLists use bindAntiParticleList(ParticleList &antiList) method.
+     *
+     * @param pdg PDG code of particles to be hold in this list
+     * @param name of the particle list
      */
-    void setPDG(int pdg);
+    void initialize(int pdg, std::string name);
+
+    /**
+     * Binds particle and anti-particle ParticleLists.
+     *
+     * @param antiList - anti-particle ParticleList of this ParticleList
+     */
+    void bindAntiParticleList(ParticleList& antiList, bool includingAntiList = true);
 
     /**
      * Sets Particle store array name to which particle list refers
      * @param name name of the Particle store array
      */
-    void setParticleCollectionName(std::string name) {m_particleStore = name;}
+    void setParticleCollectionName(std::string name, bool forAntiParticle = true);
 
     /**
      * Adds a new particle to the list (safe method)
+     *
+     * The method determines based on the particle's properties (PDGcode, flavorType)
+     * to which particular list this particle belongs (flavor-specific or
+     * self-conjugated particle or anti-particle list)
+     *
      * @param particle pointer to particle in the StoreArray<Particle>
      */
     void addParticle(const Particle* particle);
 
     /**
      * Adds a new particle to the list (almost safe method)
+     *
      * @param iparticle index of the particle in the StoreArray<Particle>
      * @param pdg particle PDG code
      * @param flavorType particle flavor type
      */
-    void addParticle(unsigned iparticle, int pdg, unsigned flavorType);
-
-    /**
-     * Adds a new particle to the list (unsafe method - please, use the safe one).
-     * Particle must be of the kind the list is constructed for.
-     * To be used in ParticleCombiner only.
-     * @param iparticle index of the particle in the StoreArray<Particle>
-     * @param K ParticleType - Particle, AntiParticle or SelfConjugatedParticle
-     */
-    void addParticle(unsigned iparticle, EParticleType K) {
-      m_list[K].push_back(iparticle);
-    }
+    void addParticle(unsigned iparticle, int pdg, Particle::EFlavorType flavorType, bool includingAntiList = true);
 
     /**
      * Remove given elements from list
+     *
+     * @param toRemove vector of Particle array indices to be removed
+     * @param removeFromAntiList flag indicating whether to remove particle also from anti-particle list (default is true)
      */
-    void removeParticles(const std::vector<unsigned int>& toRemove);
+    void removeParticles(const std::vector<unsigned int>& toRemove, bool removeFromAntiList = true);
 
     /**
      * Returns Particle store array name to which particle list refers
@@ -93,43 +106,54 @@ namespace Belle2 {
     /**
      * Returns PDG code
      */
-    int getPDG() const {return m_pdg; }
+    int getPDGCode() const {return m_pdg; }
 
     /**
      * Returns PDG code of anti-particle
      */
-    int getPDGbar() const { return m_pdgbar; }
+    int getAntiParticlePDGCode() const { return m_pdgbar; }
 
     /**
      * Returns list of StoreArray<Particle> indices.
-     * @param K ParticleType - Particle, AntiParticle or SelfConjugatedParticle
+     *
+     * @param K ParticleType - Particle, SelfConjugatedParticle
+     * @param forAntiParticle - whether the Particle or SelfConjugatedParticle should be returned for this (false) or anti-particle list (true)
      * @return const reference to vector of indices
      */
-    const std::vector<int>& getList(EParticleType K) const {
-      return m_list[K];
-    }
+    std::vector<int> getList(EParticleType K, bool forAntiParticle = false) const;
 
     /**
-     * Returns total number of particles in this list (all three EParticleTypes)
+     * Returns the name the anti-particle ParticleList.
      */
-    unsigned getListSize() const {
-      return m_list[0].size() + m_list[1].size() + m_list[2].size();
-    }
+    std::string getAntiParticleListName() const { return m_antiListName; }
 
     /**
-     * Returns i-th particle from the list
+     * Returns the name the anti-particle ParticleList.
+     */
+    std::string getParticleListName() const { return m_thisListName; }
+
+    /**
+     * Returns total number of particles in this list and anti list if requested
+     */
+    unsigned getListSize(bool includingAntiList = true) const;
+
+    /**
+     * Returns i-th particle from the this list and anti list if requested
      * @param i list index (i < getListSize())
      * @return pointer to Particle or NULL
      */
-    Particle* getParticle(unsigned i) const;
+    Particle* getParticle(unsigned i, bool includingAntiList = true) const;
 
     /**
-     * Returns number of particles, antiparticles or self-conjugated particles in the list
-     * @param K ParticleType - Particle, AntiParticle or SelfConjugatedParticle
-     * @return number of particles, antiparticles or self-conjugated particles
+     * Returns number of particles or self-conjugated particles in the list or anti-particle list
+     *
+     * @param K ParticleType - Particle or SelfConjugatedParticle
+     * @param forAntiParticle - whether the Particle or SelfConjugatedParticle should be returned for this (false) or anti-particle list (true)
+     * @return number of particles or self-conjugated particles in the list or anti-particle list
      */
-    unsigned getNumOf(EParticleType K) const {
-      return m_list[K].size();
+    unsigned getNParticlesOfType(EParticleType K, bool forAntiParticle = false) const {
+      const std::vector<int> list = getList(K, forAntiParticle);
+      return list.size();
     }
 
     /**
@@ -140,19 +164,23 @@ namespace Belle2 {
   private:
 
     /**
-     * Checks if the given pdg code particle has an anti particle
-     * We can't use TDatabase here because of a bug in our patch of ROOT!
+     * Adds particle to the anti-particle List.
      */
-    static bool hasAntiParticle(int pdg);
+    void addParticleToAntiList(unsigned iparticle, int pdg, Particle::EFlavorType type);
 
   private:
 
-    int m_pdg;               /**< PDG code of Particle */
-    int m_pdgbar;               /**< PDG code of antiparticle */
-    std::vector<int> m_list[3];        /**< list of 0-based indices of Particles */
-    std::string m_particleStore;       /**< name of Particle store array */
+    int m_pdg;                   /**< PDG code of Particle */
+    int m_pdgbar;                /**< PDG code of antiparticle */
+    std::vector<int> m_fsList;   /**< list of 0-based indices of flavor-specific Particles (particles that have an anti-particle) */
+    std::vector<int> m_scList;   /**< list of 0-based indices of self-conjugated Particles (particles that do not have an anti-particle) */
 
-    ClassDef(ParticleList, 2); /**< Class to hold a list of particles, anti-particles and self-conjugated particles. */
+    std::string m_particleStore; /**< name of Particle store array */
+
+    std::string m_thisListName;  /**< name of this ParticleList */
+    std::string m_antiListName;  /**< name of ParticleList for anti-particles */
+
+    ClassDef(ParticleList, 3); /**< Class to hold a list of particles, anti-particles and self-conjugated particles. */
 
   };
 

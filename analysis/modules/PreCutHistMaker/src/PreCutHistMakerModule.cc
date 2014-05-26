@@ -146,9 +146,11 @@ bool hasAntiParticle(int pdg)
 void PreCutHistMakerModule::clearParticleLists()
 {
   for (auto & list : m_tmpLists) {
-    int pdg = list->getPDG();
+    int pdg = list->getPDGCode();
+    std::string name = list->getParticleListName();
     list.create(true);
-    list->setPDG(pdg);
+    list->initialize(pdg, name);
+    // TODO is at this point necessary to bind anti list? probably yes
   }
 }
 
@@ -163,7 +165,7 @@ bool PreCutHistMakerModule::fillParticleLists(const std::vector<MCParticle*>& mc
       //add particles into corresponding temporary lists
       for (auto & plist : m_tmpLists) {
         //TODO: are there cases where we want misID-ed Particles? (e.g. pdg different mcPart)
-        if (abs(p.getPDGCode()) == abs(plist->getPDG())) {
+        if (abs(p.getPDGCode()) == abs(plist->getPDGCode())) {
           plist->addParticle(&p);
         }
       }
@@ -180,14 +182,17 @@ bool PreCutHistMakerModule::fillParticleLists(const std::vector<MCParticle*>& mc
 
 void PreCutHistMakerModule::saveCombinationsForSignal()
 {
-  vector<string> tmplistNames;
-  for (const auto & list : m_tmpLists) {
-    tmplistNames.push_back(list.getName());
-    //list->print();
+  // Convert input ParticleList(s) to PCombinerList(s)
+  vector<PCombinerList> inputPCombinerLists;
+  for (const auto & listName : m_tmpLists) {
+    StoreObjPtr<ParticleList> list(listName);
+    PCombinerList plist;
+    convert(list, plist);
+    inputPCombinerLists.push_back(plist);
   }
 
   StoreArray<Particle> particles;
-  ParticleCombiner combiner(tmplistNames, !hasAntiParticle(m_pdg));
+  ParticleCombiner combiner(inputPCombinerLists, !hasAntiParticle(m_pdg));
 
   while (combiner.loadNext()) {
 
@@ -209,7 +214,17 @@ void PreCutHistMakerModule::saveCombinationsForSignal()
 void PreCutHistMakerModule::saveAllCombinations()
 {
   StoreArray<Particle> particles;
-  ParticleCombiner combiner(m_inputListNames, !hasAntiParticle(m_pdg));
+
+  // Convert input ParticleList(s) to PCombinerList(s)
+  vector<PCombinerList> inputPCombinerLists;
+  for (unsigned i = 0; i < m_inputListNames.size(); i++) {
+    StoreObjPtr<ParticleList> list(m_inputListNames[i]);
+    PCombinerList plist;
+    convert(list, plist);
+    inputPCombinerLists.push_back(plist);
+  }
+
+  ParticleCombiner combiner(inputPCombinerLists, !hasAntiParticle(m_pdg));
 
   while (combiner.loadNext()) {
     const Particle part = combiner.getCurrentParticle(m_pdg, -m_pdg);
@@ -234,11 +249,12 @@ void PreCutHistMakerModule::event()
       return;
     }
     plists.push_back(list);
-    expectedDaughterPDGsAbs.insert(abs(list->getPDG()));
+    expectedDaughterPDGsAbs.insert(abs(list->getPDGCode()));
 
     //create temporary output lists (and replace any existing object)
     m_tmpLists[i].create(true);
-    m_tmpLists[i]->setPDG(list->getPDG());
+    m_tmpLists[i]->initialize(list->getPDGCode(), list->getParticleListName());
+    // TODO is at this point necessary to bind anti list? probably yes
   }
 
   //for signal + background
@@ -278,6 +294,18 @@ void PreCutHistMakerModule::event()
       }
     }
   }
+}
+
+void PreCutHistMakerModule::convert(const StoreObjPtr<ParticleList>& in, PCombinerList& out)
+{
+  std::vector<int>     particles = in->getList(ParticleList::c_FlavorSpecificParticle);
+  std::vector<int> antiParticles = in->getList(ParticleList::c_FlavorSpecificParticle, true);
+  std::vector<int>   scParticles = in->getList(ParticleList::c_SelfConjugatedParticle);
+
+  out.setPDG(in->getPDGCode());
+  out.setList(PCombinerList::c_Particle,                  particles);
+  out.setList(PCombinerList::c_AntiParticle,          antiParticles);
+  out.setList(PCombinerList::c_SelfConjugatedParticle,  scParticles);
 }
 
 void PreCutHistMakerModule::terminate()

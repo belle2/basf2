@@ -106,7 +106,7 @@ namespace Belle2 {
         getMC_PDGcodes();
         Input_Values_Muon();
       };
-      if (!ok) toRemove.push_back(i);
+      if (!ok) toRemove.push_back(particle->getArrayIndex());
     }
     plist->removeParticles(toRemove);
 

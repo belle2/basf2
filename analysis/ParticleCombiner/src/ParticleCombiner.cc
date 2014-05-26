@@ -18,16 +18,16 @@
 
 namespace Belle2 {
 
-  ListCombiner::ListCombiner(unsigned int numberOfLists) : numberOfLists(numberOfLists), iCombination(0), nCombinations(0), currentType(ParticleList::c_Particle), types(numberOfLists) {  }
+  ListCombiner::ListCombiner(unsigned int numberOfLists) : numberOfLists(numberOfLists), iCombination(0), nCombinations(0), currentType(PCombinerList::c_Particle), types(numberOfLists) {  }
 
-  void ListCombiner::init(ParticleList::EParticleType _currentType)
+  void ListCombiner::init(PCombinerList::EParticleType _currentType)
   {
     iCombination = 0;
     currentType = _currentType;
     if (numberOfLists == 0)
       nCombinations = 0;
     else
-      nCombinations = currentType == ParticleList::c_SelfConjugatedParticle ? 1 : (1 << numberOfLists) - 1;
+      nCombinations = currentType == PCombinerList::c_SelfConjugatedParticle ? 1 : (1 << numberOfLists) - 1;
   }
 
   bool ListCombiner::loadNext()
@@ -38,14 +38,14 @@ namespace Belle2 {
 
     for (unsigned int i = 0; i < numberOfLists; ++i) {
       bool useSelfConjugatedDaughterList = (iCombination & (1 << i));
-      types[i] = useSelfConjugatedDaughterList ? ParticleList::c_SelfConjugatedParticle : currentType;
+      types[i] = useSelfConjugatedDaughterList ? PCombinerList::c_SelfConjugatedParticle : currentType;
     }
 
     ++iCombination;
     return true;
   }
 
-  const std::vector<ParticleList::EParticleType>& ListCombiner::getCurrentTypes() const
+  const std::vector<PCombinerList::EParticleType>& ListCombiner::getCurrentTypes() const
   {
     return types;
   }
@@ -100,18 +100,14 @@ namespace Belle2 {
   }
 
 
-  ParticleCombiner::ParticleCombiner(const std::vector<std::string>& inputListNames, bool isCombinedParticleSelfConjugated) : listCombiner(inputListNames.size()), indexCombiner(inputListNames.size()), m_isCombinedParticleSelfConjugated(isCombinedParticleSelfConjugated)
+  ParticleCombiner::ParticleCombiner(const std::vector<PCombinerList>& inputLists, bool isCombinedParticleSelfConjugated) : listCombiner(inputLists.size()), indexCombiner(inputLists.size()), m_isCombinedParticleSelfConjugated(isCombinedParticleSelfConjugated)
   {
 
-    for (unsigned i = 0; i < inputListNames.size(); i++) {
-      StoreObjPtr<ParticleList> list(inputListNames[i]);
-      if (!list) {
-        B2ERROR("ParticleList " << inputListNames[i] << " not found");
-        return;
-      }
-      if (list->getParticleCollectionName() != std::string("Particles")) {
-        B2ERROR("ParticleList " << inputListNames[i] <<
-                " does not refer to the default Particle collection");
+    for (unsigned i = 0; i < inputLists.size(); i++) {
+      PCombinerList list = inputLists[i];
+
+      if (list.getParticleCollectionName() != std::string("Particles")) {
+        B2ERROR("PCombinerList does not refer to the default Particle collection");
         return;
       }
       plists.push_back(list);
@@ -147,7 +143,7 @@ namespace Belle2 {
         const auto& types = listCombiner.getCurrentTypes();
         std::vector<unsigned int> sizes(numberOfLists);
         for (unsigned int i = 0; i < numberOfLists; ++i) {
-          sizes[i] = plists[i]->getList(types[i]).size();
+          sizes[i] = plists[i].getList(types[i]).size();
         }
         indexCombiner.init(sizes);
         continue;
@@ -155,7 +151,7 @@ namespace Belle2 {
 
       // Load next type combination if available
       if (loadNextType()) {
-        listCombiner.init((ParticleList::EParticleType)(iType));
+        listCombiner.init((PCombinerList::EParticleType)(iType));
         continue;
       }
 
@@ -178,28 +174,28 @@ namespace Belle2 {
       vec = vec + m_particles[i]->get4Vector();
     }
 
-    ParticleList::EParticleType outputType = getCurrentType();
-    return Particle(vec, outputType == ParticleList::c_AntiParticle ? pdgbar :  pdg,
-                    outputType == ParticleList::c_SelfConjugatedParticle ? Particle::c_Unflavored : Particle::c_Flavored,
+    PCombinerList::EParticleType outputType = getCurrentType();
+    return Particle(vec, outputType == PCombinerList::c_AntiParticle ? pdgbar :  pdg,
+                    outputType == PCombinerList::c_SelfConjugatedParticle ? Particle::c_Unflavored : Particle::c_Flavored,
                     m_indices, m_particles[0]->getArrayPointer());
   }
 
-  ParticleList::EParticleType ParticleCombiner::getCurrentCombinationType() const
+  PCombinerList::EParticleType ParticleCombiner::getCurrentCombinationType() const
   {
     switch (iType) {
-      case 0: return ParticleList::c_Particle;
-      case 1: return ParticleList::c_AntiParticle;
-      case 2: return ParticleList::c_SelfConjugatedParticle;
+      case 0: return PCombinerList::c_Particle;
+      case 1: return PCombinerList::c_AntiParticle;
+      case 2: return PCombinerList::c_SelfConjugatedParticle;
       default: B2FATAL("Thomas you have a serious bug in the particle combiner!");
     }
-    return ParticleList::c_Particle; // This line can never be reached, as long B2FATAL kills the program!
+    return PCombinerList::c_Particle; // This line can never be reached, as long B2FATAL kills the program!
   }
 
 
-  ParticleList::EParticleType ParticleCombiner::getCurrentType() const
+  PCombinerList::EParticleType ParticleCombiner::getCurrentType() const
   {
     if (m_isCombinedParticleSelfConjugated)
-      return ParticleList::c_SelfConjugatedParticle;
+      return PCombinerList::c_SelfConjugatedParticle;
     return getCurrentCombinationType();
   }
 
@@ -212,7 +208,7 @@ namespace Belle2 {
     const auto& indices = indexCombiner.getCurrentIndices();
 
     for (unsigned int i = 0; i < numberOfLists; i++) {
-      m_indices[i] = plists[i]->getList(types[i])[ indices[i] ];
+      m_indices[i] = plists[i].getList(types[i])[ indices[i] ];
       m_particles[i] = Particles[ m_indices[i] ];
     }
 
@@ -259,13 +255,13 @@ namespace Belle2 {
     return elementInserted;
   }
 
-  bool ParticleCombiner::isDecaySelfConjugated(std::vector<StoreObjPtr<ParticleList> >& plists)
+  bool ParticleCombiner::isDecaySelfConjugated(std::vector<PCombinerList>& plists)
   {
 
     std::vector<int> decay, decaybar;
     for (unsigned i = 0; i < plists.size(); i++) {
-      decay.push_back(plists[i]->getPDG());
-      decaybar.push_back(plists[i]->getPDGbar());
+      decay.push_back(plists[i].getPDG());
+      decaybar.push_back(plists[i].getPDGbar());
     }
     std::sort(decay.begin(), decay.end());
     std::sort(decaybar.begin(), decaybar.end());

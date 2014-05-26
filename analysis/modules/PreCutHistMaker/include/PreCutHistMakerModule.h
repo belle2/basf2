@@ -15,6 +15,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
+#include <analysis/ParticleCombiner/PCombinerList.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/utility/VariableManager.h>
 
@@ -64,6 +65,11 @@ namespace Belle2 {
 
 
   private:
+
+    /**
+     * Converts ParticleList to PCombinerList
+     */
+    void convert(const StoreObjPtr<ParticleList>& in, PCombinerList& out);
 
     /** reset m_tmpLists. */
     void clearParticleLists();

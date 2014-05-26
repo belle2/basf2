@@ -58,7 +58,7 @@ def PreCutProbDetermination(name, pdgcode, channels, preCut_Histograms, efficien
     """
 
     files = [ROOT.TFile(filename, 'UPDATE') for filename in preCut_Histograms]
-    signal, bckgrd, ratio = LoadHistogramsFromFiles(files, 'daughterProductOf(GetExtraInfo(SignalProbability))', channels)
+    signal, bckgrd, ratio = LoadHistogramsFromFiles(files, 'daughterProductOf(getExtraInfo(SignalProbability))', channels)
     splines = FitSplineFunctions(ratio)
 
     def ycut_to_xcuts(channel, cut):
@@ -213,7 +213,7 @@ def CreatePreCutProbHistogram(path, particle, name, daughterLists, daughterSigna
     hash = createHash(name, particle.name, daughterLists, daughterSignalProbabilities)
     filename = 'CutHistograms_{pname}_{cname}_{hash}.root'.format(pname=particle.name, cname=name, hash=hash)
     if os.path.isfile(filename):
-        return {'PreCutHistogram_' + particle.name: filename}
+        return {'PreCutHistogram_' + name: filename}
     else:
         # Combine all the particles according to the decay channels
         mass = pdg.get(pdg.from_name(particle.name)).Mass()

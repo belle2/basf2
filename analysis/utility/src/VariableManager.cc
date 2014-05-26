@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 
 using namespace Belle2;
 
@@ -41,55 +42,67 @@ const VariableManager::Var* VariableManager::createVariable(const std::string& n
 {
 
   VariableManager::FunctionPtr func;
-  const static boost::regex allowedForm("^([a-zA-Z0-9_]*)\\((.*)\\)$");
-  boost::match_results<std::string::const_iterator> results;
 
-  if (boost::regex_match(name, results, allowedForm)) {
-    if (results[1] == "getExtraInfo") {
-      auto extraInfoName = results[2];
-      func = [extraInfoName](const Particle * particle) -> double {
-        return particle->getExtraInfo(extraInfoName);
-      };
-    } else {
-      const VariableManager::Var* var = getVariable(results[2]);
-      if (results[1] == "daughterProductOf") {
-        func = [var](const Particle * particle) -> double {
-          double product = 1.0;
-          for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
-            product *= var->function(particle->getDaughter(j));
-          }
-          return product;
-        };
-      } else if (results[1] == "daughterSumOf") {
-        func = [var](const Particle * particle) -> double {
-          double sum = 0.0;
-          for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
-            sum += var->function(particle->getDaughter(j));
-          }
-          return sum;
-        };
-      } else if (results[1] == "abs") {
-        func = [var](const Particle * particle) -> double { return std::abs(var->function(particle)); };
-      } else if (results[1] == "daughter0") {
-        func = [var](const Particle * particle) -> double { return var->function(particle->getDaughter(0)); };
-      } else if (results[1] == "daughter1") {
-        func = [var](const Particle * particle) -> double { return var->function(particle->getDaughter(1)); };
-      } else if (results[1] == "daughter2") {
-        func = [var](const Particle * particle) -> double { return var->function(particle->getDaughter(2)); };
-      } else if (results[1] == "daughter3") {
-        func = [var](const Particle * particle) -> double { return var->function(particle->getDaughter(3)); };
-      } else if (results[1] == "daughter4") {
-        func = [var](const Particle * particle) -> double { return var->function(particle->getDaughter(4)); };
-      } else if (results[1] == "daughter5") {
-        func = [var](const Particle * particle) -> double { return var->function(particle->getDaughter(5)); };
-      } else if (results[1] == "daughter6") {
-        func = [var](const Particle * particle) -> double { return var->function(particle->getDaughter(6)); };
-      } else {
-        return nullptr;
-      }
-    }
+  const static boost::regex allowedNumberForm("^([0-9]+\\.?[0-9]*)$");
+  boost::match_results<std::string::const_iterator> number;
+  if (boost::regex_match(name, number, allowedNumberForm)) {
+    float float_number;
+    std::stringstream sstream(number[1]) ;
+    sstream >> float_number;
+    func = [float_number](const Particle * particle) -> double {
+      return float_number;
+    };
   } else {
-    return nullptr;
+    const static boost::regex allowedForm("^([a-zA-Z0-9_]*)\\((.*)\\)$");
+    boost::match_results<std::string::const_iterator> results;
+
+    if (boost::regex_match(name, results, allowedForm)) {
+      if (results[1] == "getExtraInfo") {
+        auto extraInfoName = results[2];
+        func = [extraInfoName](const Particle * particle) -> double {
+          return particle->getExtraInfo(extraInfoName);
+        };
+      } else {
+        const VariableManager::Var* var = getVariable(results[2]);
+        if (results[1] == "daughterProductOf") {
+          func = [var](const Particle * particle) -> double {
+            double product = 1.0;
+            for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
+              product *= var->function(particle->getDaughter(j));
+            }
+            return product;
+          };
+        } else if (results[1] == "daughterSumOf") {
+          func = [var](const Particle * particle) -> double {
+            double sum = 0.0;
+            for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
+              sum += var->function(particle->getDaughter(j));
+            }
+            return sum;
+          };
+        } else if (results[1] == "abs") {
+          func = [var](const Particle * particle) -> double { return std::abs(var->function(particle)); };
+        } else if (results[1] == "daughter0") {
+          func = [var](const Particle * particle) -> double { return var->function(particle->getDaughter(0)); };
+        } else if (results[1] == "daughter1") {
+          func = [var](const Particle * particle) -> double { return var->function(particle->getDaughter(1)); };
+        } else if (results[1] == "daughter2") {
+          func = [var](const Particle * particle) -> double { return var->function(particle->getDaughter(2)); };
+        } else if (results[1] == "daughter3") {
+          func = [var](const Particle * particle) -> double { return var->function(particle->getDaughter(3)); };
+        } else if (results[1] == "daughter4") {
+          func = [var](const Particle * particle) -> double { return var->function(particle->getDaughter(4)); };
+        } else if (results[1] == "daughter5") {
+          func = [var](const Particle * particle) -> double { return var->function(particle->getDaughter(5)); };
+        } else if (results[1] == "daughter6") {
+          func = [var](const Particle * particle) -> double { return var->function(particle->getDaughter(6)); };
+        } else {
+          return nullptr;
+        }
+      }
+    } else {
+      return nullptr;
+    }
   }
 
   std::string escapedName = name;

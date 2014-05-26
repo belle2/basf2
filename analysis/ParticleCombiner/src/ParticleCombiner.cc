@@ -170,7 +170,7 @@ namespace Belle2 {
     ParticleList::EParticleType outputType = getCurrentType();
     return Particle(vec, outputType == ParticleList::c_AntiParticle ? pdgbar :  pdg,
                     outputType == ParticleList::c_SelfConjugatedParticle ? Particle::c_Unflavored : Particle::c_Flavored,
-                    m_indices);
+                    m_indices, m_particles[0]->getArrayPointer());
   }
 
   ParticleList::EParticleType ParticleCombiner::getCurrentCombinationType() const

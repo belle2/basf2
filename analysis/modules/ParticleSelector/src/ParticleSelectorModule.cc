@@ -56,6 +56,9 @@ namespace Belle2 {
     // Add parameters
     addParam("PDG", m_pdg,
              "PDG code. If set to zero, particle list assumed to exist", 0);
+    vector<string> defaultOtherLists;
+    addParam("fromOtherLists", m_otherLists,
+             "Select all particle from the given lists instead of the Particle StoreArray", defaultOtherLists);
     addParam("ListName", m_listName, "name of particle list", string(""));
     vector<string> defaultSelection;
     addParam("Select", m_selection, "selection criteria", defaultSelection);
@@ -88,6 +91,10 @@ namespace Belle2 {
       }
     }
 
+    for (unsigned int i = 0; i < m_otherLists.size(); i++) {
+      StoreObjPtr<ParticleList>::required(m_otherLists[i]);
+    }
+
     for (unsigned int i = 0; i < m_selection.size(); i++) {
       m_pSelector.addSelection(m_selection[i]);
     }
@@ -105,7 +112,20 @@ namespace Belle2 {
   {
     StoreObjPtr<ParticleList> plist(m_listName);
 
-    if (m_pdg != 0) { // new particle list: fill selected
+    if (m_otherLists.size() > 0) { // use given lists instead of store array
+      plist.create();
+      plist->setPDG(m_pdg);
+      for (unsigned int i = 0; i < m_otherLists.size(); i++) {
+        StoreObjPtr<ParticleList> otherList(m_otherLists[i]);
+        if (abs(otherList->getPDG()) != abs(m_pdg)) continue;
+        for (unsigned j = 0; j < otherList->getListSize(); j++) {
+          const Particle* part = otherList->getParticle(j);
+          if (m_pSelector.select(part)) {
+            plist->addParticle(part);
+          }
+        }
+      }
+    } else if (m_pdg != 0) { // new particle list: fill selected
       plist.create();
       plist->setPDG(m_pdg);
       StoreArray<Particle> Particles;

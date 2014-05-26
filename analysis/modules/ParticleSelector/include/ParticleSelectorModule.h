@@ -72,6 +72,7 @@ namespace Belle2 {
     int m_pdg;       /**< PDG code of particles to select */
     std::string m_listName;                /**< particle list name */
     std::vector<std::string> m_selection;  /**< selection criteria */
+    std::vector<std::string> m_otherLists; /**< other lists used as input */
     bool m_persistent;  /**< toggle particle list btw. transient/persistent */
 
     PSelector m_pSelector;                 /**< particle selector */

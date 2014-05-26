@@ -27,6 +27,7 @@
 
 
 import pdg
+import interactive
 
 import FR_utility
 from FR_reconstruction import ParticleList, ParticleListFromChannel
@@ -47,15 +48,16 @@ class Particle(object):
     """
 
     ## Create new class called DecayChannel via namedtuple. namedtuples are like a struct in C with three members: name, daughters and partial
-    DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, partial')
+    DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, variables, method, kinematic_fit, has_missing')
 
-    def __init__(self, name, variables, method, efficiency=0.90):
+    def __init__(self, name, variables, method, kinematic_fit=False, efficiency=0.90):
         """
         Creates a Particle without any decay channels. To add decay channels use addChannel method.
             @param name is the correct pdg name as a string of the particle.
             @param variables is a list of variables which are used to classify the particle. In addition to the here given variables,
                    signal probability variables of all daughter particles are automatically added later for every channel.
             @param method is a tuple (name, type, config) of the method used to classify the particle.
+            @param kinematic_fit perform a kinematic fit to improve 4 momentum of this particle
             @param efficiency minimum signal efficiency of preCuts
         """
         ## The name of the particle as correct pdg name e.g. K+, pi-, D*0.
@@ -68,32 +70,66 @@ class Particle(object):
         self.channels = []
         ## Minimum signal efficiency of preCuts for this particle
         self.efficiency = efficiency
-
-    @property
-    def partial_channels(self):
-        return [channel for channel in self.channels if channel.partial]
+        ## True if a kinematic fit should be performed as default on all the channels of this particle
+        self.kinematic_fit = kinematic_fit
 
     @property
     def complete_channels(self):
-        return [channel for channel in self.channels if not channel.partial]
+        return [channel for channel in self.channels if not channel.has_missing]
 
-    def addChannel(self, daughters):
+    @property
+    def incomplete_channels(self):
+        return [channel for channel in self.channels if channel.has_missing]
+
+    @property
+    def daughters(self):
+        return list(frozenset([daughter for channel in self.channels for daughter in channel.daughters]))
+
+    def addChannel(self, daughters, variables=None, method=None, kinematic_fit=None, has_missing=False):
         """
         Appends a new decay channel to the Particle object.
         @param daughters is a list of pdg particle names e.g. ['pi+','K-']
+        @param variables is a list of variables which are used to classify this channel. In addition to the here given variables,
+                   signal probability variables of all daughter particles are automatically added later for this channel.
+                   As default the given variables in the init of the particle object are used.
+        @param method is a tuple (name, type, config) of the method used to classify this channel.
+               As default the given variables in the init of the particle object are used.
+        @param kinematic_fit perform a kinematic fit to improve 4 momentum of this channel.
+               As default the given variables in the init of the particle object are used.
+        @param has_missing True if the given channel misses some particles like neutrinos or photons.
         """
+        variables = self.variables if variables is None else variables
+        method = self.method if method is None else method
+        kinematic_fit = self.kinematic_fit if kinematic_fit is None else kinematic_fit
         # Append a new DecayChannel two the channel member
-        self.channels.append(Particle.DecayChannel(name=self.name + ' ->' + ' '.join(daughters), daughters=daughters, partial=False))
+        self.channels.append(Particle.DecayChannel(name='|' + self.name + ' ->' + ' '.join(daughters) + '|', daughters=daughters, variables=variables,
+                                                   method=method, kinematic_fit=kinematic_fit, has_missing=has_missing))
         return self
 
-    def addPartialChannel(self, daughters):
-        """
-        Appends a new partial decay channel with one missing particle to the Particle object.
-        @param daughters is a list of pdg particle names e.g. ['pi+','K-']
-        """
-        # Append a new DecayChannel two the channel member
-        self.channels.append(Particle.DecayChannel(name=self.name + ' ->' + ' '.join(daughters), daughters=daughters, partial=True))
-        return self
+
+def addIncompleteChannels(particles):
+        # Add automatically new channels with incomplete reconstructed daughters
+        processed = [particle.name for particle in particles if particle.channels == []]
+        while len(processed) < len(particles):
+            process = [particle for particle in particles if particle.name not in processed and all([daughter in processed or pdg.conjugate(daughter) in processed for daughter in particle.daughters])]
+            for particle in process:
+                mothers = [mother for mother in particles if particle.name in mother.daughters or pdg.conjugate(particle.name) in mother.daughters]
+                for mother in mothers:
+                    for incomplete_daughter_channel in particle.incomplete_channels:
+                        for complete_mother_channel in mother.complete_channels:
+                            if particle.name in complete_mother_channel.daughters:
+                                daughters = [daughter for daughter in complete_mother_channel.daughters]
+                                daughters[daughters.index(particle.name)] = incomplete_daughter_channel.name
+                                mother.addChannel(daughters, complete_mother_channel.variables, complete_mother_channel.method, complete_mother_channel.kinematic_fit, has_missing=True)
+                            if pdg.conjugate(particle.name) != particle.name and pdg.conjugate(particle.name) in complete_mother_channel.daughters:
+                                daughters = [daughter for daughter in complete_mother_channel.daughters]
+                                daughters[daughters.index(pdg.conjugate(particle.name))] = incomplete_daughter_channel.name + '_conjugate'
+                                mother.addChannel(daughters, complete_mother_channel.variables, complete_mother_channel.method, complete_mother_channel.kinematic_fit, has_missing=True)
+                processed += [channel.name for channel in particle.incomplete_channels]
+                processed += [channel.name + '_conjugate' for channel in particle.incomplete_channels]
+            processed += [particle.name for particle in process]
+
+        return particles
 
 
 def FullReconstruction(path, particles):
@@ -106,14 +142,17 @@ def FullReconstruction(path, particles):
         """
 
         parser = argparse.ArgumentParser()
-        parser.add_argument('-cp', '--cut-probability', dest='cp', action='store_true', help='Use cut on product of signal probability')
-        parser.add_argument('-cm', '--cut-mass', dest='cm', action='store_true', help='Use cut on invariant mass')
-        parser.add_argument('-fc', '--fsp-cluster', dest='fc', action='store_true', help='Cluster training for charged fsp particles')
+        parser.add_argument('-probability', '--use-probability-cut', dest='probability', action='store_true', help='Use cut on product of signal probability')
+        parser.add_argument('-mass', '--use-mass-cut', dest='mass', action='store_true', help='Use cut on invariant mass')
+        parser.add_argument('-fit', '--use-kinematic-fit', dest='fit', action='store_true', help='Use kinematic fit to improve 4-momentum of final B meson')
+        parser.add_argument('-cluster', '--use-fsp-cluster', dest='cluster', action='store_true', help='Cluster training for charged fsp particles')
         parser.add_argument('-ve', '--verbose', dest='verbose', action='store_true', help='Output additional information')
         parser.add_argument('-nosig', '--no-signal-classifiers', dest='nosig', action='store_true', help='Do not train classifiers')
         args = parser.parse_args()
 
-        # First add the basf2 module path
+        particles = addIncompleteChannels(particles)
+
+        # Add the basf2 module path
         seq = FR_utility.Sequence()
         seq.addResource('Path', path)
 
@@ -123,7 +162,6 @@ def FullReconstruction(path, particles):
             # Add all information the user has provided as resources to the sequence, so our function can require them
             seq.addResource('Name_' + particle.name, particle.name)
             seq.addResource('PDG_' + particle.name, pdg.from_name(particle.name))
-            seq.addResource('Method_' + particle.name, particle.method)
             seq.addResource('Efficiency_' + particle.name, particle.efficiency)
             seq.addResource('Particle_' + particle.name, particle)
             # If the particle isn't self conjugated we add the name and the pdg also for the antiparticle
@@ -138,23 +176,22 @@ def FullReconstruction(path, particles):
             # The IsIgnored flag is used to deactivate a channel if there's not enough statistics.
             if particle.channels == []:
                 seq.addResource('Variables_' + particle.name, particle.variables)
+                seq.addResource('Method_' + particle.name, particle.method)
             for channel in particle.channels:
                 seq.addResource('Name_' + channel.name, channel.name)
-                seq.addResource('Variables_' + channel.name, particle.variables + ['daughter{i}(getExtraInfo(SignalProbability))'.format(i=i) for i in range(0, len(channel.daughters))])
+                seq.addResource('Variables_' + channel.name, channel.variables + ['daughter{i}(getExtraInfo(SignalProbability))'.format(i=i) for i in range(0, len(channel.daughters))])
+                seq.addResource('Method_' + channel.name, channel.method)
                 seq.addResource('IsIgnored_' + channel.name, False)
+                seq.addResource('HasMissing_' + channel.name, channel.has_missing)
+                seq.addResource('KinematicFit_' + channel.name, channel.kinematic_fit)
 
             ########### RECONSTRUCTION ACTORS ##########
             # The Reconstruction part of the FullReconstruction:
             # 1. Load the FSP (via ParticleList),
             # 2. Create a particle list for each channel of the non-FSP (via ParticleListFromChannel), depending an all daughter ParticleLists of this channel
-            # 3. Gather up the different ParticleLists for each channel, into a single ParticleList for the particle itself, depending on all channel ParticleLists
-            # 4. If the particle isn't self conjugated we gather up the anti-particles as well, because anti-particles aren't handlet properly yet.  FIXME
-            channelParticleLists = ['ParticleList_' + channel.name for channel in particle.channels]
-            seq.addFunction(ParticleList,
-                            path='Path',
-                            name='Name_' + particle.name,
-                            pdgcode='PDG_' + particle.name,
-                            particleLists=channelParticleLists)
+            # 3. Gather up the different ParticleLists for each complete channel, into a single ParticleList for the particle itself, depending on all channel ParticleLists
+            # 4. If the particle isn't self conjugated we gather up the anti-particles as well, because anti-particles aren't handlet properly yet.
+            #    Also add conjugate particle lists for the incomplete channels.
             for channel in particle.channels:
                 seq.addFunction(ParticleListFromChannel,
                                 path='Path',
@@ -162,13 +199,28 @@ def FullReconstruction(path, particles):
                                 name='Name_' + channel.name,
                                 preCut='PreCut_' + channel.name,
                                 inputLists=['ParticleList_' + daughter for daughter in channel.daughters],
-                                isIgnored='IsIgnored_' + channel.name)
+                                isIgnored='IsIgnored_' + channel.name,
+                                hasMissing='HasMissing_' + channel.name)
+
+            channelParticleLists = ['ParticleList_' + channel.name for channel in particle.complete_channels]
+            seq.addFunction(ParticleList,
+                            path='Path',
+                            name='Name_' + particle.name,
+                            pdgcode='PDG_' + particle.name,
+                            particleLists=channelParticleLists,)
             if particle.name != name_conj:
                 seq.addFunction(ParticleList,
                                 path='Path',
                                 name='Name_' + name_conj,
                                 pdgcode='PDG_' + name_conj,
                                 particleLists=channelParticleLists)
+                for incomplete_channel in particle.incomplete_channels:
+                    seq.addResource('Name_' + incomplete_channel.name + '_conjugate', incomplete_channel.name + '_conjugate')
+                    seq.addFunction(ParticleList,
+                                    path='Path',
+                                    name='Name_' + incomplete_channel.name + '_conjugate',
+                                    pdgcode='PDG_' + name_conj,
+                                    particleLists=['ParticleList_' + incomplete_channel.name])
 
             ############# PRECUT DETERMINATION ############
             # Intermediate PreCut part of FullReconstruction algorithm.
@@ -177,7 +229,7 @@ def FullReconstruction(path, particles):
             # 1. Create Histograms with the invariant mass or signal probability distribution for each channel, as soon as all daughter ParticleLists and daughter SignalProbabilities are available.
             # 2. If the Histogram is available calculate the PreCuts with the PreCutDetermination function. As soon as the PreCuts are available the particle can be reconstructed.
             if particle.channels != []:
-                if args.cp:
+                if args.probability:
                     for channel in particle.channels:
                         seq.addFunction(CreatePreCutProbHistogram,
                                         path='Path',
@@ -210,13 +262,14 @@ def FullReconstruction(path, particles):
                                     channels=['Name_' + channel.name for channel in particle.channels],
                                     preCuts=['PreCut_' + channel.name for channel in particle.channels],
                                     ignoredChannels=['IsIgnored_' + channel.name for channel in particle.channels])
+
             ########### SIGNAL PROBABILITY ACTORS #######
             # The classifier part of the FullReconstruction. Here one has to distinguish between [e+, mu+, pi+, K+, p], other FSPs and non-FSPs.
             # All the classifiers depend on the method, variables and the ParticleList (either for the particle or for the channel).
             # [e+,mu+,pi+,K+,p]: All the tracks seen in the detector are generated by one of these particles.
             #                    To get a better spearation we train these particles against each other and combine the result later
             if not args.nosig:
-                if args.fc and particle.channels == [] and particle.name in ['e+', 'e-', 'mu+', 'mu-', 'pi+', 'pi-', 'K+', 'K-', 'p+', 'p-']:
+                if args.cluster and particle.channels == [] and particle.name in ['e+', 'e-', 'mu+', 'mu-', 'pi+', 'pi-', 'K+', 'K-', 'p+', 'p-']:
                     # Add charged FSP SignalProbability classifier
                     seq.addFunction(SignalProbabilityFSPCluster,
                                     path='Path',
@@ -242,7 +295,7 @@ def FullReconstruction(path, particles):
                     for channel in particle.channels:
                         seq.addFunction(SignalProbability,
                                         path='Path',
-                                        method='Method_' + particle.name,
+                                        method='Method_' + channel.name,
                                         variables='Variables_' + channel.name,
                                         name='Name_' + channel.name,
                                         particleList='ParticleList_' + channel.name,
@@ -253,4 +306,18 @@ def FullReconstruction(path, particles):
                 # If the classifiers provide the signal probability, they also provide the signal probability for the anti particles, so we add
                 # a dummy resource which depends only on the SignalProbability of the particle and provides the SignalProbability for the anti-particle.
                 seq.addResource('SignalProbability_' + pdg.conjugate(particle.name), 'Dummy', requires=['SignalProbability_' + particle.name])
+
+            ########### KINEMATIC FIT ACTOR ###############
+            # Perform a kinematic fit to improve the 4 momentum of the particle.
+            if args.fit:
+                pass
+                """
+                if particle.channels != []:
+                    # Performs a kinemtic fit on all reconstructed particle which requested one
+                    seq.addFunction(KinematicFit,
+                                    path='Path',
+                                    partialInformation= 'PartialInformation_' + particle.name,
+                                    kinematic_fit=['KinematicFit_' + channel.name for channel in particle.channels],
+                                    particleLists=['ParticleList_' + channel.name for channel in particle.channels])
+                """
         seq.run(args.verbose)

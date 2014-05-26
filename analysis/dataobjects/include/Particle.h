@@ -131,11 +131,13 @@ namespace Belle2 {
      * @param pdgCode PDG code
      * @param flavorType decay flavor type
      * @param daughterIndices vector of daughter indices
+     * @param arrayPointer pointer to store array which stores the daughters, if the particle itself is stored in the same array the pointer can be automatically determined
      */
     Particle(const TLorentzVector& momentum,
              const int pdgCode,
              EFlavorType flavorType,
-             const std::vector<int>& daughterIndices);
+             const std::vector<int>& daughterIndices,
+             TClonesArray* arrayPointer = 0);
 
     /**
      * Constructor from a reconstructed track (mdst object Track);
@@ -511,6 +513,11 @@ namespace Belle2 {
      */
     void addExtraInfo(const std::string& name, float value);
 
+    /** Returns the pointer to the store array which holds the daughter particles */
+    TClonesArray* getArrayPointer() const {
+      if (!m_arrayPointer) fixArrayPointer();
+      return m_arrayPointer;
+    }
 
   private:
 

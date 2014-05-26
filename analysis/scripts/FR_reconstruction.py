@@ -22,11 +22,11 @@ def ParticleList(path, name, pdgcode, particleLists, criteria=[]):
     """
     # Select all the reconstructed (or loaded) particles with this pdg into one list.
     list_name = name + FR_utility.createHash(name, pdgcode, particleLists, criteria)
-    modularAnalysis.selectParticle(list_name, pdgcode, criteria, path=path)
+    modularAnalysis.selectParticle(list_name, pdgcode, criteria, False, particleLists, path=path)
     return {'ParticleList_' + name: list_name}
 
 
-def ParticleListFromChannel(path, pdgcode, name, preCut, inputLists, isIgnored):
+def ParticleListFromChannel(path, pdgcode, name, preCut, inputLists, isIgnored, hasMissing):
     """
     Creates a ParticleList by combining other particleLists via the ParticleCombiner module.
         @param path the basf2 path
@@ -35,7 +35,11 @@ def ParticleListFromChannel(path, pdgcode, name, preCut, inputLists, isIgnored):
         @param preCut cuts which are applied before the combining of the particles
         @param inputLists the inputs lists which are combined
         @param isIgnored true if the channel is ignored due to low statistics
+        @param hasMissing true if the channel is incomplete
     """
+    if isIgnored and hasMissing:
+        return {}
+
     list_name = name + FR_utility.createHash(pdgcode, name, preCut, inputLists, isIgnored)
 
     pmake = register_module('ParticleCombiner')

@@ -135,6 +135,7 @@ def selectParticle(
         PDGcode,
         criteria,
         persistent=False,
+        fromOtherLists=[],
         path=analysis_main,):
 
     pselect = register_module('ParticleSelector')
@@ -142,6 +143,7 @@ def selectParticle(
     pselect.param('PDG', PDGcode)
     pselect.param('ListName', list_name)
     pselect.param('Select', criteria)
+    pselect.param('fromOtherLists', fromOtherLists)
     pselect.param('persistent', persistent)
     path.add_module(pselect)
 

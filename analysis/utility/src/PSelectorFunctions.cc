@@ -523,6 +523,7 @@ namespace Belle2 {
       int status    = MCMatching::getMCTruthStatus(part, mcparticle);
       //remove the following bits, these are usually ok
       status &= (~MCMatching::c_MissFSR);
+      status &= (~MCMatching::c_MissNeutrino);
       //status &= (~MCMatching::c_DecayInFlight);
 
       if (status != MCMatching::c_Correct)

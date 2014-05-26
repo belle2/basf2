@@ -9,7 +9,7 @@ import FR_utility
 import os
 
 
-def SignalProbability(path, method, variables, name, particleList, daughterSignalProbabilities=[], isIgnored=False):
+def SignalProbability(path, method, variables, name, particleList, daughterSignalProbabilities=[]):
     """
     Calculates the SignalProbability of a ParticleList. If the needed experts aren't available they're created.
         @param path the basf2 path
@@ -18,14 +18,13 @@ def SignalProbability(path, method, variables, name, particleList, daughterSigna
         @param name of the particle or channel which is classified
         @param particleList the particleList which is used for training and classification
         @param daughterSignalProbabilities all daughter particles need a SignalProbability
-        @param true if the channel is ignored due to low statistics
     """
-    # Create hash with all parameters on which this training depends
-    hash = FR_utility.createHash(method, variables, particleList, daughterSignalProbabilities, isIgnored)
+    if particleList is None or any([daughterSignalProbability is None for daughterSignalProbability in daughterSignalProbabilities]):
+        return {'SignalProbability_' + name: None}
 
-    if isIgnored:
-        return {'SignalProbability_' + name: hash}
-    elif IsExpertFileAvailable(hash, particleList):
+    # Create hash with all parameters on which this training depends
+    hash = FR_utility.createHash(method, variables, particleList, daughterSignalProbabilities)
+    if IsExpertFileAvailable(hash, particleList):
         path.add_module(GetExpertModule(hash, particleList, method, signalCluster=1))
         return {'SignalProbability_' + name: hash}
     else:
@@ -43,9 +42,11 @@ def SignalProbabilityFSPCluster(path, method, variables, name, pdg, particleList
         @param pdg of the particle which is classified
         @param particleList the particleList which is used for training and classification
     """
+    if particleList is None:
+        return {'SignalProbability_' + name: None}
+
     # Create hash with all parameters on which this training depends
     hash = FR_utility.createHash(method, variables, name, particleList, pdg)
-
     if IsExpertFileAvailable(hash, particleList):
         path.add_module(GetExpertModule(hash, particleList, method, signalCluster=pdg))
         return {'SignalProbability_' + name: hash}

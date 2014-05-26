@@ -53,6 +53,7 @@ PreCutHistMakerModule::PreCutHistMakerModule()
   addParam("histParams", m_histParams, "Tuple specifying number of bins, lower and upper boundary of the variable histogram. (for invariant mass M in GeV)", defaultHistParams);
   addParam("fileName", m_fileName, "Name of the TFile where the histograms are saved.");
   addParam("variable", m_variable, "Variable for which the distributions are calculated");
+  addParam("customBinning", m_customBinning, "Custom Binning, which is used instead of histParams", std::vector<float>());
 
 }
 
@@ -73,11 +74,16 @@ void PreCutHistMakerModule::initialize()
     m_tmpLists.back().registerAsTransient();
   }
 
-  int nbins;
-  double xlow, xhigh;
-  std::tie(nbins, xlow, xhigh) = m_histParams;
-  m_histogramSignal = new TH1F((std::string("signal") + m_channelName).c_str(), "signal", nbins, xlow, xhigh);
-  m_histogramAll = new TH1F((std::string("all") + m_channelName).c_str(), "all", nbins, xlow, xhigh);
+  if (m_customBinning.size() > 0) {
+    m_histogramSignal = new TH1F((std::string("signal") + m_channelName).c_str(), "signal", m_customBinning.size(), &m_customBinning[0]);
+    m_histogramAll = new TH1F((std::string("all") + m_channelName).c_str(), "all", m_customBinning.size(), &m_customBinning[0]);
+  } else {
+    int nbins;
+    double xlow, xhigh;
+    std::tie(nbins, xlow, xhigh) = m_histParams;
+    m_histogramSignal = new TH1F((std::string("signal") + m_channelName).c_str(), "signal", nbins, xlow, xhigh);
+    m_histogramAll = new TH1F((std::string("all") + m_channelName).c_str(), "all", nbins, xlow, xhigh);
+  }
 
   VariableManager& manager = VariableManager::Instance();
   m_var = manager.getVariable(m_variable);

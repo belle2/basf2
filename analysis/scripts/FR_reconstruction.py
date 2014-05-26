@@ -20,13 +20,16 @@ def ParticleList(path, name, pdgcode, particleLists, criteria=[]):
         @param particleLists additional requirements before the Particles can be gathered. E.g. All ParticleList of created by the ParticleListFromChannel exist for this particle
         @param criteria filter criteria
     """
+    print particleLists
+    particleLists = FR_utility.removeNones(particleLists)
+    print particleLists
     # Select all the reconstructed (or loaded) particles with this pdg into one list.
     list_name = name + FR_utility.createHash(name, pdgcode, particleLists, criteria)
     modularAnalysis.selectParticle(list_name, pdgcode, criteria, False, particleLists, path=path)
     return {'ParticleList_' + name: list_name}
 
 
-def ParticleListFromChannel(path, pdgcode, name, preCut, inputLists, isIgnored, hasMissing):
+def ParticleListFromChannel(path, pdgcode, name, preCut, inputLists, hasMissing):
     """
     Creates a ParticleList by combining other particleLists via the ParticleCombiner module.
         @param path the basf2 path
@@ -34,25 +37,19 @@ def ParticleListFromChannel(path, pdgcode, name, preCut, inputLists, isIgnored, 
         @param name name of the channel or particle which shall be combined
         @param preCut cuts which are applied before the combining of the particles
         @param inputLists the inputs lists which are combined
-        @param isIgnored true if the channel is ignored due to low statistics
         @param hasMissing true if the channel is incomplete
     """
-    if isIgnored and hasMissing:
-        return {}
+    if preCut is None:
+        return {'ParticleList_' + name: None}
 
-    list_name = name + FR_utility.createHash(pdgcode, name, preCut, inputLists, isIgnored)
+    list_name = name + FR_utility.createHash(pdgcode, name, preCut, inputLists)
 
     pmake = register_module('ParticleCombiner')
     pmake.set_name('ParticleCombiner_' + name)
     pmake.param('PDG', pdgcode)
     pmake.param('ListName', list_name)
     pmake.param('InputListNames', inputLists)
-
-    if isIgnored:
-        pmake.param('cuts', {'M': (1000, 1000)})
-    else:
-        pmake.param('cuts', preCut)
-
+    pmake.param('cuts', preCut)
     path.add_module(pmake)
     modularAnalysis.matchMCTruth(list_name, path=path)
     return {'ParticleList_' + name: list_name}

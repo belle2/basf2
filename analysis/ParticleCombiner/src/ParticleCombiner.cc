@@ -125,31 +125,35 @@ namespace Belle2 {
   bool ParticleCombiner::loadNext()
   {
 
-    while (indexCombiner.loadNext()) {
-      if (loadNextCombination())
-        return true;
-    }
+    while (true) {
 
-    while (loadNextType()) {
-      listCombiner.init((ParticleList::EParticleType)(iType));
-      while (listCombiner.loadNext()) {
+      // Load next index combination if available
+      if (indexCombiner.loadNext()) {
+        if (loadNextCombination())
+          return true;
+        else
+          continue;
+      }
 
+      // Load next list combination if available and reset indexCombiner
+      if (listCombiner.loadNext()) {
         const auto& types = listCombiner.getCurrentTypes();
         std::vector<unsigned int> sizes(numberOfLists);
         for (unsigned int i = 0; i < numberOfLists; ++i) {
           sizes[i] = plists[i]->getList(types[i]).size();
         }
         indexCombiner.init(sizes);
-
-        while (indexCombiner.loadNext()) {
-          if (loadNextCombination())
-            return true;
-        }
-
+        continue;
       }
-    }
 
-    return false;
+      // Load next type combination if available
+      if (loadNextType()) {
+        listCombiner.init((ParticleList::EParticleType)(iType));
+        continue;
+      }
+
+      return false;
+    }
 
   }
 

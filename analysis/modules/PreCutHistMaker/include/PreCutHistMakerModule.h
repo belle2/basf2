@@ -85,6 +85,7 @@ namespace Belle2 {
     std::vector<std::string> m_inputListNames; /**< input particle list names */
     typedef std::tuple<int, double, double> HistParams; /**< Tuple holding amount of bins, lower and upper boundary of a histogram */
     HistParams m_histParams; /**< nbins, lower and upper boundary of histogram. */
+    std::vector<float> m_customBinning; /**< Custom binning */
 
     std::string m_variable; /**< Variable for which the distributions are calculated */
     const VariableManager::Var* m_var; /**< Pointer to variable stored in the variable manager */

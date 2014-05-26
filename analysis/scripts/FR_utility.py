@@ -162,3 +162,19 @@ def createHash(*args):
         @args arguments the hash depends on
     """
     return hashlib.sha1(str([str(v) for v in args])).hexdigest()
+
+
+def removeNones(*requirementLists):
+    nones = frozenset([index for requirementList in requirementLists for index, object in enumerate(requirementList) if object is None])
+    result = zip(*[objects for index, objects in enumerate(zip(*requirementLists)) if index not in nones])
+    if len(result) == 1:
+        return result[0]
+    return result
+
+
+def getNones(*requirementLists):
+    nones = frozenset([index for requirementList in requirementLists for index, object in enumerate(requirementList) if object is None])
+    result = zip(*[objects for index, objects in enumerate(zip(*requirementLists)) if index in nones])
+    if len(result) == 1:
+        return result[0]
+    return result

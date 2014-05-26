@@ -138,7 +138,7 @@ namespace Belle2 {
      */
     bool loadNext();
 
-    /*
+    /**
      * Returns the current loaded combination of particles as pointers to the particle objects
      */
     const std::vector<Particle*>& getCurrentParticles() const { return m_particles; }

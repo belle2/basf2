@@ -360,6 +360,16 @@ namespace {
     EXPECT_EQ(c_Correct, getMCTruthStatus(d.m_particle)) << d.getString();
 
   }
+  /** all information should be empty, and we should get errors if we try to get flags */
+  TEST_F(MCMatchingTest, SetMCTruthNeverRun)
+  {
+    Decay d(421, {321, -211, {111, {22, 22}}});
+    d.reconstruct({421, {211, -211, {111, {22, 22}}}});
+
+    EXPECT_EQ(nullptr, d.m_particle->getRelated<MCParticle>());
+    ASSERT_FALSE(d.m_particle->hasExtraInfo("MCTruthStatus"));
+    EXPECT_EQ(c_InternalError, getMCTruthStatus(d.m_particle)) << d.getString();
+  }
 
   TEST_F(MCMatchingTest, SettingTruths)
   {
@@ -367,7 +377,6 @@ namespace {
     d.reconstruct({421, {211, -211, {111, {22, 22}}}});
 
     //setMCTruth should set relation
-    EXPECT_EQ(nullptr, d.m_particle->getRelated<MCParticle>());
     ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
     EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
 

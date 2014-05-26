@@ -81,7 +81,8 @@ namespace Belle2 {
   };
 
   /**
-   * IndexCombiner is a generator for all the combinations of the particle indices stored in the particle lists
+   * IndexCombiner is a generator for all the combinations of the particle indices stored in the particle lists.
+   * It takes a number of particles in each of the input lists e.g. 2,3 and returns all the possible combinations: 00, 01, 02, 10, 11, 12
    */
   class IndexCombiner {
 
@@ -120,6 +121,23 @@ namespace Belle2 {
 
   /**
    * ParticleCombiner combines ParticleLists to a new ParticleList using the ListCombiner and IndexCombiner.
+   * 1. The particle combiner loops over the three types of the output particle. The output particle can
+   *    be a particle, anti-particle or a self-conjugated particle
+   * 2. For each output types there are a number of possible combinations of the input sublists. These combinations
+   *    are produced via the ListCombiner: E.g. for 2 Particles
+   *    Particle + Particle -> Particle
+   *    Particle + SelfConjugatedParticle -> Particle
+   *    SelfConjugatedParticle + Particle -> Particle
+   *    AntiParticle + AntiParticle -> AntiParticle
+   *    AntiParticle + SelfConjugatedParticle -> AntiParticle
+   *    SelfConjugatedParticle + AntiParticle -> AntiParticle
+   *    SelfConjugatedParticle + SelfConjugatedParticle -> SelfConjugatedParticle
+   * 3. For each combination of lists the IndexCombiner produces the combination of the particles
+   *    inside the lists.
+   * 4. The ParticleCombiner takes the current OutputType, ListCombination and IndexCombination
+   *    and fills a vector: with the StoreArray indices of the current combination (getCurrentIndices), with the
+   *    pointers to the particle objects of the current combination (getCurrentParticles). In addition the ParticleCombiner
+   *    can return the output particle (combined from the current combination) directly (getCurrentParticle)
    *
    * \note This class retains state, so create a new ParticleCombiner object for each event.
    */

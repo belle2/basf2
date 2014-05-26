@@ -24,7 +24,10 @@ namespace Belle2 {
   {
     iCombination = 0;
     currentType = _currentType;
-    nCombinations = currentType == ParticleList::c_SelfConjugatedParticle ? 1 : (1 << numberOfLists) - 1;
+    if (numberOfLists == 0)
+      nCombinations = 0;
+    else
+      nCombinations = currentType == ParticleList::c_SelfConjugatedParticle ? 1 : (1 << numberOfLists) - 1;
   }
 
   bool ListCombiner::loadNext()
@@ -63,6 +66,10 @@ namespace Belle2 {
     nCombinations = 1;
     for (unsigned int i = 0; i < numberOfLists; ++i)
       nCombinations *= sizes[i];
+
+    if (numberOfLists == 0) {
+      nCombinations = 0;
+    }
 
   }
 

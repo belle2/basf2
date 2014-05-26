@@ -111,7 +111,7 @@ namespace Belle2 {
 
     /**
      * Constructor for final state particles.
-     * All other private members are set to their defalt values (0).
+     * All other private members are set to their default values (0).
      * @param momentum Lorentz vector
      * @param pdgCode PDG code
      * @param flavorType flavor type

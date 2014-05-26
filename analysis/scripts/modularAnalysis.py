@@ -7,6 +7,13 @@ analysis_main = create_path()
 
 
 def inputMdst(filename, path=analysis_main):
+    """
+    Loads the specified ROOT (DST/mDST/muDST) file with the RootInput module.
+    
+    @param filename the name of the file to be loaded
+    @param modules are added to this path      
+    """
+
     roinput = register_module('RootInput')
     roinput.param('inputFileName', filename)
     path.add_module(roinput)
@@ -17,6 +24,13 @@ def inputMdst(filename, path=analysis_main):
 
 
 def inputMdstList(filelist, path=analysis_main):
+    """
+    Loads the specified ROOT (DST/mDST/muDST) files with the RootInput module.
+                                                                                                                                              
+    @param filelist the filename list of files to be loaded
+    @param modules are added to this path
+    """
+
     roinput = register_module('RootInput')
     roinput.param('inputFileNames', filelist)
     path.add_module(roinput)
@@ -59,11 +73,12 @@ def generateY4S(noEvents, decayTable, path=analysis_main):
 
 
 def generateContinuum(
-        noEvents,
-        inclusiveP,
-        decayTable,
-        inclusiveT=2,
-        path=analysis_main):
+    noEvents,
+    inclusiveP,
+    decayTable,
+    inclusiveT=2,
+    path=analysis_main,
+    ):
     """
     Generated e+e- -> gamma* -> qq-bar where light quarks hadronize
     and decay in user specified way (via specified decay table).
@@ -130,13 +145,93 @@ def loadReconstructedParticles(path=analysis_main):
     path.add_module(ploader)
 
 
+def copyList(
+    outputListName,
+    inputListName,
+    persistent=False,
+    path=analysis_main,
+    ):
+
+    pmanipulate = register_module('ParticleListManipulator')
+    pmanipulate.set_name('PListCopy_' + outputListName)
+    pmanipulate.param('OutputListName', outputListName)
+    pmanipulate.param('InputListNames', [inputListName])
+    pmanipulate.param('persistent', persistent)
+    path.add_module(pmanipulate)
+
+
+def copyLists(
+    outputListName,
+    inputListNames,
+    persistent=False,
+    path=analysis_main,
+    ):
+
+    pmanipulate = register_module('ParticleListManipulator')
+    pmanipulate.set_name('PListCopy_' + outputListName)
+    pmanipulate.param('OutputListName', outputListName)
+    pmanipulate.param('InputListNames', inputListNames)
+    pmanipulate.param('persistent', persistent)
+    path.add_module(pmanipulate)
+
+
+def cutAndCopyLists(
+    outputListName,
+    inputListNames,
+    criteria,
+    persistent=False,
+    path=analysis_main,
+    ):
+
+    pmanipulate = register_module('ParticleListManipulator')
+    pmanipulate.set_name('PListCutAndCopy_' + outputListName)
+    pmanipulate.param('OutputListName', outputListName)
+    pmanipulate.param('InputListNames', inputListNames)
+    pmanipulate.param('Cuts', criteria)
+    pmanipulate.param('persistent', persistent)
+    path.add_module(pmanipulate)
+
+
+def cutAndCopyList(
+    outputListName,
+    inputListName,
+    criteria,
+    persistent=False,
+    path=analysis_main,
+    ):
+
+    pmanipulate = register_module('ParticleListManipulator')
+    pmanipulate.set_name('PListCutAndCopy_' + outputListName)
+    pmanipulate.param('OutputListName', outputListName)
+    pmanipulate.param('InputListNames', [inputListName])
+    pmanipulate.param('Cuts', criteria)
+    pmanipulate.param('persistent', persistent)
+    path.add_module(pmanipulate)
+
+
+def fillParticleList(
+    decayString,
+    criteria,
+    persistent=False,
+    path=analysis_main,
+    ):
+
+    pselect = register_module('ParticleSelector')
+    pselect.set_name('ParticleSelector_' + decayString)
+    pselect.param('strDecayString', decayString)
+    pselect.param('Select', criteria)
+    pselect.param('persistent', persistent)
+    path.add_module(pselect)
+
+
 def selectParticle(
-        list_name,
-        PDGcode,
-        criteria,
-        persistent=False,
-        fromOtherLists=[],
-        path=analysis_main,):
+    list_name,
+    PDGcode,
+    criteria,
+    persistent=False,
+    fromOtherLists=[],
+    path=analysis_main,
+    ):
 
     pselect = register_module('ParticleSelector')
     pselect.set_name('ParticleSelector_' + list_name)
@@ -156,14 +251,30 @@ def applyCuts(list_name, criteria, path=analysis_main):
     path.add_module(pselect)
 
 
+def reconDecay(
+    decayString,
+    cuts,
+    persistent=False,
+    path=analysis_main,
+    ):
+
+    pmake = register_module('ParticleCombiner')
+    pmake.set_name('ParticleCombiner_' + decayString)
+    pmake.param('strDecayString', decayString)
+    pmake.param('cuts', cuts)
+    pmake.param('persistent', persistent)
+    path.add_module(pmake)
+
+
 def makeParticle(
-        list_name,
-        PDGcode,
-        list_of_lists,
-        mL,
-        mH,
-        persistent=False,
-        path=analysis_main,):
+    list_name,
+    PDGcode,
+    list_of_lists,
+    mL,
+    mH,
+    persistent=False,
+    path=analysis_main,
+    ):
 
     pmake = register_module('ParticleCombiner')
     pmake.set_name('ParticleCombiner_' + list_name)
@@ -176,13 +287,14 @@ def makeParticle(
 
 
 def fitVertex(
-        list_name,
-        conf_level,
-        decay_string='',
-        fitter='rave',
-        fit_type='vertex',
-        constraint='',
-        path=analysis_main,):
+    list_name,
+    conf_level,
+    decay_string='',
+    fitter='rave',
+    fit_type='vertex',
+    constraint='',
+    path=analysis_main,
+    ):
     """
     Perform the specified kinematic fit for each Particle in the given ParticleList.
 
@@ -214,11 +326,12 @@ def fitVertex(
 
 
 def vertexKFit(
-        list_name,
-        conf_level,
-        decay_string='',
-        constraint='',
-        path=analysis_main,):
+    list_name,
+    conf_level,
+    decay_string='',
+    constraint='',
+    path=analysis_main,
+    ):
     """
     Perform vertex fit using the kfitter for each Particle in the given ParticleList.
 
@@ -236,14 +349,16 @@ def vertexKFit(
         'kfitter',
         'vertex',
         constraint,
-        path,)
+        path,
+        )
 
 
 def massVertexKFit(
-        list_name,
-        conf_level,
-        decay_string='',
-        path=analysis_main,):
+    list_name,
+    conf_level,
+    decay_string='',
+    path=analysis_main,
+    ):
     """
     Perform mass-constrained vertex fit using the kfitter for each Particle in the given ParticleList.
 
@@ -260,14 +375,16 @@ def massVertexKFit(
         'kfitter',
         'massvertex',
         '',
-        path,)
+        path,
+        )
 
 
 def massKFit(
-        list_name,
-        conf_level,
-        decay_string='',
-        path=analysis_main,):
+    list_name,
+    conf_level,
+    decay_string='',
+    path=analysis_main,
+    ):
     """
     Perform vertex fit using the kfitter for each Particle in the given ParticleList.
 
@@ -284,7 +401,8 @@ def massKFit(
         'kfitter',
         'mass',
         '',
-        path,)
+        path,
+        )
 
 
 def printDataStore(path=analysis_main):
@@ -297,6 +415,15 @@ def printDataStore(path=analysis_main):
 
     printDS = register_module('PrintCollections')
     path.add_module(printDS)
+
+
+def printVariableValues(list_name, var_names, path=analysis_main):
+    prlist = register_module('ParticlePrinter')
+    prlist.set_name('ParticlePrinter_' + list_name)
+    prlist.param('ListName', list_name)
+    prlist.param('FullPrint', False)
+    prlist.param('Variables', var_names)
+    path.add_module(prlist)
 
 
 def printList(list_name, full, path=analysis_main):
@@ -315,10 +442,11 @@ def ntupleFile(file_name, path=analysis_main):
 
 
 def ntupleTree(
-        tree_name,
-        list_name,
-        tools,
-        path=analysis_main,):
+    tree_name,
+    list_name,
+    tools,
+    path=analysis_main,
+    ):
 
     ntmaker = register_module('NtupleMaker')
     ntmaker.set_name('NtupleMaker_ntupleTree_' + list_name)
@@ -329,10 +457,11 @@ def ntupleTree(
 
 
 def findMCDecay(
-        list_name,
-        decay,
-        persistent=False,
-        path=analysis_main,):
+    list_name,
+    decay,
+    persistent=False,
+    path=analysis_main,
+    ):
 
     decayfinder = register_module('MCDecayFinder')
     decayfinder.set_name('MCDecayFinder_' + list_name)
@@ -380,11 +509,12 @@ def buildRestOfEvent(list_name, path=analysis_main):
 
 
 def TagV(
-        list_name,
-        confidenceLevel,
-        MCassociation=True,
-        useConstraint='boostcut',
-        path=analysis_main,):
+    list_name,
+    confidenceLevel,
+    MCassociation=True,
+    useConstraint='boostcut',
+    path=analysis_main,
+    ):
     """
     For each Particle in the given Breco ParticleList:
     perform the fit of tag side using the track list from the RestOfEvent dataobject
@@ -426,3 +556,5 @@ def buildContinuumSuppression(list_name, path=analysis_main):
     qqBuilder.set_name('QQBuilder_' + list_name)
     qqBuilder.param('particleList', list_name)
     path.add_module(qqBuilder)
+
+

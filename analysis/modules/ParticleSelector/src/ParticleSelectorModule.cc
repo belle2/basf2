@@ -29,6 +29,8 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
+// utilities
+#include <analysis/utility/EvtPDLUtil.h>
 
 using namespace std;
 
@@ -54,16 +56,17 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("PDG", m_pdg,
-             "PDG code. If set to zero, particle list assumed to exist", 0);
-    vector<string> defaultOtherLists;
-    addParam("fromOtherLists", m_otherLists,
-             "Select all particle from the given lists instead of the Particle StoreArray", defaultOtherLists);
-    addParam("ListName", m_listName, "name of particle list", string(""));
+    addParam("strDecayString", m_strDecay, "Input DecayDescriptor string.", string(""));
+
     vector<string> defaultSelection;
     addParam("Select", m_selection, "selection criteria", defaultSelection);
     addParam("persistent", m_persistent,
              "toggle newly created particle list btw. transient/persistent", false);
+
+    // legacy parameters (can be used instead of strDecayString parameter)
+    addParam("PDG", m_pdgCode,
+             "PDG code. If set to zero, particle list assumed to exist", 0);
+    addParam("ListName", m_listName, "name of particle list", string(""));
 
   }
 
@@ -83,25 +86,62 @@ namespace Belle2 {
       m_printVariables = false;
     }
 
-    if (m_pdg != 0) {
-      if (m_persistent) {
-        StoreObjPtr<ParticleList>::registerPersistent(m_listName);
-      } else {
-        StoreObjPtr<ParticleList>::registerTransient(m_listName);
-      }
+    if (!m_strDecay.empty()) {
+      m_pdgCode  = 0;
+      m_listName = "";
+
+      // obtain the input and output particle lists from the decay string
+      bool valid = m_decaydescriptor.init(m_strDecay);
+      if (!valid)
+        B2ERROR("ParticleSelectorModule::initialize Invalid input DecayString: " << m_strDecay);
+
+      int nProducts = m_decaydescriptor.getNDaughters();
+      if (nProducts > 0)
+        B2ERROR("ParticleSelectorModule::initialize Invalid input DecayString " << m_strDecay
+                << ". DecayString should not contain any daughters, only the mother particle.");
+
+      // Mother particle
+      const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
+
+      m_pdgCode  = mother->getPDGCode();
+      m_listName = mother->getFullName();
+
+      m_isSelfConjugatedParticle = !(Belle2::EvtPDLUtil::hasAntiParticle(m_pdgCode));
+      m_antiListName             = Belle2::EvtPDLUtil::antiParticleListName(m_pdgCode, mother->getLabel());
+    } else {
+      bool valid = m_decaydescriptor.init(m_listName);
+      if (!valid)
+        B2ERROR("Invalid output list name: " << m_listName);
+
+      // Mother particle
+      const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
+      if (m_pdgCode != mother->getPDGCode())
+        B2WARNING("Inconsistent list name and pdg code! Will use the pdg code determined from the list name.");
+
+      m_pdgCode  = mother->getPDGCode();
+
+      m_isSelfConjugatedParticle = !(Belle2::EvtPDLUtil::hasAntiParticle(m_pdgCode));
+      m_antiListName             = Belle2::EvtPDLUtil::antiParticleListName(m_pdgCode, mother->getLabel());
     }
 
-    for (unsigned int i = 0; i < m_otherLists.size(); i++) {
-      StoreObjPtr<ParticleList>::required(m_otherLists[i]);
+    if (m_persistent) {
+      StoreObjPtr<ParticleList>::registerPersistent(m_listName, DataStore::c_Event, false);
+      if (!m_isSelfConjugatedParticle)
+        StoreObjPtr<ParticleList>::registerPersistent(m_antiListName, DataStore::c_Event, false);
+    } else {
+      StoreObjPtr<ParticleList>::registerTransient(m_listName, DataStore::c_Event, false);
+      if (!m_isSelfConjugatedParticle)
+        StoreObjPtr<ParticleList>::registerTransient(m_antiListName, DataStore::c_Event, false);
     }
 
     for (unsigned int i = 0; i < m_selection.size(); i++) {
       m_pSelector.addSelection(m_selection[i]);
     }
+
     std::string cuts;
     m_pSelector.listCuts(cuts);
     if (cuts.empty()) cuts = "(all)";
-    B2INFO("ParticleSelector: " << m_listName << " " << cuts);
+    B2INFO("ParticleSelector: " << m_listName << " (" << m_antiListName << ") " << cuts);
   }
 
   void ParticleSelectorModule::beginRun()
@@ -111,27 +151,24 @@ namespace Belle2 {
   void ParticleSelectorModule::event()
   {
     StoreObjPtr<ParticleList> plist(m_listName);
+    bool existingList = plist.isValid();
 
-    if (m_otherLists.size() > 0) { // use given lists instead of store array
+    if (!existingList) { // new particle list: fill selected
       plist.create();
-      plist->setPDG(m_pdg);
-      for (unsigned int i = 0; i < m_otherLists.size(); i++) {
-        StoreObjPtr<ParticleList> otherList(m_otherLists[i]);
-        if (abs(otherList->getPDG()) != abs(m_pdg)) continue;
-        for (unsigned j = 0; j < otherList->getListSize(); j++) {
-          const Particle* part = otherList->getParticle(j);
-          if (m_pSelector.select(part)) {
-            plist->addParticle(part);
-          }
-        }
+      plist->initialize(m_pdgCode, m_listName);
+
+      if (!m_isSelfConjugatedParticle) {
+        StoreObjPtr<ParticleList> antiPlist(m_antiListName);
+        antiPlist.create();
+        antiPlist->initialize(-1 * m_pdgCode, m_antiListName);
+
+        antiPlist->bindAntiParticleList(*(plist));
       }
-    } else if (m_pdg != 0) { // new particle list: fill selected
-      plist.create();
-      plist->setPDG(m_pdg);
+
       StoreArray<Particle> Particles;
       for (int i = 0; i < Particles.getEntries(); i++) {
         const Particle* part = Particles[i];
-        if (abs(part->getPDGCode()) != abs(m_pdg)) continue;
+        if (abs(part->getPDGCode()) != abs(m_pdgCode)) continue;
         if (m_pSelector.select(part)) {
           plist->addParticle(part);
         }
@@ -140,16 +177,21 @@ namespace Belle2 {
       std::vector<unsigned int> toRemove;
       for (unsigned i = 0; i < plist->getListSize(); i++) {
         const Particle* part = plist->getParticle(i);
-        if (!m_pSelector.select(part)) toRemove.push_back(i);
+        if (!m_pSelector.select(part)) toRemove.push_back(part->getArrayIndex());
       }
+
       plist->removeParticles(toRemove);
     }
 
 
-    B2INFO("ParticleSelector: " << m_pdg << " " << m_listName << " size="
-           << plist->getList(ParticleList::c_Particle).size()
-           << "+" << plist->getList(ParticleList::c_AntiParticle).size()
-           << "+" << plist->getList(ParticleList::c_SelfConjugatedParticle).size());
+    /*
+    B2INFO("ParticleSelector: " << m_pdgCode << " " << m_listName  << " (" << m_antiListName << ") "<< " size="
+           << plist->getNumOf(ParticleList::c_Particle,false)
+           << "+" << plist->getNumOf(ParticleList::c_SelfConjugatedParticle,false)
+           << " (" << plist->getNumOf(ParticleList::c_Particle,true)
+           << "+" << plist->getNumOf(ParticleList::c_SelfConjugatedParticle,true) << ")");
+    */
+    //plist->print();
 
   }
 

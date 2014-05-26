@@ -14,6 +14,7 @@
 #include <framework/core/Module.h>
 #include <string>
 #include <analysis/utility/PSelector.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 namespace Belle2 {
 
@@ -69,8 +70,17 @@ namespace Belle2 {
     void printModuleParams() const;
 
   private:
-    int m_pdg;       /**< PDG code of particles to select */
-    std::string m_listName;                /**< particle list name */
+
+    std::string m_strDecay;   /**< Input DecayString specifying the particle being selected */
+    DecayDescriptor m_decaydescriptor; /**< Decay descriptor of the particle being selected */
+
+    std::string m_listName;   /**< output particle list name */
+    std::string m_antiListName;   /**< output anti-particle list name */
+
+    bool m_isSelfConjugatedParticle; /**< flag that indicates whether an anti-particle does not exist */
+
+    int m_pdgCode;       /**< PDG code of particles to select */
+
     std::vector<std::string> m_selection;  /**< selection criteria */
     std::vector<std::string> m_otherLists; /**< other lists used as input */
     bool m_persistent;  /**< toggle particle list btw. transient/persistent */

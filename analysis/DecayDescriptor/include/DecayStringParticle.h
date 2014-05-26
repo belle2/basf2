@@ -13,9 +13,9 @@
 #include <boost/fusion/include/adapt_struct.hpp>
 
 namespace Belle2 {
-  /** Holds the information of a particle in the decay string. Example: ^pi+/slow */
+  /** Holds the information of a particle in the decay string. Example: ^pi+:slow */
   struct DecayStringParticle {
-    /** If the particle is selected by a preceeding "^", this is stored here, if not, this is empty. */
+    /** If the particle is selected by a preceding "^", this is stored here, if not, this is empty. */
     std::string m_strSelector;
     /** Particle name as it is defined in the evt.pdl file. */
     std::string m_strName;

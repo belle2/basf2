@@ -13,7 +13,7 @@ using namespace boost::algorithm;
 DecayDescriptorParticle::DecayDescriptorParticle() :
   m_strName(""),
   m_iSelected(0),
-  m_strLabel("default"),
+  m_strLabel(""),
   m_iPDGCode(0)
 {}
 

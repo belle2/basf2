@@ -39,6 +39,15 @@ namespace Belle2 {
     std::string getName() const {
       return m_strName;
     }
+    /** returns the full name of the particle
+     *  full_name = name:label
+     */
+    std::string getFullName() const {
+      if (m_strLabel.empty())
+        return m_strName;
+      else
+        return m_strName + ":" + m_strLabel;
+    }
     /** Return the name from getName() without + - * or anti- */
     std::string getNameSimple() const;
     /** Is the particle selected in the decay string? */

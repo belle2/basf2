@@ -140,13 +140,15 @@ def setup_vxdtf1T(
 
 def setup_vxdtfR470VXD(
     candName='CaVXDTCs',
-    secSetup=['R470TB3GeVNoMagnetNoAlignedSource2014May27PXDSVD-moreThan1500MeV_PXDSVD'
+    secSetup=['R470TB3GeVNoMagnetNoAlignedSource2014May27MINIPXDSVD-moreThan1500MeV_PXDSVD'
               ],
     filterOverlaps='hopfield',
     qiType='straightLine',
     baseLineTF=0,
     seedType='straightLine',
     ):
+
+                               # R470TB3GeVNoMagnetNoAlignedSource2014May27MINIInnerTEL
 
     #
     vxdtf = register_module('VXDTF')
@@ -216,7 +218,7 @@ def setup_vxdtfR470VXD(
 
 def setup_vxdtfR470InnerTEL(
     candName='CaInnerTELTCs',
-    secSetup=['R470TB3GeVNoMagnetNoAlignedSource2014May27InnerTEL-moreThan1500MeV_TEL'
+    secSetup=['R470TB3GeVNoMagnetNoAlignedSource2014May27MINIInnerTEL-moreThan1500MeV_TEL'
               ],
     filterOverlaps='hopfield',
     qiType='straightLine',
@@ -295,7 +297,7 @@ def setup_vxdtfR470InnerTEL(
 
 def setup_vxdtfR470OuterTEL(
     candName='CaOuterTELTCs',
-    secSetup=['R470TB3GeVNoMagnetNoAlignedSource2014May27OuterTEL-moreThan1500MeV_TEL'
+    secSetup=['R470TB3GeVNoMagnetNoAlignedSource2014May27MINIOuterTEL-moreThan1500MeV_TEL'
               ],
     filterOverlaps='hopfield',
     qiType='straightLine',

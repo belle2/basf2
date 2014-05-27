@@ -1,5 +1,4 @@
-#ifndef VXDTFDQMModule_H_
-#define VXDTFDQMModule_H_
+#pragma once
 
 #undef DQM
 #ifndef DQM
@@ -10,7 +9,6 @@
 
 // fw:
 #include <vxd/dataobjects/VxdID.h>
-// #include <pxd/geometry/SensorInfo.h> // needed later, when PXD-data is there
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 
@@ -210,4 +208,3 @@ namespace Belle2 {
   };
 
 }
-#endif

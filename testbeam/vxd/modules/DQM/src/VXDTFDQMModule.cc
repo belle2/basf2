@@ -194,65 +194,14 @@ void VXDTFDQMModule::defineHisto()
   headLine = "VXDTF: hitMapTotal U and V for ";
   title = "hitMapTotal4Sensor";
   Prepare2DHistMap(headLine, title, m_hitMapHitsTotal);
-//   for (auto& anEntry : m_hitMapHitsTotal) { // TODO move into a function - is used several times
-//     VxdID thisID = anEntry.first;
-//     stringstream titleStream, headStream;
-//     titleStream << title << thisID;
-//     headStream << headLine << "at sensor " << thisID;
-//     currentTitle = titleStream.str();
-//     currentHeadLine = headStream.str();
-//
-//     const VXD::SensorInfoBase* aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(thisID);
-//     int nPixelsU = aSensorInfo->getUCells();
-//     int nPixelsV = aSensorInfo->getVCells();
-//
-//     anEntry.second = new TH2F(currentTitle.c_str(), currentHeadLine.c_str(), nPixelsU, 0, nPixelsU, nPixelsV, 0, nPixelsV);
-//     anEntry.second->GetXaxis()->SetTitle("u position [pitch units]");
-//     anEntry.second->GetYaxis()->SetTitle("v position [pitch units]");
-//     anEntry.second->GetZaxis()->SetTitle("hits");
-//   }
 
   headLine = "VXDTF: hitMapTCOnly U and V for ";
   title = "hitMapTCOnly4Sensor";
   Prepare2DHistMap(headLine, title, m_hitMapTCsOnly);
-//   for (auto& anEntry : m_hitMapTCsOnly) { // TODO move into a function - is used several times
-//     VxdID thisID = anEntry.first;
-//     stringstream titleStream, headStream;
-//     titleStream << title << thisID;
-//     headStream << headLine << "at sensor " << thisID;
-//     currentTitle = titleStream.str();
-//     currentHeadLine = headStream.str();
-//
-//     const VXD::SensorInfoBase* aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(thisID);
-//     int nPixelsU = aSensorInfo->getUCells();
-//     int nPixelsV = aSensorInfo->getVCells();
-//
-//     anEntry.second = new TH2F(currentTitle.c_str(), currentHeadLine.c_str(), nPixelsU, 0, nPixelsU, nPixelsV, 0, nPixelsV);
-//     anEntry.second->GetXaxis()->SetTitle("u position [pitch units]");
-//     anEntry.second->GetYaxis()->SetTitle("v position [pitch units]");
-//     anEntry.second->GetZaxis()->SetTitle("hits");
-//   }
 
   headLine = "VXDTF: hitMapReferenceTCs U and V for ";
   title = "hitMapReferenceTCs4Sensor";
   Prepare2DHistMap(headLine, title, m_hitMapReferenceTCs);
-//   for (auto& anEntry : m_hitMapReferenceTCs) { // TODO move into a function - is used several times
-//     VxdID thisID = anEntry.first;
-//     stringstream titleStream, headStream;
-//     titleStream << title << thisID;
-//     headStream << headLine << "at sensor " << thisID;
-//     currentTitle = titleStream.str();
-//     currentHeadLine = headStream.str();
-//
-//     const VXD::SensorInfoBase* aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(thisID);
-//     int nPixelsU = aSensorInfo->getUCells();
-//     int nPixelsV = aSensorInfo->getVCells();
-//
-//     anEntry.second = new TH2F(currentTitle.c_str(), currentHeadLine.c_str(), nPixelsU, 0, nPixelsU, nPixelsV, 0, nPixelsV);
-//     anEntry.second->GetXaxis()->SetTitle("u position [pitch units]");
-//     anEntry.second->GetYaxis()->SetTitle("v position [pitch units]");
-//     anEntry.second->GetZaxis()->SetTitle("hits");
-//   }
 
   headLine = "VXDTF: hitMapTotal for SVD U for ";
   title = "hitMapTotalSVDOnlyU";
@@ -277,17 +226,7 @@ void VXDTFDQMModule::defineHisto()
   headLine = "VXDTF: hitMapReferenceTCs for SVD V for ";
   title = "hitMapReferenceTCsSVDOnlyV";
   Prepare1DHistMap(headLine, title, m_hitMapReferenceTCsSVDOnlyV, false);
-//  efficiencyHist->Draw("AP");
 
-//  aCanvas->SetGridx(1);
-//  aCanvas->SetGridy(1);
-//  efficiencyHist->SetTitle( "Efficiency of Momentum" );
-//  efficiencyHist->GetYaxis()->SetRangeUser(0.,1.);
-//  efficiencyHist->GetXaxis()->SetTitle( "p [GeV]" );
-//  efficiencyHist->SetMarkerColor( 1 );
-//  efficiencyHist->SetMarkerStyle( 1 +2 );
-//  efficiencyHist->SetMarkerSize( 1 );
-//  efficiencyHist->SetLineColor( 1 );
 
   for (int i = 0; i < c_nSVDPlanes; i++) {
 
@@ -316,7 +255,6 @@ void VXDTFDQMModule::defineHisto()
 
     string namenHits = str(format("hSVDHitmapV%1%") % iPlane);
     string titlenHits = str(format("SVD total HitPos vs accepted by TF HitPos in U, plane %1%") % iPlane);
-//    m_correlationNHitUsed[i]
   }
 
   oldDir->cd();

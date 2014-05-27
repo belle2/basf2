@@ -28,7 +28,7 @@ namespace {
 namespace {
   MCParticleGraph gParticleGraph;
 
-  /** is this a final state particle? */
+  /** is this a final state particle? (determines wether a Particle->MCParticle relation will be created during reconstruction) */
   bool isFSP(int pdg)
   {
     switch (abs(pdg)) {
@@ -219,7 +219,19 @@ namespace {
 
         }
         if (decay.m_pdg != 0) {
-          m_particle = particles.appendNew(TLorentzVector(), decay.m_pdg, Particle::c_Unflavored, daughterIndices);
+          //is decay self conjugated?
+          std::vector<int> decaylist, decaybarlist;
+          for (int idx : daughterIndices) {
+            const Particle* daughterPart = particles[idx];
+            int daughterPDG = daughterPart->getPDGCode();
+            decaylist.push_back(daughterPDG);
+            decaybarlist.push_back((daughterPart->getFlavorType() == Particle::c_Flavored) ? (-daughterPDG) : daughterPDG);
+          }
+          std::sort(decaylist.begin(), decaylist.end());
+          std::sort(decaybarlist.begin(), decaybarlist.end());
+          bool isUnflavored = (decaylist == decaybarlist);
+
+          m_particle = particles.appendNew(TLorentzVector(), decay.m_pdg, isUnflavored ? (Particle::c_Unflavored) : (Particle::c_Flavored), daughterIndices);
         }
       }
     }
@@ -485,7 +497,7 @@ namespace {
       EXPECT_EQ(mcparticles.getEntries(), 6);
       EXPECT_EQ(particles.getEntries(), 5); //we added only 5 Particles
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
-      EXPECT_EQ(getMCTruthStatus(d.m_particle), c_MissGamma) << d.getString();
+      EXPECT_EQ(c_MissGamma, getMCTruthStatus(d.m_particle)) << d.getString();
     }
     {
       Decay d(421, {321, -211, {111, {22, 22}}});
@@ -647,6 +659,90 @@ namespace {
       EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
       //TODO: doesn't have a flag yet, but shouldn't be 0 (same as for WrongCombination? does this warrant an own flag?)
       EXPECT_EQ(c_AddedWrongParticle, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
+  }
+
+  TEST_F(MCMatchingTest, FlavouredD0Decay)
+  {
+    {
+      //ok
+      Decay d(421, { -321, 211});
+      d.reconstruct({421, { -321, 211}});
+      ASSERT_EQ(Particle::c_Flavored, d.m_particle->getFlavorType());
+
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(d.m_particle->getPDGCode(), d.m_particle->getRelated<MCParticle>()->getPDG());
+      EXPECT_EQ(c_Correct, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
+    {
+      //also exists, but suppressed
+      Decay d(-421, { -321, 211});
+      d.reconstruct({ -421, { -321, 211}});
+      ASSERT_EQ(Particle::c_Flavored, d.m_particle->getFlavorType());
+
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(d.m_particle->getPDGCode(), d.m_particle->getRelated<MCParticle>()->getPDG());
+      EXPECT_EQ(c_Correct, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
+    {
+      //however, reconstructing the wrong D0 is not okay
+      Decay d(421, { -321, 211});
+      d.reconstruct({ -421, { -321, 211}});
+      ASSERT_EQ(Particle::c_Flavored, d.m_particle->getFlavorType());
+
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_AddedWrongParticle, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
+    {
+      //however, reconstructing the wrong D0 is not okay
+      Decay d(-421, { -321, 211});
+      d.reconstruct({421, { -321, 211}});
+      ASSERT_EQ(Particle::c_Flavored, d.m_particle->getFlavorType());
+
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_AddedWrongParticle, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
+  }
+
+  TEST_F(MCMatchingTest, UnflavouredD0Decay)
+  {
+    {
+      //ok
+      Decay d(421, { -321, 321});
+      d.reconstruct({421, { -321, 321}});
+      ASSERT_EQ(Particle::c_Unflavored, d.m_particle->getFlavorType());
+
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
+      EXPECT_EQ(c_Correct, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
+    {
+      //ok
+      Decay d(-421, { -321, 321});
+      d.reconstruct({ -421, { -321, 321}});
+      ASSERT_EQ(Particle::c_Unflavored, d.m_particle->getFlavorType());
+
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
+      EXPECT_EQ(c_Correct, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
+    {
+      //we don't know the flavour, so this is also fine
+      Decay d(421, { -321, 321});
+      d.reconstruct({ -421, { -321, 321}});
+      ASSERT_EQ(Particle::c_Unflavored, d.m_particle->getFlavorType());
+
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_Correct, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
+    {
+      //we don't know the flavour, so this is also fine
+      Decay d(-421, { -321, 321});
+      d.reconstruct({421, { -321, 321}});
+      ASSERT_EQ(Particle::c_Unflavored, d.m_particle->getFlavorType());
+
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_Correct, getMCTruthStatus(d.m_particle)) << d.getString();
     }
   }
 

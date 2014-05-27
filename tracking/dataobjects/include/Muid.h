@@ -12,7 +12,6 @@
 
 #include <framework/datastore/RelationsObject.h>
 #include <TVector3.h>
-#include <TMatrixD.h>
 
 namespace Belle2 {
 
@@ -24,160 +23,188 @@ namespace Belle2 {
     //! Empty constructor for ROOT IO (needed to make the class storable)
     Muid();
 
-    //! Constructor with parameter (pdgCode)
-    Muid(int);
+    //! Constructor with initial value
+    //! @param pdgCode PDG code of the hypothesis used for this extrapolation
+    Muid(int pdgCode);
 
     //! Destructor
     virtual ~Muid() {}
 
-    //! returns the PDG code of the hypothesis used for this extrapolation
+    //! @return PDG code of the hypothesis used for this extrapolation
     int getPDGCode() const { return m_PDGCode; }
 
-    //! returns the initial reconstructed momentum (MeV/c) used for this extrapolation
+    //! @return initial reconstructed momentum (GeV/c) used for this extrapolation
     TVector3 getMomentum() const { return m_Momentum; }
 
-    //! returns muon PDF value for this extrapolation (normalized with Pion & Kaon)
+    //! @return muon PDF value for this extrapolation (normalized with all others)
     double getMuonPDFValue() const { return m_MuonPDFValue; }
 
-    //! returns pion PDF value for this extrapolation (normalized with Muon & Kaon)
+    //! @return pion PDF value for this extrapolation (normalized with all others)
     double getPionPDFValue() const { return m_PionPDFValue; }
 
-    //! returns kaon PDF value for this extrapolation (normalized with Muon & Pion)
+    //! @return kaon PDF value for this extrapolation (normalized with all others)
     double getKaonPDFValue() const { return m_KaonPDFValue; }
 
-    //! returns proton PDF value for this extrapolation (normalized with Muon, Pion, Kaon)
+    //! @return proton PDF value for this extrapolation (normalized with all others)
     double getProtonPDFValue() const { return m_ProtonPDFValue; }
 
-    //! returns electron PDF value for this extrapolation (normalized with Muon, Pion, Kaon)
+    //! @return electron PDF value for this extrapolation (normalized with all others)
     double getElectronPDFValue() const { return m_ElectronPDFValue; }
 
-    //! returns junk PDF value for this extrapolation (1 if Muon+Pion+Kaon ~ 0)
+    //! @return junk PDF value for this extrapolation (1 if Muon+Pion+Kaon+Proton+Electron ~ 0)
     double getJunkPDFValue() const { return m_JunkPDFValue; }
 
-    //! returns muon log-likelihood for this extrapolation (not normalized)
+    //! @return muon log-likelihood for this extrapolation (not normalized)
     double getLogL_mu() const {return m_LogL_mu;}
 
-    //! returns pion log-likelihood for this extrapolation (not normalized)
+    //! @return pion log-likelihood for this extrapolation (not normalized)
     double getLogL_pi() const {return m_LogL_pi;}
 
-    //! returns kaon log-likelihood for this extrapolation (not normalized)
+    //! @return kaon log-likelihood for this extrapolation (not normalized)
     double getLogL_K() const {return m_LogL_K;}
 
-    //! returns proton log-likelihood for this extrapolation (not normalized)
+    //! @return proton log-likelihood for this extrapolation (not normalized)
     double getLogL_p() const {return m_LogL_p;}
 
-    //! returns electron log-likelihood for this extrapolation (not normalized)
+    //! @return electron log-likelihood for this extrapolation (not normalized)
     double getLogL_e() const {return m_LogL_e;}
 
-    //! returns status word (bit pattern) for this extrapolation
+    //! @return status word (bit pattern) for this extrapolation
     unsigned int getStatus() const { return m_Status; }
 
-    //! returns chi-squared for this extrapolation
+    //! @return chi-squared for this extrapolation
     double getChiSquared() const { return m_ChiSquared; }
 
-    //! returns # of degrees of freedom used in chi-squared calculation
+    //! @return number of degrees of freedom in chi-squared calculation
     int getDegreesOfFreedom() const { return m_DegreesOfFreedom; }
 
-    //! returns outcome of this extrapolation
+    //! @return outcome of this extrapolation: 0=missed KLM, 1=barrel stop, 2=endcap stop, 3=barrel exit, 4=endcap exit
     unsigned int getOutcome() const { return m_Outcome; }
 
-    //! returns Final BKLM layer crossed by track during extrapolation
+    //! @return outermost BKLM layer crossed by track during extrapolation
     int getBarrelExtLayer() const { return m_BarrelExtLayer; }
 
-    //! returns Final EKLM layer crossed by track during extrapolation
+    //! @return outermost EKLM layer crossed by track during extrapolation
     int getEndcapExtLayer() const { return m_EndcapExtLayer; }
 
-    //! returns Outermost BKLM layer with a matching hit
+    //! @return outermost BKLM layer with a matching hit
     int getBarrelHitLayer() const { return m_BarrelHitLayer; }
 
-    //! returns Outermost EKLM layer with a matching hit
+    //! @return outermost EKLM layer with a matching hit
     int getEndcapHitLayer() const { return m_EndcapHitLayer; }
 
-    //! returns Final BKLM or EKLM layer crossed by track during extrapolation
+    //! @return outermost BKLM or EKLM layer crossed by track during extrapolation
     int getExtLayer() const { return m_ExtLayer; }
 
-    //! returns Outermost BKLM or EKLM layer with a matching hit
+    //! @return outermost BKLM or EKLM layer with a matching hit
     int getHitLayer() const { return m_HitLayer; }
 
-    //! returns Layer-crossing bit pattern during extrapolation
+    //! @return layer-crossing bit pattern during extrapolation
     unsigned int getExtLayerPattern() const { return m_ExtLayerPattern; }
 
-    //! returns Matching-hit bit pattern
+    //! @return matching-hit bit pattern
     unsigned int getHitLayerPattern() const { return m_HitLayerPattern; }
 
-    //! assigns PDG code of the hypothesis used for this extrapolation
+    //! assign PDG code of the hypothesis used for this extrapolation
+    //! @param pdgCode PDG code for this extrapolation
     void setPDGCode(int pdgCode) { m_PDGCode = pdgCode; }
 
-    //! assigns initial momentum (MeV/c) used for this extrapolation
+    //! assign initial momentum (MeV/c) used for this extrapolation
+    //! @param px initial momentum's x component (GeV/c)
+    //! @param py initial momentum's y component (GeV/c)
+    //! @param pz initial momentum's z component (GeV/c)
     void setMomentum(double px, double py, double pz) { m_Momentum.SetX(px); m_Momentum.SetY(py); m_Momentum.SetZ(pz); }
 
-    //! assigns muon PDF value for this extrapolation
+    //! assign muon PDF value for this extrapolation
+    //! @param pdfValue muon PDF value (normalized) for this extrapolation
     void setMuonPDFValue(double pdfValue) { m_MuonPDFValue = pdfValue; }
 
-    //! assigns pion PDF value for this extrapolation
+    //! assign pion PDF value for this extrapolation
+    //! @param pdfValue pion PDF value (normalized) for this extrapolation
     void setPionPDFValue(double pdfValue) { m_PionPDFValue = pdfValue; }
 
-    //! assigns kaon PDF value for this extrapolation
+    //! assign kaon PDF value for this extrapolation
+    //! @param pdfValue kaon PDF value (normalized) for this extrapolation
     void setKaonPDFValue(double pdfValue) { m_KaonPDFValue = pdfValue; }
 
-    //! assigns proton PDF value for this extrapolation
+    //! assign proton PDF value for this extrapolation
+    //! @param pdfValue proton PDF value (normalized) for this extrapolation
     void setProtonPDFValue(double pdfValue) { m_ProtonPDFValue = pdfValue; }
 
-    //! assigns electron PDF value for this extrapolation
+    //! assign electron PDF value for this extrapolation
+    //! @param pdfValue electron PDF value (normalized) for this extrapolation
     void setElectronPDFValue(double pdfValue) { m_ElectronPDFValue = pdfValue; }
 
-    //! assigns junk PDF value for this extrapolation
+    //! assign junk flag for this extrapolation
+    //! @param pdfValue junk flag for this extrapolation (0 if not junk, 1 if junk)
     void setJunkPDFValue(double pdfValue) { m_JunkPDFValue = pdfValue; }
 
-    //! assigns muon log-likelihood for this extrapolation
+    //! assign muon log-likelihood for this extrapolation
+    //! @param value logarithm of muon PDF value (unnormalized) for this extrapolation
     void setLogL_mu(double value) { m_LogL_mu = value; }
 
-    //! assigns pion log-likelihood for this extrapolation
+    //! assign pion log-likelihood for this extrapolation
+    //! @param value logarithm of pion PDF value (unnormalized) for this extrapolation
     void setLogL_pi(double value) { m_LogL_pi = value; }
 
-    //! assigns kaon log-likelihood for this extrapolation
+    //! assign kaon log-likelihood for this extrapolation
+    //! @param value logarithm of kaon PDF value (unnormalized) for this extrapolation
     void setLogL_K(double value) { m_LogL_K = value; }
 
-    //! assigns proton log-likelihood for this extrapolation
+    //! assign proton log-likelihood for this extrapolation
+    //! @param value logarithm of proton PDF value (unnormalized) for this extrapolation
     void setLogL_p(double value) { m_LogL_p = value; }
 
-    //! assigns electron log-likelihood for this extrapolation
+    //! assign electron log-likelihood for this extrapolation
+    //! @param value logarithm of electron PDF value (unnormalized) for this extrapolation
     void setLogL_e(double value) { m_LogL_e = value; }
 
-    //! assigns status word (bit pattern) for this extrapolation
+    //! assign status word (bit pattern) for this extrapolation
+    //! @param status final state of this extrapolation
     void setStatus(unsigned int status) { m_Status = status; }
 
-    //! assigns chi-squared for this extrapolation
+    //! assign chi-squared for this extrapolation
+    //! @param chiSquared total chi-squared for this extrapolation
     void setChiSquared(double chiSquared) { m_ChiSquared = chiSquared; }
 
-    //! assigns # of degrees of freedom used in chi-squared calculation
+    //! assign number of degrees of freedom used in chi-squared calculation
+    //! @param dof number of degrees of freedom for this extrapolation
     void setDegreesOfFreedom(int dof) { m_DegreesOfFreedom = dof; }
 
-    //! assigns outcome of this extrapolation
+    //! assign outcome of this extrapolation
+    //! @param outcome final outcome of this extrapolation: 0=missed KLM, 1=barrel stop, 2=endcap stop, 3=barrel exit, 4=endcap exit
     void setOutcome(unsigned int outcome) { m_Outcome = outcome; }
 
-    //! assigns Final BKLM layer crossed by track during extrapolation
+    //! assign outermost BKLM layer crossed by track during extrapolation
+    //! @param layer outermost BKLM layer crossed by track during extrapolation
     void setBarrelExtLayer(int layer) { m_BarrelExtLayer = layer; }
 
-    //! assigns Final EKLM layer crossed by track during extrapolation
+    //! assign outermost EKLM layer crossed by track during extrapolation
+    //! @param layer outermost EKLM layer crossed by track during extrapolation
     void setEndcapExtLayer(int layer) { m_EndcapExtLayer = layer; }
 
-    //! assigns Outermost BKLM layer with a matching hit
+    //! assign outermost BKLM layer with a matching hit
+    //! @param layer outermost BKLM layer with a matching hit
     void setBarrelHitLayer(int layer) { m_BarrelHitLayer = layer; }
 
-    //! assigns Outermost EKLM layer with a matching hit
+    //! assign outermost EKLM layer with a matching hit
+    //! @param layer outermost EKLM layer with a matching hit
     void setEndcapHitLayer(int layer) { m_EndcapHitLayer = layer; }
 
-    //! assigns Final BKLM or EKLM layer crossed by track during extrapolation
+    //! assign outermost BKLM or EKLM layer crossed by track during extrapolation
+    //! @param layer outermost BKLM or EKLM crossed by track during extrapolation
     void setExtLayer(int layer) { m_ExtLayer = layer; }
 
-    //! assigns Outermost BKLM or EKLM layer with a matching hit
+    //! assign Outermost BKLM or EKLM layer with a matching hit
+    //! @param layer outermost BKLM or EKLM layer with a matching hit
     void setHitLayer(int layer) { m_HitLayer = layer; }
 
-    //! assigns Layer-crossing bit pattern during extrapolation
+    //! assign Layer-crossing bit pattern during extrapolation
+    //! @param pattern bit pattern of crossed layers during extrapolation
     void setExtLayerPattern(unsigned int pattern) { m_ExtLayerPattern = pattern; }
 
-    //! assigns Matching-hit bit pattern
+    //! assign Matching-hit bit pattern
+    //! @param pattern bit pattern of matching-hit layers during extrapolation
     void setHitLayerPattern(unsigned int pattern) { m_HitLayerPattern = pattern; }
 
   private:
@@ -188,22 +215,22 @@ namespace Belle2 {
     //! initial reconstructed momentum (MeV/c) used for this extrapolation
     TVector3 m_Momentum;
 
-    //! Muon PDF value for this extrapolation (normalized with Pion & Kaon)
+    //! Muon PDF value for this extrapolation (normalized with all others)
     double m_MuonPDFValue;
 
-    //! Pion PDF value for this extrapolation (normalized with Muon & Kaon)
+    //! Pion PDF value for this extrapolation (normalized with all others)
     double m_PionPDFValue;
 
-    //! Kaon PDF value for this extrapolation (normalized with Muon & Pion)
+    //! Kaon PDF value for this extrapolation (normalized with all others)
     double m_KaonPDFValue;
 
-    //! Proton PDF value for this extrapolation (normalized with Muon, Pion, Kaon)
+    //! Proton PDF value for this extrapolation (normalized with all others)
     double m_ProtonPDFValue;
 
-    //! Electron PDF value for this extrapolation (normalized with Muon, Pion, Kaon)
+    //! Electron PDF value for this extrapolation (normalized with all others)
     double m_ElectronPDFValue;
 
-    //! Junk PDF value for this extrapolation (1 if Muon+Pion+Kaon ~ 0)
+    //! Junk flag for this extrapolation (0 if not junk, 1 if junk)
     double m_JunkPDFValue;
 
     //! Muon log-likelihood for this extrapolation (not normalized)
@@ -221,49 +248,49 @@ namespace Belle2 {
     //! Electron log-likelihood for this extrapolation (not normalized)
     double m_LogL_e;
 
-    //! status word (bit pattern) for this extrapolation
+    //! Status word (bit pattern) for this extrapolation
     unsigned int m_Status;
 
-    //! chi-squared for this extrapolation
+    //! Chi-squared for this extrapolation
     double m_ChiSquared;
 
-    //! # of degrees of freedom used in chi-squared calculation
+    //! number of degrees of freedom used in chi-squared calculation
     int m_DegreesOfFreedom;
 
-    //! outcome of this extrapolation
-    //! 0=track didn't reach KLM during extrapolation
-    //! 1=track stopped in BKLM during extrapolation
-    //! 2=track stopped in EKLM during extrapolation
-    //! 3=track exited BKLM during extrapolation
-    //! 4=track exited EKLM during extrapolation
+    //! outcome of this extrapolation.
+    //! 0=track didn't reach KLM during extrapolation,
+    //! 1=track stopped in BKLM during extrapolation,
+    //! 2=track stopped in EKLM during extrapolation,
+    //! 3=track exited BKLM during extrapolation,
+    //! 4=track exited EKLM during extrapolation.
     unsigned int m_Outcome;
 
-    //! Final BKLM layer crossed by track during extrapolation
+    //! outermost BKLM layer crossed by track during extrapolation
     int m_BarrelExtLayer;
 
-    //! Final EKLM layer crossed by track during extrapolation
+    //! outermost EKLM layer crossed by track during extrapolation
     int m_EndcapExtLayer;
 
-    //! Outermost BKLM layer with a matching hit
+    //! outermost BKLM layer with a matching hit
     int m_BarrelHitLayer;
 
-    //! Outermost EKLM layer with a matching hit
+    //! outermost EKLM layer with a matching hit
     int m_EndcapHitLayer;
 
-    //! Final BKLM or EKLM layer crossed by track during extrapolation
+    //! outermost BKLM or EKLM layer crossed by track during extrapolation
     int m_ExtLayer;
 
-    //! Outermost BKLM or EKLM layer with a matching hit
+    //! outermost BKLM or EKLM layer with a matching hit
     int m_HitLayer;
 
     //! Layer-crossing bit pattern during extrapolation
-    //! bits 0..14 = barrel layers 1..15
-    //! bits 15..28 = endcap layers 1..14
+    //! (bits 0..14 = barrel layers 1..15,
+    //! bits 15..28 = endcap layers 1..14)
     unsigned int m_ExtLayerPattern;
 
     //! Matching-hit bit pattern
-    //! bits 0..14 = barrel layers 1..15
-    //! bits 15..28 = endcap layers 1..14
+    //! (bits 0..14 = barrel layers 1..15,
+    //! bits 15..28 = endcap layers 1..14)
     unsigned int m_HitLayerPattern;
 
     //! Needed to make the ROOT object storable

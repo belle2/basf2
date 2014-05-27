@@ -23,40 +23,50 @@ namespace Belle2 {
     //! Empty constructor for ROOT IO (needed to make the class storable)
     MuidHit();
 
-    //! Constructor with initial values used by Muid module
-    MuidHit(int, bool, bool, int, int, const TVector3&, const TVector3&, double, double, double);
+    //! Constructor with initial values
+    //! @param pdgCode PDG particleID hypothesis used in this extrapolation
+    //! @param inBarrel flag to indicate if this hit is in the KLM barrel (true) or endcap (false)
+    //! @param isForward flag to indicate if this hit is in the forward (true) or backward (false) end
+    //! @param sector Sector number of this hit (1..8 for barrel, 1..4 for endcap)
+    //! @param layer Layer number of this hit (1..15 for barrel, 1..14 for endcap)
+    //! @param extPos Extrapolation position of this hit (cm)
+    //! @param hitPos Matching reconstructed position of this hit (cm)
+    //! @param extTime extrapolation time of this hit (ns)
+    //! @param hitTime Measured time of this hit (ns)
+    //! @param chiSq Chi-squared contribution of this hit
+    MuidHit(int pdgCode, bool inBarrel, bool isForward, int sector, int layer, const TVector3& extPos, const TVector3& hitPos, double extTime, double hitTime, double chiSq);
 
     //! Destructor
     virtual ~MuidHit() {}
 
-    //! returns the PDG particleID hypothesis used in this extrapolation
+    //! @return PDG particleID hypothesis used in this extrapolation
     int getPdgCode() const { return m_PdgCode; }
 
-    //! returns position of the extrapolated point (cm) in global coordinates
+    //! @return global-coordinate position of the extrapolated point (cm)
     TVector3 getExtPosition() const { return m_ExtPosition; }
 
-    //! returns position of the matching KLM hit (cm) in global coordinates
+    //! @return global-coordinate position of the matching KLM hit (cm)
     TVector3 getHitPosition() const { return m_HitPosition; }
 
-    //! returns time of the extrapolated point (ns)
+    //! @return time since start of event of the extrapolated point (ns)
     double getExtTime() const { return m_ExtTime; }
 
-    //! returns time of the matching KLM hit (ns)
+    //! @return time of the matching KLM hit (ns)
     double getHitTime() const { return m_HitTime; }
 
-    //! returns flag to indicate if hit is in barrel (true) or endcap (false)
+    //! @return flag to indicate if hit is in barrel (true) or endcap (false)
     bool inBarrel() const { return m_InBarrel; }
 
-    //! returns flag to indicate if hit is in forward (true) or backward (false) half
+    //! @return flag to indicate if hit is in forward (true) or backward (false) half
     bool isForward() const { return m_IsForward; }
 
-    //! returns sector number (1..8 for barrel, 1..4 for endcap)
+    //! @return sector number (1..8 for barrel, 1..4 for endcap)
     int getSector() const { return m_Sector; }
 
-    //! returns layer number (1..15 for barrel, 1..14 for endcap)
+    //! @return layer number (1..15 for barrel, 1..14 for endcap)
     int getLayer() const { return m_Layer; }
 
-    //! returns chi-squared contribution for extrapolation point and KLM hit
+    //! @return chi-squared contribution of this hit for extrapolation point and KLM hit
     double getChiSquared() const { return m_ChiSquared; }
 
   private:
@@ -64,13 +74,13 @@ namespace Belle2 {
     //! PDG particleID code for the hypothesis used in this extrapolation
     int m_PdgCode;
 
-    //! position of the extrapolated point (cm) in global coordinates
+    //! global-coordinate position of the extrapolated point (cm)
     TVector3 m_ExtPosition;
 
     //! time of the extrapolated point (ns)
     double m_ExtTime;
 
-    //! position of the matching KLM hit (cm) in global coordinates
+    //! global-coordinate position of the matching KLM hit (cm)
     TVector3 m_HitPosition;
 
     //! time of the matching KLM hit (ns)
@@ -88,7 +98,7 @@ namespace Belle2 {
     //! layer number (1..15 for barrel, 1..14 for endcap)
     int m_Layer;
 
-    //! chi-squared contribution for extrapolation point and KLM hit
+    //! chi-squared contribution of this hit for extrapolation point and KLM hit
     double m_ChiSquared;
 
     //! Needed to make the ROOT object storable

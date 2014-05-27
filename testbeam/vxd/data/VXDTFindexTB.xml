@@ -36,6 +36,26 @@
 	
 	<xi:include href="TB3GeVFullMagnetNoAlignedSource2014May22SVD-moreThan1500MeV_SVD.xml"/>
 	
+<!-- 	<xi:include href="TB4GeVNoMagnetNoAlignedSource2014May211TEL-moreThan1500MeV_TEL.xml"/> -->
+<!-- 	<xi:include href="TB4GeVNoMagnetNoAlignedSource2014May212TEL-moreThan1500MeV_TEL.xml"/> -->
+	
+	<!-- tests may27 - run 470 -->
+	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27InnerTEL-moreThan1500MeV_TEL.xml"/>
+	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27OuterTEL-moreThan1500MeV_TEL.xml"/>
+	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27PXDSVD-moreThan1500MeV_PXDSVD.xml"/>
+	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27PXDSVDTEL-moreThan1500MeV_TELPXDSVD.xml"/>
+	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27SVD-moreThan1500MeV_SVD.xml"/>
+
+
+	<!-- tests may27 - run 470 fine -->
+	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27FINESVD-moreThan1500MeV_SVD.xml"/>
+	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27FINEPXDSVDTEL-moreThan1500MeV_TELPXDSVD.xml"/>
+	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27FINEPXDSVD-moreThan1500MeV_PXDSVD.xml"/>
+	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27FINEOuterTEL-moreThan1500MeV_TEL.xml"/>
+	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27FINEInnerTEL-moreThan1500MeV_TEL.xml"/>
+	
+	
+	
 <!-- 	<xi:include href="TBTelescope6GeVNoMagnetVXD-moreThan1500MeV_VXD.xml"/> -->
 <!-- 	<xi:include href="TBTelescope6GeVNoMagnetSVD-moreThan1500MeV_SVD.xml"/> -->
 </CATFParameters>

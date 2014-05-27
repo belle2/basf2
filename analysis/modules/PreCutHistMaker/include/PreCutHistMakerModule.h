@@ -84,6 +84,7 @@ namespace Belle2 {
     /** Make all Particle combinations for given PDG and input lists, save into 'all' histogram. */
     void saveAllCombinations();
 
+    std::string m_decayString; /**< decay string. */
     int m_pdg;                /**< PDG code of combined particles */
     std::string m_fileName; /**< save histograms in this file. */
     std::string m_channelName; /**< name of the channel which is reconstructed */

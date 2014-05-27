@@ -23,21 +23,19 @@ main.add_module(register_module('ParticleLoader'))
 selectParticle('K-', -321, [], path=main)
 selectParticle('pi+', 211, [], path=main)
 
-selectParticle('g', 22, [], path=main)
-makeParticle('pi0', 111, ['g', 'g'], 0.110, 0.150, path=main)
+selectParticle('gamma', 22, [], path=main)
+makeParticle('pi0', 111, ['gamma', 'gamma'], 0.110, 0.150, path=main)
 matchMCTruth('pi0', path=main)
 
 combinedlist = 'D0'
-#daughters = ['K-', 'pi+', 'pi0']
 daughters = ['K-', 'pi+', 'pi0']
 
 #a) save signal invariant mass using PreCutHistMaker
 histmaker = register_module('PreCutHistMaker')
-histmaker.param('PDG', 421)
+histmaker.param('decayString', 'D0 -> K- pi+ pi0')
 histmaker.param('fileName', 'test_D0signalHist.root')
 hist_params = (100, 0, 6.2)
 histmaker.param('histParams', hist_params)
-histmaker.param('inputListNames', daughters)
 histmaker.param('variable', 'M')
 main.add_module(histmaker)
 
@@ -98,8 +96,8 @@ def checkHistograms(name, selection):
     if maximum != 0.0 or minimum != 0.0:
         B2FATAL("Histograms differ!")
 
-checkHistograms("signal", "isSignal > 0.5")
-checkHistograms("all", "")
+checkHistograms("allD0", "")
+checkHistograms("signalD0", "isSignal > 0.5")
 
 
 print "Test passed, cleaning up."

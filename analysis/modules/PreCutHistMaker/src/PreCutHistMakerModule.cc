@@ -12,7 +12,10 @@
 
 #include <analysis/utility/PSelectorFunctions.h>
 #include <analysis/utility/MCMatching.h>
+#include <analysis/utility/EvtPDLUtil.h>
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
+
 #include <mdst/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/Particle.h>
 
@@ -41,13 +44,10 @@ REG_MODULE(PreCutHistMaker)
 
 PreCutHistMakerModule::PreCutHistMakerModule()
 {
-  setDescription("Saves distribution of a variable of combined particles (from input ParticleLists) into histogram 'all'. If the daughters in the given particle lists can be combined into a correctly reconstructed (!) particle of specified PDG code, save variable value for this combination to a histogram called 'signal'. This is equivalent to running ParticleCombiner on the given lists and saving the variable value of Particles with isSignal == 1 and everything else, but much faster (since Particles don't need to be saved).");
+  setDescription("Saves distribution of a variable of combined particles (from input ParticleLists) into histogram 'all'. If the daughters can be combined into a correctly reconstructed (!) particle of specified type, save variable value for this combination to a histogram called 'signal'. This is equivalent to running ParticleCombiner on the given lists and saving the variable value of Particles with isSignal == 1 and everything else, but much faster (since Particles don't need to be saved).");
   setPropertyFlags(c_ParallelProcessingCertified); //histograms are saved through HistModule, so this is ok
 
-
-  addParam("PDG", m_pdg, "PDG code of particle to reconstruct (anti-particles reconstructed implicitly)");
-  addParam("channelName", m_channelName, "Optional name for the channel which is used to name the histograms (e.g. 'signal'+channelName)", string(""));
-  addParam("inputListNames", m_inputListNames, "Particle lists of the daughter particles to be combined. MCMatching should be run on these lists beforehand.");
+  addParam("decayString", m_decayString, "Decay to reconstruct, see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString ");
 
   HistParams defaultHistParams = std::make_tuple(100, 0, 6);
   addParam("histParams", m_histParams, "Tuple specifying number of bins, lower and upper boundary of the variable histogram. (for invariant mass M in GeV)", defaultHistParams);
@@ -67,11 +67,40 @@ void PreCutHistMakerModule::initialize()
 
   StoreArray<MCParticle>::required();
   StoreArray<Particle>::required();
+
+  // obtain the input and output particle lists from the decay string
+  DecayDescriptor decay;
+  bool valid = decay.init(m_decayString);
+  if (!valid)
+    B2ERROR("Invalid input DecayString: " << m_decayString);
+
+  // Mother particle
+  const DecayDescriptorParticle* mother = decay.getMother();
+
+  m_pdg = mother->getPDGCode();
+  m_channelName = mother->getFullName();
+
+  // Daughters
+  int nProducts = decay.getNDaughters();
+  for (int i = 0; i < nProducts; ++i) {
+    const DecayDescriptorParticle* daughter = decay.getDaughter(i)->getMother();
+
+    const int daughterPDG = daughter->getPDGCode();
+    m_inputListNames.push_back(daughter->getFullName());
+
+    std::string listName = Belle2::EvtPDLUtil::particleListName(daughterPDG, "HistMaker");
+    m_tmpLists.emplace_back(listName);
+    m_tmpLists.back().registerAsTransient();
+    bool isSelfConjugated = !(Belle2::EvtPDLUtil::hasAntiParticle(daughterPDG));
+    if (!isSelfConjugated) {
+      std::string antiListName = Belle2::EvtPDLUtil::antiParticleListName(daughterPDG, "HistMaker");
+      StoreObjPtr<ParticleList>::registerTransient(antiListName);
+    }
+  }
+
+
   for (string name : m_inputListNames) {
     StoreObjPtr<ParticleList>::required(name);
-
-    m_tmpLists.emplace_back("HistMaker" + name);
-    m_tmpLists.back().registerAsTransient();
   }
 
   if (m_customBinning.size() > 0) {
@@ -150,7 +179,16 @@ void PreCutHistMakerModule::clearParticleLists()
     std::string name = list->getParticleListName();
     list.create(true);
     list->initialize(pdg, name);
-    // TODO is at this point necessary to bind anti list? probably yes
+
+    //create and bind antiparticle list if necessary
+    bool isSelfConjugated = !(Belle2::EvtPDLUtil::hasAntiParticle(pdg));
+    if (!isSelfConjugated) {
+      std::string antiListName = Belle2::EvtPDLUtil::antiParticleListName(pdg, "HistMaker");
+      StoreObjPtr<ParticleList> antiParticleList(antiListName);
+      antiParticleList.create(true);
+      antiParticleList->initialize(-pdg, antiListName);
+      list->bindAntiParticleList(*(antiParticleList));
+    }
   }
 }
 
@@ -201,8 +239,10 @@ void PreCutHistMakerModule::saveCombinationsForSignal()
     MCMatching::setMCTruth(part);
     //B2WARNING("combined Particle created.");
     if (analysis::isSignal(part) < 0.5) {
-      //part->print();
-      //B2WARNING("mcMatching says No. (status: " << MCMatching::getMCTruthStatus(part, part->getRelated<MCParticle>()));
+      /*
+      B2WARNING("mcMatching says No. (status: " << MCMatching::getMCTruthStatus(part));
+      part->print();
+      */
       continue;
     }
     //B2WARNING("passed");
@@ -251,10 +291,10 @@ void PreCutHistMakerModule::event()
     plists.push_back(list);
     expectedDaughterPDGsAbs.insert(abs(list->getPDGCode()));
 
-    //create temporary output lists (and replace any existing object)
+    //create temporary input lists (and replace any existing object)
     m_tmpLists[i].create(true);
     m_tmpLists[i]->initialize(list->getPDGCode(), list->getParticleListName());
-    // TODO is at this point necessary to bind anti list? probably yes
+    //antiparticle lists are created in clearParticleLists(), so this doesn't need to be done here
   }
 
   //for signal + background

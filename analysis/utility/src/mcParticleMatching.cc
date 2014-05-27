@@ -160,7 +160,9 @@ int MCMatching::setMCTruthStatus(Particle* particle, const MCParticle* mcParticl
     //other checks concern daughters of particle, so we're done here
     return setStatus(particle, status);
   }
-  if (particle->getPDGCode() != mcParticle->getPDG())
+  const Particle::EFlavorType flavorType = particle->getFlavorType();
+  if ((flavorType == Particle::c_Flavored and particle->getPDGCode() != mcParticle->getPDG())
+      or (flavorType == Particle::c_Unflavored and abs(particle->getPDGCode()) != abs(mcParticle->getPDG())))
     status |= MCMatchStatus::c_AddedWrongParticle;
 
   //add up all (accepted) status flags we collected for our daughters

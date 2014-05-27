@@ -512,29 +512,17 @@ namespace Belle2 {
 
     double isSignal(const Particle* part)
     {
-      double result = 0.0;
-
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-
       if (mcparticle == nullptr)
-        return result;
+        return 0.0;
 
-      int mcPDGCode = mcparticle->getPDG();
       int status    = MCMatching::getMCTruthStatus(part, mcparticle);
       //remove the following bits, these are usually ok
       status &= (~MCMatching::c_MissFSR);
       status &= (~MCMatching::c_MissNeutrino);
       //status &= (~MCMatching::c_DecayInFlight);
 
-      if (status != MCMatching::c_Correct)
-        return result;
-
-      if (part->getFlavorType() == Particle::c_Flavored && mcPDGCode == part->getPDGCode())
-        result = 1.0;
-      else if (part->getFlavorType() == Particle::c_Unflavored && abs(mcPDGCode) == abs(part->getPDGCode()))
-        result = 1.0;
-
-      return result;
+      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
     }
 
     double particleMCMatchPDGCode(const Particle* part)

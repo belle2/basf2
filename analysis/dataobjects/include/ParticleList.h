@@ -21,15 +21,113 @@
 namespace Belle2 {
 
   /**
-   * Class to hold a list of particles, anti-particles and self-conjugated particles.
-   * The list is implemented as three std::vector<int> holding the indices of particles in StoreArray<Particle>.
-   * Particles in the list can only be of the same kind (according to PDG code) and from the same Particle store array.
+   * ParticleList is a container class that stores a collection of Particle objects. The particles are internally
+   * stored in two std::vector<int> holding the indices of particles in StoreArray<Particle>:
+   * o) flavor specific particles (particles that have an anti-particle, e.g. pi-, K-, D+, D0)
+   * o) self-conjugated particles (particles that do not have an anti-particle, e.g. pi0, phi, or particles
+   *    that have an anti-particle but are reconstructed in self-conjugated decay mode, e.g. K*0 -> K0s pi0, or D0 -> K- K+, ...)
+   * ParticleList can store only particles with same PDG code (whcih however can be reconstructed in different decay modes).
+   *
+   * Each ParticleList can and should be binded with its anti-ParticleList at the time of creation of the lists.
+   * This bond for example enables automatic reconstruction of charged conjugated decays in ParticleCombiner module for example.
+   *
+   * The unique identifier of the ParticleList is its name. According to the naming convention the ParticleList's name
+   * has to be of the form:
+   *
+   * listName = particle_name:label,
+   *
+   * where particel_name is the name of the particle as given in the evt.pdl and the label can be any string
+   * indicating the selection criteria or decay mode (or anything else) used to reconstruct the particles. Examples are:
+   * o) pi+:loose - pi+ candidates passing loose PID requirements
+   * o) D0:kpi    - D0 candidates reconstructed in D0->Kpi decays
+   *
+   * <h1>Creating new ParticleList</h1>
+   *
+   * Particles and their anti-particles are stored in their own ParticleLists. Creation and connection of particle and
+   * anti-particle lists is performed in the following way (example for K- and K+ lists):
+
+     \code
+     \\ create ParticleList for particles (K+)
+     StoreObjPtr<ParticleList> pList("K+:all");
+     pList.create();
+     pList->initialize( 321, "K+:all");
+
+     \\ create ParticleList for anti-particles (K-)
+     StoreObjPtr<ParticleList> antipList("K-:all");
+     antipList.create();
+     antipList->initialize(-321, "K-:all");
+
+     \\ bind the two lists together
+     pList->bindAntiParticleList(*(antipList));
+     \endcode
+   *
+   * <h1>Adding Particle to ParticleList</h1>
+   *
+   * The following rules apply:
+   * o) ParticleList can contain only particles with same absolute value of PDG code (e.g. only charged kaons, neutral D mesons, ...)
+   * o) particles have to be stored in the same StoreArray<Particle>
+   *
+   * Example:
+   *
+     \code
+     pList->addParticle(particle);
+     \endcode
+
+   * where particle is a pointer to a Particle object. Note, if one adds anti-particle to ParticleLists for particles the
+   * particle will be actually added to the ParticleList for anti-particles. The following two lines of code give same result
+   *
+     \code
+     // adding anti-particle Particle object to ParticleList for particles
+     pList->addParticle(antiParticle);
+
+     // is the same as if the anti-particle Particle object is added to the ParticleList for anti-particles
+     antiPlist->addParticle(antiParticle);
+     \endcode
+   *
+   * <h1>Accessing elements of ParticleList</h1>
+   *
+   * To loop over all particles (as well as their anti-particles) do the following
+   *
+     \code
+     for (unsigned i = 0; i < pList->getListSize(); i++) {
+      const Particle* particle = pList->getParticle(i);
+
+      // do something with the particle
+      particle->....
+     }
+     \endcode
+   *
+   * If you would like to loop over the particles stored in particular ParticleList and not the anti-particles as well,
+   * do the following (set the boolean parameter in the relevant functions to false)
+     \code
+     for (unsigned i = 0; i < pList->getListSize(false); i++) {
+      const Particle* particle = pList->getParticle(i, false);
+
+      // do something with the particle
+      particle->....
+     }
+     \endcode
+   *
+   * <h1>Remove Particles from ParticleList</h1>
+   *
+   * Particles can be removed in the following way (as above, this action will by default be applied to list of
+   * particles as well as to list for anti-particles):
+   *
+     \code
+     std::vector<unsigned int> toRemove;
+      for (unsigned i = 0; i < pList->getListSize(); i++) {
+        const Particle* part = pList->getParticle(i);
+        if (...particle should be removed...) toRemove.push_back(part->getArrayIndex());
+      }
+
+      plist->removeParticles(toRemove);
+      \endcode
    */
 
   class ParticleList : public TObject {
   public:
 
-    /** Identifies the type of Particle (and in which of internal two lists it is stored). */
+    /** Type of Particle (determines in which of the two internal lists the particle is stored). */
     enum EParticleType {
       c_FlavorSpecificParticle = 0,
       c_SelfConjugatedParticle
@@ -58,15 +156,19 @@ namespace Belle2 {
     void initialize(int pdg, std::string name);
 
     /**
-     * Binds particle and anti-particle ParticleLists.
+     * Binds particle and anti-particle ParticleLists. After the lists are binded any action performed on ParticleList
+     * for particles will be performed by default also on ParticleList for anti-particles.
      *
      * @param antiList - anti-particle ParticleList of this ParticleList
+     * @param includingAntiList - the "anti"-anti-particle list has to be set also for the anti-particle list
      */
     void bindAntiParticleList(ParticleList& antiList, bool includingAntiList = true);
 
     /**
-     * Sets Particle store array name to which particle list refers
+     * Sets Particle store array name to which particle list refers. By default this parameter is set to "Particles".
+     *
      * @param name name of the Particle store array
+     * @param forAntiParticle if true the name is set also for the anti-particle list
      */
     void setParticleCollectionName(std::string name, bool forAntiParticle = true);
 
@@ -116,6 +218,20 @@ namespace Belle2 {
     /**
      * Returns list of StoreArray<Particle> indices.
      *
+     * Possible options are:
+     *
+     * o) getList(ParticleList::c_FlavorSpecificParticle)
+     *  - returns the vector of flavor-specific particles stored in this list
+     *
+     * o) getList(ParticleList::c_SelfConjugatedParticle)
+     *  - returns the vector of self-conjugated particles stored in this list
+     *
+     * o) getList(ParticleList::c_FlavorSpecificParticle, true)
+     *  - returns the vector of flavor-specific anti-particles stored in the anti-particle ParticleList of this list
+     *
+     * o) getList(ParticleList::c_SelfConjugatedParticle, true)
+     *  - this is equivalent to getList(ParticleList::c_SelfConjugatedParticle)
+     *
      * @param K ParticleType - Particle, SelfConjugatedParticle
      * @param forAntiParticle - whether the Particle or SelfConjugatedParticle should be returned for this (false) or anti-particle list (true)
      * @return const reference to vector of indices
@@ -128,12 +244,15 @@ namespace Belle2 {
     std::string getAntiParticleListName() const { return m_antiListName; }
 
     /**
-     * Returns the name the anti-particle ParticleList.
+     * Returns the name this ParticleList.
      */
     std::string getParticleListName() const { return m_thisListName; }
 
     /**
      * Returns total number of particles in this list and anti list if requested
+     *
+     * @param includingAntiList
+     * @return size of the this (+ anti-particle) list
      */
     unsigned getListSize(bool includingAntiList = true) const;
 
@@ -145,7 +264,7 @@ namespace Belle2 {
     Particle* getParticle(unsigned i, bool includingAntiList = true) const;
 
     /**
-     * Returns number of particles or self-conjugated particles in the list or anti-particle list
+     * Returns the number of flavor-specific particles or self-conjugated particles in this list or its anti-particle list
      *
      * @param K ParticleType - Particle or SelfConjugatedParticle
      * @param forAntiParticle - whether the Particle or SelfConjugatedParticle should be returned for this (false) or anti-particle list (true)

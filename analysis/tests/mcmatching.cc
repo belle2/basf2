@@ -1,4 +1,4 @@
-#include <analysis/utility/mcParticleMatching.h>
+#include <analysis/utility/MCMatching.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 

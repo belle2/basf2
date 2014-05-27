@@ -11,7 +11,7 @@
 #include <analysis/modules/PreCutHistMaker/PreCutHistMakerModule.h>
 
 #include <analysis/utility/PSelectorFunctions.h>
-#include <analysis/utility/mcParticleMatching.h>
+#include <analysis/utility/MCMatching.h>
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/Particle.h>

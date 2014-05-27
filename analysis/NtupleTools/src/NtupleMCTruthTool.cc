@@ -9,9 +9,8 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleMCTruthTool.h>
+#include <analysis/utility/MCMatching.h>
 #include <mdst/dataobjects/MCParticle.h>
-
-#include <analysis/utility/mcParticleMatching.h>
 
 #include <TBranch.h>
 

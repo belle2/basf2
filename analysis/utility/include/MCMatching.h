@@ -1,10 +1,9 @@
+#pragma once
 // ******************************************************************
 // MC Matching
 // authors: A. Zupanc (anze.zupanc@ijs.si), C. Pulvermacher (christian.pulvermacher@kit.edu)
 // ******************************************************************
 
-#ifndef MCPARTICLEMATCHING_H
-#define MCPARTICLEMATCHING_H
 
 #include <vector>
 
@@ -172,5 +171,3 @@ namespace Belle2 {
     bool missingKlong(std::vector<const MCParticle*> missP);
   }
 }
-
-#endif // MCPARTICLEMATCHING

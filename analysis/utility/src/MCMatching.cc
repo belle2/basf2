@@ -3,7 +3,7 @@
 // authors: A. Zupanc (anze.zupanc@ijs.si), C. Pulvermacher (christian.pulvermacher@kit.edu)
 // ******************************************************************
 
-#include <analysis/utility/mcParticleMatching.h>
+#include <analysis/utility/MCMatching.h>
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/MCParticle.h>
 

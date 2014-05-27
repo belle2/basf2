@@ -21,7 +21,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 
 // utility
-#include <analysis/utility/mcParticleMatching.h>
+#include <analysis/utility/MCMatching.h>
 
 using namespace std;
 

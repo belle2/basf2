@@ -222,8 +222,7 @@ void PreCutHistMakerModule::saveCombinationsForSignal()
 {
   // Convert input ParticleList(s) to PCombinerList(s)
   vector<PCombinerList> inputPCombinerLists;
-  for (const auto & listName : m_tmpLists) {
-    StoreObjPtr<ParticleList> list(listName);
+  for (const auto & list : m_tmpLists) {
     PCombinerList plist;
     convert(list, plist);
     inputPCombinerLists.push_back(plist);

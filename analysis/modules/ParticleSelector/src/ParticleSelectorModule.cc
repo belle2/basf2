@@ -56,14 +56,14 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("strDecayString", m_strDecay, "Input DecayDescriptor string.", string(""));
+    addParam("decayString", m_strDecay, "Input DecayDescriptor string (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString).", string(""));
 
     vector<string> defaultSelection;
     addParam("Select", m_selection, "selection criteria", defaultSelection);
     addParam("persistent", m_persistent,
              "toggle newly created particle list btw. transient/persistent", false);
 
-    // legacy parameters (can be used instead of strDecayString parameter)
+    // legacy parameters (can be used instead of decayString parameter)
     addParam("PDG", m_pdgCode,
              "PDG code. If set to zero, particle list assumed to exist", 0);
     addParam("ListName", m_listName, "name of particle list", string(""));

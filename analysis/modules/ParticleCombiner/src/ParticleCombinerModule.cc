@@ -51,7 +51,7 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("strDecayString", m_strDecay, "Input DecayDescriptor string.",
+    addParam("decayString", m_strDecay, "Input DecayDescriptor string (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString).",
              string(""));
 
     std::map<std::string, std::tuple<double, double>> defaultMap;

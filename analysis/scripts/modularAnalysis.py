@@ -218,7 +218,7 @@ def fillParticleList(
 
     pselect = register_module('ParticleSelector')
     pselect.set_name('ParticleSelector_' + decayString)
-    pselect.param('strDecayString', decayString)
+    pselect.param('decayString', decayString)
     pselect.param('Select', criteria)
     pselect.param('persistent', persistent)
     path.add_module(pselect)
@@ -260,7 +260,7 @@ def reconDecay(
 
     pmake = register_module('ParticleCombiner')
     pmake.set_name('ParticleCombiner_' + decayString)
-    pmake.param('strDecayString', decayString)
+    pmake.param('decayString', decayString)
     pmake.param('cuts', cuts)
     pmake.param('persistent', persistent)
     path.add_module(pmake)

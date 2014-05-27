@@ -19,7 +19,6 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/Particle.h>
 
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <TH1F.h>
@@ -31,16 +30,8 @@ using namespace std;
 using namespace Belle2;
 
 
-
-//-----------------------------------------------------------------
-//                 Register module
-//-----------------------------------------------------------------
-
 REG_MODULE(PreCutHistMaker)
 
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
 
 PreCutHistMakerModule::PreCutHistMakerModule()
 {
@@ -53,7 +44,7 @@ PreCutHistMakerModule::PreCutHistMakerModule()
   addParam("histParams", m_histParams, "Tuple specifying number of bins, lower and upper boundary of the variable histogram. (for invariant mass M in GeV)", defaultHistParams);
   addParam("fileName", m_fileName, "Name of the TFile where the histograms are saved.");
   addParam("variable", m_variable, "Variable for which the distributions are calculated");
-  addParam("customBinning", m_customBinning, "Custom Binning, which is used instead of histParams", std::vector<float>());
+  addParam("customBinning", m_customBinning, "Custom binning, which is used instead of histParams. Specify low-edges for each bin, with nbins+1 entries.", std::vector<float>());
 
 }
 
@@ -172,7 +163,7 @@ bool hasAntiParticle(int pdg)
   return true;
 }
 
-void PreCutHistMakerModule::clearParticleLists()
+void PreCutHistMakerModule::clearTemporaryLists()
 {
   for (auto & list : m_tmpLists) {
     int pdg = list->getPDGCode();
@@ -293,7 +284,7 @@ void PreCutHistMakerModule::event()
     //create temporary input lists (and replace any existing object)
     m_tmpLists[i].create(true);
     m_tmpLists[i]->initialize(list->getPDGCode(), list->getParticleListName());
-    //antiparticle lists are created in clearParticleLists(), so this doesn't need to be done here
+    //antiparticle lists are created in clearTemporaryLists(), so this doesn't need to be done here
   }
 
   //for signal + background
@@ -320,7 +311,7 @@ void PreCutHistMakerModule::event()
           continue;
         }
 
-        clearParticleLists();
+        clearTemporaryLists();
 
         //we found a true decay, collect all Particles associated with the daughters
         if (!fillParticleLists(mcDaughters)) {

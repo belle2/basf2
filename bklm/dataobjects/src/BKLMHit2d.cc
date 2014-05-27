@@ -19,12 +19,12 @@ using namespace Belle2;
 
 ClassImp(BKLMHit2d)
 
-//! empty constructor
+// empty constructor
 BKLMHit2d::BKLMHit2d() : RelationsObject()
 {
 }
 
-//! Constructor with orthogonal 1D hits
+// Constructor with orthogonal 1D hits
 BKLMHit2d::BKLMHit2d(const BKLMHit1d* hit1, const BKLMHit1d* hit2) :
   RelationsObject()
 {
@@ -46,14 +46,11 @@ BKLMHit2d::BKLMHit2d(const BKLMHit1d* hit1, const BKLMHit1d* hit2) :
   m_GlobalPosition[0] = 0.0;
   m_GlobalPosition[1] = 0.0;
   m_GlobalPosition[2] = 0.0;
-  m_LocalPosition[0] = 0.0;
-  m_LocalPosition[1] = 0.0;
-  m_LocalPosition[2] = 0.0;
   m_Time = 0.5 * (hitPhi->getTime() + hitZ->getTime());
   m_EDep = hitPhi->getEDep() + hitZ->getEDep();
 }
 
-//! Copy constructor
+// Copy constructor
 BKLMHit2d::BKLMHit2d(const BKLMHit2d& h) :
   RelationsObject(h),
   m_ModuleID(h.m_ModuleID),
@@ -64,26 +61,8 @@ BKLMHit2d::BKLMHit2d(const BKLMHit2d& h) :
   m_GlobalPosition[0] = h.m_GlobalPosition[0];
   m_GlobalPosition[1] = h.m_GlobalPosition[1];
   m_GlobalPosition[2] = h.m_GlobalPosition[2];
-  m_LocalPosition[0] = h.m_LocalPosition[0];
-  m_LocalPosition[1] = h.m_LocalPosition[1];
-  m_LocalPosition[2] = h.m_LocalPosition[2];
 }
 
-void BKLMHit2d::setLocalPosition(double x, double y, double z)
-{
-  m_LocalPosition[0] = x;
-  m_LocalPosition[1] = y;
-  m_LocalPosition[2] = z;
-}
-
-void BKLMHit2d::setGlobalPosition(double x, double y, double z)
-{
-  m_GlobalPosition[0] = x;
-  m_GlobalPosition[1] = y;
-  m_GlobalPosition[2] = z;
-}
-
-//! Calculate the phi-strip average
 float BKLMHit2d::getPhiStripAve() const
 {
   int stripMin = ((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1;
@@ -91,7 +70,6 @@ float BKLMHit2d::getPhiStripAve() const
   return 0.5 * (stripMin + stripMax);
 }
 
-//! Calculate the z-strip average
 float BKLMHit2d::getZStripAve() const
 {
   int stripMin = ((m_ZStrips & BKLM_ZSTRIP_MASK) >> BKLM_ZSTRIP_BIT) + 1;

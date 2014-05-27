@@ -25,6 +25,9 @@ namespace Belle2 {
     BKLMSimHitPosition() : RelationsObject() {}
 
     //! Constructor with initial values (from simulation step)
+    //! @param x Cartesian x coordinate of global position
+    //! @param y Cartesian y coordinate of global position
+    //! @param z Cartesian z coordinate of global position
     BKLMSimHitPosition(double x, double y, double z) : RelationsObject() { m_Position.SetX(x); m_Position.SetY(y); m_Position.SetZ(z); }
 
     //! Destructor
@@ -33,7 +36,8 @@ namespace Belle2 {
     //! Copy constructor
     BKLMSimHitPosition(const BKLMSimHitPosition& p) : RelationsObject(p) { m_Position = p.m_Position; }
 
-    //! get the BKLMSimHit's global position (cm)
+    //! get the BKLMSimHit's global position
+    //! @return Cartesian global position (cm)
     const TVector3& getPosition() { return m_Position; }
 
   private:

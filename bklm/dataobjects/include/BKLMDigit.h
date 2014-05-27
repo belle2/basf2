@@ -14,11 +14,6 @@
 #include <framework/datastore/RelationsObject.h>
 #include <bklm/dataobjects/BKLMStatus.h>
 
-#include <TVector3.h>
-
-//#define BKLM_INNER 1
-//#define BKLM_OUTER 2
-
 namespace Belle2 {
 
   class BKLMSimHit;
@@ -32,10 +27,13 @@ namespace Belle2 {
     BKLMDigit();
 
     //! Constructor with initial values for an RPC hit
-    BKLMDigit(const BKLMSimHit*, int);
+    //! @param simHit pointer to the BKLMSimHit
+    //! @param strip RPC strip number in a contiguous set
+    BKLMDigit(const BKLMSimHit* simHit, int strip);
 
     //! Constructor with initial values for a scint hit
-    BKLMDigit(const BKLMSimHit*);
+    //! @param simHit pointer to the BKLMSimHit
+    BKLMDigit(const BKLMSimHit* simHit);
 
     //! Copy constructor
     BKLMDigit(const BKLMDigit&);
@@ -43,84 +41,82 @@ namespace Belle2 {
     //! Destructor
     virtual ~BKLMDigit() {}
 
-    //! returns flag whether hit is in RPC (true) or scintillator (false)
+    //! @return whether hit is in RPC (true) or scintillator (false)
     bool inRPC() const { return ((m_ModuleID & BKLM_INRPC_MASK) != 0); }
 
-    //! returns whether the scint hit is usable in fit
+    //! @return whether the scint hit is usable in fit (true) or not (false)
     bool isAboveThreshold() const { return ((m_ModuleID & BKLM_ABOVETHRESHOLD_MASK) != 0); }
 
-    //! returns end (TRUE=forward or FALSE=backward) of this strip
+    //! @return detector end (TRUE=forward or FALSE=backward) of this strip
     bool isForward() const { return ((m_ModuleID & BKLM_END_MASK) != 0); }
 
-    //! returns sector number of this strip (1..8)
+    //! @return sector number of this strip (1..8)
     int getSector() const { return (((m_ModuleID & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1); }
 
-    //! returns layer number of this strip (1..15)
+    //! @return layer number of this strip (1..15)
     int getLayer() const { return (((m_ModuleID & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1); }
 
-    //! returns readout coordinate (TRUE=phi, FALSE=z) of this strip
+    //! @return readout coordinate (TRUE=phi, FALSE=z) of this strip
     bool isPhiReadout() const { return ((m_ModuleID & BKLM_PLANE_MASK) != 0); }
 
-    //! returns strip number (1..64)
+    //! @return strip number (1..64)
     int getStrip() const { return (((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1); }
 
-    //! returns unique detector-module ID (internally calculated)
+    //! @return unique detector-module ID (internally calculated)
     int getModuleID() const { return m_ModuleID; }
 
-    //! returns MC-simulation hit time
+    //! @return MC-simulation hit time (ns)
     float getSimTime() const { return m_SimTime; }
 
-    //! returns reconstructed hit time
+    //! @return reconstructed hit time (ns) from scint pulse-shape analysis
     float getTime() const { return m_Time; }
 
-    //! returns MC-simulation energy deposition
+    //! @return MC-simulation energy deposition (MeV)
     float getSimEDep() const { return m_SimEDep; }
 
-    //! returns reconstructed energy deposition
+    //! @return reconstructed energy deposition (MeV)
     float getEDep() const { return m_EDep; }
 
-    //! returns the number of simulated MPPC pixels
+    //! @return the number of simulated MPPC pixels
     float getSimNPixel() const { return m_SimNPixel; }
 
-    //! returns the number of reconstructed MPPC pixels
+    //! @return the number of reconstructed MPPC pixels
     float getNPixel() const { return m_NPixel; }
 
-    //! returns status of pulse-fit (enum EKLM::FPGAFitStatus returned as int!)
+    //! @return status of scint pulse-shape fit (enum EKLM::FPGAFitStatus returned as int!)
     int getFitStatus() { return m_FitStatus; }
 
-    //! determines if two BKLMDigits are equal based on geometry only
+    //! @return whether two BKLMDigits refer to the same strip (true) or not (false)
     bool match(const BKLMDigit* d) const { return (((d->getModuleID() ^ m_ModuleID) & BKLM_MODULESTRIPID_MASK) == 0); }
 
     //! sets whether scint hit is usable in fit
+    //! @param flag above threshold (true) or not (false)
     void isAboveThreshold(bool flag) { m_ModuleID = (flag ? m_ModuleID | BKLM_ABOVETHRESHOLD_MASK : m_ModuleID & ~BKLM_ABOVETHRESHOLD_MASK); }
 
-    //! sets reconstructed time (ns)
+    //! sets reconstructed time
+    //! @param time reconstructed time (ns) from scint pulse-shape analysis
     void setTime(float time) { m_Time = time; }
 
-    //! sets reconstructed energy deposition (MeV)
+    //! sets reconstructed energy deposition
+    //! @param eDep reconstructed energy (MeV) from scint pulse-shape analysis
     void setEDep(float eDep) { m_EDep = eDep; }
 
     //! sets the number of simulated MPPC pixels (scintillator only)
+    //! @param nPixel number of simulated MPPC pixels
     void setSimNPixel(int nPixel) { m_SimNPixel = nPixel; }
 
     //! sets the number of reconstructed MPPC pixels (scintillator only)
+    //! @param nPixel number of reconstructed MPPC pixels from the pulse-shape analysis
     void setNPixel(float nPixel) { m_NPixel = nPixel; }
 
-    //! set the status of the pulse-fit (enum EKLM::FPGAFitStatus --> int!)
+    //! set the status of the pulse-shape fit (enum EKLM::FPGAFitStatus --> int!)
+    //! @param status completion status of the pulse-shape analysis
     void setFitStatus(int status) { m_FitStatus = status; }
 
   private:
 
-    //! detector-module identifier, internally calculated (see BKLMStatus)
-    //! bit 0      = end-1 [0..1]; forward is 0
-    //! bits 1-3   = sector-1 [0..7]
-    //! bits 4-7   = layer-1 [0..14]
-    //! bit 8      = plane-1 [0..1]; inner is 0 and phiReadout
-    //! bits 9-15  = strip-1 [0..95]
-    //! bits 16-22 = maxStrip-1 [0..95] for RPCs only
-    //! bit 23     = inRPC flag
-    //! bit 24     = MC-generated hit
-    //! bit 25     = MC decay-point hit
+    //! detector-module identifier
+    //! @sa BKLMStatus.h
     int m_ModuleID;
 
     //! MC-simulation event hit time (ns)

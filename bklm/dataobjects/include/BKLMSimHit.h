@@ -28,8 +28,12 @@ namespace Belle2 {
     //! Empty constructor for ROOT IO (needed to make the class storable)
     BKLMSimHit();
 
-    //! Constructor with initial values (from simulation step)
-    BKLMSimHit(int, double, double, double);
+    //! Constructor with initial values
+    //! @param moduleID module identifier (@sa BKLMStatus.h)
+    //! @param x position along the strip (cm)
+    //! @param t time since start of event (ns)
+    //! @param dE deposited energy (MeV)
+    BKLMSimHit(int moduleID, double x, double t, double dE);
 
     //! Destructor
     virtual ~BKLMSimHit() {}
@@ -81,16 +85,8 @@ namespace Belle2 {
 
   private:
 
-    //! detector-module identifier, internally calculated (see BKLMStatus)
-    //! bit 0      = end-1 [0..1]; forward is 0
-    //! bits 1-3   = sector-1 [0..7]
-    //! bits 4-7   = layer-1 [0..14]
-    //! bit 8      = plane-1 [0..1]; inner is 0 and phiReadout
-    //! bits 9-15  = strip-1 [0..95]
-    //! bits 16-22 = maxStrip-1 [0..95] for RPCs only
-    //! bit 23     = inRPC flag
-    //! bit 24     = MC-generated hit
-    //! bit 25     = MC decay-point hit
+    //! detector-module identifier
+    //! @sa BKLMStatus.h
     int m_ModuleID;
 
     //! event hit time (ns)

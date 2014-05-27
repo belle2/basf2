@@ -11,7 +11,6 @@
 #ifndef BKLMHIT1D_H
 #define BKLMHIT1D_H
 
-#include <TVector3.h>
 #include <framework/datastore/RelationsObject.h>
 #include <bklm/dataobjects/BKLMStatus.h>
 
@@ -29,8 +28,9 @@ namespace Belle2 {
     //! Empty constructor for ROOT IO (needed to make the class storable)
     BKLMHit1d();
 
-    //! Constructor from a vector of BKLMDigits
-    BKLMHit1d(const std::vector<Belle2::BKLMDigit*>&);
+    //! Constructor with initial values
+    //! @param digits vector of contiguous BKLMDigits
+    BKLMHit1d(const std::vector<Belle2::BKLMDigit*>& digits);
 
     //! Copy constructor
     BKLMHit1d(const BKLMHit1d&);
@@ -38,51 +38,41 @@ namespace Belle2 {
     //! Destructor
     virtual ~BKLMHit1d() {}
 
-    //! returns flag whether this 1D hit is in RPC (true) or scintillator (false)
+    //! @return whether this 1D hit is in RPC (true) or scintillator (false)
     bool inRPC() const { return ((m_ModuleID & BKLM_INRPC_MASK) != 0); }
 
-    //! returns end (TRUE=forward or FALSE=backward) of this 1D hit
+    //! @return detector end (TRUE=forward or FALSE=backward) of this 1D hit
     bool isForward() const { return ((m_ModuleID & BKLM_END_MASK) != 0); }
 
-    //! returns sector number (1..8) of this 1D hit
+    //! @return sector number (1..8) of this 1D hit
     int getSector() const { return (((m_ModuleID & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1); }
 
-    //! returns layer number (1..15) of this 1D hit
+    //! @return layer number (1..15) of this 1D hit
     int getLayer() const { return (((m_ModuleID & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1); }
 
-    //! returns readout plane of this 1D hit
+    //! @return readout plane of this 1D hit
     bool isPhiReadout() const { return ((m_ModuleID & BKLM_PLANE_MASK) != 0); }
 
-    //! returns lowest strip number of this 1D hit
+    //! @return lowest strip number of this 1D hit
     int getStripMin() const { return (((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1); }
 
-    //! returns lowest strip number of this 1D hit
+    //! @return lowest strip number of this 1D hit
     int getStripMax() const { return (((m_ModuleID & BKLM_MAXSTRIP_MASK) >> BKLM_MAXSTRIP_BIT) + 1); }
 
-    //! returns detector-module identifier
+    //! @return detector-module identifier
+    //! @sa BKLMStatus.h
     int getModuleID() const { return m_ModuleID; }
 
-    //! returns reconstructed hit time
+    //! @return reconstructed hit time (ns)
     float getTime() const { return m_Time; }
 
-    //! returns energy deposition
+    //! @return energy deposition (MeV)
     float getEDep() const { return m_EDep; }
 
   private:
 
-    //! detector-module identifier, internally calculated (see BKLMStatus)
-    //! bit 0      = end-1 [0..1]; forward is 0
-    //! bits 1-3   = sector-1 [0..7]
-    //! bits 4-7   = layer-1 [0..14]
-    //! bit 8      = plane-1 [0..1]; inner is 0 and phiReadout
-    //! bits 9-15  = strip-1 [0..95]
-    //! bits 16-22 = maxStrip-1 [0..95] for RPCs only
-    //! bit 23     = inRPC flag
-    //! bit 24     = MC-generated hit
-    //! bit 25     = MC decay-point hit
-    //! bit 26     = out-of-time hit (from BKLM hit reconstruction)
-    //! bit 27     = inefficient hit (from BKLM hit reconstruction)
-    //! bit 28     = pulse height above threshold (from BKLM scint hit reconstruction)
+    //! detector-module identifier
+    //! @sa BKLMStatus.h
     int m_ModuleID;
 
     //! reconstructed hit time (ns)

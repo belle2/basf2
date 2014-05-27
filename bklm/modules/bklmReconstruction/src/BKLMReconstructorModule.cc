@@ -129,7 +129,6 @@ void BKLMReconstructorModule::event()
       const bklm::Module* m = m_GeoPar->findModule(hit2d->isForward(), hit2d->getSector(), hit2d->getLayer());
       CLHEP::Hep3Vector local = m->getLocalPosition(hit2d->getPhiStripAve(), hit2d->getZStripAve());
       CLHEP::Hep3Vector global = m->localToGlobal(local);
-      hit2d->setLocalPosition(local.x(), local.y(), local.z());
       hit2d->setGlobalPosition(global.x(), global.y(), global.z());
     }
   }

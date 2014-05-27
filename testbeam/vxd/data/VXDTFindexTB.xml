@@ -40,11 +40,11 @@
 <!-- 	<xi:include href="TB4GeVNoMagnetNoAlignedSource2014May212TEL-moreThan1500MeV_TEL.xml"/> -->
 	
 	<!-- tests may27 - run 470 -->
-	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27InnerTEL-moreThan1500MeV_TEL.xml"/>
-	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27OuterTEL-moreThan1500MeV_TEL.xml"/>
-	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27PXDSVD-moreThan1500MeV_PXDSVD.xml"/>
-	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27PXDSVDTEL-moreThan1500MeV_TELPXDSVD.xml"/>
-	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27SVD-moreThan1500MeV_SVD.xml"/>
+	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27MINIInnerTEL-moreThan1500MeV_TEL.xml"/>
+	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27MINIOuterTEL-moreThan1500MeV_TEL.xml"/>
+	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27MINIPXDSVD-moreThan1500MeV_PXDSVD.xml"/>
+	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27MINIPXDSVDTEL-moreThan1500MeV_TELPXDSVD.xml"/>
+	<xi:include href="R470TB3GeVNoMagnetNoAlignedSource2014May27MINISVD-moreThan1500MeV_SVD.xml"/>
 
 
 	<!-- tests may27 - run 470 fine -->

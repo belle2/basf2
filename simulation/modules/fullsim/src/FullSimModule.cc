@@ -233,7 +233,7 @@ void FullSimModule::initialize()
   //Apply the Geant4 UI commands
   if (m_uiCommands.size() > 0) {
     G4UImanager* uiManager = G4UImanager::GetUIpointer();
-    for (vector<string>::iterator iter = m_uiCommands.begin(); iter != m_uiCommands.end(); iter++) {
+    for (vector<string>::iterator iter = m_uiCommands.begin(); iter != m_uiCommands.end(); ++iter) {
       uiManager->ApplyCommand(*iter);
     }
   }

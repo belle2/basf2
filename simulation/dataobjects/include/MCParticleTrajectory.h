@@ -64,8 +64,10 @@ namespace Belle2 {
     void simplify(float angular_tolerance, float distance_tolerance);
 
   private:
+    //! Collection of points along the trajectory
     std::vector<MCTrajectoryPoint> m_points;
 
+    //! Needed to make the ROOT object storable
     ClassDef(MCParticleTrajectory, 1);
   };
 

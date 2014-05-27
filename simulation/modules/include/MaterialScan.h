@@ -142,6 +142,8 @@ namespace Belle2 {
 
     /** Origin for the spherical scan */
     G4ThreeVector m_origin;
+
+    /** Flag to indicate if polar-angular sampling is uniform in cos(theta) rather than theta */
     bool m_doCosTheta;
   };
 

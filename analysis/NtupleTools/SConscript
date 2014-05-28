@@ -2,10 +2,11 @@ Import('env')
 env['SUBLIB'] = True
 env['LIBS'] = [
        	      'framework', 
-	      'analysis',
-	      'analysis_dataobjects', 
-	      'simulation_dataobjects',
-	      'arich_dataobjects',
+	      	  'analysis',
+	          'analysis_dataobjects',
+	          'analysis_DecayDescriptor', 
+	          'simulation_dataobjects',
+	          'arich_dataobjects',
               'bklm_dataobjects',
               'cdc_dataobjects',
               'ecl_dataobjects',
@@ -16,7 +17,7 @@ env['LIBS'] = [
               'svd_dataobjects',
               'top_dataobjects',
               'vxd_dataobjects',
-	      'genfit2'
-	      ]
+	          'genfit2'
+	          ]
 Return('env')
 

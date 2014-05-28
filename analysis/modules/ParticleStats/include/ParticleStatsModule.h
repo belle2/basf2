@@ -40,7 +40,7 @@ namespace Belle2 {
     TMatrix*  m_PassMatrix;
     /** Particle multiplicity matrix for the particle lists. */
     TMatrix*  m_MultiplicityMatrix;
-    /**< Decay descriptor of the particle being selected */
+    /** Decay descriptor of the particle being selected */
     DecayDescriptor m_decaydescriptor;
 
   public:

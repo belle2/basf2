@@ -79,6 +79,9 @@ namespace Belle2 {
 
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of the particle being selected */
 
+    /**
+     * Prints out the values of variables specified by the user via the Variables module parameter
+     */
     void printVariables(const Particle* particle) const;
   };
 

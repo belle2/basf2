@@ -71,9 +71,6 @@ namespace Belle2 {
 
   private:
 
-    // TODO: delete
-    void print() const;
-
     const unsigned int numberOfLists; /**< Number of lists which are combined */
     unsigned int iCombination; /**< The current position of the combination */
     unsigned int nCombinations; /**< The total amount of combinations */
@@ -113,8 +110,6 @@ namespace Belle2 {
 
 
   private:
-
-    void print() const;
 
     const unsigned int numberOfLists;  /**< Number of lists which are combined */
     unsigned int iCombination;         /**< The current position of the combination */
@@ -221,9 +216,6 @@ namespace Belle2 {
     bool currentCombinationIsUnique();
 
   private:
-
-    // TODO: delete
-    void printCombiner();
 
     ListCombiner listCombiner;   /**< ListCombiner makes the combinations of the types of sublists of the PCombinerLists */
     IndexCombiner indexCombiner; /**< IndexCombiner makes the combinations of indices stored in the sublists of the PCombinerLists */

@@ -260,7 +260,7 @@ namespace Belle2 {
     void TOPReconstructorModule::getTracks(std::vector<TOPtrack>& tracks,
                                            Const::ChargedStable chargedStable)
     {
-      ExtDetectorID myDetID = EXT_TOP; // TOP
+      Const::EDetector myDetID = Const::EDetector::TOP; // TOP
       int NumBars = m_topgp->getNbars();
       int pdgCode = abs(chargedStable.getPDGCode());
       double mass = chargedStable.getMass();

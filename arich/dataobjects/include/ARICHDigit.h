@@ -32,7 +32,7 @@ namespace Belle2 {
     ARICHDigit():
       m_moduleID(-1),
       m_channelID(-1),
-      m_globalTime(0) {
+      m_globalTime(0.0) {
       /*! does nothing */
     }
 
@@ -42,11 +42,10 @@ namespace Belle2 {
       \param channelID Id number of hit channel
       \param globalTime global time of hit
      */
-    ARICHDigit(int moduleID, int channelID, double globalTime):
-      m_moduleID(moduleID),
-      m_channelID(channelID),
-      m_globalTime(globalTime) {
-      /*! Does nothing */
+    ARICHDigit(int moduleID, int channelID, double globalTime) {
+      m_moduleID = moduleID;
+      m_channelID = channelID;
+      m_globalTime = (float) globalTime;
     }
 
     //! Destructor
@@ -62,7 +61,7 @@ namespace Belle2 {
 
     //! Get global time of hit
     double getGlobalTime() const { return m_globalTime; }
-
+    /*
     //! Set ID number of module that registered hit
     void setModuleID(int moduleID) { m_moduleID = moduleID; }
 
@@ -71,12 +70,12 @@ namespace Belle2 {
 
     //! Set global time of hit
     void setGlobalTime(double globalTime) { m_globalTime = globalTime; }
-
+    */
   private:
 
     int m_moduleID;           /**< ID number of module that registered hit */
     int m_channelID;          /**< ID number of hit channel */
-    double m_globalTime;      /**< Global time of hit */
+    float m_globalTime;      /**< Global time of hit */
 
     ClassDef(ARICHDigit, 1); /**< the class title */
 

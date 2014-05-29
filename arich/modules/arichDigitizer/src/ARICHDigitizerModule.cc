@@ -150,10 +150,8 @@ namespace Belle2 {
       if (!newhit) continue;
 
       // register new digit
-      ARICHDigit* newHit = arichDigits.appendNew();
-      newHit->setModuleID(moduleID);
-      newHit->setChannelID(channelID);
-      newHit->setGlobalTime(globaltime);
+      new(arichDigits.nextFreeAddress()) ARICHDigit(moduleID, channelID, globaltime);
+
     } // for iHit
 
     m_nEvent++;

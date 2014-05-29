@@ -31,10 +31,13 @@ namespace Belle2 {
     //! Empty constructor
     /*! Recommended for ROOT IO */
     ARICHAeroHit():
-      m_trackID(-1),
       m_particleID(-1),
-      m_position(0, 0, 0),
-      m_momentum(0, 0, 0) {
+      m_x(0.0),
+      m_y(0.0),
+      m_z(0.0),
+      m_px(0.0),
+      m_py(0.0),
+      m_pz(0.0) {
       /*! does nothing */
     }
 
@@ -45,47 +48,36 @@ namespace Belle2 {
       \param position vector of track position on aerogel plane
       \param momentum vector of track momentum on aerogel plane
     */
-    ARICHAeroHit(int trackId,
-                 int particleId,
+    ARICHAeroHit(int particleId,
                  TVector3 position,
-                 TVector3 momentum) :
-      m_trackID(trackId),
-      m_particleID(particleId),
-      m_position(position),
-      m_momentum(momentum) {
+                 TVector3 momentum) {
+      m_particleID = particleId;
+      m_x = (float) position.x();
+      m_y = (float) position.y();
+      m_z = (float) position.z();
+      m_px = (float) momentum.x();
+      m_py = (float) momentum.y();
+      m_pz = (float) momentum.z();
     }
-
-    //! Set Geant4 track ID
-    void setTrackID(int trackId) { m_trackID = trackId; }
-
-    //! Set particle PDG identity number
-    void setPDG(int particleId) { m_particleID = particleId; }
-
-    //! Set track position (at entrance in 1. aerogel plane)
-    void setPosition(TVector3 position) { m_position = position; }
-
-    //! Set track momentum  (at entrance in 1. aerogel plane)
-    void setMomentum(TVector3 momentum) { m_momentum = momentum; }
-
-    //! Get Geant4 track ID
-    int getTrackID() const { return m_trackID; }
 
     //! Get particle PDG identity number
     int getPDG() const { return m_particleID; }
 
     //! Get track position (at entrance in 1. aerogel plane)
-    const TVector3& getPosition() const { return m_position; }
+    TVector3 getPosition() const { TVector3 vec(m_x, m_y, m_z); return vec; }
 
     //! Get track momentum  (at entrance in 1. aerogel plane)
-    const TVector3& getMomentum() const { return m_momentum; }
+    TVector3 getMomentum() const { TVector3 vec(m_px, m_py, m_pz); return vec; }
 
   private:
 
-    int m_trackID;             /**< G4 id of track */
-    int m_particleID;          /**< particle PDG id number */
-    TVector3 m_position;       /**< track position (at entrance in 1. aerogel plane) */
-    TVector3 m_momentum;       /**< track position (at entrance in 1. aerogel plane) */
-
+    int m_particleID;  /**< PDG code of particle */
+    float  m_x;        /**< impact point, x component (at entrance in 1. aerogel plane) */
+    float  m_y;        /**< impact point, x component (at entrance in 1. aerogel plane) */
+    float  m_z;        /**< impact point, x component (at entrance in 1. aerogel plane) */
+    float  m_px;       /**< impact momentum, x component (at entrance in 1. aerogel plane) */
+    float  m_py;       /**< impact momentum, x component (at entrance in 1. aerogel plane) */
+    float  m_pz;       /**< impact momentum, x component (at entrance in 1. aerogel plane) */
 
     ClassDef(ARICHAeroHit, 1); /**< the class title */
 

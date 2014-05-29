@@ -308,11 +308,7 @@ int arichBtestModule::readhapd(unsigned int len, unsigned int* data)
             TVector2 loc = _arichgp->getChannelCenterLoc(channel);
             if (abs(loc.X()) > 2.3 || abs(loc.Y()) > 2.3) continue;
 
-            ARICHDigit* newHit = arichDigits.appendNew();
-            newHit->setModuleID(module + 1);
-            newHit->setChannelID(channel);
-            newHit->setGlobalTime(globalTime);
-
+            new(arichDigits.nextFreeAddress()) ARICHDigit(module + 1, channel, globalTime);
 
             TVector3 rechit = _arichgp->getChannelCenterGlob(module + 1, channel);
             pair<double, double> poshapd(_arichbtgp->GetHapdChannelPosition(module * 144 + channelID));
@@ -427,8 +423,7 @@ int arichBtestModule::readdata(gzFile fp, int rec_id, int)
       StoreArray<ARICHAeroHit> arichAeroHits;
       if (!arichAeroHits.isValid()) arichAeroHits.create();
 
-      int trackId    = 1;
-      int particleId = 0;// geant4
+      int particleId = 11;// geant4
       dir *= m_beamMomentum * Unit::GeV;
       r *= Unit::mm / mm;
       static ARICHBtestGeometryPar* _arichbtgp = ARICHBtestGeometryPar::Instance();
@@ -455,11 +450,7 @@ int arichBtestModule::readdata(gzFile fp, int rec_id, int)
       B2DEBUG(50, "-----------> " <<  rc.x() <<  " " << rc.y() << " " <<   rc.z() << "::::" << rrel.x() <<  " " << rrel.y() << " " <<   rrel.z()  << " ----> R " <<   r.x() <<  " " << r.y() << " " <<   r.z() << " ----> S " <<   dir.x() <<  " " << dir.y() << " " <<   dir.z());
 
       // Add new ARIHCAeroHit to datastore
-      ARICHAeroHit* newAeroHit = arichAeroHits.appendNew();
-      newAeroHit->setTrackID(trackId);
-      newAeroHit->setPDG(particleId);
-      newAeroHit->setPosition(r);
-      newAeroHit->setMomentum(dir);
+      new(arichAeroHits.nextFreeAddress()) ARICHAeroHit(particleId, r, dir);
     }
   }
 

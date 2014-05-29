@@ -20,7 +20,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
-#include <TVector3.h>
+#include <TVector2.h>
 #include <TRandom3.h>
 
 using namespace std;
@@ -83,8 +83,6 @@ namespace Belle2 {
       //Get photon energy
       const G4double energy = track.GetKineticEnergy() / eV;
 
-      //Get ID of parent particle
-      const G4int parentID = track.GetParentID();
       //Get id of particle
       const G4int trackID = track.GetTrackID();
 
@@ -92,10 +90,10 @@ namespace Belle2 {
       //                Create ARICHSimHit and save it to datastore
       //------------------------------------------------------------
 
-      TVector3 locpos(localPosition.x() / cm, localPosition.y() / cm, localPosition.z() / cm);
+      TVector2 locpos(localPosition.x() / cm, localPosition.y() / cm);
       StoreArray<ARICHSimHit> arichSimHits;
       if (!arichSimHits.isValid()) arichSimHits.create();
-      new(arichSimHits.nextFreeAddress()) ARICHSimHit(moduleID, locpos, globalTime, energy, parentID);
+      new(arichSimHits.nextFreeAddress()) ARICHSimHit(moduleID, locpos, globalTime, energy);
 
       // add relation to MCParticle
       StoreArray<MCParticle> mcParticles;

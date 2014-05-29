@@ -80,7 +80,7 @@ namespace Belle2 {
         StoreArray<ARICHAeroHit> arichAeroHits;
         if (!arichAeroHits.isValid()) arichAeroHits.create();
 
-        new(arichAeroHits.nextFreeAddress()) ARICHAeroHit(trackID, PDGEncoding, TPosition, TMomentum);
+        new(arichAeroHits.nextFreeAddress()) ARICHAeroHit(PDGEncoding, TPosition, TMomentum);
 
         // Create relation to MCParticle
         StoreArray<MCParticle> mcParticles;

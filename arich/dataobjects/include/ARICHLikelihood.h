@@ -64,17 +64,17 @@ namespace Belle2 {
                     double Nphot_K,
                     double Nphot_p) {
       m_flag = flag;
-      m_logL_e  = logL_e;
-      m_logL_mu = logL_mu;
-      m_logL_pi = logL_pi;
-      m_logL_K  = logL_K;
-      m_logL_p  = logL_p;
+      m_logL_e  = (float) logL_e;
+      m_logL_mu = (float) logL_mu;
+      m_logL_pi = (float) logL_pi;
+      m_logL_K  = (float) logL_K;
+      m_logL_p  = (float) logL_p;
       m_Nphot = Nphot;
-      m_Nphot_e  = Nphot_e;
-      m_Nphot_mu = Nphot_mu;
-      m_Nphot_pi = Nphot_pi;
-      m_Nphot_K  = Nphot_K;
-      m_Nphot_p  = Nphot_p;
+      m_Nphot_e  = (float) Nphot_e;
+      m_Nphot_mu = (float) Nphot_mu;
+      m_Nphot_pi = (float) Nphot_pi;
+      m_Nphot_K  = (float) Nphot_K;
+      m_Nphot_p  = (float) Nphot_p;
     }
 
     /*! full constructor
@@ -86,17 +86,17 @@ namespace Belle2 {
 
     ARICHLikelihood(int flag, double logL[5], int Nphot, double Nphot_expect[5]) {
       m_flag = flag;
-      m_logL_e  = logL[0];
-      m_logL_mu = logL[1];
-      m_logL_pi = logL[2];
-      m_logL_K  = logL[3];
-      m_logL_p  = logL[4];
+      m_logL_e  = (float) logL[0];
+      m_logL_mu = (float) logL[1];
+      m_logL_pi = (float) logL[2];
+      m_logL_K  = (float) logL[3];
+      m_logL_p  = (float) logL[4];
       m_Nphot = Nphot;
-      m_Nphot_e  = Nphot_expect[0];
-      m_Nphot_mu = Nphot_expect[1];
-      m_Nphot_pi = Nphot_expect[2];
-      m_Nphot_K  = Nphot_expect[3];
-      m_Nphot_p  = Nphot_expect[4];
+      m_Nphot_e  = (float) Nphot_expect[0];
+      m_Nphot_mu = (float) Nphot_expect[1];
+      m_Nphot_pi = (float) Nphot_expect[2];
+      m_Nphot_K  = (float) Nphot_expect[3];
+      m_Nphot_p  = (float) Nphot_expect[4];
     }
 
     /*! Get reconstruction flag
@@ -161,17 +161,17 @@ namespace Belle2 {
 
   private:
     int m_flag;          /**< reconstruction flag */
-    double m_logL_e;     /**< log likelihood for electron hypothesis */
-    double m_logL_mu;    /**< log likelihood for muon hypothesis */
-    double m_logL_pi;    /**< log likelihood for pion hypothesis */
-    double m_logL_K;     /**< log likelihood for kaon hypothesis */
-    double m_logL_p;     /**< log likelihood for proton hypothesis */
+    float m_logL_e;     /**< log likelihood for electron hypothesis */
+    float m_logL_mu;    /**< log likelihood for muon hypothesis */
+    float m_logL_pi;    /**< log likelihood for pion hypothesis */
+    float m_logL_K;     /**< log likelihood for kaon hypothesis */
+    float m_logL_p;     /**< log likelihood for proton hypothesis */
     int m_Nphot;         /**< number of detected photons */
-    double m_Nphot_e;    /**< number of expected photons for electron hypothesis */
-    double m_Nphot_mu;   /**< number of expected photons for muon hypothesis */
-    double m_Nphot_pi;   /**< number of expected photons for pion hypothesis */
-    double m_Nphot_K;    /**< number of expected photons for kaon hypothesis */
-    double m_Nphot_p;    /**< number of expected photons for proton hypothesis */
+    float m_Nphot_e;    /**< number of expected photons for electron hypothesis */
+    float m_Nphot_mu;   /**< number of expected photons for muon hypothesis */
+    float m_Nphot_pi;   /**< number of expected photons for pion hypothesis */
+    float m_Nphot_K;    /**< number of expected photons for kaon hypothesis */
+    float m_Nphot_p;    /**< number of expected photons for proton hypothesis */
 
     ClassDef(ARICHLikelihood, 1); /**< the class title */
 

@@ -61,7 +61,12 @@ evtmetagen.param({'evtNumList': [2], 'runList': [1]})
 geobuilder.param('Components', ['MagneticField', 'CDC'])
 
 #...CDC Trigger...
-cdctrg.param('ConfigFile', os.path.join(basf2datadir,"trg/cdc/TRGCDCConfig_0_20101111_1051.dat"))
+#cdctrg.param('ConfigFile', os.path.join(basf2datadir,"trg/cdc/TRGCDCConfig_0_20101111_1051.dat"))
+cdctrg.param('ConfigFile', os.path.join(basf2datadir,"trg/cdc/TRGCDCConfig_0_20101111_1051_2013beamtest.dat"))
+
+
+#cdctrg.param('makeRootFile', True)
+
 cdctrg.param('InnerTSLUTDataFile', os.path.join(basf2datadir,"trg/cdc/LRLUTIN.coe"))
 cdctrg.param('OuterTSLUTDataFile', os.path.join(basf2datadir,"trg/cdc/LRLUT.coe"))
 cdctrg.param('TSFLUTSL0DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL0.coe"))
@@ -75,13 +80,13 @@ cdctrg.param('TSFLUTSL7DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL
 cdctrg.param('TSFLUTSL8DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL8.coe"))
 cdctrg.param('DebugLevel', 10)
 cdctrg.param('CurlBackStop', 1)
-cdctrg.param('SimulationMode', 1)
+cdctrg.param('SimulationMode', 2)
 cdctrg.param('FastSimulationMode', 2)
 cdctrg.param('2DFinderPerfect',1)
 #cdctrg.param('HoughFinderMeshX',180)
 #cdctrg.param('HoughFinderMeshY',24)
 #cdctrg.param('SimulationMode',0x11)
-#cdctrg.param('RootTRGCDCFile', 'TRGCDC.root')
+#cdctrg.param('RootTRGCDCFile', 'TRGCDC1.root')
 #cdctrg.param('RootFitter3DFile', 'Fitter3D.root')
 #cdctrg.param('Fitter3DLRLUT', 0)
 #cdctrg.param('TRGCDCRootFile',1)

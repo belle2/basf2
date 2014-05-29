@@ -110,6 +110,13 @@ class TRGCDCMerger
     void dump(const std::string & message = "",
                const std::string & pre = "") const;
 
+    //Dump all the details of _mosb into a .log file, do it in the end of simulate()
+    void dump_log(void) const;
+    void dump_log_inner(void) const;
+    void dump_log_outer(void) const;
+
+
+
   private: 
 
     /// Unit type.

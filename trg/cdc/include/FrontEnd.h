@@ -70,7 +70,7 @@ class TRGCDCFrontEnd
 
     /// output from FrontEnd
     //    TRGSignalBundle  output(void) { return *_osb;};
-    TRGSignalBundle* getOSB(void) { return _osb; };
+    TRGSignalBundle* getOSB(void) const { return _osb; };
 
 
   public:// VHDL utilities
@@ -119,9 +119,16 @@ class TRGCDCFrontEnd
     void dump(const std::string & message = "",
 	      const std::string & pre = "") const;
 
-  public: // allow Merger class to access FrontEnd data
+    //Dump all the details of _mosb into a .log file, do it in the end of simulate()
+    void dump_log(void) const;
+    void dump_log_innerInside(void) const;
+    void dump_log_innerOutside(void) const;
+    void dump_log_outerInside(void) const;
+    void dump_log_outerOutside(void) const;
+
+//  public: // allow Merger class to access FrontEnd data
     
-    friend class TRGCDCMerger;
+    //friend class TRGCDCMerger;
 
   private:
 

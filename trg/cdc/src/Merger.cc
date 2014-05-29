@@ -177,8 +177,14 @@ TRGCDCMerger::simulate(void) {
   //  TRGSignalBundle*  testin = ((*this)[0])->_osb;
   //  TRGSignalBundle  testin2 = new TRGSignalBundle( ((*this)[0])->output() ); 
   //TRGSignalBundle * testin = new TRGSignalBundle * ((*this)[0]->output());
-  TRGSignalVector * input1 = new TRGSignalVector ( *(((*this)[0]->_osb)[0])[0] ), 
-                  * input2 = new TRGSignalVector ( *(((*this)[1]->_osb)[0])[0] );
+  //TRGSignalVector * input1 = new TRGSignalVector ( *(((*this)[0]->_osb)[0])[0] ), 
+  //                * input2 = new TRGSignalVector ( *(((*this)[1]->_osb)[0])[0] );
+
+
+  // _osb in FrontEnd.h is private, use getOSB() to get input bundle.
+	TRGSignalVector * input1 = new TRGSignalVector(*(  (*(*this)[0]->getOSB())[0]  ));
+	TRGSignalVector * input2 = new TRGSignalVector(*(  (*(*this)[1]->getOSB())[0]  ));
+
  
    for (unsigned s = 0; s < input1->size(); s++)  {
     TRGSignal ws = (*input1)[s];
@@ -199,9 +205,9 @@ TRGCDCMerger::simulate(void) {
 #ifdef TRG_DEBUG
   _misb->dump("detail", TRGDebug::tab());
 #endif
-  cout<<"Merger input start"<<endl;
-  _misb->dump("detail", TRGDebug::tab());
-  cout<<"Merger input end"<<endl;
+//  cout<<"Merger input start"<<endl;
+//  _misb->dump("detail", TRGDebug::tab());
+//  cout<<"Merger input end"<<endl;
 
   //...Data clock...                                                                                   
   // Data clock position data is omitted. Is this problem?   
@@ -224,9 +230,14 @@ TRGCDCMerger::simulate(void) {
   }
   mosb = _mosb;
 
-  cout<<"Merger output start"<<endl;
-  _mosb->dump("detail", TRGDebug::tab());
-  cout<<"Merger output end"<<endl;
+//  cout<<"Merger output start"<<endl;
+//  _mosb->dump("detail", TRGDebug::tab());
+//  cout<<"Merger output end"<<endl;
+
+//	dump_log();	//dump details of _mosb into a .log file
+
+
+
 
   // Terminate
   delete input1;
@@ -290,6 +301,33 @@ TCMerger::packerInner(const TRGState & input) {
   s.set(32,48,hitptn1);
   unsigned p = 80;
 
+  bool PTS_in_hit[16];
+  bool PTS_out_hit[16];
+  for (unsigned i=0; i<16; i++) {
+        if (i == 0){
+        PTS_in_hit[i] = hitptn0[0] || hitptn0[16];
+        PTS_out_hit[i] = hitptn1[0] || hitptn1[1] || hitptn1[16] || hitptn1[17] || hitptn1[32] || hitptn1[33] || hitptn1[34];
+        }
+        else if (i == 1){
+        PTS_in_hit[i] = hitptn0[1] || hitptn0[16] || hitptn0[17];
+        PTS_out_hit[i] = hitptn1[0] || hitptn1[1] || hitptn1[2] || hitptn1[16] || hitptn1[17] || hitptn1[18] || hitptn1[32] || hitptn1[33] || hitptn1[34] || hitptn1[35];
+	}
+        else if (i == 14){
+        PTS_in_hit[i] = hitptn0[14] || hitptn0[29] || hitptn0[30];
+        PTS_out_hit[i] = hitptn1[13] || hitptn1[14] || hitptn1[15] || hitptn1[28] || hitptn1[29] || hitptn1[30] || hitptn1[31] || hitptn1[44] || hitptn1[45] || hitptn1[46] || hitptn1[47];
+        }
+        else if (i == 15){
+        PTS_in_hit[i] = hitptn0[15] || hitptn0[30] || hitptn0[31];
+        PTS_out_hit[i] = hitptn1[14] || hitptn1[15] || hitptn1[29] || hitptn1[30] || hitptn1[31] || hitptn1[45] || hitptn1[46] || hitptn1[47];
+        }
+        else
+        {
+        PTS_in_hit[i] = hitptn0[i] || hitptn0[i+15] || hitptn0[i+16];
+        PTS_out_hit[i] = hitptn1[i-1] || hitptn1[i] || hitptn1[i+1] || hitptn1[i+14] || hitptn1[i+15] || hitptn1[i+16] || hitptn1[i+17] || hitptn1[i+30] || hitptn1[i+31] || hitptn1[i+32] || hitptn1[i+33] || hitptn1[i+34];
+        }
+  }
+
+
   // ... priority time ... and 2nd priority location .... already prepared in FrontEnd packer
   const bool * const pt[16] = {
     &binside[33],  &binside[38],  &binside[43],  &binside[48],
@@ -323,12 +361,19 @@ TCMerger::packerInner(const TRGState & input) {
       TRGState st[2];
       st[0] = TRGState(5, ftinside[i] );
       st[1] = TRGState(5, ftoutside[i]);
-      if ( st[0] < st[1] ) {
-	  s.set(p, 4, &binside[129 + i*5]);    
-      }
-      else {
-	  s.set(p, 4, &boutside[49 + i*5]);
-      }
+        if ( !PTS_in_hit[i] ) st[0].set(5, true);
+        if ( !PTS_out_hit[i] )   st[1].set(5, true);
+
+        if ( PTS_in_hit[i] || PTS_out_hit[i]) {
+              if ( st[0] < st[1] ) {
+                  s.set(p, 4, &binside[129 + i*5]);
+              }   
+              else {
+                  s.set(p, 4, &boutside[49 + i*5]);
+              }
+        }
+        else {
+        }
       p += 4;
   }
 
@@ -337,25 +382,60 @@ TCMerger::packerInner(const TRGState & input) {
   p += 16; 
 
   // ... edge information ...
-  s.set(p, 4, &binside[209]);    p+=4;     // 4-bit hit time of cell[31]
-  s.set(p, 4, &boutside[129]);   p+=4;     // 4-bit hit time of cell[64]
-  s.set(p, 4, &boutside[134]);   p+=4;     // edge info. purely from outside FE. cell 32, 48, 64, 65 
+  
+  if (hitptn0[31])  {
+  s.set(p, 4, &binside[209]);     // 4-bit hit time of cell[31]
+  }
+  else{
+  }
+  p+=4;
+
+
+  if (hitptn1[32])  {
+  s.set(p, 4, &boutside[129]);     // 4-bit hit time of cell[64]
+  }
+  else{
+  }
+  p+=4;
+
+
+  if (hitptn1[0] || hitptn1[16] || hitptn1[32] || hitptn1[33])  {
+  s.set(p, 4, &boutside[134]);     // edge info. purely from outside FE. cell 32, 48, 64, 65 
+  }
+  else{
+  }
+  p+=4;
+
+
+
   TRGState et[2];                          // edge info. from both FE, cell 31 and 47, 62, 63, 78, 79
   et[0] = TRGState(5, &binside[208]);
   et[1] = TRGState(5, &boutside[138]);
  
   if ( (!hitptn1[15])&&(!hitptn1[30])&&(!hitptn1[31])&&(!hitptn1[46])&&(!hitptn1[47]) ) et[1].set(5,true);
   if ( (!hitptn0[31]) ) et[0].set(5,true);
-  
-  if ( et[0] < et[1] ) {
-     s.set(p, 4, &binside[209]);
+
+  if ( hitptn0[31] ||  hitptn1[15] || hitptn1[30] || hitptn1[31] || hitptn1[46] || hitptn1[47] )  {
+	  if ( et[0] < et[1] ) {
+     		s.set(p, 4, &binside[209]);
+  	}
+  	else {
+	     s.set(p, 4, &boutside[139]);
+	  }
   }
   else {
-     s.set(p, 4, &boutside[139]);
   }
-  p += 4;
-  s.set(p, 4, &boutside[144]);   p+=4;     // edge info. purely from outside FE. cell 63, 79
 
+  p += 4;
+
+
+
+  if (hitptn1[31] || hitptn1[47]) {
+  s.set(p, 4, &boutside[144]);   // edge info. purely from outside FE. cell 63, 79
+  }
+  else{
+  }
+  p+=4;
 
   // ...clock counter ...
   // no process for cc at this moment
@@ -435,6 +515,24 @@ TCMerger::packerOuter(const TRGState & input ) {
   s.set(0,48,hitptn0);
   s.set(48,32,hitptn1);
 
+  bool PTS_in_hit[16];
+  bool PTS_out_hit[16];
+  for (unsigned i=0; i<16; i++) {
+  	if (i == 0){
+	PTS_in_hit[i] = hitptn0[0] || hitptn0[1] || hitptn0[16] || hitptn0[32] ;
+	PTS_out_hit[i] = hitptn1[0] || hitptn1[16] || hitptn1[17];
+	}
+	else if (i == 15){
+	PTS_in_hit[i] = hitptn0[14] || hitptn0[14] || hitptn0[30] || hitptn0[31] || hitptn0[47] ;
+        PTS_out_hit[i] = hitptn1[14] || hitptn1[15] || hitptn1[30] || hitptn1[31];
+	}
+	else
+	{
+	PTS_in_hit[i] = hitptn0[i-1] || hitptn0[i] || hitptn0[i+1] || hitptn0[i+15] || hitptn0[i+16] || hitptn0[i+32];
+        PTS_out_hit[i] = hitptn1[i-1] || hitptn1[i] || hitptn1[i+15] || hitptn1[i+16] || hitptn1[i+17];
+	}
+  }
+
   // ... priority time ... 
   /*
   const bool * const ptinside[16] = {
@@ -454,12 +552,13 @@ TCMerger::packerOuter(const TRGState & input ) {
   // i = 0...15
   // inside binside[31+i]
   // outside boutside[i]
-  const bool scflag[2] = {false, true};
+//  const bool scflag[2] = {false, true};
   const bool dummy[6] = {false, false, false, false, false, true};
   const TRGState stDummy(6, dummy);
   unsigned p = 80;
+
   for (unsigned i=0; i<16; i++) {
-    unsigned sc=0;
+    //unsigned sc=0;
     if  ( hitptn0[32 + i] )  {
         s.set(p, 4, &binside[49 + 5*i]);;
     }
@@ -469,33 +568,47 @@ TCMerger::packerOuter(const TRGState & input ) {
       if (i==0) {      
 	if ( hitptn1[0] ) {
 	  s.set(p, 4, &boutside[49]);
-          sc = 1; 
+//          sc = 1; 
+	  s.set(208+i, 1, true);
 	}  
         else {
-          sc = 0;          
+//          sc = 0;          
+//	  s.set(209+i, 1, &scflag[sc]);
         }
       }
       else {
-        st[0] = TRGState(5, &boutside[48 + i*5]);
+        st[0] = TRGState(5, &boutside[43 + i*5]);
         st[1] = TRGState(5, &boutside[48 + i*5]);
         if ( !hitptn1[i-1] ) st[0].set(5, true);
         if ( !hitptn1[i] )   st[1].set(5, true);
-        if ( st[0] < st[1] ) {
-	  s.set(p, 4, &boutside[49 + i*5]);
-	  sc = 0;
+
+	if ( hitptn1[i] || hitptn1[i-1]) {
+          if ( st[1] < st[0] ) {
+      	    s.set(p, 4, &boutside[49 + i*5]);
+	    s.set(208+i, 1, true); // only set scflag to true when left is it and also faster
+	  }
+          else { 
+//	    sc = 1;
+	    s.set(p, 4, &boutside[44 + i*5]);
+          }
 	}
-        else { 
-	  sc = 1;
-	  s.set(p, 4, &boutside[49 + i*5]);
-        }
+	else {
+	}
+
+
       }
+
     }
-    s.set(209+i, 1, &scflag[sc]);
+//    s.set(209+i, 1, &scflag[sc]);  //the scflag is only consider when (1st not hit) && (2nd is hit)
     p += 4;
   }
 
 
   // ... fastest time ...
+
+
+
+
   /*
   const bool * const ftinside[16] = {
     &binside[129], &binside[134], &binside[139], &binside[144],
@@ -516,33 +629,81 @@ TCMerger::packerOuter(const TRGState & input ) {
       TRGState st[2];
       st[0] = TRGState(5, &binside[128 + i*5]);
       st[1] = TRGState(5, &boutside[128 + i*5]);
+
+        if ( !PTS_in_hit[i] ) st[0].set(5, true);
+        if ( !PTS_out_hit[i] )   st[1].set(5, true);
+
+	if ( PTS_in_hit[i] || PTS_out_hit[i]) {
+	      if ( st[0] < st[1] ) {
+        	  s.set(p, 4, &binside[129 + i*5]);
+	      }   
+	      else {
+	          s.set(p, 4, &boutside[129 + i*5]);
+	      }
+	}
+	else {
+	}
+/*
       if ( st[0] < st[1] ) {
 	  s.set(p, 4, &binside[129 + i*5]);
       }
       else {
 	  s.set(p, 4, &boutside[129 + i*5]);
       }
+*/
+
       p += 4;
   }
 
   // ... edge information ...
-  /*
+ /*
   const bool * const etinside[16] = {&binside[209], &binside[214] };
   const bool * const etoutside[16] = {&boutside[209], &boutside[214] };
   */
   p = 224;
+
+  if (hitptn1[15]){
   s.set(p, 4, &boutside[124]);    // 4-bit hit time of cell[63]
+  }
+
   for (unsigned i=0; i<2; i++) {
       TRGState et[2];
       // need to consider if the two areas hit
       et[0] = TRGState(5, &binside[208 + i*5]);
       et[1] = TRGState(5, &boutside[208 + i*5]);
-      p += 4;
-      if ( et[0] < et[1] ) {
-	  s.set(p, 4, &binside[209 + i*5]);
+
+      if (i == 0){
+        if ( !hitptn0[0] ) et[0].set(5, true);
+        if ( !hitptn1[16] )   et[1].set(5, true);
+        p += 4;
+	if (hitptn0[0] || hitptn1[16]){
+	      if ( et[0] < et[1] ) {
+	          s.set(p, 4, &binside[209 + i*5]);
+	      }
+	      else {
+	          s.set(p, 4, &boutside[209 + i*5]);
+	      }
+	}
+	else {
+	}
+
       }
-      else {
-	  s.set(p, 4, &boutside[209 + i*5]);
+      else if (i == 1) {
+        if ( !hitptn0[15] && !hitptn0[31]) et[0].set(5, true);
+        if ( !hitptn1[15] && !hitptn1[31])   et[1].set(5, true);
+        p += 4;
+        if ( hitptn0[15] || hitptn0[31] || hitptn1[15] || hitptn1[31] ){
+              if ( et[0] < et[1] ) {
+                  s.set(p, 4, &binside[209 + i*5]);
+              }
+              else {
+                  s.set(p, 4, &boutside[209 + i*5]);
+              }
+        }
+        else {
+        }
+
+
       }
       //      p += 4;
   }  // warning, here 'p' is at the beginning position of the last sensible data
@@ -936,6 +1097,140 @@ TCMerger:: unpackerOuter(const TRGState & input,
 
   cout << "=====================     End of Merger unpackerOuter    ========================= "<< endl;
 
+
+}
+
+void //Dump all the details of _mosb into a .log file, do it in the end of simulate()
+TRGCDCMerger::dump_log(void) const {
+	if (type()==innerType) {
+	dump_log_inner();
+	}  
+	else {
+	dump_log_outer();
+	}
+} 
+
+void
+TRGCDCMerger::dump_log_inner(void) const {
+
+		const TRGClock & dClock = TRGCDC::getTRGCDC()->dataClock();
+		ofstream output((name()+".log").c_str());
+
+		output << "Inner Superlayer Merger output dump" << endl << endl;
+
+                        const std::vector<int> changetime = _mosb->stateChanges();
+                        std::vector<vector<int>> boolvector(changetime.size());
+                for (unsigned ch_t = 0; ch_t < changetime.size(); ch_t++)       {
+
+                        for (unsigned b = 0; b <  (* _mosb)[0]->size(); b++){
+                        boolvector[ch_t].push_back(  ( (* _mosb)[0]->state(changetime[ch_t])[b])  ? 1 : 0);
+                        }
+
+                output << "# of clk: " << changetime[ch_t] << " (" << dClock.absoluteTime(changetime[ch_t]) << " ns), signal vector: " << endl;
+
+                        output << "Hitmap: " << endl << " ";
+                        for (int b = 0; b < 80; b++){
+                        output << boolvector[ch_t][79 - b] << " ";
+                        if ( b == 15 ) output << endl;
+                        else if ( b == 31 ) output << endl << " ";
+                        else if ( b == 47 ) output << endl ;
+                        else if ( b == 63 ) output << endl << " ";
+                        }
+                        output << endl;
+
+                        for (int b = 0; b < 16; b++){
+                        output << "PT#" << b << ": " << boolvector[ch_t][ 80 + 4*b + 3 ] << boolvector[ch_t][ 80 + 4*b + 2 ] << boolvector[ch_t][ 80 + 4*b + 1 ]
+                        << boolvector[ch_t][ 80 + 4*b ] << endl;
+                        }
+                        output << endl;
+
+                        for (int b = 0; b < 16; b++){
+                        output << "FT#" << b << ": " << boolvector[ch_t][ 144 + 4*b + 3 ] << boolvector[ch_t][ 144 + 4*b + 2 ] << boolvector[ch_t][ 144 + 4*b + 1 ]
+                        << boolvector[ch_t][ 144 + 4*b ] << endl;
+                        }
+
+                        output << "Secondary: " << endl;
+                        for (int b = 0; b < 16; b++){
+                        output << boolvector[ch_t][ 223 - b ] ;
+                        }
+
+                        output << endl;
+                        output << "ET#0(31): " << endl << boolvector[ch_t][227] << boolvector[ch_t][226] << boolvector[ch_t][225] << boolvector[ch_t][224] << endl;
+                        output << "ET#1(64(out32)): " << endl << boolvector[ch_t][231] << boolvector[ch_t][230] << boolvector[ch_t][229] << boolvector[ch_t][228] 
+			<< endl;
+                        output << "ET#2(32, 48, 64, 65(outside 0, 16, 32, 33)): " << endl << boolvector[ch_t][235] << boolvector[ch_t][234] << boolvector[ch_t][233] 
+			<< boolvector[ch_t][232] << endl;
+                        output << "ET#3(31, 47, 62, 63, 78, 79(inside 31, outside 15, 30, 31, 46, 47)): " << endl << boolvector[ch_t][239] << boolvector[ch_t][238] 
+			<< boolvector[ch_t][237] << boolvector[ch_t][236] << endl;
+                        output << "ET#4(63, 79(outside 31, 47)): " << endl << boolvector[ch_t][243] << boolvector[ch_t][242] << boolvector[ch_t][241] 
+			<< boolvector[ch_t][240] << endl;
+
+
+
+                output << endl;
+                }
+
+		output.close();
+
+}
+
+void
+TRGCDCMerger::dump_log_outer(void) const {
+
+		const TRGClock & dClock = TRGCDC::getTRGCDC()->dataClock();
+                ofstream output((name()+".log").c_str());
+
+		output << "Outer Superlayer Merger output dump" << endl << endl;
+
+                        const std::vector<int> changetime = _mosb->stateChanges();
+                        std::vector<vector<int>> boolvector(changetime.size());
+                for (unsigned ch_t = 0; ch_t < changetime.size(); ch_t++)       {
+
+                        for (unsigned b = 0; b <  (* _mosb)[0]->size(); b++){
+                        boolvector[ch_t].push_back(  ( (* _mosb)[0]->state(changetime[ch_t])[b])  ? 1 : 0);
+                        }
+
+                output << "# of clk: " << changetime[ch_t] << " (" << dClock.absoluteTime(changetime[ch_t]) << " ns), signal vector: " << endl;
+
+                        output << "Hitmap: " << endl << " ";
+                        for (int b = 0; b < 80; b++){
+                        output << boolvector[ch_t][79 - b] << " ";
+                        if ( b == 15 ) output << endl;
+                        else if ( b == 31 ) output << endl << " ";
+                        else if ( b == 47 ) output << endl ;
+                        else if ( b == 63 ) output << endl << " ";
+                        }
+                        output << endl;
+
+                        for (int b = 0; b < 16; b++){
+                        output << "PT#" << b << ": " << boolvector[ch_t][ 80 + 4*b + 3 ] << boolvector[ch_t][ 80 + 4*b + 2 ] << boolvector[ch_t][ 80 + 4*b + 1 ]
+                        << boolvector[ch_t][ 80 + 4*b ] << endl;
+                        }
+                        output << endl;
+
+                        for (int b = 0; b < 16; b++){
+                        output << "FT#" << b << ": " << boolvector[ch_t][ 144 + 4*b + 3 ] << boolvector[ch_t][ 144 + 4*b + 2 ] << boolvector[ch_t][ 144 + 4*b + 1 ]
+                        << boolvector[ch_t][ 144 + 4*b ] << endl;
+                        }
+
+                        output << "Secondary: ";
+                        for (int b = 0; b < 16; b++){
+                        output << boolvector[ch_t][ 223 - b ] ;
+                        }
+
+                        output << endl;
+                        output << "ET#0(63(outside 15)): " << endl << boolvector[ch_t][227] << boolvector[ch_t][226] << boolvector[ch_t][225] << boolvector[ch_t][224] 
+			<< endl;
+                        output << "ET#1(0,64(inside 0, out 16)): " << endl << boolvector[ch_t][231] << boolvector[ch_t][230] << boolvector[ch_t][229] 
+			<< boolvector[ch_t][228] << endl;
+                        output << "ET#2(15,31,63,79(inside 15, 31, outside 15, 31)): " << endl << boolvector[ch_t][235] << boolvector[ch_t][234] 
+			<< boolvector[ch_t][233] << boolvector[ch_t][232] << endl;
+
+                output << endl;
+                }
+
+
+		output.close();
 
 }
 

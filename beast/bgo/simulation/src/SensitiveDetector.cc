@@ -49,12 +49,19 @@ namespace Belle2 {
       const G4Track& track    = *step->GetTrack();
       const int trackID       = track.GetTrackID();
       const double depEnergy  = step->GetTotalEnergyDeposit() * Unit::MeV;
+      const double nielEnergy = step->GetNonIonizingEnergyDeposit() * Unit::MeV;
+      const G4ThreeVector G4tkPos = step->GetTrack()->GetPosition();
+      TVector3 tkPos(G4tkPos.x() * Unit::cm, G4tkPos.y() * Unit::cm, G4tkPos.z() * Unit::cm);
+      const G4ThreeVector G4tkMom = step->GetTrack()->GetMomentum();
+      TVector3 tkMom(G4tkMom.x() * Unit::MeV, G4tkMom.y() * Unit::MeV, G4tkMom.z() * Unit::MeV);
+      const G4ThreeVector G4tkMomDir = step->GetTrack()->GetMomentumDirection();
+      TVector3 tkMomDir(G4tkMomDir.x() * Unit::MeV, G4tkMomDir.y() * Unit::MeV, G4tkMomDir.z() * Unit::MeV);
+      const int tkPDG = step->GetTrack()->GetDefinition()->GetPDGEncoding();
+      const double tkKEnergy = step->GetTrack()->GetKineticEnergy();
       const int detNb = step->GetTrack()->GetVolume()->GetCopyNo();
-
+      const double GlTime = step->GetPreStepPoint()->GetGlobalTime();
       //Ignore everything below 1eV
       if (depEnergy < Unit::eV) return false;
-
-
 
       //Get the datastore arrays
       StoreArray<MCParticle>  mcParticles;
@@ -65,7 +72,14 @@ namespace Belle2 {
       const int hitIndex = simHits.getEntries();
       new(simHits.nextFreeAddress()) BgoSimHit(
         depEnergy,
-        detNb
+        nielEnergy,
+        tkPos,
+        tkMom,
+        tkMomDir,
+        tkPDG,
+        tkKEnergy,
+        detNb,
+        GlTime
       );
 
       //Add Relation between SimHit and MCParticle with a weight of 1. Since

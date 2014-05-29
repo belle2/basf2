@@ -59,11 +59,9 @@ namespace Belle2 {
       const int tkPDG = step->GetTrack()->GetDefinition()->GetPDGEncoding();
       const double tkKEnergy = step->GetTrack()->GetKineticEnergy();
       const int detNb = step->GetTrack()->GetVolume()->GetCopyNo();
-
+      const double GlTime = step->GetPreStepPoint()->GetGlobalTime();
       //Ignore everything below 1eV
       if (depEnergy < Unit::eV) return false;
-
-
 
       //Get the datastore arrays
       StoreArray<MCParticle>  mcParticles;
@@ -80,7 +78,8 @@ namespace Belle2 {
         tkMomDir,
         tkPDG,
         tkKEnergy,
-        detNb
+        detNb,
+        GlTime
       );
 
       //Add Relation between SimHit and MCParticle with a weight of 1. Since

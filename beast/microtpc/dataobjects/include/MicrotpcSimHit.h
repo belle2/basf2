@@ -27,14 +27,14 @@ namespace Belle2 {
   class MicrotpcSimHit : public TObject {
   public:
     /** default constructor for ROOT */
-    MicrotpcSimHit(): m_energyDep(0), m_energyNiel(0), m_tkPDG(0), m_tkKEnergy(0), m_detNb(0) {}
+    MicrotpcSimHit(): m_energyDep(0), m_energyNiel(0), m_tkPDG(0), m_tkKEnergy(0), m_detNb(0), m_GlTime(0) {}
 
 
     /** Standard constructor
      * @param energyDep Deposited energy in electrons
      */
-    MicrotpcSimHit(float energyDep, float energyNiel, TVector3 tkPos, TVector3 tkMom, TVector3 tkMomDir, int tkPDG, float tkKEnergy, float detNb):
-      m_energyDep(energyDep), m_energyNiel(energyNiel), m_tkPos(tkPos), m_tkMom(tkMom), m_tkMomDir(tkMomDir), m_tkPDG(tkPDG), m_tkKEnergy(tkKEnergy), m_detNb(detNb) {}
+    MicrotpcSimHit(float energyDep, float energyNiel, TVector3 tkPos, TVector3 tkMom, TVector3 tkMomDir, int tkPDG, float tkKEnergy, float detNb, float GlTime):
+      m_energyDep(energyDep), m_energyNiel(energyNiel), m_tkPos(tkPos), m_tkMom(tkMom), m_tkMomDir(tkMomDir), m_tkPDG(tkPDG), m_tkKEnergy(tkKEnergy), m_detNb(detNb), m_GlTime(GlTime) {}
 
     /** Return the energy deposition in electrons */
     float getEnergyDep()      const { return m_energyDep; }
@@ -52,6 +52,8 @@ namespace Belle2 {
     float gettkKEnergy()  const { return m_tkKEnergy; }
     /** Return the TPC number */
     float getdetNb()  const { return m_detNb; }
+    /** Return the global time */
+    float getGlTime()  const { return m_GlTime; }
 
   private:
     /** Deposited energy in electrons */
@@ -70,6 +72,8 @@ namespace Belle2 {
     float m_tkKEnergy;
     /** detector number */
     float m_detNb;
+    /** global time */
+    float m_GlTime;
 
     ClassDef(MicrotpcSimHit, 1)
   };

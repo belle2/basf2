@@ -75,7 +75,7 @@ namespace Belle2 {
       //Lets loop over all the Active nodes
       BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
-        //create pindiode box volume
+        //create pindiode container volume
         G4double dx_box = 2. / 2.*Unit::cm;
         G4double dy_box = 1. / 2.*Unit::cm;
         G4double dz_box = 1. / 2.*Unit::cm;
@@ -89,10 +89,14 @@ namespace Belle2 {
 
         G4LogicalVolume* l_Box = new G4LogicalVolume(s_Box, geometry::Materials::get("Al6061"), "l_Box");
 
-        //create pindiode volume
-        G4Box* s_PINDIODE1 = new G4Box("s_PINDIODE1", 2.65 / 2.*Unit::mm, 2.65 / 2.*Unit::mm, 0.25 / 2.*Unit::mm);
-        G4Box* s_PINDIODE2 = new G4Box("s_PINDIODE2", 2.65 / 2.*Unit::mm, 2.65 / 2.*Unit::mm, 0.25 / 2.*Unit::mm);
-        G4Box* s_layer = new G4Box("s_layer", 2.65 / 2.*Unit::mm, 2.65 / 2.*Unit::mm, 0.01 / 2.*Unit::mm);
+        //create pindiode volumes
+        G4double dx_diode = 2.65 / 2.*Unit::mm;
+        G4double dy_diode = 2.65 / 2.*Unit::mm;
+        G4double dz_diode = 0.25 / 2.*Unit::mm;
+        G4Box* s_PINDIODE1 = new G4Box("s_PINDIODE1", dx_diode, dy_diode, dz_diode);
+        G4Box* s_PINDIODE2 = new G4Box("s_PINDIODE2", dx_diode, dy_diode, dz_diode);
+        G4double dz_layer = 0.01 / 2.*Unit::mm;
+        G4Box* s_layer = new G4Box("s_layer", dx_diode, dy_diode, dz_layer);
 
         G4LogicalVolume* l_PINDIODE1 = new G4LogicalVolume(s_PINDIODE1, geometry::Materials::get("G4_SILICON_DIOXIDE"), "l_PINDIODE1", 0, m_sensitive);
         G4LogicalVolume* l_PINDIODE2 = new G4LogicalVolume(s_PINDIODE2, geometry::Materials::get("G4_SILICON_DIOXIDE"), "l_PINDIODE2", 0, m_sensitive);
@@ -102,12 +106,19 @@ namespace Belle2 {
         l_PINDIODE1->SetUserLimits(new G4UserLimits(stepSize));
         l_PINDIODE2->SetUserLimits(new G4UserLimits(stepSize));
 
-        //position pindiode volume
+        //position pindiode assembly
         G4ThreeVector PINDIODEpos = G4ThreeVector(
                                       activeParams.getLength("x_pindiode") * Unit::cm,
                                       activeParams.getLength("y_pindiode") * Unit::cm,
                                       activeParams.getLength("z_pindiode") * Unit::cm
                                     );
+        //pindiode 1 position
+        G4ThreeVector PINDIODEpos1 = G4ThreeVector(dx_diode, 0, 0);
+        //pindiode gold layer 1 position
+        G4ThreeVector Layerpos = G4ThreeVector(dx_diode, 0, dz_diode + dz_layer);
+        //pindiode 2 position
+        G4ThreeVector PINDIODEpos2 = G4ThreeVector(-dx_diode, 0, 0);
+
 
         G4RotationMatrix* rot_pindiode = new G4RotationMatrix();
         rot_pindiode->rotateX(activeParams.getLength("AngleX"));
@@ -117,9 +128,9 @@ namespace Belle2 {
 
 
         new G4PVPlacement(rot_pindiode, PINDIODEpos, l_Box, "p_Box", &topVolume, false, 1);
-        new G4PVPlacement(rot_pindiode, PINDIODEpos, l_layer, "p_layer", &topVolume, false, 1);
-        new G4PVPlacement(rot_pindiode, PINDIODEpos, l_PINDIODE1, "p_PINDIODE1", &topVolume, false, detID);
-        new G4PVPlacement(rot_pindiode, PINDIODEpos, l_PINDIODE2, "p_PINDIODE2", &topVolume, false, detID++);
+        new G4PVPlacement(rot_pindiode, PINDIODEpos + Layerpos, l_layer, "p_layer", &topVolume, false, 1);
+        new G4PVPlacement(rot_pindiode, PINDIODEpos + PINDIODEpos1, l_PINDIODE1, "p_PINDIODE1", &topVolume, false, detID);
+        new G4PVPlacement(rot_pindiode, PINDIODEpos + PINDIODEpos2, l_PINDIODE2, "p_PINDIODE2", &topVolume, false, detID++);
 
         detID++;
       }

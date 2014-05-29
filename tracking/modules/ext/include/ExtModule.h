@@ -99,7 +99,7 @@ namespace Belle2 {
     void registerVolumes();
 
     //! Get the physical volume information for a geant4 physical volume
-    void getVolumeID(const G4TouchableHandle&, ExtDetectorID&, int&);
+    void getVolumeID(const G4TouchableHandle&, Const::EDetector&, int&);
 
     //! Convert the geant4e 5x5 covariance to phasespace 6x6 covariance
     TMatrixDSym fromG4eToPhasespace(const G4ErrorFreeTrajState*);

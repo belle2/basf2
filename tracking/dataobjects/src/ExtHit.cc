@@ -16,13 +16,13 @@ using namespace Belle2;
 
 ClassImp(ExtHit)
 
-//! empty constructor
+// empty constructor
 ExtHit::ExtHit() : RelationsObject()
 {
 }
 
-//! Constructor with initial values
-ExtHit::ExtHit(int pdgCode, ExtDetectorID detectorID, int copyID, ExtHitStatus status, double tof,
+// Constructor with initial values
+ExtHit::ExtHit(int pdgCode, Const::EDetector detectorID, int copyID, ExtHitStatus status, double tof,
                const TVector3& position, const TVector3& momentum, const TMatrixDSym& covariance) :
   RelationsObject(),
   m_PdgCode(pdgCode),
@@ -36,7 +36,7 @@ ExtHit::ExtHit(int pdgCode, ExtDetectorID detectorID, int copyID, ExtHitStatus s
 {
 }
 
-//! Copy constructor
+// Copy constructor
 ExtHit::ExtHit(const ExtHit& h) :
   RelationsObject(h),
   m_PdgCode(h.m_PdgCode),
@@ -49,4 +49,3 @@ ExtHit::ExtHit(const ExtHit& h) :
   m_Covariance(h.m_Covariance)
 {
 }
-

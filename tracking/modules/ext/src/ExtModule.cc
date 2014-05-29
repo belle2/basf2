@@ -101,12 +101,12 @@ void ExtModule::initialize()
 
   // See if ext will coexist with geant4 simulation and/or muid extrapolation
   if (m_ExtMgr->PrintG4State() == G4String("G4State_PreInit")) {
-    B2INFO("ext::initialize:  I will run without simulation")
+    B2INFO("Ext will run without simulation")
     m_RunMgr = NULL;
     m_TrackingAction    = NULL;
     m_SteppingAction    = NULL;
     if (m_ExtMgr->PrintExtState() == G4String("G4ErrorState_PreInit")) {
-      B2INFO("ext::initialize:  I will call InitGeant4e")
+      B2INFO("Ext will call InitGeant4e")
       // Create the magnetic field for the geant4e extrapolation
       Simulation::MagneticField* magneticField = new Simulation::MagneticField();
       G4FieldManager* fieldManager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
@@ -119,19 +119,19 @@ void ExtModule::initialize()
       m_ExtMgr->SetUserInitialization(new Simulation::ExtPhysicsList);
       m_ExtMgr->InitGeant4e();
     } else {
-      B2INFO("ext::initialize:  I will not call InitGeant4e since it has already been initialized")
+      B2INFO("Ext will not call InitGeant4e since it has already been initialized")
     }
   } else {
-    B2INFO("ext::initialize:  I will coexist with simulation")
+    B2INFO("Ext will coexist with simulation")
     m_RunMgr = G4RunManager::GetRunManager();
     m_TrackingAction    = const_cast<G4UserTrackingAction*>(m_RunMgr->GetUserTrackingAction());
     m_SteppingAction    = const_cast<G4UserSteppingAction*>(m_RunMgr->GetUserSteppingAction());
     if (m_ExtMgr->PrintExtState() == G4String("G4ErrorState_PreInit")) {
-      B2INFO("ext::initialize:  I will call InitGeant4e")
+      B2INFO("Ext will call InitGeant4e")
       m_ExtMgr->InitGeant4e();
       G4StateManager::GetStateManager()->SetNewState(G4State_Idle);
     } else {
-      B2INFO("ext::initialize:  I will not call InitGeant4e since it has already been initialized")
+      B2INFO("Ext will not call InitGeant4e since it has already been initialized")
     }
   }
 
@@ -176,12 +176,11 @@ void ExtModule::initialize()
         }
       }
     }
-    if (m_ChargedStable.empty()) B2ERROR("Ext initialize(): no valid PDG codes for extrapolation")
+    if (m_ChargedStable.empty()) B2ERROR("No valid PDG codes for extrapolation")
     }
 
   for (unsigned i = 0; i < m_ChargedStable.size(); ++i) {
-    B2INFO("Module ext initialize(): hypothesis for PDG code "
-           << m_ChargedStable[i].getPDGCode() << " and its antiparticle will be extrapolated");
+    B2INFO("Hypothesis for PDG code " << m_ChargedStable[i].getPDGCode() << " and its antiparticle will be extrapolated");
   }
 
   // Register output and relation arrays
@@ -195,7 +194,7 @@ void ExtModule::initialize()
 void ExtModule::beginRun()
 {
   StoreObjPtr<EventMetaData> evtMetaData;
-  B2INFO("Ext::beginRun(): experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun())
+  B2INFO("Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun())
 }
 
 void ExtModule::event()
@@ -234,14 +233,14 @@ void ExtModule::event()
 
       const TrackFitResult* trackFit = Tracks[t]->getTrackFitResult(chargedStable);
       if (!trackFit) {
-        B2ERROR("Ext::event(): no valid TrackFitResult for PDGcode " <<
+        B2ERROR("No valid TrackFitResult for PDGcode " <<
                 chargedStable.getPDGCode() << ": extrapolation not possible")
         continue;
       }
 
       const genfit::Track* gfTrack = DataStore::getRelated<genfit::Track>(trackFit);
       if (!gfTrack) {
-        B2ERROR("Ext::event(): no relation of TrackFitResult with genfit::Track for PDGcode " <<
+        B2ERROR("No relation of TrackFitResult with genfit::Track for PDGcode " <<
                 chargedStable.getPDGCode() << ": extrapolation not possible")
         continue;
       }
@@ -331,7 +330,7 @@ void ExtModule::registerVolumes()
 
   G4PhysicalVolumeStore* pvStore = G4PhysicalVolumeStore::GetInstance();
   if (pvStore->size() == 0) {
-    B2FATAL("Module ext registerVolumes(): No geometry defined. Please create the geometry first.")
+    B2FATAL("No geometry defined. Please create the geometry first.")
   }
 
   m_Enter = new vector<G4VPhysicalVolume*>;
@@ -387,41 +386,41 @@ void ExtModule::registerVolumes()
 }
 
 // Convert the physical volume name to integer(-like) identifiers
-void ExtModule::getVolumeID(const G4TouchableHandle& touch, ExtDetectorID& detID, int& copyID)
+void ExtModule::getVolumeID(const G4TouchableHandle& touch, Const::EDetector& detID, int& copyID)
 {
 
   // default values
-  detID = EXT_UNKNOWN;
+  detID = Const::EDetector::invalidDetector;
   copyID = 0;
 
   G4String name = touch->GetVolume(0)->GetName();
   if (name.find("CDC") != string::npos) {
-    detID = EXT_CDC;
+    detID = Const::EDetector::CDC;
     copyID = touch->GetVolume(0)->GetCopyNo();
   }
   // TOP doesn't have one envelope; it has several "PlacedTOPModule"s
   if (name == "PlacedTOPModule") {
-    detID = EXT_TOP;
+    detID = Const::EDetector::TOP;
   }
   // TOP quartz bar (=sensitive) has an automatically generated PV name
   // av_WWW_impr_XXX_YYY_ZZZ because it is an imprint of a G4AssemblyVolume;
   // YYY is cuttest.
   if (name.find("_cuttest_") != string::npos) {
-    detID = EXT_TOP;
+    detID = Const::EDetector::TOP;
     copyID = (touch->GetHistoryDepth() >= 2) ? touch->GetVolume(2)->GetCopyNo() : 0;
   }
   // ARICH has an envelope that contains modules that each contain a moduleSensitive
   if (name == "ARICH.AerogelSupportPlate") {
-    detID = EXT_ARICH;
+    detID = Const::EDetector::ARICH;
     copyID = 12345;
   }
   if (name == "moduleSensitive") {
-    detID = EXT_ARICH;
+    detID = Const::EDetector::ARICH;
     copyID = (touch->GetHistoryDepth() >= 1) ? touch->GetVolume(1)->GetCopyNo() : 0;
   }
   // ECL
   if (name == "physicalECL") {
-    detID = EXT_ECL;
+    detID = Const::EDetector::ECL;
   }
   // ECL crystal (=sensitive) has an automatically generated PV name
   // av_WWW_impr_XXX_YYY_ZZZ because it is an imprint of a G4AssemblyVolume;
@@ -432,7 +431,7 @@ void ExtModule::getVolumeID(const G4TouchableHandle& touch, ExtDetectorID& detID
   if ((name.find("_logicalEclBrCrystal_") != string::npos) ||
       (name.find("_logicalEclBwCrystal_") != string::npos) ||
       (name.find("_logicalEclFwCrystal_") != string::npos)) {
-    detID = EXT_ECL;
+    detID = Const::EDetector::ECL;
     copyID = ECL::ECLGeometryPar::Instance()->ECLVolNameToCellID(name);
   }
 
@@ -516,7 +515,7 @@ void ExtModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
   }
 
   catch (genfit::Exception& e) {
-    B2WARNING("Ext::getStartPoint() caught genfit exception for " << (firstLast ? "first" : "last") << " point on track; will not extrapolate. " << e.what())
+    B2WARNING("Caught genfit exception for " << (firstLast ? "first" : "last") << " point on track; will not extrapolate. " << e.what())
     // Do not extrapolate this track by forcing minPt cut to fail
     momentum.setX(0.0);
     momentum.setY(0.0);
@@ -655,7 +654,7 @@ void ExtModule::createHit(const G4ErrorFreeTrajState* state, ExtHitStatus status
 
   TVector3 pos(stepPoint->GetPosition().x() / cm, stepPoint->GetPosition().y() / cm, stepPoint->GetPosition().z() / cm);
   TVector3 mom(stepPoint->GetMomentum().x() / GeV, stepPoint->GetMomentum().y() / GeV, stepPoint->GetMomentum().z() / GeV);
-  ExtDetectorID detID(EXT_UNKNOWN);
+  Const::EDetector detID(Const::EDetector::invalidDetector);
   int copyID(0);
   getVolumeID(preTouch, detID, copyID);
   new(extHits.nextFreeAddress()) ExtHit(pdgCode, detID, copyID, status, m_TOF, pos, mom, fromG4eToPhasespace(state));

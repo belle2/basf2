@@ -29,10 +29,11 @@ namespace Belle2 {
     BKLMSimHit();
 
     //! Constructor with initial values
-    //! @param moduleID module identifier (@sa BKLMStatus.h)
+    //! @param moduleID module identifier
     //! @param x position along the strip (cm)
     //! @param t time since start of event (ns)
     //! @param dE deposited energy (MeV)
+    //! @sa BKLMStatus.h for moduleID
     BKLMSimHit(int moduleID, double x, double t, double dE);
 
     //! Destructor
@@ -41,46 +42,59 @@ namespace Belle2 {
     //! Copy constructor
     BKLMSimHit(const BKLMSimHit&);
 
-    //! returns true if this hit is in an RPC
+    //! Determine whether this hit is in an RPC or scintillator
+    //! @return whether this hit is in an RPC (true) or scintillator (false)
     bool inRPC() const { return ((m_ModuleID & BKLM_INRPC_MASK) != 0); }
 
-    //! returns axial end (TRUE=forward or FALSE=backward) of this hit
+    //! Get detector end
+    //! @return detector end (TRUE=forward or FALSE=backward) of this hit
     bool isForward() const { return ((m_ModuleID & BKLM_END_MASK) != 0); }
 
-    //! returns sector number of this hit
+    //! Get sector number
+    //! @return sector number of this hit
     int getSector() const { return (((m_ModuleID & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1); }
 
-    //! returns layer number of this hit
+    //! Get layer number
+    //! @return layer number of this hit
     int getLayer() const { return (((m_ModuleID & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1); }
 
     //! returns plane (0=inner or 1=outer) of this hit
     //int getPlane() const { return (((m_ModuleID & BKLM_PLANE_MASK) != 0) ? BKLM_INNER : BKLM_OUTER); }
 
-    //! returns readout-coordinate (TRUE=phi, FALSE=z) of this hit
+    //! Get readout coordinate
+    //! @return readout coordinate (TRUE=phi, FALSE=z) of this hit
     bool isPhiReadout() const { return ((m_ModuleID & BKLM_PLANE_MASK) != 0); }
 
-    //! returns unique readout strip number of this hit (assumes one hit)
+    //! Get strip number of this hit
+    //! @return readout strip number of this hit (assuming one strip per hit)
     int getStrip() const { return (((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1); }
 
-    //! returns lowest readout strip number of this hit
+    //! Get lowest readout strip number of a contiguous set
+    //! @return lowest readout strip number of this hit (assuming a contiguous set of RPC strips)
     int getStripMin() const { return (((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1); }
 
-    //! returns highest readout strip number of this hit
+    //! Get highest readout strip number of a contiguous set
+    //! @return highest readout strip number of this hit (assuming a contiguous set of RPC strips)
     int getStripMax() const { return (((m_ModuleID & BKLM_MAXSTRIP_MASK) >> BKLM_MAXSTRIP_BIT) + 1); }
 
-    //! returns unique detector-module identifier
+    //! Get detector-module identifier
+    //! @return detector-module identifier
     int getModuleID() const { return m_ModuleID; }
 
-    //! returns x coordinate of the local position of the hit (for time-of-propagation)
+    //! Get coordinate of the hit along the strip's length
+    //! @return coordinate of the hit's local position along the strip (cm) for time-of-propagation
     float getLocalPositionX() const { return m_LocalX; }
 
-    //! returns the event hit time
+    //! Get the hit time
+    //! @return the hit time (ns) since start of the event
     double getTime() const { return (double)m_Time; }
 
-    //! returns energy deposition
+    //! Get energy deposition
+    //! @return energy deposition (MeV)
     double getEDep() const { return (double)m_EDep; }
 
-    //! increase energy deposition
+    //! Increase energy deposition
+    //! @param eDep Amount of additional energy deposition (MeV)
     void increaseEDep(double eDep) { m_EDep += eDep; }
 
   private:
@@ -95,7 +109,7 @@ namespace Belle2 {
     //! energy deposition (MeV)
     float m_EDep;
 
-    //! local x coordinate of hit position (cm) for time-of-propagation
+    //! local coordinate of hit position (cm) along strip's length for time-of-propagation
     float m_LocalX;
 
     //! Needed to make the ROOT object storable

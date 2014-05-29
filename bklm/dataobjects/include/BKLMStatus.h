@@ -12,7 +12,8 @@
 #define BKLMSTATUS_H
 
 //! Definition of bit positions/masks for elements of detector-module ID.
-//! Order must be (high bit) END-SECTOR-LAYER-PLANE-STRIP (low bit) for sorting in bklmReconstructor module.
+//! Order must be (high bit) END-SECTOR-LAYER-PLANE-STRIP (low bit) for
+//! proper sorting in bklmReconstructor module.
 //! Also, definition of each status bit/mask.
 
 //! bit position for strip-1 [0..47]

@@ -141,14 +141,14 @@ namespace Belle2 {
           convertHitToRPCStrips(lHitPos, m, phiStripLower, phiStripUpper, zStripLower, zStripUpper);
           if (zStripLower > 0) {
             int moduleIDZ = moduleID | ((zStripLower - 1) << BKLM_STRIP_BIT) | ((zStripUpper - 1) << BKLM_MAXSTRIP_BIT);
-            new(simHits.nextFreeAddress()) BKLMSimHit(moduleIDZ, 0.0, time, eDep);
+            new(simHits.nextFreeAddress()) BKLMSimHit(moduleIDZ, lHitPos.x(), time, eDep);
             particleToSimHits.add(trackID, simHits.getEntries() - 1);
             new(simHitPositions.nextFreeAddress()) BKLMSimHitPosition(gHitPos.x(), gHitPos.y(), gHitPos.z());
             positionToSimHits.add(simHitPositions.getEntries() - 1, simHits.getEntries() - 1);
           }
           if (phiStripLower > 0) {
             moduleID |= ((phiStripLower - 1) << BKLM_STRIP_BIT) | ((phiStripUpper - 1) << BKLM_MAXSTRIP_BIT) | BKLM_PLANE_MASK;
-            new(simHits.nextFreeAddress()) BKLMSimHit(moduleID, 0.0, time, eDep);
+            new(simHits.nextFreeAddress()) BKLMSimHit(moduleID, lHitPos.x(), time, eDep);
             particleToSimHits.add(trackID, simHits.getEntries() - 1);
             new(simHitPositions.nextFreeAddress()) BKLMSimHitPosition(gHitPos.x(), gHitPos.y(), gHitPos.z());
             positionToSimHits.add(simHitPositions.getEntries() - 1, simHits.getEntries() - 1);

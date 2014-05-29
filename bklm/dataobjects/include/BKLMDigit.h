@@ -41,75 +41,91 @@ namespace Belle2 {
     //! Destructor
     virtual ~BKLMDigit() {}
 
+    //! Determine whether hit is in RPC or scintillator
     //! @return whether hit is in RPC (true) or scintillator (false)
     bool inRPC() const { return ((m_ModuleID & BKLM_INRPC_MASK) != 0); }
 
-    //! @return whether the scint hit is usable in fit (true) or not (false)
+    //! Determine whether the scint hit is usable in fit
+    //! @return whether the scint hit is usable (true) or not (false) in pulse-shape fit
     bool isAboveThreshold() const { return ((m_ModuleID & BKLM_ABOVETHRESHOLD_MASK) != 0); }
 
+    //! Get detector end
     //! @return detector end (TRUE=forward or FALSE=backward) of this strip
     bool isForward() const { return ((m_ModuleID & BKLM_END_MASK) != 0); }
 
+    //! Get sector number
     //! @return sector number of this strip (1..8)
     int getSector() const { return (((m_ModuleID & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1); }
 
+    //! Get layer number
     //! @return layer number of this strip (1..15)
     int getLayer() const { return (((m_ModuleID & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1); }
 
+    //! Get readout coordinate
     //! @return readout coordinate (TRUE=phi, FALSE=z) of this strip
     bool isPhiReadout() const { return ((m_ModuleID & BKLM_PLANE_MASK) != 0); }
 
+    //! Get strip number
     //! @return strip number (1..64)
     int getStrip() const { return (((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1); }
 
+    //! Get detector-module ID
     //! @return unique detector-module ID (internally calculated)
     int getModuleID() const { return m_ModuleID; }
 
+    //! Get MC-simulation hit time
     //! @return MC-simulation hit time (ns)
     float getSimTime() const { return m_SimTime; }
 
+    //! Get scint's reconstructed hit time
     //! @return reconstructed hit time (ns) from scint pulse-shape analysis
     float getTime() const { return m_Time; }
 
+    //! Get MC-simulation energy deposition
     //! @return MC-simulation energy deposition (MeV)
     float getSimEDep() const { return m_SimEDep; }
 
+    //! Get scint's reconstructed energy deposition
     //! @return reconstructed energy deposition (MeV)
     float getEDep() const { return m_EDep; }
 
+    //! Get the number of simulated MPPC pixels
     //! @return the number of simulated MPPC pixels
     float getSimNPixel() const { return m_SimNPixel; }
 
+    //! Get the number of reconstructed MPPC pixels
     //! @return the number of reconstructed MPPC pixels
     float getNPixel() const { return m_NPixel; }
 
+    //! Get the status of scint pulse-shape fit
     //! @return status of scint pulse-shape fit (enum EKLM::FPGAFitStatus returned as int!)
     int getFitStatus() { return m_FitStatus; }
 
+    //! Determine whether two BKLMDigits refer to the same strip
     //! @return whether two BKLMDigits refer to the same strip (true) or not (false)
     bool match(const BKLMDigit* d) const { return (((d->getModuleID() ^ m_ModuleID) & BKLM_MODULESTRIPID_MASK) == 0); }
 
-    //! sets whether scint hit is usable in fit
+    //! Sets whether scint hit is usable in fit
     //! @param flag above threshold (true) or not (false)
     void isAboveThreshold(bool flag) { m_ModuleID = (flag ? m_ModuleID | BKLM_ABOVETHRESHOLD_MASK : m_ModuleID & ~BKLM_ABOVETHRESHOLD_MASK); }
 
-    //! sets reconstructed time
+    //! Set reconstructed time
     //! @param time reconstructed time (ns) from scint pulse-shape analysis
     void setTime(float time) { m_Time = time; }
 
-    //! sets reconstructed energy deposition
+    //! Set reconstructed energy deposition
     //! @param eDep reconstructed energy (MeV) from scint pulse-shape analysis
     void setEDep(float eDep) { m_EDep = eDep; }
 
-    //! sets the number of simulated MPPC pixels (scintillator only)
+    //! Set the number of simulated MPPC pixels (scintillator only)
     //! @param nPixel number of simulated MPPC pixels
     void setSimNPixel(int nPixel) { m_SimNPixel = nPixel; }
 
-    //! sets the number of reconstructed MPPC pixels (scintillator only)
+    //! Set the number of reconstructed MPPC pixels (scintillator only)
     //! @param nPixel number of reconstructed MPPC pixels from the pulse-shape analysis
     void setNPixel(float nPixel) { m_NPixel = nPixel; }
 
-    //! set the status of the pulse-shape fit (enum EKLM::FPGAFitStatus --> int!)
+    //! Set the status of the pulse-shape fit (enum EKLM::FPGAFitStatus --> int!)
     //! @param status completion status of the pulse-shape analysis
     void setFitStatus(int status) { m_FitStatus = status; }
 

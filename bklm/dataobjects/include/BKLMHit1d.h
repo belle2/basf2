@@ -38,34 +38,44 @@ namespace Belle2 {
     //! Destructor
     virtual ~BKLMHit1d() {}
 
+    //! Determine whether this 1D hit is in RPC or scintillator
     //! @return whether this 1D hit is in RPC (true) or scintillator (false)
     bool inRPC() const { return ((m_ModuleID & BKLM_INRPC_MASK) != 0); }
 
+    //! Get detector end
     //! @return detector end (TRUE=forward or FALSE=backward) of this 1D hit
     bool isForward() const { return ((m_ModuleID & BKLM_END_MASK) != 0); }
 
+    //! Get sector number
     //! @return sector number (1..8) of this 1D hit
     int getSector() const { return (((m_ModuleID & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1); }
 
+    //! Get layer number
     //! @return layer number (1..15) of this 1D hit
     int getLayer() const { return (((m_ModuleID & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1); }
 
-    //! @return readout plane of this 1D hit
+    //! Get readout coordinate
+    //! @return readout coordinate of this 1D hit
     bool isPhiReadout() const { return ((m_ModuleID & BKLM_PLANE_MASK) != 0); }
 
+    //! Get lowest strip number of this 1D hit
     //! @return lowest strip number of this 1D hit
     int getStripMin() const { return (((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1); }
 
-    //! @return lowest strip number of this 1D hit
+    //! Get highest strip number of this 1D hit
+    //! @return highest strip number of this 1D hit
     int getStripMax() const { return (((m_ModuleID & BKLM_MAXSTRIP_MASK) >> BKLM_MAXSTRIP_BIT) + 1); }
 
+    //! Get detector-module identifier
     //! @return detector-module identifier
     //! @sa BKLMStatus.h
     int getModuleID() const { return m_ModuleID; }
 
+    //! Get reconstructed hit time
     //! @return reconstructed hit time (ns)
     float getTime() const { return m_Time; }
 
+    //! Get energy deposition
     //! @return energy deposition (MeV)
     float getEDep() const { return m_EDep; }
 

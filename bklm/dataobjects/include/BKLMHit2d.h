@@ -38,74 +38,92 @@ namespace Belle2 {
     //! Destructor
     virtual ~BKLMHit2d() {}
 
+    //! Determine whether this 2D hit is in RPC or scintillator
     //! @return whether this 2D hit is in RPC (true) or scintillator (false)
     bool inRPC() const { return ((m_ModuleID & BKLM_INRPC_MASK) != 0); }
 
+    //! Get detector end
     //! @return detector end (TRUE=forward or FALSE=backward) of this 2D hit
     bool isForward() const { return ((m_ModuleID & BKLM_END_MASK) != 0); }
 
+    //! Get sector number
     //! @return sector number (1..8) of this 2D hit
     int getSector() const { return (((m_ModuleID & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1); }
 
+    //! Get layer number
     //! @return layer number (1..15) of this 2D hit
     int getLayer() const { return (((m_ModuleID & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1); }
 
+    //! Get lowest phi-measuring strip number
     //! @return lowest phi-measuring strip number of this 2D hit
     int getPhiStripMin() const { return (((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1); }
 
+    //! Get highest phi-measuring strip number
     //! @return highest phi-measuring strip number of this 2D hit
     int getPhiStripMax() const { return (((m_ModuleID & BKLM_MAXSTRIP_MASK) >> BKLM_MAXSTRIP_BIT) + 1); }
 
+    //! Get average phi-measuring strip number
     //! @return average phi-measuring strip number of this 2D hit
     float getPhiStripAve() const;
 
+    //! Get lowest z-measuring strip number
     //! @return lowest z-measuring strip number of this 2D hit
     int getZStripMin() const { return (((m_ZStrips & BKLM_ZSTRIP_MASK) >> BKLM_ZSTRIP_BIT) + 1); }
 
+    //! Get highest z-measuring strip number
     //! @return highest z-measuring strip number of this 2D hit
     int getZStripMax() const { return (((m_ZStrips & BKLM_ZMAXSTRIP_MASK) >> BKLM_ZMAXSTRIP_BIT) + 1); }
 
+    //! Get average z-measuring strip number
     //! @return average z-measuring strip number of this 2D hit
     float getZStripAve() const;
 
+    //! Get detector-module identifier
     //! @return detector-module identifier
     //! @sa BKLMStatus.h
     int getModuleID() const { return m_ModuleID; }
 
+    //! Determine whether this 2D hit is outside the trigger-coincidence window
     //! @return whether this 2D hit is outside the trigger-coincidence window (true) or not (false)
     bool isOutOfTime() { return (m_ModuleID & BKLM_OUTOFTIME_MASK) != 0; }
 
+    //! Determine whether this 2D hit is associated with a muid-extrapolated track
     //! @return whether this 2D hit is associated with a muid-extrapolated track (true) or not (false)
     bool isOnTrack() { return (m_ModuleID & BKLM_ONTRACK_MASK) != 0; }
 
+    //! Determine whether this 2D hit is deemed inefficient
     //! @return whether this 2D hit is deemed inefficient (true) or not (false)
     bool isInefficient() { return (m_ModuleID & BKLM_INEFFICIENT_MASK) != 0; }
 
+    //! Get 3D hit position in global coordinates
     //! @return 3D hit position in global coordinates (cm)
     TVector3 getGlobalPosition(void) const { return TVector3(m_GlobalPosition[0], m_GlobalPosition[1], m_GlobalPosition[2]); }
 
-    //! @return 2D reconstructed hit time (ns), the average of the 2 projections
+    //! Get reconstructed hit time
+    //! @return reconstructed hit time (ns), the average of the 2 projections
     float getTime() const { return m_Time; }
 
-    //! @return 2D reconstructed energy deposition (MeV), the sum of the 2 projections
+    //! Get reconstructed energy deposition
+    //! @return reconstructed energy deposition (MeV), the sum of the 2 projections
     float getEDep() const { return m_EDep; }
 
+    //! Determine whether the two BKLMHit2ds are in the same module
     //! @return whether the two BKLMHit2ds are in the same module (true) or not (false)
     bool match(const BKLMHit2d* h) const { return (((h->getModuleID() ^ m_ModuleID) & BKLM_MODULEID_MASK) == 0); }
 
-    //! set or clear the OutOfTime flag
+    //! Set or clear the OutOfTime flag
     //! @param flag whether this hit is outside the trigger-coincidence window (true) or not (false)
     void isOutOfTime(bool flag) { if (flag) { m_ModuleID |= BKLM_OUTOFTIME_MASK; } else { m_ModuleID &= ~BKLM_OUTOFTIME_MASK; } }
 
-    //! set or clear the OnTrack flag
+    //! Set or clear the OnTrack flag
     //! @param flag whether this hit is associated with a muid-extrapolated track (true) or not (false)
     void isOnTrack(bool flag) { if (flag) { m_ModuleID |= BKLM_ONTRACK_MASK; } else { m_ModuleID &= ~BKLM_ONTRACK_MASK; } }
 
-    //! set or clear the Inefficient flag
+    //! Set or clear the Inefficient flag
     //! @param flag whether this his is deemed inefficient (true) or not (false)
     void isInefficient(bool flag) { if (flag) { m_ModuleID |= BKLM_INEFFICIENT_MASK; } else { m_ModuleID &= ~BKLM_INEFFICIENT_MASK; } }
 
-    //! set the global position of this 2D hit
+    //! Set the global position of this 2D hit
     //! @param x Cartesian x coordinate (cm)
     //! @param y Cartesian y coordinate (cm)
     //! @param z Cartesian z coordinate (cm)

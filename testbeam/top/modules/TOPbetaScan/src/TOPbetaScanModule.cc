@@ -175,7 +175,7 @@ namespace Belle2 {
   void TOPbetaScanModule::getTracks(std::vector<TOP::TOPtrack>& tracks,
                                     Const::ChargedStable chargedStable)
   {
-    ExtDetectorID myDetID = EXT_TOP; // TOP
+    Const::EDetector myDetID = Const::EDetector::TOP; // TOP
     int NumBars = m_topgp->getNbars();
     int pdgCode = abs(chargedStable.getPDGCode());
     double mass = chargedStable.getMass();

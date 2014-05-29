@@ -271,7 +271,7 @@ namespace Belle2 {
     double beta = m_p / sqrt(m_p * m_p + mass * mass);
     double tof = path / (beta * Const::speedOfLight);
     TMatrixDSym covariance(6);
-    ExtHit* extHit = extHits.appendNew(ExtHit(pdgCode, EXT_TOP, barID, EXT_ENTER, tof, hit,
+    ExtHit* extHit = extHits.appendNew(ExtHit(pdgCode, Const::EDetector::TOP, barID, EXT_ENTER, tof, hit,
                                               momentum, covariance));
     track->addRelationTo(extHit);
 

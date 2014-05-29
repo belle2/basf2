@@ -29,9 +29,9 @@
 
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">7.5</x_pindiode>
-      <y_pindiode unit="cm">0.0</y_pindiode>
-      <z_pindiode unit="cm">36.8637</z_pindiode>
+      <x_pindiode unit="mm">2.65</x_pindiode>
+      <y_pindiode unit="mm">2.65</y_pindiode>
+      <z_pindiode unit="mm">0.25</z_pindiode>
       <AngleX unit="deg">0.0</AngleX>
       <AngleY unit="deg">-11.5</AngleY>
       <AngleZ unit="deg">90.0</AngleZ>

@@ -75,21 +75,32 @@ namespace Belle2 {
       //Lets loop over all the Active nodes
       BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
+        //create pindiode box volume
+        G4double dx_box = 2. / 2.*Unit::cm;
+        G4double dy_box = 1. / 2.*Unit::cm;
+        G4double dz_box = 1. / 2.*Unit::cm;
+        G4VSolid* s_Box = new G4Box("s_box", dx_box, dy_box, dz_box);
+
+        G4double dx_hole = (20. - 2.*2.05) / 2.*Unit::mm;
+        G4double dy_hole = (10. - 2.*2.05) / 2.*Unit::mm;
+        G4double dz_hole = 5.1 / 2.*Unit::mm;
+        G4VSolid* s_Hole = new G4Box("s_Hole", dx_hole, dy_hole, dz_hole);
+        s_Box = new G4SubtractionSolid("s_Box", s_Box, s_Hole, 0, G4ThreeVector(0, 0, dz_box - dz_hole));
+
+        G4LogicalVolume* l_Box = new G4LogicalVolume(s_Box, geometry::Materials::get("Al6061"), "l_Box");
+
         //create pindiode volume
-        G4Trap* s_PINDIODE = new G4Trap("s_PINDIODE",
-                                        activeParams.getLength("cDz") / 2.*Unit::mm , 0 , 0,
-                                        activeParams.getLength("cDy1") / 2.*Unit::mm ,
-                                        activeParams.getLength("cDx1") / 2.*Unit::mm ,
-                                        activeParams.getLength("cDx2") / 2.*Unit::mm , 0,
-                                        activeParams.getLength("cDy2") / 2.*Unit::mm ,
-                                        activeParams.getLength("cDx3") / 2.*Unit::mm ,
-                                        activeParams.getLength("cDx4") / 2.*Unit::mm , 0);
+        G4Box* s_PINDIODE1 = new G4Box("s_PINDIODE1", 2.65 / 2.*Unit::mm, 2.65 / 2.*Unit::mm, 0.25 / 2.*Unit::mm);
+        G4Box* s_PINDIODE2 = new G4Box("s_PINDIODE2", 2.65 / 2.*Unit::mm, 2.65 / 2.*Unit::mm, 0.25 / 2.*Unit::mm);
+        G4Box* s_layer = new G4Box("s_layer", 2.65 / 2.*Unit::mm, 2.65 / 2.*Unit::mm, 0.01 / 2.*Unit::mm);
 
-
-        G4LogicalVolume* l_PINDIODE = new G4LogicalVolume(s_PINDIODE, geometry::Materials::get("PINDIODE"), "l_PINDIODE", 0, m_sensitive);
+        G4LogicalVolume* l_PINDIODE1 = new G4LogicalVolume(s_PINDIODE1, geometry::Materials::get("G4_SILICON_DIOXIDE"), "l_PINDIODE1", 0, m_sensitive);
+        G4LogicalVolume* l_PINDIODE2 = new G4LogicalVolume(s_PINDIODE2, geometry::Materials::get("G4_SILICON_DIOXIDE"), "l_PINDIODE2", 0, m_sensitive);
+        G4LogicalVolume* l_layer = new G4LogicalVolume(s_layer,  geometry::Materials::get("G4_Au"), "l_layer");
 
         //Lets limit the Geant4 stepsize inside the volume
-        l_PINDIODE->SetUserLimits(new G4UserLimits(stepSize));
+        l_PINDIODE1->SetUserLimits(new G4UserLimits(stepSize));
+        l_PINDIODE2->SetUserLimits(new G4UserLimits(stepSize));
 
         //position pindiode volume
         G4ThreeVector PINDIODEpos = G4ThreeVector(
@@ -104,7 +115,11 @@ namespace Belle2 {
         rot_pindiode->rotateZ(activeParams.getLength("AngleZ"));
         //geometry::setColor(*l_PINDIODE, "#006699");
 
-        new G4PVPlacement(rot_pindiode, PINDIODEpos, l_PINDIODE, "p_PINDIODE", &topVolume, false, detID);
+
+        new G4PVPlacement(rot_pindiode, PINDIODEpos, l_Box, "p_Box", &topVolume, false, 1);
+        new G4PVPlacement(rot_pindiode, PINDIODEpos, l_layer, "p_layer", &topVolume, false, 1);
+        new G4PVPlacement(rot_pindiode, PINDIODEpos, l_PINDIODE1, "p_PINDIODE1", &topVolume, false, detID);
+        new G4PVPlacement(rot_pindiode, PINDIODEpos, l_PINDIODE2, "p_PINDIODE2", &topVolume, false, detID++);
 
         detID++;
       }

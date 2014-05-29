@@ -273,7 +273,7 @@ namespace Belle2 {
   void ARICHReconstructorModule::getTracks(std::vector<ARICHTrack>& tracks,
                                            Const::ChargedStable hypothesis)
   {
-    ExtDetectorID myDetID = EXT_ARICH; // arich
+    Const::EDetector myDetID = Const::EDetector::ARICH; // arich
     int pdgCode = abs(hypothesis.getPDGCode());
 
     StoreArray<Track> Tracks(m_tracksColName);

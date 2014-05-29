@@ -106,7 +106,7 @@ namespace Belle2 {
       if (!fitResult) continue;
 
       RelationVector<ExtHit> extHits = DataStore::getRelationsWithObj<ExtHit>(track);
-      ExtDetectorID myDetID = EXT_ARICH;
+      Const::EDetector myDetID = Const::EDetector::ARICH;
       for (unsigned i = 0; i < extHits.size(); i++) {
         const ExtHit* extHit = extHits[i];
         if (extHit->getPdgCode() != pdg) continue;

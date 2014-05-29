@@ -502,7 +502,7 @@ void ECLReconstructorModule::readExtrapolate()
   RelationIndex<Track, ExtHit> TracksToExtHits(Tracks, extHits);
 
   if (extHits) {
-    ExtDetectorID myDetID = EXT_ECL; // ECL in this example
+    Const::EDetector myDetID = Const::EDetector::ECL; // ECL in this example
     int pdgCodePiP = G4ParticleTable::GetParticleTable()->FindParticle("pi+")->GetPDGEncoding();
     int pdgCodePiM = G4ParticleTable::GetParticleTable()->FindParticle("pi-")->GetPDGEncoding();
 

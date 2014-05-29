@@ -58,7 +58,7 @@ void ECLTrackShowerMatchModule::event()
   StoreArray<ECLHitAssignment> eclHitAssignmentArray;
   StoreArray<ECLShower> eclRecShowerArray;
 
-  ExtDetectorID myDetID = EXT_ECL;
+  Const::EDetector myDetID = Const::EDetector::ECL;
   int pdgCodePiP = G4ParticleTable::GetParticleTable()->FindParticle("pi+")->GetPDGEncoding();
   int pdgCodePiM = G4ParticleTable::GetParticleTable()->FindParticle("pi-")->GetPDGEncoding();
 

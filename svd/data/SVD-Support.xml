@@ -1,313 +1,313 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Support description="Dead Material for the SVD">
-  <HalfShell>
-    <RotationSolid>
-      <!-- Inside support of SVD, close to Beampipe,PXD -->
-      <Name>BackwardCone</Name>
-      <Color>#666</Color>
-      <Material>SVD-Carbon</Material>
-      <!-- chosen start and end angle leaves 200µm of tolerance at narrowest point -->
-      <minPhi unit="deg">-89.65</minPhi>
-      <maxPhi unit="deg"> 89.65</maxPhi>
-      <OuterPoints>
-        <point><z unit="mm">-400.000</z><x unit="mm"> 99.000</x></point>
-        <point><z unit="mm">-357.749</z><x unit="mm"> 99.000</x></point>
-        <point><z unit="mm">-313.000</z><x unit="mm"> 69.000</x></point>
-        <point><z unit="mm">-298.000</z><x unit="mm"> 69.000</x></point>
-        <point><z unit="mm">-260.000</z><x unit="mm"> 53.000</x></point>
-        <point><z unit="mm">-245.000</z><x unit="mm"> 53.000</x></point>
-        <point><z unit="mm">-214.000</z><x unit="mm"> 40.000</x></point>
-        <point><z unit="mm">-199.000</z><x unit="mm"> 40.000</x></point>
-      </OuterPoints>
-      <InnerPoints>
-        <point><z unit="mm">-400.000</z><x unit="mm"> 91.000</x></point>
-        <point><z unit="mm">-360.182</z><x unit="mm"> 91.000</x></point>
-        <point><z unit="mm">-318.417</z><x unit="mm"> 63.000</x></point>
-        <point><z unit="mm">-299.212</z><x unit="mm"> 63.000</x></point>
-        <point><z unit="mm">-265.962</z><x unit="mm"> 49.000</x></point>
-        <point><z unit="mm">-245.805</z><x unit="mm"> 49.000</x></point>
-        <point><z unit="mm">-217.189</z><x unit="mm"> 37.000</x></point>
-        <point><z unit="mm">-199.000</z><x unit="mm"> 37.000</x></point>
-      </InnerPoints>
-    </RotationSolid>
-    <RotationSolid>
-      <Name>ForwardCone</Name>
-      <Color>#666</Color>
-      <Material>SVD-Carbon</Material>
-      <!-- chosen start and end angle leaves 200µm of tolerance at narrowest point -->
-      <minPhi unit="deg">-89.65</minPhi>
-      <maxPhi unit="deg"> 89.65</maxPhi>
-      <OuterPoints>
-        <point><z unit="mm"> 232.000</z><x unit="mm"> 35.500</x></point>
-        <point><z unit="mm"> 247.000</z><x unit="mm"> 35.500</x></point>
-        <point><z unit="mm"> 310.500</z><x unit="mm"> 44.500</x></point>
-        <point><z unit="mm"> 325.500</z><x unit="mm"> 44.500</x></point>
-        <point><z unit="mm"> 380.000</z><x unit="mm"> 61.000</x></point>
-        <point><z unit="mm"> 395.000</z><x unit="mm"> 61.000</x></point>
-        <point><z unit="mm"> 447.541</z><x unit="mm"> 90.000</x></point>
-        <point><z unit="mm"> 525.000</z><x unit="mm"> 90.000</x></point>
-      </OuterPoints>
-      <InnerPoints>
-        <point><z unit="mm"> 232.000</z><x unit="mm"> 32.500</x></point>
-        <point><z unit="mm"> 247.212</z><x unit="mm"> 32.500</x></point>
-        <point><z unit="mm"> 310.500</z><x unit="mm"> 39.984</x></point>
-        <point><z unit="mm"> 331.268</z><x unit="mm"> 39.984</x></point>
-        <point><z unit="mm"> 380.578</z><x unit="mm"> 55.000</x></point>
-        <point><z unit="mm"> 402.754</z><x unit="mm"> 55.000</x></point>
-        <point><z unit="mm"> 449.860</z><x unit="mm"> 81.000</x></point>
-        <point><z unit="mm"> 525.000</z><x unit="mm"> 81.000</x></point>
-      </InnerPoints>
-    </RotationSolid>
-    <!-- Outside hull of SVD close to CDC -->
-    <RotationSolid>
-      <Name>OuterHull</Name>
-      <Color>#666</Color>
-      <Material>SVD-Carbon</Material>
-      <!-- chosen start and end angle leaves 200µm of tolerance at narrowest point -->
-      <minPhi unit="deg">-89.95</minPhi>
-      <maxPhi unit="deg"> 89.95</maxPhi>
-      <OuterPoints>
-        <point><z unit="mm">-380.000</z><x unit="mm">155.000</x></point>
-        <point><z unit="mm"> 505.000</z><x unit="mm">155.000</x></point>
-      </OuterPoints>
-      <InnerPoints>
-        <point><z unit="mm">-380.000</z><x unit="mm">154.000</x></point>
-        <point><z unit="mm"> 505.000</z><x unit="mm">154.000</x></point>
-      </InnerPoints>
-    </RotationSolid>
-    <RotationSolid>
-      <Name>MiddleHull</Name>
-      <Color>#fff</Color>
-      <Material>SVD-Airex</Material>
-      <!-- chosen start and end angle leaves 200µm of tolerance at narrowest point -->
-      <minPhi unit="deg">-89.95</minPhi>
-      <maxPhi unit="deg"> 89.95</maxPhi>
-      <OuterPoints>
-        <point><z unit="mm">-360.000</z><x unit="mm">154.000</x></point>
-        <point><z unit="mm"> 490.000</z><x unit="mm">154.000</x></point>
-      </OuterPoints>
-      <InnerPoints>
-        <point><z unit="mm">-360.000</z><x unit="mm">150.000</x></point>
-        <point><z unit="mm"> 490.000</z><x unit="mm">150.000</x></point>
-      </InnerPoints>
-    </RotationSolid>
-    <RotationSolid>
-      <Name>InnerHull</Name>
-      <Color>#666</Color>
-      <Material>SVD-Carbon</Material>
-      <!-- chosen start and end angle leaves 200µm of tolerance at narrowest point -->
-      <minPhi unit="deg">-89.95</minPhi>
-      <maxPhi unit="deg"> 89.95</maxPhi>
-      <OuterPoints>
-        <point><z unit="mm">-360.000</z><x unit="mm">150.000</x></point>
-        <point><z unit="mm"> 490.000</z><x unit="mm">150.000</x></point>
-      </OuterPoints>
-      <InnerPoints>
-        <point><z unit="mm">-360.000</z><x unit="mm">149.000</x></point>
-        <point><z unit="mm"> 490.000</z><x unit="mm">149.000</x></point>
-      </InnerPoints>
-    </RotationSolid>
-    <RotationSolid>
-      <Name>BackwardRing</Name>
-      <Color>#ccc</Color>
-      <Material>Al</Material>
-      <!-- chosen start and end angle leaves 200µm of tolerance at narrowest point -->
-      <minPhi unit="deg">-89.95</minPhi>
-      <maxPhi unit="deg"> 89.95</maxPhi>
-      <OuterPoints>
-        <point><z unit="mm">-400.000</z><x unit="mm">154.000</x></point>
-        <point><z unit="mm">-360.000</z><x unit="mm">154.000</x></point>
-      </OuterPoints>
-      <InnerPoints>
-        <point><z unit="mm">-400.000</z><x unit="mm">148.000</x></point>
-        <point><z unit="mm">-360.000</z><x unit="mm">148.000</x></point>
-      </InnerPoints>
-    </RotationSolid>
-    <RotationSolid>
-      <Name>ForwardRing</Name>
-      <Color>#ccc</Color>
-      <Material>Al</Material>
-      <!-- chosen start and end angle leaves 200µm of tolerance at narrowest point -->
-      <minPhi unit="deg">-89.95</minPhi>
-      <maxPhi unit="deg"> 89.95</maxPhi>
-      <OuterPoints>
-        <point><z unit="mm">490.000</z><x unit="mm">154.000</x></point>
-        <point><z unit="mm">525.000</z><x unit="mm">154.000</x></point>
-      </OuterPoints>
-      <InnerPoints>
-        <point><z unit="mm">490.000</z><x unit="mm">148.000</x></point>
-        <point><z unit="mm">525.000</z><x unit="mm">148.000</x></point>
-      </InnerPoints>
-    </RotationSolid>
-  </HalfShell>
+	<HalfShell>
+		<RotationSolid>
+			<!-- Inside support of SVD, close to Beampipe,PXD -->
+			<Name>BackwardCone</Name>
+			<Color>#666</Color>
+			<Material>SVD-Carbon</Material>
+			<!-- chosen start and end angle leaves 200µm of tolerance at narrowest point -->
+			<minPhi unit="deg">-89.65</minPhi>
+			<maxPhi unit="deg"> 89.65</maxPhi>
+			<OuterPoints>
+				<point><z unit="mm">-400.000</z><x unit="mm"> 99.000</x></point>
+				<point><z unit="mm">-357.749</z><x unit="mm"> 99.000</x></point>
+				<point><z unit="mm">-313.000</z><x unit="mm"> 69.000</x></point>
+				<point><z unit="mm">-298.000</z><x unit="mm"> 69.000</x></point>
+				<point><z unit="mm">-260.000</z><x unit="mm"> 53.000</x></point>
+				<point><z unit="mm">-245.000</z><x unit="mm"> 53.000</x></point>
+				<point><z unit="mm">-214.000</z><x unit="mm"> 40.000</x></point>
+				<point><z unit="mm">-199.000</z><x unit="mm"> 40.000</x></point>
+			</OuterPoints>
+			<InnerPoints>
+				<point><z unit="mm">-400.000</z><x unit="mm"> 91.000</x></point>
+				<point><z unit="mm">-360.182</z><x unit="mm"> 91.000</x></point>
+				<point><z unit="mm">-318.417</z><x unit="mm"> 63.000</x></point>
+				<point><z unit="mm">-299.212</z><x unit="mm"> 63.000</x></point>
+				<point><z unit="mm">-265.962</z><x unit="mm"> 49.000</x></point>
+				<point><z unit="mm">-245.805</z><x unit="mm"> 49.000</x></point>
+				<point><z unit="mm">-217.189</z><x unit="mm"> 37.000</x></point>
+				<point><z unit="mm">-199.000</z><x unit="mm"> 37.000</x></point>
+			</InnerPoints>
+		</RotationSolid>
+		<RotationSolid>
+			<Name>ForwardCone</Name>
+			<Color>#666</Color>
+			<Material>SVD-Carbon</Material>
+			<!-- chosen start and end angle leaves 200µm of tolerance at narrowest point -->
+			<minPhi unit="deg">-89.65</minPhi>
+			<maxPhi unit="deg"> 89.65</maxPhi>
+			<OuterPoints>
+				<point><z unit="mm"> 232.000</z><x unit="mm"> 35.500</x></point>
+				<point><z unit="mm"> 247.000</z><x unit="mm"> 35.500</x></point>
+				<point><z unit="mm"> 310.500</z><x unit="mm"> 44.500</x></point>
+				<point><z unit="mm"> 325.500</z><x unit="mm"> 44.500</x></point>
+				<point><z unit="mm"> 380.000</z><x unit="mm"> 61.000</x></point>
+				<point><z unit="mm"> 395.000</z><x unit="mm"> 61.000</x></point>
+				<point><z unit="mm"> 447.541</z><x unit="mm"> 90.000</x></point>
+				<point><z unit="mm"> 459.860</z><x unit="mm"> 90.000</x></point>
+			</OuterPoints>
+			<InnerPoints>
+				<point><z unit="mm"> 232.000</z><x unit="mm"> 32.500</x></point>
+				<point><z unit="mm"> 247.212</z><x unit="mm"> 32.500</x></point>
+				<point><z unit="mm"> 310.500</z><x unit="mm"> 39.984</x></point>
+				<point><z unit="mm"> 331.268</z><x unit="mm"> 39.984</x></point>
+				<point><z unit="mm"> 380.578</z><x unit="mm"> 55.000</x></point>
+				<point><z unit="mm"> 402.754</z><x unit="mm"> 55.000</x></point>
+				<point><z unit="mm"> 449.860</z><x unit="mm"> 81.000</x></point>
+				<point><z unit="mm"> 459.860</z><x unit="mm"> 81.000</x></point>
+			</InnerPoints>
+		</RotationSolid>
+		<!-- Outside hull of SVD close to CDC -->
+		<RotationSolid>
+			<Name>OuterHull</Name>
+			<Color>#666</Color>
+			<Material>SVD-Carbon</Material>
+			<!-- chosen start and end angle leaves 200µm of tolerance at narrowest point -->
+			<minPhi unit="deg">-89.95</minPhi>
+			<maxPhi unit="deg"> 89.95</maxPhi>
+			<OuterPoints>
+				<point><z unit="mm">-380.000</z><x unit="mm">155.000</x></point>
+				<point><z unit="mm"> 505.000</z><x unit="mm">155.000</x></point>
+			</OuterPoints>
+			<InnerPoints>
+				<point><z unit="mm">-380.000</z><x unit="mm">154.000</x></point>
+				<point><z unit="mm"> 505.000</z><x unit="mm">154.000</x></point>
+			</InnerPoints>
+		</RotationSolid>
+		<RotationSolid>
+			<Name>MiddleHull</Name>
+			<Color>#fff</Color>
+			<Material>SVD-Airex</Material>
+			<!-- chosen start and end angle leaves 200µm of tolerance at narrowest point -->
+			<minPhi unit="deg">-89.95</minPhi>
+			<maxPhi unit="deg"> 89.95</maxPhi>
+			<OuterPoints>
+				<point><z unit="mm">-360.000</z><x unit="mm">154.000</x></point>
+				<point><z unit="mm"> 490.000</z><x unit="mm">154.000</x></point>
+			</OuterPoints>
+			<InnerPoints>
+				<point><z unit="mm">-360.000</z><x unit="mm">150.000</x></point>
+				<point><z unit="mm"> 490.000</z><x unit="mm">150.000</x></point>
+			</InnerPoints>
+		</RotationSolid>
+		<RotationSolid>
+			<Name>InnerHull</Name>
+			<Color>#666</Color>
+			<Material>SVD-Carbon</Material>
+			<!-- chosen start and end angle leaves 200µm of tolerance at narrowest point -->
+			<minPhi unit="deg">-89.95</minPhi>
+			<maxPhi unit="deg"> 89.95</maxPhi>
+			<OuterPoints>
+				<point><z unit="mm">-360.000</z><x unit="mm">150.000</x></point>
+				<point><z unit="mm"> 490.000</z><x unit="mm">150.000</x></point>
+			</OuterPoints>
+			<InnerPoints>
+				<point><z unit="mm">-360.000</z><x unit="mm">149.000</x></point>
+				<point><z unit="mm"> 490.000</z><x unit="mm">149.000</x></point>
+			</InnerPoints>
+		</RotationSolid>
+		<RotationSolid>
+			<Name>BackwardRing</Name>
+			<Color>#ccc</Color>
+			<Material>Al</Material>
+			<!-- chosen start and end angle leaves 200µm of tolerance at narrowest point -->
+			<minPhi unit="deg">-89.95</minPhi>
+			<maxPhi unit="deg"> 89.95</maxPhi>
+			<OuterPoints>
+				<point><z unit="mm">-400.000</z><x unit="mm">154.000</x></point>
+				<point><z unit="mm">-360.000</z><x unit="mm">154.000</x></point>
+			</OuterPoints>
+			<InnerPoints>
+				<point><z unit="mm">-400.000</z><x unit="mm">148.000</x></point>
+				<point><z unit="mm">-360.000</z><x unit="mm">148.000</x></point>
+			</InnerPoints>
+		</RotationSolid>
+		<RotationSolid>
+			<Name>ForwardRing</Name>
+			<Color>#ccc</Color>
+			<Material>Al</Material>
+			<!-- chosen start and end angle leaves 200µm of tolerance at narrowest point -->
+			<minPhi unit="deg">-89.95</minPhi>
+			<maxPhi unit="deg"> 89.95</maxPhi>
+			<OuterPoints>
+				<point><z unit="mm">490.000</z><x unit="mm">154.000</x></point>
+				<point><z unit="mm">525.000</z><x unit="mm">154.000</x></point>
+			</OuterPoints>
+			<InnerPoints>
+				<point><z unit="mm">490.000</z><x unit="mm">148.000</x></point>
+				<point><z unit="mm">525.000</z><x unit="mm">148.000</x></point>
+			</InnerPoints>
+		</RotationSolid>
+	</HalfShell>
 
-  <Endrings>
-    <Material>Fe</Material>
-    <!-- Leave this amount of space to the YZ plane for alignment purposes -->
-    <gapWidth unit="um">100</gapWidth>
-    <!-- length in z direction of the endrings -->
-    <length unit="mm"> 15.000</length>
-    <!-- thickness of the base ring on the carbon cone -->
-    <baseThickness unit="mm">2.000</baseThickness>
-    <Layer id="4">
-      <Endring name="Forward">
-        <!-- z position of the endring -->
-        <z unit="mm">          239.500</z>
-        <!-- inner radius of the base -->
-        <baseRadius unit="mm">  35.600</baseRadius>
-        <!-- inner radius of the endring -->
-        <innerRadius unit="mm"> 45.000</innerRadius>
-        <!-- outer radius of the endring -->
-        <outerRadius unit="mm"> 52.000</outerRadius>
-        <!-- width of the horizontal bar between endring and base -->
-        <horizontalBar unit="mm">3.000</horizontalBar>
-        <!-- width of the vertical bar between endring and base -->
-        <verticalBar unit="mm">  8.300</verticalBar>
-      </Endring>
-      <Endring name="Backward">
-        <z unit="mm">         -206.500</z>
-        <baseRadius unit="mm">  40.100</baseRadius>
-        <innerRadius unit="mm"> 59.500</innerRadius>
-        <outerRadius unit="mm"> 65.500</outerRadius>
-        <horizontalBar unit="mm">2.000</horizontalBar>
-        <verticalBar unit="mm">  3.000</verticalBar>
-      </Endring>
-    </Layer>
-    <Layer id="5">
-      <Endring name="Forward">
-        <z unit="mm">          318.000</z>
-        <baseRadius unit="mm">  44.600</baseRadius>
-        <innerRadius unit="mm"> 60.000</innerRadius>
-        <outerRadius unit="mm"> 67.500</outerRadius>
-        <horizontalBar unit="mm">2.000</horizontalBar>
-        <verticalBar unit="mm">  8.300</verticalBar>
-      </Endring>
-      <Endring name="Backward">
-        <z unit="mm">         -252.500</z>
-        <baseRadius unit="mm">  53.100</baseRadius>
-        <innerRadius unit="mm"> 85.000</innerRadius>
-        <outerRadius unit="mm"> 90.500</outerRadius>
-        <horizontalBar unit="mm">5.000</horizontalBar>
-        <verticalBar unit="mm">  5.000</verticalBar>
-      </Endring>
-    </Layer>
-    <Layer id="6">
-      <Endring name="Forward">
-        <z unit="mm">          387.500</z>
-        <baseRadius unit="mm">  61.100</baseRadius>
-        <innerRadius unit="mm"> 77.000</innerRadius>
-        <outerRadius unit="mm"> 86.000</outerRadius>
-        <horizontalBar unit="mm">2.000</horizontalBar>
-        <verticalBar unit="mm">  8.300</verticalBar>
-      </Endring>
-      <Endring name="Backward">
-        <z unit="mm">         -305.500</z>
-        <baseRadius unit="mm">  69.100</baseRadius>
-        <innerRadius unit="mm">115.000</innerRadius>
-        <outerRadius unit="mm">120.800</outerRadius>
-        <horizontalBar unit="mm">4.000</horizontalBar>
-        <verticalBar unit="mm">  5.000</verticalBar>
-      </Endring>
-    </Layer>
-  </Endrings>
+	<Endrings>
+		<Material>Fe</Material>
+		<!-- Leave this amount of space to the YZ plane for alignment purposes -->
+		<gapWidth unit="um">100</gapWidth>
+		<!-- length in z direction of the endrings -->
+		<length unit="mm"> 15.000</length>
+		<!-- thickness of the base ring on the carbon cone -->
+		<baseThickness unit="mm">2.000</baseThickness>
+		<Layer id="4">
+			<Endring name="Forward">
+				<!-- z position of the endring -->
+				<z unit="mm">          239.500</z>
+				<!-- inner radius of the base -->
+				<baseRadius unit="mm">  35.600</baseRadius>
+				<!-- inner radius of the endring -->
+				<innerRadius unit="mm"> 45.000</innerRadius>
+				<!-- outer radius of the endring -->
+				<outerRadius unit="mm"> 52.000</outerRadius>
+				<!-- width of the horizontal bar between endring and base -->
+				<horizontalBar unit="mm">3.000</horizontalBar>
+				<!-- width of the vertical bar between endring and base -->
+				<verticalBar unit="mm">  8.300</verticalBar>
+			</Endring>
+			<Endring name="Backward">
+				<z unit="mm">         -206.500</z>
+				<baseRadius unit="mm">  40.100</baseRadius>
+				<innerRadius unit="mm"> 59.500</innerRadius>
+				<outerRadius unit="mm"> 65.500</outerRadius>
+				<horizontalBar unit="mm">2.000</horizontalBar>
+				<verticalBar unit="mm">  3.000</verticalBar>
+			</Endring>
+		</Layer>
+		<Layer id="5">
+			<Endring name="Forward">
+				<z unit="mm">          318.000</z>
+				<baseRadius unit="mm">  44.600</baseRadius>
+				<innerRadius unit="mm"> 60.000</innerRadius>
+				<outerRadius unit="mm"> 67.500</outerRadius>
+				<horizontalBar unit="mm">2.000</horizontalBar>
+				<verticalBar unit="mm">  8.300</verticalBar>
+			</Endring>
+			<Endring name="Backward">
+				<z unit="mm">         -252.500</z>
+				<baseRadius unit="mm">  53.100</baseRadius>
+				<innerRadius unit="mm"> 85.000</innerRadius>
+				<outerRadius unit="mm"> 90.500</outerRadius>
+				<horizontalBar unit="mm">5.000</horizontalBar>
+				<verticalBar unit="mm">  5.000</verticalBar>
+			</Endring>
+		</Layer>
+		<Layer id="6">
+			<Endring name="Forward">
+				<z unit="mm">          387.500</z>
+				<baseRadius unit="mm">  61.100</baseRadius>
+				<innerRadius unit="mm"> 77.000</innerRadius>
+				<outerRadius unit="mm"> 86.000</outerRadius>
+				<horizontalBar unit="mm">2.000</horizontalBar>
+				<verticalBar unit="mm">  8.300</verticalBar>
+			</Endring>
+			<Endring name="Backward">
+				<z unit="mm">         -305.500</z>
+				<baseRadius unit="mm">  69.100</baseRadius>
+				<innerRadius unit="mm">115.000</innerRadius>
+				<outerRadius unit="mm">120.800</outerRadius>
+				<horizontalBar unit="mm">4.000</horizontalBar>
+				<verticalBar unit="mm">  5.000</verticalBar>
+			</Endring>
+		</Layer>
+	</Endrings>
 
-  <SupportRibs>
-    <!-- spacing between the center of the ribs -->
-    <spacing unit="mm">18.560</spacing>
-    <!-- height of the ribs -->
-    <height unit="mm">6.500</height>
-    <!-- parameters for the inner part of the ribs -->
-    <inner>
-      <Material>SVD-Airex</Material>
-      <Color>#ccc</Color>
-      <width unit="mm"> 3.000</width>
-    </inner>
-    <!-- parameters for the outer part of the ribs -->
-    <outer>
-      <Material>SVD-Carbon</Material>
-      <Color>#333</Color>
-      <!-- total outer width, inner part will be placed centered around this -->
-      <width unit="mm"> 3.280</width>
-    </outer>
-    <Layer id="4">
-      <!-- We create the ribs by placing boxes in ZX space with a given
-     rotation and adding all these boxes together -->
-      <box>
-        <length unit="mm">268.000</length>
-        <z unit="mm"> -39.660</z>
-        <r unit="mm"> -4.910</r>
-        <theta unit="deg">  0.000</theta>
-      </box>
-      <box>
-        <length unit="mm">140.738</length>
-        <z unit="mm"> 162.256</z>
-        <r unit="mm">-19.351</r>
-        <theta unit="deg">-11.900</theta>
-      </box>
-    </Layer>
-    <Layer id="5">
-      <box>
-        <length unit="mm">393.000</length>
-        <z unit="mm"> -24.000</z>
-        <r unit="mm"> -4.910</r>
-        <theta unit="deg">  0.000</theta>
-      </box>
-      <box>
-        <length unit="mm">141.031</length>
-        <z unit="mm"> 239.388</z>
-        <r unit="mm">-24.221</r>
-        <theta unit="deg">-16.000</theta>
-      </box>
-    </Layer>
-    <Layer id="6">
-      <box>
-        <length unit="mm">518.000</length>
-        <z unit="mm"> -14.500</z>
-        <r unit="mm"> -4.910</r>
-        <theta unit="deg">  0.000</theta>
-      </box>
-      <box>
-        <length unit="mm">142.561</length>
-        <z unit="mm"> 309.831</z>
-        <r unit="mm">-30.353</r>
-        <theta unit="deg">-21.000</theta>
-      </box>
-    </Layer>
-  </SupportRibs>
+	<SupportRibs>
+		<!-- spacing between the center of the ribs -->
+		<spacing unit="mm">18.560</spacing>
+		<!-- height of the ribs -->
+		<height unit="mm">6.500</height>
+		<!-- parameters for the inner part of the ribs -->
+		<inner>
+			<Material>SVD-Airex</Material>
+			<Color>#ccc</Color>
+			<width unit="mm"> 3.000</width>
+		</inner>
+		<!-- parameters for the outer part of the ribs -->
+		<outer>
+			<Material>SVD-Carbon</Material>
+			<Color>#333</Color>
+			<!-- total outer width, inner part will be placed centered around this -->
+			<width unit="mm"> 3.280</width>
+		</outer>
+		<Layer id="4">
+			<!-- We create the ribs by placing boxes in ZX space with a given
+		 rotation and adding all these boxes together -->
+			<box>
+				<length unit="mm">268.000</length>
+				<z unit="mm"> -39.660</z>
+				<r unit="mm"> -4.910</r>
+				<theta unit="deg">  0.000</theta>
+			</box>
+			<box>
+				<length unit="mm">140.738</length>
+				<z unit="mm"> 162.256</z>
+				<r unit="mm">-19.351</r>
+				<theta unit="deg">-11.900</theta>
+			</box>
+		</Layer>
+		<Layer id="5">
+			<box>
+				<length unit="mm">393.000</length>
+				<z unit="mm"> -24.000</z>
+				<r unit="mm"> -4.910</r>
+				<theta unit="deg">  0.000</theta>
+			</box>
+			<box>
+				<length unit="mm">141.031</length>
+				<z unit="mm"> 239.388</z>
+				<r unit="mm">-24.221</r>
+				<theta unit="deg">-16.000</theta>
+			</box>
+		</Layer>
+		<Layer id="6">
+			<box>
+				<length unit="mm">518.000</length>
+				<z unit="mm"> -14.500</z>
+				<r unit="mm"> -4.910</r>
+				<theta unit="deg">  0.000</theta>
+			</box>
+			<box>
+				<length unit="mm">142.561</length>
+				<z unit="mm"> 309.831</z>
+				<r unit="mm">-30.353</r>
+				<theta unit="deg">-21.000</theta>
+			</box>
+		</Layer>
+	</SupportRibs>
 
-  <CoolingPipes>
-    <Material>Fe</Material>
-    <outerDiameter unit="mm">1.500</outerDiameter>
-    <wallThickness unit="mm">0.050</wallThickness>
-    <Layer id="4">
-      <!-- number of pipes for this layer/halfshell -->
-      <nPipes>5</nPipes>
-      <!-- phi angle of the center of the first pipe -->
-      <startPhi unit="deg">-71.118</startPhi>
-      <!-- phi angle between two pipes -->
-      <deltaPhi unit="deg"> 36.000</deltaPhi>
-      <!-- distance between IP and center of the pipes -->
-      <radius   unit="mm">  87.000</radius>
-      <!-- beginning of pipe in z -->
-      <zstart   unit="mm">-155.100</zstart>
-      <!-- end of pipe in z -->
-      <zend     unit="mm">  96.880</zend>
-    </Layer>
-    <Layer id="5">
-      <nPipes>6</nPipes>
-      <startPhi unit="deg">-74.602</startPhi>
-      <deltaPhi unit="deg"> 30.000</deltaPhi>
-      <radius   unit="mm"> 112.000</radius>
-      <zstart   unit="mm">-202.000</zstart>
-      <zend     unit="mm"> 173.040</zend>
-    </Layer>
-    <Layer id="6">
-      <nPipes>8</nPipes>
-      <startPhi unit="deg">-81.211</startPhi>
-      <deltaPhi unit="deg"> 22.500</deltaPhi>
-      <radius   unit="mm"> 142.500</radius>
-      <zstart   unit="mm">-255.000</zstart>
-      <zend     unit="mm"> 245.040</zend>
-    </Layer>
-  </CoolingPipes>
+	<CoolingPipes>
+		<Material>Fe</Material>
+		<outerDiameter unit="mm">1.500</outerDiameter>
+		<wallThickness unit="mm">0.050</wallThickness>
+		<Layer id="4">
+			<!-- number of pipes for this layer/halfshell -->
+			<nPipes>5</nPipes>
+			<!-- phi angle of the center of the first pipe -->
+			<startPhi unit="deg">-71.118</startPhi>
+			<!-- phi angle between two pipes -->
+			<deltaPhi unit="deg"> 36.000</deltaPhi>
+			<!-- distance between IP and center of the pipes -->
+			<radius   unit="mm">  87.000</radius>
+			<!-- beginning of pipe in z -->
+			<zstart   unit="mm">-155.100</zstart>
+			<!-- end of pipe in z -->
+			<zend     unit="mm">  96.880</zend>
+		</Layer>
+		<Layer id="5">
+			<nPipes>6</nPipes>
+			<startPhi unit="deg">-74.602</startPhi>
+			<deltaPhi unit="deg"> 30.000</deltaPhi>
+			<radius   unit="mm"> 112.000</radius>
+			<zstart   unit="mm">-202.000</zstart>
+			<zend     unit="mm"> 173.040</zend>
+		</Layer>
+		<Layer id="6">
+			<nPipes>8</nPipes>
+			<startPhi unit="deg">-81.211</startPhi>
+			<deltaPhi unit="deg"> 22.500</deltaPhi>
+			<radius   unit="mm"> 142.500</radius>
+			<zstart   unit="mm">-255.000</zstart>
+			<zend     unit="mm"> 245.040</zend>
+		</Layer>
+	</CoolingPipes>
 </Support>

@@ -378,10 +378,13 @@ namespace Belle2 {
       const TVector3 tPosTrack(posTrack.x(), posTrack.y(), posTrack.z());
       const TVector3 tMom(mom.x(), mom.y(), mom.z());
       G4int lr = cdcg.getOldLeftRight(tPosW, tPosTrack, tMom);
+      G4int newLrRaw = cdcg.getNewLeftRightRaw(tPosW, tPosTrack, tMom);
+      G4int newLr = newLrRaw; //tentative !
 
       if (nWires == 1) {
 
-        saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep, s_in_layer * cm, momIn, posW, posIn, posOut, posTrack, lr, speed);
+        //        saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep, s_in_layer * cm, momIn, posW, posIn, posOut, posTrack, lr, newLrRaw, newLr, speed);
+        saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep, s_in_layer * cm, pOnTrack, posW, posIn, posOut, posTrack, lr, newLrRaw, newLr, speed);
 #if defined(CDC_DEBUG)
         std::cout << "saveSimHit" << std::endl;
         std::cout << "momIn    = " << momIn    << std::endl;
@@ -445,7 +448,8 @@ namespace Belle2 {
           const G4ThreeVector x_Out(xint[0]*cm, xint[1]*cm, xint[2]*cm);
           const G4ThreeVector p_In(momBefore * vent[3], momBefore * vent[4], momBefore * vent[5]);
 
-          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (sint - s1) * cm, p_In, posW, x_In, x_Out, posTrack, lr, speed);
+          //          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (sint - s1) * cm, p_In, posW, x_In, x_Out, posTrack, lr, newLrRaw, newLr, speed);
+          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (sint - s1) * cm, pOnTrack, posW, x_In, x_Out, posTrack, lr, newLrRaw, newLr, speed);
 #if defined(CDC_DEBUG)
           std::cout << "saveSimHit" << std::endl;
           std::cout << "p_In    = " << p_In     << std::endl;
@@ -472,7 +476,8 @@ namespace Belle2 {
           const G4ThreeVector x_In(vent[0]*cm, vent[1]*cm, vent[2]*cm);
           const G4ThreeVector p_In(momBefore * vent[3], momBefore * vent[4], momBefore * vent[5]);
 
-          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (s2 - sint) * cm, p_In, posW, x_In, posOut, posTrack, lr, speed);
+          //          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (s2 - sint) * cm, p_In, posW, x_In, posOut, posTrack, lr, newLrRaw, newLr, speed);
+          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (s2 - sint) * cm, pOnTrack, posW, x_In, posOut, posTrack, lr, newLrRaw, newLr, speed);
 #if defined(CDC_DEBUG)
           std::cout << "saveSimHit" << std::endl;
           std::cout << "p_In    = " << p_In     << std::endl;
@@ -517,6 +522,8 @@ namespace Belle2 {
                                    const G4ThreeVector& posOut,
                                    const G4ThreeVector& posTrack,
                                    const G4int lr,
+                                   const G4int newLrRaw,
+                                   const G4int newLr,
                                    const G4double speed)
   {
 
@@ -567,6 +574,11 @@ namespace Belle2 {
     TVector3 positionTrack(posTrack.getX() / cm, posTrack.getY() / cm, posTrack.getZ() / cm);
     simHit->setPosTrack(positionTrack);
     simHit->setPosFlag(lr);
+    simHit->setLeftRightPassageRaw(newLrRaw);
+    simHit->setLeftRightPassage(newLr);
+#if defined(CDC_DEBUG)
+    std::cout << "sensitived,oldlr,newlrRaw,newlr= " << lr << " " << newLrRaw << " " << newLr << std::endl;
+#endif
 
     B2DEBUG(150, "HitNumber: " << m_hitNumber);
     cdcSimHitRel.add(trackID, m_hitNumber);

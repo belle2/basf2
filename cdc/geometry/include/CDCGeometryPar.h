@@ -498,6 +498,15 @@ namespace Belle2 {
       unsigned short getOldLeftRight(const TVector3& posOnWire, const TVector3& posOnTrack, const TVector3& momentum) const;
 
       /**
+       * Returns new left/right_raw.
+       * @param posOnWire  Position on the wire  at the closest point.
+       * @param posOnTrack Position on the track at the closest point.
+       * @param momentum   Track 3-momentum.
+       */
+
+      signed short getNewLeftRightRaw(const TVector3& posOnWire, const TVector3& posOnTrack, const TVector3& momentum) const;
+
+      /**
        * Returns track incident angle in rphi plane (alpha in rad.).
        * @param posOnWire Position on the wire  at the closest point.
        * @param momentum  Track momentum at the closest point.

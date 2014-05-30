@@ -1026,6 +1026,14 @@ unsigned short CDCGeometryPar::getOldLeftRight(const TVector3& posOnWire, const 
   return lr;
 }
 
+signed short CDCGeometryPar::getNewLeftRightRaw(const TVector3& posOnWire, const TVector3& posOnTrack, const TVector3& momentum) const
+{
+  double distanceCrossP = ((posOnWire - posOnTrack).Cross(momentum)).z();
+  short int lr = 1;
+  if (distanceCrossP < 0.) lr = -1;
+  return lr;
+}
+
 double CDCGeometryPar::getAlpha(const TVector3& posOnWire, const TVector3& momentum) const
 {
   const double wx = posOnWire.x();

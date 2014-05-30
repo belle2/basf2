@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010-2011  Belle II Collaboration                         *
+ * Copyright(C) 2010-2014  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll, Peter Kvasnicka, Martin Ritter             *
@@ -8,17 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDTRUEHIT_H
-#define PXDTRUEHIT_H
+#pragma once
+#ifndef PXD_DATAOBJECTS_PXDTRUEHIT_H
+#define PXD_DATAOBJECTS_PXDTRUEHIT_H
 
-#include <vxd/dataobjects/VxdID.h>
 #include <vxd/dataobjects/VXDTrueHit.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-    * @{
-    */
-
   /**
     * Class PXDTrueHit - Records of tracks that either enter or leave
     * the sensitive volume.
@@ -38,43 +34,25 @@ namespace Belle2 {
     PXDTrueHit(): VXDTrueHit() {}
 
     /** Constructor
-     * @param sensorID SensorID of the Sensor
-     * @param u u coordinate of the hit
-     * @param v v coordinate of the hit
-     * @param momentum momentum of the particle in local coordinates
-     * @param globalTime timestamp of the hit
-     */
-    PXDTrueHit(VxdID sensorID, float u, float v, float energyDep, float globalTime,
-               const TVector3& momentum, const TVector3& entryMomentum, const TVector3& exitMomentum):
-      VXDTrueHit(sensorID, u, v, energyDep, globalTime, momentum, entryMomentum, exitMomentum)
-    {}
-    /** (Full) constructor
      * @param sensorID SensorID of the sensor
-     * @param u u coordinate of the hit
-     * @param v v coordinate of the hit
-     * @param w w coordinate of the hit
-     * @param entryU u coordinate of the track start point
-     * @param entryV v coordinate of the track start point
-     * @param entryW w coordinate of the track start point
-     * @param exitU u coordinate of the track endpoint
-     * @param exitV v coordinate of the track endpoint
-     * @param exitW w coordinate of the track endpoint
+     * @param posEntry position of the start of the track in local coordinates
+     * @param posMidPoint position of the mid point of the track in local coordinates
+     * @param posExit position of the end of the track in local coordinates
+     * @param momEntry momentum of the start of the track in local coordinates
+     * @param momMidPoint momentum of the mid point of the track in local coordinates
+     * @param momExit momentum of the end of the track in local coordinates
      * @param momentum momentum of the particle in local coordinates
-     * @param entryMomentum momentum at track start point
-     * @param exitMomentum momentum at track endpoint
+     * @param energyDep energy deposited by the track inside the sensor
      * @param globalTime timestamp of the hit
      */
-    PXDTrueHit(
-      VxdID sensorID, float u, float v, float w, float entryU, float entryV, float entryW,
-      float exitU, float exitV, float exitW, float energyDep, float globalTime,
-      const TVector3& momentum, const TVector3& entryMomentum, const TVector3& exitMomentum):
-      VXDTrueHit(sensorID, u, v, w, entryU, entryV, entryW, exitU, exitV, exitW,
-                 energyDep, globalTime, momentum, entryMomentum, exitMomentum)
+    PXDTrueHit(VxdID sensorID, float* posEntry, float* posMidPoint, float* posExit,
+               float* momEntry, float* momMidPoint, float* momExit, float energyDep, float globalTime):
+      VXDTrueHit(sensorID, posEntry, posMidPoint, posExit,
+                 momEntry, momMidPoint, momExit, energyDep, globalTime)
     {}
-    ClassDef(PXDTrueHit, 4)
-  };
 
-  /** @}*/
+    ClassDef(PXDTrueHit, 5)
+  };
 
 } // end namespace Belle2
 

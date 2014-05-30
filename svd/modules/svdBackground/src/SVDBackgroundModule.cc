@@ -137,9 +137,9 @@ void SVDBackgroundModule::event()
       currentSensorArea = getSensorArea(currentSensorID);
       currentLayerID.setLayerNumber(currentSensorID.getLayerNumber());
     }
-    double value = hit.getEnergyDep() / currentSensorMass / currentComponentTime * c_smy / Unit::J;
+    double value = hit.getElectrons() * Const::ehEnergy / currentSensorMass / currentComponentTime * c_smy / Unit::J;
     bData.m_layerData[currentLayerID].m_dose += value;
-    bData.m_layerData[currentLayerID].m_expo += hit.getEnergyDep();
+    bData.m_layerData[currentLayerID].m_expo += hit.getElectrons() * Const::ehEnergy;
   }
 
   for (const SVDDigit & digit : storeDigits) {

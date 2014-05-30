@@ -59,10 +59,8 @@ namespace Belle2 {
 //                 Implementation
 //-----------------------------------------------------------------
 
-    GeoTBCreator::GeoTBCreator():
-      m_activeChips(false), m_seeNeutrons(false), m_onlyPrimaryTrueHits(false),
-      m_sensitiveThreshold(0)
-    { }
+    GeoTBCreator::GeoTBCreator()
+    {}
 
     GeoTBCreator::~GeoTBCreator()
     {
@@ -241,7 +239,8 @@ namespace Belle2 {
         );
 
         PXD::SensorInfo* newInfo = new PXD::SensorInfo(sensorInfo);
-        PXD::SensitiveDetector* sensitive = new PXD::SensitiveDetector(newInfo, m_seeNeutrons, m_onlyPrimaryTrueHits, m_sensitiveThreshold);
+        PXD::SensitiveDetector* sensitive = new PXD::SensitiveDetector(newInfo);
+        sensitive->setOptions(m_seeNeutrons, m_onlyPrimaryTrueHits, m_distanceTolerance, m_electronTolerance, m_minimumElectrons);
         m_sensitivePXD.push_back(sensitive);
 
         volume->SetSensitiveDetector(sensitive);
@@ -265,7 +264,8 @@ namespace Belle2 {
         );
 
         SVD::SensorInfo* newInfo = new SVD::SensorInfo(sensorInfo);
-        VXD::SensitiveDetector<SVDSimHit, SVDTrueHit>* sensitive = new VXD::SensitiveDetector<SVDSimHit, SVDTrueHit>(newInfo, m_seeNeutrons, m_onlyPrimaryTrueHits, m_sensitiveThreshold);
+        VXD::SensitiveDetector<SVDSimHit, SVDTrueHit>* sensitive = new VXD::SensitiveDetector<SVDSimHit, SVDTrueHit>(newInfo);
+        sensitive->setOptions(m_seeNeutrons, m_onlyPrimaryTrueHits, m_distanceTolerance, m_electronTolerance, m_minimumElectrons);
         m_sensitiveSVD.push_back(sensitive);
 
         volume->SetSensitiveDetector(sensitive);
@@ -283,7 +283,8 @@ namespace Belle2 {
                                   );
 
         TEL::SensorInfo* newInfo = new TEL::SensorInfo(sensorInfo);
-        TEL::SensitiveDetector* sensitive = new TEL::SensitiveDetector(newInfo, m_seeNeutrons, m_onlyPrimaryTrueHits, m_sensitiveThreshold);
+        TEL::SensitiveDetector* sensitive = new TEL::SensitiveDetector(newInfo);
+        sensitive->setOptions(m_seeNeutrons, m_onlyPrimaryTrueHits, m_distanceTolerance, m_electronTolerance, m_minimumElectrons);
         m_sensitiveTEL.push_back(sensitive);
 
         volume->SetSensitiveDetector(sensitive);
@@ -343,10 +344,12 @@ namespace Belle2 {
 
     void GeoTBCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes)
     {
-      m_activeChips = content.getBool("ActiveChips", false);
-      m_seeNeutrons = content.getBool("SeeNeutrons", false);
-      m_onlyPrimaryTrueHits = content.getBool("OnlyPrimaryTrueHits", false);
-      m_sensitiveThreshold = content.getWithUnit("SensitiveThreshold", 1.0 * Unit::eV);
+      m_activeChips = content.getBool("ActiveChips", m_activeChips);
+      m_seeNeutrons = content.getBool("SeeNeutrons", m_seeNeutrons);
+      m_onlyPrimaryTrueHits = content.getBool("OnlyPrimaryTrueHits", m_onlyPrimaryTrueHits);
+      m_distanceTolerance = (float)content.getLength("DistanceTolerance", m_distanceTolerance);
+      m_electronTolerance = (float)content.getDouble("ElectronTolerance", m_electronTolerance);
+      m_minimumElectrons = (float)content.getDouble("MinimumElectrons", m_minimumElectrons);
 
       m_worldMaterial = content.getString("DefaultMaterial", "Air");
 

@@ -230,29 +230,31 @@ void TelDigitizerModule::processHit()
   const TVector3& stopPoint = m_currentHit->getPosOut();
   TVector3 direction = stopPoint - startPoint;
   double trackLength = direction.Mag();
-  //Calculate the number of electrons
-  double electrons = m_currentHit->getEnergyDep() * Unit::GeV
-                     / Const::ehEnergy;
 
-  if (m_currentHit->getPDGcode() == 22
-      || trackLength <= numeric_limits<double>::epsilon()) {
+  // Set magnetic field to save calls to getBField() NOT USED currently
+  m_currentBField = m_currentSensorInfo->getBField(0.5 * (startPoint + stopPoint));
+
+  if (m_currentHit->getPDGcode() == 22 || trackLength <= 0.1 * Unit::um) {
     //Photons deposit the energy at the end of their step
-    driftCharge(stopPoint, electrons);
+    driftCharge(stopPoint, m_currentHit->getElectrons());
   } else {
     //Otherwise, split into segments of (default) max. 5µm and
     //drift the charges from the center of each segment
-    int numberOfSegments = (int)(trackLength / m_segmentLength) + 1;
-    double segmentLength = trackLength / numberOfSegments;
-    electrons /= numberOfSegments;
-    direction.SetMag(1.0);
+    auto segments = m_currentHit->getElectronsConstantDistance(m_segmentLength);
+    double lastFraction {0};
+    double lastElectrons {0};
 
-    // Set magnetic field to save calls to getBField() NOT USED currently
-    m_currentBField = m_currentSensorInfo->getBField(0.5 * (startPoint + stopPoint));
+    for (auto & segment : segments) {
+      //Simhit returns step fraction and cumulative electrons. We want the
+      //center of these steps and electrons in this step
+      const double f = (segment.first + lastFraction) / 2;
+      const double e = segment.second - lastElectrons;
+      //Update last values
+      std::tie(lastFraction, lastElectrons) = segment;
 
-    for (int segment = 0; segment < numberOfSegments; ++segment) {
-      TVector3 position = startPoint
-                          + direction * segmentLength * (segment + 0.5);
-      driftCharge(position, electrons);
+      //And drift charge from that position
+      const TVector3 position = startPoint + f * direction;
+      driftCharge(position, e);
     }
   }
 }

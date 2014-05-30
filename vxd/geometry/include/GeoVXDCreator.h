@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2014 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll, Christian Oswald, Zbynek Drasal,           *
@@ -182,19 +182,23 @@ namespace Belle2 {
       GeoVXDLadder m_ladder;
       /** List to all created sensitive detector instances */
       std::vector<Simulation::SensitiveDetectorBase*> m_sensitive;
-
+      /** tolerance for Geant4 steps to be merged to a single step */
+      float m_distanceTolerance {(float)(5 * Unit::um)};
+      /** tolerance for the energy deposition in electrons to be merged in a single step */
+      float m_electronTolerance {100};
+      /** minimum number of electrons to be deposited by a particle to be saved */
+      float m_minimumElectrons {10};
       /** Stepsize to be used inside active volumes */
-      double m_activeStepSize;
+      double m_activeStepSize {5 * Unit::um};
       /** Make also chips sensitive. */
-      bool m_activeChips;
+      bool m_activeChips {false};
       /** Make sensitive detectors also see neutrons. */
-      bool m_seeNeutrons;
+      bool m_seeNeutrons {false};
       /** If true only create TrueHits from primary particles and ignore secondaries */
-      bool m_onlyPrimaryTrueHits;
-      /** Minimum deposited energy per step in the SensitiveDetector (discard step if less) */
-      double m_sensitiveThreshold;
-      /** If this is true, only active Materials will be placed for tracking studies. Dead Material will be ignored */
-      bool m_onlyActiveMaterial;
+      bool m_onlyPrimaryTrueHits {false};
+      /** If this is true, only active Materials will be placed for tracking
+       * studies. Dead Material will be ignored */
+      bool m_onlyActiveMaterial {false};
 
     }; // class GeoVXDCreator
 

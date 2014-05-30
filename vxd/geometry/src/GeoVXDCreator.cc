@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2014 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Ritter, Jozef Koval                               *
@@ -48,9 +48,7 @@ namespace Belle2 {
   using namespace geometry;
   namespace VXD {
 
-    GeoVXDCreator::GeoVXDCreator(const string& prefix) :
-      m_prefix(prefix), m_activeStepSize(0.0005), m_activeChips(false), m_seeNeutrons(false),
-      m_onlyPrimaryTrueHits(false), m_sensitiveThreshold(1.0), m_onlyActiveMaterial(false)
+    GeoVXDCreator::GeoVXDCreator(const string& prefix) : m_prefix(prefix)
     {
     }
 
@@ -345,6 +343,8 @@ namespace Belle2 {
                                                   s.activeArea.length, s.activeArea.height);
         //Create appropriate sensitive detector instance
         SensitiveDetectorBase* sensitive = createSensitiveDetector(sensorID, s, p);
+        sensitive->setOptions(m_seeNeutrons, m_onlyPrimaryTrueHits,
+                              m_distanceTolerance, m_electronTolerance, m_minimumElectrons);
         m_sensitive.push_back(sensitive);
         G4LogicalVolume* active = new G4LogicalVolume(activeShape,  sensorMaterial, name + ".Active",
                                                       0, sensitive);
@@ -459,16 +459,18 @@ namespace Belle2 {
     void GeoVXDCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes)
     {
 
-      m_activeStepSize = content.getLength("ActiveStepSize", 5 * Unit::um) / Unit::mm;
-      m_activeChips = content.getBool("ActiveChips", false);
-      m_seeNeutrons = content.getBool("SeeNeutrons", false);
-      m_onlyPrimaryTrueHits = content.getBool("OnlyPrimaryTrueHits", false);
-      m_sensitiveThreshold = content.getWithUnit("SensitiveThreshold", 1.0 * Unit::eV);
+      m_activeStepSize = content.getLength("ActiveStepSize", m_activeStepSize) / Unit::mm;
+      m_activeChips = content.getBool("ActiveChips", m_activeChips);
+      m_seeNeutrons = content.getBool("SeeNeutrons", m_seeNeutrons);
+      m_onlyPrimaryTrueHits = content.getBool("OnlyPrimaryTrueHits", m_onlyPrimaryTrueHits);
+      m_distanceTolerance = (float)content.getLength("DistanceTolerance", m_distanceTolerance);
+      m_electronTolerance = (float)content.getDouble("ElectronTolerance", m_electronTolerance);
+      m_minimumElectrons = (float)content.getDouble("MinimumElectrons", m_minimumElectrons);
+      m_onlyActiveMaterial = content.getBool("OnlyActiveMaterial", m_onlyActiveMaterial);
       m_alignment = GearDir(content, "Alignment/");
       m_components = GearDir(content, "Components/");
       GearDir support(content, "Support/");
 
-      m_onlyActiveMaterial = content.getBool("OnlyActiveMaterial");
       m_defaultMaterial = content.getString("DefaultMaterial", "Air");
       G4Material* material = Materials::get(m_defaultMaterial);
       if (!material) B2FATAL("Default Material of VXD, '" << m_defaultMaterial << "', could not be found");

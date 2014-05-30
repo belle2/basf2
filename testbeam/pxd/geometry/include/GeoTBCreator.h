@@ -98,14 +98,18 @@ namespace Belle2 {
       /** List of all created telescope sensitive detector instances */
       std::vector<TEL::SensitiveDetector*> m_sensitiveTEL;
 
+      /** tolerance for Geant4 steps to be merged to a single step */
+      float m_distanceTolerance {(float)(5 * Unit::um)};
+      /** tolerance for the energy deposition in electrons to be merged in a single step */
+      float m_electronTolerance {400};
+      /** minimum number of electrons to be deposited by a particle to be saved */
+      float m_minimumElectrons {10};
       /** Make also chips sensitive. */
-      bool m_activeChips;
+      bool m_activeChips {false};
       /** Make sensitive detectors also see neutrons. */
-      bool m_seeNeutrons;
+      bool m_seeNeutrons {false};
       /** If true only create TrueHits from primary particles and ignore secondaries */
-      bool m_onlyPrimaryTrueHits;
-      /** Minimum deposited energy per step in the SensitiveDetector (discard step if less) */
-      double m_sensitiveThreshold;
+      bool m_onlyPrimaryTrueHits {false};
     };
 
   }

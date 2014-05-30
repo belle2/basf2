@@ -159,7 +159,7 @@ void PXDValidation()
   TString name(Form("hValidSimEnergyDepositPerMicron"));
   TH1F *hValidSimEnergyDepositMicron = new TH1F(name, title, iplot1, lplot1, hplot1);
   hValidSimEnergyDepositMicron->GetXaxis()->SetTitle("Electrons per micron");
-  TString expr(Form("simhit_EnergyDep/3.65*1E9/(simhit_Length*1E4)>>%s",name.Data()));
+  TString expr(Form("simhit_EnergyDep/(simhit_Length*1E4)>>%s",name.Data()));
   treeSimHit->Draw(expr);
   hValidSimEnergyDepositMicron->GetListOfFunctions()->Add(new TNamed("Description", title.Data()));
   hValidSimEnergyDepositMicron->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check maximum, should be 60."));

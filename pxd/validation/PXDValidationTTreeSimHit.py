@@ -30,10 +30,6 @@ gROOT.ProcessLine('struct EventDataSimHit {\
     float simhit_PosOutY;\
     float simhit_PosOutZ;\
     float simhit_Length;\
-    float simhit_MomInX;\
-    float simhit_MomInY;\
-    float simhit_MomInZ;\
-    float simhit_Theta;\
     float simhit_EnergyDep;\
     float simhit_GlobalTime;\
 };'
@@ -84,12 +80,12 @@ class PXDValidationTTreeSimHit(Module):
             for simhit in pxd_simhits:
                 # Now let's store some data
                 # Event identification
-                self.data.exp = Belle2.PyStoreObj('EventMetaData'
-                        ).obj().getExperiment()
-                self.data.run = Belle2.PyStoreObj('EventMetaData'
-                        ).obj().getRun()
-                self.data.evt = Belle2.PyStoreObj('EventMetaData'
-                        ).obj().getEvent()
+                self.data.exp = Belle2.PyStoreObj(
+                    'EventMetaData').obj().getExperiment()
+                self.data.run = Belle2.PyStoreObj(
+                    'EventMetaData').obj().getRun()
+                self.data.evt = Belle2.PyStoreObj(
+                    'EventMetaData').obj().getEvent()
                 # Sesnor identification
                 vxd_id = simhit.getSensorID()
                 self.data.vxd_id = vxd_id.getID()
@@ -117,12 +113,8 @@ class PXDValidationTTreeSimHit(Module):
                 self.data.simhit_PosOutY = simhit.getPosOut().Y()
                 self.data.simhit_PosOutZ = simhit.getPosOut().Z()
                 self.data.simhit_Length = (simhit.getPosOut()
-                        - simhit.getPosIn()).Mag()
-                self.data.simhit_MomInX = simhit.getMomIn().X()
-                self.data.simhit_MomInY = simhit.getMomIn().Y()
-                self.data.simhit_MomInZ = simhit.getMomIn().Z()
-                self.data.simhit_Theta = simhit.getTheta()
-                self.data.simhit_EnergyDep = simhit.getEnergyDep()
+                                           - simhit.getPosIn()).Mag()
+                self.data.simhit_EnergyDep = simhit.getElectrons()
                 self.data.simhit_GlobalTime = simhit.getGlobalTime()
                 # Fill tree
                 self.file.cd()
@@ -134,5 +126,3 @@ class PXDValidationTTreeSimHit(Module):
         self.file.cd()
         self.file.Write()
         self.file.Close()
-
-

@@ -83,9 +83,15 @@ namespace Belle2 {
         B2DEBUG(350, "Trying to find " << filename);
 
         std::string fullpath = FileSystem::findFile(filename);
-        if (!fullpath.empty()) return new FileContext(fullpath, false);
+        if (!fullpath.empty()) {
+          if (m_rundependence) B2INFO("gearbox::FileHandler: Reading '" << fullpath << "'");
+          return new FileContext(fullpath, false);
+        }
         fullpath = FileSystem::findFile(filename + ".gz");
-        if (!fullpath.empty()) return new FileContext(fullpath, true);
+        if (!fullpath.empty()) {
+          if (m_rundependence) B2INFO("gearbox::FileHandler: Reading '" << fullpath << "' (gzip)");
+          return new FileContext(fullpath, true);
+        }
 
         //did not work, replace last slash by a - and try again if such a
         //replacement was successful. This allows flattening the directory

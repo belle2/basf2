@@ -13,7 +13,7 @@
 
 #include <framework/core/EventProcessor.h>
 
-#include <framework/core/ModuleStatistics.h>
+#include <framework/core/ProcessStatistics.h>
 #include <framework/core/PathManager.h>
 #include <framework/core/PathIterator.h>
 #include <framework/datastore/DataStore.h>
@@ -151,7 +151,7 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_iterator listIter;
-  ModuleStatistics& stats = ModuleStatistics::getInstance();
+  ProcessStatistics& stats = ProcessStatistics::getInstance();
   stats.startGlobal();
   DataStore::Instance().setInitializeActive(true);
   const StoreObjPtr<EventMetaData> eventMetaData;
@@ -169,9 +169,10 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
     DataStore::Instance().setModule(module->getName());
 
     //Do initialization
+    stats.initModule(module);
     stats.startModule();
     CALL_MODULE(module, initialize);
-    stats.stopModule(*module, ModuleStatistics::c_Init);
+    stats.stopModule(module, ModuleStatistics::c_Init);
 
     //Set the global log level
     logSystem.setModuleLogConfig(NULL);
@@ -205,7 +206,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
 
   const bool collectStats = !Environment::Instance().getNoStats();
-  ModuleStatistics& stats = ModuleStatistics::getInstance();
+  ProcessStatistics& stats = ProcessStatistics::getInstance();
 
   //Loop over the events
   long currEvent = 0;
@@ -229,7 +230,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
         stats.startModule();
       CALL_MODULE(module, event);
       if (collectStats)
-        stats.stopModule(*module, ModuleStatistics::c_Event);
+        stats.stopModule(module, ModuleStatistics::c_Event);
 
       //Set the global log level
       logSystem.setModuleLogConfig(NULL);
@@ -252,7 +253,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
             (eventMetaDataPtr->getRun() != previousEventMetaData.getRun())) {
 
           if (collectStats)
-            stats.stopGlobal(ModuleStatistics::c_Event, true);
+            stats.suspendGlobal();
           //End the previous run
           if (currEvent > 0) {
             EventMetaData newEventMetaData = *eventMetaDataPtr;
@@ -265,7 +266,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
           processBeginRun(modulePathList);
 
           if (collectStats)
-            stats.startGlobal();
+            stats.resumeGlobal();
         }
 
         previousEventMetaData = *eventMetaDataPtr;
@@ -319,7 +320,7 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
 
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_reverse_iterator listIter;
-  ModuleStatistics& stats = ModuleStatistics::getInstance();
+  ProcessStatistics& stats = ProcessStatistics::getInstance();
   stats.startGlobal();
 
   for (listIter = modulePathList.rbegin(); listIter != modulePathList.rend(); ++listIter) {
@@ -331,7 +332,7 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
     //Do termination
     stats.startModule();
     CALL_MODULE(module, terminate);
-    stats.stopModule(*module, ModuleStatistics::c_Term);
+    stats.stopModule(module, ModuleStatistics::c_Term);
 
     //Set the global log level
     logSystem.setModuleLogConfig(NULL);
@@ -349,7 +350,7 @@ void EventProcessor::processBeginRun(const ModulePtrList& modulePathList)
 
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_iterator listIter;
-  ModuleStatistics& stats = ModuleStatistics::getInstance();
+  ProcessStatistics& stats = ProcessStatistics::getInstance();
   stats.startGlobal();
 
   for (listIter = modulePathList.begin(); listIter != modulePathList.end(); ++listIter) {
@@ -361,7 +362,7 @@ void EventProcessor::processBeginRun(const ModulePtrList& modulePathList)
     //Do beginRun() call
     stats.startModule();
     CALL_MODULE(module, beginRun);
-    stats.stopModule(*module, ModuleStatistics::c_BeginRun);
+    stats.stopModule(module, ModuleStatistics::c_BeginRun);
 
     //Set the global log level
     logSystem.setModuleLogConfig(NULL);
@@ -378,7 +379,7 @@ void EventProcessor::processEndRun(const ModulePtrList& modulePathList)
 
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_iterator listIter;
-  ModuleStatistics& stats = ModuleStatistics::getInstance();
+  ProcessStatistics& stats = ProcessStatistics::getInstance();
   stats.startGlobal();
 
   for (listIter = modulePathList.begin(); listIter != modulePathList.end(); ++listIter) {
@@ -390,7 +391,7 @@ void EventProcessor::processEndRun(const ModulePtrList& modulePathList)
     //Do endRun() call
     stats.startModule();
     CALL_MODULE(module, endRun);
-    stats.stopModule(*module, ModuleStatistics::c_EndRun);
+    stats.stopModule(module, ModuleStatistics::c_EndRun);
 
     //Set the global log level
     logSystem.setModuleLogConfig(NULL);

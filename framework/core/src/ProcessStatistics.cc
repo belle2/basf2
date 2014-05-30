@@ -113,7 +113,7 @@ namespace Belle2 {
     class_<ProcessStatistics, boost::noncopyable> stats("ProcessStatistics", no_init);
 
     stats
-//    .def("set_name", &ProcessStatistics::setModuleName)
+    .def("set_name", &ProcessStatistics::setModuleName)
     .def("__str__", &ProcessStatistics::getStatistics, getStatistics_overloads())
     .def("__call__", &ProcessStatistics::getStatistics, getStatistics_overloads())
     .def("__call__", &ProcessStatistics::getModuleStatistics, getModuleStatistics_overloads())
@@ -147,6 +147,7 @@ namespace Belle2 {
     //Wrap statistics class
     class_<ModuleStatistics>("ModuleStatistics")
     .add_property("name", &ModuleStatistics::getName, &ModuleStatistics::setName)
+    .add_property("index", &ModuleStatistics::getIndex, &ModuleStatistics::setIndex)
     .def("time_sum", &ModuleStatistics::getTimeSum, stats_timeSum_overloads())
     .def("time_mean", &ModuleStatistics::getTimeMean, stats_timeMean_overloads())
     .def("time_stddev", &ModuleStatistics::getTimeStddev, stats_timeStddev_overloads())

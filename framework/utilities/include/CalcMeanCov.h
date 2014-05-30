@@ -66,6 +66,22 @@ namespace Belle2 {
       addWeighted(1.0, values...);
     }
 
+    /** Update mean and covarianced by adding a new weighted entry.
+     * @param weight weight of entry
+     * @param values pointer to the first value
+     */
+    void addWeightedArray(value_type weight, value_type* values) {
+      m_entries += weight;
+      addArrayValues(weight, values);
+    }
+
+    /** Update mean and covariance by adding a new entry.
+     * @param values pointer to the first value
+     */
+    void addArray(value_type* values) {
+      addWeightedArray(1.0, values);
+    }
+
     /** @name Getters
      * No range check if performed on indicies i and j
      */
@@ -136,6 +152,7 @@ namespace Belle2 {
 
   private:
     /** Add a single value for parameter i and update mean and covariance.
+     * @see addArrayValues
      * @tparam i index of the parameter
      * @param weight weight of the entry
      * @param x actual value
@@ -155,6 +172,7 @@ namespace Belle2 {
     template<int i> void addValue(value_type) {}
 
     /** Update covariance between parameters i and j
+     * @see addArrayValues
      * @tparam i first index
      * @tparam j second index
      * @param weight weight of the entry
@@ -174,6 +192,26 @@ namespace Belle2 {
     /** Break recursion of updateCov once all parameters are consumed */
     template<int i, int j> void updateCov(value_type, value_type) {}
 
+    /** Add a new set of values and update mean and covariance.
+     * This function does the same as addValue and updateCov but in a
+     * non-templated way.
+     * @param weight weight of the entry
+     * @param x pointer to the actual values
+     */
+    void addArrayValues(value_type weight, value_type* x) {
+      for (int i = 0; i < N; ++i) {
+        const value_type delta = (x[i] - m_mean[i]);
+        //Update covariance matrix
+        for (int j = i; j < N; ++j) {
+          const value_type delta2 = (x[j] - m_mean[j]);
+          m_covariance[getIndex(i, j)] += (m_entries - weight) * weight
+                                          / m_entries * delta * delta2;
+        }
+        //Update mean value
+        m_mean[i] += weight * delta / m_entries;
+      }
+    }
+
     /** Access element in triangular matrix including diagonal elements.
      * This function returns the storage index of an element (i,j) in a
      * symmetric matrix including diagonal elements if the elements are
@@ -188,7 +226,7 @@ namespace Belle2 {
     /** Store the mean values for all parameters */
     std::array <value_type, N> m_mean {{0}};
     /** Store the triangular covariance matrix for all parameters in
-     * continous memory. Actual covariance is m_covariance[i,j]/m_entries */
+     * continous memory. Actual covariance is m_covariance[getIndex(i,j)]/m_entries */
     std::array < value_type, (N * (N + 1) / 2) > m_covariance {{0}};
   };
 

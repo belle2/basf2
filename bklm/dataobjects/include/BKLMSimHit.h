@@ -97,6 +97,10 @@ namespace Belle2 {
     //! @param eDep Amount of additional energy deposition (MeV)
     void increaseEDep(double eDep) { m_EDep += eDep; }
 
+    //! Adjust time (for background-overlay hit)
+    //! @param delta time shift (ns)
+    void shiftInTime(float delta) { m_Time += delta; }
+
   private:
 
     //! detector-module identifier

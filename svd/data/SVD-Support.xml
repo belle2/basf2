@@ -58,53 +58,20 @@
 				<point><z unit="mm"> 459.860</z><x unit="mm"> 81.000</x></point>
 			</InnerPoints>
 		</RotationSolid>
-		<!-- Outside hull of SVD close to CDC -->
 		<RotationSolid>
-			<Name>OuterHull</Name>
+			<Name>OuterCover</Name>
 			<Color>#666</Color>
 			<Material>SVD-Carbon</Material>
 			<!-- chosen start and end angle leaves 200µm of tolerance at narrowest point -->
 			<minPhi unit="deg">-89.95</minPhi>
 			<maxPhi unit="deg"> 89.95</maxPhi>
 			<OuterPoints>
-				<point><z unit="mm">-380.000</z><x unit="mm">155.000</x></point>
-				<point><z unit="mm"> 505.000</z><x unit="mm">155.000</x></point>
+				<point><z unit="mm">-360.000</z><x unit="mm">152.000</x></point>
+				<point><z unit="mm"> 490.000</z><x unit="mm">152.000</x></point>
 			</OuterPoints>
 			<InnerPoints>
-				<point><z unit="mm">-380.000</z><x unit="mm">154.000</x></point>
-				<point><z unit="mm"> 505.000</z><x unit="mm">154.000</x></point>
-			</InnerPoints>
-		</RotationSolid>
-		<RotationSolid>
-			<Name>MiddleHull</Name>
-			<Color>#fff</Color>
-			<Material>SVD-Airex</Material>
-			<!-- chosen start and end angle leaves 200µm of tolerance at narrowest point -->
-			<minPhi unit="deg">-89.95</minPhi>
-			<maxPhi unit="deg"> 89.95</maxPhi>
-			<OuterPoints>
-				<point><z unit="mm">-360.000</z><x unit="mm">154.000</x></point>
-				<point><z unit="mm"> 490.000</z><x unit="mm">154.000</x></point>
-			</OuterPoints>
-			<InnerPoints>
-				<point><z unit="mm">-360.000</z><x unit="mm">150.000</x></point>
-				<point><z unit="mm"> 490.000</z><x unit="mm">150.000</x></point>
-			</InnerPoints>
-		</RotationSolid>
-		<RotationSolid>
-			<Name>InnerHull</Name>
-			<Color>#666</Color>
-			<Material>SVD-Carbon</Material>
-			<!-- chosen start and end angle leaves 200µm of tolerance at narrowest point -->
-			<minPhi unit="deg">-89.95</minPhi>
-			<maxPhi unit="deg"> 89.95</maxPhi>
-			<OuterPoints>
-				<point><z unit="mm">-360.000</z><x unit="mm">150.000</x></point>
-				<point><z unit="mm"> 490.000</z><x unit="mm">150.000</x></point>
-			</OuterPoints>
-			<InnerPoints>
-				<point><z unit="mm">-360.000</z><x unit="mm">149.000</x></point>
-				<point><z unit="mm"> 490.000</z><x unit="mm">149.000</x></point>
+				<point><z unit="mm">-360.000</z><x unit="mm">151.000</x></point>
+				<point><z unit="mm"> 490.000</z><x unit="mm">151.000</x></point>
 			</InnerPoints>
 		</RotationSolid>
 		<RotationSolid>

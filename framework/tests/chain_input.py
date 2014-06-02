@@ -19,14 +19,14 @@ class TestModule(Module):
     def event(self):
         """reimplementation of Module::event().
 
-        prints all PXD true and simhit energy depositions, using relations
+        prints PXD true and simhit indices, using relations
         """
 
         simhits = Belle2.PyStoreArray('PXDSimHits')
         for hit in simhits:
             relations = hit.getRelationsFrom("PXDTrueHits")
             for truehit in relations:
-                print 'truehit (edep: %g) => hit(edep: %g)' % (truehit.getEnergyDep(), hit.getEnergyDep())
+                print 'truehit %d => hit %d' % (truehit.getArrayIndex(), hit.getArrayIndex())
 
 
 # copy input file into current dir to avoid having the full path in .out file

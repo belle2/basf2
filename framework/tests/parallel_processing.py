@@ -181,7 +181,7 @@ nummcparticles = tree.Project("", "MCParticles.m_pdg")
 if nummcparticles < 5:
     B2FATAL('Output file should contain at least five MCParticles!')
 
-numhits = tree.Project("", "PXDSimHits.getEnergyDep()")
+numhits = tree.Project("", "PXDSimHits.getArrayIndex()")
 if numhits < 5:  # usually much more, existence is most important thing here
     B2FATAL('Output file should contain at least 5 hits!')
 

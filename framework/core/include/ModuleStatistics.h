@@ -100,6 +100,7 @@ namespace Belle2 {
       return m_stats[type].getCorrelation<0, 1>();
     }
 
+    /** Clear all statistics. */
     void clear() {
       for (auto & stat : m_stats) stat.clear();
     }

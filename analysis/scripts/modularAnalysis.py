@@ -556,3 +556,23 @@ def buildContinuumSuppression(list_name, path=analysis_main):
     path.add_module(qqBuilder)
 
 
+def FlavTag(list_name, path=analysis_main):
+    """
+    For each Particle in the given Breco ParticleList:
+    Tag the flavour of the tag side using the Track, the ECLCluster and the KLMCluster list from the RestOfEvent dataobject 
+    The flavour is predicted by trained Neural Networks
+    Module under development (not ready for users)
+    
+    @param mode using mode for the module 0 means Teacher, 1 means Expert
+    @param list_name name of the input Breco ParticleList
+    @param ConfidenceLevel minimum value of the ConfidenceLevel to accept the fit
+    @param path      modules are added to this path
+    """
+
+    flavtag = register_module('FlavorTagging')
+    flavtag.set_name('FlavorTagging_' + list_name)
+    flavtag.param('UsingMode', mode)
+    flavtag.param('ListName', list_name)
+    path.add_module(flavtag)
+
+

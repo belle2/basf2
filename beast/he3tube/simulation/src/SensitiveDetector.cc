@@ -51,11 +51,20 @@ namespace Belle2 {
       const double depEnergy  = step->GetTotalEnergyDeposit() * Unit::MeV;
       const double nielEnergy = step->GetNonIonizingEnergyDeposit() * Unit::MeV;
       const G4ThreeVector G4tkPos = step->GetTrack()->GetPosition();
-      TVector3 tkPos(G4tkPos.x() * Unit::cm, G4tkPos.y() * Unit::cm, G4tkPos.z() * Unit::cm);
+      float tkPos[3];
+      tkPos[0] = G4tkPos.x() * Unit::cm;
+      tkPos[1] = G4tkPos.y() * Unit::cm;
+      tkPos[2] = G4tkPos.z() * Unit::cm;
       const G4ThreeVector G4tkMom = step->GetTrack()->GetMomentum();
-      TVector3 tkMom(G4tkMom.x() * Unit::MeV, G4tkMom.y() * Unit::MeV, G4tkMom.z() * Unit::MeV);
+      float tkMom[3];
+      tkMom[0] = G4tkMom.x() * Unit::MeV;
+      tkMom[1] = G4tkMom.y() * Unit::MeV;
+      tkMom[2] = G4tkMom.z() * Unit::MeV;
       const G4ThreeVector G4tkMomDir = step->GetTrack()->GetMomentumDirection();
-      TVector3 tkMomDir(G4tkMomDir.x() * Unit::MeV, G4tkMomDir.y() * Unit::MeV, G4tkMomDir.z() * Unit::MeV);
+      float tkMomDir[3];
+      tkMomDir[0] = G4tkMomDir.x() * Unit::MeV;
+      tkMomDir[1] = G4tkMomDir.y() * Unit::MeV;
+      tkMomDir[2] = G4tkMomDir.z() * Unit::MeV;
       const int tkPDG = step->GetTrack()->GetDefinition()->GetPDGEncoding();
       const double tkKEnergy = step->GetTrack()->GetKineticEnergy();
       const int detNb = step->GetTrack()->GetVolume()->GetCopyNo();
@@ -73,13 +82,13 @@ namespace Belle2 {
       new(simHits.nextFreeAddress()) He3tubeSimHit(
         depEnergy,
         nielEnergy,
-        tkPos,
-        tkMom,
-        tkMomDir,
         tkPDG,
         tkKEnergy,
         detNb,
-        GlTime
+        GlTime,
+        tkPos,
+        tkMom,
+        tkMomDir
       );
 
       //Add Relation between SimHit and MCParticle with a weight of 1. Since

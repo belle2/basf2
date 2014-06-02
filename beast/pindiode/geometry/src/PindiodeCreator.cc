@@ -113,11 +113,11 @@ namespace Belle2 {
                                       activeParams.getLength("z_pindiode") * Unit::cm
                                     );
         //pindiode 1 position
-        G4ThreeVector PINDIODEpos1 = G4ThreeVector(dx_diode, 0, 0);
+        G4ThreeVector PINDIODEpos1 = G4ThreeVector(2.*  dx_diode, 0, 0);
         //pindiode gold layer 1 position
-        G4ThreeVector Layerpos = G4ThreeVector(dx_diode, 0, dz_diode + dz_layer);
+        G4ThreeVector Layerpos = G4ThreeVector(2. * dx_diode, 0, dz_diode + dz_layer);
         //pindiode 2 position
-        G4ThreeVector PINDIODEpos2 = G4ThreeVector(-dx_diode, 0, 0);
+        G4ThreeVector PINDIODEpos2 = G4ThreeVector(-2. * dx_diode, 0, 0);
 
 
         G4RotationMatrix* rot_pindiode = new G4RotationMatrix();

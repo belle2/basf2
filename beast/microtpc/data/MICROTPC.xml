@@ -16,18 +16,23 @@
     <bar unit="mm">1 2 3 4 5 6 7 8
     </bar>
     <!-- Lets define 3 sensitive Boxes at different z positions and with different sizes -->
-    <!--
-    <Active>
-      <Material>MICROTPC-Material</Material>
-      <x unit="mm">0.0</x>
-      <y unit="mm">-320.0</y>
-      <z unit="mm">-1220.0</z>
-      <width  unit="mm">152.4</width>
-      <length unit="mm">300</length>
-      <height unit="mm">152.4</height>
-    </Active>
-    -->
 
+    <Active>
+      <MaterialVessel>MICROTPC-Material</MaterialVessel>
+      <MaterialGas>MICROTPC-Material</MaterialGas>
+      <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
+      <Material>MICROTPC-Material</Material>
+      <dx_Vessel unit="cm">12.7</dx_Vessel>
+      <dy_Vessel unit="cm">10.16</dy_Vessel>
+      <dz_Vessel unit="cm">30.0</dz_Vessel>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleZ unit="deg">0.0</AngleZ>
+      <TPCpos_x unit="cm">0.0</TPCpos_x>
+      <TPCpos_y unit="cm">0.0</TPCpos_y>
+      <TPCpos_z unit="cm">0.0</TPCpos_z>
+    </Active>
+
+    <!--
     <Active>
       <MaterialVessel>MICROTPC-Material</MaterialVessel>
       <MaterialGas>MICROTPC-Material</MaterialGas>
@@ -147,6 +152,6 @@
       <TPCpos_y unit="cm">0.0</TPCpos_y>
       <TPCpos_z unit="cm">199.0</TPCpos_z>
     </Active>
-    
+    -->    
   </Content>
 </DetectorComponent>

@@ -15,7 +15,7 @@
          whitespace, comma or semi-colon -->
     <bar unit="mm">1 
     </bar>
-<!--
+
     <Active>
       <Material>PINDIODE-Material</Material>
       <x_pindiode unit="cm">0.0</x_pindiode>
@@ -25,8 +25,8 @@
       <AngleY unit="deg">0.0</AngleY>
       <AngleZ unit="deg">0.0</AngleZ>
    </Active>
--->
 
+<!--
     <Active>
       <Material>PINDIODE-Material</Material>
       <x_pindiode unit="mm">2.65</x_pindiode>
@@ -107,6 +107,8 @@
      <AngleY unit="deg">0.0</AngleY>
      <AngleZ unit="deg">0.0</AngleZ>
    </Active>
+
+-->
 
   </Content>
 </DetectorComponent>

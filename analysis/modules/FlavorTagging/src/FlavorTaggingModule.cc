@@ -62,13 +62,19 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  FlavorTaggingModule::FlavorTaggingModule() : Module() //, m_Bfield(0), m_fitPval(0)
+  FlavorTaggingModule::FlavorTaggingModule() : Module() , m_mode(0)//, m_fitPval(0)
   {
     // Set module properties
     setDescription("Flavor tagging neural Networks for modular analysis");
 
     // Parameter definitions
+
+    addParam("UsingMode", m_mode, "Mode of Use of the Module (0 for Teacher, 1 for Expert) ", 0);
     addParam("ListName", m_listName, "name of particle list", string(""));
+
+
+
+
 //     addParam("ConfidenceLevel", m_confidenceLevel,
 //              "required confidence level of fit to keep particles in the list", 0.001);
     //addParam("EventType", m_EventType, "Btag decay type", std::string(""));
@@ -106,7 +112,7 @@ namespace Belle2 {
         getMC_PDGcodes();
         Input_Values_Muon();
       };
-      if (!ok) toRemove.push_back(particle->getArrayIndex());
+      if (!ok) toRemove.push_back(i);
     }
     plist->removeParticles(toRemove);
 

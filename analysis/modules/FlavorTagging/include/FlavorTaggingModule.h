@@ -79,6 +79,8 @@ namespace Belle2 {
 
   private:
 
+
+    int m_mode;       /**< Mode of use of the Flavor Tagging Module 0 for Teacher, 1 for Expert*/
     std::string m_listName;               /**< Breco particle list name */
     std::vector<Belle2::Track*> tagTracks;        /**< tracks of the rest of the event */
     std::vector<Belle2::ECLCluster* > tagECLClusters;     /**< ECLClusters of the rest of the event */

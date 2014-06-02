@@ -54,8 +54,8 @@ param_vxdtf = {'sectorSetup': secSetup, 'GFTrackCandidatesColName': 'caTracks'}
 vxdtf.param(param_vxdtf)
 
 # VXDTF DQM module
-vxdtf_dqm = register_module('VXDTFDQM')
-vxdtf_dqm.param('GFTrackCandidatesColName', 'caTracks')
+# vxdtf_dqm = register_module('VXDTFDQM')
+# vxdtf_dqm.param('GFTrackCandidatesColName', 'caTracks')
 
 track_finder_mc_truth = register_module('TrackFinderMCTruth')
 track_finder_mc_truth.logging.log_level = LogLevel.INFO
@@ -88,9 +88,9 @@ analyzer.param(param_analyzer)
 
 # Create paths
 main = create_path()
-histo = register_module('HistoManager')
-histo.param('histoFileName', 'DQM-VXDTFdemo.root')  # File to save histograms
-main.add_module(histo)
+# histo = register_module('HistoManager')
+# histo.param('histoFileName', 'DQM-VXDTFdemo.root')  # File to save histograms
+# main.add_module(histo)
 # Add modules to paths
 
 # main.add_module(inputM)
@@ -109,7 +109,7 @@ main.add_module(vxdtf)
 main.add_module(track_finder_mc_truth)
 main.add_module(analyzer)
 main.add_module(trackfitter)
-main.add_module(vxdtf_dqm)
+# main.add_module(vxdtf_dqm)
 # Process events
 process(main)
 

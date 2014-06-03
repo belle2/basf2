@@ -39,10 +39,6 @@ namespace Belle2 {
      */
     static Environment& Instance();
 
-    /** Set up environment from standard BELLE2_ environment variables.
-     *
-     *  Ends with B2FATAL if something goes wrong.
-     */
     void setup();
 
     /**
@@ -173,7 +169,9 @@ namespace Belle2 {
     std::string m_profileModuleName; /**< Name of the module which should be profiled, empty if no profiling requested */
 
     /**
-     * The constructor is hidden to avoid that someone creates an instance of this class.
+     *  Set up environment from standard BELLE2_ environment variables.
+     *
+     *  Ends with B2FATAL if something goes wrong.
      */
     Environment();
 

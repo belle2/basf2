@@ -30,7 +30,27 @@ Environment& Environment::Instance()
   return instance;
 }
 
-void Environment::setup()
+const list<string>& Environment::getModuleSearchPaths() const
+{
+  return ModuleManager::Instance().getModuleSearchPaths();
+}
+
+
+//============================================================================
+//                              Private methods
+//============================================================================
+
+Environment::Environment() :
+  m_numberProcesses(0),
+  m_steering(""),
+  m_numberEventsOverride(0),
+  m_inputFilesOverride(),
+  m_outputFileOverride(""),
+  m_numberProcessesOverride(-1),
+  m_logLevelOverride(LogConfig::c_Default),
+  m_visualizeDataFlow(false),
+  m_noStats(false),
+  m_dryRun(false)
 {
   // Check for environment variables set by setuprel
   const char* envarReleaseDir = getenv("BELLE2_RELEASE_DIR");
@@ -62,31 +82,6 @@ void Environment::setup()
 
   //set path to external software
   setExternalsPath(envarExtDir);
-}
-
-
-const list<string>& Environment::getModuleSearchPaths() const
-{
-  return ModuleManager::Instance().getModuleSearchPaths();
-}
-
-
-//============================================================================
-//                              Private methods
-//============================================================================
-
-Environment::Environment() :
-  m_numberProcesses(0),
-  m_steering(""),
-  m_numberEventsOverride(0),
-  m_inputFilesOverride(),
-  m_outputFileOverride(""),
-  m_numberProcessesOverride(-1),
-  m_logLevelOverride(LogConfig::c_Default),
-  m_visualizeDataFlow(false),
-  m_noStats(false),
-  m_dryRun(false)
-{
 
 }
 

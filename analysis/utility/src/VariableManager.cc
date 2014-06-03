@@ -49,7 +49,7 @@ const VariableManager::Var* VariableManager::createVariable(const std::string& n
     float float_number;
     std::stringstream sstream(number[1]) ;
     sstream >> float_number;
-    func = [float_number](const Particle * particle) -> double {
+    func = [float_number](const Particle*) -> double {
       return float_number;
     };
   } else {

@@ -15,7 +15,8 @@ simulation = register_module('FullSim')
 eventinfosetter.param({'runList': [1], 'evtNumList': [1]})
 
 # Restrict Geometry to certain components, in this case only PXD and SVD
-geometry.param('Components', ['BGO', 'MICROTPC'])
+# geometry.param('Components', ['BGO', 'MICROTPC'])
+geometry.param('Components', ['PH1BPIPE'])
 geometry.set_log_level(LogLevel.INFO)
 
 # Create the MaterialScan module

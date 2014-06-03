@@ -13,51 +13,21 @@
     <!-- we can also have arrays as parameters which makes it easy to get a
          number of values as vector<double>.  The numbers can be divided by
          whitespace, comma or semi-colon -->
-    <bar unit="mm">1 2 3
-    </bar>
 
-    <Active>
-      <Material>PH1BPIPE-Material</Material>
-      <MaterialPipe>PH1BPIPE-Material</MaterialPipe>
-      <x_ph1bpipe unit="cm">0.0</x_ph1bpipe>
-      <y_ph1bpipe unit="cm">0.0</y_ph1bpipe>
-      <z_ph1bpipe unit="cm">0.0</z_ph1bpipe>
-      <pipe_innerRadius unit="cm">0.4</pipe_innerRadius>
-      <pipe_outerRadius unit="cm">0.5</pipe_outerRadius>
-      <pipe_hz unit="cm">50.0</pipe_hz>
-      <endcap_innerRadius unit="cm">0.5</endcap_innerRadius>
-      <endcap_outerRadius unit="cm">1.0</endcap_outerRadius>
-      <endcap_hz unit="cm">0.05</endcap_hz>
-   </Active>
-
-   <Active>
-      <Material>PH1BPIPE-Material</Material>
-      <MaterialPipe>PH1BPIPE-Material</MaterialPipe>
-      <x_ph1bpipe unit="cm">0.0</x_ph1bpipe>
-      <y_ph1bpipe unit="cm">0.0</y_ph1bpipe>
-      <z_ph1bpipe unit="cm">125.2</z_ph1bpipe>
-      <pipe_innerRadius unit="cm">0.9</pipe_innerRadius>
-      <pipe_outerRadius unit="cm">1.0</pipe_outerRadius>
-      <pipe_hz unit="cm">75.0</pipe_hz>
-      <endcap_innerRadius unit="cm">0.9</endcap_innerRadius>
-      <endcap_outerRadius unit="cm">1.0</endcap_outerRadius>
-      <endcap_hz unit="cm">0.05</endcap_hz>
-   </Active>
-
-   <Active>
-      <Material>PH1BPIPE-Material</Material>
-      <MaterialPipe>PH1BPIPE-Material</MaterialPipe>
-      <x_ph1bpipe unit="cm">0.0</x_ph1bpipe>
-      <y_ph1bpipe unit="cm">0.0</y_ph1bpipe>
-      <z_ph1bpipe unit="cm">-125.2</z_ph1bpipe>
-      <pipe_innerRadius unit="cm">0.9</pipe_innerRadius>
-      <pipe_outerRadius unit="cm">1.0</pipe_outerRadius>
-      <pipe_hz unit="cm">75.0</pipe_hz>
-      <endcap_innerRadius unit="cm">0.9</endcap_innerRadius>
-      <endcap_outerRadius unit="cm">1.0</endcap_outerRadius>
-      <endcap_hz unit="cm">0.05</endcap_hz>
-   </Active>
-
+    <Material>PH1BPIPE-Material</Material>
+    <MaterialPipe>PH1BPIPE-Material</MaterialPipe>
+    <x_ph1bpipe unit="cm">0.0</x_ph1bpipe>
+    <y_ph1bpipe unit="cm">0.0</y_ph1bpipe>
+    <z_ph1bpipe unit="cm">0.0</z_ph1bpipe>
+    <pipe_innerRadius unit="cm">3.8</pipe_innerRadius>
+    <pipe_outerRadius unit="cm">4.0</pipe_outerRadius>
+    <pipe_hz unit="cm">20.0</pipe_hz>
+    <endcap_innerRadius unit="cm">4.0</endcap_innerRadius>
+    <endcap_outerRadius unit="cm">6.0</endcap_outerRadius>
+    <endcap_hz unit="cm">2.2</endcap_hz>
+    <xpipe_innerRadius unit="cm">3.8</xpipe_innerRadius>
+    <xpipe_outerRadius unit="cm">4.0</xpipe_outerRadius>
+    <xpipe_hz unit="cm">200.0</xpipe_hz>
     
   </Content>
 </DetectorComponent>

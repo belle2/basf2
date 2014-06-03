@@ -80,13 +80,14 @@
 				<outerRadius unit="mm">35.43</outerRadius> 
 			</Plane>
 			<Plane>
-				<!-- G4 bug overcome -->
+				<!-- G4 vizualizer bug overcome -->
 				<posZ unit="mm">349.51</posZ>
 				<innerRadius unit="mm">27.4</innerRadius>
 				<outerRadius unit="mm">35.43</outerRadius> 
 			</Plane>
 			<Plane>
-				<posZ unit="mm">349.5</posZ>
+				<!-- G4 vizualizer bug overcome -->
+				<posZ unit="mm">349.52</posZ>
 				<innerRadius unit="mm">27.4</innerRadius>
 				<outerRadius unit="mm">42.54</outerRadius> 
 			</Plane>

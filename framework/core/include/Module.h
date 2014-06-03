@@ -294,19 +294,6 @@ namespace Belle2 {
      */
     const boost::shared_ptr<Path>& getConditionPath() const {return m_conditionPath; };
 
-    /**
-     * Returns the parsed condition operator
-     *
-     * @return Parsed condition operator
-     */
-    Belle2::CondParser::EConditionOperators getConditionOperator() const { return m_conditionOperator; };
-
-    /**
-     * Returns the parsed condition value
-     *
-     * @return Parsed condition value
-     */
-    int getConditionValue() const { return m_conditionValue; };
 
     /** What to do after a conditional path is finished. */
     EAfterConditionPath getAfterConditionPath() const { return m_afterConditionPath; }
@@ -454,7 +441,7 @@ namespace Belle2 {
     bool m_hasCondition;     /**< True, if a condition was set for the module. */
     boost::shared_ptr<Path> m_conditionPath; /**< The path which which will be executed if the condition is evaluated to true. */
     Belle2::CondParser::EConditionOperators m_conditionOperator;  /**< The operator of the condition (set by parsing the condition expression). */
-    int m_conditionValue;                    /**< The value of the condition (set by parsing the condition expression). */
+    int m_conditionValue;                    /**< Numeric value used in the condition (set by parsing the condition expression). */
     EAfterConditionPath m_afterConditionPath; /**< What to do after a conditional path is finished. */
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -34,6 +34,7 @@ Module::Module() :
   m_hasReturnValue(false),
   m_returnValue(0),
   m_hasCondition(false),
+  m_conditionValue(0),
   m_afterConditionPath(EAfterConditionPath::c_End)
 {
 }

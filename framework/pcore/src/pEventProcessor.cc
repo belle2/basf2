@@ -66,6 +66,7 @@ static void signalHandler(int signal)
 
 pEventProcessor::pEventProcessor(PathManager& pathManager) : EventProcessor(pathManager),
   m_procHandler(new ProcHandler()),
+  m_histoManagerFound(false),
   m_enableRBClearing(true)
 {
   g_pEventProcessor = this;
@@ -170,7 +171,6 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   */
 
   // 2. Analyze start path and split into parallel paths
-  m_histoManagerFound = false;
   analyze_path(spath); //also inserts Rx/Tx modules into path (sets up IPC structures)
   B2DEBUG(100, "process : inlistpath size = " << m_inpathlist.size());
   B2DEBUG(100, "process : bodypathlist size = " << m_bodypathlist.size());

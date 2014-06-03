@@ -47,6 +47,11 @@ ClassImp(AnalizerCollectorTFInfo)
 
 const string AnalizerCollectorTFInfo::m_fileSeparator = ",";
 
+const int AnalizerCollectorTFInfo::m_idAlive = -1;
+
+//Ohter Alive ID for output
+const int AnalizerCollectorTFInfo::m_idAlive_output = 100;
+
 
 AnalizerCollectorTFInfo::AnalizerCollectorTFInfo()
 {
@@ -304,7 +309,9 @@ void AnalizerCollectorTFInfo::setAllParticleIDs(double boarder)
 
     // 0 = ghost TC
     // 1 = clean TC
-    // 2 = contaminated TC
+    // 2 = contaminated
+    // 3 = real and not real particles in TC
+
     uint realState = 3;
 
     if (currentIsReal.at(0) > 0) {
@@ -431,7 +438,18 @@ void AnalizerCollectorTFInfo::storeHitInformation(std::string filename, int part
 
     /*const */HitTFInfo* aHit = hitTFInfo[i];
 
-    myfile << i << m_fileSeparator << aHit->getPassIndex() << m_fileSeparator << aHit->getSectorID() << m_fileSeparator << aHit->getDiedAt() << m_fileSeparator << aHit->getDiedID() << m_fileSeparator << aHit->getIsReal();
+    myfile << i << m_fileSeparator << aHit->getPassIndex() << m_fileSeparator << aHit->getSectorID() << m_fileSeparator << aHit->getDiedAt() << m_fileSeparator;
+
+
+    // Died ID for output change
+    if (aHit->getDiedID() != m_idAlive) {
+      myfile << aHit->getDiedID();
+    } else {
+      myfile << m_idAlive_output;
+    }
+
+
+    myfile << m_fileSeparator << aHit->getIsReal();
 
     if (aHit->getIsReal() == 0) { counterNotRealHits++; } else { counterRealHits++; }
 
@@ -635,14 +653,23 @@ void AnalizerCollectorTFInfo::storeCellInformation(std::string filename, int par
 
   myfile << m_fileSeparator << FilterID::nameNbFinderLost << m_fileSeparator <<  FilterID::nameCellularAutomaton << m_fileSeparator << FilterID::nameSilentTcc;
 
-  myfile << m_fileSeparator << "outer_hit" << m_fileSeparator << "inner_Hit" << endl;
+  myfile << m_fileSeparator << "outer_Hit" << m_fileSeparator << "inner_Hit" << endl;
 
   for (int i = 0; i <  cellTFInfo.getEntries(); i++) {
 
     // particleIdFilter == -1 => all Entries
     if (particleIdFilter == -1 || cellTFInfo[i]->containsParticle(particleIdFilter)) {
 
-      myfile << i << m_fileSeparator << cellTFInfo[i]->getPassIndex() << m_fileSeparator << cellTFInfo[i]->getState() << m_fileSeparator << cellTFInfo[i]->getDiedAt() << m_fileSeparator << cellTFInfo[i]->getDiedID() << m_fileSeparator << cellTFInfo[i]->getIsReal();
+      myfile << i << m_fileSeparator << cellTFInfo[i]->getPassIndex() << m_fileSeparator << cellTFInfo[i]->getState() << m_fileSeparator << cellTFInfo[i]->getDiedAt() << m_fileSeparator;
+
+      // Died ID for output change
+      if (cellTFInfo[i]->getDiedID() != m_idAlive) {
+        myfile << cellTFInfo[i]->getDiedID();
+      } else {
+        myfile << m_idAlive_output;
+      }
+
+      myfile << m_fileSeparator << cellTFInfo[i]->getIsReal();
 
       // Main Particle & Purity
       if (particleIdFilter == -1) {
@@ -776,7 +803,16 @@ void AnalizerCollectorTFInfo::storeTCInformation(std::string filename, int parti
     // particleIdFilter == -1 => all Entries
     if (particleIdFilter == -1 || tfcandTFInfo[i]->containsParticle(particleIdFilter)) {
 
-      myfile << i << m_fileSeparator << tfcandTFInfo[i]->getPassIndex() << m_fileSeparator << tfcandTFInfo[i]->getOwnID() << m_fileSeparator << tfcandTFInfo[i]->getDiedAt() << m_fileSeparator << tfcandTFInfo[i]->getDiedID() << m_fileSeparator << tfcandTFInfo[i]->getIsReal();
+      myfile << i << m_fileSeparator << tfcandTFInfo[i]->getPassIndex() << m_fileSeparator << tfcandTFInfo[i]->getOwnID() << m_fileSeparator << tfcandTFInfo[i]->getDiedAt() << m_fileSeparator;
+
+      // Died ID for output change
+      if (tfcandTFInfo[i]->getDiedID() != m_idAlive) {
+        myfile << tfcandTFInfo[i]->getDiedID();
+      } else {
+        myfile << m_idAlive_output;
+      }
+
+      myfile << m_fileSeparator << tfcandTFInfo[i]->getIsReal();
 
       // Main Particle & Purity
       if (particleIdFilter == -1) {
@@ -859,7 +895,16 @@ void AnalizerCollectorTFInfo::storeClustersInformation(std::string filename)
 
   for (int i = 0; i <  clusterTFInfo.getEntries(); i++) {
 
-    myfile << i << m_fileSeparator << clusterTFInfo[i]->getPassIndex() << m_fileSeparator << clusterTFInfo[i]->getRelativeClusterID() << m_fileSeparator << clusterTFInfo[i]->getDiedAt() << m_fileSeparator << clusterTFInfo[i]->getDiedID() << m_fileSeparator << clusterTFInfo[i]->getIsReal() << m_fileSeparator <<  clusterTFInfo[i]->getDetectorType() << m_fileSeparator << clusterTFInfo[i]->getParticleID() << m_fileSeparator << clusterTFInfo[i]->getPDG() << endl;
+    myfile << i << m_fileSeparator << clusterTFInfo[i]->getPassIndex() << m_fileSeparator << clusterTFInfo[i]->getRelativeClusterID() << m_fileSeparator << clusterTFInfo[i]->getDiedAt() << m_fileSeparator;
+
+    // Died ID for output change
+    if (clusterTFInfo[i]->getDiedID() != m_idAlive) {
+      myfile << clusterTFInfo[i]->getDiedID();
+    } else {
+      myfile << m_idAlive_output;
+    }
+
+    myfile << m_fileSeparator << clusterTFInfo[i]->getIsReal() << m_fileSeparator <<  clusterTFInfo[i]->getDetectorType() << m_fileSeparator << clusterTFInfo[i]->getParticleID() << m_fileSeparator << clusterTFInfo[i]->getPDG() << endl;
 
   }
 
@@ -904,7 +949,16 @@ void AnalizerCollectorTFInfo::storeSectorInformation(std::string filename, bool 
 
     if (withFriends || (!sectorTFInfo[i]->getIsOnlyFriend())) {
 
-      myfile << i << m_fileSeparator << sectorTFInfo[i]->getPassIndex() << m_fileSeparator << sectorTFInfo[i]->getSectorID() << m_fileSeparator << sectorTFInfo[i]->getDiedAt() << m_fileSeparator << sectorTFInfo[i]->getDiedID() << m_fileSeparator << sectorTFInfo[i]->getIsOnlyFriend() << m_fileSeparator <<  sectorTFInfo[i]->getPoint(0).X() << "/" << sectorTFInfo[i]->getPoint(0).Y() << "/" << sectorTFInfo[i]->getPoint(0).Z() << m_fileSeparator << sectorTFInfo[i]->getPoint(1).X() << "/" << sectorTFInfo[i]->getPoint(1).Y() << "/" << sectorTFInfo[i]->getPoint(1).Z() << m_fileSeparator <<  sectorTFInfo[i]->getPoint(2).X() << "/" << sectorTFInfo[i]->getPoint(2).Y() << "/" << sectorTFInfo[i]->getPoint(2).Z() << m_fileSeparator << sectorTFInfo[i]->getPoint(3).X() << "/" << sectorTFInfo[i]->getPoint(3).Y() << "/" << sectorTFInfo[i]->getPoint(3).Z();
+      myfile << i << m_fileSeparator << sectorTFInfo[i]->getPassIndex() << m_fileSeparator << sectorTFInfo[i]->getSectorID() << m_fileSeparator << sectorTFInfo[i]->getDiedAt() << m_fileSeparator;
+
+      // Died ID for output change
+      if (sectorTFInfo[i]->getDiedID() != m_idAlive) {
+        myfile << sectorTFInfo[i]->getDiedID();
+      } else {
+        myfile << m_idAlive_output;
+      }
+
+      myfile << m_fileSeparator << sectorTFInfo[i]->getIsOnlyFriend() << m_fileSeparator <<  sectorTFInfo[i]->getPoint(0).X() << "/" << sectorTFInfo[i]->getPoint(0).Y() << "/" << sectorTFInfo[i]->getPoint(0).Z() << m_fileSeparator << sectorTFInfo[i]->getPoint(1).X() << "/" << sectorTFInfo[i]->getPoint(1).Y() << "/" << sectorTFInfo[i]->getPoint(1).Z() << m_fileSeparator <<  sectorTFInfo[i]->getPoint(2).X() << "/" << sectorTFInfo[i]->getPoint(2).Y() << "/" << sectorTFInfo[i]->getPoint(2).Z() << m_fileSeparator << sectorTFInfo[i]->getPoint(3).X() << "/" << sectorTFInfo[i]->getPoint(3).Y() << "/" << sectorTFInfo[i]->getPoint(3).Z();
 
       std::vector<unsigned int> friendSectors = sectorTFInfo[i]->getFriends();
 

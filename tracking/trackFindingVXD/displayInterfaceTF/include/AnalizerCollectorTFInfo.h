@@ -87,6 +87,10 @@ namespace Belle2 {
 
     const static std::string m_fileSeparator; /**< Seperator for output-File */
 
+    const static int m_idAlive;     /**< Id for is Alive of Objects */
+    const static int m_idAlive_output;  /**< Id for is Alive of Objects for output-File */
+
+
     ClassDef(AnalizerCollectorTFInfo, 1)
   };
 }

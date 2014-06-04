@@ -31,6 +31,7 @@
 #include <G4Trap.hh>
 #include <G4Box.hh>
 #include <G4Polycone.hh>
+#include <G4Ellipsoid.hh>
 #include "G4UnionSolid.hh"
 #include "G4SubtractionSolid.hh"
 #include <G4UserLimits.hh>
@@ -133,11 +134,31 @@ namespace Belle2 {
       //create ph1bpipe volume
       G4double startAngle = 0.*Unit::deg;
       G4double spanningAngle = 360.*Unit::deg;
-      G4Tubs* s_PH1BPIPE = new G4Tubs("s_PH1BPIPE",
+      /*G4Tubs* s_PH1BPIPE = new G4Tubs("s_PH1BPIPE",
                                       content.getLength("pipe_innerRadius")*Unit::cm,
                                       content.getLength("pipe_outerRadius")*Unit::cm,
                                       content.getLength("pipe_hz")*Unit::cm,
-                                      startAngle, spanningAngle);
+                                      startAngle, spanningAngle);*/
+
+      G4VSolid* s_PH1BPIPE1 = new G4Ellipsoid("s_PH1BPIPE1",
+                                              content.getLength("pipe_outerRadius_x")*Unit::cm,
+                                              content.getLength("pipe_outerRadius_y")*Unit::cm,
+                                              content.getLength("pipe_hz")*Unit::cm,
+                                              -2.* content.getLength("pipe_hz")*Unit::cm, 2.* content.getLength("pipe_hz")*Unit::cm);
+
+      /*G4VSolid* s_PH1BPIPE2 = new G4Ellipsoid("s_PH1BPIPE2",
+                content.getLength("pipe_innerRadius_x")*Unit::cm,
+                content.getLength("pipe_innerRadius_y")*Unit::cm,
+                content.getLength("pipe_hz")*Unit::cm,
+                -2.* content.getLength("pipe_hz")*Unit::cm, 2.* content.getLength("pipe_hz")*Unit::cm);*/
+      G4VSolid* s_PH1BPIPE2 = new G4Tubs("s_PH1BPIPE2",
+                                         content.getLength("pipe_innerRadius_x")*Unit::cm,
+                                         content.getLength("pipe_innerRadius_y")*Unit::cm,
+                                         content.getLength("pipe_hz")*Unit::cm,
+                                         startAngle, spanningAngle);
+
+      G4VSolid* s_PH1BPIPE = new G4SubtractionSolid("s_PH1BPIPE", s_PH1BPIPE1, s_PH1BPIPE2);
+
 
       string matPipe = content.getString("MaterialPipe");
       G4LogicalVolume* l_PH1BPIPE = new G4LogicalVolume(s_PH1BPIPE, geometry::Materials::get(matPipe), "l_PH1BPIPE", 0, m_sensitive);
@@ -195,7 +216,7 @@ namespace Belle2 {
                                        startAngle, spanningAngle);
       //make the union
       G4Transform3D transform_X = G4Translate3D(0., 0., 0.);
-      transform_X = transform_X * G4RotateY3D(2. * 0.083 * Unit::rad);
+      transform_X = transform_X * G4RotateY3D(0.083 * Unit::rad);
       G4VSolid* s_X = new G4UnionSolid("s_Xshape1+s_Xshape2", s_Xshape1, s_Xshape2, transform_X);
 
       //substract central parts
@@ -204,23 +225,23 @@ namespace Belle2 {
                       content.getLength("y_ph1bpipe") * Unit::cm,
                       content.getLength("z_ph1bpipe") * Unit::cm + content.getLength("pipe_hz") * Unit::cm + content.getLength("endcap_hz") * Unit::cm
                     );
-      transform_X = transform_X * G4RotateY3D(0.083 * Unit::rad);
+      transform_X = transform_X * G4RotateY3D(0.083 / 2. * Unit::rad);
       s_X = new G4SubtractionSolid("s_X1", s_X, s_PH1BPIPEendcap, transform_X);
       transform_X = G4Translate3D(
                       content.getLength("x_ph1bpipe") * Unit::cm,
                       content.getLength("y_ph1bpipe") * Unit::cm,
                       content.getLength("z_ph1bpipe") * Unit::cm - content.getLength("pipe_hz") * Unit::cm - content.getLength("endcap_hz") * Unit::cm
                     );
-      transform_X = transform_X * G4RotateY3D(0.083 * Unit::rad);
+      transform_X = transform_X * G4RotateY3D(0.083 / 2. * Unit::rad);
       s_X = new G4SubtractionSolid("s_X2", s_X, s_PH1BPIPEendcap, transform_X);
       transform_X = G4Translate3D(0, 0, 0);
-      transform_X = transform_X * G4RotateY3D(0.083 * Unit::rad);
+      transform_X = transform_X * G4RotateY3D(0.083 / 2. * Unit::rad);
       s_X = new G4SubtractionSolid("s_X3", s_X, s_PH1BPIPE, transform_X);
 
       G4LogicalVolume* l_X = new G4LogicalVolume(s_X, geometry::Materials::get(matPipe), "l_X", 0, m_sensitive);
 
       transform_X = G4Translate3D(0, 0, 0);
-      transform_X = transform_X * G4RotateY3D(-0.083 * Unit::rad);
+      transform_X = transform_X * G4RotateY3D(-0.083 / 2. * Unit::rad);
       new G4PVPlacement(transform_X, l_X, "p_X", &topVolume, false, 1);
 
     }

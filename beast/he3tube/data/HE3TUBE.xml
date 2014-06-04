@@ -13,7 +13,7 @@
     <!-- we can also have arrays as parameters which makes it easy to get a
          number of values as vector<double>.  The numbers can be divided by
          whitespace, comma or semi-colon -->
-    <bar unit="mm">1 
+    <bar unit="mm">1 2
     </bar>
 
 
@@ -21,9 +21,28 @@
      <Material>HE3TUBE-Material</Material>
      <MaterialTube>HE3TUBE-Material</MaterialTube>
      <MaterialGas>HE3TUBE-Material</MaterialGas>
-     <x_he3tube unit="cm">0.0</x_he3tube>
-     <y_he3tube unit="cm">0.0</y_he3tube>
-     <z_he3tube unit="cm">0.0</z_he3tube>
+     <x_he3tube unit="cm">20.0</x_he3tube>
+     <y_he3tube unit="cm">40.0</y_he3tube>
+     <z_he3tube unit="cm">40.0</z_he3tube>
+     <AngleX unit="deg">0.0</AngleX>
+     <AngleY unit="deg">0.0</AngleY>
+     <AngleZ unit="deg">0.0</AngleZ>
+     <tube_innerRadius unit="cm">2.069</tube_innerRadius>
+     <tube_outerRadius unit="cm">2.38</tube_outerRadius>
+     <tube_hz unit="cm">10.19</tube_hz>
+     <endcap_hz unit="cm">0.47</endcap_hz>
+     <gas_outerRadius unit="mm">2.38</gas_outerRadius>
+     <gas_hz unit="mm">7.62</gas_hz>
+   </Active>
+
+
+   <Active>
+     <Material>HE3TUBE-Material</Material>
+     <MaterialTube>HE3TUBE-Material</MaterialTube>
+     <MaterialGas>HE3TUBE-Material</MaterialGas>
+     <x_he3tube unit="cm">20.0</x_he3tube>
+     <y_he3tube unit="cm">40.0</y_he3tube>
+     <z_he3tube unit="cm">-40.0</z_he3tube>
      <AngleX unit="deg">0.0</AngleX>
      <AngleY unit="deg">0.0</AngleY>
      <AngleZ unit="deg">0.0</AngleZ>

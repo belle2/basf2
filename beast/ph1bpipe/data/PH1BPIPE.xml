@@ -19,13 +19,17 @@
     <x_ph1bpipe unit="cm">0.0</x_ph1bpipe>
     <y_ph1bpipe unit="cm">0.0</y_ph1bpipe>
     <z_ph1bpipe unit="cm">0.0</z_ph1bpipe>
-    <pipe_innerRadius unit="cm">3.8</pipe_innerRadius>
-    <pipe_outerRadius unit="cm">4.0</pipe_outerRadius>
+    <pipe_outerRadius_x unit="cm">3.2</pipe_outerRadius_x>
+    <pipe_outerRadius_y unit="cm">3.6</pipe_outerRadius_y>
+ <!--     <pipe_innerRadius_x unit="cm">2.8</pipe_innerRadius_x>
+    <pipe_innerRadius_y unit="cm">3.2</pipe_innerRadius_y> -->
+    <pipe_innerRadius_x unit="cm">2.79</pipe_innerRadius_x>
+    <pipe_innerRadius_y unit="cm">2.80</pipe_innerRadius_y>
     <pipe_hz unit="cm">20.0</pipe_hz>
     <endcap_innerRadius unit="cm">4.0</endcap_innerRadius>
     <endcap_outerRadius unit="cm">6.0</endcap_outerRadius>
     <endcap_hz unit="cm">2.2</endcap_hz>
-    <xpipe_innerRadius unit="cm">3.8</xpipe_innerRadius>
+    <xpipe_innerRadius unit="cm">3.7</xpipe_innerRadius>
     <xpipe_outerRadius unit="cm">4.0</xpipe_outerRadius>
     <xpipe_hz unit="cm">200.0</xpipe_hz>
     

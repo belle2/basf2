@@ -13,17 +13,137 @@
     <!-- we can also have arrays as parameters which makes it easy to get a
          number of values as vector<double>.  The numbers can be divided by
          whitespace, comma or semi-colon -->
-    <bar unit="mm">1 
+    <bar unit="mm">1 2 3 4 5 6 7 8 9 10 11 12
     </bar>
 
     <Active>
       <Material>PINDIODE-Material</Material>
-      <x_pindiode unit="cm">0.0</x_pindiode>
+      <x_pindiode unit="cm">6.2</x_pindiode>
       <y_pindiode unit="cm">0.0</y_pindiode>
       <z_pindiode unit="cm">0.0</z_pindiode>
       <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <x_pindiode unit="cm">-6.2</x_pindiode>
+      <y_pindiode unit="cm">0.0</y_pindiode>
+      <z_pindiode unit="cm">0.0</z_pindiode>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">90.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+
+
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <x_pindiode unit="cm">0.0</x_pindiode>
+      <y_pindiode unit="cm">6.2</y_pindiode>
+      <z_pindiode unit="cm">0.0</z_pindiode>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">90.0</AngleY>
+      <AngleZ unit="deg">-90.0</AngleZ>
+   </Active>
+
+
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <x_pindiode unit="cm">0.0</x_pindiode>
+      <y_pindiode unit="cm">-6.2</y_pindiode>
+      <z_pindiode unit="cm">0.0</z_pindiode>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">90.0</AngleY>
+      <AngleZ unit="deg">-90.0</AngleZ>
+   </Active>
+
+
+
+
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <x_pindiode unit="cm">6.2</x_pindiode>
+      <y_pindiode unit="cm">0.0</y_pindiode>
+      <z_pindiode unit="cm">5.0</z_pindiode>
+      <AngleX unit="deg">0.0</AngleX>
       <AngleY unit="deg">0.0</AngleY>
-      <AngleZ unit="deg">0.0</AngleZ>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <x_pindiode unit="cm">-6.2</x_pindiode>
+      <y_pindiode unit="cm">0.0</y_pindiode>
+      <z_pindiode unit="cm">5.0</z_pindiode>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+
+
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <x_pindiode unit="cm">0.0</x_pindiode>
+      <y_pindiode unit="cm">6.2</y_pindiode>
+      <z_pindiode unit="cm">5.0</z_pindiode>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">-90.0</AngleZ>
+   </Active>
+
+
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <x_pindiode unit="cm">0.0</x_pindiode>
+      <y_pindiode unit="cm">-6.2</y_pindiode>
+      <z_pindiode unit="cm">5.0</z_pindiode>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">-90.0</AngleZ>
+   </Active>
+
+
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <x_pindiode unit="cm">6.2</x_pindiode>
+      <y_pindiode unit="cm">0.0</y_pindiode>
+      <z_pindiode unit="cm">-5.0</z_pindiode>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <x_pindiode unit="cm">-6.2</x_pindiode>
+      <y_pindiode unit="cm">0.0</y_pindiode>
+      <z_pindiode unit="cm">-5.0</z_pindiode>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">90.0</AngleZ>
+   </Active>
+
+
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <x_pindiode unit="cm">0.0</x_pindiode>
+      <y_pindiode unit="cm">6.2</y_pindiode>
+      <z_pindiode unit="cm">-5.0</z_pindiode>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">-90.0</AngleZ>
+   </Active>
+
+
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <x_pindiode unit="cm">0.0</x_pindiode>
+      <y_pindiode unit="cm">-6.2</y_pindiode>
+      <z_pindiode unit="cm">-5.0</z_pindiode>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleY unit="deg">0.0</AngleY>
+      <AngleZ unit="deg">-90.0</AngleZ>
    </Active>
 
 <!--

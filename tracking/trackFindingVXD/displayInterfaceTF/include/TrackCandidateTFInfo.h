@@ -155,12 +155,12 @@ namespace Belle2 {
     int sizeUsedParticles() { return m_usedParticles.size(); }
 
     /** returns Coordinates of the Assigned Cell */
-    std::vector<TVector3> getCoordinates() {
+    const std::vector<TVector3> getCoordinates() {
       return m_assignedCellCoordinates;
     }
 
     /** returns the String for the display - Information */
-    TString getDisplayInformation() {
+    const TString getDisplayInformation() {
 
       int cell1 = -1;
       if (m_assignedCellIds.size() > 0) { cell1 = m_assignedCellIds.at(0); }
@@ -171,7 +171,7 @@ namespace Belle2 {
     }
 
     /** returns the String for the display - AlternativeBox */
-    TString getDisplayAlternativeBox() {
+    const TString getDisplayAlternativeBox() {
 
       std::pair<int, double> mainParticle = getMainParticle();
       std::string diedAt = getDiedAt();

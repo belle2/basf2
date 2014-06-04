@@ -605,6 +605,11 @@ void AnalizerCollectorTFInfo::storeAllCellInformation(std::string filename)
 // 18 FilterID::nbFinderLost,
 // 19 FilterID::cellularAutomaton,
 // 20 FilterID::silentTcc
+
+// neue filter
+//                                   FilterID::angles3D,
+//              FilterID::distanceXY,
+
 // 21   outer hit
 // 22   inner Hit
 
@@ -628,8 +633,13 @@ void AnalizerCollectorTFInfo::storeCellInformation(std::string filename, int par
                                      FilterID::deltaSlopeZOverS,
                                      FilterID::nbFinderLost,
                                      FilterID::cellularAutomaton,
-                                     FilterID::silentTcc
+                                     FilterID::silentTcc,
+                                     FilterID::angles3D,
+                                     FilterID::distanceXY,
                                    };
+
+
+
 
   ofstream myfile(filename);
 
@@ -652,6 +662,9 @@ void AnalizerCollectorTFInfo::storeCellInformation(std::string filename, int par
   myfile << m_fileSeparator << FilterID::nameDeltaSOverZ << m_fileSeparator <<  FilterID::nameDeltaSlopeZOverS;
 
   myfile << m_fileSeparator << FilterID::nameNbFinderLost << m_fileSeparator <<  FilterID::nameCellularAutomaton << m_fileSeparator << FilterID::nameSilentTcc;
+
+  // new Filters
+  myfile << m_fileSeparator << FilterID::nameAngles3D << m_fileSeparator << FilterID::nameDistanceXY;
 
   myfile << m_fileSeparator << "outer_Hit" << m_fileSeparator << "inner_Hit" << endl;
 
@@ -720,7 +733,7 @@ void AnalizerCollectorTFInfo::storeCellInformation(std::string filename, int par
       myfile << endl;
 
       for (auto & currentCoordinate : cellTFInfo[i]->getCoordinates()) {
-        B2DEBUG(100, "Cell " << i << " Coordinate: " << currentCoordinate.X() << "/" << currentCoordinate.Y() << "/" << currentCoordinate.Z());
+        B2DEBUG(100, "Coor-Cell " << i << " Coordinate: " << currentCoordinate.X() << "/" << currentCoordinate.Y() << "/" << currentCoordinate.Z());
       }
 
     }
@@ -859,7 +872,7 @@ void AnalizerCollectorTFInfo::storeTCInformation(std::string filename, int parti
       myfile << endl;
 
       for (auto & currentCoordinate : tfcandTFInfo[i]->getCoordinates()) {
-        B2DEBUG(100, "TC " << i << " Coordinate: " << currentCoordinate.X() << "/" << currentCoordinate.Y() << "/" << currentCoordinate.Z());
+        B2DEBUG(100, "Coor-TC " << i << " Coordinate: " << currentCoordinate.X() << "/" << currentCoordinate.Y() << "/" << currentCoordinate.Z());
       }
 
     }
@@ -978,7 +991,7 @@ void AnalizerCollectorTFInfo::storeSectorInformation(std::string filename, bool 
       myfile << endl;
 
       for (auto & currentCoordinate : sectorTFInfo[i]->getCoordinates()) {
-        B2DEBUG(100, "Sector " << i << " Coordinate: " << currentCoordinate.X() << "/" << currentCoordinate.Y() << "/" << currentCoordinate.Z());
+        B2DEBUG(100, "Coor-Sector " << i << " Coordinate: " << currentCoordinate.X() << "/" << currentCoordinate.Y() << "/" << currentCoordinate.Z());
       }
 
     }

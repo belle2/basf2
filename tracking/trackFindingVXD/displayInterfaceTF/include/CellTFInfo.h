@@ -192,7 +192,7 @@ namespace Belle2 {
     int sizeUsedParticles() { return m_usedParticles.size(); }
 
     /** returns the String for the display - Information */
-    TString getDisplayInformation() {
+    const TString getDisplayInformation() {
 
       int outerHit = -1;
       if (m_assignedHitsIds.size() > 0) { outerHit = m_assignedHitsIds.at(0); }
@@ -204,13 +204,13 @@ namespace Belle2 {
 
 
     /** returns Coordinates of the Assigned Hits */
-    std::vector<TVector3> getCoordinates() {
+    const std::vector<TVector3> getCoordinates() {
       return m_assignedHitsCoordinates;
     }
 
 
     /** returns the String for the display - AlternativeBox */
-    TString getDisplayAlternativeBox() {
+    const TString getDisplayAlternativeBox() {
 
       std::pair<int, double> mainParticle = getMainParticle();
       std::string diedAt = getDiedAt();

@@ -29,7 +29,7 @@
     <endcap_innerRadius unit="cm">4.0</endcap_innerRadius>
     <endcap_outerRadius unit="cm">6.0</endcap_outerRadius>
     <endcap_hz unit="cm">2.2</endcap_hz>
-    <xpipe_innerRadius unit="cm">3.7</xpipe_innerRadius>
+    <xpipe_innerRadius unit="cm">3.5</xpipe_innerRadius>
     <xpipe_outerRadius unit="cm">4.0</xpipe_outerRadius>
     <xpipe_hz unit="cm">200.0</xpipe_hz>
     

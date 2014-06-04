@@ -388,6 +388,14 @@ namespace Belle2 {
     double eclClusterDetectionRegion(const Particle* particle);
 
     /**
+     * Return 1 if ECLCluster passes the following selection criteria:
+     * Forward  : E > 125 MeV && E9/E25>0.7
+     * Barrel   : E > 100 MeV
+     * Backward : E > 150 MeV
+     */
+    double goodGamma(const Particle* particle);
+
+    /**
      * return ratio of energies in inner 3x3 and 5x5 cells
      */
     double eclClusterE9E25(const Particle* particle);

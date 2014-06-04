@@ -653,6 +653,22 @@ namespace Belle2 {
       return result;
     }
 
+    double goodGamma(const Particle* particle)
+    {
+      double energy = particle->getEnergy();
+      double e9e25  = eclClusterE9E25(particle);
+      int region = eclClusterDetectionRegion(particle);
+
+      bool goodGammaRegion1 = region > 0.5 && region < 1.5 && energy > 0.125 && e9e25 > 0.7;
+      bool goodGammaRegion2 = region > 1.5 && region < 2.5 && energy > 0.100;
+      bool goodGammaRegion3 = region > 2.5 && region < 3.5 && energy > 0.150;
+
+      if (goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3)
+        return 1.0;
+      else
+        return 0.0;
+    }
+
     double eclClusterE9E25(const Particle* particle)
     {
       double result = 0.0;
@@ -828,6 +844,8 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("eextra", extraEnergy, "extra energy in the calorimeter that is not associated to the given Particle");
 
+    VARIABLE_GROUP("ECL Cluster related");
+    REGISTER_VARIABLE("goodGamma",         goodGamma, "1.0 if photon candidate passes good photon selection criteria");
     REGISTER_VARIABLE("clusterReg",        eclClusterDetectionRegion, "detection region in the ECL [1 - forward, 2 - barrel, 3 - backward]");
     REGISTER_VARIABLE("clusterE9E25",      eclClusterE9E25,           "ratio of energies in inner 3x3 and 5x5 cells");
     REGISTER_VARIABLE("clusterNHits",      eclClusterNHits,           "number of hits associated to this cluster");

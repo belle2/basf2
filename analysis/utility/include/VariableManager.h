@@ -15,6 +15,28 @@ namespace Belle2 {
    *  an instance of the Variable class for this key. All variables take a
    *  const Particle* and return a double.
    *
+   *
+   *  <h2>List of available variables</h2>
+   *  To simply get a list of all variables registered in the main analysis library,
+   *  run <tt>basf2 analysis/scripts/variables.py</tt> .
+   *
+   *  <h2>Special variables</h2>
+   *  There are a number of meta-variables that can be combined with existing variables to do more powerful calculations:
+   *  <dl>
+   *  <dt>abs(varName)</dt>
+   *   <dd>Return absolute value of variable varName.</dd>
+   *  <dt>daughterN(varName)</dt>
+   *   <dd>(replace N with 0..6) Calculate variable varName for Nth daughter</dd>
+   *  <dt>daughterProductOf(varName)</dt>
+   *   <dd>Calculate variable varName for each daughter, and return product of values</dd>
+   *  <dt>daughterSumOf(varName)</dt>
+   *   <dd>Calculate variable varName for each daughter, and return sum of values</dd>
+   *  <dt>getExtraInfo(extraInfoName)</dt>
+   *   <dd>Return value of extra info 'extraInfoName' from Particle (see Particle::getExtraInfo()).</dd>
+   *  </dl>
+   *  So, if you wanted to get the momentum of the first daughter, you can use "daughter1(p)" anywhere where variable
+   *  names are accepted. Nesting is also possible, e.g. "daughter1(abs(getExtraInfo('SignalProbability')))" can be used.
+   *
    *  <h2>Adding variables</h2>
    *  Variables will automatically register themselves when
    *  the library that contains them is loaded. They only need to be put in a .cc file,
@@ -45,11 +67,6 @@ namespace Belle2 {
       someParticle = Belle2.Particle(TLorentzVector(1.0, 0, 0, 0), 321)
       print variables.evaluate('E', someParticle)
       \endcode
-   *
-   *
-   *  <h2>List of available variables</h2>
-   *  To simply get a list of all variables registered in the main analysis library,
-   *  run <tt>basf2 analysis/scripts/variables.py</tt> .
    *
    *
    *  \note All functions should be listed on

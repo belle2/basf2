@@ -184,11 +184,7 @@ namespace Belle2 {
     int pdg    = outputList->getPDGCode();
     int pdgbar = outputList->getAntiParticlePDGCode();
 
-    B2INFO("[ParticleCombinerModule::event] OutputListName = " << m_listName << "(" << m_antiListName << ")" << "[" << pdg << "/" << pdgbar << "]");
-
-    int counter = 1;
     while (combiner.loadNext()) {
-      B2INFO("[ParticleCombinerModule::event] loaded Particle #" << counter++);
 
       const Particle particle = combiner.getCurrentParticle(pdg, pdgbar);
       if (!checkCuts(&particle))
@@ -220,11 +216,6 @@ namespace Belle2 {
     out.setList(PCombinerList::c_Particle, particles);
     out.setList(PCombinerList::c_AntiParticle, antiParticles);
     out.setList(PCombinerList::c_SelfConjugatedParticle, scParticles);
-
-    B2INFO("[ParticleCombinerModule::convert] IN  list: ");
-    in->print();
-    B2INFO("[ParticleCombinerModule::convert] OUT list: ");
-    out.print();
   }
 
   bool ParticleCombinerModule::checkCuts(const Particle* particle)

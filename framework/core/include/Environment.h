@@ -39,8 +39,6 @@ namespace Belle2 {
      */
     static Environment& Instance();
 
-    void setup();
-
     /**
      * Returns a list of file paths searched for module libraries.
      */

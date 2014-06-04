@@ -112,62 +112,14 @@ namespace Belle2 {
     bool isFSP(const MCParticle* p);
 
     /**
-     * Finds final stat particles given in vector of generated particles that
-     * are not given in vector of reconstructed final state particles (in other
-     * words: finds out missing what are the missing particles) and saves their
-     * indices.
+     * Finds final state particles given in vector of generated particles that
+     * are not given in vector of reconstructed final state particles,
+     * returns flags describing what kind of FSPs are missing.
      *
-     * @param reconstructed vector of reconstructed final state particles
-     * @param generated vector of generated final state particles
-     * @param missP vector of generated final state particles(holds results of this algorithm)
+     * @param reconstructedFSPs vector of reconstructed final state particles
+     * @param generatedFSPs vector of generated final state particles
+     * @returns ORed combination of MCMatchStatus flags for missing particles.
      */
-    void findMissingGeneratedParticles(std::vector<const Particle*> reconstructed,
-                                       std::vector<const MCParticle*> generated, std::vector<const MCParticle*>& missP);
-
-
-    /**
-     * Determines whether (true) or not (false) the reconstructed particle misses generated Final State Radiation (FSR) photon.
-     *
-     * @param missP vector of generated final state particles
-     *
-     * @return whether (true) or not (false) the reconstructed particle misses generated Final State Radiation (FSR) photon
-     */
-    bool missingFSRPhoton(std::vector<const MCParticle*> missP);
-
-    /**
-     * Determines whether (true) or not (false) the reconstructed particle misses generated radiative photon.
-     *
-     * @param missP vector of generated final state particles
-     *
-     * @return whether (true) or not (false) the reconstructed particle misses radiative photon
-     */
-    bool missingRadiativePhoton(std::vector<const MCParticle*> missP);
-
-    /**
-     * Determines whether (true) or not (false) the reconstructed particle misses generated neutrino.
-     *
-     * @param missP vector of generated final state particles
-     *
-     * @return whether (true) or not (false) the reconstructed particle misses neutrino
-     */
-    bool missingNeutrino(std::vector<const MCParticle*> missP);
-
-    /**
-     * Determines whether (true) or not (false) the reconstructed particle misses massive particle.
-     *
-     * @param missP vector of generated final state particles
-     *
-     * @return whether (true) or not (false) the reconstructed particle misses massive particle
-     */
-    bool missingMassiveParticle(std::vector<const MCParticle*> missP);
-
-    /**
-     * Determines whether (true) or not (false) the reconstructed particle misses Klong.
-     *
-     * @param missP vector of generated final state particles
-     *
-     * @return whether (true) or not (false) the reconstructed particle misses Klong
-     */
-    bool missingKlong(std::vector<const MCParticle*> missP);
+    int getMissingParticleFlags(const std::vector<const Particle*>& reconstructedFSPs, const std::vector<const MCParticle*>& generatedFSPs);
   }
 }

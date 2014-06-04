@@ -9,6 +9,8 @@
 
 #include <framework/datastore/StoreArray.h>
 
+#include <unordered_set>
+
 using namespace Belle2;
 using namespace std;
 
@@ -193,9 +195,6 @@ int MCMatching::setMCTruthStatus(Particle* particle, const MCParticle* mcParticl
   appendFSP(particle,   recFSPs);
   appendFSP(mcParticle, genFSPs);
 
-  vector<const MCParticle*> missingParticles;
-  findMissingGeneratedParticles(recFSPs, genFSPs, missingParticles);
-
   // TODO: do something
   if (genFSPs.empty())
     return setStatus(particle, status | MCMatchStatus::c_InternalError);
@@ -204,31 +203,7 @@ int MCMatching::setMCTruthStatus(Particle* particle, const MCParticle* mcParticl
   if (recFSPs.size() > genFSPs.size())
     return setStatus(particle, status | MCMatchStatus::c_InternalError);
 
-  // determine the status bits
-  bool missFSR            = false;
-  bool missGamma          = false;
-  bool missMasiveParticle = false;
-  bool missKlong          = false;
-  bool missNeutrino       = false;
-
-  if (!missingParticles.empty()) {
-    missFSR      = missingFSRPhoton(missingParticles);
-    missGamma    = missingRadiativePhoton(missingParticles);
-    missNeutrino = missingNeutrino(missingParticles);
-    missMasiveParticle = missingMassiveParticle(missingParticles);
-    missKlong    = missingKlong(missingParticles);
-  }
-
-  if (missFSR)
-    status |= MCMatchStatus::c_MissFSR;
-  if (missGamma)
-    status |= MCMatchStatus::c_MissGamma;
-  if (missMasiveParticle)
-    status |= MCMatchStatus::c_MissMassiveParticle;
-  if (missNeutrino)
-    status |= MCMatchStatus::c_MissNeutrino;
-  if (missKlong)
-    status |= MCMatchStatus::c_MissKlong;
+  status |= getMissingParticleFlags(recFSPs, genFSPs);
 
   return setStatus(particle, status);
 }
@@ -297,94 +272,50 @@ bool MCMatching::isFSP(const MCParticle* p)
   }
 }
 
-void MCMatching::findMissingGeneratedParticles(vector<const Particle*>   reconstructed,
-                                               vector<const MCParticle*> generated,
-                                               std::vector<const MCParticle*>& missP)
+int MCMatching::getMissingParticleFlags(const std::vector<const Particle*>& reconstructedFSPs, const std::vector<const MCParticle*>& generatedFSPs)
 {
-  if (reconstructed.size() >= generated.size())
-    return;
+  int flags = 0;
 
-  for (int i = 0; i < (int)generated.size(); ++i) {
-    int link = 0;
+  //TODO rationale behind this?
+  if (reconstructedFSPs.size() >= generatedFSPs.size())
+    return flags;
 
-    for (int j = 0; j < (int)reconstructed.size(); ++j) {
-      const MCParticle* mcParticle = reconstructed[j]->getRelatedTo<MCParticle>();
-
-      if (mcParticle)
-        if (mcParticle->getIndex() == generated[i]->getIndex()) {
-          link = 1;
-          break;
-        }
-    }
-
-    if (!link)
-      missP.push_back(generated[i]);
+  //matched MCParticles of reconstructed FSPs
+  std::unordered_set<const MCParticle*> mcMatchedFSPs;
+  for (const Particle * rec : reconstructedFSPs) {
+    const MCParticle* mcParticle = rec->getRelatedTo<MCParticle>();
+    if (mcParticle)
+      mcMatchedFSPs.insert(mcParticle);
   }
-}
 
-bool MCMatching::missingFSRPhoton(std::vector<const MCParticle*> missP)
-{
-  for (const MCParticle * generated : missP) {
-    if (generated->getPDG() == 22) {
-      if (generated->getMother()) {
-        int ndaug = generated->getMother()->getNDaughters();
-        if (ndaug > 2) {
-          return true;
+  for (const MCParticle * genFSP : generatedFSPs) {
+    const bool missing = (mcMatchedFSPs.find(genFSP) == mcMatchedFSPs.end());
+    if (missing) {
+      //we want to set a flag, so what kind of particle is genFSP?
+      const int generatedPDG = genFSP->getPDG();
+      const int absGeneratedPDG = abs(generatedPDG);
+      if (generatedPDG == 22) { //missing photon
+        if (!(flags & c_MissFSR) or !(flags & c_MissGamma)) {
+          if (genFSP->getMother()) {
+            int ndaug = genFSP->getMother()->getNDaughters();
+            if (ndaug > 2) { // M -> A B (...) gamma is probably FSP
+              flags |= c_MissFSR;
+            } else if (ndaug == 2) { // M -> A gamma is probably a decay
+              flags |= c_MissGamma;
+            }
+          }
         }
-      }
-    }
-  }
-  return false;
-}
 
-bool MCMatching::missingRadiativePhoton(std::vector<const MCParticle*> missP)
-{
-  for (const MCParticle * generated : missP) {
-    if (generated->getPDG() == 22) {
-      if (generated->getMother()) {
-        int ndaug = generated->getMother()->getNDaughters();
-        if (ndaug == 2) {
-          return true;
+      } else if (absGeneratedPDG == 12 || absGeneratedPDG == 14 || absGeneratedPDG == 16) { // missing neutrino
+        flags |= c_MissNeutrino;
+
+      } else { //neither photon nor neutrino -> massive
+        flags |= c_MissMassiveParticle;
+        if (absGeneratedPDG == 130) {
+          flags |= c_MissKlong;
         }
       }
     }
   }
-  return false;
+  return flags;
 }
-
-bool MCMatching::missingNeutrino(std::vector<const MCParticle*> missP)
-{
-  for (const MCParticle * generated : missP) {
-    // TODO: avoid hard coded values
-    if (abs(generated->getPDG()) == 12 || abs(generated->getPDG()) == 14 || abs(generated->getPDG()) == 16) {
-      return true;
-    }
-  }
-  return false;
-}
-
-bool MCMatching::missingMassiveParticle(std::vector<const MCParticle*> missP)
-{
-  for (const MCParticle * generated : missP) {
-    // TODO: avoid hard coded values
-    if (abs(generated->getPDG()) != 12
-        && abs(generated->getPDG()) != 14
-        && abs(generated->getPDG()) != 16
-        && generated->getPDG() != 22) {
-      return true;
-    }
-  }
-  return false;
-}
-
-bool MCMatching::missingKlong(std::vector<const MCParticle*> missP)
-{
-  for (const MCParticle * generated : missP) {
-    // TODO: avoid hard coded values
-    if (abs(generated->getPDG()) == 130) {
-      return true;
-    }
-  }
-  return false;
-}
-

@@ -1,7 +1,0 @@
-0f010100
-pci_int_enable
-local_int_output_enable
-master_failed
-dma0_failed
-dma1_failed
-target_failed

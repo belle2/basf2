@@ -1,8 +1,0 @@
-syntax: glob
-*.o
-*.ko
-*.cmd
-*.mod.c
-*.symvers
-*.markers
-*tmp*

@@ -1,1 +1,0 @@
-cmd_/home/yamagata/cprdist-0.1.0/cprfin-jig/cprfin-jig.ko := ld -m elf_i386 -m elf_i386 -r -o /home/yamagata/cprdist-0.1.0/cprfin-jig/cprfin-jig.ko /home/yamagata/cprdist-0.1.0/cprfin-jig/cprfin-jig.o /home/yamagata/cprdist-0.1.0/cprfin-jig/cprfin-jig.mod.o

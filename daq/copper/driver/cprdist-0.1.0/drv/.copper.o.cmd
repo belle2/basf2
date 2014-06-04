@@ -1,1 +1,0 @@
-cmd_/home/usr/yamadas/basf2/release/daq/copper/driver/cprdist-0.1.0/drv/copper.o := ld -m elf_i386 -m elf_i386  -r -o /home/usr/yamadas/basf2/release/daq/copper/driver/cprdist-0.1.0/drv/copper.o /home/usr/yamadas/basf2/release/daq/copper/driver/cprdist-0.1.0/drv/cpr.o /home/usr/yamadas/basf2/release/daq/copper/driver/cprdist-0.1.0/drv/evq.o

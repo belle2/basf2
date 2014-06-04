@@ -1,8 +1,0 @@
-0f010900
-pci_int_enable
-local_int_input_enable
-local_int_output_enable
-master_failed
-dma0_failed
-dma1_failed
-target_failed

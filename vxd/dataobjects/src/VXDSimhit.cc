@@ -51,7 +51,7 @@ std::vector<std::pair<float, float>> VXDSimHit::getElectronsConstantDistance(dou
     const double fraction = min((i + 1) * deltaFraction, 1.0);
     //finding the correct segment
     while (fraction > currentPoint.getFraction()) {
-      currentPointIt++;
+      ++currentPointIt;
       lastPoint = currentPoint;
       currentPoint = VXDElectronDeposit(*currentPointIt);
     }
@@ -84,7 +84,7 @@ std::vector<std::pair<float, float>> VXDSimHit::getElectronsConstantNumber(doubl
     const double electrons = min((i + 1) * deltaElectrons, (double)total.getElectrons());
     //finding the correct segment
     while (electrons > currentPoint.getElectrons()) {
-      currentPointIt++;
+      ++currentPointIt;
       lastPoint = currentPoint;
       currentPoint = VXDElectronDeposit(*currentPointIt);
     }

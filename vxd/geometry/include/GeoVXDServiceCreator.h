@@ -21,6 +21,9 @@ namespace Belle2 {
     /** The creator for the VXD Service geometry of the Belle II detector. */
     class GeoVXDServiceCreator : public geometry::CreatorBase {
     public:
+      /** Default constructor is sufficient in this case */
+      GeoVXDServiceCreator() = default;
+
       /**
        * Creates the Geant4 Objects for the VXD Service geometry.
        * @param content A reference to the content part of the parameter
@@ -34,7 +37,7 @@ namespace Belle2 {
       void createDockBoxes(const GearDir& content, G4LogicalVolume& topVolume);
 
       /** Default Material, inherited from topVolume */
-      G4Material* m_defaultMaterial;
+      G4Material* m_defaultMaterial {0};
     };
   } // namespace VXD
 } //namespace Belle2

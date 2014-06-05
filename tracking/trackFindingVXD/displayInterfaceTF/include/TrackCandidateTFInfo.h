@@ -179,6 +179,15 @@ namespace Belle2 {
       return TString::Format("PassIndex: %d\n Died_ID: %s, IsReal: %d, ParticleID: %d, Purity: %.3f\n  Probability: %.3f, GTFC: %d", getPassIndex(), diedAt.c_str(), m_isReal, mainParticle.first, mainParticle.second, m_probValue, m_assignedGFTC);
     }
 
+    /** returns the Color of the Object for the display */
+    Color_t getColor() const {
+      if (getActive()) {
+        return kGreen;
+      } else {
+        return (kGreen - 10);
+      }
+    }
+
   protected:
     int m_ownId; /**< Track Canrdidate ID */
 

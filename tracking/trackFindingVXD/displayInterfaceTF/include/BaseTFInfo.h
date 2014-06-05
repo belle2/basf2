@@ -49,7 +49,7 @@ namespace Belle2 {
     };
 
     /** getter - getActive Active*/
-    bool getActive() {
+    bool getActive() const {
       if (m_diedAt.size() == 0) {
         return true;
       } else {

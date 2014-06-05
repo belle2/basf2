@@ -218,6 +218,15 @@ namespace Belle2 {
       return TString::Format("State: %d, PassIndex: %d\n Died_ID: %s, IsReal: %d, ParticleID: %d, Purity: %.3f\n  Count NB-Cells: %d", m_state, getPassIndex(), diedAt.c_str(), m_isReal, mainParticle.first, mainParticle.second, sizeNeighbours());
     }
 
+    /** returns the Color of the Object for the display */
+    Color_t getColor() const {
+      if (getActive()) {
+        return (kRed - m_state); // different Red for different State
+      } else {
+        return (kRed - 10);
+      }
+    }
+
   protected:
 
     int m_state; /**< State of the cell */

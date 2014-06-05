@@ -164,6 +164,14 @@ namespace Belle2 {
       return TString::Format("SectorID: %d, PassIndex: %d\n Died_ID: %s, Count Friend Sectors: %d", m_sectorID, getPassIndex(), diedAt.c_str(), sizeFriends());
     }
 
+    /** returns the Color of the Object for the display */
+    Color_t getColor() const {
+      if (getActive()) {
+        return kBlue;
+      } else {
+        return (kBlue - 10);
+      }
+    }
 
   protected:
 

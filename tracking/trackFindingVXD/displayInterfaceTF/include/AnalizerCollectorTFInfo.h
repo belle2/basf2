@@ -35,7 +35,7 @@ namespace Belle2 {
    *
    */
 
-  class AnalizerCollectorTFInfo: public TObject {
+  class AnalizerCollectorTFInfo:  public TObject {
 
     //friend class AnalizerCollectorTFInfoTest;
 

@@ -83,10 +83,10 @@ void CollectorTFInfo::initSectors(const std::vector< std::pair <std::pair<unsign
   B2DEBUG(100, "CollectorTFInfo: initSectors");
 
   // Parameters to get the different corners
-//   std::pair<double, double> aRelCoor_corner1 = {0, 0};
-//   std::pair<double, double> aRelCoor_corner2 = {0, 1};
-//   std::pair<double, double> aRelCoor_corner3 = {1, 0};
-//   std::pair<double, double> aRelCoor_corner4 = {1, 1};
+  std::pair<double, double> aRelCoor_corner1 = {0, 0};
+  std::pair<double, double> aRelCoor_corner2 = {0, 1};
+  std::pair<double, double> aRelCoor_corner3 = {1, 0};
+  std::pair<double, double> aRelCoor_corner4 = {1, 1};
 
   int sectorSize = sectors.size();
 
@@ -111,43 +111,44 @@ void CollectorTFInfo::initSectors(const std::vector< std::pair <std::pair<unsign
 
     B2DEBUG(100, "CollectorTFInfo: initSectors, search for: " << currentFullSectorID);
 
-//     VxdID aVxdID = currentFullSectorID.getVxdID();
+    VxdID aVxdID = currentFullSectorID.getVxdID();
     unsigned short aSecID = currentFullSectorID.getSecID();
+
+    const VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
+    const VXD::SensorInfoBase& aSensorInfo = geometry.getSensorInfo(aVxdID);
 
     B2DEBUG(100, "CollectorTFInfo: initSectors, aSecID: " << aSecID);
     B2DEBUG(100, "CollectorTFInfo: initSectors, secConfigU size: " << secConfigU.size());
     B2DEBUG(100, "CollectorTFInfo: initSectors, secConfigV size: " << secConfigV.size());
 
     // Error !!! : VXD Sensor * does not exist.
-    /*
+
     std::pair<float, float> aRelCoor; // reusage of temporal value
 
     // 1. Corner Calculate
-
-
     aRelCoor = SectorTools::calcNormalizedSectorPoint(secConfigU, secConfigV, aSecID, aRelCoor_corner1);
-    pair<double, double> localCorner00 = SpacePoint::convertNormalizedToLocalCoordinates(aRelCoor, aSecID);
-    TVector3 corner1Global = SpacePoint::getGlobalCoordinates(localCorner00, aVxdID);
+    pair<double, double> localCorner00 = SpacePoint::convertNormalizedToLocalCoordinates(aRelCoor, aSecID, &aSensorInfo);
+    TVector3 corner1Global = SpacePoint::getGlobalCoordinates(localCorner00, aVxdID, &aSensorInfo);
     newsector.setPoint(0, corner1Global);
 
     // 2. Corner Calculate
     aRelCoor = SectorTools::calcNormalizedSectorPoint(secConfigU, secConfigV, aSecID, aRelCoor_corner2);
-    pair<double, double> localCorner01 = SpacePoint::convertNormalizedToLocalCoordinates(aRelCoor, aVxdID);
-    TVector3 corner2Global = SpacePoint::getGlobalCoordinates(localCorner01, aVxdID);
+    pair<double, double> localCorner01 = SpacePoint::convertNormalizedToLocalCoordinates(aRelCoor, aVxdID, &aSensorInfo);
+    TVector3 corner2Global = SpacePoint::getGlobalCoordinates(localCorner01, aVxdID, &aSensorInfo);
     newsector.setPoint(1, corner2Global);
 
     // 3. Corner Calculate
     aRelCoor = SectorTools::calcNormalizedSectorPoint(secConfigU, secConfigV, aSecID, aRelCoor_corner3);
-    pair<double, double> localCorner10 = SpacePoint::convertNormalizedToLocalCoordinates(aRelCoor, aVxdID);
-    TVector3 corner3Global = SpacePoint::getGlobalCoordinates(localCorner10, aVxdID);
+    pair<double, double> localCorner10 = SpacePoint::convertNormalizedToLocalCoordinates(aRelCoor, aVxdID, &aSensorInfo);
+    TVector3 corner3Global = SpacePoint::getGlobalCoordinates(localCorner10, aVxdID, &aSensorInfo);
     newsector.setPoint(2, corner3Global);
 
     // 4. Corner Calculate
     aRelCoor = SectorTools::calcNormalizedSectorPoint(secConfigU, secConfigV, aSecID, aRelCoor_corner4);
-    pair<double, double> localCorner11 = SpacePoint::convertNormalizedToLocalCoordinates(aRelCoor, aVxdID);
-    TVector3 corner4Global = SpacePoint::getGlobalCoordinates(localCorner11, aVxdID);
+    pair<double, double> localCorner11 = SpacePoint::convertNormalizedToLocalCoordinates(aRelCoor, aVxdID, &aSensorInfo);
+    TVector3 corner4Global = SpacePoint::getGlobalCoordinates(localCorner11, aVxdID, &aSensorInfo);
     newsector.setPoint(3, corner4Global);
-    */
+
 
     B2DEBUG(100, "CollectorTFInfo: initSectors, all Corners set: " << aSecID);
 
@@ -194,7 +195,7 @@ void CollectorTFInfo::initSectors(const std::vector< std::pair <std::pair<unsign
       }
     }
     */
-//   B2DEBUG(100, "Sector von init: " << newsector.getDisplayInformation());
+//     B2DEBUG(100, "Display Sectors: " << newsector.getDisplayInformation());
 
     m_sectorTFAll.insert(make_pair(KeySectors(currentSector.first.first, currentSector.first.second), newsector));
 
@@ -812,12 +813,20 @@ void CollectorTFInfo::safeInformation()
       // same with sectorid; IDs = SectorIDs for akt. Sector and Friend sectors
       //relSectorSectorFriend.add (currentSector.second.getSectorID(), currentFriend);
     }
+
+    B2DEBUG(100, "Display-Coor Sector:  " << currentSector.second.getDisplayInformation());
+
+    for (auto & currentCoordinate : currentSector.second.getCoordinates()) {
+      B2DEBUG(100, "Coor-Sector Coordinate: " << currentCoordinate.X() << "/" << currentCoordinate.Y() << "/" << currentCoordinate.Z());
+    }
+
   }
 
   B2DEBUG(100, "*******  SECTORS size: " << sectorTFInfo.getEntries() << " *******");
   B2DEBUG(100, "*******  akt SECTORS size: " << m_sectorTF.size() << " *******");
 
   B2DEBUG(100, "*******  relSectorSectorFriend: " << relSectorSectorFriend.getEntries() << " *******");
+
 
 
   // HITS
@@ -844,6 +853,13 @@ void CollectorTFInfo::safeInformation()
       relCellNBCell.add(indexCell, currentNb);
       B2DEBUG(100, "*******  relCellNBCell: indexCell: " << indexCell << ", currentNb: " << currentNb);
     }
+
+    B2DEBUG(100, "Display-Coor Cell:  " << currentCell.getDisplayInformation());
+
+    for (auto & currentCoordinate : currentCell.getCoordinates()) {
+      B2DEBUG(100, "Coor-Cell Coordinate: " << currentCoordinate.X() << "/" << currentCoordinate.Y() << "/" << currentCoordinate.Z());
+    }
+
   }
 
   B2DEBUG(100, "*******  relCellNBCell: " << relCellNBCell.getEntries() << " *******");
@@ -854,6 +870,13 @@ void CollectorTFInfo::safeInformation()
 
   for (auto & currentTfCand : m_tfCandTF) {
     tfcandTFInfo.appendNew(currentTfCand);
+
+    B2DEBUG(100, "Display-Coor TFCand:  " << currentTfCand.getDisplayInformation());
+
+    for (auto & currentCoordinate : currentTfCand.getCoordinates()) {
+      B2DEBUG(100, "Coor-TFCand Coordinate: " << currentCoordinate.X() << "/" << currentCoordinate.Y() << "/" << currentCoordinate.Z());
+    }
+
   }
 
 }

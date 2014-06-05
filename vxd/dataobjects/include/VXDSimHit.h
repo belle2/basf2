@@ -26,9 +26,6 @@ namespace Belle2 {
    */
   class VXDSimHit : public SimHitBase {
   public:
-    typedef std::vector<unsigned int>::iterator iterator;
-    typedef std::vector<unsigned int>::const_iterator const_iterator;
-
     /** default constructor for ROOT */
     VXDSimHit(): m_pdg(0), m_globalTime(0), m_posIn(), m_posOut(), m_sensorID(0) {}
 

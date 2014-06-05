@@ -118,7 +118,7 @@ namespace Belle2 {
         int simhitN;
         /** values for the simhits */
         double simhitInfo[SIZE_HITS* MAX_HITS];
-      } m_info;
+      } m_info; /**< object to store all variables */
     };
   }
 } //Belle2 namespace

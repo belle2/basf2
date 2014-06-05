@@ -130,7 +130,7 @@ void SmearPrimaryVertexModule::setNewPrimaryVertex(void)
   // rotate
   randomShift.RotateX(m_new_angle_ip.X());
   randomShift.RotateY(m_new_angle_ip.Y());
-  randomShift.RotateY(m_new_angle_ip.Z());
+  randomShift.RotateZ(m_new_angle_ip.Z());
 
   m_new_ip = m_new_nominal_ip + randomShift;
 }

@@ -141,7 +141,7 @@ namespace Belle2 {
       EXPECT_TRUE(check_index.none());
     }
 
-    /*
+    /**
      * Check if the cluster cache is empty
      */
     TEST(ClusterCache, Empty)

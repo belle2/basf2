@@ -117,7 +117,6 @@ void DisplayModule::initialize()
 
   //allow UI to get additional info on the represented objects
   m_display->setVisualRepMap(m_visualizer->getVisualRepMap());
-
 }
 
 
@@ -202,6 +201,21 @@ void DisplayModule::event()
     for (int i = 0 ; i < ROIs.getEntries(); i++)
       m_visualizer->addROI(ROIs[i], TString::Format("ROIs_%d", i));
 
+    //special VXDTF objects
+    StoreArray<TrackCandidateTFInfo> tfcandTFInfo;
+    for (auto & currentTC : tfcandTFInfo) {
+      m_visualizer->addTrackCandidateTFInfo(&currentTC);
+    }
+
+    StoreArray<CellTFInfo> cellTFInfo;
+    for (auto & currentCell : cellTFInfo) {
+      m_visualizer->addCellTFInfo(&currentCell);
+    }
+
+    StoreArray<SectorTFInfo> sectorTFInfo;
+    for (auto & currentSector : sectorTFInfo) {
+      m_visualizer->addSectorTFInfo(&currentSector);
+    }
   }
 
   if (m_showTrackLevelObjects) {

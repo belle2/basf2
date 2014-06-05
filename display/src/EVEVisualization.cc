@@ -51,6 +51,7 @@
 #include <TEveGeoNode.h>
 #include <TEveGeoShape.h>
 #include <TEveGeoShapeExtract.h>
+#include <TEveLine.h>
 #include <TEvePointSet.h>
 #include <TEveSelection.h>
 #include <TEveStraightLineSet.h>
@@ -1422,4 +1423,52 @@ void EVEVisualization::showUserData(const DisplayData& displayData)
 void EVEVisualization::addObject(const TObject* dataStoreObject, TEveElement* visualRepresentation)
 {
   m_visualRepMap->add(dataStoreObject, visualRepresentation);
+}
+
+void EVEVisualization::addTrackCandidateTFInfo(TrackCandidateTFInfo* info)
+{
+
+  TEveLine* line = new TEveLine(info->getCoordinates().size());
+  line->SetName(TString::Format("VXDTF TC: %d", info->getOwnID()));
+  line->SetTitle(info->getDisplayInformation());
+  line->SetMainColor(info->getColor());
+  for (auto & v : info->getCoordinates()) {
+    line->SetNextPoint(v.x(), v.y(), v.z());
+  }
+
+  gEve->AddElement(line);
+  addObject(info, line);
+}
+
+void EVEVisualization::addCellTFInfo(CellTFInfo* info)
+{
+  TEveLine* line = new TEveLine(info->getCoordinates().size());
+  line->SetName(TString::Format("Cell idx %d", info->getArrayIndex()));
+  line->SetTitle(info->getDisplayInformation());
+  line->SetMainColor(info->getColor());
+  for (auto & v : info->getCoordinates()) {
+    line->SetNextPoint(v.x(), v.y(), v.z());
+  }
+
+  gEve->AddElement(line);
+  addObject(info, line);
+}
+
+void EVEVisualization::addSectorTFInfo(SectorTFInfo* info)
+{
+  TString name = TString::Format("Sector %d", info->getSectorID());
+
+  const std::vector<TVector3>& vertices = info->getCoordinates();
+  TVector3 u = vertices[1] - vertices[0];
+  TVector3 v = vertices[2] - vertices[0];
+  TVector3 center = vertices[0] + 0.5 * u + 0.5 * v;
+
+  //u, v are the correct length, so use du = dv = 1.0
+  TEveBox* box = boxCreator(center, u, v, 1.0, 1.0, 0.01);
+  box->SetName(name);
+  box->SetTitle(info->getDisplayInformation());
+  box->SetMainColor(info->getColor());
+  box->SetMainTransparency(60);
+  gEve->AddElement(box);
+  addObject(info, box);
 }

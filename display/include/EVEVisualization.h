@@ -20,6 +20,10 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <tracking/dataobjects/ROIid.h>
 
+#include <tracking/trackFindingVXD/displayInterfaceTF/TrackCandidateTFInfo.h>
+#include <tracking/trackFindingVXD/displayInterfaceTF/CellTFInfo.h>
+#include <tracking/trackFindingVXD/displayInterfaceTF/SectorTFInfo.h>
+
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 
@@ -125,6 +129,13 @@ namespace Belle2 {
     /** Add a genfit::TrackCand, to evaluate track finding. */
     template<class PXDType, class SVDType> void addTrackCandidate(const genfit::TrackCand* trackCand, const TString& label,
         const StoreArray<PXDType>& pxdhits, const StoreArray<SVDType>& svdhits, const StoreArray<CDCHit>& cdchits);
+
+    /** Add VXDTF track candidate. */
+    void addTrackCandidateTFInfo(TrackCandidateTFInfo* info);
+    /** Add VXDTF cell. */
+    void addCellTFInfo(CellTFInfo* info);
+    /** Add VXDTF sector. */
+    void addSectorTFInfo(SectorTFInfo* info);
 
     /** Add all entries in the given 'hits' array (and the corresponding MCParticles) to the event scene. */
     template <class T> void addSimHits(const StoreArray<T>& hits) {

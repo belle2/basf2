@@ -13,25 +13,17 @@
 #include <framework/logging/Logger.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 
-// // for htonl
-#include <arpa/inet.h>
-
 #include <boost/foreach.hpp>
 #include <boost/crc.hpp>
 #include <boost/cstdint.hpp>
 
+#include <boost/spirit/home/support/detail/endian.hpp>
+
+// DHP modes are the same as for DHH envelope
 #define DHP_FRAME_HEADER_DATA_TYPE_RAW  0x0
 #define DHP_FRAME_HEADER_DATA_TYPE_ZSD  0x5
 
-// DHHC envelope
-#define DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START  0xB
-#define DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END    0xC
-// Onsen processed data
-#define DHHC_FRAME_HEADER_DATA_TYPE_DHP_ONS     0xD
-#define DHHC_FRAME_HEADER_DATA_TYPE_FCE_ONS     0x9
-#define DHHC_FRAME_HEADER_DATA_TYPE_HLTROI      0xF
-
-// DHH like above, but format has changed
+// DHH like before, but now 4 bits
 #define DHHC_FRAME_HEADER_DATA_TYPE_DHP_RAW     0x0
 #define DHHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD     0x5
 #define DHHC_FRAME_HEADER_DATA_TYPE_FCE_RAW     0x1
@@ -39,6 +31,15 @@
 #define DHHC_FRAME_HEADER_DATA_TYPE_GHOST       0x2
 #define DHHC_FRAME_HEADER_DATA_TYPE_DHH_START   0x3
 #define DHHC_FRAME_HEADER_DATA_TYPE_DHH_END     0x4
+// DHHC envelope, new
+#define DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START  0xB
+#define DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END    0xC
+// Onsen processed data, new
+#define DHHC_FRAME_HEADER_DATA_TYPE_ONSEN_DHP     0xD
+#define DHHC_FRAME_HEADER_DATA_TYPE_ONSEN_FCE     0x9
+#define DHHC_FRAME_HEADER_DATA_TYPE_ONSEN_ROI     0xF
+#define DHHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG     0xE
+// Free IDs are 0x7 0x8 0xA
 
 using namespace std;
 using namespace Belle2;
@@ -190,9 +191,11 @@ void PXDPackerModule::event()
 
 void PXDPackerModule::endian_swap_frame(unsigned short* dataptr, int len)
 {
+  boost::spirit::endian::ulittle16_t* p = (boost::spirit::endian::ulittle16_t*)dataptr;
+
   /// swap endianess of all shorts in frame BUT not the CRC (2 shorts)
   for (int i = 0; i < len / 2 - 2; i++) {
-    dataptr[i] = htons(dataptr[i]);
+    p[i] = dataptr[i];// Endian Swap! (it doesnt matter if you swap from little to big or vice versa)
   }
 }
 
@@ -232,23 +235,26 @@ void PXDPackerModule::pack_event(void)
 
 void PXDPackerModule::add_frame_to_payload(void)
 {
+  if (m_current_frame.size() & 0x3) {
+    B2ERROR("Frame is not 32bit aligned!!! Unsupported by Unpacker!");
+  }
   // checksum frame
   dhh_crc_32_type current_crc;
   current_crc.process_bytes(m_current_frame.data(), m_current_frame.size());
-  add_int32(current_crc.checksum());
+  append_int32(current_crc.checksum());
 
   // and add it
   m_onsen_header.push_back(m_current_frame.size());
   m_onsen_payload.push_back(m_current_frame);
 }
 
-void PXDPackerModule::add_int16(unsigned short w)
+void PXDPackerModule::append_int16(unsigned short w)
 {
   m_current_frame.push_back((unsigned char)(w >> 8));
   m_current_frame.push_back((unsigned char)(w));
 }
 
-void PXDPackerModule::add_int32(unsigned int w)
+void PXDPackerModule::append_int32(unsigned int w)
 {
   m_current_frame.push_back((unsigned char)(w >> 24));
   m_current_frame.push_back((unsigned char)(w >> 16));
@@ -267,14 +273,26 @@ void PXDPackerModule::pack_dhhc(int dhhc_id, int dhh_active, int* dhh_ids)
   B2INFO("PXD Packer --> pack_dhhc ID " << dhhc_id << " DHH act: " << dhh_active);
 
   /// HLT frame ??? t.b.d.
+  start_frame();
+  append_int32((DHHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG << 27) | (m_trigger_nr & 0xFFFF));
+  append_int32(0xCAFE0000);// HLT HEADER
+  append_int32(0); // HLT Trigger Nr
+  append_int32(0); // HLT Run NR etc
+  append_int32(0xCAFE0000);// DATCON HEADER ... do we want it here? t.b.d.
+  append_int32(0); // DATCON Trigger Nr
+  append_int32(0); // DATCON Run NR etc
+  add_frame_to_payload();
 
   /// DHHC Start
 
   start_frame();
-  add_int32(0x58000000 | ((dhhc_id & 0xF) << 21) | ((dhh_active & 0x1F) << 16) | (m_trigger_nr & 0xFFFF));
-  add_int16((m_trigger_nr & 0xFFFF0000) >> 16);
-  add_int32(0x00000000); // TT 11-0 | Type | TT 27-12
-  add_int32(0x00000000);  // TT 43-27 | Frame count
+  append_int32((DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START << 27) | ((dhhc_id & 0xF) << 21) | ((dhh_active & 0x1F) << 16) | (m_trigger_nr & 0xFFFF));
+  append_int16(m_trigger_nr >> 16);
+  append_int16(0x00000000); // TT 11-0 | Type
+  append_int16(0x00000000); // TT 27-12
+  append_int16(0x00000000); // TT 43-28
+  append_int16(0x00000000); // Run Nr 7-0 | Subrunnr 7-0
+  append_int16(0x00000000); // Exp NR 9-0 | Run Nr 13-8
   add_frame_to_payload();
 
   // loop for each DHH in system
@@ -289,17 +307,15 @@ void PXDPackerModule::pack_dhhc(int dhhc_id, int dhh_active, int* dhh_ids)
   /// lets copy the HLT/ROI frame
 
   //  start_frame();
-  //  crc_value = 0x38000000;//t.b.d.
-  //  add_int32(crc_value);
+  //  append_int32((DHHC_FRAME_HEADER_DATA_TYPE_ONSEN_ROI<<27) | (m_trigger_nr & 0xFFFF));
   //  add_frame_to_payload();
-
 
   /// DHHC End
 
   start_frame();
-  add_int32(0x60000000 | ((dhhc_id & 0xF) << 21) | (m_trigger_nr & 0xFFFF));
-  add_int32(0x00000000);  // 16 bit word count
-  add_int32(0x00000000);  // Error Flags
+  append_int32((DHHC_FRAME_HEADER_DATA_TYPE_DHHC_END << 27) | ((dhhc_id & 0xF) << 21) | (m_trigger_nr & 0xFFFF));
+  append_int32(0x00000000); // 16 bit word count
+  append_int32(0x00000000); // Error Flags
   add_frame_to_payload();
 
 }
@@ -310,11 +326,12 @@ void PXDPackerModule::pack_dhh(int dhh_id, int dhp_active)
   // dhh_id is not dhh_id ...
 
   /// DHH Start
-
   start_frame();
-  add_int32(0x18000000 | ((dhh_id & 0x3F) << 20) | ((dhp_active & 0xF) << 16) | (m_trigger_nr & 0xFFFF));
-  add_int32(0x00000000);  // DHH Timer Lo | DHH Time Hi
-  add_int16(0x00000000);  // Last DHP Frame Nr, Trigger Offset (nur 16 bit?)
+  append_int32((DHHC_FRAME_HEADER_DATA_TYPE_DHH_START << 27) | ((dhh_id & 0x3F) << 20) | ((dhp_active & 0xF) << 16) | (m_trigger_nr & 0xFFFF));
+  append_int16(m_trigger_nr >> 16); // Trigger Nr Hi
+  append_int16(0x00000000);  // DHH Timer Lo
+  append_int16(0x00000000);  // DHH Time Hi
+  append_int16(0x00000000);  // Last DHP Frame Nr 5-0, Trigger Offset 9-0
   add_frame_to_payload();
 
 // now prepare the data from one halfladder
@@ -381,9 +398,9 @@ void PXDPackerModule::pack_dhh(int dhh_id, int dhp_active)
 
   /// DHH End
   start_frame();
-  add_int32(0x20000000 | ((dhh_id & 0x3F) << 20) | (m_trigger_nr & 0xFFFF));
-  add_int32(0x00000000);  // 16 bit word count
-  add_int32(0x00000000);  // Error Flags
+  append_int32((DHHC_FRAME_HEADER_DATA_TYPE_DHH_END << 27) | ((dhh_id & 0x3F) << 20) | (m_trigger_nr & 0xFFFF));
+  append_int32(0x00000000);  // 16 bit word count
+  append_int32(0x00000000);  // Error Flags
   add_frame_to_payload();
 }
 
@@ -392,10 +409,11 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhh_id)
   B2INFO("PXD Packer --> pack_dhp Chip " << chip_id << " of DHH id: " << dhh_id);
   // remark: chip_id != port most of the time ...
   bool empty = true;
+  unsigned short last_rowstart = 0;
 
   start_frame();
   /// DHP data Frame
-  add_int32(0xA8000000 | ((dhh_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
+  append_int32((DHHC_FRAME_HEADER_DATA_TYPE_ONSEN_DHP << 27) | ((dhh_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
   for (int row = 0; row < PACKER_NUM_ROWS; row++) { // should be variable
     bool rowstart;
     rowstart = true;
@@ -406,26 +424,33 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhh_id)
     for (int col = c1; col < c2; col++) {
       if (halfladder_pixmap[row][col] != 0) {
         if (rowstart) {
-          add_int16(((row & 0x3FE) << (6 - 1)) | 0); // plus common mode 6 bits ... set to 0
+          last_rowstart = ((row & 0x3FE) << (6 - 1)) | 0; // plus common mode 6 bits ... set to 0
+          append_int16(last_rowstart);
           rowstart = false;
         }
-        add_int16(0x8000 | ((row & 0x1) << 14) | ((col & 0x3F) << 8) | (halfladder_pixmap[row][col] & 0xFF));
+        append_int16(0x8000 | ((row & 0x1) << 14) | ((col & 0x3F) << 8) | (halfladder_pixmap[row][col] & 0xFF));
         empty = false;
       }
     }
   }
+  if (!empty && m_current_frame.size() & 0x3) {
+    B2INFO("Repeat last rowstart to align to 32bit.");
+    append_int16(last_rowstart);
+  }
+
 
   if (empty) {
     B2WARNING("no data for halfladder! DHHID: " << dhh_id << " Chip: " << chip_id);
     start_frame();
     /// Ghost Frame
-    add_int32(0x90000000 | ((dhh_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
+    append_int32((DHHC_FRAME_HEADER_DATA_TYPE_GHOST << 27) | ((dhh_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
   } else {
     B2ERROR("no error ... just to tell you we found some data for DHHID: " << dhh_id << " Chip: " << chip_id);
   }
   add_frame_to_payload();
 
 }
+
 
 #if 0
 
@@ -565,12 +590,12 @@ int generate_data_for_trig(unsigned int m_trigger_nr, unsigned char* buffer, uns
 
             crc_value = 0x28000000 | (dhh_id & 0x3F) << 20 | (reformat & 0x1) << 19 | (chip_id & 0x3) << 16 | m_trigger_nr & 0xFFFF ;
             crc_out.process_byte((crc_value >> 24) & 0xFF);   crc_out.process_byte((crc_value >> 16) & 0xFF);   crc_out.process_byte((crc_value >> 8) & 0xFF);   crc_out.process_byte(crc_value & 0xFF);
-            add_int32(crc_value);
+            append_int32(crc_value);
             data_size2 += 4;
 
             crc_value = 0xA0000000 | (dhh_id & 0x3F) << 18 | (chip_id & 0x03) << 16 ;
             crc_out.process_byte((crc_value >> 24) & 0xFF);   crc_out.process_byte((crc_value >> 16) & 0xFF);   crc_out.process_byte((crc_value >> 8) & 0xFF);   crc_out.process_byte(crc_value & 0xFF);
-            add_int32(crc_value);
+            append_int32(crc_value);
             data_size2 += 4;
 
             frame_nr++;
@@ -593,7 +618,7 @@ int generate_data_for_trig(unsigned int m_trigger_nr, unsigned char* buffer, uns
               if ((i == 0) || (row_act != row_pre)) {
                 sor = ((dhp_pix[i] >> 20) & 0x3FE) << 5;
                 sor_d = ((dhp_pix[i] >> 20) & 0x001);
-//                   add_int16(DHH_file, sor);
+//                   append_int16(DHH_file, sor);
                 crc_value = sor ;
                 crc_dhh.process_byte((crc_value >> 8) & 0xFF);   crc_dhh.process_byte(crc_value & 0xFF);
 //      printf("SOR %04X  ", sor);
@@ -602,7 +627,7 @@ int generate_data_for_trig(unsigned int m_trigger_nr, unsigned char* buffer, uns
               }
               int dw;
               dw = 0x8000 | (sor_d & 0x001) << 15 | (dhp_pix[i] & 0x3FFF);
-//                 add_int16(DHH_file, dw);
+//                 append_int16(DHH_file, dw);
               crc_value = dw ;
               crc_dhh.process_byte((crc_value >> 8) & 0xFF);   crc_dhh.process_byte(crc_value & 0xFF);
 //    printf("DW %04X | ", dw);
@@ -627,7 +652,7 @@ int generate_data_for_trig(unsigned int m_trigger_nr, unsigned char* buffer, uns
                   sor_d = ((dhp_pix[i] >> 20) & 0x001);
                   crc_value = sor ;
                   crc_out.process_byte((crc_value >> 8) & 0xFF);   crc_out.process_byte(crc_value & 0xFF);
-                  add_int16(crc_value);
+                  append_int16(crc_value);
                   data_size2 += 2;
                   //        printf("SOR %04X  ", sor);
                   count_in_roi++;
@@ -637,7 +662,7 @@ int generate_data_for_trig(unsigned int m_trigger_nr, unsigned char* buffer, uns
                 dw = 0x8000 | (sor_d & 0x001) << 15 | (dhp_pix[i] & 0x3FFF);
                 crc_value = dw ;
                 crc_out.process_byte((crc_value >> 8) & 0xFF);   crc_out.process_byte(crc_value & 0xFF);
-                add_int16(crc_value);
+                append_int16(crc_value);
                 data_size2 += 2;
                 //      printf("DW %04X ", dw);
                 count_in_roi++;
@@ -651,11 +676,11 @@ int generate_data_for_trig(unsigned int m_trigger_nr, unsigned char* buffer, uns
             if (count_in_roi % 2 != 0) {
               crc_value = 0x0000 ;
               crc_out.process_byte((crc_value >> 8) & 0xFF);   crc_out.process_byte(crc_value & 0xFF);
-              add_int16(crc_value);
+              append_int16(crc_value);
               data_size2 += 2;
             }
 
-            add_int32(crc_out() & 0xFFFFFFFF);
+            append_int32(crc_out() & 0xFFFFFFFF);
             data_size2 += 4;
             if (data_size2 != data_size) {
               fprintf(stderr, "==== data creation error ... -> call Bjoern ... %d %d %d %d ====\n", data_size, data_size2, count_in_roi, bufferout_size - bufferout_sizestart);
@@ -669,8 +694,8 @@ int generate_data_for_trig(unsigned int m_trigger_nr, unsigned char* buffer, uns
 
             crc_value = 0x90000000 | (dhh_id & 0x3F) << 20 | (chip_id & 0x03) << 16 | m_trigger_nr & 0xFFFF ;
             crc_out.process_byte((crc_value >> 24) & 0xFF);   crc_out.process_byte((crc_value >> 16) & 0xFF);   crc_out.process_byte((crc_value >> 8) & 0xFF);   crc_out.process_byte(crc_value & 0xFF);
-            add_int32(crc_value);
-            add_int32(crc_out() & 0xFFFFFFFF);
+            append_int32(crc_value);
+            append_int32(crc_out() & 0xFFFFFFFF);
             frame_nr++;
             myonsen.frame_length[myonsen.frames++] = htonl(0x08);
 

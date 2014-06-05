@@ -101,8 +101,8 @@ namespace Belle2 {
       void endian_swap_frame(unsigned short* data, int len);
 
       void start_frame(void);//! Start with a new Frame
-      void add_int16(unsigned short w);//! cat 16bit value to frame
-      void add_int32(unsigned int w);//! cat 32value value to frame
+      void append_int16(unsigned short w);//! cat 16bit value to frame
+      void append_int32(unsigned int w);//! cat 32value value to frame
       void add_frame_to_payload(void);//! Add Frame to Event payload
 
       /** Store start of Vxd Detetcor related digits */

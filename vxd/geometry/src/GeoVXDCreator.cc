@@ -364,8 +364,7 @@ namespace Belle2 {
         //new G4PVPlacement(G4Translate3D(0,0,5*mm),wBox,"w",active,false,1);
         //}
 
-        //FIXME: don't make this hardcoded?
-        setColor(*active, "#f00");
+        setColor(*active, s.activeArea.color);
         //The coordinates of the active region are given as the distance between the corners, not to the center
         //Place the active area
         G4Transform3D activePosition = G4Translate3D(s.activeArea.width / 2.0, s.activeArea.length / 2.0, 0) * getPosition(s, s.activeArea, s.activePlacement, false);

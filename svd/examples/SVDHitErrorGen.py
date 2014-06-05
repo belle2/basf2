@@ -50,7 +50,7 @@ particlegun.param({  # Generate 5 tracks (on average)
     'momentumParams': [2, 0.2],
     'phiGeneration': 'uniform',
     'phiParams': [0, 360],
-    'thetaGeneration': 'uniformCosinus',
+    'thetaGeneration': 'uniformCos',
     'thetaParams': [30, 150],
     'vertexGeneration': 'normal',
     'xVertexParams': [0.0, 0.5],

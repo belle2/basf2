@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
-import math
 from basf2 import *
 logging.log_level = LogLevel.WARNING
 
@@ -36,19 +34,20 @@ class Clusters2Truehits(Module):
         relClustersToTrueHits = \
             Belle2.PyRelationArray('SVDClustersToSVDTrueHits')
         nClusterRelations = relClustersToTrueHits.getEntries()
-        print 'Found {nT} TrueHits and {nC} Clusters, with {nRel} relations.'.format(nT=nTruehits,
-                nC=nClusters, nRel=nClusterRelations)
+        print 'Found {nT} TrueHits and {nC} Clusters, with {nRel} relations.'\
+            .format(nT=nTruehits, nC=nClusters, nRel=nClusterRelations)
         relDigitsToTrueHits = Belle2.PyRelationArray('SVDDigitsToSVDTrueHits')
         nDigitRelations = relDigitsToTrueHits.getEntries()
-        print 'Found {nT} TrueHits and {nD} Digits, with {nRel} relations.'.format(nT=nTruehits,
-                nD=nDigits, nRel=nDigitRelations)
+        print 'Found {nT} TrueHits and {nD} Digits, with {nRel} relations.'\
+            .format(nT=nTruehits, nD=nDigits, nRel=nDigitRelations)
         relClustersToDigits = Belle2.PyRelationArray('SVDClustersToSVDDIgits')
-        print 'Found {nR} relations between clusters and digits.'.format(nR=relClustersToDigits.getEntries())
+        print 'Found {nR} relations between clusters and digits.'\
+            .format(nR=relClustersToDigits.getEntries())
         # Define auxiliary print functions
         truehit_print = lambda index, truehit: \
-            'TrueHit {index}: u {u}, v {v}, charge {charge}'.format(index=index,
-                u=truehit.getU(), v=truehit.getV(),
-                charge=truehit.getEnergyDep())
+            'TrueHit {index}: u {u}, v {v}, charge {charge}'\
+            .format(index=index, u=truehit.getU(), v=truehit.getV(),
+                    charge=truehit.getEnergyDep())
         cluster_print = lambda index, cluster: \
             ('Cluster {index}: u-side {side}, position {pos}, '
              + 'positionError {posError}, time {time}, signal {signal}'
@@ -59,12 +58,14 @@ class Clusters2Truehits(Module):
                 posError=cluster.getPositionSigma(),
                 time=cluster.getClsTime(),
                 signal=cluster.getCharge(),
-                )
+            )
         digit_print = lambda index, digit: \
             ('Digit {index}: u-side {side}, strip {pos}, time {time},'
-             + 'signal {signal}').format(index=index, side=digit.isUStrip(),
-                pos=digit.getCellID(), time=digit.getTime(),
-                signal=digit.getCharge())
+             + 'signal {signal}').format(
+                index=index, side=digit.isUStrip(),
+                pos=digit.getCellID(), time=digit.getIndex(),
+                signal=digit.getCharge()
+            )
 
         # Use the relation to get cluster's digits and truehits.
         truehits_unused_u = set(range(nTruehits))
@@ -92,7 +93,7 @@ class Clusters2Truehits(Module):
                     digit = digits[digit_index]
                     if digit.isUStrip() == uside:
                         for index in \
-                            relDigitsToTrueHits.getToIndices(digit_index):
+                                relDigitsToTrueHits.getToIndices(digit_index):
                             if index == truehit_index:
                                 truehit_digits.add(digit_index)
 
@@ -104,7 +105,8 @@ class Clusters2Truehits(Module):
             print
 
         print
-        print 'Truehits with no clusters in u: {n}'.format(n=len(truehits_unused_u))
+        print 'Truehits with no clusters in u: {n}'\
+            .format(n=len(truehits_unused_u))
         print truehits_unused_u
         for truehit_index in truehits_unused_u:
             print truehit_print(truehit_index, truehits[truehit_index])
@@ -122,7 +124,8 @@ class Clusters2Truehits(Module):
             print
 
         print
-        print 'Truehits with no clusters in v: {n}'.format(n=len(truehits_unused_v))
+        print 'Truehits with no clusters in v: {n}'\
+            .format(n=len(truehits_unused_v))
         print truehits_unused_v
         for truehit_index in truehits_unused_v:
             print truehit_print(truehit_index, truehits[truehit_index])
@@ -168,19 +171,7 @@ analyze = Clusters2Truehits()
 eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
 
 # Set parameters for particlegun
-particlegun.param({  # Generate 5 tracks
-                     # Number of tracks is a Poisson variate
-                     # Generate pi+, pi-, e+ and e-
-                     # with a normal distributed transversal momentum
-                     # with a center of 5 GeV and a width of 1 GeV
-                     # a normal distributed phi angle,
-                     # center of 180 degree and a width of 30 degree
-                     # Generate theta angles uniform in cos theta
-                     # between 17 and 150 degree
-                     # normal distributed vertex generation
-                     # around the origin with a sigma of 2cm in the xy plane
-                     # and no deviation in z
-                     # all tracks sharing the same vertex per event
+particlegun.param({
     'nTracks': 1,
     'varyNTracks': True,
     'pdgCodes': [211, -211, 11, -11],
@@ -188,17 +179,17 @@ particlegun.param({  # Generate 5 tracks
     'momentumParams': [5, 1],
     'phiGeneration': 'normal',
     'phiParams': [180, 30],
-    'thetaGeneration': 'uniformCosinus',
+    'thetaGeneration': 'uniformCos',
     'thetaParams': [17, 150],
     'vertexGeneration': 'normal',
-    'xVertexParams': [0, 2],
-    'yVertexParams': [0, 2],
+    'xVertexParams': [0, 0.2],
+    'yVertexParams': [0, 0.2],
     'zVertexParams': [0, 0],
     'independentVertices': False,
-    })
+})
 
 # Select subdetectors to be built
-geometry.param('Components', ['MagneticField', 'PXD', 'SVD'])
+geometry.param('components', ['MagneticField', 'PXD', 'SVD'])
 
 svddigi.param('statisticsFilename', 'digi.root')
 svddigi.param('ElectronicEffects', True)

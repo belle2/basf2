@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import math
 from basf2 import *
-import ROOT
 from ROOT import Belle2
 
 logging.log_level = LogLevel.WARNING
@@ -29,14 +27,14 @@ class CheckNegativeWeights(Module):
             'secondary': {'positive': 0, 'negative': 0},
             'remapped': {'positive': 0, 'negative': 0},
             'none': {'positive': 0, 'negative': 0}
-            }
+        }
         ## Relation sign statistics for PXDClusters
         self.sign_stats_svd = {
             'primary': {'positive': 0, 'negative': 0},
             'secondary': {'positive': 0, 'negative': 0},
             'remapped': {'positive': 0, 'negative': 0},
             'none': {'positive': 0, 'negative': 0}
-            }
+        }
 
     def initialize(self):
         """ Does nothing """
@@ -82,9 +80,9 @@ class CheckNegativeWeights(Module):
                             hit_particle = \
                                 hit_particle_relations[particle_index]
                             if hit_particle.getArrayIndex() == \
-                                mcparticle_array_index:
+                                    mcparticle_array_index:
                                 # check sign of the weight
-                                weight = hit_particle_relations.weight(\
+                                weight = hit_particle_relations.weight(
                                     particle_index)
                                 if weight < 0:
                                     mcparticle_tag = 'remapped'
@@ -129,9 +127,9 @@ class CheckNegativeWeights(Module):
                             hit_particle = \
                                 hit_particle_relations[particle_index]
                             if hit_particle.getArrayIndex() == \
-                                mcparticle_array_index:
+                                    mcparticle_array_index:
                                 # check sign of the weight
-                                weight = hit_particle_relations.weight(\
+                                weight = hit_particle_relations.weight(
                                     particle_index)
                                 if weight < 0:
                                     mcparticle_tag = 'remapped'
@@ -143,11 +141,12 @@ class CheckNegativeWeights(Module):
 
     def terminate(self):
         """ Write results """
-        B2INFO('\nResults for PXD: \n{list1}\nResults for SVD: \n{list2}\n'\
-            .format(list1=str(self.sign_stats_pxd), \
-                    list2=str(self.sign_stats_svd)
-                    )
+        B2INFO(
+            '\nResults for PXD: \n{pxd}\nResults for SVD: \n{svd}\n'.format(
+                pxd=str(self.sign_stats_pxd),
+                svd=str(self.sign_stats_svd)
             )
+        )
 
 # Particle gun module
 particlegun = register_module('ParticleGun')
@@ -177,14 +176,14 @@ particlegun.param({
     'momentumParams': [2, 1],
     'phiGeneration': 'normal',
     'phiParams': [0, 360],
-    'thetaGeneration': 'uniformCosinus',
+    'thetaGeneration': 'uniformCos',
     'thetaParams': [17, 150],
     'vertexGeneration': 'normal',
     'xVertexParams': [0, 1],
     'yVertexParams': [0, 1],
     'zVertexParams': [0, 1],
     'independentVertices': False,
-    })
+})
 
 pxd_digitizer = register_module('PXDDigitizer')
 pxd_digitizer.param('PoissonSmearing', True)
@@ -199,7 +198,7 @@ svd_digitizer.param('ElectronicEffects', True)
 svd_clusterizer = register_module('SVDClusterizer')
 
 # Select subdetectors to be built
-geometry.param('Components', ['MagneticField', 'PXD', 'SVD'])
+geometry.param('components', ['MagneticField', 'PXD', 'SVD'])
 
 # create processing path
 main = create_path()

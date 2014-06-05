@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import math
 from basf2 import *
-import ROOT
 from ROOT import Belle2
 
 logging.log_level = LogLevel.WARNING
@@ -59,13 +57,13 @@ class CheckMCParticles(Module):
 
     def terminate(self):
         """ Write results """
-        B2INFO('Found {nu} secondary MC Particles out of total {n}.'\
-            .format(nu=self.nSecondaries, n=self.nMCParticles))
-        B2INFO('Of these, found {n1} secondaries in PXD and {n2} in SVD.'\
-            .format(n1=self.nSecondariesPXD, n2=self.nSecondariesSVD))
-        B2INFO('Secondary processes for PXD: {list1}; for SVD: {list2}'\
-            .format(list1=str(self.processesPXD), \
-                    list2=str(self.processesSVD)))
+        B2INFO('Found {nu} secondary MC Particles out of total {n}.'
+               .format(nu=self.nSecondaries, n=self.nMCParticles))
+        B2INFO('Of these, found {n1} secondaries in PXD and {n2} in SVD.'
+               .format(n1=self.nSecondariesPXD, n2=self.nSecondariesSVD))
+        B2INFO('Secondary processes for PXD: {list1}; for SVD: {list2}'
+               .format(list1=str(self.processesPXD),
+                       list2=str(self.processesSVD)))
 
 
 # Particle gun module
@@ -97,17 +95,17 @@ particlegun.param({
     'momentumParams': [2, 1],
     'phiGeneration': 'normal',
     'phiParams': [0, 360],
-    'thetaGeneration': 'uniformCosinus',
+    'thetaGeneration': 'uniformCos',
     'thetaParams': [17, 150],
     'vertexGeneration': 'normal',
     'xVertexParams': [0, 1],
     'yVertexParams': [0, 1],
     'zVertexParams': [0, 1],
     'independentVertices': False,
-    })
+})
 
 # Select subdetectors to be built
-geometry.param('Components', ['MagneticField', 'PXD', 'SVD'])
+geometry.param('components', ['MagneticField', 'PXD', 'SVD'])
 
 # create processing path
 main = create_path()

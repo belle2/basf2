@@ -146,16 +146,16 @@ namespace Belle2 {
                                               content.getLength("pipe_hz")*Unit::cm,
                                               -2.* content.getLength("pipe_hz")*Unit::cm, 2.* content.getLength("pipe_hz")*Unit::cm);
 
-      /*G4VSolid* s_PH1BPIPE2 = new G4Ellipsoid("s_PH1BPIPE2",
-                content.getLength("pipe_innerRadius_x")*Unit::cm,
-                content.getLength("pipe_innerRadius_y")*Unit::cm,
-                content.getLength("pipe_hz")*Unit::cm,
-                -2.* content.getLength("pipe_hz")*Unit::cm, 2.* content.getLength("pipe_hz")*Unit::cm);*/
-      G4VSolid* s_PH1BPIPE2 = new G4Tubs("s_PH1BPIPE2",
+      G4VSolid* s_PH1BPIPE2 = new G4Ellipsoid("s_PH1BPIPE2",
+                                              content.getLength("pipe_innerRadius_x")*Unit::cm,
+                                              content.getLength("pipe_innerRadius_y")*Unit::cm,
+                                              content.getLength("pipe_hz")*Unit::cm,
+                                              -2.* content.getLength("pipe_hz")*Unit::cm, 2.* content.getLength("pipe_hz")*Unit::cm);
+      /*G4VSolid* s_PH1BPIPE2 = new G4Tubs("s_PH1BPIPE2",
                                          content.getLength("pipe_innerRadius_x")*Unit::cm,
                                          content.getLength("pipe_innerRadius_y")*Unit::cm,
                                          content.getLength("pipe_hz")*Unit::cm,
-                                         startAngle, spanningAngle);
+                                         startAngle, spanningAngle);*/
 
       G4VSolid* s_PH1BPIPE = new G4SubtractionSolid("s_PH1BPIPE", s_PH1BPIPE1, s_PH1BPIPE2);
 

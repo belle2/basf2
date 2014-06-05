@@ -22,7 +22,9 @@
     <pipe_outerRadius_x unit="cm">3.6</pipe_outerRadius_x>
     <pipe_outerRadius_y unit="cm">4.0</pipe_outerRadius_y>
     <pipe_innerRadius_x unit="cm">3.2</pipe_innerRadius_x>
-    <pipe_innerRadius_y unit="cm">3.6</pipe_innerRadius_y>
+    <pipe_innerRadius_y unit="cm">3.6</pipe_innerRadius_y>  
+<!--    <pipe_innerRadius_x unit="cm">3.4</pipe_innerRadius_x>
+    <pipe_innerRadius_y unit="cm">3.6</pipe_innerRadius_y> -->
     <pipe_hz unit="cm">20.0</pipe_hz>
     <endcap_innerRadius unit="cm">4.0</endcap_innerRadius>
     <endcap_outerRadius unit="cm">6.0</endcap_outerRadius>

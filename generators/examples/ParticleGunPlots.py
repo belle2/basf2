@@ -12,12 +12,17 @@ from ROOT import TH1D, TH2D, TCanvas, Belle2
 # Create some histograms to be filled
 h_nTracks = TH1D('nTracks', 'Number of Tracks per Event', 100, 0, 50)
 h_pdg = TH1D('pid', 'PDG codes', 500, -250, 250)
-h_momentum = TH1D('momentum', 'Momentum p', 200, 0, 10)
-h_pt = TH1D('pt', 'Transverse Momentum p_{t}', 200, 0, 10)
-h_phi = TH1D('phi', '#phi', 200, -180, 180)
-h_theta = TH1D('theta', '#theta', 200, 0, 180)
-h_costheta = TH1D('costheta', 'cos(#theta)', 200, -1, 1)
-h_vertex = TH2D('xyvertex', 'vertex in xy', 200, -10, 10, 200, -10, 10)
+h_momentum = TH1D('momentum', 'Momentum p; p/GeV', 200, 0, 10)
+h_pt = TH1D('pt', 'Transverse Momentum p_{t};p_{t}/GeV', 200, 0, 10)
+h_phi = TH1D('phi', 'azimuthal angle #phi; #phi in degree', 200, -180, 180)
+h_theta = TH1D('theta', 'polar angle #theta; #theta in degree', 200, 0, 180)
+h_costheta = TH1D('costheta', 'cos(#theta); cos(#theta)', 200, -1, 1)
+h_xyvertex = TH2D('xyvertex', 'vertex in xy;x/#mum;y/#mum',
+                  500, -500, 500, 500, -500, 500)
+h_zxvertex = TH2D('zxvertex', 'vertex in zx;z/#mum;x/#mum',
+                  500, -500, 500, 500, -500, 500)
+h_zyvertex = TH2D('zyvertex', 'vertex in zy;z/#mum;y/#mum',
+                  500, -500, 500, 500, -500, 500)
 
 
 class ShowMCParticles(Module):
@@ -38,13 +43,18 @@ class ShowMCParticles(Module):
             h_theta.Fill(p.Theta() / math.pi * 180)
             h_costheta.Fill(math.cos(p.Theta()))
             h_pdg.Fill(mc.getPDG())
-            h_vertex.Fill(mc.getProductionVertex().X(),
-                          mc.getProductionVertex().Y())
+            h_xyvertex.Fill(mc.getProductionVertex().X() * 1e4,
+                            mc.getProductionVertex().Y() * 1e4)
+            h_zxvertex.Fill(mc.getProductionVertex().Z() * 1e4,
+                            mc.getProductionVertex().X() * 1e4)
+            h_zyvertex.Fill(mc.getProductionVertex().Z() * 1e4,
+                            mc.getProductionVertex().Y() * 1e4)
 
 # Create Modules
 eventinfosetter = register_module('EventInfoSetter')
 progress = register_module('Progress')
 particlegun = register_module('ParticleGun')
+vertexsmear = register_module('SmearPrimaryVertex')
 showMCPart = ShowMCParticles()
 
 # Specify number of events to generate
@@ -70,16 +80,31 @@ particlegun.param({
     'thetaGeneration': 'uniformCos',
     # between 17 and 150 degree
     'thetaParams': [17, 150],
-    # finally, vertex generation, normal distributed
-    'vertexGeneration': 'normal',
-    # with a mean of 0 and w width o 2 cm for x
-    'xVertexParams': [0, 2],
-    # also a mean of 0 and w width o 2 cm for y
-    'yVertexParams': [0, 2],
-    # and a width of zero for z
-    'zVertexParams': [0, 0],
+    # finally, vertex generation, fixed, we use smearing module
+    'vertexGeneration': 'fixed',
+    'xVertexParams': [0],
+    'yVertexParams': [0],
+    'zVertexParams': [0],
     # all tracks should originate from the same vertex
     'independentVertices': False,
+})
+
+
+# The beamspot size is determined by using the beamsize for LER and HER from
+# the TDR, multiply both zx-distributions including their crossing angle and
+# fit a rotated 2D gaussian to the resulting shape.
+# Parameters used (angle is the angle between beam and z axis):
+# HER: sigma_x = 10.2µm, sigma_z = 6mm, angle= 41.5mrad
+# LER: sigma_x = 7.76µm, sigma_z = 5mm, angle=-41.5mrad
+vertexsmear.param({
+    #Beamspot size in x
+    'sigma_pvx': 6.18e-4,  # µm
+    #Beamspot size in y
+    'sigma_pvy': 59e-7,    # nm
+    #Beamspot size in z
+    'sigma_pvz': 154e-4,   # µm
+    #Angle between beamspot and z axis, rotation around y
+    'angle_pv_zx': -1.11e-2,
 })
 
 # create processing path
@@ -87,6 +112,7 @@ main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(particlegun)
+main.add_module(vertexsmear)
 main.add_module(showMCPart)
 
 # generate events
@@ -96,17 +122,19 @@ process(main)
 print statistics
 
 # Create a Canvas to show histograms
-c = TCanvas('Canvas', 'Canvas', 1536, 768)
-c.Divide(4, 2, 1e-5, 1e-5)
+c = TCanvas('Canvas', 'Canvas', 1920, 768)
+c.Divide(5, 2, 1e-5, 1e-5)
 
 # Draw all histograms
 histograms = [h_nTracks, h_pdg, h_momentum, h_pt, h_theta, h_costheta, h_phi]
+vertexhists = [h_xyvertex, h_zxvertex, h_zyvertex]
 for (i, h) in enumerate(histograms):
     c.cd(i + 1)
     h.SetMinimum(0)
     h.Draw()
-c.cd(i + 2)
-h_vertex.Draw('colz')
+for (j, h) in enumerate(vertexhists, i + 2):
+    c.cd(j)
+    h.Draw('colz')
 c.Update()
 
 # Wait for enter to be pressed

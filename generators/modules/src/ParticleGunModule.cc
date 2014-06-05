@@ -60,9 +60,9 @@ ParticleGunModule::ParticleGunModule() : Module()
   m_parameters.momentumParams = {0.05, 3.0};
   m_parameters.phiParams      = {0.0, 360.0};
   m_parameters.thetaParams    = {17.0, 150.0};
-  m_parameters.xVertexParams  = {0.0, 0.7};
-  m_parameters.yVertexParams  = {0.0, 0.7};
-  m_parameters.zVertexParams  = {0.0, 1.0};
+  m_parameters.xVertexParams  = {0.0, 10 * Unit::um};
+  m_parameters.yVertexParams  = {0.0, 59 * Unit::nm};
+  m_parameters.zVertexParams  = {0.0, 190 * Unit::um};
 
   //Parameter definition
   addParam("nTracks", m_parameters.nTracks,
@@ -86,7 +86,7 @@ ParticleGunModule::ParticleGunModule() : Module()
            "polylineCos or discrete", string("uniform"));
   addParam("vertexGeneration", m_vertexDist,
            "Vertex (x,y,z) distribution: one of fixed, uniform, normal, polyline or "
-           "discrete", string("normal"));
+           "discrete", string("fixed"));
   addParam("xVertexGeneration", m_xVertexDist,
            "X vertex distribution: same options as 'vertexGeneration'. If this parameter "
            "is not specified the value from 'vertexGeneration' is used", string(""));

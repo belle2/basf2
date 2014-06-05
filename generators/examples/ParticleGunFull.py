@@ -137,7 +137,7 @@ particlegun.param('thetaParams', [17, 150])
 
 # Finally, we could use numpy to create events where the cos(theta)
 # distribution follows a parabolic shape:
-# import numpy
+# import numpy as np
 # # Create a set of 1000 x values spread uniformly over -1, 1
 # x = np.linspace(-1,1,1000)
 # # Create the corresponding distribution
@@ -160,11 +160,18 @@ particlegun.param('phiParams', [17, 150])
 
 # ============================================================================
 # Vertex generation
-# The default is a normal distribution of the vertex
-particlegun.param('vertexGeneration', 'normal')
-particlegun.param('xVertexParams', [0, 0.7])
-particlegun.param('yVertexParams', [0, 0.7])
-particlegun.param('zVertexParams', [0, 1.0])
+# The default is a fixed vertex at (0,0,0) for all tracks
+particlegun.param('vertexGeneration', 'fixed')
+particlegun.param('xVertexParams', [0])
+particlegun.param('yVertexParams', [0])
+particlegun.param('zVertexParams', [0])
+
+# We could also generate a normal distributed vertex with mean at (0,0,0) and
+# width of 10µm, 60nm and 190 µm in x, y and z respectively
+# particlegun.param('vertexGeneration', 'fixed')
+# particlegun.param('xVertexParams', [0, 10e-4])
+# particlegun.param('yVertexParams', [0, 60e-7])
+# particlegun.param('zVertexParams', [0, 190e-4])
 
 # We can also specify a different distribution for any of the three axes, e.g.
 # to make the z-vertex uniform between -10 and 10 cm and the xy vertex normal

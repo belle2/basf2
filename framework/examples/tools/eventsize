@@ -7,8 +7,16 @@ from collections import defaultdict
 import numpy as np
 
 #stuff for plotting
-import matplotlib as mpl
-mpl.use("Agg")
+try:
+    import matplotlib as mpl
+    mpl.use("Agg")
+except ImportError:
+    print """\
+Could not find matplotlib which is required to create the charts. Please
+install it using
+    pip install matplotlib"""
+    sys.exit(1)
+
 from matplotlib import pyplot as pl
 from matplotlib.backends.backend_pdf import PdfPages
 # and reading root files, sadly root is screwing up the argparse help message
@@ -21,8 +29,8 @@ import ROOT as root
 root.gErrorIgnoreLevel = root.kWarning + 1
 
 parser = argparse.ArgumentParser(
-    description="""Create bar graphs of the disk space requirements for basf2
-    events stored in root files""",
+    description="Create bar graphs of the disk space requirements for basf2" +
+    " events stored in\nroot files",
     formatter_class=argparse.RawDescriptionHelpFormatter,
     epilog="""examples:
   create eventsize.pdf with a bar chart showing the kb/event required for each
@@ -52,8 +60,9 @@ parser = argparse.ArgumentParser(
   """
 
 )
-group1 = parser.add_argument_group("visual options", """Options influencing
-                                   the visual style of the created pdf""")
+group1 = parser.add_argument_group("visual options", "Options influencing the"
+                                   + " visual style of the created pdf")
+
 group1.add_argument("-o", dest="output", default="eventsize.pdf",
                     help="""the output PDF filename for the generated graphs,
                     (default: %(default)s)""", metavar="FILENAME")
@@ -68,9 +77,9 @@ group1.add_argument("--legend", default="best", type=str,
 group1.add_argument("--bar-gap", default=0.2, type=float,
                     help="""fraction of empty space between bars,
                     (default: %(default)s)""", metavar="FRACTION")
-group2 = parser.add_argument_group("graph options", """Options influencing
-                                   what objects to show and what graphs to
-                                   create""")
+group2 = parser.add_argument_group("graph options", "Options influencing" +
+                                   " what objects to show and what graphs to" +
+                                   " create")
 group2.add_argument("--show-fraction", default=False, action="store_true",
                     help="""create an additional chart showing the fraction of
                     the total event size for each object""")

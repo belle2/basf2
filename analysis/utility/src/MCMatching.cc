@@ -23,23 +23,18 @@ void MCMatching::fillGenMothers(const MCParticle* mcP, vector<int>& genMCPMother
 }
 
 
-int MCMatching::findCommonMother(unsigned nChildren, const vector<int>& firstMothers, const vector<int>& otherMothers)
+int MCMatching::findCommonMother(const MCParticle* mcP, const vector<int>& firstMothers, int lastMother)
 {
-  if (firstMothers.empty() || otherMothers.empty())
-    return -1;
+  while (mcP) {
+    int idx = mcP->getIndex();
+    for (unsigned int i = lastMother; i < firstMothers.size(); i++) {
+      if (firstMothers[i] == idx)
+        return i;
+    }
 
-  for (int commonMotherCandidate : firstMothers) {
-    unsigned counter = 0;
-
-    //if commonMotherCandidate is a common mother, it should occur (n-1) times in otherMothers
-    for (unsigned j = 0; j < otherMothers.size(); ++j)
-      if (commonMotherCandidate == otherMothers[j])
-        counter++;
-
-    if (counter == nChildren - 1)
-      return commonMotherCandidate;
+    mcP = mcP->getMother();
   }
-
+  //not found
   return -1;
 }
 
@@ -85,24 +80,25 @@ bool MCMatching::setMCTruth(const Particle* particle)
 
   } else {
     // at this stage for all daughters particles the  Particle <-> MCParticle relation exists
-    // 1st fill two vertices with indices of mother particles of the first daughters (1st vector)
-    // and with indices of mother particles of all other daughters (2nd vector)
+    // first fill vector with indices of all mothers of first daughter,
+    // then search common mother for each other daughter
 
     vector<int> firstDaugMothers; // indices of generated mothers of first daughter
-    vector<int> otherDaugMothers; // indices of generated mothers of all other daughter
 
+    int lastMother = 0; //index in firstDaugMothers (start with first daughter itself)
     for (int i = 0; i < nChildren; ++i) {
       const Particle*    daugP   = particle->getDaughter(i);
       const MCParticle*  daugMCP = daugP->getRelatedTo<MCParticle>();
 
-      if (i == 0)
+      if (i == 0) {
         fillGenMothers(daugMCP, firstDaugMothers);
-      else
-        fillGenMothers(daugMCP, otherDaugMothers);
+      } else {
+        lastMother = findCommonMother(daugMCP, firstDaugMothers, lastMother);
+        if (lastMother == -1)
+          break; //not found
+      }
     }
-
-    // find first generated common mother of all linked daughter MCParticles
-    motherIndex = findCommonMother(nChildren, firstDaugMothers, otherDaugMothers);
+    motherIndex = firstDaugMothers[lastMother];
   }
 
   // if index is less than 1, the common mother particle was not found

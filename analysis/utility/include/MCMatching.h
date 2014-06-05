@@ -78,15 +78,13 @@ namespace Belle2 {
     void fillGenMothers(const MCParticle* mcP, std::vector<int>& genMCPMothers);
 
     /**
-     * Finds index of a MCParticle that represents the first common mother (ancestor) of all daughter particles.
+     * Finds a mother of mcP that is in firstMothers, from [lastMother,  end]
      *
-     * @param number of daughter particles
-     * @param indices of all generated ancestors of the first daughter particle
-     * @param indices of all generated ancestors of all other daughter particles
+     * To actually find the common mother of all daughters, each time this function is called for a daughter particle, specify the return value from the last call for lastMother.
      *
-     * @return index of the first common mother
+     * @return index of the first common mother in firstMothers (!), or -1 if not found.
      */
-    int findCommonMother(unsigned nChildren, const std::vector<int>& firstMothers, const std::vector<int>& otherMothers);
+    int findCommonMother(const MCParticle* mcP, const std::vector<int>& firstMothers, int lastMother);
 
     /**
      * Appends final state particle (FSP) to the vector of Particles.

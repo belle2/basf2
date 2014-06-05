@@ -55,6 +55,14 @@ namespace Belle2 {
        */
       void findVolumes(G4VPhysicalVolume* envelope);
 
+      /** Add a SensorInfo instance to the list of known sensors
+       * This method will manually add a SensorInfo instance to the list of
+       * known sensors. It should not be needed except for testing purposes.
+       *
+       * @param sensorinfo SensorInfoBase instance to add to the list of known sensors.
+       */
+      void addSensor(SensorInfoBase* sensorinfo);
+
       /** Return a set of all known Layers.
        * @param sensortype Wether to only return the layer IDs for PXD, SVD or all VXD layers (default)
        * @return a set containing all existing Layers with the requested type

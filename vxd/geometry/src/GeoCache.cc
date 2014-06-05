@@ -108,31 +108,7 @@ namespace Belle2 {
           transform.SetDz(g4transform[14]*Unit::mm);
           info->setTransformation(transform);
 
-          //Save pointer to the SensorInfo and update lists of all existing
-          //layers,ladders,sensors
-          VxdID sensorID = info->getID();
-          VxdID ladderID = sensorID;
-          ladderID.setSensorNumber(0);
-          VxdID layerID  = ladderID;
-          layerID.setLadderNumber(0);
-
-          m_sensorInfo[sensorID] = info;
-
-          switch (info->getType()) {
-            case SensorInfoBase::PXD:
-              m_pxdLayers.insert(layerID);
-              break;
-            case SensorInfoBase::SVD:
-              m_svdLayers.insert(layerID);
-              break;
-            case SensorInfoBase::TEL:
-              m_telLayers.insert(layerID);
-              break;
-            default:
-              B2FATAL("Cannot use anything else as SensorTypes PXD, SVD, or TEL when creating VXD Sensors");
-          }
-          m_ladders[layerID].insert(ladderID);
-          m_sensors[ladderID].insert(sensorID);
+          addSensor(info);
         }
 
         int nDaughters = logical->GetNoDaughters();
@@ -145,6 +121,35 @@ namespace Belle2 {
           volumes.push(daughter);
         }
       }
+    }
+
+    void GeoCache::addSensor(SensorInfoBase* sensorinfo)
+    {
+      //Save pointer to the SensorInfo and update lists of all existing
+      //layers,ladders,sensors
+      VxdID sensorID = sensorinfo->getID();
+      VxdID ladderID = sensorID;
+      ladderID.setSensorNumber(0);
+      VxdID layerID  = ladderID;
+      layerID.setLadderNumber(0);
+
+      m_sensorInfo[sensorID] = sensorinfo;
+
+      switch (sensorinfo->getType()) {
+        case SensorInfoBase::PXD:
+          m_pxdLayers.insert(layerID);
+          break;
+        case SensorInfoBase::SVD:
+          m_svdLayers.insert(layerID);
+          break;
+        case SensorInfoBase::TEL:
+          m_telLayers.insert(layerID);
+          break;
+        default:
+          B2FATAL("Cannot use anything else as SensorTypes PXD, SVD, or TEL when creating VXD Sensors");
+      }
+      m_ladders[layerID].insert(ladderID);
+      m_sensors[ladderID].insert(sensorID);
     }
 
     const set<VxdID> GeoCache::getLayers(SensorInfoBase::SensorType type)

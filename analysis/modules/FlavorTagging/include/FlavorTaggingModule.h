@@ -28,9 +28,9 @@ namespace Belle2 {
   class Particle;
 
   /**
-   * Tag side Vertex Fitter module for modular analysis
+   * Flavor Tagging module for modular analysis
    *
-   * This module fits the Btag Vertex    *
+   * This module finds the flavour of the non reconstructed B *
    */
   class FlavorTaggingModule : public Module {
 
@@ -89,10 +89,18 @@ namespace Belle2 {
     bool getTagObjects(Particle* Breco);  /** get the tracks, ECLClusters and KLMClusters on the tag side (rest of the event) */
 
     bool getMC_PDGcodes();      /** get the PDG Codes of the Daughters of B and B-Bar */
-    bool Input_Values_Muon();   /** prepare input values for the NN specialized for Muons */
 
 
+    bool Muon_Cathegory();   /** prepare input values for the NN specialized for Muons */
 
+    /**
+     * Variables needed for the Muon Cathegory
+     */
+    double Charge(Track* track); /** Charge of the fitted Track */
+    double p_cms(Track* track); /**  Momentum of the fitted Track in the center of mass system */
+    double Theta_Lab(Track* track); /**  Slope of the fitted Track in the r-z plane in the center of mass system */
+    double PID_MonteCarlo(Track* track); /**  Flavor of Btag from the Monte Carlo (0 for B0bar, 1 for B0)*/
+    double PID_Likelihood(Track* track); /**  Return the combined likelihood probability for a particle being a muon and not a pion.  */
   };
 }
 

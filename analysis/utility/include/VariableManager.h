@@ -40,7 +40,9 @@ namespace Belle2 {
    *  <h2>Adding variables</h2>
    *  Variables will automatically register themselves when
    *  the library that contains them is loaded. They only need to be put in a .cc file,
-   *  with a call to REGISTER_VARIABLE() to set a name and description.
+   *  with a call to REGISTER_VARIABLE() in the global scope to set a name and description.
+   *  Newly registered variables will be added to the group defined by the last call to VARIABLE_GROUP(),
+   *  please search analysis/utility/src/PSelectorFunctions.cc for a matching group before adding your own.
    *
    *  Example:
       \code

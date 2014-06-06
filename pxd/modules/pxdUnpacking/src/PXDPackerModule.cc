@@ -170,6 +170,7 @@ void PXDPackerModule::event()
   for (auto it = storeDigits.begin() ; it != storeDigits.end(); it++) {
     VxdID currentVxdId;
     currentVxdId = it->getSensorID();
+    currentVxdId.setSegmentNumber(0);
     if (currentVxdId != lastVxdId) {
       // do something...
       lastVxdId = currentVxdId;
@@ -382,7 +383,9 @@ void PXDPackerModule::pack_dhh(int dhh_id, int dhp_active)
 //      B2INFO("Advance: "<< map_it->second);
 //      advance(it, map_it->second);
       for (; it != storeDigits.end(); it++) {
-        if (currentVxdId != it->getSensorID()) break; /// another sensor starts
+        auto id = it->getSensorID();
+        id.setSegmentNumber(0);
+        if (currentVxdId != id) break; /// another sensor starts
         /// Fill pixel to pixelmap
         {
           unsigned int row, col;
@@ -447,12 +450,12 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhh_id)
 
 
   if (empty) {
-    B2WARNING("no data for halfladder! DHHID: " << dhh_id << " Chip: " << chip_id);
+    B2INFO("no data for halfladder! DHHID: " << dhh_id << " Chip: " << chip_id);
     start_frame();
     /// Ghost Frame
     append_int32((DHHC_FRAME_HEADER_DATA_TYPE_GHOST << 27) | ((dhh_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
   } else {
-    B2ERROR("no error ... just to tell you we found some data for DHHID: " << dhh_id << " Chip: " << chip_id);
+    //B2ERROR("no error ... just to tell you we found some data for DHHID: " << dhh_id << " Chip: " << chip_id);
   }
   add_frame_to_payload();
 

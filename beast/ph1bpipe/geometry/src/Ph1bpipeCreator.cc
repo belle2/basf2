@@ -161,7 +161,8 @@ namespace Belle2 {
 
 
       string matPipe = content.getString("MaterialPipe");
-      G4LogicalVolume* l_PH1BPIPE = new G4LogicalVolume(s_PH1BPIPE, geometry::Materials::get(matPipe), "l_PH1BPIPE", 0, m_sensitive);
+      //G4LogicalVolume* l_PH1BPIPE = new G4LogicalVolume(s_PH1BPIPE, geometry::Materials::get(matPipe), "l_PH1BPIPE", 0, m_sensitive);
+      G4LogicalVolume* l_PH1BPIPE = new G4LogicalVolume(s_PH1BPIPE, geometry::Materials::get(matPipe), "l_PH1BPIPE", 0, 0);
 
       //Lets limit the Geant4 stepsize inside the volume
       l_PH1BPIPE->SetUserLimits(new G4UserLimits(stepSize));
@@ -184,7 +185,8 @@ namespace Belle2 {
                                             content.getLength("endcap_hz")*Unit::cm,
                                             startAngle, spanningAngle);
 
-      G4LogicalVolume* l_PH1BPIPEendcap = new G4LogicalVolume(s_PH1BPIPEendcap, geometry::Materials::get(matPipe), "l_PH1BPIPEendcap", 0, m_sensitive);
+      //G4LogicalVolume* l_PH1BPIPEendcap = new G4LogicalVolume(s_PH1BPIPEendcap, geometry::Materials::get(matPipe), "l_PH1BPIPEendcap", 0, m_sensitive);
+      G4LogicalVolume* l_PH1BPIPEendcap = new G4LogicalVolume(s_PH1BPIPEendcap, geometry::Materials::get(matPipe), "l_PH1BPIPEendcap", 0, 0);
 
       //position central endcaps
       G4ThreeVector PH1BPIPEendcapposTop = G4ThreeVector(
@@ -238,7 +240,8 @@ namespace Belle2 {
       transform_X = transform_X * G4RotateY3D(0.083 / 2. * Unit::rad);
       s_X = new G4SubtractionSolid("s_X3", s_X, s_PH1BPIPE, transform_X);
 
-      G4LogicalVolume* l_X = new G4LogicalVolume(s_X, geometry::Materials::get(matPipe), "l_X", 0, m_sensitive);
+      //G4LogicalVolume* l_X = new G4LogicalVolume(s_X, geometry::Materials::get(matPipe), "l_X", 0, m_sensitive);
+      G4LogicalVolume* l_X = new G4LogicalVolume(s_X, geometry::Materials::get(matPipe), "l_X", 0, 0);
 
       transform_X = G4Translate3D(0, 0, 0);
       transform_X = transform_X * G4RotateY3D(-0.083 / 2. * Unit::rad);

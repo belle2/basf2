@@ -81,7 +81,8 @@ namespace Belle2 {
                                   activeParams.getLength("py")*Unit::cm ,
                                   activeParams.getLength("pz")*Unit::cm);
 
-        G4LogicalVolume* l_CAVE = new G4LogicalVolume(s_CAVE, geometry::Materials::get("CAVE"), "l_CAVE", 0, m_sensitive);
+        //G4LogicalVolume* l_CAVE = new G4LogicalVolume(s_CAVE, geometry::Materials::get("CAVE"), "l_CAVE", 0, m_sensitive);
+        G4LogicalVolume* l_CAVE = new G4LogicalVolume(s_CAVE, geometry::Materials::get("CAVE"), "l_CAVE", 0, 0);
 
         //Lets limit the Geant4 stepsize inside the volume
         l_CAVE->SetUserLimits(new G4UserLimits(stepSize));
@@ -99,6 +100,7 @@ namespace Belle2 {
         rot_cave->rotateZ(activeParams.getLength("AngleZ"));
         //geometry::setColor(*l_CAVE, "#006699");
 
+        //new G4PVPlacement(rot_cave, CAVEpos, l_CAVE, "p_CAVE", &topVolume, false, detID);
         new G4PVPlacement(rot_cave, CAVEpos, l_CAVE, "p_CAVE", &topVolume, false, detID);
 
         detID++;

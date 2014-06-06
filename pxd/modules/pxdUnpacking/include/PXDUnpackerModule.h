@@ -61,6 +61,15 @@ namespace Belle2 {
       bool m_doNotStore;
       /** Event Number and compare mask grabbed from FTSW for now */
       unsigned int ftsw_evt_nr, ftsw_evt_mask;
+      /** Event Number from MetaInfo */
+      unsigned long m_meta_event_nr;
+      /** Run Number from MetaInfo */
+      unsigned long m_meta_run_nr;
+      /** Subrun Number from MetaInfo */
+      unsigned long m_meta_subrun_nr;
+      /** Experiment from MetaInfo */
+      unsigned long m_meta_experiment;
+
       /** Event counter */
       unsigned int unpacked_events;
       /** Error counters */
@@ -85,7 +94,7 @@ namespace Belle2 {
        * @param data pointer to frame
        * @param len length of frame
        */
-      void unpack_dhhc_frame(void* data, int len, bool pad, int& last_wie, unsigned int& last_evtnr, int Frame_Number, int Frames_in_event);
+      void unpack_dhhc_frame(void* data, int len, int& last_wie, unsigned int& last_evtnr, int Frame_Number, int Frames_in_event);
 
       /** Unpack DHP data within one DHH frame
        * @param data pointer to dhp data

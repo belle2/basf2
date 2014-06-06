@@ -63,6 +63,10 @@ namespace Belle2 {
       unsigned int m_packed_events;
       /** Trigger Nr */
       unsigned int m_trigger_nr;
+      /** Run+Subrun Nr */
+      unsigned short m_run_nr_word1;
+      /** Exp+Run Nr */
+      unsigned short m_run_nr_word2;
 
       /** For one DHHC event, we utilize one header (writing out, beware of endianess!) */
       std::vector <unsigned int> m_onsen_header;

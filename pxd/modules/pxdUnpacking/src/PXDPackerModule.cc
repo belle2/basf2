@@ -11,7 +11,9 @@
 #include <pxd/modules/pxdUnpacking/PXDPackerModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
-#include <rawdata/dataobjects/RawFTSW.h>
+//#include <rawdata/dataobjects/RawFTSW.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 #include <boost/foreach.hpp>
 #include <boost/crc.hpp>
@@ -139,9 +141,12 @@ void PXDPackerModule::terminate()
 
 void PXDPackerModule::event()
 {
-  StoreArray<RawFTSW> storeFTSW;/// needed for event number
+  //StoreArray<RawFTSW> storeFTSW;/// needed for event number
+  StoreObjPtr<EventMetaData> evtPtr;
 
   B2INFO("PXD Packer --> Event");
+
+//   B2ERROR("Test : " << evtPtr->getEvent() << ","  << evtPtr->getRun() << "," << evtPtr->getSubrun() << "," << evtPtr->getExperiment() << "," << evtPtr->getTime() << " ==");
 
   int nDigis = storeDigits.getEntries();
 
@@ -184,14 +189,16 @@ void PXDPackerModule::event()
     }
   }
 
-  m_trigger_nr = m_packed_events;
+  m_trigger_nr = evtPtr->getEvent();// m_packed_events;
+  m_run_nr_word1 = ((evtPtr->getRun() & 0xFF) << 8) | (evtPtr->getSubrun() & 0xFF);
+  m_run_nr_word2 = ((evtPtr->getExperiment() & 0x3FF) << 6) | ((evtPtr->getRun() >> 8) & 0x3F);
   pack_event();
   m_packed_events++;
 }
 
 void PXDPackerModule::endian_swap_frame(unsigned short* dataptr, int len)
 {
-  boost::spirit::endian::ulittle16_t* p = (boost::spirit::endian::ulittle16_t*)dataptr;
+  boost::spirit::endian::ubig16_t* p = (boost::spirit::endian::ubig16_t*)dataptr;
 
   /// swap endianess of all shorts in frame BUT not the CRC (2 shorts)
   for (int i = 0; i < len / 2 - 2; i++) {
@@ -227,7 +234,7 @@ void PXDPackerModule::pack_event(void)
     m_onsen_payload.clear();// Reset
     pack_dhhc(it.first, act_port, dhh_ids);
     // and write to PxdRaw object
-    // header will be finished and endian swapped by contructor; payload already has be on filling the vector
+    // header will be finished and endian swapped by constructor; payload already has be on filling the vector
     m_storeRaws.appendNew(m_onsen_header, m_onsen_payload);
   }
 
@@ -276,11 +283,11 @@ void PXDPackerModule::pack_dhhc(int dhhc_id, int dhh_active, int* dhh_ids)
   start_frame();
   append_int32((DHHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG << 27) | (m_trigger_nr & 0xFFFF));
   append_int32(0xCAFE0000);// HLT HEADER
-  append_int32(0); // HLT Trigger Nr
-  append_int32(0); // HLT Run NR etc
+  append_int32(m_trigger_nr); // HLT Trigger Nr
+  append_int32(m_run_nr_word1); // HLT Run NR etc
   append_int32(0xCAFE0000);// DATCON HEADER ... do we want it here? t.b.d.
-  append_int32(0); // DATCON Trigger Nr
-  append_int32(0); // DATCON Run NR etc
+  append_int32(m_trigger_nr); // DATCON Trigger Nr
+  append_int32(m_run_nr_word1); // DATCON Run NR etc
   add_frame_to_payload();
 
   /// DHHC Start
@@ -291,8 +298,8 @@ void PXDPackerModule::pack_dhhc(int dhhc_id, int dhh_active, int* dhh_ids)
   append_int16(0x00000000); // TT 11-0 | Type
   append_int16(0x00000000); // TT 27-12
   append_int16(0x00000000); // TT 43-28
-  append_int16(0x00000000); // Run Nr 7-0 | Subrunnr 7-0
-  append_int16(0x00000000); // Exp NR 9-0 | Run Nr 13-8
+  append_int16(m_run_nr_word1); // Run Nr 7-0 | Subrunnr 7-0
+  append_int16(m_run_nr_word2); // Exp NR 9-0 | Run Nr 13-8
   add_frame_to_payload();
 
   // loop for each DHH in system

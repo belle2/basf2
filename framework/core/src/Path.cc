@@ -99,7 +99,7 @@ boost::python::list _getModulesPython(const Path* path)
 
 void Path::exposePythonAPI()
 {
-  class_<Path>("Path")
+  class_<Path>("Path", no_init)
   .def("__str__", &Path::getPathString)
   .def("add_module", &Path::addModule)
   .def("add_path", &Path::addPath)

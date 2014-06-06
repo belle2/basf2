@@ -99,11 +99,11 @@ void Framework::process(PathPtr startPath, long maxEvent)
   try {
     already_executed = true;
     if (Environment::Instance().getNumberProcesses() == 0) {
-      EventProcessor processor(*m_pathManager);
+      EventProcessor processor;
       processor.setProfileModuleName(Environment::Instance().getProfileModuleName());
       processor.process(startPath, maxEvent);
     } else {
-      pEventProcessor processor(*m_pathManager);
+      pEventProcessor processor;
       processor.process(startPath, maxEvent);
     }
   } catch (std::exception& e) {

@@ -61,6 +61,43 @@ std::list<ModulePtr> Path::getModules() const
   return modules;
 }
 
+
+ModulePtrList Path::buildModulePathList() const
+{
+  ModulePtrList tmpModuleList;
+
+  //Build list of modules recursively by following the conditions of modules
+  this->fillModulePathList(tmpModuleList);
+
+  return tmpModuleList;
+}
+
+
+//============================================================================
+//                              Private methods
+//============================================================================
+
+void Path::fillModulePathList(ModulePtrList& modList) const
+{
+  ModulePtrList::const_iterator moduleIter;
+  const ModulePtrList& currModList = getModules();
+
+  for (moduleIter = currModList.begin(); moduleIter != currModList.end(); ++moduleIter) {
+    const Module* module = moduleIter->get();
+
+    //If module was not already added to the list, add it.
+    ModulePtrList::iterator findIter = find_if(modList.begin(), modList.end(), bind2nd(ModulePtrOperatorsEq(), *moduleIter));
+    if (findIter == modList.end()) {
+      modList.push_back(*moduleIter);
+
+      //If the module has a condition, call the method recursively
+      if (module->hasCondition()) {
+        module->getConditionPath()->fillModulePathList(modList);
+      }
+    }
+  }
+}
+
 //=====================================================================
 //                          Python API
 //=====================================================================

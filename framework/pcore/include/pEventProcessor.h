@@ -18,7 +18,6 @@
 
 namespace Belle2 {
 
-  class PathManager;
   class ProcHandler;
   class RingBuffer;
 
@@ -30,7 +29,7 @@ namespace Belle2 {
   public:
 
     /*! Constructor */
-    pEventProcessor(PathManager& pathManager);
+    pEventProcessor();
 
     /*! Destructor */
     virtual ~pEventProcessor();

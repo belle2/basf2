@@ -12,6 +12,7 @@
 #define PATH_H_
 
 #include <framework/core/PathElement.h>
+#include <framework/core/Module.h>
 
 #include <boost/shared_ptr.hpp>
 
@@ -20,7 +21,6 @@
 
 namespace Belle2 {
 
-  class Module;
   class Path;
 
   //------------------------------------------------------
@@ -73,6 +73,18 @@ namespace Belle2 {
     std::list<boost::shared_ptr<Module> > getModules() const;
 
     /**
+     * Builds a list of all modules which could be executed during the data processing.
+     *
+     * The method starts with the current path, iterates over the modules in the path and
+     * follows recursively module conditions to make sure the final list contains all
+     * modules which could be executed while preserving their correct order.
+     * Special care is taken to avoid that a module is added more than once to the list.
+     *
+     * @return A list containing all modules which could be executed during the data processing.
+     */
+    std::list<boost::shared_ptr<Module> > buildModulePathList() const;
+
+    /**
      * Replaces all Modules and sub-Paths with the specified Module list
      */
     void putModules(const std::list<boost::shared_ptr<Module> >& mlist) { m_elements.assign(mlist.begin(), mlist.end()); }
@@ -93,6 +105,15 @@ namespace Belle2 {
 
 
   private:
+    /**
+     * Fills the module list with the modules of this path.
+     *
+     * Calls itself recursively for modules having a condition
+     *
+     * @param modList The list of modules.
+     */
+    void fillModulePathList(std::list<boost::shared_ptr<Module> >& modList) const;
+
     std::list<boost::shared_ptr<PathElement> > m_elements; /**< The list of path elements (Modules and sub-Paths) */
 
     friend class PathIterator;

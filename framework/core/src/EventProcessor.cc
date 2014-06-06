@@ -14,7 +14,6 @@
 #include <framework/core/EventProcessor.h>
 
 #include <framework/core/ProcessStatistics.h>
-#include <framework/core/PathManager.h>
 #include <framework/core/PathIterator.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -66,7 +65,7 @@ void EventProcessor::writeToStdErr(const char msg[])
 }
 
 
-EventProcessor::EventProcessor(PathManager& pathManager) : m_pathManager(pathManager), m_master(NULL), m_mainRNG(NULL)
+EventProcessor::EventProcessor() : m_master(NULL), m_mainRNG(NULL)
 {
 
 }
@@ -87,7 +86,7 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
   }
 
   //Get list of modules which could be executed during the data processing.
-  ModulePtrList moduleList = m_pathManager.buildModulePathList(startPath);
+  ModulePtrList moduleList = startPath->buildModulePathList();
 
   //Find the adress of the module we want to profile
   if (!m_profileModuleName.empty()) {

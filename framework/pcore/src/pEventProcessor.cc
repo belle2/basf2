@@ -15,7 +15,6 @@
 #include <framework/pcore/HistModule.h>
 
 #include <framework/core/Environment.h>
-#include <framework/core/PathManager.h>
 #include <framework/logging/LogSystem.h>
 
 #include <TROOT.h>
@@ -64,7 +63,7 @@ static void signalHandler(int signal)
   }
 }
 
-pEventProcessor::pEventProcessor(PathManager& pathManager) : EventProcessor(pathManager),
+pEventProcessor::pEventProcessor() : EventProcessor(),
   m_procHandler(new ProcHandler()),
   m_histoManagerFound(false),
   m_enableRBClearing(true)
@@ -143,7 +142,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   }
 
   // 1. Initialization
-  ModulePtrList modulelist = m_pathManager.buildModulePathList(spath);
+  ModulePtrList modulelist = spath->buildModulePathList();;
   //  dump_modules ( "full : ", modulelist );
   ModulePtrList initmodules = init_modules_in_main(modulelist);
   dump_modules("processInitialize : ", initmodules);
@@ -188,7 +187,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   m_procHandler->startInputProcess();
   if (m_procHandler->isInputProcess()) {   // In input process
     PathPtr& inpath = m_inpathlist[0];
-    ModulePtrList inpath_modules = m_pathManager.buildModulePathList(inpath);
+    ModulePtrList inpath_modules = inpath->buildModulePathList();
     ModulePtrList procinitmodules = init_modules_in_process(inpath_modules);
     dump_modules("processInitialize for ", procinitmodules);
     if (!procinitmodules.empty())
@@ -215,7 +214,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
       m_procHandler->startOutputProcess(nout);
       if (m_procHandler->isOutputProcess()) {   // In output process
         m_master = outpath->getModules().begin()->get(); //set Rx as master
-        ModulePtrList outpath_modules = m_pathManager.buildModulePathList(outpath);
+        ModulePtrList outpath_modules = outpath->buildModulePathList();
         ModulePtrList procinitmodules = init_modules_in_process(outpath_modules);
         dump_modules("processInitialize for ", procinitmodules);
         if (!procinitmodules.empty())
@@ -235,7 +234,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   if (m_procHandler->isEventProcess()) {
     PathPtr& mainpath = m_bodypathlist[m_bodypathlist.size() - 1];
     m_master = mainpath->getModules().begin()->get(); //set Rx as master
-    ModulePtrList main_modules = m_pathManager.buildModulePathList(mainpath);
+    ModulePtrList main_modules = mainpath->buildModulePathList();
     ModulePtrList procinitmodules = init_modules_in_process(main_modules);
     //dump_modules("processInitialize for ", procinitmodules);
     if (!procinitmodules.empty())

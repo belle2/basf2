@@ -85,7 +85,7 @@ void AsyncWrapper::initialize()
 
     //LogSystem::Instance().resetMessageCounter(); //for testing parallel processing
 
-    EventProcessor eventProc(pathMgr);
+    EventProcessor eventProc;
     eventProc.process(path);
     B2INFO("Asynchronous process done!");
     exit(0);

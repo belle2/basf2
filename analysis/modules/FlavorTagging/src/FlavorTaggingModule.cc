@@ -110,7 +110,7 @@ namespace Belle2 {
       bool ok = getTagObjects(particle);
       if (ok) {
         getMC_PDGcodes();
-        Input_Values_Muon();
+        Muon_Cathegory();
       };
       if (!ok) toRemove.push_back(i);
     }
@@ -161,12 +161,46 @@ namespace Belle2 {
 
   }
 
-  bool FlavorTaggingModule::Input_Values_Muon()
+  //Variables needed for Muon Cathegory
+
+  double Charge(Track* track)
   {
+    const TrackFitResult* TrackRes = track->getTrackFitResult(Const::muon);
+    return TrackRes -> getChargeSign();
+  }
 
+  double p_cms(Track* track)
+  {
+    const TrackFitResult* TrackRes = track->getTrackFitResult(Const::muon);
+    TLorentzVector p_lab(TrackRes->getMomentum(), TrackRes -> getParticleType().getMass());
+    PCmsLabTransform T;
+    TLorentzVector p_cms_vec = T.rotateLabToCms() * p_lab;
+    return p_cms_vec.Vect().Mag();
+  }
+
+  double Theta_Lab(Track* track)
+  {
+    const TrackFitResult* TrackRes = track->getTrackFitResult(Const::muon);
+    return TrackRes -> getCotTheta();
+  }
+
+  double PID_MonteCarlo(Track* track)
+  {
+    const MCParticle* mcParticle = track->getRelated<MCParticle>();
+    if ((TMath::Abs(mcParticle->getPDG()) == 13) && (TMath::Abs(mcParticle->getMother()->getPDG()) == 511)) {
+      return 1.0;
+    } else return 0.0;
+  }
+
+  double PID_Likelihood(Track* track)
+  {
+    const PIDLikelihood* pid_Likelihood = track->getRelated<PIDLikelihood>();
+    return pid_Likelihood->getProbability(Const::muon, Const::pion, Const::PIDDetectorSet::set());
+  }
+
+  bool FlavorTaggingModule::Muon_Cathegory()
+  {
     //B-> Mu + Anti-v + X
-
-
 //     TLorentzVector momX; //Momentum of X in CMS-System
 //     TLorentzVector momMu;  //Momentum of Mu in CMS-System
 //     TLorentzVector momMiss;  //Momentum of Anti-v  in CMS-System
@@ -178,91 +212,30 @@ namespace Belle2 {
 //     double E_W_90;
 //
 
+    for (unsigned int i = 0; i < tagTracks.size(); i++) {
+
+      const Track* tracki = tagTracks[i];
+
+      const TrackFitResult* trakiRes = NULL;
+
+      if (tracki) trakiRes = tracki->getTrackFitResult(Const::muon);
+
+//        if (TrackRes){}
 
 
-//     for (unsigned int i = 0; i < tagTracks.size(); i++) {
-//
-//       const Track* track1 = tagTracks[i];
-//       const MCParticle* mcParticle = track1->getRelated<MCParticle>();
-//       const PIDLikelihood* pid_Likelihood = track1->getRelated<PIDLikelihood>();
-//       const TrackFitResult* trak1Res = NULL;
-//
-//
-//       if (track1) trak1Res = track1->getTrackFitResult(Const::muon); //Const::ChargedStable(mcParticle->getPDG())
-//
-//       TVector3 mom;
-//
-//
-//
-//       double charge;           //Variable1
-//       double p_cms;   //Variable2
-//       double ThetaLab;    //Variable3
-//       double PID_Likelihood;
-//
-//       double PID;
-//
-//       if (trak1Res) {
-//
-//
-// //  Belle2::Const::ParticleType Muon= trak1Res->getParticleType();
-//
-//
-//         mom = trak1Res->getMomentum();
-//
-//         charge = trak1Res->getChargeSign(); //Variable1
-//
-//
-// //   float Particlemass = TDatabasePDG::Instance()->GetParticle(13)->Mass();
-//
-//         TLorentzVector p_lab(mom, TDatabasePDG::Instance()->GetParticle(13)->Mass());
-//         PCmsLabTransform T;
-//         TLorentzVector p_cms_vec = T.rotateLabToCms() * p_lab;
-//         p_cms = p_cms_vec.Vect().Mag(); //Variable2
-//
-//         ThetaLab = trak1Res-> getCotTheta(); //Variable3
-//
-//  PID_Likelihood = pid_Likelihood->getProbability(Const::muon, Const::pion, Const::PIDDetectorSet::set());
-//
-//
-//         if ((TMath::Abs(mcParticle->getPDG()) == 13) && (TMath::Abs(mcParticle->getMother()->getPDG()) == 511)) {
-//
-//    PID=1;
-//
-//  }
-//
-//  else PID=0;
-//
-//
-//
-//       }
-//
-// //       momMiss = -(momX+momMu);
-// //       p_cms_miss = momMiss.Vect().Mag();
-// //       Cos_Theta_miss = momMu.Angle(momMiss.Vect());
-// //       M_recoil = momX.M();
-//
-// //       for (unsigned int i = 0; i < tagTracks.size(); i++) {
-// //
-// //
-// //
-// //
-// //
-// //       }
-//
-//
-//       if (!trak1Res) continue;
-//
-//
-//     }
+//        TVector3 mom;
+//       momMiss = -(momX+momMu);
+//       p_cms_miss = momMiss.Vect().Mag();
+//       Cos_Theta_miss = momMu.Angle(momMiss.Vect());
+//       M_recoil = momX.M();
 
 
 
+      if (!trakiRes) continue;
 
+
+    }
     return true;
-
-
-
-
   }
 
 

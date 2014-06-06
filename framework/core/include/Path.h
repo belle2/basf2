@@ -11,8 +11,8 @@
 #ifndef PATH_H_
 #define PATH_H_
 
-#include <framework/core/PathElement.h>
 #include <framework/core/Module.h>
+#include <framework/core/PathElement.h>
 
 #include <boost/shared_ptr.hpp>
 

@@ -5,7 +5,7 @@ if env.has_key('HAS_TEVE'):
     print "Event display disabled, please recompile root with opengl support (on Debian/Ubuntu you'll probably only need to install libglu1-mesa-dev and rebuild)"
 
   env['CONTINUE'] = env['HAS_TEVE']
-  env['LIBS'] = ['$ROOT_LIBS', 'framework', 'geometry',
+  env['LIBS'] = ['$ROOT_LIBS', 'framework', 'geometry', 'tracking',
                  'vxd', 'pxd', 'vxd_dataobjects', 'pxd_dataobjects', 'svd_dataobjects', 'svd', 'cdc_dataobjects',
                  'cdc', 'ecl_dataobjects', 'bklm_dataobjects', 'ecl', 'mdst_dataobjects', 'eklm_dataobjects',
                  'display_dataobjects', 'simulation_dataobjects', 'tracking_dataobjects',

@@ -27,21 +27,15 @@ namespace Belle2 {
   public:
     /** filterTyoes contains enums assigning unique values for each filter type allowing fast filter type recognition */
     enum filterTypes {
-      angles3D, /**< string name of filter a3D */
-      anglesRZ, /**< string name of filter aRZ */
-      anglesXY, /**< string name of filter aXY */
+      // 2hit:
       distance3D, /**< string name of filter d3D */
       distanceXY, /**< string name of filter dXY */
       distanceZ, /**< string name of filter dZ */
-      helixParameterFit, /**< string name of filter helix Paramater Fit */
       slopeRZ, /**< string name of filter slopeRZ */
-      deltaSlopeRZ, /**< string name of filter dslopeRZ */
-      pT, /**< string name of filter pT */
-      deltapT, /**< string name of filter dPt */
       normedDistance3D, /**< string name of filter nd3D */
-      distance2IP, /**< string name of filter d2IP */
-      deltaDistance2IP, /**< string name of filter dd2IP */
 
+
+      //2+1hit:
       anglesHighOccupancy3D, /**< string name of filter a3D high occupancy */
       anglesHighOccupancyXY,  /**< string name of filter aXY high occupancy */
       anglesHighOccupancyRZ, /**< string name of filter aRZ high occupancy */
@@ -49,61 +43,91 @@ namespace Belle2 {
       deltaSlopeHighOccupancyRZ, /**< string name of filter dslopeRZ high occupancy */
       pTHighOccupancy, /**< string name of filter pT high occupancy */
       helixParameterHighOccupancyFit, /**< string name of filter hFit high occupancy */
+
+
+      //3hit:
+      angles3D, /**< string name of filter a3D */
+      anglesRZ, /**< string name of filter aRZ */
+      anglesXY, /**< string name of filter aXY */
+      deltaSlopeRZ, /**< string name of filter dslopeRZ */
+      pT, /**< string name of filter pT */
+      distance2IP, /**< string name of filter d2IP */
+      helixParameterFit, /**< string name of filter helix Paramater Fit */
+      deltaSOverZ,  /**< deltaSOverZ Filter */
+      deltaSlopeZOverS, /**< deltaSlopeZOverS Filter */
+
+
+      //3+1hit:
       deltapTHighOccupancy, /**< string name of filter dPt high occupancy */
       deltaDistanceHighOccupancy2IP, /**< string name of filter dd2IP high occupancy */
+
+
+      //4hit:
+      deltapT, /**< string name of filter dPt */
+      deltaDistance2IP, /**< string name of filter dd2IP */
+
 
       //Collector FilterIDs
       nbFinderLost, /**< Nb Finder filter */
       cellularAutomaton, /**< CA filter */
 
 
-      hopfield,  /**< Hopfield filter */
-      greedy,  /**< Greedy filter */
-      tcDuel,  /**< TC Duel filter */
-      tcFinderCurr,  /**< TC Finder Curr filter */
+      // trackletFilters:
       ziggZaggXY,  /**< ziggZaggXY filter */
       ziggZaggXYWithSigma,  /**< ziggZaggXYWithSigma filter */
       ziggZaggRZ,  /**< ziggZaggRZ filter */
-      calcQIbyKalman,  /**< calcQIbyKalman filter */
-      overlapping,  /**< overlapping filter */
       circlefit,  /**< circlefit filter */
       helixfit,  /**< Helix Fit filter */
       simpleLineFit3D,  /**< simpleLineFit3D filter */
 
+
+      //TF-steps:
+      hopfield,  /**< Hopfield filter */
+      greedy,  /**< Greedy filter */
+      tcDuel,  /**< TC Duel filter */
+      tcFinderCurr,  /**< TC Finder Curr filter */
+      calcQIbyKalman,  /**< calcQIbyKalman filter */
+      overlapping,  /**< overlapping filter */
+
+
+      // for display: silent kills
       silentTcc,  /**< Silent Kill TCC filter */
       silentHitFinder,  /**< Silent Kill HitFinder filter */
       silentSegFinder,  /**< Silent Kill SefFinder filter */
 
-      // tests which are only for debugging and validation processes
-      alwaysTrue, /**< a filter with this ID will always say yes */
-      alwaysFalse, /**< a filter with this ID will always say no */
-      randomTrue,  /**< a filter with this ID will say yes or no by random choice */
 
+      // tests which are only for debugging and validation processes
+      alwaysTrue2Hit, /**< a filter with this ID will always say True */
+      alwaysFalse2Hit, /**< a filter with this ID will always say False */
+      alwaysTrue3Hit, /**< a filter with this ID will always say True */
+      alwaysFalse3Hit, /**< a filter with this ID will always say False */
+      alwaysTrue4Hit, /**< a filter with this ID will always say True */
+      alwaysFalse4Hit, /**< a filter with this ID will always say False */
+      random2Hit,  /**< a filter with this ID will say yes or no by random choice */
+      random3Hit,  /**< a filter with this ID will say yes or no by random choice */
+      random4Hit,  /**< a filter with this ID will say yes or no by random choice */
+
+
+      // other stuff
       overHighestAllowedLayer, /**< OverHighestAllowedLayer Filter */
       outOfSectorRange, /**< out of sector range filter */
 
-      deltaSOverZ,  /**< deltaSOverZ Filter */
-      deltaSlopeZOverS, /**< deltaSlopeZOverS Filter */
 
       numFilters /**< knows number of filters existing. If a member returns this value, the input-value was wrong */
 
     };
 
-    const static std::string nameAngles3D;/**< string name of filter a3D */
-    const static std::string nameAnglesRZ; /**< string name of filter aRZ */
-    const static std::string nameAnglesXY; /**< string name of filter aXY */
+
+
+    // 2hit:
     const static std::string nameDistance3D; /**< string name of filter d3D */
     const static std::string nameDistanceXY; /**< string name of filter dXY */
     const static std::string nameDistanceZ; /**< string name of filter dZ */
-    const static std::string nameHelixParameterFit; /**< string name of filter helix Parameter Fit */
     const static std::string nameSlopeRZ; /**< string name of filter slopeRZ */
-    const static std::string nameDeltaSlopeRZ; /**< string name of filter dslopeRZ */
-    const static std::string namePT; /**< string name of filter pT */
-    const static std::string nameDeltapT; /**< string name of filter dPt */
     const static std::string nameNormedDistance3D; /**< string name of filter nd3D */
-    const static std::string nameDistance2IP; /**< string name of filter d2IP */
-    const static std::string nameDeltaDistance2IP; /**< string name of filter dd2IP */
 
+
+    //2+1hit:
     const static std::string nameAnglesHighOccupancy3D; /**< string name of filter a3D high occupancy */
     const static std::string nameAnglesHighOccupancyXY;  /**< string name of filter aXY high occupancy */
     const static std::string nameAnglesHighOccupancyRZ; /**< string name of filter aRZ high occupancy */
@@ -111,41 +135,73 @@ namespace Belle2 {
     const static std::string nameDeltaSlopeHighOccupancyRZ; /**< string name of filter dslopeRZ high occupancy */
     const static std::string namePTHighOccupancy; /**< string name of filter pT high occupancy */
     const static std::string nameHelixParameterHighOccupancyFit; /**< string name of filter hFit high occupancy */
-    const static std::string nameDeltapTHighOccupancy; /**< string name of filter dPt high occupancy */
-    const static std::string nameDeltaDistanceHighOccupancy2IP; /**< string name of filter dd2IP high occupancy */
-
-    const static std::string nameNbFinderLost; /**< string name Nb Finder filter */
-    const static std::string nameCellularAutomaton; /**< string name CA filter */
 
 
-    const static std::string nameHopfield;  /**< string name Hopfield filter */
-    const static std::string nameGreedy;   /**< string name Greedy filter */
-    const static std::string nameTcDuel;   /**< string name TC Duel filter */
-    const static std::string nameTcFinderCurr;   /**< string name TC Finder Curr filter */
-    const static std::string nameZiggZaggXY;   /**< string name ZiggZaggXY filter */
-    const static std::string nameZiggZaggXYWithSigma;   /**< string name ZiggZaggXYWithSigma filter */
-    const static std::string nameZiggZaggRZ;    /**< string name ZiggZaggRZ filter */
-    const static std::string nameCalcQIbyKalman;   /**< string name CalcQIbyKalman filter */
-    const static std::string nameOverlapping;   /**< string name Overlapping filter */
-    const static std::string nameCirclefit;     /**< string name Circlefit filter */
-    const static std::string nameHelixfit;     /**< string name Helix Fit filter */
-    const static std::string nameSimpleLineFit3D;     /**< string name SimpleLineFit3D filter */
-
-    const static std::string nameSilentTcc;  /**< string name Silent Kill TCC filter */
-    const static std::string nameSilentHitFinder;   /**< string name Silent Kill Hit Finder filter */
-    const static std::string nameSilentSegFinder;    /**< string name Silent Kill Seg Finder filter */
-
-    const static std::string nameAlwaysTrue; /**< string name of a filter which will always say yes */
-    const static std::string nameAlwaysFalse; /**< string name of a filter which will always say no */
-    const static std::string nameRandomTrue;  /**< string name of a filter which will say yes or no by random choice */
-
-
+    //3hit:
+    const static std::string nameAngles3D;/**< string name of filter a3D */
+    const static std::string nameAnglesRZ; /**< string name of filter aRZ */
+    const static std::string nameAnglesXY; /**< string name of filter aXY */
+    const static std::string nameDeltaSlopeRZ; /**< string name of filter dslopeRZ */
+    const static std::string namePT; /**< string name of filter pT */
+    const static std::string nameDistance2IP; /**< string name of filter d2IP */
+    const static std::string nameHelixParameterFit; /**< string name of filter helix Parameter Fit */
     const static std::string nameDeltaSOverZ;     /**< string name deltaSOverZ Filter */
     const static std::string nameDeltaSlopeZOverS;  /**< string name deltaSlopeZOverS Filter */
 
 
+    //3+1hit:
+    const static std::string nameDeltapTHighOccupancy; /**< string name of filter dPt high occupancy */
+    const static std::string nameDeltaDistanceHighOccupancy2IP; /**< string name of filter dd2IP high occupancy */
 
 
+    //4hit:
+    const static std::string nameDeltapT; /**< string name of filter dPt */
+    const static std::string nameDeltaDistance2IP; /**< string name of filter dd2IP */
+
+
+    //Collector FilterIDs
+    const static std::string nameNbFinderLost; /**< string name Nb Finder filter */
+    const static std::string nameCellularAutomaton; /**< string name CA filter */
+
+
+    // trackletFilters:
+    const static std::string nameZiggZaggXY;   /**< string name ZiggZaggXY filter */
+    const static std::string nameZiggZaggXYWithSigma;   /**< string name ZiggZaggXYWithSigma filter */
+    const static std::string nameZiggZaggRZ;    /**< string name ZiggZaggRZ filter */
+    const static std::string nameCirclefit;     /**< string name Circlefit filter */
+    const static std::string nameHelixfit;     /**< string name Helix Fit filter */
+    const static std::string nameSimpleLineFit3D;     /**< string name SimpleLineFit3D filter */
+
+
+    //TF-steps:
+    const static std::string nameHopfield;  /**< string name Hopfield filter */
+    const static std::string nameGreedy;   /**< string name Greedy filter */
+    const static std::string nameTcDuel;   /**< string name TC Duel filter */
+    const static std::string nameTcFinderCurr;   /**< string name TC Finder Curr filter */
+    const static std::string nameCalcQIbyKalman;   /**< string name CalcQIbyKalman filter */
+    const static std::string nameOverlapping;   /**< string name Overlapping filter */
+    /// WARNING FIXME TODO some things are missing here (calcQIbyLineFit) and similar stuff
+
+
+    // for display: silent kills
+    const static std::string nameSilentTcc;  /**< string name Silent Kill TCC filter */
+    const static std::string nameSilentHitFinder;   /**< string name Silent Kill Hit Finder filter */
+    const static std::string nameSilentSegFinder;    /**< string name Silent Kill Seg Finder filter */
+
+
+    // tests which are only for debugging and validation processes
+    const static std::string nameAlwaysTrue2Hit; /**< string name of a filter which will always say yes */
+    const static std::string nameAlwaysFalse2Hit; /**< string name of a filter which will always say no */
+    const static std::string nameAlwaysTrue3Hit; /**< string name of a filter which will always say yes */
+    const static std::string nameAlwaysFalse3Hit; /**< string name of a filter which will always say no */
+    const static std::string nameAlwaysTrue4Hit; /**< string name of a filter which will always say yes */
+    const static std::string nameAlwaysFalse4Hit; /**< string name of a filter which will always say no */
+    const static std::string nameRandom2Hit;  /**< string name of a filter which will say yes or no by random choice */
+    const static std::string nameRandom3Hit;  /**< string name of a filter which will say yes or no by random choice */
+    const static std::string nameRandom4Hit;  /**< string name of a filter which will say yes or no by random choice */
+
+
+    // other stuff
     const static std::string nameOverHighestAllowedLayer; /**< string name of OverHighestAllowedLayer Filter */
     const static std::string nameOutOfSectorRange; /**< string name out of sector range filter */
 

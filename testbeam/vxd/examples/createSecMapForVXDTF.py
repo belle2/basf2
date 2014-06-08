@@ -7,11 +7,11 @@ from subprocess import call
 from sys import argv
 
 # Important parameters of the simulation:
-fieldOn = True  # Turn field on or off (changes geometry components and digi/clust params)
+fieldOn = False  # Turn field on or off (changes geometry components and digi/clust params)
 momentum = 6.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
-theta_spread = 0.005  # # degrees (sigma of gaussian)
+theta_spread = 0.005  ## degrees (sigma of gaussian)
 phi = 180.0  # degrees
 phi_spread = 0.005  # degrees (sigma of gaussian)
 gun_x_position = 100.  # cm ... 100cm ... outside magnet + plastic shielding + Al scatterer (air equiv.)
@@ -23,12 +23,21 @@ numTracks = 1
 numEvents = 5000
 initialValue = 0  # want random events
 
+fieldValue = 0.  # expected magnetic field in Tesla
 # parameters for the secMap-calculation:
-pTcuts = [1.0, 1.5]
+pTcuts = [1., 1.5]
+setupFileName = 'testBeamMini6GeVJune08'
 
-setupFileName = 'testBeamMini6GeV'
-secConfigU = [0., 1.0]
-secConfigV = [0., 1.0]
+if fieldOn:
+    fieldValue = 1.
+    setupFileName += 'MagnetOn'
+else:
+    setupFileName += 'MagnetOff'
+
+secConfigU = [0., 1.]
+secConfigV = [0., 1.]
+setupFileNamesvd = setupFileName + 'SVD'
+setupFileNamevxd = setupFileName + 'PXDSVD'
 
 # setupFileName = "testBeamStd"
 # secConfigU = [0.0, 0.5, 1.0]
@@ -116,13 +125,13 @@ print 'starting {events:} events, analyzing {numTracks:} track(s) per event by u
         numTracks=numTracks, theSeed=initialValue)
 print ''
 
-setupFileNamevxd = setupFileName + 'VXD'
 filterCalc = register_module('FilterCalculator')
 filterCalc.logging.log_level = LogLevel.INFO
 filterCalc.logging.debug_level = 10
-param_fCalc = {  # -1 = VXD, 0 = PXD, 1 = SVD
-                 # # completely different to values of Belle2-detector
-    'detectorType': -1,
+param_fCalc = {  # currently accepted: PXD, SVD, TEL
+                 # 2?
+    'detectorType': ['PXD', 'SVD'],
+    'acceptedRegionForSensors': [-1, -1],
     'maxXYvertexDistance': 200.,
     'tracksPerEvent': numTracks,
     'useEvtgen': 0,
@@ -131,7 +140,7 @@ param_fCalc = {  # -1 = VXD, 0 = PXD, 1 = SVD
     'sectorConfigU': secConfigU,
     'sectorConfigV': secConfigV,
     'setOrigin': [gun_x_position * 0.4, 0., 0.],
-    'magneticFieldStrength': 0.01,
+    'magneticFieldStrength': fieldValue,
     'testBeam': 1,
     'secMapWriteToRoot': 1,
     'secMapWriteToAscii': 0,
@@ -143,14 +152,12 @@ param_fCalc = {  # -1 = VXD, 0 = PXD, 1 = SVD
     }
 filterCalc.param(param_fCalc)
 
-setupFileNamesvd = setupFileName + 'SVD'
 filterCalc2 = register_module('FilterCalculator')
 filterCalc2.logging.log_level = LogLevel.INFO
 filterCalc2.logging.debug_level = 10
-param_fCalc2 = {  # -1 = VXD, 0 = PXD, 1 = SVD
-                  # # completely different to values of Belle2-detector
-                  # arbitrary origin
-    'detectorType': 1,
+param_fCalc2 = {
+    'detectorType': ['SVD'],
+    'acceptedRegionForSensors': [-1, -1],
     'maxXYvertexDistance': 200.,
     'tracksPerEvent': numTracks,
     'useEvtgen': 0,
@@ -159,7 +166,7 @@ param_fCalc2 = {  # -1 = VXD, 0 = PXD, 1 = SVD
     'sectorConfigU': secConfigU,
     'sectorConfigV': secConfigV,
     'setOrigin': [gun_x_position * 0.4, 0., 0.],
-    'magneticFieldStrength': 0.01,
+    'magneticFieldStrength': fieldValue,
     'testBeam': 1,
     'secMapWriteToRoot': 1,
     'secMapWriteToAscii': 0,

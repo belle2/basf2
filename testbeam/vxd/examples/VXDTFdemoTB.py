@@ -42,14 +42,15 @@ geometry = register_module('Geometry')
 # only the tracking detectors will be simulated. Makes the example much faster
 if fieldOn:
     geometry.param('components', ['MagneticField', 'TB'])
-    secSetup = \
-        ['TB3GeVFullMagnetNoAlignedSource2014May22SVD-moreThan1500MeV_SVD']
+    # secSetup = \
+        # ['TB3GeVFullMagnetNoAlignedSource2014May22SVD-moreThan1500MeV_SVD']
+    secSetup = ['testBeamMini6GeVJune08MagnetOnSVD-moreThan1500MeV_SVD']
     qiType = 'circleFit'  # circleFit
 else:
   # To turn off magnetic field:
     geometry.param('components', ['TB'])
-    secSetup = ['TB4GeVNoMagnetNoAlignedSource2014May21SVD-moreThan1500MeV_SVD'
-                ]
+    # secSetup = ['TB4GeVNoMagnetNoAlignedSource2014May21SVD-moreThan1500MeV_SVD']
+    secSetup = ['testBeamMini6GeVJune08MagnetOffSVD-moreThan1500MeV_SVD']
     qiType = 'straightLine'  # straightLine
 
 particlegun = register_module('ParticleGun')
@@ -204,10 +205,15 @@ param_mctrackfinder = {
 mctrackfinder.param(param_mctrackfinder)
 
 trackfitter = register_module('GenFitter')
-# trackfitter.logging.log_level = LogLevel.WARNING
+trackfitter.logging.log_level = LogLevel.FATAL
 trackfitter.param('GFTrackCandidatesColName', 'caTracks')
 trackfitter.param('FilterId', 'Kalman')
+trackfitter.param('StoreFailedTracks', True)
+# trackfitter.param('FilterId', 'simpleKalman')
 trackfitter.param('UseClusters', True)
+
+trackfit_dqm = register_module('TrackfitDQM')
+trackfit_dqm.param('GFTrackCandidatesColName', 'caTracks')
 
 eventCounter = register_module('EventCounter')
 eventCounter.logging.log_level = LogLevel.INFO
@@ -235,6 +241,7 @@ main.add_module(analyzer)
 main.add_module(trackfitter)
 main.add_module(eventCounter)
 main.add_module(vxdtf_dqm)
+main.add_module(trackfit_dqm)
 # Process events
 process(main)
 

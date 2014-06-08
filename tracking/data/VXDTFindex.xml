@@ -15,14 +15,23 @@
 <!-- 	<xi:include href="../tracking/secMapEvtGenOnR10501May2014SVDStd-moreThan500MeV_SVD.xml"/> -->
 	
 	<xi:include href="../tracking/belle2SimpleCaseTet35t80phi0t360SVD-50to500MeV_SVD.xml"/>
+	<xi:include href="../tracking/belle2SimpleCaseTet55t80phi270t360SVD-50to500MeV_SVD.xml"/>
 	
-	<xi:include href="../tracking/secMapEvtGenOnR10508May2014VXDStd-30to125MeV_PXDSVD.xml"/>
+<!--	<xi:include href="../tracking/secMapEvtGenOnR10508May2014VXDStd-30to125MeV_PXDSVD.xml"/>
 	<xi:include href="../tracking/secMapEvtGenOnR10508May2014VXDStd-125to500MeV_PXDSVD.xml"/>
 	<xi:include href="../tracking/secMapEvtGenOnR10508May2014VXDStd-moreThan500MeV_PXDSVD.xml"/>
 	
 	<xi:include href="../tracking/secMapEvtGenOnR10508May2014SVDStd-30to125MeV_SVD.xml"/>
 	<xi:include href="../tracking/secMapEvtGenOnR10508May2014SVDStd-125to500MeV_SVD.xml"/>
-	<xi:include href="../tracking/secMapEvtGenOnR10508May2014SVDStd-moreThan500MeV_SVD.xml"/>
+	<xi:include href="../tracking/secMapEvtGenOnR10508May2014SVDStd-moreThan500MeV_SVD.xml"/>-->
+	
+	<xi:include href="../tracking/secMapEvtGenOnR10933June2014SVDStd-30to125MeV_SVD.xml"/>
+	<xi:include href="../tracking/secMapEvtGenOnR10933June2014SVDStd-125to500MeV_SVD.xml"/>
+	<xi:include href="../tracking/secMapEvtGenOnR10933June2014SVDStd-moreThan500MeV_SVD.xml"/>
+	
+	<xi:include href="../tracking/secMapEvtGenOnR10933June2014VXDStd-30to125MeV_SVD.xml"/>
+	<xi:include href="../tracking/secMapEvtGenOnR10933June2014VXDStd-125to500MeV_SVD.xml"/>
+	<xi:include href="../tracking/secMapEvtGenOnR10933June2014VXDStd-moreThan500MeV_SVD.xml"/>
 <!-- 	<xi:include href="../tracking/miniSVD-moreThan30MeV_SVD.xml"/> -->
 <!-- 	<xi:include href="../tracking/miniVXD-moreThan30MeV_VXD.xml"/> -->
 	

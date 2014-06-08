@@ -382,6 +382,7 @@ namespace Belle2 {
       m_totalSVDClusterCombis = 0;
       m_TESTERhighOccupancyCtr = 0;
       m_TESTERtriggeredZigZagXY = 0;
+      m_TESTERtriggeredZigZagXYWithSigma = 0;
       m_TESTERtriggeredZigZagRZ = 0;
       m_TESTERtriggeredDpT = 0;
       m_TESTERtriggeredCircleFit = 0;
@@ -452,6 +453,7 @@ namespace Belle2 {
     std::vector<bool> m_PARAMactivateDeltaSOverZ; /**< activates/deactivates current filter DeltaSOverZ for each pass individually */
     std::vector<bool> m_PARAMactivateDeltaSlopeZOverS; /**< activates/deactivates current filter DeltaSlopeZOverS for each pass individually */
     std::vector<bool> m_PARAMactivateZigZagXY; /**< activates/deactivates current filter zzXY for each pass individually */
+    std::vector<bool> m_PARAMactivateZigZagXYWithSigma; /**< activates/deactivates current filter zzXY with sigmas for each pass individually */
     std::vector<bool> m_PARAMactivateZigZagRZ; /**< activates/deactivates current filter zzRZ for each pass individually */
     std::vector<bool> m_PARAMactivateDeltaPt; /**< activates/deactivates current filter dPt for each pass individually */
     std::vector<bool> m_PARAMactivateDeltaDistance2IP; /**< activates/deactivates current filter dd2IP for each pass individually*/
@@ -466,6 +468,18 @@ namespace Belle2 {
     std::vector<bool> m_PARAMactivateDeltaPtHioC; /**< activates/deactivates current filter dPt (high occupancy mode) for each pass individually */
     std::vector<bool> m_PARAMactivateDeltaDistance2IPHioC; /**< activates/deactivates current filter dd2IP (high occupancy mode) for each pass individually*/
 
+    // debugging tests:
+    std::vector<bool> m_PARAMactivateAlwaysTrue2Hit; /**< activates/deactivates current filter AlwaysTrue2Hit for each pass individually*/
+    std::vector<bool> m_PARAMactivateAlwaysFalse2Hit; /**< activates/deactivates current filter AlwaysFalse2Hit for each pass individually*/
+    std::vector<bool> m_PARAMactivateRandom2Hit; /**< activates/deactivates current filter Random2Hit for each pass individually*/
+    std::vector<bool> m_PARAMactivateAlwaysTrue3Hit; /**< activates/deactivates current filter AlwaysTrue3Hit for each pass individually*/
+    std::vector<bool> m_PARAMactivateAlwaysFalse3Hit; /**< activates/deactivates current filter AlwaysFalse3Hit for each pass individually*/
+    std::vector<bool> m_PARAMactivateRandom3Hit; /**< activates/deactivates current filter Random3Hit for each pass individually*/
+    std::vector<bool> m_PARAMactivateAlwaysTrue4Hit; /**< activates/deactivates current filter AlwaysTrue4Hit for each pass individually*/
+    std::vector<bool> m_PARAMactivateAlwaysFalse4Hit; /**< activates/deactivates current filter AlwaysFalse4Hit for each pass individually*/
+    std::vector<bool> m_PARAMactivateRandom4Hit; /**< activates/deactivates current filter Random4Hit for each pass individually*/
+
+    // tuning parameters:
     std::vector<double> m_PARAMtuneDistance3D; /**< tunes current filter d3D for each pass individually, formula: min: cut = cut-tuneValue*cut, max: cut = cut + tuneValue*cut -> tuneValue of 0, no changes, 1, stretch by 100% of own size... */
     std::vector<double> m_PARAMtuneDistanceXY; /**< tunes current filter dXY for each pass individually, same formula as in tuneDistance3D */
     std::vector<double> m_PARAMtuneDistanceZ; /**< tunes current filter dZ for each pass individually, same formula as in tuneDistance3D */
@@ -481,6 +495,7 @@ namespace Belle2 {
     std::vector<double> m_PARAMtuneDeltaSOverZ; /**< tunes current filter DeltaSOverZ for each pass individually, same formula as in tuneDistance3D */
     std::vector<double> m_PARAMtuneDeltaSlopeZOverS; /**< tunes current filter DeltaSlopeZOverS for each pass individually, same formula as in tuneDistance3D */
     std::vector<double> m_PARAMtuneZigZagXY; /**< tunes current filter zzXY for each pass individually, same formula as in tuneDistance3D */
+    std::vector<double> m_PARAMtuneZigZagXYWithSigma; /**< tunes current filter zzXY with sigmas for each pass individually */
     std::vector<double> m_PARAMtuneZigZagRZ; /**< tunes current filter zzRZ for each pass individually, same formula as in tuneDistance3D */
     std::vector<double> m_PARAMtuneDeltaPt; /**< tunes current filter dPt for each pass individually, same formula as in tuneDistance3D */
     std::vector<double> m_PARAMtuneDeltaDistance2IP; /**< tunes current filter dd2IP for each pass individually, same formula as in tuneDistance3D */
@@ -495,6 +510,16 @@ namespace Belle2 {
     std::vector<double> m_PARAMtuneHelixParameterFitHioC; /**< tunes current filter HelixParameterFit (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
     std::vector<double> m_PARAMtuneDeltaPtHioC; /**< tunes current filter dPt (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
     std::vector<double> m_PARAMtuneDeltaDistance2IPHioC; /**< tunes current filter dd2IP (high occupancy mode) for each pass individually, same formula as in tuneDistance3D */
+
+    std::vector<double> m_PARAMtuneAlwaysTrue2Hit; /**< tunes current filter AlwaysTrue2Hit for each pass individually*/
+    std::vector<double> m_PARAMtuneAlwaysFalse2Hit; /**< tunes current filter AlwaysFalse2Hit for each pass individually*/
+    std::vector<double> m_PARAMtuneRandom2Hit; /**< tunes current filter Random2Hit for each pass individually*/
+    std::vector<double> m_PARAMtuneAlwaysTrue3Hit; /**< tunes current filter AlwaysTrue3Hit for each pass individually*/
+    std::vector<double> m_PARAMtuneAlwaysFalse3Hit; /**< tunes current filter AlwaysFalse3Hit for each pass individually*/
+    std::vector<double> m_PARAMtuneRandom3Hit; /**< tunes current filter Random3Hit for each pass individually*/
+    std::vector<double> m_PARAMtuneAlwaysTrue4Hit; /**< tunes current filter AlwaysTrue4Hit for each pass individually*/
+    std::vector<double> m_PARAMtuneAlwaysFalse4Hit; /**< tunes current filter AlwaysFalse4Hit for each pass individually*/
+    std::vector<double> m_PARAMtuneRandom4Hit; /**< tunes current filter Random4Hit for each pass individually*/
 
 
     std::vector<double> m_PARAMsetupWeigh; /**< allows to individually weigh (level of surpression) each setup/pass. Please choose between 0 and -100 (%), higher momentum setups are more reliable, therefore should be weighed best */
@@ -577,6 +602,7 @@ namespace Belle2 {
     int m_TESTERrejectedBrokenHitsTrack; /**< counts number of times, where a tc having at least 1 1D-SVD hit was rejected */
     int m_TESTERsucceededBaselineTF; /**< counts number of times, the baselineTF found a track */
     int m_TESTERtriggeredZigZagXY;/**< counts how many times zigZagXY filter found bad TCs */
+    int m_TESTERtriggeredZigZagXYWithSigma;/**< counts how many times zigZagXYWithSigma filter found bad TCs */
     int m_TESTERtriggeredZigZagRZ;/**< counts how many times zigZagRZ filter found bad TCs */
     int m_TESTERtriggeredDpT; /**< counts how many times deltaPt filter found bad TCs  */
     int m_TESTERtriggeredCircleFit; /**< counts how many times circleFit filter found bad TCs  */

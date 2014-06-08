@@ -169,6 +169,32 @@ FilterCalculatorModule::FilterCalculatorModule() : Module()
   addParam("logDeltaPtHighOccupancy", m_PARAMlogDeltaPtHighOccupancy, "set 'true' if you want to log delta Pt HighOccupancy between segments", bool(true));
   addParam("logDeltaDistCircleCenterHighOccupancy", m_PARAMlogDeltaDistCircleCenterHighOccupancy, "set 'true' to compare the HighOccupancy distance of the calculated centers of track circles", bool(true));
 
+  // debug filters, should only be logged if they shall be used for testing!
+  addParam("logAlwaysTrue2Hit", m_PARAMlogAlwaysTrue2Hit,
+           "debug filters: set 'true' if you want to log AlwaysTrue2Hit between segments", bool(false));
+  addParam("logAlwaysFalse2Hit", m_PARAMlogAlwaysFalse2Hit,
+           "debug filters: set 'true' if you want to log AlwaysFalse2Hit between segments", bool(false));
+  addParam("logRandom2Hit", m_PARAMlogRandom2Hit,
+           "debug filters: set 'true' if you want to log Random2Hit between segments", bool(false));
+  addParam("logAlwaysTrue3Hit", m_PARAMlogAlwaysTrue3Hit,
+           "debug filters: set 'true' if you want to log AlwaysTrue3Hit between segments", bool(false));
+  addParam("logAlwaysFalse3Hit", m_PARAMlogAlwaysFalse3Hit,
+           "debug filters: set 'true' if you want to log AlwaysFalse3Hit between segments", bool(false));
+  addParam("logRandom3Hit", m_PARAMlogRandom3Hit,
+           "debug filters: set 'true' if you want to log Random3Hit between segments", bool(false));
+  addParam("logAlwaysTrue4Hit", m_PARAMlogAlwaysTrue4Hit,
+           "debug filters: set 'true' if you want to log AlwaysTrue4Hit between segments", bool(false));
+  addParam("logAlwaysFalse4Hit", m_PARAMlogAlwaysFalse4Hit,
+           "debug filters: set 'true' if you want to log AlwaysFalse4Hit between segments", bool(false));
+  addParam("logRandom4Hit", m_PARAMlogRandom4Hit,
+           "debug filters: set 'true' if you want to log Random4Hit between segments", bool(false));
+  addParam("logZigZagXY", m_PARAMlogZigZagXY,
+           "WARNING ZigZagXY is not a debug filter but since it does not work using cutoffs, this Filter shall not be logged, since it only collects random data (this logging is needed to bypass a design-flaw, which discards sectorMaps which only carry Filters which do not need cutoffs)", bool(false));
+  addParam("logZigZagXYWithSigmas", m_PARAMlogZigZagXYWithSigmas,
+           "WARNING ZigZagXYWithSigmas is not a debug filter but since it does not work using cutoffs, this Filter shall not be logged, since it only collects random data (this logging is needed to bypass a design-flaw, which discards sectorMaps which only carry Filters which do not need cutoffs)", bool(false));
+  addParam("logZigZagRZ", m_PARAMlogZigZagRZ,
+           "WARNING ZigZagRZ is not a debug filter but since it does not work using cutoffs, this Filter shall not be logged, since it only collects random data (this logging is needed to bypass a design-flaw, which discards sectorMaps which only carry Filters which do not need cutoffs)", bool(false));
+
   addParam("useOldSecCalc", m_PARAMuseOldSecCalc, "WARNING DEBUG - if true, old way to calc secID is used April15th-2014", bool(false));
 }
 
@@ -756,7 +782,7 @@ void FilterCalculatorModule::event()
                   B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltapT-Value: " << deltapT << " gets stored in sector " << thisSectorPos->second.getSectorID())
                   thisSectorPos->second.addValue(friendSector, FilterID::deltapT, deltapT);
                 } else {
-                  B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated deltapT-value got discarded")
+                  B2DEBUG(50, "4-hit-filter in event " << m_eventCounter << ": calculated deltapT-value got discarded")
                 }
               } else {
                 m_badFilterValueCtr++; B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculated deltapT-Value: " << deltapT << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
@@ -784,6 +810,32 @@ void FilterCalculatorModule::event()
                 m_badFilterValueCtr++; B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculated deltaDistCircleCenter-Value: " << deltaDistCircleCenter << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
                 hitG.Print(); moHitG.Print(); graMoHitG.Print(); greGraMoHitG.Print();
               }
+            }
+
+            //#### debugFilters:
+            if (m_PARAMlogAlwaysTrue4Hit == true) {
+              B2DEBUG(50, "4-hit-filterDEBUG in event " << m_eventCounter << ": calculated alwaysTrue4Hit-Value: " << 1 << " gets stored in sector " << thisSectorPos->second.getSectorID())
+              thisSectorPos->second.addValue(friendSector, FilterID::alwaysTrue4Hit, 1);
+            }
+            if (m_PARAMlogAlwaysFalse4Hit == true) {
+              B2DEBUG(50, "4-hit-filterDEBUG in event " << m_eventCounter << ": calculated alwaysFalse4Hit-Value: " << 0 << " gets stored in sector " << thisSectorPos->second.getSectorID())
+              thisSectorPos->second.addValue(friendSector, FilterID::alwaysFalse4Hit, 0);
+            }
+            if (m_PARAMlogRandom4Hit == true) {
+              B2DEBUG(50, "4-hit-filterDEBUG in event " << m_eventCounter << ": calculated random4Hit-Value: " << 0.5 << " gets stored in sector " << thisSectorPos->second.getSectorID())
+              thisSectorPos->second.addValue(friendSector, FilterID::random4Hit, 0.5);
+            }
+            if (m_PARAMlogZigZagXY == true) {
+              B2DEBUG(50, "4-hit-filterDEBUG in event " << m_eventCounter << ": calculated ziggZaggXY-Value: " << 1 << " gets stored in sector " << thisSectorPos->second.getSectorID())
+              thisSectorPos->second.addValue(friendSector, FilterID::ziggZaggXY, 1);
+            }
+            if (m_PARAMlogAlwaysTrue4Hit == true) {
+              B2DEBUG(50, "4-hit-filterDEBUG in event " << m_eventCounter << ": calculated ziggZaggXYWithSigma-Value: " << 1 << " gets stored in sector " << thisSectorPos->second.getSectorID())
+              thisSectorPos->second.addValue(friendSector, FilterID::ziggZaggXYWithSigma, 1);
+            }
+            if (m_PARAMlogAlwaysTrue4Hit == true) {
+              B2DEBUG(50, "4-hit-filterDEBUG in event " << m_eventCounter << ": calculated ziggZaggRZ-Value: " << 1 << " gets stored in sector " << thisSectorPos->second.getSectorID())
+              thisSectorPos->second.addValue(friendSector, FilterID::ziggZaggRZ, 1);
             }
 
             ++it4HitsFilter; /// -"- 4hit-Filters...
@@ -1006,6 +1058,19 @@ void FilterCalculatorModule::event()
             }
           }
 
+          //#### debugFilters:
+          if (m_PARAMlogAlwaysTrue3Hit == true) {
+            B2DEBUG(50, "3-hit-filterDEBUG in event " << m_eventCounter << ": calculated alwaysTrue3Hit-Value: " << 1 << " gets stored in sector " << thisSectorPos->second.getSectorID())
+            thisSectorPos->second.addValue(friendSector, FilterID::alwaysTrue3Hit, 1);
+          }
+          if (m_PARAMlogAlwaysFalse3Hit == true) {
+            B2DEBUG(50, "3-hit-filterDEBUG in event " << m_eventCounter << ": calculated alwaysFalse3Hit-Value: " << 0 << " gets stored in sector " << thisSectorPos->second.getSectorID())
+            thisSectorPos->second.addValue(friendSector, FilterID::alwaysFalse3Hit, 0);
+          }
+          if (m_PARAMlogRandom3Hit == true) {
+            B2DEBUG(50, "3-hit-filterDEBUG in event " << m_eventCounter << ": calculated random3Hit-Value: " << 0.5 << " gets stored in sector " << thisSectorPos->second.getSectorID())
+            thisSectorPos->second.addValue(friendSector, FilterID::random3Hit, 0.5);
+          }
 
           ++it3HitsFilter; /// -"- 3hit-Filters...
 
@@ -1131,16 +1196,6 @@ void FilterCalculatorModule::event()
             hitGlobal.Print(); motherHitGlobal.Print(); m_origin.Print();
           }
         }
-// // // //         if (m_PARAMlogHelixParameterFit == true) {
-// // // //             helixParameterFit = m_threeHitFilterBox.calcHelixParameterFit();
-// // // //             if (std::isnan(helixParameterFit) == false) {
-// // // //               B2DEBUG(50, "3-hit-filter in event " << m_eventCounter << ": calculated helixParameterFit-Value: " << helixParameterFit << " gets stored in sector " << thisSectorPos->second.getSectorID())
-// // // //               thisSectorPos->second.addValue(friendSector, FilterID::helixParameterFit, helixParameterFit);
-// // // //             } else {
-// // // //               m_badFilterValueCtr++; B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculated helixParameterFit-Value: " << helixParameterFit << " is 'nan'! currentSec: " << currentSector << ", friendSec: " << friendSector << ". Printing Vectors(outer2inner): ")
-// // // //               hitGlobal.Print(); motherHitGlobal.Print(); grandMotherHitGlobal.Print();
-// // // //             }
-// // // //           }
 
 //         if (m_PARAMlogDeltaSOverZHighOccupancy == true and lastRun == false) {
 //             deltaSOverZ = m_threeHitFilterBox.calcDeltaSOverZ();
@@ -1222,6 +1277,19 @@ void FilterCalculatorModule::event()
           }
         }
 
+        //#### debugFilters:
+        if (m_PARAMlogAlwaysTrue2Hit == true) {
+          B2DEBUG(50, "2-hit-filterDEBUG in event " << m_eventCounter << ": calculated alwaysTrue2Hit-Value: " << 1 << " gets stored in sector " << thisSectorPos->second.getSectorID())
+          thisSectorPos->second.addValue(friendSector, FilterID::alwaysTrue2Hit, 1);
+        }
+        if (m_PARAMlogAlwaysFalse2Hit == true) {
+          B2DEBUG(50, "2-hit-filterDEBUG in event " << m_eventCounter << ": calculated alwaysFalse2Hit-Value: " << 0 << " gets stored in sector " << thisSectorPos->second.getSectorID())
+          thisSectorPos->second.addValue(friendSector, FilterID::alwaysFalse2Hit, 0);
+        }
+        if (m_PARAMlogRandom2Hit == true) {
+          B2DEBUG(50, "2-hit-filterDEBUG in event " << m_eventCounter << ": calculated random2Hit-Value: " << 0.5 << " gets stored in sector " << thisSectorPos->second.getSectorID())
+          thisSectorPos->second.addValue(friendSector, FilterID::random2Hit, 0.5);
+        }
         ++it2HitsFilter; //important for 2hit-Filters: points to current hit of 2-hit-processes
 
       } else { firstrun = false; }

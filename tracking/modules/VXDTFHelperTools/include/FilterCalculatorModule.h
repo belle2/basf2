@@ -482,11 +482,23 @@ namespace Belle2 {
     bool m_PARAMlogDeltaPtHighOccupancy; /**< set 'true' if you want to log delta Pt between segments  - high occupancy mode */
     bool m_PARAMlogDeltaSlopeHighOccupancyRZ; /**< set 'true' if you want to log delta slopes in r-z-plane between segments  - high occupancy mode */
     bool m_PARAMlogHelixParameterHighOccupancyFit; /**< set 'true' if you want to log delta ((helix-circle-segment-angle) / deltaZ)  - high occupancy mode */
-//     bool m_PARAMlogDeltaSOverZ; /**< set 'true' if you want to log Delta S (arc-length) over Z */
-//     bool m_PARAMlogDeltaSlopeZOverSHighOccupancy; /**< set 'true' if you want to log Delta of the slope Z over S */
     bool m_PARAMlogSlopeHighOccupancyRZHighOccupancy; /**< set 'true' to log slope in r-z-plane for line of 2 trackHits  - high occupancy mode */
     bool m_PARAMlogTRadiusHighOccupancytoIPDistance; /**< set 'true' to log the difference between the radius of the track circle in x-y-plan and the distance of the center of the circle tdeltaSOverZo the IP  - high occupancy mode */
     bool m_PARAMlogDeltaDistCircleCenterHighOccupancy; /**< set 'true' to compare the distance of the calculated centers of track circles  - high occupancy mode */
+
+    // debug filters, should only be logged if they shall be used for testing!
+    bool m_PARAMlogAlwaysTrue2Hit; /**< set 'true' if you want to log AlwaysTrue2Hit between segments */
+    bool m_PARAMlogAlwaysFalse2Hit; /**< set 'true' if you want to log AlwaysFalse2Hit between segments */
+    bool m_PARAMlogRandom2Hit; /**< set 'true' if you want to log Random2Hit between segments */
+    bool m_PARAMlogAlwaysTrue3Hit; /**< set 'true' if you want to log AlwaysTrue2Hit between segments */
+    bool m_PARAMlogAlwaysFalse3Hit; /**< set 'true' if you want to log AlwaysFalse2Hit between segments */
+    bool m_PARAMlogRandom3Hit; /**< set 'true' if you want to log Random2Hit between segments */
+    bool m_PARAMlogAlwaysTrue4Hit; /**< set 'true' if you want to log AlwaysTrue2Hit between segments */
+    bool m_PARAMlogAlwaysFalse4Hit; /**< set 'true' if you want to log AlwaysFalse2Hit between segments */
+    bool m_PARAMlogRandom4Hit; /**< set 'true' if you want to log Random2Hit between segments */
+    bool m_PARAMlogZigZagXY; /**< WARNING ZigZagXY is not a debug filter but since it does not work using cutoffs, this Filter shall not be logged, since it only collects random data (this logging is needed to bypass a design-flaw, which discards sectorMaps which only carry Filters which do not need cutoffs) */
+    bool m_PARAMlogZigZagXYWithSigmas; /**< WARNING ZigZagXYWithSigmas is not a debug filter but since it does not work using cutoffs, this Filter shall not be logged, since it only collects random data (this logging is needed to bypass a design-flaw, which discards sectorMaps which only carry Filters which do not need cutoffs) */
+    bool m_PARAMlogZigZagRZ; /**< WARNING ZigZagRZ is not a debug filter but since it does not work using cutoffs, this Filter shall not be logged, since it only collects random data (this logging is needed to bypass a design-flaw, which discards sectorMaps which only carry Filters which do not need cutoffs) */
 
     bool m_PARAMexportSectorCoords; /**< set true if you want to export coordinates of the sectors too */
 

@@ -133,68 +133,11 @@ VXDTFModule::VXDTFModule() : Module()
   vector<double> reserveHitsThreshold;
   reserveHitsThreshold.push_back(0.6);
 
-  vector<bool> activateDistance3D, activateDistanceXY, activateDistanceZ, activateSlopeRZ, activateNormedDistance3D, activateAngles3D, activateAnglesXY, activateAnglesRZ, activateDeltaSlopeRZ, activateDistance2IP, activatePT, activateHelixParameterFit, activateDeltaSOverZ, activateDeltaSlopeZOverS, activateAngles3DHioC, activateAnglesXYHioC, activateAnglesRZHioC, activateDeltaSlopeRZHioC, activateDistance2IPHioC, activatePTHioC, activateHelixParameterFitHioC, activateZigZagXY, activateZigZagRZ, activateDeltaPt, activateDeltaDistance2IP, activateCircleFit, activateDeltaPtHioC, activateDeltaDistance2IPHioC;
-  activateDistance3D.push_back(true);
-  activateDistanceXY.push_back(true);
-  activateDistanceZ.push_back(false);
-  activateSlopeRZ.push_back(false);
-  activateNormedDistance3D.push_back(false);
-  activateAngles3D.push_back(true);
-  activateAnglesXY.push_back(true);
-  activateAnglesRZ.push_back(false);
-  activateDeltaSlopeRZ.push_back(false);
-  activatePT.push_back(true);
-  activateHelixParameterFit.push_back(false);
-  activateDeltaSOverZ.push_back(false);
-  activateDeltaSlopeZOverS.push_back(false);
-  activateDistance2IP.push_back(false);
-  activateZigZagXY.push_back(true); // first pass
-  activateZigZagXY.push_back(true); // second pass
-  activateZigZagXY.push_back(false); // third pass
-  activateZigZagRZ.push_back(false);
-  activateDeltaPt.push_back(true);
-  activateDeltaDistance2IP.push_back(false);
-  activateCircleFit.push_back(true);
-  activateAngles3DHioC.push_back(true);
-  activateAnglesXYHioC.push_back(true);
-  activateAnglesRZHioC.push_back(false);
-  activateDeltaSlopeRZHioC.push_back(false);
-  activatePTHioC.push_back(true);
-  activateHelixParameterFitHioC.push_back(false);
-  activateDistance2IPHioC.push_back(true);
-  activateDeltaPtHioC.push_back(true);
-  activateDeltaDistance2IPHioC.push_back(true);
-  vector<double> tuneDistance3D, tuneDistanceXY, tuneDistanceZ, tuneSlopeRZ, tuneNormedDistance3D, tuneAngles3D, tuneAnglesXY, tuneAnglesRZ, tuneDeltaSlopeRZ, tuneDistance2IP, tunePT, tuneHelixParameterFit, tuneDeltaSOverZ, tuneDeltaSlopeZOverS, tuneAngles3DHioC, tuneAnglesXYHioC, tuneAnglesRZHioC, tuneDeltaSlopeRZHioC, tuneDistance2IPHioC, tunePTHioC, tuneHelixParameterFitHioC, tuneZigZagXY, tuneZigZagRZ, tuneDeltaPt, tuneDeltaDistance2IP, tuneCircleFit, tuneDeltaPtHioC, tuneDeltaDistance2IPHioC;
-  tuneDistance3D.push_back(0);
-  tuneDistanceXY.push_back(0);
-  tuneDistanceZ.push_back(0);
-  tuneSlopeRZ.push_back(0);
-  tuneNormedDistance3D.push_back(0);
-  tuneAngles3D.push_back(0);
-  tuneAnglesXY.push_back(0);
-  tuneAnglesRZ.push_back(0);
-  tuneDeltaSlopeRZ.push_back(0);
-  tuneDistance2IP.push_back(0);
-  tunePT.push_back(0);
-  tuneHelixParameterFit.push_back(0);
-  tuneDeltaSOverZ.push_back(0);
-  tuneDeltaSlopeZOverS.push_back(0);
-  tuneZigZagXY.push_back(0);
-  tuneZigZagRZ.push_back(0);
-  tuneDeltaPt.push_back(0);
-  tuneDeltaDistance2IP.push_back(0);
-  tuneCircleFit.push_back(0.001); // chi2-threshold first pass
-  tuneCircleFit.push_back(0.001); // chi2-threshold second pass
-  tuneCircleFit.push_back(0.00001); // chi2-threshold third pass
-  tuneAngles3DHioC.push_back(0);
-  tuneAnglesXYHioC.push_back(0);
-  tuneAnglesRZHioC.push_back(0);
-  tuneDeltaSlopeRZHioC.push_back(0);
-  tuneDistance2IPHioC.push_back(0);
-  tunePTHioC.push_back(0);
-  tuneHelixParameterFitHioC.push_back(0);
-  tuneDeltaPtHioC.push_back(0);
-  tuneDeltaDistance2IPHioC.push_back(0);
+  vector<bool> activateTRUE = { true };
+  vector<bool> activateFALSE = { false };
+  vector<bool> activateZigZagXY = { false, true, true }; // 1st, 2nd, 3rd-pass
+  vector<double> tuneZERO = { 0 };
+  vector<double> tuneCircleFit = { 0.00001, 0.001, 0.001 }; // 1st, 2nd, 3rd-pass chi2-threshold
 
   vector<string> rootFileNameVals;
   rootFileNameVals.push_back(string("VXDTFoutput"));
@@ -207,117 +150,467 @@ VXDTFModule::VXDTFModule() : Module()
 
   ///Steering parameter import
 
-  addParam("debugMode", m_PARAMDebugMode, "some code will only be executed if this mode is enabled (leading to more verbose output)", bool(false));
-  addParam("sectorSetup", m_PARAMsectorSetup, "lets you chose the sectorSetup (compatibility of sensors, individual cutoffs,...) accepts 'std', 'low', 'high' and 'personal', please note that the chosen setup has to exist as a xml-file in ../tracking/data/friendList_XXX.xml. If you can not create your own xml files using e.g. the filterCalculatorModule, use params for  'tuneCutoffXXX' (for tuning single values) or 'tuneCutoffs' (for tuning all at once) instead. multipass supported by setting setups in a row", sectorSetup);
+  addParam("debugMode",
+           m_PARAMDebugMode,
+           "some code will only be executed if this mode is enabled (leading to more verbose output)",
+           bool(false));
+  addParam("sectorSetup",
+           m_PARAMsectorSetup,
+           "lets you chose the sectorSetup (compatibility of sensors, individual cutoffs,...) accepts 'std', 'low', 'high' and 'personal', please note that the chosen setup has to exist as a xml-file in ../tracking/data/friendList_XXX.xml. If you can not create your own xml files using e.g. the filterCalculatorModule, use params for  'tuneCutoffXXX' (for tuning single values) or 'tuneCutoffs' (for tuning all at once) instead. multipass supported by setting setups in a row",
+           sectorSetup);
 
-  addParam("tuneCutoffs", m_PARAMtuneCutoffs, "for rapid changes of all cutoffs (no personal xml files needed), reduces/enlarges the range of the cutoffs in percent (lower and upper values are changed by this value). Only valid in range -99% < x < +1000%", double(0.0));
-  addParam("GFTrackCandidatesColName", m_PARAMgfTrackCandsColName, "Name of collection holding the genfit::TrackCandidates (output)", string(""));
-  addParam("InfoBoardName", m_PARAMinfoBoardName, "Name of container used for data transfer to TFAnalyzer, only used when TESTERexpandedTestingRoutines == true", string(""));
-  addParam("telClustersName", m_PARAMtelClustersName, "Name of storeArray containing tel clusters (only valid when using secMap supporting tel clusters)", string("TELClusters"));
-  addParam("pxdClustersName", m_PARAMpxdClustersName, "Name of storeArray containing pxd clusters (only valid when using secMap supporting pxd clusters)", string(""));
-  addParam("svdClustersName", m_PARAMsvdClustersName, "Name of storeArray containing svd clusters (only valid when using secMap supporting svd clusters)", string(""));
+  addParam("tuneCutoffs",
+           m_PARAMtuneCutoffs,
+           "for rapid changes of all cutoffs (no personal xml files needed), reduces/enlarges the range of the cutoffs in percent (lower and upper values are changed by this value). Only valid in range -99% < x < +1000%",
+           double(0.0));
+  addParam("GFTrackCandidatesColName",
+           m_PARAMgfTrackCandsColName,
+           "Name of collection holding the genfit::TrackCandidates (output)",
+           string(""));
+  addParam("InfoBoardName",
+           m_PARAMinfoBoardName,
+           "Name of container used for data transfer to TFAnalyzer, only used when TESTERexpandedTestingRoutines == true",
+           string(""));
+  addParam("telClustersName",
+           m_PARAMtelClustersName,
+           "Name of storeArray containing tel clusters (only valid when using secMap supporting tel clusters)",
+           string("TELClusters"));
+  addParam("pxdClustersName",
+           m_PARAMpxdClustersName,
+           "Name of storeArray containing pxd clusters (only valid when using secMap supporting pxd clusters)",
+           string(""));
+  addParam("svdClustersName",
+           m_PARAMsvdClustersName,
+           "Name of storeArray containing svd clusters (only valid when using secMap supporting svd clusters)",
+           string(""));
 
-  addParam("nameOfInstance", m_PARAMnameOfInstance, "Name of trackFinder, usefull, if there is more than one VXDTF running at the same time. Note: please choose short names", string("VXDTF"));
-  addParam("activateBaselineTF", m_PARAMactivateBaselineTF, "there is a baseline trackfinder which catches events with a very small number of hits, e.g. bhabha, cosmic and single-track-events. Settings: 0 = deactivate baseLineTF, 1=activate it and use normal TF as fallback, 2= baseline-TF-only", int(1));
-
-
-  addParam("activateDistance3D", m_PARAMactivateDistance3D, " set True/False for each setup individually", activateDistance3D);
-  addParam("activateDistanceXY", m_PARAMactivateDistanceXY, " set True/False for each setup individually", activateDistanceXY);
-  addParam("activateDistanceZ", m_PARAMactivateDistanceZ, " set True/False for each setup individually", activateDistanceZ);
-  addParam("activateSlopeRZ", m_PARAMactivateSlopeRZ, " set True/False for each setup individually", activateSlopeRZ);
-  addParam("activateNormedDistance3D", m_PARAMactivateNormedDistance3D, " set True/False for each setup individually", activateNormedDistance3D);
-
-  addParam("activateAngles3DHioC", m_PARAMactivateAngles3DHioC, " set True/False for each setup individually", activateAngles3DHioC);
-  addParam("activateAnglesXYHioC", m_PARAMactivateAnglesXYHioC, " set True/False for each setup individually", activateAnglesXYHioC);
-  addParam("activateAnglesRZHioC", m_PARAMactivateAnglesRZHioC, " set True/False for each setup individually", activateAnglesRZHioC);
-  addParam("activateDeltaSlopeRZHioC", m_PARAMactivateDeltaSlopeRZHioC, " set True/False for each setup individually", activateDeltaSlopeRZHioC);
-  addParam("activateDistance2IPHioC", m_PARAMactivateDistance2IPHioC, " set True/False for each setup individually", activateDistance2IPHioC);
-  addParam("activatePTHioC", m_PARAMactivatePTHioC, " set True/False for each setup individually", activatePTHioC);
-  addParam("activateHelixParameterFitHioC", m_PARAMactivateHelixParameterFitHioC, " set True/False for each setup individually", activateHelixParameterFitHioC);
-
-  addParam("tuneAngles3DHioC", m_PARAMtuneAngles3DHioC, " tune for each setup individually, in %", tuneAngles3DHioC);
-  addParam("tuneAnglesXYHioC", m_PARAMtuneAnglesXYHioC, " tune for each setup individually, in %", tuneAnglesXYHioC);
-  addParam("tuneAnglesRZHioC", m_PARAMtuneAnglesRZHioC, " tune for each setup individually, in %", tuneAnglesRZHioC);
-  addParam("tuneDeltaSlopeRZHioC", m_PARAMtuneDeltaSlopeRZHioC, " tune for each setup individually, in %", tuneDeltaSlopeRZHioC);
-  addParam("tuneDistance2IPHioC", m_PARAMtuneDistance2IPHioC, " tune for each setup individually, in %", tuneDistance2IPHioC);
-  addParam("tunePTHioC", m_PARAMtunePTHioC, " tune for each setup individually, in %", tunePTHioC);
-  addParam("tuneHelixParameterFitHioC", m_PARAMtuneHelixParameterFitHioC, " tune for each setup individually, in %", tuneHelixParameterFitHioC);
-  addParam("activateDeltaPtHioC", m_PARAMactivateDeltaPtHioC, " set True/False for each setup individually", activateDeltaPtHioC);
-  addParam("activateDeltaDistance2IPHioC", m_PARAMactivateDeltaDistance2IPHioC, " set True/False for each setup individually", activateDeltaDistance2IPHioC);
-  addParam("tuneDeltaPtHioC", m_PARAMtuneDeltaPtHioC, " tune for each setup individually, in %", tuneDeltaPtHioC);
-  addParam("tuneDeltaDistance2IPHioC", m_PARAMtuneDeltaDistance2IPHioC, " tune for each setup individually, in %", tuneDeltaDistance2IPHioC);
-
-
-  addParam("activateAngles3D", m_PARAMactivateAngles3D, " set True/False for each setup individually", activateAngles3D);
-  addParam("activateAnglesXY", m_PARAMactivateAnglesXY, " set True/False for each setup individually", activateAnglesXY);
-  addParam("activateAnglesRZ", m_PARAMactivateAnglesRZ, " set True/False for each setup individually", activateAnglesRZ);
-  addParam("activateDeltaSlopeRZ", m_PARAMactivateDeltaSlopeRZ, " set True/False for each setup individually", activateDeltaSlopeRZ);
-  addParam("activateDistance2IP", m_PARAMactivateDistance2IP, " set True/False for each setup individually", activateDistance2IP);
-  addParam("activatePT", m_PARAMactivatePT, " set True/False for each setup individually", activatePT);
-  addParam("activateHelixParameterFit", m_PARAMactivateHelixParameterFit, " set True/False for each setup individually", activateHelixParameterFit);
-  addParam("activateDeltaSOverZ", m_PARAMactivateDeltaSOverZ, " set True/False for each setup individually", activateDeltaSOverZ);
-  addParam("activateDeltaSlopeZOverS", m_PARAMactivateDeltaSlopeZOverS, " set True/False for each setup individually", activateDeltaSlopeZOverS);
-
-  addParam("activateZigZagXY", m_PARAMactivateZigZagXY, " set True/False for each setup individually", activateZigZagXY);
-  addParam("activateZigZagRZ", m_PARAMactivateZigZagRZ, " set True/False for each setup individually", activateZigZagRZ);
-  addParam("activateDeltaPt", m_PARAMactivateDeltaPt, " set True/False for each setup individually", activateDeltaPt);
-  addParam("activateDeltaDistance2IP", m_PARAMactivateDeltaDistance2IP, " set True/False for each setup individually", activateDeltaDistance2IP);
-  addParam("activateCircleFit", m_PARAMactivateCircleFit, " set True/False for each setup individually", activateCircleFit);
+  addParam("nameOfInstance",
+           m_PARAMnameOfInstance,
+           "Name of trackFinder, usefull, if there is more than one VXDTF running at the same time. Note: please choose short names",
+           string("VXDTF"));
+  addParam("activateBaselineTF",
+           m_PARAMactivateBaselineTF,
+           "there is a baseline trackfinder which catches events with a very small number of hits, e.g. bhabha, cosmic and single-track-events. Settings: 0 = deactivate baseLineTF, 1=activate it and use normal TF as fallback, 2= baseline-TF-only",
+           int(1));
 
 
-  addParam("tuneDistance3D", m_PARAMtuneDistance3D, " tune for each setup individually in %", tuneDistance3D);
-  addParam("tuneDistanceXY", m_PARAMtuneDistanceXY, " tune for each setup individually, in %", tuneDistanceXY);
-  addParam("tuneDistanceZ", m_PARAMtuneDistanceZ, " tune for each setup individually, in %", tuneDistanceZ);
-  addParam("tuneSlopeRZ", m_PARAMtuneSlopeRZ, " tune for each setup individually, in %", tuneSlopeRZ);
-  addParam("tuneNormedDistance3D", m_PARAMtuneNormedDistance3D, " tune for each setup individually, in %", tuneNormedDistance3D);
+  addParam("activateDistance3D",
+           m_PARAMactivateDistance3D,
+           " set True/False for each setup individually",
+           activateTRUE);
+  addParam("activateDistanceXY",
+           m_PARAMactivateDistanceXY,
+           " set True/False for each setup individually",
+           activateTRUE);
+  addParam("activateDistanceZ",
+           m_PARAMactivateDistanceZ,
+           " set True/False for each setup individually",
+           activateFALSE);
+  addParam("activateSlopeRZ",
+           m_PARAMactivateSlopeRZ,
+           " set True/False for each setup individually",
+           activateFALSE);
+  addParam("activateNormedDistance3D",
+           m_PARAMactivateNormedDistance3D,
+           " set True/False for each setup individually",
+           activateFALSE);
 
-  addParam("tuneAngles3D", m_PARAMtuneAngles3D, " tune for each setup individually, in %", tuneAngles3D);
-  addParam("tuneAnglesXY", m_PARAMtuneAnglesXY, " tune for each setup individually, in %", tuneAnglesXY);
-  addParam("tuneAnglesRZ", m_PARAMtuneAnglesRZ, " tune for each setup individually, in %", tuneAnglesRZ);
-  addParam("tuneDeltaSlopeRZ", m_PARAMtuneDeltaSlopeRZ, " tune for each setup individually, in %", tuneDeltaSlopeRZ);
-  addParam("tuneDistance2IP", m_PARAMtuneDistance2IP, " tune for each setup individually, in %", tuneDistance2IP);
-  addParam("tunePT", m_PARAMtunePT, " tune for each setup individually, in %", tunePT);
-  addParam("tuneHelixParameterFit", m_PARAMtuneHelixParameterFit, " tune for each setup individually, in %", tuneHelixParameterFit);
-  addParam("tuneDeltaSOverZ", m_PARAMtuneDeltaSOverZ, " tune for each setup individually, in %", tuneDeltaSOverZ);
-  addParam("tuneDeltaSlopeZOverS", m_PARAMtuneDeltaSlopeZOverS, " tune for each setup individually, in %", tuneDeltaSlopeZOverS);
+  addParam("activateAngles3DHioC",
+           m_PARAMactivateAngles3DHioC,
+           " set True/False for each setup individually",
+           activateTRUE);
+  addParam("activateAnglesXYHioC",
+           m_PARAMactivateAnglesXYHioC,
+           " set True/False for each setup individually",
+           activateTRUE);
+  addParam("activateAnglesRZHioC",
+           m_PARAMactivateAnglesRZHioC,
+           " set True/False for each setup individually",
+           activateFALSE);
+  addParam("activateDeltaSlopeRZHioC",
+           m_PARAMactivateDeltaSlopeRZHioC,
+           " set True/False for each setup individually",
+           activateFALSE);
+  addParam("activateDistance2IPHioC",
+           m_PARAMactivateDistance2IPHioC,
+           " set True/False for each setup individually",
+           activateTRUE);
+  addParam("activatePTHioC",
+           m_PARAMactivatePTHioC,
+           " set True/False for each setup individually",
+           activateTRUE);
+  addParam("activateHelixParameterFitHioC",
+           m_PARAMactivateHelixParameterFitHioC,
+           " set True/False for each setup individually",
+           activateFALSE);
 
-  addParam("tuneZigZagXY", m_PARAMtuneZigZagXY, " currently not in use, only here for symmetrical reasons", tuneZigZagXY);
-  addParam("tuneZigZagRZ", m_PARAMtuneZigZagRZ, " currently not in use, only here for symmetrical reasons", tuneZigZagRZ);
-  addParam("tuneDeltaPt", m_PARAMtuneDeltaPt, " tune for each setup individually, in %", tuneDeltaPt);
-  addParam("tuneDeltaDistance2IP", m_PARAMtuneDeltaDistance2IP, " tune for each setup individually, in %", tuneDeltaDistance2IP);
-  addParam("tuneCircleFit", m_PARAMtuneCircleFit, " threshold for pValues calculated by the circleFiter for each tc. If pValue is lower than threshold, tc gets discarded", tuneCircleFit);
+  addParam("tuneAngles3DHioC",
+           m_PARAMtuneAngles3DHioC,
+           " tune for each setup individually, in %",
+           tuneZERO);
+  addParam("tuneAnglesXYHioC",
+           m_PARAMtuneAnglesXYHioC,
+           " tune for each setup individually, in %",
+           tuneZERO);
+  addParam("tuneAnglesRZHioC",
+           m_PARAMtuneAnglesRZHioC,
+           " tune for each setup individually, in %",
+           tuneZERO);
+  addParam("tuneDeltaSlopeRZHioC",
+           m_PARAMtuneDeltaSlopeRZHioC,
+           " tune for each setup individually, in %",
+           tuneZERO);
+  addParam("tuneDistance2IPHioC",
+           m_PARAMtuneDistance2IPHioC,
+           " tune for each setup individually, in %",
+           tuneZERO);
+  addParam("tunePTHioC",
+           m_PARAMtunePTHioC,
+           " tune for each setup individually, in %",
+           tuneZERO);
+  addParam("tuneHelixParameterFitHioC",
+           m_PARAMtuneHelixParameterFitHioC,
+           " tune for each setup individually, in %",
+           tuneZERO);
+
+  addParam("activateDeltaPtHioC",
+           m_PARAMactivateDeltaPtHioC,
+           " set True/False for each setup individually",
+           activateTRUE);
+  addParam("activateDeltaDistance2IPHioC",
+           m_PARAMactivateDeltaDistance2IPHioC,
+           " set True/False for each setup individually",
+           activateTRUE);
+  addParam("tuneDeltaPtHioC",
+           m_PARAMtuneDeltaPtHioC,
+           " tune for each setup individually, in %",
+           tuneZERO);
+  addParam("tuneDeltaDistance2IPHioC",
+           m_PARAMtuneDeltaDistance2IPHioC,
+           " tune for each setup individually, in %",
+           tuneZERO);
 
 
-  addParam("highOccupancyThreshold", m_PARAMhighOccupancyThreshold, "if there are more hit-combinations at a sensor than chosen threshhold, a special high-occupancy-mode will be used to filter more hits", int(17));
-  addParam("killBecauseOfOverlappsThreshold", m_PARAMkillBecauseOfOverlappsThreshold, "if there are more TCs overlapping than chosen threshold value, event kalman gets replaced by circleFit. If there are 10 times more than threshold value of TCs, the complete event gets aborted", int(500));
-  addParam("killEventForHighOccupancyThreshold", m_PARAMkillEventForHighOccupancyThreshold, "if there are more segments than threshold value, the complete event gets aborted", int(5000));
+  addParam("activateAngles3D",
+           m_PARAMactivateAngles3D,
+           " set True/False for each setup individually",
+           activateTRUE);
+  addParam("activateAnglesXY",
+           m_PARAMactivateAnglesXY,
+           " set True/False for each setup individually",
+           activateTRUE);
+  addParam("activateAnglesRZ",
+           m_PARAMactivateAnglesRZ,
+           " set True/False for each setup individually",
+           activateFALSE);
+  addParam("activateDeltaSlopeRZ",
+           m_PARAMactivateDeltaSlopeRZ,
+           " set True/False for each setup individually",
+           activateFALSE);
+  addParam("activateDistance2IP",
+           m_PARAMactivateDistance2IP,
+           " set True/False for each setup individually",
+           activateFALSE);
+  addParam("activatePT",
+           m_PARAMactivatePT,
+           " set True/False for each setup individually",
+           activateTRUE);
+  addParam("activateHelixParameterFit",
+           m_PARAMactivateHelixParameterFit,
+           " set True/False for each setup individually",
+           activateFALSE);
+  addParam("activateDeltaSOverZ",
+           m_PARAMactivateDeltaSOverZ,
+           " set True/False for each setup individually",
+           activateFALSE);
+  addParam("activateDeltaSlopeZOverS",
+           m_PARAMactivateDeltaSlopeZOverS,
+           " set True/False for each setup individually",
+           activateFALSE);
 
-  addParam("tccMinLayer", m_PARAMminLayer, "determines lowest layer considered by track candidate collector", minLayer);
-  addParam("tccMinState", m_PARAMminState, "determines lowest state of cells considered by track candidate collector", minState);
-  addParam("omega", m_PARAMomega, "tuning parameter for the hopfield network", double(0.5));
-  addParam("reserveHitsThreshold", m_PARAMreserveHitsThreshold, "tuning parameter for multi-pass-setup, valid values are 0-1 ( = 0-100%). It defines how many percent of the TCs (sorted by QI) are allowed to reserve their hits (which disallows further passes to use these hits). This does not mean that TCs which were not allowed to reserve their hits will be deleted, this only means that they have to compete with TCs of other passes for their hits again. Setting the values to 100% = 1 means, no hits used by tcs surviving that pass are reused, 0% = 0 means every tc has to compete with all tcs of other passes (quite similar to former behavior), standard is 50% = 0.5", reserveHitsThreshold);
+  addParam("activateZigZagXY",
+           m_PARAMactivateZigZagXY,
+           " set True/False for each setup individually",
+           activateZigZagXY);
+  addParam("activateZigZagXYWithSigma",
+           m_PARAMactivateZigZagXYWithSigma,
+           " set True/False for each setup individually",
+           activateFALSE);
+  addParam("activateZigZagRZ",
+           m_PARAMactivateZigZagRZ,
+           " set True/False for each setup individually",
+           activateFALSE);
+  addParam("activateDeltaPt",
+           m_PARAMactivateDeltaPt,
+           " set True/False for each setup individually",
+           activateTRUE);
+  addParam("activateDeltaDistance2IP",
+           m_PARAMactivateDeltaDistance2IP,
+           " set True/False for each setup individually",
+           activateFALSE);
+  addParam("activateCircleFit",
+           m_PARAMactivateCircleFit,
+           " set True/False for each setup individually",
+           activateTRUE);
+
+
+  addParam("tuneDistance3D",
+           m_PARAMtuneDistance3D,
+           " tune for each setup individually in %",
+           tuneZERO);
+  addParam("tuneDistanceXY",
+           m_PARAMtuneDistanceXY,
+           " tune for each setup individually, in %",
+           tuneZERO);
+  addParam("tuneDistanceZ",
+           m_PARAMtuneDistanceZ,
+           " tune for each setup individually, in %",
+           tuneZERO);
+  addParam("tuneSlopeRZ",
+           m_PARAMtuneSlopeRZ,
+           " tune for each setup individually, in %",
+           tuneZERO);
+  addParam("tuneNormedDistance3D",
+           m_PARAMtuneNormedDistance3D,
+           " tune for each setup individually, in %",
+           tuneZERO);
+
+  addParam("tuneAngles3D",
+           m_PARAMtuneAngles3D,
+           " tune for each setup individually, in %",
+           tuneZERO);
+  addParam("tuneAnglesXY",
+           m_PARAMtuneAnglesXY,
+           " tune for each setup individually, in %",
+           tuneZERO);
+  addParam("tuneAnglesRZ",
+           m_PARAMtuneAnglesRZ,
+           " tune for each setup individually, in %",
+           tuneZERO);
+  addParam("tuneDeltaSlopeRZ",
+           m_PARAMtuneDeltaSlopeRZ,
+           " tune for each setup individually, in %",
+           tuneZERO);
+  addParam("tuneDistance2IP",
+           m_PARAMtuneDistance2IP,
+           " tune for each setup individually, in %",
+           tuneZERO);
+  addParam("tunePT",
+           m_PARAMtunePT,
+           " tune for each setup individually, in %",
+           tuneZERO);
+  addParam("tuneHelixParameterFit",
+           m_PARAMtuneHelixParameterFit,
+           " tune for each setup individually, in %",
+           tuneZERO);
+  addParam("tuneDeltaSOverZ",
+           m_PARAMtuneDeltaSOverZ,
+           " tune for each setup individually, in %",
+           tuneZERO);
+  addParam("tuneDeltaSlopeZOverS",
+           m_PARAMtuneDeltaSlopeZOverS,
+           " tune for each setup individually, in %",
+           tuneZERO);
+
+  addParam("tuneZigZagXY",
+           m_PARAMtuneZigZagXY,
+           " currently not in use, only here for symmetrical reasons",
+           tuneZERO);
+  addParam("tuneZigZagXYWithSigma",
+           m_PARAMtuneZigZagXYWithSigma,
+           " currently not in use, only here for symmetrical reasons",
+           tuneZERO);
+
+  addParam("tuneZigZagRZ",
+           m_PARAMtuneZigZagRZ,
+           " currently not in use, only here for symmetrical reasons",
+           tuneZERO);
+  addParam("tuneDeltaPt",
+           m_PARAMtuneDeltaPt,
+           " tune for each setup individually, in %",
+           tuneZERO);
+  addParam("tuneDeltaDistance2IP",
+           m_PARAMtuneDeltaDistance2IP,
+           " tune for each setup individually, in %",
+           tuneZERO);
+  addParam("tuneCircleFit",
+           m_PARAMtuneCircleFit,
+           " threshold for pValues calculated by the circleFiter for each tc. If pValue is lower than threshold, tc gets discarded",
+           tuneCircleFit);
+
+
+  addParam("highOccupancyThreshold",
+           m_PARAMhighOccupancyThreshold,
+           "if there are more hit-combinations at a sensor than chosen threshhold, a special high-occupancy-mode will be used to filter more hits",
+           int(17));
+  addParam("killBecauseOfOverlappsThreshold",
+           m_PARAMkillBecauseOfOverlappsThreshold,
+           "if there are more TCs overlapping than chosen threshold value, event kalman gets replaced by circleFit. If there are 10 times more than threshold value of TCs, the complete event gets aborted",
+           int(500));
+  addParam("killEventForHighOccupancyThreshold",
+           m_PARAMkillEventForHighOccupancyThreshold,
+           "if there are more segments than threshold value, the complete event gets aborted",
+           int(5000));
+
+  addParam("tccMinLayer",
+           m_PARAMminLayer,
+           "determines lowest layer considered by track candidate collector",
+           minLayer);
+  addParam("tccMinState",
+           m_PARAMminState,
+           "determines lowest state of cells considered by track candidate collector",
+           minState);
+  addParam("omega",
+           m_PARAMomega,
+           "tuning parameter for the hopfield network",
+           double(0.5));
+  addParam("reserveHitsThreshold",
+           m_PARAMreserveHitsThreshold,
+           "tuning parameter for multi-pass-setup, valid values are 0-1 ( = 0-100%). It defines how many percent of the TCs (sorted by QI) are allowed to reserve their hits (which disallows further passes to use these hits). This does not mean that TCs which were not allowed to reserve their hits will be deleted, this only means that they have to compete with TCs of other passes for their hits again. Setting the values to 100% = 1 means, no hits used by tcs surviving that pass are reused, 0% = 0 means every tc has to compete with all tcs of other passes (quite similar to former behavior), standard is 50% = 0.5",
+           reserveHitsThreshold);
 
   //for testing purposes:
-  addParam("highestAllowedLayer", m_PARAMhighestAllowedLayer, "set value below 6 if you want to exclude outer layers (standard is 6)", highestAllowedLayer);
-  addParam("standardPdgCode", m_PARAMpdGCode, "standard value is 211 (pi+), ATTENTION, instead of using inconsistent sign of PdGList, in this module positively charged particles are always positive and negatively charged ones are negative (relevant for leptons)", int(211));
-  addParam("artificialMomentum", m_PARAMartificialMomentum, "standard value is 0. if StandardValue is changed to a nonZero value, the magnitude of the momentum seed is set artificially using this value, if value < 0, not only the magnitude is set using the norm of the value, but direction of momentum is reversed too, if you want to change charge, use parameter 'standardPdgCode'", double(0));
+  addParam("activateAlwaysTrue2Hit",
+           m_PARAMactivateAlwaysTrue2Hit,
+           " set True/False for each setup individually",
+           activateFALSE);
+  addParam("activateAlwaysFalse2Hit",
+           m_PARAMactivateAlwaysFalse2Hit,
+           " set True/False for each setup individually",
+           activateFALSE);
+  addParam("activateRandom2Hit",
+           m_PARAMactivateRandom2Hit,
+           " set True/False for each setup individually",
+           activateFALSE);
+  addParam("activateAlwaysTrue3Hit",
+           m_PARAMactivateAlwaysTrue3Hit,
+           " set True/False for each setup individually",
+           activateFALSE);
+  addParam("activateAlwaysFalse3Hit",
+           m_PARAMactivateAlwaysFalse3Hit,
+           " set True/False for each setup individually",
+           activateFALSE);
+  addParam("activateRandom3Hit",
+           m_PARAMactivateRandom3Hit,
+           " set True/False for each setup individually",
+           activateFALSE);
+  addParam("activateAlwaysTrue4Hit",
+           m_PARAMactivateAlwaysTrue4Hit,
+           " set True/False for each setup individually",
+           activateFALSE);
+  addParam("activateAlwaysFalse4Hit",
+           m_PARAMactivateAlwaysFalse4Hit,
+           " set True/False for each setup individually",
+           activateFALSE);
+  addParam("activateRandom4Hit",
+           m_PARAMactivateRandom4Hit,
+           " set True/False for each setup individually",
+           activateFALSE);
+  addParam("tuneAlwaysTrue2Hit",
+           m_PARAMtuneAlwaysTrue2Hit,
+           " set True/False for each setup individually",
+           tuneZERO);
+  addParam("tuneAlwaysFalse2Hit",
+           m_PARAMtuneAlwaysFalse2Hit,
+           " set True/False for each setup individually",
+           tuneZERO);
+  addParam("tuneRandom2Hit",
+           m_PARAMtuneRandom2Hit,
+           " set True/False for each setup individually",
+           tuneZERO);
+  addParam("tuneAlwaysTrue3Hit",
+           m_PARAMtuneAlwaysTrue3Hit,
+           " set True/False for each setup individually",
+           tuneZERO);
+  addParam("tuneAlwaysFalse3Hit",
+           m_PARAMtuneAlwaysFalse3Hit,
+           " set True/False for each setup individually",
+           tuneZERO);
+  addParam("tuneRandom3Hit",
+           m_PARAMtuneRandom3Hit,
+           " set True/False for each setup individually",
+           tuneZERO);
+  addParam("tuneAlwaysTrue4Hit",
+           m_PARAMtuneAlwaysTrue4Hit,
+           " set True/False for each setup individually",
+           tuneZERO);
+  addParam("tuneAlwaysFalse4Hit",
+           m_PARAMtuneAlwaysFalse4Hit,
+           " set True/False for each setup individually",
+           tuneZERO);
+  addParam("tuneRandom4Hit",
+           m_PARAMtuneRandom4Hit,
+           " set True/False for each setup individually",
+           tuneZERO);
+
+  addParam("highestAllowedLayer",
+           m_PARAMhighestAllowedLayer,
+           "set value below 6 if you want to exclude outer layers (standard is 6)",
+           highestAllowedLayer);
+  addParam("standardPdgCode",
+           m_PARAMpdGCode,
+           "standard value is 211 (pi+), ATTENTION, instead of using inconsistent sign of PdGList, in this module positively charged particles are always positive and negatively charged ones are negative (relevant for leptons)",
+           int(211));
+  addParam("artificialMomentum",
+           m_PARAMartificialMomentum,
+           "standard value is 0. if StandardValue is changed to a nonZero value, the magnitude of the momentum seed is set artificially using this value, if value < 0, not only the magnitude is set using the norm of the value, but direction of momentum is reversed too, if you want to change charge, use parameter 'standardPdgCode'",
+           double(0));
 
 
-  addParam("cleanOverlappingSet", m_PARAMcleanOverlappingSet, "when true, TCs which are found more than once (possible because of multipass) will get filtered", bool(true));
+  addParam("cleanOverlappingSet",
+           m_PARAMcleanOverlappingSet,
+           "when true, TCs which are found more than once (possible because of multipass) will get filtered",
+           bool(true));
 
-  addParam("qiSmear", m_PARAMqiSmear, " set True if you want to smear QI's of TCs (needed when no trackLength is chosen for QI calculation) ", bool(false));
-  addParam("smearMean", m_PARAMsmearMean, " when qiSmear = True, bias of perturbation can be set here", double(0.0));
-  addParam("smearSigma", m_PARAMsmearSigma, " when qiSmear = True, degree of perturbation can be set here", double(0.0001));
+  addParam("qiSmear",
+           m_PARAMqiSmear,
+           " set True if you want to smear QI's of TCs (needed when no trackLength is chosen for QI calculation) ",
+           bool(false));
+  addParam("smearMean",
+           m_PARAMsmearMean,
+           " when qiSmear = True, bias of perturbation can be set here",
+           double(0.0));
+  addParam("smearSigma",
+           m_PARAMsmearSigma,
+           " when qiSmear = True, degree of perturbation can be set here",
+           double(0.0001));
 
-  addParam("calcQIType", m_PARAMcalcQIType, "allows you to chose the way, the QI's of the TC's shall be calculated. currently supported: 'kalman','trackLength', 'circleFit', 'straightLine'", string("circleFit"));
-  addParam("calcSeedType", m_PARAMcalcSeedType, "allows you to chose the way, the seed-mometa of the TC's shall be calculated. currently supported: 'helixFit', 'straightLine'", string("helixFit"));
-  addParam("filterOverlappingTCs", m_PARAMfilterOverlappingTCs, "allows you to chose the which technique shall be used for filtering overlapping TCs, currently supported: 'hopfield', 'greedy', 'none'", string("hopfield"));
-  addParam("storeBrokenQI", m_PARAMstoreBrokenQI, "if true, TC survives QI-calculation-process even if fit was not possible", bool(true));
-  addParam("KFBackwardFilter", m_KFBackwardFilter, "determines whether the kalman filter moves inwards or backwards, 'True' means inwards", bool(false));
-  addParam("TESTERexpandedTestingRoutines", m_TESTERexpandedTestingRoutines, "set true if you want to export expanded infos of TCs for further analysis (setting to false means that the DataObject called 'VXDTFInfoBoard' will not be stored)", bool(true));
-  addParam("writeToRoot", m_PARAMwriteToRoot, "set true if you want to export the p-values of the fitters in a root file named by parameter 'rootFileName'", bool(false));
-  addParam("rootFileName", m_PARAMrootFileName, "fileName used for p-value export. Will be ignored if parameter 'writeToRoot' is false (standard)", rootFileNameVals);
-  addParam("displayCollector", m_PARAMdisplayCollector, "Collector operating flag: 0 = no collector, 1 = collect for display, 2 = collect for analysis", int(0));
+  addParam("calcQIType",
+           m_PARAMcalcQIType,
+           "allows you to chose the way, the QI's of the TC's shall be calculated. currently supported: 'kalman','trackLength', 'circleFit', 'straightLine'",
+           string("circleFit"));
+  addParam("calcSeedType",
+           m_PARAMcalcSeedType,
+           "allows you to chose the way, the seed-mometa of the TC's shall be calculated. currently supported: 'helixFit', 'straightLine'",
+           string("helixFit"));
+  addParam("filterOverlappingTCs",
+           m_PARAMfilterOverlappingTCs,
+           "allows you to chose the which technique shall be used for filtering overlapping TCs, currently supported: 'hopfield', 'greedy', 'none'",
+           string("hopfield"));
+  addParam("storeBrokenQI",
+           m_PARAMstoreBrokenQI,
+           "if true, TC survives QI-calculation-process even if fit was not possible",
+           bool(true));
+  addParam("KFBackwardFilter",
+           m_KFBackwardFilter,
+           "determines whether the kalman filter moves inwards or backwards, 'True' means inwards",
+           bool(false));
+  addParam("TESTERexpandedTestingRoutines",
+           m_TESTERexpandedTestingRoutines,
+           "set true if you want to export expanded infos of TCs for further analysis (setting to false means that the DataObject called 'VXDTFInfoBoard' will not be stored)",
+           bool(true));
+  addParam("writeToRoot",
+           m_PARAMwriteToRoot,
+           "set true if you want to export the p-values of the fitters in a root file named by parameter 'rootFileName'",
+           bool(false));
+  addParam("rootFileName",
+           m_PARAMrootFileName,
+           "fileName used for p-value export. Will be ignored if parameter 'writeToRoot' is false (standard)",
+           rootFileNameVals);
+  addParam("displayCollector",
+           m_PARAMdisplayCollector,
+           "Collector operating flag: 0 = no collector, 1 = collect for display, 2 = collect for analysis",
+           int(0));
 
 }
 
@@ -366,13 +659,11 @@ void VXDTFModule::initialize()
   }
 
   if (!genfit::FieldManager::getInstance()->isInitialized())
-    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
+  { genfit::FieldManager::getInstance()->init(new GFGeant4Field()); }
   if (!genfit::MaterialEffects::getInstance()->isInitialized())
-    genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
+  { genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface()); }
 
   genfit::MaterialEffects::getInstance()->setMscModel("Highland");
-
-/// TODO: further checks for validity needed!
 
   /// temporary members for testing purposes (minimal testing routines)
   if (m_TESTERexpandedTestingRoutines == true) {
@@ -389,42 +680,36 @@ void VXDTFModule::initialize()
   StoreArray<PXDCluster>::optional(m_PARAMpxdClustersName);
   StoreArray<SVDCluster>::optional(m_PARAMsvdClustersName);
 
+  B2DEBUG(1, m_PARAMnameOfInstance << "::initialize: chosen calcQIType is '" << m_PARAMcalcQIType << "'")
   if (m_PARAMcalcQIType == "trackLength") {
-    B2DEBUG(1, m_PARAMnameOfInstance << "::initialize: chosen calcQIType is '" << m_PARAMcalcQIType << "'")
     m_calcQiType = 0;
   } else if (m_PARAMcalcQIType == "kalman") {
-    B2DEBUG(1, m_PARAMnameOfInstance << "::initialize: chosen calcQIType is '" << m_PARAMcalcQIType << "'")
     m_calcQiType = 1;
   } else if (m_PARAMcalcQIType == "circleFit") {
-    B2DEBUG(1, m_PARAMnameOfInstance << "::initialize: chosen calcQIType is '" << m_PARAMcalcQIType << "'")
     m_calcQiType = 2;
   } else if (m_PARAMcalcQIType == "straightLine") {
-    B2DEBUG(1, m_PARAMnameOfInstance << "::initialize: chosen calcQIType is '" << m_PARAMcalcQIType << "'")
     m_calcQiType = 3;
   } else {
     B2WARNING(m_PARAMnameOfInstance << "::initialize: chosen qiType '" << m_PARAMcalcQIType << "' is unknown, setting standard to circleFit...")
     m_calcQiType = 2;
   }
 
+  B2DEBUG(1, m_PARAMnameOfInstance << "::initialize: chosen calcSeedType is '" << m_PARAMcalcSeedType << "'")
   if (m_PARAMcalcSeedType == "helixFit") {
-    B2DEBUG(1, m_PARAMnameOfInstance << "::initialize: chosen calcSeedType is '" << m_PARAMcalcSeedType << "'")
     m_calcSeedType = 0;
   } else if (m_PARAMcalcSeedType == "straightLine") {
-    B2DEBUG(1, m_PARAMnameOfInstance << "::initialize: chosen calcSeedType is '" << m_PARAMcalcSeedType << "'")
     m_calcSeedType = 1;
   } else {
     B2WARNING(m_PARAMnameOfInstance << "::initialize: chosen seedType '" << m_PARAMcalcSeedType << "' is unknown, setting standard to helixFit...")
     m_calcSeedType = 0;
   }
 
+  B2DEBUG(1, m_PARAMnameOfInstance << "::initialize: chosen technique to filter overlapping TCs is '" << m_PARAMfilterOverlappingTCs << "'")
   if (m_PARAMfilterOverlappingTCs == "hopfield") {
-    B2DEBUG(1, m_PARAMnameOfInstance << "::initialize: chosen technique to filter overlapping TCs is 'hopfield'")
     m_filterOverlappingTCs = 2;
   } else if (m_PARAMfilterOverlappingTCs == "greedy") {
-    B2DEBUG(1, m_PARAMnameOfInstance << "::initialize: chosen technique to filter overlapping TCs is 'greedy'")
     m_filterOverlappingTCs = 1;
   } else if (m_PARAMfilterOverlappingTCs == "none") {
-    B2DEBUG(1, m_PARAMnameOfInstance << "::initialize: chosen technique to filter overlapping TCs is 'none'")
     m_filterOverlappingTCs = 0;
   } else {
     B2WARNING(m_PARAMnameOfInstance << "::initialize: chosen technique to filter overlapping TCs '" << m_PARAMfilterOverlappingTCs << "' is unknown, setting standard to greedy...")
@@ -600,11 +885,29 @@ void VXDTFModule::beginRun()
     } else {
       newPass->normedDistance3D.first = m_PARAMactivateNormedDistance3D.at(i);
     }
+    if (int (m_PARAMactivateAlwaysTrue2Hit.size()) < i + 1) {
+      newPass->alwaysTrue2Hit.first = m_PARAMactivateAlwaysTrue2Hit.at(m_PARAMactivateAlwaysTrue2Hit.size() - 1);
+    } else {
+      newPass->alwaysTrue2Hit.first = m_PARAMactivateAlwaysTrue2Hit.at(i);
+    }
+    if (int (m_PARAMactivateAlwaysFalse2Hit.size()) < i + 1) {
+      newPass->alwaysFalse2Hit.first = m_PARAMactivateAlwaysFalse2Hit.at(m_PARAMactivateAlwaysFalse2Hit.size() - 1);
+    } else {
+      newPass->alwaysFalse2Hit.first = m_PARAMactivateAlwaysFalse2Hit.at(i);
+    }
+    if (int (m_PARAMactivateRandom2Hit.size()) < i + 1) {
+      newPass->random2Hit.first = m_PARAMactivateRandom2Hit.at(m_PARAMactivateRandom2Hit.size() - 1);
+    } else {
+      newPass->random2Hit.first = m_PARAMactivateRandom2Hit.at(i);
+    }
     if (newPass->distance3D.first == true) { sfCtr++; }
     if (newPass->distanceXY.first == true) { sfCtr++; }
     if (newPass->distanceZ.first == true) { sfCtr++; }
     if (newPass->slopeRZ.first == true) { sfCtr++; }
     if (newPass->normedDistance3D.first == true) { sfCtr++; }
+    if (newPass->alwaysTrue2Hit.first == true) { sfCtr++; }
+    if (newPass->alwaysFalse2Hit.first == true) { sfCtr++; }
+    if (newPass->random2Hit.first == true) { sfCtr++; }
     B2DEBUG(2, "finished importing segFinderFilters, " << sfCtr << " filters imported")
     ///sFinder ho finder (2+1 hit)
     B2DEBUG(10, "starting import of segFinderHioCFilters:")
@@ -699,6 +1002,21 @@ void VXDTFModule::beginRun()
     } else {
       newPass->deltaSlopeZOverS.first =  m_PARAMactivateDeltaSlopeZOverS.at(i);
     }
+    if (int (m_PARAMactivateAlwaysTrue3Hit.size()) < i + 1) {
+      newPass->alwaysTrue3Hit.first = m_PARAMactivateAlwaysTrue3Hit.at(m_PARAMactivateAlwaysTrue3Hit.size() - 1);
+    } else {
+      newPass->alwaysTrue3Hit.first = m_PARAMactivateAlwaysTrue3Hit.at(i);
+    }
+    if (int (m_PARAMactivateAlwaysFalse3Hit.size()) < i + 1) {
+      newPass->alwaysFalse3Hit.first = m_PARAMactivateAlwaysFalse3Hit.at(m_PARAMactivateAlwaysFalse3Hit.size() - 1);
+    } else {
+      newPass->alwaysFalse3Hit.first = m_PARAMactivateAlwaysFalse3Hit.at(i);
+    }
+    if (int (m_PARAMactivateRandom3Hit.size()) < i + 1) {
+      newPass->random3Hit.first = m_PARAMactivateRandom3Hit.at(m_PARAMactivateRandom3Hit.size() - 1);
+    } else {
+      newPass->random3Hit.first = m_PARAMactivateRandom3Hit.at(i);
+    }
     if (newPass->angles3D.first == true) { nfCtr++; }
     if (newPass->anglesXY.first == true) { nfCtr++; }
     if (newPass->anglesRZ.first == true) { nfCtr++; }
@@ -708,6 +1026,9 @@ void VXDTFModule::beginRun()
     if (newPass->helixParameterFit.first == true) { nfCtr++; }
     if (newPass->deltaSOverZ.first == true) { nfCtr++; }
     if (newPass->deltaSlopeZOverS.first == true) { nfCtr++; }
+    if (newPass->alwaysTrue3Hit.first == true) { nfCtr++; }
+    if (newPass->alwaysFalse3Hit.first == true) { nfCtr++; }
+    if (newPass->random3Hit.first == true) { nfCtr++; }
     B2DEBUG(2, "finished importing nFinderFilters, " << nfCtr << " filters imported")
     ///nFinder ho finder (3+1 hit)
     B2DEBUG(10, "starting import of nbFinderHioCFilters:")
@@ -730,6 +1051,11 @@ void VXDTFModule::beginRun()
     } else {
       newPass->zigzagXY.first = m_PARAMactivateZigZagXY.at(i);
     }
+    if (int (m_PARAMactivateZigZagXYWithSigma.size()) < i + 1) {
+      newPass->zigzagXYWithSigma.first = m_PARAMactivateZigZagXYWithSigma.at(m_PARAMactivateZigZagXYWithSigma.size() - 1);
+    } else {
+      newPass->zigzagXYWithSigma.first = m_PARAMactivateZigZagXYWithSigma.at(i);
+    }
     if (int (m_PARAMactivateZigZagRZ.size()) < i + 1) {
       newPass->zigzagRZ.first = m_PARAMactivateZigZagRZ.at(m_PARAMactivateZigZagRZ.size() - 1);
     } else {
@@ -750,11 +1076,30 @@ void VXDTFModule::beginRun()
     } else {
       newPass->deltaDistance2IP.first = m_PARAMactivateDeltaDistance2IP.at(i);
     }
+    if (int (m_PARAMactivateAlwaysTrue4Hit.size()) < i + 1) {
+      newPass->alwaysTrue4Hit.first = m_PARAMactivateAlwaysTrue4Hit.at(m_PARAMactivateAlwaysTrue4Hit.size() - 1);
+    } else {
+      newPass->alwaysTrue4Hit.first = m_PARAMactivateAlwaysTrue4Hit.at(i);
+    }
+    if (int (m_PARAMactivateAlwaysFalse4Hit.size()) < i + 1) {
+      newPass->alwaysFalse4Hit.first = m_PARAMactivateAlwaysFalse4Hit.at(m_PARAMactivateAlwaysFalse4Hit.size() - 1);
+    } else {
+      newPass->alwaysFalse4Hit.first = m_PARAMactivateAlwaysFalse4Hit.at(i);
+    }
+    if (int (m_PARAMactivateRandom4Hit.size()) < i + 1) {
+      newPass->random4Hit.first = m_PARAMactivateRandom4Hit.at(m_PARAMactivateRandom4Hit.size() - 1);
+    } else {
+      newPass->random4Hit.first = m_PARAMactivateRandom4Hit.at(i);
+    }
     if (newPass->zigzagXY.first == true) { tccfCtr++; }
+    if (newPass->zigzagXYWithSigma.first == true) { tccfCtr++; }
     if (newPass->zigzagRZ.first == true) { tccfCtr++; }
     if (newPass->deltaPt.first == true) { tccfCtr++; }
     if (newPass->circleFit.first == true) { tccfCtr++; }
     if (newPass->deltaDistance2IP.first == true) { tccfCtr++; }
+    if (newPass->alwaysTrue4Hit.first == true) { tccfCtr++; }
+    if (newPass->alwaysFalse4Hit.first == true) { tccfCtr++; }
+    if (newPass->random4Hit.first == true) { tccfCtr++; }
 
     newPass->activatedSegFinderTests = sfCtr;
     newPass->activatedHighOccupancySegFinderTests = sfhoCtr;
@@ -789,6 +1134,21 @@ void VXDTFModule::beginRun()
       newPass->normedDistance3D.second = m_PARAMtuneNormedDistance3D.at(m_PARAMtuneNormedDistance3D.size() - 1);
     } else {
       newPass->normedDistance3D.second = m_PARAMtuneNormedDistance3D.at(i);
+    }
+    if (int (m_PARAMtuneAlwaysTrue2Hit.size()) < i + 1) {
+      newPass->alwaysTrue2Hit.second = m_PARAMtuneAlwaysTrue2Hit.at(m_PARAMtuneAlwaysTrue2Hit.size() - 1);
+    } else {
+      newPass->alwaysTrue2Hit.second = m_PARAMtuneAlwaysTrue2Hit.at(i);
+    }
+    if (int (m_PARAMtuneAlwaysFalse2Hit.size()) < i + 1) {
+      newPass->alwaysFalse2Hit.second = m_PARAMtuneAlwaysFalse2Hit.at(m_PARAMtuneAlwaysFalse2Hit.size() - 1);
+    } else {
+      newPass->alwaysFalse2Hit.second = m_PARAMtuneAlwaysFalse2Hit.at(i);
+    }
+    if (int (m_PARAMtuneRandom2Hit.size()) < i + 1) {
+      newPass->random2Hit.second = m_PARAMtuneRandom2Hit.at(m_PARAMtuneRandom2Hit.size() - 1);
+    } else {
+      newPass->random2Hit.second = m_PARAMtuneRandom2Hit.at(i);
     }
     if (int (m_PARAMtuneAngles3D.size()) < i + 1) {
       newPass->angles3D.second = m_PARAMtuneAngles3D.at(m_PARAMtuneAngles3D.size() - 1);
@@ -835,10 +1195,30 @@ void VXDTFModule::beginRun()
     } else {
       newPass->deltaSlopeZOverS.second =  m_PARAMtuneDeltaSlopeZOverS.at(i);
     }
+    if (int (m_PARAMtuneAlwaysTrue3Hit.size()) < i + 1) {
+      newPass->alwaysTrue3Hit.second = m_PARAMtuneAlwaysTrue3Hit.at(m_PARAMtuneAlwaysTrue3Hit.size() - 1);
+    } else {
+      newPass->alwaysTrue3Hit.second = m_PARAMtuneAlwaysTrue3Hit.at(i);
+    }
+    if (int (m_PARAMtuneAlwaysFalse3Hit.size()) < i + 1) {
+      newPass->alwaysFalse3Hit.second = m_PARAMtuneAlwaysFalse3Hit.at(m_PARAMtuneAlwaysFalse3Hit.size() - 1);
+    } else {
+      newPass->alwaysFalse3Hit.second = m_PARAMtuneAlwaysFalse3Hit.at(i);
+    }
+    if (int (m_PARAMtuneRandom3Hit.size()) < i + 1) {
+      newPass->random3Hit.second = m_PARAMtuneRandom3Hit.at(m_PARAMtuneRandom3Hit.size() - 1);
+    } else {
+      newPass->random3Hit.second = m_PARAMtuneRandom3Hit.at(i);
+    }
     if (int (m_PARAMtuneZigZagXY.size()) < i + 1) {
       newPass->zigzagXY.second = m_PARAMtuneZigZagXY.at(m_PARAMtuneZigZagXY.size() - 1);
     } else {
       newPass->zigzagXY.second = m_PARAMtuneZigZagXY.at(i);
+    }
+    if (int (m_PARAMtuneZigZagXYWithSigma.size()) < i + 1) {
+      newPass->zigzagXYWithSigma.second = m_PARAMtuneZigZagXYWithSigma.at(m_PARAMtuneZigZagXYWithSigma.size() - 1);
+    } else {
+      newPass->zigzagXYWithSigma.second = m_PARAMtuneZigZagXYWithSigma.at(i);
     }
     if (int (m_PARAMtuneZigZagRZ.size()) < i + 1) {
       newPass->zigzagRZ.second = m_PARAMtuneZigZagRZ.at(m_PARAMtuneZigZagRZ.size() - 1);
@@ -854,6 +1234,21 @@ void VXDTFModule::beginRun()
       newPass->deltaDistance2IP.second = m_PARAMtuneDeltaDistance2IP.at(m_PARAMtuneDeltaDistance2IP.size() - 1);
     } else {
       newPass->deltaDistance2IP.second = m_PARAMtuneDeltaDistance2IP.at(i);
+    }
+    if (int (m_PARAMtuneAlwaysTrue4Hit.size()) < i + 1) {
+      newPass->alwaysTrue4Hit.second = m_PARAMtuneAlwaysTrue4Hit.at(m_PARAMtuneAlwaysTrue4Hit.size() - 1);
+    } else {
+      newPass->alwaysTrue4Hit.second = m_PARAMtuneAlwaysTrue4Hit.at(i);
+    }
+    if (int (m_PARAMtuneAlwaysFalse4Hit.size()) < i + 1) {
+      newPass->alwaysFalse4Hit.second = m_PARAMtuneAlwaysFalse4Hit.at(m_PARAMtuneAlwaysFalse4Hit.size() - 1);
+    } else {
+      newPass->alwaysFalse4Hit.second = m_PARAMtuneAlwaysFalse4Hit.at(i);
+    }
+    if (int (m_PARAMtuneRandom4Hit.size()) < i + 1) {
+      newPass->random4Hit.second = m_PARAMtuneRandom4Hit.at(m_PARAMtuneRandom4Hit.size() - 1);
+    } else {
+      newPass->random4Hit.second = m_PARAMtuneRandom4Hit.at(i);
     }
     if (int (m_PARAMtuneCircleFit.size()) < i + 1) {
       newPass->circleFit.second = m_PARAMtuneCircleFit.at(m_PARAMtuneCircleFit.size() - 1);
@@ -918,21 +1313,24 @@ void VXDTFModule::beginRun()
       int sectorCtr = 0, friendCtr = 0, cutoffTypesCtr = 0; // counters
       vector<int> currentCutOffTypes;
       for (auto & mapEntry : newPass->sectorMap) { // looping through sectors
-        const vector<unsigned int> currentFriends = mapEntry.second->getFriends();
-        int nFriends = currentFriends.size();
-        B2DEBUG(5, "Opening sector " << FullSecID(mapEntry.first) << " at dist2Origin " << mapEntry.second->getDistance() << " which has got " << nFriends << " friends for internal supportedCuttoffsList and " << mapEntry.second->getFriendPointers().size() << " friendSectors as pointers");
-        if (nFriends != mapEntry.second->getFriendMapSize()) {
-          B2WARNING(" number of friends do not match in sector " << FullSecID(mapEntry.first) << ": friends by friendVector vs nEntries in FriendMa: " << nFriends << "/" << mapEntry.second->getFriendMapSize())
+        VXDSector* thisSector = mapEntry.second;
+        const vector<unsigned int> currentFriends = thisSector->getFriends();
+        uint nFriends = currentFriends.size();
+        B2DEBUG(5, "Opening sector " << FullSecID(mapEntry.first) << "/" << FullSecID(thisSector->getSecID()) << " at dist2Origin " << thisSector->getDistance() << " which has got " << nFriends << " friends for internal supportedCuttoffsList and " << thisSector->getFriendPointers().size() << " friendSectors as pointers");
+        if (nFriends != uint(thisSector->getFriendMapSize()) or nFriends != thisSector->getFriendPointers().size()) {
+          B2WARNING(" number of friends do not match in sector " << FullSecID(mapEntry.first) << ": friends by friendVector vs nEntries vs nFriendPointers in FriendMap: " << nFriends << "/" << thisSector->getFriendMapSize() << "/" << thisSector->getFriendPointers().size())
         }
 
-        for (auto friendName : currentFriends) {  // looping through friends
-          B2DEBUG(10, " > Opening sectorFriend " << FullSecID(friendName) << " with dist2Origin " << newPass->sectorMap.find(friendName)->second->getDistance());
-          currentCutOffTypes = mapEntry.second->getSupportedCutoffs(friendName);
+        for (VXDSector * aFriend : thisSector->getFriendPointers()) {
+          uint friendInt = aFriend->getSecID();
+          currentCutOffTypes = thisSector->getSupportedCutoffs(friendInt);
           for (auto cutOffType : currentCutOffTypes) { // looping through cutoffs
-            const Belle2::Cutoff* aCutoff = mapEntry.second->getCutoff(cutOffType, friendName);
+            const Belle2::Cutoff* aCutoff = thisSector->getCutoff(cutOffType, friendInt);
+            if (aCutoff == NULL) { continue; }
             B2DEBUG(175, " cutoff is of type: " << FilterID().getFilterString(cutOffType) << ", min: " << aCutoff->getMinValue() << ", max:" << aCutoff->getMaxValue());
             cutoffTypesCtr++;
           }
+          B2DEBUG(175, "cutoffTypesCtr got " << cutoffTypesCtr << " cutoffs")
           ++friendCtr;
         }
         ++sectorCtr;
@@ -959,10 +1357,12 @@ void VXDTFModule::beginRun()
     m_baselinePass.chosenDetectorType = m_passSetupVector.at(0)->chosenDetectorType;
     m_baselinePass.numTotalLayers = m_passSetupVector.at(0)->numTotalLayers;
     m_baselinePass.zigzagXY = m_passSetupVector.at(0)->zigzagXY;
+    m_baselinePass.zigzagXYWithSigma = m_passSetupVector.at(0)->zigzagXYWithSigma;
     m_baselinePass.deltaPt = m_passSetupVector.at(0)->deltaPt;
     m_baselinePass.circleFit = m_passSetupVector.at(0)->circleFit;
     int countActivatedTCTests = 0;
     if (m_baselinePass.zigzagXY.first == true) { countActivatedTCTests++; }
+    if (m_baselinePass.zigzagXYWithSigma.first == true) { countActivatedTCTests++; }
     if (m_baselinePass.deltaPt.first == true) { countActivatedTCTests++; }
     if (m_baselinePass.circleFit.first == true) { countActivatedTCTests++; }
     m_baselinePass.activatedTccFilterTests = countActivatedTCTests; // pT, zzXY, circleFit
@@ -1194,7 +1594,36 @@ void VXDTFModule::the_real_event()
    * 1 track and no hits of secondary particles. the first check only tests for the most complicated case of a cosmic particle
    * passing each layer twice and hitting the overlapping regions (which results in 2 hits at the same layer in neighbouring ladders)
    * */
+  bool useBaseLine = false;
   if ((nTotalClusters - 1 < nTotalClustersThreshold) && m_PARAMactivateBaselineTF != 0) {
+    useBaseLine = true;
+    // in this case it's worth checking whether BaseLineTF is useFull or not
+    for (ClusterInfo & aCluster : clustersOfEvent) {
+      // collect number of Clusters per Sensor
+      map<VxdID, uint> sensorIDs;
+      VxdID currentID;
+      if (aCluster.isSVD() == true) {
+        currentID = aCluster.getSVDCluster()->getSensorID();
+      } else if (aCluster.isTEL() == true) {
+        currentID = aCluster.getTELCluster()->getSensorID();
+      } else if (aCluster.isPXD() == true) {
+        currentID = aCluster.getPXDCluster()->getSensorID();
+      }
+      if (sensorIDs.find(currentID) == sensorIDs.end()) {
+        sensorIDs.insert({currentID, 1});
+      } else {
+        sensorIDs.at(currentID) += 1;
+      }
+      for (auto & aSensorPack : sensorIDs) {
+        if (aSensorPack.first.getLayerNumber() > 2 or aSensorPack.first.getLayerNumber() < 7) {
+          if (aSensorPack.second > 2) { useBaseLine = false; }
+        } else {
+          if (aSensorPack.second > 1) { useBaseLine = false; }
+        }
+      }
+    }
+  }
+  if (useBaseLine == true) {
     //   generating virtual Hit at position (0, 0, 0) - needed for virtual segment.
     m_baselinePass.centerSector = centerSector;
     vertexInfo.hitPosition = m_baselinePass.origin;
@@ -2300,7 +2729,7 @@ void VXDTFModule::endRun()
 
   B2DEBUG(2, "Explanation: pxdc: number of PXDClusters, 2D), svdc: SVDClusters(1D)\n svdH: # of SVDHits(guess of actual number of 2D-Track- and -BG-hits)\n catC: SVDClusterCombinations(combining u/v, including ghosthits)\n ghR: ghostHitRate(is only a guess, TODO: should be correctly determined!!)\n noSc: are hits discarded, where no fitting sector could be found\n noFd: hits having no hits in compatible sectors (friends), ooR: sensors which were not in sensitive plane of sensor, no2D: SVDclusters, were no 2nd cluster could be found\n 1Dsn: times where a SVDsensor hat not the same number of u and v clusters, 1DHO: like 1Dsn, but where a high occupancy case prevented reconstructing them")
 
-  B2DEBUG(1, lineHigh << lineApnd << lineApnd << "\n bl+\t| bl++\t| 1D+\t| 1D-\t| NoH\t| sf+\t| sf-\t| nf+\t| nf-\t| zzXY\t| zzRZ\t| cf\t| dpT\t| tcc+\t| Ttcc\t| Ttcf\t| Tfin\t| NNns\t| NNov\t|\n " << m_TESTERstartedBaselineTF << "\t| " << m_TESTERsucceededBaselineTF << "\t| " << m_TESTERacceptedBrokenHitsTrack << "\t| " << m_TESTERrejectedBrokenHitsTrack << "\t| " << m_TESTERnoHitsAtEvent << "\t| " << m_TESTERtotalsegmentsSFCtr << "\t| " << m_TESTERdiscardedSegmentsSFCtr << "\t| " << m_TESTERtotalsegmentsNFCtr << "\t| " << m_TESTERdiscardedSegmentsNFCtr << "\t|" << m_TESTERtriggeredZigZagXY << "\t| " << m_TESTERtriggeredZigZagRZ << "\t| " << m_TESTERtriggeredCircleFit << "\t| " << m_TESTERtriggeredDpT << "\t| " << m_TESTERapprovedByTCC << "\t| " << m_TESTERcountTotalTCsAfterTCC << "\t| " << m_TESTERcountTotalTCsAfterTCCFilter << "\t| " << m_TESTERcountTotalTCsFinal << "\t| " << m_TESTERbadHopfieldCtr << "\t| " << m_TESTERHopfieldLetsOverbookedTCsAliveCtr << "\t|")
+  B2DEBUG(1, lineHigh << lineApnd << lineApnd << "\n bl+\t| bl++\t| 1D+\t| 1D-\t| NoH\t| sf+\t| sf-\t| nf+\t| nf-\t| zzXY\t| zXYS\t| zzRZ\t| cf\t| dpT\t| tcc+\t| Ttcc\t| Ttcf\t| Tfin\t| NNns\t| NNov\t|\n " << m_TESTERstartedBaselineTF << "\t| " << m_TESTERsucceededBaselineTF << "\t| " << m_TESTERacceptedBrokenHitsTrack << "\t| " << m_TESTERrejectedBrokenHitsTrack << "\t| " << m_TESTERnoHitsAtEvent << "\t| " << m_TESTERtotalsegmentsSFCtr << "\t| " << m_TESTERdiscardedSegmentsSFCtr << "\t| " << m_TESTERtotalsegmentsNFCtr << "\t| " << m_TESTERdiscardedSegmentsNFCtr << "\t|" << m_TESTERtriggeredZigZagXY << "\t| " << m_TESTERtriggeredZigZagXYWithSigma << "\t| " << m_TESTERtriggeredZigZagRZ << "\t| " << m_TESTERtriggeredCircleFit << "\t| " << m_TESTERtriggeredDpT << "\t| " << m_TESTERapprovedByTCC << "\t| " << m_TESTERcountTotalTCsAfterTCC << "\t| " << m_TESTERcountTotalTCsAfterTCCFilter << "\t| " << m_TESTERcountTotalTCsFinal << "\t| " << m_TESTERbadHopfieldCtr << "\t| " << m_TESTERHopfieldLetsOverbookedTCsAliveCtr << "\t|")
 
   B2DEBUG(2, "Explanation: bl+: baseLineTF started, bl++ baselineTF succeeded, 1D+: TCs with 1D-svd-Hits were accepted, 1D-: rejected, NoH: Events without hits\n sf+: segfinder segments activated, sf-: -discarded, nf+: nbFinder segments activated, nf-: discarded, zzXY: zigzagXY got triggered, zzRZ: same for zigzagRZ, cf: circleFit(tuneCircleFitValue), dpT: deltaPt\n tcc+: approved by tcc, Ttcc: total number of TCs after TCC, Ttcf: after TCC-filter, Tfin: total number of final TCs, NNns: the Hopfield network had no survivors, NNov: the Hopfield network accepted overlapping TCs (which should never occur! -> if != 0: Bug!)")
 
@@ -3354,6 +3783,40 @@ int VXDTFModule::segFinder(PassData* currentPass)
           } // else segment not approved
         } else { B2DEBUG(175, " slopeRZ is not activated for pass: " << currentPass->sectorSetup << "!") }
 
+        // The following tests are debug-tests:
+        if (currentPass->alwaysTrue2Hit.first == true) { // min & max!
+          accepted = currentPass->twoHitFilterBox.checkAlwaysTrue2Hit(FilterID::alwaysTrue2Hit);
+          if (accepted == true) {
+            simpleSegmentQI++;
+            B2DEBUG(150, " alwaysTrue2Hit: segment approved! SectorCombi: " << mainSecID << "/" << friendSecID)
+            acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysTrue2Hit, true));
+          } else {
+            B2DEBUG(150, " alwaysTrue2Hit: segment discarded! SectorCombi: " << mainSecID << "/" << friendSecID)
+            acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysTrue2Hit, false));
+          } // else segment not approved
+        } else { B2DEBUG(175, " alwaysTrue2Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
+        if (currentPass->alwaysFalse2Hit.first == true) { // min & max!
+          accepted = currentPass->twoHitFilterBox.checkAlwaysFalse2Hit(FilterID::alwaysFalse2Hit);
+          if (accepted == true) {
+            simpleSegmentQI++;
+            B2DEBUG(150, " alwaysFalse2Hit: segment approved! SectorCombi: " << mainSecID << "/" << friendSecID)
+            acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysFalse2Hit, true));
+          } else {
+            B2DEBUG(150, " alwaysFalse2Hit: segment discarded! SectorCombi: " << mainSecID << "/" << friendSecID)
+            acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysFalse2Hit, false));
+          } // else segment not approved
+        } else { B2DEBUG(175, " alwaysFalse2Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
+        if (currentPass->random2Hit.first == true) { // min & max!
+          accepted = currentPass->twoHitFilterBox.checkRandom2Hit(FilterID::random2Hit);
+          if (accepted == true) {
+            simpleSegmentQI++;
+            B2DEBUG(150, " random2Hit: segment approved! SectorCombi: " << mainSecID << "/" << friendSecID)
+            acceptedRejectedFilters.push_back(make_pair(FilterID::random2Hit, true));
+          } else {
+            B2DEBUG(150, " random2Hit: segment discarded! SectorCombi: " << mainSecID << "/" << friendSecID)
+            acceptedRejectedFilters.push_back(make_pair(FilterID::random2Hit, false));
+          } // else segment not approved
+        } else { B2DEBUG(175, " random2Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (simpleSegmentQI < currentPass->activatedSegFinderTests) {
           if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 50, PACKAGENAME()) == true) {
@@ -3461,7 +3924,7 @@ int VXDTFModule::importCollectorCell(int pass_index, std::string died_at, int di
   std::vector<int> rejectedFilters;
 
   for (auto entry : acceptedRejectedFilters) {
-    B2DEBUG(10, "acceptedRejected: " << entry.first << "; (T/F): " << entry.second);
+    B2DEBUG(10, "acceptedRejected: " << entry.first << "; (True/False): " << entry.second);
     if (entry.second == true) {
       acceptedFilters.push_back(entry.first);
 
@@ -3859,6 +4322,42 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           } // else segment not approved
         } else { B2DEBUG(175, " deltaSlopeZOverS is not activated for pass: " << currentPass->sectorSetup << "!") }
 
+        // The following tests are debug-tests:
+        if (currentPass->alwaysTrue3Hit.first == true) { // min & max!
+          accepted = currentPass->threeHitFilterBox.checkAlwaysTrue3Hit(FilterID::alwaysTrue3Hit);
+          if (accepted == true) {
+            simpleSegmentQI++;
+            B2DEBUG(150, " alwaysTrue3Hit: segment approved! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
+            acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysTrue3Hit, true));
+          } else {
+            B2DEBUG(150, " alwaysTrue3Hit: segment discarded! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
+            acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysTrue3Hit, false));
+          } // else segment not approved
+        } else { B2DEBUG(175, " alwaysTrue3Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
+        if (currentPass->alwaysFalse3Hit.first == true) { // min & max!
+          accepted = currentPass->threeHitFilterBox.checkAlwaysFalse3Hit(FilterID::alwaysFalse3Hit);
+          if (accepted == true) {
+            simpleSegmentQI++;
+            B2DEBUG(150, " alwaysFalse3Hit: segment approved! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
+            acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysFalse3Hit, true));
+          } else {
+            B2DEBUG(150, " alwaysFalse3Hit: segment discarded! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
+            acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysFalse3Hit, false));
+          } // else segment not approved
+        } else { B2DEBUG(175, " alwaysFalse3Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
+        if (currentPass->random3Hit.first == true) { // min & max!
+          accepted = currentPass->threeHitFilterBox.checkRandom3Hit(FilterID::random3Hit);
+          if (accepted == true) {
+            simpleSegmentQI++;
+            B2DEBUG(150, " random3Hit: segment approved! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
+            acceptedRejectedFilters.push_back(make_pair(FilterID::random3Hit, true));
+          } else {
+            B2DEBUG(150, " random3Hit: segment discarded! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
+            acceptedRejectedFilters.push_back(make_pair(FilterID::random3Hit, false));
+          } // else segment not approved
+        } else { B2DEBUG(175, " random3Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
+
+
         if (simpleSegmentQI < currentPass->activatedNbFinderTests) {
           if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 50, PACKAGENAME()) == true) {
             stringstream outputStream;
@@ -3906,7 +4405,7 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
 
       // Collector Cell died at NBFinder-lost
       if (m_PARAMdisplayCollector > 0) {
-        B2DEBUG(10, "nbFinderLost !!! " << currentSeg->getCollectorID());
+        B2DEBUG(10, "displayCollector: nbFinderLost !!! " << currentSeg->getCollectorID());
 
         m_collector.updateCell(currentSeg->getCollectorID(), CollectorTFInfo::m_nameNbFinder, CollectorTFInfo::m_idNbFinder, vector<int>(), {FilterID::nbFinderLost}, -1, -2, currentSeg->getState(), vector<int>());
       }
@@ -4424,6 +4923,50 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
         }
 
       }
+
+      // The following tests are debug-tests:
+      if (currentPass->alwaysTrue4Hit.first == true) { // min & max!
+        accepted = currentPass->fourHitFilterBox.checkAlwaysTrue4Hit(FilterID::alwaysTrue4Hit);
+        if (accepted == true) {
+          B2DEBUG(150, " TCC filter alwaysTrue4Hit: segment approved! TC: " << tcCtr)
+
+          // Collector TC Update (alwaysTrue4Hit)
+          if (m_PARAMdisplayCollector > 0) {
+            m_collector.updateTC((*currentTC)->getCollectorID(), "", CollectorTFInfo::m_idAlive, {FilterID::alwaysTrue4Hit}, vector<int>());
+          }
+        } else {
+          B2DEBUG(150, " TCC filter alwaysTrue4Hit: segment discarded! TC: " << tcCtr)
+          break;
+        } // else segment not approved
+      } else { B2DEBUG(175, " TCC filter alwaysTrue4Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
+      if (currentPass->alwaysFalse4Hit.first == true) { // min & max!
+        accepted = currentPass->fourHitFilterBox.checkAlwaysFalse4Hit(FilterID::alwaysFalse4Hit);
+        if (accepted == true) {
+          B2DEBUG(150, " TCC filter alwaysFalse4Hit: segment approved! TC: " << tcCtr)
+
+          // Collector TC Update (alwaysFalse4Hit)
+          if (m_PARAMdisplayCollector > 0) {
+            m_collector.updateTC((*currentTC)->getCollectorID(), "", CollectorTFInfo::m_idAlive, {FilterID::alwaysFalse4Hit}, vector<int>());
+          }
+        } else {
+          B2DEBUG(150, " TCC filter alwaysFalse4Hit: segment discarded! TC: " << tcCtr)
+          break;
+        } // else segment not approved
+      } else { B2DEBUG(175, " TCC filter alwaysFalse4Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
+      if (currentPass->random4Hit.first == true) { // min & max!
+        accepted = currentPass->fourHitFilterBox.checkRandom4Hit(FilterID::random4Hit);
+        if (accepted == true) {
+          B2DEBUG(150, " TCC filter random4Hit: segment approved! TC: " << tcCtr)
+
+          // Collector TC Update (random4Hit)
+          if (m_PARAMdisplayCollector > 0) {
+            m_collector.updateTC((*currentTC)->getCollectorID(), "", CollectorTFInfo::m_idAlive, {FilterID::random4Hit}, vector<int>());
+          }
+        } else {
+          B2DEBUG(150, " TCC filter random4Hit: segment discarded! TC: " << tcCtr)
+          break;
+        } // else segment not approved
+      } else { B2DEBUG(175, " TCC filter random4Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
       a++; b++; c++; d++;
     }
     if (abortTC == true) { tcCtr++; continue; }

@@ -20,9 +20,9 @@
 #include <boost/unordered_map.hpp>
 #endif
 
-#include "VXDSector.h"
-#include "VXDTFHit.h"
-#include "VXDSegmentCell.h"
+#include "tracking/vxdCaTracking/VXDSector.h"
+#include "tracking/vxdCaTracking/VXDTFHit.h"
+#include "tracking/vxdCaTracking/VXDSegmentCell.h"
 #include "tracking/vxdCaTracking/VXDTFTrackCandidate.h"
 
 #include "tracking/vxdCaTracking/SegFinderFilters.h"
@@ -33,6 +33,7 @@
 namespace Belle2 {
 
 
+//   typedef std::pair<unsigned int, VXDSector*> MapOfSectorsEntry; /**< a single entry of MapOfSectors (next line) */
   typedef boost::unordered_map<unsigned int, VXDSector*> MapOfSectors; /**< stores whole sectorMap used for storing cutoffs */
   typedef std::pair<unsigned int, MapOfSectors::iterator> SectorNameAndPointerPair; /**< we are storing the name of the sector (which is encoded into an int) to be able to sort them! */
 //   typedef std::list<SectorNameAndPointerPair> OperationSequenceOfActivatedSectors; /**< contains all active sectors, can be sorted by name (first entry) */
@@ -57,7 +58,7 @@ namespace Belle2 {
     std::pair<int, int> importSectorMap(const VXDTFSecMapTypedef::SecMapCopy& rawSecMap, const VXDTFRawSecMapTypedef::SectorDistancesMap& distancesMap, bool useDistances);
 
 
-    /** fills in standard-settings for all filters */
+    /** fills in standard-settings for all filters (except debug-filters like alwaysFalse2Hit) */
     void activateAllFilters();
 
     /** for streching the limits of the cutoff values for finetuning */
@@ -70,14 +71,6 @@ namespace Belle2 {
 
     /** clears all event-wise data **/
     void cleanPass() {
-      // may7-2014: old:
-//       for (SectorNameAndPointerPair & aSector : this->sectorSequence) { // sectors stay alive, therefore only reset!
-//         aSector.second->second->resetSector();
-//       }
-//       this->sectorMap.find(this->centerSector)->second->resetSector(); // doing the same for the virtual sector which is not in the operation sequence
-//       this->sectorSequence.clear();
-
-      // may7-2014: new:
       for (VXDSector * aSector : this->sectorVector) { // sectors stay alive, therefore only reset!
         aSector->resetSector();
       }
@@ -121,7 +114,6 @@ namespace Belle2 {
     TVector3 origin; /**< stores the chosen origin (position of assumed primary vertex) */
     std::string chosenDetectorType; /**< same as detectorType, but fully written ('SVD','PXD' or 'TEL' allowed), needed during xml and for logging messages */
     bool m_isFilterByDistance2OriginActivated; /**< if true, the sectors are not sorted by layerID but by distance to origin values */
-//     int detectorType; /**< PXD = 0 , SVD = 1, VXD = -1 */
     bool useSVDHits; /** if true, this pass uses SVD hits */
     bool usePXDHits; /** if true, this pass uses PXD hits */
     bool useTELHits; /** if true, this pass uses TEL hits */
@@ -133,9 +125,11 @@ namespace Belle2 {
     double magneticFieldStrength; /**< the strength of the magnetic field in Tesla */
     double generalTune; /**< allows stretching of all filterValues at once*/
 
+
     /** soon to come (maybe even layer-specific): **/
     std::vector<double> secConfigU;  /**< defines subdivition of sensors U */
     std::vector<double> secConfigV; /**< defines subdivition of sensors V */
+
 
     /** for segFinder, compares 2 hits**/
     PassDataTypedef::Filter distance3D; /**< carries information about the filter 'distance3D', type pair<bool isActivated, double tuningParameter> */
@@ -143,7 +137,11 @@ namespace Belle2 {
     PassDataTypedef::Filter distanceZ; /**< carries information about the filter 'distanceZ', type pair<bool isActivated, double tuningParameter> */
     PassDataTypedef::Filter slopeRZ; /**< carries information about the filter 'slopeRZ', type pair<bool isActivated, double tuningParameter> */
     PassDataTypedef::Filter normedDistance3D; /**< carries information about the filter 'normedDistance3D', type pair<bool isActivated, double tuningParameter> */
+    PassDataTypedef::Filter alwaysTrue2Hit; /**< carries information about the filter for test which always approves the input files, type pair<bool isActivated, double tuningParameter> */
+    PassDataTypedef::Filter alwaysFalse2Hit; /**< carries information about the filter test which always discards the input files, type pair<bool isActivated, double tuningParameter> */
+    PassDataTypedef::Filter random2Hit; /**< carries information about the filter test which randomly discards the input files, type pair<bool isActivated, double tuningParameter> */
     int activatedSegFinderTests; /**< counts number of tests activated for segFinder */
+
 
     /** for segFinder in high occupancy mode, compares 2+1 hits (using origin as third hit) */
     PassDataTypedef::Filter anglesHighOccupancy3D; /**< exactly the same as 'angles3D' but for high occupancy cases */
@@ -155,29 +153,39 @@ namespace Belle2 {
     PassDataTypedef::Filter helixParameterHighOccupancyFit; /**< exactly the same as 'helixFit' but for high occupancy cases */
     int activatedHighOccupancySegFinderTests; /**< counts number of tests activated for segFinder in HighOccupancy mode */
 
+
     /** for nbFinder, compares 3 hits **/
     PassDataTypedef::Filter angles3D; /**< carries information about the filter 'angles3D', type pair<bool isActivated, double tuningParameter> */
     PassDataTypedef::Filter anglesXY; /**< carries information about the filter 'anglesXY', type pair<bool isActivated, double tuningParameter> */
     PassDataTypedef::Filter anglesRZ; /**< carries information about the filter 'anglesRZ', type pair<bool isActivated, double tuningParameter> */
     PassDataTypedef::Filter deltaSlopeRZ; /**< carries information about the filter 'deltaSlopeRZ', type pair<bool isActivated, double tuningParameter> */
     PassDataTypedef::Filter pT; /**< carries information about the filter 'pT', same type as others */
-    PassDataTypedef::Filter distance2IP; /**< carries information about the filter 'distance2IP', type pair<bool isActivated, double tuningParameter>  in XY-plane, determines center of projection circle of the track and measures the residual between distance IP <-> circleCenter minus circleRadius */
-    PassDataTypedef::Filter helixParameterFit; /**< carries information about the filter 'helixFit', same type as others. It uses the fact that a helix projection to the xy-plane forms a circle. Any angle of a segment of a circle divided by its deltaZ-value has to be the same value. Therefore any three hits lying on the same helix can be compared this way */
-    PassDataTypedef::Filter deltaSOverZ;
-    PassDataTypedef::Filter deltaSlopeZOverS;
+    PassDataTypedef::Filter distance2IP; /**< carries information about the filter 'distance2IP', type pair<bool isActivated, double tuningParameter>  in XY-plane, determines center of projection circle of the track and measures the residual between distance IP <-> circleCenter minus circleRadius, type pair<bool isActivated, double tuningParameter> */
+    PassDataTypedef::Filter helixParameterFit; /**< carries information about the filter 'helixFit', same type as others. It uses the fact that a helix projection to the xy-plane forms a circle. Any angle of a segment of a circle divided by its deltaZ-value has to be the same value. Therefore any three hits lying on the same helix can be compared this way, type pair<bool isActivated, double tuningParameter> */
+    PassDataTypedef::Filter deltaSOverZ; /**< calculates the helixparameter describing the deviation in arc length per unit in z, type pair<bool isActivated, double tuningParameter> */
+    PassDataTypedef::Filter deltaSlopeZOverS; /**< compares the "slopes" z over arc length. calcDeltaSlopeZOverS is invariant under rotations in the r-z plane, type pair<bool isActivated, double tuningParameter> */
+    PassDataTypedef::Filter alwaysTrue3Hit; /**< carries information about the filter for test which always approves the input files, type pair<bool isActivated, double tuningParameter> */
+    PassDataTypedef::Filter alwaysFalse3Hit; /**< carries information about the filter test which always discards the input files, type pair<bool isActivated, double tuningParameter> */
+    PassDataTypedef::Filter random3Hit; /**< carries information about the filter test which randomly discards the input files, type pair<bool isActivated, double tuningParameter> */
     int activatedNbFinderTests; /**< counts number of tests activated for nbFinder */
+
 
     /** for nbFinder in high occupancy mode, compares 3+1 hits (using origin as fourth hit) */
     PassDataTypedef::Filter deltaPtHighOccupancy; /**< exactly the same as 'deltaPt' but for high occupancy cases */
     PassDataTypedef::Filter deltaDistanceHighOccupancy2IP; /**< exactly the same as 'deltaDistance2IP' but for high occupancy cases */
     int activatedHighOccupancyNbFinderTests; /**< counts number of tests activated for nbFinder */
 
+
     /** for TCC filter, compares 4 hits **/
     PassDataTypedef::Filter zigzagXY; /**< carries information about the filter 'zigZagXY', type pair<bool isActivated, double tuningParameter> , here the tuningparameter is currently ignored, possible future use is reserved for defining uncertainties because of measurement errors */
+    PassDataTypedef::Filter zigzagXYWithSigma; /**< checks whether chain of segments are zigg-zagging (changing sign of curvature of neighbouring segments) in the X-Y-plane, returns true, if they are ziggzagging. This functions uses the sigma of the positionInfos to consider also approximately straight tracks as not zigg-zagging, type pair<bool isActivated, double tuningParameter> , here the tuningparameter is currently ignored, possible future use is reserved for defining uncertainties because of measurement errors */
     PassDataTypedef::Filter zigzagRZ; /**< carries information about the filter 'zigZagRZ', type pair<bool isActivated, double tuningParameter> , here the tuningparameter is currently ignored, possible future use is reserved for defining uncertainties because of measurement errors */
     PassDataTypedef::Filter deltaPt; /**< carries information about the filter 'deltaPt', type pair<bool isActivated, double tuningParameter> */
     PassDataTypedef::Filter deltaDistance2IP; /**< carries information about the filter 'deltaDistance2IP', type pair<bool isActivated, double tuningParameter> */
     PassDataTypedef::Filter circleFit; /**< carries information about the filter 'circleFit', type pair<bool isActivated, doubletuningParameter> , here the tuningparameter is currently used to store the global chi2 threshold value. */
+    PassDataTypedef::Filter alwaysTrue4Hit; /**< carries information about the filter for test which always approves the input files, type pair<bool isActivated, double tuningParameter> */
+    PassDataTypedef::Filter alwaysFalse4Hit; /**< carries information about the filter test which always discards the input files, type pair<bool isActivated, double tuningParameter> */
+    PassDataTypedef::Filter random4Hit; /**< carries information about the filter test which randomly discards the input files, type pair<bool isActivated, double tuningParameter> */
     int activatedTccFilterTests; /**< counts number of tests activated for tcc filter */
 
     SegFinderFilters twoHitFilterBox; /**< contains all the two hit filters needed by the segFinder */
@@ -185,8 +193,9 @@ namespace Belle2 {
     TcFourHitFilters fourHitFilterBox; /**< contains all the four hit filters needed by the post-ca-Filter */
     TrackletFilters trackletFilterBox; /**< contains all the four-or-more hit filters needed by the post-ca-Filter */
 
+
+
     /** filled and resetted each event **/
-//     OperationSequenceOfActivatedSectors sectorSequence; /**< carries pointers to sectors which are used in current event */
     OperationVectorOfActivatedSectors sectorVector; /**< carries pointers to sectors which are used in current event */
     ActiveSegmentsOfEvent activeCellList; /**< list of active cells, dead ones get kicked (therefore it's a list) */
     TotalSegmentsOfEvent totalCellVector;   /**< This vector contains throughout the whole event all segments found. It is needed since

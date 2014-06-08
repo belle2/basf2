@@ -10,6 +10,7 @@
 
 #include "tracking/vxdCaTracking/SegFinderFilters.h"
 #include "tracking/vxdCaTracking/Cutoff.h"
+#include <TRandom.h>
 
 using namespace std;
 using namespace Belle2;
@@ -94,3 +95,29 @@ pair <double, double> SegFinderFilters::getCutoffs(int aFilter)
   }
   return make_pair(0., 0.);
 }
+
+
+bool SegFinderFilters::checkAlwaysTrue2Hit(int nameAlwaysTrue2Hit)
+{
+  if (std::isnan(nameAlwaysTrue2Hit) == true) { return false; }
+  return true;
+}
+
+
+bool SegFinderFilters::checkAlwaysFalse2Hit(int nameAlwaysFalse2Hit)
+{
+  if (std::isnan(nameAlwaysFalse2Hit) == true) { return true; }
+  return false;
+}
+
+
+bool SegFinderFilters::checkRandom2Hit(int nameRandom2Hit)
+{
+  if (std::isnan(nameRandom2Hit) == true) { return false; }
+  double randomVal = gRandom->Uniform(0, 1);
+  if (randomVal > 0.5) { return true; } // 50% chance of getting true
+  return false;
+}
+
+
+double SegFinderFilters::calcRandom2Hit() { return gRandom->Uniform(0, 1); }

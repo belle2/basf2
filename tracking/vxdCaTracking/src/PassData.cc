@@ -169,6 +169,55 @@ std::pair<int, int> PassData::importSectorMap(const VXDTFSecMapTypedef::SecMapCo
         } else if (filterID == FilterID::deltaDistanceHighOccupancy2IP &&  this->deltaDistanceHighOccupancy2IP.first == true) {
           cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->deltaDistanceHighOccupancy2IP.second);
           cutoffMaxValue = addExtraGain(+1, aFilter.second.second, this->deltaDistanceHighOccupancy2IP.second);
+
+        } else if (filterID == FilterID::alwaysTrue2Hit &&  this->alwaysTrue2Hit.first == true) {
+          cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->alwaysTrue2Hit.second);
+          cutoffMaxValue = addExtraGain(+1, aFilter.second.second, this->alwaysTrue2Hit.second);
+
+        } else if (filterID == FilterID::alwaysFalse2Hit &&  this->alwaysFalse2Hit.first == true) {
+          cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->alwaysFalse2Hit.second);
+          cutoffMaxValue = addExtraGain(+1, aFilter.second.second, this->alwaysFalse2Hit.second);
+
+        } else if (filterID == FilterID::random2Hit &&  this->random2Hit.first == true) {
+          cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->random2Hit.second);
+          cutoffMaxValue = addExtraGain(+1, aFilter.second.second, this->random2Hit.second);
+
+        } else if (filterID == FilterID::alwaysTrue3Hit &&  this->alwaysTrue3Hit.first == true) {
+          cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->alwaysTrue3Hit.second);
+          cutoffMaxValue = addExtraGain(+1, aFilter.second.second, this->alwaysTrue3Hit.second);
+
+        } else if (filterID == FilterID::alwaysFalse3Hit &&  this->alwaysFalse3Hit.first == true) {
+          cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->alwaysFalse3Hit.second);
+          cutoffMaxValue = addExtraGain(+1, aFilter.second.second, this->alwaysFalse3Hit.second);
+
+        } else if (filterID == FilterID::random3Hit &&  this->random3Hit.first == true) {
+          cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->random3Hit.second);
+          cutoffMaxValue = addExtraGain(+1, aFilter.second.second, this->random3Hit.second);
+
+        } else if (filterID == FilterID::alwaysTrue4Hit &&  this->alwaysTrue4Hit.first == true) {
+          cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->alwaysTrue4Hit.second);
+          cutoffMaxValue = addExtraGain(+1, aFilter.second.second, this->alwaysTrue4Hit.second);
+
+        } else if (filterID == FilterID::alwaysFalse4Hit &&  this->alwaysFalse4Hit.first == true) {
+          cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->alwaysFalse4Hit.second);
+          cutoffMaxValue = addExtraGain(+1, aFilter.second.second, this->alwaysFalse4Hit.second);
+
+        } else if (filterID == FilterID::random4Hit &&  this->random4Hit.first == true) {
+          cutoffMinValue = addExtraGain(-1, aFilter.second.first, this->random4Hit.second);
+          cutoffMaxValue = addExtraGain(+1, aFilter.second.second, this->random4Hit.second);
+
+        } else if (filterID == FilterID::ziggZaggXY) {
+          cutoffMinValue = 0;
+          cutoffMaxValue = 1;
+
+        } else if (filterID == FilterID::ziggZaggXYWithSigma) {
+          cutoffMinValue = 0;
+          cutoffMaxValue = 1;
+
+        } else if (filterID == FilterID::ziggZaggRZ) {
+          cutoffMinValue = 0;
+          cutoffMaxValue = 1;
+
         } else { B2DEBUG(130, "PassData::importSectorMap: filter not accepted: sector/friend/filterID: " << currentSecID << "/" << currentFriendID << "/" << FilterID().getFilterString(aFilter.first) << "!"); doNotStore = true; }
 
         if (doNotStore == false) {
@@ -230,9 +279,10 @@ void PassData::activateAllFilters()
   activatedHighOccupancyNbFinderTests = 2;
 
   zigzagXY = standardValue;
+  zigzagXYWithSigma = standardValue;
   zigzagRZ = standardValue;
   deltaPt = standardValue;
   deltaDistance2IP = standardValue;
   circleFit = standardValue;
-  activatedTccFilterTests = 5;
+  activatedTccFilterTests = 6;
 }

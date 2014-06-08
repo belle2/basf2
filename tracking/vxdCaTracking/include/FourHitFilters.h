@@ -11,7 +11,7 @@
 #pragma once
 
 #include <TVector3.h>
-#include "ThreeHitFilters.h"
+#include "tracking/vxdCaTracking/ThreeHitFilters.h"
 
 
 

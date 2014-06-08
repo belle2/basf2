@@ -11,8 +11,8 @@
 #pragma once
 
 #include <TVector3.h>
-#include "TwoHitFilters.h"
-#include "FilterExceptions.h"
+#include "tracking/vxdCaTracking/TwoHitFilters.h"
+#include "tracking/vxdCaTracking/FilterExceptions.h"
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
@@ -187,7 +187,7 @@ namespace Belle2 {
 
 
 
-    /** calculates the helixparameter describing the deviation in z per unit angle.
+    /** calculates the helixparameter describing the deviation in arc length per unit in z.
      *
      * returning unit: radians*cm
      */

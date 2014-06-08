@@ -19,8 +19,8 @@
 
 #include <TVector3.h>
 
-#include "VXDTFHit.h"
-#include "VXDSector.h"
+#include "tracking/vxdCaTracking/VXDTFHit.h"
+#include "tracking/vxdCaTracking/VXDSector.h"
 
 namespace Belle2 {
 

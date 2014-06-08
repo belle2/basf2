@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-#include "SectorFriends.h"
+#include "tracking/vxdCaTracking/SectorFriends.h"
 
 namespace Belle2 {
 

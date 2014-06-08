@@ -10,14 +10,14 @@
 
 #pragma once
 
-#include "FilterExceptions.h"
+#include "tracking/vxdCaTracking/FilterExceptions.h"
 #include <tuple>
 #include <TVector3.h>
 #include <vector>
 #include <boost/assign/std/vector.hpp> // overloading + to fill many values at once in vector;
 #include <array>
-#include "ThreeHitFilters.h"
-#include "SharedFunctions.h" // e.g. PositionInfo
+#include "tracking/vxdCaTracking/ThreeHitFilters.h"
+#include "tracking/vxdCaTracking/SharedFunctions.h" // e.g. PositionInfo
 
 
 
@@ -174,6 +174,11 @@ namespace Belle2 {
 
     /** Calculates Curvature: True means clockwise, False means counterclockwise.  (from out to in) */
     bool CalcCurvature();
+
+
+
+    /** prints positions and sigmas of all hits in given vector of PositionInfos TODO use SpacePoints instead of PositionInfo for all filters, SpacePoints shall get a print-Function */
+    std::string printHits(const std::vector<PositionInfo*>* hits) const ;
 
 
 

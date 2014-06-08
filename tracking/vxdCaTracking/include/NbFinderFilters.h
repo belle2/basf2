@@ -13,8 +13,8 @@
 #include "TObject.h"
 #include <TVector3.h>
 #include <utility>
-#include "ThreeHitFilters.h"
-#include "VXDSector.h"
+#include "tracking/vxdCaTracking/ThreeHitFilters.h"
+#include "tracking/vxdCaTracking/VXDSector.h"
 
 
 
@@ -175,8 +175,10 @@ namespace Belle2 {
     /** calculates the deltaSOverZ describing the deviation in z per unit angle, returning unit: none */
     double calcDeltaSOverZ() { return ThreeHitFilters::calcDeltaSOverZ(); }
 
+
     /** returns number of accepted (.first) and neglected (.second) filter tests using deltaSOverZ3D */
     SuccessAndFailCounter getAcceptanceRateDeltaSOverZ() { return m_deltaSOverZCtr; }
+
 
     /** simply checks whether deltaSlopeZOverS-value is accepted by the given cutoffs */
     bool checkDeltaSlopeZOverS(int nameDeltaSlopeZOverS);
@@ -185,8 +187,46 @@ namespace Belle2 {
     /** calculates the deltaSlopeZOverS describing the deviation in z per unit angle, returning unit: none */
     double calcDeltaSlopeZOverS() { return ThreeHitFilters::calcDeltaSlopeZOverS(); }
 
+
     /** returns number of accepted (.first) and neglected (.second) filter tests using deltaSlopeZOverS */
     SuccessAndFailCounter getAcceptanceRateDeltaSlopeZOverS() { return m_deltaSlopeZOverSCtr; }
+
+
+    /** simply checks test-filter which always says True (except if input is NaN, then it says False) */
+    bool checkAlwaysTrue3Hit(int nameAlwaysTrue3Hit);
+
+
+    /** "calculates" value for test-filter which always says True -> value always 1 */
+    double calcAlwaysTrue3Hit() { return 1; }
+
+
+    /** returns number of accepted (.first) and neglected (.second) filter tests using always True 3-Hit */
+    SuccessAndFailCounter getAcceptanceRateAlwaysTrue3Hit() { return m_AlwaysTrue3HitCtr; }
+
+
+    /** simply checks test-filter which always says False (except if input is NaN, then it says True) */
+    bool checkAlwaysFalse3Hit(int nameAlwaysFalse3Hit);
+
+
+    /** "calculates" value for test-filter which always says False -> value always 0 */
+    double calcAlwaysFalse3Hit() { return 0; }
+
+
+    /** returns number of accepted (.first) and neglected (.second) filter tests using always False 3-Hit */
+    SuccessAndFailCounter getAcceptanceRateAlwaysFalse3Hit() { return m_AlwaysFalse3HitCtr; }
+
+
+    /** simply checks test-filter which randomly says True or False (except if input is NaN, then it says True) */
+    bool checkRandom3Hit(int nameRandom3Hit);
+
+
+    /** "calculates" value for test-filter -> random value between 0 and 1 (not the same value as was used for checkRandom3Hit, as indicated: it's a random value) */
+    double calcRandom3Hit();
+
+
+    /** returns number of accepted (.first) and neglected (.second) filter tests using random True/False 3-Hit */
+    SuccessAndFailCounter getAcceptanceRateRandom3Hit() { return m_Random3HitCtr; }
+
 
     /** returns cutoff-values of given filter */
     std::pair <double, double> getCutoffs(int aFilter) {
@@ -209,6 +249,9 @@ namespace Belle2 {
     SuccessAndFailCounter m_helixParameterFitCtr; /**< counts number of successful (.first) and neglected (.second) tests for helixParameterFit */
     SuccessAndFailCounter m_deltaSOverZCtr; /**< counts number of successful (.first) and neglected (.second) tests for deltaSOverZ */
     SuccessAndFailCounter m_deltaSlopeZOverSCtr; /**< counts number of successful (.first) and neglected (.second) tests for deltaSlopeZOverS */
+    SuccessAndFailCounter m_AlwaysTrue3HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which always says True */
+    SuccessAndFailCounter m_AlwaysFalse3HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which always says False */
+    SuccessAndFailCounter m_Random3HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which randomly throws True or False */
   }; //end class NbFinderFilters
 } //end namespace Belle2
 

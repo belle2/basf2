@@ -14,8 +14,8 @@
 #include "TObject.h"
 #include <TVector3.h>
 #include <utility>
-#include "TwoHitFilters.h"
-#include "VXDSector.h"
+#include "tracking/vxdCaTracking/TwoHitFilters.h"
+#include "tracking/vxdCaTracking/VXDSector.h"
 
 
 
@@ -25,6 +25,7 @@ namespace Belle2 {
   class SegFinderFilters : public TwoHitFilters {
   public:
     typedef std::pair <int, int> SuccessAndFailCounter; /**<  first entry is for number of times when filter approved valuse, second one is for number of times when filter neglected values */
+
 
     /** Empty constructor. For initialisation only, an object generated this way is useless unless resetValues is called at least once */
     SegFinderFilters():
@@ -36,6 +37,7 @@ namespace Belle2 {
       m_distZCtr(std::make_pair(0, 0)),
       m_normDist3DCtr(std::make_pair(0, 0)),
       m_slopeRZCtr(std::make_pair(0, 0)) {}
+
 
     /** Constructor. use this one, when having a sectormap (e.g. during track finding), use TwoHitFilters when no sectormap is available */
     SegFinderFilters(TVector3 outerHit, TVector3 innerHit, VXDSector* thisSector, unsigned int friendID):
@@ -52,6 +54,7 @@ namespace Belle2 {
     /** Destructor. */
     ~SegFinderFilters() {}
 
+
     /** Overrides Constructor-Setup. Needed if you want to reuse the instance instead of recreating one */
     void resetValues(TVector3 outerHit, TVector3 innerHit, VXDSector* thisSector, unsigned int friendID) {
       TwoHitFilters::resetValues(outerHit, innerHit);
@@ -59,40 +62,102 @@ namespace Belle2 {
       m_friendID = friendID;
     }
 
+
     /** simply checks whether dist3D-value is accepted by the given cutoffs */
     bool checkDist3D(int nameDist3D);
+
+
     /** calculates the distance between the hits (3D), returning unit: cm^2 for speed optimization */
     double calcDist3D() { return TwoHitFilters::calcDist3D(); }
+
+
     /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
     SuccessAndFailCounter getAcceptanceRateDist3D() { return m_dist3DCtr; }
 
+
     /** simply checks whether distXY-value is accepted by the given cutoffs */
     bool checkDistXY(int nameDistXY);
+
+
     /** calculates the distance between the hits (XY), returning unit: cm^2 for speed optimization */
     double calcDistXY() { return TwoHitFilters::calcDistXY(); }
-    /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
+
+
+    /** returns number of accepted (.first) and neglected (.second) filter tests using distXY */
     SuccessAndFailCounter getAcceptanceRateDistXY() { return m_distXYCtr; }
+
 
     /** simply checks whether distZ-value is accepted by the given cutoffs */
     bool checkDistZ(int nameDistZ);
+
+
     /** calculates the distance between the hits (Z only), returning unit: cm */
     double calcDistZ() { return TwoHitFilters::calcDistZ(); }
-    /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
+
+
+    /** returns number of accepted (.first) and neglected (.second) filter tests using distZ */
     SuccessAndFailCounter getAcceptanceRateDistZ() { return m_distZCtr; }
+
 
     /** simply checks whether normedDist3D-value is accepted by the given cutoffs */
     bool checkNormedDist3D(int nameNormDist3D);
+
+
     /** calculates the normed distance between the hits (3D), return unit: none */
     double calcNormedDist3D() { return TwoHitFilters::calcNormedDist3D(); }
-    /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
+
+
+    /** returns number of accepted (.first) and neglected (.second) filter tests using normeddist3D */
     SuccessAndFailCounter getAcceptanceRateNormDist3D() { return m_normDist3DCtr; }
+
 
     /** imply checks whether the slope in RZ is accepted by the given cutoffs */
     bool checkSlopeRZ(int nameSlopeRZ);
+
+
     /** calculates the slope of the hits in RZ, return unit: cm (cm^2/cm = cm) */
     double calcSlopeRZ() { return TwoHitFilters::calcSlopeRZ(); }
-    /** returns number of accepted (.first) and neglected (.second) filter tests using dist3D */
+
+
+    /** returns number of accepted (.first) and neglected (.second) filter tests using slopeRZ */
     SuccessAndFailCounter getAcceptanceRateSlopeRZ() { return m_slopeRZCtr; }
+
+
+    /** simply checks test-filter which always says True (except if input is NaN, then it says False) */
+    bool checkAlwaysTrue2Hit(int nameAlwaysTrue2Hit);
+
+
+    /** "calculates" value for test-filter which always says True -> value always 1 */
+    double calcAlwaysTrue2Hit() { return 1; }
+
+
+    /** returns number of accepted (.first) and neglected (.second) filter tests using always True 2-Hit */
+    SuccessAndFailCounter getAcceptanceRateAlwaysTrue2Hit() { return m_AlwaysTrue2HitCtr; }
+
+
+    /** simply checks test-filter which always says False (except if input is NaN, then it says True) */
+    bool checkAlwaysFalse2Hit(int nameAlwaysFalse2Hit);
+
+
+    /** "calculates" value for test-filter which always says False -> value always 0 */
+    double calcAlwaysFalse2Hit() { return 0; }
+
+
+    /** returns number of accepted (.first) and neglected (.second) filter tests using always False 2-Hit */
+    SuccessAndFailCounter getAcceptanceRateAlwaysFalse2Hit() { return m_AlwaysFalse2HitCtr; }
+
+
+    /** simply checks test-filter which randomly says True or False (except if input is NaN, then it says True) */
+    bool checkRandom2Hit(int nameRandom2Hit);
+
+
+    /** "calculates" value for test-filter -> random value between 0 and 1 (not the same value as was used for checkRandom2Hit, as indicated: it's a random value) */
+    double calcRandom2Hit();
+
+
+    /** returns number of accepted (.first) and neglected (.second) filter tests using random True/False 2-Hit */
+    SuccessAndFailCounter getAcceptanceRateRandom2Hit() { return m_Random2HitCtr; }
+
 
     /** returns cutoff-values of given filter */
     std::pair <double, double> getCutoffs(int aFilter); // one method to read them all...
@@ -107,5 +172,8 @@ namespace Belle2 {
     SuccessAndFailCounter m_distZCtr; /**< counts number of successful (.first) and neglected (.second) tests for distanceZ */
     SuccessAndFailCounter m_normDist3DCtr; /**< counts number of successful (.first) and neglected (.second) tests for normedDistance3D */
     SuccessAndFailCounter m_slopeRZCtr; /**< counts number of successful (.first) and neglected (.second) tests for slopeRZ */
+    SuccessAndFailCounter m_AlwaysTrue2HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which always says True */
+    SuccessAndFailCounter m_AlwaysFalse2HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which always says False */
+    SuccessAndFailCounter m_Random2HitCtr; /**< counts number of successful (.first) and neglected (.second) tests for the test-filter which randomly throws True or False */
   }; //end class SegFinderFilters
 } //end namespace Belle2

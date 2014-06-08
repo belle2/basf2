@@ -10,9 +10,12 @@ from time import time
 numEvents = 250
 initialValue = 2
 
-secSetup = ['secMapEvtGenOnR10508May2014SVDStd-moreThan500MeV_SVD',
-            'secMapEvtGenOnR10508May2014SVDStd-125to500MeV_SVD',
-            'secMapEvtGenOnR10508May2014SVDStd-30to125MeV_SVD']
+# secSetup = ['secMapEvtGenOnR10508May2014SVDStd-moreThan500MeV_SVD',
+            # 'secMapEvtGenOnR10508May2014SVDStd-125to500MeV_SVD',
+            # 'secMapEvtGenOnR10508May2014SVDStd-30to125MeV_SVD']
+secSetup = ['secMapEvtGenOnR10933June2014SVDStd-30to125MeV_SVD',
+            'secMapEvtGenOnR10933June2014SVDStd-125to500MeV_SVD',
+            'secMapEvtGenOnR10933June2014SVDStd-moreThan500MeV_SVD']
 
 # secSetup = ['sectorList_evtNormSecHIGH_VXD', 'sectorList_evtNormSecMED_VXD', 'sectorList_evtNormSecLOW_VXD']
 # WARNING if you want to use SVD only, please uncomment secSetup ending with SVD, then comment the VXD-version (of vice versa if you want to have the svd version)

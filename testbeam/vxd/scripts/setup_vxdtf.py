@@ -17,11 +17,12 @@ def setup_vxdtf(
               ],
     filterOverlaps='hopfield',
     baseLineTF=0,
+    cellMinState=2,
     ):
 
     # VXDTF:
     ## parameters:
-    qiType = 'circleFit'
+    qiType = 'straightLine'
     #
     vxdtf = register_module('VXDTF')
     # vxdtf.logging.log_level = LogLevel.INFO
@@ -29,11 +30,12 @@ def setup_vxdtf(
     vxdtf.logging.debug_level = 5
     param_vxdtf = {
         'activateBaselineTF': baseLineTF,
-        'tccMinState': [2],
+        'tccMinState': [cellMinState],
         'tccMinLayer': [3],
         'standardPdgCode': -11,
         'artificialMomentum': 5.,
         'sectorSetup': secSetup,
+        'telClustersName': '',
         'calcQIType': qiType,
         'killEventForHighOccupancyThreshold': 100,
         'highOccupancyThreshold': 1200,
@@ -68,7 +70,7 @@ def setup_vxdtf(
         'activateZigZagXY': [False],
         'activateZigZagRZ': [False],
         'activateDeltaPt': [False],
-        'activateCircleFit': [True],
+        'activateCircleFit': [False],
         'tuneCircleFit': [0],
         }
         # 'tuneDistanceZ': [1.2],
@@ -82,6 +84,7 @@ def setup_vxdtf1T(
               ],
     filterOverlaps='hopfield',
     baseLineTF=0,
+    cellMinState=2,
     ):
 
     # VXDTF:
@@ -94,11 +97,12 @@ def setup_vxdtf1T(
     vxdtf.logging.debug_level = 5
     param_vxdtf = {  #   'artificialMomentum': 5.,
         'activateBaselineTF': baseLineTF,
-        'tccMinState': [2],
+        'tccMinState': [cellMinState],
         'tccMinLayer': [3],
         'standardPdgCode': -11,
         'sectorSetup': secSetup,
         'calcQIType': qiType,
+        'telClustersName': '',
         'killEventForHighOccupancyThreshold': 125,
         'highOccupancyThreshold': 1200,
         'cleanOverlappingSet': False,

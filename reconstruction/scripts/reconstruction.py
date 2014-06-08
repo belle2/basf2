@@ -107,19 +107,19 @@ def add_reconstruction(path, components=None):
             vxd_trackfinder.param('GFTrackCandidatesColName', vxd_trackcands)
             if components != None and 'PXD' not in components:
                 vxd_trackfinder.param('sectorSetup',
-                                      ['secMapEvtGenOnR10508May2014SVDStd-moreThan500MeV_SVD'
+                                      ['secMapEvtGenOnR10933June2014SVDStd-moreThan500MeV_SVD'
                                       ,
-                                      'secMapEvtGenOnR10508May2014SVDStd-125to500MeV_SVD'
+                                      'secMapEvtGenOnR10933June2014SVDStd-125to500MeV_SVD'
                                       ,
-                                      'secMapEvtGenOnR10508May2014SVDStd-30to125MeV_SVD'
+                                      'secMapEvtGenOnR10933June2014SVDStd-30to125MeV_SVD'
                                       ])
             else:
                 vxd_trackfinder.param('sectorSetup',
-                                      ['secMapEvtGenOnR10508May2014VXDStd-moreThan500MeV_PXDSVD'
+                                      ['secMapEvtGenOnR10933June2014VXDStd-moreThan500MeV_PXDSVD'
                                       ,
-                                      'secMapEvtGenOnR10508May2014VXDStd-125to500MeV_PXDSVD'
+                                      'secMapEvtGenOnR10933June2014VXDStd-125to500MeV_PXDSVD'
                                       ,
-                                      'secMapEvtGenOnR10508May2014VXDStd-30to125MeV_PXDSVD'
+                                      'secMapEvtGenOnR10933June2014VXDStd-30to125MeV_PXDSVD'
                                       ])
             path.add_module(vxd_trackfinder)
 

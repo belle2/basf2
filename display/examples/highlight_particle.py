@@ -8,6 +8,11 @@
 import os
 import random
 from basf2 import *
+
+# avoid race conditions beetween pyroot and GUI thread
+from ROOT import PyConfig
+PyConfig.StartGuiThread = False
+
 from ROOT import Belle2
 from modularAnalysis import *
 
@@ -49,9 +54,9 @@ main.add_module(register_module('Geometry'))
 
 selectParticle('K-', -321, [], path=main)
 selectParticle('pi+', 211, [], path=main)
-selectParticle('g', 22, [], path=main)
+selectParticle('gamma', 22, [], path=main)
 
-makeParticle('pi0', 111, ['g', 'g'], 0.110, 0.150, path=main)
+makeParticle('pi0', 111, ['gamma', 'gamma'], 0.110, 0.150, path=main)
 
 applyCuts('pi0', ['p.1 0.1:', 'p.2 0.1:'], path=main)
 

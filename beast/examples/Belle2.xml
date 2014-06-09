@@ -5,7 +5,7 @@
   <Global>
     <material>Air</material>
     <width  unit="m">8.0</width>
-    <length unit="m">8.0</length>
+    <length unit="m">40.0</length>
     <height unit="m">8.0</height>
   </Global>
 

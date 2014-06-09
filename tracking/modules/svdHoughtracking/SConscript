@@ -1,0 +1,7 @@
+Import('env')
+
+env['LIBS'] = ['vxd','vxd_dataobjects', 'svd', 'svd_dataobjects', 'geometry', 
+'framework', 'tracking_dataobjects', 'tracking', '$ROOT_LIBS']
+#env.Append(LIBPATH='-L/home/michi/prog/track/trunk/lib')
+
+Return('env')

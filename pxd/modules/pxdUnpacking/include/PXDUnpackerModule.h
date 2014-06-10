@@ -13,6 +13,8 @@
 
 #include <framework/core/Module.h>
 #include <pxd/dataobjects/PXDRawHit.h>
+#include <pxd/dataobjects/PXDRawAdc.h>
+#include <pxd/dataobjects/PXDRawPedestal.h>
 #include <pxd/dataobjects/PXDRawROIs.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <rawdata/dataobjects/RawPXD.h>
@@ -78,6 +80,10 @@ namespace Belle2 {
       StoreArray<PXDRawHit> m_storeRawHits;
       /** Output array for Raw Hits. */
       StoreArray<PXDRawROIs> m_storeROIs;
+      /** Output array for Raw Adcs. */
+      StoreArray<PXDRawAdc> m_storeRawAdc;
+      /** Output array for Raw Adc:Pedestals. */
+      StoreArray<PXDRawPedestal> m_storeRawPedestal;
 
       /** Unpack one event (several frames) stored in RawPXD object.
        * @param px RawPXD data object
@@ -104,8 +110,18 @@ namespace Belle2 {
        * @param dhh_DHPport raw DHP port from DHHC frame
        * @param dhh_reformat flag if DHH did reformatting
        * @param toffset triggered row (offset)
+       * @param vxd_id vertex Detector ID
        */
       void unpack_dhp(void* data, unsigned int len, unsigned int dhh_first_readout_frame_lo, unsigned int dhh_ID, unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id);
+
+      /** Unpack DHP RAW data within one DHH frame (pedestals, etc)
+       * @param data pointer to dhp data
+       * @param len length of dhp data
+       * @param dhh_ID raw DHH ID from DHHC frame
+       * @param dhh_DHPport raw DHP port from DHHC frame
+       * @param vxd_id vertex Detector ID
+       */
+      void unpack_dhp_raw(void* data, unsigned int len, unsigned int dhh_ID, unsigned dhh_DHPport, VxdID vxd_id);
 
       int nr5bits(int i) const;/// helper function to "count" nr of set bits within lower 5 bits
 

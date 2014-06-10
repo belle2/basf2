@@ -131,7 +131,7 @@ struct dhhc_frame_header_word0 {
       (const char*)"ONS_TRG",
       (const char*)"ONS_ROI"
     };
-    B2INFO("DHHC FRAME TYP " << hex << getFrameType() << " -> " << dhhc_type_name[getFrameType()] << " ERR " << getErrorFlag() << " data " << data);
+    B2INFO("DHHC FRAME TYP " << hex << getFrameType() << " -> " << dhhc_type_name[getFrameType()] << " (ERR " << getErrorFlag() << ") data " << data);
   };
 };
 
@@ -612,10 +612,6 @@ public:
     return s;
   };
 
-  void write_pedestal(void) {
-    B2INFO("Write Pedestal Data - not implemented... !");
-  };
-
 };
 
 ///******************************************************************
@@ -625,7 +621,9 @@ public:
 PXDUnpackerModule::PXDUnpackerModule() :
   Module(),
   m_storeRawHits(),
-  m_storeROIs()
+  m_storeROIs(),
+  m_storeRawAdc(),
+  m_storeRawPedestal()
 {
   //Set module properties
   setDescription("Unpack Raw PXD Hits from ONSEN data stream");
@@ -642,14 +640,13 @@ PXDUnpackerModule::PXDUnpackerModule() :
 
 void PXDUnpackerModule::initialize()
 {
-  B2INFO("For unpacking data from Desy test 2013/14, please move to PXDUnpackerDesy1314Module !!!");
-  B2INFO("PXDUnpackerModule will only unpack data recorded with latest DHHC and ONSEN firmware.");
-//   exit(0);
-
   //Register output collections
   m_storeRawHits.registerAsPersistent();
+  m_storeRawAdc.registerAsPersistent();
+  m_storeRawPedestal.registerAsPersistent();
   m_storeROIs.registerAsPersistent();
-  /// actually, later we do not want to store it into output file ...  aside from debugging
+  /// actually, later we do not want to store ROIs and Pedestals into output file ...  aside from debugging
+
   B2INFO("HeaderEndianSwap: " << m_headerEndianSwap);
   B2INFO("Ignore(missing)DATCON: " << m_ignoreDATCON);
 
@@ -827,9 +824,56 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
 
 }
 
-void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int dhh_first_readout_frame_id_lo, unsigned int dhh_ID, unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id)
+void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsigned int dhh_ID, unsigned dhh_DHPport, VxdID vxd_id)
 {
-  unsigned int nr_words = len2 / 2; // len2 in bytes!!!
+//   unsigned int nr_words = frame_len / 2; // frame_len in bytes (excl. CRC)!!!
+  unsigned short* dhp_pix = (unsigned short*)data;
+  // ADC/ADC and ADC/PEDESTAL can only be distinguised by length of frame
+
+  if (frame_len != 0x10008 && frame_len != 0x20008) {
+    B2ERROR("Frame size unsupported for RAW pedestal frame! $" << hex << frame_len << " bytes");
+    return;
+  }
+  unsigned int dhp_header_type  = 0;
+//   unsigned int dhp_reserved     = 0;
+  unsigned int dhp_dhh_id       = 0;
+  unsigned int dhp_dhp_id       = 0;
+
+  dhp_header_type  = (dhp_pix[2] >> 13) & 0x07;
+//   dhp_reserved     = (dhp_pix[2] >> 8) & 0x1F;
+  dhp_dhh_id       = (dhp_pix[2] >> 2) & 0x3F;
+  dhp_dhp_id       =  dhp_pix[2] & 0x03;
+
+  if (dhh_ID != dhp_dhh_id) {
+    B2ERROR("DHH ID in DHH and DHP header differ $" << hex << dhh_ID << " != $" << dhp_dhh_id);
+    error_mask |= ONSEN_ERR_FLAG_DHH_DHP_DHHID;
+  }
+  if (dhh_DHPport != dhp_dhp_id && !m_ignore_dhpportdiffer) {
+    B2ERROR("DHP ID (Chip/Port) in DHH and DHP header differ $" << hex << dhh_DHPport << " != $" << dhp_dhp_id);
+    error_mask |= ONSEN_ERR_FLAG_DHH_DHP_PORT;
+  }
+
+  if (dhp_header_type != DHP_FRAME_HEADER_DATA_TYPE_RAW) {
+    B2ERROR("Header type invalid for this kind of DHH frame: $" << hex << dhp_header_type);
+    return;
+  }
+
+  if (frame_len == 0x10008) { // 64k
+    B2INFO("Pedestal Data - (ADC:ADC) - not implemented... !");
+    m_storeRawAdc.appendNew(vxd_id, data, false);
+  } else if (frame_len == 0x20008) { // 128k
+    B2INFO("Pedestal Data - (ADC:Pedestal) - not implemented... !");
+    m_storeRawAdc.appendNew(vxd_id, data, true);
+    m_storeRawPedestal.appendNew(vxd_id, data);
+  } else {
+    // checked already above
+  }
+};
+
+
+void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned int dhh_first_readout_frame_id_lo, unsigned int dhh_ID, unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id)
+{
+  unsigned int nr_words = frame_len / 2; // frame_len in bytes (excl. CRC)!!!
   bool printflag = false;
   unsigned short* dhp_pix = (unsigned short*)data;
 
@@ -855,26 +899,31 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
     B2INFO("HEADER --  " << hex << dhp_pix[0] << hex << dhp_pix[1] << hex << dhp_pix[2] << hex << dhp_pix[3] << " -- ");
 
   if (printflag)
-    B2INFO("DHP Header     |   " << hex << dhp_pix[2] << " ( " << hex << dhp_pix[2] << " ) ");
+    B2INFO("DHP Header   | " << hex << dhp_pix[2] << " ( " << hex << dhp_pix[2] << " ) ");
   dhp_header_type  = (dhp_pix[2] >> 13) & 0x07;
   dhp_reserved     = (dhp_pix[2] >> 8) & 0x1F;
   dhp_dhh_id       = (dhp_pix[2] >> 2) & 0x3F;
   dhp_dhp_id       =  dhp_pix[2] & 0x03;
 
   if (printflag) {
-    B2INFO("DHP type          |    " << hex << dhp_header_type << " ( " << dec << dhp_header_type << " ) ");
-    B2INFO("DHP reserved          |    " << hex << dhp_reserved << " ( " << dec << dhp_reserved << " ) ");
-    B2INFO("DHP DHH ID          |    " << hex << dhp_dhh_id << " ( " << dec << dhp_dhh_id << " ) ");
-    B2INFO("DHP DHP ID          |    " << hex << dhp_dhp_id << " ( " << dec << dhp_dhp_id << " ) ");
+    B2INFO("DHP type     | " << hex << dhp_header_type << " ( " << dec << dhp_header_type << " ) ");
+    B2INFO("DHP reserved | " << hex << dhp_reserved << " ( " << dec << dhp_reserved << " ) ");
+    B2INFO("DHP DHH ID   | " << hex << dhp_dhh_id << " ( " << dec << dhp_dhh_id << " ) ");
+    B2INFO("DHP DHP ID   | " << hex << dhp_dhp_id << " ( " << dec << dhp_dhp_id << " ) ");
   }
 
   if (dhh_ID != dhp_dhh_id) {
-    B2ERROR("DHH ID in DHH and DHP header differ ($" << hex << dhh_ID << " != $" << dhp_dhh_id);
+    B2ERROR("DHH ID in DHH and DHP header differ $" << hex << dhh_ID << " != $" << dhp_dhh_id);
     error_mask |= ONSEN_ERR_FLAG_DHH_DHP_DHHID;
   }
   if (dhh_DHPport != dhp_dhp_id && !m_ignore_dhpportdiffer) {
-    B2ERROR("DHP ID (Chip/Port) in DHH and DHP header differ ($" << hex << dhh_DHPport << " != $" << dhp_dhp_id);
+    B2ERROR("DHP ID (Chip/Port) in DHH and DHP header differ $" << hex << dhh_DHPport << " != $" << dhp_dhp_id);
     error_mask |= ONSEN_ERR_FLAG_DHH_DHP_PORT;
+  }
+
+  if (dhp_header_type != DHP_FRAME_HEADER_DATA_TYPE_ZSD) {
+    B2ERROR("Header type invalid for this kind of DHH frame: $" << hex << dhp_header_type);
+    return;
   }
 
   static int offtab[4] = {0, 64, 128, 192};
@@ -1030,7 +1079,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, int& last_wie, un
     case DHHC_FRAME_HEADER_DATA_TYPE_DHP_RAW: {
       nr_of_frames_counted++;
 
-      if (verbose)dhhc.data_direct_readout_frame_raw->print();
+      if (verbose) dhhc.data_direct_readout_frame_raw->print();
       if (current_dhh_id != dhhc.data_direct_readout_frame_raw->getDHHId()) {
         B2ERROR("DHH ID from DHH Start and this frame do not match $" << hex << current_dhh_id << " != $" << dhhc.data_direct_readout_frame_raw->getDHHId());
         error_mask |= ONSEN_ERR_FLAG_DHH_START_ID;
@@ -1039,7 +1088,12 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, int len, int& last_wie, un
       found_mask_active_dhp |= 1 << dhhc.data_direct_readout_frame->getDHPPort();
 
 //       stat_raw++;
-      dhhc.write_pedestal();
+
+      unpack_dhp_raw(data, len - 4,
+                     dhhc.data_direct_readout_frame->getDHHId(),
+                     dhhc.data_direct_readout_frame->getDHPPort(),
+                     currentVxdId);
+
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_ONSEN_DHP:

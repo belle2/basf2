@@ -337,7 +337,7 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
     TVector3 lorentzShift = info.getLorentzShift(projU.getPos(), projV.getPos());
     projU.setPos(projU.getPos() - lorentzShift.X());
     projV.setPos(projV.getPos() - lorentzShift.Y());
-    B2INFO("Lorentz shift: " << lorentzShift.X() << " " << lorentzShift.Y());
+    B2DEBUG(100, "Lorentz shift: " << lorentzShift.X() << " " << lorentzShift.Y());
 
     //Store Cluster into Datastore ...
     int clsIndex = storeClusters.getEntries();

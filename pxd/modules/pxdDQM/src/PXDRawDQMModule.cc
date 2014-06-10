@@ -38,8 +38,9 @@ void PXDRawDQMModule::defineHisto()
   hrawPxdPacketSize = new TH1F("hrawPxdPacketSize", "Pxd Raw Packetsize;Words per packet", 1024, 0, 1024);
 
   hrawPxdHitsCount = new TH1F("hrawPxdCount", "Pxd Raw Count ;Nr per Event", 256, 0, 256);
-  for (auto i = 0; i < 10; i++) {
-    std::string s = std::to_string(i);
+  for (auto i = 0; i < 64; i++) {
+    std::string s = boost::str(boost::format("DHH ID $%02X Layer %d Ladder %d Sensor %d") % i % (((i >> 5) & 0x1) + 1) % ((i >> 1) & 0xF) % ((i & 0x1) + 1));
+
     hrawPxdHits[i]  = new TH2F(("hrawPxdHits" + s).c_str(), ("Pxd Raw Hit Map, Sensor " + s + ";column;row").c_str(), 256, 0, 256, 786, 0, 786);
     hrawPxdHitsCharge[i]  = new TH1F(("hrawPxdHitsCharge" + s).c_str(), ("Pxd Raw Hit Charge, Sensor " + s + ";Charge").c_str(), 256, 0, 256);
     hrawPxdHitsCommonMode[i]  = new TH1F(("hrawPxdHitsCommonMode" + s).c_str(), ("Pxd Raw Hit Common Mode, Sensor " + s + ";Value").c_str(), 256, 0, 256);
@@ -58,7 +59,7 @@ void PXDRawDQMModule::beginRun()
   hrawPxdPackets->Reset();
   hrawPxdPacketSize->Reset();
   hrawPxdHitsCount->Reset();
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 64; i++) {
     hrawPxdHits[i]->Reset();
     hrawPxdHitsCharge[i]->Reset();
     hrawPxdHitsCommonMode[i]->Reset();
@@ -77,11 +78,25 @@ void PXDRawDQMModule::event()
   hrawPxdHitsCount->Fill(m_storeRawHits.getEntries());
 
   for (auto & it : m_storeRawHits) {
-    int i;
-    i = it.getSensorID() % 10;
-    hrawPxdHits[i]->Fill(it.getColumn(), it.getRow());
-    hrawPxdHitsCharge[i]->Fill(it.getCharge());
-    hrawPxdHitsCommonMode[i]->Fill(it.getCommonMode());
-    hrawPxdHitsTimeWindow[i]->Fill(it.getFrameNr() * 1024 - it.getStartRow());
+    int dhh_id;
+    {
+      // calculate DHH id from Vxd Id
+      unsigned int layer, ladder, sensor;//, segment;
+      VxdID currentVxdId;
+      currentVxdId = it.getSensorID();
+      layer = currentVxdId.getLayerNumber();/// 1 ... 2
+      ladder = currentVxdId.getLadderNumber();/// 1 ... 8 and 1 ... 12
+      sensor = currentVxdId.getSensorNumber();/// 1 ... 2
+      // segment = currentVxdId.getSegmentNumber();// Frame nr? ... ignore
+      dhh_id = ((layer - 1) << 5) | ((ladder) << 1) | (sensor - 1);
+    }
+    if (dhh_id < 0 || dhh_id >= 64) {
+      B2ERROR("SensorId (DHH ID) out of range: " << dhh_id);
+      continue;
+    }
+    hrawPxdHits[dhh_id]->Fill(it.getColumn(), it.getRow());
+    hrawPxdHitsCharge[dhh_id]->Fill(it.getCharge());
+    hrawPxdHitsCommonMode[dhh_id]->Fill(it.getCommonMode());
+    hrawPxdHitsTimeWindow[dhh_id]->Fill(it.getFrameNr() * 1024 - it.getStartRow());
   }
 }

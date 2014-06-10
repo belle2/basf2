@@ -96,7 +96,7 @@ namespace Belle2 {
 
       /** Pack one DHP to buffer.
        */
-      void pack_dhp(int dhp_id, int dhh_id);
+      void pack_dhp(int dhp_id, int dhh_id, int dhh_reformat);
 
       /** Swap endianes inside all shorts of this frame besides CRC.
        * @param data pointer to frame

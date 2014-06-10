@@ -332,6 +332,7 @@ void PXDPackerModule::pack_dhh(int dhh_id, int dhp_active)
 {
   B2INFO("PXD Packer --> pack_dhh ID " << dhh_id << " DHP act: " << dhp_active);
   // dhh_id is not dhh_id ...
+  int dhh_reformat = dhh_id & 0x1; /// up/downstream to check dhh_reformat flag
 
   /// DHH Start
   start_frame();
@@ -401,7 +402,7 @@ void PXDPackerModule::pack_dhh(int dhh_id, int dhp_active)
     }
 
     for (int i = 0; i < 4; i++) {
-      if (dhp_active & 0x1) pack_dhp(i, dhh_id);
+      if (dhp_active & 0x1) pack_dhp(i, dhh_id, dhh_reformat);
       dhp_active >>= 1;
     }
   }
@@ -414,7 +415,7 @@ void PXDPackerModule::pack_dhh(int dhh_id, int dhp_active)
   add_frame_to_payload();
 }
 
-void PXDPackerModule::pack_dhp(int chip_id, int dhh_id)
+void PXDPackerModule::pack_dhp(int chip_id, int dhh_id, int dhh_reformat)
 {
   B2INFO("PXD Packer --> pack_dhp Chip " << chip_id << " of DHH id: " << dhh_id);
   // remark: chip_id != port most of the time ...
@@ -424,7 +425,7 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhh_id)
 
   start_frame();
   /// DHP data Frame
-  append_int32((DHHC_FRAME_HEADER_DATA_TYPE_ONSEN_DHP << 27) | ((dhh_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
+  append_int32((DHHC_FRAME_HEADER_DATA_TYPE_ONSEN_DHP << 27) | ((dhh_id & 0x3F) << 20) | ((dhh_reformat & 0x1) << 19) | ((chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
   append_int32((DHP_FRAME_HEADER_DATA_TYPE_ZSD << 29) | ((dhh_id & 0x3F) << 18) | ((chip_id & 0x03) << 16) | (frame_id & 0xFFFF));
   for (int row = 0; row < PACKER_NUM_ROWS; row++) { // should be variable
     bool rowstart;
@@ -440,7 +441,9 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhh_id)
           append_int16(last_rowstart);
           rowstart = false;
         }
-        append_int16(0x8000 | ((row & 0x1) << 14) | ((col & 0x3F) << 8) | (halfladder_pixmap[row][col] & 0xFF));
+        int colout = col;
+        if (dhh_reformat == 0) colout ^= 0x3C ; /// 0->60 61 62 63 4->56 57 58 59 ...
+        append_int16(0x8000 | ((row & 0x1) << 14) | ((colout & 0x3F) << 8) | (halfladder_pixmap[row][col] & 0xFF));
         empty = false;
       }
     }

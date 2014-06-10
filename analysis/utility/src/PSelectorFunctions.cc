@@ -274,6 +274,14 @@ namespace Belle2 {
       return pid->getProbability(Const::electron, Const::pion);
     }
 
+    double particlePionvsElectronId(const Particle* part)
+    {
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
+      if (!pid) return 0.5;
+
+      return pid->getProbability(Const::pion, Const::electron);
+    }
+
     double particleElectrondEdxId(const Particle* part)
     {
       const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
@@ -505,6 +513,12 @@ namespace Belle2 {
     double particleFlavorType(const Particle* part)
     {
       return part->getFlavorType();
+    }
+
+    double particleCharge(const Particle* part)
+    {
+      return part->getCharge();
+
     }
 
     // MC related ------------------------------------------------------------
@@ -872,6 +886,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("Kid", particleKaonId, "kaon identification probability");
     REGISTER_VARIABLE("prid", particleProtonId, "proton identification probability");
 
+    REGISTER_VARIABLE("K_vs_piid", particleKaonId, "kaon vs pion identification probability");
+    REGISTER_VARIABLE("pi_vs_eid", particlePionvsElectronId, "pion vs electron identification probability");
+
     REGISTER_VARIABLE("eid_dEdx", particleElectrondEdxId, "electron identification probability from dEdx measurement");
     REGISTER_VARIABLE("muid_dEdx", particleMuondEdxId, "muon identification probability from dEdx measurement");
     REGISTER_VARIABLE("piid_dEdx", particlePiondEdxId, "pion identification probability from dEdx measurement");
@@ -922,6 +939,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("chiProb", particlePvalue, "chi^2 probability of the fit");
     REGISTER_VARIABLE("nDaughters", particleNDaughters, "number of daughter particles");
     REGISTER_VARIABLE("flavor", particleFlavorType, "flavor type of decay (0=unflavored, 1=flavored)");
+    REGISTER_VARIABLE("charge", particleCharge, "charge of particle");
 
     REGISTER_VARIABLE("pRecoil",  recoilMomentum,    "magnitude of 3-momentum recoiling against given Particle");
     REGISTER_VARIABLE("eRecoil",  recoilEnergy,      "energy recoiling against given Particle");

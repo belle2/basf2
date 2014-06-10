@@ -274,6 +274,13 @@ namespace Belle2 {
     double particleFlavorType(const Particle* part);
 
     /**
+       * return charge
+       */
+    double particleCharge(const Particle* part);
+
+
+
+    /**
      * NeuroBayesifys this function
      * @param part cconst pointer to Particle
      * @return function value, except if information from ARICH is not available which is set to -999

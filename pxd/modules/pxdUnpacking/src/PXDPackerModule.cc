@@ -389,10 +389,10 @@ void PXDPackerModule::pack_dhh(int dhh_id, int dhp_active)
         /// Fill pixel to pixelmap
         {
           unsigned int row, col;
-          row = it->getVCellID(); // getRow();
-          col = it->getUCellID(); // getColumn();
-          if (col < ladder_min_row || row > ladder_max_row || col < ladder_min_col || col > ladder_max_col) {
-            B2ERROR("ROW/COL out of range");
+          col = it->getVCellID(); // getColumn();
+          row = it->getUCellID(); // getRow();
+          if (row < ladder_min_row || row > ladder_max_row || col < ladder_min_col || col > ladder_max_col) {
+            B2ERROR("ROW/COL out of range col: " << col << " row: " << row);
           } else
             // fill ADC ... convert float to unsigned char ... and how about common mode?
             halfladder_pixmap[row][col] = (unsigned char) it->getCharge(); // scaling??
@@ -420,10 +420,12 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhh_id)
   // remark: chip_id != port most of the time ...
   bool empty = true;
   unsigned short last_rowstart = 0;
+  unsigned short frame_id = 0; // to be set TODO
 
   start_frame();
   /// DHP data Frame
   append_int32((DHHC_FRAME_HEADER_DATA_TYPE_ONSEN_DHP << 27) | ((dhh_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
+  append_int32((DHP_FRAME_HEADER_DATA_TYPE_ZSD << 29) | ((dhh_id & 0x3F) << 18) | ((chip_id & 0x03) << 16) | (frame_id & 0xFFFF));
   for (int row = 0; row < PACKER_NUM_ROWS; row++) { // should be variable
     bool rowstart;
     rowstart = true;

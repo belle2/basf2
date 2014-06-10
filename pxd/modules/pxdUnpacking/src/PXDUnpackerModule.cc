@@ -829,7 +829,7 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
 
 void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int dhh_first_readout_frame_id_lo, unsigned int dhh_ID, unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id)
 {
-  unsigned int anzahl = len2 / 2; // len2 in bytes!!!
+  unsigned int nr_words = len2 / 2; // len2 in bytes!!!
   bool printflag = false;
   unsigned short* dhp_pix = (unsigned short*)data;
 
@@ -843,8 +843,8 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
   unsigned int dhp_offset = 0;
   bool rowflag = false;
 
-  if (anzahl < 4) {
-    B2ERROR("DHP frame size error (too small) " << anzahl);
+  if (nr_words < 4) {
+    B2ERROR("DHP frame size error (too small) " << nr_words);
     error_mask |= ONSEN_ERR_FLAG_DHP_SIZE;
 //     dhp_size_error++;
     return;
@@ -884,7 +884,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
   if (printflag)
     B2INFO("DHP Frame Nr     |   " << hex << dhp_readout_frame_lo << " ( " << hex << dhp_readout_frame_lo << " ) ");
 
-  for (unsigned int i = 4; i < anzahl ; i++) {
+  for (unsigned int i = 4; i < nr_words ; i++) {
 
     if (printflag)
       B2INFO("-- " << hex << dhp_pix[i] << " --   " << dec << i);
@@ -931,7 +931,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int len2, unsigned int d
 
   if (printflag) {
     B2INFO("(DHH) DHH_ID " << hex << dhh_ID << " (DHH) DHP ID  " << hex << dhh_DHPport << " (DHP) DHH_ID " << hex << dhp_dhh_id << " (DHP) DHP ID " << hex << dhp_dhp_id);
-    /*for (int i = 0; i < raw_anzahl ; i++) {
+    /*for (int i = 0; i < raw_nr_words ; i++) {
       B2INFO("RAW      |   " << hex << p_pix[i]);
       printf("raw %08X  |  ", p_pix[i]);
       B2INFO("row " << hex << ((p_pix[i] >> 20) & 0xFFF) << dec << " ( " << ((p_pix[i] >> 20) & 0xFFF) << " ) " << " col " << hex << ((p_pix[i] >> 8) & 0xFFF)

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.collections.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.cell.*?>
+<?import b2daq.nsm.*?>
+
+<VBox prefHeight="261.0" prefWidth="364.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.nsm.ui.NSMConfigDialogController">
+   <children>
+      <GridPane hgap="20.0" layoutY="-4.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="81.0" prefWidth="351.0" vgap="20.0">
+         <children>
+            <Label text="NSM communication setup" GridPane.columnSpan="2">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Label>
+            <Label text="Target NSM node" GridPane.rowIndex="1" />
+            <TextField fx:id="field_nsm_target" maxWidth="140.0" prefHeight="25.0" prefWidth="140.0" promptText="NSM client node" text="ARICH_HV" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+         </children>
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="199.0" minWidth="10.0" prefWidth="144.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="257.0" minWidth="10.0" prefWidth="138.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints maxHeight="50.0" minHeight="10.0" prefHeight="36.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="50.0" minHeight="10.0" prefHeight="36.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+         <VBox.margin>
+            <Insets bottom="10.0" />
+         </VBox.margin>
+      </GridPane>
+      <HBox alignment="CENTER_LEFT" spacing="110.0">
+         <children>
+            <Label text="NSM memories">
+               <VBox.margin>
+                  <Insets bottom="10.0" top="10.0" />
+               </VBox.margin>
+            </Label>
+            <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#handleAddButton" text="Add">
+                     <HBox.margin>
+                        <Insets left="30.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
+            </HBox>
+         </children>
+         <VBox.margin>
+            <Insets bottom="10.0" top="10.0" />
+         </VBox.margin>
+      </HBox>
+      <TableView fx:id="table_nsm" editable="true" prefHeight="141.0" prefWidth="413.0" VBox.vgrow="ALWAYS">
+         <columns>
+            <TableColumn fx:id="col_nsm_dataname" prefWidth="138.0" text="Data name">
+               <cellValueFactory>
+                  <PropertyValueFactory property="dataname" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="col_nsm_format" prefWidth="123.0" text="Format">
+               <cellValueFactory>
+                  <PropertyValueFactory property="format" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="col_nsm_revision" prefWidth="79.0" text="Revision">
+               <cellValueFactory>
+                  <PropertyValueFactory property="revision" />
+               </cellValueFactory>
+            </TableColumn>
+         </columns>
+         <items>
+            <FXCollections fx:factory="observableArrayList">
+            </FXCollections>
+         </items>
+         <VBox.margin>
+            <Insets bottom="20.0" />
+         </VBox.margin>
+      </TableView>
+      <HBox alignment="BOTTOM_CENTER" prefHeight="34.0" prefWidth="413.0">
+         <children>
+            <Button fx:id="startButton" mnemonicParsing="false" onAction="#handleCancelButton" prefHeight="32.0" prefWidth="72.0" text="Cancel">
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#handleOKButton" prefHeight="36.0" prefWidth="72.0" text="Start">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Button>
+         </children>
+      </HBox>
+   </children>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
+</VBox>

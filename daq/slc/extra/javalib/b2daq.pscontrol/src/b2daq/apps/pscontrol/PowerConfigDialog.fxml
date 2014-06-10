@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="292.0" prefWidth="315.0" spacing="16.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="b2daq.apps.pscontrol.PowerConfigDialogController">
+    <children>
+        <Label fx:id="label" text="Select Run config " />
+        <TextField fx:id="input" editable="false" promptText="run config name">
+            <font>
+                <Font size="13.0" />
+            </font>
+        </TextField>
+        <TreeView fx:id="tree_runtype" prefHeight="216.0" prefWidth="193.0" />
+        <HBox alignment="CENTER_RIGHT" prefHeight="6.0" prefWidth="193.0" spacing="15.0" VBox.vgrow="ALWAYS">
+            <children>
+                <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#handleCancelButton" prefHeight="25.0" prefWidth="72.0" text="Cancel" />
+                <Button fx:id="okButton" mnemonicParsing="false" onAction="#handleOKButton" prefHeight="25.0" prefWidth="72.0" text="OK" />
+            </children>
+            <VBox.margin>
+                <Insets />
+            </VBox.margin>
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </padding>
+        </HBox>
+    </children>
+    <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+    </padding>
+</VBox>

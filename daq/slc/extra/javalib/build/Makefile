@@ -1,0 +1,9 @@
+
+all :
+	@ jar xf ../b2daq/dist/b2daq.jar
+	@ jar xf ../b2daq.runcontrol/dist/b2daq.runcontrol.jar
+	@ jar xf ../b2daq.pscontrol/dist/b2daq.pscontrol.jar
+	@ jar cfm ../jars/b2daq-runcontrol.jar b2daq-runcontrol.mf b2daq
+	@ jar uf  ../jars/b2daq-runcontrol.jar b2daq
+	@ jar cfm ../jars/b2daq-pscontrol.jar b2daq-pscontrol.mf b2daq
+	@ jar uf  ../jars/b2daq-pscontrol.jar b2daq

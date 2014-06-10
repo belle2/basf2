@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.cell.*?>
+
+<TableView fx:id="table_hvconfig" editable="true" prefHeight="486.0" prefWidth="807.0" tableMenuButtonVisible="true" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.apps.pscontrol.HVParamTableViewController">
+    <columns>
+        <TableColumn fx:id="col_config" editable="false" prefWidth="78.0" text="Valueset" visible="false">
+            <cellValueFactory>
+                <PropertyValueFactory property="valueset" />
+            </cellValueFactory>
+        </TableColumn>
+        <TableColumn editable="false" prefWidth="54.0" text="Index">
+            <cellValueFactory>
+                <PropertyValueFactory property="index" />
+            </cellValueFactory>
+        </TableColumn>
+        <TableColumn editable="false" prefWidth="63.0" text="Crate #">
+            <cellValueFactory>
+                <PropertyValueFactory property="crate" />
+            </cellValueFactory>
+        </TableColumn>
+        <TableColumn editable="false" prefWidth="63.0" text="Slot #">
+            <cellValueFactory>
+                <PropertyValueFactory property="slot" />
+            </cellValueFactory>
+        </TableColumn>
+        <TableColumn editable="false" prefWidth="47.0" text="Ch #">
+            <cellValueFactory>
+                <PropertyValueFactory property="channel" />
+            </cellValueFactory>
+        </TableColumn>
+        <TableColumn fx:id="col_turnon" prefWidth="60.0" text="On/Off">
+            <cellValueFactory>
+                <PropertyValueFactory property="turnon" />
+            </cellValueFactory>
+        </TableColumn>
+        <TableColumn fx:id="col_rampup" prefWidth="78.0" text="Ramp up ">
+            <cellValueFactory>
+                <PropertyValueFactory property="rampupSpeed" />
+            </cellValueFactory>
+        </TableColumn>
+        <TableColumn fx:id="col_rampdown" prefWidth="97.0" text="Ramp down">
+            <cellValueFactory>
+                <PropertyValueFactory property="rampdownSpeed" />
+            </cellValueFactory>
+        </TableColumn>
+        <TableColumn fx:id="col_voltageLimit" prefWidth="108.0" text="Voltage limit">
+            <cellValueFactory>
+                <PropertyValueFactory property="voltageLimit" />
+            </cellValueFactory>
+        </TableColumn>
+        <TableColumn fx:id="col_currentLimit" prefWidth="95.0" text="Curent limit">
+            <cellValueFactory>
+                <PropertyValueFactory property="currentLimit" />
+            </cellValueFactory>
+        </TableColumn>
+        <TableColumn fx:id="col_voltageDemand" prefWidth="139.0" text="Demand voltage">
+            <cellValueFactory>
+                <PropertyValueFactory property="voltageDemand" />
+            </cellValueFactory>
+        </TableColumn>
+    </columns>
+</TableView>

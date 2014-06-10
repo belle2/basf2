@@ -1,0 +1,85 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 2014/06/03, 12:13:26
+    Author     : tkonno
+*/
+
+.hvstate-off .text {
+    -fx-font-size:13px;
+    -fx-font-weight:bold;
+    -fx-alignment: CENTER;
+    -fx-fill:black;
+}
+
+.hvstate-peak .text {
+    -fx-font-size:13px;
+    -fx-font-weight:bold;
+    -fx-alignment: CENTER;
+    -fx-fill:white;
+}
+
+.hvstate-stable .text {
+    -fx-font-size:13px;
+    -fx-font-weight:bold;
+    -fx-alignment: CENTER;
+    -fx-fill:white;
+}
+
+.hvstate-transition .text {
+    -fx-font-size:11px;
+    -fx-font-weight:bold;
+    -fx-alignment: CENTER;
+    -fx-fill:white;
+}
+
+.hvstate-error .text {
+    -fx-font-size:13px;
+    -fx-font-weight:bold;
+    -fx-alignment: CENTER;
+    -fx-fill:white;
+}
+
+.hvstate-peak {
+    -fx-background-color: limegreen; 
+    -fx-alignment: CENTER;
+    -fx-padding: 2px;
+    -fx-border-color: -fx-table-cell-border-color;
+    -fx-border-width: 2px;
+}
+
+.hvstate-stable {
+    -fx-background-color: deepskyblue; 
+    -fx-alignment: CENTER;
+    -fx-padding: 2px;
+    -fx-border-color: -fx-table-cell-border-color;
+    -fx-border-width: 2px;
+}
+
+.hvstate-transition {
+    -fx-background-color: magenta; 
+    -fx-alignment: CENTER;
+    -fx-padding: 2px;
+    -fx-border-color: -fx-table-cell-border-color;
+    -fx-border-width: 2px;
+}
+
+.hvstate-error {
+    -fx-background-color: red; 
+    -fx-alignment: CENTER;
+    -fx-padding: 2px;
+    -fx-border-color: -fx-table-cell-border-color;
+    -fx-border-width: 2px;
+}
+
+.hvstate-off {
+   // -fx-background-color: -fx-table-cell-background-color;
+   // -fx-alignment: CENTER;
+   // -fx-padding: 2px;
+   // -fx-border-color: -fx-table-cell-border-color;
+   // -fx-border-width: 2px;
+}
+

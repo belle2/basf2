@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.collections.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.web.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.collections.FXCollections?>
+<?import b2daq.nsm.*?>
+<?import b2daq.ui.*?>
+<?import javafx.scene.control.cell.*?>
+
+<HBox prefHeight="523.0" prefWidth="827.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.ui.NetworkConfigPaneController">
+    <children>
+        <VBox prefHeight="528.0" prefWidth="393.0" HBox.hgrow="ALWAYS">
+            <children>
+                <TitledPane maxHeight="1.7976931348623157E308" prefHeight="127.0" prefWidth="392.0" text="Socket connection" VBox.vgrow="ALWAYS">
+                    <content>
+                        <VBox layoutY="-4.0" maxHeight="1.7976931348623157E308" prefHeight="218.0" prefWidth="390.0">
+                            <children>
+                                <GridPane layoutY="-4.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="120.0" prefWidth="370.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="179.0" minWidth="10.0" prefWidth="115.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="264.0" minWidth="10.0" prefWidth="254.0" />
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    </rowConstraints>
+                                    <children>
+                                        <Label text="Hostname" GridPane.rowIndex="1" />
+                                        <Label text="Port" GridPane.rowIndex="2" />
+                                        <Label text="Connection" />
+                                        <AnchorPane prefHeight="39.0" prefWidth="100.0" GridPane.columnIndex="1">
+                                            <children>
+                                                <Rectangle fx:id="rect_socket" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="8.0" stroke="BLACK" strokeType="INSIDE" width="102.0" />
+                                                <Text fx:id="text_socket" layoutX="1.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="101.7294921875">
+                                                    <font>
+                                                        <Font name="System Bold" size="12.0" />
+                                                    </font>
+                                                </Text>
+                                                <Button fx:id="button_socket_reconnect" disable="true" layoutX="116.0" layoutY="12.0" mnemonicParsing="false" onAction="#handleRecnnectSocket" text="RECONNECT">
+                                                    <font>
+                                                        <Font size="11.0" />
+                                                    </font>
+                                                </Button>
+                                            </children>
+                                        </AnchorPane>
+                                        <TextField fx:id="field_socket_host" editable="false" maxWidth="200.0" promptText="host to nsm2 bridge" text="b2slow2.kek.jp" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                        <TextField fx:id="field_socket_port" editable="false" maxWidth="200.0" promptText="port to nsm2 bridge" text="9090" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    </children>
+                                </GridPane>
+                            </children>
+                        </VBox>
+                    </content>
+                </TitledPane>
+                <TitledPane animated="false" maxHeight="1.7976931348623157E308" prefHeight="287.0" prefWidth="392.0" text="Database access" VBox.vgrow="ALWAYS">
+                    <content>
+                        <VBox prefHeight="247.0" prefWidth="390.0">
+                            <children>
+                                <GridPane focusTraversable="true" hgap="10.0" layoutX="33.0" layoutY="14.0" maxHeight="1.7976931348623157E308" prefHeight="103.0" prefWidth="291.0" vgap="10.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="179.0" minWidth="10.0" prefWidth="80.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="276.0" minWidth="10.0" prefWidth="89.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="387.0" minWidth="10.0" prefWidth="79.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="534.0" minWidth="10.0" prefWidth="81.0" />
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    </rowConstraints>
+                                    <children>
+                                        <Label text="Hostname" />
+                                        <Label text="Password" GridPane.rowIndex="1" />
+                                        <Label text="User" GridPane.columnIndex="2" />
+                                        <Label text="Database" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                        <TextField fx:id="field_db_host" editable="false" prefHeight="24.0" prefWidth="113.0" text="b2slow2.kek.jp" GridPane.columnIndex="1" />
+                                        <TextField fx:id="field_db_user" editable="false" prefHeight="25.0" prefWidth="106.0" text="b2daq" GridPane.columnIndex="3" />
+                                        <TextField fx:id="field_db_database" editable="false" prefHeight="25.0" prefWidth="106.0" text="b2slow" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                                        <PasswordField fx:id="field_db_pass" editable="false" text="b2daq" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    </children>
+                                </GridPane>
+                                <Label text="Configuration tables">
+                                    <VBox.margin>
+                                        <Insets top="10.0" />
+                                    </VBox.margin>
+                                </Label>
+                                <TableView fx:id="table_db" prefHeight="210.0" prefWidth="370.0" VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="col_db_node" prefWidth="106.0" text="Node">
+                                            <cellValueFactory>
+                                                <PropertyValueFactory property="node" />
+                                            </cellValueFactory>
+                                        </TableColumn>
+                                        <TableColumn fx:id="col_db_table" prefWidth="103.0" text="Table">
+                                            <cellValueFactory>
+                                                <PropertyValueFactory property="table" />
+                                            </cellValueFactory>
+                                        </TableColumn>
+                                        <TableColumn fx:id="col_db_name" prefWidth="115.0" text="Title">
+                                            <cellValueFactory>
+                                                <PropertyValueFactory property="name" />
+                                            </cellValueFactory>
+                                        </TableColumn>
+                                        <TableColumn fx:id="col_db_id" prefWidth="45.0" text="ID">
+                                            <cellValueFactory>
+                                                <PropertyValueFactory property="id" />
+                                            </cellValueFactory>
+                                        </TableColumn>
+                                    </columns>
+                                    <VBox.margin>
+                                        <Insets top="10.0" />
+                                    </VBox.margin>
+                                    <items>
+                                        <FXCollections fx:factory="observableArrayList">
+                                        </FXCollections>
+                                    </items>                                     
+                                </TableView>
+                            </children>
+                        </VBox>
+                    </content>
+                </TitledPane>
+            </children>
+        </VBox>
+        <VBox prefHeight="528.0" prefWidth="437.0" HBox.hgrow="ALWAYS">
+            <children>
+                <TitledPane maxHeight="1.7976931348623157E308" text="NSM2" VBox.vgrow="ALWAYS">
+                    <content>
+                        <VBox layoutY="-4.0">
+                            <children>
+                                <GridPane layoutY="-4.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="194.0" prefWidth="413.0">
+                                    <children>
+                                        <Label text="Node name" GridPane.rowIndex="3" />
+                                        <Label text="Connection" />
+                                        <Label text="Host name" GridPane.rowIndex="1" />
+                                        <AnchorPane prefHeight="39.0" prefWidth="100.0" GridPane.columnIndex="1">
+                                            <children>
+                                                <Rectangle fx:id="rect_nsm" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="9.0" stroke="BLACK" strokeType="INSIDE" width="102.0" />
+                                                <Text fx:id="text_nsm" layoutY="28.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="102.7294921875">
+                                                    <font>
+                                                        <Font name="System Bold" size="12.0" />
+                                                    </font>
+                                                </Text>
+                                                <Button fx:id="button_nsm_reconnect" layoutX="111.0" layoutY="13.0" mnemonicParsing="false" text="RECONNECT" textAlignment="CENTER" visible="false">
+                                                    <font>
+                                                        <Font size="11.0" />
+                                                    </font>
+                                                </Button>
+                                            </children>
+                                        </AnchorPane>
+                                        <TextField fx:id="field_nsm_host" editable="false" maxWidth="200.0" promptText="hostname for nsm2" text="b2slow2.kek.jp" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                        <TextField fx:id="field_nsm_port" editable="false" maxWidth="200.0" promptText="port for nsm2" text="8122" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                        <Label text="Port" GridPane.rowIndex="2" />
+                                        <TextField fx:id="field_nsm_node" editable="false" maxWidth="200.0" promptText="Node name for GUI" text="NSMGUI" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                        <Label text="Target node name" GridPane.rowIndex="4" />
+                                        <TextField fx:id="field_nsm_target" editable="false" maxWidth="200.0" promptText="NSM client node" text="MASTER" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                    </children>
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="199.0" minWidth="10.0" prefWidth="184.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="257.0" minWidth="10.0" prefWidth="225.0" />
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints maxHeight="57.0" minHeight="10.0" prefHeight="46.0" vgrow="SOMETIMES" />
+                                        <RowConstraints maxHeight="56.0" minHeight="10.0" prefHeight="39.0" vgrow="SOMETIMES" />
+                                        <RowConstraints maxHeight="60.0" minHeight="0.0" prefHeight="39.0" vgrow="SOMETIMES" />
+                                        <RowConstraints maxHeight="50.0" minHeight="10.0" prefHeight="36.0" vgrow="SOMETIMES" />
+                                        <RowConstraints maxHeight="50.0" minHeight="10.0" prefHeight="36.0" vgrow="SOMETIMES" />
+                                    </rowConstraints>
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" />
+                                    </VBox.margin>
+                                </GridPane>
+                                <HBox alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label text="NSM memories">
+                                            <VBox.margin>
+                                                <Insets bottom="10.0" top="10.0" />
+                                            </VBox.margin>
+                                        </Label>
+                                        <CheckBox fx:id="check_nsm_editable" mnemonicParsing="false" text="editable" visible="false">
+                                            <HBox.margin>
+                                                <Insets left="10.0" />
+                                            </HBox.margin>
+                                        </CheckBox>
+                                        <Button fx:id="button_nsm_update" mnemonicParsing="false" text="UPDATE" textAlignment="CENTER" visible="false">
+                                            <font>
+                                                <Font size="11.0" />
+                                            </font>
+                                            <HBox.margin>
+                                                <Insets left="20.0" />
+                                            </HBox.margin>
+                                        </Button>
+                                    </children>
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" top="10.0" />
+                                    </VBox.margin>
+                                </HBox>
+                                <TableView fx:id="table_nsm" editable="true" prefHeight="239.0" prefWidth="360.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="col_nsm_dataname" prefWidth="173.0" text="Data name">
+                                            <cellValueFactory>
+                                                <PropertyValueFactory property="dataname" />
+                                            </cellValueFactory>
+                                        </TableColumn>
+                                        <TableColumn fx:id="col_nsm_format" prefWidth="133.0" text="Format">
+                                            <cellValueFactory>
+                                                <PropertyValueFactory property="format" />
+                                            </cellValueFactory>
+                                        </TableColumn>
+                                        <TableColumn fx:id="col_nsm_revision" prefWidth="102.0" text="Revision">
+                                            <cellValueFactory>
+                                                <PropertyValueFactory property="revision" />
+                                            </cellValueFactory>
+                                        </TableColumn>
+                                        <TableColumn fx:id="col_nsm_date" minWidth="0.0" prefWidth="0.0" text="Last update">
+                                            <cellFactory>
+                                                <DateCellFactory />
+                                            </cellFactory>
+                                            <cellValueFactory>
+                                                <PropertyValueFactory property="date" />
+                                            </cellValueFactory>
+                                        </TableColumn>
+                                    </columns>
+                                    <items>
+                                        <FXCollections fx:factory="observableArrayList">
+                                        </FXCollections>
+                                    </items>                                     
+                                    <VBox.margin>
+                                        <Insets />
+                                    </VBox.margin>
+                                </TableView>
+                            </children>
+                        </VBox>
+                    </content>
+                </TitledPane>
+            </children>
+        </VBox>
+    </children>
+</HBox>

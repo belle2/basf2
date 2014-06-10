@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:id="pane" prefHeight="536.0" prefWidth="816.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.apps.pscontrol.HVParamEditorPaneController">
+    <children>
+        <HBox alignment="CENTER_LEFT" prefHeight="52.0" prefWidth="796.0" spacing="10.0">
+            <children>
+                <Label text="Select configuration" />
+                <ComboBox fx:id="combo" disable="true" prefWidth="150.0" promptText="---" />
+                <Button fx:id="reload_button" mnemonicParsing="false" onAction="#handleReloadButon" text="Reload">
+                    <font>
+                        <Font size="12.0" />
+                    </font>
+                </Button>
+                <Button fx:id="create_button" disable="true" mnemonicParsing="false" onAction="#handleCreateButon" text="Create config">
+                    <HBox.margin>
+                        <Insets left="40.0" />
+                    </HBox.margin>
+                </Button>
+                <Label fx:id="label_message">
+                    <HBox.margin>
+                        <Insets left="20.0" />
+                    </HBox.margin>
+                </Label>
+            </children>
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="5.0" />
+            </padding>
+        </HBox>
+        <VBox spacing="5.0">
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="20.0" VBox.vgrow="ALWAYS">
+                    <children>
+                        <Button fx:id="add_button" disable="true" mnemonicParsing="false" onAction="#handleAddButon" text="Add to" />
+                        <RadioButton fx:id="before_radio" disable="true" mnemonicParsing="false" selected="true" text="Before current">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="toggle" />
+                     </toggleGroup></RadioButton>
+                        <RadioButton fx:id="after_radio" disable="true" mnemonicParsing="false" text="After current" toggleGroup="$toggle" />
+                  <ChoiceBox fx:id="choice_valueset" disable="true" prefWidth="150.0" />
+                  <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Button fx:id="button_multiedit" mnemonicParsing="false" onAction="#handleMultieditButton" text="Muti edit">
+                           <HBox.margin>
+                              <Insets right="30.0" />
+                           </HBox.margin>
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Button>
+                     </children>
+                     <HBox.margin>
+                        <Insets bottom="10.0" />
+                     </HBox.margin>
+                  </HBox>
+                    </children>
+                </HBox>
+                <TabPane fx:id="tabpane" prefHeight="446.0" prefWidth="794.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+                    <VBox.margin>
+                        <Insets />
+                    </VBox.margin>
+                </TabPane>
+            </children>
+        </VBox>
+    </children>
+    <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+    </padding>
+</VBox>

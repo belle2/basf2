@@ -15,6 +15,8 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <pxd/dataobjects/PXDRawHit.h>
+#include <pxd/dataobjects/PXDRawAdc.h>
+#include <pxd/dataobjects/PXDRawPedestal.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <string>
 //#include <map>
@@ -51,6 +53,10 @@ namespace Belle2 {
       StoreArray<RawPXD> m_storeRawPxdrarray;
       /** Storearray for raw pixels   */
       StoreArray<PXDRawHit> m_storeRawHits;
+      /** Storearray for ADC from full frames  */
+      StoreArray<PXDRawAdc> m_storeRawAdcs;
+      /** Storearray for Pedestal from full frames   */
+      StoreArray<PXDRawPedestal> m_storeRawPedestals;
 
       /** Histogram number of raw packets */
       TH1F* hrawPxdPackets;
@@ -58,8 +64,16 @@ namespace Belle2 {
       TH1F* hrawPxdPacketSize;
       /** Histogram pixelcount/??? */
       TH1F* hrawPxdHitsCount;
+      /** Histogram 2d hitmap (all)*/
+      TH2F* hrawPxdHitMapAll;
+      /** Histogram pedestal 2d hitmap (full frames only) (all pxd) */
+      TH2F* hrawPxdPedestalMapAll;
+      /** Histogram Adc 2d hitmap (full frames only) (all pxd) */
+      TH2F* hrawPxdAdcMapAll;
       /** Histogram 2d hitmap */
-      TH2F* hrawPxdHits[64];
+      TH2F* hrawPxdHitMap[64];
+      /** Histogram 2d chargemap */
+      TH2F* hrawPxdChargeMap[64];
       /** Histogram raw pixel charge */
       TH1F* hrawPxdHitsCharge[64];
       /** Histogram raw pixel common mode */

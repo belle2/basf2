@@ -24,6 +24,7 @@ namespace Belle2 {
     virtual bool standby() throw();
     virtual bool shoulder() throw();
     virtual bool peak() throw();
+    virtual bool hvapply(const HVApplyMessage& hvmsg) throw();
 
   private:
     std::vector<ArichHVCommunicator*> m_comm_v;

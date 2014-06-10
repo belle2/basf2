@@ -77,6 +77,7 @@ void NSMNodeDaemon::run() throw()
     LogFile::fatal("NSM node daemon : Caught exception (%s:%d %s). "
                    "Terminate process...",
                    m_host.c_str(), m_port, e.what());
-    exit(1);
+    m_callback[0]->setReply(e.what());
   }
+  m_callback[0]->term();
 }

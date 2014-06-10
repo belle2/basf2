@@ -2,6 +2,7 @@
 #define _Belle2_HVCallback_hh
 
 #include "daq/slc/hvcontrol/HVState.h"
+#include "daq/slc/hvcontrol/HVApplyMessage.h"
 
 #include <daq/slc/nsm/NSMCallback.h>
 
@@ -24,6 +25,7 @@ namespace Belle2 {
     virtual bool recover() throw() { return true; }
     virtual bool config() throw() { return true; }
     const HVState& getStateDemand() const throw() { return m_state_demand; }
+    virtual bool hvapply(const HVApplyMessage&) throw() { return true; }
 
   protected:
     virtual bool perform(const NSMMessage& msg) throw();

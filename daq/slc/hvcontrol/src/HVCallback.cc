@@ -7,6 +7,7 @@
 
 #include <daq/slc/system/LogFile.h>
 
+#include <daq/slc/base/StringUtil.h>
 #include <daq/slc/base/ConfigFile.h>
 
 #include <iostream>
@@ -22,6 +23,7 @@ HVCallback::HVCallback(const NSMNode& node) throw()
   add(HVCommand::PEAK);
   add(HVCommand::TURNON);
   add(HVCommand::TURNOFF);
+  add(HVCommand::HVAPPLY);
   getNode().setState(HVState::OFF_S);
   m_state_demand = HVState::OFF_S;
 }
@@ -35,7 +37,19 @@ bool HVCallback::perform(const NSMMessage& msg) throw()
   HVState state(getNode().getState());
   bool result = true;
   NSMCommunicator* com = getCommunicator();
-  if (cmd == HVCommand::TURNOFF) {
+
+  if (cmd == HVCommand::HVAPPLY) {
+    LogFile::debug("HVAPPLY : len=%d", msg.getLength());
+    if (msg.getLength() == 0) {
+      LogFile::warning("HVAPPLY without message");
+      return true;
+    }
+    StringList str = StringUtil::split(msg.getData(), '=', 2);
+
+    HVApplyMessage hvmsg(msg.getParam(0), msg.getParam(1),
+                         msg.getParam(1), str[0], str[1]);
+    result = hvapply(hvmsg);
+  } else if (cmd == HVCommand::TURNOFF) {
     getNode().setState(HVState::TRANSITION_TS);
     result = turnoff();
   } else if (state.isOff()) {

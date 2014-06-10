@@ -33,6 +33,7 @@ namespace Belle2 {
     static void open(const std::string& filename,
                      Priority priority = UNKNOWN);
     static void open();
+    static void close();
     static void debug(const std::string& msg, ...);
     static void info(const std::string& msg, ...);
     static void notice(const std::string& msg, ...);

@@ -35,6 +35,7 @@ DBObject::~DBObject() throw()
 void DBObject::print() const throw()
 {
   const FieldNameList& name_v(getFieldNames());
+  std::cout << "name : '" << getName() << "'" << std::endl;
   for (size_t ii = 0; ii < m_name_v.size(); ii++) {
     std::string name = name_v.at(ii);
     std::cout << name << " : ";

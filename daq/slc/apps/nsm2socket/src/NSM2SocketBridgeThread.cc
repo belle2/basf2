@@ -36,51 +36,5 @@ void NSM2SocketBridgeThread::sendMessage(NSMMessage& msg) throw()
 
 void NSM2SocketBridgeThread::run() throw()
 {
-  try {
-    NSMMessage msg;
-    NSMMessage msg_out;
-    NSMCommand cmd;
-    while (true) {
-      m_reader.readObject(msg);
-      cmd = msg.getRequestName();
-      LogFile::debug("%s %s", msg.getRequestName(), cmd.getLabel());
-      if (cmd == Enum::UNKNOWN) {
-        LogFile::warning("Unknown request : %s", msg.getRequestName());
-      } else if (cmd == NSMCommand::DBGET) {
-        DB2NSM(m_db).set(msg, msg_out);
-        sendMessage(msg_out);
-      } else if (cmd == NSMCommand::DBSET) {
-        DB2NSM(m_db).get(msg);
-      } else if (cmd == NSMCommand::NSMGET) {
-        StringList argv = StringUtil::split(msg.getData(), ' ', 2);
-        try {
-          int revision = (msg.getNParams() > 0) ? msg.getParam(0) : 0;
-          NSMData& data(m_bridge->getCallback()->getData(argv[0], argv[1], revision));
-          if (data.isAvailable()) {
-            msg_out.setRequestName(NSMCommand::NSMSET);
-            msg_out.setData(data);
-            sendMessage(msg_out);
-          }
-        } catch (const NSMHandlerException& e) {
-          LogFile::error(e.what());
-          msg_out.setRequestName(NSMCommand::LOG);
-          msg_out.setData(DAQLogMessage("NSM2Socket", LogFile::WARNING,
-                                        StringUtil::form("NSM data (%s) is not ready for read",
-                                                         argv[0].c_str())));
-          sendMessage(msg_out);
-        }
-      } else if (cmd == NSMCommand::NSMSET) {
-      } else {
-        try {
-          m_bridge->getCallback()->sendRequest(msg);
-        } catch (const NSMHandlerException& e) {
-          LogFile::error("NSM error");
-        }
-      }
-    }
-  } catch (const IOException& e) {
-    LogFile::error("%s", e.what());
-    m_socket.close();
-  }
 }
 

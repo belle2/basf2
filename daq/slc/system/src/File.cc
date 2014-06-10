@@ -40,8 +40,8 @@ size_t File::write(const void* buf, size_t count) throw(IOException)
 {
   size_t c = 0;
   int ret;
-  errno = 0;
   while (c < count) {
+    errno = 0;
     ret = ::write(m_fd, ((unsigned char*)buf + c), (count - c));
     if (ret <= 0) {
       switch (errno) {
@@ -64,8 +64,8 @@ size_t File::read(void* buf, size_t count) throw(IOException)
 {
   size_t c = 0;
   int ret;
-  errno = 0;
   while (c < count) {
+    errno = 0;
     ret = ::read(m_fd, ((unsigned char*)buf + c), (count - c));
     if (ret <= 0) {
       switch (errno) {

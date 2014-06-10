@@ -9,6 +9,7 @@
 #include <daq/slc/base/ConfigFile.h>
 
 #include <unistd.h>
+#include <iostream>
 
 using namespace Belle2;
 
@@ -85,3 +86,37 @@ bool ArichHVControlCallback::peak() throw()
   return success;
 }
 
+bool ArichHVControlCallback::hvapply(const HVApplyMessage& hvmsg)
+throw()
+{
+  for (int i = 0; i < (int)m_comm_v.size(); i++) {
+    if (hvmsg.isAllCrates() || i == hvmsg.getCrate()) {
+      ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::ALL,
+                         hvmsg.getSlot(), hvmsg.getChannel());
+      std::cout << i << " " << hvmsg.getCrate() << " " << hvmsg.getSlot()
+                << " "  << hvmsg.getChannel() << std::endl;
+      if (hvmsg.isTurnon()) {
+        //msg.setRampupSpeed(hvmsg.getRampupSpeed());
+        //msg.setCommand(ArichHVMessage::RAMPUP_SPEED);
+      } else if (hvmsg.isRampupSpeed()) {
+        msg.setRampUpSpeed(hvmsg.getRampupSpeed());
+        msg.setCommand(ArichHVMessage::RAMPUP_SPEED);
+      } else if (hvmsg.isRampdownSpeed()) {
+        msg.setRampDownSpeed(hvmsg.getRampdownSpeed());
+        msg.setCommand(ArichHVMessage::RAMPDOWN_SPEED);
+      } else if (hvmsg.isVoltageLimit()) {
+        msg.setVoltageLimit(hvmsg.getVoltageLimit());
+        msg.setCommand(ArichHVMessage::VOLTAGE_LIMIT);
+      } else if (hvmsg.isCurrentLimit()) {
+        msg.setCurrentLimit(hvmsg.getCurrentLimit());
+        msg.setCommand(ArichHVMessage::CURRENT_LIMIT);
+      } else if (hvmsg.isVoltageDemand()) {
+        std::cout << hvmsg.getVoltageDemand() << std::endl;
+        msg.setVoltageDemand(hvmsg.getVoltageDemand());
+        msg.setCommand(ArichHVMessage::VOLTAGE_DEMAND);
+      }
+      m_comm_v[i]->perform(msg, HVState(getNode().getState()));
+    }
+  }
+  return true;
+}

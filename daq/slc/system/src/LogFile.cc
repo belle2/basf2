@@ -49,6 +49,13 @@ void LogFile::open()
   debug("log file : %s", g_filepath.c_str());
 }
 
+void LogFile::close()
+{
+  if (!g_opened) return;
+  g_stream.close();
+  g_opened = false;
+}
+
 void LogFile::debug(const std::string& msg, ...)
 {
   va_list ap;

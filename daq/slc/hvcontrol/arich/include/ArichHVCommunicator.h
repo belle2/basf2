@@ -33,7 +33,7 @@ namespace Belle2 {
     HVControlCallback* getCallback() { return m_callback; }
     int getId() const { return m_crateid; }
 
-  private:
+  public:
     std::string send(ArichHVMessage& msg) throw(IOException);
     bool perform(ArichHVMessage& msg, HVState satate) throw();
 

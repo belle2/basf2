@@ -14,8 +14,8 @@
 
 using namespace Belle2;
 
-NSM2SocketCallback::NSM2SocketCallback(const NSMNode& node, int interval)
-throw() : NSMCallback(node, interval)
+NSM2SocketCallback::NSM2SocketCallback(const NSMNode& node)
+throw() : NSMCallback(node, 1)
 {
   add(RCCommand::BOOT);
   add(RCCommand::LOAD);
@@ -34,17 +34,13 @@ throw() : NSMCallback(node, interval)
   add(HVCommand::PEAK);
   add(HVCommand::TURNON);
   add(HVCommand::TURNOFF);
+  add(HVCommand::HVAPPLY);
 }
 
-bool NSM2SocketCallback::perform(NSMMessage& msg)
-throw(NSMHandlerException)
+bool NSM2SocketCallback::perform(const NSMMessage& msg) throw()
 {
   m_bridge->sendMessage(msg);
   return true;
-}
-
-void NSM2SocketCallback::init() throw()
-{
 }
 
 NSMData& NSM2SocketCallback::getData(const std::string& name,
@@ -53,27 +49,94 @@ NSMData& NSM2SocketCallback::getData(const std::string& name,
 {
   if (m_data_m.find(name) == m_data_m.end()) {
     NSMData data(name, format, revision);
-    data.open(getCommunicator());
-    LogFile::debug("open NSM data (%s) ", data.getName().c_str());
     m_data_m.insert(NSMDataList::value_type(name, data));
   }
   return m_data_m[name];
 }
 
-void NSM2SocketCallback::timeout() throw()
-{
-
-}
-
 bool NSM2SocketCallback::sendRequest(NSMMessage& msg) throw()
 {
   m_mutex.lock();
+  std::string nodename = msg.getNodeName();
   try {
-    getCommunicator()->sendRequest(msg);
+    bool isonline = true;
+    if (m_node_m.find(nodename) == m_node_m.end()) {
+      isonline = getCommunicator()->isConnected(nodename);
+      m_node_m.insert(std::map<std::string, bool>::value_type(nodename, isonline));
+    } else {
+      isonline = m_node_m[nodename];
+    }
+    if (!isonline) {
+      //m_bridge->sendError(ERRORNo::NSMONLINE, nodename, "No PID");
+      m_bridge->sendLog(DAQLogMessage(getNode().getName(), LogFile::ERROR,
+                                      StringUtil::form("Node %s was aready down.",
+                                                       nodename.c_str())));
+    } else {
+      getCommunicator()->sendRequest(msg);
+    }
   } catch (const NSMHandlerException& e) {
+    LogFile::error(e.what());
+    //m_bridge->sendError(ERRORNo::NSMSENDREQ, nodename,
+    //      std::string("Failed to send ") +
+    //      msg.getRequestName());
+    m_bridge->sendLog(DAQLogMessage(getNode().getName(),
+                                    LogFile::ERROR, e.what()));
+
     m_mutex.unlock();
     return false;
   }
   m_mutex.unlock();
   return true;
 }
+
+void NSM2SocketCallback::timeout() throw()
+{
+  static unsigned long long n = 0;
+  for (std::map<std::string, bool>::iterator it = m_node_m.begin();
+       it != m_node_m.end(); it++) {
+    std::string nodename = it->first;
+    bool isonline = it->second;
+    bool isonline2 = getCommunicator()->isConnected(nodename);
+    m_node_m[nodename] = isonline2;
+    if (isonline && !isonline2) {
+      //m_bridge->sendError(ERRORNo::NSMONLINE, nodename, "Lost PID");
+      m_bridge->sendLog(DAQLogMessage(getNode().getName(), LogFile::ERROR,
+                                      StringUtil::form("Node %s got down.",
+                                                       nodename.c_str())));
+    } else if (!isonline && isonline2) {
+      m_bridge->sendLog(DAQLogMessage(getNode().getName(), LogFile::NOTICE,
+                                      StringUtil::form("Node %s got up.",
+                                                       nodename.c_str())));
+    }
+  }
+
+  for (NSMDataList::iterator it = m_data_m.begin();
+       it != m_data_m.end(); it++) {
+    NSMData& data(it->second);
+    NSMMessage msg(getNode().getName());
+    try {
+      bool opennew = false;
+      if (!data.isAvailable()) {
+        data.open(getCommunicator());
+        LogFile::debug("open NSM data (%s) ", data.getName().c_str());
+        opennew = true;
+      }
+      if (n % 5 == 0 || opennew) {
+        msg.setNodeName(data.getName());
+        msg.setRequestName(NSMCommand::NSMSET);
+        msg.setData(data);
+        m_bridge->sendMessage(msg);
+      }
+    } catch (const NSMHandlerException& e) {
+      std::string log = StringUtil::form("Failed to open NSM data (%s) ",
+                                         data.getName().c_str());
+      LogFile::error(log);
+      //m_bridge->sendError(ERRORNo::NSMSENDREQ, getNode().getName(),
+      //        "Failed to open data "+ data.getName());
+      m_bridge->sendLog(DAQLogMessage(getNode().getName(),
+                                      LogFile::ERROR, log));
+    }
+  }
+  n++;
+}
+

@@ -82,8 +82,8 @@ size_t TCPSocket::write(const void* buf, size_t count) throw(IOException)
 {
   size_t c = 0;
   int ret;
-  errno = 0;
   while (c < count) {
+    errno = 0;
     ret = send(m_fd, ((unsigned char*)buf + c), (count - c), MSG_NOSIGNAL);
     if (ret <= 0) {
       switch (errno) {
@@ -106,8 +106,8 @@ size_t TCPSocket::read(void* buf, size_t count) throw(IOException)
 {
   size_t c = 0;
   int ret;
-  errno = 0;
   while (c < count) {
+    errno = 0;
     ret = recv(m_fd, ((unsigned char*)buf + c), (count - c), 0);
     if (ret <= 0) {
       switch (errno) {

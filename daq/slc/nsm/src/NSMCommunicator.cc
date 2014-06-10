@@ -135,7 +135,12 @@ bool NSMCommunicator::sendLog(const NSMNode& node,
   try {
     if (node.getName().size() > 0 &&
         b2nsm_nodeid(node.getName().c_str()) >= 0) {
-      sendRequest(NSMMessage(node, NSMCommand::LOG, log));
+      NSMMessage msg(node, NSMCommand::LOG);
+      msg.setNParams(2);
+      msg.setParam(0, (int)log.getPriority());
+      msg.setParam(1, log.getDateInt());
+      msg.setData(log.getNodeName() + "\n" + log.getMessage());
+      sendRequest(msg);
     }
   } catch (const NSMHandlerException& e) {
     return false;
@@ -158,6 +163,21 @@ bool NSMCommunicator::sendError(const std::string& message)
   return true;
 }
 
+bool NSMCommunicator::sendError(const ERRORNo& eno,
+                                const std::string& nodename,
+                                const std::string& message)
+{
+  try {
+    if (m_master_node.getName().size() > 0) {
+      sendRequest(NSMMessage(m_master_node, NSMCommand::ERROR,
+                             eno.getId(), nodename + "\n" + message));
+    }
+  } catch (const NSMHandlerException& e) {
+    return false;
+  }
+  return true;
+}
+
 bool NSMCommunicator::sendFatal(const std::string& message)
 {
   try {
@@ -173,8 +193,9 @@ bool NSMCommunicator::sendFatal(const std::string& message)
 void NSMCommunicator::sendState(const NSMNode& node) throw(NSMHandlerException)
 {
   if (m_master_node.getName().size() > 0) {
-    sendRequest(NSMMessage(m_master_node, NSMCommand::STATE,
-                           node.getState().getLabel()));
+    std::string text = StringUtil::form("%s %s", node.getName().c_str(),
+                                        node.getState().getLabel());
+    sendRequest(NSMMessage(m_master_node, NSMCommand::STATE, text));
   }
 }
 
@@ -205,7 +226,8 @@ bool NSMCommunicator::wait(int sec) throw(NSMHandlerException)
     m_message.setRequestName();
     const char* master_name = m_message.getNodeName();
     NSMCommand cmd(m_message.getRequestName());
-    if (m_master_node.getName().size() == 0 &&
+    if ((m_master_node.getName().size() == 0 ||
+         !isConnected(m_master_node)) &&
         cmd != NSMCommand::OK && cmd != NSMCommand::ERROR &&
         strlen(master_name) > 0) {
       m_master_node = NSMNode(master_name);
@@ -250,9 +272,9 @@ throw(NSMHandlerException)
 #endif
 }
 
-bool NSMCommunicator::isConnected(const NSMNode& node) throw()
+bool NSMCommunicator::isConnected(const std::string& node) throw()
 {
-  bool is_online = getNodeIdByName(node.getName()) >= 0 &&
-                   getNodePidByName(node.getName()) > 0;
+  bool is_online = getNodeIdByName(node) >= 0 &&
+                   getNodePidByName(node) > 0;
   return is_online;
 }

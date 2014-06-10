@@ -33,8 +33,11 @@ throw()
       }
     }
     TableInfo tinfo = TableInfoTable(m_db).get(tablename, revision);
-    std::string tablename_imp =
-      StringUtil::form("\"configinfo:%s:%d\"", tablename.c_str(), revision);
+    if (tablename.size() == 0 || revision <= 0) {
+      LogFile::warning("No table for (%s:%s)found in config DB",
+                       nodename.c_str(), configname.c_str());
+      return obj_v;
+    }
     FieldInfoTable ftable(m_db);
     FieldInfoList finfo_v = ftable.getList(tablename, revision);
     EnumNameList enum_m_m;
@@ -50,6 +53,8 @@ throw()
       }
     }
     ConfigInfo cinfo(configname, nodename, tablename, revision);
+    const std::string tablename_imp =
+      StringUtil::form("\"configinfo:%s:%d\"", tablename.c_str(), revision);
     ss << StringUtil::form("from %s where configid = (%s);",
                            tablename_imp.c_str(), cinfo.getSQL().c_str());
     try {
@@ -92,7 +97,9 @@ throw()
 ConfigObject ConfigObjectTable::get(const std::string& configname,
                                     const std::string& nodename) throw()
 {
-  return getList(configname, nodename, "", 0)[0];
+  ConfigObjectList list = getList(configname, nodename, "", 0);
+  if (list.size() > 0) return list[0];
+  return ConfigObject();
 }
 
 void ConfigObjectTable::add(const ConfigObjectList& obj_v, bool isroot) throw()
@@ -133,6 +140,39 @@ throw(DBHandlerException)
   for (size_t i = 0; i < name_v.size(); i++) {
     ss1 << ", " << name_v[i];
     ss2 << ", " << FieldInfo::getSQL(obj, name_v[i]);
+  }
+  try {
+    m_db->execute("insert into \"configinfo:%s:%d\" (%s) values (%s);",
+                  obj.getTable().c_str(), obj.getRevision(),
+                  ss1.str().c_str(), ss2.str().c_str());
+  } catch (const DBHandlerException& e) {
+    //LogFile::warning("%s", e.what());
+  }
+}
+
+void ConfigObjectTable::addAll(const ConfigObject& obj, bool isroot)
+throw(DBHandlerException)
+{
+  if (!obj.isConfig()) return;
+  ConfigInfoTable table(m_db);
+  table.add(ConfigInfo(obj.getName(), obj.getNode(),
+                       obj.getTable(), obj.getRevision()));
+  std::stringstream ss1, ss2;
+  ss1 << "configid";
+  ss2 << "(" << FieldInfo::getSQL(obj) << ")";
+  if (!isroot) {
+    ss1 << ", index";
+    ss2 << ", " << obj.getIndex();
+  }
+  const FieldNameList& name_v(obj.getFieldNames());
+  for (size_t i = 0; i < name_v.size(); i++) {
+    ss1 << ", " << name_v[i];
+    ss2 << ", " << FieldInfo::getSQL(obj, name_v[i]);
+    if (obj.hasObject(name_v[i])) {
+      for (int n = 0; n < obj.getNObjects(name_v[i]); n++) {
+        addAll((const ConfigObject&)obj.getObject(name_v[i], n), false);
+      }
+    }
   }
   try {
     m_db->execute("insert into \"configinfo:%s:%d\" (%s) values (%s);",

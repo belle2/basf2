@@ -78,7 +78,8 @@ namespace Belle2 {
   private:
     int initProperties() throw();
 #if NSM_PACKAGE_VERSION >= 1914
-    NSMparse* parse(NSMparse* ptr, int& length) throw(NSMHandlerException);
+    NSMparse* parse(NSMparse* ptr, int& length,
+                    std::string& name_in) throw(NSMHandlerException);
 #endif
 
   private:

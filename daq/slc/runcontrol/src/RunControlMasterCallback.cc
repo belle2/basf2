@@ -14,6 +14,7 @@
 #include <daq/slc/base/ConfigFile.h>
 
 #include <cstring>
+#include <sstream>
 #include <unistd.h>
 
 using namespace Belle2;
@@ -110,10 +111,20 @@ bool RunControlMasterCallback::log() throw()
 {
   NSMMessage& msg(getMessage());
   if (msg.getLength() > 0) {
-    DAQLogMessage log;
-    msg.getData(log);
+    StringList slist = StringUtil::split(msg.getData(), '\n');
+    std::string nodename = slist[0];
+    std::stringstream ss;
+    for (size_t i = 1; i < slist.size(); i++) {
+      ss << slist[i] << "<br/>";
+    }
+    DAQLogMessage log(nodename,
+                      (LogFile::Priority)msg.getParam(0),
+                      ss.str(), Date(msg.getParam(1)));
     LoggerObjectTable(getDB()).add(log, true);
+    NSMCommunicator& com(*getCommunicator());
+    com.sendLog(log);
   }
+  return true;
 }
 
 bool RunControlMasterCallback::ok() throw()
@@ -216,7 +227,7 @@ void RunControlMasterCallback::prepareRun(NSMMessage& msg) throw()
   getDB()->close();
 }
 
-void RunControlMasterCallback::postRun(NSMMessage& msg) throw()
+void RunControlMasterCallback::postRun(NSMMessage& /*msg*/) throw()
 {
   getDB()->connect();
   RunNumberInfoTable(getDB()).add(m_info);

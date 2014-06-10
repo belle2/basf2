@@ -18,6 +18,7 @@ drop function if exists confignames(text, text);
 drop function if exists loggernames(text);
 drop function if exists loggernames();
 drop function if exists nodenames(text);
+drop function if exists nodenames2(text);
 drop function if exists nodenames();
 drop function if exists addnode(text, text);
 drop function if exists addgroup(text);
@@ -422,6 +423,16 @@ create or replace function loggernames(text) returns setof loggerinfo_names as $
   where loggerinfo.nodeid = nodeinfo.id 
   and loggerinfo.tableid = tableinfo.id
   and nodeinfo.name = $1 and tableinfo.isroot = true;
+$$ language sql;
+
+create or replace function loggernames2(text) returns setof loggerinfo_names as $$
+  select loggerinfo.record_time as record_time,
+  loggerinfo.id as id, nodeinfo.name as node,
+  tableinfo.name as "table"
+  from loggerinfo, nodeinfo, tableinfo
+  where loggerinfo.nodeid = nodeinfo.id 
+  and loggerinfo.tableid = tableinfo.id
+  and tableinfo.name = $1 and tableinfo.isroot = true;
 $$ language sql;
 
 create or replace function loggernames() returns setof loggerinfo_names as $$

@@ -123,7 +123,7 @@ bool ArichHVCommunicator::shoulder() throw()
 bool ArichHVCommunicator::peak() throw()
 {
   ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::RECALL, 0, 0);
-  msg.setStoreId(3);
+  msg.setStoreId(4);
   return perform(msg, HVState::PEAK_S);
 }
 

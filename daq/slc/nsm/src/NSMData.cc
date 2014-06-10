@@ -157,7 +157,8 @@ throw(NSMHandlerException)
     throw (NSMHandlerException("Failed to parse header file"));
   }
   int length;
-  parse(ptr, length);
+  std::string name_in;
+  parse(ptr, length, name_in);
   if (m_size > 0 && malloc_new) {
     m_allocated = true;
     return malloc(m_size);
@@ -167,7 +168,8 @@ throw(NSMHandlerException)
 }
 
 #if NSM_PACKAGE_VERSION >= 1914
-NSMparse* NSMData::parse(NSMparse* ptr, int& length) throw(NSMHandlerException)
+NSMparse* NSMData::parse(NSMparse* ptr, int& length,
+                         std::string& name_in) throw(NSMHandlerException)
 {
   m_size = 0;
   while (ptr != NULL) {
@@ -190,7 +192,7 @@ NSMparse* NSMData::parse(NSMparse* ptr, int& length) throw(NSMHandlerException)
     else if (type == '(') {
       NSMData data(getName(), getFormat() + "." + name, getRevision());
       data.m_pdata = (void*)((char*)m_pdata + offset);
-      ptr = data.parse(ptr->next, length);
+      ptr = data.parse(ptr->next, length, name);
       int len = (length == 0) ? 1 : length;
       NSMDataList data_v;
       for (int i = 0; i < len; i++) {
@@ -204,6 +206,7 @@ NSMparse* NSMData::parse(NSMparse* ptr, int& length) throw(NSMHandlerException)
       type = FieldInfo::NSM_OBJECT;
       m_size += data.m_size * length;
     } else if (type == ')') {
+      name_in = name;
       return ptr;
     }
     FieldInfo::Property pro((FieldInfo::Type)type, length, offset);

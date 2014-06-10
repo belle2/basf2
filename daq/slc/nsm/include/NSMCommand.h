@@ -17,6 +17,8 @@ namespace Belle2 {
     static const NSMCommand NSMSET;
     static const NSMCommand DBGET;
     static const NSMCommand DBSET;
+    static const NSMCommand LISTGET;
+    static const NSMCommand LISTSET;
 
   public:
     static const int SUGGESTED = 2;

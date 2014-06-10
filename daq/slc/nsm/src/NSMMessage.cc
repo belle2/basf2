@@ -131,7 +131,8 @@ const char* NSMMessage::getRequestName() const throw()
     }
     return m_reqname.c_str();
   } else {
-    return NULL;
+    m_reqname = "";
+    return m_reqname.c_str();
   }
 }
 

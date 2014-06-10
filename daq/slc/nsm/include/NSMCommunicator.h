@@ -8,6 +8,7 @@
 #include <daq/slc/database/DAQLogMessage.h>
 
 #include <daq/slc/base/Serializable.h>
+#include <daq/slc/base/ERRORNo.h>
 
 extern "C" {
 #include <nsm2/nsm2.h>
@@ -43,6 +44,8 @@ namespace Belle2 {
     bool sendLog(const DAQLogMessage& log);
     bool sendLog(const NSMNode& node, const DAQLogMessage& log);
     bool sendError(const std::string& message);
+    bool sendError(const ERRORNo& e, const std::string& nodename,
+                   const std::string& message);
     bool sendFatal(const std::string& message);
     void sendState(const NSMNode& node) throw(NSMHandlerException);
 
@@ -59,7 +62,10 @@ namespace Belle2 {
     int getNodeIdByName(const std::string& name) throw(NSMHandlerException);
     int getNodePidByName(const std::string& name) throw(NSMHandlerException);
     void setContext(NSMcontext* nsmc) throw(NSMHandlerException);
-    bool isConnected(const NSMNode& node) throw();
+    bool isConnected(const NSMNode& node) throw() {
+      return isConnected(node.getName());
+    }
+    bool isConnected(const std::string& node) throw();
 
   private:
     int m_id;

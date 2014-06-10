@@ -22,6 +22,8 @@ namespace Belle2 {
     void add(const ConfigObject& obj, bool isroot = true)
     throw(DBHandlerException);
     void add(const ConfigObjectList& obj, bool isroot = false) throw();
+    void addAll(const ConfigObject& obj, bool isroot)
+    throw(DBHandlerException);
 
   private:
     DBInterface* m_db;

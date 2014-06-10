@@ -60,6 +60,7 @@ int main(int argc, char** argv)
     LogFile::debug("usage: dbtest5 <nodename> [<configname>]");
     return 1;
   }
+  /*
   const std::string nodename = argv[1];
 
   ConfigFile dbconfig("slowcontrol");
@@ -129,5 +130,6 @@ int main(int argc, char** argv)
       }
     }
   }
+  */
   return 0;
 }

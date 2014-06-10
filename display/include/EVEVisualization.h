@@ -302,6 +302,14 @@ namespace Belle2 {
     /** specialisation for CDCHit. */
     void addRecoHit(const CDCHit* hit, TEveStraightLineSet* lines);
 
+    /** Add 'elem' to the element group 'name' (created if necessary).
+     *
+     * name can also be a path, e.g. MyOwnStuff/SpecialObject A, which will automatically create sub-groups.
+     *
+     * slashes at beginning and end of name are ignored.
+     */
+    void addToGroup(const std::string& name, TEveElement* elem);
+
     /** Rescale PXD/SVD errors with this factor to ensure visibility. */
     double m_errorScale;
 
@@ -322,6 +330,9 @@ namespace Belle2 {
 
     /** map MCParticles to MCTrack (so hits can be added to the correct track). */
     std::map<const MCParticle*, MCTrack> m_mcparticleTracks;
+
+    /** name -> grouping element. */
+    std::map<std::string, TEveElementList*> m_groups;
 
     /** parent object for MC tracks. */
     TEveTrackList* m_tracklist;

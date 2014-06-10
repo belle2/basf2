@@ -73,6 +73,9 @@
 
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/algorithm/string/find.hpp>
+#include <boost/algorithm/string/trim.hpp>
+#include <boost/algorithm/string/classification.hpp>
 
 #include <assert.h>
 #include <cmath>
@@ -1178,6 +1181,7 @@ void EVEVisualization::clearEvent()
     return;
 
   m_visualRepMap->clear();
+  m_groups.clear();
   m_mcparticleTracks.clear();
   m_shownRecohits.clear();
   m_tracklist->DestroyElements();
@@ -1405,6 +1409,31 @@ void EVEVisualization::addObject(const TObject* dataStoreObject, TEveElement* vi
   m_visualRepMap->add(dataStoreObject, visualRepresentation);
 }
 
+void EVEVisualization::addToGroup(const std::string& name, TEveElement* elem)
+{
+  //slashes at beginning and end are ignored
+  const std::string& groupName = boost::algorithm::trim_copy_if(name, boost::algorithm::is_any_of("/"));
+
+  TEveElementList* group = m_groups[groupName];
+  if (!group) {
+    group = new TEveElementList(groupName.c_str(), groupName.c_str());
+    m_groups[groupName] = group;
+
+    //if groupName contains '/', remove last bit and add to parent group
+    //e.g. if groupName=A/B/C, call addToGroup("A/B", groupC)
+    auto lastSlash = boost::algorithm::find_last(groupName, "/");
+    if (lastSlash) {
+      const std::string parentGroup(groupName.begin(), lastSlash.begin());
+      const std::string thisGroup(lastSlash.end(), groupName.end());
+      group->SetElementName(thisGroup.c_str());
+      addToGroup(parentGroup, group);
+    } else {
+      gEve->AddElement(group);
+    }
+  }
+  group->AddElement(elem);
+}
+
 void EVEVisualization::addTrackCandidateTFInfo(TrackCandidateTFInfo* info)
 {
 
@@ -1416,7 +1445,7 @@ void EVEVisualization::addTrackCandidateTFInfo(TrackCandidateTFInfo* info)
     line->SetNextPoint(v.x(), v.y(), v.z());
   }
 
-  gEve->AddElement(line);
+  addToGroup("VXDTF/Track Candidates", line);
   addObject(info, line);
 }
 
@@ -1430,7 +1459,7 @@ void EVEVisualization::addCellTFInfo(CellTFInfo* info)
     line->SetNextPoint(v.x(), v.y(), v.z());
   }
 
-  gEve->AddElement(line);
+  addToGroup("VXDTF/Cells", line);
   addObject(info, line);
 }
 
@@ -1449,6 +1478,7 @@ void EVEVisualization::addSectorTFInfo(SectorTFInfo* info)
   box->SetTitle(info->getDisplayInformation());
   box->SetMainColor(info->getColor());
   box->SetMainTransparency(60);
-  gEve->AddElement(box);
+
+  addToGroup("VXDTF/Sectors", box);
   addObject(info, box);
 }

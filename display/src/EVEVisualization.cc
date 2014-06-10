@@ -702,6 +702,7 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
 TEveBox* EVEVisualization::boxCreator(const TVector3& o, TVector3 u, TVector3 v, float ud, float vd, float depth)
 {
   TEveBox* box = new TEveBox;
+  box->SetPickable(true);
   float vertices[24];
 
   TVector3 norm = u.Cross(v);

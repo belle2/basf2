@@ -98,6 +98,10 @@ namespace Belle2 {
        */
       void pack_dhp(int dhp_id, int dhh_id, int dhh_reformat);
 
+      /** Pack one DHP RAW to buffer.
+       */
+      void pack_dhp_raw(int dhp_id, int dhh_id, bool adcpedestal);
+
       /** Swap endianes inside all shorts of this frame besides CRC.
        * @param data pointer to frame
        * @param len length of frame
@@ -105,6 +109,7 @@ namespace Belle2 {
       void endian_swap_frame(unsigned short* data, int len);
 
       void start_frame(void);//! Start with a new Frame
+      void append_int8(unsigned char w);//! cat 8bit value to frame
       void append_int16(unsigned short w);//! cat 16bit value to frame
       void append_int32(unsigned int w);//! cat 32value value to frame
       void add_frame_to_payload(void);//! Add Frame to Event payload

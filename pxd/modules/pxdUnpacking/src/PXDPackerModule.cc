@@ -256,6 +256,11 @@ void PXDPackerModule::add_frame_to_payload(void)
   m_onsen_payload.push_back(m_current_frame);
 }
 
+void PXDPackerModule::append_int8(unsigned char w)
+{
+  m_current_frame.push_back(w);
+}
+
 void PXDPackerModule::append_int16(unsigned short w)
 {
   m_current_frame.push_back((unsigned char)(w >> 8));
@@ -402,7 +407,13 @@ void PXDPackerModule::pack_dhh(int dhh_id, int dhp_active)
     }
 
     for (int i = 0; i < 4; i++) {
-      if (dhp_active & 0x1) pack_dhp(i, dhh_id, dhh_reformat);
+      if (dhp_active & 0x1) {
+        pack_dhp(i, dhh_id, dhh_reformat);
+        if (m_trigger_nr == 0x11) {
+          pack_dhp_raw(i, dhh_id, false);
+          pack_dhp_raw(i, dhh_id, true);
+        }
+      }
       dhp_active >>= 1;
     }
   }
@@ -412,6 +423,51 @@ void PXDPackerModule::pack_dhh(int dhh_id, int dhp_active)
   append_int32((DHHC_FRAME_HEADER_DATA_TYPE_DHH_END << 27) | ((dhh_id & 0x3F) << 20) | (m_trigger_nr & 0xFFFF));
   append_int32(0x00000000);  // 16 bit word count
   append_int32(0x00000000);  // Error Flags
+  add_frame_to_payload();
+}
+
+void PXDPackerModule::pack_dhp_raw(int chip_id, int dhh_id, bool adcpedestal)
+{
+  B2INFO("PXD Packer --> pack_dhp Raw Chip " << chip_id << " of DHH id: " << dhh_id << " Mode " << adcpedestal);
+  start_frame();
+  /// DHP data Frame
+  append_int32((DHHC_FRAME_HEADER_DATA_TYPE_DHP_RAW << 27) | ((dhh_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
+  append_int32((DHP_FRAME_HEADER_DATA_TYPE_RAW << 29) | ((dhh_id & 0x3F) << 18) | ((chip_id & 0x03) << 16) | (0 & 0xFFFF));
+
+  int c1, c2;
+  c1 = 64 * chip_id;
+  c2 = c1 + 64;
+  if (c2 >= PACKER_NUM_COLS) c2 = PACKER_NUM_COLS;
+
+  if (adcpedestal) {
+    for (int row = 0; row < PACKER_NUM_ROWS; row++) {
+      for (int col = c1; col < c2; col++) {
+        append_int16((halfladder_pixmap[row][col] << 8) | ((row + col) & 0xFF));
+      }
+      for (int col = c2; col < c1 + 64; col++) {
+        append_int16(0);
+      }
+    }
+    for (int row = PACKER_NUM_ROWS; row < 1024; row++) {
+      for (int col = 0; col < 64; col++) {
+        append_int16(0);
+      }
+    }
+  } else {
+    for (int row = 0; row < PACKER_NUM_ROWS; row++) {
+      for (int col = c1; col < c2; col++) {
+        append_int8(halfladder_pixmap[row][col]);
+      }
+      for (int col = c2; col < c1 + 64; col++) {
+        append_int8(0);
+      }
+    }
+    for (int row = PACKER_NUM_ROWS; row < 1024; row++) {
+      for (int col = 0; col < 64; col++) {
+        append_int8(0);
+      }
+    }
+  }
   add_frame_to_payload();
 }
 
@@ -457,7 +513,7 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhh_id, int dhh_reformat)
   if (empty) {
     B2INFO("no data for halfladder! DHHID: " << dhh_id << " Chip: " << chip_id);
     start_frame();
-    /// Ghost Frame
+    /// Ghost Frame ... start frame overwrites frame info set above
     append_int32((DHHC_FRAME_HEADER_DATA_TYPE_GHOST << 27) | ((dhh_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
   } else {
     //B2ERROR("no error ... just to tell you we found some data for DHHID: " << dhh_id << " Chip: " << chip_id);

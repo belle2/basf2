@@ -179,6 +179,7 @@ SVDHoughtrackingModule::fastInterceptFinder2d(houghMap& hits, bool n_side, TVect
   int i, j, idx;
   int br = 0;
   unsigned int cnt_tracks;
+  unsigned int dbg_start_iteration = 0;
   double unitx, unity;
   double y1, y2;
   double m, a;
@@ -230,7 +231,7 @@ SVDHoughtrackingModule::fastInterceptFinder2d(houghMap& hits, bool n_side, TVect
         if (m_useSensorFilter && !layerFilter(layerHit)) {
           B2DEBUG(250, "  Kicked out by sensor filter");
         } else {
-          if (iterations >= 0) {
+          if (iterations >= dbg_start_iteration) {
             dbg_rect.push_back(make_pair(iterations, make_pair(v1, v3)));
           }
 
@@ -244,7 +245,7 @@ SVDHoughtrackingModule::fastInterceptFinder2d(houghMap& hits, bool n_side, TVect
               p_houghCand.push_back(SVDHoughCand(cand_dx, make_pair(v1, v2)));
             }
             B2DEBUG(250, "  Add candidate: (" << v1.X() << ", " << v1.Y() << ") (" << v3.X() << ", "
-                    << v3.Y() << ")");
+                    << v3.Y() << ") V3_s: " << v3_s.Y());
           }
         }
       }
@@ -294,6 +295,10 @@ SVDHoughtrackingModule::gplotCreate(const char* name, char* dat, int what)
 
       return NULL;
     }
+  }
+
+  if (dat == NULL) {
+    B2DEBUG(400, "gplotCreate: Dat is zero");
   }
 
   switch (what) {

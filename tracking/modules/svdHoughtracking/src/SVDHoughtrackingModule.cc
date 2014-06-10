@@ -1588,6 +1588,7 @@ SVDHoughtrackingModule::noiseFilter(float* samples, int size, float* peak_sample
 {
   int i, peak_pos;
   *peak_sample = 0.0;
+  peak_pos = 0;
 
   /* Find maximum sample and save position */
   for (i = 0; i < size; ++i) {
@@ -1766,6 +1767,7 @@ SVDHoughtrackingModule::clusterPosition(double pitch, short seed_strip, int size
   int max_pos, max_sample;
 
   max_diff = 50.0f;
+  diff = 9E+99;
 
   hit_cor = ((double)(size - 1)) * (pitch / 2.0);
 
@@ -2027,7 +2029,7 @@ SVDHoughtrackingModule::trackAnalyseMCParticle()
   double phi_tolerance = 1.5;
   double min, min_theta, min_phi, dist, pT;
   double nPrimary, nCorrReco, nCorrRecoN, nCorrRecoP;
-  double m_r;
+  double m_r = 0.0;
   double frac = 360.0;
   TVector3 mom;
 

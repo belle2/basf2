@@ -25,7 +25,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 #include <vxd/geometry/GeoCache.h>
-#include <ecl/geometry/ECLGeometryPar.h>
 #include <bklm/dataobjects/BKLMSimHitPosition.h>
 
 #include <svd/reconstruction/SVDRecoHit.h>
@@ -87,7 +86,7 @@ EVEVisualization::EVEVisualization():
   m_fullgeo(false),
   m_assignToPrimaries(false),
   m_trackcandlist(0),
-  m_eclsimhitdata(0),
+  m_eclData(0),
   m_unassignedRecoHits(0),
   m_visualRepMap(new VisualRepMap())
 {
@@ -124,7 +123,7 @@ EVEVisualization::EVEVisualization():
   m_gftracklist = new TEveElementList("Fitted tracks");
   m_gftracklist->IncDenyDestroy();
 
-  m_calo3d = new TEveCalo3D(NULL, "ECLHits");
+  m_calo3d = new TEveCalo3D(NULL, "ECLClusters");
   m_calo3d->SetBarrelRadius(125.80); //inner radius of ECL barrel
   m_calo3d->SetForwardEndCapPos(196.5); //inner edge of forward endcap
   m_calo3d->SetBackwardEndCapPos(-102.0); //inner edge of backward endcap
@@ -152,7 +151,7 @@ EVEVisualization::~EVEVisualization()
     return; //objects are probably already freed by Eve
 
   //Eve objects
-  delete m_eclsimhitdata;
+  delete m_eclData;
   delete m_unassignedRecoHits;
   delete m_tracklist;
   delete m_gftracklist;
@@ -955,27 +954,6 @@ void EVEVisualization::addSimHit(const TVector3& v, const MCParticle* particle)
   track->simhits->SetNextPoint(v.x(), v.y(), v.z());
 }
 
-void EVEVisualization::addSimHit(const ECLHit* hit, const MCParticle* particle)
-{
-  addMCParticle(particle);
-
-  const int cell = hit->getCellId();
-  const TVector3& pos = ECL::ECLGeometryPar::Instance()->GetCrystalPos(cell - 1);
-  const float eta = (float)pos.Eta();
-  const float phi = (float)pos.Phi();
-
-  //crystals are ~6 by 6 cm in crossection
-  TVector3 dPhiVec = pos.Cross(TVector3(0., 0., 1.0));
-  dPhiVec.SetMag(2.8); //half a crystal width in phi
-  const float dPhi = (float)pos.DeltaPhi(pos + dPhiVec);
-  TVector3 dEtaVec = pos.Cross(dPhiVec);
-  dEtaVec.SetMag(2.8); //half a crystal width in eta
-  const float dEta = (float)TMath::Abs((pos + dEtaVec).Eta() - eta);
-
-  m_eclsimhitdata->AddTower(eta - dEta, eta + dEta, phi - dPhi, phi + dPhi);
-  m_eclsimhitdata->FillSlice(0, hit->getEnergyDep());
-}
-
 EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* particle)
 {
   if (!particle) {
@@ -1182,10 +1160,10 @@ void EVEVisualization::makeTracks()
   if (m_trackcandlist)
     gEve->AddElement(m_trackcandlist);
 
-  m_eclsimhitdata->DataChanged(); //update limits (Empty() won't work otherwise)
-  if (!m_eclsimhitdata->Empty()) {
-    m_eclsimhitdata->SetAxisFromBins();
-    m_calo3d->SetData(m_eclsimhitdata);
+  m_eclData->DataChanged(); //update limits (Empty() won't work otherwise)
+  if (!m_eclData->Empty()) {
+    m_eclData->SetAxisFromBins();
+    m_calo3d->SetData(m_eclData);
   }
   gEve->AddElement(m_calo3d);
 
@@ -1214,13 +1192,13 @@ void EVEVisualization::clearEvent()
 
   //lower energy threshold for ECL
   float ecl_threshold = 0.01;
-  if (m_eclsimhitdata)
-    ecl_threshold = m_eclsimhitdata->GetSliceThreshold(0);
+  if (m_eclData)
+    ecl_threshold = m_eclData->GetSliceThreshold(0);
 
-  delete m_eclsimhitdata;
-  m_eclsimhitdata = new TEveCaloDataVec(1); //#slices
-  m_eclsimhitdata->IncDenyDestroy();
-  m_eclsimhitdata->RefSliceInfo(0).Setup("ECL", ecl_threshold, kRed);
+  delete m_eclData;
+  m_eclData = new TEveCaloDataVec(1); //#slices
+  m_eclData->IncDenyDestroy();
+  m_eclData->RefSliceInfo(0).Setup("ECL", ecl_threshold, kRed);
 
   delete m_unassignedRecoHits;
   m_unassignedRecoHits = 0;
@@ -1285,28 +1263,30 @@ void EVEVisualization::addVertex(const genfit::GFRaveVertex* vertex, const TStri
 }
 
 
-void EVEVisualization::addGamma(const ECLGamma* gamma, const TString& name)
+void EVEVisualization::addECLCluster(const ECLCluster* cluster)
 {
-  TVector3 Momentum = gamma->getMomentum();
-  Momentum.SetMag(200);
+  const float phi = cluster->getPhi();
+  const float dPhi = cluster->getErrorPhi();
+  const float dTheta = cluster->getErrorTheta();
 
-  float energy = gamma->getEnergy();
-  float pX = gamma->getPx();
-  float pY = gamma->getPy();
-  float pZ = gamma->getPz();
+  if (!std::isfinite(dPhi) or !std::isfinite(dTheta)) {
+    B2ERROR("ECLCluster phi or theta error is NaN or infinite, skipping cluster!");
+    return;
+  }
 
-  TEveLine* gammaVis = new TEveLine(name);
-  gammaVis->SetNextPoint(0, 0, 0); //assuming gamma came from IP
-  gammaVis->SetNextPoint(Momentum.x(), Momentum.y(), Momentum.z());
-  gammaVis->SetTitle(TString::Format("%s\n"
-                                     "Energy=%.3f\n"
-                                     "p=(%.3f, %.3f, %.3f)",
-                                     name.Data(), energy, pX, pY, pZ));
+  //convert theta +- dTheta into eta +- dEta
+  TVector3 thetaLow;
+  thetaLow.SetPtThetaPhi(1.0, cluster->getTheta() - dTheta, phi);
+  TVector3 thetaHigh;
+  thetaHigh.SetPtThetaPhi(1.0, cluster->getTheta() + dTheta, phi);
+  float etaLow = thetaLow.Eta();
+  float etaHigh = thetaHigh.Eta();
+  if (etaLow > etaHigh) {
+    std::swap(etaLow, etaHigh);
+  }
 
-  gammaVis->SetMainColor(kGreen + 2);
-  gammaVis->SetLineWidth(2.0);
-  m_calo3d->AddElement(gammaVis);
-  addObject(gamma, gammaVis);
+  m_eclData->AddTower(etaLow, etaHigh, phi - dPhi, phi + dPhi);
+  m_eclData->FillSlice(0, cluster->getEnergy());
 }
 
 void EVEVisualization::addROI(const ROIid* roi, const TString& name)

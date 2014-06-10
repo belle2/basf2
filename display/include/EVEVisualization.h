@@ -3,6 +3,7 @@
 
 #include <geometry/bfieldmap/BFieldMap.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/ECLCluster.h>
 #include <simulation/dataobjects/MCParticleTrajectory.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
@@ -14,8 +15,6 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
-#include <ecl/dataobjects/ECLGamma.h>
-#include <ecl/dataobjects/ECLHit.h>
 #include <vxd/geometry/GeoCache.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <tracking/dataobjects/ROIid.h>
@@ -166,9 +165,6 @@ namespace Belle2 {
     /** Add simhit as a simple point. */
     void addSimHit(const TVector3& v, const MCParticle* particle);
 
-    /** Add a ECL hit. */
-    void addSimHit(const ECLHit* hit, const MCParticle* particle);
-
     /** Return MCTrack for given particle, add it if it doesn't exist yet.
      *
      * If particle is NULL, a dummy MCTrack (with track=0) is created which can accept otherwise unassigned hits.
@@ -179,8 +175,8 @@ namespace Belle2 {
     /** Add a vertex point and its covariance matrix. */
     void addVertex(const genfit::GFRaveVertex* vertex, const TString& name);
 
-    /** Add a reconstructed photon in the ECL. */
-    void addGamma(const ECLGamma* gamma, const TString& name);
+    /** Add a reconstructed cluster in the ECL. */
+    void addECLCluster(const ECLCluster* cluster);
 
     /** Add a Region Of Interest, computed by the PXDDataReduction module */
     void addROI(const ROIid* roi, const TString& name);
@@ -342,8 +338,8 @@ namespace Belle2 {
     /** Track propagator for genfit::Tracks (different mainly because of drawing options) */
     TEveTrackPropagator* m_gftrackpropagator;
 
-    /** ECL hit data. */
-    TEveCaloDataVec* m_eclsimhitdata;
+    /** ECL cluster data. */
+    TEveCaloDataVec* m_eclData;
 
     /** The global magnetic field. */
     EveVisBField m_bfield;

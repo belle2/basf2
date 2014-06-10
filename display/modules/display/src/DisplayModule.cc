@@ -4,7 +4,6 @@
 #include <display/DisplayUI.h>
 #include <display/EVEVisualization.h>
 #include <geometry/GeometryManager.h>
-#include <ecl/dataobjects/ECLGamma.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -37,7 +36,7 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
   addParam("hideSecondaries", m_hideSecondaries, "If true, secondary MCParticles (and hits created by them) will not be shown.", false);
   addParam("showCharged", m_showCharged, "If true, all charged MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.", false);
   addParam("showNeutrals", m_showNeutrals, "If true, all neutral MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.", false);
-  addParam("showTrackLevelObjects", m_showTrackLevelObjects, "If true, fitted genfit::Tracks, GFRave Vertices and ECLGamma objects will be shown in the display.", true);
+  addParam("showTrackLevelObjects", m_showTrackLevelObjects, "If true, fitted genfit::Tracks, GFRave Vertices and ECLCluster objects will be shown in the display.", true);
   addParam("showTrackCandidates", m_showTrackCandidates, "If true, track candidates (genfit::TrackCand) and reconstructed hitso will be shown in the display.", false);
   addParam("useClusters", m_useClusters, "Use PXD/SVD clusters for track candidate & hit visualisation (instead of TrueHits).", true);
   addParam("automatic", m_automatic, "Non-interactively save visualisations for each event.", false);
@@ -69,8 +68,7 @@ void DisplayModule::initialize()
   StoreArray<SVDSimHit>::optional();
   StoreArray<BKLMSimHit>::optional();
   StoreArray<EKLMSimHit>::optional();
-  StoreArray<ECLHit>::optional();
-  StoreArray<ECLGamma>::optional();
+  StoreArray<ECLCluster>::optional();
   StoreArray<genfit::Track>::optional();
   StoreArray<genfit::TrackCand>::optional(m_trackCandidateColName);
   StoreArray<genfit::GFRaveVertex>::optional();
@@ -168,7 +166,6 @@ void DisplayModule::event()
     m_visualizer->addSimHits(StoreArray<CDCSimHit>());
     m_visualizer->addSimHits(StoreArray<PXDSimHit>());
     m_visualizer->addSimHits(StoreArray<SVDSimHit>());
-    m_visualizer->addSimHits(StoreArray<ECLHit>()); //ECLHits are input to the digitizer, so this _is_ MC level
     m_visualizer->addSimHits(StoreArray<EKLMSimHit>());
     m_visualizer->addSimHits(StoreArray<BKLMSimHit>());
   }
@@ -231,10 +228,16 @@ void DisplayModule::event()
       m_visualizer->addVertex(vertices[i], TString::Format("GFRaveVertex %d", i));
     }
 
-    StoreArray<ECLGamma> gammas;
-    const int nRecGammas = gammas.getEntries();
-    for (int i = 0; i < nRecGammas; i++) {
-      m_visualizer->addGamma(gammas[i], TString::Format("ECLGamma %d", i));
+    StoreArray<ECLCluster> clusters;
+    for (const ECLCluster & cluster : clusters) {
+      if (m_showMCInfo) {
+        //make sure we add particles producing these
+        const MCParticle* mcpart = cluster.getRelated<MCParticle>();
+        if (mcpart)
+          m_visualizer->addMCParticle(mcpart);
+      }
+
+      m_visualizer->addECLCluster(&cluster);
     }
   }
 

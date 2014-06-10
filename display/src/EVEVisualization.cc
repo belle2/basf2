@@ -123,9 +123,6 @@ EVEVisualization::EVEVisualization():
   m_gftrackpropagator->SetMagFieldObj(&m_bfield, false);
   m_gftrackpropagator->SetMaxOrbs(0.5); //stop after track markers
 
-  m_gftracklist = new TEveElementList("Fitted tracks");
-  m_gftracklist->IncDenyDestroy();
-
   m_calo3d = new TEveCalo3D(NULL, "ECLClusters");
   m_calo3d->SetBarrelRadius(125.80); //inner radius of ECL barrel
   m_calo3d->SetForwardEndCapPos(196.5); //inner edge of forward endcap
@@ -157,7 +154,6 @@ EVEVisualization::~EVEVisualization()
   delete m_eclData;
   delete m_unassignedRecoHits;
   delete m_tracklist;
-  delete m_gftracklist;
   delete m_trackcandlist;
   delete m_trackpropagator;
   delete m_gftrackpropagator;
@@ -699,7 +695,7 @@ void EVEVisualization::addTrack(const genfit::Track* track, const TString& label
                                     ));
 
 
-  m_gftracklist->AddElement(eveTrack);
+  addToGroup("Fitted Tracks", eveTrack);
   addObject(track, eveTrack);
 }
 
@@ -1158,7 +1154,6 @@ void EVEVisualization::makeTracks()
       m_gftrackpropagator->RefFVAtt() = m;
     }
   }
-  gEve->AddElement(m_gftracklist);
 
   if (m_trackcandlist)
     gEve->AddElement(m_trackcandlist);
@@ -1185,7 +1180,6 @@ void EVEVisualization::clearEvent()
   m_mcparticleTracks.clear();
   m_shownRecohits.clear();
   m_tracklist->DestroyElements();
-  m_gftracklist->DestroyElements();
   if (m_trackcandlist)
     m_trackcandlist->DestroyElements();
 
@@ -1262,7 +1256,7 @@ void EVEVisualization::addVertex(const genfit::GFRaveVertex* vertex, const TStri
   det_shape->SetMainTransparency(0);
 
   vertexPoint->AddElement(det_shape);
-  gEve->AddElement(vertexPoint);
+  addToGroup("Vertices", vertexPoint);
   addObject(vertex, vertexPoint);
 }
 
@@ -1321,7 +1315,7 @@ void EVEVisualization::addROI(const ROIid* roi, const TString& name)
   ROIbox->SetMainColor(kSpring - 9);
   ROIbox->SetMainTransparency(50);
 
-  m_gftracklist->AddElement(ROIbox);
+  addToGroup("ROIs", ROIbox);
   addObject(roi, ROIbox);
 
 }
@@ -1365,7 +1359,7 @@ void EVEVisualization::showUserData(const DisplayData& displayData)
     text->SetMainColor(kGray + 1);
     const TVector3& p = labelPair.second;
     text->PtrMainTrans()->SetPos(p.x(), p.y(), p.z());
-    gEve->AddElement(text);
+    addToGroup("DisplayData", text);
   }
 
   for (const auto & pointPair : displayData.m_pointSets) {
@@ -1376,7 +1370,7 @@ void EVEVisualization::showUserData(const DisplayData& displayData)
     for (const TVector3 & p : pointPair.second) {
       points->SetNextPoint(p.x(), p.y(), p.z());
     }
-    gEve->AddElement(points);
+    addToGroup("DisplayData", points);
   }
 
   int randomColor = 2; //primary colours, changing rapidly with index
@@ -1400,7 +1394,7 @@ void EVEVisualization::showUserData(const DisplayData& displayData)
     const TVector3& labelPos = pos + 0.5 * dir + 0.1 * dir.Orthogonal();
     text->PtrMainTrans()->SetPos(labelPos.x(), labelPos.y(), labelPos.z());
     eveArrow->AddElement(text);
-    gEve->AddElement(eveArrow);
+    addToGroup("DisplayData", eveArrow);
   }
 
 }

@@ -337,9 +337,6 @@ namespace Belle2 {
     /** parent object for MC tracks. */
     TEveTrackList* m_tracklist;
 
-    /** parent object for reconstructed tracks. */
-    TEveElementList* m_gftracklist;
-
     /** parent object for track candidates. */
     TEveTrackList* m_trackcandlist;
 

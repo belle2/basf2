@@ -396,6 +396,36 @@ namespace Belle2 {
     double goodGamma(const Particle* particle);
 
     /**
+     * return ECL cluster's uncorrected energy
+     */
+    double eclClusterUncorrectedE(const Particle* particle);
+
+    /**
+     * return ECL cluster's distance
+     */
+    double eclClusterR(const Particle* particle);
+
+    /**
+     * return ECL cluster's azimuthal angle
+     */
+    double eclClusterPhi(const Particle* particle);
+
+    /**
+     * return ECL cluster's polar angle
+     */
+    double eclClusterTheta(const Particle* particle);
+
+    /**
+     * return ECL cluster's timing
+     */
+    double eclClusterTiming(const Particle* particle);
+
+    /**
+     * return the energy of the crystall with highest  energy
+     */
+    double eclClusterHighestE(const Particle* particle);
+
+    /**
      * return ratio of energies in inner 3x3 and 5x5 cells
      */
     double eclClusterE9E25(const Particle* particle);

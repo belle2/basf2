@@ -659,19 +659,101 @@ namespace Belle2 {
 
     double goodGamma(const Particle* particle)
     {
+      double timing = eclClusterTiming(particle);
       double energy = particle->getEnergy();
       double e9e25  = eclClusterE9E25(particle);
-      int region = eclClusterDetectionRegion(particle);
+      int    region = eclClusterDetectionRegion(particle);
 
-      bool goodGammaRegion1 = region > 0.5 && region < 1.5 && energy > 0.125 && e9e25 > 0.7;
-      bool goodGammaRegion2 = region > 1.5 && region < 2.5 && energy > 0.100;
-      bool goodGammaRegion3 = region > 2.5 && region < 3.5 && energy > 0.150;
+      bool goodGammaRegion1 = region > 0.5 && region < 1.5 && energy > 0.085 && e9e25 > 0.7;
+      bool goodGammaRegion2 = region > 1.5 && region < 2.5 && energy > 0.060;
+      bool goodGammaRegion3 = region > 2.5 && region < 3.5 && energy > 0.110;
+      bool goodTiming       = timing > 800 && timing < 2400;
 
-      if (goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3)
+      if ((goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3) && goodTiming)
         return 1.0;
       else
         return 0.0;
     }
+
+    double eclClusterUncorrectedE(const Particle* particle)
+    {
+      double result = 0.0;
+
+      if (particle->getParticleType() == Particle::c_ECLCluster) {
+        StoreArray<ECLCluster> ECLClusters;
+        const ECLCluster* shower = ECLClusters[particle->getMdstArrayIndex()];
+
+        result = shower->getEnedepSum();
+      }
+      return result;
+    }
+
+    double eclClusterHighestE(const Particle* particle)
+    {
+      double result = 0.0;
+
+      if (particle->getParticleType() == Particle::c_ECLCluster) {
+        StoreArray<ECLCluster> ECLClusters;
+        const ECLCluster* shower = ECLClusters[particle->getMdstArrayIndex()];
+
+        result = shower->getHighestE();
+      }
+      return result;
+    }
+
+    double eclClusterTiming(const Particle* particle)
+    {
+      double result = 0.0;
+
+      if (particle->getParticleType() == Particle::c_ECLCluster) {
+        StoreArray<ECLCluster> ECLClusters;
+        const ECLCluster* shower = ECLClusters[particle->getMdstArrayIndex()];
+
+        result = shower->getTiming();
+      }
+      return result;
+    }
+
+    double eclClusterTheta(const Particle* particle)
+    {
+      double result = 0.0;
+
+      if (particle->getParticleType() == Particle::c_ECLCluster) {
+        StoreArray<ECLCluster> ECLClusters;
+        const ECLCluster* shower = ECLClusters[particle->getMdstArrayIndex()];
+
+        result = shower->getTheta();
+      }
+      return result;
+    }
+
+    double eclClusterPhi(const Particle* particle)
+    {
+      double result = 0.0;
+
+      if (particle->getParticleType() == Particle::c_ECLCluster) {
+        StoreArray<ECLCluster> ECLClusters;
+        const ECLCluster* shower = ECLClusters[particle->getMdstArrayIndex()];
+
+        result = shower->getPhi();
+      }
+      return result;
+    }
+
+    double eclClusterR(const Particle* particle)
+    {
+      double result = 0.0;
+
+      if (particle->getParticleType() == Particle::c_ECLCluster) {
+        StoreArray<ECLCluster> ECLClusters;
+        const ECLCluster* shower = ECLClusters[particle->getMdstArrayIndex()];
+
+        result = shower->getR();
+      }
+      return result;
+    }
+
+
 
     double eclClusterE9E25(const Particle* particle)
     {

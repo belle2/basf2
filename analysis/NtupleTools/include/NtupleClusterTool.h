@@ -29,6 +29,24 @@ namespace Belle2 {
   class NtupleClusterTool : public NtupleFlatTool {
   private:
 
+    /** uncorrected energy */
+    float* m_uncorrE;
+
+    /** energy of the most energetic cluster */
+    float* m_highestE;
+
+    /** timing */
+    float* m_timing;
+
+    /** polar angle */
+    float* m_theta;
+
+    /** azimuthal angle */
+    float* m_phi;
+
+    /** distance */
+    float* m_distance;
+
     /** detection region in the ECL [1 - forward, 2 - barrel, 3 - backward] */
     int* m_region;
 

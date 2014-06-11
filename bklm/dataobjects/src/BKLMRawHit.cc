@@ -16,12 +16,19 @@ using namespace Belle2;
 
 ClassImp(BKLMRawHit)
 
-//! empty constructor
-BKLMRawHit::BKLMRawHit() : RelationsObject()
+// empty constructor for ROOT - do not use this
+BKLMRawHit::BKLMRawHit() :
+  RelationsObject(),
+  m_Status(0),
+  m_Crate(0),
+  m_Slot(0),
+  m_Channel(0),
+  m_TDC(0),
+  m_ADC(0)
 {
 }
 
-//! Constructor with initial values
+// Constructor with initial values
 BKLMRawHit::BKLMRawHit(unsigned int status, int crate, int slot, int channel,
                        int tdc, int adc) :
   RelationsObject(),
@@ -34,7 +41,7 @@ BKLMRawHit::BKLMRawHit(unsigned int status, int crate, int slot, int channel,
 {
 }
 
-//! Copy constructor
+// Copy constructor
 BKLMRawHit::BKLMRawHit(const BKLMRawHit& h) :
   RelationsObject(h),
   m_Status(h.m_Status),

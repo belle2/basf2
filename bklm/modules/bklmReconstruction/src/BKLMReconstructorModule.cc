@@ -44,6 +44,7 @@ BKLMReconstructorModule::BKLMReconstructorModule() : Module()
   addParam("Coincidence window (ns)", m_dtMax,
            "Strip hits whose time difference exceeds this value are independent",
            double(75.0));
+  m_GeoPar = NULL;
 }
 
 BKLMReconstructorModule::~BKLMReconstructorModule()

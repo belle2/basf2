@@ -19,9 +19,17 @@ using namespace Belle2;
 
 ClassImp(BKLMHit2d)
 
-// empty constructor
-BKLMHit2d::BKLMHit2d() : RelationsObject()
+// empty constructor for ROOT - do not use this
+BKLMHit2d::BKLMHit2d() :
+  RelationsObject(),
+  m_ModuleID(0),
+  m_ZStrips(0),
+  m_Time(0.0),
+  m_EDep(0.0)
 {
+  m_GlobalPosition[0] = 0.0;
+  m_GlobalPosition[1] = 0.0;
+  m_GlobalPosition[2] = 0.0;
 }
 
 // Constructor with orthogonal 1D hits

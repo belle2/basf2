@@ -21,12 +21,16 @@ using namespace Belle2;
 
 ClassImp(BKLMHit1d)
 
-//! empty constructor for ROOT - do not use this
-BKLMHit1d::BKLMHit1d() : RelationsObject()
+// empty constructor for ROOT - do not use this
+BKLMHit1d::BKLMHit1d() :
+  RelationsObject(),
+  m_ModuleID(0),
+  m_Time(0.0),
+  m_EDep(0.0)
 {
 }
 
-//! Constructor with a cluster of contiguous parallel BKLMDigits
+// Constructor with a cluster of contiguous parallel BKLMDigits
 BKLMHit1d::BKLMHit1d(const std::vector<BKLMDigit*>& digits) :
   RelationsObject()
 {
@@ -63,7 +67,7 @@ BKLMHit1d::BKLMHit1d(const std::vector<BKLMDigit*>& digits) :
   }
 }
 
-//! Copy constructor
+// Copy constructor
 BKLMHit1d::BKLMHit1d(const BKLMHit1d& h) :
   RelationsObject(h),
   m_ModuleID(h.m_ModuleID),

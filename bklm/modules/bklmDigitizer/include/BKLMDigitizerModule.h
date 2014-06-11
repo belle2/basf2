@@ -55,18 +55,24 @@ namespace Belle2 {
     //! Digitize all BKLMSimHits
     void digitize(std::map<int, std::vector<std::pair<int, BKLMSimHit*> > >, StoreArray<BKLMDigit>&);
 
-    //! Digitize hit(s) in one scintillator strip
-    enum EKLM::FPGAFitStatus processEntry(std::vector<std::pair<int, BKLMSimHit*> >);
+    /**
+     * Digitize hit(s) in one scintillator strip with pulse-shape fit
+     * @param[in] vHits Vector of BKLMSimHits
+     * @param[out] fitParams Pulse-shape parameters from fit
+     * @param[out] nPE Number of surviving photoelectrons
+     * @return Fit status
+     */
+    enum EKLM::FPGAFitStatus processEntry(std::vector<std::pair<int, BKLMSimHit*> > vHits, EKLM::FPGAFitParams& fitParams, int& nPE);
 
     /**
-     * Calculate StripHit times (at the end of the strip),
-     * @param[in] Number of photoelectrons.
-     * @param[in] Time of the SimHit.
-     * @param[in] If the hit is direct or reflected.
-     * @param[out] hist Histogram.
-     * @return Vector of hit times.
+     * Calculate pulse(s) histogram at the MPPC end of the strip
+     * @param[in] nPEsample Sampled number of photoelectrons
+     * @param[in] timeShift Time of the SimHit
+     * @param[in] isReflected Whether the hit is direct (false) or reflected (true)
+     * @param[out] hist Pulse-shape histogram
+     * @return Number of surviving photoelectrons
      */
-    void fillAmplitude(int nPE, double timeShift, bool isReflected, float* hist);
+    int fillAmplitude(int nPEsample, double timeShift, bool isReflected, double dist, float* hist);
 
     /**
      * Reflect time-shape of 1p.e. signal
@@ -127,21 +133,6 @@ namespace Belle2 {
 
     //! FPGA fitter
     EKLM::FPGAFitter* m_fitter;
-
-    //! FPGA fit status
-    enum EKLM::FPGAFitStatus m_FPGAStat;
-
-    //! FPGA fit results
-    struct EKLM::FPGAFitParams m_FPGAParams;
-
-    //! Number of photoelectrons (generated)
-    int m_npe;
-
-    //! Distance from the hitpoint to SiPM for the forward-moving photons
-    double m_hitDistDirect;
-
-    //! Distance from the hitpoint to SiPM for the backward-moving photons
-    double m_hitDistReflected;
 
     //! User parameter: Discriminator threshold (# of photoelectrons)
     double m_discriminatorThreshold;

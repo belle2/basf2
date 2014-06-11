@@ -17,12 +17,21 @@ using namespace Belle2;
 
 ClassImp(BKLMDigit)
 
-//! empty constructor
-BKLMDigit::BKLMDigit() : RelationsObject()
+// empty constructor for ROOT - do not use this
+BKLMDigit::BKLMDigit() :
+  RelationsObject(),
+  m_ModuleID(0),
+  m_SimTime(0.0),
+  m_Time(0.0),
+  m_SimEDep(0.0),
+  m_EDep(0.0),
+  m_SimNPixel(0),
+  m_NPixel(0.0),
+  m_FitStatus(0)
 {
 }
 
-//! Constructor with initial values for an RPC hit
+// Constructor with initial values for an RPC hit
 BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
   RelationsObject(),
   m_SimTime(simHit->getTime()),
@@ -38,7 +47,7 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
   m_ModuleID |= ((strip - 1) << BKLM_MAXSTRIP_BIT);
 }
 
-//! Constructor with initial values for a scint hit
+// Constructor with initial values for a scint hit
 BKLMDigit::BKLMDigit(const BKLMSimHit* simHit) :
   RelationsObject(),
   m_ModuleID(simHit->getModuleID()),
@@ -52,7 +61,7 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit) :
 {
 }
 
-//! Copy constructor
+// Copy constructor
 BKLMDigit::BKLMDigit(const BKLMDigit& digit) :
   RelationsObject(digit),
   m_ModuleID(digit.m_ModuleID),

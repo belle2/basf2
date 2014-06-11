@@ -54,10 +54,8 @@ BKLMDigitizerModule::BKLMDigitizerModule() : Module()
   m_PEAttenuationFreq = 3.0;
   m_meanSiPMNoise = -1;
   m_enableConstBkg = false;
-  // These are calculated dynamically but initialize here to satisfy valgrind
-  m_npe = 0;
-  m_hitDistDirect = 0.0;
-  m_hitDistReflected = 0.0;
+  // This will be assigned in initialize()
+  m_fitter = NULL;
 
 }
 
@@ -177,35 +175,39 @@ void BKLMDigitizerModule::digitize(std::map<int, std::vector<std::pair<int, BKLM
 
 // DIVOT Do not merge trackID SimHit with parentID SimHit
 
-    enum EKLM::FPGAFitStatus status = processEntry(iVolMap->second);
+    struct EKLM::FPGAFitParams fitParams;
+    fitParams.startTime = 0.0;
+    fitParams.peakTime = 0.0;
+    fitParams.attenuationFreq = 0.0;
+    fitParams.amplitude = 0.0;
+    fitParams.bgAmplitude = (double)m_enableConstBkg;
+    int nPE = 0;
+    enum EKLM::FPGAFitStatus status = processEntry(iVolMap->second, fitParams, nPE);
     digit->setFitStatus(status);
-    digit->setTime(m_FPGAParams.startTime);
-    digit->setEDep(m_FPGAParams.amplitude);
-    digit->setSimNPixel(m_npe);
-    digit->setNPixel(m_PEAttenuationFreq * m_FPGAParams.amplitude
-                     * (0.5 * m_FPGAParams.peakTime + 1.0 / m_FPGAParams.attenuationFreq));
-    digit->isAboveThreshold(m_npe > m_discriminatorThreshold);
+    digit->setTime(fitParams.startTime);
+    digit->setEDep(fitParams.amplitude);
+    digit->setSimNPixel(nPE);
+    digit->setNPixel(m_PEAttenuationFreq * fitParams.amplitude
+                     * (0.5 * fitParams.peakTime + 1.0 / fitParams.attenuationFreq));
+    digit->isAboveThreshold(nPE > m_discriminatorThreshold);
 
   } // end of loop over VolIDToSimHit map
 
 }
 
-enum EKLM::FPGAFitStatus BKLMDigitizerModule::processEntry(std::vector<std::pair<int, BKLMSimHit*> > vHits)
+enum EKLM::FPGAFitStatus BKLMDigitizerModule::processEntry(std::vector<std::pair<int, BKLMSimHit*> > vHits, EKLM::FPGAFitParams& fitParams, int& nPE)
 {
 
-  m_npe = 0;
-  float m_amplitudeDirect[m_nDigitizations];
-  float m_amplitudeReflected[m_nDigitizations];
-  float m_amplitude[m_nDigitizations];
-  int   m_ADCAmplitude[m_nDigitizations];
-  float m_ADCFit[m_nDigitizations];
+  float amplitude[m_nDigitizations];
+  float amplitudeReflected[m_nDigitizations];
+  int   adcPulse[m_nDigitizations];
+  float adcFit[m_nDigitizations];
   // initialize variable-size arrays at run-time
   for (unsigned int i = 0; i < m_nDigitizations; ++i) {
-    m_amplitudeDirect[i] = 0.0;
-    m_amplitudeReflected[i] = 0.0;
-    m_amplitude[i] = 0.0;
-    m_ADCAmplitude[i] = 0;
-    m_ADCFit[i] = 0.0;
+    amplitude[i] = 0.0;
+    amplitudeReflected[i] = 0.0;
+    adcPulse[i] = 0;
+    adcFit[i] = 0.0;
   }
 
   GeometryPar* geoPar = GeometryPar::instance();
@@ -219,52 +221,49 @@ enum EKLM::FPGAFitStatus BKLMDigitizerModule::processEntry(std::vector<std::pair
     simHit = iHit->second;
     // calculate distance
     double local_pos = simHit->getLocalPositionX();
-    m_hitDistDirect = half_len - local_pos;
-    m_hitDistReflected = 3.0 * half_len + local_pos;
 
     // Poisson mean for # of p.e.
     double nPEmean = simHit->getEDep() * m_nPEperMeV;
 
     // fill histograms
-    fillAmplitude(gRandom->Poisson(nPEmean), simHit->getTime(), false, m_amplitudeDirect);
+    nPE += fillAmplitude(gRandom->Poisson(nPEmean), simHit->getTime(), false, half_len - local_pos, amplitude);
     if (m_mirrorReflectiveIndex > 0)
-      fillAmplitude(gRandom->Poisson(nPEmean), simHit->getTime(), true, m_amplitudeReflected);
+      nPE += fillAmplitude(gRandom->Poisson(nPEmean), simHit->getTime(), true, 3.0 * half_len + local_pos, amplitudeReflected);
   }
 
-  // sum up histograms
-  for (unsigned int i = 0; i < m_nDigitizations; ++i) {
-    m_amplitude[i] = m_amplitudeDirect[i];
-    if (m_mirrorReflectiveIndex > 0)
-      m_amplitude[i] = m_amplitude[i] + m_amplitudeReflected[i];
+  // fold reflected pulse(s) into direct pulse(s)
+  if (m_mirrorReflectiveIndex > 0) {
+    for (unsigned int i = 0; i < m_nDigitizations; ++i) {
+      amplitude[i] += amplitudeReflected[i];
+    }
   }
 
-  /* SiPM noise and ADC. */
-  if (m_meanSiPMNoise > 0)
-    for (unsigned int i = 0; i < m_nDigitizations; ++i)
-      m_amplitude[i] = m_amplitude[i] + gRandom->Poisson(m_meanSiPMNoise);
-  simulateADC(m_ADCAmplitude, m_amplitude);
+  // incorporate SiPM noise
+  if (m_meanSiPMNoise > 0) {
+    for (unsigned int i = 0; i < m_nDigitizations; ++i) {
+      amplitude[i] += gRandom->Poisson(m_meanSiPMNoise);
+    }
+  }
 
-  /* Fit. */
-  m_FPGAParams.bgAmplitude = (double)m_enableConstBkg;
-  m_FPGAStat = m_fitter->fit(m_ADCAmplitude, m_ADCFit, &m_FPGAParams);
-  if (m_FPGAStat != EKLM::c_FPGASuccessfulFit)
-    m_FPGAParams.startTime = 0.0;
-  m_FPGAParams.peakTime = 0.0;
-  m_FPGAParams.attenuationFreq = 0.0;
-  m_FPGAParams.amplitude = 0.0;
-  return m_FPGAStat;
+  // digitize the pulse(s)
+  simulateADC(adcPulse, amplitude);
+
+  // fit the digitized pulse(s)
+  EKLM::FPGAFitStatus status = m_fitter->fit(adcPulse, adcFit, &fitParams);
+  if (status != EKLM::c_FPGASuccessfulFit) {
+    return status;
+  }
   /**
    * TODO: Change units.
    * FPGA fitter now uses units: time = ADC conversion time,
    *                             amplitude = amplitude * 0.5 * ADCRange.
    */
-  m_FPGAParams.startTime = m_FPGAParams.startTime * m_ADCSamplingTime;
-  m_FPGAParams.peakTime = m_FPGAParams.peakTime * m_ADCSamplingTime;
-  m_FPGAParams.attenuationFreq = m_FPGAParams.attenuationFreq /
-                                 m_ADCSamplingTime;
-  m_FPGAParams.amplitude = m_FPGAParams.amplitude * 2 / EKLM::ADCRange;
-  m_FPGAParams.bgAmplitude = m_FPGAParams.bgAmplitude * 2 / EKLM::ADCRange;
-  return m_FPGAStat;
+  fitParams.startTime *= m_ADCSamplingTime;
+  fitParams.peakTime *= fitParams.peakTime;
+  fitParams.attenuationFreq /= m_ADCSamplingTime;
+  fitParams.amplitude *= 2.0 / EKLM::ADCRange;
+  fitParams.bgAmplitude *= 2.0 / EKLM::ADCRange;
+  return status;
 }
 
 double BKLMDigitizerModule::signalShape(double t)
@@ -277,12 +276,12 @@ double  BKLMDigitizerModule::distanceAttenuation(double dist)
   return exp(-dist / m_attenuationLength);
 }
 
-void BKLMDigitizerModule::fillAmplitude(int nPE, double timeShift,
-                                        bool isReflected, float* hist)
+int BKLMDigitizerModule::fillAmplitude(int nPEsample, double timeShift,
+                                       bool isReflected, double dist, float* hist)
 {
-  for (int j = 0; j < nPE; ++j) {
-    double cosTheta = gRandom->Uniform(m_minCosTheta, 1);
-    double hitDist = (isReflected ? m_hitDistReflected : m_hitDistDirect) / cosTheta;
+  int nPE = 0;
+  for (int j = 0; j < nPEsample; ++j) {
+    double hitDist = dist / gRandom->Uniform(m_minCosTheta, 1);
     /* Drop lightflashes which were captured by fiber */
     if (gRandom->Uniform() > distanceAttenuation(hitDist))
       continue;
@@ -290,18 +289,19 @@ void BKLMDigitizerModule::fillAmplitude(int nPE, double timeShift,
     if (isReflected)
       if (gRandom->Uniform() > m_mirrorReflectiveIndex)
         continue;
-    m_npe++;
+    nPE++;
     double deExcitationTime = gRandom->Exp(m_scintillatorDeExcitationTime) +
                               gRandom->Exp(m_fiberDeExcitationTime);
     double hitTime = hitDist / m_firstPhotonlightSpeed + deExcitationTime + timeShift;
     for (unsigned int i = 0; i < m_nDigitizations; ++i)
-      hist[i] = hist[i] + signalShape(i * m_ADCSamplingTime - hitTime);
+      hist[i] += signalShape(i * m_ADCSamplingTime - hitTime);
   }
+  return nPE;
 }
 
-void BKLMDigitizerModule::simulateADC(int m_ADCAmplitude[], float m_amplitude[])
+void BKLMDigitizerModule::simulateADC(int adcPulse[], float amplitude[])
 {
   for (unsigned int i = 0; i < m_nDigitizations; ++i)
-    m_ADCAmplitude[i] = (int)(0.5 * EKLM::ADCRange * m_amplitude[i]);
+    adcPulse[i] = (int)(0.5 * EKLM::ADCRange * amplitude[i]);
 }
 

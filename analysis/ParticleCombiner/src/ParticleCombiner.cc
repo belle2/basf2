@@ -222,8 +222,8 @@ namespace Belle2 {
           m_particles[i] = Particles[ m_indices[i] ];
         }
 
-        if (not currentCombinationHasDifferentSources()) return false;
-        if (not currentCombinationIsUnique()) return false;
+        if (not currentCombinationHasDifferentSources()) continue;
+        if (not currentCombinationIsUnique()) continue;
         return true;
       }
 

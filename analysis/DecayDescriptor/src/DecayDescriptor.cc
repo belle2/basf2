@@ -1,10 +1,17 @@
-#include <framework/logging/Logger.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
-#include <analysis/DecayDescriptor/DecayStringParticle.h>
+#include <analysis/DecayDescriptor/DecayString.h>
 #include <analysis/DecayDescriptor/DecayStringDecay.h>
 #include <analysis/DecayDescriptor/DecayStringGrammar.h>
+#include <analysis/utility/EvtPDLUtil.h>
+#include <analysis/dataobjects/Particle.h>
+
+#include <mdst/dataobjects/MCParticle.h>
+
+#include <framework/logging/Logger.h>
+
 #include <evtgen/EvtGenBase/EvtPDL.hh>
 #include <evtgen/EvtGenBase/EvtId.hh>
+
 #include <algorithm>
 #include <boost/variant/get.hpp>
 #include <boost/spirit/include/qi.hpp>

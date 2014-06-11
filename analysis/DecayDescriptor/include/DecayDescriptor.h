@@ -11,19 +11,15 @@
 #ifndef DECAYDESCRIPTOR_H
 #define DECAYDESCRIPTOR_H
 
-#include <analysis/dataobjects/Particle.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <analysis/DecayDescriptor/DecayString.h>
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
-#include <analysis/utility/EvtPDLUtil.h>
-
-#include <boost/ptr_container/ptr_vector.hpp>
 
 #include <vector>
-#include <utility>
 #include <string>
 
 namespace Belle2 {
+  class MCParticle;
+  class Particle;
 
   /** The DecayDescriptor stores information about
   a decay tree or parts of a decay tree. It contains

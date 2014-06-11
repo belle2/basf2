@@ -1,4 +1,5 @@
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
+#include <analysis/DecayDescriptor/DecayStringParticle.h>
 #include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
 #include <evtgen/EvtGenBase/EvtPDL.hh>

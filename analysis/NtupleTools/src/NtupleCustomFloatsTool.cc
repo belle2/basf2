@@ -9,6 +9,7 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleCustomFloatsTool.h>
+#include <framework/logging/Logger.h>
 #include <TBranch.h>
 #include <boost/algorithm/string.hpp>
 

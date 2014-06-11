@@ -10,10 +10,8 @@
 
 #ifndef DECAYSTRING_H
 #define DECAYSTRING_H
-#include <string>
-#include <vector>
-#include <boost/variant/recursive_variant.hpp>
 #include <analysis/DecayDescriptor/DecayStringParticle.h>
+#include <boost/variant/recursive_variant.hpp>
 
 namespace Belle2 {
   struct DecayStringDecay;

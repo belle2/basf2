@@ -10,11 +10,11 @@
 
 #ifndef DECAYDESCRIPTORPARTICLE_H
 #define DECAYDESCRIPTORPARTICLE_H
-#include <vector>
+
 #include <string>
-#include <analysis/DecayDescriptor/DecayStringParticle.h>
 
 namespace Belle2 {
+  struct DecayStringParticle;
 
   /** This Objects represents a particles in the DecayDescriptor.
   It is used for mother and daughter particles. */

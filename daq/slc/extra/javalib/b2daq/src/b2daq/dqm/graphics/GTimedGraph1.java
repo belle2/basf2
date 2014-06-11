@@ -50,18 +50,20 @@ public class GTimedGraph1 extends GHisto {
                 g.getAxisY().setMax(1);
             }
         }
-        long t0 = g.getUpdateTime() / 1000;
+        double t0 = g.getUpdateTime() / 1000 
+                + (canvas.getAxisX().getMin() - g.getAxisX().getMax())
+                - (g.getAxisX().getMax() - canvas.getAxisX().getMax());
         int nt = g.getIter();
         if (nt < 0) {
             nt = g.getAxisX().getNbins() - 1;
         }
-        pointX[0] = x0 - canvas.getAxisX().eval(t0 - g.getTime(nt) + canvas.getAxisX().getMin());
+        pointX[0] = x0 - canvas.getAxisX().eval(t0 - g.getTime(nt));
         pointY[0] = 1;
         int nttmp = nt;
         double xmin = 1;
         for (int n = 0; n < g.getAxisX().getNbins(); n++) {
-            long t = t0 - g.getTime(nt);
-            pointX[n + 1] = x0 - canvas.getAxisX().eval(t + canvas.getAxisX().getMin() );
+            double t = t0 - g.getTime(nt);
+            pointX[n + 1] = x0 - canvas.getAxisX().eval(t );
             if (pointX[n + 1] > 0 && xmin > pointX[n + 1]) {
                 xmin = pointX[n + 1];
             }
@@ -72,7 +74,7 @@ public class GTimedGraph1 extends GHisto {
                 nt = g.getAxisX().getNbins() - 1;
             }
         }
-        pointX[g.getAxisX().getNbins() + 1] = x0 - canvas.getAxisX().eval(t0 - g.getTime(nttmp) + canvas.getAxisX().getMin());
+        pointX[g.getAxisX().getNbins() + 1] = x0 - canvas.getAxisX().eval(t0 - g.getTime(nttmp));
         pointY[g.getAxisX().getNbins() + 1] = 1;
         for (int i = 0; i < pointX.length; i++) {
             if (pointX[i] < 0) {

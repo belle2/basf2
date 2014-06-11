@@ -6,9 +6,6 @@ package b2daq.apps.pscontrol;
  * and open the template in the editor.
  */
 import b2daq.database.ConfigObject;
-import b2daq.hvcontrol.core.HVCommand;
-import b2daq.nsm.NSMListenerService;
-import b2daq.nsm.NSMMessage;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.ResourceBundle;

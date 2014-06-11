@@ -360,10 +360,10 @@ public abstract class GAxis extends GShape {
             }
         } else {
             long dx = 5;
-            long time_max = (int) axis.getMax();
-            int range = (int) axis.getMax() - (int) axis.getMin();
+            double time_max = axis.getMax();
+            double range = axis.getMax() - axis.getMin();
             String format = "HH:mm:ss";
-            long time_base = update_time - time_max * 1000;
+            double time_base = update_time - time_max * 1000;
             if (range >= 60 * 60 * 24 * 6) {
                 format = "M/d";
                 dx = 300 * 24;
@@ -372,14 +372,20 @@ public abstract class GAxis extends GShape {
                 dx = 300 * 2;
             } else if (range > 60 * 5) {
                 format = "HH:mm";
-                dx = 30;
+                dx = 60;
+            } else if (range > 10) {
+                format = "HH:mm";
+                dx = 5;
+            } else {
+                format = "HH:mm";
+                dx = 1;
             }
             if (time_format.length() > 0) {
                 format = time_format;
             }
-            long x = 0;
+            double x = time_max;
             int n = 0;
-            while (x <= time_max) {
+            while (x > 0) {
                 if (n % ndivisions == 0) {
                     if (auto_label) {
                         String s = canvas.getTime((long) (time_base + x * 1000), format);
@@ -390,7 +396,7 @@ public abstract class GAxis extends GShape {
                     tick_line_v.add(new GLine(x, 0, x, 1));
                 }
                 n++;
-                x += dx;
+                x -= dx;
             }
         }
     }

@@ -116,7 +116,7 @@ public class StateLabel extends AnchorPane {
         } else if (state.isStable()) {
             set(state.getLabel(), Color.PLUM, Color.PURPLE, Color.WHITE);
         } else {
-            set(state.getLabel(), Color.LIGHTGRAY, Color.GRAY, Color.WHITE);
+            set(state.getLabel(), Color.BLACK, Color.GRAY, Color.BLACK);
         }
     }
 }

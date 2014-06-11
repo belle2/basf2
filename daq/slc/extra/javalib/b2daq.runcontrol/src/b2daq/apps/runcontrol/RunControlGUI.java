@@ -18,6 +18,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 /**
@@ -57,6 +58,7 @@ public class RunControlGUI extends Application {
             Scene scene = new Scene(root);
             scene.getStylesheets().add(LogMessage.getCSSPath());
             stage.setTitle("Belle II Run Control GUI");
+            stage.getIcons().add(new Image(RunControlGUI.class.getResource("runcontrol.png").toExternalForm()));
             stage.setScene(scene);
             stage.show();
         } catch (Exception ex) {

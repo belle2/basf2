@@ -60,6 +60,10 @@ public class HVParamEditorPaneController implements Initializable, NSMObserver {
     @FXML
     private Button button_multiedit;
     @FXML
+    private Button button_add_channel;
+    @FXML
+    private Button button_reload;
+    @FXML
     private TabPane tabpane;
     private ObservableList<TableView> table_v = FXCollections.observableArrayList();
 
@@ -91,6 +95,9 @@ public class HVParamEditorPaneController implements Initializable, NSMObserver {
                     @Override
                     public void changed(ObservableValue<? extends Tab> ov, Tab t, Tab t1) {
                         create_button.setDisable(tabpane.getTabs().size() == 0);
+                        button_add_channel.setDisable(tabpane.getTabs().size() == 0);
+                        button_multiedit.setDisable(tabpane.getTabs().size() == 0);
+                        button_reload.setDisable(tabpane.getTabs().size() == 0);
                     }
                 }
         );
@@ -136,10 +143,15 @@ public class HVParamEditorPaneController implements Initializable, NSMObserver {
     }
 
     @FXML
-    public void handleMultieditButton() {
+    public void handleMultiEditButton() {
         PowerSettingDialog.showDialog(tabpane.getScene(), this);
     }
     
+    @FXML
+    public void handleAddChennelButton() {
+        AddingChannelDialog.showDialog(tabpane.getScene(), this);
+    }
+
     @FXML
     public void handleCreateButon() {
         String [] namelist = new String [tabpane.getTabs().size()];
@@ -267,6 +279,9 @@ public class HVParamEditorPaneController implements Initializable, NSMObserver {
                 tabpane.setDisable(false);
                 add_button.setDisable(false);
                 choice_valueset.setDisable(false);
+                button_add_channel.setDisable(false);
+                button_multiedit.setDisable(false);
+                button_reload.setDisable(false);
             }
         }
     }
@@ -296,6 +311,11 @@ public class HVParamEditorPaneController implements Initializable, NSMObserver {
                 choice_valueset.getSelectionModel().select(index);
                 before_radio.setDisable(index == 0);
                 after_radio.setDisable(!(index < tabpane.getTabs().size() - 1));
+                if (index == 0) {
+                    after_radio.setSelected(true);
+                } else if (!(index < tabpane.getTabs().size() - 1)) {
+                    before_radio.setSelected(true);
+                }
             }
         });
         if (pos == -1) {
@@ -311,5 +331,9 @@ public class HVParamEditorPaneController implements Initializable, NSMObserver {
 
     Iterable<Tab> getTabs() {
         return tabpane.getTabs();
+    }
+    
+    void addChannel(int crate, int slot, int channel) {
+        
     }
 }

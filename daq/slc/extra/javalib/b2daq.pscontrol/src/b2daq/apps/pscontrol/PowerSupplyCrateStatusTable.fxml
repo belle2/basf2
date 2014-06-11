@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.web.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import b2daq.apps.*?>
+<?import javafx.scene.control.cell.*?>
+<?scenebuilder-classpath-element ../classes?>
+
+
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.apps.pscontrol.PowerSupplyCrateStatusTableController">
+   <children>
+      <TableView fx:id="table" prefHeight="255.0" prefWidth="574.0">
+           <columns>
+               <TableColumn prefWidth="54.0" text="Index">
+                   <cellValueFactory>
+                       <PropertyValueFactory property="index" />
+                   </cellValueFactory>
+               </TableColumn>
+               <TableColumn prefWidth="63.0" text="Slot #">
+                   <cellValueFactory>
+                       <PropertyValueFactory property="slot" />
+                   </cellValueFactory>
+               </TableColumn>
+               <TableColumn prefWidth="49.0" text="Ch #">
+                   <cellValueFactory>
+                       <PropertyValueFactory property="channel" />
+                   </cellValueFactory>
+               </TableColumn>
+               <TableColumn fx:id="col_state" prefWidth="114.0" text="State">
+            </TableColumn>
+               <TableColumn prefWidth="136.0" text="Voltage">
+                   <cellValueFactory>
+                       <PropertyValueFactory property="voltage" />
+                   </cellValueFactory>
+               </TableColumn>
+               <TableColumn prefWidth="150.0" text="Curent">
+                   <cellValueFactory>
+                       <PropertyValueFactory property="current" />
+                   </cellValueFactory>
+               </TableColumn>
+           </columns>
+       </TableView>
+   </children>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</VBox>

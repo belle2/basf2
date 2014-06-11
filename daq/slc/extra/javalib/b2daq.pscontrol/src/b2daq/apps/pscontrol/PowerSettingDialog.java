@@ -29,11 +29,12 @@ public class PowerSettingDialog {
             PowerSettingDialogController controller = loader.getController();
             controller.init(editor);
             Scene scene = new Scene(root);
-            Stage dialog = new Stage(StageStyle.UTILITY);
+            Stage dialog = new Stage();//StageStyle.UTILITY);
             dialog.setScene(scene);
-            if (pscene == null) dialog.initOwner(pscene.getWindow());
+            if (pscene != null) dialog.initOwner(pscene.getWindow());
             dialog.initModality(Modality.WINDOW_MODAL);
             dialog.setResizable(false);
+            dialog.setTitle("Edit channels");
             dialog.showAndWait();
         } catch (IOException ex) {
             Logger.getLogger(PowerSettingDialog.class.getName()).log(Level.SEVERE, null, ex);

@@ -18,27 +18,31 @@ import javafx.stage.Stage;
  *
  * @author tkonno
  */
-public class PowerConfigDialog {
+public class AddingChannelDialog {
 
-    public static String showDialog(Scene pscene, String title, 
-            String message, String prompt, String... namelist) {
+    public static String showDialog(Scene pscene, HVParamEditorPaneController editor) {
         try {
-            FXMLLoader loader = new FXMLLoader(PowerConfigDialog.class.getResource("PowerConfigDialog.fxml"));
+            FXMLLoader loader = new FXMLLoader(AddingChannelDialog.class.getResource("AddingChannelDialog.fxml"));
             loader.load();
             Parent root = loader.getRoot();
-            PowerConfigDialogController controller = loader.getController();
-            controller.set(message, prompt, namelist);
+            AddingChannelDialogController controller = loader.getController();
+            controller.setEditor(editor);
             Scene scene = new Scene(root);
             Stage dialog = new Stage();//StageStyle.UTILITY);
             dialog.setScene(scene);
-            if (pscene == null) dialog.initOwner(pscene.getWindow());
+            if (pscene != null) {
+                dialog.initOwner(pscene.getWindow());
+            } else {
+                dialog.centerOnScreen();
+            }
             dialog.initModality(Modality.WINDOW_MODAL);
+            //dialog.initModality(Modality.APPLICATION_MODAL);
             dialog.setResizable(false);
-            dialog.setTitle(title);
+            dialog.setTitle("Adding new channel");
             dialog.showAndWait();
-            return controller.getText();
+            //return controller.getText();
         } catch (IOException ex) {
-            Logger.getLogger(PowerConfigDialog.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(AddingChannelDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }

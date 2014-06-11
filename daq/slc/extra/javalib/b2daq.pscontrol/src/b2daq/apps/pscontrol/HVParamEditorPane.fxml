@@ -14,7 +14,7 @@
             <children>
                 <Label text="Select configuration" />
                 <ComboBox fx:id="combo" disable="true" prefWidth="150.0" promptText="---" />
-                <Button fx:id="reload_button" mnemonicParsing="false" onAction="#handleReloadButon" text="Reload">
+                <Button fx:id="button_reload" disable="true" mnemonicParsing="false" onAction="#handleReloadButon" text="Reload">
                     <font>
                         <Font size="12.0" />
                     </font>
@@ -47,7 +47,12 @@
                   <ChoiceBox fx:id="choice_valueset" disable="true" prefWidth="150.0" />
                   <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
                      <children>
-                        <Button fx:id="button_multiedit" mnemonicParsing="false" onAction="#handleMultieditButton" text="Muti edit">
+                        <Button fx:id="button_add_channel" disable="true" mnemonicParsing="false" onAction="#handleAddChennelButton" text="Add channel">
+                           <HBox.margin>
+                              <Insets right="20.0" />
+                           </HBox.margin>
+                        </Button>
+                        <Button fx:id="button_multiedit" disable="true" mnemonicParsing="false" onAction="#handleMultiEditButton" text="Muti edit">
                            <HBox.margin>
                               <Insets right="30.0" />
                            </HBox.margin>
@@ -57,16 +62,20 @@
                         </Button>
                      </children>
                      <HBox.margin>
-                        <Insets bottom="10.0" />
+                        <Insets />
                      </HBox.margin>
                   </HBox>
                     </children>
                 </HBox>
-                <TabPane fx:id="tabpane" prefHeight="446.0" prefWidth="794.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
-                    <VBox.margin>
-                        <Insets />
-                    </VBox.margin>
-                </TabPane>
+            <VBox>
+               <children>
+                      <TabPane fx:id="tabpane" prefHeight="446.0" prefWidth="794.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+                          <VBox.margin>
+                              <Insets />
+                          </VBox.margin>
+                      </TabPane>
+               </children>
+            </VBox>
             </children>
         </VBox>
     </children>

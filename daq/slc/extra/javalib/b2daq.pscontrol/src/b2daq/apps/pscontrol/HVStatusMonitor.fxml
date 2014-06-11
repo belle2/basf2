@@ -44,7 +44,7 @@
                                                 <HistogramCanvas fx:id="c_cur_frac" name="c_cur_frac" stat="false" title="Monitored current per channel">
                                                     <histograms>
                                                         <FXCollections fx:factory="observableArrayList">
-                                                            <Histo1D fx:id="h_cur_frac" fillColor="yellow" lineColor="blue" name="h_cur_frac" nbinsx="20" title=";Monitored value [A];# of channels" xmax="500" xmin="0" />
+                                                            <Histo1D fx:id="h_cur_frac" fillColor="yellow" lineColor="blue" name="h_cur_frac" nbinsx="20" title=";Monitored value [mA];# of channels" xmax="500" xmin="0" />
                                                         </FXCollections>
                                                     </histograms>
                                                 </HistogramCanvas>
@@ -81,8 +81,7 @@
                                                         <GAxisY labelFontSize="0.7" labelOffset="0.03" lineColor="gray" tickLength="0" title="">
                                                             <labels>
                                                                 <FXCollections fx:factory="observableArrayList">
-                                                                    <GValuedText text="GB01:Slot0" value="1.5" />
-                                                                    <GValuedText text="HV01:Slot0" value="2.5" />
+                                                                    <GValuedText text="HV01:Slot0" value="1.5" />
                                                                 </FXCollections>
                                                             </labels>
                                                         </GAxisY> 
@@ -93,7 +92,7 @@
                                                     </colorAxis> 
                                                     <histograms>
                                                         <FXCollections fx:factory="observableArrayList">
-                                                            <Histo2D fx:id="h_channel_status" lineColor="gray" lineWidth="4" name="h_channel_status" nbinsx="9" nbinsy="2" title=";Channel number;" xmax="10" xmin="1" ymax="3" ymin="1" />
+                                                            <Histo2D fx:id="h_channel_status" lineColor="gray" lineWidth="4" name="h_channel_status" nbinsx="9" nbinsy="1" title=";Channel number;" xmax="10" xmin="1" ymax="2" ymin="1" />
                                                         </FXCollections>
                                                     </histograms>
                                                     <shapes>
@@ -120,7 +119,7 @@
                 </HBox>
             </content>
         </Tab>
-        <Tab closable="false" text="ARICH_HV01">
+        <Tab closable="false" text="CDC:HV01">
             <content>
                 <VBox>
                     <children>
@@ -185,7 +184,7 @@
                                                     </pad>
                                                     <histograms>
                                                         <FXCollections fx:factory="observableArrayList">
-                                                            <TimedGraph1D fx:id="gr_cur_node0_ch0" fixYmax="true" fixYmin="true" lineColor="blue" name="gr_cur_node0_ch0" nbinsx="1000" title="ch 1;Time;Monitored curent[A]" xmax="600" xmin="0" ymax="500" ymin="0" />
+                                                            <TimedGraph1D fx:id="gr_cur_node0_ch0" fixYmax="true" fixYmin="true" lineColor="blue" name="gr_cur_node0_ch0" nbinsx="1000" title="ch 1;Time;Monitored curent[mA]" xmax="600" xmin="0" ymax="500" ymin="0" />
                                                             <TimedGraph1D fx:id="gr_cur_node0_ch1" lineColor="red" name="gr_cur_node0_ch1" nbinsx="1000" title="ch 2" xmax="600" xmin="0" />
                                                             <TimedGraph1D fx:id="gr_cur_node0_ch2" lineColor="green" name="gr_cur_node0_ch2" nbinsx="1000" title="ch 3" xmax="600" xmin="0" />
                                                             <TimedGraph1D fx:id="gr_cur_node0_ch3" lineColor="lightseagreen" name="gr_cur_node0_ch3" nbinsx="1000" title="ch 4" xmax="600" xmin="0" />

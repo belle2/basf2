@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework', '$ROOT_LIBS', 'analysis', 'analysis_dataobjects', 'mdst_dataobjects']
+env['LIBS'] = ['framework', '$ROOT_LIBS', 'analysis', 'analysis_dataobjects', 'mdst_dataobjects', 'analysis_ParticleCombiner']
 
 Return('env')

@@ -2,6 +2,7 @@ Import('env')
 
 env['LIBS'] = ['framework', 'analysis',
                'analysis_dataobjects', 'analysis_DecayDescriptor',
+               'analysis_ParticleCombiner',
                '$ROOT_LIBS']
 
 Return('env')

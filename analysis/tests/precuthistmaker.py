@@ -20,11 +20,11 @@ main.add_module(register_module('EventInfoPrinter'))
 main.add_module(register_module('ParticleLoader'))
 
 
-selectParticle('K-', -321, [], path=main)
-selectParticle('pi+', 211, [], path=main)
+selectParticle('K-', [], path=main)
+selectParticle('pi+', [], path=main)
 
-selectParticle('gamma', 22, [], path=main)
-makeParticle('pi0', 111, ['gamma', 'gamma'], 0.110, 0.150, path=main)
+selectParticle('gamma', [], path=main)
+makeParticle('pi0 -> gamma gamma', {'M': (0.110, 0.150)}, path=main)
 matchMCTruth('pi0', path=main)
 
 combinedlist = 'D0'
@@ -43,7 +43,7 @@ main.add_module(histmaker)
 #b) make all  combinations and save only signal
 
 #essentially no cuts here, which makes it slow
-makeParticle(combinedlist, 421, daughters, 0.0, 100.0, path=main)
+makeParticle('D0 -> K- pi+ pi0', {}, path=main)
 matchMCTruth(combinedlist, path=main)
 
 ntupler = register_module('VariablesToNtuple')

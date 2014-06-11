@@ -13,7 +13,6 @@
 #include <analysis/utility/PSelectorFunctions.h>
 #include <analysis/utility/MCMatching.h>
 #include <analysis/utility/EvtPDLUtil.h>
-#include <analysis/ParticleCombiner/ParticleCombiner.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 #include <mdst/dataobjects/MCParticle.h>
@@ -71,6 +70,9 @@ void PreCutHistMakerModule::initialize()
   m_pdg = mother->getPDGCode();
   m_channelName = mother->getFullName();
 
+  std::stringstream onlySignal_decayString;
+  onlySignal_decayString << mother->getFullName() << " ==> ";
+
   // Daughters
   int nProducts = decay.getNDaughters();
   for (int i = 0; i < nProducts; ++i) {
@@ -80,12 +82,14 @@ void PreCutHistMakerModule::initialize()
     m_inputListNames.push_back(daughter->getFullName());
 
     std::string listName = Belle2::EvtPDLUtil::particleListName(daughterPDG, "HistMaker");
+    onlySignal_decayString << " " << listName;
+
     m_tmpLists.emplace_back(listName);
-    m_tmpLists.back().registerAsTransient();
+    m_tmpLists.back().registerAsTransient(false);
     bool isSelfConjugated = !(Belle2::EvtPDLUtil::hasAntiParticle(daughterPDG));
     if (!isSelfConjugated) {
       std::string antiListName = Belle2::EvtPDLUtil::antiParticleListName(daughterPDG, "HistMaker");
-      StoreObjPtr<ParticleList>::registerTransient(antiListName);
+      StoreObjPtr<ParticleList>::registerTransient(antiListName, DataStore::c_Event, false);
     }
   }
 
@@ -95,8 +99,8 @@ void PreCutHistMakerModule::initialize()
   }
 
   if (m_customBinning.size() > 0) {
-    m_histogramSignal = new TH1F((std::string("signal") + m_channelName).c_str(), "signal", m_customBinning.size(), &m_customBinning[0]);
-    m_histogramAll = new TH1F((std::string("all") + m_channelName).c_str(), "all", m_customBinning.size(), &m_customBinning[0]);
+    m_histogramSignal = new TH1F((std::string("signal") + m_channelName).c_str(), "signal", m_customBinning.size() - 1, &m_customBinning[0]);
+    m_histogramAll = new TH1F((std::string("all") + m_channelName).c_str(), "all", m_customBinning.size() - 1, &m_customBinning[0]);
   } else {
     int nbins;
     double xlow, xhigh;
@@ -107,9 +111,13 @@ void PreCutHistMakerModule::initialize()
 
   VariableManager& manager = VariableManager::Instance();
   m_var = manager.getVariable(m_variable);
+
   if (m_var == nullptr) {
     B2ERROR("PreCutHistMaker: VariableManager doesn't have variable" <<  m_variable)
   }
+
+  m_generator_all = new ParticleGenerator(m_decayString);
+  m_generator_signal = new ParticleGenerator(onlySignal_decayString.str()); // TODO this is not just signal
 }
 
 
@@ -211,20 +219,12 @@ bool PreCutHistMakerModule::fillParticleLists(const std::vector<MCParticle*>& mc
 
 void PreCutHistMakerModule::saveCombinationsForSignal()
 {
-  // Convert input ParticleList(s) to PCombinerList(s)
-  vector<PCombinerList> inputPCombinerLists;
-  for (const auto & list : m_tmpLists) {
-    PCombinerList plist;
-    convert(list, plist);
-    inputPCombinerLists.push_back(plist);
-  }
 
   StoreArray<Particle> particles;
-  ParticleCombiner combiner(inputPCombinerLists, !hasAntiParticle(m_pdg));
+  m_generator_signal->init();
+  while (m_generator_signal->loadNext()) {
 
-  while (combiner.loadNext()) {
-
-    const Particle particle = combiner.getCurrentParticle(m_pdg, -m_pdg);
+    const Particle particle = m_generator_signal->getCurrentParticle();
     Particle* part = particles.appendNew(particle);
     MCMatching::setMCTruth(part);
     //B2WARNING("combined Particle created.");
@@ -243,21 +243,9 @@ void PreCutHistMakerModule::saveCombinationsForSignal()
 
 void PreCutHistMakerModule::saveAllCombinations()
 {
-  StoreArray<Particle> particles;
-
-  // Convert input ParticleList(s) to PCombinerList(s)
-  vector<PCombinerList> inputPCombinerLists;
-  for (unsigned i = 0; i < m_inputListNames.size(); i++) {
-    StoreObjPtr<ParticleList> list(m_inputListNames[i]);
-    PCombinerList plist;
-    convert(list, plist);
-    inputPCombinerLists.push_back(plist);
-  }
-
-  ParticleCombiner combiner(inputPCombinerLists, !hasAntiParticle(m_pdg));
-
-  while (combiner.loadNext()) {
-    const Particle part = combiner.getCurrentParticle(m_pdg, -m_pdg);
+  m_generator_all->init();
+  while (m_generator_all->loadNext()) {
+    const Particle part = m_generator_all->getCurrentParticle();
     m_histogramAll->Fill(m_var->function(&part));
   }
 }
@@ -342,6 +330,8 @@ void PreCutHistMakerModule::terminate()
 {
   saveHists();
 
+  delete m_generator_signal;
+  delete m_generator_all;
   delete m_histogramAll;
   delete m_histogramSignal;
 }

@@ -86,15 +86,11 @@ namespace Belle2 {
      */
     bool checkCuts(const Particle* particle);
 
-    /**
-     * Converts ParticleList to PCombinerList
-     */
-    void convert(const StoreObjPtr<ParticleList>& in, PCombinerList& out);
-
     int m_pdgCode;                /**< PDG code of the combined mother particle */
 
     std::string m_strDecay;   /**< Input DecayString specifying the decay being reconstructed */
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of the decay being reconstructed */
+    ParticleGenerator* m_generator; /**< Generates the combinations */
 
     std::string m_listName;   /**< output particle list name */
     std::string m_antiListName;   /**< output anti-particle list name */

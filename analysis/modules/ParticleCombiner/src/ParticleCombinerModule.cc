@@ -108,6 +108,7 @@ namespace Belle2 {
         m_inputListNames.push_back(daughter->getFullName());
         //m_daughterPDGCodes.push_back(daughter->getPDGCode());
       }
+      m_generator = new ParticleGenerator(m_strDecay);
     } else {
       // check if the mother and daughter list names are valid names
       bool valid = m_decaydescriptor.init(m_listName);
@@ -134,6 +135,7 @@ namespace Belle2 {
         if (!valid)
           B2ERROR("Invalid input (daughter) list name: " << m_inputListNames[i]);
       }
+      m_generator = new ParticleGenerator(m_listName); //TODO Create correct decayString here, this won't work
     }
 
     if (m_persistent) {
@@ -149,6 +151,8 @@ namespace Belle2 {
     for (unsigned i = 0; i < m_inputListNames.size(); i++) {
       StoreObjPtr<ParticleList>::required(m_inputListNames[i]);
     }
+
+
   }
 
   void ParticleCombinerModule::beginRun()
@@ -171,22 +175,17 @@ namespace Belle2 {
       outputList->bindAntiParticleList(*(outputAntiList));
     }
 
-    // Convert input ParticleList(s) to PCombinerList(s)
-    vector<PCombinerList> inputPCombinerLists;
-    for (unsigned i = 0; i < m_inputListNames.size(); i++) {
-      StoreObjPtr<ParticleList> list(m_inputListNames[i]);
-      PCombinerList plist;
-      convert(list, plist);
-      inputPCombinerLists.push_back(plist);
-    }
-
-    ParticleCombiner combiner(inputPCombinerLists, m_isSelfConjugatedParticle);
     int pdg    = outputList->getPDGCode();
     int pdgbar = outputList->getAntiParticlePDGCode();
 
-    while (combiner.loadNext()) {
+    B2INFO("[ParticleCombinerModule::event] OutputListName = " << m_listName << "(" << m_antiListName << ")" << "[" << pdg << "/" << pdgbar << "]");
 
-      const Particle particle = combiner.getCurrentParticle(pdg, pdgbar);
+    int counter = 1;
+    m_generator->init();
+    while (m_generator->loadNext()) {
+      B2INFO("[ParticleCombinerModule::event] loaded Particle #" << counter++);
+
+      const Particle particle = m_generator->getCurrentParticle();
       if (!checkCuts(&particle))
         continue;
 
@@ -203,19 +202,7 @@ namespace Belle2 {
 
   void ParticleCombinerModule::terminate()
   {
-  }
-
-  void ParticleCombinerModule::convert(const StoreObjPtr<ParticleList>& in,
-                                       PCombinerList& out)
-  {
-    std::vector<int> particles     = in->getList(ParticleList::c_FlavorSpecificParticle);
-    std::vector<int> antiParticles = in->getList(ParticleList::c_FlavorSpecificParticle, true);
-    std::vector<int> scParticles   = in->getList(ParticleList::c_SelfConjugatedParticle);
-
-    out.setPDG(in->getPDGCode());
-    out.setList(PCombinerList::c_Particle, particles);
-    out.setList(PCombinerList::c_AntiParticle, antiParticles);
-    out.setList(PCombinerList::c_SelfConjugatedParticle, scParticles);
+    delete m_generator;
   }
 
   bool ParticleCombinerModule::checkCuts(const Particle* particle)

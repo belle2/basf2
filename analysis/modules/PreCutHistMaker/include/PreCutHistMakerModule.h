@@ -17,6 +17,7 @@
 
 #include <analysis/ParticleCombiner/PCombinerList.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/ParticleCombiner/ParticleCombiner.h>
 #include <analysis/utility/VariableManager.h>
 
 #include <string>
@@ -96,6 +97,9 @@ namespace Belle2 {
     std::vector<StoreObjPtr<ParticleList>> m_tmpLists; /**< temporary particle lists (contain subsets of contents of input lists, filled from MC truth). */
     TH1F* m_histogramSignal; /**< signal histogram for combined particle. */
     TH1F* m_histogramAll; /**< signal histogram for combined particle. */
+
+    ParticleGenerator* m_generator_signal;
+    ParticleGenerator* m_generator_all;
 
   };
 

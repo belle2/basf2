@@ -28,8 +28,8 @@ MCDecayFinderModule::MCDecayFinderModule() : Module()
   //Set module properties
   setDescription("Find decays in MCParticle list matching a given DecayString.");
   //Parameter definition
-  addParam("strDecayString", m_strDecay, "DecayDescriptor string.", string(""));
-  addParam("strListName", m_strListName, "Name of the output particle list", string(""));
+  addParam("decayString", m_strDecay, "DecayDescriptor string.", string(""));
+  addParam("listName", m_strListName, "Name of the output particle list", string(""));
   addParam("persistent", m_persistent,
            "toggle output particle list btw. transient/persistent", false);
 }

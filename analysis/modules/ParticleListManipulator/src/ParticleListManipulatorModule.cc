@@ -69,8 +69,8 @@ namespace Belle2 {
 
   void ParticleListManipulatorModule::initialize()
   {
-    if (m_outputListName.empty() || m_inputListNames.size() == 0)
-      B2ERROR("Please provide input and output ParticleList names!");
+    if (m_outputListName.empty())
+      B2ERROR("Please provide output ParticleList names!");
 
     if (!m_outputListName.empty()) {
       m_pdgCode  = 0;

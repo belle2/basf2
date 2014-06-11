@@ -11,6 +11,9 @@
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
 
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
+
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 
@@ -18,47 +21,15 @@
 
 namespace Belle2 {
 
-  ListCombiner::ListCombiner(unsigned int numberOfLists) : numberOfLists(numberOfLists), iCombination(0), nCombinations(0), currentType(PCombinerList::c_Particle), types(numberOfLists) {  }
-
-  void ListCombiner::init(PCombinerList::EParticleType _currentType)
-  {
-    iCombination = 0;
-    currentType = _currentType;
-    if (numberOfLists == 0)
-      nCombinations = 0;
-    else
-      nCombinations = currentType == PCombinerList::c_SelfConjugatedParticle ? 1 : (1 << numberOfLists) - 1;
-  }
-
-  bool ListCombiner::loadNext()
+  void ParticleIndexGenerator::init(const std::vector<unsigned>& _sizes)
   {
 
-    if (iCombination == nCombinations)
-      return false;
-
-    for (unsigned int i = 0; i < numberOfLists; ++i) {
-      bool useSelfConjugatedDaughterList = (iCombination & (1 << i));
-      types[i] = useSelfConjugatedDaughterList ? PCombinerList::c_SelfConjugatedParticle : currentType;
-    }
-
-    ++iCombination;
-    return true;
-  }
-
-  const std::vector<PCombinerList::EParticleType>& ListCombiner::getCurrentTypes() const
-  {
-    return types;
-  }
-
-
-  IndexCombiner::IndexCombiner(unsigned int numberOfLists) : numberOfLists(numberOfLists), iCombination(0), nCombinations(0), indices(numberOfLists), sizes(numberOfLists) { }
-
-  void IndexCombiner::init(const std::vector<unsigned>& _sizes)
-  {
-
+    numberOfLists = _sizes.size();
     sizes = _sizes;
+
     iCombination = 0;
 
+    indices.resize(numberOfLists);
     for (unsigned int i = 0; i < numberOfLists; ++i) {
       indices[i] = 0;
     }
@@ -73,7 +44,7 @@ namespace Belle2 {
 
   }
 
-  bool IndexCombiner::loadNext()
+  bool ParticleIndexGenerator::loadNext()
   {
 
     if (iCombination == nCombinations) {
@@ -94,65 +65,166 @@ namespace Belle2 {
     return true;
   }
 
-  const std::vector<unsigned int>& IndexCombiner::getCurrentIndices() const
+  const std::vector<unsigned int>& ParticleIndexGenerator::getCurrentIndices() const
   {
     return indices;
   }
 
-
-  ParticleCombiner::ParticleCombiner(const std::vector<PCombinerList>& inputLists, bool isCombinedParticleSelfConjugated) : listCombiner(inputLists.size()), indexCombiner(inputLists.size()), m_isCombinedParticleSelfConjugated(isCombinedParticleSelfConjugated)
+  void ListIndexGenerator::init(unsigned int _numberOfLists)
   {
+    numberOfLists = _numberOfLists;
+    types.resize(numberOfLists);
 
-    for (unsigned i = 0; i < inputLists.size(); i++) {
-      PCombinerList list = inputLists[i];
-
-      if (list.getParticleCollectionName() != std::string("Particles")) {
-        B2ERROR("PCombinerList does not refer to the default Particle collection");
-        return;
-      }
-      plists.push_back(list);
-    }
-
-    numberOfLists = plists.size();
-    m_indices.resize(numberOfLists);
-    m_particles.resize(numberOfLists);
-
-    nTypes = 3;
-    iType = -1;
-
-    m_isCombinedParticleSelfConjugated = isCombinedParticleSelfConjugated || isDecaySelfConjugated(plists);
+    iCombination = 0;
+    nCombinations = (1 << numberOfLists) - 1;
 
   }
 
-
-  bool ParticleCombiner::loadNext()
+  bool ListIndexGenerator::loadNext()
   {
 
+    if (iCombination == nCombinations)
+      return false;
+
+    for (unsigned int i = 0; i < numberOfLists; ++i) {
+      bool useSelfConjugatedDaughterList = (iCombination & (1 << i));
+      types[i] = useSelfConjugatedDaughterList ? ParticleList::c_SelfConjugatedParticle : ParticleList::c_FlavorSpecificParticle;
+    }
+
+    ++iCombination;
+    return true;
+  }
+
+  const std::vector<ParticleList::EParticleType>& ListIndexGenerator::getCurrentIndices() const
+  {
+    return types;
+  }
+
+  ParticleGenerator::ParticleGenerator(std::string decayString)
+  {
+
+    DecayDescriptor decaydescriptor;
+    bool valid = decaydescriptor.init(decayString);
+    if (!valid)
+      B2ERROR("Invalid input DecayString: " << decayString);
+
+    // Mother particle
+    const DecayDescriptorParticle* mother = decaydescriptor.getMother();
+    m_pdgCode = mother->getPDGCode();
+
+    // Daughters
+    numberOfLists = decaydescriptor.getNDaughters();
+    for (unsigned int i = 0; i < numberOfLists; ++i) {
+      const DecayDescriptorParticle* daughter = decaydescriptor.getDaughter(i)->getMother();
+      StoreObjPtr<ParticleList> list(daughter->getFullName());
+      m_plists.push_back(list);
+    }
+
+    m_isSelfConjugated = decaydescriptor.isSelfConjugated();
+
+  }
+
+  void ParticleGenerator::init()
+  {
+
+    if (not m_isSelfConjugated) {
+      iParticleType = 0;
+    } else {
+      iParticleType = 1;
+    }
+
+    particleIndexGenerator.init(std::vector<unsigned int> {}); // ParticleIndexGenerator will be initialised on first call
+    listIndexGenerator.init(numberOfLists); // ListIndexGenerator must be initialised here!
+    m_usedCombinations.clear();
+    m_indices.resize(numberOfLists);
+    m_particles.resize(numberOfLists);
+  }
+
+  bool ParticleGenerator::loadNext()
+  {
+
+    bool loadedNext = false;
+    while (true) {
+      switch (iParticleType) {
+        case 0: loadedNext = loadNextParticle(true); break; //Anti-Particles
+        case 1: loadedNext = loadNextParticle(false); break; //Particles
+        case 2: loadedNext = loadNextSelfConjugatedParticle(); break;
+        default: return false;
+      }
+      if (loadedNext)
+        return true;
+      ++iParticleType;
+
+      if (iParticleType == 2) {
+        std::vector<unsigned int> sizes(numberOfLists);
+        for (unsigned int i = 0; i < numberOfLists; ++i) {
+          sizes[i] = m_plists[i]->getList(ParticleList::c_SelfConjugatedParticle, false).size();
+        }
+        particleIndexGenerator.init(sizes);
+      } else {
+        listIndexGenerator.init(numberOfLists);
+      }
+
+    }
+  }
+
+  bool ParticleGenerator::loadNextParticle(bool useAntiParticle)
+  {
+
+    StoreArray<Particle> Particles;
     while (true) {
 
       // Load next index combination if available
-      if (indexCombiner.loadNext()) {
-        if (loadNextCombination())
-          return true;
-        else
-          continue;
+      if (particleIndexGenerator.loadNext()) {
+
+        const auto& types = listIndexGenerator.getCurrentIndices();
+        const auto& indices = particleIndexGenerator.getCurrentIndices();
+
+        for (unsigned int i = 0; i < numberOfLists; i++) {
+          const auto& liste = m_plists[i]->getList(types[i], types[i] == ParticleList::c_FlavorSpecificParticle ? useAntiParticle : false);
+          m_indices[i] =  liste[ indices[i] ];
+          m_particles[i] = Particles[ m_indices[i] ];
+        }
+
+        if (not currentCombinationHasDifferentSources()) continue;
+        if (not currentCombinationIsUnique()) continue;
+        return true;
       }
 
       // Load next list combination if available and reset indexCombiner
-      if (listCombiner.loadNext()) {
-        const auto& types = listCombiner.getCurrentTypes();
+      if (listIndexGenerator.loadNext()) {
+        const auto& types = listIndexGenerator.getCurrentIndices();
         std::vector<unsigned int> sizes(numberOfLists);
         for (unsigned int i = 0; i < numberOfLists; ++i) {
-          sizes[i] = plists[i].getList(types[i]).size();
+          sizes[i] = m_plists[i]->getList(types[i], types[i] == ParticleList::c_FlavorSpecificParticle ? useAntiParticle : false).size();
         }
-        indexCombiner.init(sizes);
+        particleIndexGenerator.init(sizes);
         continue;
       }
+      return false;
+    }
 
-      // Load next type combination if available
-      if (loadNextType()) {
-        listCombiner.init((PCombinerList::EParticleType)(iType));
-        continue;
+  }
+
+  bool ParticleGenerator::loadNextSelfConjugatedParticle()
+  {
+
+    StoreArray<Particle> Particles;
+    while (true) {
+
+      // Load next index combination if available
+      if (particleIndexGenerator.loadNext()) {
+
+        const auto& indices = particleIndexGenerator.getCurrentIndices();
+
+        for (unsigned int i = 0; i < numberOfLists; i++) {
+          m_indices[i] = m_plists[i]->getList(ParticleList::c_SelfConjugatedParticle, false) [ indices[i] ];
+          m_particles[i] = Particles[ m_indices[i] ];
+        }
+
+        if (not currentCombinationHasDifferentSources()) return false;
+        if (not currentCombinationIsUnique()) return false;
+        return true;
       }
 
       return false;
@@ -160,13 +232,8 @@ namespace Belle2 {
 
   }
 
-  bool ParticleCombiner::loadNextType()
-  {
-    ++iType;
-    return iType < nTypes;
-  }
 
-  Particle ParticleCombiner::getCurrentParticle(int pdg, int pdgbar) const
+  Particle ParticleGenerator::getCurrentParticle() const
   {
 
     TLorentzVector vec(0., 0., 0., 0.);
@@ -174,55 +241,21 @@ namespace Belle2 {
       vec = vec + m_particles[i]->get4Vector();
     }
 
-    PCombinerList::EParticleType outputType = getCurrentType();
-    return Particle(vec, outputType == PCombinerList::c_AntiParticle ? pdgbar :  pdg,
-                    outputType == PCombinerList::c_SelfConjugatedParticle ? Particle::c_Unflavored : Particle::c_Flavored,
-                    m_indices, m_particles[0]->getArrayPointer());
-  }
-
-  PCombinerList::EParticleType ParticleCombiner::getCurrentCombinationType() const
-  {
-    switch (iType) {
-      case 0: return PCombinerList::c_Particle;
-      case 1: return PCombinerList::c_AntiParticle;
-      case 2: return PCombinerList::c_SelfConjugatedParticle;
-      default: B2FATAL("Thomas you have a serious bug in the particle combiner!");
+    switch (iParticleType) {
+      case 0: return Particle(vec, -m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices, m_particles[0]->getArrayPointer());
+      case 1: return Particle(vec, m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices, m_particles[0]->getArrayPointer());
+      case 2: return Particle(vec, m_pdgCode, Particle::c_Unflavored, m_indices, m_particles[0]->getArrayPointer());
+      default: B2FATAL("Thomas you have a serious bug in the particle combiner");
     }
-    return PCombinerList::c_Particle; // This line can never be reached, as long B2FATAL kills the program!
+
+    return Particle(); // This should never happen
   }
 
-
-  PCombinerList::EParticleType ParticleCombiner::getCurrentType() const
-  {
-    if (m_isCombinedParticleSelfConjugated)
-      return PCombinerList::c_SelfConjugatedParticle;
-    return getCurrentCombinationType();
-  }
-
-  bool ParticleCombiner::loadNextCombination()
+  bool ParticleGenerator::currentCombinationHasDifferentSources()
   {
 
     StoreArray<Particle> Particles;
-
-    const auto& types = listCombiner.getCurrentTypes();
-    const auto& indices = indexCombiner.getCurrentIndices();
-
-    for (unsigned int i = 0; i < numberOfLists; i++) {
-      m_indices[i] = plists[i].getList(types[i])[ indices[i] ];
-      m_particles[i] = Particles[ m_indices[i] ];
-    }
-
-    if (not currentCombinationHasDifferentSources()) return false;
-    if (not currentCombinationIsUnique()) return false;
-
-    return true;
-  }
-
-  bool ParticleCombiner::currentCombinationHasDifferentSources()
-  {
-
-    StoreArray<Particle> Particles;
-    std::vector<Particle*> stack = getCurrentParticles();
+    std::vector<Particle*> stack = m_particles;
     static std::vector<int> sources; // stack for particle sources
     sources.clear();
 
@@ -244,29 +277,11 @@ namespace Belle2 {
   }
 
 
-  bool ParticleCombiner::currentCombinationIsUnique()
+  bool ParticleGenerator::currentCombinationIsUnique()
   {
-    const std::vector<int>& indices = getCurrentIndices();
-    const std::set<int> indexSet(indices.begin(), indices.end());
-
+    const std::set<int> indexSet(m_indices.begin(), m_indices.end());
     bool elementInserted = m_usedCombinations.insert(indexSet).second;
-
-    //if it was not inserted, index combination was already used
     return elementInserted;
-  }
-
-  bool ParticleCombiner::isDecaySelfConjugated(std::vector<PCombinerList>& plists)
-  {
-
-    std::vector<int> decay, decaybar;
-    for (unsigned i = 0; i < plists.size(); i++) {
-      decay.push_back(plists[i].getPDG());
-      decaybar.push_back(plists[i].getPDGbar());
-    }
-    std::sort(decay.begin(), decay.end());
-    std::sort(decaybar.begin(), decaybar.end());
-    return decay == decaybar;
-
   }
 
 }

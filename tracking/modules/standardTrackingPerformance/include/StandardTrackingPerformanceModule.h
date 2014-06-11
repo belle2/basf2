@@ -103,6 +103,9 @@ namespace Belle2 {
      */
     genfit::Track* findRelatedTrack(MCParticle& mcParticle, StoreArray< genfit::Track >& gfTracks);
 
+    /** search for a genfit::TrackCand which is related to a given MCParticle */
+    bool findRelatedTrackCand(const MCParticle& mcParticle);
+
     /** search a valid TrackFitResult for a given genfit::Track
      * @param gfTrack: TrackFitResult must be related to this genfit::Track
      * @return: pointer to the found TrackFitResult if found, else NULL is returned
@@ -130,6 +133,8 @@ namespace Belle2 {
     /** write root tree to output file and close the file */
     void writeData();
 
+    void addVariableToTree(std::string varName, double& varReference);
+
 
     std::string m_outputFileName; /**< name of output root file */
     std::string m_gfTrackColName; /**< genfit::Track collection name */
@@ -149,8 +154,14 @@ namespace Belle2 {
     /**< properties of a reconstructed track */
     ParticleProperties m_trackProperties;
 
+    /**< pValue of track fit */
+    double m_pValue;
+
     /**< total number of genrated charged stable MCParticles */
     double m_nGeneratedChargedStableMcParticles;
+
+    /**< total number of reconstructed track candidates */
+    double m_nReconstructedChargedStableTracks;
 
     /**< total number of fitted tracks */
     double m_nFittedChargedStabletracks;

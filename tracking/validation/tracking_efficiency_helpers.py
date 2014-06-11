@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# !/usr/bin/env python
+
 #################################################################
 #                                                               #
 #    function to simulate 10 charged muon tracks with           #
@@ -15,22 +17,64 @@ from simulation import add_simulation
 from basf2 import *
 import glob
 import os
+import sys
+
+
+def get_generated_pt_value(index):
+    """
+    List with generated pt values is created in this function. With the
+    parameter index, one is able to access single pt values. If index == -1,
+    the number of pt values in the list is returned.
+
+    @param index
+
+    @return double
+    """
+
+    # pt_values = [0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0]
+    pt_values = [
+        0.4,
+        0.6,
+        1.,
+        1.5,
+        2.,
+        2.5,
+        3.,
+        4.,
+        ]
+
+    if index == -1:
+        return len(pt_values)
+    try:
+        return pt_values[index]
+    except IndexError:
+        print 'ERROR in %s. Index is out of range. Only %d elements in list.' \
+            % (get_generated_pt_value.__name__, len(pt_values))
+        sys.exit(1)
+
+
+def get_generated_pt_values():
+    """
+    Collects all pt values with help of the function get_generated_pt_value
+    and stores them in a list, that is returned
+
+    @return list of pt values
+    """
+
+    list = []
+    for index in xrange(get_generated_pt_value(-1)):
+        list.append(get_generated_pt_value(index))
+    return list
 
 
 def run_simulation(path, pt_value, output_filename):
-    '''Add needed modules to the path and set parameters and start it'''
+    """Add needed modules to the path and set parameters and start it"""
 
     # components which are used for the simulation and reconstruction
     # In order to avoid, that tracks came back in the cdc after they have left
     # TOP is added in the simulation
-    components = [
-        'MagneticFieldConstant4LimitedRCDC',
-        'BeamPipe',
-        'PXD',
-        'SVD',
-        'CDC',
-        'TOP',
-        ]
+    components = ['MagneticFieldConstant4LimitedRCDC', 'BeamPipe', 'PXD', 'SVD'
+                  , 'CDC']
 
     # evt meta
     eventinfosetter = register_module('EventInfoSetter')
@@ -46,9 +90,9 @@ def run_simulation(path, pt_value, output_filename):
     path.add_module(progress)
 
     # ParticleGun
-    pGun = register_module('ParticleGun')
+    pgun = register_module('ParticleGun')
     # choose the particles you want to simulate
-    param_pGun = {
+    param_pgun = {
         'pdgCodes': [13, -13],
         'nTracks': 10,
         'varyNTracks': 0,
@@ -59,12 +103,13 @@ def run_simulation(path, pt_value, output_filename):
         'yVertexParams': [0.0],
         'zVertexParams': [0.0],
         }
-    pGun.param(param_pGun)
 
-    path.add_module(pGun)
+    pgun.param(param_pgun)
+
+    path.add_module(pgun)
 
     background_files = []
-    if os.environ.has_key('BELLE2_BACKGROUND_DIR'):
+    if 'BELLE2_BACKGROUND_DIR' in os.environ:
         background_files += glob.glob(os.environ['BELLE2_BACKGROUND_DIR']
                                       + '/PXD*.root')
         background_files += glob.glob(os.environ['BELLE2_BACKGROUND_DIR']

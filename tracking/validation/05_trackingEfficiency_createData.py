@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# !/usr/bin/env python
+
 #################################################################
 #                                                               #
 #    script to simulate 10 charged muon tracks with             #
@@ -12,11 +14,11 @@
 #################################################################
 
 from basf2 import *
-from tracking_efficiency_helpers import run_simulation
+from tracking_efficiency_helpers import run_simulation, get_generated_pt_value
 
 set_random_seed(12345)
 
-pt_value = 0.15
+pt_value = get_generated_pt_value(2)
 
 output_filename = '../trackingEfficiency_pt_%.2fGeV.root' % pt_value
 

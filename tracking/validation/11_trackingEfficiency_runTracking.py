@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 #################################################################
@@ -13,8 +13,20 @@
 from basf2 import *
 from reconstruction import add_reconstruction
 import glob
+import argparse
 
-input_root_files = glob.glob('../trackingEfficiency_pt_*GeV.root')
+argument_parser = argparse.ArgumentParser("Options")
+
+argument_parser.add_argument("-i", "--input-files", type=str,
+                             default='../trackingEfficiency_pt_*GeV.root',
+                             help='ROOT files with simulated events.')
+argument_parser.add_argument("-o", "--output-files", type=str,
+                             default='../trackingEfficiency_FinalData.root',
+                             help='ROOT file with tracking efficiency info.')
+
+arguments = argument_parser.parse_args()
+
+input_root_files = glob.glob(arguments.input_files)
 print 'Tracking will run over these files: '
 print input_root_files
 print
@@ -38,7 +50,8 @@ path.add_module(geometry)
 
 add_reconstruction(path, components)
 
-output_file_name = '../trackingEfficiency_FinalData.root'
+output_file_name = arguments.output_files
+
 tracking_efficiency = register_module('StandardTrackingPerformance')
 # tracking_efficiency.logging.log_level = LogLevel.DEBUG
 tracking_efficiency.param('outputFileName', output_file_name)

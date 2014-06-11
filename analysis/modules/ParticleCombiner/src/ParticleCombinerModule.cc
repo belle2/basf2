@@ -161,7 +161,7 @@ namespace Belle2 {
 
   void ParticleCombinerModule::event()
   {
-    StoreArray<Particle> Particles;
+    StoreArray<Particle> particles;
 
     StoreObjPtr<ParticleList> outputList(m_listName);
     outputList.create();
@@ -180,17 +180,17 @@ namespace Belle2 {
 
     B2INFO("[ParticleCombinerModule::event] OutputListName = " << m_listName << "(" << m_antiListName << ")" << "[" << pdg << "/" << pdgbar << "]");
 
-    int counter = 1;
+    //int counter = 1;
     m_generator->init();
     while (m_generator->loadNext()) {
-      B2INFO("[ParticleCombinerModule::event] loaded Particle #" << counter++);
+      //B2INFO("[ParticleCombinerModule::event] loaded Particle #" << counter++);
 
-      const Particle particle = m_generator->getCurrentParticle();
+      const Particle& particle = m_generator->getCurrentParticle();
       if (!checkCuts(&particle))
         continue;
 
-      new(Particles.nextFreeAddress()) Particle(particle);
-      int iparticle = Particles.getEntries() - 1;
+      particles.appendNew(particle);
+      int iparticle = particles.getEntries() - 1;
 
       outputList->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
     }

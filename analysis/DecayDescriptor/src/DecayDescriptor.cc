@@ -273,6 +273,24 @@ vector<const Particle*> DecayDescriptor::getSelectionParticles(const Particle* p
   return selparticles;
 }
 
+bool DecayDescriptor::isSelfConjugated() const
+{
+
+  std::vector<int> decay, decaybar;
+  for (int i = 0; i < getNDaughters(); ++i) {
+    const DecayDescriptorParticle* daughter = getDaughter(i)->getMother();
+    int pdg = daughter->getPDGCode();
+    decay.push_back(pdg);
+    decaybar.push_back(Belle2::EvtPDLUtil::hasAntiParticle(pdg) ? -pdg : pdg);
+  }
+
+  std::sort(decay.begin(), decay.end());
+  std::sort(decaybar.begin(), decaybar.end());
+
+  return (not Belle2::EvtPDLUtil::hasAntiParticle(getMother()->getPDGCode())) || (decay == decaybar);
+
+}
+
 vector<string> DecayDescriptor::getSelectionNames()
 {
   vector<string> strNames;

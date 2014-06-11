@@ -11,14 +11,17 @@
 #ifndef DECAYDESCRIPTOR_H
 #define DECAYDESCRIPTOR_H
 
-#include <vector>
-#include <utility>
-#include <string>
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <analysis/DecayDescriptor/DecayString.h>
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
+#include <analysis/utility/EvtPDLUtil.h>
+
 #include <boost/ptr_container/ptr_vector.hpp>
+
+#include <vector>
+#include <utility>
+#include <string>
 
 namespace Belle2 {
 
@@ -59,7 +62,7 @@ namespace Belle2 {
 
     /** Initialise the DecayDescriptor from given string.
         Typically, the string is a parameter of an analysis module. */
-    bool init(const std::string s);
+    bool init(const std::string str);
 
     /** Initialise the DecayDescriptor from a given DecayString.
     The DecayString struct is obtained from the parser called
@@ -113,6 +116,9 @@ namespace Belle2 {
     bool isInclusive() const {
       return m_isInclusive;
     }
+
+    /** Is the decay or the particle self conjugated */
+    bool isSelfConjugated() const;
 
     /** Takes as input argument a (reconstructed) Particle, tries to match with
     this DecayDescriptorElement and returns true when matched. */

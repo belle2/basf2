@@ -60,11 +60,15 @@ void Belle2::EvtPDLUtil::initEvtPDL()
 
 std::string Belle2::EvtPDLUtil::antiParticleListName(int pdgCode, std::string label)
 {
+  if (label.empty())
+    return antiParticleName(pdgCode);
   return antiParticleName(pdgCode) + ":" + label;
 }
 
 std::string Belle2::EvtPDLUtil::particleListName(int pdgCode, std::string label)
 {
+  if (label.empty())
+    return antiParticleName(pdgCode);
   return particleName(pdgCode) + ":" + label;
 }
 

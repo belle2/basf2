@@ -38,7 +38,7 @@ bool DecayDescriptorParticle::init(const DecayStringParticle& p)
   }
   EvtId evtId = EvtPDL::getId(m_strName);
   if (evtId.getId() == -1) {
-    B2WARNING("Particle not in evt.pdl file!" << m_strName);
+    B2WARNING("Particle not in evt.pdl file! " << m_strName);
     return false;
   }
   m_iPDGCode = EvtPDL::getStdHep(evtId);

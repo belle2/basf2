@@ -34,7 +34,7 @@ namespace Belle2 {
     // Reserved characters for steering
     reserved = space || '^' || '[' || ']' || '>' || ':';
 
-    // particle composed of selector, particle name, and user label: "^D_s+/label"
+    // particle composed of selector, particle name, and user label: "^D_s+:label"
     particle %= -selector >> lexeme[+(char_ - reserved)] >> -label;
     selector = string("^");
     label %= lit(":") >> lexeme[+(char_ - reserved)];

@@ -89,12 +89,15 @@ bool ArichHVControlCallback::peak() throw()
 bool ArichHVControlCallback::hvapply(const HVApplyMessage& hvmsg)
 throw()
 {
-  for (int i = 0; i < (int)m_comm_v.size(); i++) {
-    if (hvmsg.isAllCrates() || i == hvmsg.getCrate()) {
+  for (size_t i = 0; i < getNChannels(); i++) {
+    const HVChannel& channel(getConfig().getChannel(i));
+    if ((hvmsg.isAllCrates() || hvmsg.getCrate() == channel.getCrate()) &&
+        (hvmsg.isAllSlots() || hvmsg.getSlot() == channel.getSlot()) &&
+        (hvmsg.isAllChannels() || hvmsg.getChannel() == channel.getChannel())) {
       ArichHVMessage msg(ArichHVMessage::SET, ArichHVMessage::ALL,
-                         hvmsg.getSlot(), hvmsg.getChannel());
-      std::cout << i << " " << hvmsg.getCrate() << " " << hvmsg.getSlot()
-                << " "  << hvmsg.getChannel() << std::endl;
+                         channel.getSlot(), channel.getChannel());
+      std::cout << i << " " << channel.getCrate() << " " << channel.getSlot()
+                << " "  << channel.getChannel() << std::endl;
       if (hvmsg.isTurnon()) {
         //msg.setRampupSpeed(hvmsg.getRampupSpeed());
         //msg.setCommand(ArichHVMessage::RAMPUP_SPEED);
@@ -115,7 +118,7 @@ throw()
         msg.setVoltageDemand(hvmsg.getVoltageDemand());
         msg.setCommand(ArichHVMessage::VOLTAGE_DEMAND);
       }
-      m_comm_v[i]->perform(msg, HVState(getNode().getState()));
+      m_comm_v[channel.getCrate()]->perform(msg, HVState(getNode().getState()));
     }
   }
   return true;

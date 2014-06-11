@@ -82,7 +82,6 @@ Environment::Environment() :
 
   //set path to external software
   setExternalsPath(envarExtDir);
-
 }
 
 

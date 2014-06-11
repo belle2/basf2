@@ -221,6 +221,7 @@ namespace Belle2 {
 
     /**
      * Reads std::vector from a python object.
+     * If the python object isn't a list, a std::vector with the given object as single entry is returned.
      *
      * @param pyObject Python object which stores the vector.
      * @param std::vector<Value> dummy allows the compiler to infer the correct template.
@@ -231,11 +232,15 @@ namespace Belle2 {
     {
 
       std::vector<Value> tmpVector;
-      const boost::python::list& pyList = static_cast<const boost::python::list&>(pyObject);
-      int nList = boost::python::len(pyList);
 
-      for (int iList = 0; iList < nList; ++iList) {
-        tmpVector.push_back(convertPythonObject(pyList[iList], Value()));
+      if (PyList_Check(pyObject.ptr())) {
+        const boost::python::list& pyList = static_cast<const boost::python::list&>(pyObject);
+        int nList = boost::python::len(pyList);
+        for (int iList = 0; iList < nList; ++iList) {
+          tmpVector.push_back(convertPythonObject(pyList[iList], Value()));
+        }
+      } else {
+        tmpVector.push_back(convertPythonObject(pyObject, Value()));
       }
       return tmpVector;
     }

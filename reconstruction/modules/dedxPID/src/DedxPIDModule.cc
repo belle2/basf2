@@ -56,7 +56,8 @@ REG_MODULE(DedxPID)
 
 
 
-DedxPIDModule::DedxPIDModule() : Module()
+DedxPIDModule::DedxPIDModule() : Module(),
+  m_pdfs()
 {
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -78,6 +79,10 @@ DedxPIDModule::DedxPIDModule() : Module()
 
   addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.", std::string("/data/reconstruction/dedxPID_PDFs_r8682_200k_events_upper_80perc_trunc.root"));
   addParam("ignoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
+
+  m_eventID = -1;
+  m_trackID = 0;
+  m_numExtrapolations = 0;
 }
 
 
@@ -86,10 +91,6 @@ DedxPIDModule::~DedxPIDModule() { }
 
 void DedxPIDModule::initialize()
 {
-  m_eventID = -1;
-  m_trackID = 0;
-  m_numExtrapolations = 0;
-
   if (!m_pdfFile.empty()) {
 
     std::string fullPath = FileSystem::findFile(m_pdfFile);

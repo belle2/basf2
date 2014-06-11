@@ -1767,7 +1767,7 @@ SVDHoughtrackingModule::clusterPosition(double pitch, short seed_strip, int size
   int max_pos, max_sample;
 
   max_diff = 50.0f;
-  diff = 9E+99;
+  diff = 1e+11;
 
   hit_cor = ((double)(size - 1)) * (pitch / 2.0);
 
@@ -1867,8 +1867,8 @@ SVDHoughtrackingModule::analyseClusterStrips()
   VxdID sensorID, svd_sensorID;
   StoreArray<SVDCluster> storeClusters(m_storeSVDClusterName);
   const StoreArray<SVDTrueHit> storeSVDTrueHits(m_storeSVDTrueHitsName);
-  SVDCluster* svdCluster;
-  SVDTrueHit* svdTrueHit;
+  SVDCluster* svdCluster = NULL;
+  SVDTrueHit* svdTrueHit = NULL;
 
   nSVDClusters = storeClusters.getEntries();
   if (nSVDClusters == 0) {
@@ -2361,7 +2361,6 @@ SVDHoughtrackingModule::createGhosts()
   for (unsigned int i = 0; i < ghost.size(); ++i) {
     //  cluster_map.insert(std::make_pair((iter->first) + 1 + i, ghost[i]));
   }
-
 }
 
 /* vim: set tabstop=2:softtabstop=2:shiftwidth=2:noexpandtab */

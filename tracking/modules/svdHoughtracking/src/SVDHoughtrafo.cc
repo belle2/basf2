@@ -408,7 +408,7 @@ SVDHoughtrackingModule::purifyTrackCandsList()
   coord2dPair hc, hc2;
   vector<unsigned int> idList, last_idList;
   unsigned int cand_cnt, found_tracks;
-  double x, y;
+  double x, y, last_x;
   vector<SVDHoughCand> cpyCand;
 
   found_tracks = 0;
@@ -463,6 +463,7 @@ SVDHoughtrackingModule::purifyTrackCandsList()
   sort(cpyCand.begin(), cpyCand.end());
   cand_cnt = 0;
   x = 0.0;
+  last_x = 0;
   y = 0.0;
   B2DEBUG(200, "Tracks found in P-Side: " << cpyCand.size());
   for (auto it = cpyCand.begin(); it != cpyCand.end(); ++it) {
@@ -475,7 +476,8 @@ SVDHoughtrackingModule::purifyTrackCandsList()
       y += hc.first.Y();
       y += hc.second.Y();
       ++cand_cnt;
-    } else if (compareList(idList, last_idList) && it != cpyCand.end()) {
+    } else if (compareList(idList, last_idList) && fabs(last_x - hc.first.X()) < 1.0
+               && it != cpyCand.end()) {
       B2DEBUG(200, "    Compare successfull... merge");
       x += hc.first.X();
       x += hc.second.X();
@@ -497,6 +499,7 @@ SVDHoughtrackingModule::purifyTrackCandsList()
       cand_cnt = 1;
     }
     last_idList = idList;
+    last_x = hc.first.X();
   }
 
   if (cpyCand.size() > 0) {

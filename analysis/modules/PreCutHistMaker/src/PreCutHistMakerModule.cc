@@ -32,7 +32,13 @@ using namespace Belle2;
 REG_MODULE(PreCutHistMaker)
 
 
-PreCutHistMakerModule::PreCutHistMakerModule()
+PreCutHistMakerModule::PreCutHistMakerModule():
+  m_pdg(0),
+  m_var(nullptr),
+  m_histogramSignal(nullptr),
+  m_histogramAll(nullptr),
+  m_generator_signal(nullptr),
+  m_generator_all(nullptr)
 {
   setDescription("Saves distribution of a variable of combined particles (from input ParticleLists) into histogram 'all'. If the daughters can be combined into a correctly reconstructed (!) particle of specified type, save variable value for this combination to a histogram called 'signal'. This is equivalent to running ParticleCombiner on the given lists and saving the variable value of Particles with isSignal == 1 and everything else, but much faster (since Particles don't need to be saved).");
   setPropertyFlags(c_ParallelProcessingCertified); //histograms are saved through HistModule, so this is ok
@@ -117,7 +123,7 @@ void PreCutHistMakerModule::initialize()
   }
 
   m_generator_all = new ParticleGenerator(m_decayString);
-  m_generator_signal = new ParticleGenerator(onlySignal_decayString.str()); // TODO this is not just signal
+  m_generator_signal = new ParticleGenerator(onlySignal_decayString.str());
 }
 
 
@@ -312,18 +318,6 @@ void PreCutHistMakerModule::event()
       }
     }
   }
-}
-
-void PreCutHistMakerModule::convert(const StoreObjPtr<ParticleList>& in, PCombinerList& out)
-{
-  std::vector<int>     particles = in->getList(ParticleList::c_FlavorSpecificParticle);
-  std::vector<int> antiParticles = in->getList(ParticleList::c_FlavorSpecificParticle, true);
-  std::vector<int>   scParticles = in->getList(ParticleList::c_SelfConjugatedParticle);
-
-  out.setPDG(in->getPDGCode());
-  out.setList(PCombinerList::c_Particle,                  particles);
-  out.setList(PCombinerList::c_AntiParticle,          antiParticles);
-  out.setList(PCombinerList::c_SelfConjugatedParticle,  scParticles);
 }
 
 void PreCutHistMakerModule::terminate()

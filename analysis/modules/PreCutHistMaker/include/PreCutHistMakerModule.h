@@ -15,7 +15,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <analysis/ParticleCombiner/PCombinerList.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
 #include <analysis/utility/VariableManager.h>
@@ -64,11 +63,6 @@ namespace Belle2 {
 
   private:
 
-    /**
-     * Converts ParticleList to PCombinerList
-     */
-    void convert(const StoreObjPtr<ParticleList>& in, PCombinerList& out);
-
     /** reset m_tmpLists. */
     void clearTemporaryLists();
 
@@ -98,8 +92,8 @@ namespace Belle2 {
     TH1F* m_histogramSignal; /**< signal histogram for combined particle. */
     TH1F* m_histogramAll; /**< signal histogram for combined particle. */
 
-    ParticleGenerator* m_generator_signal;
-    ParticleGenerator* m_generator_all;
+    ParticleGenerator* m_generator_signal; /**< Combines particles for signal (not everything is signal, so we run MCMatching for the limited number of candidates produced). */
+    ParticleGenerator* m_generator_all; /**< Combines particles for signal+background. */
 
   };
 

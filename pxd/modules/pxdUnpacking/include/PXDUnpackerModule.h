@@ -53,12 +53,6 @@ namespace Belle2 {
       bool m_headerEndianSwap;
       /**  ignore missing DATCON */
       bool m_ignoreDATCON;
-      /**  ignore wrong nr of frames info in DHHC Start*/
-      bool m_ignore_headernrframes;
-      /**  ignore missing DHPs from DHP mask in DHH Start*/
-      bool m_ignore_dhpmask;
-      /**  ignore wrong DHP ports in DHH header vs DHP header */
-      bool m_ignore_dhpportdiffer;
       /** Only unpack, but Do Not Store anything to file */
       bool m_doNotStore;
       /** Event Number and compare mask grabbed from FTSW for now */
@@ -73,9 +67,9 @@ namespace Belle2 {
       unsigned long m_meta_experiment;
 
       /** Event counter */
-      unsigned int unpacked_events;
+      unsigned int m_unpackedEventsCount;
       /** Error counters */
-      unsigned int error_counter[ONSEN_MAX_TYPE_ERR];
+      unsigned int m_errorCounter[ONSEN_MAX_TYPE_ERR];
       /** Output array for Raw Hits. */
       StoreArray<PXDRawHit> m_storeRawHits;
       /** Output array for Raw Hits. */
@@ -99,8 +93,10 @@ namespace Belle2 {
       /** Unpack one frame (within an event).
        * @param data pointer to frame
        * @param len length of frame
+       * @param Frame_Number current frame number
+       * @param Frames_in_event number of frames in PxdRaw object (subevent)
        */
-      void unpack_dhhc_frame(void* data, int len, int& last_wie, unsigned int& last_evtnr, int Frame_Number, int Frames_in_event);
+      void unpack_dhhc_frame(void* data, const int len, const int Frame_Number, const int Frames_in_event);
 
       /** Unpack DHP data within one DHH frame
        * @param data pointer to dhp data
@@ -127,7 +123,7 @@ namespace Belle2 {
 
 
       /** Error Mask set per packet / event*/
-      unsigned int error_mask;
+      unsigned int m_errorMask;
       /** give verbose unpacking information -> will eb a parameter in next release */
       bool verbose = true;
       /** ignore missing datcon (dont show error) */

@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Thomas Keck                                              *
@@ -100,7 +100,7 @@ namespace Belle2 {
     unsigned int numberOfLists; /**< Number of lists which are combined */
     unsigned int iCombination; /**< The current position of the combination */
     unsigned int nCombinations; /**< The total amount of combinations */
-    std::vector<ParticleList::EParticleType> types; /**< The current types of sublist of the PCombinerLists for this combination */
+    std::vector<ParticleList::EParticleType> types; /**< The current types of sublist of the ParticleLists for this combination */
 
   };
 
@@ -168,7 +168,7 @@ namespace Belle2 {
     ParticleIndexGenerator particleIndexGenerator; /**< particleIndexGenerator makes the combinations of indices stored in the sublists of the ParticleLists */
 
     std::vector<Particle*> m_particles; /**< Pointers to the particle objects of the current combination */
-    std::vector<int> m_indices;         /**< Indices stored in the PCombinerLists of the current combination */
+    std::vector<int> m_indices;         /**< Indices stored in the ParticleLists of the current combination */
     std::unordered_set<std::set<int>> m_usedCombinations; /**< already used combinations (as sets of indices). */
 
   };

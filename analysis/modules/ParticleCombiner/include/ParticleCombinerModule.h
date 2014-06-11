@@ -14,7 +14,6 @@
 #include <framework/core/Module.h>
 
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/ParticleCombiner/PCombinerList.h>
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
 
 #include <analysis/DecayDescriptor/DecayDescriptor.h>

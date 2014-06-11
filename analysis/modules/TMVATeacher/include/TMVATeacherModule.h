@@ -72,6 +72,7 @@ namespace Belle2 {
     std::string m_workingDirectory; /**< Working directory in which the config file and the weight file directory is created */
     std::string m_factoryOption; /**< Options which are passed to the TMVA Factory */
     std::string m_prepareOption; /**< Options which are passed to the TMVA Factory::PrepareTrainingAndTestTree */
+    bool m_createMVAPDFs; /**< Creates the MVA PDFs for signal and background. This is needed to transform the output of the trained method to a probability */
 
     TMVAInterface::Teacher* m_teacher; /**< Used TMVA method */
 

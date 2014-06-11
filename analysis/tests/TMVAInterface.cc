@@ -82,9 +82,9 @@ namespace {
 
     Expert expert("electron", FileSystem::findFile("/analysis/tests/"), "BDTGradient", 1);
     Particle p({ 1.1 , 1.0, 0.0, 0.0 }, 11);
-    EXPECT_DOUBLE_EQ(0.11980155110359192, expert.analyse(&p));
+    EXPECT_DOUBLE_EQ(0.68521744012832642, expert.analyse(&p, 0.5));
     Particle q({ 0.0 , 0.2, 0.0, 0.0 }, 11);
-    EXPECT_DOUBLE_EQ(0.048413272947072983, expert.analyse(&q));
+    EXPECT_DOUBLE_EQ(0.44863387942314148, expert.analyse(&q, 0.5));
 
   }
 
@@ -115,7 +115,7 @@ namespace {
       TLorentzVector v;
       v.SetPtEtaPhiM((i % 900) * 0.1, 0.1, i * 0.1, 0.139);
       Particle p(v, 211);
-      p.addExtraInfo("someInput", gRandom->Gaus() + target * 0.5);
+      p.addExtraInfo("someInput", gRandom->Gaus() + target * 1.0);
 
       p.addExtraInfo("target", target);
       teacher.addSample(&p);
@@ -127,23 +127,23 @@ namespace {
     {
       Particle p({ 1.1 , 1.0, 0.0, 0.0 }, 211);
       p.addExtraInfo("someInput", -3.0);
-      EXPECT_TRUE(expert.analyse(&p) < 0.4);
+      EXPECT_LT(expert.analyse(&p), 0.4);
     }
     {
       //different p, should be similar to last one
       Particle p({ 2.1 , 1.0, 0.0, 0.0 }, 211);
       p.addExtraInfo("someInput", -3.0);
-      EXPECT_TRUE(expert.analyse(&p) < 0.4);
+      EXPECT_LT(expert.analyse(&p), 0.4);
     }
     {
       Particle p({ 1.1 , 1.0, 0.0, 0.0 }, 211);
       p.addExtraInfo("someInput", 3.0);
-      EXPECT_TRUE(expert.analyse(&p) > 0.75);
+      EXPECT_GT(expert.analyse(&p), 0.75);
     }
     {
       Particle p({ 2.1 , 1.0, 0.0, 0.0 }, 211);
       p.addExtraInfo("someInput", 3.0);
-      EXPECT_TRUE(expert.analyse(&p) > 0.75);
+      EXPECT_GT(expert.analyse(&p), 0.75);
     }
   }
 }

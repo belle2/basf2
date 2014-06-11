@@ -29,7 +29,8 @@ namespace Belle2 {
                    "See also https://belle2.cc.kek.jp/~twiki/bin/view/Software/TMVA for detailed instructions.");
     //setPropertyFlags(c_ParallelProcessingCertified);
 
-    addParam("listNames", m_listNames, "Particles from these ParticleLists are used as input.");
+    std::vector<std::string> empty;
+    addParam("listNames", m_listNames, "Particles from these ParticleLists are used as input. If no name is given the teacher is applied to every event once, and one can only use variables which accept nullptr as Particle*", empty);
     addParam("methods", m_methods, "Vector of Tuples with (Name, Type, Config) of the methods. Valid types are: BDT, KNN, Fisher, Plugin. For type 'Plugin', the plugin matching the Name attribute will be loaded (e.g. NeuroBayes). The Config is passed to the TMVA Method and is documented in the TMVA UserGuide.");
     addParam("prefix", m_methodPrefix, "Prefix which is used by the TMVAInterface to store its configfile $prefix.config and by TMVA itself to write the files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml with additional information", std::string("TMVA"));
     addParam("workingDirectory", m_workingDirectory, "Working directory in which the config file and the weight file directory is created", std::string("."));
@@ -37,6 +38,7 @@ namespace Belle2 {
     addParam("target", m_target, "Target used by the method, has to be integer valued variable which defines clusters in the sample.");
     addParam("factoryOption", m_factoryOption, "Option passed to TMVA::Factory", std::string("!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification"));
     addParam("prepareOption", m_prepareOption, "Option passed to TMVA::Factory::PrepareTrainingAndTestTree", std::string("SplitMode=random:!V"));
+    addParam("createMVAPDFs", m_createMVAPDFs, "Creates the MVA PDFs for signal and background. This is needed to transform the output of the trained method to a probability.", true);
 
     m_teacher = nullptr;
   }
@@ -57,7 +59,10 @@ namespace Belle2 {
   {
     std::vector<TMVAInterface::Method> methods;
     for (auto & x : m_methods) {
-      methods.push_back(TMVAInterface::Method(std::get<0>(x), std::get<1>(x), std::get<2>(x), m_variables));
+      std::string config = std::get<2>(x);
+      if (m_createMVAPDFs)
+        config = std::string("CreateMVAPdfs:") + config;
+      methods.push_back(TMVAInterface::Method(std::get<0>(x), std::get<1>(x), config, m_variables));
     }
     m_teacher = new TMVAInterface::Teacher(m_methodPrefix, m_workingDirectory, m_target, methods);
   }
@@ -83,6 +88,10 @@ namespace Belle2 {
         const Particle* particle = list->getParticle(i);
         m_teacher->addSample(particle);
       }
+    }
+
+    if (m_listNames.empty()) {
+      m_teacher->addSample(nullptr);
     }
   }
 

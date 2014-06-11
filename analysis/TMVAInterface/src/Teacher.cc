@@ -111,6 +111,11 @@ namespace Belle2 {
         return;
       }
 
+      if (m_cluster_count.size() > 2) {
+        B2FATAL("Found more than two clusters in sample. This isn't supported at the moment (the necessary logic is already implemented but the combination of the classifier outputs is missing")
+        return;
+      }
+
       // Train the found clusters against each other
       for (auto & x : m_cluster_count) {
         for (auto & y : m_cluster_count) {

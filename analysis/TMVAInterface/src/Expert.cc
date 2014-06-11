@@ -115,6 +115,11 @@ namespace Belle2 {
         B2ERROR("There was an error while scanning the stream of the file for the used variables and the used method: " << ex.what())
       }
 
+      if (m_readers.size() > 1) {
+        B2FATAL("Found more than two clusters in sample. This isn't supported at the moment (the necessary logic is already implemented but the combination of the classifier outputs is missing")
+        return;
+      }
+
       if (m_methods.empty()) {
         B2FATAL("Method '" << methodName << "' not found, aborting.");
       }
@@ -124,7 +129,7 @@ namespace Belle2 {
 
     }
 
-    float Expert::analyse(const Particle* particle)
+    float Expert::analyse(const Particle* particle, float signalToBackgroundRatio)
     {
       // Set the input variables, we only do this once, with the variables of the first method
       // because all methods use the same variables, so there's no need to set the input variables
@@ -135,13 +140,22 @@ namespace Belle2 {
       }
 
       // Get the results of the different methods.
-      // It's assumed that the mva output corresponds to a probability
+      // If signalToBackgroundRatio is negative, it's assumed that the mva output corresponds to a probability
       std::vector<float> mva_results(m_readers.size());
       for (unsigned int i = 0; i < m_readers.size(); ++i) {
-        //mva_results[i] = m_readers[i]->EvaluateMVA(m_methods[i]->getName());
-        mva_results[i] = m_readers[i]->GetProba(m_methods[i]->getName(), 0.5);
+        if (signalToBackgroundRatio < 0)
+          mva_results[i] = m_readers[i]->EvaluateMVA(m_methods[i]->getName());
+        else
+          mva_results[i] = m_readers[i]->GetProba(m_methods[i]->getName(), signalToBackgroundRatio);
       }
 
+      if (m_reverse[m_signalCluster]) {
+        return 1 - mva_results[0];
+      } else {
+        return mva_results[0];
+      }
+
+      /* At the moment we won't support multiple clusters, I first have to check howto do this correctly.
       // Now calculate the signal probability with the mva outputs
       float result = m_clusters[m_signalCluster];
       for (unsigned int i = 0; i < m_clusters.size() - 1; ++i) {
@@ -151,6 +165,7 @@ namespace Belle2 {
           result +=  m_clusters[ m_against[i] ] * (1.0 - mva_results[i]) / mva_results[i];
       }
       return m_clusters[m_signalCluster] / result;
+      */
 
     }
 

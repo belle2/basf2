@@ -33,7 +33,8 @@ namespace Belle2 {
                    "See also https://belle2.cc.kek.jp/~twiki/bin/view/Software/TMVA for detailed instructions.");
     setPropertyFlags(c_ParallelProcessingCertified);
 
-    addParam("listNames", m_listNames, "Particles from these ParticleLists are used as input.");
+    std::vector<std::string> empty;
+    addParam("listNames", m_listNames, "Particles from these ParticleLists are used as input. If no name is given the expert is applied to every event once, and one can only use variables which accept nullptr as Particle*", empty);
     addParam("method", m_methodName, "Method name specified in the training via TMVATeacher.");
     addParam("prefix", m_methodPrefix, "Common prefix for the methods trained by TMVATeacher. "
              "The prefix is used by the TMVAInterface to read its configfile $prefix.config "
@@ -43,7 +44,8 @@ namespace Belle2 {
     addParam("signalProbabilityName", m_signalProbabilityName, "Name under which the signal probability is stored in the ExtraInfo of the Particle object.");
     addParam("signalCluster", m_signalCluster, "Number of the cluster which is considered as signal. e.g. the pdg of the Particle which is considered signal if "
              "you trained the method with pdg as target variable. Or 1 if you trained with isSignal as target.", 1);
-
+    addParam("signalToBackgroundRatio", m_signalToBackgroundRatio, "Signal to background ration to calculate probability, -1 if no transformation of the method output should be performed. If you want to use "
+             "this feature, you have to set the option createMVAPDFs in the TMVATeacher or the method config string", -1.0f);
     m_method = nullptr;
   }
 
@@ -87,9 +89,13 @@ namespace Belle2 {
       // Calculate target Value for Particles
       for (unsigned i = 0; i < list->getListSize(); ++i) {
         Particle* particle = list->getParticle(i);
-        float targetValue = m_method->analyse(particle);
+        float targetValue = m_method->analyse(particle, m_signalToBackgroundRatio);
         particle->addExtraInfo(m_signalProbabilityName, targetValue);
       }
+    }
+    if (m_listNames.empty()) {
+      float targetValue = m_method->analyse(nullptr, m_signalToBackgroundRatio);
+      // TODO What to do with this targetValue? -> DataStore somewhere?
     }
   }
 

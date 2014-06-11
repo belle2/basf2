@@ -61,9 +61,10 @@ namespace Belle2 {
       /**
        * Analyse a Particle with the given method and calculates signal probability
        * @param particle the particle which should be analysed
+       * @param signalToBackgroundRatio ratio which is used to transform the method output to a probability. -1 to disable the transformation.
        * @return signal probability of the particle
        */
-      float analyse(const Particle*);
+      float analyse(const Particle*, float signalToBackgroundRatio = -1);
 
     private:
       std::vector<TMVA::Reader*> m_readers; /**< Vector of TMVA::Reader, which steers the booked TMVA method, foreach cluster */

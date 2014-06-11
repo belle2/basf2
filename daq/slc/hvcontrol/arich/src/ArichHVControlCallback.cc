@@ -89,6 +89,8 @@ bool ArichHVControlCallback::peak() throw()
 bool ArichHVControlCallback::hvapply(const HVApplyMessage& hvmsg)
 throw()
 {
+  std::cout << hvmsg.getCrate() << " " << hvmsg.getSlot()
+            << " "  << hvmsg.getChannel() << std::endl;
   for (size_t i = 0; i < getNChannels(); i++) {
     const HVChannel& channel(getConfig().getChannel(i));
     if ((hvmsg.isAllCrates() || hvmsg.getCrate() == channel.getCrate()) &&

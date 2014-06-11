@@ -47,7 +47,7 @@ bool HVCallback::perform(const NSMMessage& msg) throw()
     StringList str = StringUtil::split(msg.getData(), '=', 2);
 
     HVApplyMessage hvmsg(msg.getParam(0), msg.getParam(1),
-                         msg.getParam(1), str[0], str[1]);
+                         msg.getParam(2), str[0], str[1]);
     result = hvapply(hvmsg);
   } else if (cmd == HVCommand::TURNOFF) {
     getNode().setState(HVState::TRANSITION_TS);

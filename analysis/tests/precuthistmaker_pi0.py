@@ -20,8 +20,8 @@ main.add_module(register_module('EventInfoPrinter'))
 main.add_module(register_module('ParticleLoader'))
 
 
-selectParticle('pi+', 211, [], path=main)
-selectParticle('gamma', 22, [], path=main)
+selectParticle('pi+', [], path=main)
+selectParticle('gamma', [], path=main)
 
 
 #a) save signal invariant mass using PreCutHistMaker
@@ -37,7 +37,7 @@ main.add_module(histmaker)
 #b) make all  combinations and save only signal
 
 #essentially no cuts here, which makes it slow
-makeParticle('pi0', 111, ['gamma', 'gamma'], 0.0, 100.0, path=main)
+makeParticle('pi0 -> gamma gamma', {}, path=main)
 matchMCTruth('pi0', path=main)
 
 ntupler = register_module('VariablesToNtuple')

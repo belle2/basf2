@@ -13,72 +13,52 @@ import os
 import hashlib
 
 
-def PreCutMassDetermination(name, pdgcode, channels, preCut_Histograms, efficiency):
-    """
-    Determines the PreCuts for all the channels of a particle. The cuts are chosen as follows:
-        1. The maximum of every signal invariant mass preCut_Histogram is isolated
-        2. The ratio of signal/background invariant mass preCut_Histogram is calculated and fitted with splines
-        3. A cut on the y-axis of S/B is performed, so that a certain signal efficiency is garantueed.
-        4. The cut on the y-axis is converted to a minimum and maximum cut on the x-axis for every channel.
-        @param name name of the particle
-        @param pdgcode pdgcode of the particle
-        @param channels list of the names of all the channels
-        @param preCut_Histograms filenames of the histogram files created for every channel by PreCutDistribution
-        @param signal efficiency for this particle
-    """
-
-    result = {'PreCut_' + channel: None for channel, _ in zip(*getNones(channels, preCut_Histograms))}
-    channels, preCut_Histograms = removeNones(channels, preCut_Histograms)
-
-    files = [ROOT.TFile(filename, 'UPDATE') for filename in preCut_Histograms]
-    signal, bckgrd, ratio = LoadHistogramsFromFiles(files, 'M', channels)
-    maxima = GetPositionsOfMaxima(signal)
-    splines = FitSplineFunctions(ratio)
-
-    def ycut_to_xcuts(channel, cut):
-        return (splines[channel].GetX(cut, signal[channel].GetXaxis().GetXmin(), maxima[channel]), splines[channel].GetX(cut, maxima[channel], signal[channel].GetXaxis().GetXmax()))
-    cuts = GetCuts(signal, efficiency, ycut_to_xcuts)
-
-    result.update({'PreCut_' + channel: {'M': cut} for (channel, cut) in cuts.iteritems()})
-    for ignoredChannel in GetIgnoredChannels(signal, bckgrd, cuts):
-        result['PreCut_' + ignoredChannel] = None
-        B2WARNING("Ignoring channel " + ignoredChannel + "!")
-    return result
-
-
-def PreCutProbDetermination(name, pdgcode, channels, preCut_Histograms, efficiency):
+def PreCutDetermination(particleName, channelNames, preCutConfig, preCutHistograms):
     """
     Determines the PreCuts for all the channels of a particle. The cuts are chosen as follows:
         1. The ratio of signal/background child probability product preCut_Histogram is calculated and fitted with splines
         2. A cut on the y-axis of S/B is performed, so that a certain signal efficiency is garantueed.
         3. The cut on the y-axis is converted to a minimum cut on the x-axis for every channel.
         @param name name of the particle
-        @param pdgcode pdgcode of the particle
         @param channels list of the names of all the channels
         @param preCut_Histograms filenames of the histogram files created for every channel by PreCutDistribution
         @param efficiency signal efficiency for this particle
     """
 
-    print list(zip(*getNones(channels, preCut_Histograms)))
-    result = {'PreCut_' + channel: None for channel, _ in zip(*getNones(channels, preCut_Histograms))}
-    channels, preCut_Histograms = removeNones(channels, preCut_Histograms)
+    result = {'PreCut_' + channel: None for channel, _ in zip(*getNones(channelNames, preCutHistograms))}
 
-    files = [ROOT.TFile(filename, 'UPDATE') for filename in preCut_Histograms]
-    signal, bckgrd, ratio = LoadHistogramsFromFiles(files, 'daughterProductOf(getExtraInfo(SignalProbability))', channels)
-    splines = FitSplineFunctions(ratio)
+    channelNames, preCutHistograms = removeNones(channelNames, preCutHistograms)
 
-    def ycut_to_xcuts(channel, cut):
-        return (splines[channel].GetX(cut, 0, 1), 1)
-    cuts = GetCuts(signal, efficiency, ycut_to_xcuts)
+    files = [ROOT.TFile(filename, 'UPDATE') for filename, _ in preCutHistograms]
 
-    result.update({'PreCut_' + channel: {'daughterProductOf(getExtraInfo(SignalProbability))': cut} for (channel, cut) in cuts.iteritems()})
+    if preCutConfig.variable == 'Mass':
+        variable = 'M'
+    else:
+        variable = 'daughterProductOf(getExtraInfo(SignalProbability))'
+
+    signal, bckgrd, ratio = LoadHistogramsFromFiles(files, variable, channelNames, preCutHistograms)
+    interpolations = GetInterpolateFunctions(ratio)
+
+    if preCutConfig.variable == 'Mass':
+        maxima = GetPositionsOfMaxima(signal)
+
+        def ycut_to_xcuts(channel, cut):
+            return (interpolations[channel].GetX(cut, signal[channel].GetXaxis().GetXmin(), maxima[channel]), interpolations[channel].GetX(cut, maxima[channel], signal[channel].GetXaxis().GetXmax()))
+    else:
+
+        def ycut_to_xcuts(channel, cut):
+            return (interpolations[channel].GetX(cut, 0, 1), 1)
+
+    cuts = GetCuts(signal, preCutConfig.efficiency, ycut_to_xcuts)
+
+    result.update({'PreCut_' + channel: {variable: cut} for (channel, cut) in cuts.iteritems()})
     for ignoredChannel in GetIgnoredChannels(signal, bckgrd, cuts):
         result['PreCut_' + ignoredChannel] = None
         B2WARNING("Ignoring channel " + ignoredChannel + "!")
     return result
 
 
-def LoadHistogramsFromFiles(files, variable, channels):
+def LoadHistogramsFromFiles(files, variable, channelNames, preCutHistograms):
     """
     Load for every channel the signal and background histogram of a variable from given ROOT file and
     calculates the ratio S/B histogram.
@@ -86,15 +66,16 @@ def LoadHistogramsFromFiles(files, variable, channels):
     @param variable the variable which defines the x-axis of the histograms
     @param channels the channels for which the histograms are loaded
     """
-    signal = dict([(channel, file.Get('signal' + channel)) for channel, file in zip(channels, files)])
-    all = dict([(channel, file.Get('all' + channel)) for channel, file in zip(channels, files)])
+    signal = dict([(channel, file.Get('signal' + key)) for (_, key), channel, file in zip(preCutHistograms, channelNames, files)])
+    all = dict([(channel, file.Get('all' + key)) for (_, key), channel, file in zip(preCutHistograms, channelNames, files)])
+
+    if any([hist is None for hist in signal.values() + all.values()]):
+        raise RuntimeError('Error while opening ROOT file with preCut Histograms')
+
     bckgrd = dict([(channel, value.Clone('bckgrd' + channel)) for (channel, value) in all.iteritems()])
     ratio = dict([(channel, value.Clone('ratio' + channel)) for (channel, value) in signal.iteritems()])
 
-    if any([hist is None for hist in signal.values() + all.values() + bckgrd.values() + ratio.values()]):
-        raise RuntimeError('Error while opening ROOT file with preCut Histograms')
-
-    for channel, file in zip(channels, files):
+    for channel, file in zip(channelNames, files):
         file.cd()
         bckgrd[channel].Add(signal[channel], -1)
         bckgrd[channel].Write('', ROOT.TObject.kOverwrite)
@@ -111,22 +92,21 @@ def GetPositionsOfMaxima(histograms):
     return dict([(channel, value.GetBinCenter(value.GetMaximumBin())) for (channel, value) in histograms.iteritems()])
 
 
-def FitSplineFunctions(histograms):
+def GetInterpolateFunctions(histograms):
     """
-    Fits Spline Functions to the given histograms
+    GetInterpolate Functions to the given histograms
     @param histograms Histograms
     """
-    splines = dict([(channel, ROOT.TSpline3(value)) for (channel, value) in histograms.iteritems()])
     return dict([(
                 channel,
                 ROOT.TF1(
                     hashlib.sha1(channel).hexdigest() + '_func',
-                    lambda x, spline=spline: spline.Eval(x[0]),
-                    histograms[channel].GetXaxis().GetXmin(),
-                    histograms[channel].GetXaxis().GetXmax(),
+                    lambda x, value=value: value.Interpolate(x[0]),
+                    value.GetXaxis().GetXmin(),
+                    value.GetXaxis().GetXmax(),
                     0
                 )
-                ) for (channel, spline) in splines.iteritems()])
+                ) for (channel, value) in histograms.iteritems()])
 
 
 def GetCuts(signal, efficiency, ycut_to_xcuts):
@@ -169,73 +149,44 @@ def GetIgnoredChannels(signal, bckgrd, cuts):
     return [channel for channel in signal.iterkeys() if isIgnored(channel)]
 
 
-def CreatePreCutMassHistogram(path, name, particle, daughterLists):
-    """
-    Creates ROOT file with invariant mass and signal probability product histogram of given channel (signal/background)
-    for a given particle, before any intermediate cuts are applied.
-        @param path the basf2 path
-        @param name of the channel
-        @param particle object for which this histogram is created
-        @param daughterLists all particleLists of all the daughter particles
-    """
-
-    if any([daughterList is None for daughterList in daughterLists]):
-        return {'PreCutHistogram_' + name: None}
-
-    # Check if the file is available. If the file isn't available yet, create it with
-    # the HistMaker Module and return Nothing. If a function is called which depends on
-    # the PreCutHistogram, the process will stop, because the PreCutHistogram isn't provided.
-    hash = createHash(name, particle.name, daughterLists)
-    filename = 'CutHistograms_{pname}_{cname}_{hash}.root'.format(pname=particle.name, cname=name, hash=hash)
-    if os.path.isfile(filename):
-        return {'PreCutHistogram_' + name: filename}
-    else:
-        # Combine all the particles according to the decay channels
-        mass = pdg.get(pdg.from_name(particle.name)).Mass()
-        pmake = register_module('PreCutHistMaker')
-        pmake.set_name('PreCutHistMaker_' + name)
-        pmake.param('fileName', filename)
-        pmake.param('channelName', name)
-        pmake.param('variable', 'M')
-        pmake.param('PDG', pdg.from_name(particle.name))
-        pmake.param('inputListNames', daughterLists)
-        pmake.param('histParams', (200, mass / 2, mass + mass / 2))
-        path.add_module(pmake)
-    return {}
-
-
-def CreatePreCutProbHistogram(path, particle, name, daughterLists, daughterSignalProbabilities):
+def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughterLists, additionalDependencies):
     """
     Creates ROOT file with invariant mass and signal probability product histogram of this channel (signal/background)
     for a given particle, before any intermediate cuts are applied.
         @param path the basf2 path
-        @param particle object for which this histogram is created
-        @param name of the channel
+        @param particleName for which this histogram is created
+        @param channelName of the channel
         @param daughterLists all particleLists of all the daughter particles
         @param daughterSignalProbabilities all daughter particles need a SignalProbability
     """
 
-    if any([daughterList is None for daughterList in daughterLists]) or any([daughterSignalProbability is None for daughterSignalProbability in daughterSignalProbabilities]):
-        return {'PreCutHistogram_' + name: None}
+    print daughterLists
+    print additionalDependencies
+    if any([daughterList is None for daughterList in daughterLists]) or any([x is None for x in additionalDependencies]):
+        return {'PreCutHistogram_' + channelName: None}
 
     # Check if the file is available. If the file isn't available yet, create it with
     # the HistMaker Module and return Nothing. If a function is called which depends on
     # the PreCutHistogram, the process will stop, because the PreCutHistogram isn't provided.
-    hash = createHash(name, particle.name, daughterLists, daughterSignalProbabilities)
-    filename = 'CutHistograms_{pname}_{cname}_{hash}.root'.format(pname=particle.name, cname=name, hash=hash)
+    hash = createHash(particleName, channelName, preCutConfig.variable, daughterLists, additionalDependencies)
+    filename = 'CutHistograms_{pname}_{cname}_{hash}.root'.format(pname=particleName, cname=channelName, hash=hash)
+    outputList = particleName + ':' + hash + ' ==> ' + ' '.join(daughterLists)
+
     if os.path.isfile(filename):
-        return {'PreCutHistogram_' + name: filename}
+        return {'PreCutHistogram_' + channelName: (filename, particleName + ':' + hash)}
     else:
         # Combine all the particles according to the decay channels
         pmake = register_module('PreCutHistMaker')
-        pmake.set_name('PreCutHistMaker_' + name)
+        pmake.set_name('PreCutHistMaker_' + channelName)
         pmake.param('fileName', filename)
-        pmake.param('channelName', name)
-        pmake.param('variable', 'daughterProductOf(getExtraInfo(SignalProbability))')
-        pmake.param('PDG', pdg.from_name(particle.name))
-        pmake.param('inputListNames', daughterLists)
-        #pmake.param('histParams', (100, 0, 1))
-        pmake.param('customBinning', list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])))
+        pmake.param('decayString', outputList)
+        if preCutConfig.variable == 'Mass':
+            mass = pdg.get(pdg.from_name(particleName)).Mass()
+            pmake.param('variable', 'M')
+            pmake.param('histParams', (200, mass / 2, mass + mass / 2))
+        else:
+            pmake.param('variable', 'daughterProductOf(getExtraInfo(SignalProbability))')
+            pmake.param('customBinning', list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])))
         path.add_module(pmake)
     return {}
 

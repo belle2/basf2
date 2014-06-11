@@ -32,6 +32,8 @@ class Resource(object):
         Returns the given value x under the given name
             @param args additional arguments are ignored
         """
+        if containsNone(args):
+            return {self.name: None}
         return {self.name: self.x}
 
 
@@ -126,7 +128,10 @@ class Sequence(object):
                 provides = item(*arguments)
                 results.update(provides)
                 if verbose:
+                    print item.name + ' provides ' + str(provides.keys())
                     for provided in provides.keys():
+                        if provided.startswith('Path'):
+                            continue
                         style = ''
                         if provided.startswith('SignalProbability'):
                             style = '[shape=box,style=filled,fillcolor=orange]'
@@ -142,7 +147,8 @@ class Sequence(object):
                             dotfile.write('"' + provided + '" ' + style + ';\n')
 
                         for r in set(item.requires):
-                            dotfile.write('"' + r + '" -> "' + provided + '";\n')
+                            if not r.startswith('Path'):
+                                dotfile.write('"' + r + '" -> "' + provided + '";\n')
 
             if current == []:
                 break
@@ -166,15 +172,22 @@ def createHash(*args):
 
 def removeNones(*requirementLists):
     nones = frozenset([index for requirementList in requirementLists for index, object in enumerate(requirementList) if object is None])
-    result = zip(*[objects for index, objects in enumerate(zip(*requirementLists)) if index not in nones])
-    if len(result) == 1:
+    result = [[object for index, object in enumerate(sublist) if index not in nones] for sublist in requirementLists]
+    if len(requirementLists) == 1:
         return result[0]
     return result
 
 
 def getNones(*requirementLists):
     nones = frozenset([index for requirementList in requirementLists for index, object in enumerate(requirementList) if object is None])
-    result = zip(*[objects for index, objects in enumerate(zip(*requirementLists)) if index in nones])
-    if len(result) == 1:
+    result = [[object for index, object in enumerate(sublist) if index in nones] for sublist in requirementLists]
+    if len(requirementLists) == 1:
         return result[0]
     return result
+
+
+def containsNone(args):
+    if isinstance(args, list) or isinstance(args, tuple):
+        return any([containsNone(x) for x in args])
+    else:
+        return args is None

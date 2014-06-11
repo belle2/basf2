@@ -11,45 +11,50 @@ import modularAnalysis
 import pdg
 
 
-def ParticleList(path, name, pdgcode, particleLists, criteria=[]):
+def SelectParticleList(path, particleName):
     """
-    Creates a ParticleList gathering up all particles with the given pdgcode.
+    Creates a ParticleList gathering up all particles with the given particleName
         @param path the basf2 path
-        @param name name of outputList
-        @param pdgcode the pdgcode of the particle
-        @param particleLists additional requirements before the Particles can be gathered. E.g. All ParticleList of created by the ParticleListFromChannel exist for this particle
-        @param criteria filter criteria
+        @param particleName returned key is named ParticleList_{particleName} corresponding ParticleList is stored as {particleName}:{hash}
     """
-    print particleLists
-    particleLists = FR_utility.removeNones(particleLists)
-    print particleLists
-    # Select all the reconstructed (or loaded) particles with this pdg into one list.
-    list_name = name + FR_utility.createHash(name, pdgcode, particleLists, criteria)
-    modularAnalysis.selectParticle(list_name, pdgcode, criteria, False, particleLists, path=path)
-    return {'ParticleList_' + name: list_name}
+    userLabel = FR_utility.createHash(particleName)
+    outputList = particleName + ':' + userLabel
+    modularAnalysis.selectParticle(outputList, [], path=path)
+    return {'ParticleList_' + particleName: outputList, 'ParticleList_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
 
 
-def ParticleListFromChannel(path, pdgcode, name, preCut, inputLists, hasMissing):
+def CopyParticleLists(path, particleName, inputLists):
     """
-    Creates a ParticleList by combining other particleLists via the ParticleCombiner module.
+    Creates a ParticleList gathering up all particles in the given inputLists
         @param path the basf2 path
-        @param pdgcode pdgcode of the particle which is reconstructed
-        @param name name of the channel or particle which shall be combined
-        @param preCut cuts which are applied before the combining of the particles
+        @param particleName returned key is named ParticleList_{particleName} corresponding ParticleList is stored as {particleName}:{hash}
+        @param inputLists names of inputLists which are copied to the new list
+    """
+    inputLists = FR_utility.removeNones(inputLists)
+    if inputLists == []:
+        return {'ParticleList_' + particleName: None, 'ParticleList_' + pdg.conjugate(particleName): None}
+
+    userLabel = FR_utility.createHash(particleName, inputLists)
+    outputList = particleName + ':' + userLabel
+    modularAnalysis.copyLists(outputList, inputLists, path=path)
+    return {'ParticleList_' + particleName: outputList, 'ParticleList_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
+
+
+def MakeAndMatchParticleList(path, particleName, channelName, inputLists, preCut):
+    """
+    Creates a ParticleList by combining other particleLists via the ParticleCombiner module and match MC truth for this new list.
+        @param path the basf2 path
+        @param particleName name of the reconstructed particle, new list is stored as {particleName}:{hash}, where the hash depends on the channel
+        @param channelName describes the combined decay, returned key ParticleList_{channelName}
         @param inputLists the inputs lists which are combined
-        @param hasMissing true if the channel is incomplete
+        @param preCut cuts which are applied before the combining of the particles
     """
     if preCut is None:
-        return {'ParticleList_' + name: None}
+        return {'ParticleList_' + channelName + '_' + particleName: None, 'ParticleList_' + channelName + '_' + pdg.conjugate(particleName): None}
 
-    list_name = name + FR_utility.createHash(pdgcode, name, preCut, inputLists)
-
-    pmake = register_module('ParticleCombiner')
-    pmake.set_name('ParticleCombiner_' + name)
-    pmake.param('PDG', pdgcode)
-    pmake.param('ListName', list_name)
-    pmake.param('InputListNames', inputLists)
-    pmake.param('cuts', preCut)
-    path.add_module(pmake)
-    modularAnalysis.matchMCTruth(list_name, path=path)
-    return {'ParticleList_' + name: list_name}
+    userLabel = FR_utility.createHash(particleName, channelName, inputLists, preCut)
+    outputList = particleName + ':' + userLabel + ' ==> ' + ' '.join(inputLists)
+    listName = particleName + ':' + userLabel
+    modularAnalysis.makeParticle(outputList, preCut, path=path)
+    modularAnalysis.matchMCTruth(listName, path=path)
+    return {'ParticleList_' + channelName + '_' + particleName: listName, 'ParticleList_' + channelName + '_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}

@@ -9,9 +9,9 @@ analysis_main = create_path()
 def inputMdst(filename, path=analysis_main):
     """
     Loads the specified ROOT (DST/mDST/muDST) file with the RootInput module.
-    
+
     @param filename the name of the file to be loaded
-    @param modules are added to this path      
+    @param modules are added to this path
     """
 
     roinput = register_module('RootInput')
@@ -26,7 +26,7 @@ def inputMdst(filename, path=analysis_main):
 def inputMdstList(filelist, path=analysis_main):
     """
     Loads the specified ROOT (DST/mDST/muDST) files with the RootInput module.
-                                                                                                                                              
+
     @param filelist the filename list of files to be loaded
     @param modules are added to this path
     """
@@ -225,17 +225,15 @@ def fillParticleList(
 
 
 def selectParticle(
-    list_name,
-    PDGcode,
+    decayString,
     criteria,
     persistent=False,
     path=analysis_main,
     ):
 
     pselect = register_module('ParticleSelector')
-    pselect.set_name('ParticleSelector_' + list_name)
-    pselect.param('PDG', PDGcode)
-    pselect.param('ListName', list_name)
+    pselect.set_name('ParticleSelector_' + decayString)
+    pselect.param('decayString', decayString)
     pselect.param('Select', criteria)
     pselect.param('persistent', persistent)
     path.add_module(pselect)
@@ -265,21 +263,16 @@ def reconDecay(
 
 
 def makeParticle(
-    list_name,
-    PDGcode,
-    list_of_lists,
-    mL,
-    mH,
+    decayString,
+    cuts,
     persistent=False,
     path=analysis_main,
     ):
 
     pmake = register_module('ParticleCombiner')
-    pmake.set_name('ParticleCombiner_' + list_name)
-    pmake.param('PDG', PDGcode)
-    pmake.param('ListName', list_name)
-    pmake.param('InputListNames', list_of_lists)
-    pmake.param('cuts', {'M': (mL, mH)})
+    pmake.set_name('ParticleCombiner_' + decayString)
+    pmake.param('decayString', decayString)
+    pmake.param('cuts', cuts)
     pmake.param('persistent', persistent)
     path.add_module(pmake)
 

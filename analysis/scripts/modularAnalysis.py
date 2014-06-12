@@ -567,3 +567,15 @@ def FlavTag(list_name, path=analysis_main):
     path.add_module(flavtag)
 
 
+def calibratePhotonEnergy(list_name, path=analysis_main):
+    """
+    Performs energy calibration for photons given in the input ParticleList.
+    @param list_name name of the input photon ParticleList
+    @param path      modules are added to this path
+    """
+
+    gammacal = register_module('GammaEnergyCalibration')
+    gammacal.param('gammaListName', list_name)
+    path.add_module(gammacal)
+
+

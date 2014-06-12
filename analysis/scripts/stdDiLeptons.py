@@ -11,15 +11,8 @@ def stdDiLeptons(path=analysis_main):
 
 
 def stdLooseJpsi2mumu(path=analysis_main):
-    makeParticle(
-        'LooseJpsi2mumu',
-        443,
-        ['StdLooseMu-', 'StdLooseMu+'],
-        2.8,
-        3.7,
-        True,
-        path,
-        )
-    fitVertex('LooseJpsi2mumu', 0.001, path)
+    reconDecay('J/psi:mumuLoose -> mu-:loose mu+:loose', {'M': (2.8, 3.7)},
+               True, path)
+    fitVertex('J/psi:mumuLoose', 0.001, path)
 
 

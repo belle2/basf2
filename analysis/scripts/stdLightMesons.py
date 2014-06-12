@@ -13,38 +13,17 @@ def stdLightMesons(path=analysis_main):
 
 
 def stdLooseKS0(path=analysis_main):
-    makeParticle(
-        'StdLooseKS0',
-        310,
-        ['StdLoosePi-', 'StdLoosePi+'],
-        0.4,
-        0.6,
-        True,
-        path,
-        )
+    reconDecay('K_S0:loose -> pi-:loose pi+:loose', {'M': (0.4, 0.6)}, True,
+               path)
 
 
 def stdRho(path=analysis_main):
-    makeParticle(
-        'StdRho',
-        113,
-        ['StdPi-', 'StdPi+'],
-        0.5,
-        1.0,
-        True,
-        path,
-        )
+    reconDecay('rho0:loose -> pi-:loose pi+:loose', {'M': (0.5, 1.0)}, True,
+               path)
 
 
 def stdKstar(path=analysis_main):
-    makeParticle(
-        'StdKstar',
-        323,
-        ['StdPi-', 'StdK+'],
-        0.8,
-        1.1,
-        True,
-        path,
-        )
+    reconDecay('K*0:loose -> pi-:loose K+:loose', {'M': (0.8, 1.1)}, True,
+               path)
 
 

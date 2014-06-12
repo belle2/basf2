@@ -175,8 +175,8 @@ namespace Belle2 {
       outputList->bindAntiParticleList(*(outputAntiList));
     }
 
-    int pdg    = outputList->getPDGCode();
-    int pdgbar = outputList->getAntiParticlePDGCode();
+    //int pdg    = outputList->getPDGCode();
+    //int pdgbar = outputList->getAntiParticlePDGCode();
 
     //B2INFO("[ParticleCombinerModule::event] OutputListName = " << m_listName << "(" << m_antiListName << ")" << "[" << pdg << "/" << pdgbar << "]");
 

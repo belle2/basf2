@@ -10,12 +10,6 @@
 
 
 
-#include <stdlib.h>
-#include <iostream>
-#include <fstream>
-#include <iomanip>
-#include <stdio.h>
-
 #include <analysis/modules/FlavorTagging/FlavorTaggingModule.h>
 #include <analysis/TMVAInterface/Teacher.h>
 
@@ -45,6 +39,8 @@
 // MC particle
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+
+#include <iostream>
 
 
 using namespace std;

@@ -49,7 +49,7 @@ namespace Belle2 {
   private:
 
     std::string m_particleList;  /**< Name of the ParticleList */
-
+    bool m_onlyGoodECLClusters;  /**< Include all(false) or only good(true) ECL clusters */
     //std::vector<std::string> m_trackSelection; /**< Selection criteria for the remaining tracks */
     //std::vector<std::string> m_eclShowerSelection; /**< Selection criteria for the remaining ECL showers */
 

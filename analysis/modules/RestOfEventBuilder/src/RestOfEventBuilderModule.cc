@@ -43,6 +43,7 @@ RestOfEventBuilderModule::RestOfEventBuilderModule() : Module()
 
   // Parameter definitions
   addParam("particleList", m_particleList, "Name of the ParticleList");
+  addParam("onlyGoodECLClusters", m_onlyGoodECLClusters, "If true, only good ECL clusters are added", true);
 
   //std::vector<std::string> defaultSelection;
   //addParam("trackSelection",     m_trackSelection,     "Remaining track(s) selection criteria",      defaultSelection);
@@ -122,6 +123,28 @@ void RestOfEventBuilderModule::addRemainingECLClusters(const Particle* particle,
   // Add remaining ECLClusters
   for (int i = 0; i < eclClusters.getEntries(); i++) {
     const ECLCluster* shower = eclClusters[i];
+
+    if (m_onlyGoodECLClusters) {
+      // TODO: make this steerable
+      double energy = shower->getEnergy();
+      double e9e25  = shower->getE9oE25();
+      int    region = 0;
+
+      float theta = shower->getTheta();
+      if (theta < 0.555) {
+        region = 1.0;
+      } else if (theta < 2.26) {
+        region = 2.0;
+      } else {
+        region = 3.0;
+      }
+
+      bool goodGammaRegion1 = region > 0.5 && region < 1.5 && energy > 0.125 && e9e25 > 0.7;
+      bool goodGammaRegion2 = region > 1.5 && region < 2.5 && energy > 0.100;
+      bool goodGammaRegion3 = region > 2.5 && region < 3.5 && energy > 0.150;
+      if (!(goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3))
+        continue;
+    }
 
     bool remainingCluster = true;
     for (unsigned j = 0; j < eclFSPs.size(); j++) {

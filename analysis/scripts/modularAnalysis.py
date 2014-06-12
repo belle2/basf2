@@ -496,7 +496,7 @@ def matchMCTruth(list_name, path=analysis_main):
     path.add_module(mcMatch)
 
 
-def buildRestOfEvent(list_name, path=analysis_main):
+def buildRestOfEvent(list_name, only_good_ecl=True, path=analysis_main):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
     dataobject and makes BASF2 relation between them.
@@ -508,6 +508,7 @@ def buildRestOfEvent(list_name, path=analysis_main):
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('ROEBuilder_' + list_name)
     roeBuilder.param('particleList', list_name)
+    roeBuilder.param('onlyGoodECLClusters', only_good_ecl)
     path.add_module(roeBuilder)
 
 

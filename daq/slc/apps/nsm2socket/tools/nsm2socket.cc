@@ -12,9 +12,11 @@
 
 #include <daq/slc/base/ConfigFile.h>
 
+#include <cstdlib>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+
 namespace Belle2 {
 
   class ProcessMonitor {

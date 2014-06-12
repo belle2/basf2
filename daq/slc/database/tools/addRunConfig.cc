@@ -11,6 +11,7 @@
 #include <daq/slc/base/StringUtil.h>
 
 #include <iostream>
+#include <cstdlib>
 
 using namespace Belle2;
 

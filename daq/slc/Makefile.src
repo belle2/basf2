@@ -11,7 +11,7 @@ INCDIR   = $(TARGET)/include
 TMPDIR   = $(SLCDIR)/tmp
 LIBDIR   = $(SLCDIR)/lib
 
-LIBNAME    = daq_slc_$(TARGET)
+LIBNAME    = daq_slc_$(shell echo $(TARGET) | sed "s/\//_/g")
 LIBTARGET  = $(LIBDIR)/lib$(LIBNAME).so
 
 SRCS     = $(wildcard $(SRCDIR)/*.cc)

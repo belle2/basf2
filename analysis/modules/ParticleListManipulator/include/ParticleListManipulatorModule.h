@@ -74,6 +74,14 @@ namespace Belle2 {
 
   private:
 
+    /**
+     * Check if the particleStack pass all cut requirements
+     * @param particle pointer to the Particle in question
+     * @return True if all requirements are passed, false otherwise
+     */
+    bool checkCuts(const Particle* particle);
+
+
     int m_pdgCode; /**< PDG code of the particles */
 
     std::vector<std::string> m_inputListNames; /**< input ParticleList names */
@@ -83,7 +91,7 @@ namespace Belle2 {
     std::string m_outputAntiListName;   /**< output anti-particle list name */
     bool m_isSelfConjugatedParticle;    /**< flag that indicates whether an anti-particle does not exist and therefore the output anti-ParticleList should not be created */
 
-    std::vector<std::string> m_selection;  /**< selection criteria */
+    std::map<std::string, std::tuple<double, double> > m_selection;  /**< selection criteria */
     bool m_persistent;                     /**< toggle Particle List btw. transient/persistent */
 
     PSelector m_pSelector;                 /**< particle selector */

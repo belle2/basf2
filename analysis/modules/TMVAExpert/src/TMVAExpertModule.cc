@@ -12,6 +12,7 @@
 #include <analysis/modules/TMVAExpert/TMVAExpertModule.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/utility/VariableManager.h>
 
 #include <framework/datastore/StoreObjPtr.h>
@@ -60,6 +61,10 @@ namespace Belle2 {
       StoreObjPtr<ParticleList>::required(name);
     }
 
+    if (m_listNames.empty()) {
+      StoreObjPtr<EventExtraInfo>::registerPersistent("", DataStore::c_Event, false);
+    }
+
     m_method = new TMVAInterface::Expert(m_methodPrefix, m_workingDirectory, m_methodName, m_signalCluster);
 
   }
@@ -94,8 +99,11 @@ namespace Belle2 {
       }
     }
     if (m_listNames.empty()) {
+      StoreObjPtr<EventExtraInfo> eventExtraInfo;
+      if (not eventExtraInfo.isValid())
+        eventExtraInfo.create();
       float targetValue = m_method->analyse(nullptr, m_signalToBackgroundRatio);
-      // TODO What to do with this targetValue? -> DataStore somewhere?
+      eventExtraInfo->addExtraInfo(m_signalProbabilityName, targetValue);
     }
   }
 

@@ -6,7 +6,13 @@
 #include <functional>
 
 namespace Belle2 {
+
   class Particle;
+
+  /**
+  * Remove () from variable names, because ROOT doesn't like them
+  */
+  std::string makeROOTCompatible(std::string str);
 
   /** Global list of available variables.
    *

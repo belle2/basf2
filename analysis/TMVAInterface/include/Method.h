@@ -20,11 +20,6 @@ namespace Belle2 {
   namespace TMVAInterface {
 
     /**
-    * Remove () from variable names, because ROOT doesn't like them
-    */
-    std::string makeROOTCompatible(std::string str);
-
-    /**
      * Represents a TMVA Method, containing name, type, config and variables of the method.
      * If type is "plugin" the shared library of the plugin associated to the given name is loaded automatically.
      * If the type corresponds to a builtin TMVA method, the name can be arbirary.

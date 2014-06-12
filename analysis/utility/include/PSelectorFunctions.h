@@ -466,6 +466,36 @@ namespace Belle2 {
      */
     double particleDaughterAngle(const Particle* particle);
 
+    /**
+     * returns true if event doesn't contain an Y(4S)
+     */
+    double isContinuumEvent(const Particle*);
+
+    /**
+     * return number of tracks in event
+     */
+    double nTracks(const Particle*);
+
+    /**
+     * return number of ECL clusters in event
+     */
+    double nECLClusters(const Particle*);
+
+    /**
+     * return number of KLM clusters in event
+     */
+    double nKLMClusters(const Particle*);
+
+    /**
+     * return total energy in ECL clusters in event
+     */
+    double ECLEnergy(const Particle*);
+
+    /**
+     * return total energy in KLM clusters in event
+     */
+    double KLMEnergy(const Particle*);
+
   }
 } // Belle2 namespace
 

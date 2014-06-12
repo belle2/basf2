@@ -9,9 +9,7 @@ from modularAnalysis import *
 # set_random_seed(75628607)
 
 # generate 10000 events according to the provided DECAY file
-generateContinuum(10, 'D*+',
-                  os.environ['BELLE2_LOCAL_DIR']
-                  + '/generators/evtgen/decayfiles/ccbar+Dst.dec')
+generateContinuum(10, 'D*+', os.environ['BELLE2_LOCAL_DIR'] + '/generators/evtgen/decayfiles/ccbar+Dst.dec')
 
 # if simulation/reconstruction scripts are not added than one needs to load gerbox
 loadGearbox()

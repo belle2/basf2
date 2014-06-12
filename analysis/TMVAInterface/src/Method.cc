@@ -17,14 +17,6 @@
 namespace Belle2 {
   namespace TMVAInterface {
 
-
-    std::string makeROOTCompatible(std::string str)
-    {
-      str.erase(std::remove(str.begin(), str.end(), '('), str.end());
-      str.erase(std::remove(str.begin(), str.end(), ')'), str.end());
-      return str;
-    }
-
     Method::Method(std::string name, std::string type, std::string config, std::vector<std::string> variables)
     {
 

@@ -25,6 +25,7 @@
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KLMCluster.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -858,6 +859,56 @@ namespace Belle2 {
       return cos(a.Angle(b));
     }
 
+    // Event ------------------------------------------------
+
+    double nTracks(const Particle*)
+    {
+      StoreArray<Track> tracks;
+      return tracks.getEntries();
+    }
+
+    double nECLClusters(const Particle*)
+    {
+      StoreArray<ECLCluster> eclClusters;
+      return eclClusters.getEntries();
+    }
+
+    double nKLMClusters(const Particle*)
+    {
+      StoreArray<KLMCluster> klmClusters;
+      return klmClusters.getEntries();
+    }
+
+    double ECLEnergy(const Particle*)
+    {
+      StoreArray<ECLCluster> eclClusters;
+      double result = 0;
+      for (int i = 0; i < eclClusters.getEntries(); ++i) {
+        result += eclClusters[i]->getEnergy();
+      }
+      return result;
+    }
+
+    double KLMEnergy(const Particle*)
+    {
+      StoreArray<KLMCluster> klmClusters;
+      double result = 0;
+      for (int i = 0; i < klmClusters.getEntries(); ++i) {
+        result += klmClusters[i]->getMomentum().Energy();
+      }
+      return result;
+    }
+
+    double isContinuumEvent(const Particle*)
+    {
+      StoreArray<MCParticle> mcParticles;
+      for (int i = 0; i < mcParticles.getEntries(); ++i) {
+        if (mcParticles[i]->getPDG() == 300553)
+          return 0.0;
+      }
+      return 1.0;
+    }
+
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
@@ -960,7 +1011,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("charge", particleCharge, "charge of particle");
 
     REGISTER_VARIABLE("pRecoil",  recoilMomentum,    "magnitude of 3-momentum recoiling against given Particle");
-    REGISTER_VARIABLE("eRecoil",  recoilEnergy,      "energy recoiling against given Particle");
+    REGISTER_VARIABLE("eRecoil",  recoilEnergy,   "energy recoiling against given Particle");
     REGISTER_VARIABLE("mRecoil",  recoilMass,        "invariant mass of the system recoiling against given Particle");
     REGISTER_VARIABLE("m2Recoil", recoilMassSquared, "invariant mass squared of the system recoiling against given Particle");
 
@@ -973,6 +1024,14 @@ namespace Belle2 {
     REGISTER_VARIABLE("clusterE9E25",      eclClusterE9E25,           "ratio of energies in inner 3x3 and 5x5 cells");
     REGISTER_VARIABLE("clusterNHits",      eclClusterNHits,           "number of hits associated to this cluster");
     REGISTER_VARIABLE("clusterTrackMatch", eclClusterTrackMatched,    "number of charged track matched to this cluster");
+
+    VARIABLE_GROUP("Event");
+    REGISTER_VARIABLE("isContinuumEvent",  isContinuumEvent,  "true if event doesn't contain an Y(4S)");
+    REGISTER_VARIABLE("nTracks",  nTracks,  "number of tracks in the event");
+    REGISTER_VARIABLE("nECLClusters", nECLClusters, "number of ECL in the event");
+    REGISTER_VARIABLE("nKLMClusters", nKLMClusters, "number of KLM in the event");
+    REGISTER_VARIABLE("ECLEnergy", ECLEnergy, "total energy in ECL in the event");
+    REGISTER_VARIABLE("KLMEnergy", KLMEnergy, "total energy in KLM in the event");
   }
 }
 

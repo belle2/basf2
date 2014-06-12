@@ -238,7 +238,7 @@ def fillParticleList(
 
 def selectParticle(
     decayString,
-    criteria,
+    criteria=[],
     persistent=False,
     path=analysis_main,
     ):

@@ -1,6 +1,8 @@
 #include <analysis/utility/VariableManager.h>
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/EventExtraInfo.h>
 
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 
 #include <boost/regex.hpp>
@@ -11,6 +13,12 @@
 
 using namespace Belle2;
 
+std::string Belle2::makeROOTCompatible(std::string str)
+{
+  str.erase(std::remove(str.begin(), str.end(), '('), str.end());
+  str.erase(std::remove(str.begin(), str.end(), ')'), str.end());
+  return str;
+}
 
 VariableManager::~VariableManager()
 {
@@ -60,6 +68,10 @@ const VariableManager::Var* VariableManager::createVariable(const std::string& n
       if (results[1] == "getExtraInfo") {
         auto extraInfoName = results[2];
         func = [extraInfoName](const Particle * particle) -> double {
+          if (particle == nullptr) {
+            StoreObjPtr<EventExtraInfo> eventExtraInfo;
+            return eventExtraInfo->getExtraInfo(extraInfoName);
+          }
           return particle->getExtraInfo(extraInfoName);
         };
       } else {

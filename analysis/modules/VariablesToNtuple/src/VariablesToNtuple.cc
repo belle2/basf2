@@ -31,7 +31,7 @@ VariablesToNtupleModule::VariablesToNtupleModule() : Module()
   setDescription("Calculate variables specified by the user for a given ParticleList and save them into a TNtuple.");
 
   vector<string> emptylist;
-  addParam("particleList", m_particleList, "Name of particle list with reconstructed particles.");
+  addParam("particleList", m_particleList, "Name of particle list with reconstructed particles. If no list is provided the variables are saved once per event (only possible for event-type variables)", std::string(""));
   addParam("variables", m_variables, "List of variables to save. Variables are taken from VariableManager, and are identical to those available to e.g. ParticleSelector.", emptylist);
 
   addParam("fileName", m_fileName, "Name of ROOT file for output.", string("VariablesToNtuple.root"));
@@ -40,7 +40,8 @@ VariablesToNtupleModule::VariablesToNtupleModule() : Module()
 
 void VariablesToNtupleModule::initialize()
 {
-  StoreObjPtr<ParticleList>::required(m_particleList);
+  if (not m_particleList.empty())
+    StoreObjPtr<ParticleList>::required(m_particleList);
 
   // Initializing the output root file
   m_file = new TFile(m_fileName.c_str(), "RECREATE");
@@ -63,7 +64,7 @@ void VariablesToNtupleModule::initialize()
   for (const string & varStr : m_variables) {
     if (!first)
       varlist += ":";
-    varlist += varStr;
+    varlist += makeROOTCompatible(varStr);
     first = false;
 
     //also collection function pointers
@@ -80,19 +81,26 @@ void VariablesToNtupleModule::initialize()
 
 void VariablesToNtupleModule::event()
 {
-  StoreObjPtr<ParticleList> particlelist(m_particleList);
   unsigned int nVars = m_variables.size();
   std::vector<float> vars(nVars);
 
-  unsigned int nPart = particlelist->getListSize();
-  for (unsigned int iPart = 0; iPart < nPart; iPart++) {
-    const Particle* particle = particlelist->getParticle(iPart);
-
+  if (m_particleList.empty()) {
     for (unsigned int iVar = 0; iVar < nVars; iVar++) {
-      vars[iVar] = m_functions[iVar](particle);
+      vars[iVar] = m_functions[iVar](nullptr);
     }
-
     m_tree->Fill(vars.data());
+
+  } else {
+    StoreObjPtr<ParticleList> particlelist(m_particleList);
+    unsigned int nPart = particlelist->getListSize();
+    for (unsigned int iPart = 0; iPart < nPart; iPart++) {
+      const Particle* particle = particlelist->getParticle(iPart);
+      for (unsigned int iVar = 0; iVar < nVars; iVar++) {
+        vars[iVar] = m_functions[iVar](particle);
+      }
+
+      m_tree->Fill(vars.data());
+    }
   }
 }
 

@@ -40,6 +40,8 @@ namespace Belle2 {
     addParam("prepareOption", m_prepareOption, "Option passed to TMVA::Factory::PrepareTrainingAndTestTree", std::string("SplitMode=random:!V"));
     addParam("createMVAPDFs", m_createMVAPDFs, "Creates the MVA PDFs for signal and background. This is needed to transform the output of the trained method to a probability.", true);
 
+    addParam("trainOncePerJob", m_trainOncePerJob, "If true training is performed once per job (in the terminate method instead of in the endRun method)", false);
+
     m_teacher = nullptr;
   }
 
@@ -52,10 +54,12 @@ namespace Belle2 {
     for (auto & name : m_listNames) {
       StoreObjPtr<ParticleList>::required(name);
     }
+
+    if (m_trainOncePerJob)
+      initTeacher();
   }
 
-
-  void TMVATeacherModule::beginRun()
+  void TMVATeacherModule::initTeacher()
   {
     std::vector<TMVAInterface::Method> methods;
     for (auto & x : m_methods) {
@@ -67,16 +71,29 @@ namespace Belle2 {
     m_teacher = new TMVAInterface::Teacher(m_methodPrefix, m_workingDirectory, m_target, methods);
   }
 
-  void TMVATeacherModule::endRun()
+  void TMVATeacherModule::beginRun()
+  {
+    if (!m_trainOncePerJob)
+      initTeacher();
+  }
+
+  void TMVATeacherModule::trainTeacher()
   {
     m_teacher->train(m_factoryOption, m_prepareOption);
     delete m_teacher;
     m_teacher = nullptr;
   }
 
+  void TMVATeacherModule::endRun()
+  {
+    if (!m_trainOncePerJob)
+      trainTeacher();
+  }
+
   void TMVATeacherModule::terminate()
   {
-
+    if (m_trainOncePerJob)
+      trainTeacher();
   }
 
   void TMVATeacherModule::event()

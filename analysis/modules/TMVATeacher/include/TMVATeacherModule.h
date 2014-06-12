@@ -64,6 +64,16 @@ namespace Belle2 {
 
   private:
 
+    /**
+     * Initalizes the TMVA teacher.
+     */
+    void initTeacher();
+
+    /**
+     * Trains TMVA teacher.
+     */
+    void trainTeacher();
+
     std::vector<std::string> m_listNames; /**< input particle list names */
     std::vector<std::string> m_variables; /**< input variables for the TMVA method */
     std::string m_target; /**< target used by multivariate analysis method has to be integer valued variable which defines clusters in the sample. */
@@ -73,6 +83,8 @@ namespace Belle2 {
     std::string m_factoryOption; /**< Options which are passed to the TMVA Factory */
     std::string m_prepareOption; /**< Options which are passed to the TMVA Factory::PrepareTrainingAndTestTree */
     bool m_createMVAPDFs; /**< Creates the MVA PDFs for signal and background. This is needed to transform the output of the trained method to a probability */
+
+    bool m_trainOncePerJob; /**< Perform TMVA training once per job (in the terminate method instead of in the endRun method) */
 
     TMVAInterface::Teacher* m_teacher; /**< Used TMVA method */
 

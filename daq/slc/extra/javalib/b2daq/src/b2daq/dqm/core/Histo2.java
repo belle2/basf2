@@ -8,8 +8,8 @@ import java.io.IOException;
 
 public abstract class Histo2 extends Histo {
 
-    private boolean _stat = true;    
-    
+    private boolean _stat = true;
+
     public Histo2() {
         super();
         drawer = new GHisto2(null, this);
@@ -225,18 +225,14 @@ public abstract class Histo2 extends Histo {
 
     @Override
     public Histo clone() {
-        try {
-            Histo2 h = (Histo2) HistoFactory.create(getDataType());
-            h.setName(getName());
-            h.setTitle(getTitle());
-            h.getAxisX().copy(getAxisX());
-            h.getAxisY().copy(getAxisY());
-            h.getAxisZ().copy(getAxisZ());
-            h.getData().copy(getData());
-            return h;
-        } catch (WrongDataTypeException e) {
-            return null;
-        }
+        Histo2 h = (Histo2) HistoFactory.create(getDataType());
+        h.setName(getName());
+        h.setTitle(getTitle());
+        h.getAxisX().copy(getAxisX());
+        h.getAxisY().copy(getAxisY());
+        h.getAxisZ().copy(getAxisZ());
+        h.getData().copy(getData());
+        return h;
     }
 
     @Override
@@ -262,12 +258,12 @@ public abstract class Histo2 extends Histo {
 
     public void setNbinsx(int nbinsx) {
         axisX.setNbins(nbinsx);
-        data.resize((nbinsx + 2) * (axisY.getNbins()+2));
+        data.resize((nbinsx + 2) * (axisY.getNbins() + 2));
     }
 
     public void setNbinsy(int nbinsy) {
         axisY.setNbins(nbinsy);
-        data.resize((nbinsy + 2) * (axisX.getNbins()+2));
+        data.resize((nbinsy + 2) * (axisX.getNbins() + 2));
     }
-    
+
 }

@@ -51,7 +51,7 @@ public class GTimedGraph1 extends GHisto {
             }
         }
         double t0 = g.getUpdateTime() / 1000 
-                + (canvas.getAxisX().getMin() - g.getAxisX().getMax())
+                + (canvas.getAxisX().getMin() - g.getAxisX().getMin())
                 - (g.getAxisX().getMax() - canvas.getAxisX().getMax());
         int nt = g.getIter();
         if (nt < 0) {

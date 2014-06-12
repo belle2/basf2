@@ -2,9 +2,9 @@
 # Login to Belle II Power supply control
 #
 
-hostname : b2slow2.kek.jp
-port : 9090
-nsmhost : b2slow2.kek.jp
+hostname : localhost
+port : 9091
+nsmhost : daqpchv01.kek.jp
 nsmport : 8122
 nsmnode : HV_GUI
 nsmtarget : ARICH_HV

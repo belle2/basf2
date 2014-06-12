@@ -2,7 +2,7 @@ package b2daq.dqm.core;
 
 public class HistoFactory {
 	
-	static public MonObject create(String type) throws WrongDataTypeException {
+	static public Histo create(String type) {
 		if (type.matches("H1C")) return new Histo1C();
 		if (type.matches("H1S")) return new Histo1S();
 		if (type.matches("H1I")) return new Histo1I();
@@ -24,6 +24,6 @@ public class HistoFactory {
 		if (type.matches("TGF")) return new TimedGraph1F();
 		if (type.matches("TGD")) return new TimedGraph1D();
 		
-		throw new WrongDataTypeException(type);
+		return null;
 	} 
 }

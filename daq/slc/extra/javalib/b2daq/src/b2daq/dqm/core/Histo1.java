@@ -144,17 +144,13 @@ public abstract class Histo1 extends Histo {
 
     @Override
     public Histo clone() {
-        try {
-            Histo1 h = (Histo1) HistoFactory.create(getDataType());
-            h.setName(getName());
-            h.setTitle(getTitle());
-            h.getAxisX().copy(getAxisX());
-            h.getAxisY().copy(getAxisY());
-            h.getData().copy(getData());
-            return h;
-        } catch (WrongDataTypeException e) {
-            return null;
-        }
+        Histo1 h = (Histo1) HistoFactory.create(getDataType());
+        h.setName(getName());
+        h.setTitle(getTitle());
+        h.getAxisX().copy(getAxisX());
+        h.getAxisY().copy(getAxisY());
+        h.getData().copy(getData());
+        return h;
     }
 
     @Override
@@ -168,7 +164,7 @@ public abstract class Histo1 extends Histo {
         }
         setMaxAndMin();
     }
-    
+
     public void setNbinsx(int nbinsx) {
         axisX.setNbins(nbinsx);
         data.resize(nbinsx + 2);

@@ -130,18 +130,13 @@ public abstract class Graph1 extends Histo {
 
     @Override
     public Histo clone() {
-        try {
-            Histo h = (Histo) HistoFactory.create(getDataType());
-            h.setName(getName());
-            h.setTitle(getTitle());
-            h.getAxisX().copy(getAxisX());
-            h.getAxisY().copy(getAxisY());
-            h.getData().copy(getData());
-            return h;
-        } catch (WrongDataTypeException e) {
-            e.printStackTrace();
-            return null;
-        }
+        Histo h = (Histo) HistoFactory.create(getDataType());
+        h.setName(getName());
+        h.setTitle(getTitle());
+        h.getAxisX().copy(getAxisX());
+        h.getAxisY().copy(getAxisY());
+        h.getData().copy(getData());
+        return h;
     }
 
     public void setNbinsx(int nbinsx) {

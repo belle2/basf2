@@ -11,22 +11,22 @@ def add_posttracking_reconstruction(path, components=None):
     """
 
     # track extrapolation
-    if components == None or 'CDC' in components and 'ECL' in components:
+    if components is None or 'CDC' in components and 'ECL' in components:
         ext = register_module('Ext')
         path.add_module(ext)
 
     # TOP reconstruction
-    if components == None or 'TOP' in components:
+    if components is None or 'TOP' in components:
         top_rec = register_module('TOPReconstructor')
         path.add_module(top_rec)
 
     # ARICH reconstruction
-    if components == None or 'ARICH' in components:
+    if components is None or 'ARICH' in components:
         arich_rec = register_module('ARICHReconstructor')
         path.add_module(arich_rec)
 
     # ECL reconstruction
-    if components == None or 'ECL' in components:
+    if components is None or 'ECL' in components:
 
         # shower reconstruction
         ecl_shower_rec = register_module('ECLReconstructor')
@@ -53,7 +53,7 @@ def add_posttracking_reconstruction(path, components=None):
         path.add_module(ecl_mc)
 
     # EKLM reconstruction
-    if components == None or 'EKLM' in components:
+    if components is None or 'EKLM' in components:
         eklm_rec = register_module('EKLMReconstructor')
         path.add_module(eklm_rec)
 
@@ -62,18 +62,18 @@ def add_posttracking_reconstruction(path, components=None):
         path.add_module(eklm_k0l_rec)
 
     # BKLM reconstruction
-    if components == None or 'BKLM' in components:
+    if components is None or 'BKLM' in components:
         bklm_rec = register_module('BKLMReconstructor')
         path.add_module(bklm_rec)
 
     # muon identification
-    if components == None or 'BKLM' in components and 'EKLM' in components:
+    if components is None or 'BKLM' in components and 'EKLM' in components:
         muid = register_module('Muid')
         path.add_module(muid)
 
     # charged particle PID
-    if components == None or 'PXD' in components or 'SVD' in components \
-        or 'CDC' in components:
+    if components is None or 'PXD' in components or 'SVD' in components \
+            or 'CDC' in components:
         mdstPID = register_module('MdstPID')
         path.add_module(mdstPID)
 
@@ -84,9 +84,9 @@ def add_reconstruction(path, components=None):
     """
 
     # tracking
-    if components == None or 'SVD' in components or 'CDC' in components:
-        use_vxd = components == None or 'SVD' in components
-        use_cdc = components == None or 'CDC' in components
+    if components is None or 'SVD' in components or 'CDC' in components:
+        use_vxd = components is None or 'SVD' in components
+        use_cdc = components is None or 'CDC' in components
 
         # CDC track finder: trasan
         if use_cdc:
@@ -105,22 +105,14 @@ def add_reconstruction(path, components=None):
                 vxd_trackcands = 'VXDGFTrackCands'
             vxd_trackfinder = register_module('VXDTF')
             vxd_trackfinder.param('GFTrackCandidatesColName', vxd_trackcands)
-            if components != None and 'PXD' not in components:
-                vxd_trackfinder.param('sectorSetup',
-                                      ['secMapEvtGenOnR10933June2014SVDStd-moreThan500MeV_SVD'
-                                      ,
-                                      'secMapEvtGenOnR10933June2014SVDStd-125to500MeV_SVD'
-                                      ,
-                                      'secMapEvtGenOnR10933June2014SVDStd-30to125MeV_SVD'
-                                      ])
+            if components is not None and 'PXD' not in components:
+                vxd_trackfinder.param('sectorSetup', ['secMapEvtGenOnR10933June2014SVDStd-moreThan500MeV_SVD',
+                                                      'secMapEvtGenOnR10933June2014SVDStd-125to500MeV_SVD',
+                                                      'secMapEvtGenOnR10933June2014SVDStd-30to125MeV_SVD'])
             else:
-                vxd_trackfinder.param('sectorSetup',
-                                      ['secMapEvtGenOnR10933June2014VXDStd-moreThan500MeV_PXDSVD'
-                                      ,
-                                      'secMapEvtGenOnR10933June2014VXDStd-125to500MeV_PXDSVD'
-                                      ,
-                                      'secMapEvtGenOnR10933June2014VXDStd-30to125MeV_PXDSVD'
-                                      ])
+                vxd_trackfinder.param('sectorSetup', ['secMapEvtGenOnR10933June2014VXDStd-moreThan500MeV_PXDSVD',
+                                                      'secMapEvtGenOnR10933June2014VXDStd-125to500MeV_PXDSVD',
+                                                      'secMapEvtGenOnR10933June2014VXDStd-30to125MeV_PXDSVD'])
             path.add_module(vxd_trackfinder)
 
         # track merging
@@ -151,16 +143,16 @@ def add_mc_reconstruction(path, components=None):
     """
 
     # tracking
-    if components == None or 'PXD' in components or 'SVD' in components \
-        or 'CDC' in components:
+    if components is None or 'PXD' in components or 'SVD' in components \
+            or 'CDC' in components:
 
         # find MCTracks in CDC, SVD, and PXD
         mc_trackfinder = register_module('TrackFinderMCTruth')
-        if components == None or 'PXD' in components:
+        if components is None or 'PXD' in components:
             mc_trackfinder.param('UsePXDHits', 1)
-        if components == None or 'SVD' in components:
+        if components is None or 'SVD' in components:
             mc_trackfinder.param('UseSVDHits', 1)
-        if components == None or 'CDC' in components:
+        if components is None or 'CDC' in components:
             mc_trackfinder.param('UseCDCHits', 1)
         path.add_module(mc_trackfinder)
 
@@ -170,9 +162,9 @@ def add_mc_reconstruction(path, components=None):
 
         # dE/dx PID
         dEdxPID = register_module('DedxPID')
-        if components != None and 'SVD' not in components:
+        if components is not None and 'SVD' not in components:
             dEdxPID.param('useSVD', False)
-        if components != None and 'CDC' not in components:
+        if components is not None and 'CDC' not in components:
             dEdxPID.param('useCDC', False)
         path.add_module(dEdxPID)
 
@@ -180,29 +172,26 @@ def add_mc_reconstruction(path, components=None):
     add_posttracking_reconstruction(path, components)
 
 
-def add_mdst_output(path, mc=True, filename='mdst.root'):
+def add_mdst_output(path, mc=True, filename='mdst.root', additionalBranches=[]):
     """
     This function adds the mdst output modules to a path.
     """
 
     output = register_module('RootOutput')
     output.param('outputFileName', filename)
-    branches = [
-        'Tracks',
-        'V0s',
-        'TrackFitResults',
-        'PIDLikelihoods',
-        'TracksToPIDLikelihoods',
-        'ECLClusters',
-        'ECLClustersToTracks',
-        'KLMClusters',
-        'KLMClustersToTracks',
-        'TRGSummary',
-        ]
+    branches = ['Tracks',
+                'V0s',
+                'TrackFitResults',
+                'PIDLikelihoods',
+                'TracksToPIDLikelihoods',
+                'ECLClusters',
+                'ECLClustersToTracks',
+                'KLMClusters',
+                'KLMClustersToTracks',
+                'TRGSummary']
     if mc:
         branches += ['MCParticles', 'TracksToMCParticles',
                      'ECLClustersToMCParticles', 'KLMClustersToMCParticles']
+    branches += additionalBranches
     output.param('branchNames', branches)
     path.add_module(output)
-
-

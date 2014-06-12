@@ -90,7 +90,7 @@ ntupleTree('truthgammatuple', 'truthGamma', truthtoolsGamma)
 
 ###########
 # check the pi0 list for resolution etc.
-matchMCTruth('StdPi0')
+matchMCTruth('pi0:all')
 pi0tools = [
     'EventMetaData',
     'pi0',
@@ -105,7 +105,7 @@ pi0tools = [
     'MCHierarchy',
     'pi0 -> ^gamma ^gamma',
     ]
-ntupleTree('pi0tuple', 'StdPi0', pi0tools)
+ntupleTree('pi0tuple', 'pi0:all', pi0tools)
 findMCDecay('truthpi0', 'pi0 => gamma gamma')
 pi0truthtools = [
     'EventMetaData',
@@ -118,7 +118,7 @@ pi0truthtools = [
 ntupleTree('truthpi0tuple', 'truthpi0', pi0truthtools)
 
 # Check the KS0 candidates
-matchMCTruth('StdLooseKS0')
+matchMCTruth('K_S0:loose')
 kstools = [
     'EventMetaData',
     'K_S0',
@@ -127,7 +127,7 @@ kstools = [
     'Kinematics',
     '^K_S0 -> ^pi- ^pi+',
     ]
-ntupleTree('kstuple', 'StdLooseKS0', kstools)
+ntupleTree('kstuple', 'K_S0:loose', kstools)
 
 ##########
 # check the Phi candidates
@@ -156,7 +156,7 @@ eventtools = [
     ]
 ntupleTree('eventtuple', '', eventtools)
 
-summaryOfLists(['StdPhi', 'StdLooseKS0'])
+summaryOfLists(['StdPhi', 'K_S0:loose'])
 
 # ----> start processing of modules
 process(analysis_main)

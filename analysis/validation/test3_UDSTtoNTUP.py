@@ -31,22 +31,6 @@ main.add_module(gearbox)
 # ----------------------------------------------------------------
 # Add the geometry for Rave
 geometry = register_module('Geometry')
-components = [
-    'MagneticField',
-    'BeamPipe',
-    'PXD',
-    'SVD',
-    'CDC',
-    'TOP',
-    'ARICH',
-    'ECL',
-    'BKLM',
-    'EKLM',
-    'ESTR',
-    'Coil',
-    'STR',
-    ]
-geometry.param('Components', components)
 main.add_module(geometry)
 
 # ---------------------------------------------------------------

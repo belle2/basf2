@@ -55,17 +55,12 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("decayString", m_strDecay, "Input DecayDescriptor string (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString).", string(""));
+    addParam("decayString", m_decayString, "Input DecayDescriptor string (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString).");
 
     vector<string> defaultSelection;
     addParam("select", m_selection, "selection criteria", defaultSelection);
     addParam("persistent", m_persistent,
              "toggle newly created particle list btw. transient/persistent", false);
-
-    // legacy parameters (can be used instead of decayString parameter)
-    addParam("PDG", m_pdgCode,
-             "PDG code. If set to zero, particle list assumed to exist", 0);
-    addParam("ListName", m_listName, "name of particle list", string(""));
 
   }
 
@@ -85,43 +80,25 @@ namespace Belle2 {
       m_printVariables = false;
     }
 
-    if (!m_strDecay.empty()) {
-      m_pdgCode  = 0;
-      m_listName = "";
+    // obtain the input and output particle lists from the decay string
+    bool valid = m_decaydescriptor.init(m_decayString);
+    if (!valid)
+      B2ERROR("ParticleSelectorModule::initialize Invalid input DecayString: " << m_decayString);
 
-      // obtain the input and output particle lists from the decay string
-      bool valid = m_decaydescriptor.init(m_strDecay);
-      if (!valid)
-        B2ERROR("ParticleSelectorModule::initialize Invalid input DecayString: " << m_strDecay);
+    int nProducts = m_decaydescriptor.getNDaughters();
+    if (nProducts > 0)
+      B2ERROR("ParticleSelectorModule::initialize Invalid input DecayString " << m_decayString
+              << ". DecayString should not contain any daughters, only the mother particle.");
 
-      int nProducts = m_decaydescriptor.getNDaughters();
-      if (nProducts > 0)
-        B2ERROR("ParticleSelectorModule::initialize Invalid input DecayString " << m_strDecay
-                << ". DecayString should not contain any daughters, only the mother particle.");
+    // Mother particle
+    const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
 
-      // Mother particle
-      const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
+    m_pdgCode  = mother->getPDGCode();
+    m_listName = mother->getFullName();
 
-      m_pdgCode  = mother->getPDGCode();
-      m_listName = mother->getFullName();
+    m_isSelfConjugatedParticle = !(Belle2::EvtPDLUtil::hasAntiParticle(m_pdgCode));
+    m_antiListName             = Belle2::EvtPDLUtil::antiParticleListName(m_pdgCode, mother->getLabel());
 
-      m_isSelfConjugatedParticle = !(Belle2::EvtPDLUtil::hasAntiParticle(m_pdgCode));
-      m_antiListName             = Belle2::EvtPDLUtil::antiParticleListName(m_pdgCode, mother->getLabel());
-    } else {
-      bool valid = m_decaydescriptor.init(m_listName);
-      if (!valid)
-        B2ERROR("Invalid output list name: " << m_listName);
-
-      // Mother particle
-      const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
-      if (m_pdgCode != mother->getPDGCode())
-        B2WARNING("Inconsistent list name and pdg code! Will use the pdg code determined from the list name.");
-
-      m_pdgCode  = mother->getPDGCode();
-
-      m_isSelfConjugatedParticle = !(Belle2::EvtPDLUtil::hasAntiParticle(m_pdgCode));
-      m_antiListName             = Belle2::EvtPDLUtil::antiParticleListName(m_pdgCode, mother->getLabel());
-    }
 
     if (m_persistent) {
       StoreObjPtr<ParticleList>::registerPersistent(m_listName, DataStore::c_Event, false);
@@ -200,10 +177,6 @@ namespace Belle2 {
   }
 
   void ParticleSelectorModule::terminate()
-  {
-  }
-
-  void ParticleSelectorModule::printModuleParams() const
   {
   }
 

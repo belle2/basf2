@@ -23,7 +23,6 @@
 
 #include <string>
 #include <vector>
-#include <unordered_set>
 #include <tuple>
 
 
@@ -87,7 +86,7 @@ namespace Belle2 {
 
     int m_pdgCode;                /**< PDG code of the combined mother particle */
 
-    std::string m_strDecay;   /**< Input DecayString specifying the decay being reconstructed */
+    std::string m_decayString;   /**< Input DecayString specifying the decay being reconstructed */
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of the decay being reconstructed */
     ParticleGenerator* m_generator; /**< Generates the combinations */
 
@@ -96,7 +95,6 @@ namespace Belle2 {
 
     bool m_isSelfConjugatedParticle; /**< flag that indicates whether an anti-particle mother does not exist and should not be reconstructed as well*/
 
-    std::vector<std::string> m_inputListNames; /**< input particle list names */
     std::map<std::string, std::tuple<double, double> > m_cuts; /**< variables -> low/high cut */
     bool m_persistent;  /**< toggle output particle list btw. transient/persistent */
 

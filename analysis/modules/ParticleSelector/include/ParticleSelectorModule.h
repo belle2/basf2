@@ -63,15 +63,9 @@ namespace Belle2 {
      * Clean-up, close files, summarize statistics, etc.
      */
     virtual void terminate();
-
-    /**
-     * Prints module parameters.
-     */
-    void printModuleParams() const;
-
   private:
 
-    std::string m_strDecay;   /**< Input DecayString specifying the particle being selected */
+    std::string m_decayString;   /**< Input DecayString specifying the particle being selected */
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of the particle being selected */
 
     std::string m_listName;   /**< output particle list name */

@@ -242,7 +242,7 @@ def selectParticle(
 def applyCuts(list_name, criteria, path=analysis_main):
     pselect = register_module('ParticleSelector')
     pselect.set_name('ParticleSelector_applyCuts_' + list_name)
-    pselect.param('ListName', list_name)
+    pselect.param('decayString', list_name)
     pselect.param('select', criteria)
     path.add_module(pselect)
 
@@ -456,8 +456,8 @@ def findMCDecay(
 
     decayfinder = register_module('MCDecayFinder')
     decayfinder.set_name('MCDecayFinder_' + list_name)
-    decayfinder.param('strListName', list_name)
-    decayfinder.param('strDecayString', decay)
+    decayfinder.param('listName', list_name)
+    decayfinder.param('decayString', decay)
     decayfinder.param('persistent', persistent)
     path.add_module(decayfinder)
 
@@ -562,8 +562,8 @@ def FlavTag(list_name, path=analysis_main):
 
     flavtag = register_module('FlavorTagging')
     flavtag.set_name('FlavorTagging_' + list_name)
-    flavtag.param('UsingMode', mode)
-    flavtag.param('ListName', list_name)
+    flavtag.param('usingMode', mode)
+    flavtag.param('listName', list_name)
     path.add_module(flavtag)
 
 

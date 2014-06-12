@@ -64,8 +64,8 @@ namespace Belle2 {
 
     // Parameter definitions
 
-    addParam("UsingMode", m_mode, "Mode of Use of the Module (0 for Teacher, 1 for Expert) ", 0);
-    addParam("ListName", m_listName, "name of particle list", string(""));
+    addParam("usingMode", m_mode, "Mode of Use of the Module (0 for Teacher, 1 for Expert) ", 0);
+    addParam("listName", m_listName, "name of particle list", string(""));
 
 
 

@@ -44,7 +44,14 @@ void NtupleCustomFloatsTool::setupTree()
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
     for (int iVar = 0; iVar < nVars; iVar++) {
       int iPos = iProduct * nDecayProducts + iVar;
-      m_tree->Branch((strNames[iProduct] + "__" + m_strVarNames[iVar]).c_str(), &m_fVars[iPos], (strNames[iProduct] + "__" + m_strVarNames[iVar] + "/F").c_str());
+      string varName = m_strVarNames[iVar];
+      varName.erase(std::remove(varName.begin(), varName.end(), '('), varName.end());
+      varName.erase(std::remove(varName.begin(), varName.end(), ')'), varName.end());
+      // TODO: remove getExtraInfo etx from the name
+      //varName.erase(std::remove(varName.begin(), varName.end(), 'getExtraInfo'), varName.end());
+
+      varName = (strNames[iProduct] + "__" + varName);
+      m_tree->Branch(varName.c_str(), &m_fVars[iPos], (varName + "/F").c_str());
     }
   }
 }

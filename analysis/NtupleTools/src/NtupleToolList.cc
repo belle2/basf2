@@ -32,7 +32,7 @@ using namespace std;
 NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescriptor& d)
 {
 
-  size_t iPosBracket1 = strName.find("(");
+  size_t iPosBracket1 = strName.find("[");
   string strOption("");
   string strToolName("");
 
@@ -41,7 +41,7 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   //B2INFO("Position of ) : " << strName.find(")"));
 
   if (iPosBracket1 != string::npos) {
-    if (strName.find(")") == strName.size() - 1) {
+    if (strName.find("]") == strName.size() - 1) {
       strToolName = strName.substr(0, iPosBracket1);
       strOption = strName.substr(iPosBracket1 + 1, strName.size() - iPosBracket1 - 2);
     } else {

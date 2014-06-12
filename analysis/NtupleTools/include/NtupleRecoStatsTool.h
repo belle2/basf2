@@ -22,6 +22,18 @@ namespace Belle2 {
   private:
     /** N ECL showers */
     int m_iClusters;
+    /** N neutral ECL showers */
+    int m_iNeutralClusters;
+    /** N charged ECL showers */
+    int m_iChargedClusters;
+    /** N good neutral ECL showers */
+    int m_iGoodNeutralClusters;
+    /** neutral ECL energy */
+    float m_neutralECLEnergy;
+    /** good neutral ECL energy */
+    float m_goodNeutralECLEnergy;
+    /** charged ECL energy */
+    float m_chargedECLEnergy;
     /** N Tracks*/
     int m_iTracks;
     /** N MCParticles*/

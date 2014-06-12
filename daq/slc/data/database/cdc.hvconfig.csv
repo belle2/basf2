@@ -1,0 +1,2 @@
+ nodename,  config, used, sequential, channel, valueset,   extra
+ CDC_HV, default, true,       true, default,  default, default

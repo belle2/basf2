@@ -1,0 +1,5 @@
+ nodename,  config,             value
+ CDC_HV, default,   default:standby
+ CDC_HV, default,  default:shoulder1
+ CDC_HV, default,  default:shoulder2
+ CDC_HV, default,      default:peak

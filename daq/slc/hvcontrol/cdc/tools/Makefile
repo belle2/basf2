@@ -14,8 +14,8 @@ INCDIR  = $(BELLE2_DAQ_SLC)/include
 TMPDIR  = $(BELLE2_DAQ_SLC)/tmp
 LIBDIR  = $(BELLE2_DAQ_SLC)/lib
 
-LIBS    += -lm -lpthread -ldl -lz -lrt -lpq -lreadline -L/usr/pgsql-9.3/lib  -lpq
-LIBS    += -L$(BELLE2_LIB) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database -ldaq_slc_nsm -ldaq_slc_hvcontrol
+LIBS    += -lm -lpthread -ldl -lz -lrt -lpq -lreadline -L/usr/pgsql-9.3/lib -lpq
+LIBS    += -L$(BELLE2_LIB) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database -ldaq_slc_nsm -ldaq_slc_hvcontrol -ldaq_slc_hvcontrol_cdc
 LIBS    += -L$(BELLE2EX_LIB) -lnsm2_corelib -lnsm2_b2lib
 
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT -I/usr/pgsql-9.3/include
@@ -33,7 +33,7 @@ OBJS   = $(SRCS:$(SRCDIR)/%.cc=$(TMPDIR)/%.o)
 .PHONY : all clean 
 
 all: $(TARGETS)
-#	@ install -m755 -p $(BINDIR)/* $(BELLE2_LOCAL_DIR)/bin
+#	@ install -m755 -p $(BINDIR)/* $(BELLE2_LOCAL_DIR)/bin/$(BELLE2_SUBDIR)
 
 force:
 	@ $(RM) $(BINDIR)/*

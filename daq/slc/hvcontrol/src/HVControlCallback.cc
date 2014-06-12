@@ -107,9 +107,9 @@ void HVControlCallback::monitor() throw()
              (count >= 3 && s != HVState::OFF_S)) {
     getCommunicator()->replyOK(getNode());
   }
-  m_db->connect();
-  LoggerObjectTable(m_db).add(m_data);
-  m_db->close();
+  //m_db->connect();
+  //LoggerObjectTable(m_db).add(m_data);
+  //m_db->close();
   if (count >= 3) count = 0;
 }
 

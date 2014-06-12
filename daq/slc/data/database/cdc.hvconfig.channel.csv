@@ -1,0 +1,10 @@
+ nodename,  config,  crate,  slot,  channel,  turnon
+ CDC_HV, default,      0,     1,        1,    true
+ CDC_HV, default,      0,     2,        1,    true
+ CDC_HV, default,      0,     3,        1,    true
+ CDC_HV, default,      0,     4,        1,    true
+ CDC_HV, default,      0,     5,        1,    true
+ CDC_HV, default,      0,     6,        1,    true
+ CDC_HV, default,      0,     7,        1,    true
+ CDC_HV, default,      0,     8,        1,    true
+ CDC_HV, default,      0,     9,        1,    true

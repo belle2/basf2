@@ -396,11 +396,19 @@ namespace Belle2 {
 
     /**
      * Return 1 if ECLCluster passes the following selection criteria:
-     * Forward  : E > 125 MeV && E9/E25>0.7
-     * Barrel   : E > 100 MeV
-     * Backward : E > 150 MeV
+     * Forward  : E >  85 MeV && E9/E25>0.7
+     * Barrel   : E >  60 MeV
+     * Backward : E > 110 MeV
      */
     double goodGamma(const Particle* particle);
+
+    /**
+     * Return 1 if ECLCluster passes the following selection criteria:
+     * Forward  : E_uncalib >  125 MeV && E9/E25>0.7
+     * Barrel   : E_uncalib > 100 MeV
+     * Backward : E_uncalib > 150 MeV
+     */
+    double goodGammaUncalibrated(const Particle* particle);
 
     /**
      * return ECL cluster's uncorrected energy

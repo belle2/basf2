@@ -671,9 +671,26 @@ namespace Belle2 {
       return result;
     }
 
+    double goodGammaUncalibrated(const Particle* particle)
+    {
+      double energy = particle->getEnergy();
+      double e9e25  = eclClusterE9E25(particle);
+      int    region = eclClusterDetectionRegion(particle);
+
+      bool goodGammaRegion1 = region > 0.5 && region < 1.5 && energy > 0.125 && e9e25 > 0.7;
+      bool goodGammaRegion2 = region > 1.5 && region < 2.5 && energy > 0.100;
+      bool goodGammaRegion3 = region > 2.5 && region < 3.5 && energy > 0.150;
+
+      if (goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3)
+        return 1.0;
+      else
+        return 0.0;
+    }
+
+
     double goodGamma(const Particle* particle)
     {
-      double timing = eclClusterTiming(particle);
+      //double timing = eclClusterTiming(particle);
       double energy = particle->getEnergy();
       double e9e25  = eclClusterE9E25(particle);
       int    region = eclClusterDetectionRegion(particle);
@@ -681,9 +698,10 @@ namespace Belle2 {
       bool goodGammaRegion1 = region > 0.5 && region < 1.5 && energy > 0.085 && e9e25 > 0.7;
       bool goodGammaRegion2 = region > 1.5 && region < 2.5 && energy > 0.060;
       bool goodGammaRegion3 = region > 2.5 && region < 3.5 && energy > 0.110;
-      bool goodTiming       = timing > 800 && timing < 2400;
+      //bool goodTiming       = timing > 800 && timing < 2400;
 
-      if ((goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3) && goodTiming)
+      //if ((goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3) && goodTiming)
+      if (goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3)
         return 1.0;
       else
         return 0.0;
@@ -873,7 +891,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("Mbc", particleMbc, "beam constrained mass");
     REGISTER_VARIABLE("deltaE", particleDeltaE, "energy difference");
 
-    REGISTER_VARIABLE("invM", particleInvariantMass, "invariant mass (determined from particle's daughter 4-momentum vectors)");
+    REGISTER_VARIABLE("InvM", particleInvariantMass, "invariant mass (determined from particle's daughter 4-momentum vectors)");
     REGISTER_VARIABLE("ErrM", particleInvariantMassError, "uncertainty of invariant mass (determined from particle's daughter 4-momentum vectors)");
 
     REGISTER_VARIABLE("decayAngle", particleDecayAngle, "cosine of the angle between the mother momentum vector and the direction of the first daughter in the mother's rest frame");
@@ -950,6 +968,7 @@ namespace Belle2 {
 
     VARIABLE_GROUP("ECL Cluster related");
     REGISTER_VARIABLE("goodGamma",         goodGamma, "1.0 if photon candidate passes good photon selection criteria");
+    REGISTER_VARIABLE("goodGammaUnCal",    goodGammaUncalibrated, "1.0 if photon candidate passes good photon selection criteria (to be used if photon's energy is not calibrated)");
     REGISTER_VARIABLE("clusterReg",        eclClusterDetectionRegion, "detection region in the ECL [1 - forward, 2 - barrel, 3 - backward]");
     REGISTER_VARIABLE("clusterE9E25",      eclClusterE9E25,           "ratio of energies in inner 3x3 and 5x5 cells");
     REGISTER_VARIABLE("clusterNHits",      eclClusterNHits,           "number of hits associated to this cluster");

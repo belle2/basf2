@@ -60,7 +60,6 @@ makeParticle('pi0 -> gamma gamma', {'M': (0.110, 0.150)}, path=main)
 
 makeParticle('D0 -> K- pi+', {'M': (1.7, 2.0)}, path=main)
 makeParticle('D*+ -> D0 pi+', {'M': (1.9, 2.1)}, path=main)
-makeParticle('D*+', 413, ['D0', 'pi+'], 1.900, 2.100, path=main)
 
 
 main.add_module(HighlighterModule())

@@ -42,7 +42,7 @@ RestOfEventBuilderModule::RestOfEventBuilderModule() : Module()
   setDescription("Creates for each Particle in the given ParticleList a RestOfEvent dataobject and makes BASF2 relation between them.");
 
   // Parameter definitions
-  addParam("particleList", m_particleList, "Name of the ParticleList", std::string(""));
+  addParam("particleList", m_particleList, "Name of the ParticleList");
 
   //std::vector<std::string> defaultSelection;
   //addParam("trackSelection",     m_trackSelection,     "Remaining track(s) selection criteria",      defaultSelection);

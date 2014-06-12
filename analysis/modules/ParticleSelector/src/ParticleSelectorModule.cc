@@ -49,17 +49,16 @@ namespace Belle2 {
   //-----------------------------------------------------------------
 
   ParticleSelectorModule::ParticleSelectorModule() : Module()
-
   {
     // set module description (e.g. insert text)
-    setDescription("Performs particle selection");
+    setDescription("Selects from StoreArray<Particles> according to given decay and selection criteria and fills them into a ParticleList.");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
     addParam("decayString", m_strDecay, "Input DecayDescriptor string (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString).", string(""));
 
     vector<string> defaultSelection;
-    addParam("Select", m_selection, "selection criteria", defaultSelection);
+    addParam("select", m_selection, "selection criteria", defaultSelection);
     addParam("persistent", m_persistent,
              "toggle newly created particle list btw. transient/persistent", false);
 

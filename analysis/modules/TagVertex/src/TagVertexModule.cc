@@ -59,12 +59,12 @@ namespace Belle2 {
     setDescription("Tag side Vertex Fitter for modular analysis");
 
     // Parameter definitions
-    addParam("ListName", m_listName, "name of particle list", string(""));
-    addParam("ConfidenceLevel", m_confidenceLevel,
+    addParam("listName", m_listName, "name of particle list", string(""));
+    addParam("confidenceLevel", m_confidenceLevel,
              "required confidence level of fit to keep particles in the list", 0.001);
     addParam("MCAssociation", m_useBrecoMCassociation,
              "true: use standard Breco MC association. false: use internal MC association", false);
-    addParam("UseConstraint", m_useConstraint,
+    addParam("useConstraint", m_useConstraint,
              "Choose spatial constraint for the Tag Vertex fit: boostcut,boost,breco,no ", string("boostcut"));
     //addParam("EventType", m_EventType, "Btag decay type", std::string(""));
 

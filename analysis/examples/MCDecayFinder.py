@@ -106,8 +106,8 @@ combinerB.param('InputListNames', ['D0', 'pi'])
 main.add_module(combinerB)
 
 mcfinder = register_module('MCDecayFinder')
-mcfinder.param('strDecayString', 'B+ => (anti-D0 => K+ pi-) ...')
-mcfinder.param('strListName', 'testB')
+mcfinder.param('decayString', 'B+ => (anti-D0 => K+ pi-) ...')
+mcfinder.param('listName', 'testB')
 main.add_module(mcfinder)
 
 mcparticles = register_module('PrintMCParticles')

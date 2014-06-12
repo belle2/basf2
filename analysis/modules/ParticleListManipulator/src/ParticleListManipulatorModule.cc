@@ -48,18 +48,18 @@ namespace Belle2 {
 
   {
     // set module description (e.g. insert text)
-    setDescription("Manipulates with ParticleLists: copies/mergesPerforms particle selection");
+    setDescription("Manipulates ParticleLists: copies/mergesPerforms particle selection");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("OutputListName", m_outputListName, "Output ParticleList name", string(""));
+    addParam("outputListName", m_outputListName, "Output ParticleList name", string(""));
 
     vector<string> defaultList;
-    addParam("InputListNames", m_inputListNames,
+    addParam("inputListNames", m_inputListNames,
              "list of input ParticleList names", defaultList);
 
     std::map<std::string, std::tuple<double, double>> defaultMap;
-    addParam("Cuts", m_selection, "Selection criteria to be applied", defaultMap);
+    addParam("cuts", m_selection, "Selection criteria to be applied", defaultMap);
     addParam("persistent", m_persistent,
              "toggle newly created particle list btw. transient/persistent", false);
   }

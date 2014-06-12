@@ -42,7 +42,7 @@ namespace Belle2 {
     setDescription("Module performs MC matching (sets relation Particle->MCParticle) for all particles (and its (grand)^N-daughter particles) in the ParticleList. The relation can be used in conjuction with MCMatching::MCMatchStatus flags, e.g. using the isSignal or mcPDG & mcStatus variables.");
     setPropertyFlags(c_ParallelProcessingCertified);
 
-    addParam("ListName", m_listName, "Name of the input ParticleList.", string(""));
+    addParam("listName", m_listName, "Name of the input ParticleList.", string(""));
   }
 
 

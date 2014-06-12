@@ -26,9 +26,9 @@ REG_MODULE(ParticleStats)
 ParticleStatsModule::ParticleStatsModule() : Module()
 {
   //Set module properties
-  setDescription("Make a Summary of specific ParticleLists.");
+  setDescription("Make a summary of specific ParticleLists.");
   //Parameter definition
-  addParam("strParticleLists", m_strParticleLists, "List of ParticleLists", vector<string>());
+  addParam("particleLists", m_strParticleLists, "List of ParticleLists", vector<string>());
 }
 
 void ParticleStatsModule::initialize()

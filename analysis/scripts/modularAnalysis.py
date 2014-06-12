@@ -135,13 +135,13 @@ def printPrimaryMCParticles(path=analysis_main):
 
 def loadMCParticles(path=analysis_main):
     ploader = register_module('ParticleLoader')
-    ploader.param('UseMCParticles', True)
+    ploader.param('useMCParticles', True)
     path.add_module(ploader)
 
 
 def loadReconstructedParticles(path=analysis_main):
     ploader = register_module('ParticleLoader')
-    ploader.param('UseMCParticles', False)
+    ploader.param('useMCParticles', False)
     path.add_module(ploader)
 
 
@@ -154,8 +154,8 @@ def copyList(
 
     pmanipulate = register_module('ParticleListManipulator')
     pmanipulate.set_name('PListCopy_' + outputListName)
-    pmanipulate.param('OutputListName', outputListName)
-    pmanipulate.param('InputListNames', [inputListName])
+    pmanipulate.param('outputListName', outputListName)
+    pmanipulate.param('inputListNames', [inputListName])
     pmanipulate.param('persistent', persistent)
     path.add_module(pmanipulate)
 
@@ -169,8 +169,8 @@ def copyLists(
 
     pmanipulate = register_module('ParticleListManipulator')
     pmanipulate.set_name('PListCopy_' + outputListName)
-    pmanipulate.param('OutputListName', outputListName)
-    pmanipulate.param('InputListNames', inputListNames)
+    pmanipulate.param('outputListName', outputListName)
+    pmanipulate.param('inputListNames', inputListNames)
     pmanipulate.param('persistent', persistent)
     path.add_module(pmanipulate)
 
@@ -185,9 +185,9 @@ def cutAndCopyLists(
 
     pmanipulate = register_module('ParticleListManipulator')
     pmanipulate.set_name('PListCutAndCopy_' + outputListName)
-    pmanipulate.param('OutputListName', outputListName)
-    pmanipulate.param('InputListNames', inputListNames)
-    pmanipulate.param('Cuts', criteria)
+    pmanipulate.param('outputListName', outputListName)
+    pmanipulate.param('inputListNames', inputListNames)
+    pmanipulate.param('cuts', criteria)
     pmanipulate.param('persistent', persistent)
     path.add_module(pmanipulate)
 
@@ -202,9 +202,9 @@ def cutAndCopyList(
 
     pmanipulate = register_module('ParticleListManipulator')
     pmanipulate.set_name('PListCutAndCopy_' + outputListName)
-    pmanipulate.param('OutputListName', outputListName)
-    pmanipulate.param('InputListNames', [inputListName])
-    pmanipulate.param('Cuts', criteria)
+    pmanipulate.param('outputListName', outputListName)
+    pmanipulate.param('inputListNames', [inputListName])
+    pmanipulate.param('cuts', criteria)
     pmanipulate.param('persistent', persistent)
     path.add_module(pmanipulate)
 
@@ -219,7 +219,7 @@ def fillParticleList(
     pselect = register_module('ParticleSelector')
     pselect.set_name('ParticleSelector_' + decayString)
     pselect.param('decayString', decayString)
-    pselect.param('Select', criteria)
+    pselect.param('select', criteria)
     pselect.param('persistent', persistent)
     path.add_module(pselect)
 
@@ -234,7 +234,7 @@ def selectParticle(
     pselect = register_module('ParticleSelector')
     pselect.set_name('ParticleSelector_' + decayString)
     pselect.param('decayString', decayString)
-    pselect.param('Select', criteria)
+    pselect.param('select', criteria)
     pselect.param('persistent', persistent)
     path.add_module(pselect)
 
@@ -243,7 +243,7 @@ def applyCuts(list_name, criteria, path=analysis_main):
     pselect = register_module('ParticleSelector')
     pselect.set_name('ParticleSelector_applyCuts_' + list_name)
     pselect.param('ListName', list_name)
-    pselect.param('Select', criteria)
+    pselect.param('select', criteria)
     path.add_module(pselect)
 
 
@@ -307,9 +307,9 @@ def fitVertex(
 
     pvfit = register_module('ParticleVertexFitter')
     pvfit.set_name('ParticleVertexFitter_' + list_name)
-    pvfit.param('ListName', list_name)
-    pvfit.param('ConfidenceLevel', conf_level)
-    pvfit.param('VertexFitter', fitter)
+    pvfit.param('listName', list_name)
+    pvfit.param('confidenceLevel', conf_level)
+    pvfit.param('vertexFitter', fitter)
     pvfit.param('fitType', fit_type)
     pvfit.param('withConstraint', constraint)
     pvfit.param('decayString', decay_string)
@@ -411,24 +411,24 @@ def printDataStore(path=analysis_main):
 def printVariableValues(list_name, var_names, path=analysis_main):
     prlist = register_module('ParticlePrinter')
     prlist.set_name('ParticlePrinter_' + list_name)
-    prlist.param('ListName', list_name)
-    prlist.param('FullPrint', False)
-    prlist.param('Variables', var_names)
+    prlist.param('listName', list_name)
+    prlist.param('fullPrint', False)
+    prlist.param('variables', var_names)
     path.add_module(prlist)
 
 
 def printList(list_name, full, path=analysis_main):
     prlist = register_module('ParticlePrinter')
     prlist.set_name('ParticlePrinter_' + list_name)
-    prlist.param('ListName', list_name)
-    prlist.param('FullPrint', full)
+    prlist.param('listName', list_name)
+    prlist.param('fullPrint', full)
     path.add_module(prlist)
 
 
 def ntupleFile(file_name, path=analysis_main):
     ntmaker = register_module('NtupleMaker')
     ntmaker.set_name('NtupleMaker_ntupleFile_' + file_name)
-    ntmaker.param('strFileName', file_name)
+    ntmaker.param('fileName', file_name)
     path.add_module(ntmaker)
 
 
@@ -441,9 +441,9 @@ def ntupleTree(
 
     ntmaker = register_module('NtupleMaker')
     ntmaker.set_name('NtupleMaker_ntupleTree_' + list_name)
-    ntmaker.param('strTreeName', tree_name)
-    ntmaker.param('strListName', list_name)
-    ntmaker.param('strTools', tools)
+    ntmaker.param('treeName', tree_name)
+    ntmaker.param('listName', list_name)
+    ntmaker.param('tools', tools)
     path.add_module(ntmaker)
 
 
@@ -464,7 +464,7 @@ def findMCDecay(
 
 def summaryOfLists(particleLists, path=analysis_main):
     particleStats = register_module('ParticleStats')
-    particleStats.param('strParticleLists', particleLists)
+    particleStats.param('particleLists', particleLists)
     path.add_module(particleStats)
 
 
@@ -480,7 +480,7 @@ def matchMCTruth(list_name, path=analysis_main):
 
     mcMatch = register_module('MCMatching')
     mcMatch.set_name('MCMatching_' + list_name)
-    mcMatch.param('ListName', list_name)
+    mcMatch.param('listName', list_name)
     path.add_module(mcMatch)
 
 
@@ -512,7 +512,7 @@ def TagV(
     save the MC Btag in case of signal MC
 
     @param list_name name of the input Breco ParticleList
-    @param ConfidenceLevel minimum value of the ConfidenceLevel to accept the fit
+    @param confidenceLevel minimum value of the ConfidenceLevel to accept the fit
     @param MCassociation: use standard MC association or the internal one
     @param useConstraint: choose constraint for the tag vertes fit
     @param path      modules are added to this path
@@ -527,10 +527,10 @@ def TagV(
 
     tvfit = register_module('TagVertex')
     tvfit.set_name('TagVertex_' + list_name)
-    tvfit.param('ListName', list_name)
-    tvfit.param('ConfidenceLevel', confidenceLevel)
+    tvfit.param('listName', list_name)
+    tvfit.param('confidenceLevel', confidenceLevel)
     tvfit.param('MCAssociation', MCassociation)
-    tvfit.param('UseConstraint', useConstraint)
+    tvfit.param('useConstraint', useConstraint)
     path.add_module(tvfit)
 
 
@@ -556,9 +556,7 @@ def FlavTag(list_name, path=analysis_main):
     The flavour is predicted by trained Neural Networks
     Module under development (not ready for users)
     
-    @param mode using mode for the module 0 means Teacher, 1 means Expert
     @param list_name name of the input Breco ParticleList
-    @param ConfidenceLevel minimum value of the ConfidenceLevel to accept the fit
     @param path      modules are added to this path
     """
 

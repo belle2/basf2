@@ -52,10 +52,10 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("ListName", m_listName, "name of particle list", string(""));
-    addParam("ConfidenceLevel", m_confidenceLevel,
+    addParam("listName", m_listName, "name of particle list", string(""));
+    addParam("confidenceLevel", m_confidenceLevel,
              "required confidence level of fit to keep particles in the list", 0.001);
-    addParam("VertexFitter", m_vertexFitter, "kfitter or rave", string("kfitter"));
+    addParam("vertexFitter", m_vertexFitter, "kfitter or rave", string("kfitter"));
     addParam("fitType", m_fitType, "type of the kinematic fit", string("vertex"));
     addParam("withConstraint", m_withConstraint, "additional constraint on vertex", string(""));
     addParam("decayString", m_decayString, "specifies which daughter particles are included in the kinematic fit", string(""));

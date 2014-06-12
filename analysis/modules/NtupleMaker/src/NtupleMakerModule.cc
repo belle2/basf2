@@ -31,13 +31,20 @@ NtupleMakerModule::NtupleMakerModule() : Module()
 {
   m_tree = NULL;
   //Set module properties
-  setDescription("Make a TTree with the properties of seleted decay products.");
+  setDescription("Make a TTree with the properties of selected decay products.");
   //Parameter definition
-  addParam("strFileName", m_strFileName, "Name of ROOT file for output", string("test.root"));
-  addParam("strTreeName", m_strTreeName, "Name of TTree to be filled.", string("test"));
-  addParam("strComment", m_strComment, "Comment about the content of the TTree.", string("No comment."));
-  addParam("strTools", m_strTools, "List of tools and decay descriptors", vector<string>());
-  addParam("strListName", m_strListName, "Name of particle list with reconstructed particles.", string(""));
+  addParam("fileName", m_strFileName, "Name of ROOT file for output", string("test.root"));
+  addParam("treeName", m_strTreeName, "Name of TTree to be filled.", string("test"));
+  addParam("comment", m_strComment, "Comment about the content of the TTree.", string("No comment."));
+  addParam("tools", m_strTools, "List of tools and decay descriptors", vector<string>());
+  addParam("listName", m_strListName, "Name of particle list with reconstructed particles.", string(""));
+
+  //TODO legacy, remove in july 2014
+  addParam("strFileName", m_strFileName, "deprecated, don't use", string("test.root"));
+  addParam("strTreeName", m_strTreeName, "deprecated, don't use", string("test"));
+  addParam("strComment", m_strComment, "deprecated, don't use", string("No comment."));
+  addParam("strTools", m_strTools, "deprecated, don't use", vector<string>());
+  addParam("strListName", m_strListName, "deprecated, don't use", string(""));
 }
 
 void NtupleMakerModule::initialize()

@@ -26,9 +26,9 @@ REG_MODULE(SkimFilter)
 SkimFilterModule::SkimFilterModule() : Module()
 {
   //Set module properties
-  setDescription("Filter based on ParticleLists.");
+  setDescription("Filter based on ParticleLists, by setting return value to true if at least one of the given lists is not empty.");
   //Parameter definition
-  addParam("strParticleLists", m_strParticleLists, "List of ParticleLists", vector<string>());
+  addParam("particleLists", m_strParticleLists, "List of ParticleLists", vector<string>());
 }
 
 void SkimFilterModule::initialize()
@@ -56,7 +56,7 @@ void SkimFilterModule::event()
       B2INFO("ParticleList " << m_strParticleLists[iList] << " not found");
       continue;
     } else {
-      if (!particlelist->getListSize())continue;
+      if (particlelist->getListSize() == 0)continue;
       pass = true;
     }
 

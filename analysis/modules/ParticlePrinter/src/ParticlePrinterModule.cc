@@ -17,15 +17,12 @@
 
 // framework aux
 #include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // dataobjects
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/utility/VariableManager.h>
 
-// utilities
-#include <analysis/utility/EvtPDLUtil.h>
 
 using namespace std;
 
@@ -45,14 +42,14 @@ namespace Belle2 {
 
   {
     // set module description (e.g. insert text)
-    setDescription("Prints particle list to screen (usefull for debugging)");
+    setDescription("Prints particle list to screen (useful for debugging)");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("ListName", m_listName, "name of particle list", string(""));
-    addParam("FullPrint", m_fullPrint, "execute Particle's internal print() function", true);
+    addParam("listName", m_listName, "name of ParticleList", string(""));
+    addParam("fullPrint", m_fullPrint, "execute Particle's internal print() function", true);
     vector<string> defaultVariables;
-    addParam("Variables", m_variables, "names of PSelector functions to be printed", defaultVariables);
+    addParam("variables", m_variables, "names of variables to be printed (see VariableManager)", defaultVariables);
 
   }
 
@@ -136,8 +133,7 @@ namespace Belle2 {
     for (auto & varName : m_variables) {
       auto var = manager.getVariable(varName);
       if (var == nullptr) {
-        B2INFO(
-          "ParticlePrinter: VariableManager doesn't have variable" << varName)
+        B2ERROR("ParticlePrinter: VariableManager doesn't have variable" << varName)
       }
       double value = var->function(particle);
       B2INFO("     o) " << varName << " = " << value);

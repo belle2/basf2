@@ -17,7 +17,6 @@
 #include <stdio.h>
 
 #include <analysis/modules/FlavorTagging/FlavorTaggingModule.h>
-#include <analysis/modules/TMVATeacher/TMVATeacherModule.h>
 #include <analysis/TMVAInterface/Teacher.h>
 
 

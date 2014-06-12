@@ -45,6 +45,18 @@ def outputMdst(filename, path=analysis_main):
     reconstruction.add_mdst_output(path, mc=True, filename=filename)
 
 
+def outputUdst(filename, path=analysis_main):
+    """
+    Save uDST (micro-Data Summary Tables) = MDST + Particles
+    """
+
+    import reconstruction
+    partBranches = ['Particles', 'ParticlesToMCParticles',
+                    'ParticlesToPIDLikelihoods']
+    reconstruction.add_mdst_output(path, mc=True, filename=filename,
+                                   additionalBranches=partBranches)
+
+
 def generateY4S(noEvents, decayTable, path=analysis_main):
     """
     Generated e+e- -> Y(4S) events with EvtGen event generator.

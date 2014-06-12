@@ -13,14 +13,14 @@ loadReconstructedParticles()
 stdFSParticles()
 stdLooseFSParticles()
 
-makeParticle('D0', 421, ['StdVeryLooseK-', 'StdVeryLoosePi+'], 1.7, 2.0)
+makeParticle('D0 -> K-:all pi+:all', {'M': (1.7, 2.0)})
 applyCuts('D0', ['M 1.81:1.91'])
 matchMCTruth('D0')
 
 # Prepare the B candidates
-makeParticle('B-toD0pi', -521, ['D0', 'StdVeryLoosePi-'], 5.2, 5.4)
-applyCuts('B-toD0pi', ['M 5.2:5.4'])
-matchMCTruth('B-toD0pi')
+makeParticle('B- -> D0 pi-:all', {'M': (5.2, 5.4)})
+applyCuts('B-', ['M 5.2:5.4'])
+matchMCTruth('B-')
 
 # Prepare the ntuples
 ntupleFile('../Bu_Dpi,Kpi.ntup.root')
@@ -44,7 +44,7 @@ tools = [
     'Kinematics',
     '^B- -> [^anti-D0 -> ^K+ ^pi-] ^pi-',
     ]
-ntupleTree('Bu_Dpi_tuple', 'B-toD0pi', tools)
+ntupleTree('Bu_Dpi_tuple', 'B-', tools)
 
 ##########
 # dump all event summary information
@@ -60,7 +60,7 @@ eventtools = [
     ]
 ntupleTree('eventtuple', '', eventtools)
 
-summaryOfLists(['D0', 'B-toD0pi'])
+summaryOfLists(['D0', 'B-'])
 
 # ----> start processing of modules
 process(analysis_main)

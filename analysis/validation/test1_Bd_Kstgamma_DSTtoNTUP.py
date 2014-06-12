@@ -15,12 +15,12 @@ stdFSParticles()
 stdLooseFSParticles()
 stdLightMesons()
 
-makeParticle('K*0', 313, ['StdVeryLooseK-', 'StdVeryLoosePi+'], 0.6, 1.2)
+makeParticle('K*0 -> K-:all pi+:all', {'M': (0.6, 1.2)})
 matchMCTruth('K*0')
 
 # Prepare the B candidates
-makeParticle('B0toK*0gamma', 511, ['K*0', 'StdPhoton'], 5.2, 5.4)
-matchMCTruth('B0toK*0gamma')
+makeParticle('B0 -> K*0 gamma:all', {'M': (5.2, 5.4)})
+matchMCTruth('B0')
 
 ntupleFile('../Bd_Kstgamma.ntup.root')
 tools = [
@@ -39,7 +39,7 @@ tools = [
     'PID',
     'B0 -> [K*0 -> ^K+ ^pi-] gamma',
     ]
-ntupleTree('Bd_Kstgamma_tuple', 'B0toK*0gamma', tools)
+ntupleTree('Bd_Kstgamma_tuple', 'B0', tools)
 
 ##########
 # dump all event summary information
@@ -55,7 +55,7 @@ eventtools = [
     ]
 ntupleTree('eventtuple', '', eventtools)
 
-summaryOfLists(['K*0', 'B0toK*0gamma'])
+summaryOfLists(['K*0', 'B0'])
 
 # ----> start processing of modules
 process(analysis_main)

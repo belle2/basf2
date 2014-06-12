@@ -150,13 +150,16 @@ namespace Belle2 {
         }
       }
     } else { // existing particle list: apply selections and remove unselected
-      std::vector<unsigned int> toRemove;
-      for (unsigned i = 0; i < plist->getListSize(); i++) {
-        const Particle* part = plist->getParticle(i);
-        if (!m_pSelector.select(part)) toRemove.push_back(part->getArrayIndex());
-      }
+      if (m_selection.size() > 0) {
+        // loop over list only if cuts should be applied
+        std::vector<unsigned int> toRemove;
+        for (unsigned i = 0; i < plist->getListSize(); i++) {
+          const Particle* part = plist->getParticle(i);
+          if (!m_pSelector.select(part)) toRemove.push_back(part->getArrayIndex());
+        }
 
-      plist->removeParticles(toRemove);
+        plist->removeParticles(toRemove);
+      }
     }
 
 

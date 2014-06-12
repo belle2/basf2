@@ -13,13 +13,13 @@ loadReconstructedParticles()
 stdFSParticles()
 stdLooseFSParticles()
 
-makeParticle('jpsi', 443, ['StdVeryLooseMu-', 'StdVeryLooseMu+'], 2.8, 3.3)
-matchMCTruth('jpsi')
-makeParticle('KS0', 310, ['StdVeryLoosePi-', 'StdVeryLoosePi+'], 0.4, 0.6)
-matchMCTruth('KS0')
+makeParticle('J/psi', 443, ['StdVeryLooseMu-', 'StdVeryLooseMu+'], 2.8, 3.3)
+matchMCTruth('J/psi')
+makeParticle('K_S0', 310, ['StdVeryLoosePi-', 'StdVeryLoosePi+'], 0.4, 0.6)
+matchMCTruth('K_S0')
 
 # Prepare the B candidates
-makeParticle('B0toJpsiKS', 511, ['jpsi', 'KS0'], 5.2, 5.4)
+makeParticle('B0toJpsiKS', 511, ['J/psi', 'K_S0'], 5.2, 5.4)
 matchMCTruth('B0toJpsiKS')
 
 # ----> NtupleMaker module
@@ -55,7 +55,7 @@ eventtools = [
     ]
 ntupleTree('eventtuple', '', eventtools)
 
-summaryOfLists(['jpsi', 'KS0', 'B0toJpsiKS'])
+summaryOfLists(['J/psi', 'K_S0', 'B0toJpsiKS'])
 
 # ----> start processing of modules
 process(analysis_main)

@@ -16,8 +16,17 @@ using namespace Belle2;
 
 ClassImp(ExtHit)
 
-// empty constructor
-ExtHit::ExtHit() : RelationsObject()
+// empty constructor for ROOT - do not use this
+ExtHit::ExtHit() :
+  RelationsObject(),
+  m_PdgCode(0),
+  m_DetectorID(Const::EDetector::invalidDetector),
+  m_CopyID(0),
+  m_Status(EXT_FIRST),
+  m_TOF(0.0),
+  m_Position(TVector3(0.0, 0.0, 0.0)),
+  m_Momentum(TVector3(0.0, 0.0, 0.0)),
+  m_Covariance(TMatrixDSym(6))
 {
 }
 

@@ -80,8 +80,62 @@ using namespace Belle2;
 
 REG_MODULE(Muid)
 
-MuidModule::MuidModule() : Module(), m_ExtMgr(NULL)    // no ExtManager yet
+MuidModule::MuidModule() :
+  Module(),
+  m_ExtMgr(NULL),
+  m_RunMgr(NULL),
+  m_TrackingAction(NULL),
+  m_SteppingAction(NULL),
+  m_BKLMVolumes(NULL),
+  m_EKLMVolumes(NULL),
+  m_TOF(0.0),
+  m_MinRadiusSq(0.0),
+  m_Target(NULL),
+  m_OffsetZ(0.0),
+  m_EndcapMaxR(0.0),
+  m_EndcapMinR(0.0),
+  m_BarrelMinR(0.0),
+  m_BarrelMaxR(0.0),
+  m_EndcapHalfLength(0.0),
+  m_BarrelHalfLength(0.0),
+  m_OutermostActiveEndcapLayer(0),
+  m_OutermostActiveBarrelLayer(0),
+  m_EndcapMiddleZ(0.0),
+  m_BarrelScintVariance(0.0),
+  m_EndcapScintVariance(0.0),
+  m_FirstBarrelLayer(0),
+  m_FirstEndcapLayer(0),
+  m_ExtLayerPattern(0),
+  m_HitLayerPattern(0),
+  m_Escaped(false),
+  m_Chi2(0.0),
+  m_NPoint(0),
+  m_LastBarrelExtLayer(0),
+  m_LastBarrelHitLayer(0),
+  m_LastEndcapExtLayer(0),
+  m_LastEndcapHitLayer(0),
+  m_MuonPlusPar(NULL),
+  m_MuonMinusPar(NULL),
+  m_PionPlusPar(NULL),
+  m_PionMinusPar(NULL),
+  m_KaonPlusPar(NULL),
+  m_KaonMinusPar(NULL),
+  m_ProtonPar(NULL),
+  m_AntiprotonPar(NULL),
+  m_ElectronPar(NULL),
+  m_PositronPar(NULL)
 {
+  for (int j = 0; j < NLAYER + 1; ++j) {
+    m_BarrelPhiStripVariance[j] = 0.0;
+    m_BarrelZStripVariance[j] = 0.0;
+    m_BarrelPhiStripVariance[j] = 0.0;
+    m_BarrelModuleMiddleRadius[j] = 0.0;
+    m_EndcapModuleMiddleZ[j] = 0.0;
+  }
+  for (int j = 0; j < NSECTOR + 1; ++j) {
+    m_BarrelSectorPerp[j] = TVector3(0.0, 0.0, 0.0);
+    m_BarrelSectorPhi[j] = TVector3(0.0, 0.0, 0.0);
+  }
   m_PDGCode.clear();
   setDescription("Identifies muons by extrapolating tracks from CDC to KLM using geant4e");
   setPropertyFlags(c_ParallelProcessingCertified);

@@ -67,7 +67,17 @@ using namespace Belle2;
 
 REG_MODULE(Ext)
 
-ExtModule::ExtModule() : Module(), m_ExtMgr(NULL)  // no ExtManager yet
+ExtModule::ExtModule() :
+  Module(),
+  m_ExtMgr(NULL), // initialized later
+  m_RunMgr(NULL), // initialized later
+  m_TrackingAction(NULL), // initialized later
+  m_SteppingAction(NULL), // initialized later
+  m_Enter(NULL), // initialized later
+  m_Exit(NULL), // initialized later
+  m_TOF(0.0), // initialized later
+  m_MinRadiusSq(0.0), // initialized later
+  m_Target(NULL) // initialized later
 {
   m_PDGCode.clear();
   setDescription("Extrapolates tracks from CDC to outer detectors using geant4e");
@@ -103,8 +113,8 @@ void ExtModule::initialize()
   if (m_ExtMgr->PrintG4State() == G4String("G4State_PreInit")) {
     B2INFO("Ext will run without simulation")
     m_RunMgr = NULL;
-    m_TrackingAction    = NULL;
-    m_SteppingAction    = NULL;
+    m_TrackingAction = NULL;
+    m_SteppingAction = NULL;
     if (m_ExtMgr->PrintExtState() == G4String("G4ErrorState_PreInit")) {
       B2INFO("Ext will call InitGeant4e")
       // Create the magnetic field for the geant4e extrapolation
@@ -124,8 +134,8 @@ void ExtModule::initialize()
   } else {
     B2INFO("Ext will coexist with simulation")
     m_RunMgr = G4RunManager::GetRunManager();
-    m_TrackingAction    = const_cast<G4UserTrackingAction*>(m_RunMgr->GetUserTrackingAction());
-    m_SteppingAction    = const_cast<G4UserSteppingAction*>(m_RunMgr->GetUserSteppingAction());
+    m_TrackingAction = const_cast<G4UserTrackingAction*>(m_RunMgr->GetUserTrackingAction());
+    m_SteppingAction = const_cast<G4UserSteppingAction*>(m_RunMgr->GetUserSteppingAction());
     if (m_ExtMgr->PrintExtState() == G4String("G4ErrorState_PreInit")) {
       B2INFO("Ext will call InitGeant4e")
       m_ExtMgr->InitGeant4e();

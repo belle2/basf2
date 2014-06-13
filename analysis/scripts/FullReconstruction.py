@@ -27,14 +27,12 @@
 
 
 import pdg
-import interactive
 
 import FR_utility
 from FR_reconstruction import SelectParticleList, CopyParticleLists, MakeAndMatchParticleList
 from FR_signalProbability import SignalProbability
 from FR_preCut import PreCutDetermination, CreatePreCutHistogram, PrintPreCuts
 
-import os
 import collections
 import argparse
 import copy

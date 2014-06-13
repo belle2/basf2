@@ -195,5 +195,4 @@ main.add_module(progress)
 # Process events
 process(main)
 
-import os
 os.remove('seqout_test.sroot')

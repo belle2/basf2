@@ -483,7 +483,7 @@ void SVDUnpackerModule::fillSVDTransparentDigitList(int nWords, uint32_t* data32
 
   unsigned short doneSample = 0x0;
 
-  SVDTransparentDigit* newDigits;
+  SVDTransparentDigit* newDigits = NULL;
 
   for (; !FADCtrailerFound  && (data32 != &data32_in[nWords]); ++data32) {
 
@@ -507,11 +507,12 @@ void SVDUnpackerModule::fillSVDTransparentDigitList(int nWords, uint32_t* data32
 
         B2DEBUG(1, "Found new APV header");
 
-        if (oldAPVnum >= 0) {
+        if (oldAPVnum >= 0 && newDigits != NULL) {
           B2DEBUG(2, newDigits->print());
           newDigits->setNSample(oldAdcSample + 1);
           svdTransparentDigits->appendNew(*newDigits);
           delete newDigits;
+          newDigits = NULL;
         }//if (oldAPVnum>0) {
 
         const SVDOnlineToOfflineMap::ChipInfo& chip_info =
@@ -535,11 +536,12 @@ void SVDUnpackerModule::fillSVDTransparentDigitList(int nWords, uint32_t* data32
 
       oldAdcSample = curAdcSample;
 
-      if (oldAPVnum >= 0) {
+      if (oldAPVnum >= 0 && newDigits != NULL) {
         B2DEBUG(2, newDigits->print());
         newDigits->setNSample(oldAdcSample + 1);
         svdTransparentDigits->appendNew(*newDigits);
         delete newDigits;
+        newDigits = NULL;
       }//if (oldAPVnum>0) {
 
       FADCtrailerFound = true;

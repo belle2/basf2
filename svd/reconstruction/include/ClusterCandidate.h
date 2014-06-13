@@ -27,7 +27,7 @@ namespace Belle2 {
     class ClusterCandidate {
     public:
       /** Constructor to create an empty Cluster */
-      ClusterCandidate(): m_charge(0), m_seed() {};
+      ClusterCandidate() : m_charge(0), m_seed(), m_qfCharge(0), m_qfSeedCharge(0) {};
 
       /** Merge a cluster with this one.
        * Discard all samples of the other cluster and set its charge to 0
@@ -40,7 +40,8 @@ namespace Belle2 {
        * @param sample Sample to add to the cluster
        */
       void add(const Sample& sample);
-      /** get the strip-wise charge of the cluster (sum of maximum strip charges). */
+
+      /** get the strip-wise charge of the cluster (sum of quadratic fitcharges). */
       float getCharge() const { return m_charge; }
       /** get the seed charge of the cluster */
       float getSeedCharge() const { return m_seed.getCharge(); }
@@ -57,8 +58,20 @@ namespace Belle2 {
       /** get the reference to the map of sample counts per strip */
       const std::map<unsigned int, unsigned int>& getCounts() const { return m_counts; }
 
+      float getQFCharge() const { return m_qfCharge; }
+      /** get the seed charge of the cluster */
+      float getQFSeedCharge() const { return m_qfSeedCharge; }
+      /** get the reference to the map of quadratic fit charges */
+      const std::map<unsigned int, float>& getQFCharges() const { return m_qfCharges; }
+      /** get the reference to the map of quadratic fit times */
+      const std::map<unsigned int, float>& getQFTimes() const { return m_qfTimes; }
 
     protected:
+      struct adjacentCharge {
+        float prev_charge;
+        float next_charge;
+      };
+
       /** Charge of the cluster */
       float m_charge;
       /** Seed pixel of the cluster */
@@ -71,10 +84,21 @@ namespace Belle2 {
       std::map<unsigned int, unsigned int> m_maxima;
       /** Number of samples per strip */
       std::map<unsigned int, unsigned int> m_counts;
+
+      /** Charge of the cluster */
+      float m_qfCharge;
+      /** Seed pixel of the cluster */
+      float m_qfSeedCharge;
+      /** Samples with quadratic fit charges by strip */
+      std::map<unsigned int, float> m_qfCharges;
+      /** Samples with quadratic fit times by strip */
+      std::map<unsigned int, float> m_qfTimes;
+      /** Samples with quadratic fit charges by strip */
+      std::map<unsigned int, struct adjacentCharge> m_adjacentCharges;
     };
 
   }
 
 }
 
-#endif //SVD_CLUSTERCANDIDATE_H
+#endif //SVD_CLUSTERCANDIDATE_QUADFIT_H

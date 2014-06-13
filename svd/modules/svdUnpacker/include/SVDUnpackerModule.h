@@ -19,8 +19,10 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <rawdata/dataobjects/RawSVD.h>
 #include <svd/dataobjects/SVDDigit.h>
+#include <svd/dataobjects/SVDTransparentDigit.h>
 
 #include <svd/online/SVDOnlineToOfflineMap.h>
+#include <svd/online/SVDStripNoiseMap.h>
 
 namespace Belle2 {
 
@@ -64,7 +66,9 @@ namespace Belle2 {
 
       std::string m_rawSVDListName;
       std::string m_svdDigitListName;
+      std::string m_svdTransparentDigitListName;
       std::string m_xmlMapFileName;
+      std::string m_noiseMapFileName;
 
       float m_APVLatency;
       float m_APVSamplingTime;
@@ -89,6 +93,13 @@ namespace Belle2 {
     private:
 
       SVDOnlineToOfflineMap* m_map;
+
+      SVDStripNoiseMap* m_noiseMap;
+
+      unsigned short m_runType;
+
+      bool  m_enableFineCMC;
+      short m_nCmcGroup;
 
       // The following assumes i386 byte order: MSB comes last!
 
@@ -127,6 +138,27 @@ namespace Belle2 {
         unsigned int check : 1; //MSB
       };
 
+      struct tp_APVHeader { // APV header for transparent mode
+        unsigned int CMC1 : 8; //LSB
+
+        unsigned int CMC2 : 4;
+        unsigned int sample : 3;
+        unsigned int errorBit : 1;
+
+        unsigned int pipelineAddr : 8;
+
+        unsigned int APVnum : 6;
+        unsigned int check : 2; //MSB
+      };
+
+      struct tp_data { // data for transparent mode
+        unsigned short adc_1 : 10; //LSB
+        unsigned short reserved_1 : 6;
+        unsigned short adc_2 : 10; //LSB
+        unsigned short reserved_2 : 5;
+        unsigned int check : 1; //MSB
+      };
+
       struct FADCTrailer {
         unsigned int FTBFlags: 16; //LSB
 
@@ -153,7 +185,15 @@ namespace Belle2 {
 
       void fillSVDDigitList(int nWords, uint32_t* data32_in, StoreArray<SVDDigit>* svdDigits);
 
+      void fillSVDTransparentDigitList(int nWords, uint32_t* data32, StoreArray<SVDTransparentDigit>* svdTransparentDigits);
+
+      void emulateCmc(StoreArray<SVDTransparentDigit>* svdTransparentDigits);
+
+      void emulateZeroSupp(StoreArray<SVDTransparentDigit>* svdTransparentDigits, StoreArray<SVDDigit>* svdDigits);
+
       void printDebug(uint32_t* data32, uint32_t* data32_min, uint32_t* data32_max, int nWords);
+
+      void printB2Debug(uint32_t* data32, uint32_t* data32_min, uint32_t* data32_max, int nWords);
 
       //temporary: to check format from Vienna test files:
       //      void printbitssimple(int n, int nBits);

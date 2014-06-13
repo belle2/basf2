@@ -32,9 +32,9 @@ namespace Belle2 {
        * @param digit Pointer to the digit to be wrapped by this pixel
        * @param index Index of the SVDDigit in the collection
        */
-      Sample(const SVDDigit* digit, unsigned int index):
+      Sample(const SVDDigit* digit, unsigned int index, float prev_charge = -1.0, float next_charge = -1.0):
         m_arrayIndex(index), m_cellID(digit->getCellID()), m_iTime(digit->getIndex()),
-        m_charge(digit->getCharge()) {}
+        m_charge(digit->getCharge()), m_prev_charge(prev_charge), m_next_charge(next_charge) {}
       /** Bare constructor,
        * to construct an empty sample, eg. for a seed in ClusterCandidate.
        */
@@ -61,6 +61,11 @@ namespace Belle2 {
       /** Return the index of the Digit in the collection */
       unsigned int getArrayIndex() const { return m_arrayIndex; }
 
+      /** Shorthand to get the previous sample charge */
+      float getPrevCharge() const { return m_prev_charge; }
+      /** Shorthand to get the next sample charge */
+      float getNextCharge() const { return m_next_charge; }
+
     protected:
       /** StoreArray index of the digit */
       unsigned int m_arrayIndex;
@@ -70,6 +75,10 @@ namespace Belle2 {
       unsigned short m_iTime;
       /** Charge of the digit */
       float m_charge;
+      /** Charge of the previous digit */
+      float m_prev_charge;
+      /** Charge of the next digit */
+      float m_next_charge;
     };
 
   }

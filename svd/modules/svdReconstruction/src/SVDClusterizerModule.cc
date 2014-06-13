@@ -215,7 +215,6 @@ inline void SVDClusterizerModule::findCluster(const Sample& sample)
   m_cache.setLast(sample.getSampleIndex(), sample.getCellID(), prev);
 }
 
-
 void SVDClusterizerModule::event()
 {
   const StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
@@ -254,7 +253,15 @@ void SVDClusterizerModule::event()
     Sensors sensors;
     //Fill sensors
     for (int i = 0; i < nDigits; i++) {
-      Sample sample(storeDigits[i], i);
+      B2DEBUG(3, storeDigits[i]->print());
+
+      short prev_id = storeDigits[i]->getPrevID();
+      short next_id = storeDigits[i]->getNextID();
+      float prev_charge = (prev_id >= 0) ? storeDigits[prev_id]->getCharge() : -1.0;
+      float next_charge = (next_id >= 0) ? storeDigits[next_id]->getCharge() : -1.0;
+      Sample sample(storeDigits[i], i, prev_charge, next_charge);
+      //Sample sample(storeDigits[i], i);
+
       VxdID sensorID = storeDigits[i]->getSensorID();
       // If malformed object, drop it. Only here, for sorted digits the check will be done in sorter module.
       if (!geo.validSensorID(sensorID)) {
@@ -272,6 +279,7 @@ void SVDClusterizerModule::event()
       }
     }
 
+    B2DEBUG(1, "Number of hits: " << sensors.size());
     //Now we loop over sensors and cluster each sensor in turn
     for (SensorIterator it = sensors.begin(); it != sensors.end(); it++) {
       for (int iSide = 0; iSide < 2; ++iSide) {
@@ -293,7 +301,15 @@ void SVDClusterizerModule::event()
     int lastTime(0);
     unsigned int lastStrip(0);
     for (int i = 0; i < nDigits; i++) {
-      Sample sample(storeDigits[i], i);
+      B2DEBUG(3, storeDigits[i]->print());
+
+      short prev_id = storeDigits[i]->getPrevID();
+      short next_id = storeDigits[i]->getNextID();
+      float prev_charge = (prev_id >= 0) ? storeDigits[prev_id]->getCharge() : -1.0;
+      float next_charge = (next_id >= 0) ? storeDigits[next_id]->getCharge() : -1.0;
+      Sample sample(storeDigits[i], i, prev_charge, next_charge);
+      //Sample sample(storeDigits[i], i);
+
       VxdID thisSensorID = storeDigits[i]->getSensorID();
       bool thisSide = storeDigits[i]->isUStrip();
 
@@ -312,21 +328,30 @@ void SVDClusterizerModule::event()
       //Load the correct noise map for the first pixel
       if (i == 0) m_noiseMap.setSensorID(thisSensorID);
       //Ignore digits with insufficient signal
-      if (!m_noiseMap(sample, m_cutAdjacent)) continue;
+      if (!m_noiseMap(sample, m_cutAdjacent)) {
+        B2DEBUG(3, "continue");
+        continue;
+      }
 
       //Check for sorting as precaution
       if (lastStrip > sample.getCellID() || (lastStrip == sample.getCellID() && lastTime > sample.getSampleIndex())) {
+        B2DEBUG(3, "last strip: " << lastStrip << ", current strip: " << sample.getCellID());
+        B2DEBUG(3, "last time : " << lastTime << ", current time : " << sample.getSampleIndex());
         B2FATAL("Digits are not sorted correctly, please change the assumeSorted parameter "
                 "to false or fix the input to be ordered by strip number and time in ascending order");
       }
       lastTime = sample.getSampleIndex();
       lastStrip = sample.getCellID();
+      B2DEBUG(3, "lastStrip <= " << lastStrip);
+      B2DEBUG(3, "lastTime <= " << lastTime);
 
       //Find the correct cluster and add sample to cluster
       findCluster(sample);
     }
     writeClusters(sensorID, uSide ? 0 : 1);
   }
+
+  B2DEBUG(1, "Number of clusters: " << storeClusters.getEntries());
 }
 
 void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
@@ -356,14 +381,17 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
     if (!(cls.size() > 0 && m_noiseMap(cls.getCharge(), m_cutCluster) && m_noiseMap(cls.getSeed(), m_cutSeed))) continue;
 
     const Sample& clusterSeed = cls.getSeed();
-    double clusterCharge = cls.getCharge();
+    //double clusterCharge = cls.getCharge();
+    double clusterCharge = cls.getQFCharge();
 
-    const std::map<unsigned int, float> stripCharges = cls.getStripCharges();
+    //const std::map<unsigned int, float> stripCharges = cls.getStripCharges();
+    const std::map<unsigned int, float> stripCharges = cls.getQFCharges();
     unsigned int maxStrip = stripCharges.rbegin()->first;
     double maxStripCharge = stripCharges.rbegin()->second;
     unsigned int minStrip = stripCharges.begin()->first;
     double minStripCharge = stripCharges.begin()->second;
     int clusterSize = stripCharges.size();
+    double totalCharge = 0.0;
     double clusterPosition = 0.0;
     double clusterPositionError = 0.0;
     if (clusterSize < m_sizeHeadTail) { // COG, size = 1 or 2
@@ -372,8 +400,9 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
         double stripPos = isU ? info.getUCellPosition(strip_charge->first)
                           : info.getVCellPosition(strip_charge->first);
         clusterPosition += stripPos * strip_charge->second;
+        totalCharge     += strip_charge->second;
       }
-      clusterPosition /= clusterCharge;
+      clusterPosition /= totalCharge;
       // Compute position error
       if (clusterSize == 1) {
         // Add a strip charge equal to the zero-suppression threshold to compute the error
@@ -385,7 +414,7 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
         clusterPositionError = a * pitch / sn;
       }
     } else { // Head-tail
-      double centreCharge = (clusterCharge - minStripCharge - maxStripCharge) / (clusterSize - 2);
+      double centreCharge = (totalCharge - minStripCharge - maxStripCharge) / (clusterSize - 2);
       minStripCharge = (minStripCharge < centreCharge) ? minStripCharge : centreCharge;
       maxStripCharge = (maxStripCharge < centreCharge) ? maxStripCharge : centreCharge;
       double minPos = isU ? info.getUCellPosition(minStrip) : info.getVCellPosition(minStrip);
@@ -401,7 +430,8 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
     }
 
     // Estimate time - this is currently very crude
-    const std::map<unsigned int, unsigned int> stripMaxima = cls.getMaxima();
+    //const std::map<unsigned int, unsigned int> stripMaxima = cls.getMaxima();
+    const std::map<unsigned int, float> stripMaxima = cls.getQFTimes();
     const std::map<unsigned int, unsigned int> stripCounts = cls.getCounts();
     // Check that we have enough data in each strip.
     unsigned int maxCount = 0;

@@ -90,7 +90,7 @@ void NtupleContinuumSuppressionTool::eval(const Particle* particle)
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
   if (selparticles.empty()) return;
 
-  const ContinuumSuppression* qq = DataStore::getRelated<ContinuumSuppression>(selparticles[0]);
+  const ContinuumSuppression* qq = selparticles[0]->getRelated<ContinuumSuppression>();
   if (qq) {
     m_fThrustB = qq->getThrustBm();
     m_fThrustO = qq->getThrustOm();

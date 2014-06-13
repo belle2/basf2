@@ -13,7 +13,6 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
@@ -125,7 +124,7 @@ void ContinuumSuppressionBuilderModule::event()
     }
 
     // -- ROE -----------------------------------------------------------------------------
-    const RestOfEvent* roe = DataStore::getRelated<RestOfEvent>(particle);
+    const RestOfEvent* roe = particle->getRelated<RestOfEvent>();
 
     if (roe) {
 

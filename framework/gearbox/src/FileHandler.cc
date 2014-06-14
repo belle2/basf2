@@ -29,6 +29,7 @@ namespace Belle2 {
 
     FileContext::FileContext(const string& filename, bool compressed)
     {
+      B2DEBUG(100, "Opening " << filename << (compressed ? " (gzip)" : ""));
       if (compressed) m_stream.push(io::gzip_decompressor());
       m_stream.push(io::file_source(filename));
     }
@@ -56,8 +57,7 @@ namespace Belle2 {
           tmp = boost::regex_replace(tmp, run, std::string("%2$$0$1d"));
           B2DEBUG(300, "Found run-dependence in file path, resulting in " << tmp);
           m_pathformat = boost::format(tmp);
-          m_pathformat.exceptions(boost::io::all_error_bits ^
-                                  (boost::io::too_many_args_bit | boost::io::too_few_args_bit));
+          m_pathformat.exceptions(boost::io::all_error_bits ^ boost::io::too_many_args_bit);
         }
       }
       B2DEBUG(300, "Created FileHandler for directory " << m_path);
@@ -98,7 +98,15 @@ namespace Belle2 {
         //structure from e.g. data/pxd/PXD-Alignment.xml to
         //data-pxd-PXD-Alignment.xml to more easily override single files
         size_t last_slash = filename.find_last_of('/');
-        repeat = last_slash != 0 && last_slash != std::string::npos;
+        //If the last slash we found is after the primary path we try again.
+        //This means we try to replace all slashes in the requested filename
+        //but not in the given base path, for example:
+        // - if the base path is "/somedir/data/" and the file to be opened is
+        //   "foo/bar/baz.xml", we will look only for files up to
+        //   "/somedir/data/foo-bar-baz.xml"
+        // - if the base path does not end in "/", e.g. "/somedir/data" we also
+        //   look for "/somedir/data-foo-bar-baz.xml"
+        repeat = (last_slash >= m_path.size()) && (last_slash != std::string::npos);
         if (repeat) {
           filename[last_slash] = '-';
         }

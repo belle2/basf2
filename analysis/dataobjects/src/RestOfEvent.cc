@@ -43,12 +43,12 @@ void RestOfEvent::addECLClusters(const std::vector<int>& indices)
 
 void RestOfEvent::addKLMCluster(const KLMCluster* cluster)
 {
-  m_eclClusterIndices.insert(cluster->getArrayIndex());
+  m_klmClusterIndices.insert(cluster->getArrayIndex());
 }
 
 void RestOfEvent::addKLMClusters(const std::vector<int>& indices)
 {
-  addIndices(indices, m_eclClusterIndices);
+  addIndices(indices, m_klmClusterIndices);
 }
 
 const std::vector<Belle2::Track*> RestOfEvent::getTracks() const
@@ -73,8 +73,9 @@ const std::vector<Belle2::ECLCluster*> RestOfEvent::getECLClusters() const
   std::vector<ECLCluster*> remainECLClusters(getNECLClusters());
   StoreArray<ECLCluster> allECLClusters;
 
-  if (allECLClusters.getEntries() < getNECLClusters())
+  if (allECLClusters.getEntries() < getNECLClusters()) {
     B2ERROR("[RestOfEvent::getAllECLClusters] Number of remaining ECL showers in the RestOfEvent > number of all showers in StoreArray<ECLCluster>!");
+  }
 
   int i = 0;
   for (const int index : m_eclClusterIndices) {

@@ -67,8 +67,6 @@ void RestOfEventBuilderModule::event()
   StoreObjPtr<ParticleList> plist(m_particleList);
   StoreObjPtr<Particle>     particles;
 
-  //printEvent();
-
   // output
   StoreArray<RestOfEvent> roeArray;
 
@@ -124,6 +122,7 @@ void RestOfEventBuilderModule::addRemainingECLClusters(const Particle* particle,
   for (int i = 0; i < eclClusters.getEntries(); i++) {
     const ECLCluster* shower = eclClusters[i];
 
+    bool goodCluster = true;
     if (m_onlyGoodECLClusters) {
       // TODO: make this steerable
       double energy = shower->getEnergy();
@@ -143,7 +142,11 @@ void RestOfEventBuilderModule::addRemainingECLClusters(const Particle* particle,
       bool goodGammaRegion2 = region > 1.5 && region < 2.5 && energy > 0.100;
       bool goodGammaRegion3 = region > 2.5 && region < 3.5 && energy > 0.150;
       if (!(goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3))
-        continue;
+        goodCluster = false;
+    }
+
+    if (m_onlyGoodECLClusters && !goodCluster) {
+      continue;
     }
 
     bool remainingCluster = true;
@@ -154,8 +157,9 @@ void RestOfEventBuilderModule::addRemainingECLClusters(const Particle* particle,
       }
     }
 
-    if (!remainingCluster)
+    if (!remainingCluster) {
       continue;
+    }
 
     // check if the ECLCluster is matched to any track used in reconstruction
     for (unsigned j = 0; j < trackFSPs.size(); j++) {
@@ -171,8 +175,9 @@ void RestOfEventBuilderModule::addRemainingECLClusters(const Particle* particle,
       }
     }
 
-    if (remainingCluster)
+    if (remainingCluster) {
       roe->addECLCluster(shower);
+    }
   }
 }
 

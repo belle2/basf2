@@ -18,134 +18,146 @@
 
     <Active>
       <Material>BGO-Material</Material>
-      <cDx1 unit="mm">22.938</cDx1>
-      <cDx2 unit="mm">25.356</cDx2>       
-      <cDy1 unit="mm">12.280</cDy1>
-      <cDx3 unit="mm">30.828</cDx3>
-      <cDy2 unit="mm">19.616</cDy2>
-      <cDx4 unit="mm">34.69205</cDx4>
+      <cDx1 unit="mm">17.974</cDx1>
+      <cDx2 unit="mm">20.394</cDx2>       
+      <cDy1 unit="mm">12.289</cDy1>
+      <cDx3 unit="mm">22.973</cDx3>
+      <cDy2 unit="mm">19.626</cDy2>
+      <cDx4 unit="mm">26.8378</cDx4>
       <cDz unit="mm">124.0</cDz>
+      <cDtheta unit="deg">13.1856</cDtheta>
+      <cDphi unit="deg">-90.0</cDphi>
       <k_phi_init unit="deg">90.0</k_phi_init>
-      <k_z_TILTED unit="deg">13.0899</k_z_TILTED>
+      <k_z_TILTED unit="deg">12.6686</k_z_TILTED>
       <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
-      <k_zC unit="cm">37.0</k_zC>
-      <k_phiC unit="deg">37.5791</k_phiC>
+      <k_zC unit="cm">32.0</k_zC>
+      <k_phiC unit="deg">50.5903</k_phiC>
     </Active>
 
     <Active>
       <Material>BGO-Material</Material>
-      <cDx1 unit="mm">22.938</cDx1>
-      <cDx2 unit="mm">25.356</cDx2>       
-      <cDy1 unit="mm">12.280</cDy1>
-      <cDx3 unit="mm">30.828</cDx3>
-      <cDy2 unit="mm">19.616</cDy2>
-      <cDx4 unit="mm">34.69205</cDx4>
+      <cDx1 unit="mm">17.974</cDx1>
+      <cDx2 unit="mm">20.394</cDx2>       
+      <cDy1 unit="mm">12.289</cDy1>
+      <cDx3 unit="mm">22.973</cDx3>
+      <cDy2 unit="mm">19.626</cDy2>
+      <cDx4 unit="mm">26.8378</cDx4>
       <cDz unit="mm">124.0</cDz>
+      <cDtheta unit="deg">13.1856</cDtheta>
+      <cDphi unit="deg">-90.0</cDphi>
       <k_phi_init unit="deg">90.0</k_phi_init>
-      <k_z_TILTED unit="deg">9.82993</k_z_TILTED>
+      <k_z_TILTED unit="deg">12.6304</k_z_TILTED>
       <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
-      <k_zC unit="cm">37.0</k_zC>
-      <k_phiC unit="deg">125.076</k_phiC>
+      <k_zC unit="cm">32.0</k_zC>
+      <k_phiC unit="deg">110.519</k_phiC>
     </Active>
 
     <Active>
       <Material>BGO-Material</Material>
-      <cDx1 unit="mm">22.938</cDx1>
-      <cDx2 unit="mm">25.356</cDx2>       
-      <cDy1 unit="mm">12.280</cDy1>
-      <cDx3 unit="mm">30.828</cDx3>
-      <cDy2 unit="mm">19.616</cDy2>
-      <cDx4 unit="mm">34.69205</cDx4>
+      <cDx1 unit="mm">17.974</cDx1>
+      <cDx2 unit="mm">20.394</cDx2>       
+      <cDy1 unit="mm">12.289</cDy1>
+      <cDx3 unit="mm">22.973</cDx3>
+      <cDy2 unit="mm">19.626</cDy2>
+      <cDx4 unit="mm">26.8378</cDx4>
       <cDz unit="mm">124.0</cDz>
+      <cDtheta unit="deg">13.1856</cDtheta>
+      <cDphi unit="deg">-90.0</cDphi>
       <k_phi_init unit="deg">90.0</k_phi_init>
-      <k_z_TILTED unit="deg">9.82993</k_z_TILTED>
+      <k_z_TILTED unit="deg">12.6304</k_z_TILTED>
       <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
-      <k_zC unit="cm">37.0</k_zC>
-      <!-- 360 - 125.076 -->
-      <k_phiC unit="deg">234.924</k_phiC> 
+      <k_zC unit="cm">32.0</k_zC>
+      <k_phiC unit="deg">249.481</k_phiC>
     </Active>
 
     <Active>
       <Material>BGO-Material</Material>
-      <cDx1 unit="mm">22.938</cDx1>
-      <cDx2 unit="mm">25.356</cDx2>       
-      <cDy1 unit="mm">12.280</cDy1>
-      <cDx3 unit="mm">30.828</cDx3>
-      <cDy2 unit="mm">19.616</cDy2>
-      <cDx4 unit="mm">34.69205</cDx4>
+      <cDx1 unit="mm">17.974</cDx1>
+      <cDx2 unit="mm">20.394</cDx2>       
+      <cDy1 unit="mm">12.289</cDy1>
+      <cDx3 unit="mm">22.973</cDx3>
+      <cDy2 unit="mm">19.626</cDy2>
+      <cDx4 unit="mm">26.8378</cDx4>
       <cDz unit="mm">124.0</cDz>
+      <cDtheta unit="deg">13.1856</cDtheta>
+      <cDphi unit="deg">-90.0</cDphi>
       <k_phi_init unit="deg">90.0</k_phi_init>
-      <k_z_TILTED unit="deg">13.0899</k_z_TILTED>
+      <k_z_TILTED unit="deg">12.6686</k_z_TILTED>
       <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
-      <k_zC unit="cm">37.0</k_zC>
-      <!-- 360 - 37.5791 -->
-      <k_phiC unit="deg">322.421</k_phiC> 
+      <k_zC unit="cm">32.0</k_zC>
+      <k_phiC unit="deg">309.4097</k_phiC>
     </Active>
 
     <Active>
       <Material>BGO-Material</Material>
-      <cDx1 unit="mm">22.938</cDx1>
-      <cDx2 unit="mm">25.356</cDx2>       
-      <cDy1 unit="mm">12.280</cDy1>
-      <cDx3 unit="mm">30.828</cDx3>
-      <cDy2 unit="mm">19.616</cDy2>
-      <cDx4 unit="mm">34.69205</cDx4>
+      <cDx1 unit="mm">17.974</cDx1>
+      <cDx2 unit="mm">20.394</cDx2>       
+      <cDy1 unit="mm">12.289</cDy1>
+      <cDx3 unit="mm">22.973</cDx3>
+      <cDy2 unit="mm">19.626</cDy2>
+      <cDx4 unit="mm">26.8378</cDx4>
       <cDz unit="mm">124.0</cDz>
+      <cDtheta unit="deg">13.1856</cDtheta>
+      <cDphi unit="deg">-90.0</cDphi>
       <k_phi_init unit="deg">-90.0</k_phi_init>
-      <k_z_TILTED unit="deg">158.544</k_z_TILTED>
+      <k_z_TILTED unit="deg">155.098</k_z_TILTED>
       <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
       <k_zC unit="cm">-21.0</k_zC>
-      <k_phiC unit="deg">40.4231</k_phiC> 
+      <k_phiC unit="deg">55.1259</k_phiC>
     </Active>
 
     <Active>
       <Material>BGO-Material</Material>
-      <cDx1 unit="mm">22.938</cDx1>
-      <cDx2 unit="mm">25.356</cDx2>       
-      <cDy1 unit="mm">12.280</cDy1>
-      <cDx3 unit="mm">30.828</cDx3>
-      <cDy2 unit="mm">19.616</cDy2>
-      <cDx4 unit="mm">34.69205</cDx4>
+      <cDx1 unit="mm">17.974</cDx1>
+      <cDx2 unit="mm">20.394</cDx2>       
+      <cDy1 unit="mm">12.289</cDy1>
+      <cDx3 unit="mm">22.973</cDx3>
+      <cDy2 unit="mm">19.626</cDy2>
+      <cDx4 unit="mm">26.8378</cDx4>
       <cDz unit="mm">124.0</cDz>
+      <cDtheta unit="deg">13.1856</cDtheta>
+      <cDphi unit="deg">-90.0</cDphi>
       <k_phi_init unit="deg">-90.0</k_phi_init>
-      <k_z_TILTED unit="deg">161.694</k_z_TILTED>
+      <k_z_TILTED unit="deg">161.193</k_z_TILTED>
       <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
       <k_zC unit="cm">-21.0</k_zC>
-      <k_phiC unit="deg">129.613</k_phiC> 
+      <k_phiC unit="deg">113.578</k_phiC>
     </Active>
 
     <Active>
       <Material>BGO-Material</Material>
-      <cDx1 unit="mm">22.938</cDx1>
-      <cDx2 unit="mm">25.356</cDx2>       
-      <cDy1 unit="mm">12.280</cDy1>
-      <cDx3 unit="mm">30.828</cDx3>
-      <cDy2 unit="mm">19.616</cDy2>
-      <cDx4 unit="mm">34.69205</cDx4>
+      <cDx1 unit="mm">17.974</cDx1>
+      <cDx2 unit="mm">20.394</cDx2>       
+      <cDy1 unit="mm">12.289</cDy1>
+      <cDx3 unit="mm">22.973</cDx3>
+      <cDy2 unit="mm">19.626</cDy2>
+      <cDx4 unit="mm">26.8378</cDx4>
       <cDz unit="mm">124.0</cDz>
+      <cDtheta unit="deg">13.1856</cDtheta>
+      <cDphi unit="deg">-90.0</cDphi>
       <k_phi_init unit="deg">-90.0</k_phi_init>
-      <k_z_TILTED unit="deg">161.694</k_z_TILTED>
+      <k_z_TILTED unit="deg">161.193</k_z_TILTED>
       <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
       <k_zC unit="cm">-21.0</k_zC>
-      <!-- 360 - 129.613 -->
-      <k_phiC unit="deg">230.387</k_phiC> 
+      <k_phiC unit="deg">246.422</k_phiC>
     </Active>
 
     <Active>
       <Material>BGO-Material</Material>
-      <cDx1 unit="mm">22.938</cDx1>
-      <cDx2 unit="mm">25.356</cDx2>       
-      <cDy1 unit="mm">12.280</cDy1>
-      <cDx3 unit="mm">30.828</cDx3>
-      <cDy2 unit="mm">19.616</cDy2>
-      <cDx4 unit="mm">34.69205</cDx4>
+      <cDx1 unit="mm">17.974</cDx1>
+      <cDx2 unit="mm">20.394</cDx2>       
+      <cDy1 unit="mm">12.289</cDy1>
+      <cDx3 unit="mm">22.973</cDx3>
+      <cDy2 unit="mm">19.626</cDy2>
+      <cDx4 unit="mm">26.8378</cDx4>
       <cDz unit="mm">124.0</cDz>
+      <cDtheta unit="deg">13.1856</cDtheta>
+      <cDphi unit="deg">-90.0</cDphi>
       <k_phi_init unit="deg">-90.0</k_phi_init>
-      <k_z_TILTED unit="deg">158.544</k_z_TILTED>
+      <k_z_TILTED unit="deg">155.098</k_z_TILTED>
       <k_phi_TILTED unit="deg">0.0</k_phi_TILTED>
       <k_zC unit="cm">-21.0</k_zC>
-      <!-- 360 - 40.4231 -->
-      <k_phiC unit="deg">319.577</k_phiC> 
+      <k_phiC unit="deg">304.8741</k_phiC>
     </Active>
 
 

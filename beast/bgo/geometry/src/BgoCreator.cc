@@ -77,13 +77,15 @@ namespace Belle2 {
 
         //create bgo volume
         G4Trap* s_BGO = new G4Trap("s_BGO",
-                                   activeParams.getLength("cDz") *Unit::mm , 0 , 0,
-                                   activeParams.getLength("cDy1") *Unit::mm ,
-                                   activeParams.getLength("cDx2") *Unit::mm ,
-                                   activeParams.getLength("cDx1") *Unit::mm , 0,
-                                   activeParams.getLength("cDy2") *Unit::mm ,
-                                   activeParams.getLength("cDx4") *Unit::mm ,
-                                   activeParams.getLength("cDx3") *Unit::mm , 0);
+                                   activeParams.getLength("cDz") / 2.*Unit::mm ,
+                                   activeParams.getLength("cDtheta") ,
+                                   activeParams.getLength("cDphi") ,
+                                   activeParams.getLength("cDy1") / 2.*Unit::mm ,
+                                   activeParams.getLength("cDx2") / 2.*Unit::mm ,
+                                   activeParams.getLength("cDx1") / 2.*Unit::mm , 0,
+                                   activeParams.getLength("cDy2") / 2.*Unit::mm ,
+                                   activeParams.getLength("cDx4") / 2.*Unit::mm ,
+                                   activeParams.getLength("cDx3") / 2.*Unit::mm , 0);
 
         G4LogicalVolume* l_BGO = new G4LogicalVolume(s_BGO, geometry::Materials::get("BGO"), "l_BGO", 0, m_sensitive);
 
@@ -91,13 +93,14 @@ namespace Belle2 {
         l_BGO->SetUserLimits(new G4UserLimits(stepSize));
 
         //position bgo volume
+        G4Transform3D theta_init = G4RotateX3D(- activeParams.getLength("cDtheta"));
         G4Transform3D phi_init = G4RotateZ3D(activeParams.getLength("k_phi_init"));
         G4Transform3D tilt_z = G4RotateY3D(activeParams.getLength("k_z_TILTED"));
         G4Transform3D tilt_phi = G4RotateZ3D(activeParams.getLength("k_phi_TILTED"));
         G4Transform3D position = G4Translate3D(activeParams.getLength("k_zC") * tan(activeParams.getLength("k_z_TILTED")) * Unit::cm, 0,
                                                activeParams.getLength("k_zC") * Unit::cm);
         G4Transform3D pos_phi = G4RotateZ3D(activeParams.getLength("k_phiC"));
-        G4Transform3D Tr = pos_phi * position * tilt_phi * tilt_z * phi_init;
+        G4Transform3D Tr = pos_phi * position * tilt_phi * tilt_z * phi_init * theta_init;
         //cout << "rotation  " << Tr.getRotation() << " translation " << Tr.getTranslation() << endl;
 
         new G4PVPlacement(Tr, l_BGO, "p_BGO", &topVolume, false, detID);

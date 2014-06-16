@@ -116,12 +116,7 @@ namespace Belle2 {
      */
     std::vector<std::string> m_excludeBranchNames[DataStore::c_NDurabilityTypes];
 
-    /** TFile compression level.
-     *
-     *  Set the TFile compression level.
-     *  Should be between 1 for low compression and 9 for much compression.
-     *  <a href="http://root.cern.ch/root/html/src/TFile.cxx.html#b.RlJE">See the ROOT page for more information</a>.
-     */
+    /** TFile compression level.  */
     int m_compressionLevel;
 
     /** Branch split level.

@@ -44,8 +44,9 @@ namespace Belle2 {
       }
       \endcode
    *
-   *  Objects linked together using relations can also be obtained through
-   *  the RelationIndex class. (See class documentation for usage examples.)
+   *  Objects linked together using relations can also be obtained by querying
+   *  the objects themselves, since they should derive from RelationsObject
+   *  (See class documentation for usage examples.)
    *
    *
    *  <h1>Adding elements</h1>
@@ -73,8 +74,7 @@ namespace Belle2 {
    *  Internally, the arrays are stored as TClonesArrays, see
    *  http://root.cern.ch/root/html/TClonesArray.html for technical details.
    *
-   *  @sa Objects in different arrays can be linked using relations, see
-   *      RelationArray or RelationIndex.
+   *  @sa Objects in different arrays can be linked using relations, see RelationsInterface, RelationsObject
    *  @sa See StoreObjPtr for a way store single objects
    *  @sa Data can also be accessed from Python modules using PyStoreArray
    *

@@ -75,14 +75,32 @@ int main(int argc, char** argv)
       FieldInfo& info(info_m[name]);
       switch (info.getType()) {
         case FieldInfo::BOOL:   obj.addBool(name, value != "false"); break;
-        case FieldInfo::SHORT:  obj.addShort(name, atoi(value.c_str())); break;
-        case FieldInfo::INT:    obj.addInt(name, atoi(value.c_str())); break;
-        case FieldInfo::LONG:   obj.addLong(name, atoll(value.c_str())); break;
+        case FieldInfo::SHORT:    {
+          if (value.find("0x") != std::string::npos) {
+            obj.addShort(name, strtol(value.c_str(), NULL, 0)); break;
+          } else {
+            obj.addShort(name, atoi(value.c_str())); break;
+          }
+        }
+        case FieldInfo::INT:    {
+          if (value.find("0x") != std::string::npos) {
+            obj.addInt(name, strtol(value.c_str(), NULL, 0)); break;
+          } else {
+            obj.addInt(name, atoi(value.c_str())); break;
+          }
+        }
+        case FieldInfo::LONG:    {
+          if (value.find("0x") != std::string::npos) {
+            obj.addLong(name, strtol(value.c_str(), NULL, 0)); break;
+          } else {
+            obj.addLong(name, atoi(value.c_str())); break;
+          }
+        }
         case FieldInfo::FLOAT:  obj.addFloat(name, atof(value.c_str())); break;
         case FieldInfo::TEXT:   obj.addText(name, value); break;
         case FieldInfo::OBJECT:  {
           ConfigObject cobj;
-          StringList str_v = StringUtil::split(value, ':');
+          StringList str_v = StringUtil::split(value, '/');
           std::string cnodename = nodename;
           std::string ctablename = tablename + "." + name;
           int crevision = revision;

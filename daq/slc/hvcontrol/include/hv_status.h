@@ -5,7 +5,7 @@ extern "C" {
 #include <nsm2/nsm2.h>
 }
 
-#define MAX_HVCHANNELS 20
+#define MAX_HVCHANNELS 200
 
 namespace Belle2 {
 

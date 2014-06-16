@@ -1,0 +1,3 @@
+ nodename,  config, crate, slot, hostname, serialid, copperid,     prpmc,     ttrx, ttrx_firmware,        hslb_a,        hslb_b, hslb_c, hslb_d,   hslb_firmware
+   CPR010, CDC:V03,     1,    1,   cpr010,  E11C046,  cpr5013, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR011, CDC:V03,     1,    2,   cpr011,  E11C021,  cpr5013, RP-2-0081, 1303T156,   tt5r019.bit, HSLB-V3-3-008, HSLB-V3-3-009,      ,      , hslb_rck015.bit

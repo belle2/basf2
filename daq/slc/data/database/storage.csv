@@ -1,2 +1,0 @@
-nodename, config, scriptpath, nworkers, compression, storagein_host, storagein_port, storageout_port, storagerecord_dir
-STORAGE, default, ${BELLE2_LOCAL_DIR}/daq/storage/examples/DataStorager.py, 4, 0, localhost, 3333, 4444, /daq/storage/sroot

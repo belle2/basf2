@@ -54,12 +54,12 @@ bool StoragerCallback::boot() throw()
   for (size_t i = 0; i < 3 + nproc; i++) {
     m_con.push_back(ProcessController(this));
   }
-  m_con[0].init("storagein", sizeof(storage_info) / sizeof(int));
-  m_con[1].init("storagerecord", sizeof(storage_info) / sizeof(int));
-  m_con[2].init("storageout", sizeof(storage_info) / sizeof(int));
+  m_con[0].init("storagein", sizeof(storage_info));
+  m_con[1].init("storagerecord", sizeof(storage_info));
+  m_con[2].init("storageout", sizeof(storage_info));
   for (size_t i = 3; i < m_con.size(); i++) {
     m_con[i].init(StringUtil::form("basf2_%d", i - 3),
-                  sizeof(storage_info) / sizeof(int));
+                  sizeof(storage_info));
   }
 
   const std::string ibuf_name = obj.getText("ibuf_name");

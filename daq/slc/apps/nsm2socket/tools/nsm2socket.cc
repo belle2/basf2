@@ -60,6 +60,7 @@ int main(int argc, char** argv)
     TCPSocket socket;
     try {
       socket = server_socket.accept();
+      socket.print();
     } catch (const IOException& e) {
       LogFile::error("Faield to accept connection.");
       return 1;

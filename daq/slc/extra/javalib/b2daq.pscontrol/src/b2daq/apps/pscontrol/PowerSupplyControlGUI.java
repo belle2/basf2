@@ -33,11 +33,9 @@ public class PowerSupplyControlGUI extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         try {
-            NSM2Socket socket = NSM2Socket.connect((arguments.length>1?arguments[1]:".pscontol.init"),
-                        "localhost", 9090,
-                    "localhost", 8122, "HV_GUI", "ARICH_HV",
-                    new String[]{"ARICH_HV_STATUS:hv_status:1"},
-                    "Login to Belle II Power supply control",
+            NSM2Socket socket = NSM2Socket.connect((arguments.length>1?arguments[1]:".pscontrol.init"),
+                    null, 9090, null, 8122, "HV_GUI", "ARICH_HV",
+                    new String[]{"ARICH_HV_STATUS:hv_status:1"}, "Login to Belle II Power supply control",
                     "NSM set up for power supply");
             if (socket == null) {
                 return;

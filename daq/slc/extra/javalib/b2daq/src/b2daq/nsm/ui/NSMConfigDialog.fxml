@@ -12,7 +12,7 @@
 <?import javafx.scene.control.cell.*?>
 <?import b2daq.nsm.*?>
 
-<VBox prefHeight="261.0" prefWidth="364.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.nsm.ui.NSMConfigDialogController">
+<VBox prefHeight="397.0" prefWidth="468.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.nsm.ui.NSMConfigDialogController">
    <children>
       <GridPane hgap="20.0" layoutY="-4.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="81.0" prefWidth="351.0" vgap="20.0">
          <children>
@@ -60,19 +60,19 @@
             <Insets bottom="10.0" top="10.0" />
          </VBox.margin>
       </HBox>
-      <TableView fx:id="table_nsm" editable="true" prefHeight="141.0" prefWidth="413.0" VBox.vgrow="ALWAYS">
+      <TableView fx:id="table_nsm" editable="true" prefHeight="211.0" prefWidth="448.0" VBox.vgrow="ALWAYS">
          <columns>
-            <TableColumn fx:id="col_nsm_dataname" prefWidth="138.0" text="Data name">
+            <TableColumn fx:id="col_nsm_dataname" prefWidth="170.0" text="Data name">
                <cellValueFactory>
                   <PropertyValueFactory property="dataname" />
                </cellValueFactory>
             </TableColumn>
-            <TableColumn fx:id="col_nsm_format" prefWidth="123.0" text="Format">
+            <TableColumn fx:id="col_nsm_format" prefWidth="171.0" text="Format">
                <cellValueFactory>
                   <PropertyValueFactory property="format" />
                </cellValueFactory>
             </TableColumn>
-            <TableColumn fx:id="col_nsm_revision" prefWidth="79.0" text="Revision">
+            <TableColumn fx:id="col_nsm_revision" prefWidth="105.0" text="Revision">
                <cellValueFactory>
                   <PropertyValueFactory property="revision" />
                </cellValueFactory>
@@ -86,7 +86,7 @@
             <Insets bottom="20.0" />
          </VBox.margin>
       </TableView>
-      <HBox alignment="BOTTOM_CENTER" prefHeight="34.0" prefWidth="413.0">
+      <HBox alignment="BOTTOM_CENTER" prefHeight="13.0" prefWidth="448.0">
          <children>
             <Button fx:id="startButton" mnemonicParsing="false" onAction="#handleCancelButton" prefHeight="32.0" prefWidth="72.0" text="Cancel">
                <HBox.margin>

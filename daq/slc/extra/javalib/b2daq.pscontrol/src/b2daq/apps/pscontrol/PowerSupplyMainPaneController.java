@@ -82,9 +82,9 @@ public class PowerSupplyMainPaneController implements Initializable, NSMObserver
 
     @Override
     public void handleOnConnected() {
-        NSMDataProperty pro = getNSMDataProperties().get(0);
-        NSMListenerService.requestNSMGet(pro.getDataname(),
-                pro.getFormat(), pro.getRevision());
+//        NSMDataProperty pro = getNSMDataProperties().get(0);
+//        NSMListenerService.requestNSMGet(pro.getDataname(),
+//                pro.getFormat(), pro.getRevision());
         NSMConfig config = NSMListenerService.getNSMConfig();
         commandButtonController.set(this);
         psStatusController.setConnected(config);

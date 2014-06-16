@@ -71,7 +71,7 @@ public class RunCommandButtonPaneController implements Initializable {
     private void perform(String reqname) {
         RCCommand cmd = new RCCommand();
         cmd.copy(reqname);
-        if (cmd.equals(Enum.UNKNOWN)) {
+        if (cmd.equals(RCCommand.UNKNOWN)) {
             return;
         }
         String nodename =  NSMListenerService.getNSMConfig().getNsmTarget();

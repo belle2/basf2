@@ -23,6 +23,7 @@ public class DBObjectProperty {
     private final SimpleStringProperty node;
     private final SimpleStringProperty table;
     private final SimpleStringProperty name;
+    private final SimpleIntegerProperty index;
     private final SimpleIntegerProperty id;
     private final SimpleObjectProperty date;
     static private final SimpleDateFormat dateformat = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");//"yyyy/MM/dd HH:mm:ss"
@@ -31,6 +32,7 @@ public class DBObjectProperty {
         this.node = new SimpleStringProperty("");
         this.table = new SimpleStringProperty("");
         this.name = new SimpleStringProperty("");
+        this.index = new SimpleIntegerProperty(0);
         this.id = new SimpleIntegerProperty(0);
         this.date = new SimpleObjectProperty(new Date());
     }
@@ -39,6 +41,7 @@ public class DBObjectProperty {
         this.node = new SimpleStringProperty(node);
         this.table = new SimpleStringProperty(table);
         this.name = new SimpleStringProperty(name);
+        this.index = new SimpleIntegerProperty(0);
         this.id = new SimpleIntegerProperty(id);
         this.date = new SimpleObjectProperty(date);
     }
@@ -63,6 +66,10 @@ public class DBObjectProperty {
         return name.get();
     }
 
+    public int getIndex() {
+        return index.get();
+    }
+
     public int getId() {
         return id.get();
     }
@@ -83,6 +90,10 @@ public class DBObjectProperty {
         this.table.set(table);
     }
 
+    public void setIndex(int id) {
+        this.index.set(id);
+    }
+
     public void setId(int id) {
         this.id.set(id);
     }
@@ -97,6 +108,10 @@ public class DBObjectProperty {
 
     public StringProperty tableProperty() {
         return table;
+    }
+
+    public IntegerProperty indexProperty() {
+        return index;
     }
 
     public IntegerProperty idProperty() {

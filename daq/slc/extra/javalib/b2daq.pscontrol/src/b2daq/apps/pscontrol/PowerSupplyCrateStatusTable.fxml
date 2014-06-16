@@ -9,7 +9,6 @@
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
-<?import b2daq.apps.*?>
 <?import javafx.scene.control.cell.*?>
 <?scenebuilder-classpath-element ../classes?>
 

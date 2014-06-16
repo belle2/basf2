@@ -49,6 +49,7 @@ public class GCircle extends GShape {
     }
 
     public void draw(GraphicsDrawer c) {
+        if (!isVisible()) return;
         c.setLine(getLine());
         c.setFill(getFill());
         c.drawCircle(_x, _y, _r_x, _r_y);

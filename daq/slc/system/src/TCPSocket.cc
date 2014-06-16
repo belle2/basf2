@@ -121,3 +121,26 @@ size_t TCPSocket::read(void* buf, size_t count) throw(IOException)
   }
   return c;
 }
+
+void TCPSocket::print()
+{
+  sockaddr_in sa;
+  memset(&sa, 0, sizeof(sockaddr_in));
+  socklen_t sa_len = sizeof(sa);
+  if (getsockname(m_fd, (struct sockaddr*)&sa, (socklen_t*)&sa_len) != 0) {
+    perror("getsockname");
+  }
+  printf("Local IP address is: %s\n", inet_ntoa(sa.sin_addr));
+  printf("Local port is: %d\n", (int) ntohs(sa.sin_port));
+}
+
+int TCPSocket::getLocalPort()
+{
+  sockaddr_in sa;
+  memset(&sa, 0, sizeof(sockaddr_in));
+  socklen_t sa_len = sizeof(sa);
+  if (getsockname(m_fd, (struct sockaddr*)&sa, (socklen_t*)&sa_len) != 0) {
+    return 0;
+  }
+  return ntohs(sa.sin_port);
+}

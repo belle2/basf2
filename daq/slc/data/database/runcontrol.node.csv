@@ -1,4 +1,4 @@
- nodename,     config, used,                  runtype, type, dbmode, sequential
- ARICH_RC,    default, true, CPR010:copper:1:default,  daq,    set,       true
- ARICH_RC,    default, true, CPR011:copper:1:default,  daq,    set,       true
- ARICH_RC,    default, true,   ROPC01:ropc:1:default,  daq,    set,       true
+ nodename,  config, used,                   runtype, type, dbmode, sequential
+   CDC_RC, default, true,   CPR010/copper/1/CDC:V03,  daq,    set,       true
+   CDC_RC, default, true,   CPR011/copper/1/CDC:V03,  daq,    set,       true
+   CDC_RC, default, true, ROPC01/ropc/1/CDC:default,  daq,    set,       true

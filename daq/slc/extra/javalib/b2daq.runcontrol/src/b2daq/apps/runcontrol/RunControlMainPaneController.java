@@ -5,20 +5,20 @@
  */
 package b2daq.apps.runcontrol;
 
-import b2daq.ui.NetworkConfigPaneController;
-import b2daq.logger.core.LogMessage;
-import b2daq.logger.ui.LogViewPaneController;
-import b2daq.nsm.NSMObserver;
-import b2daq.nsm.NSMListenerService;
 import b2daq.core.LogLevel;
 import b2daq.database.ConfigObject;
+import b2daq.logger.core.LogMessage;
+import b2daq.logger.ui.LogViewPaneController;
 import b2daq.nsm.NSMCommand;
 import b2daq.nsm.NSMConfig;
 import b2daq.nsm.NSMData;
 import b2daq.nsm.NSMDataProperty;
+import b2daq.nsm.NSMListenerService;
 import b2daq.nsm.NSMMessage;
+import b2daq.nsm.NSMObserver;
 import b2daq.runcontrol.core.RCCommand;
 import b2daq.runcontrol.core.RCState;
+import b2daq.ui.NetworkConfigPaneController;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -30,6 +30,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -51,6 +53,12 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
     private RunStateLabelController rcStateController;
     @FXML
     private NetworkConfigPaneController networkconfigController;
+    @FXML
+    private CopperEditorController copperEditorController;
+    
+    private final HashMap<String, DataFlowMonitorController> flowmonitors = new HashMap<>();
+    @FXML
+    private TabPane tabpane_mon;
     @FXML
     private Label label_rcnode;
     @FXML
@@ -128,6 +136,10 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
         rcStateController = new RunStateLabelController(rect_rc, text_rc);
         rcStateController.setVisible(true);
         logviewController.add(new LogMessage("LOCAL", LogLevel.INFO, "GUI opened"));
+//        Tab tab = new Tab();
+//        tab.setText("Summary");
+//        tab.setContent(DataFlowSummaryController.create("").getPane());
+//        tabpane_mon.getTabs().add(tab);
     }
 
     @Override
@@ -135,7 +147,7 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
         NSMDataProperty pro = getNSMDataProperties().get(0);
         NSMListenerService.requestNSMGet(pro.getDataname(),
                 pro.getFormat(), pro.getRevision());
-        NSMConfig config =  NSMListenerService.getNSMConfig();
+        NSMConfig config = NSMListenerService.getNSMConfig();
         label_rcnode.setText(config.getNsmTarget());
         rcStateController.setFont(Color.BLACK);
         commandButtonController.set(this);
@@ -180,30 +192,57 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
         } else if (command.equals(NSMCommand.DBSET)) {
             ConfigObject cobj = NSMListenerService.getDB(msg.getNodeName());
             if (cobj != null) {
-                label_runtype.setText(cobj.getName());
+                //cobj.print();
+                copperEditorController.handleOnReceived(msg);
                 networkconfigController.add(cobj);
-                if (cobj.hasObject("node")) {
-                    int count = 0;
-                    for (ConfigObject obj : cobj.getObjects("node")) {
-                        String name = obj.getObject("runtype").getNode();
-                        if (label_v[count] != null) {
-                            label_v[count].setText(name);
-                        }   
-                        if (statelabel_v[count] != null) {
-                            statelabel_v[count].setFont(Color.BLACK);
-                            statelabel_v[count].set(name, logviewController);
-                            label_m.put(name, statelabel_v[count]);
+                if (cobj.getTable().matches("runcontrol")) {
+                    label_runtype.setText(cobj.getName());
+                    if (cobj.hasObject("node")) {
+                        int count = 0;
+                        for (ConfigObject obj : cobj.getObjects("node")) {
+                            String name = obj.getObject("runtype").getNode();
+                            if (label_v[count] != null) {
+                                label_v[count].setText(name);
+                            }
+                            if (statelabel_v[count] != null) {
+                                statelabel_v[count].setFont(Color.BLACK);
+                                statelabel_v[count].set(name, logviewController);
+                                label_m.put(name, statelabel_v[count]);
+                            }
+                            count++;
+                            System.out.println(name+":"+obj.getObject("runtype").getId());
+                            NSMListenerService.requestDBGet(name, obj.getObject("runtype").getId());
                         }
-                        count++;
                     }
                 }
             }
         } else if (command.equals(NSMCommand.NSMSET)) {
-            String dataname = getNSMDataProperties().get(0).getDataname();
+            String dataname = msg.getNodeName();
+            NSMData data = NSMListenerService.getData(dataname);
+            Tab tab = null;
+            String nodename = msg.getNodeName().replace("STATUS_", "");
+            for (Tab t : tabpane_mon.getTabs()) {
+                if (data.getFormat().matches("ronode_status")
+                        && t.getText().matches(nodename)) {
+                    tab = t;
+                    flowmonitors.get(nodename).handleOnReceived(msg);
+                    break;
+                }
+            }
+            if (data.getFormat().matches("ronode_status") && tab == null) {
+                DataFlowMonitorController flowmonitor = DataFlowMonitorController.create(nodename);
+                tab = new Tab();
+                tab.setText(flowmonitor.getNodeName());
+                tab.setContent(flowmonitor.getPane());
+                tab.setClosable(false);
+                tabpane_mon.getTabs().add(tab);
+                flowmonitors.put(nodename, flowmonitor);
+            }
+            dataname = getNSMDataProperties().get(0).getDataname();
             if (dataname.matches(msg.getNodeName())) {
-                NSMData data = NSMListenerService.getData(dataname);
+                data = NSMListenerService.getData(dataname);
                 networkconfigController.add(data);
-                NSMConfig config =  NSMListenerService.getNSMConfig();
+                NSMConfig config = NSMListenerService.getNSMConfig();
                 ConfigObject cobj = NSMListenerService.getDB(config.getNsmTarget());
                 label_runnum.setText(String.format("%04d.%04d.%03d",
                         data.getInt("expno"), data.getInt("runno"),
@@ -216,7 +255,7 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
                 } else {
                     label_starttime.setText("---- / -- / --  -- : -- : --");
                 }
-                
+
                 if (cobj == null) {
                     NSMListenerService.requestDBGet(config.getNsmTarget(),
                             data.getInt("configid", 0));
@@ -264,9 +303,10 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
     @Override
     public void handleOnDisConnected() {
     }
-        
+
     @Override
-    public void log(LogMessage log) {
+    public void log(LogMessage log
+    ) {
         logviewController.add(log);
     }
 

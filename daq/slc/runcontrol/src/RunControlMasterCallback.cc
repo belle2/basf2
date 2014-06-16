@@ -120,7 +120,9 @@ bool RunControlMasterCallback::log() throw()
     DAQLogMessage log(nodename,
                       (LogFile::Priority)msg.getParam(0),
                       ss.str(), Date(msg.getParam(1)));
+    getDB()->connect();
     LoggerObjectTable(getDB()).add(log, true);
+    getDB()->close();
     NSMCommunicator& com(*getCommunicator());
     com.sendLog(log);
   }

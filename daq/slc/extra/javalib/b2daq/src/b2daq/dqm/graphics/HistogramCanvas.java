@@ -213,6 +213,12 @@ public class HistogramCanvas extends GRect {
             histo.getDrawer().setCanvas(this);
             histo.getDrawer().update();
         });
+        if (legend != null && 
+                legend.getHistograms().size() == 0) {
+            for (Histo histo : histograms) {
+                legend.add(histo);
+            }
+         }
         if (stat && _stat_histo != null) {
             if (_stat_rect == null) {
                 _stat_rect = new GRect(0.71, 0.02, 0.28, 0.12, Color.WHITE, Color.BLACK);
@@ -436,4 +442,21 @@ public class HistogramCanvas extends GRect {
     public void setxPanel(CanvasPanel panel) {
         this.panel = panel;
     }
+    
+    public String getXLabelAlignment() {
+        return axisx.getLabelAlignment();
+    }
+    
+    public String getYLabelAlignment() {
+        return axisy.getLabelAlignment();
+    }
+    
+    public void setXLabelAlignment(String align) {
+        axisx.setLabelAlignment(align);
+    }
+    
+    public void setYLabelAlignment(String align) {
+        axisy.setLabelAlignment(align);
+    }
+        
 }

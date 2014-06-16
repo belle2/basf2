@@ -8,6 +8,7 @@ public class NSMCommand extends Enum {
     final static public int ENABLED = 1;
     final static public int SUGGESTED = 2;
 
+    final static public NSMCommand UNKNOWN = new NSMCommand(0, "UNKNOWN");
     final static public NSMCommand OK = new NSMCommand(1, "OK");
     final static public NSMCommand ERROR = new NSMCommand(2, "ERROR");//param[0] : command if >0
     final static public NSMCommand LOG = new NSMCommand(3, "LOG");

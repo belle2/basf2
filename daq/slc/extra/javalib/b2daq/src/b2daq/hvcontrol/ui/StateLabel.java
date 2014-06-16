@@ -38,9 +38,10 @@ public final class StateLabel extends Pane {
     public final void repaint() {
         double width = getWidth();
         double height = getHeight();
+        GraphicsContext c = canvas.getGraphicsContext2D();
+        c.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         canvas.setWidth(width);
         canvas.setHeight(height);
-        GraphicsContext c = canvas.getGraphicsContext2D();
         c.setFill(fill);
         c.fillRoundRect(5, 5, width - 10, height - 10, 4, 4);
         c.setStroke(line);

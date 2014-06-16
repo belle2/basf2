@@ -198,6 +198,7 @@ public class NSMListenerService extends Thread {
                     m_data_m.put(msg.getNodeName(), data);
                 }
                 msg.getData(data);
+                //data.print();
             }
         }
         return msg;
@@ -205,16 +206,26 @@ public class NSMListenerService extends Thread {
 
     private static void handleOnConnected() {
         Platform.runLater(() -> {
-            m_observer.stream().forEach((obs) -> {
-                obs.handleOnConnected();
-            });
+            for (NSMObserver obs : m_observer) {
+                try {
+                    obs.handleOnConnected();
+                } catch (Exception e) {
+                    log(new LogMessage("LOCAL", LogLevel.ERROR,
+                            "Internal exception " + e.getMessage()));
+                }
+            }
         });
     }
 
     private static void handleOnReceived(final NSMMessage msg) {
         Platform.runLater(() -> {
             for (NSMObserver obs : m_observer) {
-                obs.handleOnReceived(msg);
+                try {
+                    obs.handleOnReceived(msg);
+                } catch (Exception e) {
+                    log(new LogMessage("LOCAL", LogLevel.ERROR,
+                            "Internal exception " + e.getMessage()));
+                }
             }
         });
     }
@@ -222,7 +233,12 @@ public class NSMListenerService extends Thread {
     private static void handleOnDisConnected() {
         Platform.runLater(() -> {
             for (NSMObserver obs : m_observer) {
-                obs.handleOnDisConnected();
+                try {
+                    obs.handleOnDisConnected();
+                } catch (Exception e) {
+                    log(new LogMessage("LOCAL", LogLevel.ERROR,
+                            "Internal exception " + e.getMessage()));
+                }
             }
         });
     }

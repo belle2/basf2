@@ -1,10 +1,10 @@
 package b2daq.hvcontrol.core;
 
-import b2daq.logger.core.LogMessage;
 import b2daq.nsm.NSMState;
 
 public class HVState extends NSMState {
 
+    final static public HVState UNKNOWN = new HVState(0, "UNKNOWN");
     final static public HVState OFF_S = new HVState(2, "OFF");
     final static public HVState STABLE_S = new HVState(11, "STABLE");
     final static public HVState STANDBY_S = new HVState(12, "STANDBY");

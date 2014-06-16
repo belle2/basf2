@@ -76,6 +76,9 @@ public class GColorAxis extends GAxisY {
     }
 
     public ObservableList<Paint> getColorPattern() {
+        if (colorPattern.size() == 0) {
+            colorPattern.setAll(COLOR_LIST);
+        }
         return colorPattern;
     }
 

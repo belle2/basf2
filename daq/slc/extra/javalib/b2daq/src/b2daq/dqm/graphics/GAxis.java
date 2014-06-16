@@ -55,6 +55,7 @@ public abstract class GAxis extends GShape {
     protected GLine border_line0 = new GLine(0, 0, 0, 0, Color.BLACK);
     protected GLine border_line1 = new GLine(0, 0, 0, 0, Color.BLACK);
     protected String label_align;
+    protected String label_position;
     private String time_format = "";
     private int ndivisions = 10;
 
@@ -231,13 +232,13 @@ public abstract class GAxis extends GShape {
         time_scale = scale;
         switch (time_scale) {
             case TIME_SCALE_SEC:
-                ndivisions = 6;
+                ndivisions = 5;
                 break;
             case TIME_SCALE_MIN:
-                ndivisions = 6;
+                ndivisions = 10;
                 break;
             case TIME_SCALE_HOUR:
-                ndivisions = 6;
+                ndivisions = 10;
                 break;
         }
     }
@@ -364,13 +365,13 @@ public abstract class GAxis extends GShape {
             double range = axis.getMax() - axis.getMin();
             String format = "HH:mm:ss";
             double time_base = update_time - time_max * 1000;
-            if (range >= 60 * 60 * 24 * 6) {
+            if (range >= 60 * 60 * 24 * 2) {
                 format = "M/d";
                 dx = 300 * 24;
-            } else if (range > 60 * 60 * 6) {
+            } else if (range > 60 * 60 * 2) {
                 format = "M/d HH:mm";
                 dx = 300 * 2;
-            } else if (range > 60 * 5) {
+            } else if (range > 60 * 2) {
                 format = "HH:mm";
                 dx = 60;
             } else if (range > 10) {
@@ -385,7 +386,7 @@ public abstract class GAxis extends GShape {
             }
             double x = time_max;
             int n = 0;
-            while (x > 0) {
+            while (x >= 0) {
                 if (n % ndivisions == 0) {
                     if (auto_label) {
                         String s = canvas.getTime((long) (time_base + x * 1000), format);

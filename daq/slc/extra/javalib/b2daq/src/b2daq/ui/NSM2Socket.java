@@ -14,6 +14,8 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,6 +36,16 @@ public class NSM2Socket {
             } catch (Exception e) {
             }
             if (!file.hasKey("hostname")) {
+                if (hostname == null) {
+                    try {
+                        hostname = InetAddress.getLocalHost().getHostName();
+                    } catch (UnknownHostException e) {
+                        hostname = "localhost";
+                    }
+                }
+                if (nsmhost == null) {
+                    nsmhost = hostname;
+                }
                 file.add("hostname", hostname);
                 file.add("port", "" + port);
                 file.add("nsmhost", nsmhost);
@@ -41,7 +53,7 @@ public class NSM2Socket {
                 file.add("nsmnode", nsmnode);
                 file.add("nsmtarget", nsmtarget);
                 for (int i = 0; i < data.length; i++) {
-                    String [] str = data[i].split(":");
+                    String[] str = data[i].split(":");
                     System.out.println(data[i]);
                     if (str.length > 2) {
                         file.add(String.format("data%02d.dataname", i), str[0]);
@@ -56,6 +68,7 @@ public class NSM2Socket {
             if (config == null) {
                 return null;
             }
+            nsmtarget = file.getString("nsmtarget");
             ArrayList<NSMDataProperty> datalist = new ArrayList<>();
             for (int i = 0; i < file.getKeyList().size(); i++) {
                 String label = String.format("data%02d", i);
@@ -103,7 +116,12 @@ public class NSM2Socket {
         this.netconfig = netconfig;
     }
 
-    public NSMConfig getConfig() { return config; }
-    public NSMConfigDialogController getNSMConfig() { return netconfig; }
+    public NSMConfig getConfig() {
+        return config;
+    }
+
+    public NSMConfigDialogController getNSMConfig() {
+        return netconfig;
+    }
 
 }

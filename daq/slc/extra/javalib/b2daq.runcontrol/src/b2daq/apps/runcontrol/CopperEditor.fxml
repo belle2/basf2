@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<VBox fx:id="vbox" prefHeight="505.0" prefWidth="878.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.apps.runcontrol.CopperEditorController">
+    <children>
+        <HBox alignment="CENTER_LEFT" prefHeight="52.0" prefWidth="796.0" spacing="10.0">
+            <children>
+                <Label text="Select configuration" />
+                <ComboBox fx:id="combo" prefWidth="150.0" promptText="---" />
+                <Button fx:id="button_reload" mnemonicParsing="false" text="Reload">
+                    <font>
+                        <Font size="12.0" />
+                    </font>
+                </Button>
+                <Button fx:id="create_button" mnemonicParsing="false" text="Create config">
+                    <HBox.margin>
+                        <Insets left="30.0" />
+                    </HBox.margin>
+                </Button>
+                <Label fx:id="label_message">
+                    <HBox.margin>
+                        <Insets left="20.0" />
+                    </HBox.margin>
+                </Label>
+                <HBox alignment="CENTER_RIGHT" nodeOrientation="LEFT_TO_RIGHT" spacing="10.0">
+                    <children>
+                        <Button fx:id="button_add_channel" mnemonicParsing="false" text="Add COPPER">
+                            <HBox.margin>
+                                <Insets left="10.0" right="5.0" />
+                            </HBox.margin>
+                        </Button>
+                        <Button fx:id="button_multiedit" mnemonicParsing="false" text="Add FEE">
+                            <HBox.margin>
+                                <Insets right="5.0" />
+                            </HBox.margin>
+                        </Button>
+                        <Button fx:id="button_multiedit1" mnemonicParsing="false" prefHeight="23.0" prefWidth="91.0" text="Add Param">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                            <HBox.margin>
+                                <Insets right="5.0" />
+                            </HBox.margin>
+                        </Button>
+                    </children>
+                </HBox>
+            </children>
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="5.0" />
+            </padding>
+        </HBox>
+        <TabPane prefHeight="365.0" prefWidth="616.0" VBox.vgrow="ALWAYS">
+            <tabs>
+                <Tab closable="false" text="Config">
+                    <content>
+                        <TableView fx:id="table_config" layoutX="21.0" layoutY="-10.0" prefHeight="365.0" prefWidth="546.0" tableMenuButtonVisible="true">
+                            <columns>
+                                <TableColumn fx:id="col_config_node" prefWidth="76.0" text="Node">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="node" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn fx:id="col_config_copperid" prefWidth="104.0" text="COPPER ID">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="copperID" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn fx:id="col_config_hslba" prefWidth="70.0" text="HSLB:a">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="hslbA" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn fx:id="col_config_hslbb" prefWidth="67.0" text="HSLB:b">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="hslbB" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn fx:id="col_config_hslbc" prefWidth="67.0" text="HSLB:c">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="hslbC" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn fx:id="col_config_hslbd" prefWidth="69.0" text="HSLB:d">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="hslbD" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn fx:id="col_config_script" prefWidth="138.0" text="Basf2 R/O">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="basf2script" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn fx:id="col_config_dma" prefWidth="85.0" text="DMA limit">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="dmaLimit" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn prefWidth="190.0" text="Event builder 0">
+                                    <columns>
+                                        <TableColumn fx:id="col_config_eb0_host" prefWidth="100.0" text="Host">
+                                            <cellValueFactory>
+                                                <PropertyValueFactory property="eb0Host" />
+                                            </cellValueFactory>
+                                        </TableColumn>
+                                        <TableColumn fx:id="col_config_eb0_port" prefWidth="90.0" text="Port">
+                                            <cellValueFactory>
+                                                <PropertyValueFactory property="eb0Port" />
+                                            </cellValueFactory>
+                                        </TableColumn>
+                                    </columns>
+                                </TableColumn>
+                            </columns>
+                            <padding>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="8.0" />
+                            </padding>
+                        </TableView>
+                    </content>
+                </Tab>
+                <Tab closable="false" text="Setup">
+                    <content>
+                          <TableView fx:id="table_setup" layoutX="21.0" layoutY="-10.0" prefWidth="1200.0" tableMenuButtonVisible="true">
+                              <columns>
+                                  <TableColumn fx:id="col_setup_node" prefWidth="102.0" text="Node">
+                                      <cellValueFactory>
+                                          <PropertyValueFactory property="node" />
+                                      </cellValueFactory>
+                                  </TableColumn>
+                                  <TableColumn fx:id="col_setup_copperid" prefWidth="102.0" text="COPPER ID">
+                                      <cellValueFactory>
+                                          <PropertyValueFactory property="copperID" />
+                                      </cellValueFactory>
+                                  </TableColumn>
+                                  <TableColumn fx:id="col_setup_hostname" prefWidth="87.0" text="Hostname">
+                                      <cellValueFactory>
+                                          <PropertyValueFactory property="hostname" />
+                                      </cellValueFactory>
+                                  </TableColumn>                                        
+                                  <TableColumn fx:id="col_setup_crate" prefWidth="60.0" text="Crate">
+                                      <cellValueFactory>
+                                          <PropertyValueFactory property="crate" />
+                                      </cellValueFactory>
+                                  </TableColumn>
+                                  <TableColumn fx:id="col_setup_slot" prefWidth="65.0" text="Slot">
+                                      <cellValueFactory>
+                                          <PropertyValueFactory property="slot" />
+                                      </cellValueFactory>
+                                  </TableColumn>
+                                  <TableColumn fx:id="col_setup_serialid" prefWidth="88.0" text="S/N">
+                                      <cellValueFactory>
+                                          <PropertyValueFactory property="serialID" />
+                                      </cellValueFactory>
+                                  </TableColumn>
+                                  <TableColumn fx:id="col_setup_prpmc" prefWidth="114.0" text="PrPMC S/N">
+                                      <cellValueFactory>
+                                          <PropertyValueFactory property="prpmc" />
+                                      </cellValueFactory>
+                                  </TableColumn>
+                                  <TableColumn prefWidth="102.0" text="TTRX">
+                                      <columns>
+                                          <TableColumn fx:id="col_setup_ttrx" prefWidth="116.0" text="S/N">
+                                              <cellValueFactory>
+                                                  <PropertyValueFactory property="ttrx" />
+                                              </cellValueFactory>
+                                          </TableColumn>
+                                          <TableColumn fx:id="col_setup_ttrxfirm" prefWidth="116.0" text="Firmware">
+                                              <cellValueFactory>
+                                                  <PropertyValueFactory property="ttrxFirmware" />
+                                              </cellValueFactory>
+                                          </TableColumn>
+                                      </columns>
+                                  </TableColumn>
+                                  <TableColumn prefWidth="93.0" text="HSLB">
+                                      <columns>
+                                          <TableColumn fx:id="col_setup_hslba" prefWidth="93.0" text="Slot a">
+                                              <cellValueFactory>
+                                                  <PropertyValueFactory property="hslbA" />
+                                              </cellValueFactory>
+                                          </TableColumn>
+                                          <TableColumn fx:id="col_setup_hslbb" prefWidth="93.0" text="Slot b">
+                                              <cellValueFactory>
+                                                  <PropertyValueFactory property="hslbB" />
+                                              </cellValueFactory>
+                                          </TableColumn>
+                                          <TableColumn fx:id="col_setup_hslbc" prefWidth="93.0" text="Slot c">
+                                              <cellValueFactory>
+                                                  <PropertyValueFactory property="hslbC" />
+                                              </cellValueFactory>
+                                          </TableColumn>
+                                          <TableColumn fx:id="col_setup_hslbd" prefWidth="93.0" text="Slot d">
+                                              <cellValueFactory>
+                                                  <PropertyValueFactory property="hslbD" />
+                                              </cellValueFactory>
+                                          </TableColumn>
+                                          <TableColumn fx:id="col_setup_hslbfirm" prefWidth="93.0" text="Firmware">
+                                              <cellValueFactory>
+                                                  <PropertyValueFactory property="hslbFirmware" />
+                                              </cellValueFactory>
+                                          </TableColumn>
+                                      </columns>
+                                  </TableColumn>
+                              </columns>
+                              <padding>
+                                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                              </padding>
+                          </TableView>
+                    </content>
+                </Tab>
+                <Tab closable="false" text="FEE">
+                    <content>
+                        <TableView fx:id="table_fee" layoutX="21.0" layoutY="-10.0" prefHeight="332.0" prefWidth="1057.0" tableMenuButtonVisible="true">
+                            <columns>
+                                <TableColumn fx:id="col_fee_node" prefWidth="102.0" text="Node">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="node" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn fx:id="col_fee_copperid" prefWidth="149.0" text="COPPER ID">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="copperID" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn fx:id="col_fee_slot" prefWidth="125.0" text="HSLB slot">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="slot" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn fx:id="col_fee_board" prefWidth="151.0" text="Board type">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="board" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn fx:id="col_fee_firmware" prefWidth="156.0" text="Firemware">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="firmware" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn fx:id="col_fee_used" prefWidth="57.0" text="Used">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="used" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                            </columns>
+                            <padding>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                            </padding>
+                        </TableView>
+                    </content>
+                </Tab>
+                <Tab closable="false" text="Parameter">
+                    <content>
+                        <VBox>
+                            <children>
+                                <TableView fx:id="table_param" layoutX="21.0" layoutY="-10.0" prefHeight="332.0" prefWidth="605.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="col_param_node" prefWidth="102.0" text="Node">
+                                            <cellValueFactory>
+                                                <PropertyValueFactory property="node" />
+                                            </cellValueFactory>
+                                        </TableColumn>
+                                        <TableColumn fx:id="col_param_copperid" prefWidth="102.0" text="COPPER ID">
+                                            <cellValueFactory>
+                                                <PropertyValueFactory property="copperID" />
+                                            </cellValueFactory>
+                                        </TableColumn>
+                                        <TableColumn fx:id="col_param_slot" prefWidth="75.0" text="HSLB slot">
+                                            <cellValueFactory>
+                                                <PropertyValueFactory property="slot" />
+                                            </cellValueFactory>
+                                        </TableColumn>
+                                        <TableColumn fx:id="col_param_board" prefWidth="102.0" text="Board type">
+                                            <cellValueFactory>
+                                                <PropertyValueFactory property="board" />
+                                            </cellValueFactory>
+                                        </TableColumn>
+                                        <TableColumn fx:id="col_param_regisger" prefWidth="99.0" text="Register">
+                                            <cellValueFactory>
+                                                <PropertyValueFactory property="paramName" />
+                                            </cellValueFactory>
+                                        </TableColumn>
+                                        <TableColumn fx:id="col_param_address" prefWidth="102.0" text="Address">
+                                            <cellValueFactory>
+                                                <PropertyValueFactory property="address" />
+                                            </cellValueFactory>
+                                        </TableColumn>
+                                        <TableColumn fx:id="col_param_index" prefWidth="63.0" text="index">
+                                            <cellValueFactory>
+                                                <PropertyValueFactory property="arrayIndex" />
+                                            </cellValueFactory>
+                                        </TableColumn>
+                                        <TableColumn fx:id="col_param_value" prefWidth="126.0" text="Value">
+                                            <cellValueFactory>
+                                                <PropertyValueFactory property="value" />
+                                            </cellValueFactory>
+                                        </TableColumn>
+                                    </columns>
+                                    <padding>
+                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                    </padding>
+                                </TableView>
+                            </children>
+                        </VBox>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </children>
+</VBox>

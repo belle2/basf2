@@ -9,14 +9,14 @@ using namespace Belle2;
 size_t RunInfoBuffer::size() throw()
 {
   return m_mutex.size() + m_cond.size() +
-         sizeof(unsigned int) * (5 + m_nreserved);
+         sizeof(unsigned int) * 5 + m_bufsize;
 }
 
 bool RunInfoBuffer::open(const std::string& nodename,
-                         int nreserved, bool recreate)
+                         int bufsize, bool recreate)
 {
   m_nodename = nodename;
-  m_nreserved = nreserved;
+  m_bufsize = bufsize;
   std::string username = getenv("USER");
   m_path = "/run_info_" + username + "_" + nodename;
   //if (recreate) SharedMemory::unlink(_path);
@@ -43,7 +43,7 @@ bool RunInfoBuffer::init()
   if (m_buf == NULL) return false;
   m_mutex.init();
   m_cond.init();
-  memset(m_buf, 0, sizeof(unsigned int) * (5 + m_nreserved));
+  memset(m_buf, 0, sizeof(unsigned int) * 5 + m_bufsize);
   return true;
 }
 
@@ -51,7 +51,7 @@ void RunInfoBuffer::clear()
 {
   if (m_buf == NULL) return;
   m_mutex.lock();
-  memset(m_buf, 0, sizeof(unsigned int) * (5 + m_nreserved));
+  memset(m_buf, 0, sizeof(unsigned int) * 5 + m_bufsize);
   m_mutex.unlock();
 }
 

@@ -40,6 +40,7 @@ public class GRect extends GShape {
 
     @Override
     public void draw(GraphicsDrawer c) {
+        if (!isVisible()) return;
         c.setLine(getLine());
         c.setFill(getFill());
         c.drawRect(x, y, width, height);

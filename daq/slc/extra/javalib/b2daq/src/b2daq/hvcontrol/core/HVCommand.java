@@ -4,6 +4,7 @@ import b2daq.nsm.NSMCommand;
 
 public class HVCommand extends NSMCommand {
 
+        final static public HVCommand UNKNOWN = new HVCommand(0, "UNKNOWN");
         final static public HVCommand CONFIGURE = new HVCommand(101, "CONFIGURE");
         final static public HVCommand TURNON = new HVCommand(102, "TURNON");
         final static public HVCommand TURNOFF = new HVCommand(103, "TURNOFF");
@@ -25,6 +26,7 @@ public class HVCommand extends NSMCommand {
 		copy(command);
 	}
 
+        @Override
 	public boolean copy(String msg) {
 		if (super.copy(msg)) { return true; }
 		else if (msg.equals(CONFIGURE.getLabel())) { copy(CONFIGURE); return true; } 
@@ -38,6 +40,7 @@ public class HVCommand extends NSMCommand {
 		return false;
 	}
 
+        @Override
 	public boolean copy(int id) {
 		if (super.copy(id)) { return true; }
 		else if (id == CONFIGURE.getId()) { copy(CONFIGURE); return true; } 

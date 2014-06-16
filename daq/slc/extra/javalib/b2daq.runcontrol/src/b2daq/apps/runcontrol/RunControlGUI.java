@@ -33,9 +33,8 @@ public class RunControlGUI extends Application {
     @Override
     public void start(Stage stage) {
         try {
-            NSM2Socket socket = NSM2Socket.connect((arguments.length>1?arguments[1]:".runcontol.init"),
-                    "localhost", 9090,
-                    "localhost", 8122, "RC_GUI", "ARICH_RC", 
+            NSM2Socket socket = NSM2Socket.connect((arguments.length>1?arguments[1]:".runcontrol.init"),
+                    null, 9090, null, 8122, "RC_GUI", "ARICH_RC", 
                     new String [] {"ARICH_RC_STATUS:rc_status:1"},
                     "Login to Belle II Run control", 
                     "NSM set up for run control");
@@ -57,6 +56,7 @@ public class RunControlGUI extends Application {
             NSMListenerService.restart();
             Scene scene = new Scene(root);
             scene.getStylesheets().add(LogMessage.getCSSPath());
+            scene.getStylesheets().add(DataFlowMonitorController.class.getResource("DataFlowMonitor.css").toExternalForm());
             stage.setTitle("Belle II Run Control GUI");
             stage.getIcons().add(new Image(RunControlGUI.class.getResource("runcontrol.png").toExternalForm()));
             stage.setScene(scene);

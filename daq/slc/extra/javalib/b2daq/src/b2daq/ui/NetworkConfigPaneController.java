@@ -209,6 +209,12 @@ public class NetworkConfigPaneController implements Initializable, NSMObserver {
     @Override
     public void handleOnConnected() {
         setState(true, true);
+        for (NSMDataProperty pro : getNSMDataProperties()) {
+            System.out.println(pro.getDataname()+" "+
+            pro.getFormat() +" "+ pro.getRevision());
+            NSMListenerService.requestNSMGet(pro.getDataname(),
+            pro.getFormat(), pro.getRevision());    
+        }
     }
 
     @Override

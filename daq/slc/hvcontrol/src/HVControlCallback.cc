@@ -23,6 +23,7 @@ throw() : HVCallback(node), m_db(NULL),
   m_data(node.getName() + "_STATUS",
          "hv_status", hv_status_revision)
 {
+  m_default_config = "default";
 }
 
 HVControlCallback::~HVControlCallback() throw()
@@ -31,13 +32,14 @@ HVControlCallback::~HVControlCallback() throw()
 
 void HVControlCallback::init() throw()
 {
+  initialize();
   NSMCommunicator* comm = getCommunicator();
   hv_status* status = (hv_status*)m_data.allocate(comm);
   if (m_db != NULL) {
     m_db->connect();
     ConfigObjectTable table(m_db);
     std::string nodename = getNode().getName();
-    ConfigObject obj(table.get("default", nodename));
+    ConfigObject obj(table.get(m_default_config, nodename));
     status->configid = obj.getId();
     m_config.set(obj);
     for (size_t i = 0; i < m_config.getNChannels(); i++) {
@@ -46,7 +48,6 @@ void HVControlCallback::init() throw()
     m_db->close();
   }
   PThread(new HVNodeMonitor(this));
-  initialize();
 }
 
 bool HVControlCallback::config() throw()

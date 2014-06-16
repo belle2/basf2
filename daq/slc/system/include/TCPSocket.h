@@ -28,6 +28,8 @@ namespace Belle2 {
     int connect() throw(IOException);
     int connect(const std::string& ip, unsigned short port) throw(IOException);
     void setBufferSize(int size) throw(IOException);
+    void print();
+    int getLocalPort();
 
   public:
     virtual size_t write(const void* v, size_t count) throw(IOException);

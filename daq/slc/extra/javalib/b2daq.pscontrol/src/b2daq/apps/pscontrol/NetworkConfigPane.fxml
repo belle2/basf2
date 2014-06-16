@@ -61,7 +61,7 @@
                         </VBox>
                     </content>
                 </TitledPane>
-                <TitledPane animated="false" maxHeight="1.7976931348623157E308" prefHeight="361.0" prefWidth="392.0" text="Database access">
+                <TitledPane animated="false" maxHeight="1.7976931348623157E308" prefHeight="287.0" prefWidth="392.0" text="Database access" VBox.vgrow="ALWAYS">
                     <content>
                         <VBox prefHeight="247.0" prefWidth="390.0">
                             <children>
@@ -94,17 +94,17 @@
                                 </Label>
                                 <TableView fx:id="table_db" prefHeight="210.0" prefWidth="370.0" VBox.vgrow="ALWAYS">
                                     <columns>
-                                        <TableColumn fx:id="col_db_node" prefWidth="117.0" text="Node">
+                                        <TableColumn fx:id="col_db_node" prefWidth="106.0" text="Node">
                                             <cellValueFactory>
                                                 <PropertyValueFactory property="node" />
                                             </cellValueFactory>
                                         </TableColumn>
-                                        <TableColumn fx:id="col_db_table" prefWidth="96.0" text="Table">
+                                        <TableColumn fx:id="col_db_table" prefWidth="103.0" text="Table">
                                             <cellValueFactory>
                                                 <PropertyValueFactory property="table" />
                                             </cellValueFactory>
                                         </TableColumn>
-                                        <TableColumn fx:id="col_db_name" prefWidth="111.0" text="Title">
+                                        <TableColumn fx:id="col_db_name" prefWidth="115.0" text="Title">
                                             <cellValueFactory>
                                                 <PropertyValueFactory property="name" />
                                             </cellValueFactory>
@@ -129,7 +129,7 @@
                 </TitledPane>
             </children>
         </VBox>
-        <VBox prefHeight="528.0" prefWidth="437.0">
+        <VBox prefHeight="528.0" prefWidth="437.0" HBox.hgrow="ALWAYS">
             <children>
                 <TitledPane maxHeight="1.7976931348623157E308" text="NSM2" VBox.vgrow="ALWAYS">
                     <content>
@@ -158,9 +158,9 @@
                                         <TextField fx:id="field_nsm_host" editable="false" maxWidth="200.0" promptText="hostname for nsm2" text="b2slow2.kek.jp" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                         <TextField fx:id="field_nsm_port" editable="false" maxWidth="200.0" promptText="port for nsm2" text="8122" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                         <Label text="Port" GridPane.rowIndex="2" />
-                                        <TextField fx:id="field_nsm_node" editable="false" maxWidth="200.0" promptText="Node name for GUI" text="NSM_KONNO" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                        <TextField fx:id="field_nsm_node" editable="false" maxWidth="200.0" promptText="Node name for GUI" text="NSMGUI" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                         <Label text="Target node name" GridPane.rowIndex="4" />
-                                        <TextField fx:id="field_nsm_target" editable="false" maxWidth="200.0" promptText="NSM client node" text="ARICH_RC" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                        <TextField fx:id="field_nsm_target" editable="false" maxWidth="200.0" promptText="NSM client node" text="MASTER" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                                     </children>
                                     <columnConstraints>
                                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="199.0" minWidth="10.0" prefWidth="184.0" />
@@ -204,22 +204,22 @@
                                 </HBox>
                                 <TableView fx:id="table_nsm" editable="true" prefHeight="239.0" prefWidth="360.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
                                     <columns>
-                                        <TableColumn fx:id="col_nsm_dataname" prefWidth="114.0" text="Data name">
+                                        <TableColumn fx:id="col_nsm_dataname" prefWidth="173.0" text="Data name">
                                             <cellValueFactory>
                                                 <PropertyValueFactory property="dataname" />
                                             </cellValueFactory>
                                         </TableColumn>
-                                        <TableColumn fx:id="col_nsm_format" prefWidth="86.0" text="Format">
+                                        <TableColumn fx:id="col_nsm_format" prefWidth="133.0" text="Format">
                                             <cellValueFactory>
                                                 <PropertyValueFactory property="format" />
                                             </cellValueFactory>
                                         </TableColumn>
-                                        <TableColumn fx:id="col_nsm_revision" prefWidth="77.0" text="Revision">
+                                        <TableColumn fx:id="col_nsm_revision" prefWidth="102.0" text="Revision">
                                             <cellValueFactory>
                                                 <PropertyValueFactory property="revision" />
                                             </cellValueFactory>
                                         </TableColumn>
-                                        <TableColumn fx:id="col_nsm_date" prefWidth="131.0" text="Last update">
+                                        <TableColumn fx:id="col_nsm_date" minWidth="0.0" prefWidth="0.0" text="Last update" visible="false">
                                             <cellFactory>
                                                 <DateCellFactory />
                                             </cellFactory>

@@ -39,11 +39,17 @@ namespace Belle2 {
     virtual bool config() throw();
     void monitor() throw();
 
+  protected:
+    void setDefaultConfigName(const std::string& name) {
+      m_default_config = name;
+    }
+
   private:
     DBInterface* m_db;
     NSMData m_data;
     HVConfig m_config;
     HVChannelStatusList m_status_v;
+    std::string m_default_config;
 
   private:
     class HVNodeMonitor {

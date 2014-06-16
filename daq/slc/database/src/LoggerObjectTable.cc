@@ -21,6 +21,9 @@ throw(DBHandlerException)
   if (obj.getIndex() == 0) {
     FieldInfoTable(m_db).createTable(obj, isroot);
     LoggerInfoTable table(m_db);
+    LogFile::debug("adding LogggerInfo %s:%s:%d",
+                   obj.getNode().c_str(),
+                   obj.getTable().c_str(), obj.getRevision());
     id = table.add(LoggerInfo(obj.getNode(), obj.getTable(), obj.getRevision()));
   }
   std::stringstream ss1, ss2;

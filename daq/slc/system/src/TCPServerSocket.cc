@@ -100,6 +100,6 @@ TCPSocket TCPServerSocket::accept() throw(IOException)
   }
   TCPSocket s(fd);
   s.m_ip = inet_ntoa(addr.sin_addr);
-  s.m_port = m_port;
+  s.m_port = ntohs(addr.sin_port);
   return s;
 }

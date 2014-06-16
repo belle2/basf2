@@ -7,8 +7,8 @@ import b2daq.dqm.graphics.Legend;
 import b2daq.dqm.ui.event.CanvasPopupHandler;
 import b2daq.dqm.ui.event.CanvasToolTipHandler;
 import b2daq.graphics.FXGraphicsDrawer;
-import b2daq.graphics.GraphicsDrawer;
 import b2daq.graphics.GShape;
+import b2daq.graphics.GraphicsDrawer;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
@@ -17,6 +17,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -43,7 +44,7 @@ public class CanvasPanel extends AnchorPane implements Updatable {
     }
 
     public CanvasPanel(HistogramCanvas canvas) {
-        this(canvas, 100,100);
+        this(canvas, 100, 100);
     }
 
     public CanvasPanel(String name, String title, double width, double height) {
@@ -73,7 +74,7 @@ public class CanvasPanel extends AnchorPane implements Updatable {
     public void addHisto(Histo obj) {
         getCanvas().addHisto(obj);
     }
-    
+
     public void addShape(GShape shape) {
         getCanvas().addShape(shape);
     }
@@ -85,7 +86,7 @@ public class CanvasPanel extends AnchorPane implements Updatable {
     public void setLegend(Legend legend) {
         getCanvas().setLegend(legend);
     }
-    
+
     @Override
     public void setPrefSize(double width, double height) {
         super.setPrefSize(width, height);
@@ -93,10 +94,12 @@ public class CanvasPanel extends AnchorPane implements Updatable {
     }
 
     public void repaint() {
-        _graphics.setGraphics(_raw_canvas.getGraphicsContext2D());
+        GraphicsContext graphics = _raw_canvas.getGraphicsContext2D();
+        _graphics.setGraphics(graphics);
+        graphics.clearRect(0, 0, getWidth(), getHeight());
         _graphics.setWidth(getWidth());
         _graphics.setHeight(getHeight());
-        _graphics.setFontRealSize(Math.max(getHeight(), getWidth())/20);
+        _graphics.setFontRealSize((getHeight()+ getWidth()) / 40);
         getCanvas().draw(_graphics);
     }
 
@@ -216,10 +219,10 @@ public class CanvasPanel extends AnchorPane implements Updatable {
                 double x = mouse.getX() / panel.getWidth();
                 double y = mouse.getY() / panel.getHeight();
                 if ((getCanvas().usePad() && (getCanvas().getAxisY().hit(x, y)
-                        || getCanvas().getAxisX().hit(x, y) 
-                        || (getCanvas().getAxisY2() != null 
+                        || getCanvas().getAxisX().hit(x, y)
+                        || (getCanvas().getAxisY2() != null
                         && getCanvas().getAxisY2().hit(x, y))))
-                        || (getCanvas().getColorAxis() != null 
+                        || (getCanvas().getColorAxis() != null
                         && getCanvas().getColorAxis().hit(x, y))) {
                     panel.setCursor(Cursor.CLOSED_HAND);
                 } else {
@@ -239,7 +242,7 @@ public class CanvasPanel extends AnchorPane implements Updatable {
         });
 
     }
-    
+
     public void setCanvas(HistogramCanvas canvas) {
         this.canvas.set(canvas);
         canvas.setxPanel(this);

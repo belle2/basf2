@@ -44,6 +44,7 @@ public class GPath extends GShape {
     }
 
     public void draw(GraphicsDrawer c) {
+        if (!isVisible()) return;
         c.setLine(getLine());
         for (Iterator<Path> it = _path_v.iterator(); it.hasNext();) {
             Path path = it.next();

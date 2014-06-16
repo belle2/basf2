@@ -87,6 +87,7 @@ public class PowerSupplyStatusPaneController implements Initializable {
                 Tab tab = new Tab();
                 tab.setText(slabel.getName());
                 tab.setContent(controller.getTable());
+                tab.setClosable(false);
                 tabpane.getTabs().add(tab);
                 tables.add(controller);
             } catch (Exception e) {

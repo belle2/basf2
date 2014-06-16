@@ -26,6 +26,11 @@ public class GLine extends GShape {
         this.y2 = y2;
     }
 
+    public GLine(double x1, double y1, double x2, double y2, Color linecolor, double width) {
+        this(x1, y1, x2, y2, linecolor);
+        setLineWidth(width);
+    }
+
     public void set(double x1, double y1, double x2, double y2) {
         this.x1 = x1;
         this.y1 = y1;
@@ -34,6 +39,7 @@ public class GLine extends GShape {
     }
 
     public void draw(GraphicsDrawer c) {
+        if (!isVisible()) return;
         c.setLine(getLine());
         c.drawLine(this.x1, this.y1, this.x2, this.y2);
     }

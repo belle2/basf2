@@ -1,2 +1,2 @@
-nodename,  config, id,      host,          script, from_hosts
-ROPC01,   default,  0, localhost, RecvStrream1.py,    default
+ nodename,      config,   ropcid, hostname,  port,    basf2script, eb0_host, eb0_port,    hostlist
+   ROPC01, CDC:default, ropc5001,   ropc01, 36000, RecvStream1.py,   ropc01,    33000, CDC:default

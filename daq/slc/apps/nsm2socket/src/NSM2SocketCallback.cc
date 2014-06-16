@@ -128,8 +128,11 @@ void NSM2SocketCallback::timeout() throw()
         m_bridge->sendMessage(msg);
       }
     } catch (const NSMHandlerException& e) {
-      std::string log = StringUtil::form("Failed to open NSM data (%s) ",
-                                         data.getName().c_str());
+      std::string log = StringUtil::form("Failed to open NSM data (%s:%s:%d) ",
+                                         data.getName().c_str(),
+                                         data.getFormat().c_str(),
+                                         data.getRevision());
+      LogFile::error(e.what());
       LogFile::error(log);
       //m_bridge->sendError(ERRORNo::NSMSENDREQ, getNode().getName(),
       //        "Failed to open data "+ data.getName());

@@ -219,7 +219,7 @@
                                                 <PropertyValueFactory property="revision" />
                                             </cellValueFactory>
                                         </TableColumn>
-                                        <TableColumn fx:id="col_nsm_date" minWidth="0.0" prefWidth="0.0" text="Last update">
+                                        <TableColumn fx:id="col_nsm_date" minWidth="0.0" prefWidth="0.0" text="Last update" visible="false">
                                             <cellFactory>
                                                 <DateCellFactory />
                                             </cellFactory>

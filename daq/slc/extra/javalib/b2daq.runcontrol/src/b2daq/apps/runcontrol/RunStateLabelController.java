@@ -148,14 +148,14 @@ public class RunStateLabelController {
     }
 
     public void update(RCState state) {
-        if (state.equals(RCState.RUNNING_S)) {
-            set(state.getLabel(), Color.LIMEGREEN, Color.GREEN, Color.WHITE);
+        if (state.equals(RCState.OFF_S)) {
+            set(state.getLabel(), Color.WHITESMOKE, Color.LIGHTGRAY, Color.BLACK);
+        } else if (state.equals(RCState.RUNNING_S)) {
+            set(state.getLabel(), Color.LIGHTGREEN, Color.LIMEGREEN, Color.WHITE);
         } else if (state.isStable()) {
-            set(state.getLabel(), Color.CYAN, Color.BLUE, Color.WHITE);
+            set(state.getLabel(), Color.CYAN, Color.DEEPSKYBLUE, Color.WHITE);
         } else if (state.isTransition()) {
-            set(state.getLabel(), Color.YELLOW, Color.GOLD, Color.WHITE);
-        } else if (state.isStable()) {
-            set(state.getLabel(), Color.PLUM, Color.PURPLE, Color.WHITE);
+            set(state.getLabel(), Color.PINK, Color.MAGENTA, Color.WHITE);
         } else {
             set(state.getLabel(), Color.BLACK, Color.GRAY, Color.WHITE);
         }

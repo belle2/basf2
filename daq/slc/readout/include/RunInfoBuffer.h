@@ -17,7 +17,7 @@ namespace Belle2 {
 
   public:
     RunInfoBuffer() {
-      m_nreserved = 0;
+      m_bufsize = 0;
       m_buf = NULL;
     }
     ~RunInfoBuffer() {}
@@ -25,7 +25,7 @@ namespace Belle2 {
   public:
     size_t size() throw();
     bool open(const std::string& nodename,
-              int nreserved = 0,
+              int bufsize = 0,
               bool recreate = false);
     bool init();
     bool close();
@@ -62,7 +62,7 @@ namespace Belle2 {
   private:
     std::string m_nodename;
     std::string m_path;
-    int m_nreserved;
+    int m_bufsize;
     SharedMemory m_memory;
     unsigned int* m_buf;
     MMutex m_mutex;

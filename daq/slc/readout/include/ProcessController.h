@@ -29,7 +29,7 @@ namespace Belle2 {
     }
 
   public:
-    bool init(const std::string& name, int nreserved = 0);
+    bool init(const std::string& name, int bufsize = 0);
     void clear();
     bool load(int timeout);
     bool start();

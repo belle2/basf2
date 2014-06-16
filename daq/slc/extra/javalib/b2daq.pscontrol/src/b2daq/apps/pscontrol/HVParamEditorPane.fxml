@@ -34,48 +34,45 @@
                 <Insets bottom="10.0" left="10.0" right="10.0" top="5.0" />
             </padding>
         </HBox>
-        <VBox spacing="5.0">
+        <HBox alignment="CENTER_LEFT" spacing="20.0" VBox.vgrow="ALWAYS">
             <children>
-                <HBox alignment="CENTER_LEFT" spacing="20.0" VBox.vgrow="ALWAYS">
-                    <children>
-                        <Button fx:id="add_button" disable="true" mnemonicParsing="false" onAction="#handleAddButon" text="Add to" />
-                        <RadioButton fx:id="before_radio" disable="true" mnemonicParsing="false" selected="true" text="Before current">
-                     <toggleGroup>
+                <Button fx:id="add_button" disable="true" mnemonicParsing="false" onAction="#handleAddButon" text="Add to" />
+                <RadioButton fx:id="before_radio" disable="true" mnemonicParsing="false" selected="true" text="Before current">
+                    <toggleGroup>
                         <ToggleGroup fx:id="toggle" />
-                     </toggleGroup></RadioButton>
-                        <RadioButton fx:id="after_radio" disable="true" mnemonicParsing="false" text="After current" toggleGroup="$toggle" />
-                  <ChoiceBox fx:id="choice_valueset" disable="true" prefWidth="150.0" />
-                  <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
-                     <children>
+                    </toggleGroup>
+                </RadioButton>
+                <RadioButton fx:id="after_radio" disable="true" mnemonicParsing="false" text="After current" toggleGroup="$toggle" />
+                <ChoiceBox fx:id="choice_valueset" disable="true" prefWidth="150.0" />
+                <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                    <children>
                         <Button fx:id="button_add_channel" disable="true" mnemonicParsing="false" onAction="#handleAddChennelButton" text="Add channel">
-                           <HBox.margin>
-                              <Insets right="20.0" />
-                           </HBox.margin>
+                            <HBox.margin>
+                                <Insets right="20.0" />
+                            </HBox.margin>
                         </Button>
                         <Button fx:id="button_multiedit" disable="true" mnemonicParsing="false" onAction="#handleMultiEditButton" text="Muti edit">
-                           <HBox.margin>
-                              <Insets right="30.0" />
-                           </HBox.margin>
-                           <font>
-                              <Font size="12.0" />
-                           </font>
+                            <HBox.margin>
+                                <Insets right="30.0" />
+                            </HBox.margin>
+                            <font>
+                                <Font size="12.0" />
+                            </font>
                         </Button>
-                     </children>
-                     <HBox.margin>
-                        <Insets />
-                     </HBox.margin>
-                  </HBox>
                     </children>
+                    <HBox.margin>
+                        <Insets />
+                    </HBox.margin>
                 </HBox>
-            <VBox>
-               <children>
-                      <TabPane fx:id="tabpane" prefHeight="446.0" prefWidth="794.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
-                          <VBox.margin>
-                              <Insets />
-                          </VBox.margin>
-                      </TabPane>
-               </children>
-            </VBox>
+            </children>
+        </HBox>
+        <VBox>
+            <children>
+                <TabPane fx:id="tabpane" prefHeight="446.0" prefWidth="794.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+                    <VBox.margin>
+                        <Insets />
+                    </VBox.margin>
+                </TabPane>
             </children>
         </VBox>
     </children>

@@ -5,12 +5,16 @@
 
 #include "daq/slc/runcontrol/RCCallback.h"
 
+#include <daq/slc/nsm/NSMData.h>
+
+#include <daq/slc/system/PThread.h>
+
 namespace Belle2 {
 
   class TemplateCallback : public RCCallback {
 
   public:
-    TemplateCallback(const NSMNode& node);
+    TemplateCallback(const NSMNode& node, const std::string& host, const std::string& port);
     virtual ~TemplateCallback() throw();
 
   public:
@@ -24,6 +28,13 @@ namespace Belle2 {
     virtual bool pause() throw();
     virtual bool recover() throw();
     virtual bool abort() throw();
+
+  private:
+    ProcessController m_con;
+    PThread m_thread;
+    NSMData m_data;
+    std::string m_host;
+    std::string m_port;
 
   };
 

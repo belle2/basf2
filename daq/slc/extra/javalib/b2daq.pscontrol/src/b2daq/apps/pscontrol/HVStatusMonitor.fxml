@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
+<?import b2daq.hvcontrol.ui.*?>
 <?import javafx.collections.*?>
 <?import java.lang.*?>
 <?import java.util.*?>

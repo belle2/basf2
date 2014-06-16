@@ -1,0 +1,6 @@
+Import('env')
+
+env['TOOLS_LIBS']['rodummy_in'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['rodummy_out'] = ['daq', 'framework', '$ROOT_LIBS' ]
+
+Return('env')

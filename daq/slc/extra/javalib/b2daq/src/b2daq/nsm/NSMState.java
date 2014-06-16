@@ -4,6 +4,8 @@ import b2daq.core.Enum;
 
 public class NSMState extends Enum {
 
+    final static public NSMState UNKNOWN = new NSMState(0, "UNKNOWN");
+
     private boolean _active = true;
     private boolean _masked = false;
     private boolean _enabled = true;

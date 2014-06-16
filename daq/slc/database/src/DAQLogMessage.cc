@@ -10,6 +10,8 @@ const int DAQLogMessage::g_revision = 1;
 DAQLogMessage::DAQLogMessage() throw()
 {
   setConfig(false);
+  setTable(g_tablename);
+  setRevision(g_revision);
   addInt("date", Date().get());
   addText("nodename", "");
   addEnumList("priority", "DEBUG,INFO,NOTICE,WARNING,ERROR,FATAL");
@@ -22,6 +24,8 @@ DAQLogMessage::DAQLogMessage(const std::string& nodename,
                              const std::string& message) throw()
 {
   setConfig(false);
+  setTable(g_tablename);
+  setRevision(g_revision);
   addInt("date", Date().get());
   addText("nodename", nodename);
   addEnumList("priority", "DEBUG,INFO,NOTICE,WARNING,ERROR,FATAL");
@@ -36,6 +40,8 @@ DAQLogMessage::DAQLogMessage(const std::string& nodename,
                              const Date& date) throw()
 {
   setConfig(false);
+  setTable(g_tablename);
+  setRevision(g_revision);
   addInt("date", date.get());
   addText("nodename", nodename);
   addEnumList("priority", "DEBUG,INFO,NOTICE,WARNING,ERROR,FATAL");
@@ -47,6 +53,13 @@ DAQLogMessage::DAQLogMessage(const std::string& nodename,
 DAQLogMessage::DAQLogMessage(const DAQLogMessage& log) throw()
   : ConfigObject(log)
 {
+  setTable(g_tablename);
+  setRevision(g_revision);
+  addInt("date", 0);
+  addText("nodename", "");
+  addEnumList("priority", "DEBUG,INFO,NOTICE,WARNING,ERROR,FATAL");
+  addEnum("priority", "");
+  addText("message", "");
 }
 
 void DAQLogMessage::setPriority(LogFile::Priority priority) throw()

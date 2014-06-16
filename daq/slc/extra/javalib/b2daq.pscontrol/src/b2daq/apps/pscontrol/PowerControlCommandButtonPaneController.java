@@ -74,7 +74,7 @@ public class PowerControlCommandButtonPaneController implements Initializable {
     private void perform(String reqname) {
         HVCommand cmd = new HVCommand();
         cmd.copy(reqname);
-        if (cmd.equals(b2daq.core.Enum.UNKNOWN)) {
+        if (cmd.equals(HVCommand.UNKNOWN)) {
             return;
         }
         String nodename = NSMListenerService.getNSMConfig().getNsmTarget();

@@ -24,6 +24,7 @@ public class GPolygon extends GShape {
     }
 
     public void draw(GraphicsDrawer c) {
+        if (!isVisible()) return;
         if (_x.length > 0 && _y.length > 0) {
             c.setLine(getLine());
             c.setFill(getFill());

@@ -6,16 +6,13 @@
 
 package b2daq.core;
 
-import static b2daq.core.Enum.UNKNOWN;
-import b2daq.nsm.NSMCommand;
-import static b2daq.nsm.NSMCommand.OK;
-
 /**
  *
  * @author tkonno
  */
 public class ERRORNo extends Enum {
 
+    final static public ERRORNo UNKNOWN = new ERRORNo(0, "UNKNOWN");
     final static public ERRORNo NSMONLINE = new ERRORNo(11, "NSMONLINE");
     final static public ERRORNo NSMSENDREQ = new ERRORNo(12, "NSMSENDREQ");
     final static public ERRORNo NSMMEMOPEN = new ERRORNo(13, "SENOPEN");

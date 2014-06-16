@@ -5,8 +5,8 @@
 <?import java.util.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.cell.*?>
+<?import javafx.scene.layout.*?>
 
 <TableView fx:id="table_hvconfig" editable="true" prefHeight="486.0" prefWidth="807.0" tableMenuButtonVisible="true" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.apps.pscontrol.HVParamTableViewController">
     <columns>

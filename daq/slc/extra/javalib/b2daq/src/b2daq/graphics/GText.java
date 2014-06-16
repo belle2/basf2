@@ -1,6 +1,7 @@
 package b2daq.graphics;
 
 import javafx.scene.paint.Color;
+import javafx.scene.text.FontWeight;
 
 public class GText extends GShape {
 
@@ -21,6 +22,14 @@ public class GText extends GShape {
         set(str, x, y);
         alignment = align;
         setFontColor(font_color);
+    }
+
+    public GText(String str, double x, double y, String align, Color font_color, double size, FontWeight weight) {
+        set(str, x, y);
+        alignment = align;
+        setFontColor(font_color);
+        setFontSize(size);
+        setFontWeight(weight);
     }
 
     public GText(String str, double x, double y, String align, double angle, Color font_color) {

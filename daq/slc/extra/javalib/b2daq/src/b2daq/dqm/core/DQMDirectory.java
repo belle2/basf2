@@ -22,33 +22,33 @@ public class DQMDirectory implements Serializable {
 
     private final StringProperty name = new SimpleStringProperty();
     private final ObservableList<DQMDirectory> directories = FXCollections.observableArrayList();
-    private final ObservableList<Histo> histograms = FXCollections.observableArrayList();
+    private final ObservableList<String> histograms = FXCollections.observableArrayList();
 
     public DQMDirectory() {
-    
+
     }
-    
+
     public DQMDirectory(String name) {
         this.name.set(name);
     }
-    
+
     public String getName() {
         return name.get();
     }
-    
+
     public void setName(String name) {
         this.name.set(name);
     }
-    
+
     public StringProperty nameProperty() {
         return name;
     }
-    
+
     public ObservableList<DQMDirectory> getDirectories() {
         return directories;
     }
 
-    public ObservableList<Histo> getHistograms() {
+    public ObservableList<String> getHistograms() {
         return histograms;
     }
 
@@ -56,7 +56,7 @@ public class DQMDirectory implements Serializable {
         this.directories.setAll(directories);
     }
 
-    public void setHistograms(ObservableList<Histo> histograms) {
+    public void setHistograms(ObservableList<String> histograms) {
         this.histograms.setAll(histograms);
     }
 
@@ -73,13 +73,9 @@ public class DQMDirectory implements Serializable {
         histograms.clear();
         int nhist = reader.readInt();
         for (int n = 0; n < nhist; n++) {
-            Histo hist = HistoFactory.create(reader.readString());
-            if (hist != null) {
-                hist.readConfig(reader);
-                histograms.add(hist);
-            }
+            histograms.add(reader.readString());
         }
-        
+
     }
 
     @Override
@@ -90,8 +86,8 @@ public class DQMDirectory implements Serializable {
             writer.writeObject(dir);
         }
         writer.writeInt(histograms.size());
-        for (Histo hist : histograms) {
-            hist.writeConfig(writer);
+        for (String hist : histograms) {
+            writer.writeString(hist);
         }
     }
 

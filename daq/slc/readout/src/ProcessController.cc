@@ -13,11 +13,11 @@
 using namespace Belle2;
 
 bool ProcessController::init(const std::string& name_in,
-                             int nreserved)
+                             int bufsize)
 {
   m_name = (name_in.size() > 0) ? name_in : m_callback->getNode().getName();
   LogFile::open(m_name);
-  if (!m_info.open(m_name, nreserved, true)) {
+  if (!m_info.open(m_name, bufsize, true)) {
     return false;
   }
   return true;

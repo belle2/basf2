@@ -10,7 +10,6 @@ import b2daq.core.Writer;
 public class ConfigObject extends DBObject {
 
     private HashMap<String, Object> m_value_m = new HashMap<>();
-    private HashMap<String, String> m_text_m = new HashMap<>();
     private HashMap<String, ArrayList<ConfigObject>> m_obj_v_m
             = new HashMap<>();
 
@@ -18,7 +17,6 @@ public class ConfigObject extends DBObject {
     public void reset() {
         super.reset();
         m_value_m = new HashMap<>();
-        m_text_m = new HashMap<>();
         m_obj_v_m = new HashMap<>();
     }
 
@@ -174,9 +172,11 @@ public class ConfigObject extends DBObject {
     public void addValue(String name, int type, Object value) {
         FieldInfo.Property pro = new FieldInfo.Property(type, 0, 0);
         int size = pro.getTypeSize();
+        /*
         if (size <= 0) {
             return;
         }
+                */
         if (!hasField(name)) {
             add(name, pro);
         }
@@ -205,7 +205,7 @@ public class ConfigObject extends DBObject {
         if (!hasText(name)) {
             return "";
         }
-        return m_text_m.get(name);
+        return (String)m_value_m.get(name);
     }
 
     @Override
@@ -213,7 +213,7 @@ public class ConfigObject extends DBObject {
         if (!hasEnum(name)) {
             return "";
         }
-        return m_text_m.get(name);
+        return (String)m_value_m.get(name);
     }
 
     public ArrayList<ConfigObject> getObjects(String name) {

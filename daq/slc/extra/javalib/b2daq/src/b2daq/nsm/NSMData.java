@@ -12,8 +12,7 @@ import b2daq.database.FieldInfo;
 public class NSMData extends DBObject {
 
     private int m_size = 0;
-    private HashMap<String, ArrayList<Object>> m_data_m
-            = new HashMap<String, ArrayList<Object>>();
+    private HashMap<String, ArrayList<Object>> m_data_m = new HashMap<>();
 
     public NSMData() {
         this("", "", 0);
@@ -34,6 +33,7 @@ public class NSMData extends DBObject {
         setTable(format);
     }
 
+    @Override
     public void readObject(Reader reader) throws IOException {
         reset();
         setName(reader.readString());
@@ -54,15 +54,14 @@ public class NSMData extends DBObject {
                 length = 1;
             }
             if (type == FieldInfo.NSM_OBJECT) {
-                ArrayList<Object> data_v = new ArrayList<Object>();
+                ArrayList<Object> data_v = new ArrayList<>();
                 try {
                     for (int i = 0; i < length; i++) {
                         NSMData data = new NSMData();
                         reader.readObject(data);
                         data_v.add(data);
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (IOException e) {
                 }
                 add(name, new FieldInfo.Property(type, length, offset));
                 m_data_m.put(name, data_v);
@@ -162,19 +161,24 @@ public class NSMData extends DBObject {
         }
     }
 
+    @Override
     public void addText(String name, String value) {
     }
 
+    @Override
     public void addEnum(String name, String value) {
     }
 
+    @Override
     public void setObject(String name, int index, DBObject obj) {
     }
 
+    @Override
     public String getEnum(String name) {
         return "";
     }
 
+    @Override
     public String getText(String name) {
         if (getProperty(name).getType() == FieldInfo.NSM_CHAR
                 && getProperty(name).getLength() > 0) {
@@ -203,7 +207,7 @@ public class NSMData extends DBObject {
         }
         if (!hasField(name)) {
             add(name, pro);
-            m_data_m.put(name, new ArrayList<Object>());
+            m_data_m.put(name, new ArrayList<>());
         }
         m_data_m.get(name).add(value);
     }

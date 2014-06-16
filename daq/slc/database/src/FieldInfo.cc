@@ -11,8 +11,19 @@
 
 #include <sstream>
 #include <cstdlib>
+#include <cmath>
 
 using namespace Belle2;
+
+template <typename T>
+const std::string putNumber(T num)
+{
+  if (isnan(num)) return "'nan'";
+  if (isinf(num)) return "'infinity'";
+  std::stringstream ss;
+  ss << num;
+  return ss.str();
+}
 
 int FieldInfo::Property::getTypeSize() const throw()
 {
@@ -109,12 +120,12 @@ const std::string FieldInfo::getSQL(const DBObject& obj,
   } else {
     switch (pro.getType()) {
       case BOOL:   ss << (obj.getBool(name) ? "true" : "false"); break;
-      case CHAR:   ss << obj.getChar(name); break;
-      case SHORT:  ss << obj.getShort(name); break;
-      case INT:    ss << obj.getInt(name); break;
-      case LONG:   ss << obj.getLong(name); break;
-      case FLOAT:  ss << obj.getFloat(name); break;
-      case DOUBLE: ss << obj.getDouble(name); break;
+      case CHAR:   ss << putNumber(obj.getChar(name)); break;
+      case SHORT:  ss << putNumber(obj.getShort(name)); break;
+      case INT:    ss << putNumber(obj.getInt(name)); break;
+      case LONG:   ss << putNumber(obj.getLong(name)); break;
+      case FLOAT:  ss << putNumber(obj.getFloat(name)); break;
+      case DOUBLE: ss << putNumber(obj.getDouble(name)); break;
       case TEXT:   ss << "'" << obj.getText(name) << "'"; break;
       case ENUM:
         ss << StringUtil::form("(select fieldid from fieldid('%s', '%s', '%s'))",
@@ -124,16 +135,16 @@ const std::string FieldInfo::getSQL(const DBObject& obj,
       case OBJECT:
         ss << "(" << getSQL(obj.getObject(name)) << ")";
         break;
-      case NSM_CHAR:   ss << obj.getChar(name); break;
-      case NSM_INT16:  ss << obj.getShort(name); break;
-      case NSM_INT32:  ss << obj.getInt(name); break;
-      case NSM_INT64:  ss << obj.getLong(name); break;
-      case NSM_BYTE8:  ss << obj.getUChar(name); break;
-      case NSM_UINT16: ss << obj.getUShort(name); break;
-      case NSM_UINT32: ss << obj.getUInt(name); break;
-      case NSM_UINT64: ss << obj.getULong(name); break;
-      case NSM_FLOAT:  ss << obj.getFloat(name); break;
-      case NSM_DOUBLE: ss << obj.getDouble(name); break;
+      case NSM_CHAR:   ss << putNumber(obj.getChar(name)); break;
+      case NSM_INT16:  ss << putNumber(obj.getShort(name)); break;
+      case NSM_INT32:  ss << putNumber(obj.getInt(name)); break;
+      case NSM_INT64:  ss << putNumber(obj.getLong(name)); break;
+      case NSM_BYTE8:  ss << putNumber(obj.getUChar(name)); break;
+      case NSM_UINT16: ss << putNumber(obj.getUShort(name)); break;
+      case NSM_UINT32: ss << putNumber(obj.getUInt(name)); break;
+      case NSM_UINT64: ss << putNumber(obj.getULong(name)); break;
+      case NSM_FLOAT:  ss << putNumber(obj.getFloat(name)); break;
+      case NSM_DOUBLE: ss << putNumber(obj.getDouble(name)); break;
       case NSM_OBJECT:
         ss << "(" << getSQL(obj.getObject(name)) << ")";
         break;

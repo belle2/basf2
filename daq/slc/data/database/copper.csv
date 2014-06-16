@@ -1,3 +1,3 @@
-  nodename,  config,  copper_id,    host,  productid,             script,     hslb
-    CPR010, default,          1,  cpr001,     100001,  RecvSendCOPPER.py,  default
-    CPR011, default,          2,  cpr002,     100002,  RecvSendCOPPER.py,  default
+ nodename,   config, copperid,   setup, hslb_a, hslb_b, hslb_c, hslb_d, dmalimit,     fee,       basf2script, eb0_host, eb0_port
+   CPR010,  CDC:V03,  cpr5010, CDC:V03,   true,   true,  false,  false,      100, CDC:V03, RecvSendCOPPER.py,   ropc01,    33000
+   CPR011,  CDC:V03,  cpr5011, CDC:V03,   true,   true,  false,  false,      100, CDC:V03, RecvSendCOPPER.py,   ropc01,    33000

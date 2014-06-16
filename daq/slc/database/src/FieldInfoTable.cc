@@ -117,8 +117,8 @@ int FieldInfoTable::createTable(const DBObject& obj, bool isroot)
                         ctablename_in.c_str(), idname.c_str(),
                         info.getName().c_str(),
                         info.getTypeAlias().c_str());
-          ss << ", \"" << info.getName() << "\" int references "
-             << ctablename_in << "(" << idname << ")";
+          ss << ", \"" << info.getName() << "\" int ";
+          //"references " << ctablename_in << "(" << idname << ")";
         } else {
           ss << ", \"" << info.getName() << "\" "
              << " " << info.getTypeAlias();

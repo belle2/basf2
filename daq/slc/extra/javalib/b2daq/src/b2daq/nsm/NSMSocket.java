@@ -19,6 +19,7 @@ public class NSMSocket {
     public boolean reconnect(String hostname, int port, String nodename) {
         try {
             m_socket = new Socket(hostname, port);
+            System.out.println(m_socket.getLocalAddress().getHostName()+":"+ m_socket.getLocalPort());
             m_reader = new SocketDataReader(m_socket);
             m_writer = new SocketDataWriter(m_socket);
             m_writer.writeString(nodename);

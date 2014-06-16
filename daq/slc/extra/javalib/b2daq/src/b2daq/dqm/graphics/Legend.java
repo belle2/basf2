@@ -25,7 +25,7 @@ public class Legend extends GRect {
         height = 0.08;
         setFillColor(Color.WHITE);
         setLineColor(Color.BLACK);
-        font.setSize(0.9);
+        font.setSize(0.8);
     }
 
     public void setBounds(double x, double y, double width, double height) {
@@ -57,7 +57,7 @@ public class Legend extends GRect {
 
     public void add(Histo h) {
         histograms.add(h);
-        height = histograms.size() * 0.03 + 0.02;
+        height = histograms.size() * 0.05 + 0.02;
     }
 
     public void setTitle(String title) {
@@ -72,7 +72,7 @@ public class Legend extends GRect {
         return histograms;
     }
 
-    public void setHistograms(ObservableList<GHisto> histograms) {
+    public void setHistograms(ObservableList<Histo> histograms) {
         histograms.addAll(histograms);
     }
 
@@ -87,15 +87,15 @@ public class Legend extends GRect {
             canvas.setFill(h.getFill());
             canvas.setLine(h.getLine());
             if (h.getDraw().matches(".*L.*")) {
-                canvas.drawLine(x + 0.02, y + 0.01 * (2.5 + n * 3), x + 0.06, y + 0.01 * (2.5 + n * 3));
+                canvas.drawLine(x + 0.02, y + 0.01 * (3.5 + n * 5), x + 0.06, y + 0.01 * (3.5 + n * 5));
                 if (h.getFill() != null && h.getFill().getColor() != null) {
-                    canvas.drawRect(x + 0.02, y + 0.01 * (1.5 + n * 3), 0.055, 0.02);
+                    canvas.drawRect(x + 0.02, y + 0.01 * (1.5 + n * 5), 0.055, 0.02);
                 }
             }
             if (h.getDraw().matches(".*P.*")) {
-                canvas.drawMarker(x + 0.03, y + 0.01 * (2.5 + n * 3));
+                canvas.drawMarker(x + 0.03, y + 0.01 * (3.5 + n * 5));
             }
-            canvas.drawString(h.getTitle(), x + 0.08, y + 0.01 * (2.5 + n * 3), "left middle");
+            canvas.drawString(h.getTitle(), x + 0.08, y + 0.01 * (3.5 + n * 5), "left middle");
             n++;
         }
     }

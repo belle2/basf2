@@ -1,0 +1,5 @@
+ nodename,  config, slot, board,       firmware, register,         parameter
+   CPR010, CDC:V03,    0, CDCV03, b2l_cdc040.bit,  CDC:V03, CDC:V03:default:a
+   CPR010, CDC:V03,    1, CDCV03, b2l_cdc040.bit,  CDC:V03, CDC:V03:default:b
+   CPR011, CDC:V03,    0, CDCV03, b2l_cdc040.bit,  CDC:V03, CDC:V03:default:a
+   CPR011, CDC:V03,    1, CDCV03, b2l_cdc040.bit,  CDC:V03, CDC:V03:default:b

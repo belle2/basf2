@@ -2,8 +2,6 @@ package b2daq.core;
 
 public class Enum {
 
-	final static public Enum UNKNOWN = new Enum(0, "UNKNOWN");
-	
 	protected String _label;
 	protected int _id;
 	

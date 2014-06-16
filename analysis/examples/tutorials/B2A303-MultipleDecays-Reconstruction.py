@@ -1,0 +1,89 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+#######################################################
+#
+# This tutorial demonstrates how to reconstruct the
+# following decay chain involving several decay modes:
+#
+# B- -> D0 pi-
+#       |
+#       +-> K- pi+
+#       +-> K- pi+ pi0
+#       +-> K- pi+ pi+
+#       +-> K- K+
+#       +-> pi- pi+
+#
+# Note: This reconstruction is performed on generated level
+# to speed up the reconstruction during the tutorial. However,
+# the reconstruction can as well be performed using reconstructed
+# final state particles.
+#
+# Contributors: A. Zupanc (June 2014)
+#
+######################################################
+
+from basf2 import *
+from modularAnalysis import inputMdst
+from modularAnalysis import loadMCParticles
+from modularAnalysis import fillParticleList
+from modularAnalysis import reconDecay
+from modularAnalysis import copyLists
+from modularAnalysis import matchMCTruth
+from modularAnalysis import analysis_main
+from modularAnalysis import ntupleFile
+from modularAnalysis import ntupleTree
+
+# check if the required input file exists (from B2A101 example)
+import os.path
+import sys
+if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
+    sys.exit('Required input file (B2A101-Y4SEventGeneration-evtgen.root) does not exist. Please run B2A101-Y4SEventGeneration.py tutorial script first.'
+             )
+
+# load input ROOT file
+inputMdst('B2A101-Y4SEventGeneration-evtgen.root')
+
+# load all final state Particles (on generator level)
+loadMCParticles()
+
+# create and fill final state ParticleLists
+fillParticleList('K-', [''])
+fillParticleList('pi-', [''])
+fillParticleList('gamma', [''])
+
+# 1. reconstruct pi0 -> gamma gamma decay
+reconDecay('pi0 -> gamma gamma', {'M': (0.100, 0.150)})
+
+# 2. reconstruct D0 in multiple decay modes
+reconDecay('D0:ch1 -> K- pi+', {'M': (1.800, 1.900)})
+reconDecay('D0:ch2 -> K- pi+ pi0', {'M': (1.800, 1.900)})
+reconDecay('D0:ch3 -> K- pi+ pi+ pi-', {'M': (1.800, 1.900)})
+reconDecay('D0:ch4 -> K- K+', {'M': (1.800, 1.900)})
+reconDecay('D0:ch5 -> pi+ pi-', {'M': (1.800, 1.900)})
+
+# merge the D0 lists together into one single list
+copyLists('D0:all', ['D0:ch1', 'D0:ch2', 'D0:ch3', 'D0:ch4', 'D0:ch5'])
+
+# 3. reconstruct B+ -> anti-D0 pi+ decay
+reconDecay('B+:D0pi -> anti-D0:all pi+', {'Mbc': (5.24, 5.29),
+           'deltaE': (-1.0, 1.0)})
+
+# perform MC matching (MC truth asociation)
+matchMCTruth('B+:D0pi')
+
+# create and fill flat Ntuple with MCTruth and kinematic information
+toolsB = ['EventMetaData', '^B+']
+toolsB += ['DeltaEMbc', '^B+']
+toolsB += ['MCTruth', '^B+']
+
+# write out the flat ntuple
+ntupleFile('B2A303-MultipleDecays-Reconstruction.root')
+ntupleTree('bp', 'B+:D0pi', toolsB)
+
+# Process the events
+process(analysis_main)
+
+# print out the summary
+print statistics
+

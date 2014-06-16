@@ -1,0 +1,98 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+#######################################################
+#
+# This tutorial demonstrates how to perform Vertex fits
+# using KFit. The following  decay chain (and c.c. decay
+# chain):
+#
+# D*+ -> D0 pi+
+#        |
+#        +-> K- pi+
+#
+# is reconstructed and the D0 and D*+ decay vertices are
+# fitted.
+#
+# Note: This example is build upon
+# B2A301-Dstar2D0Pi-Reconstruction.py
+#
+# Note: This example uses the signal MC sample created in
+# MC campaign 3.5, therefore it can be ran only on KEKCC computers.
+#
+# Contributors: A. Zupanc (June 2014)
+#
+######################################################
+
+from basf2 import *
+from modularAnalysis import inputMdstList
+from modularAnalysis import loadReconstructedParticles
+from modularAnalysis import reconDecay
+from modularAnalysis import matchMCTruth
+from modularAnalysis import analysis_main
+from modularAnalysis import ntupleFile
+from modularAnalysis import ntupleTree
+from modularAnalysis import vertexKFit
+from stdLooseFSParticles import stdVeryLoosePi
+from stdLooseFSParticles import stdLoosePi
+from stdLooseFSParticles import stdLooseK
+
+# Add 10 signal MC files (each containing 1000 generated events)
+filelistSIG = \
+    ['/group/belle2/MC/signal/cc2dstar/mcprod1405/BGx1/mc35_cc2dstar_BGx1_s00/cc2dstar_e0001r001*_s00_BGx1.mdst.root'
+     ]
+
+inputMdstList(filelistSIG)
+
+# load all final state Particles
+loadReconstructedParticles()
+
+# use standard final state particle lists
+#
+# creates "pi+:all" ParticleList (and c.c.)
+stdVeryLoosePi()
+# creates "pi+:loose" ParticleList (and c.c.)
+stdLoosePi()
+# creates "K+:loose" ParticleList (and c.c.)
+stdLooseK()
+
+# reconstruct D0 -> K- pi+ decay
+# keep only candidates with 1.8 < M(Kpi) < 1.9 GeV
+reconDecay('D0:kpi -> K-:loose pi+:loose', {'M': (1.8, 1.9)})
+
+# perform D0 vertex fit
+# keep candidates only passing C.L. value of the fit > 0.0 (no cut)
+vertexKFit('D0:kpi', 0.0)
+
+# reconstruct D*+ -> D0 pi+ decay
+# keep only candidates with Q = M(D0pi) - M(D0) - M(pi) < 20 MeV
+# and D* CMS momentum > 2.5 GeV
+reconDecay('D*+ -> D0:kpi pi+:all', {'Q': (0.0, 0.020), 'p_CMS': (2.5, 5.5)})
+
+# perform D*+ vertex fit
+# keep candidates only passing C.L. value of the fit > 0.0 (no cut)
+vertexKFit('D*+', 0.0)
+
+# perform MC matching (MC truth asociation)
+matchMCTruth('D*+')
+
+# create and fill flat Ntuple with MCTruth and kinematic information
+toolsDST = ['EventMetaData', '^D*+']
+toolsDST += ['Kinematics', '^D*+ -> ^D0 pi+']
+toolsDST += ['CMSKinematics', '^D*+']
+toolsDST += ['Vertex', '^D*+ -> ^D0 pi+']
+toolsDST += ['MCVertex', '^D*+ -> ^D0 pi+']
+toolsDST += ['PID', 'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
+toolsDST += ['Track', 'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
+toolsDST += ['MCTruth', '^D*+ -> ^D0 ^pi+']
+
+# write out the flat ntuple
+ntupleFile('B2A403-KFit-VertexFit.root')
+ntupleTree('dsttree', 'D*+', toolsDST)
+
+# Process the events
+process(analysis_main)
+
+# print out the summary
+print statistics
+

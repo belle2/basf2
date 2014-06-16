@@ -156,6 +156,9 @@ namespace Belle2 {
       /** Assume the SVDDigits are sorted by sensor and strip direction. */
       bool m_assumeSorted;
 
+      /* Type of Cluster Charge Calculation (0: use maximum charge sample, 1: use quadratic fit) */
+      int m_calClsCharge;
+
       /** List of all cluster candidates */
       std::deque<ClusterCandidate> m_clusters;
 

@@ -105,6 +105,9 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(), m_elNoise(2000.0),
            "Time of the trigger", double(0.0));
   addParam("acceptanceWindowSize", m_acceptance,
            "Size of the acceptance window following the trigger", double(100));
+
+  /** Cluster charge calculation. */
+  addParam("calClsChargeCal", m_calClsCharge, "Type of Cluster Charge Calculation (0: use maximum charge sample, 1: use quadratic fit)", int(0));
 }
 
 void SVDClusterizerModule::initialize()
@@ -382,10 +385,26 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
 
     const Sample& clusterSeed = cls.getSeed();
     //double clusterCharge = cls.getCharge();
-    double clusterCharge = cls.getQFCharge();
+    //double clusterCharge = cls.getQFCharge();
+    double clusterCharge = 0;
+    if (m_calClsCharge == 0) {
+      clusterCharge = cls.getCharge();
+    } else if (m_calClsCharge == 1) {
+      clusterCharge = cls.getQFCharge();
+    } else {
+      clusterCharge = cls.getCharge();
+    }
 
     //const std::map<unsigned int, float> stripCharges = cls.getStripCharges();
-    const std::map<unsigned int, float> stripCharges = cls.getQFCharges();
+    //const std::map<unsigned int, float> stripCharges = cls.getQFCharges();
+    std::map<unsigned int, float> stripCharges;
+    if (m_calClsCharge == 0) {
+      stripCharges = cls.getStripCharges();
+    } else if (m_calClsCharge == 1) {
+      stripCharges = cls.getQFCharges();
+    } else {
+      stripCharges = cls.getStripCharges();
+    }
     unsigned int maxStrip = stripCharges.rbegin()->first;
     double maxStripCharge = stripCharges.rbegin()->second;
     unsigned int minStrip = stripCharges.begin()->first;
@@ -430,8 +449,8 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
     }
 
     // Estimate time - this is currently very crude
-    //const std::map<unsigned int, unsigned int> stripMaxima = cls.getMaxima();
-    const std::map<unsigned int, float> stripMaxima = cls.getQFTimes();
+    const std::map<unsigned int, unsigned int> stripMaxima = cls.getMaxima();
+    const std::map<unsigned int, float> stripQFMaxima = cls.getQFTimes();
     const std::map<unsigned int, unsigned int> stripCounts = cls.getCounts();
     // Check that we have enough data in each strip.
     unsigned int maxCount = 0;
@@ -450,7 +469,16 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
     double restrictedCharge = 0.0;
     for (unsigned int strip = stripLow; strip <= stripHigh; ++strip) {
       double charge = stripCharges.find(strip)->second; // safe
-      clusterTime += charge * stripMaxima.find(strip)->second;
+      double time = 0.0;
+      if (m_calClsCharge == 0) {
+        time = static_cast<double>(stripMaxima.find(strip)->second);
+      } else if (m_calClsCharge == 1) {
+        time = static_cast<double>(stripQFMaxima.find(strip)->second);
+      } else {
+        time = static_cast<double>(stripMaxima.find(strip)->second);
+      }
+      //clusterTime += charge * stripMaxima.find(strip)->second;
+      clusterTime += charge * time;
       restrictedCharge += charge;
     }
     clusterTime /= restrictedCharge;
@@ -458,7 +486,16 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
     if (clusterSize > 1) {
       for (unsigned int strip = stripLow; strip <= stripHigh; ++strip) {
         double charge = stripCharges.find(strip)->second; // safe
-        double diff = stripMaxima.find(strip)->second - clusterTime;
+        double time = 0.0;
+        if (m_calClsCharge == 0) {
+          time = static_cast<double>(stripMaxima.find(strip)->second);
+        } else if (m_calClsCharge == 1) {
+          time = static_cast<double>(stripQFMaxima.find(strip)->second);
+        } else {
+          time = static_cast<double>(stripMaxima.find(strip)->second);
+        }
+        //double diff = stripMaxima.find(strip)->second - clusterTime;
+        double diff = time - clusterTime;
         clusterTiimeStd += charge * diff * diff;
       }
     }
@@ -472,7 +509,6 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
 
     //Lorentz shift correction
     clusterPosition -= info.getLorentzShift(isU, clusterPosition);
-
     map<int, float> mc_relations;
     map<int, float> truehit_relations;
     vector<pair<int, float> > digit_weights;

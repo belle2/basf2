@@ -8,8 +8,8 @@
 using namespace Belle2;
 
 CDCHVMessage::CDCHVMessage(MessageType type, Command command,
-                           unsigned short unit, unsigned short ch)
-  : m_type(type), m_command(command), m_unit(unit), m_ch(ch)
+                           unsigned short unit/*, unsigned short ch*/)
+  : m_type(type), m_command(command), m_unit(unit)//, m_ch(unit)
 {
   m_status = OFF;
   m_switchon = 0;
@@ -26,7 +26,7 @@ CDCHVMessage::CDCHVMessage(MessageType type, Command command,
 std::string CDCHVMessage::toString()
 {
   std::stringstream ss;
-  ss << "#" << getUnit() << getChannel() << " ";
+  ss << "#" << getUnit() /*<< getChannel()*/ << " ";
   if (m_type == GET) {
     switch (m_command) {
       case ALL:            ss << "GET"; break;
@@ -67,11 +67,11 @@ void CDCHVMessage::read(const std::string& str)
   std::string s = str;
   if (str.at(0) == '#') {
     setUnit(str.at(1) - '0');
-    setChannel(str.at(2) - '0');
+    //setChannel(str.at(2) - '0');
     s = s.substr(s.find(" ") + 1);
   } else {
     setUnit(0);
-    setChannel(0);
+    //setChannel(0);
   }
   s = StringUtil::toupper(s);
   std::vector<std::string> s_v = StringUtil::split(s, ' ');

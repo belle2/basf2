@@ -43,7 +43,7 @@ bool CDCHVCommunicator::configure() throw()
   if (m_available) {
     try {
       {
-        CDCHVMessage msg(CDCHVMessage::SET, CDCHVMessage::SWITCH, 0, 0);
+        CDCHVMessage msg(CDCHVMessage::SET, CDCHVMessage::SWITCH, 0);
         msg.setSwitchOn(false);
         send(msg);
       }
@@ -55,7 +55,7 @@ bool CDCHVCommunicator::configure() throw()
           if (channel.getCrate() != m_crateid) continue;
           const HVValue& value(value_v[i]);
           CDCHVMessage msg(CDCHVMessage::SET, CDCHVMessage::ALL,
-                           channel.getSlot(), channel.getChannel());
+                           /*channel.getSlot(), */channel.getChannel());
           msg.setVoltageLimit(value.getVoltageLimit());
           msg.setCommand(CDCHVMessage::VOLTAGE_LIMIT);
           send(msg);
@@ -73,7 +73,7 @@ bool CDCHVCommunicator::configure() throw()
           msg.setVoltageDemand(voltage_demand);
           send(msg);
         }
-        CDCHVMessage msg(CDCHVMessage::SET, CDCHVMessage::STORE, 0, 0);
+        CDCHVMessage msg(CDCHVMessage::SET, CDCHVMessage::STORE, 0);
         msg.setStoreId(j + 1);
         send(msg);
       }
@@ -90,7 +90,7 @@ bool CDCHVCommunicator::configure() throw()
 bool CDCHVCommunicator::turnon() throw()
 {
   m_mutex.lock();
-  CDCHVMessage msg(CDCHVMessage::SET, CDCHVMessage::RECALL, 0, 0);
+  CDCHVMessage msg(CDCHVMessage::SET, CDCHVMessage::RECALL, 0);
   msg.setStoreId(1);
   send(msg);
   m_mutex.unlock();
@@ -101,35 +101,35 @@ bool CDCHVCommunicator::turnon() throw()
 
 bool CDCHVCommunicator::turnoff() throw()
 {
-  CDCHVMessage msg(CDCHVMessage::SET, CDCHVMessage::SWITCH, 0, 0);
+  CDCHVMessage msg(CDCHVMessage::SET, CDCHVMessage::SWITCH, 0);
   msg.setSwitchOn(false);
   return perform(msg, HVState::OFF_S);
 }
 
 bool CDCHVCommunicator::standby() throw()
 {
-  CDCHVMessage msg(CDCHVMessage::SET, CDCHVMessage::RECALL, 0, 0);
+  CDCHVMessage msg(CDCHVMessage::SET, CDCHVMessage::RECALL, 0);
   msg.setStoreId(1);
   return perform(msg, HVState::STANDBY_S);
 }
 
 bool CDCHVCommunicator::shoulder() throw()
 {
-  CDCHVMessage msg(CDCHVMessage::SET, CDCHVMessage::RECALL, 0, 0);
+  CDCHVMessage msg(CDCHVMessage::SET, CDCHVMessage::RECALL, 0);
   msg.setStoreId(2);
   return perform(msg, HVState::SHOULDER_S);
 }
 
 bool CDCHVCommunicator::peak() throw()
 {
-  CDCHVMessage msg(CDCHVMessage::SET, CDCHVMessage::RECALL, 0, 0);
+  CDCHVMessage msg(CDCHVMessage::SET, CDCHVMessage::RECALL, 0);
   msg.setStoreId(4);
   return perform(msg, HVState::PEAK_S);
 }
 
-CDCHVMessage CDCHVCommunicator::readParams(int slot, int channel) throw(IOException)
+CDCHVMessage CDCHVCommunicator::readParams(/*int slot, */int channel) throw(IOException)
 {
-  CDCHVMessage msg(CDCHVMessage::GET, CDCHVMessage::ALL, slot, channel);
+  CDCHVMessage msg(CDCHVMessage::GET, CDCHVMessage::ALL, /*slot, */channel);
   msg.read(send(msg));
   msg.setCommand(CDCHVMessage::CURRENT_LIMIT);
   msg.read(send(msg));

@@ -2,6 +2,7 @@ package b2daq.dqm.graphics;
 
 import b2daq.dqm.core.Axis;
 import b2daq.graphics.GraphicsDrawer;
+import java.util.Arrays;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
@@ -76,9 +77,6 @@ public class GColorAxis extends GAxisY {
     }
 
     public ObservableList<Paint> getColorPattern() {
-        if (colorPattern.size() == 0) {
-            colorPattern.setAll(COLOR_LIST);
-        }
         return colorPattern;
     }
 

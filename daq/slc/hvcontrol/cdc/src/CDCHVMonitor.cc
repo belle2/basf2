@@ -26,8 +26,8 @@ void CDCHVMonitor::run()
           const HVChannel& channel(config.getChannel(i));
           if (channel.getCrate() != m_comm->getId()) continue;
           HVChannelStatus& status(callback->getChannelStatus(i));
-          CDCHVMessage msg = m_comm->readParams(channel.getSlot(),
-                                                channel.getChannel());
+          CDCHVMessage msg = m_comm->readParams(/*channel.getSlot(),*/
+                               channel.getChannel());
           status.setVoltageMon(msg.getVoltageMon());
           status.setCurrentMon(msg.getCurrentMon());
           switch (msg.getStatus()) {

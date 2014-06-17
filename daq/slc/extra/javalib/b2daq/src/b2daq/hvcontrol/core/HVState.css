@@ -19,40 +19,55 @@ and open the template in the editor.
     -fx-font-size:13px;
     -fx-font-weight:bold;
     -fx-alignment: CENTER;
-    -fx-fill:white;
+    -fx-fill:black;
 }
 
-.hvstate-stable .text {
+.hvstate-standby .text {
     -fx-font-size:13px;
     -fx-font-weight:bold;
     -fx-alignment: CENTER;
-    -fx-fill:white;
+    -fx-fill:black;
+}
+
+.hvstate-shoulder .text {
+    -fx-font-size:13px;
+    -fx-font-weight:bold;
+    -fx-alignment: CENTER;
+    -fx-fill:black;
 }
 
 .hvstate-transition .text {
     -fx-font-size:11px;
     -fx-font-weight:bold;
     -fx-alignment: CENTER;
-    -fx-fill:white;
+    -fx-fill:black;
 }
 
 .hvstate-error .text {
     -fx-font-size:13px;
     -fx-font-weight:bold;
     -fx-alignment: CENTER;
-    -fx-fill:white;
+    -fx-fill:black;
 }
 
 .hvstate-peak {
-    -fx-background-color: limegreen; 
+    -fx-background-color: cyan; 
     -fx-alignment: CENTER;
     -fx-padding: 2px;
     -fx-border-color: -fx-table-cell-border-color;
     -fx-border-width: 2px;
 }
 
-.hvstate-stable {
-    -fx-background-color: deepskyblue; 
+.hvstate-standby {
+    -fx-background-color: yellow; 
+    -fx-alignment: CENTER;
+    -fx-padding: 2px;
+    -fx-border-color: -fx-table-cell-border-color;
+    -fx-border-width: 2px;
+}
+
+.hvstate-shoulder {
+    -fx-background-color: rgb(0,176,80); 
     -fx-alignment: CENTER;
     -fx-padding: 2px;
     -fx-border-color: -fx-table-cell-border-color;
@@ -60,7 +75,7 @@ and open the template in the editor.
 }
 
 .hvstate-transition {
-    -fx-background-color: magenta; 
+    -fx-background-color: orange; 
     -fx-alignment: CENTER;
     -fx-padding: 2px;
     -fx-border-color: -fx-table-cell-border-color;
@@ -68,7 +83,7 @@ and open the template in the editor.
 }
 
 .hvstate-error {
-    -fx-background-color: red; 
+    -fx-background-color: rgb(204,193,218); 
     -fx-alignment: CENTER;
     -fx-padding: 2px;
     -fx-border-color: -fx-table-cell-border-color;
@@ -76,10 +91,10 @@ and open the template in the editor.
 }
 
 .hvstate-off {
-   // -fx-background-color: -fx-table-cell-background-color;
-   // -fx-alignment: CENTER;
-   // -fx-padding: 2px;
-   // -fx-border-color: -fx-table-cell-border-color;
-   // -fx-border-width: 2px;
+    -fx-background-color: red;
+    -fx-alignment: CENTER;
+    -fx-padding: 2px;
+    -fx-border-color: -fx-table-cell-border-color;
+    -fx-border-width: 2px;
 }
 

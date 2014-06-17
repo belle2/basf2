@@ -50,14 +50,18 @@ public class PowerSupplyCrateStatusTableController implements Initializable {
                     protected void updateItem(HVState item, boolean empty) {
                         super.updateItem(item, empty);
                         getStyleClass().removeAll("hvstate-off", "hvstate-peak",
-                                "hvstate-stable", "hvstate-transition",
-                                "hvstate-error");
+                                "hvstate-standby", "hvstate-shoulder", 
+                                "hvstate-transition", "hvstate-error");
                         if (!empty && item != null) {
                             HVState state = (HVState) item;
                             if (state.equals(HVState.OFF_S)) {
                                 getStyleClass().add("hvstate-off");
                             } else if (state.equals(HVState.PEAK_S)) {
                                 getStyleClass().add("hvstate-peak");
+                            } else if (state.equals(HVState.STANDBY_S)) {
+                                getStyleClass().add("hvstate-standby");
+                            } else if (state.equals(HVState.SHOULDER_S)) {
+                                getStyleClass().add("hvstate-shoulder");
                             } else if (state.isStable()) {
                                 getStyleClass().add("hvstate-stable");
                             } else if (state.isTransition()) {

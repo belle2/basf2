@@ -16,7 +16,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<TabPane prefHeight="454.0" prefWidth="841.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.apps.pscontrol.HVStatusMonitorController">
+<TabPane fx:id="tabpane" prefHeight="454.0" prefWidth="841.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.apps.pscontrol.HVStatusMonitorController">
     <tabs>
         <Tab closable="false" text="Summary">
             <content>
@@ -89,7 +89,7 @@
                                                         </GAxisY> 
                                                     </axisY>
                                                     <colorAxis>
-                                                        <GColorAxis colorPattern="white,lightgray,deepskyblue,deeppink,limegreen" fixedMax="true" fixedMin="true" max="5" min="0" visible="false">
+                                                        <GColorAxis colorPattern="white,red,yellow,#00B050,orange,cyan" fixedMax="true" fixedMin="true" max="6" min="0" visible="false">
                                                         </GColorAxis>
                                                     </colorAxis> 
                                                     <histograms>
@@ -99,15 +99,17 @@
                                                     </histograms>
                                                     <shapes>
                                                         <FXCollections fx:factory="observableArrayList">
-                                                            <GRect fillColor="white" height="0.1" lineColor="black" lineWidth="0.6" width="0.94" x="0.02" y="0.02" />
-                                                            <GRect fillColor="lightgray" height="0.06" lineColor="black" lineWidth="0.6" width="0.05" x="0.04" y="0.04" />
-                                                            <GRect fillColor="deepskyblue" height="0.06" lineColor="black" lineWidth="0.6" width="0.05" x="0.21" y="0.04" />
-                                                            <GRect fillColor="deeppink" height="0.06" lineColor="black" lineWidth="0.6" width="0.05" x="0.45" y="0.04" />
-                                                            <GRect fillColor="limegreen" height="0.06" lineColor="black" lineWidth="0.6" width="0.05" x="0.77" y="0.04" />
-                                                            <GText alignment="midle left" fontColor="gray" fontSize="0.7" text="OFF" x="0.10" y="0.1" />
-                                                            <GText alignment="midle left" fontColor="deepskyblue" fontSize="0.7" text="STABLE" x="0.27" y="0.1" />
-                                                            <GText alignment="midle left" fontColor="deeppink" fontSize="0.65" text="TRANSITION" x="0.52" y="0.1" />
-                                                            <GText alignment="midle left" fontColor="limegreen" fontSize="0.7" text="PEAK" x="0.84" y="0.1" />
+                                                            <GRect fillColor="white" height="0.1" lineColor="black" lineWidth="0.6" width="0.96" x="0.02" y="0.02" />
+                                                            <GRect fillColor="red" height="0.06" lineColor="black" lineWidth="0.6" width="0.03" x="0.04" y="0.04" />
+                                                            <GRect fillColor="yellow" height="0.06" lineColor="black" lineWidth="0.6" width="0.03" x="0.15" y="0.04" />
+                                                            <GRect fillColor="#00B050" height="0.06" lineColor="black" lineWidth="0.6" width="0.03" x="0.34" y="0.04" />
+                                                            <GRect fillColor="orange" height="0.06" lineColor="black" lineWidth="0.6" width="0.03" x="0.56" y="0.04" />
+                                                            <GRect fillColor="cyan" height="0.06" lineColor="black" lineWidth="0.6" width="0.03" x="0.79" y="0.04" />
+                                                            <GText alignment="midle left" fontColor="black" fontSize="0.6" text="OFF" x="0.08" y="0.09" />
+                                                            <GText alignment="midle left" fontColor="black" fontSize="0.6" text="STANDBY" x="0.19" y="0.09" />
+                                                            <GText alignment="midle left" fontColor="black" fontSize="0.6" text="SHOULDER" x="0.38" y="0.09" />
+                                                            <GText alignment="midle left" fontColor="black" fontSize="0.6" text="TRANSITION" x="0.6" y="0.09" />
+                                                            <GText alignment="midle left" fontColor="black" fontSize="0.6" text="PEAK" x="0.83" y="0.09" />
                                                         </FXCollections>
                                                     </shapes>
                                                 </HistogramCanvas>
@@ -119,116 +121,6 @@
                         </VBox>
                     </children>
                 </HBox>
-            </content>
-        </Tab>
-        <Tab closable="false" text="CDC:HV01">
-            <content>
-                <VBox>
-                    <children>
-                        <HBox VBox.vgrow="ALWAYS">
-                            <children>
-                                <TitledPane text="Monitored voltage" HBox.hgrow="ALWAYS">
-                                    <content>
-                                        <CanvasPanel prefHeight="520.0" prefWidth="400.0" HBox.hgrow="ALWAYS">
-                                            <canvas>
-                                                <HistogramCanvas fx:id="c_node0_vol_gr" fillColor="lightgray" name="c_node0_voltage_time" stat="false" title="">
-                                                    <pad>
-                                                        <Pad x="0.16" y="0.17" />
-                                                    </pad>
-                                                    <histograms>
-                                                        <FXCollections fx:factory="observableArrayList">
-                                                            <TimedGraph1D fx:id="gr_vol_node0_ch0" fixYmax="true" fixYmin="true" lineColor="blue" name="gr_vol_node0_ch0" nbinsx="1000" title="ch 1;Time;Monitored voltage[V]" xmax="600" xmin="0" ymax="2200" ymin="0" />
-                                                            <TimedGraph1D fx:id="gr_vol_node0_ch1" lineColor="red" name="gr_vol_node0_ch1" nbinsx="1000" title="ch 2" xmax="600" xmin="0" />
-                                                            <TimedGraph1D fx:id="gr_vol_node0_ch2" lineColor="green" name="gr_vol_node0_ch2" nbinsx="1000" title="ch 3" xmax="600" xmin="0" />
-                                                            <TimedGraph1D fx:id="gr_vol_node0_ch3" lineColor="lightseagreen" name="gr_vol_node0_ch3" nbinsx="1000" title="ch 4" xmax="600" xmin="0" />
-                                                            <TimedGraph1D fx:id="gr_vol_node0_ch4" lineColor="magenta" name="gr_vol_node0_ch4" nbinsx="1000" title="ch 5" xmax="600" xmin="0" />
-                                                            <TimedGraph1D fx:id="gr_vol_node0_ch5" lineColor="limegreen" name="gr_vol_node0_ch5" nbinsx="1000" title="ch 6" xmax="600" xmin="0" />
-                                                            <TimedGraph1D fx:id="gr_vol_node0_ch6" lineColor="gray" name="gr_vol_node0_ch6" nbinsx="1000" title="ch 7" xmax="600" xmin="0" />
-                                                            <TimedGraph1D fx:id="gr_vol_node0_ch7" lineColor="darkslateblue" name="gr_vol_node0_ch7" nbinsx="1000" title="ch 8" xmax="600" xmin="0" />
-                                                            <TimedGraph1D fx:id="gr_vol_node0_ch8" lineColor="orangered" name="gr_vol_node0_ch8" nbinsx="1000" title="ch 9" xmax="600" xmin="0" />
-                                                        </FXCollections>
-                                                    </histograms>
-                                                    <shapes>
-                                                        <FXCollections fx:factory="observableArrayList">
-                                                            <GRect fillColor="white" height="0.12" lineColor="black" lineWidth="0.6" width="0.96" x="0.02" y="0.02" />
-                                                            <GLine lineColor="blue" lineWidth="2.4" x1="0.04" x2="0.08" y1="0.06" y2="0.06" />
-                                                            <GLine lineColor="red" lineWidth="2.4" x1="0.22" x2="0.26" y1="0.06" y2="0.06" />
-                                                            <GLine lineColor="green" lineWidth="2.4" x1="0.40" x2="0.44" y1="0.06" y2="0.06" />
-                                                            <GLine lineColor="lightseagreen" lineWidth="2.4" x1="0.58" x2="0.62" y1="0.06" y2="0.06" />
-                                                            <GLine lineColor="magenta" lineWidth="2.4" x1="0.04" x2="0.08" y1="0.11" y2="0.11" />
-                                                            <GLine lineColor="limegreen" lineWidth="2.4" x1="0.22" x2="0.26" y1="0.11" y2="0.11" />
-                                                            <GLine lineColor="gray" lineWidth="2.4" x1="0.40" x2="0.44" y1="0.11" y2="0.11" />
-                                                            <GLine lineColor="darkslateblue" lineWidth="2.4" x1="0.58" x2="0.62" y1="0.11" y2="0.11" />
-                                                            <GLine lineColor="orangered" lineWidth="2.4" x1="0.76" x2="0.80" y1="0.11" y2="0.11" />
-                                                            <GText alignment="midle left" fontColor="blue" fontSize="0.6" text="CH 01" x="0.09" y="0.08" />
-                                                            <GText alignment="midle left" fontColor="red" fontSize="0.6" text="CH 02" x="0.27" y="0.08" />
-                                                            <GText alignment="midle left" fontColor="green" fontSize="0.6" text="CH 03" x="0.45" y="0.08" />
-                                                            <GText alignment="midle left" fontColor="lightseagreen" fontSize="0.6" text="CH 04" x="0.63" y="0.08" />
-                                                            <GText alignment="midle left" fontColor="magenta" fontSize="0.6" text="CH 05" x="0.09" y="0.13" />
-                                                            <GText alignment="midle left" fontColor="limegreen" fontSize="0.6" text="CH 06" x="0.27" y="0.13" />
-                                                            <GText alignment="midle left" fontColor="gray" fontSize="0.6" text="CH 07" x="0.45" y="0.13" />
-                                                            <GText alignment="midle left" fontColor="darkslateblue" fontSize="0.6" text="CH 08" x="0.63" y="0.13" />
-                                                            <GText alignment="midle left" fontColor="orangered" fontSize="0.6" text="CH 09" x="0.81" y="0.13" />
-                                                        </FXCollections>
-                                                    </shapes>
-                                                </HistogramCanvas>
-                                            </canvas>
-                                        </CanvasPanel>
-                                    </content>
-                                </TitledPane>
-                                <TitledPane text="Monitored current" HBox.hgrow="ALWAYS">
-                                    <content>
-                                        <CanvasPanel prefHeight="520.0" prefWidth="400.0" HBox.hgrow="ALWAYS">
-                                            <canvas>
-                                                <HistogramCanvas fx:id="c_node0_cur_gr" fillColor="lightgray" name="c_node0_cur_gr" stat="false" title="">
-                                                    <pad>
-                                                        <Pad x="0.16" y="0.17" />
-                                                    </pad>
-                                                    <histograms>
-                                                        <FXCollections fx:factory="observableArrayList">
-                                                            <TimedGraph1D fx:id="gr_cur_node0_ch0" fixYmax="true" fixYmin="true" lineColor="blue" name="gr_cur_node0_ch0" nbinsx="1000" title="ch 1;Time;Monitored curent[mA]" xmax="600" xmin="0" ymax="500" ymin="0" />
-                                                            <TimedGraph1D fx:id="gr_cur_node0_ch1" lineColor="red" name="gr_cur_node0_ch1" nbinsx="1000" title="ch 2" xmax="600" xmin="0" />
-                                                            <TimedGraph1D fx:id="gr_cur_node0_ch2" lineColor="green" name="gr_cur_node0_ch2" nbinsx="1000" title="ch 3" xmax="600" xmin="0" />
-                                                            <TimedGraph1D fx:id="gr_cur_node0_ch3" lineColor="lightseagreen" name="gr_cur_node0_ch3" nbinsx="1000" title="ch 4" xmax="600" xmin="0" />
-                                                            <TimedGraph1D fx:id="gr_cur_node0_ch4" lineColor="magenta" name="gr_cur_node0_ch4" nbinsx="1000" title="ch 5" xmax="600" xmin="0" />
-                                                            <TimedGraph1D fx:id="gr_cur_node0_ch5" lineColor="limegreen" name="gr_cur_node0_ch5" nbinsx="1000" title="ch 6" xmax="600" xmin="0" />
-                                                            <TimedGraph1D fx:id="gr_cur_node0_ch6" lineColor="gray" name="gr_cur_node0_ch6" nbinsx="1000" title="ch 7" xmax="600" xmin="0" />
-                                                            <TimedGraph1D fx:id="gr_cur_node0_ch7" lineColor="darkslateblue" name="gr_cur_node0_ch7" nbinsx="1000" title="ch 8" xmax="600" xmin="0" />
-                                                            <TimedGraph1D fx:id="gr_cur_node0_ch8" lineColor="orangered" name="gr_cur_node0_ch8" nbinsx="1000" title="ch 9" xmax="600" xmin="0" />
-                                                        </FXCollections>
-                                                    </histograms>
-                                                    <shapes>
-                                                        <FXCollections fx:factory="observableArrayList">
-                                                            <GRect fillColor="white" height="0.12" lineColor="black" lineWidth="0.6" width="0.96" x="0.02" y="0.02" />
-                                                            <GLine lineColor="blue" lineWidth="2.4" x1="0.04" x2="0.08" y1="0.06" y2="0.06" />
-                                                            <GLine lineColor="red" lineWidth="2.4" x1="0.22" x2="0.26" y1="0.06" y2="0.06" />
-                                                            <GLine lineColor="green" lineWidth="2.4" x1="0.40" x2="0.44" y1="0.06" y2="0.06" />
-                                                            <GLine lineColor="lightseagreen" lineWidth="2.4" x1="0.58" x2="0.62" y1="0.06" y2="0.06" />
-                                                            <GLine lineColor="magenta" lineWidth="2.4" x1="0.04" x2="0.08" y1="0.11" y2="0.11" />
-                                                            <GLine lineColor="limegreen" lineWidth="2.4" x1="0.22" x2="0.26" y1="0.11" y2="0.11" />
-                                                            <GLine lineColor="gray" lineWidth="2.4" x1="0.40" x2="0.44" y1="0.11" y2="0.11" />
-                                                            <GLine lineColor="darkslateblue" lineWidth="2.4" x1="0.58" x2="0.62" y1="0.11" y2="0.11" />
-                                                            <GLine lineColor="orangered" lineWidth="2.4" x1="0.76" x2="0.80" y1="0.11" y2="0.11" />
-                                                            <GText alignment="midle left" fontColor="blue" fontSize="0.6" text="CH 01" x="0.09" y="0.08" />
-                                                            <GText alignment="midle left" fontColor="red" fontSize="0.6" text="CH 02" x="0.27" y="0.08" />
-                                                            <GText alignment="midle left" fontColor="green" fontSize="0.6" text="CH 03" x="0.45" y="0.08" />
-                                                            <GText alignment="midle left" fontColor="lightseagreen" fontSize="0.6" text="CH 04" x="0.63" y="0.08" />
-                                                            <GText alignment="midle left" fontColor="magenta" fontSize="0.6" text="CH 05" x="0.09" y="0.13" />
-                                                            <GText alignment="midle left" fontColor="limegreen" fontSize="0.6" text="CH 06" x="0.27" y="0.13" />
-                                                            <GText alignment="midle left" fontColor="gray" fontSize="0.6" text="CH 07" x="0.45" y="0.13" />
-                                                            <GText alignment="midle left" fontColor="darkslateblue" fontSize="0.6" text="CH 08" x="0.63" y="0.13" />
-                                                            <GText alignment="midle left" fontColor="orangered" fontSize="0.6" text="CH 09" x="0.81" y="0.13" />
-                                                        </FXCollections>
-                                                    </shapes>
-                                                </HistogramCanvas>
-                                            </canvas>
-                                        </CanvasPanel>
-                                    </content>
-                                </TitledPane>
-                            </children>
-                        </HBox>
-                    </children>
-                </VBox>
             </content>
         </Tab>
     </tabs>

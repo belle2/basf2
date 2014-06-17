@@ -13,13 +13,13 @@
 <?import javafx.scene.control.cell.*?>
 <?scenebuilder-classpath-element ../classes?>
 
-<TabPane prefHeight="591.0" prefWidth="901.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.apps.pscontrol.PowerSupplyMainPaneController">
+<TabPane prefHeight="591.0" prefWidth="944.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.apps.pscontrol.PowerSupplyMainPaneController">
     <tabs>
         <Tab closable="false" text="Control main">
             <content>
                 <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="528.0" prefWidth="825.0">
                     <children>
-                        <VBox alignment="BOTTOM_LEFT" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="400.0" prefWidth="245.0" HBox.hgrow="ALWAYS">
+                        <VBox alignment="BOTTOM_LEFT" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="558.0" prefWidth="190.0" HBox.hgrow="ALWAYS">
                             <children>
                                 <TitledPane animated="false" collapsible="false" prefHeight="102.0" prefWidth="245.0" text="Operation mode">
                                     <content>

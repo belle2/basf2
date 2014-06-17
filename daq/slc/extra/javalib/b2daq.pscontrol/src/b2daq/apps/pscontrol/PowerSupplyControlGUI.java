@@ -53,7 +53,6 @@ public class PowerSupplyControlGUI extends Application {
             for (NSMDataProperty data : socket.getNSMConfig().getNSMDataProperties()) {
                 netconf.add(data);
             }
-            controller.getMonitor().setDB(controller.getDB());
             NSMListenerService.add(controller);
             NSMListenerService.add(controller.getEditor());
             NSMListenerService.add(controller.getMonitor());

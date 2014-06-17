@@ -153,15 +153,18 @@ public class PowerStateLabelController {
         boolean renewed = (state.equals(state_org));
         state_org.copy(state);
         if (state.equals(HVState.OFF_S)) {
-            set(state.getLabel(), Color.WHITESMOKE, Color.LIGHTGRAY, Color.BLACK);
+            set(state.getLabel(), Color.RED, Color.RED, Color.BLACK);
+        } else if (state.equals(HVState.STANDBY_S)) {
+            set(state.getLabel(), Color.YELLOW, Color.YELLOW, Color.BLACK);
+        } else if (state.equals(HVState.SHOULDER_S)) {
+            set(state.getLabel(), Color.rgb(0, 176, 80), Color.rgb(0, 176, 80), Color.BLACK);
         } else if (state.equals(HVState.PEAK_S)) {
-            set(state.getLabel(), Color.LIGHTGREEN, Color.LIMEGREEN, Color.WHITE);
-        } else if (state.isStable()) {
-            set(state.getLabel(), Color.CYAN, Color.DEEPSKYBLUE, Color.WHITE);
+            //set(state.getLabel(), Color.LIGHTGREEN, Color.LIMEGREEN, Color.WHITE);
+            set(state.getLabel(), Color.CYAN, Color.CYAN, Color.BLACK);
         } else if (state.isTransition()) {
-            set(state.getLabel(), Color.PINK, Color.MAGENTA, Color.WHITE);
+            set(state.getLabel(), Color.ORANGE, Color.ORANGE, Color.BLACK);
         } else {
-            set(state.getLabel(), Color.BLACK, Color.GRAY, Color.WHITE);
+            set(state.getLabel(), Color.BLACK, Color.BLACK, Color.WHITE);
         }
         return renewed;
     }

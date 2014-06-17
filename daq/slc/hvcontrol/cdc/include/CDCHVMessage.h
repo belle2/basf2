@@ -37,7 +37,7 @@ namespace Belle2 {
 
   public:
     CDCHVMessage(MessageType type = GET, Command command = ALL,
-                 unsigned short unit = 0, unsigned short ch = 0);
+                 unsigned short unit = 0);
     ~CDCHVMessage() {}
 
   public:
@@ -48,7 +48,7 @@ namespace Belle2 {
     void setMessageType(MessageType type) { m_type = type; }
     void setCommand(Command command) { m_command = command; }
     void setUnit(int unit) { m_unit = unit; }
-    void setChannel(int ch) { m_ch = ch; }
+    //void setChannel(int ch) { m_ch = ch; }
     void setStatus(StatusFlag v) { m_status = v; }
     void setSwitchOn(bool v) { m_switchon = v; }
     void setRampUpSpeed(unsigned int v) { m_rampup_speed = v; }
@@ -63,7 +63,7 @@ namespace Belle2 {
     MessageType getMessageType() const { return m_type; }
     Command getCommand() const { return m_command; }
     int getUnit() const { return m_unit; }
-    int getChannel() const { return m_ch; }
+    //int getChannel() const { return m_ch; }
     StatusFlag getStatus() const { return m_status; }
     bool isSwitchOn() const { return m_switchon; }
     unsigned int getVoltageDemand() const { return m_voltage_demand; }
@@ -78,7 +78,8 @@ namespace Belle2 {
   private:
     MessageType m_type;
     Command m_command;
-    unsigned short m_unit, m_ch;
+    //unsigned short m_ch;
+    unsigned short m_unit;
     StatusFlag m_status;
     bool m_switchon;
     unsigned int m_voltage_demand;

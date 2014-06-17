@@ -1,0 +1,4 @@
+ nodename,  config, hostnode,      dataname,        format, revision
+   ARICH_RC, default,   CPR010, STATUS_CPR010, ronode_status,        1
+   ARICH_RC, default,   CPR011, STATUS_CPR011, ronode_status,        1
+   ARICH_RC, default,   ROPC01, STATUS_ROPC01, ronode_status,        1

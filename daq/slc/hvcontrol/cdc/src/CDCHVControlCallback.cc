@@ -97,7 +97,7 @@ throw()
         (hvmsg.isAllSlots() || hvmsg.getSlot() == channel.getSlot()) &&
         (hvmsg.isAllChannels() || hvmsg.getChannel() == channel.getChannel())) {
       CDCHVMessage msg(CDCHVMessage::SET, CDCHVMessage::ALL,
-                       channel.getSlot(), channel.getChannel());
+                       /*channel.getSlot(), */channel.getChannel());
       std::cout << i << " " << channel.getCrate() << " " << channel.getSlot()
                 << " "  << channel.getChannel() << std::endl;
       if (hvmsg.isTurnon()) {

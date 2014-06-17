@@ -130,6 +130,7 @@ public class PowerSupplyMainPaneController implements Initializable, NSMObserver
                 networkconfigController.add(cobj);
                 powerSettingsController.update(cobj);
                 psStatusController.setDB(cobj, logviewController);
+                hvmonitorController.setDB(cobj);
             }
         } else if (command.equals(NSMCommand.NSMSET)) {
             String dataname = getNSMDataProperties().get(0).getDataname();

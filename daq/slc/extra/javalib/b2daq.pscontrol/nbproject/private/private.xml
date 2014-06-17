@@ -2,6 +2,17 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/home/tkonno/belle2/release2/daq/slc/extra/javalib/b2daq.pscontrol/src/b2daq/apps/pscontrol/PowerSupplyCrateStatusTableController.java</file>
+            <file>file:/home/tkonno/belle2/release2/daq/slc/extra/javalib/b2daq.pscontrol/src/b2daq/apps/pscontrol/HVStatusMonitor.fxml</file>
+            <file>file:/home/tkonno/belle2/release2/daq/slc/extra/javalib/b2daq.pscontrol/src/b2daq/apps/pscontrol/HVStabilityMonitorController1.java</file>
+            <file>file:/home/tkonno/belle2/release2/daq/slc/extra/javalib/b2daq.pscontrol/src/b2daq/apps/pscontrol/AddingChannelDialog.java</file>
+            <file>file:/home/tkonno/belle2/release2/daq/slc/extra/javalib/b2daq.pscontrol/src/b2daq/apps/pscontrol/PowerStateLabelController.java</file>
+            <file>file:/home/tkonno/belle2/release2/daq/slc/extra/javalib/b2daq.pscontrol/src/b2daq/apps/pscontrol/HVStatusMonitorController.java</file>
+            <file>file:/home/tkonno/belle2/release2/daq/slc/extra/javalib/b2daq.pscontrol/src/b2daq/apps/pscontrol/HVStabilityMonitor.fxml</file>
+            <file>file:/home/tkonno/belle2/release2/daq/slc/extra/javalib/b2daq.pscontrol/src/b2daq/apps/pscontrol/PowerSupplyStatusPaneController.java</file>
+            <file>file:/home/tkonno/belle2/release2/daq/slc/extra/javalib/b2daq.pscontrol/src/b2daq/apps/pscontrol/PowerSupplyMainPaneController.java</file>
+            <file>file:/home/tkonno/belle2/release2/daq/slc/extra/javalib/b2daq.pscontrol/src/b2daq/apps/pscontrol/PowerSupplyControlGUI.java</file>
+        </group>
     </open-files>
 </project-private>

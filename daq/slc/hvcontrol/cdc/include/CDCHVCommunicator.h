@@ -29,7 +29,7 @@ namespace Belle2 {
     bool peak() throw();
 
   public:
-    CDCHVMessage readParams(int slot, int channel) throw(IOException);
+    CDCHVMessage readParams(/*int slot, */int channel) throw(IOException);
     HVControlCallback* getCallback() { return m_callback; }
     int getId() const { return m_crateid; }
 

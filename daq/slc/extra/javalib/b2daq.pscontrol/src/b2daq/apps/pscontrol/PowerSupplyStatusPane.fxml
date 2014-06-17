@@ -65,8 +65,8 @@
                         </GridPane>
                   <GridPane fx:id="grid_crates" hgap="5.0" vgap="5.0" VBox.vgrow="ALWAYS">
                     <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="88.0" minWidth="10.0" prefWidth="88.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="88.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="109.0" minWidth="10.0" prefWidth="109.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="84.0" minWidth="10.0" prefWidth="70.0" />
                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="88.0" minWidth="10.0" prefWidth="88.0" />
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="88.0" />
                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="88.0" minWidth="10.0" prefWidth="88.0" />
@@ -80,7 +80,22 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Label fx:id="label0" text="CDC:HV01" />
+                        <Label fx:id="label0" GridPane.columnIndex="2" />
+                        <Label text="# of crate" />
+                        <Label text="# of channels" GridPane.rowIndex="2" />
+                        <Label text="# of slots" GridPane.rowIndex="1" />
+                        <Label fx:id="label_crates" text="-- / --" GridPane.columnIndex="1" />
+                        <Label fx:id="label_slots" text="-- / --" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <Label fx:id="label_channels" text="-- / --" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <Label fx:id="label1" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                        <Label fx:id="label2" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                        <Label fx:id="label3" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                        <Label fx:id="label4" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                        <Label fx:id="label5" GridPane.columnIndex="4" />
+                        <Label fx:id="label6" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                        <Label fx:id="label7" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                        <Label fx:id="label8" GridPane.columnIndex="4" GridPane.rowIndex="3" />
+                        <Label fx:id="label9" GridPane.columnIndex="4" GridPane.rowIndex="4" />
                      </children>
                      <VBox.margin>
                         <Insets />

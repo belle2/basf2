@@ -42,7 +42,7 @@ throw()
     FieldInfoList finfo_v = ftable.getList(tablename, revision);
     EnumNameList enum_m_m;
     std::stringstream ss;
-    ss << "select configid" << ((!tinfo.isRoot()) ? ", index" : "");
+    ss << "select configid" << ((!tinfo.isRoot()) ? ", index " : "");
     for (FieldInfoList::iterator it = finfo_v.begin();
          it != finfo_v.end(); it++) {
       ss << ", " << it->setSQL();

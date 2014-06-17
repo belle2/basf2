@@ -11,6 +11,7 @@ import b2daq.hvcontrol.ui.StateLabel;
 import b2daq.logger.ui.LogViewPaneController;
 import b2daq.nsm.NSMConfig;
 import b2daq.nsm.NSMData;
+import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -38,7 +39,7 @@ public class PowerSupplyStatusPaneController implements Initializable {
     private TabPane tabpane;
     @FXML
     private GridPane grid_crates;
-    
+
     @FXML
     private Label label_ps;
     @FXML
@@ -51,20 +52,31 @@ public class PowerSupplyStatusPaneController implements Initializable {
     private Label label3;
     @FXML
     private Label label4;
+    @FXML
+    private Label label5;
+    @FXML
+    private Label label6;
+    @FXML
+    private Label label7;
+    @FXML
+    private Label label8;
+    @FXML
+    private Label label9;
 
     @FXML
     private Label label_update;
-    //@FXML
-    //private Label label_modules;
-    //@FXML
-    //private Label label_channels;
+    @FXML
+    private Label label_crates;
+    @FXML
+    private Label label_slots;
+    @FXML
+    private Label label_channels;
     @FXML
     private Label label_config;
     @FXML
     private StateLabel state_ps;
 
-    private final ObservableList<PowerSupplyCrateStatusTableController> 
-            tables = FXCollections.observableArrayList();
+    private final ObservableList<PowerSupplyCrateStatusTableController> tables = FXCollections.observableArrayList();
     private final ObservableList<StateLabel> states
             = FXCollections.observableArrayList();
 
@@ -73,27 +85,6 @@ public class PowerSupplyStatusPaneController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        Label[] labels = new Label[]{label0, label1, label2, label3, label4};
-        for (Label label : labels) {
-            StateLabel slabel = addLabel(label, grid_crates);
-            if (slabel == null) {
-                continue;
-            }
-            try {
-                states.add(slabel);
-                FXMLLoader loader = new FXMLLoader(PowerSupplyCrateStatusTableController.class.getResource("PowerSupplyCrateStatusTable.fxml"));
-                loader.load();
-                PowerSupplyCrateStatusTableController controller = loader.getController();
-                Tab tab = new Tab();
-                tab.setText(slabel.getName());
-                tab.setContent(controller.getTable());
-                tab.setClosable(false);
-                tabpane.getTabs().add(tab);
-                tables.add(controller);
-            } catch (Exception e) {
-                Logger.getLogger(PowerSupplyStatusPaneController.class.getName()).log(Level.SEVERE, null, e);
-            }
-        }
     }
 
     public void setConnected(NSMConfig config) {
@@ -128,6 +119,34 @@ public class PowerSupplyStatusPaneController implements Initializable {
     }
 
     public void setDB(ConfigObject cobj, LogViewPaneController logview) {
+        Label[] labels = new Label[]{label0, label1, label2, label3, label4,
+            label5, label6, label7, label8, label9};
+        
+        for (int i = 0; i < labels.length; i++) {
+            Label label = labels[i];
+            if (cobj.hasObject("crate") && cobj.getNObjects("crate") > i) {
+                label.setText(cobj.getObject("crate", i).getText("label"));
+                StateLabel slabel = addLabel(label, grid_crates);
+                if (slabel == null) {
+                    continue;
+                }
+                try {
+                    states.add(slabel);
+                    FXMLLoader loader = new FXMLLoader(PowerSupplyCrateStatusTableController.class.getResource("PowerSupplyCrateStatusTable.fxml"));
+                    loader.load();
+                    PowerSupplyCrateStatusTableController controller = loader.getController();
+                    Tab tab = new Tab();
+                    tab.setText(slabel.getName());
+                    tab.setContent(controller.getTable());
+                    tab.setClosable(false);
+                    tabpane.getTabs().add(tab);
+                    tables.add(controller);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Logger.getLogger(PowerSupplyStatusPaneController.class.getName()).log(Level.SEVERE, null, e);
+                }
+            }
+        }
         if (cobj.hasObject("channel")) {
             for (ConfigObject obj : cobj.getObjects("channel")) {
                 int crate = obj.getInt("crate");
@@ -150,6 +169,7 @@ public class PowerSupplyStatusPaneController implements Initializable {
             boolean iserror = false;
             int id = HVState.PEAK_S.getId();
             int ncrate = 0, ncrate_active = 0;
+            int nslot = 0, nslot_active = 0;
             int nchannel = 0, nchannel_active = 0;
             for (ConfigObject obj : cobj.getObjects("channel")) {
                 int crate = obj.getInt("crate");
@@ -217,8 +237,8 @@ public class PowerSupplyStatusPaneController implements Initializable {
                 id = HVState.ERROR_ES.getId();
             }
             ncrate++;
-            //label_modules.setText(ncrate_active + " / " + ncrate);
-            //label_channels.setText(nchannel_active + " / " + nchannel);
+            label_crates.setText(ncrate_active + " / " + ncrate);
+            label_channels.setText(nchannel_active + " / " + nchannel);
             state.copy(id);
             if (crate_tmp < states.size()) {
                 states.get(crate_tmp).update(state);

@@ -6,7 +6,9 @@ createParamTable hvconfig ${DIR}/
 createParamTable hvconfig.channel ${DIR}/
 createParamTable hvconfig.valueset ${DIR}/
 createParamTable hvconfig.valueset.value ${DIR}/
+createParamTable hvconfig.crate ${DIR}/
 
+addParamConfig ARICH hvconfig.crate ${DIR}/arich.hvconfig.crate.csv
 addParamConfig ARICH hvconfig.valueset.value ${DIR}/arich.hvconfig.valueset.value.csv
 addParamConfig ARICH hvconfig.valueset ${DIR}/arich.hvconfig.valueset.csv
 addParamConfig ARICH hvconfig.channel ${DIR}/arich.hvconfig.channel.csv

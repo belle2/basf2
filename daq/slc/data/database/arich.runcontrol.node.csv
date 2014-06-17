@@ -1,0 +1,4 @@
+ nodename,  config, used,                   runtype, type, dbmode, sequential
+   ARICH_RC, default, true,   CPR010/copper/1/ARICH:V03,  daq,    set,       true
+   ARICH_RC, default, true,   CPR011/copper/1/ARICH:V03,  daq,    set,       true
+   ARICH_RC, default, true, ROPC01/ropc/1/ARICH:default,  daq,    set,       true

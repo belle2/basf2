@@ -70,7 +70,7 @@ public:
 std::string toReplyText(CDCHVMessage& msg)
 {
   std::stringstream ss;
-  ss << "#" << msg.getUnit() << msg.getChannel();
+  ss << "#" << msg.getUnit(); //<< msg.getChannel();
   switch (msg.getCommand()) {
     case CDCHVMessage::ALL: {
       ss << StringUtil::form("GET=%04X,%04X,%d,%04X,%04X",
@@ -101,7 +101,7 @@ int main(int argc, char** argv)
     CDCHVMessage* hvmsg = new CDCHVMessage[MAX_UNITS];
     for (int i = 0; i < MAX_STORES; i++) {
       hvmsg[i].setUnit(unit + 1);
-      hvmsg[i].setChannel(1);
+      //hvmsg[i].setChannel(1);
     }
     hvmsg_v.push_back(hvmsg);
     PThread(new HVEmulator(unit));
@@ -141,8 +141,8 @@ int main(int argc, char** argv)
         for (int iunit = 0; iunit < MAX_UNITS; iunit++) {
           CDCHVMessage& hvmsg(hvmsg_v[iunit][0]);
           msg = msg_org;
-          if ((msg.getUnit() == 0 && msg.getChannel() == 0) ||
-              (msg.getUnit() == hvmsg.getUnit() && msg.getChannel() == hvmsg.getChannel())) {
+          if ((msg.getUnit() == 0 /*&& msg.getChannel() == 0*/) ||
+              (msg.getUnit() == hvmsg.getUnit() /*&& msg.getChannel() == hvmsg.getChannel()*/)) {
             if (msg.getMessageType() == CDCHVMessage::GET) {
               mutex[iunit].lock();
               msg = hvmsg;

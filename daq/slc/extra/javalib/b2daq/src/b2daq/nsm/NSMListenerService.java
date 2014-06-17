@@ -210,6 +210,7 @@ public class NSMListenerService extends Thread {
                 try {
                     obs.handleOnConnected();
                 } catch (Exception e) {
+                    e.printStackTrace();
                     log(new LogMessage("LOCAL", LogLevel.ERROR,
                             "Internal exception " + e.getMessage()));
                 }
@@ -223,6 +224,7 @@ public class NSMListenerService extends Thread {
                 try {
                     obs.handleOnReceived(msg);
                 } catch (Exception e) {
+                    e.printStackTrace();
                     log(new LogMessage("LOCAL", LogLevel.ERROR,
                             "Internal exception " + e.getMessage()));
                 }
@@ -236,6 +238,7 @@ public class NSMListenerService extends Thread {
                 try {
                     obs.handleOnDisConnected();
                 } catch (Exception e) {
+                    e.printStackTrace();
                     log(new LogMessage("LOCAL", LogLevel.ERROR,
                             "Internal exception " + e.getMessage()));
                 }

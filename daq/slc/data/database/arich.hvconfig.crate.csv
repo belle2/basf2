@@ -1,0 +1,2 @@
+   nodename,  config, crateid, label,  hostname,  port
+   ARICH_HV, default,       0,  HV01, localhost, 44000

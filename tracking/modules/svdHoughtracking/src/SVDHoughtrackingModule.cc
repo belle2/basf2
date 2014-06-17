@@ -2094,7 +2094,7 @@ SVDHoughtrackingModule::trackAnalyseMCParticle()
       m_histPhiDist->Fill(mom.Phi() / Unit::deg);
       m_histThetaDist->Fill(mom.Theta() / Unit::deg);
 
-      B2INFO("  MCParticleInfo: Mom Vec: " << mom.X() << " " << mom.Y() << " " << mom.Z());
+      B2DEBUG(250, "  MCParticleInfo: Mom Vec: " << mom.X() << " " << mom.Y() << " " << mom.Z());
       if (m_compareMCParticleVerbose) {
         cout << "  ID: " << storeMCParticles[i]->getIndex() << " PDG ID: "
              << boost::format("+%+3f") % storeMCParticles[i]->getPDG()

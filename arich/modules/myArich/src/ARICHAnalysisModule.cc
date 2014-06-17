@@ -177,6 +177,7 @@ namespace Belle2 {
         m_expPhotons[3] = arich->getNphot_K();
         m_expPhotons[4] = arich->getNphot_p();
         m_status += 10;
+        m_flag = arich->getFlag();
       }
 
       const ExtHit* extHit = DataStore::getRelated<ExtHit>(aeroHit);

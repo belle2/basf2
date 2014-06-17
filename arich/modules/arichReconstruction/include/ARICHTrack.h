@@ -47,7 +47,8 @@ namespace Belle2 {
       m_trackID(-1),
       m_extHitID(-1),
       m_identity(-1),
-      m_aeroIndex(-1) {
+      m_aeroIndex(-1),
+      m_flag(1) {
       /*! does nothing */
       for (int i = 0; i < c_noOfHypotheses; i++) {
         m_lkh[i] = 0;
@@ -83,7 +84,8 @@ namespace Belle2 {
       m_trackID(trackID),
       m_extHitID(-1),
       m_identity(-1),
-      m_aeroIndex(-1) {
+      m_aeroIndex(-1),
+      m_flag(1) {
       for (int i = 0; i < c_noOfHypotheses; i++) {
         m_lkh[i]  = 0;
         m_expectedPhotons[i] = 0;
@@ -161,9 +163,11 @@ namespace Belle2 {
     //! returns expected number of detected photons for all particle hypotheses
     void getDetectedPhotons(int nphot[]) {nphot[0] = m_detectedPhotons[0]; nphot[1] = m_detectedPhotons[1]; nphot[2] = m_detectedPhotons[2]; nphot[3] = m_detectedPhotons[3]; nphot[4] = m_detectedPhotons[4]; };
 
-
     //! returns geometrical acceptance of emitted Cherenkov photons by particle "i" (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
     double getGeometricalAcceptance(int i) const {return m_acc[i]; };
+
+    //! returns the likelihood flag. 0 if outside ARICH geometrical acceptance.
+    int getFlag() const {return  m_flag; };
 
     //! sets value of likelihood function for particle hypothesis "i" to "val" (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
     void setLikelihood(int i, double val) {m_lkh[i] = val; };
@@ -182,6 +186,10 @@ namespace Belle2 {
 
     //! sets the geometrical acceptance of Cherenkov ring for i-th particle hypothesis (here i is particle index: 0 electron, 1 muon, 2 pion, 3 kaon, 4 proton)
     void setGeometricalAcceptance(int i, double val) {m_acc[i] = val;};
+
+    //! sets the likelihood flag. Set to 0 if outside ARICH geometrical acceptance.
+    void setFlag(int fl) { m_flag = fl; };
+
 
     //! sets the reconstructed value of track parameters.
     // "r" is position of track, "dir" direction and "p" momentum of track on aerogel plane.
@@ -247,7 +255,7 @@ namespace Belle2 {
     int    m_extHitID;                    /**< track identification number in ext */
     int    m_identity;                    /**< particle index (0 electron, 1 muon, 2 pion, 3 kaon, 4 proton, -1 else). */
     int    m_aeroIndex;                   /**< Relation index needed to create relation from ARICHAeroHit(MC simulation) to ARICHLikelihood. */
-
+    int    m_flag;                        /**< Flag for calculated likelihood usefulness. */
 
 
     double  m_lkh[c_noOfHypotheses];  /**< Value of likelihood function for different particle hypotheses. */

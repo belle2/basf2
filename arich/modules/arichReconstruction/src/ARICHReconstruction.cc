@@ -550,11 +550,15 @@ namespace Belle2 {
       //******************************************
       // store LikeliHOOD info
       //******************************************
+
+
       for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
         track->setExpectedPhotons(iHyp, nSig[iHyp][nAerogelLayers]); // sum for all agels
         track->setDetectedPhotons(iHyp, nDetPhotons[iHyp]);
         track->setGeometricalAcceptance(iHyp, acceptance[iHyp][0]);
+        if ((thetaCh[iHyp][0] > 0 || thetaCh[iHyp][1] > 0) && nSig[iHyp][nAerogelLayers] == 0) track->setFlag(0);
       }
+
       track->setLikelihood(logL);
       //**************************************
 

@@ -72,8 +72,7 @@ def add_posttracking_reconstruction(path, components=None):
         path.add_module(muid)
 
     # charged particle PID
-    if components is None or 'PXD' in components or 'SVD' in components \
-            or 'CDC' in components:
+    if components is None or 'SVD' in components or 'CDC' in components:
         mdstPID = register_module('MdstPID')
         path.add_module(mdstPID)
 

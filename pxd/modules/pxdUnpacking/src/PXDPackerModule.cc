@@ -356,10 +356,10 @@ void PXDPackerModule::pack_dhh(int dhh_id, int dhp_active)
 // we fake the framenr and startframenr until we find some better solution
 
   if (dhp_active != 0) { /// is there any hardware switched on?
-    unsigned int ladder_min_row = 0; /// get them from database
-    unsigned int ladder_max_row = 785;
-    unsigned int ladder_min_col = 0;
-    unsigned int ladder_max_col = 250;
+    const unsigned int ladder_min_row = 0; /// get them from database
+    const unsigned int ladder_max_row = 785;
+    const unsigned int ladder_min_col = 0;
+    const unsigned int ladder_max_col = 250;
 
     /// clear pixelmap
     bzero(halfladder_pixmap, sizeof(halfladder_pixmap));
@@ -395,8 +395,8 @@ void PXDPackerModule::pack_dhh(int dhh_id, int dhp_active)
         /// Fill pixel to pixelmap
         {
           unsigned int row, col;
-          col = it->getVCellID(); // getColumn();
-          row = it->getUCellID(); // getRow();
+          row = it->getVCellID();
+          col = it->getUCellID();
           if (row < ladder_min_row || row > ladder_max_row || col < ladder_min_col || col > ladder_max_col) {
             B2ERROR("ROW/COL out of range col: " << col << " row: " << row);
           } else

@@ -997,20 +997,19 @@ int PXDUnpackerModule::nr5bits(int i) const
 
 void PXDUnpackerModule::unpack_dhhc_frame(void* data, const int len, const int Frame_Number, const int Frames_in_event)
 {
-  /// The following STATIC variables are used to save some state or cound some things
+  /// The following STATIC variables are used to save some state or count some things
   /// while depacking the frames. they are in most cases (re)set on the first frame or ONSEN trg frame
   /// Most could put in as a class member, but they are only needed within this function
   static unsigned int eventNrOfOnsenTrgFrame = 0;
   static int countedWordsInEvent;// count the size of all frames in words
-  static int nr_of_dhh_start_frame = 0;
-  static int nr_of_dhh_end_frame = 0;
+  static int countedDHHStartFrames = 0;
+  static int countedDHHEndFrames = 0;
   //  static int nr_of_frames_dhhc = 0;/// tbd if and where this number will still show up in te DHHC format TODO
-  static int nr_of_frames_counted = 0;/// eould not be needed if nr_of_frames_dhhc is not within the data structure
-  static int nr_active_dhh = 0;
-  static int mask_active_dhh = 0;
-  //  static int nr_active_dhp = 0;// unused
-  static int mask_active_dhp = 0;
-  static int found_mask_active_dhp = 0;
+  static int countedDHHCFrames = 0;/// would not be needed if nr_of_frames_dhhc is not within the data structure
+  static int mask_active_dhh = 0;// DHH mask (5 bit)
+  static int nr_active_dhh = 0;// just count the active DHHs. Until now, it is not possible to check for the bit mask. we would need the info on which DHH connects to which DHHC at which port from gearbox/geometry?
+  static int mask_active_dhp = 0;// DHP active mask, 4 bit, per current DHH
+  static int found_mask_active_dhp = 0;// mask which DHP send data and check on DHH END frame if it matches
   static unsigned int dhh_first_readout_frame_id_lo = 0;
   static unsigned int dhh_first_offset = 0;
   static unsigned int currentDHHID = 0xFFFFFFFF;
@@ -1034,8 +1033,9 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, const int len, const int F
   int type = dhhc.getFrameType();
 
   if (Frame_Number == 0) { /// We reset the counters on the first event
-    nr_of_dhh_start_frame = 0;
-    nr_of_dhh_end_frame = 0;
+    countedDHHStartFrames = 0;
+    countedDHHEndFrames = 0;
+    countedWordsInEvent = 0;
     currentDHHID = 0xFFFFFFFF;
     currentVxdId = 0;
 
@@ -1071,7 +1071,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, const int len, const int F
   }
 
   if (Frame_Number > 1 && Frame_Number < Frames_in_event - 1) {
-    if (nr_of_dhh_start_frame != nr_of_dhh_end_frame + 1)
+    if (countedDHHStartFrames != countedDHHEndFrames + 1)
       if (type != DHHC_FRAME_HEADER_DATA_TYPE_ONSEN_ROI && type != DHHC_FRAME_HEADER_DATA_TYPE_DHH_START) {
         B2ERROR("Data Frame outside a DHH START/END");
         m_errorMask |= ONSEN_ERR_FLAG_DATA_OUTSIDE;
@@ -1080,7 +1080,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, const int len, const int F
 
   switch (type) {
     case DHHC_FRAME_HEADER_DATA_TYPE_DHP_RAW: {
-      nr_of_frames_counted++;
+      countedDHHCFrames++;
 
       if (verbose) dhhc.data_direct_readout_frame_raw->print();
       if (currentDHHID != dhhc.data_direct_readout_frame_raw->getDHHId()) {
@@ -1101,7 +1101,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, const int len, const int F
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_ONSEN_DHP:
     case DHHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD: {
-      nr_of_frames_counted++;
+      countedDHHCFrames++;
 
       if (verbose)dhhc.data_direct_readout_frame->print();
 
@@ -1125,7 +1125,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, const int len, const int F
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_ONSEN_FCE:
     case DHHC_FRAME_HEADER_DATA_TYPE_FCE_RAW: {
-      nr_of_frames_counted++;
+      countedDHHCFrames++;
 
       if (verbose) hw->print();
       if (currentDHHID != dhhc.data_direct_readout_frame_raw->getDHHId()) {
@@ -1136,7 +1136,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, const int len, const int F
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_COMMODE: {
-      nr_of_frames_counted++;
+      countedDHHCFrames++;
 
       if (verbose) hw->print();
       if (currentDHHID != dhhc.data_commode_frame->getDHHId()) {
@@ -1161,7 +1161,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, const int len, const int F
       currentDHHID = 0xFFFFFFFF;
       currentVxdId = 0; /// invalid
       //nr_of_frames_dhhc = dhhc.data_dhhc_start_frame->get_dhhc_nr_frames();
-      nr_of_frames_counted = 1;
+      countedDHHCFrames = 1;
       m_errorMask |= dhhc.check_crc();
 //       stat_start++;
 
@@ -1175,18 +1175,18 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, const int len, const int F
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_DHH_START: {
-      nr_of_frames_counted++;
+      countedDHHCFrames++;
       if (verbose)dhhc.data_dhh_start_frame->print();
       dhh_first_readout_frame_id_lo = dhhc.data_dhh_start_frame->getStartFrameNr();
       dhh_first_offset = dhhc.data_dhh_start_frame->getTriggerOffsetRow();
       currentDHHID = dhhc.data_dhh_start_frame->getDHHId();
       m_errorMask |= dhhc.check_crc();
 
-      if (nr_of_dhh_start_frame != nr_of_dhh_end_frame) {
+      if (countedDHHStartFrames != countedDHHEndFrames) {
         B2ERROR("DHHC_FRAME_HEADER_DATA_TYPE_DHH_START without DHHC_FRAME_HEADER_DATA_TYPE_DHH_END");
         m_errorMask |= ONSEN_ERR_FLAG_DHH_START_WO_END;
       }
-      nr_of_dhh_start_frame++;
+      countedDHHStartFrames++;
 
       found_mask_active_dhp = 0;
       mask_active_dhp = dhhc.data_dhh_start_frame->getActiveDHPMask();
@@ -1211,7 +1211,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, const int len, const int F
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_GHOST:
-      nr_of_frames_counted++;
+      countedDHHCFrames++;
       if (verbose)dhhc.data_ghost_frame->print();
       if (currentDHHID != dhhc.data_ghost_frame->getDHHId()) {
         B2ERROR("DHH ID from DHH Start and this frame do not match $" << hex << currentDHHID << " != $" << dhhc.data_ghost_frame->getDHHId());
@@ -1227,7 +1227,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, const int len, const int F
       if (dhhc.data_dhhc_end_frame->isFakedData() != isFakedData_event) {
         B2ERROR("DHHC END is but no Fake event OR Fake Event but DHH END is not.");
       }
-      nr_of_frames_counted++;
+      countedDHHCFrames++;
       currentDHHID = 0xFFFFFFFF;
       currentVxdId = 0; /// invalid
       if (isFakedData_event) {
@@ -1239,8 +1239,8 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, const int len, const int F
 //       stat_end++;
 
       if (!isFakedData_event) {
-//         if (nr_of_frames_counted != nr_of_frames_dhhc) { /// Nr Frames has been removed .. tbd
-//           if (!m_ignore_headernrframes) B2ERROR("Number of DHHC Frames in Header(??? Tail?) " << nr_of_frames_dhhc << " != " << nr_of_frames_counted << " Counted");
+//         if (countedDHHCFrames != nr_of_frames_dhhc) { /// Nr Frames has been removed .. tbd
+//           if (!m_ignore_headernrframes) B2ERROR("Number of DHHC Frames in Header(??? Tail?) " << nr_of_frames_dhhc << " != " << countedDHHCFrames << " Counted");
 //           m_errorMask |= ONSEN_ERR_FLAG_DHHC_FRAMECOUNT;
 //         }
       }
@@ -1266,7 +1266,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, const int len, const int F
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_DHH_END: {
-      nr_of_frames_counted++;
+      countedDHHCFrames++;
       if (verbose) dhhc.data_dhh_end_frame->print();
       if (currentDHHID != dhhc.data_dhh_end_frame->getDHHId()) {
         B2ERROR("DHH ID from DHH Start and this frame do not match $" << hex << currentDHHID << " != $" << dhhc.data_dhh_end_frame->getDHHId());
@@ -1279,15 +1279,15 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, const int len, const int F
         B2ERROR("DHH_END: DHP active mask $" << hex << mask_active_dhp << " != $" << hex << found_mask_active_dhp << " mask of found dhp/ghost frames");
         m_errorMask |= ONSEN_ERR_FLAG_DHP_ACTIVE;
       }
-      nr_of_dhh_end_frame++;
-      if (nr_of_dhh_start_frame != nr_of_dhh_end_frame) {
+      countedDHHEndFrames++;
+      if (countedDHHStartFrames != countedDHHEndFrames) {
         B2ERROR("DHHC_FRAME_HEADER_DATA_TYPE_DHH_END without DHHC_FRAME_HEADER_DATA_TYPE_DHH_START");
         m_errorMask |= ONSEN_ERR_FLAG_DHH_START;
       }
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_ONSEN_ROI:
-      nr_of_frames_counted += 0; /// DO NOT COUNT!!!!
+      countedDHHCFrames += 0; /// DO NOT COUNT!!!!
       if (verbose) dhhc.data_onsen_roi_frame->print();
       m_errorMask |= dhhc.data_onsen_roi_frame->check_error(ignore_datcon_flag);
       m_errorMask |= dhhc.data_onsen_roi_frame->check_inner_crc(len - 4); /// CRC is without the DHHC header
@@ -1295,7 +1295,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, const int len, const int F
       if (!m_doNotStore) dhhc.data_onsen_roi_frame->save(m_storeROIs, len, (unsigned int*) data);
       break;
     case DHHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG:
-      nr_of_frames_counted += 0; /// DO NOT COUNT!!!!
+      countedDHHCFrames += 0; /// DO NOT COUNT!!!!
       eventNrOfOnsenTrgFrame = eventNrOfThisFrame;
 //   m_meta_event_nr=evtPtr->getEvent();
 //   m_meta_run_nr=evtPtr->getRun();
@@ -1360,8 +1360,8 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, const int len, const int F
     }
 
     /// As we now have processed the whole event, we can do some more consistency checks!
-    if (nr_of_dhh_start_frame != nr_of_dhh_end_frame || nr_of_dhh_start_frame != nr_active_dhh) {
-      B2ERROR("The number of DHH Start/End does not match the number of active DHH in DHHC Header! Header: " << nr_active_dhh << " Start: " << nr_of_dhh_start_frame << " End: " << nr_of_dhh_end_frame << " Mask: $" << hex << mask_active_dhh << " in Event Nr " << eventNrOfThisFrame);
+    if (countedDHHStartFrames != countedDHHEndFrames || countedDHHStartFrames != nr_active_dhh) {
+      B2ERROR("The number of DHH Start/End does not match the number of active DHH in DHHC Header! Header: " << nr_active_dhh << " Start: " << countedDHHStartFrames << " End: " << countedDHHEndFrames << " Mask: $" << hex << mask_active_dhh << " in Event Nr " << eventNrOfThisFrame);
       m_errorMask |= ONSEN_ERR_FLAG_DHH_ACTIVE;
     }
 

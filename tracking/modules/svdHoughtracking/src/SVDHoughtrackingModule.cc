@@ -119,6 +119,8 @@ SVDHoughtrackingModule::SVDHoughtrackingModule() : Module(), curTrackEff(0.0), t
            "Run full tracking pipelin?", bool(false));
   addParam("WriteHoughSpace", m_writeHoughSpace,
            "Write Hough space into a gnuplot file?", bool(false));
+  addParam("WriteHoughSectors", m_writeHoughSectors,
+           "Write Secotrs into a gnuplot file?", bool(false));
   addParam("UseSensorFilter", m_useSensorFilter,
            "Use the Sensor layer filter", bool(true));
   addParam("UseRadiusFilter", m_useRadiusFilter,
@@ -248,30 +250,27 @@ SVDHoughtrackingModule::initialize()
     effDir = m_rootFile->mkdir("Efficiency");
     effDir->cd();
     /* Histogram for pT-distribution */
-    m_histPTDist = new TH1D("pTDist", "pT-Distribution", 195, 0.05, 2.0);
+    m_histPtDist = new TH1D("pTDist", "pT-Distribution", 195, 0.05, 2.0);
     /* Histogram for correctly reconstructed tracks in pT */
-    m_histPTPhirecon = new TH1D("pTPhirecon", "pT of reconstructed tracks in Phi", 195, 0.05, 2.0);
+    m_histPtPhiRecon = new TH1D("pTPhirecon", "pT of reconstructed tracks in Phi", 195, 0.05, 2.0);
+    m_histPtThetaRecon = new TH1D("pTThetarecon", "pT of reconstructed tracks in Theta", 195, 0.05, 2.0);
     /* Histogram for efficiency vs pT (only in phi while reconstruction in theta is not proved) */
-    m_histPTEffPhi = new TH1D("pTEffPhi", "Efficiency vs pT (in Phi)", 195, 0.05, 2.0);
+    m_histPtEffPhi = new TH1D("pTEffPhi", "Efficiency vs pT (in Phi)", 195, 0.05, 2.0);
     /* Histogram for Phi-distribution */
     m_histPhiDist = new TH1D("PhiDist", "Phi-Distribution", 360, -180, 180);
     /* Histogram for correctly reconstructed tracks in Phi */
-    m_histPhirecon = new TH1D("Phirecon", "Phi of reconstructed tracks", 360, -180, 180);
+    m_histPhiRecon = new TH1D("Phirecon", "Phi of reconstructed tracks", 360, -180, 180);
     /* Histogram for efficiency vs phi */
     m_histEffPhi = new TH1D("EffPhi", "Efficiency vs Phi", 360, -180, 180);
     /* Histogram for Theta-distribution */
-    m_histThetaDist = new TH1D("ThetaDist", "Theta-Distribution", 133, 17, 150);    // Only to fill, if theta can be reconstructed
+    m_histThetaDist = new TH1D("ThetaDist", "Theta-Distribution", 133, 17, 150);
+    m_histThetaPhiDist = new TH1D("ThetaPhiDist", "Theta Eff vs Phi", 360, -180, 180);
     /* Histogram for correctly reconstructed tracks in Theta */
-    m_histThetarecon = new TH1D("Thetarecon", "Theta of reconstructed tracks", 133, 17, 150);
+    m_histThetaRecon = new TH1D("Thetarecon", "Theta of reconstructed tracks", 133, 17, 150);
     /* Histogram for efficiency vs Theta */
     m_histEffTheta = new TH1D("EffTheta", "Efficiency vs Theta", 133, 17, 150);     // Only to fill, if theta can be reconstructed
     /* Histogram for fake rate vs pT (only in phi while reconstruction in theta is not proved) */
-    m_histPTFakePhi = new TH1D("pTFake", "Fake rate vs pT (in Phi)", 200, 0.0, 2.0);
-  }
-
-  /* Write statistics file */
-  if (!m_statisticsFileName.empty()) {
-    statout.open(m_statisticsFileName, ofstream::out | ofstream::app);
+    m_histPtFakePhi = new TH1D("pTFake", "Fake rate vs pT (in Phi)", 200, 0.0, 2.0);
   }
 
   B2INFO("SVDHoughtracking initilized");
@@ -321,33 +320,55 @@ SVDHoughtrackingModule::endRun()
 
   /* Statistics output */
   if (!m_statisticsFileName.empty()) {
-    if (m_useHashPurify) {
-      statout << 1 << "\t" << m_critIterationsN << "\t" << m_critIterationsP << "\t"
-              << (double) m_rectSizeN << "\t" << (double) m_rectSizeP << "\t"
-              << curTrackEffP / (double) runNumber << "\t" << totFakeTracks / (double) runNumber << endl;
-    } else {
-      statout << 0 << "\t" << m_critIterationsN << "\t" << m_critIterationsP << "\t"
-              << (double) m_rectSizeN << "\t" << (double) m_rectSizeP << "\t"
-              << curTrackEffP / (double) runNumber << "\t" << totFakeTracks / (double) runNumber << endl;
+    /* Open file stream */
+    statout.open(m_statisticsFileName, ofstream::out | ofstream::app);
+
+    /* Check if stat file already exists, if not write legend */
+    if (statout.tellp() == 0) {
+      statout << "#Hash" << "\t" << "CritN" << "\t" << "CritP" << "\t" << "RectN" << "\t" << "RectP"
+              << "\t" << "EffP" << "\t" << "EffN" << "\t" << "EffTot" << "\t" << "Fake" << endl;
     }
+
+    if (m_useHashPurify) {
+      statout << 1 << "\t";
+    } else {
+      statout << 0 << "\t";
+    }
+
+    statout << m_critIterationsN << "\t" << m_critIterationsP << "\t"
+            << boost::format("%1.3f") % (double) m_rectSizeN << "\t"
+            << boost::format("%1.3f") % (double) m_rectSizeP << "\t"
+            << boost::format("%1.3f") % (curTrackEffP / (double) runNumber) << "\t"
+            << boost::format("%1.3f") % (curTrackEffN / (double) runNumber) << "\t"
+            << boost::format("%1.3f") % (curTrackEff / (double) runNumber) << "\t"
+            << (totFakeTracks / (double) runNumber) << endl;
 
     /* Close Statistic output */
     statout.close();
   }
 
-  /* Fill efficiency histograms as a division */
+  /* Fill efficiency histograms */
   if (!m_rootFilename.empty()) {
-    *m_histPTEffPhi = (*m_histPTPhirecon) / (*m_histPTDist);
-    m_histPTEffPhi->SetName("pTEffPhi");
-    m_histPTEffPhi->SetTitle("Efficiency vs pT (in Phi)");
-    *m_histEffPhi = (*m_histPhirecon) / (*m_histPhiDist);
+    *m_histPtEffPhi = (*m_histPtPhiRecon) / (*m_histPtDist);
+    m_histPtEffPhi->SetName("pTEffPhi");
+    m_histPtEffPhi->SetTitle("Efficiency vs pT (in Phi)");
+    m_histPtEffPhi->GetXaxis()->SetTitle("pT [GeV]");
+
+    *m_histPtEffPhi = (*m_histPtThetaRecon) / (*m_histPtDist);
+    m_histPtEffPhi->SetName("pTEffPhi");
+    m_histPtEffPhi->SetTitle("Efficiency vs pT (in Phi)");
+    m_histPtEffPhi->GetXaxis()->SetTitle("pT [GeV]");
+
+    *m_histEffPhi = (*m_histPhiRecon) / (*m_histPhiDist);
     m_histEffPhi->SetName("EffPhi");
     m_histEffPhi->SetTitle("Efficiency vs Phi");
-    *m_histEffTheta = (*m_histThetarecon) / (*m_histThetaDist);
+    m_histEffPhi->GetXaxis()->SetTitle("#varphi [deg]");
+
+    *m_histEffTheta = (*m_histThetaRecon) / (*m_histThetaDist);
     m_histEffTheta->SetName("EffTheta");
     m_histEffTheta->SetTitle("Efficiency vs theta");
+    m_histEffTheta->GetXaxis()->SetTitle("#theta [deg]");
   }
-
 }
 
 void
@@ -836,7 +857,9 @@ SVDHoughtrackingModule::trackingPipeline()
   /* Run intercept finder */
   fastInterceptFinder2d(p_hough, false, v1_s, v2_s, v3_s, v4_s, 0, m_critIterationsP, m_maxIterationsP, p_rect);
   /* Debug */
-  gplotRect("dbg/p_rect.plot", p_rect);
+  if (m_writeHoughSectors) {
+    gplotRect("dbg/p_rect.plot", p_rect);
+  }
 
   /*
    * Run hough trackign on N-Side
@@ -852,7 +875,9 @@ SVDHoughtrackingModule::trackingPipeline()
   /* Run intercept finder */
   fastInterceptFinder2d(n_hough, true, v1_s, v2_s, v3_s, v4_s, 0, m_critIterationsN, m_maxIterationsN, n_rect);
   /* Debug */
-  gplotRect("dbg/n_rect.plot", n_rect);
+  if (m_writeHoughSectors) {
+    gplotRect("dbg/n_rect.plot", n_rect);
+  }
 
   /* Print Hough list */
   printHoughCandidates();
@@ -884,10 +909,11 @@ void
 SVDHoughtrackingModule::fac3d()
 {
   StoreArray<SVDHoughTrack> storeHoughTrack(m_storeHoughTrack);
+  vector<unsigned int> n_idList, p_idList;
   unsigned int tracks;
   TVector2 n_tc, p_tc;
   double r, phi, theta;
-  bool all = true; /* combine every track in N and P */
+  bool all = false; /* combine every track in N and P */
 
   if (!storeHoughTrack.isValid()) {
     storeHoughTrack.create();
@@ -896,41 +922,44 @@ SVDHoughtrackingModule::fac3d()
   }
 
   tracks = 0;
-  //for (auto it = n_houghTrackCand.begin(); it != n_houghTrackCand.end(); ++it) {
-  for (auto it_in = p_houghTrackCand.begin(); it_in != p_houghTrackCand.end(); ++it_in) {
-    if (/*(it->getHash() == it_in->getHash() && it->getHitSize() == it_in->getHitSize()) ||*/ all) {
-      ++tracks;
-      //n_tc = it->getCoord();
-      p_tc = it_in->getCoord();
-      r = 1.0 / (2.0 * p_tc.Y());
+  for (auto it = n_houghTrackCand.begin(); it != n_houghTrackCand.end(); ++it) {
+    for (auto it_in = p_houghTrackCand.begin(); it_in != p_houghTrackCand.end(); ++it_in) {
+      n_idList = it->getIdList();
+      p_idList = it_in->getIdList();
+      //if ((it->getHash() == it_in->getHash() && it->getHitSize() == it_in->getHitSize()) || all) {
+      if (compareList(p_idList, n_idList) || all) {
+        ++tracks;
+        n_tc = it->getCoord();
+        p_tc = it_in->getCoord();
+        r = 1.0 / (2.0 * p_tc.Y());
 
-      if (r < 0.0) {
-        phi = 1.0 * p_tc.X() + M_PI / 2.0;
-      } else {
-        phi = (1.0 * p_tc.X() + M_PI / 2.0) - M_PI;
-      }
-      if (phi > M_PI) {
-      } else if (phi < -1.0 * M_PI) {
-        phi += 2 * M_PI;
-      }
+        if (r < 0.0) {
+          phi = 1.0 * p_tc.X() + M_PI / 2.0;
+        } else {
+          phi = (1.0 * p_tc.X() + M_PI / 2.0) - M_PI;
+        }
+        if (phi > M_PI) {
+        } else if (phi < -1.0 * M_PI) {
+          phi += 2 * M_PI;
+        }
 
-      if (n_tc.X() > 0.0) {
-        theta = n_tc.X(); // (M_PI) - n_tc.X();
-      } else {
-        theta = -1.0 * n_tc.X(); //(M_PI / 2) - n_tc.X();
-      }
+        if (n_tc.X() > 0.0) {
+          theta = n_tc.X(); // (M_PI) - n_tc.X();
+        } else {
+          theta = -1.0 * n_tc.X(); //(M_PI / 2) - n_tc.X();
+        }
 
-      /* Radius Filter */
-      if (m_useRadiusFilter) {
-        if (fabs(r) > m_radiusThreshold) {
+        /* Radius Filter */
+        if (m_useRadiusFilter) {
+          if (fabs(r) > m_radiusThreshold) {
+            storeHoughTrack.appendNew(SVDHoughTrack(tracks, r, phi, theta));
+          }
+        } else {
           storeHoughTrack.appendNew(SVDHoughTrack(tracks, r, phi, theta));
         }
-      } else {
-        storeHoughTrack.appendNew(SVDHoughTrack(tracks, r, phi, theta));
       }
     }
   }
-  //}
 }
 
 /*
@@ -2020,17 +2049,18 @@ SVDHoughtrackingModule::trackAnalyseMCParticle()
   static int run = 1;
   bool primeOnly = true;
   bool usePhi = true;
-  bool useTheta = false;
+  bool useTheta = true;
   bool* track_match_n;
   bool* track_match_p;
   bool* track_match;
   double charge, phi, theta, r;
-  double theta_tolerance = 1.5;
-  double phi_tolerance = 1.5;
+  double theta_tolerance = 5.0; /* tolerance in theta */
+  double phi_tolerance = 1.5; /* tolerance in phi */
   double min, min_theta, min_phi, dist, pT;
   double nPrimary, nCorrReco, nCorrRecoN, nCorrRecoP;
   double m_r = 0.0;
   double frac = 360.0;
+  double projected_theta;
   TVector3 mom;
 
   nMCParticles = storeMCParticles.getEntries();
@@ -2058,11 +2088,13 @@ SVDHoughtrackingModule::trackAnalyseMCParticle()
     if (storeMCParticles[i]->getMother() == NULL || !primeOnly) {
       /* Get pT of particles */
       pT = mom.Perp();
-      /* Write pT in pT-distribution-histogram */
-      m_histPTDist->Fill(pT);
-      /* Write Phi in Phi-distribution-histogram */
+      /* Write pT in pT histogram */
+      m_histPtDist->Fill(pT);
+      /* Write Phi and Theta into histogram */
       m_histPhiDist->Fill(mom.Phi() / Unit::deg);
+      m_histThetaDist->Fill(mom.Theta() / Unit::deg);
 
+      B2INFO("  MCParticleInfo: Mom Vec: " << mom.X() << " " << mom.Y() << " " << mom.Z());
       if (m_compareMCParticleVerbose) {
         cout << "  ID: " << storeMCParticles[i]->getIndex() << " PDG ID: "
              << boost::format("+%+3f") % storeMCParticles[i]->getPDG()
@@ -2107,8 +2139,11 @@ SVDHoughtrackingModule::trackAnalyseMCParticle()
           m_r = r;
         }
 
-        if (fabs((theta - (mom.Theta() * sin(mom.Phi())))) < fabs(min_theta)) {
-          min_theta = ((theta - (mom.Theta() * sin(mom.Phi()))));
+        //projected_theta = (M_PI / 2.0) * (1.0 / acos(mom.Theta() - M_PI / 4.0) - 0.5);
+        projected_theta = atan(fabs(mom.Y()) / fabs(mom.Z()));
+        //if (fabs((theta - (mom.Theta() * sin(mom.Phi())))) < fabs(min_theta)) {
+        if (fabs(theta - projected_theta) < fabs(min_theta)) {
+          min_theta = theta - projected_theta;
           //if (fabs((storeHoughTrack[j]->getTrackTheta() - (mom.Theta()))) < fabs(min_theta)) {
           //  min_theta = ((storeHoughTrack[j]->getTrackTheta() - (mom.Theta())));
         }
@@ -2124,10 +2159,6 @@ SVDHoughtrackingModule::trackAnalyseMCParticle()
       if (nTracks != 0) {
         m_histHoughDiffPhi->Fill(min_phi);
         m_histHoughDiffTheta->Fill(min_theta);
-      }
-      /* Found this one */
-      if (min < (M_PI / 180.0)) {
-        track_match[i] = true;
       }
 
       if (usePhi) {
@@ -2146,8 +2177,8 @@ SVDHoughtrackingModule::trackAnalyseMCParticle()
             cout << "\t\033[1;32m" << " found  (" << min_phi << ")\033[0m";
           }
           /* Efficiency vs pT (only in phi while reconstruction in theta is not proved) */
-          m_histPTPhirecon->Fill(pT);
-          m_histPhirecon->Fill(mom.Phi() / Unit::deg); /* Efficiency vs Phi */
+          m_histPtPhiRecon->Fill(pT);
+          m_histPhiRecon->Fill(mom.Phi() / Unit::deg); /* Efficiency vs Phi */
 
           track_match_p[i] = true;
         } else if (m_compareMCParticleVerbose) {
@@ -2163,7 +2194,17 @@ SVDHoughtrackingModule::trackAnalyseMCParticle()
           if (m_compareMCParticleVerbose) {
             cout << "\033[1;32m" << " found (" << min_theta << ")\033[0m" << endl;
           }
+          /* Efficiency vs pT (only in phi while reconstruction in theta is not proved) */
+          m_histPtThetaRecon->Fill(pT);
+          m_histThetaRecon->Fill(mom.Theta() / Unit::deg); /* Efficiency vs Theta */
+          m_histThetaPhiDist->Fill(mom.Phi() / Unit::deg); /* Efficiency of Theta vs Phi */
+
           track_match_n[i] = true;
+
+          /* Found Theta, check also if Phi was correctly reconstructed */
+          if (track_match_p[i]) {
+            track_match[i] = true;
+          }
         } else if (m_compareMCParticleVerbose) {
           cout << "\033[1;31m" << " failed (" << min_theta << ")\033[0m" << endl;
         }

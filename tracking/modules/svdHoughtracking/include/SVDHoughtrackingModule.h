@@ -270,7 +270,8 @@ namespace Belle2 {
       void purifyTrackCandsList();
       void purifyTrackCandsHash();
       void oldpurifyTrackCands();
-      bool compareList(std::vector<unsigned int>, std::vector<unsigned int>);
+      bool compareList(std::vector<unsigned int>&, std::vector<unsigned int>&);
+      void mergeIdList(std::vector<unsigned int>&, std::vector<unsigned int>&, std::vector<unsigned int>&);
 
       /** Print Track candidates */
       void printTrackCandidates();
@@ -384,6 +385,7 @@ namespace Belle2 {
       bool m_useSimHitClusters;
       bool m_fullTrackingPipeline;
       bool m_writeHoughSpace;
+      bool m_writeHoughSectors;
       bool m_useSensorFilter;
       bool m_useRadiusFilter;
       bool m_useHashPurify;
@@ -471,25 +473,27 @@ namespace Belle2 {
       TH1I* m_histSimHits;
 
       /** Histogram for pT-distribution */
-      TH1D* m_histPTDist;
+      TH1D* m_histPtDist;
       /** Histogram for correctly reconstructed tracks in pT */
-      TH1D* m_histPTPhirecon;
+      TH1D* m_histPtPhiRecon;
+      TH1D* m_histPtThetaRecon;
       /** Histogram for efficiency vs pT (only in phi while reconstruction in theta is not proved) */
-      TH1D* m_histPTEffPhi;
+      TH1D* m_histPtEffPhi;
       /** Histogram for Phi-distribution */
       TH1D* m_histPhiDist;
       /** Histogram for correctly reconstructed tracks in Phi */
-      TH1D* m_histPhirecon;
+      TH1D* m_histPhiRecon;
       /** Histogram for efficiency vs Phi */
       TH1D* m_histEffPhi;
       /** Histogram for Theta-distribution */
       TH1D* m_histThetaDist;
+      TH1D* m_histThetaPhiDist;
       /** Histogram for correctly reconstructed tracks in Theta */
-      TH1D* m_histThetarecon;
+      TH1D* m_histThetaRecon;
       /** Histogram for efficiency vs Theta */
       TH1D* m_histEffTheta;
       /** Histogram for fake rate vs pT (only in phi while reconstruction in theta is not proved) */
-      TH1D* m_histPTFakePhi;
+      TH1D* m_histPtFakePhi;
 
       /* List of coord SVD clusters */
       clusterMap cluster_map;

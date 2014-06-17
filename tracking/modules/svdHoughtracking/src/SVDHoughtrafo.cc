@@ -406,16 +406,19 @@ void
 SVDHoughtrackingModule::purifyTrackCandsList()
 {
   coord2dPair hc, hc2;
-  vector<unsigned int> idList, last_idList;
+  vector<unsigned int> idList, last_idList, merged_idList;
   unsigned int cand_cnt, found_tracks;
   double x, y, last_x;
+  double x_tolerance = 1.0;
   vector<SVDHoughCand> cpyCand;
+  bool useMerger = false;
 
   found_tracks = 0;
   cpyCand = n_houghCand;
   sort(cpyCand.begin(), cpyCand.end());
   cand_cnt = 0;
   x = 0.0;
+  last_x = 0;
   y = 0.0;
   B2DEBUG(200, "Tracks found in N-Side: " << cpyCand.size());
   for (auto it = cpyCand.begin(); it != cpyCand.end(); ++it) {
@@ -426,28 +429,37 @@ SVDHoughtrackingModule::purifyTrackCandsList()
       x += hc.second.X();
       y += hc.first.Y();
       y += hc.second.Y();
+      merged_idList = idList;
       ++cand_cnt;
-    } else if (compareList(idList, last_idList) && it != cpyCand.end()) {
+    } else if (compareList(idList, last_idList) && fabs(last_x - hc.first.X()) < x_tolerance
+               && it != cpyCand.end()) {
       x += hc.first.X();
       x += hc.second.X();
       y += hc.first.Y();
       y += hc.second.Y();
       ++cand_cnt;
+      if (useMerger) {
+        mergeIdList(merged_idList, idList, last_idList);
+      } else {
+        merged_idList = idList;
+      }
     } else {
       if (it != cpyCand.begin()) {
         x /= (2.0 * ((double) cand_cnt));
         y /= (2.0 * ((double) cand_cnt));
         ++found_tracks;
         B2DEBUG(200, "  Track [ " << found_tracks << " ]: " << x << " " << y);
-        n_houghTrackCand.push_back(SVDHoughTrackCand(idList, TVector2(x, y)));
+        n_houghTrackCand.push_back(SVDHoughTrackCand(merged_idList, TVector2(x, y)));
       }
       x = hc.first.X();
       x += hc.second.X();
       y = hc.first.Y();
       y += hc.second.Y();
       cand_cnt = 1;
+      merged_idList = idList;
     }
     last_idList = idList;
+    last_x = hc.first.X();
   }
 
   if (cpyCand.size() > 0) {
@@ -455,7 +467,7 @@ SVDHoughtrackingModule::purifyTrackCandsList()
     y /= (2.0 * ((double) cand_cnt));
     ++found_tracks;
     B2DEBUG(200, "  Track [ " << found_tracks << " ]: " << x << " " << y);
-    n_houghTrackCand.push_back(SVDHoughTrackCand(idList, TVector2(x, y)));
+    n_houghTrackCand.push_back(SVDHoughTrackCand(merged_idList, TVector2(x, y)));
   }
 
   found_tracks = 0;
@@ -476,7 +488,8 @@ SVDHoughtrackingModule::purifyTrackCandsList()
       y += hc.first.Y();
       y += hc.second.Y();
       ++cand_cnt;
-    } else if (compareList(idList, last_idList) && fabs(last_x - hc.first.X()) < 1.0
+      merged_idList = idList;
+    } else if (compareList(idList, last_idList) && fabs(last_x - hc.first.X()) < x_tolerance
                && it != cpyCand.end()) {
       B2DEBUG(200, "    Compare successfull... merge");
       x += hc.first.X();
@@ -484,19 +497,25 @@ SVDHoughtrackingModule::purifyTrackCandsList()
       y += hc.first.Y();
       y += hc.second.Y();
       ++cand_cnt;
+      if (useMerger) {
+        mergeIdList(merged_idList, idList, last_idList);
+      } else {
+        merged_idList = idList;
+      }
     } else {
       if (it != cpyCand.begin()) {
         x /= (2.0 * ((double) cand_cnt));
         y /= (2.0 * ((double) cand_cnt));
         ++found_tracks;
         B2DEBUG(200, "  Track [ " << found_tracks << " ]: " << x << " " << y);
-        p_houghTrackCand.push_back(SVDHoughTrackCand(idList, TVector2(x, y)));
+        p_houghTrackCand.push_back(SVDHoughTrackCand(merged_idList, TVector2(x, y)));
       }
       x = hc.first.X();
       x += hc.second.X();
       y = hc.first.Y();
       y += hc.second.Y();
       cand_cnt = 1;
+      merged_idList = idList;
     }
     last_idList = idList;
     last_x = hc.first.X();
@@ -507,7 +526,7 @@ SVDHoughtrackingModule::purifyTrackCandsList()
     y /= (2.0 * ((double) cand_cnt));
     ++found_tracks;
     B2DEBUG(200, "  Track [ " << found_tracks << " ]: " << x << " " << y);
-    p_houghTrackCand.push_back(SVDHoughTrackCand(idList, TVector2(x, y)));
+    p_houghTrackCand.push_back(SVDHoughTrackCand(merged_idList, TVector2(x, y)));
   }
 }
 
@@ -516,7 +535,7 @@ SVDHoughtrackingModule::purifyTrackCandsList()
  * possible: exact match, contains etc...
  */
 bool
-SVDHoughtrackingModule::compareList(std::vector<unsigned int> a, std::vector<unsigned int> b)
+SVDHoughtrackingModule::compareList(std::vector<unsigned int>& a, std::vector<unsigned int>& b)
 {
   unsigned int cnt = 0;
   bool exact_match = false;
@@ -548,6 +567,40 @@ SVDHoughtrackingModule::compareList(std::vector<unsigned int> a, std::vector<uns
   }
 
   return (true);
+}
+
+/*
+ * Merge Id lists.
+ */
+void
+SVDHoughtrackingModule::mergeIdList(std::vector<unsigned int>& merged, std::vector<unsigned int>& a,
+                                    std::vector<unsigned int>& b)
+{
+  bool found;
+
+  for (auto it = a.begin(); it != a.end(); ++it) {
+    found = false;
+    for (auto it_in = merged.begin(); it_in != merged.end(); ++it_in) {
+      if (*it_in == *it) {
+        found = true;
+      }
+    }
+    if (!found) {
+      merged.push_back(*it);
+    }
+  }
+
+  for (auto it = b.begin(); it != b.end(); ++it) {
+    found = false;
+    for (auto it_in = merged.begin(); it_in != merged.end(); ++it_in) {
+      if (*it_in == *it) {
+        found = true;
+      }
+    }
+    if (!found) {
+      merged.push_back(*it);
+    }
+  }
 }
 
 /*

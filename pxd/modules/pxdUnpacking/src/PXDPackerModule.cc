@@ -11,7 +11,6 @@
 #include <pxd/modules/pxdUnpacking/PXDPackerModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
-//#include <rawdata/dataobjects/RawFTSW.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
@@ -141,7 +140,6 @@ void PXDPackerModule::terminate()
 
 void PXDPackerModule::event()
 {
-  //StoreArray<RawFTSW> storeFTSW;/// needed for event number
   StoreObjPtr<EventMetaData> evtPtr;
 
   B2INFO("PXD Packer --> Event");
@@ -150,17 +148,7 @@ void PXDPackerModule::event()
 
   int nDigis = storeDigits.getEntries();
 
-  B2INFO("PXD Packer --> Digis:" << nDigis);
-
-  /*  ftsw_evt_nr = 0;
-    ftsw_evt_mask = 0;
-    for (auto & it : storeFTSW) {
-      ftsw_evt_nr = it.GetEveNo(0);
-      ftsw_evt_mask = 0x7FFF;
-      B2INFO("PXD Packer --> FTSW Event Number: $" << hex << ftsw_evt_nr);
-      break;
-    }
-  */
+  B2INFO("PXD Packer --> Nr of Digis: " << nDigis);
 
   startOfVxdID.clear();
 
@@ -285,7 +273,7 @@ void PXDPackerModule::pack_dhhc(int dhhc_id, int dhh_active, int* dhh_ids)
 {
   B2INFO("PXD Packer --> pack_dhhc ID " << dhhc_id << " DHH act: " << dhh_active);
 
-  /// HLT frame ??? t.b.d.
+  /// HLT frame ??? format still t.b.d.
   start_frame();
   append_int32((DHHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG << 27) | (m_trigger_nr & 0xFFFF));
   append_int32(0xCAFE0000);// HLT HEADER
@@ -349,7 +337,7 @@ void PXDPackerModule::pack_dhh(int dhh_id, int dhp_active)
   add_frame_to_payload();
 
 // now prepare the data from one halfladder
-// do the ROI selection???
+// do the ROI selection??? optional...
 // then loop for each DHP in system
 // get active DHPs from a database?
 // and pack data per halfladder.
@@ -357,7 +345,7 @@ void PXDPackerModule::pack_dhh(int dhh_id, int dhp_active)
 
   if (dhp_active != 0) { /// is there any hardware switched on?
     const unsigned int ladder_min_row = 0; /// get them from database
-    const unsigned int ladder_max_row = 785;
+    const unsigned int ladder_max_row = 767;
     const unsigned int ladder_min_col = 0;
     const unsigned int ladder_max_col = 250;
 
@@ -380,14 +368,10 @@ void PXDPackerModule::pack_dhh(int dhh_id, int dhp_active)
     }
     B2INFO("pack_dhh: VxdId: " << currentVxdId << " " << (int)currentVxdId);
 
-    //auto map_it = startOfVxdID.find(currentVxdId);
-//    if (map_it != startOfVxdID.end())
     {
       auto it = storeDigits.begin();
       B2INFO("Advance: " << startOfVxdID[currentVxdId]);
       advance(it, startOfVxdID[currentVxdId]);
-//      B2INFO("Advance: "<< map_it->second);
-//      advance(it, map_it->second);
       for (; it != storeDigits.end(); it++) {
         auto id = it->getSensorID();
         id.setSegmentNumber(0);
@@ -511,274 +495,13 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhh_id, int dhh_reformat)
 
 
   if (empty) {
-    B2INFO("no data for halfladder! DHHID: " << dhh_id << " Chip: " << chip_id);
+    B2INFO("Found no data for halfladder! DHHID: " << dhh_id << " Chip: " << chip_id);
     start_frame();
     /// Ghost Frame ... start frame overwrites frame info set above
     append_int32((DHHC_FRAME_HEADER_DATA_TYPE_GHOST << 27) | ((dhh_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
   } else {
-    //B2ERROR("no error ... just to tell you we found some data for DHHID: " << dhh_id << " Chip: " << chip_id);
+    //B2INFO("Found data for halfladder DHHID: " << dhh_id << " Chip: " << chip_id);
   }
   add_frame_to_payload();
 
 }
-
-
-#if 0
-
-#define NR_LAYER_ONE  1 // 8
-#define NR_LAYER_TWO  1 // 12
-#define NR_CHIPS  1  // 4
-
-#define BUFFERSIZE  65536
-
-unsigned char bufferin[65536];
-unsigned char bufferout[65536];
-int bufferin_size = 0, bufferout_size;
-
-unsigned char pixelmap[NR_ROW][NR_COL_CHIP];
-int dhp_pix[200000];
-
-unsigned int roi_buffer[10000], roibuffer_cnt;
-
-int generate_data_for_trig(unsigned int m_trigger_nr, unsigned char* buffer, unsigned int buffer_len)
-{
-  int  nr_pixel;
-
-  /// Now the data frames ...
-#if 1
-  for (int dhh_ly = 0; dhh_ly <= 1; dhh_ly++) {
-    for (int dhh_ld = 1; ((dhh_ly == 0 && dhh_ld <= NR_LAYER_ONE) || (dhh_ly == 1 && dhh_ld <= NR_LAYER_TWO)); dhh_ld++) {
-      for (int dhh_se = 0; dhh_se <= 1; dhh_se++) {
-        dhh_id = (dhh_ly & 0x01) << 5 | (dhh_ld & 0x0F) << 1 | (dhh_se & 0x01);
-        for (int chip_id = 0; chip_id < NR_CHIPS; chip_id++) {
-
-          int bufferout_sizestart;
-
-          bufferout_sizestart = bufferout_size;
-          nr_pixel = (rand() % NR_PIXELS_RAND) + NR_PIXELS_RAND_OFF;
-//             memset(pixelmap, 0, sizeof(pixelmap));
-          if (nr_pixel > 0) {
-
-            /*
-            //               printf("gen map\n");
-              for (int i = 0; i < nr_pixel; i++) {
-                int row, col, adc;
-                row = rand() % NR_ROW;
-                col = rand() % NR_COL_CHIP;
-                adc = row + col;
-                if (adc == 0) adc = 0x42;
-                pixelmap[row][col] = adc;
-                ///dhp_pix[i] = (row&0x3FF)<<20 | (col&0x3FF)<<8 | (adc&0xFF);
-
-              }
-              */
-//               printf("gen list\n");
-
-            unsigned int k;
-            k = 0;
-            /*
-            for (int i = 0; i < NR_ROW; i++) {
-                for (int j = 0; j < NR_COL_CHIP; j++) {
-                  if (pixelmap[i][j]) {
-                    dhp_pix[k++] = (i & 0x3FF) << 20 | (j & 0x3FF) << 8 | (pixelmap[i][j] & 0xFF);
-                  }
-                }
-              }*/
-
-
-            dhp_pix[k++] = ((m_trigger_nr & 0x1F) & 0x3FF) << 20 | (((m_trigger_nr & 0x3E0) >> 5) & 0x3FF) << 8 | ((m_trigger_nr >> 4) & 0xFF);
-            dhp_pix[k++] = ((m_trigger_nr & 0x1F) & 0x3FF) << 20 | (((m_trigger_nr & 0xF80) >> 7) & 0x3FF) << 8 | ((m_trigger_nr >> 4) & 0xFF);
-            dhp_pix[k++] = ((m_trigger_nr & 0x1F) & 0x3FF) << 20 | ((((m_trigger_nr & 0x3E0) >> 5) + 1) & 0x3FF) << 8 | ((m_trigger_nr >> 5) & 0xFF);
-            dhp_pix[k++] = (((m_trigger_nr & 0x1F) + 1) & 0x3FF) << 20 | (((m_trigger_nr & 0xF80) >> 7) & 0x3FF) << 8 | ((m_trigger_nr >> 5) & 0xFF);
-
-            nr_pixel = k;
-
-            /*          printf("sort list\n");
-                     for (int i=0; i<nr_pixel; i++) {
-                        for (int j=i+1; j<nr_pixel; j++) {
-                           int row_col_i, row_col_j;
-                           if (dhp_pix[i] == dhp_pix[j]) {
-                              int row = ((dhp_pix[j]>>20)&0x3FF) + 1;
-                              dhp_pix[j] = dhp_pix[j]&0x003FFFF | (row&0x3FF)<<20 ;
-                           }
-                           if (dhp_pix[i] > dhp_pix[j]) {
-                              int pix_sw;
-                              pix_sw = dhp_pix[i];
-                              dhp_pix[i] = dhp_pix[j];
-                              dhp_pix[j] = pix_sw;
-                           }
-                        }
-                     }*/
-
-            count_dhp = 0;
-            count_in_roi = 0;
-            int last_in_roi = 0xFFFFFFFF;
-            int pix_dhh, pix_row, pix_col;
-            for (int i = 0; i < nr_pixel; i++) {
-              int row_act, row_pre;
-
-              row_act = (dhp_pix[i] >> 20) & 0x3FF;
-              row_pre = (dhp_pix[i - 1] >> 20) & 0x3FF;
-              if ((i == 0) || (row_act != row_pre)) {
-                count_dhp++;
-              }
-              count_dhp++;
-
-              pix_dhh = dhh_id;
-              pix_row = (dhp_pix[i] >> 20) & 0x3FF ;
-              pix_col = (dhp_pix[i] >> 8) & 0x3FF ;
-
-              int is_in_roi = 1;
-//                 int is_in_roi = 0;
-//                 for (int r = 0; r < n_rois; r++) {
-//                   if (pix_dhh == rois[0][r] && pix_row >= rois[1][r] && pix_row <= rois[3][r] && pix_col >= rois[2][r] && pix_col <= rois[4][r]) { is_in_roi = 1; }
-//                 }
-
-              if (is_in_roi == 1) {
-                row_act = (dhp_pix[i] >> 20) & 0x3FF;
-                row_pre = (last_in_roi >> 20) & 0x3FF;
-                if ((last_in_roi == 0xFFFFFFFF) || (row_act != row_pre)) {
-                  count_in_roi++;
-                }
-                count_in_roi++;
-
-                last_in_roi = dhp_pix[i];
-              }
-
-            }
-
-            unsigned int data_size;
-            unsigned int data_size2;
-            data_size2 = 0;
-            if (count_in_roi % 2 != 0) { /// payload bytes
-              data_size = count_in_roi * 2 + 14;
-            } else {
-              data_size = count_in_roi * 2 + 12;
-            }
-
-            crc_out.reset(CRC_INIT);
-            int reformat = 1;
-
-            crc_value = 0x28000000 | (dhh_id & 0x3F) << 20 | (reformat & 0x1) << 19 | (chip_id & 0x3) << 16 | m_trigger_nr & 0xFFFF ;
-            crc_out.process_byte((crc_value >> 24) & 0xFF);   crc_out.process_byte((crc_value >> 16) & 0xFF);   crc_out.process_byte((crc_value >> 8) & 0xFF);   crc_out.process_byte(crc_value & 0xFF);
-            append_int32(crc_value);
-            data_size2 += 4;
-
-            crc_value = 0xA0000000 | (dhh_id & 0x3F) << 18 | (chip_id & 0x03) << 16 ;
-            crc_out.process_byte((crc_value >> 24) & 0xFF);   crc_out.process_byte((crc_value >> 16) & 0xFF);   crc_out.process_byte((crc_value >> 8) & 0xFF);   crc_out.process_byte(crc_value & 0xFF);
-            append_int32(crc_value);
-            data_size2 += 4;
-
-            frame_nr++;
-
-            count_dhp = 0;
-            count_in_roi = 0;
-            last_in_roi = 0xFFFFFFFF;
-//        printf("\n");
-            for (int i = 0; i < nr_pixel; i++) {
-//    printf("%08X | ", dhp_pix[i]);
-//    printf("R %03X  ", (dhp_pix[i]>>20)&0x3FF);
-//    printf("C %03X  ", (dhp_pix[i]>>8)&0x3FF);
-//    printf("A %02X | ", dhp_pix[i]&0xFF);
-
-              int sor, sor_d;
-              int row_act, row_pre;
-#if 0
-              row_act = (dhp_pix[i] >> 20) & 0x3FF;
-              row_pre = (dhp_pix[i - 1] >> 20) & 0x3FF;
-              if ((i == 0) || (row_act != row_pre)) {
-                sor = ((dhp_pix[i] >> 20) & 0x3FE) << 5;
-                sor_d = ((dhp_pix[i] >> 20) & 0x001);
-//                   append_int16(DHH_file, sor);
-                crc_value = sor ;
-                crc_dhh.process_byte((crc_value >> 8) & 0xFF);   crc_dhh.process_byte(crc_value & 0xFF);
-//      printf("SOR %04X  ", sor);
-                count_dhp++;
-//    } else { printf("          ", sor);
-              }
-              int dw;
-              dw = 0x8000 | (sor_d & 0x001) << 15 | (dhp_pix[i] & 0x3FFF);
-//                 append_int16(DHH_file, dw);
-              crc_value = dw ;
-              crc_dhh.process_byte((crc_value >> 8) & 0xFF);   crc_dhh.process_byte(crc_value & 0xFF);
-//    printf("DW %04X | ", dw);
-              count_dhp++;
-#endif
-              pix_dhh = dhh_id;
-              pix_row = (dhp_pix[i] >> 20) & 0x3FF ;
-              pix_col = (dhp_pix[i] >> 8) & 0x3FF ;
-
-              int is_in_roi = 1;
-//                 int is_in_roi = 0;
-//                 for (int r = 0; r < n_rois; r++) {
-//                   if (pix_dhh == rois[0][r] && pix_row >= rois[1][r] && pix_row <= rois[3][r] && pix_col >= rois[2][r] && pix_col <= rois[4][r]) { is_in_roi = 1; }
-//                 }
-
-              if (is_in_roi == 1) {
-
-                row_act = (dhp_pix[i] >> 20) & 0x3FF;
-                row_pre = (last_in_roi >> 20) & 0x3FF;
-                if ((last_in_roi == 0xFFFFFFFF) || (row_act != row_pre)) {
-                  sor = ((dhp_pix[i] >> 20) & 0x3FE) << 5;
-                  sor_d = ((dhp_pix[i] >> 20) & 0x001);
-                  crc_value = sor ;
-                  crc_out.process_byte((crc_value >> 8) & 0xFF);   crc_out.process_byte(crc_value & 0xFF);
-                  append_int16(crc_value);
-                  data_size2 += 2;
-                  //        printf("SOR %04X  ", sor);
-                  count_in_roi++;
-//      } else { printf("          ", sor);
-                }
-                int dw;
-                dw = 0x8000 | (sor_d & 0x001) << 15 | (dhp_pix[i] & 0x3FFF);
-                crc_value = dw ;
-                crc_out.process_byte((crc_value >> 8) & 0xFF);   crc_out.process_byte(crc_value & 0xFF);
-                append_int16(crc_value);
-                data_size2 += 2;
-                //      printf("DW %04X ", dw);
-                count_in_roi++;
-
-                last_in_roi = dhp_pix[i];
-              }
-//    printf("\n");
-
-            }
-
-            if (count_in_roi % 2 != 0) {
-              crc_value = 0x0000 ;
-              crc_out.process_byte((crc_value >> 8) & 0xFF);   crc_out.process_byte(crc_value & 0xFF);
-              append_int16(crc_value);
-              data_size2 += 2;
-            }
-
-            append_int32(crc_out() & 0xFFFFFFFF);
-            data_size2 += 4;
-            if (data_size2 != data_size) {
-              fprintf(stderr, "==== data creation error ... -> call Bjoern ... %d %d %d %d ====\n", data_size, data_size2, count_in_roi, bufferout_size - bufferout_sizestart);
-              return 0;
-            }
-            //      printf("%08X   DHH CRC \n", 0xC0010005);
-            myonsen.frame_length[myonsen.frames++] = htonl(data_size);
-
-          } else {
-            crc_out.reset(CRC_INIT);
-
-            crc_value = 0x90000000 | (dhh_id & 0x3F) << 20 | (chip_id & 0x03) << 16 | m_trigger_nr & 0xFFFF ;
-            crc_out.process_byte((crc_value >> 24) & 0xFF);   crc_out.process_byte((crc_value >> 16) & 0xFF);   crc_out.process_byte((crc_value >> 8) & 0xFF);   crc_out.process_byte(crc_value & 0xFF);
-            append_int32(crc_value);
-            append_int32(crc_out() & 0xFFFFFFFF);
-            frame_nr++;
-            myonsen.frame_length[myonsen.frames++] = htonl(0x08);
-
-          }
-
-        }
-      }
-    }
-  }
-#endif
-
-
-
-#endif
-

@@ -854,10 +854,10 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
   }
 
   if (frame_len == 0x10008) { // 64k
-    B2INFO("Pedestal Data - (ADC:ADC) - not implemented... !");
+    B2INFO("Pedestal Data - (ADC:ADC)");
     m_storeRawAdc.appendNew(vxd_id, data, false);
   } else if (frame_len == 0x20008) { // 128k
-    B2INFO("Pedestal Data - (ADC:Pedestal) - not implemented... !");
+    B2INFO("Pedestal Data - (ADC:Pedestal)");
     m_storeRawAdc.appendNew(vxd_id, data, true);
     m_storeRawPedestal.appendNew(vxd_id, data);
   } else {

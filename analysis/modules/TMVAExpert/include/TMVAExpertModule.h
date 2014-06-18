@@ -70,7 +70,7 @@ namespace Belle2 {
     std::string m_signalProbabilityName /**< Name under which the SignalProbability is stored in the ExtraInfo of the Particle object. */;
     int m_signalCluster; /**< Number of the cluster which is considered signal.  */
     TMVAInterface::Expert* m_method; /**< Method used to calculate the target variable */
-    float m_signalToBackgroundRatio; /**< Signal to background ration to calculate probability, -1 if no transformation of the method output should be performed */
+    float m_signalFraction; /**< signalFraction to calculate probability, -1 if no transformation of the method output should be performed */
 
   };
 

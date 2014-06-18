@@ -13,6 +13,7 @@
 #include <TPluginManager.h>
 
 #include <algorithm>
+#include <iostream>
 
 namespace Belle2 {
   namespace TMVAInterface {
@@ -25,10 +26,21 @@ namespace Belle2 {
 
       // Automatically load Plugin if necessary. The given name has to correspond to the method name
       if (type == "Plugin") {
-        gPluginMgr->AddHandler("TMVA@@MethodBase", (std::string(".*_") + name + std::string(".*")).c_str(), (std::string("TMVA::Method") + name).c_str(),
-                               (std::string("TMVA") + name).c_str(), (std::string("Method") + name + std::string("(DataSetInfo&,TString)")).c_str());
-        gPluginMgr->AddHandler("TMVA@@MethodBase", (std::string(".*") + name + std::string(".*")).c_str(), (std::string("TMVA::Method") + name).c_str(),
-                               (std::string("TMVA") + name).c_str(), (std::string("Method") + name + std::string("(TString&,TString&,DataSetInfo&,TString&)")).c_str());
+        std::string base = "TMVA@@MethodBase";
+        std::string regexp1 = std::string(".*_") + name + std::string(".*");
+        std::string regexp2 = std::string(".*") + name + std::string(".*");
+        std::string className = std::string("TMVA::Method") + name;
+        std::string pluginName = std::string("TMVA") + name;
+        std::string ctor1 = std::string("Method") + name + std::string("(DataSetInfo&,TString)");
+        std::string ctor2 = std::string("Method") + name + std::string("(TString&,TString&,DataSetInfo&,TString&)");
+
+        if (m_name == "MockPlugin") {
+          pluginName = std::string("analysis_TMVA") + name;
+        }
+
+        gPluginMgr->AddHandler(base.c_str(), regexp1.c_str(), className.c_str(), pluginName.c_str(), ctor1.c_str());
+        gPluginMgr->AddHandler(base.c_str(), regexp2.c_str(), className.c_str(), pluginName.c_str(), ctor2.c_str());
+
         m_type = TMVA::Types::kPlugins;
         B2INFO("Loaded plugin " << name)
       } else {

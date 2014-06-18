@@ -35,8 +35,9 @@ void PIDLikelihood::setLogLikelihood(Const::EDetector det,
     B2ERROR("PIDLikelihood::setLogLikelihood: detector is not a PID device");
     return;
   }
-  if (!isfinite(logl)) {
-    B2ERROR("PIDLikelihood::setLogLikelihood: log-likelihood for detector " << det << " is not finite (i.e. infinite or NaN)! Ignoring this value.");
+  if (logl != logl or logl == INFINITY) {
+    B2ERROR("PIDLikelihood::setLogLikelihood: log-likelihood for detector " << det << " is " << logl << " (i.e. +inf or NaN)! Ignoring this value. (" << Const::CDC << "=CDC, " << Const::TOP << "=TOP, " << Const::ARICH << "=ARICH, " << Const::ECL << "=ECL)");
+
     return;
   }
   m_detectors += det;

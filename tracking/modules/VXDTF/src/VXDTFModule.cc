@@ -1369,8 +1369,6 @@ void VXDTFModule::beginRun()
 
     /// WARNING TODO at the moment, copying the first pass set by the user means that the baselineTF can not be set at different behavior than first normal pass. Need new method to introduce independent steering too! (maybe first pass-entries are used for baselineTF if activated, and first pass is second entry in list?)
   }
-  m_errorContainer = getHitErrors();
-
 
 
   //Import all Sectors for all events (Collector)
@@ -1758,8 +1756,8 @@ void VXDTFModule::the_real_event()
     aLayerID = aVxdID.getLayerNumber();
     VXD::SensorInfoBase aSensorInfo = geometry.getSensorInfo(aVxdID);
     hitInfo.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
-    hitInfo.sigmaU = m_errorContainer.at(aLayerID - 1).first;
-    hitInfo.sigmaV = m_errorContainer.at(aLayerID - 1).second;
+    hitInfo.sigmaU = aClusterPtr->getUSigma();
+    hitInfo.sigmaV = aClusterPtr->getVSigma();
     hitInfo.hitSigma = aSensorInfo.vectorToGlobal(hitSigma);
     B2DEBUG(100, " telCluster at vxdID " << aVxdID << " got global pos X/Y/Z: " << hitInfo.hitPosition.X() << "/" << hitInfo.hitPosition.Y() << "/" << hitInfo.hitPosition.Z() << ", global var X/Y/Z: " << hitInfo.hitSigma.X() << "/" << hitInfo.hitSigma.Y() << "/" << hitInfo.hitSigma.Z())
 
@@ -1828,8 +1826,8 @@ void VXDTFModule::the_real_event()
     aLayerID = aVxdID.getLayerNumber();
     VXD::SensorInfoBase aSensorInfo = geometry.getSensorInfo(aVxdID);
     hitInfo.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
-    hitInfo.sigmaU = m_errorContainer.at(aLayerID - 1).first;
-    hitInfo.sigmaV = m_errorContainer.at(aLayerID - 1).second;
+    hitInfo.sigmaU = aClusterPtr->getUSigma();
+    hitInfo.sigmaV = aClusterPtr->getVSigma();
     hitInfo.hitSigma = aSensorInfo.vectorToGlobal(hitSigma);
     B2DEBUG(100, " pxdluster got global pos X/Y/Z: " << hitInfo.hitPosition.X() << "/" << hitInfo.hitPosition.Y() << "/" << hitInfo.hitPosition.Z() << ", global var X/Y/Z: " << hitInfo.hitSigma.X() << "/" << hitInfo.hitSigma.Y() << "/" << hitInfo.hitSigma.Z())
 
@@ -1977,9 +1975,8 @@ void VXDTFModule::the_real_event()
 
       hitInfo.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
       hitInfo.hitSigma = aSensorInfo.vectorToGlobal(hitSigma);
-      B2DEBUG(100, " VXDTF-event SVD hits: m_errorContainer.size(): " << m_errorContainer.size() << ", layerID-1: " << aLayerID - 1)
-      hitInfo.sigmaU = m_errorContainer.at(aLayerID - 1).first;
-      hitInfo.sigmaV = m_errorContainer.at(aLayerID - 1).second;
+      hitInfo.sigmaU = uClusterPtr->getPositionSigma();
+      hitInfo.sigmaV = vClusterPtr->getPositionSigma();
 
       B2DEBUG(100, "svdClusterCombi got global pos X/Y/Z: " << hitInfo.hitPosition.X() << "/" << hitInfo.hitPosition.Y() << "/" << hitInfo.hitPosition.Z() << ", global var X/Y/Z: " << hitInfo.hitSigma.X() << "/" << hitInfo.hitSigma.Y() << "/" << hitInfo.hitSigma.Z())
 
@@ -3783,40 +3780,40 @@ int VXDTFModule::segFinder(PassData* currentPass)
           } // else segment not approved
         } else { B2DEBUG(175, " slopeRZ is not activated for pass: " << currentPass->sectorSetup << "!") }
 
-        // The following tests are debug-tests:
-        if (currentPass->alwaysTrue2Hit.first == true) { // min & max!
-          accepted = currentPass->twoHitFilterBox.checkAlwaysTrue2Hit(FilterID::alwaysTrue2Hit);
-          if (accepted == true) {
-            simpleSegmentQI++;
-            B2DEBUG(150, " alwaysTrue2Hit: segment approved! SectorCombi: " << mainSecID << "/" << friendSecID)
-            acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysTrue2Hit, true));
-          } else {
-            B2DEBUG(150, " alwaysTrue2Hit: segment discarded! SectorCombi: " << mainSecID << "/" << friendSecID)
-            acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysTrue2Hit, false));
-          } // else segment not approved
-        } else { B2DEBUG(175, " alwaysTrue2Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
-        if (currentPass->alwaysFalse2Hit.first == true) { // min & max!
-          accepted = currentPass->twoHitFilterBox.checkAlwaysFalse2Hit(FilterID::alwaysFalse2Hit);
-          if (accepted == true) {
-            simpleSegmentQI++;
-            B2DEBUG(150, " alwaysFalse2Hit: segment approved! SectorCombi: " << mainSecID << "/" << friendSecID)
-            acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysFalse2Hit, true));
-          } else {
-            B2DEBUG(150, " alwaysFalse2Hit: segment discarded! SectorCombi: " << mainSecID << "/" << friendSecID)
-            acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysFalse2Hit, false));
-          } // else segment not approved
-        } else { B2DEBUG(175, " alwaysFalse2Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
-        if (currentPass->random2Hit.first == true) { // min & max!
-          accepted = currentPass->twoHitFilterBox.checkRandom2Hit(FilterID::random2Hit);
-          if (accepted == true) {
-            simpleSegmentQI++;
-            B2DEBUG(150, " random2Hit: segment approved! SectorCombi: " << mainSecID << "/" << friendSecID)
-            acceptedRejectedFilters.push_back(make_pair(FilterID::random2Hit, true));
-          } else {
-            B2DEBUG(150, " random2Hit: segment discarded! SectorCombi: " << mainSecID << "/" << friendSecID)
-            acceptedRejectedFilters.push_back(make_pair(FilterID::random2Hit, false));
-          } // else segment not approved
-        } else { B2DEBUG(175, " random2Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
+        /// The following tests are debug-tests WARNING uncomment only if needed!:
+//         if (currentPass->alwaysTrue2Hit.first == true) { // min & max!
+//           accepted = currentPass->twoHitFilterBox.checkAlwaysTrue2Hit(FilterID::alwaysTrue2Hit);
+//           if (accepted == true) {
+//             simpleSegmentQI++;
+//             B2DEBUG(150, " alwaysTrue2Hit: segment approved! SectorCombi: " << mainSecID << "/" << friendSecID)
+//             acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysTrue2Hit, true));
+//           } else {
+//             B2DEBUG(150, " alwaysTrue2Hit: segment discarded! SectorCombi: " << mainSecID << "/" << friendSecID)
+//             acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysTrue2Hit, false));
+//           } // else segment not approved
+//         } else { B2DEBUG(175, " alwaysTrue2Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
+//         if (currentPass->alwaysFalse2Hit.first == true) { // min & max!
+//           accepted = currentPass->twoHitFilterBox.checkAlwaysFalse2Hit(FilterID::alwaysFalse2Hit);
+//           if (accepted == true) {
+//             simpleSegmentQI++;
+//             B2DEBUG(150, " alwaysFalse2Hit: segment approved! SectorCombi: " << mainSecID << "/" << friendSecID)
+//             acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysFalse2Hit, true));
+//           } else {
+//             B2DEBUG(150, " alwaysFalse2Hit: segment discarded! SectorCombi: " << mainSecID << "/" << friendSecID)
+//             acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysFalse2Hit, false));
+//           } // else segment not approved
+//         } else { B2DEBUG(175, " alwaysFalse2Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
+//         if (currentPass->random2Hit.first == true) { // min & max!
+//           accepted = currentPass->twoHitFilterBox.checkRandom2Hit(FilterID::random2Hit);
+//           if (accepted == true) {
+//             simpleSegmentQI++;
+//             B2DEBUG(150, " random2Hit: segment approved! SectorCombi: " << mainSecID << "/" << friendSecID)
+//             acceptedRejectedFilters.push_back(make_pair(FilterID::random2Hit, true));
+//           } else {
+//             B2DEBUG(150, " random2Hit: segment discarded! SectorCombi: " << mainSecID << "/" << friendSecID)
+//             acceptedRejectedFilters.push_back(make_pair(FilterID::random2Hit, false));
+//           } // else segment not approved
+//         } else { B2DEBUG(175, " random2Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
 
         if (simpleSegmentQI < currentPass->activatedSegFinderTests) {
           if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 50, PACKAGENAME()) == true) {
@@ -4322,40 +4319,40 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           } // else segment not approved
         } else { B2DEBUG(175, " deltaSlopeZOverS is not activated for pass: " << currentPass->sectorSetup << "!") }
 
-        // The following tests are debug-tests:
-        if (currentPass->alwaysTrue3Hit.first == true) { // min & max!
-          accepted = currentPass->threeHitFilterBox.checkAlwaysTrue3Hit(FilterID::alwaysTrue3Hit);
-          if (accepted == true) {
-            simpleSegmentQI++;
-            B2DEBUG(150, " alwaysTrue3Hit: segment approved! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
-            acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysTrue3Hit, true));
-          } else {
-            B2DEBUG(150, " alwaysTrue3Hit: segment discarded! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
-            acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysTrue3Hit, false));
-          } // else segment not approved
-        } else { B2DEBUG(175, " alwaysTrue3Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
-        if (currentPass->alwaysFalse3Hit.first == true) { // min & max!
-          accepted = currentPass->threeHitFilterBox.checkAlwaysFalse3Hit(FilterID::alwaysFalse3Hit);
-          if (accepted == true) {
-            simpleSegmentQI++;
-            B2DEBUG(150, " alwaysFalse3Hit: segment approved! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
-            acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysFalse3Hit, true));
-          } else {
-            B2DEBUG(150, " alwaysFalse3Hit: segment discarded! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
-            acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysFalse3Hit, false));
-          } // else segment not approved
-        } else { B2DEBUG(175, " alwaysFalse3Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
-        if (currentPass->random3Hit.first == true) { // min & max!
-          accepted = currentPass->threeHitFilterBox.checkRandom3Hit(FilterID::random3Hit);
-          if (accepted == true) {
-            simpleSegmentQI++;
-            B2DEBUG(150, " random3Hit: segment approved! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
-            acceptedRejectedFilters.push_back(make_pair(FilterID::random3Hit, true));
-          } else {
-            B2DEBUG(150, " random3Hit: segment discarded! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
-            acceptedRejectedFilters.push_back(make_pair(FilterID::random3Hit, false));
-          } // else segment not approved
-        } else { B2DEBUG(175, " random3Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
+        // The following tests are debug-tests WARNING uncomment only if needed!:
+//         if (currentPass->alwaysTrue3Hit.first == true) { // min & max!
+//           accepted = currentPass->threeHitFilterBox.checkAlwaysTrue3Hit(FilterID::alwaysTrue3Hit);
+//           if (accepted == true) {
+//             simpleSegmentQI++;
+//             B2DEBUG(150, " alwaysTrue3Hit: segment approved! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
+//             acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysTrue3Hit, true));
+//           } else {
+//             B2DEBUG(150, " alwaysTrue3Hit: segment discarded! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
+//             acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysTrue3Hit, false));
+//           } // else segment not approved
+//         } else { B2DEBUG(175, " alwaysTrue3Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
+//         if (currentPass->alwaysFalse3Hit.first == true) { // min & max!
+//           accepted = currentPass->threeHitFilterBox.checkAlwaysFalse3Hit(FilterID::alwaysFalse3Hit);
+//           if (accepted == true) {
+//             simpleSegmentQI++;
+//             B2DEBUG(150, " alwaysFalse3Hit: segment approved! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
+//             acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysFalse3Hit, true));
+//           } else {
+//             B2DEBUG(150, " alwaysFalse3Hit: segment discarded! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
+//             acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysFalse3Hit, false));
+//           } // else segment not approved
+//         } else { B2DEBUG(175, " alwaysFalse3Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
+//         if (currentPass->random3Hit.first == true) { // min & max!
+//           accepted = currentPass->threeHitFilterBox.checkRandom3Hit(FilterID::random3Hit);
+//           if (accepted == true) {
+//             simpleSegmentQI++;
+//             B2DEBUG(150, " random3Hit: segment approved! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
+//             acceptedRejectedFilters.push_back(make_pair(FilterID::random3Hit, true));
+//           } else {
+//             B2DEBUG(150, " random3Hit: segment discarded! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
+//             acceptedRejectedFilters.push_back(make_pair(FilterID::random3Hit, false));
+//           } // else segment not approved
+//         } else { B2DEBUG(175, " random3Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
 
 
         if (simpleSegmentQI < currentPass->activatedNbFinderTests) {
@@ -4924,49 +4921,49 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
 
       }
 
-      // The following tests are debug-tests:
-      if (currentPass->alwaysTrue4Hit.first == true) { // min & max!
-        accepted = currentPass->fourHitFilterBox.checkAlwaysTrue4Hit(FilterID::alwaysTrue4Hit);
-        if (accepted == true) {
-          B2DEBUG(150, " TCC filter alwaysTrue4Hit: segment approved! TC: " << tcCtr)
-
-          // Collector TC Update (alwaysTrue4Hit)
-          if (m_PARAMdisplayCollector > 0) {
-            m_collector.updateTC((*currentTC)->getCollectorID(), "", CollectorTFInfo::m_idAlive, {FilterID::alwaysTrue4Hit}, vector<int>());
-          }
-        } else {
-          B2DEBUG(150, " TCC filter alwaysTrue4Hit: segment discarded! TC: " << tcCtr)
-          break;
-        } // else segment not approved
-      } else { B2DEBUG(175, " TCC filter alwaysTrue4Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
-      if (currentPass->alwaysFalse4Hit.first == true) { // min & max!
-        accepted = currentPass->fourHitFilterBox.checkAlwaysFalse4Hit(FilterID::alwaysFalse4Hit);
-        if (accepted == true) {
-          B2DEBUG(150, " TCC filter alwaysFalse4Hit: segment approved! TC: " << tcCtr)
-
-          // Collector TC Update (alwaysFalse4Hit)
-          if (m_PARAMdisplayCollector > 0) {
-            m_collector.updateTC((*currentTC)->getCollectorID(), "", CollectorTFInfo::m_idAlive, {FilterID::alwaysFalse4Hit}, vector<int>());
-          }
-        } else {
-          B2DEBUG(150, " TCC filter alwaysFalse4Hit: segment discarded! TC: " << tcCtr)
-          break;
-        } // else segment not approved
-      } else { B2DEBUG(175, " TCC filter alwaysFalse4Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
-      if (currentPass->random4Hit.first == true) { // min & max!
-        accepted = currentPass->fourHitFilterBox.checkRandom4Hit(FilterID::random4Hit);
-        if (accepted == true) {
-          B2DEBUG(150, " TCC filter random4Hit: segment approved! TC: " << tcCtr)
-
-          // Collector TC Update (random4Hit)
-          if (m_PARAMdisplayCollector > 0) {
-            m_collector.updateTC((*currentTC)->getCollectorID(), "", CollectorTFInfo::m_idAlive, {FilterID::random4Hit}, vector<int>());
-          }
-        } else {
-          B2DEBUG(150, " TCC filter random4Hit: segment discarded! TC: " << tcCtr)
-          break;
-        } // else segment not approved
-      } else { B2DEBUG(175, " TCC filter random4Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
+      // The following tests are debug-tests WARNING uncomment only if needed!:
+//       if (currentPass->alwaysTrue4Hit.first == true) { // min & max!
+//         accepted = currentPass->fourHitFilterBox.checkAlwaysTrue4Hit(FilterID::alwaysTrue4Hit);
+//         if (accepted == true) {
+//           B2DEBUG(150, " TCC filter alwaysTrue4Hit: segment approved! TC: " << tcCtr)
+//
+//           // Collector TC Update (alwaysTrue4Hit)
+//           if (m_PARAMdisplayCollector > 0) {
+//             m_collector.updateTC((*currentTC)->getCollectorID(), "", CollectorTFInfo::m_idAlive, {FilterID::alwaysTrue4Hit}, vector<int>());
+//           }
+//         } else {
+//           B2DEBUG(150, " TCC filter alwaysTrue4Hit: segment discarded! TC: " << tcCtr)
+//           break;
+//         } // else segment not approved
+//       } else { B2DEBUG(175, " TCC filter alwaysTrue4Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
+//       if (currentPass->alwaysFalse4Hit.first == true) { // min & max!
+//         accepted = currentPass->fourHitFilterBox.checkAlwaysFalse4Hit(FilterID::alwaysFalse4Hit);
+//         if (accepted == true) {
+//           B2DEBUG(150, " TCC filter alwaysFalse4Hit: segment approved! TC: " << tcCtr)
+//
+//           // Collector TC Update (alwaysFalse4Hit)
+//           if (m_PARAMdisplayCollector > 0) {
+//             m_collector.updateTC((*currentTC)->getCollectorID(), "", CollectorTFInfo::m_idAlive, {FilterID::alwaysFalse4Hit}, vector<int>());
+//           }
+//         } else {
+//           B2DEBUG(150, " TCC filter alwaysFalse4Hit: segment discarded! TC: " << tcCtr)
+//           break;
+//         } // else segment not approved
+//       } else { B2DEBUG(175, " TCC filter alwaysFalse4Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
+//       if (currentPass->random4Hit.first == true) { // min & max!
+//         accepted = currentPass->fourHitFilterBox.checkRandom4Hit(FilterID::random4Hit);
+//         if (accepted == true) {
+//           B2DEBUG(150, " TCC filter random4Hit: segment approved! TC: " << tcCtr)
+//
+//           // Collector TC Update (random4Hit)
+//           if (m_PARAMdisplayCollector > 0) {
+//             m_collector.updateTC((*currentTC)->getCollectorID(), "", CollectorTFInfo::m_idAlive, {FilterID::random4Hit}, vector<int>());
+//           }
+//         } else {
+//           B2DEBUG(150, " TCC filter random4Hit: segment discarded! TC: " << tcCtr)
+//           break;
+//         } // else segment not approved
+//       } else { B2DEBUG(175, " TCC filter random4Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
       a++; b++; c++; d++;
     }
     if (abortTC == true) { tcCtr++; continue; }
@@ -5529,8 +5526,8 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
       newPosition.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
       newPosition.hitSigma = aSensorInfo.vectorToGlobal(sigmaVec);
       B2DEBUG(100, " baselineTF: pxdluster got global pos X/Y/Z: " << newPosition.hitPosition.X() << "/" << newPosition.hitPosition.Y() << "/" << newPosition.hitPosition.Z() << ", global var X/Y/Z: " << newPosition.hitSigma.X() << "/" << newPosition.hitSigma.Y() << "/" << newPosition.hitSigma.Z())
-      newPosition.sigmaU = m_errorContainer.at(aLayerID - 1).first;
-      newPosition.sigmaV = m_errorContainer.at(aLayerID - 1).second;
+      newPosition.sigmaU = aClusterInfo.getPXDCluster()->getUSigma();
+      newPosition.sigmaV = aClusterInfo.getPXDCluster()->getVSigma();
       FullSecID aSecID = FullSecID(aVxdID, false, 0);
       VXDTFHit newHit = VXDTFHit(newPosition, 1, NULL, NULL, &aClusterInfo, Const::PXD, aSecID.getFullSecID(), aVxdID, 0);
       passInfo->fullHitsVector.push_back(newHit);
@@ -5545,8 +5542,8 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
       newPosition.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
       newPosition.hitSigma = aSensorInfo.vectorToGlobal(sigmaVec);
       B2DEBUG(100, " baselineTF: pxdluster got global pos X/Y/Z: " << newPosition.hitPosition.X() << "/" << newPosition.hitPosition.Y() << "/" << newPosition.hitPosition.Z() << ", global var X/Y/Z: " << newPosition.hitSigma.X() << "/" << newPosition.hitSigma.Y() << "/" << newPosition.hitSigma.Z())
-      newPosition.sigmaU = m_errorContainer.at(aLayerID - 1).first;
-      newPosition.sigmaV = m_errorContainer.at(aLayerID - 1).second;
+      newPosition.sigmaU = aClusterInfo.getTELCluster()->getUSigma();
+      newPosition.sigmaV = aClusterInfo.getTELCluster()->getVSigma();
       FullSecID aSecID = FullSecID(aVxdID, false, 0);
       VXDTFHit newHit = VXDTFHit(newPosition, 1, NULL, NULL, &aClusterInfo, Const::TEST, aSecID.getFullSecID(), aVxdID, 0);
       passInfo->fullHitsVector.push_back(newHit);
@@ -5817,14 +5814,14 @@ VXDTFHit VXDTFModule::deliverVXDTFHitWrappedSVDHit(ClusterInfo* uClusterInfo, Cl
     aVxdID = vClusterInfo->getSVDCluster()->getSensorID(); // could overwrite the value assigned by uCluster, but it's not important, since they are on the same sensor
   }
 
-  int aLayerID = aVxdID.getLayerNumber();
+//   int aLayerID = aVxdID.getLayerNumber();
 
   const VXD::SensorInfoBase& aSensorInfo = dynamic_cast<const VXD::SensorInfoBase&>(VXD::GeoCache::get(aVxdID));
 
   /// WARNING we are ignoring the case of a missing cluster at a wedge sensor (at least for the calculation of the error. For the Kalman filter, this should be unimportant since it is working with local coordinates and an axis transformation (where the problem of the dependency of clusters at both side does not occur), this will be a problem for the circleFitter, which is working with global coordinates, where the dependeny is still there!)
   if (vClusterInfo != NULL) {
     hitLocal.SetY(vClusterInfo->getSVDCluster()->getPosition()); // always correct
-    newPosition.sigmaV = m_errorContainer.at(aLayerID - 1).second;
+    newPosition.sigmaV = vClusterInfo->getSVDCluster()->getPositionSigma();
     sigmaVec.SetY(vClusterInfo->getSVDCluster()->getPositionSigma());
   } else {
     hitLocal.SetY(0.); // is center of the plane
@@ -5838,7 +5835,7 @@ VXDTFHit VXDTFModule::deliverVXDTFHitWrappedSVDHit(ClusterInfo* uClusterInfo, Cl
     } else { // rectangular Sensor and/or no 2D-info (in this case the X-value of the center of the sensor is taken)
       hitLocal.SetX(uClusterInfo->getSVDCluster()->getPosition());
     }
-    newPosition.sigmaU = m_errorContainer.at(aLayerID - 1).first;
+    newPosition.sigmaU = uClusterInfo->getSVDCluster()->getPositionSigma();
     sigmaVec.SetX(uClusterInfo->getSVDCluster()->getPositionSigma());
   } else {
     hitLocal.SetX(0.); // is center of the plane

@@ -62,7 +62,8 @@ EvtMessage& EvtMessage::operator=(const EvtMessage& obj)
   if (this != &obj) {
     if (m_ownsBuffer)
       delete [] m_data;
-    buffer(obj.m_data); //copy m_data (m_ownsBuffer is set)
+    buffer(obj.m_data); //copy m_data
+    m_ownsBuffer = true; //already set by buffer(), but let's be explicit
   }
 
   return *this;

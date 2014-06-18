@@ -823,6 +823,7 @@ bool MuidModule::findMatchingBarrelHit(Point& point)
     BKLMHit2d* hit = bklmHits[h];
     if (hit->getLayer() != matchingLayer) continue;
     if (hit->isOutOfTime()) continue;
+    if (hit->getTime() > 50.0) continue; // DIVOT this needs tuning work
     TVector3 diff(hit->getGlobalPosition() - point.position);
     double dn = diff * n; // in cm
     if (fabs(dn) < 2.0) {
@@ -892,6 +893,7 @@ bool MuidModule::findMatchingEndcapHit(Point& point)
       if (hit->getEndcap() != 1) continue;
     }
     // DIVOT no such function! if (hit->isOutOfTime()) continue;
+    if (hit->getTime() > 50.0) continue; // DIVOT this needs tuning work
     TVector3 diff(hit->getPosition() - point.position);
     double dn = diff * n; // in cm
     if (fabs(dn) > 2.0) continue;

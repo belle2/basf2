@@ -199,6 +199,13 @@ void PreCutHistMakerModule::clearTemporaryLists()
 
 bool PreCutHistMakerModule::fillParticleLists(const std::vector<MCParticle*>& mcDaughters)
 {
+  //map abs(PDG) to list
+  //TODO: are there cases where we want misID-ed Particles? (e.g. pdg different mcPart)
+  std::map<int, StoreObjPtr<ParticleList>> pdgToTmpList;
+  for (auto & plist : m_tmpLists) {
+    pdgToTmpList[abs(plist->getPDGCode())] = plist;
+  }
+
   for (const MCParticle * mcPart : mcDaughters) {
     //B2WARNING("fillParticleLists: mc " << mcPart->getIndex() << " " << mcPart->getPDG());
     const auto& particles = mcPart->getRelationsWith<Particle>();
@@ -206,12 +213,9 @@ bool PreCutHistMakerModule::fillParticleLists(const std::vector<MCParticle*>& mc
       //B2WARNING("fillParticleLists: adding p " << p.getArrayIndex() << " " << p.getPDGCode());
 
       //add particles into corresponding temporary lists
-      for (auto & plist : m_tmpLists) {
-        //TODO: are there cases where we want misID-ed Particles? (e.g. pdg different mcPart)
-        if (abs(p.getPDGCode()) == abs(plist->getPDGCode())) {
-          plist->addParticle(&p);
-        }
-      }
+      const auto& it = pdgToTmpList.find(abs(p.getPDGCode()));
+      if (it != pdgToTmpList.end())
+        it->second->addParticle(&p);
     }
   }
 

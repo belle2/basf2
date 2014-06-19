@@ -445,10 +445,11 @@ namespace {
   TEST_F(MCMatchingTest, MissingParticles)
   {
     {
+      //pi0 is not FSP, so doesn't get c_MissMassiveParticle
       Decay d(421, {321, -211, {111, {22, 22}}});
       d.reconstruct({421, {321, -211, {0}}});
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
-      EXPECT_EQ(getMCTruthStatus(d.m_particle), c_MissMassiveParticle) << d.getString();
+      EXPECT_EQ(c_MissGamma, getMCTruthStatus(d.m_particle)) << d.getString();
     }
     {
       Decay d(421, {321, -211, {111, {22, 22}}});
@@ -506,6 +507,62 @@ namespace {
       EXPECT_EQ(c_MissMassiveParticle | c_MissGamma, getMCTruthStatus(d.m_particle)) << d.getString();
     }
   }
+  TEST_F(MCMatchingTest, MissGamma)
+  {
+    {
+      //D*+ -> D+ pi0
+      Decay d(431, {{421, {321, -211, {111, {22, 22}}}}, {111, {22, 22}}});
+      d.reconstruct({431, {{421, {321, -211, {111, {22, 22}}}}, {111, {22, 22}}}});
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_Correct, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
+    {
+      //D*+ -> D+ pi0 reconstructed as D*+ -> D+ gamma
+      Decay d(431, {{421, {321, -211, {111, {22, 22}}}}, {111, {22, 22}}});
+      Decay& gamma = d[1][0]; //first gamma from second pi0
+      d.reconstruct({431, {{421, {321, -211, {111, {22, 22}}}}, {22, {}, Decay::c_ReconstructFrom, &gamma}}});
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_MissGamma, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
+
+    {
+      //D*+ -> D+ gamma
+      Decay d(431, {{421, {321, -211, {111, {22, 22}}}}, 22});
+      d.reconstruct({431, {{421, {321, -211, {111, {22, 22}}}}, 22}});
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_Correct, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
+    {
+      //pi0 -> e+ e- gamma
+      Decay d(111, {11, -11, 22});
+      d.reconstruct({111, {11, -11, 22}});
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_Correct, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
+    {
+      //pi0 -> e+ e- gamma reconstructed without gamma
+      Decay d(111, {11, -11, 22});
+      d.reconstruct({111, {11, -11, 0}});
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      //TODO: this should get c_MissGamma, but distinction between these cases is hard
+      EXPECT_EQ(c_MissFSR, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
+    {
+      //pi0 -> 4 gamma
+      Decay d(111, {22, 22, 22, 22});
+      d.reconstruct({111, {22, 22, 22, 22}});
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_Correct, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
+    {
+      //pi0 -> 4 gamma as 2 gamma
+      Decay d(111, {22, 22, 22, 22});
+      d.reconstruct({111, {22, 22, 0, 0}});
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      //TODO: this should get c_MissGamma, but distinction between these cases is hard
+      EXPECT_EQ(c_MissFSR, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
+  }
   /** photon 'reconstructed' from a pi+ track, combined into other stuff. */
   TEST_F(MCMatchingTest, WrongPhotonForPi0)
   {
@@ -513,20 +570,21 @@ namespace {
       Decay d(521, {211, {421, {321, -211, {111, {22, 22}}}}});
       d.finalize();
       d.reconstruct({521, {211, {421, {321, -211, {111, {{22}, {22, {}, Decay::c_RelateWith, d.getMCParticle(211)}}}}}}});
-      //result: pi0 gets MC match 521. Gets misID & c_AddedWrongParticle because of 'wrong' photon, plus c_MissMassiveParticle since the B's daughters are missing
-      Particle* p = d.getParticle(111);
+      //result: pi0 gets MC match 521. Gets misID & c_AddedWrongParticle because of 'wrong' photon, plus c_MissMassiveParticle since the B's daughters are missing, plus c_MissGamma because one photon was not reconstructed
+      Particle* pi0 = d.getParticle(111);
       Decay* pi0decay = d.getDecay(111);
-      ASSERT_TRUE(setMCTruth(p)) << pi0decay->getString();
-      EXPECT_EQ(521, p->getRelated<MCParticle>()->getPDG());
-      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissMassiveParticle, getMCTruthStatus(p)) << pi0decay->getString();
+      ASSERT_TRUE(setMCTruth(pi0)) << pi0decay->getString();
+      EXPECT_EQ(521, pi0->getRelated<MCParticle>()->getPDG());
+      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissMassiveParticle | c_MissGamma, getMCTruthStatus(pi0)) << pi0decay->getString();
 
       //flags migrate upstream
-      p = d.getParticle(421);
+      Particle* p = d.getParticle(421);
       Decay* d0decay = d.getDecay(421);
       ASSERT_TRUE(setMCTruth(p)) << d0decay->getString();
-      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissMassiveParticle, getMCTruthStatus(p)) << d0decay->getString();
+      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissGamma, getMCTruthStatus(p)) << d0decay->getString();
     }
   }
+
 
   /** pi+ decays into muon, pi+ track is found. */
   TEST_F(MCMatchingTest, DecayInFlightCorrect)

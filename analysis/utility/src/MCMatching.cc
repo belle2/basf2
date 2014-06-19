@@ -222,7 +222,7 @@ void MCMatching::appendFSP(const Particle* p, vector<const Particle*>& children)
     const Particle* daug = p->getDaughter(i);
 
     // TODO: fix this (aim for no hard coded values)
-    if (daug->getNDaughters() && daug->getPDGCode() != 111 && daug->getPDGCode() != 310) {
+    if (daug->getNDaughters() && daug->getPDGCode() != 310) {
       appendFSP(daug, children);
     } else {
       children.push_back(daug);
@@ -258,7 +258,6 @@ bool MCMatching::isFSP(const MCParticle* p)
     case 16:
     case 22:
     case 2212:
-    case 111:
     case 310:
     case 130:
     case 2112:

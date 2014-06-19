@@ -21,10 +21,10 @@ namespace Belle2 {
     /** Flags that describe different reconstruction errors. */
     enum MCMatchStatus {
       c_Correct             = 0,  /**< This Particle and all its daughters are perfectly reconstructed. */
-      c_MissFSR             = 1,  /**< bit 0: A Final State Radiation (FSR) photon is not reconstructed. */
+      c_MissFSR             = 1,  /**< bit 0: A Final State Radiation (FSR) photon is not reconstructed. Note that distinction from c_MissGamma is based only on number of other daughters and may be wrong. */
       c_MisID               = 2,  /**< bit 1: One of the charged final state particles is mis-identified. */
       c_MissGamma           = 4,  /**< bit 2: A Photon (not FSR) is missing (not reconstructed). */
-      c_MissMassiveParticle = 8,  /**< bit 3: A generated massive particle is missing (not reconstructed). */
+      c_MissMassiveParticle = 8,  /**< bit 3: A generated massive FSP is missing (not reconstructed). */
       c_MissNeutrino        = 16, /**< bit 4: A Neutrino is missing (not reconstructed). */
       c_MissKlong           = 32, /**< bit 5: A Klong is missing (not reconstructed). */
       c_AddedWrongParticle  = 64,  /**< bit 6: A non-FSP Particle has wrong PDG code, meaning one of the daughters (or their daughters) belongs to another Particle. */

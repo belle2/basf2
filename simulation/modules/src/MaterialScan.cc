@@ -42,7 +42,7 @@ REG_MODULE(MaterialScan);
 //-----------------------------------------------------------------
 
 MaterialScan::MaterialScan(TFile* rootFile, const std::string& name, const std::string& axisLabel, ScanParams params):
-  G4UserSteppingAction(), m_rootFile(rootFile), m_name(name), m_axisLabel(axisLabel), m_params(params)
+  G4UserSteppingAction(), m_rootFile(rootFile), m_name(name), m_axisLabel(axisLabel), m_params(params), m_curDepth(0)
 {
   //Sort the parameters accordingly
   if (m_params.minU > m_params.maxU) std::swap(m_params.minU, m_params.maxU);

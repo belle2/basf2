@@ -26,6 +26,9 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Unit.h>
 
+#include <CLHEP/Units/PhysicalConstants.h>
+#include <CLHEP/Units/SystemOfUnits.h>
+
 #include <G4TransportationManager.hh>
 #include <G4Transportation.hh>
 #include <G4ParticleTable.hh>
@@ -58,7 +61,7 @@ REG_MODULE(FullSim)
 //                 Implementation
 //-----------------------------------------------------------------
 
-FullSimModule::FullSimModule() : Module(), m_visManager(NULL)
+FullSimModule::FullSimModule() : Module(), m_visManager(NULL), m_useNativeGeant4(true)
 {
   //Set module properties and the description
   setDescription("Performs the full Geant4 detector simulation. Requires a valid geometry in memory.");

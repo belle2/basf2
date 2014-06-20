@@ -14,6 +14,9 @@
 #include <simulation/kernel/ExtPhysicsConstructor.h>
 #include <framework/gearbox/Unit.h>
 
+#include <CLHEP/Units/PhysicalConstants.h>
+#include <CLHEP/Units/SystemOfUnits.h>
+
 #include <G4EmStandardPhysics.hh>
 #include <G4UnitsTable.hh>
 #include <G4ParticleTable.hh>

@@ -26,7 +26,7 @@ using namespace Belle2::Simulation;
 TrackingAction::TrackingAction(MCParticleGraph& mcParticleGraph):
   G4UserTrackingAction(), m_mcParticleGraph(mcParticleGraph),
   m_IgnoreOpticalPhotons(false), m_IgnoreSecondaries(false),
-  m_storeTrajectories(false), m_angularTolerance(0), m_distanceTolerance(0),
+  m_EnergyCut(0.0), m_storeTrajectories(false), m_angularTolerance(0), m_distanceTolerance(0),
   m_storeMCTrajectories(), m_relMCTrajectories(StoreArray<MCParticle>(), m_storeMCTrajectories)
 {
   if (false) {

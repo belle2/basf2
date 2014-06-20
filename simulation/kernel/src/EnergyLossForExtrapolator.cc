@@ -13,6 +13,10 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
 #include <simulation/kernel/EnergyLossForExtrapolator.h>
+
+#include <CLHEP/Units/PhysicalConstants.h>
+#include <CLHEP/Units/SystemOfUnits.h>
+
 #include <G4PhysicsLogVector.hh>
 #include <G4ParticleDefinition.hh>
 #include <G4Material.hh>

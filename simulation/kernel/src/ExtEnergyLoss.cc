@@ -10,6 +10,10 @@
 
 #include <simulation/kernel/ExtEnergyLoss.h>
 #include <simulation/kernel/EnergyLossForExtrapolator.h>
+
+#include <CLHEP/Units/PhysicalConstants.h>
+#include <CLHEP/Units/SystemOfUnits.h>
+
 #include <G4ErrorPropagatorData.hh>
 
 #include <framework/logging/Logger.h>

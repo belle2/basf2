@@ -9,6 +9,10 @@
  **************************************************************************/
 
 #include <simulation/kernel/ExtPhysicsConstructor.h>
+
+#include <CLHEP/Units/PhysicalConstants.h>
+#include <CLHEP/Units/SystemOfUnits.h>
+
 #include <G4ParticleTable.hh>
 #include <G4ParticleDefinition.hh>
 #include <G4Ions.hh>

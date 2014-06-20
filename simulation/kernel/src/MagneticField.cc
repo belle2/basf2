@@ -13,6 +13,9 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
+#include <CLHEP/Units/PhysicalConstants.h>
+#include <CLHEP/Units/SystemOfUnits.h>
+
 #include <globals.hh>
 
 using namespace std;

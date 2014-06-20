@@ -53,12 +53,13 @@ class Particle(object):
     ## Create new class called DecayChannel via namedtuple. namedtuples are like a struct in C
     DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, mvaConfig, isIncomplete')
 
-    def __init__(self, name, mvaConfig, preCutConfig=PreCutConfiguration(variable='Mass', efficiency=0.70)):
+    def __init__(self, name, mvaConfig, preCutConfig=PreCutConfiguration(variable='Mass', efficiency=0.70), explicitCuts=[]):
         """
         Creates a Particle without any decay channels. To add decay channels use addChannel method.
             @param name is the correct pdg name as a string of the particle.
             @param mvaConfig multivariate analysis configuration
             @param preCutConfig intermediate cut configuration
+            @param explicitCuts explicit cuts to apply when selecing this particle, see ParticleSelector for formatting details.
         """
         ## The name of the particle as correct pdg name e.g. K+, pi-, D*0.
         self.name = name
@@ -68,6 +69,8 @@ class Particle(object):
         self.channels = []
         ## intermediate cut configuration
         self.preCutConfig = preCutConfig
+        ## Explicit cuts to apply to this Particle
+        self.explicitCuts = explicitCuts
 
     @property
     def complete_channels(self):
@@ -174,6 +177,8 @@ def FullReconstruction(path, particles):
             seq.addResource('Name_' + channel.name, channel.name)
             seq.addResource('MVAConfig_' + channel.name, channel.mvaConfig)
 
+        seq.addResource('ExplicitCuts_' + particle.name, particle.explicitCuts)
+
         ########### RECONSTRUCTION ACTORS ##########
         # The Reconstruction part of the FullReconstruction:
         # 1. Load the FSP (via CreateParticleList),
@@ -182,7 +187,9 @@ def FullReconstruction(path, particles):
         if particle.isFSP:
             seq.addFunction(SelectParticleList,
                             path='Path',
-                            particleName='Name_' + particle.name)
+                            particleName='Name_' + particle.name,
+                            explicitCuts='ExplicitCuts_' + particle.name,
+                            )
         else:
             for channel in particle.channels:
                 seq.addFunction(MakeAndMatchParticleList,

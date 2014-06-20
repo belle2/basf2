@@ -46,7 +46,7 @@ mvaConfig_chargedFSP = Particle.MVAConfiguration(
 
 mvaConfig_gamma = Particle.MVAConfiguration(
     name='NeuroBayes', type='Plugin', config='!H:V:CreateMVAPdfs:NtrainingIter=0:Preprocessing=122:ShapeTreat=DIAG:TrainingMethod=BFGS',
-    variables=['p', 'pt', 'clusterE9E25', 'goodGamma'],
+    variables=['p', 'pt', 'clusterE9E25'],
     target='isSignal', targetCluster=1
 )
 
@@ -78,9 +78,9 @@ preCutConfiguration_nonFSP = Particle.PreCutConfiguration(
 
 
 particles = []
-particles.append(Particle('pi+', mvaConfig_chargedFSP))
-particles.append(Particle('K+', mvaConfig_chargedFSP))
-particles.append(Particle('gamma', mvaConfig_gamma))
+particles.append(Particle('pi+', mvaConfig_chargedFSP, explicitCuts=['piid 0.1:']))
+particles.append(Particle('K+', mvaConfig_chargedFSP, explicitCuts=['Kid 0.1:']))
+particles.append(Particle('gamma', mvaConfig_gamma, explicitCuts=['goodGamma 0.1:']))  # TODO: not exactly soft
 
 p = Particle('pi0', mvaConfig_pi0, preCutConfiguration_nonFSP)
 p.addChannel(['gamma', 'gamma'])
@@ -131,10 +131,9 @@ FullReconstruction(main, particles)
 
 main.add_module(register_module('ProgressBar'))
 
-# ntupler = register_module('VariableNtuple')
-# ntupler.param('particleList', 'B+')
-# ntupler.param('variables', ['p', 'pt', 'M', 'dM', 'Q', 'dQ', 'Mbc', 'deltaE',
-#'nDaughters', 'flavor', 'tmptruth'])
+# ntupler = register_module('VariablesToNtuple')
+# ntupler.param('particleList', 'D+:e280f278828c609765c60979efadb682ec239d64')
+# ntupler.param('variables', ['daughterProductOf(getExtraInfo(SignalProbability))', 'p', 'pt', 'p_CMS', 'pt_CMS', 'M'])
 # main.add_module(ntupler)
 
 # show constructed path

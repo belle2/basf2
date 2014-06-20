@@ -11,15 +11,15 @@ import modularAnalysis
 import pdg
 
 
-def SelectParticleList(path, particleName):
+def SelectParticleList(path, particleName, explicitCuts):
     """
     Creates a ParticleList gathering up all particles with the given particleName
         @param path the basf2 path
         @param particleName returned key is named ParticleList_{particleName} corresponding ParticleList is stored as {particleName}:{hash}
     """
-    userLabel = FR_utility.createHash(particleName)
+    userLabel = FR_utility.createHash(particleName, explicitCuts)
     outputList = particleName + ':' + userLabel
-    modularAnalysis.selectParticle(outputList, [], path=path)
+    modularAnalysis.selectParticle(outputList, explicitCuts, path=path)
     return {'ParticleList_' + particleName: outputList, 'ParticleList_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
 
 

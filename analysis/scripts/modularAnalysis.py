@@ -41,6 +41,10 @@ def inputMdstList(filelist, path=analysis_main):
 
 
 def outputMdst(filename, path=analysis_main):
+    """
+    Saves mDST (mini-Data Summary Tables) to the output root file.
+    """
+
     import reconstruction
     reconstruction.add_mdst_output(path, mc=True, filename=filename)
 
@@ -146,12 +150,26 @@ def printPrimaryMCParticles(path=analysis_main):
 
 
 def loadMCParticles(path=analysis_main):
+    """
+    Loads all Final state MCParticles (e/mu/pi/K/p/gamma and Klongs) as Particles.
+    """
+
     ploader = register_module('ParticleLoader')
     ploader.param('useMCParticles', True)
     path.add_module(ploader)
 
 
 def loadReconstructedParticles(path=analysis_main):
+    """
+    Loads mDST data objects (Tracks/ECLClusters/KLMClusters) as Particles.
+    In particular:
+     - each Track is loaded as e/mu/pi/K/p Particles 
+     - each neutral ECLCluster is loaded as gamma Particle 
+     - each neutral KLMCluster is loaded as Klong Particle
+
+    In all the cases no selection criteria are applied. 
+    """
+
     ploader = register_module('ParticleLoader')
     ploader.param('useMCParticles', False)
     path.add_module(ploader)
@@ -163,6 +181,14 @@ def copyList(
     persistent=False,
     path=analysis_main,
     ):
+    """
+    Copy all Particle indices from input ParticleList to the output ParticleList.
+
+    @param ouputListName copied ParticleList
+    @param inputListName original ParticleList to be copied
+    @param persistent    toggle newly created particle list btw. transient/persistent
+    @param path          modules are added to this path 
+    """
 
     pmanipulate = register_module('ParticleListManipulator')
     pmanipulate.set_name('PListCopy_' + outputListName)
@@ -178,6 +204,14 @@ def copyLists(
     persistent=False,
     path=analysis_main,
     ):
+    """
+    Copy all Particle indices from all input ParticleLists to the single output ParticleList.
+    
+    @param ouputListName copied ParticleList
+    @param inputListName vector of original ParticleLists to be copied
+    @param persistent    toggle newly created particle list btw. transient/persistent
+    @param path          modules are added to this path
+    """
 
     pmanipulate = register_module('ParticleListManipulator')
     pmanipulate.set_name('PListCopy_' + outputListName)
@@ -194,6 +228,17 @@ def cutAndCopyLists(
     persistent=False,
     path=analysis_main,
     ):
+    """
+    Copy Particle indices that pass selection criteria from all 
+    input ParticleLists to the single output ParticleList.
+    
+    @param ouputListName copied ParticleList
+    @param inputListName vector of original ParticleLists to be copied
+    @param criteria      selection criteria given in VariableManager 
+                         style that copied Particles need to fullfill
+    @param persistent    toggle newly created particle list btw. transient/persistent
+    @param path          modules are added to this path
+    """
 
     pmanipulate = register_module('ParticleListManipulator')
     pmanipulate.set_name('PListCutAndCopy_' + outputListName)
@@ -211,6 +256,17 @@ def cutAndCopyList(
     persistent=False,
     path=analysis_main,
     ):
+    """
+    Copy Particle indices that pass selection criteria from 
+    the input ParticleList to the output ParticleList.
+
+    @param ouputListName copied ParticleList
+    @param inputListName vector of original ParticleLists to be copied
+    @param criteria      selection criteria given in VariableManager 
+                         style that copied Particles need to fullfill
+    @param persistent    toggle newly created particle list btw. transient/persistent
+    @param path          modules are added to this path
+    """
 
     pmanipulate = register_module('ParticleListManipulator')
     pmanipulate.set_name('PListCutAndCopy_' + outputListName)
@@ -227,6 +283,16 @@ def fillParticleList(
     persistent=False,
     path=analysis_main,
     ):
+    """
+    Creates and fills ParticleList with StoreArray<Particle> 
+    indices of Particles of desired type.
+    
+    @param decayString   specifies type of Particles and determines the name of the ParticleList
+    @param criteria      Particles need to pass these selection criteria 
+                         (given in ParticleSelector style) to be added to the ParticleList
+    @param persistent    toggle newly created particle list btw. transient/persistent
+    @param path          modules are added to this path 
+    """
 
     pselect = register_module('ParticleSelector')
     pselect.set_name('ParticleSelector_' + decayString)
@@ -242,6 +308,15 @@ def selectParticle(
     persistent=False,
     path=analysis_main,
     ):
+    """
+    Creates and fills ParticleList with StoreArray<Particle> indices of Particles of desired type.
+    
+    @param decayString   specifies type of Particles and determines the name of the ParticleList
+    @param criteria      Particles need to pass these selection criteria 
+                         (given in ParticleSelector style) to be added to the ParticleList
+    @param persistent    toggle newly created particle list btw. transient/persistent
+    @param path          modules are added to this path
+    """
 
     pselect = register_module('ParticleSelector')
     pselect.set_name('ParticleSelector_' + decayString)
@@ -252,6 +327,16 @@ def selectParticle(
 
 
 def applyCuts(list_name, criteria, path=analysis_main):
+    """
+    Removes StoreArray<PArticle> indices of Particles from given ParticleList 
+    that do not pass the given selection criteria (given in ParticleSelector style).
+
+    @param list_name input ParticleList name
+    @param criteria  Particles that do not pass these selection criteria 
+                     (given in ParticleSelector style) are removed from the ParticleList
+    @param path      modules are added to this path 
+    """
+
     pselect = register_module('ParticleSelector')
     pselect.set_name('ParticleSelector_applyCuts_' + list_name)
     pselect.param('decayString', list_name)
@@ -265,6 +350,20 @@ def reconDecay(
     persistent=False,
     path=analysis_main,
     ):
+    """
+    Creates new Particles by making combinations of existing Particles - it reconstructs unstable particles via 
+    their specified decay mode, e.g. in form of a DecayString: D0 -> K- pi+; B+ -> anti-D0 pi+, .... All 
+    possible combinations are created (overlaps are forbidden) and combinations that pass the specified selection
+    criteria are saved to a newly created (mother) ParticleList. By default the charge conjugated decay is
+    reconstructed as well (meaning that the charge conjugated mother list is created as well).
+    
+    @param decayString DecayString specifying what kind of the decay should be reconstructed 
+                       (from the DecayString the mother and daughter ParticleLists are determined)
+    @param cuts        created (mother) Particles are added to the mother ParticleList if they 
+                       pass give cuts (in VariableManager style) and rejected otherwise
+    @param persistent  toggle newly created particle list btw. transient/persistent
+    @param path        modules are added to this path     
+    """
 
     pmake = register_module('ParticleCombiner')
     pmake.set_name('ParticleCombiner_' + decayString)
@@ -280,6 +379,20 @@ def makeParticle(
     persistent=False,
     path=analysis_main,
     ):
+    """
+    Creates new Particles by making combinations of existing Particles - it reconstructs unstable particles via
+    their specified decay mode, e.g. in form of a DecayString: D0 -> K- pi+; B+ -> anti-D0 pi+, .... All
+    possible combinations are created (overlaps are forbidden) and combinations that pass the specifed selection
+    criteria are saved to a newly created (mother) ParticleList. By default the charge conjugated decay is
+    reconstructed as well (meaning that the charge conjugated mother list is created as well).
+
+    @param decayString DecayString specifying what kind of the decay should be reconstructed 
+                       (from the DecayString the mother and daughter ParticleLists are determined)
+    @param cuts        created (mother) Particles are added to the mother ParticleList if they 
+                       pass give cuts (in VariableManager style) and rejected otherwise
+    @param persistent  toggle newly created particle list btw. transient/persistent
+    @param path        modules are added to this path
+    """
 
     pmake = register_module('ParticleCombiner')
     pmake.set_name('ParticleCombiner_' + decayString)
@@ -421,6 +534,14 @@ def printDataStore(path=analysis_main):
 
 
 def printVariableValues(list_name, var_names, path=analysis_main):
+    """
+    Prints out values of specified variables of all Particles included in given ParticleList. For debugging purposes.
+
+    @param list_name input ParticleList name
+    @param var_names vector of variable names to be printed
+    @param path         modules are added to this path 
+    """
+
     prlist = register_module('ParticlePrinter')
     prlist.set_name('ParticlePrinter_' + list_name)
     prlist.param('listName', list_name)
@@ -430,6 +551,15 @@ def printVariableValues(list_name, var_names, path=analysis_main):
 
 
 def printList(list_name, full, path=analysis_main):
+    """
+    Prints the size and executes Particle->print() (if full=True) 
+    method for all Particles in given ParticleList. For debugging purposes.
+    
+    @param list_name input ParticleList name
+    @param full      execute Particle->print() method for all Particles
+    @param path      modules are added to this path
+    """
+
     prlist = register_module('ParticlePrinter')
     prlist.set_name('ParticlePrinter_' + list_name)
     prlist.param('listName', list_name)
@@ -438,6 +568,13 @@ def printList(list_name, full, path=analysis_main):
 
 
 def ntupleFile(file_name, path=analysis_main):
+    """
+    Creates new ROOT file to which the flat ntuples will be saved.
+    
+    @param file_name file name of the output root file
+    @param path      modules are added to this path
+    """
+
     ntmaker = register_module('NtupleMaker')
     ntmaker.set_name('NtupleMaker_ntupleFile_' + file_name)
     ntmaker.param('fileName', file_name)
@@ -450,6 +587,13 @@ def ntupleTree(
     tools,
     path=analysis_main,
     ):
+    """
+    Creates and fills flat ntuple (TTree) with the specified Ntuple tools.
+
+    @param tree_name output nutple (TTree) name
+    @param list_name input ParticleList name
+    @param tools     list of Ntuple tools to be included
+    """
 
     ntmaker = register_module('NtupleMaker')
     ntmaker.set_name('NtupleMaker_ntupleTree_' + list_name)
@@ -465,6 +609,9 @@ def findMCDecay(
     persistent=False,
     path=analysis_main,
     ):
+    """
+    The MCDecayFinder module is buggy at the moment. Not to be used.
+    """
 
     decayfinder = register_module('MCDecayFinder')
     decayfinder.set_name('MCDecayFinder_' + list_name)
@@ -475,6 +622,13 @@ def findMCDecay(
 
 
 def summaryOfLists(particleLists, path=analysis_main):
+    """
+    Prints out Particle statistics at the end of the job: number of events with at 
+    least one candidate, average number of candidates per event, etc.
+
+    @param particleLists list of input ParticleLists
+    """
+
     particleStats = register_module('ParticleStats')
     particleStats.param('particleLists', particleLists)
     path.add_module(particleStats)

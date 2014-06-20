@@ -27,6 +27,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include "CLHEP/Vector/ThreeVector.h"
+#include "CLHEP/Units/PhysicalConstants.h"
 #include "CLHEP/Units/SystemOfUnits.h"
 
 #include "TRandom3.h"

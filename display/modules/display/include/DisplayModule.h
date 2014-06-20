@@ -46,6 +46,9 @@ namespace Belle2 {
     /** Name of track candidate collection. */
     std::string m_trackCandidateColName;
 
+    /** Array name for genfit::tarcks. */
+    std::string m_gftrackColName;
+
     /** List of drawing options, a combination of:
      *
      * - A autoscale errors - use when hits are too small to be seen (because of tiny errors)

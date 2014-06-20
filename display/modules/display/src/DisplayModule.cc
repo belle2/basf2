@@ -28,7 +28,6 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
 {
   setDescription("Interactive visualisation of MCParticles, genfit::Tracks and various SimHits (plus geometry). See https://belle2.cc.kek.jp/~twiki/bin/view/Software/EventDisplay for detailed documentation.");
 
-  addParam("GFTrackCandidatesColName", m_trackCandidateColName, "Name of collection holding the genfit::TrackCandidates", std::string(""));
   addParam("options", m_options, "Drawing options for genfit::Tracks, a combination of DHMPS. See EVEVisualization::setOptions or the display.py example for an explanation.", std::string("MH"));
   addParam("showMCInfo", m_showMCInfo, "Show Monte Carlo information (MCParticles, SimHits)", true);
   addParam("assignHitsToPrimaries", m_assignToPrimaries, "If true, hits created by secondary particles (after scattering, decay-in-flight, ...) will be assigned to the original primary particle.", false);
@@ -41,6 +40,8 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
   addParam("useClusters", m_useClusters, "Use PXD/SVD clusters for track candidate & hit visualisation (instead of TrueHits).", true);
   addParam("automatic", m_automatic, "Non-interactively save visualisations for each event. Note that this still requires an X server, but you can use the 'Xvfb' dummy server by running basf2 using 'xvfb-run -s \"-screen 0 640x480x24\" basf2 ...' to run headless.", false);
   addParam("fullGeometry", m_fullGeometry, "Show full geometry instead of simplified shapes. Further details can be enabled by changing the VisLevel option for Eve -> Scenes -> Geometry Scene -> Top_1.", false);
+  addParam("GFTrackCandidatesColName", m_trackCandidateColName, "Name of collection holding the genfit::TrackCandidates", std::string(""));
+  addParam("GFTrackColName", m_gftrackColName, "Name of collection holding the genfit::Tracks", std::string(""));
 
   //make sure dictionaries for PXDrecohits are loaded
   //needs to be done here to have dictionaries available during RootInput::initialize()
@@ -69,7 +70,7 @@ void DisplayModule::initialize()
   StoreArray<BKLMSimHit>::optional();
   StoreArray<EKLMSimHit>::optional();
   StoreArray<ECLCluster>::optional();
-  StoreArray<genfit::Track>::optional();
+  StoreArray<genfit::Track>::optional(m_gftrackColName);
   StoreArray<genfit::TrackCand>::optional(m_trackCandidateColName);
   StoreArray<genfit::GFRaveVertex>::optional();
   StoreObjPtr<DisplayData>::optional();
@@ -217,7 +218,7 @@ void DisplayModule::event()
 
   if (m_showTrackLevelObjects) {
     //gather track-level objects
-    StoreArray<genfit::Track> gftracks;
+    StoreArray<genfit::Track> gftracks(m_gftrackColName);
     const int nTracks = gftracks.getEntries();
     for (int i = 0; i < nTracks; i++)
       m_visualizer->addTrack(gftracks[i], TString::Format("genfit::Track %d", i));

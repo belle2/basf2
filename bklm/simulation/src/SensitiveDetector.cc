@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
 #include <bklm/simulation/SensitiveDetector.h>
 #include <bklm/simulation/SimulationPar.h>
 #include <bklm/geometry/GeometryPar.h>

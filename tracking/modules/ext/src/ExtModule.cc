@@ -667,7 +667,7 @@ void ExtModule::createHit(const G4ErrorFreeTrajState* state, ExtHitStatus status
   Const::EDetector detID(Const::EDetector::invalidDetector);
   int copyID(0);
   getVolumeID(preTouch, detID, copyID);
-  new(extHits.nextFreeAddress()) ExtHit(pdgCode, detID, copyID, status, m_TOF, pos, mom, fromG4eToPhasespace(state));
+  extHits.appendNew(pdgCode, detID, copyID, status, m_TOF, pos, mom, fromG4eToPhasespace(state));
   TrackToExtHits.add(trackID, extHits.getEntries() - 1);
 
 }

@@ -209,7 +209,7 @@ int MCDecayFinderModule::write(DecayTree<MCParticle>* decay)
   RelationArray particle2mcparticle(particles, mcparticles);
 
   // Create new Particle in particles array
-  new(particles.nextFreeAddress()) Particle(decay->getObj());
+  particles.appendNew(decay->getObj());
 
   // set relation between the created Particle and the MCParticle
   int iIndex = particles.getEntries() - 1;

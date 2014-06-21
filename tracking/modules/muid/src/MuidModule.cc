@@ -382,7 +382,7 @@ void MuidModule::event()
       int pdgCode = chargedStable.getPDGCode();
       if (chargedStable == Const::electron || chargedStable == Const::muon) pdgCode = -pdgCode;
 
-      Muid* muid = new(muids.nextFreeAddress()) Muid(pdgCode); // pdgCode doesn't know charge yet
+      Muid* muid = muids.appendNew(pdgCode); // pdgCode doesn't know charge yet
       trackToMuid.add(t, muids.getEntries() - 1);
 
       const TrackFitResult* trackFit = tracks[t]->getTrackFitResult(chargedStable);
@@ -721,8 +721,7 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, int trackID, int pdgCode
   // Create a new MuidHit and RelationEntry between it and the track.
   // Adjust geant4e's position, momentum and covariance based on matching hit and tell caller to update the geant4e state.
   if (point.chi2 >= 0.0) {
-    new(muidHits.nextFreeAddress())
-    MuidHit(pdgCode, point.inBarrel, point.isForward, point.sector, point.layer, point.position, point.positionAtHitPlane, m_TOF, point.time, point.chi2);
+    muidHits.appendNew(pdgCode, point.inBarrel, point.isForward, point.sector, point.layer, point.position, point.positionAtHitPlane, m_TOF, point.time, point.chi2);
     trackToMuidHits.add(trackID, muidHits.getEntries() - 1);
     G4Point3D newPos(point.position.X()*cm, point.position.Y()*cm, point.position.Z()*cm);
     state->SetPosition(newPos);

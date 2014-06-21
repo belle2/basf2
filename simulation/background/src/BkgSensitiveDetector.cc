@@ -101,7 +101,7 @@ namespace Belle2 {
       }
       StoreArray<BeamBackHit> beamBackHits;
       int nentr = beamBackHits.getEntries();
-      new(beamBackHits.nextFreeAddress()) BeamBackHit(m_subDet, m_identifier, pdgCode, m_trackID, m_startPos, m_startMom, m_startTime, endEnergy, m_startEnergy, m_energyDeposit, m_trackLength, neutWeight);
+      beamBackHits.appendNew(m_subDet, m_identifier, pdgCode, m_trackID, m_startPos, m_startMom, m_startTime, endEnergy, m_startEnergy, m_energyDeposit, m_trackLength, neutWeight);
 
 
       // create relation to MCParticle

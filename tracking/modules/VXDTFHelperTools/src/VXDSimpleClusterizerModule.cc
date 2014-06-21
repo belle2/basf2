@@ -220,7 +220,7 @@ void VXDSimpleClusterizerModule::event()
      */
     // Save as new 2D-PXD-cluster
     unsigned int clusterIndex = pxdClusters.getEntries();
-    new(pxdClusters.nextFreeAddress()) PXDCluster(aVXDId, u, v, sigmaU, sigmaV, 0, 1, 1, 1, 1, 1, 1, 1);
+    pxdClusters.appendNew(aVXDId, u, v, sigmaU, sigmaV, 0, 1, 1, 1, 1, 1, 1, 1);
 
     //add relations:
     relPXDClusterTrueHit.add(clusterIndex, currentTrueHit);
@@ -295,8 +295,8 @@ void VXDSimpleClusterizerModule::event()
      * @param seedCharge The charge of the seed strip in electrons.
      * @param clsSize The size of the cluster in the corresponding strip pitch units.
      */
-    new(svdClusters.nextFreeAddress()) SVDCluster(aVXDId, true, u, sigmaU, timeStamp, 0, 1, 1, 3); // in a typical situation 3-5 Strips are excited per Hit -> set to 3
-    new(svdClusters.nextFreeAddress()) SVDCluster(aVXDId, false, v, sigmaV, timeStamp, 0, 1, 1, 3);
+    svdClusters.appendNew(aVXDId, true, u, sigmaU, timeStamp, 0, 1, 1, 3); // in a typical situation 3-5 Strips are excited per Hit -> set to 3
+    svdClusters.appendNew(aVXDId, false, v, sigmaV, timeStamp, 0, 1, 1, 3);
 
 
 

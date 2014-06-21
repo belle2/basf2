@@ -93,6 +93,9 @@ namespace Belle2 {
     /** Set title of Eve window. Add fileName, if given. */
     void setTitle(const std::string& fileName = "");
 
+    /** hide objects with the given names. */
+    void hideObjects(const std::vector<std::string>& names) { m_hideObjects = names; }
+
     /** Toggle between light and dark color scheme for viewers. */
     void toggleColorScheme();
 
@@ -214,6 +217,9 @@ namespace Belle2 {
 
     /** Map TObject <-> TEveElement */
     const VisualRepMap* m_visualRepMap;
+
+    /** objects which are to be hidden (can be manually re-enabled in tree view). Names correspond to the object names in the 'Event Scene'. */
+    std::vector<std::string> m_hideObjects;
 
 
     /** Dictionary needed for signal/slot mechanism (0 to disable I/O). */

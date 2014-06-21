@@ -320,6 +320,18 @@ bool DisplayUI::startDisplay()
   m_eventData->AddElement(getViewPane()->getRPhiMgr()->ImportElements((TEveElement*)gEve->GetEventScene()));
   m_eventData->AddElement(getViewPane()->getRhoZMgr()->ImportElements((TEveElement*)gEve->GetEventScene()));
 
+  for (std::string name : m_hideObjects) {
+    TGListTreeItem* eventItem = gEve->GetListTree()->FindItemByPathname("Event");
+    TGListTreeItem* item = gEve->GetListTree()->FindChildByName(eventItem, name.c_str());
+    if (item) {
+      B2INFO("hiding object '" << name << "'.");
+      TEveElement* eveItem = static_cast<TEveElement*>(item->GetUserData());
+      eveItem->SetRnrSelfChildren(false, false);
+    } else {
+      B2ERROR("hideObjects: '" << name << "' not found.");
+    }
+  }
+
   if (!m_automatic) {
     gEve->Redraw3D(false); //do not reset camera when redrawing
 

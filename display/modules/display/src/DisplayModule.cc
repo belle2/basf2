@@ -40,6 +40,7 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
   addParam("useClusters", m_useClusters, "Use PXD/SVD clusters for track candidate & hit visualisation (instead of TrueHits).", true);
   addParam("automatic", m_automatic, "Non-interactively save visualisations for each event. Note that this still requires an X server, but you can use the 'Xvfb' dummy server by running basf2 using 'xvfb-run -s \"-screen 0 640x480x24\" basf2 ...' to run headless.", false);
   addParam("fullGeometry", m_fullGeometry, "Show full geometry instead of simplified shapes. Further details can be enabled by changing the VisLevel option for Eve -> Scenes -> Geometry Scene -> Top_1.", false);
+  addParam("hideObjects", m_hideObjects, "Objects which are to be hidden (can be manually re-enabled in tree view). Names correspond to the object names in the 'Event'. (Note that this won't work for objects somewhere deep in the tree, only for those immediately below 'Event'.)", {});
   addParam("GFTrackCandidatesColName", m_trackCandidateColName, "Name of collection holding the genfit::TrackCandidates", std::string(""));
   addParam("GFTrackColName", m_gftrackColName, "Name of collection holding the genfit::Tracks", std::string(""));
 
@@ -113,6 +114,8 @@ void DisplayModule::initialize()
   m_visualizer->setOptions(m_options);
   m_visualizer->showFullGeo(m_fullGeometry);
   m_visualizer->addGeometry();
+
+  m_display->hideObjects(m_hideObjects);
 
   //allow UI to get additional info on the represented objects
   m_display->setVisualRepMap(m_visualizer->getVisualRepMap());

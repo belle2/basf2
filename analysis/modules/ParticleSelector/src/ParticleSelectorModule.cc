@@ -62,6 +62,9 @@ namespace Belle2 {
     addParam("persistent", m_persistent,
              "toggle newly created particle list btw. transient/persistent", false);
 
+    // initializing the rest of private memebers
+    m_pdgCode   = 0;
+    m_isSelfConjugatedParticle = 0;
   }
 
   ParticleSelectorModule::~ParticleSelectorModule()

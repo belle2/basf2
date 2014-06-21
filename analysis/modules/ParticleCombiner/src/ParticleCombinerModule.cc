@@ -57,6 +57,11 @@ namespace Belle2 {
     addParam("cuts", m_cuts, "Map of Variables to cut values (min/max).", defaultMap);
     addParam("persistent", m_persistent,
              "toggle output particle list btw. transient/persistent", false);
+
+    // initializing the rest of private memebers
+    m_pdgCode   = 0;
+    m_isSelfConjugatedParticle = 0;
+    m_generator = 0;
   }
 
   ParticleCombinerModule::~ParticleCombinerModule()

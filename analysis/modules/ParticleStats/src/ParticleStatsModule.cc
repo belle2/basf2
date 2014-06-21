@@ -29,6 +29,13 @@ ParticleStatsModule::ParticleStatsModule() : Module()
   setDescription("Make a summary of specific ParticleLists.");
   //Parameter definition
   addParam("particleLists", m_strParticleLists, "List of ParticleLists", vector<string>());
+
+  // initializing the rest of private memebers
+  m_nEvents = 0;
+  m_nPass   = 0;
+  m_nParticles = 0;
+  m_PassMatrix = 0;
+  m_MultiplicityMatrix = 0;
 }
 
 void ParticleStatsModule::initialize()

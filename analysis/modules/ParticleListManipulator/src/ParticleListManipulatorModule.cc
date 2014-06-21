@@ -62,6 +62,10 @@ namespace Belle2 {
     addParam("cuts", m_selection, "Selection criteria to be applied", defaultMap);
     addParam("persistent", m_persistent,
              "toggle newly created particle list btw. transient/persistent", false);
+
+    // initializing the rest of private memebers
+    m_pdgCode   = 0;
+    m_isSelfConjugatedParticle = 0;
   }
 
   ParticleListManipulatorModule::~ParticleListManipulatorModule()

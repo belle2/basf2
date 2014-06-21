@@ -176,6 +176,7 @@ int MCMatching::setMCTruthStatus(Particle* particle, const MCParticle* mcParticl
   //int genMotherPDG = mcParticle->getPDG();
   // TODO: fix this (aim for no hard coded values)
   // TODO: is this neccessary ?
+  // -> might speed up things by removing combinatorics  (we don't need missingX flags there)
   //if (genMotherPDG == 10022 || genMotherPDG == 300553 || genMotherPDG == 9000553)
   //  return -1;
 
@@ -222,6 +223,7 @@ void MCMatching::appendFSP(const Particle* p, vector<const Particle*>& children)
     const Particle* daug = p->getDaughter(i);
 
     // TODO: fix this (aim for no hard coded values)
+    // don't add K_S^0 daughters since they are also in isFSPs()
     if (daug->getNDaughters() && daug->getPDGCode() != 310) {
       appendFSP(daug, children);
     } else {
@@ -271,7 +273,8 @@ int MCMatching::getMissingParticleFlags(const std::vector<const Particle*>& reco
 {
   int flags = 0;
 
-  //TODO rationale behind this?
+  //a) same number for reconstructed and generated FSPs: nothing missing (provided the common mother is the same)
+  //b) more FSPs reconstructed than generated: most likely something like K_S, which counts as FSP. TODO: I don't think this should happen when K_S = 310 gets special handling in appendFSP(Particle*, ...)
   if (reconstructedFSPs.size() >= generatedFSPs.size())
     return flags;
 

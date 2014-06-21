@@ -51,11 +51,9 @@ namespace {
 
         //fancy constructors
         newobj = evtDataDifferentDurability.appendNew(30 + i);
-        //equivalent to:
-        //newobj = new(evtDataDifferentDurability.nextFreeAddress()) EventMetaData(30 + i);
 
         //copy-construct ProfileInfo objects
-        new(profileInfo.nextFreeAddress()) ProfileInfo(profileInfoObject);
+        profileInfo.appendNew(profileInfoObject);
       }
     }
 

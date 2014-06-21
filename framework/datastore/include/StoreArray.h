@@ -200,9 +200,8 @@ namespace Belle2 {
      *
      *  \return pointer to address just past the last array element
      */
-    inline T* nextFreeAddress() {
-      ensureCreated();
-      return static_cast<T*>((*m_storeArray)->AddrAt(getEntries()));
+    inline T* nextFreeAddress() __attribute__((deprecated("Please use StoreArray::appendNew(ctor arguments...) instead of placement-new."))) {
+      return nextFreeAddress_internal();
     }
 
     /** Construct a new T object at the end of the array.
@@ -213,7 +212,7 @@ namespace Belle2 {
      *
      *  \return pointer to the created object
      */
-    inline T* appendNew() { return new(nextFreeAddress()) T(); }
+    inline T* appendNew() { return new(nextFreeAddress_internal()) T(); }
 
     /** Construct a new T object directly at the end of the array.
      *
@@ -222,11 +221,9 @@ namespace Belle2 {
      * then this call will succeed, otherwise it fails on compilation.
      *
      * This method imposes no overhead as no temporary has to be constructed
-     * and should be the preferred solution for creating new objects. It is equivalent to
-     * \code
-       new (myStoreArray.nextFreeAddress()) T(some ctor arguments);
-       \endcode
-     * but would be written just as
+     * and should be the preferred solution for creating new objects.
+     *
+     * It handles just like the (C++11) standard library's emplace..() functions:
      * \code
        myStoreArray.appendNew(some ctor arguments);
        \endcode
@@ -234,7 +231,7 @@ namespace Belle2 {
      *  \return pointer to the created object
      */
     template<class ...Args> T* appendNew(Args&& ... params) {
-      return new(nextFreeAddress()) T(std::forward<Args>(params)...);
+      return new(nextFreeAddress_internal()) T(std::forward<Args>(params)...);
     }
 
     /** Raw access to the underlying TClonesArray.
@@ -256,6 +253,17 @@ namespace Belle2 {
     const_iterator end() const { ensureAttached(); return const_iterator(this, getEntries()); }
 
   private:
+    /** Returns address of the next free position of the array.
+     *
+     * TODO: rename to nextFreeAddress() once the public function is removed.
+     *
+     *  \return pointer to address just past the last array element
+     */
+    inline T* nextFreeAddress_internal() {
+      ensureCreated();
+      return static_cast<T*>((*m_storeArray)->AddrAt(getEntries()));
+    }
+
     /** Ensure that this object is attached. */
     inline void ensureAttached() const {
       if (!m_storeArray) {

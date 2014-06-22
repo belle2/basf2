@@ -255,7 +255,9 @@ namespace Belle2 {
      */
     TVector3 getMomentum() const {
 
-      return TVector3(float(m_Energy * sin(m_Theta) * cos(m_Phi)), float(m_Energy * sin(m_Theta) * sin(m_Phi)), float(m_Energy * cos(m_Theta)));
+      return TVector3(float(m_Energy * sin(m_Theta) * cos(m_Phi)),
+                      float(m_Energy * sin(m_Theta) * sin(m_Phi)),
+                      float(m_Energy * cos(m_Theta)));
     }
 
 
@@ -263,7 +265,10 @@ namespace Belle2 {
     /*! Return 4Vector  (Px,Py,Pz,E)
      */
     TLorentzVector get4Vector() const {
-      return TLorentzVector(float(m_Energy * sin(m_Theta) * cos(m_Phi)), float(m_Energy * sin(m_Theta) * sin(m_Phi)), float(m_Energy * cos(m_Theta)), m_Energy);
+      return TLorentzVector(float(m_Energy * sin(m_Theta) * cos(m_Phi)),
+                            float(m_Energy * sin(m_Theta) * sin(m_Phi)),
+                            float(m_Energy * cos(m_Theta)),
+                            m_Energy);
     }
 
 
@@ -271,8 +276,8 @@ namespace Belle2 {
     /*! Return TVector3 on cluster position /Shower center (x,y,z)
      */
     TVector3 getclusterPosition() const {
-      float cluster_x =  m_R * sin(m_Phi) * cos(m_Theta);
-      float cluster_y =  m_R * sin(m_Phi) * sin(m_Theta);
+      float cluster_x =  m_R * sin(m_Theta) * cos(m_Phi);
+      float cluster_y =  m_R * sin(m_Theta) * sin(m_Phi);
       float cluster_z =  m_R * cos(m_Phi);
       return TVector3(cluster_x, cluster_y, cluster_z);
     }

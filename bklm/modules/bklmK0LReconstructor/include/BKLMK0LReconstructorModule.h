@@ -1,0 +1,71 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2014  Belle II Collaboration                              *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Leo Piilonen                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#ifndef BKLMK0LRECONSTRUCTORMODULE_H
+#define BKLMK0LRECONSTRUCTORMODULE_H
+
+#include <framework/core/Module.h>
+
+namespace Belle2 {
+
+  /**
+   * Module BKLMK0LReconstructorModule.
+   * @details
+   * Module for K0L reconstruction.
+   */
+  class BKLMK0LReconstructorModule : public Module {
+
+  public:
+
+    //! Constructor
+    BKLMK0LReconstructorModule();
+
+    //! Destructor
+    ~BKLMK0LReconstructorModule();
+
+    //! Once-only initialization at start of job
+    void initialize();
+
+    //! Prepare for start of each run
+    void beginRun();
+
+    //! Process each event
+    void event();
+
+    //! Aggregate information at end of each run
+    void endRun();
+
+    //! Once-only termination at the end of the job
+    void terminate();
+
+  private:
+
+    //! square of the Klong mass (GeV^2)
+    double m_KaonMassSq;
+
+    //! maximum cone angle (from IP) separating two hits in a cluster
+    double m_MaxHitConeAngle;
+
+    //! maximum cone angle (radians) between matching ECL and KLM clusters
+    double m_MaxKLMECLConeAngle;
+
+    //! Name of the KLMCluster collection
+    std::string m_KLMClustersColName;
+
+    //! Name of the ECLCluster collection
+    std::string m_ECLClustersColName;
+
+
+  };
+
+}
+
+#endif
+

@@ -128,6 +128,7 @@ namespace Belle2 {
         const CLHEP::Hep3Vector gHitPos = 0.5 * (preStep->GetPosition() + postStep->GetPosition()) / cm; // in cm
         const Module* m = m_GeoPar->findModule(isForward, sector, layer);
         const CLHEP::Hep3Vector lHitPos = m->globalToLocal(gHitPos);
+        const CLHEP::Hep3Vector propagationTimes = m->getPropagationTimes(lHitPos);
         if (postStep->GetProcessDefinedStep() != 0) {
           if (postStep->GetProcessDefinedStep()->GetProcessType() == fDecay) { moduleID |= BKLM_DECAYED_MASK; }
         }
@@ -141,25 +142,29 @@ namespace Belle2 {
           convertHitToRPCStrips(lHitPos, m, phiStripLower, phiStripUpper, zStripLower, zStripUpper);
           if (zStripLower > 0) {
             int moduleIDZ = moduleID | ((zStripLower - 1) << BKLM_STRIP_BIT) | ((zStripUpper - 1) << BKLM_MAXSTRIP_BIT);
-            new(simHits.nextFreeAddress()) BKLMSimHit(moduleIDZ, lHitPos.x(), time, eDep);
+            simHits.appendNew(moduleIDZ, propagationTimes.z(), time, eDep);
             particleToSimHits.add(trackID, simHits.getEntries() - 1);
-            new(simHitPositions.nextFreeAddress()) BKLMSimHitPosition(gHitPos.x(), gHitPos.y(), gHitPos.z());
+            simHitPositions.appendNew(gHitPos.x(), gHitPos.y(), gHitPos.z());
             positionToSimHits.add(simHitPositions.getEntries() - 1, simHits.getEntries() - 1);
           }
           if (phiStripLower > 0) {
             moduleID |= ((phiStripLower - 1) << BKLM_STRIP_BIT) | ((phiStripUpper - 1) << BKLM_MAXSTRIP_BIT) | BKLM_PLANE_MASK;
-            new(simHits.nextFreeAddress()) BKLMSimHit(moduleID, lHitPos.x(), time, eDep);
+            simHits.appendNew(moduleID, propagationTimes.y(), time, eDep);
             particleToSimHits.add(trackID, simHits.getEntries() - 1);
-            new(simHitPositions.nextFreeAddress()) BKLMSimHitPosition(gHitPos.x(), gHitPos.y(), gHitPos.z());
+            simHitPositions.appendNew(gHitPos.x(), gHitPos.y(), gHitPos.z());
             positionToSimHits.add(simHitPositions.getEntries() - 1, simHits.getEntries() - 1);
           }
         } else {
           int scint = hist->GetCopyNumber(0);
           moduleID |= ((scint - 1) << BKLM_STRIP_BIT) | ((scint - 1) << BKLM_MAXSTRIP_BIT);
-          if (plane == BKLM_INNER) moduleID |= BKLM_PLANE_MASK;
-          new(simHits.nextFreeAddress()) BKLMSimHit(moduleID, lHitPos.x(), time, eDep);
+          double propTime = propagationTimes.z();
+          if (plane == BKLM_INNER) {
+            moduleID |= BKLM_PLANE_MASK;
+            propTime = propagationTimes.y();
+          }
+          simHits.appendNew(moduleID, propTime, time, eDep);
           particleToSimHits.add(trackID, simHits.getEntries() - 1);
-          new(simHitPositions.nextFreeAddress()) BKLMSimHitPosition(gHitPos.x(), gHitPos.y(), gHitPos.z());
+          simHitPositions.appendNew(gHitPos.x(), gHitPos.y(), gHitPos.z());
           positionToSimHits.add(simHitPositions.getEntries() - 1, simHits.getEntries() - 1);
         }
         return true;

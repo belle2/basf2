@@ -169,8 +169,6 @@ namespace Belle2 {
             layerContent.append(name);
             m_HasRPCs[layer] = layerContent.getBool("HasRPCs");
             m_NPhiScints[layer] = layerContent.getInt("PhiScintillators/NScints", 0);
-            m_PhiScintsOffsetSign[layer] = layerContent.getInt("PhiScintillators/OffsetSign", 1.0);
-            m_ZScintsOffsetSign[layer] = layerContent.getInt("ZScintillators/OffsetSign", 1.0);
             Hep3Vector localOrigin(getActiveMiddleRadius(layer), 0.0, m_ModuleFrameThickness);
             int moduleID = (isForward ? BKLM_END_MASK : 0)
                            | ((sector - 1) << BKLM_SECTOR_BIT)
@@ -189,9 +187,11 @@ namespace Belle2 {
                                           );
               m_Modules.insert(std::pair<int, Module*>(moduleID, pModule));
             } else {
+              m_PhiScintsOffsetSign[layer] = layerContent.getInt("PhiScintillators/OffsetSign");
               localOrigin.setY(localOrigin.y() + getScintEnvelopeOffset(layer, hasChimney).y());
               Module* pModule = new Module(m_ScintWidth,
                                            m_NPhiScints[layer],
+                                           m_PhiScintsOffsetSign[layer],
                                            nZScints,
                                            Hep3Vector(0.0, 0.0, m_OffsetZ) + rotation(localOrigin),
                                            localReconstructionShift,
@@ -206,7 +206,7 @@ namespace Belle2 {
                 double dLength = scintContent.getLength("DLength", 0.0);
                 pModule->addPhiScint(scint,
                                      nZScints * m_ScintWidth + dLength,
-                                     0.5 * fabs(dLength) * scintContent.getInt("OffsetSign", 0),
+                                     -0.5 * dLength,
                                      base + scint * m_ScintWidth
                                     );
               }
@@ -218,7 +218,7 @@ namespace Belle2 {
                 double dLength = scintContent.getLength("DLength", 0.0);
                 pModule->addZScint(scint,
                                    m_NPhiScints[layer] * m_ScintWidth + dLength,
-                                   0.5 * fabs(dLength) * scintContent.getInt("OffsetSign", 0),
+                                   -0.5 * dLength,
                                    base + scint * m_ScintWidth
                                   );
               }
@@ -365,7 +365,7 @@ namespace Belle2 {
       Hep3Vector envelopeHalfSize = getScintEnvelopeHalfSize(layer, hasChimney);
       Hep3Vector offset((airHalfSize.x() - envelopeHalfSize.x()),
                         (airHalfSize.y() - envelopeHalfSize.y()) * m_PhiScintsOffsetSign[layer],
-                        (airHalfSize.z() - envelopeHalfSize.z()) * m_ZScintsOffsetSign[layer]);
+                        -(airHalfSize.z() - envelopeHalfSize.z()));
       return offset;
     }
 

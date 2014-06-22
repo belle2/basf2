@@ -53,7 +53,7 @@ namespace Belle2 {
   private:
 
     //! Digitize all BKLMSimHits
-    void digitize(std::map<int, std::vector<std::pair<int, BKLMSimHit*> > >, StoreArray<BKLMDigit>&);
+    void digitize(const std::map<int, std::vector<std::pair<int, BKLMSimHit*> > >&, StoreArray<BKLMDigit>&);
 
     /**
      * Digitize hit(s) in one scintillator strip with pulse-shape fit
@@ -81,16 +81,6 @@ namespace Belle2 {
      * @return Signal shape.
      */
     double signalShape(double t);
-
-    //! Add random noise to the signal (amplitude-dependent)
-    void addRandomSiPMNoise();
-
-    /**
-     * Amplitude attenuation with a distance f(l)=distanceAttenuation(l)*f(0)
-     * @param[in] dist Distance.
-     * @return Amplitude attenuation.
-     */
-    double distanceAttenuation(double dist);
 
     //! Create digital signal from analog
     void simulateADC(int [], float []);

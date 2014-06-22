@@ -11,6 +11,7 @@
 #include "bklm/geometry/Module.h"
 
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 
 #include <iostream>
 
@@ -30,6 +31,8 @@ namespace Belle2 {
       m_ZStripMin(0),
       m_ZStripMax(0),
       m_ZPositionBase(0.0),
+      m_PhiSensorSide(0),
+      m_SignalSpeed(0.0),
       m_GlobalOrigin(Hep3Vector()),
       m_LocalReconstructionShift(Hep3Vector()),
       m_Rotation(HepRotation())
@@ -60,6 +63,8 @@ namespace Belle2 {
       m_ZStripMin(1),
       m_ZStripMax(zStripNumber),
       m_ZPositionBase(1.0), // start at #1
+      m_PhiSensorSide(1),
+      m_SignalSpeed(0.5 * Const::speedOfLight),
       m_GlobalOrigin(globalOrigin),
       m_LocalReconstructionShift(localReconstructionShift),
       m_Rotation(rotation)
@@ -76,6 +81,7 @@ namespace Belle2 {
     // constructor for scint module
     Module::Module(double     stripWidth,
                    int        phiStripNumber,
+                   int        phiSensorSide,
                    int        zStripNumber,
                    Hep3Vector globalOrigin,
                    Hep3Vector localReconstructionShift,
@@ -88,6 +94,8 @@ namespace Belle2 {
       m_ZStripMin(1),
       m_ZStripMax(zStripNumber),
       m_ZPositionBase(1.0), // start at #1
+      m_PhiSensorSide(phiSensorSide),
+      m_SignalSpeed(0.5671 * Const::speedOfLight), // m_firstPhotonlightSpeed, from EKLM
       m_GlobalOrigin(globalOrigin),
       m_LocalReconstructionShift(localReconstructionShift),
       m_Rotation(rotation)
@@ -158,6 +166,13 @@ namespace Belle2 {
       return Hep3Vector(0.0,
                         (phiStripAve - m_PhiPositionBase + 0.5) * m_PhiStripWidth,
                         (zStripAve - m_ZPositionBase + 0.5) * m_ZStripWidth);
+    }
+
+    const Hep3Vector Module::getPropagationTimes(const Hep3Vector& local) const
+    {
+      double dy = m_PhiPositionBase * m_PhiStripWidth - m_PhiSensorSide * local.y();
+      double dz = m_ZStripMax * m_ZStripWidth - local.z();
+      return Hep3Vector(0.0, dz / m_SignalSpeed, dy / m_SignalSpeed);
     }
 
   } // end of namespace bklm

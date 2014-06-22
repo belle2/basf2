@@ -35,7 +35,7 @@ BKLMDigit::BKLMDigit() :
 BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
   RelationsObject(),
   m_SimTime(simHit->getTime()),
-  m_Time(m_SimTime),
+  m_Time(m_SimTime + simHit->getPropagationTime()),
   m_SimEDep(simHit->getEDep()),
   m_EDep(m_SimEDep),
   m_SimNPixel(0),
@@ -52,7 +52,7 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit) :
   RelationsObject(),
   m_ModuleID(simHit->getModuleID()),
   m_SimTime(simHit->getTime()),
-  m_Time(m_SimTime),
+  m_Time(m_SimTime + simHit->getPropagationTime()),
   m_SimEDep(simHit->getEDep()),
   m_EDep(m_SimEDep),
   m_SimNPixel(0),

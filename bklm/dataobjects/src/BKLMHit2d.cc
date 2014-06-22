@@ -13,6 +13,8 @@
 
 #include <framework/logging/Logger.h>
 
+#include <CLHEP/Vector/ThreeVector.h>
+
 #include <cmath>
 
 using namespace Belle2;
@@ -33,17 +35,9 @@ BKLMHit2d::BKLMHit2d() :
 }
 
 // Constructor with orthogonal 1D hits
-BKLMHit2d::BKLMHit2d(const BKLMHit1d* hit1, const BKLMHit1d* hit2) :
+BKLMHit2d::BKLMHit2d(const BKLMHit1d* hitPhi, const BKLMHit1d* hitZ, const CLHEP::Hep3Vector& globalPos, double time) :
   RelationsObject()
 {
-  const BKLMHit1d* hitPhi = hit1;
-  const BKLMHit1d* hitZ   = hit2;
-  if (hitPhi->isPhiReadout() == hitZ->isPhiReadout()) {
-    B2WARNING("Attempt to form a 2D hit from parallel 1D hits")
-  } else if (hitZ->isPhiReadout()) {
-    hitPhi = hit2;
-    hitZ   = hit1;
-  }
   m_ModuleID = hitPhi->getModuleID() | (hitZ->getModuleID() & BKLM_STATUS_MASK);
   m_ZStrips = ((hitZ->getStripMin() - 1) << BKLM_ZSTRIP_BIT) | ((hitZ->getStripMax() - 1) << BKLM_ZMAXSTRIP_BIT);
 
@@ -51,10 +45,10 @@ BKLMHit2d::BKLMHit2d(const BKLMHit1d* hit1, const BKLMHit1d* hit2) :
     B2WARNING("Attempt to form a 2D hit from distinct-module 1D hits")
   }
 
-  m_GlobalPosition[0] = 0.0;
-  m_GlobalPosition[1] = 0.0;
-  m_GlobalPosition[2] = 0.0;
-  m_Time = 0.5 * (hitPhi->getTime() + hitZ->getTime());
+  m_GlobalPosition[0] = globalPos.x();
+  m_GlobalPosition[1] = globalPos.y();
+  m_GlobalPosition[2] = globalPos.z();
+  m_Time = time;
   m_EDep = hitPhi->getEDep() + hitZ->getEDep();
 }
 
@@ -71,14 +65,14 @@ BKLMHit2d::BKLMHit2d(const BKLMHit2d& h) :
   m_GlobalPosition[2] = h.m_GlobalPosition[2];
 }
 
-float BKLMHit2d::getPhiStripAve() const
+double BKLMHit2d::getPhiStripAve() const
 {
   int stripMin = ((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1;
   int stripMax = ((m_ModuleID & BKLM_MAXSTRIP_MASK) >> BKLM_MAXSTRIP_BIT) + 1;
   return 0.5 * (stripMin + stripMax);
 }
 
-float BKLMHit2d::getZStripAve() const
+double BKLMHit2d::getZStripAve() const
 {
   int stripMin = ((m_ZStrips & BKLM_ZSTRIP_MASK) >> BKLM_ZSTRIP_BIT) + 1;
   int stripMax = ((m_ZStrips & BKLM_ZMAXSTRIP_MASK) >> BKLM_ZMAXSTRIP_BIT) + 1;

@@ -50,12 +50,23 @@ namespace Belle2 {
      *   the module's sensitive volume.  The module's local origin is also shifted
      *   slightly along the local y and z axes so that it is in the middle of the
      *   sensitive volume along the local y axis and at the edge nearest the local
-     *   origin of the sensitive *   volume along the local z axis.
+     *   origin of the sensitive volume along the local z axis.
      *
      *   For the backward sectors, the module is rotated by 180 degrees about the +x
      *   axis so that the orientation of the local z axis is flipped from the global
      *   orientation so that all modules extend along the local +z axis from the
      *   local z=0 (which is nearest the forward-backward boundary).
+     *
+     *   Strip numbering for RPCs:
+     *     z-measuring strips: #1 is nearest the I.P., sensors are at the other end
+     *     phi-measuring strips: #1 is on the local -y end, sensors are at the local +y end
+     *
+     *   Strip numbering for scintillatorss:
+     *     z-measuring strips: #1 is nearest the I.P., sensors are at the other end
+     *     phi-measuring strips:
+     *        if phiSensorSide > 0: #1 is on the local -y end, sensors are at the local +y end
+     *        if phiSensorSide < 0: #1 is on the local +y end, sensors are at the local -y end
+     *
      */
     class Module {
 
@@ -77,6 +88,7 @@ namespace Belle2 {
       //! Constructor with explicit values (for scint module)
       Module(double            stripWidth,
              int               phiStripNumber,
+             int               phiSensorSide,
              int               zStripNumber,
              CLHEP::Hep3Vector globalOrigin,
              CLHEP::Hep3Vector localReconstructionShift,
@@ -127,6 +139,9 @@ namespace Belle2 {
       //! Convert 2D strip position (0..nStrips along each axis) to local coordinates
       const CLHEP::Hep3Vector getLocalPosition(double phiStripAve, double zStripAve) const;
 
+      //! Convert local coordinates to signal-propagation time (ns)
+      const CLHEP::Hep3Vector getPropagationTimes(const CLHEP::Hep3Vector&) const;
+
       //! Return phi strip (including fractional part) corresponding to local phi coordinate
       double getPhiStrip(const CLHEP::Hep3Vector& p) const { return p.y() / m_PhiStripWidth + m_PhiPositionBase; }
 
@@ -167,6 +182,12 @@ namespace Belle2 {
 
       //! to store the base position (in strip-# units) along z coordinate of the edge of first z-measuring strip
       double m_ZPositionBase;
+
+      //! to store the sensor side for phi scintillators
+      int m_PhiSensorSide;
+
+      //! to store the signal-propagation speed (cm/ns) along the strip
+      double m_SignalSpeed;
 
       //! to store the position (in global coordinates) of this module's sensitive-volume origin
       CLHEP::Hep3Vector m_GlobalOrigin;

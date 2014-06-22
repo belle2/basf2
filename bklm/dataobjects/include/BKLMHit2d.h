@@ -15,6 +15,10 @@
 #include <framework/datastore/RelationsObject.h>
 #include <bklm/dataobjects/BKLMStatus.h>
 
+namespace CLHEP {
+  class Hep3Vector;
+}
+
 namespace Belle2 {
 
   class BKLMHit1d;
@@ -28,9 +32,9 @@ namespace Belle2 {
     BKLMHit2d();
 
     //! Constructor with initial values
-    //! @param hit1 reconstructed BKLMHit1d
-    //! @param hit2 reconstructed BKLMHit1d in the same module's orthogonal readout direction
-    BKLMHit2d(const BKLMHit1d*, const BKLMHit1d*);
+    //! @param hitPhi reconstructed BKLMHit1d along the phi-measuring direction
+    //! @param hitZ reconstructed BKLMHit1d along the z-measuring direction
+    BKLMHit2d(const BKLMHit1d* hitPhi, const BKLMHit1d* hitZ, const CLHEP::Hep3Vector& globalPos, double time);
 
     //! Copy constructor
     BKLMHit2d(const BKLMHit2d&);
@@ -64,7 +68,7 @@ namespace Belle2 {
 
     //! Get average phi-measuring strip number
     //! @return average phi-measuring strip number of this 2D hit
-    float getPhiStripAve() const;
+    double getPhiStripAve() const;
 
     //! Get lowest z-measuring strip number
     //! @return lowest z-measuring strip number of this 2D hit
@@ -76,7 +80,7 @@ namespace Belle2 {
 
     //! Get average z-measuring strip number
     //! @return average z-measuring strip number of this 2D hit
-    float getZStripAve() const;
+    double getZStripAve() const;
 
     //! Get detector-module identifier
     //! @return detector-module identifier
@@ -122,12 +126,6 @@ namespace Belle2 {
     //! Set or clear the Inefficient flag
     //! @param flag whether this his is deemed inefficient (true) or not (false)
     void isInefficient(bool flag) { if (flag) { m_ModuleID |= BKLM_INEFFICIENT_MASK; } else { m_ModuleID &= ~BKLM_INEFFICIENT_MASK; } }
-
-    //! Set the global position of this 2D hit
-    //! @param x Cartesian x coordinate (cm)
-    //! @param y Cartesian y coordinate (cm)
-    //! @param z Cartesian z coordinate (cm)
-    void setGlobalPosition(double x, double y, double z) { m_GlobalPosition[0] = x; m_GlobalPosition[1] = y; m_GlobalPosition[2] = z; }
 
   private:
 

@@ -53,9 +53,6 @@
           <NScints>37</NScints>
           <OffsetSign>-1</OffsetSign>
         </PhiScintillators>
-        <ZScintillators>
-          <OffsetSign>-1</OffsetSign>
-        </ZScintillators>
       </Layer>
       <Layer layer="2">
         <HasRPCs desc="Flag to construct layer with RPCs (1) or scintillators (0)">0</HasRPCs>
@@ -71,66 +68,50 @@
           <OffsetSign>+1</OffsetSign>
         </PhiScintillators>
         <ZScintillators>
-          <OffsetSign>-1</OffsetSign>
           <Scint scint="7">
             <DLength unit="cm">-2.0</DLength>
-            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="8">
             <DLength unit="cm">-2.0</DLength>
-            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="9">
             <DLength unit="cm">-2.0</DLength>
-            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="10">
             <DLength unit="cm">-2.0</DLength>
-            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="22">
             <DLength unit="cm">-2.0</DLength>
-            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="23">
             <DLength unit="cm">-2.0</DLength>
-            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="24">
             <DLength unit="cm">-2.0</DLength>
-            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="25">
             <DLength unit="cm">-2.0</DLength>
-            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="37">
             <DLength unit="cm">-2.0</DLength>
-            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="38">
             <DLength unit="cm">-2.0</DLength>
-            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="39">
             <DLength unit="cm">-2.0</DLength>
-            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="40">
             <DLength unit="cm">-2.0</DLength>
-            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="51">
             <DLength unit="cm">-2.0</DLength>
-            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="52">
             <DLength unit="cm">-2.0</DLength>
-            <OffsetSign>+1</OffsetSign>
           </Scint>
           <Scint scint="53">
             <DLength unit="cm">-2.0</DLength>
-            <OffsetSign>+1</OffsetSign>
           </Scint>
         </ZScintillators>
       </Layer>

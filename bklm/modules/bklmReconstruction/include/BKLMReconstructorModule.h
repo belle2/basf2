@@ -1,9 +1,6 @@
 #ifndef BKLMRECONSTRUCTIONMODULE_H
 #define BKLMRECONSTRUCTIONMODULE_H
 
-//#include <framework/datastore/StoreObjPtr.h>
-//#include <framework/datastore/StoreArray.h>
-
 #include <framework/core/Module.h>
 
 namespace Belle2 {
@@ -12,63 +9,45 @@ namespace Belle2 {
     class GeometryPar;
   }
 
-  //! Module BKLMReconstructorModule
+  //! Module BKLMReconstructorModule.
   /*!
-    Convert StoreArray<BKLMDigit> to StoreArray<BKLMHit1d> and that to StoreArray<BKLMHit2d>
-    and store relations among these.
+    Create BKLMHit1ds from BKLMDigits then create BKLMHit2ds from BKLMHit1ds.
+    Store relations among these.
   */
   class BKLMReconstructorModule : public Module {
 
   public:
 
     //! Constructor
-    /*!
-      Create and allocate memory for variables here. Add the module parameters in this method.
-      \param selfRegisterType True if this module is self-registering, otherwise false.
-    */
     BKLMReconstructorModule();
 
     //! Destructor
-    /*!
-       Use the destructor to release the memory you allocated in the constructor.
-    */
     virtual ~BKLMReconstructorModule();
 
-    //! Initialize the Module
-    /*! This method is called only once before the actual event processing starts.
-        Use this method to initialize variables, open files etc.
-    */
+    //! Once-only initialization at start of job
     virtual void initialize();
 
-    //! Called when entering a new run
-    /*! Called at the beginning of each run, the method gives you the chance to change run dependent constants like alignment parameters, etc.
-    */
+    //! Prepare for start of each run
     virtual void beginRun();
 
-    //! This method is the core of the module.
-    /*! This method is called for each event. All processing of the event has to take place in this method.
-    */
+    //! Process each event
     virtual void event();
 
-    //! This method is called if the current run ends.
-    /*! Use this method to store information, which should be aggregated over one run.
-    */
+    //! Aggregate information at end of each run
     virtual void endRun();
 
-    //! This method is called at the end of the event processing.
-    /*! This method is called only once after the event processing finished.
-        Use this method for cleaning up, closing files, etc.
-    */
+    //! Once-only termination at the end of the job
     virtual void terminate();
 
   protected:
+
   private:
 
     //! Pointer to GeometryPar singleton
     bklm::GeometryPar* m_GeoPar;
 
     //! maximum time difference (ns) between two strips that are considered to be in coincidence
-    double m_dtMax;
+    double m_DtMax;
 
   };
 } // end namespace Belle2

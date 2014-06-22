@@ -81,9 +81,9 @@ namespace Belle2 {
     //! @return detector-module identifier
     int getModuleID() const { return m_ModuleID; }
 
-    //! Get coordinate of the hit along the strip's length
-    //! @return coordinate of the hit's local position along the strip (cm) for time-of-propagation
-    float getLocalPositionX() const { return m_LocalX; }
+    //! Get signal propagation time alont strip
+    //! @return time-of-propagation (ns) from hit to sensor
+    float getPropagationTime() const { return m_PropagationTime; }
 
     //! Get the hit time
     //! @return the hit time (ns) since start of the event
@@ -113,8 +113,8 @@ namespace Belle2 {
     //! energy deposition (MeV)
     float m_EDep;
 
-    //! local coordinate of hit position (cm) along strip's length for time-of-propagation
-    float m_LocalX;
+    //! time-of-propagation (ns) from hit to sensor
+    float m_PropagationTime;
 
     //! Needed to make the ROOT object storable
     ClassDef(BKLMSimHit, 3);

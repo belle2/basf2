@@ -66,6 +66,10 @@ namespace Belle2 {
     //! @return highest strip number of this 1D hit
     int getStripMax() const { return (((m_ModuleID & BKLM_MAXSTRIP_MASK) >> BKLM_MAXSTRIP_BIT) + 1); }
 
+    //! Get average strip number
+    //! @return average strip number of this 1D hit
+    double getStripAve() const;
+
     //! Get detector-module identifier
     //! @return detector-module identifier
     //! @sa BKLMStatus.h

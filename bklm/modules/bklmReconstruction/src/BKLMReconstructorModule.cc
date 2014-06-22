@@ -14,6 +14,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/gearbox/Const.h>
+
 #include <bklm/geometry/GeometryPar.h>
 #include <bklm/geometry/Module.h>
 #include <bklm/dataobjects/BKLMDigit.h>
@@ -31,20 +33,20 @@ using namespace Belle2::bklm;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
+
 REG_MODULE(BKLMReconstructor)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-BKLMReconstructorModule::BKLMReconstructorModule() : Module()
+BKLMReconstructorModule::BKLMReconstructorModule() : Module(), m_GeoPar(NULL)
 {
   setDescription("BKLM reconstruction module of 1D and 2D hits");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("Coincidence window (ns)", m_dtMax,
+  addParam("Coincidence window (ns)", m_DtMax,
            "Strip hits whose time difference exceeds this value are independent",
            double(75.0));
-  m_GeoPar = NULL;
 }
 
 BKLMReconstructorModule::~BKLMReconstructorModule()
@@ -55,7 +57,7 @@ void BKLMReconstructorModule::initialize()
 {
   StoreArray<BKLMDigit>::required();
 
-  // Force creation and persistence of BKLM output datastores
+  // Force creation and persistence of BKLM output datastores and relations
   StoreArray<BKLMHit1d>::registerPersistent();
   StoreArray<BKLMHit2d>::registerPersistent();
   RelationArray::registerPersistent<BKLMHit1d, BKLMDigit>();
@@ -68,7 +70,7 @@ void BKLMReconstructorModule::initialize()
 void BKLMReconstructorModule::beginRun()
 {
   StoreObjPtr<EventMetaData> evtMetaData;
-  B2INFO("Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun())
+  B2INFO("BKLMReconstructor: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun())
 }
 
 void BKLMReconstructorModule::event()
@@ -96,8 +98,8 @@ void BKLMReconstructorModule::event()
   for (std::map<int, int>::iterator iVolMap = volIDToDigits.begin(); iVolMap != volIDToDigits.end(); ++iVolMap) {
     int d = iVolMap->second;
     BKLMDigit* digit = digits[d];
-    if ((iVolMap->first > oldVolID + 1) || (std::fabs(digit->getTime() - averageTime) > m_dtMax)) {
-      new(hit1ds.nextFreeAddress()) BKLMHit1d(cluster);
+    if ((iVolMap->first > oldVolID + 1) || (std::fabs(digit->getTime() - averageTime) > m_DtMax)) {
+      hit1ds.appendNew(cluster);
       hit1dToDigits.add(hit1ds.getEntries() - 1, indices);
       indices.clear();
       cluster.clear();
@@ -108,7 +110,7 @@ void BKLMReconstructorModule::event()
     cluster.push_back(digit);
     oldVolID = iVolMap->first;
   }
-  new(hit1ds.nextFreeAddress()) BKLMHit1d(cluster);
+  hit1ds.appendNew(cluster);
   hit1dToDigits.add(hit1ds.getEntries() - 1, indices);
 
   // Construct StoreArray<BKLMHit2D> from orthogonal same-module hits in StoreArray<BKLMHit1D>
@@ -118,19 +120,24 @@ void BKLMReconstructorModule::event()
 
   for (int i = 0; i < hit1ds.getEntries(); ++i) {
     int moduleID = hit1ds[i]->getModuleID() & BKLM_MODULEID_MASK;
+    const bklm::Module* m = m_GeoPar->findModule(hit1ds[i]->isForward(), hit1ds[i]->getSector(), hit1ds[i]->getLayer());
     bool isPhiReadout = hit1ds[i]->isPhiReadout();
-    double time = hit1ds[i]->getTime();
     for (int j = i + 1; j < hit1ds.getEntries(); ++j) {
       if (moduleID != (hit1ds[j]->getModuleID() & BKLM_MODULEID_MASK)) continue;
       if (isPhiReadout == hit1ds[j]->isPhiReadout()) continue;
-      if (std::fabs(time - hit1ds[j]->getTime()) > m_dtMax) continue;
-      BKLMHit2d* hit2d = new(hit2ds.nextFreeAddress()) BKLMHit2d(hit1ds[i], hit1ds[j]);
+      int phiIndex = isPhiReadout ? i : j;
+      int zIndex   = isPhiReadout ? j : i;
+      CLHEP::Hep3Vector local = m->getLocalPosition(hit1ds[phiIndex]->getStripAve(), hit1ds[zIndex]->getStripAve());
+      CLHEP::Hep3Vector propagationTimes = m->getPropagationTimes(local);
+      double phiTime = hit1ds[phiIndex]->getTime() - propagationTimes.y();
+      double zTime = hit1ds[zIndex]->getTime() - propagationTimes.z();
+      if (std::fabs(phiTime - zTime) > m_DtMax) continue;
+      CLHEP::Hep3Vector global = m->localToGlobal(local);
+      double time = 0.5 * (phiTime + zTime) - global.mag() / Const::speedOfLight;
+      hit2ds.appendNew(hit1ds[phiIndex], hit1ds[zIndex], global, time);
       hit2dToHit1d.add(hit2ds.getEntries() - 1, i);
       hit2dToHit1d.add(hit2ds.getEntries() - 1, j);
-      const bklm::Module* m = m_GeoPar->findModule(hit2d->isForward(), hit2d->getSector(), hit2d->getLayer());
-      CLHEP::Hep3Vector local = m->getLocalPosition(hit2d->getPhiStripAve(), hit2d->getZStripAve());
-      CLHEP::Hep3Vector global = m->localToGlobal(local);
-      hit2d->setGlobalPosition(global.x(), global.y(), global.z());
+
     }
   }
 

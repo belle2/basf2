@@ -10,12 +10,15 @@
 
 #include <bklm/modules/bklmDigitizer/BKLMDigitizerModule.h>
 
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <bklm/geometry/GeometryPar.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <bklm/dataobjects/BKLMDigit.h>
+#include <eklm/simulation/FPGAFitter.h>
 
 #include <TRandom.h>
 
@@ -79,6 +82,8 @@ void BKLMDigitizerModule::initialize()
 
 void BKLMDigitizerModule::beginRun()
 {
+  StoreObjPtr<EventMetaData> evtMetaData;
+  B2INFO("BKLMDigitizer: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun())
 }
 
 void BKLMDigitizerModule::event()
@@ -143,37 +148,21 @@ void BKLMDigitizerModule::terminate()
   delete m_fitter;
 }
 
-void BKLMDigitizerModule::digitize(std::map<int, std::vector<std::pair<int, BKLMSimHit*> > > volIDToSimHits, StoreArray<BKLMDigit>& digits)
+void BKLMDigitizerModule::digitize(const std::map<int, std::vector<std::pair<int, BKLMSimHit*> > >& volIDToSimHits, StoreArray<BKLMDigit>& digits)
 {
 
   StoreArray<BKLMSimHit> simHits;
   RelationArray simHitToDigit(simHits, digits);
 
-  // Make one BKLMDigit for each scintillator strip (identified by volumeID)
-  for (std::map<int, std::vector<std::pair<int, BKLMSimHit*> > >::iterator iVolMap = volIDToSimHits.begin(); iVolMap != volIDToSimHits.end(); ++iVolMap) {
-    BKLMDigit* digit = new(digits.nextFreeAddress()) BKLMDigit((iVolMap->second.front()).second);
-    int d = digits.getEntries() - 1;
-    // Collect all SimHits in this scint associated with a given trackID by taking earliest time and sum of energy deposits
-    std::map<int, std::vector<BKLMSimHit*> > trackIDToSimHit;
-    for (std::vector<std::pair<int, BKLMSimHit*> >::iterator iSimHit = iVolMap->second.begin(); iSimHit != iVolMap->second.end(); ++iSimHit) {
-      simHitToDigit.add(iSimHit->first, d);
-      int trackID = 0; // DIVOT TrackID is not stored anymore (iSimHit->second)->getTrackID();
-      std::map <int, std::vector<BKLMSimHit*> >::iterator iTrackMap = trackIDToSimHit.find(trackID);
-      if (iTrackMap == trackIDToSimHit.end()) {
-        trackIDToSimHit.insert(std::pair<int, std::vector<BKLMSimHit*> >(trackID, std::vector<BKLMSimHit*>(1, iSimHit->second)));
-      } else {
-        iTrackMap->second.push_back(iSimHit->second);
-        // DIVOT Do not modify the StoreArray simhits!
-        //if ((iSimHit->second)->getTime() > iTrackMap->second->getTime()) { // this hit is later
-        //  iTrackMap->second->increaseEDep((iSimHit->second)->getEDep());
-        //} else { // this hit is earlier
-        //  (iSimHit->second)->increaseEDep(iTrackMap->second->getEDep());
-        //  iTrackMap->second = iSimHit->second;
-        //}
-      }
-    }
+  // Digitize the pulse(s) in each scintillator strip (identified by volumeID)
+  for (std::map<int, std::vector<std::pair<int, BKLMSimHit*> > >::const_iterator iVolMap = volIDToSimHits.begin(); iVolMap != volIDToSimHits.end(); ++iVolMap) {
 
-// DIVOT Do not merge trackID SimHit with parentID SimHit
+    // Make one BKLMDigit for each scintillator strip then add relations to this BKLMDigit from each BKLMSimHit
+    BKLMDigit* digit = digits.appendNew((iVolMap->second.front()).second);
+    int d = digits.getEntries() - 1;
+    for (std::vector<std::pair<int, BKLMSimHit*> >::const_iterator iSimHit = iVolMap->second.begin(); iSimHit != iVolMap->second.end(); ++iSimHit) {
+      simHitToDigit.add(iSimHit->first, d);
+    }
 
     struct EKLM::FPGAFitParams fitParams;
     fitParams.startTime = 0.0;
@@ -184,14 +173,14 @@ void BKLMDigitizerModule::digitize(std::map<int, std::vector<std::pair<int, BKLM
     int nPE = 0;
     enum EKLM::FPGAFitStatus status = processEntry(iVolMap->second, fitParams, nPE);
     digit->setFitStatus(status);
-    digit->setTime(fitParams.startTime);
+    // digit->setTime(fitParams.startTime); // DIVOT - this is producing garbage times
     digit->setEDep(fitParams.amplitude);
     digit->setSimNPixel(nPE);
     digit->setNPixel(m_PEAttenuationFreq * fitParams.amplitude
                      * (0.5 * fitParams.peakTime + 1.0 / fitParams.attenuationFreq));
     digit->isAboveThreshold(nPE > m_discriminatorThreshold);
 
-  } // end of loop over VolIDToSimHit map
+  }
 
 }
 
@@ -199,13 +188,10 @@ enum EKLM::FPGAFitStatus BKLMDigitizerModule::processEntry(std::vector<std::pair
 {
 
   float amplitude[m_nDigitizations];
-  float amplitudeReflected[m_nDigitizations];
   int   adcPulse[m_nDigitizations];
   float adcFit[m_nDigitizations];
-  // initialize variable-size arrays at run-time
   for (unsigned int i = 0; i < m_nDigitizations; ++i) {
     amplitude[i] = 0.0;
-    amplitudeReflected[i] = 0.0;
     adcPulse[i] = 0;
     adcFit[i] = 0.0;
   }
@@ -213,29 +199,16 @@ enum EKLM::FPGAFitStatus BKLMDigitizerModule::processEntry(std::vector<std::pair
   GeometryPar* geoPar = GeometryPar::instance();
   BKLMSimHit* simHit = vHits.front().second;
   const bklm::Module* module = geoPar->findModule(simHit->isForward(), simHit->getSector(), simHit->getLayer());
-  double half_len = (simHit->isPhiReadout() ? module->getPhiScintHalfLength(simHit->getStrip())
-                     : module->getZScintHalfLength(simHit->getStrip()));
+  double scintLength2 = 4.0 * (simHit->isPhiReadout() ? module->getPhiScintHalfLength(simHit->getStrip())
+                               : module->getZScintHalfLength(simHit->getStrip()));
 
   for (std::vector<std::pair<int, BKLMSimHit*> >::iterator iHit = vHits.begin(); iHit != vHits.end(); ++iHit) {
-
     simHit = iHit->second;
-    // calculate distance
-    double local_pos = simHit->getLocalPositionX();
-
-    // Poisson mean for # of p.e.
-    double nPEmean = simHit->getEDep() * m_nPEperMeV;
-
-    // fill histograms
-    nPE += fillAmplitude(gRandom->Poisson(nPEmean), simHit->getTime(), false, half_len - local_pos, amplitude);
+    double hitDist = simHit->getPropagationTime() * m_firstPhotonlightSpeed;
+    double nPEmean = simHit->getEDep() * m_nPEperMeV; // Poisson mean for # of SiPM pixels
+    nPE += fillAmplitude(gRandom->Poisson(nPEmean), simHit->getTime(), false, hitDist, amplitude);
     if (m_mirrorReflectiveIndex > 0)
-      nPE += fillAmplitude(gRandom->Poisson(nPEmean), simHit->getTime(), true, 3.0 * half_len + local_pos, amplitudeReflected);
-  }
-
-  // fold reflected pulse(s) into direct pulse(s)
-  if (m_mirrorReflectiveIndex > 0) {
-    for (unsigned int i = 0; i < m_nDigitizations; ++i) {
-      amplitude[i] += amplitudeReflected[i];
-    }
+      nPE += fillAmplitude(gRandom->Poisson(nPEmean), simHit->getTime(), true, scintLength2 - hitDist, amplitude);
   }
 
   // incorporate SiPM noise
@@ -250,19 +223,18 @@ enum EKLM::FPGAFitStatus BKLMDigitizerModule::processEntry(std::vector<std::pair
 
   // fit the digitized pulse(s)
   EKLM::FPGAFitStatus status = m_fitter->fit(adcPulse, adcFit, &fitParams);
-  if (status != EKLM::c_FPGASuccessfulFit) {
-    return status;
+  if (status == EKLM::c_FPGASuccessfulFit) {
+    /**
+     * TODO: Change units.
+     * FPGA fitter now uses units: time = ADC conversion time,
+     *                             amplitude = amplitude * 0.5 * ADCRange.
+     */
+    fitParams.startTime *= m_ADCSamplingTime;
+    fitParams.peakTime *= fitParams.peakTime;
+    fitParams.attenuationFreq /= m_ADCSamplingTime;
+    fitParams.amplitude *= 2.0 / EKLM::ADCRange;
+    fitParams.bgAmplitude *= 2.0 / EKLM::ADCRange;
   }
-  /**
-   * TODO: Change units.
-   * FPGA fitter now uses units: time = ADC conversion time,
-   *                             amplitude = amplitude * 0.5 * ADCRange.
-   */
-  fitParams.startTime *= m_ADCSamplingTime;
-  fitParams.peakTime *= fitParams.peakTime;
-  fitParams.attenuationFreq /= m_ADCSamplingTime;
-  fitParams.amplitude *= 2.0 / EKLM::ADCRange;
-  fitParams.bgAmplitude *= 2.0 / EKLM::ADCRange;
   return status;
 }
 
@@ -271,28 +243,21 @@ double BKLMDigitizerModule::signalShape(double t)
   return (t > 0.0 ? exp(-m_PEAttenuationFreq * t) : 0.0);
 }
 
-double  BKLMDigitizerModule::distanceAttenuation(double dist)
-{
-  return exp(-dist / m_attenuationLength);
-}
-
 int BKLMDigitizerModule::fillAmplitude(int nPEsample, double timeShift,
                                        bool isReflected, double dist, float* hist)
 {
   int nPE = 0;
   for (int j = 0; j < nPEsample; ++j) {
-    double hitDist = dist / gRandom->Uniform(m_minCosTheta, 1);
-    /* Drop lightflashes which were captured by fiber */
-    if (gRandom->Uniform() > distanceAttenuation(hitDist))
-      continue;
-    /* Account for mirror reflective index. */
+    // Attenuation in the WLS fiber
+    if (gRandom->Uniform() > exp(-dist / m_attenuationLength)) continue;
+    // Absorption at the mirrored end
     if (isReflected)
-      if (gRandom->Uniform() > m_mirrorReflectiveIndex)
-        continue;
+      if (gRandom->Uniform() > m_mirrorReflectiveIndex) continue;
     nPE++;
     double deExcitationTime = gRandom->Exp(m_scintillatorDeExcitationTime) +
                               gRandom->Exp(m_fiberDeExcitationTime);
-    double hitTime = hitDist / m_firstPhotonlightSpeed + deExcitationTime + timeShift;
+    double hitTime = dist / (gRandom->Uniform(m_minCosTheta, 1) * m_firstPhotonlightSpeed)
+                     + deExcitationTime + timeShift;
     for (unsigned int i = 0; i < m_nDigitizations; ++i)
       hist[i] += signalShape(i * m_ADCSamplingTime - hitTime);
   }

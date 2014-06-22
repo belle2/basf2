@@ -395,10 +395,7 @@ namespace Belle2 {
       int m_NZScintsChimney;
 
       //! Sign (+/-1) of scintillator envelope's shift along phi axis within its enclosing module
-      double m_PhiScintsOffsetSign[NLAYER + 1];
-
-      //! Sign (+/-1) of scintillator envelope's shift along z axis within its enclosing module
-      double m_ZScintsOffsetSign[NLAYER + 1];
+      int m_PhiScintsOffsetSign[NLAYER + 1];
 
       //! length along z of the module
       double m_ModuleLength;

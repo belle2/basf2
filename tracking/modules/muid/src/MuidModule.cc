@@ -150,7 +150,7 @@ MuidModule::MuidModule() :
   addParam("MinKE", m_MinKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation.", double(0.002));
   addParam("MaxStep", m_MaxStep, "[cm] Maximum step size during extrapolation (use 0 for infinity).", double(25.0));
   addParam("MaxDistSigma", m_MaxDistSqInVariances, "[#sigmas] Maximum hit-to-extrapolation difference.", double(7.5));
-  addParam("MaxKLMClusterDistance", m_MaxKLMClusterDistSq, "[cm] Maximum distance between track and KLM cluster.", double(50.0));
+  addParam("MaxKLMClusterTrackConeAngle", m_MaxClusterTrackConeAngle, "[degrees] Maximum cone angle between matching track and KLM cluster.", double(15.0));
   addParam("Cosmic", m_Cosmic, "Particle source (0 = beam, 1 = cosmic ray.", 0);
 }
 
@@ -165,12 +165,8 @@ void MuidModule::initialize()
   m_MinPt = max(0.0, m_MinPt) * GeV;
   m_MinKE = max(0.0, m_MinKE) * GeV;
 
-  // Square user's input value to get max number of variances for hit-to-extrapolation squared difference
-  m_MaxDistSqInVariances *= m_MaxDistSqInVariances;
-
-  // Convert and square user's input value to get max distance^2 in mm^2 between KLM cluster and (straight-line) projected track
-  m_MaxKLMClusterDistSq *= cm;
-  m_MaxKLMClusterDistSq *= m_MaxKLMClusterDistSq;
+  // Convert user's maximum track-KLMCluster cone angle from degrees to radians
+  m_MaxClusterTrackConeAngle *= M_PI / 180.0;
 
   // Define the list of BKLM/EKLM sensitive volumes in the geant4 geometry
   registerVolumes();
@@ -330,7 +326,7 @@ void MuidModule::beginRun()
 {
   StoreObjPtr<EventMetaData> evtMetaData;
   int expNo = evtMetaData->getExperiment();
-  B2INFO("Experiment " << expNo << "  run " << evtMetaData->getRun())
+  B2INFO("muid: Experiment " << expNo << "  run " << evtMetaData->getRun())
   m_MuonPlusPar = new MuidPar(expNo, "MuonPlus");
   m_MuonMinusPar = new MuidPar(expNo, "MuonMinus");
   m_PionPlusPar = new MuidPar(expNo, "PionPlus");
@@ -445,13 +441,14 @@ void MuidModule::event()
       finishTrack(muid, int(gfTrack->getFittedState().getCharge()));
 
       // Find the matching KLMCluster(s)
-      G4Vector3D direction = momentum.unit();
       for (int c = 0; c < klmClusters.getEntries(); ++c) {
-        G4Point3D diff(klmClusters[c]->getPosition().X() * cm - position.x(),
-                       klmClusters[c]->getPosition().Y() * cm - position.y(),
-                       klmClusters[c]->getPosition().Z() * cm - position.z());
-        if ((diff - (diff * direction) * direction).mag2() < m_MaxKLMClusterDistSq) {
+        G4Point3D clusterDirection(klmClusters[c]->getPosition().X(),
+                                   klmClusters[c]->getPosition().Y(),
+                                   klmClusters[c]->getPosition().Z());
+        if (position.angle(clusterDirection) < m_MaxClusterTrackConeAngle) {
+          klmClusters[c]->setAssociatedTrackFlag();
           trackToKLMCluster.add(t, c);
+          break;
         }
       }
 

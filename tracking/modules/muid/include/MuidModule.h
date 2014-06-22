@@ -234,8 +234,8 @@ namespace Belle2 {
     //! user-defined maximum squared-distance (#variances) for matching hit to extrapolation
     double m_MaxDistSqInVariances;
 
-    //! user-defined maximum distance (cm) between KLMCluster and associated track
-    double m_MaxKLMClusterDistSq;
+    //! user-defined maximum cone angle (radians) between KLMCluster and associated track
+    double m_MaxClusterTrackConeAngle;
 
     //! BKLM RPC phi-measuring strip position variance (cm^2) by layer
     double m_BarrelPhiStripVariance[NLAYER + 1];

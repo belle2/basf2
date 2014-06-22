@@ -204,7 +204,7 @@ void ExtModule::initialize()
 void ExtModule::beginRun()
 {
   StoreObjPtr<EventMetaData> evtMetaData;
-  B2INFO("Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun())
+  B2INFO("ext: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun())
 }
 
 void ExtModule::event()

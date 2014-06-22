@@ -16,6 +16,7 @@
 // Hit classes
 #include <top/dataobjects/TOPSimHit.h>
 #include <top/dataobjects/TOPDigit.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -76,7 +77,11 @@ namespace Belle2 {
     {
       // data store registration
       StoreArray<TOPDigit>::registerPersistent(m_outputDigits);
-      RelationArray::registerPersistent<TOPSimHit, TOPDigit>(m_inputSimHits, m_outputDigits);
+      RelationArray::registerPersistent<TOPDigit, TOPSimHit>(m_outputDigits, m_inputSimHits);
+      RelationArray::registerPersistent<TOPDigit, MCParticle>(m_outputDigits, "");
+
+      StoreArray<TOPSimHit>::required();
+      StoreArray<MCParticle>::optional();
 
       // store electronics jitter and efficiency to make it known for reconstruction
       m_topgp->setELjitter(m_electronicJitter);
@@ -96,10 +101,6 @@ namespace Belle2 {
 
       // output: digitized hits
       StoreArray<TOPDigit> topDigits(m_outputDigits);
-      topDigits.create();
-
-      RelationArray relSimHitToDigit(topSimHits, topDigits);
-      relSimHitToDigit.clear();
 
       m_topgp->setBasfUnits();
 
@@ -119,19 +120,19 @@ namespace Belle2 {
         if (gRandom->Rndm() > m_electronicEfficiency) continue;
 
         // take simulated hit
-        TOPSimHit* aSimHit = topSimHits[iHit];
+        const TOPSimHit* simHit = topSimHits[iHit];
 
         // Do spatial digitization
-        double x = aSimHit->getX();
-        double y = aSimHit->getY();
-        int pmtID = aSimHit->getPmtID();
+        double x = simHit->getX();
+        double y = simHit->getY();
+        int pmtID = simHit->getPmtID();
         int channelID = m_topgp->getChannelID(x, y, pmtID);
         if (channelID == 0) continue;
 
         // add T0 jitter, TTS and electronic jitter to photon time
         double tts = PMT_TTS();
         double tel = gRandom->Gaus(0., m_electronicJitter);
-        double time = t_beam + aSimHit->getTime() + tts + tel;
+        double time = t_beam + simHit->getTime() + tts + tel;
 
         // convert to TDC digits
         if (time < 0) continue;
@@ -139,12 +140,11 @@ namespace Belle2 {
         int TDC = int(time / TDCwidth);
         if (TDC > maxTDC) TDC = maxTDC;
 
-        // store result
-        new(topDigits.nextFreeAddress()) TOPDigit(aSimHit->getBarID(), channelID, TDC);
-
-        // make relations
-        int iDigit = topDigits.getEntries() - 1;
-        relSimHitToDigit.add(iHit, iDigit);
+        // store result and add relations
+        TOPDigit* digit = topDigits.appendNew(simHit->getBarID(), channelID, TDC);
+        digit->addRelationTo(simHit);
+        const MCParticle* particle = simHit->getRelatedFrom<MCParticle>();
+        digit->addRelationTo(particle); //TODO: add relation weight
 
       }
 
@@ -160,7 +160,7 @@ namespace Belle2 {
         for (int i = 0; i < NoiseHits; i++) {
           int channelID = int(gRandom->Rndm() * Nchannels) + 1;
           int TDC = int(gRandom->Rndm() * maxTDC);
-          new(topDigits.nextFreeAddress()) TOPDigit(barID, channelID, TDC);
+          topDigits.appendNew(barID, channelID, TDC);
         }
       }
 

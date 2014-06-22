@@ -109,26 +109,22 @@ namespace Belle2 {
 
       // write to store arrays; add relations
 
-      StoreArray<TOPSimHit> hits;
-      if (!hits.isValid()) hits.create();
-      new(hits.nextFreeAddress()) TOPSimHit(barID, pmtID, xLocal, yLocal,
-                                            detTime, energy);
+      StoreArray<TOPSimHit> simHits;
+      if (!simHits.isValid()) simHits.create();
+      TOPSimHit* simHit = simHits.appendNew(barID, pmtID, xLocal, yLocal, detTime, energy);
 
       StoreArray<MCParticle> particles;
-      RelationArray relParticleHit(particles, hits);
-      int lastHit = hits.getEntries() - 1;
+      RelationArray relParticleHit(particles, simHits);
       int parentID = photon.GetParentID();
-      relParticleHit.add(parentID, lastHit);
+      relParticleHit.add(parentID, simHit->getArrayIndex());
 
-      StoreArray<TOPSimPhoton> photons;
-      if (!photons.isValid()) photons.create();
-      new(photons.nextFreeAddress()) TOPSimPhoton(barID, emiPoint, emiMomDir, emiTime,
-                                                  detPoint, detMomDir, detTime,
-                                                  length, energy);
+      StoreArray<TOPSimPhoton> simPhotons;
+      if (!simPhotons.isValid()) simPhotons.create();
+      TOPSimPhoton* simPhoton = simPhotons.appendNew(barID, emiPoint, emiMomDir, emiTime,
+                                                     detPoint, detMomDir, detTime,
+                                                     length, energy);
 
-      RelationArray relHitPhot(hits, photons);
-      int lastPhot = photons.getEntries() - 1;
-      relHitPhot.add(lastHit, lastPhot);
+      simHit->addRelationTo(simPhoton);
 
       // kill photon after detection
       photon.SetTrackStatus(fStopAndKill);

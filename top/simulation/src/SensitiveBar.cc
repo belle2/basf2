@@ -134,14 +134,13 @@ namespace Belle2 {
       //! write the hit to datastore
       StoreArray<TOPBarHit> barHits;
       if (!barHits.isValid()) barHits.create();
-      new(barHits.nextFreeAddress()) TOPBarHit(barID, PDG, TOrigin, TPosition,
-                                               TMomentum, globalTime, tracklength);
+      TOPBarHit* hit = barHits.appendNew(barID, PDG, TOrigin, TPosition, TMomentum,
+                                         globalTime, tracklength);
 
       //! set the relation
       StoreArray<MCParticle> mcParticles;
       RelationArray rel(mcParticles, barHits);
-      int last = barHits.getEntries() - 1;
-      rel.add(trackID, last);
+      rel.add(trackID, hit->getArrayIndex());
 
       return true;
     }

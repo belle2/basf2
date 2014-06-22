@@ -122,12 +122,15 @@ namespace Belle2 {
       // Data store registration
 
       StoreArray<TOPLikelihood>::registerPersistent(m_outputLikelihoods);
-      RelationArray::registerPersistent<Track, TOPLikelihood>
-      (m_inputTracks, m_outputLikelihoods);
-      RelationArray::registerPersistent<TOPLikelihood, ExtHit>
-      (m_outputLikelihoods, m_inputExtHits);
-      RelationArray::registerPersistent<TOPBarHit, TOPLikelihood>
-      (m_inputBarHits, m_outputLikelihoods);
+      RelationArray::registerPersistent<Track, TOPLikelihood>(m_inputTracks, m_outputLikelihoods);
+      RelationArray::registerPersistent<TOPLikelihood, ExtHit>(m_outputLikelihoods, m_inputExtHits);
+      RelationArray::registerPersistent<TOPBarHit, TOPLikelihood>(m_inputBarHits, m_outputLikelihoods);
+
+      StoreArray<TOPDigit>::required();
+      StoreArray<Track>::required();
+      StoreArray<ExtHit>::required();
+      StoreArray<MCParticle>::optional();
+      StoreArray<TOPBarHit>::optional();
 
       // Configure TOP detector
 
@@ -222,9 +225,9 @@ namespace Belle2 {
         reco.GetLogL(c_Nhyp, logl, expPhot, nphot);
 
         // store results
-        new(toplogL.nextFreeAddress()) TOPLikelihood(reco.Flag(), logl, nphot, expPhot);
+        toplogL.appendNew(reco.Flag(), logl, nphot, expPhot);
 
-        // make relations
+        // make relations: TODO use new interface
         int last = toplogL.getEntries() - 1;
         TrackLogL.add(tracks[i].Label(c_LTrack), last);
         LogLextHit.add(last, tracks[i].Label(c_LextHit));

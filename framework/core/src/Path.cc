@@ -72,6 +72,10 @@ ModulePtrList Path::buildModulePathList() const
   return tmpModuleList;
 }
 
+void Path::putModules(const std::list<boost::shared_ptr<Module> >& mlist)
+{
+  m_elements.assign(mlist.begin(), mlist.end());
+}
 
 //============================================================================
 //                              Private methods

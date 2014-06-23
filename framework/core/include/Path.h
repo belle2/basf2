@@ -11,7 +11,6 @@
 #ifndef PATH_H_
 #define PATH_H_
 
-#include <framework/core/Module.h>
 #include <framework/core/PathElement.h>
 
 #include <boost/shared_ptr.hpp>
@@ -22,6 +21,7 @@
 namespace Belle2 {
 
   class Path;
+  class Module;
 
   //------------------------------------------------------
   //             Define convenient typdefs
@@ -30,8 +30,7 @@ namespace Belle2 {
   /** Defines a pointer to a path object as a boost shared pointer. */
   typedef boost::shared_ptr<Path> PathPtr;
 
-  /** The path class.
-   * Implements a path consisting of modules. The modules are arranged in a linear order.
+  /** Implements a path consisting of Module and/or Path objects. The modules are arranged in a linear order.
    */
   class Path : public PathElement {
 
@@ -48,20 +47,27 @@ namespace Belle2 {
     ~Path();
 
     /**
-     * Adds a new module to the path.
+     * Adds a module to the path.
      *
-     * A new module is added to the path by inserting it to the end
+     * The module is added to the path by inserting it to the end
      * of the list of modules.
      *
-     * @param module Reference to the module that should be added to the path.
+     * @param module Module that should be added to the path.
      */
     void addModule(boost::shared_ptr<Module> module);
 
 
-    /** Connect another path with this one.
+    /** Insert another path at the end of this one.
      *
-     * Modules in the other path will be executed after all modules in the
-     * curren path.
+     * E.g.
+     *
+       \code
+       main.add_module(a)
+       main.add_path(otherPath)
+       main.add_module(b)
+       \endcode
+     *
+     * would create a path [ A -> [ contents of otherPath ] -> B ].
      */
     void addPath(PathPtr path);
 
@@ -87,14 +93,14 @@ namespace Belle2 {
     /**
      * Replaces all Modules and sub-Paths with the specified Module list
      */
-    void putModules(const std::list<boost::shared_ptr<Module> >& mlist) { m_elements.assign(mlist.begin(), mlist.end()); }
+    void putModules(const std::list<boost::shared_ptr<Module> >& mlist);
 
 
     //--------------------------------------------------
     //                   Python API
     //--------------------------------------------------
 
-    /** return a string of the form [module a, module b, [another path]]
+    /** return a string of the form [module a -> module b -> [another path]]
      *
      *  can be used to 'print' a path in a steering file.
      */

@@ -11,6 +11,10 @@
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
+
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <analysis/utility/EvtPDLUtil.h>
+
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
@@ -196,185 +200,186 @@ namespace {
 
   }
 
-  TEST_F(ParticleCombinerTest, MuPlusMuMinus)
-  {
-    StoreObjPtr<ParticleList> inputA("mu+");
-    StoreObjPtr<ParticleList> inputB("mu-");
 
-    DataStore::Instance().setInitializeActive(true);
-    inputA.registerAsPersistent();
-    inputB.registerAsPersistent();
-    DataStore::Instance().setInitializeActive(false);
+  class TestParticleList {
 
-    StoreArray<Particle> particles;
-    particles.appendNew(TLorentzVector(), 13, Particle::c_Flavored, Particle::c_MCParticle, 0);
-    particles.appendNew(TLorentzVector(), -13, Particle::c_Flavored, Particle::c_MCParticle, 1);
+    typedef std::tuple<Particle::EFlavorType, int, std::vector<int>> MockParticle;
 
-    inputA.create();
-    inputA->initialize(13, "mu+");
+  public:
+    TestParticleList(std::string decayString) : decayString(decayString) {
 
-    inputB.create();
-    inputB->initialize(-13, "mu-");
+      DecayDescriptor decaydescriptor;
+      decaydescriptor.init(decayString);
+      const DecayDescriptorParticle* mother = decaydescriptor.getMother();
 
-    inputB->bindAntiParticleList(*(inputA));
+      pdgCode = mother->getPDGCode();
+      listName = mother->getFullName();
 
-    inputA->addParticle(particles[0]);
-    inputA->addParticle(particles[1]);
+      isSelfConjugatedParticle = !(Belle2::EvtPDLUtil::hasAntiParticle(pdgCode));
 
-    ParticleGenerator combiner("D0 -> mu+ mu-");
-    combiner.init();
-    int nCombinations = 0;
-    while (combiner.loadNext()) {
-      nCombinations++;
+      StoreObjPtr<ParticleList> list(listName);
+      DataStore::Instance().setInitializeActive(true);
+      list.registerAsPersistent();
+      DataStore::Instance().setInitializeActive(false);
+
+      if (not list.isValid())
+        list.create();
+      list->initialize(pdgCode, listName);
+
+      if (not isSelfConjugatedParticle) {
+        antiListName = Belle2::EvtPDLUtil::antiParticleListName(pdgCode, mother->getLabel());
+        StoreObjPtr<ParticleList> antiList(antiListName);
+        DataStore::Instance().setInitializeActive(true);
+        antiList.registerAsPersistent();
+        DataStore::Instance().setInitializeActive(false);
+        if (not antiList.isValid())
+          antiList.create();
+        antiList->initialize(-pdgCode, antiListName);
+        list->bindAntiParticleList(*(antiList));
+      }
     }
-    EXPECT_EQ(1, nCombinations);
-  }
+
+    void addParticle(unsigned int mdstSource) {
+      StoreObjPtr<ParticleList> list(listName);
+      StoreArray<Particle> particles;
+      Particle* part = particles.appendNew(TLorentzVector(), pdgCode, isSelfConjugatedParticle ? Particle::c_Unflavored : Particle::c_Flavored, Particle::c_MCParticle, mdstSource);
+      list->addParticle(part);
+    }
+
+    void addAntiParticle(unsigned int mdstSource) {
+      StoreObjPtr<ParticleList> list(antiListName);
+      StoreArray<Particle> particles;
+      Particle* part = particles.appendNew(TLorentzVector(), -pdgCode, isSelfConjugatedParticle ? Particle::c_Unflavored : Particle::c_Flavored, Particle::c_MCParticle, mdstSource);
+      list->addParticle(part);
+    }
+
+    void addExpectedParticle(Particle::EFlavorType flavourType, int pdg_code, std::vector<int> daughter_indices) {
+      expected_particles.push_back(std::make_tuple(flavourType, pdg_code, daughter_indices));
+    }
+
+    void addAndCheckParticlesFromGenerator() {
+
+      StoreObjPtr<ParticleList> list(listName);
+      StoreArray<Particle> particles;
+
+      ParticleGenerator generator(decayString);
+      generator.init();
+
+      std::vector<MockParticle> received_particles;
+      std::vector<Particle*> added_particles;
+      for (unsigned int i = 0; i < expected_particles.size(); ++i) {
+        EXPECT_TRUE(generator.loadNext());
+        const Particle& particle = generator.getCurrentParticle();
+        Particle* part = particles.appendNew(particle);
+        added_particles.push_back(part);
+        received_particles.push_back(std::make_tuple(part->getFlavorType(), part->getPDGCode(), part->getDaughterIndices()));
+      }
+      EXPECT_FALSE(generator.loadNext());
+
+      for (const auto & p : received_particles) {
+        EXPECT_EQ(std::count(expected_particles.begin(), expected_particles.end(), p), 1);
+      }
+
+      for (const auto & p : expected_particles) {
+        EXPECT_EQ(std::count(received_particles.begin(), received_particles.end(), p), 1);
+        auto it = std::find(received_particles.begin(), received_particles.end(), p);
+        if (it != received_particles.end()) {
+          auto index = std::distance(received_particles.begin(), it);
+          list->addParticle(added_particles[index]);
+        }
+      }
+
+    }
+
+    int operator*(int index) {
+      StoreObjPtr<ParticleList> list(listName);
+      return list->getList(ParticleList::c_SelfConjugatedParticle)[index];
+    }
+
+    int operator+(int index) {
+      StoreObjPtr<ParticleList> list(listName);
+      return list->getList(ParticleList::c_FlavorSpecificParticle)[index];
+    }
+
+    int operator-(int index) {
+      StoreObjPtr<ParticleList> list(antiListName);
+      return list->getList(ParticleList::c_FlavorSpecificParticle)[index];
+    }
+
+  private:
+    int pdgCode;
+    std::string decayString;
+    std::string listName;
+    std::string antiListName;
+    bool isSelfConjugatedParticle;
+    std::vector<MockParticle> expected_particles;
+
+  };
 
   TEST_F(ParticleCombinerTest, DStar)
   {
-    StoreObjPtr<ParticleList> inputD("D0");
-    StoreObjPtr<ParticleList> inputDbar("anti-D0");
-    StoreObjPtr<ParticleList> inputKM("K-");
-    StoreObjPtr<ParticleList> inputKP("K+");
-    StoreObjPtr<ParticleList> inputPiP("pi+");
-    StoreObjPtr<ParticleList> inputPiM("pi-");
+    TestParticleList K("K+");
+    K.addParticle(1);
+    K.addAntiParticle(2);
+    K.addAntiParticle(3);
 
+    TestParticleList pi("pi+");
+    pi.addParticle(4);
+    pi.addParticle(5);
+    pi.addAntiParticle(6);
 
-    DataStore::Instance().setInitializeActive(true);
-    inputD.registerAsPersistent();
-    inputDbar.registerAsPersistent();
-    inputKM.registerAsPersistent();
-    inputKP.registerAsPersistent();
-    inputPiP.registerAsPersistent();
-    inputPiM.registerAsPersistent();
-    DataStore::Instance().setInitializeActive(false);
+    {
+      TestParticleList D0("D0 -> K- pi+");
+      D0.addExpectedParticle(Particle::c_Flavored, 421, {K - 0, pi + 0});
+      D0.addExpectedParticle(Particle::c_Flavored, 421, {K - 0, pi + 1});
+      D0.addExpectedParticle(Particle::c_Flavored, 421, {K - 1, pi + 0});
+      D0.addExpectedParticle(Particle::c_Flavored, 421, {K - 1, pi + 1});
+      D0.addExpectedParticle(Particle::c_Flavored, -421, {K + 0, pi - 0});
+      D0.addAndCheckParticlesFromGenerator();
+    }
 
-    StoreArray<Particle> particles;
-    particles.appendNew(TLorentzVector(), 211, Particle::c_Flavored, Particle::c_MCParticle, 0);
-    particles.appendNew(TLorentzVector(), 211, Particle::c_Flavored, Particle::c_MCParticle, 1);
-    particles.appendNew(TLorentzVector(), -211, Particle::c_Flavored, Particle::c_MCParticle, 2);
+    {
+      TestParticleList D0("D0 -> K- K+");
+      D0.addExpectedParticle(Particle::c_Unflavored, 421, {K - 0, K + 0});
+      D0.addExpectedParticle(Particle::c_Unflavored, 421, {K - 1, K + 0});
+      D0.addAndCheckParticlesFromGenerator();
+    }
 
-    particles.appendNew(TLorentzVector(), -321, Particle::c_Flavored, Particle::c_MCParticle, 3);
-    particles.appendNew(TLorentzVector(), -321, Particle::c_Flavored, Particle::c_MCParticle, 4);
-    particles.appendNew(TLorentzVector(), 321, Particle::c_Flavored, Particle::c_MCParticle, 5);
+    TestParticleList D0("D0");
 
-    inputKM.create();
-    inputKM->initialize(-321, "K-");
+    TestParticleList DS("D*+ -> D0 pi+");
+    DS.addExpectedParticle(Particle::c_Flavored, 413, {D0 + 0, pi + 1});
+    DS.addExpectedParticle(Particle::c_Flavored, 413, {D0 + 1, pi + 0});
+    DS.addExpectedParticle(Particle::c_Flavored, 413, {D0 + 2, pi + 1});
+    DS.addExpectedParticle(Particle::c_Flavored, 413, {D0 + 3, pi + 0});
+    DS.addExpectedParticle(Particle::c_Flavored, 413, {D0 * 0, pi + 0});
+    DS.addExpectedParticle(Particle::c_Flavored, 413, {D0 * 0, pi + 1});
+    DS.addExpectedParticle(Particle::c_Flavored, 413, {D0 * 1, pi + 0});
+    DS.addExpectedParticle(Particle::c_Flavored, 413, {D0 * 1, pi + 1});
 
-    inputKP.create();
-    inputKP->initialize(321, "K+");
+    DS.addExpectedParticle(Particle::c_Flavored, -413, {D0 * 0, pi - 0});
+    DS.addExpectedParticle(Particle::c_Flavored, -413, {D0 * 1, pi - 0});
 
-    inputKM->bindAntiParticleList(*(inputKP));
-    inputKP->addParticle(particles[3]);
-    inputKP->addParticle(particles[4]);
-    inputKP->addParticle(particles[5]);
+    DS.addAndCheckParticlesFromGenerator();
 
-    inputPiP.create();
-    inputPiP->initialize(211, "pi+");
-    inputPiM.create();
-    inputPiM->initialize(-211, "pi-");
+  }
 
-    inputPiP->bindAntiParticleList(*(inputPiM));
+  TEST_F(ParticleCombinerTest, MuPlusMuMinus)
+  {
 
-    inputPiP->addParticle(particles[0]);
-    inputPiP->addParticle(particles[1]);
-    inputPiP->addParticle(particles[2]);
+    TestParticleList mu("mu+");
+    mu.addParticle(1);
+    mu.addParticle(2);
+    mu.addAntiParticle(3);
+    mu.addAntiParticle(4);
 
-    inputD.create();
-    inputD->initialize(421, "D0");
-    inputDbar.create();
-    inputDbar->initialize(-421, "anti-D0");
-    inputD->bindAntiParticleList(*(inputDbar));
+    TestParticleList D0("D0 -> mu+ mu-");
+    D0.addExpectedParticle(Particle::c_Unflavored, 421, {mu + 0, mu - 0});
+    D0.addExpectedParticle(Particle::c_Unflavored, 421, {mu + 0, mu - 1});
+    D0.addExpectedParticle(Particle::c_Unflavored, 421, {mu + 1, mu - 1});
+    D0.addExpectedParticle(Particle::c_Unflavored, 421, {mu + 1, mu - 0});
+    D0.addAndCheckParticlesFromGenerator();
 
-    Particle* part = nullptr;
-
-    ParticleGenerator combinerD0("D0 -> K- pi+");
-    combinerD0.init();
-
-    EXPECT_TRUE(combinerD0.loadNext()); // 6
-    EXPECT_EQ(std::vector<int>({5, 2}), combinerD0.getCurrentParticle().getDaughterIndices());
-    EXPECT_EQ(Particle::c_Flavored, combinerD0.getCurrentParticle().getFlavorType());
-    part = particles.appendNew(combinerD0.getCurrentParticle());
-    inputD->addParticle(part);
-
-    EXPECT_TRUE(combinerD0.loadNext());  // 7
-    EXPECT_EQ(std::vector<int>({3, 0}), combinerD0.getCurrentParticle().getDaughterIndices());
-    EXPECT_EQ(Particle::c_Flavored, combinerD0.getCurrentParticle().getFlavorType());
-    part = particles.appendNew(combinerD0.getCurrentParticle());
-    inputD->addParticle(part);
-
-    EXPECT_TRUE(combinerD0.loadNext());  // 8
-    EXPECT_EQ(std::vector<int>({4, 0}), combinerD0.getCurrentParticle().getDaughterIndices());
-    EXPECT_EQ(Particle::c_Flavored, combinerD0.getCurrentParticle().getFlavorType());
-    part = particles.appendNew(combinerD0.getCurrentParticle());
-    inputD->addParticle(part);
-
-    EXPECT_TRUE(combinerD0.loadNext());  // 9
-    EXPECT_EQ(std::vector<int>({3, 1}), combinerD0.getCurrentParticle().getDaughterIndices());
-    EXPECT_EQ(Particle::c_Flavored, combinerD0.getCurrentParticle().getFlavorType());
-    part = particles.appendNew(combinerD0.getCurrentParticle());
-    inputD->addParticle(part);
-
-    EXPECT_TRUE(combinerD0.loadNext());  // 10
-    EXPECT_EQ(std::vector<int>({4, 1}), combinerD0.getCurrentParticle().getDaughterIndices());
-    EXPECT_EQ(Particle::c_Flavored, combinerD0.getCurrentParticle().getFlavorType());
-    part = particles.appendNew(combinerD0.getCurrentParticle());
-    inputD->addParticle(part);
-
-
-    EXPECT_FALSE(combinerD0.loadNext());
-
-    ParticleGenerator combinerD0_KK("D0 -> K+ K-"); //non-self-conjugated particle
-    combinerD0_KK.init();
-
-    EXPECT_TRUE(combinerD0_KK.loadNext()); // 11
-    EXPECT_EQ(std::vector<int>({5, 3}), combinerD0_KK.getCurrentParticle().getDaughterIndices());
-    EXPECT_EQ(Particle::c_Unflavored, combinerD0_KK.getCurrentParticle().getFlavorType());
-    part = particles.appendNew(combinerD0_KK.getCurrentParticle());
-    inputD->addParticle(part);
-
-    EXPECT_TRUE(combinerD0_KK.loadNext()); // 12
-    EXPECT_EQ(std::vector<int>({5, 4}), combinerD0_KK.getCurrentParticle().getDaughterIndices());
-    EXPECT_EQ(Particle::c_Unflavored, combinerD0_KK.getCurrentParticle().getFlavorType());
-    part = particles.appendNew(combinerD0_KK.getCurrentParticle());
-    inputD->addParticle(part);
-
-    EXPECT_FALSE(combinerD0_KK.loadNext());
-
-    ParticleGenerator combinerDStar("D*+ -> D0 pi+");
-    combinerDStar.init();
-
-    EXPECT_TRUE(combinerDStar.loadNext());
-    EXPECT_EQ(std::vector<int>({11, 2}), combinerDStar.getCurrentParticle().getDaughterIndices());
-
-    EXPECT_TRUE(combinerDStar.loadNext());
-    EXPECT_EQ(std::vector<int>({12, 2}), combinerDStar.getCurrentParticle().getDaughterIndices());
-
-    EXPECT_TRUE(combinerDStar.loadNext());
-    EXPECT_EQ(std::vector<int>({9, 0}), combinerDStar.getCurrentParticle().getDaughterIndices());
-
-    EXPECT_TRUE(combinerDStar.loadNext());
-    EXPECT_EQ(std::vector<int>({10, 0}), combinerDStar.getCurrentParticle().getDaughterIndices());
-
-    EXPECT_TRUE(combinerDStar.loadNext());
-    EXPECT_EQ(std::vector<int>({7, 1}), combinerDStar.getCurrentParticle().getDaughterIndices());
-
-    EXPECT_TRUE(combinerDStar.loadNext());
-    EXPECT_EQ(std::vector<int>({8, 1}), combinerDStar.getCurrentParticle().getDaughterIndices());
-
-    EXPECT_TRUE(combinerDStar.loadNext());
-    EXPECT_EQ(std::vector<int>({11, 0}), combinerDStar.getCurrentParticle().getDaughterIndices());
-
-    EXPECT_TRUE(combinerDStar.loadNext());
-    EXPECT_EQ(std::vector<int>({12, 0}), combinerDStar.getCurrentParticle().getDaughterIndices());
-
-    EXPECT_TRUE(combinerDStar.loadNext());
-    EXPECT_EQ(std::vector<int>({11, 1}), combinerDStar.getCurrentParticle().getDaughterIndices());
-
-    EXPECT_TRUE(combinerDStar.loadNext());
-    EXPECT_EQ(std::vector<int>({12, 1}), combinerDStar.getCurrentParticle().getDaughterIndices());
-
-    EXPECT_FALSE(combinerDStar.loadNext());
 
   }
 

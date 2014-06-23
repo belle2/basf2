@@ -41,7 +41,7 @@ TMVA::MethodMockPlugin::~MethodMockPlugin(void)
 {
 }
 
-Bool_t TMVA::MethodMockPlugin::HasAnalysisType(Types::EAnalysisType type, UInt_t numberClasses, UInt_t numberTargets)
+Bool_t TMVA::MethodMockPlugin::HasAnalysisType(Types::EAnalysisType, UInt_t, UInt_t)
 {
   return kTRUE;
 }
@@ -83,20 +83,20 @@ void TMVA::MethodMockPlugin::Train()
 
 }
 
-void TMVA::MethodMockPlugin::AddWeightsXMLTo(void* parent) const
+void TMVA::MethodMockPlugin::AddWeightsXMLTo(void*) const
 {
 }
 
-void TMVA::MethodMockPlugin::ReadWeightsFromXML(void* parent)
+void TMVA::MethodMockPlugin::ReadWeightsFromXML(void*)
 {
 
 }
 
-void  TMVA::MethodMockPlugin::ReadWeightsFromStream(std::istream& istr)
+void  TMVA::MethodMockPlugin::ReadWeightsFromStream(std::istream&)
 {
 }
 
-Double_t TMVA::MethodMockPlugin::GetMvaValue(Double_t* err, Double_t* errUpper)
+Double_t TMVA::MethodMockPlugin::GetMvaValue(Double_t*, Double_t*)
 {
 
   Belle2::MockPluginInspector& inspector = Belle2::MockPluginInspector::GetInstance();

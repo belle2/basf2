@@ -6,7 +6,6 @@
 // Date : 2 - Aug - 2013
 //-
 
-
 #include "daq/dataobjects/SendTrailer.h"
 
 using namespace std;

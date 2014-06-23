@@ -8,7 +8,7 @@
 
 #include <daq/rawdata/modules/DeSerializerFILE.h>
 #ifdef REDUCED_RAWCOPPER
-#include <rawdata/dataobjects/RawCOPPERFormat_v1.h>
+#include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
 #endif
 using namespace std;
 using namespace Belle2;
@@ -137,7 +137,7 @@ int* DeSerializerFILEModule::readOneDataBlock(int* malloc_flag, int* size_word, 
 
     int pos_data_length;
 #ifdef REDUCED_RAWCOPPER
-    pos_data_length = RawCOPPERFormat_v1::POS_DATA_LENGTH;
+    pos_data_length = PreRawCOPPERFormat_latest::POS_DATA_LENGTH;
 #else
     pos_data_length = RawCOPPER::POS_DATA_LENGTH;
 #endif
@@ -147,7 +147,7 @@ int* DeSerializerFILEModule::readOneDataBlock(int* malloc_flag, int* size_word, 
 
 #ifdef REDUCED_RAWCOPPER
     *size_word = length_buf[ pos_data_length - 1 ] +
-                 RawCOPPERFormat_v1::SIZE_COPPER_DRIVER_HEADER + RawCOPPERFormat_v1::SIZE_COPPER_DRIVER_TRAILER
+                 PreRawCOPPERFormat_latest::SIZE_COPPER_DRIVER_HEADER + PreRawCOPPERFormat_latest::SIZE_COPPER_DRIVER_TRAILER
                  + m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS + m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS;
     start_word = 1 + pos_data_length + m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS;
     stop_word = *size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS;

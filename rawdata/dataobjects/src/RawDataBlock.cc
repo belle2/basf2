@@ -123,6 +123,7 @@ int* RawDataBlock::GetBuffer(int n)
 
 void RawDataBlock::SetBuffer(int* bufin, int nwords, int malloc_flag, int num_events, int num_nodes)
 {
+
   if (bufin == NULL) {
     printf("[DEBUG] bufin is NULL. Exting...\n");
     exit(1);

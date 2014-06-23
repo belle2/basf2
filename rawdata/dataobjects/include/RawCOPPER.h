@@ -12,28 +12,36 @@
 // Includes
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/time.h>
 
 #include <rawdata/dataobjects/RawDataBlock.h>
-#include <rawdata/dataobjects/RawHeader.h>
-#include <rawdata/dataobjects/RawTrailer.h>
+#include <rawdata/dataobjects/RawCOPPERFormat.h>
+#include <rawdata/dataobjects/RawCOPPERFormat_latest.h>
+#include <rawdata/dataobjects/RawCOPPERFormat_v0.h>
+#include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
+#include <rawdata/dataobjects/PreRawCOPPERFormat_v0.h>
 #include <framework/datastore/DataStore.h>
+
 
 
 #include <TObject.h>
 
 //#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 
-
+using namespace std;
 
 #define DETECTOR_MASK 0xFF000000 // tentative
 #define SVD_ID  0x01000000 // tentative
 #define CDC_ID  0x02000000 // tentative
 #define BPID_ID 0x03000000 // tentative
 #define EPID_ID 0x04000000 // tentative
-#define ECL_ID  0x05000000 // tentative
-#define KLM_ID  0x06000000 // tentative
-
+#define BECL_ID  0x05000000 // tentative
+#define EECL_ID  0x06000000 // tentative
+#define BKLM_ID  0x07000000 // tentative
+#define EKLM_ID  0x08000000 // tentative
+// Divide ECL and KLM to barrel and endcap categories from Itoh-san's suggestion
+// Updated on May 9, 2014
 
 namespace Belle2 {
   /** \addtogroup dataobjects
@@ -58,12 +66,14 @@ namespace Belle2 {
     //
     // Get position of or pointer to data
     //
+
+    //! set buffer ( malloc_flag : m_buffer is freeed( = 0 )/ not freeed( = 1 ) in Destructer )
+    void SetBuffer(int* bufin, int nwords, int malloc_flag, int num_events, int num_nodes);
+
     ///////////////////////////////////////////////////////////////////////////////////////
     // POINTER TO "DETECTOR BUFFER"
     //( after removing "B2link headers" from "FINESSE buffer". THIS IS THE RAW DATA FROM A DETECTOR
     ///////////////////////////////////////////////////////////////////////////////////////
-
-
     //! get Detector buffer length
     int GetDetectorNwords(int n, int finesse_num);
 
@@ -215,6 +225,9 @@ namespace Belle2 {
     //! get magic word of  COPPER driver trailer
     unsigned int GetMagicDriverTrailer(int n);
 
+    //! Get checksum in RawTrailer
+    unsigned int GetTrailerChksum(int  n);
+
     //! Check if COPPER Magic words are correct
     bool CheckCOPPERMagic(int n);
 
@@ -257,493 +270,425 @@ namespace Belle2 {
     //! Get timeval
     void GetTTTimeVal(int n, struct timeval* tv);
 
-    //
-    // size of "COPPER front header" and "COPPER trailer"
-    //
-    //! Copper data words = ( total_data_length in COPPER header ) + COPPER_HEADER_TRAILER_NWORDS
+    //! read data, detect and set the version number of the data format
+    void SetVersion();
+
+    //! Get timeval
+    void SetVersion(string class_name);
+
+    //! Check the version number of data format
+    void CheckVersionSetBuffer();
+
+    //! show m_buffer
+    void ShowBuffer();
+
     enum {
-      SIZE_COPPER_DRIVER_HEADER = 7,
-      SIZE_COPPER_DRIVER_TRAILER = 2
+      POS_FORMAT_VERSION = 1,
+      FORMAT_MASK = 0x0000FF00
     };
 
-    //
-    // Data Format : "COPPER header"
-    //
-    enum {
-      POS_MAGIC_COPPER_1 = 0,
-      POS_EVE_NUM_COPPER = 1,
-      POS_SUBSYSTEM_ID = 2,
-      POS_CRATE_ID = 3,
-      POS_SLOT_ID = 4,
-      POS_MAGIC_COPPER_2 = 7,
-      POS_DATA_LENGTH = 8,
-      POS_CH_A_DATA_LENGTH = 9,
-      POS_CH_B_DATA_LENGTH = 10,
-      POS_CH_C_DATA_LENGTH = 11,
-      POS_CH_D_DATA_LENGTH = 12,
+    //! class to access
+    RawCOPPERFormat* m_access;
 
-      SIZE_COPPER_HEADER = 13
-    };
-
-
-
-    //
-    // Data Format : "COPPER Trailer"
-    //
-    enum {
-      POS_MAGIC_COPPER_3 = 0,
-      POS_CHKSUM_COPPER = 1,
-      POS_MAGIC_COPPER_4 = 2,
-
-      SIZE_COPPER_TRAILER = 3
-    };
-
-    //
-    // Data Format : "B2Link HSLB Header"
-    //
-    enum {
-      POS_MAGIC_B2LHSLB = 0,
-      //      POS_EVE_CNT_B2LHSLB = 1,
-      SIZE_B2LHSLB_HEADER = 1
-    };
-
-    //
-    // Data Format : "B2Link HSLB Trailer"
-    //
-    enum {
-      POS_CHKSUM_B2LHSLB = 0,
-      SIZE_B2LHSLB_TRAILER = 1
-    };
-
-
-    // Data Format : "B2Link FEE Header"
-    // modified by Nov. 21, 2013, Nakao-san's New firmware?
-    enum {
-      POS_TT_CTIME_TYPE = 0,
-      POS_TT_TAG = 1,
-      POS_TT_UTIME = 2,
-      POS_EXP_RUN = 3,
-      POS_B2L_CTIME = 4,
-      SIZE_B2LFEE_HEADER = 5
-    };
-
-
-    //
-    // Data Format : B2Link FEE Trailer
-    //
-    enum {
-      POS_CHKSUM_B2LFEE = 0,
-      SIZE_B2LFEE_TRAILER = 1
-    };
-
-    //
-    // COPPER magic words
-    //
-    enum {
-      COPPER_MAGIC_DRIVER_HEADER = 0x7FFF0008,
-      COPPER_MAGIC_FPGA_HEADER = 0xFFFFFAFA,
-      COPPER_MAGIC_FPGA_TRAILER = 0xFFFFF5F5,
-      COPPER_MAGIC_DRIVER_TRAILER = 0x7FFF0009
-    };
-
-    //! header ( not recorded )
-    RawHeader tmp_header;
-
-    //! trailer ( not recorded )
-    RawTrailer tmp_trailer;
+    //! Version of the format
+    int m_version;
 
   protected :
     ///ver.2 Change FEE format as presented at B2GM in Nov.2013 ( Nov.20, 2013)
-    ClassDef(RawCOPPER, 2);
+    ///ver.3 Change FEE format as presented at B2GM in Nov.2013 ( May 1, 2014)
+    ClassDef(RawCOPPER, 3);
 
   };
 
 
-
   inline int* RawCOPPER::GetRawHdrBufPtr(int n)
   {
-    int pos_nwords = GetBufferPos(n);
-    return &(m_buffer[ pos_nwords ]);
+    CheckVersionSetBuffer();
+    return m_access->GetRawHdrBufPtr(n);
   }
 
   inline int* RawCOPPER::GetRawTrlBufPtr(int n)
   {
-    int pos_nwords;
-    RawTrailer trl;
-
-    if (n == (m_num_events * m_num_nodes) - 1) {
-      pos_nwords = m_nwords - trl.GetTrlNwords();
-    } else {
-      pos_nwords = GetBufferPos(n + 1) - trl.GetTrlNwords();
-    }
-    return &(m_buffer[ pos_nwords ]);
+    CheckVersionSetBuffer();
+    return m_access->GetRawTrlBufPtr(n);
   }
 
   inline unsigned int RawCOPPER::GetDriverChkSum(int n)
   {
-    int pos_nwords = GetBufferPos(n) + GetBlockNwords(n)
-                     - RawTrailer::RAWTRAILER_NWORDS - SIZE_COPPER_DRIVER_TRAILER;
-    return m_buffer[ pos_nwords ];
+    CheckVersionSetBuffer();
+    return m_access->GetDriverChkSum(n);
   }
 
   inline int RawCOPPER::GetCOPPERNodeId(int n)
   {
-    RawHeader hdr;
-    int pos_nwords = GetBufferPos(n) + hdr.POS_SUBSYS_ID;
-    return m_buffer[ pos_nwords ];
+    CheckVersionSetBuffer();
+    return m_access->GetCOPPERNodeId(n);
   }
 
 
   inline int RawCOPPER::GetExpNo(int n)
   {
-    RawHeader hdr;
-    hdr.SetBuffer(GetBuffer(n));
-    return hdr.GetExpNo();
+    CheckVersionSetBuffer();
+    return m_access->GetExpNo(n);
   }
 
   inline int RawCOPPER::GetRunNo(int n)
   {
-    RawHeader hdr;
-    hdr.SetBuffer(GetBuffer(n));
-    return hdr.GetRunNo();
+    CheckVersionSetBuffer();
+    return m_access->GetRunNo(n);
   }
 
 
   inline int RawCOPPER::GetSubRunNo(int n)
   {
-    RawHeader hdr;
-    hdr.SetBuffer(GetBuffer(n));
-    return hdr.GetSubRunNo();
+    CheckVersionSetBuffer();
+    return m_access->GetSubRunNo(n);
   }
 
   inline int RawCOPPER::GetRunNoSubRunNo(int n)
   {
-    RawHeader hdr;
-    hdr.SetBuffer(GetBuffer(n));
-    return hdr.GetRunNoSubRunNo();
+    CheckVersionSetBuffer();
+    return m_access->GetRunNoSubRunNo(n);
   }
 
   inline unsigned int RawCOPPER::GetEveNo(int n)
   {
-    RawHeader hdr;
-    hdr.SetBuffer(GetBuffer(n));
-    return hdr.GetEveNo();
+    CheckVersionSetBuffer();
+    return m_access->GetEveNo(n);
   }
 
 
   inline int RawCOPPER::GetSubsysId(int n)
   {
-    RawHeader hdr;
-    hdr.SetBuffer(GetBuffer(n));
-    return hdr.GetSubsysId();
+    CheckVersionSetBuffer();
+    return m_access->GetSubsysId(n);
   }
 
 
   inline int RawCOPPER::GetDataType(int n)
   {
-    RawHeader hdr;
-    hdr.SetBuffer(GetBuffer(n));
-    return hdr.GetDataType();
+    CheckVersionSetBuffer();
+    return m_access->GetDataType(n);
   }
 
   inline int RawCOPPER::GetTruncMask(int n)
   {
-    RawHeader hdr;
-    hdr.SetBuffer(GetBuffer(n));
-    return hdr.GetTruncMask();
+    CheckVersionSetBuffer();
+    return m_access->GetTruncMask(n);
   }
 
 
   inline unsigned int RawCOPPER::GetCOPPERCounter(int n)
   {
-    RawHeader hdr;
-    int pos_nwords = GetBufferPos(n) + POS_EVE_NUM_COPPER + hdr.RAWHEADER_NWORDS;
-    return (unsigned int)(m_buffer[ pos_nwords ]);
+    CheckVersionSetBuffer();
+    return m_access->GetCOPPERCounter(n);
   }
-
-
-
 
   inline int RawCOPPER::Get1stDetectorNwords(int n)
   {
-#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-    CheckB2LFEEHeaderVersion(n);
-#endif
-    int nwords = 0;
-    if (Get1stFINESSENwords(n) > 0) {
-      nwords = Get1stFINESSENwords(n) -  SIZE_B2LHSLB_HEADER - SIZE_B2LFEE_HEADER
-               - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
-    }
-    return nwords;
+    CheckVersionSetBuffer();
+    return m_access->Get1stDetectorNwords(n);
   }
 
   inline int RawCOPPER::Get2ndDetectorNwords(int n)
   {
-#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-    CheckB2LFEEHeaderVersion(n);
-#endif
-    int nwords = 0;
-    if (Get2ndFINESSENwords(n) > 0) {
-      nwords = Get2ndFINESSENwords(n) -  SIZE_B2LHSLB_HEADER -
-               SIZE_B2LFEE_HEADER - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
-    }
-    return nwords;
+    CheckVersionSetBuffer();
+    return m_access->Get2ndDetectorNwords(n);
   }
 
   inline int RawCOPPER::Get3rdDetectorNwords(int n)
   {
-#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-    CheckB2LFEEHeaderVersion(n);
-#endif
-    int nwords = 0;
-    if (Get3rdFINESSENwords(n) > 0) {
-      nwords = Get3rdFINESSENwords(n) -  SIZE_B2LHSLB_HEADER -
-               SIZE_B2LFEE_HEADER - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
-    }
-    return nwords;
+    CheckVersionSetBuffer();
+    return m_access->Get3rdDetectorNwords(n);
   }
 
   inline int RawCOPPER::Get4thDetectorNwords(int n)
   {
-#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-    CheckB2LFEEHeaderVersion(n);
-#endif
-    int nwords = 0;
-    if (Get4thFINESSENwords(n) > 0) {
-      nwords = Get4thFINESSENwords(n) -  SIZE_B2LHSLB_HEADER -
-               SIZE_B2LFEE_HEADER - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER;
-    }
-    return nwords;
+    CheckVersionSetBuffer();
+    return m_access->Get4thDetectorNwords(n);
   }
-
-
 
   inline int RawCOPPER::Get1stFINESSENwords(int n)
   {
-    RawHeader hdr;
-    int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_CH_A_DATA_LENGTH;
-    return m_buffer[ pos_nwords ];
+    CheckVersionSetBuffer();
+    return m_access->Get1stFINESSENwords(n);
   }
 
   inline int RawCOPPER::Get2ndFINESSENwords(int n)
   {
-    RawHeader hdr;
-    int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_CH_B_DATA_LENGTH;
-    return m_buffer[ pos_nwords ];
+    CheckVersionSetBuffer();
+    return m_access->Get2ndFINESSENwords(n);
   }
 
   inline int RawCOPPER::Get3rdFINESSENwords(int n)
   {
-    RawHeader hdr;
-    int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_CH_C_DATA_LENGTH;
-    return m_buffer[ pos_nwords ];
+    CheckVersionSetBuffer();
+    return m_access->Get3rdFINESSENwords(n);
   }
 
   inline int RawCOPPER::Get4thFINESSENwords(int n)
   {
-    RawHeader hdr;
-    int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_CH_D_DATA_LENGTH;
-    return m_buffer[ pos_nwords ];
+    CheckVersionSetBuffer();
+    return m_access->Get4thFINESSENwords(n);
   }
-
-
-
-
-
 
   inline int RawCOPPER::GetOffset1stFINESSE(int n)
   {
-    RawHeader hdr;
-    int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + SIZE_COPPER_HEADER;
-    return pos_nwords;
+    CheckVersionSetBuffer();
+    return m_access->GetOffset1stFINESSE(n);
   }
 
   inline int RawCOPPER::GetOffset2ndFINESSE(int n)
   {
-    return GetOffset1stFINESSE(n) + Get1stFINESSENwords(n);
+    CheckVersionSetBuffer();
+    return m_access->GetOffset2ndFINESSE(n);
   }
 
   inline int RawCOPPER::GetOffset3rdFINESSE(int n)
   {
-    return GetOffset2ndFINESSE(n) + Get2ndFINESSENwords(n);
+    CheckVersionSetBuffer();
+    return m_access->GetOffset3rdFINESSE(n);
   }
 
   inline int RawCOPPER::GetOffset4thFINESSE(int n)
   {
-    return GetOffset3rdFINESSE(n) + Get3rdFINESSENwords(n);
+    CheckVersionSetBuffer();
+    return m_access->GetOffset4thFINESSE(n);
   }
-
-
 
   inline int* RawCOPPER::Get1stFINESSEBuffer(int n)
   {
-    int pos_nwords = GetOffset1stFINESSE(n);
-    if (pos_nwords >= m_nwords) {
-      printf("[DEBUG] Data size is smaller than data position info. Exting...\n");
-      exit(1);
-    }
-    return &(m_buffer[ pos_nwords]);
+    CheckVersionSetBuffer();
+    return m_access->Get1stFINESSEBuffer(n);
   }
 
   inline int* RawCOPPER::Get2ndFINESSEBuffer(int n)
   {
-    int pos_nwords = GetOffset2ndFINESSE(n);
-    if (pos_nwords >= m_nwords) {
-      printf("[DEBUG] Data size is smaller than data position info. Exting...\n");
-      exit(1);
-    }
-    return &(m_buffer[ pos_nwords]);
+    CheckVersionSetBuffer();
+    return m_access->Get2ndFINESSEBuffer(n);
   }
 
   inline int* RawCOPPER::Get3rdFINESSEBuffer(int n)
   {
-    int pos_nwords = GetOffset3rdFINESSE(n);
-    if (pos_nwords >= m_nwords) {
-      printf("[DEBUG] Data size is smaller than data position info. Exting...\n");
-      exit(1);
-    }
-    return &(m_buffer[ pos_nwords]);
+    CheckVersionSetBuffer();
+    return m_access->Get3rdFINESSEBuffer(n);
   }
 
   inline int* RawCOPPER::Get4thFINESSEBuffer(int n)
   {
-    int pos_nwords = GetOffset4thFINESSE(n);
-    if (pos_nwords >= m_nwords) {
-      printf("[DEBUG] Data size is smaller than data position info. Exting...\n");
-      exit(1);
-    }
-    return &(m_buffer[ pos_nwords]);
+    CheckVersionSetBuffer();
+    return m_access->Get4thFINESSEBuffer(n);
   }
-
-
-
-
-
 
   inline int* RawCOPPER::Get1stDetectorBuffer(int n)
   {
-#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-    CheckB2LFEEHeaderVersion(n);
-#endif
-    if (Get1stFINESSENwords(n) > 0) {
-      int pos_nwords = GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
-      return &(m_buffer[ pos_nwords ]);
-    }
-    return NULL;
+    CheckVersionSetBuffer();
+    return m_access->Get1stDetectorBuffer(n);
   }
 
   inline int* RawCOPPER::Get2ndDetectorBuffer(int n)
   {
-#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-    CheckB2LFEEHeaderVersion(n);
-#endif
-    if (Get2ndFINESSENwords(n) > 0) {
-      int pos_nwords = GetOffset2ndFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
-      return &(m_buffer[ pos_nwords ]);
-    }
-    return NULL;
+    CheckVersionSetBuffer();
+    return m_access->Get2ndDetectorBuffer(n);
   }
 
   inline int* RawCOPPER::Get3rdDetectorBuffer(int n)
   {
-#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-    CheckB2LFEEHeaderVersion(n);
-#endif
-    if (Get3rdFINESSENwords(n) > 0) {
-      int pos_nwords = GetOffset3rdFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
-      return &(m_buffer[ pos_nwords ]);
-    }
-    return NULL;
+    CheckVersionSetBuffer();
+    return m_access->Get3rdDetectorBuffer(n);
   }
 
   inline int* RawCOPPER::Get4thDetectorBuffer(int n)
   {
-#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-    CheckB2LFEEHeaderVersion(n);
-#endif
-    if (Get4thFINESSENwords(n) > 0) {
-      int pos_nwords = GetOffset4thFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
-      return &(m_buffer[ pos_nwords ]);
-    }
-    return NULL;
+    CheckVersionSetBuffer();
+    return m_access->Get4thDetectorBuffer(n);
   }
 
   inline int* RawCOPPER::GetExpRunBuf(int n)
   {
-#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-    CheckB2LFEEHeaderVersion(n);
-#endif
-    int pos_nwords = GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + POS_EXP_RUN;
-    return &(m_buffer[ pos_nwords ]);
+    CheckVersionSetBuffer();
+    return m_access->GetExpRunBuf(n);
   }
-
-
 
   inline unsigned int RawCOPPER::GetMagicDriverHeader(int n)
   {
-    RawHeader hdr;
-    int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_MAGIC_COPPER_1;
-    return (unsigned int)(m_buffer[ pos_nwords ]);
+    CheckVersionSetBuffer();
+    return m_access->GetMagicDriverHeader(n);
   }
 
   inline unsigned int RawCOPPER::GetMagicFPGAHeader(int n)
   {
-    RawHeader hdr;
-    int pos_nwords = GetBufferPos(n) + hdr.RAWHEADER_NWORDS + POS_MAGIC_COPPER_2;
-    return (unsigned int)(m_buffer[ pos_nwords ]);
+    CheckVersionSetBuffer();
+    return m_access->GetMagicFPGAHeader(n);
   }
 
   inline unsigned int RawCOPPER::GetMagicFPGATrailer(int n)
   {
-    RawTrailer trl;
-    int pos_nwords = GetBufferPos(n) + GetBlockNwords(n) - trl.GetTrlNwords() - 3;
-
-    //    printf( "[DEBUG] 1 %d 2 %d 3 %d\n", GetBufferPos(n), GetBlockNwords(n), trl.GetTrlNwords());
-
-    return (unsigned int)(m_buffer[ pos_nwords ]);
+    CheckVersionSetBuffer();
+    return m_access->GetMagicFPGATrailer(n);
   }
 
   inline unsigned int RawCOPPER::GetMagicDriverTrailer(int n)
   {
-    RawTrailer trl;
-    int pos_nwords = GetBufferPos(n) + GetBlockNwords(n) - trl.GetTrlNwords() - 1;
-    return (unsigned int)(m_buffer[ pos_nwords ]);
+    CheckVersionSetBuffer();
+    return m_access->GetMagicDriverTrailer(n);
   }
 
+  inline unsigned int RawCOPPER::GetTrailerChksum(int  n)
+  {
+    CheckVersionSetBuffer();
+    return m_access->GetTrailerChksum(n);
+  }
 
   inline unsigned int RawCOPPER::GetTTCtimeTRGType(int n)
   {
-    RawHeader hdr;
-    hdr.SetBuffer(GetBuffer(n));
-    return hdr.GetTTCtimeTRGType();
+    CheckVersionSetBuffer();
+    return m_access->GetTTCtimeTRGType(n);
   }
 
   inline unsigned int RawCOPPER::GetTTUtime(int n)
   {
-    RawHeader hdr;
-    hdr.SetBuffer(GetBuffer(n));
-    return hdr.GetTTUtime();
+    CheckVersionSetBuffer();
+    return m_access->GetTTUtime(n);
   }
-
 
   inline int RawCOPPER::GetTTCtime(int n)
   {
-    RawHeader hdr;
-    hdr.SetBuffer(GetBuffer(n));
-    return hdr.GetTTCtime();
+    CheckVersionSetBuffer();
+    return m_access->GetTTCtime(n);
   }
-
 
   inline void RawCOPPER::GetTTTimeVal(int n, struct timeval* tv)
   {
-    RawHeader hdr;
-    hdr.SetBuffer(GetBuffer(n));
-    hdr.GetTTTimeVal(tv);
-    return ;
+    CheckVersionSetBuffer();
+    return m_access->GetTTTimeVal(n, tv);
+  }
+
+  inline int RawCOPPER::GetBufferPos(int n)
+  {
+    CheckVersionSetBuffer();
+    return m_access->GetBufferPos(n);
+  }
+
+  inline   unsigned int RawCOPPER::CalcDriverChkSum(int n)
+  {
+    CheckVersionSetBuffer();
+    return m_access->CalcDriverChkSum(n);
   }
 
 
+  inline  int RawCOPPER::GetNumFINESSEBlock(int n)
+  {
+    CheckVersionSetBuffer();
+    return m_access->GetNumFINESSEBlock(n);
+  }
 
+  inline  int RawCOPPER::GetDetectorNwords(int n, int finesse_num)
+  {
+    CheckVersionSetBuffer();
+    return m_access->GetDetectorNwords(n, finesse_num);
+  }
+
+  inline  int RawCOPPER::GetFINESSENwords(int n, int finesse_num)
+  {
+    CheckVersionSetBuffer();
+    return m_access->GetFINESSENwords(n, finesse_num);
+  }
+
+  inline  int RawCOPPER::GetOffsetFINESSE(int n, int finesse_num)
+  {
+    CheckVersionSetBuffer();
+    return m_access->GetOffsetFINESSE(n, finesse_num);
+  }
+
+  inline  int* RawCOPPER::GetFINESSEBuffer(int n, int finesse_num)
+  {
+    CheckVersionSetBuffer();
+    return m_access->GetFINESSEBuffer(n, finesse_num);
+  }
+
+  inline  int* RawCOPPER::GetDetectorBuffer(int n, int finesse_num)
+  {
+    CheckVersionSetBuffer();
+    return m_access->GetDetectorBuffer(n, finesse_num);
+  }
+
+  inline  unsigned int RawCOPPER::GetB2LFEE32bitEventNumber(int n)
+  {
+    CheckVersionSetBuffer();
+    return m_access->GetB2LFEE32bitEventNumber(n);
+  }
+
+  inline  unsigned int RawCOPPER::CalcXORChecksum(int* buf, int nwords)
+  {
+    CheckVersionSetBuffer();
+    return m_access->CalcXORChecksum(buf, nwords);
+  }
+
+  inline  void RawCOPPER::CheckData(int n,
+                                    unsigned int prev_evenum, unsigned int* cur_evenum_rawcprhdr,
+                                    unsigned int prev_copper_ctr, unsigned int* cur_copper_ctr,
+                                    int prev_runsubrun_no, int* cur_runsubrun_no)
+  {
+
+    CheckVersionSetBuffer();
+    m_access->CheckData(n,
+                        prev_evenum, cur_evenum_rawcprhdr,
+                        prev_copper_ctr, cur_copper_ctr,
+                        prev_runsubrun_no,  cur_runsubrun_no);
+    return;
+  }
+
+  inline  bool RawCOPPER::CheckCOPPERMagic(int n)
+  {
+    CheckVersionSetBuffer();
+    return m_access->CheckCOPPERMagic(n);
+  }
+
+  inline  void RawCOPPER::CheckUtimeCtimeTRGType(int n)
+  {
+    CheckVersionSetBuffer();
+    return m_access->CheckUtimeCtimeTRGType(n);
+  }
+
+  inline  double RawCOPPER::GetEventUnixTime(int n)
+  {
+    CheckVersionSetBuffer();
+    return m_access->GetEventUnixTime(n);
+  }
+
+  inline  unsigned int RawCOPPER::GetB2LHeaderWord(int n, int finesse_buffer_pos)
+  {
+    CheckVersionSetBuffer();
+    return m_access->GetB2LHeaderWord(n, finesse_buffer_pos);
+  }
+
+  inline  unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type,
+                                                        unsigned int m_trunc_mask, unsigned int prev_eve32,
+                                                        int prev_runsubrun_no, int* cur_runsubrun_no)
+  {
+    CheckVersionSetBuffer();
+    return m_access->FillTopBlockRawHeader(m_node_id, m_data_type,
+                                           m_trunc_mask, prev_eve32,
+                                           prev_runsubrun_no, cur_runsubrun_no);
+  }
+
+#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
+  inline  void RawCOPPER::CheckB2LFEEHeaderVersion(int n)
+  {
+    CheckVersionSetBuffer();
+    return m_access->CheckB2LFEEHeaderVersion(n);
+  }
+#endif
+
+  inline void RawCOPPER::CheckVersionSetBuffer()
+  {
+    if (((m_buffer[ POS_FORMAT_VERSION ] & FORMAT_MASK) >> 8)  != m_version
+        || m_access == NULL) {
+      SetVersion();
+    }
+    m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
+  }
 }
 
 #endif

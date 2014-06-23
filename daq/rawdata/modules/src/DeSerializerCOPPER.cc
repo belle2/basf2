@@ -13,7 +13,7 @@
 #include <rawdata/dataobjects/RawHeader.h>
 #include <rawdata/dataobjects/RawTrailer.h>
 #else
-#include <rawdata/dataobjects/PreRawCOPPERFormat_v1.h>
+#include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
 #endif
 
 
@@ -728,7 +728,7 @@ void DeSerializerCOPPERModule::event()
 #ifndef REDUCED_RAWCOPPER
     RawCOPPER temp_rawcopper;
 #else
-    PreRawCOPPERFormat_v1 temp_rawcopper;
+    PreRawCOPPERFormat_latest temp_rawcopper;
 #endif
     temp_rawcopper.SetBuffer(temp_buf, m_size_word, 0, num_events, num_nodes);
 
@@ -756,6 +756,8 @@ void DeSerializerCOPPERModule::event()
 #endif
 
 
+
+
   //
   // Update EventMetaData
   //
@@ -765,7 +767,17 @@ void DeSerializerCOPPERModule::event()
   m_eventMetaDataPtr->setEvent(n_basf2evt);
 
 
-
+  //
+  // Monitor
+  //
+  if (max_nevt >= 0 || max_seconds >= 0.) {
+    if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC >= max_nevt && max_nevt > 0)
+        || (getTimeSec() - m_start_time > max_seconds && max_seconds > 0.)) {
+      printf("[DEBUG] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n",
+             max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, getTimeSec() - m_start_time);
+      m_eventMetaDataPtr->setEndOfData();
+    }
+  }
 
   //
   // Print current status

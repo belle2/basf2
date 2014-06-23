@@ -34,8 +34,8 @@
 #include <rawdata/dataobjects/RawCOPPER.h>
 #else
 //#include <rawdata/dataobjects/PreRawCOPPER.h>
-#include <rawdata/dataobjects/PreRawCOPPERFormat_v1.h>
-#include <rawdata/dataobjects/RawCOPPERFormat_v1.h>
+#include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
+#include <rawdata/dataobjects/RawCOPPERFormat_latest.h>
 #endif
 
 
@@ -79,7 +79,7 @@ namespace Belle2 {
 
 #ifdef REDUCED_RAWCOPPER
     //! Handle to data from HSLBs
-    const PreRawCOPPERFormat_v1 m_pre_rawcpr;
+    const PreRawCOPPERFormat_latest m_pre_rawcpr;
 #endif
 
 

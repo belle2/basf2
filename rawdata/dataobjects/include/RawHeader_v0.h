@@ -1,13 +1,13 @@
 //+
-// File : RawHeader.h
-// Description : Module to handle RawHeader attached to raw data from COPPER
+// File : RawHeader_v0.h
+// Description : Module to handle RawHeader_v0 attached to raw data from COPPER
 //
 // Author : Satoru Yamada, IPNS, KEK
 // Date : 2 - Aug - 2013
 //-
 
-#ifndef RAWHEADER_H
-#define RAWHEADER_H
+#ifndef RAWHEADER_V0_H
+#define RAWHEADER_V0_H
 
 #include <string.h>
 #include <stdlib.h>
@@ -24,21 +24,21 @@ namespace Belle2 {
     */
 
   /**
-   * The Raw Header class
+   * The Raw Header class ver.0 ( from August, 2013 to April, 2014 )
    * This class defines the format of the header of RawCOPPER class data
    * and used for extracting header info from RawCOPPER object
    */
 
-  class RawHeader : public TObject {
+  class RawHeader_v0 : public TObject {
   public:
     //! Default constructor
-    RawHeader();
+    RawHeader_v0();
 
     //! Constructor using existing pointer to raw data buffer
-    RawHeader(int*);
+    RawHeader_v0(int*);
 
     //! Destructor
-    ~RawHeader();
+    ~RawHeader_v0();
 
     //! Get header contents
     int* GetBuffer() { return m_buffer; }
@@ -137,6 +137,12 @@ namespace Belle2 {
       Experimental(10bit) #, Run#(14bit), restat# bit mask(8bit)
     */
     enum {
+      DATA_FORMAT_VERSION = 0,
+      FORMAT_VERSION__MASK = 0x0000FF00,
+      FORMAT_VERSION_SHIFT = 8
+    };
+
+    enum {
       EXP_MASK = 0xFFC00000,
       EXP_SHIFT = 22,
       RUNNO_MASK = 0x003FFF00,
@@ -190,15 +196,15 @@ namespace Belle2 {
     };
 
   private:
-    //! do not record buffer ( RawCOPPER includes buffer of RawHeader and RawTrailer )
+    //! do not record buffer ( RawCOPPER includes buffer of RawHeader_v0 and RawTrailer )
     int* m_buffer;
 
     /// To derive from TObject
-    ClassDef(RawHeader, 1);
+    ClassDef(RawHeader_v0, 1);
   };
 
 
-  inline void RawHeader::CheckSetBuffer()
+  inline void RawHeader_v0::CheckSetBuffer()
   {
     if (m_buffer == NULL) {
       perror("m_buffer is NULL. Exiting...");
@@ -206,15 +212,23 @@ namespace Belle2 {
     }
   }
 
-  inline void RawHeader::CheckGetBuffer()
+  inline void RawHeader_v0::CheckGetBuffer()
   {
-    if (m_buffer == NULL || m_buffer[ POS_TERM_HEADER ] != MAGIC_WORD_TERM_HEADER) {
-      printf("[DEBUG] m_buffer is NULL(%p) or magic word is invalid(0x%x). Data is corrupted or header info has not yet filled. Exiting...",
-             m_buffer,
-             m_buffer[ POS_TERM_HEADER ]
-            );
+
+    if (m_buffer == NULL) {
+      printf("[DEBUG] m_buffer is NULL(%p). Data is corrupted or header info has not yet filled. Exiting...",
+             m_buffer);
       exit(1);
+    } else if (m_buffer[ POS_TERM_HEADER ] != MAGIC_WORD_TERM_HEADER) {
+      printf("[DEBUG]  magic word is invalid(0x%x, %p pos %d). Data is corrupted or header info has not yet filled. Exiting...",
+             m_buffer[ POS_TERM_HEADER ], m_buffer, POS_TERM_HEADER);
+
+      exit(1);
+
     }
+
+
+
   }
 
 
@@ -222,7 +236,7 @@ namespace Belle2 {
 //
 // Set info.
 //
-  inline void RawHeader::Initialize()
+  inline void RawHeader_v0::Initialize()
   {
     CheckSetBuffer();
     memset(m_buffer, 0, sizeof(int)*RAWHEADER_NWORDS);
@@ -231,83 +245,83 @@ namespace Belle2 {
 
   }
 
-  inline void RawHeader::SetMagicWordEntireHeader()
+  inline void RawHeader_v0::SetMagicWordEntireHeader()
   {
     m_buffer[ POS_TERM_HEADER ] = MAGIC_WORD_TERM_HEADER;
   }
 
-  inline void RawHeader::SetNwords(int nwords)
+  inline void RawHeader_v0::SetNwords(int nwords)
   {
     CheckSetBuffer();
     m_buffer[ POS_NWORDS ] = nwords;
 
   }
 
-  inline void RawHeader::SetEveNo(unsigned int eve_no)
+  inline void RawHeader_v0::SetEveNo(unsigned int eve_no)
   {
     CheckSetBuffer();
     m_buffer[ POS_EVE_NO ] = eve_no;
   }
 
-  inline void RawHeader::SetSubsysId(int subsys_id)
+  inline void RawHeader_v0::SetSubsysId(int subsys_id)
   {
     CheckSetBuffer();
     m_buffer[ POS_SUBSYS_ID ] = subsys_id;
   }
 
-  inline void RawHeader::SetDataType(int data_type)
+  inline void RawHeader_v0::SetDataType(int data_type)
   {
     CheckSetBuffer();
     m_buffer[ POS_TRUNC_MASK_DATATYPE ] =
       (data_type & 0x7FFFFFFF) | (m_buffer[ POS_TRUNC_MASK_DATATYPE ] & 0x80000000);
   }
 
-  inline void RawHeader::SetTruncMask(int trunc_mask)
+  inline void RawHeader_v0::SetTruncMask(int trunc_mask)
   {
     CheckSetBuffer();
     m_buffer[ POS_TRUNC_MASK_DATATYPE ] = (trunc_mask << 31) | (m_buffer[ POS_TRUNC_MASK_DATATYPE ] & 0x7FFFFFFF);
   }
 
-  /*   inline void RawHeader::SetB2LFEEHdrPart(unsigned int word1, unsigned int word2) */
+  /*   inline void RawHeader_v0::SetB2LFEEHdrPart(unsigned int word1, unsigned int word2) */
   /*   { */
   /*     m_buffer[ POS_HSLB_1 ] = word1; */
   /*     m_buffer[ POS_HSLB_2 ] = word2; */
   /*   } */
 
 
-  inline void RawHeader::SetOffset1stFINESSE(int offset_1st_FINESSE)
+  inline void RawHeader_v0::SetOffset1stFINESSE(int offset_1st_FINESSE)
   {
     CheckSetBuffer();
     m_buffer[ POS_OFFSET_1ST_FINESSE ] = offset_1st_FINESSE;
   }
 
-  inline void RawHeader::SetOffset2ndFINESSE(int offset_2nd_FINESSE)
+  inline void RawHeader_v0::SetOffset2ndFINESSE(int offset_2nd_FINESSE)
   {
     CheckSetBuffer();
     m_buffer[ POS_OFFSET_2ND_FINESSE ] = offset_2nd_FINESSE;
   }
 
-  inline void RawHeader::SetOffset3rdFINESSE(int offset_3rd_FINESSE)
+  inline void RawHeader_v0::SetOffset3rdFINESSE(int offset_3rd_FINESSE)
   {
     CheckSetBuffer();
     m_buffer[ POS_OFFSET_3RD_FINESSE ] = offset_3rd_FINESSE;
   }
 
-  inline void RawHeader::SetOffset4thFINESSE(int offset_4th_FINESSE)
+  inline void RawHeader_v0::SetOffset4thFINESSE(int offset_4th_FINESSE)
   {
     CheckSetBuffer();
     m_buffer[ POS_OFFSET_4TH_FINESSE ] = offset_4th_FINESSE;
   }
 
-  /*   inline void RawHeader::SetFTSW2Words(int* ftsw_buf) */
+  /*   inline void RawHeader_v0::SetFTSW2Words(int* ftsw_buf) */
   /*   { */
   /*     CheckSetBuffer(); */
   /*     memcpy(&(m_buffer[ POS_HSLB_1 ]), (char*)ftsw_buf, sizeof(int) * 2); */
   /*     return; */
   /*   } */
 
-  inline void RawHeader::SetFTSW2Words(unsigned int word1,
-                                       unsigned int word2)
+  inline void RawHeader_v0::SetFTSW2Words(unsigned int word1,
+                                          unsigned int word2)
   {
     CheckSetBuffer();
     m_buffer[ POS_TTCTIME_TRGTYPE ] = word1;
@@ -316,7 +330,7 @@ namespace Belle2 {
   }
 
 
-  inline void RawHeader::SetExpRunNumber(int* exprun_buf)
+  inline void RawHeader_v0::SetExpRunNumber(int* exprun_buf)
   {
     CheckSetBuffer();
     memcpy(&(m_buffer[ POS_EXP_RUN_NO ]), (char*)exprun_buf, sizeof(int) * 1);
@@ -328,59 +342,61 @@ namespace Belle2 {
 // Obtain info
 //
 
-  inline int RawHeader::GetNwords()
+  inline int RawHeader_v0::GetNwords()
   {
     CheckGetBuffer();
     return m_buffer[ POS_NWORDS ];
   }
 
-  inline int RawHeader::GetHdrNwords()
+  inline int RawHeader_v0::GetHdrNwords()
   {
+
     CheckGetBuffer();
+
     return m_buffer[ POS_HDR_NWORDS ];
   }
 
-  inline int RawHeader::GetExpNo()
+  inline int RawHeader_v0::GetExpNo()
   {
     CheckGetBuffer();
     return (((unsigned int)(m_buffer[ POS_EXP_RUN_NO ]) & EXP_MASK)
             >> EXP_SHIFT);
   }
 
-  inline int RawHeader::GetRunNoSubRunNo()
+  inline int RawHeader_v0::GetRunNoSubRunNo()
   {
     CheckGetBuffer();
     return ((unsigned int)(m_buffer[ POS_EXP_RUN_NO ]) &
             (RUNNO_MASK | SUBRUNNO_MASK));
   }
 
-  inline int RawHeader::GetRunNo()
+  inline int RawHeader_v0::GetRunNo()
   {
     CheckGetBuffer();
     return (((unsigned int)(m_buffer[ POS_EXP_RUN_NO ]) & RUNNO_MASK)
             >> RUNNO_SHIFT);
   }
 
-  inline int RawHeader::GetSubRunNo()
+  inline int RawHeader_v0::GetSubRunNo()
   {
     CheckGetBuffer();
     return (m_buffer[ POS_EXP_RUN_NO ] & SUBRUNNO_MASK);
   }
 
-  inline unsigned int RawHeader::GetExpRunNumberWord()
+  inline unsigned int RawHeader_v0::GetExpRunNumberWord()
   {
     CheckGetBuffer();
     return ((unsigned int)(m_buffer[ POS_EXP_RUN_NO ]));
   }
 
 
-  inline unsigned int RawHeader::GetEveNo()
+  inline unsigned int RawHeader_v0::GetEveNo()
   {
     CheckGetBuffer();
     return m_buffer[ POS_EVE_NO ];
   }
 
-  inline int RawHeader::GetSubsysId()
+  inline int RawHeader_v0::GetSubsysId()
   {
     CheckGetBuffer();
     return m_buffer[ POS_SUBSYS_ID ];
@@ -394,68 +410,68 @@ namespace Belle2 {
 
   }
 
-  inline int RawHeader::GetDataType()
+  inline int RawHeader_v0::GetDataType()
   {
     CheckGetBuffer();
     return (m_buffer[ POS_TRUNC_MASK_DATATYPE ] & 0x7FFFFFFF);
   }
 
-  inline int RawHeader::GetTruncMask()
+  inline int RawHeader_v0::GetTruncMask()
   {
     CheckGetBuffer();
     return (m_buffer[ POS_TRUNC_MASK_DATATYPE ] >> 23) & 0x1;
   }
 
 
-  inline int RawHeader::GetOffset1stFINESSE()
+  inline int RawHeader_v0::GetOffset1stFINESSE()
   {
     CheckGetBuffer();
     return m_buffer[ POS_OFFSET_1ST_FINESSE ];
   }
 
-  inline int RawHeader::GetOffset2ndFINESSE()
+  inline int RawHeader_v0::GetOffset2ndFINESSE()
   {
     CheckGetBuffer();
     return m_buffer[ POS_OFFSET_2ND_FINESSE ];
   }
 
-  inline int RawHeader::GetOffset3rdFINESSE()
+  inline int RawHeader_v0::GetOffset3rdFINESSE()
   {
     CheckGetBuffer();
     return m_buffer[ POS_OFFSET_3RD_FINESSE ];
   }
 
-  inline int RawHeader::GetOffset4thFINESSE()
+  inline int RawHeader_v0::GetOffset4thFINESSE()
   {
     CheckGetBuffer();
     return m_buffer[ POS_OFFSET_4TH_FINESSE ];
   }
 
-  inline int RawHeader::GetNumNodes()
+  inline int RawHeader_v0::GetNumNodes()
   {
     CheckGetBuffer();
     return m_buffer[ POS_NUM_NODES ];
   }
 
-  inline unsigned int RawHeader::GetTTCtimeTRGType()
+  inline unsigned int RawHeader_v0::GetTTCtimeTRGType()
   {
     CheckGetBuffer();
     return (unsigned int)(m_buffer[ POS_TTCTIME_TRGTYPE ]);
   }
 
-  inline int RawHeader::GetTTCtime()
+  inline int RawHeader_v0::GetTTCtime()
   {
     CheckGetBuffer();
     return (int)((GetTTCtimeTRGType() & TTCTIME_MASK) >> TTCTIME_SHIFT);
   }
 
-  inline unsigned int RawHeader::GetTTUtime()
+  inline unsigned int RawHeader_v0::GetTTUtime()
   {
     CheckGetBuffer();
     return (unsigned int)(m_buffer[ POS_TTUTIME ]);
   }
 
-  inline void RawHeader::GetTTTimeVal(struct timeval* tv)
+  inline void RawHeader_v0::GetTTTimeVal(struct timeval* tv)
   {
     tv->tv_sec = GetTTUtime();
     tv->tv_usec = (int)(((double)GetTTCtime()) / 127.216);
@@ -463,7 +479,7 @@ namespace Belle2 {
   }
 
 
-  inline unsigned int RawHeader::GetMagicWordEntireHeader()
+  inline unsigned int RawHeader_v0::GetMagicWordEntireHeader()
   {
     CheckGetBuffer();
     return m_buffer[ POS_TERM_HEADER ];

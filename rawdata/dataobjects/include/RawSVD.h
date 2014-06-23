@@ -13,8 +13,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
-#include <rawdata/dataobjects/RawHeader.h>
-#include <rawdata/dataobjects/RawTrailer.h>
 #include <framework/datastore/DataStore.h>
 
 #include <TObject.h>

@@ -33,7 +33,7 @@
 #ifndef REDUCED_RAWCOPPER
 #include <rawdata/dataobjects/RawHeader.h>
 #else
-#include <rawdata/dataobjects/RawHeader_v1.h>
+#include <rawdata/dataobjects/RawHeader_latest.h>
 #endif
 //#include <rawdata/dataobjects/RawCOPPER.h>
 
@@ -208,7 +208,7 @@ namespace Belle2 {
 
 #ifdef REDUCED_RAWCOPPER
     //! which format is used
-    RawHeader_v1 tmp_header;
+    RawHeader_latest tmp_header;
 #endif
 
   };

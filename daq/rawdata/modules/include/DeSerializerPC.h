@@ -33,9 +33,7 @@
 #include <rawdata/dataobjects/RawBPID.h>
 #include <rawdata/dataobjects/RawKLM.h>
 #else
-#include <rawdata/dataobjects/PreRawCOPPERFormat_v1.h>
-/* #include <rawdata/dataobjects/PreRawCOPPER.h> */
-/* #include <rawdata/dataobjects/ReducedRawCOPPER.h> */
+#include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
 #endif
 
 #include <rawdata/dataobjects/RawFTSW.h>
@@ -119,7 +117,7 @@ namespace Belle2 {
 
     //    StoreArray<ReducedRawCOPPER> rawcprarray;
     ///
-    PreRawCOPPERFormat_v1 m_pre_rawcpr_v1;
+    PreRawCOPPERFormat_latest m_pre_rawcpr;
 
 #endif
 

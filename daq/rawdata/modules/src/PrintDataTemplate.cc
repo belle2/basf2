@@ -66,11 +66,12 @@ void PrintDataTemplateModule::initialize()
 
 void PrintDataTemplateModule::printBuffer(int* buf, int nwords)
 {
+  printf("%.8x :", 0);
   for (int j = 0; j < nwords; j++) {
     printf(" %.8x", buf[ j ]);
     if ((j + 1) % 10 == 0) {
       //    if ((m_print_cnt + 1) % 10 == 0) {
-      printf("\n");
+      printf("\n%.8x :", j + 1);
     }
     m_print_cnt++;
   }
@@ -173,6 +174,7 @@ void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
 
 void PrintDataTemplateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
 {
+
   printf(": Event # %d : node ID 0x%.8x : block size %d bytes\n",
          raw_copper->GetEveNo(i), raw_copper->GetCOPPERNodeId(i),
          raw_copper->GetBlockNwords(i) * sizeof(int));
@@ -198,9 +200,19 @@ void PrintDataTemplateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
   //
   // Print data from each FINESSE
   //
+  if (raw_copper->Get1stFINESSENwords(i) > 0) {
+    printf("## FINESSE  Buffer(FINESSE A) 0x%x words \n", raw_copper->Get1stDetectorNwords(i));
+    printBuffer(raw_copper->Get1stFINESSEBuffer(i), raw_copper->Get1stFINESSENwords(i));
+  }
+
   if (raw_copper->Get1stDetectorNwords(i) > 0) {
-    printf("== Detector Buffer(FINESSE A)\n");
+    printf("== Detector Buffer(FINESSE A) 0x%x words \n", raw_copper->Get1stDetectorNwords(i));
     printBuffer(raw_copper->Get1stDetectorBuffer(i), raw_copper->Get1stDetectorNwords(i));
+  }
+
+  if (raw_copper->Get2ndFINESSENwords(i) > 0) {
+    printf("## FINESSE  Buffer(FINESSE A) 0x%x words \n", raw_copper->Get2ndDetectorNwords(i));
+    printBuffer(raw_copper->Get2ndFINESSEBuffer(i), raw_copper->Get2ndFINESSENwords(i));
   }
 
   if (raw_copper->Get2ndDetectorNwords(i) > 0) {
@@ -208,9 +220,19 @@ void PrintDataTemplateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
     printBuffer(raw_copper->Get2ndDetectorBuffer(i), raw_copper->Get2ndDetectorNwords(i));
   }
 
+  if (raw_copper->Get3rdFINESSENwords(i) > 0) {
+    printf("## FINESSE  Buffer(FINESSE A) 0x%x words \n", raw_copper->Get3rdDetectorNwords(i));
+    printBuffer(raw_copper->Get3rdFINESSEBuffer(i), raw_copper->Get3rdFINESSENwords(i));
+  }
+
   if (raw_copper->Get3rdDetectorNwords(i) > 0) {
     printf("== Detector Buffer(FINESSE C)\n");
     printBuffer(raw_copper->Get3rdDetectorBuffer(i), raw_copper->Get3rdDetectorNwords(i));
+  }
+
+  if (raw_copper->Get4thFINESSENwords(i) > 0) {
+    printf("## FINESSE  Buffer(FINESSE A) 0x%x words \n", raw_copper->Get4thDetectorNwords(i));
+    printBuffer(raw_copper->Get4thFINESSEBuffer(i), raw_copper->Get4thFINESSENwords(i));
   }
 
   if (raw_copper->Get4thDetectorNwords(i) > 0) {
@@ -234,12 +256,11 @@ void PrintDataTemplateModule::event()
 {
 
 
-  B2INFO("PrintDataTemplate: event() started.");
+  B2INFO("aPrintDataTemplate: event() started.");
   //
   // FTSW + COPPER can be combined in the array
   //
   StoreArray<RawDataBlock> raw_datablkarray;
-
 
 
   for (int i = 0; i < raw_datablkarray.getEntries(); i++) {
@@ -258,19 +279,13 @@ void PrintDataTemplateModule::event()
       } else if (raw_datablkarray[ i ]->CheckTLUID(j)) {
         // No operation
       } else {
-#ifndef REDUCED_RAWCOPPER
+
         // COPPER data block
         printf("\n===== DataBlock( RawDataBlock(COPPER) ) : Block # %d ", i);
         RawCOPPER temp_raw_copper;
         temp_raw_copper.SetBuffer(temp_buf, nwords, malloc_flag, num_nodes, num_events);
         printCOPPEREvent(&temp_raw_copper, 0);
-#else
-        // COPPER data block
-        printf("\n===== DataBlock( RawDataBlock(COPPER) ) : Block # %d ", i);
-        //  ReducedRawCOPPER temp_raw_copper;
-        //        temp_raw_copper.SetBuffer(temp_buf, nwords, malloc_flag, num_nodes, num_events);
-        //        printReducedCOPPEREvent(&temp_raw_copper, 0);
-#endif
+
       }
     }
   }
@@ -286,6 +301,8 @@ void PrintDataTemplateModule::event()
     }
   }
 
+
+
   //
   // Data from COPPER ( data from any detectors(e.g. CDC, SVD, ... ))
   //
@@ -297,22 +314,26 @@ void PrintDataTemplateModule::event()
     }
   }
 
+
   //
   // Data from COPPER named as RawSVD by software
   //
   StoreArray<RawSVD> raw_svdarray;
   for (int i = 0; i < raw_svdarray.getEntries(); i++) {
 
-
     for (int j = 0; j < raw_svdarray[ i ]->GetNumEntries(); j++) {
 //       printf("\n===== DataBlock(RawSVD) : Block # %d : tempval %d", i,
 //       raw_svdarray[ i ]->m_temp_value );
       printf("\n===== DataBlock(RawSVD) : Block # %d\n", i);
+      //      raw_svdarray[ i ]->ShowBuffer();
 
       printCOPPEREvent(raw_svdarray[ i ], j);
     }
     //    raw_svdarray[ i ]->m_temp_value = 12345678 + i ;
   }
+
+
+
 
   //
   // Data from COPPER named as RawCDC by software

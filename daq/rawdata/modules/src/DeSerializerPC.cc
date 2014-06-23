@@ -476,9 +476,9 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ev
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader::POS_TTUTIME ] = utime_ftsw;
 #else
 
-        (temp_rawcopper->GetBuffer(block_id))[ RawHeader_v1::POS_EXP_RUN_NO ] = exp_run_ftsw;
-        (temp_rawcopper->GetBuffer(block_id))[ RawHeader_v1::POS_TTCTIME_TRGTYPE ] = ctime_trgtype_ftsw;
-        (temp_rawcopper->GetBuffer(block_id))[ RawHeader_v1::POS_TTUTIME ] = utime_ftsw;
+        (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_EXP_RUN_NO ] = exp_run_ftsw;
+        (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_TTCTIME_TRGTYPE ] = ctime_trgtype_ftsw;
+        (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_TTUTIME ] = utime_ftsw;
 
 #endif
 #endif
@@ -596,8 +596,6 @@ void DeSerializerPCModule::event()
     RawDataBlock temp_rawdatablk;
     setRecvdBuffer(&temp_rawdatablk, &malloc_flag_from);
 
-
-
     checkData(&temp_rawdatablk, &eve_copper_0);
 
 #ifdef REDUCED_RAWCOPPER
@@ -605,10 +603,10 @@ void DeSerializerPCModule::event()
     // Copy reduced buffer
     //
     ;
-    int* buf_to = getBuffer(m_pre_rawcpr_v1.CalcReducedDataSize(&temp_rawdatablk),
+    int* buf_to = getBuffer(m_pre_rawcpr.CalcReducedDataSize(&temp_rawdatablk),
                             &malloc_flag_to);
 
-    m_pre_rawcpr_v1.CopyReducedData(&temp_rawdatablk, buf_to, malloc_flag_from);
+    m_pre_rawcpr.CopyReducedData(&temp_rawdatablk, buf_to, malloc_flag_from);
 
 #else
     malloc_flag_to = malloc_flag_from;

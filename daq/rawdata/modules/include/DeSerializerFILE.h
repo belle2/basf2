@@ -96,7 +96,7 @@ namespace Belle2 {
 
     //! a class to handle data from a file
 #ifdef REDUCED_RAWCOPPER
-    RawCOPPERFormat_v1 m_tmp_header;
+    PostRawCOPPERFormat_latest m_tmp_header;
 #endif
 
   };

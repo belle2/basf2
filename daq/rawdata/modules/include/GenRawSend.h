@@ -20,7 +20,7 @@
 #include <rawdata/dataobjects/RawCOPPER.h>
 
 #ifdef REDUCED_RAWCOPPER
-#include <rawdata/dataobjects/RawHeader_v1.h>
+#include <rawdata/dataobjects/RawHeader_latest.h>
 #else
 #include <rawdata/dataobjects/RawHeader.h>
 #endif

@@ -1,37 +1,37 @@
 //+
-// File : RawHeader.cc
-// Description : Module to handle RawHeader attached to raw data from COPPER
+// File : RawHeader_v0.cc
+// Description : Module to handle RawHeader_v0 attached to raw data from COPPER
 //
 // Author : Satoru Yamada, IPNS, KEK
 // Date : 2 - Aug - 2013
 //-
 
-#include <rawdata/dataobjects/RawHeader.h>
+#include <rawdata/dataobjects/RawHeader_v0.h>
 
 
 using namespace std;
 using namespace Belle2;
 
-ClassImp(RawHeader);
+ClassImp(RawHeader_v0);
 
-RawHeader::RawHeader()
+RawHeader_v0::RawHeader_v0()
 {
   m_buffer = NULL;
   //  initialize();
-  //  cout << "RawHeader NULL constructor" << endl;
+  //  cout << "RawHeader_v0 NULL constructor" << endl;
 }
 
-RawHeader::RawHeader(int* buffer)
+RawHeader_v0::RawHeader_v0(int* buffer)
 {
   m_buffer = buffer;
 }
 
-RawHeader::~RawHeader()
+RawHeader_v0::~RawHeader_v0()
 {
 }
 
 
-int RawHeader::AddNodeInfo(int node_id)
+int RawHeader_v0::AddNodeInfo(int node_id)
 {
   CheckSetBuffer();
   // When the number of total nodes exceeds NUM_MAX_NODES
@@ -45,7 +45,7 @@ int RawHeader::AddNodeInfo(int node_id)
   return 0;
 }
 
-int RawHeader::GetNodeInfo(int node_no, int* node_id)
+int RawHeader_v0::GetNodeInfo(int node_no, int* node_id)
 {
   CheckGetBuffer();
   if (node_no >= GetNumNodes()) {

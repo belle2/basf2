@@ -1,4 +1,5 @@
 #include <rawdata/CRCCalculator.h>
+using namespace std;
 
 
 unsigned short CalcCRC16(unsigned short crc16, const char buf[], size_t size)
@@ -52,3 +53,19 @@ unsigned short CalcCRC16(unsigned short crc16, const char buf[], size_t size)
   return crc16;
 
 }
+
+
+void copyData(int* buf_to, int* pos_nwords_to, const int* buf_from,
+              const int copy_nwords, const int nwords_buf_to)
+{
+
+  if (*pos_nwords_to + copy_nwords > nwords_buf_to) {
+    perror("Buffer overflow. Exiting...");
+    exit(1);
+  }
+
+  memcpy(buf_to + *pos_nwords_to, buf_from, copy_nwords * sizeof(int));
+  *pos_nwords_to += copy_nwords;
+  return;
+}
+

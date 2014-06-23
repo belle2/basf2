@@ -143,8 +143,10 @@ namespace Belle2 {
         // store result and add relations
         TOPDigit* digit = topDigits.appendNew(simHit->getBarID(), channelID, TDC);
         digit->addRelationTo(simHit);
-        const MCParticle* particle = simHit->getRelatedFrom<MCParticle>();
-        digit->addRelationTo(particle); //TODO: add relation weight
+        RelationVector<MCParticle> particles = simHit->getRelationsFrom<MCParticle>();
+        for (unsigned k = 0; k < particles.size(); ++k) {
+          digit->addRelationTo(particles[k], particles.weight(k));
+        }
 
       }
 

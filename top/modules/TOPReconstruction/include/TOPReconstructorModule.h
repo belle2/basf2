@@ -16,6 +16,8 @@
 #include <string>
 
 #include <top/reconstruction/TOPtrack.h>
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/ExtHit.h>
 #include <framework/gearbox/Const.h>
 
 
@@ -80,21 +82,15 @@ namespace Belle2 {
 
     private:
 
-      // Enumerators
-
-      /**
-       * Label tags
-       */
-      enum {c_LTrack = 0, c_LextHit, c_LbarHit};
-
       // Private methods
 
       /**
-       * Return extrapolated tracks
-       * @param tracks vector of TOPtracks to return
+       * Return extrapolated hit on TOP, if any
+       * @param track a pointer to reconstructed track
        * @param chargedStable particle hypothesis used for extrapolation
+       * @return a pointer to extrapolated hit or NULL
        */
-      void getTracks(std::vector<TOPtrack>& tracks, Const::ChargedStable chargedStable);
+      const ExtHit* getExtHit(const Track* track, Const::ChargedStable chargedStable);
 
       // Module steering parameters
       std::string m_inputTracks;       /**< reconstructed tracks (input) */

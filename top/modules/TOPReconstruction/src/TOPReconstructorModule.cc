@@ -124,7 +124,7 @@ namespace Belle2 {
       StoreArray<TOPLikelihood>::registerPersistent(m_outputLikelihoods);
       RelationArray::registerPersistent<Track, TOPLikelihood>(m_inputTracks, m_outputLikelihoods);
       RelationArray::registerPersistent<TOPLikelihood, ExtHit>(m_outputLikelihoods, m_inputExtHits);
-      RelationArray::registerPersistent<TOPBarHit, TOPLikelihood>(m_inputBarHits, m_outputLikelihoods);
+      RelationArray::registerPersistent<TOPLikelihood, TOPBarHit>(m_outputLikelihoods, m_inputBarHits);
 
       StoreArray<TOPDigit>::required();
       StoreArray<Track>::required();
@@ -150,71 +150,72 @@ namespace Belle2 {
     void TOPReconstructorModule::event()
     {
 
-      // input: digitized photons
-
-      StoreArray<TOPDigit> topDigits(m_inputDigits);
-
-      // input: reconstructed tracks
-
-      StoreArray<Track> Tracks(m_inputTracks);
-      StoreArray<ExtHit> extHits(m_inputExtHits);
-      StoreArray<TOPBarHit> barHits(m_inputBarHits);
-
       // output: log likelihoods
-
-      StoreArray<TOPLikelihood> toplogL(m_outputLikelihoods);
-      toplogL.create();
-
-      // output: relations
-
-      RelationArray TrackLogL(Tracks, toplogL);
-      TrackLogL.clear();
-      RelationArray LogLextHit(toplogL, extHits);
-      LogLextHit.clear();
-      RelationArray barHitLogL(barHits, toplogL);
-      barHitLogL.clear();
-
-      // collect reconstructed tracks extrapolated to TOP
-
-      std::vector<TOPtrack> tracks; // extrapolated tracks
-      getTracks(tracks, Const::pion); // use pion hypothesis
-      if (tracks.empty()) return;
-
-      // optional track smearing (needed for some MC studies)
-      if (m_smearTrack) {
-        for (unsigned int i = 0; i < tracks.size(); i++) {
-          tracks[i].smear(m_sigmaRphi, m_sigmaZ, m_sigmaTheta, m_sigmaPhi);
-        }
-        B2INFO("TOPReconstructor: additional smearing of track parameters done");
-      }
+      StoreArray<TOPLikelihood> topLikelihoods(m_outputLikelihoods);
+      topLikelihoods.create();
 
       // create reconstruction object
-
       TOPreco reco(c_Nhyp, m_Masses, m_minBkgPerBar, m_scaleN0);
 
       // set time limit for photons lower than that given by TDC range (optional)
-
       if (m_maxTime > 0) reco.setTmax(m_maxTime);
 
       // clear reconstruction object
-
       reco.Clear();
 
       // add photons
-
+      StoreArray<TOPDigit> topDigits(m_inputDigits);
       int nHits = topDigits.getEntries();
       for (int i = 0; i < nHits; ++i) {
-        TOPDigit* data = topDigits[i];
+        const TOPDigit* data = topDigits[i];
         reco.AddData(data->getBarID() - 1, data->getChannelID() - 1, data->getTDC());
       }
 
-      // reconstruct track-by-track and store the results
+      // use pion hypothesis for track extrapolation
+      Const::ChargedStable chargedStable = Const::pion;
 
-      for (unsigned int i = 0; i < tracks.size(); i++) {
+      // reconstruct track-by-track and store the results
+      StoreArray<Track> tracks(m_inputTracks);
+      for (int i = 0; i < tracks.getEntries(); ++i) {
+
+        const Track* track = tracks[i];
+        const ExtHit* extHit = getExtHit(track, chargedStable);
+        if (!extHit) continue;
+
+        TVector3 point = extHit->getPosition();
+        double x = point.X();
+        double y = point.Y();
+        double z = point.Z();
+        TVector3 momentum = extHit->getMomentum();
+        double px = momentum.X();
+        double py = momentum.Y();
+        double pz = momentum.Z();
+
+        const TrackFitResult* fitResult = track->getTrackFitResult(chargedStable);
+        if (!fitResult) {
+          B2ERROR("No TrackFitResult for " << chargedStable.getPDGCode());
+          continue;
+        }
+        int charge = fitResult->getChargeSign();
+
+        const MCParticle* particle = track->getRelated<MCParticle>();
+        int truePDGCode = 0;
+        if (particle) truePDGCode = particle->getPDG();
+
+        TOPtrack trk(x, y, z, px, py, pz, 0.0, charge, truePDGCode);
+        double tof = extHit->getTOF();
+        trk.setTrackLength(tof, chargedStable.getMass());
+
+        // optional track smearing (needed for some MC studies)
+        if (m_smearTrack) {
+          trk.smear(m_sigmaRphi, m_sigmaZ, m_sigmaTheta, m_sigmaPhi);
+          B2INFO("TOPReconstructor: additional smearing of track parameters done");
+        }
+
         // reconstruct
-        reco.Reconstruct(tracks[i]);
+        reco.Reconstruct(trk);
         if (m_debugLevel > 1) {
-          tracks[i].Dump();
+          trk.Dump();
           reco.DumpHit(Local);
           reco.DumpLogL(c_Nhyp);
         }
@@ -225,21 +226,15 @@ namespace Belle2 {
         reco.GetLogL(c_Nhyp, logl, expPhot, nphot);
 
         // store results
-        toplogL.appendNew(reco.Flag(), logl, nphot, expPhot);
+        TOPLikelihood* topL = topLikelihoods.appendNew(reco.Flag(), logl, nphot, expPhot);
 
-        // make relations: TODO use new interface
-        int last = toplogL.getEntries() - 1;
-        TrackLogL.add(tracks[i].Label(c_LTrack), last);
-        LogLextHit.add(last, tracks[i].Label(c_LextHit));
-        int ibarHit = tracks[i].Label(c_LbarHit);
-        if (ibarHit >= 0) barHitLogL.add(ibarHit, last);
+        // make relations:
+        track->addRelationTo(topL);
+        topL->addRelationTo(extHit);
+        const TOPBarHit* barHit = particle->getRelated<TOPBarHit>(m_inputBarHits);
+        topL->addRelationTo(barHit);
+
       }
-
-      // consolidate relatons
-
-      TrackLogL.consolidate();
-      LogLextHit.consolidate();
-      barHitLogL.consolidate();
 
     }
 
@@ -260,60 +255,35 @@ namespace Belle2 {
     }
 
 
-    void TOPReconstructorModule::getTracks(std::vector<TOPtrack>& tracks,
-                                           Const::ChargedStable chargedStable)
+    const ExtHit* TOPReconstructorModule::getExtHit(const Track* track,
+                                                    Const::ChargedStable chargedStable)
     {
-      Const::EDetector myDetID = Const::EDetector::TOP; // TOP
+
+      Const::EDetector myDetID = Const::EDetector::TOP;
       int NumBars = m_topgp->getNbars();
       int pdgCode = abs(chargedStable.getPDGCode());
-      double mass = chargedStable.getMass();
 
-      StoreArray<Track> Tracks(m_inputTracks);
-
-      for (int itra = 0; itra < Tracks.getEntries(); ++itra) {
-        const Track* track = Tracks[itra];
-        const TrackFitResult* fitResult = track->getTrackFitResult(chargedStable);
-        if (!fitResult) {
-          B2ERROR("No TrackFitResult for " << chargedStable.getPDGCode());
-          continue;
-        }
-        int charge = fitResult->getChargeSign();
-        const MCParticle* particle = DataStore::getRelated<MCParticle>(track);
-        const TOPBarHit* barHit = DataStore::getRelated<TOPBarHit>(particle);
-        int iBarHit = -1;
-        if (barHit) iBarHit = barHit->getArrayIndex();
-        int truePDGCode = 0;
-        if (particle) truePDGCode = particle->getPDG();
-
-        RelationVector<ExtHit> extHits = DataStore::getRelationsWithObj<ExtHit>(track);
-        for (unsigned i = 0; i < extHits.size(); i++) {
-          const ExtHit* extHit = extHits[i];
-          if (abs(extHit->getPdgCode()) != pdgCode) continue;
-          if (extHit->getDetectorID() != myDetID) continue;
-          if (extHit->getCopyID() == 0 || extHit->getCopyID() > NumBars) continue;
-          if (extHit->getStatus() != EXT_ENTER) continue;
-          TVector3 point = extHit->getPosition();
-          double x = point.X();
-          double y = point.Y();
-          double z = point.Z();
-          if (z < m_Z1 || z > m_Z2) continue;
-          double r = sqrt(x * x + y * y);
-          if (r < m_R1 || r > m_R2) continue;
-          TVector3 momentum = extHit->getMomentum();
-          double px = momentum.X();
-          double py = momentum.Y();
-          double pz = momentum.Z();
-          TOPtrack trk(x, y, z, px, py, pz, 0.0, charge, truePDGCode);
-          double tof = extHit->getTOF();
-          trk.setTrackLength(tof, mass);
-          trk.setLabel(c_LTrack, itra);
-          trk.setLabel(c_LextHit, extHit->getArrayIndex());
-          trk.setLabel(c_LbarHit, iBarHit);
-          tracks.push_back(trk);
-        }
+      RelationVector<ExtHit> extHits = track->getRelationsWith<ExtHit>(m_inputExtHits);
+      for (unsigned i = 0; i < extHits.size(); i++) {
+        const ExtHit* extHit = extHits[i];
+        if (abs(extHit->getPdgCode()) != pdgCode) continue;
+        if (extHit->getDetectorID() != myDetID) continue;
+        if (extHit->getCopyID() == 0 || extHit->getCopyID() > NumBars) continue;
+        if (extHit->getStatus() != EXT_ENTER) continue;
+        TVector3 point = extHit->getPosition(); // do I need to x-check?
+        double x = point.X();
+        double y = point.Y();
+        double z = point.Z();
+        if (z < m_Z1 || z > m_Z2) continue;
+        double r = sqrt(x * x + y * y);
+        if (r < m_R1 || r > m_R2) continue;
+        return extHit;
       }
+      return 0;
+
     }
 
 
   } // end top namespace
 } // end Belle2 namespace
+

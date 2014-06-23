@@ -34,25 +34,25 @@ namespace Belle2 {
   class NtupleMakerModule : public Module {
   private:
     /** Name of ROOT file for output. */
-    std::string m_strFileName;
+    std::string m_fileName;
     /** ROOT file for output. */
     static TFile* m_file;
     /** Number of TTrees which are not yet written to TFile. */
     static int m_nTrees;
     /** Name of the TTree. */
-    std::string m_strTreeName;
+    std::string m_treeName;
     /** Comment about the content of the TTree */
-    std::string m_strComment;
+    std::string m_comment;
     /** The ROOT TTree for output. */
     TTree* m_tree;
     /** Parameter provided by basf2 script: ntuple tool, decay string, ntuple tool, decay string.... */
-    std::vector<std::string> m_strTools;
+    std::vector<std::string> m_toolNames;
     /** Output Tools */
     boost::ptr_vector<NtupleFlatTool> m_tools;
     /** List of the DecayDescriptor objects corresponding to the m_tools. */
     std::vector<DecayDescriptor> m_decaydescriptors;
     /** Name of particle list with reconstructed particles. */
-    std::string m_strListName;
+    std::string m_listName;
   public:
     /** Constructor. */
     NtupleMakerModule();

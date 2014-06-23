@@ -89,14 +89,14 @@ main.add_module(combinerB)
 
 ntuple1 = register_module('NtupleMaker')
 # output root file name (the suffix .root will be added automaticaly)
-ntuple1.param('strFileName', rootFileName)
+ntuple1.param('fileName', rootFileName)
 # Name of the output TTree
-ntuple1.param('strTreeName', 'test1')
+ntuple1.param('treeName', 'test1')
 # particle list with reconstructed decays
-ntuple1.param('strListName', 'B')
+ntuple1.param('listName', 'B')
 # Specifiy output tools
 # decay descriptor strings ignored (parser for  not yet implemented)
-ntuple1.param('strTools', [
+ntuple1.param('tools', [
     'EventMetaData',
     'B-',
     'Kinematics',

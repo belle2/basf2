@@ -31,60 +31,53 @@ NtupleMakerModule::NtupleMakerModule() : Module()
 {
   m_tree = NULL;
   //Set module properties
-  setDescription("Make a TTree with the properties of selected decay products.");
+  setDescription("Make a TTree with the properties of selected decay products. See https://belle2.cc.kek.jp/~twiki/bin/view/Physics/NtupleMaker for an introduction.");
   //Parameter definition
-  addParam("fileName", m_strFileName, "Name of ROOT file for output", string("test.root"));
-  addParam("treeName", m_strTreeName, "Name of TTree to be filled.", string("test"));
-  addParam("comment", m_strComment, "Comment about the content of the TTree.", string("No comment."));
-  addParam("tools", m_strTools, "List of tools and decay descriptors", vector<string>());
-  addParam("listName", m_strListName, "Name of particle list with reconstructed particles.", string(""));
-
-  //TODO legacy, remove in july 2014
-  addParam("strFileName", m_strFileName, "deprecated, don't use", string("test.root"));
-  addParam("strTreeName", m_strTreeName, "deprecated, don't use", string("test"));
-  addParam("strComment", m_strComment, "deprecated, don't use", string("No comment."));
-  addParam("strTools", m_strTools, "deprecated, don't use", vector<string>());
-  addParam("strListName", m_strListName, "deprecated, don't use", string(""));
+  addParam("fileName", m_fileName, "Name of ROOT file for output", string("test.root"));
+  addParam("treeName", m_treeName, "Name of TTree to be filled.", string("test"));
+  addParam("comment", m_comment, "Comment about the content of the TTree.", string("No comment."));
+  addParam("tools", m_toolNames, "List of tools and decay descriptors. Available tools are described in https://belle2.cc.kek.jp/~twiki/bin/view/Physics/NtupleTool", vector<string>());
+  addParam("listName", m_listName, "Name of particle list with reconstructed particles.", string(""));
 }
 
 void NtupleMakerModule::initialize()
 {
   // Initializing the output root file
-  if (!m_file) m_file = new TFile(m_strFileName.c_str(), "RECREATE");
+  if (!m_file) m_file = new TFile(m_fileName.c_str(), "RECREATE");
   if (!m_file->IsOpen()) {
-    B2WARNING("Could not create file " << m_strFileName);
+    B2WARNING("Could not create file " << m_fileName);
     return;
   }
 
   m_file->cd();
 
   // check if TTree with that name already exists
-  if (m_file->Get(m_strTreeName.c_str())) {
-    B2WARNING("Tree with this name already exists: " << m_strFileName);
+  if (m_file->Get(m_treeName.c_str())) {
+    B2WARNING("Tree with this name already exists: " << m_fileName);
     return;
   }
 
-  m_tree = new TTree(m_strTreeName.c_str(), m_strComment.c_str());
+  m_tree = new TTree(m_treeName.c_str(), m_comment.c_str());
   m_nTrees++;
 
-  B2INFO("NtupleMaker: Creating tree with name " << m_strTreeName << " for the ParticleList " << m_strListName << " filled with the following tools:");
-  int nTools = m_strTools.size();
+  B2INFO("NtupleMaker: Creating tree with name " << m_treeName << " for the ParticleList " << m_listName << " filled with the following tools:");
+  int nTools = m_toolNames.size();
   for (int iTool =  0; iTool < (nTools - 1); iTool = iTool + 2) {
     // Create decay descriptors with selected particles from string
     DecayDescriptor desc;
-    bool isStringOK = desc.init(m_strTools[iTool + 1]);
-    if (!isStringOK) B2ERROR("Could not initialise decay descriptor!" << m_strTools[iTool + 1]);
+    bool isStringOK = desc.init(m_toolNames[iTool + 1]);
+    if (!isStringOK) B2ERROR("Could not initialise decay descriptor!" << m_toolNames[iTool + 1]);
     m_decaydescriptors.push_back(desc);
 
     // select ntuple tools to be used
-    NtupleFlatTool* ntool = NtupleToolList::create(m_strTools[iTool], m_tree, m_decaydescriptors.back());
+    NtupleFlatTool* ntool = NtupleToolList::create(m_toolNames[iTool], m_tree, m_decaydescriptors.back());
     if (ntool) m_tools.push_back(ntool);
   }
 
   // book two variables in the data store to save the number of
   //  candidates per event and the current candidate index
-  StoreObjPtr< TParameter<Int_t> >::registerTransient(m_strTreeName + "_nCands");
-  StoreObjPtr< TParameter<Int_t> >::registerTransient(m_strTreeName + "_iCand");
+  StoreObjPtr< TParameter<Int_t> >::registerTransient(m_treeName + "_nCands");
+  StoreObjPtr< TParameter<Int_t> >::registerTransient(m_treeName + "_iCand");
 }
 
 void NtupleMakerModule::event()
@@ -93,27 +86,27 @@ void NtupleMakerModule::event()
   int nTools = m_tools.size();
 
   // Number of candidates in this event?
-  StoreObjPtr< TParameter<int> > nCands(m_strTreeName + "_nCands");
+  StoreObjPtr< TParameter<int> > nCands(m_treeName + "_nCands");
   nCands.create();
   nCands->SetVal(-1);
   // candidate index?
-  StoreObjPtr< TParameter<int> > iCand(m_strTreeName + "_iCand");
+  StoreObjPtr< TParameter<int> > iCand(m_treeName + "_iCand");
   iCand.create();
   iCand->SetVal(-1);
 
   // If no particle list name is specified, just call every
   // ntuple Tool with a NULL pointer for the particle argument
   // (useful if you want to save event information for every event)
-  if (m_strListName.empty()) {
+  if (m_listName.empty()) {
     for (int iTool = 0; iTool < nTools; ++iTool)
       m_tools[iTool].eval(NULL);
     m_tree->Fill();
     return;
   }
 
-  StoreObjPtr<ParticleList> particlelist(m_strListName);
+  StoreObjPtr<ParticleList> particlelist(m_listName);
   if (!particlelist) {
-    B2WARNING("ParticleList " << m_strListName << " not found");
+    B2WARNING("ParticleList " << m_listName << " not found");
     B2WARNING("Event not written to the ntuple!");
     return;
   }
@@ -130,13 +123,13 @@ void NtupleMakerModule::event()
 
 void NtupleMakerModule::terminate()
 {
-  B2INFO("Terminate TTree " << m_strTreeName);
+  B2INFO("Terminate TTree " << m_treeName);
   m_file->cd();
   m_tree->Write();
   m_nTrees--;
   B2INFO("Remaining unsaved Trees: " << m_nTrees);
   if (m_nTrees == 0) {
-    B2INFO("Close file " << m_strFileName);
+    B2INFO("Close file " << m_fileName);
     m_file->Close();
     m_file = NULL;
   }

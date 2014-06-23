@@ -114,10 +114,10 @@ mcparticles = register_module('PrintMCParticles')
 main.add_module(mcparticles)
 
 ntuple = register_module('NtupleMaker')
-ntuple.param('strFileName', 'test.root')
-ntuple.param('strTreeName', 'test')
-ntuple.param('strListName', 'testB')
-ntuple.param('strTools', [
+ntuple.param('fileName', 'test.root')
+ntuple.param('treeName', 'test')
+ntuple.param('listName', 'testB')
+ntuple.param('tools', [
     'EventMetaData',
     'B+',
     'Kinematics',

@@ -66,6 +66,10 @@ def add_posttracking_reconstruction(path, components=None):
         bklm_rec = register_module('BKLMReconstructor')
         path.add_module(bklm_rec)
 
+        # K0L reconstruction
+        bklm_k0l_rec = register_module('BKLMK0LReconstructor')
+        path.add_module(bklm_k0l_rec)
+
     # muon identification
     if components is None or 'BKLM' in components and 'EKLM' in components:
         muid = register_module('Muid')

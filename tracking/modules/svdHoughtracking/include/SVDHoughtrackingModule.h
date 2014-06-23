@@ -299,11 +299,14 @@ namespace Belle2 {
       int sector_track_fit(sensorMap*);
       void fullHoughTracking();
       void pxdExtrapolation();
+      void pxdExtrapolationPhi();
+      void pxdSingleExtrapolation();
       void pxdStraightExtrapolation();
       void createResiduals();
       void createTbResiduals();
       void analyseClusterStrips();
       void analyseExtrapolatedHits();
+      void analyseExtrapolatedPhi();
 
       /** Plot hough lines in gnuplot */
       void houghTrafoPlot(bool);
@@ -390,10 +393,12 @@ namespace Belle2 {
       bool m_useRadiusFilter;
       bool m_useHashPurify;
       bool m_useTrackMerger;
+      bool m_usePhiOnly;
       bool m_compareMCParticle;
       bool m_compareMCParticleVerbose;
       bool m_PXDExtrapolation;
       bool m_PXDTbExtrapolation;
+      bool m_usePhiExtrapolation;
       bool m_printTrackInfo;
       bool m_printStatistics;
 
@@ -479,6 +484,7 @@ namespace Belle2 {
       TH1D* m_histPtThetaRecon;
       /** Histogram for efficiency vs pT (only in phi while reconstruction in theta is not proved) */
       TH1D* m_histPtEffPhi;
+      TH1D* m_histPtEffTheta;
       /** Histogram for Phi-distribution */
       TH1D* m_histPhiDist;
       /** Histogram for correctly reconstructed tracks in Phi */
@@ -494,6 +500,10 @@ namespace Belle2 {
       TH1D* m_histEffTheta;
       /** Histogram for fake rate vs pT (only in phi while reconstruction in theta is not proved) */
       TH1D* m_histPtFakePhi;
+
+      /** Histograms for ROIs */
+      TH1D* m_histROIDiffPhi;
+      TH1D* m_histROIDiffTheta;
 
       /* List of coord SVD clusters */
       clusterMap cluster_map;

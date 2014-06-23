@@ -15,7 +15,7 @@
 #include <daq/rawdata/modules/DAQConsts.h>
 
 #ifdef REDUCED_RAWCOPPER
-#include "rawdata/dataobjects/RawHeader_v1.h"
+#include "rawdata/dataobjects/RawHeader_latest.h"
 #else
 #include "rawdata/dataobjects/RawHeader.h"
 #endif
@@ -70,7 +70,7 @@ namespace Belle2 {
     int GetRunNumSubRunNum(); //!
 
 #ifdef REDUCED_RAWCOPPER
-    RawHeader_v1 tmp_header; //!
+    RawHeader_latest tmp_header; //!
 #endif
 
     /* Data Format : Node info */

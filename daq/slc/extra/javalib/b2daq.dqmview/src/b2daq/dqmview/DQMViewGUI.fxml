@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import b2daq.hvcontrol.ui.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.dqmview.DQMViewGUIController">
+    <children>
+        <MenuBar VBox.vgrow="NEVER">
+            <menus>
+                <Menu mnemonicParsing="false" text="File">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="New" />
+                        <MenuItem mnemonicParsing="false" text="Open" />
+                        <Menu mnemonicParsing="false" text="Recent" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem mnemonicParsing="false" text="Close" />
+                        <MenuItem mnemonicParsing="false" text="Save" />
+                        <MenuItem mnemonicParsing="false" text="Save.as" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem mnemonicParsing="false" text="Preferences" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Help">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                        <MenuItem mnemonicParsing="false" text="Version" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+        <HBox alignment="CENTER_LEFT" minHeight="44.0" prefHeight="44.0" prefWidth="700.0" spacing="20.0" VBox.vgrow="NEVER">
+            <children>
+                <Label alignment="CENTER" text="Run # :" />
+                <Label fx:id="label_runno" text="0000.0000.000" />
+                <StateLabel fx:id="slabel" prefHeight="27.0" prefWidth="112.0" />
+            </children>
+            <VBox.margin>
+                <Insets />
+            </VBox.margin>
+            <padding>
+                <Insets left="10.0" right="10.0" />
+            </padding>
+        </HBox>
+        <SplitPane dividerPositions="0.3" VBox.vgrow="ALWAYS">
+            <items>
+                <Accordion fx:id="accordion" disable="true" maxWidth="280.0" minWidth="0.0" HBox.hgrow="SOMETIMES" />
+                <TabPane fx:id="tabpane" disable="true" minHeight="400.0" minWidth="500.0" HBox.hgrow="ALWAYS" />
+            </items>
+        </SplitPane>
+    </children>
+</VBox>

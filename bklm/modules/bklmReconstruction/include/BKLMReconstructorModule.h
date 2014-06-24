@@ -46,8 +46,14 @@ namespace Belle2 {
     //! Pointer to GeometryPar singleton
     bklm::GeometryPar* m_GeoPar;
 
-    //! maximum time difference (ns) between two strips that are considered to be in coincidence
+    //! maximum time difference (ns) between orthogonal strips that are in coincidence
     double m_DtMax;
+
+    //! mean prompt time (ns) of 2D hit
+    double m_PromptTime;
+
+    //! half-width window (ns) of 2D hit relative to mean prompt time
+    double m_PromptWindow;
 
   };
 } // end namespace Belle2

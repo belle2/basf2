@@ -68,7 +68,10 @@ namespace Belle2 {
 
     //! Get average phi-measuring strip number
     //! @return average phi-measuring strip number of this 2D hit
-    double getPhiStripAve() const;
+    double getPhiStripAve() const {
+      return 0.5 * ((((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1) +
+                    (((m_ModuleID & BKLM_MAXSTRIP_MASK) >> BKLM_MAXSTRIP_BIT) + 1));
+    }
 
     //! Get lowest z-measuring strip number
     //! @return lowest z-measuring strip number of this 2D hit
@@ -80,7 +83,10 @@ namespace Belle2 {
 
     //! Get average z-measuring strip number
     //! @return average z-measuring strip number of this 2D hit
-    double getZStripAve() const;
+    double getZStripAve() const {
+      return 0.5 * ((((m_ZStrips & BKLM_ZSTRIP_MASK) >> BKLM_ZSTRIP_BIT) + 1) +
+                    (((m_ZStrips & BKLM_ZMAXSTRIP_MASK) >> BKLM_ZMAXSTRIP_BIT) + 1));
+    }
 
     //! Get detector-module identifier
     //! @return detector-module identifier

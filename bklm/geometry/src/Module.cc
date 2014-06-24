@@ -119,6 +119,8 @@ namespace Belle2 {
       m_ZStripMin(m.m_ZStripMin),
       m_ZStripMax(m.m_ZStripMax),
       m_ZPositionBase(m.m_ZPositionBase),
+      m_PhiSensorSide(m.m_PhiSensorSide),
+      m_SignalSpeed(m.m_SignalSpeed),
       m_GlobalOrigin(m.m_GlobalOrigin),
       m_LocalReconstructionShift(m.m_LocalReconstructionShift),
       m_Rotation(m.m_Rotation),

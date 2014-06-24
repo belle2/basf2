@@ -44,9 +44,18 @@ BKLMReconstructorModule::BKLMReconstructorModule() : Module(), m_GeoPar(NULL)
 {
   setDescription("BKLM reconstruction module of 1D and 2D hits");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("Coincidence window (ns)", m_DtMax,
-           "Strip hits whose time difference exceeds this value are independent",
-           double(75.0));
+  // MC 1 GeV/c muons: 1-sigma width is 0.43 ns
+  addParam("Orthogonal-strip coincidence window (ns)", m_DtMax,
+           "Orthogonal strip hits whose time difference exceeds this value are independent",
+           double(50.0));
+  // MC 1 GeV/c muons: mean prompt time is 0.43 ns
+  addParam("Nominal prompt time (ns)", m_PromptTime,
+           "Nominal time of prompt hits",
+           double(0.0));
+  // MC 1 GeV/c muons: 1-sigma width is 0.15 ns
+  addParam("Prompt window (ns)", m_PromptWindow,
+           "Half-width of prompt window relative to PromptTime",
+           double(50.0));
 }
 
 BKLMReconstructorModule::~BKLMReconstructorModule()
@@ -134,7 +143,9 @@ void BKLMReconstructorModule::event()
       if (std::fabs(phiTime - zTime) > m_DtMax) continue;
       CLHEP::Hep3Vector global = m->localToGlobal(local);
       double time = 0.5 * (phiTime + zTime) - global.mag() / Const::speedOfLight;
-      hit2ds.appendNew(hit1ds[phiIndex], hit1ds[zIndex], global, time);
+      std::cout << "," << time << "," << phiTime - zTime << std::endl;
+      BKLMHit2d* hit2d = hit2ds.appendNew(hit1ds[phiIndex], hit1ds[zIndex], global, time);
+      if (fabs(time - m_PromptTime) > m_PromptWindow) hit2d->isOutOfTime();
       hit2dToHit1d.add(hit2ds.getEntries() - 1, i);
       hit2dToHit1d.add(hit2ds.getEntries() - 1, j);
 

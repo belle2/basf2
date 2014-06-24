@@ -68,7 +68,10 @@ namespace Belle2 {
 
     //! Get average strip number
     //! @return average strip number of this 1D hit
-    double getStripAve() const;
+    double getStripAve() const {
+      return 0.5 * ((((m_ModuleID & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1) +
+                    (((m_ModuleID & BKLM_MAXSTRIP_MASK) >> BKLM_MAXSTRIP_BIT) + 1));
+    }
 
     //! Get detector-module identifier
     //! @return detector-module identifier

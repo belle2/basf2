@@ -2,7 +2,6 @@ package b2daq.dqm.graphics;
 
 import b2daq.dqm.core.Axis;
 import b2daq.graphics.GraphicsDrawer;
-import java.util.Arrays;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
@@ -10,7 +9,7 @@ import javafx.scene.paint.Paint;
 
 public class GColorAxis extends GAxisY {
 
-    private final static Color[] COLOR_LIST = {
+    public final static Color[] COLOR_LIST = {
         Color.rgb(153, 0, 255), Color.rgb(102, 0, 255),
         Color.rgb(51, 0, 255), Color.rgb(0, 0, 255),
         Color.rgb(0, 51, 255), Color.rgb(0, 102, 255),

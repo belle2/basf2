@@ -3,12 +3,12 @@
 
 #include <daq/slc/nsm/NSMNode.h>
 
-#include <daq/slc/database/ConfigObject.h>
+#include <daq/slc/database/LoggerObject.h>
 #include <daq/slc/database/RunNumberInfo.h>
 
 namespace Belle2 {
 
-  class RunSetting : public ConfigObject {
+  class RunSetting : public LoggerObject {
 
   public:
     RunSetting(const NSMNode& node);

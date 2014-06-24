@@ -14,9 +14,10 @@ namespace Belle2 {
     ~LoggerObjectTable() throw() {}
 
   public:
-    ConfigObject getLast(const std::string& nodename,
-                         const std::string& tablename_in,
-                         int revision) throw();
+    LoggerObject getLatest(const std::string& nodename,
+                           const std::string& tablename_in) throw();
+    LoggerObject getList(const std::string& nodename,
+                         const std::string& tablename_in) throw();
     int add(DBObject& obj, bool isroot = true)
     throw(DBHandlerException);
 

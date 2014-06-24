@@ -22,6 +22,8 @@ namespace Belle2 {
     void run() {
       TCPServerSocket server_socket(m_ip, m_port);
       server_socket.open();
+      LogFile::debug("open socket (%s:%d)",
+                     m_ip.c_str(), m_port);
       while (true) {
         TCPSocket socket = server_socket.accept();
         LogFile::debug("new connection accepted (%s:%d)",

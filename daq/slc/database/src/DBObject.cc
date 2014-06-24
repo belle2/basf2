@@ -110,6 +110,11 @@ FieldInfo::Property DBObject::getProperty(const std::string& name) const throw()
   return m_pro_m[name];
 }
 
+size_t DBObject::getLength(const std::string& name) const throw()
+{
+  return getProperty(name).getLength();
+}
+
 bool DBObject::hasField(const std::string& name) const throw()
 {
   return m_pro_m.find(name) != m_pro_m.end();
@@ -146,81 +151,81 @@ bool DBObject::hasObject(const std::string& name, int index) const throw()
          (index < 0 || index < getNObjects(name));
 }
 
-bool DBObject::getBool(const std::string& name) const throw()
+bool DBObject::getBool(const std::string& name, int index) const throw()
 {
   const void* value = getValue(name);
-  if (value == NULL) return false;
-  return *(bool*)value;
+  if (value == NULL && getLength(name)) return false;
+  return ((bool*)value)[index];
 }
 
-char DBObject::getChar(const std::string& name) const throw()
+char DBObject::getChar(const std::string& name, int index) const throw()
 {
   const void* value = getValue(name);
-  if (value == NULL) return 0;
-  return *(char*)value;
+  if (value == NULL && getLength(name)) return 0;
+  return ((char*)value)[index];
 }
 
-short DBObject::getShort(const std::string& name) const throw()
+short DBObject::getShort(const std::string& name, int index) const throw()
 {
   const void* value = getValue(name);
-  if (value == NULL) return 0;
-  return *(short*)value;
+  if (value == NULL && getLength(name)) return 0;
+  return ((short*)value)[index];
 }
 
-int DBObject::getInt(const std::string& name) const throw()
+int DBObject::getInt(const std::string& name, int index) const throw()
 {
   const void* value = getValue(name);
-  if (value == NULL) return 0;
-  return *(int*)value;
+  if (value == NULL && getLength(name)) return 0;
+  return ((int*)value)[index];
 }
 
-long long DBObject::getLong(const std::string& name) const throw()
+long long DBObject::getLong(const std::string& name, int index) const throw()
 {
   const void* value = getValue(name);
-  if (value == NULL) return 0;
-  return *(long long*)value;
+  if (value == NULL && getLength(name)) return 0;
+  return ((long long*)value)[index];
 }
 
-unsigned char DBObject::getUChar(const std::string& name) const throw()
+unsigned char DBObject::getUChar(const std::string& name, int index) const throw()
 {
   const void* value = getValue(name);
-  if (value == NULL) return 0;
-  return *(unsigned char*)value;
+  if (value == NULL && getLength(name)) return 0;
+  return ((unsigned char*)value)[index];
 }
 
-unsigned short DBObject::getUShort(const std::string& name) const throw()
+unsigned short DBObject::getUShort(const std::string& name, int index) const throw()
 {
   const void* value = getValue(name);
-  if (value == NULL) return 0;
-  return *(unsigned short*)value;
+  if (value == NULL && getLength(name)) return 0;
+  return ((unsigned short*)value)[index];
 }
 
-unsigned int DBObject::getUInt(const std::string& name) const throw()
+unsigned int DBObject::getUInt(const std::string& name, int index) const throw()
 {
   const void* value = getValue(name);
-  if (value == NULL) return 0;
-  return *(unsigned int*)value;
+  if (value == NULL && getLength(name)) return 0;
+  return ((unsigned int*)value)[index];
 }
 
-unsigned long long DBObject::getULong(const std::string& name) const throw()
+unsigned long long DBObject::getULong(const std::string& name, int index) const throw()
 {
   const void* value = getValue(name);
-  if (value == NULL) return 0;
-  return *(unsigned long long*)value;
+  if (value == NULL && getLength(name)) return 0;
+  return ((unsigned long long*)value)[index];
 }
 
-float DBObject::getFloat(const std::string& name) const throw()
+float DBObject::getFloat(const std::string& name, int index) const throw()
 {
   const void* value = getValue(name);
-  if (value == NULL) return 0;
-  return *(float*)value;
+  if (value == NULL && getLength(name)) return 0;
+  return ((float*)value)[index];
 }
 
-double DBObject::getDouble(const std::string& name) const throw()
+double DBObject::getDouble(const std::string& name, int index) const throw()
 {
   const void* value = getValue(name);
-  if (value == NULL) return 0;
-  return *(double*)value;
+  if (value == NULL && getLength(name)) return 0;
+  return ((double*)value)[index];
 }
 
 const EnumList& DBObject::getEnumList(const std::string& name) const throw()
@@ -232,6 +237,61 @@ int DBObject::getEnumId(const std::string& name) const throw()
 {
   if (!hasEnum(name)) return 0;
   return m_enum_m_m[name][getEnum(name)];
+}
+
+void DBObject::setBool(const std::string& name, bool value, int index) throw()
+{
+  setValue(name, &value, index);
+}
+
+void DBObject::setChar(const std::string& name, int value, int index) throw()
+{
+  setValue(name, &value, index);
+}
+
+void DBObject::setShort(const std::string& name, int value, int index) throw()
+{
+  setValue(name, &value, index);
+}
+
+void DBObject::setInt(const std::string& name, int value, int index) throw()
+{
+  setValue(name, &value, index);
+}
+
+void DBObject::setLong(const std::string& name, long long value, int index) throw()
+{
+  setValue(name, &value, index);
+}
+
+void DBObject::setUChar(const std::string& name, unsigned int value, int index) throw()
+{
+  setValue(name, &value, index);
+}
+
+void DBObject::setUShort(const std::string& name, unsigned int value, int index) throw()
+{
+  setValue(name, &value, index);
+}
+
+void DBObject::setUInt(const std::string& name, unsigned int value, int index) throw()
+{
+  setValue(name, &value, index);
+}
+
+void DBObject::setULong(const std::string& name, unsigned long long value, int index) throw()
+{
+  setValue(name, &value, index);
+}
+
+void DBObject::setFloat(const std::string& name, float value, int index) throw()
+{
+  setValue(name, &value, index);
+}
+
+void DBObject::setDouble(const std::string& name, double value, int index) throw()
+{
+  setValue(name, &value, index);
 }
 
 void DBObject::setEnum(const std::string& name, int value) throw()

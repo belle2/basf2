@@ -14,7 +14,6 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.collections.ObservableList;
 
 /**
  *
@@ -68,18 +67,18 @@ public class DQMDATA implements Serializable {
         histograms.clear();
         int nhist = reader.readInt();
         for (int n = 0; n < nhist; n++) {
-            String name = reader.readString();
+            String oname = reader.readString();
             String datatype = reader.readString();
             Histo hist = null;
-            if (histograms.containsKey(name)) {
-                hist = histograms.get(name);
+            if (histograms.containsKey(oname)) {
+                hist = histograms.get(oname);
                 if (!hist.getDataType().matches(datatype)) {
                     hist = null;
                 }
             }
             if (hist == null) {
                 hist = HistoFactory.create(datatype);
-                histograms.put(name, hist);
+                histograms.put(oname, hist);
             }
             hist.readObject(reader);
         }
@@ -89,9 +88,9 @@ public class DQMDATA implements Serializable {
     public void writeObject(Writer writer) throws IOException {
         writer.writeString(name.get());
         writer.writeInt(histograms.size());
-        for (String name : histograms.keySet()) {
-            Histo hist = histograms.get(name);
-            writer.writeString(name);
+        for (String oname : histograms.keySet()) {
+            Histo hist = histograms.get(oname);
+            writer.writeString(oname);
             writer.writeObject(hist);
         }
     }

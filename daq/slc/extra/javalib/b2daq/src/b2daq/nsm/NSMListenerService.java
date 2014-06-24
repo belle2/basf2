@@ -185,6 +185,7 @@ public class NSMListenerService extends Thread {
             NSMCommand command = new NSMCommand();
             command.copy(msg.getReqName());
             if (command.equals(NSMCommand.DBSET)) {
+                System.out.println(msg.getNodeName());
                 ConfigObject obj = getDB(msg.getNodeName());
                 if (obj == null) {
                     obj = new ConfigObject();

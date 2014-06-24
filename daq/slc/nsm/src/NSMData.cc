@@ -21,7 +21,7 @@ using namespace Belle2;
 
 NSMData::NSMData(const std::string& dataname,
                  const std::string& format, int revision)
-throw() : LoggerObject(), m_allocated(false),
+throw() : DBObject(), m_allocated(false),
   m_pdata(NULL), m_size(0), m_offset(0)
 {
   setName(dataname);
@@ -31,14 +31,14 @@ throw() : LoggerObject(), m_allocated(false),
 }
 
 NSMData::NSMData()
-throw() : LoggerObject(), m_allocated(false),
+throw() : DBObject(), m_allocated(false),
   m_pdata(NULL), m_size(0), m_offset(0)
 {
   setConfig(false);
 }
 
 NSMData::NSMData(const NSMData& data) throw()
-  : LoggerObject(data)
+  : DBObject(data)
 {
   setConfig(false);
   m_allocated = data.m_allocated;

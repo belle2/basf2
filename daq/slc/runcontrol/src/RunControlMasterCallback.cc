@@ -115,16 +115,20 @@ bool RunControlMasterCallback::log() throw()
     std::string nodename = slist[0];
     std::stringstream ss;
     for (size_t i = 1; i < slist.size(); i++) {
-      ss << slist[i] << "<br/>";
+      ss << slist[i];
+      if (i < slist.size() - 1) ss << "\n";
     }
-    DAQLogMessage log(nodename,
-                      (LogFile::Priority)msg.getParam(0),
+    DAQLogMessage log(nodename, (LogFile::Priority)msg.getParam(0),
                       ss.str(), Date(msg.getParam(1)));
+    log.setNode(getNode().getName());
     getDB()->connect();
     LoggerObjectTable(getDB()).add(log, true);
     getDB()->close();
     NSMCommunicator& com(*getCommunicator());
-    com.sendLog(log);
+    if (nodename != com.getMaster().getName() &&
+        log.getPriority() > LogFile::INFO) {
+      com.sendLog(log);
+    }
   }
   return true;
 }
@@ -169,8 +173,20 @@ bool RunControlMasterCallback::error() throw()
 {
   NSMMessage& msg(getMessage());
   if (msg.getLength() > 0) {
+    std::string nodename = msg.getNodeName();
     LogFile::error("Error from '%s' (%s)",
-                   msg.getNodeName(), msg.getData());
+                   nodename.c_str(), msg.getData());
+    DAQLogMessage log(nodename, LogFile::ERROR,
+                      msg.getData(), Date());
+    log.setNode(getNode().getName());
+    getDB()->connect();
+    LoggerObjectTable(getDB()).add(log, true);
+    getDB()->close();
+    NSMCommunicator& com(*getCommunicator());
+    if (nodename != com.getMaster().getName() &&
+        log.getPriority() > LogFile::INFO) {
+      com.sendLog(log);
+    }
   }
   return true;//?
 }

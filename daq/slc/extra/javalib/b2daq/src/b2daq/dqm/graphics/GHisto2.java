@@ -27,6 +27,10 @@ public class GHisto2 extends GHisto {
         update();
         axisY = this.canvas.getColorAxis();
         ObservableList<Paint> color_pattern = ((GColorAxis) this.canvas.getColorAxis()).getColorPattern();
+        if (color_pattern.size() == 0) {
+                ((GColorAxis)this.canvas.getColorAxis()).setColorPattern(GColorAxis.COLOR_LIST);
+                color_pattern = ((GColorAxis) this.canvas.getColorAxis()).getColorPattern();
+        }
         double x0 = this.canvas.getPad().getX();
         double y0 = this.canvas.getPad().getY() + this.canvas.getPad().getHeight();
         double xmin = histo.getAxisX().getMin(), xmax = histo.getAxisX().getMax();
@@ -45,7 +49,7 @@ public class GHisto2 extends GHisto {
                 Paint color = color_pattern.get(0);
                 double data = histo.getBinContent(nx, ny);
                 if (data < max && data > min) {
-                    color = color_pattern.get((int)(color_pattern.size()
+                    color = color_pattern.get((int) (color_pattern.size()
                             * ((data - min) / (max - min))));
                 }
                 if (data >= max) {

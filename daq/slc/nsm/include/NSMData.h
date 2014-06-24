@@ -3,7 +3,7 @@
 
 #include "daq/slc/nsm/NSMHandlerException.h"
 
-#include <daq/slc/database/LoggerObject.h>
+#include <daq/slc/database/DBObject.h>
 
 #include <daq/slc/base/StringUtil.h>
 
@@ -20,7 +20,7 @@ namespace Belle2 {
 
   class NSMCommunicator;
 
-  class NSMData : public LoggerObject {
+  class NSMData : public DBObject {
 
   public:
     typedef std::vector<NSMData> NSMDataList;

@@ -12,17 +12,18 @@ using namespace Belle2;
 void DQMViewMaster::init()
 {
   for (size_t i = 0; i < m_reader_v.size(); i++) {
-    m_con_v.push_back(ProcessController());
+    //m_con_v.push_back(ProcessController());
   }
   for (size_t i = 0; i < m_reader_v.size(); i++) {
     const std::string name = m_reader_v[i].getName();
-    m_con_v[i].setCallback(m_callback);
-    m_con_v[i].init("hserver_" + name);
+    //m_con_v[i].setCallback(m_callback);
+    //m_con_v[i].init("hserver_" + name);
   }
 }
 
 bool DQMViewMaster::boot()
 {
+  /*
   ConfigFile config("dqm");
   const std::string dumppath = config.get("DQM_DUMP_PATH");
   const std::string mappath = config.get("DQM_MAP_PATH");
@@ -37,13 +38,14 @@ bool DQMViewMaster::boot()
     m_con_v[i].addArgument(filename);
     m_con_v[i].load(-1);
   }
+  */
   return true;
 }
 
 bool DQMViewMaster::abort()
 {
   for (size_t i = 0; i < m_reader_v.size(); i++) {
-    m_con_v[i].abort();
+    //m_con_v[i].abort();
   }
   return true;
 }

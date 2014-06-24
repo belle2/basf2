@@ -39,6 +39,7 @@ namespace Belle2 {
     FieldNameList& getFieldNames() throw() { return m_name_v; }
     const FieldNameList& getFieldNames() const throw() { return m_name_v; }
     FieldInfo::Property getProperty(const std::string& name) const throw();
+    size_t getLength(const std::string& name) const throw();
     bool hasField(const std::string& name) const throw();
     bool hasValue(const std::string& name) const throw();
     bool hasText(const std::string& name) const throw();
@@ -60,17 +61,17 @@ namespace Belle2 {
     void setConfig(bool isconfig) throw() { m_isconfig = isconfig; }
 
   public:
-    virtual bool getBool(const std::string& name) const throw();
-    virtual char getChar(const std::string& name) const throw();
-    virtual short getShort(const std::string& name) const throw();
-    virtual int getInt(const std::string& name) const throw();
-    virtual long long getLong(const std::string& name) const throw();
-    virtual unsigned char getUChar(const std::string&) const throw();
-    virtual unsigned short getUShort(const std::string&) const throw();
-    virtual unsigned int getUInt(const std::string&) const throw();
-    virtual unsigned long long getULong(const std::string&) const throw();
-    virtual float getFloat(const std::string& name) const throw();
-    virtual double getDouble(const std::string& name) const throw();
+    virtual bool getBool(const std::string& name, int index = 0) const throw();
+    virtual char getChar(const std::string& name, int index = 0) const throw();
+    virtual short getShort(const std::string& name, int index = 0) const throw();
+    virtual int getInt(const std::string& name, int index = 0) const throw();
+    virtual long long getLong(const std::string& name, int index = 0) const throw();
+    virtual unsigned char getUChar(const std::string& name, int index = 0) const throw();
+    virtual unsigned short getUShort(const std::string& name, int index = 0) const throw();
+    virtual unsigned int getUInt(const std::string& name, int index = 0) const throw();
+    virtual unsigned long long getULong(const std::string& name, int index = 0) const throw();
+    virtual float getFloat(const std::string& name, int index = 0) const throw();
+    virtual double getDouble(const std::string& name, int index = 0) const throw();
     virtual void addBool(const std::string& name, bool value) throw() { addValue(name, &value, FieldInfo::BOOL, 0); }
     virtual void addChar(const std::string& name, char value) throw() { addValue(name, &value, FieldInfo::CHAR, 0); }
     virtual void addShort(const std::string& name, short value) throw() { addValue(name, &value, FieldInfo::SHORT, 0); }
@@ -82,17 +83,17 @@ namespace Belle2 {
     virtual void addULong(const std::string& name, long long value) throw() { addValue(name, &value, FieldInfo::LONG, 0); }
     virtual void addFloat(const std::string& name, float value) throw() { addValue(name, &value, FieldInfo::FLOAT, 0); }
     virtual void addDouble(const std::string& name, double value) throw() { addValue(name, &value, FieldInfo::DOUBLE, 0); }
-    virtual void setBool(const std::string& name, bool value) throw() { setValue(name, &value, 0); }
-    virtual void setChar(const std::string& name, int value) throw() { setValue(name, &value, 0); }
-    virtual void setShort(const std::string& name, int value) throw() { setValue(name, &value, 0); }
-    virtual void setInt(const std::string& name, int value) throw() { setValue(name, &value, 0); }
-    virtual void setLong(const std::string& name, long long value) throw() { setValue(name, &value, 0); }
-    virtual void setUChar(const std::string& name, unsigned int value) throw() { setValue(name, &value, 0); }
-    virtual void setUShort(const std::string& name, unsigned int value) throw() { setValue(name, &value, 0); }
-    virtual void setUInt(const std::string& name, unsigned int value) throw() { setValue(name, &value, 0); }
-    virtual void setULong(const std::string& name, unsigned long long value) throw() { setValue(name, &value, 0); }
-    virtual void setFloat(const std::string& name, float value) throw() { setValue(name, &value, 0); }
-    virtual void setDouble(const std::string& name, double value) throw() { setValue(name, &value, 0); }
+    virtual void setBool(const std::string& name, bool value, int index = 0) throw();
+    virtual void setChar(const std::string& name, int value, int index = 0) throw();
+    virtual void setShort(const std::string& name, int value, int index = 0) throw();
+    virtual void setInt(const std::string& name, int value, int index = 0) throw();
+    virtual void setLong(const std::string& name, long long value, int index = 0) throw();
+    virtual void setUChar(const std::string& name, unsigned int value, int index = 0) throw();
+    virtual void setUShort(const std::string& name, unsigned int value, int index = 0) throw();
+    virtual void setUInt(const std::string& name, unsigned int value, int index = 0) throw();
+    virtual void setULong(const std::string& name, unsigned long long value, int index = 0) throw();
+    virtual void setFloat(const std::string& name, float value, int index = 0) throw();
+    virtual void setDouble(const std::string& name, double value, int index = 0) throw();
 
   public:
     void print() const throw();

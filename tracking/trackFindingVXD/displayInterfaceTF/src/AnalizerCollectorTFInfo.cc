@@ -121,13 +121,16 @@ void AnalizerCollectorTFInfo::setAllParticleIDs(double boarder)
         RelationVector<MCParticle> mcParticleRelations = aCluster->getRelationsTo<MCParticle>();
 
         // Same procedure VXDSimpleClusterizerModule => first particle (should not have a second particleID)
-        particleID = mcParticleRelations[0]->getIndex();
-        isReal = mcParticleRelations[0]->hasStatus(MCParticle::c_PrimaryParticle);
-        pdgCode = mcParticleRelations[0]->getPDG();
+        if (mcParticleRelations.size() > 0) {
+          particleID = mcParticleRelations[0]->getIndex();
+          isReal = mcParticleRelations[0]->hasStatus(MCParticle::c_PrimaryParticle);
+          pdgCode = mcParticleRelations[0]->getPDG();
 
-        // should not have a second particleID
-        if (mcParticleRelations.size() > 1) {
-          B2DEBUG(100, "2nd Particle ID !!!: " << particleID);
+          // should not have a second particleID
+          if (mcParticleRelations.size() > 1) {
+            B2DEBUG(100, "2nd Particle ID !!!: " << particleID);
+          }
+
         }
 
       }
@@ -151,13 +154,16 @@ void AnalizerCollectorTFInfo::setAllParticleIDs(double boarder)
         RelationVector<MCParticle> mcParticleRelations = aCluster->getRelationsTo<MCParticle>();
 
         // Same procedure VXDSimpleClusterizerModule => first particle (should not have a second particleID)
-        particleID = mcParticleRelations[0]->getIndex();
-        isReal = mcParticleRelations[0]->hasStatus(MCParticle::c_PrimaryParticle);
-        pdgCode = mcParticleRelations[0]->getPDG();
+        if (mcParticleRelations.size() > 0) {
+          particleID = mcParticleRelations[0]->getIndex();
+          isReal = mcParticleRelations[0]->hasStatus(MCParticle::c_PrimaryParticle);
+          pdgCode = mcParticleRelations[0]->getPDG();
 
-        // should not have a second particleID
-        if (mcParticleRelations.size() > 1) {
-          B2DEBUG(100, "2nd Particle ID !!!: " << particleID);
+          // should not have a second particleID
+          if (mcParticleRelations.size() > 1) {
+            B2DEBUG(100, "2nd Particle ID !!!: " << particleID);
+          }
+
         }
 
       }
@@ -694,8 +700,7 @@ void AnalizerCollectorTFInfo::storeCellInformation(std::string filename, int par
       std::vector<int> accepted = cellTFInfo[i]->getAccepted();
       std::vector<int> rejected = cellTFInfo[i]->getRejected();
 
-      B2DEBUG(100, "SaveCellInformation: i: " << i << ", pass index: " << cellTFInfo[i]->getPassIndex() << ", size accepted: " <<
-              accepted.size() << ", size rejected: " << rejected.size());
+      B2DEBUG(100, "SaveCellInformation: i: " << i << ", pass index: " << cellTFInfo[i]->getPassIndex() << ", size accepted: " << accepted.size() <<  ", size rejected: " << rejected.size() << ", sizeNeighbours: " << cellTFInfo[i]->sizeNeighbours());
 
       for (uint u = 0; u < searchfilters.size(); u++) {
         //B2DEBUG(100,"Filter ?: " << searchfilters.at(u));

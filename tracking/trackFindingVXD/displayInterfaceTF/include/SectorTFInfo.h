@@ -82,7 +82,7 @@ namespace Belle2 {
     void setSectorID(unsigned int value) { m_sectorID = value; }
 
     /** getter - getFriends*/
-    std::vector<unsigned int>& getFriends()  { return m_friends; }
+    std::vector<unsigned int> getFriends() const  { return m_friends; }
 
     /** add new int to Friends */
     void push_back_Friends(unsigned int newMember) {
@@ -95,7 +95,7 @@ namespace Belle2 {
     }
 
     /** returns size of Friends */
-    int sizeFriends() { return m_friends.size(); }
+    int sizeFriends() const { return m_friends.size(); }
 
     /** getter - IsOnlyFriend */
     bool getIsOnlyFriend()  { return m_isOnlyFriend; }
@@ -137,14 +137,14 @@ namespace Belle2 {
     }
 
     /** returns the String for the display - Information */
-    const TString getDisplayInformation() {
+    const TString getDisplayInformation() const {
 
       return TString::Format("Point 1: (%.3f, %.3f, %.3f) Point 2: (%.3f, %.3f, %.3f) Point 3: (%.3f, %.3f, %.3f) Point 4: (%.3f, %.3f, %.3f)\n Friend Only: %s\n Died_ID: %d ", m_points[0].X(), m_points[0].Y(), m_points[0].Z(), m_points[1].X(), m_points[1].Y(), m_points[1].Z(), m_points[2].X(), m_points[2].Y(), m_points[2].Z(), m_points[3].X(), m_points[3].Y(), m_points[3].Z(), m_isOnlyFriend ? "true" : "false", getDiedID());
 
     }
 
     /** returns Coordinates of a Sector, Point 1 = Point 5 to draw Sector */
-    const std::vector<TVector3> getCoordinates() {
+    const std::vector<TVector3> getCoordinates() const {
       std::vector<TVector3> coordinates;
 
       for (auto & currentPoint : m_points) {
@@ -157,7 +157,7 @@ namespace Belle2 {
     }
 
     /** returns the String for the display - AlternativeBox */
-    const TString getDisplayAlternativeBox() {
+    const TString getDisplayAlternativeBox() const {
 
       std::string diedAt = getDiedAt();
 

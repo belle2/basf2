@@ -2726,7 +2726,8 @@ void VXDTFModule::endRun()
 
   B2DEBUG(2, "Explanation: pxdc: number of PXDClusters, 2D), svdc: SVDClusters(1D)\n svdH: # of SVDHits(guess of actual number of 2D-Track- and -BG-hits)\n catC: SVDClusterCombinations(combining u/v, including ghosthits)\n ghR: ghostHitRate(is only a guess, TODO: should be correctly determined!!)\n noSc: are hits discarded, where no fitting sector could be found\n noFd: hits having no hits in compatible sectors (friends), ooR: sensors which were not in sensitive plane of sensor, no2D: SVDclusters, were no 2nd cluster could be found\n 1Dsn: times where a SVDsensor hat not the same number of u and v clusters, 1DHO: like 1Dsn, but where a high occupancy case prevented reconstructing them")
 
-  B2DEBUG(1, lineHigh << lineApnd << lineApnd << "\n bl+\t| bl++\t| 1D+\t| 1D-\t| NoH\t| sf+\t| sf-\t| nf+\t| nf-\t| zzXY\t| zXYS\t| zzRZ\t| cf\t| dpT\t| tcc+\t| Ttcc\t| Ttcf\t| Tfin\t| NNns\t| NNov\t|\n " << m_TESTERstartedBaselineTF << "\t| " << m_TESTERsucceededBaselineTF << "\t| " << m_TESTERacceptedBrokenHitsTrack << "\t| " << m_TESTERrejectedBrokenHitsTrack << "\t| " << m_TESTERnoHitsAtEvent << "\t| " << m_TESTERtotalsegmentsSFCtr << "\t| " << m_TESTERdiscardedSegmentsSFCtr << "\t| " << m_TESTERtotalsegmentsNFCtr << "\t| " << m_TESTERdiscardedSegmentsNFCtr << "\t|" << m_TESTERtriggeredZigZagXY << "\t| " << m_TESTERtriggeredZigZagXYWithSigma << "\t| " << m_TESTERtriggeredZigZagRZ << "\t| " << m_TESTERtriggeredCircleFit << "\t| " << m_TESTERtriggeredDpT << "\t| " << m_TESTERapprovedByTCC << "\t| " << m_TESTERcountTotalTCsAfterTCC << "\t| " << m_TESTERcountTotalTCsAfterTCCFilter << "\t| " << m_TESTERcountTotalTCsFinal << "\t| " << m_TESTERbadHopfieldCtr << "\t| " << m_TESTERHopfieldLetsOverbookedTCsAliveCtr << "\t|")
+  B2DEBUG(1, lineHigh << lineApnd << lineApnd << "\n bl+\t| bl++\t| 1D+\t| 1D-\t| NoH\t| sf+\t| sf-\t| nf+\t| nf-\t| zzXY\t| zXYS\t| zzRZ\t| cf\t| dpT\t| tcc+\t| Ttcc\t| Ttcf\t| Tfin\t| NNns\t| NNov\t|\n " << m_TESTERstartedBaselineTF << "\t| " << m_TESTERsucceededBaselineTF << "\t| " << m_TESTERacceptedBrokenHitsTrack << "\t| " << m_TESTERrejectedBrokenHitsTrack << "\t| " << m_TESTERnoHitsAtEvent << "\t| " << m_TESTERtotalsegmentsSFCtr << "\t| " << m_TESTERdiscardedSegmentsSFCtr << "\t| " << m_TESTERtotalsegmentsNFCtr << "\t| " << m_TESTERdiscardedSegmentsNFCtr << "\t|" << m_TESTERtriggeredZigZagXY << "\t| " << m_TESTERtriggeredZigZagXYWithSigma << "\t| " << m_TESTERtriggeredZigZagRZ << "\t| " << m_TESTERtriggeredCircleFit << "\t| " << m_TESTERtriggeredDpT << "\t| " << m_TESTERapprovedByTCC << "\t| " << m_TESTERcountTotalTCsAfterTCC << "\t| " << m_TESTERcountTotalTCsAfterTCCFilter << "\t| " << m_TESTERcountTotalTCsFinal << "\t| " << m_TESTERbadHopfieldCtr << "\t| "
+          << m_TESTERHopfieldLetsOverbookedTCsAliveCtr << "\t|")
 
   B2DEBUG(2, "Explanation: bl+: baseLineTF started, bl++ baselineTF succeeded, 1D+: TCs with 1D-svd-Hits were accepted, 1D-: rejected, NoH: Events without hits\n sf+: segfinder segments activated, sf-: -discarded, nf+: nbFinder segments activated, nf-: discarded, zzXY: zigzagXY got triggered, zzRZ: same for zigzagRZ, cf: circleFit(tuneCircleFitValue), dpT: deltaPt\n tcc+: approved by tcc, Ttcc: total number of TCs after TCC, Ttcf: after TCC-filter, Tfin: total number of final TCs, NNns: the Hopfield network had no survivors, NNov: the Hopfield network accepted overlapping TCs (which should never occur! -> if != 0: Bug!)")
 
@@ -4550,6 +4551,8 @@ int VXDTFModule::cellularAutomaton(PassData* currentPass)
     for (VXDSegmentCell * currentSeg : currentPass->activeCellList) {
       if (currentSeg->isActivated() == false) { continue; }
 
+      std::vector<int> idsNeighbours;
+
       goodNeighbours = 0;
       list<VXDSegmentCell*>* currentNeighbourList = currentSeg->getInnerNeighbours();
       B2DEBUG(50, "CAstep: cell with outer/inner hit at sectors: " << currentSeg->getOuterHit()->getSectorString() << "/" << currentSeg->getInnerHit()->getSectorString() << " has inner/outer friend at " << currentSeg->sizeOfInnerNeighbours() << "/" << currentSeg->sizeOfOuterNeighbours() << ", only innerNeighbours count!")
@@ -4558,9 +4561,18 @@ int VXDTFModule::cellularAutomaton(PassData* currentPass)
       while (currentNeighbour != currentNeighbourList->end()) {
         //TODO probably outdated: can't deal with cells of special shape (e.g. two-layer cells) in some uncommon scenario yet -> search for test scenario
         if (currentSeg->getState() == (*currentNeighbour)->getState()) {
+
+          // Neighbour to Collector
+          if (m_PARAMdisplayCollector > 0) {
+            idsNeighbours.push_back((*currentNeighbour)->getCollectorID());
+            B2DEBUG(100, "neighboring cell found with CollectorID: " << (*currentNeighbour)->getCollectorID());
+          }
+
+
           goodNeighbours++;
           ++currentNeighbour;
           B2DEBUG(100, "neighboring cell found!")
+
         } else {
           currentNeighbour = currentSeg->eraseInnerNeighbour(currentNeighbour); // includes currentNeighbour++;
         }
@@ -4572,7 +4584,7 @@ int VXDTFModule::cellularAutomaton(PassData* currentPass)
 
         // Collector Cell OK CA
         if (m_PARAMdisplayCollector > 0) {
-          m_collector.updateCell(currentSeg->getCollectorID(), "", CollectorTFInfo::m_idAlive, {FilterID::cellularAutomaton}, vector<int>(), -1, -1, currentSeg->getState(), vector<int>());
+          m_collector.updateCell(currentSeg->getCollectorID(), "", CollectorTFInfo::m_idAlive, {FilterID::cellularAutomaton}, vector<int>(), -1, -1, currentSeg->getState(), idsNeighbours);
         }
 
       } else {

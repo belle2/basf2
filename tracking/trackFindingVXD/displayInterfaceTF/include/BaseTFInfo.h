@@ -58,7 +58,7 @@ namespace Belle2 {
     }
 
     /** getter - getDiedAt Died At */
-    std::string getDiedAt()  { return m_diedAt; }
+    std::string getDiedAt() const { return m_diedAt; }
 
     /** setter - Died At */
     void setDiedAt(std::string value) {
@@ -113,13 +113,13 @@ namespace Belle2 {
     }
 
     /** getter - getState Pass Index */
-    int getPassIndex()  { return m_passIndex; }
+    int getPassIndex()  const { return m_passIndex; }
 
     /** setter - Pass Index */
     void setPassIndex(int value) { m_passIndex = value; }
 
     /** getter - getState Pass Index */
-    int getDiedID()  { return m_diedId; }
+    int getDiedID() const { return m_diedId; }
 
     /** setter - Pass Index */
     void setDiedID(int value) { m_diedId = value; }

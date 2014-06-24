@@ -68,7 +68,7 @@ namespace Belle2 {
 
 
     /** getter - getneighbours*/
-    std::vector<int>& getNeighbours()  { return m_neighbours; }
+    std::vector<int> getNeighbours() const { return m_neighbours; }
 
     /** add new int to Neighbours */
     void push_back_Neighbours(int newMember) {
@@ -84,7 +84,7 @@ namespace Belle2 {
 
 
     /** returns size of Neighbours */
-    int sizeNeighbours() { return m_neighbours.size(); }
+    int sizeNeighbours() const { return m_neighbours.size(); }
 
 
 
@@ -149,7 +149,7 @@ namespace Belle2 {
     }
 
     /** getter - Particle with highest purity*/
-    std::pair<int, double> getMainParticle()  {
+    std::pair<int, double> getMainParticle() const {
 
       int maxPos = 0;
 
@@ -192,7 +192,7 @@ namespace Belle2 {
     int sizeUsedParticles() { return m_usedParticles.size(); }
 
     /** returns the String for the display - Information */
-    const TString getDisplayInformation() {
+    const TString getDisplayInformation() const {
 
       int outerHit = -1;
       if (m_assignedHitsIds.size() > 0) { outerHit = m_assignedHitsIds.at(0); }
@@ -204,13 +204,13 @@ namespace Belle2 {
 
 
     /** returns Coordinates of the Assigned Hits */
-    const std::vector<TVector3> getCoordinates() {
+    const std::vector<TVector3> getCoordinates() const {
       return m_assignedHitsCoordinates;
     }
 
 
     /** returns the String for the display - AlternativeBox */
-    const TString getDisplayAlternativeBox() {
+    const TString getDisplayAlternativeBox() const {
 
       std::pair<int, double> mainParticle = getMainParticle();
       std::string diedAt = getDiedAt();

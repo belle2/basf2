@@ -57,18 +57,9 @@ PXDRawHitSorterModule::PXDRawHitSorterModule() : Module()
 void PXDRawHitSorterModule::initialize()
 {
   //Register collections
-  StoreArray<PXDRawHit> storeRawHits(m_storeRawHitsName);
-  storeRawHits.required();
-
-  StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
-  storeDigits.registerAsPersistent();
-
-  StoreArray<PXDFrame> storeFrames(m_storeFramesName);
-  storeFrames.registerAsPersistent();
-
-  m_storeRawHitsName = storeRawHits.getName();
-  m_storeDigitsName = storeDigits.getName();
-  m_storeFramesName = storeFrames.getName();
+  StoreArray<PXDRawHit>::required(m_storeRawHitsName);
+  StoreArray<PXDDigit>::registerPersistent(m_storeDigitsName);
+  StoreArray<PXDFrame>::registerPersistent(m_storeFramesName);
 
   m_ignoredPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(m_ignoredPixelsListName));
 }
@@ -103,7 +94,7 @@ void PXDRawHitSorterModule::event()
         sensorID.setLadderNumber(1);
         sensorID.setSensorNumber(2);
       } else {
-        B2WARNING("Malformed PXDRawHit, VxdID " << sensorID.getID() << ", dropping.");
+        B2WARNING("Malformed PXDRawHit, VxdID $" << hex << sensorID.getID() << ", dropping. (" << sensorID << ")");
         continue;
       }
     }

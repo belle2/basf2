@@ -36,8 +36,6 @@ using namespace std;
 
 namespace Belle2 {
 
-  bool ParticleSelectorModule::m_printVariables(true);
-
   //-----------------------------------------------------------------
   //                 Register module
   //-----------------------------------------------------------------
@@ -63,7 +61,7 @@ namespace Belle2 {
              "toggle newly created particle list btw. transient/persistent", false);
 
     // initializing the rest of private memebers
-    m_pdgCode   = 0;
+    m_pdgCode = 0;
     m_isSelfConjugatedParticle = 0;
   }
 
@@ -73,16 +71,6 @@ namespace Belle2 {
 
   void ParticleSelectorModule::initialize()
   {
-
-    if (m_printVariables) {
-      cout << "--------------------------------------------------------\n";
-      cout << "Modular analysis: list of available selection variables:\n";
-      cout << "--------------------------------------------------------\n";
-      m_pSelector.listVariables();
-      cout << "--------------------------------------------------------\n";
-      m_printVariables = false;
-    }
-
     // obtain the input and output particle lists from the decay string
     bool valid = m_decaydescriptor.init(m_decayString);
     if (!valid)

@@ -131,6 +131,8 @@ SVDHoughtrackingModule::SVDHoughtrackingModule() : Module(), curTrackEff(0.0), t
            "Use the track merger", bool(false));
   addParam("UsePhiOnly", m_usePhiOnly,
            "Use Phi/radius reconstruction only", bool(false));
+  addParam("UseThetaOnly", m_useThetaOnly,
+           "Use Theta reconstruction only", bool(false));
   addParam("CompareWithMCParticle", m_compareMCParticle,
            "Compare reconstructed tracks with MC Particles?", bool(false));
   addParam("CompareWithMCParticleVerbose", m_compareMCParticleVerbose,
@@ -204,6 +206,13 @@ SVDHoughtrackingModule::initialize()
   //dist_thres[0] = 4.60;
   //dist_thres[1] = 2.98;
   //dist_thres[2] = 3.65;
+
+
+  /* Sanity check of some options */
+  if (m_usePhiOnly && m_useThetaOnly) {
+    B2WARNING("Both UsePhi and UseThetaOnly set. Disable Theta..")
+    m_useThetaOnly = false;
+  }
 
   /* Init min and max R */
   minR = -9E+99;
@@ -949,11 +958,13 @@ SVDHoughtrackingModule::fac3d()
   }
 
   tracks = 0;
+
+  /* Phi reconstruction only */
   if (m_usePhiOnly) {
-    for (auto it_in = p_houghTrackCand.begin(); it_in != p_houghTrackCand.end(); ++it_in) {
-      p_idList = it_in->getIdList();
+    for (auto it = p_houghTrackCand.begin(); it != p_houghTrackCand.end(); ++it) {
+      p_idList = it->getIdList();
       ++tracks;
-      p_tc = it_in->getCoord();
+      p_tc = it->getCoord();
       r = 1.0 / (2.0 * p_tc.Y());
 
       if (r < 0.0) {
@@ -966,20 +977,32 @@ SVDHoughtrackingModule::fac3d()
         phi += 2 * M_PI;
       }
 
+      /* Radius Filter */
+      if (m_useRadiusFilter) {
+        if (fabs(r) > m_radiusThreshold) {
+          storeHoughTrack.appendNew(SVDHoughTrack(tracks, r, phi, 0.0));
+        }
+      } else {
+        storeHoughTrack.appendNew(SVDHoughTrack(tracks, r, phi, 0.0));
+      }
+    }
+
+    return;
+  }
+
+  /* Theta reconstruction only */
+  if (m_useThetaOnly) {
+    for (auto it = n_houghTrackCand.begin(); it != n_houghTrackCand.end(); ++it) {
+      ++tracks;
+      n_tc = it->getCoord();
+
       if (n_tc.X() > 0.0) {
         theta = n_tc.X(); // (M_PI) - n_tc.X();
       } else {
         theta = -1.0 * n_tc.X(); //(M_PI / 2) - n_tc.X();
       }
 
-      /* Radius Filter */
-      if (m_useRadiusFilter) {
-        if (fabs(r) > m_radiusThreshold) {
-          storeHoughTrack.appendNew(SVDHoughTrack(tracks, r, phi, theta));
-        }
-      } else {
-        storeHoughTrack.appendNew(SVDHoughTrack(tracks, r, phi, theta));
-      }
+      storeHoughTrack.appendNew(SVDHoughTrack(tracks, 0.0, 0.0, theta));
     }
 
     return;
@@ -2318,6 +2341,11 @@ SVDHoughtrackingModule::trackAnalyseMCParticle()
   /* Disable Theta reco */
   if (m_usePhiOnly) {
     useTheta = false;
+  }
+
+  /* Disable Theta reco */
+  if (m_useThetaOnly) {
+    usePhi = false;
   }
 
   track_match_n = new bool[nMCParticles]();

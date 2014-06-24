@@ -394,6 +394,7 @@ namespace Belle2 {
       bool m_useHashPurify;
       bool m_useTrackMerger;
       bool m_usePhiOnly;
+      bool m_useThetaOnly;
       bool m_compareMCParticle;
       bool m_compareMCParticleVerbose;
       bool m_PXDExtrapolation;

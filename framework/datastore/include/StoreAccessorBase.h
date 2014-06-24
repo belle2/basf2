@@ -52,6 +52,22 @@ namespace Belle2 {
                                                  false, errorIfExisting);
     }
 
+    /** Register the object/array in the DataStore and include it in the output by default.
+     *  This must be called in the initialization phase.
+     *
+     *  @param name  If not empty, set non-default name for this object/array. This is permanent, so that e.g. after using registerAsPersistent("myName") in initialize(), this object will continue refer to 'myName' in event().
+     *  @param errorIfExisting  Flag whether an error will be reported if the object/array was already registered.
+     *  @return            True if the registration succeeded.
+     */
+    bool registerAsPersistent(const std::string& name, bool errorIfExisting = false) {
+      if (!name.empty())
+        m_name = name;
+      return registerAsPersistent(errorIfExisting);
+    }
+
+    /** conversion from char * to bool is apparently better than to string. let's do it ourselves then. */
+    bool registerAsPersistent(const char* name, bool errorIfExisting = false) { return registerAsPersistent(std::string(name), errorIfExisting); }
+
     /** Register the object/array in the data store, but do not include it in the output by default.
      *  This must be called in the initialization phase.
      *
@@ -63,13 +79,32 @@ namespace Belle2 {
                                                  true, errorIfExisting);
     }
 
+    /** Register the object/array in the data store, but do not include it in the output by default.
+     *  This must be called in the initialization phase.
+     *
+     *  @param name  If not empty, set non-default name for this object/array. This is permanent, so that e.g. after using registerAsPersistent("myName") in initialize(), this object will continue refer to 'myName' in event().
+     *  @param errorIfExisting  Flag whether an error will be reported if the object/array was already registered.
+     *  @return            True if the registration succeeded.
+     */
+    bool registerAsTransient(const std::string& name, bool errorIfExisting = false) {
+      if (!name.empty())
+        m_name = name;
+      return registerAsTransient(errorIfExisting);
+    }
+
+    /** conversion from char * to bool is apparently better than to string. let's do it ourselves then. */
+    bool registerAsTransient(const char* name, bool errorIfExisting = false) { return registerAsTransient(std::string(name), errorIfExisting); }
+
     /** Ensure this array/object has been registered previously.
      *  Will cause an ERROR if it does not exist.
      *  This must be called in the initialization phase.
      *
+     *  @param name  If not empty, set non-default name for this object/array. This is permanent, so that e.g. after using registerAsPersistent("myName") in initialize(), this object will continue refer to 'myName' in event().
      *  @return            True if the object/array exists.
      */
-    bool isRequired() {
+    bool isRequired(const std::string& name = "") {
+      if (!name.empty())
+        m_name = name;
       return DataStore::Instance().require(*this);
     }
 
@@ -78,9 +113,12 @@ namespace Belle2 {
      *  Mainly useful for creating diagrams of module inputs and outputs.
      *  This must be called in the initialization phase.
      *
+     *  @param name  If not empty, set non-default name for this object/array. This is permanent, so that e.g. after using registerAsPersistent("myName") in initialize(), this object will continue refer to 'myName' in event().
      *  @return            True if the object/array exists.
      */
-    bool isOptional() {
+    bool isOptional(const std::string& name = "") {
+      if (!name.empty())
+        m_name = name;
       return DataStore::Instance().optionalInput(*this);
     }
 

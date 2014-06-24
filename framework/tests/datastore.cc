@@ -412,7 +412,6 @@ namespace {
     EXPECT_TRUE(StoreArray<EventMetaData>::required(evtArray.getName()));
   }
 
-  /** nomen est omen. */
   TEST_F(DataStoreTest, RegistrationOutsideOfInitializeShouldFail)
   {
     //outside initialize(), registration results in an error
@@ -428,4 +427,44 @@ namespace {
     EXPECT_FALSE(someothernewname.isValid()); //still invalid (as create() failed)
   }
 
+  TEST_F(DataStoreTest, ConstructedBeforeInitializeButWithNonDefaultName)
+  {
+    //as a class member, the classes get constructed before initialize(), but we may not have the name yet
+    StoreArray<EventMetaData> events;
+    StoreObjPtr<ProfileInfo> profile;
+    StoreArray<EventMetaData> eventsMetaDatas2;
+
+    //inialize(), use names from module paramateres
+    DataStore::Instance().setInitializeActive(true);
+    {
+      EXPECT_TRUE(events.registerAsPersistent("ThisBeInterestingNameForEvents"));
+      EXPECT_TRUE(profile.registerAsTransient("MyProfileInfoName"));
+
+      //also should work with optional / required
+      EXPECT_TRUE(eventsMetaDatas2.isOptional("EventMetaDatas_2"));
+      EXPECT_TRUE(eventsMetaDatas2.isRequired("EventMetaDatas_2"));
+    }
+    DataStore::Instance().setInitializeActive(false);
+
+    //ok, our objects should now know their name
+    EXPECT_EQ("ThisBeInterestingNameForEvents", events.getName());
+    EXPECT_TRUE(profile.getName() == "MyProfileInfoName");
+    EXPECT_TRUE(eventsMetaDatas2.getName() == "EventMetaDatas_2");
+
+    //accessing data
+    EXPECT_EQ(0, events.getEntries());
+    EXPECT_FALSE(profile.isValid());
+    EXPECT_EQ(10, eventsMetaDatas2.getEntries());
+
+    //saving data
+    profile.create();
+    EXPECT_TRUE(profile.isValid());
+    StoreObjPtr<ProfileInfo> profileAttachAgain("MyProfileInfoName");
+    EXPECT_TRUE(profileAttachAgain.isValid());
+
+    events.appendNew();
+    EXPECT_EQ(1, events.getEntries());
+    StoreArray<EventMetaData> eventsAttachAgain("ThisBeInterestingNameForEvents");
+    EXPECT_EQ(1, eventsAttachAgain.getEntries());
+  }
 }  // namespace

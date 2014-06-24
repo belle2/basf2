@@ -10,8 +10,9 @@
 
 #pragma once
 
-#include <framework/datastore/RelationsObject.h>
 #include <map>
+
+#include <TObject.h>
 
 namespace Belle2 {
 
@@ -19,7 +20,7 @@ namespace Belle2 {
    * Class to stores ExtraInfo of the whole event.
    * Used by TMVAExpert to save expert output for a event-level training
    */
-  class EventExtraInfo : public RelationsObject {
+  class EventExtraInfo : public TObject {
 
   public:
     /** Return given value if set.
@@ -38,9 +39,9 @@ namespace Belle2 {
     void addExtraInfo(const std::string& name, float value);
 
   private:
-    std::map<std::string, float> eventExtraInfo;
+    std::map<std::string, float> eventExtraInfo; /**< map variable names to values. */
 
-    ClassDef(EventExtraInfo, 1); /**< Class to store event extra info. */
+    ClassDef(EventExtraInfo, 2); /**< Class to store event extra info. */
   };
 
 } // end namespace Belle2

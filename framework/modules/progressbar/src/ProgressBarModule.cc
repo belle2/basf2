@@ -21,7 +21,7 @@ using namespace Belle2;
 
 REG_MODULE(ProgressBar)
 
-ProgressBarModule::ProgressBarModule() : Module(), m_evtNr(0), m_nTotal(0)
+ProgressBarModule::ProgressBarModule() : Module(), m_evtNr(0), m_nTotal(0), m_startTime(0), m_lastPrint(0)
 {
   setDescription("Display a progress bar and an estimate of remaining time when number of events is known (e.g. reading from file, or -n switch used). The bar uses stderr for output, so it works best when stdout is piped to a file.");
 }

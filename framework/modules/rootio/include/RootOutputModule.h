@@ -166,9 +166,6 @@ namespace Belle2 {
     /** Highest event number in highest run.
      */
     unsigned long m_eventHigh;
-
-    /** Start time (ns). */
-    unsigned long m_startTime;
   };
 } // end namespace Belle2
 

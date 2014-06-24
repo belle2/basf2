@@ -29,6 +29,9 @@ REG_MODULE(EventInfoSetter)
 
 EventInfoSetterModule::EventInfoSetterModule() : Module()
 {
+  m_evtNumber = 0;
+  m_colIndex = 0;
+
   //Set module properties
   setDescription("Sets the event meta data information (exp, run, evt). You must use this module to tell basf2 about the number of events you want to generate, unless you have an input module that already does so.");
 

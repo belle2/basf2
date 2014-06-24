@@ -252,4 +252,15 @@ int PostRawCOPPERFormat_latest::CheckB2LHSLBMagicWords(int* finesse_buf, int fin
 
 }
 
+int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
+{
+  unsigned short temp_crc16 = CalcCRC16(0x0000, (char*)(m_buffer[ tmp_header.POS_TTCTIME_TRGTYPE ]), 4);
+  temp_crc16 = CalcCRC16(temp_crc16, (char*)(m_buffer[ tmp_header.POS_EVE_NO ]), 4);
+  temp_crc16 = CalcCRC16(temp_crc16, (char*)(m_buffer[ tmp_header.POS_TTUTIME ]), 4);
+  temp_crc16 = CalcCRC16(temp_crc16, (char*)(m_buffer[ tmp_header.POS_EXP_RUN_NO ]), 4);
+  int* buf = GetFINESSEBuffer(n, finesse_num) +  SIZE_B2LHSLB_HEADER + POS_B2L_CTIME;
+  int pos_byte = GetFINESSENwords(n, finesse_num) - (SIZE_B2LHSLB_HEADER + POS_B2L_CTIME) * sizeof(unsigned int);
+  temp_crc16 = CalcCRC16(temp_crc16, (char*)buf, pos_byte);
 
+
+}

@@ -16,6 +16,7 @@
 #include <sys/time.h>
 
 #include <rawdata/dataobjects/RawCOPPERFormat_latest.h>
+#include <rawdata/CRCCalculator.h>
 #include <framework/datastore/DataStore.h>
 
 
@@ -141,6 +142,10 @@ namespace Belle2 {
     //! check magic words
     int CheckB2LHSLBMagicWords(int* finesse_buf, int finesse_nwords);
 
+    //! check magic words
+    int CheckCRC16(int n, int finesse_num);
+
+
     //
     // size of "COPPER front header" and "COPPER trailer"
     //
@@ -167,13 +172,6 @@ namespace Belle2 {
       SIZE_B2LHSLB_HEADER = 1
     };
 
-    //
-    // Data Format : "B2Link HSLB Trailer"
-    //
-    enum {
-      POS_B2LHSLB_CRC16 = 0,
-      SIZE_B2LHSLB_TRAILER = 1
-    };
 
     // Data Format : "B2Link FEE Header"
     enum {
@@ -183,7 +181,15 @@ namespace Belle2 {
 
     // Data Format : B2Link FEE Trailer
     enum {
-      SIZE_B2LFEE_TRAILER = 0
+      POS_B2LFEE_CRC16 = 0,
+      SIZE_B2LFEE_TRAILER = 1
+    };
+
+    //
+    // Data Format : "B2Link HSLB Trailer"
+    //
+    enum {
+      SIZE_B2LHSLB_TRAILER = 0
     };
 
 

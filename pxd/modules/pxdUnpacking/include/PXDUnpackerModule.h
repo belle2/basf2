@@ -49,6 +49,12 @@ namespace Belle2 {
 
     private:
 
+      std::string m_RawPXDsName;  /**< The name of the StoreArray of processed RawPXDs */
+      std::string m_PXDRawHitsName;  /**< The name of the StoreArray of PXDRawHits to be generated */
+      std::string m_PXDRawAdcsName;  /**< The name of the StoreArray of PXDRawAdcs to be generated */
+      std::string m_PXDRawPedestalsName;  /**< The name of the StoreArray of PXDRawPedestals to be generated */
+      std::string m_PXDRawROIsName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
+
       /**  Swap the endianess of the ONSEN header yes/no */
       bool m_headerEndianSwap;
       /**  ignore missing DATCON */

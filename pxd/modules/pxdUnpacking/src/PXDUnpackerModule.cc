@@ -629,6 +629,11 @@ PXDUnpackerModule::PXDUnpackerModule() :
   setDescription("Unpack Raw PXD Hits from ONSEN data stream");
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  addParam("RawPXDsName", m_RawPXDsName, "The name of the StoreArray of RawPXDs to be processed", std::string(""));
+  addParam("PXDRawHitsName", m_PXDRawHitsName, "The name of the StoreArray of generated PXDRawHits", std::string(""));
+  addParam("PXDRawAdcsName", m_PXDRawAdcsName, "The name of the StoreArray of generated PXDRawAdcs", std::string(""));
+  addParam("PXDRawPedestalsName", m_PXDRawPedestalsName, "The name of the StoreArray of generated PXDRawPedestals", std::string(""));
+  addParam("PXDRawROIsName", m_PXDRawROIsName, "The name of the StoreArray of generated PXDRawROIs", std::string(""));
   addParam("HeaderEndianSwap", m_headerEndianSwap, "Swap the endianess of the ONSEN header", true);
   addParam("IgnoreDATCON", m_ignoreDATCON, "Ignore missing DATCON ROIs", false);
   addParam("DoNotStore", m_doNotStore, "only unpack and check, but do not store", false);
@@ -637,11 +642,12 @@ PXDUnpackerModule::PXDUnpackerModule() :
 
 void PXDUnpackerModule::initialize()
 {
+  StoreArray<RawPXD>::required(m_RawPXDsName);
   //Register output collections
-  m_storeRawHits.registerAsPersistent();
-  m_storeRawAdc.registerAsPersistent();
-  m_storeRawPedestal.registerAsPersistent();
-  m_storeROIs.registerAsPersistent();
+  m_storeRawHits.registerAsPersistent(m_PXDRawHitsName);
+  m_storeRawAdc.registerAsPersistent(m_PXDRawAdcsName);
+  m_storeRawPedestal.registerAsPersistent(m_PXDRawPedestalsName);
+  m_storeROIs.registerAsPersistent(m_PXDRawROIsName);
   /// actually, later we do not want to store ROIs and Pedestals into output file ...  aside from debugging
 
   B2INFO("HeaderEndianSwap: " << m_headerEndianSwap);
@@ -686,7 +692,7 @@ void PXDUnpackerModule::terminate()
 
 void PXDUnpackerModule::event()
 {
-  StoreArray<RawPXD> storeRaws;
+  StoreArray<RawPXD> storeRaws(m_RawPXDsName);
   StoreArray<RawFTSW> storeFTSW;
   StoreObjPtr<EventMetaData> evtPtr;/// what will happen if it does not exist???
 

@@ -374,11 +374,11 @@ namespace Belle2 {
       // 2. VXD Output
       std::string m_svdPosName;
       std::string m_svdStripName;
-      ofstream of_pos;
-      ofstream of_strip;
+      std::ofstream of_pos;
+      std::ofstream of_strip;
 
       /** Statistics output stream */
-      ofstream statout;
+      std::ofstream statout;
 
       // 3. Options
       bool m_useClusters;

@@ -16,13 +16,14 @@
 #include "framework/datastore/StoreArray.h"
 #include "cdc/dataobjects/CDCHit.h"
 
-#include <iomanip>
-
 #include "TF1.h"
 #include "TCanvas.h"
 #include "TGraph.h"
 #include "TAxis.h"
 #include "TEllipse.h"
+
+#include <iomanip>
+#include <fstream>
 
 
 using namespace Belle2;
@@ -217,7 +218,7 @@ void CDCLegendreTrackDrawer::openFileAgain()
   remove(ss.str().c_str());
   rename(ss_temp.str().c_str(), ss.str().c_str());
 
-  m_fig.open(ss.str().c_str(), fstream::in | fstream::app);
+  m_fig.open(ss.str().c_str(), std::fstream::in | std::fstream::app);
 
 }
 

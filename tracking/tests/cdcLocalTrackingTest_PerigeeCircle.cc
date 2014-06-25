@@ -25,9 +25,9 @@ using namespace CDCLocalTracking;
 TEST_F(CDCLocalTrackingTest, PerigeeCircle_n)
 {
 
-  FloatType curvature = 1;
-  FloatType tangtialPhi = PI / 4;
-  FloatType impact = 1;
+  FloatType curvature = 1.0;
+  FloatType tangtialPhi = PI / 4.0;
+  FloatType impact = 1.0;
 
   // Checks if the normal parameters n follow the same sign convention
   PerigeeCircle perigeeCircle(curvature, tangtialPhi, impact);
@@ -41,3 +41,28 @@ TEST_F(CDCLocalTrackingTest, PerigeeCircle_n)
 
 }
 
+
+TEST_F(CDCLocalTrackingTest, PerigeeCircle_minimalPolarR)
+{
+  FloatType curvature = 1.0 / 2.0;
+  FloatType tangtialPhi = PI / 4.0;
+  FloatType impact = -1.0;
+
+  // Checks if the normal parameters n follow the same sign convention
+  PerigeeCircle perigeeCircle(curvature, tangtialPhi, impact);
+
+  EXPECT_EQ(1, perigeeCircle.minimalPolarR());
+}
+
+
+TEST_F(CDCLocalTrackingTest, PerigeeCircle_maximalPolarR)
+{
+  FloatType curvature = 1.0 / 2.0;
+  FloatType tangtialPhi = PI / 4.0;
+  FloatType impact = -1.0;
+
+  // Checks if the normal parameters n follow the same sign convention
+  PerigeeCircle perigeeCircle(curvature, tangtialPhi, impact);
+
+  EXPECT_EQ(3, perigeeCircle.maximalPolarR());
+}

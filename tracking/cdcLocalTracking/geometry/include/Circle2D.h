@@ -173,7 +173,8 @@ namespace Belle2 {
 
       /// Getter for the signed radius
       /** The sign encodes the orientation of the circle */
-      const FloatType& signedRadius() const { return m_signedRadius; }
+      const FloatType& signedRadius() const
+      { return m_signedRadius; }
 
       /// Getter for the square radius
       /** The sign encodes the orientation of the circle */
@@ -197,7 +198,7 @@ namespace Belle2 {
       CCWInfo isCCWOrCW() const { return radiusSign(); }
 
       /// Gives  the absolute curvature of the generalized circle
-      inline FloatType curvature() const { return 1 / absRadius(); }
+      //inline FloatType curvature() const { return 1 / absRadius(); }
 
       /// Getter for the central point of the circle
       Vector2D center() const { return m_center; }

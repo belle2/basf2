@@ -612,8 +612,9 @@ class CDCDataobjectsConverter:
 
             styleDict['fill'] = 'none'
 
-            radius = fit.getGenCircle().radius()
             signedRadius = fit.getGenCircle().signedRadius()
+            radius = abs(signedRadius)
+
             impactParameter = fit.getGenCircle().impact()
 
             center = fit.getGenCircle().center()

@@ -18,6 +18,8 @@
 #include "Vector2D.h"
 #include "StandardOriginCircle2D.h"
 
+#include "GeneralizedCircle.h"
+
 
 namespace Belle2 {
 
@@ -34,19 +36,19 @@ namespace Belle2 {
     class PerigeeCircle : public UsedTObject {
 
     public:
-
       /// Default constructor for ROOT compatibility.
       PerigeeCircle() {;}
 
-      /// Constructor with the signed curvature as single parameter
+      /// Constructor with the signed curvature as single parameter.
       PerigeeCircle(const FloatType& signedCurvature) :
         m_standardOriginCircle(signedCurvature),
         m_tangentialPhi(copysign(PI / 2.0 , -signedCurvature)),
         m_tangential(Vector2D(0.0, -sign(signedCurvature))),
-        m_impact(0)
-      {;}
+        m_impact(0) {
+        //updateBase();
+      }
 
-      /// Constructor taking the perigee and a signed curvature, the polar angle of the flight direction at the perigee and the signed impact parameter
+      /// Constructor taking the perigee and a signed curvature, the polar angle of the flight direction at the perigee and the signed impact parameter.
       PerigeeCircle(const FloatType& signedCurvature,
                     const FloatType& tangentialPhi,
                     const FloatType& impact) :
@@ -60,6 +62,10 @@ namespace Belle2 {
       ~PerigeeCircle() {;}
 
     public:
+      operator GeneralizedCircle() const
+      { return GeneralizedCircle(n0(), n12(), n3()); }
+
+    public:
       ///Setter for first circle parameter. Makes _no_ normalization after setting. Use is discouraged.
       inline void setSignedCurvature(const FloatType& signedCurvature)
       { m_standardOriginCircle.setSignedCurvature(signedCurvature); }
@@ -69,8 +75,8 @@ namespace Belle2 {
       { return m_standardOriginCircle.signedCurvature(); }
 
       ///Getter for the absolute value of curvature
-      inline FloatType curvature() const
-      { return fabs(signedCurvature()); }
+      //inline FloatType curvature() const
+      //{ return fabs(signedCurvature()); }
 
       /// Sets the impact parameter of the circle
       inline void setImpact(const FloatType& impact)
@@ -115,10 +121,9 @@ namespace Belle2 {
       { return signedCurvature() != 0.0; }
 
 
-
       /// Gives the radius of the circle. If it was a line this will be infinity
-      inline FloatType radius() const
-      { return 1 / curvature(); }
+      //inline FloatType radius() const
+      //{ return 1 / curvature(); }
 
       /// Gives the signed radius of the circle. If it was a line this will be infinity
       inline FloatType signedRadius() const
@@ -126,11 +131,11 @@ namespace Belle2 {
 
       /// Gives the minimal polar r the circle reaches (unsigned)
       inline FloatType minimalPolarR() const
-      { return 0; }
+      { return fabs(impact()); }
 
       /// Gives the maximal polar r the circle reaches
       inline FloatType maximalPolarR() const
-      { return radius(); }
+      { return fabs(impact() + 2 * signedRadius()); }
 
       /// Gives the center of the circle. If it was a line both components will be infinity
       inline Vector2D center() const
@@ -161,9 +166,11 @@ namespace Belle2 {
       ///Getter for the fourth circle parameter
       inline FloatType n3() const
       { return signedCurvature() / 2.0; }
+
+
+
+
       /**@}*/
-
-
 
       /// Sets the signed curvature to zero
       inline void setNull() {
@@ -175,7 +182,6 @@ namespace Belle2 {
       /// Indicates the signed curvature is zero
       inline bool isNull() const
       { return signedCurvature() == 0.0 and tangentialPhi() == 0.0 and impact() == 0.0; }
-
 
 
     private:

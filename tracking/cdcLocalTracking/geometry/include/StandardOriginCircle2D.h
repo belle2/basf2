@@ -58,8 +58,8 @@ namespace Belle2 {
       { return m_signedCurvature; }
 
       ///Getter for the absolute value of curvature
-      inline FloatType curvature() const
-      { return fabs(m_signedCurvature); }
+      //inline FloatType curvature() const
+      //{ return fabs(m_signedCurvature); }
 
 
       /** @name Generalized Circle parameters
@@ -250,7 +250,7 @@ namespace Belle2 {
 
       /// Gives the maximal polar r the circle reaches
       inline FloatType maximalPolarR() const
-      { return radius(); }
+      { return 2.0 * fabs(signedRadius()); }
 
       /// Gives the proper absolute distance of the point to the circle line.
       inline FloatType absoluteDistance(const Vector2D& point) const
@@ -277,8 +277,8 @@ namespace Belle2 {
       { return signedCurvature() != 0.0; }
 
       /// Gives the radius of the circle. If it was a line this will be infinity
-      inline FloatType radius() const
-      { return 1 / curvature(); }
+      //inline FloatType radius() const
+      //{ return 1 / curvature(); }
 
       /// Gives the signed radius of the circle. If it was a line this will be infinity
       inline FloatType signedRadius() const
@@ -286,7 +286,7 @@ namespace Belle2 {
 
       /// Gives the center of the circle. If it was a line both components will be infinity
       inline Vector2D center() const
-      { return Vector2D(radius(), 0); }
+      { return Vector2D(fabs(signedRadius()), 0); }
 
       /// Gives the orientation of the circle
       /**

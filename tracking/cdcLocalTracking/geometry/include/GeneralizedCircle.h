@@ -72,21 +72,45 @@ namespace Belle2 {
                         const CCWInfo& orientation = CCW);
 
       /** Destructor. */
-      ~GeneralizedCircle() { ; }
+      ~GeneralizedCircle() {;}
 
-    private:
+    protected:
       ///Setter for first circle parameter. Makes _no_ normalization after setting. Use is discouraged.
       inline void setN0(const FloatType& n0) { m_n0 = n0; }
+
       ///Setter for second circle parameter. Makes _no_ normalization after setting. Use is discouraged.
       inline void setN1(const FloatType& n1) { m_n12.setX(n1); }
+
       ///Setter for third circle parameter. Makes _no_ normalization after setting. Use is discouraged.
       inline void setN2(const FloatType& n2) { m_n12.setY(n2); }
 
       ///Setter for second and third circle parameter. Makes _no_ normalization after setting. Use is discouraged.
       inline void setN12(const FloatType& n1, const FloatType& n2) { m_n12.setXY(n1, n2); }
 
+      ///Setter for second and third circle parameter. Makes _no_ normalization after setting. Use is discouraged.
+      inline void setN12(const Vector2D& n12) { m_n12.setXY(n12); }
+
       ///Setter for fourth circle parameter. Makes _no_ normalization after setting. Use is discouraged.
       inline void setN3(const FloatType& n3) { m_n3 = n3; }
+
+      /// Setter for the perigee parameters
+      inline void setPerigeeParameters(const FloatType& curvature,
+                                       const Vector2D& tangential,
+                                       const FloatType& impact) {
+        FloatType n0 = impact * (impact * curvature / 2.0 + 1.0);
+        Vector2D n12 = -tangential.orthogonal() * (1 + curvature * impact);
+        FloatType n3 = curvature / 2.0;
+        setN0(n0);
+        setN12(n12);
+        setN3(n3);
+      }
+
+      /// Setter for the perigee parameters
+      inline void setPerigeeParameters(const FloatType& curvature,
+                                       const FloatType& tangentialPhi,
+                                       const FloatType& impact) {
+        setPerigeeParameters(curvature, Vector2D::Phi(tangentialPhi), impact);
+      }
 
     public:
       ///Getter for the first circle parameter
@@ -94,11 +118,13 @@ namespace Belle2 {
 
       ///Getter for the second circle parameter
       inline const FloatType& n1() const { return m_n12.x(); }
+
       ///Getter for the third circle parameter
       inline const FloatType& n2() const { return m_n12.y(); }
 
       ///Getter for the second and third circle parameter which natuarally from a vector
       inline const Vector2D& n12() const { return m_n12; }
+
       ///Getter for the fourth circle parameter
       inline const FloatType& n3() const { return m_n3; }
 
@@ -210,6 +236,7 @@ namespace Belle2 {
        */
       Vector2D closest(const Vector2D& point) const;
 
+
       /// Calculates the closest approach to the two dimensional origin
       Vector2D perigee() const;
 
@@ -318,13 +345,13 @@ namespace Belle2 {
       inline bool isCircle() const { return n3() != 0.0; }
 
       /// Gives the radius of the circle. If it was a line this will be infinity
-      inline FloatType radius() const { return 1 / curvature(); }
+      // inline FloatType radius() const { return 1 / curvature(); }
 
       /// Gives the signed radius of the circle. If it was a line this will be infinity
       inline FloatType signedRadius() const { return 1 / signedCurvature(); }
 
       /// Gives  the absolute curvature of the generalized circle
-      inline FloatType curvature() const { return std::fabs(signedCurvature()); }
+      // inline FloatType curvature() const { return std::fabs(signedCurvature()); }
 
       /// Gives  the signed curvature of the generalized circle
       inline FloatType signedCurvature() const { return 2 * n3(); }
@@ -381,7 +408,7 @@ namespace Belle2 {
           return output;
         } else {
           output << "CircleCenter = " << circle.center()
-                 << ", Radius = " << circle.radius();
+                 << ", Radius = " << circle.signedRadius();
           return output;
         }
       }

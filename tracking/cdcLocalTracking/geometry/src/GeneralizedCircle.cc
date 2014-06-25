@@ -261,7 +261,7 @@ FloatType GeneralizedCircle::arcLengthFactor(const FloatType& directDistance) co
     if (abs(x) >= taylor_0_bound) {
       FloatType x2 = x * x;
       // approximation by taylor series in x at 0 up to order 2
-      result -= x2 / 6.0;
+      result += x2 / 6.0;
 
       FloatType const taylor_2_bound = tools::root_epsilon<FloatType>();
       if (abs(x) >= taylor_2_bound) {

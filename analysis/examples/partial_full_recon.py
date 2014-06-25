@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Thomas Keck 2014
 
-from FullReconstruction import *
+from FullEventInterpretation import *
 from basf2 import *
 import pdg
 
@@ -111,7 +111,7 @@ particles.append(p)
 main = create_path()
 main.add_module(register_module('RootInput'))
 main.add_module(register_module('ParticleLoader'))
-FullReconstruction(main, particles)
+FullEventInterpretation(main, particles)
 main.add_module(register_module('ProgressBar'))
 
 print main

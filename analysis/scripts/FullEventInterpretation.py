@@ -3,35 +3,29 @@
 #
 # Thomas Keck 2014
 #
-# This FullReconstrucion algorithm uses a functional approach.
-# All tasks are implemented in Functions called Actors.
+# This FullEventInterpretation algorithm uses a functional approach (see actorFramework.py).
+# All tasks are implemented in Functions called actors.
 # Each Actor has requirements and provides return values.
 # E.g. SignalProbability requires the path, a method, variables and a ParticleList.
 #                        provides SignalProbability for the ParticleList.
-#      PreCutDistribution require among others the SignalProbability for the ParticleLists
+#      CreatePreCutDistribution require among others the SignalProbability for the ParticleLists
 #                        provides PreCutDistribution
 #      PreCutDetermination requires among others a PreCutDistribution
 #                         provides PreCuts
 #      ParticleListFromChannel requires among others PreCuts
 # ... and so on ...
 #
-# In the FR_*.py file all the Actors are defined and they're added to the Sequence of Actors in the FullReconstruction function at the end of this file.
+# The actors are added to the Sequence of actors in the FullEventInterpretation function at the end of this file.
 # Afterwards the dependencies between the Actors are solved, and the Actors are called in the correct order, with the required parameters.
 # If no further Actors can be called without satisfying all their requirements, the FullReoncstruction function returns.
-# Therefore the end user has to run the FullReconstruction several times, until all Distributions, Classifiers, ... are created.
+# Therefore the end user has to run the FullEventInterpretation several times, until all Distributions, Classifiers, ... are created.
 #
-# To create a new Actor:
-#   1. Write a normal function which takes the needed arguments and returns a dictonary of provided values . E.g. def foo(path, particleList) ... return {'Stuff': x}
-#   2. Make sure your return value depends on all the used arguments, easiest way to accomplish this is using the createHash function
-#   2. Add the function in the FullReonstruction method (at the end of the file) to the sequence like this: seq.addFunction(foo, path='Path', particleList='K+')
 
 
 import pdg
 
-import FR_utility
-from FR_reconstruction import SelectParticleList, CopyParticleLists, MakeAndMatchParticleList
-from FR_signalProbability import SignalProbability
-from FR_preCut import PreCutDetermination, CreatePreCutHistogram, PrintPreCuts
+import actorFramework
+from actorFunctions import *
 
 import collections
 import argparse
@@ -141,13 +135,13 @@ def addIncompleteChannels(particles, verbose):
     return particles
 
 
-def FullReconstruction(path, particles):
+def FullEventInterpretation(path, particles):
     """
     The FullReconstruction algorithm.
     Alle the Actors defined above are added to the sequence and are executed in an order which fulfills all requirements.
     This function returns if no more Actors can be called without violate some requirements.
         @param path the basf2 module path
-        @particles sequence of particle objects which shall be reconstructed by this algorithm
+        @param particles sequence of particle objects which shall be reconstructed by this algorithm
     """
 
     parser = argparse.ArgumentParser()
@@ -158,8 +152,7 @@ def FullReconstruction(path, particles):
     particles = addIncompleteChannels(particles, args.verbose)
 
     # Add the basf2 module path
-    seq = FR_utility.Sequence()
-    seq.addResource('Path', path)
+    seq = actorFramework.Sequence()
 
     # Now loop over all given particles, foreach particle we add some Resources and Actors.
     for particle in particles:
@@ -181,8 +174,8 @@ def FullReconstruction(path, particles):
 
         ########### RECONSTRUCTION ACTORS ##########
         # The Reconstruction part of the FullReconstruction:
-        # 1. Load the FSP (via CreateParticleList),
-        # 2. Create a particle list for each channel of the non-FSP (via CombineParticleLists), depending an all daughter ParticleLists of this channel
+        # 1. Load the FSP (via SelectParticleList),
+        # 2. Create a particle list for each channel of the non-FSP (via MakeAndMatchParticleList), depending an all daughter ParticleLists of this channel
         # 3. Merge the different ParticleLists for each complete channel into a single ParticleList, depending on all complete channel ParticleLists
         if particle.isFSP:
             seq.addFunction(SelectParticleList,
@@ -257,4 +250,4 @@ def FullReconstruction(path, particles):
                 seq.addResource('SignalProbability_' + particle.name, 'Dummy', requires=['SignalProbability_' + channel.name + '_' + particle.name for channel in particle.channels])
                 seq.addResource('SignalProbability_' + pdg.conjugate(particle.name), 'Dummy', requires=['SignalProbability_' + particle.name])
 
-    seq.run(args.verbose)
+    seq.run(path, args.verbose)

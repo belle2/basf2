@@ -1,0 +1,190 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from actorFunctions import *
+from FullEventInterpretation import Particle
+
+from basf2 import *
+import unittest
+import os
+
+
+class MockPath(object):
+    def __init__(self):
+        self.modules = []
+
+    def add_module(self, module):
+        self.modules.append(module)
+
+
+class TestSelectParticleList(unittest.TestCase):
+    def setUp(self):
+        self.path = MockPath()
+
+    def test_flavour_specific(self):
+        result = SelectParticleList(self.path, 'e+', [])
+        self.assertDictEqual(result, {'ParticleList_e+': 'e+:7f4f5313461a4c5b3831c0f5f8991af89ea9dbcb',
+                                      'ParticleList_e-': 'e-:7f4f5313461a4c5b3831c0f5f8991af89ea9dbcb'})
+        self.assertEqual(len(self.path.modules), 1)
+
+    def test_self_conjugated(self):
+        result = SelectParticleList(self.path, 'J/Psi', [])
+        self.assertDictEqual(result, {'ParticleList_J/Psi': 'J/Psi:3f4cfc25d6ab1b0da74329d76451dacd2e1bffce',
+                                      'ParticleList_J/Psi': 'J/Psi:3f4cfc25d6ab1b0da74329d76451dacd2e1bffce'})
+        self.assertEqual(len(self.path.modules), 1)
+
+
+class TestCopyParticleLists(unittest.TestCase):
+    def setUp(self):
+        self.path = MockPath()
+
+    def test_without_nones(self):
+        result = CopyParticleLists(self.path, 'D+', ['D+:1', 'D+:2', 'D+:3'])
+        self.assertDictEqual(result, {'ParticleList_D+': 'D+:5cd7f2d37f66c44b92dbd64e10ada329133b6a63',
+                                      'ParticleList_D-': 'D-:5cd7f2d37f66c44b92dbd64e10ada329133b6a63'})
+        self.assertEqual(len(self.path.modules), 1)
+
+    def test_with_nones(self):
+        result = CopyParticleLists(self.path, 'D+', ['D+:1', None, 'D+:3', None])
+        self.assertDictEqual(result, {'ParticleList_D+': 'D+:fc01399545fea42891ffc8fc0b07b52de3317544',
+                                      'ParticleList_D-': 'D-:fc01399545fea42891ffc8fc0b07b52de3317544'})
+        self.assertEqual(len(self.path.modules), 1)
+
+    def test_only_nones(self):
+        result = CopyParticleLists(self.path, 'D+', [None, None])
+        self.assertDictEqual(result, {'ParticleList_D+': None,
+                                      'ParticleList_D-': None})
+        self.assertEqual(len(self.path.modules), 0)
+
+
+class TestMakeAndMatchParticleList(unittest.TestCase):
+    def setUp(self):
+        self.path = MockPath()
+
+    def test_with_precut(self):
+        result = MakeAndMatchParticleList(self.path, 'D+', 'D+ -> pi+ K-', ['pi+', 'K-'], {'M': (0.0, 10.0)})
+        self.assertDictEqual(result, {'ParticleList_D+ -> pi+ K-_D+': 'D+:f76206d83d352e9dcabfb537b16964934612f387',
+                                      'ParticleList_D+ -> pi+ K-_D-': 'D-:f76206d83d352e9dcabfb537b16964934612f387'})
+        self.assertEqual(len(self.path.modules), 2)
+
+    def test_without_precut(self):
+        result = MakeAndMatchParticleList(self.path, 'D+', 'D+ -> pi+ K-', ['pi+', 'K-'], None)
+        self.assertDictEqual(result, {'ParticleList_D+ -> pi+ K-_D+': None,
+                                      'ParticleList_D+ -> pi+ K-_D-': None})
+        self.assertEqual(len(self.path.modules), 0)
+
+
+mvaConfig = Particle.MVAConfiguration(
+    name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
+    variables=['p', 'pt', 'p_CMS', 'pt_CMS', 'chiProb'],
+    target='isSignal', targetCluster=1
+)
+
+
+class TestSignalProbability(unittest.TestCase):
+    def setUp(self):
+        self.path = MockPath()
+
+    def test_non_fsp_teacher(self):
+        hash = 'cc2f06ba7958e3ba29514d90c5bb75dcb375b95f'
+        filename = 'D+:1_{hash}.config'.format(hash=hash)
+        open(filename, 'a').close()
+        os.remove(filename)
+        result = SignalProbability(self.path, 'D+', 'D+ -> pi+ K-', mvaConfig, 'D+:1', ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        self.assertDictEqual(result, {})
+        self.assertEqual(len(self.path.modules), 1)
+
+    def test_non_fsp_expert(self):
+        hash = 'cc2f06ba7958e3ba29514d90c5bb75dcb375b95f'
+        filename = 'D+:1_{hash}.config'.format(hash=hash)
+        open(filename, 'a').close()
+        result = SignalProbability(self.path, 'D+', 'D+ -> pi+ K-', mvaConfig, 'D+:1', ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        self.assertDictEqual(result, {'SignalProbability_D+ -> pi+ K-_D+': hash,
+                                      'SignalProbability_D+ -> pi+ K-_D-': hash})
+        os.remove(filename)
+        self.assertEqual(len(self.path.modules), 1)
+
+    def test_non_fsp_with_nones(self):
+        result = SignalProbability(self.path, 'D+', 'D+ -> pi+ K-', mvaConfig, 'D+:1', [None, 'SignalProbabilityHashK'])
+        self.assertDictEqual(result, {'SignalProbability_D+ -> pi+ K-_D+': None,
+                                      'SignalProbability_D+ -> pi+ K-_D-': None})
+        self.assertEqual(len(self.path.modules), 0)
+
+    def test_fsp_teacher(self):
+        hash = 'a12fbfb9aca362bf8589840ca54ea9151bbb6a0e'
+        filename = 'e+:1_{hash}.config'.format(hash=hash)
+        open(filename, 'a').close()
+        os.remove(filename)
+        result = SignalProbability(self.path, 'e+', 'e+', mvaConfig, 'e+:1')
+        self.assertDictEqual(result, {})
+        self.assertEqual(len(self.path.modules), 1)
+
+    def test_fsp_expert(self):
+        hash = 'a12fbfb9aca362bf8589840ca54ea9151bbb6a0e'
+        filename = 'e+:1_{hash}.config'.format(hash=hash)
+        open(filename, 'a').close()
+        result = SignalProbability(self.path, 'e+', 'e+', mvaConfig, 'e+:1')
+        os.remove(filename)
+        self.assertDictEqual(result, {'SignalProbability_e+': hash,
+                                      'SignalProbability_e-': hash})
+        self.assertEqual(len(self.path.modules), 1)
+
+
+preCutConfig = Particle.PreCutConfiguration(
+    variable='Mass',
+    efficiency=0.7
+)
+
+
+class TestCreatePreCutHistogram(unittest.TestCase):
+    def setUp(self):
+        self.path = MockPath()
+
+    def test_create_hist(self):
+        hash = 'f75ee3533d3c9475373e59ef33e236faf7548a39'
+        filename = 'CutHistograms_D+_D+ -> pi+ K-_{hash}.root'.format(hash=hash)
+        open(filename, 'a').close()
+        os.remove(filename)
+        result = CreatePreCutHistogram(self.path, 'D+', 'D+ -> pi+ K-', preCutConfig, ['pi+:1', 'K+:1'], [])
+        self.assertDictEqual(result, {})
+        self.assertEqual(len(self.path.modules), 1)
+
+    def test_nothing_to_do(self):
+        hash = 'f75ee3533d3c9475373e59ef33e236faf7548a39'
+        filename = 'CutHistograms_D+_D+ -> pi+ K-_{hash}.root'.format(hash=hash)
+        open(filename, 'a').close()
+        result = CreatePreCutHistogram(self.path, 'D+', 'D+ -> pi+ K-', preCutConfig, ['pi+:1', 'K+:1'], [])
+        os.remove(filename)
+        self.assertDictEqual(result, {'PreCutHistogram_D+ -> pi+ K-': (filename, 'D+:' + hash)})
+        self.assertEqual(len(self.path.modules), 0)
+
+    def test_create_hist_additionalDependency(self):
+        hash = 'ddd94f65a16fe9d92343ff57256fd013684d56e1'
+        filename = 'CutHistograms_D+_D+ -> pi+ K-_{hash}.root'.format(hash=hash)
+        open(filename, 'a').close()
+        os.remove(filename)
+        result = CreatePreCutHistogram(self.path, 'D+', 'D+ -> pi+ K-', preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
+        self.assertDictEqual(result, {})
+        self.assertEqual(len(self.path.modules), 1)
+
+    def test_non_in_daughter(self):
+        hash = 'f75ee3533d3c9475373e59ef33e236faf7548a39'
+        filename = 'CutHistograms_D+_D+ -> pi+ K-_{hash}.root'.format(hash=hash)
+        open(filename, 'a').close()
+        os.remove(filename)
+        result = CreatePreCutHistogram(self.path, 'D+', 'D+ -> pi+ K-', preCutConfig, [None, 'K+:1'], [])
+        self.assertDictEqual(result, {'PreCutHistogram_D+ -> pi+ K-': None})
+        self.assertEqual(len(self.path.modules), 0)
+
+    def test_non_in_additionalDependencies(self):
+        hash = 'ddd94f65a16fe9d92343ff57256fd013684d56e1'
+        filename = 'CutHistograms_D+_D+ -> pi+ K-_{hash}.root'.format(hash=hash)
+        open(filename, 'a').close()
+        os.remove(filename)
+        result = CreatePreCutHistogram(self.path, 'D+', 'D+ -> pi+ K-', preCutConfig, [None, 'K+:1'], ['bar', None])
+        self.assertDictEqual(result, {'PreCutHistogram_D+ -> pi+ K-': None})
+        self.assertEqual(len(self.path.modules), 0)
+
+
+if __name__ == '__main__':
+    unittest.main()

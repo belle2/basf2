@@ -11,6 +11,7 @@
 #define UNCERTAINPERIGEECIRCLE_H
 
 #include <cmath>
+#include "TMatrixD.h"
 
 #include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
@@ -41,56 +42,36 @@ namespace Belle2 {
         m_perigeeCovariance.Zero();
       }
 
-      /// Constructor with the signed curvature as single parameter
-      UncertainPerigeeCircle(const FloatType& curvature) :
-        PerigeeCircle(curvature),
-        m_perigeeCovariance(3, 3) {
-        m_perigeeCovariance.Zero();
-      }
-
-      /// Constructor taking the perigee and a signed curvature, the polar angle of the flight direction at the perigee and the signed impact parameter
-      UncertainPerigeeCircle(const FloatType& curvature,
-                             const FloatType& tangentialPhi,
-                             const FloatType& impact) :
-        PerigeeCircle(curvature, tangentialPhi, impact),
-        m_perigeeCovariance(3, 3) {
-        m_perigeeCovariance.Zero();
-      }
-
-      /// Augments a plain perigee circle with a covariance matrix. Covariance defaults to zero
-      UncertainPerigeeCircle(const GeneralizedCircle& generalizedCircle):
-        PerigeeCircle(generalizedCircle),
-        m_perigeeCovariance(3, 3) {
-        m_perigeeCovariance.Zero();
-      }
-
-      /// Augments a plain perigee circle with a covariance matrix. Covariance defaults to zero
-      UncertainPerigeeCircle(const PerigeeCircle& perigeeCircle):
-        PerigeeCircle(perigeeCircle),
-        m_perigeeCovariance(3, 3) {
-        m_perigeeCovariance.Zero();
-      }
-
-      /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix.
+      /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix. Covariance matrix defaults to a zero matrix
       UncertainPerigeeCircle(const FloatType& curvature,
                              const FloatType& tangentialPhi,
                              const FloatType& impact,
-                             const TMatrixD& perigeeCovariance) :
-        PerigeeCircle(curvature, tangentialPhi, impact),
+                             const TMatrixD& perigeeCovariance = TMatrixD(3, 3)) :
+        PerigeeCircle(PerigeeCircle::fromPerigeeParameters(curvature, tangentialPhi, impact)),
         m_perigeeCovariance(perigeeCovariance) {
         checkCovarianceMatrix();
       }
 
       /// Augments a plain perigee circle with a covariance matrix. Covariance defaults to zero
       UncertainPerigeeCircle(const PerigeeCircle& perigeeCircle,
-                             const TMatrixD& perigeeCovariance) :
+                             const TMatrixD& perigeeCovariance = TMatrixD(3, 3)) :
         PerigeeCircle(perigeeCircle),
+        m_perigeeCovariance(perigeeCovariance) {
+        checkCovarianceMatrix();
+      }
+
+      /// Augments a plain perigee circle with a covariance matrix. Covariance defaults to zero
+      UncertainPerigeeCircle(const GeneralizedCircle& generalizedCircle,
+                             const TMatrixD& perigeeCovariance = TMatrixD(3, 3)) :
+        PerigeeCircle(generalizedCircle),
         m_perigeeCovariance(perigeeCovariance) {
         checkCovarianceMatrix();
       }
 
       /// Empty destructor
       ~UncertainPerigeeCircle() {;}
+
+
 
     private:
       /// Checks the covariance matrix for consistence

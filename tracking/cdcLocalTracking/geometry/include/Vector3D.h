@@ -10,7 +10,7 @@
 #ifndef VECTOR3D_H
 #define VECTOR3D_H
 
-#include <cmath>
+#include <math.h>
 #include <iostream>
 
 #include <TVector3.h>
@@ -124,7 +124,7 @@ namespace Belle2 {
       inline bool isNull() const { return x() == 0.0 and y() == 0.0 and z() == 0.0 ; }
 
       /// Checks if one of the coordinates is NAN
-      inline bool hasNAN() const { return isnan(x()) or isnan(y()) or isnan(z()); }
+      inline bool hasNAN() const { return isNAN(x()) or isNAN(y()) or isNAN(z()); }
 
       /// Output operator for debugging
       friend std::ostream& operator<<(std::ostream& output, const Vector3D& vector)
@@ -156,7 +156,7 @@ namespace Belle2 {
       /// Calculates the squared length of the vector
       inline FloatType normSquared() const { return x() * x() + y() * y() + z() * z(); }
       /// Calculates the length of the vector
-      inline FloatType norm() const { return std::sqrt(x() * x() + y() * y() + z() * z()); }
+      inline FloatType norm() const { return hypot(hypot(x(), y()), z()); }
 
 
 
@@ -183,7 +183,7 @@ namespace Belle2 {
         FloatType deltaX = x() - rhs.x();
         FloatType deltaY = y() - rhs.y();
         FloatType deltaZ = z() - rhs.z();
-        return std::sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+        return hypot(hypot(deltaX, deltaY), deltaZ);
       }
 
       /// Scales the vector in place by the given factor

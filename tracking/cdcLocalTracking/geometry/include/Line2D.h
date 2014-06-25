@@ -141,7 +141,7 @@ namespace Belle2 {
 
       /// Calculates the normalization. Helper for normalize.
       FloatType normalization() const
-      { return std::sqrt(normalizationSquared()); }
+      { return sqrt(normalizationSquared()); }
 
     public:
       /// Calculates the signed distance of the point to the line.

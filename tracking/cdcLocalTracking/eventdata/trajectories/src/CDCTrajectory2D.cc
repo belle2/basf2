@@ -26,7 +26,9 @@ ClassImpInCDCLocalTracking(CDCTrajectory2D)
 
 CDCTrajectory2D::CDCTrajectory2D(const Vector2D& startPoint,
                                  const Vector2D& startMomentum,
-                                 const FloatType& charge) : m_perigeeCircle(), m_startPos2D(startPoint)
+                                 const FloatType& charge) :
+  m_perigeeCircle(),
+  m_startPos2D(startPoint)
 {
 
   setStartPosMom2D(startPoint, startMomentum, charge);
@@ -68,7 +70,7 @@ CDCTrajectory2D::setStartPosMom2D(
   //same memory different name
   Vector2D& circleCenter = posToCenter.add(pos2D);
 
-  m_perigeeCircle.setCenterAndRadius(circleCenter, r, orientation);
+  m_perigeeCircle = PerigeeCircle::fromCenterAndRadius(circleCenter, r, orientation);
 
   setStartPos2D(pos2D);
 
@@ -78,12 +80,11 @@ Vector3D CDCTrajectory2D::reconstruct3D(const BoundSkewLine& skewLine) const
 {
 
   const Vector2D& refPos2D = skewLine.refPos2D();
-  const UncertainPerigeeCircle& perigeeCircle = getPerigeeCircle();
 
-  FloatType firstorder = perigeeCircle.fastDistance(refPos2D);
+  FloatType firstorder = getCircle().fastDistance(refPos2D);
 
-  FloatType crossComponent = refPos2D.cross(perigeeCircle.n12());
-  FloatType quadraticComponent = refPos2D.normSquared() * perigeeCircle.n3();
+  FloatType crossComponent = refPos2D.cross(getCircle().n12());
+  FloatType quadraticComponent = refPos2D.normSquared() * getCircle().n3();
 
   const FloatType& a = quadraticComponent;
   const FloatType& b = crossComponent;
@@ -92,8 +93,7 @@ Vector3D CDCTrajectory2D::reconstruct3D(const BoundSkewLine& skewLine) const
   std::pair<FloatType, FloatType> solutionsSkewTimesDeltaZ = solveQuadraticABC(a, b, c);
 
   //std::pair<FloatType,FloatType> invSolutions = CDCLocalTracking::solveQuadraticPQ(crossComponent, firstorder*quadraticComponent);
-
-  //FloatType deltaZTimesSkew = firstorder/invSolutions.first;
+  //FloatType deltaZTimesSkew = firstorder / invSolutions.first;
 
   // Take the solution with the smaller deviation from the reference position
   const FloatType& smallerSolution = solutionsSkewTimesDeltaZ.second;
@@ -111,7 +111,7 @@ Vector2D CDCTrajectory2D::getInnerExit() const
 
   FloatType innerPolarR = innerMostLayer.getInnerPolarR();
 
-  return getPerigeeCircle().samePolarRForwardOf(getStartPos2D(), innerPolarR);
+  return getCircle().samePolarRForwardOf(getStartPos2D(), innerPolarR);
 
 }
 
@@ -123,7 +123,7 @@ Vector2D CDCTrajectory2D::getOuterExit() const
 
   FloatType outerPolarR = outerMostLayer.getOuterPolarR();
 
-  return getPerigeeCircle().samePolarRForwardOf(getStartPos2D(), outerPolarR);
+  return getCircle().samePolarRForwardOf(getStartPos2D(), outerPolarR);
 
 }
 
@@ -132,7 +132,7 @@ Vector2D CDCTrajectory2D::getExit() const
   Vector2D outerExit = getOuterExit();
   Vector2D innerExit = getInnerExit();
 
-  return getPerigeeCircle().chooseNextForwardOf(getStartPos2D(), outerExit, innerExit);
+  return getCircle().chooseNextForwardOf(getStartPos2D(), outerExit, innerExit);
 
 }
 

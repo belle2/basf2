@@ -54,7 +54,7 @@ ISuperLayerType CDCLocalTracking::getISuperLayerAtPolarR(const FloatType& polarR
   const CDCWireTopology& cdcWireTopology = CDCWireTopology::getInstance();
   const std::vector<CDCWireSuperLayer>& wireSuperLayers = cdcWireTopology.getWireSuperLayers();
 
-  if (isnan(polarR) or polarR < 0) return INVALID_ISUPERLAYER;
+  if (std::isnan(polarR) or polarR < 0) return INVALID_ISUPERLAYER;
 
   if (polarR < cdcWireTopology.getWireSuperLayer(0).getInnerPolarR()) return INNER_ISUPERLAYER;
 

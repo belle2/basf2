@@ -596,7 +596,7 @@ class CDCDataobjectsConverter:
         styleDict = {'stroke': 'black', 'stroke-width': '0.02'}
         styleDict.update(kwd)
 
-        if fit.getPerigeeCircle().isCircle():
+        if fit.getCircle().isCircle():
 
             charge = fit.getChargeSign()
 
@@ -610,9 +610,9 @@ class CDCDataobjectsConverter:
 
             styleDict['fill'] = 'none'
 
-            radius = fit.getPerigeeCircle().absRadius()
+            radius = fit.getCircle().absRadius()
 
-            center = fit.getPerigeeCircle().center()
+            center = fit.getCircle().center()
             centerPoint = (center.x(), center.y())
 
             start = fit.getStartPos2D()
@@ -651,7 +651,7 @@ class CDCDataobjectsConverter:
                     **styleDict
                     )
                 svgElements.append(circleArcElement)
-        elif fit.getPerigeeCircle().isLine():
+        elif fit.getCircle().isLine():
 
       # print "isline"
             start = fit.getStartPos2D()

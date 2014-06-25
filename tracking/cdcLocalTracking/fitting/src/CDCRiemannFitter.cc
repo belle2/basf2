@@ -203,7 +203,7 @@ void CDCRiemannFitter::updateWithOutRightLeft(CDCTrajectory2D& trajectory2D, CDC
 
     // set the generalized circle parameters
     // last set to zero constrains to a line
-    trajectory2D.setGenCircle(GeneralizedCircle(offset, normalToLine(0), normalToLine(1), 0));
+    trajectory2D.setCircle(PerigeeCircle::fromN(offset, normalToLine(0), normalToLine(1), 0));
 
   } else {
 
@@ -237,7 +237,7 @@ void CDCRiemannFitter::updateWithOutRightLeft(CDCTrajectory2D& trajectory2D, CDC
 
     FloatType offset = -pointMean * normalToPlane;
 
-    trajectory2D.setGenCircle(GeneralizedCircle(offset, normalToPlane(0), normalToPlane(1), normalToPlane(2)));
+    trajectory2D.setCircle(PerigeeCircle::fromN(offset, normalToPlane(0), normalToPlane(1), normalToPlane(2)));
     //fit.setParameters();
 
   }
@@ -292,7 +292,7 @@ void CDCRiemannFitter::updateWithRightLeft(CDCTrajectory2D& trajectory2D, CDCObs
 
     Matrix< FloatType, 2, 1> parameters = projectedPoints.jacobiSvd(ComputeThinU | ComputeThinV).solve(distances);
 
-    trajectory2D.setGenCircle(GeneralizedCircle(0.0, parameters(0), parameters(1), 0.0));
+    trajectory2D.setCircle(PerigeeCircle::fromN(0.0, parameters(0), parameters(1), 0.0));
   }
 
   else if ((! isLineConstrained()) && (isOriginConstrained())) {
@@ -307,7 +307,7 @@ void CDCRiemannFitter::updateWithRightLeft(CDCTrajectory2D& trajectory2D, CDCObs
 
     Matrix< FloatType, 3, 1> parameters = projectedPoints.jacobiSvd(ComputeThinU | ComputeThinV).solve(distances);
 
-    trajectory2D.setGenCircle(GeneralizedCircle(0.0, parameters(0), parameters(1), parameters(2)));
+    trajectory2D.setCircle(PerigeeCircle::fromN(0.0, parameters(0), parameters(1), parameters(2)));
   }
 
   else if ((isLineConstrained()) && (! isOriginConstrained())) {
@@ -322,7 +322,7 @@ void CDCRiemannFitter::updateWithRightLeft(CDCTrajectory2D& trajectory2D, CDCObs
 
     Matrix< FloatType, 3, 1> parameters = projectedPoints.jacobiSvd(ComputeThinU | ComputeThinV).solve(distances);
 
-    trajectory2D.setGenCircle(GeneralizedCircle(parameters(0), parameters(1), parameters(2), 0.0));
+    trajectory2D.setCircle(PerigeeCircle::fromN(parameters(0), parameters(1), parameters(2), 0.0));
     //fit.setParameters(parameters(0),parameters(1),parameters(2),0.0);
 
   }
@@ -341,7 +341,7 @@ void CDCRiemannFitter::updateWithRightLeft(CDCTrajectory2D& trajectory2D, CDCObs
 
     Matrix< FloatType, 4, 1> parameters = projectedPoints.jacobiSvd(ComputeThinU | ComputeThinV).solve(distances);
 
-    trajectory2D.setGenCircle(GeneralizedCircle(parameters(0), parameters(1), parameters(2), parameters(3)));
+    trajectory2D.setCircle(PerigeeCircle::fromN(parameters(0), parameters(1), parameters(2), parameters(3)));
 
   }
 

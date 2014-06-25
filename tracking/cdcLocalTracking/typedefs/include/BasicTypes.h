@@ -11,7 +11,8 @@
 #define BASICTYPES_H
 
 #include <cstddef> //for size_t
-#include <cmath>
+#include <cstdlib> //for abs
+#include <math.h>
 
 //#include <Rtypes.h> //for nullptr remove for c++11  !!
 
@@ -36,7 +37,7 @@ namespace Belle2 {
     /**@{*/
 
     /// The float type used by the algorithm. Just as necessary for speed.
-    typedef float FloatType;
+    typedef double FloatType;
     /// The famous number
     const FloatType PI = 3.141592653589793238462;
 

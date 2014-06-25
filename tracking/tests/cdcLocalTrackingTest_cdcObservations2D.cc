@@ -16,10 +16,7 @@
 #include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
 
 #include <tracking/cdcLocalTracking/geometry/Vector2D.h>
-#include <tracking/cdcLocalTracking/geometry/GeneralizedCircle.h>
-
 #include <tracking/cdcLocalTracking/fitting/CDCObservations2D.h>
-#include <tracking/cdcLocalTracking/fitting/CDCRiemannFitter.h>
 
 using namespace std;
 
@@ -37,7 +34,8 @@ TEST_F(CDCLocalTrackingTest, CDCObservations2D_centralize)
 
   Vector2D centralPoint = observations.centralize();
 
-  EXPECT_EQ(Vector2D(1, 2), centralPoint) << "Central point of observation (0,0) , (1,1) and (2,2) is not (1,1)" ;
+  EXPECT_EQ(Vector2D(1, 2), centralPoint) <<
+                                          "Central point of observation (0,0) , (1,1) and (2,2) is not (1,1)" ;
 
   EXPECT_EQ(-1, observations.getX(0));
   EXPECT_EQ(-2, observations.getY(0));

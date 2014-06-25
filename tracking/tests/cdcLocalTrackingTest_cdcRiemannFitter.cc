@@ -16,7 +16,6 @@
 #include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
 
 #include <tracking/cdcLocalTracking/geometry/Vector2D.h>
-#include <tracking/cdcLocalTracking/geometry/GeneralizedCircle.h>
 
 #include <tracking/cdcLocalTracking/fitting/CDCObservations2D.h>
 #include <tracking/cdcLocalTracking/fitting/CDCRiemannFitter.h>
@@ -30,7 +29,7 @@ using namespace CDCLocalTracking;
 TEST_F(CDCLocalTrackingTest, CDCRiemannFitter_LineFit)
 {
 
-  CDCRiemannFitter lineFitter = CDCRiemannFitter::getLineFitter();
+  const CDCRiemannFitter& lineFitter = CDCRiemannFitter::getLineFitter();
 
   CDCObservations2D observations2D;
   observations2D.append(Vector2D(0, 1), 0.5);
@@ -40,8 +39,6 @@ TEST_F(CDCLocalTrackingTest, CDCRiemannFitter_LineFit)
   CDCTrajectory2D trajectory2D;
 
   lineFitter.update(trajectory2D, observations2D);
-
-  //CDCGenerailzedCircle& genCircle = trajectory2D.getGenCircle();
 
   Vector2D perigee = trajectory2D.getPerigee();
 
@@ -56,6 +53,70 @@ TEST_F(CDCLocalTrackingTest, CDCRiemannFitter_LineFit)
 }
 
 
+TEST_F(CDCLocalTrackingTest, CDCRiemannFitter_CircleFit)
+{
+  // Setup a test circle
+  Vector2D center(6.5, 0);
+  FloatType radius = 5;
 
+  Circle2D circle(center, radius);
+
+  vector<Vector2D> observationCenters;
+
+
+  observationCenters.emplace_back(0.0, 0.0);
+
+  observationCenters.emplace_back(1.0, 1.0);
+  observationCenters.emplace_back(1.0, -1.0);
+
+  observationCenters.emplace_back(1.5, 1.5);
+  observationCenters.emplace_back(1.5, -1.5);
+
+  observationCenters.emplace_back(2.0, 2.0);
+  observationCenters.emplace_back(2.0, -2.0);
+
+  observationCenters.emplace_back(2.5, 2.5);
+  observationCenters.emplace_back(2.5, -2.5);
+
+  observationCenters.emplace_back(3.0, 3.0);
+  observationCenters.emplace_back(3.0, -3.0);
+
+  observationCenters.emplace_back(3.5, 3.5);
+  observationCenters.emplace_back(3.5, -3.5);
+
+  observationCenters.emplace_back(4.0, 4.0);
+  observationCenters.emplace_back(4.0, -4.0);
+
+  observationCenters.emplace_back(4.5, 4.5);
+  observationCenters.emplace_back(4.5, -4.5);
+
+  observationCenters.emplace_back(5.0, 5.0);
+  observationCenters.emplace_back(5.0, -5.0);
+
+  observationCenters.emplace_back(5.5, 5.5);
+  observationCenters.emplace_back(5.5, -5.5);
+
+
+  CDCObservations2D observations2D;
+  for (const Vector2D & observationCenter : observationCenters) {
+    FloatType distance = circle.distance(observationCenter);
+    observations2D.append(observationCenter, distance);
+  }
+
+  //Now fit it
+  const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
+
+  CDCTrajectory2D trajectory2D;
+
+  fitter.update(trajectory2D, observations2D);
+
+  const PerigeeCircle& fittedCircle = trajectory2D.getCircle();
+
+  //EXPECT_NEAR(circle.perigee().x(), fittedCircle.perigee().x(), 10e-7);
+  //EXPECT_NEAR(circle.perigee().y(), fittedCircle.perigee().y(), 10e-7);
+
+  //EXPECT_NEAR(circle.radius(), fittedCircle.radius(), 10e-7);
+
+}
 
 

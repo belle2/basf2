@@ -1,4 +1,3 @@
-
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2012 - Belle II Collaboration                             *
@@ -11,7 +10,7 @@
 #ifndef NUMERICS_H
 #define NUMERICS_H
 
-#include <cmath>
+#include <math.h>
 #include <utility>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
@@ -29,10 +28,12 @@ namespace Belle2 {
     inline bool isOdd(const IntNumber& x)
     { return (x % 2) != 0; }
 
+
     ///Checks if a float is not a number
-    template<class FloatNumber>
-    inline bool isNAN(const FloatNumber& x)
-    { return x != x; }
+    bool isNAN(const double x);
+
+    ///Checks if a float is not a number
+    bool isNAN(const float x);
 
     ///Returns the sign of an integer number
     inline SignType sign(int x)
@@ -43,8 +44,7 @@ namespace Belle2 {
      *  This means 0.0 has sign PLUS while -0.0 has sign MINUS
      *  NAN is treat specially and returns an INVALID_SIGN
      */
-    inline SignType sign(double x)
-    { return isNAN(x) ? INVALID_SIGN : (std::signbit(x) ? MINUS : PLUS); }
+    SignType sign(double x);
 
     /// Returns the two roots in pq formula
     /** Calculates the two roots of the parabola x*x + p*x + q = 0 in a rather stable manner \n
@@ -60,7 +60,7 @@ namespace Belle2 {
       const double discriminant = phalf * phalf - q;
 
       // calculate bigger solution first !!!
-      const double solutionOne = (p > 0) ?  -phalf  - std::sqrt(discriminant)  : -phalf  + std::sqrt(discriminant) ;
+      const double solutionOne = (p > 0) ?  -phalf  - sqrt(discriminant)  : -phalf  + sqrt(discriminant) ;
 
       //second solution by vieta identity
       return std::pair<FloatType, FloatType>(solutionOne, q / solutionOne);
@@ -93,7 +93,7 @@ namespace Belle2 {
       {
 
         const double discriminant = ((double)b) * b - 4 * a * c;
-        const double root = std::sqrt(discriminant);
+        const double root = sqrt(discriminant);
 
         const double bigSum = (b > 0) ? -b - root : -b + root;
 

@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef GENERALIZEDCIRCLE_H
-#define GENERALIZEDCIRCLE_H
+#ifndef GENERALIZEDCIRCLEIMPL_H
+#define GENERALIZEDCIRCLEIMPL_H
 
 #include <cmath>
 
@@ -67,9 +67,17 @@ namespace Belle2 {
       /** The center and radius alone do not carry any orientation. However the generalized circle does.
        *  This constructor makes an orientated representation from them. If not given the orientation defaults to
        *  mathematical positiv counterclockwise. */
-      GeneralizedCircle(const Vector2D& center,
-                        const FloatType& absRadius,
-                        const CCWInfo& orientation = CCW);
+      static GeneralizedCircle fromCenterAndRadius(const Vector2D& center,
+                                                   const FloatType& absRadius,
+                                                   const CCWInfo& orientation = CCW);
+
+      static GeneralizedCircle fromPerigeeParameters(const FloatType& curvature,
+                                                     const Vector2D& tangential,
+                                                     const FloatType& impact);
+
+      static GeneralizedCircle fromPerigeeParameters(const FloatType& curvature,
+                                                     const FloatType& tangentialPhi,
+                                                     const FloatType& impact);
 
       /** Destructor. */
       ~GeneralizedCircle() {;}
@@ -99,23 +107,74 @@ namespace Belle2 {
       inline void setN3(const FloatType& n3)
       { m_n3 = n3; }
 
+
+    public:
+      /// Setter for the circle center and radius
+      void setCenterAndRadius(const Vector2D& center,
+                              const FloatType& absRadius,
+                              const CCWInfo& orientation = CCW);
+
       /// Setter for the perigee parameters
-      inline void setPerigeeParameters(const FloatType& curvature,
-                                       const Vector2D& tangential,
-                                       const FloatType& impact) {
-        FloatType n0 = impact * (impact * curvature / 2.0 + 1.0);
-        Vector2D n12 = -tangential.orthogonal() * (1 + curvature * impact);
-        FloatType n3 = curvature / 2.0;
-        setN0(n0);
-        setN12(n12);
-        setN3(n3);
-      }
+      void setPerigeeParameters(const FloatType& curvature,
+                                const Vector2D& tangential,
+                                const FloatType& impact);
 
       /// Setter for the perigee parameters
       inline void setPerigeeParameters(const FloatType& curvature,
                                        const FloatType& tangentialPhi,
                                        const FloatType& impact)
       { setPerigeeParameters(curvature, Vector2D::Phi(tangentialPhi), impact); }
+
+      /// Setter for all four circle parameters. Makes a normalization after setting.
+      /// The normal representation of a line leave out the last parameter
+      void setN(const FloatType& n0, const FloatType& n1, const FloatType& n2, const FloatType& n3 = 0.0)
+      { setN0(n0); setN12(n1, n2); setN3(n3); normalize(); }
+
+      /// Setter for all four circle parameters. Makes a normalization after setting.
+      /// The normal representation of a line leave out the last parameter
+      void setN(const FloatType& n0, const Vector2D& n12, const FloatType& n3 = 0.0)
+      { setN0(n0); setN12(n12); setN3(n3); normalize(); }
+
+      /// Setter for all four circle parameters from another circle
+      void setN(const Line2D& n012)
+      { setN(n012.n0(), n012.n12()); }
+
+      /// Setter for all four circle parameters from another circle
+      void setN(const GeneralizedCircle& n0123)
+      { setN(n0123.n0(), n0123.n12(), n0123.n3()); }
+
+      /// Sets all circle parameters to zero
+      void setNull()
+      { setN(0.0, 0.0, 0.0, 0.0); }
+
+      /// Flips the orientation of the circle in place
+      inline void reverse()
+      { scaleN(-1); }
+
+    protected:
+      /// Transforms the generalized circle to conformal space inplace
+      /** Applies the conformal map in the self-inverse from  X = x / (x^2 + y^2) and Y = y / (x^2 +y^2) inplace
+       *  It works most easily by the exchange of the circle parameters n0 <-> n3 */
+      inline void conformalTransform()
+      { std::swap(m_n0, m_n3); }
+
+
+    protected:
+      ///Normalizes the circle parameters.
+      /** The normalization is only made if the circle parameters have a valid positiv
+       *  norm. If the normalization of the cirlce is negativ or zero all circle
+       *  parameters are not changed.
+       */
+      inline void normalize() {
+        FloatType normalization_squared = normalizationSquared();
+        if (normalization_squared  > 0) scaleN(1.0 / std::sqrt(normalization_squared));
+      }
+
+    private:
+      ///Scales the circle parameters by a common factor.
+      inline void scaleN(const FloatType& factor)
+      { m_n0 *= factor; m_n12 *= factor; m_n3 *= factor; }
+
 
     public:
       ///Getter for the first circle parameter
@@ -138,21 +197,6 @@ namespace Belle2 {
       inline const FloatType& n3() const
       { return m_n3; }
 
-    protected:
-      /// Setter for all four circle parameters. Makes a normalization after setting.
-      /// The normal representation of a line leave out the last parameter
-      void setN(const FloatType& n0, const FloatType& n1, const FloatType& n2, const FloatType& n3 = 0.0)
-      { setN0(n0); setN12(n1, n2); setN3(n3); normalize(); }
-
-      /// Setter for the circle center and radius
-      void setCenterAndRadius(const Vector2D& circleCenter,
-                              const FloatType& absRadius,
-                              const CCWInfo& orientation = CCW);
-
-      /// Sets all circle parameters to zero
-      void setNull()
-      { setN(0.0, 0.0, 0.0, 0.0); }
-
     public:
       /// Indicates if all circle parameters are zero
       inline bool isNull() const
@@ -166,32 +210,11 @@ namespace Belle2 {
       inline FloatType normalizationSquared() const
       { return n12().normSquared() - 4 * n0() * n3(); }
 
-      ///Normalizes the circle parameters.
-      /** The normalization is only made if the circle parameters have a valid positiv
-       *  norm. If the normalization of the cirlce is negativ or zero all circle
-       *  parameters are not changed.
-       */
-      inline void normalize() {
-        FloatType normalization_squared = normalizationSquared();
-        if (normalization_squared  > 0) scaleN(1.0 / std::sqrt(normalization_squared));
-      }
-
-    protected:
-      /// Flips the orientation of the circle in place
-      inline void reverse()
-      { scaleN(-1); }
 
     public:
       /// Returns a copy of the circle with opposite orientation.
       inline GeneralizedCircle reversed() const
       { return GeneralizedCircle(-n0(), -n12(), -n3()); }
-
-    protected:
-      /// Transforms the generalized circle to conformal space inplace
-      /** Applies the conformal map in the self-inverse from  X = x / (x^2 + y^2) and Y = y / (x^2 +y^2) inplace
-       *  It works most easily by the exchange of the circle parameters n0 <-> n3 */
-      inline void conformalTransform()
-      { std::swap(m_n0, m_n3); }
 
     public:
       /// Returns a copy of the circle in conformal space
@@ -199,11 +222,6 @@ namespace Belle2 {
        *  It works most easily by the exchange of the circle parameters n0 <-> n3 */
       inline GeneralizedCircle conformalTransformed() const
       { return GeneralizedCircle(n3(), n12(), n0()); }
-
-    private:
-      ///Scales the circle parameters by a common factor.
-      inline void scaleN(const FloatType& factor)
-      { m_n0 *= factor; m_n12 *= factor; m_n3 *= factor; }
 
     public:
       /// Gradient of the distance field
@@ -323,6 +341,10 @@ namespace Belle2 {
       inline Vector2D tangential() const
       { return tangential(Vector2D(0.0, 0.0)); }
 
+      /// Gives to polar phi of the direction of flight at the perigee
+      inline FloatType tangentialPhi() const
+      { return tangential().phi(); }
+
       /// Gives the minimal polar r the circle reaches (unsigned)
       inline FloatType minimalPolarR() const
       { return std::fabs(impact()); }
@@ -404,7 +426,6 @@ namespace Belle2 {
        */
       FloatType lengthOnCurve(const Vector2D& from, const Vector2D& to) const;
 
-    private:
       /// Helper function the calculate the factor between the length of a secant line and the length on the arc.
       /**
        *  Smooth function expressing the relation between arc length and direct length
@@ -428,7 +449,6 @@ namespace Belle2 {
       }
 
     private:
-
       // Order of this parameters make them easier to initialize
       FloatType m_n3; ///< Memory for the fourth parameter
       Vector2D m_n12; ///< Memory for the second and third parameter

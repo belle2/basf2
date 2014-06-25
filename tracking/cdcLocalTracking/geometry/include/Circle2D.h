@@ -86,16 +86,16 @@ namespace Belle2 {
       /** Returns the signed distance of the point to the line. The sign is positiv \n
        *  for the right side of the line and negativ for the left side. */
       FloatType distance(const Vector2D& point) const
-      { return std::copysign(center().distance(point), radius()) - radius(); }
+      { return copysign(center().distance(point), radius()) - radius(); }
 
       /// Returns the signed distance to the origin
       /** The distance to the origin is equivalent to the first line parameter*/
       FloatType impact() const
-      { return std::copysign(center().norm(), radius()) - radius(); }
+      { return copysign(center().norm(), radius()) - radius(); }
 
       /// Returns the euclidian distance of the point to the circle line
       FloatType absDistance(const Vector2D& point) const
-      { return std::fabs(center().distance(point) - absRadius()); }
+      { return fabs(center().distance(point) - absRadius()); }
 
       /// Return if the point given is right or left of the line
       RightLeftInfo isRightOrLeft(const Vector2D& point) const
@@ -192,7 +192,7 @@ namespace Belle2 {
       /// Getter for the absolute radius
       /** The absolute radius is the absolute value of the signed Radius */
       FloatType absRadius() const
-      { return std::fabs(radius()); }
+      { return fabs(radius()); }
 
       /// Indicates if the circle is oriented counterclockwise
       // bool isCCW() const

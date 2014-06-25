@@ -66,7 +66,7 @@ CDCObservations2D::EigenObservationMatrix CDCObservations2D::getObservationMatri
 
 void CDCObservations2D::centralize(const Vector2D& origin)
 {
-  RowVector2f eigenOrigin(origin.x(), origin.y());
+  Matrix< FloatType, 1, 2 >  eigenOrigin(origin.x(), origin.y());
   EigenObservationMatrix eigenObservations = getObservationMatrix();
   eigenObservations.leftCols<2>().rowwise() -= eigenOrigin;
 }

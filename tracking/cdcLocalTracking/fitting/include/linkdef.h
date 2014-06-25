@@ -11,6 +11,7 @@
 
 #pragma link C++ class Belle2::CDCLocalTracking::CDCObservations2D+;
 #pragma link C++ class Belle2::CDCLocalTracking::CDCRiemannFitter+;
+#pragma link C++ class Belle2::CDCLocalTracking::CDCKarimakiFitter+;
 #pragma link C++ class Belle2::CDCLocalTracking::CDCSZFitter+;
 
 #endif

@@ -63,28 +63,65 @@ GeneralizedCircle::GeneralizedCircle(const Circle2D& circle):
 { ; }
 
 
+GeneralizedCircle GeneralizedCircle::fromCenterAndRadius(const Vector2D& center,
+                                                         const FloatType& absRadius,
+                                                         const CCWInfo& orientation)
+{
+  GeneralizedCircle generalizedCircle;
+  generalizedCircle.setCenterAndRadius(center, absRadius, orientation);
+  return generalizedCircle;
+}
 
-GeneralizedCircle::GeneralizedCircle(const Vector2D& center,
-                                     const FloatType& absRadius,
-                                     const CCWInfo& orientation):
-  m_n3(orientation / 2.0 / fabs(absRadius)),
-  m_n12(- center.x() * m_n3 * 2.0,
-        - center.y() * m_n3 * 2.0),
-  m_n0((center.normSquared() - absRadius* absRadius) * m_n3)
-{ ; }
+GeneralizedCircle GeneralizedCircle::fromPerigeeParameters(const FloatType& curvature,
+                                                           const Vector2D& tangential,
+                                                           const FloatType& impact)
+{
+  GeneralizedCircle generalizedCircle;
+  generalizedCircle.setPerigeeParameters(curvature, tangential, impact);
+  return generalizedCircle;
+}
+
+GeneralizedCircle GeneralizedCircle::fromPerigeeParameters(const FloatType& curvature,
+                                                           const FloatType& tangentialPhi,
+                                                           const FloatType& impact)
+{
+  GeneralizedCircle generalizedCircle;
+  generalizedCircle.setPerigeeParameters(curvature, tangentialPhi, impact);
+  return generalizedCircle;
+}
 
 
-void GeneralizedCircle::setCenterAndRadius(const Vector2D& circleCenter,
+
+
+
+
+void GeneralizedCircle::setCenterAndRadius(const Vector2D& center,
                                            const FloatType& absRadius,
                                            const CCWInfo& orientation)
 {
   FloatType curvature = orientation / fabs(absRadius);
-  setN0((circleCenter.normSquared() - absRadius * absRadius) * curvature / 2.0);
-  setN1(-circleCenter.x() * curvature);
-  setN2(-circleCenter.y() * curvature);
+  setN0((center.normSquared() - absRadius * absRadius) * curvature / 2.0);
+  setN1(-center.x() * curvature);
+  setN2(-center.y() * curvature);
   setN3(curvature / 2.0);
   normalize(); // the call to normalize should be superfluous
 }
+
+
+
+void GeneralizedCircle::setPerigeeParameters(const FloatType& curvature,
+                                             const Vector2D& tangential,
+                                             const FloatType& impact)
+{
+  FloatType n0 = impact * (impact * curvature / 2.0 + 1.0);
+  Vector2D n12 = -tangential.orthogonal() * (1 + curvature * impact);
+  FloatType n3 = curvature / 2.0;
+  setN(n0, n12, n3);
+}
+
+
+
+
 
 Vector2D GeneralizedCircle::closest(const Vector2D& point) const
 {

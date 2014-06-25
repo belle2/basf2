@@ -11,7 +11,7 @@
 #define VECTOR2D_H
 
 #include <TVector2.h>
-#include <cmath>
+#include <math.h>
 #include <iostream>
 
 #include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
@@ -53,7 +53,7 @@ namespace Belle2 {
 
       /// Constucts a unit vector with polar angle equal to phi
       static inline Vector2D Phi(const FloatType& phi)
-      { return Vector2D(cos(phi), sin(phi)); }
+      { return isNAN(phi) ? Vector2D(0.0, 0.0) : Vector2D(cos(phi), sin(phi)); }
 
       /// Constructs a vector from a unit coordinate system vector and the coordinates in that system
       /** Combines a coordinate system vector expressed in laboratory coordinates \n
@@ -130,7 +130,7 @@ namespace Belle2 {
       inline bool isNull() const { return x() == 0.0 and y() == 0.0; }
 
       /// Checks if one of the coordinates is NAN
-      inline bool hasNAN() const { return isnan(x()) or isnan(y()); }
+      inline bool hasNAN() const { return isNAN(x()) or isNAN(y()); }
 
       /// Output operator for debugging
       friend std::ostream& operator<<(std::ostream& output, const Vector2D& vector)
@@ -145,7 +145,7 @@ namespace Belle2 {
       inline FloatType normSquared() const { return x() * x() + y() * y(); }
 
       /// Calculates the length of the vector.
-      inline FloatType norm() const { return std::sqrt(x() * x() + y() * y()); }
+      inline FloatType norm() const { return hypot(x(), y()); }
 
       /** @name Angle functions
        *  These functions measure the angle between two vectors from *this* to rhs
@@ -165,7 +165,7 @@ namespace Belle2 {
       inline FloatType distance(const Vector2D& rhs = Vector2D(0.0, 0.0)) const {
         FloatType deltaX = x() - rhs.x();
         FloatType deltaY = y() - rhs.y();
-        return std::sqrt(deltaX * deltaX + deltaY * deltaY);
+        return hypot(deltaX, deltaY);
       }
 
       /// Scales the vector in place by the given factor
@@ -311,14 +311,14 @@ namespace Belle2 {
       inline void swapCoordinates() { std::swap(m_x, m_y); }
 
       /// Gives the polar radius of the vector. Same as norm()
-      inline FloatType polarR() const { return std::sqrt(x() * x() + y() * y()); }
+      inline FloatType polarR() const { return hypot(x(), y()); }
 
       /// Set the polar radius while keeping the polar angle phi the same
       inline void setPolarR(const FloatType& polar_r)
       { scale(polar_r / norm()); }
 
       /// Gives the polar radius being the angle to the x axes ( range -PI to PI )
-      inline FloatType phi() const { return atan2(y(), x()) ; }
+      inline FloatType phi() const { return isNull() ? NAN : atan2(y(), x()) ; }
 
       /// Getter for the x coordinate
       inline const FloatType& x() const { return m_x; }

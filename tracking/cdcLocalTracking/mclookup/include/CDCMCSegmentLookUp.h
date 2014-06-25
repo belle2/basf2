@@ -30,18 +30,20 @@ namespace Belle2 {
     class CDCMCSegmentLookUp : public UsedTObject {
 
     public:
-      /// Structure representing a matched Monte Carlo track id with the corresponding efficiency
-      struct MCTrackIdEfficiencyPair : public std::pair<ITrackType, float> {
+      /// Structure representing a matched Monte Carlo track id with the corresponding purity
+      struct MCTrackIdPurityPair : public std::pair<ITrackType, float> {
 
-        /// Constructor taking the Monte Carlo track id and the efficiency to be stored
-        MCTrackIdEfficiencyPair(ITrackType mcTrackId, float efficiency):
-          std::pair<ITrackType, float>(mcTrackId, efficiency) {;}
+        /// Constructor taking the Monte Carlo track id and the purity to be stored
+        MCTrackIdPurityPair(ITrackType mcTrackId, float purity):
+          std::pair<ITrackType, float>(mcTrackId, purity) {;}
 
         /// Getter for the Monte Carlo track Id
-        ITrackType getMCTrackId() const { return this->first; }
+        ITrackType getMCTrackId() const
+        { return this->first; }
 
-        /// Getter for the efficiency
-        float getEfficiency() const { return this->second; }
+        /// Getter for the purity
+        float getPurity() const
+        { return this->second; }
 
       };
 
@@ -59,7 +61,10 @@ namespace Belle2 {
       /// Clears all Monte Carlo information left from the last event
       void clear();
 
-      static const float MinimalMatchEfficiency;
+
+    private:
+      /// Threshold for the purity of the segments must exceed to be considered as a match.
+      static const float s_minimalMatchPurity;
 
     private:
       /// Fill a map with the number of hits for each track id contained in the given hit range.
@@ -79,9 +84,9 @@ namespace Belle2 {
 
       }
 
-      /// Get the track id with the highest corresponding efficiency.
+      /// Get the track id with the highest corresponding purity.
       template<class CDCHitPtrRange>
-      MCTrackIdEfficiencyPair getHighestEfficieny(const CDCHitPtrRange& ptrHits) const {
+      MCTrackIdPurityPair getHighestPurity(const CDCHitPtrRange& ptrHits) const {
 
         std::map<ITrackType, size_t>&& hitCountByMCTrackId = getHitCountByMCTrackId(ptrHits);
 
@@ -98,7 +103,7 @@ namespace Belle2 {
 
         }
 
-        return MCTrackIdEfficiencyPair(highestHitCountMCTrackId.first, (float(highestHitCountMCTrackId.second)) / nHits);
+        return MCTrackIdPurityPair(highestHitCountMCTrackId.first, (float(highestHitCountMCTrackId.second)) / nHits);
       }
 
       /*
@@ -116,9 +121,9 @@ namespace Belle2 {
 
     public:
       /// Getter for the Monte Carlo track id matched to this segment
-      /** On first encounter of a segment this evaluates the efficiencies for the contained track ids.
-       *  The match is valid if the highest efficiency exceeds the MinimalMatchEfficiency threshold.
-       *  In case the highest efficiency is to low to result will be INVALID_ITRACK. To result is stored
+      /** On first encounter of a segment this evaluates the purities for the contained track ids.
+       *  The match is valid if the highest purity exceeds the s_minimalMatchPurity threshold.
+       *  In case the highest purity is to low to result will be INVALID_ITRACK. To result is stored
        *  in member map object for fast look up for repeated calls.*/
       ITrackType getMCTrackId(const CDCRecoSegment2D* ptrSegment2D) const;
 
@@ -169,12 +174,13 @@ namespace Belle2 {
        */
       ForwardBackwardInfo isForwardOrBackwardToMCTrack(const CDCRecoSegment2D* ptrSegment2D) const;
 
-
+      ///
       ForwardBackwardInfo areAlignedInMCTrack(const CDCRecoSegment2D* ptrStartSegment2D, const CDCRecoSegment2D* ptrendSegment2D) const;
 
 
 
     private:
+      /// Storage for the map from reconstructed segments to their matched Monte Carlo Track Id
       mutable std::map<const CDCRecoSegment2D* , ITrackType> m_mcTrackIds;
 
 

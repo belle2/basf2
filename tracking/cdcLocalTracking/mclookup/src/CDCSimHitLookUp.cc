@@ -37,9 +37,6 @@ void CDCSimHitLookUp::clear()
   m_primarySimHits.clear();
   m_rightLeftInfos.clear();
 
-  B2INFO("m_primarySimHits.size(): " << m_primarySimHits.size());
-  B2INFO("m_rightLeftInfos.size(): " << m_rightLeftInfos.size());
-
 }
 
 
@@ -54,8 +51,8 @@ void CDCSimHitLookUp::fill(const CDCMCMap* ptrMCMap)
   fillPrimarySimHits();
   fillRLInfo();
 
-  B2INFO("m_primarySimHits.size(): " << m_primarySimHits.size());
-  B2INFO("m_rightLeftInfos.size(): " << m_rightLeftInfos.size());
+  B2DEBUG(100, "m_primarySimHits.size(): " << m_primarySimHits.size());
+  B2DEBUG(100, "m_rightLeftInfos.size(): " << m_rightLeftInfos.size());
 }
 
 
@@ -149,14 +146,13 @@ const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCSimHit* ptrSi
     });
 
     if (itClosestPrimarySimHit != primarySimHitsOnSameOrNeighborWire.end()) {
-
-      //B2INFO("Found primary hit for reassigned secondary");
+      //Found primary simulated hit for secondary hit
       return *itClosestPrimarySimHit;
 
     } else {
-
       B2WARNING("NO primary hit for reassigned secondary");
       return nullptr;
+
     }
   }
 

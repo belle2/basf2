@@ -15,7 +15,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-//ClassImpInCDCLocalTracking(CDCMCSegmentLookUp)
+ClassImpInCDCLocalTracking(CDCMCSegmentLookUp)
 
 
 CDCMCSegmentLookUp::CDCMCSegmentLookUp()
@@ -23,10 +23,16 @@ CDCMCSegmentLookUp::CDCMCSegmentLookUp()
 }
 
 
-/** Destructor. */
+
+
+
 CDCMCSegmentLookUp::~CDCMCSegmentLookUp()
 {
 }
+
+
+
+
 
 const CDCMCSegmentLookUp& CDCMCSegmentLookUp::getInstance()
 {
@@ -34,14 +40,23 @@ const CDCMCSegmentLookUp& CDCMCSegmentLookUp::getInstance()
 }
 
 
+
+
+
 void CDCMCSegmentLookUp::clear()
 {
-  B2INFO("Clearing CDCMCSegmentLookUp");
+  B2DEBUG(100, "Clearing CDCMCSegmentLookUp");
   m_mcTrackIds.clear();
-  B2INFO("m_mcTrackIds.size(): " <<  m_mcTrackIds.size());
+  B2DEBUG(100, "m_mcTrackIds.size(): " <<  m_mcTrackIds.size());
 }
 
-const float CDCMCSegmentLookUp::MinimalMatchEfficiency = 0.5;
+
+
+
+
+const float CDCMCSegmentLookUp::s_minimalMatchPurity = 0.5;
+
+
 
 
 ITrackType CDCMCSegmentLookUp::getMCTrackId(const CDCRecoSegment2D* ptrSegment2D) const
@@ -53,10 +68,10 @@ ITrackType CDCMCSegmentLookUp::getMCTrackId(const CDCRecoSegment2D* ptrSegment2D
   auto itFound = m_mcTrackIds.find(ptrSegment2D);
 
   if (itFound == m_mcTrackIds.end()) {
-    MCTrackIdEfficiencyPair mcTrackIdAndEfficiency = getHighestEfficieny(segment2D);
-    if (mcTrackIdAndEfficiency.getEfficiency() >= MinimalMatchEfficiency) {
-      m_mcTrackIds[ptrSegment2D] = mcTrackIdAndEfficiency.getMCTrackId();
-      return mcTrackIdAndEfficiency.getMCTrackId();
+    MCTrackIdPurityPair mcTrackIdAndPurity = getHighestPurity(segment2D);
+    if (mcTrackIdAndPurity.getPurity() >= s_minimalMatchPurity) {
+      m_mcTrackIds[ptrSegment2D] = mcTrackIdAndPurity.getMCTrackId();
+      return mcTrackIdAndPurity.getMCTrackId();
     } else {
       m_mcTrackIds[ptrSegment2D] = INVALID_ITRACK;
       return INVALID_ITRACK;
@@ -66,6 +81,8 @@ ITrackType CDCMCSegmentLookUp::getMCTrackId(const CDCRecoSegment2D* ptrSegment2D
     return itFound->second;
   }
 }
+
+
 
 
 
@@ -85,6 +102,9 @@ const CDCHit* CDCMCSegmentLookUp::getFirstHit(const CDCRecoSegment2D* ptrSegment
   return nullptr;
 
 }
+
+
+
 
 
 const CDCHit* CDCMCSegmentLookUp::getLastHit(const CDCRecoSegment2D* ptrSegment2D) const
@@ -108,6 +128,7 @@ const CDCHit* CDCMCSegmentLookUp::getLastHit(const CDCRecoSegment2D* ptrSegment2
 
 
 
+
 ForwardBackwardInfo CDCMCSegmentLookUp::isForwardOrBackwardToMCTrack(const CDCRecoSegment2D* ptrSegment2D) const
 {
   Index firstInTrackId = getFirstInTrackId(ptrSegment2D);
@@ -118,6 +139,9 @@ ForwardBackwardInfo CDCMCSegmentLookUp::isForwardOrBackwardToMCTrack(const CDCRe
   else if (firstInTrackId == lastInTrackId) return INVALID_INFO;
   return INVALID_ITRACK;
 }
+
+
+
 
 
 ForwardBackwardInfo CDCMCSegmentLookUp::areAlignedInMCTrack(const CDCRecoSegment2D* ptrStartSegment2D, const CDCRecoSegment2D* ptrEndSegment2D) const
@@ -161,14 +185,13 @@ ForwardBackwardInfo CDCMCSegmentLookUp::areAlignedInMCTrack(const CDCRecoSegment
   }
 
   // Now we are in the same passed super layer with both segments
-  //TODO check this definition....
   Index lastInTrackIdOfStartSegment = getLastInTrackId(ptrStartSegment2D);
   if (lastInTrackIdOfStartSegment == INVALID_INDEX) return INVALID_INFO;
 
   Index firstInTrackIdOfEndSegment = getFirstInTrackId(ptrEndSegment2D);
   if (firstInTrackIdOfEndSegment == INVALID_INDEX) return INVALID_INFO;
 
-  if (startFBInfo == FORWARD and  endFBInfo == FORWARD) {
+  if (startFBInfo == FORWARD and endFBInfo == FORWARD) {
     if (lastInTrackIdOfStartSegment < firstInTrackIdOfEndSegment) return FORWARD;
     else return INVALID_INFO;
   } else if (startFBInfo == BACKWARD and endFBInfo == BACKWARD) {

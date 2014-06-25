@@ -43,15 +43,6 @@ void CDCMCMap::clear()
   m_reassignedSecondaryHits.clear();
   m_reassignedSecondarySimHits.clear();
 
-  B2INFO("m_simHitByHit.size(): " << m_simHitByHit.size());
-
-  B2INFO("m_mcParticlesByHit.size(): " << m_mcParticlesByHit.size());
-  B2INFO("m_mcParticlesBySimHit.size(): " << m_mcParticlesBySimHit.size());
-
-  B2INFO("m_reassignedSecondaryHits.size(): " << m_reassignedSecondaryHits.size());
-  B2INFO("m_reassignedSecondarySimHits.size(): " << m_reassignedSecondarySimHits.size());
-
-
 }
 
 
@@ -70,13 +61,13 @@ void CDCMCMap::fill()
   validateReassignedSecondaries();
 
 
-  B2INFO("m_simHitByHit.size(): " << m_simHitByHit.size());
+  B2DEBUG(100, "m_simHitByHit.size(): " << m_simHitByHit.size());
 
-  B2INFO("m_mcParticlesByHit.size(): " << m_mcParticlesByHit.size());
-  B2INFO("m_mcParticlesBySimHit.size(): " << m_mcParticlesBySimHit.size());
+  B2DEBUG(100, "m_mcParticlesByHit.size(): " << m_mcParticlesByHit.size());
+  B2DEBUG(100, "m_mcParticlesBySimHit.size(): " << m_mcParticlesBySimHit.size());
 
-  B2INFO("m_reassignedSecondaryHits.size(): " << m_reassignedSecondaryHits.size());
-  B2INFO("m_reassignedSecondarySimHits.size(): " << m_reassignedSecondarySimHits.size());
+  B2DEBUG(100, "m_reassignedSecondaryHits.size(): " << m_reassignedSecondaryHits.size());
+  B2DEBUG(100, "m_reassignedSecondarySimHits.size(): " << m_reassignedSecondarySimHits.size());
 
 }
 

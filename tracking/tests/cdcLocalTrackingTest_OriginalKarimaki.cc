@@ -111,6 +111,7 @@ TEST_F(CDCLocalTrackingTest, OriginalKarimakisMethod_CircleFit)
   testCircleFitter(fitter, false);
 }
 
+
 TEST_F(CDCLocalTrackingTest, PortedKarimakisMethod_CircleFit)
 {
   const CDCFitter2D<PortedKarimakisMethod> fitter;
@@ -141,6 +142,8 @@ TEST_F(CDCLocalTrackingTest, PortedKarimakisMethod_CircleFit)
 }
 
 
+
+
 TEST_F(CDCLocalTrackingTest, PortedKarimakisMethod_CircleFit_WithDriftLengths)
 {
   const CDCFitter2D<PortedKarimakisMethod> fitter;
@@ -161,6 +164,8 @@ TEST_F(CDCLocalTrackingTest, CDCKarimakiFitter_CircleFit_WithoutDriftLength)
   fitter.useOnlyPosition();
   testCircleFitter(fitter, false);
 }
+
+
 
 
 

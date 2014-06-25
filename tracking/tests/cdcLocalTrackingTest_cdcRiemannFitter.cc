@@ -129,27 +129,3 @@ TEST_F(CDCLocalTrackingTest, CDCRiemannFitter_CircleFit)
   EXPECT_NEAR(generalCircle.radius(), fittedCircle.radius(), 10e-7);
 
 }
-
-
-
-TEST_F(CDCLocalTrackingTest, CDCKarimakiFitter_CircleFit)
-{
-
-  // Setup a test circle
-  CDCObservations2D observations2D = createGeneralCircleObservations();
-
-  //Now fit it
-  CDCKarimakiFitter fitter = CDCKarimakiFitter::getFitter();
-
-  CDCTrajectory2D trajectory2D;
-  fitter.update(trajectory2D, observations2D);
-
-  const PerigeeCircle& fittedCircle = trajectory2D.getCircle();
-
-  EXPECT_NEAR(generalCircle.perigee().x(), fittedCircle.perigee().x(), 10e-7);
-  EXPECT_NEAR(generalCircle.perigee().y(), fittedCircle.perigee().y(), 10e-7);
-  EXPECT_NEAR(generalCircle.radius(), fittedCircle.radius(), 10e-7);
-
-}
-
-

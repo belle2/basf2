@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2012 - Belle II Collaboration                             *
+ * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Oliver Frost                                             *
@@ -10,6 +10,7 @@
 
 #include "../include/KarimakisMethod.h"
 
+#include "TMatrixDSym.h"
 #include <Eigen/Dense>
 
 #include <tracking/cdcLocalTracking/geometry/UncertainPerigeeCircle.h>
@@ -24,15 +25,8 @@ using namespace CDCLocalTracking;
 ClassImpInCDCLocalTracking(KarimakisMethod)
 
 
-namespace {
-
-}
-
-
-
 KarimakisMethod::KarimakisMethod() :
-  m_lineConstrained(false),
-  m_originConstrained(false)
+  m_lineConstrained(false)
 {
 }
 
@@ -44,297 +38,238 @@ KarimakisMethod::~KarimakisMethod()
 
 
 
-void KarimakisMethod::update(CDCTrajectory2D& trajectory2D, CDCObservations2D& observations2D) const
+void KarimakisMethod::update(CDCTrajectory2D& trajectory2D,
+                             CDCObservations2D& observations2D) const
 {
+  size_t nObservations = observations2D.size();
+  trajectory2D.clear();
+  if (not nObservations) return;
 
-  updateWithDriftLength(trajectory2D, observations2D);
+  Vector2D ref = observations2D.getCentralPoint();
+  B2INFO("Reference point " << ref);
 
-  // if (observations2D.getNObservationsWithDriftRadius() > 0) {
+  observations2D.passiveMoveBy(ref);
 
-  // } else {
-  //   updateWithoutDriftLength(trajectory2D, observations2D);
-  //}
+  UncertainPerigeeCircle perigeeCircle = fit(observations2D);
 
+  FloatType frontX = observations2D.getX(0);
+  FloatType frontY = observations2D.getY(0);
+  Vector2D frontPos(frontX, frontY);
+
+  FloatType backX = observations2D.getX(nObservations - 1);
+  FloatType backY = observations2D.getY(nObservations - 1);
+  Vector2D backPos(backX, backY);
+
+  FloatType totalPerps = perigeeCircle.lengthOnCurve(frontPos, backPos);
+  if (totalPerps < 0) {
+    B2INFO("Reversed");
+    perigeeCircle.reverse();
+  }
+
+  perigeeCircle.passiveMoveBy(-ref);
+
+  trajectory2D.setCircle(perigeeCircle);
+
+  // Logical start position of the travel distance scale
+  trajectory2D.setStartPos2D(ref);
 }
 
 
 
-void KarimakisMethod::updateWithoutDriftLength(CDCTrajectory2D& trajectory2D, CDCObservations2D& observations2D) const
-{
 
-  CDCObservations2D::EigenObservationMatrix&&  eigenObservation = observations2D.getObservationMatrix();
+namespace {
+  /// Helper indices for meaningfull matrix access to the observations matrices
+  constexpr size_t iW = 0;
+  constexpr size_t iX = 1;
+  constexpr size_t iY = 2;
+  constexpr size_t iR2 = 3;
 
-  size_t nObservations = observations2D.size();
+  /// Helper indices for meaningfull matrix access to the perigee covariance matrices
+  constexpr size_t iCurv = 0;
+  constexpr size_t iPhi = 1;
+  constexpr size_t iI = 2;
 
-
-  if (isLineConstrained()) {
-
-    //do a normal line fit
-    Matrix<FloatType, Dynamic, 2> points = eigenObservation.leftCols<2>();
-
-    Matrix<FloatType, 1, 2> pointMean;
-    //RowVector2d pointMean;
-    pointMean << 0.0, 0.0;
-    if (!(isOriginConstrained())) {
-      // subtract the offset from the origin
-      pointMean = points.colwise().mean();
-
-      points = points.rowwise() - pointMean;
-    }
-    Matrix<FloatType, 2, 2> covarianceMatrix = points.transpose() * points;
-
-    SelfAdjointEigenSolver< Matrix<FloatType, 2, 2> > eigensolver(covarianceMatrix);
-
-    if (eigensolver.info() != Success) B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
-
-    //the eigenvalues are generated in increasing order
-    //we are interested in the lowest one since we want to compute the normal vector of the plane
-
-    Matrix<FloatType, 2, 1> normalToLine = eigensolver.eigenvectors().col(0);
-
-    FloatType offset = -pointMean * normalToLine;
-
-    // set the generalized circle parameters
-    // last set to zero constrains to a line
-    trajectory2D.setCircle(PerigeeCircle::fromN(offset, normalToLine(0), normalToLine(1), 0));
-
-  } else {
-
-    //lift the points to the projection space
-    Matrix<FloatType, Dynamic, 3> projectedPoints(nObservations, 3);
-
-    projectedPoints.col(0) = eigenObservation.col(0);
-    projectedPoints.col(1) = eigenObservation.col(1);
-    projectedPoints.col(2) = eigenObservation.leftCols<2>().rowwise().squaredNorm();
-
-
-    Matrix<FloatType, 1, 3> pointMean;
-    pointMean << 0.0, 0.0, 0.0;
-    if (!(isOriginConstrained())) {
-      // subtract the offset from the origin
-      pointMean = projectedPoints.colwise().mean();
-
-      projectedPoints = projectedPoints.rowwise() - pointMean;
+  /// Variant implementing Karimakis method without drift circles.
+  UncertainPerigeeCircle fitKarimaki(const FloatType& /*sw*/,
+                                     const Matrix< FloatType, 4, 1 >& a,
+                                     const Matrix< FloatType, 4, 4 >& c,
+                                     bool lineConstrained = false)
+  {
+    double q1, q2 = 0.0;
+    if (lineConstrained) {
+      q1 = c(iX, iY);
+      q2 = c(iX, iX) - c(iY, iY);
+    } else {
+      q1 = c(iX, iY) * c(iR2, iR2) - c(iX, iR2) * c(iY, iR2);
+      q2 = (c(iX, iX) - c(iY, iY)) * c(iR2, iR2) - c(iX, iR2) * c(iX, iR2) + c(iY, iR2) * c(iY, iR2);
     }
 
-    Matrix<FloatType, 3, 3> covarianceMatrix = projectedPoints.transpose() * projectedPoints;
+    double phi = 0.5 * atan2(2. * q1, q2);
 
-    SelfAdjointEigenSolver< Matrix<FloatType, 3, 3> > eigensolver(covarianceMatrix);
+    double sinphi = sin(phi);
+    double cosphi = cos(phi);
 
-    if (eigensolver.info() != Success) B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
+    double curv, I = 0.0;
+    if (lineConstrained) {
+      curv = 0.0; //line
+      I = sinphi * a(iX) - cosphi * a(iY);
 
-    //the eigenvalues are generated in increasing order
-    //we are interested in the lowest one since we want to compute the normal vector of the plane
+    } else {
+      double kappa = (sinphi * c(iX, iR2) - cosphi * c(iY, iR2)) / c(iR2, iR2);
+      double delta = -kappa * a(iR2) + sinphi * a(iX) - cosphi * a(iY);
+      curv = 2. * kappa / sqrt(1. - 4. * delta * kappa);
+      I = 2. * delta / (1. + sqrt(1. - 4. * delta * kappa));
 
-    Matrix<FloatType, 3, 1> normalToPlane = eigensolver.eigenvectors().col(0);
+    }
 
-    FloatType offset = -pointMean * normalToPlane;
-
-    trajectory2D.setCircle(PerigeeCircle::fromN(offset, normalToPlane(0), normalToPlane(1), normalToPlane(2)));
-    //fit.setParameters();
+    // Karimaki uses the opposite sign for phi in contrast to the convention of this framework !!!
+    phi += phi > 0 ? -PI : PI;
+    return PerigeeCircle::fromPerigeeParameters(curv, phi, I);
 
   }
 
-  //check if the orientation is alright
-  Vector2D directionAtCenter = trajectory2D.getUnitMom2D(Vector2D(0.0, 0.0));
 
 
-  size_t voteForChangeSign = 0;
-  for (size_t iPoint = 0; iPoint < nObservations; ++iPoint) {
-    FloatType pointInSameDirection = eigenObservation(iPoint, 0) * directionAtCenter.x() +
-                                     eigenObservation(iPoint, 1) * directionAtCenter.y();
-    if (pointInSameDirection < 0) ++voteForChangeSign;
+
+
+  /// Variant without drift circles
+  FloatType calcChi2Karimaki(const PerigeeCircle& parameters,
+                             const FloatType& sw,
+                             const Matrix< FloatType, 4, 4 >& c,
+                             bool lineConstrained = false)
+  {
+    // Karimaki uses the opposite sign for phi in contrast to the convention of this framework !!!
+    const Vector2D vecPhi = -parameters.tangential();
+
+    const FloatType& cosphi = vecPhi.x();
+    const FloatType& sinphi = vecPhi.y();
+
+
+    if (lineConstrained) {
+      FloatType chi2 = sw * (sinphi * sinphi * c(iX, iX) - 2. * sinphi * cosphi * c(iX, iY) + cosphi * cosphi * c(iY, iY));
+      return chi2;
+    } else {
+      // Ternminology Karimaki used in the paper
+      const FloatType& rho = parameters.curvature();
+      const FloatType& d = parameters.impact();
+
+      const FloatType u = 1 + d * rho;
+      const FloatType kappa = 0.5 * rho / u;
+
+      FloatType chi2 =  sw * u * u * (sinphi * sinphi * c(iX, iX) - 2. * sinphi * cosphi * c(iX, iY) + cosphi * cosphi * c(iY, iY) - kappa * kappa * c(iR2, iR2));
+      return chi2;
+    }
+
   }
 
-  if (voteForChangeSign > nObservations / 2.0) trajectory2D.reverse();
-
-}
 
 
+  Matrix<FloatType, 3, 3> calcCovarianceKarimaki(const PerigeeCircle& parameters,
+                                                 const Matrix< FloatType, 4, 4 >& s,
+                                                 bool lineConstrained = false)
+  {
+    Matrix<FloatType, 3, 3> invV;
 
-void KarimakisMethod::updateWithDriftLength(CDCTrajectory2D& trajectory2D, CDCObservations2D& observations2D) const
+    const FloatType& curv = parameters.curvature();
+    const FloatType& I =  parameters.impact();
+
+    // Karimaki uses the opposite sign for phi in contrast to the convention of this framework !!!
+    const Vector2D vecPhi = -parameters.tangential();
+
+
+    // Ternminology Karimaki using in the paper
+    const FloatType& cosphi = vecPhi.x();
+    const FloatType& sinphi = vecPhi.y();
+
+    const FloatType ssphi = sinphi * sinphi;
+    const FloatType scphi = sinphi * cosphi;
+    const FloatType ccphi = cosphi * cosphi;
+
+    const FloatType rho = curv;
+    const FloatType& d = I;
+
+    const double u = 1. + rho * d;
+
+    if (lineConstrained) {
+      invV(iCurv, iCurv) = 1.;
+      invV(iCurv, iPhi) = 0.;
+      invV(iCurv, iI) = 0.;
+      invV(iPhi, iCurv) = 0.;
+      invV(iI, iCurv) = 0.;
+
+      invV(iPhi, iPhi) = ccphi * s(iX, iX) + 2. * scphi * s(iX, iY) + ssphi * s(iY, iY);
+      invV(iPhi, iI) = -(cosphi * s(iX) + sinphi * s(iY));
+      invV(iI, iPhi) = invV(iPhi, iI);
+      invV(iI, iI) = s(iW);
+
+      Matrix<FloatType, 3, 3> V = invV.inverse();
+      V(iCurv, iCurv) = 0.;
+      return V;
+    } else {
+      double sa = sinphi * s(iX) - cosphi * s(iY);
+      double sb = cosphi * s(iX) + sinphi * s(iY);
+      double sc = (ssphi - ccphi) * s(iX, iY) + scphi * (s(iX, iX) - s(iY, iY));
+
+      double sd = sinphi * s(iX, iR2) - cosphi * s(iY, iR2);
+
+      double saa = ssphi * s(iX, iX) - 2. * scphi * s(iX, iY) + ccphi * s(iY, iY);
+
+      // Not in the Karimaki paper, but factors a similar term.
+      double se = cosphi * s(iX, iR2) + sinphi * s(iY, iR2);
+      double sbb = ccphi * s(iX, iX) + 2. * scphi * s(iX, iY) + ssphi * s(iY, iY);
+
+      invV(iCurv, iCurv) = 0.25 * s(iR2, iR2) - d * (sd - d * (saa + 0.5 * s(iR2) - d * (sa - 0.25 * d * s(iW))));
+      invV(iCurv, iPhi) = - u * (0.5 * se - d * (sc - 0.5 * d * sb));
+      invV(iPhi, iCurv) = invV(iCurv, iPhi);
+      invV(iPhi, iPhi) = u * u * sbb;
+
+      invV(iCurv, iI) = rho * (-0.5 * sd + d * saa) + 0.5 * u * s(iR2) - 0.5 * d * ((2 * u + rho * d) * sa - u * d * s(iW));
+      invV(iI, iCurv) = invV(iCurv, iI);
+      invV(iPhi, iI) = u * (rho * sc - u * sb);
+      invV(iI, iPhi) = invV(iPhi, iI);
+      invV(iI, iI) = rho * (rho * saa - 2 * u * sa) + u * u * s(iW);
+      return invV.inverse();
+    }
+
+  }
+
+
+} // end anonymuous namespace
+
+
+
+UncertainPerigeeCircle KarimakisMethod::fit(CDCObservations2D& observations2D) const
 {
-  // Assume a central point
-  Vector2D referencePoint = observations2D.centralize();
-  size_t nObservations = observations2D.size();
-  size_t nObservationsWithDriftRadius = observations2D.getNObservationsWithDriftRadius();
+  // Matrix of weighted sums
+  Matrix< FloatType, 4, 4> sNoL = observations2D.getWXYRSumMatrix();
 
+  // Matrix of averages
+  Matrix< FloatType, 4, 4> aNoL = sNoL / sNoL(iW);
+
+  // Measurement means
+  Matrix< FloatType, 4, 1> meansNoL = aNoL.row(iW);
+
+  // Covariance matrix
+  Matrix< FloatType, 4, 4> cNoL = aNoL - meansNoL * meansNoL.transpose();
+
+  // Parameters to be fitted
   UncertainPerigeeCircle resultCircle;
+  FloatType chi2;
+  Matrix< FloatType, 3, 3> perigeeCovariance;
 
-  // Unpack the informations
-  CDCObservations2D::EigenObservationMatrix && eigenObservation = observations2D.getObservationMatrix();
+  resultCircle = fitKarimaki(sNoL(iW), meansNoL, cNoL, isLineConstrained());
+  chi2 = calcChi2Karimaki(resultCircle, sNoL(iW), cNoL);
+  perigeeCovariance = calcCovarianceKarimaki(resultCircle, sNoL, isLineConstrained());
 
-  Matrix< FloatType, Dynamic, 1 > driftLengths = eigenObservation.col(2);
-  Matrix< FloatType, Dynamic, 4 > projectedPoints(nObservations, 4);
+  resultCircle.setChi2(chi2);
 
-  const size_t iX = 0;
-  const size_t iY = 1;
-  const size_t iR2 = 2;
-  const size_t iW = 3;
-
-  //all coordiates
-
-  projectedPoints.col(iX) = eigenObservation.col(0);
-  projectedPoints.col(iY) = eigenObservation.col(1);
-  projectedPoints.col(iR2) = eigenObservation.leftCols<2>().rowwise().squaredNorm() - driftLengths.rowwise().squaredNorm();
-  projectedPoints.col(iW) = Matrix<FloatType, Dynamic, 1>::Constant(nObservations, 1.0); //Offset column
-
-  //Array< FloatType, Dynamic, 1 > weights = Array<FloatType, Dynamic, 1>::Constant(nObservations, 1.0);
-  Matrix< FloatType, Dynamic, 4 > weightedProjectedPoints = projectedPoints; //.array().colwise() * weights;
-
-  Matrix< FloatType, 4, 4 > s =  weightedProjectedPoints.transpose() * projectedPoints;
-  Matrix< FloatType, 4, 1 > l = weightedProjectedPoints.transpose() * driftLengths;
-
-  FloatType sw = s(0, 0);
-  Matrix< FloatType, 4, 4 > a = s / sw;
-  Matrix< FloatType, 3, 1> observationAverage = a.topRightCorner<3, 1>();
-  Matrix< FloatType, 3, 3 > c = a.topLeftCorner<3, 3>() - observationAverage * observationAverage.transpose();
-
-
-  if (nObservationsWithDriftRadius > 0) {
-    Matrix< FloatType, 4, 1 > n = s.ldlt().solve(l);
-    resultCircle.setN(n(iW), n(iX), n(iY), n(iR2));
-
-  } else {
-    B2INFO("Here");
-    SelfAdjointEigenSolver< Matrix<FloatType, 4, 4> > eigensolver(s);
-    if (eigensolver.info() != Success) B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
-    Matrix<FloatType, 4, 1> n = eigensolver.eigenvectors().col(0);
-    resultCircle.setN(n(iW), n(iX), n(iY), n(iR2));
-    resultCircle.reverse();
-    // SelfAdjointEigenSolver< Matrix<FloatType, 3, 3> > eigensolver(c);
-    // if (eigensolver.info() != Success) B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
-    // //the eigenvalues are generated in increasing order
-    // //we are interested in the lowest one since we want to compute the normal vector of the plane
-    // Matrix<FloatType, 3, 1> normalToPlane = eigensolver.eigenvectors().col(0);
-    // FloatType offset = -observationAverage.transpose() * normalToPlane;
-    // resultCircle.setN(offset, normalToPlane(iX), normalToPlane(iY), normalToPlane(iR2));
-
+  TMatrixDSym tPerigeeCovariance(3);
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      tPerigeeCovariance(i, j) = perigeeCovariance(i, j);
+    }
   }
 
-  //B2INFO("s = " << endl << s);
-  //B2INFO("l = " << endl << l);
-  //B2INFO("n = " << endl << n);
-
-  FloatType curvature = resultCircle.curvature();
-  FloatType impact = resultCircle.impact();
-  Vector2D tangential = resultCircle.tangential().unit();
-  FloatType tangentialPhi = tangential.phi();
-
-  FloatType sx = s(iX, iW);
-  FloatType sy = s(iY, iW);
-  FloatType sr = s(iR2, iW);
-
-  FloatType sxx = s(iX, iX);
-  FloatType sxy = s(iX, iY);
-  FloatType sxr = s(iX, iR2);
-
-  FloatType syy = s(iY, iY);
-  FloatType syr = s(iY, iR2);
-
-  FloatType srr = s(iR2, iR2);
-
-  FloatType cxx = c(iX, iX);
-  FloatType cxy = c(iX, iY);
-  FloatType cxr = c(iX, iR2);
-
-  FloatType cyy = c(iY, iY);
-  FloatType cyr = c(iY, iR2);
-
-  FloatType crr = c(iR2, iR2);
-
-  TMatrixD inversePerigeeCovariance(3, 3);
-
-  double q1, q2;
-  if (not isLineConstrained()) {
-    q1 = crr * cxy - cxr * cyr;
-    q2 = crr * (cxx - cyy) - cxr * cxr + cyr * cyr;
-  } else {
-    q1 = cxy;
-    q2 = cxx - cyy;
-  }
-
-  //double phi = 0.5 * atan2(2. * q1, q2);
-  //double sinphi = sin(phi);
-  //double cosphi = cos(phi);
-
-  // compare phi with initial track direction
-  //if (cosphi * (ax + _xRef) + sinphi * (ay + _yRef) < 0.) {
-  // reverse direction
-  //   phi -= (phi > 0.) ? M_PI : -M_PI;
-  //  cosphi = -cosphi;
-  //  sinphi = -sinphi;
-  //}
-
-  if (isLineConstrained()) {
-    //TODO
-
-  } else {
-    B2INFO("Here 2");
-    // Karimaki has opposite phi sign convention
-    FloatType cosphi = tangential.x();
-    FloatType sinphi = tangential.y();
-
-
-    double kappa = (sinphi * cxr - cosphi * cyr) / crr;
-    // double delta = -kappa * ar + sinphi * ax - cosphi * ay;
-    // track parameters
-    //double rho = -2. * kappa / sqrt(1. - 4. * delta * kappa);
-    double rho = curvature;
-    //double d = 2. * delta / (1. + sqrt(1. - 4. * delta * kappa));
-    double d = impact;
-
-    // _parameters[0] = rho;
-    // _parameters[1] = phi;
-    // _parameters[2] = d;
-
-    FloatType u = 1. - rho * d;
-    FloatType Chi2 = sw * u * u * (sinphi * sinphi * cxx - 2. * sinphi * cosphi * cxy + cosphi * cosphi * cyy - kappa * kappa * crr);
-    //cout << " xyfit " << Chi2 << " " << _numPoints << " " <<_npar << ": " << rho << " " << phi << " " << d << endl;
-
-    // calculate covariance matrix
-    double sa = sinphi * sx - cosphi * sy;
-    double sb = cosphi * sx + sinphi * sy;
-    double sc = (sinphi * sinphi - cosphi * cosphi) * sxy + sinphi * cosphi * (sxx - syy);
-    double sd = sinphi * sxr - cosphi * syr;
-    double saa = sinphi * sinphi * sxx - 2. * sinphi * cosphi * sxy + cosphi * cosphi * syy;
-    inversePerigeeCovariance(0, 0) = 0.25 * srr - d * (sd - d * (saa + 0.5 * sr - d * (sa - 0.25 * d * sw)));
-    inversePerigeeCovariance(0, 1) = u * (0.5 * (cosphi * sxr + sinphi * syr) - d * (sc - 0.5 * d * sb));
-    inversePerigeeCovariance(1, 0) =  inversePerigeeCovariance(0, 1);
-    inversePerigeeCovariance(1, 1) = u * u * (cosphi * cosphi * sxx + 2. * cosphi * sinphi * sxy + sinphi * sinphi * syy);
-    inversePerigeeCovariance(0, 2) = rho * (-0.5 * sd + d * saa) - 0.5 * u * sr + 0.5 * d * ((3 * u - 1.) * sa - u * d * sw);
-    inversePerigeeCovariance(2, 0) =  inversePerigeeCovariance(0, 2);
-    inversePerigeeCovariance(1, 2) = -u * (rho * sc + u * sb);
-    inversePerigeeCovariance(2, 1) =  inversePerigeeCovariance(1, 2);
-    inversePerigeeCovariance(2, 2) = rho * (rho * saa + 2 * u * sa) + u * u * sw;
-
-    //cout << "points : " << endl << projectedPoints << endl;
-    TMatrixD perigeeCovariance = inversePerigeeCovariance;
-    perigeeCovariance.Invert();
-    //perigeeCovariance.Print();
-    UncertainPerigeeCircle(curvature, tangentialPhi, impact, perigeeCovariance);
-
-    resultCircle.setPerigeeCovariance(perigeeCovariance);
-  }
-
-  resultCircle.passiveMoveBy(-referencePoint);
-  trajectory2D.setCircle(resultCircle);
-  B2INFO("Reference point" << referencePoint);
-
-  return;
-
-  //cout << "updateWithRightLeft : " << endl;
-  //observations always have the structure
-  /*
-  observables[0][0] == x of first point
-  observables[0][1] == y of first point
-  observables[0][2] == desired distance of first point
-  */
-
-  // Build the covariance matix of
-  // * x
-  // * y
-  // * rho^2 - r^2
+  resultCircle.setPerigeeCovariance(tPerigeeCovariance);
+  return resultCircle;
 }
-
-

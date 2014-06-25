@@ -32,9 +32,10 @@ TEST_F(CDCLocalTrackingTest, PerigeeCircle_n)
   // Checks if the normal parameters n follow the same sign convention
   PerigeeCircle perigeeCircle(curvature, tangtialPhi, impact);
 
-  GeneralizedCircle generalizedCircle(perigeeCircle.n0(), perigeeCircle.n12(), perigeeCircle.n3());
+  GeneralizedCircle generalizedCircle = perigeeCircle;
+  //(perigeeCircle.n0(), perigeeCircle.n12(), perigeeCircle.n3());
 
-  EXPECT_NEAR(curvature, generalizedCircle.signedCurvature(), 10e-7);
+  EXPECT_NEAR(curvature, generalizedCircle.curvature(), 10e-7);
   EXPECT_NEAR(impact, generalizedCircle.impact(), 10e-7);
   EXPECT_NEAR(perigeeCircle.tangential().x(), generalizedCircle.tangential().x(), 10e-7);
   EXPECT_NEAR(perigeeCircle.tangential().y(), generalizedCircle.tangential().y(), 10e-7);

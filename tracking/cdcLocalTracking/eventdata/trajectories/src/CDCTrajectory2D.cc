@@ -68,7 +68,7 @@ CDCTrajectory2D::setStartPosMom2D(
   //same memory different name
   Vector2D& circleCenter = posToCenter.add(pos2D);
 
-  m_genCircle.setCenterAndRadius(circleCenter, r, orientation);
+  m_genCircle = GeneralizedCircle(circleCenter, r, orientation);
 
   setStartPos2D(pos2D);
 

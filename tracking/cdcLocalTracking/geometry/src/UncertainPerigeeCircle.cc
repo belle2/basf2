@@ -39,7 +39,7 @@ TMatrixD UncertainPerigeeCircle::passiveMoveByJacobian(const Vector2D& by) const
   FloatType A = 2 * halfA;
 
   B2INFO("A = " << A);
-  B2INFO("A = " << 2 * deltaOrthogonal + signedCurvature() * delta.normSquared());
+  B2INFO("A = " << 2 * deltaOrthogonal + curvature() * delta.normSquared());
 
   Vector2D CB = gradient(by).orthogonal();
   FloatType C = CB.first();
@@ -48,14 +48,14 @@ TMatrixD UncertainPerigeeCircle::passiveMoveByJacobian(const Vector2D& by) const
   B2INFO("B = " << B);
   B2INFO("C = " << C);
 
-  FloatType u = 1 + signedCurvature() * impact(); //= n12().polarR()
+  FloatType u = 1 + curvature() * impact(); //= n12().polarR()
 
-  FloatType U = sqrt(1 + signedCurvature() * A);
+  FloatType U = sqrt(1 + curvature() * A);
 
   B2INFO("U = " << U);
 
 
-  FloatType nu = 1 + signedCurvature() * deltaOrthogonal;
+  FloatType nu = 1 + curvature() * deltaOrthogonal;
 
   B2INFO("nu = " << nu);
 
@@ -64,7 +64,7 @@ TMatrixD UncertainPerigeeCircle::passiveMoveByJacobian(const Vector2D& by) const
   B2INFO("xi = " << xi);
 
   FloatType lambda = halfA / ((1 + U) * (1 + U) * U);
-  FloatType mu = 1.0 / (U * (U + 1)) + signedCurvature() * lambda;
+  FloatType mu = 1.0 / (U * (U + 1)) + curvature() * lambda;
 
   B2INFO("lambda = " << lambda);
   B2INFO("mu = " << mu);
@@ -80,7 +80,7 @@ TMatrixD UncertainPerigeeCircle::passiveMoveByJacobian(const Vector2D& by) const
 
   jacobian[1][0] = xi * deltaParallel;
   jacobian[1][1] = xi * u * nu;
-  jacobian[1][2] = -xi * signedCurvature() * signedCurvature() * deltaParallel;
+  jacobian[1][2] = -xi * curvature() * curvature() * deltaParallel;
 
   jacobian[2][0] = mu * zeta - lambda * A;
   jacobian[2][1] = 2 * mu * u * deltaParallel;

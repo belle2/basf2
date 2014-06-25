@@ -346,7 +346,7 @@ namespace Belle2 {
 
       /// Reverses the trajectory in place
       void reverse()
-      { m_genCircle.reverse(); }
+      { m_genCircle = m_genCircle.reversed(); }
 
       /// Returns the reverse trajectory as a copy
       CDCTrajectory2D reversed()
@@ -359,7 +359,7 @@ namespace Belle2 {
 
       /// Get the estimation for the absolute value of the transvers momentum
       inline FloatType getAbsMom2D() const
-      { return radiusToMom(getGenCircle().radius()); }
+      { return radiusToMom(getGenCircle().absRadius()); }
 
       /// Get the momentum at the start point of the trajectory
       inline Vector2D getStartMom2D() const
@@ -390,7 +390,7 @@ namespace Belle2 {
 
       /// Clears all information from this trajectoy
       void clear() {
-        m_genCircle.setNull();
+        m_genCircle = GeneralizedCircle(0.0, 0.0, 0.0, 0.0);
         m_startPos2D.set(0.0, 0.0);
       }
 
@@ -406,8 +406,8 @@ namespace Belle2 {
 
     public:
       /// Output helper for debugging
-      friend std::ostream& operator<<(std::ostream& output, const CDCTrajectory2D& trajector2D)
-      { return output << trajector2D.getGenCircle();  }
+      friend std::ostream& operator<<(std::ostream& output, const CDCTrajectory2D& trajectory2D)
+      { return output << trajectory2D.getGenCircle();  }
 
 
 

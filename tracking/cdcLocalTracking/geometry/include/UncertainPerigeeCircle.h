@@ -42,17 +42,17 @@ namespace Belle2 {
       }
 
       /// Constructor with the signed curvature as single parameter
-      UncertainPerigeeCircle(const FloatType& signedCurvature) :
-        PerigeeCircle(signedCurvature),
+      UncertainPerigeeCircle(const FloatType& curvature) :
+        PerigeeCircle(curvature),
         m_perigeeCovariance(3, 3) {
         m_perigeeCovariance.Zero();
       }
 
       /// Constructor taking the perigee and a signed curvature, the polar angle of the flight direction at the perigee and the signed impact parameter
-      UncertainPerigeeCircle(const FloatType& signedCurvature,
+      UncertainPerigeeCircle(const FloatType& curvature,
                              const FloatType& tangentialPhi,
                              const FloatType& impact) :
-        PerigeeCircle(signedCurvature, tangentialPhi, impact),
+        PerigeeCircle(curvature, tangentialPhi, impact),
         m_perigeeCovariance(3, 3) {
         m_perigeeCovariance.Zero();
       }
@@ -65,11 +65,11 @@ namespace Belle2 {
       }
 
       /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix.
-      UncertainPerigeeCircle(const FloatType& signedCurvature,
+      UncertainPerigeeCircle(const FloatType& curvature,
                              const FloatType& tangentialPhi,
                              const FloatType& impact,
                              const TMatrixD& perigeeCovariance) :
-        PerigeeCircle(signedCurvature, tangentialPhi, impact),
+        PerigeeCircle(curvature, tangentialPhi, impact),
         m_perigeeCovariance(perigeeCovariance) {
         checkCovarianceMatrix();
       }
@@ -130,9 +130,7 @@ namespace Belle2 {
 
       /// Sets all circle parameters to zero including the covariance matrix
       inline void setNull() {
-        setSignedCurvature(0.0);
-        setTangentialPhi(0.0);
-        setImpact(0.0);
+        PerigeeCircle::setNull();
         m_perigeeCovariance.Zero();
       }
 
@@ -182,7 +180,7 @@ namespace Belle2 {
       friend std::ostream& operator<<(std::ostream& output, const UncertainPerigeeCircle& perigeeCircle) {
         return output <<
                "UncertainPerigeeCircle(" <<
-               "curvature=" << perigeeCircle.signedCurvature() << "," <<
+               "curvature=" << perigeeCircle.curvature() << "," <<
                "tangentialPhi=" << perigeeCircle.tangentialPhi() << "," <<
                "impact=" << perigeeCircle.impact() << ")" ;
       }

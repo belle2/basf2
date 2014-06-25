@@ -24,49 +24,66 @@ using namespace CDCLocalTracking;
 ClassImpInCDCLocalTracking(GeneralizedCircle)
 
 
+
 GeneralizedCircle::GeneralizedCircle() : m_n3(0.0), m_n12(0.0, 0.0), m_n0(0.0) { ; }
+
+
 
 GeneralizedCircle::GeneralizedCircle(const FloatType& n0, const FloatType& n1,
                                      const FloatType& n2, const FloatType& n3) :
-  m_n3(n3), m_n12(n1, n2), m_n0(n0) { normalize(); }
+  m_n3(n3), m_n12(n1, n2), m_n0(n0)
+{
+  normalize();
+}
+
+
 
 GeneralizedCircle::GeneralizedCircle(const FloatType& n0,
                                      const Vector2D& n12,
                                      const FloatType& n3):
-  m_n3(n3), m_n12(n12), m_n0(n0) { normalize(); }
+  m_n3(n3), m_n12(n12), m_n0(n0)
+{
+  normalize();
+}
+
+
 
 GeneralizedCircle::GeneralizedCircle(const Line2D& n012):
-  m_n3(0.0), m_n12(n012.n12()), m_n0(n012.n0()) { normalize(); }
+  m_n3(0.0), m_n12(n012.n12()), m_n0(n012.n0())
+{
+  normalize();
+}
 
 
 GeneralizedCircle::GeneralizedCircle(const Circle2D& circle):
-  m_n3(1.0 / 2.0 / circle.signedRadius()),
+  m_n3(1.0 / 2.0 / circle.radius()),
   m_n12(- circle.center().x() * (m_n3 * 2.0)  ,
         - circle.center().y() * (m_n3 * 2.0)),
   m_n0((circle.center().normSquared() - circle.radiusSquared()) * m_n3)
-{;}
+{ ; }
+
+
 
 GeneralizedCircle::GeneralizedCircle(const Vector2D& center,
-                                     const FloatType& radius,
+                                     const FloatType& absRadius,
                                      const CCWInfo& orientation):
-  m_n3(orientation / 2.0 / radius),
+  m_n3(orientation / 2.0 / fabs(absRadius)),
   m_n12(- center.x() * m_n3 * 2.0,
         - center.y() * m_n3 * 2.0),
-  m_n0((center.normSquared() - radius* radius) * m_n3) { ; }
+  m_n0((center.normSquared() - absRadius* absRadius) * m_n3)
+{ ; }
 
 
 void GeneralizedCircle::setCenterAndRadius(const Vector2D& circleCenter,
-                                           const FloatType& r,
+                                           const FloatType& absRadius,
                                            const CCWInfo& orientation)
 {
-
-  FloatType signedCurvature = orientation / fabs(r);
-  setN0((circleCenter.normSquared() - r * r) * signedCurvature / 2.0);
-  setN1(-circleCenter.x() * signedCurvature);
-  setN2(-circleCenter.y() * signedCurvature);
-  setN3(signedCurvature / 2.0);
+  FloatType curvature = orientation / fabs(absRadius);
+  setN0((circleCenter.normSquared() - absRadius * absRadius) * curvature / 2.0);
+  setN1(-circleCenter.x() * curvature);
+  setN2(-circleCenter.y() * curvature);
+  setN3(curvature / 2.0);
   normalize(); // the call to normalize should be superfluous
-
 }
 
 Vector2D GeneralizedCircle::closest(const Vector2D& point) const
@@ -187,7 +204,6 @@ pair<Vector2D, Vector2D> GeneralizedCircle::samePolarR(const FloatType& R) const
 
 Vector2D GeneralizedCircle::samePolarR(const Vector2D& point) const
 {
-
   const FloatType R = point.norm();
 
   //extraploted to r
@@ -242,7 +258,7 @@ FloatType GeneralizedCircle::lengthOnCurve(const Vector2D& from, const Vector2D&
 
 FloatType GeneralizedCircle::arcLengthFactor(const FloatType& directDistance) const
 {
-  FloatType x = directDistance * signedCurvature() / 2.0;
+  FloatType x = directDistance * curvature() / 2.0;
 
   // Implementation of asin(x)/x
   // Inspired by BOOST's sinc

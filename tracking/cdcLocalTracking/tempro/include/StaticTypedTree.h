@@ -12,6 +12,7 @@
 
 #include <stddef.h>
 #include <typeinfo>
+#include <iostream>
 
 #include "StaticString.h"
 #include "TaggedTuple.h"
@@ -98,6 +99,7 @@ namespace Belle2 {
 
         tFile.cd();
         m_ptrTTree = new TTree(getName().c_str(), getTitle().c_str());
+
         createBranches();
 
         if (ptrSavedCurrentTDirectory) {
@@ -113,8 +115,23 @@ namespace Belle2 {
       { m_ptrTTree->Fill(); }
 
       /// Save the tree to file
-      void save() const
-      { if (m_ptrTTree) m_ptrTTree->Write(); }
+      void save() const {
+        if (m_ptrTTree) {
+          // Due to some weird we have to cd to the file of the TTree
+          // before saving in order to have the tree in the correct file.
+          TDirectory* ptrSavedCurrentTDirectory = gDirectory;
+
+          m_ptrTTree->GetCurrentFile()->cd();
+          m_ptrTTree->Write();
+
+          if (ptrSavedCurrentTDirectory) {
+            ptrSavedCurrentTDirectory->cd();
+          } else {
+            gROOT->cd();
+          }
+
+        }
+      }
 
       /// Get the current number of stored entries.
       size_t size() const
@@ -143,6 +160,7 @@ namespace Belle2 {
       std::string m_title; ///< Memory for the title of the underlying TTree
 
       TTree* m_ptrTTree; ///< Reference to the wrapped TTree
+
       BranchTuple branchTuple; ///< Memory for the statically defined branches
 
     };

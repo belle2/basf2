@@ -18,6 +18,7 @@
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include "MCFacetFilter.h"
+#include "FacetFilterTree.h"
 
 namespace Belle2 {
   namespace CDCLocalTracking {
@@ -35,10 +36,10 @@ namespace Belle2 {
       ~EvaluateFacetFilter();
 
       /// Main filter method returning the weight of the facet. Returns NOT_A_CELL if the cell shall be rejected.
-      CellState isGoodFacet(const CDCRecoFacet& facet) const;
+      CellState isGoodFacet(const CDCRecoFacet& facet);
 
       /// Clears all remember information from the last event
-      void clear() const;
+      void clear();
 
       /// Forwards the modules initialize to the filter
       void initialize();
@@ -46,9 +47,23 @@ namespace Belle2 {
       /// Forwards the modules initialize to the filter
       void terminate();
 
-    private:
-      mutable std::ofstream m_output_csv;  ///< Output stream for the csv file
+      /// Getter for the file name the tree shall be written to
+      std::string getFileName() const;
 
+      /// Getter for the filter to be evaluted
+      RealFacetFilter& getRealFacetFilter()
+      { return m_realFacetFilter; }
+
+      /// Getter for the Monte Carlo filter
+      MCFacetFilter& getMCFacetFilter()
+      { return m_mcFacetFilter; }
+
+    private:
+      /// ROOT output file
+      TFile* m_ptrTFileForOutput;
+
+      /// ROOT tree wrapper helping to file the output tree.
+      FacetFilterTree m_facetFilterTree;
 
       MCFacetFilter m_mcFacetFilter; ///< Instance of Monte Carlo facet filter.
       RealFacetFilter m_realFacetFilter; ///< Instance of evaluated facet filter.
@@ -56,7 +71,6 @@ namespace Belle2 {
     }; // end class EvaluateFacetFilter
   } //end namespace CDCLocalTracking
 } //end namespace Belle2
-
 
 
 
@@ -78,61 +92,66 @@ namespace Belle2 {
 
 
     template<class RealFacetFilter>
-    CellState EvaluateFacetFilter<RealFacetFilter>::isGoodFacet(const CDCRecoFacet& facet) const
+    CellWeight EvaluateFacetFilter<RealFacetFilter>::isGoodFacet(const CDCRecoFacet& facet)
     {
+      CellWeight mcWeight = m_mcFacetFilter.isGoodFacet(facet);
+      CellWeight prWeight = m_realFacetFilter.isGoodFacet(facet);
 
-      CellState mcCellWeight = m_mcFacetFilter.isGoodFacet(facet);
-      //bool mcDecision = (not isNotACell(mcCellWeight));
-
-      //CDCRecoFacet reversedFacet = facet.reversed();
-      //CellState mcReversedCellWeight = m_mcFacetFilter.isGoodFacet(reversedFacet);
-
-      bool mcDecision = not isNotACell(mcCellWeight);
-
+      //do fits
       facet.adjustLines();
 
-      const ParameterLine2D& startToMiddle = facet.getStartToMiddleLine();
-      const ParameterLine2D& startToEnd    = facet.getStartToEndLine();
-      const ParameterLine2D& middleToEnd   = facet.getMiddleToEndLine();
+      m_facetFilterTree.setValues(mcWeight, prWeight, facet);
+      m_facetFilterTree.fill();
 
-      m_output_csv << startToMiddle.tangential().cosWith(startToEnd.tangential()) << ","
-                   << startToEnd.tangential().cosWith(middleToEnd.tangential()) << ","
-                   << startToMiddle.tangential().cosWith(middleToEnd.tangential()) << ","
-                   << mcDecision
-                   << std::endl;
-
-      //return mcCellWeight;
-
-      CellState realCellWeight = m_realFacetFilter.isGoodFacet(facet);
-      return realCellWeight;
-
-
+      return prWeight;
     }
 
 
+
     template<class RealFacetFilter>
-    void EvaluateFacetFilter<RealFacetFilter>::clear() const {;}
+    void EvaluateFacetFilter<RealFacetFilter>::clear()
+    {
+    }
+
 
 
     template<class RealFacetFilter>
     void EvaluateFacetFilter<RealFacetFilter>::initialize()
     {
-      m_output_csv.open("facet_creator_filter.csv");
-      m_output_csv << "SMToSECosine,"
-                   << "SEToMECosine,"
-                   << "SMToMECosine,"
-                   << "MCTruth"
-                   << std::endl;
+      getMCFacetFilter().initialize();
+      getRealFacetFilter().initialize();
+
+      m_ptrTFileForOutput = new TFile(getFileName().c_str(), "RECREATE");
+      if (m_ptrTFileForOutput) {
+        m_facetFilterTree.create(*m_ptrTFileForOutput);
+      }
     }
+
 
 
     template<class RealFacetFilter>
     void EvaluateFacetFilter<RealFacetFilter>::terminate()
     {
-      m_output_csv.close();
+      m_facetFilterTree.save();
+
+      if (m_ptrTFileForOutput != nullptr) {
+        m_ptrTFileForOutput->Close();
+        delete m_ptrTFileForOutput;
+        m_ptrTFileForOutput = nullptr;
+      }
+
+      getRealFacetFilter().terminate();
+      getMCFacetFilter().terminate();
+
     }
 
 
+
+    template<class RealFacetFilter>
+    std::string EvaluateFacetFilter<RealFacetFilter>::getFileName() const
+    {
+      return "EvaluateFacetFilter.root";
+    }
 
   } //end namespace CDCLocalTracking
 } //end namespace Belle2

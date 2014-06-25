@@ -140,7 +140,7 @@ namespace Belle2 {
       }
 
     private:
-      FacetFilter m_facetFilter; ///< Instance of the filter used to judge the hit triple quality.
+      mutable FacetFilter m_facetFilter; ///< Instance of the filter used to judge the hit triple quality.
 
     }; //end class FacetCreator
   } //end namespace CDCLocalTracking

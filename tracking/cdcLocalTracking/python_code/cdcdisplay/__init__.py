@@ -449,7 +449,7 @@ class CDCSVGDisplayModule(Module):
             if segment_storearray:
                 print '#Segment', segment_storearray.getEntries()
                 axial_segments = [segment for segment in segment_storearray
-                                  if segment.getAxialType() == 0]
+                                  if segment.getStereoType() == 0]
 
                 mc_axial_axial_segment_filter = \
                     Belle2.CDCLocalTracking.MCAxialAxialSegmentPairFilter()
@@ -479,10 +479,10 @@ class CDCSVGDisplayModule(Module):
             if segment_storearray:
                 print '#Segment', segment_storearray.getEntries()
                 axial_segments = [segment for segment in segment_storearray
-                                  if segment.getAxialType() == 0]
+                                  if segment.getStereoType() == 0]
 
                 stereo_segments = [segment for segment in segment_storearray
-                                   if segment.getAxialType() != 0]
+                                   if segment.getStereoType() != 0]
 
                 # Misuse this a bit but still does what we want
                 mc_axial_axial_segment_filter = \
@@ -523,10 +523,10 @@ class CDCSVGDisplayModule(Module):
             if segment_storearray:
                 print '#Segment', segment_storearray.getEntries()
                 axial_segments = [segment for segment in segment_storearray
-                                  if segment.getAxialType() == 0]
+                                  if segment.getStereoType() == 0]
 
                 stereo_segments = [segment for segment in segment_storearray
-                                   if segment.getAxialType() != 0]
+                                   if segment.getStereoType() != 0]
 
                 # Misuse this a bit but still does what we want
                 mc_axial_axial_segment_filter = \
@@ -639,7 +639,7 @@ class CDCSVGDisplayModule(Module):
             if segment_storearray:
                 print '#Trajectories', segment_storearray.getEntries()
                 for segment in segment_storearray:
-                    if segment.getAxialType() == 0:
+                    if segment.getStereoType() == 0:
 
                         fitter = Belle2.CDCLocalTracking.CDCRiemannFitter()
                         # fitter.useOnlyPosition()

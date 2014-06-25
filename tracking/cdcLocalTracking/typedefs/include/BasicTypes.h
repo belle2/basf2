@@ -121,17 +121,6 @@ namespace Belle2 {
     const WireNeighborType CCW_OUT_NEIGHBOR = 11; ///< Constant for counterclockwise outwards
     /**@}*/
 
-    /** @name Axial type */
-    /**@{*/
-    typedef SignType AxialType; ///< Type for the stereo property of the wire
-    const AxialType AXIAL = 0; ///< Constant for an axial wire
-    const AxialType STEREO_U = 1; ///< Constant for an stereo wire in the U configuration
-    const AxialType STEREO_V = -1;  ///< Constant for an stereo wire in the V configuration
-
-    const AxialType INVALID_AXIALTYPE = -127; ///< Constant for an invalid stereo information
-    /**@}*/
-
-
   } // namespace CDCLocalTracking
 
 } // namespace Belle2

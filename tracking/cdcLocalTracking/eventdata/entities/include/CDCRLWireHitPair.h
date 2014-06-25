@@ -99,11 +99,9 @@ namespace Belle2 {
         return result == getToRLWireHit().getISuperLayer() ? result : INVALIDSUPERLAYER;
       }
 
-      /// Getter for the common axial type of the superlayer of the pair
-      AxialType getAxialType() const
-      { return getISuperLayer() == INVALIDSUPERLAYER ? INVALID_AXIALTYPE : getFromRLWireHit().getAxialType(); }
-
-
+      /// Getter for the common stereo type of the superlayer of the pair
+      StereoType getStereoType() const
+      { return isValidISuperLayer(getISuperLayer()) ? getFromRLWireHit().getStereoType() : INVALID_STEREOTYPE; }
 
       /// Getter for the wire the first oriented wire hit is based on
       const CDCWire& getFromWire() const { return getFromRLWireHit()->getWire(); }

@@ -68,7 +68,7 @@ namespace Belle2 {
        *  be determined since the projection can not show any information about it. It
        *  is always set to NAN for axial hits.
        *
-       *  For two dimensional reconstructed hits on axial wires however the deviation of the xy position \n
+       *  For two dimensional reconstructed hits on stereo wires however the deviation of the xy position \n
        *  can be used to get z information. The reconstucted hit lies exactly on the fitted trajectory \n
        *  as seen from the xy plane. Hence also xy position and transvers travel distance are available. \n
        *  Only the stereo hits have then the full information to go head and make the sz trajectory. */
@@ -84,7 +84,7 @@ namespace Belle2 {
        *  by evaluating the sz trajectory at the just calculated travel distance. Note that it is important \n
        *  that both circle trajectory and sz trajectory share a common reference point.
        *
-       *  For two dimensional reconstructed hits on axial wires the transerse travel distance is obtained \n
+       *  For two dimensional reconstructed hits on stereo wires the transerse travel distance is obtained \n
        *  as in the reconstuct() method before. However the z coordinate is set to the value of the sz trajectory \n
        *  at just calculated the transvers travel distance, since the trajectory should be more exact than the shifting \n
        *  along the wire.*/
@@ -147,9 +147,9 @@ namespace Belle2 {
 
 
 
-      /// Getter for the axial type of the underlying wire.
-      AxialType getAxialType() const
-      { return getRLWireHit().getAxialType(); }
+      /// Getter for the stereo type of the underlying wire.
+      StereoType getStereoType() const
+      { return getRLWireHit().getStereoType(); }
 
       /// Getter for the superlayer id
       ILayerType getISuperLayer() const

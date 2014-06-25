@@ -16,6 +16,8 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/WireID.h>
 
+#include "StereoType.h"
+
 #include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
@@ -156,15 +158,15 @@ namespace Belle2 {
       const BoundSkewLine& getSkewLine() const { return m_skewLine; }
 
       /// Indicates if the wire is axial or stereo
-      inline bool isAxial() const { return getAxialType() == AXIAL; }
+      inline bool isAxial() const { return getStereoType() == AXIAL; }
 
-      /// Getter for the axial type of the wire
-      /** Gives the axial type of the wire.
+      /// Getter for the stereo type of the wire
+      /** Gives the stereo type of the wire.
        *  Result is one of AXIAL, STEREO_U and STEREO_V
-       *  The axial type is shared by all wires in the same superlayer
+       *  The stereo type is shared by all wires in the same superlayer
        *  The superlayer pattern for Belle II is AUAVAUAVA according the TDR
        */
-      inline AxialType getAxialType() const {
+      inline StereoType getStereoType() const {
         if ((getISuperLayer() % 2) == 0)  return AXIAL;
         else if ((getISuperLayer() % 4) == 1)  return STEREO_U;
         else return STEREO_V;

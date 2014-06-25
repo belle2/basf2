@@ -128,9 +128,9 @@ namespace Belle2 {
       Vector2D getCenterOfMass2D() const
       { return getWireHit().getRefPos2D(); }
 
-      /// Getter for the axial type of the underlying wire.
-      AxialType getAxialType() const
-      { return getWireHit().getAxialType(); }
+      /// Getter for the stereo type of the underlying wire.
+      StereoType getStereoType() const
+      { return getWireHit().getStereoType(); }
 
       /// Getter for the superlayer id
       ILayerType getISuperLayer() const

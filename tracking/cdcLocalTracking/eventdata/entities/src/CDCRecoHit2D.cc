@@ -144,8 +144,8 @@ CDCRecoHit2D CDCRecoHit2D::reversed() const
 Vector2D CDCRecoHit2D::getRecoPos2D(const CDCTrajectory2D& trajectory2D) const
 {
 
-  AxialType axialType = getAxialType();
-  if (axialType == AXIAL) {
+  StereoType stereoType = getStereoType();
+  if (stereoType == AXIAL) {
     return trajectory2D.getClosest(getRecoPos2D());
   } else {
     const BoundSkewLine skewLine = getSkewLine();

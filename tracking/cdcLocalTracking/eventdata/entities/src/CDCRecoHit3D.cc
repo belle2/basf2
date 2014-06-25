@@ -64,15 +64,15 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(
 )
 {
 
-  AxialType axialType = recoHit.getAxialType();
-  if (axialType == STEREO_V or axialType == STEREO_U) {
+  StereoType stereoType = recoHit.getStereoType();
+  if (stereoType == STEREO_V or stereoType == STEREO_U) {
 
     BoundSkewLine skewLine = recoHit.getSkewLine();
     Vector3D reconstructedPoint = trajectory2D.reconstruct3D(skewLine);
     FloatType perpS = trajectory2D.calcPerpS(reconstructedPoint.xy());
     return CDCRecoHit3D(&(recoHit.getRLWireHit()), reconstructedPoint, perpS);
 
-  } else if (axialType == AXIAL) {
+  } else if (stereoType == AXIAL) {
     Vector2D recoPos2D = trajectory2D.getClosest(recoHit.getRecoPos2D());
     FloatType perpS    = trajectory2D.calcPerpS(recoPos2D);
 
@@ -94,8 +94,8 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(
 )
 {
 
-  AxialType axialType = recoHit.getAxialType();
-  if (axialType == AXIAL) {
+  StereoType stereoType = recoHit.getStereoType();
+  if (stereoType == AXIAL) {
     Vector2D recoPos2D = trajectory2D.getClosest(recoHit.getRecoPos2D());
     FloatType perpS    = trajectory2D.calcPerpS(recoPos2D);
     FloatType z        = trajectorySZ.mapSToZ(perpS);
@@ -103,7 +103,7 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(
     Vector3D recoPos3D(recoPos2D, z);
     return CDCRecoHit3D(&(recoHit.getRLWireHit()), recoPos3D, perpS);
 
-  } else if (axialType == STEREO_U or axialType == STEREO_V) {
+  } else if (stereoType == STEREO_U or stereoType == STEREO_V) {
     //the closest approach of a skew line to a helix
     //( in this case representated by the two trajectories )
     //can not be solved as a closed expression

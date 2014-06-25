@@ -137,12 +137,12 @@ namespace Belle2 {
         return accumulate;
       }
 
-      /// Returns the common axial type of all tracking entities.
+      /// Returns the common stereo type of all tracking entities.
       /** This checks if all tracking entities are located in the same superlayer and \n
-       *  returns the axial type of the later. Returns INVALID_AXIALTYPE if the superlayer \n
+       *  returns the stereo type of the later. Returns INVALID_STEREOTYPE if the superlayer \n
        *  is not shared among the tracking entities. */
-      AxialType getAxialType() const
-      { return getISuperLayer() == INVALIDSUPERLAYER ? INVALID_AXIALTYPE : this->front()->getAxialType(); }
+      StereoType getStereoType() const
+      { return isValidISuperLayer(getISuperLayer()) ? this->front()->getStereoType() : INVALID_STEREOTYPE; }
 
 
       /// Returns the common super layer id of all stored tracking entities
@@ -150,14 +150,14 @@ namespace Belle2 {
        *  returns the superlayer id of the later. Returns INVALIDSUPERLAYER if the superlayer \n
        *  is not shared among the tracking entities. */
       ILayerType getISuperLayer() const {
-        if (this->empty()) return INVALIDSUPERLAYER;
+        if (this->empty()) return INVALID_ISUPERLAYER;
         const_iterator itItem = this->begin();
         const T& firstItem =  *itItem;
-        ILayerType iSuperlayer = firstItem->getISuperLayer();
+        ILayerType iSuperLayer = firstItem->getISuperLayer();
         for (++itItem; itItem != this->end(); ++itItem) {
-          if (iSuperlayer != (*itItem)->getISuperLayer()) return INVALIDSUPERLAYER ;
+          if (iSuperLayer != (*itItem)->getISuperLayer()) return INVALID_ISUPERLAYER;
         }
-        return iSuperlayer;
+        return iSuperLayer;
       }
 
       /// Calculates the sum of all squared distances of the stored tracking entities to the circle as see from the transvers plane.

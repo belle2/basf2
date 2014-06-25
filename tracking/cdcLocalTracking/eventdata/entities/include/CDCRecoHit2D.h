@@ -147,9 +147,9 @@ namespace Belle2 {
       BoundSkewLine getSkewLine() const
       { return getWire().getSkewLine().movedBy(getRecoDisp2D()); }
 
-      /// Getter for the axial type of the underlying wire.
-      AxialType getAxialType() const
-      { return getRLWireHit().getAxialType(); }
+      /// Getter for the stereo type of the underlying wire.
+      StereoType getStereoType() const
+      { return getRLWireHit().getStereoType(); }
 
       /// Getter for the superlayer id
       ILayerType getISuperLayer() const

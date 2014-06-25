@@ -119,8 +119,8 @@ namespace Belle2 {
 
       /// Reconstuct the wire reference position onto the given trajectory
       Vector2D getRecoPos2D(const CDCTrajectory2D& trajectory2D) const {
-        AxialType axialType = getAxialType();
-        if (axialType == AXIAL) {
+        StereoType stereoType = getStereoType();
+        if (stereoType == AXIAL) {
           return trajectory2D.getClosest(getRefPos2D());
         } else {
           // TODO replace with something better if at all possible
@@ -167,9 +167,9 @@ namespace Belle2 {
       /// Center of mass is just the refernce position for wire hits.
       const Vector2D& getCenterOfMass2D() const { return getRefPos2D(); }
 
-      /// Getter for the axial type of the underlying wire.
-      AxialType getAxialType() const
-      { return getWire().getAxialType(); }
+      /// Getter for the stereo type of the underlying wire.
+      StereoType getStereoType() const
+      { return getWire().getStereoType(); }
 
       /// Getter for the super layer id
       ILayerType getISuperLayer() const

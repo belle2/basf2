@@ -235,6 +235,9 @@ namespace Belle2 {
       /** Convert SimHits into the cluster format */
       void convertSimHits();
 
+      /** Mix True and Sim hits for background simulation */
+      void mixTrueSimHits();
+
       /** Create ghosts hits */
       void createGhosts();
 

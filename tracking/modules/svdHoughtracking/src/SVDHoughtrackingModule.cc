@@ -437,7 +437,8 @@ SVDHoughtrackingModule::event()
     } else if (m_useSimHitClusters) {
       /* This is for background simulation, so add sim and true hits */
       convertSimHits();
-      convertTrueHits();
+      //convertTrueHits();
+      //mixTrueSimHits();
     } else {
       clusterStrips();
     }
@@ -1915,7 +1916,7 @@ SVDHoughtrackingModule::convertSimHits()
   int i, cluster_cnt;
   int nSimHit;
   double dist;
-  VxdID sensorID;
+  VxdID sensorID, last_sensorID;
   TVector3 pos, last_pos, local_pos;
   TVector3 diff, vec, abs_pos;
 
@@ -1966,26 +1967,106 @@ SVDHoughtrackingModule::convertSimHits()
         ++cluster_cnt;
       }
     } else {
-      diff = pos - last_pos;
+      //diff = pos - last_pos;
+      diff = abs_pos - last_pos;
       dist = diff.Mag();
       B2DEBUG(250, "   Distance: " << dist);
 
-      if (fabs(dist) < 0.01 && i != (nSimHit - 1)) {
+      if (fabs(dist) < 0.08 && i != (nSimHit - 1)) {
       } else {
-        n_clusters.insert(std::make_pair(n_idx, std::make_pair(sensorID, last_pos)));
+        n_clusters.insert(std::make_pair(n_idx, std::make_pair(last_sensorID, last_pos)));
         ++n_idx;
-        p_clusters.insert(std::make_pair(p_idx, std::make_pair(sensorID, last_pos)));
+        p_clusters.insert(std::make_pair(p_idx, std::make_pair(last_sensorID, last_pos)));
         ++p_idx;
-        storeHoughCluster.appendNew(SVDHoughCluster(sensorID, pos));
+        storeHoughCluster.appendNew(SVDHoughCluster(last_sensorID, pos));
         ++cluster_cnt;
       }
     }
 
-    last_pos = pos;
+    //last_pos = pos;
+    last_pos = abs_pos;
+    last_sensorID = sensorID;
   }
 
   if (m_compareMCParticleVerbose) {
     B2INFO("  Total Clusters: " << cluster_cnt << " Number of Sim Hits: " << nSimHit);
+  }
+}
+
+/*
+ * With background simulation we need to mix sim and true hits, in case we
+ * also want the true hits inside.
+ */
+void
+SVDHoughtrackingModule::mixTrueSimHits()
+{
+  StoreArray<SVDSimHit> storeSVDSimHit(m_storeSVDSimHitsName);
+  StoreArray<SVDHoughCluster> storeHoughCluster(m_storeHoughCluster);
+  const StoreArray<SVDTrueHit> storeSVDTrueHits(m_storeSVDTrueHitsName);
+  int nTrueHit;
+  VxdID sensorID;
+  SVDTrueHit* svdTrueHit;
+  TVector3 pos, local_pos;
+  TVector3 diff, abs_pos, sim_pos;
+  double dist;
+
+  clusterMap pos_map;
+  sensorMap sensor_cluster;
+  std::map<int, TVector3> cpy_map = pos_map;
+  std::map<int, TVector3>::iterator iter, inner_iter;
+  TVector3 clusterDelta(0.15, 0.15, 0.15);
+
+  if (!storeHoughCluster.isValid()) {
+    storeHoughCluster.create();
+  } else {
+    storeHoughCluster.getPtr()->Clear();
+  }
+
+  //convertSimHits(); /* Convert Simhits first */
+  convertTrueHits(); /* Convert Simhits first */
+
+  nTrueHit = storeSVDTrueHits.getEntries();
+  if (nTrueHit == 0) {
+    return;
+  }
+
+  B2DEBUG(250, "mixTrueSimHits: Include True hits if necessary");
+
+  dist = 1e+99;
+  /* First convert to absolute hits and save into a map */
+  /* Clear global cluser maps */
+  svd_sensor_cluster_map.clear();
+  for (int i = 0; i < nTrueHit; ++i) {
+    svdTrueHit = storeSVDTrueHits[i];
+    sensorID = svdTrueHit->getSensorID();
+    local_pos.SetX(svdTrueHit->getU());
+    local_pos.SetY(svdTrueHit->getV());
+    local_pos.SetZ(svdTrueHit->getW());
+
+    /* Convert local to global position */
+    const SensorInfo* sensorInfo = dynamic_cast<const SensorInfo*>(&VXD::GeoCache::get(sensorID));
+    pos = sensorInfo->pointToGlobal(local_pos);
+
+    for (int j = 0; j < storeHoughCluster.getEntries(); ++j) {
+      sim_pos = storeHoughCluster[j]->getHitPos();
+      diff = sim_pos - pos;
+
+      if (diff.Mag() < dist) {
+        dist = diff.Mag();
+      }
+    }
+
+    if (dist > 0.060) {
+      B2DEBUG(250, "  Include trueHit Local Pos: " << local_pos.X() << " " << local_pos.Y() << " " << local_pos.Z()
+              << " Pos: " << pos.X() << " " << pos.Y() << " " << pos.Z() << " Sensor ID: " << sensorID);
+
+      n_clusters.insert(std::make_pair(n_idx, std::make_pair(sensorID, pos)));
+      ++n_idx;
+      p_clusters.insert(std::make_pair(p_idx, std::make_pair(sensorID, pos)));
+      ++p_idx;
+
+      storeHoughCluster.appendNew(SVDHoughCluster(sensorID, pos));
+    }
   }
 }
 

@@ -247,7 +247,10 @@ namespace Belle2 {
 
 
       /// Moves the coordinates system by the given vector. Updates perigee parameters in place
-      void passiveMoveBy(const Vector2D& by);
+      void passiveMoveBy(const Vector2D& by) {
+        GeneralizedCircle::passiveMoveBy(by);
+        receivePerigeeParameters();
+      }
 
 
       ///Getter for the signed curvature.

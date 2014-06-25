@@ -124,15 +124,3 @@ PerigeeCircle PerigeeCircle::fromPerigeeParameters(const FloatType& curvature,
   return circle;
 }
 
-
-
-
-void PerigeeCircle::passiveMoveBy(const Vector2D& by)
-{
-  FloatType newCurvature = curvature();
-  Vector2D newTangential = tangential(by);
-  FloatType newImpact = distance(by);
-
-  setPerigeeParameters(newCurvature, newTangential, newImpact);
-}
-

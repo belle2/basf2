@@ -41,13 +41,13 @@ TEST_F(CDCLocalTrackingTest, PerigeeCircle_inheritance)
   EXPECT_NEAR(perigeeCircle.tangential().y(), generalizedCircle.tangential().y(), 10e-7);
 
 
-  //PerigeeCircle roundTripCircle(generalizedCircle);
+  PerigeeCircle roundTripCircle(generalizedCircle);
 
-  //EXPECT_NEAR(curvature, roundTripCircle.curvature(), 10e-7);
-  //EXPECT_NEAR(impact, roundTripCircle.impact(), 10e-7);
-  //EXPECT_NEAR(cos(tangentialPhi), roundTripCircle.tangential().x(), 10e-7);
-  //EXPECT_NEAR(sin(tangentialPhi), roundTripCircle.tangential().y(), 10e-7);
-  //EXPECT_NEAR(tangentialPhi, roundTripCircle.tangentialPhi(), 10e-7);
+  EXPECT_NEAR(curvature, roundTripCircle.curvature(), 10e-7);
+  EXPECT_NEAR(impact, roundTripCircle.impact(), 10e-7);
+  EXPECT_NEAR(cos(tangentialPhi), roundTripCircle.tangential().x(), 10e-7);
+  EXPECT_NEAR(sin(tangentialPhi), roundTripCircle.tangential().y(), 10e-7);
+  EXPECT_NEAR(tangentialPhi, roundTripCircle.tangentialPhi(), 10e-7);
 
 
   PerigeeCircle roundTripCircle2;
@@ -90,19 +90,20 @@ TEST_F(CDCLocalTrackingTest, PerigeeCircle_maximalPolarR)
 
 
 
-// TEST_F(CDCLocalTrackingTest, PerigeeCircle_setCenterAndRadius) {
-//   PerigeeCircle circle;
-//   Vector2D center(0.5, 0.0);
-//   FloatType radius = 1.5;
-//   circle.setCenterAndRadius(center, radius, CCW);
+TEST_F(CDCLocalTrackingTest, PerigeeCircle_setCenterAndRadius)
+{
+  PerigeeCircle circle;
+  Vector2D center(0.5, 0.0);
+  FloatType radius = 1.5;
+  circle.setCenterAndRadius(center, radius, CCW);
 
-//   EXPECT_TRUE(circle.isCircle());
-//   EXPECT_FALSE(circle.isLine());
+  EXPECT_TRUE(circle.isCircle());
+  EXPECT_FALSE(circle.isLine());
 
-//   EXPECT_NEAR(1.5, circle.radius(), 10e-7);
-//   EXPECT_NEAR(0.5, circle.center().x(), 10e-7);
-//   EXPECT_NEAR(0.0, circle.center().y(), 10e-7);
-// }
+  EXPECT_NEAR(1.5, circle.radius(), 10e-7);
+  EXPECT_NEAR(0.5, circle.center().x(), 10e-7);
+  EXPECT_NEAR(0.0, circle.center().y(), 10e-7);
+}
 
 
 TEST_F(CDCLocalTrackingTest, PerigeeCircle_distance)
@@ -229,7 +230,19 @@ TEST_F(CDCLocalTrackingTest, PerigeeCircle_setNull)
 }
 
 
+TEST_F(CDCLocalTrackingTest, PerigeeCircle_passiveMoveBy)
+{
+  Vector2D center(4.0, 2.0);
+  FloatType radius = 5.0;
+  PerigeeCircle circle = PerigeeCircle::fromCenterAndRadius(center, radius);
 
+  circle.passiveMoveBy(Vector2D(4.0, 0.0));
+
+  EXPECT_NEAR(5.0, circle.radius(), 10e-7);
+  EXPECT_NEAR(0.0, circle.perigee().x(), 10e-7);
+  EXPECT_NEAR(-3.0, circle.perigee().y(), 10e-7);
+
+}
 
 
 

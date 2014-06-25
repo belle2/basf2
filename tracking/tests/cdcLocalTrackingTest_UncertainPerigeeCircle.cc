@@ -159,8 +159,57 @@ TEST_F(CDCLocalTrackingTest, PerigeeCircle_passiveMovedCovarianceBy)
 
 
 
+  {
+    TMatrixD transformedVariance = circle.passiveMovedCovarianceBy(Vector2D(2.5, 0.0));
+
+
+
+  }
 
 }
 
 
+
+TEST_F(CDCLocalTrackingTest, PerigeeCircle_passiveMove)
+{
+  TMatrixD perigeeVariance(3, 3);
+  perigeeVariance(0, 0) = 1.0;
+  perigeeVariance(0, 1) = 0.3;
+  perigeeVariance(0, 2) = 0.5;
+
+  perigeeVariance(1, 0) = 0.3;
+  perigeeVariance(1, 1) = 0.7;
+  perigeeVariance(1, 2) = 0.6;
+
+  perigeeVariance(2, 0) = 0.5;
+  perigeeVariance(2, 1) = 0.6;
+  perigeeVariance(2, 2) = 1;
+
+  UncertainPerigeeCircle circle(1.0, -PI / 4, 1.0, perigeeVariance);
+
+  //circle.perigeeCovariance().Print();
+
+  //Test if the move commutes
+  circle.passiveMoveBy(Vector2D(0.0, -1.0));
+
+  //circle.perigeeCovariance().Print();
+
+  circle.passiveMoveBy(Vector2D(0.0, 1.0));
+
+  //circle.perigeeCovariance().Print();
+
+  TMatrixD twiceMovedVariance  = circle.perigeeCovariance();
+
+  EXPECT_NEAR(perigeeVariance(0, 0), twiceMovedVariance(0, 0), 10e-7);
+  EXPECT_NEAR(perigeeVariance(0, 1), twiceMovedVariance(0, 1), 10e-7);
+  EXPECT_NEAR(perigeeVariance(0, 2), twiceMovedVariance(0, 2), 10e-7);
+
+  EXPECT_NEAR(perigeeVariance(1, 0), twiceMovedVariance(1, 0), 10e-7);
+  EXPECT_NEAR(perigeeVariance(1, 1), twiceMovedVariance(1, 1), 10e-7);
+  EXPECT_NEAR(perigeeVariance(1, 2), twiceMovedVariance(1, 2), 10e-7);
+
+  EXPECT_NEAR(perigeeVariance(2, 0), twiceMovedVariance(2, 0), 10e-7);
+  EXPECT_NEAR(perigeeVariance(2, 1), twiceMovedVariance(2, 1), 10e-7);
+  EXPECT_NEAR(perigeeVariance(2, 2), twiceMovedVariance(2, 2), 10e-7);
+}
 

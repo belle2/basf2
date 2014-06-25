@@ -139,16 +139,17 @@ namespace Belle2 {
       // Forget about the Monte Carlo fit
       axialAxialSegmentPair.clearTrajectory2D();
 
-      CellWeight realWeight = getRealAxialAxialSegmentPairFilter().isGoodAxialAxialSegmentPair(axialAxialSegmentPair);
+      CellWeight prWeight = getRealAxialAxialSegmentPairFilter().isGoodAxialAxialSegmentPair(axialAxialSegmentPair);
+
       //do fits
       getRealAxialAxialSegmentPairFilter().getFittedTrajectory2D(*ptrStartSegment);
       getRealAxialAxialSegmentPairFilter().getFittedTrajectory2D(*ptrEndSegment);
       getRealAxialAxialSegmentPairFilter().getFittedTrajectory2D(axialAxialSegmentPair);
 
-      m_axialAxialSegmentFilterTree.setValues(mcWeight, axialAxialSegmentPair);
+      m_axialAxialSegmentFilterTree.setValues(mcWeight, prWeight, axialAxialSegmentPair);
       m_axialAxialSegmentFilterTree.fill();
 
-      return realWeight;
+      return prWeight;
 
     }
 

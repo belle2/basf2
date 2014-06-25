@@ -22,7 +22,7 @@ AxialAxialSegmentPairFilterTree::~AxialAxialSegmentPairFilterTree()
 {
 }
 
-bool AxialAxialSegmentPairFilterTree::setValues(const CellWeight& mcWeight, const CDCAxialAxialSegmentPair& axialAxialSegmentPair)
+bool AxialAxialSegmentPairFilterTree::setValues(const CellWeight& mcWeight, const CellWeight& prWeight, const CDCAxialAxialSegmentPair& axialAxialSegmentPair)
 {
   const CDCAxialRecoSegment2D* ptrStartSegment = axialAxialSegmentPair.getStart();
   const CDCAxialRecoSegment2D* ptrEndSegment = axialAxialSegmentPair.getEnd();
@@ -44,9 +44,15 @@ bool AxialAxialSegmentPairFilterTree::setValues(const CellWeight& mcWeight, cons
   const CDCTrajectory2D& endFit = endSegment.getTrajectory2D();
   const CDCTrajectory2D& commonFit = axialAxialSegmentPair.getTrajectory2D();
 
+  //setValue < NAMED("mcWeight") > (mcWeight);
+  //setValue < NAMED("prWeight") > (prWeight);
+
   bool mcDecision = not isNotACell(mcWeight);
-  setValue < NAMED("mcWeight") > (mcWeight);
+  bool prDecision = not isNotACell(prWeight);
+
   setValue < NAMED("mcDecision") > (mcDecision);
+  setValue < NAMED("prDecision") > (prDecision);
+
 
   // Collect decision criterions
 

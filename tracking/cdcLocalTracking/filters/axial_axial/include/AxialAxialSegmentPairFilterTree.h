@@ -22,8 +22,11 @@ namespace Belle2 {
 
     /// Filter for the constuction of axial to axial segment pairs based on simple criterions
     typedef StaticTypedTree <
-    BranchOf < float, NAMED("mcWeight") > ,
-             BranchOf < bool, NAMED("mcDecision") > ,
+    //BranchOf < Float_t, NAMED("mcWeight") > ,
+    //BranchOf < Float_t, NAMED("prWeight") > ,
+
+    BranchOf < Bool_t, NAMED("mcDecision") > ,
+             BranchOf < Bool_t, NAMED("prDecision") > ,
 
              BranchOf < UInt_t, NAMED("startSegment_size") > ,
              BranchOf < UInt_t, NAMED("endSegment_size") > ,
@@ -92,7 +95,7 @@ namespace Belle2 {
 
     public:
       /// Fills the object with the information gather from the given segment to segment pair instance.
-      bool setValues(const CellWeight& mcWeight, const CDCAxialAxialSegmentPair& axialAxialSegmentPair);
+      bool setValues(const CellWeight& mcWeight, const CellWeight& prWeight, const CDCAxialAxialSegmentPair& axialAxialSegmentPair);
 
     private:
 

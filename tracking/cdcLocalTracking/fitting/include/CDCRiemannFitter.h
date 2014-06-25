@@ -21,7 +21,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Class implementing the Riemann fit for two dimensional trajectory circle
-    class CDCRiemannFitter : public CDCFitter2D<Belle2::CDCLocalTracking::RiemannsMethod> {
+    class CDCRiemannFitter : public CDCFitter2D<Belle2::CDCLocalTracking::ExtendedRiemannsMethod> {
 
     public:
       ///Static getter for a general riemann fitter
@@ -34,7 +34,6 @@ namespace Belle2 {
       static const CDCRiemannFitter& getOriginCircleFitter();
 
     public:
-
       ///Empty constructor
       CDCRiemannFitter();
 

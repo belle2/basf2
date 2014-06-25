@@ -435,6 +435,10 @@ namespace Belle2 {
        */
       FloatType arcLengthFactor(const FloatType& directDistance) const;
 
+      /// Calculates the two points common to both circles.
+      /** If the two points coincide both returned points are the same. If there is no common point both returned points will be  made of NAN.*/
+      std::pair<Vector2D, Vector2D> intersections(const GeneralizedCircle& generalizedCircle) const;
+
     public:
       /// Debug helper
       friend std::ostream& operator<<(std::ostream& output, const GeneralizedCircle& circle) {

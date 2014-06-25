@@ -129,6 +129,29 @@ TEST_F(CDCLocalTrackingTest, GeneralizedCircle_passiveMoveBy)
 
 
 
+TEST_F(CDCLocalTrackingTest, GeneralizedCircle_intersections)
+{
+
+  GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(Vector2D(1.0, 1.0), 1);
+  GeneralizedCircle line = GeneralizedCircle(sqrt(2.0), -Vector2D(1.0, 1.0).unit());
+
+
+  pair<Vector2D, Vector2D> intersections = circle.intersections(line);
+
+  const Vector2D& intersection1 = intersections.first;
+  const Vector2D& intersection2 = intersections.second;
+
+  EXPECT_NEAR(1 - sqrt(2.0) / 2.0, intersection1.x(), 10e-7);
+  EXPECT_NEAR(1 + sqrt(2.0) / 2.0, intersection1.y(), 10e-7);
+
+  EXPECT_NEAR(1 + sqrt(2.0) / 2.0, intersection2.x(), 10e-7);
+  EXPECT_NEAR(1 - sqrt(2.0) / 2.0, intersection2.y(), 10e-7);
+
+
+}
+
+
+
 
 
 

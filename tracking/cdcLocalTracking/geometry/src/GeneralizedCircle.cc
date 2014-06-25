@@ -355,3 +355,34 @@ FloatType GeneralizedCircle::distance(const Vector2D& point) const
   }
 }
 
+std::pair<Vector2D, Vector2D> GeneralizedCircle::intersections(const GeneralizedCircle& generalizedCircle) const
+{
+
+  const FloatType& m0 = generalizedCircle.n0();
+  const Vector2D& m12 = generalizedCircle.n12();
+  const FloatType& m3 = generalizedCircle.n3();
+
+  const FloatType& n0 = this->n0();
+  const Vector2D& n12 = this->n12();
+  const FloatType& n3 = this->n3();
+
+
+  Vector2D unitC = n12 * m3 - m12 * n3;
+  FloatType absC = unitC.normalize();
+
+  FloatType xParallel = (m0 * n3 - m3 * n0) / absC;
+
+  // Use symmetric solution and use all input parameters
+  Vector2D mn12 = n12 + m12;
+  FloatType mn12Parallel = unitC.fastParallelComp(mn12);
+  FloatType mn12Orthogonal = unitC.fastOrthogonalComp(mn12);
+
+  FloatType a = m3 + n3;
+  FloatType b = mn12Orthogonal;
+  FloatType c = (a * xParallel + mn12Parallel) * xParallel + m0 + n0;
+
+  pair<FloatType, FloatType> xOrthogonal = solveQuadraticABC(a, b, c);
+
+  return make_pair(Vector2D::compose(unitC, xParallel, xOrthogonal.first),
+                   Vector2D::compose(unitC, xParallel, xOrthogonal.second));
+}

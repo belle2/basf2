@@ -16,6 +16,8 @@
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
 
+#include <tracking/cdcLocalTracking/algorithms/NeighborWeight.h>
+
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCRLWireHitPair.h>
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoFacet.h>
 

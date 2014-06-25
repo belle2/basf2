@@ -8,11 +8,27 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include "../include/BasicTypes.h"
+
 #include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
+
+#include <limits>
+
+
 
 using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
+
+
+
+
+
+const Weight CDCLocalTracking::HIGHEST_WEIGHT = std::numeric_limits<Weight>::infinity();
+
+const Weight CDCLocalTracking::LOWEST_WEIGHT = -std::numeric_limits<Weight>::infinity();
+
+
+
 
 
 bool CDCLocalTracking::isValidISuperLayer(const ISuperLayerType& iSuperLayer)
@@ -22,10 +38,14 @@ bool CDCLocalTracking::isValidISuperLayer(const ISuperLayerType& iSuperLayer)
 
 
 
+
+
 bool CDCLocalTracking::isLogicISuperLayer(const ISuperLayerType& iSuperLayer)
 {
   return INNER_ISUPERLAYER <= iSuperLayer and iSuperLayer <= OUTER_ISUPERLAYER;
 }
+
+
 
 
 
@@ -47,6 +67,8 @@ ISuperLayerType CDCLocalTracking::getISuperLayerAtPolarR(const FloatType& polarR
   return OUTER_ISUPERLAYER;
 
 }
+
+
 
 
 

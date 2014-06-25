@@ -132,25 +132,25 @@ namespace Belle2 {
 
       /// Sets the do not use flag of the facet's automaton cell and of the three contained wire hits
       void setDoNotUse() const {
-        getAutomatonCell().setFlags(DO_NOT_USE);
+        getAutomatonCell().setDoNotUseFlag();
         forwardDoNotUse();
       }
 
       /// Sets the do not use flag of the three contained wire hits
       void forwardDoNotUse() const {
-        getStartWireHit().getAutomatonCell().setFlags(DO_NOT_USE);
-        getMiddleWireHit().getAutomatonCell().setFlags(DO_NOT_USE);
-        getEndWireHit().getAutomatonCell().setFlags(DO_NOT_USE);
+        getStartWireHit().getAutomatonCell().setDoNotUseFlag();
+        getMiddleWireHit().getAutomatonCell().setDoNotUseFlag();
+        getEndWireHit().getAutomatonCell().setDoNotUseFlag();
       }
 
       /// If one of the contained wire hits is marked as do not use this facet is set be not usable as well
       void receiveDoNotUse() const {
 
-        if (getStartWireHit().getAutomatonCell().hasAnyFlags(DO_NOT_USE) or
-            getMiddleWireHit().getAutomatonCell().hasAnyFlags(DO_NOT_USE) or
-            getEndWireHit().getAutomatonCell().hasAnyFlags(DO_NOT_USE)) {
+        if (getStartWireHit().getAutomatonCell().hasDoNotUseFlag() or
+            getMiddleWireHit().getAutomatonCell().hasDoNotUseFlag() or
+            getEndWireHit().getAutomatonCell().hasDoNotUseFlag()) {
 
-          getAutomatonCell().setFlags(DO_NOT_USE);
+          getAutomatonCell().setDoNotUseFlag();
         }
       }
 

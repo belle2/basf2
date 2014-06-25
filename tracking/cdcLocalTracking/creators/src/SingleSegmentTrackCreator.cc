@@ -43,14 +43,16 @@ const
   // plus no z information from the
 
   BOOST_FOREACH(const CDCRecoSegment2D & segment, recoSegments) {
-    if (segment.getISuperLayer() == 0 and not segment.getAutomatonCell().hasAnyFlags(DO_NOT_USE) and segment.size() >= 8) {
+    if (segment.getISuperLayer() == 0 and
+        not segment.getAutomatonCell().hasDoNotUseFlag() and
+        segment.size() >= 8) {
 
       tracks.push_back(CDCTrack());
       bool created = m_trackCreator.create(segment, tracks.back());
       if (not created) {
         tracks.pop_back();
       } else {
-        segment.getAutomatonCell().setFlags(DO_NOT_USE);
+        segment.getAutomatonCell().setDoNotUseFlag();
       }
     }
 

@@ -88,22 +88,22 @@ namespace Belle2 {
 
       /// Sets the do not use flag of the segment triple's automaton cell and of the three contained segments
       void setDoNotUse() const {
-        getAutomatonCell().setFlags(DO_NOT_USE);
+        getAutomatonCell().setDoNotUseFlag();
         forwardDoNotUse();
       }
 
       /// Sets the do not use flag of the three contained segments
       void forwardDoNotUse() const {
-        getStart()->getAutomatonCell().setFlags(DO_NOT_USE);
-        getEnd()->getAutomatonCell().setFlags(DO_NOT_USE);
+        getStart()->getAutomatonCell().setDoNotUseFlag();
+        getEnd()->getAutomatonCell().setDoNotUseFlag();
       }
 
       /// If one of the contained segments is marked as do not use this segment triple is set be not usable as well
       void receiveDoNotUse() const {
-        if (getStart()->getAutomatonCell().hasAnyFlags(DO_NOT_USE) or
-            getEnd()->getAutomatonCell().hasAnyFlags(DO_NOT_USE)) {
+        if (getStart()->getAutomatonCell().hasDoNotUseFlag() or
+            getEnd()->getAutomatonCell().hasDoNotUseFlag()) {
 
-          getAutomatonCell().setFlags(DO_NOT_USE);
+          getAutomatonCell().setDoNotUseFlag();
         }
 
       }

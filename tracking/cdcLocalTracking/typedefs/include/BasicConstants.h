@@ -24,7 +24,7 @@ namespace Belle2 {
     /**@name Additional constant
      * Additional constants ROOT cint cannot deal with. Only use them in .cc files */
     /**@{*/
-
+    /*
     ///Constant for the highest possible weight
     const Weight HIGHEST_WEIGHT =  std::numeric_limits<Weight>::infinity();
 
@@ -45,6 +45,7 @@ namespace Belle2 {
 
     ///Returns if the weight indicates that a certain connection in a neighborhood shall not be made.
     inline bool isNotANeighbor(const NeighborWeight& weight) { return isNAN(weight); }
+    */
     /**@}*/
 
   } // CDCLocalTracking

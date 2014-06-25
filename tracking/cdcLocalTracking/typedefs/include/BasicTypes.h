@@ -11,7 +11,7 @@
 #define BASICTYPES_H
 
 #include <cstddef> //for size_t
-#include <limits>
+#include <cmath>
 
 //#include <Rtypes.h> //for nullptr remove for c++11  !!
 
@@ -42,6 +42,12 @@ namespace Belle2 {
 
     /// An additive measure of quality (e.g. logarithms of probabilities)
     typedef float Weight;
+
+    ///Constant for the highest possible weight
+    extern const Weight HIGHEST_WEIGHT;
+
+    ///Constant for the lowest possible weight
+    extern const Weight LOWEST_WEIGHT;
     /**@}*/
 
 
@@ -53,24 +59,6 @@ namespace Belle2 {
     const SignType PLUS = 1; ///< Constant for plus sign
     const SignType MINUS = -1; ///< Constant for minus sign
     const SignType ZERO = 0;  ///< Constant for undefined sign
-    /**@}*/
-
-
-    /** @name Cellular automata types */
-    /**@{*/
-    typedef Weight CellState;  ///< Type for the cell states in the cellular automata
-    typedef Weight CellWeight;  ///< Type for the cell weight in the cellular automata
-    typedef Weight NeighborWeight;  ///< Type for the cell weight in the cellular automata
-    //const CellState CYCLE_MARKER = 999;
-
-    typedef unsigned CellFlags; ///< Type for the additional status flags of cells in the cellular automata
-    const CellFlags IS_SET = 1; ///< Constant for a already updated cell
-    const CellFlags IS_START = 2; ///< Constant for a cell that marks the start of a path
-    const CellFlags IS_CYCLE = 4; ///< Constant marker for the detection of cycles in the cellular automata
-    const CellFlags DO_NOT_USE = 8; ///< Constant for a cell that should not be used
-
-    /// Constant summing all possible cell flags
-    const CellFlags ALL_FLAGS = IS_SET + IS_START + IS_CYCLE + DO_NOT_USE;
     /**@}*/
 
     /** @name Wire and layer ids */

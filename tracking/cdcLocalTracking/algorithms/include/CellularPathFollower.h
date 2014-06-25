@@ -15,6 +15,10 @@
 
 #include <framework/logging/Logger.h>
 
+#include <tracking/cdcLocalTracking/algorithms/CellWeight.h>
+#include <tracking/cdcLocalTracking/algorithms/NeighborWeight.h>
+
+#include <tracking/cdcLocalTracking/algorithms/AutomatonCell.h>
 #include <tracking/cdcLocalTracking/algorithms/WeightedNeighborhood.h>
 
 
@@ -34,7 +38,10 @@ namespace Belle2 {
     class CellularPathFollower {
 
     private:
+      /// Neighborhood type for the graph edges
       typedef WeightedNeighborhood<const Item> Neighborhood;
+
+      /// Resulting path type to be generated
       typedef std::vector<const Item*> Path;
 
     public:
@@ -45,8 +52,7 @@ namespace Belle2 {
       ~CellularPathFollower() {;}
     public:
 
-      /// Follow paths from all start items marked with IS_START
-
+      /// Follow paths from all start items marked with the start flag
       template<class ItemRange>
       inline size_t followAll(
         const ItemRange& itemRange,
@@ -61,10 +67,13 @@ namespace Belle2 {
         Path path;
 
         for (const Item & item : itemRange) {
+          const AutomatonCell& cell = item.getAutomatonCell();
 
-          if (item.getAutomatonCell().hasAnyFlags(IS_START) and
-              not item.getAutomatonCell().hasAnyFlags(DO_NOT_USE + IS_CYCLE) and
-              minStateToFollow <= item.getAutomatonCell().getCellState()) {
+          if (cell.hasStartFlag() and
+              not cell.hasDoNotUseFlag() and
+              not cell.hasCycleFlag() and
+              minStateToFollow <= cell.getCellState()) {
+
 
             //item marks a start point of a path
 
@@ -86,46 +95,51 @@ namespace Belle2 {
 
       /// Follows a single maximal path starting with the given start item. If the start item is nullptr or has a state lower than the minimum state to follow na empty vecotr is returned.
       inline Path followSingle(
-        const Item* startItem,
+        const Item* ptrStartItem,
         const WeightedNeighborhood<const Item>& neighborhood,
         CellState minStateToFollow = -std::numeric_limits<CellState>::infinity()
       ) const {
 
         Path path;
 
-        if (startItem != nullptr and
-            startItem->getAutomatonCell().hasAnyFlags(IS_START) and
-            not startItem-> getAutomatonCell().hasAnyFlags(DO_NOT_USE + IS_CYCLE) and
-            minStateToFollow <= startItem->getAutomatonCell().getCellState()) {
+        if (ptrStartItem == nullptr) return path;
+
+        const Item& startItem = *ptrStartItem;
+        const AutomatonCell& startCell = startItem.getAutomatonCell();
+
+        if (startCell.hasStartFlag() and
+            not startCell.hasDoNotUseFlag() and
+            not startCell.hasCycleFlag() and
+            minStateToFollow <= startCell.getCellState()) {
 
           //start new segment
           path.reserve(20); //Just a guess
           path.clear();
 
           //insert a pointer to the item into the segment
-          path.push_back(startItem);
+          path.push_back(ptrStartItem);
 
-          const Item* currentItem = startItem;
+          const Item* ptrCurrentItem = ptrStartItem;
 
           // Search for the highest neighbor
           // Get the range of neighbors
-          typename Neighborhood::range currentNeighborRange = neighborhood.equal_range(currentItem);
+          typename Neighborhood::range currentNeighborRange = neighborhood.equal_range(ptrCurrentItem);
 
           while (currentNeighborRange.first != currentNeighborRange.second) {
 
             //const Item * currentItem = itNeighbor.getItem();
-            const Item* neighborItem = currentNeighborRange.first.getNeighbor();
+            const Item* ptrNeighborItem = currentNeighborRange.first.getNeighbor();
             Weight relationWeight = currentNeighborRange.first.getWeight();
 
-            if (isHighestNeighbor(currentItem, relationWeight, neighborItem)) {
+            if (isHighestNeighbor(ptrCurrentItem, relationWeight, ptrNeighborItem)) {
 
-              path.push_back(neighborItem);
+              path.push_back(ptrNeighborItem);
 
               // Get the neighbors neighbors to be considered next. Changes iteration range.
-              currentNeighborRange = neighborhood.equal_range(neighborItem);
+              currentNeighborRange = neighborhood.equal_range(ptrNeighborItem);
 
               // The neighbor item becomes the new first postion
-              currentItem = neighborItem;
+              ptrCurrentItem = ptrNeighborItem;
 
             } else {
               ++(currentNeighborRange.first);
@@ -174,9 +188,11 @@ namespace Belle2 {
 
       }
 
+
       bool isHighestNeighbor(const Item* item, const Weight& relationWeight, const Item* neighbor) const {
 
-        return (not neighbor->getAutomatonCell().hasAnyFlags(DO_NOT_USE + IS_CYCLE) and
+        return (not neighbor->getAutomatonCell().hasCycleFlag() and
+                not neighbor->getAutomatonCell().hasDoNotUseFlag() and
                 (item->getAutomatonCell().getCellState() ==
                  item->getAutomatonCell().getCellWeight() + relationWeight + neighbor->getAutomatonCell().getCellState())
                );

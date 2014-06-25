@@ -18,6 +18,10 @@
 
 #include <framework/logging/Logger.h>
 
+
+#include <tracking/cdcLocalTracking/algorithms/CellWeight.h>
+#include <tracking/cdcLocalTracking/algorithms/NeighborWeight.h>
+#include <tracking/cdcLocalTracking/algorithms/AutomatonCell.h>
 #include <tracking/cdcLocalTracking/algorithms/WeightedNeighborhood.h>
 
 
@@ -82,7 +86,7 @@ namespace Belle2 {
 
         // Advance the iterator to a valid item in order to to have a valid highest item.
         while (itHighestItem != std::end(itemRange) and
-               itHighestItem->getAutomatonCell().hasAnyFlags(DO_NOT_USE)) {
+               itHighestItem->getAutomatonCell().hasDoNotUseFlag()) {
 
           ++itHighestItem;
 
@@ -94,13 +98,17 @@ namespace Belle2 {
 
           const Item& item = *itItem;
 
-          if (not item.getAutomatonCell().hasAnyFlags(IS_SET + IS_CYCLE + DO_NOT_USE)) {
+          const AutomatonCell& itemCell = item.getAutomatonCell();
+
+          if (not itemCell.hasAssignedFlag() and
+              not itemCell.hasCycleFlag() and
+              not itemCell.hasDoNotUseFlag()) {
 
             const CellState& state = updateState(item, neighborhood);
 
             // Mark this cell as a start point of a long path since we encountered it in
             // a top level recursion
-            item.getAutomatonCell().setFlags(IS_START);
+            item.getAutomatonCell().setStartFlag();
             itHighestItem = itHighestItem->getAutomatonCell().getCellState() > state ?  itHighestItem : itItem;
 
           }
@@ -108,8 +116,9 @@ namespace Belle2 {
 
         // Return the element with the highst cell value as a good start point for a segment/track
         if (itHighestItem == std::end(itemRange) or
-            itHighestItem->getAutomatonCell().hasAnyFlags(IS_CYCLE + DO_NOT_USE) or
-            not itHighestItem->getAutomatonCell().hasAnyFlags(IS_START)) {
+            itHighestItem->getAutomatonCell().hasCycleFlag() or
+            itHighestItem->getAutomatonCell().hasDoNotUseFlag() or
+            not itHighestItem->getAutomatonCell().hasStartFlag()) {
 
           return nullptr;
 
@@ -123,17 +132,15 @@ namespace Belle2 {
       inline const CellState& updateState(const Item& item, const Neighborhood& neighborhood) const {
 
         // since we encounter this cell in a recursion it is not the start point of track
-        item.getAutomatonCell().clearFlags(IS_START);
+        item.getAutomatonCell().unsetStartFlag();
 
         // check if the cell is valid to continue on
-        if (item.getAutomatonCell().hasAnyFlags(IS_CYCLE /* + DO_NOT_USE */)) {
+        if (item.getAutomatonCell().hasCycleFlag()) {
           // if not invalidate this cell and return
           item.getAutomatonCell().setCellState(NO_CONTINUATION);
           return item.getAutomatonCell().getCellState();
         }
         // We check the do not use flag before going into the recursion
-
-
         // We check the IS_SET flag before going into the recursion
         // so now need to check here again for the IS_SET flag
         /*
@@ -151,7 +158,7 @@ namespace Belle2 {
 
         //advance to a valid neighbor
         while (neighborRange.first != neighborRange.second and
-               neighborRange.first.getNeighbor()->getAutomatonCell().hasAnyFlags(DO_NOT_USE)) {
+               neighborRange.first.getNeighbor()->getAutomatonCell().hasDoNotUseFlag()) {
           ++(neighborRange.first);
         }
 
@@ -168,23 +175,23 @@ namespace Belle2 {
           maxStateWithContinuation = -std::numeric_limits<CellState>::infinity();
 
           //mark cell in order to detect if it was already traversed in this recursion cycle
-          item.getAutomatonCell().setFlags(IS_CYCLE);
+          item.getAutomatonCell().setCycleFlag();
 
           // consider all neighbors as possible continuations and
-          // ask each who much value they have to offer
+          // ask each how much value they have to offer
           for (typename Neighborhood::iterator itNeighbor = neighborRange.first;
                itNeighbor != neighborRange.second; ++itNeighbor) {
 
             const Item* neighbor = itNeighbor.getNeighbor();
 
-            if (not neighbor->getAutomatonCell().hasAnyFlags(DO_NOT_USE)) {
+            if (not neighbor->getAutomatonCell().hasDoNotUseFlag()) {
 
               // Invalidate a possible start flag since the neighbor has an ancestors
-              neighbor->getAutomatonCell().clearFlags(IS_START);
+              neighbor->getAutomatonCell().unsetStartFlag();
 
               // Check if the neighbor was already marked in this recursion cycle
               // Preventing an infinit loop
-              if (neighbor->getAutomatonCell().hasAnyFlags(IS_CYCLE)) {
+              if (neighbor->getAutomatonCell().hasCycleFlag()) {
                 // encountered cycle
                 // do not unset IS_CYCLE of this item
                 item.getAutomatonCell().setCellState(NO_CONTINUATION);
@@ -197,7 +204,7 @@ namespace Belle2 {
               // If it was set just get it
               // If is was not set go into the recursion
               const CellState& stateWithoutContinuation =
-                neighbor->getAutomatonCell().hasAnyFlags(IS_SET) ?
+                neighbor->getAutomatonCell().hasAssignedFlag() ?
                 neighbor->getAutomatonCell().getCellState() :
                 updateState(*neighbor, neighborhood);
 
@@ -207,11 +214,12 @@ namespace Belle2 {
 
               // Remember only the maximum value of all neighbors
               maxStateWithContinuation = std::max(maxStateWithContinuation, stateWithContinuation);
+
             }
           }
 
           // no cycle encountered, unset flag
-          item.getAutomatonCell().clearFlags(IS_CYCLE);
+          item.getAutomatonCell().unsetCycleFlag();
 
         }
 
@@ -220,7 +228,7 @@ namespace Belle2 {
         maxStateWithContinuation += item.getAutomatonCell().getCellWeight();
 
         // Set this cell has a correct value
-        item.getAutomatonCell().setFlags(IS_SET);
+        item.getAutomatonCell().setAssignedFlag();
         // Set the value
         item.getAutomatonCell().setCellState(maxStateWithContinuation);
 
@@ -346,7 +354,7 @@ namespace Belle2 {
       void prepareCellFlags(const ItemRange& itemRange) const {
         for (const Item & item : itemRange) {
 
-          item.getAutomatonCell().clearFlags(IS_SET + IS_START + IS_CYCLE);
+          item.getAutomatonCell().unsetTemporaryFlags();
           item.getAutomatonCell().setCellState(-std::numeric_limits<CellState>::infinity());
 
         }

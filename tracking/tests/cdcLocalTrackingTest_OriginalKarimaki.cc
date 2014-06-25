@@ -143,6 +143,36 @@ TEST_F(CDCLocalTrackingTest, PortedKarimakisMethod_CircleFit)
 
 
 
+TEST_F(CDCLocalTrackingTest, ExtendedRiemannsMethod_CircleFit)
+{
+  const CDCFitter2D<ExtendedRiemannsMethod> fitter;
+  CDCTrajectory2D trajectory2D = testCircleFitter(fitter, false);
+  UncertainPerigeeCircle perigeeCircle = trajectory2D.getCircle();
+  TMatrixD perigeeCovariance = perigeeCircle.perigeeCovariance();
+
+  EXPECT_NEAR(0.0003644, perigeeCovariance(0, 0), 10e-7);
+  EXPECT_NEAR(3.028e-20, perigeeCovariance(0, 1), 10e-7);
+  EXPECT_NEAR(-0.002235, perigeeCovariance(0, 2), 10e-7);
+
+  EXPECT_NEAR(3.028e-20, perigeeCovariance(1, 0), 10e-7);
+  EXPECT_NEAR(0.002525, perigeeCovariance(1, 1), 10e-7);
+  EXPECT_NEAR(-1.265e-19, perigeeCovariance(1, 2), 10e-7);
+
+
+  EXPECT_NEAR(-0.002235, perigeeCovariance(2, 0), 10e-7);
+  EXPECT_NEAR(-1.265e-19, perigeeCovariance(2, 1), 10e-7);
+  EXPECT_NEAR(0.09703616, perigeeCovariance(2, 2), 10e-7);
+
+  // 3x3 matrix was as follows with wrong curvature sign
+  //      |      0    |      1    |      2    |
+  // --------------------------------------------
+  //    0 |  0.0003644  -3.028e-20    0.002235
+  //    1 | -3.028e-20    0.002525  -1.265e-19
+  //    2 |   0.002235  -1.265e-19     0.09704
+
+}
+
+
 
 TEST_F(CDCLocalTrackingTest, PortedKarimakisMethod_CircleFit_WithDriftLengths)
 {

@@ -460,6 +460,7 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ev
       } else {
 
 
+
         //
         // RawCOPPER
         //
@@ -482,6 +483,8 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ev
 
 #endif
 #endif
+
+
 
 #ifndef NO_DATA_CHECK
         try {
@@ -598,6 +601,12 @@ void DeSerializerPCModule::event()
 
     checkData(&temp_rawdatablk, &eve_copper_0);
 
+    PreRawCOPPERFormat_latest pre_rawcopper_latest;
+    pre_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
+                                   0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
+    //    pre_rawcopper_latest.CheckCRC16( 0, 0 );
+
+
 #ifdef REDUCED_RAWCOPPER
     //
     // Copy reduced buffer
@@ -608,6 +617,9 @@ void DeSerializerPCModule::event()
 
     m_pre_rawcpr.CopyReducedData(&temp_rawdatablk, buf_to, malloc_flag_from);
 
+
+
+
 #else
     malloc_flag_to = malloc_flag_from;
 #endif
@@ -616,6 +628,14 @@ void DeSerializerPCModule::event()
     raw_datablk->SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
                            malloc_flag_to, temp_rawdatablk.GetNumEvents(),
                            temp_rawdatablk.GetNumNodes());
+
+    // CRC16 check
+    PostRawCOPPERFormat_latest post_rawcopper_latest;
+    post_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
+                                    0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
+    post_rawcopper_latest.CheckCRC16(0, 0);
+
+
 
   }
 

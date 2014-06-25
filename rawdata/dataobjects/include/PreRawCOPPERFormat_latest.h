@@ -153,6 +153,8 @@ namespace Belle2 {
     //! copy data to reduced buffer
     int CopyReducedBuffer(int n, int* buf_to);
 
+    //! check CRC16 in B2LFEE trailer
+    int CheckCRC16(int n, int finesse_num);
 
     //
     // size of "COPPER front header" and "COPPER trailer"
@@ -204,15 +206,6 @@ namespace Belle2 {
       SIZE_B2LHSLB_HEADER = 1
     };
 
-    //
-    // Data Format : "B2Link HSLB Trailer"
-    //
-    enum {
-      POS_CHKSUM_B2LHSLB = 0,
-      SIZE_B2LHSLB_TRAILER = 1
-    };
-
-
     // Data Format : "B2Link FEE Header"
     // modified by Nov. 21, 2013, Nakao-san's New firmware?
     enum {
@@ -233,6 +226,17 @@ namespace Belle2 {
       POS_CHKSUM_B2LFEE = 1,
       SIZE_B2LFEE_TRAILER = 2
     };
+
+
+    //
+    // Data Format : "B2Link HSLB Trailer"
+    //
+    enum {
+      POS_CHKSUM_B2LHSLB = 0,
+      SIZE_B2LHSLB_TRAILER = 1
+    };
+
+
 
     //
     // COPPER magic words

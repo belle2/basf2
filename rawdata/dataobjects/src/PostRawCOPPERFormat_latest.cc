@@ -254,13 +254,35 @@ int PostRawCOPPERFormat_latest::CheckB2LHSLBMagicWords(int* finesse_buf, int fin
 
 int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
 {
-  unsigned short temp_crc16 = CalcCRC16(0x0000, (char*)(m_buffer[ tmp_header.POS_TTCTIME_TRGTYPE ]), 4);
-  temp_crc16 = CalcCRC16(temp_crc16, (char*)(m_buffer[ tmp_header.POS_EVE_NO ]), 4);
-  temp_crc16 = CalcCRC16(temp_crc16, (char*)(m_buffer[ tmp_header.POS_TTUTIME ]), 4);
-  temp_crc16 = CalcCRC16(temp_crc16, (char*)(m_buffer[ tmp_header.POS_EXP_RUN_NO ]), 4);
+  unsigned short temp_crc16 = CalcCRC16LittleEndian(0xffff, &(m_buffer[ tmp_header.POS_TTCTIME_TRGTYPE ]), 1);
+  temp_crc16 = CalcCRC16LittleEndian(temp_crc16, &(m_buffer[ tmp_header.POS_EVE_NO ]), 1);
+  temp_crc16 = CalcCRC16LittleEndian(temp_crc16, &(m_buffer[ tmp_header.POS_TTUTIME ]), 1);
+  temp_crc16 = CalcCRC16LittleEndian(temp_crc16, &(m_buffer[ tmp_header.POS_EXP_RUN_NO ]), 1);
   int* buf = GetFINESSEBuffer(n, finesse_num) +  SIZE_B2LHSLB_HEADER + POS_B2L_CTIME;
-  int pos_byte = GetFINESSENwords(n, finesse_num) - (SIZE_B2LHSLB_HEADER + POS_B2L_CTIME) * sizeof(unsigned int);
-  temp_crc16 = CalcCRC16(temp_crc16, (char*)buf, pos_byte);
+  int pos_nwords = GetFINESSENwords(n, finesse_num) - (SIZE_B2LHSLB_HEADER + POS_B2L_CTIME + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER);
+  temp_crc16 = CalcCRC16LittleEndian(temp_crc16, buf, pos_nwords);
 
+  buf = GetFINESSEBuffer(n, finesse_num) +  GetFINESSENwords(n, finesse_num) - ((SIZE_B2LFEE_TRAILER - POS_B2LFEE_CRC16) + SIZE_B2LHSLB_TRAILER) ;
+
+  //
+  // CRC16 CCIT MSB error
+  //
+  if ((unsigned short)(*buf & 0xFFFF) != temp_crc16) {
+    printf("CRC16 error %x %x %d\n", *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
+    printf("\n");
+    buf = GetFINESSEBuffer(n, finesse_num);
+    printf("POINTER %p\n", buf);
+    printf("%.8x ", 0);
+    for (int k = 0; k <  GetFINESSENwords(n, finesse_num); k++) {
+      printf("%.8x ", buf[ k ]);
+      if ((k + 1) % 10 == 0) printf("\n%.8x : ", k);
+    }
+    printf("\n");
+    exit(1);
+  } else {
+    return 1;
+  }
+
+  return -1;
 
 }

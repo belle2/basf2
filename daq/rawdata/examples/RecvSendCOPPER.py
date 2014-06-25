@@ -37,7 +37,7 @@ reader.param('FinesseBitFlag', int(argvs[3]))
 use_shm_flag = int(argvs[4])
 reader.param('UseShmFlag', use_shm_flag)
 reader.param('NodeName', argvs[5])
-reader.param('MaxTime', 30.)
+reader.param('MaxTime', -1.)
 reader.param('MaxEventNum', -1)
 
 # reader.param('DumpFileName', 'COPPERdump.dat' )
@@ -73,8 +73,8 @@ main.add_module(reader)
 # if use_shm_flag != 0:
 #    main.add_module(histo)
 #    main.add_module(monitor)
-main.add_module(dump)
-# main.add_module(sender)
+# main.add_module(dump)
+main.add_module(sender)
 
 # Process all events
 process(main)

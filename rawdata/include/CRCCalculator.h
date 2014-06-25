@@ -15,6 +15,7 @@
  */
 unsigned short CalcCRC16(unsigned short crc16, const char buf[], size_t size);
 
+unsigned short CalcCRC16LittleEndian(unsigned short crc16, const int buf[], int nwords);
 
 /**
  * Function to copy data

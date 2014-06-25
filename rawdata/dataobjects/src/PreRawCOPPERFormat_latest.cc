@@ -638,6 +638,13 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   //
   // check incrementation of event #
   //
+
+  if ((unsigned int)(prev_eve32 + 1) < 50) {
+    printf("#################EVE cur %.8x prev %.8x\n", cur_ftsw_eve32, prev_eve32);
+    fflush(stdout);
+  }
+
+
   *cur_runsubrun_no = GetRunNoSubRunNo(datablock_id);
   if (prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0) {
 #ifdef WO_FIRST_EVENUM_CHECK
@@ -954,4 +961,42 @@ int PreRawCOPPERFormat_latest::CheckB2LHSLBMagicWords(int* finesse_buf, int fine
     exit(-1);
     return -1;
   }
+}
+
+
+
+int PreRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
+{
+  int* buf = GetFINESSEBuffer(n, finesse_num) +  SIZE_B2LHSLB_HEADER;
+  int nwords = GetFINESSENwords(n, finesse_num) - (SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER);
+  unsigned short temp_crc16 = CalcCRC16LittleEndian(0xffff, buf, nwords);
+
+
+  buf = GetFINESSEBuffer(n, finesse_num) +  GetFINESSENwords(n, finesse_num)
+        - ((SIZE_B2LFEE_TRAILER - POS_CHKSUM_B2LFEE) + SIZE_B2LHSLB_TRAILER) ;
+
+
+  if ((unsigned short)(*buf & 0xFFFF) != temp_crc16) {
+    printf("PRE CRC16 error %x %x %d\n", *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
+
+    printf("\n");
+
+    buf = GetFINESSEBuffer(n, finesse_num);
+    printf("PRE POINTER %p\n", buf);
+    //    printf("%.8x ", 0);
+    for (int k = 0; k <  GetFINESSENwords(n, finesse_num); k++) {
+      printf("%.8x ", buf[ k ]);
+      if ((k + 1) % 10 == 0) {
+        printf("\n");
+        //      printf("\n%.8x : ", k);
+      }
+    }
+    printf("\n");
+    exit(1);
+  } else {
+    return 1;
+  }
+
+  return -1;
+
 }

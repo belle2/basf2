@@ -24,7 +24,7 @@
 //#define TIME_MONITOR
 //#define NO_DATA_CHECK
 //#define WO_FIRST_EVENUM_CHECK
-#define YAMADA_DUMMY
+//#define YAMADA_DUMMY
 
 
 

@@ -65,50 +65,62 @@ namespace Belle2 {
        *  No matter you have a pointer or an object access is given with '->'*/
       const CDCRecoFacet* operator->() const { return this; }
 
-
+      /// Getter for the tangential line from the first to the second hit
       const ParameterLine2D& getStartToMiddleLine() const
       { return m_startToMiddle; }
 
+      /// Getter for the tangential line from the first to the third hit
       const ParameterLine2D& getStartToEndLine() const
       { return m_startToEnd; }
 
+      /// Getter for the tangential line from the second to the third hit
       const ParameterLine2D& getMiddleToEndLine() const
       { return m_middleToEnd; }
 
-
+      /// Construct and stores the three tangential lines corresponding to the three pairs of wire hits.
       void adjustLines() const;
 
+
+      /// Getter for the recostructed position at the first hit averaged from the two touching points of the tangential lines
       Vector2D getStartRecoPos2D() const
       { return Vector2D::average(getStartToMiddleLine().at(0), getStartToEndLine().at(0)); }
 
+      /// Getter for the recostructed position at the second hit averaged from the two touching points of the tangential lines
       Vector2D getMiddleRecoPos2D() const
       { return Vector2D::average(getStartToMiddleLine().at(1), getMiddleToEndLine().at(0)); }
 
+      /// Getter for the recostructed position at the third hit averaged from the two touching points of the tangential lines
       Vector2D getEndRecoPos2D() const
       { return Vector2D::average(getStartToEndLine().at(1), getMiddleToEndLine().at(1)); }
 
+
+      /// Average of the three reconstructed positions.
       Vector2D getCenterOfMass2D() const
       { return Vector2D::average(getStartRecoPos2D(), getMiddleRecoPos2D(), getEndRecoPos2D()); }
 
 
-
+      /// Getter for the recostructed position including the first hit averaged from the two touching points of the tangential lines
       CDCRecoHit2D getStartRecoHit2D() const
       { return CDCRecoHit2D::fromAbsPos2D(&(getStartRLWireHit()), getStartRecoPos2D()); }
 
+      /// Getter for the recostructed position including the second hit averaged from the two touching points of the tangential lines
       CDCRecoHit2D getMiddleRecoHit2D() const
       { return CDCRecoHit2D::fromAbsPos2D(&(getMiddleRLWireHit()), getMiddleRecoPos2D()); }
 
+      /// Getter for the recostructed position including the third hit averaged from the two touching points of the tangential lines
       CDCRecoHit2D getEndRecoHit2D() const
       { return CDCRecoHit2D::fromAbsPos2D(&(getEndRLWireHit()), getEndRecoPos2D()); }
 
 
-
+      /// Getter for the tangential line including the hits from the first to the second hit
       CDCRecoTangent getStartToMiddle() const
       { return CDCRecoTangent(&(getStartRLWireHit()), &(getEndRLWireHit()), getStartToMiddleLine()); }
 
+      /// Getter for the tangential line including the hits from the first to the third hit
       CDCRecoTangent getStartToEnd() const
       { return CDCRecoTangent(&(getStartRLWireHit()), &(getEndRLWireHit()), getStartToEndLine()); }
 
+      /// Getter for the tangential line including the hits from the second to the third hit
       CDCRecoTangent getMiddleToEnd() const
       { return CDCRecoTangent(&(getMiddleRLWireHit()), &(getEndRLWireHit()), getMiddleToEndLine()); }
 
@@ -121,13 +133,15 @@ namespace Belle2 {
       Vector2D getBackRecoPos2D(const CDCTrajectory2D& trajectory2D) const
       { return trajectory2D.getClosest(getEndRecoPos2D()); }
 
-
+      /// Estimate the transvers travel distance on the given circle to the reconstructed position at the first hit
       FloatType getFrontPerpS(const CDCTrajectory2D& trajectory2D) const
       { return trajectory2D.calcPerpS(getStartRecoPos2D()); }
 
+      /// Estimate the transvers travel distance on the given circle to the reconstructed position at the last hit
       FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
       { return trajectory2D.calcPerpS(getEndRecoPos2D()); }
 
+      /// Calculates the sum of squared distances of the trajectory to the three hits.
       FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const;
 
       /// Sets the do not use flag of the facet's automaton cell and of the three contained wire hits
@@ -162,11 +176,11 @@ namespace Belle2 {
 
     private:
 
-      mutable ParameterLine2D m_startToMiddle;
-      mutable ParameterLine2D m_startToEnd;
-      mutable ParameterLine2D m_middleToEnd;
+      mutable ParameterLine2D m_startToMiddle; ///< Memory for the tangential line between first and second hit
+      mutable ParameterLine2D m_startToEnd; ///< Memory for the tangential line between first and third hit
+      mutable ParameterLine2D m_middleToEnd; ///< Memory for the tangential line between second and third hit
 
-      AutomatonCell m_automatonCell;
+      AutomatonCell m_automatonCell; //< Memory for the cellular automaton cell assoziated with the facet.
 
 
 

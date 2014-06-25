@@ -56,7 +56,7 @@ namespace Belle2 {
         StoreArray < CDCWireHitCluster >::registerTransient("CDCWireHitClusters");
 #endif
 
-        m_clusters.reserve(50);
+        m_clustersInSuperLayer.reserve(20);
 
         m_facetCreator.initialize();
         m_facetNeighborhoodBuilder.initialize();

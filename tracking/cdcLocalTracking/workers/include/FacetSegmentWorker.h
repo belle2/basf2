@@ -81,6 +81,7 @@ namespace Belle2 {
         outputSegments.clear();
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
+        m_clusters.clear();
         m_recoTangentSegments.clear();
 #endif
 
@@ -114,16 +115,22 @@ namespace Belle2 {
 
           //create the clusters
           B2DEBUG(100, "Creating the CDCWireHit clusters");
-          m_clusters.clear();
-          m_wirehitClusterizer.create(wireHitsInSuperlayer, m_wirehitNeighborhood, m_clusters);
+          m_clustersInSuperLayer.clear();
+          m_wirehitClusterizer.create(wireHitsInSuperlayer, m_wirehitNeighborhood, m_clustersInSuperLayer);
+          B2DEBUG(100, "Created " << m_clustersInSuperLayer.size() << " CDCWireHit clusters in superlayer");
 
-          B2DEBUG(100, "Created " << m_clusters.size() << " CDCWireHit clusters");
+#ifdef CDCLOCALTRACKING_USE_ROOT
+          m_clusters.insert(m_clusters.end(), m_clustersInSuperLayer.begin(), m_clustersInSuperLayer.end());
+#endif
 
           //double d;
           //std::cin >> d;
 
-          for (CDCWireHitCluster & cluster : m_clusters) {
+          for (CDCWireHitCluster & cluster : m_clustersInSuperLayer) {
             //size_t nSegmentsBefore = m_segments2D.size();
+
+            B2DEBUG(100, "Cluster size: " << cluster.size());
+            B2DEBUG(100, "Wire hit neighborhood size: " << m_wirehitNeighborhood.size());
 
             //create the facets
             B2DEBUG(100, "Creating the CDCRecoFacets");
@@ -241,6 +248,9 @@ namespace Belle2 {
 #ifdef CDCLOCALTRACKING_USE_ROOT
       /// Memory for the tangent segments extracted from the paths
       std::vector< CDCRecoTangentVector > m_recoTangentSegments;
+
+      /// Memory for the hit clusters
+      std::vector<CDCWireHitCluster> m_clusters;
 #endif
 
       /// Memory for the segments extracted from the paths
@@ -249,8 +259,8 @@ namespace Belle2 {
       /// Instance of the hit cluster generator
       Clusterizer<CDCWireHit, CDCWireHitCluster> m_wirehitClusterizer;
 
-      /// Memory for the hit clusters
-      std::vector<CDCWireHitCluster> m_clusters;
+      /// Memory for the hit clusters in the current superlayer
+      std::vector<CDCWireHitCluster> m_clustersInSuperLayer;
 
       //object creators
 

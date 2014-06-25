@@ -44,7 +44,7 @@ void StoragerCallback::term() throw()
   }
 }
 
-bool StoragerCallback::boot() throw()
+bool StoragerCallback::load() throw()
 {
   if (m_thread.is_alive()) m_thread.cancel();
 
@@ -114,14 +114,8 @@ bool StoragerCallback::boot() throw()
     LogFile::warning(emsg);
   }
   LogFile::debug("Booted storageout");
-
   m_thread = PThread(new StoragerMonitor(this));
-  return true;
-}
 
-bool StoragerCallback::load() throw()
-{
-  ConfigObject& obj(getConfig().getObject());
   for (size_t i = 3; i < m_con.size(); i++) {
     m_con[i].clearArguments();
     m_con[i].setExecutable("basf2");
@@ -181,7 +175,7 @@ bool StoragerCallback::pause() throw()
 
 bool StoragerCallback::recover() throw()
 {
-  return abort() && boot() && load();
+  return abort() && load();
 }
 
 bool StoragerCallback::abort() throw()

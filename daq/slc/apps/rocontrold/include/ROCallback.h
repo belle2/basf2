@@ -16,7 +16,6 @@ namespace Belle2 {
   public:
     virtual void init() throw();
     virtual void term() throw();
-    virtual bool boot() throw();
     virtual bool load() throw();
     virtual bool start() throw();
     virtual bool stop() throw();

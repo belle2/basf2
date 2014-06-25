@@ -12,9 +12,6 @@ namespace Belle2 {
   public:
     NSMNodeDaemon(NSMCallback* callback,
                   const std::string host = "", int port = -1);
-    NSMNodeDaemon(NSMCallback* callback1,
-                  NSMCallback* callback2,
-                  const std::string host = "", int port = -1);
     virtual ~NSMNodeDaemon() throw() {}
 
   public:
@@ -22,7 +19,7 @@ namespace Belle2 {
     void init() throw(NSMHandlerException);
 
   private:
-    NSMCallback* m_callback[2];
+    NSMCallback* m_callback;
     std::string m_host;
     int m_port;
     NSMCommunicator* m_nsm_comm;

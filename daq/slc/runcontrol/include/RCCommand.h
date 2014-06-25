@@ -10,7 +10,6 @@ namespace Belle2 {
   class RCCommand : public NSMCommand {
 
   public:
-    static const RCCommand BOOT;
     static const RCCommand LOAD;
     static const RCCommand START;
     static const RCCommand STOP;
@@ -20,6 +19,8 @@ namespace Belle2 {
     static const RCCommand ABORT;
     static const RCCommand STATECHECK;
     static const RCCommand TRIGFT;
+    static const RCCommand EXCLUDE;
+    static const RCCommand INCLUDE;
 
   public:
     RCCommand() throw() {}

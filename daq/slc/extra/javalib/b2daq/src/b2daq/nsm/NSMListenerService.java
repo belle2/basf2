@@ -32,7 +32,7 @@ public class NSMListenerService extends Thread {
     private static final HashMap<String, ConfigObject> m_obj_m = new HashMap<>();
     private static boolean is_closecalled = false;
     private static NSMConfig m_cofig;
-    
+
     private NSMListenerService() {
 
     }
@@ -41,14 +41,14 @@ public class NSMListenerService extends Thread {
         m_observer.add(observable);
     }
 
-    public static void setNSMConfig(NSMConfig config)  {
+    public static void setNSMConfig(NSMConfig config) {
         m_cofig = config;
     }
-    
-    public static NSMConfig getNSMConfig()  {
+
+    public static NSMConfig getNSMConfig() {
         return m_cofig;
     }
-    
+
     public static NSMData getData(String name) {
         if (m_data_m.containsKey(name)) {
             return m_data_m.get(name);
@@ -78,6 +78,7 @@ public class NSMListenerService extends Thread {
     public static boolean isCloseCalled() {
         return is_closecalled;
     }
+
     public static boolean isConnected() {
         return m_socket.isConnected();
     }
@@ -96,8 +97,8 @@ public class NSMListenerService extends Thread {
             }
             NSMConfig config = getNSMConfig();
             if (m_socket.reconnect(config.getHostname(),
-                    config.getPort(),
-                    config.getNsmNode())) {
+                    config.getPort(), config.getNsmNode(),
+                    config.getNsmHost(), config.getNsmPort())) {
                 connection.set(true);
                 handleOnConnected();
                 log(new LogMessage("LOCAL", LogLevel.DEBUG,

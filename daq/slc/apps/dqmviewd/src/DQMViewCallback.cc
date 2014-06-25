@@ -12,14 +12,8 @@ void DQMViewCallback::init() throw()
   m_master.setCallback(this);
   m_master.init();
   m_master.boot();
-  m_master.setState(RCState::INITIAL_S);
+  m_master.setState(RCState::NOTREADY_S);
   PThread(new DQMPackageUpdater(this, m_master));
-}
-
-bool DQMViewCallback::boot() throw()
-{
-  m_master.setState(RCState::CONFIGURED_S);
-  return true;
 }
 
 bool DQMViewCallback::load() throw()
@@ -60,12 +54,12 @@ bool DQMViewCallback::pause() throw()
 
 bool DQMViewCallback::abort() throw()
 {
-  m_master.setState(RCState::INITIAL_S);
+  m_master.setState(RCState::NOTREADY_S);
   return true;//_master.abort();
 }
 
 bool DQMViewCallback::recover() throw()
 {
-  return abort() && boot() && load();
+  return abort() && load();
 }
 

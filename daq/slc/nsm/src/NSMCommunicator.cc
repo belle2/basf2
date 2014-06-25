@@ -113,14 +113,20 @@ throw(NSMHandlerException)
 void NSMCommunicator::replyOK(const NSMNode& node)
 throw(NSMHandlerException)
 {
-  sendRequest(NSMMessage(m_master_node, NSMCommand::OK,
-                         node.getState().getLabel()));
+  if (m_master_node.getName().size() > 0 &&
+      b2nsm_nodeid(m_master_node.getName().c_str()) >= 0) {
+    sendRequest(NSMMessage(m_master_node, NSMCommand::OK,
+                           node.getState().getLabel()));
+  }
 }
 
 void NSMCommunicator::replyError(const std::string& message)
 throw(NSMHandlerException)
 {
-  sendRequest(NSMMessage(m_master_node, NSMCommand::ERROR, message));
+  if (m_master_node.getName().size() > 0 &&
+      b2nsm_nodeid(m_master_node.getName().c_str()) >= 0) {
+    sendRequest(NSMMessage(m_master_node, NSMCommand::ERROR, message));
+  }
 }
 
 bool NSMCommunicator::sendLog(const DAQLogMessage& log)
@@ -168,7 +174,8 @@ bool NSMCommunicator::sendError(const ERRORNo& eno,
                                 const std::string& message)
 {
   try {
-    if (m_master_node.getName().size() > 0) {
+    if (m_master_node.getName().size() > 0 &&
+        b2nsm_nodeid(m_master_node.getName().c_str()) >= 0) {
       sendRequest(NSMMessage(m_master_node, NSMCommand::ERROR,
                              eno.getId(), nodename + "\n" + message));
     }
@@ -181,7 +188,8 @@ bool NSMCommunicator::sendError(const ERRORNo& eno,
 bool NSMCommunicator::sendFatal(const std::string& message)
 {
   try {
-    if (m_master_node.getName().size() > 0) {
+    if (m_master_node.getName().size() > 0 &&
+        b2nsm_nodeid(m_master_node.getName().c_str()) >= 0) {
       sendRequest(NSMMessage(m_master_node, NSMCommand::FATAL, message));
     }
   } catch (const NSMHandlerException& e) {
@@ -192,7 +200,8 @@ bool NSMCommunicator::sendFatal(const std::string& message)
 
 void NSMCommunicator::sendState(const NSMNode& node) throw(NSMHandlerException)
 {
-  if (m_master_node.getName().size() > 0) {
+  if (m_master_node.getName().size() > 0 &&
+      b2nsm_nodeid(m_master_node.getName().c_str()) >= 0) {
     std::string text = StringUtil::form("%s %s", node.getName().c_str(),
                                         node.getState().getLabel());
     sendRequest(NSMMessage(m_master_node, NSMCommand::STATE, text));
@@ -222,6 +231,54 @@ bool NSMCommunicator::wait(int sec) throw(NSMHandlerException)
     throw (NSMHandlerException("Failed to select"));
   }
   if (FD_ISSET(m_nsmc->sock, &fds)) {
+    readContext(m_nsmc);
+    b2nsm_context(m_nsmc);
+    return true;
+  } else {
+    return false;
+  }
+}
+
+int NSMCommunicator::select(int sec, NSMCommunicator** com, int ncoms)
+throw(NSMHandlerException)
+{
+  fd_set fds;
+  int ret;
+  FD_ZERO(&fds);
+  for (int i = 0; i < ncoms; i++) {
+    if (com[i] != NULL && com[i]->m_nsmc != NULL) {
+      FD_SET(com[i]->m_nsmc->sock, &fds);
+    }
+  }
+  while (true) {
+    if (sec >= 0) {
+      timeval t = {sec, 0};
+      ret = ::select(FD_SETSIZE, &fds, NULL, NULL, &t);
+    } else {
+      ret = ::select(FD_SETSIZE, &fds, NULL, NULL, NULL);
+    }
+    if (ret != -1 || (errno != EINTR && errno != EAGAIN)) break;
+  }
+  if (ret < 0) {
+    perror("select");
+    throw (NSMHandlerException("Failed to select"));
+  }
+
+  for (int i = 0; i < ncoms; i++) {
+    if (com[i] != NULL && com[i]->m_nsmc != NULL) {
+      if (FD_ISSET(com[i]->m_nsmc->sock, &fds)) {
+        com[i]->readContext(com[i]->m_nsmc);
+        b2nsm_context(com[i]->m_nsmc);
+        return i;
+      }
+    }
+  }
+  return -1;
+}
+
+void NSMCommunicator::readContext(NSMcontext* nsmc) throw()
+{
+  if (nsmc == NULL || nsmc == m_nsmc) {
     m_message.read(m_nsmc);
     m_message.setRequestName();
     const char* master_name = m_message.getNodeName();
@@ -232,10 +289,6 @@ bool NSMCommunicator::wait(int sec) throw(NSMHandlerException)
         strlen(master_name) > 0) {
       m_master_node = NSMNode(master_name);
     }
-    b2nsm_context(m_nsmc);
-    return true;
-  } else {
-    return false;
   }
 }
 

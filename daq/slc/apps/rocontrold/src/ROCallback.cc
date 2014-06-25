@@ -28,11 +28,6 @@ void ROCallback::term() throw()
   m_con.getInfo().unlink();
 }
 
-bool ROCallback::boot() throw()
-{
-  return true;
-}
-
 bool ROCallback::load() throw()
 {
   const DBObject& obj(getConfig().getObject());
@@ -75,7 +70,7 @@ bool ROCallback::pause() throw()
 
 bool ROCallback::recover() throw()
 {
-  if (abort() && boot() && load()) {
+  if (abort() && load()) {
     getNode().setState(RCState::READY_S);
     return true;
   }
@@ -85,7 +80,7 @@ bool ROCallback::recover() throw()
 bool ROCallback::abort() throw()
 {
   m_con.abort();
-  getNode().setState(RCState::INITIAL_S);
+  getNode().setState(RCState::NOTREADY_S);
   return true;
 }
 

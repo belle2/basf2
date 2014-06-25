@@ -25,7 +25,6 @@ namespace Belle2 {
     virtual ~ExpRecoCallback() throw();
 
   public:
-    virtual bool boot() throw();
     virtual bool load() throw();
     virtual bool start() throw();
     virtual bool stop() throw();

@@ -9,12 +9,10 @@ namespace Belle2 {
 
   public:
     static const RCState OFF_S;
-    static const RCState INITIAL_S;
-    static const RCState CONFIGURED_S;
+    static const RCState NOTREADY_S;
     static const RCState READY_S;
     static const RCState RUNNING_S;
     static const RCState PAUSED_S;
-    static const RCState BOOTING_TS;
     static const RCState LOADING_TS;
     static const RCState STARTING_TS;
     static const RCState STOPPING_TS;

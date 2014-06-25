@@ -4,21 +4,21 @@
 
 using namespace Belle2;
 
-const RCCommand RCCommand::BOOT(101, "BOOT");
 const RCCommand RCCommand::LOAD(102, "LOAD");
 const RCCommand RCCommand::START(103, "START");
 const RCCommand RCCommand::STOP(104, "STOP");
-const RCCommand RCCommand::RECOVER(108, "RECOVER");
-const RCCommand RCCommand::RESUME(105, "RESUMEN");
+const RCCommand RCCommand::RESUME(105, "RESUME");
 const RCCommand RCCommand::PAUSE(106, "PAUSE");
-const RCCommand RCCommand::ABORT(107, "ABORT");
-const RCCommand RCCommand::STATECHECK(201, "STATECHECK");
-const RCCommand RCCommand::TRIGFT(301, "TRIGFT");
+const RCCommand RCCommand::RECOVER(107, "RECOVER");
+const RCCommand RCCommand::ABORT(108, "ABORT");
+const RCCommand RCCommand::TRIGFT(109, "TRIGFT");
+const RCCommand RCCommand::STATECHECK(110, "STATECHECK");
+const RCCommand RCCommand::EXCLUDE(111, "EXCLUDE");
+const RCCommand RCCommand::INCLUDE(112, "INCLUDE");
 
 const RCCommand& RCCommand::operator=(const std::string& label) throw()
 {
   if (NSMCommand::operator=(label) != Enum::UNKNOWN) return *this;
-  else if (label == BOOT.getLabel()) *this = BOOT;
   else if (label == LOAD.getLabel()) *this = LOAD;
   else if (label == START.getLabel()) *this = START;
   else if (label == STOP.getLabel()) *this = STOP;
@@ -26,8 +26,10 @@ const RCCommand& RCCommand::operator=(const std::string& label) throw()
   else if (label == RESUME.getLabel()) *this = RESUME;
   else if (label == PAUSE.getLabel()) *this = PAUSE;
   else if (label == ABORT.getLabel()) *this = ABORT;
-  else if (label == STATECHECK.getLabel()) *this = STATECHECK;
   else if (label == TRIGFT.getLabel()) *this = TRIGFT;
+  else if (label == STATECHECK.getLabel()) *this = STATECHECK;
+  else if (label == EXCLUDE.getLabel()) *this = EXCLUDE;
+  else if (label == INCLUDE.getLabel()) *this = INCLUDE;
   else *this = Enum::UNKNOWN;
   return *this;
 }
@@ -35,7 +37,6 @@ const RCCommand& RCCommand::operator=(const std::string& label) throw()
 const RCCommand& RCCommand::operator=(int id) throw()
 {
   if (NSMCommand::operator=(id) != Enum::UNKNOWN) return *this;
-  else if (id == BOOT.getId()) *this = BOOT;
   else if (id == LOAD.getId()) *this = LOAD;
   else if (id == START.getId()) *this = START;
   else if (id == STOP.getId()) *this = STOP;
@@ -45,6 +46,8 @@ const RCCommand& RCCommand::operator=(int id) throw()
   else if (id == ABORT.getId()) *this = ABORT;
   else if (id == STATECHECK.getId()) *this = STATECHECK;
   else if (id == TRIGFT.getId()) *this = TRIGFT;
+  else if (id == EXCLUDE.getId()) *this = EXCLUDE;
+  else if (id == INCLUDE.getId()) *this = INCLUDE;
   else *this = Enum::UNKNOWN;
   return *this;
 }
@@ -58,12 +61,7 @@ const RCCommand& RCCommand::operator=(const char* label) throw()
 
 int RCCommand::isAvailable(const RCState& state) const throw()
 {
-  if (*this == BOOT && state == RCState::INITIAL_S) {
-    return SUGGESTED;
-  } else if (*this == BOOT && (state == RCState::CONFIGURED_S ||
-                               state == RCState::READY_S)) {
-    return ENABLED;
-  } else if (*this == LOAD && state == RCState::CONFIGURED_S) {
+  if (*this == LOAD && state == RCState::NOTREADY_S) {
     return SUGGESTED;
   } else if ((*this == LOAD || *this == TRIGFT) &&
              state == RCState::READY_S) {
@@ -78,7 +76,8 @@ int RCCommand::isAvailable(const RCState& state) const throw()
   } else if (*this == RESUME && state == RCState::PAUSED_S) {
     return ENABLED;
   } else if (*this == RECOVER || *this == STATECHECK ||
-             *this == ABORT || *this == RECOVER) {
+             *this == ABORT || *this == RECOVER ||
+             *this == EXCLUDE || *this == INCLUDE) {
     return ENABLED;
   } else if (state == RCState::ERROR_ES) {
     return ENABLED;
@@ -89,22 +88,20 @@ int RCCommand::isAvailable(const RCState& state) const throw()
 
 RCState RCCommand::nextState() const throw()
 {
-  if (*this == BOOT) return RCState::CONFIGURED_S;
-  else if (*this == LOAD) return RCState::READY_S;
+  if (*this == LOAD) return RCState::READY_S;
   else if (*this == TRIGFT) return RCState::READY_S;
   else if (*this == START) return RCState::RUNNING_S;
   else if (*this == STOP) return RCState::READY_S;
   else if (*this == RESUME) return RCState::RUNNING_S;
   else if (*this == PAUSE) return RCState::PAUSED_S;
   else if (*this == RECOVER) return RCState::READY_S;
-  else if (*this == ABORT) return RCState::INITIAL_S;
+  else if (*this == ABORT) return RCState::NOTREADY_S;
   else return Enum::UNKNOWN;
 }
 
 RCState RCCommand::nextTState() const throw()
 {
-  if (*this == BOOT) return RCState::BOOTING_TS;
-  else if (*this == LOAD) return RCState::LOADING_TS;
+  if (*this == LOAD) return RCState::LOADING_TS;
   else if (*this == TRIGFT) return RCState::LOADING_TS;
   else if (*this == START) return RCState::STARTING_TS;
   else if (*this == STOP) return RCState::STOPPING_TS;

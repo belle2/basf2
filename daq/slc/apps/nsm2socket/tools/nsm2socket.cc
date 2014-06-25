@@ -35,7 +35,7 @@ using namespace Belle2;
 int main(int argc, char** argv)
 {
   if (argc < 2) {
-    LogFile::debug("usage: %s <port> [<hostname2nsm> <port2nsm>]", argv[0]);
+    LogFile::debug("usage: %s <port>", argv[0]);
     return 1;
   }
   ConfigFile config("slowcontrol");
@@ -47,8 +47,6 @@ int main(int argc, char** argv)
   LogFile::open("nsm2socket");
   const std::string host = "0.0.0.0";
   const int port = atoi(argv[1]);
-  const std::string host2nsm = (argc > 3) ? argv[2] : "";
-  const int port2nsm = (argc > 3) ? atoi(argv[3]) : -1;
   TCPServerSocket server_socket(host, port);
   try {
     server_socket.open();
@@ -65,19 +63,24 @@ int main(int argc, char** argv)
       LogFile::error("Faield to accept connection.");
       return 1;
     }
-    NSMNode node;
-    try {
-      node = NSMNode(TCPSocketReader(socket).readString());
-    } catch (const IOException& e) {
-      LogFile::error("IO error : %s ", e.what());
-      return 1;
-    }
     pid_t pid = fork();
     if (pid < 0) {
       LogFile::error("Faield to fork proces.");
       return 1;
     } else if (pid == 0) {
       LogFile::close();
+      NSMNode node;
+      std::string host2nsm;
+      int port2nsm;
+      try {
+        TCPSocketReader reader(socket);
+        node = NSMNode(reader.readString());
+        host2nsm = reader.readString();
+        port2nsm = reader.readInt();
+      } catch (const IOException& e) {
+        LogFile::error("IO error : %s ", e.what());
+        return 1;
+      }
       LogFile::open("nsm2socket." + node.getName());
       NSM2SocketCallback* callback = new NSM2SocketCallback(node);
       PThread(new NSMNodeDaemon(callback, host2nsm, port2nsm));

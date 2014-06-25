@@ -7,7 +7,6 @@ package b2daq.apps.runcontrol;
 
 import b2daq.logger.core.LogMessage;
 import b2daq.nsm.NSMListenerService;
-import b2daq.core.Enum;
 import b2daq.core.LogLevel;
 import b2daq.nsm.NSMMessage;
 import b2daq.runcontrol.core.RCCommand;
@@ -131,6 +130,9 @@ public class RunCommandButtonPaneController implements Initializable {
     public void update(RCState state, boolean ready, boolean registered) {
         button_abort.setDisable(!registered);
         button_pause.setDisable(true);
+        button_start.setDefaultButton(false);
+        button_pause.setDefaultButton(false);
+        button_load.setDefaultButton(false);
         if (state.equals(RCState.RUNNING_S)) {
             button_start.setText("STOP");
             button_start.setDisable(false);
@@ -157,18 +159,10 @@ public class RunCommandButtonPaneController implements Initializable {
             }
             button_load.setText("LOAD");
             button_load.setDisable(!registered);
-        } else if (state.equals(RCState.CONFIGURED_S)) {
+        } else if (state.equals(RCState.NOTREADY_S)) {
             button_start.setText("START");
             button_start.setDisable(true);
             button_load.setText("LOAD");
-            if (ready) {
-                button_load.setDefaultButton(true);
-            }
-            button_load.setDisable(!registered);
-        } else if (state.equals(RCState.INITIAL_S)) {
-            button_start.setText("START");
-            button_start.setDisable(true);
-            button_load.setText("BOOT");
             if (ready) {
                 button_load.setDefaultButton(true);
             }

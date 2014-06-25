@@ -2,6 +2,7 @@
 #define _Belle2_RunControlMasterCallback_h
 
 #include "daq/slc/runcontrol/RCCallback.h"
+#include "daq/slc/runcontrol/RunControlCallback.h"
 
 #include "daq/slc/database/RunNumberInfoTable.h"
 #include "daq/slc/runcontrol/RunSetting.h"
@@ -23,44 +24,19 @@ namespace Belle2 {
     typedef std::vector<NSMData> NSMDataList;
 
   public:
-    RunControlMasterCallback(const NSMNode& node);
+    RunControlMasterCallback(const NSMNode& node,
+                             RunControlCallback* callback);
     virtual ~RunControlMasterCallback() throw() {}
 
   public:
     virtual void init() throw();
     virtual void timeout() throw();
+    virtual bool perform(const NSMMessage& msg) throw();
     virtual void update() throw();
-    virtual bool send(const NSMMessage msg) throw();
-    virtual bool ok() throw();
-    virtual bool error() throw();
-    virtual bool log() throw();
-
-  public:
-    virtual bool boot() throw() { return send(getMessage()); }
-    virtual bool load() throw() { return send(getMessage()); }
-    virtual bool start() throw() { return send(getMessage()); }
-    virtual bool stop() throw() { return send(getMessage()); }
-    virtual bool recover() throw() { return send(getMessage()); }
-    virtual bool resume() throw() { return send(getMessage()); }
-    virtual bool pause() throw() { return send(getMessage()); }
-    virtual bool abort() throw() { return send(getMessage()); }
-    virtual bool trigft() throw() { return send(getMessage()); }
-    virtual bool stateCheck() throw() { return true; }
 
   protected:
-    void prepareRun(NSMMessage& msg) throw();
-    void postRun(NSMMessage& msg) throw();
-    NSMNodeIterator find(const std::string& nodename) throw();
-    NSMNodeIterator synchronize(NSMNode& node) throw();
-    virtual bool isManual() { return true; }
-
-  protected:
-    RunSetting m_setting;
-    NSMNodeList m_node_v;
-    NSMDataList m_data_v;
-    NSMMessage m_msg_tmp;
-    RunNumberInfo m_info;
     NSMData m_data;
+    RunControlCallback* m_callback;
 
   };
 

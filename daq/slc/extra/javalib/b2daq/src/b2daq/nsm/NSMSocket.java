@@ -16,15 +16,18 @@ public class NSMSocket {
     public NSMSocket() {
     }
 
-    public boolean reconnect(String hostname, int port, String nodename) {
+    public boolean reconnect(String hostname, int port, String nodename,
+            String nsm2host, int nsm2port) {
         try {
             m_socket = new Socket(hostname, port);
-            System.out.println(m_socket.getLocalAddress().getHostName()+":"+ m_socket.getLocalPort());
+            System.out.println(m_socket.getLocalAddress().getHostName() + ":" + m_socket.getLocalPort());
             m_reader = new SocketDataReader(m_socket);
             m_writer = new SocketDataWriter(m_socket);
             m_writer.writeString(nodename);
+            m_writer.writeString(nsm2host);
+            m_writer.writeInt(nsm2port);
             return true;
-        } catch (Exception e) {
+        } catch (IOException e) {
             close();
             return false;
         }

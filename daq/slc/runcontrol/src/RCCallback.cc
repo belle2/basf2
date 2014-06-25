@@ -9,9 +9,8 @@
 using namespace Belle2;
 
 RCCallback::RCCallback(const NSMNode& node) throw()
-  : NSMCallback(node), m_state_demand(RCState::INITIAL_S)
+  : NSMCallback(node), m_state_demand(RCState::NOTREADY_S)
 {
-  add(RCCommand::BOOT);
   add(RCCommand::LOAD);
   add(RCCommand::START);
   add(RCCommand::STOP);
@@ -21,7 +20,7 @@ RCCallback::RCCallback(const NSMNode& node) throw()
   add(RCCommand::ABORT);
   add(RCCommand::STATECHECK);
   add(RCCommand::TRIGFT);
-  getNode().setState(RCState::INITIAL_S);
+  getNode().setState(RCState::NOTREADY_S);
 }
 
 bool RCCallback::perform(const NSMMessage& msg) throw()
@@ -40,9 +39,7 @@ bool RCCallback::perform(const NSMMessage& msg) throw()
                    cmd.getLabel(), state.getLabel());
     //com->replyOK(getNode());
     setReply("");
-    if (cmd == RCCommand::BOOT) {
-      result = boot();
-    } else if (cmd == RCCommand::LOAD) {
+    if (cmd == RCCommand::LOAD) {
       result = preload(msg) && load();
     } else if (cmd == RCCommand::START) {
       result = start();

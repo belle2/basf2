@@ -30,7 +30,6 @@ namespace Belle2 {
     RCConfig& getConfig() throw() { return m_config; }
 
   public:
-    virtual bool boot() throw() { return true; }
     virtual bool load() throw() { return true; }
     virtual bool start() throw() { return true; }
     virtual bool stop() throw() { return true; }
@@ -47,6 +46,7 @@ namespace Belle2 {
     const RCState& getStateDemand() const throw() { return m_state_demand; }
     void setStateDemand(const RCState& state) throw() { m_state_demand = state; }
     virtual bool perform(const NSMMessage& msg) throw();
+    virtual void update() throw() {}
 
   protected:
     bool preload(const NSMMessage& msg) throw();

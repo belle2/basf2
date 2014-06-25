@@ -22,19 +22,12 @@ RFRunControlCallback::~RFRunControlCallback() throw()
 
 }
 
-bool RFRunControlCallback::boot() throw()
+bool RFRunControlCallback::load() throw()
 {
   NSMmsg* msg = getCommunicator()->getMessage().getMsg();
   NSMcontext* nsmc =  _callback->getCommunicator()->getContext();
   b2nsm_context(nsmc);
   _master->Configure(msg, nsmc);
-  return true;
-}
-
-bool RFRunControlCallback::load() throw()
-{
-  NSMcontext* nsmc =  _callback->getCommunicator()->getContext();
-  b2nsm_context(nsmc);
   return true;
 }
 
@@ -60,7 +53,7 @@ bool RFRunControlCallback::recover() throw()
 {
   NSMcontext* nsmc =  _callback->getCommunicator()->getContext();
   b2nsm_context(nsmc);
-  return (abort() && boot() && load());
+  return (abort() && load());
 }
 
 bool RFRunControlCallback::abort() throw()

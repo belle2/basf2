@@ -32,7 +32,7 @@ namespace Belle2 {
       m_db->close();
     }
 
-    virtual bool boot() throw() {
+    virtual bool load() throw() {
       NSMMessage& msg(getCommunicator()->getMessage());
       ConfigObject& obj(getConfig().getObject());
       msg.getData(obj);

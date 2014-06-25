@@ -3,28 +3,24 @@
 using namespace Belle2;
 
 const RCState RCState::OFF_S(1, "OFF");
-const RCState RCState::INITIAL_S(2, "INITIAL");
-const RCState RCState::CONFIGURED_S(3, "CONFIGURED");
-const RCState RCState::READY_S(4, "READY");
-const RCState RCState::RUNNING_S(5, "RUNNING");
-const RCState RCState::PAUSED_S(6, "PAUSED");
-const RCState RCState::BOOTING_TS(7, "BOOTING");
-const RCState RCState::LOADING_TS(8, "LOADING");
-const RCState RCState::STARTING_TS(9, "STARTING");
-const RCState RCState::STOPPING_TS(10, "STOPPING");
-const RCState RCState::ERROR_ES(11, "ERROR");
-const RCState RCState::FATAL_ES(12, "FATAL");
-const RCState RCState::RECOVERING_RS(13, "RECOVERING");
-const RCState RCState::ABORTING_RS(14, "ABORTING");
+const RCState RCState::NOTREADY_S(2, "NOTREADY");
+const RCState RCState::READY_S(3, "READY");
+const RCState RCState::RUNNING_S(4, "RUNNING");
+const RCState RCState::PAUSED_S(5, "PAUSED");
+const RCState RCState::LOADING_TS(6, "LOADING");
+const RCState RCState::STARTING_TS(7, "STARTING");
+const RCState RCState::STOPPING_TS(8, "STOPPING");
+const RCState RCState::ERROR_ES(9, "ERROR");
+const RCState RCState::FATAL_ES(10, "FATAL");
+const RCState RCState::RECOVERING_RS(11, "RECOVERING");
+const RCState RCState::ABORTING_RS(12, "ABORTING");
 
 const RCState& RCState::operator=(const std::string& label) throw()
 {
-  if (label == INITIAL_S.getLabel()) *this = INITIAL_S;
-  else if (label == CONFIGURED_S.getLabel()) *this = CONFIGURED_S;
+  if (label == NOTREADY_S.getLabel()) *this = NOTREADY_S;
   else if (label == READY_S.getLabel()) *this = READY_S;
   else if (label == RUNNING_S.getLabel()) *this = RUNNING_S;
   else if (label == PAUSED_S.getLabel()) *this = PAUSED_S;
-  else if (label == BOOTING_TS.getLabel()) *this = BOOTING_TS;
   else if (label == LOADING_TS.getLabel()) *this = LOADING_TS;
   else if (label == STARTING_TS.getLabel()) *this = STARTING_TS;
   else if (label == STOPPING_TS.getLabel()) *this = STOPPING_TS;
@@ -45,12 +41,10 @@ const RCState& RCState::operator=(const char* label) throw()
 
 const RCState& RCState::operator=(int id) throw()
 {
-  if (id == INITIAL_S.getId()) *this = INITIAL_S;
-  else if (id == CONFIGURED_S.getId()) *this = CONFIGURED_S;
+  if (id == NOTREADY_S.getId()) *this = NOTREADY_S;
   else if (id == READY_S.getId()) *this = READY_S;
   else if (id == RUNNING_S.getId()) *this = RUNNING_S;
   else if (id == PAUSED_S.getId()) *this = PAUSED_S;
-  else if (id == BOOTING_TS.getId()) *this = BOOTING_TS;
   else if (id == LOADING_TS.getId()) *this = LOADING_TS;
   else if (id == STARTING_TS.getId()) *this = STARTING_TS;
   else if (id == STOPPING_TS.getId()) *this = STOPPING_TS;
@@ -64,11 +58,10 @@ const RCState& RCState::operator=(int id) throw()
 
 RCState RCState::next() const throw()
 {
-  if (*this == BOOTING_TS) return CONFIGURED_S;
-  else if (*this == LOADING_TS) return READY_S;
+  if (*this == LOADING_TS) return READY_S;
   else if (*this == STARTING_TS) return RUNNING_S;
   else if (*this == STOPPING_TS) return READY_S;
   else if (*this == RECOVERING_RS) return READY_S;
-  else if (*this == ABORTING_RS) return INITIAL_S;
+  else if (*this == ABORTING_RS) return NOTREADY_S;
   else return Enum::UNKNOWN;
 }

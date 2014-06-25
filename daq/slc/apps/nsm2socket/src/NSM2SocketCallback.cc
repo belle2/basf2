@@ -17,7 +17,6 @@ using namespace Belle2;
 NSM2SocketCallback::NSM2SocketCallback(const NSMNode& node)
 throw() : NSMCallback(node, 1)
 {
-  add(RCCommand::BOOT);
   add(RCCommand::LOAD);
   add(RCCommand::START);
   add(RCCommand::STOP);
@@ -28,6 +27,8 @@ throw() : NSMCallback(node, 1)
   add(RCCommand::STATE);
   add(RCCommand::STATECHECK);
   add(RCCommand::TRIGFT);
+  add(RCCommand::EXCLUDE);
+  add(RCCommand::INCLUDE);
   add(HVCommand::CONFIGURE);
   add(HVCommand::STANDBY);
   add(HVCommand::SHOULDER);

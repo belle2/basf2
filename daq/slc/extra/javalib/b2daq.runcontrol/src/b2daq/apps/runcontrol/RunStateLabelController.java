@@ -36,7 +36,6 @@ public class RunStateLabelController {
     private final Text text;
 
     private final ContextMenu menu = new ContextMenu();
-    private final MenuItem boot = new MenuItem("BOOT");
     private final MenuItem load = new MenuItem("LOAD");
     private final MenuItem recover = new MenuItem("RECOVER");
     private final MenuItem abort = new MenuItem("ABORT");
@@ -59,14 +58,7 @@ public class RunStateLabelController {
         setVisible(true);
         this.nodename = nodename;
         m_logview = logview;
-        menu.getItems().addAll(boot, load, recover, abort);
-        boot.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                NSMListenerService.request(new NSMMessage(nodename, RCCommand.BOOT));
-                m_logview.add(new LogMessage("LOCAL", LogLevel.NOTICE, "Command BOOT>>"+nodename));
-            }
-        });
+        menu.getItems().addAll(load, recover, abort);
         load.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -93,27 +85,21 @@ public class RunStateLabelController {
             @Override
             public void handle(MouseEvent e) {
                 if (text.getText().matches("INITIAL")) {
-                    boot.setDisable(false);
                     load.setDisable(true);
                     recover.setDisable(false);
                 } else if (text.getText().matches("CONFIGURED")) {
-                    boot.setDisable(true);
                     load.setDisable(false);
                     recover.setDisable(false);
                 } else if (text.getText().matches("READY")) {
-                    boot.setDisable(true);
                     load.setDisable(false);
                     recover.setDisable(false);
                 } else if (text.getText().matches("RUNNING")) {
-                    boot.setDisable(true);
                     load.setDisable(true);
                     recover.setDisable(true);
                 } else if (text.getText().matches("RECOVERING")) {
-                    boot.setDisable(true);
                     load.setDisable(true);
                     recover.setDisable(true);
                 } else if (text.getText().matches("ABORTING")) {
-                    boot.setDisable(true);
                     load.setDisable(true);
                     recover.setDisable(true);
                 }
@@ -152,9 +138,9 @@ public class RunStateLabelController {
             set(state.getLabel(), Color.WHITESMOKE, Color.LIGHTGRAY, Color.BLACK);
         } else if (state.equals(RCState.READY_S)) {
             set(state.getLabel(), Color.YELLOW, Color.YELLOW, Color.BLACK);
-        } else if (state.equals(RCState.CONFIGURED_S)) {
-            set(state.getLabel(), Color.rgb(0, 176, 80), Color.rgb(0, 176, 80), Color.BLACK);
-        } else if (state.equals(RCState.INITIAL_S)) {
+        //} else if (state.equals(RCState.CONFIGURED_S)) {
+        //    set(state.getLabel(), Color.rgb(0, 176, 80), Color.rgb(0, 176, 80), Color.BLACK);
+        } else if (state.equals(RCState.NOTREADY_S)) {
             set(state.getLabel(), Color.RED, Color.RED, Color.BLACK);
         } else if (state.equals(RCState.RUNNING_S)) {
             set(state.getLabel(), Color.CYAN, Color.CYAN, Color.BLACK);

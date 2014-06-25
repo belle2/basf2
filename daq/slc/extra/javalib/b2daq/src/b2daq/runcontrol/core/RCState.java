@@ -5,19 +5,17 @@ import b2daq.nsm.NSMState;
 public class RCState extends NSMState {
 
     final static public RCState OFF_S = new RCState(1, "OFF");
-    final static public RCState INITIAL_S = new RCState(2, "INITIAL");
-    final static public RCState CONFIGURED_S = new RCState(3, "CONFIGURED");
-    final static public RCState READY_S = new RCState(4, "READY");
-    final static public RCState RUNNING_S = new RCState(5, "RUNNING");
-    final static public RCState PAUSED_S = new RCState(6, "PAUSED");
-    final static public RCState BOOTING_TS = new RCState(7, "BOOTING");
-    final static public RCState LOADING_TS = new RCState(8, "LOADING");
-    final static public RCState STARTING_TS = new RCState(9, "STARTING");
-    final static public RCState STOPPING_TS = new RCState(10, "STOPPING");
-    final static public RCState ERROR_ES = new RCState(11, "ERROR");
-    final static public RCState FATAL_ES = new RCState(12, "FATAL");
-    final static public RCState RECOVERING_RS = new RCState(13, "RECOVERING");
-    final static public RCState ABORTING_RS = new RCState(14, "ABORTING");
+    final static public RCState NOTREADY_S = new RCState(2, "NOTREADY");
+    final static public RCState READY_S = new RCState(3, "READY");
+    final static public RCState RUNNING_S = new RCState(4, "RUNNING");
+    final static public RCState PAUSED_S = new RCState(5, "PAUSED");
+    final static public RCState LOADING_TS = new RCState(6, "LOADING");
+    final static public RCState STARTING_TS = new RCState(7, "STARTING");
+    final static public RCState STOPPING_TS = new RCState(8, "STOPPING");
+    final static public RCState ERROR_ES = new RCState(9, "ERROR");
+    final static public RCState FATAL_ES = new RCState(10, "FATAL");
+    final static public RCState RECOVERING_RS = new RCState(11, "RECOVERING");
+    final static public RCState ABORTING_RS = new RCState(12, "ABORTING");
 
     public static RCState get(int id) {
         RCState state = new RCState();
@@ -55,18 +53,14 @@ public class RCState extends NSMState {
 
     @Override
     public void copy(String label) {
-        if (label.matches(INITIAL_S._label)) {
-            copy(INITIAL_S);
-        } else if (label.matches(CONFIGURED_S._label)) {
-            copy(CONFIGURED_S);
+        if (label.matches(NOTREADY_S._label)) {
+            copy(NOTREADY_S);
         } else if (label.matches(READY_S._label)) {
             copy(READY_S);
         } else if (label.matches(RUNNING_S._label)) {
             copy(RUNNING_S);
         } else if (label.matches(PAUSED_S._label)) {
             copy(PAUSED_S);
-        } else if (label.matches(BOOTING_TS._label)) {
-            copy(BOOTING_TS);
         } else if (label.matches(LOADING_TS._label)) {
             copy(LOADING_TS);
         } else if (label.matches(STARTING_TS._label)) {
@@ -87,9 +81,7 @@ public class RCState extends NSMState {
     }
 
     public RCState next() {
-        if (equals(BOOTING_TS)) {
-            return CONFIGURED_S;
-        } else if (equals(LOADING_TS)) {
+        if (equals(LOADING_TS)) {
             return READY_S;
         } else if (equals(STARTING_TS)) {
             return RUNNING_S;
@@ -102,18 +94,14 @@ public class RCState extends NSMState {
 
     @Override
     public void copy(int id) {
-        if (id == INITIAL_S._id) {
-            copy(INITIAL_S);
-        } else if (id == CONFIGURED_S._id) {
-            copy(CONFIGURED_S);
+        if (id == NOTREADY_S._id) {
+            copy(NOTREADY_S);
         } else if (id == READY_S._id) {
             copy(READY_S);
         } else if (id == RUNNING_S._id) {
             copy(RUNNING_S);
         } else if (id == PAUSED_S._id) {
             copy(PAUSED_S);
-        } else if (id == BOOTING_TS._id) {
-            copy(BOOTING_TS);
         } else if (id == LOADING_TS._id) {
             copy(LOADING_TS);
         } else if (id == STARTING_TS._id) {

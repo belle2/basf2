@@ -33,8 +33,9 @@ void TemplateCallback::term() throw()
   m_con.getInfo().unlink();
 }
 
-bool TemplateCallback::boot() throw()
+bool TemplateCallback::load() throw()
 {
+  getConfig().getObject().print();
   std::string workername = "woerker:" + getNode().getName();
   m_con.init(workername, sizeof(ronode_info));
   m_con.clearArguments();
@@ -51,12 +52,6 @@ bool TemplateCallback::boot() throw()
   m_thread = PThread(new ReadoutMonitor(this,
                                         (ronode_info*)m_con.getInfo().getReserved(),
                                         (ronode_status*)m_data.get()));
-  return true;
-}
-
-bool TemplateCallback::load() throw()
-{
-  getConfig().getObject().print();
   return true;
 }
 
@@ -88,7 +83,7 @@ bool TemplateCallback::pause() throw()
 
 bool TemplateCallback::recover() throw()
 {
-  if (abort() && boot() && load()) {
+  if (abort() && load()) {
     getNode().setState(RCState::READY_S);
     return true;
   }
@@ -98,7 +93,7 @@ bool TemplateCallback::recover() throw()
 bool TemplateCallback::abort() throw()
 {
   m_con.abort();
-  getNode().setState(RCState::INITIAL_S);
+  getNode().setState(RCState::NOTREADY_S);
   return true;
 }
 

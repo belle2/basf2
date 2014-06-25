@@ -38,7 +38,7 @@ ExpRecoCallback::~ExpRecoCallback() throw()
 
 }
 
-bool ExpRecoCallback::boot() throw()
+bool ExpRecoCallback::load() throw()
 {
   // 1. Set execution directory
   //  char* chr_execdir = m_conf->getconf("expreco","execdir_base");
@@ -93,11 +93,6 @@ bool ExpRecoCallback::boot() throw()
   char* evsport = m_conf->getconf("expreco", "evsport");
   m_pid_evs = m_proc->Execute(evs, rboutname, evsport);
 
-  return true;
-}
-
-bool ExpRecoCallback::load() throw()
-{
   return true;
 }
 

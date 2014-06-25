@@ -3,6 +3,8 @@
 #include "daq/slc/readout/ronode_info.h"
 #include "daq/slc/readout/ronode_status.h"
 
+#include <daq/slc/nsm/NSMCommunicator.h>
+
 #include <daq/slc/system/Time.h>
 #include <daq/slc/system/LogFile.h>
 
@@ -19,10 +21,6 @@ using namespace Belle2;
 
 int ReadoutMonitor::checkConnection(const std::string& proc_name, int port)
 {
-  //std::string cmd =
-  //  StringUtil::form("/usr/sbin/lsof -a -c '%s' -i TCP:%d | "
-  //                   "grep ESTABLISHED | wc -l",
-  //                   proc_name.c_str(), port);
   std::string cmd =
     StringUtil::form("/usr/sbin/lsof -a -i TCP:%d | "
                      "grep ESTABLISHED | wc -l", port);
@@ -55,11 +53,17 @@ void ReadoutMonitor::run()
       if (info.io[i].port == 0) {
         m_status->io[i].port = 0;//not used
       } else if (info.io[i].port < 0) {
+        if (m_status->io[i].port > 0) {
+          m_callback->getCommunicator()->sendError("Lost connection");
+        }
         m_status->io[i].port = -1;//offline
       } else {
         if (checkConnection("", info.io[i].port) > 0) {
           m_status->io[i].port = info.io[i].port;
         } else {
+          if (m_status->io[i].port > 0) {
+            m_callback->getCommunicator()->sendError("Lost connection");
+          }
           m_status->io[i].port = -1;//offline
         }
       }
@@ -71,15 +75,6 @@ void ReadoutMonitor::run()
           m_status->io[i].rate = dnbyte[i] / length / 1000000.;
           m_status->io[i].count = info.io[i].count;
           m_status->io[i].nbyte = info.io[i].nbyte;
-          LogFile::debug("expno =%d, runno =%d, subno =%d, "
-                         "stime =%d, ctime =%d, freq =%f, "
-                         "evtsize =%f, rate =%f, count = %d, nbyte = %d",
-                         m_status->expno,
-                         m_status->runno, m_status->subno,
-                         m_status->stime, m_status->ctime,
-                         m_status->io[i].freq, m_status->io[i].evtsize,
-                         m_status->io[i].rate, m_status->io[i].count,
-                         m_status->io[i].nbyte);
         }
       } else {
         m_status->io[i].freq = 0;
@@ -92,13 +87,13 @@ void ReadoutMonitor::run()
 
     if (m_status->io[0].port < 0 || m_status->io[1].port < 0) {
       m_status->state = 2;//not ready
-    } else if (dcount[0] > 0) {
-      m_status->state = 5;//running
+    } else if (dcount[0] > 0 || dcount[1] > 0) {
+      m_status->state = 4;//running
     } else if (info.stime > 0) {
-      m_status->state = 4;//ready
+      m_status->state = 3;//ready
     } else {
       m_status->state = 1;//unknown
     }
-    LogFile::debug("state =%d", m_status->state);
+    //LogFile::debug("state =%d", m_status->state);
   }
 }

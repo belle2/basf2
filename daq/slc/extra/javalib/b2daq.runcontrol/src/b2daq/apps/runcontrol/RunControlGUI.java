@@ -10,6 +10,7 @@ import b2daq.nsm.NSMDataProperty;
 import b2daq.nsm.NSMListenerService;
 import b2daq.ui.NSM2Socket;
 import b2daq.ui.NetworkConfigPaneController;
+import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,7 +62,7 @@ public class RunControlGUI extends Application {
             stage.getIcons().add(new Image(RunControlGUI.class.getResource("runcontrol.png").toExternalForm()));
             stage.setScene(scene);
             stage.show();
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             Logger.getLogger(RunControlGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

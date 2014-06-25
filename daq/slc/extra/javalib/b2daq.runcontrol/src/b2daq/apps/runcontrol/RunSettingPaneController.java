@@ -126,9 +126,7 @@ public class RunSettingPaneController implements Initializable {
                     return false;
                 } else if (state.equals(RCState.READY_S)) {
                     return true;
-                } else if (state.equals(RCState.CONFIGURED_S)) {
-                    return true;
-                } else if (state.equals(RCState.INITIAL_S)) {
+                } else if (state.equals(RCState.NOTREADY_S)) {
                     return true;
                 }
                 return false;
@@ -149,9 +147,7 @@ public class RunSettingPaneController implements Initializable {
                     return true;
                 } else if (state.equals(RCState.READY_S)) {
                     return false;
-                } else if (state.equals(RCState.CONFIGURED_S)) {
-                    return true;
-                } else if (state.equals(RCState.INITIAL_S)) {
+                } else if (state.equals(RCState.NOTREADY_S)) {
                     return true;
                 }
                 return true;

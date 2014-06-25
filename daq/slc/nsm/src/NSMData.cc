@@ -138,7 +138,8 @@ throw(NSMHandlerException)
   b2nsm_context(comm->getContext());
   if ((m_pdata = b2nsm_allocmem(getName().c_str(), getFormat().c_str(),
                                 getRevision(), interval)) == NULL) {
-    throw (NSMHandlerException("Failed to allocate data memory"));
+    throw (NSMHandlerException("Failed to allocate data memory %s",
+                               nsmlib_strerror(comm->getContext())));
   }
   setNode(comm->getNode().getName());
   parse();

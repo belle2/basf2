@@ -40,6 +40,6 @@ int main(int argc, char** argv)
   comm->init(NSMNode(nodename));
   NSMNode node(name);
   NSMMessage msg;
-  comm->sendRequest(NSMMessage(node, RCCommand::BOOT, obj));
+  comm->sendRequest(NSMMessage(node, RCCommand::LOAD, obj));
   return 0;
 }

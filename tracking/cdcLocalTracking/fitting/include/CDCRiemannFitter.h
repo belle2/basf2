@@ -24,7 +24,7 @@ namespace Belle2 {
     class CDCRiemannFitter : public CDCFitter2D<Belle2::CDCLocalTracking::ExtendedRiemannsMethod> {
 
     public:
-      ///Static getter for a general riemann fitter
+      ///Static getter for a general Riemann fitter
       static const CDCRiemannFitter& getFitter();
 
       ///Static getter for a line fitter

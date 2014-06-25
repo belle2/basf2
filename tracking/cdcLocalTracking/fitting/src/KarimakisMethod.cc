@@ -46,7 +46,7 @@ void KarimakisMethod::update(CDCTrajectory2D& trajectory2D,
   if (not nObservations) return;
 
   Vector2D ref = observations2D.getCentralPoint();
-  B2INFO("Reference point " << ref);
+  //B2INFO("Reference point " << ref);
 
   observations2D.passiveMoveBy(ref);
 
@@ -62,7 +62,7 @@ void KarimakisMethod::update(CDCTrajectory2D& trajectory2D,
 
   FloatType totalPerps = perigeeCircle.lengthOnCurve(frontPos, backPos);
   if (totalPerps < 0) {
-    B2INFO("Reversed");
+    //B2INFO("Reversed");
     perigeeCircle.reverse();
   }
 

@@ -23,7 +23,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-// Tests if CDCGenHitVector can handle CDCWireHits
+
 TEST_F(CDCLocalTrackingTest, CDCObservations2D_centralize)
 {
   CDCObservations2D observations;
@@ -45,10 +45,6 @@ TEST_F(CDCLocalTrackingTest, CDCObservations2D_centralize)
 
   EXPECT_EQ(1, observations.getX(2));
   EXPECT_EQ(2, observations.getY(2));
-
 }
-
-
-
 
 

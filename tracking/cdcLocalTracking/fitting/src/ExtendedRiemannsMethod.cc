@@ -45,8 +45,11 @@ void ExtendedRiemannsMethod::update(CDCTrajectory2D& trajectory2D,
   trajectory2D.clear();
   if (not nObservations) return;
 
-  Vector2D ref = observations2D.getCentralPoint();
-  B2INFO("Reference point " << ref);
+  Vector2D origin = Vector2D(0.0, 0.0);
+  Vector2D cenralPoint = observations2D.getCentralPoint();
+
+  const Vector2D& ref = origin;
+  //const Vector2D& ref = centralPoint;
 
   observations2D.passiveMoveBy(ref);
 
@@ -62,7 +65,7 @@ void ExtendedRiemannsMethod::update(CDCTrajectory2D& trajectory2D,
 
   FloatType totalPerps = perigeeCircle.lengthOnCurve(frontPos, backPos);
   if (totalPerps < 0) {
-    B2INFO("Reversed");
+    //B2INFO("Reversed");
     perigeeCircle.reverse();
   }
 
@@ -71,7 +74,7 @@ void ExtendedRiemannsMethod::update(CDCTrajectory2D& trajectory2D,
   trajectory2D.setCircle(perigeeCircle);
 
   // Logical start position of the travel distance scale
-  trajectory2D.setStartPos2D(ref);
+  trajectory2D.setStartPos2D(cenralPoint);
 }
 
 

@@ -24,14 +24,13 @@ namespace Belle2 {
     class CDCAxialAxialSegmentPair : public UsedTObject {
     public:
 
-      /** Constructor. */
-      /** This is as well the parameter free I/O constructor.
-       */
-
+      /// Default constructor - for ROOT compatability
       CDCAxialAxialSegmentPair();
 
+      /// Constructor from two segments
       CDCAxialAxialSegmentPair(const CDCAxialRecoSegment2D* startSegment, const CDCAxialRecoSegment2D* endSegment);
 
+      /// Constructor from two segments and an assoziated trajectory
       CDCAxialAxialSegmentPair(
         const CDCAxialRecoSegment2D* startSegment,
         const CDCAxialRecoSegment2D* endSegment,
@@ -45,9 +44,10 @@ namespace Belle2 {
       bool operator==(CDCAxialAxialSegmentPair const& rhs) const
       { return getStart() == rhs.getStart() and getEnd() == rhs.getEnd(); }
 
+      /// Total ordering sheme comparing the segment pointers.
       bool operator<(CDCAxialAxialSegmentPair const& rhs) const {
         return (getStart() < rhs.getStart()  or
-                (getStart() == rhs.getStart() and   getEnd() < rhs.getEnd()));
+                (getStart() == rhs.getStart() and getEnd() < rhs.getEnd()));
       }
 
       /// Define reconstructed segments and segment triples as coaligned on the start segment
@@ -58,31 +58,46 @@ namespace Belle2 {
       friend bool operator<(const CDCAxialRecoSegment2D* axialSegment, CDCAxialAxialSegmentPair const& segmentTriple)
       { return axialSegment < segmentTriple.getStart(); }
 
-      const CDCAxialAxialSegmentPair* operator->() const { return this; }
 
-      /// Checks the references to the contained three segment for nullptrs
+      /// Checks the references to the contained three segment for nullptrs.
       bool checkSegments() const
       { return not(m_startSegment == nullptr or m_endSegment == nullptr); }
 
 
+      /// Getter for the superlayer id of the start segment.
       ILayerType getStartISuperLayer() const
       { return getStart() == nullptr ? INVALIDSUPERLAYER : getStart()->getISuperLayer(); }
 
+      /// Getter for the superlayer id of the end segment.
       ILayerType getEndISuperLayer() const
       { return getEnd() == nullptr ? INVALIDSUPERLAYER : getEnd()->getISuperLayer(); }
 
-      const CDCAxialRecoSegment2D*   getStart()   const { return m_startSegment; }
-      void setStart(const CDCAxialRecoSegment2D* startSegment) { m_startSegment = startSegment; }
+      /// Getter for the start segment.
+      const CDCAxialRecoSegment2D* getStart() const
+      { return m_startSegment; }
 
-      const CDCAxialRecoSegment2D*   getEnd()     const { return m_endSegment; }
-      void setEnd(const CDCAxialRecoSegment2D* endSegment) { m_endSegment = endSegment; }
+      /// Setter for the start segment.
+      void setStart(const CDCAxialRecoSegment2D* startSegment)
+      { m_startSegment = startSegment; }
 
+      /// Getter for the end segment.
+      const CDCAxialRecoSegment2D* getEnd() const
+      { return m_endSegment; }
+
+      /// Setter for the end segment.
+      void setEnd(const CDCAxialRecoSegment2D* endSegment)
+      { m_endSegment = endSegment; }
+
+
+      /// Getter for the trajectory of the two dimensional trajectory
       CDCTrajectory2D& getTrajectory2D() const
       { return m_trajectory2D; }
 
+      /// Setter for the trajectory of the two dimensional trajectory
       void setTrajectory2D(const CDCTrajectory2D& trajectory2D) const
       { m_trajectory2D =  trajectory2D; }
 
+      /// Invalides the currently stored trajectory information
       void clearTrajectory2D() const
       { getTrajectory2D().clear(); }
 
@@ -130,11 +145,11 @@ namespace Belle2 {
 
     private:
 
-      const CDCAxialRecoSegment2D* m_startSegment;
-      const CDCAxialRecoSegment2D* m_endSegment;
+      const CDCAxialRecoSegment2D* m_startSegment; ///< Reference to the start segment
+      const CDCAxialRecoSegment2D* m_endSegment; ///< Reference to the end segment
 
-      mutable CDCTrajectory2D m_trajectory2D;
-      mutable AutomatonCell m_automatonCell;
+      mutable CDCTrajectory2D m_trajectory2D; ///< Reference to the common trajectory
+      mutable AutomatonCell m_automatonCell; ///< Automaton cell assoziated with the pair of segments
 
       /** ROOT Macro to make CDCAxialAxialSegmentPair a ROOT class.*/
       ClassDefInCDCLocalTracking(CDCAxialAxialSegmentPair, 1);

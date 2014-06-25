@@ -19,17 +19,18 @@
 
 namespace Belle2 {
   namespace CDCLocalTracking {
-    ///Implementation of the unique assignement analysis of hits to segments
+    /// Implementation of the unique assignement analysis of hits to segments. To be removed soonish
     class SegmentSelecter {
 
     public:
 
-      /** Constructor. */
+      /// Empty constructor.
       SegmentSelecter();
 
-      /** Destructor.*/
+      /// Empty destructor.
       virtual ~SegmentSelecter();
 
+      /// Copies segments from the in vector to the out vector, based on selection criteria.
       void selectSegments(
         std::vector<CDCRecoSegment2D>& in,
         std::vector<CDCRecoSegment2D>& out

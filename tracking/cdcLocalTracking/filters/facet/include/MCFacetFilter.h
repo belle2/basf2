@@ -21,13 +21,10 @@ namespace Belle2 {
     class MCFacetFilter {
 
     public:
-
-      /** Constructor. */
+      /// Empty Constructor.
       MCFacetFilter();
 
-      /** Destructor.*/
-      ~MCFacetFilter();
-
+      /// Main filter method returning the weight of the facet. Returns NOT_A_CELL if the cell shall be rejected.
       CellState isGoodFacet(const CDCRecoFacet& facet) const;
 
     public:

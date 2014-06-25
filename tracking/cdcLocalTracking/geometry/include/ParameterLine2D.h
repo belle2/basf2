@@ -82,7 +82,7 @@ namespace Belle2 {
        */
       inline operator Line2D() { return Line2D(distanceToOrigin(), normal().unit()); }  //not optimal yet. tangential.norm() is getting calculated two times.
 
-
+      /// Output operate helping debugging.
       friend std::ostream& operator<<(std::ostream& output, const ParameterLine2D& line)
       { output << "ParameterLine2D(" << line.support() << "," << line.tangential() << ")"; return output; }
 

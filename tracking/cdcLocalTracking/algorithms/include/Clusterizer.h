@@ -231,7 +231,7 @@ namespace Belle2 {
       } // end  startCluster(...)
 
     private:
-      mutable std::map<const Item*, CellState> m_cellStates; /// Memory for the cell state, if the Item does not inherit from AutomatonCell.
+      mutable std::map<const Item*, CellState> m_cellStates; ///< Memory for the cell state, if the Item does not inherit from AutomatonCell.
 
     }; // end class Clusterizer
 

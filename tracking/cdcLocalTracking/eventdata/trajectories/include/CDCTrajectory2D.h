@@ -52,6 +52,7 @@ namespace Belle2 {
         m_perigeeCircle(perigeeCircle),
         m_startPos2D(perigeeCircle.closest(startPoint)) {;}
 
+      /// Construct a trajectory with given start point, momentum at the start point and given charge.
       CDCTrajectory2D(const Vector2D& startPoint, const Vector2D& startMomentum, const FloatType& charge);
 
       /// Empty destructor

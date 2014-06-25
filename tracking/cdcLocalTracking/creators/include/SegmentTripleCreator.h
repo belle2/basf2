@@ -25,22 +25,25 @@ namespace Belle2 {
 
     public:
 
-      /** Constructor. */
+      /// Empty constructor.
       SegmentTripleCreator() {;}
 
-      /** Destructor.*/
+      /// Empty destructor.
       ~SegmentTripleCreator() {;}
 
+      /// Forwards the initialize method of the module to the filters
       void initialize() {
         m_axialAxialSegmentPairFilter.initialize();
         m_segmentTripleFilter.initialize();
       }
 
+      /// Forwards the terminate method of the module to the filters
       void terminate() {
         m_axialAxialSegmentPairFilter.terminate();
         m_segmentTripleFilter.terminate();
       }
 
+      /// Create the segment triples by combining close by segments in the combination axial-stereo-axial based on the filter selection criteria.
       inline void create(const std::vector<CDCRecoSegment2D>& segments,
                          std::set<CDCSegmentTriple>& segmentTriples) const {
 
@@ -80,10 +83,13 @@ namespace Belle2 {
       }
 
     private:
-
+      /// Storage structure type for axial segements by their superlayer id
       typedef std::vector<const CDCAxialRecoSegment2D* > AxialSegmentsBySuperLayer[CDCWireTopology::N_SUPERLAYERS];
+
+      /// Storage structure type for stereo segements by their superlayer id
       typedef std::vector<const CDCStereoRecoSegment2D*> StereoSegmentsBySuperLayer[CDCWireTopology::N_SUPERLAYERS];
 
+      /// Creates the segment triples from the segments, which have been grouped by their superlayer id.
       inline void create(
         const AxialSegmentsBySuperLayer& axialSegmentsBySL,
         const StereoSegmentsBySuperLayer& stereoSegmentsBySL,
@@ -183,7 +189,7 @@ namespace Belle2 {
       }
 
 
-
+      /// Creates segment tiples from a combination of start segment, middle segments and end segments.
       inline void createForAxialSuperLayerPair(
         const std::vector<const CDCAxialRecoSegment2D* >& startSegments,
         const std::vector<const CDCStereoRecoSegment2D* >& middleSegments,
@@ -253,8 +259,8 @@ namespace Belle2 {
       }
 
     private:
-      mutable AxialAxialSegmentPairFilter m_axialAxialSegmentPairFilter;
-      mutable SegmentTripleFilter m_segmentTripleFilter;
+      mutable AxialAxialSegmentPairFilter m_axialAxialSegmentPairFilter; ///< Instance of the axial to axial pair filter.
+      mutable SegmentTripleFilter m_segmentTripleFilter; ///< Instance of the segment triple filter.
     };
   } //end namespace CDCLocalTracking
 } //end namespace Belle2

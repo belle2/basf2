@@ -259,6 +259,8 @@ class CDCSVGDisplayModule(Module):
         #      return
 
         plotter = svgdrawing.CDCSVGPlotter(animate=self.animate)
+
+        ## Plotter instance receiving drawable tracking objects.
         self.plotter = plotter
 
         # Construct additional information from basic Monte Carlo data, if it is available from the DataStore

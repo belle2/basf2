@@ -26,6 +26,7 @@ namespace Belle2 {
 
     public:
 #ifndef __CINT__
+      /// Matrix type used to wrap the raw memory chunk of values generated from the various hit types for structured vectorized access.
       typedef Eigen::Map< Eigen::Matrix< FloatType, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor > > EigenObservationMatrix;
 #endif
 
@@ -225,7 +226,7 @@ namespace Belle2 {
 #endif
 
     private:
-      std::vector<FloatType> m_observations;
+      std::vector<FloatType> m_observations; ///< Memory for the individual observations. Arrangement of values is x,y, drift raduis, x, y, .....
 
       /** ROOT Macro to make CDCObservation2D a ROOT class.*/
       ClassDefInCDCLocalTracking(CDCObservations2D, 1);

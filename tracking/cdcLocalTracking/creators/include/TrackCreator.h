@@ -26,30 +26,29 @@ namespace Belle2 {
 
     public:
 
-      /** Constructor. */
+      /// Empty constructor.
       TrackCreator() {;}
 
-      /** Destructor.*/
+      /// Empty destructor.
       ~TrackCreator() {;}
 
+      /// Type of a path of segment triples.
+      typedef std::vector<const CDCSegmentTriple*> CDCSegmentTripleTrack;
 
-      typedef Belle2::CDCLocalTracking::CDCSegmentTriple Item;
-      typedef std::vector<const Item*> CDCSegmentTripleTrack;
-
-
+      /// Creates many CDCTracks from a path of segment triples by averaging the common parts and shifting the transverse travel distance of each part to match the end of the former triple.
       void create(
         const std::vector<CDCSegmentTripleTrack>& segmentTripleTracks,
         std::vector<CDCTrack>& tracks
       ) const;
 
 
-
+      /// Copies the hit content of the segment triple to the CDCTrack
       void create(
         const CDCSegmentTripleTrack& segmentTripleTrack,
         CDCTrack& track
       ) const;
 
-
+      /// Copies the hit content of the segment to the CDCTrack
       bool create(
         const CDCRecoSegment2D& segment,
         CDCTrack& track
@@ -66,21 +65,21 @@ namespace Belle2 {
         CDCRecoSegment3D& recohits3D
       ) const;
 
-      ///Reconstruct the middle segment of a triple and append it to the track
+      /// Reconstruct the middle segment of a triple and append it to the track
       void appendMiddleRecoHits3D(
         const CDCSegmentTriple& triple,
         FloatType perpSOffset,
         CDCRecoSegment3D& recohits3D
       ) const;
 
-      ///Reconstruct the end segment of a triple and append it to the track
+      /// Reconstruct the end segment of a triple and append it to the track
       void appendEndRecoHits3D(
         const CDCSegmentTriple& triple,
         FloatType perpSOffset,
         CDCRecoSegment3D& recohits3D
       ) const;
 
-      ///Reconstruct a segment with the two fits and append it to the track
+      /// Reconstruct a segment with the two fits and append it to the track
       void appendRecoHits3D(
         const CDCRecoSegment2D& segment,
         const CDCTrajectory2D& trajectory2D,

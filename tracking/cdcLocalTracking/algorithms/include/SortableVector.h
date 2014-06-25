@@ -98,7 +98,9 @@ namespace Belle2 {
       /// Input iterator type for the sortable vector usable with stl algorithms
       class input_iterator : public std::iterator<std::output_iterator_tag, void, void, void, void> {
       protected:
+        /// Reference to the sorted vector.
         SortableVector<T>& m_collection;
+
       public:
         /// Constructor taking the sortable vector to be filled as a reference
         explicit input_iterator(SortableVector<T>& collection) : m_collection(collection) {}

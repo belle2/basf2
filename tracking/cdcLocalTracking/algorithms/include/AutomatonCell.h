@@ -19,13 +19,13 @@
 namespace Belle2 {
   namespace CDCLocalTracking {
 
-    /// Cell used by the cellular automata
+    /// Cell used by the cellular automata.
     /** This class represents a cell in the cellular automata algorithm the local tracking is build on.
      *  Different to the ordinary cellular automaton algorihms this class stores the state not as a interger number but \n
      *  as a float value. This enables to have fractional measures of quality attached to the cell if say one new item \n
      *  is not worth a full point, but a probability measure which is additiv. The points that can be gained by picking \n
      *  this cell are stored in the cell weight property. Moreover the class defines status flags to be set and/or read by\n
-     *  the cellular automaton */
+     *  the cellular automaton. */
     class AutomatonCell : public CDCLocalTracking::UsedTObject {
 
     public:
@@ -141,6 +141,7 @@ namespace Belle2 {
       { return hasAnyFlags(DO_NOT_USE); }
 
 
+      /// Setting accessing the flag by tag.
       template<CellFlags cellFlag>
       void setFlags(bool setTo) const {
         if (setTo) setFlags(cellFlag);

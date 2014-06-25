@@ -32,9 +32,10 @@ namespace Belle2 {
       /// Empty constructor
       SingleSegmentTrackCreator();
 
-      /** Destructor.*/
+      /// Empty destructor.
       virtual ~SingleSegmentTrackCreator();
 
+      /// Augments the given segments to tracks and appends them to the given vector of tracks
       void
       append(
         const std::vector<CDCRecoSegment2D>& recoSegments,
@@ -42,8 +43,7 @@ namespace Belle2 {
       const;
 
     private:
-
-      TrackCreator m_trackCreator;
+      TrackCreator m_trackCreator; ///< Instance of the track creator internally used for the appending of hits.
 
     }; // end class SingleSegmentTrackCreator
 

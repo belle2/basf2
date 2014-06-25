@@ -50,6 +50,7 @@ namespace Belle2 {
         m_output_csv.close();
       }
 
+      /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
       inline NeighborWeight isGoodNeighbor(
         const CDCRecoFacet& facet,
         const CDCRecoFacet& neighborFacet
@@ -88,9 +89,8 @@ namespace Belle2 {
 
       mutable std::ofstream m_output_csv;  ///< Output stream for the csv file
 
-      MCFacetNeighborChooser m_mcNeighborChooser;
-      RealFacetNeighborChooser m_realNeighborChooser;
-
+      MCFacetNeighborChooser m_mcNeighborChooser; ///< Instance of the Monte Carlo filter as reference
+      RealFacetNeighborChooser m_realNeighborChooser; ///< Instance of the tested neighbor filter.
 
     }; // end class
 

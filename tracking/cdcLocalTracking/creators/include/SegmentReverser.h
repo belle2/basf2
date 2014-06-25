@@ -19,22 +19,20 @@ namespace Belle2 {
     class SegmentReverser {
 
     public:
-
-      /** Constructor. */
+      /// Constructor.
       SegmentReverser();
 
-      /** Destructor.*/
+      /// Destructor.
       virtual ~SegmentReverser();
 
+      /// Appends a copy of each segment in the vector to the end of the vector.
       void appendReversed(std::vector<CDCRecoSegment2D>& segments) const;
 
     private:
-
+      /// Copies the hit content of the given segment to the other given segment but in reverse order.
       inline void reverse(const CDCRecoSegment2D& segment, CDCRecoSegment2D& reverseSegment) const;
 
-
     }; // end class SegmentReverser
-
 
   } //end namespace CDCLocalTracking
 } //end namespace Belle2

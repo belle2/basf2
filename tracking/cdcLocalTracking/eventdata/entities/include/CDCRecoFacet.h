@@ -180,7 +180,7 @@ namespace Belle2 {
       mutable ParameterLine2D m_startToEnd; ///< Memory for the tangential line between first and third hit
       mutable ParameterLine2D m_middleToEnd; ///< Memory for the tangential line between second and third hit
 
-      AutomatonCell m_automatonCell; //< Memory for the cellular automaton cell assoziated with the facet.
+      AutomatonCell m_automatonCell; ///< Memory for the cellular automaton cell assoziated with the facet.
 
 
 

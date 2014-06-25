@@ -49,6 +49,7 @@ class Bound:
     """Class representing the rectangular boundary of an svg
             element in its local coordinates"""
 
+    ## A list of svg tags to be ignored in the calculation of the bounding box.
     ignoreList = ['defs', 'set']
 
     @classmethod

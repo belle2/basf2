@@ -46,22 +46,28 @@ namespace Belle2 {
       CellWeight isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair);
 
     private:
+      /// Getter for the test filter.
       RealAxialAxialSegmentPairFilter& getRealAxialAxialSegmentPairFilter()
       { return m_realAxialAxialSegmentPairFilter; }
 
+      /// Getter for the Monte Carlo reference filter.
       MCAxialAxialSegmentPairFilter& getMCAxialAxialSegmentPairFilter()
       { return m_mcAxialAxialSegmentPairFilter; }
 
     private:
-      RealAxialAxialSegmentPairFilter m_realAxialAxialSegmentPairFilter; //< filter to be compared with Monte Carlo data.
-      MCAxialAxialSegmentPairFilter m_mcAxialAxialSegmentPairFilter; //< monte carlo filter
+      RealAxialAxialSegmentPairFilter m_realAxialAxialSegmentPairFilter; ///< Instance of the filter to be compared with Monte Carlo data.
+      MCAxialAxialSegmentPairFilter m_mcAxialAxialSegmentPairFilter; ///< Instance of the Monte Carlo filter
 
 
 
     private:
+      /// File name of the ROOT output file for further analysis.
       std::string m_outputFileName = "EvaluateAxialAxialSegmentFilter.root";
 
+      /// ROOT output file
       TFile* m_ptrTFileForOutput;
+
+      /// ROOT tree wrapper helping to file the output tree.
       AxialAxialSegmentPairFilterTree m_axialAxialSegmentFilterTree;
 
     }; // end class EvaluateAxialAxialSegmentPairFilter

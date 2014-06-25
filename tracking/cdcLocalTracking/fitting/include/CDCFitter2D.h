@@ -35,17 +35,18 @@ namespace Belle2 {
     class CDCFitter2D : public FitMethod {
 
     public:
-      ///Empty constructor
+      /// Empty constructor
       CDCFitter2D() :
         FitMethod(),
         m_usePosition(false),
         m_useOrientation(true)
       { ; }
 
-      ///Empty destructor
+      /// Empty destructor
       ~CDCFitter2D()
       { ; }
 
+      /// Fits a collection of hits typs which are convertable to observation circles.
       template<class Hits>
       CDCTrajectory2D fit(const Hits& hits) const {
         CDCTrajectory2D result;
@@ -53,6 +54,7 @@ namespace Belle2 {
         return result;
       }
 
+      /// Updates a given trajectory with a fit to a collection of hits typs, which are convertable to observation circles.
       template<class Hits>
       void update(CDCTrajectory2D& trajectory2D, const Hits& hits) const {
         CDCObservations2D observations2D;
@@ -70,19 +72,26 @@ namespace Belle2 {
         else if (isCoaligned != FORWARD) B2WARNING("Fit cannot be oriented correctly");
       }
 
+      /// Update the trajectory with a fit to the observations.
       void update(CDCTrajectory2D& trajectory2D, CDCObservations2D& observations2D) const
       { FitMethod::update(trajectory2D, observations2D); }
 
 
       //set which information should be used from the recohits
       //usePositionAndOrientation is standard
+
+      /// Setup the fitter to use only the reconstructed positions of the hits
       void useOnlyPosition() { m_usePosition = true; m_useOrientation = false;}
+
+      /// Setup the fitter to use only reference position and the drift length with right left orientation
       void useOnlyOrientation() { m_usePosition = false; m_useOrientation = true;}
+
+      /// Setup the fitter to use both the reconstructed position and the reference position and the drift length with right left orientation.
       void usePositionAndOrientation() { m_usePosition = true; m_useOrientation = true;}
 
     private:
-      bool m_usePosition;
-      bool m_useOrientation;
+      bool m_usePosition; ///< Flag indicating the reconstructed position shall be used in the fit.
+      bool m_useOrientation; ///< Flag indicating the reference position and drift length with right left orientation shall be used in the fit.
 
     public:
       /** ROOT Macro to make CDCFitter2D a ROOT class.*/

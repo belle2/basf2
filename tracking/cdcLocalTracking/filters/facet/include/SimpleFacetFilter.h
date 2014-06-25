@@ -19,27 +19,26 @@ namespace Belle2 {
     class SimpleFacetFilter {
 
     public:
-
-      /** Constructor. */
+      /// Constructor using default direction of flight deviation cut off.
       SimpleFacetFilter();
+
+      /// Constructor using given direction of flight deviation cut off.
       SimpleFacetFilter(FloatType allowedDeviationCos);
 
-      /** Destructor.*/
-      ~SimpleFacetFilter();
-
+      /// Main filter method returning the weight of the facet. Returns NOT_A_CELL if the cell shall be rejected.
       CellState isGoodFacet(const CDCRecoFacet& facet) const;
 
       /// Clears all remember information from the last event
       void clear() const;
 
-      /// Forwards the modules initialize to the filter
+      /// Forwards the modules initialize to the filter.
       void initialize();
 
-      /// Forwards the modules initialize to the filter
+      /// Forwards the modules initialize to the filter.
       void terminate();
 
     private:
-      const FloatType m_allowedDeviationCos;
+      const FloatType m_allowedDeviationCos; ///< Memory for the used direction of flight deviation.
 
     }; // end class SimpleFacetFilter
   } //end namespace CDCLocalTracking

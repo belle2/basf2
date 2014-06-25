@@ -71,15 +71,17 @@ namespace Belle2 {
                                                    const FloatType& absRadius,
                                                    const CCWInfo& orientation = CCW);
 
+      /// Constructor of a generalized circle from perigee parameters. Tangential at perigee given as two dimensional vector.
       static GeneralizedCircle fromPerigeeParameters(const FloatType& curvature,
                                                      const Vector2D& tangential,
                                                      const FloatType& impact);
 
+      /// Constructor of a generalized circle from perigee parameters. Tangential at perigee given as polar angle.
       static GeneralizedCircle fromPerigeeParameters(const FloatType& curvature,
                                                      const FloatType& tangentialPhi,
                                                      const FloatType& impact);
 
-      /** Destructor. */
+      /// Destructor.
       ~GeneralizedCircle() {;}
 
     protected:

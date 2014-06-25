@@ -64,7 +64,7 @@ namespace Belle2 {
       }
 
 
-
+      /// Generates tracks from the given segments
       inline void apply(const std::vector< CDCRecoSegment2D >& recoSegments,
                         StoreArray < genfit::TrackCand >& storedGFTrackCands) {
 
@@ -113,6 +113,7 @@ namespace Belle2 {
 
 
     private:
+      /// Helper function to copy intermediate objects to the data store for analysis from python.
       void copyToDataStoreForDebug() const {
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
@@ -146,26 +147,41 @@ namespace Belle2 {
 
     private:
       //object pools
+
+      /// Memory for the segment triples
       std::set<CDCSegmentTriple> m_segmentTriples;
+
+      /// Memory for the segment triples neighborhood
       WeightedNeighborhood<const CDCSegmentTriple> m_segmentTripleNeighborhood;
+
+      /// Memory for the segment triple paths generated from the graph.
       std::vector< std::vector<const CDCSegmentTriple*> > m_segmentTripleTracks;
+
+      /// Memory for the tracks generated from the paths
       std::vector<CDCTrack> m_tracks;
 
       //object creators
+      /// Instance of the segment triple creator
       SegmentTripleCreator<AxialAxialSegmentPairFilter, SegmentTripleFilter> m_segmentTripleCreator;
 
       //neighborhood builders
+      /// Instance of the segment triple neighborhoos builder
       NeighborhoodBuilder <CDCSegmentTriple, SegmentTripleNeighborChooser > m_segmentTriple_neighborhoodBuilder;
 
       //cellular automat
+      /// Instance of the cellular automaton.
       MultipassCellularPathFinder<CDCSegmentTriple> m_cellularPathFinder;
 
+      /// Instance of the track creator from paths.
       TrackCreator m_trackCreator;
 
+      /// Instance of the leftover single segment tracks creator.
       SingleSegmentTrackCreator m_singleSegmentTrackCreator;
 
+      /// Instance of the orientation fixer
       TrackOrientator m_trackOrientator;
 
+      /// Instance of track to the genfit translater
       GFTrackCandCreator m_gfTrackCandCreator;
 
     }; // end class SegmentTripleTrackingWorker

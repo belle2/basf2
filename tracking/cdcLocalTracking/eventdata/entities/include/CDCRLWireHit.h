@@ -30,9 +30,9 @@ namespace Belle2 {
 
       /// Constructs an oriented wire hit
       /** Constructs an oriented wire hit
-       *  @param wirehit the wire hit the oriented hit is assoziated with.
-       *  @param rlinfo the right left passage information the _wire_ relativ to the track */
-      CDCRLWireHit(const CDCWireHit* wirehit, RightLeftInfo rlInfo = 0);
+       *  @param wireHit the wire hit the oriented hit is assoziated with.
+       *  @param rlInfo the right left passage information the _wire_ relativ to the track */
+      CDCRLWireHit(const CDCWireHit* wireHit, RightLeftInfo rlInfo = 0);
 
       /// Empty deconstructor
       ~CDCRLWireHit();

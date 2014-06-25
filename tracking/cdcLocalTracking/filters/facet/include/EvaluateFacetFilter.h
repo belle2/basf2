@@ -34,6 +34,7 @@ namespace Belle2 {
       /** Destructor.*/
       ~EvaluateFacetFilter();
 
+      /// Main filter method returning the weight of the facet. Returns NOT_A_CELL if the cell shall be rejected.
       CellState isGoodFacet(const CDCRecoFacet& facet) const;
 
       /// Clears all remember information from the last event
@@ -49,8 +50,8 @@ namespace Belle2 {
       mutable std::ofstream m_output_csv;  ///< Output stream for the csv file
 
 
-      MCFacetFilter m_mcFacetFilter;
-      RealFacetFilter m_realFacetFilter;
+      MCFacetFilter m_mcFacetFilter; ///< Instance of Monte Carlo facet filter.
+      RealFacetFilter m_realFacetFilter; ///< Instance of evaluated facet filter.
 
     }; // end class EvaluateFacetFilter
   } //end namespace CDCLocalTracking

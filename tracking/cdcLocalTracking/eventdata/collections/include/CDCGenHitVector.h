@@ -59,20 +59,30 @@ namespace Belle2 {
 
     private:
 
-      /// Helper class for STL algorithms searching for specific wire
+      /// Helper class for STL algorithms searching for specific wire.
       class HasWirePredicate {
       public:
+        /// Constructor of the helper class taking the sought wire.
         HasWirePredicate(const Belle2::CDCLocalTracking::CDCWire& wire) : m_wire(wire) {;}
+
+        /// Evaluates if the given item has the sought wire.
         bool operator()(const T& item) { return item->hasWire(m_wire); }
+
       private:
+        /// Reference to the sought wire.
         const CDCWire& m_wire;
       };
-      /// Helper class for STL algorithms searching for specific wire hit
+      /// Helper class for STL algorithms searching for specific wire hit.
       class HasWireHitPredicate {
       public:
+        /// Constructor of the helper class taking the sought wire hit.
         HasWireHitPredicate(const Belle2::CDCLocalTracking::CDCWireHit& wirehit) : m_wirehit(wirehit) {;}
+
+        /// Evaluates if the given item has the sought wire hit.
         bool operator()(const T& item) { return item->hasWireHit(m_wirehit); }
+
       private:
+        /// Reference to the sought wire hit.
         const Belle2::CDCLocalTracking::CDCWireHit& m_wirehit;
       };
 

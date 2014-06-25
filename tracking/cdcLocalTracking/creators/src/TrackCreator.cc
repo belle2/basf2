@@ -146,7 +146,7 @@ TrackCreator::appendStartRecoHits3D(
   CDCRecoSegment3D& recohits3D
 ) const
 {
-  const CDCRecoSegment2D* startSegment = triple->getStart();
+  const CDCRecoSegment2D* startSegment = triple.getStart();
   if (startSegment != nullptr) {
     appendRecoHits3D(*startSegment,
                      triple.getTrajectory2D(),
@@ -165,7 +165,7 @@ TrackCreator::appendMiddleRecoHits3D(
   CDCRecoSegment3D& recohits3D
 ) const
 {
-  const CDCRecoSegment2D* middleSegment = triple->getMiddle();
+  const CDCRecoSegment2D* middleSegment = triple.getMiddle();
   if (middleSegment != nullptr) {
     appendRecoHits3D(*middleSegment,
                      triple.getTrajectory2D(),
@@ -184,7 +184,7 @@ TrackCreator::appendEndRecoHits3D(
   CDCRecoSegment3D& recohits3D
 ) const
 {
-  const CDCRecoSegment2D* endSegment = triple->getEnd();
+  const CDCRecoSegment2D* endSegment = triple.getEnd();
   if (endSegment != nullptr) {
     appendRecoHits3D(*endSegment,
                      triple.getTrajectory2D(),

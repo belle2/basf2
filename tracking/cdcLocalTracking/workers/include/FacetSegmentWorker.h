@@ -30,13 +30,12 @@
 #include <tracking/cdcLocalTracking/creators/RecoSegmentCreator.h>
 #include <tracking/cdcLocalTracking/creators/TangentSegmentCreator.h>
 
-#include <tracking/cdcLocalTracking/creators/SegmentSelecter.h>
 #include <tracking/cdcLocalTracking/creators/SegmentReverser.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {
 
-    // Worker for building reconstructed segments form wirehits using reconstructed facets
+    /// Worker for building reconstructed segments form wirehits using reconstructed facets
     template<class FacetFilter, class FacetNeighborChooser>
     class FacetSegmentWorker {
 
@@ -73,7 +72,7 @@ namespace Belle2 {
       }
 
 
-
+      /// Generates the segments from the event topology.
       template<class CDCWireHitRange>
       inline void apply(const CDCWireHitRange&,
                         std::vector< CDCRecoSegment2D >& outputSegments) {
@@ -174,6 +173,7 @@ namespace Belle2 {
       }
 
     private:
+      /// Helper function to copy intermediate objects to the data store for analysis from python.
       void copyToDataStoreForDebug() const {
 
 
@@ -220,57 +220,90 @@ namespace Belle2 {
 
     private:
       //object pools
+      /// Neighborhood type for wire hits
       typedef WeightedNeighborhood<const CDCWireHit> CDCWireHitNeighborhood;
+
+      /// Memory for the wire hit neighborhood.
       CDCWireHitNeighborhood m_wirehitNeighborhood;
 
+      /// Memory for the constructed facets.
       CDCRecoFacetCollection m_facets;
 
+      /// Neighborhood type for facets.
       typedef WeightedNeighborhood<const CDCRecoFacet> CDCRecoFacetNeighborhood;
+
+      /// Memory for the facet neighborhood.
       CDCRecoFacetNeighborhood m_facetsNeighborhood;
 
+      /// Memory for the facet paths generated from the graph.
       std::vector< std::vector<const CDCRecoFacet*> > m_facetPaths;
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
+      /// Memory for the tangent segments extracted from the paths
       std::vector< CDCRecoTangentVector > m_recoTangentSegments;
 #endif
 
+      /// Memory for the segments extracted from the paths
       std::vector<CDCRecoSegment2D> m_segments2D;
 
+      /// Instance of the hit cluster generator
       Clusterizer<CDCWireHit, CDCWireHitCluster> m_wirehitClusterizer;
+
+      /// Memory for the hit clusters
       std::vector<CDCWireHitCluster> m_clusters;
 
       //object creators
+
+      /// Instance of the facet creator
       FacetCreator<FacetFilter> m_facetCreator;
 
       //neighborhood builders
+      /// Type of the neighborhood relation builder.
       NeighborhoodBuilder<CDCWireHit, WireHitNeighborChooser<CW_OUT_NEIGHBOR> >
+      /// Instance of the neighborhood builder.
       m_clockwiseOut_neighborhoodBuilder;
 
+      /// Type of the neighborhood relation builder.
       NeighborhoodBuilder<CDCWireHit, WireHitNeighborChooser<CW_NEIGHBOR> >
+      /// Instance of the neighborhood builder.
       m_clockwise_neighborhoodBuilder;
 
+      /// Type of the neighborhood relation builder.
       NeighborhoodBuilder<CDCWireHit, WireHitNeighborChooser<CW_IN_NEIGHBOR> >
+      /// Instance of the neighborhood builder.
       m_clockwiseIn_neighborhoodBuilder;
 
+      /// Type of the neighborhood relation builder.
       NeighborhoodBuilder<CDCWireHit, WireHitNeighborChooser<CCW_OUT_NEIGHBOR> >
+      /// Instance of the neighborhood builder.
       m_counterClockwiseOut_neighborhoodBuilder;
 
+      /// Type of the neighborhood relation builder.
       NeighborhoodBuilder<CDCWireHit, WireHitNeighborChooser<CCW_NEIGHBOR> >
+      /// Instance of the neighborhood builder.
       m_counterClockwise_neighborhoodBuilder;
 
+      /// Type of the neighborhood relation builder.
       NeighborhoodBuilder<CDCWireHit, WireHitNeighborChooser<CCW_IN_NEIGHBOR> >
+      /// Instance of the neighborhood builder.
       m_counterClockwiseIn_neighborhoodBuilder;
 
+      /// Type of the neighborhood relation builder.
       NeighborhoodBuilder<CDCRecoFacet, FacetNeighborChooser>
+      /// Instance of the neighborhood builder.
       m_facetNeighborhoodBuilder;
 
       //cellular automaton
+      /// Instance of the cellular automaton path finder
       MultipassCellularPathFinder<CDCRecoFacet> m_cellularPathFinder;
 
+      /// Instance of the segment creator.
       RecoSegmentCreator m_recoSegmentCreator;
+
+      /// Instance of the tangent segment creator.
       TangentSegmentCreator m_tangentSegmentCreator;
 
-      SegmentSelecter m_segmentSelecter;
+      /// Instance of the segment reverser.
       SegmentReverser m_segmentReverser;
 
     }; // end class FacetSegmentWorker

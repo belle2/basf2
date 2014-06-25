@@ -48,7 +48,7 @@ namespace Belle2 {
       void terminate() {;}
 
 
-
+      /// Returns a two iterator range covering the range of possible neighboring segment triples of the given facet out of the sorted range given by the two other argumets.
       template<class CDCSegmentTripleIterator>
       boost::iterator_range<CDCSegmentTripleIterator>
       getPossibleNeighbors(
@@ -63,6 +63,7 @@ namespace Belle2 {
 
       }
 
+      /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
       inline Weight isGoodNeighbor(
         const CDCSegmentTriple& triple __attribute__((unused)) ,
         const CDCSegmentTriple& neighborTriple

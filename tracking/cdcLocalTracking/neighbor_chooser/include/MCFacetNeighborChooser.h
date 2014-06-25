@@ -27,6 +27,7 @@ namespace Belle2 {
       /** Destructor.*/
       ~MCFacetNeighborChooser() {;}
 
+      /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
       inline
       NeighborWeight
       isGoodNeighbor(
@@ -56,7 +57,7 @@ namespace Belle2 {
       }
 
     private:
-      const MCFacetFilter m_mcFacetFilter;
+      const MCFacetFilter m_mcFacetFilter; ///< Monte Carlo cell filter to reject neighborhoods have false cells
 
     }; // end class
   } //end namespace CDCLocalTracking

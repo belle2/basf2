@@ -28,8 +28,8 @@ namespace Belle2 {
       /** Destructor.*/
       ~MCSegmentTripleNeighborChooser() {;}
 
-
-      inline Weight isGoodNeighbor(
+      /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
+      inline NeighborWeight isGoodNeighbor(
         const CDCSegmentTriple& triple,
         const CDCSegmentTriple& neighborTriple
       ) const {
@@ -44,7 +44,7 @@ namespace Belle2 {
       }
 
     private:
-      MCSegmentTripleFilter m_mcSegmentTripleFilter;
+      MCSegmentTripleFilter m_mcSegmentTripleFilter; ///< Instance of the Monte Carlo segment triple filter for rejection of false cells.
 
     }; // end class
 

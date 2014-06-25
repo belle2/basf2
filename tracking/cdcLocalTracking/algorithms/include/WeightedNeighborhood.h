@@ -142,9 +142,6 @@ namespace Belle2 {
       /** Inserts a new relation. The item and neighbor are given by pointer. \n
        *  Copys of the pointers are stored in the underlying multimap. \n
        *  Additionally a weight can be given. If omited the weight defaults to one. \n
-       *  @param itemPtr pointer to an item
-       *  @param neighborPtr pointer to the neighbor of the item
-       *  @param weight weight of the neighborhood relation
        */
       inline void insert(
         const ItemPtr& itemPtr,
@@ -157,9 +154,6 @@ namespace Belle2 {
       /** Inserts a new relation. The item and neighbor are given by pointer. \n
        *  Copys of the pointers are stored in the underlying multimap. \n
        *  Additionally a weight must be given in the middle.
-       *  @param itemPtr pointer to an item
-       *  @param weight weight of the neighborhood relation
-       *  @param neighborPtr pointer to the neighbor of the item
        */
       inline void insert(
         ItemPtr itemPtr,
@@ -175,9 +169,6 @@ namespace Belle2 {
        *  out and stored in the multimap.
        *  Copys of the pointers are stored in the underlying multimap. \n
        *  Additionally a weight can be given. If omited the weight defaults to one. \n
-       *  @param itemPtr reference to an item
-       *  @param neighborPtr reference to the neighbor of the item
-       *  @param weight weight of the neighborhood relation
        */
       inline void insert(
         ItemRef itemRef,
@@ -193,9 +184,6 @@ namespace Belle2 {
        *  out and stored in the multimap.
        *  Copys of the pointers are stored in the underlying multimap. \n
        *  Additionally a weight must be given in the middle. \n
-       *  @param itemPtr reference to an item
-       *  @param weight weight of the neighborhood relation
-       *  @param neighborPtr reference to the neighbor of the item
        */
       inline void insert(
         ItemRef itemRef,

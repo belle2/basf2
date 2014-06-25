@@ -144,13 +144,13 @@ namespace Belle2 {
 
       //CDCRecoHit3DVector m_hits; // now inherited
 
-      CDCTrajectory2D m_startTrajectory2D; /// Memory for the two dimensional trajectory at the start of the track
-      CDCTrajectorySZ m_startTrajectorySZ; /// Memory for the sz trajectory at the start of the track
+      CDCTrajectory2D m_startTrajectory2D; ///< Memory for the two dimensional trajectory at the start of the track
+      CDCTrajectorySZ m_startTrajectorySZ; ///< Memory for the sz trajectory at the start of the track
 
-      CDCTrajectory2D m_endTrajectory2D; /// Memory for the two dimensional trajectory at the end of the track
-      CDCTrajectorySZ m_endTrajectorySZ; /// Memory for the sz trajectory at the end of the track
+      CDCTrajectory2D m_endTrajectory2D; ///< Memory for the two dimensional trajectory at the end of the track
+      CDCTrajectorySZ m_endTrajectorySZ; ///< Memory for the sz trajectory at the end of the track
 
-      ForwardBackwardInfo m_fbInfo; /// Memory for the forward backward indicator
+      ForwardBackwardInfo m_fbInfo; ///< Memory for the forward backward indicator
 
       /// ROOT Macro to make CDCTrack a ROOT class.
       ClassDefInCDCLocalTracking(CDCTrack, 1);

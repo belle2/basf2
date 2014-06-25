@@ -29,6 +29,7 @@ namespace Belle2 {
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
 
+    /// Typedef the normal TObject as the base class of the track finder in case the ROOT inheritance is switched on.
     typedef TObject UsedTObject;
 
 #define ClassDefInCDCLocalTracking(ClassName,ClassVersion) ClassDef(ClassName, ClassVersion)
@@ -37,7 +38,10 @@ namespace Belle2 {
 #else
     // Do not use the ROOT inheritance in all Tracking objects
     // Use an empty base class instead
+    /// Empty base class for the switched of ROOT inheritance
     class MockTObject { ; };
+
+    /// Typedef the empty class as the base class of the track finder in case the ROOT inheritance is switched off.
     typedef MockTObject UsedTObject;
 
 #define ClassDefInCDCLocalTracking(ClassName,ClassVersion)

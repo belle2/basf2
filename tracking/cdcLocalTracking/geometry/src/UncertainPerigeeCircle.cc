@@ -42,8 +42,8 @@ TMatrixD UncertainPerigeeCircle::passiveMoveByJacobian(const Vector2D& by) const
   //B2INFO("A = " << 2 * deltaOrthogonal + curvature() * delta.normSquared());
 
   Vector2D CB = gradient(by).orthogonal();
-  FloatType C = CB.first();
-  FloatType B = CB.second();
+  //FloatType C = CB.first();
+  //FloatType B = CB.second();
 
   //B2INFO("B = " << B);
   //B2INFO("C = " << C);

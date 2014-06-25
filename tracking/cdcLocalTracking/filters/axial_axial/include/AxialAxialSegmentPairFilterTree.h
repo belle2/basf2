@@ -85,20 +85,19 @@ namespace Belle2 {
 
              > AxialAxialSegmentPairFilterTreeBase;
 
-
+    /// Class managing the output in the evaluation of axial to axial segment pair filters.
     class AxialAxialSegmentPairFilterTree : public AxialAxialSegmentPairFilterTreeBase {
 
     public:
+      /// Empty constructor.
       AxialAxialSegmentPairFilterTree();
 
+      /// Empty deconstructor.
       ~AxialAxialSegmentPairFilterTree();
 
     public:
       /// Fills the object with the information gather from the given segment to segment pair instance.
       bool setValues(const CellWeight& mcWeight, const CellWeight& prWeight, const CDCAxialAxialSegmentPair& axialAxialSegmentPair);
-
-    private:
-
 
     }; // end class AxialAxialSegmentPairFilterVars
 

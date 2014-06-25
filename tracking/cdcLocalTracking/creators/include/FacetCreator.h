@@ -25,53 +25,46 @@ namespace Belle2 {
     class FacetCreator {
 
     public:
+      /// Constructor with the default filter.
       FacetCreator() : m_facetFilter() {;}
+
+      /// Constructor taking the facet filter with externally setup parameters
       FacetCreator(const FacetFilter& facetFilter) : m_facetFilter(facetFilter) {;}
+
+      /// Empty deconstructor
       ~FacetCreator() {;}
 
-      //in types
+      /// The neighborhood type used to generate wire hit triples
       typedef WeightedNeighborhood<const CDCWireHit> Neighborhood;
 
+      /// Creates the facets from the given wire hits and the neighborhood among them, pushes the results into the given sortable facets vector and sorts it.
       template<class CDCWireHitMayBePtrRange>
       void createFacets(const CDCWireHitMayBePtrRange& wirehits,
                         const Neighborhood& neighborhood,
                         SortableVector<CDCRecoFacet>& facets) const {
-
         createFacetsGeneric(wirehits, neighborhood, facets);
         facets.sort();
 
       }
 
-      template<class CDCWireHitMayBePtrRange>
-      void createFacets(const CDCWireHitMayBePtrRange& wirehits,
-                        const Neighborhood& neighborhood,
-                        std::set<CDCRecoFacet>& facets) const {
-        createFacetsGeneric(wirehits, neighborhood, facets);
-      }
-
-      template<class CDCWireHitMayBePtrRange>
-      void createFacets(const CDCWireHitMayBePtrRange& wirehits,
-                        const Neighborhood& neighborhood,
-                        std::vector<CDCRecoFacet>& facets) const {
-        createFacetsGeneric(wirehits, neighborhood, facets);
-        std::sort(facets.begin(), facets.end());
-      }
 
 
-
+      /// Forwards the modules initialize method to the filter.
       void initialize() {
         m_facetFilter.initialize();
       }
 
 
 
+      /// Forwards the modules terminate method to the filter
       void terminate() {
         m_facetFilter.terminate();
       }
 
 
-    private:
 
+    private:
+      /// Generates facets on the given wire hits generating neighboring triples of hits. Inserts the result to the end of the GenericFacetCollection.
       template<class CDCWireHitMayBePtrRange, class GenericFacetCollection>
       void createFacetsGeneric(const CDCWireHitMayBePtrRange& wirehits,
                                const Neighborhood& neighborhood,
@@ -109,6 +102,7 @@ namespace Belle2 {
         //B2DEBUG(200,"#GroupsOfThree " << nGroupsOfThree);
       }
 
+      /// Generates reconstruted facets on the three given wire hits by hypothesizing over the 8 left right passage combinations. Inserts the result to the end of the GenericFacetCollection.
       template<class GenericFacetCollection>
       void createFacetsForHitTriple(const CDCWireHit* startWireHit,
                                     const CDCWireHit* middleWireHit,
@@ -128,7 +122,7 @@ namespace Belle2 {
             for (const CDCRLWireHit & endRLWireHit : endRLWireHits) {
 
               CDCRecoFacet facet(&startRLWireHit, &middleRLWireHit, &endRLWireHit, ParameterLine2D());
-              // do not set the lines yet. The filter shall do that if he wants to.
+              // do not set the lines yet. The filter shall do that if it wants to.
               // He should set them if he accepts the facet.
 
               //Obtain a constant interface to pass to the filter method following
@@ -146,7 +140,7 @@ namespace Belle2 {
       }
 
     private:
-      FacetFilter m_facetFilter;
+      FacetFilter m_facetFilter; ///< Instance of the filter used to judge the hit triple quality.
 
     }; //end class FacetCreator
   } //end namespace CDCLocalTracking

@@ -19,6 +19,7 @@ namespace Belle2 {
     /** Retrieves the Tag of a type, which is a dedicated member type named Tag.*/
     template<class TaggedType>
     struct GetTagImpl {
+      /// Tag type unpacked from the TaggedType.
       typedef typename TaggedType::Tag type;
     };
 

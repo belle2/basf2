@@ -32,6 +32,7 @@ namespace Belle2 {
       ~CDCRecoHit3DVector() {;}
 
     public:
+      /// Sums the squared distances to the trajectory of all hits in the vector.
       FloatType getSquaredZDist(const CDCTrajectorySZ& trajectorySZ) const;
 
     private:

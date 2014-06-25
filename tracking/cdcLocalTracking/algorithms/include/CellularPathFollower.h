@@ -188,7 +188,7 @@ namespace Belle2 {
 
       }
 
-
+      /// Helper function determining if the given neighbor is one of the best to be followed. Since this is an algebraic property on comparision to the other alternative is necessary.
       bool isHighestNeighbor(const Item* item, const Weight& relationWeight, const Item* neighbor) const {
 
         return (not neighbor->getAutomatonCell().hasCycleFlag() and

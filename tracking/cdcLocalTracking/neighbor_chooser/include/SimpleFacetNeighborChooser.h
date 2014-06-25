@@ -20,9 +20,11 @@ namespace Belle2 {
     class SimpleFacetNeighborChooser : public BaseFacetNeighborChooser {
 
     public:
-      /** Constructor. */
+      /// Constructor using default direction of flight deviation cut off.
       SimpleFacetNeighborChooser() : m_allowedDeviationCos(cos(PI / 180.0 * 180.0))
       {;}
+
+      /// Constructor using given direction of flight deviation cut off.
       SimpleFacetNeighborChooser(FloatType allowedDeviationCos) : m_allowedDeviationCos(allowedDeviationCos)
       {;}
 
@@ -64,7 +66,7 @@ namespace Belle2 {
       }
 
     private:
-      FloatType m_allowedDeviationCos;
+      FloatType m_allowedDeviationCos;  ///< Memory for the used direction of flight deviation.
 
     }; // end class
 

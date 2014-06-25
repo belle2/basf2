@@ -29,9 +29,10 @@ namespace Belle2 {
       /// Empty constructor
       TrackOrientator();
 
-      /** Destructor.*/
+      /// Empty destructor.
       virtual ~TrackOrientator();
 
+      /// Set the orientation marker of each track to FORWARD or BACKWARD. Currently trivially implemented as going outward.
       void markOrientation(std::vector<CDCTrack>& tracks) const;
 
     private:

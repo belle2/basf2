@@ -106,8 +106,7 @@ namespace Belle2 {
       /// Forwards the terminate method from the module
       void terminate() {;}
 
-
-
+      /// Returns a two iterator range covering the range of possible neighboring wire hits of the given facet out of the sorted range given by the two other argumets.
       template<class CDCWireHitIterator>
       boost::iterator_range<CDCWireHitIterator> getPossibleNeighbors(const CDCWireHit& wireHit, const CDCWireHitIterator& itBegin, const CDCWireHitIterator& itEnd) const {
 

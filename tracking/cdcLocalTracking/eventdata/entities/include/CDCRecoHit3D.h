@@ -48,11 +48,7 @@ namespace Belle2 {
       /// Default constructor for ROOT compatibility.
       CDCRecoHit3D();
 
-      /// Standard constructor
-      /** Constructor taking a stored variables of the reconstructed hit.
-       *  @param rlWireHit the oriented wire hit the reconstructed hit is assoziated with
-       *  @param postion the absolute position of the reconstructed hit
-       *  @param perpS   the travel distance as seen from the xy projection */
+      /// Constructor taking all stored variables of the reconstructed hit.
       CDCRecoHit3D(const CDCRLWireHit* rlWireHit, const Vector3D& position, FloatType perpS = 0);
 
     public:

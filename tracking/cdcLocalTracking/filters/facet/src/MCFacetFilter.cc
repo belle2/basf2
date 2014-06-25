@@ -24,9 +24,6 @@ using namespace CDCLocalTracking;
 
 MCFacetFilter::MCFacetFilter() {;}
 
-MCFacetFilter::~MCFacetFilter() {;}
-
-
 CellState MCFacetFilter::isGoodFacet(const CDCRecoFacet& facet) const
 {
   bool isCorrectFacet = isCorrect(facet, 3);

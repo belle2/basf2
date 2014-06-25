@@ -19,10 +19,26 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-SimpleFacetFilter::SimpleFacetFilter(): m_allowedDeviationCos(cos(PI / 180.0 * 9)) {;}
-SimpleFacetFilter::SimpleFacetFilter(FloatType allowedDeviationCos): m_allowedDeviationCos(allowedDeviationCos) {;}
 
-SimpleFacetFilter::~SimpleFacetFilter() {;}
+
+
+
+
+SimpleFacetFilter::SimpleFacetFilter():
+  m_allowedDeviationCos(cos(PI / 180.0 * 9))
+{
+}
+
+
+
+
+
+SimpleFacetFilter::SimpleFacetFilter(FloatType allowedDeviationCos):
+  m_allowedDeviationCos(allowedDeviationCos)
+{
+}
+
+
 
 
 

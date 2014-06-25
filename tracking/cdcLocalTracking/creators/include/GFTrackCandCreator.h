@@ -30,17 +30,18 @@ namespace Belle2 {
       /** Destructor.*/
       ~GFTrackCandCreator() {;}
 
+      /// Translates all CDCTracks to genfit tracks
       void create(const std::vector<CDCTrack>& cdcTracks,
                   StoreArray<genfit::TrackCand>& gfTrackCands) const;
 
     private:
+      /// Copies the hit content of the CDCTrack to the genfit track and sets its initial parameters.
       void create(const CDCTrack& track, genfit::TrackCand& gfTrackCand) const;
 
-
+      /// Copies the hit content of the CDCTrack to the genfit track.
       inline void appendHits(const CDCTrack& track, genfit::TrackCand& gfTrackCand) const;
 
     private:
-
 
     }; // end class WireHitCreator
 

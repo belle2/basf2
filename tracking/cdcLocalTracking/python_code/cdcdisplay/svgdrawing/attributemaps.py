@@ -159,6 +159,10 @@ class RLColorMap(CDCHitColorMap):
             self.bkgHitColor
 
     def __str__(self):
+        """
+        Informal string summarizing the translation from right left passage variable to colors.
+        """
+
         return 'Local right left passage variable: green <-> right, red <-> left, orange <-> not determinable.'
 
 
@@ -185,6 +189,10 @@ class PosFlagColorMap(CDCHitColorMap):
             self.bkgHitColor
 
     def __str__(self):
+        """
+        Informal string summarizing the translation from CDCSimHit::getPosFlag variable to colors.
+        """
+
         return 'PosFlag variable of the related CDCSimHit: green <-> 0 (Right), red <-> 1 (Left), orange <-> determinable.'
 
 
@@ -429,7 +437,7 @@ orange->beam background
 class CDCSegmentColorMap:
 
     """
-    Base class for Segments to color  map functional objects.
+    Base class for Segments to color map functional objects.
     """
 
     ## Default color to be used
@@ -444,6 +452,10 @@ class CDCSegmentColorMap:
 
 
 class SegmentMCTrackIdColorMap(CDCSegmentColorMap):
+
+    """
+    Segment to color map based on the matched MCTrackId
+    """
 
     def __call__(self, iSegment, segment):
         """
@@ -464,30 +476,9 @@ class SegmentMCTrackIdColorMap(CDCSegmentColorMap):
 
 class SegmentFBInfoColorMap(CDCSegmentColorMap):
 
-    def __call__(self, iSegment, segment):
-        """
-        Function call to map a segments object from the local finder to a color.
-        """
-
-        mcSegmentLookUp = \
-            Belle2.CDCLocalTracking.CDCMCSegmentLookUp.getInstance()
-
-        # Just to look at matched segments
-        mcTrackId = mcSegmentLookUp.getMCTrackId(segment)
-        if mcTrackId < 0:
-            return self.bkgSegmentColor
-
-        fbInfo = mcSegmentLookUp.isForwardOrBackwardToMCTrack(segment)
-        if fbInfo == 1:
-            return 'green'
-        elif fbInfo == -1:
-            return 'red'
-        else:
-            print 'Segment not orientable to match track'
-            return self.bkgSegmentColor
-
-
-class SegmentFBInfoColorMap(CDCSegmentColorMap):
+    """
+    Segment to color map based on the forward or backward alignment relative to the match Monte Carlo track.
+    """
 
     def __call__(self, iSegment, segment):
         """

@@ -30,7 +30,13 @@ namespace Belle2 {
 
     public:
 
-      enum Shape { ILLSHAPED = 0 , ORTHO = 1, META = 2, PARA = 3, };
+      /// Enum of the different shapes of three neighboring hits (up to mirror and rotational symmetries).
+      enum Shape {
+        ILLSHAPED = 0,
+        ORTHO = 1,
+        META = 2,
+        PARA = 3,
+      };
 
     public:
 

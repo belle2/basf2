@@ -44,6 +44,7 @@ namespace Belle2 {
       void setTrajectoryOf(const CDCSegmentTriple& segmentTriple) const;
 
     private:
+      /// Instance of the cell filter to reject neighborhoods of false cells.
       MCAxialAxialSegmentPairFilter m_mcAxialAxialSegmentPairFilter;
     }; // end class MCSegmentTripleFilter
   } //end namespace CDCLocalTracking

@@ -24,18 +24,20 @@ namespace Belle2 {
       /** Constructor. */
       /** This is as well the parameter free I/O constructor.
        */
-
       CDCSZFitter();
 
       /** Destructor. */
       ~CDCSZFitter();
 
+      /// Update the trajectory with a fit in the sz direction to the three dimensional hits
       void update(CDCTrajectorySZ& trajectory, const CDCRecoHit3DVector& recohits) const {
         std::vector<FloatType> observations;
         fillObservations(recohits, observations);
         update(trajectory, observations);
       }
 
+    private:
+      /// Appends the s and z values of all given hits to the given vector.
       void fillObservations(const CDCRecoHit3DVector& recohits, std::vector<FloatType>& observations) const {
         for (CDCRecoHit3DVector::const_iterator itRecoHit = recohits.begin();
              itRecoHit != recohits.end(); ++itRecoHit) {
@@ -43,12 +45,15 @@ namespace Belle2 {
         }
       }
 
+      /// Appends the s and z value of the given hits to the given vector.
       void fillObservation(const Belle2::CDCLocalTracking::CDCRecoHit3D& recohit, std::vector<FloatType>& observations) const {
         observations.push_back(recohit.getPerpS());
         observations.push_back(recohit.getRecoPos3D().z());
       }
 
+
     private:
+      /// Update the trajectory with a fit in the sz direction to the vector of s and z values setup by fillObservations.
       void update(CDCTrajectorySZ& trajectorySZ, std::vector<FloatType>& observations) const {
 
         size_t nObservations = observations.size() / 2;
@@ -57,12 +62,14 @@ namespace Belle2 {
 
       }
 
+      /// Update the trajectory with a fit in the sz direction to the vector of s and z values setup by fillObservations optimizing the direct euclidian distance in sz space.
       void updateOptimizeSZDistance(
         CDCTrajectorySZ& trajectorySZ,
         FloatType* observations,
         size_t nObservations
       ) const;
 
+      /// Update the trajectory with a fit in the sz direction to the vector of s and z values setup by fillObservations optimizing the z distance in sz space.
       void updateOptimizeZDistance(
         CDCTrajectorySZ& trajectorySZ,
         FloatType* observations,

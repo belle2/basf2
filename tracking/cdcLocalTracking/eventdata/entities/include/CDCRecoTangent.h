@@ -42,10 +42,10 @@ namespace Belle2 {
     public:
 
       /// Constructs a line touching two circles in one point each.
-      /** @param fromCenter first circle center
-       *  @param signedFromRadius radius of the first circle multiplied with the right left passage information
-       *  @param toCenter second circle center
-       *  @param signedToRadius radius of the first circle multiplied with the right left passage information.
+      /** @param[in] fromCenter first circle center
+       *  @param[in] fromSignedRadius radius of the first circle multiplied with the right left passage information
+       *  @param[in] toCenter second circle center
+       *  @param[in] toSignedRadius radius of the first circle multiplied with the right left passage information.
        *  @return the line being tangential to both circles.
        *  Note : the touch points reside at(0) for the first and at(1) for the second */
       static ParameterLine2D constructTouchingLine(

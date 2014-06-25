@@ -76,8 +76,8 @@ void MCParticleGenerator::addParticle(MCParticle& mcParticle,
   G4PrimaryParticle* g4Mother = lastG4Mother;
 
   //Check if the particle should be added to Geant4
-  //Only add particle if its PDG code is known to Geant4 and it is not flagged as virtual.
-  bool addToG4 = !mcParticle.isVirtual();
+  //Only add particle if its PDG code is known to Geant4 and it is not flagged as virtual or initial.
+  bool addToG4 = (!mcParticle.isVirtual()) && (!mcParticle.isInitial());
 
   //MS: distinguish optical photon from the rest of particles
   bool opticalPhoton = mcParticle.getPDG() == 0 && mcParticle.getEnergy() < 10.0 * Unit::eV;

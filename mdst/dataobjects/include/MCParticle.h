@@ -48,7 +48,8 @@ namespace Belle2 {
       c_StableInGenerator = 2,   /**< bit 1:  Particle is stable in the generator. */
       c_LeftDetector      = 4,   /**< bit 2:  Particle left the detector (the simulation volume). */
       c_StoppedInDetector = 8,   /**< bit 3:  Particle was stopped in the detector (the simulation volume). */
-      c_IsVirtual         = 16   /**< bit 4:  Particle is virtual and not going to Geant4 */
+      c_IsVirtual         = 16,  /**< bit 4:  Particle is virtual and not going to Geant4 */
+      c_Initial           = 32   /**< bit 5:  Particle is initial such as ISR and not going to Geant4 */
     };
 
 
@@ -296,6 +297,12 @@ namespace Belle2 {
     bool isVirtual() const;
 
     /**
+     * Check if particle is an initial particle such as ISR
+     *
+     */
+    bool isInitial() const;
+
+    /**
      * Set PDG code of the particle.
      * @param pdg The PDG code of the MonteCarlo particle.
      */
@@ -457,6 +464,11 @@ namespace Belle2 {
      */
     void setVirtual() {  addStatus(c_IsVirtual); }
 
+    /**
+     * Set particle to initial. (A bit more convinient)
+     */
+    void setInitial() {  addStatus(c_Initial); }
+
 
   protected:
 
@@ -505,7 +517,7 @@ namespace Belle2 {
     Const::DetectorSet m_seenIn;  /**< Each bit is a seen-in flag for the corresoponding subdetector of Belle II */
 
     /** Class definition required for the creation of the ROOT dictionary. */
-    ClassDef(MCParticle, 4);
+    ClassDef(MCParticle, 5);
   };
 
 
@@ -522,6 +534,11 @@ namespace Belle2 {
       virtuality = (fabs(E2 - (p2 + m2)) > c_epsilon * E2);
     }
     return virtuality;
+  }
+
+  inline bool MCParticle::isInitial() const
+  {
+    return hasStatus(c_Initial);
   }
 
 

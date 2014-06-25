@@ -189,6 +189,14 @@ namespace Belle2 {
       bool isForwardTrajectory(const CDCTrajectory2D& trajectory2D) const
       { return getTotalPerpS(trajectory2D) > 0.0; }
 
+      /// Checks if the last entity in the vector lies greater or lower travel distance than the last entity.
+      /** Returns:
+       *  * FORWARD if the last entity lies behind the first.
+       *  * BACKWARD if the last entity lies before the first.
+       */
+      ForwardBackwardInfo isCoaligned(const CDCTrajectory2D& trajectory2D) const
+      { return sign(getTotalPerpS(trajectory2D)); }
+
     private:
       /// ROOT Macro to make CDCGenHitVector a ROOT class.
       ClassDefInCDCLocalTracking(CDCGenHitVector, 1);

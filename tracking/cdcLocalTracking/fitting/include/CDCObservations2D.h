@@ -104,6 +104,21 @@ namespace Belle2 {
         }
       }
 
+      /// Appends all reconstructed hits from the two axial segments, usePosition indicates whether the absolute position shall be used instead of the oriented wire hit information.
+      void append(const CDCAxialAxialSegmentPair& axialAxialSegmentPair, bool usePosition = false) {
+        const CDCRecoSegment2D* ptrStartSegment2D = axialAxialSegmentPair.getStart();
+        if (ptrStartSegment2D) {
+          const CDCRecoSegment2D& startSegment2D = *ptrStartSegment2D;
+          append(startSegment2D, usePosition);
+        }
+
+        const CDCRecoSegment2D* ptrEndSegment2D = axialAxialSegmentPair.getEnd();
+        if (ptrEndSegment2D) {
+          const CDCRecoSegment2D& endSegment2D = *ptrEndSegment2D;
+          append(endSegment2D, usePosition);
+        }
+      }
+
       /// Moves all observations passively such that the given vector becomes to origin of the new coordinate system
       void centralize(const Vector2D& origin);
 

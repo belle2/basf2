@@ -108,6 +108,20 @@ namespace Belle2 {
 
       }
 
+      /// Checks if the last entity in the vector lies greater or lower travel distance than the last entity.
+      /** Returns:
+       *  * FORWARD if the last entity lies behind the first.
+       *  * BACKWARD if the last entity lies before the first.
+       */
+      ForwardBackwardInfo isCoaligned(const CDCTrajectory2D& trajectory2D) const {
+        ForwardBackwardInfo startIsCoaligned = getStart()->isCoaligned(trajectory2D);
+        ForwardBackwardInfo endIsCoaligned = getEnd()->isCoaligned(trajectory2D);
+
+        if (startIsCoaligned == FORWARD and endIsCoaligned == FORWARD) return FORWARD;
+        else if (startIsCoaligned == BACKWARD and endIsCoaligned == BACKWARD) return BACKWARD;
+        else return INVALID_INFO;
+      }
+
       /// Getter for the automaton cell.
       AutomatonCell& getAutomatonCell() { return m_automatonCell; }
 

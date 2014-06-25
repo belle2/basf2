@@ -213,6 +213,17 @@ namespace Belle2 {
       /// Calculates the closest approach to the two dimensional origin
       Vector2D closestToOrigin() const;
 
+      /// Calculates if the to vector is closer to the from vector following the along orientation of the circle or against.
+      /** Returns:
+       *  * FORWARD in case the to vector is closer following the along the orientation
+       *  * BACKWARD in case the to vector is closer against the orientation.
+       *  * UNKNOWN_INFO if neither can be determined.
+       */
+      ForwardBackwardInfo isForwardOrBackwardOf(const Vector2D& from, const Vector2D& to) const {
+        Vector2D difference = to - from;
+        Vector2D tangentialAtFrom = tangential(from);
+        return tangentialAtFrom.isForwardOrBackwardOf(difference);
+      }
 
       /// Returns the end point which is first reached if one follows the forward direction of the circle starting from the start point
       /**
@@ -339,6 +350,7 @@ namespace Belle2 {
       inline FloatType openingAngle(const Vector2D& from, const Vector2D& to) const
       { return gradient(from).angleWith(gradient(to)); } //not optimal in number of computations
 
+
       /// Calculates the arc length between two points of closest approach on the circle.
       /**
        * The arc length is signed positiv for travel in orientation direction.
@@ -348,11 +360,20 @@ namespace Belle2 {
        * before we take the length on the curve.
        * For the line case the length is the distance component parallel to the line.
        */
-      inline FloatType lengthOnCurve(const Vector2D& from, const Vector2D& to) const {
-        return isLine() ?
-               to.fastOrthogonalComp(n12()) - from.fastOrthogonalComp(n12()) : // use fastParallelComp here because n12() is of unit length in the n3 == 0 zero case
-               openingAngle(from, to) / 2 / n3();
-      }
+      FloatType lengthOnCurve(const Vector2D& from, const Vector2D& to) const;
+
+    private:
+      /// Helper function the calculate the factor between the length of a secant line and the length on the arc.
+      /**
+       *  Smooth function expressing the relation between arc length and direct length
+       *  only using the curvature of the circle as additional information.
+       *  It enables better handling of the line limit compared to the former implementaiton
+       *  which used the opening angle of the arc.
+       */
+      FloatType arcLengthFactor(const FloatType& directDistance) const;
+
+    public:
+
 
       /// Debug helper
       friend std::ostream& operator<<(std::ostream& output, const GeneralizedCircle& circle) {

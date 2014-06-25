@@ -12,9 +12,12 @@
 
 #include <framework/logging/Logger.h>
 
+#include <boost/math/tools/precision.hpp>
 #include <cmath>
 
 using namespace std;
+using namespace boost::math;
+
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
@@ -218,6 +221,59 @@ Vector2D GeneralizedCircle::samePolarRForwardOf(const Vector2D& startPoint, cons
   pair<Vector2D, Vector2D> candidatePoints = samePolarR(polarR);
   return chooseNextForwardOf(startPoint, candidatePoints.first, candidatePoints.second);
 
+}
+
+
+
+FloatType GeneralizedCircle::lengthOnCurve(const Vector2D& from, const Vector2D& to) const
+{
+  ForwardBackwardInfo lengthSign = isForwardOrBackwardOf(from, to);
+  if (lengthSign == INVALID_INFO) return NAN;
+
+  // Handling the rare case that from and to correspond to opposing points on the circle
+  if (lengthSign == UNKNOWN_INFO) lengthSign = 1;
+
+  Vector2D closestAtFrom = closest(from);
+  Vector2D closestAtTo = closest(to);
+  FloatType directDistance = closestAtFrom.distance(closestAtTo);
+
+  return lengthSign * arcLengthFactor(directDistance) * directDistance;
+}
+
+
+
+FloatType GeneralizedCircle::arcLengthFactor(const FloatType& directDistance) const
+{
+  FloatType x = directDistance * signedCurvature() / 2.0;
+
+  // Implementation of asin(x)/x
+  // Inspired by BOOST's sinc
+  BOOST_MATH_STD_USING;
+
+  FloatType const taylor_n_bound = tools::forth_root_epsilon<FloatType>();
+
+  if (abs(x) >= taylor_n_bound) {
+    return  asin(x) / x;
+
+  } else {
+    // approximation by taylor series in x at 0 up to order 0
+    FloatType result = 1.0;
+
+    FloatType const taylor_0_bound = tools::epsilon<FloatType>();
+    if (abs(x) >= taylor_0_bound) {
+      FloatType x2 = x * x;
+      // approximation by taylor series in x at 0 up to order 2
+      result -= x2 / 6.0;
+
+      FloatType const taylor_2_bound = tools::root_epsilon<FloatType>();
+      if (abs(x) >= taylor_2_bound) {
+        // approximation by taylor series in x at 0 up to order 4
+        result += x2 * x2 * (3.0 / 40.0);
+
+      }
+    }
+    return result;
+  }
 }
 
 

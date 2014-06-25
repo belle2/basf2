@@ -12,9 +12,12 @@
 
 #include <framework/logging/Logger.h>
 
+#include <boost/math/tools/precision.hpp>
 #include <cmath>
 
 using namespace std;
+using namespace boost::math;
+
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
@@ -26,10 +29,10 @@ Vector2D StandardOriginCircle2D::closest(const Vector2D& point) const
   if (fastDistance(point) == 0) return point;
 
   //solve the minization | point - pointOnCirlce | ^2 subjected to the on circle constraint
-  //                     1.0                   * m_n0 +
-  //                     point.x()             * m_n1 +
-  //                     point.y()             * m_n2 +
-  //                     point.polarRSquared() * m_n3 == 0
+  //                     1.0                   * n0 +
+  //                     point.x()             * n1 +
+  //                     point.y()             * n2 +
+  //                     point.polarRSquared() * n3 == 0
 
   //solved with a lagrangian muliplicator for the constraint
 
@@ -43,7 +46,7 @@ Vector2D StandardOriginCircle2D::closest(const Vector2D& point) const
   FloatType nOrthogonal = n12().fastOrthogonalComp(coordinateSystem);
   FloatType nParallel = n12().fastParallelComp(coordinateSystem);
 
-  FloatType closestParallel = 0.0;
+  FloatType closestParallel = NAN;
   if (isLine()) {
     closestParallel = - (nOrthogonal * closestOrthogonal + n0()) / nParallel;
 
@@ -65,6 +68,7 @@ Vector2D StandardOriginCircle2D::closest(const Vector2D& point) const
   }
   return Vector2D::compose(coordinateSystem, closestParallel, closestOrthogonal);
 }
+
 
 
 
@@ -106,8 +110,8 @@ Vector2D StandardOriginCircle2D::chooseNextForwardOf(const Vector2D& start, cons
 
 pair<Vector2D, Vector2D> StandardOriginCircle2D::samePolarR(const FloatType& R) const
 {
-  //extraploted to r
-  //solve
+  // extraploted to r
+  // solve
   // n0 + n1*x + n2*y + n3*r*r == 0
   // and r = R
   //search for x and y
@@ -129,6 +133,60 @@ pair<Vector2D, Vector2D> StandardOriginCircle2D::samePolarR(const FloatType& R) 
   return result;
 
 }
+
+
+
+FloatType StandardOriginCircle2D::lengthOnCurve(const Vector2D& from, const Vector2D& to) const
+{
+  ForwardBackwardInfo lengthSign = isForwardOrBackwardOf(from, to);
+  if (lengthSign == INVALID_INFO) return NAN;
+
+  // Handling the rare case that from and to correspond to opposing points on the circle
+  if (lengthSign == UNKNOWN_INFO) lengthSign = 1;
+
+  Vector2D closestAtFrom = closest(from);
+  Vector2D closestAtTo = closest(to);
+  FloatType directDistance = closestAtFrom.distance(closestAtTo);
+
+  return lengthSign * arcLengthFactor(directDistance) * directDistance;
+}
+
+
+
+FloatType StandardOriginCircle2D::arcLengthFactor(const FloatType& directDistance) const
+{
+  FloatType x = directDistance * signedCurvature() / 2.0;
+
+  // Implementation of asin(x)/x
+  // Inspired by BOOST's sinc
+  BOOST_MATH_STD_USING;
+
+  FloatType const taylor_n_bound = tools::forth_root_epsilon<FloatType>();
+
+  if (abs(x) >= taylor_n_bound) {
+    return  asin(x) / x;
+
+  } else {
+    // approximation by taylor series in x at 0 up to order 0
+    FloatType result = 1.0;
+
+    FloatType const taylor_0_bound = tools::epsilon<FloatType>();
+    if (abs(x) >= taylor_0_bound) {
+      FloatType x2 = x * x;
+      // approximation by taylor series in x at 0 up to order 2
+      result += x2 / 6.0;
+
+      FloatType const taylor_2_bound = tools::root_epsilon<FloatType>();
+      if (abs(x) >= taylor_2_bound) {
+        // approximation by taylor series in x at 0 up to order 4
+        result += x2 * x2 * (3.0 / 40.0);
+
+      }
+    }
+    return result;
+  }
+}
+
 
 
 Vector2D StandardOriginCircle2D::samePolarR(const Vector2D& point) const

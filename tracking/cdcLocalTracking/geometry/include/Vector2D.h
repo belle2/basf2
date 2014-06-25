@@ -289,6 +289,21 @@ namespace Belle2 {
       inline bool isCWOf(const Vector2D& rhs) const
       { return isCCWOrCWOf(rhs) == CW; }
 
+
+      /// Indicates if the given vector is more coaligned or reverse if you looked in the direction of this vector.
+      inline ForwardBackwardInfo isForwardOrBackwardOf(const Vector2D& rhs) const
+      { return CDCLocalTracking::sign(fastParallelComp(rhs)); }
+
+      /// Indicates if the given vector is more coaligned if you looked in the direction of this vector.
+      inline bool isForwardOf(const Vector2D& rhs) const
+      { return isForwardOrBackwardOf(rhs) == FORWARD; }
+
+      /// Indicates if the given vector is more Reverse if you looked in the direction of this vector.
+      inline bool isBackwardOf(const Vector2D& rhs) const
+      { return isForwardOrBackwardOf(rhs) == BACKWARD; }
+
+
+
       /// Swaps the coordinates in place
       inline void swapCoordinates() { std::swap(m_x, m_y); }
 

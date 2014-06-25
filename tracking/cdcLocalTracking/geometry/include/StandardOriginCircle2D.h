@@ -47,14 +47,17 @@ namespace Belle2 {
 
     private:
       ///Setter for first circle parameter. Makes _no_ normalization after setting. Use is discouraged.
-      inline void setSignedCurvature(const FloatType& signedCurvature) { m_signedCurvature = signedCurvature; }
+      inline void setSignedCurvature(const FloatType& signedCurvature)
+      { m_signedCurvature = signedCurvature; }
 
     public:
       ///Getter for the signed curvature
-      inline const FloatType& signedCurvature() const { return m_signedCurvature; }
+      inline const FloatType& signedCurvature() const
+      { return m_signedCurvature; }
 
       ///Getter for the absolute value of curvature
-      inline FloatType curvature() const { return fabs(m_signedCurvature); }
+      inline FloatType curvature() const
+      { return fabs(m_signedCurvature); }
 
 
       /** @name Generalized Circle parameters
@@ -62,17 +65,24 @@ namespace Belle2 {
        */
       /**@{*/
       ///Getter for the first circle parameter
-      inline FloatType n0() const { return 0.0; }
+      inline FloatType n0() const
+      { return 0.0; }
 
       ///Getter for the second circle parameter
-      inline FloatType n1() const { return -sign(signedCurvature()) * 1.0; }
+      inline FloatType n1() const
+      { return -sign(signedCurvature()) * 1.0; }
+
       ///Getter for the third circle parameter
-      inline FloatType n2() const { return 0.0; }
+      inline FloatType n2() const
+      { return 0.0; }
 
       ///Getter for the second and third circle parameter which natuarally from a vector
-      inline Vector2D n12() const { return Vector2D(n1(), n2()); }
+      inline Vector2D n12() const
+      { return Vector2D(n1(), n2()); }
+
       ///Getter for the fourth circle parameter
-      inline FloatType n3() const { return signedCurvature() / 2.0; }
+      inline FloatType n3() const
+      { return signedCurvature() / 2.0; }
       /**@}*/
 
       /// Sets the signed curvature to zero
@@ -103,7 +113,7 @@ namespace Belle2 {
        * @return Gradient of the distance field
        */
       inline Vector2D gradient(const Vector2D& point) const {
-        Vector2D result = point * (2.0 * n3());
+        Vector2D result = point * signedCurvature();
         result += n12();
         return result;
       }
@@ -131,7 +141,8 @@ namespace Belle2 {
        * @param point Point in the plane to calculate the tangential
        * @return Unit tangential vector to the circle line
        */
-      inline Vector2D tangential(const Vector2D& point) const { return normal(point).orthogonal(); }
+      inline Vector2D tangential(const Vector2D& point) const
+      { return normal(point).orthogonal(); }
 
       ///Closest approach on the circle to the point
       /**
@@ -142,7 +153,21 @@ namespace Belle2 {
       Vector2D closest(const Vector2D& point) const;
 
       /// Calculates the closest approach to the two dimensional origin
-      Vector2D closestToOrigin() const { return Vector2D(0.0, 0.0); }
+      Vector2D closestToOrigin() const
+      { return Vector2D(0.0, 0.0); }
+
+
+      /// Calculates if the to vector is closer to the from vector following the along orientation of the circle or against.
+      /** Returns:
+       *  * FORWARD in case the to vector is closer following the along the orientation
+       *  * BACKWARD in case the to vector is closer against the orientation.
+       *  * UNKNOWN_INFO if neither can be determined.
+       */
+      ForwardBackwardInfo isForwardOrBackwardOf(const Vector2D& from, const Vector2D& to) const {
+        Vector2D difference = to - from;
+        Vector2D tangentialAtFrom = tangential(from);
+        return tangentialAtFrom.isForwardOrBackwardOf(difference);
+      }
 
 
       /// Returns the end point which is first reached if one follows the forward direction of the circle starting from the start point
@@ -203,6 +228,18 @@ namespace Belle2 {
       inline FloatType distanceToOrigin() const
       { return 0.0; }
 
+      /// Gives the signed distance of the origin to the circle
+      inline FloatType impact() const
+      { return 0; }
+
+      /// Gives the minimal polar r the circle reaches (unsigned)
+      inline FloatType minimalPolarR() const
+      { return 0; }
+
+      /// Gives the maximal polar r the circle reaches
+      inline FloatType maximalPolarR() const
+      { return radius(); }
+
       /// Gives the proper absolute distance of the point to the circle line.
       inline FloatType absoluteDistance(const Vector2D& point) const
       { return fabs(distance(point)); }
@@ -220,15 +257,20 @@ namespace Belle2 {
       { return isRightOrLeft(rhs) == RIGHT; }
 
       /// Indicates if the generalized circle is actually a line
-      inline bool isLine() const { return signedCurvature() == 0.0; }
+      inline bool isLine() const
+      { return signedCurvature() == 0.0; }
+
       /// Indicates if the generalized circle is actually a circle
-      inline bool isCircle() const { return signedCurvature() != 0.0; }
+      inline bool isCircle() const
+      { return signedCurvature() != 0.0; }
 
       /// Gives the radius of the circle. If it was a line this will be infinity
-      inline FloatType radius() const { return 1 / curvature(); }
+      inline FloatType radius() const
+      { return 1 / curvature(); }
 
       /// Gives the signed radius of the circle. If it was a line this will be infinity
-      inline FloatType signedRadius() const { return 1 / signedCurvature(); }
+      inline FloatType signedRadius() const
+      { return 1 / signedCurvature(); }
 
       /// Gives the center of the circle. If it was a line both components will be infinity
       inline Vector2D center() const
@@ -261,11 +303,20 @@ namespace Belle2 {
        * before we take the length on the curve.
        * For the line case the length is the distance component parallel to the line.
        */
-      inline FloatType lengthOnCurve(const Vector2D& from, const Vector2D& to) const {
-        return isLine() ?
-               to.fastOrthogonalComp(n12()) - from.fastOrthogonalComp(n12()) : // use fastParallelComp here because n12() is of unit length in the n3 == 0 zero case
-               openingAngle(from, to) / 2 / n3();
-      }
+      FloatType lengthOnCurve(const Vector2D& from, const Vector2D& to) const;
+
+    public:
+      /// Helper function the calculate the factor between the length of a secant line and the length on the arc.
+      /**
+       *  Smooth function expressing the relation between arc length and direct length
+       *  only using the curvature of the circle as additional information.
+       *  It enables better handling of the line limit compared to the former implementaiton
+       *  which used the opening angle of the arc.
+       */
+      FloatType arcLengthFactor(const FloatType& directDistance) const;
+
+    public:
+
 
       /// Debug helper
       friend std::ostream& operator<<(std::ostream& output, const StandardOriginCircle2D& standardOriginCircle2D)

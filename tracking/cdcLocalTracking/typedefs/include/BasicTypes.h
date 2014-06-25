@@ -59,6 +59,15 @@ namespace Belle2 {
     const SignType PLUS = 1; ///< Constant for plus sign
     const SignType MINUS = -1; ///< Constant for minus sign
     const SignType ZERO = 0;  ///< Constant for undefined sign
+    const SignType INVALID_SIGN = -32768;
+
+    /// Return the opposite sign. Leaves INVALID_SIGN the same.
+    inline SignType oppositeSign(const SignType& s)
+    { return SignType(-s); }
+
+    /// Returns true if sign is PLUS, MINUS or ZERO
+    inline bool isValidSign(const SignType& s)
+    { return std::abs(s) <= 1; }
     /**@}*/
 
     /** @name Wire and layer ids */

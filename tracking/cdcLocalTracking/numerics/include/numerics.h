@@ -19,11 +19,6 @@ namespace Belle2 {
 
   namespace CDCLocalTracking {
 
-    ///Returns the sign of a number
-    template<class Number>
-    inline SignType sign(Number x)
-    { return x > 0 ? PLUS : (x < 0 ? MINUS : ZERO); }
-
     ///Checks if an integer is even
     template<class IntNumber>
     inline bool isEven(const IntNumber& x)
@@ -38,6 +33,18 @@ namespace Belle2 {
     template<class FloatNumber>
     inline bool isNAN(const FloatNumber& x)
     { return x != x; }
+
+    ///Returns the sign of an integer number
+    inline SignType sign(int x)
+    { return x > 0 ? PLUS : (x < 0 ? MINUS : ZERO); }
+
+    ///Returns the sign of a floating point number.
+    /** Essentially return the signbit of the float.
+     *  This means 0.0 has sign PLUS while -0.0 has sign MINUS
+     *  NAN is treat specially and returns an INVALID_SIGN
+     */
+    inline SignType sign(double x)
+    { return isNAN(x) ? INVALID_SIGN : (std::signbit(x) ? MINUS : PLUS); }
 
     /// Returns the two roots in pq formula
     /** Calculates the two roots of the parabola x*x + p*x + q = 0 in a rather stable manner \n

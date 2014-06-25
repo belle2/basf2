@@ -63,6 +63,20 @@ CDCObservations2D::EigenObservationMatrix CDCObservations2D::getObservationMatri
 }
 
 
+Vector2D CDCObservations2D::getCentralPoint() const
+{
+  size_t nObservations = size();
+  if (nObservations == 0) return Vector2D(NAN, NAN);
+
+  size_t iCentralObservation = nObservations / 2;
+
+  FloatType centralX = m_observations[iCentralObservation * 3];
+  FloatType centralY = m_observations[iCentralObservation * 3 + 1];
+
+  return Vector2D(centralX, centralY);
+}
+
+
 
 void CDCObservations2D::centralize(const Vector2D& origin)
 {
@@ -72,20 +86,12 @@ void CDCObservations2D::centralize(const Vector2D& origin)
 }
 
 
+
 Vector2D CDCObservations2D::centralize()
 {
-  size_t nObservations = size();
-  if (nObservations == 0) return Vector2D(NAN, NAN);
-
-  size_t iCentralObservation = nObservations / 2;
-
-  FloatType centralX = m_observations[iCentralObservation * 3];
-  FloatType centralY = m_observations[iCentralObservation * 3 + 1];
-  Vector2D centralPoint(centralX, centralY);
-
+  Vector2D centralPoint = getCentralPoint();
   centralize(centralPoint);
   return centralPoint;
-
   // May refine somehow
   // EigenObservationMatrix eigenObservations = getObservationMatrix();
   // RowVector2f meanPoint = eigenObservations.leftCols<2>.colwise().mean();

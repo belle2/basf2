@@ -119,6 +119,10 @@ namespace Belle2 {
         }
       }
 
+
+      /// Extracts the observation center that is at the index in the middle.
+      Vector2D getCentralPoint() const;
+
       /// Moves all observations passively such that the given vector becomes to origin of the new coordinate system
       void centralize(const Vector2D& origin);
 

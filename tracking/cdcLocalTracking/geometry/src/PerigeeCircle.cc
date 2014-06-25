@@ -14,6 +14,7 @@
 
 #include <boost/math/tools/precision.hpp>
 #include <cmath>
+#include <boost/math/special_functions/sinc.hpp>
 
 using namespace std;
 using namespace boost::math;
@@ -124,3 +125,11 @@ PerigeeCircle PerigeeCircle::fromPerigeeParameters(const FloatType& curvature,
   return circle;
 }
 
+
+
+Vector2D PerigeeCircle::atPerpS(const FloatType& perpS) const
+{
+  FloatType atX =  perpS * cosc(perpS * curvature()) + impact();
+  FloatType atY =  -perpS * sinc_pi(perpS * curvature());
+  return Vector2D::compose(-n12().unit(), atX, atY);
+}

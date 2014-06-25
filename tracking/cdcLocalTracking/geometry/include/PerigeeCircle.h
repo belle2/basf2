@@ -252,6 +252,9 @@ namespace Belle2 {
         receivePerigeeParameters();
       }
 
+      /// Calculates the point, which lies at the give perpendicular travel distance (counted from the perigee)
+      Vector2D atPerpS(const FloatType& perpS) const;
+
 
       ///Getter for the signed curvature.
       inline const FloatType& curvature() const

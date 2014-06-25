@@ -13,6 +13,8 @@
 #include <framework/logging/Logger.h>
 
 #include <boost/math/tools/precision.hpp>
+
+#include <boost/math/special_functions/sinc.hpp>
 #include <cmath>
 
 using namespace std;
@@ -385,4 +387,12 @@ std::pair<Vector2D, Vector2D> GeneralizedCircle::intersections(const Generalized
 
   return make_pair(Vector2D::compose(unitC, xParallel, xOrthogonal.first),
                    Vector2D::compose(unitC, xParallel, xOrthogonal.second));
+}
+
+
+Vector2D GeneralizedCircle::atPerpS(const FloatType& perpS) const
+{
+  FloatType atX =  perpS * cosc(perpS * curvature()) + impact();
+  FloatType atY =  -perpS * sinc_pi(perpS * curvature());
+  return Vector2D::compose(-n12().unit(), atX, atY);
 }

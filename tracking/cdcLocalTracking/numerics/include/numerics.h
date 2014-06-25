@@ -46,6 +46,12 @@ namespace Belle2 {
      */
     SignType sign(double x);
 
+    /// The harmonic conjugated of sinc.
+    /** The cosine cardinalis function, which is the sibling of the sine cardinalis.
+     *  Both form the real and imaginary part of (1 - e(ix) / x) */
+    FloatType cosc(FloatType x);
+
+
     /// Returns the two roots in pq formula
     /** Calculates the two roots of the parabola x*x + p*x + q = 0 in a rather stable manner \n
      *  The first value of the returned pair is the solution with the bigger absolut value. \n

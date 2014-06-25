@@ -439,6 +439,11 @@ namespace Belle2 {
       /** If the two points coincide both returned points are the same. If there is no common point both returned points will be  made of NAN.*/
       std::pair<Vector2D, Vector2D> intersections(const GeneralizedCircle& generalizedCircle) const;
 
+
+      /// Calculates the point, which lies at the give perpendicular travel distance (counted from the perigee)
+      Vector2D atPerpS(const FloatType& perpS) const;
+
+
     public:
       /// Debug helper
       friend std::ostream& operator<<(std::ostream& output, const GeneralizedCircle& circle) {

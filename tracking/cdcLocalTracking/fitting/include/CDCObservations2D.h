@@ -124,7 +124,7 @@ namespace Belle2 {
       Vector2D getCentralPoint() const;
 
       /// Moves all observations passively such that the given vector becomes to origin of the new coordinate system
-      void centralize(const Vector2D& origin);
+      void passiveMoveBy(const Vector2D& origin);
 
       /// Picks one observation as a reference point and transform all observations to that new origin
       Vector2D centralize();

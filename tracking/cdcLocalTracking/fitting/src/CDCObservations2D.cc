@@ -78,7 +78,7 @@ Vector2D CDCObservations2D::getCentralPoint() const
 
 
 
-void CDCObservations2D::centralize(const Vector2D& origin)
+void CDCObservations2D::passiveMoveBy(const Vector2D& origin)
 {
   Matrix< FloatType, 1, 2 >  eigenOrigin(origin.x(), origin.y());
   EigenObservationMatrix eigenObservations = getObservationMatrix();
@@ -89,13 +89,14 @@ void CDCObservations2D::centralize(const Vector2D& origin)
 
 Vector2D CDCObservations2D::centralize()
 {
+  // Pick an observation at the center
   Vector2D centralPoint = getCentralPoint();
-  centralize(centralPoint);
+  passiveMoveBy(centralPoint);
   return centralPoint;
+
   // May refine somehow
   // EigenObservationMatrix eigenObservations = getObservationMatrix();
   // RowVector2f meanPoint = eigenObservations.leftCols<2>.colwise().mean();
-  // Pick an observation at the center
 }
 
 

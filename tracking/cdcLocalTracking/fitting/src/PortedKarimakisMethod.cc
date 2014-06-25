@@ -48,9 +48,9 @@ void PortedKarimakisMethod::update(CDCTrajectory2D& trajectory2D,
   Vector2D ref = observations2D.getCentralPoint();
   B2INFO("Reference point " << ref);
 
-  observations2D.centralize(ref);
+  observations2D.passiveMoveBy(ref);
 
-  UncertainPerigeeCircle perigeeCircle =  fit(observations2D);
+  UncertainPerigeeCircle perigeeCircle = fit(observations2D);
 
   FloatType frontX = observations2D.getX(0);
   FloatType frontY = observations2D.getY(0);
@@ -70,7 +70,7 @@ void PortedKarimakisMethod::update(CDCTrajectory2D& trajectory2D,
 
   trajectory2D.setCircle(perigeeCircle);
 
-// Logical start position of the travel distance scale
+  // Logical start position of the travel distance scale
   trajectory2D.setStartPos2D(ref);
 }
 

@@ -45,47 +45,23 @@ namespace Belle2 {
       /// Empty deconstructor
       ~CDCGenHit();
 
-
-      /** @name Equality comparision
-       *  Based on the equality of the wire and the dummy position */
-      /**@{*/
       /// Equality comparision based the wire and the dummy position.
       bool operator==(const CDCGenHit& other) const
       { return getWire() == other.getWire() and getDummyPos2D() == other.getDummyPos2D(); }
 
-      /// Equality comparision based on the wire and the dummy position usable with pointer.
-      bool inline IsEqual(const CDCGenHit* const& other) const
-      { return other == nullptr ? false : operator==(*other); }
-
-      /// Equality comparision based on on the wire and the dummy position usable with two pointer.
-      static inline bool ptrIsEqual(const CDCGenHit* lhs , const CDCGenHit* rhs)
-      { return lhs == nullptr ? (rhs == nullptr ? true : false) : lhs->IsEqual(rhs); }
-      /**@}*/
-
-      /** @name Total ordering
-       *  Comparing the wire first and the dummy position second. Hence generic hits are coaligned with the wires.*/
-      /**@{*/
       /// Total ordering relation based on the wire and the dummy position.
-      bool operator<(const CDCGenHit& other) const
-      { return getWire() < other.getWire() or (getWire() == other.getWire() and getDummyPos2D() < other.getDummyPos2D()); }
-
-
-      /// Defines wires and dummy hits to be coaligned on the wire on which they are based.
-      friend bool operator<(const CDCGenHit& genHit, const CDCWire& wire) { return genHit.getWire() < wire; }
+      bool operator<(const CDCGenHit& other) const {
+        return getWire() < other.getWire() or
+               (getWire() == other.getWire() and getDummyPos2D() < other.getDummyPos2D());
+      }
 
       /// Defines wires and dummy hits to be coaligned on the wire on which they are based.
-      friend bool operator<(const CDCWire& wire, const CDCGenHit& genHit) { return wire < genHit.getWire(); }
+      friend bool operator<(const CDCGenHit& genHit, const CDCWire& wire)
+      { return genHit.getWire() < wire; }
 
-
-      /// Total ordering relation based on the wire and the dummy position usable with pointers.
-      bool inline IsLessThan(const CDCGenHit* const& other) const
-      { return other == nullptr ? false : operator<(*other); }
-
-      /// Total ordering relation based on the wire and the dummy position usable with two pointer
-      static inline bool ptrIsLessThan(const CDCGenHit* lhs , const CDCGenHit* rhs)
-      { return rhs == nullptr ? false : (lhs == nullptr ? true : *lhs < *rhs); }
-      /**@}*/
-
+      /// Defines wires and dummy hits to be coaligned on the wire on which they are based.
+      friend bool operator<(const CDCWire& wire, const CDCGenHit& genHit)
+      { return wire < genHit.getWire(); }
 
       /** @name Mimic pointer
         */
@@ -103,11 +79,12 @@ namespace Belle2 {
       { return getWire() == wire; }
 
       /// Checks of the generic wire hit
-      bool hasWireHit(const CDCWireHit& wirehit __attribute__((unused))) const
+      bool hasWireHit(const CDCWireHit&) const
       { return false; }
 
       /// Center of mass is just the refernce position for wire hits.
-      const Vector2D& getCenterOfMass2D() const { return getDummyPos2D(); }
+      const Vector2D& getCenterOfMass2D() const
+      { return getDummyPos2D(); }
 
       /// Getter for the axial type of the underlying wire.
       AxialType getAxialType() const
@@ -149,10 +126,12 @@ namespace Belle2 {
       { return trajectory2D.getClosest(getDummyPos2D()); }
 
       /// Getter for the CDCWire the hit is located on.
-      const CDCWire& getWire() const { return *m_wire; }
+      const CDCWire& getWire() const
+      { return *m_wire; }
 
       /// The two dimensional dummy position
-      const Vector2D& getDummyPos2D() const { return m_dummyPos; }
+      const Vector2D& getDummyPos2D() const
+      { return m_dummyPos; }
 
     private:
 

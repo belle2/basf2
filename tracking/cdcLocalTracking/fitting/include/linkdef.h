@@ -13,13 +13,16 @@
 
 #pragma link C++ class Belle2::CDCLocalTracking::RiemannsMethod+;
 #pragma link C++ class Belle2::CDCLocalTracking::KarimakisMethod+;
+#pragma link C++ class Belle2::CDCLocalTracking::OriginalKarimakisMethod+;
+#pragma link C++ class Belle2::CDCLocalTracking::PortedKarimakisMethod+;
 
 #pragma link C++ class Belle2::CDCLocalTracking::CDCFitter2D<RiemannsMethod>+;
 #pragma link C++ class Belle2::CDCLocalTracking::CDCFitter2D<KarimakisMethod>+;
+#pragma link C++ class Belle2::CDCLocalTracking::CDCFitter2D<OriginalKarimakisMethod>+;
+#pragma link C++ class Belle2::CDCLocalTracking::CDCFitter2D<PortedKarimakisMethod>+;
 
 #pragma link C++ class Belle2::CDCLocalTracking::CDCRiemannFitter+;
 #pragma link C++ class Belle2::CDCLocalTracking::CDCKarimakiFitter+;
-
 
 #pragma link C++ class Belle2::CDCLocalTracking::CDCSZFitter+;
 

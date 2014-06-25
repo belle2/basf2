@@ -82,6 +82,9 @@ namespace {
     EXPECT_NEAR(generalCircle.radius(), fittedCircle.radius(), 10e-7) <<
         "Fitter " << typeid(fitter).name() << " failed.";
 
+    EXPECT_NEAR(-PI / 2.0, fittedCircle.tangentialPhi(), 10e-7) <<
+                                                                "Fitter " << typeid(fitter).name() << " failed.";
+
     B2INFO("Covariance matrix:");
     trajectory2D.getCircle().perigeeCovariance().Print();
     return trajectory2D;
@@ -99,7 +102,37 @@ TEST_F(CDCLocalTrackingTest, OriginalKarimakisMethod_CircleFit)
 TEST_F(CDCLocalTrackingTest, PortedKarimakisMethod_CircleFit)
 {
   const CDCFitter2D<PortedKarimakisMethod> fitter;
-  testCircleFitter(fitter, false);
+  CDCTrajectory2D trajectory2D = testCircleFitter(fitter, false);
+  UncertainPerigeeCircle perigeeCircle = trajectory2D.getCircle();
+  TMatrixD perigeeCovariance = perigeeCircle.perigeeCovariance();
+
+  EXPECT_NEAR(0.0003644, perigeeCovariance(0, 0), 10e-7);
+  EXPECT_NEAR(-3.028e-20, perigeeCovariance(0, 1), 10e-7);
+  EXPECT_NEAR(0.002235, perigeeCovariance(0, 2), 10e-7);
+
+  EXPECT_NEAR(-3.028e-20, perigeeCovariance(1, 0), 10e-7);
+  EXPECT_NEAR(0.002525, perigeeCovariance(1, 1), 10e-7);
+  EXPECT_NEAR(-1.265e-19, perigeeCovariance(1, 2), 10e-7);
+
+
+  EXPECT_NEAR(0.002235, perigeeCovariance(2, 0), 10e-7);
+  EXPECT_NEAR(-1.265e-19, perigeeCovariance(2, 1), 10e-7);
+  EXPECT_NEAR(0.09703616, perigeeCovariance(2, 2), 10e-7);
+
+  // 3x3 matrix is as follows
+  //      |      0    |      1    |      2    |
+  // --------------------------------------------
+  //    0 |  0.0003644  -3.028e-20    0.002235
+  //    1 | -3.028e-20    0.002525  -1.265e-19
+  //    2 |   0.002235  -1.265e-19     0.09704
+
+}
+
+
+TEST_F(CDCLocalTrackingTest, PortedKarimakisMethod_CircleFit_WithDriftLengths)
+{
+  const CDCFitter2D<PortedKarimakisMethod> fitter;
+  testCircleFitter(fitter, true);
 }
 
 

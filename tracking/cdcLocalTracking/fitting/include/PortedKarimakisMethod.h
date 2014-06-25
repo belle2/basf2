@@ -34,28 +34,17 @@ namespace Belle2 {
 
 
     private:
-      void simpleFitXY() const;
-      void addPoint(double, double, double) const;
-      int fit(double&, int&) const;
-      TVectorD getPar() const;
-      TMatrixDSym getCov() const;
+      int fit(CDCObservations2D& , double&) const;
 
     private:
       const bool _curved;
       const int _npar;
       mutable int _numPoints;
-      mutable double _sx;
-      mutable double _sy;
-      mutable double _sxx;
-      mutable double _sxy;
-      mutable double _syy;
-      mutable double _sw;
-      mutable double _sr;
-      mutable double _sxr;
-      mutable double _syr;
-      mutable double _srr;
+
+
       mutable TVectorD _parameters;
       mutable TMatrixDSym _covariance;
+
 
     public:
       /** ROOT Macro to make PortedKarimakisMethod a ROOT class.*/

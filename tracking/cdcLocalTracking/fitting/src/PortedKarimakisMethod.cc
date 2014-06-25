@@ -47,7 +47,6 @@ void PortedKarimakisMethod::update(CDCTrajectory2D& trajectory2D,
   size_t nObservations = observations2D.size();
   trajectory2D.clear();
   if (not nObservations) return;
-  simpleFitXY(true);
 
   FloatType xRef = observations2D.getX(0);
   FloatType yRef = observations2D.getY(0);
@@ -60,16 +59,10 @@ void PortedKarimakisMethod::update(CDCTrajectory2D& trajectory2D,
 
   observations2D.centralize(ref);
 
-  for (size_t iObservation = 0; iObservation < nObservations; ++iObservation) {
-    FloatType x = observations2D.getX(iObservation);
-    FloatType y = observations2D.getY(iObservation);
-    addPoint(x, y, 1.0);
-  }
-
   double Chi2 = 0;
   int nPoints = 0;
 
-  fit(Chi2, nPoints);
+  fit(observations2D, Chi2);
 
   FloatType curvature = _parameters(0);
   FloatType tangentialPhi = _parameters(1) + (_parameters(1) > 0 ? - PI : + PI);
@@ -87,146 +80,218 @@ void PortedKarimakisMethod::update(CDCTrajectory2D& trajectory2D,
   Vector2D backPos(backX, backY);
 
   FloatType totalPerps = perigeeCircle.lengthOnCurve(frontPos, backPos);
-  if (totalPerps < 0) perigeeCircle.reverse();
-
+  if (totalPerps < 0) {
+    B2INFO("Reversed");
+    perigeeCircle.reverse();
+  }
   perigeeCircle.passiveMoveBy(-ref);
   trajectory2D.setCircle(perigeeCircle);
 
 }
 
-void PortedKarimakisMethod::simpleFitXY() const
-{
-  _numPoints = 0;
-  _sx = _sy = _sxx = _sxy = _syy = _sw = 0.;
-  _sr = _sxr = _syr = _srr = 0.;
-}
 
 
-void PortedKarimakisMethod::addPoint(double x, double y, double w) const
-{
-  _numPoints++;
-  double xl = x;
-  double yl = y;
-  _sw += w;
-  _sx += w * xl;
-  _sy += w * yl;
-  _sxx += w * xl * xl;
-  _sxy += w * xl * yl;
-  _syy += w * yl * yl;
-  if (_curved) {
-    double r2 = xl * xl + yl * yl;
-    _sr += w * r2;
-    _sxr += w * r2 * xl;
-    _syr += w * r2 * yl;
-    _srr += w * r2 * r2;
+
+namespace {
+  /// Helper indices for meaningfull matrix access
+  constexpr size_t iW = 0;
+  constexpr size_t iX = 1;
+  constexpr size_t iY = 2;
+  constexpr size_t iR2 = 3;
+  constexpr size_t iL = 4;
+
+
+  UncertainPerigeeCircle fitWithDriftLength(const Matrix< FloatType, 5, 5 >& sumMatrix)
+  {
+    //Solve the normal equation X * n = y
+    Matrix< FloatType, 4, 4 > X = sumMatrix.block<4, 4>(0, 0);
+    Matrix< FloatType, 4, 1 > y = sumMatrix.block<4, 1>(0, iL);
+    Matrix< FloatType, 4, 1 > n = X.ldlt().solve(y);
+    return PerigeeCircle::fromN(n(iW), n(iX), n(iY), n(iR2));
+  }
+
+
+
+  UncertainPerigeeCircle fitWithoutDriftLength(Matrix< FloatType, 5, 5 > sumMatrix)
+  {
+    // Solve the normal equation min_n  n^T * X * n
+    // n is the smallest eigenvector
+    Matrix< FloatType, 4, 4 > X = sumMatrix.block<4, 4>(0, 0);
+    SelfAdjointEigenSolver< Matrix<FloatType, 4, 4> > eigensolver(X);
+    Matrix<FloatType, 4, 1> n = eigensolver.eigenvectors().col(0);
+
+    if (eigensolver.info() != Success) {
+      B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
+    }
+    return PerigeeCircle::fromN(n(iW), n(iX), n(iY), n(iR2));
+  }
+
+
+
+  UncertainPerigeeCircle fitWithoutDriftLengthSeperateOffset(Matrix< FloatType, 5, 1 > means,
+                                                             Matrix< FloatType, 5, 5 > c)
+  {
+    // Solve the normal equation min_n  n^T * c * n
+    // for the plane normal and move the plain by the offset
+    // n is the smallest eigenvector
+    Matrix< FloatType, 3, 3 > X = c.block<3, 3>(1, 1);
+    SelfAdjointEigenSolver< Matrix<FloatType, 3, 3> > eigensolver(X);
+    if (eigensolver.info() != Success) {
+      B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
+    }
+
+    //the eigenvalues are generated in increasing order
+    //we are interested in the lowest one since we want to compute the normal vector of the plane
+    Matrix<FloatType, 4, 1> n;
+    n.middleRows<3>(iX) = eigensolver.eigenvectors().col(0);
+    n(iW) = -means.middleRows<3>(iX).transpose() * n.middleRows<3>(iX);
+    return PerigeeCircle::fromN(n(iW), n(iX), n(iY), n(iR2));
+
+  }
+
+
+
+  UncertainPerigeeCircle fitWithoutDriftLengthOriginal(FloatType sw,
+                                                       const Matrix< FloatType, 5, 1 >& a,
+                                                       const Matrix< FloatType, 5, 5 >& c,
+                                                       bool lineConstrained = false)
+  {
+    double q1, q2 = 0.0;
+    if (not lineConstrained) {
+      q1 = c(iX, iY) * c(iR2, iR2) - c(iX, iR2) * c(iY, iR2);
+      q2 = (c(iX, iX) - c(iY, iY)) * c(iR2, iR2) - c(iX, iR2) * c(iX, iR2) + c(iY, iR2) * c(iY, iR2);
+    } else {
+      q1 = c(iX, iY);
+      q2 = c(iX, iX) - c(iY, iY);
+    }
+
+    double phi = 0.5 * atan2(2. * q1, q2);
+
+    double sinphi = sin(phi);
+    double cosphi = cos(phi);
+
+    double curv, I = 0.0;
+    if (not lineConstrained) {
+      double kappa = (sinphi * c(iX, iR2) - cosphi * c(iY, iR2)) / c(iR2, iR2);
+      double delta = -kappa * a(iR2) + sinphi * a(iX) - cosphi * a(iY);
+
+      curv = 2. * kappa / sqrt(1. - 4. * delta * kappa);
+      I = 2. * delta / (1. + sqrt(1. - 4. * delta * kappa));
+
+      double u = 1. + curv * I;
+
+      double chi2 =  sw * u * u * (sinphi * sinphi * c(iX, iX) - 2. * sinphi * cosphi * c(iX, iY) + cosphi * cosphi * c(iY, iY) - kappa * kappa * c(iR2, iR2));
+
+    } else {
+      curv = 0.0; //line
+      I = sinphi * a(iX) - cosphi * a(iY);
+
+      double chi2 = sw * (sinphi * sinphi * c(iX, iX) - 2. * sinphi * cosphi * c(iX, iY) + cosphi * cosphi * c(iY, iY));
+    }
+
+    // Karimaki uses the opposite sign for phi in contrast to the convention of this framework !!!
+    phi += phi > 0 ? -PI : PI;
+
+    return PerigeeCircle::fromPerigeeParameters(curv, phi, I);
   }
 }
 
 
-int PortedKarimakisMethod::fit(double& Chi2, int& nPoints) const
+
+int PortedKarimakisMethod::fit(CDCObservations2D& observations2D, double& Chi2) const
 {
-  // averages
-  double ax = _sx / _sw;
-  double ay = _sy / _sw;
-  double ar = _sr / _sw;
-  double axx = _sxx / _sw;
-  double ayy = _syy / _sw;
-  double axy = _sxy / _sw;
-  double axr = _sxr / _sw;
-  double ayr = _syr / _sw;
-  double arr = _srr / _sw;
-  // variances
-  double cxx = axx - ax * ax;
-  double cyy = ayy - ay * ay;
-  double cxy = axy - ax * ay;
-  double cxr = axr - ax * ar;
-  double cyr = ayr - ay * ar;
-  double crr = arr - ar * ar;
 
-  double q1, q2;
-  if (_curved) {
-    q1 = crr * cxy - cxr * cyr;
-    q2 = crr * (cxx - cyy) - cxr * cxr + cyr * cyr;
+  Matrix< FloatType, 5, 5 > s = observations2D.getWXYRLSumMatrix();
+  Matrix< FloatType, 5, 5 > a = s / s(iW);
+
+  Matrix< FloatType, 5, 1> means = a.row(iW);
+  Matrix< FloatType, 5, 5> c = a - means * means.transpose();
+
+  /// Fit te parameters
+  UncertainPerigeeCircle resultCircle;
+
+  size_t nObservationsWithDriftRadius = observations2D.getNObservationsWithDriftRadius();
+  if (nObservationsWithDriftRadius > 0) {
+    resultCircle = fitWithDriftLength(s);
   } else {
-    q1 = cxy;
-    q2 = cxx - cyy;
-  }
-  double phi = 0.5 * atan2(2. * q1, q2);
-  double sinphi = sin(phi);
-  double cosphi = cos(phi);
-
-  // compare phi with initial track direction
-  //B2INFO(ax + _xRef);
-  //B2INFO(ay + _yRef);
-  //B2INFO(cosphi);
-  //B2INFO(sinphi);
-
-  //if (cosphi * (ax + _xRef) + sinphi * (ay + _yRef) < 0.) {
-  if ((cosphi * ax + sinphi * ay) < 0.) {
-    // reverse direction
-    //B2INFO("Reversed phi");
-    phi -= (phi > 0.) ? M_PI : -M_PI;
-    cosphi = -cosphi;
-    sinphi = -sinphi;
-  } else {
-    //B2INFO("Unreversed phi");
+    //resultCircle = fitWithoutDriftLength(s);
+    //resultCircle = fitWithoutDriftLengthSeperateOffset(means, c);
+    resultCircle = fitWithoutDriftLengthOriginal(s(iW), means, c);
   }
 
-  if (_curved) {
-    double kappa = (sinphi * cxr - cosphi * cyr) / crr;
-    double delta = -kappa * ar + sinphi * ax - cosphi * ay;
-    // track parameters
-    double rho = -2. * kappa / sqrt(1. - 4. * delta * kappa);
-    double d = 2. * delta / (1. + sqrt(1. - 4. * delta * kappa));
-    _parameters[0] = rho;
-    _parameters[1] = phi;
-    _parameters[2] = d;
-    // chi2
-    double u = 1. - rho * d;
-    Chi2 = _sw * u * u * (sinphi * sinphi * cxx - 2. * sinphi * cosphi * cxy + cosphi * cosphi * cyy - kappa * kappa * crr);
-    //cout << " xyfit " << Chi2 << " " << _numPoints << " " <<_npar << ": " << rho << " " << phi << " " << d << endl;
-    // calculate covariance matrix
-    double sa = sinphi * _sx - cosphi * _sy;
-    double sb = cosphi * _sx + sinphi * _sy;
-    double sc = (sinphi * sinphi - cosphi * cosphi) * _sxy + sinphi * cosphi * (_sxx - _syy);
-    double sd = sinphi * _sxr - cosphi * _syr;
-    double saa = sinphi * sinphi * _sxx - 2. * sinphi * cosphi * _sxy + cosphi * cosphi * _syy;
-    _covariance[0][0] = 0.25 * _srr - d * (sd - d * (saa + 0.5 * _sr - d * (sa - 0.25 * d * _sw)));
-    _covariance[0][1] = u * (0.5 * (cosphi * _sxr + sinphi * _syr) - d * (sc - 0.5 * d * sb));
-    _covariance[1][0] = _covariance[0][1];
-    _covariance[1][1] = u * u * (cosphi * cosphi * _sxx + 2. * cosphi * sinphi * _sxy + sinphi * sinphi * _syy);
-    _covariance[0][2] = rho * (-0.5 * sd + d * saa) - 0.5 * u * _sr + 0.5 * d * ((3 * u - 1.) * sa - u * d * _sw);
-    _covariance[2][0] = _covariance[0][2];
-    _covariance[1][2] = -u * (rho * sc + u * sb);
-    _covariance[2][1] = _covariance[1][2];
-    _covariance[2][2] = rho * (rho * saa + 2 * u * sa) + u * u * _sw;
-  } else {
-    // track parameters
-    double d = sinphi * ax - cosphi * ay;
-    _parameters[0] = phi;
-    _parameters[1] = d;
-    // chi2
-    Chi2 = _sw * (sinphi * sinphi * cxx - 2. * sinphi * cosphi * cxy + cosphi * cosphi * cyy);
-    //cout << " xyfit " << chi2 << " " << _numPoints-_npar << ": " << phi << " " << d << endl;
-    // calculate covariance matrix
-    _covariance[0][0] = cosphi * cosphi * _sxx + 2. * cosphi * sinphi * _sxy + sinphi * sinphi * _syy;
-    _covariance[0][1] = -(cosphi * _sx + sinphi * _sy);
-    _covariance[1][0] = _covariance[0][1];
-    _covariance[1][1] = _sw;
+  const FloatType& curv = resultCircle.curvature();
+  const FloatType& I = resultCircle.impact();
+  const FloatType& phi = resultCircle.tangentialPhi();
+
+  _parameters[0] = curv;
+  _parameters[1] = phi;
+  _parameters[2] = I;
+
+  B2INFO("Curvature " << curv);
+  B2INFO("Tangential phi " << phi);
+  B2INFO("Impact " << I);
+
+
+  {
+    // Karimaki uses the opposite sign for phi in contrast to the convention of this framework !!!
+    const Vector2D vecPhi = -resultCircle.tangential();
+
+    const FloatType& cosphi = vecPhi.x();
+    const FloatType& sinphi = vecPhi.y();
+
+    const FloatType ssphi = sinphi * sinphi;
+    const FloatType scphi = sinphi * cosphi;
+    const FloatType ccphi = cosphi * cosphi;
+
+    const FloatType rho = curv;
+    const FloatType& d = I;
+
+    double u = 1. + rho * d;
+
+    if (_curved) {
+      // calculate covariance matrix
+      double sa = sinphi * s(iX) - cosphi * s(iY);
+      double sb = cosphi * s(iX) + sinphi * s(iY);
+      double sc = (ssphi - ccphi) * s(iX, iY) + scphi * (s(iX, iX) - s(iY, iY));
+
+      double sd = sinphi * s(iX, iR2) - cosphi * s(iY, iR2);
+
+      double saa = ssphi * s(iX, iX) - 2. * scphi * s(iX, iY) + ccphi * s(iY, iY);
+
+      // Not in the Karimaki paper, but factors a similar term.
+      double se = cosphi * s(iX, iR2) + sinphi * s(iY, iR2);
+      double sbb = ccphi * s(iX, iX) + 2. * scphi * s(iX, iY) + ssphi * s(iY, iY);
+
+      _covariance(0, 0) = 0.25 * s(iR2, iR2) - d * (sd - d * (saa + 0.5 * s(iR2) - d * (sa - 0.25 * d * s(iW))));
+      _covariance(0, 1) = u * (0.5 * se - d * (sc - 0.5 * d * sb));
+      _covariance(1, 0) = _covariance(0, 1);
+      _covariance(1, 1) = u * u * sbb;
+
+      _covariance(0, 2) = rho * (0.5 * sd - d * saa) - 0.5 * u * s(iR2) + 0.5 * d * ((3.  * u - 1.) * sa - u * d * s(iW));
+      _covariance(2, 0) = _covariance(0, 2);
+      _covariance(1, 2) = u * (rho * sc - u * sb);
+      _covariance(2, 1) = _covariance(1, 2);
+      _covariance(2, 2) = rho * (rho * saa - 2 * u * sa) + u * u * s(iW);
+
+    } else {
+      _covariance(0, 0) = 0.;
+      _covariance(0, 1) = 0.;
+      _covariance(0, 2) = 0.;
+      _covariance(1, 0) = 0.;
+      _covariance(2, 0) = 0.;
+
+      _covariance(1, 1) = ccphi * s(iX, iX) + 2. * scphi * s(iX, iY) + ssphi * s(iY, iY);
+      _covariance(1, 2) = -(cosphi * s(iX) + sinphi * s(iY));
+      _covariance(2, 1) = _covariance(0, 1);
+      _covariance(2, 2) = s(iW);
+    }
+    _covariance.Invert();
+
+    resultCircle.setPerigeeCovariance(_covariance);
   }
-  _covariance.Invert();
-  nPoints = _numPoints;
+
+
+
+  //nPoints = _numPoints;
   return _npar;
-}
-
-
-TVectorD PortedKarimakisMethod::getPar() const
-{
-  return _parameters;
-}
-
-
-TMatrixDSym PortedKarimakisMethod::getCov() const
-{
-  return _covariance;
 }

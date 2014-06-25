@@ -185,6 +185,27 @@ namespace Belle2 {
       /// Indicates the minimal superlayer the trajectory traverses
       ISuperLayerType getMinimalISuperLayer() const;
 
+    public:
+      /// Calculates the perpendicular travel distance from the last position of the fromEntity to the first position of the toEntity.
+      /** Entities can be all eventdata/entities , segments and tracks **/
+      template<class FromEntity, class ToEntity>
+      FloatType getPerpSGap(const FromEntity& fromEntity, const ToEntity& toEntity) const {
+        Vector2D fromRecoPos2D = fromEntity.getBackRecoPos2D(*this);
+        Vector2D toRecoPos2D = toEntity.getFrontRecoPos2D(*this);
+        return calcPerpSBetween(fromRecoPos2D, toRecoPos2D);
+      }
+
+      /// Calculates the perpendicular travel distance from the first position of the entity to the last position of the entity.
+      /** Entities can be all eventdata/entities , segments and tracks **/
+      template<class Entity>
+      FloatType getTotalPerpS(const Entity& entity) const {
+        Vector2D frontRecoPos2D = entity.getFrontRecoPos2D(*this);
+        Vector2D backRecoPos2D = entity.getBackRecoPos2D(*this);
+        return calcPerpSBetween(frontRecoPos2D, backRecoPos2D);
+      }
+
+
+
     private:
       // this class should not really be the provider of this information.
       // So use the corresponding functions which should eventually change to the correct

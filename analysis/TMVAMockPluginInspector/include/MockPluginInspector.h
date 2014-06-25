@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "analysis/TMVAMockPlugin/MethodMockPlugin.h"
+#include <vector>
 
 namespace Belle2 {
 
@@ -23,11 +23,10 @@ namespace Belle2 {
     MockPluginInspector(const MockPluginInspector&);
     MockPluginInspector() : mva_value(0) { }
 
+  public:
     float mva_value;
     std::vector<float> test_event;
     std::vector< std::vector<float> > train_events;
-
-    friend TMVA::MethodMockPlugin;
 
   };
 

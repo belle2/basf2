@@ -100,7 +100,7 @@ namespace Belle2 {
     return types;
   }
 
-  ParticleGenerator::ParticleGenerator(std::string decayString)
+  ParticleGenerator::ParticleGenerator(std::string decayString) : iParticleType(0), listIndexGenerator(), particleIndexGenerator()
   {
 
     DecayDescriptor decaydescriptor;

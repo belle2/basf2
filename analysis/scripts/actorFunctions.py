@@ -12,12 +12,15 @@
 #      seq.addFunction(foo, path='Path', particleList='K+')
 
 from basf2 import *
+from ROOT import Belle2
 import modularAnalysis
 import pdg
 
 import actorFramework
 import preCutDetermination
 import os
+import subprocess
+from string import Template
 
 
 def SelectParticleList(path, particleName, explicitCuts):
@@ -100,11 +103,11 @@ def SignalProbability(path, particleName, channelName, mvaConfig, particleList, 
         path.add_module(expert)
 
         if particleName == channelName:
-            return {'SignalProbability_' + particleName: hash,
-                    'SignalProbability_' + pdg.conjugate(particleName): hash}
+            return {'SignalProbability_' + particleName: filename,
+                    'SignalProbability_' + pdg.conjugate(particleName): filename}
         else:
-            return {'SignalProbability_' + channelName + '_' + particleName: hash,
-                    'SignalProbability_' + channelName + '_' + pdg.conjugate(particleName): hash}
+            return {'SignalProbability_' + channelName + '_' + particleName: filename,
+                    'SignalProbability_' + channelName + '_' + pdg.conjugate(particleName): filename}
 
     else:
         teacher = register_module('TMVATeacher')
@@ -177,12 +180,54 @@ def PreCutDetermination(particleName, channelNames, preCutConfig, preCutHistogra
     return results
 
 
-def PrintPreCuts(name, channels, preCuts):
-    print 'PreCuts for {name}'.format(name=name)
-    for (channel, preCut) in zip(channels, preCuts):
-        if preCut is None:
-            print 'Channel {channel} is ignored due to low statistics'.format(channel=channel)
-        else:
-            for variable, (low, high) in preCut.iteritems():
-                print 'Channel {channel} has cut on {variable} with range {low} to {high}'.format(channel=channel, variable=variable, low=low, high=high)
+def WriteAnalysisFileForChannel(particleName, channelName, preCutConfig, preCutHistogram, preCut, mvaConfig, signalProbability):
+    """
+    Creates a pdf document with the PreCut and Training plots
+        @param particleName name of the particle
+        @param channelName name of the channel
+        @param preCutConfig configuration for pre cut
+        @param preCutHistogram preCutHistogram (filename, histogram postfix)
+        @param preCut used preCuts for this channel
+        @param mvaConfig configuration for mva
+        @param signalProbability config filename for TMVA training
+    """
+
+    print "Executed Write analysis for ", particleName, " ", channelName, " ", signalProbability, " ", preCut
+    if signalProbability is None or preCut is None:
+        return {'dummy': None}
+    print "Really do it"
+
+    stripped_tmva_filename = signalProbability[:-7]  # Strip .config of filename
+    stripped_preCut_filename = preCutHistogram[0][:-5]  # Strip .root of filename
+    subprocess.call(['createAnalysisPlots', stripped_tmva_filename, stripped_preCut_filename])
+
+    placeholders = {}
+    placeholders['particleName'] = particleName
+    placeholders['channelName'] = channelName
+
+    placeholders['preCutVariable'] = preCutConfig.variable
+    placeholders['preCutEfficiency'] = preCutConfig.efficiency
+    placeholders['preCutRange'] = 'Ignored' if preCut is None else str(preCut.values()[0])
+
+    placeholders['preCutAllPlot'] = 'all.png'
+    placeholders['preCutSignalPlot'] = 'signal.png'
+    placeholders['preCutBackgroundPlot'] = 'background.png'
+    placeholders['preCutRatioPlot'] = 'ratio.png'
+
+    placeholders['mvaName'] = mvaConfig.name
+    placeholders['mvaType'] = mvaConfig.type
+    placeholders['mvaConfig'] = mvaConfig.config
+    placeholders['mvaVariables'] = ', '.join(mvaConfig.variables)
+    placeholders['mvaTarget'] = mvaConfig.target
+    placeholders['mvaTargetCluster'] = mvaConfig.targetCluster
+
+    placeholders['mvaROCPlot'] = 'roc.png'
+    placeholders['mvaOvertrainingPlot'] = 'overtraining.png'
+
+    template = Template(file(Belle2.FileSystem.findFile('analysis/scripts/FullEventInterpretationTemplate.tex'), 'r').read())
+    page = template.substitute(placeholders)
+    file(channelName + '.tex', 'w').write(page)
+    subprocess.call(['pdflatex', channelName + '.tex'])
+
     return {}
+    return {'dummy': None}

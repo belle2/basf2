@@ -99,8 +99,8 @@ class TestSignalProbability(unittest.TestCase):
         filename = 'D+:1_{hash}.config'.format(hash=hash)
         open(filename, 'a').close()
         result = SignalProbability(self.path, 'D+', 'D+ -> pi+ K-', mvaConfig, 'D+:1', ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
-        self.assertDictEqual(result, {'SignalProbability_D+ -> pi+ K-_D+': hash,
-                                      'SignalProbability_D+ -> pi+ K-_D-': hash})
+        self.assertDictEqual(result, {'SignalProbability_D+ -> pi+ K-_D+': 'D+:1_' + hash + '.config',
+                                      'SignalProbability_D+ -> pi+ K-_D-': 'D+:1_' + hash + '.config'})
         os.remove(filename)
         self.assertEqual(len(self.path.modules), 1)
 
@@ -125,8 +125,8 @@ class TestSignalProbability(unittest.TestCase):
         open(filename, 'a').close()
         result = SignalProbability(self.path, 'e+', 'e+', mvaConfig, 'e+:1')
         os.remove(filename)
-        self.assertDictEqual(result, {'SignalProbability_e+': hash,
-                                      'SignalProbability_e-': hash})
+        self.assertDictEqual(result, {'SignalProbability_e+': 'e+:1_' + hash + '.config',
+                                      'SignalProbability_e-': 'e+:1_' + hash + '.config'})
         self.assertEqual(len(self.path.modules), 1)
 
 

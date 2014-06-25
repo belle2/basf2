@@ -222,11 +222,6 @@ def FullEventInterpretation(path, particles):
                                 preCutConfig='PreCutConfig_' + particle.name,
                                 daughterLists=['ParticleList_' + daughter for daughter in channel.daughters],
                                 additionalDependencies=additionalDependencies)
-            if args.verbose:
-                seq.addFunction(PrintPreCuts,
-                                name='Name_' + particle.name,
-                                channels=['Name_' + channel.name for channel in particle.channels],
-                                preCuts=['PreCut_' + channel.name for channel in particle.channels])
 
         ########### SIGNAL PROBABILITY ACTORS #######
         # The classifier part of the FullReconstruction.
@@ -249,5 +244,16 @@ def FullEventInterpretation(path, particles):
                                     daughterSignalProbabilities=['SignalProbability_' + daughter for daughter in channel.daughters])
                 seq.addResource('SignalProbability_' + particle.name, 'Dummy', requires=['SignalProbability_' + channel.name + '_' + particle.name for channel in particle.channels])
                 seq.addResource('SignalProbability_' + pdg.conjugate(particle.name), 'Dummy', requires=['SignalProbability_' + particle.name])
+
+        ################ Information ACTORS #################
+        for channel in particle.channels:
+            seq.addFunction(WriteAnalysisFileForChannel,
+                            particleName='Name_' + particle.name,
+                            channelName='Name_' + channel.name,
+                            preCutConfig='PreCutConfig_' + particle.name,
+                            preCutHistogram='PreCutHistogram_' + channel.name,
+                            preCut='PreCut_' + channel.name,
+                            mvaConfig='MVAConfig_' + channel.name,
+                            signalProbability='SignalProbability_' + channel.name + '_' + particle.name)
 
     seq.run(path, args.verbose)

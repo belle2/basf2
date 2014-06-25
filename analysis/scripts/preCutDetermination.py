@@ -70,8 +70,10 @@ def LoadHistogramsFromFiles(files, variable, channelNames, preCutHistograms):
     for channel, file in zip(channelNames, files):
         file.cd()
         bckgrd[channel].Add(signal[channel], -1)
+        bckgrd[channel].SetTitle('Background')
         bckgrd[channel].Write('', ROOT.TObject.kOverwrite)
         ratio[channel].Divide(bckgrd[channel])
+        ratio[channel].SetTitle('Ratio')
         ratio[channel].Write('', ROOT.TObject.kOverwrite)
     return (signal, bckgrd, ratio)
 

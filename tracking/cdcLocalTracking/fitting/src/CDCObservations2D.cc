@@ -33,6 +33,7 @@ CDCObservations2D::~CDCObservations2D()
 
 size_t CDCObservations2D::getNObservationsWithDriftRadius() const
 {
+
   // Obtain an iterator an advance it to the first drift radius
   std::vector<FloatType>::const_iterator itDriftRadius = m_observations.begin();
   std::advance(itDriftRadius, 2);
@@ -60,3 +61,35 @@ CDCObservations2D::EigenObservationMatrix CDCObservations2D::getObservationMatri
   return eigenObservations;
 
 }
+
+
+
+void CDCObservations2D::centralize(const Vector2D& origin)
+{
+  RowVector2f eigenOrigin(origin.x(), origin.y());
+  EigenObservationMatrix eigenObservations = getObservationMatrix();
+  eigenObservations.leftCols<2>().rowwise() -= eigenOrigin;
+}
+
+
+Vector2D CDCObservations2D::centralize()
+{
+  size_t nObservations = size();
+  if (nObservations == 0) return Vector2D(NAN, NAN);
+
+  size_t iCentralObservation = nObservations / 2;
+
+  FloatType centralX = m_observations[iCentralObservation * 3];
+  FloatType centralY = m_observations[iCentralObservation * 3 + 1];
+  Vector2D centralPoint(centralX, centralY);
+
+  centralize(centralPoint);
+  return centralPoint;
+
+  // May refine somehow
+  // EigenObservationMatrix eigenObservations = getObservationMatrix();
+  // RowVector2f meanPoint = eigenObservations.leftCols<2>.colwise().mean();
+  // Pick an observation at the center
+}
+
+

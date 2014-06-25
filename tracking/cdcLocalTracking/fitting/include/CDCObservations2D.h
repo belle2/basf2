@@ -47,6 +47,19 @@ namespace Belle2 {
       void reserve(size_t nObservations)
       { m_observations.reserve(nObservations * 3); }
 
+      /// Getter for the x value of the observation at the given index
+      FloatType getX(const int iObservation) const
+      { return m_observations[iObservation * 3]; }
+
+      /// Getter for the y value of the observation at the  given index
+      FloatType getY(const int iObservation) const
+      { return m_observations[iObservation * 3 + 1]; }
+
+      /// Getter for the signed drift radius of the observation at the  given index
+      FloatType getSignedDriftLength(const int iObservation) const
+      { return m_observations[iObservation * 3 + 2]; }
+
+
       /// Appends the observed position - drift radius is assumed to be zero
       void append(const Belle2::CDCLocalTracking::Vector2D& pos2D, const FloatType& signedRadius = 0.0) {
         m_observations.push_back(pos2D.x());
@@ -91,13 +104,17 @@ namespace Belle2 {
         }
       }
 
+      /// Moves all observations passively such that the given vector becomes to origin of the new coordinate system
+      void centralize(const Vector2D& origin);
 
+      /// Picks one observation as a reference point and transform all observations to that new origin
+      Vector2D centralize();
 
       /// Returns the number of observations having a drift radius radius
       size_t getNObservationsWithDriftRadius() const;
 
 #ifndef __CINT__
-      //Hide this methode from CINT since it does not like the Eigen Library to much
+      //Hide this methods from CINT since it does not like the Eigen Library to much
       /// Returns the observations structured as an Eigen matrix
       /** This returns a reference to the stored observations. Note that operations may alter the content of the underlying memory and render it useless for subceeding calculations.*/
       EigenObservationMatrix getObservationMatrix();

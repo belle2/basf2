@@ -263,11 +263,11 @@ int PortedKarimakisMethod::fit(CDCObservations2D& observations2D, double& Chi2) 
       double sbb = ccphi * s(iX, iX) + 2. * scphi * s(iX, iY) + ssphi * s(iY, iY);
 
       _covariance(0, 0) = 0.25 * s(iR2, iR2) - d * (sd - d * (saa + 0.5 * s(iR2) - d * (sa - 0.25 * d * s(iW))));
-      _covariance(0, 1) = u * (0.5 * se - d * (sc - 0.5 * d * sb));
+      _covariance(0, 1) = - u * (0.5 * se - d * (sc - 0.5 * d * sb));
       _covariance(1, 0) = _covariance(0, 1);
       _covariance(1, 1) = u * u * sbb;
 
-      _covariance(0, 2) = rho * (0.5 * sd - d * saa) - 0.5 * u * s(iR2) + 0.5 * d * ((3.  * u - 1.) * sa - u * d * s(iW));
+      _covariance(0, 2) = rho * (-0.5 * sd + d * saa) + 0.5 * u * s(iR2) - 0.5 * d * ((2 * u + rho * d) * sa - u * d * s(iW));
       _covariance(2, 0) = _covariance(0, 2);
       _covariance(1, 2) = u * (rho * sc - u * sb);
       _covariance(2, 1) = _covariance(1, 2);

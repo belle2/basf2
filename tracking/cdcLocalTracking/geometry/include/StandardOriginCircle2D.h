@@ -11,6 +11,8 @@
 #define STANDARDORIGINCIRCLE_H
 
 #include <cmath>
+#include "TMatrixD.h"
+
 
 #include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
@@ -45,8 +47,8 @@ namespace Belle2 {
       /// Empty destructor
       ~StandardOriginCircle2D() {;}
 
-    private:
-      ///Setter for first circle parameter. Makes _no_ normalization after setting. Use is discouraged.
+
+      ///Setter for first circle parameter. Makes _no_ normalization after setting. Use is discouraged
       inline void setSignedCurvature(const FloatType& signedCurvature)
       { m_signedCurvature = signedCurvature; }
 
@@ -153,6 +155,10 @@ namespace Belle2 {
       Vector2D closest(const Vector2D& point) const;
 
       /// Calculates the closest approach to the two dimensional origin
+      Vector2D perigee() const
+      { return Vector2D(0.0, 0.0); }
+
+      /// Calculates the closest approach to the two dimensional origin
       Vector2D closestToOrigin() const
       { return Vector2D(0.0, 0.0); }
 
@@ -228,9 +234,15 @@ namespace Belle2 {
       inline FloatType distanceToOrigin() const
       { return 0.0; }
 
-      /// Gives the signed distance of the origin to the circle
+      /// Gives the signed distance of the origin to the circle.
       inline FloatType impact() const
       { return 0; }
+
+
+      /// Gives the tangential direction of flight at the perigee.
+      inline Vector2D tangential() const
+      { return n12().orthogonal(); }
+
 
       /// Gives the minimal polar r the circle reaches (unsigned)
       inline FloatType minimalPolarR() const

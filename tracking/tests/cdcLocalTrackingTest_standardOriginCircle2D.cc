@@ -113,8 +113,3 @@ TEST_F(CDCLocalTrackingTest, StandardOriginCircle2D_lengthOnCurve)
   EXPECT_NEAR(0, reverseLine.lengthOnCurve(origin, far), 10e-7);
 
 }
-
-
-
-
-

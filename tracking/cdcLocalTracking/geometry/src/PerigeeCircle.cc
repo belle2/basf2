@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2012 - Belle II Collaboration                             *
+ * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Oliver Frost                                             *
@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/GeneralizedCircle.h"
+#include "../include/PerigeeCircle.h"
 
 #include <framework/logging/Logger.h>
 
@@ -21,64 +21,18 @@ using namespace boost::math;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-ClassImpInCDCLocalTracking(GeneralizedCircle)
+ClassImpInCDCLocalTracking(PerigeeCircle)
 
-
-GeneralizedCircle::GeneralizedCircle() : m_n3(0.0), m_n12(0.0, 0.0), m_n0(0.0) { ; }
-
-GeneralizedCircle::GeneralizedCircle(const FloatType& n0, const FloatType& n1,
-                                     const FloatType& n2, const FloatType& n3) :
-  m_n3(n3), m_n12(n1, n2), m_n0(n0) { normalize(); }
-
-GeneralizedCircle::GeneralizedCircle(const FloatType& n0,
-                                     const Vector2D& n12,
-                                     const FloatType& n3):
-  m_n3(n3), m_n12(n12), m_n0(n0) { normalize(); }
-
-GeneralizedCircle::GeneralizedCircle(const Line2D& n012):
-  m_n3(0.0), m_n12(n012.n12()), m_n0(n012.n0()) { normalize(); }
-
-
-GeneralizedCircle::GeneralizedCircle(const Circle2D& circle):
-  m_n3(1.0 / 2.0 / circle.signedRadius()),
-  m_n12(- circle.center().x() * (m_n3 * 2.0)  ,
-        - circle.center().y() * (m_n3 * 2.0)),
-  m_n0((circle.center().normSquared() - circle.radiusSquared()) * m_n3)
-{;}
-
-GeneralizedCircle::GeneralizedCircle(const Vector2D& center,
-                                     const FloatType& radius,
-                                     const CCWInfo& orientation):
-  m_n3(orientation / 2.0 / radius),
-  m_n12(- center.x() * m_n3 * 2.0,
-        - center.y() * m_n3 * 2.0),
-  m_n0((center.normSquared() - radius* radius) * m_n3) { ; }
-
-
-void GeneralizedCircle::setCenterAndRadius(const Vector2D& circleCenter,
-                                           const FloatType& r,
-                                           const CCWInfo& orientation)
-{
-
-  FloatType signedCurvature = orientation / fabs(r);
-  setN0((circleCenter.normSquared() - r * r) * signedCurvature / 2.0);
-  setN1(-circleCenter.x() * signedCurvature);
-  setN2(-circleCenter.y() * signedCurvature);
-  setN3(signedCurvature / 2.0);
-  normalize(); // the call to normalize should be superfluous
-
-}
-
-Vector2D GeneralizedCircle::closest(const Vector2D& point) const
+Vector2D PerigeeCircle::closest(const Vector2D& point) const
 {
 
   if (fastDistance(point) == 0) return point;
 
   //solve the minization | point - pointOnCirlce | ^2 subjected to the on circle constraint
-  //                     1.0                   * m_n0 +
-  //                     point.x()             * m_n1 +
-  //                     point.y()             * m_n2 +
-  //                     point.polarRSquared() * m_n3 == 0
+  //                     1.0                   * n0 +
+  //                     point.x()             * n1 +
+  //                     point.y()             * n2 +
+  //                     point.polarRSquared() * n3 == 0
 
   //solved with a lagrangian muliplicator for the constraint
 
@@ -92,7 +46,7 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
   FloatType nOrthogonal = n12().fastOrthogonalComp(coordinateSystem);
   FloatType nParallel = n12().fastParallelComp(coordinateSystem);
 
-  FloatType closestParallel = 0.0;
+  FloatType closestParallel = NAN;
   if (isLine()) {
     closestParallel = - (nOrthogonal * closestOrthogonal + n0()) / nParallel;
 
@@ -115,14 +69,10 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
   return Vector2D::compose(coordinateSystem, closestParallel, closestOrthogonal);
 }
 
-Vector2D GeneralizedCircle::perigee() const
-{
-  Vector2D result(n12());
-  result.setPolarR(-impact());
-  return result;
-}
 
-Vector2D GeneralizedCircle::chooseNextForwardOf(const Vector2D& start, const Vector2D& end1, const Vector2D& end2) const
+
+
+Vector2D PerigeeCircle::chooseNextForwardOf(const Vector2D& start, const Vector2D& end1, const Vector2D& end2) const
 {
 
   FloatType lengthOnCurve1 = lengthOnCurve(start, end1);
@@ -144,7 +94,7 @@ Vector2D GeneralizedCircle::chooseNextForwardOf(const Vector2D& start, const Vec
       //both lengths on curve have a negative sign
       //the candidate with the lesser length on curve wins because of the discontinuaty
       //unless the generalized circle is a line
-      //in this case their is no forward intersection with the same polar radius
+      //in this case their is no forward intersection
       if (isLine()) {
         return Vector2D(NAN, NAN);
       } else {
@@ -158,10 +108,10 @@ Vector2D GeneralizedCircle::chooseNextForwardOf(const Vector2D& start, const Vec
 
 }
 
-pair<Vector2D, Vector2D> GeneralizedCircle::samePolarR(const FloatType& R) const
+pair<Vector2D, Vector2D> PerigeeCircle::samePolarR(const FloatType& R) const
 {
-  //extraploted to r
-  //solve
+  // extraploted to r
+  // solve
   // n0 + n1*x + n2*y + n3*r*r == 0
   // and r = R
   //search for x and y
@@ -185,7 +135,25 @@ pair<Vector2D, Vector2D> GeneralizedCircle::samePolarR(const FloatType& R) const
 }
 
 
-Vector2D GeneralizedCircle::samePolarR(const Vector2D& point) const
+
+FloatType PerigeeCircle::lengthOnCurve(const Vector2D& from, const Vector2D& to) const
+{
+  ForwardBackwardInfo lengthSign = isForwardOrBackwardOf(from, to);
+  if (lengthSign == INVALID_INFO) return NAN;
+
+  // Handling the rare case that from and to correspond to opposing points on the circle
+  if (lengthSign == UNKNOWN_INFO) lengthSign = 1;
+
+  Vector2D closestAtFrom = closest(from);
+  Vector2D closestAtTo = closest(to);
+  FloatType directDistance = closestAtFrom.distance(closestAtTo);
+
+  return lengthSign * m_standardOriginCircle.arcLengthFactor(directDistance) * directDistance;
+}
+
+
+
+Vector2D PerigeeCircle::samePolarR(const Vector2D& point) const
 {
 
   const FloatType R = point.norm();
@@ -213,75 +181,16 @@ Vector2D GeneralizedCircle::samePolarR(const Vector2D& point) const
 
 }
 
-Vector2D GeneralizedCircle::samePolarRForwardOf(const Vector2D& startPoint, const FloatType& polarR) const
+Vector2D PerigeeCircle::samePolarRForwardOf(const Vector2D& startPoint, const FloatType& polarR) const
 {
-
   pair<Vector2D, Vector2D> candidatePoints = samePolarR(polarR);
   return chooseNextForwardOf(startPoint, candidatePoints.first, candidatePoints.second);
-
 }
 
 
 
-FloatType GeneralizedCircle::lengthOnCurve(const Vector2D& from, const Vector2D& to) const
+FloatType PerigeeCircle::distance(const Vector2D& point) const
 {
-  ForwardBackwardInfo lengthSign = isForwardOrBackwardOf(from, to);
-  if (lengthSign == INVALID_INFO) return NAN;
-
-  // Handling the rare case that from and to correspond to opposing points on the circle
-  if (lengthSign == UNKNOWN_INFO) lengthSign = 1;
-
-  Vector2D closestAtFrom = closest(from);
-  Vector2D closestAtTo = closest(to);
-  FloatType directDistance = closestAtFrom.distance(closestAtTo);
-
-  return lengthSign * arcLengthFactor(directDistance) * directDistance;
-}
-
-
-
-FloatType GeneralizedCircle::arcLengthFactor(const FloatType& directDistance) const
-{
-  FloatType x = directDistance * signedCurvature() / 2.0;
-
-  // Implementation of asin(x)/x
-  // Inspired by BOOST's sinc
-  BOOST_MATH_STD_USING;
-
-  FloatType const taylor_n_bound = tools::forth_root_epsilon<FloatType>();
-
-  if (abs(x) >= taylor_n_bound) {
-    return  asin(x) / x;
-
-  } else {
-    // approximation by taylor series in x at 0 up to order 0
-    FloatType result = 1.0;
-
-    FloatType const taylor_0_bound = tools::epsilon<FloatType>();
-    if (abs(x) >= taylor_0_bound) {
-      FloatType x2 = x * x;
-      // approximation by taylor series in x at 0 up to order 2
-      result -= x2 / 6.0;
-
-      FloatType const taylor_2_bound = tools::root_epsilon<FloatType>();
-      if (abs(x) >= taylor_2_bound) {
-        // approximation by taylor series in x at 0 up to order 4
-        result += x2 * x2 * (3.0 / 40.0);
-
-      }
-    }
-    return result;
-  }
-}
-
-
-
-
-FloatType GeneralizedCircle::distance(const Vector2D& point) const
-{
-
-  //this is the approximated distance also used for the fit
-  //can be correct for second order deviations if nessecary
   const FloatType fastD = fastDistance(point);
 
   if (fastD == 0.0 or isLine()) {
@@ -302,3 +211,13 @@ FloatType GeneralizedCircle::distance(const Vector2D& point) const
   }
 }
 
+
+
+void PerigeeCircle::passiveMoveBy(const Vector2D& by)
+{
+  FloatType newImpact = distance(by);
+  Vector2D newTangential = tangential(by);
+
+  setImpact(newImpact);
+  setTangential(newTangential);
+}

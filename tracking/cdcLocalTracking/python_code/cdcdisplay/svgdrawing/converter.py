@@ -614,7 +614,7 @@ class CDCDataobjectsConverter:
 
             radius = fit.getGenCircle().radius()
             signedRadius = fit.getGenCircle().signedRadius()
-            impactParameter = fit.getGenCircle().distanceToOrigin()
+            impactParameter = fit.getGenCircle().impact()
 
             center = fit.getGenCircle().center()
             centerPoint = (center.x(), center.y())

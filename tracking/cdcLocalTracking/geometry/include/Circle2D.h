@@ -82,7 +82,7 @@ namespace Belle2 {
 
       /// Returns the signed distance to the origin
       /** The distance to the origin is equivalent to the first line parameter*/
-      FloatType distanceToOrigin() const
+      FloatType impact() const
       { return center().norm() * radiusSign() - signedRadius(); }
 
       /// Returns the euclidian distance of the point to the circle line
@@ -110,7 +110,7 @@ namespace Belle2 {
       }
 
       /// Returns the point closest to the origin
-      Vector2D closestToOrigin() const {
+      Vector2D perigee() const {
         Vector2D connection = center();
         connection.normalizeTo(-absRadius());
         connection += center();

@@ -51,6 +51,9 @@ namespace Belle2 {
         m_x(coordinateVec.x() * parallelCoor - coordinateVec.y() * orthoCoor),
         m_y(coordinateVec.y() * parallelCoor + coordinateVec.x() * orthoCoor) {;}
 
+      /// Constucts a unit vector with polar angle equal to phi
+      static inline Vector2D Phi(const FloatType& phi)
+      { return Vector2D(cos(phi), sin(phi)); }
 
       /// Constructs a vector from a unit coordinate system vector and the coordinates in that system
       /** Combines a coordinate system vector expressed in laboratory coordinates \n

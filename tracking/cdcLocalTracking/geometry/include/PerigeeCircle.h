@@ -1,14 +1,14 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2013 - Belle II Collaboration                             *
+ * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Oliver Frost                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef GENERALIZEDCIRCLE_H
-#define GENERALIZEDCIRCLE_H
+#ifndef PERIGEECIRCLE_H
+#define PERIGEECIRCLE_H
 
 #include <cmath>
 
@@ -16,152 +16,186 @@
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include "Vector2D.h"
-#include "Line2D.h"
-#include "Circle2D.h"
-#include "BoundSkewLine.h"
+#include "StandardOriginCircle2D.h"
+
 
 namespace Belle2 {
 
   namespace CDCLocalTracking {
 
-    ///A generalized circle
+    ///A circle through the origin which center lies on the positive x-axis
     /** Makes a smooth generalization from a two dimensional normal line ( like Line2D ) to a circle \n
-     *  The parameterisation is best suited for low curvature circle. The representation takes four \n
-     *  parameters. They correspond to the normal circle parameters like \n
-     *  n0 = (m_x*m_x + m_y*m_y - r*r)/2r \n
-     *  n1 = -m_x/r \n
-     *  n2 = -m_y/r \n
-     *  n3 = 1/2r \n
-     *  where the normalization condtion is n1*n1 + n2*n2 - 4 * n0 * n3 = 1. \n
-     *  The overall sign is fixed in the following way: If the last parameter is positiv the circle \n
-     *  is assummed to be orientated counterclockwise else the circle is assummed to be orientated clockwise.\n
-     *  The parameters n1 and n2 are indeed a vector in two dimensions and we keep them stored as Vector2D. \n
-     *  Additionally we can represent a line with same parameters by setting n3 = 0. Compare Line2D.
+     *  since its single parameter is its curvature. This may serve as a base class for other low curvature
+     *  circles, because the general case is similar the the standard circle up to translational and rotational
+     *  transformations.
+     *  This circle is implemented as a parameter curve. The parameter along the curve is the distance on the
+     *  circle from the origin. It can carry an orientation in the sign of the curvature.
      */
-
-    class GeneralizedCircle : public CDCLocalTracking::UsedTObject {
+    class PerigeeCircle : public UsedTObject {
 
     public:
 
       /// Default constructor for ROOT compatibility.
-      GeneralizedCircle();
+      PerigeeCircle() {;}
 
-      /// Constructor with the four parameters of the generalized circle
-      GeneralizedCircle(const FloatType& n0,
-                        const FloatType& n1,
-                        const FloatType& n2,
-                        const FloatType& n3 = 0);
+      /// Constructor with the signed curvature as single parameter
+      PerigeeCircle(const FloatType& signedCurvature) :
+        m_standardOriginCircle(signedCurvature),
+        m_tangentialPhi(copysign(PI / 2.0 , -signedCurvature)),
+        m_tangential(Vector2D(0.0, -sign(signedCurvature))),
+        m_impact(0)
+      {;}
 
-      /// Constructor with the four parameters of the generalized circle
-      GeneralizedCircle(const FloatType& n0,
-                        const Vector2D& n12,
-                        const FloatType& n3 = 0);
+      /// Constructor taking the perigee and a signed curvature, the polar angle of the flight direction at the perigee and the signed impact parameter
+      PerigeeCircle(const FloatType& signedCurvature,
+                    const FloatType& tangentialPhi,
+                    const FloatType& impact) :
+        m_standardOriginCircle(signedCurvature),
+        m_tangentialPhi(tangentialPhi),
+        m_tangential(Vector2D::Phi(tangentialPhi)),
+        m_impact(impact)
+      {;}
 
-      /// Constructor from a two dimensional line
-      GeneralizedCircle(const Line2D& n012);
+      /// Empty destructor
+      ~PerigeeCircle() {;}
 
-      /// Constructor from a two dimensional circle
-      GeneralizedCircle(const Circle2D& circle);
-
-      /// Constructor from center, radius and a optional orientation
-      /** The center and radius alone do not carry any orientation. However the generalized circle does.
-       *  This constructor makes an orientated representation from them. If not given the orientation defaults to
-       *  mathematical positiv counterclockwise. */
-      GeneralizedCircle(const Vector2D& center,
-                        const FloatType& radius,
-                        const CCWInfo& orientation = CCW);
-
-      /** Destructor. */
-      ~GeneralizedCircle() { ; }
-
-    private:
+    public:
       ///Setter for first circle parameter. Makes _no_ normalization after setting. Use is discouraged.
-      inline void setN0(const FloatType& n0) { m_n0 = n0; }
-      ///Setter for second circle parameter. Makes _no_ normalization after setting. Use is discouraged.
-      inline void setN1(const FloatType& n1) { m_n12.setX(n1); }
-      ///Setter for third circle parameter. Makes _no_ normalization after setting. Use is discouraged.
-      inline void setN2(const FloatType& n2) { m_n12.setY(n2); }
+      inline void setSignedCurvature(const FloatType& signedCurvature)
+      { m_standardOriginCircle.setSignedCurvature(signedCurvature); }
 
-      ///Setter for second and third circle parameter. Makes _no_ normalization after setting. Use is discouraged.
-      inline void setN12(const FloatType& n1, const FloatType& n2) { m_n12.setXY(n1, n2); }
+      ///Getter for the signed curvature
+      inline const FloatType& signedCurvature() const
+      { return m_standardOriginCircle.signedCurvature(); }
 
-      ///Setter for fourth circle parameter. Makes _no_ normalization after setting. Use is discouraged.
-      inline void setN3(const FloatType& n3) { m_n3 = n3; }
+      ///Getter for the absolute value of curvature
+      inline FloatType curvature() const
+      { return fabs(signedCurvature()); }
 
-    public:
-      ///Getter for the first circle parameter
-      inline const FloatType& n0() const { return m_n0; }
+      /// Sets the impact parameter of the circle
+      inline void setImpact(const FloatType& impact)
+      { m_impact = impact; }
 
-      ///Getter for the second circle parameter
-      inline const FloatType& n1() const { return m_n12.x(); }
-      ///Getter for the third circle parameter
-      inline const FloatType& n2() const { return m_n12.y(); }
+      /// Gives the signed distance of the origin to the circle
+      inline FloatType impact() const
+      { return m_impact; }
 
-      ///Getter for the second and third circle parameter which natuarally from a vector
-      inline const Vector2D& n12() const { return m_n12; }
-      ///Getter for the fourth circle parameter
-      inline const FloatType& n3() const { return m_n3; }
-
-    public:
-      /// Setter for all four circle parameters. Makes a normalization after setting.
-      /// The normal representation of a line leave out the last parameter
-      void setN(const FloatType& n0, const FloatType& n1, const FloatType& n2, const FloatType& n3 = 0.0)
-      { setN0(n0); setN12(n1, n2); setN3(n3); normalize(); }
-
-      /// Setter for the circle center and radius
-      void setCenterAndRadius(const Vector2D& circleCenter,
-                              const FloatType& r,
-                              const CCWInfo& orientation = CCW);
-
-      /// Sets all circle parameters to zero
-      void setNull()
-      { setN(0.0, 0.0, 0.0, 0.0); }
-
-      /// Indicates if all circle parameters are zero
-      inline bool isNull() const
-      { return n0() == 0 and n12().isNull() and n3() == 0; }
-
-      /// Indicates if the combination of the circle parameters makes up a valid circle
-      inline bool isValid() const
-      { return normalizationSquared() > 0; }
-
-      /// Calculates the generalized circle specific squared norm. Correctly normalized this should give one.
-      inline FloatType normalizationSquared() const
-      { return n12().normSquared() - 4 * n0() * n3(); }
-
-      ///Normalizes the circle parameters.
-      /** The normalization is only made if the circle parameters have a valid positiv
-       *  norm. If the normalization of the cirlce is negativ or zero all circle
-       *  parameters are not changed.
-       */
-      inline void normalize() {
-        FloatType normalization_squared = normalizationSquared();
-        if (normalization_squared  > 0) scaleN(1.0 / std::sqrt(normalization_squared));
+      /// Sets the polar angle of the direction of flight at the perigee
+      inline void setTangentialPhi(const FloatType& tangentialPhi) {
+        m_tangentialPhi = tangentialPhi;
+        m_tangential = Vector2D::Phi(tangentialPhi);
       }
 
-      /// Flips the orientation of the circle in place
-      inline void reverse() { scaleN(-1); }
+      /// Sets the unit direction of flight at the perigee
+      inline void setTangential(const Vector2D& tangential) {
+        m_tangentialPhi = tangential.phi();
+        m_tangential = tangential.unit();
+      }
 
-      /// Returns a copy of the circle with opposite orientation.
-      inline GeneralizedCircle reversed() const
-      { return GeneralizedCircle(-n0(), -n12(), -n3()); }
+      /// Gets the polar angle of the direction of flight at the perigee
+      inline FloatType tangentialPhi() const
+      { return m_tangentialPhi; }
 
-      /// Transforms the generalized circle to conformal space inplace
-      /** Applies the conformal map in the self-inverse from  X = x / (x^2 + y^2) and Y = y / (x^2 +y^2) inplace
-       *  It works most easily by the exchange of the circle parameters n0 <-> n3 */
-      inline void conformalTransform()
-      { std::swap(m_n0, m_n3); }
+      /// Getter for the tangtial vector at the perigee
+      inline Vector2D tangential() const
+      { return m_tangential; }
 
-      /// Returns a copy of the circle in conformal space
-      /** Applies the conformal map in the self-inverse from  X = x / (x^2 + y^2) and Y = y / (x^2 +y^2) and returns the result as a new GeneralizedCircle
-       *  It works most easily by the exchange of the circle parameters n0 <-> n3 */
-      inline GeneralizedCircle conformalTransformed() const
-      { return GeneralizedCircle(n3(), n12(), n0()); }
+      /// Getter for the perigee point
+      inline Vector2D perigee() const
+      { return tangential().orthogonal() * impact(); }
+
+
+
+      /// Indicates if the generalized circle is actually a line
+      inline bool isLine() const
+      { return signedCurvature() == 0.0; }
+
+      /// Indicates if the generalized circle is actually a circle
+      inline bool isCircle() const
+      { return signedCurvature() != 0.0; }
+
+
+
+      /// Gives the radius of the circle. If it was a line this will be infinity
+      inline FloatType radius() const
+      { return 1 / curvature(); }
+
+      /// Gives the signed radius of the circle. If it was a line this will be infinity
+      inline FloatType signedRadius() const
+      { return 1 / signedCurvature(); }
+
+      /// Gives the minimal polar r the circle reaches (unsigned)
+      inline FloatType minimalPolarR() const
+      { return 0; }
+
+      /// Gives the maximal polar r the circle reaches
+      inline FloatType maximalPolarR() const
+      { return radius(); }
+
+      /// Gives the center of the circle. If it was a line both components will be infinity
+      inline Vector2D center() const
+      { return tangential().orthogonal() * (impact() + signedRadius()); }
+
+
+
+      /** @name Generalized Circle parameters
+       *  In close relation to the generalized circle we provide the four generalized circle parameters with the same meaning as in the GeneralizedCircle class
+       */
+      /**@{*/
+      ///Getter for the first circle parameter
+      inline FloatType n0() const
+      { return impact() * (impact() * signedCurvature() / 2.0 + 1.0); }
+
+      ///Getter for the second circle parameter
+      inline FloatType n1() const
+      { return n12().first(); }
+
+      ///Getter for the third circle parameter
+      inline FloatType n2() const
+      { return n12().second(); }
+
+      ///Getter for the second and third circle parameter which natuarally from a vector
+      inline Vector2D n12() const
+      { return -tangential().orthogonal() * (1 + signedCurvature() * impact()); }
+
+      ///Getter for the fourth circle parameter
+      inline FloatType n3() const
+      { return signedCurvature() / 2.0; }
+      /**@}*/
+
+
+
+      /// Sets the signed curvature to zero
+      inline void setNull() {
+        setSignedCurvature(0.0);
+        setTangentialPhi(0.0);
+        setImpact(0.0);
+      }
+
+      /// Indicates the signed curvature is zero
+      inline bool isNull() const
+      { return signedCurvature() == 0.0 and tangentialPhi() == 0.0 and impact() == 0.0; }
+
+
 
     private:
-      ///Scales the circle parameters by a common factor.
-      inline void scaleN(const FloatType& factor)
-      { m_n0 *= factor; m_n12 *= factor; m_n3 *= factor; }
+      /// Returns the polar angle associated with the reverse vector
+      inline FloatType reversedPhi(const FloatType& phi) const
+      { return phi > 0 ? phi - PI : phi + PI; }
+
+    public:
+      /// Flips the orientation of the circle in place
+      inline void reverse() {
+        m_standardOriginCircle.reverse();
+        m_tangentialPhi = reversedPhi(m_tangentialPhi);
+        m_tangential.reverse();
+        m_impact = -m_impact;
+      }
+
+      /// Returns a copy of the circle with opposite orientation.
+      inline PerigeeCircle reversed() const
+      { return PerigeeCircle(-signedCurvature(), reversedPhi(tangentialPhi()), -impact()); }
+
 
     public:
       /// Gradient of the distance field
@@ -171,11 +205,10 @@ namespace Belle2 {
        * @return Gradient of the distance field
        */
       inline Vector2D gradient(const Vector2D& point) const {
-        Vector2D result = point * (2.0 * n3());
+        Vector2D result = point * signedCurvature();
         result += n12();
         return result;
       }
-
 
       /// Normal vector to the circle near the given position
       /**
@@ -200,7 +233,8 @@ namespace Belle2 {
        * @param point Point in the plane to calculate the tangential
        * @return Unit tangential vector to the circle line
        */
-      inline Vector2D tangential(const Vector2D& point) const { return normal(point).orthogonal(); }
+      inline Vector2D tangential(const Vector2D& point) const
+      { return normal(point).orthogonal(); }
 
       ///Closest approach on the circle to the point
       /**
@@ -210,8 +244,6 @@ namespace Belle2 {
        */
       Vector2D closest(const Vector2D& point) const;
 
-      /// Calculates the closest approach to the two dimensional origin
-      Vector2D perigee() const;
 
       /// Calculates if the to vector is closer to the from vector following the along orientation of the circle or against.
       /** Returns:
@@ -224,6 +256,7 @@ namespace Belle2 {
         Vector2D tangentialAtFrom = tangential(from);
         return tangentialAtFrom.isForwardOrBackwardOf(difference);
       }
+
 
       /// Returns the end point which is first reached if one follows the forward direction of the circle starting from the start point
       /**
@@ -279,21 +312,7 @@ namespace Belle2 {
       /// Gives the proper distance of the point to the circle line retaining the sign of the fast distance.
       FloatType distance(const Vector2D& point) const;
 
-      /// Gives the signed distance of the origin to the circle
-      inline FloatType impact() const
-      { return distance(Vector2D(0.0, 0.0)); }
 
-      /// Gives the tangential vector at the closest approach to the origin / at the perigee
-      inline Vector2D tangential() const
-      { return tangential(Vector2D(0.0, 0.0)); }
-
-      /// Gives the minimal polar r the circle reaches (unsigned)
-      inline FloatType minimalPolarR() const
-      { return std::fabs(impact()); }
-
-      /// Gives the maximal polar r the circle reaches
-      inline FloatType maximalPolarR() const
-      { return std::fabs(impact() + signedRadius()); }
 
       /// Gives the proper absolute distance of the point to the circle line.
       inline FloatType absoluteDistance(const Vector2D& point) const
@@ -311,27 +330,6 @@ namespace Belle2 {
       inline bool isRight(const Vector2D& rhs) const
       { return isRightOrLeft(rhs) == RIGHT; }
 
-      /// Indicates if the generalized circle is actually a line
-      inline bool isLine() const { return n3() == 0.0; }
-
-      /// Indicates if the generalized circle is actually a circle
-      inline bool isCircle() const { return n3() != 0.0; }
-
-      /// Gives the radius of the circle. If it was a line this will be infinity
-      inline FloatType radius() const { return 1 / curvature(); }
-
-      /// Gives the signed radius of the circle. If it was a line this will be infinity
-      inline FloatType signedRadius() const { return 1 / signedCurvature(); }
-
-      /// Gives  the absolute curvature of the generalized circle
-      inline FloatType curvature() const { return std::fabs(signedCurvature()); }
-
-      /// Gives  the signed curvature of the generalized circle
-      inline FloatType signedCurvature() const { return 2 * n3(); }
-
-      /// Gives the center of the circle. If it was a line both components will be infinity
-      inline Vector2D center() const
-      { return n12().divided(-2 * n3()); }
 
       /// Gives the orientation of the circle
       /**
@@ -339,7 +337,7 @@ namespace Belle2 {
        * @return CCW for counterclockwise travel, CW for clockwise.
        */
       inline CCWInfo orientation() const
-      {  return sign(n3()); }
+      {  return sign(signedCurvature()); }
 
       /// Calculates the angle between two points of closest approach on the circle
       /**
@@ -350,7 +348,6 @@ namespace Belle2 {
        */
       inline FloatType openingAngle(const Vector2D& from, const Vector2D& to) const
       { return gradient(from).angleWith(gradient(to)); } //not optimal in number of computations
-
 
       /// Calculates the arc length between two points of closest approach on the circle.
       /**
@@ -363,41 +360,35 @@ namespace Belle2 {
        */
       FloatType lengthOnCurve(const Vector2D& from, const Vector2D& to) const;
 
-    private:
-      /// Helper function the calculate the factor between the length of a secant line and the length on the arc.
-      /**
-       *  Smooth function expressing the relation between arc length and direct length
-       *  only using the curvature of the circle as additional information.
-       *  It enables better handling of the line limit compared to the former implementaiton
-       *  which used the opening angle of the arc.
-       */
-      FloatType arcLengthFactor(const FloatType& directDistance) const;
+
+      /// Moves the coordinates system by the given vector. Updates perigee parameters in place
+      void passiveMoveBy(const Vector2D& by);
+
 
     public:
       /// Debug helper
-      friend std::ostream& operator<<(std::ostream& output, const GeneralizedCircle& circle) {
-        if (circle.isLine()) {
-          output << "Line support point = " << circle.perigee();
-          return output;
-        } else {
-          output << "CircleCenter = " << circle.center()
-                 << ", Radius = " << circle.radius();
-          return output;
-        }
+      friend std::ostream& operator<<(std::ostream& output, const PerigeeCircle& perigeeCircle) {
+        return output <<
+               "PerigeeCircle(" <<
+               "curvature=" << perigeeCircle.signedCurvature() << "," <<
+               "tangentialPhi=" << perigeeCircle.tangentialPhi() << "," <<
+               "impact=" << perigeeCircle.impact() << ")" ;
       }
 
+
     private:
+      StandardOriginCircle2D m_standardOriginCircle; ///< Memory for the signed curvature plus basic methods
 
-      // Order of this parameters make them easier to initialize
-      FloatType m_n3; ///< Memory for the fourth parameter
-      Vector2D m_n12; ///< Memory for the second and third parameter
-      FloatType m_n0; ///< Memory for the first parameter
+      FloatType m_tangentialPhi; ///< Memory for the polar angle of the direction of flight at the perigee
+      Vector2D m_tangential; ///< Cached unit direction of flight at the perigee
 
-      /// ROOT Macro to make GeneralizedCircle a ROOT class.
-      ClassDefInCDCLocalTracking(GeneralizedCircle, 1);
+      FloatType m_impact; ///< Memory for the signed impact parameter
+
+      /// ROOT Macro to make StandardOriginCircle2D a ROOT class.
+      ClassDefInCDCLocalTracking(PerigeeCircle, 1);
 
     }; //class
 
   } // namespace CDCLocalTracking
 } // namespace Belle2
-#endif // GENERALIZEDCIRCLE
+#endif // PERIGEECIRCLE

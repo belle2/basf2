@@ -38,7 +38,7 @@ namespace Belle2 {
        *  The start point is set to the closest approach to the origin */
       CDCTrajectory2D(const GeneralizedCircle& genCircle) :
         m_genCircle(genCircle),
-        m_startPos2D(genCircle.closestToOrigin()) {;}
+        m_startPos2D(genCircle.perigee()) {;}
 
       /// Constructs a trajectory from a generalized circle and a start point
       /** Constructs a trajectory which is described by the given circle and \n
@@ -90,7 +90,7 @@ namespace Belle2 {
 
       /// Calculates the closest approach on the trajectory to the origin
       Vector2D getClosestToOrigin() const
-      { return getGenCircle().closestToOrigin(); }
+      { return getGenCircle().perigee(); }
 
       /// Calculates the closest approach on the trajectory to the given point
       Vector2D getClosest(const Vector2D& point) const

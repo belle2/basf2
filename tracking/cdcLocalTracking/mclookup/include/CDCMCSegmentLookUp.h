@@ -169,12 +169,16 @@ namespace Belle2 {
       /** Returns the orientation of the segment relative to its matched track.
        *  * Returns INVALID_INFO if the segment is not matched to anz hit.
        *  * Returns FORWARD if the segment is coaligned with the matched track.
-       *  * Returns FORWARD if the segment is coaligned with the matched track interpreted in reverse.
+       *  * Returns BACKWARD if the segment is coaligned with the matched track interpreted in reverse.
        *  * Returns INVALID_INFO if the segment has only a single hit.
        */
       ForwardBackwardInfo isForwardOrBackwardToMCTrack(const CDCRecoSegment2D* ptrSegment2D) const;
 
-      ///
+      /** Returns if the second segments follows the first segment in their common Monte Carlo track
+       *  * Returns INVALID_INFO if the segment is not matched in the same Monte Carlo track
+       *  * Returns FORWARD if both segments are coaligned with the Monte Carlo track and the second segment comes after the first
+       *  * Returns BBACKWARD if both segments are anticoaligned with the Monte Carlo track and the second segment comes after the first in the reversed sense
+       */
       ForwardBackwardInfo areAlignedInMCTrack(const CDCRecoSegment2D* ptrStartSegment2D, const CDCRecoSegment2D* ptrendSegment2D) const;
 
 

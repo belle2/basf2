@@ -27,7 +27,7 @@
 #include <tracking/cdcLocalTracking/mclookup/CDCMCHitLookUp.h>
 
 
-#include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
+//#include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
 
 //out type
 #include "genfit/TrackCand.h"
@@ -60,7 +60,7 @@ CDCLocalTrackingModule::~CDCLocalTrackingModule()
 void CDCLocalTrackingModule::initialize()
 {
   //output collection
-  StoreArray < genfit::TrackCand >::registerPersistent(m_param_gfTrackCandColName);
+  StoreArray <genfit::TrackCand>::registerPersistent(m_param_gfTrackCandColName);
 
   m_segmentWorker.initialize();
   m_trackingWorker.initialize();

@@ -19,7 +19,7 @@
 #include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
 
 #include <tracking/cdcLocalTracking/algorithms/NeighborhoodBuilder.h>
-#include <tracking/cdcLocalTracking/neighbor_chooser/WireHitNeighborChooser.h>
+#include <tracking/cdcLocalTracking/filters/wirehit_wirehit/WireHitNeighborChooser.h>
 
 #include <tracking/cdcLocalTracking/algorithms/MultipassCellularPathFinder.h>
 #include <tracking/cdcLocalTracking/algorithms/Clusterizer.h>

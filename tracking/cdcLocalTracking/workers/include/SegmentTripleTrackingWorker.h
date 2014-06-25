@@ -17,7 +17,6 @@
 
 #include <tracking/cdcLocalTracking/algorithms/WeightedNeighborhood.h>
 #include <tracking/cdcLocalTracking/algorithms/NeighborhoodBuilder.h>
-#include <tracking/cdcLocalTracking/neighbor_chooser/SimpleSegmentTripleNeighborChooser.h>
 
 #include <tracking/cdcLocalTracking/algorithms/Clusterizer.h>
 #include <tracking/cdcLocalTracking/algorithms/MultipassCellularPathFinder.h>

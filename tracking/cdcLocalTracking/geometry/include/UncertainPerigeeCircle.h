@@ -58,6 +58,13 @@ namespace Belle2 {
       }
 
       /// Augments a plain perigee circle with a covariance matrix. Covariance defaults to zero
+      UncertainPerigeeCircle(const GeneralizedCircle& generalizedCircle):
+        PerigeeCircle(generalizedCircle),
+        m_perigeeCovariance(3, 3) {
+        m_perigeeCovariance.Zero();
+      }
+
+      /// Augments a plain perigee circle with a covariance matrix. Covariance defaults to zero
       UncertainPerigeeCircle(const PerigeeCircle& perigeeCircle):
         PerigeeCircle(perigeeCircle),
         m_perigeeCovariance(3, 3) {

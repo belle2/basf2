@@ -26,7 +26,7 @@ ClassImpInCDCLocalTracking(CDCTrajectory2D)
 
 CDCTrajectory2D::CDCTrajectory2D(const Vector2D& startPoint,
                                  const Vector2D& startMomentum,
-                                 const FloatType& charge) : m_genCircle(), m_startPos2D(startPoint)
+                                 const FloatType& charge) : m_perigeeCircle(), m_startPos2D(startPoint)
 {
 
   setStartPosMom2D(startPoint, startMomentum, charge);
@@ -68,7 +68,7 @@ CDCTrajectory2D::setStartPosMom2D(
   //same memory different name
   Vector2D& circleCenter = posToCenter.add(pos2D);
 
-  m_genCircle = GeneralizedCircle(circleCenter, r, orientation);
+  m_perigeeCircle.setCenterAndRadius(circleCenter, r, orientation);
 
   setStartPos2D(pos2D);
 
@@ -78,16 +78,12 @@ Vector3D CDCTrajectory2D::reconstruct3D(const BoundSkewLine& skewLine) const
 {
 
   const Vector2D& refPos2D = skewLine.refPos2D();
-  const GeneralizedCircle genCircle = getGenCircle();
+  const UncertainPerigeeCircle& perigeeCircle = getPerigeeCircle();
 
-  FloatType firstorder = genCircle.fastDistance(refPos2D);
+  FloatType firstorder = perigeeCircle.fastDistance(refPos2D);
 
-  //FloatType crossComponent = refPos2D.x() * getGenCircle().n2() -
-  //                           refPos2D.y() * getGenCircle().n1();
-
-  FloatType crossComponent = refPos2D.cross(genCircle.n12());
-
-  FloatType quadraticComponent = refPos2D.normSquared() * genCircle.n3();
+  FloatType crossComponent = refPos2D.cross(perigeeCircle.n12());
+  FloatType quadraticComponent = refPos2D.normSquared() * perigeeCircle.n3();
 
   const FloatType& a = quadraticComponent;
   const FloatType& b = crossComponent;
@@ -115,7 +111,7 @@ Vector2D CDCTrajectory2D::getInnerExit() const
 
   FloatType innerPolarR = innerMostLayer.getInnerPolarR();
 
-  return getGenCircle().samePolarRForwardOf(getStartPos2D(), innerPolarR);
+  return getPerigeeCircle().samePolarRForwardOf(getStartPos2D(), innerPolarR);
 
 }
 
@@ -127,7 +123,7 @@ Vector2D CDCTrajectory2D::getOuterExit() const
 
   FloatType outerPolarR = outerMostLayer.getOuterPolarR();
 
-  return getGenCircle().samePolarRForwardOf(getStartPos2D(), outerPolarR);
+  return getPerigeeCircle().samePolarRForwardOf(getStartPos2D(), outerPolarR);
 
 }
 
@@ -136,7 +132,7 @@ Vector2D CDCTrajectory2D::getExit() const
   Vector2D outerExit = getOuterExit();
   Vector2D innerExit = getInnerExit();
 
-  return getGenCircle().chooseNextForwardOf(getStartPos2D(), outerExit, innerExit);
+  return getPerigeeCircle().chooseNextForwardOf(getStartPos2D(), outerExit, innerExit);
 
 }
 

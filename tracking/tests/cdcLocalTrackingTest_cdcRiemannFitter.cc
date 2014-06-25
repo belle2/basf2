@@ -43,10 +43,10 @@ TEST_F(CDCLocalTrackingTest, CDCRiemannFitter_LineFit)
 
   //CDCGenerailzedCircle& genCircle = trajectory2D.getGenCircle();
 
-  Vector2D closestToOrigin = trajectory2D.getClosestToOrigin();
+  Vector2D perigee = trajectory2D.getPerigee();
 
-  EXPECT_NEAR(0.0, closestToOrigin.x(), 10e-7);
-  EXPECT_NEAR(0.0, closestToOrigin.y(), 10e-7);
+  EXPECT_NEAR(0.0, perigee.x(), 10e-7);
+  EXPECT_NEAR(0.0, perigee.y(), 10e-7);
 
   Vector2D closestToPoint = trajectory2D.getClosest(Vector2D(2, 2));
 

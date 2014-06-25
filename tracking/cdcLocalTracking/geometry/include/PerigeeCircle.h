@@ -58,6 +58,9 @@ namespace Belle2 {
         m_impact(impact)
       { cacheN(); }
 
+      PerigeeCircle(const GeneralizedCircle& generalizedCircle)
+      { setN(generalizedCircle); }
+
       /// Empty destructor
       ~PerigeeCircle() {;}
 
@@ -112,6 +115,19 @@ namespace Belle2 {
              generalizedCircle.n2(),
              generalizedCircle.n3());
       }
+
+      /// Setter for the circle center and radius
+      void setCenterAndRadius(const Vector2D& center,
+                              const FloatType& absRadius,
+                              const CCWInfo& orientation = CCW) {
+
+        GeneralizedCircle::setCenterAndRadius(center, absRadius, orientation);
+        m_curvature = GeneralizedCircle::curvature();
+        m_tangential = GeneralizedCircle::tangential();
+        m_tangentialPhi = m_tangential.phi();
+        m_impact = GeneralizedCircle::impact();
+      }
+
 
 
     public:

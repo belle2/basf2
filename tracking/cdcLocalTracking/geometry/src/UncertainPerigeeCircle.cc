@@ -38,40 +38,40 @@ TMatrixD UncertainPerigeeCircle::passiveMoveByJacobian(const Vector2D& by) const
   FloatType halfA =  fastDistance(by);
   FloatType A = 2 * halfA;
 
-  B2INFO("A = " << A);
-  B2INFO("A = " << 2 * deltaOrthogonal + curvature() * delta.normSquared());
+  //B2INFO("A = " << A);
+  //B2INFO("A = " << 2 * deltaOrthogonal + curvature() * delta.normSquared());
 
   Vector2D CB = gradient(by).orthogonal();
   FloatType C = CB.first();
   FloatType B = CB.second();
 
-  B2INFO("B = " << B);
-  B2INFO("C = " << C);
+  //B2INFO("B = " << B);
+  //B2INFO("C = " << C);
 
   FloatType u = 1 + curvature() * impact(); //= n12().polarR()
 
   FloatType U = sqrt(1 + curvature() * A);
 
-  B2INFO("U = " << U);
+  //B2INFO("U = " << U);
 
 
   FloatType nu = 1 + curvature() * deltaOrthogonal;
 
-  B2INFO("nu = " << nu);
+  //B2INFO("nu = " << nu);
 
   FloatType xi = 1.0 / CB.normSquared();
 
-  B2INFO("xi = " << xi);
+  //B2INFO("xi = " << xi);
 
   FloatType lambda = halfA / ((1 + U) * (1 + U) * U);
   FloatType mu = 1.0 / (U * (U + 1)) + curvature() * lambda;
 
-  B2INFO("lambda = " << lambda);
-  B2INFO("mu = " << mu);
+  //B2INFO("lambda = " << lambda);
+  //B2INFO("mu = " << mu);
 
   FloatType zeta = delta.normSquared();
 
-  B2INFO("zeta = " << zeta);
+  //B2INFO("zeta = " << zeta);
 
   TMatrixD jacobian(3, 3);
   jacobian[0][0] = 1;

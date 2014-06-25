@@ -70,105 +70,66 @@ bool AxialAxialSegmentPairFilterTree::setValues(const CellWeight& mcWeight, cons
   setValue < NAMED("endFit_previousISuperLayer") > (endFit.getPreviousISuperLayer());
   setValue < NAMED("endFit_previousAxialISuperLayer") > (endFit.getPreviousAxialISuperLayer());
 
+
   // Coalignment indicators
-  setValue < NAMED("startSegment_isForwardTrajectory_startFit") > (startSegment.isForwardTrajectory(startFit));
-  setValue < NAMED("startSegment_isForwardTrajectory_endFit") > (startSegment.isForwardTrajectory(endFit));
-  setValue < NAMED("startSegment_isForwardTrajectory_commonFit") > (startSegment.isForwardTrajectory(commonFit));
+  setValue < NAMED("startFit_totalPerpS_startSegment") > (startFit.getTotalPerpS(startSegment));
+  setValue < NAMED("endFit_totalPerpS_startSegment") > (endFit.getTotalPerpS(startSegment));
+  setValue < NAMED("commonFit_totalPerpS_startSegment") > (commonFit.getTotalPerpS(startSegment));
 
-  setValue < NAMED("endSegment_isForwardTrajectory_startFit") > (endSegment.isForwardTrajectory(startFit));
-  setValue < NAMED("endSegment_isForwardTrajectory_endFit") > (endSegment.isForwardTrajectory(endFit));
-  setValue < NAMED("endSegment_isForwardTrajectory_commonFit") > (endSegment.isForwardTrajectory(commonFit));
-
-  // Total trajectory lengths - refinement of the former
-  setValue < NAMED("startSegment_totalPerpS_startFit") > (startSegment.getTotalPerpS(startFit));
-  setValue < NAMED("startSegment_totalPerpS_endFit") > (startSegment.getTotalPerpS(endFit));
-  setValue < NAMED("startSegment_totalPerpS_commonFit") > (startSegment.getTotalPerpS(commonFit));
-
-  setValue < NAMED("endSegment_totalPerpS_startFit") > (endSegment.getTotalPerpS(startFit));
-  setValue < NAMED("endSegment_totalPerpS_endFit") > (endSegment.getTotalPerpS(endFit));
-  setValue < NAMED("endSegment_totalPerpS_commonFit") > (endSegment.getTotalPerpS(commonFit));
+  setValue < NAMED("startFit_totalPerpS_endSegment") > (startFit.getTotalPerpS(endSegment));
+  setValue < NAMED("endFit_totalPerpS_endSegment") > (endFit.getTotalPerpS(endSegment));
+  setValue < NAMED("commonFit_totalPerpS_endSegment") > (commonFit.getTotalPerpS(endSegment));
 
 
-  setValue < NAMED("perpS_gap_startFit") > (endSegment.getFrontPerpS(startFit) - startSegment.getBackPerpS(startFit));
-  setValue < NAMED("perpS_gap_endFit") > (endSegment.getFrontPerpS(endFit) - startSegment.getBackPerpS(endFit));
-  setValue < NAMED("perpS_gap_commonFit") > (endSegment.getFrontPerpS(commonFit) - startSegment.getBackPerpS(commonFit));
 
-  setValue < NAMED("perpS_offset_startHits_startFit") > (endSegment.getFrontPerpS(startFit) - startSegment.getFrontPerpS(startFit));
-  setValue < NAMED("perpS_offset_startHits_endFit") > (endSegment.getFrontPerpS(endFit) - startSegment.getFrontPerpS(endFit));
-  setValue < NAMED("perpS_offset_startHits_commonFit") > (endSegment.getFrontPerpS(commonFit) - startSegment.getFrontPerpS(commonFit));
+  setValue < NAMED("startFit_isForwardOrBackwardTo_startSegment") > (startFit.isForwardOrBackwardTo(startSegment));
+  setValue < NAMED("endFit_isForwardOrBackwardTo_startSegment") > (endFit.isForwardOrBackwardTo(startSegment));
+  setValue < NAMED("commonFit_isForwardOrBackwardTo_startSegment") > (commonFit.isForwardOrBackwardTo(startSegment));
 
-  setValue < NAMED("perpS_offset_endHits_startFit") > (endSegment.getBackPerpS(startFit) - startSegment.getBackPerpS(startFit));
-  setValue < NAMED("perpS_offset_endHits_endFit") > (endSegment.getBackPerpS(endFit) - startSegment.getBackPerpS(endFit));
-  setValue < NAMED("perpS_offset_endHits_commonFit") > (endSegment.getBackPerpS(commonFit) - startSegment.getBackPerpS(commonFit));
-
-  Vector2D startCOM = startSegment.getCenterOfMass2D();
-  Vector2D endCOM = endSegment.getCenterOfMass2D();
-
-  setValue < NAMED("startSegment_com_x") > (startCOM.x());
-  setValue < NAMED("startSegment_com_y") > (startCOM.y());
-
-  setValue < NAMED("endSegment_com_x") > (endCOM.x());
-  setValue < NAMED("endSegment_com_y") > (endCOM.y());
+  setValue < NAMED("startFit_isForwardOrBackwardTo_endSegment") > (startFit.isForwardOrBackwardTo(endSegment));
+  setValue < NAMED("endFit_isForwardOrBackwardTo_endSegment") > (endFit.isForwardOrBackwardTo(endSegment));
+  setValue < NAMED("commonFit_isForwardOrBackwardTo_endSegment") > (commonFit.isForwardOrBackwardTo(endSegment));
 
 
-  FloatType startAbsMom = startFit.getAbsMom2D();
-  FloatType endAbsMom = endFit.getAbsMom2D();
 
-  setValue < NAMED("startSegment_absmom") > (startAbsMom);
-  setValue < NAMED("endSegment_absmom") > (endAbsMom);
+  setValue < NAMED("startFit_perpSGap") > (startFit.getPerpSGap(startSegment, endSegment));
+  setValue < NAMED("endFit_perpSGap") > (endFit.getPerpSGap(startSegment, endSegment));
+  setValue < NAMED("commonFit_perpSGap") > (commonFit.getPerpSGap(startSegment, endSegment));
 
+  setValue < NAMED("startFit_perpSFrontOffset") > (startFit.getPerpSFrontOffset(startSegment, endSegment));
+  setValue < NAMED("endFit_perpSFrontOffset") > (endFit.getPerpSFrontOffset(startSegment, endSegment));
+  setValue < NAMED("commonFit_perpSFrontOffset") > (commonFit.getPerpSFrontOffset(startSegment, endSegment));
 
-  Vector2D startCenter = startFit.getClosest(startCOM);
-  Vector2D endCenter = endFit.getClosest(endCOM);
+  setValue < NAMED("startFit_perpSBackOffset") > (startFit.getPerpSBackOffset(startSegment, endSegment));
+  setValue < NAMED("endFit_perpSBackOffset") > (endFit.getPerpSBackOffset(startSegment, endSegment));
+  setValue < NAMED("commonFit_perpSBackOffset") > (commonFit.getPerpSBackOffset(startSegment, endSegment));
 
-  setValue < NAMED("startSegment_center_x") > (startCenter.x());
-  setValue < NAMED("startSegment_center_y") > (startCenter.y());
+  setValue < NAMED("startFit_dist2DToCenter_endSegment") > (startFit.getDist2DToCenter(endSegment));
+  setValue < NAMED("endFit_dist2DToCenter_startSegment") > (endFit.getDist2DToCenter(startSegment));
 
-  setValue < NAMED("endSegment_center_x") > (endCenter.x());
-  setValue < NAMED("endSegment_center_y") > (endCenter.y());
+  setValue < NAMED("startFit_dist2DToFront_endSegment") > (startFit.getDist2DToFront(endSegment));
+  setValue < NAMED("endFit_dist2DToBack_startSegment") > (endFit.getDist2DToBack(startSegment));
 
+  setValue < NAMED("startFit_absMom2D") > (startFit.getAbsMom2D());
+  setValue < NAMED("endFit_absMom2D") > (endFit.getAbsMom2D());
 
-  Vector2D startExtrapolatedToEndCenter = startFit.getClosest(endCenter);
-  Vector2D endExtrapolatedToStartCenter = endFit.getClosest(startCenter);
+  // Vector2D startCOM = startSegment.getCenterOfMass2D();
+  // Vector2D endCOM = endSegment.getCenterOfMass2D();
+  // Vector2D startCenter = startFit.getClosest(startCOM);
+  // Vector2D endCenter = endFit.getClosest(endCOM);
+  // Vector2D startExtrapolatedToEndCenter = startFit.getClosest(endCenter);
+  // Vector2D endExtrapolatedToStartCenter = endFit.getClosest(startCenter);
 
-  setValue < NAMED("startSegment_extrapolation_x") > (startExtrapolatedToEndCenter.x());
-  setValue < NAMED("startSegment_extrapolation_y") > (startExtrapolatedToEndCenter.y());
+  Vector2D startMomAtCenter = startFit.getUnitMom2DAtCenter(startSegment);
+  Vector2D endMomAtCenter = endFit.getUnitMom2DAtCenter(endSegment);
 
-  setValue < NAMED("endSegment_extrapolation_x") > (endExtrapolatedToStartCenter.x());
-  setValue < NAMED("endSegment_extrapolation_y") > (endExtrapolatedToStartCenter.y());
+  Vector2D startMomAtExtrapolation = startFit.getUnitMom2DAtCenter(endSegment);
+  Vector2D endMomAtExtrapolation = endFit.getUnitMom2DAtCenter(startSegment);
 
-
-  setValue < NAMED("startSegment_extrapolation_to_center_distance") > (startExtrapolatedToEndCenter.distance(endCenter));
-  setValue < NAMED("endSegment_extrapolation_to_center_distance") > (endExtrapolatedToStartCenter.distance(startCenter));
-
-  Vector2D startMomAtCenter = startFit.getUnitMom2D(startCenter);
-  Vector2D endMomAtCenter = endFit.getUnitMom2D(endCenter);
-
-  Vector2D startMomAtExtrapolation = startFit.getUnitMom2D(startExtrapolatedToEndCenter);
-  Vector2D endMomAtExtrapolation = endFit.getUnitMom2D(endExtrapolatedToStartCenter);
-
-  setValue < NAMED("startFit_center_unitMom_x") > (startMomAtCenter.x());
-  setValue < NAMED("startFit_center_unitMom_y") > (startMomAtCenter.y());
-
-  setValue < NAMED("startFit_extrapolation_unitMom_x") > (startMomAtExtrapolation.x());
-  setValue < NAMED("startFit_extrapolation_unitMom_y") > (startMomAtExtrapolation.y());
-
-
-  setValue < NAMED("endFit_center_unitMom_x") > (endMomAtCenter.x());
-  setValue < NAMED("endFit_center_unitMom_y") > (endMomAtCenter.y());
-
-  setValue < NAMED("endFit_extrapolation_unitMom_x") > (endMomAtExtrapolation.x());
-  setValue < NAMED("endFit_extrapolation_unitMom_y") > (endMomAtExtrapolation.y());
-
-  setValue < NAMED("start_to_end_mom_angle") > (startMomAtCenter.angleWith(endMomAtExtrapolation));
-  setValue < NAMED("end_to_start_mom_angle") > (endMomAtCenter.angleWith(startMomAtExtrapolation));
-
-
+  setValue < NAMED("momAngleAtCenter_startSegment") > (startMomAtCenter.angleWith(endMomAtExtrapolation));
+  setValue < NAMED("momAngleAtCenter_endSegment") > (endMomAtCenter.angleWith(startMomAtExtrapolation));
 
   /*
-  m_distanceAtStart = startCenter.distance(endExtrapolatedToStartCenter);
-  m_distanceAtEnd = endCenter.distance(startExtrapolatedToEndCenter);
-
   //make a cut - make this more sophisticated at some point
   //double cosDeviation = endCenter.cosWith(pointOnFromTrack);
   //double tolerance = cos(PI / 180);

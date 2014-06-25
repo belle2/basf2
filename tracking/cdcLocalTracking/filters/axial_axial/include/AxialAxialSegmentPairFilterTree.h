@@ -40,73 +40,45 @@ namespace Belle2 {
              BranchOf < Int_t, NAMED("startFit_nextAxialISuperLayer") > ,
              BranchOf < Int_t, NAMED("endFit_previousAxialISuperLayer") > ,
 
+             BranchOf < float, NAMED("startFit_totalPerpS_startSegment") > ,
+             BranchOf < float, NAMED("endFit_totalPerpS_startSegment") > ,
+             BranchOf < float, NAMED("commonFit_totalPerpS_startSegment") > ,
 
-             BranchOf < bool, NAMED("startSegment_isForwardTrajectory_startFit") > ,
-             BranchOf < bool, NAMED("startSegment_isForwardTrajectory_endFit") > ,
-             BranchOf < bool, NAMED("startSegment_isForwardTrajectory_commonFit") > ,
+             BranchOf < float, NAMED("startFit_totalPerpS_endSegment") > ,
+             BranchOf < float, NAMED("endFit_totalPerpS_endSegment") > ,
+             BranchOf < float, NAMED("commonFit_totalPerpS_endSegment") > ,
 
-             BranchOf < bool, NAMED("endSegment_isForwardTrajectory_startFit") > ,
-             BranchOf < bool, NAMED("endSegment_isForwardTrajectory_endFit") > ,
-             BranchOf < bool, NAMED("endSegment_isForwardTrajectory_commonFit") > ,
+             BranchOf < bool, NAMED("startFit_isForwardOrBackwardTo_startSegment") > ,
+             BranchOf < bool, NAMED("endFit_isForwardOrBackwardTo_startSegment") > ,
+             BranchOf < bool, NAMED("commonFit_isForwardOrBackwardTo_startSegment") > ,
 
-             BranchOf < float, NAMED("startSegment_totalPerpS_startFit") > ,
-             BranchOf < float, NAMED("startSegment_totalPerpS_endFit") > ,
-             BranchOf < float, NAMED("startSegment_totalPerpS_commonFit") > ,
+             BranchOf < bool, NAMED("startFit_isForwardOrBackwardTo_endSegment") > ,
+             BranchOf < bool, NAMED("endFit_isForwardOrBackwardTo_endSegment") > ,
+             BranchOf < bool, NAMED("commonFit_isForwardOrBackwardTo_endSegment") > ,
 
-             BranchOf < float, NAMED("endSegment_totalPerpS_startFit") > ,
-             BranchOf < float, NAMED("endSegment_totalPerpS_endFit") > ,
-             BranchOf < float, NAMED("endSegment_totalPerpS_commonFit") > ,
+             BranchOf < float, NAMED("startFit_perpSGap") > ,
+             BranchOf < float, NAMED("endFit_perpSGap") > ,
+             BranchOf < float, NAMED("commonFit_perpSGap") > ,
 
-             BranchOf < float, NAMED("perpS_gap_startFit") > ,
-             BranchOf < float, NAMED("perpS_gap_endFit") > ,
-             BranchOf < float, NAMED("perpS_gap_commonFit") > ,
+             BranchOf < float, NAMED("startFit_perpSFrontOffset") > ,
+             BranchOf < float, NAMED("endFit_perpSFrontOffset") > ,
+             BranchOf < float, NAMED("commonFit_perpSFrontOffset") > ,
 
-             BranchOf < float, NAMED("perpS_offset_startHits_startFit") > ,
-             BranchOf < float, NAMED("perpS_offset_startHits_endFit") > ,
-             BranchOf < float, NAMED("perpS_offset_startHits_commonFit") > ,
+             BranchOf < float, NAMED("startFit_perpSBackOffset") > ,
+             BranchOf < float, NAMED("endFit_perpSBackOffset") > ,
+             BranchOf < float, NAMED("commonFit_perpSBackOffset") > ,
 
-             BranchOf < float, NAMED("perpS_offset_endHits_startFit") > ,
-             BranchOf < float, NAMED("perpS_offset_endHits_endFit") > ,
-             BranchOf < float, NAMED("perpS_offset_endHits_commonFit") > ,
+             BranchOf < float, NAMED("startFit_dist2DToCenter_endSegment") > ,
+             BranchOf < float, NAMED("endFit_dist2DToCenter_startSegment") > ,
 
-             BranchOf < float, NAMED("startSegment_absmom") > ,
-             BranchOf < float, NAMED("endSegment_absmom") > ,
+             BranchOf < float, NAMED("startFit_dist2DToFront_endSegment") > ,
+             BranchOf < float, NAMED("endFit_dist2DToBack_startSegment") > ,
 
+             BranchOf < float, NAMED("startFit_absMom2D") > ,
+             BranchOf < float, NAMED("endFit_absMom2D") > ,
 
-             BranchOf < float, NAMED("startSegment_com_x") > ,
-             BranchOf < float, NAMED("startSegment_com_y") > ,
-             BranchOf < float, NAMED("endSegment_com_x") > ,
-             BranchOf < float, NAMED("endSegment_com_y") > ,
-
-             BranchOf < float, NAMED("startSegment_center_x") > ,
-             BranchOf < float, NAMED("startSegment_center_y") > ,
-             BranchOf < float, NAMED("endSegment_center_x") > ,
-             BranchOf < float, NAMED("endSegment_center_y") > ,
-
-             BranchOf < float, NAMED("startSegment_extrapolation_x") > ,
-             BranchOf < float, NAMED("startSegment_extrapolation_y") > ,
-             BranchOf < float, NAMED("endSegment_extrapolation_x") > ,
-             BranchOf < float, NAMED("endSegment_extrapolation_y") > ,
-
-             BranchOf < float, NAMED("startSegment_extrapolation_to_center_distance") > ,
-             BranchOf < float, NAMED("endSegment_extrapolation_to_center_distance") > ,
-
-
-             BranchOf < float, NAMED("startFit_center_unitMom_x") > ,
-             BranchOf < float, NAMED("startFit_center_unitMom_y") > ,
-
-             BranchOf < float, NAMED("startFit_extrapolation_unitMom_x") > ,
-             BranchOf < float, NAMED("startFit_extrapolation_unitMom_y") > ,
-
-
-             BranchOf < float, NAMED("endFit_center_unitMom_x") > ,
-             BranchOf < float, NAMED("endFit_center_unitMom_y") > ,
-
-             BranchOf < float, NAMED("endFit_extrapolation_unitMom_x") > ,
-             BranchOf < float, NAMED("endFit_extrapolation_unitMom_y") > ,
-
-             BranchOf < float, NAMED("start_to_end_mom_angle") > ,
-             BranchOf < float, NAMED("end_to_start_mom_angle") >
+             BranchOf < float, NAMED("momAngleAtCenter_endSegment") > ,
+             BranchOf < float, NAMED("momAngleAtCenter_startSegment") >
 
              > AxialAxialSegmentPairFilterTreeBase;
 

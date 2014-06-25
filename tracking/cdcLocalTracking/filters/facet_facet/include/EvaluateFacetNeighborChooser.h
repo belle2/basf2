@@ -17,6 +17,8 @@
 #include "BaseFacetNeighborChooser.h"
 #include "MCFacetNeighborChooser.h"
 
+#include "FacetNeighborChooserTree.h"
+
 namespace Belle2 {
   namespace CDCLocalTracking {
 
@@ -26,76 +28,132 @@ namespace Belle2 {
 
     public:
       /// Empty constructor
-      EvaluateFacetNeighborChooser() {
-      }
+      EvaluateFacetNeighborChooser();
 
       /// Empty deconstructor
-      ~EvaluateFacetNeighborChooser() {
-      }
+      ~EvaluateFacetNeighborChooser();
 
       /// Forwards the modules initialize to the filter
-      void initialize() {
-        m_output_csv.open("facet_neighbor_chooser.csv");
-
-        //Headline
-        m_output_csv << "SMToNeighborSECosing,"
-                     << "SEToNeighborMECosing,"
-                     << "MCTruth"
-                     << std::endl;
-      }
-
-
-      /// Forwards the modules initialize to the filter
-      void terminate() {
-        m_output_csv.close();
-      }
+      void initialize();
 
       /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
-      inline NeighborWeight isGoodNeighbor(
-        const CDCRecoFacet& facet,
-        const CDCRecoFacet& neighborFacet
-      ) const {
+      NeighborWeight isGoodNeighbor(const CDCRecoFacet& facet, const CDCRecoFacet& neighborFacet);
 
-        if (facet.getStartWire() == neighborFacet.getEndWire()) return NOT_A_NEIGHBOR;
+      /// Forwards the modules initialize to the filter.
+      void terminate();
 
-        NeighborWeight mcWeight = m_mcNeighborChooser.isGoodNeighbor(facet, neighborFacet);
+      /// Getter for the filter to be evaluted.
+      RealFacetNeighborChooser& getRealFacetNeighborChooser()
+      { return m_realFacetNeighborChooser; }
 
-        bool mcDecision = not isNotANeighbor(mcWeight);
+      /// Getter for the Monte Carlo filter.
+      MCFacetNeighborChooser& getMCFacetNeighborChooser()
+      { return m_mcFacetNeighborChooser; }
 
-
-        //the compatibility of the short legs or all?
-        //start end to continuation middle end
-        //start middle to continuation start end
-
-        const ParameterLine2D& firstStartToMiddle = facet.getStartToMiddleLine();
-        const ParameterLine2D& firstStartToEnd    = facet.getStartToEndLine();
-
-        const ParameterLine2D& secondStartToEnd   = neighborFacet.getStartToEndLine();
-        const ParameterLine2D& secondMiddleToEnd   = neighborFacet.getMiddleToEndLine();
-
-
-        m_output_csv << firstStartToMiddle.tangential().cosWith(secondStartToEnd.tangential())  << ","
-                     << firstStartToEnd.tangential().cosWith(secondMiddleToEnd.tangential()) << ","
-                     << mcDecision
-                     << std::endl;
-
-        NeighborWeight realWeight = m_realNeighborChooser.isGoodNeighbor(facet, neighborFacet);
-        return realWeight;
-
-      }
-
+      /// Getter for the file name the tree shall be written to.
+      std::string getFileName() const;
 
     private:
+      /// ROOT output file
+      TFile* m_ptrTFileForOutput;
 
-      mutable std::ofstream m_output_csv;  ///< Output stream for the csv file
+      /// ROOT tree wrapper helping to file the output tree.
+      FacetNeighborChooserTree m_facetNeighborChooserTree;
 
-      MCFacetNeighborChooser m_mcNeighborChooser; ///< Instance of the Monte Carlo filter as reference
-      RealFacetNeighborChooser m_realNeighborChooser; ///< Instance of the tested neighbor filter.
+      MCFacetNeighborChooser m_mcFacetNeighborChooser; ///< Instance of the Monte Carlo filter as reference
+      RealFacetNeighborChooser m_realFacetNeighborChooser; ///< Instance of the tested neighbor filter.
 
     }; // end class
 
 
   } //end namespace CDCLocalTracking
 } //end namespace Belle2
+
+
+// Implementations
+
+namespace Belle2 {
+  namespace CDCLocalTracking {
+
+    template<class RealFacetNeighborChooser>
+    EvaluateFacetNeighborChooser<RealFacetNeighborChooser>::EvaluateFacetNeighborChooser()
+    {
+    }
+
+
+
+    template<class RealFacetNeighborChooser>
+    EvaluateFacetNeighborChooser<RealFacetNeighborChooser>::~EvaluateFacetNeighborChooser()
+    {
+    }
+
+
+
+    template<class RealFacetNeighborChooser>
+    void EvaluateFacetNeighborChooser<RealFacetNeighborChooser>::initialize()
+    {
+
+      getMCFacetNeighborChooser().initialize();
+      getRealFacetNeighborChooser().initialize();
+
+      m_ptrTFileForOutput = new TFile(getFileName().c_str(), "RECREATE");
+      if (m_ptrTFileForOutput) {
+        m_facetNeighborChooserTree.create(*m_ptrTFileForOutput);
+      }
+
+    }
+
+    template<class RealFacetNeighborChooser>
+    NeighborWeight EvaluateFacetNeighborChooser<RealFacetNeighborChooser>::isGoodNeighbor(
+      const CDCRecoFacet& facet,
+      const CDCRecoFacet& neighborFacet
+    )
+    {
+
+      if (facet.getStartWire() == neighborFacet.getEndWire()) return NOT_A_NEIGHBOR;
+
+      NeighborWeight mcWeight = getMCFacetNeighborChooser().isGoodNeighbor(facet, neighborFacet);
+      NeighborWeight prWeight = getRealFacetNeighborChooser().isGoodNeighbor(facet, neighborFacet);
+
+      m_facetNeighborChooserTree.setValues(mcWeight, prWeight, facet, neighborFacet);
+      m_facetNeighborChooserTree.fill();
+
+      return prWeight;
+    }
+
+
+
+    template<class RealFacetNeighborChooser>
+    void EvaluateFacetNeighborChooser<RealFacetNeighborChooser>::terminate()
+    {
+
+      m_facetNeighborChooserTree.save();
+
+      if (m_ptrTFileForOutput != nullptr) {
+        m_ptrTFileForOutput->Close();
+        delete m_ptrTFileForOutput;
+        m_ptrTFileForOutput = nullptr;
+      }
+
+      getRealFacetNeighborChooser().terminate();
+      getMCFacetNeighborChooser().terminate();
+
+    }
+
+
+
+    template<class RealFacetNeighborChooser>
+    std::string EvaluateFacetNeighborChooser<RealFacetNeighborChooser>::getFileName() const
+    {
+      return "EvaluateFacetNeighborChooser.root";
+    }
+
+
+
+  } //end namespace CDCLocalTracking
+} //end namespace Belle
+
+
+
 
 #endif //EVALUATEFACETNEIGHBORCHOOSER_H_

@@ -86,7 +86,7 @@ namespace Belle2 {
       }
 
     private:
-      NeighborChooser m_chooser; ///< Memory for the neighborhood chooser
+      mutable NeighborChooser m_chooser; ///< Memory for the neighborhood chooser
 
     }; // end class
 

@@ -94,8 +94,8 @@ namespace Belle2 {
     template<class RealFacetFilter>
     CellWeight EvaluateFacetFilter<RealFacetFilter>::isGoodFacet(const CDCRecoFacet& facet)
     {
-      CellWeight mcWeight = m_mcFacetFilter.isGoodFacet(facet);
-      CellWeight prWeight = m_realFacetFilter.isGoodFacet(facet);
+      CellWeight mcWeight = getMCFacetFilter().isGoodFacet(facet);
+      CellWeight prWeight = getRealFacetFilter().isGoodFacet(facet);
 
       //do fits
       facet.adjustLines();

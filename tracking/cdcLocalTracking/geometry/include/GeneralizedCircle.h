@@ -342,7 +342,7 @@ namespace Belle2 {
 
       /// Gives the tangential vector at the closest approach to the origin / at the perigee
       inline Vector2D tangential() const
-      { return tangential(Vector2D(0.0, 0.0)); }
+      { return tangential(Vector2D(0.0, 0.0)).unit(); }
 
       /// Gives to polar phi of the direction of flight at the perigee
       inline FloatType tangentialPhi() const

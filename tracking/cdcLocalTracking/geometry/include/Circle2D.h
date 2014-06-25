@@ -125,6 +125,15 @@ namespace Belle2 {
         return connection;
       }
 
+      /// Gives the tangential vector at the closest approach to the origin / at the perigee
+      inline Vector2D tangential() const
+      { return tangential(Vector2D(0.0, 0.0)).unit(); }
+
+
+      /// Gives to polar phi of the direction of flight at the perigee
+      inline FloatType tangentialPhi() const
+      { return tangential().phi(); }
+
       /// Gradient of the distance field
       /**
        * Gives the gradient of the euclidian distance field for the given point.
@@ -146,7 +155,7 @@ namespace Belle2 {
        * @return Unit normal vector to the circle line
        */
       inline Vector2D normal(const Vector2D& point) const
-      { return gradient(point); }
+      { return gradient(point).unit(); }
 
       /// Tangential vector to the circle near the given position
       /**

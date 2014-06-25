@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2012 - Belle II Collaboration                             *
+ * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Oliver Frost                                             *
@@ -41,18 +41,11 @@ PortedKarimakisMethod::~PortedKarimakisMethod()
 void PortedKarimakisMethod::update(CDCTrajectory2D& trajectory2D,
                                    CDCObservations2D& observations2D) const
 {
-
   size_t nObservations = observations2D.size();
   trajectory2D.clear();
   if (not nObservations) return;
 
-  FloatType xRef = observations2D.getX(0);
-  FloatType yRef = observations2D.getY(0);
-
-  //Vector2D ref(xRef, yRef);
-  //Vector2D ref = Vector2D(0.0, 0.0);
   Vector2D ref = observations2D.getCentralPoint();
-  //Vector2D ref = Vector2D(0.5, 0.0);
   B2INFO("Reference point " << ref);
 
   observations2D.centralize(ref);
@@ -72,9 +65,13 @@ void PortedKarimakisMethod::update(CDCTrajectory2D& trajectory2D,
     B2INFO("Reversed");
     perigeeCircle.reverse();
   }
+
   perigeeCircle.passiveMoveBy(-ref);
+
   trajectory2D.setCircle(perigeeCircle);
 
+// Logical start position of the travel distance scale
+  trajectory2D.setStartPos2D(ref);
 }
 
 
@@ -483,7 +480,7 @@ namespace {
 
       Matrix<FloatType, 3, 3> V = invV.inverse();
       V(iCurv, iCurv) = 0.;
-      return V; \
+      return V;
     } else {
       double sa = sinphi * s(iX) - cosphi * s(iY);
       double sb = cosphi * s(iX) + sinphi * s(iY);
@@ -523,10 +520,10 @@ UncertainPerigeeCircle PortedKarimakisMethod::fit(CDCObservations2D& observation
   Matrix< FloatType, 5, 5 > s = observations2D.getWXYRLSumMatrix();
 
   // Matrix of averages
-  Matrix< FloatType, 5, 5 > a = s / s(iW);
+  // Matrix< FloatType, 5, 5 > a = s / s(iW);
 
   // Measurement means
-  Matrix< FloatType, 5, 1> means = a.row(iW);
+  // Matrix< FloatType, 5, 1> means = a.row(iW);
 
   // Covariance matrix
   // Matrix< FloatType, 5, 5> c = a - means * means.transpose();
@@ -576,5 +573,4 @@ UncertainPerigeeCircle PortedKarimakisMethod::fit(CDCObservations2D& observation
 
   resultCircle.setPerigeeCovariance(tPerigeeCovariance);
   return resultCircle;
-
 }

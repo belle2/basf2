@@ -81,10 +81,8 @@ namespace {
         "Fitter " << typeid(fitter).name() << " failed.";
     EXPECT_NEAR(generalCircle.radius(), fittedCircle.radius(), 10e-7) <<
         "Fitter " << typeid(fitter).name() << " failed.";
-
     EXPECT_NEAR(generalCircle.tangentialPhi(), fittedCircle.tangentialPhi(), 10e-7) <<
         "Fitter " << typeid(fitter).name() << " failed.";
-
     EXPECT_NEAR(0.0, fittedCircle.chi2(), 10e-7) <<
                                                  "Fitter " << typeid(fitter).name() << " failed.";
 

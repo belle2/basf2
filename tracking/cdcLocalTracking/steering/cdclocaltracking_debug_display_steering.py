@@ -34,6 +34,9 @@ for option in svgdisplay.drawoptions:
 parser.add_option('--options', dest='show_options', action='store_true',
                   default=False)
 
+parser.add_option('--simulate', dest='simulate', action='store_true',
+                  default=False)
+
 (options, args) = parser.parse_args()
 
 try:
@@ -57,7 +60,10 @@ for option in svgdisplay.drawoptions:
         setattr(svgdisplay, option, is_active_option)
 
 # Check if an input file has been given that shall be used as ROOT input
-if args:
+# But first see if a simulation is forced
+if options.simulate:
+    use_simulation = True
+elif args:
     simulated_events_file = args[0]
     if not os.path.exists(simulated_events_file):
         print 'The given input file', simulated_events_file, 'does not exist.'

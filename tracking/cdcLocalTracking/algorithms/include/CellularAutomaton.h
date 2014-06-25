@@ -13,6 +13,7 @@
 
 #include <vector>
 #include <boost/foreach.hpp>
+#include <limits>
 
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 

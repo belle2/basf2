@@ -14,8 +14,6 @@
 #include <vector>
 #include <set>
 
-#include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
-
 #include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
 #include <tracking/cdcLocalTracking/algorithms/SortableVector.h>
 #include <tracking/cdcLocalTracking/algorithms/WeightedNeighborhood.h>

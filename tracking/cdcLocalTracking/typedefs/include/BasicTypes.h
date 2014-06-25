@@ -43,10 +43,10 @@ namespace Belle2 {
     /// An additive measure of quality (e.g. logarithms of probabilities)
     typedef float Weight;
 
-    ///Constant for the highest possible weight
+    /// Constant for the highest possible weight
     extern const Weight HIGHEST_WEIGHT;
 
-    ///Constant for the lowest possible weight
+    /// Constant for the lowest possible weight
     extern const Weight LOWEST_WEIGHT;
     /**@}*/
 
@@ -120,7 +120,6 @@ namespace Belle2 {
 
     const AxialType INVALID_AXIALTYPE = -127; ///< Constant for an invalid stereo information
     /**@}*/
-
 
 
   } // namespace CDCLocalTracking

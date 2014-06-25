@@ -16,8 +16,6 @@
 #include <tracking/cdcLocalTracking/eventdata/tracks/CDCSegmentTriple.h>
 
 #include <tracking/cdcLocalTracking/fitting/CDCRiemannFitter.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
-
 
 namespace Belle2 {
   namespace CDCLocalTracking {

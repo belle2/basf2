@@ -14,7 +14,7 @@
 #include <boost/range/iterator_range.hpp>
 
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
+#include <tracking/cdcLocalTracking/algorithms/NeighborWeight.h>
 
 #include <tracking/cdcLocalTracking/topology/CDCWire.h>
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCWireHit.h>
@@ -126,7 +126,7 @@ namespace Belle2 {
       /// Returns whether the wire hit is a good neighbor.
       /** Returns if the wire hit given in the range of possible neighbors is also a good neighbor.
        *  In the case of wire hits every neighbor is a good neighbor */
-      inline Weight isGoodNeighbor(
+      inline NeighborWeight isGoodNeighbor(
         const CDCWireHit& wirehit __attribute__((unused)),
         const CDCWireHit& neighborWirehit __attribute__((unused))
       ) const {

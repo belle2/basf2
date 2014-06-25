@@ -12,9 +12,6 @@
 
 #include <framework/logging/Logger.h>
 
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;

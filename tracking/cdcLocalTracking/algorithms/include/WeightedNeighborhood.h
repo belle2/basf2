@@ -12,9 +12,9 @@
 
 #include <iostream>
 #include <map>
+#include <limits>
 
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
 
 #include "NeighborWeight.h"
 

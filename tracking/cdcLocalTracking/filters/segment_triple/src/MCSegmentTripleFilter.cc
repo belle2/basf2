@@ -15,7 +15,6 @@
 #include <TDatabasePDG.h>
 
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
-#include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
 
 #include <tracking/cdcLocalTracking/mclookup/CDCMCSegmentLookUp.h>
 

@@ -17,8 +17,6 @@
 
 #include <tracking/cdcLocalTracking/eventdata/tracks/CDCAxialAxialSegmentPair.h>
 
-#include <tracking/cdcLocalTracking/typedefs/BasicConstants.h>
-
 namespace Belle2 {
   namespace CDCLocalTracking {
 

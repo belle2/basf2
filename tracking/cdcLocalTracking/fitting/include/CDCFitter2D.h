@@ -20,7 +20,6 @@
 #include "ExtendedRiemannsMethod.h"
 #include "KarimakisMethod.h"
 #include "OriginalKarimakisMethod.h"
-#include "PortedKarimakisMethod.h"
 
 #ifdef __CINT__
 //Unpack specialisation from all namespaces to spoon feeding them to ROOT
@@ -28,7 +27,6 @@ typedef Belle2::CDCLocalTracking::RiemannsMethod RiemannsMethod;
 typedef Belle2::CDCLocalTracking::ExtendedRiemannsMethod ExtendedRiemannsMethod;
 typedef Belle2::CDCLocalTracking::KarimakisMethod KarimakisMethod;
 typedef Belle2::CDCLocalTracking::OriginalKarimakisMethod OriginalKarimakisMethod;
-typedef Belle2::CDCLocalTracking::PortedKarimakisMethod PortedKarimakisMethod;
 #endif // __CINT__
 
 namespace Belle2 {

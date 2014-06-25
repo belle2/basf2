@@ -87,11 +87,11 @@ namespace Belle2 {
 
     public:
       /// Setter for the whole covariance matrix of the perigee parameters
-      inline void perigeeCovariance(const TMatrixD& perigeeCovariance)
+      inline void setPerigeeCovariance(const TMatrixD& perigeeCovariance)
       { m_perigeeCovariance = perigeeCovariance; }
 
       /// Getter for the whole covariance matrix of the perigee parameters
-      const TMatrixD& getPerigeeCovariance() const
+      const TMatrixD& perigeeCovariance() const
       { return m_perigeeCovariance; }
 
     private:

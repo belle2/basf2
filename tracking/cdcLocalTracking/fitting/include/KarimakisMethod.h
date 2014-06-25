@@ -69,4 +69,4 @@ namespace Belle2 {
     }; //class
   } // end namespace CDCLocalTracking
 } // namespace Belle2
-#endif // KARIMAKISMETHOD
+#endif // ORIGNALKARIMAKISMETHOD

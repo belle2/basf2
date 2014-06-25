@@ -85,7 +85,7 @@ namespace {
 TEST_F(CDCLocalTrackingTest, CDCRiemannFitter_LineFit)
 {
 
-  const CDCRiemannFitter& lineFitter = CDCRiemannFitter::getLineFitter();
+  CDCRiemannFitter lineFitter = CDCRiemannFitter::getLineFitter();
 
   CDCObservations2D observations2D;
   observations2D.append(Vector2D(0, 1), 0.5);
@@ -117,7 +117,7 @@ TEST_F(CDCLocalTrackingTest, CDCRiemannFitter_CircleFit)
   CDCObservations2D observations2D = createGeneralCircleObservations();
 
   //Now fit it
-  const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
+  CDCRiemannFitter fitter = CDCRiemannFitter::getFitter();
 
   CDCTrajectory2D trajectory2D;
   fitter.update(trajectory2D, observations2D);
@@ -139,7 +139,7 @@ TEST_F(CDCLocalTrackingTest, CDCKarimakiFitter_CircleFit)
   CDCObservations2D observations2D = createGeneralCircleObservations();
 
   //Now fit it
-  const CDCKarimakiFitter& fitter = CDCKarimakiFitter::getFitter();
+  CDCKarimakiFitter fitter = CDCKarimakiFitter::getFitter();
 
   CDCTrajectory2D trajectory2D;
   fitter.update(trajectory2D, observations2D);

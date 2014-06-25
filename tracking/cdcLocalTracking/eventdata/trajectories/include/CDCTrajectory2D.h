@@ -226,8 +226,12 @@ namespace Belle2 {
       /// Calculates if this trajectory and the entity are coaligned
       /** Returns the sign of the total perpendicular travel distance of the trajectory */
       template<class Entity>
-      ForwardBackwardInfo isForwardOrBackwardTo(const Entity& entity) const
-      { return sign(getTotalPerpS(entity)); }
+      ForwardBackwardInfo isForwardOrBackwardTo(const Entity& entity) const {
+        FloatType totalPerpS = getTotalPerpS(entity);
+        if (totalPerpS > 0) return FORWARD;
+        else if (totalPerpS < 0) return BACKWARD;
+        else return UNKNOWN_INFO;
+      }
 
       /// Extrapolate to the closest approach to the front of the first point of the entity
       template<class Entity>
@@ -260,6 +264,8 @@ namespace Belle2 {
       template<class Entity>
       FloatType getDist2DToBack(const Entity& entity) const
       { return getDist2D(entity.getBackRecoPos2D()); }
+
+
 
       /// Get the unit momentum of the trajectory at the center of the entity
       template<class Entity>

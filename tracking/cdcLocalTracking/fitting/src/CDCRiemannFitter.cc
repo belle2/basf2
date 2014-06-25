@@ -288,7 +288,7 @@ void CDCRiemannFitter::updateWithRightLeft(CDCTrajectory2D& trajectory2D, CDCObs
     //projectedPoints.col(0) = Matrix<FloatType,Dynamic,1>::Constant(nObservations,1.0);
     projectedPoints.col(0) = eigenObservation.col(0);
     projectedPoints.col(1) = eigenObservation.col(1);
-    //projectedPoints.col(2) = eigenObservation.leftCols<2>().rowwise().squaredNorm();
+    //projectedPoints.col(2) = eigenObservation.leftCols<2>().rowwise().squaredNorm() - distances.rowwise().squaredNorm();
 
     Matrix< FloatType, 2, 1> parameters = projectedPoints.jacobiSvd(ComputeThinU | ComputeThinV).solve(distances);
 
@@ -303,7 +303,7 @@ void CDCRiemannFitter::updateWithRightLeft(CDCTrajectory2D& trajectory2D, CDCObs
     //projectedPoints.col(0) = Matrix<FloatType,Dynamic,1>::Constant(1.0);
     projectedPoints.col(0) = eigenObservation.col(0);
     projectedPoints.col(1) = eigenObservation.col(1);
-    projectedPoints.col(2) = eigenObservation.leftCols<2>().rowwise().squaredNorm();
+    projectedPoints.col(2) = eigenObservation.leftCols<2>().rowwise().squaredNorm() - distances.rowwise().squaredNorm();
 
     Matrix< FloatType, 3, 1> parameters = projectedPoints.jacobiSvd(ComputeThinU | ComputeThinV).solve(distances);
 
@@ -318,7 +318,7 @@ void CDCRiemannFitter::updateWithRightLeft(CDCTrajectory2D& trajectory2D, CDCObs
     projectedPoints.col(0) = Matrix<FloatType, Dynamic, 1>::Constant(nObservations, 1.0);
     projectedPoints.col(1) = eigenObservation.col(0);
     projectedPoints.col(2) = eigenObservation.col(1);
-    //projectedPoints.col(3) = eigenObservation.leftCols<2>().rowwise().squaredNorm();
+    //projectedPoints.col(3) = eigenObservation.leftCols<2>().rowwise().squaredNorm()- distances.rowwise().squaredNorm();
 
     Matrix< FloatType, 3, 1> parameters = projectedPoints.jacobiSvd(ComputeThinU | ComputeThinV).solve(distances);
 
@@ -335,7 +335,7 @@ void CDCRiemannFitter::updateWithRightLeft(CDCTrajectory2D& trajectory2D, CDCObs
     projectedPoints.col(0) = Matrix<FloatType, Dynamic, 1>::Constant(nObservations, 1.0);
     projectedPoints.col(1) = eigenObservation.col(0);
     projectedPoints.col(2) = eigenObservation.col(1);
-    projectedPoints.col(3) = eigenObservation.leftCols<2>().rowwise().squaredNorm();
+    projectedPoints.col(3) = eigenObservation.leftCols<2>().rowwise().squaredNorm() - distances.rowwise().squaredNorm();
 
     //cout << "points : " << endl << projectedPoints << endl;
 

@@ -282,23 +282,27 @@ void CDCKarimakiFitter::updateWithRightLeft(CDCTrajectory2D& trajectory2D, CDCOb
   projectedPoints.col(2) = eigenObservation.leftCols<2>().rowwise().squaredNorm() - driftLengths.rowwise().squaredNorm();
   projectedPoints.col(3) = Matrix<FloatType, Dynamic, 1>::Constant(nObservations, 1.0); //Offset column
 
-  Array< FloatType, Dynamic, 1 > weights = Array<FloatType, Dynamic, 1>::Constant(nObservations, 1.0);
-  Matrix< FloatType, Dynamic, 4 > weightedProjectedPoints = projectedPoints.array().colwise() * weights;
+  //Array< FloatType, Dynamic, 1 > weights = Array<FloatType, Dynamic, 1>::Constant(nObservations, 1.0);
+  Matrix< FloatType, Dynamic, 4 > weightedProjectedPoints = projectedPoints; //.array().colwise() * weights;
 
   Matrix< FloatType, 4, 4 > s = projectedPoints.transpose() * weightedProjectedPoints;
 
-  Matrix< FloatType, 4, 1 > l = weightedProjectedPoints .transpose() * driftLengths;
+  Matrix< FloatType, 4, 1 > l = weightedProjectedPoints.transpose() * driftLengths;
   Matrix< FloatType, 4, 1 > n = s.ldlt().solve(l);
 
-  PerigeeCircle resultCircle = PerigeeCircle::fromN(n(0), n(1), n(2), n(3));
+  //B2INFO("s = " << endl << s);
+  //B2INFO("l = " << endl << l);
+  //B2INFO("n = " << endl << n);
+
+  PerigeeCircle resultCircle = PerigeeCircle::fromN(n(3), n(0), n(1), n(2));
 
   FloatType curvature = resultCircle.curvature();
   FloatType impact = resultCircle.impact();
   Vector2D tangential = resultCircle.tangential().unit();
   FloatType tangentialPhi = tangential.phi();
 
-  FloatType cosphi = tangential.x();
-  FloatType sinphi = tangential.y();
+
+  resultCircle.passiveMoveBy(-referencePoint);
 
   trajectory2D.setCircle(resultCircle);
   return;
@@ -358,6 +362,11 @@ void CDCKarimakiFitter::updateWithRightLeft(CDCTrajectory2D& trajectory2D, CDCOb
     //TODO
 
   } else {
+    // Karimaki has opposite phi sign convention
+    FloatType cosphi = -tangential.x();
+    FloatType sinphi = -tangential.y();
+
+
     double kappa = (sinphi * cxr - cosphi * cyr) / crr;
     // double delta = -kappa * ar + sinphi * ax - cosphi * ay;
     // track parameters

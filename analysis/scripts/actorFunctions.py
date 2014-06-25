@@ -192,14 +192,12 @@ def WriteAnalysisFileForChannel(particleName, channelName, preCutConfig, preCutH
         @param signalProbability config filename for TMVA training
     """
 
-    print "Executed Write analysis for ", particleName, " ", channelName, " ", signalProbability, " ", preCut
     if signalProbability is None or preCut is None:
         return {'dummy': None}
-    print "Really do it"
 
     stripped_tmva_filename = signalProbability[:-7]  # Strip .config of filename
     stripped_preCut_filename = preCutHistogram[0][:-5]  # Strip .root of filename
-    subprocess.call(['createAnalysisPlots', stripped_tmva_filename, stripped_preCut_filename])
+    subprocess.call(['createAnalysisPlots', stripped_tmva_filename, stripped_preCut_filename, str(preCut.values()[0][0]), str(preCut.values()[0][1])])
 
     placeholders = {}
     placeholders['particleName'] = particleName

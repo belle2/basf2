@@ -2,9 +2,9 @@
 # createAnalysisPlots.sh
 # Create Control Plots as png for a training stored in root file created by TMVATeacher
 
-if [ $# -ne 2 ]
+if [ $# -ne 4 ]
 then
-  echo "Usage: createAnalysisPlots TMVA_PREFIX PRECUT_PREFIX"
+  echo "Usage: createAnalysisPlots TMVA_PREFIX PRECUT_PREFIX LOWER_CUT UPPER_CUT"
   echo "TMVA_PREFIX: $PREFIX_1_vs_0.root"
   exit 1
 fi
@@ -12,6 +12,8 @@ fi
 #get full path
 TF=$1
 PF=$2
+LC=$3
+UC=$4
 
 TMVA_FILE=`readlink -f "$TF"_1_vs_0.root`
 PRECUT_FILE=`readlink -f "$PF".root`
@@ -32,24 +34,41 @@ cp plots/$(ls -t plots/ | head -1) roc.png
 
 echo "auto keys = _file0->GetListOfKeys();
       TCanvas canvas1(\"signal_canvas\", \"signal\", 600, 400);
-      canvas1.cd()
-      auto hist1 = _file0->Get(keys.At(0).GetName());
+      canvas1.cd();
+      TH1F* hist1 = _file0->Get(keys.At(0).GetName());
       hist1->Draw();
+      canvas1.Update()
+      TLine *lower_cut1 = new TLine($LC,0,$LC,hist1->GetMaximum());
+      TLine *upper_cut1 = new TLine($UC,0,$UC,hist1->GetMaximum());
+      lower_cut1->Draw();
+      upper_cut1->Draw();
       canvas1.SaveAs(\"signal.png\");
       TCanvas canvas2(\"all_canvas\", \"all\", 600, 400);
-      canvas2.cd()
-      auto hist2 = _file0->Get(keys.At(1).GetName());
+      canvas2.cd();
+      TH1F* hist2 = _file0->Get(keys.At(1).GetName());
       hist2->Draw();
+      TLine *lower_cut2 = new TLine($LC,0,$LC,hist2->GetMaximum());
+      TLine *upper_cut2 = new TLine($UC,0,$UC,hist2->GetMaximum());
+      lower_cut2->Draw();
+      upper_cut2->Draw();
       canvas2.SaveAs(\"all.png\");
       TCanvas canvas3(\"bckgrd_canvas\", \"background\", 600, 400);
-      canvas3.cd()
-      auto hist3 = _file0->Get(keys.At(2).GetName());
+      canvas3.cd();
+      TH1F* hist3 = _file0->Get(keys.At(2).GetName());
       hist3->Draw();
+      TLine *lower_cut3 = new TLine($LC,0,$LC,hist3->GetMaximum());
+      TLine *upper_cut3 = new TLine($UC,0,$UC,hist3->GetMaximum());
+      lower_cut3->Draw();
+      upper_cut3->Draw();
       canvas3.SaveAs(\"background.png\");
       TCanvas canvas4(\"ratio_canvas\", \"ratio\", 600, 400);
-      canvas4.cd()
-      auto hist4 = _file0->Get(keys.At(3).GetName());
+      canvas4.cd();
+      TH1F* hist4 = _file0->Get(keys.At(3).GetName());
       hist4->Draw();
+      TLine *lower_cut4 = new TLine($LC,0,$LC,hist4->GetMaximum());
+      TLine *upper_cut4 = new TLine($UC,0,$UC,hist4->GetMaximum());
+      lower_cut4->Draw();
+      upper_cut4->Draw();
       canvas4.SaveAs(\"ratio.png\");
       .q" | root -l -b "$PRECUT_FILE"
       

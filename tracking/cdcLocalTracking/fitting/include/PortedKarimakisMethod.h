@@ -34,16 +34,11 @@ namespace Belle2 {
 
 
     private:
-      int fit(CDCObservations2D& , double&) const;
+      UncertainPerigeeCircle fit(CDCObservations2D&) const;
 
     private:
       const bool _curved;
       const int _npar;
-      mutable int _numPoints;
-
-
-      mutable TVectorD _parameters;
-      mutable TMatrixDSym _covariance;
 
 
     public:

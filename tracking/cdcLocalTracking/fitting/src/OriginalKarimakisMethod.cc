@@ -63,6 +63,7 @@ void OriginalKarimakisMethod::update(CDCTrajectory2D& trajectory2D,
   int nPoints = 0;
 
   fit(Chi2, nPoints);
+  B2INFO("Chi2 " << Chi2);
 
   FloatType curvature = _parameters(0);
   FloatType tangentialPhi = _parameters(1) + (_parameters(1) > 0 ? - PI : + PI);

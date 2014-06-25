@@ -73,7 +73,7 @@ namespace {
     CDCTrajectory2D trajectory2D;
     fitter.update(trajectory2D, observations2D);
 
-    const PerigeeCircle& fittedCircle = trajectory2D.getCircle();
+    const UncertainPerigeeCircle& fittedCircle = trajectory2D.getCircle();
 
     EXPECT_NEAR(generalCircle.perigee().x(), fittedCircle.perigee().x(), 10e-7) <<
         "Fitter " << typeid(fitter).name() << " failed.";
@@ -84,6 +84,10 @@ namespace {
 
     EXPECT_NEAR(-PI / 2.0, fittedCircle.tangentialPhi(), 10e-7) <<
                                                                 "Fitter " << typeid(fitter).name() << " failed.";
+
+    EXPECT_NEAR(0.0, fittedCircle.chi2(), 10e-7) <<
+                                                 "Fitter " << typeid(fitter).name() << " failed.";
+
 
     B2INFO("Covariance matrix:");
     trajectory2D.getCircle().perigeeCovariance().Print();

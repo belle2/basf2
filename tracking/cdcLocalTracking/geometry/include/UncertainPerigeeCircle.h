@@ -94,6 +94,14 @@ namespace Belle2 {
       const TMatrixD& perigeeCovariance() const
       { return m_perigeeCovariance; }
 
+      /// Getter for the chi square value of the circle fit
+      const FloatType& chi2() const
+      { return m_chi2; }
+
+      /// Setter for the chi square value of the circle fit
+      void setChi2(const FloatType& chi2)
+      { m_chi2 = chi2; }
+
     private:
       /// Modifies to perigee covariance matrix inplace to represent the reverse travel direction.
       void reversePerigeeCovariance(TMatrixD& perigeeCovariance) const {
@@ -134,6 +142,8 @@ namespace Belle2 {
         return UncertainPerigeeCircle(PerigeeCircle::reversed(),
                                       reversedPerigeeCovariance());
       }
+
+
 
 
     public:
@@ -182,6 +192,8 @@ namespace Belle2 {
        *  * 2 <-> signed impact parameter
        */
       TMatrixD m_perigeeCovariance;
+
+      FloatType m_chi2; ///< Memory for the chi square value of the fit of this circle.
 
       /// ROOT Macro to make StandardOriginCircle2D a ROOT class.
       ClassDefInCDCLocalTracking(UncertainPerigeeCircle, 1);

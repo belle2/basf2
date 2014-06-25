@@ -26,9 +26,7 @@ ClassImpInCDCLocalTracking(PortedKarimakisMethod)
 
 PortedKarimakisMethod::PortedKarimakisMethod() :
   _curved(true),
-  _npar(_curved ? 3 : 2),
-  _parameters(_npar),
-  _covariance(_npar)
+  _npar(_curved ? 3 : 2)
 {
 }
 
@@ -59,17 +57,7 @@ void PortedKarimakisMethod::update(CDCTrajectory2D& trajectory2D,
 
   observations2D.centralize(ref);
 
-  double Chi2 = 0;
-  int nPoints = 0;
-
-  fit(observations2D, Chi2);
-
-  FloatType curvature = _parameters(0);
-  FloatType tangentialPhi = _parameters(1) + (_parameters(1) > 0 ? - PI : + PI);
-  tangentialPhi = _parameters(1);
-  FloatType impact = _parameters(2);
-
-  UncertainPerigeeCircle perigeeCircle(curvature, tangentialPhi, impact, _covariance);
+  UncertainPerigeeCircle perigeeCircle =  fit(observations2D);
 
   FloatType frontX = observations2D.getX(0);
   FloatType frontY = observations2D.getY(0);
@@ -93,7 +81,7 @@ void PortedKarimakisMethod::update(CDCTrajectory2D& trajectory2D,
 
 
 namespace {
-  /// Helper indices for meaningfull matrix access
+  /// Helper indices for meaningfull matrix access to the observations matrices
   constexpr size_t iW = 0;
   constexpr size_t iX = 1;
   constexpr size_t iY = 2;
@@ -101,60 +89,163 @@ namespace {
   constexpr size_t iL = 4;
 
 
-  UncertainPerigeeCircle fitWithDriftLength(const Matrix< FloatType, 5, 5 >& sumMatrix)
+  /// Helper indices for meaningfull matrix access to the full generalized parameter covariance matrices
+  constexpr size_t iN0 = 0;
+  constexpr size_t iN1 = 1;
+  constexpr size_t iN2 = 2;
+  constexpr size_t iN3 = 3;
+
+  /// Helper indices for meaningfull matrix access to the reduced generalized parameter covariance matrices
+  constexpr size_t iReducedN0 = 0;
+  constexpr size_t iReducedN2 = 1;
+  constexpr size_t iReducedN3 = 2;
+
+  /// Helper indices for meaningfull matrix access to the perigee covariance matrices
+  constexpr size_t iCurv = 0;
+  constexpr size_t iPhi = 1;
+  constexpr size_t iI = 2;
+
+
+  /// Variant with drift circles
+  UncertainPerigeeCircle fit(const Matrix< FloatType, 5, 5 >& sumMatrix,
+                             bool lineConstrained = false,
+                             bool originConstrained = false)
   {
     //Solve the normal equation X * n = y
-    Matrix< FloatType, 4, 4 > X = sumMatrix.block<4, 4>(0, 0);
-    Matrix< FloatType, 4, 1 > y = sumMatrix.block<4, 1>(0, iL);
-    Matrix< FloatType, 4, 1 > n = X.ldlt().solve(y);
-    return PerigeeCircle::fromN(n(iW), n(iX), n(iY), n(iR2));
+    if (lineConstrained) {
+      if (originConstrained) {
+        Matrix< FloatType, 2, 2> X = sumMatrix.block<2, 2>(1, 1);
+        Matrix< FloatType, 2, 1> y = sumMatrix.block<2, 1>(1, iL);
+        Matrix< FloatType, 2, 1> n = X.ldlt().solve(y);
+        return PerigeeCircle::fromN(0.0, n(0), n(1), 0.0);
+
+      } else {
+        Matrix< FloatType, 3, 3> X = sumMatrix.block<3, 3>(0, 0);
+        Matrix< FloatType, 3, 1> y = sumMatrix.block<3, 1>(0, iL);
+        Matrix< FloatType, 3, 1> n = X.ldlt().solve(y);
+        return PerigeeCircle::fromN(n(iW), n(iX), n(iY), 0.0);
+
+      }
+
+    } else {
+      if (originConstrained) {
+        Matrix< FloatType, 3, 3> X = sumMatrix.block<3, 3>(1, 1);
+        Matrix< FloatType, 3, 1> y = sumMatrix.block<3, 1>(1, iL);
+        Matrix< FloatType, 3, 1> n = X.ldlt().solve(y);
+        return PerigeeCircle::fromN(0.0, n(0), n(1), n(2));
+
+      } else {
+        Matrix< FloatType, 4, 4> X = sumMatrix.block<4, 4>(0, 0);
+        Matrix< FloatType, 4, 1> y = sumMatrix.block<4, 1>(0, iL);
+        Matrix< FloatType, 4, 1> n = X.ldlt().solve(y);
+        return PerigeeCircle::fromN(n(iW), n(iX), n(iY), n(iR2));
+
+      }
+    }
   }
 
 
-
-  UncertainPerigeeCircle fitWithoutDriftLength(Matrix< FloatType, 5, 5 > sumMatrix)
+  /// Variant without drift circles
+  UncertainPerigeeCircle fit(Matrix< FloatType, 4, 4 > sumMatrix,
+                             bool lineConstrained = false,
+                             bool originConstrained = false)
   {
     // Solve the normal equation min_n  n^T * X * n
     // n is the smallest eigenvector
-    Matrix< FloatType, 4, 4 > X = sumMatrix.block<4, 4>(0, 0);
-    SelfAdjointEigenSolver< Matrix<FloatType, 4, 4> > eigensolver(X);
-    Matrix<FloatType, 4, 1> n = eigensolver.eigenvectors().col(0);
 
-    if (eigensolver.info() != Success) {
-      B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
+    if (lineConstrained) {
+      if (originConstrained) {
+        Matrix< FloatType, 2, 2> X = sumMatrix.block<2, 2>(1, 1);
+        SelfAdjointEigenSolver< Matrix<FloatType, 2, 2> > eigensolver(X);
+        Matrix<FloatType, 2, 1> n = eigensolver.eigenvectors().col(0);
+        if (eigensolver.info() != Success) {
+          B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
+        }
+        return PerigeeCircle::fromN(0.0, n(0), n(1), 0.0);
+
+      } else {
+        Matrix< FloatType, 3, 3> X = sumMatrix.block<3, 3>(0, 0);
+        SelfAdjointEigenSolver< Matrix<FloatType, 3, 3> > eigensolver(X);
+        Matrix<FloatType, 3, 1> n = eigensolver.eigenvectors().col(0);
+        if (eigensolver.info() != Success) {
+          B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
+        }
+        return PerigeeCircle::fromN(n(iW), n(iX), n(iY), 0.0);
+
+      }
+    } else {
+      if (originConstrained) {
+        Matrix< FloatType, 3, 3> X = sumMatrix.block<3, 3>(1, 1);
+        SelfAdjointEigenSolver< Matrix<FloatType, 3, 3> > eigensolver(X);
+        Matrix<FloatType, 3, 1> n = eigensolver.eigenvectors().col(0);
+        if (eigensolver.info() != Success) {
+          B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
+        }
+        return PerigeeCircle::fromN(0.0, n(0), n(1), n(2));
+
+      } else {
+        Matrix< FloatType, 4, 4 > X = sumMatrix.block<4, 4>(0, 0);
+        SelfAdjointEigenSolver< Matrix<FloatType, 4, 4> > eigensolver(X);
+        Matrix<FloatType, 4, 1> n = eigensolver.eigenvectors().col(0);
+        if (eigensolver.info() != Success) {
+          B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
+        }
+        return PerigeeCircle::fromN(n(iW), n(iX), n(iY), n(iR2));
+
+      }
     }
-    return PerigeeCircle::fromN(n(iW), n(iX), n(iY), n(iR2));
+
   }
 
 
-
-  UncertainPerigeeCircle fitWithoutDriftLengthSeperateOffset(Matrix< FloatType, 5, 1 > means,
-                                                             Matrix< FloatType, 5, 5 > c)
+  /// Variant without drift circles and seperating the offset before the matrix solving
+  UncertainPerigeeCircle fitSeperateOffset(Matrix< FloatType, 4, 1 > means,
+                                           Matrix< FloatType, 4, 4 > c,
+                                           bool lineConstrained = false)
   {
     // Solve the normal equation min_n  n^T * c * n
     // for the plane normal and move the plain by the offset
     // n is the smallest eigenvector
-    Matrix< FloatType, 3, 3 > X = c.block<3, 3>(1, 1);
-    SelfAdjointEigenSolver< Matrix<FloatType, 3, 3> > eigensolver(X);
-    if (eigensolver.info() != Success) {
-      B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
-    }
 
-    //the eigenvalues are generated in increasing order
-    //we are interested in the lowest one since we want to compute the normal vector of the plane
-    Matrix<FloatType, 4, 1> n;
-    n.middleRows<3>(iX) = eigensolver.eigenvectors().col(0);
-    n(iW) = -means.middleRows<3>(iX).transpose() * n.middleRows<3>(iX);
-    return PerigeeCircle::fromN(n(iW), n(iX), n(iY), n(iR2));
+    if (lineConstrained) {
+      Matrix< FloatType, 2, 2> X = c.block<2, 2>(1, 1);
+      SelfAdjointEigenSolver< Matrix<FloatType, 2, 2> > eigensolver(X);
+      if (eigensolver.info() != Success) {
+        B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
+      }
+
+      //the eigenvalues are generated in increasing order
+      //we are interested in the lowest one since we want to compute the normal vector of the plane
+      Matrix<FloatType, 4, 1> n;
+      n.middleRows<2>(iX) = eigensolver.eigenvectors().col(0);
+      n(iW) = -means.middleRows<2>(iX).transpose() * n.middleRows<2>(iX);
+      n(iR2) = 0.;
+      return PerigeeCircle::fromN(n(iW), n(iX), n(iY), n(iR2));
+
+    } else {
+      Matrix< FloatType, 3, 3> X = c.block<3, 3>(1, 1);
+      SelfAdjointEigenSolver< Matrix<FloatType, 3, 3> > eigensolver(X);
+      if (eigensolver.info() != Success) {
+        B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
+      }
+
+      //the eigenvalues are generated in increasing order
+      //we are interested in the lowest one since we want to compute the normal vector of the plane
+      Matrix<FloatType, 4, 1> n;
+      n.middleRows<3>(iX) = eigensolver.eigenvectors().col(0);
+      n(iW) = -means.middleRows<3>(iX).transpose() * n.middleRows<3>(iX);
+      return PerigeeCircle::fromN(n(iW), n(iX), n(iY), n(iR2));
+
+    }
 
   }
 
 
-
-  UncertainPerigeeCircle fitWithoutDriftLengthOriginal(FloatType sw,
-                                                       const Matrix< FloatType, 5, 1 >& a,
-                                                       const Matrix< FloatType, 5, 5 >& c,
-                                                       bool lineConstrained = false)
+  /// Variant implementing Karimakis method without drift circles.
+  UncertainPerigeeCircle fitKarimaki(FloatType sw,
+                                     const Matrix< FloatType, 4, 1 >& a,
+                                     const Matrix< FloatType, 4, 4 >& c,
+                                     bool lineConstrained = false)
   {
     double q1, q2 = 0.0;
     if (not lineConstrained) {
@@ -178,64 +269,178 @@ namespace {
       curv = 2. * kappa / sqrt(1. - 4. * delta * kappa);
       I = 2. * delta / (1. + sqrt(1. - 4. * delta * kappa));
 
-      double u = 1. + curv * I;
-
-      double chi2 =  sw * u * u * (sinphi * sinphi * c(iX, iX) - 2. * sinphi * cosphi * c(iX, iY) + cosphi * cosphi * c(iY, iY) - kappa * kappa * c(iR2, iR2));
-
     } else {
       curv = 0.0; //line
       I = sinphi * a(iX) - cosphi * a(iY);
 
-      double chi2 = sw * (sinphi * sinphi * c(iX, iX) - 2. * sinphi * cosphi * c(iX, iY) + cosphi * cosphi * c(iY, iY));
     }
 
     // Karimaki uses the opposite sign for phi in contrast to the convention of this framework !!!
     phi += phi > 0 ? -PI : PI;
-
     return PerigeeCircle::fromPerigeeParameters(curv, phi, I);
-  }
-}
 
-
-
-int PortedKarimakisMethod::fit(CDCObservations2D& observations2D, double& Chi2) const
-{
-
-  Matrix< FloatType, 5, 5 > s = observations2D.getWXYRLSumMatrix();
-  Matrix< FloatType, 5, 5 > a = s / s(iW);
-
-  Matrix< FloatType, 5, 1> means = a.row(iW);
-  Matrix< FloatType, 5, 5> c = a - means * means.transpose();
-
-  /// Fit te parameters
-  UncertainPerigeeCircle resultCircle;
-
-  size_t nObservationsWithDriftRadius = observations2D.getNObservationsWithDriftRadius();
-  if (nObservationsWithDriftRadius > 0) {
-    resultCircle = fitWithDriftLength(s);
-  } else {
-    //resultCircle = fitWithoutDriftLength(s);
-    //resultCircle = fitWithoutDriftLengthSeperateOffset(means, c);
-    resultCircle = fitWithoutDriftLengthOriginal(s(iW), means, c);
   }
 
-  const FloatType& curv = resultCircle.curvature();
-  const FloatType& I = resultCircle.impact();
-  const FloatType& phi = resultCircle.tangentialPhi();
 
-  _parameters[0] = curv;
-  _parameters[1] = phi;
-  _parameters[2] = I;
+  /// Variant with drift circles
+  FloatType calcChi2(const PerigeeCircle& parameters,
+                     const Matrix< FloatType, 5, 5 >& s)
+  {
 
-  B2INFO("Curvature " << curv);
-  B2INFO("Tangential phi " << phi);
-  B2INFO("Impact " << I);
+    Matrix<FloatType, 5, 1> n;
+    n <<
+      parameters.n0(),
+                    parameters.n1(),
+                    parameters.n2(),
+                    parameters.n3(),
+                    -1.0;  // subtraction of the drift lengths
+
+    FloatType chi2 = n.transpose() * s * n;
+
+    return chi2;
+
+  }
 
 
+  /// Variant without drift circles
+  FloatType calcChi2(const PerigeeCircle& parameters,
+                     const Matrix< FloatType, 4, 4 >& s)
+  {
+
+    Matrix<FloatType, 4, 1> n;
+    n <<
+      parameters.n0(),
+                    parameters.n1(),
+                    parameters.n2(),
+                    parameters.n3();
+
+    FloatType chi2 = n.transpose() * s * n;
+
+    return chi2;
+  }
+
+
+  /// Variant without drift circles
+  FloatType calcChi2Karimaki(const PerigeeCircle& parameters,
+                             const FloatType& sw,
+                             const Matrix< FloatType, 4, 4 >& c,
+                             bool lineConstrained = false)
   {
     // Karimaki uses the opposite sign for phi in contrast to the convention of this framework !!!
-    const Vector2D vecPhi = -resultCircle.tangential();
+    const Vector2D vecPhi = -parameters.tangential();
 
+    // Ternminology Karimaki used in the paper
+    const FloatType& cosphi = vecPhi.x();
+    const FloatType& sinphi = vecPhi.y();
+
+    const FloatType& rho = parameters.curvature();
+    const FloatType& d = parameters.impact();
+
+    const FloatType u = 1 + d * rho;
+    const FloatType kappa = 0.5 * rho / u;
+
+    if (not lineConstrained) {
+      FloatType chi2 =  sw * u * u * (sinphi * sinphi * c(iX, iX) - 2. * sinphi * cosphi * c(iX, iY) + cosphi * cosphi * c(iY, iY) - kappa * kappa * c(iR2, iR2));
+
+      return chi2;
+    } else {
+      FloatType chi2 = sw * (sinphi * sinphi * c(iX, iX) - 2. * sinphi * cosphi * c(iX, iY) + cosphi * cosphi * c(iY, iY));
+      return chi2;
+    }
+
+  }
+
+
+
+  Matrix<FloatType, 3, 3> calcCovariance(const PerigeeCircle& parameters,
+                                         const Matrix< FloatType, 4, 4 >& s)
+  {
+    const FloatType n0 = parameters.n0();
+
+    Vector2D n12 = parameters.n12();
+    const FloatType n3 = parameters.n3();
+
+    // 1. Passive rotation such that n12 = (n1, 0);
+
+    // n12 in the rotated system will be:
+    const FloatType rotN1 = n12.normalize();
+    const FloatType rotN2 = 0.0;
+
+    // Setup passive rotation matrix.
+    Matrix< FloatType, 4, 4 > rot = Matrix< FloatType, 4, 4 >::Identity();
+    rot(iX, iX) = n12.x();
+    rot(iX, iY) = n12.y();
+
+    rot(iY, iX) = -n12.y();
+    rot(iY, iY) = n12.x();
+
+
+    // 2. Reduce the four generalized parameters to three parameters lifting the normalization constraint
+    // n1 * n1 + n2 * n2 - 4 n0*n3 = 1
+    // in the rotated system
+    // The rotation is needed because to assure n1 != 0 at the point the constraint needs to be inverted.
+    // In case n12 = (0, 0) this breaks down.
+    // However this correspondes to the case where circle is centered on the origin where the perigee parameterization is ill conditioned in the first place.
+
+    Matrix< FloatType, 3, 4 > reduce = Matrix< FloatType, 3, 4 >::Zero();
+    reduce(iReducedN0, iN0) = 1.;
+    reduce(iReducedN2, iN2) = 1.;
+    reduce(iReducedN3, iN3) = 1.;
+
+    reduce(iReducedN0, iN1) = 2 * n3 / rotN1;
+    reduce(iReducedN2, iN1) = -rotN2 / rotN1;
+    reduce(iReducedN3, iN1) = 2 * n0 / rotN1;
+
+    B2INFO("reduce " << endl << reduce);
+
+    // Instead of doing the two transformations seperatly we combine matrices and apply a single transformation
+    // This saves one matrix multiplication.
+    // Matrix<FloatType, 4, 4> rotS = rot * s * rot.transpose();
+    // Matrix<FloatType, 3, 3> reducedNInvV = reduce * rotS * reduce.transpose();
+
+    Matrix< FloatType, 3, 4 > rotAndReduce = reduce * rot;
+    Matrix<FloatType, 3, 3> reducedNInvCov = rotAndReduce * s * rotAndReduce.transpose();
+
+    Matrix<FloatType, 3, 3> reducedNCov = reducedNInvCov.inverse();
+
+    // 3. Translate to perigee
+    Matrix< FloatType, 3, 3 > perigeeJ;
+
+    FloatType normN12 = fabs(rotN1); // = 1 / hypot(n1, n2);
+    FloatType denominator = (1 + normN12) * (1 + normN12) * normN12;
+    perigeeJ(iCurv, iReducedN0) = 0;
+    perigeeJ(iCurv, iReducedN2) = 0;
+    perigeeJ(iCurv, iReducedN3) = 2;
+
+    perigeeJ(iPhi, iReducedN0) = 0;
+    perigeeJ(iPhi, iReducedN2) = -1 / normN12;
+    perigeeJ(iPhi, iReducedN3) = 0;
+
+    perigeeJ(iI, iReducedN0) = 2 * (normN12 * (1 + 2 * normN12) - 1) / denominator;
+    perigeeJ(iI, iReducedN2) = 0;
+    perigeeJ(iI, iReducedN3) =  -4 * n0 * n0 /  denominator;
+
+    Matrix< FloatType, 3, 3 > perigeeCov = perigeeJ * reducedNCov * perigeeJ.transpose();
+
+    return perigeeCov;
+  }
+
+
+
+  Matrix<FloatType, 3, 3> calcCovarianceKarimaki(const PerigeeCircle& parameters,
+                                                 const Matrix< FloatType, 4, 4 >& s,
+                                                 bool lineConstrained = false)
+  {
+    Matrix<FloatType, 3, 3> invV;
+
+    const FloatType& curv = parameters.curvature();
+    const FloatType& I =  parameters.impact();
+
+    // Karimaki uses the opposite sign for phi in contrast to the convention of this framework !!!
+    const Vector2D vecPhi = -parameters.tangential();
+
+
+    // Ternminology Karimaki using in the paper
     const FloatType& cosphi = vecPhi.x();
     const FloatType& sinphi = vecPhi.y();
 
@@ -246,9 +451,9 @@ int PortedKarimakisMethod::fit(CDCObservations2D& observations2D, double& Chi2) 
     const FloatType rho = curv;
     const FloatType& d = I;
 
-    double u = 1. + rho * d;
+    const double u = 1. + rho * d;
 
-    if (_curved) {
+    if (not lineConstrained) {
       // calculate covariance matrix
       double sa = sinphi * s(iX) - cosphi * s(iY);
       double sb = cosphi * s(iX) + sinphi * s(iY);
@@ -262,36 +467,98 @@ int PortedKarimakisMethod::fit(CDCObservations2D& observations2D, double& Chi2) 
       double se = cosphi * s(iX, iR2) + sinphi * s(iY, iR2);
       double sbb = ccphi * s(iX, iX) + 2. * scphi * s(iX, iY) + ssphi * s(iY, iY);
 
-      _covariance(0, 0) = 0.25 * s(iR2, iR2) - d * (sd - d * (saa + 0.5 * s(iR2) - d * (sa - 0.25 * d * s(iW))));
-      _covariance(0, 1) = - u * (0.5 * se - d * (sc - 0.5 * d * sb));
-      _covariance(1, 0) = _covariance(0, 1);
-      _covariance(1, 1) = u * u * sbb;
+      invV(iCurv, iCurv) = 0.25 * s(iR2, iR2) - d * (sd - d * (saa + 0.5 * s(iR2) - d * (sa - 0.25 * d * s(iW))));
+      invV(iCurv, iPhi) = - u * (0.5 * se - d * (sc - 0.5 * d * sb));
+      invV(iPhi, iCurv) = invV(iCurv, iPhi);
+      invV(iPhi, iPhi) = u * u * sbb;
 
-      _covariance(0, 2) = rho * (-0.5 * sd + d * saa) + 0.5 * u * s(iR2) - 0.5 * d * ((2 * u + rho * d) * sa - u * d * s(iW));
-      _covariance(2, 0) = _covariance(0, 2);
-      _covariance(1, 2) = u * (rho * sc - u * sb);
-      _covariance(2, 1) = _covariance(1, 2);
-      _covariance(2, 2) = rho * (rho * saa - 2 * u * sa) + u * u * s(iW);
+      invV(iCurv, iI) = rho * (-0.5 * sd + d * saa) + 0.5 * u * s(iR2) - 0.5 * d * ((2 * u + rho * d) * sa - u * d * s(iW));
+      invV(iI, iCurv) = invV(iCurv, iI);
+      invV(iPhi, iI) = u * (rho * sc - u * sb);
+      invV(iI, iPhi) = invV(iPhi, iI);
+      invV(iI, iI) = rho * (rho * saa - 2 * u * sa) + u * u * s(iW);
+      return invV.inverse();
 
     } else {
-      _covariance(0, 0) = 0.;
-      _covariance(0, 1) = 0.;
-      _covariance(0, 2) = 0.;
-      _covariance(1, 0) = 0.;
-      _covariance(2, 0) = 0.;
+      invV(iCurv, iCurv) = 1.;
+      invV(iCurv, iPhi) = 0.;
+      invV(iCurv, iI) = 0.;
+      invV(iPhi, iCurv) = 0.;
+      invV(iI, iCurv) = 0.;
 
-      _covariance(1, 1) = ccphi * s(iX, iX) + 2. * scphi * s(iX, iY) + ssphi * s(iY, iY);
-      _covariance(1, 2) = -(cosphi * s(iX) + sinphi * s(iY));
-      _covariance(2, 1) = _covariance(0, 1);
-      _covariance(2, 2) = s(iW);
+      invV(iPhi, iPhi) = ccphi * s(iX, iX) + 2. * scphi * s(iX, iY) + ssphi * s(iY, iY);
+      invV(iPhi, iI) = -(cosphi * s(iX) + sinphi * s(iY));
+      invV(iI, iPhi) = invV(iPhi, iI);
+      invV(iI, iI) = s(iW);
+
+      Matrix<FloatType, 3, 3> V = invV.inverse();
+      V(iCurv, iCurv) = 0.;
+      return V;
     }
-    _covariance.Invert();
 
-    resultCircle.setPerigeeCovariance(_covariance);
   }
 
 
+} // end anonymuous namespace
 
-  //nPoints = _numPoints;
-  return _npar;
+
+
+UncertainPerigeeCircle PortedKarimakisMethod::fit(CDCObservations2D& observations2D) const
+{
+
+  Matrix< FloatType, 5, 5 > s = observations2D.getWXYRLSumMatrix();
+  Matrix< FloatType, 5, 5 > a = s / s(iW);
+
+  Matrix< FloatType, 5, 1> means = a.row(iW);
+  Matrix< FloatType, 5, 5> c = a - means * means.transpose();
+
+  Matrix<FloatType, 4, 4> sNoL = s.block<4, 4>(0, 0);
+  Matrix< FloatType, 4, 1> meansNoL = means.block<4, 1>(0, 0);
+  Matrix<FloatType, 4, 4> cNoL = c.block<4, 4>(0, 0);
+
+  /// Fit te parameters
+  UncertainPerigeeCircle resultCircle;
+  FloatType chi2;
+
+  size_t nObservationsWithDriftRadius = observations2D.getNObservationsWithDriftRadius();
+  if (nObservationsWithDriftRadius > 0) {
+    resultCircle = ::fit(s);
+
+    chi2 = calcChi2(resultCircle, s);
+  } else {
+    resultCircle = ::fit(sNoL);
+    resultCircle = fitSeperateOffset(meansNoL, cNoL);
+    resultCircle = fitKarimaki(s(iW), meansNoL, cNoL);
+
+    chi2 = calcChi2(resultCircle, sNoL);
+    chi2 = calcChi2Karimaki(resultCircle, s(iW), cNoL);
+
+  }
+
+  resultCircle.setChi2(chi2);
+
+  const FloatType& curv = resultCircle.curvature();
+  const FloatType& I = resultCircle.impact();
+  const FloatType& phi = resultCircle.tangentialPhi();
+
+  B2INFO("Curvature " << curv);
+  B2INFO("Tangential phi " << phi);
+  B2INFO("Impact " << I);
+
+  B2INFO("Chi2 " << chi2);
+
+
+  Matrix< FloatType, 3, 3 > perigeeCovariance = calcCovariance(resultCircle, sNoL);
+  //Matrix< FloatType, 3, 3 > perigeeCovariance = calcCovarianceKarimaki(resultCircle, sNoL);
+  TMatrixDSym tPerigeeCovariance(3);
+
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      tPerigeeCovariance(i, j) = perigeeCovariance(i, j);
+    }
+  }
+
+  resultCircle.setPerigeeCovariance(tPerigeeCovariance);
+  return resultCircle;
+
 }

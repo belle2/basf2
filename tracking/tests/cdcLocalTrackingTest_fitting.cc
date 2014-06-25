@@ -11,17 +11,12 @@
 #include <gtest/gtest.h>
 #include "cdcLocalTrackingTest.h"
 
-#include <tracking/cdcLocalTracking/eventdata/entities/CDCGenHit.h>
-#include <tracking/cdcLocalTracking/topology/CDCWire.h>
-#include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
-
 #include <tracking/cdcLocalTracking/geometry/Vector2D.h>
 
 #include <tracking/cdcLocalTracking/fitting/CDCObservations2D.h>
 #include <tracking/cdcLocalTracking/fitting/CDCFitter2D.h>
 #include <tracking/cdcLocalTracking/fitting/CDCRiemannFitter.h>
 #include <tracking/cdcLocalTracking/fitting/CDCKarimakiFitter.h>
-#include <tracking/cdcLocalTracking/fitting/OriginalKarimakisMethod.h>
 
 using namespace std;
 
@@ -34,7 +29,7 @@ namespace {
 
   const Circle2D generalCircle(generalCenter, generalRadius);
 
-  vector<Vector2D> createObservationCenters()
+  vector<Vector2D> createGeneralCircleObservationCenters()
   {
     vector<Vector2D> observationCenters;
     // Setting up a trajectory traveling clockwise
@@ -48,7 +43,7 @@ namespace {
 
   CDCObservations2D createGeneralCircleObservations(bool withDriftLength = true)
   {
-    vector<Vector2D>&&  observationCenters = createObservationCenters();
+    vector<Vector2D>&&  observationCenters = createGeneralCircleObservationCenters();
 
     CDCObservations2D observations2D;
     if (withDriftLength) {
@@ -66,7 +61,7 @@ namespace {
   }
 
   template<class Fitter>
-  CDCTrajectory2D testCircleFitter(const Fitter& fitter, const bool withDriftLenght)
+  CDCTrajectory2D testGeneralCircleFitter(const Fitter& fitter, const bool withDriftLenght)
   {
     // Setup a test circle
     CDCObservations2D observations2D = createGeneralCircleObservations(withDriftLenght);
@@ -101,22 +96,44 @@ namespace {
     trajectory2D.getCircle().perigeeCovariance().Print();
     return trajectory2D;
   }
+
+
+
+  Line2D line(-0.5, 0.0, -1.0);
+
+  template<class Fitter>
+  CDCTrajectory2D testLineFitter(const Fitter& fitter)
+  {
+
+    CDCObservations2D observations2D;
+    observations2D.append(Vector2D(0, 0), 0.5);
+    observations2D.append(Vector2D(1, -1), -0.5);
+    observations2D.append(Vector2D(2, 0), 0.5);
+
+    CDCTrajectory2D trajectory2D;
+
+    fitter.update(trajectory2D, observations2D);
+
+    const UncertainPerigeeCircle& fittedCircle = trajectory2D.getCircle();
+
+    EXPECT_EQ(0.0, fittedCircle.curvature()) <<
+                                             "Fitter " << typeid(fitter).name() << " failed.";
+
+    Vector2D perigee = trajectory2D.getPerigee();
+    EXPECT_NEAR(0.0, perigee.x(), 10e-7);
+    EXPECT_NEAR(-0.5, perigee.y(), 10e-7);
+
+    return trajectory2D;
+  }
+
 }
 
 
 
-TEST_F(CDCLocalTrackingTest, OriginalKarimakisMethod_CircleFit)
-{
-  const CDCFitter2D<OriginalKarimakisMethod> fitter;
-  testCircleFitter(fitter, false);
-}
-
-
-
-TEST_F(CDCLocalTrackingTest, ExtendedRiemannsMethod_CircleFit)
+TEST_F(CDCLocalTrackingTest, ExtendedRiemannsMethod_GeneralCircleFit_NoDriftLength)
 {
   const CDCFitter2D<ExtendedRiemannsMethod> fitter;
-  CDCTrajectory2D trajectory2D = testCircleFitter(fitter, false);
+  CDCTrajectory2D trajectory2D = testGeneralCircleFitter(fitter, false);
   UncertainPerigeeCircle perigeeCircle = trajectory2D.getCircle();
   TMatrixD perigeeCovariance = perigeeCircle.perigeeCovariance();
 
@@ -144,28 +161,41 @@ TEST_F(CDCLocalTrackingTest, ExtendedRiemannsMethod_CircleFit)
 
 
 
-TEST_F(CDCLocalTrackingTest, ExtendedRiemannsMethod_CircleFit_WithDriftLengths)
+TEST_F(CDCLocalTrackingTest, ExtendedRiemannsMethod_GeneralCircleFit_WithDriftLengths)
 {
   const CDCFitter2D<ExtendedRiemannsMethod> fitter;
-  testCircleFitter(fitter, true);
+  testGeneralCircleFitter(fitter, true);
 }
 
 
-TEST_F(CDCLocalTrackingTest, CDCRiemannFitter_CircleFit_WithoutDriftLength)
+TEST_F(CDCLocalTrackingTest, RiemannsMethod_GeneralCircleFit_WithDriftLengths)
+{
+  const CDCFitter2D<RiemannsMethod> fitter;
+  testGeneralCircleFitter(fitter, true);
+}
+
+
+
+TEST_F(CDCLocalTrackingTest, CDCRiemannFitter_CircleFit_NoDriftLength)
 {
   CDCRiemannFitter fitter = CDCRiemannFitter::getFitter();
-  testCircleFitter(fitter, false);
+  testGeneralCircleFitter(fitter, false);
 }
 
 
-TEST_F(CDCLocalTrackingTest, CDCKarimakiFitter_CircleFit_WithoutDriftLength)
+
+TEST_F(CDCLocalTrackingTest, CDCKarimakiFitter_CircleFit_NoDriftLength)
 {
   CDCKarimakiFitter fitter = CDCKarimakiFitter::getFitter();
   fitter.useOnlyPosition();
-  testCircleFitter(fitter, false);
+  testGeneralCircleFitter(fitter, false);
 }
 
 
 
-
+TEST_F(CDCLocalTrackingTest, CDCRiemannFitter_LineFit_WithDriftLength)
+{
+  CDCRiemannFitter fitter = CDCRiemannFitter::getLineFitter();
+  testLineFitter(fitter);
+}
 

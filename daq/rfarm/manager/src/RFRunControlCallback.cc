@@ -13,8 +13,9 @@ using namespace Belle2;
 RFRunControlCallback::RFRunControlCallback(const NSMNode& node,
                                            RFMaster* master,
                                            RFMasterCallback* callback)
-  : RCCallback(node), _master(master), _callback(callback)
+  : RCCallback(node), m_master(master), m_callback(callback)
 {
+  callback->setCallback(this);
 }
 
 RFRunControlCallback::~RFRunControlCallback() throw()
@@ -22,46 +23,39 @@ RFRunControlCallback::~RFRunControlCallback() throw()
 
 }
 
+void RFRunControlCallback::init() throw()
+{
+  m_data = NSMData(getNode().getName() + "_STATUS", "rfunitinfo", 1);
+  m_data.allocate(getCommunicator());
+}
+
 bool RFRunControlCallback::load() throw()
 {
-  NSMmsg* msg = getCommunicator()->getMessage().getMsg();
-  NSMcontext* nsmc =  _callback->getCommunicator()->getContext();
-  b2nsm_context(nsmc);
-  _master->Configure(msg, nsmc);
-  return true;
+  m_callback->setMessage(getMessage());
+  return m_callback->configure();
 }
 
 bool RFRunControlCallback::start() throw()
 {
-  NSMmsg* msg = getCommunicator()->getMessage().getMsg();
-  NSMcontext* nsmc =  _callback->getCommunicator()->getContext();
-  b2nsm_context(nsmc);
-  _master->Start(msg, nsmc);
-  return true;
+  m_callback->setMessage(getMessage());
+  return m_callback->start();
 }
 
 bool RFRunControlCallback::stop() throw()
 {
-  NSMmsg* msg = getCommunicator()->getMessage().getMsg();
-  NSMcontext* nsmc =  _callback->getCommunicator()->getContext();
-  b2nsm_context(nsmc);
-  _master->Stop(msg, nsmc);
-  return true;
+  m_callback->setMessage(getMessage());
+  return m_callback->stop();
 }
 
 bool RFRunControlCallback::recover() throw()
 {
-  NSMcontext* nsmc =  _callback->getCommunicator()->getContext();
-  b2nsm_context(nsmc);
-  return (abort() && load());
+  m_callback->setMessage(getMessage());
+  return m_callback->unconfigure() && m_callback->configure();
 }
 
 bool RFRunControlCallback::abort() throw()
 {
-  NSMmsg* msg = getCommunicator()->getMessage().getMsg();
-  NSMcontext* nsmc =  _callback->getCommunicator()->getContext();
-  b2nsm_context(nsmc);
-  _master->UnConfigure(msg, nsmc);
-  return true;
+  m_callback->setMessage(getMessage());
+  return m_callback->unconfigure();
 }
 

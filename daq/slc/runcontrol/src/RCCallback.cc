@@ -59,7 +59,7 @@ bool RCCallback::perform(const NSMMessage& msg) throw()
   }
   if (result) {
     state = cmd.nextState();
-    if (!isManual() && state != Enum::UNKNOWN)
+    if (state != Enum::UNKNOWN)
       getNode().setState(state);
     com->replyOK(getNode());
   } else {

@@ -34,10 +34,10 @@ namespace Belle2 {
     virtual bool ok() throw();
     virtual bool error() throw();
     virtual bool log() throw();
-    virtual void addCallback(RCCallback* callback) throw() {
+    NSMData& getData() { return m_data; }
+    void addCallback(RCCallback* callback) throw() {
       m_callbacks.push_back(callback);
     }
-    NSMData& getData() { return m_data; }
 
   public:
     virtual bool load() throw() { return send(getMessage()); }

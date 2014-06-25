@@ -5,9 +5,6 @@
         <group>
             <file>file:/home/tkonno/belle2/release2/daq/slc/extra/javalib/b2daq/src/b2daq/runcontrol/core/RCState.java</file>
             <file>file:/home/tkonno/belle2/release2/daq/slc/extra/javalib/b2daq/src/b2daq/runcontrol/core/RCCommand.java</file>
-            <file>file:/home/tkonno/belle2/release2/daq/slc/extra/javalib/b2daq/src/b2daq/nsm/NSMSocket.java</file>
-            <file>file:/home/tkonno/belle2/release2/daq/slc/extra/javalib/b2daq/src/b2daq/nsm/NSMListenerService.java</file>
-            <file>file:/home/tkonno/belle2/release2/daq/slc/extra/javalib/b2daq/src/b2daq/runcontrol/ui/RCStateLabel.java</file>
         </group>
     </open-files>
 </project-private>

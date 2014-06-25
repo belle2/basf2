@@ -11,8 +11,6 @@
 #include <daq/slc/system/Cond.h>
 #include <daq/slc/system/PThread.h>
 
-#include <queue>
-
 namespace Belle2 {
 
   class DBInterface;
@@ -52,7 +50,6 @@ namespace Belle2 {
     bool preload(const NSMMessage& msg) throw();
     bool execute(const RCCommand& cmd) throw();
     void execute() throw();
-    virtual bool isManual() { return false; }
 
   private:
     RCState m_state_demand;

@@ -32,15 +32,17 @@ int main(int argc, char** argv)
   RFMaster* master = new RFMaster(argv[1]);
 
   ConfigFile slc_config("slolwcontrol", "hlt");
-  const std::string global_host = slc_config.get("NSM_GLOBAL_HOST");
-  const int global_port = slc_config.getInt("NSM_GLOBAL_PORT");
-  const std::string local_host = slc_config.get("NSM_LOCAL_HOST");
-  const int local_port = slc_config.getInt("NSM_LOCAL_PORT");
+  const std::string global_host = slc_config.get("nsm.global.host");
+  const int global_port = slc_config.getInt("nsm.global.port");
+  const std::string local_host = slc_config.get("nsm.local.host");
+  const int local_port = slc_config.getInt("nsm.local.port");
   RFMasterCallback* callback = new RFMasterCallback(node, data, master);
-  RFRunControlCallback* rccallback = new RFRunControlCallback(NSMNode("HLT"),
-                                                              master, callback);
-  PThread(new NSMNodeDaemon(rccallback, global_host, global_port));
-  NSMNodeDaemon* daemon = new NSMNodeDaemon(callback, local_host, local_port/*, NULL, data*/);
+  RFRunControlCallback* rccallback =
+    new RFRunControlCallback(NSMNode("HLT"), master, callback);
+  if (global_port > 0) {
+    PThread(new NSMNodeDaemon(rccallback, global_host, global_port));
+  }
+  NSMNodeDaemon* daemon = new NSMNodeDaemon(callback, local_host, local_port);
   daemon->run();
 
   return 0;

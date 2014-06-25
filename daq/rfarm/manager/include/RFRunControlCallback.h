@@ -2,6 +2,7 @@
 #define _Belle2_RFRunControlCallback_hh
 
 #include <daq/slc/runcontrol/RCCallback.h>
+#include <daq/slc/nsm/NSMData.h>
 
 namespace Belle2 {
 
@@ -16,15 +17,20 @@ namespace Belle2 {
     virtual ~RFRunControlCallback() throw();
 
   public:
+    virtual void init() throw();
     virtual bool load() throw();
     virtual bool start() throw();
     virtual bool stop() throw();
     virtual bool recover() throw();
     virtual bool abort() throw();
 
+  public:
+    NSMData& getData() throw() { return m_data; }
+
   private:
-    RFMaster* _master;
-    RFMasterCallback* _callback;
+    RFMaster* m_master;
+    RFMasterCallback* m_callback;
+    NSMData m_data;
 
   };
 

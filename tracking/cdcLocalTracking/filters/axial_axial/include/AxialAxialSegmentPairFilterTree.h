@@ -48,13 +48,13 @@ namespace Belle2 {
              BranchOf < float, NAMED("endFit_totalPerpS_endSegment") > ,
              BranchOf < float, NAMED("commonFit_totalPerpS_endSegment") > ,
 
-             BranchOf < bool, NAMED("startFit_isForwardOrBackwardTo_startSegment") > ,
-             BranchOf < bool, NAMED("endFit_isForwardOrBackwardTo_startSegment") > ,
-             BranchOf < bool, NAMED("commonFit_isForwardOrBackwardTo_startSegment") > ,
+             BranchOf < ForwardBackwardInfo, NAMED("startFit_isForwardOrBackwardTo_startSegment") > ,
+             BranchOf < ForwardBackwardInfo, NAMED("endFit_isForwardOrBackwardTo_startSegment") > ,
+             BranchOf < ForwardBackwardInfo, NAMED("commonFit_isForwardOrBackwardTo_startSegment") > ,
 
-             BranchOf < bool, NAMED("startFit_isForwardOrBackwardTo_endSegment") > ,
-             BranchOf < bool, NAMED("endFit_isForwardOrBackwardTo_endSegment") > ,
-             BranchOf < bool, NAMED("commonFit_isForwardOrBackwardTo_endSegment") > ,
+             BranchOf < ForwardBackwardInfo, NAMED("startFit_isForwardOrBackwardTo_endSegment") > ,
+             BranchOf < ForwardBackwardInfo, NAMED("endFit_isForwardOrBackwardTo_endSegment") > ,
+             BranchOf < ForwardBackwardInfo, NAMED("commonFit_isForwardOrBackwardTo_endSegment") > ,
 
              BranchOf < float, NAMED("startFit_perpSGap") > ,
              BranchOf < float, NAMED("endFit_perpSGap") > ,

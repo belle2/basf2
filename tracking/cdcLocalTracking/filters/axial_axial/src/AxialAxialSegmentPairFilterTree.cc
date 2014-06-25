@@ -44,7 +44,6 @@ bool AxialAxialSegmentPairFilterTree::setValues(const CellWeight& mcWeight, cons
   const CDCTrajectory2D& endFit = endSegment.getTrajectory2D();
   const CDCTrajectory2D& commonFit = axialAxialSegmentPair.getTrajectory2D();
 
-
   bool mcDecision = not isNotACell(mcWeight);
   setValue < NAMED("mcWeight") > (mcWeight);
   setValue < NAMED("mcDecision") > (mcDecision);
@@ -79,8 +78,6 @@ bool AxialAxialSegmentPairFilterTree::setValues(const CellWeight& mcWeight, cons
   setValue < NAMED("startFit_totalPerpS_endSegment") > (startFit.getTotalPerpS(endSegment));
   setValue < NAMED("endFit_totalPerpS_endSegment") > (endFit.getTotalPerpS(endSegment));
   setValue < NAMED("commonFit_totalPerpS_endSegment") > (commonFit.getTotalPerpS(endSegment));
-
-
 
   setValue < NAMED("startFit_isForwardOrBackwardTo_startSegment") > (startFit.isForwardOrBackwardTo(startSegment));
   setValue < NAMED("endFit_isForwardOrBackwardTo_startSegment") > (endFit.isForwardOrBackwardTo(startSegment));

@@ -88,7 +88,6 @@ namespace {
   constexpr size_t iR2 = 3;
   constexpr size_t iL = 4;
 
-
   /// Helper indices for meaningfull matrix access to the full generalized parameter covariance matrices
   constexpr size_t iN0 = 0;
   constexpr size_t iN1 = 1;
@@ -104,6 +103,7 @@ namespace {
   constexpr size_t iCurv = 0;
   constexpr size_t iPhi = 1;
   constexpr size_t iI = 2;
+
 
 
   /// Variant with drift circles
@@ -242,18 +242,18 @@ namespace {
 
 
   /// Variant implementing Karimakis method without drift circles.
-  UncertainPerigeeCircle fitKarimaki(FloatType sw,
+  UncertainPerigeeCircle fitKarimaki(const FloatType& /*sw*/,
                                      const Matrix< FloatType, 4, 1 >& a,
                                      const Matrix< FloatType, 4, 4 >& c,
                                      bool lineConstrained = false)
   {
     double q1, q2 = 0.0;
-    if (not lineConstrained) {
-      q1 = c(iX, iY) * c(iR2, iR2) - c(iX, iR2) * c(iY, iR2);
-      q2 = (c(iX, iX) - c(iY, iY)) * c(iR2, iR2) - c(iX, iR2) * c(iX, iR2) + c(iY, iR2) * c(iY, iR2);
-    } else {
+    if (lineConstrained) {
       q1 = c(iX, iY);
       q2 = c(iX, iX) - c(iY, iY);
+    } else {
+      q1 = c(iX, iY) * c(iR2, iR2) - c(iX, iR2) * c(iY, iR2);
+      q2 = (c(iX, iX) - c(iY, iY)) * c(iR2, iR2) - c(iX, iR2) * c(iX, iR2) + c(iY, iR2) * c(iY, iR2);
     }
 
     double phi = 0.5 * atan2(2. * q1, q2);
@@ -262,16 +262,15 @@ namespace {
     double cosphi = cos(phi);
 
     double curv, I = 0.0;
-    if (not lineConstrained) {
-      double kappa = (sinphi * c(iX, iR2) - cosphi * c(iY, iR2)) / c(iR2, iR2);
-      double delta = -kappa * a(iR2) + sinphi * a(iX) - cosphi * a(iY);
-
-      curv = 2. * kappa / sqrt(1. - 4. * delta * kappa);
-      I = 2. * delta / (1. + sqrt(1. - 4. * delta * kappa));
-
-    } else {
+    if (lineConstrained) {
       curv = 0.0; //line
       I = sinphi * a(iX) - cosphi * a(iY);
+
+    } else {
+      double kappa = (sinphi * c(iX, iR2) - cosphi * c(iY, iR2)) / c(iR2, iR2);
+      double delta = -kappa * a(iR2) + sinphi * a(iX) - cosphi * a(iY);
+      curv = 2. * kappa / sqrt(1. - 4. * delta * kappa);
+      I = 2. * delta / (1. + sqrt(1. - 4. * delta * kappa));
 
     }
 
@@ -288,15 +287,13 @@ namespace {
   {
 
     Matrix<FloatType, 5, 1> n;
-    n <<
-      parameters.n0(),
-                    parameters.n1(),
-                    parameters.n2(),
-                    parameters.n3(),
-                    -1.0;  // subtraction of the drift lengths
+    n(0) = parameters.n0();
+    n(1) = parameters.n1();
+    n(2) = parameters.n2();
+    n(3) = parameters.n3();
+    n(4) = -1;
 
     FloatType chi2 = n.transpose() * s * n;
-
     return chi2;
 
   }
@@ -308,11 +305,10 @@ namespace {
   {
 
     Matrix<FloatType, 4, 1> n;
-    n <<
-      parameters.n0(),
-                    parameters.n1(),
-                    parameters.n2(),
-                    parameters.n3();
+    n(0) = parameters.n0();
+    n(1) = parameters.n1();
+    n(2) = parameters.n2();
+    n(3) = parameters.n3();
 
     FloatType chi2 = n.transpose() * s * n;
 
@@ -329,31 +325,32 @@ namespace {
     // Karimaki uses the opposite sign for phi in contrast to the convention of this framework !!!
     const Vector2D vecPhi = -parameters.tangential();
 
-    // Ternminology Karimaki used in the paper
     const FloatType& cosphi = vecPhi.x();
     const FloatType& sinphi = vecPhi.y();
 
-    const FloatType& rho = parameters.curvature();
-    const FloatType& d = parameters.impact();
 
-    const FloatType u = 1 + d * rho;
-    const FloatType kappa = 0.5 * rho / u;
-
-    if (not lineConstrained) {
-      FloatType chi2 =  sw * u * u * (sinphi * sinphi * c(iX, iX) - 2. * sinphi * cosphi * c(iX, iY) + cosphi * cosphi * c(iY, iY) - kappa * kappa * c(iR2, iR2));
-
+    if (lineConstrained) {
+      FloatType chi2 = sw * (sinphi * sinphi * c(iX, iX) - 2. * sinphi * cosphi * c(iX, iY) + cosphi * cosphi * c(iY, iY));
       return chi2;
     } else {
-      FloatType chi2 = sw * (sinphi * sinphi * c(iX, iX) - 2. * sinphi * cosphi * c(iX, iY) + cosphi * cosphi * c(iY, iY));
+      // Ternminology Karimaki used in the paper
+      const FloatType& rho = parameters.curvature();
+      const FloatType& d = parameters.impact();
+
+      const FloatType u = 1 + d * rho;
+      const FloatType kappa = 0.5 * rho / u;
+
+      FloatType chi2 =  sw * u * u * (sinphi * sinphi * c(iX, iX) - 2. * sinphi * cosphi * c(iX, iY) + cosphi * cosphi * c(iY, iY) - kappa * kappa * c(iR2, iR2));
       return chi2;
     }
 
   }
 
 
-
   Matrix<FloatType, 3, 3> calcCovariance(const PerigeeCircle& parameters,
-                                         const Matrix< FloatType, 4, 4 >& s)
+                                         const Matrix< FloatType, 4, 4 >& s,
+                                         bool lineConstrained = false,
+                                         bool originConstrained = false)
   {
     const FloatType n0 = parameters.n0();
 
@@ -374,14 +371,12 @@ namespace {
     rot(iY, iX) = -n12.y();
     rot(iY, iY) = n12.x();
 
-
     // 2. Reduce the four generalized parameters to three parameters lifting the normalization constraint
     // n1 * n1 + n2 * n2 - 4 n0*n3 = 1
     // in the rotated system
     // The rotation is needed because to assure n1 != 0 at the point the constraint needs to be inverted.
     // In case n12 = (0, 0) this breaks down.
-    // However this correspondes to the case where circle is centered on the origin where the perigee parameterization is ill conditioned in the first place.
-
+    // However this correspondes to the case when the circle is centered on the origin, where the perigee parameterization is ill conditioned in the first place.
     Matrix< FloatType, 3, 4 > reduce = Matrix< FloatType, 3, 4 >::Zero();
     reduce(iReducedN0, iN0) = 1.;
     reduce(iReducedN2, iN2) = 1.;
@@ -399,9 +394,30 @@ namespace {
     // Matrix<FloatType, 3, 3> reducedNInvV = reduce * rotS * reduce.transpose();
 
     Matrix< FloatType, 3, 4 > rotAndReduce = reduce * rot;
-    Matrix<FloatType, 3, 3> reducedNInvCov = rotAndReduce * s * rotAndReduce.transpose();
+    Matrix< FloatType, 3, 3> reducedNInvCov = rotAndReduce * s * rotAndReduce.transpose();
 
-    Matrix<FloatType, 3, 3> reducedNCov = reducedNInvCov.inverse();
+    //Zero out the unconsidered Parameters before inversion. Keep one the diagonal.
+    if (lineConstrained) {
+      reducedNInvCov.row(iReducedN3) = Matrix<FloatType, 1, 3>::Zero();
+      reducedNInvCov.col(iReducedN3) = Matrix<FloatType, 3, 1>::Zero();
+      reducedNInvCov(iReducedN0, iReducedN3) = 1.;
+    }
+
+    if (originConstrained) {
+      reducedNInvCov.row(iReducedN0) = Matrix<FloatType, 1, 3>::Zero();
+      reducedNInvCov.col(iReducedN0) = Matrix<FloatType, 3, 1>::Zero();
+      reducedNInvCov(iReducedN0, iReducedN0) = 1.;
+    }
+
+    Matrix< FloatType, 3, 3> reducedNCov = reducedNInvCov.inverse();
+
+    if (lineConstrained) {
+      reducedNCov(iReducedN3, iReducedN3) = 0.;
+    }
+
+    if (originConstrained) {
+      reducedNCov(iReducedN0, iReducedN0) = 0.;
+    }
 
     // 3. Translate to perigee
     Matrix< FloatType, 3, 3 > perigeeJ;
@@ -423,6 +439,7 @@ namespace {
     Matrix< FloatType, 3, 3 > perigeeCov = perigeeJ * reducedNCov * perigeeJ.transpose();
 
     return perigeeCov;
+
   }
 
 
@@ -453,8 +470,22 @@ namespace {
 
     const double u = 1. + rho * d;
 
-    if (not lineConstrained) {
-      // calculate covariance matrix
+    if (lineConstrained) {
+      invV(iCurv, iCurv) = 1.;
+      invV(iCurv, iPhi) = 0.;
+      invV(iCurv, iI) = 0.;
+      invV(iPhi, iCurv) = 0.;
+      invV(iI, iCurv) = 0.;
+
+      invV(iPhi, iPhi) = ccphi * s(iX, iX) + 2. * scphi * s(iX, iY) + ssphi * s(iY, iY);
+      invV(iPhi, iI) = -(cosphi * s(iX) + sinphi * s(iY));
+      invV(iI, iPhi) = invV(iPhi, iI);
+      invV(iI, iI) = s(iW);
+
+      Matrix<FloatType, 3, 3> V = invV.inverse();
+      V(iCurv, iCurv) = 0.;
+      return V; \
+    } else {
       double sa = sinphi * s(iX) - cosphi * s(iY);
       double sb = cosphi * s(iX) + sinphi * s(iY);
       double sc = (ssphi - ccphi) * s(iX, iY) + scphi * (s(iX, iX) - s(iY, iY));
@@ -478,22 +509,6 @@ namespace {
       invV(iI, iPhi) = invV(iPhi, iI);
       invV(iI, iI) = rho * (rho * saa - 2 * u * sa) + u * u * s(iW);
       return invV.inverse();
-
-    } else {
-      invV(iCurv, iCurv) = 1.;
-      invV(iCurv, iPhi) = 0.;
-      invV(iCurv, iI) = 0.;
-      invV(iPhi, iCurv) = 0.;
-      invV(iI, iCurv) = 0.;
-
-      invV(iPhi, iPhi) = ccphi * s(iX, iX) + 2. * scphi * s(iX, iY) + ssphi * s(iY, iY);
-      invV(iPhi, iI) = -(cosphi * s(iX) + sinphi * s(iY));
-      invV(iI, iPhi) = invV(iPhi, iI);
-      invV(iI, iI) = s(iW);
-
-      Matrix<FloatType, 3, 3> V = invV.inverse();
-      V(iCurv, iCurv) = 0.;
-      return V;
     }
 
   }
@@ -548,8 +563,8 @@ UncertainPerigeeCircle PortedKarimakisMethod::fit(CDCObservations2D& observation
   B2INFO("Chi2 " << chi2);
 
 
-  Matrix< FloatType, 3, 3 > perigeeCovariance = calcCovariance(resultCircle, sNoL);
-  //Matrix< FloatType, 3, 3 > perigeeCovariance = calcCovarianceKarimaki(resultCircle, sNoL);
+  Matrix< FloatType, 3, 3> perigeeCovariance = calcCovariance(resultCircle, sNoL);
+  //Matrix< FloatType, 3, 3> perigeeCovariance = calcCovarianceKarimaki(resultCircle, sNoL);
   TMatrixDSym tPerigeeCovariance(3);
 
   for (int i = 0; i < 3; ++i) {

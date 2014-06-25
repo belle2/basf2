@@ -99,3 +99,115 @@ Vector2D CDCObservations2D::centralize()
 }
 
 
+
+
+Eigen::Matrix<FloatType, 5, 5> CDCObservations2D::getWXYRLSumMatrix()
+{
+  CDCObservations2D::EigenObservationMatrix&&  eigenObservation = getObservationMatrix();
+  size_t nObservations = size();
+
+  Matrix< FloatType, Dynamic, 5 > projectedPoints(nObservations, 5);
+
+  const size_t iW = 0;
+  const size_t iX = 1;
+  const size_t iY = 2;
+  const size_t iR2 = 3;
+  const size_t iL = 4;
+
+  projectedPoints.col(iW) = Matrix<FloatType, Dynamic, 1>::Constant(nObservations, 1.0); //Offset column
+  projectedPoints.col(iX) = eigenObservation.col(0);
+  projectedPoints.col(iY) = eigenObservation.col(1);
+  projectedPoints.col(iR2) = eigenObservation.leftCols<2>().rowwise().squaredNorm() - eigenObservation.col(2).rowwise().squaredNorm();
+  projectedPoints.col(iL) = eigenObservation.col(2);
+
+  Array< FloatType, Dynamic, 1 > weights = Array<FloatType, Dynamic, 1>::Constant(nObservations, 1.0);
+  Matrix< FloatType, Dynamic, 5 > weightedProjectedPoints = projectedPoints.array().colwise() * weights;
+  Matrix< FloatType, 5, 5 > sumMatrix  =  weightedProjectedPoints.transpose() * projectedPoints;
+
+  return sumMatrix;
+}
+
+
+
+
+
+Eigen::Matrix<FloatType, 4, 4> CDCObservations2D::getWXYLSumMatrix()
+{
+
+  CDCObservations2D::EigenObservationMatrix&&  eigenObservation = getObservationMatrix();
+  size_t nObservations = size();
+
+  Matrix< FloatType, Dynamic, 4 > projectedPoints(nObservations, 4);
+
+  const size_t iW = 0;
+  const size_t iX = 1;
+  const size_t iY = 2;
+  const size_t iL = 3;
+
+  projectedPoints.col(iW) = Matrix<FloatType, Dynamic, 1>::Constant(nObservations, 1.0); //Offset column
+  projectedPoints.col(iX) = eigenObservation.col(0);
+  projectedPoints.col(iY) = eigenObservation.col(1);
+  projectedPoints.col(iL) = eigenObservation.col(2);
+
+  Array< FloatType, Dynamic, 1 > weights = Array<FloatType, Dynamic, 1>::Constant(nObservations, 1.0);
+  Matrix< FloatType, Dynamic, 4 > weightedProjectedPoints = projectedPoints.array().colwise() * weights;
+  Matrix< FloatType, 4, 4 > sumMatrix  =  weightedProjectedPoints.transpose() * projectedPoints;
+
+  return sumMatrix;
+
+
+
+
+}
+
+
+
+Eigen::Matrix<FloatType, 4, 4> CDCObservations2D::getWXYRSumMatrix()
+{
+
+  CDCObservations2D::EigenObservationMatrix&&  eigenObservation = getObservationMatrix();
+  size_t nObservations = size();
+
+  Matrix< FloatType, Dynamic, 4 > projectedPoints(nObservations, 4);
+
+  const size_t iW = 0;
+  const size_t iX = 1;
+  const size_t iY = 2;
+  const size_t iR2 = 3;
+
+  projectedPoints.col(iW) = Matrix<FloatType, Dynamic, 1>::Constant(nObservations, 1.0); //Offset column
+  projectedPoints.col(iX) = eigenObservation.col(0);
+  projectedPoints.col(iY) = eigenObservation.col(1);
+  projectedPoints.col(iR2) = eigenObservation.leftCols<2>().rowwise().squaredNorm() - eigenObservation.col(2).rowwise().squaredNorm();
+
+  Array< FloatType, Dynamic, 1 > weights = Array<FloatType, Dynamic, 1>::Constant(nObservations, 1.0);
+  Matrix< FloatType, Dynamic, 4 > weightedProjectedPoints = projectedPoints.array().colwise() * weights;
+  Matrix< FloatType, 4, 4 > sumMatrix  =  weightedProjectedPoints.transpose() * projectedPoints;
+  return sumMatrix;
+
+}
+
+
+Eigen::Matrix<FloatType, 3, 3> CDCObservations2D::getWXYSumMatrix()
+{
+  CDCObservations2D::EigenObservationMatrix&&  eigenObservation = getObservationMatrix();
+  size_t nObservations = size();
+
+  Matrix< FloatType, Dynamic, 3 > projectedPoints(nObservations, 3);
+
+  const size_t iW = 0;
+  const size_t iX = 1;
+  const size_t iY = 2;
+
+  projectedPoints.col(iW) = Matrix<FloatType, Dynamic, 1>::Constant(nObservations, 1.0); //Offset column
+  projectedPoints.col(iX) = eigenObservation.col(0);
+  projectedPoints.col(iY) = eigenObservation.col(1);
+
+  Array< FloatType, Dynamic, 1 > weights = Array<FloatType, Dynamic, 1>::Constant(nObservations, 1.0);
+  Matrix< FloatType, Dynamic, 3 > weightedProjectedPoints = projectedPoints.array().colwise() * weights;
+  Matrix< FloatType, 3, 3 > sumMatrix  =  weightedProjectedPoints.transpose() * projectedPoints;
+
+  return sumMatrix;
+
+}
+

@@ -137,6 +137,91 @@ namespace Belle2 {
       /// Returns the observations structured as an Eigen matrix
       /** This returns a reference to the stored observations. Note that operations may alter the content of the underlying memory and render it useless for subceeding calculations.*/
       EigenObservationMatrix getObservationMatrix();
+
+
+      /// Constructs a symmetric matrix of weighted sums of x, y, r^2 and drift lengts as relevant for circle fits.
+      /** Cumulates weights, x positions, y positions, quadratic polar radii and signed drift legnths and products thereof
+       *  Returns symmetric matrix s with the following:
+       *  * \f$ s_{00} = \sum w \f$
+       *  * \f$ s_{01} = \sum x * w \f$
+       *  * \f$ s_{02} = \sum y * w \f$
+       *  * \f$ s_{03} = \sum (r^2 - l^2) * w \f$
+       *  * \f$ s_{04} = \sum l * w \f$
+       *
+       *  * \f$ s_{11} = \sum x * x * w \f$
+       *  * \f$ s_{12} = \sum x * y * w \f$
+       *  * \f$ s_{13} = \sum x * (r^2 - l^2) * w \f$
+       *  * \f$ s_{14} = \sum x * l * w \f$
+       *
+       *  * \f$ s_{22} = \sum y * y * w \f$
+       *  * \f$ s_{23} = \sum y * (r^2 - l^2) * w \f$
+       *  * \f$ s_{24} = \sum y * l * w \f$
+       *
+       *  * \f$ s_{33} = \sum (r^2 - l^2) * (r^2 - l^2) * w \f$
+       *  * \f$ s_{34} = \sum (r^2 - l^2) * l * w \f$
+
+       *  * \f$ s_{44} = \sum l * l * w \f$
+       *  * + symmetric.
+       */
+      Eigen::Matrix<FloatType, 5, 5> getWXYRLSumMatrix();
+
+      /// Constructs a symmetric matrix of weighted sums of x, y and drift lengts as relevant for line fits.
+      /** Cumulates weights, x positions, y positions and signed drift legnths and products thereof
+       *  Returns symmetric matrix s with the following:
+       *  * \f$ s_{00} = \sum w \f$
+       *  * \f$ s_{01} = \sum x * w \f$
+       *  * \f$ s_{02} = \sum y * w \f$
+       *  * \f$ s_{03} = \sum l * w \f$
+       *
+       *  * \f$ s_{11} = \sum x * x * w \f$
+       *  * \f$ s_{12} = \sum x * y * w \f$
+       *  * \f$ s_{13} = \sum x * l * w \f$
+       *
+       *  * \f$ s_{22} = \sum y * y * w \f$
+       *  * \f$ s_{23} = \sum y * l * w \f$
+       *
+       *  * \f$ s_{33} = \sum (r^2 - l^2) * l * w \f$
+       *  * + symmetric
+       */
+      Eigen::Matrix<FloatType, 4, 4> getWXYLSumMatrix();
+
+      /// Constructs a symmetric matrix of weighted sums of x, y, r^2 as relevant for circle fits.
+      /** Cumulates weights, x positions, y positions, quadratic polar radii and products thereof
+       *  Returns symmetric matrix s with the following:
+       *  * \f$ s_{00} = \sum w \f$
+       *  * \f$ s_{01} = \sum x * w \f$
+       *  * \f$ s_{02} = \sum y * w \f$
+       *  * \f$ s_{03} = \sum (r^2 - l^2) * w \f$
+       *
+       *  * \f$ s_{11} = \sum x * x * w \f$
+       *  * \f$ s_{12} = \sum x * y * w \f$
+       *  * \f$ s_{13} = \sum x * (r^2 - l^2) * w \f$
+       *
+       *  * \f$ s_{22} = \sum y * y * w \f$
+       *  * \f$ s_{23} = \sum y * (r^2 - l^2) * w \f$
+       *  * \f$ s_{24} = \sum y * l * w \f$
+       *
+       *  * \f$ s_{33} = \sum (r^2 - l^2) * (r^2 - l^2) * w \f$
+       *  * + symmetric.
+       */
+      Eigen::Matrix<FloatType, 4, 4> getWXYRSumMatrix();
+
+
+      /// Constructs a symmetric matrix of weighted sums of x, y as relevant for line fits.
+      /** Cumulates weights, x positions, y positions and products thereof
+       *  Returns symmetric matrix s with the following:
+       *  * \f$ s_{00} = \sum w \f$
+       *  * \f$ s_{01} = \sum x * w \f$
+       *  * \f$ s_{02} = \sum y * w \f$
+       *
+       *  * \f$ s_{11} = \sum x * x * w \f$
+       *  * \f$ s_{12} = \sum x * y * w \f$
+       *
+       *  * \f$ s_{22} = \sum y * y * w \f$
+       *  * + symmetric.
+       */
+      Eigen::Matrix<FloatType, 3, 3> getWXYSumMatrix();
+
 #endif
 
     private:

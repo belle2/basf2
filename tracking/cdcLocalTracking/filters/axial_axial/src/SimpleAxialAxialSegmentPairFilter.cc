@@ -68,56 +68,52 @@ CellWeight SimpleAxialAxialSegmentPairFilter::isGoodAxialAxialSegmentPair(const 
   const CDCTrajectory2D& startFit = getFittedTrajectory2D(startSegment);
   const CDCTrajectory2D& endFit = getFittedTrajectory2D(endSegment);
 
-  //alignment cut - nonnegotiable
-  if (not endSegment.isForwardTrajectory(startFit)) return NOT_A_CELL;
 
-  //FloatType distanceAverage = ( endSegment.getFrontPerpS(startFit) +
-  //                              endSegment.getBackPerpS(startFit)    ) / 2;
+  // Check if segments are coaligned
+  bool endSegmentIsCoaligned = startFit.getTotalPerpS(endSegment) >= 0.0;
+  bool startSegmentIsCoaligned = endFit.getTotalPerpS(startSegment) >= 0.0;
 
-
-  //check if end segment is in forward direction of startSegment
-  //reference point was already set in the fit to the first hit of the startSegment
-  //alignment cut - nonnegotiable
-  if (endSegment.getBackPerpS(startFit)   < startSegment.getBackPerpS(startFit) or
-      endSegment.getFrontPerpS(startFit) < startSegment.getFrontPerpS(startFit)) return NOT_A_CELL;
+  if (not endSegmentIsCoaligned or not startSegmentIsCoaligned) {
+    return NOT_A_CELL;
+  }
 
 
-  //check if the last hit of the reco hit lies further in travel direction than the first
-  //FloatType distanceLastToFirst = endSegment.getFrontPerpS(startFit) -
-  //                                endSegment.getBackPerpS(startFit) ;
+  // Check if there is a positive gap between start and end segment
+  FloatType startFitGap = startFit.getPerpSGap(startSegment, endSegment);
+  FloatType endFitGap = endFit.getPerpSGap(startSegment, endSegment);
 
-  Vector2D startCOM = startSegment.getCenterOfMass2D();
-  Vector2D endCOM   = endSegment.getCenterOfMass2D();
+  if (startFitGap < 0 or startFitGap > 100 or endFitGap < 0 or endFitGap > 100) {
+    return NOT_A_CELL;
+  }
 
-  //B2DEBUG(100,"  Check distanceAverage " << distanceAverage);
-  //B2DEBUG(100,"  Check distanceLastToFirst " << distanceLastToFirst);
+  FloatType startFitFrontOffset = startFit.getPerpSFrontOffset(startSegment, endSegment);
+  FloatType endFitBackOffset = endFit.getPerpSBackOffset(startSegment, endSegment);
 
-  //difference in position at the forward extrapolation point
-  Vector2D endCenter = endFit.getClosest(endCOM);
-  Vector2D pointOnFromTrack = startFit.getCloseSamePolarR(endCenter);
+  if (startFitFrontOffset < 0 or endFitBackOffset < 0) {
+    return NOT_A_CELL;
+  }
 
-  //difference in flight direction
-  Vector2D startDirection  = startFit.getUnitMom2D(pointOnFromTrack);
-  Vector2D endDirection    = endFit.getUnitMom2D(endCenter);
+  // Momentum agreement cut
+  Vector2D startMomAtCenter = startFit.getUnitMom2DAtCenter(startSegment);
+  Vector2D endMomAtCenter = endFit.getUnitMom2DAtCenter(endSegment);
 
-  //difference in momentum ?
-  //marked as usused, because they should not generate a warning
-  //the variables are a reminder which variables can be used in the cut
-  FloatType startMom __attribute__((unused)) = startFit.getAbsMom2D();
-  FloatType endMom __attribute__((unused)) = endFit.getAbsMom2D();
+  Vector2D startMomAtExtrapolation = startFit.getUnitMom2DAtCenter(endSegment);
+  Vector2D endMomAtExtrapolation = endFit.getUnitMom2DAtCenter(startSegment);
 
-  //check if end segment is in forward direction of startSegment
+  FloatType momAngleAtStartCenter = startMomAtCenter.angleWith(endMomAtExtrapolation);
+  FloatType momAngleAtEndCenter = endMomAtCenter.angleWith(startMomAtExtrapolation);
 
+  if (momAngleAtEndCenter > 2 or momAngleAtStartCenter > 2) {
+    return NOT_A_CELL;
+  }
 
-  //make a cut - make this more sophisticated at some point
-  double cosDeviation = endCenter.cosWith(pointOnFromTrack);
-  double tolerance = cos(PI / 180);
+  // Proximity cut
+  FloatType startFit_dist2DToFront_endSegment = startFit.getDist2DToFront(endSegment);
+  FloatType endFit_dist2DToBack_startSegment = endFit.getDist2DToBack(startSegment);
 
-  return startSegment.size() + endSegment.size();
-
-  if (cosDeviation > tolerance) {
+  if (startFit_dist2DToFront_endSegment < 6 and  endFit_dist2DToBack_startSegment < 6)
     return startSegment.size() + endSegment.size();
-  } else {
+  else {
     return NOT_A_CELL;
   }
 

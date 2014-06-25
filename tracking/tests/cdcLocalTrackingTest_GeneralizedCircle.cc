@@ -113,6 +113,21 @@ TEST_F(CDCLocalTrackingTest, GeneralizedCircle_lengthOnCurve)
 
 
 
+TEST_F(CDCLocalTrackingTest, GeneralizedCircle_passiveMoveBy)
+{
+  Vector2D center(4.0, 2.0);
+  FloatType radius = 5.0;
+  GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(center, radius);
+
+  circle.passiveMoveBy(Vector2D(3.0, 3.0));
+
+  EXPECT_NEAR(5.0, circle.radius(), 10e-7);
+  EXPECT_NEAR(1.0, circle.center().x(), 10e-7);
+  EXPECT_NEAR(-1.0, circle.center().y(), 10e-7);
+
+}
+
+
 
 
 

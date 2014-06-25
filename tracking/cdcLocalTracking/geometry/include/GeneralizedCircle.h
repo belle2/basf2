@@ -151,12 +151,15 @@ namespace Belle2 {
       inline void reverse()
       { scaleN(-1); }
 
-    protected:
       /// Transforms the generalized circle to conformal space inplace
       /** Applies the conformal map in the self-inverse from  X = x / (x^2 + y^2) and Y = y / (x^2 +y^2) inplace
        *  It works most easily by the exchange of the circle parameters n0 <-> n3 */
       inline void conformalTransform()
       { std::swap(m_n0, m_n3); }
+
+      /// Moves the coordinate system by the given vector. Updates the circle parameters inplace.
+      void passiveMoveBy(const Vector2D& by)
+      { setN(fastDistance(by), gradient(by), n3()); }
 
 
     protected:
@@ -376,9 +379,6 @@ namespace Belle2 {
       /// Indicates if the generalized circle is actually a circle
       inline bool isCircle() const
       { return n3() != 0.0; }
-
-      /// Gives the radius of the circle. If it was a line this will be infinity
-      // inline FloatType radius() const { return 1 / curvature(); }
 
       /// Gives the signed radius of the circle. If it was a line this will be infinity
       inline FloatType radius() const

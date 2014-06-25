@@ -302,8 +302,8 @@ void CDCKarimakiFitter::updateWithRightLeft(CDCTrajectory2D& trajectory2D, CDCOb
   FloatType tangentialPhi = tangential.phi();
 
 
-  resultCircle.passiveMoveBy(-referencePoint);
 
+  resultCircle.passiveMoveBy(-referencePoint);
   trajectory2D.setCircle(resultCircle);
   return;
 

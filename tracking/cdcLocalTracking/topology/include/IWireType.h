@@ -1,38 +1,31 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014 - Belle II Collaboration                             *
+ * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Oliver Frost                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef STEREOTYPES_H
-#define STEREOTYPES_H
+#ifndef IWIRETYPE_H
+#define IWIRETYPE_H
 
-#include <tracking/cdcLocalTracking/typedefs/SignType.h>
+
 
 namespace Belle2 {
 
   namespace CDCLocalTracking {
 
-    /// Type for the stereo property of the wire
-    typedef SignType StereoType;
+    /// The type of the wire ids enumerating wires within a given layer
+    typedef signed short IWireType;
 
-    /// Constant for an axial wire
-    const StereoType AXIAL = 0;
+    /// Constant making an invalid wire id
+    const IWireType INVALID_IWIRE = 32767;
 
-    /// Constant for an stereo wire in the U configuration
-    const StereoType STEREO_U = 1;
-
-    /// Constant for an stereo wire in the V configuration
-    const StereoType STEREO_V = -1;
-
-    /// Constant for an invalid stereo information
-    const StereoType INVALID_STEREOTYPE = -127;
+    /// Legacy constant
+    const IWireType INVALIDWIRE = INVALID_IWIRE;
 
   } // namespace CDCLocalTracking
 
 } // namespace Belle2
-
-#endif // STEREOTYPES
+#endif // WIRETYPE_H

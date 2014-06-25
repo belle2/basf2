@@ -22,6 +22,8 @@
 
 #include <tracking/cdcLocalTracking/geometry/UncertainPerigeeCircle.h>
 
+#include <tracking/cdcLocalTracking/topology/ISuperLayerType.h>
+
 namespace Belle2 {
 
   namespace CDCLocalTracking {

@@ -11,6 +11,7 @@
 #define INFOTYPES_H
 
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/cdcLocalTracking/typedefs/SignType.h>
 #include <tracking/cdcLocalTracking/numerics/numerics.h>
 
 namespace Belle2 {

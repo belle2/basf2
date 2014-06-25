@@ -71,7 +71,7 @@ namespace Belle2 {
         */
       /**@{*/
       /// Getter for the super layer id
-      ILayerType getISuperLayer() const { return first().getISuperLayer(); }
+      ISuperLayerType getISuperLayer() const { return first().getISuperLayer(); }
       /**@}*/
 
       /** @name Layer range
@@ -91,7 +91,7 @@ namespace Belle2 {
       const CDCWireLayer* nextWireLayer(const CDCWireLayer* obj = nullptr) const;
 
       /// Gives the number of wire in this superlayer
-      ILayerType size() const { return m_end - m_begin; }
+      size_t size() const { return m_end - m_begin; }
 
       /// Getter for the first layer of this superlayer
       const CDCWireLayer& first() const { return *(begin()); }

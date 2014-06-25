@@ -77,7 +77,7 @@ namespace Belle2 {
 
       /// Getter for the superlayer id of the middle segment
       ILayerType getMiddleISuperLayer() const
-      { return getMiddle() == nullptr ? INVALIDSUPERLAYER : getMiddle()->getISuperLayer(); }
+      { return getMiddle() == nullptr ? INVALID_ISUPERLAYER : getMiddle()->getISuperLayer(); }
 
       /// Getter for the middle stereo segment
       const CDCStereoRecoSegment2D* getMiddle()  const

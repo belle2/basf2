@@ -147,7 +147,7 @@ namespace Belle2 {
 
       /// Returns the common super layer id of all stored tracking entities
       /** This checks if all tracking entities are located in the same superlayer and \n
-       *  returns the superlayer id of the later. Returns INVALIDSUPERLAYER if the superlayer \n
+       *  returns the superlayer id of the later. Returns INVALID_ISUPERLAYER if the superlayer \n
        *  is not shared among the tracking entities. */
       ILayerType getISuperLayer() const {
         if (this->empty()) return INVALID_ISUPERLAYER;

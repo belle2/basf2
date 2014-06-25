@@ -13,10 +13,13 @@
 #include <math.h>
 #include <utility>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/cdcLocalTracking/typedefs/SignType.h>
 
 namespace Belle2 {
 
   namespace CDCLocalTracking {
+    /// The famous number
+    const FloatType PI = 3.141592653589793238462;
 
     ///Checks if an integer is even
     template<class IntNumber>

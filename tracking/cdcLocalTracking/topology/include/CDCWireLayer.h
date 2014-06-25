@@ -64,7 +64,7 @@ namespace Belle2 {
       /// Getter from the the continuous layer id. Does not construct a new object.
       static const CDCWireLayer* getInstance(const ILayerType& iCLayer);
       /// Getter from the superlayer id, the layer id. Does not construct a new object.
-      static const CDCWireLayer* getInstance(const ILayerType& iSuperLayer,
+      static const CDCWireLayer* getInstance(const ISuperLayerType& iSuperLayer,
                                              const ILayerType& iLayer);
       /// Getter for the layer with superlayer id 0, layer id 0.
       static const CDCWireLayer* getLowest() { return getInstance(0, 0); }
@@ -84,10 +84,10 @@ namespace Belle2 {
       ILayerType getICLayer() const { return first().getICLayer(); }
 
       /// Getter for the layer id unique within the superlayer
-      ILayerType getILayer()       const { return first().getILayer(); }
+      ILayerType getILayer() const { return first().getILayer(); }
 
       /// Getter for the super layer id
-      ILayerType getISuperLayer()  const { return first().getISuperLayer(); }
+      ISuperLayerType getISuperLayer() const { return first().getISuperLayer(); }
       /**@}*/
 
 

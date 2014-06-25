@@ -16,6 +16,12 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/WireID.h>
 
+#include "ISuperLayerType.h"
+#include "ILayerType.h"
+#include "IWireType.h"
+
+#include "WireNeighborType.h"
+
 #include "StereoType.h"
 
 #include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
@@ -53,7 +59,7 @@ namespace Belle2 {
       CDCWire(const WireID& wireID);
 
       /// Constructor taking the superlayer id, the layer id and the wire id. Use rather getInstance() to avoid instance constructions.
-      CDCWire(const ILayerType& iSuperLayer,
+      CDCWire(const ISuperLayerType& iSuperLayer,
               const ILayerType& iLayer,
               const IWireType&   iWire);
 
@@ -68,7 +74,7 @@ namespace Belle2 {
 
       static const CDCWire* getInstance(const CDCWire& wire);
       /// Getter from the superlayer id, the layer id and the wire id. Does not construct a new object.
-      static const CDCWire* getInstance(const ILayerType& iSuperLayer,
+      static const CDCWire* getInstance(const ISuperLayerType& iSuperLayer,
                                         const ILayerType& iLayer,
                                         const IWireType&   iWire);
 
@@ -142,7 +148,7 @@ namespace Belle2 {
 
       /// Getter for superlayer id.
       /**  Gives the superlayer id ranging from 0 - 8. */
-      ILayerType getISuperLayer() const { return getWireID().getISuperLayer(); }
+      ISuperLayerType getISuperLayer() const { return getWireID().getISuperLayer(); }
 
       /// Setter for the wireID
       void setWireID(const WireID& wireID)

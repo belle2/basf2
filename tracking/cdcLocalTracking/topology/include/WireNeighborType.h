@@ -7,32 +7,37 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef STEREOTYPES_H
-#define STEREOTYPES_H
-
-#include <tracking/cdcLocalTracking/typedefs/SignType.h>
+#ifndef WIRENEIGHBORTYPE_H
+#define WIRENEIGHBORTYPE_H
 
 namespace Belle2 {
 
   namespace CDCLocalTracking {
+    /// Type for the neighbor relationship from in wire to an other, imagined in the clock
+    typedef signed short WireNeighborType;
 
-    /// Type for the stereo property of the wire
-    typedef SignType StereoType;
 
-    /// Constant for an axial wire
-    const StereoType AXIAL = 0;
+    /// Constant for clockwise outwards
+    const WireNeighborType CW_OUT_NEIGHBOR = 1;
 
-    /// Constant for an stereo wire in the U configuration
-    const StereoType STEREO_U = 1;
+    /// Constant for clockwise
+    const WireNeighborType CW_NEIGHBOR = 3;
 
-    /// Constant for an stereo wire in the V configuration
-    const StereoType STEREO_V = -1;
+    /// Constant for clockwise inwards
+    const WireNeighborType CW_IN_NEIGHBOR = 5;
 
-    /// Constant for an invalid stereo information
-    const StereoType INVALID_STEREOTYPE = -127;
+    /// Constant for counterclockwise inwards
+    const WireNeighborType CCW_IN_NEIGHBOR = 7;
+
+    /// Constant for counterclockwise
+    const WireNeighborType CCW_NEIGHBOR = 9;
+
+    /// Constant for counterclockwise outwards
+    const WireNeighborType CCW_OUT_NEIGHBOR = 11;
+
 
   } // namespace CDCLocalTracking
 
 } // namespace Belle2
 
-#endif // STEREOTYPES
+#endif // WIRENEIGHBORTYPE_H

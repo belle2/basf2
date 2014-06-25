@@ -7,32 +7,26 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef STEREOTYPES_H
-#define STEREOTYPES_H
+#ifndef ILAYERTYPE_H
+#define ILAYERTYPE_H
 
-#include <tracking/cdcLocalTracking/typedefs/SignType.h>
+
 
 namespace Belle2 {
 
   namespace CDCLocalTracking {
 
-    /// Type for the stereo property of the wire
-    typedef SignType StereoType;
+    ///The type of the layer ids enumerating layers within a superlayer
+    typedef signed short ILayerType;
 
-    /// Constant for an axial wire
-    const StereoType AXIAL = 0;
+    /// Constant making an invalid layer id
+    const ILayerType INVALID_ILAYER = 127;
 
-    /// Constant for an stereo wire in the U configuration
-    const StereoType STEREO_U = 1;
-
-    /// Constant for an stereo wire in the V configuration
-    const StereoType STEREO_V = -1;
-
-    /// Constant for an invalid stereo information
-    const StereoType INVALID_STEREOTYPE = -127;
+    ///Legacy constant
+    const ILayerType INVALIDLAYER = INVALID_ILAYER;
 
   } // namespace CDCLocalTracking
 
 } // namespace Belle2
 
-#endif // STEREOTYPES
+#endif // ILAYERTYPE_H

@@ -129,7 +129,7 @@ namespace Belle2 {
       /// Getter for the common superlayer id of the pair
       ILayerType getISuperLayer() const {
         ILayerType result = getStartRLWireHit().getISuperLayer();
-        return result == getRearRLWireHitPair().getISuperLayer() ? result : INVALIDSUPERLAYER;
+        return result == getRearRLWireHitPair().getISuperLayer() ? result : INVALID_ISUPERLAYER;
       }
 
       /// Getter for the common stereo type of the superlayer of the pair

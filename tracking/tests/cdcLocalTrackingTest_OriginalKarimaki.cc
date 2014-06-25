@@ -88,6 +88,16 @@ namespace {
     EXPECT_NEAR(0.0, fittedCircle.chi2(), 10e-7) <<
                                                  "Fitter " << typeid(fitter).name() << " failed.";
 
+    const FloatType& curv = fittedCircle.curvature();
+    const FloatType& I = fittedCircle.impact();
+    const FloatType& phi = fittedCircle.tangentialPhi();
+
+    const FloatType& chi2 = fittedCircle.chi2();
+
+    B2INFO("Curvature " << curv);
+    B2INFO("Tangential phi " << phi);
+    B2INFO("Impact " << I);
+    B2INFO("Chi2 " << chi2);
 
     B2INFO("Covariance matrix:");
     trajectory2D.getCircle().perigeeCovariance().Print();

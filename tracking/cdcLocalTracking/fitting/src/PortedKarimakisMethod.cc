@@ -25,8 +25,8 @@ ClassImpInCDCLocalTracking(PortedKarimakisMethod)
 
 
 PortedKarimakisMethod::PortedKarimakisMethod() :
-  _curved(true),
-  _npar(_curved ? 3 : 2)
+  m_lineConstrained(false),
+  m_originConstrained(false)
 {
 }
 
@@ -111,7 +111,7 @@ namespace {
                              bool lineConstrained = false,
                              bool originConstrained = false)
   {
-    //Solve the normal equation X * n = y
+    // Solve the normal equation X * n = y
     if (lineConstrained) {
       if (originConstrained) {
         Matrix< FloatType, 2, 2> X = sumMatrix.block<2, 2>(1, 1);
@@ -386,7 +386,6 @@ namespace {
     reduce(iReducedN2, iN1) = -rotN2 / rotN1;
     reduce(iReducedN3, iN1) = 2 * n0 / rotN1;
 
-    B2INFO("reduce " << endl << reduce);
 
     // Instead of doing the two transformations seperatly we combine matrices and apply a single transformation
     // This saves one matrix multiplication.
@@ -520,53 +519,55 @@ namespace {
 
 UncertainPerigeeCircle PortedKarimakisMethod::fit(CDCObservations2D& observations2D) const
 {
-
+  // Matrix of weighted sums
   Matrix< FloatType, 5, 5 > s = observations2D.getWXYRLSumMatrix();
+
+  // Matrix of averages
   Matrix< FloatType, 5, 5 > a = s / s(iW);
 
+  // Measurement means
   Matrix< FloatType, 5, 1> means = a.row(iW);
-  Matrix< FloatType, 5, 5> c = a - means * means.transpose();
 
+  // Covariance matrix
+  // Matrix< FloatType, 5, 5> c = a - means * means.transpose();
+
+  // The same as above without drift lengths
   Matrix<FloatType, 4, 4> sNoL = s.block<4, 4>(0, 0);
-  Matrix< FloatType, 4, 1> meansNoL = means.block<4, 1>(0, 0);
-  Matrix<FloatType, 4, 4> cNoL = c.block<4, 4>(0, 0);
+  //Matrix< FloatType, 4, 1> meansNoL = means.block<4, 1>(0, 0);
+  //Matrix<FloatType, 4, 4> cNoL = c.block<4, 4>(0, 0);
 
-  /// Fit te parameters
+  // Parameters to be fitted
   UncertainPerigeeCircle resultCircle;
   FloatType chi2;
+  Matrix< FloatType, 3, 3> perigeeCovariance;
+
 
   size_t nObservationsWithDriftRadius = observations2D.getNObservationsWithDriftRadius();
   if (nObservationsWithDriftRadius > 0) {
-    resultCircle = ::fit(s);
-
+    resultCircle = ::fit(s, isLineConstrained(), isOriginConstrained());
     chi2 = calcChi2(resultCircle, s);
+
+    // Covariance calculation does not need the drift lengths, which is why we do not forward them
+    perigeeCovariance = calcCovariance(resultCircle, sNoL, isLineConstrained(), isOriginConstrained());
+
   } else {
-    resultCircle = ::fit(sNoL);
-    resultCircle = fitSeperateOffset(meansNoL, cNoL);
-    resultCircle = fitKarimaki(s(iW), meansNoL, cNoL);
-
+    resultCircle = ::fit(sNoL, isLineConstrained(), isOriginConstrained());
     chi2 = calcChi2(resultCircle, sNoL);
-    chi2 = calcChi2Karimaki(resultCircle, s(iW), cNoL);
+    perigeeCovariance = calcCovariance(resultCircle, sNoL, isLineConstrained(), isOriginConstrained());
 
+
+    //Alternative implementations for comparision
+    // if (not isOriginConstrained()){
+    //   resultCircle = fitSeperateOffset(meansNoL, cNoL, isLineConstrained());
+    //   resultCircle = fitKarimaki(s(iW), meansNoL, cNoL, isLineConstrained());
+    //}
+    //chi2 = calcChi2Karimaki(resultCircle, s(iW), cNoL);
+    //perigeeCovariance = calcCovarianceKarimaki(resultCircle, sNoL, isLineConstrained());
   }
 
   resultCircle.setChi2(chi2);
 
-  const FloatType& curv = resultCircle.curvature();
-  const FloatType& I = resultCircle.impact();
-  const FloatType& phi = resultCircle.tangentialPhi();
-
-  B2INFO("Curvature " << curv);
-  B2INFO("Tangential phi " << phi);
-  B2INFO("Impact " << I);
-
-  B2INFO("Chi2 " << chi2);
-
-
-  Matrix< FloatType, 3, 3> perigeeCovariance = calcCovariance(resultCircle, sNoL);
-  //Matrix< FloatType, 3, 3> perigeeCovariance = calcCovarianceKarimaki(resultCircle, sNoL);
   TMatrixDSym tPerigeeCovariance(3);
-
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
       tPerigeeCovariance(i, j) = perigeeCovariance(i, j);

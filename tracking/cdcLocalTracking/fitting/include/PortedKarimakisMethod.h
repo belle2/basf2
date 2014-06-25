@@ -34,17 +34,34 @@ namespace Belle2 {
 
 
     private:
+      /// Internal method doing the heavy work.
       UncertainPerigeeCircle fit(CDCObservations2D&) const;
 
-    private:
-      const bool _curved;
-      const int _npar;
 
+    public:
+      /// Getter for the indictor that lines should be fitted by this fitter
+      bool isLineConstrained() const
+      { return m_lineConstrained; }
+
+      /// Getter for the indictor that curves through the origin should be fitted by this fitter
+      bool isOriginConstrained() const
+      { return m_originConstrained; }
+
+      /// Indicator if this fitter is setup to fit lines
+      void setLineConstrained(bool constrained = true)
+      { m_lineConstrained = constrained; }
+
+      /// Indicator if this fitter is setup to fit curves through the origin
+      void setOriginConstrained(bool constrained = true)
+      { m_originConstrained = constrained; }
+
+    protected:
+      bool m_lineConstrained; ///< Memory for the flag indicating that lines should be fitted
+      bool m_originConstrained; ///< Memory for the flag indicating that curves through the origin shall be fitter
 
     public:
       /** ROOT Macro to make PortedKarimakisMethod a ROOT class.*/
       ClassDefInCDCLocalTracking(PortedKarimakisMethod, 1);
-
 
     }; //class
   } // end namespace CDCLocalTracking

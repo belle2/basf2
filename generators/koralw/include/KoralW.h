@@ -90,9 +90,11 @@ namespace Belle2 {
      * @param vtx The vertex of the particle in [mm].
      * @param pdg The PDG code of the particle.
      * @param isVirtual If the particle is a virtual particle, such as the incoming particles, set this to true.
+     *
+     * @param isInitial If the particle is a initial particle for ISR, set this to true.
      */
-    void storeParticle(MCParticleGraph& mcGraph, const float* mom, const float* vtx, int pdg, bool isVirtual = false);
 
+    void storeParticle(MCParticleGraph& mcGraph, const float* mom, const float* vtx, int pdg, bool isVirtual = false, bool isInitial = false);
 
   private:
 

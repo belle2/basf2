@@ -127,16 +127,25 @@ void KoralW::term()
 //                       Protected methods
 //=========================================================================
 
-void KoralW::storeParticle(MCParticleGraph& mcGraph, const float* mom, const float* vtx, int pdg, bool isVirtual)
+void KoralW::storeParticle(MCParticleGraph& mcGraph, const float* mom, const float* vtx, int pdg, bool isVirtual, bool isInitial)
 {
-  //Create particle
-  MCParticleGraph::GraphParticle& part = mcGraph.addParticle();
-  if (!isVirtual) {
-    part.setStatus(MCParticle::c_PrimaryParticle);
-  } else {
-    part.setStatus(MCParticle::c_IsVirtual);
-  }
+  // //Create particle
+  //MCParticleGraph::GraphParticle& part = mcGraph.addParticle();
+  //if (!isVirtual) {
+  //  part.setStatus(MCParticle::c_PrimaryParticle);
+  //} else {
+  //  part.setStatus(MCParticle::c_IsVirtual);
+  //}
 
+  //  RG 6/25/14 Add new flag for ISR "c_Initial"
+  MCParticleGraph::GraphParticle& part = mcGraph.addParticle();
+  if (isVirtual) {
+    part.setStatus(MCParticle::c_IsVirtual);
+  } else if (isInitial) {
+    part.setStatus(MCParticle::c_Initial);
+  } else {
+    part.setStatus(MCParticle::c_PrimaryParticle);
+  }
   part.setPDG(pdg);
   part.setFirstDaughter(0);
   part.setLastDaughter(0);

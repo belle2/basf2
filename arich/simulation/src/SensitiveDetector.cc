@@ -83,9 +83,6 @@ namespace Belle2 {
       //Get photon energy
       const G4double energy = track.GetKineticEnergy() / eV;
 
-      //Get id of particle
-      const G4int trackID = track.GetTrackID();
-
       //------------------------------------------------------------
       //                Create ARICHSimHit and save it to datastore
       //------------------------------------------------------------
@@ -93,13 +90,14 @@ namespace Belle2 {
       TVector2 locpos(localPosition.x() / cm, localPosition.y() / cm);
       StoreArray<ARICHSimHit> arichSimHits;
       if (!arichSimHits.isValid()) arichSimHits.create();
-      new(arichSimHits.nextFreeAddress()) ARICHSimHit(moduleID, locpos, globalTime, energy);
+      ARICHSimHit* simHit = arichSimHits.appendNew(moduleID, locpos, globalTime, energy);
+
 
       // add relation to MCParticle
       StoreArray<MCParticle> mcParticles;
       RelationArray  arichSimHitRel(mcParticles, arichSimHits);
-      int nentr = arichSimHits.getEntries() - 1;
-      arichSimHitRel.add(trackID, nentr);
+      int parentID = track.GetParentID();
+      arichSimHitRel.add(parentID, simHit->getArrayIndex());
 
       // after detection photon track is killed
       track.SetTrackStatus(fStopAndKill);

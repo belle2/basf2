@@ -80,13 +80,12 @@ namespace Belle2 {
         StoreArray<ARICHAeroHit> arichAeroHits;
         if (!arichAeroHits.isValid()) arichAeroHits.create();
 
-        new(arichAeroHits.nextFreeAddress()) ARICHAeroHit(PDGEncoding, TPosition, TMomentum);
+        ARICHAeroHit* hit = arichAeroHits.appendNew(PDGEncoding, TPosition, TMomentum);
 
         // Create relation to MCParticle
         StoreArray<MCParticle> mcParticles;
         RelationArray  arichAeroHitRel(mcParticles, arichAeroHits);
-        int nentr = arichAeroHits.getEntries() - 1;
-        arichAeroHitRel.add(trackID, nentr);
+        arichAeroHitRel.add(trackID, hit->getArrayIndex());
       }
       return true;
     }

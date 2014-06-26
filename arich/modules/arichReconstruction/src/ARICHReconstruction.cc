@@ -466,9 +466,9 @@ namespace Belle2 {
             double fi_cer = dirch.Phi();
             double th_cer = dirch.Theta();
 
-            if (th_cer > 0.5 || th_cer < 0.05) continue;
+            if (th_cer > 0.5 /*|| th_cer < 0.05*/) continue;
 
-            if (ncount < m_storeHist) m_hitstuple->Fill(ncount, track->getIdentity(), iAerogel, mirr, th_cer, fi_cer, hitpos.x(), hitpos.y(), epoint.x(), epoint.y(), track->getReconstructedMomentum());
+            if (ncount < m_storeHist) m_hitstuple->Fill(ncount, track->getIdentity(), iAerogel, mirr, th_cer, fi_cer, hitpos.x(), hitpos.y(), track->getPosError(), track->getDirError(), track->getReconstructedMomentum());
             if (m_beamtest) continue;
             if (fi_cer < 0) fi_cer += 2 * M_PI;
             double fii = fi_cer;

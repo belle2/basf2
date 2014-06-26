@@ -308,7 +308,7 @@ int arichBtestModule::readhapd(unsigned int len, unsigned int* data)
             TVector2 loc = _arichgp->getChannelCenterLoc(channel);
             if (abs(loc.X()) > 2.3 || abs(loc.Y()) > 2.3) continue;
 
-            new(arichDigits.nextFreeAddress()) ARICHDigit(module + 1, channel, globalTime);
+            arichDigits.appendNew(module + 1, channel, globalTime);
 
             TVector3 rechit = _arichgp->getChannelCenterGlob(module + 1, channel);
             pair<double, double> poshapd(_arichbtgp->GetHapdChannelPosition(module * 144 + channelID));
@@ -450,7 +450,8 @@ int arichBtestModule::readdata(gzFile fp, int rec_id, int)
       B2DEBUG(50, "-----------> " <<  rc.x() <<  " " << rc.y() << " " <<   rc.z() << "::::" << rrel.x() <<  " " << rrel.y() << " " <<   rrel.z()  << " ----> R " <<   r.x() <<  " " << r.y() << " " <<   r.z() << " ----> S " <<   dir.x() <<  " " << dir.y() << " " <<   dir.z());
 
       // Add new ARIHCAeroHit to datastore
-      new(arichAeroHits.nextFreeAddress()) ARICHAeroHit(particleId, r, dir);
+      arichAeroHits.appendNew(particleId, r, dir);
+
     }
   }
 

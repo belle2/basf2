@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter, Igal Jaegle                               *
+ * Contributors: Martin Ritter, Igal Jaegle, FaHui Lin                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

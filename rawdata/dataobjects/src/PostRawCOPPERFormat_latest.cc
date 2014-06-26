@@ -254,6 +254,10 @@ int PostRawCOPPERFormat_latest::CheckB2LHSLBMagicWords(int* finesse_buf, int fin
 
 int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
 {
+
+  //
+  // Calculate CRC16
+  //
   unsigned short temp_crc16 = CalcCRC16LittleEndian(0xffff, &(m_buffer[ tmp_header.POS_TTCTIME_TRGTYPE ]), 1);
   temp_crc16 = CalcCRC16LittleEndian(temp_crc16, &(m_buffer[ tmp_header.POS_EVE_NO ]), 1);
   temp_crc16 = CalcCRC16LittleEndian(temp_crc16, &(m_buffer[ tmp_header.POS_TTUTIME ]), 1);
@@ -262,27 +266,27 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
   int pos_nwords = GetFINESSENwords(n, finesse_num) - (SIZE_B2LHSLB_HEADER + POS_B2L_CTIME + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER);
   temp_crc16 = CalcCRC16LittleEndian(temp_crc16, buf, pos_nwords);
 
-  buf = GetFINESSEBuffer(n, finesse_num) +  GetFINESSENwords(n, finesse_num) - ((SIZE_B2LFEE_TRAILER - POS_B2LFEE_CRC16) + SIZE_B2LHSLB_TRAILER) ;
-
   //
-  // CRC16 CCIT MSB error
+  // Compare CRC16 with B2LCRC16
   //
-  if ((unsigned short)(*buf & 0xFFFF) != temp_crc16) {
+  buf = GetFINESSEBuffer(n, finesse_num) +  GetFINESSENwords(n, finesse_num) - ((SIZE_B2LFEE_TRAILER - POS_B2LFEE_CRC16) + SIZE_B2LHSLB_TRAILER) ;  if ((unsigned short)(*buf & 0xFFFF) != temp_crc16) {
     printf("CRC16 error %x %x %d\n", *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
     printf("\n");
-    buf = GetFINESSEBuffer(n, finesse_num);
-    printf("POINTER %p\n", buf);
+    int* temp_buf = GetFINESSEBuffer(n, finesse_num);
     printf("%.8x ", 0);
     for (int k = 0; k <  GetFINESSENwords(n, finesse_num); k++) {
-      printf("%.8x ", buf[ k ]);
+      printf("%.8x ", temp_buf[ k ]);
       if ((k + 1) % 10 == 0) printf("\n%.8x : ", k);
     }
     printf("\n");
-    exit(1);
-  } else {
-    return 1;
+    fflush(stdout);
+    char err_buf[500];
+    sprintf(err_buf, "[DEBUG] [ERROR] B2LCRC16 (%.4x) differs from one ( %.4x) calculated by PostRawCOPPERfromat class. Exiting...\n %s %s %d\n",
+            (unsigned short)(*buf & 0xFFFF), temp_crc16, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    string err_str = err_buf;     throw (err_str);
   }
 
-  return -1;
+  return 1;
+
 
 }

@@ -986,7 +986,8 @@ int PreRawCOPPERFormat_v0::CopyReducedBuffer(int n, int* buf_to)
       copyData(buf_to, &pos_nwords_to, buf_from, copy_nwords, nwords_buf_to);
 
       // check CRC data
-      CalcCRC16(0xFFFF, (char*)buf_to, copy_nwords);
+      //      CheckCRC16( n, j);
+
 
     }
   }

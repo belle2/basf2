@@ -894,8 +894,7 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
       pos_nwords_to++;
 
       // check CRC data
-      CalcCRC16(0xFFFF, (char*)finesse_buf_to, copy_nwords + 1);
-
+      //      CheckCRC16( n, j );
     }
   }
 
@@ -967,36 +966,39 @@ int PreRawCOPPERFormat_latest::CheckB2LHSLBMagicWords(int* finesse_buf, int fine
 
 int PreRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
 {
+  //
+  // Calculate CRC16
+  //
   int* buf = GetFINESSEBuffer(n, finesse_num) +  SIZE_B2LHSLB_HEADER;
   int nwords = GetFINESSENwords(n, finesse_num) - (SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER);
   unsigned short temp_crc16 = CalcCRC16LittleEndian(0xffff, buf, nwords);
 
-
+  //
+  // Compare CRC16 with B2LCRC16
+  //
   buf = GetFINESSEBuffer(n, finesse_num) +  GetFINESSENwords(n, finesse_num)
         - ((SIZE_B2LFEE_TRAILER - POS_CHKSUM_B2LFEE) + SIZE_B2LHSLB_TRAILER) ;
 
-
   if ((unsigned short)(*buf & 0xFFFF) != temp_crc16) {
-    printf("PRE CRC16 error %x %x %d\n", *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
-
-    printf("\n");
-
-    buf = GetFINESSEBuffer(n, finesse_num);
-    printf("PRE POINTER %p\n", buf);
-    //    printf("%.8x ", 0);
+    printf("PRE CRC16 error : B2LCRC16 %x Calculated CRC16 %x : Nwords of FINESSE buf %d\n",
+           *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
+    int* temp_buf = GetFINESSEBuffer(n, finesse_num);
     for (int k = 0; k <  GetFINESSENwords(n, finesse_num); k++) {
-      printf("%.8x ", buf[ k ]);
+      printf("%.8x ", temp_buf[ k ]);
       if ((k + 1) % 10 == 0) {
         printf("\n");
-        //      printf("\n%.8x : ", k);
       }
     }
     printf("\n");
-    exit(1);
-  } else {
-    return 1;
-  }
+    fflush(stdout);
 
-  return -1;
+    char err_buf[500];
+    sprintf(err_buf, "[DEBUG] [ERROR] B2LCRC16 (%.4x) differs from one ( %.4x) calculated by PreRawCOPPERfromat class. Exiting...\n %s %s %d\n",
+            (unsigned short)(*buf & 0xFFFF), temp_crc16,
+            __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    string err_str = err_buf;     throw (err_str);
+
+  }
+  return 1;
 
 }

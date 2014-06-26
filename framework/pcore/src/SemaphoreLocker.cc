@@ -13,7 +13,7 @@ int SemaphoreLocker::create(key_t semkey)
 {
   int semid = semget(semkey, 1, IPC_CREAT | 0600);
   if (semid < 0) {
-    B2FATAL("Couldn't create semaphore with semget()!");
+    B2FATAL("Couldn't create semaphore with semget()! Maybe you have semaphores from aborted processes lying around, you can clean those up using 'clear_basf2_ipc'. (Don't do this if you are currently running basf2 with parallel processing!)");
   }
 
   // POSIX doesn't guarantee any particular state of our fresh semaphore

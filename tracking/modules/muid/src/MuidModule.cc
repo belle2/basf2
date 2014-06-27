@@ -174,10 +174,12 @@ void MuidModule::initialize()
   // Define the geant4e extrapolation Manager.
   m_ExtMgr = Simulation::ExtManager::GetManager();
 
-  // See if muid will coexist with geant4 simulation and/or ext extrapolation
-  if (m_ExtMgr->PrintG4State() == G4String("G4State_PreInit")) {
+  // See if muid will coexist with geant4 simulation and/or ext extrapolation.
+  // Only geant4 simulation will have created a G4RunManager singleton; geant4e
+  // uses only the G4RunManagerKernel singleton (for ext and/or muid).
+  m_RunMgr = G4RunManager::GetRunManager();
+  if (m_RunMgr == NULL) {
     B2INFO("Muid will run without simulation")
-    m_RunMgr = NULL;
     m_TrackingAction = NULL;
     m_SteppingAction = NULL;
     if (m_ExtMgr->PrintExtState() == G4String("G4ErrorState_PreInit")) {
@@ -198,7 +200,6 @@ void MuidModule::initialize()
     }
   } else {
     B2INFO("Muid will coexist with simulation")
-    m_RunMgr = G4RunManager::GetRunManager();
     m_TrackingAction = const_cast<G4UserTrackingAction*>(m_RunMgr->GetUserTrackingAction());
     m_SteppingAction = const_cast<G4UserSteppingAction*>(m_RunMgr->GetUserSteppingAction());
     if (m_ExtMgr->PrintExtState() == G4String("G4ErrorState_PreInit")) {
@@ -213,6 +214,7 @@ void MuidModule::initialize()
   // Redefine muid's step length, magnetic field step limitation (fraction of local curvature radius),
   // and kinetic energy loss limitation (maximum fractional energy loss) by communicating with
   // the geant4 UI.  (Commands were defined in ExtMessenger when physics list was set up.)
+  // *NOTE* If module ext runs after this, its G4UImanager commands will override these.
   G4double maxStep = ((m_MaxStep == 0.0) ? 10.0 : std::min(10.0, m_MaxStep)) * cm;
   char line[80];
   std::sprintf(line, "/geant4e/limits/stepLength %8.2f mm", maxStep);

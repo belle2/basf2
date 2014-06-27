@@ -49,7 +49,7 @@ namespace Belle2 {
       const G4Track& track    = *step->GetTrack();
       const int trackID       = track.GetTrackID();
       const double depEnergy  = step->GetTotalEnergyDeposit() * Unit::MeV;
-      const int detID = step->GetTrack()->GetVolume()->GetCopyNo();
+      const int detNb = step->GetTrack()->GetVolume()->GetCopyNo();
 
       //Ignore everything below 1eV
       if (depEnergy < Unit::eV) return false;
@@ -61,12 +61,13 @@ namespace Belle2 {
       StoreArray<Ph1sustrSimHit> simHits;
       RelationArray relMCSimHit(mcParticles, simHits);
 
-      //Add SimHit
       const int hitIndex = simHits.getEntries();
-      new(simHits.nextFreeAddress()) Ph1sustrSimHit(
-        depEnergy,
-        detID
-      );
+      StoreArray<Ph1sustrSimHit> Ph1sustrHits;
+      if (!Ph1sustrHits.isValid()) Ph1sustrHits.create();
+      Ph1sustrSimHit* hit = Ph1sustrHits.appendNew(
+                              depEnergy,
+                              detNb
+                            );
 
       //Add Relation between SimHit and MCParticle with a weight of 1. Since
       //the MCParticle index is not yet defined we use the trackID from Geant4

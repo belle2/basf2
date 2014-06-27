@@ -77,23 +77,23 @@ namespace Belle2 {
       StoreArray<He3tubeSimHit> simHits;
       RelationArray relMCSimHit(mcParticles, simHits);
 
-      //Add SimHit
-      const int hitIndex = simHits.getEntries();
-      new(simHits.nextFreeAddress()) He3tubeSimHit(
-        depEnergy,
-        nielEnergy,
-        tkPDG,
-        tkKEnergy,
-        detNb,
-        GlTime,
-        tkPos,
-        tkMom,
-        tkMomDir
-      );
+      StoreArray<He3tubeSimHit> He3tubeHits;
+      if (!He3tubeHits.isValid()) He3tubeHits.create();
+      He3tubeSimHit* hit = He3tubeHits.appendNew(
+                             depEnergy,
+                             nielEnergy,
+                             tkPDG,
+                             tkKEnergy,
+                             detNb,
+                             GlTime,
+                             tkPos,
+                             tkMom,
+                             tkMomDir
+                           );
 
       //Add Relation between SimHit and MCParticle with a weight of 1. Since
       //the MCParticle index is not yet defined we use the trackID from Geant4
-      relMCSimHit.add(trackID, hitIndex, 1.0);
+      relMCSimHit.add(trackID, hit->getArrayIndex(), 1.0);
 
       return true;
     }

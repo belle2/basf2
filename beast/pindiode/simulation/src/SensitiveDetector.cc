@@ -77,23 +77,23 @@ namespace Belle2 {
       StoreArray<PindiodeSimHit> simHits;
       RelationArray relMCSimHit(mcParticles, simHits);
 
-      //Add SimHit
-      const int hitIndex = simHits.getEntries();
-      new(simHits.nextFreeAddress()) PindiodeSimHit(
-        depEnergy,
-        nielEnergy,
-        tkPDG,
-        tkKEnergy,
-        detNb,
-        GlTime,
-        tkPos,
-        tkMom,
-        tkMomDir
-      );
+      StoreArray<PindiodeSimHit> PindiodeHits;
+      if (!PindiodeHits.isValid()) PindiodeHits.create();
+      PindiodeSimHit* hit = PindiodeHits.appendNew(
+                              depEnergy,
+                              nielEnergy,
+                              tkPDG,
+                              tkKEnergy,
+                              detNb,
+                              GlTime,
+                              tkPos,
+                              tkMom,
+                              tkMomDir
+                            );
 
       //Add Relation between SimHit and MCParticle with a weight of 1. Since
       //the MCParticle index is not yet defined we use the trackID from Geant4
-      relMCSimHit.add(trackID, hitIndex, 1.0);
+      relMCSimHit.add(trackID, hit->getArrayIndex(), 1.0);
 
       return true;
     }

@@ -923,6 +923,34 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
   *(buf_to + m_reduced_rawcpr.tmp_header.POS_OFFSET_4TH_FINESSE) = pos_nwords_finesse[ 3 ];
 
 
+  //
+  // CRC16 check
+  //
+  m_reduced_rawcpr.SetBuffer(buf_to, nwords_buf_to, 0, GetNumEvents(), GetNumNodes());
+  if (m_reduced_rawcpr.GetNumEvents() * m_reduced_rawcpr.GetNumNodes() <= 0) {
+    printf("Invalid data block numbers.(# of events %d, # of nodes %d) Exiting...\n",
+           m_reduced_rawcpr.GetNumEvents(), m_reduced_rawcpr.GetNumNodes());
+    fflush(stdout);
+    exit(1);
+  }
+
+  for (int i = 0; i < m_reduced_rawcpr.GetNumEvents() * m_reduced_rawcpr.GetNumNodes(); i++) {
+    int nonzero_finesse_buf = 0;
+    for (int j = 0; j < 4; j++) {
+      pos_nwords_finesse[ j ] = pos_nwords_to;
+      if (GetFINESSENwords(n, j) > 0) {
+        m_reduced_rawcpr.CheckCRC16(i, j);
+        nonzero_finesse_buf++;
+      }
+    }
+    if (nonzero_finesse_buf == 0) {
+      printf("No non-zero FINESSE buffer. Exiting...\n");
+      fflush(stdout);
+      exit(1);
+    }
+  }
+
+  //    post_rawcopper_latest.CheckCRC16(0, 0);
   //       printf("fROM =======================================\n");
   //       for (int k = 0; k < nwords_buf_to; k++) {
   //  printf(" %.8x", GetBuffer(n)[ k ]);
@@ -978,6 +1006,8 @@ int PreRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
   //
   buf = GetFINESSEBuffer(n, finesse_num) +  GetFINESSENwords(n, finesse_num)
         - ((SIZE_B2LFEE_TRAILER - POS_CHKSUM_B2LFEE) + SIZE_B2LHSLB_TRAILER) ;
+
+  //  printf("PreRawCOPPER  : Eve %.8x B2LCRC16 %.8x calculated CRC16 %.8x\n", GetEveNo(n), *buf, temp_crc16 );
 
   if ((unsigned short)(*buf & 0xFFFF) != temp_crc16) {
     printf("PRE CRC16 error : B2LCRC16 %x Calculated CRC16 %x : Nwords of FINESSE buf %d\n",

@@ -12,7 +12,7 @@
 #      seq.addFunction(foo, path='Path', particleList='K+')
 
 from basf2 import *
-from ROOT import Belle2
+import ROOT
 import modularAnalysis
 import pdg
 
@@ -36,12 +36,13 @@ def SelectParticleList(path, particleName, explicitCuts):
             'ParticleList_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
 
 
-def CopyParticleLists(path, particleName, inputLists):
+def CopyParticleLists(path, particleName, inputLists, pdf):
     """
     Creates a ParticleList gathering up all particles in the given inputLists
         @param path the basf2 path
         @param particleName returned key is named ParticleList_{particleName} corresponding ParticleList is stored as {particleName}:{hash}
         @param inputLists names of inputLists which are copied to the new list
+        @param pdf dependency to particle overview pdf, to trigger the generation of the overview PDF as soon as the particle is available
     """
     inputLists = actorFramework.removeNones(inputLists)
     if inputLists == []:
@@ -180,11 +181,12 @@ def PreCutDetermination(particleName, channelNames, preCutConfig, preCutHistogra
     return results
 
 
-def WriteAnalysisFileForChannel(particleName, channelName, preCutConfig, preCutHistogram, preCut, mvaConfig, signalProbability):
+def WriteAnalysisFileForChannel(particleName, channelName, channelList, preCutConfig, preCutHistogram, preCut, mvaConfig, signalProbability):
     """
     Creates a pdf document with the PreCut and Training plots
         @param particleName name of the particle
         @param channelName name of the channel
+        @param channelList ParticleList name of the channel
         @param preCutConfig configuration for pre cut
         @param preCutHistogram preCutHistogram (filename, histogram postfix)
         @param preCut used preCuts for this channel
@@ -193,24 +195,64 @@ def WriteAnalysisFileForChannel(particleName, channelName, preCutConfig, preCutH
     """
 
     if signalProbability is None or preCut is None:
-        return {'dummy': None}
+        return {'Tex_' + channelName: None}
 
-    stripped_tmva_filename = signalProbability[:-7]  # Strip .config of filename
-    stripped_preCut_filename = preCutHistogram[0][:-5]  # Strip .root of filename
-    subprocess.call(['createAnalysisPlots', stripped_tmva_filename, stripped_preCut_filename, str(preCut.values()[0][0]), str(preCut.values()[0][1])])
+    ROOT.gROOT.SetBatch(True)
+
+    # Create TMVA Plots
+    tmva_filename = signalProbability[:-7] + '_1_vs_0.root'  # Strip .config of filename
+    subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/mvas.C(\\"{f}\\",3)"'.format(f=tmva_filename)], shell=True)
+    subprocess.call(['cp plots/$(ls -t plots/ | head -1) {c}_overtraining.png'.format(c=channelList)], shell=True)
+    subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/efficiencies.C(\\"{f}\\")"'.format(f=tmva_filename)], shell=True)
+    subprocess.call(['cp plots/$(ls -t plots/ | head -1) {c}_roc.png'.format(c=channelList)], shell=True)
+
+    # Create PreCut Hist Plots
+    rootfile = ROOT.TFile(preCutHistogram[0])
+    names = ['signal', 'all', 'background', 'ratio']
+    keys = rootfile.GetListOfKeys()
+    lc, uc = preCut.values()[0]
+    for (name, key) in zip(names, keys):
+        canvas = ROOT.TCanvas(name + channelList + '_canvas', name, 600, 400)
+        canvas.cd()
+        hist = rootfile.Get(key.GetName())
+        hist.Draw()
+        ll = ROOT.TLine(lc, 0, lc, hist.GetMaximum())
+        ul = ROOT.TLine(uc, 0, uc, hist.GetMaximum())
+        ll.Draw()
+        ul.Draw()
+        canvas.SaveAs(channelList + '_' + name + '.png')
+
+    # Calculate purity and efficiency for this channel
+    # ...
+    signal_hist = rootfile.Get(keys.At(0).GetName())
+    background_hist = rootfile.Get(keys.At(2).GetName())
+
+    ntotalsignal = signal_hist.Integral()
+    nsignal = preCutDetermination.GetNumberOfEventsInRange(signal_hist, (lc, uc))
+    nbckgrd = preCutDetermination.GetNumberOfEventsInRange(background_hist, (lc, uc))
+
+    purity = nsignal / (nsignal + nbckgrd)
+    efficiency = nsignal / ntotalsignal
 
     placeholders = {}
+
     placeholders['particleName'] = particleName
     placeholders['channelName'] = channelName
 
-    placeholders['preCutVariable'] = preCutConfig.variable
-    placeholders['preCutEfficiency'] = preCutConfig.efficiency
-    placeholders['preCutRange'] = 'Ignored' if preCut is None else str(preCut.values()[0])
+    placeholders['channelNSignal'] = int(nsignal)
+    placeholders['channelNBackground'] = int(nbckgrd)
+    placeholders['channelPurity'] = '{:.3f}'.format(purity)
+    placeholders['channelEfficiency'] = '{:.3f}'.format(efficiency)
 
-    placeholders['preCutAllPlot'] = 'all.png'
-    placeholders['preCutSignalPlot'] = 'signal.png'
-    placeholders['preCutBackgroundPlot'] = 'background.png'
-    placeholders['preCutRatioPlot'] = 'ratio.png'
+    placeholders['preCutVariable'] = preCutConfig.variable
+    placeholders['preCutEfficiency'] = '{:.2f}'.format(preCutConfig.efficiency)
+    a, b = preCut.values()[0]
+    placeholders['preCutRange'] = 'Ignored' if preCut is None else '({:.2f},'.format(a) + ' {:.2f}'.format(b) + ')'
+
+    placeholders['preCutAllPlot'] = channelList + '_all.png'
+    placeholders['preCutSignalPlot'] = channelList + '_signal.png'
+    placeholders['preCutBackgroundPlot'] = channelList + '_background.png'
+    placeholders['preCutRatioPlot'] = channelList + '_ratio.png'
 
     placeholders['mvaName'] = mvaConfig.name
     placeholders['mvaType'] = mvaConfig.type
@@ -219,13 +261,41 @@ def WriteAnalysisFileForChannel(particleName, channelName, preCutConfig, preCutH
     placeholders['mvaTarget'] = mvaConfig.target
     placeholders['mvaTargetCluster'] = mvaConfig.targetCluster
 
-    placeholders['mvaROCPlot'] = 'roc.png'
-    placeholders['mvaOvertrainingPlot'] = 'overtraining.png'
+    placeholders['mvaROCPlot'] = channelList + '_roc.png'
+    placeholders['mvaOvertrainingPlot'] = channelList + '_overtraining.png'
 
-    template = Template(file(Belle2.FileSystem.findFile('analysis/scripts/FullEventInterpretationTemplate.tex'), 'r').read())
+    template = Template(file(ROOT.Belle2.FileSystem.findFile('analysis/scripts/FullEventInterpretationChannelTemplate.tex'), 'r').read())
     page = template.substitute(placeholders)
-    file(channelName + '.tex', 'w').write(page)
-    subprocess.call(['pdflatex', channelName + '.tex'])
+    filename = channelList + '.tex'
+    file(filename, 'w').write(page)
 
-    return {}
-    return {'dummy': None}
+    return {'Tex_' + channelName: (filename, placeholders)}
+
+
+def WriteAnalysisFileForParticle(particleName, texfiles):
+    """
+    Creates a pdf document with the PreCut and Training plots
+        @param particleName name of the particle
+        @param texfiles list of tex filenames
+    """
+    placeholders = {}
+    placeholders['NChannels'] = len(texfiles)
+    texfiles = actorFramework.removeNones(texfiles)
+    placeholders['NUsedChannels'] = len(texfiles)
+
+    placeholders['particleName'] = particleName
+    placeholders['channelInputs'] = ""
+    placeholders['particleNSignal'] = 0
+    placeholders['particleNBackground'] = 0
+    for texfile, channelPlaceholders in texfiles:
+        placeholders['particleNSignal'] += channelPlaceholders['channelNSignal']
+        placeholders['particleNBackground'] += channelPlaceholders['channelNBackground']
+        placeholders['channelInputs'] += '\include{' + texfile[:-4] + '}\n'
+
+    template = Template(file(ROOT.Belle2.FileSystem.findFile('analysis/scripts/FullEventInterpretationParticleTemplate.tex'), 'r').read())
+    page = template.substitute(placeholders)
+    filename = particleName + '.tex'
+    file(filename, 'w').write(page)
+
+    subprocess.call(['pdflatex', filename])
+    return {'PDF_' + particleName: filename[:-4] + '.pdf'}

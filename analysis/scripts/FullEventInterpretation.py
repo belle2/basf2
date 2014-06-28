@@ -21,6 +21,8 @@
 # Therefore the end user has to run the FullEventInterpretation several times, until all Distributions, Classifiers, ... are created.
 #
 
+from ROOT import PyConfig
+PyConfig.IgnoreCommandLineOptions = True
 
 import pdg
 
@@ -194,7 +196,8 @@ def FullEventInterpretation(path, particles):
             seq.addFunction(CopyParticleLists,
                             path='Path',
                             particleName='Name_' + particle.name,
-                            inputLists=['ParticleList_' + channel.name + '_' + particle.name for channel in particle.complete_channels])
+                            inputLists=['ParticleList_' + channel.name + '_' + particle.name for channel in particle.complete_channels],
+                            pdf='PDF_' + particle.name)
 
         ############# PRECUT DETERMINATION ############
         # Intermediate PreCut part of FullReconstruction algorithm.
@@ -250,10 +253,15 @@ def FullEventInterpretation(path, particles):
             seq.addFunction(WriteAnalysisFileForChannel,
                             particleName='Name_' + particle.name,
                             channelName='Name_' + channel.name,
+                            channelList='ParticleList_' + channel.name + '_' + particle.name,
                             preCutConfig='PreCutConfig_' + particle.name,
                             preCutHistogram='PreCutHistogram_' + channel.name,
                             preCut='PreCut_' + channel.name,
                             mvaConfig='MVAConfig_' + channel.name,
                             signalProbability='SignalProbability_' + channel.name + '_' + particle.name)
+
+        seq.addFunction(WriteAnalysisFileForParticle,
+                        particleName='Name_' + particle.name,
+                        texfiles=['Tex_' + channel.name for channel in particle.channels])
 
     seq.run(path, args.verbose)

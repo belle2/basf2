@@ -21,6 +21,7 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
         @param preCutHistograms filenames of the histogram files created for every channel by PreCutDistribution
     """
 
+    ROOT.gROOT.SetBatch(True)
     files = [ROOT.TFile(filename, 'UPDATE') for filename, _ in preCutHistograms]
 
     if preCutConfig.variable == 'Mass':
@@ -101,6 +102,25 @@ def GetInterpolateFunctions(histograms):
                     0
                 )
                 ) for (channel, value) in histograms.iteritems()])
+
+
+def GetFitFunctions(histograms):
+    """
+    GetFit Functions to the given histograms
+    @param histograms Histograms
+    """
+    dict = {}
+    for (channel, value) in histograms.iteritems():
+        fitfunc = ROOT.TF1(hashlib.sha1(channel).hexdigest() + '_func',
+                           'gaus(0)',
+                           value.GetXaxis().GetXmin(),
+                           value.GetXaxis().GetXmax())
+        fitfunc.SetParameter(0, value.Integral() / 6)
+        fitfunc.SetParameter(1, value.GetBinCenter(value.GetMaximumBin()))
+        fitfunc.SetParameter(2, 1)
+        value.Fit(fitfunc)
+        dict[channel] = fitfunc
+    return dict
 
 
 def GetCuts(signal, efficiency, ycut_to_xcuts):

@@ -245,7 +245,7 @@ def FullEventInterpretation(path, particles):
                                     mvaConfig='MVAConfig_' + channel.name,
                                     particleList='ParticleList_' + channel.name + '_' + particle.name,
                                     daughterSignalProbabilities=['SignalProbability_' + daughter for daughter in channel.daughters])
-                seq.addResource('SignalProbability_' + particle.name, 'Dummy', requires=['SignalProbability_' + channel.name + '_' + particle.name for channel in particle.channels])
+                seq.addResource('SignalProbability_' + particle.name, 'Dummy', requires=['SignalProbability_' + channel.name + '_' + particle.name for channel in particle.channels], strict=False)
                 seq.addResource('SignalProbability_' + pdg.conjugate(particle.name), 'Dummy', requires=['SignalProbability_' + particle.name])
 
         ################ Information ACTORS #################
@@ -264,4 +264,6 @@ def FullEventInterpretation(path, particles):
                         particleName='Name_' + particle.name,
                         texfiles=['Tex_' + channel.name for channel in particle.channels])
 
+        seq.addNeeded('SignalProbability_B+')
+        seq.addNeeded('SignalProbability_B0')
     seq.run(path, args.verbose)

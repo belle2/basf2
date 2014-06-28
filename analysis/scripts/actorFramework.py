@@ -25,12 +25,13 @@ class Resource(object):
     More specific the Resource class is a generic Functor class, which provides a simple value under a given name.
     It's used to provide things like: Name of a particle, PDG code of a particle, MVA configuration,...
     """
-    def __init__(self, name, value, requires=None):
+    def __init__(self, name, value, requires=None, strict=True):
         """
         Creates a new Resource
             @param name the name of the resource. Other Actors can require this resource using its name.
             @param value the value of the resource. If another Actor requires this resource its value is passed to the Actor.
             @param requires these requirements have to be fulfilled before calling this Actor
+            @param strict if any requirement is None the returned value is None for strict == True
         """
         ##  the name of the resource. Other Actors can require this resource using its name.
         self.name = name
@@ -38,6 +39,8 @@ class Resource(object):
         self.value = value
         ## these requirements have to be fulfilled before calling this Actor
         self.requires = [] if requires is None else requires
+        ## if any requirement is None the returned value is none for strict == true
+        self.strict = strict
 
     def __call__(self, arguments):
         """
@@ -48,7 +51,9 @@ class Resource(object):
         if len(arguments) != len(self.requires):
             raise RuntimeError('Requirements are not fulfilled')
 
-        if containsNone(arguments):
+        if self.strict and containsNone(arguments):
+            return {self.name: None}
+        if not self.strict and all([argument is None for argument in arguments]):
             return {self.name: None}
         return {self.name: self.value}
 
@@ -166,9 +171,9 @@ class Sequence(object):
         # Every actor which provides a requirement of a needed actor is also needed.
         # We loop over the chain in reversed direction and add all needed actors to needed.
         # In the end we reverse the needed list, therefore every actor in the lists depends only on the previous actors in the list.
-        needed = []
+        needed = [actor for level in chain for actor in level if len(actor.provides) == 0]
         for level in reversed(chain):
-            needed += [actor for actor in level if len(actor.provides) == 0 or any(r in actor.provides for n in needed for r in n.requires)]
+            needed += list(reversed([actor for actor in level if any(r in actor.provides for n in needed for r in n.requires)]))
         needed = list(reversed(needed))
 
         # The modules in the basf2 path added by the actors are crucial to the FullEventInterpretation

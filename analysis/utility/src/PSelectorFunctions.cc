@@ -562,6 +562,18 @@ namespace Belle2 {
       return MCMatching::getMCTruthStatus(part);
     }
 
+    double isKaon(const Particle* part)
+    {
+      const MCParticle* mcParticle = part->getRelated<MCParticle>();
+      if (mcParticle == nullptr) {return -1.0;} //if there is no mcparticle (e.g. not in training modus
+      else if ((TMath::Abs(mcParticle->getPDG()) == 321) && (TMath::Abs(mcParticle->getMother()->getPDG()) == 511)) {
+        return 1.0;
+      } else if (TMath::Abs(mcParticle->getMother()->getMother() != nullptr && TMath::Abs(mcParticle->getPDG()) == 321) && (TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511)) {
+        //first check if there was a mother otherwise seg fault
+        return 1.0;
+      } else return 0.0;
+    }
+
     // RestOfEvent related --------------------------------------------------
 
     double nROETracks(const Particle* particle)
@@ -999,6 +1011,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("mcPDG",    particleMCMatchPDGCode, "The PDG code of matched MCParticle");
     REGISTER_VARIABLE("abs_mcPDG", particleAbsMCMatchPDGCode, "The absolute PDG code of matched MCParticle");
     REGISTER_VARIABLE("mcStatus", particleMCMatchStatus,  "The bit pattern indicating the quality of MC match (see MCMatching::MCMatchStatus)");
+    REGISTER_VARIABLE("isKaon", isKaon,  "Checks if the track (given as a dummy particle) was really a Kaon. 1.0 if true otherwise 0.0");
 
     VARIABLE_GROUP("Rest Of Event");
     REGISTER_VARIABLE("nROETracks",  nROETracks,  "number of remaining tracks as given by the related RestOfEvent object");

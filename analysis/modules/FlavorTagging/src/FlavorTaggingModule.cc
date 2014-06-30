@@ -3,7 +3,8 @@
  * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Fernando Abudinen, Pablo Goldenzweig, Luigi Li Gioi      *
+ * Contributors: Fernando Abudinen, Moritz Gelb, Pablo Goldenzweig,       *
+ *               Luigi Li Gioi                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -66,7 +67,10 @@ namespace Belle2 {
 
     addParam("usingMode", m_mode, "Mode of Use of the Module (0 for Teacher, 1 for Expert) ", 0);
     addParam("listName", m_listName, "name of particle list", string(""));
-
+    //addParam("trainingMethod", m_training, "Specifify your method"); //please one default, please several targets
+    //addParam("trainingVariables", m_variables, "Specify your variables for training");
+    //addParam("trainingTarget", m_target, "Specify your target");
+    //addParam("output_training_filename", m_trainingoutputfilename, "Training Output File Name")
 
 
 
@@ -82,6 +86,14 @@ namespace Belle2 {
 
   void FlavorTaggingModule::initialize()
   {
+    //training definition for kaon-tracks
+    //target & variables defined in PSelectorFunctions
+    std::string target = "isKaon";
+    std::vector<std::string> variables = {"charge", "p_CMS", "cosTheta", "K_vs_piid"};
+    //choose method
+    TMVAInterface::Method method1("FastBDT", "Plugin", "H:!V:CreateMVAPdfs:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3", variables);
+    TMVAInterface::Method method2("Fisher", "Fisher", "H:!V:Fisher:VarTransform=None:CreateMVAPdfs:PDFInterpolMVAPdf=Spline2:NbinsMVAPdf=50:NsmoothMVAPdf=10", variables);
+    teacher = new TMVAInterface::Teacher("training_kaon", ".", target, {method1, method2});
   }
 
   void FlavorTaggingModule::beginRun()
@@ -105,7 +117,8 @@ namespace Belle2 {
       bool ok = getTagObjects(particle);
       if (ok) {
         getMC_PDGcodes();
-        Muon_Cathegory();
+        //Muon_Cathegory();
+        Kaon_Category();
       };
       if (!ok) toRemove.push_back(i);
     }
@@ -119,9 +132,11 @@ namespace Belle2 {
     const RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
 
     if (roe) {
-      tagTracks = roe->getTracks();
-      tagECLClusters = roe-> getECLClusters();
-      tagKLMClusters = roe-> getKLMClusters();
+      m_tagTracks = roe->getTracks();
+      //m_Clusters = roe-> getECLClusters();
+
+      //BUG!!! RoE Dataobject error!!!!
+      //m_tagKLMClusters = roe-> getKLMClusters();
 
     } else {
       return false;
@@ -193,6 +208,24 @@ namespace Belle2 {
     return pid_Likelihood->getProbability(Const::muon, Const::pion, Const::PIDDetectorSet::set());
   }
 
+  /** //allready defined in PSelectorFunctions
+    double PID_Likelihood_Kaon(Track* track){
+    const PIDLikelihood* pid_Likelihood = track->getRelated<PIDLikelihood>();
+    return pid_Likelihood->getProbability(Const::kaon, Const::pion, Const::PIDDetectorSet::set());
+  }
+
+    double target_Kaon(Track* track){
+   const MCParticle* mcParticle = track->getRelated<MCParticle>();
+     if ((TMath::Abs(mcParticle->getPDG()) == 321) && (TMath::Abs(mcParticle->getMother()->getPDG()) == 511)){
+       return 1.0;
+     }
+   else if (((TMath::Abs(mcParticle->getPDG()) == 321) && (TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511)){ //Is double get Mother possible?
+       return 1.0;
+     }
+   else return 0.0;
+  }
+  **/
+
   bool FlavorTaggingModule::Muon_Cathegory()
   {
     //B-> Mu + Anti-v + X
@@ -207,9 +240,9 @@ namespace Belle2 {
 //     double E_W_90;
 //
 
-    for (unsigned int i = 0; i < tagTracks.size(); i++) {
+    for (unsigned int i = 0; i < m_tagTracks.size(); i++) {
 
-      const Track* tracki = tagTracks[i];
+      const Track* tracki = m_tagTracks[i];
 
       const TrackFitResult* trakiRes = NULL;
 
@@ -233,14 +266,50 @@ namespace Belle2 {
     return true;
   }
 
+//Kaon Category
+  bool FlavorTaggingModule::Kaon_Category()
+  {
+    //Bbar-> D+(K- 2pi+) K-
+
+//for storing dummy-particle in datastore - otherwise we cannot set a relation
+    StoreArray<Particle> particles;
+
+    for (unsigned int i = 0; i < m_tagTracks.size(); i++) {
+
+      const Track* tracki = m_tagTracks[i];
+      const TrackFitResult* trakiRes = NULL;
+
+      if (tracki) trakiRes = tracki->getTrackFitResult(Const::kaon); //
+      if (!trakiRes) continue;
+
+      //make a dummy particle from track
+      Particle* p = particles.appendNew(tracki, Const::kaon);
+
+      //add a relation: dummy particle related to its mcparticle and pid likelihood - now we can use PSelectorFunctions!
+      const PIDLikelihood* pid = tracki->getRelated<PIDLikelihood>();
+      const MCParticle* mcParticle = tracki->getRelated<MCParticle>();
+      if (pid) p->addRelationTo(pid);
+      if (mcParticle) p->addRelationTo(mcParticle);
+      teacher->addSample(p); //endrun
+    }
+
+
+    return true;
+  }
 
 
   void FlavorTaggingModule::endRun()
   {
+
   }
 
   void FlavorTaggingModule::terminate()
   {
+    //performs the training
+    teacher->train();
+
+    delete teacher;
+
   }
 
 } // end Belle2 namespace

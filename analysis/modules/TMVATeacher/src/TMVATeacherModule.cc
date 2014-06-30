@@ -39,7 +39,8 @@ namespace Belle2 {
     addParam("factoryOption", m_factoryOption, "Option passed to TMVA::Factory", std::string("!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification"));
     addParam("prepareOption", m_prepareOption, "Option passed to TMVA::Factory::PrepareTrainingAndTestTree", std::string("SplitMode=random:!V"));
     addParam("createMVAPDFs", m_createMVAPDFs, "Creates the MVA PDFs for signal and background. This is needed to transform the output of the trained method to a probability.", true);
-
+    addParam("useExistingData", m_useExistingData, "Use existing data which is already stored in the $prefix.root file.", false);
+    addParam("doNotTrain", m_doNotTrain, "Do not train, create only datafile with samples. Useful if you want to train outside of basf2 with the externTeacher tool.", false);
     addParam("trainOncePerJob", m_trainOncePerJob, "If true, training is performed once per job (in the terminate method instead of in the endRun method)", true);
 
     m_teacher = nullptr;
@@ -68,7 +69,7 @@ namespace Belle2 {
         config = std::string("CreateMVAPdfs:") + config;
       methods.push_back(TMVAInterface::Method(std::get<0>(x), std::get<1>(x), config, m_variables));
     }
-    m_teacher = new TMVAInterface::Teacher(m_methodPrefix, m_workingDirectory, m_target, methods);
+    m_teacher = new TMVAInterface::Teacher(m_methodPrefix, m_workingDirectory, m_target, methods, m_useExistingData);
   }
 
   void TMVATeacherModule::beginRun()
@@ -79,7 +80,9 @@ namespace Belle2 {
 
   void TMVATeacherModule::trainTeacher()
   {
-    m_teacher->train(m_factoryOption, m_prepareOption);
+    if (not m_doNotTrain) {
+      m_teacher->train(m_factoryOption, m_prepareOption);
+    }
     delete m_teacher;
     m_teacher = nullptr;
   }

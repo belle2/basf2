@@ -18,6 +18,7 @@
 /**
  * Forward declaration
  */
+class TFile;
 class TTree;
 
 
@@ -38,8 +39,9 @@ namespace Belle2 {
        * @param workingDirectory where the config file and weight file directory is stored
        * @param target the name of the target variable (registered in VariableManager), which is used as expected output for the chosen TMVA method
        * @param methods vector of Method
+       * @param useExistingData if correct TFile and TTree exists already exists, use the stored samples for training
        */
-      Teacher(std::string prefix, std::string workingDirectory, std::string target, std::vector<Method> methods);
+      Teacher(std::string prefix, std::string workingDirectory, std::string target, std::vector<Method> methods, bool useExistingData = false);
 
       /**
        * Disallow copy
@@ -63,6 +65,12 @@ namespace Belle2 {
       void addSample(const Particle* particle);
 
       /**
+       * TODO Implement read and write of current sample tree to implement external training via a new tool TMVATeacher tree-var-file + opts
+      void readTree();
+      void writeTree();
+      */
+
+      /**
        * Train, test and evaluate all methods
        * @param factoryOption options which are passed to the TMVA::Factory constructor, in most cases default options should be fine.
        * @param prepareOption options which are passed to the TMVA::Factory::PrepareTrainingAndTestTree, in most cases default options should be fine.
@@ -74,7 +82,9 @@ namespace Belle2 {
       std::string m_workingDirectory; /**< workingDirectory where the config file and weight file directory is stored */
       std::vector<Method> m_methods; /**< Name, Type and Config of methods */
 
+      TFile* m_file; /**< stores TTree and training histograms created by TMVA */
       TTree* m_tree; /**< holds training and test signal samples */
+
       const VariableManager::Var* m_target_var; /**< Variable Pointer to target variable */
       int m_target; /**< Storage for the target variable */
       std::vector<float> m_input; /**< Storage for input variables */

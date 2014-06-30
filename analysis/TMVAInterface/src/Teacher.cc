@@ -27,7 +27,7 @@ namespace Belle2 {
 
   namespace TMVAInterface {
 
-    Teacher::Teacher(std::string prefix, std::string workingDirectory, std::string target, std::vector<Method> methods) : m_prefix(prefix), m_workingDirectory(workingDirectory), m_methods(methods)
+    Teacher::Teacher(std::string prefix, std::string workingDirectory, std::string target, std::vector<Method> methods, bool useExistingData) : m_prefix(prefix), m_workingDirectory(workingDirectory), m_methods(methods), m_file(nullptr), m_tree(nullptr)
     {
 
 
@@ -39,20 +39,55 @@ namespace Belle2 {
       }
       m_target = 0;
 
-      // Create new tree which stores the niput and target variable
+      // Create new tree which stores the input and target variable
       const auto& variables = m_methods[0].getVariables();
       m_input.resize(variables.size());
-      m_tree = new TTree((m_prefix + "_tree").c_str(), (m_prefix + "_tree").c_str());
+
+      // If we want to use existing data we open the file in UPDATE mode,
+      // otherwise we recreate the file (overwrite it!)
+      std::string mode = "RECREATE";
+      if (useExistingData) {
+        mode = "UPDATE";
+      }
+
+      m_file = TFile::Open((m_prefix + ".root").c_str(), mode.c_str());
+      m_file->cd();
+      std::string tree_name = m_prefix + "_tree";
+
+      // Search for an existing tree in the file
+      if (useExistingData) {
+        m_file->GetObject((tree_name + ";1").c_str(), m_tree);
+      }
+
+      if (m_tree == nullptr) {
+        if (useExistingData)
+          B2INFO("Couldn't find existing data, create new tree")
+          m_tree = new TTree(tree_name.c_str(), tree_name.c_str());
+      }
+
       for (unsigned int i = 0; i < variables.size(); ++i)
         m_tree->Branch(makeROOTCompatible(variables[i]->name).c_str(), &m_input[i]);
       m_tree->Branch(makeROOTCompatible(m_target_var->name).c_str(), &m_target);
+
+      TBranch* targetBranch  = m_tree->GetBranch(makeROOTCompatible(m_target_var->name).c_str());
+      targetBranch->SetAddress(&m_target);
+      int nevent = m_tree->GetEntries();
+      for (int i = 0; i < nevent; i++) {
+        targetBranch->GetEvent(i);
+        auto it = m_cluster_count.find(m_target);
+        if (it == m_cluster_count.end())
+          m_cluster_count[m_target] = 1;
+        else
+          it->second++;
+      }
 
     }
 
     Teacher::~Teacher()
     {
-
+      m_tree->Write();
       delete m_tree;
+      m_file->Close();
     }
 
     void Teacher::addSample(const Particle* particle)
@@ -82,6 +117,8 @@ namespace Belle2 {
       // Change the workling directory to the user defined working directory
       std::string oldDirectory = gSystem->WorkingDirectory();
       gSystem->ChangeDirectory(m_workingDirectory.c_str());
+
+      m_file->cd();
 
       // Calculate the total number of events
       unsigned int total = 0;
@@ -127,15 +164,14 @@ namespace Belle2 {
           std::stringstream bckgrd;
           signal << x.first;
           bckgrd << y.first;
-          std::string prefix = m_prefix + "_" + signal.str() + "_vs_" + bckgrd.str();
+          std::string jobName = m_prefix + "_" + signal.str() + "_vs_" + bckgrd.str();
 
-          TFile* file = TFile::Open((prefix + ".root").c_str(), "RECREATE");
           {
 
             boost::property_tree::ptree node;
             // Intitialize TMVA and ROOT stuff
             TMVA::Tools::Instance();
-            TMVA::Factory factory(prefix, file, factoryOption);
+            TMVA::Factory factory(jobName, m_file, factoryOption);
 
             // Add variables to the factory
             for (auto & var : m_methods[0].getVariables()) {
@@ -154,7 +190,8 @@ namespace Belle2 {
               method_node.put("BackgroundID", y.first);
               method_node.put("MethodName", method.getName());
               method_node.put("MethodType", method.getTypeAsString());
-              method_node.put("Weightfile", std::string("weights/") + prefix + std::string("_") + method.getName() + std::string(".weights.xml"));
+              method_node.put("Samplefile", m_prefix + ".root");
+              method_node.put("Weightfile", std::string("weights/") + jobName + std::string("_") + method.getName() + std::string(".weights.xml"));
               factory.BookMethod(method.getType(), method.getName(), method.getConfig());
               node.add_child("Methods.Method", method_node);
             }
@@ -165,8 +202,6 @@ namespace Belle2 {
 
             pt.add_child("Setup.Trainings.Training", node);
           }
-
-          file->Close();
 
         }
       }

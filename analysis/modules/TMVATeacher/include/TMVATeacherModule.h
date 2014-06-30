@@ -84,6 +84,8 @@ namespace Belle2 {
     std::string m_prepareOption; /**< Options which are passed to the TMVA Factory::PrepareTrainingAndTestTree */
     bool m_createMVAPDFs; /**< Creates the MVA PDFs for signal and background. This is needed to transform the output of the trained method to a probability */
 
+    bool m_useExistingData; /**< Use existing data if available */
+    bool m_doNotTrain; /**< do not train the method, just create the sample file. Useful for external training with externTeacher */
     bool m_trainOncePerJob; /**< Perform TMVA training once per job (in the terminate method instead of in the endRun method) */
 
     TMVAInterface::Teacher* m_teacher; /**< Used TMVA method */

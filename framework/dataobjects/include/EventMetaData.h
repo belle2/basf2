@@ -81,6 +81,9 @@ namespace Belle2 {
      */
     void setEndOfData();
 
+    /** is end-of-data set? (see setEndOfData()). */
+    bool isEndOfData() const;
+
     /** Parent Index Setter.
      *
      *  @param index The index of the current parent file.

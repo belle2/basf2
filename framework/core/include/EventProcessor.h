@@ -13,6 +13,9 @@
 
 #include <framework/core/Path.h>
 #include <framework/core/Module.h>
+#include <framework/core/PathIterator.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 class TRandom;
 
@@ -77,6 +80,12 @@ namespace Belle2 {
      */
     void processCore(PathPtr startPath, const ModulePtrList& modulePathList, long maxEvent = 0);
 
+    /** Calls event() functions on all modules for the current event. Used by processCore.
+     *
+     * @return true if execution should stop.
+     */
+    bool processEvent(PathIterator moduleIter, EventMetaData* previousEventMetaData);
+
     /**
      * Terminates the modules.
      *
@@ -92,10 +101,8 @@ namespace Belle2 {
      * and calls their beginRun() method. Please note: the
      * beginRun() method of the module which triggered
      * the beginRun() loop will also be called.
-     *
-     * @param modulePathList The list containing all module instances added to a path.
      */
-    void processBeginRun(const ModulePtrList& modulePathList);
+    void processBeginRun();
 
     /**
      * Calls the end run methods of all modules.
@@ -104,21 +111,27 @@ namespace Belle2 {
      * and calls their endRun() method. Please note: the
      * endRun() method of the module which triggered
      * the endRun() loop will also be called.
-     *
-     * @param modulePathList The list containing all module instances added to a path.
      */
-    void processEndRun(const ModulePtrList& modulePathList);
+    void processEndRun();
 
     /** Install signal handlers. */
     void setupSignalHandler();
 
     const Module* m_master;  /**< The master module that determines the experiment/run/event number **/
+    ModulePtrList m_moduleList; /**< List of all modules in order initialized. */
     TRandom* m_mainRNG; /**< The main random number generator. A copy of the gRandom pointer, to reset it at the beginning of module execution when using RandomBarrierModule. */
 
     /** Name of the module which should be profiled, empty if no profiling is requested */
     std::string m_profileModuleName;
+
     /** Adress of the module which we want to profile, nullptr if no profiling is requested */
     Module* m_profileModule = nullptr;
+
+    /** EventMetaData is used by processEvent()/processCore(). */
+    StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
+
+    /** Are we currently in a run? If yes, processEndRun() needs to do something. */
+    bool m_inRun;
   };
 
 }

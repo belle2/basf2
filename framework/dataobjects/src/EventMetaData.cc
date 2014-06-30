@@ -33,6 +33,11 @@ void EventMetaData::setEndOfData()
   m_experiment = UINT_MAX;
 }
 
+bool EventMetaData::isEndOfData() const
+{
+  return (m_event == UINT_MAX and m_run == UINT_MAX and m_experiment == UINT_MAX);
+}
+
 bool EventMetaData::operator== (const EventMetaData& eventMetaData) const
 {
   return ((m_event == eventMetaData.getEvent()) &&

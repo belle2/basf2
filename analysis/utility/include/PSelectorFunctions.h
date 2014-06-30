@@ -348,6 +348,11 @@ namespace Belle2 {
     double particleMCMatchStatus(const Particle* particle);
 
     /**
+     * return 1 if (dummy) Particle was a Kaon, 0 otherwise
+     */
+    double isKaon(const Particle* particle);
+
+    /**
      * return number of remaining tracks as given by the related RestOfEvent object
      *
      * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)

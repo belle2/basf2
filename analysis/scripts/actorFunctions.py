@@ -119,7 +119,7 @@ def SignalProbability(path, particleName, channelName, mvaConfig, particleList, 
         teacher.param('methods', [(mvaConfig.name, mvaConfig.type, mvaConfig.config)])
         teacher.param('factoryOption', '!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification')
 
-        if preCut is None or preCut['nBackground'] < 1000000:
+        if preCut is None or preCut['nBackground'] < 2000000:
             n = 0
         else:
             n = 1000000

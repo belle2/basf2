@@ -241,8 +241,8 @@ namespace Belle2 {
     //! read COPPER driver's checksum value
     virtual unsigned int GetDriverChkSum(int n) = 0;
 
-    //! calc COPPER driver's checksum value
-    virtual unsigned int CalcDriverChkSum(int n) = 0;
+    /*     //! calc COPPER driver's checksum value */
+    /*     virtual unsigned int CalcDriverChkSum(int n) = 0; */
 
     //! calc XOR checksum
     unsigned int CalcXORChecksum(int* buf, int nwords);

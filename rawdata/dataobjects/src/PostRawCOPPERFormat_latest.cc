@@ -79,8 +79,8 @@ int PostRawCOPPERFormat_latest::GetDetectorNwords(int n, int finesse_num)
 unsigned int PostRawCOPPERFormat_latest::CalcDriverChkSum(int n)
 {
   char err_buf[500];
-  sprintf(err_buf, "This function is not supported. Exiting...\n%s %s %d\n",
-          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  sprintf(err_buf, "This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   string err_str = err_buf; throw (err_str);
   return 0;
 }
@@ -141,8 +141,8 @@ int PostRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
 unsigned int PostRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
 {
   char err_buf[500];
-  sprintf(err_buf, "No event # in B2LFEE header. Exiting...\n%s %s %d\n",
-          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  sprintf(err_buf, "No event # in B2LFEE header. (block %d) Exiting...\n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   string err_str = err_buf; throw (err_str);
   return 0;
 }
@@ -193,6 +193,7 @@ void PostRawCOPPERFormat_latest::CheckData(int n,
     PrintData(GetBuffer(n), GetBlockNwords(n));
     string err_str = err_buf;
     throw (err_str);
+    printf("Print out variables to reduce unused-variables-warnings : %u %u\n", prev_copper_ctr, *cur_copper_ctr);
 //     sleep(1234567);
 //     exit(-1);
   }
@@ -204,8 +205,8 @@ void PostRawCOPPERFormat_latest::CheckData(int n,
 bool PostRawCOPPERFormat_latest::CheckCOPPERMagic(int n)
 {
   char err_buf[500];
-  sprintf(err_buf, "No magic word # in COPPER header. Exiting...\n%s %s %d\n",
-          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  sprintf(err_buf, "No magic word # in COPPER header (block %d). Exiting...\n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   string err_str = err_buf; throw (err_str);
   return false;
 }
@@ -213,8 +214,8 @@ bool PostRawCOPPERFormat_latest::CheckCOPPERMagic(int n)
 void PostRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
 {
   char err_buf[500];
-  sprintf(err_buf, "This function is not supported. Exiting...\n%s %s %d\n",
-          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  sprintf(err_buf, "This function is not supported (block %d). Exiting...\n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   string err_str = err_buf; throw (err_str);
   return;
 }
@@ -228,7 +229,6 @@ double PostRawCOPPERFormat_latest::GetEventUnixTime(int n)
 
 }
 
-
 unsigned int PostRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type,
     unsigned int m_trunc_mask, unsigned int prev_eve32,
     int prev_runsubrun_no, int* cur_runsubrun_no)
@@ -237,6 +237,8 @@ unsigned int PostRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_no
   sprintf(err_buf, "This function should be called by PrePostRawCOPPERFormat_latest. Exiting...\n %s %s %d\n",
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   string err_str = err_buf; throw (err_str);
+  printf("Print out variables to reduce unused-variables-warnings : %u %u %u %u %d %d\n",
+         m_node_id, m_data_type, m_trunc_mask, prev_eve32, prev_runsubrun_no, *cur_runsubrun_no);
   return -1;
 
 }
@@ -248,6 +250,7 @@ int PostRawCOPPERFormat_latest::CheckB2LHSLBMagicWords(int* finesse_buf, int fin
   sprintf(err_buf, "This function should be called by PrePostRawCOPPERFormat_latest. Exiting...\n %s %s %d\n",
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   string err_str = err_buf; throw (err_str);
+  printf("Print out variables to reduce unused-variables-warnings : %p %u\n", finesse_buf, finesse_nwords);
   return -1;
 
 }

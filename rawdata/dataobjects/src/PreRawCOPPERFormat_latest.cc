@@ -98,8 +98,7 @@ int PreRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
 {
   if (!CheckCOPPERMagic(n)) {
     char err_buf[500];
-    sprintf(err_buf, "COPPER's magic word is invalid. Maybe it is due to data corruption or different version of the data format.\n",
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    sprintf(err_buf, "COPPER's magic word is invalid. Maybe it is due to data corruption or different version of the data format.\n %s %s %d\n", __FILE__, __PRETTY_FUNCTION__, __LINE__);
     perror(err_buf);
     exit(1);
     string err_str = err_buf;    throw (err_str);
@@ -733,7 +732,7 @@ int PreRawCOPPERFormat_latest::CalcReducedDataSize(RawDataBlock* raw_datablk)
   // Calculate reduced length for a total RawDataBlock (containing multiple data blocks)
   //
 
-  int* buf_from = raw_datablk->GetWholeBuffer();
+
   int reduced_nwords = 0;
   for (int k = 0; k < raw_datablk->GetNumEvents(); k++) {
     int num_nodes_in_sendblock = raw_datablk->GetNumNodes();
@@ -864,7 +863,6 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
     pos_nwords_finesse[ j ] = pos_nwords_to;
     if (GetFINESSENwords(n, j) > 0) {
       int* finesse_buf = GetFINESSEBuffer(n, j);
-      int* finesse_buf_to = buf_to + pos_nwords_to;
       int finesse_nwords = GetFINESSENwords(n, j);
       CheckB2LHSLBMagicWords(finesse_buf, finesse_nwords);
 

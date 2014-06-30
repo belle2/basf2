@@ -3,7 +3,8 @@
  * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Fernando Abudinen, Pablo Goldenzweig, Luigi Li Gioi      *
+ * Contributors: Fernando Abudinen, Moritz Gelb, Pablo Goldenzweig,       *
+ *               Luigi Li Gioi                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,6 +12,7 @@
 #ifndef FLAVORTAGGINGMODULE_H
 #define FLAVORTAGGINGMODULE_H
 
+#include <analysis/TMVAInterface/Teacher.h>
 #include <framework/core/Module.h>
 
 #include <mdst/dataobjects/KLMCluster.h>
@@ -21,6 +23,7 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 
 #include <string>
+
 
 
 namespace Belle2 {
@@ -82,9 +85,9 @@ namespace Belle2 {
 
     int m_mode;       /**< Mode of use of the Flavor Tagging Module 0 for Teacher, 1 for Expert*/
     std::string m_listName;               /**< Breco particle list name */
-    std::vector<Belle2::Track*> tagTracks;        /**< tracks of the rest of the event */
-    std::vector<Belle2::ECLCluster* > tagECLClusters;     /**< ECLClusters of the rest of the event */
-    std::vector<Belle2::KLMCluster* > tagKLMClusters;     /**< KLMClusters of the rest of the event */
+    std::vector<Belle2::Track*> m_tagTracks;        /**< tracks of the rest of the event */
+    //std::vector<Belle2::ECLCluster* > m_tagECLClusters;     /**< ECLClusters of the rest of the event */
+    //std::vector<Belle2::KLMCluster* > m_tagKLMClusters;     /**< KLMClusters of the rest of the event */
 
     bool getTagObjects(Particle* Breco);  /** get the tracks, ECLClusters and KLMClusters on the tag side (rest of the event) */
 
@@ -92,6 +95,10 @@ namespace Belle2 {
 
 
     bool Muon_Cathegory();   /** prepare input values for the NN specialized for Muons */
+
+    bool Kaon_Category();   /** prepare input values for the NN specialized for Muons */
+
+    TMVAInterface::Teacher* teacher; //
 
     /**
      * Variables needed for the Muon Cathegory
@@ -101,6 +108,9 @@ namespace Belle2 {
     double Theta_Lab(Track* track); /**  Slope of the fitted Track in the r-z plane in the center of mass system */
     double PID_MonteCarlo(Track* track); /**  Flavor of Btag from the Monte Carlo (0 for B0bar, 1 for B0)*/
     double PID_Likelihood(Track* track); /**  Return the combined likelihood probability for a particle being a muon and not a pion.  */
+
+
+
   };
 }
 

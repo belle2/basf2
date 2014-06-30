@@ -244,7 +244,7 @@ def FullEventInterpretation(path, particles):
                                     channelName='Name_' + channel.name,
                                     mvaConfig='MVAConfig_' + channel.name,
                                     particleList='ParticleList_' + channel.name + '_' + particle.name,
-                                    preCut='PreCut_' + channel.name,
+                                    nBackground='nBackground_' + channel.name,
                                     daughterSignalProbabilities=['SignalProbability_' + daughter for daughter in channel.daughters])
                 seq.addResource('SignalProbability_' + particle.name, 'Dummy', requires=['SignalProbability_' + channel.name + '_' + particle.name for channel in particle.channels], strict=False)
                 seq.addResource('SignalProbability_' + pdg.conjugate(particle.name), 'Dummy', requires=['SignalProbability_' + particle.name])

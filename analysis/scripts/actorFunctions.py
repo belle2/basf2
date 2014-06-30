@@ -76,7 +76,7 @@ def MakeAndMatchParticleList(path, particleName, channelName, inputLists, preCut
             'ParticleList_' + channelName + '_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
 
 
-def SignalProbability(path, particleName, channelName, mvaConfig, particleList, preCut=None, daughterSignalProbabilities=[]):
+def SignalProbability(path, particleName, channelName, mvaConfig, particleList, nBackground=None, daughterSignalProbabilities=[]):
     """
     Calculates the SignalProbability of a ParticleList. If the files required from TMVAExpert aren't available they're created.
         @param path the basf2 path
@@ -84,14 +84,14 @@ def SignalProbability(path, particleName, channelName, mvaConfig, particleList, 
         @param channelName of channel which is classified
         @param mvaConfig configuration for the multivariate analysis
         @param particleList the particleList which is used for training and classification
-        @param preCut used preCut for this channel
+        @param nBackground number of background events
         @param daughterSignalProbabilities all daughter particles need a SignalProbability
     """
     if particleList is None or any([daughterSignalProbability is None for daughterSignalProbability in daughterSignalProbabilities]):
         return {'SignalProbability_' + channelName + '_' + particleName: None,
                 'SignalProbability_' + channelName + '_' + pdg.conjugate(particleName): None}
 
-    hash = actorFramework.createHash(particleName, channelName, mvaConfig, particleList, preCut, daughterSignalProbabilities)
+    hash = actorFramework.createHash(particleName, channelName, mvaConfig, particleList, nBackground, daughterSignalProbabilities)
 
     filename = '{particleList}_{hash}.config'.format(particleList=particleList, hash=hash)
     if os.path.isfile(filename):
@@ -119,7 +119,9 @@ def SignalProbability(path, particleName, channelName, mvaConfig, particleList, 
         teacher.param('methods', [(mvaConfig.name, mvaConfig.type, mvaConfig.config)])
         teacher.param('factoryOption', '!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification')
 
-        if preCut is None or preCut['nBackground'] < 2000000:
+        if nBackground is None:
+            n = 0
+        elif nBackground < 2000000:
             n = 0
         else:
             n = 1000000
@@ -187,6 +189,8 @@ def PreCutDetermination(particleName, channelNames, preCutConfig, preCutHistogra
 
     for (channel, cut) in cuts.iteritems():
         results['PreCut_' + channel] = None if cut['isIgnored'] else {cut['variable']: cut['range']}
+        results['nSignal_' + channel] = None if cut['isIgnored'] else cut['nSignal']
+        results['nBackground_' + channel] = None if cut['isIgnored'] else cut['nBackground']
     return results
 
 

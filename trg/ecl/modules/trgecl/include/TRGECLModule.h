@@ -21,11 +21,11 @@
 namespace Belle2 {
 
 /// A module to process ECL trigger data
-class TRGECLModule : public Module {
+  class TRGECLModule : public Module {
 
 
   public:
-    
+
     //    virtual ModulePtr newModule(){
     //      ModulePtr nm(new TRGECLModule(false)); return nm;
     //    };
@@ -34,51 +34,51 @@ class TRGECLModule : public Module {
     TRGECLModule();
     //    TRGECLModule(bool selfReg = true);
     //  TRGECLModule(const std::string & type);
-    
+
     // Destructor
     virtual ~TRGECLModule();
-    
+
     // Initilizes TRGECLModule.
     virtual void initialize();
 
     // Called when new run started.
     virtual void beginRun();
-    
+
     // Called event by event.
     virtual void event();
-    
+
     // Called when run ended.
     virtual void endRun();
-    
+
     // Called when processing ended.
     virtual void terminate();
-    
+
   public:
-    
+
     // returns version of TRGECLModule.
     std::string version(void) const;
-    
+
   private: // Parameters
-    
+
     // Debug level.
     int _debugLevel;
-    
+
     // Config. file name.
     std::string _configFilename;
-    
+
     /// A pointer to a TRGECL;
-    TrgEcl * _ecl;
+    TrgEcl* _ecl;
 
   protected:
-    
+
     std::string m_inColName;          // Input array name.
     std::string m_eclHitOutColName;   // Output array name for Xtal
     std::string m_eclTCHitOutColName;   // Output array name for TC
 
-    // The current number of created hits in an event. 
+    // The current number of created hits in an event.
     // Used to fill the DataStore ECL array.
-    int m_hitNum; 
-    int m_hitTCNum; 
+    int m_hitNum;
+    int m_hitTCNum;
 
   private:
 
@@ -86,7 +86,7 @@ class TRGECLModule : public Module {
     int    m_nRun;           //  Run number
     int    m_nEvent;         //  Event number
 
-};
+  };
 
 } // namespace Belle2
 

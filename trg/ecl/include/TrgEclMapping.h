@@ -3,7 +3,7 @@
 //-----------------------------------------------------------
 // Filename : TrgEclMapping.h
 // Section  : TRG ECL
-// Owner    : InSu Lee/Yuuji Unno
+// Owner    : InSoo Lee/Yuuji Unno
 // Email    : islee@hep.hanyang.ac.kr / yunno@post.kek.jp
 //-----------------------------------------------------------
 // Description : A class to represent TRG ECL.
@@ -17,6 +17,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "TVector3.h"
 //
 //
 //
@@ -24,39 +25,40 @@ namespace Belle2 {
 //
 //
 //
-class TrgEclMapping;
+  class TrgEclMapping;
 //
 // A class to represent ECL.
 //
-class TrgEclMapping {
+  class TrgEclMapping {
 
- public:
+  public:
 
-  /// Constructor
-  TrgEclMapping();
-  
-  /// Destructor
-  virtual ~TrgEclMapping(){};
-  
- public:
+    /// Constructor
+    TrgEclMapping();
 
-  // get [TC ID] from [Xtal ID] 
-  int getTCIdFromXtalId(int);
-  // get [TC sub ID] from [Xtal ID] 
-  int getTCSubIdFromXtalId(int);
-  // get [TC Theta ID] from [TC ID] 
-  int getTCThetaIdFromTCId(int);
-  // get [TC Phi ID] from [TC ID] 
-  int getTCPhiIdFromTCId(int);
+    /// Destructor
+    virtual ~TrgEclMapping() {};
 
- private:
-  //
-  int _tcid;       // ID = 1-576
-  int _tcsubid;    // ID = 0-1
-  int _tcthetaid;  // ID = 0-16
-  int _tcphiid;    // ID = 0-35(0-31 for both endcap)
+  public:
 
-};
+    // get [TC ID] from [Xtal ID]
+    int getTCIdFromXtalId(int);
+    // get [TC sub ID] from [Xtal ID]
+    int getTCSubIdFromXtalId(int);
+    // get [TC Theta ID] from [TC ID]
+    int getTCThetaIdFromTCId(int);
+    // get [TC Phi ID] from [TC ID]
+    int getTCPhiIdFromTCId(int);
+    //TC position (cm)
+    TVector3 getTCPosition(int);
+  private:
+    //
+    int _tcid;       // ID = 1-576
+    int _tcsubid;    // ID = 0-1
+    int _tcthetaid;  // ID = 0-16
+    int _tcphiid;    // ID = 0-35(0-31 for both endcap)
+
+  };
 //
 //
 //

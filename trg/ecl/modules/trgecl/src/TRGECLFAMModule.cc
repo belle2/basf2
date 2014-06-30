@@ -38,133 +38,140 @@ namespace Belle2 {
 //
 //
 //
-REG_MODULE(TRGECLFAM);
+  REG_MODULE(TRGECLFAM);
 //
 //
 //
-string
-TRGECLFAMModule::version() const {
-  return string("TRGECLFAMModule 1.00");
-}
-//
-//
-//
-TRGECLFAMModule::TRGECLFAMModule()
-  : Module::Module(),
-    _debugLevel(0),
-    _famMethod(1),
-    _binTimeInterval(100)
-{
-
-  string desc = "TRGECLFAMModule(" + version() + ")";
-  setDescription(desc);
-
-  addParam("DebugLevel", _debugLevel, "TRGECL debug level", _debugLevel);
-  addParam("FAMFitMethod", _famMethod, "TRGECLFAM fit method", _famMethod);
-  addParam("FAMBinTimeInterval", _binTimeInterval, "TRGECLFAM binTimeInterval",
-	   _binTimeInterval);
-
-  if (TRGDebug::level()){
-    std::cout << "TRGECLFAMModule ... created" << std::endl;
+  string
+  TRGECLFAMModule::version() const
+  {
+    return string("TRGECLFAMModule 1.00");
   }
-}
 //
 //
 //
-TRGECLFAMModule::~TRGECLFAMModule() {
+  TRGECLFAMModule::TRGECLFAMModule()
+    : Module::Module(),
+      _debugLevel(0),
+      _famMethod(1),
+      _binTimeInterval(100)
+  {
 
-  if (TRGDebug::level()){
-    std::cout << "TRGECLFAMModule ... destructed " << std::endl;
+    string desc = "TRGECLFAMModule(" + version() + ")";
+    setDescription(desc);
+
+    addParam("DebugLevel", _debugLevel, "TRGECL debug level", _debugLevel);
+    addParam("FAMFitMethod", _famMethod, "TRGECLFAM fit method", _famMethod);
+    addParam("FAMBinTimeInterval", _binTimeInterval, "TRGECLFAM binTimeInterval",
+             _binTimeInterval);
+
+    if (TRGDebug::level()) {
+      std::cout << "TRGECLFAMModule ... created" << std::endl;
+    }
   }
-}
 //
 //
 //
-void
-TRGECLFAMModule::initialize() {
+  TRGECLFAMModule::~TRGECLFAMModule()
+  {
 
-  TRGDebug::level(_debugLevel);
-
-  if (TRGDebug::level()) {
-    std::cout << "TRGECLFAMModule::initialize ... options" << std::endl;
-    std::cout << TRGDebug::tab(4) << "debug level = " << TRGDebug::level()
-	      << std::endl;
+    if (TRGDebug::level()) {
+      std::cout << "TRGECLFAMModule ... destructed " << std::endl;
+    }
   }
-  //
-  std::cout << "TRGECLFAMModule::initialize> FAM Fit Method = " 
-	    << _famMethod
-	    << std::endl;
-  std::cout << "TRGECLFAMModule::initialize> FAM Bin of Time Interval = " 
-	    << _binTimeInterval
-	    << std::endl;
-  //
-  m_nRun   = 0;
-  m_nEvent = 1;
+//
+//
+//
+  void
+  TRGECLFAMModule::initialize()
+  {
 
-  StoreArray<TRGECLDigi>::registerPersistent();
-  StoreArray<TRGECLDigi0>::registerPersistent();
-  StoreArray<TRGECLHit>::registerPersistent();
-}
-//
-//
-//
-void
-TRGECLFAMModule::beginRun() {
+    TRGDebug::level(_debugLevel);
 
-  if (TRGDebug::level()){
-    std::cout << "TRGECLFAMModule ... beginRun called " << std::endl;
-  }
+    if (TRGDebug::level()) {
+      std::cout << "TRGECLFAMModule::initialize ... options" << std::endl;
+      std::cout << TRGDebug::tab(4) << "debug level = " << TRGDebug::level()
+                << std::endl;
+    }
+    //
+    std::cout << "TRGECLFAMModule::initialize> FAM Fit Method = "
+              << _famMethod
+              << std::endl;
+    std::cout << "TRGECLFAMModule::initialize> FAM Bin of Time Interval = "
+              << _binTimeInterval
+              << std::endl;
+    //
+    m_nRun   = 0;
+    m_nEvent = 1;
 
-}
+    StoreArray<TRGECLDigi>::registerPersistent();
+    StoreArray<TRGECLDigi0>::registerPersistent();
+    StoreArray<TRGECLHit>::registerPersistent();
+  }
 //
 //
 //
-void
-TRGECLFAMModule::event() {
+  void
+  TRGECLFAMModule::beginRun()
+  {
 
-  if (TRGDebug::level()) {
-    std::cout << "TRGECLFAMMoudle ... event called" << std::endl;
+    if (TRGDebug::level()) {
+      std::cout << "TRGECLFAMModule ... beginRun called " << std::endl;
+    }
+
   }
-  //
-  //
-  //
-  if     (m_nEvent<1e2){if(m_nEvent%    10==0){printf("TRGECLFAMModule::event> evtno=%10i\n",m_nEvent);}}
-  else if(m_nEvent<1e3){if(m_nEvent%   100==0){printf("TRGECLFAMModule::event> evtno=%10i\n",m_nEvent);}}
-  else if(m_nEvent<1e4){if(m_nEvent%  1000==0){printf("TRGECLFAMModule::event> evtno=%10i\n",m_nEvent);}}
-  else if(m_nEvent<1e5){if(m_nEvent% 10000==0){printf("TRGECLFAMModule::event> evtno=%10i\n",m_nEvent);}}
-  else if(m_nEvent<1e6){if(m_nEvent%100000==0){printf("TRGECLFAMModule::event> evtno=%10i\n",m_nEvent);}}
-  //
-  //
-  //
-  // FAM simulation
-  TrgEclFAM * obj_trgeclfam = new TrgEclFAM();
-  obj_trgeclfam->setup(m_nEvent, _famMethod);
-  //
-  //
-  //
-  m_nEvent++;
-  //
-  //
-  //
-}
 //
 //
 //
-void
-TRGECLFAMModule::endRun() {
-  if (TRGDebug::level()){
-    std::cout << "TRGECLFAMModule ... endRun called " << std::endl;
+  void
+  TRGECLFAMModule::event()
+  {
+
+    if (TRGDebug::level()) {
+      std::cout << "TRGECLFAMMoudle ... event called" << std::endl;
+    }
+    //
+    //
+    //
+    if (m_nEvent < 1e2) {if (m_nEvent %    10 == 0) {printf("TRGECLFAMModule::event> evtno=%10i\n", m_nEvent);}}
+    else if (m_nEvent < 1e3) {if (m_nEvent %   100 == 0) {printf("TRGECLFAMModule::event> evtno=%10i\n", m_nEvent);}}
+    else if (m_nEvent < 1e4) {if (m_nEvent %  1000 == 0) {printf("TRGECLFAMModule::event> evtno=%10i\n", m_nEvent);}}
+    else if (m_nEvent < 1e5) {if (m_nEvent % 10000 == 0) {printf("TRGECLFAMModule::event> evtno=%10i\n", m_nEvent);}}
+    else if (m_nEvent < 1e6) {if (m_nEvent % 100000 == 0) {printf("TRGECLFAMModule::event> evtno=%10i\n", m_nEvent);}}
+    //
+    //
+    //
+    // FAM simulation
+    TrgEclFAM* obj_trgeclfam = new TrgEclFAM();
+    obj_trgeclfam->setup(m_nEvent, _famMethod);
+    //
+    //
+    //
+    m_nEvent++;
+    //
+    //
+    //
   }
-}
 //
 //
 //
-void
-TRGECLFAMModule::terminate() {
-  if (TRGDebug::level()){
-    std::cout << "TRGECLFAMModule ... terminate called " << std::endl;
+  void
+  TRGECLFAMModule::endRun()
+  {
+    if (TRGDebug::level()) {
+      std::cout << "TRGECLFAMModule ... endRun called " << std::endl;
+    }
   }
-}
+//
+//
+//
+  void
+  TRGECLFAMModule::terminate()
+  {
+    if (TRGDebug::level()) {
+      std::cout << "TRGECLFAMModule ... terminate called " << std::endl;
+    }
+  }
 //
 //
 //

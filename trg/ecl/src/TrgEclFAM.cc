@@ -28,7 +28,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <math.h>
-#include <TRandom3.h>
+#include <TRandom.h>
 
 using namespace std;
 using namespace Belle2;
@@ -61,6 +61,10 @@ TrgEclFAM::setup(int m_nEvent,
   // prepare coefficient for fitting
   //
   readFAMDB();
+  //
+  // prepare Matrix for Noise generation 
+  //
+  readNoiseLMatrix();
   //
   int TableFlag = 1;//1: ECLHit ,2: ECLSimHit 
   // initialize parameters
@@ -103,7 +107,7 @@ TrgEclFAM::getTCHit(int TableFlag )
   float (*E_cell)[80]  = new float[8736][80];
   float (*T_ave)[80]   = new float[8736][80]; // (1)Averaged time[ns] between hit point in Xtal and PD.
   float (*Tof_ave)[80] = new float[8736][80]; // (2)Averaged time[ns] between hit point in Xtal and IP.
-  //  int nBinTime = 80; // "80" covers t=0-8us even for 100ns binning.
+  //  int nBinTime = 80; // "80" covers t=-4 ~ 4us even for 100ns binning.
   for (int iXCell=0; iXCell<8736; iXCell++){
     for (int iBinTime=0; iBinTime<80; iBinTime++){
       E_cell[iXCell][iBinTime] = 0;
@@ -112,14 +116,13 @@ TrgEclFAM::getTCHit(int TableFlag )
     }
   }
   int nBinTime = 80;
+  TimeRange =4000; // -4us ~ 4us
   ////-------------------------------------------------------------------
   //                          read Xtal data 
   //---------------------------------------------------------------------
   if(TableFlag ==1 ){// read  ECLHit table
     StoreArray<ECLHit> eclHitArray("ECLHits");
     int nHits_hit = eclHitArray.getEntries()-1;
-    int TimeIndex = 0 ;
-    
     //
     for (int iHits = 0; iHits < nHits_hit; iHits++) {
       // Get a hit
@@ -127,18 +130,26 @@ TrgEclFAM::getTCHit(int TableFlag )
       // Hit geom. info
       int hitCellId  = aECLHit->getCellId()-1;
       float hitE     = aECLHit->getEnergyDep() / Unit::GeV;
-      float aveT     = aECLHit->getTimeAve();
-      TimeIndex = (int)aveT/100;
-      // "hitTO" [ns] is flight time of track at ECL from IP
+      float aveT     = aECLHit->getTimeAve(); // ns :time from  IP  to PD 
+      if(aveT < - TimeRange || aveT > TimeRange){continue;}//Choose - TimeRange ~ TimeTange 
+      int  TimeIndex = (int)((aveT+TimeRange)/100);//Binning : -4000 = 1st bin ~  4000 80th bin. 
       for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
 	if (hitCellId == iECLCell) {
 	  
      	  E_cell[iECLCell][TimeIndex]  = E_cell[iECLCell][TimeIndex]+hitE;
-     	  T_ave[iECLCell][TimeIndex]   = aveT;  
+     	  T_ave[iECLCell][TimeIndex]   = T_ave[iECLCell][TimeIndex] + hitE*aveT;
 	  
 	}
-      } // End loop crsyal 8736
+      }
+ 
     }
+    for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
+      for (int  iTime = 0; iTime < nBinTime; iTime++) {
+	if(E_cell[iECLCell][iTime]>0){
+	  T_ave[iECLCell][iTime]   = T_ave[iECLCell][iTime]/E_cell[iECLCell][iTime];
+	}
+      }
+    }//Get Energy weighted timing of each TC.
   }
   
   
@@ -164,10 +175,12 @@ TrgEclFAM::getTCHit(int TableFlag )
       // "local_pos_r" = Distance between track hit in Xtal and 
       // rear surface(max=30, min=0) of the Xtal.
       float local_pos_r = (15.0 - (HitInPos - PosCell) * VecCell);
+      if(hitTOF < - TimeRange||hitTOF >  TimeRange){continue;}
+     int TimeIndex = (int) ((hitTOF+ TimeRange)/100);
       for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
 	if (hitCellId == iECLCell && hitTOF < 8000) {
 	  // time interval is (0.5, 0.1, 0.05us) => (16, 80, 160bins) between T=0-8us.
-	  int TimeIndex = (int) (hitTOF / 100);
+	  //int TimeIndex = (int) (hitTOF / 100);
 	  E_cell[iECLCell][TimeIndex]  = E_cell[iECLCell][TimeIndex]  + hitE;
 	  T_ave[iECLCell][TimeIndex]   = T_ave[iECLCell][TimeIndex]   + hitE * local_pos_r;
 	  Tof_ave[iECLCell][TimeIndex] = Tof_ave[iECLCell][TimeIndex] + hitE * hitTOF;
@@ -232,9 +245,8 @@ TrgEclFAM::getTCHit(int TableFlag )
   //--------------------------
   // TC energy and timing in t=0-1us as true values.
   //--------------------------
-  int nBin_1us = (int) (1000.0 / 100);
   for (int iTCIdm=0; iTCIdm<576; iTCIdm++) {
-    for (int  iTime = 0; iTime < nBin_1us; iTime++) {
+    for (int  iTime = 40; iTime < 50; iTime++) {
       TCEnergy_tot[iTCIdm] += TCEnergy[iTCIdm][iTime];
       TCTiming_tot[iTCIdm] += TCTiming[iTCIdm][iTime]*TCEnergy[iTCIdm][iTime];
     }
@@ -258,14 +270,14 @@ TrgEclFAM::digitization01( void ){
   double cut_energy_tot = 0.03; // [GeV]
   int nbin_pedestal = 5; // = nbin_pedestal*fam_sampling_interval [ns] in total
   double fam_sampling_interval = 96; // [ns]
-  double TCDigiE[576][160] = {{0}};  // [GeV]
-  double TCDigiT[576][160] = {{0}};  // [ns]
   int NSampling = 80; // # of sampling array
-  
-  TRandom3* rand00 = new TRandom3(0);
+
+  double noise_plileup[576][80] = {{0}};  // [GeV]
+  double noise_parallel[576][80] = {{0}};  // [GeV]
+  double noise_serial[576][80] = {{0}};  // [GeV]
   // (Make sampling time random between FAM sampling intervals)
   double random_sampling_correction = 0; // [ns]
-  random_sampling_correction = rand00->Rndm()*fam_sampling_interval;
+  random_sampling_correction = gRandom->Rndm()*fam_sampling_interval;
   //==================
   // (01)Signal digitization
   //==================
@@ -276,14 +288,14 @@ TrgEclFAM::digitization01( void ){
       for (int iSampling=0; iSampling<NSampling; iSampling++) {
 	// inputTiming is in [us] <-- Be careful, here is NOT [ns]
 	double inputTiming 
-	  = (-TCTiming[iTCIdm][iTimeBin]+(-nbin_pedestal+iSampling)*fam_sampling_interval)*0.001; 
+	  = (-TCTiming[iTCIdm][iTimeBin]-TimeRange+(-nbin_pedestal+iSampling)*fam_sampling_interval)*0.001; 
 	inputTiming += random_sampling_correction*0.001;
 	if (inputTiming>0){
-	  TCDigiE[iTCIdm][iSampling] += FADC(0, inputTiming) * TCEnergy[iTCIdm][iTimeBin];
+	  TCDigiE[iTCIdm][iSampling] += SimplifiedFADC(0, inputTiming) * TCEnergy[iTCIdm][iTimeBin];
 	}
       }
       for (int iSampling=0; iSampling<NSampling; iSampling++) {
-	TCDigiT[iTCIdm][iSampling] = (-nbin_pedestal+iSampling)*fam_sampling_interval;
+	TCDigiT[iTCIdm][iSampling] = (-nbin_pedestal+iSampling-TimeRange/fam_sampling_interval)*fam_sampling_interval;
 	TCDigiT[iTCIdm][iSampling] += random_sampling_correction;
       }
     }
@@ -328,27 +340,64 @@ TrgEclFAM::digitization01( void ){
   // corr_pileup   = 0.011068;   // default in case 1xBelle noise in 100ns sampling
   // corr_parallel = 0.00727324; // default in case 1xBelle noise in 100ns sampling
   // corr_serial   = 0.0173925;  // default in case 1xBelle noise in 100ns sampling
-  
-  for (int iTCIdm=0; iTCIdm<576; iTCIdm++) {
-    if ( TCEnergy_tot[iTCIdm] < cut_energy_tot ) { continue; } // TC energy_tot cut
-    for (int jjj=0; jjj<bkg_level; jjj++){
-      ttt0 = -(tmin_noise + tgen * rand00->Rndm());  // [us]
-      ttt1 = -(tmin_noise + tgen * rand00->Rndm());  // [us]
-      ttt2 = -(tmin_noise + tgen * rand00->Rndm());  // [us]
-      for (int iSampling=0; iSampling<NSampling; iSampling++) {
-    	// (pile-up noise)
-    	if (ttt0>0){ TCDigiE[iTCIdm][iSampling] += FADC(0,ttt0) * corr_pileup * 0.001; }
-    	// (parallel noise)
-    	if (ttt1>0){ TCDigiE[iTCIdm][iSampling] += FADC(1,ttt1) * corr_parallel; }
-    	// (serial noise)
-    	if (ttt2>0){ TCDigiE[iTCIdm][iSampling] += FADC(2,ttt2) * corr_serial; }
-    	ttt0 += fam_sampling_interval*0.001;
-    	ttt1 += fam_sampling_interval*0.001;
-    	ttt2 += fam_sampling_interval*0.001;
+  if(0){
+    for (int iTCIdm=0; iTCIdm<576; iTCIdm++) {
+      if ( TCEnergy_tot[iTCIdm] < cut_energy_tot ) { continue; } // TC energy_tot cut
+      for (int jjj=0; jjj<bkg_level; jjj++){
+	ttt0 = -(tmin_noise + tgen * gRandom->Rndm()); // [us]
+	ttt1 = -(tmin_noise + tgen * gRandom->Rndm());  // [us]
+	ttt2 = -(tmin_noise + tgen * gRandom->Rndm());  // [us]
+	for (int iSampling=0; iSampling<NSampling; iSampling++) {
+	  // (pile-up noise)
+	  if (ttt0>0){ TCDigiE[iTCIdm][iSampling] += SimplifiedFADC(0,ttt0) * corr_pileup * 0.001; }
+	  // (parallel noise)
+	  if (ttt1>0){ TCDigiE[iTCIdm][iSampling] += SimplifiedFADC(1,ttt1) * corr_parallel; }
+	  // (serial noise)
+	  if (ttt2>0){ TCDigiE[iTCIdm][iSampling] += SimplifiedFADC(2,ttt2) * corr_serial; }
+	  ttt0 += fam_sampling_interval*0.001;
+	  ttt1 += fam_sampling_interval*0.001;
+	  ttt2 += fam_sampling_interval*0.001;
+	}
       }
     }
   }
-  delete rand00;
+  if(1){//use L Matrix
+    for (int iTCIdm=0; iTCIdm<576; iTCIdm++) {
+      
+      if ( TCEnergy_tot[iTCIdm] < cut_energy_tot ) { continue; } // TC energy_tot cut
+      double X_pr[80]={0};
+      double X_sr[80]={0};
+      
+      for(int iSampling = 0;iSampling<NSampling; iSampling++){
+	X_pr[iSampling] = gRandom ->Gaus(0,1);
+	X_sr[iSampling] = gRandom ->Gaus(0,1);
+      }
+      
+      for(int iSampling = 0;iSampling<NSampling; iSampling++){
+	for(int jSampling = 0;jSampling<NSampling; jSampling++){
+	  noise_parallel[iTCIdm][iSampling] += 10*corr_parallel*MatrixParallel[iSampling][jSampling]*X_pr[jSampling];
+	  noise_serial[iTCIdm][iSampling] += 10*corr_serial*MatrixSerial[iSampling][jSampling]*X_sr[jSampling];
+	}
+      }
+      
+      for (int iSampling=0; iSampling<NSampling; iSampling++) {
+	
+	TCDigiE[iTCIdm][iSampling] += noise_plileup[iTCIdm][iSampling]+noise_parallel[iTCIdm][iSampling]+ noise_serial[iTCIdm][iSampling];
+      }    
+    }
+    for (int iTCIdm=0; iTCIdm<576; iTCIdm++) { //Only Pile-up noise use old method. 
+      if ( TCEnergy_tot[iTCIdm] < cut_energy_tot ) { continue; } // TC energy_tot cut
+      for (int jjj=0; jjj<bkg_level; jjj++){
+	ttt0 = -(tmin_noise + tgen * gRandom->Rndm()); // [us]
+	for (int iSampling=0; iSampling<NSampling; iSampling++) {
+	  // (pile-up noise)
+	  if (ttt0>0){ TCDigiE[iTCIdm][iSampling] += SimplifiedFADC(0,ttt0) * corr_pileup * 0.001; }
+	  ttt0 += fam_sampling_interval*0.001;
+	}
+      }
+    }
+  }
+
   
   
   //
@@ -389,7 +438,7 @@ TrgEclFAM::digitization01( void ){
     
     for(int inoutput=0; inoutput<noutput[iTCIdm];inoutput++){
       TCFitEnergy[iTCIdm][inoutput] = returnE[inoutput];
-      TCFitTiming[iTCIdm][inoutput] = returnT[inoutput]+random_sampling_correction;
+      TCFitTiming[iTCIdm][inoutput] = returnT[inoutput]+GetTCLatency(iTCIdm)+random_sampling_correction;
     }
   }
   //
@@ -407,13 +456,14 @@ TrgEclFAM::digitization02( void ){
   double cut_energy_tot = 0.03; // [GeV]
   int nbin_pedestal = 5; // = nbin_pedestal*fam_sampling_interval [ns] in total
   double fam_sampling_interval = 96; //@ [ns]
-  double TCDigiE[576][160] = {{0}};  //@ [GeV]
-  double TCDigiT[576][160] = {{0}};  //@ [ns]
   int NSampling = 80;
-  TRandom3* rand00 = new TRandom3(0);
-  //@ Make sampling time random between FAM sampling intervals
+
+  double noise_plileup[576][80] = {{0}};  // [GeV]
+  double noise_parallel[576][80] = {{0}};  // [GeV]
+  double noise_serial[576][80] = {{0}};  // [GeV]
+    //@ Make sampling time random between FAM sampling intervals
   double random_sampling_correction = 0; //@ [ns]
-  random_sampling_correction = rand00->Rndm()*fam_sampling_interval;
+  random_sampling_correction = gRandom->Rndm()*fam_sampling_interval;
   //==================
   // (02)Signal digitization
   //==================
@@ -425,12 +475,12 @@ TrgEclFAM::digitization02( void ){
       for (int iSampling=0; iSampling<NSampling; iSampling++) {
 	//@ inputTiming is in [us] <-- Be careful, here is NOT [ns]
 	double inputTiming 
-	  = (-TCTiming[iTCIdm][iTimeBin]+(-nbin_pedestal+iSampling)*fam_sampling_interval)*0.001; 
+	  = (-TCTiming[iTCIdm][iTimeBin]-TimeRange+(-nbin_pedestal+iSampling)*fam_sampling_interval)*0.001; 
 	inputTiming += random_sampling_correction*0.001;
-	TCDigiE[iTCIdm][iSampling] += FADC(0, inputTiming) * TCEnergy[iTCIdm][iTimeBin];
+	TCDigiE[iTCIdm][iSampling] += SimplifiedFADC(0, inputTiming) * TCEnergy[iTCIdm][iTimeBin];
       }
       for (int iSampling=0; iSampling<NSampling; iSampling++) {
-	TCDigiT[iTCIdm][iSampling] = (-nbin_pedestal+iSampling)*fam_sampling_interval;
+	TCDigiT[iTCIdm][iSampling] = (-nbin_pedestal+iSampling -TimeRange/fam_sampling_interval )*fam_sampling_interval;
 	TCDigiT[iTCIdm][iSampling] += random_sampling_correction;
       }
     }
@@ -459,30 +509,65 @@ TrgEclFAM::digitization02( void ){
   // corr_parallel = 0.00727324;
   // corr_serial   = 0.0173925;
   
-  
-  for (int iTCIdm=0; iTCIdm<576; iTCIdm++) {
-    if ( TCEnergy_tot[iTCIdm] < cut_energy_tot ) { continue; } // TC energy_tot cut
-    for (int jjj=0; jjj<bkg_level; jjj++){
-      ttt0 = -(tmin_noise + tgen * rand00->Rndm());  //@ [us]
-      ttt1 = -(tmin_noise + tgen * rand00->Rndm());  //@ [us]
-      ttt2 = -(tmin_noise + tgen * rand00->Rndm());  //@ [us]
+  if(0){
+    for (int iTCIdm=0; iTCIdm<576; iTCIdm++) {
+      if ( TCEnergy_tot[iTCIdm] < cut_energy_tot ) { continue; } // TC energy_tot cut
+      for (int jjj=0; jjj<bkg_level; jjj++){
+	ttt0 = -(tmin_noise + tgen * gRandom->Rndm());  //@ [us]
+	ttt1 = -(tmin_noise + tgen * gRandom->Rndm());  //@ [us]
+	ttt2 = -(tmin_noise + tgen * gRandom->Rndm());  //@ [us]
+	for (int iSampling=0; iSampling<NSampling; iSampling++) {
+	  //@ (pile-up noise)
+	  if (ttt0>0){ TCDigiE[iTCIdm][iSampling] += SimplifiedFADC(0,ttt0) * corr_pileup * 0.001; }
+	  //@ (parallel noise)
+	  if (ttt1>0){ TCDigiE[iTCIdm][iSampling] += SimplifiedFADC(1,ttt1) * corr_parallel; }
+	  //@ (serial noise)
+	  if (ttt2>0){ TCDigiE[iTCIdm][iSampling] += SimplifiedFADC(2,ttt2) * corr_serial; }
+	  ttt0 += fam_sampling_interval*0.001;
+	  ttt1 += fam_sampling_interval*0.001;
+	  ttt2 += fam_sampling_interval*0.001;
+	}
+      }
+    }
+  }
+  if(1){//use L Matrix
+    for (int iTCIdm=0; iTCIdm<576; iTCIdm++) {
+      
+      if ( TCEnergy_tot[iTCIdm] < cut_energy_tot ) { continue; } // TC energy_tot cut
+      double X_pr[80]={0};
+      double X_sr[80]={0};
+      
+      for(int iSampling = 0;iSampling<NSampling; iSampling++){
+	X_pr[iSampling] = gRandom ->Gaus(0,1);
+	X_sr[iSampling] = gRandom ->Gaus(0,1);
+      }
+      
+      for(int iSampling = 0;iSampling<NSampling; iSampling++){
+	for(int jSampling = 0;jSampling<NSampling; jSampling++){
+	  noise_parallel[iTCIdm][iSampling] += 10*corr_parallel*MatrixParallel[iSampling][jSampling]*X_pr[jSampling];
+	  noise_serial[iTCIdm][iSampling] += 10*corr_serial*MatrixSerial[iSampling][jSampling]*X_sr[jSampling];
+	}
+      }
+      
       for (int iSampling=0; iSampling<NSampling; iSampling++) {
-  	//@ (pile-up noise)
-  	if (ttt0>0){ TCDigiE[iTCIdm][iSampling] += FADC(0,ttt0) * corr_pileup * 0.001; }
-  	//@ (parallel noise)
-  	if (ttt1>0){ TCDigiE[iTCIdm][iSampling] += FADC(1,ttt1) * corr_parallel; }
-  	//@ (serial noise)
-  	if (ttt2>0){ TCDigiE[iTCIdm][iSampling] += FADC(2,ttt2) * corr_serial; }
-  	ttt0 += fam_sampling_interval*0.001;
-  	ttt1 += fam_sampling_interval*0.001;
-  	ttt2 += fam_sampling_interval*0.001;
+	
+	TCDigiE[iTCIdm][iSampling] += noise_plileup[iTCIdm][iSampling]+noise_parallel[iTCIdm][iSampling]+ noise_serial[iTCIdm][iSampling];
+      }    
+    }
+    for (int iTCIdm=0; iTCIdm<576; iTCIdm++) { //Only Pile-up noise use old method. 
+      if ( TCEnergy_tot[iTCIdm] < cut_energy_tot ) { continue; } // TC energy_tot cut
+      for (int jjj=0; jjj<bkg_level; jjj++){
+	ttt0 = -(tmin_noise + tgen * gRandom->Rndm()); // [us]
+	for (int iSampling=0; iSampling<NSampling; iSampling++) {
+	  // (pile-up noise)
+	  if (ttt0>0){ TCDigiE[iTCIdm][iSampling] += SimplifiedFADC(0,ttt0) * corr_pileup * 0.001; }
+	  ttt0 += fam_sampling_interval*0.001;
+	}
       }
     }
   }
   
   
-  
-  delete rand00;
   //==================
   // (02)Peak search
   //==================
@@ -568,7 +653,7 @@ TrgEclFAM::digitization02( void ){
 		//@ time between t0 and 0.6*peak_energy
 		//@ Alex's number = 274.4 (how he got this value ?)
 		//@ by my check = 278.7 [ns]
-		TCFitTiming[iTCIdm][noutput[iTCIdm]] -= (278.7 + 2);
+		TCFitTiming[iTCIdm][noutput[iTCIdm]] -= (278.7 + 2)+GetTCLatency(iTCIdm);
 		//@ here "+2" is a shift due to imperfectness of no-fit method.
 	      }
 	      noutput[iTCIdm]++;
@@ -598,10 +683,10 @@ TrgEclFAM::digitization03( void ){
   float TCDigiE[576][666] = {{0}};  // [GeV]
   float TCDigiT[576][666] = {{0}};  // [ns]
   int NSampling = 666;
-  TRandom3* rand00 = new TRandom3(0);
+  
   // Make sampling time random between FAM sampling intervals
   float random_sampling_correction = 0; // [ns]
-  random_sampling_correction = rand00->Rndm()*fam_sampling_interval;
+  random_sampling_correction = gRandom->Rndm()*fam_sampling_interval;
   for (int iTCIdm=0; iTCIdm<576; iTCIdm++) {
     if (TCEnergy_tot[iTCIdm]<cut_energy_tot){continue;} // TC energy_tot cut
     for (int iTimeBin=0; iTimeBin<80; iTimeBin++) {
@@ -609,13 +694,13 @@ TrgEclFAM::digitization03( void ){
       for (int iSampling=0; iSampling<NSampling; iSampling++) {
 	// inputTiming is in [us] <-- Be careful, here is NOT [ns]
 	float inputTiming 
-	  = (-TCTiming[iTCIdm][iTimeBin]+(-nbin_pedestal+iSampling)*fam_sampling_interval)*0.001; 
+	  = (-TCTiming[iTCIdm][iTimeBin]-TimeRange+(-nbin_pedestal+iSampling)*fam_sampling_interval)*0.001; 
 	inputTiming += random_sampling_correction*0.001;
 	TCDigiE[iTCIdm][iSampling] += FADC(0, inputTiming) * TCEnergy[iTCIdm][iTimeBin];
       }
     }
     for (int iSampling=0; iSampling<NSampling; iSampling++) {
-      TCDigiT[iTCIdm][iSampling] = (-nbin_pedestal+iSampling)*fam_sampling_interval;
+      TCDigiT[iTCIdm][iSampling] = (-nbin_pedestal+iSampling-TimeRange/fam_sampling_interval)*fam_sampling_interval;
       TCDigiT[iTCIdm][iSampling] += random_sampling_correction;
     }
   }
@@ -647,9 +732,9 @@ TrgEclFAM::digitization03( void ){
   for (int iTCIdm=0; iTCIdm<576; iTCIdm++) {
     if ( TCEnergy_tot[iTCIdm] < cut_energy_tot ) { continue; } // 1 MeV TC energy cut
     for (int jjj=0; jjj<bkg_level; jjj++){
-      ttt0 = -(tmin_noise + tgen * rand00->Rndm());  // [us]
-      ttt1 = -(tmin_noise + tgen * rand00->Rndm());  // [us]
-      ttt2 = -(tmin_noise + tgen * rand00->Rndm());  // [us]
+      ttt0 = -(tmin_noise + tgen * gRandom->Rndm());  // [us]
+      ttt1 = -(tmin_noise + tgen * gRandom->Rndm());  // [us]
+      ttt2 = -(tmin_noise + tgen * gRandom->Rndm());  // [us]
       for (int iSampling=0; iSampling<NSampling; iSampling++) {
  	// (pile-up noise)
  	if (ttt0>0){ TCDigiE[iTCIdm][iSampling] += FADC(0,ttt0) * corr_pileup * 0.001; }
@@ -663,7 +748,7 @@ TrgEclFAM::digitization03( void ){
       }
     }
   }
-  delete rand00;
+  
   
   
   //
@@ -726,7 +811,7 @@ TrgEclFAM::digitization03( void ){
 	      }
 	      if (NoiseCount!=0) { NoiseLevel /= NoiseCount; }
 	      TCFitEnergy[iTCIdm][noutput[iTCIdm]] = TCDigiE[iTCIdm][maxId[noutput[iTCIdm]]]-NoiseLevel;
-	      TCFitTiming[iTCIdm][noutput[iTCIdm]] = TCDigiT[iTCIdm][maxId[noutput[iTCIdm]]]-max_shape_time;
+	      TCFitTiming[iTCIdm][noutput[iTCIdm]] = TCDigiT[iTCIdm][maxId[noutput[iTCIdm]]]-max_shape_time + GetTCLatency(iTCIdm);
 	      noutput[iTCIdm]++;
 	    }
 	  }
@@ -951,7 +1036,6 @@ TrgEclFAM::ShapeF(double t00,
 		  double tb2,
 		  double td1,
 		  double ts1){
-  
   double dr;
   double dzna;
   double das1,das0,dac0;
@@ -1013,6 +1097,206 @@ TrgEclFAM::ShapeF(double t00,
   
   return sv123;
 }
+
+//
+//
+//
+
+
+double
+TrgEclFAM::SimplifiedFADC(int flag_gen, 
+	    double timing){
+
+  //--------------------------------------
+  //
+  // o "timing" unit is [us]
+  // o flag_gen = 0(=signal), 1(=parallel), 2(=serial)
+  // o return value(PDF) is [GeV]
+  // o Generate signal shape using a simplified function.
+  //
+  //
+  //--------------------------------------
+  double tsh,dd;
+  static double tc,fm,fff,tt,dt,tc2,tm,tsc,tris;
+  static double amp,td,t1,t2,ts,dft,as;
+  int im, ij;
+
+  static int ifir=0;
+  
+  if(ifir==0){
+    
+    td =  0.10;  // diff time    (  0.10)
+    t1 =  0.10;  // integ1 real  (  0.10)
+    // b1 = 30.90;  // integ1 imag  ( 30.90)
+    t2 =  0.01;  // integ2 real  (  0.01)
+    // b2 = 30.01;  // integ2 imag  ( 30.01)
+    ts =  1.00;  // scint decay  (  1.00)
+    dft= 0.600;  // diff delay   ( 0.600)
+    as = 0.548;  // diff frac    ( 0.548)
+    //
+    amp = 1.0;
+    tris = 0.01;
+    // ts0 = 0.0;
+    tsc = ts;
+    //
+    im = 0;
+    ij = 0;
+    fm = 0;
+    tc = 0;
+    tt = u_max(u_max(td,t1),u_max(t2,ts))*2;
+    int flag_once = 0;
+    while(flag_once == 0){
+      dt = tt/1000;
+      for(int j=1; j<=1000; j++){
+	tc2 = tc-dft;
+	fff = 
+	  (ShapeF(tc, tsc)-
+	   ShapeF(tc, tris)*0.01)-
+	  (ShapeF(tc2,tsc)-
+	   ShapeF(tc2,tris)*0.01)*as;
+	if( fff>fm ){
+	  fm = fff;
+	  tm = tc;
+	  im = j;
+	}
+	tc = tc+dt;
+      }
+      if( im>=1000 ){
+	tt = 2*tt;
+	flag_once = 0;
+	continue;
+      }
+      if( ij==0 ){
+	ij = 1;
+	tc = 0.99*tm;
+	dt = tm*0.02/1000;
+	flag_once = 0;
+	continue;
+      }
+      flag_once = 1;
+    }
+    amp = 1.0/fm;
+    ifir = 1;
+  }
+  //
+  //
+  double pdf = 0;
+  if ( flag_gen==0 ){
+    //-----<signal>
+    tc2 = timing-dft;
+    pdf = amp*(
+	       (ShapeF(timing, tsc)-
+		ShapeF(timing, tris)*0.01)-
+	       (ShapeF(tc2,    tsc)-
+		ShapeF(tc2,      tris)*0.01)*as);
+  }else if( flag_gen==1 ){
+    //-----<parallel>
+    tc2 = timing-dft;
+    tsh = 0.001;
+    pdf = amp*(
+	       ShapeF(timing, tsh)-
+	       ShapeF(tc2,     tsh)*as);
+    pdf = pdf*0.001; // GeV
+  }else{
+    //-----<serial>
+    tc2 = timing-dft;
+    tsh = 0.001;
+    pdf = amp*(
+	       ShapeF(timing,tsh)-
+	       ShapeF(tc2,    tsh)*as);
+    //
+    tc = timing-0.01;
+    if ( tc<0 ){ tc = 0; }
+    dd = timing-tc;
+    tc2 = tc-dft;
+    pdf = (amp*(
+		ShapeF(tc,tsh)-
+		ShapeF(tc2,tsh)*as)-pdf)/dd;
+    pdf = pdf*0.001; // GeV
+  }
+
+  return pdf;
+}
+
+
+double TrgEclFAM::ShapeF(double t00, double ts1){
+  
+  double dzna;
+  // double das1,das0,dac0;
+  double dcs0s,dsn0s,dcs0d,dsn0d;
+  double dcs1s,dsn1s,dcs1d,dsn1d;
+  double a1, a2, b1, b2, c1, c2;
+  double sv123 = 0.0;
+  
+  if ( t00<=0.0 ) return 0;
+  
+
+
+  a1 = 10 ;
+  a2 =  0.0323625 ;
+  b1 = 100;
+  b2 = 0.0333222;
+  c1 = 10;
+  
+  // das0 =  269.91;
+  //dac0 = -0.1941;
+  // das1 =  262.136;
+  if(ts1==1){
+    c2 = 1;
+    dsn0s =  -29.9897;
+    dcs0s =   -0.08627;
+    
+    dsn1s =  -2.64784;
+    dcs1s =  -0.00285194;
+  }
+  if(ts1==0.01){
+    c2 = 100;
+    dsn0s =  2.999 ;
+    dcs0s =   -0.00323517;
+    
+    dsn1s =  5.82524;
+    dcs1s = -7866.7;
+  }
+  if(ts1==0.001){
+    c2 = 1000;
+    dsn0s = 0.272636;
+    dcs0s = -0.000204983;
+    
+    dsn1s = 0.291262;
+    dcs1s = 0.000204894;
+  }
+
+  dsn0d =  -5.998;
+  dcs0d =   -8340.22;
+  
+  dsn1d =  -2.91262;
+  dcs1d = -0.00323517;
+  //
+  //
+  //
+  dzna = 6.561e+07;
+
+
+
+
+
+
+
+
+  sv123 = (
+	   (dcs0s+dcs1s)*exp(-c2*t00)*(-1)+
+	   (dcs0d+dcs1d)*exp(-c1*t00)+
+	   ((dsn0s-dsn0d)*sin(a2*t00)+(dcs0s-dcs0d)*cos(a2*t00))*exp(-a1*t00)+
+ 	   ((dsn1s-dsn1d)*sin(b2*t00)+(dcs1s-dcs1d)*cos(b2*t00))*exp(-b1*t00)
+	   )
+    /dzna/(1/c2-1/c1);
+
+ 
+  return sv123;
+}
+
+
+
 //
 //
 //
@@ -1048,7 +1332,7 @@ TrgEclFAM::FAMFit(int nbin_pedestal,
   int Nsmalldt = 96;
   int SmallOffset = 1;
   double IntervaldT  = fam_sampling_interval*0.001/ Nsmalldt;
-  double EThreshold = 50; //[GeV]
+  double EThreshold =100; //[GeV]
   int FitSleepCounter   = 100; // counter to suspend fit
   int FitSleepThreshold = 2;   // # of clk to suspend fit
   double FitE = 0;
@@ -1056,7 +1340,7 @@ TrgEclFAM::FAMFit(int nbin_pedestal,
   
   noutput[iTCIdm]= 0;
   
-  for(int iShift=0; iShift<(NSampling-14); iShift++ ){
+  for(int iShift=25; iShift<(NSampling-14); iShift++ ){// In order to avoid BKG shaping effect, iShift start from 20.
     
     FitSleepCounter++;
     if (FitSleepCounter<=FitSleepThreshold){continue;}
@@ -1106,7 +1390,7 @@ TrgEclFAM::FAMFit(int nbin_pedestal,
       //--------
       //	break;
       returnE[noutput[iTCIdm]] = FitE/1000.0;  // [GeV/c2]
-      returnT[noutput[iTCIdm]] = FitT*1000;
+      returnT[noutput[iTCIdm]] = FitT*1000 - TimeRange;
       noutput[iTCIdm]++;
       FitSleepCounter = 0;
       ShiftdTBin = 0;
@@ -1117,6 +1401,193 @@ TrgEclFAM::FAMFit(int nbin_pedestal,
   //
   //
   return;
+}
+void TrgEclFAM:: readNoiseLMatrix(){
+  double LMatrixParallel[80][80]= { { 0.00222966,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 0.00192588,  0.00112354,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 0.00132815,  0.00154529,  0.000905244,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 0.000777012,  0.0013038,  0.00137787,  0.00087703,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 0.000380947,  0.000888984,  0.00119483,  0.00135989,  0.000871223,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 0.000137899,  0.000519611,  0.000824496,  0.00118655,  0.00135543,  0.000870323,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 3.0757e-05,  0.000220937,  0.000516014,  0.000808992,  0.0011897,  0.00135248,  0.00086965,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.16539e-05,  4.10608e-05,  0.00025246,  0.000500477,  0.00081413,  0.00118677,  0.00135206,  0.000869505,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 5.53408e-06,  1.3641e-05,  4.43506e-05,  0.000255717,  0.000498618,  0.000814396,  0.00118865,  0.00135098,  0.000868266,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 2.57381e-06,  6.5705e-06,  1.37118e-05,  4.46028e-05,  0.000256659,  0.00049809,  0.000815015,  0.00118827,  0.00135237,  0.000866042,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.17667e-06,  3.09075e-06,  6.62825e-06,  1.35769e-05,  4.47635e-05,  0.000256744,  0.000498779,  0.000814652,  0.0011893,  0.00135218,  0.000864831,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 5.30251e-07,  1.42617e-06,  3.1269e-06,  6.56665e-06,  1.35997e-05,  4.47652e-05,  0.000256984,  0.000498658,  0.000815705,  0.00118938,  0.00135176,  0.000864382,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 2.36044e-07,  6.47668e-07,  1.44627e-06,  3.09921e-06,  6.57785e-06,  1.35921e-05,  4.48054e-05,  0.000256992,  0.000499519,  0.000815689,  0.00118951,  0.00135137,  0.000864329,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.03976e-07,  2.90201e-07,  6.58095e-07,  1.43397e-06,  3.10456e-06,  6.57441e-06,  1.36055e-05,  4.48018e-05,  0.00025737,  0.000499802,  0.000815675,  0.00118944,  0.00135127,  0.000864327,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 4.53829e-08,  1.28547e-07,  2.95368e-07,  6.52696e-07,  1.43648e-06,  3.10302e-06,  6.58094e-06,  1.36024e-05,  4.48632e-05,  0.000257862,  0.000499649,  0.000815765,  0.00118934,  0.00135126,  0.000864327,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.965e-08,  5.63796e-08,  1.31025e-07,  2.93019e-07,  6.53845e-07,  1.4358e-06,  3.10612e-06,  6.57949e-06,  1.36207e-05,  4.49277e-05,  0.000258091,  0.00049955,  0.00081576,  0.00118935,  0.00135126,  0.000864304,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 8.44778e-09,  2.45146e-08,  5.75382e-08,  1.30011e-07,  2.93539e-07,  6.53547e-07,  1.43723e-06,  3.10545e-06,  6.58844e-06,  1.36311e-05,  4.49571e-05,  0.000258169,  0.000499508,  0.00081576,  0.00118935,  0.00135129,  0.000864253,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 3.60887e-09,  1.05785e-08,  2.50459e-08,  5.71038e-08,  1.30243e-07,  2.93409e-07,  6.54204e-07,  1.43693e-06,  3.1097e-06,  6.5937e-06,  1.36338e-05,  4.49672e-05,  0.000258173,  0.000499513,  0.000815758,  0.00118936,  0.00135131,  0.000864208,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.53297e-09,  4.53407e-09,  1.08182e-08,  2.4861e-08,  5.72064e-08,  1.30188e-07,  2.93705e-07,  6.5407e-07,  1.43891e-06,  3.11228e-06,  6.59513e-06,  1.36344e-05,  4.49673e-05,  0.000258174,  0.000499513,  0.000815775,  0.00118938,  0.0013513,  0.000864187,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 6.47848e-10,  1.93168e-09,  4.64085e-09,  1.07399e-08,  2.49058e-08,  5.71826e-08,  1.30319e-07,  2.93646e-07,  6.54974e-07,  1.44014e-06,  3.113e-06,  6.59546e-06,  1.36339e-05,  4.49675e-05,  0.000258174,  0.000499526,  0.000815785,  0.00118938,  0.00135128,  0.000864183,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 2.72519e-10,  8.18518e-10,  1.9787e-09,  4.60784e-09,  1.07594e-08,  2.48957e-08,  5.72404e-08,  1.30293e-07,  2.94054e-07,  6.55547e-07,  1.44049e-06,  3.11318e-06,  6.59525e-06,  1.3634e-05,  4.49675e-05,  0.000258181,  0.000499535,  0.00081579,  0.00118938,  0.00135128,  0.000864183,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.14153e-10,  3.4514e-10,  8.39028e-10,  1.96485e-09,  4.61622e-09,  1.07551e-08,  2.49209e-08,  5.72293e-08,  1.30475e-07,  2.94315e-07,  6.55714e-07,  1.44058e-06,  3.11308e-06,  6.59529e-06,  1.3634e-05,  4.49685e-05,  0.000258193,  0.000499536,  0.000815792,  0.00118937,  0.00135128,  0.000864183,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 4.76319e-11,  1.44888e-10,  3.54012e-10,  8.33243e-10,  1.96844e-09,  4.61442e-09,  1.0766e-08,  2.49161e-08,  5.73091e-08,  1.30593e-07,  2.94393e-07,  6.55756e-07,  1.44054e-06,  3.1131e-06,  6.59528e-06,  1.36343e-05,  4.49702e-05,  0.000258202,  0.000499532,  0.000815792,  0.00118937,  0.00135128,  0.000864183,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.98048e-11,  6.05772e-11,  1.48698e-10,  3.51604e-10,  8.34769e-10,  1.96769e-09,  4.6191e-09,  1.0764e-08,  2.4951e-08,  5.73618e-08,  1.30628e-07,  2.94413e-07,  6.55736e-07,  1.44054e-06,  3.1131e-06,  6.59543e-06,  1.36346e-05,  4.49715e-05,  0.000258206,  0.00049953,  0.000815792,  0.00118937,  0.00135128,  0.000864181,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 8.20777e-12,  2.52333e-11,  6.22028e-11,  1.47699e-10,  3.5225e-10,  8.34455e-10,  1.96969e-09,  4.61824e-09,  1.0779e-08,  2.49742e-08,  5.73777e-08,  1.30637e-07,  2.94404e-07,  6.5574e-07,  1.44054e-06,  3.11316e-06,  6.59559e-06,  1.36348e-05,  4.4972e-05,  0.000258206,  0.00049953,  0.000815792,  0.00118937,  0.00135128,  0.00086418,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 3.39133e-12,  1.04751e-11,  2.5923e-11,  6.17898e-11,  1.47971e-10,  3.5212e-10,  8.35303e-10,  1.96932e-09,  4.62472e-09,  1.07892e-08,  2.49812e-08,  5.73818e-08,  1.30634e-07,  2.94406e-07,  6.5574e-07,  1.44057e-06,  3.11325e-06,  6.59569e-06,  1.36348e-05,  4.4972e-05,  0.000258206,  0.00049953,  0.000815792,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.39734e-12,  4.33486e-12,  1.07662e-11,  2.57527e-11,  6.1904e-11,  1.47917e-10,  3.52478e-10,  8.35149e-10,  1.97209e-09,  4.62911e-09,  1.07923e-08,  2.49831e-08,  5.73802e-08,  1.30634e-07,  2.94406e-07,  6.55754e-07,  1.44061e-06,  3.11329e-06,  6.5957e-06,  1.36348e-05,  4.4972e-05,  0.000258206,  0.00049953,  0.000815793,  0.00118938,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 5.74254e-13,  1.78866e-12,  4.45714e-12,  1.06962e-11,  2.58004e-11,  6.18816e-11,  1.48068e-10,  3.52413e-10,  8.36325e-10,  1.97397e-09,  4.63046e-09,  1.07931e-08,  2.49824e-08,  5.73806e-08,  1.30634e-07,  2.94413e-07,  6.55772e-07,  1.44063e-06,  3.1133e-06,  6.5957e-06,  1.36348e-05,  4.4972e-05,  0.000258206,  0.000499531,  0.000815793,  0.00118938,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 2.35427e-13,  7.36052e-13,  1.83982e-12,  4.42843e-12,  1.0716e-11,  2.57912e-11,  6.19446e-11,  1.48041e-10,  3.5291e-10,  8.3713e-10,  1.97456e-09,  4.63082e-09,  1.07928e-08,  2.49826e-08,  5.73806e-08,  1.30637e-07,  2.94421e-07,  6.55782e-07,  1.44064e-06,  3.1133e-06,  6.5957e-06,  1.36348e-05,  4.4972e-05,  0.000258207,  0.000499531,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 9.63e-14,  3.02133e-13,  7.57371e-13,  1.82807e-12,  4.43666e-12,  1.07122e-11,  2.58174e-11,  6.19335e-11,  1.4825e-10,  3.53252e-10,  8.37381e-10,  1.97472e-09,  4.6307e-09,  1.07929e-08,  2.49826e-08,  5.73818e-08,  1.30641e-07,  2.94425e-07,  6.55784e-07,  1.44064e-06,  3.1133e-06,  6.5957e-06,  1.36348e-05,  4.49721e-05,  0.000258207,  0.000499531,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 3.93077e-14,  1.23728e-13,  3.10986e-13,  7.52574e-13,  1.83147e-12,  4.43511e-12,  1.07231e-11,  2.58128e-11,  6.20209e-11,  1.48394e-10,  3.53359e-10,  8.37449e-10,  1.97466e-09,  4.63073e-09,  1.07929e-08,  2.49831e-08,  5.73834e-08,  1.30643e-07,  2.94426e-07,  6.55784e-07,  1.44064e-06,  3.1133e-06,  6.5957e-06,  1.36348e-05,  4.49721e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.60128e-14,  5.05579e-14,  1.27393e-13,  3.09031e-13,  7.53977e-13,  1.83084e-12,  4.43963e-12,  1.07212e-11,  2.58493e-11,  6.20817e-11,  1.4844e-10,  3.53388e-10,  8.37427e-10,  1.97468e-09,  4.63072e-09,  1.07931e-08,  2.49838e-08,  5.73844e-08,  1.30643e-07,  2.94426e-07,  6.55784e-07,  1.44064e-06,  3.1133e-06,  6.5957e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 6.51096e-15,  2.06166e-14,  5.20704e-14,  1.26598e-13,  3.09609e-13,  7.53719e-13,  1.83271e-12,  4.43885e-12,  1.07364e-11,  2.58748e-11,  6.21008e-11,  1.48452e-10,  3.53379e-10,  8.37432e-10,  1.97467e-09,  4.63083e-09,  1.07934e-08,  2.49842e-08,  5.73846e-08,  1.30643e-07,  2.94426e-07,  6.55784e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 2.64278e-15,  8.39089e-15,  2.12391e-14,  5.17477e-14,  1.26835e-13,  3.09503e-13,  7.54488e-13,  1.83238e-12,  4.44513e-12,  1.0747e-11,  2.58828e-11,  6.21061e-11,  1.48448e-10,  3.53381e-10,  8.37432e-10,  1.97472e-09,  4.63096e-09,  1.07936e-08,  2.49843e-08,  5.73845e-08,  1.30643e-07,  2.94426e-07,  6.55784e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.07092e-15,  3.40888e-15,  8.64645e-15,  2.11083e-14,  5.18446e-14,  1.26792e-13,  3.09819e-13,  7.54356e-13,  1.83498e-12,  4.44955e-12,  1.07504e-11,  2.5885e-11,  6.21045e-11,  1.48449e-10,  3.53381e-10,  8.37451e-10,  1.97478e-09,  4.63104e-09,  1.07936e-08,  2.49843e-08,  5.73845e-08,  1.30643e-07,  2.94426e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 4.33282e-16,  1.38253e-15,  3.51354e-15,  8.59352e-15,  2.11479e-14,  5.18272e-14,  1.26922e-13,  3.09765e-13,  7.55425e-13,  1.83681e-12,  4.45095e-12,  1.07513e-11,  2.58844e-11,  6.21049e-11,  1.48449e-10,  3.53389e-10,  8.37474e-10,  1.97481e-09,  4.63105e-09,  1.07936e-08,  2.49843e-08,  5.73845e-08,  1.30643e-07,  2.94426e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.75042e-16,  5.59801e-16,  1.42529e-15,  3.49216e-15,  8.60965e-15,  2.11408e-14,  5.18801e-14,  1.269e-13,  3.10204e-13,  7.56181e-13,  1.83739e-12,  4.45134e-12,  1.0751e-11,  2.58845e-11,  6.21049e-11,  1.48452e-10,  3.53399e-10,  8.37489e-10,  1.97482e-09,  4.63105e-09,  1.07936e-08,  2.49843e-08,  5.73846e-08,  1.30643e-07,  2.94426e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 7.0616e-17,  2.26325e-16,  5.77241e-16,  1.41667e-15,  3.49872e-15,  8.6068e-15,  2.11625e-14,  5.18712e-14,  1.2708e-13,  3.10516e-13,  7.56422e-13,  1.83755e-12,  4.45122e-12,  1.07511e-11,  2.58845e-11,  6.21063e-11,  1.48457e-10,  3.53405e-10,  8.37492e-10,  1.97482e-09,  4.63105e-09,  1.07936e-08,  2.49843e-08,  5.73846e-08,  1.30643e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 2.84502e-17,  9.13697e-17,  2.33422e-16,  5.73765e-16,  1.41933e-15,  3.49757e-15,  8.6156e-15,  2.11588e-14,  5.19448e-14,  1.27208e-13,  3.10615e-13,  7.56489e-13,  1.83751e-12,  4.45125e-12,  1.07511e-11,  2.58851e-11,  6.21081e-11,  1.48459e-10,  3.53407e-10,  8.37492e-10,  1.97482e-09,  4.63105e-09,  1.07936e-08,  2.49843e-08,  5.73846e-08,  1.30643e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.14477e-17,  3.68364e-17,  9.42532e-17,  2.32024e-16,  5.74846e-16,  1.41887e-15,  3.50114e-15,  8.61412e-15,  2.11889e-14,  5.19973e-14,  1.27249e-13,  3.10643e-13,  7.5647e-13,  1.83752e-12,  4.45125e-12,  1.07513e-11,  2.58858e-11,  6.21091e-11,  1.4846e-10,  3.53406e-10,  8.37492e-10,  1.97482e-09,  4.63105e-09,  1.07936e-08,  2.49843e-08,  5.73846e-08,  1.30643e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 4.60071e-18,  1.48316e-17,  3.80058e-17,  9.36911e-17,  2.32461e-16,  5.74659e-16,  1.42032e-15,  3.50054e-15,  8.62636e-15,  2.12103e-14,  5.20141e-14,  1.2726e-13,  3.10636e-13,  7.56475e-13,  1.83752e-12,  4.45135e-12,  1.07517e-11,  2.58863e-11,  6.21094e-11,  1.4846e-10,  3.53406e-10,  8.37492e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73846e-08,  1.30643e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.84686e-18,  5.96432e-18,  1.53051e-17,  3.77802e-17,  9.38679e-17,  2.32386e-16,  5.75246e-16,  1.42007e-15,  3.50552e-15,  8.63512e-15,  2.12172e-14,  5.20188e-14,  1.27257e-13,  3.10637e-13,  7.56474e-13,  1.83756e-12,  4.45148e-12,  1.07518e-11,  2.58864e-11,  6.21094e-11,  1.4846e-10,  3.53406e-10,  8.37492e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73846e-08,  1.30643e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 7.40569e-19,  2.39564e-18,  6.15573e-18,  1.52146e-17,  3.78515e-17,  9.38376e-17,  2.32624e-16,  5.75148e-16,  1.42209e-15,  3.50909e-15,  8.63793e-15,  2.12191e-14,  5.20175e-14,  1.27258e-13,  3.10637e-13,  7.56492e-13,  1.83761e-12,  4.45156e-12,  1.07519e-11,  2.58864e-11,  6.21094e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73846e-08,  1.30643e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 2.9665e-19,  9.61159e-19,  2.47291e-18,  6.11948e-18,  1.52433e-17,  3.78394e-17,  9.39336e-17,  2.32584e-16,  5.75967e-16,  1.42355e-15,  3.51024e-15,  8.63872e-15,  2.12186e-14,  5.20178e-14,  1.27258e-13,  3.10644e-13,  7.56514e-13,  1.83765e-12,  4.45158e-12,  1.07519e-11,  2.58864e-11,  6.21094e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73846e-08,  1.30643e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.1871e-19,  3.85215e-19,  9.92308e-19,  2.45841e-18,  6.13106e-18,  1.52385e-17,  3.78781e-17,  9.39177e-17,  2.32915e-16,  5.76555e-16,  1.42401e-15,  3.51056e-15,  8.63852e-15,  2.12187e-14,  5.20178e-14,  1.2726e-13,  3.10653e-13,  7.56527e-13,  1.83765e-12,  4.45158e-12,  1.07519e-11,  2.58864e-11,  6.21094e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 4.74586e-20,  1.54229e-19,  3.97755e-19,  9.86509e-19,  2.46306e-18,  6.12911e-18,  1.52541e-17,  3.78717e-17,  9.40515e-17,  2.33154e-16,  5.76745e-16,  1.42414e-15,  3.51048e-15,  8.63857e-15,  2.12187e-14,  5.2019e-14,  1.27264e-13,  3.10659e-13,  7.56531e-13,  1.83765e-12,  4.45157e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.89559e-20,  6.16884e-20,  1.59271e-19,  3.95439e-19,  9.88378e-19,  2.46228e-18,  6.13538e-18,  1.52515e-17,  3.79257e-17,  9.4148e-17,  2.33231e-16,  5.76799e-16,  1.42411e-15,  3.5105e-15,  8.63856e-15,  2.12192e-14,  5.20205e-14,  1.27266e-13,  3.1066e-13,  7.5653e-13,  1.83765e-12,  4.45158e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 7.56472e-21,  2.4651e-20,  6.37136e-20,  1.58347e-19,  3.96189e-19,  9.88066e-19,  2.4648e-18,  6.13435e-18,  1.52732e-17,  3.79646e-17,  9.41791e-17,  2.33252e-16,  5.76785e-16,  1.42412e-15,  3.51049e-15,  8.63876e-15,  2.12198e-14,  5.20214e-14,  1.27267e-13,  3.1066e-13,  7.5653e-13,  1.83765e-12,  4.45158e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 3.0163e-21,  9.84181e-21,  2.54634e-20,  6.33451e-20,  1.58648e-19,  3.96064e-19,  9.89078e-19,  2.46439e-18,  6.14309e-18,  1.5289e-17,  3.79772e-17,  9.41879e-17,  2.33247e-16,  5.76788e-16,  1.42412e-15,  3.51057e-15,  8.63901e-15,  2.12202e-14,  5.20217e-14,  1.27267e-13,  3.1066e-13,  7.5653e-13,  1.83765e-12,  4.45158e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.20172e-21,  3.92592e-21,  1.01674e-20,  2.53166e-20,  6.34653e-20,  1.58598e-19,  3.9647e-19,  9.88912e-19,  2.4679e-18,  6.14943e-18,  1.5294e-17,  3.79808e-17,  9.41857e-17,  2.33248e-16,  5.76788e-16,  1.42415e-15,  3.51068e-15,  8.63917e-15,  2.12203e-14,  5.20217e-14,  1.27267e-13,  3.1066e-13,  7.56531e-13,  1.83765e-12,  4.45158e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 4.78406e-22,  1.56476e-21,  4.05626e-21,  1.01089e-20,  2.53647e-20,  6.34455e-20,  1.5876e-19,  3.96404e-19,  9.90322e-19,  2.47045e-18,  6.15148e-18,  1.52955e-17,  3.79799e-17,  9.41863e-17,  2.33248e-16,  5.76801e-16,  1.42419e-15,  3.51074e-15,  8.63921e-15,  2.12203e-14,  5.20217e-14,  1.27267e-13,  3.1066e-13,  7.56531e-13,  1.83766e-12,  4.45158e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.90311e-22,  6.23176e-22,  1.61689e-21,  4.03301e-21,  1.01281e-20,  2.53568e-20,  6.35105e-20,  1.58734e-19,  3.96969e-19,  9.91347e-19,  2.47127e-18,  6.15206e-18,  1.52951e-17,  3.79801e-17,  9.41862e-17,  2.33254e-16,  5.76818e-16,  1.42422e-15,  3.51076e-15,  8.63921e-15,  2.12203e-14,  5.20217e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 7.56515e-23,  2.47994e-22,  6.44004e-22,  1.60765e-21,  4.04067e-21,  1.0125e-20,  2.53828e-20,  6.35e-20,  1.5896e-19,  3.9738e-19,  9.91679e-19,  2.47151e-18,  6.15192e-18,  1.52952e-17,  3.79801e-17,  9.41884e-17,  2.3326e-16,  5.76829e-16,  1.42422e-15,  3.51076e-15,  8.63921e-15,  2.12203e-14,  5.20217e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 3.00518e-23,  9.86173e-23,  2.56309e-22,  6.40333e-22,  1.61071e-21,  4.03943e-21,  1.01354e-20,  2.53786e-20,  6.35906e-20,  1.59125e-19,  3.97514e-19,  9.91773e-19,  2.47145e-18,  6.15195e-18,  1.52952e-17,  3.7981e-17,  9.41912e-17,  2.33265e-16,  5.76832e-16,  1.42422e-15,  3.51076e-15,  8.63921e-15,  2.12203e-14,  5.20217e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.19298e-23,  3.91884e-23,  1.01934e-22,  2.54852e-22,  6.41552e-22,  1.61021e-21,  4.04357e-21,  1.01337e-20,  2.54148e-20,  6.36566e-20,  1.59179e-19,  3.97552e-19,  9.9175e-19,  2.47147e-18,  6.15195e-18,  1.52956e-17,  3.79821e-17,  9.41929e-17,  2.33266e-16,  5.76831e-16,  1.42422e-15,  3.51076e-15,  8.63921e-15,  2.12203e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 4.73276e-24,  1.5562e-23,  4.051e-23,  1.01356e-22,  2.55337e-22,  6.41355e-22,  1.61186e-21,  4.0429e-21,  1.01482e-20,  2.54412e-20,  6.3678e-20,  1.59194e-19,  3.97542e-19,  9.91756e-19,  2.47146e-18,  6.15209e-18,  1.5296e-17,  3.79828e-17,  9.41933e-17,  2.33266e-16,  5.76831e-16,  1.42422e-15,  3.51076e-15,  8.63922e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.8764e-24,  6.17573e-24,  1.60883e-23,  4.02809e-23,  1.01549e-22,  2.55259e-22,  6.42012e-22,  1.61159e-21,  4.04867e-21,  1.01587e-20,  2.54498e-20,  6.36841e-20,  1.5919e-19,  3.97545e-19,  9.91755e-19,  2.47152e-18,  6.15227e-18,  1.52963e-17,  3.7983e-17,  9.41933e-17,  2.33266e-16,  5.76831e-16,  1.42422e-15,  3.51076e-15,  8.63922e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 7.43491e-25,  2.44926e-24,  6.38515e-24,  1.59975e-23,  4.03576e-23,  1.01518e-22,  2.5552e-22,  6.41906e-22,  1.6139e-21,  4.05289e-21,  1.01622e-20,  2.54522e-20,  6.36827e-20,  1.59191e-19,  3.97544e-19,  9.91778e-19,  2.4716e-18,  6.15239e-18,  1.52964e-17,  3.7983e-17,  9.41933e-17,  2.33266e-16,  5.76832e-16,  1.42423e-15,  3.51076e-15,  8.63923e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 2.94424e-25,  9.70772e-25,  2.53253e-24,  6.3492e-24,  1.6028e-23,  4.03454e-23,  1.01622e-22,  2.55478e-22,  6.42823e-22,  1.61558e-21,  4.05426e-21,  1.01631e-20,  2.54517e-20,  6.3683e-20,  1.59191e-19,  3.97554e-19,  9.91808e-19,  2.47164e-18,  6.15242e-18,  1.52964e-17,  3.7983e-17,  9.41933e-17,  2.33266e-16,  5.76832e-16,  1.42423e-15,  3.51076e-15,  8.63923e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.16527e-25,  3.8454e-25,  1.00386e-24,  2.5183e-24,  6.36131e-24,  1.60231e-23,  4.03867e-23,  1.01605e-22,  2.55843e-22,  6.43494e-22,  1.61613e-21,  4.05465e-21,  1.01629e-20,  2.54518e-20,  6.3683e-20,  1.59195e-19,  3.97565e-19,  9.91826e-19,  2.47165e-18,  6.15241e-18,  1.52964e-17,  3.7983e-17,  9.41933e-17,  2.33266e-16,  5.76832e-16,  1.42423e-15,  3.51076e-15,  8.63923e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 4.60941e-26,  1.52236e-25,  3.97678e-25,  9.9823e-25,  2.52311e-24,  6.35938e-24,  1.60396e-23,  4.03801e-23,  1.0175e-22,  2.5611e-22,  6.43713e-22,  1.61628e-21,  4.05456e-21,  1.0163e-20,  2.54518e-20,  6.36845e-20,  1.592e-19,  3.97573e-19,  9.91831e-19,  2.47165e-18,  6.15241e-18,  1.52964e-17,  3.7983e-17,  9.41934e-17,  2.33266e-16,  5.76833e-16,  1.42423e-15,  3.51076e-15,  8.63923e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.82236e-26,  6.02357e-26,  1.57449e-25,  3.95453e-25,  1.00014e-24,  2.52235e-24,  6.3659e-24,  1.60369e-23,  4.04378e-23,  1.01857e-22,  2.56198e-22,  6.43775e-22,  1.61625e-21,  4.05458e-21,  1.0163e-20,  2.54524e-20,  6.36864e-20,  1.59202e-19,  3.97575e-19,  9.9183e-19,  2.47165e-18,  6.15241e-18,  1.52964e-17,  3.7983e-17,  9.41935e-17,  2.33266e-16,  5.76833e-16,  1.42423e-15,  3.51076e-15,  8.63923e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 7.20115e-27,  2.38209e-26,  6.2303e-26,  1.5657e-25,  3.96208e-25,  9.99834e-25,  2.52493e-24,  6.36486e-24,  1.60599e-23,  4.04801e-23,  1.01891e-22,  2.56223e-22,  6.4376e-22,  1.61626e-21,  4.05458e-21,  1.01632e-20,  2.54531e-20,  6.36876e-20,  1.59203e-19,  3.97574e-19,  9.9183e-19,  2.47165e-18,  6.15242e-18,  1.52964e-17,  3.7983e-17,  9.41935e-17,  2.33266e-16,  5.76833e-16,  1.42423e-15,  3.51076e-15,  8.63923e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 2.84417e-27,  9.41536e-27,  2.46402e-26,  6.19558e-26,  1.56869e-25,  3.96089e-25,  1.00086e-24,  2.52452e-24,  6.37396e-24,  1.60767e-23,  4.04939e-23,  1.01901e-22,  2.56217e-22,  6.43764e-22,  1.61625e-21,  4.05467e-21,  1.01635e-20,  2.54536e-20,  6.36879e-20,  1.59203e-19,  3.97574e-19,  9.9183e-19,  2.47165e-18,  6.15242e-18,  1.52964e-17,  3.79831e-17,  9.41935e-17,  2.33266e-16,  5.76833e-16,  1.42423e-15,  3.51076e-15,  8.63923e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.12279e-27,  3.71961e-27,  9.73986e-27,  2.45031e-26,  6.20742e-26,  1.56822e-25,  3.96495e-25,  1.0007e-24,  2.52813e-24,  6.38064e-24,  1.60822e-23,  4.04979e-23,  1.01899e-22,  2.56218e-22,  6.43764e-22,  1.61629e-21,  4.0548e-21,  1.01637e-20,  2.54537e-20,  6.36878e-20,  1.59203e-19,  3.97574e-19,  9.91831e-19,  2.47165e-18,  6.15243e-18,  1.52964e-17,  3.79831e-17,  9.41935e-17,  2.33266e-16,  5.76833e-16,  1.42423e-15,  3.51076e-15,  8.63923e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 4.43041e-28,  1.46875e-27,  3.84807e-27,  9.68578e-27,  2.455e-26,  6.20556e-26,  1.56983e-25,  3.9643e-25,  1.00213e-24,  2.53078e-24,  6.38282e-24,  1.60837e-23,  4.04969e-23,  1.01899e-22,  2.56218e-22,  6.43779e-22,  1.61634e-21,  4.05487e-21,  1.01637e-20,  2.54537e-20,  6.36878e-20,  1.59203e-19,  3.97575e-19,  9.91831e-19,  2.47166e-18,  6.15243e-18,  1.52964e-17,  3.79831e-17,  9.41935e-17,  2.33266e-16,  5.76833e-16,  1.42423e-15,  3.51076e-15,  8.63923e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.7474e-28,  5.79685e-28,  1.51957e-27,  3.82674e-27,  9.7043e-27,  2.45426e-26,  6.21192e-26,  1.56957e-25,  3.96997e-25,  1.00318e-24,  2.53165e-24,  6.38345e-24,  1.60834e-23,  4.04972e-23,  1.01899e-22,  2.56224e-22,  6.43798e-22,  1.61637e-21,  4.05489e-21,  1.01637e-20,  2.54537e-20,  6.36878e-20,  1.59203e-19,  3.97575e-19,  9.91832e-19,  2.47166e-18,  6.15243e-18,  1.52964e-17,  3.79831e-17,  9.41935e-17,  2.33266e-16,  5.76833e-16,  1.42423e-15,  3.51076e-15,  8.63923e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 6.8889e-29,  2.28685e-28,  5.99782e-28,  1.51116e-27,  3.83406e-27,  9.70141e-27,  2.45678e-26,  6.21091e-26,  1.57182e-25,  3.97414e-25,  1.00352e-24,  2.5319e-24,  6.3833e-24,  1.60835e-23,  4.04972e-23,  1.01902e-22,  2.56232e-22,  6.4381e-22,  1.61638e-21,  4.05489e-21,  1.01637e-20,  2.54537e-20,  6.36879e-20,  1.59203e-19,  3.97575e-19,  9.91832e-19,  2.47166e-18,  6.15243e-18,  1.52964e-17,  3.79831e-17,  9.41935e-17,  2.33266e-16,  5.76833e-16,  1.42423e-15,  3.51076e-15,  8.63923e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 2.71471e-29,  9.01762e-29,  2.36628e-28,  5.96468e-28,  1.51405e-27,  3.83292e-27,  9.71136e-27,  2.45638e-26,  6.21979e-26,  1.57347e-25,  3.97551e-25,  1.00362e-24,  2.53184e-24,  6.38334e-24,  1.60835e-23,  4.04981e-23,  1.01905e-22,  2.56236e-22,  6.43813e-22,  1.61638e-21,  4.05489e-21,  1.01637e-20,  2.54537e-20,  6.36879e-20,  1.59203e-19,  3.97575e-19,  9.91832e-19,  2.47166e-18,  6.15243e-18,  1.52964e-17,  3.79831e-17,  9.41935e-17,  2.33266e-16,  5.76833e-16,  1.42423e-15,  3.51076e-15,  8.63923e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.06935e-29,  3.55433e-29,  9.33136e-29,  2.35323e-28,  5.9761e-28,  1.5136e-27,  3.83685e-27,  9.70978e-27,  2.45989e-26,  6.22634e-26,  1.57401e-25,  3.9759e-25,  1.0036e-24,  2.53186e-24,  6.38334e-24,  1.60838e-23,  4.04993e-23,  1.01907e-22,  2.56238e-22,  6.43813e-22,  1.61638e-21,  4.05489e-21,  1.01637e-20,  2.54538e-20,  6.3688e-20,  1.59204e-19,  3.97575e-19,  9.91832e-19,  2.47166e-18,  6.15243e-18,  1.52964e-17,  3.79831e-17,  9.41935e-17,  2.33266e-16,  5.76833e-16,  1.42423e-15,  3.51076e-15,  8.63923e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 4.21054e-30,  1.40037e-29,  3.67821e-29,  9.27997e-29,  2.35773e-28,  5.97432e-28,  1.51516e-27,  3.83623e-27,  9.72367e-27,  2.46248e-26,  6.22848e-26,  1.57417e-25,  3.97581e-25,  1.0036e-24,  2.53185e-24,  6.38348e-24,  1.60843e-23,  4.05001e-23,  1.01907e-22,  2.56238e-22,  6.43813e-22,  1.61638e-21,  4.05489e-21,  1.01638e-20,  2.54538e-20,  6.3688e-20,  1.59204e-19,  3.97575e-19,  9.91832e-19,  2.47166e-18,  6.15243e-18,  1.52964e-17,  3.79831e-17,  9.41935e-17,  2.33266e-16,  5.76833e-16,  1.42423e-15,  3.51076e-15,  8.63923e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.65725e-30,  5.51505e-30,  1.44925e-29,  3.65798e-29,  9.29774e-29,  2.35703e-28,  5.98045e-28,  1.51491e-27,  3.84172e-27,  9.73391e-27,  2.46333e-26,  6.2291e-26,  1.57413e-25,  3.97583e-25,  1.0036e-24,  2.53191e-24,  6.38368e-24,  1.60846e-23,  4.05003e-23,  1.01907e-22,  2.56238e-22,  6.43813e-22,  1.61638e-21,  4.05489e-21,  1.01638e-20,  2.54538e-20,  6.3688e-20,  1.59204e-19,  3.97575e-19,  9.91832e-19,  2.47166e-18,  6.15243e-18,  1.52964e-17,  3.79831e-17,  9.41935e-17,  2.33266e-16,  5.76833e-16,  1.42423e-15,  3.51076e-15,  8.63923e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 6.5204e-31,  2.17112e-30,  5.70789e-30,  1.4413e-29,  3.66499e-29,  9.295e-29,  2.35945e-28,  5.97948e-28,  1.51708e-27,  3.84577e-27,  9.73727e-27,  2.46357e-26,  6.22895e-26,  1.57414e-25,  3.97583e-25,  1.00363e-24,  2.53199e-24,  6.38379e-24,  1.60847e-23,  4.05003e-23,  1.01907e-22,  2.56238e-22,  6.43813e-22,  1.61638e-21,  4.0549e-21,  1.01638e-20,  2.54538e-20,  6.3688e-20,  1.59204e-19,  3.97575e-19,  9.91832e-19,  2.47166e-18,  6.15243e-18,  1.52964e-17,  3.79831e-17,  9.41935e-17,  2.33266e-16,  5.76833e-16,  1.42423e-15,  3.51076e-15,  8.63923e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 2.56448e-31,  8.54383e-31,  2.24716e-30,  5.67659e-30,  1.44406e-29,  3.66391e-29,  9.30453e-29,  2.35907e-28,  5.98804e-28,  1.51868e-27,  3.84709e-27,  9.73823e-27,  2.46352e-26,  6.22899e-26,  1.57414e-25,  3.97592e-25,  1.00366e-24,  2.53204e-24,  6.38383e-24,  1.60847e-23,  4.05002e-23,  1.01907e-22,  2.56238e-22,  6.43814e-22,  1.61638e-21,  4.0549e-21,  1.01638e-20,  2.54538e-20,  6.3688e-20,  1.59204e-19,  3.97575e-19,  9.91832e-19,  2.47166e-18,  6.15243e-18,  1.52964e-17,  3.79831e-17,  9.41935e-17,  2.33266e-16,  5.76833e-16,  1.42423e-15,  3.51076e-15,  8.63923e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.00825e-31,  3.36092e-31,  8.84351e-31,  2.23486e-30,  5.68747e-30,  1.44363e-29,  3.66767e-29,  9.30302e-29,  2.36245e-28,  5.99436e-28,  1.5192e-27,  3.84747e-27,  9.73801e-27,  2.46353e-26,  6.22899e-26,  1.57418e-25,  3.97604e-25,  1.00368e-24,  2.53205e-24,  6.38382e-24,  1.60847e-23,  4.05002e-23,  1.01907e-22,  2.56238e-22,  6.43814e-22,  1.61638e-21,  4.0549e-21,  1.01638e-20,  2.54538e-20,  6.3688e-20,  1.59204e-19,  3.97575e-19,  9.91832e-19,  2.47166e-18,  6.15243e-18,  1.52964e-17,  3.79831e-17,  9.41935e-17,  2.33266e-16,  5.76833e-16,  1.42423e-15,  3.51076e-15,  8.63923e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  0,  }, 
+{ 3.96265e-32,  1.32162e-31,  3.47898e-31,  8.79516e-31,  2.23914e-30,  5.6858e-30,  1.44511e-29,  3.66707e-29,  9.31634e-29,  2.36494e-28,  5.99643e-28,  1.51935e-27,  3.84739e-27,  9.73807e-27,  2.46353e-26,  6.22913e-26,  1.57422e-25,  3.97611e-25,  1.00368e-24,  2.53205e-24,  6.38382e-24,  1.60847e-23,  4.05003e-23,  1.01907e-22,  2.56238e-22,  6.43814e-22,  1.61638e-21,  4.0549e-21,  1.01638e-20,  2.54538e-20,  6.3688e-20,  1.59204e-19,  3.97575e-19,  9.91832e-19,  2.47166e-18,  6.15243e-18,  1.52964e-17,  3.79831e-17,  9.41935e-17,  2.33266e-16,  5.76833e-16,  1.42423e-15,  3.51076e-15,  8.63923e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  0,  }, 
+{ 1.55688e-32,  5.19516e-32,  1.36811e-31,  3.45998e-31,  8.81202e-31,  2.23848e-30,  5.69164e-30,  1.44488e-29,  3.67232e-29,  9.32619e-29,  2.36576e-28,  5.99703e-28,  1.51932e-27,  3.84741e-27,  9.73807e-27,  2.46359e-26,  6.22932e-26,  1.57425e-25,  3.97613e-25,  1.00368e-24,  2.53205e-24,  6.38382e-24,  1.60847e-23,  4.05003e-23,  1.01907e-22,  2.56238e-22,  6.43814e-22,  1.61638e-21,  4.0549e-21,  1.01638e-20,  2.54538e-20,  6.3688e-20,  1.59204e-19,  3.97575e-19,  9.91832e-19,  2.47166e-18,  6.15243e-18,  1.52964e-17,  3.79831e-17,  9.41935e-17,  2.33266e-16,  5.76833e-16,  1.42423e-15,  3.51076e-15,  8.63923e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  0,  }, 
+{ 6.11475e-33,  2.04146e-32,  5.37816e-32,  1.36065e-31,  3.46662e-31,  8.80944e-31,  2.24078e-30,  5.69071e-30,  1.44695e-29,  3.67621e-29,  9.32942e-29,  2.366e-28,  5.9969e-28,  1.51933e-27,  3.84741e-27,  9.73829e-27,  2.46366e-26,  6.22944e-26,  1.57426e-25,  3.97613e-25,  1.00368e-24,  2.53205e-24,  6.38383e-24,  1.60847e-23,  4.05003e-23,  1.01907e-22,  2.56238e-22,  6.43814e-22,  1.61638e-21,  4.0549e-21,  1.01638e-20,  2.54538e-20,  6.3688e-20,  1.59204e-19,  3.97575e-19,  9.91832e-19,  2.47166e-18,  6.15243e-18,  1.52964e-17,  3.79831e-17,  9.41935e-17,  2.33266e-16,  5.76833e-16,  1.42423e-15,  3.51076e-15,  8.63923e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  0,  }, 
+{ 2.40083e-33,  8.01933e-33,  2.11347e-32,  5.34888e-32,  1.36326e-31,  3.46561e-31,  8.81848e-31,  2.24042e-30,  5.69886e-30,  1.44848e-29,  3.67748e-29,  9.33035e-29,  2.36594e-28,  5.99693e-28,  1.51933e-27,  3.8475e-27,  9.73859e-27,  2.46371e-26,  6.22947e-26,  1.57426e-25,  3.97613e-25,  1.00368e-24,  2.53205e-24,  6.38383e-24,  1.60847e-23,  4.05003e-23,  1.01907e-22,  2.56238e-22,  6.43814e-22,  1.61638e-21,  4.0549e-21,  1.01638e-20,  2.54538e-20,  6.3688e-20,  1.59204e-19,  3.97575e-19,  9.91832e-19,  2.47166e-18,  6.15243e-18,  1.52964e-17,  3.79831e-17,  9.41935e-17,  2.33266e-16,  5.76833e-16,  1.42423e-15,  3.51076e-15,  8.63923e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  0,  }, 
+{ 9.42341e-34,  3.14914e-33,  8.30258e-33,  2.10198e-32,  5.35914e-32,  1.36286e-31,  3.46916e-31,  8.81705e-31,  2.24363e-30,  5.7049e-30,  1.44898e-29,  3.67785e-29,  9.33014e-29,  2.36596e-28,  5.99693e-28,  1.51936e-27,  3.84761e-27,  9.73877e-27,  2.46372e-26,  6.22947e-26,  1.57426e-25,  3.97613e-25,  1.00368e-24,  2.53205e-24,  6.38384e-24,  1.60847e-23,  4.05003e-23,  1.01907e-22,  2.56238e-22,  6.43814e-22,  1.61638e-21,  4.0549e-21,  1.01638e-20,  2.54538e-20,  6.3688e-20,  1.59204e-19,  3.97575e-19,  9.91832e-19,  2.47166e-18,  6.15243e-18,  1.52964e-17,  3.79831e-17,  9.41935e-17,  2.33266e-16,  5.76833e-16,  1.42423e-15,  3.51076e-15,  8.63923e-15,  2.12204e-14,  5.20218e-14,  1.27267e-13,  3.10661e-13,  7.56532e-13,  1.83766e-12,  4.45159e-12,  1.07519e-11,  2.58864e-11,  6.21095e-11,  1.4846e-10,  3.53407e-10,  8.37493e-10,  1.97482e-09,  4.63106e-09,  1.07936e-08,  2.49844e-08,  5.73847e-08,  1.30644e-07,  2.94427e-07,  6.55785e-07,  1.44064e-06,  3.1133e-06,  6.59571e-06,  1.36348e-05,  4.49722e-05,  0.000258207,  0.00049953,  0.000815793,  0.00118937,  0.00135128,  0.000864179,  }};
+
+  double LMatrixSerial[80][80]= { { 0.013249,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 0.00668497,  0.0114388,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 0.00292944,  0.00603085,  0.0114273,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 0.00264252,  0.0018487,  0.00609758,  0.0113117,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 0.00200379,  0.00188965,  0.00188548,  0.00603656,  0.0113117,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 0.000581761,  0.0019809,  0.00186921,  0.0019639,  0.00603628,  0.0112909,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 3.7995e-05,  0.000651618,  0.00196959,  0.001918,  0.00196371,  0.00601847,  0.0112904,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 6.90184e-05,  3.67249e-06,  0.000654872,  0.00197724,  0.00191792,  0.00195558,  0.00601803,  0.0112904,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 0.000800078,  -0.000387634,  4.35254e-05,  0.000534379,  0.00197757,  0.00197017,  0.00196475,  0.00601933,  0.0112504,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 0.00164121,  -3.2455e-05,  -0.000323584,  -0.000159169,  0.000534965,  0.00206767,  0.00198552,  0.0019669,  0.00590824,  0.0111996,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 0.00145905,  0.00104824,  3.6791e-07,  -0.000431525,  -0.000158847,  0.000583483,  0.00207582,  0.00198667,  0.00190297,  0.00587039,  0.011199,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 0.000990146,  0.00111129,  0.00106253,  -4.85825e-05,  -0.000431384,  -0.000138226,  0.00058682,  0.0020763,  0.00196468,  0.00189462,  0.00587074,  0.0111988,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 0.000587775,  0.000803331,  0.001117,  0.00105157,  -4.85819e-05,  -0.000432088,  -0.000138477,  0.000586785,  0.0020858,  0.00199272,  0.0018988,  0.00586849,  0.0111925,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 0.000321582,  0.000492853,  0.000805445,  0.00111909,  0.00105153,  -5.43642e-05,  -0.000433065,  -0.000138616,  0.000597424,  0.0021097,  0.00199651,  0.0018967,  0.00585969,  0.0111913,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 0.00016646,  0.000275191,  0.00049357,  0.000809801,  0.00111905,  0.00104815,  -5.4604e-05,  -0.000433099,  -0.000136983,  0.000601433,  0.00211056,  0.00199601,  0.00189504,  0.00586006,  0.0111911,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 8.27651e-05,  0.000144433,  0.000275405,  0.000497043,  0.000809777,  0.00111751,  0.00104828,  -5.45783e-05,  -0.00043621,  -0.000142877,  0.000600748,  0.00211095,  0.00199963,  0.00189732,  0.00585914,  0.0111903,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 3.99098e-05,  7.25388e-05,  0.000144483,  0.000277596,  0.000497029,  0.000809149,  0.0011177,  0.00104832,  -5.70169e-05,  -0.000441179,  -0.00014365,  0.000601185,  0.00211475,  0.00200203,  0.00189627,  0.00585757,  0.0111899,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.87858e-05,  3.52467e-05,  7.25417e-05,  0.000145716,  0.000277588,  0.000496797,  0.000809299,  0.00111773,  0.00105029,  -5.0826e-05,  -0.000440548,  -0.000143984,  0.000599556,  0.00211441,  0.00200211,  0.00189664,  0.00585815,  0.0111895,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 8.67172e-06,  1.66908e-05,  3.52403e-05,  7.31899e-05,  0.000145712,  0.000277511,  0.000496891,  0.000809317,  0.00112059,  0.00106279,  -4.8925e-05,  -0.000441593,  -0.000150219,  0.000596848,  0.00211555,  0.00200455,  0.00189858,  0.00585642,  0.011188,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 3.93894e-06,  7.74203e-06,  1.66849e-05,  3.55654e-05,  7.31879e-05,  0.00014569,  0.000277564,  0.000496901,  0.000811559,  0.00113147,  0.00106461,  -4.99517e-05,  -0.000447852,  -0.000153092,  0.000598059,  0.00211808,  0.00200658,  0.00189663,  0.00585347,  0.0111872,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.76511e-06,  3.53072e-06,  7.73828e-06,  1.68425e-05,  3.55645e-05,  7.31838e-05,  0.000145719,  0.00027757,  0.000498331,  0.000818863,  0.00113275,  0.0010639,  -5.40443e-05,  -0.000449709,  -0.000152303,  0.000599636,  0.00211934,  0.00200537,  0.00189462,  0.00585263,  0.0111871,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 7.81899e-07,  1.58748e-06,  3.52863e-06,  7.81266e-06,  1.6842e-05,  3.5565e-05,  7.3198e-05,  0.000145721,  0.000278386,  0.000502635,  0.000819632,  0.00113232,  0.00106211,  -5.45725e-05,  -0.000449496,  -0.000151914,  0.000599933,  0.0021191,  0.00200532,  0.00189491,  0.00585279,  0.011187,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 3.4293e-07,  7.0522e-07,  1.5864e-06,  3.56303e-06,  7.81246e-06,  1.68432e-05,  3.55719e-05,  7.31993e-05,  0.000146156,  0.000280728,  0.00050306,  0.000819398,  0.00113167,  0.00106222,  -5.46654e-05,  -0.000449711,  -0.000152099,  0.000600137,  0.00211984,  0.00200618,  0.00189521,  0.0058524,  0.0111868,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.49105e-07,  3.10059e-07,  7.04687e-07,  1.60204e-06,  3.56293e-06,  7.81336e-06,  1.68465e-05,  3.55725e-05,  7.34198e-05,  0.000147364,  0.00028095,  0.000502938,  0.000819196,  0.0011319,  0.00106209,  -5.48823e-05,  -0.000449888,  -0.000151918,  0.000600567,  0.00212034,  0.00200638,  0.00189492,  0.0058522,  0.0111868,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 6.43371e-08,  1.35101e-07,  3.09805e-07,  7.117e-07,  1.602e-06,  3.56348e-06,  7.81489e-06,  1.68468e-05,  3.56805e-05,  7.40187e-05,  0.000147475,  0.00028089,  0.000502894,  0.000819389,  0.00113181,  0.00106202,  -5.48808e-05,  -0.000449903,  -0.000151999,  0.000600535,  0.00212036,  0.00200636,  0.00189496,  0.00585223,  0.0111868,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 2.75737e-08,  5.84039e-08,  1.34982e-07,  3.12912e-07,  7.11682e-07,  1.60229e-06,  3.56417e-06,  7.81502e-06,  1.68982e-05,  3.59686e-05,  7.40723e-05,  0.000147446,  0.000280891,  0.000503019,  0.00081933,  0.0011318,  0.00106212,  -5.50118e-05,  -0.000450228,  -0.000152283,  0.000600453,  0.0021205,  0.00200658,  0.00189505,  0.00585214,  0.0111867,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.17464e-08,  2.50724e-08,  5.83501e-08,  1.36345e-07,  3.12905e-07,  7.11831e-07,  1.60261e-06,  3.56423e-06,  7.83899e-06,  1.70335e-05,  3.59939e-05,  7.40586e-05,  0.000147455,  0.000280962,  0.000502986,  0.000819343,  0.00113189,  0.00106202,  -5.51332e-05,  -0.00045035,  -0.000152328,  0.000600528,  0.00212063,  0.00200664,  0.00189499,  0.00585208,  0.0111867,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 4.97691e-09,  1.06967e-08,  2.50482e-08,  5.89426e-08,  1.36342e-07,  3.12977e-07,  7.11971e-07,  1.60263e-06,  3.57521e-06,  7.90136e-06,  1.70453e-05,  3.59876e-05,  7.40666e-05,  0.000147493,  0.000280945,  0.000502999,  0.000819409,  0.00113184,  0.00106214,  -5.49532e-05,  -0.000450301,  -0.000152397,  0.000600458,  0.00212061,  0.00200666,  0.00189503,  0.0058521,  0.0111867,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 2.0984e-09,  4.53816e-09,  1.0686e-08,  2.53039e-08,  5.89412e-08,  1.36376e-07,  3.13039e-07,  7.11982e-07,  1.60758e-06,  3.6035e-06,  7.9067e-06,  1.70424e-05,  3.59926e-05,  7.40857e-05,  0.000147484,  0.000280954,  0.000503038,  0.000819381,  0.001132,  0.00106243,  -5.48479e-05,  -0.00045046,  -0.000152585,  0.000600397,  0.00212068,  0.00200679,  0.00189507,  0.00585202,  0.0111867,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 8.80816e-10,  1.9157e-09,  4.53348e-09,  1.07955e-08,  2.53032e-08,  5.89571e-08,  1.36403e-07,  3.13044e-07,  7.14187e-07,  1.62025e-06,  3.60589e-06,  7.90541e-06,  1.70452e-05,  3.60019e-05,  7.40816e-05,  0.00014749,  0.000280975,  0.000503025,  0.000819499,  0.00113223,  0.00106253,  -5.50017e-05,  -0.000450641,  -0.000152647,  0.000600468,  0.00212081,  0.00200683,  0.00189499,  0.00585192,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 3.68233e-10,  8.05003e-10,  1.91367e-09,  4.58012e-09,  1.07952e-08,  2.53104e-08,  5.89687e-08,  1.36405e-07,  3.14015e-07,  7.19791e-07,  1.62131e-06,  3.60532e-06,  7.90685e-06,  1.70496e-05,  3.6e-05,  7.40844e-05,  0.000147501,  0.000280969,  0.000503099,  0.000819656,  0.0011323,  0.00106243,  -5.50966e-05,  -0.000450673,  -0.00015261,  0.000600528,  0.00212082,  0.00200679,  0.00189494,  0.00585191,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.53373e-10,  3.36872e-10,  8.04128e-10,  1.93343e-09,  4.58001e-09,  1.07985e-08,  2.53154e-08,  5.89696e-08,  1.3683e-07,  3.16471e-07,  7.20258e-07,  1.62106e-06,  3.60604e-06,  7.90891e-06,  1.70487e-05,  3.60014e-05,  7.409e-05,  0.000147498,  0.000281011,  0.00050319,  0.000819698,  0.00113225,  0.0010624,  -5.51002e-05,  -0.00045067,  -0.000152607,  0.000600529,  0.00212083,  0.00200681,  0.00189496,  0.00585191,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 6.36642e-11,  1.40438e-10,  3.36498e-10,  8.12454e-10,  1.93338e-09,  4.58143e-09,  1.08006e-08,  2.53158e-08,  5.91533e-08,  1.37896e-07,  3.16674e-07,  7.20149e-07,  1.6214e-06,  3.60698e-06,  7.9085e-06,  1.70494e-05,  3.60041e-05,  7.40887e-05,  0.00014752,  0.00028106,  0.000503213,  0.00081967,  0.00113225,  0.00106241,  -5.51103e-05,  -0.000450688,  -0.000152612,  0.000600543,  0.00212086,  0.00200684,  0.00189496,  0.0058519,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 2.63436e-11,  5.83433e-11,  1.40279e-10,  3.39991e-10,  8.12434e-10,  1.934e-09,  4.58233e-09,  1.08008e-08,  2.53948e-08,  5.96133e-08,  1.37984e-07,  3.16627e-07,  7.20309e-07,  1.62183e-06,  3.6068e-06,  7.90884e-06,  1.70507e-05,  3.60035e-05,  7.41e-05,  0.000147545,  0.000281072,  0.000503199,  0.000819675,  0.00113226,  0.0010624,  -5.51202e-05,  -0.000450691,  -0.000152606,  0.000600556,  0.00212087,  0.00200684,  0.00189496,  0.00585189,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.08691e-11,  2.41604e-11,  5.82761e-11,  1.41739e-10,  3.39983e-10,  8.12704e-10,  1.93438e-09,  4.58241e-09,  1.08345e-08,  2.55918e-08,  5.9651e-08,  1.37964e-07,  3.167e-07,  7.20497e-07,  1.62175e-06,  3.60696e-06,  7.90944e-06,  1.70504e-05,  3.60091e-05,  7.41124e-05,  0.000147551,  0.000281066,  0.000503204,  0.00081968,  0.00113225,  0.0010624,  -5.51185e-05,  -0.000450696,  -0.000152615,  0.00060055,  0.00212087,  0.00200684,  0.00189496,  0.00585189,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 4.47238e-12,  9.97538e-12,  2.41321e-11,  5.8884e-11,  1.41735e-10,  3.40099e-10,  8.12864e-10,  1.93441e-09,  4.59674e-09,  1.09184e-08,  2.56079e-08,  5.96424e-08,  1.37997e-07,  3.16783e-07,  7.20462e-07,  1.62182e-06,  3.60723e-06,  7.90932e-06,  1.70531e-05,  3.6015e-05,  7.41153e-05,  0.000147548,  0.000281069,  0.000503207,  0.000819677,  0.00113225,  0.0010624,  -5.51266e-05,  -0.00045071,  -0.000152626,  0.00060055,  0.00212088,  0.00200685,  0.00189496,  0.00585189,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.83567e-12,  4.10734e-12,  9.96354e-12,  2.43844e-11,  5.88826e-11,  1.41785e-10,  3.40166e-10,  8.12877e-10,  1.94047e-09,  4.63226e-09,  1.09252e-08,  2.56043e-08,  5.96571e-08,  1.38033e-07,  3.16768e-07,  7.20495e-07,  1.62194e-06,  3.60718e-06,  7.91054e-06,  1.70559e-05,  3.60164e-05,  7.41139e-05,  0.00014755,  0.000281071,  0.000503206,  0.000819681,  0.00113226,  0.0010624,  -5.51307e-05,  -0.000450714,  -0.000152626,  0.000600553,  0.00212089,  0.00200685,  0.00189496,  0.00585189,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 7.51682e-13,  1.68687e-12,  4.1024e-12,  1.00679e-11,  2.43838e-11,  5.89037e-11,  1.41813e-10,  3.40171e-10,  8.15425e-10,  1.95544e-09,  4.63514e-09,  1.09237e-08,  2.56107e-08,  5.96727e-08,  1.38027e-07,  3.16783e-07,  7.20549e-07,  1.62192e-06,  3.60773e-06,  7.91182e-06,  1.70565e-05,  3.60157e-05,  7.41149e-05,  0.000147551,  0.00028107,  0.000503208,  0.000819682,  0.00113225,  0.0010624,  -5.51244e-05,  -0.000450714,  -0.00015263,  0.00060055,  0.00212089,  0.00200685,  0.00189496,  0.00585189,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 3.0713e-13,  6.91143e-13,  1.68482e-12,  4.14544e-12,  1.00676e-11,  2.43927e-11,  5.89153e-11,  1.41815e-10,  3.41239e-10,  8.21706e-10,  1.95665e-09,  4.63449e-09,  1.09265e-08,  2.56174e-08,  5.96699e-08,  1.38033e-07,  3.16806e-07,  7.2054e-07,  1.62217e-06,  3.60831e-06,  7.91211e-06,  1.70562e-05,  3.60162e-05,  7.41153e-05,  0.000147551,  0.000281071,  0.000503209,  0.000819681,  0.00113226,  0.00106241,  -5.51244e-05,  -0.000450721,  -0.000152636,  0.00060055,  0.00212089,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.25234e-13,  2.82545e-13,  6.90293e-13,  1.70252e-12,  4.14534e-12,  1.00714e-11,  2.43975e-11,  5.89161e-11,  1.42261e-10,  3.43864e-10,  8.22211e-10,  1.95638e-09,  4.63571e-09,  1.09293e-08,  2.56162e-08,  5.96727e-08,  1.38043e-07,  3.16802e-07,  7.20651e-07,  1.62243e-06,  3.60844e-06,  7.91199e-06,  1.70564e-05,  3.60165e-05,  7.41152e-05,  0.000147551,  0.000281072,  0.000503209,  0.000819686,  0.00113227,  0.00106241,  -5.51302e-05,  -0.000450726,  -0.000152637,  0.000600553,  0.00212089,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 5.09663e-14,  1.15266e-13,  2.82194e-13,  6.97557e-13,  1.70248e-12,  4.1469e-12,  1.00734e-11,  2.43979e-11,  5.91013e-11,  1.43353e-10,  3.44074e-10,  8.22099e-10,  1.9569e-09,  4.63692e-09,  1.09288e-08,  2.56174e-08,  5.96771e-08,  1.38042e-07,  3.16852e-07,  7.20766e-07,  1.62249e-06,  3.60839e-06,  7.9121e-06,  1.70566e-05,  3.60164e-05,  7.41155e-05,  0.000147552,  0.000281072,  0.000503212,  0.000819691,  0.00113227,  0.00106241,  -5.51324e-05,  -0.000450727,  -0.000152636,  0.000600555,  0.00212089,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 2.07042e-14,  4.69318e-14,  1.15122e-13,  2.85168e-13,  6.9754e-13,  1.70313e-12,  4.14772e-12,  1.00735e-11,  2.44746e-11,  5.95548e-11,  1.43441e-10,  3.44028e-10,  8.22322e-10,  1.95741e-09,  4.63671e-09,  1.09294e-08,  2.56194e-08,  5.96764e-08,  1.38063e-07,  3.16902e-07,  7.20791e-07,  1.62246e-06,  3.60844e-06,  7.91215e-06,  1.70565e-05,  3.60166e-05,  7.41157e-05,  0.000147552,  0.000281073,  0.000503214,  0.000819691,  0.00113227,  0.00106241,  -5.51323e-05,  -0.000450727,  -0.000152636,  0.000600554,  0.00212089,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 8.39641e-15,  1.90737e-14,  4.68725e-14,  1.16336e-13,  2.85161e-13,  6.97812e-13,  1.70347e-12,  4.14778e-12,  1.01052e-11,  2.46622e-11,  5.9591e-11,  1.43422e-10,  3.44122e-10,  8.22537e-10,  1.95732e-09,  4.63694e-09,  1.09302e-08,  2.56191e-08,  5.96857e-08,  1.38085e-07,  3.16912e-07,  7.20781e-07,  1.62249e-06,  3.60846e-06,  7.91214e-06,  1.70566e-05,  3.60166e-05,  7.41156e-05,  0.000147553,  0.000281075,  0.000503214,  0.00081969,  0.00113227,  0.00106241,  -5.51331e-05,  -0.000450728,  -0.000152636,  0.000600555,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 3.3996e-15,  7.73835e-15,  1.90493e-14,  4.73676e-14,  1.16334e-13,  2.85273e-13,  6.97949e-13,  1.70349e-12,  4.16084e-12,  1.01826e-11,  2.46771e-11,  5.9583e-11,  1.43461e-10,  3.44212e-10,  8.225e-10,  1.95742e-09,  4.63728e-09,  1.093e-08,  2.56231e-08,  5.96951e-08,  1.38089e-07,  3.16908e-07,  7.20792e-07,  1.6225e-06,  3.60846e-06,  7.91218e-06,  1.70566e-05,  3.60166e-05,  7.41161e-05,  0.000147553,  0.000281075,  0.000503214,  0.000819691,  0.00113227,  0.00106241,  -5.51333e-05,  -0.000450728,  -0.000152636,  0.000600555,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.37436e-15,  3.13439e-15,  7.72841e-15,  1.92508e-14,  4.73665e-14,  1.1638e-13,  2.85329e-13,  6.97959e-13,  1.70886e-12,  4.19267e-12,  1.01887e-11,  2.46739e-11,  5.95998e-11,  1.43499e-10,  3.44197e-10,  8.2254e-10,  1.95756e-09,  4.63723e-09,  1.09318e-08,  2.56271e-08,  5.96971e-08,  1.38088e-07,  3.16913e-07,  7.20796e-07,  1.62249e-06,  3.60848e-06,  7.91219e-06,  1.70566e-05,  3.60168e-05,  7.41165e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.51332e-05,  -0.000450728,  -0.000152637,  0.000600555,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 5.54815e-16,  1.26761e-15,  3.13033e-15,  7.81022e-15,  1.92503e-14,  4.73856e-14,  1.16403e-13,  2.85334e-13,  7.0016e-13,  1.72192e-12,  4.1952e-12,  1.01874e-11,  2.46809e-11,  5.96154e-11,  1.43492e-10,  3.44214e-10,  8.22601e-10,  1.95754e-09,  4.63795e-09,  1.09335e-08,  2.56279e-08,  5.96964e-08,  1.3809e-07,  3.16915e-07,  7.20795e-07,  1.6225e-06,  3.60848e-06,  7.91219e-06,  1.70567e-05,  3.6017e-05,  7.41165e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.51336e-05,  -0.000450729,  -0.000152637,  0.000600555,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 2.23666e-16,  5.119e-16,  1.26596e-15,  3.1635e-15,  7.81004e-15,  1.92582e-14,  4.73949e-14,  1.16405e-13,  2.86233e-13,  7.05506e-13,  1.72296e-12,  4.19465e-12,  1.01903e-11,  2.46873e-11,  5.96127e-11,  1.435e-10,  3.44239e-10,  8.22593e-10,  1.95785e-09,  4.63867e-09,  1.09338e-08,  2.56276e-08,  5.96973e-08,  1.38091e-07,  3.16915e-07,  7.20799e-07,  1.62251e-06,  3.60848e-06,  7.91224e-06,  1.70568e-05,  3.6017e-05,  7.41164e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.51338e-05,  -0.000450729,  -0.000152637,  0.000600555,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 9.00509e-17,  2.06434e-16,  5.11229e-16,  1.27939e-15,  3.16343e-15,  7.81325e-15,  1.9262e-14,  4.73956e-14,  1.16772e-13,  2.88418e-13,  7.05929e-13,  1.72273e-12,  4.19586e-12,  1.0193e-11,  2.46862e-11,  5.96157e-11,  1.4351e-10,  3.44236e-10,  8.22721e-10,  1.95815e-09,  4.63883e-09,  1.09337e-08,  2.5628e-08,  5.96977e-08,  1.38091e-07,  3.16916e-07,  7.208e-07,  1.62251e-06,  3.6085e-06,  7.91228e-06,  1.70568e-05,  3.6017e-05,  7.41165e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.51336e-05,  -0.000450729,  -0.000152637,  0.000600555,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 3.62109e-17,  8.31392e-17,  2.06162e-16,  5.16656e-16,  1.27936e-15,  3.16474e-15,  7.81479e-15,  1.92622e-14,  4.75452e-14,  1.17662e-13,  2.8859e-13,  7.05838e-13,  1.72323e-12,  4.19696e-12,  1.01925e-11,  2.46875e-11,  5.96201e-11,  1.43509e-10,  3.44289e-10,  8.22848e-10,  1.95822e-09,  4.63877e-09,  1.09339e-08,  2.56282e-08,  5.96976e-08,  1.38091e-07,  3.16917e-07,  7.208e-07,  1.62252e-06,  3.60852e-06,  7.91228e-06,  1.70568e-05,  3.6017e-05,  7.41165e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.51337e-05,  -0.000450729,  -0.000152637,  0.000600555,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.45439e-17,  3.34416e-17,  8.30291e-17,  2.08352e-16,  5.16643e-16,  1.27989e-15,  3.16536e-15,  7.8149e-15,  1.93231e-14,  4.79075e-14,  1.17732e-13,  2.88553e-13,  7.06044e-13,  1.72368e-12,  4.19677e-12,  1.0193e-11,  2.46893e-11,  5.96195e-11,  1.43531e-10,  3.44342e-10,  8.22875e-10,  1.95819e-09,  4.63885e-09,  1.09339e-08,  2.56281e-08,  5.96979e-08,  1.38092e-07,  3.16917e-07,  7.20804e-07,  1.62252e-06,  3.60852e-06,  7.91228e-06,  1.70568e-05,  3.6017e-05,  7.41165e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.51339e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 5.83489e-18,  1.34354e-17,  3.33971e-17,  8.39118e-17,  2.08347e-16,  5.16861e-16,  1.28015e-15,  3.16541e-15,  7.83959e-15,  1.94702e-14,  4.7936e-14,  1.17717e-13,  2.88638e-13,  7.06229e-13,  1.72361e-12,  4.19698e-12,  1.01938e-11,  2.4689e-11,  5.96288e-11,  1.43553e-10,  3.44354e-10,  8.22866e-10,  1.95823e-09,  4.63888e-09,  1.09339e-08,  2.56283e-08,  5.9698e-08,  1.38092e-07,  3.16919e-07,  7.20808e-07,  1.62252e-06,  3.60852e-06,  7.91228e-06,  1.70568e-05,  3.6017e-05,  7.41165e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.51339e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 2.33841e-18,  5.39165e-18,  1.34174e-17,  3.37524e-17,  8.39098e-17,  2.08436e-16,  5.16963e-16,  1.28016e-15,  3.17541e-15,  7.89926e-15,  1.94818e-14,  4.79299e-14,  1.17752e-13,  2.88713e-13,  7.06198e-13,  1.72369e-12,  4.19729e-12,  1.01937e-11,  2.46929e-11,  5.9638e-11,  1.43558e-10,  3.4435e-10,  8.22879e-10,  1.95824e-09,  4.63887e-09,  1.0934e-08,  2.56283e-08,  5.9698e-08,  1.38092e-07,  3.1692e-07,  7.20808e-07,  1.62252e-06,  3.60852e-06,  7.91228e-06,  1.70568e-05,  3.6017e-05,  7.41165e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.51339e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 9.36193e-19,  2.16134e-18,  5.38441e-18,  1.35603e-17,  3.37516e-17,  8.39457e-17,  2.08477e-16,  5.16971e-16,  1.28421e-15,  3.19957e-15,  7.90394e-15,  1.94793e-14,  4.79442e-14,  1.17783e-13,  2.88701e-13,  7.06234e-13,  1.72382e-12,  4.19725e-12,  1.01953e-11,  2.46967e-11,  5.96399e-11,  1.43556e-10,  3.44355e-10,  8.22884e-10,  1.95823e-09,  4.6389e-09,  1.0934e-08,  2.56283e-08,  5.96983e-08,  1.38093e-07,  3.1692e-07,  7.20808e-07,  1.62252e-06,  3.60852e-06,  7.91228e-06,  1.70568e-05,  3.6017e-05,  7.41165e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.51339e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 3.74442e-19,  8.65515e-19,  2.15842e-18,  5.44177e-18,  1.356e-17,  3.37661e-17,  8.39622e-17,  2.0848e-16,  5.18606e-16,  1.29397e-15,  3.20146e-15,  7.90294e-15,  1.94852e-14,  4.79567e-14,  1.17778e-13,  2.88715e-13,  7.06286e-13,  1.72381e-12,  4.19791e-12,  1.01969e-11,  2.46975e-11,  5.96393e-11,  1.43559e-10,  3.44358e-10,  8.22883e-10,  1.95825e-09,  4.6389e-09,  1.0934e-08,  2.56285e-08,  5.96986e-08,  1.38093e-07,  3.1692e-07,  7.20808e-07,  1.62252e-06,  3.60852e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41165e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.51339e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.49623e-19,  3.46255e-19,  8.64342e-19,  2.18143e-18,  5.44164e-18,  1.35659e-17,  3.37728e-17,  8.39635e-17,  2.09139e-16,  5.22546e-16,  1.29474e-15,  3.20106e-15,  7.90532e-15,  1.94902e-14,  4.79546e-14,  1.17784e-13,  2.88737e-13,  7.06279e-13,  1.72407e-12,  4.19855e-12,  1.01972e-11,  2.46972e-11,  5.96402e-11,  1.4356e-10,  3.44357e-10,  8.22888e-10,  1.95825e-09,  4.6389e-09,  1.09341e-08,  2.56286e-08,  5.96986e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62252e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.51339e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 5.9734e-20,  1.38391e-19,  3.45785e-19,  8.73562e-19,  2.18138e-18,  5.44402e-18,  1.35685e-17,  3.37733e-17,  8.42291e-17,  2.10728e-16,  5.22855e-16,  1.29458e-15,  3.20203e-15,  7.90739e-15,  1.94894e-14,  4.79571e-14,  1.17793e-13,  2.88734e-13,  7.0639e-13,  1.72434e-12,  4.19869e-12,  1.01971e-11,  2.46976e-11,  5.96406e-11,  1.43559e-10,  3.44359e-10,  8.22889e-10,  1.95825e-09,  4.63893e-09,  1.09341e-08,  2.56286e-08,  5.96986e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41165e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 2.38271e-20,  5.52619e-20,  1.38202e-19,  3.49475e-19,  8.73541e-19,  2.18234e-18,  5.44509e-18,  1.35687e-17,  3.38802e-17,  8.48686e-17,  2.10852e-16,  5.22789e-16,  1.29497e-15,  3.20286e-15,  7.90704e-15,  1.94904e-14,  4.79606e-14,  1.17792e-13,  2.88779e-13,  7.06498e-13,  1.72439e-12,  4.19864e-12,  1.01972e-11,  2.46978e-11,  5.96405e-11,  1.4356e-10,  3.4436e-10,  8.22889e-10,  1.95826e-09,  4.63895e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41165e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 9.49648e-21,  2.20478e-20,  5.51862e-20,  1.39678e-19,  3.49467e-19,  8.73926e-19,  2.18277e-18,  5.44517e-18,  1.36117e-17,  3.41373e-17,  8.49185e-17,  2.10826e-16,  5.22948e-16,  1.29531e-15,  3.20272e-15,  7.90745e-15,  1.94918e-14,  4.79602e-14,  1.1781e-13,  2.88823e-13,  7.0652e-13,  1.72438e-12,  4.19871e-12,  1.01973e-11,  2.46977e-11,  5.96409e-11,  1.4356e-10,  3.4436e-10,  8.22894e-10,  1.95827e-09,  4.63895e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 3.78189e-21,  8.78909e-21,  2.20175e-20,  5.57758e-20,  1.39675e-19,  3.49622e-19,  8.74098e-19,  2.1828e-18,  5.46241e-18,  1.37149e-17,  3.41573e-17,  8.49079e-17,  2.1089e-16,  5.23085e-16,  1.29525e-15,  3.20289e-15,  7.90803e-15,  1.94917e-14,  4.79677e-14,  1.17828e-13,  2.88832e-13,  7.06513e-13,  1.7244e-12,  4.19874e-12,  1.01973e-11,  2.46979e-11,  5.96409e-11,  1.4356e-10,  3.44362e-10,  8.22898e-10,  1.95827e-09,  4.63895e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.50496e-21,  3.50085e-21,  8.77697e-21,  2.22529e-20,  5.57745e-20,  1.39737e-19,  3.4969e-19,  8.74111e-19,  2.18971e-18,  5.50383e-18,  1.3723e-17,  3.41531e-17,  8.4934e-17,  2.10945e-16,  5.23063e-16,  1.29532e-15,  3.20313e-15,  7.90796e-15,  1.94947e-14,  4.7975e-14,  1.17832e-13,  2.8883e-13,  7.06525e-13,  1.72441e-12,  4.19873e-12,  1.01974e-11,  2.46979e-11,  5.9641e-11,  1.43561e-10,  3.44363e-10,  8.22898e-10,  1.95827e-09,  4.63896e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 5.98442e-22,  1.39338e-21,  3.49601e-21,  8.87083e-21,  2.22523e-20,  5.57994e-20,  1.39764e-19,  3.49695e-19,  8.7688e-19,  2.20631e-18,  5.50705e-18,  1.37213e-17,  3.41636e-17,  8.49562e-17,  2.10936e-16,  5.2309e-16,  1.29541e-15,  3.2031e-15,  7.9092e-15,  1.94977e-14,  4.79765e-14,  1.17831e-13,  2.88834e-13,  7.06529e-13,  1.72441e-12,  4.19876e-12,  1.01974e-11,  2.46979e-11,  5.96413e-11,  1.43562e-10,  3.44363e-10,  8.22898e-10,  1.95827e-09,  4.63896e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 2.378e-22,  5.54171e-22,  1.39145e-21,  3.53341e-21,  8.87062e-21,  2.22623e-20,  5.58104e-20,  1.39766e-19,  3.50803e-19,  8.83524e-19,  2.2076e-18,  5.50637e-18,  1.37255e-17,  3.41725e-17,  8.49526e-17,  2.10947e-16,  5.23128e-16,  1.2954e-15,  3.2036e-15,  7.9104e-15,  1.94983e-14,  4.7976e-14,  1.17832e-13,  2.88836e-13,  7.06528e-13,  1.72442e-12,  4.19876e-12,  1.01974e-11,  2.46981e-11,  5.96416e-11,  1.43562e-10,  3.44363e-10,  8.22898e-10,  1.95827e-09,  4.63896e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 9.44293e-23,  2.20246e-22,  5.534e-22,  1.40634e-21,  3.53333e-21,  8.87462e-21,  2.22667e-20,  5.58112e-20,  1.40209e-19,  3.53461e-19,  8.84041e-19,  2.20733e-18,  5.50808e-18,  1.37291e-17,  3.41711e-17,  8.4957e-17,  2.10963e-16,  5.23124e-16,  1.29561e-15,  3.20409e-15,  7.91065e-15,  1.94981e-14,  4.79768e-14,  1.17833e-13,  2.88836e-13,  7.06532e-13,  1.72442e-12,  4.19876e-12,  1.01974e-11,  2.46982e-11,  5.96416e-11,  1.43562e-10,  3.44363e-10,  8.22898e-10,  1.95827e-09,  4.63896e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 3.74728e-23,  8.74729e-23,  2.19939e-22,  5.59326e-22,  1.40631e-21,  3.53493e-21,  8.87637e-21,  2.2267e-20,  5.59881e-20,  1.41271e-19,  3.53667e-19,  8.83932e-19,  2.20801e-18,  5.50952e-18,  1.37285e-17,  3.41728e-17,  8.49632e-17,  2.10961e-16,  5.23206e-16,  1.2958e-15,  3.20419e-15,  7.91057e-15,  1.94984e-14,  4.79771e-14,  1.17833e-13,  2.88837e-13,  7.06533e-13,  1.72443e-12,  4.19879e-12,  1.01975e-11,  2.46982e-11,  5.96416e-11,  1.43562e-10,  3.44364e-10,  8.22898e-10,  1.95827e-09,  4.63896e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.48611e-23,  3.47178e-23,  8.73506e-23,  2.22295e-22,  5.59312e-22,  1.40695e-21,  3.53563e-21,  8.8765e-21,  2.23376e-20,  5.64119e-20,  1.41353e-19,  3.53624e-19,  8.84207e-19,  2.20859e-18,  5.50928e-18,  1.37292e-17,  3.41754e-17,  8.49625e-17,  2.10994e-16,  5.23285e-16,  1.29584e-15,  3.20416e-15,  7.91071e-15,  1.94985e-14,  4.79771e-14,  1.17834e-13,  2.88838e-13,  7.06533e-13,  1.72444e-12,  4.19881e-12,  1.01975e-11,  2.46982e-11,  5.96416e-11,  1.43562e-10,  3.44364e-10,  8.22899e-10,  1.95827e-09,  4.63896e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 5.89006e-24,  1.37706e-23,  3.46691e-23,  8.82867e-23,  2.22289e-22,  5.59568e-22,  1.40722e-21,  3.53568e-21,  8.90464e-21,  2.25067e-20,  5.64448e-20,  1.41336e-19,  3.53734e-19,  8.84439e-19,  2.2085e-18,  5.50957e-18,  1.37302e-17,  3.41751e-17,  8.49758e-17,  2.11026e-16,  5.23301e-16,  1.29583e-15,  3.20421e-15,  7.91075e-15,  1.94985e-14,  4.79773e-14,  1.17834e-13,  2.88838e-13,  7.06537e-13,  1.72444e-12,  4.19881e-12,  1.01975e-11,  2.46982e-11,  5.96416e-11,  1.43562e-10,  3.44364e-10,  8.22899e-10,  1.95827e-09,  4.63896e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 2.33309e-24,  5.45866e-24,  1.37512e-23,  3.50408e-23,  8.82846e-23,  2.22391e-22,  5.59678e-22,  1.40724e-21,  3.54689e-21,  8.97201e-21,  2.25198e-20,  5.64379e-20,  1.4138e-19,  3.53827e-19,  8.84401e-19,  2.20861e-18,  5.50998e-18,  1.37301e-17,  3.41804e-17,  8.49887e-17,  2.11032e-16,  5.23296e-16,  1.29585e-15,  3.20423e-15,  7.91074e-15,  1.94986e-14,  4.79774e-14,  1.17834e-13,  2.8884e-13,  7.06541e-13,  1.72444e-12,  4.19881e-12,  1.01975e-11,  2.46982e-11,  5.96416e-11,  1.43562e-10,  3.44364e-10,  8.22899e-10,  1.95827e-09,  4.63896e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 9.23627e-25,  2.16252e-24,  5.45097e-24,  1.38987e-23,  3.504e-23,  8.83252e-23,  2.22435e-22,  5.59686e-22,  1.41171e-21,  3.57372e-21,  8.97723e-21,  2.2517e-20,  5.64556e-20,  1.41417e-19,  3.53812e-19,  8.84447e-19,  2.20877e-18,  5.50993e-18,  1.37323e-17,  3.41856e-17,  8.49913e-17,  2.1103e-16,  5.23305e-16,  1.29586e-15,  3.20422e-15,  7.91079e-15,  1.94987e-14,  4.79774e-14,  1.17835e-13,  2.88841e-13,  7.06541e-13,  1.72444e-12,  4.19881e-12,  1.01975e-11,  2.46982e-11,  5.96417e-11,  1.43562e-10,  3.44364e-10,  8.22899e-10,  1.95827e-09,  4.63896e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 3.65445e-25,  8.56219e-25,  2.15947e-24,  5.50945e-24,  1.38984e-23,  3.50561e-23,  8.83426e-23,  2.22438e-22,  5.61461e-22,  1.42238e-21,  3.5758e-21,  8.97614e-21,  2.25241e-20,  5.64704e-20,  1.41411e-19,  3.5383e-19,  8.84512e-19,  2.20876e-18,  5.51079e-18,  1.37343e-17,  3.41867e-17,  8.49905e-17,  2.11034e-16,  5.23308e-16,  1.29586e-15,  3.20424e-15,  7.9108e-15,  1.94987e-14,  4.79777e-14,  1.17835e-13,  2.88841e-13,  7.06541e-13,  1.72444e-12,  4.19881e-12,  1.01975e-11,  2.46982e-11,  5.96417e-11,  1.43562e-10,  3.44364e-10,  8.22899e-10,  1.95827e-09,  4.63896e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.44515e-25,  3.38819e-25,  8.55007e-25,  2.18264e-24,  5.50932e-24,  1.39048e-23,  3.5063e-23,  8.83438e-23,  2.23144e-22,  5.65706e-22,  1.42321e-21,  3.57536e-21,  8.97897e-21,  2.253e-20,  5.6468e-20,  1.41419e-19,  3.53856e-19,  8.84505e-19,  2.2091e-18,  5.51163e-18,  1.37348e-17,  3.41863e-17,  8.4992e-17,  2.11035e-16,  5.23308e-16,  1.29587e-15,  3.20425e-15,  7.9108e-15,  1.94988e-14,  4.79779e-14,  1.17835e-13,  2.88841e-13,  7.06541e-13,  1.72445e-12,  4.19881e-12,  1.01975e-11,  2.46982e-11,  5.96417e-11,  1.43562e-10,  3.44364e-10,  8.22899e-10,  1.95827e-09,  4.63896e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 5.71192e-26,  1.34003e-25,  3.38338e-25,  8.64186e-25,  2.18259e-24,  5.51187e-24,  1.39076e-23,  3.50635e-23,  8.86242e-23,  2.2483e-22,  5.66034e-22,  1.42303e-21,  3.57649e-21,  8.98132e-21,  2.25291e-20,  5.64709e-20,  1.41429e-19,  3.53853e-19,  8.84643e-19,  2.20944e-18,  5.5118e-18,  1.37346e-17,  3.41869e-17,  8.49925e-17,  2.11035e-16,  5.23311e-16,  1.29587e-15,  3.20425e-15,  7.91085e-15,  1.94989e-14,  4.79779e-14,  1.17835e-13,  2.88841e-13,  7.06541e-13,  1.72445e-12,  4.19881e-12,  1.01975e-11,  2.46982e-11,  5.96417e-11,  1.43562e-10,  3.44364e-10,  8.22899e-10,  1.95827e-09,  4.63896e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 2.25648e-26,  5.2971e-26,  1.33813e-25,  3.41971e-25,  8.64165e-25,  2.18361e-24,  5.51296e-24,  1.39078e-23,  3.51748e-23,  8.92938e-23,  2.24961e-22,  5.65965e-22,  1.42349e-21,  3.57742e-21,  8.98093e-21,  2.25302e-20,  5.64751e-20,  1.41428e-19,  3.53909e-19,  8.84777e-19,  2.2095e-18,  5.51175e-18,  1.37349e-17,  3.41871e-17,  8.49924e-17,  2.11036e-16,  5.23311e-16,  1.29587e-15,  3.20427e-15,  7.91089e-15,  1.94989e-14,  4.79779e-14,  1.17835e-13,  2.88841e-13,  7.06541e-13,  1.72445e-12,  4.19881e-12,  1.01975e-11,  2.46982e-11,  5.96417e-11,  1.43562e-10,  3.44364e-10,  8.22899e-10,  1.95827e-09,  4.63896e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 8.90988e-27,  2.09286e-26,  5.28956e-26,  1.3525e-25,  3.41963e-25,  8.64569e-25,  2.18404e-24,  5.51304e-24,  1.39519e-23,  3.54405e-23,  8.93456e-23,  2.24934e-22,  5.66145e-22,  1.42386e-21,  3.57727e-21,  8.98141e-21,  2.25319e-20,  5.64746e-20,  1.4145e-19,  3.53962e-19,  8.84804e-19,  2.20948e-18,  5.51184e-18,  1.3735e-17,  3.41871e-17,  8.49929e-17,  2.11036e-16,  5.23312e-16,  1.29588e-15,  3.20428e-15,  7.91089e-15,  1.94989e-14,  4.7978e-14,  1.17835e-13,  2.88841e-13,  7.06542e-13,  1.72445e-12,  4.19881e-12,  1.01975e-11,  2.46982e-11,  5.96417e-11,  1.43562e-10,  3.44364e-10,  8.22899e-10,  1.95827e-09,  4.63896e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  0,  }, 
+{ 3.51647e-27,  8.26478e-27,  2.08988e-26,  5.34639e-26,  1.35247e-25,  3.42123e-25,  8.64739e-25,  2.18407e-24,  5.53054e-24,  1.40573e-23,  3.5461e-23,  8.93347e-23,  2.25005e-22,  5.66293e-22,  1.4238e-21,  3.57746e-21,  8.98206e-21,  2.25317e-20,  5.64835e-20,  1.41471e-19,  3.53973e-19,  8.84796e-19,  2.20952e-18,  5.51187e-18,  1.37349e-17,  3.41873e-17,  8.4993e-17,  2.11037e-16,  5.23315e-16,  1.29588e-15,  3.20428e-15,  7.91089e-15,  1.94989e-14,  4.7978e-14,  1.17835e-13,  2.88841e-13,  7.06542e-13,  1.72445e-12,  4.19881e-12,  1.01975e-11,  2.46982e-11,  5.96417e-11,  1.43562e-10,  3.44364e-10,  8.22899e-10,  1.95827e-09,  4.63896e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  0,  }, 
+{ 1.38721e-27,  3.26224e-27,  8.25297e-27,  2.11234e-26,  5.34627e-26,  1.35311e-25,  3.42191e-25,  8.64751e-25,  2.191e-24,  5.5723e-24,  1.40654e-23,  3.54567e-23,  8.93632e-23,  2.25064e-22,  5.66269e-22,  1.42387e-21,  3.57772e-21,  8.98199e-21,  2.25352e-20,  5.6492e-20,  1.41476e-19,  3.5397e-19,  8.84811e-19,  2.20953e-18,  5.51187e-18,  1.3735e-17,  3.41873e-17,  8.4993e-17,  2.11038e-16,  5.23317e-16,  1.29588e-15,  3.20428e-15,  7.91089e-15,  1.94989e-14,  4.7978e-14,  1.17835e-13,  2.88841e-13,  7.06542e-13,  1.72445e-12,  4.19881e-12,  1.01975e-11,  2.46982e-11,  5.96417e-11,  1.43562e-10,  3.44364e-10,  8.22899e-10,  1.95827e-09,  4.63896e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  0,  }, 
+{ 5.46999e-28,  1.28706e-27,  3.25757e-27,  8.34169e-27,  2.11229e-26,  5.34878e-26,  1.35337e-25,  3.42196e-25,  8.67497e-25,  2.20754e-24,  5.57552e-24,  1.40637e-23,  3.54681e-23,  8.93866e-23,  2.25054e-22,  5.66299e-22,  1.42398e-21,  3.5777e-21,  8.9834e-21,  2.25386e-20,  5.64938e-20,  1.41475e-19,  3.53976e-19,  8.84817e-19,  2.20953e-18,  5.5119e-18,  1.3735e-17,  3.41873e-17,  8.49935e-17,  2.11039e-16,  5.23317e-16,  1.29588e-15,  3.20429e-15,  7.91089e-15,  1.94989e-14,  4.7978e-14,  1.17835e-13,  2.88841e-13,  7.06542e-13,  1.72445e-12,  4.19881e-12,  1.01975e-11,  2.46982e-11,  5.96417e-11,  1.43562e-10,  3.44364e-10,  8.22899e-10,  1.95827e-09,  4.63896e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  0,  }, 
+{ 2.15597e-28,  5.07563e-28,  1.28522e-27,  3.2926e-27,  8.3415e-27,  2.11329e-26,  5.34983e-26,  1.35339e-25,  3.43282e-25,  8.74044e-25,  2.20882e-24,  5.57485e-24,  1.40682e-23,  3.54773e-23,  8.93828e-23,  2.25066e-22,  5.6634e-22,  1.42397e-21,  3.57826e-21,  8.98475e-21,  2.25393e-20,  5.64932e-20,  1.41477e-19,  3.53978e-19,  8.84815e-19,  2.20954e-18,  5.51191e-18,  1.3735e-17,  3.41875e-17,  8.49939e-17,  2.11039e-16,  5.23317e-16,  1.29588e-15,  3.20429e-15,  7.91089e-15,  1.94989e-14,  4.7978e-14,  1.17835e-13,  2.88841e-13,  7.06542e-13,  1.72445e-12,  4.19881e-12,  1.01975e-11,  2.46982e-11,  5.96417e-11,  1.43562e-10,  3.44364e-10,  8.22899e-10,  1.95827e-09,  4.63896e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  0,  }, 
+{ 8.49412e-29,  2.00074e-28,  5.06834e-28,  1.29904e-27,  3.29252e-27,  8.34544e-27,  2.1137e-26,  5.34991e-26,  1.35769e-25,  3.45873e-25,  8.7455e-25,  2.20855e-24,  5.57663e-24,  1.40719e-23,  3.54758e-23,  8.93875e-23,  2.25083e-22,  5.66336e-22,  1.42419e-21,  3.57879e-21,  8.98503e-21,  2.25391e-20,  5.64942e-20,  1.41478e-19,  3.53977e-19,  8.84821e-19,  2.20955e-18,  5.51191e-18,  1.37351e-17,  3.41877e-17,  8.49939e-17,  2.11039e-16,  5.23318e-16,  1.29588e-15,  3.20429e-15,  7.9109e-15,  1.94989e-14,  4.7978e-14,  1.17835e-13,  2.88841e-13,  7.06542e-13,  1.72445e-12,  4.19881e-12,  1.01975e-11,  2.46982e-11,  5.96417e-11,  1.43562e-10,  3.44364e-10,  8.22899e-10,  1.95827e-09,  4.63896e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  0,  }, 
+{ 3.34516e-29,  7.88334e-29,  1.99787e-28,  5.12287e-28,  1.29901e-27,  3.29408e-27,  8.34708e-27,  2.11373e-26,  5.36691e-26,  1.36793e-25,  3.46072e-25,  8.74444e-25,  2.20926e-24,  5.57809e-24,  1.40713e-23,  3.54777e-23,  8.9394e-23,  2.25081e-22,  5.66425e-22,  1.4244e-21,  3.57891e-21,  8.98495e-21,  2.25395e-20,  5.64945e-20,  1.41478e-19,  3.5398e-19,  8.84822e-19,  2.20955e-18,  5.51194e-18,  1.37352e-17,  3.41877e-17,  8.49939e-17,  2.11039e-16,  5.23318e-16,  1.29588e-15,  3.20429e-15,  7.9109e-15,  1.94989e-14,  4.7978e-14,  1.17835e-13,  2.88841e-13,  7.06542e-13,  1.72445e-12,  4.19881e-12,  1.01975e-11,  2.46982e-11,  5.96417e-11,  1.43562e-10,  3.44364e-10,  8.22899e-10,  1.95827e-09,  4.63896e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  0,  }, 
+{ 1.31687e-29,  3.10493e-29,  7.87198e-29,  2.01937e-28,  5.12275e-28,  1.29963e-27,  3.29473e-27,  8.3472e-27,  2.12045e-26,  5.40739e-26,  1.36872e-25,  3.46031e-25,  8.74725e-25,  2.20984e-24,  5.57786e-24,  1.4072e-23,  3.54803e-23,  8.93934e-23,  2.25116e-22,  5.6651e-22,  1.42445e-21,  3.57887e-21,  8.98511e-21,  2.25397e-20,  5.64945e-20,  1.41478e-19,  3.5398e-19,  8.84822e-19,  2.20956e-18,  5.51197e-18,  1.37352e-17,  3.41877e-17,  8.4994e-17,  2.11039e-16,  5.23318e-16,  1.29588e-15,  3.20429e-15,  7.9109e-15,  1.94989e-14,  4.7978e-14,  1.17835e-13,  2.88841e-13,  7.06542e-13,  1.72445e-12,  4.19881e-12,  1.01975e-11,  2.46982e-11,  5.96417e-11,  1.43562e-10,  3.44364e-10,  8.22899e-10,  1.95827e-09,  4.63896e-09,  1.09341e-08,  2.56286e-08,  5.96987e-08,  1.38093e-07,  3.16921e-07,  7.20809e-07,  1.62253e-06,  3.60853e-06,  7.91229e-06,  1.70568e-05,  3.60171e-05,  7.41166e-05,  0.000147553,  0.000281075,  0.000503215,  0.000819691,  0.00113227,  0.00106241,  -5.5134e-05,  -0.000450729,  -0.000152637,  0.000600556,  0.0021209,  0.00200686,  0.00189496,  0.00585188,  0.0111866,  }
+};
+
+
+  for (int iii=0; iii<80; iii++){
+    for (int jjj=0; jjj<80; jjj++){
+      MatrixParallel[iii][jjj]= LMatrixParallel[iii][jjj];
+      MatrixSerial[iii][jjj]= LMatrixSerial[iii][jjj];
+      
+    }
+  }
+  
+}
+double TrgEclFAM::GetTCLatency(int TCId){
+
+  //----------------------------------------------------------
+  // TC latency = Flight time of slowest TC - Other TCs
+  // Flight time was calculated supposing particle is gamma.   
+  //----------------------------------------------------------
+
+  
+ double TCLatency[576] =   { 0.715606, 0.417428, 4.32053e-07, 0.0101334, 0.41738, 0.715606, 0.417427, 2.63428e-06, 0.0101316, 0.417379, 0.715606, 0.417428, 0, 0.0101295, 0.41738, 0.715606, 0.417427, 5.84426e-06, 0.0101284, 0.41738, 0.715606, 0.417428, 4.32053e-07, 0.0101334, 0.41738, 0.715606, 0.417427, 2.63428e-06, 0.0101316, 0.417379, 0.715606, 0.417428, 0, 0.0101295, 0.41738, 0.715606, 0.417427, 5.84426e-06, 0.0101284, 0.41738, 0.715606, 0.417428, 4.32053e-07, 0.0101334, 0.41738, 0.715606, 0.417427, 2.63428e-06, 0.0101316, 0.417379, 0.715606, 0.417428, 0, 0.0101295, 0.41738, 0.715606, 0.417427, 5.84426e-06, 0.0101284, 0.41738, 0.715606, 0.417428, 4.32053e-07, 0.0101334, 0.41738, 0.715606, 0.417427, 2.63428e-06, 0.0101316, 0.417379, 0.715606, 0.417428, 0, 0.0101295, 0.41738, 0.715606, 0.417427, 5.84426e-06, 0.0101284, 0.41738, 0.0919657, 1.0329, 1.78857, 2.38025, 2.82433, 3.13196, 3.30927, 3.34687, 3.23671, 2.99469, 2.61992, 2.24861, 0.0919505, 1.03291, 1.78857, 2.38026, 2.82432, 3.13194, 3.30926, 3.34688, 3.23672, 2.99469, 2.61991, 2.24862, 0.0919648, 1.03289, 1.78857, 2.38026, 2.82433, 3.13195, 3.30928, 3.34687, 3.23672, 2.9947, 2.61993, 2.2486, 0.0919576, 1.0329, 1.78859, 2.38026, 2.82433, 3.13197, 3.30926, 3.34688, 3.23671, 2.99469, 2.61991, 2.2486, 0.0919594, 1.0329, 1.78858, 2.38025, 2.82433, 3.13195, 3.30927, 3.34688, 3.23671, 2.9947, 2.61992, 2.24861, 0.0919549, 1.0329, 1.78859, 2.38024, 2.82433, 3.13196, 3.30927, 3.34687, 3.23671, 2.9947, 2.61992, 2.24861, 0.0919564, 1.03289, 1.78858, 2.38024, 2.82433, 3.13197, 3.30927, 3.34688, 3.2367, 2.99469, 2.61991, 2.24861, 0.0919696, 1.0329, 1.78859, 2.38026, 2.82434, 3.13195, 3.30926, 3.34687, 3.23671, 2.99469, 2.61991, 2.24862, 0.0919613, 1.0329, 1.7886, 2.38024, 2.82432, 3.13197, 3.30925, 3.34686, 3.23672, 2.99471, 2.61992, 2.24861, 0.0919657, 1.0329, 1.78857, 2.38025, 2.82433, 3.13196, 3.30927, 3.34687, 3.23671, 2.99469, 2.61992, 2.24861, 0.0919505, 1.03291, 1.78857, 2.38026, 2.82432, 3.13194, 3.30926, 3.34688, 3.23672, 2.99469, 2.61991, 2.24862, 0.0919648, 1.03289, 1.78857, 2.38026, 2.82433, 3.13195, 3.30928, 3.34687, 3.23672, 2.9947, 2.61993, 2.2486, 0.0919576, 1.0329, 1.78859, 2.38026, 2.82433, 3.13197, 3.30926, 3.34688, 3.23671, 2.99469, 2.61991, 2.2486, 0.0919594, 1.0329, 1.78858, 2.38025, 2.82433, 3.13195, 3.30927, 3.34688, 3.23671, 2.9947, 2.61992, 2.24861, 0.0919549, 1.0329, 1.78859, 2.38024, 2.82433, 3.13196, 3.30927, 3.34687, 3.23671, 2.9947, 2.61992, 2.24861, 0.0919564, 1.03289, 1.78858, 2.38024, 2.82433, 3.13197, 3.30927, 3.34688, 3.2367, 2.99469, 2.61991, 2.24861, 0.0919696, 1.0329, 1.78859, 2.38026, 2.82434, 3.13195, 3.30926, 3.34687, 3.23671, 2.99469, 2.61991, 2.24862, 0.0919613, 1.0329, 1.7886, 2.38024, 2.82432, 3.13197, 3.30925, 3.34686, 3.23672, 2.99471, 2.61992, 2.24861, 0.0919657, 1.0329, 1.78857, 2.38025, 2.82433, 3.13196, 3.30927, 3.34687, 3.23671, 2.99469, 2.61992, 2.24861, 0.0919505, 1.03291, 1.78857, 2.38026, 2.82432, 3.13194, 3.30926, 3.34688, 3.23672, 2.99469, 2.61991, 2.24862, 0.0919648, 1.03289, 1.78857, 2.38026, 2.82433, 3.13195, 3.30928, 3.34687, 3.23672, 2.9947, 2.61993, 2.2486, 0.0919576, 1.0329, 1.78859, 2.38026, 2.82433, 3.13197, 3.30926, 3.34688, 3.23671, 2.99469, 2.61991, 2.2486, 0.0919594, 1.0329, 1.78858, 2.38025, 2.82433, 3.13195, 3.30927, 3.34688, 3.23671, 2.9947, 2.61992, 2.24861, 0.0919549, 1.0329, 1.78859, 2.38024, 2.82433, 3.13196, 3.30927, 3.34687, 3.23671, 2.9947, 2.61992, 2.24861, 0.0919564, 1.03289, 1.78858, 2.38024, 2.82433, 3.13197, 3.30927, 3.34688, 3.2367, 2.99469, 2.61991, 2.24861, 0.0919696, 1.0329, 1.78859, 2.38026, 2.82434, 3.13195, 3.30926, 3.34687, 3.23671, 2.99469, 2.61991, 2.24862, 0.0919613, 1.0329, 1.7886, 2.38024, 2.82432, 3.13197, 3.30925, 3.34686, 3.23672, 2.99471, 2.61992, 2.24861, 0.0919657, 1.0329, 1.78857, 2.38025, 2.82433, 3.13196, 3.30927, 3.34687, 3.23671, 2.99469, 2.61992, 2.24861, 0.0919505, 1.03291, 1.78857, 2.38026, 2.82432, 3.13194, 3.30926, 3.34688, 3.23672, 2.99469, 2.61991, 2.24862, 0.0919648, 1.03289, 1.78857, 2.38026, 2.82433, 3.13195, 3.30928, 3.34687, 3.23672, 2.9947, 2.61993, 2.2486, 0.0919576, 1.0329, 1.78859, 2.38026, 2.82433, 3.13197, 3.30926, 3.34688, 3.23671, 2.99469, 2.61991, 2.2486, 0.0919594, 1.0329, 1.78858, 2.38025, 2.82433, 3.13195, 3.30927, 3.34688, 3.23671, 2.9947, 2.61992, 2.24861, 0.0919549, 1.0329, 1.78859, 2.38024, 2.82433, 3.13196, 3.30927, 3.34687, 3.23671, 2.9947, 2.61992, 2.24861, 0.0919564, 1.03289, 1.78858, 2.38024, 2.82433, 3.13197, 3.30927, 3.34688, 3.2367, 2.99469, 2.61991, 2.24861, 0.0919696, 1.0329, 1.78859, 2.38026, 2.82434, 3.13195, 3.30926, 3.34687, 3.23671, 2.99469, 2.61991, 2.24862, 0.0919613, 1.0329, 1.7886, 2.38024, 2.82432, 3.13197, 3.30925, 3.34686, 3.23672, 2.99471, 2.61992, 2.24861, 3.37164, 2.58506, 2.56517, 3.37178, 3.37164, 2.58506, 2.56517, 3.37178, 3.37164, 2.58505, 2.56516, 3.37178, 3.37164, 2.58505, 2.56517, 3.37178, 3.37164, 2.58506, 2.56517, 3.37178, 3.37164, 2.58506, 2.56517, 3.37178, 3.37164, 2.58505, 2.56516, 3.37178, 3.37164, 2.58505, 2.56517, 3.37178, 3.37164, 2.58506, 2.56517, 3.37178, 3.37164, 2.58506, 2.56517, 3.37178, 3.37164, 2.58505, 2.56516, 3.37178, 3.37164, 2.58505, 2.56517, 3.37178, 3.37164, 2.58506, 2.56517, 3.37178, 3.37164, 2.58506, 2.56517, 3.37178, 3.37164, 2.58505, 2.56516, 3.37178, 3.37164, 2.58505, 2.56517, 3.37178};
+
+
+ return TCLatency[TCId -1];
 }
 
 //

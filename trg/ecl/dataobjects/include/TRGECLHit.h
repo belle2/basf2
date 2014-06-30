@@ -29,7 +29,7 @@ namespace Belle2 {
 
     //! The cell id of this hit.
     int m_cellId;
-    
+
     //! The # of output of TC.
     int m_noutput;
 

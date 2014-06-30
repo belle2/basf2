@@ -72,6 +72,13 @@ namespace Belle2 {
     { return m_layers;}
 
     /**
+     * Get number of the innermost layer with hits.
+     * @return Number of the innermost layer with hits.
+     */
+    inline int getInnermostLayer() const
+    { return m_innermostLayer;}
+
+    /**
      * Get global position of the particle hit.
      * @return Hit coordinates.
      */

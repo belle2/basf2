@@ -95,6 +95,24 @@ namespace Belle2 {
      */
     void putModules(const std::list<boost::shared_ptr<Module> >& mlist);
 
+    /**
+     * similar to addPath()/add_path(), this will execute path at the current position, but
+     * will run it once for each object in the given array 'foreach', and set the loop variable
+     * 'objectName' (a StoreObjPtr of same type as array) to the current object.
+     *
+       \code
+       #read: for each  $objName   in $arrayName   run over $path
+       path.for_each('MCParticle', 'MCParticles', subeventpath)
+       \endcode
+     *
+     * Changes to existing arrays / objects will be available to all modules after the for_each(),
+     * including those made to the loop variable (it will simply modify the i'th item in the array looped over.)
+     * Arrays / objects created inside the loop will however be limited to the validity of the loop variable. That is,
+     * creating a list of Particles matching the current MCParticle (loop object) will no longer exist after switching
+     * to the next MCParticle or exiting the loop.
+     */
+    void forEach(std::string objectName, std::string foreach, PathPtr path);
+
 
     //--------------------------------------------------
     //                   Python API

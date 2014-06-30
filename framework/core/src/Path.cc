@@ -14,6 +14,7 @@
 
 #include <framework/core/Path.h>
 #include <framework/core/Module.h>
+#include <framework/core/SubEventModule.h>
 
 using namespace Belle2;
 using namespace boost::python;
@@ -76,6 +77,14 @@ void Path::putModules(const std::list<boost::shared_ptr<Module> >& mlist)
 {
   m_elements.assign(mlist.begin(), mlist.end());
 }
+
+
+void Path::forEach(std::string objectName, std::string foreach, PathPtr path)
+{
+  ModulePtr subEventModule(new SubEventModule(objectName, foreach, path));
+  addModule(subEventModule);
+}
+
 
 //============================================================================
 //                              Private methods
@@ -145,6 +154,7 @@ void Path::exposePythonAPI()
   .def("add_module", &Path::addModule)
   .def("add_path", &Path::addPath)
   .def("modules", &_getModulesPython)
+  .def("for_each", &Path::forEach)
   ;
 
   register_ptr_to_python<PathPtr>();

@@ -228,8 +228,11 @@ namespace Belle2 {
      */
     bool createObject(TObject* object, bool replace, const StoreAccessorBase& accessor);
 
-    /** Get a reference to the object/array map. */
-    const StoreObjMap& getStoreObjectMap(EDurability durability) const { return m_storeObjMap[durability]; }
+    /** Get a reference to the object/array map.
+     *
+     * This is intended to be used for input/output or other framework-internal modules.
+     */
+    StoreObjMap& getStoreObjectMap(EDurability durability) { return m_storeObjMap[durability]; }
 
 
     /** Add a relation from an object in a store array to another object in a store array.

@@ -54,7 +54,11 @@ for dir in dirs:
         if dir == 'core':
             header_files += Glob(os.path.join(src_dir, 'finitePlanes', 'include', '*.h'))
         elif dir == 'GBL':
-    	    header_files = [os.path.join(src_dir, dir, 'include', 'GFGbl.h')]
+    	    header_files = [os.path.join(src_dir, dir, 'include', 'GFGbl.h'), 
+            os.path.join(src_dir, dir, 'include', 'GblFitter.h'),
+            os.path.join(src_dir, dir, 'include', 'GblFitterInfo.h'),
+            os.path.join(src_dir, dir, 'include', 'GblFitStatus.h'),
+            os.path.join(src_dir, dir, 'include', 'ICalibrationParametersDerivatives.h')]
         elif dir == 'GFRave':
             header_files = [os.path.join(src_dir, dir, 'include', 'GFRaveVertex.h'), os.path.join(src_dir, dir, 'include', 'GFRaveTrackParameters.h')]
         header_files = [os.path.join(env['INCDIR'], 'genfit', os.path.basename(str(header_file))) for header_file in header_files]

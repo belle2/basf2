@@ -299,8 +299,12 @@ double RKTrackRep::extrapToPoint(StateOnPlane& state,
     if (angle*distToPoca < 0.1*MINSTEP) break;
 
     // if lastStep and step have opposite sign, the real normal vector lies somewhere between the last two normal vectors (i.e. the directions)
-    // -> try mean value of the two (normalization not needed)
+    // -> try mean value of the two
     if (lastStep*step < 0){
+      if (G != NULL) { // after multiplication with G, dir has not length 1 anymore in general
+        dir.SetMag(1.);
+        lastDir.SetMag(1.);
+      }
       dir += lastDir;
       maxStep = 0.5*fabs(lastStep); // make it converge!
     }
@@ -953,6 +957,12 @@ void RKTrackRep::setPosMom(StateOnPlane& state, const TVector3& pos, const TVect
 
   if (dynamic_cast<MeasurementOnPlane*>(&state) != NULL) {
     Exception exc("RKTrackRep::setPosMom - cannot set pos/mom of a MeasurementOnPlane",__LINE__,__FILE__);
+    exc.setFatal();
+    throw exc;
+  }
+
+  if (mom.Mag2() == 0) {
+    Exception exc("RKTrackRep::setPosMom - momentum is 0",__LINE__,__FILE__);
     exc.setFatal();
     throw exc;
   }
@@ -1812,7 +1822,10 @@ bool RKTrackRep::RKutta(const M1x4& SU,
     }
 
     // check if total angle is bigger than AngleMax. Can happen if a curler should be fitted and it does not hit the active area of the next plane.
-    deltaAngle += acos(ABefore[0]*A[0] + ABefore[1]*A[1] + ABefore[2]*A[2]);
+    double arg = ABefore[0]*A[0] + ABefore[1]*A[1] + ABefore[2]*A[2];
+    arg = arg > 1 ? 1 : arg;
+    arg = arg < -1 ? -1 : arg;
+    deltaAngle += acos(arg);
     if (fabs(deltaAngle) > AngleMax){
       std::ostringstream sstream;
       sstream << "RKTrackRep::RKutta ==> Do not get to an active plane! Already extrapolated " << deltaAngle * 180 / TMath::Pi() << "°.";

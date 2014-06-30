@@ -90,7 +90,7 @@ class TrackPoint : public TObject {
   Track* getTrack() const {return track_;}
   void setTrack(Track* track) {track_ = track;}
 
-  const std::vector< genfit::AbsMeasurement* >& getRawMeasurements() {return rawMeasurements_;}
+  const std::vector< genfit::AbsMeasurement* >& getRawMeasurements() const {return rawMeasurements_;}
   AbsMeasurement* getRawMeasurement(int i = 0) const;
   unsigned int getNumRawMeasurements() const {return rawMeasurements_.size();}
   bool hasRawMeasurements() const {return (rawMeasurements_.size() != 0);}
@@ -104,8 +104,8 @@ class TrackPoint : public TObject {
     return (fitterInfos_.find(rep) != fitterInfos_.end());
   }
 
-  ThinScatterer* getMaterialInfo() {return thinScatterer_.get();}
-  bool hasThinScatterer() {return thinScatterer_.get() != NULL;}
+  ThinScatterer* getMaterialInfo() const {return thinScatterer_.get();}
+  bool hasThinScatterer() const {return thinScatterer_.get() != NULL;}
 
 
   void setSortingParameter(double sortingParameter) {sortingParameter_ = sortingParameter;}

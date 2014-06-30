@@ -39,19 +39,19 @@ class TestCopyParticleLists(unittest.TestCase):
         self.path = MockPath()
 
     def test_without_nones(self):
-        result = CopyParticleLists(self.path, 'D+', ['D+:1', 'D+:2', 'D+:3'])
+        result = CopyParticleLists(self.path, 'D+', ['D+:1', 'D+:2', 'D+:3'], None)
         self.assertDictEqual(result, {'ParticleList_D+': 'D+:5cd7f2d37f66c44b92dbd64e10ada329133b6a63',
                                       'ParticleList_D-': 'D-:5cd7f2d37f66c44b92dbd64e10ada329133b6a63'})
         self.assertEqual(len(self.path.modules), 1)
 
     def test_with_nones(self):
-        result = CopyParticleLists(self.path, 'D+', ['D+:1', None, 'D+:3', None])
+        result = CopyParticleLists(self.path, 'D+', ['D+:1', None, 'D+:3', None], None)
         self.assertDictEqual(result, {'ParticleList_D+': 'D+:fc01399545fea42891ffc8fc0b07b52de3317544',
                                       'ParticleList_D-': 'D-:fc01399545fea42891ffc8fc0b07b52de3317544'})
         self.assertEqual(len(self.path.modules), 1)
 
     def test_only_nones(self):
-        result = CopyParticleLists(self.path, 'D+', [None, None])
+        result = CopyParticleLists(self.path, 'D+', [None, None], None)
         self.assertDictEqual(result, {'ParticleList_D+': None,
                                       'ParticleList_D-': None})
         self.assertEqual(len(self.path.modules), 0)
@@ -86,32 +86,32 @@ class TestSignalProbability(unittest.TestCase):
         self.path = MockPath()
 
     def test_non_fsp_teacher(self):
-        hash = 'cc2f06ba7958e3ba29514d90c5bb75dcb375b95f'
+        hash = 'f33ca0b3926a6ef3fdffca0ceadb85ab6ef03075'
         filename = 'D+:1_{hash}.config'.format(hash=hash)
         open(filename, 'a').close()
         os.remove(filename)
-        result = SignalProbability(self.path, 'D+', 'D+ -> pi+ K-', mvaConfig, 'D+:1', ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        result = SignalProbability(self.path, 'D+', 'D+ -> pi+ K-', mvaConfig, 'D+:1', None, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules), 1)
 
     def test_non_fsp_expert(self):
-        hash = 'cc2f06ba7958e3ba29514d90c5bb75dcb375b95f'
+        hash = 'f33ca0b3926a6ef3fdffca0ceadb85ab6ef03075'
         filename = 'D+:1_{hash}.config'.format(hash=hash)
         open(filename, 'a').close()
-        result = SignalProbability(self.path, 'D+', 'D+ -> pi+ K-', mvaConfig, 'D+:1', ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        result = SignalProbability(self.path, 'D+', 'D+ -> pi+ K-', mvaConfig, 'D+:1', None, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
         self.assertDictEqual(result, {'SignalProbability_D+ -> pi+ K-_D+': 'D+:1_' + hash + '.config',
                                       'SignalProbability_D+ -> pi+ K-_D-': 'D+:1_' + hash + '.config'})
         os.remove(filename)
         self.assertEqual(len(self.path.modules), 1)
 
     def test_non_fsp_with_nones(self):
-        result = SignalProbability(self.path, 'D+', 'D+ -> pi+ K-', mvaConfig, 'D+:1', [None, 'SignalProbabilityHashK'])
+        result = SignalProbability(self.path, 'D+', 'D+ -> pi+ K-', mvaConfig, 'D+:1', None, [None, 'SignalProbabilityHashK'])
         self.assertDictEqual(result, {'SignalProbability_D+ -> pi+ K-_D+': None,
                                       'SignalProbability_D+ -> pi+ K-_D-': None})
         self.assertEqual(len(self.path.modules), 0)
 
     def test_fsp_teacher(self):
-        hash = 'a12fbfb9aca362bf8589840ca54ea9151bbb6a0e'
+        hash = '10c53868227bfb2edffa5a9bfc5c5c6d9af542eb'
         filename = 'e+:1_{hash}.config'.format(hash=hash)
         open(filename, 'a').close()
         os.remove(filename)
@@ -120,7 +120,7 @@ class TestSignalProbability(unittest.TestCase):
         self.assertEqual(len(self.path.modules), 1)
 
     def test_fsp_expert(self):
-        hash = 'a12fbfb9aca362bf8589840ca54ea9151bbb6a0e'
+        hash = '10c53868227bfb2edffa5a9bfc5c5c6d9af542eb'
         filename = 'e+:1_{hash}.config'.format(hash=hash)
         open(filename, 'a').close()
         result = SignalProbability(self.path, 'e+', 'e+', mvaConfig, 'e+:1')

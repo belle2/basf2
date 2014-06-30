@@ -168,12 +168,12 @@ class Sequence(object):
         # Now the chain contains all actors with grantable requirements.
         # The chain is a list of list of actors, all actors in one element of the list depend on the actors in the previous elements.
         # We determine now which of these actors are actually needed. Every actor which doesn't provide a value is defined as needed.
-        # Every actor which provides a requirement of a needed actor is also needed.
+        # Every actor which provides a requirement of a needed actor is also needed, unless the provided value is None.
         # We loop over the chain in reversed direction and add all needed actors to needed.
         # In the end we reverse the needed list, therefore every actor in the lists depends only on the previous actors in the list.
         needed = [actor for level in chain for actor in level if len(actor.provides) == 0]
         for level in reversed(chain):
-            needed += list(reversed([actor for actor in level if any(r in actor.provides for n in needed for r in n.requires)]))
+            needed += list(reversed([actor for actor in level if any((r in actor.provides and actor.provides[r] is not None) for n in needed for r in n.requires)]))
         needed = list(reversed(needed))
 
         # The modules in the basf2 path added by the actors are crucial to the FullEventInterpretation

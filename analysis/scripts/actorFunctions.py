@@ -76,20 +76,22 @@ def MakeAndMatchParticleList(path, particleName, channelName, inputLists, preCut
             'ParticleList_' + channelName + '_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
 
 
-def SignalProbability(path, particleName, channelName, mvaConfig, particleList, daughterSignalProbabilities=[]):
+def SignalProbability(path, particleName, channelName, mvaConfig, particleList, preCut=None, daughterSignalProbabilities=[]):
     """
     Calculates the SignalProbability of a ParticleList. If the files required from TMVAExpert aren't available they're created.
         @param path the basf2 path
+        @param particleName of the particle which is classified
+        @param channelName of channel which is classified
         @param mvaConfig configuration for the multivariate analysis
-        @param name of the particle or channel which is classified
         @param particleList the particleList which is used for training and classification
+        @param preCut used preCut for this channel
         @param daughterSignalProbabilities all daughter particles need a SignalProbability
     """
     if particleList is None or any([daughterSignalProbability is None for daughterSignalProbability in daughterSignalProbabilities]):
         return {'SignalProbability_' + channelName + '_' + particleName: None,
                 'SignalProbability_' + channelName + '_' + pdg.conjugate(particleName): None}
 
-    hash = actorFramework.createHash(mvaConfig, particleList, daughterSignalProbabilities)
+    hash = actorFramework.createHash(particleName, channelName, mvaConfig, particleList, preCut, daughterSignalProbabilities)
 
     filename = '{particleList}_{hash}.config'.format(particleList=particleList, hash=hash)
     if os.path.isfile(filename):
@@ -116,6 +118,13 @@ def SignalProbability(path, particleName, channelName, mvaConfig, particleList, 
         teacher.param('prefix', particleList + '_' + hash)
         teacher.param('methods', [(mvaConfig.name, mvaConfig.type, mvaConfig.config)])
         teacher.param('factoryOption', '!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification')
+
+        if preCut is None or preCut['nBackground'] < 1000000:
+            n = 0
+        else:
+            n = 1000000
+
+        teacher.param('prepareOption', 'SplitMode=random:!V:nTrain_Background={n}:nTest_Background={n}'.format(n=n))
         teacher.param('variables', mvaConfig.variables)
         teacher.param('target', mvaConfig.target)
         teacher.param('listNames', [particleList])
@@ -298,4 +307,6 @@ def WriteAnalysisFileForParticle(particleName, texfiles):
     file(filename, 'w').write(page)
 
     subprocess.call(['pdflatex', filename])
-    return {'PDF_' + particleName: filename[:-4] + '.pdf'}
+
+    # Return None - Therefore Particle List depends not on TMVAExpert directly
+    return {'PDF_' + particleName: None}  # filename[:-4] + '.pdf'}

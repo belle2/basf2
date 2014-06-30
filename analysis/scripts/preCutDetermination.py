@@ -44,7 +44,9 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
 
     cuts = GetCuts(signal, preCutConfig.efficiency, ycut_to_xcuts)
 
-    result = {channel: {'variable': variable, 'range': range, 'isIgnored': False} for (channel, range) in cuts.iteritems()}
+    result = {channel: {'variable': variable, 'range': range, 'isIgnored': False,
+                        'nBackground': GetNumberOfEventsInRange(bckgrd[channel], range),
+                        'nSignal': GetNumberOfEventsInRange(signal[channel], range)} for (channel, range) in cuts.iteritems()}
     for ignoredChannel in GetIgnoredChannels(signal, bckgrd, cuts):
         result[ignoredChannel]['isIgnored'] = True
         B2WARNING("Ignoring channel " + ignoredChannel + "!")

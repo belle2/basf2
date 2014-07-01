@@ -546,5 +546,31 @@ namespace {
     EXPECT_DOUBLE_EQ(sum, 1.0 + 1.0 + 2.0);
   }
 
+  TEST_F(RelationTest, RelationsToSameArray)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    RelationArray relation1(relObjData, relObjData);
+    relation1.registerAsPersistent();
+    DataStore::Instance().setInitializeActive(false);
+
+    relObjData[0]->addRelationTo(relObjData[1]);
+    EXPECT_TRUE(relObjData[0] == relObjData[1]->getRelated<RelationsObject>());
+    EXPECT_TRUE(relObjData[0] == relObjData[1]->getRelatedFrom<RelationsObject>());
+    EXPECT_TRUE(relObjData[1] == relObjData[0]->getRelated<RelationsObject>());
+    EXPECT_TRUE(relObjData[1] == relObjData[0]->getRelatedTo<RelationsObject>());
+    EXPECT_TRUE(nullptr == relObjData[2]->getRelated<RelationsObject>());
+    EXPECT_TRUE(nullptr == relObjData[2]->getRelatedFrom<RelationsObject>());
+    EXPECT_TRUE(nullptr == relObjData[2]->getRelatedTo<RelationsObject>());
+    //still in one direction
+    EXPECT_TRUE(nullptr == relObjData[1]->getRelatedTo<RelationsObject>());
+    EXPECT_TRUE(nullptr == relObjData[0]->getRelatedFrom<RelationsObject>());
+
+    //to same object
+    relObjData[3]->addRelationTo(relObjData[3]);
+    EXPECT_TRUE(relObjData[3] == relObjData[3]->getRelated<RelationsObject>());
+    EXPECT_TRUE(relObjData[3] == relObjData[3]->getRelatedFrom<RelationsObject>());
+    EXPECT_TRUE(relObjData[3] == relObjData[3]->getRelatedTo<RelationsObject>());
+  }
+
 
 }  // namespace

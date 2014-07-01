@@ -108,6 +108,21 @@ int ProcHandler::EvtProcID()
   return s_processID;
 }
 
+std::string ProcHandler::getProcessName()
+{
+  if (isEventProcess())
+    return "event";
+  if (isInputProcess())
+    return "input";
+  if (isOutputProcess())
+    return "output";
+  if (isFramework())
+    return "framework";
+
+  //shouldn't happen
+  return "???";
+}
+
 
 void ProcHandler::waitForProcesses(std::vector<pid_t>& pids)
 {

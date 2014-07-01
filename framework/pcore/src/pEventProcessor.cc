@@ -173,9 +173,6 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
 
   // 2. Analyze start path and split into parallel paths
   analyze_path(spath); //also inserts Rx/Tx modules into path (sets up IPC structures)
-  B2DEBUG(100, "process : inlistpath size = " << m_inpathlist.size());
-  B2DEBUG(100, "process : bodypathlist size = " << m_bodypathlist.size());
-  B2DEBUG(100, "process : outpathlist size = " << m_outpathlist.size());
 
   dump_path("Input Path ", m_inpathlist[0]);
   for (unsigned int i = 0; i < m_bodypathlist.size(); i++) {
@@ -185,74 +182,64 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     dump_path("Output Path ", m_outpathlist[i]);
   }
 
+  //Path for current process
+  PathPtr localPath;
+
   // 3. Fork input path
   m_procHandler->startInputProcess();
   if (m_procHandler->isInputProcess()) {   // In input process
-    PathPtr& inpath = m_inpathlist[0];
-    ModulePtrList inpath_modules = inpath->buildModulePathList();
-    ModulePtrList procinitmodules = getModulesWithFlag(inpath_modules, Module::c_InternalSerializer);
-    dump_modules("processInitialize for ", procinitmodules);
-    if (!procinitmodules.empty())
-      processInitialize(procinitmodules);
-
-    setupSignalHandler();
-    processCore(inpath, inpath_modules, maxEvent);
-    prependModulesIfNotPresent(&inpath_modules, terminateGlobally);
-    processTerminate(inpath_modules);
-    B2INFO("Input process finished.");
-    exit(0);
+    localPath = m_inpathlist[0];
   }
 
-  // for all processes except the input process (already started by now)
-  // ignore SIGINT so we can do our own handling to ensure safe termination.
-  if (signal(SIGINT, SIG_IGN) == SIG_ERR) {
-    B2FATAL("Cannot ignore SIGINT signal handler\n");
-  }
+  if (localPath == nullptr) { //not forked yet
+    // for all processes except the input process (already started by now)
+    // ignore SIGINT so we can do our own handling to ensure safe termination.
+    if (signal(SIGINT, SIG_IGN) == SIG_ERR) {
+      B2FATAL("Cannot ignore SIGINT signal handler\n");
+    }
 
-  // 4. Fork output path
-  int nout = 0;
-  for (std::vector<PathPtr>::iterator it = m_outpathlist.begin(); it != m_outpathlist.end(); ++it) {
-    PathPtr& outpath = *it;
-    if ((outpath->getModules()).size() > 0) {
-      m_procHandler->startOutputProcess(nout);
-      if (m_procHandler->isOutputProcess()) {   // In output process
-        m_master = outpath->getModules().begin()->get(); //set Rx as master
-        ModulePtrList outpath_modules = outpath->buildModulePathList();
-        ModulePtrList procinitmodules = getModulesWithFlag(outpath_modules, Module::c_InternalSerializer);
-        dump_modules("processInitialize for ", procinitmodules);
-        if (!procinitmodules.empty())
-          processInitialize(procinitmodules);
-        processCore(outpath, outpath_modules, maxEvent);
-        prependModulesIfNotPresent(&outpath_modules, terminateGlobally);
-        processTerminate(outpath_modules);
-        B2INFO("Output process finished.");
-        exit(0);
+    // 4. Fork output paths
+    int nout = 0;
+    for (PathPtr & outpath : m_outpathlist) {
+      if ((outpath->getModules()).size() > 0) {
+        m_procHandler->startOutputProcess(nout);
+        if (m_procHandler->isOutputProcess()) {   // In output process
+          localPath = outpath;
+          m_master = localPath->getModules().begin()->get(); //set Rx as master
+        }
+        nout++;
       }
-      nout++;
     }
   }
 
-  // 5. Fork out main path (parallel part)
-  fflush(stdout);
-  m_procHandler->startEventProcesses(numProcesses);
-  if (m_procHandler->isEventProcess()) {
-    PathPtr& mainpath = m_bodypathlist[m_bodypathlist.size() - 1];
-    m_master = mainpath->getModules().begin()->get(); //set Rx as master
-    ModulePtrList main_modules = mainpath->buildModulePathList();
-    ModulePtrList procinitmodules = getModulesWithFlag(main_modules, Module::c_InternalSerializer);
-    //dump_modules("processInitialize for ", procinitmodules);
-    if (!procinitmodules.empty())
-      processInitialize(procinitmodules);
-    processCore(mainpath, main_modules, maxEvent);
-    prependModulesIfNotPresent(&main_modules, terminateGlobally);
-    processTerminate(main_modules);
-    B2INFO("Event process finished.");
-    exit(0);
+  if (localPath == nullptr) { //not forked yet
+    // 5. Fork out main path (parallel part)
+    fflush(stdout);
+    m_procHandler->startEventProcesses(numProcesses);
+    if (m_procHandler->isEventProcess()) {
+      localPath = m_bodypathlist[m_bodypathlist.size() - 1];
+      m_master = localPath->getModules().begin()->get(); //set Rx as master
+    }
   }
 
+  //we're one of the forked processes
+  if (localPath != nullptr) {
+    ModulePtrList localModules = localPath->buildModulePathList();
+    ModulePtrList procinitmodules = getModulesWithFlag(localModules, Module::c_InternalSerializer);
+    //dump_modules("processInitialize for ", procinitmodules);
+    processInitialize(procinitmodules);
 
-  // 6. Framework process
-  if (m_procHandler->isFramework()) {
+    if (m_procHandler->isInputProcess())
+      setupSignalHandler();
+
+    processCore(localPath, localModules, maxEvent);
+    prependModulesIfNotPresent(&localModules, terminateGlobally);
+    processTerminate(localModules);
+
+    B2INFO(m_procHandler->getProcessName() << " process finished.");
+    exit(0);
+  } else { // 6. Framework process
+
     //ignore some signals for framework (mother) process, so only child processes will handle them
     //once they are finished, the framework process will clean up IPC structures
     if (signal(SIGTERM, SIG_IGN) == SIG_ERR) {

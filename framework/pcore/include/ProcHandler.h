@@ -7,6 +7,7 @@
 #define PROCHANDLER_H
 
 #include <vector>
+#include <string>
 #include <sys/types.h>
 
 namespace Belle2 {
@@ -47,6 +48,7 @@ namespace Belle2 {
     /** Return true if the process is an output process */
     static bool isOutputProcess();
 
+
     /** Return ID of the current process.
      *
      * Return values mean:
@@ -56,6 +58,9 @@ namespace Belle2 {
      *  >=20000 output path
      */
     static int EvtProcID();
+
+    /** Get a name for this process. (input, event, output...). */
+    static std::string getProcessName();
 
   private:
     /** wait for all processes in the given list to terminate. */

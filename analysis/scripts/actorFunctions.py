@@ -213,7 +213,7 @@ def WriteAnalysisFileForChannel(particleName, channelName, channelList, preCutCo
     ROOT.gROOT.SetBatch(True)
 
     # Create TMVA Plots
-    tmva_filename = signalProbability[:-7] + '_1_vs_0.root'  # Strip .config of filename
+    tmva_filename = signalProbability[:-7] + '.root'  # Strip .config of filename
     subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/mvas.C(\\"{f}\\",3)"'.format(f=tmva_filename)], shell=True)
     subprocess.call(['cp plots/$(ls -t plots/ | head -1) {c}_overtraining.png'.format(c=channelList)], shell=True)
     subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/efficiencies.C(\\"{f}\\")"'.format(f=tmva_filename)], shell=True)

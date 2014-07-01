@@ -165,6 +165,12 @@ main.add_module(simulation)
 main.add_module(output)
 main.add_module(progress)
 
+#test wether flags are what we expect
+if particlegun.has_properties(ModulePropFlags.PARALLELPROCESSINGCERTIFIED):
+    B2FATAL("ParticleGun has pp flag?")
+if not simulation.has_properties(ModulePropFlags.PARALLELPROCESSINGCERTIFIED):
+    B2FATAL("Simulation doesn't have pp flag?")
+
 # Process events
 nprocess(2)
 process(main)

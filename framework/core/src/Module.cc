@@ -220,6 +220,15 @@ void Module::exposePythonAPI()
   .value("CONTINUE", Module::EAfterConditionPath::c_Continue)
   ;
 
+  enum_<Module::EModulePropFlags>("ModulePropFlags")
+  .value("INPUT", Module::EModulePropFlags::c_Input)
+  .value("OUTPUT", Module::EModulePropFlags::c_Output)
+  .value("PARALLELPROCESSINGCERTIFIED", Module::EModulePropFlags::c_ParallelProcessingCertified)
+  .value("HISTOGRAMMANAGER", Module::EModulePropFlags::c_HistogramManager)
+  .value("INTERNALSERIALIZER", Module::EModulePropFlags::c_InternalSerializer)
+  .value("TERMINATEINALLPROCESSES", Module::EModulePropFlags::c_TerminateInAllProcesses)
+  ;
+
   //Python class definition
   class_<Module, PyModule>("Module")
   .def("__str__", &Module::getPathString)
@@ -227,15 +236,16 @@ void Module::exposePythonAPI()
   .def("set_name", &Module::setModuleName)
   .def("description", &Module::getDescription, return_value_policy<copy_const_reference>())
   .def("package", &Module::getPackage, return_value_policy<copy_const_reference>())
+  .def("available_params", &_getParamInfoListPython)
+  .def("has_properties", &Module::hasProperties)
   .def("if_value", &Module::if_value, if_value_overloads())
   .def("if_false", &Module::if_false, if_false_overloads())
   .def("if_true", &Module::if_true, if_true_overloads())
-  .def("param", &Module::setParamPython)
-  .def("param", &Module::setParamPythonDict)
-  .def("available_params", &_getParamInfoListPython)
   .add_property("logging",
                 make_function(&Module::getLogConfig, return_value_policy<reference_existing_object>()),
                 &Module::setLogConfig)
+  .def("param", &Module::setParamPython)
+  .def("param", &Module::setParamPythonDict)
   .def("return_value", setReturnValueInt)
   .def("return_value", setReturnValueBool)
   .def("set_log_level", &Module::setLogLevel)

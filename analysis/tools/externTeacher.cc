@@ -38,18 +38,19 @@ int main(int argc, char* argv[])
 
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, options), vm);
-  po::notify(vm);
 
   if (vm.count("help")) {
     std::cout << options << "\n";
     return 1;
   }
+  //check for required arguments etc. after parsing --help
+  po::notify(vm);
 
   std::string methodName = "";
   if (vm.count("methodName") == 1) {
     methodName = vm["methodName"].as<std::string>();
   } else {
-    std::cerr << "Pleas input one methodName" << std::endl;
+    std::cerr << "Please input one methodName" << std::endl;
     return 1;
   }
 
@@ -57,7 +58,7 @@ int main(int argc, char* argv[])
   if (vm.count("methodType") == 1) {
     methodType = vm["methodType"].as<std::string>();
   } else {
-    std::cerr << "Pleas input one methodType" << std::endl;
+    std::cerr << "Please input one methodType" << std::endl;
     return 1;
   }
 
@@ -65,7 +66,7 @@ int main(int argc, char* argv[])
   if (vm.count("methodConfig") == 1) {
     methodConfig = vm["methodConfig"].as<std::string>();
   } else {
-    std::cerr << "Pleas input one methodConfig" << std::endl;
+    std::cerr << "Please input one methodConfig" << std::endl;
     return 1;
   }
 
@@ -77,7 +78,7 @@ int main(int argc, char* argv[])
   if (vm.count("target") == 1) {
     target = vm["target"].as<std::string>();
   } else {
-    std::cerr << "Pleas input one target" << std::endl;
+    std::cerr << "Please input one target" << std::endl;
     return 1;
   }
 

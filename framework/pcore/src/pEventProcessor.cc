@@ -144,9 +144,11 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   // 1. Initialization
   ModulePtrList modulelist = spath->buildModulePathList();;
   //  dump_modules ( "full : ", modulelist );
-  ModulePtrList initmodules = init_modules_in_main(modulelist);
-  dump_modules("processInitialize : ", initmodules);
-  processInitialize(initmodules);
+  ModulePtrList initGlobally = getModulesWithoutFlag(modulelist, Module::c_InternalSerializer);
+  dump_modules("processInitialize : ", initGlobally);
+  processInitialize(initGlobally);
+
+  ModulePtrList terminateGlobally = getModulesWithFlag(modulelist, Module::c_TerminateInAllProcesses);
 
   //Don't start processing in case of no master module
   if (!m_master) {
@@ -188,13 +190,14 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   if (m_procHandler->isInputProcess()) {   // In input process
     PathPtr& inpath = m_inpathlist[0];
     ModulePtrList inpath_modules = inpath->buildModulePathList();
-    ModulePtrList procinitmodules = init_modules_in_process(inpath_modules);
+    ModulePtrList procinitmodules = getModulesWithFlag(inpath_modules, Module::c_InternalSerializer);
     dump_modules("processInitialize for ", procinitmodules);
     if (!procinitmodules.empty())
       processInitialize(procinitmodules);
 
     setupSignalHandler();
     processCore(inpath, inpath_modules, maxEvent);
+    prependModulesIfNotPresent(&inpath_modules, terminateGlobally);
     processTerminate(inpath_modules);
     B2INFO("Input process finished.");
     exit(0);
@@ -215,11 +218,12 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
       if (m_procHandler->isOutputProcess()) {   // In output process
         m_master = outpath->getModules().begin()->get(); //set Rx as master
         ModulePtrList outpath_modules = outpath->buildModulePathList();
-        ModulePtrList procinitmodules = init_modules_in_process(outpath_modules);
+        ModulePtrList procinitmodules = getModulesWithFlag(outpath_modules, Module::c_InternalSerializer);
         dump_modules("processInitialize for ", procinitmodules);
         if (!procinitmodules.empty())
           processInitialize(procinitmodules);
         processCore(outpath, outpath_modules, maxEvent);
+        prependModulesIfNotPresent(&outpath_modules, terminateGlobally);
         processTerminate(outpath_modules);
         B2INFO("Output process finished.");
         exit(0);
@@ -235,11 +239,12 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     PathPtr& mainpath = m_bodypathlist[m_bodypathlist.size() - 1];
     m_master = mainpath->getModules().begin()->get(); //set Rx as master
     ModulePtrList main_modules = mainpath->buildModulePathList();
-    ModulePtrList procinitmodules = init_modules_in_process(main_modules);
+    ModulePtrList procinitmodules = getModulesWithFlag(main_modules, Module::c_InternalSerializer);
     //dump_modules("processInitialize for ", procinitmodules);
     if (!procinitmodules.empty())
       processInitialize(procinitmodules);
     processCore(mainpath, main_modules, maxEvent);
+    prependModulesIfNotPresent(&main_modules, terminateGlobally);
     processTerminate(main_modules);
     B2INFO("Event process finished.");
     exit(0);
@@ -295,6 +300,8 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
       delete rb;
     for (RingBuffer * rb : m_rboutlist)
       delete rb;
+
+    processTerminate(terminateGlobally);
 
     B2INFO("Global process: completed");
 
@@ -511,33 +518,36 @@ void pEventProcessor::dump_modules(const std::string title, const ModulePtrList 
   B2INFO(strbuf.str());
 }
 
-bool pEventProcessor::initializeGlobally(ModulePtr module)
-{
-  return (!module->hasProperties(Module::c_InternalSerializer));
-}
 
-ModulePtrList pEventProcessor::init_modules_in_main(const ModulePtrList& modlist)
+ModulePtrList pEventProcessor::getModulesWithFlag(const ModulePtrList& modules, Module::EModulePropFlags flag)
 {
   ModulePtrList tmpModuleList;
   ModulePtrList::const_iterator listIter;
 
-  for (listIter = modlist.begin(); listIter != modlist.end(); ++listIter) {
-    if (initializeGlobally(*listIter))
-      tmpModuleList.push_back(*listIter);
+  for (const ModulePtr & m : modules) {
+    if (m->hasProperties(flag))
+      tmpModuleList.push_back(m);
   }
 
   return tmpModuleList;
 }
-
-ModulePtrList pEventProcessor::init_modules_in_process(const ModulePtrList& modlist)
+ModulePtrList pEventProcessor::getModulesWithoutFlag(const ModulePtrList& modules, Module::EModulePropFlags flag)
 {
   ModulePtrList tmpModuleList;
   ModulePtrList::const_iterator listIter;
 
-  for (listIter = modlist.begin(); listIter != modlist.end(); ++listIter) {
-    if (!initializeGlobally(*listIter))
-      tmpModuleList.push_back(*listIter);
+  for (const ModulePtr & m : modules) {
+    if (!m->hasProperties(flag))
+      tmpModuleList.push_back(m);
   }
-
   return tmpModuleList;
+}
+
+void pEventProcessor::prependModulesIfNotPresent(ModulePtrList* modules, const ModulePtrList& prependModules)
+{
+  for (const ModulePtr & m : prependModules) {
+    if (std::find(modules->begin(), modules->end(), m) == modules->end()) { //not present
+      modules->push_front(m);
+    }
+  }
 }

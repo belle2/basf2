@@ -59,11 +59,6 @@ namespace Belle2 {
     /*! Dump module names in the ModulePtrList */
     void dump_modules(const std::string, const ModulePtrList);
 
-    /** Should this module be initialized in the global process?
-     *
-     *  Returns false if initialize() should be called inside forked process.
-     */
-    bool initializeGlobally(ModulePtr module);
     /** TFiles are stored in a global list and cleaned up by root
      * since this will happen in all forked processes, these will be corrupted if we don't clean the list!
      *
@@ -74,12 +69,12 @@ namespace Belle2 {
     /** Insert a termination message at the end of the given RingBuffer. */
     void sendTerminationMessage(RingBuffer* rb);
 
-
-    /** Extract modules to be initialized in main process */
-    ModulePtrList init_modules_in_main(const ModulePtrList& modlist);
-
-    /** Extract modules to be initialized in forked process */
-    ModulePtrList init_modules_in_process(const ModulePtrList& modlist);
+    /** Return only modules which have the given Module flag set. */
+    static ModulePtrList getModulesWithFlag(const ModulePtrList& modules, Module::EModulePropFlags flag);
+    /** Return only modules which do not have the given Module flag set. */
+    static ModulePtrList getModulesWithoutFlag(const ModulePtrList& modules, Module::EModulePropFlags flag);
+    /** Prepend given 'prependModules' to 'modules', if they're not already present. */
+    static void prependModulesIfNotPresent(ModulePtrList* modules, const ModulePtrList& prependModules);
 
   protected:
 

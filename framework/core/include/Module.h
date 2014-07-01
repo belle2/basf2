@@ -80,6 +80,7 @@ namespace Belle2 {
       c_ParallelProcessingCertified = 4,  /**< This module can be run in parallel processing mode safely (All I/O must be done through the data store, in particular, the module must not write any files.) */
       c_HistogramManager            = 8, /**< This module is used to manage histograms accumulated by other modules */
       c_InternalSerializer          = 16,  /**< This module is an internal serializer/deserializer for parallel processing */
+      c_TerminateInAllProcesses     = 32,  /**< When using parallel processing, call this module's terminate() function in all processes(). */
     };
 
     /** Different options for behaviour _after_ a conditional path was executed. */

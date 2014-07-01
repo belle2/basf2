@@ -1,0 +1,314 @@
+#!/usr/bin/env python
+#coding: utf8
+
+"""\
+{0}: Utility to measure the memory consumption of a process hierarchy on Linux.
+
+This is optimized for basf2, taking into account page sharing for parallel
+processing mode and obtaining the process role from the output of basf2 if the
+debug level of the framework is set to INFO.
+
+Usage:
+    {0} program [program arguments]
+
+After execution is complete, the execution time (wall time) and maximum amount
+of memory used will be printed to stderr. The memory usage profile will be
+saved as {0}.pdf"""
+
+# we want to print some stuff to sys.stderr and the print function makes this
+# much easier
+from __future__ import print_function
+import os
+import sys
+import re
+import time
+import subprocess
+import numpy as np
+from collections import defaultdict
+import threading
+
+basename = os.path.basename(sys.argv[0])
+if len(sys.argv) <= 1:
+    print(__doc__.format(basename))
+    sys.exit(1)
+
+#stuff for plotting
+try:
+    import matplotlib as mpl
+    mpl.use("Agg")
+except ImportError:
+    print("""\
+Could not find matplotlib which is required to create the charts. Please
+install it using
+    pip install matplotlib""", file=sys.stderr)
+    sys.exit(1)
+
+from matplotlib import pyplot as pl
+
+# minimal time in seconds between checking the memory consumption, larger
+# values reduce load due to memory check and memory consumption for long
+# running processes
+sampling_interval = 0.05
+
+# types of memory to plot, can be a list of labels and fields from
+# /proc/<PID>/smaps
+memory_types = [
+    #("virtual size", "Size:"),
+    #("resident memory", "Rss:"),
+    ("proportional memory", "Pss:"),
+    #("swap", "Swap:"),
+]
+ntypes = len(memory_types)
+
+
+class IntervalTimer(object):
+    """
+    Class to run code in fixed intervals.
+    This class allows to wait until a certain time is passed since the last
+    call. This allows to run code every n seconds while factoring out the
+    runtime of the code itself without resorting to multithreading
+    """
+
+    def __init__(self, delay=1.0):
+        """Initialize the timer with a given delay between ticks in seconds"""
+        self.delay = delay
+        self.starttime = time.time()
+        self.lasttime = None
+
+    def reltime(self):
+        """Return the relative time since the start of the timer"""
+        return time.time() - self.starttime
+
+    def tick(self):
+        """Return the relative time since the start of the timer and increase
+        the last call timestamp"""
+        self.lasttime = self.reltime()
+        return self.lasttime
+
+    def wait(self):
+        """Wait for the next tick and return the time"""
+        if self.lasttime is None:
+            return self.tick()
+
+        target = (int(self.lasttime / self.delay) + 1) * self.delay
+        new = self.reltime()
+        while new < target:
+            time.sleep(target - new)
+            new = self.reltime()
+        return self.tick()
+
+    def ready(self):
+        """Check if the next tick is ready"""
+        return self.reltime() - self.lasttime >= self.delay
+
+    def __nonzero__(self):
+        """Check if the next tick is ready"""
+        return self.ready()
+
+
+def find_children(rootpid):
+    """Find all child processes of the given process id and return them,
+    including the original pid.
+
+    This function builds a process tree by looping over all existing processes
+    in /proc/ and checking the parent pid for each process. It returns all
+    descendants of the given rootpid, including rootpid itself"""
+
+    # get list of all existing PID
+    pids = [int(pid) for pid in os.listdir('/proc/') if pid.isdigit()]
+    # and create dependency graph with parent PID
+    ppids = defaultdict(list)
+
+    for pid in pids:
+        # process could have ended between listdir and reading the status so
+        # lets allow for IOError
+        try:
+            # since we read the stat files of all processes very often we
+            # optimize this using native os.open instead of file objects
+            fd = os.open("/proc/%d/stat" % pid, os.O_RDONLY)
+            stat = os.read(fd, 1024)
+            os.close(fd)
+            # stat has ppid in the fourth field but the process name (second
+            # field) might contain spaces. It is enclosed in () so we split at
+            # the last ')' and then it's the second field.
+            ppid = stat.rsplit(")", 1)[-1].split(None, 2)[1]
+            ppids[int(ppid)].append(pid)
+        except OSError:
+            continue
+
+    # now recursively look for all children of a given pid
+    def get_children(pid):
+        result = [pid]
+        # if there are children, add them too
+        for c in ppids.get(pid, []):
+            result += get_children(c)
+        return result
+
+    # and return all pids
+    return get_children(rootpid)
+
+
+def get_memory_usage(pid):
+    """Return the memory usage of a given process id."""
+    try:
+        #Open the smaps file and look for all defined fields
+        sizes = np.zeros(ntypes)
+        with open("/proc/%s/smaps" % pid) as smaps:
+            # there are a lot of memory segments in smaps, add them all up
+            for line in smaps:
+                for i, (name, field) in enumerate(memory_types):
+                    if line.startswith(field):
+                        sizes[i] += int(line.split()[1])
+                        # There can only be one ... field per line
+                        break
+
+        return sizes
+    except IOError:
+        #IOError can happen if the process ends while reading, return 0 then
+        return np.zeros(ntypes)
+
+
+def get_cmdline(pid):
+    """Return command line of a process given by PID"""
+    try:
+        args = open("/proc/%s/cmdline" % pid).read().strip("\0").split("\0")
+        return " ".join(args)
+    except IOError:
+        return ""
+
+
+def get_system_memory():
+    """Return the amount of used memory in the system"""
+    memory = 0
+    with open("/proc/meminfo") as meminfo:
+        for line in meminfo:
+            if line.startswith("MemAvailable:"):
+                # only available on fairly recent kernels
+                return int(line.split()[1])
+            if line.startswith("MemTotal:"):
+                memory += int(line.split()[1])
+            if line.startswith("MemFree:") or line.startswith("Buffers:") \
+                    or line.startswith("Cached:"):
+                memory -= int(line.split()[1])
+
+    return memory
+
+
+def check_output():
+    # check for the B2INFO output to determine process role
+    prochandler = re.compile(r"ProcHandler:\s*(.*?)\s*forked."
+                             "\s*pid\s*=\s*([0-9]*)")
+    while True:
+        if child.poll() is not None:
+            return
+        line = child.stdout.readline()
+        # see if we have a ProcHandler message
+        forkmessage = prochandler.search(line)
+        if forkmessage:
+            # jaay, update the process name
+            process_names[int(forkmessage.group(2))] = forkmessage.group(1)
+        # forward output to stdout
+        print(line, end="")
+
+# create a list of memory consumptions for each pid
+process_memory = {}
+process_names = {}
+total_memory = []
+# run the program
+child = subprocess.Popen(sys.argv[1:], stdout=subprocess.PIPE)
+# we want to check the output for process spawn messages but we don't want to
+# block the memory checker, so let's use a thread to check the output
+output_checker = threading.Thread(target=check_output)
+output_checker.daemon = True
+output_checker.start()
+# start the timer
+timer = IntervalTimer(sampling_interval)
+
+diff = []
+lasttime = 0
+# while child is running, check its memory usage
+while True:
+    runtime = timer.wait()
+    diff.append(runtime - lasttime)
+    lasttime = runtime
+    #check if child is still running
+    if child.poll() is not None:
+        break
+    #if so, find all processes and obtain memory usage for each
+    pids = find_children(child.pid)
+    total = np.zeros(ntypes)
+    for i, pid in enumerate(pids):
+        if not pid in process_memory:
+            cmdline = get_cmdline(pid)
+            if not cmdline:
+                continue
+            process_names.setdefault(pid, cmdline)
+            process_memory[pid] = []
+
+        mem = get_memory_usage(pid)
+        total += mem
+        #remember the values for this process
+        process_memory[pid].append([runtime] + list(mem))
+
+    #and remember the total as well as pid 0
+    total_memory.append([runtime] + list(total))
+
+
+def get_color(i, n):
+    """Choose an appropriate color for line i out of n lines
+    If more than 6 lines are needed we take the colors from a rainbow colormap,
+    otherwise just use red, green, blue, cyan, magenta and yellow"""
+    if n <= 6:
+        return "rgbcmy"[i]
+    else:
+        cmap = mpl.cm.get_cmap("jet")
+        return cmap(i / (n - 1.))
+
+
+def plot_memory(data, label, color, marker=True):
+    """Plot memory usage over time"""
+    data = np.array(data)
+    for i in range(ntypes):
+        # plot the line
+        axes[i].plot(data[:, 0], data[:, i + 1] / 1000, label=label, c=color)
+        # and add start and end marker
+        axes[i].plot(data[0, 0], data[0, i + 1] / 1000, c=color, marker=".")
+        axes[i].plot(data[-1, 0], data[-1, i + 1] / 1000, c=color, marker=".")
+
+
+# start plotting
+f = pl.figure(figsize=(12, 8))
+# create axes for all memory "types"
+axes = [f.add_subplot(ntypes, 1, 1 + i) for i in range(ntypes)]
+
+total_memory = np.array(total_memory)
+#plot total memory if we saw more than one process
+if len(process_memory) > 1:
+    plot_memory(total_memory, "total", "k")
+
+# and plot all processes
+for i, (pid, val) in enumerate(sorted(process_memory.items())):
+    label = "%s (%d)" % (process_names[pid], pid)
+    plot_memory(val, label, get_color(i, len(process_memory)))
+
+# let's add title and labels
+for i, (a, title) in enumerate(zip(axes, memory_types)):
+    a.set_xlabel("time / s")
+    a.set_ylabel("memory / MB")
+    a.set_title(title[0])
+    a.set_ylim(ymin=0)
+    a.grid()
+    # and a legend if there were children
+    if len(process_memory) > 1 and i == 0:
+        l = a.legend(loc="best")
+        l.get_frame().set_alpha(0.8)
+
+# save plots
+pl.tight_layout()
+f.savefig(basename + ".pdf")
+
+# finally, print max values
+print("\nexecution time: %d s" % total_memory[:, 0].max(), file=sys.stderr)
+for i, (name, field) in enumerate(memory_types):
+    print("max %s: %.2f MB" % (name, total_memory[:, i+1].max()/1000),
+          file=sys.stderr)

@@ -16,6 +16,7 @@
 #include <geometry/CreatorManager.h>
 #include <geometry/CreatorBase.h>
 #include <geometry/utilities.h>
+#include <geometry/bfieldmap/BFieldMap.h>
 
 #include "G4Box.hh"
 #include "G4ThreeVector.hh"
@@ -187,6 +188,11 @@ namespace Belle2 {
       B2INFO("Created a total of " << newSolids << " solids, " << newLogical
              << " logical volumes and " << newPhysical << " physical volumes");
 
+      B2INFO("Initializing magnetic field if present ...");
+      B2INFO_MEASURE_TIME(
+        "Initialization of magnetic field took ",
+        BFieldMap::Instance().getBField(TVector3(0, 0, 0));
+      );
     }
 
     void GeometryManager::createTGeoRepresentation()

@@ -101,8 +101,8 @@ int PreRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
     sprintf(err_buf, "COPPER's magic word is invalid. Maybe it is due to data corruption or different version of the data format.\n %s %s %d\n", __FILE__, __PRETTY_FUNCTION__, __LINE__);
     perror(err_buf);
     exit(1);
-    string err_str = err_buf;    throw (err_str);
-    exit(1);
+    string err_str = err_buf;
+    throw (err_str);
   }
   int pos_nwords;
   switch (finesse_num) {
@@ -122,11 +122,9 @@ int PreRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
       char err_buf[500];
       sprintf(err_buf, "Specifined FINESSE number( = %d ) is invalid. Exiting...\n %s %s %d\n",
               finesse_num, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      string err_str = err_buf; throw (err_str);
-      sleep(12345678);
-      exit(-1);
-      //   return 0;
-      //      break;
+      string err_str = err_buf;
+      throw (err_str);
+
   }
   return m_buffer[ pos_nwords ];
 
@@ -935,7 +933,7 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
   for (int i = 0; i < m_reduced_rawcpr.GetNumEvents() * m_reduced_rawcpr.GetNumNodes(); i++) {
     int nonzero_finesse_buf = 0;
     for (int j = 0; j < 4; j++) {
-      pos_nwords_finesse[ j ] = pos_nwords_to;
+      //      pos_nwords_finesse[ j ] = pos_nwords_to;
       if (GetFINESSENwords(n, j) > 0) {
         m_reduced_rawcpr.CheckCRC16(i, j);
         nonzero_finesse_buf++;

@@ -121,7 +121,7 @@ int PostRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       string err_str = err_buf; throw (err_str);
       exit(1);
-      break;
+
   }
 
   if (nwords < 0 || nwords > 1e6) {
@@ -191,9 +191,10 @@ void PostRawCOPPERFormat_latest::CheckData(int n,
   if (err_flag == 1) {
     printf("[DEBUG] ========== dump a data blcok : block # %d==========\n", n);
     PrintData(GetBuffer(n), GetBlockNwords(n));
+    printf("Print out variables to reduce unused-variables-warnings : %u %u\n", prev_copper_ctr, *cur_copper_ctr);
     string err_str = err_buf;
     throw (err_str);
-    printf("Print out variables to reduce unused-variables-warnings : %u %u\n", prev_copper_ctr, *cur_copper_ctr);
+
 //     sleep(1234567);
 //     exit(-1);
   }
@@ -216,8 +217,8 @@ void PostRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
   char err_buf[500];
   sprintf(err_buf, "This function is not supported (block %d). Exiting...\n%s %s %d\n",
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf; throw (err_str);
-  return;
+  string err_str = err_buf;
+  throw (err_str);
 }
 
 
@@ -236,10 +237,10 @@ unsigned int PostRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_no
   char err_buf[500];
   sprintf(err_buf, "This function should be called by PrePostRawCOPPERFormat_latest. Exiting...\n %s %s %d\n",
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf; throw (err_str);
   printf("Print out variables to reduce unused-variables-warnings : %u %u %u %u %d %d\n",
          m_node_id, m_data_type, m_trunc_mask, prev_eve32, prev_runsubrun_no, *cur_runsubrun_no);
-  return -1;
+  string err_str = err_buf;
+  throw (err_str);
 
 }
 
@@ -249,9 +250,9 @@ int PostRawCOPPERFormat_latest::CheckB2LHSLBMagicWords(int* finesse_buf, int fin
   char err_buf[500];
   sprintf(err_buf, "This function should be called by PrePostRawCOPPERFormat_latest. Exiting...\n %s %s %d\n",
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf; throw (err_str);
   printf("Print out variables to reduce unused-variables-warnings : %p %u\n", finesse_buf, finesse_nwords);
-  return -1;
+  string err_str = err_buf;
+  throw (err_str);
 
 }
 

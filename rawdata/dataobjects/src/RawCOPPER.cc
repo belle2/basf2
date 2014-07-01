@@ -101,8 +101,8 @@ void RawCOPPER::SetVersion(string class_name)
     sprintf(err_buf, "Invalid name of a data format class (%s). Exiting...\n %s %s %d\n",
             class_name.c_str(), __FILE__, __PRETTY_FUNCTION__, __LINE__);
     perror(err_buf);
-    string err_str = err_buf; throw (err_str);
-    exit(1);
+    string err_str = err_buf;
+    throw (err_str);
   }
 
 //   if( class_name == "RawCOPPERFormat_v0" ){

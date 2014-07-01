@@ -18,7 +18,9 @@ RawDataBlock::RawDataBlock()
   m_nwords = 0;
   m_use_prealloc_buf = 0;
   m_buffer = NULL;
-
+  m_num_nodes = 0;
+  m_num_events = 0;
+  m_which_part = 0;
 }
 
 RawDataBlock::~RawDataBlock()

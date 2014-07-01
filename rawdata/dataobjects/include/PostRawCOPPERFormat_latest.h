@@ -287,7 +287,7 @@ namespace Belle2 {
     char err_buf[500];
     sprintf(err_buf, "This function is not supported. (block %d) Exiting...\n %s %s %d\n",
             n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    string err_str = err_buf; throw (err_str); n = 0;
+    string err_str = err_buf; throw (err_str);
     return 0;
   }
 
@@ -296,7 +296,7 @@ namespace Belle2 {
     char err_buf[500];
     sprintf(err_buf, "This function is not supported. (block %d) Exiting...\n %s %s %d\n",
             n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    string err_str = err_buf; throw (err_str); n = 0;
+    string err_str = err_buf; throw (err_str);
     return 0;
   }
 

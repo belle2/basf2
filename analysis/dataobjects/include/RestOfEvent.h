@@ -148,7 +148,7 @@ namespace Belle2 {
      * @return number of all remaining KLM clusters
      */
     int getNKLMClusters(void) const {
-      return int(m_eclClusterIndices.size());
+      return int(m_klmClusterIndices.size());
     }
 
     /**

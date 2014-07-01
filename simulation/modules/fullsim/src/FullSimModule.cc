@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010-2011  Belle II Collaboration                         *
+ * Copyright(C) 2010-2014 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Guofu Cao                                  *
+ * Contributors: Andreas Moll, Guofu Cao, Martin Ritter                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -61,11 +61,11 @@ REG_MODULE(FullSim)
 //                 Implementation
 //-----------------------------------------------------------------
 
-FullSimModule::FullSimModule() : Module(), m_visManager(NULL), m_useNativeGeant4(true)
+FullSimModule::FullSimModule() : Module(), m_visManager(nullptr), m_useNativeGeant4(true)
 {
   //Set module properties and the description
   setDescription("Performs the full Geant4 detector simulation. Requires a valid geometry in memory.");
-  setPropertyFlags(c_ParallelProcessingCertified);
+  setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
   //Parameter definition
   addParam("InputMCParticleCollection", m_mcParticleInputColName, "The name of the input MCParticle collection.", string(""));
@@ -197,7 +197,7 @@ void FullSimModule::initialize()
     G4ProcessVector& currProcList = *currParticle->GetProcessManager()->GetProcessList();
     for (int iProcess = 0; iProcess < currProcList.size(); ++iProcess) {
       G4Transportation* transport = dynamic_cast<G4Transportation*>(currProcList[iProcess]);
-      if (transport != NULL) {
+      if (transport != nullptr) {
         transport->SetThresholdImportantEnergy(m_thresholdImportantEnergy / Unit::MeV); //Geant4 energy unit is MeV
         transport->SetThresholdTrials(m_thresholdTrials);
         break;
@@ -246,16 +246,23 @@ void FullSimModule::initialize()
     trackingAction->setStoreTrajectories(m_trajectoryStore, m_trajectoryAngularTolerance, m_trajectoryDistanceTolerance);
     steppingAction->setStoreTrajectories(true);
   }
+
+  //Physics tables are build in run initialization. We have run independent
+  //geometry at the moment so there is no need to do this in begin run. Instead
+  //we use one Geant4 run for all Belle2 runs we might encounter. So let's do
+  //run initialization now to save memory when doing parallel processing
+  B2INFO("Perform Geant4 final initializtation: Geometry optimization, PhysicsList calculations...");
+  RunManager::Instance().beginRun(0);
+  B2INFO("done, Geant4 ready");
+  //Otherwise we could use a fake run to do this and move RunManager::beginRun
+  //back to beginRun()
+  //runManager.BeamOn(0);
 }
 
 
 void FullSimModule::beginRun()
 {
-  //Get the event meta data
-  StoreObjPtr<EventMetaData> eventMetaDataPtr;
-
-  //Begin the Geant4 run
-  RunManager::Instance().beginRun(eventMetaDataPtr->getRun());
+  //Nothing to do: geometry and physics are run independent
 }
 
 
@@ -271,17 +278,14 @@ void FullSimModule::event()
 
 void FullSimModule::endRun()
 {
-  //Terminate the Geant4 run
-  RunManager::Instance().endRun();
-
-  //G4UIExecutive * ui = new G4UIExecutive(0,0);
-  //ui->SessionStart();
-  //delete ui;
+  //Nothing to do: geometry and physics are run independent
 }
-
 
 void FullSimModule::terminate()
 {
-  if (m_visManager != NULL) delete m_visManager;
+  //We used one Geant4 run for all Belle2 runs so end the geant4 run here
+  RunManager::Instance().endRun();
+  //And clean up the run manager
+  if (m_visManager != nullptr) delete m_visManager;
   RunManager::Instance().destroy();
 }

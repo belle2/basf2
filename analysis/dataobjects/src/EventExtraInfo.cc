@@ -33,3 +33,5 @@ void EventExtraInfo::addExtraInfo(const std::string& name, float value)
   }
   eventExtraInfo[name] = value;
 }
+
+ClassImp(EventExtraInfo);

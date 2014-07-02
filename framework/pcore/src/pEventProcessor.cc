@@ -145,13 +145,12 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   analyzePath(spath);
 
 
-  dump_path("Input Path ", m_inpathlist[0]);
-  for (unsigned int i = 0; i < m_mainpathlist.size(); i++) {
-    dump_path("Main Path ", m_mainpathlist[i]);
-  }
-  for (unsigned int i = 0; i < m_outpathlist.size(); i++) {
-    dump_path("Output Path ", m_outpathlist[i]);
-  }
+  if (!m_inpathlist.empty())
+    B2INFO("Input Path " << m_inpathlist[0]->getPathString());
+  if (!m_mainpathlist.empty())
+    B2INFO("Main Path " << m_mainpathlist[0]->getPathString());
+  if (!m_outpathlist.empty())
+    B2INFO("Output Path " << m_outpathlist[0]->getPathString());
   if (m_mainpathlist.empty()) {
     B2WARNING("Cannot run any modules in parallel (no c_ParallelProcessingCertified flag), falling back to single-core mode.");
     EventProcessor::process(spath, maxEvent);
@@ -163,9 +162,8 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
 
   // 2. Initialization
   ModulePtrList modulelist = spath->buildModulePathList();;
-  //  dump_modules ( "full : ", modulelist );
   ModulePtrList initGlobally = getModulesWithoutFlag(modulelist, Module::c_InternalSerializer);
-  dump_modules("processInitialize : ", initGlobally);
+  //dump_modules("Initializing globally: ", initGlobally);
   processInitialize(initGlobally);
 
   ModulePtrList terminateGlobally = getModulesWithFlag(modulelist, Module::c_TerminateInAllProcesses);
@@ -396,24 +394,6 @@ void pEventProcessor::preparePaths()
 
 }
 
-void pEventProcessor::dump_path(const std::string title, PathPtr path)
-{
-  const ModulePtrList& modlist = path->getModules();
-  ModulePtrList::const_iterator it;
-  std::ostringstream strbuf;
-  strbuf << title << "(" << path.get() << ") : ";
-  for (it = modlist.begin(); it != modlist.end(); ++it) {
-    const Module* module = it->get();
-    strbuf << module->getName();
-    if (module->hasCondition()) {
-      PathPtr condpath = module->getConditionPath();
-      strbuf << "[->" << condpath.get() << "] ";
-    }
-    if (*it != modlist.back())
-      strbuf << " -> ";
-  }
-  B2INFO(strbuf.str());
-}
 
 void pEventProcessor::dump_modules(const std::string title, const ModulePtrList modlist)
 {

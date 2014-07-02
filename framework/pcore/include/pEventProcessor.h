@@ -59,9 +59,6 @@ namespace Belle2 {
     /** Create RingBuffer with name from given environment variable, add Tx and Rx modules to a and b. */
     RingBuffer* connectViaRingBuffer(const char* name, PathPtr a, PathPtr& b);
 
-    /*! Dump module names in the path */
-    void dump_path(const std::string, PathPtr);
-
     /*! Dump module names in the ModulePtrList */
     void dump_modules(const std::string, const ModulePtrList);
 

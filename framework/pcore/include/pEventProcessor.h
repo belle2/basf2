@@ -50,8 +50,14 @@ namespace Belle2 {
     void gotSigINT();
 
   private:
-    /*! Analyze given path */
-    void analyze_path(const PathPtr& path, Module* mod = NULL, int cstate = 0);
+    /** Analyze given path. Fills m_*pathlist objects. */
+    void analyzePath(const PathPtr& path);
+
+    /** Adds internal modules to paths, prepare RingBuffers. */
+    void preparePaths();
+
+    /** Create RingBuffer with name from given environment variable, add Tx and Rx modules to a and b. */
+    RingBuffer* connectViaRingBuffer(const char* name, PathPtr a, PathPtr& b);
 
     /*! Dump module names in the path */
     void dump_path(const std::string, PathPtr);

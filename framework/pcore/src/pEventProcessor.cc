@@ -142,7 +142,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   }
 
   // 1. Analyze start path and split into parallel paths
-  analyze_path(spath); //also inserts Rx/Tx modules into path (sets up IPC structures)
+  analyzePath(spath);
 
 
   dump_path("Input Path ", m_inpathlist[0]);
@@ -158,6 +158,8 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     return;
   }
 
+  //inserts Rx/Tx modules into path (sets up IPC structures)
+  preparePaths();
 
   // 2. Initialization
   ModulePtrList modulelist = spath->buildModulePathList();;
@@ -308,169 +310,90 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   }
 }
 
-
-void pEventProcessor::analyze_path(const PathPtr& path, Module* inmod, int cstate)
+void pEventProcessor::analyzePath(const PathPtr& path)
 {
+  //TODO this should either be properly generalized so it can deal with multiple parallel sections,
+  //or one can simply get rid of the different lists for paths...
+  PathPtr inpath(new Path);
+  PathPtr mainpath(new Path);
+  PathPtr outpath(new Path);
 
-  const ModulePtrList& modlist = path->getModules();
-  ModulePtrList::const_iterator iter;
+  int stage = 0; //0: in, 1: event/main, 2: out
+  for (const ModulePtr & module : path->getModules()) {
+    //TODO also check conditional path, or have setConditionPath() update module flag...
+    const bool hasParallelFlag = module->hasProperties(Module::c_ParallelProcessingCertified);
 
-  ModulePtrList inlist;
-  ModulePtrList mainlist;
-  ModulePtrList outlist;
+    //update stage?
+    if ((stage == 0 and hasParallelFlag) or (stage == 1 and !hasParallelFlag))
+      stage++;
 
-  // Set state
-  int state = 0;
-  if (inmod != NULL) {
-    state = 1;
-    B2DEBUG(0, "Analyze Path: called with condition module");
-  }
+    if (stage == 0) { //fill input path
+      inpath->addModule(module);
 
-  int nrbin = 0;
-  int nrbout = 0;
-  // Loop over modules on the path
-  for (iter = modlist.begin(); iter != modlist.end(); ++iter) {
-    ModulePtr modptr = *iter;
-    Module* module = iter->get();
-    // Check Module property
-    if (state == 0) {   // non-parallel modules for input
-      /*
-      if ( iter == modlist.begin() &&
-      module->hasProperties ( Module::c_HistogramManager ) ) {
-      if ( module->hasProperties ( Module::c_HistogramManager ) ) {
-      m_histoManagerFound = true;
-      m_histoman = *iter;  // Register histomanager module if exists
-      }
-      */
-      if (!module->hasProperties(Module::c_ParallelProcessingCertified)) {
-        inlist.push_back(modptr);
-        B2DEBUG(0, "Analyze Path : state=0, Module " << module->getName() << " added to inlist");
-        if (module->hasCondition()) {
-          B2DEBUG(0, "Analyze Path : Condition detected, recursive call");
-          PathPtr next = module->getConditionPath();
-          analyze_path(next, module, state);
-        }
-        if (module->hasProperties(Module::c_HistogramManager)) {
-          // Initialize histogram manager if found in the path
-          m_histoManagerFound = true;
-          m_histoman = *iter;
-          module->initialize();
-        }
-      } else {
-        state = 1;
-        if (!(inlist.empty())) {
-          // Create RingBuffer
-          char* inrbname = getenv("BASF2_RBIN");
-          RingBuffer* rbuf;
-          if (inrbname == NULL) {
-            rbuf = new RingBuffer();
-          } else {
-            char rbname[256];
-            sprintf(rbname, "%s%d", inrbname, nrbin);
-            rbuf = new RingBuffer(rbname, RingBuffer::c_DefaultSize);
-          }
-          m_rbinlist.push_back(rbuf);
-          nrbin++;
-          // Insert Tx at the end of current path
-          ModulePtr txptr(new TxModule(rbuf));
-          inlist.push_back(txptr);
-          // Inserv Rx at the top of next path
-          ModulePtr rxptr(new RxModule(rbuf));
-          mainlist.push_back(rxptr);
-          B2DEBUG(0, "Analyze Path : state=0->1, Tx and Rx are inserted");
-          if (m_histoManagerFound) {
-            mainlist.push_back(m_histoman);
-            B2DEBUG(0, "Analyze Path : state=0->1, HistoMan is inserted");
-          }
-        }
-        mainlist.push_back(modptr);
-        B2DEBUG(0, "Analyze Path : state=0->1, Module " << module->getName() << " added to mainlist");
-        if (module->hasCondition()) {
-          B2DEBUG(0, "Analyze Path : Condition detected, recursive call");
-          PathPtr next = module->getConditionPath();
-          analyze_path(next, module, state);
-        }
-      }
-    } else if (state == 1) {
-      if (module->hasProperties(Module::c_ParallelProcessingCertified)) {
-        mainlist.push_back(modptr);
-        B2DEBUG(0, "Analyze Path : state=1, Module " << module->getName() << " added to mainlist");
-        if (module->hasCondition()) {
-          B2DEBUG(0, "Analyze Path : Condition detected, recursive call");
-          PathPtr next = module->getConditionPath();
-          analyze_path(next, module, state);
-        }
-      } else {
-        state = 2;
-        if (!(mainlist.empty()) || (cstate == 1 && mainlist.empty())) {
-          // Create RingBuffer
-          //          RingBuffer* rbuf = new RingBuffer();
-          char* inrbname = getenv("BASF2_RBOUT");
-          RingBuffer* rbuf;
-          if (inrbname == NULL) {
-            rbuf = new RingBuffer();
-          } else {
-            char rbname[256];
-            sprintf(rbname, "%s%d", inrbname, nrbout);
-            rbuf = new RingBuffer(rbname, RingBuffer::c_DefaultSize);
-          }
-          m_rboutlist.push_back(rbuf);
-          nrbout++;
-          // Insert Tx at the end of current path
-          ModulePtr txptr(new TxModule(rbuf));
-          mainlist.push_back(txptr);
-          // Insert Rx at the top of next path
-          ModulePtr rxptr(new RxModule(rbuf));
-          outlist.push_back(rxptr);
-          B2DEBUG(0, "Analyze Path : state=1->2, Tx and Rx are inserted");
-          if (m_histoManagerFound) {
-            outlist.push_back(m_histoman);
-            B2DEBUG(0, "Analyze Path : state=1->2, HistoMan is inserted");
-          }
-        }
-        outlist.push_back(modptr);
-        B2DEBUG(0, "Analyze Path : state=1->2, Module " << module->getName() << " added to outlist");
-        if (module->hasCondition()) {
-          B2DEBUG(0, "Analyze Path : Condition detected, recursive call");
-          PathPtr next = module->getConditionPath();
-          analyze_path(next, module, state);
-        }
-      }
-    } else if (state == 2) {
-      // Modules after non-parallel module are all placed in output path.
-      B2DEBUG(0, "Analyze Path : state=2, Module " << module->getName() << " added to outlist");
-      outlist.push_back(modptr);
-      if (module->hasCondition()) {
-        B2DEBUG(0, "Analyze Path : Condition detected, recursive call");
-        PathPtr next = module->getConditionPath();
-        analyze_path(next, module, state);
+      if (module->hasProperties(Module::c_HistogramManager)) {
+        // Initialize histogram manager if found in the path
+        m_histoManagerFound = true;
+        m_histoman = module;
+
+        //add histoman to other paths
+        mainpath->addModule(m_histoman);
+        outpath->addModule(m_histoman);
       }
     }
-  }
-  B2DEBUG(100, "Analyze Path : mainlist size = " << mainlist.size());
-  B2DEBUG(100, "Analyze Path : inlist size = " << mainlist.size());
-  B2DEBUG(100, "Analyze Path : outlist size = " << mainlist.size());
 
-  PathPtr inpath(new Path);
-  if (!inlist.empty()) {
-    inpath->putModules(inlist);
+    if (stage == 1)
+      mainpath->addModule(module);
+    if (stage == 2)
+      outpath->addModule(module);
+  }
+
+  if (!inpath->isEmpty())
     m_inpathlist.push_back(inpath);
-  }
-  PathPtr bodypath(new Path);
-  if (!mainlist.empty()) {
-    bodypath->putModules(mainlist);
-    m_mainpathlist.push_back(bodypath);
-  }
-  PathPtr outpath(new Path);
-  if (!outlist.empty()) {
-    outpath->putModules(outlist);
+  if (!mainpath->isEmpty())
+    m_mainpathlist.push_back(mainpath);
+  if (!outpath->isEmpty())
     m_outpathlist.push_back(outpath);
+}
+
+RingBuffer* pEventProcessor::connectViaRingBuffer(const char* name, PathPtr a, PathPtr& b)
+{
+  //create ringbuffers and add rx/tx where needed
+  char* inrbname = getenv(name);
+  RingBuffer* rbuf;
+  if (inrbname == NULL) {
+    rbuf = new RingBuffer();
+  } else {
+    char rbname[256];
+    sprintf(rbname, "%s%d", inrbname, 0); //currently at most one input, one output buffer
+    rbuf = new RingBuffer(rbname, RingBuffer::c_DefaultSize);
   }
 
-  // Set new condition path to condition module
-  if (inmod != NULL && !mainlist.empty()) {
-    inmod->setConditionPath(bodypath);
+  // Insert Tx at the end of current path
+  ModulePtr txptr(new TxModule(rbuf));
+  a->addModule(txptr);
+  // Insert Rx at beginning of next path
+  ModulePtr rxptr(new RxModule(rbuf));
+  PathPtr newB(new Path());
+  newB->addModule(rxptr);
+  newB->addPath(b);
+  b.swap(newB);
+
+  return rbuf;
+}
+
+void pEventProcessor::preparePaths()
+{
+  if (m_histoManagerFound) {
+    m_histoman->initialize();
   }
+  if (m_mainpathlist.empty())
+    return; //we'll fall back to single-core
+
+  if (!m_inpathlist.empty())
+    m_rbinlist.push_back(connectViaRingBuffer("BASF2_RBIN", m_inpathlist[0], m_mainpathlist[0]));
+  if (!m_outpathlist.empty())
+    m_rboutlist.push_back(connectViaRingBuffer("BASF2_RBOUT", m_mainpathlist[0], m_outpathlist[0]));
+
 }
 
 void pEventProcessor::dump_path(const std::string title, PathPtr path)

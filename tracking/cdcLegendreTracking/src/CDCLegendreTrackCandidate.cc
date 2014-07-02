@@ -298,6 +298,9 @@ void CDCLegendreTrackCandidate::removeHit(CDCLegendreTrackHit* hit)
   [&hit](CDCLegendreTrackHit * trackHit) {
     return trackHit == hit;
   }), m_TrackHits.end());
+  /*
+    m_TrackHits.erase(std::remove(m_TrackHits.begin(), m_TrackHits.end(), hit), m_TrackHits.end());
+  */
 
   makeHitPattern();
 
@@ -306,6 +309,7 @@ void CDCLegendreTrackCandidate::removeHit(CDCLegendreTrackHit* hit)
   else
     --m_stereoHits;
 
+  hit->setUsed(CDCLegendreTrackHit::not_used);
 }
 
 int CDCLegendreTrackCandidate::getInnermostSLayer(bool forced, int minNHits)

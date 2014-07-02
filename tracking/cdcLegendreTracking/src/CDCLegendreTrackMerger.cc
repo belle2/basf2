@@ -278,8 +278,90 @@ double CDCLegendreTrackMerger::tryToMergeAndFit(CDCLegendreTrackCandidate* cand1
   std::pair<double, double> track_par = std::make_pair(-999, -999);
   double chi2_temp = m_cdcLegendreTrackFitter->fitTrackCandidateFast(c_list_temp, track_par, ref_point) / c_list_temp.size();
 
+  if (chi2_temp < 2.) {
+    std::vector<CDCLegendreTrackHit*> c_list_temp_new;
+    for (CDCLegendreTrackHit * hit : c_list_temp) {
+      c_list_temp_new.push_back(hit);
+    }
+    for (CDCLegendreTrackHit * hitToRemove : c_list_temp) {
+      c_list_temp_new.erase(std::remove(c_list_temp_new.begin(), c_list_temp_new.end(), hitToRemove), c_list_temp_new.end());
+      double chi2_temp_new = m_cdcLegendreTrackFitter->fitTrackCandidateFast(c_list_temp_new, track_par, ref_point) / c_list_temp_new.size();
+      if (chi2_temp_new > chi2_temp) c_list_temp_new.push_back(hitToRemove);
+    }
+    double chi2_temp_new = m_cdcLegendreTrackFitter->fitTrackCandidateFast(c_list_temp_new, track_par, ref_point) / c_list_temp_new.size();
+    if (chi2_temp > chi2_temp_new) {
+      /*      c_list_temp.clear();
+            for (CDCLegendreTrackHit * hit : c_list_temp_new) {
+              c_list_temp.push_back(hit);
+            }
+            chi2_temp = m_cdcLegendreTrackFitter->fitTrackCandidateFast(c_list_temp, track_par, ref_point) / c_list_temp.size();
+            for(CDCLegendreTrackHit* hitToRemove: c_list_temp){
+              c_list_temp_new.erase(std::remove(c_list_temp_new.begin(), c_list_temp_new.end(), hitToRemove), c_list_temp_new.end());
+              double chi2_temp_new = m_cdcLegendreTrackFitter->fitTrackCandidateFast(c_list_temp_new, track_par, ref_point) / c_list_temp_new.size();
+              if(chi2_temp_new > chi2_temp) c_list_temp_new.push_back(hitToRemove);
+            }
+            double chi2_temp_new = m_cdcLegendreTrackFitter->fitTrackCandidateFast(c_list_temp_new, track_par, ref_point) / c_list_temp_new.size();
+            if (chi2_temp > chi2_temp_new)
+            {
+              c_list_temp.clear();
+              for (CDCLegendreTrackHit * hit : c_list_temp_new) {
+                c_list_temp.push_back(hit);
+              }
+              chi2_temp = m_cdcLegendreTrackFitter->fitTrackCandidateFast(c_list_temp, track_par, ref_point) / c_list_temp.size();
+            }*/
+      chi2_temp = chi2_temp_new;
+    }
+  }
+
   return chi2_temp;
 
+}
+
+
+double CDCLegendreTrackMerger::selectCoreMergeFit(CDCLegendreTrackCandidate* cand1, CDCLegendreTrackCandidate* cand2)
+{
+  std::vector<CDCLegendreTrackHit*> hitList1;
+  for (CDCLegendreTrackHit * hit : cand1->getTrackHits()) {
+    if (checkDist(hit, cand1) <  4.*hit->getDeltaDriftTime()) hitList1.push_back(hit);
+  }
+
+  std::vector<CDCLegendreTrackHit*> hitList2;
+  for (CDCLegendreTrackHit * hit : cand2->getTrackHits()) {
+    if (checkDist(hit, cand2) <  4.*hit->getDeltaDriftTime()) hitList2.push_back(hit);
+  }
+
+  std::vector<CDCLegendreTrackHit*> c_list_temp;
+  for (CDCLegendreTrackHit * hit : hitList1) {
+    c_list_temp.push_back(hit);
+  }
+  for (CDCLegendreTrackHit * hit : hitList2) {
+    c_list_temp.push_back(hit);
+  }
+
+
+  std::pair<double, double> ref_point = std::make_pair(0., 0.);
+  std::pair<double, double> track_par = std::make_pair(-999, -999);
+  double chi2_temp = m_cdcLegendreTrackFitter->fitTrackCandidateFast(c_list_temp, track_par, ref_point) / c_list_temp.size();
+
+  return chi2_temp;
+
+}
+
+
+double CDCLegendreTrackMerger::checkDist(CDCLegendreTrackHit* hit, CDCLegendreTrackCandidate* track)
+{
+  double x0_track = cos(track->getTheta()) / track->getR() + track->getReferencePoint().X();
+  double y0_track = sin(track->getTheta()) / track->getR() + track->getReferencePoint().Y();
+  double R = fabs(1. / track->getR());
+  double dist_min = 999;
+  double x_pos, y_pos;
+
+
+  double x0_hit = hit->getOriginalWirePosition().X();
+  double y0_hit = hit->getOriginalWirePosition().Y();
+  double dist = fabs(fabs(R - sqrt((x0_track - x0_hit) * (x0_track - x0_hit) + (y0_track - y0_hit) * (y0_track - y0_hit))) - hit->getDriftTime());
+
+  return dist;
 }
 
 void CDCLegendreTrackMerger::splitTracks()
@@ -312,7 +394,7 @@ void CDCLegendreTrackMerger::splitTracks()
     }
 
     if ((hits_pos != 0) && (hits_neg != 0)) {
-      std::vector<CDCLegendreTrackHit*> hitForNewTrack;
+      std::vector<CDCLegendreTrackHit*> hitsForNewTrack;
       int chargeNewTrack;
       if (hits_pos > hits_neg)
         chargeNewTrack = CDCLegendreTrackCandidate::charge_negative;
@@ -321,20 +403,20 @@ void CDCLegendreTrackMerger::splitTracks()
 
       for (CDCLegendreTrackHit * hit : cand->getTrackHits()) {
         int curve_sign = hit->getCurvatureSignWrt(xc, yc);
-        if (curve_sign == chargeNewTrack) hitForNewTrack.push_back(hit);
+        if (curve_sign == chargeNewTrack) hitsForNewTrack.push_back(hit);
       }
 
-      for (CDCLegendreTrackHit * hit : hitForNewTrack) {
+      for (CDCLegendreTrackHit * hit : hitsForNewTrack) {
         cand->removeHit(hit);
         hit->setUsed(CDCLegendreTrackHit::not_used);
       }
 
-      if (hitForNewTrack.size() > 5) {
-        CDCLegendreTrackCandidate* newTracklet = m_cdcLegendreTrackCreator->createLegendreTracklet(hitForNewTrack);
+      if (hitsForNewTrack.size() > 5) {
+        CDCLegendreTrackCandidate* newTracklet = m_cdcLegendreTrackCreator->createLegendreTracklet(hitsForNewTrack);
         newTracklet->reestimateCharge();
         m_cdcLegendreTrackFitter->fitTrackCandidateFast(newTracklet);
       } else {
-        hitForNewTrack.clear();
+        hitsForNewTrack.clear();
       }
 
       cand->reestimateCharge();

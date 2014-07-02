@@ -47,6 +47,16 @@ namespace Belle2 {
     double tryToMergeAndFit(CDCLegendreTrackCandidate* cand1, CDCLegendreTrackCandidate* cand2);
 
     /**
+     * Trying select core of the tracks and fit them together, then add good hits
+     */
+    double selectCoreMergeFit(CDCLegendreTrackCandidate* cand1, CDCLegendreTrackCandidate* cand2);
+
+    /**
+     * Calculate distance between track and hit
+     */
+    double checkDist(CDCLegendreTrackHit* hit, CDCLegendreTrackCandidate* cand);
+
+    /**
      * Split tracks into positive and negative parts
      */
     void splitTracks();

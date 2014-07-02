@@ -13,6 +13,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KLMCluster.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
@@ -128,7 +129,7 @@ void ContinuumSuppressionBuilderModule::event()
 
     if (roe) {
 
-      // Charged tracks
+      // Charged tracks -> Pion
       //
       std::vector<Belle2::Track*> roeTracks = roe->getTracks();
 
@@ -156,7 +157,7 @@ void ContinuumSuppressionBuilderModule::event()
         }
       }
 
-      // Gammas
+      // ECLCluster -> Gamma
       //
       std::vector<Belle2::ECLCluster*> roeECLClusters = roe->getECLClusters();
 
@@ -166,7 +167,7 @@ void ContinuumSuppressionBuilderModule::event()
 
         if (cluster->isNeutral()) {
 
-          // Create particle from cluster with gamma hypothesis
+          // Create particle from ECLCluster with gamma hypothesis
           Particle particle(cluster);
 
           TLorentzVector p_lab = particle.get4Vector();
@@ -181,6 +182,30 @@ void ContinuumSuppressionBuilderModule::event()
           et[0] += p_cms.Perp();
           et[1] += p_cms.Perp();
         }
+      }
+
+      // KLMCluster -> K0_L
+      //
+      std::vector<Belle2::KLMCluster*> roeKLMClusters = roe->getKLMClusters();
+
+      for (int i = 0; i < roe->getNKLMClusters(); i++) {
+
+        const KLMCluster* cluster = roeKLMClusters[i];
+
+        // Create particle from KLMCluster with K0_L hypothesis
+        Particle particle(cluster);
+
+        TLorentzVector p_lab = particle.get4Vector();
+        if (p_lab.Rho() < 0.05) continue;
+        PCmsLabTransform T;
+        TLorentzVector p_cms = T.rotateLabToCms() * p_lab;
+        if (p_cms.Rho() > P_MAX) continue;
+        p3_cms_roe.push_back(p_cms.Vect());
+        Q_roe.push_back(0);
+        p_cms_missA -= p_cms;
+        p_cms_missB -= p_cms;
+        et[0] += p_cms.Perp();
+        et[1] += p_cms.Perp();
       }
 
       // Thrust variables

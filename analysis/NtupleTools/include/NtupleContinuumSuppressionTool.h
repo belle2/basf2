@@ -25,19 +25,52 @@ namespace Belle2 {
   /** Writes DeltaE and M_bc of B candidate to flat ntuple. */
   class NtupleContinuumSuppressionTool : public NtupleFlatTool {
   private:
-    float m_fThrustB;
-    float m_fThrustO;
+    float m_fThrustB; /** magnitude of B thrust axis */
+    float m_fThrustO; /** magnitude of ROE thrust axis */
 
-    float m_fCosTBTO;
-    float m_fCosTBz;
+    float m_fCosTBTO; /** cosine of the angle between the thrust axis of the B and the thrust axis of the ROE */
+    float m_fCosTBz;  /** cosine of the angle between the thrust axis of the B and the z-axis */
 
-    float
-    m_k0mm2,   m_k0et,
-               m_k0hso00, m_k0hso01, m_k0hso02, m_k0hso03, m_k0hso04, m_k0hso10, m_k0hso12, m_k0hso14, m_k0hso20, m_k0hso22, m_k0hso24,
-               m_k0hoo0,  m_k0hoo1,  m_k0hoo2,  m_k0hoo3,  m_k0hoo4,
-               m_k1mm2,   m_k1et,
-               m_k1hso00, m_k1hso01, m_k1hso02, m_k1hso03, m_k1hso04, m_k1hso10, m_k1hso12, m_k1hso14, m_k1hso20, m_k1hso22, m_k1hso24,
-               m_k1hoo0,  m_k1hoo1,  m_k1hoo2,  m_k1hoo3,  m_k1hoo4;
+    // For final state = 0
+    float m_k0mm2;    /** missing mass squared */
+    float m_k0et;     /** E_{T} */
+    float m_k0hso00;  /** H_{00}^{so} */
+    float m_k0hso01;  /** H_{01}^{so} */
+    float m_k0hso02;  /** H_{02}^{so} */
+    float m_k0hso03;  /** H_{03}^{so} */
+    float m_k0hso04;  /** H_{04}^{so} */
+    float m_k0hso10;  /** H_{10}^{so} */
+    float m_k0hso12;  /** H_{12}^{so} */
+    float m_k0hso14;  /** H_{14}^{so} */
+    float m_k0hso20;  /** H_{20}^{so} */
+    float m_k0hso22;  /** H_{22}^{so} */
+    float m_k0hso24;  /** H_{24}^{so} */
+    float m_k0hoo0;   /** R_{0}^{oo} */
+    float m_k0hoo1;   /** R_{1}^{oo} */
+    float m_k0hoo2;   /** R_{2}^{oo} */
+    float m_k0hoo3;   /** R_{3}^{oo} */
+    float m_k0hoo4;   /** R_{4}^{oo} */
+
+    // For final state = 1
+    float m_k1mm2;    /** missing mass squared */
+    float m_k1et;     /** E_{T} */
+    float m_k1hso00;  /** H_{00}^{so} */
+    float m_k1hso01;  /** H_{01}^{so} */
+    float m_k1hso02;  /** H_{02}^{so} */
+    float m_k1hso03;  /** H_{03}^{so} */
+    float m_k1hso04;  /** H_{04}^{so} */
+    float m_k1hso10;  /** H_{10}^{so} */
+    float m_k1hso12;  /** H_{12}^{so} */
+    float m_k1hso14;  /** H_{14}^{so} */
+    float m_k1hso20;  /** H_{20}^{so} */
+    float m_k1hso22;  /** H_{22}^{so} */
+    float m_k1hso24;  /** H_{24}^{so} */
+    float m_k1hoo0;   /** R_{0}^{oo} */
+    float m_k1hoo1;   /** R_{1}^{oo} */
+    float m_k1hoo2;   /** R_{2}^{oo} */
+    float m_k1hoo3;   /** R_{3}^{oo} */
+    float m_k1hoo4;   /** R_{4}^{oo} */
+
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();

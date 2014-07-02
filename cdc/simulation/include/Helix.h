@@ -225,8 +225,8 @@ namespace Belle2 {
 
     private:
       static HepVector ms_amin;
-      static HepVector ms_amax; ///
-      static bool ms_check_range;     /// Check the helix parameter's range.
+      static HepVector ms_amax; //!
+      static bool ms_check_range;     //! Check the helix parameter's range.
       static bool ms_print_debug;     /*! Debug option flag. */
       static bool ms_throw_exception; /*! Throw exception flag. */
 

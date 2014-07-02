@@ -156,12 +156,14 @@ namespace Belle2 {
       m_leftRight = (m_leftRight | (unsigned char)zeroOrOne);
     }
 
+    //! The method to set new left/right info. for digitization
     void setLeftRightPassageRaw(int minusOneOrZeroOrOne) {
       int zeroOrOne = (minusOneOrZeroOrOne <= 0) ? 0 : 1;
       m_leftRight &= 0x5;
       m_leftRight = (m_leftRight | ((unsigned char)zeroOrOne << 1));
     }
 
+    //! The method to set new left/right info. for tracking
     void setLeftRightPassage(int minusOneOrZeroOrOne) {
       int zeroOrOne = (minusOneOrZeroOrOne <= 0) ? 0 : 1;
       m_leftRight &= 0x3;
@@ -214,16 +216,18 @@ namespace Belle2 {
       return TVector3(m_posTrack[0], m_posTrack[1], m_posTrack[2]);
     }
 
-    //! The method to get left/right info.
+    //! The method to get old left/right info.
     int getPosFlag() const {
       return (int)(m_leftRight & 0x1);
     }
 
+    //! The method to get new left/right info. for digitization
     int getLeftRightPassageRaw() const {
       int minusOneOrOne = (int((m_leftRight & 0x2) >> 1) == 0) ? -1 : 1;
       return minusOneOrOne;
     }
 
+    //! The method to get new left/right info. for tracking
     int getLeftRightPassage() const {
       int minusOneOrOne = (int((m_leftRight & 0x4) >> 2) == 0) ? -1 : 1;
       return minusOneOrOne;
@@ -261,6 +265,7 @@ namespace Belle2 {
               TVector3 posTrack,
               int leftRight,
               double globalTime): SimHitBase() {
+
       m_wireID.setWireID(layerId, wireId);
       m_trackId = trackId;
       m_pdg = pdg;

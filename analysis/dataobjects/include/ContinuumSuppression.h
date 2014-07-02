@@ -45,38 +45,101 @@ namespace Belle2 {
      */
     ContinuumSuppression() : m_thrustBm(0.0), m_thrustOm(0.0), m_cosTBTO(0.0), m_cosTBz(0.0) {};
 
+    // setters
+    /**
+     * Add magnitude of B thrust axis.
+     *
+     * @param Float magnitute of B thrust axis
+     */
     void addThrustBm(float thrustBm);
 
+    /**
+     * Add magnitude of ROE thrust axis.
+     *
+     * @param Float magnitute of ROE thrust axis
+     */
+    void addThrustOm(float thrustOm);
+
+    /**
+     * Add cosine of the angle between the thrust axis of the B and the thrust axis of the ROE.
+     *
+     * @param Float cosine of the angle between the thrust axis of the B and the thrust axis of the ROE
+     */
+    void addCosTBTO(float cosTBTO);
+
+    /**
+     * Add cosine of the angle between the thrust axis of the B and the z-axis.
+     *
+     * @param Float cosine of the angle between the thrust axis of the B and the z-axis
+     */
+    void addCosTBz(float cosTBz);
+
+    /**
+     * Add vector of KSFW moments, Et, and mm2 for final state = 0.
+     *
+     * @param vector of KSFW moments, Et, and mm2 for final state = 0
+     */
+    void addKsfwFS0(std::vector<float> ksfwFS0);
+
+    /**
+     * Add vector of KSFW moments, Et, and mm2 for final state = 1.
+     *
+     * @param vector of KSFW moments, Et, and mm2 for final state = 1
+     */
+    void addKsfwFS1(std::vector<float> ksfwFS1);
+
+
+    // getters
+    /**
+     * Get magnitude of B thrust axis.
+     *
+     * @return Float magnitute of B thrust axis
+     */
     float getThrustBm(void) const {
       return m_thrustBm;
     }
 
-    void addThrustOm(float thrustOm);
-
+    /**
+     * Get magnitude of ROE thrust axis.
+     *
+     * @return Float magnitute of ROE thrust axis
+     */
     float getThrustOm(void) const {
       return m_thrustOm;
     }
 
-    void addCosTBTO(float cosTBTO);
-
+    /**
+     * Get cosine of the angle between the thrust axis of the B and the thrust axis of the ROE.
+     *
+     * @return Float cosine of the angle between the thrust axis of the B and the thrust axis of the ROE
+     */
     float getCosTBTO(void) const {
       return m_cosTBTO;
     }
 
-    void addCosTBz(float cosTBz);
-
+    /**
+     * Get cosine of the angle between the thrust axis of the B and the z-axis.
+     *
+     * @return Float cosine of the angle between the thrust axis of the B and the z-axis
+     */
     float getCosTBz(void) const {
       return m_cosTBz;
     }
 
-    void addKsfwFS0(std::vector<float> ksfwFS0);
-
+    /**
+     * Get vector of KSFW moments, Et, and mm2 for final state = 0.
+     *
+     * @return vector of KSFW moments, Et, and mm2 for final state = 0
+     */
     std::vector<float> getKsfwFS0(void) const {
       return m_ksfwFS0;
     }
 
-    void addKsfwFS1(std::vector<float> ksfwFS1);
-
+    /**
+     * Get vector of KSFW moments, Et, and mm2 for final state = 1.
+     *
+     * @return vector of KSFW moments, Et, and mm2 for final state = 1
+     */
     std::vector<float> getKsfwFS1(void) const {
       return m_ksfwFS1;
     }
@@ -84,13 +147,14 @@ namespace Belle2 {
 
   private:
 
-    float m_thrustBm;
-    float m_thrustOm;
-    float m_cosTBTO;
-    float m_cosTBz;
+    // persistent data members
+    float m_thrustBm;  /**< Float of magnitude of B thrust axis */
+    float m_thrustOm;  /**< Float of magnitude of ROE thrust axis */
+    float m_cosTBTO;   /**< cosine of the angle between the thrust axis of the B and the thrust axis of the ROE */
+    float m_cosTBz;    /**< cosine of the angle between the thrust axis of the B and the z-axis */
 
-    std::vector<float> m_ksfwFS0;
-    std::vector<float> m_ksfwFS1;
+    std::vector<float> m_ksfwFS0;  /**< vector of KSFW moments, Et, and mm2 for final state = 0 */
+    std::vector<float> m_ksfwFS1;  /**< vector of KSFW moments, Et, and mm2 for final state = 1 */
 
     ClassDef(ContinuumSuppression, 1) /**< class definition */
 

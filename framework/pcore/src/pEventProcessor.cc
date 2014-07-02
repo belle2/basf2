@@ -141,7 +141,25 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     return;
   }
 
-  // 1. Initialization
+  // 1. Analyze start path and split into parallel paths
+  analyze_path(spath); //also inserts Rx/Tx modules into path (sets up IPC structures)
+
+
+  dump_path("Input Path ", m_inpathlist[0]);
+  for (unsigned int i = 0; i < m_mainpathlist.size(); i++) {
+    dump_path("Main Path ", m_mainpathlist[i]);
+  }
+  for (unsigned int i = 0; i < m_outpathlist.size(); i++) {
+    dump_path("Output Path ", m_outpathlist[i]);
+  }
+  if (m_mainpathlist.empty()) {
+    B2WARNING("Cannot run any modules in parallel (no c_ParallelProcessingCertified flag), falling back to single-core mode.");
+    EventProcessor::process(spath, maxEvent);
+    return;
+  }
+
+
+  // 2. Initialization
   ModulePtrList modulelist = spath->buildModulePathList();;
   //  dump_modules ( "full : ", modulelist );
   ModulePtrList initGlobally = getModulesWithoutFlag(modulelist, Module::c_InternalSerializer);
@@ -170,17 +188,6 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     B2FATAL("Cannot setup SIGSEGV signal handler\n");
   }
   */
-
-  // 2. Analyze start path and split into parallel paths
-  analyze_path(spath); //also inserts Rx/Tx modules into path (sets up IPC structures)
-
-  dump_path("Input Path ", m_inpathlist[0]);
-  for (unsigned int i = 0; i < m_bodypathlist.size(); i++) {
-    dump_path("Main Path ", m_bodypathlist[i]);
-  }
-  for (unsigned int i = 0; i < m_outpathlist.size(); i++) {
-    dump_path("Output Path ", m_outpathlist[i]);
-  }
 
   //Path for current process
   PathPtr localPath;
@@ -217,7 +224,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     fflush(stdout);
     m_procHandler->startEventProcesses(numProcesses);
     if (m_procHandler->isEventProcess()) {
-      localPath = m_bodypathlist[m_bodypathlist.size() - 1];
+      localPath = m_mainpathlist[m_mainpathlist.size() - 1];
       m_master = localPath->getModules().begin()->get(); //set Rx as master
     }
   }
@@ -452,7 +459,7 @@ void pEventProcessor::analyze_path(const PathPtr& path, Module* inmod, int cstat
   PathPtr bodypath(new Path);
   if (!mainlist.empty()) {
     bodypath->putModules(mainlist);
-    m_bodypathlist.push_back(bodypath);
+    m_mainpathlist.push_back(bodypath);
   }
   PathPtr outpath(new Path);
   if (!outlist.empty()) {
@@ -464,8 +471,6 @@ void pEventProcessor::analyze_path(const PathPtr& path, Module* inmod, int cstat
   if (inmod != NULL && !mainlist.empty()) {
     inmod->setConditionPath(bodypath);
   }
-
-  return;
 }
 
 void pEventProcessor::dump_path(const std::string title, PathPtr path)

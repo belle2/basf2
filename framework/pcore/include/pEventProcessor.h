@@ -90,7 +90,7 @@ namespace Belle2 {
     /** list of input paths (contains one path. why a list?) */
     std::vector<PathPtr> m_inpathlist;
     /** list of main paths (contains one path. why a list?) */
-    std::vector<PathPtr> m_bodypathlist;
+    std::vector<PathPtr> m_mainpathlist;
     /** list of output paths (contains one path. why a list?) */
     std::vector<PathPtr> m_outpathlist;
 

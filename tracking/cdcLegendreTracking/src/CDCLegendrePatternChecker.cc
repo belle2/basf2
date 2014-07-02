@@ -4,6 +4,8 @@
 
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
 
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackCreator.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -40,7 +42,7 @@ void CDCLegendrePatternChecker::checkCurler(
       track->first.erase(std::remove_if(track->first.begin(), track->first.end(),
       [&center, &charge, &ii](CDCLegendreTrackHit * hit) {
       if ((hit->getSuperlayerId() == ii) && (hit->getCurvatureSignWrt(center.first, center.second) == CDCLegendreTrackCandidate::charge_positive)) {
-        hit->setUsed(CDCLegendreTrackHit::used_bad);
+        hit->setUsed(CDCLegendreTrackHit::bad);
         return true;
       } else {
         return false;
@@ -55,7 +57,7 @@ void CDCLegendrePatternChecker::checkCurler(
       track->first.erase(std::remove_if(track->first.begin(), track->first.end(),
       [&center, &charge, &ii](CDCLegendreTrackHit * hit) {
       if ((hit->getSuperlayerId() == ii) && (hit->getCurvatureSignWrt(center.first, center.second) == CDCLegendreTrackCandidate::charge_negative)) {
-        hit->setUsed(CDCLegendreTrackHit::used_bad);
+        hit->setUsed(CDCLegendreTrackHit::bad);
         return true;
       } else {
         return false;
@@ -69,7 +71,7 @@ void CDCLegendrePatternChecker::checkCurler(
     track->first.erase(std::remove_if(track->first.begin(), track->first.end(),
     [&center, &charge](CDCLegendreTrackHit * hit) {
       if (hit->getCurvatureSignWrt(center.first, center.second) != CDCLegendreTrackCandidate::charge_positive) {
-        hit->setUsed(CDCLegendreTrackHit::used_bad);
+        hit->setUsed(CDCLegendreTrackHit::bad);
         return true;
       } else {
         return false;
@@ -79,7 +81,7 @@ void CDCLegendrePatternChecker::checkCurler(
     track->first.erase(std::remove_if(track->first.begin(), track->first.end(),
     [&center, &charge](CDCLegendreTrackHit * hit) {
       if (hit->getCurvatureSignWrt(center.first, center.second) != CDCLegendreTrackCandidate::charge_negative) {
-        hit->setUsed(CDCLegendreTrackHit::used_bad);
+        hit->setUsed(CDCLegendreTrackHit::bad);
         return true;
       } else {
         return false;
@@ -92,12 +94,122 @@ void CDCLegendrePatternChecker::checkCurler(
 }
 
 
-void CDCLegendrePatternChecker::checkCandidate(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* track)
+bool CDCLegendrePatternChecker::checkCandidate(CDCLegendreTrackCandidate* track, int minNHitsSLayer)
 {
-  if (track->second.second < m_rc) checkCurler(track);
+  HitPatternCDC trackHitPattern = track->getHitPattern();
+  B2DEBUG(100, "Initial pattern: " << trackHitPattern.getBitSet());
+
+  // The variable is true if we are following part of pattern with number of hits >= 3
+  // Set it to false when nhits in sLayer < 3
+  // Allows to find tracklets and longest path of hits
+  bool trackHitsFollowing = false;
+
+  //here we store all patterns of hits created during procedure
+  std::vector<HitPatternCDC> patterns;
+  std::bitset<64> temp_pattern;
+  temp_pattern.reset();
+
+  std::bitset<64> sLayerZer(static_cast<std::string>("0000000000000000000000000000000000000000000000000000000011111111"));
+  std::bitset<64> sLayerOne(static_cast<std::string>("0000000100000000000000000000000000000000000000000011111100000000"));
+  std::bitset<64> sLayerTwo(static_cast<std::string>("0000001000000000000000000000000000000000000011111100000000000000"));
+  std::bitset<64> sLayerThr(static_cast<std::string>("0000010000000000000000000000000000000011111100000000000000000000"));
+  std::bitset<64> sLayerFou(static_cast<std::string>("0000100000000000000000000000000011111100000000000000000000000000"));
+  std::bitset<64> sLayerFiv(static_cast<std::string>("0001000000000000000000000011111100000000000000000000000000000000"));
+  std::bitset<64> sLayerSix(static_cast<std::string>("0010000000000000000011111100000000000000000000000000000000000000"));
+  std::bitset<64> sLayerSev(static_cast<std::string>("0100000000000011111100000000000000000000000000000000000000000000"));
+  std::bitset<64> sLayerEig(static_cast<std::string>("1000000011111100000000000000000000000000000000000000000000000000"));
+  const std::bitset<64> s_sLayerMasks[9] = {sLayerZer, sLayerOne, sLayerTwo, sLayerThr, sLayerFou,
+                                            sLayerFiv, sLayerSix, sLayerSev, sLayerEig
+                                           };
+  for (int sLayer = 8; sLayer >= 0; sLayer -= 2) {
+    unsigned short nHits = trackHitPattern.getSLayerNHits(sLayer);
+    if (nHits < minNHitsSLayer) {
+      trackHitPattern.resetSLayer(sLayer);
+      if (trackHitsFollowing) {
+        patterns.emplace_back(temp_pattern.to_ulong());
+        temp_pattern.reset();
+      }
+      trackHitsFollowing = false;
+    } else {
+      trackHitsFollowing = true;
+      temp_pattern = temp_pattern | (trackHitPattern.getBitSet() & s_sLayerMasks[sLayer]);
+    }
+
+  }
+
+  if (trackHitsFollowing)
+    patterns.emplace_back(temp_pattern.to_ulong());
+
+  if (patterns.size() == 0) return false;
+
+  B2DEBUG(100, "Cleaned pattern: " << trackHitPattern.getBitSet());
+  B2DEBUG(100, "Number of found tracklets: " << patterns.size());
+
+  if (patterns.size() > 1) B2DEBUG(100, "Track has been splitted!");
+
+  int nHits_longest = 0;
+  int nHits_current = 0;
+  int index_longest = 0;
+  int ii = 0;
+
+  for (HitPatternCDC & pattern : patterns) {
+    B2DEBUG(100, "Tracklet pattern: " << pattern.getBitSet());
+    nHits_current = 0;
+    for (int sLayer = 8; sLayer >= 0; sLayer -= 2) {
+      nHits_current += pattern.getSLayerNHits(sLayer);
+    }
+    if (nHits_current > nHits_longest) {
+      nHits_longest = nHits_current;
+      index_longest = ii;
+    }
+    ii++;
+  }
+
+  std::vector<CDCLegendreTrackHit*> trackletHits;
+  trackletHits.clear();
+  for (int ii = 0; ii < patterns.size(); ii++) {
+    if (ii == index_longest) continue;
+    for (CDCLegendreTrackHit * hit : track->getTrackHits()) {
+      if (patterns[ii].hasLayer(hit->getLayerId())) trackletHits.push_back(hit);
+    }
+    if (trackletHits.size() > 0) m_cdcLegendreTrackCreator->createLegendreTracklet(trackletHits)->setCandidateType(CDCLegendreTrackCandidate::tracklet);
+    trackletHits.clear();
+  }
+
+  track->getTrackHits().erase(std::remove_if(track->getTrackHits().begin(), track->getTrackHits().end(), [&patterns, &index_longest](CDCLegendreTrackHit * hit) {return not patterns[index_longest].hasLayer(hit->getLayerId());}), track->getTrackHits().end());
+
+  track->setCandidateType(CDCLegendreTrackCandidate::tracklet);
+
+  return true;
 
 }
 
+/*
+int CDCLegendreTrackCandidate::getCandidateType()
+{
+  int type = 0;
+  int innermostAxialLayer = getInnermostSLayer();
+  int outermostAxialLayer = getOutermostSLayer();
+
+  B2DEBUG(100, "innermost: " <<  innermostAxialLayer << "; outermost:" << outermostAxialLayer);
+  //check whether track is "fullTrack"
+  if ((innermostAxialLayer == 0) && (outermostAxialLayer == 8)) { //hardcoded since CDC will not change
+    type = fullTrack;
+  } else
+    //check whether track is "curler"
+    if ((innermostAxialLayer == 0) && (m_hitPattern.getSLayerNHits(0) > 2)) {
+//    for(int layer = 2; layer < 8; layer+=2)
+//      if(hitPatternAxial.getNSLayer(layer) > 3)
+      type = curlerTrack;
+    } else
+      //check whether track is "tracklet"
+      if ((innermostAxialLayer != 0) || (m_hitPattern.getSLayerNHits(0) < 2)) {
+        type = tracklet;
+      }
+
+  return type;
+}
+*/
 int CDCLegendrePatternChecker::getMaxSLayer(HitPatternCDC* pattern)
 {
   double outermostAxialSLayer;
@@ -147,7 +259,7 @@ void CDCLegendrePatternChecker::clearBadHits(std::pair<std::vector<CDCLegendreTr
     double y0_hit = hit->getOriginalWirePosition().Y();
     double dist = fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftTime();
     if (dist > hit->getDriftTime() / 2.) {
-      hit->setUsed(CDCLegendreTrackHit::used_bad);
+      hit->setUsed(CDCLegendreTrackHit::bad);
       return true;
     } else {
       return false;

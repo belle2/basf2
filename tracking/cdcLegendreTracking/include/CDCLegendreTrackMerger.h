@@ -19,6 +19,8 @@ namespace Belle2 {
   class CDCLegendreTrackHit;
   class CDCLegendreTrackCandidate;
   class CDCLegendreTrackFitter;
+  class CDCLegendreFastHough;
+  class CDCLegendreTrackCreator;
 
 
   /* TODO: Check whether track overlaps with other tracks; may be try to sort tracks according to number of inresections/overlappings, some weights might be applied
@@ -26,7 +28,7 @@ namespace Belle2 {
   class CDCLegendreTrackMerger {
   public:
 
-    CDCLegendreTrackMerger(std::list<CDCLegendreTrackCandidate*>& trackList, CDCLegendreTrackFitter* cdcLegendreTrackFitter);
+    CDCLegendreTrackMerger(std::list<CDCLegendreTrackCandidate*>& trackList, std::list<CDCLegendreTrackCandidate*>& trackletList, std::list<CDCLegendreTrackCandidate*>& stereoTrackletList, CDCLegendreTrackFitter* cdcLegendreTrackFitter, CDCLegendreFastHough* cdcLegendreFastHough, CDCLegendreTrackCreator* cdcLegendreTrackCreator);
 
 
     /**
@@ -38,6 +40,22 @@ namespace Belle2 {
      * Trying to merge tracks
      */
     void MergeTracks();
+
+    /**
+     * Trying to merge tracks
+     */
+    double tryToMergeAndFit(CDCLegendreTrackCandidate* cand1, CDCLegendreTrackCandidate* cand2);
+
+    /**
+     * Split tracks into positive and negative parts
+     */
+    void splitTracks();
+
+    /**
+     * check whether tracks are overlapping;
+     * for overlapping tracks try to merge them or make clear separation
+     */
+    void checkOverlapping();
 
     /**
      * @brief Function to merge two track candidates
@@ -60,10 +78,34 @@ namespace Belle2 {
      */
     void mergeTracks(CDCLegendreTrackCandidate* cand1, CDCLegendreTrackCandidate* cand2);
 
+    /**
+     * Function which adds stereo tracklets to the track
+     * Uses simple combinations of tracks
+     * also theta angle determination implemented; for each tracklet which possibly can belong to the track theta angle are calculated, and then voting for better theta angle done
+     */
+    void addStereoTracklesToTrack();
+
+    /**
+     * Set stereowire z position
+     * first, estimate z-position of wires, fine ajustment of z position using info about drift time
+     *
+     */
+    double fitStereoTrackletsToTrack(CDCLegendreTrackCandidate*, CDCLegendreTrackCandidate*);
+
+
+    void extendTracklet(CDCLegendreTrackCandidate* tracklet, std::vector<CDCLegendreTrackHit*>& m_AxialHitList);
+
+
   private:
 
     std::list<CDCLegendreTrackCandidate*>& m_trackList; /**< List of track candidates. Mainly used for memory management! */
+    std::list<CDCLegendreTrackCandidate*>& m_trackletList; /**< List of tracklets. */
+    std::list<CDCLegendreTrackCandidate*>& m_stereoTrackletList; /**< List of tracklets. */
     CDCLegendreTrackFitter* m_cdcLegendreTrackFitter;
+    CDCLegendreFastHough* m_cdcLegendreFastHough;
+    CDCLegendreTrackCreator* m_cdcLegendreTrackCreator;
+
+
   };
 
 }

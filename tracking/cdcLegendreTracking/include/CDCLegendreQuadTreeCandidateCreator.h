@@ -20,6 +20,7 @@ namespace Belle2 {
   class CDCLegendreQuadTree;
   class CDCLegendreTrackFitter;
   class CDCLegendreTrackCreator;
+  class CDCLegendreTrackMerger;
 
 
   class CDCLegendreQuadTreeCandidateCreator {
@@ -34,12 +35,22 @@ namespace Belle2 {
     /*
      * Set candidate fitter
      */
-    void setFitter(CDCLegendreTrackFitter* cdcLegendreTrackFitter) {s_cdcLegendreTrackFitter = cdcLegendreTrackFitter;};
+    static void setFitter(CDCLegendreTrackFitter* cdcLegendreTrackFitter) {s_cdcLegendreTrackFitter = cdcLegendreTrackFitter;};
+
+    /*
+     * Set candidate merger
+     */
+    static void setMerger(CDCLegendreTrackMerger* cdcLegendreTrackMerger) {s_cdcLegendreTrackMerger = cdcLegendreTrackMerger;};
+
+    /*
+     * Set hits
+     */
+    static void setHits(std::vector<CDCLegendreTrackHit*>& axialHits) {s_axialHits = axialHits;};
 
     /*
      * Set candidate fitter
      */
-    void setCandidateCreator(CDCLegendreTrackCreator* cdcLegendreTrackCreator) {s_cdcLegendreTrackCreator = cdcLegendreTrackCreator;};
+    static void setCandidateCreator(CDCLegendreTrackCreator* cdcLegendreTrackCreator) {s_cdcLegendreTrackCreator = cdcLegendreTrackCreator;};
 
     /*
      * Add node to the list of nodes with candidated
@@ -54,7 +65,12 @@ namespace Belle2 {
     /*
      * Creating candidate using information from given node
      */
-    void createCandidate(CDCLegendreQuadTree* node);
+    bool createCandidate(CDCLegendreQuadTree* node);
+
+    /*
+     * Creating candidate using information from given node
+     */
+    bool createCandidateDirect(CDCLegendreQuadTree* node);
 
     /*
      * Creating candidates using information from nodes
@@ -72,6 +88,11 @@ namespace Belle2 {
      */
     void clearNodes();
 
+    /*
+     * Find leaf node with given parameters r and theta
+     */
+    CDCLegendreQuadTree* findNode(CDCLegendreQuadTree*, double, double);
+
     static bool sort_nodes(const CDCLegendreQuadTree* node_one, const CDCLegendreQuadTree* node_two);
 
 
@@ -80,6 +101,8 @@ namespace Belle2 {
     static std::list<CDCLegendreQuadTree*> s_nodesWithCandidates;
     static CDCLegendreTrackFitter* s_cdcLegendreTrackFitter;
     static CDCLegendreTrackCreator* s_cdcLegendreTrackCreator;
+    static CDCLegendreTrackMerger* s_cdcLegendreTrackMerger;
+    static std::vector<CDCLegendreTrackHit*> s_axialHits;
 
     static CDCLegendreQuadTreeCandidateCreator* s_cdcLegendreQuadTreeCandidateCreator;
 

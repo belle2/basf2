@@ -23,12 +23,6 @@ CDCLegendreConformalPosition& CDCLegendreConformalPosition::Instance()
   return *s_cdcLegendreConformalPosition;
 }
 
-
-CDCLegendreConformalPosition& CDCLegendreConformalPosition::InstanceTrusted()
-{
-  return *s_cdcLegendreConformalPosition;
-}
-
 void CDCLegendreConformalPosition::clearPointers()
 {
   delete s_cdcLegendreConformalPosition;
@@ -62,23 +56,7 @@ CDCLegendreConformalPosition::CDCLegendreConformalPosition()
 
   for (int layerId = 0; layerId < nLayers_max; layerId++) {
 
-    if ((layerId >= 0) && (layerId <= 13)) {
-      nWires = 160;
-    } else if ((layerId >= 14) && (layerId <= 19)) {
-      nWires = 192;
-    } else if ((layerId >= 20) && (layerId <= 25)) {
-      nWires = 224;
-    } else if ((layerId >= 26) && (layerId <= 31)) {
-      nWires = 256;
-    } else if ((layerId >= 32) && (layerId <= 37)) {
-      nWires = 288;
-    } else if ((layerId >= 38) && (layerId <= 43)) {
-      nWires = 320;
-    } else if ((layerId >= 44) && (layerId <= 49)) {
-      nWires = 352;
-    } else if ((layerId >= 50) && (layerId <= 55)) {
-      nWires = 384;
-    }
+    nWires = getNWires(layerId);
 
     for (int wireId = 0; wireId < nWires; wireId++) {
 
@@ -101,6 +79,31 @@ CDCLegendreConformalPosition::CDCLegendreConformalPosition()
     }
   }
 
+}
+
+double CDCLegendreConformalPosition::getNWires(int layerId)
+{
+  int nWires = 0;
+  if ((layerId >= 0) && (layerId <= 13)) {
+    nWires = 160;
+  } else if ((layerId >= 14) && (layerId <= 19)) {
+    nWires = 192;
+  } else if ((layerId >= 20) && (layerId <= 25)) {
+    nWires = 224;
+  } else if ((layerId >= 26) && (layerId <= 31)) {
+    nWires = 256;
+  } else if ((layerId >= 32) && (layerId <= 37)) {
+    nWires = 288;
+  } else if ((layerId >= 38) && (layerId <= 43)) {
+    nWires = 320;
+  } else if ((layerId >= 44) && (layerId <= 49)) {
+    nWires = 352;
+  } else if ((layerId >= 50) && (layerId <= 55)) {
+    nWires = 384;
+  } else {
+    B2FATAL("BAD LAYERID IN CDCLegendreConformalPosition::getNWires");
+  }
+  return nWires;
 }
 
 CDCLegendreConformalPosition::~CDCLegendreConformalPosition()

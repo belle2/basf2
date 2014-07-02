@@ -101,7 +101,9 @@ void CDCLegendreFastHough::FastHoughNormal(
   for (CDCLegendreTrackHit * hit : hits) {
     for (int t_index = 0; t_index < 3; ++t_index) {
 
-      r_temp = CDCLegendreConformalPosition::Instance().getConformalR(hit->getLayerId(), hit->getWireId(), thetaBin[t_index]);
+//      r_temp = CDCLegendreConformalPosition::Instance().getConformalR(hit->getLayerId(), hit->getWireId(), thetaBin[t_index]);
+      r_temp = hit->getConformalX() * m_cos_theta[thetaBin[t_index]] +
+               hit->getConformalY() * m_sin_theta[thetaBin[t_index]];
 
       r_1 = r_temp + hit->getConformalDriftTime();
       r_2 = r_temp - hit->getConformalDriftTime();
@@ -181,7 +183,7 @@ void CDCLegendreFastHough::FastHoughNormal(
       level_diff = 2;
     else if ((fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) < (2.*m_rMax / 3.)) && (fabs(r[r_index] + (r[r_index + 1] - r[r_index]) / 2.) > (m_rMax / 2.)))
       level_diff = 1;
-    //      level_diff = 0;
+    level_diff = 0;
 
     //      if(max_value_bin != std::make_pair(t_index, r_index))allow_overlap = false;
 

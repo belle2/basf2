@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackHitShifted.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreWireCenter.h>
 
@@ -24,7 +25,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDC;
 
-CDCLegendreTrackHit::CDCLegendreTrackHit(CDCHit* hit, int ID) : m_storeID(ID), m_wireId(hit->getIWire())
+CDCLegendreTrackHitShifted::CDCLegendreTrackHitShifted(CDCHit* hit, int ID) : m_storeID(ID), m_wireId(hit->getIWire())
 {
 //  m_zReference = CDCLegendreWireCenter::Instance().getCenter(hit->getILayer());
   m_zReference = 0;
@@ -55,21 +56,20 @@ CDCLegendreTrackHit::CDCLegendreTrackHit(CDCHit* hit, int ID) : m_storeID(ID), m
   ConformalTransformation();
   m_wirePositionOrig = m_wirePosition;
 
-  m_is_used = CDCLegendreTrackHit::not_used;
+  m_is_used = CDCLegendreTrackHitShifted::not_used;
 
   checkHitDriftTime();
 }
 
-CDCLegendreTrackHit::CDCLegendreTrackHit(const CDCLegendreTrackHit& rhs)
+CDCLegendreTrackHitShifted::CDCLegendreTrackHitShifted(const CDCLegendreTrackHit& rhs)
 {
-  m_storeID = rhs.m_storeID;
+  m_storeID = rhs.getStoreIndex();
   m_driftTime = rhs.getDriftTime();
-  m_charge = rhs.m_charge;
   m_wireId = rhs.getWireId();
   m_superlayerId = rhs.getSuperlayerId();
   m_layerId = rhs.getLayerId();
-  m_isAxial = rhs.m_isAxial;
-  m_wirePositionOrig = rhs.m_wirePositionOrig;
+  m_isAxial = rhs.getIsAxial();
+  m_wirePositionOrig = rhs.getOriginalWirePosition();
   m_is_used = rhs.isUsed();
 
   //set hit coordinates in normal space and conformal plane
@@ -77,12 +77,36 @@ CDCLegendreTrackHit::CDCLegendreTrackHit(const CDCLegendreTrackHit& rhs)
   ConformalTransformation();
 }
 
-CDCLegendreTrackHit::~CDCLegendreTrackHit()
+CDCLegendreTrackHitShifted::CDCLegendreTrackHitShifted(const CDCLegendreTrackHit& rhs, double offsetX, double offsetY)
+{
+  m_storeID = rhs.getStoreIndex();
+  m_driftTime = rhs.getDriftTime();
+  m_wireId = rhs.getWireId();
+  m_superlayerId = rhs.getSuperlayerId();
+  m_layerId = rhs.getLayerId();
+  m_isAxial = rhs.getIsAxial();
+  m_wirePositionOrig = rhs.getOriginalWirePosition();
+  m_is_used = rhs.isUsed();
+
+  //set hit coordinates in normal space and conformal plane
+  setOffset(offsetX, offsetY);
+}
+
+CDCLegendreTrackHitShifted::~CDCLegendreTrackHitShifted()
 {
 }
 
 
-bool CDCLegendreTrackHit::checkHitDriftTime()
+void CDCLegendreTrackHitShifted::setOffset(double offsetX, double offsetY)
+{
+  setWirePosition();
+  m_wirePosition.SetX(m_wirePosition.X() + offsetX);
+  m_wirePosition.SetY(m_wirePosition.Y() + offsetY);
+  ConformalTransformation();
+}
+
+
+bool CDCLegendreTrackHitShifted::checkHitDriftTime()
 {
   //Get the position of the hit wire from CDCGeometryParameters
   CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
@@ -101,7 +125,7 @@ bool CDCLegendreTrackHit::checkHitDriftTime()
                       (wireBegin.y() - wireBeginNeighbor.y()) * (wireBegin.y() - wireBeginNeighbor.y()));
 
   if (m_driftTime > delta * 0.75) {
-    m_is_used = CDCLegendreTrackHit::background;
+    m_is_used = CDCLegendreTrackHitShifted::background;
 //    B2INFO("Bad hit!");
     return false;
   }
@@ -110,14 +134,14 @@ bool CDCLegendreTrackHit::checkHitDriftTime()
 }
 
 /** Assigns the Z coordinate of the hit wire and update XY coordinates*/
-void CDCLegendreTrackHit::setZReference(double zReference)
+void CDCLegendreTrackHitShifted::setZReference(double zReference)
 {
   m_zReference = zReference;
 
   setWirePosition();
 }
 
-void CDCLegendreTrackHit::setWirePosition()
+void CDCLegendreTrackHitShifted::setWirePosition()
 {
   //Get the position of the hit wire from CDCGeometryParameters
   CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
@@ -132,22 +156,22 @@ void CDCLegendreTrackHit::setWirePosition()
   m_wirePosition.SetY(wireBegin.y() + fraction * (wireEnd.y() - wireBegin.y()));
 }
 
-void CDCLegendreTrackHit::ConformalTransformation()
+void CDCLegendreTrackHitShifted::ConformalTransformation()
 {
   double x = m_wirePosition.x();
   double y = m_wirePosition.y();
 
   //transformation of the coordinates from normal to conformal plane
   //this is not the actual wire position but the transformed center of the drift circle
-  m_conformalX = 2 * x / (x * x + y * y - m_driftTime * m_driftTime);
-  m_conformalY = 2 * y / (x * x + y * y - m_driftTime * m_driftTime);
+  m_conformalX = 2 * x / (x * x + y * y/* - m_driftTime * m_driftTime*/);
+  m_conformalY = 2 * y / (x * x + y * y/* - m_driftTime * m_driftTime*/);
 
   //conformal drift time =  (x * x + y * y - m_driftTime * m_driftTime)
   m_conformalDriftTime = 2 * m_driftTime / (x * x + y * y - m_driftTime * m_driftTime);
 
 }
 
-double CDCLegendreTrackHit::getPhi() const
+double CDCLegendreTrackHitShifted::getPhi() const
 {
   //the phi angle of the hit depends on the definition, so I try to use the wireId instead
   //however maybe this function might also be still useful...
@@ -170,7 +194,7 @@ double CDCLegendreTrackHit::getPhi() const
 
 }
 
-int CDCLegendreTrackHit::getCurvatureSignWrt(double xc, double yc) const
+int CDCLegendreTrackHitShifted::getCurvatureSignWrt(double xc, double yc) const
 {
   double PI = 3.1415926535897932384626433832795;
   double phi_diff = atan2(yc, xc) - getPhi();
@@ -187,7 +211,7 @@ int CDCLegendreTrackHit::getCurvatureSignWrt(double xc, double yc) const
     return CDCLegendreTrackCandidate::charge_negative;
 }
 
-bool CDCLegendreTrackHit::approach(const CDCLegendreTrackCandidate& track)
+bool CDCLegendreTrackHitShifted::approach(const CDCLegendreTrackCandidate& track)
 {
   if (m_isAxial)
     return false;
@@ -230,7 +254,8 @@ bool CDCLegendreTrackHit::approach(const CDCLegendreTrackCandidate& track)
     m_wirePosition.SetX(backwardWirePoint.x() + parameter[i] * wireVector.x());
     m_wirePosition.SetY(backwardWirePoint.y() + parameter[i] * wireVector.y());
 
-    distance = track.DistanceTo(*this);
+    //TODO: !!!!! should be solved
+//    distance = track.DistanceTo(*this);
 
     //search for the wire point which gives the shortest distance
     if (distance < distanceMax) {
@@ -250,7 +275,7 @@ bool CDCLegendreTrackHit::approach(const CDCLegendreTrackCandidate& track)
   return true;
 }
 
-bool CDCLegendreTrackHit::approach2(const CDCLegendreTrackCandidate& track)
+bool CDCLegendreTrackHitShifted::approach2(const CDCLegendreTrackCandidate& track)
 {
   if (m_isAxial)
     return false;

@@ -95,6 +95,8 @@ namespace Belle2 {
     std::vector<CDCLegendreTrackHit*> m_AxialHitList; /**< List of the axial hits used for track finding. This is the vector, which is used for memory management! */
     std::vector<CDCLegendreTrackHit*> m_StereoHitList; /**< List of the stereo hits used for track finding. This is the vector, which is used for memory management! */
     std::list<CDCLegendreTrackCandidate*> m_trackList; /**< List of track candidates. Mainly used for memory management! */
+    std::list<CDCLegendreTrackCandidate*> m_trackletList; /**< List of tracklets. */
+    std::list<CDCLegendreTrackCandidate*> m_stereoTrackletList; /**< List of tracklets. */
 
     CDCLegendreTrackFitter* m_cdcLegendreTrackFitter;
     CDCLegendrePatternChecker* m_cdcLegendrePatternChecker;
@@ -134,6 +136,8 @@ namespace Belle2 {
 
     CDCLegendreTrackDrawer* m_cdcLegendreTrackDrawer; /**< Class which allows in-module drawing*/
 
+    int m_treeFinder;
+    int m_steppedFinder;
     /**
      * Function used in the event function, which contains the search for tracks, calling multiply the Fast Hough algorithm, always just searching for one track and afterwards removin the according hits from the hit list.
      */
@@ -143,6 +147,11 @@ namespace Belle2 {
      * Function used in the event function, which contains the search for tracks, calling multiply the Fast Hough algorithm, always just searching for one track and afterwards removin the according hits from the hit list.
      */
     void DoTreeTrackFinding();
+
+    /**
+     * Finding of stereo tracklets which will be assigned to some track
+     */
+    void DoTreeStereoTrackletFinding();
 
     /**
      * In this function, the stereo hits are assigned to the track candidates.
@@ -155,6 +164,14 @@ namespace Belle2 {
      * Long tracks - passed through all superlayers; curlers - starts at 1st superlayer, but not reach 9th; tracklets - some kind of cluster somewhere in CDC, should be merged with other tracklets or tracks
      */
     void checkHitPattern();
+
+
+
+    /**
+     * @brief Function to improve quality of founded tracks
+     */
+    void processTracks();
+
 
 
     /**

@@ -35,12 +35,22 @@ namespace Belle2 {
     /*
      * Perform fast circular fitting
      */
+    double fitTrackCandidateFast(std::vector<CDCLegendreTrackHit*>& hits, std::pair<double, double>& track_par, std::pair<double, double>& ref_point, bool with_drift_time = false);
+
+    /*
+     * Perform fast circular fitting
+     */
     void fitTrackCandidateFast(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* track, std::pair<double, double>& ref_point, double& chi2, bool with_drift_time = false);
 
     /*
      * Perform fast circular fitting
      */
     void fitTrackCandidateFast(CDCLegendreTrackCandidate* track, std::pair<double, double>& ref_point, bool with_drift_time = false);
+
+    /*
+     * Perform fast circular fitting
+     */
+    void fitTrackCandidateFast(CDCLegendreTrackCandidate* track, bool with_drift_time = false);
 
     /**
      * Simple fitter which perform stepped fitting in normal space, not the best choice in sense of performance

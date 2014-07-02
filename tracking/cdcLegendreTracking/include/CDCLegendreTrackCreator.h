@@ -25,10 +25,11 @@ namespace Belle2 {
   class CDCLegendreTrackCandidate;
   class CDCLegendreTrackFitter;
   class CDCLegendreTrackDrawer;
+  class CDCLegendreQuadTree;
 
   class CDCLegendreTrackCreator {
   public:
-    CDCLegendreTrackCreator(std::vector<CDCLegendreTrackHit*>& AxialHitList, std::list<CDCLegendreTrackCandidate*>& trackList, bool appendHits, CDCLegendreTrackFitter* cdcLegendreTrackFitter, CDCLegendreTrackDrawer* cdcLegendreTrackDrawer);
+    CDCLegendreTrackCreator(std::vector<CDCLegendreTrackHit*>& AxialHitList, std::vector<CDCLegendreTrackHit*>& StereoHitList, std::list<CDCLegendreTrackCandidate*>& trackList, std::list<CDCLegendreTrackCandidate*>& trackletList, std::list<CDCLegendreTrackCandidate*>& stereoTrackletList, bool appendHits, CDCLegendreTrackFitter* cdcLegendreTrackFitter, CDCLegendreTrackDrawer* cdcLegendreTrackDrawer);
 
     /**
      * @brief Function to create a track candidate
@@ -37,6 +38,20 @@ namespace Belle2 {
      */
     void createLegendreTrackCandidate(const std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >& track, std::set<CDCLegendreTrackHit*>* trackHitList, std::pair<double, double>& ref_point);
 
+    /**
+     * Create track candidate using CDCLegendreQuadTree nodes and return pointer to created candidate
+     */
+    CDCLegendreTrackCandidate* createLegendreTrackCandidate(std::vector<CDCLegendreQuadTree*> nodeList);
+
+    /**
+     * Create tracklet using vector of hits and store it
+     */
+    CDCLegendreTrackCandidate* createLegendreTracklet(std::vector<CDCLegendreTrackHit*>& hits);
+
+    /**
+     * Create stereo tracklet using vector of hits and store it
+     */
+    CDCLegendreTrackCandidate* createLegendreStereoTracklet(std::vector<CDCLegendreQuadTree*> nodeList);
 
     /**
      * @brief Perform the necessary operations after the track candidate has been constructed
@@ -44,7 +59,7 @@ namespace Belle2 {
      * @param trackHitList list of all hits, which are used for track finding. Hits belonging to the track candidate will be deleted from it.
      * This function leaves room for other operations like further quality checks or even the actual fitting of the track candidate.
      */
-    void processTrack(CDCLegendreTrackCandidate* track, std::set<CDCLegendreTrackHit*>* trackHitList);
+    void processTrack(CDCLegendreTrackCandidate* track, std::list<CDCLegendreTrackCandidate*>& trackList);
 
     /**
      * @brief Implementation of check for quality criteria after the track candidate was produced.
@@ -68,10 +83,29 @@ namespace Belle2 {
      */
     void appendNewHits(CDCLegendreTrackCandidate* track);
 
+    /*
+     * Move candidate between two collections
+     */
+    void moveCandidate(list<CDCLegendreTrackCandidate*>&, list<CDCLegendreTrackCandidate*>&, CDCLegendreTrackCandidate*);
+
+    /*
+     * Remove candidate from given list
+     */
+    void removeFromList(list<CDCLegendreTrackCandidate*>&, CDCLegendreTrackCandidate*);
+
+    /*
+     * Move
+     */
+    void setAsTracklet(CDCLegendreTrackCandidate*);
+
+    void setAsTrack(CDCLegendreTrackCandidate*);
 
   private:
     std::vector<CDCLegendreTrackHit*>& m_AxialHitList; /**< Vector which hold axial hits */
-    std::list<CDCLegendreTrackCandidate*>& m_trackList; /**< List of track candidates. Mainly used for memory management! */
+    std::vector<CDCLegendreTrackHit*>& m_StereoHitList; /**< Vector which holds stereo hits */
+    std::list<CDCLegendreTrackCandidate*>& m_trackList; /**< List of track candidates. */
+    std::list<CDCLegendreTrackCandidate*>& m_trackletList; /**< List of tracklets. */
+    std::list<CDCLegendreTrackCandidate*>& m_stereoTrackletList; /**< List of stereo tracklets. */
     bool m_appendHits; /**< Trying to append new hits to track candidate*/
 
     CDCLegendreTrackFitter* m_cdcLegendreTrackFitter; /**< Class which performs track candidate fitting */

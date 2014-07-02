@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCLEGENDRETRACKHIT_H
-#define CDCLEGENDRETRACKHIT_H
+#pragma once
 
 #include "TVector3.h"
 #include <cdc/dataobjects/CDCHit.h>
@@ -17,9 +16,10 @@
 namespace Belle2 {
 
   class CDCLegendreTrackCandidate;
+  class CDCLegendreTrackHit;
 
   /** CDC Hit Class used for pattern recognition in the Legendre plain. */
-  class CDCLegendreTrackHit {
+  class CDCLegendreTrackHitShifted {
   public:
 
 
@@ -35,15 +35,25 @@ namespace Belle2 {
     /** Constructor to create a CDCTrackHit from a CDCHit object.
      * Some member variables of CDCHit are copied and other to CDCTrackHit specific variables are initialized (e.g. the position of the hit wire in normal space and in the conformal plane).
      */
-    CDCLegendreTrackHit(CDCHit* hit, int iHit);
+    CDCLegendreTrackHitShifted(CDCHit* hit, int iHit);
 
     /** Copy constructor.
      *
      */
-    CDCLegendreTrackHit(const CDCLegendreTrackHit& rhs);
+    CDCLegendreTrackHitShifted(const CDCLegendreTrackHit& rhs);
+
+    /** Copy constructor.
+     *
+     */
+    CDCLegendreTrackHitShifted(const CDCLegendreTrackHit& rhs, double offsetX, double offsetY);
 
     /* Destructor. */
-    ~CDCLegendreTrackHit();
+    ~CDCLegendreTrackHitShifted();
+
+    /**
+     * Set new origin
+     */
+    void setOffset(double, double);
 
     /** Check hit drift time; if it greater than distances between wires mark hit as bad*/
     bool checkHitDriftTime();
@@ -108,7 +118,7 @@ namespace Belle2 {
     bool approach2(const CDCLegendreTrackCandidate&);
 
     /** Sets the position of the hit to given point in 3D space.*/
-    void setPosition(const TVector3 position) {
+    void setPosition(const TVector3& position) {
       m_wirePosition = position;
       ConformalTransformation();
     }
@@ -151,6 +161,5 @@ namespace Belle2 {
   }; //end class CDCTrackHit
 } //end namespace Belle2
 
-#endif //CDCTRACKHIT
 
 

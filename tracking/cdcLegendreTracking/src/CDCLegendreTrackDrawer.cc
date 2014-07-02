@@ -21,6 +21,7 @@
 #include "TGraph.h"
 #include "TAxis.h"
 #include "TEllipse.h"
+#include "TLine.h"
 
 #include <iomanip>
 #include <fstream>
@@ -252,9 +253,14 @@ void CDCLegendreTrackDrawer::drawConformalHits(std::vector<CDCLegendreTrackHit*>
     TCanvas* canv = new TCanvas("canv", "conformal space", 0, 0, 600, 600);
     canv->Range(0, 0, 1, 1);
 
-    BOOST_FOREACH(TEllipse * hit_conformal, m_hitsConformal) {
+    for (TEllipse * hit_conformal : m_hitsConformal) {
       hit_conformal->Draw();
     }
+
+    TLine* axis_x = new TLine(0, 0.5, 1, 0.5);
+    TLine* axis_y = new TLine(0.5, 0, 0.5, 1);
+    axis_x->Draw();
+    axis_y->Draw();
 
     canv->Print(Form("conformalHits_%i.root", nevent));
     canv->Print(Form("conformalHits_%i.eps", nevent));
@@ -277,11 +283,8 @@ void CDCLegendreTrackDrawer::drawLegendreHits(std::vector<CDCLegendreTrackHit*> 
     for (CDCLegendreTrackHit * hit : trackHitList) {
       TF1* funct1 = new TF1("funct", "[0]*cos(x)+[1]*sin(x)+[2]", 0, m_PI);
       TF1* funct2 = new TF1("funct", "[0]*cos(x)+[1]*sin(x)-[2]", 0, m_PI);
-      /**
-      //TODO This seems wrong. The compiler says line width function takes short as argument, not float.
-      funct1->SetLineWidth(0.25);
-      funct2->SetLineWidth(0.25);
-      */
+      funct1->SetLineWidth(1);
+      funct2->SetLineWidth(1);
       x0 = hit->getConformalX();
       y0 = hit->getConformalY();
       R = hit->getConformalDriftTime();
@@ -289,8 +292,8 @@ void CDCLegendreTrackDrawer::drawLegendreHits(std::vector<CDCLegendreTrackHit*> 
       funct2->SetParameters(x0, y0, R);
       funct1->SetLineColor(trackColor);
       funct2->SetLineColor(trackColor);
-//      if(ntrack == -1)funct1->SetLineStyle(2);
-//      if(ntrack == -1)funct2->SetLineStyle(2);
+      if (ntrack == -1)funct1->SetLineStyle(2);
+      if (ntrack == -1)funct2->SetLineStyle(2);
       m_hitsLegendre.push_back(funct1);
       m_hitsLegendre.push_back(funct2);
     }

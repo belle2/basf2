@@ -19,6 +19,7 @@
 namespace Belle2 {
 
   class CDCLegendreTrackHit;
+  class CDCLegendreQuadTree;
 
   /** Class for track candidates after CDC pattern recognition. */
   class CDCLegendreTrackCandidate {
@@ -29,20 +30,26 @@ namespace Belle2 {
       charge_positive = 1, /**< Enum value positive charge. */
       charge_negative = -1, /**< Enum value negative charge. */
       charge_two_tracks = 2, /**< Enum value two tracks with the same values of r and theta charge. */
-      charge_curler = 4 /**< Enum value curler (d < r(CDC). */
+      charge_curler = 3, /**< Enum value curler (d < r(CDC). */
+      charge_tracklet = 4
     };
 
     /** Enum for track candidate type */
     enum CandidateType {
-      fullTrack = 1, /**< passed through all superlayers */
-      curlerTrack = 2, /**< starts at 1st superlayer, but not reach 9th */
-      tracklet = 3, /**< some kind of cluster somewhere in CDC, should be merged with other tracklets or tracks */
+      goodTrack = 1, /**< passed through all superlayers */
+      tracklet = 2, /**< some kind of cluster somewhere in CDC, should be merged with other tracklets or tracks */
+      curlerTrack = 3, /**< starts at 1st superlayer, but not reach 9th */
     };
 
     /** Copy Constructor.
      * Creates a new track from a copy of another track.
      */
     CDCLegendreTrackCandidate(CDCLegendreTrackCandidate& candidate);
+
+    /*
+     * Construct track candidate using information from CDCLegendreQuadTree nodes
+     */
+    CDCLegendreTrackCandidate(const std::vector<CDCLegendreQuadTree*>& nodeList);
 
     /** Destructor. */
     ~CDCLegendreTrackCandidate();
@@ -57,31 +64,14 @@ namespace Belle2 {
                               const std::vector<CDCLegendreTrackHit*>& trackHitList);
 
     /**Return vector of assigned hits.*/
-    inline std::vector<Belle2::CDCLegendreTrackHit*> getTrackHits() {
+    inline std::vector<Belle2::CDCLegendreTrackHit*>& getTrackHits() {
       return m_TrackHits;
-    }
-
-    /**Return pattern of assigned axial hits.*/
-    inline HitPatternCDC getHitPatternAxial() {
-      return m_hitPatternAxial;
-    }
-
-    /**Return pattern of assigned stereo hits.*/
-    inline HitPatternCDC getHitPatternStereo() {
-      return m_hitPatternStereo;
     }
 
     /**Return pattern of assigned axial and stereo hits.*/
     inline HitPatternCDC getHitPattern() {
       return m_hitPattern;
     }
-
-    /**
-     * Check pattern of hits:
-     * in between of innermost and outermost SLayers should be no empty SLayers;
-     * argument of function allows define minimal number of axial hits in each SLayer
-     * */
-    bool checkHitPattern(int minNHitsSLayer = 2);
 
     /** Return theta value of track.*/
     inline double getTheta() const {
@@ -110,6 +100,15 @@ namespace Belle2 {
       return m_charge;
     }
 
+
+    /**
+     * Reestimate charge sign
+     */
+    void reestimateCharge() {
+      m_charge = CDCLegendreTrackCandidate::getChargeAssumption(m_theta, m_r, m_TrackHits);
+    }
+
+
     /** Return charge sign of track.
      * Sure to be 1 or -1 (1 for curlers)
      */
@@ -117,7 +116,7 @@ namespace Belle2 {
 
     /** Return number of assigned hits.*/
     inline int getNHits() const {
-      return (m_stereoHits + m_axialHits);
+      return static_cast<int>(m_TrackHits.size());
     }
 
     /** Return number of assigned axial hits.*/
@@ -141,6 +140,9 @@ namespace Belle2 {
 
     /** Adds a hit to the trackHitVector.*/
     void addHit(CDCLegendreTrackHit* hit);
+
+    /** Adds a hit to the trackHitVector.*/
+    void removeHit(CDCLegendreTrackHit* hit);
 
     /** Calculate distance to a given track hit.*/
     double DistanceTo(const CDCLegendreTrackHit&) const;
@@ -175,14 +177,14 @@ namespace Belle2 {
      * @param forced allows to redefine innermost SLayer ID (especially after changes in hit pattern)
      * @param minNhits allows to change minimal number of hits required in innermost SLayer
      */
-    int getInnermostAxialSLayer(bool forced = false, int minNHits = 2);
+    int getInnermostSLayer(bool forced = false, int minNHits = 2);
 
     /**
      * @brief return SLayer ID of the contributing axial hit with the largest layer ID.
      * @param forced allows to redefine outermost SLayer ID (especially after changes in hit pattern)
      * @param minNhits allows to change minimal number of hits required in outermost SLayer
       */
-    int getOutermostAxialSLayer(bool forced = false, int minNHits = 2);
+    int getOutermostSLayer(bool forced = false, int minNHits = 2);
 
     /**
      * set reference point, with respect to which track was found
@@ -206,14 +208,9 @@ namespace Belle2 {
     void CheckStereoHits();
 
     /**
-     * Returns type of candidate (see enum CandidateType)
-     */
-    int getCandidateType();
-
-    /**
      * Remove "bad" hits
      */
-    void clearBadHits(std::pair<double, double> ref_point);
+    void clearBadHits();
 
     /**
      * set chi2 after fitting
@@ -229,12 +226,23 @@ namespace Belle2 {
       return m_chi2;
     }
 
+    /*
+     * set type of the track
+     */
+    void setCandidateType(int type) {m_type = type;};
+
+    /*
+     * get type of the track (see enum CandidateType)
+     */
+    inline int getCandidateType() const {return m_type;};
+
   private:
 
     /** Empty constructor. */
-    CDCLegendreTrackCandidate() : m_charge(0) {};
+//    CDCLegendreTrackCandidate() : m_charge(0) {};
 
     std::vector<CDCLegendreTrackHit*> m_TrackHits; /**< vector to store TrackCandidateHits belonging to this TrackCandidate */
+    std::vector<CDCLegendreQuadTree*> m_nodes; /**< vector to store nodes containing hits which belong to the candidate */
 
     double m_theta; /**< theta_value of the track candidate, given by Legendre track finding*/
     double m_r; /**< r_value of the track candidate, given by Legendre track finding*/
@@ -242,7 +250,8 @@ namespace Belle2 {
     double m_yc; /**< yc value in conformal plane*/
     double m_ref_x; /**< xc value in conformal plane*/
     double m_ref_y; /**< yc value in conformal plane*/
-    const int m_charge; /**< charge assumption of track*/
+    int m_charge; /**< charge assumption of track*/
+    int m_type; /**< type of the track*/
 
     int m_axialHits; /**< Number of axial hits, belonging to the track*/
     int m_stereoHits; /**< Number of stereo hits, belonging to the track*/
@@ -250,8 +259,6 @@ namespace Belle2 {
     bool m_calcedMomentum; /**< Is the momentum estimation already calculated?*/
     TVector3 m_momEstimation; /**< Momentum estimation*/
 
-    HitPatternCDC m_hitPatternAxial; /**< Efficient hit pattern builder; see HitPatternCDC description  */
-    HitPatternCDC m_hitPatternStereo; /**< Efficient hit pattern builder; see HitPatternCDC description  */
     HitPatternCDC m_hitPattern; /**< Efficient hit pattern builder; see HitPatternCDC description  */
 
     int m_innermostAxialSLayer; //Innermost axial superlayer;

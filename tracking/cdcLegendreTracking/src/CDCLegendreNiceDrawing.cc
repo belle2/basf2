@@ -6,6 +6,8 @@
  */
 
 #include "tracking/cdcLegendreTracking/CDCLegendreNiceDrawing.h"
+#include <tracking/cdcLegendreTracking/CDCLegendreWireCenter.h>
+
 
 #include "framework/datastore/StoreArray.h"
 #include "cdc/dataobjects/CDCHit.h"
@@ -34,7 +36,7 @@ CDCLegendreNiceDrawing::CDCLegendreNiceDrawing(std::string& TrackCandColName, st
 
 void CDCLegendreNiceDrawing::initialize()
 {
-  m_zReference = 25.852;
+//  m_zReference = 25.852;
 
   m_eventCounter = 1;
 
@@ -149,10 +151,15 @@ TVector2 CDCLegendreNiceDrawing::getWirePosition(int iLayer, int iWire)
   TVector3 wireBegin = CDC::CDCGeometryPar::Instance().wireForwardPosition(iLayer, iWire);
   TVector3 wireEnd = CDC::CDCGeometryPar::Instance().wireBackwardPosition(iLayer, iWire);
 
-  double fraction = (m_zReference - wireBegin.z()) / (wireEnd.z() - wireBegin.z());
+  m_zReference = CDCLegendreWireCenter::Instance().getCenter(iLayer);
+//  B2INFO("Z position: " << m_zReference << "; Layer: " << iLayer);
 
-  double WireX = (wireBegin.x() + fraction * (wireEnd.x() - wireBegin.x()));
-  double WireY = (wireBegin.y() + fraction * (wireEnd.y() - wireBegin.y()));
+  double fraction;
+
+  fraction = (m_zReference - wireBegin.z()) / (wireBegin.z() - wireEnd.z());
+//  B2INFO("Fraction: " << fraction);
+  double WireX = (wireBegin.x() + fraction * (wireBegin.x() - wireEnd.x()));
+  double WireY = (wireBegin.y() + fraction * (wireBegin.y() - wireEnd.y()));
 
   return TVector2(WireX, WireY);
 }
@@ -286,6 +293,8 @@ void CDCLegendreNiceDrawing::drawTrackCands()
 
     BOOST_FOREACH(int hitID, TrackCandidate->getHitIDs(Const::CDC)) {
       CDCHit* TrackHit = HitArray[hitID];
+
+//      B2INFO("HitID: " << hitID);
 
       drawCDCHit(ss, TrackHit, trackColor);
     }

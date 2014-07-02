@@ -25,9 +25,11 @@ namespace Belle2 {
 
     static CDCLegendreConformalPosition& Instance();
 
-    static CDCLegendreConformalPosition& InstanceTrusted();
+    inline static CDCLegendreConformalPosition& InstanceTrusted() {  return *s_cdcLegendreConformalPosition; };
 
     inline double getConformalR(int layerId, int wireId, int binTheta) const { return m_lookupR[layerId][wireId][binTheta]; };
+
+    double getNWires(int layerId);
 
 
   private:

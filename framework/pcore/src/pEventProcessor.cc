@@ -65,7 +65,7 @@ static void signalHandler(int signal)
 
 pEventProcessor::pEventProcessor() : EventProcessor(),
   m_procHandler(new ProcHandler()),
-  m_histoManagerFound(false),
+  m_histoman(nullptr),
   m_enableRBClearing(true)
 {
   g_pEventProcessor = this;
@@ -77,7 +77,7 @@ pEventProcessor::~pEventProcessor()
   delete m_procHandler;
 }
 
-void pEventProcessor::sendTerminationMessage(RingBuffer* rb)
+void pEventProcessor::sendTerminationMessage(boost::shared_ptr<RingBuffer> rb)
 {
   m_enableRBClearing = false;
   EvtMessage term(NULL, 0, MSG_TERMINATE);
@@ -99,13 +99,13 @@ void pEventProcessor::gotSigINT()
     EventProcessor::writeToStdErr("\nDiscarding pending events for quicker termination... \n");
     //clear ringbuffers and add terminate message
     const int numProcesses = Environment::Instance().getNumberProcesses();
-    for (RingBuffer * rb : m_rbinlist) {
+    for (auto rb : m_rbinlist) {
       rb->clear();
       for (int i = 0; i < numProcesses; i++) {
         sendTerminationMessage(rb);
       }
     }
-    for (RingBuffer * rb : m_rboutlist) {
+    for (auto rb : m_rboutlist) {
       rb->clear();
       sendTerminationMessage(rb);
     }
@@ -269,14 +269,14 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     m_procHandler->waitForInputProcesses();
     // 6.2 Send termination to event processes
     for (int i = 0; i < numProcesses; i++) {
-      for (RingBuffer * rb : m_rbinlist) {
+      for (auto rb : m_rbinlist) {
         sendTerminationMessage(rb);
       }
     }
     // 6.3 Wait for event processes to terminate
     m_procHandler->waitForEventProcesses();
     // 6.4 Send termination to output processes
-    for (RingBuffer * rb : m_rboutlist) {
+    for (auto rb : m_rboutlist) {
       sendTerminationMessage(rb);
     }
     m_procHandler->waitForOutputProcesses();
@@ -290,10 +290,8 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     HistModule::mergeFiles();
 
     // 6.5 Remove all ring buffers
-    for (RingBuffer * rb : m_rbinlist)
-      delete rb;
-    for (RingBuffer * rb : m_rboutlist)
-      delete rb;
+    m_rbinlist.clear();
+    m_rboutlist.clear();
 
     processTerminate(terminateGlobally);
 
@@ -330,7 +328,6 @@ void pEventProcessor::analyzePath(const PathPtr& path)
 
       if (module->hasProperties(Module::c_HistogramManager)) {
         // Initialize histogram manager if found in the path
-        m_histoManagerFound = true;
         m_histoman = module;
 
         //add histoman to other paths
@@ -381,16 +378,16 @@ RingBuffer* pEventProcessor::connectViaRingBuffer(const char* name, PathPtr a, P
 
 void pEventProcessor::preparePaths()
 {
-  if (m_histoManagerFound) {
+  if (m_histoman) {
     m_histoman->initialize();
   }
   if (m_mainpathlist.empty())
     return; //we'll fall back to single-core
 
   if (!m_inpathlist.empty())
-    m_rbinlist.push_back(connectViaRingBuffer("BASF2_RBIN", m_inpathlist[0], m_mainpathlist[0]));
+    m_rbinlist.emplace_back(connectViaRingBuffer("BASF2_RBIN", m_inpathlist[0], m_mainpathlist[0]));
   if (!m_outpathlist.empty())
-    m_rboutlist.push_back(connectViaRingBuffer("BASF2_RBOUT", m_mainpathlist[0], m_outpathlist[0]));
+    m_rboutlist.emplace_back(connectViaRingBuffer("BASF2_RBOUT", m_mainpathlist[0], m_outpathlist[0]));
 
 }
 

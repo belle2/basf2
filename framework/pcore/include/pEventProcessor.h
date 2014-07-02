@@ -15,6 +15,8 @@
 #include <framework/core/EventProcessor.h>
 #include <framework/core/Path.h>
 
+#include <boost/shared_ptr.hpp>
+
 
 namespace Belle2 {
 
@@ -70,7 +72,7 @@ namespace Belle2 {
     void clearFileList();
 
     /** Insert a termination message at the end of the given RingBuffer. */
-    void sendTerminationMessage(RingBuffer* rb);
+    void sendTerminationMessage(boost::shared_ptr<RingBuffer> rb);
 
     /** Return only modules which have the given Module flag set. */
     static ModulePtrList getModulesWithFlag(const ModulePtrList& modules, Module::EModulePropFlags flag);
@@ -98,13 +100,11 @@ namespace Belle2 {
     std::vector<PathPtr> m_outpathlist;
 
     /** input RingBuffers */
-    std::vector<RingBuffer*> m_rbinlist;
+    std::vector<boost::shared_ptr<RingBuffer>> m_rbinlist;
     /** output RingBuffers */
-    std::vector<RingBuffer*> m_rboutlist;
+    std::vector<boost::shared_ptr<RingBuffer>> m_rboutlist;
 
-    /** HistoManagerModule found? */
-    bool m_histoManagerFound;
-    /** Pointer to HistoManagerModule, if m_histoManagerFound is set */
+    /** Pointer to HistoManagerModule, or nullptr if not found. */
     ModulePtr m_histoman;
 
     /** if false, SIGINT handler will not clear RingBuffers.

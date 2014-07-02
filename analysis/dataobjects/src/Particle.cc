@@ -236,6 +236,7 @@ Particle::Particle(const KLMCluster* klmCluster) :
   m_pValue = -1;
 
   // TODO: set error matrix
+  resetErrorMatrix();
   //storeErrorMatrix(klmCluster->???);
 }
 

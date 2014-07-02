@@ -101,6 +101,7 @@ EVEVisualization::EVEVisualization():
   m_trackpropagator = new TEveTrackPropagator();
   m_trackpropagator->IncDenyDestroy();
   m_trackpropagator->SetMagFieldObj(&m_bfield, false);
+  m_trackpropagator->SetFitDaughters(false); //most secondaries are no longer immediate daughters since we might discard those!
 
   //find a point that is inside the top node
   TGeoVolume* top_node = gGeoManager->GetTopNode()->GetVolume();

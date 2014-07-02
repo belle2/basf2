@@ -36,6 +36,9 @@ VariablesToNtupleModule::VariablesToNtupleModule() : Module()
 
   addParam("fileName", m_fileName, "Name of ROOT file for output.", string("VariablesToNtuple.root"));
   addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", string("ntuple"));
+
+  m_file = nullptr;
+  m_tree = nullptr;
 }
 
 void VariablesToNtupleModule::initialize()

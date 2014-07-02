@@ -46,6 +46,11 @@ void Path::addPath(PathPtr path)
   m_elements.push_back(path);
 }
 
+bool Path::isEmpty() const
+{
+  return m_elements.empty();
+}
+
 std::list<ModulePtr> Path::getModules() const
 {
   std::list<ModulePtr> modules;

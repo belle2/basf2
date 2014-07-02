@@ -71,6 +71,9 @@ namespace Belle2 {
      */
     void addPath(PathPtr path);
 
+    /** Returns true if this Path doesn't contain any elements. */
+    bool isEmpty() const;
+
     /**
      * Returns a list of the modules in this path.
      *

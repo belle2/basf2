@@ -522,6 +522,34 @@ namespace Belle2 {
 
     }
 
+
+    void printParticleInternal(const Particle* p, int depth)
+    {
+      stringstream s("");
+      for (int i = 0; i < depth; i++) {
+        s << "    ";
+      }
+      s  << p->getPDGCode();
+      const MCParticle* mcp = p->getRelated<MCParticle>();
+      if (mcp) {
+        s << " -> MC: " << mcp->getPDG() << ", mcStatus: " << MCMatching::getMCTruthStatus(p, mcp);
+      } else {
+        s << " (no MC match)";
+      }
+      B2INFO(s.str())
+      for (const auto * daughter : p->getDaughters()) {
+        printParticleInternal(daughter, depth + 1);
+      }
+    }
+
+    double printParticle(const Particle* p)
+    {
+      printParticleInternal(p, 0);
+      return 0.0;
+    }
+
+
+
     // MC related ------------------------------------------------------------
 
     double isSignal(const Particle* part)
@@ -1029,6 +1057,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("m2Recoil", recoilMassSquared, "invariant mass squared of the system recoiling against given Particle");
 
     REGISTER_VARIABLE("eextra", extraEnergy, "extra energy in the calorimeter that is not associated to the given Particle");
+
+    REGISTER_VARIABLE("printParticle", printParticle, "For debugging, print Particle and daughter PDG codes, plus MC match. Returns 0.");
 
     VARIABLE_GROUP("ECL Cluster related");
     REGISTER_VARIABLE("goodGamma",         goodGamma, "1.0 if photon candidate passes good photon selection criteria");

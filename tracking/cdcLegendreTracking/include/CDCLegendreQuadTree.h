@@ -58,17 +58,17 @@ namespace Belle2 {
     /*
      * Sets threshold on number of hits in the node
      */
-    void setHitsThreshold(unsigned int hitsThreshold) {s_hitsThreshold = hitsThreshold;};
+    static void setHitsThreshold(unsigned int hitsThreshold) {s_hitsThreshold = hitsThreshold;};
 
     /*
      * Sets threshold on pt of candidates
      */
-    void setRThreshold(double rThreshold) {s_rThreshold = rThreshold;};
+    static void setRThreshold(double rThreshold) {s_rThreshold = rThreshold;};
 
     /*
      * Sets threshold on pt of candidates
      */
-    void setLastLevel(double lastLevel) {s_lastLevel = lastLevel;};
+    static void setLastLevel(double lastLevel) {s_lastLevel = lastLevel;};
 
     /*
      * Copy information about hits into member of class (node at level 0 should be used  because other levels fills by parents)
@@ -225,36 +225,36 @@ namespace Belle2 {
 
     static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
 
-    double m_rMin;
-    double m_rMax;
-    int m_thetaMin;
-    int m_thetaMax;
-    int m_level;
-    double Rcell;
-    double m_deltaR;
+    double m_rMin; /**< Lower border of the node (R) */
+    double m_rMax; /**< Upper border of the node (R) */
+    int m_thetaMin;  /**< Lower border of the node (Theta) */
+    int m_thetaMax;  /**< Upper border of the node (Theta) */
+    int m_level;  /**< Level of node in the tree */
+    double Rcell;  /**< Approximate radius of drift cell */
+    double m_deltaR;  /**< Value of R, when node splitting whould be stopped; currently not used */
 
-    std::vector<CDCLegendreTrackHit*> m_hits;
+    std::vector<CDCLegendreTrackHit*> m_hits;  /**< Vector of hits which belongs to the node */
 
-    CDCLegendreQuadTree* m_parent;
+    CDCLegendreQuadTree* m_parent;  /**< Pointer to the parent node */
 
-    std::vector<CDCLegendreQuadTree*> m_neighbors; // 8 neighbours of each node (or 5 at borders)
+    std::vector<CDCLegendreQuadTree*> m_neighbors; /**< 8 neighbours of each node (or 5 at borders) */
 
-    CDCLegendreQuadTree*** m_children;
-    bool m_isMaxLevel;
+    CDCLegendreQuadTree*** m_children; /**< Pointers to the children nodes */
+    bool m_isMaxLevel;  /**< If node is leaf */
 
-    double* m_r;          //bins range on r
-    int* m_thetaBin;      //bins range on theta
-    int m_nbins_r;        //number of r bins
-    int m_nbins_theta;    //number of theta bins
+    double* m_r;          /**< bins range on r */
+    int* m_thetaBin;      /**< bins range on theta */
+    int m_nbins_r;        /**< number of r bins */
+    int m_nbins_theta;    /**< number of theta bins */
     static double* s_sin_theta; /**< Lookup array for calculation of sin */
     static double* s_cos_theta; /**< Lookup array for calculation of cos */
     static bool s_sin_lookup_created; /**< Allows to use the same lookup table for sin and cos */
-    static int s_nbinsTheta;
+    static int s_nbinsTheta; /**< Number of theta bins */
     static unsigned int s_hitsThreshold;
     static double s_rThreshold; /**< Threshold on r variable; allows to set threshold on pt of tracks */
     static int s_lastLevel;
-    bool m_filled;
-    bool m_neighborsDefined;
+    bool m_filled; /**< Is the node has been filled with hits */
+    bool m_neighborsDefined; /**< Checks whether neighbors of current node has been defined */
 
 
     /*

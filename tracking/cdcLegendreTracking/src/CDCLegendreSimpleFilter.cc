@@ -9,8 +9,8 @@
  **************************************************************************/
 
 
-#include <tracking/cdcLegendreTracking/filter/CDCLegendreSimpleFilter.h>
-#include <tracking/cdcLegendreTracking/filter/CDCLegendreFilterCandidate.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreSimpleFilter.h>
+//#include <tracking/cdcLegendreTracking/filter/CDCLegendreFilterCandidate.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
 
@@ -22,19 +22,7 @@ using namespace std;
 
 using namespace Belle2;
 
-CDCLegendreSimpleFilter::CDCLegendreSimpleFilter()
-{
 
-}
-
-CDCLegendreSimpleFilter::~CDCLegendreSimpleFilter()
-{
-  for (CDCLegendreFilterCandidate * filterTrack : m_cdcLegendreFilterCandidateList) {
-    delete filterTrack;
-  }
-  m_cdcLegendreFilterCandidateList.clear();
-
-}
 
 double CDCLegendreSimpleFilter::getAssigmentProbability(CDCLegendreTrackHit* hit, CDCLegendreTrackCandidate* track)
 {
@@ -44,8 +32,6 @@ double CDCLegendreSimpleFilter::getAssigmentProbability(CDCLegendreTrackHit* hit
   double x0_track = cos(track->getTheta()) / track->getR() + track->getReferencePoint().X();
   double y0_track = sin(track->getTheta()) / track->getR() + track->getReferencePoint().Y();
   double R = fabs(1. / track->getR());
-  double dist_min = 999;
-  double x_pos, y_pos;
 
 
   double x0_hit = hit->getOriginalWirePosition().X();
@@ -60,27 +46,12 @@ double CDCLegendreSimpleFilter::getAssigmentProbability(CDCLegendreTrackHit* hit
 }
 
 
-void CDCLegendreSimpleFilter::createFilterCandidateList(std::list<CDCLegendreTrackCandidate*> trackList)
+
+void CDCLegendreSimpleFilter::processTracks(std::list<CDCLegendreTrackCandidate*>& m_trackList)
 {
-  m_trackList = trackList;
-
-  for (CDCLegendreTrackCandidate * cand : m_trackList) {
-    CDCLegendreFilterCandidate* filterCandidate = new CDCLegendreFilterCandidate(cand);
-    for (CDCLegendreTrackHit * hit : cand->getTrackHits()) {
-      double prob = getAssigmentProbability(hit, cand);
-      filterCandidate->addHit(hit, prob);
-    }
-    m_cdcLegendreFilterCandidateList.push_back(filterCandidate);
-  }
-
-}
-
-
-void CDCLegendreSimpleFilter::processTracks()
-{
-  double total_prob = 1.;
 
   /*
+  double total_prob = 1.;
   for (CDCLegendreFilterCandidate* filterCandidate : m_cdcLegendreFilterCandidateList) {
 
     for(auto& hitMap: filterCandidate->getHitsMap()){
@@ -119,9 +90,17 @@ void CDCLegendreSimpleFilter::processTracks()
 
   */
 
+  int ii = 0;
 
+  B2INFO("NCands = " << m_trackList.size());
 
   for (CDCLegendreTrackCandidate * cand : m_trackList) {
+    ii++;
+    B2INFO("ii = " << ii);
+    B2INFO("Processing: Cand hits vector size = " << cand->getTrackHits().size());
+    B2INFO("Processing: Cand R = " << cand->getR());
+
+    if (cand->getTrackHits().size() == 0)continue;
 
     for (CDCLegendreTrackHit * hit : cand->getTrackHits()) {
       double prob = getAssigmentProbability(hit, cand);;
@@ -135,7 +114,7 @@ void CDCLegendreSimpleFilter::processTracks()
         if (candInner == cand) continue;
         double probTemp = getAssigmentProbability(hit, candInner);
 
-        int curve_sign = hit->getCurvatureSignWrt(cos(candInner->getTheta()) / candInner->getR(), sin(candInner->getTheta()) / candInner->getR());
+//        int curve_sign = hit->getCurvatureSignWrt(cos(candInner->getTheta()) / candInner->getR(), sin(candInner->getTheta()) / candInner->getR());
 
         if (probTemp > bestHitProb /*&& curve_sign == candInner->getCharge()*/) {
           BestCandidate = candInner;
@@ -147,7 +126,7 @@ void CDCLegendreSimpleFilter::processTracks()
 //          filterCandidate->getLegendreCandidate()->removeHit(hit);
         BestCandidate->addHit(hit);
         cand->removeHit(hit);
-        B2INFO("Hit has been reassigned.");
+//        B2INFO("Hit has been reassigned.");
       }
 
 
@@ -160,7 +139,7 @@ void CDCLegendreSimpleFilter::processTracks()
 
 }
 
-
+/*
 void CDCLegendreSimpleFilter::trackCore()
 {
 
@@ -182,7 +161,8 @@ void CDCLegendreSimpleFilter::trackCore()
           if (candInner == cand) continue;
           double probTemp = getAssigmentProbability(hit, candInner);
 
-          if (probTemp > otherProbs /*&& curve_sign == candInner->getCharge()*/) {
+          if (probTemp > otherProbs && curve_sign == candInner->getCharge()) {
+
             otherProbs = probTemp;
           }
         }
@@ -194,7 +174,7 @@ void CDCLegendreSimpleFilter::trackCore()
 
       if (removeHit) {
         cand->removeHit(hit);
-        B2INFO("Hit has been removed!");
+//        B2INFO("Hit has been removed!");
       }
 
 
@@ -206,10 +186,10 @@ void CDCLegendreSimpleFilter::trackCore()
 
 }
 
+*/
 
 
-
-void CDCLegendreSimpleFilter::appenUnusedHits(std::vector<CDCLegendreTrackHit*> AxialHitList)
+void CDCLegendreSimpleFilter::appenUnusedHits(std::list<CDCLegendreTrackCandidate*>& m_trackList, std::vector<CDCLegendreTrackHit*> AxialHitList)
 {
   for (CDCLegendreTrackHit * hit : AxialHitList) {
     if (hit->isUsed() != CDCLegendreTrackHit::not_used) continue;
@@ -219,7 +199,7 @@ void CDCLegendreSimpleFilter::appenUnusedHits(std::vector<CDCLegendreTrackHit*> 
     for (CDCLegendreTrackCandidate * cand : m_trackList) {
       double probTemp = getAssigmentProbability(hit, cand);
 
-      int curve_sign = hit->getCurvatureSignWrt(cos(cand->getTheta()) / cand->getR(), sin(cand->getTheta()) / cand->getR());
+//      int curve_sign = hit->getCurvatureSignWrt(cos(cand->getTheta()) / cand->getR(), sin(cand->getTheta()) / cand->getR());
 
       if (probTemp > bestHitProb /*&& curve_sign == cand->getCharge()*/) {
         BestCandidate = cand;
@@ -230,7 +210,7 @@ void CDCLegendreSimpleFilter::appenUnusedHits(std::vector<CDCLegendreTrackHit*> 
     if (bestHitProb > 0.8) {
       BestCandidate->addHit(hit);
       hit->setUsed(CDCLegendreTrackHit::used_in_track);
-      B2INFO("Unused hit has been assigned.");
+//      B2INFO("Unused hit has been assigned.");
     }
 
   }

@@ -28,6 +28,9 @@ namespace Belle2 {
      */
     bool checkCandidate(CDCLegendreTrackCandidate* track, int minNHitsSLayer = 2);
 
+    /**
+     * Checks given pattern; in development
+     */
     void checkPattern(HitPatternCDC* pattern);
 
     /** Gets number of innermost superlayer*/
@@ -41,7 +44,7 @@ namespace Belle2 {
 
   private:
 
-    CDCLegendreTrackCreator* m_cdcLegendreTrackCreator;
+    CDCLegendreTrackCreator* m_cdcLegendreTrackCreator; /**< object for track candidate creating */
 
     static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
     static constexpr double m_rc = 0.0176991150442477874; /**< threshold of r, which defines curlers*/

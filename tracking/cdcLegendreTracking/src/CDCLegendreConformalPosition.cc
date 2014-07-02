@@ -34,7 +34,6 @@ CDCLegendreConformalPosition::CDCLegendreConformalPosition()
   CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
 
 
-  int nWires;
   TVector3 wireBegin;
   TVector3 wireEnd;
   double zReference = 25.852;
@@ -56,7 +55,7 @@ CDCLegendreConformalPosition::CDCLegendreConformalPosition()
 
   for (int layerId = 0; layerId < nLayers_max; layerId++) {
 
-    nWires = getNWires(layerId);
+    int nWires = getNWires(layerId);
 
     for (int wireId = 0; wireId < nWires; wireId++) {
 

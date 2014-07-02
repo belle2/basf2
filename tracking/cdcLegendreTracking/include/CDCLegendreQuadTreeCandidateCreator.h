@@ -55,7 +55,7 @@ namespace Belle2 {
     /*
      * Add node to the list of nodes with candidated
      */
-    inline void addNode(CDCLegendreQuadTree* node) {s_nodesWithCandidates.push_back(node);};
+    static inline void addNode(CDCLegendreQuadTree* node) {s_nodesWithCandidates.push_back(node);};
 
     /*
      * Creating candidates using information from nodes
@@ -93,18 +93,22 @@ namespace Belle2 {
      */
     CDCLegendreQuadTree* findNode(CDCLegendreQuadTree*, double, double);
 
+
+    /**
+     * Sort nodes according to number of hits
+     */
     static bool sort_nodes(const CDCLegendreQuadTree* node_one, const CDCLegendreQuadTree* node_two);
 
 
   private:
     static std::vector< std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > > s_candidates; /**< Holds list of track candidates */
-    static std::list<CDCLegendreQuadTree*> s_nodesWithCandidates;
-    static CDCLegendreTrackFitter* s_cdcLegendreTrackFitter;
-    static CDCLegendreTrackCreator* s_cdcLegendreTrackCreator;
-    static CDCLegendreTrackMerger* s_cdcLegendreTrackMerger;
-    static std::vector<CDCLegendreTrackHit*> s_axialHits;
+    static std::list<CDCLegendreQuadTree*> s_nodesWithCandidates; /**< List of nodes with possible track candidates */
+    static CDCLegendreTrackFitter* s_cdcLegendreTrackFitter; /**< Track fitter object */
+    static CDCLegendreTrackCreator* s_cdcLegendreTrackCreator; /**< Track creator object */
+    static CDCLegendreTrackMerger* s_cdcLegendreTrackMerger; /**< Track merger object */
+    static std::vector<CDCLegendreTrackHit*> s_axialHits; /**< Holds list of acial hits */
 
-    static CDCLegendreQuadTreeCandidateCreator* s_cdcLegendreQuadTreeCandidateCreator;
+    static CDCLegendreQuadTreeCandidateCreator* s_cdcLegendreQuadTreeCandidateCreator; /**< Instance of the class */
 
 
   };

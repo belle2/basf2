@@ -98,14 +98,14 @@ namespace Belle2 {
     std::list<CDCLegendreTrackCandidate*> m_trackletList; /**< List of tracklets. */
     std::list<CDCLegendreTrackCandidate*> m_stereoTrackletList; /**< List of tracklets. */
 
-    CDCLegendreTrackFitter* m_cdcLegendreTrackFitter;
-    CDCLegendrePatternChecker* m_cdcLegendrePatternChecker;
-    CDCLegendreFastHough* m_cdcLegendreFastHough;
-    CDCLegendreTrackMerger* m_cdcLegendreTrackMerger;
-    CDCLegendreTrackCreator* m_cdcLegendreTrackCreator;
-    CDCLegendreQuadTree* m_cdcLegendreQuadTree;
-    CDCLegendreConformalPosition* m_cdcLegendreConformalPosition;
-    CDCLegendreQuadTreeCandidateCreator* m_cdcLegendreQuadTreeCandidateCreator;
+    CDCLegendreTrackFitter* m_cdcLegendreTrackFitter; /**< Object containing fitter for tracking */
+    CDCLegendrePatternChecker* m_cdcLegendrePatternChecker; /**< Used for check patterns of tracks */
+    CDCLegendreFastHough* m_cdcLegendreFastHough; /**< Fast Hough transformer */
+    CDCLegendreTrackMerger* m_cdcLegendreTrackMerger; /**< Object which make track merging inside the module */
+    CDCLegendreTrackCreator* m_cdcLegendreTrackCreator; /**< Object for creating tracks */
+    CDCLegendreQuadTree* m_cdcLegendreQuadTree; /**< Object which holds quadtree structure */
+    CDCLegendreConformalPosition* m_cdcLegendreConformalPosition; /**< Object which holds pre-calculated conformal transformation of each wire */
+    CDCLegendreQuadTreeCandidateCreator* m_cdcLegendreQuadTreeCandidateCreator; /**< Object which creates track candidates using quadtree nodes */
 
     int m_threshold; /**< Threshold for votes in the legendre plane, parameter of the module*/
     double m_thresholdUnique; /**< Threshold of unique TrackHits for track building*/

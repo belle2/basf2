@@ -229,16 +229,14 @@ void CDCLegendreTrackDrawer::drawConformalHits(std::vector<CDCLegendreTrackHit*>
   if (not m_drawCandInfo) return;
 
   if (!do_print) {
-    double x0, y0, R;
-    double norm;
-    norm = 1. / (m_rMax - m_rMin);
+    double norm = 1. / (m_rMax - m_rMin);
     Color_t trackColor;
     if (ntrack >= 0)trackColor = getRootColor(ntrack);
     else trackColor = kBlue;
     for (CDCLegendreTrackHit * hit : trackHitList) {
-      x0 = hit->getConformalX();
-      y0 = hit->getConformalY();
-      R = hit->getConformalDriftTime();
+      double x0 = hit->getConformalX();
+      double y0 = hit->getConformalY();
+      double R = hit->getConformalDriftTime();
       TEllipse* hit_conformal = new TEllipse((x0 - m_rMin)*norm, (y0 - m_rMin)*norm, R * norm, R * norm);
       //    TEllipse* hit_conformal = new TEllipse(x0,y0,R, R);
       hit_conformal->SetFillStyle(0);
@@ -276,7 +274,6 @@ void CDCLegendreTrackDrawer::drawLegendreHits(std::vector<CDCLegendreTrackHit*> 
   if (!do_print) {
 
 //    int nhits = 0;
-    double x0, y0, R;
     Color_t trackColor;
     if (ntrack >= 0)trackColor = getRootColor(ntrack);
     else trackColor = kBlue;
@@ -285,9 +282,9 @@ void CDCLegendreTrackDrawer::drawLegendreHits(std::vector<CDCLegendreTrackHit*> 
       TF1* funct2 = new TF1("funct", "[0]*cos(x)+[1]*sin(x)-[2]", 0, m_PI);
       funct1->SetLineWidth(1);
       funct2->SetLineWidth(1);
-      x0 = hit->getConformalX();
-      y0 = hit->getConformalY();
-      R = hit->getConformalDriftTime();
+      double x0 = hit->getConformalX();
+      double y0 = hit->getConformalY();
+      double R = hit->getConformalDriftTime();
       funct1->SetParameters(x0, y0, R);
       funct2->SetParameters(x0, y0, R);
       funct1->SetLineColor(trackColor);

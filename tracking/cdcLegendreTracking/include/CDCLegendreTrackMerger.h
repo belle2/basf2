@@ -39,11 +39,6 @@ namespace Belle2 {
     /**
      * Trying to merge tracks
      */
-    void MergeTracks();
-
-    /**
-     * Trying to merge tracks
-     */
     double tryToMergeAndFit(CDCLegendreTrackCandidate* cand1, CDCLegendreTrackCandidate* cand2);
 
     /**
@@ -102,7 +97,9 @@ namespace Belle2 {
      */
     double fitStereoTrackletsToTrack(CDCLegendreTrackCandidate*, CDCLegendreTrackCandidate*);
 
-
+    /**
+     * Extend tracklet using conformal transformation with respect to given point
+     */
     void extendTracklet(CDCLegendreTrackCandidate* tracklet, std::vector<CDCLegendreTrackHit*>& m_AxialHitList);
 
 
@@ -111,9 +108,9 @@ namespace Belle2 {
     std::list<CDCLegendreTrackCandidate*>& m_trackList; /**< List of track candidates. Mainly used for memory management! */
     std::list<CDCLegendreTrackCandidate*>& m_trackletList; /**< List of tracklets. */
     std::list<CDCLegendreTrackCandidate*>& m_stereoTrackletList; /**< List of tracklets. */
-    CDCLegendreTrackFitter* m_cdcLegendreTrackFitter;
-    CDCLegendreFastHough* m_cdcLegendreFastHough;
-    CDCLegendreTrackCreator* m_cdcLegendreTrackCreator;
+    CDCLegendreTrackFitter* m_cdcLegendreTrackFitter; /**< Track fitter */
+    CDCLegendreFastHough* m_cdcLegendreFastHough;  /**< Fast Hough finder */
+    CDCLegendreTrackCreator* m_cdcLegendreTrackCreator; /**< Track creator */
 
 
   };

@@ -41,7 +41,7 @@ CDCLegendreTrackCreator::CDCLegendreTrackCreator(std::vector<CDCLegendreTrackHit
 
 void CDCLegendreTrackCreator::createLegendreTrackCandidate(
   const std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >& track,
-  std::set<CDCLegendreTrackHit*>* trackHitList, std::pair<double, double>& ref_point)
+  std::pair<double, double>& ref_point)
 {
 
   //get theta and r values for each track candidate
@@ -245,13 +245,14 @@ void CDCLegendreTrackCreator::createGFTrackCandidates(string& m_gfTrackCandsColN
   gfTrackCandidates.create();
 
   int i = 0;
-  std::vector<CDCLegendreTrackCandidate*> completeTracksList;
-  std::copy(m_trackList.begin(), m_trackList.end(), std::back_inserter(completeTracksList));
-  std::copy(m_trackletList.begin(), m_trackletList.end(), std::back_inserter(completeTracksList));
-  std::copy(m_stereoTrackletList.begin(), m_stereoTrackletList.end(), std::back_inserter(completeTracksList));
-
+  /*  std::vector<CDCLegendreTrackCandidate*> completeTracksList;
+    std::copy(m_trackList.begin(), m_trackList.end(), std::back_inserter(completeTracksList));
+    std::copy(m_trackletList.begin(), m_trackletList.end(), std::back_inserter(completeTracksList));
+    std::copy(m_stereoTrackletList.begin(), m_stereoTrackletList.end(), std::back_inserter(completeTracksList));
+  */
   for (CDCLegendreTrackCandidate * trackCand : m_trackList) {
-    if (trackCand->getNHits() == 0) continue;
+//    if (trackCand->getNHits() == 0) continue;
+    if (trackCand->getTrackHits().size() < 10) continue;
 //    B2INFO("Number of hits: " << trackCand->getNHits());
     gfTrackCandidates.appendNew();
     std::pair<double, double> ref_point_temp = std::make_pair(0., 0.);

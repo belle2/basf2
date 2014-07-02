@@ -69,7 +69,7 @@ namespace Belle2 {
     }
 
     /**Return pattern of assigned axial and stereo hits.*/
-    inline HitPatternCDC getHitPattern() {
+    inline HitPatternCDC getHitPattern() const {
       return m_hitPattern;
     }
 
@@ -105,7 +105,7 @@ namespace Belle2 {
      * Reestimate charge sign
      */
     void reestimateCharge() {
-      m_charge = CDCLegendreTrackCandidate::getChargeAssumption(m_theta, m_r, m_TrackHits);
+      m_charge = getChargeAssumption(m_theta, m_r, m_TrackHits);
     }
 
 
@@ -222,7 +222,7 @@ namespace Belle2 {
     /**
      * Get chi2 square of circular fit
      */
-    double getChi2() {
+    double getChi2() const {
       return m_chi2;
     }
 

@@ -20,7 +20,6 @@
 
 
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackHitShifted.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackCreator.h>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackMerger.h>
@@ -34,7 +33,7 @@
 #include "tracking/cdcLegendreTracking/CDCLegendreQuadTreeNeighborFinder.h"
 #include <tracking/cdcLegendreTracking/CDCLegendreWireCenter.h>
 
-#include <tracking/cdcLegendreTracking/filter/CDCLegendreSimpleFilter.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreSimpleFilter.h>
 
 
 
@@ -140,7 +139,7 @@ void CDCLegendreTrackingModule::initialize()
   m_AxialHitList.reserve(2048);
   m_StereoHitList.reserve(2048);
 
-  m_cdcLegendreFastHough = new CDCLegendreFastHough(m_useHitPrecalculatedR, m_reconstructCurler, m_maxLevel, m_nbinsTheta, m_rMin, m_rMax);
+  m_cdcLegendreFastHough = new CDCLegendreFastHough(m_reconstructCurler, m_maxLevel, m_nbinsTheta, m_rMax);
 
   m_cdcLegendreTrackCreator = new CDCLegendreTrackCreator(m_AxialHitList, m_StereoHitList, m_trackList, m_trackletList, m_stereoTrackletList, m_appendHits, m_cdcLegendreTrackFitter, m_cdcLegendreTrackDrawer);
 
@@ -219,7 +218,7 @@ void CDCLegendreTrackingModule::event()
   DoTreeTrackFinding();
 
 
-  processTracks();
+  if (m_mergeTracksEarly)processTracks();
 
 //  if(m_AxialHitList.size() > 100) DoTreeTrackFinding();
 //  else DoSteppedTrackFinding();
@@ -285,7 +284,7 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
         bool merged = false;
         if (m_mergeTracksEarly) merged = m_cdcLegendreTrackMerger->earlyCandidateMerge(candidate, hits_set, m_fitTracksEarly);
 
-        if (!merged) m_cdcLegendreTrackCreator->createLegendreTrackCandidate(candidate, &hits_set, ref_point);
+        if (!merged) m_cdcLegendreTrackCreator->createLegendreTrackCandidate(candidate, ref_point);
 
         if (m_drawCandidates) m_cdcLegendreTrackDrawer->showPicture();
 
@@ -314,7 +313,7 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
             bool merged = false;
             if (m_mergeTracksEarly) merged = m_cdcLegendreTrackMerger->earlyCandidateMerge(candidate_temp, hits_set, m_fitTracksEarly);
 
-            if (!merged) m_cdcLegendreTrackCreator->createLegendreTrackCandidate(candidate_temp, &hits_set, ref_point);
+            if (!merged) m_cdcLegendreTrackCreator->createLegendreTrackCandidate(candidate_temp, ref_point);
 
             if (m_drawCandidates) m_cdcLegendreTrackDrawer->showPicture();
           }
@@ -406,7 +405,6 @@ void CDCLegendreTrackingModule::DoTreeStereoTrackletFinding()
     CDCLegendreQuadTreeCandidateCreator::Instance().clearNodes();
     CDCLegendreQuadTreeCandidateCreator::Instance().clearCandidates();
 
-    unsigned int n_hits = 999;
     double limit = 6;
     double rThreshold = 0.15;
     m_cdcLegendreQuadTree->provideHitSet(hits_set);
@@ -470,14 +468,9 @@ void CDCLegendreTrackingModule::processTracks()
 
   for (CDCLegendreTrackCandidate * cand : m_trackList) {
     if (cand->getCandidateType() != CDCLegendreTrackCandidate::tracklet) continue;
-    m_cdcLegendreTrackMerger->extendTracklet(cand, m_AxialHitList/*s_axialHits*/);
+    m_cdcLegendreTrackMerger->extendTracklet(cand, m_AxialHitList);
   }
 
-
-  m_cdcLegendreTrackMerger->MergeCurler();
-  m_cdcLegendreTrackMerger->MergeCurler();
-
-//  m_cdcLegendreTrackMerger->checkOverlapping();
 
   m_cdcLegendreTrackMerger->MergeCurler();
 
@@ -486,87 +479,31 @@ void CDCLegendreTrackingModule::processTracks()
   }
 
 
-//  m_cdcLegendreTrackMerger->MergeCurler();
-//  m_cdcLegendreTrackMerger->splitTracks();
-
 
   for (CDCLegendreTrackCandidate * cand : m_trackList) {
     m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
   }
 
   CDCLegendreSimpleFilter m_cdcLegendreSimpleFilter;
-  m_cdcLegendreSimpleFilter.createFilterCandidateList(m_trackList);
-  m_cdcLegendreSimpleFilter.processTracks();
+  m_cdcLegendreSimpleFilter.processTracks(m_trackList);
   for (CDCLegendreTrackCandidate * cand : m_trackList) {
     m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
   }
 
-  m_cdcLegendreSimpleFilter.appenUnusedHits(m_AxialHitList);
+  m_cdcLegendreSimpleFilter.appenUnusedHits(m_trackList, m_AxialHitList);
   for (CDCLegendreTrackCandidate * cand : m_trackList) {
     m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
   }
-  /*
-    m_cdcLegendreSimpleFilter.trackCore();
-    for (CDCLegendreTrackCandidate * cand : m_trackList) {
-      m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
-    }
 
-    m_cdcLegendreSimpleFilter.appenUnusedHits(m_AxialHitList);
-    for (CDCLegendreTrackCandidate * cand : m_trackList) {
-      m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
-    }
+  CDCLegendrePatternChecker cdcLegendrePatternChecker(m_cdcLegendreTrackCreator);
+  for (CDCLegendreTrackCandidate * cand : m_trackList) {
+    cand->reestimateCharge();
+    cdcLegendrePatternChecker.checkCandidate(cand);
+    m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
+  }
 
-    m_cdcLegendreSimpleFilter.trackCore();
-    for (CDCLegendreTrackCandidate * cand : m_trackList) {
-      m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
-    }
+  m_cdcLegendreTrackMerger->MergeCurler();
 
-    m_cdcLegendreSimpleFilter.appenUnusedHits(m_AxialHitList);
-    for (CDCLegendreTrackCandidate * cand : m_trackList) {
-      m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
-    }
-
-    m_cdcLegendreSimpleFilter.trackCore();
-    for (CDCLegendreTrackCandidate * cand : m_trackList) {
-      m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
-    }
-
-    m_cdcLegendreSimpleFilter.appenUnusedHits(m_AxialHitList);
-    for (CDCLegendreTrackCandidate * cand : m_trackList) {
-      m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
-    }
-
-    m_cdcLegendreSimpleFilter.trackCore();
-    for (CDCLegendreTrackCandidate * cand : m_trackList) {
-      m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
-    }
-
-    m_cdcLegendreSimpleFilter.appenUnusedHits(m_AxialHitList);
-    for (CDCLegendreTrackCandidate * cand : m_trackList) {
-      m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
-    }
-  */
-  /*
-    m_cdcLegendreSimpleFilter.processTracks();
-    for (CDCLegendreTrackCandidate * cand : m_trackList) {
-      m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
-    }
-
-    m_cdcLegendreSimpleFilter.appenUnusedHits(m_AxialHitList);
-    for (CDCLegendreTrackCandidate * cand : m_trackList) {
-      m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
-    }
-
-
-    m_cdcLegendreSimpleFilter.processTracks();
-    for (CDCLegendreTrackCandidate * cand : m_trackList) {
-      m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
-    }
-
-
-      m_cdcLegendreTrackMerger->splitTracks();
-      m_cdcLegendreTrackMerger->MergeCurler();
-  */
 }
 
 void CDCLegendreTrackingModule::endRun()

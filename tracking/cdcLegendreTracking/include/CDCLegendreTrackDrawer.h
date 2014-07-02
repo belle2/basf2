@@ -40,37 +40,79 @@ namespace Belle2 {
 
     virtual ~CDCLegendreTrackDrawer() {};
 
+    /**
+     * Prepare variables and CDC stucture
+     */
     void initialize();
 
+    /**
+     * Process event
+     */
     void event();
 
+    /**
+     * Draw given track candidate
+     */
     void drawTrackCand(CDCLegendreTrackCandidate* TrackCand);
 
+    /**
+     * Finalize svg file
+     */
     void finalizeFile();
 
+    /**
+     * Reopen file
+     */
     void openFileAgain();
 
+    /**
+     * Show picture during basf2 run
+     */
     void showPicture();
 
 
+    /**
+     * Draw cdc hits in conformal space
+     */
     void drawConformalHits(std::vector<CDCLegendreTrackHit*> trackHitList, int ntrack, bool do_print);
+
+    /**
+     * Draw cdc hits in legendre space
+     */
     void drawLegendreHits(std::vector<CDCLegendreTrackHit*> trackHitList, int ntrack, bool do_print);
+
+    /**
+     * Get color by index (ROOT drawings)
+     */
     Color_t getRootColor(int i);
+
+    /**
+     * Initialize ROOT colors vector
+     */
     void initRootColorVec();
+
+    /**
+     * Draw hits in legendre and conformal space using ROOT
+     */
     void drawHitsROOT(std::vector<CDCLegendreTrackHit*>& hits_vector); /**<Method for drawing cdchits in TCanvas (in legendre and conformal spaces)*/
+
+    /**
+     * Finalize ROOT drawing
+     */
     void finalizeROOTFile(std::vector<CDCLegendreTrackHit*>& hits_vector);
+
   protected:
 
-    bool m_drawCandInfo;
-    bool m_drawCandidates;
-    int m_iTrack;
-    FILE* pipeout_fp;
-    int m_trackCounter;
+    bool m_drawCandInfo; /**< Checks whether conformal and legendre transformation should be drawn */
+    bool m_drawCandidates;  /**< Checks whether drawing while basf2 running should be done */
+    int m_iTrack; /**< Track counter */
+//    FILE* pipeout_fp; /**< Chacks whether conformal and legendre transformation should be drawn */
+    int m_trackCounter; /**< Track counter; used for saving track finding progress */
 
     //for ROOT drawing:
-    std::vector<TF1*> m_hitsLegendre;
-    std::vector<TEllipse*> m_hitsConformal;
-    std::vector<Color_t> m_colorRootVec;
+    std::vector<TF1*> m_hitsLegendre; /**< Holds cdc hits transformation into legendre space */
+    std::vector<TEllipse*> m_hitsConformal;  /**< Holds cdc hits transformation into conformal space */
+    std::vector<Color_t> m_colorRootVec; /**< Holds ROOT colors used in drawing */
 
     double m_rMin; /**< Minimum in r direction, initialized in initializer list of the module*/
     double m_rMax; /**< Maximum in r direction, initialized in initializer list of the module*/

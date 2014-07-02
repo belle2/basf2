@@ -17,18 +17,36 @@ namespace Belle2 {
   class CDCLegendreConformalPosition {
   public:
 
+    /*
+     * Constructor
+     */
     CDCLegendreConformalPosition();
 
     ~CDCLegendreConformalPosition();
 
+    /*
+     * Delete static instance
+     */
     void clearPointers();
 
+    /*
+     * Get instance of class
+     */
     static CDCLegendreConformalPosition& Instance();
 
+    /*
+     * Get pre-created instance of class; should be used when static instance 100% has been created
+     */
     inline static CDCLegendreConformalPosition& InstanceTrusted() {  return *s_cdcLegendreConformalPosition; };
 
+    /*
+     * Ger conformal position of wire
+     */
     inline double getConformalR(int layerId, int wireId, int binTheta) const { return m_lookupR[layerId][wireId][binTheta]; };
 
+    /*
+     * Get number of wires in layer
+     */
     double getNWires(int layerId);
 
 
@@ -38,13 +56,13 @@ namespace Belle2 {
     double* m_cos_theta; /**< Lookup array for calculation of cos */
     static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
 
-    static const int nLayers_max = 56;
-    static const int nWires_max = 384;
-    static const int m_nbinsTheta = 8192;
+    static const int nLayers_max = 56; /**< Number of layers */
+    static const int nWires_max = 384; /**< max. number of wires in layer */
+    static const int m_nbinsTheta = 8192; /**< Number of theta bins (in legendre space) */
 
     double m_lookupR[nLayers_max][nWires_max][(m_nbinsTheta + 1)]; /**< Lookup table for holding information about r value, used in FastHogh algorithm. */
 
-    static CDCLegendreConformalPosition* s_cdcLegendreConformalPosition;
+    static CDCLegendreConformalPosition* s_cdcLegendreConformalPosition; /**< Static instance of the class */
 
   };
 

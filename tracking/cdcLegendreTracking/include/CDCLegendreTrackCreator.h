@@ -36,7 +36,7 @@ namespace Belle2 {
      * @param track construction of std::pairs, describing the track candidate by the axial hits, belonging to it and the parameter r and theta
      * @param trackHitList list of all track hits, which are used for track finding. Hits belonging to the track candidate will be deleted from it.
      */
-    void createLegendreTrackCandidate(const std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >& track, std::set<CDCLegendreTrackHit*>* trackHitList, std::pair<double, double>& ref_point);
+    void createLegendreTrackCandidate(const std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >& track, std::pair<double, double>& ref_point);
 
     /**
      * Create track candidate using CDCLegendreQuadTree nodes and return pointer to created candidate

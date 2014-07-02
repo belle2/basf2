@@ -148,13 +148,12 @@ bool CDCLegendrePatternChecker::checkCandidate(CDCLegendreTrackCandidate* track,
   if (patterns.size() > 1) B2DEBUG(100, "Track has been splitted!");
 
   int nHits_longest = 0;
-  int nHits_current = 0;
-  int index_longest = 0;
+  unsigned int index_longest = 0;
   int ii = 0;
 
   for (HitPatternCDC & pattern : patterns) {
     B2DEBUG(100, "Tracklet pattern: " << pattern.getBitSet());
-    nHits_current = 0;
+    int nHits_current = 0;
     for (int sLayer = 8; sLayer >= 0; sLayer -= 2) {
       nHits_current += pattern.getSLayerNHits(sLayer);
     }
@@ -167,7 +166,7 @@ bool CDCLegendrePatternChecker::checkCandidate(CDCLegendreTrackCandidate* track,
 
   std::vector<CDCLegendreTrackHit*> trackletHits;
   trackletHits.clear();
-  for (int ii = 0; ii < patterns.size(); ii++) {
+  for (unsigned int ii = 0; ii < patterns.size(); ii++) {
     if (ii == index_longest) continue;
     for (CDCLegendreTrackHit * hit : track->getTrackHits()) {
       if (patterns[ii].hasLayer(hit->getLayerId())) trackletHits.push_back(hit);

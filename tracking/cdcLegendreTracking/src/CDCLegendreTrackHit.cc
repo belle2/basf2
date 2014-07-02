@@ -212,7 +212,6 @@ bool CDCLegendreTrackHit::approach(const CDCLegendreTrackCandidate& track)
   //direction of the wire
   wireVector = forwardWirePoint - backwardWirePoint;
 
-  double distance; //distance between the hit und the intersection point ( = shortest distance from hit to "track line")
   double distanceMax = 5;  //start value for the search
 
   //create a vector with 100 aquidistant values from 0 to 1 to parametrise the wire vector
@@ -230,7 +229,7 @@ bool CDCLegendreTrackHit::approach(const CDCLegendreTrackCandidate& track)
     m_wirePosition.SetX(backwardWirePoint.x() + parameter[i] * wireVector.x());
     m_wirePosition.SetY(backwardWirePoint.y() + parameter[i] * wireVector.y());
 
-    distance = track.DistanceTo(*this);
+    double distance = track.DistanceTo(*this); //distance between the hit und the intersection point ( = shortest distance from hit to "track line")
 
     //search for the wire point which gives the shortest distance
     if (distance < distanceMax) {

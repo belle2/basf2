@@ -43,7 +43,8 @@ double CDCLegendreTrackFitter::fitTrackCandidateFast(
   double r2 = 0, x = 0, y = 0, x2 = 0, y2 = 0; // coords
   double weight;// weight of each hit, so far no difference in hit quality
   double sumWeights = 0, divisor; // sumWeights is sum of weights, divisor is 1/sumWeights;
-  double radius_track, xc_track, yc_track;
+
+  int nhits = hits.size();
 
   // if with_drift_time if true, uses drift time information in fitting procedure
   if (!with_drift_time) {
@@ -51,6 +52,7 @@ double CDCLegendreTrackFitter::fitTrackCandidateFast(
     for (CDCLegendreTrackHit * hit : hits) {
       if (hit->getDriftTime() != 0.)weight =  1. / hit->getDriftTime();
       else continue;
+      if (nhits < 15) weight = 1.;
       sumWeights += weight;
       x = hit->getWirePosition().X();
       y = hit->getWirePosition().Y();
@@ -68,11 +70,11 @@ double CDCLegendreTrackFitter::fitTrackCandidateFast(
       meanR4 += r2 * r2 * weight;
     }
   } else {
-    radius_track = fabs(1. / track_par.second);
+    double radius_track = fabs(1. / track_par.second);
 //    xc_track = track->getXc();
 //    yc_track = track->getYc();
-    xc_track = cos(track_par.first) / track_par.second + ref_point.first;
-    yc_track = sin(track_par.first) / track_par.second + ref_point.second;
+    double xc_track = cos(track_par.first) / track_par.second + ref_point.first;
+    double yc_track = sin(track_par.first) / track_par.second + ref_point.second;
     for (CDCLegendreTrackHit * hit : hits) {
 //      if (hit->getDriftTime() != 0.)weight =  1. / hit->getDriftTime();
 //      else continue;
@@ -156,7 +158,7 @@ double CDCLegendreTrackFitter::fitTrackCandidateFast(
   double chi2 = sumWeights * (1. + rho * clapR) * (1. + rho * clapR) * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2); /// returns chi2
   B2DEBUG(100, "chi2: " << chi2);
 
-  return chi2;
+  return chi2 / (hits.size() - 4);
 
 }
 

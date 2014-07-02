@@ -29,10 +29,10 @@ using namespace Belle2;
 
 CDCLegendreTrackCandidate::CDCLegendreTrackCandidate(
   CDCLegendreTrackCandidate& candidate) :
-  m_theta(candidate.m_theta), m_r(candidate.m_r), m_xc(candidate.m_xc), m_yc(
-    candidate.m_yc), m_charge(
-      candidate.m_charge), m_calcedMomentum(candidate.m_calcedMomentum), m_momEstimation(candidate.m_momEstimation),
-  m_type(candidate.m_type)
+  m_theta(candidate.m_theta), m_r(candidate.m_r), m_xc(candidate.m_xc), m_yc(candidate.m_yc),
+  m_charge(candidate.m_charge), m_type(candidate.m_type),
+  m_calcedMomentum(candidate.m_calcedMomentum), m_momEstimation(candidate.m_momEstimation)
+
 {
   m_hitPattern = candidate.getHitPattern();
   m_TrackHits = candidate.getTrackHits();

@@ -21,7 +21,7 @@ namespace Belle2 {
   class CDCLegendreFastHough {
   public:
 
-    CDCLegendreFastHough(bool useHitPrecalculatedR, bool reconstructCurler, int maxLevel, int nbinsTheta, double rMin, double rMax);
+    CDCLegendreFastHough(bool reconstructCurler, int maxLevel, int nbinsTheta, double rMax);
 
     ~CDCLegendreFastHough();
 
@@ -87,7 +87,7 @@ namespace Belle2 {
   private:
 
 //    bool m_useHitPrecalculatedR; /**< To store r values inside hit objects or recalculate it each step */
-    bool m_reconstructCurler;
+    bool m_reconstructCurler; /**< Set if curlers should be reconstructed */
     int m_maxLevel; /**< Maximum Level of FastHough Algorithm*/
 
     static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
@@ -98,8 +98,8 @@ namespace Belle2 {
     double* m_sin_theta; /**< Lookup array for calculation of sin */
     double* m_cos_theta; /**< Lookup array for calculation of cos */
     unsigned m_limit;  /**< Limitation on number of hits in candidate */
-    std::vector<CDCLegendreTrackHit*> m_hits;
-    double Rcell;
+    std::vector<CDCLegendreTrackHit*> m_hits; /**< Holds vector of hits */
+    double Rcell; /**< Rough estimation of cell size */
 
     std::vector< std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > >* m_candidates; /**< Holds list of track candidates */
 //    CDCLegendreConformalPosition &m_cdcLegendreConformalPosition;

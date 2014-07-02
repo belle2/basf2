@@ -18,9 +18,15 @@ namespace Belle2 {
 
     ~CDCLegendreWireCenter();
 
+    /**
+     * Get static instance of the class
+     */
     static CDCLegendreWireCenter& Instance();
 
-    inline double getCenter(int iCLayer) {return m_wireCentersArray[iCLayer];};
+    /**
+     * Get center of wire
+     */
+    inline double getCenter(int iCLayer) const {return m_wireCentersArray[iCLayer];};
 
   private:
 

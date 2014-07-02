@@ -267,4 +267,6 @@ def FullEventInterpretation(path, particles):
 
         seq.addNeeded('SignalProbability_B+')
         seq.addNeeded('SignalProbability_B0')
+        seq.addNeeded('ParticleList_B0')
+        seq.addNeeded('ParticleList_B+')
     seq.run(path, args.verbose)

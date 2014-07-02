@@ -225,8 +225,8 @@ namespace Belle2 {
 
     private:
       static HepVector ms_amin;
-      static HepVector ms_amax;
-      static bool ms_check_range;     /*! Check the helix parameter's range. */
+      static HepVector ms_amax; ///
+      static bool ms_check_range;     /// Check the helix parameter's range.
       static bool ms_print_debug;     /*! Debug option flag. */
       static bool ms_throw_exception; /*! Throw exception flag. */
 
@@ -237,13 +237,15 @@ namespace Belle2 {
     public: // Mathmatical functions
 
       HepMatrix delApDelA(const HepVector& ap) const;
-      HepMatrix delXDelA(double phi) const;
-      HepMatrix delMDelA(double phi) const;
-      HepMatrix del4MDelA(double phi, double mass) const;
-      HepMatrix del4MXDelA(double phi, double mass) const;
+      HepMatrix delXDelA(double phi) const; ///
+      HepMatrix delMDelA(double phi) const; ///
+      HepMatrix del4MDelA(double phi, double mass) const; ///
+      HepMatrix del4MXDelA(double phi, double mass) const; ///
 
     private:
-
+      /**
+       *
+       */
       void updateCache(void);
 
       /**
@@ -258,6 +260,9 @@ namespace Belle2 {
        */
       void debugPrint(void) const;
 
+      /**
+       *
+       */
       void debugHelix(void) const;
     public:
       /// Constant alpha for uniform field.
@@ -265,8 +270,8 @@ namespace Belle2 {
 
     private:
 
-      bool m_matrixValid; /*! */
-      bool m_helixValid;  /*! True: helix valid, False: helix not valid. */
+      bool m_matrixValid; ///
+      bool m_helixValid;  /// True: helix valid, False: helix not valid.
       double m_bField;    /*! Magnetic field, assuming uniform Bz in the unit of  kG. */
       double m_alpha;     /*! 10000.0/(speed of light)/B. */
       HepPoint3D m_pivot; /*! Pivot */
@@ -276,11 +281,11 @@ namespace Belle2 {
     private: // caches
 
       HepPoint3D m_center;
-      double m_cp; /*! Chache of the cos phi0 */
-      double m_sp; /*! Chache of the sin phi0 */
-      double m_pt; /*! Chache of the pt */
+      double m_cp; /// Chache of the cos phi0
+      double m_sp; /// Chache of the sin phi0
+      double m_pt;
       double m_r;
-      double m_ac[5]; /*! Cache of the helix parameter. */
+      double m_ac[5]; /// Cache of the helix parameter.
 
       static const std::string invalidhelix; /// String "Invalid Helix".
 

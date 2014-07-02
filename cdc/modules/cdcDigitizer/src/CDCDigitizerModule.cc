@@ -30,8 +30,10 @@ using namespace CDC;
 
 // register module
 REG_MODULE(CDCDigitizer)
-
-CDCDigitizerModule::CDCDigitizerModule() : Module()
+CDCDigitizerModule::CDCDigitizerModule() : Module(),
+  m_tdcOffset(0.0), m_cdcp(), m_aCDCSimHit(), m_tdcBinWidth(1.0),
+  m_tdcBinWidthInv(1.0), m_tdcResol(0.144), m_driftV(4.0e-3),
+  m_driftVInv(250.0), m_propSpeedInv(27.25)
 {
   // Set description
   setDescription("Creates CDCHits from CDCSimHits.");
@@ -244,8 +246,8 @@ void CDCDigitizerModule::event()
       continue;
     }
 
-    new(cdcHits.nextFreeAddress()) CDCHit(static_cast<unsigned short>(iterSignalMap->second.m_driftTime * m_tdcBinWidthInv + 0.5) + m_tdcOffset, getADCCount(iterSignalMap->second.m_charge),
-                                          iterSignalMap->first);
+    cdcHits.appendNew(static_cast<unsigned short>(iterSignalMap->second.m_driftTime * m_tdcBinWidthInv + 0.5) + m_tdcOffset, getADCCount(iterSignalMap->second.m_charge),
+                      iterSignalMap->first);
 
     //add entry : CDCSimHit <-> CDCHit
     cdcSimHitsToCDCHits.add(iterSignalMap->second.m_simHitIndex, iCDCHits);

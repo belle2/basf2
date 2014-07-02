@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
+#include <rawdata/RawCOPPERHdrInfo.h>
 #include <rawdata/dataobjects/RawDataBlock.h>
 #include <framework/datastore/DataStore.h>
 
@@ -120,21 +121,30 @@ namespace Belle2 {
     //
     // Get information from "RawCOPPERFormat header" attached by DAQ software
     //
-    virtual int GetExpNo(int n) = 0;    //! get Experimental # from header
 
-    virtual int GetRunNoSubRunNo(int n) = 0;    //! run# (14bit) restart # (8bit)
+    //! get Experimental # from header
+    virtual int GetExpNo(int n) = 0;
 
-    virtual int GetRunNo(int n) = 0;    //! get run # (14bit)
+    //! run# (14bit) restart # (8bit)
+    virtual int GetRunNoSubRunNo(int n) = 0;
 
-    virtual int GetSubRunNo(int n) = 0;    //! get subrun #(8bit)
+    //! get run # (14bit)
+    virtual int GetRunNo(int n) = 0;
 
-    virtual unsigned int GetEveNo(int n) = 0;    //! get contents of header
+    //! get subrun #(8bit)
+    virtual int GetSubRunNo(int n) = 0;
 
-    virtual int GetDataType(int n) = 0;    //! get contents of header
+    //! get contents of header
+    virtual unsigned int GetEveNo(int n) = 0;
 
-    virtual int GetTruncMask(int n) = 0;    //! get contents of header
+    //! get contents of header
+    virtual int GetDataType(int n) = 0;
 
-    virtual int GetSubsysId(int n) = 0;     //! get subsystem-ID from data
+    //! get contents of header
+    virtual int GetTruncMask(int n) = 0;
+
+    //! get subsystem-ID from data
+    virtual int GetSubsysId(int n) = 0;
 
     //
     // Get information from 13words "COPPER header" attached by COPPER board
@@ -256,6 +266,13 @@ namespace Belle2 {
 
     //! calc XOR checksum
     virtual unsigned int CalcXORChecksum(int* buf, int nwords) = 0;
+
+    //! Pack data (format ver. = -1 -> Select the latest format version)
+    virtual void PackBuffer(int* buf_1st, int nwords_1st,
+                            int* buf_2nd, int nwords_2nd,
+                            int* buf_3rd, int nwords_3rd,
+                            int* buf_4th, int nwords_4th,
+                            RawCOPPERHdrInfo rawcprpacker_info , int format_ver = -1) = 0;
 
 
   protected :

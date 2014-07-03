@@ -15,33 +15,33 @@ getFSPClusterMVAConfiguration = lambda name: Particle.MVAConfiguration(
 mvaConfig_chargedFSP = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=['p', 'pt', 'p_CMS', 'pt_CMS', 'chiProb'] + map(lambda x: ''.join(x), zip(['eid', 'Kid', 'muid', 'prid'], ['', '_dEdx', '_TOP', '_ARICH'])),
-    target='isSignal', targetCluster=1
+    target='isSignalAcceptMissingNeutrino', targetCluster=1
 )
 
 mvaConfig_nonFSP = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     #name='NeuroBayes', type='Plugin', config='!H:V:CreateMVAPdfs:NtrainingIter=0:Preprocessing=122:ShapeTreat=DIAG:TrainingMethod=BFGS',
     variables=['daughterProductOf(getExtraInfo(SignalProbability))', 'p', 'pt', 'p_CMS', 'pt_CMS'],
-    target='isSignal', targetCluster=1
+    target='isSignalAcceptMissingNeutrino', targetCluster=1
 )
 
 mvaConfig_gamma = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=['p', 'pt', 'clusterE9E25'],
-    target='isSignal', targetCluster=1
+    target='isSignalAcceptMissingNeutrino', targetCluster=1
 )
 
 mvaConfig_pi0 = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=['p', 'pt', 'daughterAngle', 'M'],
-    target='isSignal', targetCluster=1
+    target='isSignalAcceptMissingNeutrino', targetCluster=1
 )
 
 mvaConfig_B = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     #name='NeuroBayes', type='Plugin', config='!H:V:CreateMVAPdfs:NtrainingIter=0:Preprocessing=122:ShapeTreat=DIAG:TrainingMethod=BFGS',
     variables=['daughterProductOf(getExtraInfo(SignalProbability))', 'p', 'pt'],  # no variables correlated with mass here!
-    target='isSignal', targetCluster=1
+    target='isSignalAcceptMissingNeutrino', targetCluster=1
 )
 
 preCutConfiguration_nonFSP = Particle.PreCutConfiguration(

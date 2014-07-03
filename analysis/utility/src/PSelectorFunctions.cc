@@ -562,11 +562,31 @@ namespace Belle2 {
       if (abs(mcparticle->getPDG()) != abs(part->getPDGCode()))
         return 0.0;
 
-      int status    = MCMatching::getMCTruthStatus(part, mcparticle);
+      int status = MCMatching::getMCTruthStatus(part, mcparticle);
       //remove the following bits, these are usually ok
       status &= (~MCMatching::c_MissFSR);
-      status &= (~MCMatching::c_MissNeutrino);
+      status &= (~MCMatching::c_MissingResonance);
       //status &= (~MCMatching::c_DecayInFlight);
+
+      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
+    }
+
+    double isSignalAcceptMissingNeutrino(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return 0.0;
+
+      //abort early if PDG codes are different
+      if (abs(mcparticle->getPDG()) != abs(part->getPDGCode()))
+        return 0.0;
+
+      int status = MCMatching::getMCTruthStatus(part, mcparticle);
+      //remove the following bits, these are usually ok
+      status &= (~MCMatching::c_MissFSR);
+      status &= (~MCMatching::c_MissingResonance);
+      //status &= (~MCMatching::c_DecayInFlight);
+      status &= (~MCMatching::c_MissNeutrino);
 
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
     }
@@ -1036,6 +1056,7 @@ namespace Belle2 {
 
     VARIABLE_GROUP("MC Matching");
     REGISTER_VARIABLE("isSignal", isSignal,               "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
+    REGISTER_VARIABLE("isSignalAcceptMissingNeutrino", isSignalAcceptMissingNeutrino, "same as isSignal, but also accept missing neutrino");
     REGISTER_VARIABLE("mcPDG",    particleMCMatchPDGCode, "The PDG code of matched MCParticle");
     REGISTER_VARIABLE("abs_mcPDG", particleAbsMCMatchPDGCode, "The absolute PDG code of matched MCParticle");
     REGISTER_VARIABLE("mcStatus", particleMCMatchStatus,  "The bit pattern indicating the quality of MC match (see MCMatching::MCMatchStatus)");

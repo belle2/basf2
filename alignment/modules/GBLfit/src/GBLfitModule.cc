@@ -35,7 +35,6 @@
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 
-#define ALLOW_TELESCOPES_IN_GBLFITMODULE
 #ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
 #include <testbeam/vxd/dataobjects/TelCluster.h>
 #include <testbeam/vxd/dataobjects/TelTrueHit.h>

@@ -1,5 +1,16 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'geometry', 'mdst_dataobjects', 'cdc', 'cdc_dataobjects', 'vxd', 'pxd_dataobjects', 'svd_dataobjects', 'vxd_dataobjects', 'testbeam_vxd_dataobjects', 'testbeam', 'genfit2', '$ROOT_LIBS', 'EG', 'tracking_dataobjects', 'svd']
+import os
+
+testbeam = False
+if 'BELLE2_RELEASE_DIR' in os.environ.keys():
+    testbeam = os.path.isdir(os.path.join(os.environ['BELLE2_RELEASE_DIR'], 'testbeam'))
+if not testbeam and 'BELLE2_LOCAL_DIR' in os.environ.keys():
+    testbeam = os.path.isdir(os.path.join(os.environ['BELLE2_LOCAL_DIR'], 'testbeam'))
+
+if testbeam:
+    env['CPPDEFINES']['ALLOW_TELESCOPES_IN_GBLFITMODULE'] = True
+
+env['LIBS'] = ['framework', 'geometry', 'mdst_dataobjects', 'cdc', 'cdc_dataobjects', 'vxd', 'pxd_dataobjects', 'svd_dataobjects', 'vxd_dataobjects', 'genfit2', '$ROOT_LIBS', 'EG', 'tracking_dataobjects', 'svd']
 Return('env')
 

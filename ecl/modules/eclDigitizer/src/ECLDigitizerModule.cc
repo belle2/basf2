@@ -108,7 +108,8 @@ void ECLDigitizerModule::event()
 
   double dt = .02; //delta t for interpolation
   int n = 1250;//provide a shape array for interpolation
-  double DeltaT =  gRandom->Uniform(0, 24);
+  // double DeltaT =  gRandom->Uniform(0, 24);
+  double DeltaT =  0.0; // test by KM 20140620
 
   for (int ii = 0; ii <  eclArray.getEntries(); ii++) {
 

@@ -21,15 +21,16 @@ namespace Belle2 {
     /** Flags that describe different reconstruction errors. */
     enum MCMatchStatus {
       c_Correct             = 0,  /**< This Particle and all its daughters are perfectly reconstructed. */
-      c_MissFSR             = 1,  /**< bit 0: A Final State Radiation (FSR) photon is not reconstructed. Note that distinction from c_MissGamma is based only on number of other daughters and may be wrong. */
-      c_MisID               = 2,  /**< bit 1: One of the charged final state particles is mis-identified. */
-      c_MissGamma           = 4,  /**< bit 2: A Photon (not FSR) is missing (not reconstructed). */
-      c_MissMassiveParticle = 8,  /**< bit 3: A generated massive FSP is missing (not reconstructed). */
-      c_MissNeutrino        = 16, /**< bit 4: A Neutrino is missing (not reconstructed). */
-      c_MissKlong           = 32, /**< bit 5: A Klong is missing (not reconstructed). */
-      c_AddedWrongParticle  = 64,  /**< bit 6: A non-FSP Particle has wrong PDG code, meaning one of the daughters (or their daughters) belongs to another Particle. */
-      c_DecayInFlight       = 128,  /**< bit 7: A Particle was reconstructed from the secondary decay product of the actual particle. This means that a wrong hypothesis was used to reconstruct it, which e.g. for tracks might mean a pion hypothesis was used for a secondary electron. */
-      c_InternalError       = 256,  /**< bit 8: There was an error in MC matching. Not a valid match. */
+      c_MissFSR             = 1, /**< A Final State Radiation (FSR) photon is not reconstructed. Note that distinction from c_MissGamma is based only on number of other daughters and may be wrong. */
+      c_MissingResonance    = 2, /**< The associated MCParticle decay contained additional particles (e.g. a rho) that weren't reconstructed. This is probably O.K. in most cases*/
+      c_DecayInFlight       = 4, /**< A Particle was reconstructed from the secondary decay product of the actual particle. This means that a wrong hypothesis was used to reconstruct it, which e.g. for tracks might mean a pion hypothesis was used for a secondary electron. */
+      c_MissNeutrino        = 8, /**< A Neutrino is missing (not reconstructed). */
+      c_MissGamma           = 16, /**< A Photon (not FSR) is missing (not reconstructed). */
+      c_MissMassiveParticle = 32, /**< A generated massive FSP is missing (not reconstructed). */
+      c_MissKlong           = 64, /**< A Klong is missing (not reconstructed). */
+      c_MisID               = 128, /**< One of the charged final state particles is mis-identified. */
+      c_AddedWrongParticle  = 256, /**< A non-FSP Particle has wrong PDG code, meaning one of the daughters (or their daughters) belongs to another Particle. */
+      c_InternalError       = 512, /**< There was an error in MC matching. Not a valid match. */
     };
 
     /**

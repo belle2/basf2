@@ -32,63 +32,63 @@ namespace Belle2 {
 
     static CDCLegendreQuadTreeCandidateCreator& Instance();
 
-    /*
+    /**
      * Set candidate fitter
      */
     static void setFitter(CDCLegendreTrackFitter* cdcLegendreTrackFitter) {s_cdcLegendreTrackFitter = cdcLegendreTrackFitter;};
 
-    /*
+    /**
      * Set candidate merger
      */
     static void setMerger(CDCLegendreTrackMerger* cdcLegendreTrackMerger) {s_cdcLegendreTrackMerger = cdcLegendreTrackMerger;};
 
-    /*
+    /**
      * Set hits
      */
     static void setHits(std::vector<CDCLegendreTrackHit*>& axialHits) {s_axialHits = axialHits;};
 
-    /*
+    /**
      * Set candidate fitter
      */
     static void setCandidateCreator(CDCLegendreTrackCreator* cdcLegendreTrackCreator) {s_cdcLegendreTrackCreator = cdcLegendreTrackCreator;};
 
-    /*
+    /**
      * Add node to the list of nodes with candidated
      */
     static inline void addNode(CDCLegendreQuadTree* node) {s_nodesWithCandidates.push_back(node);};
 
-    /*
+    /**
      * Creating candidates using information from nodes
      */
     void createCandidates();
 
-    /*
+    /**
      * Creating candidate using information from given node
      */
     bool createCandidate(CDCLegendreQuadTree* node);
 
-    /*
+    /**
      * Creating candidate using information from given node
      */
     bool createCandidateDirect(CDCLegendreQuadTree* node);
 
-    /*
+    /**
      * Creating candidates using information from nodes
      */
     std::vector< std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > >& getCandidates()
     {return s_candidates;};
 
-    /*
+    /**
      * Clear list of candidates
      */
     void clearCandidates();
 
-    /*
+    /**
      * Creating candidates using information from nodes
      */
     void clearNodes();
 
-    /*
+    /**
      * Find leaf node with given parameters r and theta
      */
     CDCLegendreQuadTree* findNode(CDCLegendreQuadTree*, double, double);

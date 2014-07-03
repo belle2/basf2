@@ -22,7 +22,9 @@ namespace Belle2 {
   class CDCLegendreTrackHit {
   public:
 
-
+    /**
+     * Numeration used for marking hits
+     */
     enum HitUsage {
       not_used = 0,
       used_in_track = 1,

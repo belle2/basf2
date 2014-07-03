@@ -36,6 +36,11 @@ namespace Belle2 {
 
   public:
 
+    /**
+     * @brief Constructor
+     * @param drawCandInfo Sets whether conformal and legendre transformation should be drawn
+     * @param drawCandidates Sets whether drawing while basf2 running should be done
+     */
     CDCLegendreTrackDrawer(bool drawCandInfo, bool drawCandidates);
 
     virtual ~CDCLegendreTrackDrawer() {};

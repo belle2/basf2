@@ -34,6 +34,16 @@ namespace Belle2 {
 //      m_realMax(0), m_max(0), m_eventCounter(0)
     {};
 
+    /**
+     * @brief Constructor
+     * @param TrackCandColName Name of track candidates in StoreArray
+     * @param trackColName Name of tracks in StoreArray
+     * @param HitColName Name of CDCHits in StoreArray
+     * @param StoreDirectory Directory to store pictures
+     * @param drawMCSignal Sets whether MC particles should be drawn
+     * @param drawCands Sets whether track candidates should be drawn
+     * @param mcParticlesColName Name of MC particles in StoreArray
+     */
     CDCLegendreNiceDrawing(std::string& TrackCandColName, std::string& trackColName,
                            std::string& HitColName, std::string& StoreDirectory, bool drawMCSignal,
                            bool drawCands, std::string& mcParticlesColName);
@@ -103,7 +113,7 @@ namespace Belle2 {
      */
     void drawCDCHit(std::stringstream& drawString, CDCHit* TrackHit, std::string hitColor);
 
-    /*
+    /**
      * Track drawing function
      */
     void drawAnyTrack(std::stringstream& drawString, TVector2 momentum, int charge, std::string trackColor, TVector2 position, int linewidth = 2);

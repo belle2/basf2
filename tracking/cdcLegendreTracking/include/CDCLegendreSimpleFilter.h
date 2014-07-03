@@ -10,7 +10,6 @@
 
 #pragma once
 
-using namespace std;
 #include <fstream>
 #include <vector>
 #include <list>
@@ -58,7 +57,7 @@ namespace Belle2 {
 //    std::list<CDCLegendreTrackCandidate*>& m_trackList;
 //    std::list<CDCLegendreTrackCandidate*> m_trackCoreList;
     const double m_distFactor = 0.5; /**< Factor used in assignment probability estimation */
-    const double m_minProb = 0.98; /**< Minimal probability of hit assignment; currently no used*/
+//    const double __attribute__((unused)) m_minProb = 0.98; /**< Minimal probability of hit assignment; currently no used*/
 
   };
 

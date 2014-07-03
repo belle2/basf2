@@ -252,7 +252,7 @@ void CDCLegendreTrackCreator::createGFTrackCandidates(string& m_gfTrackCandsColN
   */
   for (CDCLegendreTrackCandidate * trackCand : m_trackList) {
 //    if (trackCand->getNHits() == 0) continue;
-    if (trackCand->getTrackHits().size() < 10) continue;
+    if (trackCand->getTrackHits().size() < 5) continue;
 //    B2INFO("Number of hits: " << trackCand->getNHits());
     gfTrackCandidates.appendNew();
     std::pair<double, double> ref_point_temp = std::make_pair(0., 0.);

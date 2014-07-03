@@ -78,27 +78,20 @@ namespace Belle2 {
      */
     void sortHits(std::vector<CDCLegendreTrackHit*>& hitIndices, int charge);
 
-    /*
+    /**
      * Appends new unused hits from set of hits which might belong to current track
      */
     void appendNewHits(CDCLegendreTrackCandidate* track);
 
-    /*
+    /**
      * Move candidate between two collections
      */
     void moveCandidate(list<CDCLegendreTrackCandidate*>&, list<CDCLegendreTrackCandidate*>&, CDCLegendreTrackCandidate*);
 
-    /*
+    /**
      * Remove candidate from given list
      */
     void removeFromList(list<CDCLegendreTrackCandidate*>&, CDCLegendreTrackCandidate*);
-
-    /*
-     * Move
-     */
-    void setAsTracklet(CDCLegendreTrackCandidate*);
-
-    void setAsTrack(CDCLegendreTrackCandidate*);
 
   private:
     std::vector<CDCLegendreTrackHit*>& m_AxialHitList; /**< Vector which hold axial hits */

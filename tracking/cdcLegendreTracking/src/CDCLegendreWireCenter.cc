@@ -11,7 +11,7 @@
 
 #include <tracking/cdcLegendreTracking/CDCLegendreWireCenter.h>
 
-using namespace std;
+//using namespace std;
 using namespace Belle2;
 
 CDCLegendreWireCenter* CDCLegendreWireCenter::s_cdcLegendreWireCenter = 0;

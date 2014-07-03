@@ -158,8 +158,29 @@ double CDCLegendreTrackFitter::fitTrackCandidateFast(
   double chi2 = sumWeights * (1. + rho * clapR) * (1. + rho * clapR) * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2); /// returns chi2
   B2DEBUG(100, "chi2: " << chi2);
 
+//  chi2 = estimateChi2( hits, track_par, ref_point);
+
   return chi2 / (hits.size() - 4);
 
+}
+
+
+double CDCLegendreTrackFitter::estimateChi2(std::vector<CDCLegendreTrackHit*>& hits,
+                                            std::pair<double, double>& track_par, std::pair<double, double>& ref_point)
+{
+  double chi2 = 0;
+
+  double x0_track = cos(track_par.first) / fabs(track_par.second) + ref_point.first;
+  double y0_track = sin(track_par.first) / fabs(track_par.second) + ref_point.second;
+
+  for (CDCLegendreTrackHit * hit : hits) {
+    double x0_hit = hit->getOriginalWirePosition().X();
+    double y0_hit = hit->getOriginalWirePosition().Y();
+    double dist = fabs(fabs(1 / fabs(track_par.second) - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftTime());
+    chi2 += (dist - hit->getDeltaDriftTime()) / hit->getDeltaDriftTime();
+  }
+
+  return chi2 / (hits.size() - 4);
 }
 
 

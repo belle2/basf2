@@ -39,7 +39,7 @@ namespace Belle2 {
     /**
      * Trying to merge tracks
      */
-    double tryToMergeAndFit(CDCLegendreTrackCandidate* cand1, CDCLegendreTrackCandidate* cand2);
+    double tryToMergeAndFit(CDCLegendreTrackCandidate* cand1, CDCLegendreTrackCandidate* cand2, bool remove_hits = true);
 
     /**
      * Trying select core of the tracks and fit them together, then add good hits
@@ -81,7 +81,7 @@ namespace Belle2 {
      * All hits of track 2 are assigned to track 1 and the mean of the r and theta values of the two tracks are assigned to track 1
      * Track 2 is deleted.
      */
-    void mergeTracks(CDCLegendreTrackCandidate* cand1, CDCLegendreTrackCandidate* cand2);
+    void mergeTracks(CDCLegendreTrackCandidate* cand1, CDCLegendreTrackCandidate* cand2, bool remove_hits = false);
 
     /**
      * Function which adds stereo tracklets to the track
@@ -106,7 +106,7 @@ namespace Belle2 {
   private:
 
     std::list<CDCLegendreTrackCandidate*>& m_trackList; /**< List of track candidates. Mainly used for memory management! */
-    std::list<CDCLegendreTrackCandidate*>& m_trackletList; /**< List of tracklets. */
+    std::list<CDCLegendreTrackCandidate*>& __attribute__((unused)) m_trackletList; /**< List of tracklets. */
     std::list<CDCLegendreTrackCandidate*>& m_stereoTrackletList; /**< List of tracklets. */
     CDCLegendreTrackFitter* m_cdcLegendreTrackFitter; /**< Track fitter */
     CDCLegendreFastHough* m_cdcLegendreFastHough;  /**< Fast Hough finder */

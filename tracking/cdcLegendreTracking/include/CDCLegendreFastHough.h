@@ -21,6 +21,13 @@ namespace Belle2 {
   class CDCLegendreFastHough {
   public:
 
+    /**
+     * @brief Constructor
+     * @param reconstructCurler Sets whether curlers should be reconstructed
+     * @param maxLevel Maximal level of Fast Hough algorithm
+     * @param nbinsTheta Number of theta bins (usually depends on maxlevel and should be not less than 2^maxlevel)
+     * @param rMax Maximal value of r used in algorithm
+     */
     CDCLegendreFastHough(bool reconstructCurler, int maxLevel, int nbinsTheta, double rMax);
 
     ~CDCLegendreFastHough();
@@ -63,10 +70,6 @@ namespace Belle2 {
     void MaxFastHough(const std::vector<CDCLegendreTrackHit*>& hits, const int level, const int theta_min, const int theta_max,
                       const double r_min, const double r_max);
 
-    /**
-     * Same logic as in MaxFastHough, but looks only for HighPt tracks;
-     * starts with 2x2 binning, but when reached desired dr resolution (which defined as 2*Rcell) makes 1xN binning and finish algorithm in one iteration
-     */
     /**
      * Same logic as in MaxFastHough, but looks only for HighPt tracks;
      * starts with 2x2 binning, but when reached desired dr resolution (which defined as 2*Rcell) makes 1xN binning and finish algorithm in one iteration

@@ -226,12 +226,12 @@ namespace Belle2 {
       return m_chi2;
     }
 
-    /*
+    /**
      * set type of the track
      */
     void setCandidateType(int type) {m_type = type;};
 
-    /*
+    /**
      * get type of the track (see enum CandidateType)
      */
     inline int getCandidateType() const {return m_type;};
@@ -261,12 +261,12 @@ namespace Belle2 {
 
     HitPatternCDC m_hitPattern; /**< Efficient hit pattern builder; see HitPatternCDC description  */
 
-    int m_innermostAxialSLayer; //Innermost axial superlayer;
-    int m_outermostAxialSLayer; //Outermost axial superlayer;
+    int m_innermostAxialSLayer; /**< Innermost axial superlayer */
+    int m_outermostAxialSLayer; /**< Outermost axial superlayer */
 //    int m_innermostAxialLayer; //Innermost axial layer;
 //    int m_outermostAxialLayer; //Outermost axial layer;
 
-    double m_chi2;
+    double m_chi2; /**< Chi2 of track fitting */
     /**
      * Calculates the momentum estimation from parameters of the track (for x and y)
      * and from contributing hits (for z)

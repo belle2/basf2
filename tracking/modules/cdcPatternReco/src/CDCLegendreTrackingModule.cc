@@ -103,7 +103,7 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
            "Try to merge hit pattern after FastHough with any found track candidate", true);
 
   addParam("AppendHits", m_appendHits,
-           "Try to append new hits to track candidate", true);
+           "Try to append new hits to track candidate", false);
 
   addParam("DrawCandidates", m_drawCandidates,
            "Draw candidate after finding", false);
@@ -502,6 +502,8 @@ void CDCLegendreTrackingModule::processTracks()
     m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
   }
 
+  m_cdcLegendreTrackMerger->MergeCurler();
+  m_cdcLegendreTrackMerger->MergeCurler();
   m_cdcLegendreTrackMerger->MergeCurler();
 
 }

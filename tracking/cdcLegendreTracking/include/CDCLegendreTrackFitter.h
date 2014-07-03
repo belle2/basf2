@@ -32,22 +32,22 @@ namespace Belle2 {
 
     ~CDCLegendreTrackFitter();
 
-    /*
+    /**
      * Perform fast circular fitting
      */
     double fitTrackCandidateFast(std::vector<CDCLegendreTrackHit*>& hits, std::pair<double, double>& track_par, std::pair<double, double>& ref_point, bool with_drift_time = false);
 
-    /*
+    /**
      * Perform fast circular fitting
      */
     void fitTrackCandidateFast(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* track, std::pair<double, double>& ref_point, double& chi2, bool with_drift_time = false);
 
-    /*
+    /**
      * Perform fast circular fitting
      */
     void fitTrackCandidateFast(CDCLegendreTrackCandidate* track, std::pair<double, double>& ref_point, bool with_drift_time = false);
 
-    /*
+    /**
      * Perform fast circular fitting
      */
     void fitTrackCandidateFast(CDCLegendreTrackCandidate* track, bool with_drift_time = false);
@@ -65,6 +65,10 @@ namespace Belle2 {
      */
     void fitTrackCandidateStepped(std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* track);
 
+    /**
+     * Correct estimation of chi2
+     */
+    double estimateChi2(std::vector<CDCLegendreTrackHit*>& hits, std::pair<double, double>& track_par, std::pair<double, double>& ref_point);
 
   private:
 

@@ -108,7 +108,7 @@ void CDCLegendreSimpleFilter::processTracks(std::list<CDCLegendreTrackCandidate*
 //      if(prob<m_minProb){
 
       double bestHitProb = prob;
-      CDCLegendreTrackCandidate* BestCandidate;
+      CDCLegendreTrackCandidate* BestCandidate = NULL;
 
       for (CDCLegendreTrackCandidate * candInner : m_trackList) {
         if (candInner == cand) continue;

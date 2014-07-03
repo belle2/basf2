@@ -17,34 +17,34 @@ namespace Belle2 {
   class CDCLegendreConformalPosition {
   public:
 
-    /*
+    /**
      * Constructor
      */
     CDCLegendreConformalPosition();
 
     ~CDCLegendreConformalPosition();
 
-    /*
+    /**
      * Delete static instance
      */
     void clearPointers();
 
-    /*
+    /**
      * Get instance of class
      */
     static CDCLegendreConformalPosition& Instance();
 
-    /*
+    /**
      * Get pre-created instance of class; should be used when static instance 100% has been created
      */
     inline static CDCLegendreConformalPosition& InstanceTrusted() {  return *s_cdcLegendreConformalPosition; };
 
-    /*
+    /**
      * Ger conformal position of wire
      */
     inline double getConformalR(int layerId, int wireId, int binTheta) const { return m_lookupR[layerId][wireId][binTheta]; };
 
-    /*
+    /**
      * Get number of wires in layer
      */
     double getNWires(int layerId);

@@ -252,7 +252,7 @@ FTSuperLayer::connectSingleHit(FTList<FTSegment*>& shortSegments, bool complicat
         }
       } else {
         if (!m_superLayerId) m_complicatedSegments->append(&s);
-        else delete &s;
+        else n = shortSegments.deleteObj(i);
       }
     }
   }

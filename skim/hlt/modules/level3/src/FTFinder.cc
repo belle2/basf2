@@ -52,6 +52,27 @@ FTFinder::FTFinder()
 {
 }
 
+FTFinder::FTFinder(const FTFinder& o)
+  : m_tOffSet(o.m_tOffSet),
+    m_xtCoEff(o.m_xtCoEff),
+    m_tWindow(400.),
+    m_wire(o.m_wire),
+    m_layer(o.m_layer),
+    m_superLayer(o.m_superLayer),
+    m_Nwire(o.m_Nwire),
+    m_Nlayer(o.m_Nlayer),
+    m_NsuperLayer(o.m_NsuperLayer),
+    m_tracks(*(new FTList<FTTrack*>(20))),
+    m_linkedSegments(new FTList<FTSegment*>(6)),
+    m_tWindowLow(0.),
+    m_tWindowHigh(0.),
+    m_vx(0.),
+    m_vy(0.),
+    m_vz(0.),
+    m_EvtByEvtBadWires(NULL)
+{
+}
+
 void
 FTFinder::init()
 {

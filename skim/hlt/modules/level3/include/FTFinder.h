@@ -33,6 +33,9 @@ namespace Belle2 {
     //! Constructors and destructor
     FTFinder();
 
+    //! Constructors and destructor
+    FTFinder(const FTFinder&);
+
     //! initializer(creates geometry)
     void init();
 

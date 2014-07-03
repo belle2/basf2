@@ -417,11 +417,11 @@ namespace {
   TEST_F(MCMatchingTest, MissingParticles)
   {
     {
-      //pi0 is not FSP, so doesn't get c_MissMassiveParticle
+      //pi0 is not FSP, so doesn't get c_MissMassiveParticle (but c_MissingResonance)
       Decay d(421, {321, -211, {111, {22, 22}}});
       d.reconstruct({421, {321, -211, {0}}});
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
-      EXPECT_EQ(c_MissGamma, getMCTruthStatus(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_MissGamma | c_MissingResonance, getMCTruthStatus(d.m_particle)) << d.getString();
     }
     {
       Decay d(421, {321, -211, {111, {22, 22}}});
@@ -445,18 +445,18 @@ namespace {
   TEST_F(MCMatchingTest, KLong)
   {
     {
-      //correct
+      //correct (we miss the 'K0' resonance, but that's fine)
       Decay d(431, { {323, {321, {111, {22, 22}} }}, { -311, {130}}});
       d.reconstruct({431, { {323, {321, {111, {22, 22}} }}, {130, {}, Decay::c_ReconstructFrom, d.getDecay(130)}}});
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
-      EXPECT_EQ(c_Correct, getMCTruthStatus(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_MissingResonance, getMCTruthStatus(d.m_particle)) << d.getString();
     }
     {
       //K0L not reconstructed
       Decay d(431, { {323, {321, {111, {22, 22}} }}, { -311, {130}}});
       d.reconstruct({431, { {323, {321, {111, {22, 22}} }}, 0}});
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
-      EXPECT_EQ(c_MissKlong | c_MissMassiveParticle, getMCTruthStatus(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_MissKlong | c_MissMassiveParticle | c_MissingResonance, getMCTruthStatus(d.m_particle)) << d.getString();
     }
   }
   /** more missing particles. */
@@ -494,7 +494,7 @@ namespace {
       Decay& gamma = d[1][0]; //first gamma from second pi0
       d.reconstruct({431, {{421, {321, -211, {111, {22, 22}}}}, {22, {}, Decay::c_ReconstructFrom, &gamma}}});
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
-      EXPECT_EQ(c_MissGamma, getMCTruthStatus(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_MissGamma | c_MissingResonance, getMCTruthStatus(d.m_particle)) << d.getString();
     }
 
     {
@@ -539,21 +539,21 @@ namespace {
   TEST_F(MCMatchingTest, WrongPhotonForPi0)
   {
     {
-      Decay d(521, {211, {421, {321, -211, {111, {22, 22}}}}});
+      Decay d(521, {211, Decay(421, {321, -211, Decay(111, {22, 22})})});
       d.finalize();
       d.reconstruct({521, {211, {421, {321, -211, {111, {{22}, {22, {}, Decay::c_RelateWith, d.getMCParticle(211)}}}}}}});
-      //result: pi0 gets MC match 521. Gets misID & c_AddedWrongParticle because of 'wrong' photon, plus c_MissMassiveParticle since the B's daughters are missing, plus c_MissGamma because one photon was not reconstructed
+      //result: pi0 gets MC match 521. Gets misID & c_AddedWrongParticle because of 'wrong' photon, plus c_MissMassiveParticle since the B's daughters are missing, plus c_MissGamma because one photon was not reconstructed, plus c_MissingResonance because non-FSPs were missed (MC matched particle (521) has lots of daughters)
       Particle* pi0 = d.getParticle(111);
       Decay* pi0decay = d.getDecay(111);
       ASSERT_TRUE(setMCTruth(pi0)) << pi0decay->getString();
       EXPECT_EQ(521, pi0->getRelated<MCParticle>()->getPDG());
-      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissMassiveParticle | c_MissGamma, getMCTruthStatus(pi0)) << pi0decay->getString();
+      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissMassiveParticle | c_MissGamma | c_MissingResonance, getMCTruthStatus(pi0)) << pi0decay->getString();
 
       //flags migrate upstream
       Particle* p = d.getParticle(421);
       Decay* d0decay = d.getDecay(421);
       ASSERT_TRUE(setMCTruth(p)) << d0decay->getString();
-      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissGamma, getMCTruthStatus(p)) << d0decay->getString();
+      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissGamma | c_MissingResonance, getMCTruthStatus(p)) << d0decay->getString();
     }
   }
 

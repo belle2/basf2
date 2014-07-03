@@ -189,8 +189,10 @@ int MCMatching::setMCTruthStatus(Particle* particle, const MCParticle* mcParticl
   vector<const Particle*>   recFSPs;
   vector<const MCParticle*> genFSPs;
 
-  appendFSP(particle,   recFSPs);
-  appendFSP(mcParticle, genFSPs);
+  int reconstructedNonFSPs = appendFSP(particle,   recFSPs);
+  int mcNonFSPs = appendFSP(mcParticle, genFSPs);
+  if (mcNonFSPs > reconstructedNonFSPs)
+    status |= c_MissingResonance;
 
   // TODO: do something
   if (genFSPs.empty())
@@ -217,35 +219,38 @@ int MCMatching::getMCTruthStatus(const Particle* particle, const MCParticle* mcP
 }
 
 
-void MCMatching::appendFSP(const Particle* p, vector<const Particle*>& children)
+int MCMatching::appendFSP(const Particle* p, vector<const Particle*>& children)
 {
+  int nonFSPs = 0;
   for (unsigned i = 0; i < p->getNDaughters(); ++i) {
     const Particle* daug = p->getDaughter(i);
 
     // TODO: fix this (aim for no hard coded values)
     // don't add K_S^0 daughters since they are also in isFSPs()
     if (daug->getNDaughters() && daug->getPDGCode() != 310) {
-      appendFSP(daug, children);
+      nonFSPs += 1 + appendFSP(daug, children);
     } else {
       children.push_back(daug);
     }
   }
+  return nonFSPs;
 }
 
-void MCMatching::appendFSP(const MCParticle* gen, vector<const MCParticle*>& children)
+int MCMatching::appendFSP(const MCParticle* gen, vector<const MCParticle*>& children)
 {
+  int nonFSPs = 0;
   const vector<MCParticle*>& genDaughters = gen->getDaughters();
-
   for (unsigned i = 0; i < genDaughters.size(); ++i) {
     const MCParticle* daug = genDaughters[i];
 
     int nDaughs = daug->getNDaughters();
     if (nDaughs && !isFSP(daug)) {
-      appendFSP(daug, children);
+      nonFSPs += 1 + appendFSP(daug, children);
     } else {
       children.push_back(daug);
     }
   }
+  return nonFSPs;
 }
 
 bool MCMatching::isFSP(const MCParticle* p)

@@ -92,16 +92,18 @@ namespace Belle2 {
      *
      * @param pointer to the particle
      * @param vector of FSPs that are used to reconstruct specified particle
+     * @return number of non-FSPs encountered
      */
-    void appendFSP(const Particle* p,     std::vector<const Particle*>&   children);
+    int appendFSP(const Particle* p,     std::vector<const Particle*>&   children);
 
     /**
      * Appends final state particle (FSP) to the vector of MCParticles.
      *
      * @param gen pointer to the MCParticle
      * @param children vector of FSPs that can be found in the generated decay chain of specified MCParticle
+     * @return number of non-FSPs encountered
      */
-    void appendFSP(const MCParticle* gen, std::vector<const MCParticle*>& children);
+    int appendFSP(const MCParticle* gen, std::vector<const MCParticle*>& children);
 
     /**
      * Returns true if given MCParticle is FSP or not.

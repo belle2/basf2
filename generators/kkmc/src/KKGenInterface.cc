@@ -140,7 +140,7 @@ int KKGenInterface::simulateEvent(MCParticleGraph& graph)
   // before storing event to MCParticle, check /hepevt/ common block
   B2DEBUG(100, "HepEVT table:");
 
-  for (int i = 1; i < hepevt_.nhep; ++i) {
+  for (int i = 0; i < hepevt_.nhep; ++i) {
     char buf[200];
     sprintf(buf,
             "IntA: %3d %4d %8d %4d %4d %4d %9.4f %9.4f %9.4f %9.4f %9.4f",
@@ -254,6 +254,16 @@ void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphPartic
   gParticle->setValidVertex(true);
 
   gParticle->setStatus(MCParticleGraph::GraphParticle::c_PrimaryParticle);
+
+
+  // initial beam electron and positron should be Initial.
+  if (abs(hepevt_.idhep[index - 1]) == 11 &&
+      hepevt_.jmohep[index - 1][0] == 0 &&
+      hepevt_.jmohep[index - 1][1] == 0 &&
+      hepevt_.isthep[index - 1] == 3 &&
+      index > 0 && index < 3) {
+    gParticle->setStatus(MCParticle::c_Initial);
+  }
 
   // Z or W should be virtual
   if (hepevt_.idhep[index - 1] == 23 || hepevt_.idhep[index - 1] == 24) {

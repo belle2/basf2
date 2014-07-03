@@ -25,6 +25,7 @@
 #include <analysis/NtupleTools/NtupleTagVertexTool.h>
 #include <analysis/NtupleTools/NtupleMCTagVertexTool.h>
 #include <analysis/NtupleTools/NtupleContinuumSuppressionTool.h>
+#include <analysis/NtupleTools/NtupleMCDecayStringTool.h>
 
 using namespace Belle2;
 using namespace std;
@@ -82,6 +83,7 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName.compare("TagVertex") == 0) return new NtupleTagVertexTool(tree, d);
   else if (strToolName.compare("MCTagVertex") == 0) return new NtupleMCTagVertexTool(tree, d);
   else if (strToolName.compare("ContinuumSuppression") == 0) return new NtupleContinuumSuppressionTool(tree, d);
+  else if (strToolName.compare("MCDecayString") == 0) return new NtupleMCDecayStringTool(tree, d);
 
   B2WARNING("NtupleTool " << strToolName << " is not available!");
   return NULL;

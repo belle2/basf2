@@ -5,6 +5,8 @@ from basf2 import *
 from modularAnalysis import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
+from ROOT import Belle2
+
 
 myMain = create_path()
 
@@ -12,7 +14,7 @@ myMain = create_path()
 # Y(4S) -> B-:tag- B+:sig
 # B-:tag -> D0 pi-; D0 -> K- pi+
 # B+:sig -> pi0 e+ nu_e
-generateY4S(100, os.environ['BELLE2_LOCAL_DIR'] + '/analysis/examples/exampleEvtgenDecayFiles/Btag2Dpi_Bsig2pi0enu.dec', myMain)
+generateY4S(100, Belle2.FileSystem.findFile('/analysis/examples/exampleEvtgenDecayFiles/Btag2Dpi_Bsig2pi0enu.dec'), myMain)
 
 # simulation
 add_simulation(myMain)
@@ -51,6 +53,11 @@ matchMCTruth('B-:tag', myMain)
 matchMCTruth('B+:sig', myMain)
 matchMCTruth('Upsilon(4S)', myMain)
 
+decayhashmodule = register_module('ParticleMCDecayString')
+decayhashmodule.param('listName', 'B-:tag')
+myMain.add_module(decayhashmodule)
+
+
 # create and fill RestOfEvent for B- and Y(4S) particles
 buildRestOfEvent('B-:tag', path=myMain)
 buildRestOfEvent('Upsilon(4S)', path=myMain)
@@ -58,6 +65,7 @@ buildRestOfEvent('Upsilon(4S)', path=myMain)
 # define what should be dumped to ntuple for Btag
 toolsB = ['MCTruth', '^B-:tag -> D0 pi-']
 toolsB += ['DeltaEMbc', '^B-:tag -> D0 pi-']
+toolsB += ['MCDecayString', '^B-:tag -> D0 pi-']
 toolsB += ['ROEMultiplicities', '^B-:tag -> D0 pi-']
 
 # define what should be dumped to ntuple for Upsilon(4S)

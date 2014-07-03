@@ -23,6 +23,7 @@
 #include <genfit/PlanarMeasurement.h>
 #include <genfit/HMatrixUV.h>
 #include <genfit/TrackCandHit.h>
+#include <genfit/ICalibrationParametersDerivatives.h>
 
 namespace Belle2 {
   /**
@@ -46,8 +47,9 @@ namespace Belle2 {
    * }
    * @endcode
    */
-  class PXDRecoHit: public genfit::PlanarMeasurement {
+  class PXDRecoHit: public genfit::PlanarMeasurement, public genfit::ICalibrationParametersDerivatives {
   public:
+
     /** Default constructor for ROOT IO. */
     PXDRecoHit();
 
@@ -123,6 +125,22 @@ namespace Belle2 {
     //float getEnergyDepError() const { return m_energyDepError; }
 
     virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const { return new genfit::HMatrixUV(); };
+
+    /**
+     * @brief Derivatives for alignment parameters
+     *
+     * @param sop Predicted track state on plane
+     * @return TMatrixD
+     */
+    TMatrixD derivatives(const genfit::StateOnPlane* sop);
+
+    /**
+     * @brief Labels for alignment parameters
+     *
+     * @return std::vector< int, std::allocator< void > >
+     */
+    std::vector< int > labels();
+
   private:
 
     enum { HIT_DIMENSIONS = 2 /**< sensitive Dimensions of the Hit */ };

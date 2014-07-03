@@ -52,8 +52,8 @@ matchMCTruth('B+:sig', myMain)
 matchMCTruth('Upsilon(4S)', myMain)
 
 # create and fill RestOfEvent for B- and Y(4S) particles
-buildRestOfEvent('B-:tag', myMain)
-buildRestOfEvent('Upsilon(4S)', myMain)
+buildRestOfEvent('B-:tag', path=myMain)
+buildRestOfEvent('Upsilon(4S)', path=myMain)
 
 # define what should be dumped to ntuple for Btag
 toolsB = ['MCTruth', '^B-:tag -> D0 pi-']

@@ -35,6 +35,19 @@
 
 #include <iostream>
 
+/* Geant4 default unit
+                millimeter              (mm)
+                nanosecond              (ns)
+                Mega electron Volt      (MeV)
+                positron charge         (eplus)
+                degree Kelvin           (kelvin)
+                the amount of substance (mole)
+                luminous intensity      (candela)
+                radian                  (radian)
+                steradian               (steradian)
+*/
+
+
 using namespace std;
 
 namespace Belle2 {
@@ -67,7 +80,7 @@ namespace Belle2 {
 
       // --- Collect global parameters
       double GlobalRotAngle = content.getAngle("Rotation") / Unit::rad;
-      double GlobalOffsetZ  = content.getLength("OffsetZ") / Unit::cm;
+      double GlobalOffsetZ  = content.getLength("OffsetZ") / Unit::mm;
 
       string strMatCryo = content.getString("Cryostat/Material");
 
@@ -82,7 +95,7 @@ namespace Belle2 {
         new G4Tubs("Cryostat", CryoRmin, CryoRmax, CryoLength, 0.0, M_PI * 2.0);
       G4LogicalVolume* CryoLV =
         new G4LogicalVolume(CryoTube, Materials::get("G4_Fe"), "LVCryo", 0, 0, 0);
-      new G4PVPlacement(G4TranslateZ3D(GlobalOffsetZ * cm) * G4RotateZ3D(GlobalRotAngle * rad),
+      new G4PVPlacement(G4TranslateZ3D(GlobalOffsetZ) * G4RotateZ3D(GlobalRotAngle),
                         CryoLV, "PVCryo", &topVolume, false, 0);
 
 

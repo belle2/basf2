@@ -37,6 +37,13 @@ mvaConfig_pi0 = Particle.MVAConfiguration(
     target='isSignal', targetCluster=1
 )
 
+mvaConfig_B = Particle.MVAConfiguration(
+    name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
+    #name='NeuroBayes', type='Plugin', config='!H:V:CreateMVAPdfs:NtrainingIter=0:Preprocessing=122:ShapeTreat=DIAG:TrainingMethod=BFGS',
+    variables=['daughterProductOf(getExtraInfo(SignalProbability))', 'p', 'pt'],  # no variables correlated with mass here!
+    target='isSignal', targetCluster=1
+)
+
 preCutConfiguration_nonFSP = Particle.PreCutConfiguration(
     #variable='daughterProductOfSignalProbability',
     variable='Mass',
@@ -90,7 +97,7 @@ p.addChannel(['D0', 'pi0'])
 p.addChannel(['D0', 'gamma'])
 particles.append(p)
 
-p = Particle('B+', mvaConfig_nonFSP, preCutConfiguration_nonFSP)
+p = Particle('B+', mvaConfig_B, preCutConfiguration_nonFSP)
 p.addChannel(['D0', 'pi+'])
 p.addChannel(['D+', 'pi0'])
 p.addChannel(['D*-', 'pi+', 'pi+'])
@@ -98,7 +105,7 @@ p.addChannel(['D0', 'e+'], isIncomplete=True)
 p.addChannel(['D0', 'mu+'], isIncomplete=True)
 particles.append(p)
 
-p = Particle('B0', mvaConfig_nonFSP, preCutConfiguration_nonFSP)
+p = Particle('B0', mvaConfig_B, preCutConfiguration_nonFSP)
 p.addChannel(['D0', 'pi0'])
 p.addChannel(['D-', 'pi+'])
 p.addChannel(['D-', 'pi0', 'pi+'])

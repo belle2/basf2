@@ -8,7 +8,6 @@
 #pragma link C++ class Belle2::RawCOPPERFormat+;
 #pragma link C++ class Belle2::RawCOPPERFormat_v0+;
 #pragma link C++ class Belle2::RawCOPPERFormat_latest+;
-#pragma link C++ class Belle2::PreRawCOPPERFormat_v0+;
 #pragma link C++ class Belle2::PreRawCOPPERFormat_latest+;
 #pragma link C++ class Belle2::PostRawCOPPERFormat_latest+;
 #pragma link C++ class Belle2::RawHeader_v0+;

@@ -20,7 +20,6 @@
 #include <rawdata/dataobjects/RawCOPPERFormat_latest.h>
 #include <rawdata/dataobjects/RawCOPPERFormat_v0.h>
 #include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
-#include <rawdata/dataobjects/PreRawCOPPERFormat_v0.h>
 #include <framework/datastore/DataStore.h>
 
 

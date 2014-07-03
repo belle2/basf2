@@ -14,7 +14,10 @@
 #include <sys/time.h>
 
 #include <rawdata/dataobjects/RawDataBlock.h>
+#include <rawdata/RawCOPPERPackerInfo.h>
+
 #include <framework/datastore/DataStore.h>
+
 
 
 #include <TObject.h>
@@ -257,6 +260,13 @@ namespace Belle2 {
     //! calc XOR checksum
     virtual unsigned int CalcXORChecksum(int* buf, int nwords) = 0;
 
+    //! Pack data (format ver. = -1 -> Select the latest format version)
+    virtual void Packer(int* buf_1st, int nwords_1st,
+                        int* buf_2nd, int nwords_2nd,
+                        int* buf_3rd, int nwords_3rd,
+                        int* buf_4th, int nwords_4th,
+                        RawCOPPERPackerInfo rawcprpacker_info ,
+                        int format_ver = -1) = 0;
 
   protected :
     ///ver.2 Change FEE format as presented at B2GM in Nov.2013 ( Nov.20, 2013)

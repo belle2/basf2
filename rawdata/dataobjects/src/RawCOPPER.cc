@@ -57,10 +57,6 @@ void RawCOPPER::SetVersion()
       m_access = new RawCOPPERFormat_v0;
       //      printf("########################## RawCOPPERFormat_v0\n");
       break;
-    case 128 :
-      m_access = new PreRawCOPPERFormat_v0;
-      //      printf("########################## PreRawCOPPERFormat_v0\n");
-      break;
     default : {
       char err_buf[500];
       sprintf(err_buf, "Invalid version of a data format(0x%.2x). Exiting...\n %s %s %d\n",
@@ -93,9 +89,6 @@ void RawCOPPER::SetVersion(string class_name)
   } else if (class_name == "RawCOPPERFormat_v0") {
     m_access = new RawCOPPERFormat_v0;
     m_version = (0 << 7) | 0;
-  } else if (class_name == "PreRawCOPPERFormat_v0") {
-    m_access = new PreRawCOPPERFormat_v0;
-    m_version = (1 << 7) | 0;
   } else {
     char err_buf[500];
     sprintf(err_buf, "Invalid name of a data format class (%s). Exiting...\n %s %s %d\n",

@@ -472,7 +472,7 @@ void CDCLegendreTrackingModule::processTracks()
   }
 
 
-  m_cdcLegendreTrackMerger->MergeCurler();
+  m_cdcLegendreTrackMerger->doTracksMerging();
 
   for (CDCLegendreTrackCandidate * cand : m_trackList) {
     cand->reestimateCharge();
@@ -502,9 +502,7 @@ void CDCLegendreTrackingModule::processTracks()
     m_cdcLegendreTrackFitter->fitTrackCandidateFast(cand);
   }
 
-  m_cdcLegendreTrackMerger->MergeCurler();
-  m_cdcLegendreTrackMerger->MergeCurler();
-  m_cdcLegendreTrackMerger->MergeCurler();
+  m_cdcLegendreTrackMerger->doTracksMerging();
 
 }
 

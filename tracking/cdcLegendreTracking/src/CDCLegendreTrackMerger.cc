@@ -214,7 +214,7 @@ void CDCLegendreTrackMerger::mergeTracks(CDCLegendreTrackCandidate* cand1,
 
 
 
-void CDCLegendreTrackMerger::MergeCurler()
+void CDCLegendreTrackMerger::doTracksMerging()
 {
 
   int ii = 0;

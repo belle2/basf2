@@ -78,15 +78,23 @@
 #include <TGeoManager.h>
 #include <TDatabasePDG.h>
 
+#include <TFile.h>
+#include <TH1.h>
+
 
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
-
+/*
+TFile *file;
+TH1F *hist;
+TH1F *chi2;
+TH1F *chi2ondf;
+*/
 REG_MODULE(GBLfit)
 
 GBLfitModule::GBLfitModule() :
-  Module()
+  Module(), m_usePdgCodeFromTrackCand(true)
 {
 
   setDescription(
@@ -106,29 +114,41 @@ GBLfitModule::GBLfitModule() :
   addParam("UseClusters", m_useClusters, "if set to true cluster hits (PXD/SVD clusters) will be used for fitting. If false Gaussian smeared trueHits will be used", true);
   addParam("PDGCodes", m_pdgCodes, "List of PDG codes used to set the mass hypothesis for the fit. All your codes will be tried with every track. The sign of your codes will be ignored and the charge will always come from the genfit::TrackCand. If you do not set any PDG code the code will be taken from the genfit::TrackCand. This is the default behavior)", vector<int>(0));
 
-  addParam("energyLossBetheBloch", m_energyLossBetheBloch, "activate the material effect: EnergyLossBetheBloch", false);
+  addParam("energyLossBetheBloch", m_energyLossBetheBloch, "activate the material effect: EnergyLossBetheBloch", true);
   addParam("noiseBetheBloch", m_noiseBetheBloch, "activate the material effect: NoiseBetheBloch", false);
   addParam("noiseCoulomb", m_noiseCoulomb, "activate the material effect: NoiseCoulomb", false);
-  addParam("energyLossBrems", m_energyLossBrems, "activate the material effect: EnergyLossBrems", false);
+  addParam("energyLossBrems", m_energyLossBrems, "activate the material effect: EnergyLossBrems", true);
   addParam("noiseBrems", m_noiseBrems, "activate the material effect: NoiseBrems", false);
   addParam("noEffects", m_noEffects, "switch off all material effects in Genfit. This overwrites all individual material effects switches", false);
   addParam("MSCModel", m_mscModel, "Multiple scattering model", string("Highland"));
   addParam("resolveWireHitAmbi", m_resolveWireHitAmbi, "Determines how the ambiguity in wire hits is to be dealt with.  This only makes sense for the Kalman fitters.  Values are either 'default' (use the default for the respective fitter algorithm), 'weightedAverage', 'unweightedClosestToReference' (default for the Kalman filter), or 'unweightedClosestToPrediction' (default for the Kalman filter without reference track).", string("default"));
 
-  addParam("suppressGFExceptionOutput", m_suppressGFExceptionOutput, "Suppress error messages in GenFit.", true);
+  addParam("beamSpot", m_beamSpot, "point to which the fitted track will be extrapolated in order to put together the TrackFitResults", vector<double>(3, 0.0));
 
+  addParam("suppressGFExceptionOutput", m_suppressGFExceptionOutput, "Suppress error messages in GenFit.", true);
+  addParam("StoreFailedTracks", m_storeFailed, "Set true if the tracks where the fit failed should also be stored in the output", bool(false));
   // keep GFExceptions quiet or not
   genfit::Exception::quiet(m_suppressGFExceptionOutput);
 
-  addParam("internalIterations", m_gblInternalIterations, "GBL internal downweighting setting", std::string(""));
-  addParam("pValueCut", m_gblPvalueCut, "GBL p-value cut to output track to millepede file", 0.0);
-  addParam("minNdf", m_gblMinNdf, "GBL minimum NDF to output track to millepede file", 1);
-  addParam("milleFileName", m_gblMilleFileName, "GBL: Name of the mille binary file to be produced for alignments", std::string("millefile.dat"));
+  addParam("internalIterations", m_gblInternalIterations, "GBL: internal downweighting setting (separatd by ',' for each external iteration, e.g ',,Hh'", std::string(""));
+  addParam("externalIterations", m_gblExternalIterations, "GBL: Number of times the GBL trajectory should be fitted and updated with results", int(1));
+  addParam("pValueCut", m_gblPvalueCut, "GBL: p-value cut to output track to millepede file", 0.0);
+  addParam("minNdf", m_gblMinNdf, "GBL: minimum NDF to output track to millepede file", 1);
+  addParam("milleFileName", m_gblMilleFileName, "GBL: Name of the mille binary file to be produced for alignment", std::string("millefile.dat"));
   addParam("chi2Cut", m_chi2Cut, "GBL: Cut on single measurement Chi2", double(50.));
   addParam("enableScatterers", m_enableScatterers, "GBL: Enable scattering in GBL trajectory", bool(true));
   addParam("enableIntermediateScatterer", m_enableIntermediateScatterer, "GBL: Enable intermediate scatterers for simulation of thick scatterer", bool(true));
+  addParam("resortHits", m_resortHits, "GBL: Sort hits by extrapolation before fit. Turn on if you see a lot of 'Extrapolation stepped back by ...' errors. The candidates should be already sorted!", bool(true));
+  addParam("recalcJacobians", m_recalcJacobians, "GBL: Recalculate Jacobians/planes: 0=do not recalc, 1=after 1st fit, 2=1 & after 2nd fit, etc. Use '1' for 1 iteration + output to mille or if iteration>=2 ", int(0));
+
+  addParam("useOldGbl", m_useOldGbl, "GBL: Use old GBL interface ", bool(true));
 
 
+  m_failedFitCounter = 0;
+  m_successfulFitCounter = 0;
+
+  m_failedGFTrackCandFitCounter = 0;
+  m_successfulGFTrackCandFitCounter = 0;
 }
 
 GBLfitModule::~GBLfitModule()
@@ -137,30 +157,31 @@ GBLfitModule::~GBLfitModule()
 
 void GBLfitModule::initialize()
 {
+  //file = new TFile("test.root","recreate");
+  //hist = new TH1F("pvalue", "pvalue", 100, 0., 1.);
+  //chi2 = new TH1F("chi2", "chi2", 100, 0., 40.);
+  //chi2ondf = new TH1F("chi2ondf", "chi2/ndf", 100, 0., 10.);
 
-  m_failedFitCounter = 0;
-  m_successfulFitCounter = 0;
 
-  m_failedGFTrackCandFitCounter = 0;
-  m_successfulGFTrackCandFitCounter = 0;
 
   StoreArray<genfit::TrackCand>::required(m_gfTrackCandsColName);
 
-  //StoreArray<Track>::registerPersistent();
-  //StoreArray<TrackFitResult>::registerPersistent();
-  //StoreArray < genfit::Track >::registerPersistent(m_gfTracksColName);
-  //StoreArray < genfit::TrackCand >::registerPersistent();
+  StoreArray<Track>::registerPersistent();
+  StoreArray<TrackFitResult>::registerPersistent();
+  //FIXME name
+  StoreArray < genfit::Track >::registerPersistent("");
+  StoreArray < genfit::TrackCand >::registerPersistent();
 
   if (!m_tracksColName.empty() and m_tracksColName != "Tracks") {
     B2ERROR("Setting a collection name with TracksColName is not implemented.");
     //TODO: implementation might also need different name for TrackFitResults?
   }
 
-  //RelationArray::registerPersistent<genfit::Track, MCParticle>(m_gfTracksColName, m_mcParticlesColName);
-  //RelationArray::registerPersistent<MCParticle, Track> ();
-  //RelationArray::registerPersistent<genfit::Track, TrackFitResult>(m_gfTracksColName, "");
-  //RelationArray::registerPersistent<genfit::TrackCand, TrackFitResult>(m_gfTrackCandsColName, "");
-  //RelationArray::registerPersistent<genfit::TrackCand, genfit::Track>(m_gfTrackCandsColName, m_gfTracksColName);
+  RelationArray::registerPersistent<genfit::Track, MCParticle>(m_gfTracksColName, m_mcParticlesColName);
+  RelationArray::registerPersistent<MCParticle, Track> ();
+  RelationArray::registerPersistent<genfit::Track, TrackFitResult>(m_gfTracksColName, "");
+  RelationArray::registerPersistent<genfit::TrackCand, TrackFitResult>(m_gfTrackCandsColName, "");
+  RelationArray::registerPersistent<genfit::TrackCand, genfit::Track>(m_gfTrackCandsColName, m_gfTracksColName);
 
   if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
     geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
@@ -201,14 +222,18 @@ void GBLfitModule::initialize()
   CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(), new IdealCDCGeometryTranslator(), new SimpleTDCCountTranslator());
 
   // Set GBL parameters
-  m_gbl.setGBLOptions(m_gblInternalIterations, m_enableScatterers, m_enableIntermediateScatterer);
-  m_gbl.setMP2Options(m_gblPvalueCut, m_gblMinNdf, m_gblMilleFileName, m_chi2Cut);
+  m_gbl.setOptions(m_gblInternalIterations, m_enableScatterers, m_enableIntermediateScatterer, m_gblExternalIterations, m_recalcJacobians);
+  m_oldGbl.setGBLOptions(m_gblInternalIterations, m_enableScatterers, m_enableIntermediateScatterer);
+  m_oldGbl.setMP2Options(m_gblPvalueCut, m_gblMinNdf, m_gblMilleFileName, m_chi2Cut);
+
+  if (!m_useOldGbl)
+    m_milleFile = new gbl::MilleBinary(m_gblMilleFileName);
 
 }
 
 void GBLfitModule::beginRun()
 {
-  m_gbl.beginRun();
+  m_oldGbl.beginRun();
 }
 
 void GBLfitModule::event()
@@ -268,9 +293,29 @@ void GBLfitModule::event()
   B2DEBUG(149, "GBLfit: Number of SVDClusters: " << nSVDClusters);
   if (nSVDClusters == 0) {B2DEBUG(100, "GBLfit: SVDClustersCollection is empty!");}
 
+  //StoreArrays to store the fit results
+  StoreArray < Track > tracks;
+  tracks.create();
+  StoreArray <TrackFitResult> trackFitResults;
+  trackFitResults.create();
+  StoreArray < genfit::Track > gfTracks(m_gfTracksColName);
+  gfTracks.create();
+
+  //Relations for Tracks
+  RelationArray mcParticlesToTracks(mcParticles, tracks);
+  RelationArray gfTracksToTrackFitResults(gfTracks, trackFitResults);
+  RelationArray gfTrackCandidatesTogfTracks(trackCandidates, gfTracks);
+
+  RelationArray gfTrackCandidatesToTrackFitResults(trackCandidates, trackFitResults, "");//"GFTrackCandsToTrackFitResults");
+
+  //Create a relation between the gftracks and their most probable 'mother' MC particle
+  RelationArray gfTracksToMCPart(gfTracks, mcParticles);
+
+
+
   //counter for fitted tracks, the number of fitted tracks may differ from the number of trackCandidates if the fit fails for some of them
-  //int trackCounter = -1;
-  //int trackFitResultCounter = 0;
+  int trackCounter = -1;
+  int trackFitResultCounter = 0;
 
   for (int iCand = 0; iCand < trackCandidates.getEntries(); ++iCand) { //loop over all track candidates
     B2DEBUG(99, "#############  Fit track candidate Nr. : " << iCand << "  ################");
@@ -289,7 +334,7 @@ void GBLfitModule::event()
     }
 
     const int nPdg = m_pdgCodes.size();  //number of pdg hypothesises
-    // bool candFitted = false;   //boolean to mark if the track candidates was fitted successfully with at least one PDG hypothesis
+    bool candFitted = false;   //boolean to mark if the track candidates was fitted successfully with at least one PDG hypothesis
 
     for (int iPdg = 0; iPdg != nPdg; ++iPdg) {  // loop over all pdg hypothesises
       //make sure the track fit starts with the correct PDG code because the sign of the PDG code will also set the charge in the TrackRep
@@ -337,7 +382,7 @@ void GBLfitModule::event()
 #endif
       genfit::MeasurementProducer <SVDTrueHit, SVDRecoHit2D>* SVDProducer =  NULL;
       //TODO: CDC
-      // genfit::MeasurementProducer <CDCHit, CDCRecoHit>* CDCProducer =  NULL;
+      genfit::MeasurementProducer <CDCHit, CDCRecoHit>* CDCProducer =  NULL;
 
       genfit::MeasurementProducer <PXDCluster, PXDRecoHit>* pxdClusterProducer = NULL;
 #ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
@@ -378,10 +423,10 @@ void GBLfitModule::event()
         }
       }
       if (cdcHits.getEntries()) {
-        B2WARNING("GBLfit: CDC hits not yet supported. Will be ignored during track construction.");
+        //B2WARNING("GBLfit: CDC hits not yet supported. Will be ignored during track construction.");
         //TODO: CDC
-        //CDCProducer =  new genfit::MeasurementProducer <CDCHit, CDCRecoHit> (cdcHits.getPtr());
-        //factory.addProducer(Const::CDC, CDCProducer);
+        CDCProducer =  new genfit::MeasurementProducer <CDCHit, CDCRecoHit> (cdcHits.getPtr());
+        factory.addProducer(Const::CDC, CDCProducer);
       }
 
       // The track fit needs an initial guess for the resolution.  The
@@ -435,38 +480,421 @@ void GBLfitModule::event()
         continue;
       }
 
+
+      try {
+        // Now combine SVDRecoHits if any (they are already placed at the same track point - by genfit::Track constructor)
+        genfit::PlanarMeasurement* planarMeas1(NULL);
+        genfit::PlanarMeasurement* planarMeas2(NULL);
+        for (unsigned int i = 0; i < gfTrack.getNumPoints(); ++i) {
+          if (gfTrack.getPointWithMeasurement(i)->getNumRawMeasurements() != 2)
+            continue;
+          planarMeas1 = dynamic_cast<genfit::PlanarMeasurement*>(gfTrack.getPointWithMeasurement(i)->getRawMeasurement(0));
+          planarMeas2 = dynamic_cast<genfit::PlanarMeasurement*>(gfTrack.getPointWithMeasurement(i)->getRawMeasurement(1));
+
+          if (planarMeas1 != NULL && planarMeas2 != NULL &&
+              planarMeas1->getDetId() == planarMeas2->getDetId() &&
+              planarMeas1->getPlaneId() != -1 &&   // -1 is default plane id
+              planarMeas1->getPlaneId() == planarMeas2->getPlaneId()) {
+            Belle2::SVDRecoHit* hit1 = dynamic_cast<Belle2::SVDRecoHit*>(planarMeas1);
+            Belle2::SVDRecoHit* hit2 = dynamic_cast<Belle2::SVDRecoHit*>(planarMeas2);
+            Belle2::SVDRecoHit* hitU(NULL);
+            Belle2::SVDRecoHit* hitV(NULL);
+            if (hit1 && hit2) {
+              // We have to decide U/V now (else SVDRecoHit2D could throw FATAL)
+              if (hit1->isU() && !hit2->isU()) {
+                hitU = hit1;
+                hitV = hit2;
+              } else if (!hit1->isU() && hit2->isU()) {
+                hitU = hit2;
+                hitV = hit1;
+              } else {
+                continue;
+              }
+              Belle2::SVDRecoHit2D* hit = new Belle2::SVDRecoHit2D(*hitU, *hitV);
+              // insert measurement before point i (increases number of currect point to i+1)
+              gfTrack.insertMeasurement(hit, i);
+              // now delete current point (at its original place, we have the new 2D recohit)
+              gfTrack.deletePoint(i + 1);
+            }
+          }
+        }
+      } catch (...) {
+        B2FATAL("Hit combination of SVD clusters in genfit::Track failed.");
+      }
+
+      /*
       //now fit the track
       try {
         // Prepare the the track (set ReferenceStates)
-        genfit::KalmanFitterRefTrack* refKalman = new genfit::KalmanFitterRefTrack();
-        int failedHits = 0;
-        refKalman->prepareTrack(&gfTrack, trackRep, true, failedHits);
-        if (failedHits > 0 && (nHitsInTrack - failedHits) < 3)
-          continue;
+        //genfit::KalmanFitterRefTrack* refKalman = new genfit::KalmanFitterRefTrack();
+        //int failedHits = 0;
+        //refKalman->prepareTrack(&gfTrack, trackRep, true, failedHits);
+        //if (failedHits > 0 && (nHitsInTrack - failedHits) < 3)
+        //  continue;
         // Let's try to pass the track to GBL
         // Reference state (and planes) are used by GBL.
-        m_gbl.processTrack(&gfTrack);
+
+        m_gbl.processTrack(&gfTrack, m_resortHits);
+
+        genfit::GblFitStatus* gblfs = 0;
+        if (gfTrack.hasFitStatus(trackRep) && (gblfs = dynamic_cast<genfit::GblFitStatus*>(gfTrack.getFitStatus(trackRep)))) {
+          //Fill histos
+          hist->Fill(gblfs->getPVal());
+          chi2->Fill(gblfs->getChi2());
+          chi2ondf->Fill(gblfs->getChi2()/gblfs->getNdf());
+
+          //If cuts are fullfilled, create GBL trajectory and out to Mille binary
+          if (gblfs->getPVal() >= m_gblPvalueCut && gblfs->getNdf() >= m_gblMinNdf) {
+            gbl::GblTrajectory traj(m_gbl.collectGblPoints(&gfTrack, trackRep), gblfs->hasCurvature());
+            traj.milleOut(*m_milleFile);
+
+          }
+
+          gfTracks.appendNew(gfTrack);  //genfit::Track can be assigned directly
+
+        }
+
+
+      } catch (genfit::Exception e) {
+        std::string error( e.getExcString() );
+        B2WARNING("Exception during GBL fit / returning GBL fit status / storing of genfit::Track: " << error);
+        e.info();
+        ++m_failedFitCounter;
+      } catch (std::exception e) {
+        B2WARNING("Something went wrong during the fit: " << e.what());
+        ++m_failedFitCounter;
+      } catch (...) {
+        B2WARNING("Something really unexpected happended during the fit");
+        ++m_failedFitCounter;
+      }
+
+      */
+
+      //now fit the track
+      try {
+
+        if (m_useOldGbl) {
+          try {
+            // Prepare the the track (set ReferenceStates)
+            genfit::KalmanFitterRefTrack* refKalman = new genfit::KalmanFitterRefTrack();
+            int failedHits = 0;
+            refKalman->prepareTrack(&gfTrack, trackRep, true, failedHits);
+            if (failedHits > 0 && (nHitsInTrack - failedHits) < 3)
+              continue;
+            // Let's try to pass the track to GBL
+            // Reference state (and planes) are used by GBL.
+            m_oldGbl.processTrack(&gfTrack);
+
+          } catch (...) {
+            B2WARNING("Something went wrong during the fit!");
+            ++m_failedFitCounter;
+          }
+          // Nothing more can be done here with old GBL interface
+          return;
+
+        } else {
+          // New GBL interface
+          m_gbl.processTrack(&gfTrack, m_resortHits);
+        }
+
+        //gfTrack.Print();
+        bool fitSuccess = gfTrack.hasFitStatus(trackRep);
+        genfit::FitStatus* fs = 0;
+        genfit::GblFitStatus* gfs = 0;
+        if (fitSuccess) {
+          fs = gfTrack.getFitStatus(trackRep);
+          fitSuccess = fitSuccess && fs->isFitted();
+          //fitSuccess = fitSuccess && fs->isFitConverged();
+          fitSuccess = fitSuccess && fs->isFitConverged();
+
+          gfs = dynamic_cast<genfit::GblFitStatus*>(fs);
+          //hNit->Fill(kfs->getNumIterations());
+          //if (!fitSuccess && kfs)
+          //kfs->Print();
+          fitSuccess = fitSuccess && gfs;
+        }
+        B2DEBUG(99, "-----> Fit results:");
+        B2DEBUG(99, "       Fitted and converged: " << fitSuccess);
+
+        //hSuccess->Fill(fitSuccess);
+
+        if (fitSuccess) {
+          B2DEBUG(99, "       Chi2 of the fit: " << gfs->getChi2());
+          //B2DEBUG(99,"       Forward Chi2: "<<gfTrack.getForwardChi2());
+          B2DEBUG(99, "       NDF of the fit: " << gfs->getNdf());
+          //Calculate probability
+          double pValue = gfTrack.getFitStatus()->getPVal();
+          B2DEBUG(99, "       pValue of the fit: " << pValue);
+
+
+          //hist->Fill(gfs->getPVal());
+          //chi2->Fill(gfs->getChi2());
+          //chi2ondf->Fill(gfs->getChi2()/gfs->getNdf());
+
+          //If cuts are fullfilled, create GBL trajectory and out to Mille binary
+          if (m_milleFile && gfs->getPVal() >= m_gblPvalueCut && gfs->getNdf() >= m_gblMinNdf) {
+            bool overChi2Cut = false;
+            for (auto tp : gfTrack.getPoints()) {
+              if (m_chi2Cut <= 0.)
+                break;
+              genfit::MeasuredStateOnPlane residual = tp->getFitterInfo()->getResidual();
+              for (int idim = 0; idim < residual.getState().GetNoElements(); idim++) {
+                double pull = residual.getState()(idim); //residual
+                pull = pull * pull; // residual squared
+                pull = pull / residual.getCov()(idim, idim); // residual squared over error squared
+                if (pull > m_chi2Cut) {
+                  overChi2Cut = true;
+                  break;
+                }
+              }
+            }
+            if (!overChi2Cut) {
+              gbl::GblTrajectory traj(m_gbl.collectGblPoints(&gfTrack, trackRep), gfs->hasCurvature());
+              traj.milleOut(*m_milleFile);
+            }
+          }
+
+
+        }// end if(fitSuccess)
+
+        //B2DEBUG(99,"       Covariance matrix: ");
+        //gfTrack.getTrackRep(0)->getCov().Print();
+
+        if (!fitSuccess) {    //if fit failed
+          std::stringstream warningStreamFitFailed;
+          warningStreamFitFailed << "Event " << eventCounter << ", genfit::TrackCand: " << iCand << ", PDG hypo: " << currentPdgCode <<
+                                 ": fit failed. GenFit returned an error (with fitSuccess " << fitSuccess << ").";
+          B2DEBUG(99, warningStreamFitFailed.str());
+          ++m_failedFitCounter;
+          if (m_storeFailed == true) {
+            ++trackCounter;
+
+            //Create output tracks
+            gfTracks.appendNew(gfTrack);  //genfit::Track can be assigned directly
+            tracks.appendNew(); //Track is created empty, helix parameters are not available because the fit failed, but other variables may give some hint on the reason for the failure
+
+            //Create relation
+            if (aTrackCandPointer->getMcTrackId() >= 0) {
+              gfTracksToMCPart.add(trackCounter, aTrackCandPointer->getMcTrackId());
+            }
+
+            //else B2WARNING("No MCParticle contributed to this track! No genfit::Track<->MCParticle relation will be created!");
+            //FIXME: disabled, makes no sense with real data.
+
+            //Set non-helix parameters
+            tracks[trackCounter]->setTrackFitResultIndex(chargedStable, -999);
+            /*                            tracks[trackCounter]->setFitFailed(true);
+             *                                 tracks[trackCounter]->setChi2(gfTrack.getChiSqu());
+             *                                 tracks[trackCounter]->setNHits(gfTrack.getNumHits());
+             *                                 tracks[trackCounter]->setNCDCHits(nCDC);
+             *                                 tracks[trackCounter]->setNSVDHits(nSVD);
+             *                                 tracks[trackCounter]->setNPXDHits(nPXD);
+             *                                 tracks[trackCounter]->setMCId(aTrackCandPointer->getMcTrackId());
+             *                                 tracks[trackCounter]->setPDG(aTrackCandPointer->getPdgCode());
+             *                                 //tracks[trackCounter]->setPurity(aTrackCandPointer->getDip()); //setDip will be deleted soon. If purity is used it has to be passed differently to the Track class
+             *                                 tracks[trackCounter]->setPValue(pValue);
+             *                                 //Set helix parameters
+             *                                 tracks[trackCounter]->setD0(-999);
+             *                                 tracks[trackCounter]->setPhi(-999);
+             *                                 tracks[trackCounter]->setOmega(gfTrack.getCharge());
+             *                                 tracks[trackCounter]->setZ0(-999);
+             *                                 tracks[trackCounter]->setCotTheta(-999);
+             */
+            //Create relations
+            if (aTrackCandPointer->getMcTrackId() >= 0) {
+              mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
+            }
+            //else B2WARNING("No MCParticle contributed to this track! No MCParticle<->Track relation will be created!");
+            //FIXME: disabled, makes no sense with real data.
+          }
+        } else {            //fit successful
+          ++m_successfulFitCounter;
+          ++trackCounter;
+
+          candFitted = true;
+          //Create output tracks
+          if (gfs->getPVal() > m_gblPvalueCut)
+            gfTracks.appendNew(gfTrack);  //genfit::Track can be assigned directly
+          tracks.appendNew(); //Track is created empty, parameters are set later on
+
+          //Create relation
+          if (aTrackCandPointer->getMcTrackId() >= 0) {
+            gfTracksToMCPart.add(trackCounter, aTrackCandPointer->getMcTrackId());
+          }
+
+          //else B2WARNING("No MCParticle contributed to this track! No genfit::Track<->MCParticle relation will be created!");
+          //FIXME: disabled, makes no sense for real data
+
+          //Set non-helix parameters
+          /*            tracks[trackCounter]->setFitFailed(false);
+           *               tracks[trackCounter]->setChi2(gfTrack.getChiSqu());
+           *               tracks[trackCounter]->setNHits(gfTrack.getNumHits());
+           *               tracks[trackCounter]->setNCDCHits(nCDC);
+           *               tracks[trackCounter]->setNSVDHits(nSVD);
+           *               tracks[trackCounter]->setNPXDHits(nPXD);
+           *               tracks[trackCounter]->setMCId(aTrackCandPointer->getMcTrackId());
+           *               tracks[trackCounter]->setPDG(aTrackCandPointer->getPdgCode());
+           *               //tracks[trackCounter]->setPurity(aTrackCandPointer->getDip()); //setDip will be deleted soon. If purity is used it has to be passed differently to the Track class
+           *               tracks[trackCounter]->setPValue(pValue);
+           *               tracks[trackCounter]->setExtrapFailed(false);
+           */
+
+          //To calculate the correct starting helix parameters, one has to extrapolate the track to its 'start' (here: take point of closest approach to the origin)
+
+          //Find the point of closest approach of the track to the origin
+          TVector3 pos(m_beamSpot.at(0), m_beamSpot.at(1), m_beamSpot.at(2)); //origin
+          TVector3 lineDirection(0, 0, 1); // beam axis
+          TVector3 poca(0., 0., 0.); //point of closest approach
+          TVector3 dirInPoca(0., 0., 0.); //direction of the track at the point of closest approach
+          TMatrixDSym cov(6);
+
+          try {
+            //extrapolate the track to the origin, the results are stored directly in poca and dirInPoca
+            // +/- predictions of GBL are the same at 1st point, so no matter if we take forward state for
+            // most likely backward propagation (to interaction point)
+            genfit::MeasuredStateOnPlane mop = gfTrack.getFittedState();
+            mop.extrapolateToLine(pos, lineDirection);
+            mop.getPosMomCov(poca, dirInPoca, cov);
+
+            B2DEBUG(149, "Point of closest approach: " << poca.x() << "  " << poca.y() << "  " << poca.z());
+            B2DEBUG(149, "Track direction in POCA: " << dirInPoca.x() << "  " << dirInPoca.y() << "  " << dirInPoca.z());
+
+            //MH: this is new stuff...
+            tracks[trackCounter]->setTrackFitResultIndex(chargedStable, trackFitResultCounter);
+            //Create relations
+            if (aTrackCandPointer->getMcTrackId() >= 0) {
+              mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
+            }
+
+            genfit::FitStatus* fs = gfTrack.getFitStatus();
+            int charge = fs->getCharge();
+            double pVal = fs->getPVal();
+            float bField = 1.5; //TODO: get magnetic field from genfit
+
+            trackFitResults.appendNew(TrackFitResult(poca, dirInPoca, cov, charge, chargedStable, pVal, bField, 0, 0));
+
+            gfTracksToTrackFitResults.add(trackCounter, trackFitResultCounter);
+            gfTrackCandidatesToTrackFitResults.add(iCand, trackFitResultCounter);
+            gfTrackCandidatesTogfTracks.add(iCand, trackCounter);
+            trackFitResultCounter++;
+
+
+            // store position
+            //              tracks[trackCounter]->setPosition(resultPosition);
+            // store covariance matrix
+            //              tracks[trackCounter]->setErrorMatrix(resultCovariance);
+
+            //store position errors
+            double xErr = sqrt(cov(0, 0));
+            double yErr = sqrt(cov(1, 1));
+            double zErr = sqrt(cov(2, 2));
+            B2DEBUG(99, "Position standard deviation: " << xErr << "  " << yErr << "  " << zErr);
+            //              tracks[trackCounter]->setVertexErrors(xErr, yErr, zErr);
+
+            //store momentum errors
+            double pxErr = sqrt(cov(3, 3));
+            double pyErr = sqrt(cov(4, 4));
+            double pzErr = sqrt(cov(5, 5));
+            B2DEBUG(99, "Momentum standard deviation: " << pxErr << "  " << pyErr << "  " << pzErr);
+            //              tracks[trackCounter]->setPErrors(pxErr, pyErr, pzErr);
+
+
+            //Now calculate the parameters for helix parametrisation to fill the Track objects
+
+            //calculate transverse momentum
+            //double pt = sqrt(resultMomentum.x() * resultMomentum.x() + resultMomentum.y() * resultMomentum.y());
+
+            //determine angle phi for perigee parametrisation, distributed from -pi to pi
+            //double phi = atan2(dirInPoca.y() , dirInPoca.x());
+
+            //determine d0 sign for perigee parametrization
+            //double d0Sign = TMath::Sign(1., poca.x() * dirInPoca.x() + poca.y() * dirInPoca.y());
+
+            //coefficient to illiminate the B field and get the 'pure' curvature
+            //double alpha = 1 / (1.5 * 0.00299792458);
+
+            //Now set the helix parameters for perigee parametrization
+            /*              tracks[trackCounter]->setD0(d0Sign * sqrt(poca.x() * poca.x() + poca.y() * poca.y()));
+             *                   tracks[trackCounter]->setPhi(phi);
+             *                   tracks[trackCounter]->setOmega((gfTrack.getCharge() / (pt * alpha)));
+             *                   tracks[trackCounter]->setZ0(poca.z());
+             *                   tracks[trackCounter]->setCotTheta(dirInPoca.z() / (sqrt(dirInPoca.x() * dirInPoca.x() + dirInPoca.y() * dirInPoca.y())));
+             */
+            //Print helix parameters
+            /*              B2DEBUG(99, ">>>>>>> Helix Parameters <<<<<<<");
+             *                   B2DEBUG(99, "D0: " << std::setprecision(3) << tracks[trackCounter]->getD0() << "  Phi: " << std::setprecision(3) << tracks[trackCounter]->getPhi() << "  Omega: " << std::setprecision(3) << tracks[trackCounter]->getOmega() << "  Z0: " << std::setprecision(3) << tracks[trackCounter]->getZ0() << "  CotTheta: " << std::setprecision(3) << tracks[trackCounter]->getCotTheta());
+             *                   B2DEBUG(99, "<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>");
+             *                   //Additional check
+             *                   B2DEBUG(99, "Recalculate momentum from perigee: px: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha)) * (cos(tracks[trackCounter]->getPhi())) << "  py: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*sin(tracks[trackCounter]->getPhi()) << "  pz: " << abs(1 / (tracks[trackCounter]->getOmega()*alpha))*tracks[trackCounter]->getCotTheta());
+             *                   B2DEBUG(99, "<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>");
+             */
+            //if (m_createTextFile) {
+            //Additional code
+            //print helix parameter to a file
+            //useful if one like to quickly plot track trajectories
+            //-------------------------------------
+            /*                HelixParam << tracks[trackCounter]->getD0() << " \t"
+             *                                  << tracks[trackCounter]->getPhi() << " \t"
+             *                                  << tracks[trackCounter]->getOmega() << " \t"
+             *                                  << tracks[trackCounter]->getZ0() << " \t"
+             *                                  << tracks[trackCounter]->getCotTheta() << "\t" << poca.x()
+             *                                  << "\t" << poca.y() << "\t" << poca.z() << endl;
+             *                       //----------------------------------------
+             */              //end additional code
+            //}
+          }
+
+          catch (...) {
+            B2WARNING("Something went wrong during the extrapolation of fit results!");
+            //Create relations
+            if (aTrackCandPointer->getMcTrackId() >= 0) {
+              mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
+            }
+            //else B2WARNING("No MCParticle contributed to this track! No MCParticle<->Track relation will be created!");
+            //FIXME: disabled, makes no sense for real data
+            //              tracks[trackCounter]->setExtrapFailed(true);
+          }
+
+        }// end else for successful fits
+
+      } catch (genfit::Exception e) {
+        std::string error(e.getExcString());
+        B2WARNING("genfit::Exception during the fit: " << error);
+        e.info();
+        ++m_failedFitCounter;
+
+      } catch (std::exception e) {
+        B2WARNING("std::exception during the fit: " << e.what());
+        ++m_failedFitCounter;
 
       } catch (...) {
-        B2WARNING("Something went wrong during the fit!");
+        // Final catch
+        B2WARNING("Something went wrong during the fit.");
         ++m_failedFitCounter;
       }
 
     } //end loop over all pdg hypothesis
 
+
+    if (candFitted == true) m_successfulGFTrackCandFitCounter++;
+    else m_failedGFTrackCandFitCounter++;
+
   }//end loop over all track candidates
+  B2DEBUG(99, "GBLfit event summary: " << trackCounter + 1 << " tracks were processed");
+
 
 }
 
 void GBLfitModule::endRun()
 {
-  // Needed to be able to store ROOT data from GBL. During destruction, it is too late.
-  // Also the Millepede binary file must be closed before running pede (dtor is too late).
-  m_gbl.endRun();
+  if (m_milleFile)
+    delete m_milleFile;
+
 }
 
 void GBLfitModule::terminate()
 {
-
+  m_oldGbl.endRun();
+  //delete m_milleFile;
 }
 

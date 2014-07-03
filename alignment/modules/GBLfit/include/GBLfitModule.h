@@ -14,6 +14,7 @@
 #include <genfit/KalmanFitter.h>
 #include <genfit/KalmanFitterRefTrack.h>
 #include <genfit/DAF.h>
+#include <genfit/GblFitter.h>
 #include <genfit/GFGbl.h>
 
 #include <fstream>
@@ -100,14 +101,23 @@ namespace Belle2 {
     std::string m_mscModel;                          /**< Multiple scattering model */
     std::string m_resolveWireHitAmbi;                /**< Determines how the ambiguity of wire measurements should be dealt with.  If this is set to 'default', we use 'weightedAverage' for the DAF is, the Kalman fit uses 'unweightedClosestToReference', and the simple Kalman (which doesn't have a reference) uses 'unweightedClosestToPrediction'. */
     std::vector<double> m_beamSpot;                  /**< The coordinates of the point whose POCA will define the parameters of the TrackFitResults.  */
-    genfit::GFGbl m_gbl;                             /**< General Broken Line interface class object. */
+    genfit::GblFitter m_gbl;                         /**< General Broken Line interface class object. */
+    genfit::GFGbl m_oldGbl;                          /**< General Broken Line interface class object. Old version*/
+
     std::string m_gblInternalIterations;             /**< GBL internal downweighting setting */
-    double m_gblPvalueCut;                           /**< GBL p-value cut to output track to millepede file */
-    int m_gblMinNdf;                                 /**< GBL minimum NDF to output track to millepede file */
+    int m_gblExternalIterations;                     /**< GBL: Real GBL iteration with state updates */
+    double m_gblPvalueCut;                           /**< GBL: p-value cut to output track to millepede file */
+    int m_gblMinNdf;                                 /**< GBL: minimum NDF to output track to millepede file */
     std::string m_gblMilleFileName;                  /**< GBL: Name of the mille binary file to be produced for alignment */
     double m_chi2Cut;                                /**< GBL: Cut on single measurement Chi2", double(50.)) */
-    bool m_enableScatterers;                          /**< GBL: Enable scattering in GBL trajectory", bool(true)) */
+    bool m_enableScatterers;                         /**< GBL: Enable scattering in GBL trajectory", bool(true)) */
     bool m_enableIntermediateScatterer;              /**< GBL: Enable intermediate scatterers for simulation of thick scatterer", bool(true)) */
+    gbl::MilleBinary* m_milleFile;                   /**< Millepede: Name of Mille binary file for output of GBL data */
+    bool m_resortHits;                               /**< GBL: Sort hits by extrapolation before init of GBL fit */
+    int m_recalcJacobians;                           /**< Recalculate Jacobians: 0=do not recalc, 1=after 1st fit, 2=1+after 2nd fit, etc. */
+    bool m_storeFailed;                              /**< Store tracks where the fit failed */
+    bool m_useOldGbl;                                /**< Use old GBL interface version */
+
 
   };
 }

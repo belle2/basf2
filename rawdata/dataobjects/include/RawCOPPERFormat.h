@@ -80,7 +80,7 @@ namespace Belle2 {
     virtual int Get4thDetectorNwords(int n) = 0;
 
     //! get Detector buffer
-    virtual int* GetDetectorBuffer(int n, int finesse_num) = 0;
+    virtual int* GetDetectorBuffer(int n, int finesse_num);
 
     //! get Detector buffer of slot A
     virtual int* Get1stDetectorBuffer(int n) = 0;
@@ -99,25 +99,25 @@ namespace Belle2 {
     virtual int GetBufferPos(int n) = 0;
 
     //! get buffer pointer of rawcopper header(Currently same as GetBufferPos)
-    virtual int* GetRawHdrBufPtr(int n) = 0;
+    virtual int* GetRawHdrBufPtr(int n);
 
     //! get buffer pointer of rawcopper trailer
     virtual int* GetRawTrlBufPtr(int n) = 0;
 
     //! get FINESSE buffer pointer
-    virtual int* GetFINESSEBuffer(int n, int finesse_num) = 0;
+    virtual int* GetFINESSEBuffer(int n, int finesse_num);
 
     //! get FINESSE buffer pointer for slot A
-    virtual int* Get1stFINESSEBuffer(int n) = 0;
+    virtual int* Get1stFINESSEBuffer(int n);
 
     //! get FINESSE buffer pointer for slot B
-    virtual int* Get2ndFINESSEBuffer(int n) = 0;
+    virtual int* Get2ndFINESSEBuffer(int n);
 
     //! get FINESSE buffer pointer for slot C
-    virtual int* Get3rdFINESSEBuffer(int n) = 0;
+    virtual int* Get3rdFINESSEBuffer(int n);
 
     //! get FINESSE buffer pointer for slot D
-    virtual int* Get4thFINESSEBuffer(int n) = 0;
+    virtual int* Get4thFINESSEBuffer(int n);
 
 
     //
@@ -152,19 +152,19 @@ namespace Belle2 {
     virtual int GetNumFINESSEBlock(int n) = 0;
 
     //! get # of offset words
-    virtual int GetOffsetFINESSE(int n, int finesse) = 0;
+    virtual int GetOffsetFINESSE(int n, int finesse);
 
     //! get # of offset words for FINESSE slot A buffer position
     virtual int GetOffset1stFINESSE(int n) = 0;
 
     //! get # of offset words for FINESSE slot B buffer position
-    virtual int GetOffset2ndFINESSE(int n) = 0;
+    virtual int GetOffset2ndFINESSE(int n);
 
     //! get # of offset words for FINESSE slot C buffer position
-    virtual int GetOffset3rdFINESSE(int n) = 0;
+    virtual int GetOffset3rdFINESSE(int n);
 
     //! get # of offset words for FINESSE slot D buffer position
-    virtual int GetOffset4thFINESSE(int n) = 0;
+    virtual int GetOffset4thFINESSE(int n);
 
     //! get data size of  FINESSE buffer
     virtual int GetFINESSENwords(int n, int finesse) = 0;
@@ -182,7 +182,7 @@ namespace Belle2 {
     virtual int Get4thFINESSENwords(int n) = 0;
 
     //! For copying FTSW word1 (FEE header)
-    virtual unsigned int GetB2LHeaderWord(int n, int finesse_buffer_pos) = 0;
+    virtual unsigned int GetB2LHeaderWord(int n, int finesse_buffer_pos);
 
     //
     // Get information from "B2link(attached by FEE and HLSB) header"
@@ -258,7 +258,7 @@ namespace Belle2 {
     virtual void GetTTTimeVal(int n, struct timeval* tv) = 0;
 
     //! calc XOR checksum
-    virtual unsigned int CalcXORChecksum(int* buf, int nwords) = 0;
+    virtual unsigned int CalcXORChecksum(int* buf, int nwords);
 
     //! Pack data (format ver. = -1 -> Select the latest format version)
     virtual void Packer(int* buf_1st, int nwords_1st,
@@ -273,6 +273,72 @@ namespace Belle2 {
     ClassDef(RawCOPPERFormat, 2);
 
   };
+
+
+
+  inline int* RawCOPPERFormat::GetRawHdrBufPtr(int n)
+  {
+    int pos_nwords = GetBufferPos(n);
+    return &(m_buffer[ pos_nwords ]);
+  }
+
+
+  inline int RawCOPPERFormat::GetOffset2ndFINESSE(int n)
+  {
+    return GetOffset1stFINESSE(n) + Get1stFINESSENwords(n);
+  }
+
+  inline int RawCOPPERFormat::GetOffset3rdFINESSE(int n)
+  {
+    return GetOffset2ndFINESSE(n) + Get2ndFINESSENwords(n);
+  }
+
+  inline int RawCOPPERFormat::GetOffset4thFINESSE(int n)
+  {
+    return GetOffset3rdFINESSE(n) + Get3rdFINESSENwords(n);
+  }
+
+
+
+  inline int* RawCOPPERFormat::Get1stFINESSEBuffer(int n)
+  {
+    int pos_nwords = GetOffset1stFINESSE(n);
+    if (pos_nwords >= m_nwords) {
+      printf("[DEBUG] Data size is smaller than data position info. Exting...\n");
+      exit(1);
+    }
+    return &(m_buffer[ pos_nwords]);
+  }
+
+  inline int* RawCOPPERFormat::Get2ndFINESSEBuffer(int n)
+  {
+    int pos_nwords = GetOffset2ndFINESSE(n);
+    if (pos_nwords >= m_nwords) {
+      printf("[DEBUG] Data size is smaller than data position info. Exting...\n");
+      exit(1);
+    }
+    return &(m_buffer[ pos_nwords]);
+  }
+
+  inline int* RawCOPPERFormat::Get3rdFINESSEBuffer(int n)
+  {
+    int pos_nwords = GetOffset3rdFINESSE(n);
+    if (pos_nwords >= m_nwords) {
+      printf("[DEBUG] Data size is smaller than data position info. Exting...\n");
+      exit(1);
+    }
+    return &(m_buffer[ pos_nwords]);
+  }
+
+  inline int* RawCOPPERFormat::Get4thFINESSEBuffer(int n)
+  {
+    int pos_nwords = GetOffset4thFINESSE(n);
+    if (pos_nwords >= m_nwords) {
+      printf("[DEBUG] Data size is smaller than data position info. Exting...\n");
+      exit(1);
+    }
+    return &(m_buffer[ pos_nwords]);
+  }
 
 
 }

@@ -26,12 +26,14 @@ namespace Belle2 {
       /** Destructor. */
       ~LinearGlobalADCCountTranslator() {}
 
+      const float EnergyLossOffset =  conversionFactor / 2.; // eV
+
       /** just multiply with the conversion factor and return. */
       float getCharge(unsigned short adcCount,
                       const WireID&,
                       bool,
                       float, float) {
-        return (adcCount * m_conversionFactor);
+        return (adcCount * m_conversionFactor + EnergyLossOffset);
       }
 
     private:

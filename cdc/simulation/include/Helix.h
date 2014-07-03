@@ -215,7 +215,9 @@ namespace Belle2 {
        */
       double bFieldZ(void) const;
 
+      //! set limit for parameter "a"
       static void set_limits(const HepVector& a_min, const HepVector& a_max);
+      //!
       static bool set_exception(bool);
 
       /**
@@ -224,9 +226,12 @@ namespace Belle2 {
       static bool set_print(bool);
 
     private:
+      //!
       static HepVector ms_amin;
-      static HepVector ms_amax; //!
-      static bool ms_check_range;     //! Check the helix parameter's range.
+      //!
+      static HepVector ms_amax;
+      //! Check the helix parameter's range.
+      static bool ms_check_range;
       static bool ms_print_debug;     /*! Debug option flag. */
       static bool ms_throw_exception; /*! Throw exception flag. */
 
@@ -237,14 +242,18 @@ namespace Belle2 {
     public: // Mathmatical functions
 
       HepMatrix delApDelA(const HepVector& ap) const;
-      HepMatrix delXDelA(double phi) const; ///
-      HepMatrix delMDelA(double phi) const; ///
-      HepMatrix del4MDelA(double phi, double mass) const; ///
-      HepMatrix del4MXDelA(double phi, double mass) const; ///
+      //!
+      HepMatrix delXDelA(double phi) const;
+      //!
+      HepMatrix delMDelA(double phi) const;
+      //!
+      HepMatrix del4MDelA(double phi, double mass) const;
+      //!
+      HepMatrix del4MXDelA(double phi, double mass) const;
 
     private:
       /**
-       *
+       * updateCache
        */
       void updateCache(void);
 
@@ -261,7 +270,7 @@ namespace Belle2 {
       void debugPrint(void) const;
 
       /**
-       *
+       * Debug Helix
        */
       void debugHelix(void) const;
     public:
@@ -270,8 +279,10 @@ namespace Belle2 {
 
     private:
 
-      bool m_matrixValid; ///
-      bool m_helixValid;  /// True: helix valid, False: helix not valid.
+      //!
+      bool m_matrixValid;
+      //! True: helix valid, False: helix not valid.
+      bool m_helixValid;
       double m_bField;    /*! Magnetic field, assuming uniform Bz in the unit of  kG. */
       double m_alpha;     /*! 10000.0/(speed of light)/B. */
       HepPoint3D m_pivot; /*! Pivot */
@@ -281,11 +292,14 @@ namespace Belle2 {
     private: // caches
 
       HepPoint3D m_center;
-      double m_cp; /// Chache of the cos phi0
+      //! Chache of the cos phi0
+      double m_cp;
       double m_sp; /// Chache of the sin phi0
       double m_pt;
+      //!
       double m_r;
-      double m_ac[5]; /// Cache of the helix parameter.
+      //! Cache of the helix parameter.
+      double m_ac[5];
 
       static const std::string invalidhelix; /// String "Invalid Helix".
 

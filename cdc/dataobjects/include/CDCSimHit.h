@@ -244,9 +244,9 @@ namespace Belle2 {
     CDCSimHit(): SimHitBase(),
       m_trackId(0), m_pdg(0), m_driftLength(0.0),
       m_flightTime(0.0), m_edep(0.0), m_stepLength(1.0),
-      m_leftRight(0), m_globalTime(0.0),
       m_momentum(), m_posWire(),
-      m_posIn(), m_posOut(), m_posTrack()
+      m_posIn(), m_posOut(), m_posTrack(),
+      m_leftRight(0), m_globalTime(0.0)
     {}
 
     //! Useful Constructor

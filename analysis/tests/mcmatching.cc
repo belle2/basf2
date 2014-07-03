@@ -170,10 +170,9 @@ namespace {
           //use given decay to reconstruct daughters instead
           mcDecay = decay.m_optDecay;
         }
-        ASSERT_EQ(decay.m_daughterDecays.size(), mcDecay->m_daughterDecays.size());
         std::vector<int> daughterIndices;
         for (unsigned int i = 0; i < decay.m_daughterDecays.size(); i++) {
-          Decay* d = &(mcDecay->m_daughterDecays[i]);
+          Decay* d = nullptr;
           ReconstructedDecay rd = decay.m_daughterDecays[i];
           //we must make sure that m_graphParticle always corresponds to the same thing in the reconstructed thing.
           if (rd.m_behavior == c_ReconstructFrom) {
@@ -182,6 +181,9 @@ namespace {
             rd.m_optDecay = nullptr;
             rd.m_behavior = Decay::c_Default;
             d = mcDecay;
+          } else {
+            ASSERT_TRUE(decay.m_daughterDecays.size() > i);
+            d = &(mcDecay->m_daughterDecays[i]);
           }
           d->reconstruct({rd});
           if (d->m_particle)
@@ -773,6 +775,32 @@ namespace {
       EXPECT_EQ(c_Correct, getMCTruthStatus(d.m_particle)) << d.getString();
     }
   }
+
+  //B0 -> rho+ D-
+  TEST_F(MCMatchingTest, MissingResonance)
+  {
+    //explicitly reconstruct the rho
+    {
+      Decay d(511, {{ -411, { -321, 321, 211}}, {213, {211, {111, {22, 22}}}}});
+      d.reconstruct({511, {{ -411, { -321, 321, 211}}, {213, {211, {111, {22, 22}}}}}});
+
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_Correct, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
+    //missing rho
+    {
+      Decay d(511, {{ -411, { -321, 321, 211}}, {213, {211, {111, {22, 22}}}}});
+      //d.reconstruct({511, {{-411, {-321, 321, 211}}, {0, {211, {111, {22, 22}}}}}});
+      Decay* piplus = &(d[1][0]);
+      Decay* pi0 = &(d[1][1]);
+
+      d.reconstruct({511, {{ -411, { -321, 321, 211}}, {211, {}, Decay::c_ReconstructFrom, piplus}, {111, {22, 22}, Decay::c_ReconstructFrom, pi0}}});
+
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_MissingResonance, getMCTruthStatus(d.m_particle)) << d.getString();
+    }
+  }
+
 
 }  // namespace
 #endif

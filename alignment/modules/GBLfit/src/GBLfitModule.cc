@@ -93,7 +93,7 @@ TH1F *chi2ondf;
 REG_MODULE(GBLfit)
 
 GBLfitModule::GBLfitModule() :
-  Module(), m_usePdgCodeFromTrackCand(true)
+  Module(), m_usePdgCodeFromTrackCand(true), m_milleFile(0)
 {
 
   setDescription(
@@ -856,13 +856,13 @@ void GBLfitModule::event()
 
         }// end else for successful fits
 
-      } catch (genfit::Exception e) {
+      } catch (genfit::Exception& e) {
         std::string error(e.getExcString());
         B2WARNING("genfit::Exception during the fit: " << error);
         e.info();
         ++m_failedFitCounter;
 
-      } catch (std::exception e) {
+      } catch (std::exception& e) {
         B2WARNING("std::exception during the fit: " << e.what());
         ++m_failedFitCounter;
 

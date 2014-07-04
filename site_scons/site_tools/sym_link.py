@@ -37,7 +37,7 @@ def create_symlink(target, source, env):
 
 
 def generate(env):
-    if GetOption('symlink'):
+    if not GetOption('no-symlink'):
         env['INSTALL'] = create_symlink
 
 

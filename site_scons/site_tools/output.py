@@ -49,10 +49,10 @@ def generate(env):
         color_map = color_map_dark
 
     if not GetOption('verbose'):
-        if GetOption('symlink'):
-            install_text = 'symlinking'
-        else:
+        if GetOption('no-symlink'):
             install_text = 'installing'
+        else:
+            install_text = 'symlinking'
         env.Replace(
             SHCXXCOMSTR='${CXXCOMSTR}',
             CXXCOMSTR=color_map['compile'] + '*** compiling  : ${SOURCE}'

@@ -11,7 +11,7 @@ AddOption('--color', dest = 'color', nargs = 1, default = 'off', action = 'store
 AddOption('--verbose', dest = 'verbose', action = 'store_true', default = False, help='Enable verbose output')
 if not analysis:
     AddOption('--local', dest = 'local', action = 'store_true', default = False, help='Enable faster build of local code. No code in the central release should depend on the local code!')
-AddOption('--symlink', dest = 'symlink', action = 'store_true', default = False, help='Use symbolic links instead of copies')
+AddOption('--no-symlink', dest = 'no-symlink', action = 'store_true', default = False, help='Use copies instead of symbolic links')
 AddOption('--extra-libpath', dest = 'extralibpath', action = 'store', help = 'Additional library path')
 AddOption('--extra-ccflags', dest = 'extraccflags', action = 'store', help = 'Additional compiler flags')
 

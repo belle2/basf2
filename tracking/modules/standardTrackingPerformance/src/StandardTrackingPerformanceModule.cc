@@ -117,9 +117,6 @@ void StandardTrackingPerformanceModule::event()
 
       genfit::Track* gfTrack = findRelatedTrack(mcParticle, gfTracks);
 
-      if (findRelatedTrackCand(mcParticle)) m_nReconstructedChargedStableTracks++;
-
-
       if (gfTrack != NULL) { // genfit::Track found
         // find related TrackFitResult, if none is found, something went wrong during fit or extrapolation
         const TrackFitResult* fitResult = findRelatedTrackFitResult(gfTrack);
@@ -188,14 +185,6 @@ genfit::Track* StandardTrackingPerformanceModule::findRelatedTrack(
   }
 
   return resultGfTrack;
-}
-
-bool StandardTrackingPerformanceModule::findRelatedTrackCand(const MCParticle& mcParticle)
-{
-
-
-
-  return false;
 }
 
 void StandardTrackingPerformanceModule::setupTree()

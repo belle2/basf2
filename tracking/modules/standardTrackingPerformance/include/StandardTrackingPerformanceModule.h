@@ -103,9 +103,6 @@ namespace Belle2 {
      */
     genfit::Track* findRelatedTrack(MCParticle& mcParticle, StoreArray< genfit::Track >& gfTracks);
 
-    /** search for a genfit::TrackCand which is related to a given MCParticle */
-    bool findRelatedTrackCand(const MCParticle& mcParticle);
-
     /** search a valid TrackFitResult for a given genfit::Track
      * @param gfTrack: TrackFitResult must be related to this genfit::Track
      * @return: pointer to the found TrackFitResult if found, else NULL is returned

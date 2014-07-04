@@ -26,12 +26,12 @@ using namespace Belle2;
 ClassImp(SVDRecoHit2D)
 
 SVDRecoHit2D::SVDRecoHit2D():
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0),
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0), m_uCluster(0), m_vCluster(0),
   m_energyDep(0)//, m_energyDepError(0)
 {}
 
 SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, const genfit::TrackCandHit*, float sigmaU, float sigmaV):
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit),
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(hit), m_uCluster(0), m_vCluster(0),
   m_energyDep(0)//, m_energyDepError(0)
 {
   if (!gRandom) B2FATAL("gRandom not initialized, please set up gRandom first");
@@ -61,7 +61,7 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, const genfit::TrackCandHit*, f
 }
 
 SVDRecoHit2D::SVDRecoHit2D(VxdID::baseType vxdid, const double u, const double v, double sigmaU, double sigmaV):
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(vxdid), m_trueHit(NULL),
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(vxdid), m_trueHit(NULL), m_uCluster(0), m_vCluster(0),
   m_energyDep(0)//, m_energyDepError(0)
 {
   //If no error is given, estimate the error by dividing the pixel size by sqrt(12)
@@ -120,7 +120,7 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDCluster& uHit, const SVDCluster& vHit):
 }
 
 SVDRecoHit2D::SVDRecoHit2D(const SVDRecoHit& uRecoHit, const SVDRecoHit& vRecoHit):
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(NULL), m_energyDep(0)
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(NULL), m_uCluster(0), m_vCluster(0), m_energyDep(0)
 {
   const SVDCluster& uHit = *(uRecoHit.getCluster());
   const SVDCluster& vHit = *(vRecoHit.getCluster());
@@ -185,4 +185,59 @@ genfit::AbsMeasurement* SVDRecoHit2D::clone() const
 {
   return new SVDRecoHit2D(*this);
 }
+
+TMatrixD SVDRecoHit2D::derivatives(const genfit::StateOnPlane* sop)
+{
+
+  // values for global derivatives
+  //TMatrixD derGlobal(2, 6);
+  TMatrixD derGlobal(2, 6);
+  derGlobal.Zero();
+
+  // track u-slope in local sensor system
+  double uSlope = sop->getState()[1];
+  // track v-slope in local sensor system
+  double vSlope = sop->getState()[2];
+  // Predicted track u-position in local sensor system
+  double uPos = sop->getState()[3];
+  // Predicted track v-position in local sensor system
+  double vPos = sop->getState()[4];
+
+  //Global derivatives for alignment in sensor local coordinates
+
+  derGlobal(0, 0) = 1.0;
+  derGlobal(0, 1) = 0.0;
+  derGlobal(0, 2) = - uSlope;
+  derGlobal(0, 3) = vPos * uSlope;
+  derGlobal(0, 4) = -uPos * uSlope;
+  derGlobal(0, 5) = vPos;
+
+  derGlobal(1, 0) = 0.0;
+  derGlobal(1, 1) = 1.0;
+  derGlobal(1, 2) = - vSlope;
+  derGlobal(1, 3) = vPos * vSlope;
+  derGlobal(1, 4) = -uPos * vSlope;
+  derGlobal(1, 5) = -uPos;
+
+  return derGlobal;
+}
+
+vector< int > SVDRecoHit2D::labels()
+{
+  VxdID vxdid(getPlaneId());
+  int sensorId = (int) vxdid;
+  std::vector<int> labGlobal;
+  // sensor label = sensorID * 10, then last digit is label for global derivative for the sensor
+  int label = sensorId * 10;
+
+  labGlobal.push_back(label + 1); // du
+  labGlobal.push_back(label + 2); // dv
+  labGlobal.push_back(label + 3); // dw
+  labGlobal.push_back(label + 4); // dalpha
+  labGlobal.push_back(label + 5); // dbeta
+  labGlobal.push_back(label + 6); // dgamma
+
+  return labGlobal;
+}
+
 

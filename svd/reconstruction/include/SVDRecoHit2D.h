@@ -41,7 +41,7 @@ namespace Belle2 {
    * }
    * @endcode
    */
-  class SVDRecoHit2D: public genfit::PlanarMeasurement {
+  class SVDRecoHit2D: public genfit::PlanarMeasurement, public genfit::ICalibrationParametersDerivatives {
   public:
     /** Default constructor for ROOT IO. */
     SVDRecoHit2D();
@@ -123,6 +123,22 @@ namespace Belle2 {
     /** Methods that actually interface to Genfit.  */
     //virtual genfit::SharedPlanePtr constructPlane(const genfit::StateOnPlane&) const;
     virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const;
+
+    /**
+     * @brief Derivatives for alignment parameters
+     *
+     * @param sop Predicted track state on plane
+     * @return TMatrixD
+     */
+    TMatrixD derivatives(const genfit::StateOnPlane* sop);
+
+    /**
+     * @brief Labels for alignment parameters
+     *
+     * @return std::vector< int, std::allocator< void > >
+     */
+    std::vector< int > labels();
+
   private:
 
     enum { HIT_DIMENSIONS = 2 /**< sensitive Dimensions of the Hit */ };

@@ -23,6 +23,7 @@
 #include <genfit/HMatrixU.h>
 #include <genfit/HMatrixV.h>
 #include <genfit/TrackCandHit.h>
+#include <genfit/ICalibrationParametersDerivatives.h>
 
 namespace Belle2 {
   /**
@@ -42,7 +43,7 @@ namespace Belle2 {
    * }
    * @endcode
    */
-  class SVDRecoHit: public genfit::PlanarMeasurement {
+  class SVDRecoHit: public genfit::PlanarMeasurement, public genfit::ICalibrationParametersDerivatives {
   public:
     /** Default constructor for ROOT IO. */
     SVDRecoHit();
@@ -105,6 +106,21 @@ namespace Belle2 {
 
     // TODO: use HMatrixPhi for wedge sensors instead of rotating the plane!
     virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const { if (m_isU) return new genfit::HMatrixU(); else return new genfit::HMatrixV(); }
+
+    /**
+     * @brief Derivatives for alignment parameters
+     *
+     * @param sop Predicted track state on plane
+     * @return TMatrixD
+     */
+    TMatrixD derivatives(const genfit::StateOnPlane* sop);
+
+    /**
+     * @brief Labels for alignment parameters
+     *
+     * @return std::vector< int, std::allocator< void > >
+     */
+    std::vector< int > labels();
 
   private:
 

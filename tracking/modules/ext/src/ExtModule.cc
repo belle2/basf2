@@ -139,8 +139,15 @@ void ExtModule::initialize()
     m_SteppingAction = const_cast<G4UserSteppingAction*>(m_RunMgr->GetUserSteppingAction());
     if (m_ExtMgr->PrintExtState() == G4String("G4ErrorState_PreInit")) {
       B2INFO("Ext will call InitGeant4e")
-      m_ExtMgr->InitGeant4e();
-      G4StateManager::GetStateManager()->SetNewState(G4State_Idle);
+      if (m_ExtMgr->PrintG4State() == G4String("G4State_Idle")) {
+        // ... if G4RunManager::RunInitialization() will be called via fullsim/beginRun()
+        m_ExtMgr->InitGeant4e();
+        G4StateManager::GetStateManager()->SetNewState(G4State_Idle);
+      } else {
+        // ... if G4RunManager::RunInitialization() has been called via fullsim/initialize()
+        G4StateManager::GetStateManager()->SetNewState(G4State_Idle);
+        m_ExtMgr->InitGeant4e();
+      }
     } else {
       B2INFO("Ext will not call InitGeant4e since it has already been initialized")
     }

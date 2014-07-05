@@ -93,7 +93,7 @@ namespace Belle2 {
     }
   }
 
-  //what is final state particle for this purpose
+  /** defines what is a final state particle for this purpose. */
   bool isFSP(int pdg)
   {
     switch (abs(pdg)) {

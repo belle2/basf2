@@ -43,9 +43,11 @@ namespace Belle2 {
   private:
     std::vector<std::string> m_DecayStringVector; /**< map variable names to values. */
 
-    std::map<std::string, unsigned int> m_StringLookupMap; //! List of already present decay strings. (Not serialized due to funny comment command)
+    /** List of already present decay strings. (Not serialized due to funny comment command) */
+    std::map<std::string, unsigned int> m_StringLookupMap; //!
 
-    bool m_LookupIsUpdated; //! is m_StringLookupMap up-to-date?
+    /** is m_StringLookupMap up-to-date?. */
+    bool m_LookupIsUpdated; //!
 
     ClassDef(DecayHashMap, 2); /**< Wrapper to store the the hash <-> decay string combinations of an event, used by ParticleMCDecayStringModule. */
   };

@@ -72,11 +72,11 @@ namespace Belle2 {
 
   private:
 
-    std::string m_listName; /** Name of the particle list **/
+    std::string m_listName; /**< Name of the particle list **/
 
-    std::vector<int> m_motherPDGs; /** List of potential mother particles **/
+    std::vector<int> m_motherPDGs; /**< List of potential mother particles **/
 
-    const std::string c_ExtraInfoName = "DecayHash"; /** Name of the extraInfo, which is stored in each Particle **/
+    const std::string c_ExtraInfoName = "DecayHash"; /**< Name of the extraInfo, which is stored in each Particle **/
   };
 
 } // Belle2 namespace

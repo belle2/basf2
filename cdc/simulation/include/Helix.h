@@ -217,7 +217,7 @@ namespace Belle2 {
 
       //! set limit for parameter "a"
       static void set_limits(const HepVector& a_min, const HepVector& a_max);
-      //!
+      //! set exception
       static bool set_exception(bool);
 
       /**
@@ -226,9 +226,9 @@ namespace Belle2 {
       static bool set_print(bool);
 
     private:
-      //!
+      //! minimum limit of Helix parameter a
       static HepVector ms_amin;
-      //!
+      //! maxiimum limit of Helix parameter a
       static HepVector ms_amax;
       //! Check the helix parameter's range.
       static bool ms_check_range;
@@ -242,13 +242,13 @@ namespace Belle2 {
     public: // Mathmatical functions
 
       HepMatrix delApDelA(const HepVector& ap) const;
-      //!
+      //! DX/DA
       HepMatrix delXDelA(double phi) const;
-      //!
+      //! DM/DA
       HepMatrix delMDelA(double phi) const;
-      //!
+      //! DM4/DA
       HepMatrix del4MDelA(double phi, double mass) const;
-      //!
+      //! DMX4/DA
       HepMatrix del4MXDelA(double phi, double mass) const;
 
     private:
@@ -294,9 +294,10 @@ namespace Belle2 {
       HepPoint3D m_center;
       //! Chache of the cos phi0
       double m_cp;
-      double m_sp; /// Chache of the sin phi0
+      //! Chache of the sin phi0
+      double m_sp;
       double m_pt;
-      //!
+      //! Cache of the r
       double m_r;
       //! Cache of the helix parameter.
       double m_ac[5];

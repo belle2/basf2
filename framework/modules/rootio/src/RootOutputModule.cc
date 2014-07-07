@@ -102,12 +102,12 @@ void RootOutputModule::initialize()
     //check for branch names that are not in the DataStore
     for (unsigned int iBranch = 0; iBranch < m_branchNames[ii].size(); iBranch++) {
       if (map.find(m_branchNames[ii][iBranch]) == map.end()) {
-        B2WARNING("The branch " << m_branchNames[ii][iBranch] << " has no entry in the DataStore.");
+        B2INFO("The branch " << m_branchNames[ii][iBranch] << " has no entry in the DataStore.");
       }
     }
     for (unsigned int iBranch = 0; iBranch < m_excludeBranchNames[ii].size(); iBranch++) {
       if (map.find(m_excludeBranchNames[ii][iBranch]) == map.end()) {
-        B2WARNING("The excluded branch " << m_excludeBranchNames[ii][iBranch] << " has no entry in the DataStore.");
+        B2INFO("The excluded branch " << m_excludeBranchNames[ii][iBranch] << " has no entry in the DataStore.");
       }
     }
 

@@ -12,8 +12,9 @@
 #ifndef FLAVORTAGGINGMODULE_H
 #define FLAVORTAGGINGMODULE_H
 
-#include <analysis/TMVAInterface/Teacher.h>
 #include <framework/core/Module.h>
+
+#include <analysis/TMVAInterface/Teacher.h>
 
 #include <mdst/dataobjects/KLMCluster.h>
 #include "mdst/dataobjects/ECLCluster.h"

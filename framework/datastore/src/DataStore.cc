@@ -408,6 +408,32 @@ RelationEntry DataStore::getRelationWith(ESearchSide searchSide, const TObject* 
   return RelationEntry(nullptr);
 }
 
+std::vector<std::string> DataStore::getListOfRelationsForArray(const StoreAccessorBase& array) const
+{
+  std::vector<std::string> relations;
+  if (!array.isArray()) {
+    B2ERROR("getListOfRelationsForArray(): " << array.readableName() << " is not an array!");
+    return relations;
+  }
+
+  //loop over all arrays
+  EDurability durability = array.getDurability();
+  for (auto & mapEntry : m_storeObjMap[durability]) {
+    if (mapEntry.second->isArray) {
+      const std::string& name = mapEntry.second->name;
+
+      //check both from & to 'array'
+      for (int searchSide = 0; searchSide < c_BothSides; searchSide++) {
+        const string& relationsName = (searchSide == c_ToSide) ? relationName(array.getName(), name) : relationName(name, array.getName());
+        const StoreObjConstIter& it = m_storeObjMap[durability].find(relationsName);
+        if (it != m_storeObjMap[durability].end())
+          relations.push_back(relationsName);
+      }
+    }
+  }
+
+  return relations;
+}
 
 void DataStore::clearMaps(EDurability durability)
 {

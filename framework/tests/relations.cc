@@ -8,7 +8,6 @@
 
 #include <boost/foreach.hpp>
 
-#include <iostream>
 using namespace std;
 using namespace Belle2;
 
@@ -451,6 +450,34 @@ namespace {
     EXPECT_EQ(DataStore::getRelationsFromObj<EventMetaData>(fromObj, "ALL").size(), 0u);
     //should work again
     EXPECT_EQ(DataStore::getRelationsFromObj<TObject>(fromObj, "ALL").size(), 4u);
+
+  }
+
+
+  TEST_F(RelationTest, ListOfRelationsForArray)
+  {
+    //2nd array of this type
+    StoreArray<ProfileInfo> profileData2("ProfileInfos2");
+
+    //nothing
+    EXPECT_EQ(0u, DataStore::Instance().getListOfRelationsForArray(profileData2).size());
+    EXPECT_EQ(0u, DataStore::Instance().getListOfRelationsForArray(profileData).size());
+    EXPECT_EQ(0u, DataStore::Instance().getListOfRelationsForArray(evtData).size());
+
+    DataStore::Instance().setInitializeActive(true);
+    profileData2.registerAsPersistent();
+    RelationArray relation(evtData, profileData);
+    relation.registerAsPersistent();
+    RelationArray relation2(evtData, profileData2);
+    relation2.registerAsPersistent();
+    DataStore::Instance().setInitializeActive(false);
+
+    EXPECT_EQ(1u, DataStore::Instance().getListOfRelationsForArray(profileData2).size());
+    EXPECT_EQ(1u, DataStore::Instance().getListOfRelationsForArray(profileData).size());
+    EXPECT_EQ(2u, DataStore::Instance().getListOfRelationsForArray(evtData).size());
+
+    EXPECT_EQ(relation2.getName(), DataStore::Instance().getListOfRelationsForArray(profileData2).at(0));
+    EXPECT_EQ(relation.getName(), DataStore::Instance().getListOfRelationsForArray(profileData).at(0));
   }
 
   /** Test adding/finding using RelationsObject/RelationsInterface. */

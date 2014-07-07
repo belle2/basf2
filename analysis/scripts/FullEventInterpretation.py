@@ -244,7 +244,6 @@ def FullEventInterpretation(path, particles):
                                     channelName='Name_' + channel.name,
                                     mvaConfig='MVAConfig_' + channel.name,
                                     particleList='ParticleList_' + channel.name + '_' + particle.name,
-                                    nBackground='nBackground_' + channel.name,
                                     daughterSignalProbabilities=['SignalProbability_' + daughter for daughter in channel.daughters])
                 seq.addResource('SignalProbability_' + particle.name, 'Dummy', requires=['SignalProbability_' + channel.name + '_' + particle.name for channel in particle.channels], strict=False)
                 seq.addResource('SignalProbability_' + pdg.conjugate(particle.name), 'Dummy', requires=['SignalProbability_' + particle.name])
@@ -265,8 +264,19 @@ def FullEventInterpretation(path, particles):
                         particleName='Name_' + particle.name,
                         texfiles=['Tex_' + channel.name for channel in particle.channels])
 
-        seq.addNeeded('SignalProbability_B+')
-        seq.addNeeded('SignalProbability_B0')
-        seq.addNeeded('ParticleList_B0')
-        seq.addNeeded('ParticleList_B+')
+    seq.addFunction(VariablesToNTuple,
+                    path='Path',
+                    particleList='ParticleList_B0',
+                    signalProbability='SignalProbability_B0')
+
+    seq.addFunction(VariablesToNTuple,
+                    path='Path',
+                    particleList='ParticleList_B+',
+                    signalProbability='SignalProbability_B+')
+
+    seq.addNeeded('SignalProbability_B+')
+    seq.addNeeded('SignalProbability_B0')
+    seq.addNeeded('ParticleList_B0')
+    seq.addNeeded('ParticleList_B+')
+
     seq.run(path, args.verbose)

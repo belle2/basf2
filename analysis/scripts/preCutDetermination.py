@@ -26,6 +26,8 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
 
     if preCutConfig.variable == 'Mass':
         variable = 'M'
+    elif preCutConfig.variable == 'Same':
+        variable = 'M'
     else:
         variable = 'daughterProductOf(getExtraInfo(SignalProbability))'
 
@@ -37,6 +39,12 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
 
         def ycut_to_xcuts(channel, cut):
             return (interpolations[channel].GetX(cut, signal[channel].GetXaxis().GetXmin(), maxima[channel]), interpolations[channel].GetX(cut, maxima[channel], signal[channel].GetXaxis().GetXmax()))
+    elif preCutConfig.variable == 'Same':
+        maxima = GetPositionsOfMaxima(signal)
+
+        def ycut_to_xcuts(channel, cut):
+            return (maxima[channel] - cut * 2, maxima[channel] + cut * 2)
+
     else:
 
         def ycut_to_xcuts(channel, cut):

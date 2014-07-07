@@ -56,7 +56,8 @@ namespace Belle2 {
 
       // Search for an existing tree in the file
       if (useExistingData) {
-        m_file->GetObject((tree_name + ";1").c_str(), m_tree);
+        //m_file->GetObject((tree_name + ";21").c_str(), m_tree);
+        m_file->GetObject((tree_name).c_str(), m_tree);
       }
 
       if (m_tree == nullptr) {
@@ -111,7 +112,7 @@ namespace Belle2 {
         it->second++;
     }
 
-    void Teacher::train(std::string factoryOption, std::string prepareOption)
+    void Teacher::train(std::string factoryOption, std::string prepareOption, unsigned int maxEventsPerClass)
     {
 
       // Change the workling directory to the user defined working directory
@@ -121,8 +122,12 @@ namespace Belle2 {
       m_file->cd();
 
       // Calculate the total number of events
+      std::vector<int> classesWhichReachedMaximum;
       unsigned int total = 0;
       for (auto & x : m_cluster_count) {
+        if (maxEventsPerClass != 0 and x.second > maxEventsPerClass) {
+          classesWhichReachedMaximum.push_back(x.first);
+        }
         total += x.second;
       }
 
@@ -132,6 +137,7 @@ namespace Belle2 {
         boost::property_tree::ptree node;
         node.put("ID", x.first);
         node.put("Count", x.second);
+        node.put("MaxEventUsedInTraining", maxEventsPerClass);
         node.put("Fraction", static_cast<double>(x.second) / total);
         pt.add_child("Setup.Clusters.Cluster", node);
       }
@@ -178,10 +184,15 @@ namespace Belle2 {
               factory.AddVariable(makeROOTCompatible(var->name));
             }
 
-            factory.AddSignalTree(m_tree);
-            factory.AddBackgroundTree(m_tree);
-            factory.PrepareTrainingAndTestTree(TCut((makeROOTCompatible(m_target_var->name) + " == " + signal.str()).c_str()),
-                                               TCut((makeROOTCompatible(m_target_var->name) + " == " + bckgrd.str()).c_str()), prepareOption);
+            // Copy Events from original tree to new signal and background tree.
+            // Unfortunatly this is necessary because TMVA internally uses vectors to store the data,
+            // therefore TMVA looses its out-of-core capability.
+            // The options nTrain_Background and nTest_Background (same for *_Signal) are applied
+            // after this transformation to vectors, therefore they're too late to prevent a allocation of huge amount of memory
+            // if one has many backgruond events.
+            factory.AddSignalTree(m_tree->CopyTree(TCut((makeROOTCompatible(m_target_var->name) + " == " + signal.str()).c_str()))->CopyTree("", "", maxEventsPerClass == 0 ? x.second : maxEventsPerClass));
+            factory.AddBackgroundTree(m_tree->CopyTree(TCut((makeROOTCompatible(m_target_var->name) + " == " + bckgrd.str()).c_str()))->CopyTree("", "", maxEventsPerClass == 0 ? y.second : maxEventsPerClass));
+            factory.PrepareTrainingAndTestTree("", prepareOption);
 
             // Append the trained methods to the config xml file
             for (auto & method : m_methods) {

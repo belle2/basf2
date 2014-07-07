@@ -74,8 +74,9 @@ namespace Belle2 {
        * Train, test and evaluate all methods
        * @param factoryOption options which are passed to the TMVA::Factory constructor, in most cases default options should be fine.
        * @param prepareOption options which are passed to the TMVA::Factory::PrepareTrainingAndTestTree, in most cases default options should be fine.
+       * @param maxEventsPerClass maximum number of events given to TMVA per class. TMVA internally uses a vector instead of a tree and therefore looses out-of-core ability.
        */
-      void train(std::string factoryOption = "!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification", std::string prepareOption = "SplitMode=random:!V");
+      void train(std::string factoryOption = "!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification", std::string prepareOption = "SplitMode=random:!V", unsigned int maxEventsPerClass = 0);
 
     private:
       std::string m_prefix; /**< used to identify the outputted training files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml */

@@ -87,6 +87,7 @@ namespace Belle2 {
     bool m_useExistingData; /**< Use existing data if available */
     bool m_doNotTrain; /**< do not train the method, just create the sample file. Useful for external training with externTeacher */
     bool m_trainOncePerJob; /**< Perform TMVA training once per job (in the terminate method instead of in the endRun method) */
+    unsigned int m_maxEventsPerClass; /**< Maximum nuber of events per class passed to TMVA */
 
     TMVAInterface::Teacher* m_teacher; /**< Used TMVA method */
 

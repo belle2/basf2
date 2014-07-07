@@ -42,6 +42,7 @@ namespace Belle2 {
     addParam("useExistingData", m_useExistingData, "Use existing data which is already stored in the $prefix.root file.", false);
     addParam("doNotTrain", m_doNotTrain, "Do not train, create only datafile with samples. Useful if you want to train outside of basf2 with the externTeacher tool.", false);
     addParam("trainOncePerJob", m_trainOncePerJob, "If true, training is performed once per job (in the terminate method instead of in the endRun method)", true);
+    addParam("maxEventsPerClass", m_maxEventsPerClass, "Maximum number of events per class passed to TMVA. 0 means no limit.", static_cast<unsigned int>(0));
 
     m_teacher = nullptr;
   }
@@ -81,7 +82,7 @@ namespace Belle2 {
   void TMVATeacherModule::trainTeacher()
   {
     if (not m_doNotTrain) {
-      m_teacher->train(m_factoryOption, m_prepareOption);
+      m_teacher->train(m_factoryOption, m_prepareOption, m_maxEventsPerClass);
     }
     delete m_teacher;
     m_teacher = nullptr;

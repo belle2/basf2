@@ -76,7 +76,7 @@ def MakeAndMatchParticleList(path, particleName, channelName, inputLists, preCut
             'ParticleList_' + channelName + '_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
 
 
-def SignalProbability(path, particleName, channelName, mvaConfig, particleList, nBackground=None, daughterSignalProbabilities=[]):
+def SignalProbability(path, particleName, channelName, mvaConfig, particleList, daughterSignalProbabilities=[]):
     """
     Calculates the SignalProbability of a ParticleList. If the files required from TMVAExpert aren't available they're created.
         @param path the basf2 path
@@ -84,14 +84,13 @@ def SignalProbability(path, particleName, channelName, mvaConfig, particleList, 
         @param channelName of channel which is classified
         @param mvaConfig configuration for the multivariate analysis
         @param particleList the particleList which is used for training and classification
-        @param nBackground number of background events
         @param daughterSignalProbabilities all daughter particles need a SignalProbability
     """
     if particleList is None or any([daughterSignalProbability is None for daughterSignalProbability in daughterSignalProbabilities]):
         return {'SignalProbability_' + channelName + '_' + particleName: None,
                 'SignalProbability_' + channelName + '_' + pdg.conjugate(particleName): None}
 
-    hash = actorFramework.createHash(particleName, channelName, mvaConfig, particleList, nBackground, daughterSignalProbabilities)
+    hash = actorFramework.createHash(particleName, channelName, mvaConfig, particleList, daughterSignalProbabilities)
 
     filename = '{particleList}_{hash}.config'.format(particleList=particleList, hash=hash)
     if os.path.isfile(filename):
@@ -118,20 +117,35 @@ def SignalProbability(path, particleName, channelName, mvaConfig, particleList, 
         teacher.param('prefix', particleList + '_' + hash)
         teacher.param('methods', [(mvaConfig.name, mvaConfig.type, mvaConfig.config)])
         teacher.param('factoryOption', '!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification')
-
-        if nBackground is None:
-            n = 0
-        elif nBackground < 2000000:
-            n = 0
-        else:
-            n = 1000000
-
-        teacher.param('prepareOption', 'SplitMode=random:!V:nTrain_Background={n}:nTest_Background={n}'.format(n=n))
+        teacher.param('prepareOption', 'SplitMode=random:!V')
         teacher.param('variables', mvaConfig.variables)
         teacher.param('target', mvaConfig.target)
         teacher.param('listNames', [particleList])
+        teacher.param('maxEventsPerClass', 1000000)
         path.add_module(teacher)
         return {}
+
+
+class VariablesToNTuple(path, particleList, signalProbability):
+    """
+    Saves the calculated signal probability for this particle list
+        @param path the basf2 path
+        @param particleList the particleList
+        @param signalProbability signalProbability as additional dependency
+    """
+    hash = actorFramework.createHash(particleList, signalProbability)
+    filename = '{particleList}_{hash}.root'.format(particleList=particleList, hash=hash)
+
+    if os.path.isfile(filename):
+        output = register_module('VariablesToNtuple')
+        output.param('particleList', particleList)
+        output.param('variables', ['getExtraInfo(SignalProbability)'])
+        output.param('fileName', filename)
+        output.param('treeName', 'variables')
+        path.add_module(output)
+        return {}
+
+    return {'VariablesToNTuple': filename}
 
 
 def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughterLists, additionalDependencies):
@@ -162,7 +176,7 @@ def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughte
         pmake.set_name('PreCutHistMaker_' + channelName)
         pmake.param('fileName', filename)
         pmake.param('decayString', outputList)
-        if preCutConfig.variable == 'Mass':
+        if preCutConfig.variable in ['Mass', 'Same']:
             mass = pdg.get(pdg.from_name(particleName)).Mass()
             pmake.param('variable', 'M')
             pmake.param('histParams', (200, mass / 2, mass + mass / 2))

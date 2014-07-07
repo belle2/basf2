@@ -86,32 +86,32 @@ class TestSignalProbability(unittest.TestCase):
         self.path = MockPath()
 
     def test_non_fsp_teacher(self):
-        hash = 'f33ca0b3926a6ef3fdffca0ceadb85ab6ef03075'
+        hash = '3727bb77c7f7f5577ea2eade97adea69e3eec95e'
         filename = 'D+:1_{hash}.config'.format(hash=hash)
         open(filename, 'a').close()
         os.remove(filename)
-        result = SignalProbability(self.path, 'D+', 'D+ -> pi+ K-', mvaConfig, 'D+:1', None, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        result = SignalProbability(self.path, 'D+', 'D+ -> pi+ K-', mvaConfig, 'D+:1', ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules), 1)
 
     def test_non_fsp_expert(self):
-        hash = 'f33ca0b3926a6ef3fdffca0ceadb85ab6ef03075'
+        hash = '3727bb77c7f7f5577ea2eade97adea69e3eec95e'
         filename = 'D+:1_{hash}.config'.format(hash=hash)
         open(filename, 'a').close()
-        result = SignalProbability(self.path, 'D+', 'D+ -> pi+ K-', mvaConfig, 'D+:1', None, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        result = SignalProbability(self.path, 'D+', 'D+ -> pi+ K-', mvaConfig, 'D+:1', ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
         self.assertDictEqual(result, {'SignalProbability_D+ -> pi+ K-_D+': 'D+:1_' + hash + '.config',
                                       'SignalProbability_D+ -> pi+ K-_D-': 'D+:1_' + hash + '.config'})
         os.remove(filename)
         self.assertEqual(len(self.path.modules), 1)
 
     def test_non_fsp_with_nones(self):
-        result = SignalProbability(self.path, 'D+', 'D+ -> pi+ K-', mvaConfig, 'D+:1', None, [None, 'SignalProbabilityHashK'])
+        result = SignalProbability(self.path, 'D+', 'D+ -> pi+ K-', mvaConfig, 'D+:1', [None, 'SignalProbabilityHashK'])
         self.assertDictEqual(result, {'SignalProbability_D+ -> pi+ K-_D+': None,
                                       'SignalProbability_D+ -> pi+ K-_D-': None})
         self.assertEqual(len(self.path.modules), 0)
 
     def test_fsp_teacher(self):
-        hash = '10c53868227bfb2edffa5a9bfc5c5c6d9af542eb'
+        hash = 'd02f42dce674a689665bce945e81cfafe92c547f'
         filename = 'e+:1_{hash}.config'.format(hash=hash)
         open(filename, 'a').close()
         os.remove(filename)
@@ -120,7 +120,7 @@ class TestSignalProbability(unittest.TestCase):
         self.assertEqual(len(self.path.modules), 1)
 
     def test_fsp_expert(self):
-        hash = '10c53868227bfb2edffa5a9bfc5c5c6d9af542eb'
+        hash = 'd02f42dce674a689665bce945e81cfafe92c547f'
         filename = 'e+:1_{hash}.config'.format(hash=hash)
         open(filename, 'a').close()
         result = SignalProbability(self.path, 'e+', 'e+', mvaConfig, 'e+:1')
@@ -132,7 +132,8 @@ class TestSignalProbability(unittest.TestCase):
 
 preCutConfig = Particle.PreCutConfiguration(
     variable='Mass',
-    efficiency=0.7
+    efficiency=0.7,
+    purity=0.01
 )
 
 

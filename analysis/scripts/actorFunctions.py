@@ -93,6 +93,7 @@ def SignalProbability(path, particleName, channelName, mvaConfig, particleList, 
     hash = actorFramework.createHash(particleName, channelName, mvaConfig, particleList, daughterSignalProbabilities)
 
     filename = '{particleList}_{hash}.config'.format(particleList=particleList, hash=hash)
+
     if os.path.isfile(filename):
 
         expert = register_module('TMVAExpert')

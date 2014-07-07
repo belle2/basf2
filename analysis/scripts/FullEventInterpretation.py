@@ -45,11 +45,11 @@ class Particle(object):
     ## Create new class called MVAConfiguration via namedtuple. namedtuples are like a struct in C
     MVAConfiguration = collections.namedtuple('MVAConfiguration', 'name, type, config, variables, target, targetCluster')
     ## Create new class called PreCutConfiguration via namedtuple. namedtuples are like a struct in C
-    PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'variable, efficiency')
+    PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'variable, efficiency, purity')
     ## Create new class called DecayChannel via namedtuple. namedtuples are like a struct in C
     DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, mvaConfig, isIncomplete')
 
-    def __init__(self, name, mvaConfig, preCutConfig=PreCutConfiguration(variable='Mass', efficiency=0.70), explicitCuts=[]):
+    def __init__(self, name, mvaConfig, preCutConfig=PreCutConfiguration(variable='Mass', efficiency=0.70, purity=0.001), explicitCuts=[]):
         """
         Creates a Particle without any decay channels. To add decay channels use addChannel method.
             @param name is the correct pdg name as a string of the particle.

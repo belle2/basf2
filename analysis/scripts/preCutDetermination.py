@@ -50,7 +50,7 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
         def ycut_to_xcuts(channel, cut):
             return (interpolations[channel].GetX(cut, 0, 1), 1)
 
-    cuts = GetCuts(signal, preCutConfig.efficiency, ycut_to_xcuts)
+    cuts = GetCuts(signal, bckgrd, preCutConfig.efficiency, preCutConfig.purity, ycut_to_xcuts)
 
     result = {channel: {'variable': variable, 'range': range, 'isIgnored': False,
                         'nBackground': GetNumberOfEventsInRange(bckgrd[channel], range),
@@ -58,6 +58,7 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
     for ignoredChannel in GetIgnoredChannels(signal, bckgrd, cuts):
         result[ignoredChannel]['isIgnored'] = True
         B2WARNING("Ignoring channel " + ignoredChannel + "!")
+    print result
     return result
 
 
@@ -133,20 +134,37 @@ def GetFitFunctions(histograms):
     return dict
 
 
-def GetCuts(signal, efficiency, ycut_to_xcuts):
+def GetCuts(signal, bckgrd, efficiency, purity, ycut_to_xcuts):
     """
     Calculates the individual cuts on the x-axis for all channels
     @param signal signal histograms of the channels
-    @param efficiency the minimal efficiency for each channel
+    @param bckgrd signal histograms of the channels
+    @param efficiency the maximal efficiency for the channels in total
+    @param purity the minimal purity for the channels in total
     @param ycut_to_xcuts function which calculates xcuts from a given cut on the y-axis
     """
-    nDesiredSignal = sum([value.GetEntries() for value in signal.values()]) * efficiency
 
-    def nSignal_after_cut(ycut):
-        return sum([GetNumberOfEventsInRange(s, ycut_to_xcuts(channel, ycut[0])) for (channel, s) in signal.iteritems()])
+    nSignal = sum([value.GetEntries() for value in signal.values()])
 
-    f = ROOT.TF1('Cut_function', nSignal_after_cut, 0, 1, 0)
-    ycut = f.GetX(nDesiredSignal, 0.0, 1.0)
+    if nSignal == 0:
+        B2WARNING("No signal present")
+        return {channel: (0, 0) for channel in signal.iterkeys()}
+
+    def pythonEfficiencyFunc(ycut):
+        return sum([GetNumberOfEventsInRange(s, ycut_to_xcuts(channel, ycut[0])) for (channel, s) in signal.iteritems()]) / float(nSignal)
+
+    def pythonPurityFunc(ycut):
+        s = sum([GetNumberOfEventsInRange(h, ycut_to_xcuts(channel, ycut[0])) for (channel, h) in signal.iteritems()])
+        b = sum([GetNumberOfEventsInRange(h, ycut_to_xcuts(channel, ycut[0])) for (channel, h) in bckgrd.iteritems()])
+        return s / float(s + b)
+
+    rootEfficiencyFunc = ROOT.TF1('EfficiencyFunction', pythonEfficiencyFunc, 0, 1, 0)
+    ycut = rootEfficiencyFunc.GetX(efficiency, 0.0, 1.0)
+
+    if pythonPurityFunc([ycut]) < purity:
+        rootPurityFunc = ROOT.TF1('PurityFunction', pythonPurityFunc, 0, 1, 0)
+        ycut = rootPurityFunc.GetX(purity, 0.0, 1.0)
+
     return {channel: ycut_to_xcuts(channel, ycut) for channel in signal.iterkeys()}
 
 
@@ -169,5 +187,5 @@ def GetIgnoredChannels(signal, bckgrd, cuts):
     @param cuts cuts on the x-axis of the channels
     """
     def isIgnored(channel):
-        return cuts[channel][0] == cuts[channel][1] or GetNumberOfEventsInRange(signal[channel], cuts[channel]) < 100 or GetNumberOfEventsInRange(bckgrd[channel], cuts[channel]) < 100
+        return abs(cuts[channel][0] - cuts[channel][1]) < 1e-4 or GetNumberOfEventsInRange(signal[channel], cuts[channel]) < 100 or GetNumberOfEventsInRange(bckgrd[channel], cuts[channel]) < 100
     return [channel for channel in signal.iterkeys() if isIgnored(channel)]

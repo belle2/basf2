@@ -126,20 +126,24 @@ def SignalProbability(path, particleName, channelName, mvaConfig, particleList, 
         return {}
 
 
-class VariablesToNTuple(path, particleList, signalProbability):
+def VariablesToNTuple(path, particleList, signalProbability):
     """
     Saves the calculated signal probability for this particle list
         @param path the basf2 path
         @param particleList the particleList
         @param signalProbability signalProbability as additional dependency
     """
-    hash = actorFramework.createHash(particleList, signalProbability)
-    filename = '{particleList}_{hash}.root'.format(particleList=particleList, hash=hash)
 
-    if os.path.isfile(filename):
+    if particleList is None or signalProbability is None:
+        return {'VariablesToNTuple': None}
+
+    hash = actorFramework.createHash(particleList, signalProbability)
+    filename = 'var_{particleList}_{hash}.root'.format(particleList=particleList, hash=hash)
+
+    if not os.path.isfile(filename):
         output = register_module('VariablesToNtuple')
         output.param('particleList', particleList)
-        output.param('variables', ['getExtraInfo(SignalProbability)'])
+        output.param('variables', ['getExtraInfo(SignalProbability)', 'isSignal'])
         output.param('fileName', filename)
         output.param('treeName', 'variables')
         path.add_module(output)
@@ -268,7 +272,7 @@ def WriteAnalysisFileForChannel(particleName, channelName, channelList, preCutCo
 
     placeholders['channelNSignal'] = int(nsignal)
     placeholders['channelNBackground'] = int(nbckgrd)
-    placeholders['channelPurity'] = '{:.3f}'.format(purity)
+    placeholders['channelPurity'] = '{:.5f}'.format(purity)
     placeholders['channelEfficiency'] = '{:.3f}'.format(efficiency)
 
     placeholders['preCutVariable'] = preCutConfig.variable

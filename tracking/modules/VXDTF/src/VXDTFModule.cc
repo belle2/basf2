@@ -609,7 +609,7 @@ VXDTFModule::VXDTFModule() : Module()
            rootFileNameVals);
   addParam("displayCollector",
            m_PARAMdisplayCollector,
-           "Collector operating flag: 0 = no collector, 1 = collect for display, 2 = collect for analysis",
+           "Collector operating flag: 0 = no collector, 1 = collect for analysis, 2 = collect for display",
            int(0));
 
 }

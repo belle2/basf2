@@ -88,7 +88,7 @@ TFAnalizerModule::TFAnalizerModule() : Module()
   addParam("rootFileName", m_PARAMrootFileName, " only two entries accepted, first one is the root filename, second one is 'RECREATE' or 'UPDATE' which is the write mode for the root file, parameter is used only if 'writeToRoot'=true  ", rootFileNameVals);
 
   // Display
-  addParam("collectorDisplayId", m_display, "Flag for Collector (collects information about trackFinder) Settings: 0 = deactivate Collector, 1=activate it for display with files, 2=activate for analysis, 3=activate for display without files", int(0));
+  addParam("collectorDisplayId", m_display, "Flag for Collector (collects information about trackFinder) Settings: 0 = deactivate Collector, 1 = activate for analysis, 2 = activate for display", int(0));
 
   addParam("collectorFilePath", m_collectorFilePath, "File Path for the Collector", string(""));
 

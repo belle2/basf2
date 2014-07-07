@@ -640,7 +640,7 @@ namespace Belle2 {
 
     // Member Variables for Collector/Display
     CollectorTFInfo m_collector; /**< Object that collectes all the Information needed for the collector*/
-    int m_PARAMdisplayCollector;  /**< Collector operating flag: 0 = no collector, 1 = collect for display, 2 = collect for analysis */
+    int m_PARAMdisplayCollector;  /**< Collector operating flag: 0 = no collector, 1 = collect for analysis, 2 = collect for display */
     int m_aktpassNumber;  /**< Pass Number Information used for the collector */
 
 

@@ -117,11 +117,11 @@ namespace Belle2 {
   }
 
 
-  std::string ParticleMCDecayStringModule::buildDecayString(const MCParticle& mcPMother, const MCParticle& mcP)
+  std::string ParticleMCDecayStringModule::buildDecayString(const MCParticle& mcPMother, const MCParticle& mcPMatched)
   {
     std::stringstream ss;
     ss << " ";
-    if (mcPMother.getArrayIndex() == mcP.getArrayIndex()) {
+    if (mcPMother.getArrayIndex() == mcPMatched.getArrayIndex()) {
       ss << "^";
     }
 
@@ -130,7 +130,7 @@ namespace Belle2 {
     } else {
       ss << mcPMother.getPDG() << " (-->";
       for (auto daughter : mcPMother.getDaughters()) {
-        ss << buildDecayString(*daughter, mcP);
+        ss << buildDecayString(*daughter, mcPMatched);
       }
       ss << ")";
     }
@@ -140,20 +140,20 @@ namespace Belle2 {
 
   std::string ParticleMCDecayStringModule::getDecayString(const Particle& p)
   {
-    const MCParticle* mcP = p.getRelatedTo<MCParticle>();
-    if (mcP == nullptr)
+    const MCParticle* mcPMatched = p.getRelatedTo<MCParticle>();
+    if (mcPMatched == nullptr)
       return ("No MC match");
-    else if (mcP->getPDG() == 300553)
+    else if (mcPMatched->getPDG() == 300553)
       return ("Y(4S) match");
-    else if (mcP->getPDG() == 10022)
+    else if (mcPMatched->getPDG() == 10022)
       return ("Virtual gamma match");
 
-    const MCParticle* mcPMother = getMother(*mcP);
+    const MCParticle* mcPMother = getMother(*mcPMatched);
 
     if (mcPMother == nullptr)
       return ("No mother found");
 
-    return buildDecayString(*mcPMother, *mcP);
+    return buildDecayString(*mcPMother, *mcPMatched);
   }
 
 } // Belle2 namespace

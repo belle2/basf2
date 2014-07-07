@@ -1,6 +1,6 @@
 /**************************************************************************
 * BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2010 - Belle II Collaboration                             *
+* Copyright(C) 2014 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
 * Contributors: Bastian Kronenbitter                                     *
@@ -40,7 +40,8 @@ namespace Belle2 {
     /** The decay string **/
     char m_decayString[c_lengthOfDecayString];
 
-    const std::string c_ExtraInfoName = "DecayHash"; /** Name of the extraInfo, which is stored in each Particle **/
+    /** Name of the extraInfo, which is stored in each Particle **/
+    const std::string c_ExtraInfoName = "DecayHash";
   };
 
 } // namespace Belle2

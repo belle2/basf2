@@ -67,8 +67,8 @@ namespace Belle2 {
     /** search from mcP upwards for a particle that matches specified mother PDG codes. */
     const MCParticle* getMother(const MCParticle& mcP);
 
-    /** return decay string for mcPMother, highlight mcP. */
-    std::string buildDecayString(const MCParticle& mcPMother, const MCParticle& mcP);
+    /** return decay string for mcPMother, highlight mcPMatched. */
+    std::string buildDecayString(const MCParticle& mcPMother, const MCParticle& mcPMatched);
 
   private:
 

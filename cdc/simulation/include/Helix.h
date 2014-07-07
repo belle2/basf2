@@ -232,8 +232,10 @@ namespace Belle2 {
       static HepVector ms_amax;
       //! Check the helix parameter's range.
       static bool ms_check_range;
-      static bool ms_print_debug;     /*! Debug option flag. */
-      static bool ms_throw_exception; /*! Throw exception flag. */
+      //! Debug option flag.
+      static bool ms_print_debug;
+      //! Throw exception flag.
+      static bool ms_throw_exception;
 
     public: // Operators
 
@@ -279,15 +281,19 @@ namespace Belle2 {
 
     private:
 
-      //!
+      //! True: matrix valid, False: matrix not valid.
       bool m_matrixValid;
       //! True: helix valid, False: helix not valid.
       bool m_helixValid;
-      double m_bField;    /*! Magnetic field, assuming uniform Bz in the unit of  kG. */
+      //! Magnetic field, assuming uniform Bz in the unit of  kG.
+      double m_bField;
       double m_alpha;     /*! 10000.0/(speed of light)/B. */
-      HepPoint3D m_pivot; /*! Pivot */
-      HepVector m_a;      /*! Helix parameter. */
-      HepSymMatrix m_Ea;  /*! Error of the helix parameter. */
+      //! Pivot
+      HepPoint3D m_pivot;
+      //! Helix parameter.
+      HepVector m_a;
+      //! Error of the helix parameter.
+      HepSymMatrix m_Ea;
 
     private: // caches
 
@@ -296,13 +302,15 @@ namespace Belle2 {
       double m_cp;
       //! Chache of the sin phi0
       double m_sp;
+      //! Cache of the pt
       double m_pt;
       //! Cache of the r
       double m_r;
       //! Cache of the helix parameter.
       double m_ac[5];
 
-      static const std::string invalidhelix; /// String "Invalid Helix".
+      //! String "Invalid Helix".
+      static const std::string invalidhelix;
 
     };
 

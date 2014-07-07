@@ -425,6 +425,8 @@ void DataStore::reset(EDurability durability)
     delete mapEntry.second;
   }
   m_storeObjMap[durability].clear();
+  //invalidate any cached relations (expect RelationArrays to remain valid)
+  RelationIndexManager::Instance().clear();
 }
 
 bool DataStore::require(const StoreAccessorBase& accessor)

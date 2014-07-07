@@ -34,6 +34,7 @@ int main(int argc, char* argv[])
   ("factoryOption", po::value<std::string>(), "Option passed to TMVA::Factory")
   ("prepareOption", po::value<std::string>(), "Option passed to TMVA::Factory::PrepareTrainingAndTestTree")
   ("createMVAPDFs", "Creates the MVA PDFs for signal and background. This is needed to transform the output of the trained method to a probability.")
+  ("maxEventsPerClass", po::value<int>(),  "Maximum number of events per class")
   ;
 
   po::variables_map vm;
@@ -112,6 +113,11 @@ int main(int argc, char* argv[])
     return 1;
   }
 
+  int maxEventsPerClass = 0;
+  if (vm.count("maxEventsPerClass") == 1) {
+    maxEventsPerClass = vm["maxEventsPerClass"].as<int>();
+  }
+
   std::cout << "Received options" << std::endl;
   std::cout << "\t methodName \t" << methodName << std::endl;
   std::cout << "\t methodType \t" << methodType << std::endl;
@@ -121,6 +127,7 @@ int main(int argc, char* argv[])
   std::cout << "\t target \t" << target << std::endl;
   std::cout << "\t factoryOption \t" << factoryOption << std::endl;
   std::cout << "\t prepareOption \t" << prepareOption << std::endl;
+  std::cout << "\t maxEventsPerClass \t" << maxEventsPerClass << std::endl;
   std::cout << "\t Variables " << std::endl;
 
   for (auto & var : variables) {
@@ -130,7 +137,7 @@ int main(int argc, char* argv[])
   std::vector<TMVAInterface::Method> methods;
   methods.push_back(TMVAInterface::Method(methodName, methodType, methodConfig, variables));
   TMVAInterface::Teacher* teacher = new TMVAInterface::Teacher(prefix, workingDirectory, target, methods, true);
-  teacher->train(factoryOption, prepareOption);
+  teacher->train(factoryOption, prepareOption, maxEventsPerClass);
 
   delete teacher;
   return 0;

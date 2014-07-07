@@ -32,6 +32,8 @@ def SelectParticleList(path, particleName, explicitCuts):
     userLabel = actorFramework.createHash(particleName, explicitCuts)
     outputList = particleName + ':' + userLabel
     modularAnalysis.selectParticle(outputList, explicitCuts, path=path)
+
+    B2INFO("Select Particle List " + outputList + " and charged conjugated")
     return {'ParticleList_' + particleName: outputList,
             'ParticleList_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
 
@@ -46,11 +48,14 @@ def CopyParticleLists(path, particleName, inputLists, pdf):
     """
     inputLists = actorFramework.removeNones(inputLists)
     if inputLists == []:
+        B2INFO("Gather Particle List for particle " + particleName + " and charged conjugated. But there are no particles to gather :-(.")
         return {'ParticleList_' + particleName: None, 'ParticleList_' + pdg.conjugate(particleName): None}
 
     userLabel = actorFramework.createHash(particleName, inputLists)
     outputList = particleName + ':' + userLabel
     modularAnalysis.copyLists(outputList, inputLists, path=path)
+
+    B2INFO("Gather Particle List for particle " + particleName + " and charged conjugated")
     return {'ParticleList_' + particleName: outputList,
             'ParticleList_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
 
@@ -65,6 +70,7 @@ def MakeAndMatchParticleList(path, particleName, channelName, inputLists, preCut
         @param preCut cuts which are applied before the combining of the particles
     """
     if preCut is None:
+        B2INFO("Make and Match Particle List for channel " + channelName + " and charged conjugated. But the channel is ignored :-(.")
         return {'ParticleList_' + channelName + '_' + particleName: None, 'ParticleList_' + channelName + '_' + pdg.conjugate(particleName): None}
 
     userLabel = actorFramework.createHash(particleName, channelName, inputLists, preCut)
@@ -72,6 +78,7 @@ def MakeAndMatchParticleList(path, particleName, channelName, inputLists, preCut
     listName = particleName + ':' + userLabel
     modularAnalysis.makeParticle(outputList, preCut, path=path)
     modularAnalysis.matchMCTruth(listName, path=path)
+    B2INFO("Make and Match Particle List for channel " + channelName + " and charged conjugated.")
     return {'ParticleList_' + channelName + '_' + particleName: listName,
             'ParticleList_' + channelName + '_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
 
@@ -87,32 +94,16 @@ def SignalProbability(path, particleName, channelName, mvaConfig, particleList, 
         @param daughterSignalProbabilities all daughter particles need a SignalProbability
     """
     if particleList is None or any([daughterSignalProbability is None for daughterSignalProbability in daughterSignalProbabilities]):
+        B2INFO("Calculate SignalProbability for channel " + channelName + " and charged conjugated. But the channel is ignored :-(.")
         return {'SignalProbability_' + channelName + '_' + particleName: None,
                 'SignalProbability_' + channelName + '_' + pdg.conjugate(particleName): None}
 
     hash = actorFramework.createHash(particleName, channelName, mvaConfig, particleList, daughterSignalProbabilities)
 
-    filename = '{particleList}_{hash}.config'.format(particleList=particleList, hash=hash)
+    rootFilename = '{particleList}_{hash}.root'.format(particleList=particleList, hash=hash)
+    configFilename = '{particleList}_{hash}.config'.format(particleList=particleList, hash=hash)
 
-    if os.path.isfile(filename):
-
-        expert = register_module('TMVAExpert')
-        expert.set_name('TMVAExpert_' + particleList)
-        expert.param('prefix', particleList + '_' + hash)
-        expert.param('method', mvaConfig.name)
-        expert.param('signalProbabilityName', 'SignalProbability')
-        expert.param('signalCluster', mvaConfig.targetCluster)
-        expert.param('listNames', [particleList])
-        path.add_module(expert)
-
-        if particleName == channelName:
-            return {'SignalProbability_' + particleName: filename,
-                    'SignalProbability_' + pdg.conjugate(particleName): filename}
-        else:
-            return {'SignalProbability_' + channelName + '_' + particleName: filename,
-                    'SignalProbability_' + channelName + '_' + pdg.conjugate(particleName): filename}
-
-    else:
+    if not os.path.isfile(rootFilename):
         teacher = register_module('TMVATeacher')
         teacher.set_name('TMVATeacher_' + particleList)
         teacher.param('prefix', particleList + '_' + hash)
@@ -123,8 +114,42 @@ def SignalProbability(path, particleName, channelName, mvaConfig, particleList, 
         teacher.param('target', mvaConfig.target)
         teacher.param('listNames', [particleList])
         teacher.param('maxEventsPerClass', 1000000)
+        teacher.param('doNotTrain', True)
         path.add_module(teacher)
+        B2INFO("Calculate SignalProbability for channel " + channelName + " and charged conjugated. Create root file with variables first.")
         return {}
+
+    if not os.path.isfile(configFilename):
+        B2INFO("Calculate SignalProbability for channel " + channelName + " and charged conjugated. Run Teacher in extern process.")
+        subprocess.call("externTeacher --methodName '{name}' --methodType '{type}' --methodConfig '{config}' --target '{target}'"
+                        " --variables '{variables}' --factoryOption '{foption}' --prepareOption '{poption}' --prefix '{prefix}'"
+                        " --maxEventsPerClass {maxEvents}".format(name=mvaConfig.name, type=mvaConfig.type, config=mvaConfig.config,
+                                                                  target=mvaConfig.target, variables="' '".join(mvaConfig.variables),
+                                                                  foption='!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification',
+                                                                  poption='SplitMode=random:!V', maxEvents=1000000,
+                                                                  prefix=particleList + '_' + hash), shell=True)
+
+    if os.path.isfile(configFilename):
+
+        expert = register_module('TMVAExpert')
+        expert.set_name('TMVAExpert_' + particleList)
+        expert.param('prefix', particleList + '_' + hash)
+        expert.param('method', mvaConfig.name)
+        expert.param('signalProbabilityName', 'SignalProbability')
+        expert.param('signalCluster', mvaConfig.targetCluster)
+        expert.param('listNames', [particleList])
+        path.add_module(expert)
+
+        B2INFO("Calculate SignalProbability for channel " + channelName + " and charged conjugated.")
+        if particleName == channelName:
+            return {'SignalProbability_' + particleName: configFilename,
+                    'SignalProbability_' + pdg.conjugate(particleName): configFilename}
+        else:
+            return {'SignalProbability_' + channelName + '_' + particleName: configFilename,
+                    'SignalProbability_' + channelName + '_' + pdg.conjugate(particleName): configFilename}
+
+    B2ERROR("Training of channel " + channelName + " failed")
+    return {}
 
 
 def VariablesToNTuple(path, particleList, signalProbability):
@@ -136,6 +161,7 @@ def VariablesToNTuple(path, particleList, signalProbability):
     """
 
     if particleList is None or signalProbability is None:
+        B2INFO("Write variables to ntuple for " + particleList + " and charged conjugated. But list is ignored.")
         return {'VariablesToNTuple': None}
 
     hash = actorFramework.createHash(particleList, signalProbability)
@@ -148,8 +174,10 @@ def VariablesToNTuple(path, particleList, signalProbability):
         output.param('fileName', filename)
         output.param('treeName', 'variables')
         path.add_module(output)
+        B2INFO("Write variables to ntuple for " + particleList + " and charged conjugated.")
         return {}
 
+    B2INFO("Write variables to ntuple for " + particleList + " and charged conjugated. But file already exists, so nothiong to do here.")
     return {'VariablesToNTuple': filename}
 
 
@@ -164,6 +192,7 @@ def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughte
         @param daughterSignalProbabilities all daughter particles need a SignalProbability
     """
     if any([daughterList is None for daughterList in daughterLists]) or any([x is None for x in additionalDependencies]):
+        B2INFO("Create pre cut histogram for channel " + channelName + " and charged conjugated. But channel is ignored.")
         return {'PreCutHistogram_' + channelName: None}
 
     # Check if the file is available. If the file isn't available yet, create it with
@@ -173,6 +202,7 @@ def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughte
     filename = 'CutHistograms_{pname}_{cname}_{hash}.root'.format(pname=particleName, cname=channelName, hash=hash)
 
     if os.path.isfile(filename):
+        B2INFO("Create pre cut histogram for channel " + channelName + " and charged conjugated. But file already exists, so nothiong to do here.")
         return {'PreCutHistogram_' + channelName: (filename, particleName + ':' + hash)}
     else:
         # Combine all the particles according to the decay channels
@@ -189,6 +219,8 @@ def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughte
             pmake.param('variable', 'daughterProductOf(getExtraInfo(SignalProbability))')
             pmake.param('customBinning', list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])))
         path.add_module(pmake)
+
+    B2INFO("Create pre cut histogram for channel " + channelName + " and charged conjugated.")
     return {}
 
 
@@ -210,6 +242,8 @@ def PreCutDetermination(particleName, channelNames, preCutConfig, preCutHistogra
         results['PreCut_' + channel] = None if cut['isIgnored'] else {cut['variable']: cut['range']}
         results['nSignal_' + channel] = None if cut['isIgnored'] else cut['nSignal']
         results['nBackground_' + channel] = None if cut['isIgnored'] else cut['nBackground']
+
+    B2INFO("Calculate pre cut for particle " + particleName + " and charged conjugated.")
     return results
 
 
@@ -227,16 +261,23 @@ def WriteAnalysisFileForChannel(particleName, channelName, channelList, preCutCo
     """
 
     if signalProbability is None or preCut is None:
+        B2INFO("Write analysis tex file for channel " + channelName + " and charged conjugated. But channel is ignored.")
         return {'Tex_' + channelName: None}
 
     ROOT.gROOT.SetBatch(True)
 
     # Create TMVA Plots
     tmva_filename = signalProbability[:-7] + '.root'  # Strip .config of filename
-    subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/mvas.C(\\"{f}\\",3)"'.format(f=tmva_filename)], shell=True)
-    subprocess.call(['cp plots/$(ls -t plots/ | head -1) {c}_overtraining.png'.format(c=channelList)], shell=True)
-    subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/efficiencies.C(\\"{f}\\")"'.format(f=tmva_filename)], shell=True)
-    subprocess.call(['cp plots/$(ls -t plots/ | head -1) {c}_roc.png'.format(c=channelList)], shell=True)
+
+    overtrainingPlot = channelList + '_overtraining.png'
+    if not os.path.isfile(overtrainingPlot):
+        subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/mvas.C(\\"{f}\\",3)"'.format(f=tmva_filename)], shell=True)
+        subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=overtrainingPlot)], shell=True)
+
+    rocPlot = channelList + '_roc.png'
+    if not os.path.isfile(rocPlot):
+        subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/efficiencies.C(\\"{f}\\")"'.format(f=tmva_filename)], shell=True)
+        subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=rocPlot)], shell=True)
 
     # Create PreCut Hist Plots
     rootfile = ROOT.TFile(preCutHistogram[0])
@@ -244,15 +285,17 @@ def WriteAnalysisFileForChannel(particleName, channelName, channelList, preCutCo
     keys = rootfile.GetListOfKeys()
     lc, uc = preCut.values()[0]
     for (name, key) in zip(names, keys):
-        canvas = ROOT.TCanvas(name + channelList + '_canvas', name, 600, 400)
-        canvas.cd()
-        hist = rootfile.Get(key.GetName())
-        hist.Draw()
-        ll = ROOT.TLine(lc, 0, lc, hist.GetMaximum())
-        ul = ROOT.TLine(uc, 0, uc, hist.GetMaximum())
-        ll.Draw()
-        ul.Draw()
-        canvas.SaveAs(channelList + '_' + name + '.png')
+        plotName = channelList + '_' + name + '.png'
+        if not os.path.isfile(plotName):
+            canvas = ROOT.TCanvas(name + channelList + '_canvas', name, 600, 400)
+            canvas.cd()
+            hist = rootfile.Get(key.GetName())
+            hist.Draw()
+            ll = ROOT.TLine(lc, 0, lc, hist.GetMaximum())
+            ul = ROOT.TLine(uc, 0, uc, hist.GetMaximum())
+            ll.Draw()
+            ul.Draw()
+            canvas.SaveAs(plotName)
 
     # Calculate purity and efficiency for this channel
     # ...
@@ -293,14 +336,17 @@ def WriteAnalysisFileForChannel(particleName, channelName, channelList, preCutCo
     placeholders['mvaTarget'] = mvaConfig.target
     placeholders['mvaTargetCluster'] = mvaConfig.targetCluster
 
-    placeholders['mvaROCPlot'] = channelList + '_roc.png'
-    placeholders['mvaOvertrainingPlot'] = channelList + '_overtraining.png'
+    placeholders['mvaROCPlot'] = rocPlot
+    placeholders['mvaOvertrainingPlot'] = overtrainingPlot
 
-    template = Template(file(ROOT.Belle2.FileSystem.findFile('analysis/scripts/FullEventInterpretationChannelTemplate.tex'), 'r').read())
-    page = template.substitute(placeholders)
     filename = channelList + '.tex'
-    file(filename, 'w').write(page)
-
+    if not os.path.isfile(filename):
+        template = Template(file(ROOT.Belle2.FileSystem.findFile('analysis/scripts/FullEventInterpretationChannelTemplate.tex'), 'r').read())
+        page = template.substitute(placeholders)
+        file(filename, 'w').write(page)
+        B2INFO("Write analysis tex file for channel " + channelName + " and charged conjugated.")
+    else:
+        B2INFO("Write analysis tex file for channel " + channelName + " and charged conjugated. But file already exists, nothing to do here.")
     return {'Tex_' + channelName: (filename, placeholders)}
 
 
@@ -310,26 +356,31 @@ def WriteAnalysisFileForParticle(particleName, texfiles):
         @param particleName name of the particle
         @param texfiles list of tex filenames
     """
-    placeholders = {}
-    placeholders['NChannels'] = len(texfiles)
-    texfiles = actorFramework.removeNones(texfiles)
-    placeholders['NUsedChannels'] = len(texfiles)
-
-    placeholders['particleName'] = particleName
-    placeholders['channelInputs'] = ""
-    placeholders['particleNSignal'] = 0
-    placeholders['particleNBackground'] = 0
-    for texfile, channelPlaceholders in texfiles:
-        placeholders['particleNSignal'] += channelPlaceholders['channelNSignal']
-        placeholders['particleNBackground'] += channelPlaceholders['channelNBackground']
-        placeholders['channelInputs'] += '\include{' + texfile[:-4] + '}\n'
-
-    template = Template(file(ROOT.Belle2.FileSystem.findFile('analysis/scripts/FullEventInterpretationParticleTemplate.tex'), 'r').read())
-    page = template.substitute(placeholders)
     filename = particleName + '.tex'
-    file(filename, 'w').write(page)
+    if not os.path.isfile(filename):
 
-    subprocess.call(['pdflatex', filename])
+        placeholders = {}
+        placeholders['NChannels'] = len(texfiles)
+        texfiles = actorFramework.removeNones(texfiles)
+        placeholders['NUsedChannels'] = len(texfiles)
 
+        placeholders['particleName'] = particleName
+        placeholders['channelInputs'] = ""
+        placeholders['particleNSignal'] = 0
+        placeholders['particleNBackground'] = 0
+        for texfile, channelPlaceholders in texfiles:
+            placeholders['particleNSignal'] += channelPlaceholders['channelNSignal']
+            placeholders['particleNBackground'] += channelPlaceholders['channelNBackground']
+            placeholders['channelInputs'] += '\include{' + texfile[:-4] + '}\n'
+
+        template = Template(file(ROOT.Belle2.FileSystem.findFile('analysis/scripts/FullEventInterpretationParticleTemplate.tex'), 'r').read())
+        page = template.substitute(placeholders)
+
+        file(filename, 'w').write(page)
+
+        subprocess.call(['pdflatex', filename])
+        B2INFO("Write analysis tex file and create pdf for particle " + particleName + " and charged conjugated.")
+    else:
+        B2INFO("Write analysis tex file and create pdf for particle " + particleName + " and charged conjugated. But file already exists, nothing to do here.")
     # Return None - Therefore Particle List depends not on TMVAExpert directly
     return {'PDF_' + particleName: None}  # filename[:-4] + '.pdf'}

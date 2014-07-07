@@ -87,21 +87,25 @@ class TestSignalProbability(unittest.TestCase):
 
     def test_non_fsp_teacher(self):
         hash = '3727bb77c7f7f5577ea2eade97adea69e3eec95e'
-        filename = 'D+:1_{hash}.config'.format(hash=hash)
-        open(filename, 'a').close()
-        os.remove(filename)
+        filename = 'D+:1_{hash}'.format(hash=hash)
+        open(filename + '.root', 'a').close()
+        open(filename + '.config', 'a').close()
+        os.remove(filename + '.root')
+        os.remove(filename + '.config')
         result = SignalProbability(self.path, 'D+', 'D+ -> pi+ K-', mvaConfig, 'D+:1', ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules), 1)
 
     def test_non_fsp_expert(self):
         hash = '3727bb77c7f7f5577ea2eade97adea69e3eec95e'
-        filename = 'D+:1_{hash}.config'.format(hash=hash)
-        open(filename, 'a').close()
+        filename = 'D+:1_{hash}'.format(hash=hash)
+        open(filename + '.root', 'a').close()
+        open(filename + '.config', 'a').close()
         result = SignalProbability(self.path, 'D+', 'D+ -> pi+ K-', mvaConfig, 'D+:1', ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
         self.assertDictEqual(result, {'SignalProbability_D+ -> pi+ K-_D+': 'D+:1_' + hash + '.config',
                                       'SignalProbability_D+ -> pi+ K-_D-': 'D+:1_' + hash + '.config'})
-        os.remove(filename)
+        os.remove(filename + '.root')
+        os.remove(filename + '.config')
         self.assertEqual(len(self.path.modules), 1)
 
     def test_non_fsp_with_nones(self):
@@ -112,19 +116,23 @@ class TestSignalProbability(unittest.TestCase):
 
     def test_fsp_teacher(self):
         hash = 'd02f42dce674a689665bce945e81cfafe92c547f'
-        filename = 'e+:1_{hash}.config'.format(hash=hash)
-        open(filename, 'a').close()
-        os.remove(filename)
+        filename = 'e+:1_{hash}'.format(hash=hash)
+        open(filename + '.root', 'a').close()
+        open(filename + '.config', 'a').close()
+        os.remove(filename + '.root')
+        os.remove(filename + '.config')
         result = SignalProbability(self.path, 'e+', 'e+', mvaConfig, 'e+:1')
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules), 1)
 
     def test_fsp_expert(self):
         hash = 'd02f42dce674a689665bce945e81cfafe92c547f'
-        filename = 'e+:1_{hash}.config'.format(hash=hash)
-        open(filename, 'a').close()
+        filename = 'e+:1_{hash}'.format(hash=hash)
+        open(filename + '.root', 'a').close()
+        open(filename + '.config', 'a').close()
         result = SignalProbability(self.path, 'e+', 'e+', mvaConfig, 'e+:1')
-        os.remove(filename)
+        os.remove(filename + '.root')
+        os.remove(filename + '.config')
         self.assertDictEqual(result, {'SignalProbability_e+': 'e+:1_' + hash + '.config',
                                       'SignalProbability_e-': 'e+:1_' + hash + '.config'})
         self.assertEqual(len(self.path.modules), 1)

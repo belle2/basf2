@@ -58,7 +58,6 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
     for ignoredChannel in GetIgnoredChannels(signal, bckgrd, cuts):
         result[ignoredChannel]['isIgnored'] = True
         B2WARNING("Ignoring channel " + ignoredChannel + "!")
-    print result
     return result
 
 

@@ -56,19 +56,27 @@ namespace Belle2 {
 
       // Search for an existing tree in the file
       if (useExistingData) {
-        //m_file->GetObject((tree_name + ";21").c_str(), m_tree);
         m_file->GetObject((tree_name).c_str(), m_tree);
       }
 
       if (m_tree == nullptr) {
+
         if (useExistingData)
           B2INFO("Couldn't find existing data, create new tree")
+
           m_tree = new TTree(tree_name.c_str(), tree_name.c_str());
+
+        for (unsigned int i = 0; i < variables.size(); ++i)
+          m_tree->Branch(makeROOTCompatible(variables[i]->name).c_str(), &m_input[i]);
+        m_tree->Branch(makeROOTCompatible(m_target_var->name).c_str(), &m_target);
+
+      } else {
+        for (unsigned int i = 0; i < variables.size(); ++i)
+          m_tree->SetBranchAddress(makeROOTCompatible(variables[i]->name).c_str(), &m_input[i]);
+        m_tree->SetBranchAddress(makeROOTCompatible(m_target_var->name).c_str(), &m_target);
       }
 
-      for (unsigned int i = 0; i < variables.size(); ++i)
-        m_tree->Branch(makeROOTCompatible(variables[i]->name).c_str(), &m_input[i]);
-      m_tree->Branch(makeROOTCompatible(m_target_var->name).c_str(), &m_target);
+
 
       TBranch* targetBranch  = m_tree->GetBranch(makeROOTCompatible(m_target_var->name).c_str());
       targetBranch->SetAddress(&m_target);
@@ -86,7 +94,8 @@ namespace Belle2 {
 
     Teacher::~Teacher()
     {
-      m_tree->Write();
+      m_file->cd();
+      m_tree->Write("", TObject::kOverwrite);
       delete m_tree;
       m_file->Close();
     }

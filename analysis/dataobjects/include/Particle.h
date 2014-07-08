@@ -494,6 +494,34 @@ namespace Belle2 {
     bool overlapsWith(const Particle* oParticle) const;
 
     /**
+     * Returns the pointer to the Track object that was used to create this Particle (ParticleType == c_Track).
+     * NULL pointer is returned, if the Particle was not made from Track.
+     * @return const pointer to the Track
+     */
+    const Track* getTrack() const;
+
+    /**
+     * Returns the pointer to the ECLCluster object that was used to create this Particle (ParticleType == c_ECLCluster).
+     * NULL pointer is returned, if the Particle was not made from ECLCluster.
+     * @return const pointer to the ECLCluster
+     */
+    const ECLCluster* getECLCluster() const;
+
+    /**
+     * Returns the pointer to the KLMCluster object that was used to create this Particle (ParticleType == c_KLMCluster).
+     * NULL pointer is returned, if the Particle was not made from KLMCluster.
+     * @return const pointer to the KLMCluster
+     */
+    const KLMCluster* getKLMCluster() const;
+
+    /**
+     * Returns the pointer to the MCParticle object that was used to create this Particle (ParticleType == c_MCParticle).
+     * NULL pointer is returned, if the Particle was not made from MCParticle.
+     * @return const pointer to the MCParticle
+     */
+    const MCParticle* getMCParticle() const;
+
+    /**
      * Prints the contents of a Particle object to standard output.
      */
     void print() const;

@@ -457,6 +457,41 @@ bool Particle::overlapsWith(const Particle* oParticle) const
   return false;
 }
 
+const Track* Particle::getTrack() const
+{
+  if (m_particleType == c_Track) {
+    StoreArray<Track> tracks;
+    return tracks[m_mdstIndex];
+  } else
+    return nullptr;
+}
+
+const ECLCluster* Particle::getECLCluster() const
+{
+  if (m_particleType == c_ECLCluster) {
+    StoreArray<ECLCluster> eclClusters;
+    return eclClusters[m_mdstIndex];
+  } else
+    return nullptr;
+}
+
+const KLMCluster* Particle::getKLMCluster() const
+{
+  if (m_particleType == c_KLMCluster) {
+    StoreArray<KLMCluster> klmClusters;
+    return klmClusters[m_mdstIndex];
+  } else
+    return nullptr;
+}
+
+const MCParticle* Particle::getMCParticle() const
+{
+  if (m_particleType == c_MCParticle) {
+    StoreArray<MCParticle> mcParticles;
+    return mcParticles[m_mdstIndex];
+  } else
+    return nullptr;
+}
 
 //--- private methods --------------------------------------------
 

@@ -22,7 +22,7 @@ using namespace Belle2;
 
 namespace Belle2 {
 
-  /** Writes DeltaE and M_bc of B candidate to flat ntuple. */
+  /** Writes continuum suppression variables to flat ntuple. */
   class NtupleContinuumSuppressionTool : public NtupleFlatTool {
   private:
     float m_fThrustB; /** magnitude of B thrust axis */

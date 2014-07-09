@@ -20,6 +20,7 @@
 
 // dataobjects
 #include <analysis/dataobjects/RestOfEvent.h>
+#include <analysis/dataobjects/ContinuumSuppression.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
@@ -969,6 +970,564 @@ namespace Belle2 {
       return 1.0;
     }
 
+    // Continuum Suppression  -------------------------------
+
+    double thrustBm(const Particle* particle)
+    {
+      double result = -1.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      result = qq->getThrustBm();
+
+      return result;
+    }
+
+    double thrustOm(const Particle* particle)
+    {
+      double result = -1.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      result = qq->getThrustOm();
+
+      return result;
+    }
+
+    double cosTBTO(const Particle* particle)
+    {
+      double result = -1.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      result = qq->getCosTBTO();
+
+      return result;
+    }
+
+    double cosTBz(const Particle* particle)
+    {
+      double result = -1.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      result = qq->getCosTBz();
+
+      return result;
+    }
+
+    double k0mm2(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS0 = qq->getKsfwFS0();
+      result = ksfwFS0.at(0);
+
+      return result;
+    }
+
+    double k0et(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS0 = qq->getKsfwFS0();
+      result = ksfwFS0.at(1);
+
+      return result;
+    }
+
+    double k0hso00(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS0 = qq->getKsfwFS0();
+      result = ksfwFS0.at(2);
+
+      return result;
+    }
+
+    double k0hso01(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS0 = qq->getKsfwFS0();
+      result = ksfwFS0.at(3);
+
+      return result;
+    }
+
+    double k0hso02(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS0 = qq->getKsfwFS0();
+      result = ksfwFS0.at(4);
+
+      return result;
+    }
+
+    double k0hso03(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS0 = qq->getKsfwFS0();
+      result = ksfwFS0.at(5);
+
+      return result;
+    }
+
+    double k0hso04(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS0 = qq->getKsfwFS0();
+      result = ksfwFS0.at(6);
+
+      return result;
+    }
+
+    double k0hso10(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS0 = qq->getKsfwFS0();
+      result = ksfwFS0.at(7);
+
+      return result;
+    }
+
+    double k0hso12(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS0 = qq->getKsfwFS0();
+      result = ksfwFS0.at(8);
+
+      return result;
+    }
+
+    double k0hso14(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS0 = qq->getKsfwFS0();
+      result = ksfwFS0.at(9);
+
+      return result;
+    }
+
+    double k0hso20(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS0 = qq->getKsfwFS0();
+      result = ksfwFS0.at(10);
+
+      return result;
+    }
+
+    double k0hso22(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS0 = qq->getKsfwFS0();
+      result = ksfwFS0.at(11);
+
+      return result;
+    }
+
+    double k0hso24(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS0 = qq->getKsfwFS0();
+      result = ksfwFS0.at(12);
+
+      return result;
+    }
+
+    double k0hoo0(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS0 = qq->getKsfwFS0();
+      result = ksfwFS0.at(13);
+
+      return result;
+    }
+
+    double k0hoo1(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS0 = qq->getKsfwFS0();
+      result = ksfwFS0.at(14);
+
+      return result;
+    }
+
+    double k0hoo2(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS0 = qq->getKsfwFS0();
+      result = ksfwFS0.at(15);
+
+      return result;
+    }
+
+    double k0hoo3(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS0 = qq->getKsfwFS0();
+      result = ksfwFS0.at(16);
+
+      return result;
+    }
+
+    double k0hoo4(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS0 = qq->getKsfwFS0();
+      result = ksfwFS0.at(17);
+
+      return result;
+    }
+
+    double k1mm2(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS1 = qq->getKsfwFS1();
+      result = ksfwFS1.at(0);
+
+      return result;
+    }
+
+    double k1et(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS1 = qq->getKsfwFS1();
+      result = ksfwFS1.at(1);
+
+      return result;
+    }
+
+    double k1hso00(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS1 = qq->getKsfwFS1();
+      result = ksfwFS1.at(2);
+
+      return result;
+    }
+
+    double k1hso01(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS1 = qq->getKsfwFS1();
+      result = ksfwFS1.at(3);
+
+      return result;
+    }
+
+    double k1hso02(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS1 = qq->getKsfwFS1();
+      result = ksfwFS1.at(4);
+
+      return result;
+    }
+
+    double k1hso03(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS1 = qq->getKsfwFS1();
+      result = ksfwFS1.at(5);
+
+      return result;
+    }
+
+    double k1hso04(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS1 = qq->getKsfwFS1();
+      result = ksfwFS1.at(6);
+
+      return result;
+    }
+
+    double k1hso10(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS1 = qq->getKsfwFS1();
+      result = ksfwFS1.at(7);
+
+      return result;
+    }
+
+    double k1hso12(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS1 = qq->getKsfwFS1();
+      result = ksfwFS1.at(8);
+
+      return result;
+    }
+
+    double k1hso14(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS1 = qq->getKsfwFS1();
+      result = ksfwFS1.at(9);
+
+      return result;
+    }
+
+    double k1hso20(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS1 = qq->getKsfwFS1();
+      result = ksfwFS1.at(10);
+
+      return result;
+    }
+
+    double k1hso22(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS1 = qq->getKsfwFS1();
+      result = ksfwFS1.at(11);
+
+      return result;
+    }
+
+    double k1hso24(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS1 = qq->getKsfwFS1();
+      result = ksfwFS1.at(12);
+
+      return result;
+    }
+
+    double k1hoo0(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS1 = qq->getKsfwFS1();
+      result = ksfwFS1.at(13);
+
+      return result;
+    }
+
+    double k1hoo1(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS1 = qq->getKsfwFS1();
+      result = ksfwFS1.at(14);
+
+      return result;
+    }
+
+    double k1hoo2(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS1 = qq->getKsfwFS1();
+      result = ksfwFS1.at(15);
+
+      return result;
+    }
+
+    double k1hoo3(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS1 = qq->getKsfwFS1();
+      result = ksfwFS1.at(16);
+
+      return result;
+    }
+
+    double k1hoo4(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> ksfwFS1 = qq->getKsfwFS1();
+      result = ksfwFS1.at(17);
+
+      return result;
+    }
+
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
@@ -1096,6 +1655,47 @@ namespace Belle2 {
     REGISTER_VARIABLE("nKLMClusters", nKLMClusters, "number of KLM in the event");
     REGISTER_VARIABLE("ECLEnergy", ECLEnergy, "total energy in ECL in the event");
     REGISTER_VARIABLE("KLMEnergy", KLMEnergy, "total energy in KLM in the event");
+
+    VARIABLE_GROUP("Continuum Suppression");
+    REGISTER_VARIABLE("cosTBTO"  , cosTBTO , "cosine of angle between thrust axis of B and thrust axis of ROE");
+    REGISTER_VARIABLE("cosTBz"   , cosTBz  , "cosine of angle between thrust axis of B and z-axis");
+    REGISTER_VARIABLE("thrustBm" , thrustBm, "magnitude of the B thrust axis");
+    REGISTER_VARIABLE("thrustOm" , thrustOm, "magnitude of the ROE thrust axis");
+    REGISTER_VARIABLE("k0mm2"    , k0mm2   , "missing mass squared for FS=0");
+    REGISTER_VARIABLE("k0et"     , k0et    , "transverse energy for FS=0");
+    REGISTER_VARIABLE("k0hso00"  , k0hso00 , "Hso(0,0) for FS=0");
+    REGISTER_VARIABLE("k0hso01"  , k0hso01 , "Hso(0,1) for FS=0");
+    REGISTER_VARIABLE("k0hso02"  , k0hso02 , "Hso(0,2) for FS=0");
+    REGISTER_VARIABLE("k0hso03"  , k0hso03 , "Hso(0,3) for FS=0");
+    REGISTER_VARIABLE("k0hso04"  , k0hso04 , "Hso(0,4) for FS=0");
+    REGISTER_VARIABLE("k0hso10"  , k0hso10 , "Hso(1,0) for FS=0");
+    REGISTER_VARIABLE("k0hso12"  , k0hso12 , "Hso(1,2) for FS=0");
+    REGISTER_VARIABLE("k0hso14"  , k0hso14 , "Hso(1,4) for FS=0");
+    REGISTER_VARIABLE("k0hso20"  , k0hso20 , "Hso(2,0) for FS=0");
+    REGISTER_VARIABLE("k0hso22"  , k0hso22 , "Hso(2,2) for FS=0");
+    REGISTER_VARIABLE("k0hso24"  , k0hso24 , "Hso(2,4) for FS=0");
+    REGISTER_VARIABLE("k0hoo0"   , k0hoo0  , "Roo(0)   for FS=0");
+    REGISTER_VARIABLE("k0hoo1"   , k0hoo1  , "Roo(1)   for FS=0");
+    REGISTER_VARIABLE("k0hoo2"   , k0hoo2  , "Roo(2)   for FS=0");
+    REGISTER_VARIABLE("k0hoo3"   , k0hoo3  , "Roo(3)   for FS=0");
+    REGISTER_VARIABLE("k0hoo4"   , k0hoo4  , "Roo(4)   for FS=0");
+    REGISTER_VARIABLE("k1mm2"    , k1mm2   , "missing mass squared for FS=1");
+    REGISTER_VARIABLE("k1et"     , k1et    , "transverse energy for FS=1");
+    REGISTER_VARIABLE("k1hso00"  , k1hso00 , "Hso(0,0) for FS=1");
+    REGISTER_VARIABLE("k1hso01"  , k1hso01 , "Hso(0,1) for FS=1");
+    REGISTER_VARIABLE("k1hso02"  , k1hso02 , "Hso(0,2) for FS=1");
+    REGISTER_VARIABLE("k1hso03"  , k1hso03 , "Hso(0,3) for FS=1");
+    REGISTER_VARIABLE("k1hso04"  , k1hso04 , "Hso(0,4) for FS=1");
+    REGISTER_VARIABLE("k1hso10"  , k1hso10 , "Hso(1,0) for FS=1");
+    REGISTER_VARIABLE("k1hso12"  , k1hso12 , "Hso(1,2) for FS=1");
+    REGISTER_VARIABLE("k1hso14"  , k1hso14 , "Hso(1,4) for FS=1");
+    REGISTER_VARIABLE("k1hso20"  , k1hso20 , "Hso(2,0) for FS=1");
+    REGISTER_VARIABLE("k1hso22"  , k1hso22 , "Hso(2,2) for FS=1");
+    REGISTER_VARIABLE("k1hso24"  , k1hso24 , "Hso(2,4) for FS=1");
+    REGISTER_VARIABLE("k1hoo0"   , k1hoo0  , "Roo(0)   for FS=1");
+    REGISTER_VARIABLE("k1hoo1"   , k1hoo1  , "Roo(1)   for FS=1");
+    REGISTER_VARIABLE("k1hoo2"   , k1hoo2  , "Roo(2)   for FS=1");
+    REGISTER_VARIABLE("k1hoo3"   , k1hoo3  , "Roo(3)   for FS=1");
+    REGISTER_VARIABLE("k1hoo4"   , k1hoo4  , "Roo(4)   for FS=1");
   }
 }
-

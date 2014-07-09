@@ -239,10 +239,12 @@ namespace Belle2 {
 
     public: // Operators
 
-      Helix& operator = (const Helix&);       /// Copy operator.
+      //! Copy operator.
+      Helix& operator = (const Helix&);
 
     public: // Mathmatical functions
 
+      //! DAp/DA
       HepMatrix delApDelA(const HepVector& ap) const;
       //! DX/DA
       HepMatrix delXDelA(double phi) const;
@@ -287,7 +289,8 @@ namespace Belle2 {
       bool m_helixValid;
       //! Magnetic field, assuming uniform Bz in the unit of  kG.
       double m_bField;
-      double m_alpha;     /*! 10000.0/(speed of light)/B. */
+      //! 10000.0/(speed of light)/B.
+      double m_alpha;
       //! Pivot
       HepPoint3D m_pivot;
       //! Helix parameter.
@@ -297,10 +300,11 @@ namespace Belle2 {
 
     private: // caches
 
+      //! Cache of the center position of Helix
       HepPoint3D m_center;
-      //! Chache of the cos phi0
+      //! Cache of the cos phi0
       double m_cp;
-      //! Chache of the sin phi0
+      //! Cache of the sin phi0
       double m_sp;
       //! Cache of the pt
       double m_pt;

@@ -33,43 +33,43 @@ namespace Belle2 {
 
     // For final state = 0
     float m_k0mm2;    /** missing mass squared */
-    float m_k0et;     /** E_{T} */
-    float m_k0hso00;  /** H_{00}^{so} */
-    float m_k0hso01;  /** H_{01}^{so} */
-    float m_k0hso02;  /** H_{02}^{so} */
-    float m_k0hso03;  /** H_{03}^{so} */
-    float m_k0hso04;  /** H_{04}^{so} */
-    float m_k0hso10;  /** H_{10}^{so} */
-    float m_k0hso12;  /** H_{12}^{so} */
-    float m_k0hso14;  /** H_{14}^{so} */
-    float m_k0hso20;  /** H_{20}^{so} */
-    float m_k0hso22;  /** H_{22}^{so} */
-    float m_k0hso24;  /** H_{24}^{so} */
-    float m_k0hoo0;   /** R_{0}^{oo} */
-    float m_k0hoo1;   /** R_{1}^{oo} */
-    float m_k0hoo2;   /** R_{2}^{oo} */
-    float m_k0hoo3;   /** R_{3}^{oo} */
-    float m_k0hoo4;   /** R_{4}^{oo} */
+    float m_k0et;     /** transverse energy */
+    float m_k0hso00;  /** Hso(0,0) */
+    float m_k0hso01;  /** Hso(0,1) */
+    float m_k0hso02;  /** Hso(0,2) */
+    float m_k0hso03;  /** Hso(0,3) */
+    float m_k0hso04;  /** Hso(0,4) */
+    float m_k0hso10;  /** Hso(1,0) */
+    float m_k0hso12;  /** Hso(1,2) */
+    float m_k0hso14;  /** Hso(1,4) */
+    float m_k0hso20;  /** Hso(2,0) */
+    float m_k0hso22;  /** Hso(2,2) */
+    float m_k0hso24;  /** Hso(2,4) */
+    float m_k0hoo0;   /** Roo(0) */
+    float m_k0hoo1;   /** Roo(1) */
+    float m_k0hoo2;   /** Roo(2) */
+    float m_k0hoo3;   /** Roo(3) */
+    float m_k0hoo4;   /** Roo(4) */
 
     // For final state = 1
     float m_k1mm2;    /** missing mass squared */
-    float m_k1et;     /** E_{T} */
-    float m_k1hso00;  /** H_{00}^{so} */
-    float m_k1hso01;  /** H_{01}^{so} */
-    float m_k1hso02;  /** H_{02}^{so} */
-    float m_k1hso03;  /** H_{03}^{so} */
-    float m_k1hso04;  /** H_{04}^{so} */
-    float m_k1hso10;  /** H_{10}^{so} */
-    float m_k1hso12;  /** H_{12}^{so} */
-    float m_k1hso14;  /** H_{14}^{so} */
-    float m_k1hso20;  /** H_{20}^{so} */
-    float m_k1hso22;  /** H_{22}^{so} */
-    float m_k1hso24;  /** H_{24}^{so} */
-    float m_k1hoo0;   /** R_{0}^{oo} */
-    float m_k1hoo1;   /** R_{1}^{oo} */
-    float m_k1hoo2;   /** R_{2}^{oo} */
-    float m_k1hoo3;   /** R_{3}^{oo} */
-    float m_k1hoo4;   /** R_{4}^{oo} */
+    float m_k1et;     /** transverse energy */
+    float m_k1hso00;  /** Hso(0,0) */
+    float m_k1hso01;  /** Hso(0,1) */
+    float m_k1hso02;  /** Hso(0,2) */
+    float m_k1hso03;  /** Hso(0,3) */
+    float m_k1hso04;  /** Hso(0,4) */
+    float m_k1hso10;  /** Hso(1,0) */
+    float m_k1hso12;  /** Hso(1,2) */
+    float m_k1hso14;  /** Hso(1,4) */
+    float m_k1hso20;  /** Hso(2,0) */
+    float m_k1hso22;  /** Hso(2,2) */
+    float m_k1hso24;  /** Hso(2,4) */
+    float m_k1hoo0;   /** Roo(0) */
+    float m_k1hoo1;   /** Roo(1) */
+    float m_k1hoo2;   /** Roo(2) */
+    float m_k1hoo3;   /** Roo(3) */
+    float m_k1hoo4;   /** Roo(4) */
 
 
     /** Create branches in m_tree - this function should be called by the constructor only. */

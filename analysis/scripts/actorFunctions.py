@@ -170,15 +170,16 @@ def VariablesToNTuple(path, particleList, signalProbability):
     if not os.path.isfile(filename):
         output = register_module('VariablesToNtuple')
         output.param('particleList', particleList)
-        output.param('variables', ['getExtraInfo(SignalProbability)', 'isSignal'])
+        output.param('variables', ['getExtraInfo(SignalProbability)', 'isSignal', 'Mbc', 'mcStatus'])
         output.param('fileName', filename)
         output.param('treeName', 'variables')
         path.add_module(output)
         B2INFO("Write variables to ntuple for " + particleList + " and charged conjugated.")
         return {}
 
-    B2INFO("Write variables to ntuple for " + particleList + " and charged conjugated. But file already exists, so nothiong to do here.")
-    return {'VariablesToNTuple': filename}
+    B2INFO("Write variables to ntuple for " + particleList + " and charged conjugated. But file already exists, so nothing to do here.")
+    particleName = particleList.split(':')[0]
+    return {'VariablesToNTuple_' + particleName: filename}
 
 
 def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughterLists, additionalDependencies):
@@ -202,7 +203,7 @@ def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughte
     filename = 'CutHistograms_{pname}_{cname}_{hash}.root'.format(pname=particleName, cname=channelName, hash=hash)
 
     if os.path.isfile(filename):
-        B2INFO("Create pre cut histogram for channel " + channelName + " and charged conjugated. But file already exists, so nothiong to do here.")
+        B2INFO("Create pre cut histogram for channel " + channelName + " and charged conjugated. But file already exists, so nothing to do here.")
         return {'PreCutHistogram_' + channelName: (filename, particleName + ':' + hash)}
     else:
         # Combine all the particles according to the decay channels
@@ -390,5 +391,34 @@ def WriteAnalysisFileForParticle(particleName, texfiles):
         B2INFO("Write analysis tex file and create pdf for particle " + particleName + " and charged conjugated.")
     else:
         B2INFO("Write analysis tex file and create pdf for particle " + particleName + " and charged conjugated. But file already exists, nothing to do here.")
+
+    return {'PDF_' + particleName: filename[:-4] + '.pdf'}
+
+
+def WriteAnalysisFileSummary(pdffiles, ntuples):
+    """
+    Creates a pdf summarizing all networks trained.
+        @param texfiles list of tex filenames
+    """
+
+    #gather the previously produced PDFs
+    fileList = []
+    for fileName in pdffiles:
+        #fileName = f[4:] + '.pdf'
+        if os.path.isfile(fileName):
+            fileList.append(fileName)
+
+    #create Mbc plots
+    from makeMbcPlot import makeMbcPlot
+    B2WARNING("i got these ntuples: " + str(ntuples))
+    for ntupleFile in ntuples:
+        outputFile = ntupleFile[:-5] + '_mbc.pdf'
+        makeMbcPlot(ntupleFile, outputFile)
+        fileList.append(outputFile)
+
+    #TODO: overall efficiencies in our channels
+
+    subprocess.call(['pdfunite'] + fileList + ['FEIsummary.pdf'])
+
     # Return None - Therefore Particle List depends not on TMVAExpert directly
-    return {'PDF_' + particleName: None}  # filename[:-4] + '.pdf'}
+    return {'PDF_FEIsummary': None}

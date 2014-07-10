@@ -22,7 +22,7 @@ def makeDiagPlot(outputPrefix, tmvaFile, methodName):
     """
     testTree = tmvaFile.Get('TestTree')
     if testTree.GetEntries() == 0:
-        raise 'TestTree is empty'
+        raise RuntimeError('TestTree is empty')
 
     nbins = 100
     varPrefix = ''  # there's also a prob_MethodName variable, but not sure what it is. it definitely looks odd.
@@ -61,7 +61,7 @@ def makeDiagPlot(outputPrefix, tmvaFile, methodName):
     purityPerBin = ROOT.TGraphErrors(len(x), x, y, xerr, yerr)
 
     plotTitle = 'Diagonal plot for ' + methodName
-    canvas = ROOT.TCanvas(plotTitle, plotTitle, 600, 400)
+    canvas = ROOT.TCanvas(plotTitle + outputPrefix, plotTitle, 600, 400)
     canvas.cd()
 
     purityPerBin.SetTitle(';' + probabilityVar + ' output;'
@@ -83,6 +83,10 @@ def makeDiagPlots(fileName, outputPrefix):
     tmvaFile = ROOT.TFile(fileName)
 
     # which methods were trained?
-    methods = tmvaFile.Get('Method_Plugins')
+    try:
+        methods = tmvaFile.Get('Method_Plugins')
+    except:
+        raise RuntimeError('Problem opening file ' + fileName)
+
     for m in methods.GetListOfKeys():
         makeDiagPlot(outputPrefix, tmvaFile, m.GetName())

@@ -264,6 +264,7 @@ def FullEventInterpretation(path, particles):
                         particleName='Name_' + particle.name,
                         texfiles=['Tex_' + channel.name for channel in particle.channels])
 
+    #TODO: don't hardcode B0/B+ here
     seq.addFunction(VariablesToNTuple,
                     path='Path',
                     particleList='ParticleList_B0',
@@ -273,6 +274,10 @@ def FullEventInterpretation(path, particles):
                     path='Path',
                     particleList='ParticleList_B+',
                     signalProbability='SignalProbability_B+')
+
+    seq.addFunction(WriteAnalysisFileSummary,
+                    pdffiles=['PDF_' + particle.name for particle in particles],
+                    ntuples=['VariablesToNTuple_B0'])  # , 'VariablesToNTuple_B+'])
 
     seq.addNeeded('SignalProbability_B+')
     seq.addNeeded('SignalProbability_B0')

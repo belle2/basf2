@@ -258,6 +258,7 @@ void Module::exposePythonAPI()
   .def("event", &PyModule::def_event)
   .def("endRun", &PyModule::def_endRun)
   .def("terminate", &PyModule::def_terminate)
+  .enable_pickling()
   ;
 
   register_ptr_to_python<ModulePtr>();

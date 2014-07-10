@@ -154,7 +154,13 @@ void CDCGeometryPar::read()
 
   // Get control switch for gas and wire material definition
   m_materialDefinitionMode = gbxParams.getInt("MaterialDefinitionMode");
-  //  std::cout <<"m_materialDefinitionMode in CDCGeometryPar= " << m_materialDefinitionMode << std::endl;
+  if (m_materialDefinitionMode == 0) {
+    B2INFO("CDCGeometryPar: Define a mixture of gases and wires in the tracking volume.");
+  } else if (m_materialDefinitionMode == 2) {
+    B2INFO("CDCGeometryPar: Define all sense and field wires explicitly in the tracking volume.");
+  } else {
+    B2FATAL("CDCGeometryPar: Materialdefinition mode you specify is invalid.");
+  }
 
   // Loop over all sense layers
   for (int iSLayer = 0; iSLayer < nSLayer; ++iSLayer) {

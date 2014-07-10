@@ -679,7 +679,7 @@ void DeSerializerCOPPERModule::event()
     //
     // for DESY test
     //
-    m_nodeid = SVD_ID | m_nodeid  ;
+    //    m_nodeid = SVD_ID | m_nodeid  ;
     m_start_time = getTimeSec();
     n_basf2evt = 0;
   }

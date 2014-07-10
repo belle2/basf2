@@ -601,10 +601,10 @@ void DeSerializerPCModule::event()
 
     checkData(&temp_rawdatablk, &eve_copper_0);
 
-    PreRawCOPPERFormat_latest pre_rawcopper_latest;
-    pre_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
-                                   0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
-    //    pre_rawcopper_latest.CheckCRC16( 0, 0 );
+//     PreRawCOPPERFormat_latest pre_rawcopper_latest;
+//     pre_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
+//                                    0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
+//     pre_rawcopper_latest.CheckCRC16( 0, 0 );
 
 
 #ifdef REDUCED_RAWCOPPER
@@ -630,10 +630,10 @@ void DeSerializerPCModule::event()
                            temp_rawdatablk.GetNumNodes());
 
     // CRC16 check
-    PostRawCOPPERFormat_latest post_rawcopper_latest;
-    post_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
-                                    0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
-    post_rawcopper_latest.CheckCRC16(0, 0);
+//     PostRawCOPPERFormat_latest post_rawcopper_latest;
+//     post_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
+//                                     0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
+    //    post_rawcopper_latest.CheckCRC16(0, 0);
 
 
 

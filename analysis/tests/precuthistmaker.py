@@ -20,8 +20,8 @@ main.add_module(register_module('EventInfoPrinter'))
 main.add_module(register_module('ParticleLoader'))
 
 
-selectParticle('K-', [], path=main)
-selectParticle('pi+', [], path=main)
+selectParticle('K-', ['Kid 0.1:'], path=main)
+selectParticle('pi+', ['piid 0.1:'], path=main)
 
 selectParticle('gamma', [], path=main)
 makeParticle('pi0 -> gamma gamma', {'M': (0.110, 0.150)}, path=main)

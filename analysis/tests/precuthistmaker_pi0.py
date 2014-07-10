@@ -20,8 +20,8 @@ main.add_module(register_module('EventInfoPrinter'))
 main.add_module(register_module('ParticleLoader'))
 
 
-selectParticle('pi+', [], path=main)
-selectParticle('gamma', [], path=main)
+#loose cut on energy
+selectParticle('gamma', ['E 0.05:'], path=main)
 
 
 #a) save signal invariant mass using PreCutHistMaker

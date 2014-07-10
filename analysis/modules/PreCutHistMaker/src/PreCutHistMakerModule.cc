@@ -80,12 +80,17 @@ void PreCutHistMakerModule::initialize()
   onlySignal_decayString << mother->getFullName() << " ==> ";
 
   // Daughters
+  set<int> setOfPDGs;
+  set<string> setOfInputListNames;
   int nProducts = decay.getNDaughters();
   for (int i = 0; i < nProducts; ++i) {
     const DecayDescriptorParticle* daughter = decay.getDaughter(i)->getMother();
 
     const int daughterPDG = daughter->getPDGCode();
-    m_inputListNames.push_back(daughter->getFullName());
+    m_inputLists.emplace_back(daughter->getFullName());
+
+    setOfPDGs.insert(daughterPDG);
+    setOfInputListNames.insert(daughter->getFullName());
 
     std::string listName = Belle2::EvtPDLUtil::particleListName(daughterPDG, "HistMaker");
     onlySignal_decayString << " " << listName;
@@ -99,9 +104,13 @@ void PreCutHistMakerModule::initialize()
     }
   }
 
+  if (setOfPDGs.size() != setOfInputListNames.size()) {
+    B2ERROR("You're using at least two different input lists for the same particle in decay '" << m_decayString << "'. This won't work at the moment. [Can be implemented by going over all input particle lists in fillParticleLists() and adding Particles to all temporary lists where they are found in the corresponding input lists.]");
+  }
 
-  for (string name : m_inputListNames) {
-    StoreObjPtr<ParticleList>::required(name);
+
+  for (auto l : m_inputLists) {
+    l.isRequired();
   }
 
   if (m_customBinning.size() > 0) {
@@ -202,8 +211,12 @@ bool PreCutHistMakerModule::fillParticleLists(const std::vector<MCParticle*>& mc
   //map abs(PDG) to list
   //TODO: are there cases where we want misID-ed Particles? (e.g. pdg different mcPart)
   std::map<int, StoreObjPtr<ParticleList>> pdgToTmpList;
+  std::map<int, StoreObjPtr<ParticleList>> pdgToInputList;
   for (auto & plist : m_tmpLists) {
     pdgToTmpList[abs(plist->getPDGCode())] = plist;
+  }
+  for (auto & plist : m_inputLists) {
+    pdgToInputList[abs(plist->getPDGCode())] = plist;
   }
 
   for (const MCParticle * mcPart : mcDaughters) {
@@ -212,10 +225,14 @@ bool PreCutHistMakerModule::fillParticleLists(const std::vector<MCParticle*>& mc
     for (const Particle & p : particles) {
       //B2WARNING("fillParticleLists: adding p " << p.getArrayIndex() << " " << p.getPDGCode());
 
-      //add particles into corresponding temporary lists
       const auto& it = pdgToTmpList.find(abs(p.getPDGCode()));
-      if (it != pdgToTmpList.end())
-        it->second->addParticle(&p);
+      if (it != pdgToTmpList.end()) {
+        //in principle this seems ok, also check if Particle occurs in our input lists
+        if (pdgToInputList.find(abs(p.getPDGCode()))->second->contains(&p)) {
+          //add particles into corresponding temporary lists
+          it->second->addParticle(&p);
+        }
+      }
     }
   }
 
@@ -262,11 +279,10 @@ void PreCutHistMakerModule::saveAllCombinations()
 
 void PreCutHistMakerModule::event()
 {
-  vector<StoreObjPtr<ParticleList> > plists;
   std::multiset<int> expectedDaughterPDGsAbs;
-  for (unsigned i = 0; i < m_inputListNames.size(); i++) {
-    const string name = m_inputListNames[i];
-    StoreObjPtr<ParticleList> list(name);
+  for (unsigned i = 0; i < m_inputLists.size(); i++) {
+    StoreObjPtr<ParticleList>& list = m_inputLists[i];
+    const string name = list.getName();
     if (!list) {
       B2ERROR("ParticleList " << name << " not found");
       return;
@@ -276,7 +292,6 @@ void PreCutHistMakerModule::event()
               " does not refer to the default Particle collection");
       return;
     }
-    plists.push_back(list);
     expectedDaughterPDGsAbs.insert(abs(list->getPDGCode()));
 
     //create temporary input lists (and replace any existing object)
@@ -299,7 +314,7 @@ void PreCutHistMakerModule::event()
       std::vector<MCParticle*> mcDaughters;
       if (getMatchingDaughters(mcparticle, mcDaughters, expectedDaughterPDGsAbs)) {
         //B2WARNING("mcdecay found");
-        if (mcDaughters.size() < m_inputListNames.size()) {
+        if (mcDaughters.size() < m_inputLists.size()) {
           /*
           B2WARNING("size mismatch, discarding " << mcparticle.getIndex());
           for (auto m : mcDaughters) {

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCLEGENDRETRACKCANDIDATE_H
-#define CDCLEGENDRETRACKCANDIDATE_H
+#pragma once
 
 #include "TVector3.h"
 #include "TVector2.h"
@@ -291,5 +290,3 @@ namespace Belle2 {
   };
 //end class CDCLegendreTrackCandidate
 }//end namespace Belle2
-
-#endif //CDCLEGENDRETRACKCANDIDATE

@@ -204,12 +204,12 @@ void CDCLegendreQuadTree::buildNeighborhood(int levelNeighborhood)
 void CDCLegendreQuadTree::provideHitSet(const std::set<CDCLegendreTrackHit*>& hits_set)
 {
   m_hits.clear();
-  std::copy_if(hits_set.begin(), hits_set.end(), std::back_inserter(m_hits), [](CDCLegendreTrackHit * hit) {return (hit->isUsed() == CDCLegendreTrackHit::not_used);});
+  std::copy_if(hits_set.begin(), hits_set.end(), std::back_inserter(m_hits), [](CDCLegendreTrackHit * hit) {return (hit->getHitUsage() == CDCLegendreTrackHit::not_used);});
 }
 
 void CDCLegendreQuadTree::cleanHitsInNode()
 {
-  m_hits.erase(std::remove_if(m_hits.begin(), m_hits.end(), [](CDCLegendreTrackHit * hit) {return hit->isUsed() != CDCLegendreTrackHit::not_used;}), m_hits.end());
+  m_hits.erase(std::remove_if(m_hits.begin(), m_hits.end(), [](CDCLegendreTrackHit * hit) {return hit->getHitUsage() != CDCLegendreTrackHit::not_used;}), m_hits.end());
 }
 
 void CDCLegendreQuadTree::clearTree()
@@ -288,7 +288,7 @@ void CDCLegendreQuadTree::fillChildren(/*const std::vector<CDCLegendreTrackHit*>
   //Voting within the four bins
   for (CDCLegendreTrackHit * hit : m_hits) {
     //B2DEBUG(100, "PROCCESSING hit " << hit_counter << " of " << nhitsToReserve);
-    if (hit->isUsed() != CDCLegendreTrackHit::not_used) continue;
+    if (hit->getHitUsage() != CDCLegendreTrackHit::not_used) continue;
     for (int t_index = 0; t_index < m_nbins_theta + 1; ++t_index) {
 
       /*if (hit->checkRValue(m_thetaBin[t_index])) r_temp = hit->getRValue(m_thetaBin[t_index]);
@@ -302,8 +302,8 @@ void CDCLegendreQuadTree::fillChildren(/*const std::vector<CDCLegendreTrackHit*>
 
 
 //      r_temp = CDCLegendreConformalPosition::InstanceTrusted().getConformalR(hit->getLayerId(), hit->getWireId(), m_thetaBin[t_index]);
-      r_1 = r_temp + hit->getConformalDriftTime();
-      r_2 = r_temp - hit->getConformalDriftTime();
+      r_1 = r_temp + hit->getConformalDriftLength();
+      r_2 = r_temp - hit->getConformalDriftLength();
 
       //calculate distances of lines to horizontal bin border
       for (int r_index = 0; r_index < m_nbins_r + 1; ++r_index) {

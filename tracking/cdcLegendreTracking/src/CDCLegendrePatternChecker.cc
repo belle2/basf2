@@ -42,7 +42,7 @@ void CDCLegendrePatternChecker::checkCurler(
       track->first.erase(std::remove_if(track->first.begin(), track->first.end(),
       [&center, &charge, &ii](CDCLegendreTrackHit * hit) {
       if ((hit->getSuperlayerId() == ii) && (hit->getCurvatureSignWrt(center.first, center.second) == CDCLegendreTrackCandidate::charge_positive)) {
-        hit->setUsed(CDCLegendreTrackHit::bad);
+        hit->setHitUsage(CDCLegendreTrackHit::bad);
         return true;
       } else {
         return false;
@@ -57,7 +57,7 @@ void CDCLegendrePatternChecker::checkCurler(
       track->first.erase(std::remove_if(track->first.begin(), track->first.end(),
       [&center, &charge, &ii](CDCLegendreTrackHit * hit) {
       if ((hit->getSuperlayerId() == ii) && (hit->getCurvatureSignWrt(center.first, center.second) == CDCLegendreTrackCandidate::charge_negative)) {
-        hit->setUsed(CDCLegendreTrackHit::bad);
+        hit->setHitUsage(CDCLegendreTrackHit::bad);
         return true;
       } else {
         return false;
@@ -71,7 +71,7 @@ void CDCLegendrePatternChecker::checkCurler(
     track->first.erase(std::remove_if(track->first.begin(), track->first.end(),
     [&center, &charge](CDCLegendreTrackHit * hit) {
       if (hit->getCurvatureSignWrt(center.first, center.second) != CDCLegendreTrackCandidate::charge_positive) {
-        hit->setUsed(CDCLegendreTrackHit::bad);
+        hit->setHitUsage(CDCLegendreTrackHit::bad);
         return true;
       } else {
         return false;
@@ -81,7 +81,7 @@ void CDCLegendrePatternChecker::checkCurler(
     track->first.erase(std::remove_if(track->first.begin(), track->first.end(),
     [&center, &charge](CDCLegendreTrackHit * hit) {
       if (hit->getCurvatureSignWrt(center.first, center.second) != CDCLegendreTrackCandidate::charge_negative) {
-        hit->setUsed(CDCLegendreTrackHit::bad);
+        hit->setHitUsage(CDCLegendreTrackHit::bad);
         return true;
       } else {
         return false;
@@ -256,9 +256,9 @@ void CDCLegendrePatternChecker::clearBadHits(std::pair<std::vector<CDCLegendreTr
     double y0_track = sin(track->second.first) / track->second.second + ref_point.second;
     double x0_hit = hit->getOriginalWirePosition().X();
     double y0_hit = hit->getOriginalWirePosition().Y();
-    double dist = fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftTime();
-    if (dist > hit->getDriftTime() / 2.) {
-      hit->setUsed(CDCLegendreTrackHit::bad);
+    double dist = fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftLength();
+    if (dist > hit->getDriftLength() / 2.) {
+      hit->setHitUsage(CDCLegendreTrackHit::bad);
       return true;
     } else {
       return false;

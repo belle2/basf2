@@ -196,7 +196,7 @@ double CDCLegendreTrackCandidate::DistanceTo(double xc, double yc,
 
   double xw;
   double yw;
-  double rw = tHit.getDriftTime();
+  double rw = tHit.getDriftLength();
 
   if (orig) {
     xw = tHit.getOriginalWirePosition().X();
@@ -309,7 +309,7 @@ void CDCLegendreTrackCandidate::removeHit(CDCLegendreTrackHit* hit)
   else
     --m_stereoHits;
 
-  hit->setUsed(CDCLegendreTrackHit::not_used);
+  hit->setHitUsage(CDCLegendreTrackHit::not_used);
 }
 
 int CDCLegendreTrackCandidate::getInnermostSLayer(bool forced, int minNHits)
@@ -450,9 +450,9 @@ void CDCLegendreTrackCandidate::clearBadHits()
   [&R, &x0_track, &y0_track](CDCLegendreTrackHit * hit) {
     double x0_hit = hit->getOriginalWirePosition().X();
     double y0_hit = hit->getOriginalWirePosition().Y();
-    double dist = fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftTime();
-    if (dist > hit->getDeltaDriftTime() * 2.) {
-      hit->setUsed(CDCLegendreTrackHit::bad);
+    double dist = fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftLength();
+    if (dist > hit->getSigmaDriftLength() * 2.) {
+      hit->setHitUsage(CDCLegendreTrackHit::bad);
       return true;
     } else {
       return false;

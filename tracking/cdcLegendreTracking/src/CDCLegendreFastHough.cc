@@ -105,8 +105,8 @@ void CDCLegendreFastHough::FastHoughNormal(
       r_temp = hit->getConformalX() * m_cos_theta[thetaBin[t_index]] +
                hit->getConformalY() * m_sin_theta[thetaBin[t_index]];
 
-      r_1 = r_temp + hit->getConformalDriftTime();
-      r_2 = r_temp - hit->getConformalDriftTime();
+      r_1 = r_temp + hit->getConformalDriftLength();
+      r_2 = r_temp - hit->getConformalDriftLength();
 
       //calculate distances of lines to horizontal bin border
       for (int r_index = 0; r_index < 3; ++r_index) {
@@ -120,10 +120,10 @@ void CDCLegendreFastHough::FastHoughNormal(
       for (int r_index = 0; r_index < 2; ++r_index) {
         //curves are assumed to be straight lines, might be a reasonable assumption locally
         if ((!sameSign(dist_1[t_index][r_index], dist_1[t_index][r_index + 1], dist_1[t_index + 1][r_index], dist_1[t_index + 1][r_index + 1])) &&
-            (hit->isUsed() == CDCLegendreTrackHit::not_used))
+            (hit->getHitUsage() == CDCLegendreTrackHit::not_used))
           voted_hits[t_index][r_index].push_back(hit);
         else if ((!sameSign(dist_2[t_index][r_index], dist_2[t_index][r_index + 1], dist_2[t_index + 1][r_index], dist_2[t_index + 1][r_index + 1])) &&
-                 (hit->isUsed() == CDCLegendreTrackHit::not_used))
+                 (hit->getHitUsage() == CDCLegendreTrackHit::not_used))
           voted_hits[t_index][r_index].push_back(hit);
       }
     }
@@ -298,13 +298,13 @@ void CDCLegendreFastHough::MaxFastHough(const std::vector<CDCLegendreTrackHit*>&
 
   //Voting within the four bins
   for (CDCLegendreTrackHit * hit : hits) {
-    if (hit->isUsed() != CDCLegendreTrackHit::not_used) continue;
+    if (hit->getHitUsage() != CDCLegendreTrackHit::not_used) continue;
     for (int t_index = 0; t_index < 3; ++t_index) {
 
       r_temp = CDCLegendreConformalPosition::Instance().getConformalR(hit->getLayerId(), hit->getWireId(), thetaBin[t_index]);
 
-      r_1 = r_temp + hit->getConformalDriftTime();
-      r_2 = r_temp - hit->getConformalDriftTime();
+      r_1 = r_temp + hit->getConformalDriftLength();
+      r_2 = r_temp - hit->getConformalDriftLength();
 
       //calculate distances of lines to horizontal bin border
       for (int r_index = 0; r_index < 3; ++r_index) {
@@ -381,10 +381,10 @@ void CDCLegendreFastHough::MaxFastHough(const std::vector<CDCLegendreTrackHit*>&
             && fabs((r[r_index] + r[r_index + 1]) / 2) > m_rc)
           return;
 
-        voted_hits[t_index][r_index].erase(std::remove_if(voted_hits[t_index][r_index].begin(), voted_hits[t_index][r_index].end(), [](CDCLegendreTrackHit * hit) {return hit->isUsed() != CDCLegendreTrackHit::not_used;}), voted_hits[t_index][r_index].end());
+        voted_hits[t_index][r_index].erase(std::remove_if(voted_hits[t_index][r_index].begin(), voted_hits[t_index][r_index].end(), [](CDCLegendreTrackHit * hit) {return hit->getHitUsage() != CDCLegendreTrackHit::not_used;}), voted_hits[t_index][r_index].end());
 
         for (CDCLegendreTrackHit * hit : voted_hits[t_index][r_index]) {
-          hit->setUsed(CDCLegendreTrackHit::used_in_cand);
+          hit->setHitUsage(CDCLegendreTrackHit::used_in_cand);
         }
 
         candidate_temp.first = voted_hits[t_index][r_index];
@@ -499,13 +499,13 @@ void CDCLegendreFastHough::MaxFastHoughHighPt(const std::vector<CDCLegendreTrack
   for (CDCLegendreTrackHit * hit : hits) {
     hit_counter++;
     //B2DEBUG(100, "PROCCESSING hit " << hit_counter << " of " << nhitsToReserve);
-    if (hit->isUsed() != CDCLegendreTrackHit::not_used) continue;
+    if (hit->getHitUsage() != CDCLegendreTrackHit::not_used) continue;
     for (int t_index = 0; t_index < nbins_theta + 1; ++t_index) {
 
       r_temp = CDCLegendreConformalPosition::InstanceTrusted().getConformalR(hit->getLayerId(), hit->getWireId(), thetaBin[t_index]);
 
-      r_1 = r_temp + hit->getConformalDriftTime();
-      r_2 = r_temp - hit->getConformalDriftTime();
+      r_1 = r_temp + hit->getConformalDriftLength();
+      r_2 = r_temp - hit->getConformalDriftLength();
 
       //calculate distances of lines to horizontal bin border
       for (int r_index = 0; r_index < nbins_r + 1; ++r_index) {
@@ -602,10 +602,10 @@ void CDCLegendreFastHough::MaxFastHoughHighPt(const std::vector<CDCLegendreTrack
           return;
         }
 
-        voted_hits[t_index][r_index].erase(std::remove_if(voted_hits[t_index][r_index].begin(), voted_hits[t_index][r_index].end(), [](CDCLegendreTrackHit * hit) {return hit->isUsed() != CDCLegendreTrackHit::not_used;}), voted_hits[t_index][r_index].end());
+        voted_hits[t_index][r_index].erase(std::remove_if(voted_hits[t_index][r_index].begin(), voted_hits[t_index][r_index].end(), [](CDCLegendreTrackHit * hit) {return hit->getHitUsage() != CDCLegendreTrackHit::not_used;}), voted_hits[t_index][r_index].end());
 
         for (CDCLegendreTrackHit * hit : voted_hits[t_index][r_index]) {
-          hit->setUsed(CDCLegendreTrackHit::used_in_cand);
+          hit->setHitUsage(CDCLegendreTrackHit::used_in_cand);
         }
 
         candidate_temp.first = voted_hits[t_index][r_index];

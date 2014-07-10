@@ -36,7 +36,7 @@ double CDCLegendreSimpleFilter::getAssigmentProbability(CDCLegendreTrackHit* hit
 
   double x0_hit = hit->getOriginalWirePosition().X();
   double y0_hit = hit->getOriginalWirePosition().Y();
-  double dist = fabs(fabs(R - sqrt((x0_track - x0_hit) * (x0_track - x0_hit) + (y0_track - y0_hit) * (y0_track - y0_hit))) - hit->getDriftTime());
+  double dist = fabs(fabs(R - sqrt((x0_track - x0_hit) * (x0_track - x0_hit) + (y0_track - y0_hit) * (y0_track - y0_hit))) - hit->getDriftLength());
 
 
 
@@ -192,7 +192,7 @@ void CDCLegendreSimpleFilter::trackCore()
 void CDCLegendreSimpleFilter::appenUnusedHits(std::list<CDCLegendreTrackCandidate*>& m_trackList, std::vector<CDCLegendreTrackHit*> AxialHitList)
 {
   for (CDCLegendreTrackHit * hit : AxialHitList) {
-    if (hit->isUsed() != CDCLegendreTrackHit::not_used) continue;
+    if (hit->getHitUsage() != CDCLegendreTrackHit::not_used) continue;
     double bestHitProb = 0;
     CDCLegendreTrackCandidate* BestCandidate;
 
@@ -209,7 +209,7 @@ void CDCLegendreSimpleFilter::appenUnusedHits(std::list<CDCLegendreTrackCandidat
 
     if (bestHitProb > 0.8) {
       BestCandidate->addHit(hit);
-      hit->setUsed(CDCLegendreTrackHit::used_in_track);
+      hit->setHitUsage(CDCLegendreTrackHit::used_in_track);
 //      B2INFO("Unused hit has been assigned.");
     }
 

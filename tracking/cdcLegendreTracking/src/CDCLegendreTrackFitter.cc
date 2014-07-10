@@ -50,7 +50,7 @@ double CDCLegendreTrackFitter::fitTrackCandidateFast(
   if (!with_drift_time) {
     // looping over all hits and do the division afterwards
     for (CDCLegendreTrackHit * hit : hits) {
-      if (hit->getDriftTime() != 0.)weight =  1. / hit->getDriftTime();
+      if (hit->getDriftLength() != 0.)weight =  1. / hit->getDriftLength();
       else continue;
       if (nhits < 15) weight = 1.;
       sumWeights += weight;
@@ -87,11 +87,11 @@ double CDCLegendreTrackFitter::fitTrackCandidateFast(
       double dist = radius_track - R_dist;
 
       if (dist > 0) {
-        x = x + hit->getDriftTime() * (R_dist / (x - xc_track));
-        y = y + hit->getDriftTime() * (R_dist / (y - yc_track));
+        x = x + hit->getDriftLength() * (R_dist / (x - xc_track));
+        y = y + hit->getDriftLength() * (R_dist / (y - yc_track));
       } else {
-        x = x - hit->getDriftTime() * (R_dist / (x - xc_track));
-        y = y - hit->getDriftTime() * (R_dist / (y - yc_track));
+        x = x - hit->getDriftLength() * (R_dist / (x - xc_track));
+        y = y - hit->getDriftLength() * (R_dist / (y - yc_track));
       }
 
       x2 = x * x;
@@ -176,8 +176,8 @@ double CDCLegendreTrackFitter::estimateChi2(std::vector<CDCLegendreTrackHit*>& h
   for (CDCLegendreTrackHit * hit : hits) {
     double x0_hit = hit->getOriginalWirePosition().X();
     double y0_hit = hit->getOriginalWirePosition().Y();
-    double dist = fabs(fabs(1 / fabs(track_par.second) - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftTime());
-    chi2 += (dist - hit->getDeltaDriftTime()) / hit->getDeltaDriftTime();
+    double dist = fabs(fabs(1 / fabs(track_par.second) - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftLength());
+    chi2 += (dist - hit->getSigmaDriftLength()) / hit->getSigmaDriftLength();
   }
 
   return chi2 / (hits.size() - 4);
@@ -297,7 +297,7 @@ void CDCLegendreTrackFitter::fitTrackCandidateStepped(
     BOOST_FOREACH(CDCLegendreTrackHit * hit, track->first) {
       x0 = hit->getConformalX();
       y0 = hit->getConformalY();
-      drift_time = hit->getConformalDriftTime();
+      drift_time = hit->getConformalDriftLength();
 //      summ += (x0-(x0+alpha*(y0-beta))/((alpha+1)*(alpha+1)))*(x0-(x0+alpha*(y0-beta))/((alpha+1)*(alpha+1)))
 //            + (y0-(alpha*x0+alpha*alpha*y0+beta)/((alpha+1)*(alpha+1)))*(y0-(alpha*x0+alpha*alpha*y0+beta)/((alpha+1)*(alpha+1)));
       summ += SQR(fabs(cos(track_theta) * (y0 - alpha * x0 - beta))/*-drift_time*/);
@@ -384,7 +384,7 @@ void CDCLegendreTrackFitter::fitTrackCandidateStepped(
     BOOST_FOREACH(CDCLegendreTrackHit * hit, track->first) {
       x0 = hit->getConformalX();
       y0 = hit->getConformalY();
-      drift_time = hit->getConformalDriftTime();
+      drift_time = hit->getConformalDriftLength();
       summ += SQR(fabs(cos(track_theta) * (y0 - alpha * x0 - beta)) - drift_time);
     }
 
@@ -465,7 +465,7 @@ void CDCLegendreTrackFitter::fitTrackCandidateNormalSpace(
   BOOST_FOREACH(CDCLegendreTrackHit * hit, track->first) {
     x0_hit = hit->getOriginalWirePosition().X();
     y0_hit = hit->getOriginalWirePosition().Y();
-    summ += SQR(fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftTime());
+    summ += SQR(fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftLength());
   }
 
   summ_prev = summ;
@@ -489,7 +489,7 @@ void CDCLegendreTrackFitter::fitTrackCandidateNormalSpace(
     for (CDCLegendreTrackHit * hit : track->first) {
       x0_hit = hit->getOriginalWirePosition().X();
       y0_hit = hit->getOriginalWirePosition().Y();
-      summ += SQR(fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftTime());
+      summ += SQR(fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftLength());
     }
 
     if (direction == 1) {

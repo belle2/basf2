@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCLEGENDRETRACKHIT_H
-#define CDCLEGENDRETRACKHIT_H
+#pragma once
 
 #include "TVector3.h"
 #include <cdc/dataobjects/CDCHit.h>
@@ -48,7 +47,7 @@ namespace Belle2 {
     ~CDCLegendreTrackHit();
 
     /** Check hit drift time; if it greater than distances between wires mark hit as bad*/
-    bool checkHitDriftTime();
+    bool checkHitDriftLength();
 
     /** Assigns the coordinates of the hit wire (from CDC Geometry database) and sets the wire vector.*/
     void setWirePosition();
@@ -57,10 +56,10 @@ namespace Belle2 {
     void setZReference(double zReference);
 
     /** Assigns values for conformal coordinates by transforming the wire coordinates. */
-    void ConformalTransformation();
+    void performConformalTransformation();
 
     /** Return the index in the store array of the original CDCHit*/
-    inline int getStoreIndex() const {return m_storeID;}
+    inline int getStoreIndex() const {return m_cdcHitIndex;}
 
     /** Returns the layerId (0 - 55). */
     inline int getLayerId() const {return m_layerId;};
@@ -72,10 +71,10 @@ namespace Belle2 {
     inline int getSuperlayerId() const {return m_superlayerId;};
 
     /** Returns the DriftTime.*/
-    inline double getDriftTime() const {return m_driftTime;}
+    inline double getDriftLength() const {return m_driftLength;}
 
     /** Returns the Uncertainty of the Drift Time.*/
-    inline double getDeltaDriftTime() const {return m_deltaDriftTime;}
+    inline double getSigmaDriftLength() const {return m_sigmaDriftLength;}
 
     /** Returns true for a Hit in an axial layer, false for a Hit in a stereo layer. */
     inline bool getIsAxial() const {return m_isAxial;};
@@ -93,7 +92,7 @@ namespace Belle2 {
     inline double getConformalY() const {return m_conformalY;};
 
     /** Returns the drift time in the conformal plane (with r << x,y).*/
-    inline double getConformalDriftTime() const {return m_conformalDriftTime;};
+    inline double getConformalDriftLength() const {return m_conformalDriftLength;};
 
     /** Returns the phi angle of the center wire position.
       * From the Hit position (= center of the wire) the angle is calculated so that it goes from 0 to 2*pi.
@@ -112,47 +111,41 @@ namespace Belle2 {
     /** Sets the position of the hit to given point in 3D space.*/
     void setPosition(const TVector3 position) {
       m_wirePosition = position;
-      ConformalTransformation();
+      performConformalTransformation();
     }
 
-    /**
-     * Shows where hit was used
-     */
-    inline int isUsed() const {return m_is_used;};
+    /** Shows how hit was used */
+    inline int getHitUsage() const {return m_hitUsage;};
 
-    /**
-     * Sets where hit was used
-     */
-    void setUsed(int is_used) {m_is_used = is_used;};
+    /** Sets how hit was used */
+    void setHitUsage(int hitUsage) {m_hitUsage = hitUsage;};
 
 
   private:
 
-    int m_storeID;                     /**< ID of the original CDCHit in the store array*/
+    int m_cdcHitIndex;                 /**< ID of the original CDCHit in the store array*/
     int m_layerId;                     /**< ID of the layer of the hit (0-55)*/
     int m_wireId;                      /**< ID of the wire of the hit */
     int m_superlayerId;                /**< ID of the superlayer of the hit (0-8) (superlayer = group of 6/8 layers with the same orientation)*/
-    double m_driftTime;                /**< Drifttime of the CDCHit (may be DriftLegth, see CDCHit documentation)*/
-    double m_deltaDriftTime;           /**< Resolution of the drift Time*/
-    double m_charge;                   /**< Charge deposit the CDCHit */
+    double m_driftLength;              /**< Drift Length of the CDCHit */
+    double m_sigmaDriftLength;         /**< Resolution of the drift Length*/
+    unsigned short m_charge;                   /**< Charge deposit the CDCHit */
 
     bool m_isAxial;                    /**< Boolean to mark a Hit as belonging to an axial superlayer */
 
     TVector3 m_wirePosition;           /**< Coordinates of the center (!) of the hit wire. */
     double m_conformalX;               /**< X coordinate of the hit in the conformal plane*/
     double m_conformalY;               /**< Y coordinate of the hit in the conformal plane*/
-    double m_conformalDriftTime;       /**< Drift time of the hit in the conformal plane (under the assumption that r << x,y*/
+    double m_conformalDriftLength;       /**< Drift time of the hit in the conformal plane (under the assumption that r << x,y*/
 
     TVector3 m_wirePositionOrig;           /**< Original Coordinates of the center (!) of the hit wire. */
 
 //    static constexpr double m_zReference = 25.852;  /**< Reference z position for wire position determination*/
     double m_zReference;  /**< Reference z position for wire position determination*/
 
-    int m_is_used; /**< Indicates whether hit was used */
+    int m_hitUsage; /**< Indicates whether hit was used */
 
   }; //end class CDCTrackHit
 } //end namespace Belle2
-
-#endif //CDCTRACKHIT
 
 

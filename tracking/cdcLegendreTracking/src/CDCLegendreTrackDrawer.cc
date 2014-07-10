@@ -236,7 +236,7 @@ void CDCLegendreTrackDrawer::drawConformalHits(std::vector<CDCLegendreTrackHit*>
     for (CDCLegendreTrackHit * hit : trackHitList) {
       double x0 = hit->getConformalX();
       double y0 = hit->getConformalY();
-      double R = hit->getConformalDriftTime();
+      double R = hit->getConformalDriftLength();
       TEllipse* hit_conformal = new TEllipse((x0 - m_rMin)*norm, (y0 - m_rMin)*norm, R * norm, R * norm);
       //    TEllipse* hit_conformal = new TEllipse(x0,y0,R, R);
       hit_conformal->SetFillStyle(0);
@@ -284,7 +284,7 @@ void CDCLegendreTrackDrawer::drawLegendreHits(std::vector<CDCLegendreTrackHit*> 
       funct2->SetLineWidth(1);
       double x0 = hit->getConformalX();
       double y0 = hit->getConformalY();
-      double R = hit->getConformalDriftTime();
+      double R = hit->getConformalDriftLength();
       funct1->SetParameters(x0, y0, R);
       funct2->SetParameters(x0, y0, R);
       funct1->SetLineColor(trackColor);

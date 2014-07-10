@@ -24,15 +24,15 @@ using namespace std;
 using namespace Belle2;
 using namespace CDC;
 
-CDCLegendreTrackHit::CDCLegendreTrackHit(CDCHit* hit, int ID) : m_storeID(ID), m_wireId(hit->getIWire())
+CDCLegendreTrackHit::CDCLegendreTrackHit(CDCHit* hit, int ID) : m_cdcHitIndex(ID), m_wireId(hit->getIWire())
 {
 //  m_zReference = CDCLegendreWireCenter::Instance().getCenter(hit->getILayer());
   m_zReference = 0;
 
   CDC::SimpleTDCCountTranslator sDriftTimeTranslator;
-  m_driftTime = sDriftTimeTranslator.getDriftLength(hit->getTDCCount(), WireID(hit->getID()));
+  m_driftLength = sDriftTimeTranslator.getDriftLength(hit->getTDCCount(), WireID(hit->getID()));
   //FIXME: Provide correct parameters, as soon as driftTimeTranslator supports them
-  m_deltaDriftTime = sDriftTimeTranslator.getDriftLengthResolution(-999., WireID(hit->getID()), false, -999., -999.);
+  m_sigmaDriftLength = sDriftTimeTranslator.getDriftLengthResolution(-999., WireID(hit->getID()), false, -999., -999.);
 
   m_charge = hit->getADCCount();
 
@@ -52,29 +52,29 @@ CDCLegendreTrackHit::CDCLegendreTrackHit(CDCHit* hit, int ID) : m_storeID(ID), m
 
   //set hit coordinates in normal space and conformal plane
   setWirePosition();
-  ConformalTransformation();
+  performConformalTransformation();
   m_wirePositionOrig = m_wirePosition;
 
-  m_is_used = CDCLegendreTrackHit::not_used;
+  m_hitUsage = CDCLegendreTrackHit::not_used;
 
-  checkHitDriftTime();
+  checkHitDriftLength();
 }
 
 CDCLegendreTrackHit::CDCLegendreTrackHit(const CDCLegendreTrackHit& rhs)
 {
-  m_storeID = rhs.m_storeID;
-  m_driftTime = rhs.getDriftTime();
+  m_cdcHitIndex = rhs.m_cdcHitIndex;
+  m_driftLength = rhs.getDriftLength();
   m_charge = rhs.m_charge;
   m_wireId = rhs.getWireId();
   m_superlayerId = rhs.getSuperlayerId();
   m_layerId = rhs.getLayerId();
   m_isAxial = rhs.m_isAxial;
   m_wirePositionOrig = rhs.m_wirePositionOrig;
-  m_is_used = rhs.isUsed();
+  m_hitUsage = rhs.getHitUsage();
 
   //set hit coordinates in normal space and conformal plane
   setWirePosition();
-  ConformalTransformation();
+  performConformalTransformation();
 }
 
 CDCLegendreTrackHit::~CDCLegendreTrackHit()
@@ -82,7 +82,7 @@ CDCLegendreTrackHit::~CDCLegendreTrackHit()
 }
 
 
-bool CDCLegendreTrackHit::checkHitDriftTime()
+bool CDCLegendreTrackHit::checkHitDriftLength()
 {
   //Get the position of the hit wire from CDCGeometryParameters
   CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
@@ -100,8 +100,8 @@ bool CDCLegendreTrackHit::checkHitDriftTime()
   double delta = sqrt((wireBegin.x() - wireBeginNeighbor.x()) * (wireBegin.x() - wireBeginNeighbor.x()) +
                       (wireBegin.y() - wireBeginNeighbor.y()) * (wireBegin.y() - wireBeginNeighbor.y()));
 
-  if (m_driftTime > delta * 0.75) {
-    m_is_used = CDCLegendreTrackHit::background;
+  if (m_driftLength > delta * 0.75) {
+    m_hitUsage = CDCLegendreTrackHit::background;
 //    B2INFO("Bad hit!");
     return false;
   }
@@ -132,18 +132,18 @@ void CDCLegendreTrackHit::setWirePosition()
   m_wirePosition.SetY(wireBegin.y() + fraction * (wireEnd.y() - wireBegin.y()));
 }
 
-void CDCLegendreTrackHit::ConformalTransformation()
+void CDCLegendreTrackHit::performConformalTransformation()
 {
   double x = m_wirePosition.x();
   double y = m_wirePosition.y();
 
   //transformation of the coordinates from normal to conformal plane
   //this is not the actual wire position but the transformed center of the drift circle
-  m_conformalX = 2 * x / (x * x + y * y - m_driftTime * m_driftTime);
-  m_conformalY = 2 * y / (x * x + y * y - m_driftTime * m_driftTime);
+  m_conformalX = 2 * x / (x * x + y * y - m_driftLength * m_driftLength);
+  m_conformalY = 2 * y / (x * x + y * y - m_driftLength * m_driftLength);
 
   //conformal drift time =  (x * x + y * y - m_driftTime * m_driftTime)
-  m_conformalDriftTime = 2 * m_driftTime / (x * x + y * y - m_driftTime * m_driftTime);
+  m_conformalDriftLength = 2 * m_driftLength / (x * x + y * y - m_driftLength * m_driftLength);
 
 }
 
@@ -244,7 +244,7 @@ bool CDCLegendreTrackHit::approach(const CDCLegendreTrackCandidate& track)
   double z = backwardWirePoint.z() + parameter[bestIndex] * wireVector.z();
 
   m_wirePosition.SetXYZ(x, y, z);
-  ConformalTransformation();
+  performConformalTransformation();
 
   return true;
 }
@@ -284,7 +284,7 @@ bool CDCLegendreTrackHit::approach2(const CDCLegendreTrackCandidate& track)
   double ty = track.getYc();
 
   double r_t = sqrt(tx * tx + ty * ty);
-  double r_h = m_driftTime;
+  double r_h = m_driftLength;
 
   double d = sqrt((m_wirePositionOrig.X() - tx) * (m_wirePositionOrig.X() - tx) + (m_wirePositionOrig.Y() - ty) * (m_wirePositionOrig.Y() - ty));
   double radii;
@@ -321,7 +321,7 @@ bool CDCLegendreTrackHit::approach2(const CDCLegendreTrackCandidate& track)
   double z = backwardWirePoint.z() + l * wireVector.z();
 
   m_wirePosition.SetXYZ(x, y, z);
-  ConformalTransformation();
+  performConformalTransformation();
 
   return true;
 }

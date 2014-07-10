@@ -65,7 +65,7 @@ void CDCLegendreQuadTreeCandidateCreator::createCandidates()
 
 
     for (CDCLegendreTrackHit * hit : node->getHits()) {
-      hit->setUsed(CDCLegendreTrackHit::used_in_cand);
+      hit->setHitUsage(CDCLegendreTrackHit::used_in_cand);
     }
 
     candidate_temp.first = node->getHits();
@@ -97,7 +97,7 @@ bool CDCLegendreQuadTreeCandidateCreator::createCandidate(CDCLegendreQuadTree* n
 
 
   for (CDCLegendreTrackHit * hit : node->getHits()) {
-    hit->setUsed(CDCLegendreTrackHit::used_in_cand);
+    hit->setHitUsage(CDCLegendreTrackHit::used_in_cand);
   }
 
   candidate_temp.first = node->getHits();
@@ -121,7 +121,7 @@ bool CDCLegendreQuadTreeCandidateCreator::createCandidateDirect(CDCLegendreQuadT
   int AxialVsStereo = 0;
 
   for (CDCLegendreTrackHit * hit : node->getHits()) {
-    hit->setUsed(CDCLegendreTrackHit::used_in_cand);
+    hit->setHitUsage(CDCLegendreTrackHit::used_in_cand);
     if (hit->getIsAxial()) AxialVsStereo++;
     else AxialVsStereo--;
   }

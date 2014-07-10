@@ -141,7 +141,7 @@ CDCLegendreTrackCandidate* CDCLegendreTrackCreator::createLegendreTracklet(std::
   processTrack(trackCandidate, m_trackList);
 
   for (CDCLegendreTrackHit * hit : trackCandidate->getTrackHits()) {
-    hit->setUsed(CDCLegendreTrackHit::not_used);
+    hit->setHitUsage(CDCLegendreTrackHit::not_used);
   }
 
   trackCandidate->setCandidateType(CDCLegendreTrackCandidate::tracklet);
@@ -174,11 +174,11 @@ void CDCLegendreTrackCreator::appendNewHits(CDCLegendreTrackCandidate* track)
   double R = fabs(1. / track->getR());
 
   for (CDCLegendreTrackHit * hit : m_AxialHitList) {
-    if (hit->isUsed() != CDCLegendreTrackHit::used_in_track || hit->isUsed() != CDCLegendreTrackHit::background) {
+    if (hit->getHitUsage() != CDCLegendreTrackHit::used_in_track || hit->getHitUsage() != CDCLegendreTrackHit::background) {
       double x0_hit = hit->getOriginalWirePosition().X();
       double y0_hit = hit->getOriginalWirePosition().Y();
-      double dist = fabs(R - sqrt((x0_track - x0_hit) * (x0_track - x0_hit) + (y0_track - y0_hit) * (y0_track - y0_hit))) - hit->getDriftTime();
-      if (dist < hit->getDriftTime() * 0.75) track->addHit(hit);
+      double dist = fabs(R - sqrt((x0_track - x0_hit) * (x0_track - x0_hit) + (y0_track - y0_hit) * (y0_track - y0_hit))) - hit->getDriftLength();
+      if (dist < hit->getDriftLength() * 0.75) track->addHit(hit);
     }
   }
 }
@@ -194,7 +194,7 @@ void CDCLegendreTrackCreator::processTrack(CDCLegendreTrackCandidate* trackCandi
     m_cdcLegendreTrackDrawer->drawTrackCand(trackCandidate);
 
     for (CDCLegendreTrackHit * hit : trackCandidate->getTrackHits()) {
-      hit->setUsed(CDCLegendreTrackHit::used_in_track);
+      hit->setHitUsage(CDCLegendreTrackHit::used_in_track);
     }
 
     CDCLegendrePatternChecker cdcLegendrePatternChecker(this);
@@ -204,7 +204,7 @@ void CDCLegendreTrackCreator::processTrack(CDCLegendreTrackCandidate* trackCandi
 
   else {
     for (CDCLegendreTrackHit * hit : trackCandidate->getTrackHits()) {
-      hit->setUsed(CDCLegendreTrackHit::bad);
+      hit->setHitUsage(CDCLegendreTrackHit::bad);
     }
 
     //memory management, since we cannot use smart pointers in function interfaces

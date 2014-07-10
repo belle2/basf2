@@ -200,7 +200,7 @@ void CDCLegendreTrackingModule::event()
   //Convert CDCHits to own Hit class
   for (int iHit = 0; iHit < cdcHits.getEntries(); iHit++) {
     CDCLegendreTrackHit* trackHit = new CDCLegendreTrackHit(cdcHits[iHit], iHit);
-    if (trackHit->checkHitDriftTime()) {
+    if (trackHit->checkHitDriftLength()) {
       if (trackHit->getIsAxial())
         m_AxialHitList.push_back(trackHit);
       else
@@ -262,7 +262,7 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
     B2DEBUG(100, "Copying hits set");
 
     std::vector<CDCLegendreTrackHit*> hits_vector;
-    std::copy_if(hits_set.begin(), hits_set.end(), std::back_inserter(hits_vector), [](CDCLegendreTrackHit * hit) {return (hit->isUsed() == CDCLegendreTrackHit::not_used);});
+    std::copy_if(hits_set.begin(), hits_set.end(), std::back_inserter(hits_vector), [](CDCLegendreTrackHit * hit) {return (hit->getHitUsage() == CDCLegendreTrackHit::not_used);});
     if (not m_multipleCandidateSearch) {
       std::vector<CDCLegendreTrackHit*> c_list;
       std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > candidate = std::make_pair(c_list, std::make_pair(-999, -999));
@@ -329,7 +329,7 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
 
 
   std::vector<CDCLegendreTrackHit*> hits_vector_unused; //temporary array;
-  std::copy_if(hits_set.begin(), hits_set.end(), std::back_inserter(hits_vector_unused), [](CDCLegendreTrackHit * hit) {return (hit->isUsed() != CDCLegendreTrackHit::used_in_track);});
+  std::copy_if(hits_set.begin(), hits_set.end(), std::back_inserter(hits_vector_unused), [](CDCLegendreTrackHit * hit) {return (hit->getHitUsage() != CDCLegendreTrackHit::used_in_track);});
   m_cdcLegendreTrackDrawer->drawConformalHits(hits_vector_unused, -1, false);
   m_cdcLegendreTrackDrawer->drawLegendreHits(hits_vector_unused, -1, false);
 
@@ -431,7 +431,7 @@ void CDCLegendreTrackingModule::AsignStereoHits()
         if ((candidate->getCharge() == CDCLegendreTrackCandidate::charge_curler) || hit->getCurvatureSignWrt(candidate->getXc(), candidate->getYc()) == candidate->getCharge()) {
           //check nearest position of the hit to the track
           if (hit->approach2(*candidate)) {
-            double chi2 = candidate->DistanceTo(*hit) / sqrt(hit->getDeltaDriftTime());
+            double chi2 = candidate->DistanceTo(*hit) / sqrt(hit->getSigmaDriftLength());
 
             if (chi2 < m_resolutionStereo) {
               //search for minimal distance
@@ -466,11 +466,11 @@ void CDCLegendreTrackingModule::processTracks()
 
   m_cdcLegendreTrackMerger->splitTracks();
 
+  return;
   for (CDCLegendreTrackCandidate * cand : m_trackList) {
     if (cand->getCandidateType() != CDCLegendreTrackCandidate::tracklet) continue;
     m_cdcLegendreTrackMerger->extendTracklet(cand, m_AxialHitList);
   }
-
 
   m_cdcLegendreTrackMerger->doTracksMerging();
 

@@ -276,6 +276,12 @@ namespace Belle2 {
     }
 
     /**
+     * Returns true if and only if 'p' is already in this list.
+     * Will check flavour-specific and self-conjugated list, and optionally (with includingAntiList=true) also the anti-particle list.
+     */
+    bool contains(const Particle* p, bool includingAntiList = true) const;
+
+    /**
      * Prints the list
      */
     void print() const;

@@ -222,6 +222,20 @@ std::vector<int> ParticleList::getList(EParticleType K, bool forAntiParticle) co
   }
 }
 
+bool ParticleList::contains(const Particle* p, bool includingAntiList) const
+{
+  const int index = p->getArrayIndex();
+  for (int i = 0; i < 3; i++) {
+    if (i == 1 && !includingAntiList)
+      continue;
+
+    const std::vector<int>& currentList = getList((i < 2) ? c_FlavorSpecificParticle : c_SelfConjugatedParticle, i == 1);
+    if (std::find(currentList.begin(), currentList.end(), index) != currentList.end())
+      return true;
+  }
+  return false;
+}
+
 void ParticleList::print() const
 {
   unsigned thisFSCount = getNParticlesOfType(c_FlavorSpecificParticle);

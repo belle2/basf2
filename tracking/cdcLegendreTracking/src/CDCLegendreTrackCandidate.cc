@@ -26,9 +26,10 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace TrackFinderCDCLegendre;
 
-CDCLegendreTrackCandidate::CDCLegendreTrackCandidate(
-  CDCLegendreTrackCandidate& candidate) :
+TrackCandidate::TrackCandidate(
+  TrackCandidate& candidate) :
   m_theta(candidate.m_theta), m_r(candidate.m_r), m_xc(candidate.m_xc), m_yc(candidate.m_yc),
   m_charge(candidate.m_charge), m_type(candidate.m_type),
   m_calcedMomentum(candidate.m_calcedMomentum), m_momEstimation(candidate.m_momEstimation)
@@ -38,18 +39,18 @@ CDCLegendreTrackCandidate::CDCLegendreTrackCandidate(
   m_TrackHits = candidate.getTrackHits();
 }
 
-CDCLegendreTrackCandidate::~CDCLegendreTrackCandidate()
+TrackCandidate::~TrackCandidate()
 {
 }
 
-CDCLegendreTrackCandidate::CDCLegendreTrackCandidate(double theta, double r, int charge,
-                                                     const std::vector<CDCLegendreTrackHit*>& trackHitList) :
+TrackCandidate::TrackCandidate(double theta, double r, int charge,
+                               const std::vector<TrackHit*>& trackHitList) :
   m_theta(theta), m_r(r), m_xc(cos(theta) / r), m_yc(sin(theta) / r), m_charge(charge), m_axialHits(0), m_stereoHits(0), m_calcedMomentum(false), m_momEstimation(0, 0, 0)
 {
   m_TrackHits.reserve(256);
 
   //only accepts hits, which support the correct curvature
-  for (CDCLegendreTrackHit * hit : trackHitList) {
+  for (TrackHit * hit : trackHitList) {
     if (/*(m_charge != charge_tracklet) &&*/ ((m_charge == charge_positive || m_charge == charge_negative)
                                               && hit->getCurvatureSignWrt(getXc(), getYc()) != m_charge))
       continue;
@@ -64,15 +65,15 @@ CDCLegendreTrackCandidate::CDCLegendreTrackCandidate(double theta, double r, int
   m_type = goodTrack;
 }
 
-CDCLegendreTrackCandidate::CDCLegendreTrackCandidate(const std::vector<CDCLegendreQuadTree*>& nodeList) :
+TrackCandidate::TrackCandidate(const std::vector<QuadTree*>& nodeList) :
   m_theta(0), m_r(0), m_xc(0), m_yc(0), m_charge(0), m_axialHits(0), m_stereoHits(0), m_calcedMomentum(false), m_momEstimation(0, 0, 0)
 {
   m_TrackHits.reserve(256);
 
   int nHitsNodeMax = 0;
   //only accepts hits, which support the correct curvature
-  for (CDCLegendreQuadTree * node : nodeList) {
-    for (CDCLegendreTrackHit * hit : node->getHits()) {
+  for (QuadTree * node : nodeList) {
+    for (TrackHit * hit : node->getHits()) {
       /*      if ((m_charge == charge_positive || m_charge == charge_negative)
                 && hit->getCurvatureSignWrt(getXc(), getYc()) != m_charge)
               continue;
@@ -92,9 +93,9 @@ CDCLegendreTrackCandidate::CDCLegendreTrackCandidate(const std::vector<CDCLegend
   m_xc = cos(m_theta) / m_r;
   m_yc = sin(m_theta) / m_r;
 
-  m_charge = CDCLegendreTrackCandidate::getChargeAssumption(m_theta, m_r, m_TrackHits);
+  m_charge = TrackCandidate::getChargeAssumption(m_theta, m_r, m_TrackHits);
 
-  m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(), [this](CDCLegendreTrackHit * hit) {
+  m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(), [this](TrackHit * hit) {
     return ((this->m_charge == charge_positive || this->m_charge == charge_negative)
             && hit->getCurvatureSignWrt(getXc(), getYc()) != this->m_charge);
   })
@@ -106,11 +107,11 @@ CDCLegendreTrackCandidate::CDCLegendreTrackCandidate(const std::vector<CDCLegend
 
 }
 
-void CDCLegendreTrackCandidate::determineHitNumbers()
+void TrackCandidate::determineHitNumbers()
 {
   m_axialHits = 0;
   m_stereoHits = 0;
-  for (CDCLegendreTrackHit * hit : m_TrackHits) {
+  for (TrackHit * hit : m_TrackHits) {
     if (hit->getIsAxial())
       ++m_axialHits;
     else
@@ -119,15 +120,15 @@ void CDCLegendreTrackCandidate::determineHitNumbers()
 
 }
 
-TVector3 CDCLegendreTrackCandidate::getMomentumEstimation(bool force_calculation) const
+TVector3 TrackCandidate::getMomentumEstimation(bool force_calculation) const
 {
   if (force_calculation || !m_calcedMomentum)
-    const_cast<CDCLegendreTrackCandidate*>(this)->calculateMomentumEstimation();
+    const_cast<TrackCandidate*>(this)->calculateMomentumEstimation();
 
   return m_momEstimation;
 }
 
-void CDCLegendreTrackCandidate::calculateMomentumEstimation()
+void TrackCandidate::calculateMomentumEstimation()
 {
   double R = fabs(1 / m_r);
   double pt = R * 1.5 * 0.00299792458;
@@ -142,14 +143,14 @@ void CDCLegendreTrackCandidate::calculateMomentumEstimation()
   m_calcedMomentum = true;
 }
 
-double CDCLegendreTrackCandidate::getZMomentumEstimation(TVector2 mom2) const
+double TrackCandidate::getZMomentumEstimation(TVector2 mom2) const
 {
   std::vector<double> median_vector;
   median_vector.reserve(m_TrackHits.size() / 2);
 
-  for (std::vector<CDCLegendreTrackHit*>::const_iterator it = m_TrackHits.begin(); it != m_TrackHits.end(); ++it) {
+  for (std::vector<TrackHit*>::const_iterator it = m_TrackHits.begin(); it != m_TrackHits.end(); ++it) {
 
-    CDCLegendreTrackHit* trackHit = *it;
+    TrackHit* trackHit = *it;
 
     if (trackHit->getIsAxial())
       continue;
@@ -177,20 +178,20 @@ double CDCLegendreTrackCandidate::getZMomentumEstimation(TVector2 mom2) const
   return zmom;
 }
 
-double CDCLegendreTrackCandidate::DistanceTo(
-  const CDCLegendreTrackHit& tHit) const
+double TrackCandidate::DistanceTo(
+  const TrackHit& tHit) const
 {
   return (DistanceTo(getXc(), getYc(), tHit, false));
 }
 
-double CDCLegendreTrackCandidate::OriginalDistanceTo(
-  const CDCLegendreTrackHit& tHit) const
+double TrackCandidate::OriginalDistanceTo(
+  const TrackHit& tHit) const
 {
   return (DistanceTo(getXc(), getYc(), tHit, true));
 }
 
-double CDCLegendreTrackCandidate::DistanceTo(double xc, double yc,
-                                             const CDCLegendreTrackHit& tHit, bool orig)
+double TrackCandidate::DistanceTo(double xc, double yc,
+                                  const TrackHit& tHit, bool orig)
 {
   double rc = sqrt(xc * xc + yc * yc);
 
@@ -222,8 +223,8 @@ double CDCLegendreTrackCandidate::DistanceTo(double xc, double yc,
   return distance;
 }
 
-int CDCLegendreTrackCandidate::getChargeAssumption(
-  double theta, double r, const std::vector<CDCLegendreTrackHit*>& trackHits)
+int TrackCandidate::getChargeAssumption(
+  double theta, double r, const std::vector<TrackHit*>& trackHits)
 {
   double yc = TMath::Sin(theta) / r;
   double xc = TMath::Cos(theta) / r;
@@ -235,16 +236,16 @@ int CDCLegendreTrackCandidate::getChargeAssumption(
   int vote_pos = 0;
   int vote_neg = 0;
 
-  for (CDCLegendreTrackHit * Hit : trackHits) {
+  for (TrackHit * Hit : trackHits) {
     int curve_sign = Hit->getCurvatureSignWrt(xc, yc);
 
-    if (curve_sign == CDCLegendreTrackCandidate::charge_positive)
+    if (curve_sign == TrackCandidate::charge_positive)
       ++vote_pos;
-    else if (curve_sign == CDCLegendreTrackCandidate::charge_negative)
+    else if (curve_sign == TrackCandidate::charge_negative)
       ++vote_neg;
     else {
       B2ERROR(
-        "Strange behaviour of CDCLegendreTrackHit::getCurvatureSignWrt");
+        "Strange behaviour of TrackHit::getCurvatureSignWrt");
       exit(EXIT_FAILURE);
     }
   }
@@ -259,26 +260,26 @@ int CDCLegendreTrackCandidate::getChargeAssumption(
     return charge_negative;
 }
 
-int CDCLegendreTrackCandidate::getChargeSign() const
+int TrackCandidate::getChargeSign() const
 {
   return m_charge / abs(m_charge);
 }
 
-void CDCLegendreTrackCandidate::setR(double r)
+void TrackCandidate::setR(double r)
 {
   m_r = r;
   m_xc = cos(m_theta) / r;
   m_yc = sin(m_theta) / r;
 }
 
-void CDCLegendreTrackCandidate::setTheta(double theta)
+void TrackCandidate::setTheta(double theta)
 {
   m_theta = theta;
   m_xc = cos(theta) / m_r;
   m_yc = sin(theta) / m_r;
 }
 
-void CDCLegendreTrackCandidate::addHit(CDCLegendreTrackHit* hit)
+void TrackCandidate::addHit(TrackHit* hit)
 {
   if ((m_charge == charge_curler) || hit->getCurvatureSignWrt(getXc(), getYc()) == m_charge)
     m_TrackHits.push_back(hit);
@@ -292,10 +293,10 @@ void CDCLegendreTrackCandidate::addHit(CDCLegendreTrackHit* hit)
 
 }
 
-void CDCLegendreTrackCandidate::removeHit(CDCLegendreTrackHit* hit)
+void TrackCandidate::removeHit(TrackHit* hit)
 {
   m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(),
-  [&hit](CDCLegendreTrackHit * trackHit) {
+  [&hit](TrackHit * trackHit) {
     return trackHit == hit;
   }), m_TrackHits.end());
   /*
@@ -309,10 +310,10 @@ void CDCLegendreTrackCandidate::removeHit(CDCLegendreTrackHit* hit)
   else
     --m_stereoHits;
 
-  hit->setHitUsage(CDCLegendreTrackHit::not_used);
+  hit->setHitUsage(TrackHit::not_used);
 }
 
-int CDCLegendreTrackCandidate::getInnermostSLayer(bool forced, int minNHits)
+int TrackCandidate::getInnermostSLayer(bool forced, int minNHits)
 {
 
   if ((m_innermostAxialSLayer == -1) || (forced)) {
@@ -322,7 +323,7 @@ int CDCLegendreTrackCandidate::getInnermostSLayer(bool forced, int minNHits)
       if (m_hitPattern.hasSLayer(minSLayer)) {
         if (m_hitPattern.getSLayerNHits(minSLayer) < minNHits) {
           //using lambda functions for erase-remove idiom
-          m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(), [&minSLayer](CDCLegendreTrackHit * hit) {return hit->getSuperlayerId() == minSLayer;}), m_TrackHits.end());
+          m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(), [&minSLayer](TrackHit * hit) {return hit->getSuperlayerId() == minSLayer;}), m_TrackHits.end());
         } else {
           m_innermostAxialSLayer = minSLayer;
           break;
@@ -337,7 +338,7 @@ int CDCLegendreTrackCandidate::getInnermostSLayer(bool forced, int minNHits)
   return m_innermostAxialSLayer;
 }
 
-int CDCLegendreTrackCandidate::getOutermostSLayer(bool forced, int minNHits)
+int TrackCandidate::getOutermostSLayer(bool forced, int minNHits)
 {
   if ((m_outermostAxialSLayer == -1) || (forced)) {
     unsigned nHits = m_TrackHits.size();
@@ -346,7 +347,7 @@ int CDCLegendreTrackCandidate::getOutermostSLayer(bool forced, int minNHits)
       if (m_hitPattern.hasSLayer(maxSLayer)) {
         if (m_hitPattern.getSLayerNHits(maxSLayer) < minNHits) {
           //using lambda functions for erase-remove idiom
-          m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(), [&maxSLayer](CDCLegendreTrackHit * hit) {return hit->getSuperlayerId() == maxSLayer;}), m_TrackHits.end());
+          m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(), [&maxSLayer](TrackHit * hit) {return hit->getSuperlayerId() == maxSLayer;}), m_TrackHits.end());
         } else {
           m_outermostAxialSLayer = maxSLayer;
           break;
@@ -362,11 +363,11 @@ int CDCLegendreTrackCandidate::getOutermostSLayer(bool forced, int minNHits)
 }
 
 
-void CDCLegendreTrackCandidate::makeHitPattern()
+void TrackCandidate::makeHitPattern()
 {
   m_hitPattern.resetPattern();
 
-  for (CDCLegendreTrackHit * hit : m_TrackHits) {
+  for (TrackHit * hit : m_TrackHits) {
     m_hitPattern.setLayer(hit->getLayerId());
   }
 
@@ -378,10 +379,10 @@ void CDCLegendreTrackCandidate::makeHitPattern()
 
 
 
-double CDCLegendreTrackCandidate::getLayerWaight()
+double TrackCandidate::getLayerWaight()
 {
   int maxLayer = -999;
-  BOOST_FOREACH(CDCLegendreTrackHit * hit, m_TrackHits) {
+  BOOST_FOREACH(TrackHit * hit, m_TrackHits) {
     if (hit->getIsAxial()) {
       if (hit->getLayerId() > maxLayer)
         maxLayer = hit->getLayerId();
@@ -389,7 +390,7 @@ double CDCLegendreTrackCandidate::getLayerWaight()
   }
 
   double layerWaight = 0;
-  BOOST_FOREACH(CDCLegendreTrackHit * hit, m_TrackHits) {
+  BOOST_FOREACH(TrackHit * hit, m_TrackHits) {
     if (hit->getIsAxial()) {
       layerWaight += 1. / (hit->getLayerId() + 1);
     }
@@ -400,9 +401,9 @@ double CDCLegendreTrackCandidate::getLayerWaight()
 
 #include <iostream>
 
-void CDCLegendreTrackCandidate::CheckStereoHits()
+void TrackCandidate::CheckStereoHits()
 {
-  std::vector<CDCLegendreTrackHit*> replace_vector;
+  std::vector<TrackHit*> replace_vector;
   replace_vector.reserve(m_TrackHits.size());
 
   TVector3 mom = getMomentumEstimation();
@@ -411,7 +412,7 @@ void CDCLegendreTrackCandidate::CheckStereoHits()
   double phi_track = atan2(mom.Z(), mom_r);
   m_stereoHits = 0;
 
-  for (CDCLegendreTrackHit * hit : m_TrackHits) {
+  for (TrackHit * hit : m_TrackHits) {
     if (hit->getIsAxial())
       replace_vector.push_back(hit);
     else {
@@ -433,7 +434,7 @@ void CDCLegendreTrackCandidate::CheckStereoHits()
   m_TrackHits = replace_vector;
 }
 
-void CDCLegendreTrackCandidate::setReferencePoint(double x0, double y0)
+void TrackCandidate::setReferencePoint(double x0, double y0)
 {
   m_ref_x = x0;
   m_ref_y = y0;
@@ -441,18 +442,18 @@ void CDCLegendreTrackCandidate::setReferencePoint(double x0, double y0)
   m_yc = sin(m_theta) / m_r + m_ref_y;
 }
 
-void CDCLegendreTrackCandidate::clearBadHits()
+void TrackCandidate::clearBadHits()
 {
   double R = fabs(1. / this->m_r);
   double x0_track = cos(this->m_theta) / this->m_r + m_ref_x;
   double y0_track = sin(this->m_theta) / this->m_r + m_ref_y;
   m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(),
-  [&R, &x0_track, &y0_track](CDCLegendreTrackHit * hit) {
+  [&R, &x0_track, &y0_track](TrackHit * hit) {
     double x0_hit = hit->getOriginalWirePosition().X();
     double y0_hit = hit->getOriginalWirePosition().Y();
     double dist = fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftLength();
     if (dist > hit->getSigmaDriftLength() * 2.) {
-      hit->setHitUsage(CDCLegendreTrackHit::bad);
+      hit->setHitUsage(TrackHit::bad);
       return true;
     } else {
       return false;

@@ -1,5 +1,5 @@
 /*
- * CDCLegendreQuadTreeNeighborFinder.cpp
+ * QuadTreeNeighborFinder.cpp
  *
  *  Created on: Apr 15, 2014
  *      Author: vtrusov
@@ -12,17 +12,18 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace TrackFinderCDCLegendre;
 
-CDCLegendreQuadTreeNeighborFinder* CDCLegendreQuadTreeNeighborFinder::s_cdcLegendreQuadTreeNeighborFinder = 0;
+QuadTreeNeighborFinder* QuadTreeNeighborFinder::s_cdcLegendreQuadTreeNeighborFinder = 0;
 
 
-CDCLegendreQuadTreeNeighborFinder& CDCLegendreQuadTreeNeighborFinder::Instance()
+QuadTreeNeighborFinder& QuadTreeNeighborFinder::Instance()
 {
-  if (!s_cdcLegendreQuadTreeNeighborFinder) s_cdcLegendreQuadTreeNeighborFinder = new CDCLegendreQuadTreeNeighborFinder();
+  if (!s_cdcLegendreQuadTreeNeighborFinder) s_cdcLegendreQuadTreeNeighborFinder = new QuadTreeNeighborFinder();
   return *s_cdcLegendreQuadTreeNeighborFinder;
 }
 
-void CDCLegendreQuadTreeNeighborFinder::controller(CDCLegendreQuadTree* origin_node, CDCLegendreQuadTree* caller_node, CDCLegendreQuadTree* node)
+void QuadTreeNeighborFinder::controller(QuadTree* origin_node, QuadTree* caller_node, QuadTree* node)
 {
   /*  B2INFO("LOOKING for neighbors");
     B2INFO("LEVEL = " << node->getLevel());
@@ -48,16 +49,16 @@ void CDCLegendreQuadTreeNeighborFinder::controller(CDCLegendreQuadTree* origin_n
 
 }
 
-void CDCLegendreQuadTreeNeighborFinder::levelUp(CDCLegendreQuadTree* origin_node, CDCLegendreQuadTree* caller_node)
+void QuadTreeNeighborFinder::levelUp(QuadTree* origin_node, QuadTree* caller_node)
 {
   controller(origin_node, caller_node, caller_node->getParent());
 }
 
-void CDCLegendreQuadTreeNeighborFinder::levelDown(CDCLegendreQuadTree* origin_node, CDCLegendreQuadTree* node)
+void QuadTreeNeighborFinder::levelDown(QuadTree* origin_node, QuadTree* node)
 {
   for (int t_index = 0; t_index < node->getThetaNbins(); ++t_index) {
     for (int r_index = 0; r_index < node->getRNbins(); ++r_index) {
-      CDCLegendreQuadTree* child_node = node->getChildren(t_index, r_index);
+      QuadTree* child_node = node->getChildren(t_index, r_index);
 
       if (child_node == origin_node) continue;
 
@@ -75,11 +76,11 @@ void CDCLegendreQuadTreeNeighborFinder::levelDown(CDCLegendreQuadTree* origin_no
 
 
 
-void CDCLegendreQuadTreeNeighborFinder::findNeighbors(CDCLegendreQuadTree* origin_node, CDCLegendreQuadTree* caller_node, CDCLegendreQuadTree* node)
+void QuadTreeNeighborFinder::findNeighbors(QuadTree* origin_node, QuadTree* caller_node, QuadTree* node)
 {
   for (int t_index = 0; t_index < node->getThetaNbins(); ++t_index) {
     for (int r_index = 0; r_index < node->getRNbins(); ++r_index) {
-      CDCLegendreQuadTree* child_node = node->getChildren(t_index, r_index);
+      QuadTree* child_node = node->getChildren(t_index, r_index);
 
       if (child_node == origin_node) continue;
 
@@ -96,7 +97,7 @@ void CDCLegendreQuadTreeNeighborFinder::findNeighbors(CDCLegendreQuadTree* origi
   }
 }
 
-bool CDCLegendreQuadTreeNeighborFinder::compareNodes(CDCLegendreQuadTree* node1 , CDCLegendreQuadTree* node2)
+bool QuadTreeNeighborFinder::compareNodes(QuadTree* node1 , QuadTree* node2)
 {
   /*check all possible combination borders; 8 combinations at total
    *  ________

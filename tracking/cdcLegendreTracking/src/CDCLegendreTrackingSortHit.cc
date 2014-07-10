@@ -3,11 +3,12 @@
 #include <boost/tuple/tuple.hpp>
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
 
-using namespace Belle2;
 using namespace std;
+using namespace Belle2;
+using namespace TrackFinderCDCLegendre;
 
-bool CDCLegendreTrackingSortHit::operator()(CDCLegendreTrackHit* hit1,
-                                            CDCLegendreTrackHit* hit2)
+bool SortHits::operator()(TrackHit* hit1,
+                          TrackHit* hit2)
 {
   bool result = true;
   boost::tuple<int, double, int, double> tuple1(hit1->getStoreIndex(),

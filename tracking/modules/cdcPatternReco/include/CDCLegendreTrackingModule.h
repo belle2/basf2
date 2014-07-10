@@ -16,6 +16,23 @@
 #include <boost/tuple/tuple.hpp>
 #include <vector>
 
+
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackCreator.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackMerger.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackFitter.h>
+#include <tracking/cdcLegendreTracking/CDCLegendrePatternChecker.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreFastHough.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackDrawer.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreQuadTree.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreConformalPosition.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreQuadTreeCandidateCreator.h>
+#include "tracking/cdcLegendreTracking/CDCLegendreQuadTreeNeighborFinder.h"
+#include <tracking/cdcLegendreTracking/CDCLegendreWireCenter.h>
+
+#include <tracking/cdcLegendreTracking/CDCLegendreSimpleFilter.h>
+
 namespace Belle2 {
   /**
    *  \addtogroup modules
@@ -25,19 +42,19 @@ namespace Belle2 {
    *  @{ CDCLegendreTrackingModule @} @}
    */
 
-  /** Forward declaration to avoid including the corresponding header file*/
-  class CDCLegendreTrackHit;
-  class CDCLegendreTrackCandidate;
-  class CDCLegendreTrackFitter;
-  class CDCLegendrePatternChecker;
-  class CDCLegendreFastHough;
-  class CDCLegendreTrackMerger;
-  class CDCLegendreTrackCreator;
-  class CDCLegendreTrackDrawer;
-  class CDCLegendreQuadTree;
-  class CDCLegendreConformalPosition;
-  class CDCLegendreQuadTreeCandidateCreator;
-
+  /** Forward declaration to avoid including the corresponding header file
+  class TrackHit;
+  class TrackCandidate;
+  class TrackFitter;
+  class PatternChecker;
+  class FastHough;
+  class TrackMerger;
+  class TrackCreator;
+  class TrackDrawer;
+  class QuadTree;
+  class ConformalPosition;
+  class QuadTreeCandidateCreator;
+  */
   class CDCNiceDrawingModule;
 
   /** CDC tracking module, using Legendre transformation of the drift time circles.
@@ -91,20 +108,20 @@ namespace Belle2 {
     std::string m_cdcHitsColName; /**< Input digitized hits collection name (output of CDCDigitizer module) */
     std::string m_gfTrackCandsColName; /**< Output genfit track candidates collection name*/
 
-    std::vector<CDCLegendreTrackHit*> m_AxialHitList; /**< List of the axial hits used for track finding. This is the vector, which is used for memory management! */
-    std::vector<CDCLegendreTrackHit*> m_StereoHitList; /**< List of the stereo hits used for track finding. This is the vector, which is used for memory management! */
-    std::list<CDCLegendreTrackCandidate*> m_trackList; /**< List of track candidates. Mainly used for memory management! */
-    std::list<CDCLegendreTrackCandidate*> m_trackletList; /**< List of tracklets. */
-    std::list<CDCLegendreTrackCandidate*> m_stereoTrackletList; /**< List of tracklets. */
+    std::vector<TrackFinderCDCLegendre::TrackHit*> m_AxialHitList; /**< List of the axial hits used for track finding. This is the vector, which is used for memory management! */
+    std::vector<TrackFinderCDCLegendre::TrackHit*> m_StereoHitList; /**< List of the stereo hits used for track finding. This is the vector, which is used for memory management! */
+    std::list<TrackFinderCDCLegendre::TrackCandidate*> m_trackList; /**< List of track candidates. Mainly used for memory management! */
+    std::list<TrackFinderCDCLegendre::TrackCandidate*> m_trackletList; /**< List of tracklets. */
+    std::list<TrackFinderCDCLegendre::TrackCandidate*> m_stereoTrackletList; /**< List of tracklets. */
 
-    CDCLegendreTrackFitter* m_cdcLegendreTrackFitter; /**< Object containing fitter for tracking */
-    CDCLegendrePatternChecker* m_cdcLegendrePatternChecker; /**< Used for check patterns of tracks */
-    CDCLegendreFastHough* m_cdcLegendreFastHough; /**< Fast Hough transformer */
-    CDCLegendreTrackMerger* m_cdcLegendreTrackMerger; /**< Object which make track merging inside the module */
-    CDCLegendreTrackCreator* m_cdcLegendreTrackCreator; /**< Object for creating tracks */
-    CDCLegendreQuadTree* m_cdcLegendreQuadTree; /**< Object which holds quadtree structure */
-    CDCLegendreConformalPosition* m_cdcLegendreConformalPosition; /**< Object which holds pre-calculated conformal transformation of each wire */
-    CDCLegendreQuadTreeCandidateCreator* m_cdcLegendreQuadTreeCandidateCreator; /**< Object which creates track candidates using quadtree nodes */
+    TrackFinderCDCLegendre::TrackFitter* m_cdcLegendreTrackFitter; /**< Object containing fitter for tracking */
+    TrackFinderCDCLegendre::PatternChecker* m_cdcLegendrePatternChecker; /**< Used for check patterns of tracks */
+    TrackFinderCDCLegendre::FastHough* m_cdcLegendreFastHough; /**< Fast Hough transformer */
+    TrackFinderCDCLegendre::TrackMerger* m_cdcLegendreTrackMerger; /**< Object which make track merging inside the module */
+    TrackFinderCDCLegendre::TrackCreator* m_cdcLegendreTrackCreator; /**< Object for creating tracks */
+    TrackFinderCDCLegendre::QuadTree* m_cdcLegendreQuadTree; /**< Object which holds quadtree structure */
+    TrackFinderCDCLegendre::ConformalPosition* m_cdcLegendreConformalPosition; /**< Object which holds pre-calculated conformal transformation of each wire */
+    TrackFinderCDCLegendre::QuadTreeCandidateCreator* m_cdcLegendreQuadTreeCandidateCreator; /**< Object which creates track candidates using quadtree nodes */
 
     int m_threshold; /**< Threshold for votes in the legendre plane, parameter of the module*/
     double m_thresholdUnique; /**< Threshold of unique TrackHits for track building*/
@@ -128,12 +145,12 @@ namespace Belle2 {
     bool m_mergeTracksEarly; /**< Apply fitting for candidates on early stage or not*/
     bool m_earlyMerge; /**< Apply fitting for candidates or not*/
     bool m_drawCandidates; /**< Draw each candidate in interactive mode*/
-    bool m_drawCandInfo; /**< Set whether CDCLegendreTrackDrawer class will bw used at all*/
+    bool m_drawCandInfo; /**< Set whether TrackDrawer class will bw used at all*/
     bool m_appendHits; /**< Try to append new hits to track candidate*/
     bool m_multipleCandidateSearch; /**< Search multiple track candidates per run of FastHough algorithm*/
     bool m_useHitPrecalculatedR; /**< To store r values inside hit objects or recalculate it each step */
 
-    CDCLegendreTrackDrawer* m_cdcLegendreTrackDrawer; /**< Class which allows in-module drawing*/
+    TrackFinderCDCLegendre::TrackDrawer* m_cdcLegendreTrackDrawer; /**< Class which allows in-module drawing*/
 
     int m_treeFinder;
     int m_steppedFinder;

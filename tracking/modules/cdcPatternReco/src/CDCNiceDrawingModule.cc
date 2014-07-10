@@ -24,6 +24,7 @@
 
 using namespace Belle2;
 using namespace CDC;
+using namespace TrackFinderCDCLegendre;
 
 REG_MODULE(CDCNiceDrawing)
 
@@ -56,7 +57,7 @@ CDCNiceDrawingModule::CDCNiceDrawingModule() : Module()
 
 void CDCNiceDrawingModule::initialize()
 {
-  m_cdcLegendreNiceDrawing = new CDCLegendreNiceDrawing(m_TrackCandColName, m_trackColName, m_HitColName, m_StoreDirectory, m_drawMCSignal, m_drawCands, m_mcParticlesColName);
+  m_cdcLegendreNiceDrawing = new NiceDrawing(m_TrackCandColName, m_trackColName, m_HitColName, m_StoreDirectory, m_drawMCSignal, m_drawCands, m_mcParticlesColName);
 
   m_cdcLegendreNiceDrawing->initialize();
 

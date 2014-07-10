@@ -16,6 +16,8 @@
 #include "genfit/Track.h"
 #include "genfit/TrackCand.h"
 
+#include "tracking/cdcLegendreTracking/CDCLegendreNiceDrawing.h"
+
 class TVector2;
 //class TrackCand;
 //class Track;
@@ -24,7 +26,7 @@ namespace Belle2 {
 
   class CDCHit;
   class MCParticle;
-  class CDCLegendreNiceDrawing;
+//  class NiceDrawing;
 
   class CDCNiceDrawingModule : public Module {
 
@@ -63,7 +65,7 @@ namespace Belle2 {
 
     bool m_drawCands;
 
-    CDCLegendreNiceDrawing* m_cdcLegendreNiceDrawing;
+    TrackFinderCDCLegendre::NiceDrawing* m_cdcLegendreNiceDrawing;
 
   };
 

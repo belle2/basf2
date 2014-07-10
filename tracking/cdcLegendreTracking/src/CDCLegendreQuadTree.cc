@@ -32,14 +32,15 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace TrackFinderCDCLegendre;
 
-double* CDCLegendreQuadTree::s_sin_theta;
-double* CDCLegendreQuadTree::s_cos_theta;
-bool CDCLegendreQuadTree::s_sin_lookup_created;
-int CDCLegendreQuadTree::s_nbinsTheta;
-unsigned int CDCLegendreQuadTree::s_hitsThreshold;
-double CDCLegendreQuadTree::s_rThreshold;
-int CDCLegendreQuadTree::s_lastLevel;
+double* QuadTree::s_sin_theta;
+double* QuadTree::s_cos_theta;
+bool QuadTree::s_sin_lookup_created;
+int QuadTree::s_nbinsTheta;
+unsigned int QuadTree::s_hitsThreshold;
+double QuadTree::s_rThreshold;
+int QuadTree::s_lastLevel;
 
 /*
  * TODO: How to organise it? we can fill tree, then check, if hit was used twice or more times; in that case mark it as "multipleused" and don't include it to any track.
@@ -47,14 +48,14 @@ int CDCLegendreQuadTree::s_lastLevel;
  *
  * Lits of nodes with candidates should be provided as output of whole algorithm; then another class can create candidates using pointer to the node
  */
-CDCLegendreQuadTree::CDCLegendreQuadTree():
+QuadTree::QuadTree():
   m_rMin(0), m_rMax(0), m_thetaMin(0), m_thetaMax(0), m_level(0)
 {
 
 }
 
 
-CDCLegendreQuadTree::CDCLegendreQuadTree(double rMin, double rMax, int thetaMin, int thetaMax, int level, CDCLegendreQuadTree* parent) :
+QuadTree::QuadTree(double rMin, double rMax, int thetaMin, int thetaMax, int level, QuadTree* parent) :
   m_rMin(rMin), m_rMax(rMax), m_thetaMin(thetaMin), m_thetaMax(thetaMax), m_level(level)
 {
   m_filled = false;
@@ -80,7 +81,7 @@ CDCLegendreQuadTree::CDCLegendreQuadTree(double rMin, double rMax, int thetaMin,
 }
 
 
-CDCLegendreQuadTree::~CDCLegendreQuadTree()
+QuadTree::~QuadTree()
 {
   if (not m_isMaxLevel) {
     for (int t_index = 0; t_index < m_nbins_theta; ++t_index) {
@@ -101,7 +102,7 @@ CDCLegendreQuadTree::~CDCLegendreQuadTree()
 
 }
 
-bool CDCLegendreQuadTree::checkLimitsR()
+bool QuadTree::checkLimitsR()
 {
 
   if (m_level == 11)
@@ -115,7 +116,7 @@ bool CDCLegendreQuadTree::checkLimitsR()
 }
 
 
-void CDCLegendreQuadTree::initialize()
+void QuadTree::initialize()
 {
   if (not s_sin_lookup_created) {
     //B2INFO("Create lookup table");
@@ -167,17 +168,17 @@ void CDCLegendreQuadTree::initialize()
   //B2DEBUG(100, "Number of bins: " << nbins_r << "x" << nbins_theta);
   //B2DEBUG(100, "CREATING voting plane");
 
-  m_children = new CDCLegendreQuadTree** [m_nbins_theta];
+  m_children = new QuadTree** [m_nbins_theta];
   for (int i = 0; i < m_nbins_theta; ++i) {
-    m_children[i] = new CDCLegendreQuadTree*[m_nbins_r];
+    m_children[i] = new QuadTree*[m_nbins_r];
     for (int j = 0; j < m_nbins_r; ++j) {
-      m_children[i][j] = new CDCLegendreQuadTree(m_r[j], m_r[j + 1], m_thetaBin[i], m_thetaBin[i + 1], m_level + 1, this);
+      m_children[i][j] = new QuadTree(m_r[j], m_r[j + 1], m_thetaBin[i], m_thetaBin[i + 1], m_level + 1, this);
     }
   }
 
 }
 
-void CDCLegendreQuadTree::buildNeighborhood(int levelNeighborhood)
+void QuadTree::buildNeighborhood(int levelNeighborhood)
 {
   /*  if (m_level < levelNeighborhood) {
       for (int i = 0; i < m_nbins_theta; ++i) {
@@ -201,18 +202,18 @@ void CDCLegendreQuadTree::buildNeighborhood(int levelNeighborhood)
 
 }
 
-void CDCLegendreQuadTree::provideHitSet(const std::set<CDCLegendreTrackHit*>& hits_set)
+void QuadTree::provideHitSet(const std::set<TrackHit*>& hits_set)
 {
   m_hits.clear();
-  std::copy_if(hits_set.begin(), hits_set.end(), std::back_inserter(m_hits), [](CDCLegendreTrackHit * hit) {return (hit->getHitUsage() == CDCLegendreTrackHit::not_used);});
+  std::copy_if(hits_set.begin(), hits_set.end(), std::back_inserter(m_hits), [](TrackHit * hit) {return (hit->getHitUsage() == TrackHit::not_used);});
 }
 
-void CDCLegendreQuadTree::cleanHitsInNode()
+void QuadTree::cleanHitsInNode()
 {
-  m_hits.erase(std::remove_if(m_hits.begin(), m_hits.end(), [](CDCLegendreTrackHit * hit) {return hit->getHitUsage() != CDCLegendreTrackHit::not_used;}), m_hits.end());
+  m_hits.erase(std::remove_if(m_hits.begin(), m_hits.end(), [](TrackHit * hit) {return hit->getHitUsage() != TrackHit::not_used;}), m_hits.end());
 }
 
-void CDCLegendreQuadTree::clearTree()
+void QuadTree::clearTree()
 {
   clearNode();
   if (checkFilled()) {
@@ -225,7 +226,7 @@ void CDCLegendreQuadTree::clearTree()
   m_filled = false;
 }
 
-void CDCLegendreQuadTree::startFillingTree()
+void QuadTree::startFillingTree()
 {
   if (m_hits.size() < s_hitsThreshold) return;
   if (m_rMin * m_rMax >= 0 && fabs(m_rMin) > s_rThreshold && fabs(m_rMax) > s_rThreshold) return;
@@ -233,7 +234,7 @@ void CDCLegendreQuadTree::startFillingTree()
 //    B2INFO("Last level! Not filling children. Level = " << m_level << "; bin " << m_rMin << "-" << m_rMax << "x" << m_thetaMin << "-" << m_thetaMax);
 //    B2INFO("Candidate: " << m_rMin << "-" << m_rMax << "x" << m_thetaMin << "-" << m_thetaMax << "; nhits=" << m_hits.size());
 
-    CDCLegendreQuadTreeCandidateCreator::Instance().createCandidateDirect(this);
+    QuadTreeCandidateCreator::Instance().createCandidateDirect(this);
     return;
   }
 
@@ -269,7 +270,7 @@ void CDCLegendreQuadTree::startFillingTree()
   }
 }
 
-void CDCLegendreQuadTree::fillChildren(/*const std::vector<CDCLegendreTrackHit*>& hits*/)
+void QuadTree::fillChildren(/*const std::vector<CDCLegendreTrackHit*>& hits*/)
 {
 
   double r_temp, r_1, r_2;
@@ -286,9 +287,9 @@ void CDCLegendreQuadTree::fillChildren(/*const std::vector<CDCLegendreTrackHit*>
   }
 
   //Voting within the four bins
-  for (CDCLegendreTrackHit * hit : m_hits) {
+  for (TrackHit * hit : m_hits) {
     //B2DEBUG(100, "PROCCESSING hit " << hit_counter << " of " << nhitsToReserve);
-    if (hit->getHitUsage() != CDCLegendreTrackHit::not_used) continue;
+    if (hit->getHitUsage() != TrackHit::not_used) continue;
     for (int t_index = 0; t_index < m_nbins_theta + 1; ++t_index) {
 
       /*if (hit->checkRValue(m_thetaBin[t_index])) r_temp = hit->getRValue(m_thetaBin[t_index]);
@@ -317,10 +318,10 @@ void CDCLegendreQuadTree::fillChildren(/*const std::vector<CDCLegendreTrackHit*>
     for (int t_index = 0; t_index < m_nbins_theta; ++t_index) {
       for (int r_index = 0; r_index < m_nbins_r; ++r_index) {
         //curves are assumed to be straight lines, might be a reasonable assumption locally
-        if (!CDCLegendreFastHough::sameSign(dist_1[t_index][r_index], dist_1[t_index][r_index + 1], dist_1[t_index + 1][r_index], dist_1[t_index + 1][r_index + 1])) {
+        if (!FastHough::sameSign(dist_1[t_index][r_index], dist_1[t_index][r_index + 1], dist_1[t_index + 1][r_index], dist_1[t_index + 1][r_index + 1])) {
           //B2DEBUG(100, "INSERT hit in " << t_index << ";" << r_index << " bin");
           m_children[t_index][r_index]->insertHit(hit);
-        } else if (!CDCLegendreFastHough::sameSign(dist_2[t_index][r_index], dist_2[t_index][r_index + 1], dist_2[t_index + 1][r_index], dist_2[t_index + 1][r_index + 1])) {
+        } else if (!FastHough::sameSign(dist_2[t_index][r_index], dist_2[t_index][r_index + 1], dist_2[t_index + 1][r_index], dist_2[t_index + 1][r_index + 1])) {
           //B2DEBUG(100, "INSERT hit in " << t_index << ";" << r_index << " bin");
           m_children[t_index][r_index]->insertHit(hit);
         }
@@ -334,7 +335,7 @@ void CDCLegendreQuadTree::fillChildren(/*const std::vector<CDCLegendreTrackHit*>
 }
 
 
-void CDCLegendreQuadTree::fillChildrenForced()
+void QuadTree::fillChildrenForced()
 {
   if (!m_parent->checkFilled()) {
     m_parent->fillChildrenForced();
@@ -343,10 +344,10 @@ void CDCLegendreQuadTree::fillChildrenForced()
 }
 
 
-void CDCLegendreQuadTree::findNeighbors()
+void QuadTree::findNeighbors()
 {
   if (not m_neighborsDefined) {
-    CDCLegendreQuadTreeNeighborFinder::Instance().controller(this, this, m_parent);
+    QuadTreeNeighborFinder::Instance().controller(this, this, m_parent);
     m_neighborsDefined = true;
   }
 //  B2INFO("Number of neighbors: " << m_neighbors.size());
@@ -366,7 +367,7 @@ void CDCLegendreQuadTree::findNeighbors()
 
 }
 
-std::vector<CDCLegendreQuadTree*>& CDCLegendreQuadTree::getNeighborsVector()
+std::vector<QuadTree*>& QuadTree::getNeighborsVector()
 {
   if (not m_neighborsDefined) {
     B2WARNING("Trying to get neighbors of the node which are not defined. Starting neighbors finding");
@@ -375,7 +376,7 @@ std::vector<CDCLegendreQuadTree*>& CDCLegendreQuadTree::getNeighborsVector()
   return m_neighbors;
 }
 
-CDCLegendreQuadTree* CDCLegendreQuadTree::getChildren(int t_index, int r_index) const
+QuadTree* QuadTree::getChildren(int t_index, int r_index) const
 {
   if ((t_index > m_nbins_theta) || (r_index > m_nbins_r))
     B2FATAL("BAD THETA OR R INDEX OF CHILDREN NODE! m_nbins_theta=" << m_nbins_theta << ", m_nbins_r" << m_nbins_r << "; t_index=" << t_index << ", r_index" << r_index);

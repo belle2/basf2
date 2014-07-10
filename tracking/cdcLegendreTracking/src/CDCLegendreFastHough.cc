@@ -18,11 +18,12 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace TrackFinderCDCLegendre;
 
 
 
-CDCLegendreFastHough::CDCLegendreFastHough(bool reconstructCurler,
-                                           int maxLevel, int nbinsTheta, double rMax):
+FastHough::FastHough(bool reconstructCurler,
+                     int maxLevel, int nbinsTheta, double rMax):
   m_reconstructCurler(reconstructCurler), m_maxLevel(maxLevel),
   m_nbinsTheta(nbinsTheta), m_rMax(rMax)
 {
@@ -44,7 +45,7 @@ CDCLegendreFastHough::CDCLegendreFastHough(bool reconstructCurler,
 }
 
 
-CDCLegendreFastHough::~CDCLegendreFastHough()
+FastHough::~FastHough()
 {
   delete[] m_sin_theta;
   delete[] m_cos_theta;
@@ -65,9 +66,9 @@ inline bool CDCLegendreFastHough::sameSign(double n1, double n2,
 }
 */
 
-void CDCLegendreFastHough::FastHoughNormal(
-  std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >* candidate,
-  const std::vector<CDCLegendreTrackHit*>& hits, const int level,
+void FastHough::FastHoughNormal(
+  std::pair<std::vector<TrackHit*>, std::pair<double, double> >* candidate,
+  const std::vector<TrackHit*>& hits, const int level,
   const int theta_min, const int theta_max, const double r_min,
   const double r_max, const unsigned limit)
 {
@@ -88,7 +89,7 @@ void CDCLegendreFastHough::FastHoughNormal(
   r[2] = r_max;
 
   //2 x 2 voting plane
-  std::vector<CDCLegendreTrackHit*> voted_hits[2][2];
+  std::vector<TrackHit*> voted_hits[2][2];
   for (unsigned int i = 0; i < 2; ++i)
     for (unsigned int j = 0; j < 2; ++j)
       voted_hits[i][j].reserve(1024);
@@ -98,7 +99,7 @@ void CDCLegendreFastHough::FastHoughNormal(
   double dist_2[3][3];
 
   //Voting within the four bins
-  for (CDCLegendreTrackHit * hit : hits) {
+  for (TrackHit * hit : hits) {
     for (int t_index = 0; t_index < 3; ++t_index) {
 
 //      r_temp = CDCLegendreConformalPosition::Instance().getConformalR(hit->getLayerId(), hit->getWireId(), thetaBin[t_index]);
@@ -120,10 +121,10 @@ void CDCLegendreFastHough::FastHoughNormal(
       for (int r_index = 0; r_index < 2; ++r_index) {
         //curves are assumed to be straight lines, might be a reasonable assumption locally
         if ((!sameSign(dist_1[t_index][r_index], dist_1[t_index][r_index + 1], dist_1[t_index + 1][r_index], dist_1[t_index + 1][r_index + 1])) &&
-            (hit->getHitUsage() == CDCLegendreTrackHit::not_used))
+            (hit->getHitUsage() == TrackHit::not_used))
           voted_hits[t_index][r_index].push_back(hit);
         else if ((!sameSign(dist_2[t_index][r_index], dist_2[t_index][r_index + 1], dist_2[t_index + 1][r_index], dist_2[t_index + 1][r_index + 1])) &&
-                 (hit->getHitUsage() == CDCLegendreTrackHit::not_used))
+                 (hit->getHitUsage() == TrackHit::not_used))
           voted_hits[t_index][r_index].push_back(hit);
       }
     }
@@ -266,8 +267,8 @@ void CDCLegendreFastHough::FastHoughNormal(
 }
 
 
-void CDCLegendreFastHough::MaxFastHough(const std::vector<CDCLegendreTrackHit*>& hits, const int level, const int theta_min, const int theta_max,
-                                        const double r_min, const double r_max)
+void FastHough::MaxFastHough(const std::vector<TrackHit*>& hits, const int level, const int theta_min, const int theta_max,
+                             const double r_min, const double r_max)
 {
 
   if (not m_reconstructCurler
@@ -287,7 +288,7 @@ void CDCLegendreFastHough::MaxFastHough(const std::vector<CDCLegendreTrackHit*>&
   r[2] = r_max;
 
   //2 x 2 voting plane
-  std::vector<CDCLegendreTrackHit*> voted_hits[2][2];
+  std::vector<TrackHit*> voted_hits[2][2];
   for (unsigned int i = 0; i < 2; ++i)
     for (unsigned int j = 0; j < 2; ++j)
       voted_hits[i][j].reserve(1024);
@@ -297,11 +298,11 @@ void CDCLegendreFastHough::MaxFastHough(const std::vector<CDCLegendreTrackHit*>&
   double dist_2[3][3];
 
   //Voting within the four bins
-  for (CDCLegendreTrackHit * hit : hits) {
-    if (hit->getHitUsage() != CDCLegendreTrackHit::not_used) continue;
+  for (TrackHit * hit : hits) {
+    if (hit->getHitUsage() != TrackHit::not_used) continue;
     for (int t_index = 0; t_index < 3; ++t_index) {
 
-      r_temp = CDCLegendreConformalPosition::Instance().getConformalR(hit->getLayerId(), hit->getWireId(), thetaBin[t_index]);
+      r_temp = ConformalPosition::Instance().getConformalR(hit->getLayerId(), hit->getWireId(), thetaBin[t_index]);
 
       r_1 = r_temp + hit->getConformalDriftLength();
       r_2 = r_temp - hit->getConformalDriftLength();
@@ -368,8 +369,8 @@ void CDCLegendreFastHough::MaxFastHough(const std::vector<CDCLegendreTrackHit*>&
       //        if (((!allow_overlap)&&(level == (m_maxLevel - level_diff))) || ((allow_overlap)&&(level == (m_maxLevel - level_diff) + 2))) {
       if (level >= (m_maxLevel - level_diff)) {
 
-        std::vector<CDCLegendreTrackHit*> c_list;
-        std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > candidate_temp =
+        std::vector<TrackHit*> c_list;
+        std::pair<std::vector<TrackHit*>, std::pair<double, double> > candidate_temp =
           std::make_pair(c_list, std::make_pair(-999, -999));
 
 
@@ -381,10 +382,10 @@ void CDCLegendreFastHough::MaxFastHough(const std::vector<CDCLegendreTrackHit*>&
             && fabs((r[r_index] + r[r_index + 1]) / 2) > m_rc)
           return;
 
-        voted_hits[t_index][r_index].erase(std::remove_if(voted_hits[t_index][r_index].begin(), voted_hits[t_index][r_index].end(), [](CDCLegendreTrackHit * hit) {return hit->getHitUsage() != CDCLegendreTrackHit::not_used;}), voted_hits[t_index][r_index].end());
+        voted_hits[t_index][r_index].erase(std::remove_if(voted_hits[t_index][r_index].begin(), voted_hits[t_index][r_index].end(), [](TrackHit * hit) {return hit->getHitUsage() != TrackHit::not_used;}), voted_hits[t_index][r_index].end());
 
-        for (CDCLegendreTrackHit * hit : voted_hits[t_index][r_index]) {
-          hit->setHitUsage(CDCLegendreTrackHit::used_in_cand);
+        for (TrackHit * hit : voted_hits[t_index][r_index]) {
+          hit->setHitUsage(TrackHit::used_in_cand);
         }
 
         candidate_temp.first = voted_hits[t_index][r_index];
@@ -405,8 +406,8 @@ void CDCLegendreFastHough::MaxFastHough(const std::vector<CDCLegendreTrackHit*>&
 }
 
 
-void CDCLegendreFastHough::MaxFastHoughHighPt(const std::vector<CDCLegendreTrackHit*>& hits, const int theta_min, const int theta_max,
-                                              double r_min, double r_max, int level)
+void FastHough::MaxFastHoughHighPt(const std::vector<TrackHit*>& hits, const int theta_min, const int theta_max,
+                                   double r_min, double r_max, int level)
 {
 
   //B2DEBUG(100, "MaxFastHoughHighPt: " << theta_min << " " << theta_max << " " << r_min << " " << r_max);
@@ -430,7 +431,7 @@ void CDCLegendreFastHough::MaxFastHoughHighPt(const std::vector<CDCLegendreTrack
 
   delta_r = 4. * Rcell / (4. / ((r_max + r_min) * (r_max + r_min)) - 4.*Rcell * Rcell);
 
-  if ((delta_r < 0) || (delta_r > 1))B2FATAL("Bad delta_r value: " << delta_r << ". Please check limits in CDCLegendreFastHough::MaxFastHoughHighPt() or switch to CDCLegendreFastHough::MaxFastHough()");
+  if ((delta_r < 0) || (delta_r > 1))B2FATAL("Bad delta_r value: " << delta_r << ". Please check limits in FastHough::MaxFastHoughHighPt() or switch to FastHough::MaxFastHough()");
 
   //B2DEBUG(100, "DELTA r: " << delta_r << "; r_max-r_min: " << fabs(r_max - r_min));
 
@@ -472,15 +473,15 @@ void CDCLegendreFastHough::MaxFastHoughHighPt(const std::vector<CDCLegendreTrack
   int nhitsToReserve;
   nhitsToReserve = 2 * hits.size();
   //voting plane
-  /*  std::vector<CDCLegendreTrackHit*> voted_hits[nbins_theta][nbins_r];
+  /*  std::vector<TrackHit*> voted_hits[nbins_theta][nbins_r];
     for (int i = 0; i < nbins_theta; ++i)
       for (int j = 0; j < nbins_r; ++j)
         voted_hits[i][j].reserve(nhitsToReserve);
   */
-  std::vector<CDCLegendreTrackHit*>** voted_hits;
-  voted_hits = new std::vector<CDCLegendreTrackHit*>* [nbins_theta];
+  std::vector<TrackHit*>** voted_hits;
+  voted_hits = new std::vector<TrackHit*>* [nbins_theta];
   for (int i = 0; i < nbins_theta; ++i) {
-    voted_hits[i] = new std::vector<CDCLegendreTrackHit*>[nbins_r];
+    voted_hits[i] = new std::vector<TrackHit*>[nbins_r];
     for (int j = 0; j < nbins_r; ++j)
       voted_hits[i][j].reserve(nhitsToReserve);
   }
@@ -496,13 +497,13 @@ void CDCLegendreFastHough::MaxFastHoughHighPt(const std::vector<CDCLegendreTrack
 
   int hit_counter = 0;
   //Voting within the four bins
-  for (CDCLegendreTrackHit * hit : hits) {
+  for (TrackHit * hit : hits) {
     hit_counter++;
     //B2DEBUG(100, "PROCCESSING hit " << hit_counter << " of " << nhitsToReserve);
-    if (hit->getHitUsage() != CDCLegendreTrackHit::not_used) continue;
+    if (hit->getHitUsage() != TrackHit::not_used) continue;
     for (int t_index = 0; t_index < nbins_theta + 1; ++t_index) {
 
-      r_temp = CDCLegendreConformalPosition::InstanceTrusted().getConformalR(hit->getLayerId(), hit->getWireId(), thetaBin[t_index]);
+      r_temp = ConformalPosition::InstanceTrusted().getConformalR(hit->getLayerId(), hit->getWireId(), thetaBin[t_index]);
 
       r_1 = r_temp + hit->getConformalDriftLength();
       r_2 = r_temp - hit->getConformalDriftLength();
@@ -583,8 +584,8 @@ void CDCLegendreFastHough::MaxFastHoughHighPt(const std::vector<CDCLegendreTrack
 
         //B2DEBUG(100, "CREATING candidate");
 
-        std::vector<CDCLegendreTrackHit*> c_list;
-        std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > candidate_temp =
+        std::vector<TrackHit*> c_list;
+        std::pair<std::vector<TrackHit*>, std::pair<double, double> > candidate_temp =
           std::make_pair(c_list, std::make_pair(-999, -999));
 
 
@@ -602,10 +603,10 @@ void CDCLegendreFastHough::MaxFastHoughHighPt(const std::vector<CDCLegendreTrack
           return;
         }
 
-        voted_hits[t_index][r_index].erase(std::remove_if(voted_hits[t_index][r_index].begin(), voted_hits[t_index][r_index].end(), [](CDCLegendreTrackHit * hit) {return hit->getHitUsage() != CDCLegendreTrackHit::not_used;}), voted_hits[t_index][r_index].end());
+        voted_hits[t_index][r_index].erase(std::remove_if(voted_hits[t_index][r_index].begin(), voted_hits[t_index][r_index].end(), [](TrackHit * hit) {return hit->getHitUsage() != TrackHit::not_used;}), voted_hits[t_index][r_index].end());
 
-        for (CDCLegendreTrackHit * hit : voted_hits[t_index][r_index]) {
-          hit->setHitUsage(CDCLegendreTrackHit::used_in_cand);
+        for (TrackHit * hit : voted_hits[t_index][r_index]) {
+          hit->setHitUsage(TrackHit::used_in_cand);
         }
 
         candidate_temp.first = voted_hits[t_index][r_index];

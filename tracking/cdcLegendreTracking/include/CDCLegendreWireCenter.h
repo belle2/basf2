@@ -11,26 +11,28 @@
 #pragma once
 
 namespace Belle2 {
+  namespace TrackFinderCDCLegendre {
 
-  class CDCLegendreWireCenter {
-  public:
-    CDCLegendreWireCenter();
+    class WireCenter {
+    public:
+      WireCenter();
 
-    ~CDCLegendreWireCenter();
+      ~WireCenter();
 
-    /**
-     * Get static instance of the class
-     */
-    static CDCLegendreWireCenter& Instance();
+      /**
+       * Get static instance of the class
+       */
+      static WireCenter& Instance();
 
-    /**
-     * Get center of wire
-     */
-    inline double getCenter(int iCLayer) const {return m_wireCentersArray[iCLayer];};
+      /**
+       * Get center of wire
+       */
+      inline double getCenter(int iCLayer) const {return m_wireCentersArray[iCLayer];};
 
-  private:
+    private:
 
-    double m_wireCentersArray[56];
-    static CDCLegendreWireCenter* s_cdcLegendreWireCenter;
-  };
+      double m_wireCentersArray[56];
+      static WireCenter* s_cdcLegendreWireCenter;
+    };
+  }
 }

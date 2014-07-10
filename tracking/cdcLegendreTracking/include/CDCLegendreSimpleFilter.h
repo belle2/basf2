@@ -16,49 +16,50 @@
 #include <map>
 
 namespace Belle2 {
+  namespace TrackFinderCDCLegendre {
 
-  class CDCLegendreTrackCandidate;
-  class CDCLegendreTrackHit;
+    class TrackCandidate;
+    class TrackHit;
 //  class CDCLegendreFilterCandidate;
 
-  class CDCLegendreSimpleFilter {
+    class SimpleFilter {
 
-  public:
+    public:
 
 
-    /**
-     * Constructor
-     */
-    CDCLegendreSimpleFilter() {};
+      /**
+       * Constructor
+       */
+      SimpleFilter() {};
 
-    ~CDCLegendreSimpleFilter() {};
+      ~SimpleFilter() {};
 
-    /**
-     * Returns probability of hit assignment to track. TODO: more robust criteria should be implemented
-     */
-    double getAssigmentProbability(CDCLegendreTrackHit* hit, CDCLegendreTrackCandidate* track);
+      /**
+       * Returns probability of hit assignment to track. TODO: more robust criteria should be implemented
+       */
+      double getAssigmentProbability(TrackHit* hit, TrackCandidate* track);
 
-    /**
-     * Hits reassignment;
-     */
-    void processTracks(std::list<CDCLegendreTrackCandidate*>& trackList);
+      /**
+       * Hits reassignment;
+       */
+      void processTracks(std::list<TrackCandidate*>& trackList);
 
-    /**
-     * Append unused hits to tracks
-     */
-    void appenUnusedHits(std::list<CDCLegendreTrackCandidate*>& trackList, std::vector<CDCLegendreTrackHit*> AxialHitList);
+      /**
+       * Append unused hits to tracks
+       */
+      void appenUnusedHits(std::list<TrackCandidate*>& trackList, std::vector<TrackHit*> AxialHitList);
 
 //    void trackCore();
 
 
-  private:
+    private:
 
 //    std::list<CDCLegendreFilterCandidate*> m_cdcLegendreFilterCandidateList;
 //    std::list<CDCLegendreTrackCandidate*>& m_trackList;
 //    std::list<CDCLegendreTrackCandidate*> m_trackCoreList;
-    const double m_distFactor = 0.5; /**< Factor used in assignment probability estimation */
+      const double m_distFactor = 0.5; /**< Factor used in assignment probability estimation */
 //    const double __attribute__((unused)) m_minProb = 0.98; /**< Minimal probability of hit assignment; currently no used*/
 
-  };
-
+    };
+  }
 }

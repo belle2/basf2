@@ -28,15 +28,16 @@
 
 
 using namespace Belle2;
+using namespace TrackFinderCDCLegendre;
 
 
-CDCLegendreTrackDrawer::CDCLegendreTrackDrawer(bool drawCandInfo, bool drawCandidates) :
+TrackDrawer::TrackDrawer(bool drawCandInfo, bool drawCandidates) :
   m_drawCandInfo(drawCandInfo), m_drawCandidates(drawCandidates), m_rMin(-0.15), m_rMax(0.15)
 {
 
 }
 
-void CDCLegendreTrackDrawer::initialize()
+void TrackDrawer::initialize()
 {
   system("mkdir tmp");
 
@@ -66,7 +67,7 @@ void CDCLegendreTrackDrawer::initialize()
 
 }
 
-void CDCLegendreTrackDrawer::event()
+void TrackDrawer::event()
 {
   if (not m_drawCandInfo) return;
 
@@ -96,13 +97,13 @@ void CDCLegendreTrackDrawer::event()
 
 }
 
-void CDCLegendreTrackDrawer::drawHitsROOT(std::vector<CDCLegendreTrackHit*>& hits_vector)
+void TrackDrawer::drawHitsROOT(std::vector<TrackHit*>& hits_vector)
 {
   drawConformalHits(hits_vector, -1, false);
   drawLegendreHits(hits_vector, -1, false);
 }
 
-void CDCLegendreTrackDrawer::drawTrackCand(CDCLegendreTrackCandidate* TrackCand)
+void TrackDrawer::drawTrackCand(TrackCandidate* TrackCand)
 {
   if (not m_drawCandInfo) return;
 
@@ -117,7 +118,7 @@ void CDCLegendreTrackDrawer::drawTrackCand(CDCLegendreTrackCandidate* TrackCand)
 
   drawAnyTrack(ss, momentum, charge, trackColor, position);
 
-  for (CDCLegendreTrackHit * hit : TrackCand->getTrackHits()) {
+  for (TrackHit * hit : TrackCand->getTrackHits()) {
     CDCHit* TrackHit = HitArray[hit->getStoreIndex()];
 
     drawCDCHit(ss, TrackHit, trackColor);
@@ -134,7 +135,7 @@ void CDCLegendreTrackDrawer::drawTrackCand(CDCLegendreTrackCandidate* TrackCand)
 
 }
 
-void CDCLegendreTrackDrawer::finalizeFile()
+void TrackDrawer::finalizeFile()
 {
 
   if (!m_drawCandInfo) return;
@@ -145,7 +146,7 @@ void CDCLegendreTrackDrawer::finalizeFile()
 }
 
 
-void CDCLegendreTrackDrawer::finalizeROOTFile(std::vector<CDCLegendreTrackHit*>& hits_vector)
+void TrackDrawer::finalizeROOTFile(std::vector<TrackHit*>& hits_vector)
 {
   if (not m_drawCandInfo) return;
 
@@ -165,7 +166,7 @@ void CDCLegendreTrackDrawer::finalizeROOTFile(std::vector<CDCLegendreTrackHit*>&
 }
 
 
-void CDCLegendreTrackDrawer::showPicture()
+void TrackDrawer::showPicture()
 {
 
   if (!(m_drawCandidates && m_drawCandInfo)) return;
@@ -191,7 +192,7 @@ void CDCLegendreTrackDrawer::showPicture()
 
 }
 
-void CDCLegendreTrackDrawer::openFileAgain()
+void TrackDrawer::openFileAgain()
 {
   if (!m_drawCandInfo) return;
 
@@ -224,7 +225,7 @@ void CDCLegendreTrackDrawer::openFileAgain()
 }
 
 
-void CDCLegendreTrackDrawer::drawConformalHits(std::vector<CDCLegendreTrackHit*> trackHitList, int ntrack, bool do_print = false)
+void TrackDrawer::drawConformalHits(std::vector<TrackHit*> trackHitList, int ntrack, bool do_print = false)
 {
   if (not m_drawCandInfo) return;
 
@@ -233,7 +234,7 @@ void CDCLegendreTrackDrawer::drawConformalHits(std::vector<CDCLegendreTrackHit*>
     Color_t trackColor;
     if (ntrack >= 0)trackColor = getRootColor(ntrack);
     else trackColor = kBlue;
-    for (CDCLegendreTrackHit * hit : trackHitList) {
+    for (TrackHit * hit : trackHitList) {
       double x0 = hit->getConformalX();
       double y0 = hit->getConformalY();
       double R = hit->getConformalDriftLength();
@@ -267,7 +268,7 @@ void CDCLegendreTrackDrawer::drawConformalHits(std::vector<CDCLegendreTrackHit*>
 }
 
 
-void CDCLegendreTrackDrawer::drawLegendreHits(std::vector<CDCLegendreTrackHit*> trackHitList, int ntrack, bool do_print = false)
+void TrackDrawer::drawLegendreHits(std::vector<TrackHit*> trackHitList, int ntrack, bool do_print = false)
 {
   if (not m_drawCandInfo) return;
 
@@ -277,7 +278,7 @@ void CDCLegendreTrackDrawer::drawLegendreHits(std::vector<CDCLegendreTrackHit*> 
     Color_t trackColor;
     if (ntrack >= 0)trackColor = getRootColor(ntrack);
     else trackColor = kBlue;
-    for (CDCLegendreTrackHit * hit : trackHitList) {
+    for (TrackHit * hit : trackHitList) {
       TF1* funct1 = new TF1("funct", "[0]*cos(x)+[1]*sin(x)+[2]", 0, m_PI);
       TF1* funct2 = new TF1("funct", "[0]*cos(x)+[1]*sin(x)-[2]", 0, m_PI);
       funct1->SetLineWidth(1);
@@ -321,7 +322,7 @@ void CDCLegendreTrackDrawer::drawLegendreHits(std::vector<CDCLegendreTrackHit*> 
 }
 
 
-void CDCLegendreTrackDrawer::initRootColorVec()
+void TrackDrawer::initRootColorVec()
 {
 //  m_colorVec.push_back("#0343df"); //blue
   m_colorRootVec.push_back(kGreen); //green
@@ -347,7 +348,7 @@ void CDCLegendreTrackDrawer::initRootColorVec()
 }
 
 
-Color_t CDCLegendreTrackDrawer::getRootColor(int i)
+Color_t TrackDrawer::getRootColor(int i)
 {
   int iColor = i % m_colorVec.size();
 

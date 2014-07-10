@@ -15,103 +15,106 @@
 #include <vector>
 
 namespace Belle2 {
-
-  class CDCLegendreTrackHit;
-  class CDCLegendreQuadTree;
-  class CDCLegendreTrackFitter;
-  class CDCLegendreTrackCreator;
-  class CDCLegendreTrackMerger;
+  namespace TrackFinderCDCLegendre {
 
 
-  class CDCLegendreQuadTreeCandidateCreator {
-
-  public:
-    CDCLegendreQuadTreeCandidateCreator() {};
-
-    ~CDCLegendreQuadTreeCandidateCreator();
-
-    static CDCLegendreQuadTreeCandidateCreator& Instance();
-
-    /**
-     * Set candidate fitter
-     */
-    static void setFitter(CDCLegendreTrackFitter* cdcLegendreTrackFitter) {s_cdcLegendreTrackFitter = cdcLegendreTrackFitter;};
-
-    /**
-     * Set candidate merger
-     */
-    static void setMerger(CDCLegendreTrackMerger* cdcLegendreTrackMerger) {s_cdcLegendreTrackMerger = cdcLegendreTrackMerger;};
-
-    /**
-     * Set hits
-     */
-    static void setHits(std::vector<CDCLegendreTrackHit*>& axialHits) {s_axialHits = axialHits;};
-
-    /**
-     * Set candidate fitter
-     */
-    static void setCandidateCreator(CDCLegendreTrackCreator* cdcLegendreTrackCreator) {s_cdcLegendreTrackCreator = cdcLegendreTrackCreator;};
-
-    /**
-     * Add node to the list of nodes with candidated
-     */
-    static inline void addNode(CDCLegendreQuadTree* node) {s_nodesWithCandidates.push_back(node);};
-
-    /**
-     * Creating candidates using information from nodes
-     */
-    void createCandidates();
-
-    /**
-     * Creating candidate using information from given node
-     */
-    bool createCandidate(CDCLegendreQuadTree* node);
-
-    /**
-     * Creating candidate using information from given node
-     */
-    bool createCandidateDirect(CDCLegendreQuadTree* node);
-
-    /**
-     * Creating candidates using information from nodes
-     */
-    std::vector< std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > >& getCandidates()
-    {return s_candidates;};
-
-    /**
-     * Clear list of candidates
-     */
-    void clearCandidates();
-
-    /**
-     * Creating candidates using information from nodes
-     */
-    void clearNodes();
-
-    /**
-     * Find leaf node with given parameters r and theta
-     */
-    CDCLegendreQuadTree* findNode(CDCLegendreQuadTree*, double, double);
+    class TrackHit;
+    class QuadTree;
+    class TrackFitter;
+    class TrackCreator;
+    class TrackMerger;
 
 
-    /**
-     * Sort nodes according to number of hits
-     */
-    static bool sort_nodes(const CDCLegendreQuadTree* node_one, const CDCLegendreQuadTree* node_two);
+    class QuadTreeCandidateCreator {
+
+    public:
+      QuadTreeCandidateCreator() {};
+
+      ~QuadTreeCandidateCreator();
+
+      static QuadTreeCandidateCreator& Instance();
+
+      /**
+       * Set candidate fitter
+       */
+      static void setFitter(TrackFitter* cdcLegendreTrackFitter) {s_cdcLegendreTrackFitter = cdcLegendreTrackFitter;};
+
+      /**
+       * Set candidate merger
+       */
+      static void setMerger(TrackMerger* cdcLegendreTrackMerger) {s_cdcLegendreTrackMerger = cdcLegendreTrackMerger;};
+
+      /**
+       * Set hits
+       */
+      static void setHits(std::vector<TrackHit*>& axialHits) {s_axialHits = axialHits;};
+
+      /**
+       * Set candidate fitter
+       */
+      static void setCandidateCreator(TrackCreator* cdcLegendreTrackCreator) {s_cdcLegendreTrackCreator = cdcLegendreTrackCreator;};
+
+      /**
+       * Add node to the list of nodes with candidated
+       */
+      static inline void addNode(QuadTree* node) {s_nodesWithCandidates.push_back(node);};
+
+      /**
+       * Creating candidates using information from nodes
+       */
+      void createCandidates();
+
+      /**
+       * Creating candidate using information from given node
+       */
+      bool createCandidate(QuadTree* node);
+
+      /**
+       * Creating candidate using information from given node
+       */
+      bool createCandidateDirect(QuadTree* node);
+
+      /**
+       * Creating candidates using information from nodes
+       */
+      std::vector< std::pair<std::vector<TrackHit*>, std::pair<double, double> > >& getCandidates()
+      {return s_candidates;};
+
+      /**
+       * Clear list of candidates
+       */
+      void clearCandidates();
+
+      /**
+       * Creating candidates using information from nodes
+       */
+      void clearNodes();
+
+      /**
+       * Find leaf node with given parameters r and theta
+       */
+      QuadTree* findNode(QuadTree*, double, double);
 
 
-  private:
-    static std::vector< std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> > > s_candidates; /**< Holds list of track candidates */
-    static std::list<CDCLegendreQuadTree*> s_nodesWithCandidates; /**< List of nodes with possible track candidates */
-    static CDCLegendreTrackFitter* s_cdcLegendreTrackFitter; /**< Track fitter object */
-    static CDCLegendreTrackCreator* s_cdcLegendreTrackCreator; /**< Track creator object */
-    static CDCLegendreTrackMerger* s_cdcLegendreTrackMerger; /**< Track merger object */
-    static std::vector<CDCLegendreTrackHit*> s_axialHits; /**< Holds list of acial hits */
-
-    static CDCLegendreQuadTreeCandidateCreator* s_cdcLegendreQuadTreeCandidateCreator; /**< Instance of the class */
+      /**
+       * Sort nodes according to number of hits
+       */
+      static bool sort_nodes(const QuadTree* node_one, const QuadTree* node_two);
 
 
-  };
+    private:
+      static std::vector< std::pair<std::vector<TrackHit*>, std::pair<double, double> > > s_candidates; /**< Holds list of track candidates */
+      static std::list<QuadTree*> s_nodesWithCandidates; /**< List of nodes with possible track candidates */
+      static TrackFitter* s_cdcLegendreTrackFitter; /**< Track fitter object */
+      static TrackCreator* s_cdcLegendreTrackCreator; /**< Track creator object */
+      static TrackMerger* s_cdcLegendreTrackMerger; /**< Track merger object */
+      static std::vector<TrackHit*> s_axialHits; /**< Holds list of acial hits */
+
+      static QuadTreeCandidateCreator* s_cdcLegendreQuadTreeCandidateCreator; /**< Instance of the class */
+
+
+    };
+  }
 }
 
 

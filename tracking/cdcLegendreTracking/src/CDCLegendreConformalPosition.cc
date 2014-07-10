@@ -14,21 +14,22 @@
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
+using namespace TrackFinderCDCLegendre;
 
-CDCLegendreConformalPosition* CDCLegendreConformalPosition::s_cdcLegendreConformalPosition = 0;
+ConformalPosition* ConformalPosition::s_cdcLegendreConformalPosition = 0;
 
-CDCLegendreConformalPosition& CDCLegendreConformalPosition::Instance()
+ConformalPosition& ConformalPosition::Instance()
 {
-  if (!s_cdcLegendreConformalPosition) s_cdcLegendreConformalPosition = new CDCLegendreConformalPosition();
+  if (!s_cdcLegendreConformalPosition) s_cdcLegendreConformalPosition = new ConformalPosition();
   return *s_cdcLegendreConformalPosition;
 }
 
-void CDCLegendreConformalPosition::clearPointers()
+void ConformalPosition::clearPointers()
 {
   delete s_cdcLegendreConformalPosition;
 }
 
-CDCLegendreConformalPosition::CDCLegendreConformalPosition()
+ConformalPosition::ConformalPosition()
 {
   //Get the position of the hit wire from CDCGeometryParameters
   CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
@@ -80,7 +81,7 @@ CDCLegendreConformalPosition::CDCLegendreConformalPosition()
 
 }
 
-double CDCLegendreConformalPosition::getNWires(int layerId)
+double ConformalPosition::getNWires(int layerId)
 {
   int nWires = 0;
   if ((layerId >= 0) && (layerId <= 13)) {
@@ -105,7 +106,7 @@ double CDCLegendreConformalPosition::getNWires(int layerId)
   return nWires;
 }
 
-CDCLegendreConformalPosition::~CDCLegendreConformalPosition()
+ConformalPosition::~ConformalPosition()
 {
   if ((s_cdcLegendreConformalPosition) && (this != s_cdcLegendreConformalPosition)) {
     delete s_cdcLegendreConformalPosition;

@@ -28,19 +28,20 @@
 #include <iomanip>
 #include <string>
 
-using namespace Belle2;
 using namespace std;
+using namespace Belle2;
+using namespace TrackFinderCDCLegendre;
 
-CDCLegendreTrackCreator::CDCLegendreTrackCreator(std::vector<CDCLegendreTrackHit*>& AxialHitList, std::vector<CDCLegendreTrackHit*>& StereoHitList, std::list<CDCLegendreTrackCandidate*>& trackList, std::list<CDCLegendreTrackCandidate*>& trackletList,
-                                                 std::list<CDCLegendreTrackCandidate*>& stereoTrackletList, bool appendHits, CDCLegendreTrackFitter* cdcLegendreTrackFitter, CDCLegendreTrackDrawer* cdcLegendreTrackDrawer):
+TrackCreator::TrackCreator(std::vector<TrackHit*>& AxialHitList, std::vector<TrackHit*>& StereoHitList, std::list<TrackCandidate*>& trackList, std::list<TrackCandidate*>& trackletList,
+                           std::list<TrackCandidate*>& stereoTrackletList, bool appendHits, TrackFitter* cdcLegendreTrackFitter, TrackDrawer* cdcLegendreTrackDrawer):
   m_AxialHitList(AxialHitList), m_StereoHitList(StereoHitList), m_trackList(trackList), m_trackletList(trackletList), m_stereoTrackletList(stereoTrackletList), m_appendHits(appendHits),
   m_cdcLegendreTrackFitter(cdcLegendreTrackFitter), m_cdcLegendreTrackDrawer(cdcLegendreTrackDrawer)
 {
 
 }
 
-void CDCLegendreTrackCreator::createLegendreTrackCandidate(
-  const std::pair<std::vector<CDCLegendreTrackHit*>, std::pair<double, double> >& track,
+void TrackCreator::createLegendreTrackCandidate(
+  const std::pair<std::vector<TrackHit*>, std::pair<double, double> >& track,
   std::pair<double, double>& ref_point)
 {
 
@@ -49,14 +50,14 @@ void CDCLegendreTrackCreator::createLegendreTrackCandidate(
   double track_r = track.second.second;
 
   //get charge estimation for the track candidate
-  int charge = CDCLegendreTrackCandidate::getChargeAssumption(track_theta,
-                                                              track_r, track.first);
+  int charge = TrackCandidate::getChargeAssumption(track_theta,
+                                                   track_r, track.first);
 
   //for curlers, negative, and positive tracks we want to create one track candidate
-  if (charge == CDCLegendreTrackCandidate::charge_positive
-      || charge == CDCLegendreTrackCandidate::charge_negative
-      || charge == CDCLegendreTrackCandidate::charge_curler) {
-    CDCLegendreTrackCandidate* trackCandidate = new CDCLegendreTrackCandidate(
+  if (charge == TrackCandidate::charge_positive
+      || charge == TrackCandidate::charge_negative
+      || charge == TrackCandidate::charge_curler) {
+    TrackCandidate* trackCandidate = new TrackCandidate(
       track_theta, track_r, charge, track.first);
     m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate, ref_point);
     trackCandidate->setReferencePoint(ref_point.first, ref_point.second);
@@ -65,19 +66,19 @@ void CDCLegendreTrackCreator::createLegendreTrackCandidate(
 
     processTrack(trackCandidate, m_trackList);
 
-    trackCandidate->setCandidateType(CDCLegendreTrackCandidate::goodTrack);
+    trackCandidate->setCandidateType(TrackCandidate::goodTrack);
 
   }
 
   //here we create two oppositely charged tracks (with the same theta and r value)
-  else if (charge == CDCLegendreTrackCandidate::charge_two_tracks) {
-    CDCLegendreTrackCandidate* trackCandidate_pos =
-      new CDCLegendreTrackCandidate(track_theta, track_r,
-                                    CDCLegendreTrackCandidate::charge_positive, track.first);
+  else if (charge == TrackCandidate::charge_two_tracks) {
+    TrackCandidate* trackCandidate_pos =
+      new TrackCandidate(track_theta, track_r,
+                         TrackCandidate::charge_positive, track.first);
 
-    CDCLegendreTrackCandidate* trackCandidate_neg =
-      new CDCLegendreTrackCandidate(track_theta, track_r,
-                                    CDCLegendreTrackCandidate::charge_negative, track.first);
+    TrackCandidate* trackCandidate_neg =
+      new TrackCandidate(track_theta, track_r,
+                         TrackCandidate::charge_negative, track.first);
     m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate_pos, ref_point);
     m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate_neg, ref_point);
     trackCandidate_neg->setReferencePoint(ref_point.first, ref_point.second);
@@ -91,22 +92,22 @@ void CDCLegendreTrackCreator::createLegendreTrackCandidate(
 
     processTrack(trackCandidate_neg, m_trackList);
 
-    trackCandidate_pos->setCandidateType(CDCLegendreTrackCandidate::goodTrack);
-    trackCandidate_neg->setCandidateType(CDCLegendreTrackCandidate::goodTrack);
+    trackCandidate_pos->setCandidateType(TrackCandidate::goodTrack);
+    trackCandidate_neg->setCandidateType(TrackCandidate::goodTrack);
 
   }
-  //This shouldn't happen, check CDCLegendreTrackCandidate::getChargeAssumption()
+  //This shouldn't happen, check TrackCandidate::getChargeAssumption()
   else {
     B2ERROR(
-      "Strange behavior of CDCLegendreTrackCandidate::getChargeAssumption");
+      "Strange behavior of TrackCandidate::getChargeAssumption");
     exit(EXIT_FAILURE);
   }
 }
 
-CDCLegendreTrackCandidate* CDCLegendreTrackCreator::createLegendreTrackCandidate(std::vector<CDCLegendreQuadTree*> nodeList)
+TrackCandidate* TrackCreator::createLegendreTrackCandidate(std::vector<QuadTree*> nodeList)
 {
   std::pair<double, double> ref_point = std::make_pair(0., 0.);;
-  CDCLegendreTrackCandidate* trackCandidate = new CDCLegendreTrackCandidate(nodeList);
+  TrackCandidate* trackCandidate = new TrackCandidate(nodeList);
 //  trackCandidate->clearBadHits(ref_point);
 //    appendNewHits(trackCandidate);
 
@@ -117,21 +118,21 @@ CDCLegendreTrackCandidate* CDCLegendreTrackCreator::createLegendreTrackCandidate
   processTrack(trackCandidate, m_trackList);
   appendNewHits(trackCandidate);
 
-  trackCandidate->setCandidateType(CDCLegendreTrackCandidate::goodTrack);
+  trackCandidate->setCandidateType(TrackCandidate::goodTrack);
 
   return trackCandidate;
 }
 
 
-CDCLegendreTrackCandidate* CDCLegendreTrackCreator::createLegendreTracklet(std::vector<CDCLegendreTrackHit*>& hits)
+TrackCandidate* TrackCreator::createLegendreTracklet(std::vector<TrackHit*>& hits)
 {
   std::pair<double, double> ref_point = std::make_pair(0., 0.);
   std::pair<double, double> track_par = std::make_pair(-999, -999);
   double chi2;
   chi2 = m_cdcLegendreTrackFitter->fitTrackCandidateFast(hits, track_par, ref_point);
-  int charge = CDCLegendreTrackCandidate::getChargeAssumption(track_par.first,
-                                                              track_par.second, hits);
-  CDCLegendreTrackCandidate* trackCandidate = new CDCLegendreTrackCandidate(track_par.first, track_par.second, charge /*CDCLegendreTrackCandidate::charge_tracklet*/, hits);
+  int charge = TrackCandidate::getChargeAssumption(track_par.first,
+                                                   track_par.second, hits);
+  TrackCandidate* trackCandidate = new TrackCandidate(track_par.first, track_par.second, charge /*TrackCandidate::charge_tracklet*/, hits);
 //  trackCandidate->clearBadHits(ref_point);
 //    appendNewHits(trackCandidate);
   trackCandidate->setChi2(chi2);
@@ -140,19 +141,19 @@ CDCLegendreTrackCandidate* CDCLegendreTrackCreator::createLegendreTracklet(std::
 
   processTrack(trackCandidate, m_trackList);
 
-  for (CDCLegendreTrackHit * hit : trackCandidate->getTrackHits()) {
-    hit->setHitUsage(CDCLegendreTrackHit::not_used);
+  for (TrackHit * hit : trackCandidate->getTrackHits()) {
+    hit->setHitUsage(TrackHit::not_used);
   }
 
-  trackCandidate->setCandidateType(CDCLegendreTrackCandidate::tracklet);
+  trackCandidate->setCandidateType(TrackCandidate::tracklet);
 
   return trackCandidate;
 }
 
 
-CDCLegendreTrackCandidate* CDCLegendreTrackCreator::createLegendreStereoTracklet(std::vector<CDCLegendreQuadTree*> nodeList)
+TrackCandidate* TrackCreator::createLegendreStereoTracklet(std::vector<QuadTree*> nodeList)
 {
-  CDCLegendreTrackCandidate* trackCandidate = new CDCLegendreTrackCandidate(nodeList);
+  TrackCandidate* trackCandidate = new TrackCandidate(nodeList);
   std::pair<double, double> ref_point = std::make_pair(0., 0.);
   m_cdcLegendreTrackFitter->fitTrackCandidateFast(trackCandidate, ref_point);
   //  trackCandidate->clearBadHits(ref_point);
@@ -166,15 +167,15 @@ CDCLegendreTrackCandidate* CDCLegendreTrackCreator::createLegendreStereoTracklet
 }
 
 
-void CDCLegendreTrackCreator::appendNewHits(CDCLegendreTrackCandidate* track)
+void TrackCreator::appendNewHits(TrackCandidate* track)
 {
   if (not m_appendHits) return;
   double x0_track = cos(track->getTheta()) / track->getR() + track->getReferencePoint().X();
   double y0_track = sin(track->getTheta()) / track->getR() + track->getReferencePoint().Y();
   double R = fabs(1. / track->getR());
 
-  for (CDCLegendreTrackHit * hit : m_AxialHitList) {
-    if (hit->getHitUsage() != CDCLegendreTrackHit::used_in_track || hit->getHitUsage() != CDCLegendreTrackHit::background) {
+  for (TrackHit * hit : m_AxialHitList) {
+    if (hit->getHitUsage() != TrackHit::used_in_track || hit->getHitUsage() != TrackHit::background) {
       double x0_hit = hit->getOriginalWirePosition().X();
       double y0_hit = hit->getOriginalWirePosition().Y();
       double dist = fabs(R - sqrt((x0_track - x0_hit) * (x0_track - x0_hit) + (y0_track - y0_hit) * (y0_track - y0_hit))) - hit->getDriftLength();
@@ -183,7 +184,7 @@ void CDCLegendreTrackCreator::appendNewHits(CDCLegendreTrackCandidate* track)
   }
 }
 
-void CDCLegendreTrackCreator::processTrack(CDCLegendreTrackCandidate* trackCandidate, std::list<CDCLegendreTrackCandidate*>& trackList)
+void TrackCreator::processTrack(TrackCandidate* trackCandidate, std::list<TrackCandidate*>& trackList)
 {
 
 
@@ -193,18 +194,18 @@ void CDCLegendreTrackCreator::processTrack(CDCLegendreTrackCandidate* trackCandi
 
     m_cdcLegendreTrackDrawer->drawTrackCand(trackCandidate);
 
-    for (CDCLegendreTrackHit * hit : trackCandidate->getTrackHits()) {
-      hit->setHitUsage(CDCLegendreTrackHit::used_in_track);
+    for (TrackHit * hit : trackCandidate->getTrackHits()) {
+      hit->setHitUsage(TrackHit::used_in_track);
     }
 
-    CDCLegendrePatternChecker cdcLegendrePatternChecker(this);
+    PatternChecker cdcLegendrePatternChecker(this);
     cdcLegendrePatternChecker.checkCandidate(trackCandidate);
 
   }
 
   else {
-    for (CDCLegendreTrackHit * hit : trackCandidate->getTrackHits()) {
-      hit->setHitUsage(CDCLegendreTrackHit::bad);
+    for (TrackHit * hit : trackCandidate->getTrackHits()) {
+      hit->setHitUsage(TrackHit::bad);
     }
 
     //memory management, since we cannot use smart pointers in function interfaces
@@ -215,7 +216,7 @@ void CDCLegendreTrackCreator::processTrack(CDCLegendreTrackCandidate* trackCandi
 }
 
 
-bool CDCLegendreTrackCreator::fullfillsQualityCriteria(CDCLegendreTrackCandidate* /*trackCandidate*/)
+bool TrackCreator::fullfillsQualityCriteria(TrackCandidate* /*trackCandidate*/)
 {
 //  if (trackCandidate->getNAxialHits() < m_threshold)
 //    return false;
@@ -226,31 +227,31 @@ bool CDCLegendreTrackCreator::fullfillsQualityCriteria(CDCLegendreTrackCandidate
   return true;
 }
 
-void CDCLegendreTrackCreator::moveCandidate(list<CDCLegendreTrackCandidate*>& initialTrackList, list<CDCLegendreTrackCandidate*>& resultTrackList, CDCLegendreTrackCandidate* cand)
+void TrackCreator::moveCandidate(list<TrackCandidate*>& initialTrackList, list<TrackCandidate*>& resultTrackList, TrackCandidate* cand)
 {
   initialTrackList.remove(cand);
   resultTrackList.push_back(cand);
 }
 
-void CDCLegendreTrackCreator::removeFromList(list<CDCLegendreTrackCandidate*>& trackList, CDCLegendreTrackCandidate* cand)
+void TrackCreator::removeFromList(list<TrackCandidate*>& trackList, TrackCandidate* cand)
 {
   trackList.remove(cand);
 }
 
 
-void CDCLegendreTrackCreator::createGFTrackCandidates(string& m_gfTrackCandsColName)
+void TrackCreator::createGFTrackCandidates(string& m_gfTrackCandsColName)
 {
   //StoreArray for genfit::TrackCandidates: interface class to Genfit
   StoreArray<genfit::TrackCand> gfTrackCandidates(m_gfTrackCandsColName);
   gfTrackCandidates.create();
 
   int i = 0;
-  /*  std::vector<CDCLegendreTrackCandidate*> completeTracksList;
+  /*  std::vector<TrackCandidate*> completeTracksList;
     std::copy(m_trackList.begin(), m_trackList.end(), std::back_inserter(completeTracksList));
     std::copy(m_trackletList.begin(), m_trackletList.end(), std::back_inserter(completeTracksList));
     std::copy(m_stereoTrackletList.begin(), m_stereoTrackletList.end(), std::back_inserter(completeTracksList));
   */
-  for (CDCLegendreTrackCandidate * trackCand : m_trackList) {
+  for (TrackCandidate * trackCand : m_trackList) {
 //    if (trackCand->getNHits() == 0) continue;
     if (trackCand->getTrackHits().size() < 5) continue;
 //    B2INFO("Number of hits: " << trackCand->getNHits());
@@ -287,12 +288,12 @@ void CDCLegendreTrackCreator::createGFTrackCandidates(string& m_gfTrackCandsColN
             "momentum seed:  (" << momentum.x() << ", " << momentum.y() << ", " << momentum.z() << ")");//   position variance: (" << covSeed(3, 3) << ", " << covSeed(4, 4) << ", " << covSeed(5, 5) << ") ");
 
     //find indices of the Hits
-    std::vector<CDCLegendreTrackHit*>& trackHitVector = trackCand->getTrackHits();
+    std::vector<TrackHit*>& trackHitVector = trackCand->getTrackHits();
 
     sortHits(trackHitVector, trackCand->getChargeSign());
 
 
-    for (CDCLegendreTrackHit * trackHit : trackHitVector) {
+    for (TrackHit * trackHit : trackHitVector) {
       int hitID = trackHit->getStoreIndex();
       gfTrackCandidates[i]->addHit(Const::CDC, hitID);
     }
@@ -301,9 +302,9 @@ void CDCLegendreTrackCreator::createGFTrackCandidates(string& m_gfTrackCandsColN
 }
 
 
-void CDCLegendreTrackCreator::sortHits(
-  std::vector<CDCLegendreTrackHit*>& hits, int charge)
+void TrackCreator::sortHits(
+  std::vector<TrackHit*>& hits, int charge)
 {
-  CDCLegendreTrackingSortHit sorter(charge);
+  SortHits sorter(charge);
   stable_sort(hits.begin(), hits.end(), sorter);
 }

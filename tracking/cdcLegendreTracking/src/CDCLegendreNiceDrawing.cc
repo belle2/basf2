@@ -24,17 +24,18 @@
 
 using namespace Belle2;
 using namespace CDC;
+using namespace TrackFinderCDCLegendre;
 
-CDCLegendreNiceDrawing::CDCLegendreNiceDrawing(std::string& TrackCandColName, std::string& trackColName,
-                                               std::string& HitColName, std::string& StoreDirectory, bool drawMCSignal,
-                                               bool drawCands, std::string& mcParticlesColName):
+NiceDrawing::NiceDrawing(std::string& TrackCandColName, std::string& trackColName,
+                         std::string& HitColName, std::string& StoreDirectory, bool drawMCSignal,
+                         bool drawCands, std::string& mcParticlesColName):
   m_TrackCandColName(TrackCandColName), m_trackColName(trackColName), m_HitColName(HitColName), m_StoreDirectory(StoreDirectory),
   m_drawMCSignal(drawMCSignal), m_drawCands(drawCands), m_mcParticlesColName(mcParticlesColName)
 {
 
 }
 
-void CDCLegendreNiceDrawing::initialize()
+void NiceDrawing::initialize()
 {
 //  m_zReference = 25.852;
 
@@ -64,7 +65,7 @@ void CDCLegendreNiceDrawing::initialize()
 
 }
 
-void CDCLegendreNiceDrawing::event()
+void NiceDrawing::event()
 {
   initFig();
 
@@ -85,7 +86,7 @@ void CDCLegendreNiceDrawing::event()
   finalizeFile();
 }
 
-void CDCLegendreNiceDrawing::initFig()
+void NiceDrawing::initFig()
 {
   std::stringstream ss;
   ss << m_StoreDirectory << std::setfill('0') << std::setw(4) << m_eventCounter << "_cdc.svg";
@@ -95,12 +96,12 @@ void CDCLegendreNiceDrawing::initFig()
   m_fig << "<?xml version=\"1.0\" ?> \n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"" << m_max << "pt\" height=\"" << m_max << "pt\" viewBox=\"0 0 " << m_max << " " << m_max << "\" version=\"1.1\">\n";
 }
 
-void CDCLegendreNiceDrawing::drawWires()
+void NiceDrawing::drawWires()
 {
   m_fig << m_wireString.str();
 }
 
-void CDCLegendreNiceDrawing::initWireString()
+void NiceDrawing::initWireString()
 {
   double rWire = 0.00025 * m_max;
 
@@ -114,14 +115,14 @@ void CDCLegendreNiceDrawing::initWireString()
   drawCircle(m_wireString, TVector2(0, 0) , m_rCDC, "gray", 2);
 }
 
-std::string CDCLegendreNiceDrawing::getColor(int i)
+std::string NiceDrawing::getColor(int i)
 {
   int iColor = i % m_colorVec.size();
 
   return m_colorVec[iColor];
 }
 
-void CDCLegendreNiceDrawing::initColorVec()
+void NiceDrawing::initColorVec()
 {
   m_colorVec.push_back("#0343df"); //blue
   m_colorVec.push_back("#15b01a"); //green
@@ -146,12 +147,12 @@ void CDCLegendreNiceDrawing::initColorVec()
   m_colorVec.push_back("#1e488f"); //cobalt
 }
 
-TVector2 CDCLegendreNiceDrawing::getWirePosition(int iLayer, int iWire)
+TVector2 NiceDrawing::getWirePosition(int iLayer, int iWire)
 {
   TVector3 wireBegin = CDC::CDCGeometryPar::Instance().wireForwardPosition(iLayer, iWire);
   TVector3 wireEnd = CDC::CDCGeometryPar::Instance().wireBackwardPosition(iLayer, iWire);
 
-  m_zReference = CDCLegendreWireCenter::Instance().getCenter(iLayer);
+  m_zReference = WireCenter::Instance().getCenter(iLayer);
 //  B2INFO("Z position: " << m_zReference << "; Layer: " << iLayer);
 
   double fraction;
@@ -164,7 +165,7 @@ TVector2 CDCLegendreNiceDrawing::getWirePosition(int iLayer, int iWire)
   return TVector2(WireX, WireY);
 }
 
-void CDCLegendreNiceDrawing::drawArc(std::stringstream& drawString, TVector2 position, TVector2 center, double radius, int charge, std::string color, double linewidth)
+void NiceDrawing::drawArc(std::stringstream& drawString, TVector2 position, TVector2 center, double radius, int charge, std::string color, double linewidth)
 {
   std::pair<TVector2, TVector2> intersect_both = getIntersect(center, position);
 
@@ -190,14 +191,14 @@ void CDCLegendreNiceDrawing::drawArc(std::stringstream& drawString, TVector2 pos
   drawString << "fill=\"none\" stroke=\"" << color << "\" stroke-width=\"" << linewidth << "\" />\n";
 }
 
-void CDCLegendreNiceDrawing::drawCircle(std::stringstream& drawString, TVector2 position, double radius, std::string color, double linewidth)
+void NiceDrawing::drawCircle(std::stringstream& drawString, TVector2 position, double radius, std::string color, double linewidth)
 {
   TVector3 circle_new = translateCircle(position, radius);
 
   drawString << "<circle cx=\"" << circle_new[0] << "\" cy=\"" << circle_new[1] << "\" r=\"" << circle_new[2] << "\" fill=\"none\" stroke=\"" << color << "\" stroke-width=\"" << linewidth << "\"  />\n";
 }
 
-TVector3 CDCLegendreNiceDrawing::translateCircle(TVector2 center, double radius)
+TVector3 NiceDrawing::translateCircle(TVector2 center, double radius)
 {
   double retX =      center.X() * m_scale + (m_max / 2);
   double retY = -1 * center.Y() * m_scale + (m_max / 2);
@@ -206,13 +207,13 @@ TVector3 CDCLegendreNiceDrawing::translateCircle(TVector2 center, double radius)
   return TVector3(retX, retY, retR);
 }
 
-void CDCLegendreNiceDrawing::finalizeFile()
+void NiceDrawing::finalizeFile()
 {
   m_fig << "</svg>\n";
   m_fig.close();
 }
 
-void CDCLegendreNiceDrawing::drawCDCHits()
+void NiceDrawing::drawCDCHits()
 {
   StoreArray<CDCHit> HitArray(m_HitColName);
 
@@ -222,32 +223,32 @@ void CDCLegendreNiceDrawing::drawCDCHits()
   std::stringstream ss;
 
   for (int iHit = 0; iHit < HitArray.getEntries(); ++iHit) {
-    CDCHit* TrackHit = HitArray[iHit];
+    CDCHit* cdcHit = HitArray[iHit];
 
-    drawCDCHit(ss, TrackHit, "black");
+    drawCDCHit(ss, cdcHit, "black");
   }
 
   m_fig << ss.str();
 }
 
-void CDCLegendreNiceDrawing::drawCDCHit(std::stringstream& drawString, CDCHit* TrackHit, std::string hitColor)
+void NiceDrawing::drawCDCHit(std::stringstream& drawString, CDCHit* cdcHit, std::string hitColor)
 {
   double driftTime = m_driftTimeTranslator.getDriftLength(
-                       TrackHit->getTDCCount(), WireID(TrackHit->getID()));
+                       cdcHit->getTDCCount(), WireID(cdcHit->getID()));
 
   int layerID = 0;
 
-  if (TrackHit->getISuperLayer() == 0)
-    layerID = TrackHit->getILayer();
+  if (cdcHit->getISuperLayer() == 0)
+    layerID = cdcHit->getILayer();
   else
-    layerID = TrackHit->getILayer() + TrackHit->getISuperLayer() * 6 + 2;
+    layerID = cdcHit->getILayer() + cdcHit->getISuperLayer() * 6 + 2;
 
-  TVector2 position = getWirePosition(layerID, TrackHit->getIWire());
+  TVector2 position = getWirePosition(layerID, cdcHit->getIWire());
 
   drawCircle(drawString, position, driftTime, hitColor);
 }
 
-void CDCLegendreNiceDrawing::drawTrackCand(std::stringstream& drawString, genfit::TrackCand* TrackCand, std::string trackColor)
+void NiceDrawing::drawTrackCand(std::stringstream& drawString, genfit::TrackCand* TrackCand, std::string trackColor)
 {
   TVector2 momentum(TrackCand->getMomSeed().X(), TrackCand->getMomSeed().Y());
   TVector2 position(TrackCand->getPosSeed().X(), TrackCand->getPosSeed().Y());
@@ -257,7 +258,7 @@ void CDCLegendreNiceDrawing::drawTrackCand(std::stringstream& drawString, genfit
   drawAnyTrack(drawString, momentum, charge, trackColor, position);
 }
 
-void CDCLegendreNiceDrawing::drawAnyTrack(std::stringstream& drawString, TVector2 momentum, int charge, std::string trackColor, TVector2 position, int linewidth)
+void NiceDrawing::drawAnyTrack(std::stringstream& drawString, TVector2 momentum, int charge, std::string trackColor, TVector2 position, int linewidth)
 {
   double radius = sqrt(momentum.X() * momentum.X() + momentum.Y() * momentum.Y()) / (1.5 * 0.00299792458);
 
@@ -274,7 +275,7 @@ void CDCLegendreNiceDrawing::drawAnyTrack(std::stringstream& drawString, TVector
 //    drawCircle(drawString, position, radius, trackColor, linewidth);
 }
 
-void CDCLegendreNiceDrawing::drawTrackCands()
+void NiceDrawing::drawTrackCands()
 {
   StoreArray<genfit::TrackCand> CandArray(m_TrackCandColName);
   StoreArray<CDCHit> HitArray(m_HitColName);
@@ -303,7 +304,7 @@ void CDCLegendreNiceDrawing::drawTrackCands()
   m_fig << ss.str();
 }
 
-void CDCLegendreNiceDrawing::drawMCTracks()
+void NiceDrawing::drawMCTracks()
 {
   StoreArray<MCParticle> mcParticles(m_mcParticlesColName);
 
@@ -319,7 +320,7 @@ void CDCLegendreNiceDrawing::drawMCTracks()
   m_fig << ss.str();
 }
 
-void CDCLegendreNiceDrawing::drawMCTrack(std::stringstream& drawString, MCParticle* mcPart, std::string trackColor)
+void NiceDrawing::drawMCTrack(std::stringstream& drawString, MCParticle* mcPart, std::string trackColor)
 {
   TVector2 momentum(mcPart->getMomentum().X(), mcPart->getMomentum().Y());
 
@@ -378,7 +379,7 @@ void CDCNiceDrawingModule::drawTrack(std::stringstream& drawString, genfit::Trac
 }
 */
 
-std::pair<TVector2, TVector2> CDCLegendreNiceDrawing::getIntersect(TVector2 center, TVector2 position)
+std::pair<TVector2, TVector2> NiceDrawing::getIntersect(TVector2 center, TVector2 position)
 {
   TVector2 A(position.X(), position.Y());
   TVector2 B(center.X(), center.Y());

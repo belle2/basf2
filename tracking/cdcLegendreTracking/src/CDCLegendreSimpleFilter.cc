@@ -21,10 +21,11 @@
 using namespace std;
 
 using namespace Belle2;
+using namespace TrackFinderCDCLegendre;
 
 
 
-double CDCLegendreSimpleFilter::getAssigmentProbability(CDCLegendreTrackHit* hit, CDCLegendreTrackCandidate* track)
+double SimpleFilter::getAssigmentProbability(TrackHit* hit, TrackCandidate* track)
 {
 
   double prob = 0;
@@ -47,7 +48,7 @@ double CDCLegendreSimpleFilter::getAssigmentProbability(CDCLegendreTrackHit* hit
 
 
 
-void CDCLegendreSimpleFilter::processTracks(std::list<CDCLegendreTrackCandidate*>& m_trackList)
+void SimpleFilter::processTracks(std::list<TrackCandidate*>& m_trackList)
 {
 
   /*
@@ -61,9 +62,9 @@ void CDCLegendreSimpleFilter::processTracks(std::list<CDCLegendreTrackCandidate*
   //     if(prob<m_minProb){
 
         double bestHitProb = prob;
-        CDCLegendreTrackCandidate* BestCandidate;
+        TrackCandidate* BestCandidate;
 
-        for (CDCLegendreTrackCandidate * cand : m_trackList) {
+        for (TrackCandidate * cand : m_trackList) {
           double probTemp = getAssigmentProbability(hit, cand);
 
           int curve_sign = hit->getCurvatureSignWrt(cos(cand->getTheta()) / cand->getR(), sin(cand->getTheta()) / cand->getR());
@@ -94,7 +95,7 @@ void CDCLegendreSimpleFilter::processTracks(std::list<CDCLegendreTrackCandidate*
 
   B2INFO("NCands = " << m_trackList.size());
 
-  for (CDCLegendreTrackCandidate * cand : m_trackList) {
+  for (TrackCandidate * cand : m_trackList) {
     ii++;
     B2INFO("ii = " << ii);
     B2INFO("Processing: Cand hits vector size = " << cand->getTrackHits().size());
@@ -102,15 +103,15 @@ void CDCLegendreSimpleFilter::processTracks(std::list<CDCLegendreTrackCandidate*
 
     if (cand->getTrackHits().size() == 0)continue;
 
-    for (CDCLegendreTrackHit * hit : cand->getTrackHits()) {
+    for (TrackHit * hit : cand->getTrackHits()) {
       double prob = getAssigmentProbability(hit, cand);;
 
 //      if(prob<m_minProb){
 
       double bestHitProb = prob;
-      CDCLegendreTrackCandidate* BestCandidate = NULL;
+      TrackCandidate* BestCandidate = NULL;
 
-      for (CDCLegendreTrackCandidate * candInner : m_trackList) {
+      for (TrackCandidate * candInner : m_trackList) {
         if (candInner == cand) continue;
         double probTemp = getAssigmentProbability(hit, candInner);
 
@@ -140,10 +141,10 @@ void CDCLegendreSimpleFilter::processTracks(std::list<CDCLegendreTrackCandidate*
 }
 
 /*
-void CDCLegendreSimpleFilter::trackCore()
+void SimpleFilter::trackCore()
 {
 
-  for (CDCLegendreTrackCandidate * cand : m_trackList) {
+  for (TrackCandidate * cand : m_trackList) {
 
 //    if(cand->getTrackHits().size() < 10)
 
@@ -157,7 +158,7 @@ void CDCLegendreSimpleFilter::trackCore()
 
         double otherProbs = 0;
 
-        for (CDCLegendreTrackCandidate * candInner : m_trackList) {
+        for (TrackCandidate * candInner : m_trackList) {
           if (candInner == cand) continue;
           double probTemp = getAssigmentProbability(hit, candInner);
 
@@ -189,14 +190,14 @@ void CDCLegendreSimpleFilter::trackCore()
 */
 
 
-void CDCLegendreSimpleFilter::appenUnusedHits(std::list<CDCLegendreTrackCandidate*>& m_trackList, std::vector<CDCLegendreTrackHit*> AxialHitList)
+void SimpleFilter::appenUnusedHits(std::list<TrackCandidate*>& m_trackList, std::vector<TrackHit*> AxialHitList)
 {
-  for (CDCLegendreTrackHit * hit : AxialHitList) {
-    if (hit->getHitUsage() != CDCLegendreTrackHit::not_used) continue;
+  for (TrackHit * hit : AxialHitList) {
+    if (hit->getHitUsage() != TrackHit::not_used) continue;
     double bestHitProb = 0;
-    CDCLegendreTrackCandidate* BestCandidate;
+    TrackCandidate* BestCandidate;
 
-    for (CDCLegendreTrackCandidate * cand : m_trackList) {
+    for (TrackCandidate * cand : m_trackList) {
       double probTemp = getAssigmentProbability(hit, cand);
 
 //      int curve_sign = hit->getCurvatureSignWrt(cos(cand->getTheta()) / cand->getR(), sin(cand->getTheta()) / cand->getR());
@@ -209,7 +210,7 @@ void CDCLegendreSimpleFilter::appenUnusedHits(std::list<CDCLegendreTrackCandidat
 
     if (bestHitProb > 0.8) {
       BestCandidate->addHit(hit);
-      hit->setHitUsage(CDCLegendreTrackHit::used_in_track);
+      hit->setHitUsage(TrackHit::used_in_track);
 //      B2INFO("Unused hit has been assigned.");
     }
 

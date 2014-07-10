@@ -2,18 +2,19 @@
 
 
 namespace Belle2 {
+  namespace TrackFinderCDCLegendre {
 
-  /**
-     * Small helper class to perform sorting of hits in the CDC pattern reco
-     */
+    /**
+       * Small helper class to perform sorting of hits in the CDC pattern reco
+       */
 
-  class CDCLegendreTrackHit;
+    class TrackHit;
 
-  struct CDCLegendreTrackingSortHit {
+    struct SortHits {
 
-    CDCLegendreTrackingSortHit(int charge) : m_charge(charge) {}
-    bool operator()(CDCLegendreTrackHit* hit1, CDCLegendreTrackHit* hit2);
-    int m_charge;
-  };
-
+      SortHits(int charge) : m_charge(charge) {}
+      bool operator()(TrackHit* hit1, TrackHit* hit2);
+      int m_charge;
+    };
+  }
 }

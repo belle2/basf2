@@ -13,10 +13,11 @@
 
 //using namespace std;
 using namespace Belle2;
+using namespace TrackFinderCDCLegendre;
 
-CDCLegendreWireCenter* CDCLegendreWireCenter::s_cdcLegendreWireCenter = 0;
+WireCenter* WireCenter::s_cdcLegendreWireCenter = 0;
 
-CDCLegendreWireCenter::CDCLegendreWireCenter()
+WireCenter::WireCenter()
 {
   m_wireCentersArray[0] = -0.54;
   m_wireCentersArray[1] = -0.57;
@@ -80,13 +81,13 @@ CDCLegendreWireCenter::CDCLegendreWireCenter()
 
 
 
-CDCLegendreWireCenter& CDCLegendreWireCenter::Instance()
+WireCenter& WireCenter::Instance()
 {
-  if (!s_cdcLegendreWireCenter) s_cdcLegendreWireCenter = new CDCLegendreWireCenter();
+  if (!s_cdcLegendreWireCenter) s_cdcLegendreWireCenter = new WireCenter();
   return *s_cdcLegendreWireCenter;
 }
 
-CDCLegendreWireCenter::~CDCLegendreWireCenter()
+WireCenter::~WireCenter()
 {
   if ((s_cdcLegendreWireCenter) && (this != s_cdcLegendreWireCenter)) {
     delete s_cdcLegendreWireCenter;

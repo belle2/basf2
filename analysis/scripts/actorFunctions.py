@@ -297,6 +297,13 @@ def WriteAnalysisFileForChannel(particleName, channelName, channelList, preCutCo
             ul.Draw()
             canvas.SaveAs(plotName)
 
+    # Create diag plots
+    diagPlotFile = channelList + '_diag_' + mvaConfig.name + '.pdf'
+    if not os.path.isfile(diagPlotFile):
+        B2WARNING("plot " + diagPlotFile + " doesn't exist, creating it")
+        from makeDiagPlotForTMVA import makeDiagPlots
+        makeDiagPlots(tmva_filename, channelList)
+
     # Calculate purity and efficiency for this channel
     # ...
     signal_hist = rootfile.Get(keys.At(0).GetName())
@@ -338,6 +345,7 @@ def WriteAnalysisFileForChannel(particleName, channelName, channelList, preCutCo
 
     placeholders['mvaROCPlot'] = rocPlot
     placeholders['mvaOvertrainingPlot'] = overtrainingPlot
+    placeholders['mvaDiagPlot'] = diagPlotFile
 
     filename = channelList + '.tex'
     if not os.path.isfile(filename):

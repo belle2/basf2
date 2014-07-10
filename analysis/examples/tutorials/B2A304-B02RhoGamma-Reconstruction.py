@@ -61,13 +61,12 @@ stdLoosePi()
 
 # reconstruct rho -> pi+ pi- decay
 # keep only candidates with 0.6 < M(pi+pi-) < 1.0 GeV
-reconDecay('rho0 -> pi+:loose pi-:loose', {'M': (0.6, 1.0)})
+reconDecay('rho0 -> pi+:loose pi-:loose', '0.6 < M < 1.0')
 
 # reconstruct B0 -> rho0 gamma decay
 # keep only candidates with Mbc > 5.2 GeV
 # and -2 < Delta E < 2 GeV
-reconDecay('B0 -> rho0 gamma:highE', {'Mbc': (5.2, 5.29), 'deltaE': (-2.0,
-           2.0)})
+reconDecay('B0 -> rho0 gamma:highE', '5.2 < Mbc < 5.29 and abs(deltaE) < 2.0')
 
 # perform MC matching (MC truth asociation)
 matchMCTruth('B0')
@@ -90,4 +89,3 @@ process(analysis_main)
 
 # print out the summary
 print statistics
-

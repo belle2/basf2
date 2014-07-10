@@ -74,23 +74,21 @@ stdLooseMu()
 stdPi0()
 
 # 1. reconstruct D0 in multiple decay modes
-reconDecay('D0:ch1 -> K-:loose pi+:loose', {'M': (1.800, 1.900)})
-reconDecay('D0:ch2 -> K-:loose pi+:loose pi0:good', {'M': (1.800, 1.900)})
-reconDecay('D0:ch3 -> K-:loose pi+:loose pi+:loose pi-:loose', {'M': (1.800,
-           1.900)})
-reconDecay('D0:ch4 -> K-:loose K+:loose', {'M': (1.800, 1.900)})
-reconDecay('D0:ch5 -> pi-:loose pi+:loose', {'M': (1.800, 1.900)})
+reconDecay('D0:ch1 -> K-:loose pi+:loose', '1.8 < M < 1.9')
+reconDecay('D0:ch2 -> K-:loose pi+:loose pi0:good', '1.8 < M < 1.9')
+reconDecay('D0:ch3 -> K-:loose pi+:loose pi+:loose pi-:loose', '1.8 < M < 1.9')
+reconDecay('D0:ch4 -> K-:loose K+:loose', '1.8 < M < 1.9')
+reconDecay('D0:ch5 -> pi-:loose pi+:loose', '1.8 < M < 1.9')
 
 # merge the D0 lists together into one single list
 copyLists('D0:all', ['D0:ch1', 'D0:ch2', 'D0:ch3', 'D0:ch4', 'D0:ch5'])
 
 # 2. reconstruct Btag+ -> anti-D0 pi+
-reconDecay('B+:tag -> anti-D0:all pi+:loose', {'Mbc': (5.2, 5.29),
-           'deltaE': (-1.0, 1.0)})
+reconDecay('B+:tag -> anti-D0:all pi+:loose', '5.2 < Mbc < 5.29 and abs(deltaE) < 1.0')
 matchMCTruth('B+:tag')
 
 # 3. reconstruct Upsilon(4S) -> Btag+ Bsig- -> Btag+ mu-
-reconDecay('Upsilon(4S) -> B-:tag mu+:loose', {})
+reconDecay('Upsilon(4S) -> B-:tag mu+:loose', "")
 
 # perform MC matching (MC truth asociation)
 matchMCTruth('Upsilon(4S)')
@@ -119,4 +117,3 @@ process(analysis_main)
 
 # print out the summary
 print statistics
-

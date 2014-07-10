@@ -51,12 +51,12 @@ stdLooseK()
 
 # reconstruct D0 -> K- pi+ decay
 # keep only candidates with 1.8 < M(Kpi) < 1.9 GeV
-reconDecay('D0:kpi -> K-:loose pi+:loose', {'M': (1.8, 1.9)})
+reconDecay('D0:kpi -> K-:loose pi+:loose', '1.8 < M < 1.9')
 
 # reconstruct D*+ -> D0 pi+ decay
 # keep only candidates with Q = M(D0pi) - M(D0) - M(pi) < 20 MeV
 # and D* CMS momentum > 2.5 GeV
-reconDecay('D*+ -> D0:kpi pi+:all', {'Q': (0.0, 0.020), 'p_CMS': (2.5, 5.5)})
+reconDecay('D*+ -> D0:kpi pi+:all', '0.0 < Q < 0.020 and 2.5 < p_CMS < 5.5')
 
 # perform MC matching (MC truth asociation)
 matchMCTruth('D*+')
@@ -78,4 +78,3 @@ process(analysis_main)
 
 # print out the summary
 print statistics
-

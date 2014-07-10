@@ -68,7 +68,7 @@ loadReconstructedParticles()
 goodPhoton()
 
 # construct pi0 candidates
-reconDecay('pi0 -> gamma:good gamma:good', {'M': (0.100, 0.180)})
+reconDecay('pi0 -> gamma:good gamma:good', '0.1 < M < 1.8')
 # perform mass fit
 massKFit('pi0', 0.0, '')
 # perform MC matching
@@ -84,18 +84,14 @@ variables = [
     'daughter0(E)',
     'daughter1(E)',
     'daughter0(clusterE9E25)',
-    'daughter1(clusterE9E25)',
-    ]
+    'daughter1(clusterE9E25)']
 
 # define the methods
 # in this case Likelihood and BDT are defined
 # the last argument are TMVA options. Refer to
 # TMVA manual for instructions.
-methods = [('LPCA', 'Likelihood',
-           '!H:!V:!TransformOutput:PDFInterpol=Spline2:NSmoothSig[0]=20:NSmoothBkg[0]=20:NSmooth=5:NAvEvtPerBin=50:VarTransform=PCA'
-           ), ('BDTG', 'BDT',
-           '!H:!V:CreateMVAPdfs:NTrees=100:BoostType=Grad:Shrinkage=0.10:UseBaggedGrad:GradBaggingFraction=0.5:nCuts=200:MaxDepth=2'
-           )]
+methods = [('LPCA', 'Likelihood', '!H:!V:!TransformOutput:PDFInterpol=Spline2:NSmoothSig[0]=20:NSmoothBkg[0]=20:NSmooth=5:NAvEvtPerBin=50:VarTransform=PCA'),
+           ('BDTG', 'BDT', '!H:!V:CreateMVAPdfs:NTrees=100:BoostType=Grad:Shrinkage=0.10:UseBaggedGrad:GradBaggingFraction=0.5:nCuts=200:MaxDepth=2')]
 
 # at the moment the python wrapper function for the TMVATeacher module
 # does not exist, therefore we have to register the module by ourselves
@@ -112,4 +108,3 @@ analysis_main.add_module(teacher)
 
 process(analysis_main)
 print statistics
-

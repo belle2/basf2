@@ -48,26 +48,25 @@ inputMdst('B2A101-Y4SEventGeneration-evtgen.root')
 loadMCParticles()
 
 # create and fill final state ParticleLists
-fillParticleList('K-', [''])
-fillParticleList('pi-', [''])
-fillParticleList('gamma', [''])
+fillParticleList('K-', '')
+fillParticleList('pi-', '')
+fillParticleList('gamma', '')
 
 # 1. reconstruct pi0 -> gamma gamma decay
-reconDecay('pi0 -> gamma gamma', {'M': (0.100, 0.150)})
+reconDecay('pi0 -> gamma gamma', '0.1 < M < 0.15')
 
 # 2. reconstruct D0 in multiple decay modes
-reconDecay('D0:ch1 -> K- pi+', {'M': (1.800, 1.900)})
-reconDecay('D0:ch2 -> K- pi+ pi0', {'M': (1.800, 1.900)})
-reconDecay('D0:ch3 -> K- pi+ pi+ pi-', {'M': (1.800, 1.900)})
-reconDecay('D0:ch4 -> K- K+', {'M': (1.800, 1.900)})
-reconDecay('D0:ch5 -> pi+ pi-', {'M': (1.800, 1.900)})
+reconDecay('D0:ch1 -> K- pi+', '1.8 < M < 1.9')
+reconDecay('D0:ch2 -> K- pi+ pi0', '1.8 < M < 1.9')
+reconDecay('D0:ch3 -> K- pi+ pi+ pi-', '1.8 < M < 1.9')
+reconDecay('D0:ch4 -> K- K+', '1.8 < M < 1.9')
+reconDecay('D0:ch5 -> pi+ pi-', '1.8 < M < 1.9')
 
 # merge the D0 lists together into one single list
 copyLists('D0:all', ['D0:ch1', 'D0:ch2', 'D0:ch3', 'D0:ch4', 'D0:ch5'])
 
 # 3. reconstruct B+ -> anti-D0 pi+ decay
-reconDecay('B+:D0pi -> anti-D0:all pi+', {'Mbc': (5.24, 5.29),
-           'deltaE': (-1.0, 1.0)})
+reconDecay('B+:D0pi -> anti-D0:all pi+', '5.24 < Mbc < 5.29 and abs(deltaE) < 1.0')
 
 # perform MC matching (MC truth asociation)
 matchMCTruth('B+:D0pi')
@@ -86,4 +85,3 @@ process(analysis_main)
 
 # print out the summary
 print statistics
-

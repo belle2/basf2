@@ -4,7 +4,7 @@
 # Uses TMVATeacher module to train a classifier to do electron identification
 # using a combination of available PID variables.
 #
-# Use 'show_tmva_results TMVA.root' to view detailed detailed information about
+# Use 'showTMVAResults TMVA.root' to view detailed detailed information about
 # a completed training
 
 import sys

@@ -75,6 +75,8 @@ preCutConfiguration_nonFSP = Particle.PreCutConfiguration(
     purity=0.0001,
 )
 
+partial = False
+
 particles = []
 particles.append(Particle('pi+', mvaConfig_chargedFSP, explicitCuts='0.1 < piid'))
 particles.append(Particle('K+', mvaConfig_chargedFSP, explicitCuts='0.1 < Kid'))
@@ -82,6 +84,8 @@ particles.append(Particle('gamma', mvaConfig_gamma, explicitCuts='0.1 < goodGamm
 
 p = Particle('pi0', mvaConfig_pi0, preCutConfiguration_nonFSP)
 p.addChannel(['gamma', 'gamma'])
+if partial:
+    p.addChannel(['gamma'], isIncomplete=True)
 particles.append(p)
 
 p = Particle('D0', mvaConfig_D, preCutConfiguration_nonFSP)
@@ -91,7 +95,9 @@ p.addChannel(['K-', 'pi+', 'pi+', 'pi-'])
 p.addChannel(['pi-', 'pi+'])
 p.addChannel(['pi-', 'pi+', 'pi0'])
 p.addChannel(['K-', 'K+'])
-
+if partial:
+    p.addChannel(['K-', 'e+'], isIncomplete=True)
+    p.addChannel(['K-', 'mu+'], isIncomplete=True)
 particles.append(p)
 
 p = Particle('D+', mvaConfig_D, preCutConfiguration_nonFSP)
@@ -99,6 +105,9 @@ p.addChannel(['K-', 'pi+', 'pi+'])
 p.addChannel(['K-', 'K+', 'pi+'])
 p.addChannel(['K-', 'pi+', 'pi+', 'pi0'])
 p.addChannel(['K-', 'K+', 'pi+', 'pi0'])
+if partial:
+    p.addChannel(['K-', 'pi+', 'e+'], isIncomplete=True)
+    p.addChannel(['K-', 'pi+', 'mu+'], isIncomplete=True)
 particles.append(p)
 
 p = Particle('D*+', mvaConfig_D, preCutConfiguration_nonFSP)
@@ -120,6 +129,9 @@ p.addChannel(['anti-D*0', 'pi+', 'pi0'])
 p.addChannel(['anti-D*0', 'pi+', 'pi+', 'pi-'])
 p.addChannel(['anti-D*0', 'pi+', 'pi+', 'pi-', 'pi0'])
 p.addChannel(['D-', 'pi+', 'pi+'])
+if partial:
+    p.addChannel(['D0', 'e+'], isIncomplete=True)
+    p.addChannel(['D0', 'mu+'], isIncomplete=True)
 particles.append(p)
 
 p = Particle('B0', mvaConfig_B, preCutConfiguration_nonFSP)
@@ -131,6 +143,9 @@ p.addChannel(['D*-', 'pi+'])
 p.addChannel(['D*-', 'pi0', 'pi+'])
 p.addChannel(['D*-', 'pi+', 'pi+', 'pi-'])
 p.addChannel(['D*-', 'pi+', 'pi+', 'pi-', 'pi0'])
+if partial:
+    p.addChannel(['D-', 'e+'], isIncomplete=True)
+    p.addChannel(['D-', 'mu+'], isIncomplete=True)
 particles.append(p)
 
 main = create_path()

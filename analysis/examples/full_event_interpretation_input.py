@@ -79,9 +79,9 @@ preCutConfiguration_nonFSP = Particle.PreCutConfiguration(
 
 
 particles = []
-particles.append(Particle('pi+', mvaConfig_chargedFSP, explicitCuts=['piid 0.1:']))
-particles.append(Particle('K+', mvaConfig_chargedFSP, explicitCuts=['Kid 0.1:']))
-particles.append(Particle('gamma', mvaConfig_gamma, explicitCuts=['goodGamma 0.1:']))  # TODO: not exactly soft
+particles.append(Particle('pi+', mvaConfig_chargedFSP, explicitCuts='piid > 0.1'))
+particles.append(Particle('K+', mvaConfig_chargedFSP, explicitCuts='Kid > 0.1'))
+particles.append(Particle('gamma', mvaConfig_gamma, explicitCuts='goodGamma > 0.1'))  # TODO: not exactly soft
 
 p = Particle('pi0', mvaConfig_pi0, preCutConfiguration_nonFSP)
 p.addChannel(['gamma', 'gamma'])

@@ -10,11 +10,11 @@ from ROOT import Belle2
 
 myMain = create_path()
 
-# generation of 100 events according to the specified DECAY table
+# generation of 1000 events according to the specified DECAY table
 # Y(4S) -> B-:tag- B+:sig
 # B-:tag -> D0 pi-; D0 -> K- pi+
 # B+:sig -> pi0 e+ nu_e
-generateY4S(100, Belle2.FileSystem.findFile('/analysis/examples/exampleEvtgenDecayFiles/Btag2Dpi_Bsig2pi0enu.dec'), myMain)
+generateY4S(1000, Belle2.FileSystem.findFile('/analysis/examples/exampleEvtgenDecayFiles/Btag2Dpi_Bsig2pi0enu.dec'), myMain)
 
 # simulation
 add_simulation(myMain)

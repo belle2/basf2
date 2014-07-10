@@ -42,22 +42,22 @@ printDataStore()
 loadReconstructedParticles()
 
 # create and fill gamma/e/mu/pi/K/p ParticleLists
-# second argument are the selection criteria: [''] means no cut, take all
-fillParticleList('gamma:all', [''])
-fillParticleList('e-:all', [''])
-fillParticleList('mu-:all', [''])
-fillParticleList('pi-:all', [''])
-fillParticleList('K-:all', [''])
-fillParticleList('anti-p-:all', [''])
+# second argument are the selection criteria: '' means no cut, take all
+fillParticleList('gamma:all', '')
+fillParticleList('e-:all', '')
+fillParticleList('mu-:all', '')
+fillParticleList('pi-:all', '')
+fillParticleList('K-:all', '')
+fillParticleList('anti-p-:all', '')
 
 # alternatively, we can create and fill final state Particle lists only
 # with candidates that pass certain PID requirements
-fillParticleList('gamma:highE', ['E 1.0:'])
-fillParticleList('e+:good', ['eid 0.1:'])
-fillParticleList('mu+:good', ['muid 0.1:'])
-fillParticleList('pi+:good', ['piid 0.1:'])
-fillParticleList('K+:good', ['Kid 0.1:'])
-fillParticleList('p+:good', ['prid 0.1:'])
+fillParticleList('gamma:highE', 'E > 1.0')
+fillParticleList('e+:good', 'eid > 0.1')
+fillParticleList('mu+:good', 'muid > 0.1')
+fillParticleList('pi+:good', 'piid > 0.1')
+fillParticleList('K+:good', 'Kid > 0.1')
+fillParticleList('p+:good', 'prid > 0.1')
 
 # print contents of the DataStore after loading Particles
 printDataStore()

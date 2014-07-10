@@ -48,13 +48,12 @@ stdPi0()
 
 # reconstruct D0 -> pi0 pi0 decay
 # keep only candidates with 1.7 < M(pi0pi0) < 2.0 GeV
-reconDecay('D0:pi0pi0 -> pi0:good pi0:good', {'M': (1.7, 2.0)})
+reconDecay('D0:pi0pi0 -> pi0:good pi0:good', '1.7 < M < 2.0')
 
 # reconstruct B0 -> D0 pi0 decay
 # keep only candidates with Mbc > 5.24 GeV
 # and -1 < Delta E < 1 GeV
-reconDecay('B0:all -> D0:pi0pi0 pi0:good', {'Mbc': (5.24, 5.29),
-           'deltaE': (-1.0, 1.0)})
+reconDecay('B0:all -> D0:pi0pi0 pi0:good', '5.24 < Mbc < 5.29 and abs(deltaE) < 1.0')
 
 # perform MC matching (MC truth asociation)
 matchMCTruth('B0:all')
@@ -85,4 +84,3 @@ process(analysis_main)
 
 # print out the summary
 print statistics
-

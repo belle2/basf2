@@ -34,8 +34,8 @@ loadMCParticles()
 
 # create charged kaon and pion particle lists with names "K-:gen" and "pi-:gen"
 # all generated kaons(pions) will be added to the kaon(pion) list
-fillParticleList('K-:gen', [''])
-fillParticleList('pi-:gen', [''])
+fillParticleList('K-:gen', '')
+fillParticleList('pi-:gen', '')
 
 # print charge, energy and total momentum of generated kaons
 # and x,y,z components of momenta for generated pions

@@ -4,7 +4,7 @@
 # Uses TMVATeacher module to train a classifier to do event classification.
 # In this example the teacher trains a very simple continuum supression
 #
-# Use 'show_tmva_results TMVA.root' to view detailed detailed information about
+# Use 'showTMVAResults TMVA.root' to view detailed detailed information about
 # a completed training
 # Root input file for this example can be downloaded here:
 # http://www-ekp.physik.uni-karlsruhe.de/~tkeck/contiunuum_and_friends.root

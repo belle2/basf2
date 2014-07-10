@@ -23,9 +23,9 @@ if not os.path.isfile('evtgen-Dstar.root'):
 inputMdst('evtgen-Dstar.root')
 loadMCParticles()
 
-selectParticle('K-', {})
-selectParticle('pi+', {})
-selectParticle('gamma', {})
+selectParticle('K-', "")
+selectParticle('pi+', "")
+selectParticle('gamma', "")
 
 makeParticle('pi0 -> gamma gamma', '0.110 < M < 0.150')
 
@@ -45,7 +45,7 @@ toolsDst += ['MCKinematics', 'D*+ -> [D0 -> ^K- ^pi+ ^pi0] ^pi+']
 toolsDst += ['MCVertex', '^D*+ -> ^D0 pi+']
 
 # write flat ntuples
-ntupleFile('ntupleDstar.root')
+ntupleFile('ntupleDstar2.root')
 ntupleTree('ntupDst', 'D*+', toolsDst)
 
 process(analysis_main)

@@ -66,7 +66,7 @@ loadReconstructedParticles()
 goodPhoton()
 
 # construct pi0 candidates
-reconDecay('pi0 -> gamma:good gamma:good', {'M': (0.100, 0.180)})
+reconDecay('pi0 -> gamma:good gamma:good', '0.1 < M < 0.18')
 # perform mass fit
 massKFit('pi0', 0.0, '')
 # perform MC matching
@@ -99,4 +99,3 @@ ntupleTree('pi0', 'pi0', toolsPI0)
 
 process(analysis_main)
 print statistics
-

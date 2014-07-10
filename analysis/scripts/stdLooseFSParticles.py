@@ -21,28 +21,26 @@ def stdLooseFSParticles(path=analysis_main):
 
 
 def stdVeryLoosePi(path=analysis_main):
-    fillParticleList('pi+:all', [''], True, path)
+    fillParticleList('pi+:all', '', True, path)
 
 
 def stdVeryLooseK(path=analysis_main):
-    fillParticleList('K+:all', [''], True, path)
+    fillParticleList('K+:all', '', True, path)
 
 
 def stdLoosePi(path=analysis_main):
-    fillParticleList('pi+:loose', ['piid 0.1:', 'chiProb 0.001:'], True, path)
+    fillParticleList('pi+:loose', 'piid > 0.1 and chiProb > 0.001', True, path)
 
 
 def stdLooseK(path=analysis_main):
-    fillParticleList('K+:loose', ['Kid 0.1:', 'chiProb 0.001:'], True, path)
+    fillParticleList('K+:loose', 'Kid > 0.1 and chiProb > 0.001', True, path)
 
 
    # Add a loose PID here when Mu is available
 
 def stdLooseMu(path=analysis_main):
-    fillParticleList('mu+:loose', ['chiProb 0.001:'], True, path)
+    fillParticleList('mu+:loose', 'chiProb > 0.001', True, path)
 
 
 def stdVeryLooseMu(path=analysis_main):
-    fillParticleList('mu+:all', ['chiProb 0.001:'], True, path)
-
-
+    fillParticleList('mu+:all', 'chiProb > 0.001', True, path)

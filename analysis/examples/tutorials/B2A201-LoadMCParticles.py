@@ -40,13 +40,13 @@ printDataStore()
 loadMCParticles()
 
 # create and fill gamma/e/mu/pi/K/p ParticleLists
-# second argument are the selection criteria: [''] means no cut, take all
-fillParticleList('gamma:gen', [''])
-fillParticleList('e-:gen', [''])
-fillParticleList('mu-:gen', [''])
-fillParticleList('pi-:gen', [''])
-fillParticleList('K-:gen', [''])
-fillParticleList('anti-p-:gen', [''])
+# second argument are the selection criteria: '' means no cut, take all
+fillParticleList('gamma:gen', '')
+fillParticleList('e-:gen', '')
+fillParticleList('mu-:gen', '')
+fillParticleList('pi-:gen', '')
+fillParticleList('K-:gen', '')
+fillParticleList('anti-p-:gen', '')
 
 # print contents of the DataStore before loading MCParticles
 # the difference is that DataStore now contains StoreArray<Particle>

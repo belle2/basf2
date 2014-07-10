@@ -24,16 +24,16 @@ def stdFSParticles(path=analysis_main):
 
 
 def stdPi(path=analysis_main):
-    fillParticleList('pi+:std', ['piid 0.5:', 'chiProb 0.001:'], True, path)
+    fillParticleList('pi+:std', 'piid > 0.5 and chiProb > 0.001', True, path)
 
 
 def stdK(path=analysis_main):
-    fillParticleList('K+:std', ['Kid 0.5:', 'chiProb 0.001:'], True, path)
+    fillParticleList('K+:std', 'Kid > 0.5 and chiProb > 0.001', True, path)
 
 
 def stdPi0(path=analysis_main):
     goodPhoton(path)
-    reconDecay('pi0:all -> gamma:good gamma:good', {'M': (0.110, 0.160)},
+    reconDecay('pi0:all -> gamma:good gamma:good', '0.11 < M < 0.16',
                True, path)
     massKFit('pi0:all', 0.0, '', path)
     matchMCTruth('pi0:all', path)
@@ -47,37 +47,35 @@ def stdPi0(path=analysis_main):
     expert.param('signalProbabilityName', 'BDT')
     path.add_module(expert)
 
-    cutAndCopyList('pi0:loose', 'pi0:all', {'getExtraInfo(BDT)': (-0.6, 1.0)},
+    cutAndCopyList('pi0:loose', 'pi0:all', '-0.6 < getExtraInfo(BDT) < 1.0',
                    True, path)
-    cutAndCopyList('pi0:good', 'pi0:all', {'getExtraInfo(BDT)': (0.5, 1.0)},
+    cutAndCopyList('pi0:good', 'pi0:all', '0.5 < getExtraInfo(BDT) < 1.0',
                    True, path)
 
 
 def loosePi0(path=analysis_main):
     stdPi0(path)
-    cutAndCopyList('pi0:loose', 'pi0:all', {'getExtraInfo(BDT)': (-0.6, 1.0)},
+    cutAndCopyList('pi0:loose', 'pi0:all', '-0.6 < getExtraInfo(BDT) < 1.0',
                    True, path)
 
 
 def goodPi0(path=analysis_main):
     stdPi0(path)
-    cutAndCopyList('pi0:good', 'pi0:all', {'getExtraInfo(BDT)': (0.5, 1.0)},
+    cutAndCopyList('pi0:good', 'pi0:all', '0.5 < getExtraInfo(BDT) < 1.0',
                    True, path)
 
 
 def stdPhoton(path=analysis_main):
-    fillParticleList('gamma:all', [''], True, path)
+    fillParticleList('gamma:all', '', True, path)
     calibratePhotonEnergy('gamma:all', path)
 
 
 def goodPhoton(path=analysis_main):
     stdPhoton(path)
-    cutAndCopyList('gamma:good', 'gamma:all', {'goodGamma': (0.5, 1.5)}, True,
+    cutAndCopyList('gamma:good', 'gamma:all', '0.5 < goodGamma < 1.5', True,
                    path)
 
 
 def stdHighEPhoton(path=analysis_main):
     stdPhoton(path)
-    cutAndCopyList('gamma:highE', 'gamma:all', {'E': (1.5, 100)}, True, path)
-
-
+    cutAndCopyList('gamma:highE', 'gamma:all', '1.5 < E < 100', True, path)

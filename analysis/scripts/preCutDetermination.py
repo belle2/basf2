@@ -50,15 +50,26 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
         def ycut_to_xcuts(channel, cut):
             return (interpolations[channel].GetX(cut, 0, 1), 1)
 
-    cuts = GetCuts(signal, bckgrd, preCutConfig.efficiency, preCutConfig.purity, ycut_to_xcuts)
+    result = {}
+    redo_cuts = True
+    while redo_cuts:
+        redo_cuts = False
 
-    result = {channel: {'variable': variable, 'range': range, 'isIgnored': False,
-                        'cutstring': str(range[0]) + " <= " + variable + " <= " + str(range[1]),
-                        'nBackground': GetNumberOfEventsInRange(bckgrd[channel], range),
-                        'nSignal': GetNumberOfEventsInRange(signal[channel], range)} for (channel, range) in cuts.iteritems()}
-    for ignoredChannel in GetIgnoredChannels(signal, bckgrd, cuts):
-        result[ignoredChannel]['isIgnored'] = True
-        B2WARNING("Ignoring channel " + ignoredChannel + "!")
+        cuts = GetCuts(signal, bckgrd, preCutConfig.efficiency, preCutConfig.purity, ycut_to_xcuts)
+        for (channel, range) in cuts.iteritems():
+            result[channel] = {'variable': variable, 'range': range, 'isIgnored': False,
+                               'cutstring': str(range[0]) + " <= " + variable + " <= " + str(range[1]),
+                               'nBackground': GetNumberOfEventsInRange(bckgrd[channel], range),
+                               'nSignal': GetNumberOfEventsInRange(signal[channel], range)}
+
+        for ignoredChannel in GetIgnoredChannels(signal, bckgrd, cuts):
+            redo_cuts = True
+            result[ignoredChannel]['isIgnored'] = True
+            B2WARNING("Ignoring channel " + ignoredChannel + "!")
+
+        signal = {channel: hist for (channel, hist) in signal.iteritems() if not result[channel]['isIgnored']}
+        bckgrd = {channel: hist for (channel, hist) in bckgrd.iteritems() if not result[channel]['isIgnored']}
+
     return result
 
 

@@ -18,6 +18,8 @@ import pdg
 
 import actorFramework
 import preCutDetermination
+from makeDiagPlotForTMVA import makeDiagPlots
+from makeMbcPlot import makeMbcPlot
 import os
 import subprocess
 from string import Template
@@ -76,7 +78,7 @@ def MakeAndMatchParticleList(path, particleName, channelName, inputLists, preCut
     userLabel = actorFramework.createHash(particleName, channelName, inputLists, preCut)
     outputList = particleName + ':' + userLabel + ' ==> ' + ' '.join(inputLists)
     listName = particleName + ':' + userLabel
-    modularAnalysis.makeParticle(outputList, preCut, path=path)
+    modularAnalysis.makeParticle(outputList, preCut['cutstring'], path=path)
     modularAnalysis.matchMCTruth(listName, path=path)
     B2INFO("Make and Match Particle List for channel " + channelName + " and charged conjugated.")
     return {'ParticleList_' + channelName + '_' + particleName: listName,
@@ -241,9 +243,7 @@ def PreCutDetermination(particleName, channelNames, preCutConfig, preCutHistogra
     cuts = preCutDetermination.CalculatePreCuts(preCutConfig, channelNames, preCutHistograms)
 
     for (channel, cut) in cuts.iteritems():
-        results['PreCut_' + channel] = None if cut['isIgnored'] else cut['cutstring']
-        results['nSignal_' + channel] = None if cut['isIgnored'] else cut['nSignal']
-        results['nBackground_' + channel] = None if cut['isIgnored'] else cut['nBackground']
+        results['PreCut_' + channel] = None if cut['isIgnored'] else cut
 
     B2INFO("Calculate pre cut for particle " + particleName + " and charged conjugated.")
     return results
@@ -285,7 +285,7 @@ def WriteAnalysisFileForChannel(particleName, channelName, channelList, preCutCo
     rootfile = ROOT.TFile(preCutHistogram[0])
     names = ['signal', 'all', 'background', 'ratio']
     keys = rootfile.GetListOfKeys()
-    lc, uc = preCut.values()[0]
+    lc, uc = preCut['range']
     for (name, key) in zip(names, keys):
         plotName = channelList + '_' + name + '.png'
         if not os.path.isfile(plotName):
@@ -303,7 +303,6 @@ def WriteAnalysisFileForChannel(particleName, channelName, channelList, preCutCo
     diagPlotFile = channelList + '_diag_' + mvaConfig.name + '.pdf'
     if not os.path.isfile(diagPlotFile):
         B2WARNING("plot " + diagPlotFile + " doesn't exist, creating it")
-        from makeDiagPlotForTMVA import makeDiagPlots
         makeDiagPlots(tmva_filename, channelList)
 
     # Calculate purity and efficiency for this channel
@@ -330,7 +329,7 @@ def WriteAnalysisFileForChannel(particleName, channelName, channelList, preCutCo
 
     placeholders['preCutVariable'] = preCutConfig.variable
     placeholders['preCutEfficiency'] = '{:.2f}'.format(preCutConfig.efficiency)
-    a, b = preCut.values()[0]
+    a, b = preCut['range']
     placeholders['preCutRange'] = 'Ignored' if preCut is None else '({:.2f},'.format(a) + ' {:.2f}'.format(b) + ')'
 
     placeholders['preCutAllPlot'] = channelList + '_all.png'
@@ -410,7 +409,6 @@ def WriteAnalysisFileSummary(pdffiles, ntuples):
             fileList.append(fileName)
 
     #create Mbc plots
-    from makeMbcPlot import makeMbcPlot
     B2WARNING("i got these ntuples: " + str(ntuples))
     for ntupleFile in ntuples:
         outputFile = ntupleFile[:-5] + '_mbc.pdf'

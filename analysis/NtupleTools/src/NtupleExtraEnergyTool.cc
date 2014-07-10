@@ -10,7 +10,7 @@
 
 #include <analysis/NtupleTools/NtupleExtraEnergyTool.h>
 
-#include <analysis/utility/PSelectorFunctions.h>
+#include <analysis/VariableManager/Variables.h>
 
 #include <TBranch.h>
 
@@ -35,6 +35,6 @@ void NtupleExtraEnergyTool::eval(const Particle* particle)
 
   int nDecayProducts = selparticles.size();
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    m_extraE[iProduct]   = analysis::extraEnergy(selparticles[iProduct]);
+    m_extraE[iProduct]   = Variable::extraEnergy(selparticles[iProduct]);
   }
 }

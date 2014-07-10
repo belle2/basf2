@@ -55,18 +55,15 @@ namespace Belle2 {
     // Add parameters
     addParam("decayString", m_decayString, "Input DecayDescriptor string (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString).");
 
-    vector<string> defaultSelection;
-    addParam("select", m_selection, "selection criteria", defaultSelection);
+    Variable::Cut::Parameter emptyCut;
+    addParam("cut", m_cutParameter, "Selection criteria to be applied", emptyCut);
+
     addParam("persistent", m_persistent,
              "toggle newly created particle list btw. transient/persistent", false);
 
     // initializing the rest of private memebers
     m_pdgCode = 0;
     m_isSelfConjugatedParticle = 0;
-  }
-
-  ParticleSelectorModule::~ParticleSelectorModule()
-  {
   }
 
   void ParticleSelectorModule::initialize()
@@ -101,18 +98,9 @@ namespace Belle2 {
         StoreObjPtr<ParticleList>::registerTransient(m_antiListName, DataStore::c_Event, false);
     }
 
-    for (unsigned int i = 0; i < m_selection.size(); i++) {
-      m_pSelector.addSelection(m_selection[i]);
-    }
+    m_cut.init(m_cutParameter);
 
-    std::string cuts;
-    m_pSelector.listCuts(cuts);
-    if (cuts.empty()) cuts = "(all)";
-    B2INFO("ParticleSelector: " << m_listName << " (" << m_antiListName << ") " << cuts);
-  }
-
-  void ParticleSelectorModule::beginRun()
-  {
+    B2INFO("ParticleSelector: " << m_listName << " (" << m_antiListName << ") ");
   }
 
   void ParticleSelectorModule::event()
@@ -136,44 +124,20 @@ namespace Belle2 {
       for (int i = 0; i < Particles.getEntries(); i++) {
         const Particle* part = Particles[i];
         if (abs(part->getPDGCode()) != abs(m_pdgCode)) continue;
-        if (m_pSelector.select(part)) {
+        if (m_cut.check(part)) {
           plist->addParticle(part);
         }
       }
     } else { // existing particle list: apply selections and remove unselected
-      if (m_selection.size() > 0) {
-        // loop over list only if cuts should be applied
-        std::vector<unsigned int> toRemove;
-        for (unsigned i = 0; i < plist->getListSize(); i++) {
-          const Particle* part = plist->getParticle(i);
-          if (!m_pSelector.select(part)) toRemove.push_back(part->getArrayIndex());
-        }
-
-        plist->removeParticles(toRemove);
+      // loop over list only if cuts should be applied
+      std::vector<unsigned int> toRemove;
+      for (unsigned i = 0; i < plist->getListSize(); i++) {
+        const Particle* part = plist->getParticle(i);
+        if (!m_cut.check(part)) toRemove.push_back(part->getArrayIndex());
       }
+
+      plist->removeParticles(toRemove);
     }
-
-
-    /*
-    B2INFO("ParticleSelector: " << m_pdgCode << " " << m_listName  << " (" << m_antiListName << ") "<< " size="
-           << plist->getNumOf(ParticleList::c_Particle,false)
-           << "+" << plist->getNumOf(ParticleList::c_SelfConjugatedParticle,false)
-           << " (" << plist->getNumOf(ParticleList::c_Particle,true)
-           << "+" << plist->getNumOf(ParticleList::c_SelfConjugatedParticle,true) << ")");
-    */
-    //plist->print();
-
   }
-
-
-  void ParticleSelectorModule::endRun()
-  {
-  }
-
-  void ParticleSelectorModule::terminate()
-  {
-  }
-
-
 } // end Belle2 namespace
 

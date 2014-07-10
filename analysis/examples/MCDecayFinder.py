@@ -39,8 +39,7 @@ main.add_module(progress)
 gearbox = register_module('Gearbox')
 main.add_module(gearbox)
 geometry = register_module('Geometry')
-geometry.param('components', ['MagneticField', 'BeamPipe', 'PXD', 'SVD', 'CDC'
-               ])
+geometry.param('components', ['MagneticField', 'BeamPipe', 'PXD', 'SVD', 'CDC'])
 main.add_module(geometry)
 
 # ----> simulation
@@ -82,32 +81,25 @@ main.add_module(particleloader)
 
 # ----> Select kaons and pions
 kaonselector = register_module('ParticleSelector')
-kaonselector.param('PDG', -321)
-kaonselector.param('ListName', 'k')
+kaonselector.param('decayString', 'K+')
 main.add_module(kaonselector)
 
 pionselector = register_module('ParticleSelector')
-pionselector.param('PDG', 211)
-pionselector.param('ListName', 'pi')
+pionselector.param('decayString', 'pi+')
 main.add_module(pionselector)
 
 # ----> Reco D0
 combinerD0 = register_module('ParticleCombiner')
-combinerD0.param('PDG', -421)
-combinerD0.param('ListName', 'D0')
-combinerD0.param('InputListNames', ['k', 'pi'])
+combinerD0.param('decayString', 'anti-D0 -> K+ pi-')
 main.add_module(combinerD0)
 
 # ----> Reco B
 combinerB = register_module('ParticleCombiner')
-combinerB.param('PDG', 521)
-combinerB.param('ListName', 'B')
-combinerB.param('InputListNames', ['D0', 'pi'])
+combinerB.param('decayString', 'B+ -> anti-D0 pi+')
 main.add_module(combinerB)
 
 mcfinder = register_module('MCDecayFinder')
-mcfinder.param('decayString', 'B+ => (anti-D0 => K+ pi-) ...')
-mcfinder.param('listName', 'testB')
+mcfinder.param('decayString', 'B+:test => (anti-D0 => K+ pi-) ...')
 main.add_module(mcfinder)
 
 mcparticles = register_module('PrintMCParticles')
@@ -116,15 +108,14 @@ main.add_module(mcparticles)
 ntuple = register_module('NtupleMaker')
 ntuple.param('fileName', 'test.root')
 ntuple.param('treeName', 'test')
-ntuple.param('listName', 'testB')
-ntuple.param('tools', [
-    'EventMetaData',
-    'B+',
-    'Kinematics',
-    '^B+',
-    'MCKinematics',
-    'B+ => (anti-D0 => ^K+ ^pi-) ...',
-    ])
+ntuple.param('listName', 'B+:test')
+ntuple.param('tools',
+             ['EventMetaData',
+              'B+',
+              'Kinematics',
+              '^B+',
+              'MCKinematics',
+              'B+ => (anti-D0 => ^K+ ^pi-) ...'])
 main.add_module(ntuple)
 
 # ----> start processing of modules

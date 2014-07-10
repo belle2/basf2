@@ -64,27 +64,21 @@ main.add_module(particleloader)
 
 # ----> Select kaons and pions
 kaonselector = register_module('ParticleSelector')
-kaonselector.param('PDG', -321)
-kaonselector.param('ListName', 'k')
+kaonselector.param('decayString', 'K+')
 main.add_module(kaonselector)
 
 pionselector = register_module('ParticleSelector')
-pionselector.param('PDG', 211)
-pionselector.param('ListName', 'pi')
+pionselector.param('decayString', 'pi+')
 main.add_module(pionselector)
 
 # ----> Reco D0
 combinerD0 = register_module('ParticleCombiner')
-combinerD0.param('PDG', -421)
-combinerD0.param('ListName', 'D0')
-combinerD0.param('InputListNames', ['k', 'pi'])
+combinerD0.param('decayString', 'anti-D0 -> K+ pi-')
 main.add_module(combinerD0)
 
 # ----> Reco B
 combinerB = register_module('ParticleCombiner')
-combinerB.param('PDG', 521)
-combinerB.param('ListName', 'B')
-combinerB.param('InputListNames', ['D0', 'pi'])
+combinerB.param('decayString', 'B+ -> anti-D0 pi+')
 main.add_module(combinerB)
 
 ntuple1 = register_module('NtupleMaker')
@@ -93,17 +87,17 @@ ntuple1.param('fileName', rootFileName)
 # Name of the output TTree
 ntuple1.param('treeName', 'test1')
 # particle list with reconstructed decays
-ntuple1.param('listName', 'B')
+ntuple1.param('listName', 'B+')
 # Specifiy output tools
 # decay descriptor strings ignored (parser for  not yet implemented)
 ntuple1.param('tools', [
     'EventMetaData',
-    'B-',
+    'B+',
     'Kinematics',
-    'B- -> [anti-D0 -> ^K+ ^pi-] ^pi-',
+    'B+ -> [anti-D0 -> ^K+ ^pi-] ^pi+',
     'MCKinematics',
-    'B- -> [anti-D0 -> ^K+ ^pi-] ^pi-',
-    ])
+    'B+ -> [anti-D0 -> ^K+ ^pi-] ^pi+'])
+
 main.add_module(ntuple1)
 
 # ----> start processing of modules

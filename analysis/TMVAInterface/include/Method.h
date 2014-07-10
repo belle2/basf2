@@ -9,7 +9,8 @@
 
 #pragma once
 
-#include <analysis/utility/VariableManager.h>
+#include <analysis/VariableManager/Manager.h>
+#include <analysis/VariableManager/Utility.h>
 
 #include <TMVA/Types.h>
 
@@ -65,12 +66,12 @@ namespace Belle2 {
        * Getter for variabels of the method
        * @return variables
        */
-      const std::vector<const VariableManager::Var*>& getVariables() { return m_variables; }
+      const std::vector<const Variable::Manager::Var*>& getVariables() { return m_variables; }
 
     private:
       std::string m_name; /**< name of the method */
       std::string m_config; /**< config string given to the method */
-      std::vector<const VariableManager::Var*> m_variables; /**< Pointers to the input variables loaded from VariableManager */
+      std::vector<const Variable::Manager::Var*> m_variables; /**< Pointers to the input variables loaded from VariableManager */
       TMVA::Types::EMVA m_type; /**< type of the method */
       std::string m_type_as_string; /**< type of the method as string */
     };

@@ -13,7 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <string>
-#include <analysis/utility/PSelector.h>
+#include <analysis/VariableManager/Utility.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 namespace Belle2 {
@@ -31,38 +31,16 @@ namespace Belle2 {
     ParticleSelectorModule();
 
     /**
-     * Destructor
-     */
-    virtual ~ParticleSelectorModule();
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
     virtual void initialize();
 
     /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    virtual void beginRun();
-
-    /**
      * Event processor.
      */
     virtual void event();
 
-    /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun();
-
-    /**
-     * Termination action.
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    virtual void terminate();
   private:
 
     std::string m_decayString;   /**< Input DecayString specifying the particle being selected */
@@ -75,10 +53,10 @@ namespace Belle2 {
 
     int m_pdgCode;       /**< PDG code of particles to select */
 
-    std::vector<std::string> m_selection;  /**< selection criteria */
-    bool m_persistent;  /**< toggle particle list btw. transient/persistent */
+    Variable::Cut::Parameter m_cutParameter;  /**< selection criteria */
+    Variable::Cut m_cut; /**< cut object which performs the cuts */
 
-    PSelector m_pSelector;                 /**< particle selector */
+    bool m_persistent;  /**< toggle particle list btw. transient/persistent */
 
   };
 

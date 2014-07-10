@@ -163,11 +163,11 @@ def loadReconstructedParticles(path=analysis_main):
     """
     Loads mDST data objects (Tracks/ECLClusters/KLMClusters) as Particles.
     In particular:
-     - each Track is loaded as e/mu/pi/K/p Particles 
-     - each neutral ECLCluster is loaded as gamma Particle 
+     - each Track is loaded as e/mu/pi/K/p Particles
+     - each neutral ECLCluster is loaded as gamma Particle
      - each neutral KLMCluster is loaded as Klong Particle
 
-    In all the cases no selection criteria are applied. 
+    In all the cases no selection criteria are applied.
     """
 
     ploader = register_module('ParticleLoader')
@@ -224,7 +224,7 @@ def copyLists(
 def cutAndCopyLists(
     outputListName,
     inputListNames,
-    criteria,
+    cut,
     persistent=False,
     path=analysis_main,
     ):
@@ -234,8 +234,7 @@ def cutAndCopyLists(
     
     @param ouputListName copied ParticleList
     @param inputListName vector of original ParticleLists to be copied
-    @param criteria      selection criteria given in VariableManager 
-                         style that copied Particles need to fullfill
+    @param cut      selection criteria given in VariableManager style that copied Particles need to fullfill
     @param persistent    toggle newly created particle list btw. transient/persistent
     @param path          modules are added to this path
     """
@@ -244,7 +243,7 @@ def cutAndCopyLists(
     pmanipulate.set_name('PListCutAndCopy_' + outputListName)
     pmanipulate.param('outputListName', outputListName)
     pmanipulate.param('inputListNames', inputListNames)
-    pmanipulate.param('cuts', criteria)
+    pmanipulate.param('cut', cut)
     pmanipulate.param('persistent', persistent)
     path.add_module(pmanipulate)
 
@@ -252,7 +251,7 @@ def cutAndCopyLists(
 def cutAndCopyList(
     outputListName,
     inputListName,
-    criteria,
+    cut,
     persistent=False,
     path=analysis_main,
     ):
@@ -262,8 +261,7 @@ def cutAndCopyList(
 
     @param ouputListName copied ParticleList
     @param inputListName vector of original ParticleLists to be copied
-    @param criteria      selection criteria given in VariableManager 
-                         style that copied Particles need to fullfill
+    @param cut      selection criteria given in VariableManager style that copied Particles need to fullfill
     @param persistent    toggle newly created particle list btw. transient/persistent
     @param path          modules are added to this path
     """
@@ -272,14 +270,14 @@ def cutAndCopyList(
     pmanipulate.set_name('PListCutAndCopy_' + outputListName)
     pmanipulate.param('outputListName', outputListName)
     pmanipulate.param('inputListNames', [inputListName])
-    pmanipulate.param('cuts', criteria)
+    pmanipulate.param('cut', cut)
     pmanipulate.param('persistent', persistent)
     path.add_module(pmanipulate)
 
 
 def fillParticleList(
     decayString,
-    criteria,
+    cut,
     persistent=False,
     path=analysis_main,
     ):
@@ -288,8 +286,7 @@ def fillParticleList(
     indices of Particles of desired type.
     
     @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param criteria      Particles need to pass these selection criteria 
-                         (given in ParticleSelector style) to be added to the ParticleList
+    @param cut      Particles need to pass these selection criteria to be added to the ParticleList
     @param persistent    toggle newly created particle list btw. transient/persistent
     @param path          modules are added to this path 
     """
@@ -297,14 +294,14 @@ def fillParticleList(
     pselect = register_module('ParticleSelector')
     pselect.set_name('ParticleSelector_' + decayString)
     pselect.param('decayString', decayString)
-    pselect.param('select', criteria)
+    pselect.param('cut', cut)
     pselect.param('persistent', persistent)
     path.add_module(pselect)
 
 
 def selectParticle(
     decayString,
-    criteria=[],
+    cut='',
     persistent=False,
     path=analysis_main,
     ):
@@ -312,8 +309,7 @@ def selectParticle(
     Creates and fills ParticleList with StoreArray<Particle> indices of Particles of desired type.
     
     @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param criteria      Particles need to pass these selection criteria 
-                         (given in ParticleSelector style) to be added to the ParticleList
+    @param cut      Particles need to pass these selection criteria to be added to the ParticleList
     @param persistent    toggle newly created particle list btw. transient/persistent
     @param path          modules are added to this path
     """
@@ -321,32 +317,31 @@ def selectParticle(
     pselect = register_module('ParticleSelector')
     pselect.set_name('ParticleSelector_' + decayString)
     pselect.param('decayString', decayString)
-    pselect.param('select', criteria)
+    pselect.param('cut', cut)
     pselect.param('persistent', persistent)
     path.add_module(pselect)
 
 
-def applyCuts(list_name, criteria, path=analysis_main):
+def applyCuts(list_name, cut, path=analysis_main):
     """
     Removes StoreArray<PArticle> indices of Particles from given ParticleList 
     that do not pass the given selection criteria (given in ParticleSelector style).
 
     @param list_name input ParticleList name
-    @param criteria  Particles that do not pass these selection criteria 
-                     (given in ParticleSelector style) are removed from the ParticleList
+    @param cut  Particles that do not pass these selection criteria are removed from the ParticleList
     @param path      modules are added to this path 
     """
 
     pselect = register_module('ParticleSelector')
     pselect.set_name('ParticleSelector_applyCuts_' + list_name)
     pselect.param('decayString', list_name)
-    pselect.param('select', criteria)
+    pselect.param('cut', cut)
     path.add_module(pselect)
 
 
 def reconDecay(
     decayString,
-    cuts,
+    cut,
     persistent=False,
     path=analysis_main,
     ):
@@ -359,7 +354,7 @@ def reconDecay(
     
     @param decayString DecayString specifying what kind of the decay should be reconstructed 
                        (from the DecayString the mother and daughter ParticleLists are determined)
-    @param cuts        created (mother) Particles are added to the mother ParticleList if they 
+    @param cut        created (mother) Particles are added to the mother ParticleList if they 
                        pass give cuts (in VariableManager style) and rejected otherwise
     @param persistent  toggle newly created particle list btw. transient/persistent
     @param path        modules are added to this path     
@@ -368,14 +363,14 @@ def reconDecay(
     pmake = register_module('ParticleCombiner')
     pmake.set_name('ParticleCombiner_' + decayString)
     pmake.param('decayString', decayString)
-    pmake.param('cuts', cuts)
+    pmake.param('cut', cut)
     pmake.param('persistent', persistent)
     path.add_module(pmake)
 
 
 def makeParticle(
     decayString,
-    cuts,
+    cut,
     persistent=False,
     path=analysis_main,
     ):
@@ -388,7 +383,7 @@ def makeParticle(
 
     @param decayString DecayString specifying what kind of the decay should be reconstructed 
                        (from the DecayString the mother and daughter ParticleLists are determined)
-    @param cuts        created (mother) Particles are added to the mother ParticleList if they 
+    @param cut        created (mother) Particles are added to the mother ParticleList if they 
                        pass give cuts (in VariableManager style) and rejected otherwise
     @param persistent  toggle newly created particle list btw. transient/persistent
     @param path        modules are added to this path
@@ -397,7 +392,7 @@ def makeParticle(
     pmake = register_module('ParticleCombiner')
     pmake.set_name('ParticleCombiner_' + decayString)
     pmake.param('decayString', decayString)
-    pmake.param('cuts', cuts)
+    pmake.param('cut', cut)
     pmake.param('persistent', persistent)
     path.add_module(pmake)
 
@@ -719,10 +714,10 @@ def buildContinuumSuppression(list_name, path=analysis_main):
 def FlavTag(list_name, path=analysis_main):
     """
     For each Particle in the given Breco ParticleList:
-    Tag the flavour of the tag side using the Track, the ECLCluster and the KLMCluster list from the RestOfEvent dataobject 
+    Tag the flavour of the tag side using the Track, the ECLCluster and the KLMCluster list from the RestOfEvent dataobject
     The flavour is predicted by trained Neural Networks
     Module under development (not ready for users)
-    
+
     @param list_name name of the input Breco ParticleList
     @param path      modules are added to this path
     """

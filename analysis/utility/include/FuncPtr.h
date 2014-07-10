@@ -30,7 +30,7 @@
 #include <iostream>
 #include <sstream>
 
-#include <analysis/utility/VariableManager.h>
+#include <analysis/VariableManager/Manager.h>
 
 namespace Belle2 {
 

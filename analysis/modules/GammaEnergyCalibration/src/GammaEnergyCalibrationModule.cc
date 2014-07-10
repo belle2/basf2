@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <analysis/modules/GammaEnergyCalibration/GammaEnergyCalibrationModule.h>
-#include <analysis/utility/PSelectorFunctions.h>
+#include <analysis/VariableManager/Variables.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
@@ -22,7 +22,6 @@
 
 // dataobjects
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/utility/VariableManager.h>
 
 
 using namespace Belle2;
@@ -92,8 +91,8 @@ void GammaEnergyCalibrationModule::calibrateEnergy(Particle* particle) const
     return;
 
   // TODO: can be optimized for speed
-  double theta = analysis::eclClusterTheta(particle);
-  double phi   = analysis::eclClusterPhi(particle);
+  double theta = Variable::eclClusterTheta(particle);
+  double phi   = Variable::eclClusterPhi(particle);
 
   TLorentzVector newLorentzVector(float(newE * sin(theta) * cos(phi)), float(newE * sin(theta) * sin(phi)), float(newE * cos(theta)), newE);
 

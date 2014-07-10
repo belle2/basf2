@@ -26,26 +26,26 @@ add_reconstruction(myMain)
 loadReconstructedParticles(myMain)
 
 # create final state particle lists
-selectParticle('K-', [], True, myMain)
-selectParticle('pi+', [], True, myMain)
-selectParticle('pi-', [], True, myMain)
-selectParticle('e+', [], True, myMain)
-selectParticle('gamma', [], True, myMain)
+selectParticle('K-', '', True, myMain)
+selectParticle('pi+', '', True, myMain)
+selectParticle('pi-', '', True, myMain)
+selectParticle('e+', '', True, myMain)
+selectParticle('gamma', '', True, myMain)
 
 # reconstruct pi0 -> gamma gamma decay
-makeParticle('pi0 -> gamma gamma', {'M': (0.05, 1.7)}, True, myMain)
+makeParticle('pi0 -> gamma gamma', '0.05 < M < 1.7', True, myMain)
 
 # reconstruct D0 -> K- pi+ decay (and c.c.)
-makeParticle('D0 -> K- pi+', {'M': (1.800, 1.900)}, True, myMain)
+makeParticle('D0 -> K- pi+', '1.800 < M < 1.900', True, myMain)
 
 # reconstruct Btag -> D0 pi- (and c.c.)
-makeParticle('B-:tag -> D0 pi-', {'M': (5.000, 6.000)}, True, myMain)
+makeParticle('B-:tag -> D0 pi-', '5.000 < M < 6.000', True, myMain)
 
 # reconstruct Bsig -> pi0 e+ [nu_e] (and c.c.)
-makeParticle('B+:sig -> pi0 e+', {'M': (0.000, 6.000)}, True, myMain)
+makeParticle('B+:sig -> pi0 e+', '0.000 < M < 6.000', True, myMain)
 
 # reconstruct Y(4S) -> Btag Bsig
-makeParticle('Upsilon(4S) -> B-:tag B+:sig', {'M': (0.000, 11.000)}, True, myMain)
+makeParticle('Upsilon(4S) -> B-:tag B+:sig', '0.000 < M < 11.000', True, myMain)
 
 # perform MC matching
 matchMCTruth('pi0', myMain)

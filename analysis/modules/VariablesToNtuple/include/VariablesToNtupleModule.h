@@ -10,7 +10,7 @@
 **************************************************************************/
 
 #include <framework/core/Module.h>
-#include <analysis/utility/VariableManager.h>
+#include <analysis/VariableManager/Manager.h>
 
 #include <TNtuple.h>
 #include <TFile.h>
@@ -40,7 +40,7 @@ namespace Belle2 {
   private:
     /** Name of particle list with reconstructed particles. */
     std::string m_particleList;
-    /** List of variables to save. Variables are taken from VariableManager, and are identical to those available to e.g. ParticleSelector. */
+    /** List of variables to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. */
     std::vector<std::string> m_variables;
     /** Name of ROOT file for output. */
     std::string m_fileName;
@@ -52,7 +52,7 @@ namespace Belle2 {
     /** The ROOT TNtuple for output. */
     TNtuple* m_tree;
     /** List of function pointers corresponding to given variables. */
-    std::vector<VariableManager::FunctionPtr> m_functions;
+    std::vector<Variable::Manager::FunctionPtr> m_functions;
 
   };
 } // end namespace Belle2

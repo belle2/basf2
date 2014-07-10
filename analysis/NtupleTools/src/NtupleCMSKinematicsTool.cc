@@ -9,7 +9,7 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleCMSKinematicsTool.h>
-#include <analysis/utility/PSelectorFunctions.h>
+#include <analysis/VariableManager/Variables.h>
 #include <TBranch.h>
 
 using namespace Belle2;
@@ -41,10 +41,10 @@ void NtupleCMSKinematicsTool::eval(const Particle* particle)
   int nDecayProducts = selparticles.size();
 
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    m_fP[iProduct]     = analysis::particleP_CMS(selparticles[iProduct]);
-    m_fP4[iProduct][0] = analysis::particlePx_CMS(selparticles[iProduct]);
-    m_fP4[iProduct][1] = analysis::particlePy_CMS(selparticles[iProduct]);
-    m_fP4[iProduct][2] = analysis::particlePz_CMS(selparticles[iProduct]);
-    m_fP4[iProduct][3] = analysis::particleE_CMS(selparticles[iProduct]);
+    m_fP[iProduct]     = Variable::particleP_CMS(selparticles[iProduct]);
+    m_fP4[iProduct][0] = Variable::particlePx_CMS(selparticles[iProduct]);
+    m_fP4[iProduct][1] = Variable::particlePy_CMS(selparticles[iProduct]);
+    m_fP4[iProduct][2] = Variable::particlePz_CMS(selparticles[iProduct]);
+    m_fP4[iProduct][3] = Variable::particleE_CMS(selparticles[iProduct]);
   }
 }

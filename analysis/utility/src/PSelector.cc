@@ -10,7 +10,7 @@
 
 // Own include
 #include <analysis/utility/PSelector.h>
-#include <analysis/utility/VariableManager.h>
+#include <analysis/VariableManager/Manager.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -135,7 +135,7 @@ namespace Belle2 {
       return true;
     }
 
-    const VariableManager::Var* var = VariableManager::Instance().getVariable(varName);
+    const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(varName);
     if (!var) {
       cout << str << " ***undefined variable: " << varName << endl;
       return false;
@@ -263,7 +263,7 @@ namespace Belle2 {
 
   void PSelector::listVariables() const
   {
-    VariableManager::Instance().printList();
+    Variable::Manager::Instance().printList();
   }
 
 

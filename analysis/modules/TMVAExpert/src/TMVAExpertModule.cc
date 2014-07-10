@@ -13,7 +13,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
-#include <analysis/utility/VariableManager.h>
+#include <analysis/VariableManager/Manager.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>

@@ -9,7 +9,7 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleMassBeforeFitTool.h>
-#include <analysis/utility/PSelectorFunctions.h>
+#include <analysis/VariableManager/Variables.h>
 #include <TBranch.h>
 
 using namespace Belle2;
@@ -40,7 +40,7 @@ void NtupleMassBeforeFitTool::eval(const Particle* particle)
   int nDecayProducts = selparticles.size();
 
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    m_invM[iProduct]     = analysis::particleInvariantMass(selparticles[iProduct]);
-    m_invMerr[iProduct]  = analysis::particleInvariantMassError(selparticles[iProduct]);
+    m_invM[iProduct]     = Variable::particleInvariantMass(selparticles[iProduct]);
+    m_invMerr[iProduct]  = Variable::particleInvariantMassError(selparticles[iProduct]);
   }
 }

@@ -24,7 +24,7 @@
 
 // Own include
 #include <analysis/utility/PSelector.h>
-#include <analysis/utility/VariableManager.h>
+#include <analysis/VariableManager/Manager.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>

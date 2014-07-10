@@ -92,7 +92,7 @@ namespace Belle2 {
               const auto& vars = method->getVariables();
               m_input.resize(vars.size(), 0);
               for (unsigned int i = 0; i < vars.size(); ++i) {
-                reader->AddVariable(makeROOTCompatible(vars[i]->name), &m_input[i]);
+                reader->AddVariable(Variable::makeROOTCompatible(vars[i]->name), &m_input[i]);
               }
 
               // Book the methoid

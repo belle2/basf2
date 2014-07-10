@@ -28,9 +28,9 @@ void NtupleCustomFloatsTool::setupTree()
 
   int nVars = m_strVarNames.size();
   for (int iVar = 0; iVar < nVars; iVar++) {
-    const VariableManager::Var* var = VariableManager::Instance().getVariable(m_strVarNames[iVar]);
+    const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(m_strVarNames[iVar]);
     if (!var) {
-      B2ERROR("Variable '" << m_strVarNames[iVar] << "' is not available in VariableManager!");
+      B2ERROR("Variable '" << m_strVarNames[iVar] << "' is not available in Variable::Manager!");
     } else {
       m_functions.push_back(var->function);
     }

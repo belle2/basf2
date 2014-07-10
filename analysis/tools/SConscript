@@ -1,5 +1,6 @@
 Import('env')
 
-env['TOOLS_LIBS']['externTeacher'] = ['stdc++', 'framework', 'analysis', 'boost_program_options']
+env['TOOLS_LIBS']['externTeacher'] = ['stdc++', 'framework', 'analysis', 'boost_program_options', '$ROOT_LIBS']
+env['TOOLS_LIBS']['parser'] = ['stdc++', 'framework', 'analysis', 'analysis_dataobjects', '$ROOT_LIBS']
 
 Return('env')

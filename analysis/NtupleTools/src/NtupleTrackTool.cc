@@ -9,7 +9,7 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleTrackTool.h>
-#include <analysis/utility/PSelectorFunctions.h>
+#include <analysis/VariableManager/Variables.h>
 #include <TBranch.h>
 
 using namespace Belle2;
@@ -38,8 +38,8 @@ void NtupleTrackTool::eval(const Particle* particle)
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
   int nDecayProducts = selparticles.size();
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    m_fdr[iProduct] = analysis::particleDRho(selparticles[iProduct]);
-    m_fdz[iProduct] = analysis::particleDZ(selparticles[iProduct]);
+    m_fdr[iProduct] = Variable::particleDRho(selparticles[iProduct]);
+    m_fdz[iProduct] = Variable::particleDZ(selparticles[iProduct]);
     m_fTrPval[iProduct] = selparticles[iProduct]->getPValue();
   }
 }

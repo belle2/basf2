@@ -13,7 +13,7 @@
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
-#include <analysis/utility/VariableManager.h>
+#include <analysis/VariableManager/Manager.h>
 #include <TTree.h>
 #include <string>
 #include <utility>
@@ -29,7 +29,7 @@ namespace Belle2 {
     /** Names of the float variables. */
     std::vector<std::string> m_strVarNames;
     /** List of function pointers corresponding to given variables. */
-    std::vector<VariableManager::FunctionPtr> m_functions;
+    std::vector<Variable::Manager::FunctionPtr> m_functions;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
   public:

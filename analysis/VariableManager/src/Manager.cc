@@ -1,4 +1,4 @@
-#include <analysis/utility/VariableManager.h>
+#include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 
@@ -13,26 +13,19 @@
 
 using namespace Belle2;
 
-std::string Belle2::makeROOTCompatible(std::string str)
-{
-  str.erase(std::remove(str.begin(), str.end(), '('), str.end());
-  str.erase(std::remove(str.begin(), str.end(), ')'), str.end());
-  return str;
-}
-
-VariableManager::~VariableManager()
+Variable::Manager::~Manager()
 {
   for (auto & pair : m_variables) {
     delete pair.second;
   }
 }
-VariableManager& VariableManager::Instance()
+Variable::Manager& Variable::Manager::Instance()
 {
-  static VariableManager v;
+  static Variable::Manager v;
   return v;
 }
 
-const VariableManager::Var* VariableManager::getVariable(const std::string& name)
+const Variable::Manager::Var* Variable::Manager::getVariable(const std::string& name)
 {
   auto mapIter = m_variables.find(name);
   if (mapIter == m_variables.end()) {
@@ -41,15 +34,15 @@ const VariableManager::Var* VariableManager::getVariable(const std::string& name
     return mapIter->second;
   }
 }
-void VariableManager::setVariableGroup(const std::string& groupName)
+void Variable::Manager::setVariableGroup(const std::string& groupName)
 {
   m_currentGroup = groupName;
 }
 
-const VariableManager::Var* VariableManager::createVariable(const std::string& name)
+const Variable::Manager::Var* Variable::Manager::createVariable(const std::string& name)
 {
 
-  VariableManager::FunctionPtr func;
+  Variable::Manager::FunctionPtr func;
 
   const static boost::regex allowedNumberForm("^([0-9]+\\.?[0-9]*)$");
   boost::match_results<std::string::const_iterator> number;
@@ -75,7 +68,7 @@ const VariableManager::Var* VariableManager::createVariable(const std::string& n
           return particle->getExtraInfo(extraInfoName);
         };
       } else {
-        const VariableManager::Var* var = getVariable(results[2]);
+        const Variable::Manager::Var* var = getVariable(results[2]);
         if (results[1] == "daughterProductOf") {
           func = [var](const Particle * particle) -> double {
             double product = 1.0;
@@ -127,7 +120,7 @@ const VariableManager::Var* VariableManager::createVariable(const std::string& n
   return getVariable(name);
 }
 
-void VariableManager::registerVariable(const std::string& name, VariableManager::FunctionPtr f, const std::string& description)
+void Variable::Manager::registerVariable(const std::string& name, Variable::Manager::FunctionPtr f, const std::string& description)
 {
   if (!f) {
     B2FATAL("No function provided for variable '" << name << "'.");
@@ -149,7 +142,7 @@ void VariableManager::registerVariable(const std::string& name, VariableManager:
   }
 }
 
-std::vector<std::string> VariableManager::getNames() const
+std::vector<std::string> Variable::Manager::getNames() const
 {
   std::vector<std::string> names;
   for (const Var * var : m_variablesInRegistrationOrder) {
@@ -158,7 +151,7 @@ std::vector<std::string> VariableManager::getNames() const
   return names;
 }
 
-void VariableManager::printList() const
+void Variable::Manager::printList() const
 {
   std::string group;
   for (const Var * var : getVariables()) {
@@ -171,11 +164,11 @@ void VariableManager::printList() const
   }
 }
 
-double VariableManager::evaluate(const std::string& varName, const Particle* p)
+double Variable::Manager::evaluate(const std::string& varName, const Particle* p)
 {
   const Var* var = getVariable(varName);
   if (!var) {
-    B2FATAL("VariableManager::evaluate(): variable '" << varName << "' not found!");
+    B2FATAL("Variable::Manager::evaluate(): variable '" << varName << "' not found!");
     return 0.0; //never reached, suppresses cppcheck warning
   }
 

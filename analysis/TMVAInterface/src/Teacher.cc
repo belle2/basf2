@@ -31,11 +31,11 @@ namespace Belle2 {
     {
 
 
-      // Get Pointer to VariableManager::Var for the provided target name
-      VariableManager& manager = VariableManager::Instance();
+      // Get Pointer to Variable::Manager::Var for the provided target name
+      Variable::Manager& manager = Variable::Manager::Instance();
       m_target_var =  manager.getVariable(target);
       if (m_target_var == nullptr) {
-        B2FATAL("Couldn't find target variable " << target << " via the VariableManager. Check the name!")
+        B2FATAL("Couldn't find target variable " << target << " via the Variable::Manager. Check the name!")
       }
       m_target = 0;
 
@@ -67,18 +67,18 @@ namespace Belle2 {
           m_tree = new TTree(tree_name.c_str(), tree_name.c_str());
 
         for (unsigned int i = 0; i < variables.size(); ++i)
-          m_tree->Branch(makeROOTCompatible(variables[i]->name).c_str(), &m_input[i]);
-        m_tree->Branch(makeROOTCompatible(m_target_var->name).c_str(), &m_target);
+          m_tree->Branch(Variable::makeROOTCompatible(variables[i]->name).c_str(), &m_input[i]);
+        m_tree->Branch(Variable::makeROOTCompatible(m_target_var->name).c_str(), &m_target);
 
       } else {
         for (unsigned int i = 0; i < variables.size(); ++i)
-          m_tree->SetBranchAddress(makeROOTCompatible(variables[i]->name).c_str(), &m_input[i]);
-        m_tree->SetBranchAddress(makeROOTCompatible(m_target_var->name).c_str(), &m_target);
+          m_tree->SetBranchAddress(Variable::makeROOTCompatible(variables[i]->name).c_str(), &m_input[i]);
+        m_tree->SetBranchAddress(Variable::makeROOTCompatible(m_target_var->name).c_str(), &m_target);
       }
 
 
 
-      TBranch* targetBranch  = m_tree->GetBranch(makeROOTCompatible(m_target_var->name).c_str());
+      TBranch* targetBranch  = m_tree->GetBranch(Variable::makeROOTCompatible(m_target_var->name).c_str());
       targetBranch->SetAddress(&m_target);
       int nevent = m_tree->GetEntries();
       for (int i = 0; i < nevent; i++) {
@@ -190,7 +190,7 @@ namespace Belle2 {
 
             // Add variables to the factory
             for (auto & var : m_methods[0].getVariables()) {
-              factory.AddVariable(makeROOTCompatible(var->name));
+              factory.AddVariable(Variable::makeROOTCompatible(var->name));
             }
 
             // Copy Events from original tree to new signal and background tree.
@@ -199,8 +199,8 @@ namespace Belle2 {
             // The options nTrain_Background and nTest_Background (same for *_Signal) are applied
             // after this transformation to vectors, therefore they're too late to prevent a allocation of huge amount of memory
             // if one has many backgruond events.
-            factory.AddSignalTree(m_tree->CopyTree(TCut((makeROOTCompatible(m_target_var->name) + " == " + signal.str()).c_str()))->CopyTree("", "", maxEventsPerClass == 0 ? x.second : maxEventsPerClass));
-            factory.AddBackgroundTree(m_tree->CopyTree(TCut((makeROOTCompatible(m_target_var->name) + " == " + bckgrd.str()).c_str()))->CopyTree("", "", maxEventsPerClass == 0 ? y.second : maxEventsPerClass));
+            factory.AddSignalTree(m_tree->CopyTree(TCut((Variable::makeROOTCompatible(m_target_var->name) + " == " + signal.str()).c_str()))->CopyTree("", "", maxEventsPerClass == 0 ? x.second : maxEventsPerClass));
+            factory.AddBackgroundTree(m_tree->CopyTree(TCut((Variable::makeROOTCompatible(m_target_var->name) + " == " + bckgrd.str()).c_str()))->CopyTree("", "", maxEventsPerClass == 0 ? y.second : maxEventsPerClass));
             factory.PrepareTrainingAndTestTree("", prepareOption);
 
             // Append the trained methods to the config xml file

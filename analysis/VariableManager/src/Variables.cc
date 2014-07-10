@@ -9,10 +9,10 @@
  **************************************************************************/
 
 // Own include
-#include <analysis/utility/PSelectorFunctions.h>
+#include <analysis/VariableManager/Variables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 
-#include <analysis/utility/VariableManager.h>
+#include <analysis/VariableManager/Manager.h>
 #include <analysis/utility/MCMatching.h>
 
 // framework - DataStore
@@ -42,7 +42,7 @@
 using namespace std;
 
 namespace Belle2 {
-  namespace analysis {
+  namespace Variable {
 
     // momentum (lab) -------------------------------------------
 

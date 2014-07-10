@@ -20,7 +20,7 @@
 #include <iostream>
 #include <sstream>
 
-#include <analysis/utility/VariableManager.h>
+#include <analysis/VariableManager/Variables.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/RestOfEvent.h>

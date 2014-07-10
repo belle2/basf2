@@ -18,7 +18,7 @@ namespace Belle2 {
 
   /**
    * This module trains a TMVA method with the given particle lists as training samples.  The target variable has to be a
-   * discrete integer valued variable (although the VariableManager returns the value as a float) which defines the clusters
+   * discrete integer valued variable (although the Variable::Manager returns the value as a float) which defines the clusters
    * in the sample. All the clusters are trained against each other.
    * You can apply a trained TMVAMethod with the TMVAExpertModule and calculate the SignalProbability for the Particles in a ParticleList.
    */

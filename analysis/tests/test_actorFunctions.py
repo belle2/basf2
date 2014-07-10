@@ -22,15 +22,15 @@ class TestSelectParticleList(unittest.TestCase):
         self.path = MockPath()
 
     def test_flavour_specific(self):
-        result = SelectParticleList(self.path, 'e+', [])
-        self.assertDictEqual(result, {'ParticleList_e+': 'e+:7f4f5313461a4c5b3831c0f5f8991af89ea9dbcb',
-                                      'ParticleList_e-': 'e-:7f4f5313461a4c5b3831c0f5f8991af89ea9dbcb'})
+        result = SelectParticleList(self.path, 'e+', "")
+        self.assertDictEqual(result, {'ParticleList_e+': 'e+:d60929b66e4239a833c762ef1f73a6b5ad1d63b8',
+                                      'ParticleList_e-': 'e-:d60929b66e4239a833c762ef1f73a6b5ad1d63b8'})
         self.assertEqual(len(self.path.modules), 1)
 
     def test_self_conjugated(self):
-        result = SelectParticleList(self.path, 'J/Psi', [])
-        self.assertDictEqual(result, {'ParticleList_J/Psi': 'J/Psi:3f4cfc25d6ab1b0da74329d76451dacd2e1bffce',
-                                      'ParticleList_J/Psi': 'J/Psi:3f4cfc25d6ab1b0da74329d76451dacd2e1bffce'})
+        result = SelectParticleList(self.path, 'J/Psi', "")
+        self.assertDictEqual(result, {'ParticleList_J/Psi': 'J/Psi:7215a3ec9c26bbd5095615422cb9b2abf8f8b114',
+                                      'ParticleList_J/Psi': 'J/Psi:7215a3ec9c26bbd5095615422cb9b2abf8f8b114'})
         self.assertEqual(len(self.path.modules), 1)
 
 
@@ -62,9 +62,9 @@ class TestMakeAndMatchParticleList(unittest.TestCase):
         self.path = MockPath()
 
     def test_with_precut(self):
-        result = MakeAndMatchParticleList(self.path, 'D+', 'D+ -> pi+ K-', ['pi+', 'K-'], {'M': (0.0, 10.0)})
-        self.assertDictEqual(result, {'ParticleList_D+ -> pi+ K-_D+': 'D+:f76206d83d352e9dcabfb537b16964934612f387',
-                                      'ParticleList_D+ -> pi+ K-_D-': 'D-:f76206d83d352e9dcabfb537b16964934612f387'})
+        result = MakeAndMatchParticleList(self.path, 'D+', 'D+ -> pi+ K-', ['pi+', 'K-'], '0 < M < 10')
+        self.assertDictEqual(result, {'ParticleList_D+ -> pi+ K-_D+': 'D+:8e60a50a70eafabf5497d3b6f996a06944d2ccad',
+                                      'ParticleList_D+ -> pi+ K-_D-': 'D-:8e60a50a70eafabf5497d3b6f996a06944d2ccad'})
         self.assertEqual(len(self.path.modules), 2)
 
     def test_without_precut(self):

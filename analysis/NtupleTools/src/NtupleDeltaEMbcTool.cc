@@ -9,7 +9,7 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleDeltaEMbcTool.h>
-#include <analysis/utility/PSelectorFunctions.h>
+#include <analysis/VariableManager/Variables.h>
 #include <cmath>
 #include <TBranch.h>
 #include <TLorentzVector.h>
@@ -38,8 +38,8 @@ void NtupleDeltaEMbcTool::eval(const Particle* particle)
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
   if (selparticles.empty()) return;
 
-  m_fDeltaE = analysis::particleDeltaE(selparticles[0]);
-  m_fMbc    = analysis::particleMbc(selparticles[0]);
+  m_fDeltaE = Variable::particleDeltaE(selparticles[0]);
+  m_fMbc    = Variable::particleMbc(selparticles[0]);
 
 }
 

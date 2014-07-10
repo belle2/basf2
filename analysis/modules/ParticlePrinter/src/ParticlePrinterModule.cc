@@ -21,7 +21,7 @@
 
 // dataobjects
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/utility/VariableManager.h>
+#include <analysis/VariableManager/Manager.h>
 
 
 using namespace std;
@@ -49,7 +49,7 @@ namespace Belle2 {
     addParam("listName", m_listName, "name of ParticleList", string(""));
     addParam("fullPrint", m_fullPrint, "execute Particle's internal print() function", true);
     vector<string> defaultVariables;
-    addParam("variables", m_variables, "names of variables to be printed (see VariableManager)", defaultVariables);
+    addParam("variables", m_variables, "names of variables to be printed (see Variable::Manager)", defaultVariables);
 
   }
 
@@ -128,12 +128,12 @@ namespace Belle2 {
 
   void ParticlePrinterModule::printVariables(const Particle* particle) const
   {
-    VariableManager& manager = VariableManager::Instance();
+    Variable::Manager& manager = Variable::Manager::Instance();
 
     for (auto & varName : m_variables) {
       auto var = manager.getVariable(varName);
       if (var == nullptr) {
-        B2ERROR("ParticlePrinter: VariableManager doesn't have variable" << varName)
+        B2ERROR("ParticlePrinter: Variable::Manager doesn't have variable" << varName)
       }
       double value = var->function(particle);
       B2INFO("     o) " << varName << " = " << value);

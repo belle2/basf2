@@ -152,20 +152,21 @@ def SignalProbability(path, particleName, channelName, mvaConfig, particleList, 
     return {}
 
 
-def VariablesToNTuple(path, particleList, signalProbability):
+def VariablesToNTuple(path, particleName, particleList, signalProbability):
     """
     Saves the calculated signal probability for this particle list
         @param path the basf2 path
+        @param particleName particleName
         @param particleList the particleList
         @param signalProbability signalProbability as additional dependency
     """
 
     if particleList is None or signalProbability is None:
-        B2INFO("Write variables to ntuple for " + particleList + " and charged conjugated. But list is ignored.")
+        B2INFO("Write variables to ntuple for " + particleName + " and charged conjugated. But list is ignored.")
         return {'VariablesToNTuple': None}
 
-    hash = actorFramework.createHash(particleList, signalProbability)
-    filename = 'var_{particleList}_{hash}.root'.format(particleList=particleList, hash=hash)
+    hash = actorFramework.createHash(particleName, particleList, signalProbability)
+    filename = 'var_{particleName}_{hash}.root'.format(particleName=particleName, hash=hash)
 
     if not os.path.isfile(filename):
         output = register_module('VariablesToNtuple')
@@ -174,7 +175,7 @@ def VariablesToNTuple(path, particleList, signalProbability):
         output.param('fileName', filename)
         output.param('treeName', 'variables')
         path.add_module(output)
-        B2INFO("Write variables to ntuple for " + particleList + " and charged conjugated.")
+        B2INFO("Write variables to ntuple for " + particleName + " and charged conjugated.")
         return {}
 
     B2INFO("Write variables to ntuple for " + particleList + " and charged conjugated. But file already exists, so nothing to do here.")
@@ -240,7 +241,7 @@ def PreCutDetermination(particleName, channelNames, preCutConfig, preCutHistogra
     cuts = preCutDetermination.CalculatePreCuts(preCutConfig, channelNames, preCutHistograms)
 
     for (channel, cut) in cuts.iteritems():
-        results['PreCut_' + channel] = None if cut['isIgnored'] else {cut['variable']: cut['range']}
+        results['PreCut_' + channel] = None if cut['isIgnored'] else cut['cutstring']
         results['nSignal_' + channel] = None if cut['isIgnored'] else cut['nSignal']
         results['nBackground_' + channel] = None if cut['isIgnored'] else cut['nBackground']
 

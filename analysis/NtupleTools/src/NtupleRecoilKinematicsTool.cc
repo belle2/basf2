@@ -10,7 +10,7 @@
 
 #include <analysis/NtupleTools/NtupleRecoilKinematicsTool.h>
 
-#include <analysis/utility/PSelectorFunctions.h>
+#include <analysis/VariableManager/Variables.h>
 
 #include <TBranch.h>
 
@@ -41,9 +41,9 @@ void NtupleRecoilKinematicsTool::eval(const Particle* particle)
 
   int nDecayProducts = selparticles.size();
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    m_recoilP[iProduct]   = analysis::recoilMomentum(selparticles[iProduct]);
-    m_recoilE[iProduct]   = analysis::recoilEnergy(selparticles[iProduct]);
-    m_recoilM[iProduct]   = analysis::recoilMass(selparticles[iProduct]);
-    m_recoilMM2[iProduct] = analysis::recoilMassSquared(selparticles[iProduct]);
+    m_recoilP[iProduct]   = Variable::recoilMomentum(selparticles[iProduct]);
+    m_recoilE[iProduct]   = Variable::recoilEnergy(selparticles[iProduct]);
+    m_recoilM[iProduct]   = Variable::recoilMass(selparticles[iProduct]);
+    m_recoilMM2[iProduct] = Variable::recoilMassSquared(selparticles[iProduct]);
   }
 }

@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-  namespace analysis {
+  namespace Variable {
 
     /**
      * return momentum magnitude

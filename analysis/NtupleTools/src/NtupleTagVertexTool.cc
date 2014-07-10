@@ -9,7 +9,7 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleTagVertexTool.h>
-#include <analysis/utility/PSelectorFunctions.h>
+#include <analysis/VariableManager/Variables.h>
 #include <analysis/dataobjects/Vertex.h>
 #include <cmath>
 #include <TBranch.h>

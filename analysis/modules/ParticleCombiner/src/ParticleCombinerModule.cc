@@ -18,7 +18,6 @@
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/utility/VariableManager.h>
 
 // decay descriptor
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
@@ -53,8 +52,9 @@ namespace Belle2 {
     // Add parameters
     addParam("decayString", m_decayString, "Input DecayDescriptor string (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString).");
 
-    std::map<std::string, std::tuple<double, double>> defaultMap;
-    addParam("cuts", m_cuts, "Map of Variables to cut values (min/max).", defaultMap);
+    Variable::Cut::Parameter emptyCut;
+    addParam("cut", m_cutParameter, "Selection criteria to be applied", emptyCut);
+
     addParam("persistent", m_persistent,
              "toggle output particle list btw. transient/persistent", false);
 
@@ -109,6 +109,8 @@ namespace Belle2 {
         StoreObjPtr<ParticleList>::registerTransient(m_antiListName);
     }
 
+    m_cut.init(m_cutParameter);
+
   }
 
   void ParticleCombinerModule::beginRun()
@@ -131,18 +133,11 @@ namespace Belle2 {
       outputList->bindAntiParticleList(*(outputAntiList));
     }
 
-    //int pdg    = outputList->getPDGCode();
-    //int pdgbar = outputList->getAntiParticlePDGCode();
-
-    //B2INFO("[ParticleCombinerModule::event] OutputListName = " << m_listName << "(" << m_antiListName << ")" << "[" << pdg << "/" << pdgbar << "]");
-
-    //int counter = 1;
     m_generator->init();
     while (m_generator->loadNext()) {
-      //B2INFO("[ParticleCombinerModule::event] loaded Particle #" << counter++);
 
       const Particle& particle = m_generator->getCurrentParticle();
-      if (!checkCuts(&particle))
+      if (!m_cut.check(&particle))
         continue;
 
       particles.appendNew(particle);
@@ -159,26 +154,6 @@ namespace Belle2 {
   void ParticleCombinerModule::terminate()
   {
     delete m_generator;
-  }
-
-  bool ParticleCombinerModule::checkCuts(const Particle* particle)
-  {
-
-    VariableManager& manager = VariableManager::Instance();
-
-    for (auto & cut : m_cuts) {
-      auto var = manager.getVariable(cut.first);
-      if (var == nullptr) {
-        B2INFO(
-          "ParticleCombiner: VariableManager doesn't have variable" << cut.first)
-        return false;
-      }
-      double value = var->function(particle);
-      if (value < std::get < 0 > (cut.second)
-          || value > std::get < 1 > (cut.second))
-        return false;
-    }
-    return true;
   }
 
 } // end Belle2 namespace

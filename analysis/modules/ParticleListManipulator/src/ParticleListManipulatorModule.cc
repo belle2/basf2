@@ -28,7 +28,6 @@
 
 // utilities
 #include <analysis/utility/EvtPDLUtil.h>
-#include <analysis/utility/VariableManager.h>
 
 using namespace std;
 
@@ -58,8 +57,9 @@ namespace Belle2 {
     addParam("inputListNames", m_inputListNames,
              "list of input ParticleList names", defaultList);
 
-    std::map<std::string, std::tuple<double, double>> defaultMap;
-    addParam("cuts", m_selection, "Selection criteria to be applied", defaultMap);
+    Variable::Cut::Parameter emptyCut;
+    addParam("cut", m_cutParameter, "Selection criteria to be applied", emptyCut);
+
     addParam("persistent", m_persistent,
              "toggle newly created particle list btw. transient/persistent", false);
 
@@ -117,6 +117,9 @@ namespace Belle2 {
     for (unsigned i = 0; i < m_inputListNames.size(); i++) {
       StoreObjPtr<ParticleList>::required(m_inputListNames[i]);
     }
+
+    m_cut.init(m_cutParameter);
+
   }
 
   void ParticleListManipulatorModule::beginRun()
@@ -156,31 +159,10 @@ namespace Belle2 {
       for (unsigned i = 0; i < fsParticles.size(); i++) {
         const Particle* part = particles[fsParticles[i]];
 
-        if (checkCuts(part))
+        if (m_cut.check(part))
           plist->addParticle(part);
       }
     }
-  }
-
-
-  bool ParticleListManipulatorModule::checkCuts(const Particle* particle)
-  {
-
-    VariableManager& manager = VariableManager::Instance();
-
-    for (auto & cut : m_selection) {
-      auto var = manager.getVariable(cut.first);
-      if (var == nullptr) {
-        B2INFO(
-          "ParticleCombiner: VariableManager doesn't have variable" << cut.first)
-        return false;
-      }
-      double value = var->function(particle);
-      if (value < std::get < 0 > (cut.second)
-          || value > std::get < 1 > (cut.second))
-        return false;
-    }
-    return true;
   }
 
 

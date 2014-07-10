@@ -21,7 +21,7 @@ main.add_module(register_module('ParticleLoader'))
 
 
 #loose cut on energy
-selectParticle('gamma', ['E 0.05:'], path=main)
+selectParticle('gamma', 'E > 0.05', path=main)
 
 
 #a) save signal invariant mass using PreCutHistMaker
@@ -37,7 +37,7 @@ main.add_module(histmaker)
 #b) make all  combinations and save only signal
 
 #essentially no cuts here, which makes it slow
-makeParticle('pi0 -> gamma gamma', {}, path=main)
+makeParticle('pi0 -> gamma gamma', '', path=main)
 matchMCTruth('pi0', path=main)
 
 ntupler = register_module('VariablesToNtuple')

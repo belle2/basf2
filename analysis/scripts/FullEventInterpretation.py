@@ -49,7 +49,7 @@ class Particle(object):
     ## Create new class called DecayChannel via namedtuple. namedtuples are like a struct in C
     DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, mvaConfig, isIncomplete')
 
-    def __init__(self, name, mvaConfig, preCutConfig=PreCutConfiguration(variable='Mass', efficiency=0.70, purity=0.001), explicitCuts=[]):
+    def __init__(self, name, mvaConfig, preCutConfig=PreCutConfiguration(variable='Mass', efficiency=0.70, purity=0.001), explicitCuts=""):
         """
         Creates a Particle without any decay channels. To add decay channels use addChannel method.
             @param name is the correct pdg name as a string of the particle.
@@ -267,11 +267,13 @@ def FullEventInterpretation(path, particles):
     #TODO: don't hardcode B0/B+ here
     seq.addFunction(VariablesToNTuple,
                     path='Path',
+                    particleName='Name_B0',
                     particleList='ParticleList_B0',
                     signalProbability='SignalProbability_B0')
 
     seq.addFunction(VariablesToNTuple,
                     path='Path',
+                    particleName='Name_B+',
                     particleList='ParticleList_B+',
                     signalProbability='SignalProbability_B+')
 

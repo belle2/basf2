@@ -10,7 +10,7 @@
 
 #include <analysis/modules/PreCutHistMaker/PreCutHistMakerModule.h>
 
-#include <analysis/utility/PSelectorFunctions.h>
+#include <analysis/VariableManager/Variables.h>
 #include <analysis/utility/MCMatching.h>
 #include <analysis/utility/EvtPDLUtil.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -124,11 +124,11 @@ void PreCutHistMakerModule::initialize()
     m_histogramAll = new TH1F((std::string("all") + m_channelName).c_str(), "all", nbins, xlow, xhigh);
   }
 
-  VariableManager& manager = VariableManager::Instance();
+  Variable::Manager& manager = Variable::Manager::Instance();
   m_var = manager.getVariable(m_variable);
 
   if (m_var == nullptr) {
-    B2ERROR("PreCutHistMaker: VariableManager doesn't have variable" <<  m_variable)
+    B2ERROR("PreCutHistMaker: Variable::Manager doesn't have variable" <<  m_variable)
   }
 
   m_generator_all = new ParticleGenerator(m_decayString);
@@ -255,7 +255,7 @@ void PreCutHistMakerModule::saveCombinationsForSignal()
     Particle* part = particles.appendNew(particle);
     MCMatching::setMCTruth(part);
     //B2WARNING("combined Particle created.");
-    if (analysis::isSignal(part) < 0.5) {
+    if (Variable::isSignal(part) < 0.5) {
       /*
       B2WARNING("mcMatching says No. (status: " << MCMatching::getMCTruthStatus(part));
       part->print();

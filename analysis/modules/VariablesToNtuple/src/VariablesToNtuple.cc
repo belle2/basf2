@@ -11,7 +11,8 @@
 #include <analysis/modules/VariablesToNtuple/VariablesToNtupleModule.h>
 
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/utility/VariableManager.h>
+#include <analysis/VariableManager/Manager.h>
+#include <analysis/VariableManager/Utility.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreObjPtr.h>
 
@@ -32,7 +33,7 @@ VariablesToNtupleModule::VariablesToNtupleModule() : Module()
 
   vector<string> emptylist;
   addParam("particleList", m_particleList, "Name of particle list with reconstructed particles. If no list is provided the variables are saved once per event (only possible for event-type variables)", std::string(""));
-  addParam("variables", m_variables, "List of variables to save. Variables are taken from VariableManager, and are identical to those available to e.g. ParticleSelector.", emptylist);
+  addParam("variables", m_variables, "List of variables to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector.", emptylist);
 
   addParam("fileName", m_fileName, "Name of ROOT file for output.", string("VariablesToNtuple.root"));
   addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", string("ntuple"));
@@ -67,13 +68,13 @@ void VariablesToNtupleModule::initialize()
   for (const string & varStr : m_variables) {
     if (!first)
       varlist += ":";
-    varlist += makeROOTCompatible(varStr);
+    varlist += Variable::makeROOTCompatible(varStr);
     first = false;
 
     //also collection function pointers
-    const VariableManager::Var* var = VariableManager::Instance().getVariable(varStr);
+    const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(varStr);
     if (!var) {
-      B2ERROR("Variable '" << varStr << "' is not available in VariableManager!");
+      B2ERROR("Variable '" << varStr << "' is not available in Variable::Manager!");
     } else {
       m_functions.push_back(var->function);
     }

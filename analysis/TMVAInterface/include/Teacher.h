@@ -10,7 +10,7 @@
 #pragma once
 
 #include <analysis/TMVAInterface/Method.h>
-#include <analysis/utility/VariableManager.h>
+#include <analysis/VariableManager/Manager.h>
 
 #include <vector>
 #include <string>
@@ -37,7 +37,7 @@ namespace Belle2 {
       /**
        * @param prefix which used to identify the outputted training files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml
        * @param workingDirectory where the config file and weight file directory is stored
-       * @param target the name of the target variable (registered in VariableManager), which is used as expected output for the chosen TMVA method
+       * @param target the name of the target variable (registered in Variable::Manager), which is used as expected output for the chosen TMVA method
        * @param methods vector of Method
        * @param useExistingData if correct TFile and TTree exists already exists, use the stored samples for training
        */
@@ -86,7 +86,7 @@ namespace Belle2 {
       TFile* m_file; /**< stores TTree and training histograms created by TMVA */
       TTree* m_tree; /**< holds training and test signal samples */
 
-      const VariableManager::Var* m_target_var; /**< Variable Pointer to target variable */
+      const Variable::Manager::Var* m_target_var; /**< Variable Pointer to target variable */
       int m_target; /**< Storage for the target variable */
       std::vector<float> m_input; /**< Storage for input variables */
       std::map<int, unsigned int> m_cluster_count; /**< Number of events foreach identified cluster */

@@ -9,7 +9,7 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtuplePIDTool.h>
-#include <analysis/utility/PSelectorFunctions.h>
+#include <analysis/VariableManager/Variables.h>
 #include <framework/gearbox/Const.h>
 #include <TBranch.h>
 
@@ -46,11 +46,11 @@ void NtuplePIDTool::eval(const Particle* particle)
   int nDecayProducts = selparticles.size();
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
 
-    m_fPIDk[iProduct] = analysis::particleKaonId(selparticles[iProduct]);
-    m_fPIDpi[iProduct] = analysis::particlePionId(selparticles[iProduct]);
-    m_fPIDe[iProduct] = analysis::particleElectronId(selparticles[iProduct]);
-    m_fPIDmu[iProduct] = analysis::particleMuonId(selparticles[iProduct]);
-    m_fPIDp[iProduct] = analysis::particleProtonId(selparticles[iProduct]);
+    m_fPIDk[iProduct] = Variable::particleKaonId(selparticles[iProduct]);
+    m_fPIDpi[iProduct] = Variable::particlePionId(selparticles[iProduct]);
+    m_fPIDe[iProduct] = Variable::particleElectronId(selparticles[iProduct]);
+    m_fPIDmu[iProduct] = Variable::particleMuonId(selparticles[iProduct]);
+    m_fPIDp[iProduct] = Variable::particleProtonId(selparticles[iProduct]);
 
 
 

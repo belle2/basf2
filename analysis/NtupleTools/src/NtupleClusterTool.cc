@@ -9,7 +9,7 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleClusterTool.h>
-#include <analysis/utility/PSelectorFunctions.h>
+#include <analysis/VariableManager/Variables.h>
 #include <TBranch.h>
 
 using namespace Belle2;
@@ -56,16 +56,16 @@ void NtupleClusterTool::eval(const Particle* particle)
   int nDecayProducts = selparticles.size();
 
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    m_region[iProduct]  = int(analysis::eclClusterDetectionRegion(selparticles[iProduct]));
-    m_e9e25[iProduct]   = analysis::eclClusterE9E25(selparticles[iProduct]);
-    m_nHits[iProduct]   = int(analysis::eclClusterNHits(selparticles[iProduct]));
-    m_trackM[iProduct]  = int(analysis::eclClusterTrackMatched(selparticles[iProduct]));
+    m_region[iProduct]  = int(Variable::eclClusterDetectionRegion(selparticles[iProduct]));
+    m_e9e25[iProduct]   = Variable::eclClusterE9E25(selparticles[iProduct]);
+    m_nHits[iProduct]   = int(Variable::eclClusterNHits(selparticles[iProduct]));
+    m_trackM[iProduct]  = int(Variable::eclClusterTrackMatched(selparticles[iProduct]));
 
-    m_uncorrE[iProduct]  = analysis::eclClusterUncorrectedE(selparticles[iProduct]);
-    m_highestE[iProduct] = analysis::eclClusterHighestE(selparticles[iProduct]);
-    m_timing[iProduct]   = analysis::eclClusterTiming(selparticles[iProduct]);
-    m_theta[iProduct]    = analysis::eclClusterTheta(selparticles[iProduct]);
-    m_phi[iProduct]      = analysis::eclClusterPhi(selparticles[iProduct]);
-    m_distance[iProduct] = analysis::eclClusterR(selparticles[iProduct]);
+    m_uncorrE[iProduct]  = Variable::eclClusterUncorrectedE(selparticles[iProduct]);
+    m_highestE[iProduct] = Variable::eclClusterHighestE(selparticles[iProduct]);
+    m_timing[iProduct]   = Variable::eclClusterTiming(selparticles[iProduct]);
+    m_theta[iProduct]    = Variable::eclClusterTheta(selparticles[iProduct]);
+    m_phi[iProduct]      = Variable::eclClusterPhi(selparticles[iProduct]);
+    m_distance[iProduct] = Variable::eclClusterR(selparticles[iProduct]);
   }
 }

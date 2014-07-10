@@ -48,12 +48,12 @@ namespace Belle2 {
       }
       m_type_as_string = type;
 
-      // Load variables from the VariableManager
-      VariableManager& manager = VariableManager::Instance();
+      // Load variables from the Variable::Manager
+      Variable::Manager& manager = Variable::Manager::Instance();
       for (auto & variable : variables) {
-        const VariableManager::Var* x =  manager.getVariable(variable);
+        const Variable::Manager::Var* x =  manager.getVariable(variable);
         if (x == nullptr) {
-          B2ERROR("Couldn't find variable " << variable << " via the VariableManager. Check the name!")
+          B2ERROR("Couldn't find variable " << variable << " via the Variable::Manager. Check the name!")
           continue;
         }
         m_variables.push_back(x);

@@ -17,7 +17,7 @@
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
-#include <analysis/utility/VariableManager.h>
+#include <analysis/VariableManager/Manager.h>
 
 #include <string>
 #include <vector>
@@ -87,7 +87,7 @@ namespace Belle2 {
     std::vector<float> m_customBinning; /**< Custom binning */
 
     std::string m_variable; /**< Variable for which the distributions are calculated */
-    const VariableManager::Var* m_var; /**< Pointer to variable stored in the variable manager */
+    const Variable::Manager::Var* m_var; /**< Pointer to variable stored in the variable manager */
     std::vector<StoreObjPtr<ParticleList>> m_tmpLists; /**< temporary particle lists (contain subsets of contents of input lists, filled from MC truth). */
     TH1F* m_histogramSignal; /**< signal histogram for combined particle. */
     TH1F* m_histogramAll; /**< signal histogram for combined particle. */

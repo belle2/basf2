@@ -13,6 +13,7 @@
 
 #include <framework/core/Module.h>
 
+#include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
 
@@ -77,13 +78,6 @@ namespace Belle2 {
 
   private:
 
-    /**
-     * Check if the particleStack pass all cut requirements
-     * @param particleStack Reference to stack of pointers to Particle
-     * @return True if all requirements are passed, false otherwise
-     */
-    bool checkCuts(const Particle* particle);
-
     int m_pdgCode;                /**< PDG code of the combined mother particle */
 
     std::string m_decayString;   /**< Input DecayString specifying the decay being reconstructed */
@@ -95,7 +89,9 @@ namespace Belle2 {
 
     bool m_isSelfConjugatedParticle; /**< flag that indicates whether an anti-particle mother does not exist and should not be reconstructed as well*/
 
-    std::map<std::string, std::tuple<double, double> > m_cuts; /**< variables -> low/high cut */
+    Variable::Cut::Parameter m_cutParameter;  /**< selection criteria */
+    Variable::Cut m_cut; /**< cut object which performs the cuts */
+
     bool m_persistent;  /**< toggle output particle list btw. transient/persistent */
 
   };

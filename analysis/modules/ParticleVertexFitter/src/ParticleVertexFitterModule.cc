@@ -649,16 +649,44 @@ namespace Belle2 {
 
         analysis::RaveKinematicVertexFitter rsf;
         bool mothSel = false;
+        int nTrk = 0;
         for (unsigned itrack = 0; itrack < tracksVertex.size(); itrack++) {
-          if (tracksVertex[itrack] != mother) rsf.addTrack(tracksVertex[itrack]);
-          if (tracksVertex[itrack] != mother) B2INFO("ParticleVertexFitterModule: Adding particle " << tracksName[itrack] << " to vertex fit ");
+          if (tracksVertex[itrack] != mother) {
+            rsf.addTrack(tracksVertex[itrack]);
+            B2INFO("ParticleVertexFitterModule: Adding particle " << tracksName[itrack] << " to vertex fit ");
+            nTrk++;
+          }
           if (tracksVertex[itrack] == mother) mothSel = true;
         }
 
-        int nvert = rsf.fit();
-
         TVector3 pos;
         TMatrixDSym RerrMatrix(3);
+        int nvert = 0;
+
+        if (nTrk == 1) {
+          analysis::RaveVertexFitter rsg;
+          for (unsigned itrack = 0; itrack < tracksVertex.size(); itrack++) {
+            rsg.addTrack(tracksVertex[itrack]);
+            nvert = rsg.fit("kalman");
+            if (nvert > 0) {
+              pos = rsg.getPos(0);
+              RerrMatrix = rsg.getCov(0);
+              double prob = rsg.getPValue(0);
+              TLorentzVector mom(mother->getMomentum(), mother->getEnergy());
+              TMatrixDSym errMatrix(7);
+              for (int i = 0; i < 7; i++) {
+                for (int j = 0; j < 7; j++) {
+                  if (i > 3 && j > 3) {errMatrix[i][j] = RerrMatrix[i - 4][j - 4];}
+                  else {errMatrix[i][j] = 0;}
+                }
+              }
+              mother->updateMomentum(mom, pos, errMatrix, prob);
+              return true;
+            } else {return false;}
+          }
+        } else {
+          nvert = rsf.fit();
+        }
 
         if (nvert > 0) {
           pos = rsf.getPos();
@@ -676,7 +704,7 @@ namespace Belle2 {
         } else {return false;}
 
 
-        if (mothSel) {
+        if (mothSel && nTrk > 1) {
           analysis::RaveSetup::getInstance()->setBeamSpot(pos, RerrMatrix);
           rf.addMother(mother);
           int nKfit = rf.fit();

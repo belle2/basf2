@@ -111,19 +111,10 @@ REG_MODULE(VXDTF)
 VXDTFModule::VXDTFModule() : Module()
 {
   /// setting standard values for steering parameters
-  std::vector<double> defaultConfigU; // sector sizes
-  std::vector<double> defaultConfigV;
-  defaultConfigU.push_back(0.0);
-  defaultConfigU.push_back(0.5);
-  defaultConfigU.push_back(1.0);
-  defaultConfigV.push_back(0.0);
-  defaultConfigV.push_back(0.33);
-  defaultConfigV.push_back(0.67);
-  defaultConfigV.push_back(1.0);
+  std::vector<double> defaultConfigU = {0.0, 0.5, 1.0};
+  std::vector<double> defaultConfigV = {0.0, 0.33, 0.67, 1.0};
 
-  std::vector<std::string> sectorSetup/*, detectorType*/;
-  sectorSetup.push_back("std");
-//   detectorType.push_back("SVD");  // Recycling Const::IR for Const::VXD, which means that we treat Const::IR as if it would be Const::VXD
+  std::vector<std::string> sectorSetup = {"std"};
 
   vector<int> highestAllowedLayer, minLayer, minState;
   highestAllowedLayer.push_back(6);
@@ -139,9 +130,8 @@ VXDTFModule::VXDTFModule() : Module()
   vector<double> tuneZERO = { 0 };
   vector<double> tuneCircleFit = { 0.00001, 0.001, 0.001 }; // 1st, 2nd, 3rd-pass chi2-threshold
 
-  vector<string> rootFileNameVals;
-  rootFileNameVals.push_back(string("VXDTFoutput"));
-  rootFileNameVals.push_back("RECREATE");
+  vector<string> rootFileNameVals = {"VXDTFoutput", "UPDATE"};
+
 
 
   //Set module properties

@@ -56,34 +56,14 @@ FilterCalculatorModule::FilterCalculatorModule() : Module()
   setDescription("This module calculates the relations of sectors and exports sector dependent filtervalues. Size of sectors and type of filters can be set by steering file. Only one track per event, needs many events for usefull outcome.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  std::vector<double> defaultConfigU;
-  std::vector<double> defaultConfigV;
-  defaultConfigU.push_back(0.0);
-  defaultConfigU.push_back(0.5);
-  defaultConfigU.push_back(1.0);
-  defaultConfigV.push_back(0.0);
-  defaultConfigV.push_back(0.33);
-  defaultConfigV.push_back(0.67);
-  defaultConfigV.push_back(1.0);
-  std::vector<double> defaultpTcuts;
-  defaultpTcuts.push_back(0.035);
-  std::vector<std::string> defaultSecNames;
-  defaultSecNames.push_back("fullRange");
-  std::vector<double> originVec;
-  originVec.push_back(0);
-  originVec.push_back(0);
-  originVec.push_back(0);
-
-  std::vector<double> acceptedRegionForSensorsVec;
-  acceptedRegionForSensorsVec.push_back(-1);
-  acceptedRegionForSensorsVec.push_back(-1);
-
-  std::vector<std::string> rootFileNameVals;
-  rootFileNameVals.push_back("FilterCalculatorResults");
-  rootFileNameVals.push_back("UPDATE"); // RECREATE, UPDATE
-
-  std::vector<std::string> supportedDetectors;
-  supportedDetectors.push_back("SVD");
+  std::vector<double> defaultConfigU = {0.0, 0.5, 1.0};
+  std::vector<double> defaultConfigV = {0.0, 0.33, 0.67, 1.0};
+  std::vector<double> defaultpTcuts = { 0.035};
+  std::vector<std::string> defaultSecNames = {"fullRange"};
+  std::vector<double> originVec = {0, 0, 0};
+  std::vector<double> acceptedRegionForSensorsVec = { -1, -1};
+  std::vector<std::string> rootFileNameVals = {"FilterCalculatorResults", "UPDATE"};
+  std::vector<std::string> supportedDetectors = {"SVD"};
 
   addParam("exportSectorCoords", m_PARAMexportSectorCoords, "set true if you want to export coordinates of the sectors too", bool(true));
 

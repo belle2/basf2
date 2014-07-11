@@ -98,6 +98,7 @@ namespace Belle2 {
     double m_deltaT;              /**< reconstructed DeltaT */
     double m_MCdeltaT;            /**< generated DeltaT */
     TMatrixDSym m_tube;           /**< constrained to be used in the tag vertex fit */
+    TVector3 m_BeamSpotCenter;    /**< Beam spot position */
 
     /** central method for the tag side vertex fit */
     bool doVertexFit(Particle* Breco);

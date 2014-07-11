@@ -77,8 +77,10 @@ namespace Belle2 {
   void TagVertexModule::initialize()
   {
 
+    m_BeamSpotCenter = TVector3(0., 0., 0.);  // TEST TEST TEST
+
     // magnetic field
-    m_Bfield = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
+    m_Bfield = BFieldMap::Instance().getBField(m_BeamSpotCenter).Z();
     // RAVE setup
     analysis::RaveSetup::initialize(1, m_Bfield);
     B2INFO("TagVertexModule : magnetic field = " << m_Bfield);
@@ -95,7 +97,7 @@ namespace Belle2 {
   void TagVertexModule::beginRun()
   {
     //TODO: set magnetic field for each run
-    //m_Bfield = BFieldMap::Instance().getBField(TVector3(0,0,0)).Z();
+    //m_Bfield = BFieldMap::Instance().getBField(m_BeamSpotCenter).Z();
   }
 
   void TagVertexModule::event()
@@ -197,15 +199,14 @@ namespace Belle2 {
   {
     if (Breco->getPValue() < 0.) return false;
 
-    TVector3 beamSpot(0, 0, 0);
     TMatrixDSym beamSpotCov(3);
     beamSpotCov(0, 0) = 1e-03 * 1e-03; beamSpotCov(1, 1) = 5.9e-06 * 5.9e-06; beamSpotCov(2, 2) = 1.9e-02 * 1.9e-02;
-    analysis::RaveSetup::getInstance()->setBeamSpot(beamSpot, beamSpotCov);
+    analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, beamSpotCov);
 
     double pmag = Breco->getMomentumMagnitude();
-    double xmag = (Breco->getVertex() - beamSpot).Mag();
+    double xmag = (Breco->getVertex() - m_BeamSpotCenter).Mag();
 
-    TVector3 Pmom = (pmag / xmag) * (Breco->getVertex() - beamSpot);
+    TVector3 Pmom = (pmag / xmag) * (Breco->getVertex() - m_BeamSpotCenter);
 
     TMatrixDSym TerrMatrix = Breco->getMomentumVertexErrorMatrix();
     TMatrixDSym PerrMatrix(7);
@@ -330,7 +331,6 @@ namespace Belle2 {
     TVector3 boost = T.getBoostVector().BoostVector();
     TVector3 boostDir = boost.Unit();
 
-    TVector3 beamSpot(0, 0, 0);
     TMatrix beamSpotCov(3, 3);
     beamSpotCov(0, 0) = 1e-03 * 1e-03; beamSpotCov(1, 1) = 5.9e-06 * 5.9e-06; beamSpotCov(2, 2) = cut * cut;
     double thetab = boostDir.Theta();
@@ -487,8 +487,7 @@ namespace Belle2 {
 
     // apply constraint
     analysis::RaveSetup::getInstance()->unsetBeamSpot();
-    TVector3 beamSpot(0, 0, 0); // TODO: use measured value when it will be available
-    if (m_useConstraint.compare(std::string("no")) != 0) analysis::RaveSetup::getInstance()->setBeamSpot(beamSpot, m_tube);
+    if (m_useConstraint.compare(std::string("no")) != 0) analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_tube);
 
 
     analysis::RaveVertexFitter rFit;

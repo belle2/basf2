@@ -129,12 +129,8 @@ std::pair<TVector3, int> TrackletFilters::calcMomentumSeed(bool useBackwards, do
     B2WARNING("Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << anException.what())
     try {
       fitResults = simpleLineFit3D(m_hits, useBackwards, setMomentumMagnitude);
-      stringstream hitPositions, hitSigmas;
-      for (PositionInfo * hit : *m_hits) {
-        hitPositions << hit->hitPosition.X() << "," << hit->hitPosition.Y() << "," << hit->hitPosition.Z() << "\n";
-        hitSigmas << hit->hitSigma.X() << "," << hit->hitSigma.Y() << "," << hit->hitSigma.Z() << "\n";
-      }
-      B2WARNING("After catching straight line case in Helix fit, the lineFit has chi2 of " << fitResults.first  << "\nwhile using following hits:\n" << hitPositions.str() << "\nand following sigmas: " << hitSigmas.str() << "with seed: " << fitResults.second.X() << " " << fitResults.second.Y() << " " << fitResults.second.Z() << "\n")
+
+      B2WARNING("After catching straight line case in Helix fit, the lineFit has chi2 of " << fitResults.first  << "\nwhile using following hits:\n" << printHits(m_hits) << "with seed: " << fitResults.second.X() << " " << fitResults.second.Y() << " " << fitResults.second.Z() << "\n")
 
     } catch (FilterExceptions::Straight_Up& anException) {
       try {
@@ -156,11 +152,7 @@ std::pair<TVector3, int> TrackletFilters::calcMomentumSeed(bool useBackwards, do
       }
     }
   } catch (FilterExceptions::Invalid_result_Nan& anException) {
-    stringstream hitPositions;
-    for (PositionInfo * hit : *m_hits) {
-      hitPositions << hit->hitPosition.X() << " " << hit->hitPosition.Y() << " " << hit->hitPosition.Z() << "\n";
-    }
-    B2WARNING("Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << anException.what() << "\nwhile using following hits:\n" << hitPositions.str())
+    B2WARNING("Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << anException.what() << "\nwhile using following hits:\n" << printHits(m_hits))
     try {
       fitResults = simpleLineFit3D(m_hits, useBackwards, setMomentumMagnitude);
     } catch (FilterExceptions::Straight_Up& anException) {
@@ -581,14 +573,10 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
     if (T(k, 0) < 0) {
 
       //Console Output:
-      B2ERROR("T" << k << " was " << T(k, 0) << " and will manually be set to 0.");
-      int i = 0;
-      stringstream hitOutput;
-      for (PositionInfo * hit : *m_hits) {
-        hitOutput << " hit " << i << ": x,y: " << hit->hitPosition.X() << " , " << hit->hitPosition.Y() << ", Sigma x,y: " << hit->hitSigma.X() << " , " << hit->hitSigma.Y() << " xBar "  << xBar(0, i) << endl;
-        ++i;
+      B2WARNING("T" << k << " was " << T(k, 0) << " and will manually be set to 0.");
+      if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true) {
+        B2DEBUG(1, "The following hits were part of this TC: \n" << printHits(m_hits) << "\n'T' had following entries: " << printMyMatrixstring(T));
       }
-      B2WARNING("The following hits were part of this TC: \n" << hitOutput.str());
 
       T(k, 0) = 0;
     }
@@ -682,16 +670,6 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
     }
   }
 
-//   if (didNanAppear == true) {
-//     stringstream hitOutput;
-//     int i = 0;
-//     for (PositionInfo * hit : *m_hits) {
-//       hitOutput << " hit " << i << ": x/y/sigmaU/sigmaV: " << hit->hitPosition.X() << "/" << hit->hitPosition.Y() << "/" << hit->sigmaU << "/" << hit->sigmaV << endl;
-//      ++i;
-//     }
-//     B2WARNING("helixFit: there was a 'nan'-value detected. The following hits were part of this TC: \n" << hitOutput.str())
-//   }
-
   /// fit line s (= arc length) versus z
 
   TMatrixD AtGA(2, 2);
@@ -778,23 +756,12 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
   // if (((useBackwards == true) && (vectorToSecondHit.Angle(pVector) > M_PI * 0.5)) || ((useBackwards == false) && (vectorToSecondHit.Angle(pVector) < M_PI * 0.5))) { pVector *= -1.; } // edit: Feb4-2014: swapped values...
   if (lambdaCheckVector4NAN(pVector) == true) { B2ERROR("helixFit: pVector got 'nan'-entries x/y/z: " << pVector.X() << "/" << pVector.Y() << "/" << pVector.Z()); didNanAppear = true; }
 
-  if (didNanAppear == true) {
-    stringstream hitOutput;
-    int i = 0;
-    for (PositionInfo * hit : *m_hits) {
-      hitOutput << " hit " << i << ": x/y/sigmaU/sigmaV: " << hit->hitPosition.X() << "/" << hit->hitPosition.Y() << "/" << hit->sigmaU << "/" << hit->sigmaV << endl;
-      ++i;
-    }
-    B2DEBUG(1, "helixFit: there was a 'nan'-value detected. When using magnetic field of " << m_3hitFilterBox.getMagneticField() << ", the following hits were part of this TC: \n" << hitOutput.str() << "\n pVector  x/y/z: " << pVector.X() << "/" << pVector.Y() << "/" << pVector.Z())
+  if (didNanAppear == true && LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true) {
+    B2DEBUG(1, "helixFit: there was a 'nan'-value detected. When using magnetic field of " << m_3hitFilterBox.getMagneticField() << ", the following hits were part of this TC: \n" << printHits(m_hits) << "\n pVector  x/y/z: " << pVector.X() << "/" << pVector.Y() << "/" << pVector.Z())
   }
 
-//    stringstream hitOutput;
-//     int i = 0;
-//     for (PositionInfo * hit : *m_hits) {
-//       hitOutput << " hit " << i << ": x/y/z/sigmaU/sigmaV: " << hit->hitPosition.X() << "/" << hit->hitPosition.Y() << "/" << hit->hitPosition.Z() << "/" << hit->sigmaU << "/" << hit->sigmaV << endl;
-//      ++i;
-//     }
-//     B2WARNING("helixFit: strange pVector (Mag="<<pVector.Mag()<< ") detected. The following hits were part of this TC: \n" << hitOutput.str() << "\n pVector  x/y/z: " << pVector.X()<<"/"<< pVector.Y()<<"/"<< pVector.Z())
+
+//     B2WARNING("helixFit: strange pVector (Mag="<<pVector.Mag()<< ") detected. The following hits were part of this TC: \n" << printHits(m_hits) << "\n pVector  x/y/z: " << pVector.X()<<"/"<< pVector.Y()<<"/"<< pVector.Z())
 ///   }
 //    B2ERROR("again: useBackwards == " << useBackwards << ", seedHit.Mag()/secondHit.Mag(): " << seedHit.Mag()<<"/"<< secondHit.Mag())
 
@@ -1129,6 +1096,25 @@ bool TrackletFilters::CalcCurvature()
 }
 
 
+std::string TrackletFilters::printHits(const std::vector<PositionInfo*>* hits) const
+{
+  stringstream hitX, hitY, hitZ, sigmaX, sigmaY, sigmaZ;
+  hitX << "xPos: ";
+  hitY << "yPos: ";
+  hitZ << "zPos: ";
+  sigmaX << "xSigma: ";
+  sigmaY << "ySigma: ";
+  sigmaZ << "zSigma: ";
+  for (PositionInfo * hit : *hits) {
+    hitX << hit->hitPosition.X() << ", ";
+    hitY << hit->hitPosition.Y() << ", ";
+    hitZ << hit->hitPosition.Z() << ", ";
+    sigmaX << hit->hitSigma.X() << ", ";
+    sigmaY << hit->hitSigma.X() << ", ";
+    sigmaZ << hit->hitSigma.X() << ", ";
+  }
+  return hitX.str() + "\n" + hitY.str() + "\n" + hitZ.str() + "\n" + sigmaX.str() + "\n" + sigmaY.str() + "\n" + sigmaZ.str() + "\n";
+}
 // bool TrackletFilters::CalcCurvature()
 // {
 //   if (m_hits == NULL) B2FATAL(" TrackletFilters::CalcCurvature: hits not set, therefore no calculation possible - please check that!")

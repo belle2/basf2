@@ -93,6 +93,17 @@ namespace Belle2 {
   }
 
 
+  std::string printMyMatrixstring(TMatrixD& aMatrix)
+  {
+    std::stringstream printOut;
+    for (int nRow = 0; nRow < aMatrix.GetNrows(); nRow++) {
+      for (int nCol = 0; nCol < aMatrix.GetNcols(); nCol++) {
+        printOut << aMatrix(nRow, nCol) << '\t';
+      }
+      printOut << std::endl;
+    }
+    return printOut.str();
+  }
 
   /// WARNING TODO miniFkt für streamOutPut für vectoren schreiben -> template fkt, auch die Lambda-FKTs für trackletFilters dazu stopfen!
 //   h:

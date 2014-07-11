@@ -48,6 +48,10 @@ namespace Belle2 {
 
   template<typename T_type1> void expandRootBranch(const T_type1& variable, const std::string& branchName, const std::string& treeName, const std::string& rootFileName); /**< can be used for exporting data into a branch of a rootFile */
 
+
+  /** simple printFunction for root library Matrices */
+  std::string printMyMatrixstring(TMatrixD& aMatrix);
+
   /** simple printFunction for root library Matrices */
   void printMyMatrix(TMatrixD& aMatrix, std::stringstream& ss); /*{
     //      std::stringstream printOut;

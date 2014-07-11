@@ -516,6 +516,87 @@ def massKFit(
         )
 
 
+def vertexRave(
+    list_name,
+    conf_level,
+    decay_string='',
+    constraint='',
+    path=analysis_main,
+    ):
+    """
+    Perform vertex fit using the RAVE for each Particle in the given ParticleList.
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param constraint   add aditional constraint to the fit (valid options are ipprofile or iptube)
+    @param path         modules are added to this path
+    @param decay_string select particles used for the vertex fit
+    """
+
+    fitVertex(
+        list_name,
+        conf_level,
+        decay_string,
+        'rave',
+        'vertex',
+        constraint,
+        path,
+        )
+
+
+def massVertexRave(
+    list_name,
+    conf_level,
+    decay_string='',
+    path=analysis_main,
+    ):
+    """
+    Perform mass-constrained vertex fit using the RAVE for each Particle in the given ParticleList.
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param path         modules are added to this path
+    @param decay_string select particles used for the vertex fit
+    """
+
+    fitVertex(
+        list_name,
+        conf_level,
+        decay_string,
+        'rave',
+        'massvertex',
+        '',
+        path,
+        )
+
+
+def massRave(
+    list_name,
+    conf_level,
+    decay_string='',
+    path=analysis_main,
+    ):
+    """
+    Perform mass fit using the RAVE for each Particle in the given ParticleList.
+    7x7 error matrix of the mother particle must be defined
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param path         modules are added to this path
+    @param decay_string select particles used for the vertex fit
+    """
+
+    fitVertex(
+        list_name,
+        conf_level,
+        decay_string,
+        'rave',
+        'mass',
+        '',
+        path,
+        )
+
+
 def printDataStore(path=analysis_main):
     """
     Prints the contents of DataStore in each event,

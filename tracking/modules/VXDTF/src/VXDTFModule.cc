@@ -745,7 +745,7 @@ void VXDTFModule::initialize()
 
 void VXDTFModule::beginRun()
 {
-  B2INFO("-----------------------------------------------\n       entering VXD CA track finder (" << m_PARAMnameOfInstance << ") - beginRun.\n       if you want to have some basic infos during begin- and endrun about it, set debug level 1 or 2. Debug level 3 or more gives you event wise output (the higher the level, the more verbose it gets, highest level: 175)\n       -----------------------------------------------");
+  B2INFO("-----------------------------------------------\n       entering VXD CA track finder (" << m_PARAMnameOfInstance << ") - beginRun.\n       if you want to have some basic infos during begin- and endrun about it, set debug level 1 or 2. Debug level 3 or more gives you event wise output (the higher the level, the more verbose it gets, highest level: 175)");
   B2DEBUG(50, "##### be careful, current TF status does not support more than one run per initialization! #####"); /// WARNING TODO: check whether this is still valid
 
 
@@ -791,7 +791,7 @@ void VXDTFModule::beginRun()
     stringstream secConU, secConV;
     for (double entry : newPass->secConfigU) { secConU << " " << entry; }
     for (double entry : newPass->secConfigV) { secConV << " " << entry; }
-    B2DEBUG(1, " pass " << newPass->sectorSetup << "-setting: got magneticFieldStrength: " << magneticField << ", origin at: (" << origin[0] << "," << origin[1] << "," << origin[2] << ") and sectorConfig \n U: " << secConU.str() << endl << " V: " << secConV.str() << endl << " and additional Info: " << newPass->additionalInfo)
+    B2INFO(" pass " << newPass->sectorSetup << "-setting: got magneticFieldStrength: " << magneticField << ", origin at: (" << origin[0] << "," << origin[1] << "," << origin[2] << ") and sectorConfig \n U: " << secConU.str() << endl << " V: " << secConV.str() << endl << " and additional Info: " << newPass->additionalInfo)
 
 
     if (int (m_PARAMhighestAllowedLayer.size()) < i + 1) {
@@ -1390,7 +1390,7 @@ void VXDTFModule::beginRun()
           sectorsDisplayFriends.push_back(currentFriend);
         }
 
-        sectorsDisplayAllPass.push_back(std::make_pair(std::make_pair(i, currentSector.second->getSecID()), sectorsDisplayFriends));
+        sectorsDisplayAllPass.push_back({ {i, currentSector.second->getSecID()}, sectorsDisplayFriends });
 
       }
 
@@ -1412,7 +1412,7 @@ void VXDTFModule::beginRun()
 
   resetCountersAtBeginRun();
 
-  B2DEBUG(1, m_PARAMnameOfInstance << "leaving VXD CA track finder (VXDTFModule) - beginRun...\n       -----------------------------------------------");
+  B2INFO(m_PARAMnameOfInstance << "leaving VXD CA track finder (VXDTFModule) - beginRun...\n       -----------------------------------------------");
 }
 
 /** *************************************+************************************* **/
@@ -1424,7 +1424,7 @@ void VXDTFModule::beginRun()
 void VXDTFModule::the_real_event()
 {
   EventInfoPackage thisInfoPackage;
-  thisInfoPackage.clear();
+
   boostClock::time_point beginEvent = boostClock::now();
 
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
@@ -1865,9 +1865,7 @@ void VXDTFModule::the_real_event()
         // importHits 2.
         if (m_PARAMdisplayCollector > 0) {
 
-          std::vector<int> assignedIDs;
-
-          assignedIDs.push_back(clustersOfEvent[iPart].getCollectorID());
+          std::vector<int> assignedIDs = { clustersOfEvent[iPart].getCollectorID() };
 
           int hitID = m_collector.importHit(passNumber, CollectorTFInfo::m_nameHitFinder, CollectorTFInfo::m_idHitFinder, vector<int>(), vector<int>(), assignedIDs, aSecID, hitInfo.hitPosition, hitInfo.hitSigma);
 
@@ -1887,9 +1885,7 @@ void VXDTFModule::the_real_event()
       // importHits 3.
       if (m_PARAMdisplayCollector > 0) {
 
-        std::vector<int> assignedIDs;
-
-        assignedIDs.push_back(clustersOfEvent[iPart].getCollectorID());
+        std::vector<int> assignedIDs = { clustersOfEvent[iPart].getCollectorID() };
 
         int hitId = m_collector.importHit(passNumber, "", CollectorTFInfo::m_idAlive, vector<int>(), vector<int>(), assignedIDs, aSecID, hitInfo.hitPosition, hitInfo.hitSigma);
 
@@ -2014,10 +2010,7 @@ void VXDTFModule::the_real_event()
           // importHits 4.
           if (m_PARAMdisplayCollector > 0) {
 
-            std::vector<int> assignedIDs;
-
-            assignedIDs.push_back(clusterIndexU);
-            assignedIDs.push_back(clusterIndexV);
+            std::vector<int> assignedIDs = { clusterIndexU, clusterIndexV };
 
             std::vector<int> rejectedFilters = {FilterID::overHighestAllowedLayer};
 
@@ -2053,10 +2046,7 @@ void VXDTFModule::the_real_event()
           // importHits 5.
           if (m_PARAMdisplayCollector > 0) {
 
-            std::vector<int> assignedIDs;
-
-            assignedIDs.push_back(clusterIndexU);
-            assignedIDs.push_back(clusterIndexV);
+            std::vector<int> assignedIDs = { clusterIndexU, clusterIndexV };
 
             std::vector<int> rejectedFilters = {FilterID::outOfSectorRange};
 
@@ -2077,10 +2067,7 @@ void VXDTFModule::the_real_event()
         // importHits 6.
         if (m_PARAMdisplayCollector > 0) {
 
-          std::vector<int> assignedIDs;
-
-          assignedIDs.push_back(clusterIndexU);
-          assignedIDs.push_back(clusterIndexV);
+          std::vector<int> assignedIDs = { clusterIndexU, clusterIndexV };
 
           int hit_id =  m_collector.importHit(passNumber, "", CollectorTFInfo::m_idAlive, vector<int>(), vector<int>(), assignedIDs, aSecID, hitInfo.hitPosition, hitInfo.hitSigma);
 
@@ -2110,6 +2097,7 @@ void VXDTFModule::the_real_event()
   m_totalTELClusters += nTelClusters;
   m_totalSVDClusters += nSvdClusters;
   m_totalSVDClusterCombis += nClusterCombis;
+  thisInfoPackage.numSVDHits += nClusterCombis;
   stopTimer = boostClock::now();
   m_TESTERtimeConsumption.hitSorting += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
   thisInfoPackage.sectionConsumption.hitSorting += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
@@ -2135,8 +2123,6 @@ void VXDTFModule::the_real_event()
 
 
     timeStamp = boostClock::now();
-    int numPassHits = currentPass->hitVector.size();
-    thisInfoPackage.numSVDHits += numPassHits;
     B2DEBUG(10, "Pass " << passNumber << ": sectorVector has got " << currentPass->sectorVector.size() << " entries before applying unique & sort");
 
     // inverse sorting and removing unique entries so we can get a list of activated sectors where the outermost sector is the first in the list:
@@ -2163,6 +2149,7 @@ void VXDTFModule::the_real_event()
     B2DEBUG(3, "VXDTF-event " << m_eventCounter << ", pass" << passNumber << " @ segfinder - " << activatedSegments << " segments activated, " << discardedSegments << " discarded");
     thisInfoPackage.segFinderActivated += activatedSegments;
     thisInfoPackage.segFinderDiscarded += discardedSegments;
+    thisInfoPackage.numHitCombisTotal += (activatedSegments + discardedSegments);
 
     stopTimer = boostClock::now();
     m_TESTERtimeConsumption.segFinder += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
@@ -2473,7 +2460,7 @@ void VXDTFModule::the_real_event()
         greedy(m_tcVectorOverlapped);                                               /// greedy
 
       } else { /* do nothing -> accept overlapping TCs */ }
-    } else if (totalOverlaps == 2) {
+    } else if (m_filterOverlappingTCs != 0 and totalOverlaps == 2) {
 
       tcDuel(m_tcVectorOverlapped);                                                 /// tcDuel
 
@@ -2699,6 +2686,9 @@ void VXDTFModule::endRun()
   std::reverse(m_TESTERlogEvents.begin(), m_TESTERlogEvents.end());
 
   B2DEBUG(1, " ############### " << m_PARAMnameOfInstance << " endRun of " <<  m_eventCounter + 1 << " events ###############\nfor explanations of the values, activate DEBUG-mode (level 2 or greater)!")
+
+  if (m_eventCounter == 0) { m_eventCounter = 1; }
+  float invNEvents = 1. / float(m_eventCounter);
   string lineHigh = "------------------------------------------------------------------------------------------";
   string lineApnd = "--------------------------";
   B2DEBUG(1, lineHigh << lineApnd << lineApnd)
@@ -2767,7 +2757,10 @@ void VXDTFModule::endRun()
   B2DEBUG(1, std::fixed << std::setprecision(2) << " of " << nTotalHits << " svd-hit-combinations: Lists hits per sensor in percent\n 1\t|2-4\t|5-9\t|-16\t|-25\t|-50\t|-100\t|-200\t|-300\t|-400\t|-500\t|-600\t|-700\t|-800\t|>800\t|highest value occured \t|\n " << double(h1 * pFac) << "\t| " << double(h2t4 * pFac) << "\t| " << double(h5t9 * pFac) << "\t| " << double(h10t16 * pFac) << "\t| " << double(h17t25 * pFac) << "\t| " << double(h26t50 * pFac) << "\t| " << double(h51t100 * pFac) << "\t| " << double(h101t200 * pFac) << "\t| " << double(h201t300 * pFac) << "\t| " << double(h301t400 * pFac) << "\t| " << double(h401t500 * pFac) << "\t| " << double(h501t600 * pFac) << "\t| " << double(h601t700 * pFac) << "\t| " << double(h701t800 * pFac) << "\t| " << double(h800plus * pFac) << "\t| " << m_TESTERSVDOccupancy.size() + 1 << "\t\t\t| ")
   B2DEBUG(1, lineHigh << lineApnd << lineApnd)
 
-  B2DEBUG(1, std::fixed << std::setprecision(2) << " time consumption in microseconds: \n " << "HSort\t|baseTF\t|sgFind\t|nbFind\t|CA \t|tcCol\t|tcFlt\t|kalmn\t|chkOvr\t|clnOvr\t|neuNet\t|others\t|\n" << (m_TESTERtimeConsumption.hitSorting.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.baselineTF.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.segFinder.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.nbFinder.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.cellularAutomaton.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.tcc.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.postCAFilter.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.kalmanStuff.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.checkOverlap.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.cleanOverlap.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.neuronalStuff.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.intermediateStuff.count() * 0.001) << "\t|")
+  B2DEBUG(1, std::fixed << std::setprecision(2) << " total time consumption in milliseconds: \n " << "HSort\t|baseTF\t|sgFind\t|nbFind\t|CA \t|tcCol\t|tcFlt\t|kalmn\t|chkOvr\t|clnOvr\t|neuNet\t|others\t|\n" << (m_TESTERtimeConsumption.hitSorting.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.baselineTF.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.segFinder.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.nbFinder.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.cellularAutomaton.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.tcc.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.postCAFilter.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.kalmanStuff.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.checkOverlap.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.cleanOverlap.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.neuronalStuff.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.intermediateStuff.count() * 0.001) << "\t|")
+
+//   m_eventCounter
+  B2DEBUG(1, std::fixed << std::setprecision(2) << " mean time consumption in microseconds: \n " << "HSort\t|baseTF\t|sgFind\t|nbFind\t|CA \t|tcCol\t|tcFlt\t|kalmn\t|chkOvr\t|clnOvr\t|neuNet\t|others\t|\n" << (m_TESTERtimeConsumption.hitSorting.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.baselineTF.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.segFinder.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.nbFinder.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.cellularAutomaton.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.tcc.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.postCAFilter.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.kalmanStuff.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.checkOverlap.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.cleanOverlap.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.neuronalStuff.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.intermediateStuff.count() * invNEvents) << "\t|")
 
   B2DEBUG(2, "Explanation: HSort: hit sorting, baseTF: baseline TF, sgFind: segment finder , nbFind: neighbouring segments finder, CA: cellular automaton, tcCol: track candidate collector, tcFlt: track candidate filter (e.g. circleFit), kalmn: kalman filter, chkOvr: checking track candidates for overlapping clusters, clnOvr: cleaning track candidates for overlapping clusters, neuNet: neuronal network of Hopfield type, others: everything which was not listed above")
 
@@ -2799,9 +2792,115 @@ void VXDTFModule::endRun()
     B2DEBUG(1, "manually calculated mean: " << meanTimeConsumption / numLoggedEvents << ", and median: " << m_TESTERlogEvents.at(median).totalTime.count() << " of time consumption per event");
   }
 
-  B2INFO(" VXDTF - endRun: within " << m_eventCounter + 1 << " events, there were a total number of " << m_TESTERcountTotalTCsFinal << " TCs and " << float(m_TESTERcountTotalTCsFinal) / (float(m_eventCounter + 1)) << " TCs per event(" << m_TESTERbrokenEventsCtr << " events killed for high occupancy). Mean track length (indices/hits): " << float(m_TESTERcountTotalUsedIndicesFinal) / float(m_TESTERcountTotalTCsFinal) << "/" << float(m_TESTERcountTotalUsedHitsFinal) / float(m_TESTERcountTotalTCsFinal))
+  vector<EventInfoPackage> logEventsCopy = m_TESTERlogEvents; // copying original since we want to change the internal order now for several times and do not want to break the original
+  vector<EventInfoPackage> infoQ(5); // for each value we want to find the key figures, we store one entry. first is min, third is median, last is max
+  stringstream telClusterStream, pxdClusterStream, svdClusterStream, svdHitStream, twoHitCombiStream, twoHitActivatedStream, twoHitDiscardedStream;
 
-  B2DEBUG(1, " ############### " << m_PARAMnameOfInstance << " endRun - end ############### ")
+  // sort by nTelClusters:
+  std::sort(
+    logEventsCopy.begin(),
+    logEventsCopy.end(),
+    [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.numTELCluster < b.numTELCluster; }
+  );
+  infoQ.at(0).numTELCluster = logEventsCopy.at(0).numTELCluster;
+  infoQ.at(1).numTELCluster = logEventsCopy.at(q25).numTELCluster;
+  infoQ.at(2).numTELCluster = logEventsCopy.at(median).numTELCluster;
+  infoQ.at(3).numTELCluster = logEventsCopy.at(q75).numTELCluster;
+  infoQ.at(4).numTELCluster = logEventsCopy.at(numLoggedEvents - 1).numTELCluster;
+  telClusterStream << infoQ[0].numTELCluster << " / " << infoQ[1].numTELCluster << " / " << infoQ[2].numTELCluster << " / " << infoQ[3].numTELCluster << " / " << infoQ[4].numTELCluster << "\n";
+
+  // sort by nPxdClusters:
+  std::sort(
+    logEventsCopy.begin(),
+    logEventsCopy.end(),
+    [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.numPXDCluster < b.numPXDCluster; }
+  );
+  infoQ.at(0).numPXDCluster = logEventsCopy.at(0).numPXDCluster;
+  infoQ.at(1).numPXDCluster = logEventsCopy.at(q25).numPXDCluster;
+  infoQ.at(2).numPXDCluster = logEventsCopy.at(median).numPXDCluster;
+  infoQ.at(3).numPXDCluster = logEventsCopy.at(q75).numPXDCluster;
+  infoQ.at(4).numPXDCluster = logEventsCopy.at(numLoggedEvents - 1).numPXDCluster;
+  pxdClusterStream << infoQ[0].numPXDCluster << " / " << infoQ[1].numPXDCluster << " / " << infoQ[2].numPXDCluster << " / " << infoQ[3].numPXDCluster << " / " << infoQ[4].numPXDCluster << "\n";
+
+  // sort by nSVDClusters:
+  std::sort(
+    logEventsCopy.begin(),
+    logEventsCopy.end(),
+    [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.numSVDCluster < b.numSVDCluster; }
+  );
+  infoQ.at(0).numSVDCluster = logEventsCopy.at(0).numSVDCluster;
+  infoQ.at(1).numSVDCluster = logEventsCopy.at(q25).numSVDCluster;
+  infoQ.at(2).numSVDCluster = logEventsCopy.at(median).numSVDCluster;
+  infoQ.at(3).numSVDCluster = logEventsCopy.at(q75).numSVDCluster;
+  infoQ.at(4).numSVDCluster = logEventsCopy.at(numLoggedEvents - 1).numSVDCluster;
+  svdClusterStream << infoQ[0].numSVDCluster << " / " << infoQ[1].numSVDCluster << " / " << infoQ[2].numSVDCluster << " / " << infoQ[3].numSVDCluster << " / " << infoQ[4].numSVDCluster << "\n";
+
+  // sort by nSVDClusterCombis:
+  std::sort(
+    logEventsCopy.begin(),
+    logEventsCopy.end(),
+    [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.numSVDHits < b.numSVDHits; }
+  );
+  infoQ.at(0).numSVDHits = logEventsCopy.at(0).numSVDHits;
+  infoQ.at(1).numSVDHits = logEventsCopy.at(q25).numSVDHits;
+  infoQ.at(2).numSVDHits = logEventsCopy.at(median).numSVDHits;
+  infoQ.at(3).numSVDHits = logEventsCopy.at(q75).numSVDHits;
+  infoQ.at(4).numSVDHits = logEventsCopy.at(numLoggedEvents - 1).numSVDHits;
+  svdHitStream << infoQ[0].numSVDHits << " / " << infoQ[1].numSVDHits << " / " << infoQ[2].numSVDHits << " / " << infoQ[3].numSVDHits << " / " << infoQ[4].numSVDHits << "\n";
+
+  // sort by 2HitCombis:
+  std::sort(
+    logEventsCopy.begin(),
+    logEventsCopy.end(),
+    [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.numHitCombisTotal < b.numHitCombisTotal; }
+  );
+  infoQ.at(0).numHitCombisTotal = logEventsCopy.at(0).numHitCombisTotal;
+  infoQ.at(1).numHitCombisTotal = logEventsCopy.at(q25).numHitCombisTotal;
+  infoQ.at(2).numHitCombisTotal = logEventsCopy.at(median).numHitCombisTotal;
+  infoQ.at(3).numHitCombisTotal = logEventsCopy.at(q75).numHitCombisTotal;
+  infoQ.at(4).numHitCombisTotal = logEventsCopy.at(numLoggedEvents - 1).numHitCombisTotal;
+  twoHitCombiStream << infoQ[0].numHitCombisTotal << " / " << infoQ[1].numHitCombisTotal << " / " << infoQ[2].numHitCombisTotal << " / " << infoQ[3].numHitCombisTotal << " / " << infoQ[4].numHitCombisTotal << "\n";
+
+  // sort by 2HitCombisActivated:
+  std::sort(
+    logEventsCopy.begin(),
+    logEventsCopy.end(),
+    [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.segFinderActivated < b.segFinderActivated; }
+  );
+  infoQ.at(0).segFinderActivated = logEventsCopy.at(0).segFinderActivated;
+  infoQ.at(1).segFinderActivated = logEventsCopy.at(q25).segFinderActivated;
+  infoQ.at(2).segFinderActivated = logEventsCopy.at(median).segFinderActivated;
+  infoQ.at(3).segFinderActivated = logEventsCopy.at(q75).segFinderActivated;
+  infoQ.at(4).segFinderActivated = logEventsCopy.at(numLoggedEvents - 1).segFinderActivated;
+  twoHitActivatedStream << infoQ[0].segFinderActivated << " / " << infoQ[1].segFinderActivated << " / " << infoQ[2].segFinderActivated << " / " << infoQ[3].segFinderActivated << " / " << infoQ[4].segFinderActivated << "\n";
+
+  // sort by 2HitCombisDiscarded:
+  std::sort(
+    logEventsCopy.begin(),
+    logEventsCopy.end(),
+    [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.segFinderDiscarded < b.segFinderDiscarded; }
+  );
+  infoQ.at(0).segFinderDiscarded = logEventsCopy.at(0).segFinderDiscarded;
+  infoQ.at(1).segFinderDiscarded = logEventsCopy.at(q25).segFinderDiscarded;
+  infoQ.at(2).segFinderDiscarded = logEventsCopy.at(median).segFinderDiscarded;
+  infoQ.at(3).segFinderDiscarded = logEventsCopy.at(q75).segFinderDiscarded;
+  infoQ.at(4).segFinderDiscarded = logEventsCopy.at(numLoggedEvents - 1).segFinderDiscarded;
+  twoHitDiscardedStream << infoQ[0].segFinderDiscarded << " / " << infoQ[1].segFinderDiscarded << " / " << infoQ[2].segFinderDiscarded << " / " << infoQ[3].segFinderDiscarded << " / " << infoQ[4].segFinderDiscarded << "\n";
+
+  B2INFO(" VXDTF - endRun: ###############\n" <<
+         "within " << m_eventCounter << " events, there were a total number of " << m_TESTERcountTotalTCsFinal << " TCs " <<
+         "and " << float(m_TESTERcountTotalTCsFinal) * invNEvents << " TCs per event" <<
+         "(" << m_TESTERbrokenEventsCtr << " events killed for high occupancy).\n" <<
+         "Mean track length (indices/hits): " << float(m_TESTERcountTotalUsedIndicesFinal) / float(m_TESTERcountTotalTCsFinal) << "/" << float(m_TESTERcountTotalUsedHitsFinal) / float(m_TESTERcountTotalTCsFinal) << "\n\
+                       min / q0.25 / median / q0.75 / max\n" <<
+         "nTelClusters           " << telClusterStream.str() <<
+         "nPxdClusters           " << pxdClusterStream.str() <<
+         "nSVDClusters           " << svdClusterStream.str() <<
+         "nSVDClusterCombis      " << svdHitStream.str() <<
+         "2HitCombis             " << twoHitCombiStream.str() <<
+         "2HitCombisActivated    " << twoHitActivatedStream.str() <<
+         "2HitCombisDiscarded    " << twoHitDiscardedStream.str() <<
+         "VXDTF -endRun - end ###############")
 
   // runWise cleanup:
   for (PassData * currentPass : m_passSetupVector) {
@@ -3036,13 +3135,14 @@ void VXDTFModule::hopfieldVectorized(TCsOfEvent& tcVector, double omega)
     m_TESTERbadHopfieldCtr++;
     B2DEBUG(3, "VXDTF event " << m_eventCounter << ": hopfield had no survivors! now using greedy... ")
     greedy(tcVector); /// greedy
+    if ((LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 4, PACKAGENAME())) {
     for (int i = 0; i < nTCs; i++) {
-      B2DEBUG(3, "tc " << i << " - got final neuron value: " << xMatrix(0, i) << " while having " << int((tcVector.at(i)->getHits()).size()) << " hits and quality indicator " << tcVector.at(i)->getTrackQuality())
+        B2DEBUG(4, "tc " << i << " - got final neuron value: " << xMatrix(0, i) << " while having " << int((tcVector.at(i)->getHits()).size()) << " hits and quality indicator " << tcVector.at(i)->getTrackQuality())
+      }
     }
 
-    survivorCtr = 0;
     for (VXDTFTrackCandidate * tc : tcVector) {
-      if (tc->getCondition() == true)  { survivorCtr++; }
+    if (tc->getCondition() == true)  { survivorCtr++; }
     } // should now have got some survivors
   } else {
     for (int i = 0; i < nTCs; i++) {
@@ -3302,8 +3402,10 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
     m_TESTERbadHopfieldCtr++;
     B2DEBUG(3, "VXDTF event " << m_eventCounter << ": hopfield had no survivors! now using greedy... ")
     greedy(tcVector); /// greedy
-    for (int i = 0; i < nTCs; i++) {
-      B2DEBUG(3, "tc " << i << " - got final neuron value: " << xMatrix(0, i) << " while having " << int((tcVector.at(i)->getHits()).size()) << " hits and quality indicator " << tcVector.at(i)->getTrackQuality())
+    if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 4, PACKAGENAME()) == true) {
+      for (int i = 0; i < nTCs; i++) {
+        B2DEBUG(4, "tc " << i << " - got final neuron value: " << xMatrix(0, i) << " while having " << int((tcVector.at(i)->getHits()).size()) << " hits and quality indicator " << tcVector.at(i)->getTrackQuality())
+      }
     }
 
     survivorCtr = 0;
@@ -5029,11 +5131,11 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
   ///deleting TCs which did not survive the tcFilter-step
   int goodOnes = goodTCIndices.size(); // number of tc's after TCC-Filter
   if (goodOnes not_eq numTCsafterTCC) {
-    if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 3, PACKAGENAME()) == true) {
+    if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 4, PACKAGENAME()) == true) {
       stringstream deadTCs;
       deadTCs << " dead TCs are:";
       for (auto entry : killedList) { deadTCs << " " << entry.first << ", reason: " << entry.second; }
-      B2DEBUG(3, std::endl << deadTCs.str())
+      B2DEBUG(4, std::endl << deadTCs.str())
     }
     currentPass->tcVector.clear();
     for (TCsOfEvent::iterator goodTCIndex : goodTCIndices) {
@@ -5921,7 +6023,7 @@ VXDTFModule::BrokenSensorsOfEvent VXDTFModule::find2DSVDHits(ActiveSensorsOfEven
     }
     if (numUclusters != numVclusters) {
       m_TESTERclustersPersSectorNotMatching++;
-      B2DEBUG(3, "at event: " << m_eventCounter << " at sensor " << FullSecID(VxdID(aSensor.first), false, 0) << " at layer " << aSensor.second.layerID << " number of clusters do not match: Has got " << numUclusters << "/" << numVclusters << " u/vclusters!")
+      B2DEBUG(4, "at event: " << m_eventCounter << " at sensor " << FullSecID(VxdID(aSensor.first), false, 0) << " at layer " << aSensor.second.layerID << " number of clusters do not match: Has got " << numUclusters << "/" << numVclusters << " u/vclusters!")
       isStrange = true;
     }
     if (isStrange == true) { strangeSensors.push_back(aSensor.first); isStrange = false; }
@@ -5952,15 +6054,13 @@ VXDTFModule::BrokenSensorsOfEvent VXDTFModule::find2DSVDHits(ActiveSensorsOfEven
     numHits = 0;
   }
 
-  if (strangeSensors.size() != 0) {
-    if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true) {
-      stringstream output;
-      output << m_PARAMnameOfInstance << " - event: " << m_eventCounter << ": there were strange sensors (having missing clusters) during this event, activated Sensors (ATTENTION: these are sensors, not sectors, therefore no sublayer and sector-info) were:\n";
-      for (const mapEntry & aSensor : activatedSensors) { output << " " << FullSecID(VxdID(aSensor.first), false, 0); }
-      output << "\n strange sensors were:\n";
-      for (unsigned int sensorID : strangeSensors) { output << " " << FullSecID(VxdID(sensorID), false, 0); }
-      B2DEBUG(3, "\n\n" << output.str() << "\n\n")
-    }
+  if (strangeSensors.size() != 0 and LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 4, PACKAGENAME()) == true) {
+    stringstream output;
+    output << m_PARAMnameOfInstance << " - event: " << m_eventCounter << ": there were strange sensors (having missing clusters) during this event, activated Sensors (ATTENTION: these are sensors, not sectors, therefore no sublayer and sector-info) were:\n";
+    for (const mapEntry & aSensor : activatedSensors) { output << " " << FullSecID(VxdID(aSensor.first), false, 0); }
+    output << "\n strange sensors were:\n";
+    for (unsigned int sensorID : strangeSensors) { output << " " << FullSecID(VxdID(sensorID), false, 0); }
+    B2DEBUG(4, "\n\n" << output.str() << "\n\n")
   }
 
   return strangeSensors;

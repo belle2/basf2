@@ -130,6 +130,23 @@ namespace Belle2 {
       bool operator<(const EventInfoPackage& b)  const { return totalTime < b.totalTime; } /**< overloaded '<'-operator for sorting algorithms */
       bool operator==(const EventInfoPackage& b) const { return totalTime == b.totalTime; } /**< overloaded '=='-operator for sorting algorithms */
 
+      /** StandardConstructor for the EventInfoPackage - sets all values to zero */
+      EventInfoPackage():
+        numPXDCluster(0),
+        numTELCluster(0),
+        numSVDCluster(0),
+        numSVDHits(0),
+        segFinderActivated(0),
+        segFinderDiscarded(0),
+        numHitCombisTotal(0),
+        nbFinderActivated(0),
+        nbFinderDiscarded(0),
+        tccApprovedTCs(0),
+        numTCsAfterTCC(0),
+        numTCsAfterTCCfilter(0),
+        numTCsKilledByCleanOverlap(0),
+        numTCsfinal(0) {}
+
       /** printing collected data, returned string can be printed using B2INFO or similar */
       std::string Print();
 
@@ -141,6 +158,7 @@ namespace Belle2 {
         numSVDHits = 0;
         segFinderActivated = 0;
         segFinderDiscarded = 0;
+        numHitCombisTotal = 0;
         nbFinderActivated = 0;
         nbFinderDiscarded = 0;
         tccApprovedTCs = 0;
@@ -160,6 +178,7 @@ namespace Belle2 {
       int numSVDHits; /**< number of possible svd-cluster-combinations. every combination of any pass will be counted  */
       int segFinderActivated; /**< number of segments which survived the segfinder. every segment of any pass will be counted  */
       int segFinderDiscarded; /**< number of segments which died in the segfinder. every segment of any pass will be counted  */
+      int numHitCombisTotal; /**< total number of hit-combinations (segFinderActivated+segFinderDiscarded) */
       int nbFinderActivated; /**< number of segments which survived the nbfinder. every segment of any pass will be counted  */
       int nbFinderDiscarded;  /**< number of segments which died in the nbfinder. every segment of any pass will be counted  */
       int tccApprovedTCs;  /**< number of tcs approved by the tcc. every tc of any pass will be counted  */

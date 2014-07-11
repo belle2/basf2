@@ -23,6 +23,8 @@
 #include <G4NistManager.hh>
 #include <G4OpticalSurface.hh>
 
+#include "CLHEP/Units/PhysicalConstants.h"
+
 using namespace std;
 
 namespace Belle2 {
@@ -80,9 +82,9 @@ namespace Belle2 {
       }
       B2INFO("Creating Material " << name);
       string stateStr = parameters.getString("state", "undefined");
-      double density = parameters.getDensity("density", 0) * g / cm3;
-      double temperature = parameters.getDouble("temperature", STP_Temperature);
-      double pressure = parameters.getDouble("pressure", STP_Pressure / pascal);
+      double density = parameters.getDensity("density", 0) * CLHEP::g / CLHEP::cm3;
+      double temperature = parameters.getDouble("temperature", CLHEP::STP_Temperature);
+      double pressure = parameters.getDouble("pressure", CLHEP::STP_Pressure / CLHEP::pascal);
       //If density is negative or smaller than epsilon we should calculate the
       //density from the used materials
       bool deductDensity = density < 1e-25;
@@ -151,7 +153,7 @@ namespace Belle2 {
 
       //Finally, create Material and add all components
       G4Material* mat = new G4Material(name, density, componentElements.size() + componentMaterials.size(),
-                                       state, temperature, pressure * pascal);
+                                       state, temperature, pressure * CLHEP::pascal);
 
       for (size_t i = 0; i < componentMaterials.size(); ++i) {
         mat->AddMaterial(componentMaterials[i], fractionMaterials[i] / sumFractions);

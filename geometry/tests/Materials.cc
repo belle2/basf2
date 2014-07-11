@@ -11,6 +11,8 @@
 #include <G4OpticalSurface.hh>
 #include <G4MaterialPropertiesTable.hh>
 
+#include "CLHEP/Units/PhysicalConstants.h"
+
 using namespace std;
 
 namespace Belle2 {
@@ -211,12 +213,12 @@ namespace Belle2 {
       EXPECT_EQ(4u, property->GetVectorLength());
       EXPECT_DOUBLE_EQ(1.40, property->GetMinValue());
       EXPECT_DOUBLE_EQ(1.43, property->GetMaxValue());
-      EXPECT_DOUBLE_EQ(1 * eV, property->GetMinLowEdgeEnergy());
-      EXPECT_DOUBLE_EQ(3.5 * eV, property->GetMaxLowEdgeEnergy());
-      EXPECT_DOUBLE_EQ(1.0 * eV, property->Energy(0));
-      EXPECT_DOUBLE_EQ(1.5 * eV, property->Energy(1));
-      EXPECT_DOUBLE_EQ(2.0 * eV, property->Energy(2));
-      EXPECT_DOUBLE_EQ(3.5 * eV, property->Energy(3));
+      EXPECT_DOUBLE_EQ(1 * CLHEP::eV, property->GetMinLowEdgeEnergy());
+      EXPECT_DOUBLE_EQ(3.5 * CLHEP::eV, property->GetMaxLowEdgeEnergy());
+      EXPECT_DOUBLE_EQ(1.0 * CLHEP::eV, property->Energy(0));
+      EXPECT_DOUBLE_EQ(1.5 * CLHEP::eV, property->Energy(1));
+      EXPECT_DOUBLE_EQ(2.0 * CLHEP::eV, property->Energy(2));
+      EXPECT_DOUBLE_EQ(3.5 * CLHEP::eV, property->Energy(3));
       EXPECT_DOUBLE_EQ(1.40, (*property)[0]);
       EXPECT_DOUBLE_EQ(1.41, (*property)[1]);
       EXPECT_DOUBLE_EQ(1.42, (*property)[2]);

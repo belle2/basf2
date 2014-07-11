@@ -87,7 +87,7 @@ void AnalizerCollectorTFInfo::setAllParticleIDs(double boarder)
   B2DEBUG(100, "setAllParticleIDs - npxdclusters: " << npxdclusters);
 
 
-  for (auto & currentCluster : clusterTFInfo) {
+  for (ClusterTFInfo & currentCluster : clusterTFInfo) {
 
     // Detector Type for svd/pxd difference
     int particleID = -1;

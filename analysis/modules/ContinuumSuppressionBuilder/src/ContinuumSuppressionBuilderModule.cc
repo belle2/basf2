@@ -80,6 +80,9 @@ void ContinuumSuppressionBuilderModule::event()
 
     double et[2];
 
+    TVector3 thrustB;
+    TVector3 thrustO;
+
     float thrustBm = -1;
     float thrustOm = -1;
     float cosTBTO  = -1;
@@ -209,8 +212,8 @@ void ContinuumSuppressionBuilderModule::event()
       }
 
       // Thrust variables
-      TVector3 thrustB = thrust(p3_cms_sigB.begin(), p3_cms_sigB.end(), SelfFunc(TVector3()));
-      TVector3 thrustO = thrust(p3_cms_roe.begin() , p3_cms_roe.end() , SelfFunc(TVector3()));
+      thrustB  = thrust(p3_cms_sigB.begin(), p3_cms_sigB.end(), SelfFunc(TVector3()));
+      thrustO  = thrust(p3_cms_roe.begin() , p3_cms_roe.end() , SelfFunc(TVector3()));
       thrustBm = thrustB.Mag();
       thrustOm = thrustO.Mag();
       cosTBTO  = fabs(cos(thrustB.Angle(thrustO)));
@@ -275,6 +278,7 @@ void ContinuumSuppressionBuilderModule::event()
     }
 
     // Fill ContinuumSuppression with content
+    qqVars->addThrustO(thrustO);
     qqVars->addThrustBm(thrustBm);
     qqVars->addThrustOm(thrustOm);
     qqVars->addCosTBTO(cosTBTO);

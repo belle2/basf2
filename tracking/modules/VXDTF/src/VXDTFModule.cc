@@ -3135,14 +3135,14 @@ void VXDTFModule::hopfieldVectorized(TCsOfEvent& tcVector, double omega)
     m_TESTERbadHopfieldCtr++;
     B2DEBUG(3, "VXDTF event " << m_eventCounter << ": hopfield had no survivors! now using greedy... ")
     greedy(tcVector); /// greedy
-    if ((LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 4, PACKAGENAME())) {
-    for (int i = 0; i < nTCs; i++) {
+    if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 4, PACKAGENAME())) {
+      for (int i = 0; i < nTCs; i++) {
         B2DEBUG(4, "tc " << i << " - got final neuron value: " << xMatrix(0, i) << " while having " << int((tcVector.at(i)->getHits()).size()) << " hits and quality indicator " << tcVector.at(i)->getTrackQuality())
       }
     }
 
     for (VXDTFTrackCandidate * tc : tcVector) {
-    if (tc->getCondition() == true)  { survivorCtr++; }
+      if (tc->getCondition() == true)  { survivorCtr++; }
     } // should now have got some survivors
   } else {
     for (int i = 0; i < nTCs; i++) {

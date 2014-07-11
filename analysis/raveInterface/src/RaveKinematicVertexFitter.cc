@@ -121,9 +121,9 @@ int RaveKinematicVertexFitter::fit()
 
   ndf = 2 * m_inputParticles.size();
 
-  if (m_useBeamSpot == true) {
-    ndf += 3;
-  }
+  //if (m_useBeamSpot == true) {
+  //ndf += 3;
+  //}
   if (ndf < 4 && m_vertFit) {
     return -1;
   }

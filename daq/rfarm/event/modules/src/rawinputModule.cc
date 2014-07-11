@@ -58,6 +58,7 @@ void RawInputModule::initialize()
   StoreArray<RawEPID>::registerPersistent();
   StoreArray<RawECL>::registerPersistent();
   StoreArray<RawKLM>::registerPersistent();
+  StoreArray<RawFTSW>::registerPersistent();
 
   // Open input file
   printf("RawInput : Opening file %s\n", m_inputFileName.c_str());
@@ -85,7 +86,7 @@ void RawInputModule::registerRawCOPPERs()
   int rstat = read(m_fd, evtbuf + sizeof(int), (*recsize - 1) * 4);
   if (rstat <= 0) return;
 
-  B2INFO("Raw2Ds: got an event from RingBuffer, size=" << recsize <<
+  B2INFO("RawInput: got an event from RingBuffer, size=" << recsize <<
          " (proc= " << (int)getpid() << ")");
 
   // Unpack SendHeader
@@ -105,37 +106,57 @@ void RawInputModule::registerRawCOPPERs()
   RawCOPPER tempcpr;
   tempcpr.SetBuffer(bufbody, nwords, false, npackedevts, ncprs);
 
+  //  B2INFO ( "NCoppers = " << ncprs << " Nwords = " << nwords );
   // Store data contents in Corresponding RawXXXX
   for (int cprid = 0; cprid < ncprs; cprid++) {
     // Pick up one COPPER and copy data in a temporary buffer
     int nwds_buf = tempcpr.GetBlockNwords(cprid);
     int* cprbuf = new int[nwds_buf];
     memcpy(cprbuf, tempcpr.GetBuffer(cprid), nwds_buf * 4);
+
+    //    printf ( "Processing COPPER %d: blocknw = %d\n", cprid, nwds_buf );
+
+    if (tempcpr.CheckFTSWID(cprid)) {
+      //      printf ( "FTSW detected\n" );
+      StoreArray<RawFTSW> ary;
+      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
+      continue;
+    }
+
     // Get subsys id
     int subsysid = tempcpr.GetSubsysId(cprid);
+    //    B2INFO ( "--> subsys ID = " << subsysid << " Block words = " << nwds_buf );
     // Switch to each detector and register RawXXX
     if (subsysid == CDC_ID) {
+      //      printf ( "CDC identified\n" );
       StoreArray<RawCDC> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
     } else if (subsysid == SVD_ID) {
+      //      printf ( "SVD identified\n" );
       StoreArray<RawSVD> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
     } else if (subsysid == ECL_ID) {
+      //      printf ( "ECL identified\n" );
       StoreArray<RawECL> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
     } else if (subsysid == BPID_ID) {
+      //      printf ( "BPID identified\n" );
       StoreArray<RawBPID> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
     } else if (subsysid == EPID_ID) {
+      //      printf ( "EPID identified\n" );
       StoreArray<RawEPID> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
     } else if (subsysid == KLM_ID) {
+      //      printf ( "KLM identified\n" );
       StoreArray<RawKLM> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
     } else {
+      //      printf ( "Fall back COPPER identified\n" );
       StoreArray<RawCOPPER> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
     }
+    //    printf ( "COPPER %d completed\n", cprid );
     //    delete[] cprbuf;
   }
 

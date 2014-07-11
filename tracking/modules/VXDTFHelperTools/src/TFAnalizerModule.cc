@@ -364,11 +364,11 @@ void TFAnalizerModule::event()
   } // print info about all ghost and good caTCs
 
 
-  B2DEBUG(1, "Event " << m_eventCounter << ": There are " << int(mcTcVector.size()) << " mcTCs, with mean of " << (float(mcPXDHits) / float(mcTcVector.size())) << "/" << (float(mcSVDHits) / float(mcTcVector.size())) << " PXD/SVD hits")
+  B2DEBUG(1, "Event " << m_eventCounter << ": There are " << int(mcTcVector.size()) << " mcTCs, with mean of " << (float(mcPXDHits) / float(mcTcVector.size())) << "/" << (float(mcSVDHits) / float(mcTcVector.size())) << " PXD/SVD clusters")
   for (foundIDentry ID : foundIDs) {
     B2DEBUG(1, " - ID " << ID.first << " recovered")
   }
-  B2DEBUG(1, "Event " << m_eventCounter << ": There are " << int(caTcVector.size()) << " caTCs, with mean of " << (float(caPXDHits) / float(caTcVector.size())) << "/" << (float(caSVDHits) / float(caTcVector.size())) << " PXD/SVD hits")
+  B2DEBUG(1, "Event " << m_eventCounter << ": There are " << int(caTcVector.size()) << " caTCs, with mean of " << (float(caPXDHits) / float(caTcVector.size())) << "/" << (float(caSVDHits) / float(caTcVector.size())) << " PXD/SVD clusters")
   int acceptedTCs = acceptedTrackCandidates.getEntries();
   m_countAcceptedGFTCs += acceptedTCs;
   B2DEBUG(1, " of " << numOfCaTCs << " TCs produced by the tested TrackFinder, " << acceptedTCs << " were recognized safely and stored into the container of accepted TCs")

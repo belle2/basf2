@@ -84,7 +84,9 @@ FilterCalculatorModule::FilterCalculatorModule() : Module()
 
   addParam("setOrigin", m_PARAMsetOrigin, "standard origin is (0,0,0). If you want to have the map calculated for another origin, set here(x,y,z) - WARNING for testbeam cases, this is a typical source for strange results", originVec);
 
-  addParam("testBeam", m_PARAMtestBeam, "if normal mode does not produce a full sectormap, try setting it to testBeam-mode = 1 (testbeam 1 does not assume that the IP is at the origin and ignores curler) or even testBeam-mode = 2 (next to mode 1 features it ignores tracks jumping e.g. from layer 1 to 7 (telescopes), should only be used with care since some bad cases can not be caught that way)", int(0));
+  addParam("testBeam", m_PARAMtestBeam, "if normal mode (0) does not produce a full sectormap, try setting it to testBeam-mode = 1 (testbeam 1 does not assume that the IP is at the origin and ignores curler) or even testBeam-mode = 2 (next to mode 1 features it ignores tracks jumping e.g. from layer 1 to 7 (telescopes), should only be used with care since some bad cases can not be caught that way)", int(0));
+
+  addParam("multiHitsAllowed", m_PARAMmultiHitsAllowed, "if this parameter is true, the FilterCalculatorModule ignores tracks which have more than one hit on the same sensor. If false, these tracks get filtered. There will be a warning, if parameter 'testBeam' is != 0 and this parameter is true, since there curlers shouldn't be possible", bool(false));
 
   addParam("acceptedRegionForSensors", m_PARAMacceptedRegionForSensors, " accepts pair of input values. first one defines minimal distance for sectors to the origin and second one defines maximum accepted distance for sectors. If anyone of these values is above 0, sectors will be sorted using their distance2Origin parameter, not their layerID", acceptedRegionForSensorsVec);
 
@@ -193,9 +195,7 @@ void FilterCalculatorModule::initialize()
   if (int(m_PARAMsetOrigin.size()) != 3) {
     B2WARNING("FilterCalculator::initialize: origin is set wrong, please set only 3 values (x,y,z). Rejecting user defined value and reset to (0,0,0)!")
     m_PARAMsetOrigin.clear();
-    m_PARAMsetOrigin.push_back(0);
-    m_PARAMsetOrigin.push_back(0);
-    m_PARAMsetOrigin.push_back(0);
+    m_PARAMsetOrigin.assign(3, 0);
   }
   m_origin.SetXYZ(m_PARAMsetOrigin.at(0), m_PARAMsetOrigin.at(1), m_PARAMsetOrigin.at(2));
 
@@ -207,14 +207,14 @@ void FilterCalculatorModule::initialize()
   if (int(m_PARAMacceptedRegionForSensors.size()) != 2) {
     B2ERROR("FilterCalculatorModule::initialize: acceptedRegionForSensor-parameter has got " << m_PARAMacceptedRegionForSensors.size() << " which is not allowed. Setting to standard value. If you do not know the correct choice, please type 'basf2 -m VXDTF' and read the description.")
     m_PARAMacceptedRegionForSensors.clear();
-    m_PARAMacceptedRegionForSensors.push_back(-1);
-    m_PARAMacceptedRegionForSensors.push_back(-1);
+    m_PARAMacceptedRegionForSensors.assign(2, -1);
   }
 
   if (m_PARAMtestBeam < 0 or m_PARAMtestBeam > 2) {
     B2ERROR("FilterCalculatorModule::initialize: testbeam-parameter set to " << m_PARAMtestBeam << " which is not allowed. Setting to 0. If you do not know the correct choice, please type 'basf2 -m VXDTF' and read the description.")
     m_PARAMtestBeam = 0;
   }
+  if (m_PARAMmultiHitsAllowed == true and m_PARAMtestBeam > 0) { B2WARNING("FilterCalculatorModule::Initialize: parameter 'multiHitsAllowed' is true although 'testBeamm' is " << m_PARAMtestBeam << "! Is this on purpose? Please check!")}
 
 
   if (m_PARAManalysisWriteToRoot == true) { // preparing output of analysis data:
@@ -278,9 +278,7 @@ void FilterCalculatorModule::beginRun()
     m_useSVD = true;
   }
 
-  for (int i = 0; i <= m_numOfLayers * 2; i++) {
-    m_trackletLengthCounter.push_back(0);
-  }
+  m_trackletLengthCounter.assign(m_numOfLayers * 2 + 1, 0);
 
   B2INFO("chosen detectorTypes: " << detectorNames.str() << ", version 2: " << Belle2::printMyStdVector(m_PARAMdetectorType) << ", uniSigma: " << m_PARAMuniSigma)
 
@@ -523,7 +521,7 @@ void FilterCalculatorModule::event()
     }
     uniIDsOfTrack.sort();
     uniIDsOfTrack.unique();
-    if (uniIDsOfTrack.size() != thisTrack.size() and m_PARAMtestBeam > 0) { // means that there were more than one hit per sensor, a case which should not occur during test-beam case
+    if (m_PARAMmultiHitsAllowed == false and uniIDsOfTrack.size() != thisTrack.size()) { // means that there were more than one hit per sensor
       B2INFO("event " << m_eventCounter << ": track of particle " << iPart << "(pT/theta:" << mcMomValue << "/" << mcMomentum.Theta() << ") had number of hits/traversed sensors: " << thisTrack.size() << "/" << uniIDsOfTrack.size() << " - skipping track!")
       continue;
     }
@@ -1341,10 +1339,10 @@ void FilterCalculatorModule::endRun()
         }
 
         if (m_PARAMsecMapWriteToRoot == true) { /* stores all Sectors and a raw version of the data (no calculated cutoffs yet)*/
-          rootSecMap.push_back(make_pair(FullSecID(thisEntry.first).getFullSecID(), thisEntry.second.exportFriendsRoot()));
+          rootSecMap.push_back({FullSecID(thisEntry.first).getFullSecID(), thisEntry.second.exportFriendsRoot()});
         }
 
-        distanceOfSectorsMap.push_back(make_pair(FullSecID(thisEntry.first).getFullSecID(), thisEntry.second.getDistance2Origin()));
+        distanceOfSectorsMap.push_back({FullSecID(thisEntry.first).getFullSecID(), thisEntry.second.getDistance2Origin()});
         thisEntry.second.clearFriends();
         ctr++;
       } else {
@@ -1389,7 +1387,7 @@ void FilterCalculatorModule::endRun()
           newTemporarySecMap.setHigherMomentumThreshold(m_PARAMpTcuts.at(smCtr));
         }
 
-        SecMapVector::MapPack newMapPack = make_pair(m_PARAMsecMapNames.at(smCtr), newTemporarySecMap);
+        SecMapVector::MapPack newMapPack = {m_PARAMsecMapNames.at(smCtr), newTemporarySecMap};
         rawSectorMapVector.push_back(newMapPack);
       }
 
@@ -1553,7 +1551,7 @@ bool FilterCalculatorModule::createSectorAndHit(Belle2::Const::EDetector detecto
             if (thisSecMap->find(aSectorName) == thisSecMap->end()) { // fallback solution using one secMap for whole range of pT
 //               Sector newSector(sectorEdgeV1, sectorEdgeV2, sectorEdgeU1OfV1, sectorEdgeU1OfV2, sectorEdgeU2OfV1, sectorEdgeU2OfV2, dist2Origin, aSectorName);
               Sector newSector(aSectorName, {sectorEdgeU1OfV1, sectorEdgeV1}, {sectorEdgeU2OfV1, sectorEdgeV1}, {sectorEdgeU1OfV2, sectorEdgeV2}, {sectorEdgeU2OfV2, sectorEdgeV2}, dist2Origin);
-              thisSecMap->insert(make_pair(aSectorName, newSector));
+              thisSecMap->insert({aSectorName, newSector});
             } else {
               thisSecMap->find(aSectorName)->second.increaseCounter();
             }
@@ -1618,7 +1616,7 @@ bool FilterCalculatorModule::createSectorAndHit(Belle2::Const::EDetector detecto
       Sector newSector(aSectorName, localCorner00, localCorner10, localCorner01, localCorner11, dist2Origin);
 //       (std::string myName, LocalCoordinates edge0, LocalCoordinates edgeU, LocalCoordinates edgeV, LocalCoordinates edgeUV, double distance)
 
-      thisSecMap->insert(make_pair(aSectorName, newSector));
+      thisSecMap->insert({aSectorName, newSector});
     } else {
       thisSecMap->find(aSectorName)->second.increaseCounter();
     }

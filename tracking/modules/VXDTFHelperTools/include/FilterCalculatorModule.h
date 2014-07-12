@@ -441,6 +441,7 @@ namespace Belle2 {
     double m_PARAMmaxZvertexDistance; /**< allows to abort particles having their production vertex too far away from the origin (z-dist) */
     std::vector<double> m_PARAMsetOrigin; /**< allows to reset orign (e.g. usefull for special cases like testbeams), only valid if 3 entries are found */
     int m_PARAMtestBeam; /**< some things which are important for the real detector are a problem for testbeams, if you want to use the filterCalculator and the testBeam = false does not work, then try setting the parameter to true */
+    bool m_PARAMmultiHitsAllowed; /**< if this parameter is true, the FilterCalculatorModule ignores tracks which have more than one hit on the same sensor. If false, these tracks get filtered. There will be a warning, if parameter 'testBeam' is != 0 and this parameter is true, since there curlers shouldn't be possible */
     std::vector<double> m_PARAMacceptedRegionForSensors;  /**< accepts pair of input values. first one defines minimal distance for sectors to the origin and second one defines maximum accepted distance for sectors. If anyone of these values is above 0, sectors will be sorted using their distance2Origin parameter, not their layerID */
     double m_PARAMmagneticFieldStrength; /**< strength of magnetic field in Tesla, standard is 1.5T */
 

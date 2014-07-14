@@ -163,9 +163,9 @@ EvtMessage* DataStoreStreamer::streamDataStore(DataStore::EDurability durability
 
   // Encode EvtMessage
   EvtMessage* msg = m_msghandler->encode_msg(MSG_EVENT);
-  (msg->header())->reserved[0] = (int)durability;
-  (msg->header())->reserved[1] = nobjs;       // No. of objects
-  (msg->header())->reserved[2] = narrays;    // No. of arrays
+  (msg->header())->durability = (int)durability;
+  (msg->header())->nObjects = nobjs;       // No. of objects
+  (msg->header())->nArrays = narrays;    // No. of arrays
 
   // Return msg
   // Note : returned EvtMessage has to be deleted later
@@ -193,9 +193,9 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
 
     // Decode EvtMessage
     m_msghandler->decode_msg(msg, objlist, namelist);
-    DataStore::EDurability durability = (DataStore::EDurability)(msg->header())->reserved[0];
-    int nobjs = (msg->header())->reserved[1];
-    int narrays = (msg->header())->reserved[2];
+    DataStore::EDurability durability = (DataStore::EDurability)(msg->header())->durability;
+    int nobjs = (msg->header())->nObjects;
+    int narrays = (msg->header())->nArrays;
     if (durability != DataStore::c_Event and durability != DataStore::c_Persistent) {
       B2FATAL("Invalid durability when deserializing data: " << durability);
     }
@@ -328,9 +328,9 @@ void* DataStoreStreamer::decodeEvtMessage(int id)
     pthread_mutex_lock(&mutex);     // Lock queueing
     my_objlist.push(objlist);
     my_namelist.push(namelist);
-    my_nobjs.push((msg->header())->reserved[1]);
-    my_narrays.push((msg->header())->reserved[2]);
-    my_durability.push((DataStore::EDurability)(msg->header())->reserved[0]);
+    my_nobjs.push((msg->header())->nObjects);
+    my_narrays.push((msg->header())->nArrays);
+    my_durability.push((DataStore::EDurability)(msg->header())->durability);
     pthread_mutex_unlock(&mutex);    // Unlock queueing
 
     // Release EvtMessage

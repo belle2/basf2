@@ -107,7 +107,7 @@ int EvtMessage::paddedSize() const
 
 // @brief msgsize
 // @return message size
-int EvtMessage::msg_size()
+int EvtMessage::msg_size() const
 {
   return ((reinterpret_cast<EvtHeader*>(m_data))->size - sizeof(EvtHeader));
 }

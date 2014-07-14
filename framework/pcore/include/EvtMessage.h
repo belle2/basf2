@@ -26,7 +26,10 @@ namespace Belle2 {
     Long64_t time_usec; /**< seconds part of timeval. */
     UInt_t src; /**< source IP. */
     UInt_t dest; /**< destination IP. */
-    UInt_t reserved[10]; /**< Someone forgot to name these when introduced. first three are durability, #objects, #arrays. */
+    UInt_t durability; /**< DataStore::EDurability. */
+    UInt_t nObjects; /**< #objects in message. */
+    UInt_t nArrays; /**< #objects in message. */
+    UInt_t reserved[7]; /**< Reserved for future use. Don't ever use these directly. */
   };
 
   /** Class to manage streamed object.
@@ -75,7 +78,7 @@ namespace Belle2 {
      */
     int   paddedSize() const;
     /*! Get size of message body */
-    int   msg_size();
+    int   msg_size() const;
 
     /*! Get record type */
     RECORD_TYPE type();

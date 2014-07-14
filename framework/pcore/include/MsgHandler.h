@@ -29,7 +29,7 @@ namespace Belle2 {
     /*! Add an object to be streamed */
     virtual bool add(const TObject*, const std::string& name);
 
-    /*! Stream object list into an EvtMessage */
+    /*! Stream object list into an EvtMessage. Caller is responsible for deletion. */
     virtual EvtMessage* encode_msg(RECORD_TYPE rectype);
     /*! Decode an EvtMessage into a vector list of objects with names */
     virtual int decode_msg(EvtMessage*, std::vector<TObject*>&, std::vector<std::string>&);

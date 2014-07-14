@@ -40,13 +40,13 @@ namespace Belle2 {
     /** Gets data from m_rbuf and puts it into the data store. */
     void readEvent();
 
-    //! RingBuffer ID
+    /** attached RingBuffer. */
     RingBuffer* m_rbuf;
 
-    //! DataStoreStreamer
+    /** Used for serialization. */
     DataStoreStreamer* m_streamer;
 
-    //! Compression Level
+    /**  Compression Level. */
     int m_compressionLevel;
 
     /** Current event number. */

@@ -164,6 +164,7 @@ main.add_module(simulation)
 # output path
 main.add_module(output)
 main.add_module(progress)
+#main.add_module(register_module('PrintCollections'))
 
 #test wether flags are what we expect
 if particlegun.has_properties(ModulePropFlags.PARALLELPROCESSINGCERTIFIED):
@@ -181,7 +182,7 @@ from ROOT import TTree
 file = TFile('parallel_processing_test.root')
 tree = file.Get('tree')
 if tree.GetEntries() != 5:
-    B2FATAL('Created output file contains wrong number of events!')
+    B2FATAL('Created output file contains wrong number of events! (' + str(tree.GetEntries()) + ')')
 
 nummcparticles = tree.Project("", "MCParticles.m_pdg")
 if nummcparticles < 5:

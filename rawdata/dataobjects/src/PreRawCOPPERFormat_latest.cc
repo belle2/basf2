@@ -1034,12 +1034,12 @@ int PreRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
 
 }
 
-int PreRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf,
-                                               int* buf_1st, int nwords_1st,
-                                               int* buf_2nd, int nwords_2nd,
-                                               int* buf_3rd, int nwords_3rd,
-                                               int* buf_4th, int nwords_4th,
-                                               RawCOPPERPackerInfo rawcprpacker_info)
+int* PreRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
+                                                int* buf_1st, int nwords_1st,
+                                                int* buf_2nd, int nwords_2nd,
+                                                int* buf_3rd, int nwords_3rd,
+                                                int* buf_4th, int nwords_4th,
+                                                RawCOPPERPackerInfo rawcprpacker_info)
 {
   char err_buf[500];
   sprintf(err_buf, "This function is not supported . Exiting...\n%s %s %d\n",

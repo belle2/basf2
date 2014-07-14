@@ -7,7 +7,7 @@ namespace Belle2 {
    */
   struct RawCOPPERPackerInfo {
     unsigned int exp_num; // 10bit
-    unsigned int run_num; // 22bit
+    unsigned int run_subrun_num; // 22bit
     unsigned int eve_num; // 32bit
     unsigned int node_id; // 32bit
     unsigned int tt_ctime; // 27bit clock ticks at trigger timing distributed by FTSW. For details, see Nakao-san's belle2link user guide

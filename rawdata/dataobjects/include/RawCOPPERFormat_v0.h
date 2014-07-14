@@ -221,12 +221,12 @@ namespace Belle2 {
     void GetTTTimeVal(int n, struct timeval* tv);
 
     //! Pack data (format ver. = -1 -> Select the latest format version)
-    int PackDetectorBuf(int* packed_buf,
-                        int* detector_buf_1st, int nwords_1st,
-                        int* detector_buf_2nd, int nwords_2nd,
-                        int* detector_buf_3rd, int nwords_3rd,
-                        int* detector_buf_4th, int nwords_4th,
-                        RawCOPPERPackerInfo rawcprpacker_info);
+    int* PackDetectorBuf(int* packed_buf_nwords,
+                         int* detector_buf_1st, int nwords_1st,
+                         int* detector_buf_2nd, int nwords_2nd,
+                         int* detector_buf_3rd, int nwords_3rd,
+                         int* detector_buf_4th, int nwords_4th,
+                         RawCOPPERPackerInfo rawcprpacker_info);
 
     //
     // size of "COPPER front header" and "COPPER trailer"

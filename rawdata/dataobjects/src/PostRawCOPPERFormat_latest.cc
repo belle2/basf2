@@ -301,13 +301,14 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
 }
 
 
-int PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf,
-                                                int* detector_buf_1st,  int nwords_1st,
-                                                int* detector_buf_2nd,  int nwords_2nd,
-                                                int* detector_buf_3rd,  int nwords_3rd,
-                                                int* detector_buf_4th,  int nwords_4th,
-                                                RawCOPPERPackerInfo rawcpr_info)
+int* PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
+                                                 int* detector_buf_1st,  int nwords_1st,
+                                                 int* detector_buf_2nd,  int nwords_2nd,
+                                                 int* detector_buf_3rd,  int nwords_3rd,
+                                                 int* detector_buf_4th,  int nwords_4th,
+                                                 RawCOPPERPackerInfo rawcpr_info)
 {
+  int* packed_buf = NULL;
 
   int poswords_to = 0;
   int* detector_buf[ 4 ] = { detector_buf_1st, detector_buf_2nd, detector_buf_3rd, detector_buf_4th };
@@ -315,6 +316,7 @@ int PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf,
 
   // calculate the event length
   int length_nwords = tmp_header.GetHdrNwords() + SIZE_COPPER_HEADER + SIZE_COPPER_TRAILER + tmp_trailer.GetTrlNwords();
+
   for (int i = 0; i < 4; i++) {
     if (detector_buf[ i ] == NULL || nwords[ i ] <= 0) continue;    // for an empty FINESSE slot
     length_nwords += nwords[ i ];
@@ -330,11 +332,12 @@ int PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf,
   // Fill RawHeader
   //
   tmp_header.SetBuffer(packed_buf);
+
   packed_buf[ tmp_header.POS_NWORDS ] = length_nwords; // total length
   packed_buf[ tmp_header.POS_VERSION_HDRNWORDS ] = 0x7f7f0000 | ((POST_RAWCOPPER_FORMAT_VER1 << 8) & 0x0000ff00)
                                                    | tmp_header.RAWHEADER_NWORDS; // ver.#, header length
   packed_buf[ tmp_header.POS_EXP_RUN_NO ] = (rawcpr_info.exp_num << 22)
-                                            | (rawcpr_info.run_num & 0x003FFFFF);   // exp. and run #
+                                            | (rawcpr_info.run_subrun_num & 0x003FFFFF);   // exp. and run #
   packed_buf[ tmp_header.POS_EVE_NO ] = rawcpr_info.eve_num; // eve #
   packed_buf[ tmp_header.POS_TTCTIME_TRGTYPE ] = (rawcpr_info.tt_ctime & 0x7FFFFFF) << 4;   // tt_ctime
   packed_buf[ tmp_header.POS_TTUTIME ] = rawcpr_info.tt_utime; // tt_utime
@@ -342,12 +345,23 @@ int PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf,
 
   // fill the positions of finesse buffers
   packed_buf[ tmp_header.POS_OFFSET_1ST_FINESSE ] = tmp_header.RAWHEADER_NWORDS + SIZE_COPPER_HEADER;
-  packed_buf[ tmp_header.POS_OFFSET_2ND_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_1ST_FINESSE ]
-                                                    + nwords[ 0 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
-  packed_buf[ tmp_header.POS_OFFSET_3RD_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_2ND_FINESSE ]
-                                                    + nwords[ 1 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
-  packed_buf[ tmp_header.POS_OFFSET_4TH_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_3RD_FINESSE ]
-                                                    + nwords[ 2 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+
+  packed_buf[ tmp_header.POS_OFFSET_2ND_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_1ST_FINESSE ];
+  if (nwords[ 0 ] > 0) {
+    packed_buf[ tmp_header.POS_OFFSET_2ND_FINESSE ] +=
+      nwords[ 0 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+  }
+
+  packed_buf[ tmp_header.POS_OFFSET_3RD_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_2ND_FINESSE ];
+  if (nwords[ 1 ] > 0) {
+    packed_buf[ tmp_header.POS_OFFSET_3RD_FINESSE ] +=
+      nwords[ 1 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+  }
+
+  packed_buf[ tmp_header.POS_OFFSET_4TH_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_3RD_FINESSE ];
+  if (nwords[ 2 ] > 0) {
+    packed_buf[ tmp_header.POS_OFFSET_4TH_FINESSE ] += nwords[ 2 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+  }
   poswords_to += tmp_header.GetHdrNwords();
 
   // Fill COPPER header
@@ -387,6 +401,8 @@ int PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf,
   packed_buf[ poswords_to + tmp_trailer.POS_TERM_WORD ] = tmp_trailer.MAGIC_WORD_TERM_TRAILER;
   poswords_to += tmp_trailer.GetTrlNwords();
 
-  return poswords_to;
+  *packed_buf_nwords = poswords_to;
+
+  return packed_buf;
 }
 

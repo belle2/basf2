@@ -752,12 +752,12 @@ void RawCOPPERFormat_v0::CheckB2LFEEHeaderVersion(int n)
 }
 #endif
 
-int RawCOPPERFormat_v0::PackDetectorBuf(int* packed_buf,
-                                        int* detector_buf_1st, int nwords_1st,
-                                        int* detector_buf_2nd, int nwords_2nd,
-                                        int* detector_buf_3rd, int nwords_3rd,
-                                        int* detector_buf_4th, int nwords_4th,
-                                        RawCOPPERPackerInfo rawcprpacker_info)
+int* RawCOPPERFormat_v0::PackDetectorBuf(int* packed_buf_nwords,
+                                         int* detector_buf_1st, int nwords_1st,
+                                         int* detector_buf_2nd, int nwords_2nd,
+                                         int* detector_buf_3rd, int nwords_3rd,
+                                         int* detector_buf_4th, int nwords_4th,
+                                         RawCOPPERPackerInfo rawcprpacker_info)
 {
   char err_buf[500];
   sprintf(err_buf, "This function is not supported Exiting...\n%s %s %d\n",

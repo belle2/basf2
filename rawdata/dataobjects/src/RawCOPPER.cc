@@ -173,13 +173,13 @@ void RawCOPPER::PackDetectorBuf(
   m_num_events = 1;
   m_num_nodes = 1;
 
-  int* packed_buf;
-  m_nwords = m_access->PackDetectorBuf(packed_buf,
-                                       detector_buf_1st, nwords_1st,
-                                       detector_buf_2nd, nwords_2nd,
-                                       detector_buf_3rd, nwords_3rd,
-                                       detector_buf_4th, nwords_4th,
-                                       rawcprpacker_info);
+  int* packed_buf = NULL;
+  packed_buf = m_access->PackDetectorBuf(&m_nwords,
+                                         detector_buf_1st, nwords_1st,
+                                         detector_buf_2nd, nwords_2nd,
+                                         detector_buf_3rd, nwords_3rd,
+                                         detector_buf_4th, nwords_4th,
+                                         rawcprpacker_info);
 
   int malloc_flag = 1; // Not use preallocated buffer. Delete m_buffer when destructer is called.
   SetBuffer(packed_buf, m_nwords, malloc_flag, m_num_events, m_num_nodes);

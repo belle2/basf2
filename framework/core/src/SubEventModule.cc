@@ -58,7 +58,8 @@ void SubEventModule::initialize()
 
   //register loop object (!array, transient, errorIfExisting)
   const DataStore::StoreEntry* arrayEntry = DataStore::Instance().getStoreObjectMap(DataStore::c_Event).at(m_loopOver.getName());
-  DataStore::Instance().registerEntry(m_objectName, DataStore::c_Event, arrayEntry->object->IsA(), false, true, true);
+  TClass* arrayClass = static_cast<TClonesArray*>(arrayEntry->object)->GetClass();
+  DataStore::Instance().registerEntry(m_objectName, DataStore::c_Event, arrayClass, false, true, true);
 
   processInitialize(m_moduleList);
 

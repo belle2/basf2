@@ -43,7 +43,7 @@ namespace Belle2 {
              "and weights/$prefix_$method.weights.xml with additional information", std::string("TMVA"));
     addParam("workingDirectory", m_workingDirectory, "Working directory in which the expert finds the config file and the weight file directory", std::string("."));
     addParam("signalProbabilityName", m_signalProbabilityName, "Name under which the signal probability is stored in the ExtraInfo of the Particle object.");
-    addParam("signalCluster", m_signalCluster, "Number of the cluster which is considered as signal. e.g. the pdg of the Particle which is considered signal if "
+    addParam("signalClass", m_signalClass, "Class which is considered as signal. e.g. the pdg of the Particle which is considered signal if "
              "you trained the method with pdg as target variable. Or 1 if you trained with isSignal as target.", 1);
     addParam("signalFraction", m_signalFraction, "signalFraction to calculate probability, -1 if no transformation of the method output should be performed, -2 if training signal/background ratio should be used. If you want to use "
              "this feature, you have to set the option createMVAPDFs in the TMVATeacher or the method config string", -1.0f);
@@ -65,7 +65,7 @@ namespace Belle2 {
       StoreObjPtr<EventExtraInfo>::registerPersistent("", DataStore::c_Event, false);
     }
 
-    m_method = new TMVAInterface::Expert(m_methodPrefix, m_workingDirectory, m_methodName, m_signalCluster);
+    m_method = new TMVAInterface::Expert(m_methodPrefix, m_workingDirectory, m_methodName, m_signalClass);
 
   }
 

@@ -25,7 +25,7 @@ namespace Belle2 {
 
   namespace TMVAInterface {
 
-    Expert::Expert(std::string prefix, std::string workingDirectory, std::string methodName, int signalCluster) : m_signalCluster(signalCluster)
+    Expert::Expert(std::string prefix, std::string workingDirectory, std::string methodName, int signalClass) : m_signalClass(signalClass)
     {
 
       // Change directory to user defined working directory
@@ -77,7 +77,7 @@ namespace Belle2 {
             // Now check if the signalCluster was used as signal or background in this training
             int signalID = g.second.get<int>("SignalID");
             int backgroundID = g.second.get<int>("BackgroundID");
-            if (signalID == signalCluster or backgroundID == signalCluster) {
+            if (signalID == m_signalClass or backgroundID == m_signalClass) {
 
               TMVA::Reader* reader = new TMVA::Reader("!Color:!Silent");
 
@@ -102,10 +102,10 @@ namespace Belle2 {
 
               m_readers.push_back(reader);
               // Against stores the cluster ID against the signalCluster was trained
-              m_against.push_back(backgroundID == signalCluster ? signalID : backgroundID);
+              m_against.push_back(backgroundID == m_signalClass ? signalID : backgroundID);
               // Reverse stores whether the signalCluster was used as background in this training,
               // if so we need to modify the calculation of the signal probability for this training
-              m_reverse.push_back(backgroundID == signalCluster);
+              m_reverse.push_back(backgroundID == m_signalClass);
               m_methods.push_back(method);
 
             }
@@ -148,18 +148,18 @@ namespace Belle2 {
       // If signalToBackgroundRatio is negative, it's assumed that the mva output corresponds to a probability
       std::vector<float> mva_results(m_readers.size());
       for (unsigned int i = 0; i < m_readers.size(); ++i) {
-        if (m_reverse[m_signalCluster]) {
+        if (m_reverse[m_signalClass]) {
           if (signalFraction < 0 and signalFraction > -1.5)
             mva_results[i] = 1 - m_readers[i]->EvaluateMVA(m_methods[i]->getName());
           else if (signalFraction < -1.5 and signalFraction > -2.5)
-            mva_results[i] = 1 - m_readers[i]->GetProba(m_methods[i]->getName(), 1 - m_clusters[m_signalCluster]);
+            mva_results[i] = 1 - m_readers[i]->GetProba(m_methods[i]->getName(), 1 - m_clusters[m_signalClass]);
           else
             mva_results[i] = 1 - m_readers[i]->GetProba(m_methods[i]->getName(), 1 - signalFraction);
         } else {
           if (signalFraction < 0 and signalFraction > -1.5)
             mva_results[i] = m_readers[i]->EvaluateMVA(m_methods[i]->getName());
           else if (signalFraction < -1.5 and signalFraction > -2.5)
-            mva_results[i] = m_readers[i]->GetProba(m_methods[i]->getName(), m_clusters[m_signalCluster]);
+            mva_results[i] = m_readers[i]->GetProba(m_methods[i]->getName(), m_clusters[m_signalClass]);
           else
             mva_results[i] = m_readers[i]->GetProba(m_methods[i]->getName(), signalFraction);
         }
@@ -169,14 +169,14 @@ namespace Belle2 {
 
       /* At the moment we won't support multiple clusters, I first have to check howto do this correctly.
       // Now calculate the signal probability with the mva outputs
-      float result = m_clusters[m_signalCluster];
+      float result = m_clusters[m_signalClass];
       for (unsigned int i = 0; i < m_clusters.size() - 1; ++i) {
         if (m_reverse[i])
           result +=  m_clusters[ m_against[i] ] * mva_results[i] / (1.0 - mva_results[i]);
         else
           result +=  m_clusters[ m_against[i] ] * (1.0 - mva_results[i]) / mva_results[i];
       }
-      return m_clusters[m_signalCluster] / result;
+      return m_clusters[m_signalClass] / result;
       */
 
     }

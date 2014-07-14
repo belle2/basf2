@@ -140,7 +140,7 @@ def SignalProbability(path, particleName, channelName, mvaConfig, particleList, 
         expert.param('method', mvaConfig.name)
         expert.param('signalFraction', -2)  # Use signalFraction from training
         expert.param('signalProbabilityName', 'SignalProbability')
-        expert.param('signalCluster', mvaConfig.targetCluster)
+        expert.param('signalClass', mvaConfig.targetCluster)
         expert.param('listNames', [particleList])
         path.add_module(expert)
 

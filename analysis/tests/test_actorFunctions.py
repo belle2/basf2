@@ -22,15 +22,15 @@ class TestSelectParticleList(unittest.TestCase):
         self.path = MockPath()
 
     def test_flavour_specific(self):
-        result = SelectParticleList(self.path, 'e+', "")
-        self.assertDictEqual(result, {'ParticleList_e+': 'e+:d60929b66e4239a833c762ef1f73a6b5ad1d63b8',
-                                      'ParticleList_e-': 'e-:d60929b66e4239a833c762ef1f73a6b5ad1d63b8'})
+        result = SelectParticleList(self.path, 'e+')
+        self.assertDictEqual(result, {'RawParticleList_e+': 'e+:f85be0cdd943c9ad2f4d050d79ef49a870352bba',
+                                      'RawParticleList_e-': 'e-:f85be0cdd943c9ad2f4d050d79ef49a870352bba'})
         self.assertEqual(len(self.path.modules), 1)
 
     def test_self_conjugated(self):
-        result = SelectParticleList(self.path, 'J/Psi', "")
-        self.assertDictEqual(result, {'ParticleList_J/Psi': 'J/Psi:7215a3ec9c26bbd5095615422cb9b2abf8f8b114',
-                                      'ParticleList_J/Psi': 'J/Psi:7215a3ec9c26bbd5095615422cb9b2abf8f8b114'})
+        result = SelectParticleList(self.path, 'J/Psi')
+        self.assertDictEqual(result, {'RawParticleList_J/Psi': 'J/Psi:8534a63998eabdb26f4cda1cb905ab2ab0aa4a2c',
+                                      'RawParticleList_J/Psi': 'J/Psi:8534a63998eabdb26f4cda1cb905ab2ab0aa4a2c'})
         self.assertEqual(len(self.path.modules), 1)
 
 

@@ -41,7 +41,7 @@ void MagneticField::GetFieldValue(const G4double Point[3], G4double* Bfield) con
   TVector3 magField = m_bField.getBField(TVector3(Point[0] * Unit::mm, Point[1] * Unit::mm, Point[2] * Unit::mm));
 
   //Set the magnetic field (Use the Geant4 tesla unit here !)
-  Bfield[0] = magField[0] * tesla;
-  Bfield[1] = magField[1] * tesla;
-  Bfield[2] = magField[2] * tesla;
+  Bfield[0] = magField[0] * CLHEP::tesla;
+  Bfield[1] = magField[1] * CLHEP::tesla;
+  Bfield[2] = magField[2] * CLHEP::tesla;
 }

@@ -30,7 +30,7 @@ using namespace Simulation;
 
 PhysicsList::PhysicsList(const string& physicsListName) : G4VModularPhysicsList()
 {
-  defaultCutValue  = 0.7 * mm; //Default production cut value. Unit given in Geant4 units.
+  defaultCutValue  = 0.7 * CLHEP::mm; //Default production cut value. Unit given in Geant4 units.
 
   //First register the physics form Geant4 predefined PhysicsList.
   G4PhysListFactory physListFactory;
@@ -66,12 +66,13 @@ void PhysicsList::SetCuts()
   // LEP: For geant4e-specific particles, set a big step so that AlongStep computes
   // all the energy (as is done in G4ErrorPhysicsList)
   G4ParticleTable* theParticleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleTable::G4PTblDicIterator* theParticleIterator = theParticleTable->GetIterator();
+  //G4ParticleTable::G4PTblDicIterator* theParticleIterator = theParticleTable->GetIterator();
+  theParticleIterator = theParticleTable->GetIterator();
   theParticleIterator->reset();
   while ((*theParticleIterator)()) {
     G4ParticleDefinition* particle = theParticleIterator->value();
     if (particle->GetParticleName().substr(0, 4) == "g4e_") {
-      SetParticleCuts(1.0E+9 * cm, particle);
+      SetParticleCuts(1.0E+9 * CLHEP::cm, particle);
     }
   }
 
@@ -81,7 +82,7 @@ void PhysicsList::SetCuts()
 
 void PhysicsList::setProductionCutValue(double productionCut)
 {
-  defaultCutValue = (productionCut / Unit::mm) * mm;
+  defaultCutValue = (productionCut / Unit::mm) * CLHEP::mm;
 }
 
 

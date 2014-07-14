@@ -16,26 +16,31 @@ def makeMbcPlot(fileName, outputFileName):
     if testTree.GetEntries() == 0:
         raise RuntimeError('Couldn\'t find TNtuple "' + ntupleName + '" in file ' + ntupleFile)
 
-    nbins = 100
-
     plotTitle = 'Mbc plot'
+    ROOT.gStyle.SetOptStat(0)
     canvas = ROOT.TCanvas(plotTitle, plotTitle, 600, 400)
     canvas.cd()
 
-    first = True
-    color = ROOT.kBlue
-    for cut in [0.0, 0.0001, 0.001, 0.01, 0.1, 0.5]:
-        if first:
-            option = ''
-        else:
-            option = 'same'
-        color -= 1.5
+    testTree.SetLineColor(ROOT.kBlack)
+    testTree.Draw('Mbc', 'Mbc > 5.23', '')
+    testTree.SetLineStyle(ROOT.kDotted)
+    testTree.Draw('Mbc', '!isSignal', 'same')
+    color = ROOT.kRed + 4
+    for cut in [0.0001, 0.001, 0.01, 0.1, 0.5]:
         testTree.SetLineColor(int(color))
-        testTree.Draw('Mbc', 'Mbc > 5.24 && getExtraInfoSignalProbability > ' + str(cut), option)
-        first = False
+        testTree.SetLineStyle(ROOT.kSolid)
+        testTree.Draw('Mbc', 'getExtraInfoSignalProbability > ' + str(cut), 'same')
 
-    testTree.SetLineColor(ROOT.kRed)
-    testTree.Draw('Mbc', 'Mbc > 5.24 && isSignal > 0.5', 'same')
+        testTree.SetLineStyle(ROOT.kDotted)
+        testTree.Draw('Mbc', 'getExtraInfoSignalProbability > ' + str(cut) + ' && !isSignal', 'same')
+        color -= 1
+
+    l = canvas.GetListOfPrimitives()
+    for i in range(l.GetEntries()):
+        hist = l[i]
+        if isinstance(hist, ROOT.TH1F):
+            hist.GetXaxis().SetRangeUser(5.24, 5.29)
+            break
 
     canvas.BuildLegend(0.1, 0.65, 0.6, 0.9)
 

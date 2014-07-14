@@ -122,7 +122,19 @@ void EKLM::FiberAndElectronics::processEntry()
    * FPGA fitter now uses units: time = ADC conversion time,
    *                             amplitude = amplitude * 0.5 * ADCRange.
    */
-  m_FPGAParams.startTime = m_FPGAParams.startTime * m_digPar->ADCSamplingTime;
+
+  //* --------------------------     this is a very simple procedure to find a start time instead of the fit
+  // to be removed or modified...
+
+  int my_thr = 100;
+  m_FPGAParams.startTime = 0;
+  for (int i = 0 ; i < m_digPar->nDigitizations; i++)
+    if (m_ADCAmplitude[i] > my_thr) {
+      m_FPGAParams.startTime = i * m_digPar->ADCSamplingTime;
+      break;
+    }
+  std::cout << "-------------------------------- " << m_FPGAParams.startTime << std::endl;
+  //  m_FPGAParams.startTime = m_FPGAParams.startTime * m_digPar->ADCSamplingTime;
   m_FPGAParams.peakTime = m_FPGAParams.peakTime * m_digPar->ADCSamplingTime;
   m_FPGAParams.attenuationFreq = m_FPGAParams.attenuationFreq /
                                  m_digPar->ADCSamplingTime;

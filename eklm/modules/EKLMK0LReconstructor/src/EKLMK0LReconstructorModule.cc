@@ -241,7 +241,7 @@ static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
 
   /*  reversion of rev #9900 */
   //  k0l = k0lArray.appendNew();
-  k0l = new(k0lArray.nextFreeAddress()) EKLMK0L();
+  k0l = k0lArray.appendNew(EKLMK0L());
   /**  end of reversion */
 
 
@@ -286,13 +286,14 @@ void EKLMK0LReconstructorModule::fillMdstDataobjects()
   for (int i = 0; i < k0lArray.getEntries(); i++) {
     HepGeom::Point3D<double> pos = k0lArray[i]->getGlobalPosition();
     CLHEP::HepLorentzVector momentum = k0lArray[i]->getMomentum();
-    new(klmClusterMDST.nextFreeAddress()) KLMCluster(
-      pos.x(), pos.y(), pos.z(),
-      k0lArray[i]->getTime(),
-      k0lArray[i]->getLayers(),
-      k0lArray[i]->getInnermostLayer(),
-      momentum.x(), momentum.y(), momentum.z()
-    );
+    klmClusterMDST.appendNew(KLMCluster(
+                               pos.x(), pos.y(), pos.z(),
+                               k0lArray[i]->getTime(),
+                               k0lArray[i]->getLayers(),
+                               k0lArray[i]->getInnermostLayer(),
+                               momentum.x(), momentum.y(), momentum.z()
+                             )
+                            );
   }
 
 }

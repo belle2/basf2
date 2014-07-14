@@ -232,7 +232,7 @@ namespace Belle2 {
       int ich = (m_top.pmtid_mcp[i] - 1) * m_numPMTchannels + m_top.ch_mcp[i];
       int TDC = t / m_tdcWidth;
       if (TDC < m_tdcOverflow)
-        new(digits.nextFreeAddress()) TOPDigit(1, ich, TDC);
+        digits.appendNew(1, ich, TDC);
     }
 
     // write track info to data store
@@ -240,13 +240,15 @@ namespace Belle2 {
     TVector3 position(m_x0, m_y0, m_z0);
     TMatrixDSym dummyMatrix;
     TrackFitResult* trackFitResult = trackFitResults.appendNew(
-                                       position, momentum, dummyMatrix,
-                                       -1,                         //charge
-                                       Const::pion,                //The new constructor requires a ParticleType.
-                                       0.5,                        //The new constructor requires a p-value.
-                                       1.5,                        //The new constructor requires a b-field.
-                                       0,                          //HitPatternCDC
-                                       0                           //HitPatternVXD
+                                       position,
+                                       momentum,
+                                       dummyMatrix,
+                                       1,                 // charge
+                                       Const::electron,   // ParticleType.
+                                       0.5,               // p-value.
+                                       0.0,               // b-field.
+                                       0,                 //HitPatternCDC
+                                       0                  //HitPatternVXD
                                      );
 
 
@@ -271,8 +273,14 @@ namespace Belle2 {
     double beta = m_p / sqrt(m_p * m_p + mass * mass);
     double tof = path / (beta * Const::speedOfLight);
     TMatrixDSym covariance(6);
-    ExtHit* extHit = extHits.appendNew(ExtHit(pdgCode, Const::EDetector::TOP, barID, EXT_ENTER, tof, hit,
-                                              momentum, covariance));
+    ExtHit* extHit = extHits.appendNew(pdgCode,
+                                       Const::EDetector::TOP,
+                                       barID,
+                                       EXT_ENTER,
+                                       tof,
+                                       hit,
+                                       momentum,
+                                       covariance);
     track->addRelationTo(extHit);
 
     B2INFO("run " << evtMetaData->getRun()

@@ -100,14 +100,14 @@ namespace Belle2 {
 
           StoreArray<TOPTBSimHit> hits;
           if (!hits.isValid()) hits.create();
-          new(hits.nextFreeAddress()) TOPTBSimHit(m_detectorID,
-                                                  m_type,
-                                                  channelID,
-                                                  m_energyDeposit,
-                                                  m_meanTime,
-                                                  m_meanX,
-                                                  m_meanY,
-                                                  m_meanZ);
+          hits.appendNew(m_detectorID,
+                         m_type,
+                         channelID,
+                         m_energyDeposit,
+                         m_meanTime,
+                         m_meanX,
+                         m_meanY,
+                         m_meanZ);
           StoreArray<MCParticle> particles;
           RelationArray relation(particles, hits);
           int lastHit = hits.getEntries() - 1;

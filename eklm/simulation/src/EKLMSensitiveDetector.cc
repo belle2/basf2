@@ -98,7 +98,7 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   lpos = hist->GetHistory()->GetTopTransform().TransformPoint(gpos);
   /* Create step hit and store in to DataStore */
   StoreArray<EKLMSimHit> simHits;
-  EKLMSimHit* hit = new(simHits.nextFreeAddress())EKLMSimHit();
+  EKLMSimHit* hit = simHits.appendNew(EKLMSimHit());
   hit->setMomentum(CLHEP::HepLorentzVector(track.GetMomentum(),
                                            track.GetTotalEnergy()));
   hit->setTrackID(track.GetTrackID());

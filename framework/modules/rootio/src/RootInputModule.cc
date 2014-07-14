@@ -197,11 +197,19 @@ void RootInputModule::readTree()
     }
   }
 
-  // Read the FileMetaData object from the persisten tree and update the parent file metadata if there's a new file
-  string fileName = m_tree->GetCurrentFile()->GetName();
-  m_tree->GetEntry(m_counterNumber);
-  if (fileName.compare(m_tree->GetCurrentFile()->GetName()) != 0) {
-    m_persistent->GetEntry(m_tree->GetTreeNumber());
+  const TFile* prevFile = m_tree->GetCurrentFile();
+  int bytesRead = m_tree->GetEntry(m_counterNumber);
+  if (bytesRead <= 0) {
+    B2FATAL("Could not read 'tree' entry " << m_counterNumber << " in file " << m_tree->GetCurrentFile()->GetName());
+  }
+
+  if (prevFile != m_tree->GetCurrentFile()) {
+    // file changed, read the FileMetaData object from the persistent tree and update the parent file metadata
+    B2DEBUG(100, "File changed, loading persistent data.");
+    bytesRead = m_persistent->GetEntry(m_tree->GetTreeNumber());
+    if (bytesRead <= 0) {
+      B2FATAL("Could not read 'persistent' entry " << m_tree->GetTreeNumber() << " in file " << m_tree->GetCurrentFile()->GetName());
+    }
     StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
     FileCatalog::Instance().getParentMetaData(m_parentLevel, 0, *fileMetaData, m_parentMetaData);
     m_currentParent.resize(0);

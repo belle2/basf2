@@ -45,17 +45,20 @@ class Particle(object):
     ## Create new class called MVAConfiguration via namedtuple. namedtuples are like a struct in C
     MVAConfiguration = collections.namedtuple('MVAConfiguration', 'name, type, config, variables, target, targetCluster')
     ## Create new class called PreCutConfiguration via namedtuple. namedtuples are like a struct in C
-    PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'variable, efficiency, purity')
+    PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'variable, method, efficiency, purity')
+    ## Create new class called PostCutConfiguration via namedtuple. namedtuples are like a struct in C
+    PostCutConfiguration = collections.namedtuple('PostCutConfiguration', 'value')
     ## Create new class called DecayChannel via namedtuple. namedtuples are like a struct in C
     DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, mvaConfig, isIncomplete')
 
-    def __init__(self, name, mvaConfig, preCutConfig=PreCutConfiguration(variable='Mass', efficiency=0.70, purity=0.001), explicitCuts=""):
+    def __init__(self, name, mvaConfig, preCutConfig=PreCutConfiguration(variable='Mass', method='S/B', efficiency=0.70, purity=0.001),
+                 postCutConfig=PostCutConfiguration(value=0.1)):
         """
         Creates a Particle without any decay channels. To add decay channels use addChannel method.
             @param name is the correct pdg name as a string of the particle.
             @param mvaConfig multivariate analysis configuration
             @param preCutConfig intermediate cut configuration
-            @param explicitCuts explicit cuts to apply when selecing this particle, see ParticleSelector for formatting details.
+            @param postCutConfig post cut configuration
         """
         ## The name of the particle as correct pdg name e.g. K+, pi-, D*0.
         self.name = name
@@ -65,8 +68,8 @@ class Particle(object):
         self.channels = []
         ## intermediate cut configuration
         self.preCutConfig = preCutConfig
-        ## Explicit cuts to apply to this Particle
-        self.explicitCuts = explicitCuts
+        ## post cut configuration
+        self.postCutConfig = postCutConfig
 
     @property
     def complete_channels(self):
@@ -104,7 +107,8 @@ class Particle(object):
         mvaConfig = copy.deepcopy(self.mvaConfig if mvaConfig is None else mvaConfig)
         if addExtraVars:
             mvaConfig.variables.extend(['daughter{i}(getExtraInfo(SignalProbability))'.format(i=i) for i in range(0, len(daughters))])
-        self.channels.append(Particle.DecayChannel(name=self.name + ' ==> ' + ' '.join(daughters), daughters=daughters,
+        self.channels.append(Particle.DecayChannel(name=self.name + ' ==> ' + ' '.join(daughters),
+                                                   daughters=daughters,
                                                    mvaConfig=mvaConfig, isIncomplete=isIncomplete))
         return self
 
@@ -162,6 +166,7 @@ def FullEventInterpretation(path, particles):
         # Add all information the user has provided as resources to the sequence, so our function can require them
         seq.addResource('Name_' + particle.name, particle.name)
         seq.addResource('PreCutConfig_' + particle.name, particle.preCutConfig)
+        seq.addResource('PostCutConfig_' + particle.name, particle.postCutConfig)
 
         # Add Variables:
         # If the particle is a FSP, we add the variables for the particle
@@ -172,8 +177,6 @@ def FullEventInterpretation(path, particles):
             seq.addResource('Name_' + channel.name, channel.name)
             seq.addResource('MVAConfig_' + channel.name, channel.mvaConfig)
 
-        seq.addResource('ExplicitCuts_' + particle.name, particle.explicitCuts)
-
         ########### RECONSTRUCTION ACTORS ##########
         # The Reconstruction part of the FullReconstruction:
         # 1. Load the FSP (via SelectParticleList),
@@ -182,9 +185,13 @@ def FullEventInterpretation(path, particles):
         if particle.isFSP:
             seq.addFunction(SelectParticleList,
                             path='Path',
+                            particleName='Name_' + particle.name)
+            seq.addFunction(CopyParticleLists,
+                            path='Path',
                             particleName='Name_' + particle.name,
-                            explicitCuts='ExplicitCuts_' + particle.name,
-                            )
+                            inputLists=['RawParticleList_' + particle.name],
+                            postCut='PostCut_' + particle.name,
+                            pdf='PDF_' + particle.name)
         else:
             for channel in particle.channels:
                 seq.addFunction(MakeAndMatchParticleList,
@@ -197,6 +204,7 @@ def FullEventInterpretation(path, particles):
                             path='Path',
                             particleName='Name_' + particle.name,
                             inputLists=['ParticleList_' + channel.name + '_' + particle.name for channel in particle.complete_channels],
+                            postCut='PostCut_' + particle.name,
                             pdf='PDF_' + particle.name)
 
         ############# PRECUT DETERMINATION ############
@@ -226,6 +234,11 @@ def FullEventInterpretation(path, particles):
                                 daughterLists=['ParticleList_' + daughter for daughter in channel.daughters],
                                 additionalDependencies=additionalDependencies)
 
+        seq.addFunction(PostCutDetermination,
+                        particleName='Name_' + particle.name,
+                        postCutConfig='PostCutConfig_' + particle.name,
+                        signalProbability='SignalProbability_' + particle.name)
+
         ########### SIGNAL PROBABILITY ACTORS #######
         # The classifier part of the FullReconstruction.
         if not args.nosig:
@@ -235,7 +248,7 @@ def FullEventInterpretation(path, particles):
                                 particleName='Name_' + particle.name,
                                 channelName='Name_' + particle.name,
                                 mvaConfig='MVAConfig_' + particle.name,
-                                particleList='ParticleList_' + particle.name)
+                                particleList='RawParticleList_' + particle.name)
             else:
                 for channel in particle.channels:
                     seq.addFunction(SignalProbability,
@@ -262,6 +275,8 @@ def FullEventInterpretation(path, particles):
 
         seq.addFunction(WriteAnalysisFileForParticle,
                         particleName='Name_' + particle.name,
+                        postCutConfig='PostCutConfig_' + particle.name,
+                        postCut='PostCut_' + particle.name,
                         texfiles=['Tex_' + channel.name for channel in particle.channels])
 
     #TODO: don't hardcode B0/B+ here

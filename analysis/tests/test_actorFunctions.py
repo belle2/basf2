@@ -39,19 +39,19 @@ class TestCopyParticleLists(unittest.TestCase):
         self.path = MockPath()
 
     def test_without_nones(self):
-        result = CopyParticleLists(self.path, 'D+', ['D+:1', 'D+:2', 'D+:3'], None)
+        result = CopyParticleLists(self.path, 'D+', ['D+:1', 'D+:2', 'D+:3'], {'cutstring': ''}, None)
         self.assertDictEqual(result, {'ParticleList_D+': 'D+:5cd7f2d37f66c44b92dbd64e10ada329133b6a63',
                                       'ParticleList_D-': 'D-:5cd7f2d37f66c44b92dbd64e10ada329133b6a63'})
         self.assertEqual(len(self.path.modules), 1)
 
     def test_with_nones(self):
-        result = CopyParticleLists(self.path, 'D+', ['D+:1', None, 'D+:3', None], None)
+        result = CopyParticleLists(self.path, 'D+', ['D+:1', None, 'D+:3', None], {'cutstring': ''}, None)
         self.assertDictEqual(result, {'ParticleList_D+': 'D+:fc01399545fea42891ffc8fc0b07b52de3317544',
                                       'ParticleList_D-': 'D-:fc01399545fea42891ffc8fc0b07b52de3317544'})
         self.assertEqual(len(self.path.modules), 1)
 
     def test_only_nones(self):
-        result = CopyParticleLists(self.path, 'D+', [None, None], None)
+        result = CopyParticleLists(self.path, 'D+', [None, None], {'cutstring': ''}, None)
         self.assertDictEqual(result, {'ParticleList_D+': None,
                                       'ParticleList_D-': None})
         self.assertEqual(len(self.path.modules), 0)
@@ -62,9 +62,9 @@ class TestMakeAndMatchParticleList(unittest.TestCase):
         self.path = MockPath()
 
     def test_with_precut(self):
-        result = MakeAndMatchParticleList(self.path, 'D+', 'D+ -> pi+ K-', ['pi+', 'K-'], '0 < M < 10')
-        self.assertDictEqual(result, {'ParticleList_D+ -> pi+ K-_D+': 'D+:8e60a50a70eafabf5497d3b6f996a06944d2ccad',
-                                      'ParticleList_D+ -> pi+ K-_D-': 'D-:8e60a50a70eafabf5497d3b6f996a06944d2ccad'})
+        result = MakeAndMatchParticleList(self.path, 'D+', 'D+ -> pi+ K-', ['pi+', 'K-'], {'cutstring': '0 < M < 10'})
+        self.assertDictEqual(result, {'ParticleList_D+ -> pi+ K-_D+': 'D+:a82b536fc03a4a03b3e7f73db062250ec59a1f4f',
+                                      'ParticleList_D+ -> pi+ K-_D-': 'D-:a82b536fc03a4a03b3e7f73db062250ec59a1f4f'})
         self.assertEqual(len(self.path.modules), 2)
 
     def test_without_precut(self):
@@ -139,7 +139,8 @@ class TestSignalProbability(unittest.TestCase):
 
 
 preCutConfig = Particle.PreCutConfiguration(
-    variable='Mass',
+    variable='M',
+    method='Same',
     efficiency=0.7,
     purity=0.01
 )
@@ -159,7 +160,7 @@ class TestCreatePreCutHistogram(unittest.TestCase):
         self.assertEqual(len(self.path.modules), 1)
 
     def test_nothing_to_do(self):
-        hash = 'f75ee3533d3c9475373e59ef33e236faf7548a39'
+        hash = 'b5119ce3e4709ebb035b7fec050621d1354c2b32'
         filename = 'CutHistograms_D+_D+ -> pi+ K-_{hash}.root'.format(hash=hash)
         open(filename, 'a').close()
         result = CreatePreCutHistogram(self.path, 'D+', 'D+ -> pi+ K-', preCutConfig, ['pi+:1', 'K+:1'], [])

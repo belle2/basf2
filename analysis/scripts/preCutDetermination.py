@@ -24,31 +24,35 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
     ROOT.gROOT.SetBatch(True)
     files = [ROOT.TFile(filename, 'UPDATE') for filename, _ in preCutHistograms]
 
-    if preCutConfig.variable == 'Mass':
-        variable = 'M'
-    elif preCutConfig.variable == 'Same':
-        variable = 'M'
-    else:
-        variable = 'daughterProductOf(getExtraInfo(SignalProbability))'
-
-    signal, bckgrd, ratio = LoadHistogramsFromFiles(files, variable, channelNames, preCutHistograms)
+    signal, bckgrd, ratio = LoadHistogramsFromFiles(files, preCutConfig.variable, channelNames, preCutHistograms)
     interpolations = GetInterpolateFunctions(ratio)
 
-    if preCutConfig.variable == 'Mass':
+    # Two-Side cut S/B ratio constructed
+    if preCutConfig.method == 'S/B' and preCutConfig.variable in ['M', 'Q']:
         maxima = GetPositionsOfMaxima(signal)
 
         def ycut_to_xcuts(channel, cut):
-            return (interpolations[channel].GetX(cut, signal[channel].GetXaxis().GetXmin(), maxima[channel]), interpolations[channel].GetX(cut, maxima[channel], signal[channel].GetXaxis().GetXmax()))
-    elif preCutConfig.variable == 'Same':
+            return (interpolations[channel].GetX(cut, signal[channel].GetXaxis().GetXmin(), maxima[channel]),
+                    interpolations[channel].GetX(cut, maxima[channel], signal[channel].GetXaxis().GetXmax()))
+
+    # One-Side cut S/B ratio constructed
+    elif preCutConfig.method == 'S/B' and preCutConfig.variable in ['daughterProductOf(getExtraInfo(SignalProbability)']:
+
+        def ycut_to_xcuts(channel, cut):
+            return (interpolations[channel].GetX(cut, 0, 1), 1)
+
+    # Two sided cut, same for all channels
+    elif preCutConfig.method == 'Same' and preCutConfig.variable in ['M', 'Q']:
         maxima = GetPositionsOfMaxima(signal)
 
         def ycut_to_xcuts(channel, cut):
             return (maxima[channel] - cut * 2, maxima[channel] + cut * 2)
 
-    else:
+    # One sided cut, same for all channels
+    elif preCutConfig.method == 'Same' and preCutConfig.variable in ['daughterProductOf(getExtraInfo(SignalProbability)']:
 
         def ycut_to_xcuts(channel, cut):
-            return (interpolations[channel].GetX(cut, 0, 1), 1)
+            return (cut, 1)
 
     result = {}
     redo_cuts = True
@@ -57,8 +61,8 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
 
         cuts = GetCuts(signal, bckgrd, preCutConfig.efficiency, preCutConfig.purity, ycut_to_xcuts)
         for (channel, range) in cuts.iteritems():
-            result[channel] = {'variable': variable, 'range': range, 'isIgnored': False,
-                               'cutstring': str(range[0]) + " <= " + variable + " <= " + str(range[1]),
+            result[channel] = {'range': range, 'isIgnored': False,
+                               'cutstring': str(range[0]) + " <= " + preCutConfig.variable + " <= " + str(range[1]),
                                'nBackground': GetNumberOfEventsInRange(bckgrd[channel], range),
                                'nSignal': GetNumberOfEventsInRange(signal[channel], range)}
 

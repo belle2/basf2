@@ -25,27 +25,28 @@ import subprocess
 from string import Template
 
 
-def SelectParticleList(path, particleName, explicitCuts):
+def SelectParticleList(path, particleName):
     """
     Creates a ParticleList gathering up all particles with the given particleName
         @param path the basf2 path
         @param particleName returned key is named ParticleList_{particleName} corresponding ParticleList is stored as {particleName}:{hash}
     """
-    userLabel = actorFramework.createHash(particleName, explicitCuts)
+    userLabel = actorFramework.createHash(particleName)
     outputList = particleName + ':' + userLabel
-    modularAnalysis.selectParticle(outputList, explicitCuts, path=path)
+    modularAnalysis.selectParticle(outputList, path=path)
 
     B2INFO("Select Particle List " + outputList + " and charged conjugated")
-    return {'ParticleList_' + particleName: outputList,
-            'ParticleList_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
+    return {'RawParticleList_' + particleName: outputList,
+            'RawParticleList_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
 
 
-def CopyParticleLists(path, particleName, inputLists, pdf):
+def CopyParticleLists(path, particleName, inputLists, postCut, pdf):
     """
     Creates a ParticleList gathering up all particles in the given inputLists
         @param path the basf2 path
         @param particleName returned key is named ParticleList_{particleName} corresponding ParticleList is stored as {particleName}:{hash}
         @param inputLists names of inputLists which are copied to the new list
+        @param postCut cuts which are applied after the reconstruction of the particle
         @param pdf dependency to particle overview pdf, to trigger the generation of the overview PDF as soon as the particle is available
     """
     inputLists = actorFramework.removeNones(inputLists)
@@ -55,7 +56,7 @@ def CopyParticleLists(path, particleName, inputLists, pdf):
 
     userLabel = actorFramework.createHash(particleName, inputLists)
     outputList = particleName + ':' + userLabel
-    modularAnalysis.copyLists(outputList, inputLists, path=path)
+    modularAnalysis.cutAndCopyLists(outputList, inputLists, postCut['cutstring'], path=path)
 
     B2INFO("Gather Particle List for particle " + particleName + " and charged conjugated")
     return {'ParticleList_' + particleName: outputList,
@@ -137,6 +138,7 @@ def SignalProbability(path, particleName, channelName, mvaConfig, particleList, 
         expert.set_name('TMVAExpert_' + particleList)
         expert.param('prefix', particleList + '_' + hash)
         expert.param('method', mvaConfig.name)
+        expert.param('signalFraction', -2)  # Use signalFraction from training
         expert.param('signalProbabilityName', 'SignalProbability')
         expert.param('signalCluster', mvaConfig.targetCluster)
         expert.param('listNames', [particleList])
@@ -215,10 +217,13 @@ def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughte
         pmake.set_name('PreCutHistMaker_' + channelName)
         pmake.param('fileName', filename)
         pmake.param('decayString', outputList)
-        if preCutConfig.variable in ['Mass', 'Same']:
+        if preCutConfig.variable in ['M']:
             mass = pdg.get(pdg.from_name(particleName)).Mass()
             pmake.param('variable', 'M')
             pmake.param('histParams', (200, mass / 2, mass + mass / 2))
+        elif preCutConfig.variable in ['Q']:
+            pmake.param('variable', 'Q')
+            pmake.param('histParams', (200, -1, 1))
         else:
             pmake.param('variable', 'daughterProductOf(getExtraInfo(SignalProbability))')
             pmake.param('customBinning', list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])))
@@ -247,6 +252,17 @@ def PreCutDetermination(particleName, channelNames, preCutConfig, preCutHistogra
 
     B2INFO("Calculate pre cut for particle " + particleName + " and charged conjugated.")
     return results
+
+
+def PostCutDetermination(particleName, postCutConfig, signalProbability):
+    """
+    Determines the PostCut of a particle.
+        @param particleName name of the particle
+        @param postCutConfig configuration for post cut determination
+        @param signalProbability of the particle
+    """
+    B2INFO("Calculate post cut for particle " + particleName + " and charged conjugated.")
+    return {'PostCut_' + particleName: {'cutstring': '0.1 < getExtraInfo(SignalProbability)', 'range': (0.1, 1)}}
 
 
 def WriteAnalysisFileForChannel(particleName, channelName, channelList, preCutConfig, preCutHistogram, preCut, mvaConfig, signalProbability):
@@ -359,10 +375,12 @@ def WriteAnalysisFileForChannel(particleName, channelName, channelList, preCutCo
     return {'Tex_' + channelName: (filename, placeholders)}
 
 
-def WriteAnalysisFileForParticle(particleName, texfiles):
+def WriteAnalysisFileForParticle(particleName, postCutConfig, postCut, texfiles):
     """
     Creates a pdf document with the PreCut and Training plots
         @param particleName name of the particle
+        @param preCutConfig configuration for post cut
+        @param preCut used postCut for this particle
         @param texfiles list of tex filenames
     """
     filename = particleName + '.tex'
@@ -372,6 +390,9 @@ def WriteAnalysisFileForParticle(particleName, texfiles):
         placeholders['NChannels'] = len(texfiles)
         texfiles = actorFramework.removeNones(texfiles)
         placeholders['NUsedChannels'] = len(texfiles)
+
+        a, b = postCut['range']
+        placeholders['postCutRange'] = 'Ignored' if postCut is None else '({:.2f},'.format(a) + ' {:.2f}'.format(b) + ')'
 
         placeholders['particleName'] = particleName
         placeholders['channelInputs'] = ""

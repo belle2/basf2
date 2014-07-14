@@ -69,8 +69,17 @@ mvaConfig_B = Particle.MVAConfiguration(
 )
 
 preCutConfiguration_nonFSP = Particle.PreCutConfiguration(
-    #variable='daughterProductOfSignalProbability',
-    variable='Same',
+    #variable='daughterProductOf(getExtraInfo(SignalProbability))',
+    variable='M',
+    method='Same',
+    efficiency=0.9,
+    purity=0.0001,
+)
+
+preCutConfiguration_DStar = Particle.PreCutConfiguration(
+    #variable='daughterProductOf(getExtraInfo(SignalProbability))',
+    variable='Q',
+    method='Same',
     efficiency=0.9,
     purity=0.0001,
 )
@@ -78,9 +87,9 @@ preCutConfiguration_nonFSP = Particle.PreCutConfiguration(
 partial = False
 
 particles = []
-particles.append(Particle('pi+', mvaConfig_chargedFSP, explicitCuts='0.1 < piid'))
-particles.append(Particle('K+', mvaConfig_chargedFSP, explicitCuts='0.1 < Kid'))
-particles.append(Particle('gamma', mvaConfig_gamma, explicitCuts='0.1 < goodGamma'))  # TODO: not exactly soft
+particles.append(Particle('pi+', mvaConfig_chargedFSP))
+particles.append(Particle('K+', mvaConfig_chargedFSP))
+particles.append(Particle('gamma', mvaConfig_gamma))
 
 p = Particle('pi0', mvaConfig_pi0, preCutConfiguration_nonFSP)
 p.addChannel(['gamma', 'gamma'])
@@ -110,12 +119,12 @@ if partial:
     p.addChannel(['K-', 'pi+', 'mu+'], isIncomplete=True)
 particles.append(p)
 
-p = Particle('D*+', mvaConfig_D, preCutConfiguration_nonFSP)
+p = Particle('D*+', mvaConfig_D, preCutConfiguration_DStar)
 p.addChannel(['D0', 'pi+'])
 p.addChannel(['D+', 'pi0'])
 particles.append(p)
 
-p = Particle('D*0', mvaConfig_D, preCutConfiguration_nonFSP)
+p = Particle('D*0', mvaConfig_D, preCutConfiguration_DStar)
 p.addChannel(['D0', 'pi0'])
 p.addChannel(['D0', 'gamma'])
 particles.append(p)

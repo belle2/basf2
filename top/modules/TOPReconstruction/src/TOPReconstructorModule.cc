@@ -165,10 +165,10 @@ namespace Belle2 {
 
       // add photons
       StoreArray<TOPDigit> topDigits(m_inputDigits);
-      int nHits = topDigits.getEntries();
-      for (int i = 0; i < nHits; ++i) {
+      for (int i = 0; i < topDigits.getEntries(); ++i) {
         const TOPDigit* data = topDigits[i];
-        reco.AddData(data->getBarID() - 1, data->getChannelID() - 1, data->getTDC());
+        if (data->getHitQuality() == TOPDigit::EHitQuality::c_Good)
+          reco.AddData(data->getBarID() - 1, data->getChannelID() - 1, data->getTDC());
       }
 
       // use pion hypothesis for track extrapolation

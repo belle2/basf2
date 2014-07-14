@@ -28,6 +28,11 @@ namespace Belle2 {
   public:
 
     /**
+     * hit quality enumerators
+     */
+    enum EHitQuality {c_Junk, c_Good, c_ChargeShare, c_CrossTalk};
+
+    /**
      * Default constructor
      */
     TOPDigit():
@@ -35,8 +40,9 @@ namespace Belle2 {
       m_channelID(0),
       m_TDC(0),
       m_ADC(0),
-      m_hardChannelID(0) {
-    }
+      m_hardChannelID(0),
+      m_quality(c_Junk)
+    {}
 
     /** Almost full constructor
      * @param barID     bar ID
@@ -48,8 +54,9 @@ namespace Belle2 {
       m_channelID(channelID),
       m_TDC(TDC),
       m_ADC(0),
-      m_hardChannelID(0) {
-    }
+      m_hardChannelID(0),
+      m_quality(c_Good)
+    {}
 
     /** Full constructor
      * @param barID     bar ID
@@ -63,8 +70,19 @@ namespace Belle2 {
       m_channelID(channelID),
       m_TDC(TDC),
       m_ADC(ADC),
-      m_hardChannelID(hardChID) {
-    }
+      m_hardChannelID(hardChID),
+      m_quality(c_Good)
+    {}
+
+    /** Set hit quality
+     * @param quality hit quality
+     */
+    void setHitQuality(EHitQuality quality) {m_quality = quality;}
+
+    /** Get hit quality
+     * @return hit quality
+     */
+    EHitQuality getHitQuality() const {return m_quality; }
 
     /** Get bar ID
      * @return bar ID
@@ -97,8 +115,9 @@ namespace Belle2 {
     int m_TDC;                 /**< digitized time */
     int m_ADC;                 /**< digitized pulse height or charge (to be decided) */
     unsigned m_hardChannelID;  /**< hardware channel ID (0-based) */
+    EHitQuality m_quality;     /**< hit quality */
 
-    ClassDef(TOPDigit, 2); /**< ClassDef */
+    ClassDef(TOPDigit, 3); /**< ClassDef */
 
   };
 

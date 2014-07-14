@@ -117,9 +117,9 @@ int RawCOPPERFormat_v0::GetDetectorNwords(int n, int finesse_num)
   sprintf(err_buf, "Specifined FINESSE number( = %d ) is invalid. Exiting...\n %s %s %d\n", finesse_num,
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   string err_str = err_buf; throw (err_str);
-//   sleep(12345678);
-//   exit(-1);
-//   return 0;
+  //   sleep(12345678);
+  //   exit(-1);
+  //   return 0;
 }
 
 
@@ -146,9 +146,9 @@ int RawCOPPERFormat_v0::GetFINESSENwords(int n, int finesse_num)
   sprintf(err_buf, "Specifined FINESSE number( = %d ) is invalid. Exiting...\n %s %s %d\n",
           finesse_num, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   string err_str = err_buf; throw (err_str);
-//   sleep(12345678);
-//   exit(-1);
-//   return 0;
+  //   sleep(12345678);
+  //   exit(-1);
+  //   return 0;
 
 }
 
@@ -184,8 +184,8 @@ unsigned int RawCOPPERFormat_v0::GetB2LFEE32bitEventNumber(int n)
     sprintf(err_buf, "No HSLB data in COPPER data. Exiting...\n%s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf; throw (err_str);
-//     sleep(12345678);
-//     exit(-1);
+    //     sleep(12345678);
+    //     exit(-1);
   }
 
   if (err_flag == 1) {
@@ -197,8 +197,8 @@ unsigned int RawCOPPERFormat_v0::GetB2LFEE32bitEventNumber(int n)
     printf("[DEBUG] [ERROR] %s\n", err_buf);
 #ifndef NO_DATA_CHECK
     string err_str = err_buf; throw (err_str);
-//     sleep(12345678);
-//     exit(-1);
+    //     sleep(12345678);
+    //     exit(-1);
 
 #endif //NO_DATA_CHECK
   }
@@ -210,9 +210,9 @@ unsigned int RawCOPPERFormat_v0::GetB2LFEE32bitEventNumber(int n)
   sprintf(err_buf, "You need comment out READ_OLD_B2LFEE_FORMAT_FILE if you are handling a new data format\n%s %s %d\n",
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   string err_str = err_buf; throw (err_str);
-//   sleep(12345678);
-//   exit(1);
-//   return 0;
+  //   sleep(12345678);
+  //   exit(1);
+  //   return 0;
 
 #endif // READ_OLD_B2LFEE_FORMAT_FILE
 
@@ -257,11 +257,13 @@ void RawCOPPERFormat_v0::CheckData(int n,
   // Check incrementation of event #
   //
   *cur_runsubrun_no = GetRunNoSubRunNo(n);
+  if (
 #ifdef WO_FIRST_EVENUM_CHECK
-  if (prev_evenum != 0xFFFFFFFF && *cur_evenum_rawcprhdr != 0)  {
+    prev_evenum != 0xFFFFFFFF && *cur_evenum_rawcprhdr != 0
 #else
-  if (prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0) {
+    prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0
 #endif
+  ) {
     if ((unsigned int)(prev_evenum + 1) != *cur_evenum_rawcprhdr) {
       sprintf(err_buf, "CORRUPTED DATA: Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n%s %s %d\n",
               n, prev_evenum, *cur_evenum_rawcprhdr,
@@ -272,11 +274,13 @@ void RawCOPPERFormat_v0::CheckData(int n,
 
 
   *cur_copper_ctr = GetCOPPERCounter(n);
+  if (
 #ifdef WO_FIRST_EVENUM_CHECK
-  if (prev_copper_ctr != 0xFFFFFFFF) {
+    prev_copper_ctr != 0xFFFFFFFF
 #else
-  if (true) {
+    true
 #endif
+  ) {
     if ((unsigned int)(prev_copper_ctr + 1) != *cur_copper_ctr) {
       sprintf(err_buf, "COPPER counter jump : i %d prev 0x%x cur 0x%x :\n%s %s %d\n",
               n, prev_copper_ctr, *cur_copper_ctr,
@@ -360,8 +364,8 @@ void RawCOPPERFormat_v0::CheckData(int n,
     PrintData(GetBuffer(n), GetBlockNwords(n));
     string err_str = err_buf;
     throw (err_str);
-//     sleep(1234567);
-//     exit(-1);
+    //     sleep(1234567);
+    //     exit(-1);
   }
 
   return;
@@ -423,8 +427,8 @@ void RawCOPPERFormat_v0::CheckUtimeCtimeTRGType(int n)
     sprintf(err_buf, "CORRUPTED DATA: mismatch over FINESSEs. Exiting...\n %s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf; throw (err_str);
-//     sleep(1234567);
-//     exit(1);
+    //     sleep(1234567);
+    //     exit(1);
   }
   return;
 }
@@ -492,8 +496,8 @@ unsigned int RawCOPPERFormat_v0::FillTopBlockRawHeader(unsigned int m_node_id, u
             "No FINESSE data in a copper data block. Exiting...\n %s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf; throw (err_str);
-//     sleep(12345678);
-//     exit(-1);
+    //     sleep(12345678);
+    //     exit(-1);
   }
 
   //
@@ -517,8 +521,8 @@ unsigned int RawCOPPERFormat_v0::FillTopBlockRawHeader(unsigned int m_node_id, u
             m_nwords, m_buffer[ tmp_header.POS_NWORDS ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf; throw (err_str);
-//     sleep(12345678);
-//     exit(-1);
+    //     sleep(12345678);
+    //     exit(-1);
   }
 
   //
@@ -608,8 +612,8 @@ unsigned int RawCOPPERFormat_v0::FillTopBlockRawHeader(unsigned int m_node_id, u
             chksum_body, m_buffer[ body_end ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf; throw (err_str);
-//     sleep(12345678);
-//     exit(-1);
+    //     sleep(12345678);
+    //     exit(-1);
   }
 
   //
@@ -655,8 +659,8 @@ unsigned int RawCOPPERFormat_v0::FillTopBlockRawHeader(unsigned int m_node_id, u
 #ifndef NO_DATA_CHECK
     string err_str = err_buf; throw (err_str);
 
-//     sleep(12345678);
-//     exit(-1);
+    //     sleep(12345678);
+    //     exit(-1);
 #endif
   }
 
@@ -665,11 +669,13 @@ unsigned int RawCOPPERFormat_v0::FillTopBlockRawHeader(unsigned int m_node_id, u
   //
   *cur_runsubrun_no = GetRunNoSubRunNo(cpr_id);
   if (prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0) {
+    if (
 #ifdef WO_FIRST_EVENUM_CHECK
-    if ((prev_eve32 + 1 != cur_ftsw_eve32) && (prev_eve32 != 0xFFFFFFFF && cur_ftsw_eve32 != 0)) {
+      (prev_eve32 + 1 != cur_ftsw_eve32) && (prev_eve32 != 0xFFFFFFFF && cur_ftsw_eve32 != 0)
 #else
-    if (prev_eve32 + 1 != cur_ftsw_eve32) {
+      prev_eve32 + 1 != cur_ftsw_eve32
 #endif
+    ) {
 
 #ifndef NO_DATA_CHECK
       char err_buf[500];
@@ -721,8 +727,8 @@ void RawCOPPERFormat_v0::CheckB2LFEEHeaderVersion(int n)
         sprintf(err_buf, "FTSW and b2tt firmwares are old. Exiting...\n %s %s %d\n",
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         string err_str = err_buf; throw (err_str);
-//         sleep(12345678);
-//         exit(-1);
+        //         sleep(12345678);
+        //         exit(-1);
 #endif
       } else {
         // this word for 32bit unixtime
@@ -737,8 +743,8 @@ void RawCOPPERFormat_v0::CheckB2LFEEHeaderVersion(int n)
       sprintf(err_buf, "RawCOPPERFormat_v0 contains no FINESSE data. Exiting...\n %s %s %d\n",
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       string err_str = err_buf; throw (err_str);
-//       sleep(12345678);
-//      exit(-1);
+      //       sleep(12345678);
+      //      exit(-1);
 #endif
     }
   }
@@ -746,14 +752,16 @@ void RawCOPPERFormat_v0::CheckB2LFEEHeaderVersion(int n)
 }
 #endif
 
-void RawCOPPERFormat_v0::Packer(int* buf_1st, int nwords_1st,
-                                int* buf_2nd, int nwords_2nd,
-                                int* buf_3rd, int nwords_3rd,
-                                int* buf_4th, int nwords_4th,
-                                RawCOPPERPackerInfo rawcprpacker_info ,
-                                int format_ver)
+int RawCOPPERFormat_v0::PackDetectorBuf(int* packed_buf,
+                                        int* detector_buf_1st, int nwords_1st,
+                                        int* detector_buf_2nd, int nwords_2nd,
+                                        int* detector_buf_3rd, int nwords_3rd,
+                                        int* detector_buf_4th, int nwords_4th,
+                                        RawCOPPERPackerInfo rawcprpacker_info)
 {
-  return;
+  char err_buf[500];
+  sprintf(err_buf, "This function is not supported Exiting...\n%s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  string err_str = err_buf;
+  throw (err_str);
 }
-
-

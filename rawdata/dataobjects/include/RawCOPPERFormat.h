@@ -261,12 +261,12 @@ namespace Belle2 {
     virtual unsigned int CalcXORChecksum(int* buf, int nwords);
 
     //! Pack data (format ver. = -1 -> Select the latest format version)
-    virtual void Packer(int* buf_1st, int nwords_1st,
-                        int* buf_2nd, int nwords_2nd,
-                        int* buf_3rd, int nwords_3rd,
-                        int* buf_4th, int nwords_4th,
-                        RawCOPPERPackerInfo rawcprpacker_info ,
-                        int format_ver = -1) = 0;
+    virtual int PackDetectorBuf(int* packed_buf,
+                                int* detector_buf_1st, int nwords_1st,
+                                int* detector_buf_2nd, int nwords_2nd,
+                                int* detector_buf_3rd, int nwords_3rd,
+                                int* detector_buf_4th, int nwords_4th,
+                                RawCOPPERPackerInfo rawcprpacker_info) = 0;
 
   protected :
     ///ver.2 Change FEE format as presented at B2GM in Nov.2013 ( Nov.20, 2013)

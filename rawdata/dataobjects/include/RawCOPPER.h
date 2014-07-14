@@ -21,7 +21,7 @@
 #include <rawdata/dataobjects/RawCOPPERFormat_v0.h>
 #include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
 #include <framework/datastore/DataStore.h>
-
+#include <rawdata/RawCOPPERPackerInfo.h>
 
 
 #include <TObject.h>
@@ -41,6 +41,14 @@ using namespace std;
 #define EKLM_ID  0x08000000 // tentative
 // Divide ECL and KLM to barrel and endcap categories from Itoh-san's suggestion
 // Updated on May 9, 2014
+
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//
+// The latest DAQformat version number
+#define LATEST_POSTREDUCTION_FORMAT_VER 1
+//
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
 namespace Belle2 {
   /** \addtogroup dataobjects
@@ -280,6 +288,14 @@ namespace Belle2 {
 
     //! show m_buffer
     void ShowBuffer();
+
+    //! Packer for RawCOPPER class
+    //! Pack data (format ver. = -1 -> Select the latest format version)
+    void PackDetectorBuf(int* detector_buf_1st, int nwords_1st,
+                         int* detector_buf_2nd, int nwords_2nd,
+                         int* detector_buf_3rd, int nwords_3rd,
+                         int* detector_buf_4th, int nwords_4th,
+                         RawCOPPERPackerInfo rawcprpacker_info);
 
     enum {
       POS_FORMAT_VERSION = 1,

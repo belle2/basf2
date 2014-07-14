@@ -45,11 +45,11 @@ void RawCOPPER::SetVersion()
 
   m_version = ((m_buffer[ POS_FORMAT_VERSION ]) & FORMAT_MASK) >> 8;
   switch (m_version) {
-    case 1 :
+    case LATEST_POSTREDUCTION_FORMAT_VER :
       m_access = new PostRawCOPPERFormat_latest;
       //      printf("########################## PostRawCOPPERFormat_latest\n");
       break;
-    case 129 :
+    case (0x10 + LATEST_POSTREDUCTION_FORMAT_VER) :
       m_access = new PreRawCOPPERFormat_latest;
       //      printf("########################## PreRawCOPPERFormat_latest\n");
       break;
@@ -82,10 +82,10 @@ void RawCOPPER::SetVersion(string class_name)
 
   if (class_name == "RawCOPPERFormat_latest") {
     m_access = new PostRawCOPPERFormat_latest;
-    m_version = (0 << 7) | 1;
+    m_version = (0 << 7) | LATEST_POSTREDUCTION_FORMAT_VER;
   } else if (class_name == "PreRawCOPPERFormat_latest") {
     m_access = new PreRawCOPPERFormat_latest;
-    m_version = (1 << 7) | 1;
+    m_version = (1 << 7) | LATEST_POSTREDUCTION_FORMAT_VER;
   } else if (class_name == "RawCOPPERFormat_v0") {
     m_access = new RawCOPPERFormat_v0;
     m_version = (0 << 7) | 0;
@@ -154,4 +154,38 @@ void RawCOPPER::ShowBuffer()
   }
   printf("\n");
 
+}
+
+
+void RawCOPPER::PackDetectorBuf(
+  int* detector_buf_1st, int nwords_1st,
+  int* detector_buf_2nd, int nwords_2nd,
+  int* detector_buf_3rd, int nwords_3rd,
+  int* detector_buf_4th, int nwords_4th,
+  RawCOPPERPackerInfo rawcprpacker_info)
+{
+
+  if (m_access != NULL) {
+    delete m_access;
+  }
+  m_access = new PostRawCOPPERFormat_latest;
+  m_version = LATEST_POSTREDUCTION_FORMAT_VER;
+  m_num_events = 1;
+  m_num_nodes = 1;
+
+  int* packed_buf;
+  m_nwords = m_access->PackDetectorBuf(packed_buf,
+                                       detector_buf_1st, nwords_1st,
+                                       detector_buf_2nd, nwords_2nd,
+                                       detector_buf_3rd, nwords_3rd,
+                                       detector_buf_4th, nwords_4th,
+                                       rawcprpacker_info);
+
+  int malloc_flag = 1; // Not use preallocated buffer. Delete m_buffer when destructer is called.
+  SetBuffer(packed_buf, m_nwords, malloc_flag, m_num_events, m_num_nodes);
+
+  malloc_flag = 0; // For m_access, need not to delete m_buffer
+  m_access->SetBuffer(m_buffer, m_nwords, malloc_flag, m_num_events, m_num_nodes);
+
+  return;
 }

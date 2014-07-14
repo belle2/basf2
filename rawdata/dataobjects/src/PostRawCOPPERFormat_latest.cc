@@ -161,11 +161,13 @@ void PostRawCOPPERFormat_latest::CheckData(int n,
   // Check incrementation of event #
   //
   *cur_runsubrun_no = GetRunNoSubRunNo(n);
+  if (
 #ifdef WO_FIRST_EVENUM_CHECK
-  if (prev_evenum != 0xFFFFFFFF && *cur_evenum_rawcprhdr != 0)  {
+    prev_evenum != 0xFFFFFFFF && *cur_evenum_rawcprhdr != 0
 #else
-  if (prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0) {
+    prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0
 #endif
+  ) {
     if ((unsigned int)(prev_evenum + 1) != *cur_evenum_rawcprhdr) {
       sprintf(err_buf, "CORRUPTED DATA: Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n%s %s %d\n",
               n, prev_evenum, *cur_evenum_rawcprhdr,
@@ -181,7 +183,7 @@ void PostRawCOPPERFormat_latest::CheckData(int n,
   tmp_trailer.SetBuffer(GetRawTrlBufPtr(n));
   unsigned int xor_chksum = CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - tmp_trailer.GetTrlNwords());
   if (tmp_trailer.GetChksum() != xor_chksum) {
-    sprintf(err_buf, "CORRUPTED DATA: PostRawCOPPERFormat_latest checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n %s %s %d\n",
+    sprintf(err_buf, "CORRUPTED DATA: checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n %s %s %d\n",
             n, GetBlockNwords(n), *cur_evenum_rawcprhdr, tmp_trailer.GetChksum(), xor_chksum,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
@@ -195,8 +197,8 @@ void PostRawCOPPERFormat_latest::CheckData(int n,
     string err_str = err_buf;
     throw (err_str);
 
-//     sleep(1234567);
-//     exit(-1);
+    //     sleep(1234567);
+    //     exit(-1);
   }
 
   return;
@@ -235,7 +237,7 @@ unsigned int PostRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_no
     int prev_runsubrun_no, int* cur_runsubrun_no)
 {
   char err_buf[500];
-  sprintf(err_buf, "This function should be called by PrePostRawCOPPERFormat_latest. Exiting...\n %s %s %d\n",
+  sprintf(err_buf, "This function should be called by PrePostRawCOPPERFormat_***. Exiting...\n %s %s %d\n",
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("Print out variables to reduce unused-variables-warnings : %u %u %u %u %d %d\n",
          m_node_id, m_data_type, m_trunc_mask, prev_eve32, prev_runsubrun_no, *cur_runsubrun_no);
@@ -248,7 +250,7 @@ unsigned int PostRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_no
 int PostRawCOPPERFormat_latest::CheckB2LHSLBMagicWords(int* finesse_buf, int finesse_nwords)
 {
   char err_buf[500];
-  sprintf(err_buf, "This function should be called by PrePostRawCOPPERFormat_latest. Exiting...\n %s %s %d\n",
+  sprintf(err_buf, "This function should be called by PrePostRawCOPPERFormat_***. Exiting...\n %s %s %d\n",
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("Print out variables to reduce unused-variables-warnings : %p %u\n", finesse_buf, finesse_nwords);
   string err_str = err_buf;
@@ -299,15 +301,92 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
 }
 
 
-void PostRawCOPPERFormat_latest::Packer(int* buf_1st, int nwords_1st,
-                                        int* buf_2nd, int nwords_2nd,
-                                        int* buf_3rd, int nwords_3rd,
-                                        int* buf_4th, int nwords_4th,
-                                        RawCOPPERPackerInfo rawcprpacker_info ,
-                                        int format_ver)
+int PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf,
+                                                int* detector_buf_1st,  int nwords_1st,
+                                                int* detector_buf_2nd,  int nwords_2nd,
+                                                int* detector_buf_3rd,  int nwords_3rd,
+                                                int* detector_buf_4th,  int nwords_4th,
+                                                RawCOPPERPackerInfo rawcpr_info)
 {
 
+  int poswords_to = 0;
+  int* detector_buf[ 4 ] = { detector_buf_1st, detector_buf_2nd, detector_buf_3rd, detector_buf_4th };
+  int nwords[ 4 ] = { nwords_1st, nwords_2nd, nwords_3rd, nwords_4th };
 
-  return;
+  // calculate the event length
+  int length_nwords = tmp_header.GetHdrNwords() + SIZE_COPPER_HEADER + SIZE_COPPER_TRAILER + tmp_trailer.GetTrlNwords();
+  for (int i = 0; i < 4; i++) {
+    if (detector_buf[ i ] == NULL || nwords[ i ] <= 0) continue;    // for an empty FINESSE slot
+    length_nwords += nwords[ i ];
+    length_nwords += SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER
+                     + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+  }
+
+  // allocate buffer
+  packed_buf = new int[ length_nwords ];
+  memset(packed_buf, 0, sizeof(int) * length_nwords);
+
+  //
+  // Fill RawHeader
+  //
+  tmp_header.SetBuffer(packed_buf);
+  packed_buf[ tmp_header.POS_NWORDS ] = length_nwords; // total length
+  packed_buf[ tmp_header.POS_VERSION_HDRNWORDS ] = 0x7f7f0000 | ((POST_RAWCOPPER_FORMAT_VER1 << 8) & 0x0000ff00)
+                                                   | tmp_header.RAWHEADER_NWORDS; // ver.#, header length
+  packed_buf[ tmp_header.POS_EXP_RUN_NO ] = (rawcpr_info.exp_num << 22)
+                                            | (rawcpr_info.run_num & 0x003FFFFF);   // exp. and run #
+  packed_buf[ tmp_header.POS_EVE_NO ] = rawcpr_info.eve_num; // eve #
+  packed_buf[ tmp_header.POS_TTCTIME_TRGTYPE ] = (rawcpr_info.tt_ctime & 0x7FFFFFF) << 4;   // tt_ctime
+  packed_buf[ tmp_header.POS_TTUTIME ] = rawcpr_info.tt_utime; // tt_utime
+  packed_buf[ tmp_header.POS_SUBSYS_ID ] = rawcpr_info.node_id; // subsystem(node) ID
+
+  // fill the positions of finesse buffers
+  packed_buf[ tmp_header.POS_OFFSET_1ST_FINESSE ] = tmp_header.RAWHEADER_NWORDS + SIZE_COPPER_HEADER;
+  packed_buf[ tmp_header.POS_OFFSET_2ND_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_1ST_FINESSE ]
+                                                    + nwords[ 0 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+  packed_buf[ tmp_header.POS_OFFSET_3RD_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_2ND_FINESSE ]
+                                                    + nwords[ 1 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+  packed_buf[ tmp_header.POS_OFFSET_4TH_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_3RD_FINESSE ]
+                                                    + nwords[ 2 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+  poswords_to += tmp_header.GetHdrNwords();
+
+  // Fill COPPER header
+  poswords_to += SIZE_COPPER_HEADER;
+
+  // Fill FINESSE buffer
+  for (int i = 0; i < 4; i++) {
+
+    if (detector_buf[ i ] == NULL || nwords[ i ] <= 0) continue;     // for an empty FINESSE slot
+
+    // Fill b2link HSLB header
+    packed_buf[ poswords_to + POS_B2LHSLB_MAGIC ] = 0xffaa0000 | (0xffff & rawcpr_info.eve_num);
+    poswords_to += SIZE_B2LHSLB_HEADER;
+
+    // Fill b2link FEE header
+    packed_buf[ poswords_to + POS_B2LHSLB_MAGIC ] = (rawcpr_info.b2l_ctime & 0x1FFFFFF) << 4;
+    poswords_to += SIZE_B2LFEE_HEADER;
+
+    // copy the 1st Detector Buffer
+    memcpy(packed_buf + poswords_to, detector_buf[ i ], nwords[ i ]*sizeof(int));
+    poswords_to += nwords[ i ];
+
+    // Fill b2link FEE trailer
+    unsigned int crc16 = 0;
+    packed_buf[ poswords_to + POS_B2LFEE_CRC16 ] = ((0xffff & rawcpr_info.eve_num) << 16) | (crc16 & 0xffff);
+    poswords_to += SIZE_B2LFEE_TRAILER;
+
+    // Fill b2link HSLB trailer
+    poswords_to += SIZE_B2LHSLB_TRAILER;
+
+  }
+
+  // Fill COPPER trailer
+  poswords_to += SIZE_COPPER_TRAILER;
+
+  // Fill RawTrailer
+  packed_buf[ poswords_to + tmp_trailer.POS_TERM_WORD ] = tmp_trailer.MAGIC_WORD_TERM_TRAILER;
+  poswords_to += tmp_trailer.GetTrlNwords();
+
+  return poswords_to;
 }
 

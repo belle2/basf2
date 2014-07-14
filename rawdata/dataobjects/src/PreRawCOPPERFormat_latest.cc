@@ -156,8 +156,8 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
     sprintf(err_buf, "No HSLB data in COPPER data. Exiting...\n%s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf; throw (err_str);
-//     sleep(12345678);
-//     exit(-1);
+    //     sleep(12345678);
+    //     exit(-1);
   }
 
   if (err_flag == 1) {
@@ -169,8 +169,8 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
     printf("[DEBUG] [ERROR] %s\n", err_buf);
 #ifndef NO_DATA_CHECK
     string err_str = err_buf; throw (err_str);
-//     sleep(12345678);
-//     exit(-1);
+    //     sleep(12345678);
+    //     exit(-1);
 
 #endif //NO_DATA_CHECK
   }
@@ -182,9 +182,9 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
   sprintf(err_buf, "You need comment out READ_OLD_B2LFEE_FORMAT_FILE if you are handling a new data format\n%s %s %d\n",
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   string err_str = err_buf; throw (err_str);
-//   sleep(12345678);
-//   exit(1);
-//   return 0;
+  //   sleep(12345678);
+  //   exit(1);
+  //   return 0;
 
 #endif // READ_OLD_B2LFEE_FORMAT_FILE
 
@@ -228,11 +228,13 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   // Check incrementation of event #
   //
   *cur_runsubrun_no = GetRunNoSubRunNo(n);
+  if (
 #ifdef WO_FIRST_EVENUM_CHECK
-  if (prev_evenum != 0xFFFFFFFF && *cur_evenum_rawcprhdr != 0)  {
+    prev_evenum != 0xFFFFFFFF && *cur_evenum_rawcprhdr != 0
 #else
-  if (prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0) {
+    prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0
 #endif
+  ) {
     if ((unsigned int)(prev_evenum + 1) != *cur_evenum_rawcprhdr) {
       sprintf(err_buf, "CORRUPTED DATA: Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n%s %s %d\n",
               n, prev_evenum, *cur_evenum_rawcprhdr,
@@ -243,11 +245,13 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
 
 
   *cur_copper_ctr = GetCOPPERCounter(n);
+  if (
 #ifdef WO_FIRST_EVENUM_CHECK
-  if (prev_copper_ctr != 0xFFFFFFFF) {
+    prev_copper_ctr != 0xFFFFFFFF
 #else
-  if (true) {
+    true
 #endif
+  ) {
     if ((unsigned int)(prev_copper_ctr + 1) != *cur_copper_ctr) {
       sprintf(err_buf, "COPPER counter jump : i %d prev 0x%x cur 0x%x :\n%s %s %d\n",
               n, prev_copper_ctr, *cur_copper_ctr,
@@ -330,8 +334,8 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
     PrintData(GetBuffer(n), GetBlockNwords(n));
     string err_str = err_buf;
     throw (err_str);
-//     sleep(1234567);
-//     exit(-1);
+    //     sleep(1234567);
+    //     exit(-1);
   }
 
   return;
@@ -393,8 +397,8 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
     sprintf(err_buf, "CORRUPTED DATA: mismatch over FINESSEs. Exiting...\n %s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf; throw (err_str);
-//     sleep(1234567);
-//     exit(1);
+    //     sleep(1234567);
+    //     exit(1);
   }
   return;
 }
@@ -466,8 +470,8 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
             "No FINESSE data in a copper data block. Exiting...\n %s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf; throw (err_str);
-//     sleep(12345678);
-//     exit(-1);
+    //     sleep(12345678);
+    //     exit(-1);
   }
 
   //
@@ -482,16 +486,16 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   m_buffer[ tmp_header.POS_NWORDS ] = datablock_nwords;
 
 
-//   if( m_buffer[ tmp_header.RAWHEADER_NWORDS + SIZE_COPPER_HEADER
-//    + SIZE_B2LHSLB_HEADER + POS_TT_UTIME ] !=
-//       m_buffer[ datablock_nwords - tmp_trailer.RAWTRAILER_NWORDS
-//    - SIZE_COPPER_DRIVER_TRAILER - SIZE_B2LHSLB_TRAILER
-//    - (SIZE_B2LFEE_TRAILER - POS_TT_CTIME_B2LFEE ) ] ){
-//     char err_buf[500];
-//     sprintf(err_buf, "CORRUPTED DATA: You may be using an old b2tt core in FEE firmware. Please read Nakao-san's e-mail(b2link_ml:0143  Belle2link version 0.01 -SVN update ) and use the latest b2tt core. Exiting...\n %s %s %d\n",  __FILE__, __PRETTY_FUNCTION__, __LINE__);
-//     sprintf(err_buf, "%s %s %d\n",  __FILE__, __PRETTY_FUNCTION__, __LINE__);
-//     string err_str = err_buf; throw (err_str);
-//   }
+  //   if( m_buffer[ tmp_header.RAWHEADER_NWORDS + SIZE_COPPER_HEADER
+  //    + SIZE_B2LHSLB_HEADER + POS_TT_UTIME ] !=
+  //       m_buffer[ datablock_nwords - tmp_trailer.RAWTRAILER_NWORDS
+  //    - SIZE_COPPER_DRIVER_TRAILER - SIZE_B2LHSLB_TRAILER
+  //    - (SIZE_B2LFEE_TRAILER - POS_TT_CTIME_B2LFEE ) ] ){
+  //     char err_buf[500];
+  //     sprintf(err_buf, "CORRUPTED DATA: You may be using an old b2tt core in FEE firmware. Please read Nakao-san's e-mail(b2link_ml:0143  Belle2link version 0.01 -SVN update ) and use the latest b2tt core. Exiting...\n %s %s %d\n",  __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  //     sprintf(err_buf, "%s %s %d\n",  __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  //     string err_str = err_buf; throw (err_str);
+  //   }
 
 
   //
@@ -504,8 +508,8 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
             m_nwords, m_buffer[ tmp_header.POS_NWORDS ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf; throw (err_str);
-//     sleep(12345678);
-//     exit(-1);
+    //     sleep(12345678);
+    //     exit(-1);
   }
 
   //
@@ -580,8 +584,8 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
             chksum_body, m_buffer[ body_end ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf; throw (err_str);
-//     sleep(12345678);
-//     exit(-1);
+    //     sleep(12345678);
+    //     exit(-1);
   }
 
   //
@@ -627,8 +631,8 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
 #ifndef NO_DATA_CHECK
     string err_str = err_buf; throw (err_str);
 
-//     sleep(12345678);
-//     exit(-1);
+    //     sleep(12345678);
+    //     exit(-1);
 #endif
   }
 
@@ -644,12 +648,13 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
 
   *cur_runsubrun_no = GetRunNoSubRunNo(datablock_id);
   if (prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0) {
+    if (
 #ifdef WO_FIRST_EVENUM_CHECK
-    if ((prev_eve32 + 1 != cur_ftsw_eve32) && (prev_eve32 != 0xFFFFFFFF && cur_ftsw_eve32 != 0)) {
+      (prev_eve32 + 1 != cur_ftsw_eve32) && (prev_eve32 != 0xFFFFFFFF && cur_ftsw_eve32 != 0)
 #else
-    if (prev_eve32 + 1 != cur_ftsw_eve32) {
+      prev_eve32 + 1 != cur_ftsw_eve32
 #endif
-
+    ) {
 #ifndef NO_DATA_CHECK
       char err_buf[500];
       sprintf(err_buf, "CORRUPTED DATA: Invalid event_number. Exiting...: cur 32bit eve %u preveve %u prun %d crun %d\n %s %s %d\n",  cur_ftsw_eve32, prev_eve32,
@@ -698,8 +703,8 @@ void PreRawCOPPERFormat_latest::CheckB2LFEEHeaderVersion(int n)
         sprintf(err_buf, "FTSW and b2tt firmwares are old. Exiting...\n %s %s %d\n",
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         string err_str = err_buf; throw (err_str);
-//         sleep(12345678);
-//         exit(-1);
+        //         sleep(12345678);
+        //         exit(-1);
 #endif
       } else {
         // this word for 32bit unixtime
@@ -714,8 +719,8 @@ void PreRawCOPPERFormat_latest::CheckB2LFEEHeaderVersion(int n)
       sprintf(err_buf, "PreRawCOPPERFormat_latest contains no FINESSE data. Exiting...\n %s %s %d\n",
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       string err_str = err_buf; throw (err_str);
-//       sleep(12345678);
-//      exit(-1);
+      //       sleep(12345678);
+      //      exit(-1);
 #endif
     }
   }
@@ -1029,17 +1034,16 @@ int PreRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
 
 }
 
-void PreRawCOPPERFormat_latest::Packer(int* buf_1st, int nwords_1st,
-                                       int* buf_2nd, int nwords_2nd,
-                                       int* buf_3rd, int nwords_3rd,
-                                       int* buf_4th, int nwords_4th,
-                                       RawCOPPERPackerInfo rawcprpacker_info ,
-                                       int format_ver)
+int PreRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf,
+                                               int* buf_1st, int nwords_1st,
+                                               int* buf_2nd, int nwords_2nd,
+                                               int* buf_3rd, int nwords_3rd,
+                                               int* buf_4th, int nwords_4th,
+                                               RawCOPPERPackerInfo rawcprpacker_info)
 {
-
-
-  return;
+  char err_buf[500];
+  sprintf(err_buf, "This function is not supported . Exiting...\n%s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  string err_str = err_buf;
+  throw (err_str);
 }
-
-
-

@@ -22,6 +22,9 @@
 
 #include <TObject.h>
 
+// version #
+#define POST_RAWCOPPER_FORMAT_VER1 1
+
 using namespace std;
 //#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 
@@ -146,12 +149,12 @@ namespace Belle2 {
     int CheckCRC16(int n, int finesse_num);
 
     //! Pack data (format ver. = -1 -> Select the latest format version)
-    void Packer(int* buf_1st, int nwords_1st,
-                int* buf_2nd, int nwords_2nd,
-                int* buf_3rd, int nwords_3rd,
-                int* buf_4th, int nwords_4th,
-                RawCOPPERPackerInfo rawcprpacker_info ,
-                int format_ver);
+    int PackDetectorBuf(int* packed_buf,
+                        int* detector_buf_1st, int nwords_1st,
+                        int* detector_buf_2nd, int nwords_2nd,
+                        int* detector_buf_3rd, int nwords_3rd,
+                        int* detector_buf_4th, int nwords_4th,
+                        RawCOPPERPackerInfo rawcprpacker_info);
 
     //
     // size of "COPPER front header" and "COPPER trailer"

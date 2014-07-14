@@ -231,9 +231,10 @@ namespace Belle2 {
         // make relations:
         track->addRelationTo(topL);
         topL->addRelationTo(extHit);
-        const TOPBarHit* barHit = particle->getRelated<TOPBarHit>(m_inputBarHits);
-        topL->addRelationTo(barHit);
-
+        if (particle) {
+          const TOPBarHit* barHit = particle->getRelated<TOPBarHit>(m_inputBarHits);
+          topL->addRelationTo(barHit);
+        }
       }
 
     }

@@ -97,9 +97,12 @@ namespace Belle2 {
 
     bool Muon_Cathegory();   /** prepare input values for the NN specialized for Muons */
 
-    bool Kaon_Category();   /** prepare input values for the NN specialized for Muons */
+    bool Kaon_Category();   /** prepare input values for the NN specialized for Kaons */
 
-    TMVAInterface::Teacher* teacher; //
+    bool SlowPion_Category();   /** prepare input values for the NN specialized for slow Pions */
+
+    TMVAInterface::Teacher* teacher_Kaon;
+    TMVAInterface::Teacher* teacher_SlowPion;
 
     /**
      * Variables needed for the Muon Cathegory

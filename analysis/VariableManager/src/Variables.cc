@@ -286,6 +286,15 @@ namespace Belle2 {
       return pid->getProbability(Const::pion, Const::electron);
     }
 
+    double particlePionvsElectrondEdxId(const Particle* part)
+    {
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
+      if (!pid) return 0.5;
+
+      Const::PIDDetectorSet set = Const::CDC + Const::SVD;
+      return pid->getProbability(Const::pion, Const::electron);
+    }
+
     double particleElectrondEdxId(const Particle* part)
     {
       const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
@@ -616,11 +625,21 @@ namespace Belle2 {
     double isKaon(const Particle* part)
     {
       const MCParticle* mcParticle = part->getRelated<MCParticle>();
-      if (mcParticle == nullptr) {return -1.0;} //if there is no mcparticle (e.g. not in training modus
+      if (mcParticle == nullptr) {return -1.0;} //if there is no mcparticle (e.g. not in training modus)
       else if ((TMath::Abs(mcParticle->getPDG()) == 321) && (TMath::Abs(mcParticle->getMother()->getPDG()) == 511)) {
         return 1.0;
       } else if (TMath::Abs(mcParticle->getMother()->getMother() != nullptr && TMath::Abs(mcParticle->getPDG()) == 321) && (TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511)) {
         //first check if there was a mother otherwise seg fault
+        return 1.0;
+      } else return 0.0;
+    }
+
+
+    double isSlowPion(const Particle* part)
+    {
+      const MCParticle* mcParticle = part->getRelated<MCParticle>();
+      if (mcParticle == nullptr) {return -1.0;} //if there is no mcparticle (e.g. not in training modus)
+      else if ((TMath::Abs(mcParticle->getPDG()) == 211) && (TMath::Abs(mcParticle->getMother()->getPDG()) == 413) && (TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511)) {
         return 1.0;
       } else return 0.0;
     }
@@ -1609,6 +1628,7 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("K_vs_piid", particleKaonId, "kaon vs pion identification probability");
     REGISTER_VARIABLE("pi_vs_eid", particlePionvsElectronId, "pion vs electron identification probability");
+    REGISTER_VARIABLE("pi_vs_edEdxid", particlePionvsElectrondEdxId, "pion vs electron identification probability from dEdx measurement");
 
     REGISTER_VARIABLE("eid_dEdx", particleElectrondEdxId, "electron identification probability from dEdx measurement");
     REGISTER_VARIABLE("muid_dEdx", particleMuondEdxId, "muon identification probability from dEdx measurement");
@@ -1653,6 +1673,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("abs_mcPDG", particleAbsMCMatchPDGCode, "The absolute PDG code of matched MCParticle");
     REGISTER_VARIABLE("mcStatus", particleMCMatchStatus,  "The bit pattern indicating the quality of MC match (see MCMatching::MCMatchStatus)");
     REGISTER_VARIABLE("isKaon", isKaon,  "Checks if the track (given as a dummy particle) was really a Kaon. 1.0 if true otherwise 0.0");
+    REGISTER_VARIABLE("isSlowPion", isSlowPion,  "Checks if the track (given as a dummy particle) was really a Kaon. 1.0 if true otherwise 0.0");
 
     VARIABLE_GROUP("Rest Of Event");
     REGISTER_VARIABLE("isInRestOfEvent",  isInRestOfEvent,  "1.0 of track, cluster of given particle is found in rest of event. 0 otherwise.");

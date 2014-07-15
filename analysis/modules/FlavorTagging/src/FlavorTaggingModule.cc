@@ -86,14 +86,22 @@ namespace Belle2 {
 
   void FlavorTaggingModule::initialize()
   {
+    StoreArray<MCParticle>::optional();
+    //store array for dummy particle:
+    StoreArray<Particle>::required(); //if we don't need them anymore, ok. If not, we have to adapt it for each category.
     //training definition for kaon-tracks
     //target & variables defined in PSelectorFunctions
-    std::string target = "isKaon";
-    std::vector<std::string> variables = {"charge", "p_CMS", "cosTheta", "K_vs_piid"};
+    std::string target_Kaon = "isKaon";
+    std::string target_SlowPion = "isSlowPion"; //implement and change!
+    std::vector<std::string> variables_Kaon = {"charge", "p_CMS", "cosTheta", "K_vs_piid"};
+    std::vector<std::string> variables_SlowPion = {"charge", "p", "cosTheta", "pi_vs_edEdxid"}; //a_thrust is missing
     //choose method
-    TMVAInterface::Method method1("FastBDT", "Plugin", "H:!V:CreateMVAPdfs:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3", variables);
-    TMVAInterface::Method method2("Fisher", "Fisher", "H:!V:Fisher:VarTransform=None:CreateMVAPdfs:PDFInterpolMVAPdf=Spline2:NbinsMVAPdf=50:NsmoothMVAPdf=10", variables);
-    teacher = new TMVAInterface::Teacher("training_kaon", ".", target, {method1, method2});
+    TMVAInterface::Method method_Kaon_1("FastBDT", "Plugin", "H:!V:CreateMVAPdfs:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3", variables_Kaon);
+    TMVAInterface::Method method_Kaon_2("Fisher", "Fisher", "H:!V:Fisher:VarTransform=None:CreateMVAPdfs:PDFInterpolMVAPdf=Spline2:NbinsMVAPdf=50:NsmoothMVAPdf=10", variables_Kaon);
+    TMVAInterface::Method method_SlowPion_1("FastBDT", "Plugin", "H:!V:CreateMVAPdfs:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3", variables_SlowPion);
+    TMVAInterface::Method method_SlowPion_2("Fisher", "Fisher", "H:!V:Fisher:VarTransform=None:CreateMVAPdfs:PDFInterpolMVAPdf=Spline2:NbinsMVAPdf=50:NsmoothMVAPdf=10", variables_SlowPion);
+    teacher_Kaon = new TMVAInterface::Teacher("training_Kaon", ".", target_Kaon, {method_Kaon_1, method_Kaon_2});
+    teacher_SlowPion = new TMVAInterface::Teacher("training_SlowPion", ".", target_SlowPion, {method_SlowPion_1, method_SlowPion_2});
   }
 
   void FlavorTaggingModule::beginRun()
@@ -119,6 +127,7 @@ namespace Belle2 {
         getMC_PDGcodes();
         //Muon_Cathegory();
         Kaon_Category();
+        SlowPion_Category();
       };
       if (!ok) toRemove.push_back(i);
     }
@@ -208,24 +217,6 @@ namespace Belle2 {
     return pid_Likelihood->getProbability(Const::muon, Const::pion, Const::PIDDetectorSet::set());
   }
 
-  /** //allready defined in PSelectorFunctions
-    double PID_Likelihood_Kaon(Track* track){
-    const PIDLikelihood* pid_Likelihood = track->getRelated<PIDLikelihood>();
-    return pid_Likelihood->getProbability(Const::kaon, Const::pion, Const::PIDDetectorSet::set());
-  }
-
-    double target_Kaon(Track* track){
-   const MCParticle* mcParticle = track->getRelated<MCParticle>();
-     if ((TMath::Abs(mcParticle->getPDG()) == 321) && (TMath::Abs(mcParticle->getMother()->getPDG()) == 511)){
-       return 1.0;
-     }
-   else if (((TMath::Abs(mcParticle->getPDG()) == 321) && (TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511)){ //Is double get Mother possible?
-       return 1.0;
-     }
-   else return 0.0;
-  }
-  **/
-
   bool FlavorTaggingModule::Muon_Cathegory()
   {
     //B-> Mu + Anti-v + X
@@ -290,13 +281,44 @@ namespace Belle2 {
       const MCParticle* mcParticle = tracki->getRelated<MCParticle>();
       if (pid) p->addRelationTo(pid);
       if (mcParticle) p->addRelationTo(mcParticle);
-      teacher->addSample(p); //endrun
+      teacher_Kaon->addSample(p); //endrun
     }
 
 
     return true;
   }
 
+//Slow Pion Category
+  bool FlavorTaggingModule::SlowPion_Category()
+  {
+    //B->  D*-(Dbar0 pion-) X
+    //write target
+    //for storing dummy-particle in datastore - otherwise we cannot set a relation
+    //adapt everything.
+    StoreArray<Particle> particles;
+
+    for (unsigned int i = 0; i < m_tagTracks.size(); i++) {
+
+      const Track* tracki = m_tagTracks[i];
+      const TrackFitResult* trakiRes = NULL;
+
+      if (tracki) trakiRes = tracki->getTrackFitResult(Const::pion);
+      if (!trakiRes) continue;
+
+      //make a dummy particle from track
+      Particle* p = particles.appendNew(tracki, Const::pion);
+
+      //add a relation: dummy particle related to its mcparticle and pid likelihood - now we can use PSelectorFunctions!
+      const PIDLikelihood* pid = tracki->getRelated<PIDLikelihood>();
+      const MCParticle* mcParticle = tracki->getRelated<MCParticle>();
+      if (pid) p->addRelationTo(pid);
+      if (mcParticle) p->addRelationTo(mcParticle);
+      teacher_SlowPion->addSample(p); //endrun
+    }
+
+
+    return true;
+  }
 
   void FlavorTaggingModule::endRun()
   {
@@ -306,9 +328,11 @@ namespace Belle2 {
   void FlavorTaggingModule::terminate()
   {
     //performs the training
-    teacher->train();
+    teacher_Kaon->train();
+    teacher_SlowPion->train();
 
-    delete teacher;
+    delete teacher_Kaon;
+    delete teacher_SlowPion;
 
   }
 

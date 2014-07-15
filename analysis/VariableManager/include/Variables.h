@@ -164,6 +164,16 @@ namespace Belle2 {
     double particleElectronId(const Particle* part);
 
     /**
+     * return pion vs electron Id
+     */
+    double particlePionvsElectronId(const Particle* part);
+
+    /**
+     * return pion vs electron Id from dEdx measurement
+     */
+    double particlePionvsElectrondEdxId(const Particle* part);
+
+    /**
      * return electron Id
      */
     double particleElectrondEdxId(const Particle* part);
@@ -356,6 +366,11 @@ namespace Belle2 {
      * return 1 if Particle was in RestOfEventObject, 0 otherwise
      */
     double isInRestOfEvent(const Particle* particle);
+
+    /**
+     * return 1 if (dummy) Particle was a slow Pion, 0 otherwise
+     */
+    double isSlowPion(const Particle* part);
 
     /**
      * return number of remaining tracks as given by the related RestOfEvent object

@@ -526,6 +526,11 @@ namespace Belle2 {
      */
     void print() const;
 
+    /**
+     * Remove extra info
+     */
+    void removeExtraInfo();
+
     /** Return given value if set.
      *
      * throws std::runtime_error if variable is not set.

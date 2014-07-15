@@ -659,6 +659,11 @@ bool Particle::hasExtraInfo(const std::string& name) const
   return true;
 }
 
+void Particle::removeExtraInfo()
+{
+  m_extraInfo.clear();
+}
+
 float Particle::getExtraInfo(const std::string& name) const
 {
   if (m_extraInfo.empty())

@@ -12,6 +12,7 @@
 #include <analysis/modules/TMVAExpert/TMVAExpertModule.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/VariableManager/Manager.h>
 
@@ -63,6 +64,8 @@ namespace Belle2 {
 
     if (m_listNames.empty()) {
       StoreObjPtr<EventExtraInfo>::registerPersistent("", DataStore::c_Event, false);
+    } else {
+      StoreObjPtr<ParticleExtraInfoMap>::registerPersistent("", DataStore::c_Event, false); //allow reregistration
     }
 
     m_method = new TMVAInterface::Expert(m_methodPrefix, m_workingDirectory, m_methodName, m_signalClass);

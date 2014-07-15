@@ -87,6 +87,11 @@ namespace Belle2 {
     }
 
     Particles.create();
+    StoreObjPtr<ParticleExtraInfoMap> particleExtraInfoMap;
+    if (not particleExtraInfoMap) {
+      particleExtraInfoMap.create();
+    }
+
     if (m_useMCParticles)
       loadFromMCParticles();
     else

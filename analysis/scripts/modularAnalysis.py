@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+import os
 
 analysis_main = create_path()
 
@@ -397,6 +398,68 @@ def makeParticle(
     path.add_module(pmake)
 
 
+def trainTMVAMethod(
+    decayString,
+    variables,
+    methods=[('FastBDT', 'Plugin',
+             '!H:!V:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3'
+             )],
+    target='isSignal',
+    prefix='TMVA',
+    path=analysis_main,
+    ):
+    """
+    Trains a TMVA Method
+    @param decayString   specifies type of Particles and determines the name of the ParticleList
+    @param variables list of variables which are registered in the VariableManager
+    @param methods list of tuples (name, type, config) of the TMVA methods
+    @param target variable registered in VariableManager which is used as target
+    @param prefix prefix which is used to identify the weight files created by TMVA
+    @param path         modules are added to this path
+    """
+
+    teacher = register_module('TMVATeacher')
+    teacher.param('prefix', prefix)
+    teacher.param('methods', methods)
+    teacher.param('variables', variables)
+    teacher.param('target', target)
+    teacher.param('listNames', decayString)
+    path.add_module(teacher)
+
+
+def applyTMVAMethod(
+    decayString,
+    method='FastBDT',
+    signalProbabilityName='isSignal',
+    prefix='TMVA',
+    path=analysis_main,
+    ):
+    """
+    Applies a trained TMVA method to a particle list
+    @param decayString   specifies type of Particles and determines the name of the ParticleList
+    @param method name of the TMVA method
+    @param target name which is used to store signalProbability in extra info of the particle
+    @param prefix prefix which is used to identify the weight files created by TMVA
+    @param path         modules are added to this path
+    """
+
+    expert = register_module('TMVAExpert')
+    expert.param('prefix', prefix)
+    expert.param('method', method)
+    expert.param('listNames', decayString)
+    expert.param('signalProbabilityName', signalProbabilityName)
+    path.add_module(expert)
+
+
+def isTMVAMethodAvailable(prefix='TMVA'):
+    """
+    True of a TMVA method with the given prefix was trained
+    @param prefix prefix which is used to identify the weight files created by TMVA
+    """
+
+    return os.path.isfile(prefix + '.config')
+
+
 def fitVertex(
     list_name,
     conf_level,
@@ -677,6 +740,30 @@ def ntupleTree(
     ntmaker.param('listName', list_name)
     ntmaker.param('tools', tools)
     path.add_module(ntmaker)
+
+
+def variablesToNTuple(
+    decayString,
+    variables,
+    treename='variables',
+    filename='ntuple.root',
+    path=analysis_main,
+    ):
+    """
+    Creates and fills a flat ntuple with the specified variables from the VariableManager
+    @param decayString   specifies type of Particles and determines the name of the ParticleList
+    @param variables variables which must be registered in the VariableManager
+    @param treename name of the ntuple tree
+    @param filename which is used to store the variables
+    @param path basf2 path
+    """
+
+    output = register_module('VariablesToNtuple')
+    output.param('particleList', decayString)
+    output.param('variables', variables)
+    output.param('fileName', filename)
+    output.param('treeName', treename)
+    path.add_module(output)
 
 
 def findMCDecay(

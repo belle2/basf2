@@ -116,7 +116,7 @@ def SignalProbability(path, particleName, channelName, mvaConfig, particleList, 
         teacher.param('variables', mvaConfig.variables)
         teacher.param('target', mvaConfig.target)
         teacher.param('listNames', [particleList])
-        teacher.param('maxEventsPerClass', 1000000)
+        teacher.param('maxEventsPerClass', 10000000)
         teacher.param('doNotTrain', True)
         path.add_module(teacher)
         B2INFO("Calculate SignalProbability for channel " + channelName + " and charged conjugated. Create root file with variables first.")
@@ -129,7 +129,7 @@ def SignalProbability(path, particleName, channelName, mvaConfig, particleList, 
                         " --maxEventsPerClass {maxEvents}".format(name=mvaConfig.name, type=mvaConfig.type, config=mvaConfig.config,
                                                                   target=mvaConfig.target, variables="' '".join(mvaConfig.variables),
                                                                   foption='!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification',
-                                                                  poption='SplitMode=random:!V', maxEvents=1000000,
+                                                                  poption='SplitMode=random:!V', maxEvents=10000000,
                                                                   prefix=particleList + '_' + hash), shell=True)
 
     if os.path.isfile(configFilename):
@@ -262,7 +262,7 @@ def PostCutDetermination(particleName, postCutConfig, signalProbability):
         @param signalProbability of the particle
     """
     B2INFO("Calculate post cut for particle " + particleName + " and charged conjugated.")
-    return {'PostCut_' + particleName: {'cutstring': '0.1 < getExtraInfo(SignalProbability)', 'range': (0.1, 1)}}
+    return {'PostCut_' + particleName: {'cutstring': str(postCutConfig.value) + ' < getExtraInfo(SignalProbability)', 'range': (postCutConfig.value, 1)}}
 
 
 def WriteAnalysisFileForChannel(particleName, channelName, channelList, preCutConfig, preCutHistogram, preCut, mvaConfig, signalProbability):

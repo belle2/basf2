@@ -17,6 +17,7 @@
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 // dataobjects
 #include <analysis/dataobjects/RestOfEvent.h>
@@ -37,6 +38,7 @@
 #include <TVectorF.h>
 
 #include <iostream>
+#include <algorithm>
 #include <cmath>
 
 using namespace std;
@@ -624,6 +626,24 @@ namespace Belle2 {
     }
 
     // RestOfEvent related --------------------------------------------------
+
+    double isInRestOfEvent(const Particle* particle)
+    {
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      const auto& tracks = roe->getTracks();
+      if (std::find(tracks.begin(), tracks.end(), particle->getTrack()) != tracks.end()) {
+        return 1.0;
+      }
+      const auto& klm = roe->getKLMClusters();
+      if (std::find(klm.begin(), klm.end(), particle->getKLMCluster()) != klm.end()) {
+        return 1.0;
+      }
+      const auto& ecl = roe->getECLClusters();
+      if (std::find(ecl.begin(), ecl.end(), particle->getECLCluster()) != ecl.end()) {
+        return 1.0;
+      }
+      return 0;
+    }
 
     double nROETracks(const Particle* particle)
     {
@@ -1622,6 +1642,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("isKaon", isKaon,  "Checks if the track (given as a dummy particle) was really a Kaon. 1.0 if true otherwise 0.0");
 
     VARIABLE_GROUP("Rest Of Event");
+    REGISTER_VARIABLE("isInRestOfEvent",  isInRestOfEvent,  "1.0 of track, cluster of given particle is found in rest of event. 0 otherwise.");
     REGISTER_VARIABLE("nROETracks",  nROETracks,  "number of remaining tracks as given by the related RestOfEvent object");
     REGISTER_VARIABLE("nROEClusters", nROEClusters, "number of remaining ECL clusters as given by the related RestOfEvent object");
 

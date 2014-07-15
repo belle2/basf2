@@ -66,12 +66,12 @@ void PrintDataTemplateModule::initialize()
 
 void PrintDataTemplateModule::printBuffer(int* buf, int nwords)
 {
-  printf("%.8x :", 0);
+  //  printf("%.8x :", 0);
   for (int j = 0; j < nwords; j++) {
     printf(" %.8x", buf[ j ]);
     if ((j + 1) % 10 == 0) {
-      //    if ((m_print_cnt + 1) % 10 == 0) {
-      printf("\n%.8x :", j + 1);
+      //      printf("\n%.8x :", j + 1);
+      printf("\n");
     }
     m_print_cnt++;
   }
@@ -180,7 +180,7 @@ void PrintDataTemplateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
          raw_copper->GetBlockNwords(i) * sizeof(int));
 
   //#ifdef DEBUG
-  printf("******* Raw COPPER data block(including Detector Buffer)**********\n");
+  printf("===== Raw COPPER data block(including 4 FINESSE buffers )\n");
   printBuffer(raw_copper->GetBuffer(i), raw_copper->GetBlockNwords(i));
 
 //   if (!(raw_copper->CheckCOPPERMagic( i ))) {
@@ -201,42 +201,42 @@ void PrintDataTemplateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
   // Print data from each FINESSE
   //
   if (raw_copper->Get1stFINESSENwords(i) > 0) {
-    printf("## FINESSE  Buffer(FINESSE A) 0x%x words \n", raw_copper->Get1stDetectorNwords(i));
+    printf("===== FINESSE  Buffer(FINESSE A) 0x%x words \n", raw_copper->Get1stDetectorNwords(i));
     printBuffer(raw_copper->Get1stFINESSEBuffer(i), raw_copper->Get1stFINESSENwords(i));
   }
 
   if (raw_copper->Get1stDetectorNwords(i) > 0) {
-    printf("== Detector Buffer(FINESSE A) 0x%x words \n", raw_copper->Get1stDetectorNwords(i));
+    printf("===== Detector Buffer(FINESSE A) 0x%x words \n", raw_copper->Get1stDetectorNwords(i));
     printBuffer(raw_copper->Get1stDetectorBuffer(i), raw_copper->Get1stDetectorNwords(i));
   }
-
+  printf("\n");
   if (raw_copper->Get2ndFINESSENwords(i) > 0) {
-    printf("## FINESSE  Buffer(FINESSE A) 0x%x words \n", raw_copper->Get2ndDetectorNwords(i));
+    printf("===== FINESSE  Buffer(FINESSE B) 0x%x words \n", raw_copper->Get2ndDetectorNwords(i));
     printBuffer(raw_copper->Get2ndFINESSEBuffer(i), raw_copper->Get2ndFINESSENwords(i));
   }
 
   if (raw_copper->Get2ndDetectorNwords(i) > 0) {
-    printf("== Detector Buffer(FINESSE B)\n");
+    printf("====== Detector Buffer(FINESSE B)\n");
     printBuffer(raw_copper->Get2ndDetectorBuffer(i), raw_copper->Get2ndDetectorNwords(i));
   }
-
+  printf("\n");
   if (raw_copper->Get3rdFINESSENwords(i) > 0) {
-    printf("## FINESSE  Buffer(FINESSE A) 0x%x words \n", raw_copper->Get3rdDetectorNwords(i));
+    printf("===== FINESSE  Buffer(FINESSE C) 0x%x words \n", raw_copper->Get3rdDetectorNwords(i));
     printBuffer(raw_copper->Get3rdFINESSEBuffer(i), raw_copper->Get3rdFINESSENwords(i));
   }
 
   if (raw_copper->Get3rdDetectorNwords(i) > 0) {
-    printf("== Detector Buffer(FINESSE C)\n");
+    printf("===== Detector Buffer(FINESSE C)\n");
     printBuffer(raw_copper->Get3rdDetectorBuffer(i), raw_copper->Get3rdDetectorNwords(i));
   }
-
+  printf("\n");
   if (raw_copper->Get4thFINESSENwords(i) > 0) {
-    printf("## FINESSE  Buffer(FINESSE A) 0x%x words \n", raw_copper->Get4thDetectorNwords(i));
+    printf("===== FINESSE  Buffer(FINESSE D) 0x%x words \n", raw_copper->Get4thDetectorNwords(i));
     printBuffer(raw_copper->Get4thFINESSEBuffer(i), raw_copper->Get4thFINESSENwords(i));
   }
 
   if (raw_copper->Get4thDetectorNwords(i) > 0) {
-    printf("== Detector Buffer(FINESSE D)\n");
+    printf("===== Detector Buffer(FINESSE D)\n");
     printBuffer(raw_copper->Get4thDetectorBuffer(i), raw_copper->Get4thDetectorNwords(i));
   }
 
@@ -309,7 +309,7 @@ void PrintDataTemplateModule::event()
   StoreArray<RawCOPPER> rawcprarray;
   for (int i = 0; i < rawcprarray.getEntries(); i++) {
     for (int j = 0; j < rawcprarray[ i ]->GetNumEntries(); j++) {
-      printf("\n===== DataBlock(RawCOPPER): Block # %d ", i);
+      printf("\n\n===== DataBlock(RawCOPPER): Block # %d ", i);
       printCOPPEREvent(rawcprarray[ i ], j);
     }
   }

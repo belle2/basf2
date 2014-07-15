@@ -54,6 +54,9 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
         def ycut_to_xcuts(channel, cut):
             return (cut, 1)
 
+    else:
+        raise RuntimeError('Given PreCutConfiguration is not implemented. Please check that method and used variables are compatible.')
+
     result = {}
     redo_cuts = True
     while redo_cuts:

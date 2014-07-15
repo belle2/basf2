@@ -40,6 +40,8 @@
 #include <G4SubtractionSolid.hh>
 #include <G4UserLimits.hh>
 
+#include "CLHEP/Units/PhysicalConstants.h"
+
 using namespace std;
 using namespace boost;
 
@@ -418,7 +420,7 @@ namespace Belle2 {
       //-   Tube (virtual tube for radiation level study)
 
       //define geometry
-      G4Tubs* geo_Tube = new G4Tubs("geo_Tube_name", 3995 * mm, 4000 * mm, 29 * m, 0. * deg, 360.*deg);
+      G4Tubs* geo_Tube = new G4Tubs("geo_Tube_name", 3995 * CLHEP::mm, 4000 * CLHEP::mm, 29 * CLHEP::m, 0. * CLHEP::deg, 360.*CLHEP::deg);
       G4Material* mat_Tube = Materials::get("G4_Si");
       G4LogicalVolume* logi_Tube = new G4LogicalVolume(geo_Tube, mat_Tube, "logi_Tube_name");
 
@@ -453,7 +455,7 @@ namespace Belle2 {
 
       //define geometry
       G4Box* geo_polyShieldRx = new G4Box("geo_polyShieldRx_name", PolyShieldR_X, PolyShieldR_Y, PolyShieldR_Z);
-      G4Tubs* geo_polyShieldR_Hole = new G4Tubs("geo_polyShieldRxx_name", 0 * mm, PolyShieldR_r, PolyShieldR_Z, 0. * deg, 360.*deg);
+      G4Tubs* geo_polyShieldR_Hole = new G4Tubs("geo_polyShieldRxx_name", 0 * CLHEP::mm, PolyShieldR_r, PolyShieldR_Z, 0. * CLHEP::deg, 360.*CLHEP::deg);
       G4SubtractionSolid* geo_polyShieldR
         = new G4SubtractionSolid("geo_polyShieldR_name", geo_polyShieldRx, geo_polyShieldR_Hole, transform_polyShieldR_Hole);
 
@@ -486,7 +488,7 @@ namespace Belle2 {
 
       //define geometry
       G4Box* geo_polyShieldLxx = new G4Box("geo_polyShieldLxx_name", PolyShieldL_X, PolyShieldL_Y, PolyShieldL_Z);
-      G4Tubs* geo_polyShieldL_Hole = new G4Tubs("geo_polyShieldLxxx_name", 0 * mm, PolyShieldL_r, PolyShieldL_Z, 0. * deg, 360.*deg);
+      G4Tubs* geo_polyShieldL_Hole = new G4Tubs("geo_polyShieldLxxx_name", 0 * CLHEP::mm, PolyShieldL_r, PolyShieldL_Z, 0. * CLHEP::deg, 360.*CLHEP::deg);
       G4SubtractionSolid* geo_polyShieldLx
         = new G4SubtractionSolid("geo_polyShieldLx_name", geo_polyShieldLxx, geo_polyShieldL_Hole, transform_polyShieldL_Hole);
       G4SubtractionSolid* geo_polyShieldL

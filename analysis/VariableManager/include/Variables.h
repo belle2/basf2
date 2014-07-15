@@ -288,7 +288,10 @@ namespace Belle2 {
        */
     double particleCharge(const Particle* part);
 
-
+    /**
+       * return cosine of angle between thrust axis of given particle and thrust axis of ROE
+       */
+    double cosTPTO(const Particle* part);
 
     /**
      * NeuroBayesifys this function

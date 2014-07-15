@@ -13,22 +13,11 @@
 
 #include <framework/core/Module.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/RestOfEvent.h>
-#include <analysis/dataobjects/ContinuumSuppression.h>
-#include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/utility/Thrust.h>
-#include <analysis/utility/FoxWolfram.h>
-#include <analysis/utility/KsfwMoments.h>
 
 #include <string>
 #include <vector>
 
 namespace Belle2 {
-  /**
-   * \addtogroup modules
-   * @{ ContinuumSuppressionBuilderModule @}
-   */
-
   /**
    * Creates for each Particle in given ParticleList an ContinuumSuppression dataobject and makes BASF2 relation between them.
    *

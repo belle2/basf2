@@ -13,6 +13,8 @@
 
 #include <analysis/modules/FlavorTagging/FlavorTaggingModule.h>
 #include <analysis/TMVAInterface/Teacher.h>
+#include <analysis/TMVAInterface/Expert.h>
+#include <analysis/ContinuumSuppression/ContinuumSuppression.h>
 
 
 // framework - DataStore
@@ -23,7 +25,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/core/ModuleManager.h>
 
-
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
@@ -33,6 +34,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/RestOfEvent.h>
+#include <analysis/dataobjects/ContinuumSuppression.h>
 
 // utilities
 #include <analysis/utility/PCmsLabTransform.h>
@@ -86,22 +88,33 @@ namespace Belle2 {
 
   void FlavorTaggingModule::initialize()
   {
+    //TO DO: choose method etc in steering file also adapt design: see teacher.py
     StoreArray<MCParticle>::optional();
     //store array for dummy particle:
     StoreArray<Particle>::required(); //if we don't need them anymore, ok. If not, we have to adapt it for each category.
-    //training definition for kaon-tracks
-    //target & variables defined in PSelectorFunctions
+    StoreArray<ContinuumSuppression>::registerPersistent();
+    RelationArray::registerPersistent<Particle, ContinuumSuppression>();
+
+    //training definition for Kaons
     std::string target_Kaon = "isKaon";
-    std::string target_SlowPion = "isSlowPion"; //implement and change!
     std::vector<std::string> variables_Kaon = {"charge", "p_CMS", "cosTheta", "K_vs_piid"};
-    std::vector<std::string> variables_SlowPion = {"charge", "p", "cosTheta", "pi_vs_edEdxid"}; //a_thrust is missing
-    //choose method
     TMVAInterface::Method method_Kaon_1("FastBDT", "Plugin", "H:!V:CreateMVAPdfs:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3", variables_Kaon);
     TMVAInterface::Method method_Kaon_2("Fisher", "Fisher", "H:!V:Fisher:VarTransform=None:CreateMVAPdfs:PDFInterpolMVAPdf=Spline2:NbinsMVAPdf=50:NsmoothMVAPdf=10", variables_Kaon);
+    TMVAInterface::Method method_Kaon_3("BDTGradient", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100:BoostType=Grad:Shrinkage=0.10:UseBaggedGrad:GradBaggingFraction=0.5:nCuts=200:MaxDepth=2", variables_Kaon);
+    TMVAInterface::Method method_Kaon_4("PDEFoamBoost", "PDEFoam", "!H:!V:CreateMVAPdfs:Boost_Num=10:Boost_Transform=linear:SigBgSeparate=F:MaxDepth=4:UseYesNoCell=T:DTLogic=MisClassificationError:FillFoamWithOrigWeights=F:TailCut=0:nActiveCells=500:nBin=20:Nmin=400:Kernel=None:Compress=T", variables_Kaon);
+    teacher_Kaon = new TMVAInterface::Teacher("training_Kaon", ".", target_Kaon, {method_Kaon_1, method_Kaon_2, method_Kaon_3, method_Kaon_4});
+
+    //training definition for Slow Pions
+    std::string target_SlowPion = "isSlowPion";
+    std::vector<std::string> variables_SlowPion = {"charge", "p", "cosTheta", "pi_vs_edEdxid", "a_thrust"};
     TMVAInterface::Method method_SlowPion_1("FastBDT", "Plugin", "H:!V:CreateMVAPdfs:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3", variables_SlowPion);
     TMVAInterface::Method method_SlowPion_2("Fisher", "Fisher", "H:!V:Fisher:VarTransform=None:CreateMVAPdfs:PDFInterpolMVAPdf=Spline2:NbinsMVAPdf=50:NsmoothMVAPdf=10", variables_SlowPion);
-    teacher_Kaon = new TMVAInterface::Teacher("training_Kaon", ".", target_Kaon, {method_Kaon_1, method_Kaon_2});
-    teacher_SlowPion = new TMVAInterface::Teacher("training_SlowPion", ".", target_SlowPion, {method_SlowPion_1, method_SlowPion_2});
+    TMVAInterface::Method method_SlowPion_3("BDTGradient", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100:BoostType=Grad:Shrinkage=0.10:UseBaggedGrad:GradBaggingFraction=0.5:nCuts=200:MaxDepth=2", variables_SlowPion);
+    TMVAInterface::Method method_SlowPion_4("PDEFoamBoost", "PDEFoam", "!H:!V:CreateMVAPdfs:Boost_Num=10:Boost_Transform=linear:SigBgSeparate=F:MaxDepth=4:UseYesNoCell=T:DTLogic=MisClassificationError:FillFoamWithOrigWeights=F:TailCut=0:nActiveCells=500:nBin=20:Nmin=400:Kernel=None:Compress=T", variables_SlowPion);
+    teacher_SlowPion = new TMVAInterface::Teacher("training_SlowPion", ".", target_SlowPion, {method_SlowPion_1, method_SlowPion_2, method_SlowPion_3, method_SlowPion_4});
+
+    //further expert definitions
+    //expert_Kaon = new TMVAInterface::Expert("training_Kaon", ".","Fisher",1);
   }
 
   void FlavorTaggingModule::beginRun()
@@ -262,12 +275,13 @@ namespace Belle2 {
   {
     //Bbar-> D+(K- 2pi+) K-
 
-//for storing dummy-particle in datastore - otherwise we cannot set a relation
+    //for storing dummy-particle in datastore - otherwise we cannot set a relation
     StoreArray<Particle> particles;
 
     for (unsigned int i = 0; i < m_tagTracks.size(); i++) {
 
       const Track* tracki = m_tagTracks[i];
+
       const TrackFitResult* trakiRes = NULL;
 
       if (tracki) trakiRes = tracki->getTrackFitResult(Const::kaon); //
@@ -276,14 +290,20 @@ namespace Belle2 {
       //make a dummy particle from track
       Particle* p = particles.appendNew(tracki, Const::kaon);
 
-      //add a relation: dummy particle related to its mcparticle and pid likelihood - now we can use PSelectorFunctions!
+      //add a relation: dummy particle related to its mcparticle and pid likelihood - now we can use Variables!
       const PIDLikelihood* pid = tracki->getRelated<PIDLikelihood>();
       const MCParticle* mcParticle = tracki->getRelated<MCParticle>();
+
+
+      addContinuumSuppression(p);
+      //const ContinuumSuppression* continuumSuppression = p->getRelated<ContinuumSuppression>();
       if (pid) p->addRelationTo(pid);
       if (mcParticle) p->addRelationTo(mcParticle);
-      teacher_Kaon->addSample(p); //endrun
-    }
 
+      teacher_Kaon->addSample(p); //endrun
+
+      //p->addExtraInfo("signalProbabilityKaon", expert_Kaon->analyse(p));
+    }
 
     return true;
   }
@@ -292,9 +312,8 @@ namespace Belle2 {
   bool FlavorTaggingModule::SlowPion_Category()
   {
     //B->  D*-(Dbar0 pion-) X
-    //write target
+
     //for storing dummy-particle in datastore - otherwise we cannot set a relation
-    //adapt everything.
     StoreArray<Particle> particles;
 
     for (unsigned int i = 0; i < m_tagTracks.size(); i++) {
@@ -308,17 +327,24 @@ namespace Belle2 {
       //make a dummy particle from track
       Particle* p = particles.appendNew(tracki, Const::pion);
 
-      //add a relation: dummy particle related to its mcparticle and pid likelihood - now we can use PSelectorFunctions!
+      //add a relation: dummy particle related to its mcparticle and pid likelihood - now we can use Variables!
       const PIDLikelihood* pid = tracki->getRelated<PIDLikelihood>();
       const MCParticle* mcParticle = tracki->getRelated<MCParticle>();
+
+      addContinuumSuppression(p);
+      //const ContinuumSuppression* continuumSuppression = tracki->getRelated<ContinuumSuppression>();
       if (pid) p->addRelationTo(pid);
       if (mcParticle) p->addRelationTo(mcParticle);
-      teacher_SlowPion->addSample(p); //endrun
-    }
 
+      teacher_SlowPion->addSample(p); //endrun
+      //p->addExtraInfo("signalProbabilitySlowPion", expert_SlowPion->analyse(p));
+      //p->getExtraInfo("signalProbabilitySlowPion");
+    }
 
     return true;
   }
+
+//TO DO: add more categories...
 
   void FlavorTaggingModule::endRun()
   {
@@ -327,9 +353,9 @@ namespace Belle2 {
 
   void FlavorTaggingModule::terminate()
   {
-    //performs the training
-    teacher_Kaon->train();
-    teacher_SlowPion->train();
+    //perform training
+    //teacher_Kaon->train();
+    //teacher_SlowPion->train();
 
     delete teacher_Kaon;
     delete teacher_SlowPion;

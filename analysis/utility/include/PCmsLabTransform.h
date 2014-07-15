@@ -69,6 +69,8 @@ namespace Belle2 {
       return m_cmsEnergy;
     }
 
+    static TLorentzVector labToCms(const TLorentzVector&);
+
   private:
     static bool m_initialized;          /**< true when class initialized */
     static TLorentzRotation m_cms2lab;  /**< from CMS to Lab */

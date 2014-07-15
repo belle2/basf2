@@ -22,6 +22,11 @@ TLorentzRotation PCmsLabTransform::m_lab2cms;
 TLorentzVector PCmsLabTransform::m_boost;
 double PCmsLabTransform::m_cmsEnergy(0);
 
+TLorentzVector PCmsLabTransform::labToCms(const TLorentzVector& vector)
+{
+  static PCmsLabTransform T;
+  return T.rotateLabToCms() * vector;
+}
 
 PCmsLabTransform::PCmsLabTransform()
 {

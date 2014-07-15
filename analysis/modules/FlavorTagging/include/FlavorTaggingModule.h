@@ -15,6 +15,7 @@
 #include <framework/core/Module.h>
 
 #include <analysis/TMVAInterface/Teacher.h>
+#include <analysis/TMVAInterface/Expert.h>
 
 #include <mdst/dataobjects/KLMCluster.h>
 #include "mdst/dataobjects/ECLCluster.h"
@@ -103,7 +104,7 @@ namespace Belle2 {
 
     TMVAInterface::Teacher* teacher_Kaon;
     TMVAInterface::Teacher* teacher_SlowPion;
-
+    TMVAInterface::Expert*  expert_Kaon;
     /**
      * Variables needed for the Muon Cathegory
      */

@@ -36,11 +36,13 @@
 
 #include <TLorentzVector.h>
 #include <TVectorF.h>
+#include <TVector3.h>
 
 #include <iostream>
 #include <algorithm>
 #include <cmath>
 
+class getRelatedTo;
 using namespace std;
 
 namespace Belle2 {
@@ -531,9 +533,7 @@ namespace Belle2 {
     double particleCharge(const Particle* part)
     {
       return part->getCharge();
-
     }
-
 
     void printParticleInternal(const Particle* p, int depth)
     {
@@ -559,6 +559,25 @@ namespace Belle2 {
       printParticleInternal(p, 0);
       return 0.0;
     }
+
+    std::ostream& operator<<(std::ostream& str, const TVector3& vector)
+    {
+      str << "X: " << vector.X() << "Y: " << vector.Y() << "Z: " << vector.Z();
+      return str;
+    }
+
+    double cosTPTO(const Particle* p)
+    {
+      const ContinuumSuppression* qq = p->getRelated<ContinuumSuppression>();
+      const TVector3 thrustAxisO = qq->getThrustO();
+      cout << "thrustAxisO" << thrustAxisO << endl;
+
+      const TVector3 pAxis = PCmsLabTransform::labToCms(p->get4Vector()).Vect();
+      cout << "pAxis" << pAxis << endl;
+      double result = fabs(cos(pAxis.Angle(thrustAxisO)));
+      return result;
+    }
+
 
 
 
@@ -1712,6 +1731,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("KLMEnergy", KLMEnergy, "total energy in KLM in the event");
 
     VARIABLE_GROUP("Continuum Suppression");
+    REGISTER_VARIABLE("cosTBTO"  , cosTBTO , "cosine of angle between thrust axis of B and thrust axis of ROE");
+    REGISTER_VARIABLE("cosTBz"   , cosTBz  , "cosine of angle between thrust axis of B and z-axis");
+    REGISTER_VARIABLE("a_thrust"  , cosTPTO , "cosine of angle between thrust axis of given particle and thrust axis of ROE");
     REGISTER_VARIABLE("thrustBm" , thrustBm, "magnitude of the B thrust axis");
     REGISTER_VARIABLE("thrustOm" , thrustOm, "magnitude of the ROE thrust axis");
     REGISTER_VARIABLE("cosTBTO"  , cosTBTO , "cosine of angle between thrust axis of B and thrust axis of ROE");

@@ -1044,6 +1044,19 @@ namespace Belle2 {
       return result;
     }
 
+    double R2(const Particle* particle)
+    {
+      double result = -1.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      result = qq->getR2();
+
+      return result;
+    }
+
     double k0mm2(const Particle* particle)
     {
       double result = -99.0;
@@ -1678,10 +1691,11 @@ namespace Belle2 {
     REGISTER_VARIABLE("KLMEnergy", KLMEnergy, "total energy in KLM in the event");
 
     VARIABLE_GROUP("Continuum Suppression");
-    REGISTER_VARIABLE("cosTBTO"  , cosTBTO , "cosine of angle between thrust axis of B and thrust axis of ROE");
-    REGISTER_VARIABLE("cosTBz"   , cosTBz  , "cosine of angle between thrust axis of B and z-axis");
     REGISTER_VARIABLE("thrustBm" , thrustBm, "magnitude of the B thrust axis");
     REGISTER_VARIABLE("thrustOm" , thrustOm, "magnitude of the ROE thrust axis");
+    REGISTER_VARIABLE("cosTBTO"  , cosTBTO , "cosine of angle between thrust axis of B and thrust axis of ROE");
+    REGISTER_VARIABLE("cosTBz"   , cosTBz  , "cosine of angle between thrust axis of B and z-axis");
+    REGISTER_VARIABLE("R2"       , R2      , "reduced Fox-Wolfram moment R2");
     REGISTER_VARIABLE("k0mm2"    , k0mm2   , "missing mass squared for FS=0");
     REGISTER_VARIABLE("k0et"     , k0et    , "transverse energy for FS=0");
     REGISTER_VARIABLE("k0hso00"  , k0hso00 , "Hso(0,0) for FS=0");

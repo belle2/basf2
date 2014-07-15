@@ -78,14 +78,8 @@ namespace Belle2 {
       }
 
       StoreArray<IRSimHit> irSimHits;
-      new(irSimHits.nextFreeAddress()) IRSimHit(posInVec,
-                                                momInVec,
-                                                posOutVec,
-                                                momOutVec,
-                                                partPDGCode,
-                                                depEnergy,
-                                                Volname
-                                               );
+      IRSimHit* simHit = irSimHits.appendNew(posInVec, momInVec, posOutVec, momOutVec, partPDGCode, depEnergy, Volname);
+
       // add relation to MCParticles
       StoreArray<MCParticle> mcParticles;
       RelationArray irSimHitRel(mcParticles, irSimHits);

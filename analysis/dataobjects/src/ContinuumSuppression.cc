@@ -41,6 +41,11 @@ void ContinuumSuppression::addCosTBz(float cosTBz)
   m_cosTBz = cosTBz;
 }
 
+void ContinuumSuppression::addR2(float R2)
+{
+  m_R2 = R2;
+}
+
 void ContinuumSuppression::addKsfwFS0(std::vector<float> KsfwFS0)
 {
   m_ksfwFS0 = KsfwFS0;

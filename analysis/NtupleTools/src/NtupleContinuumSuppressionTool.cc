@@ -35,11 +35,29 @@ void NtupleContinuumSuppressionTool::setupTree()
   m_tree->Branch((strNames[0] + "_CosTBTO").c_str(), &m_fCosTBTO, (strNames[0] + "_CosTBTO/F").c_str());
   m_tree->Branch((strNames[0] + "_CosTBz").c_str() , &m_fCosTBz , (strNames[0] + "_CosTBz/F").c_str());
 
-  m_k0mm2   = 0; m_k0et    = 0;
-  m_k0hso00 = 0; m_k0hso01 = 0; m_k0hso02 = 0; m_k0hso03 = 0; m_k0hso04 = 0; m_k0hso10 = 0; m_k0hso12 = 0; m_k0hso14 = 0; m_k0hso20 = 0; m_k0hso22 = 0; m_k0hso24 = 0;
-  m_k0hoo0  = 0; m_k0hoo1  = 0; m_k0hoo2  = 0; m_k0hoo3  = 0; m_k0hoo4  = 0;
-  m_tree->Branch((strNames[0] + "_k0mm2").c_str(), &m_k0mm2  , (strNames[0] + "_k0mm2/F").c_str());
-  m_tree->Branch((strNames[0] + "_k0et").c_str(), &m_k0et   , (strNames[0] + "_k0et/F").c_str());
+  m_fR2 = 0;
+  m_tree->Branch((strNames[0] + "_R2").c_str()     , &m_fR2     , (strNames[0] + "_R2/F").c_str());
+
+  m_k0mm2   = 0;
+  m_k0et    = 0;
+  m_k0hso00 = 0;
+  m_k0hso01 = 0;
+  m_k0hso02 = 0;
+  m_k0hso03 = 0;
+  m_k0hso04 = 0;
+  m_k0hso10 = 0;
+  m_k0hso12 = 0;
+  m_k0hso14 = 0;
+  m_k0hso20 = 0;
+  m_k0hso22 = 0;
+  m_k0hso24 = 0;
+  m_k0hoo0  = 0;
+  m_k0hoo1  = 0;
+  m_k0hoo2  = 0;
+  m_k0hoo3  = 0;
+  m_k0hoo4  = 0;
+  m_tree->Branch((strNames[0] + "_k0mm2").c_str()  , &m_k0mm2  , (strNames[0] + "_k0mm2/F").c_str());
+  m_tree->Branch((strNames[0] + "_k0et").c_str()   , &m_k0et   , (strNames[0] + "_k0et/F").c_str());
   m_tree->Branch((strNames[0] + "_k0hso00").c_str(), &m_k0hso00, (strNames[0] + "_k0hso00/F").c_str());
   m_tree->Branch((strNames[0] + "_k0hso01").c_str(), &m_k0hso01, (strNames[0] + "_k0hso01/F").c_str());
   m_tree->Branch((strNames[0] + "_k0hso02").c_str(), &m_k0hso02, (strNames[0] + "_k0hso02/F").c_str());
@@ -51,17 +69,32 @@ void NtupleContinuumSuppressionTool::setupTree()
   m_tree->Branch((strNames[0] + "_k0hso20").c_str(), &m_k0hso20, (strNames[0] + "_k0hso20/F").c_str());
   m_tree->Branch((strNames[0] + "_k0hso22").c_str(), &m_k0hso22, (strNames[0] + "_k0hso22/F").c_str());
   m_tree->Branch((strNames[0] + "_k0hso24").c_str(), &m_k0hso24, (strNames[0] + "_k0hso24/F").c_str());
-  m_tree->Branch((strNames[0] + "_k0hoo0").c_str(), &m_k0hoo0 , (strNames[0] + "_k0hoo0/F").c_str());
-  m_tree->Branch((strNames[0] + "_k0hoo1").c_str(), &m_k0hoo1 , (strNames[0] + "_k0hoo1/F").c_str());
-  m_tree->Branch((strNames[0] + "_k0hoo2").c_str(), &m_k0hoo2 , (strNames[0] + "_k0hoo2/F").c_str());
-  m_tree->Branch((strNames[0] + "_k0hoo3").c_str(), &m_k0hoo3 , (strNames[0] + "_k0hoo3/F").c_str());
-  m_tree->Branch((strNames[0] + "_k0hoo4").c_str(), &m_k0hoo4 , (strNames[0] + "_k0hoo4/F").c_str());
+  m_tree->Branch((strNames[0] + "_k0hoo0").c_str() , &m_k0hoo0 , (strNames[0] + "_k0hoo0/F").c_str());
+  m_tree->Branch((strNames[0] + "_k0hoo1").c_str() , &m_k0hoo1 , (strNames[0] + "_k0hoo1/F").c_str());
+  m_tree->Branch((strNames[0] + "_k0hoo2").c_str() , &m_k0hoo2 , (strNames[0] + "_k0hoo2/F").c_str());
+  m_tree->Branch((strNames[0] + "_k0hoo3").c_str() , &m_k0hoo3 , (strNames[0] + "_k0hoo3/F").c_str());
+  m_tree->Branch((strNames[0] + "_k0hoo4").c_str() , &m_k0hoo4 , (strNames[0] + "_k0hoo4/F").c_str());
 
-  m_k1mm2   = 0; m_k1et    = 0;
-  m_k1hso00 = 0; m_k1hso01 = 0; m_k1hso02 = 0; m_k1hso03 = 0; m_k1hso04 = 0; m_k1hso10 = 0; m_k1hso12 = 0; m_k1hso14 = 0; m_k1hso20 = 0; m_k1hso22 = 0; m_k1hso24 = 0;
-  m_k1hoo0  = 0; m_k1hoo1  = 0; m_k1hoo2  = 0; m_k1hoo3  = 0; m_k1hoo4  = 0;
-  m_tree->Branch((strNames[0] + "_k1mm2").c_str(), &m_k1mm2  , (strNames[0] + "_k1mm2/F").c_str());
-  m_tree->Branch((strNames[0] + "_k1et").c_str(), &m_k1et   , (strNames[0] + "_k1et/F").c_str());
+  m_k1mm2   = 0;
+  m_k1et    = 0;
+  m_k1hso00 = 0;
+  m_k1hso01 = 0;
+  m_k1hso02 = 0;
+  m_k1hso03 = 0;
+  m_k1hso04 = 0;
+  m_k1hso10 = 0;
+  m_k1hso12 = 0;
+  m_k1hso14 = 0;
+  m_k1hso20 = 0;
+  m_k1hso22 = 0;
+  m_k1hso24 = 0;
+  m_k1hoo0  = 0;
+  m_k1hoo1  = 0;
+  m_k1hoo2  = 0;
+  m_k1hoo3  = 0;
+  m_k1hoo4  = 0;
+  m_tree->Branch((strNames[0] + "_k1mm2").c_str()  , &m_k1mm2  , (strNames[0] + "_k1mm2/F").c_str());
+  m_tree->Branch((strNames[0] + "_k1et").c_str()   , &m_k1et   , (strNames[0] + "_k1et/F").c_str());
   m_tree->Branch((strNames[0] + "_k1hso00").c_str(), &m_k1hso00, (strNames[0] + "_k1hso00/F").c_str());
   m_tree->Branch((strNames[0] + "_k1hso01").c_str(), &m_k1hso01, (strNames[0] + "_k1hso01/F").c_str());
   m_tree->Branch((strNames[0] + "_k1hso02").c_str(), &m_k1hso02, (strNames[0] + "_k1hso02/F").c_str());
@@ -73,11 +106,11 @@ void NtupleContinuumSuppressionTool::setupTree()
   m_tree->Branch((strNames[0] + "_k1hso20").c_str(), &m_k1hso20, (strNames[0] + "_k1hso20/F").c_str());
   m_tree->Branch((strNames[0] + "_k1hso22").c_str(), &m_k1hso22, (strNames[0] + "_k1hso22/F").c_str());
   m_tree->Branch((strNames[0] + "_k1hso24").c_str(), &m_k1hso24, (strNames[0] + "_k1hso24/F").c_str());
-  m_tree->Branch((strNames[0] + "_k1hoo0").c_str(), &m_k1hoo0 , (strNames[0] + "_k1hoo0/F").c_str());
-  m_tree->Branch((strNames[0] + "_k1hoo1").c_str(), &m_k1hoo1 , (strNames[0] + "_k1hoo1/F").c_str());
-  m_tree->Branch((strNames[0] + "_k1hoo2").c_str(), &m_k1hoo2 , (strNames[0] + "_k1hoo2/F").c_str());
-  m_tree->Branch((strNames[0] + "_k1hoo3").c_str(), &m_k1hoo3 , (strNames[0] + "_k1hoo3/F").c_str());
-  m_tree->Branch((strNames[0] + "_k1hoo4").c_str(), &m_k1hoo4 , (strNames[0] + "_k1hoo4/F").c_str());
+  m_tree->Branch((strNames[0] + "_k1hoo0").c_str() , &m_k1hoo0 , (strNames[0] + "_k1hoo0/F").c_str());
+  m_tree->Branch((strNames[0] + "_k1hoo1").c_str() , &m_k1hoo1 , (strNames[0] + "_k1hoo1/F").c_str());
+  m_tree->Branch((strNames[0] + "_k1hoo2").c_str() , &m_k1hoo2 , (strNames[0] + "_k1hoo2/F").c_str());
+  m_tree->Branch((strNames[0] + "_k1hoo3").c_str() , &m_k1hoo3 , (strNames[0] + "_k1hoo3/F").c_str());
+  m_tree->Branch((strNames[0] + "_k1hoo4").c_str() , &m_k1hoo4 , (strNames[0] + "_k1hoo4/F").c_str());
 }
 
 void NtupleContinuumSuppressionTool::eval(const Particle* particle)
@@ -96,6 +129,8 @@ void NtupleContinuumSuppressionTool::eval(const Particle* particle)
     m_fThrustO = qq->getThrustOm();
     m_fCosTBTO = qq->getCosTBTO();
     m_fCosTBz  = qq->getCosTBz();
+
+    m_fR2      = qq->getR2();
 
     // use_finalstate_for_sig == 0
     std::vector<float> ksfwFS0 = qq->getKsfwFS0();

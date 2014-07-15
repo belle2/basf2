@@ -25,10 +25,12 @@ namespace Belle2 {
 
   /**
    * This is a class for collecting variables used in continuum suppression. These variables
-   * include thrust related quantities and the Super Fox Wolfram (KSFW) moments. The moments
-   * are stored in separate vectors depending on whether the use_final_state_for_sig==0 (FS0)
-   * or ==1 (FS1). For FS0 the moments are calculated using the B daughters, while for FS1
-   * they are calculated using the B final state daughters.
+   * include: thrust related quantities; the reduced Fox-Wolfram moment R2; and the Super
+   * Fox Wolfram (KSFW) moments.
+   *
+   * The KSFW moments are stored in separate vectors depending on whether the
+   * use_final_state_for_sig==0 (FS0) or ==1 (FS1). For FS0 the moments are calculated
+   * using the B primary daughters, while for FS1 they are calculated using the B final state daughters.
    *
    * The ContinuumSuppression object is created for given existing Particle object by the
    * ContinuumSuppressionBuilder module and are related between each other with a BASF2 relation.
@@ -83,9 +85,9 @@ namespace Belle2 {
     void addCosTBz(float cosTBz);
 
     /**
-     * Add Fox-Wolfram moment R2.
+     * Add reduced Fox-Wolfram moment R2.
      *
-     * @param Float Fox-Wolgram moment R2
+     * @param Float reduced Fox-Wolfram moment R2
      */
     void addR2(float R2);
 
@@ -150,9 +152,9 @@ namespace Belle2 {
     }
 
     /**
-     * Get Fox-Wolfram moment R2.
+     * Get reduced Fox-Wolfram moment R2.
      *
-     * @return Float Fox-Wolfram moment R2
+     * @return Float reduced Fox-Wolfram moment R2
      */
     float getR2(void) const {
       return m_R2;

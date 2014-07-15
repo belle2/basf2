@@ -28,11 +28,11 @@ class G4Polycone;
 
 namespace Belle2 {
   namespace ir {
-    // Struct with description of elements
+    /** The struct for CryostatElement */
     struct CryostatElement {
-      G4Transform3D transform;
-      G4VSolid* geo;
-      G4LogicalVolume* logi;
+      G4Transform3D transform; /** Transformation */
+      G4VSolid* geo;           /** Solid volume */
+      G4LogicalVolume* logi;   /** Logical volume */
     };
 
     class SensitiveDetector;

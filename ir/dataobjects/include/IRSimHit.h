@@ -14,12 +14,12 @@
 #include <TObject.h>
 #include <TVector3.h>
 #include <string>
-
+#include <simulation/dataobjects/SimHitBase.h>
 
 namespace Belle2 {
 
   /** Class for saving raw hit data of the IR.  */
-  class IRSimHit : public TObject {
+  class IRSimHit : public SimHitBase {
   public:
 
     /** Empty constructor for ROOT IO. */

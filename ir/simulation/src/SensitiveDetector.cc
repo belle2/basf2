@@ -83,8 +83,7 @@ namespace Belle2 {
       // add relation to MCParticles
       StoreArray<MCParticle> mcParticles;
       RelationArray irSimHitRel(mcParticles, irSimHits);
-      int nentr = irSimHits.getEntries() - 1 ;
-      irSimHitRel.add(trackID, nentr);
+      irSimHitRel.add(trackID, simHit->getArrayIndex());
 
       return true;
     }

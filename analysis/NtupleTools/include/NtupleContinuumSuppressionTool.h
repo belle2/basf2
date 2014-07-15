@@ -31,6 +31,8 @@ namespace Belle2 {
     float m_fCosTBTO; /** cosine of the angle between the thrust axis of the B and the thrust axis of the ROE */
     float m_fCosTBz;  /** cosine of the angle between the thrust axis of the B and the z-axis */
 
+    float m_fR2;      /** reduced Fox-Wolfram moment R2 */
+
     // For final state = 0
     float m_k0mm2;    /** missing mass squared */
     float m_k0et;     /** transverse energy */

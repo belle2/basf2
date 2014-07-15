@@ -28,8 +28,6 @@ input = register_module('RootInput')
 # input = register_module('SeqRootInput')
 # input.param('inputFileName', '/x02/data/e0000r000554.sroot')
 
-# input.param('iutputFileName', 'RootOutput1.root')
-
 # output
 output = register_module('PrintDataTemplate')
 

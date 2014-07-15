@@ -73,7 +73,7 @@ main.add_module(reader)
 # if use_shm_flag != 0:
 #    main.add_module(histo)
 #    main.add_module(monitor)
-#main.add_module(dump)
+# main.add_module(dump)
 main.add_module(sender)
 
 # Process all events

@@ -115,62 +115,6 @@ void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
   return;
 }
 
-#ifndef REDUCED_RAWCOPPER
-#else
-// void PrintDataTemplateModule::printReducedCOPPEREvent(ReducedRawCOPPER* reduced_raw_copper, int i)
-// {
-
-//   printf(": Event # %d : node ID 0x%.8x : block size %d bytes\n",
-//          reduced_raw_copper->GetEveNo(i), reduced_raw_copper->GetCOPPERNodeId(i),
-//          reduced_raw_copper->GetBlockNwords(i) * sizeof(int));
-
-//   //#ifdef DEBUG
-//   printf("******* Reduced RawCOPPER data block(including Detector Buffer)**********: %d words\n",
-//          reduced_raw_copper->GetBlockNwords(i));
-//   printBuffer(reduced_raw_copper->GetBuffer(i), reduced_raw_copper->GetBlockNwords(i));
-
-// //   if (!(reduced_raw_copper->CheckCOPPERMagic( i ))) {
-// //     ErrorMessage print_err;
-// //     char err_buf[500];
-// //     sprintf(err_buf, "Invalid Magic word 0x7FFFF0008=%x 0xFFFFFAFA=%x 0xFFFFF5F5=%x 0x7FFF0009=%x\n",
-// //             reduced_raw_copper->GetMagicDriverHeader( i ),
-// //             reduced_raw_copper->GetMagicFPGAHeader( i ),
-// //             reduced_raw_copper->GetMagicFPGATrailer( i ),
-// //             reduced_raw_copper->GetMagicDriverTrailer( i ));
-// //     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-// //     sleep(12345678);
-// //     exit(-1);
-// //   }
-//   //#endif
-
-//   //
-//   // Print data from each FINESSE
-//   //
-//   if (reduced_raw_copper->Get1stDetectorNwords(i) > 0) {
-//     printf("== Detector Buffer(FINESSE A): nwords %d\n", reduced_raw_copper->Get1stDetectorNwords(i));
-//     printBuffer(reduced_raw_copper->Get1stDetectorBuffer(i), reduced_raw_copper->Get1stDetectorNwords(i));
-//   }
-
-//   if (reduced_raw_copper->Get2ndDetectorNwords(i) > 0) {
-//     printf("== Detector Buffer(FINESSE B)\n");
-//     printBuffer(reduced_raw_copper->Get2ndDetectorBuffer(i), reduced_raw_copper->Get2ndDetectorNwords(i));
-//   }
-
-//   if (reduced_raw_copper->Get3rdDetectorNwords(i) > 0) {
-//     printf("== Detector Buffer(FINESSE C)\n");
-//     printBuffer(reduced_raw_copper->Get3rdDetectorBuffer(i), reduced_raw_copper->Get3rdDetectorNwords(i));
-//   }
-
-//   if (reduced_raw_copper->Get4thDetectorNwords(i) > 0) {
-//     printf("== Detector Buffer(FINESSE D)\n");
-//     printBuffer(reduced_raw_copper->Get4thDetectorBuffer(i), reduced_raw_copper->Get4thDetectorNwords(i));
-//   }
-
-//   m_ncpr++;
-
-// }
-#endif
-
 
 void PrintDataTemplateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
 {
@@ -179,65 +123,27 @@ void PrintDataTemplateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
          raw_copper->GetEveNo(i), raw_copper->GetCOPPERNodeId(i),
          raw_copper->GetBlockNwords(i) * sizeof(int));
 
-  //#ifdef DEBUG
-  printf("===== Raw COPPER data block(including 4 FINESSE buffers )\n");
-  printBuffer(raw_copper->GetBuffer(i), raw_copper->GetBlockNwords(i));
-
-//   if (!(raw_copper->CheckCOPPERMagic( i ))) {
-//     ErrorMessage print_err;
-//     char err_buf[500];
-//     sprintf(err_buf, "Invalid Magic word 0x7FFFF0008=%x 0xFFFFFAFA=%x 0xFFFFF5F5=%x 0x7FFF0009=%x\n",
-//             raw_copper->GetMagicDriverHeader( i ),
-//             raw_copper->GetMagicFPGAHeader( i ),
-//             raw_copper->GetMagicFPGATrailer( i ),
-//             raw_copper->GetMagicDriverTrailer( i ));
-//     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-//     sleep(12345678);
-//     exit(-1);
-//   }
-  //#endif
-
   //
   // Print data from each FINESSE
   //
-  if (raw_copper->Get1stFINESSENwords(i) > 0) {
-    printf("===== FINESSE  Buffer(FINESSE A) 0x%x words \n", raw_copper->Get1stDetectorNwords(i));
-    printBuffer(raw_copper->Get1stFINESSEBuffer(i), raw_copper->Get1stFINESSENwords(i));
+  if (raw_copper->GetDetectorNwords(i, 0) > 0) {
+    printf("===== Detector Buffer(FINESSE A) 0x%x words \n", raw_copper->GetDetectorNwords(i, 0));
+    printBuffer(raw_copper->GetDetectorBuffer(i, 0), raw_copper->GetDetectorNwords(i, 0));
   }
 
-  if (raw_copper->Get1stDetectorNwords(i) > 0) {
-    printf("===== Detector Buffer(FINESSE A) 0x%x words \n", raw_copper->Get1stDetectorNwords(i));
-    printBuffer(raw_copper->Get1stDetectorBuffer(i), raw_copper->Get1stDetectorNwords(i));
-  }
-  printf("\n");
-  if (raw_copper->Get2ndFINESSENwords(i) > 0) {
-    printf("===== FINESSE  Buffer(FINESSE B) 0x%x words \n", raw_copper->Get2ndDetectorNwords(i));
-    printBuffer(raw_copper->Get2ndFINESSEBuffer(i), raw_copper->Get2ndFINESSENwords(i));
+  if (raw_copper->GetDetectorNwords(i, 1) > 0) {
+    printf("===== Detector Buffer(FINESSE B) 0x%x words \n", raw_copper->GetDetectorNwords(i, 1));
+    printBuffer(raw_copper->GetDetectorBuffer(i, 1), raw_copper->GetDetectorNwords(i, 1));
   }
 
-  if (raw_copper->Get2ndDetectorNwords(i) > 0) {
-    printf("====== Detector Buffer(FINESSE B)\n");
-    printBuffer(raw_copper->Get2ndDetectorBuffer(i), raw_copper->Get2ndDetectorNwords(i));
-  }
-  printf("\n");
-  if (raw_copper->Get3rdFINESSENwords(i) > 0) {
-    printf("===== FINESSE  Buffer(FINESSE C) 0x%x words \n", raw_copper->Get3rdDetectorNwords(i));
-    printBuffer(raw_copper->Get3rdFINESSEBuffer(i), raw_copper->Get3rdFINESSENwords(i));
+  if (raw_copper->GetDetectorNwords(i, 2) > 0) {
+    printf("===== Detector Buffer(FINESSE C) 0x%x words \n", raw_copper->GetDetectorNwords(i, 2));
+    printBuffer(raw_copper->GetDetectorBuffer(i, 2), raw_copper->GetDetectorNwords(i, 2));
   }
 
-  if (raw_copper->Get3rdDetectorNwords(i) > 0) {
-    printf("===== Detector Buffer(FINESSE C)\n");
-    printBuffer(raw_copper->Get3rdDetectorBuffer(i), raw_copper->Get3rdDetectorNwords(i));
-  }
-  printf("\n");
-  if (raw_copper->Get4thFINESSENwords(i) > 0) {
-    printf("===== FINESSE  Buffer(FINESSE D) 0x%x words \n", raw_copper->Get4thDetectorNwords(i));
-    printBuffer(raw_copper->Get4thFINESSEBuffer(i), raw_copper->Get4thFINESSENwords(i));
-  }
-
-  if (raw_copper->Get4thDetectorNwords(i) > 0) {
-    printf("===== Detector Buffer(FINESSE D)\n");
-    printBuffer(raw_copper->Get4thDetectorBuffer(i), raw_copper->Get4thDetectorNwords(i));
+  if (raw_copper->GetDetectorNwords(i, 3) > 0) {
+    printf("===== Detector Buffer(FINESSE D) 0x%x words \n", raw_copper->GetDetectorNwords(i, 3));
+    printBuffer(raw_copper->GetDetectorBuffer(i, 3), raw_copper->GetDetectorNwords(i, 3));
   }
 
   m_ncpr++;
@@ -301,38 +207,27 @@ void PrintDataTemplateModule::event()
     }
   }
 
-
-
   //
-  // Data from COPPER ( data from any detectors(e.g. CDC, SVD, ... ))
+  //  Data from COPPER ( data from any detectors(e.g. CDC, SVD, ... ))
   //
   StoreArray<RawCOPPER> rawcprarray;
   for (int i = 0; i < rawcprarray.getEntries(); i++) {
     for (int j = 0; j < rawcprarray[ i ]->GetNumEntries(); j++) {
-      printf("\n\n===== DataBlock(RawCOPPER): Block # %d ", i);
+      printf("\n===== DataBlock(RawCOPPER): Block # %d ", i);
       printCOPPEREvent(rawcprarray[ i ], j);
     }
   }
 
-
-  //
+//
   // Data from COPPER named as RawSVD by software
   //
   StoreArray<RawSVD> raw_svdarray;
   for (int i = 0; i < raw_svdarray.getEntries(); i++) {
-
     for (int j = 0; j < raw_svdarray[ i ]->GetNumEntries(); j++) {
-//       printf("\n===== DataBlock(RawSVD) : Block # %d : tempval %d", i,
-//       raw_svdarray[ i ]->m_temp_value );
       printf("\n===== DataBlock(RawSVD) : Block # %d\n", i);
-      //      raw_svdarray[ i ]->ShowBuffer();
-
       printCOPPEREvent(raw_svdarray[ i ], j);
     }
-    //    raw_svdarray[ i ]->m_temp_value = 12345678 + i ;
   }
-
-
 
 
   //

@@ -26,10 +26,10 @@ set_log_level(LogLevel.ERROR)
 # input
 input = register_module('RootInput')
 # input = register_module('SeqRootInput')
-input.param('inputFileName', 'e0000r000366.sroot')
+input.param('inputFileName', 'temp.root')
 
 # output
-output = register_module('PrintDataTemplate')
+output = register_module('PrintData')
 
 # dump
 dump = register_module('RootOutput')

@@ -106,7 +106,7 @@ namespace Belle2 {
 
     //training definition for Slow Pions
     std::string target_SlowPion = "isSlowPion";
-    std::vector<std::string> variables_SlowPion = {"charge", "p", "cosTheta", "pi_vs_edEdxid", "a_thrust"};
+    std::vector<std::string> variables_SlowPion = {"charge", "p", "cosTheta", "pi_vs_edEdxid", "cosTPTO"};
     TMVAInterface::Method method_SlowPion_1("FastBDT", "Plugin", "H:!V:CreateMVAPdfs:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3", variables_SlowPion);
     TMVAInterface::Method method_SlowPion_2("Fisher", "Fisher", "H:!V:Fisher:VarTransform=None:CreateMVAPdfs:PDFInterpolMVAPdf=Spline2:NbinsMVAPdf=50:NsmoothMVAPdf=10", variables_SlowPion);
     TMVAInterface::Method method_SlowPion_3("BDTGradient", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100:BoostType=Grad:Shrinkage=0.10:UseBaggedGrad:GradBaggingFraction=0.5:nCuts=200:MaxDepth=2", variables_SlowPion);

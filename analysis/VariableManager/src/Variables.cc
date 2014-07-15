@@ -560,20 +560,15 @@ namespace Belle2 {
       return 0.0;
     }
 
-    std::ostream& operator<<(std::ostream& str, const TVector3& vector)
-    {
-      str << "X: " << vector.X() << "Y: " << vector.Y() << "Z: " << vector.Z();
-      return str;
-    }
 
     double cosTPTO(const Particle* p)
     {
       const ContinuumSuppression* qq = p->getRelated<ContinuumSuppression>();
       const TVector3 thrustAxisO = qq->getThrustO();
-      cout << "thrustAxisO" << thrustAxisO << endl;
+      //cout << "thrustAxisO" << thrustAxisO << endl;
 
       const TVector3 pAxis = PCmsLabTransform::labToCms(p->get4Vector()).Vect();
-      cout << "pAxis" << pAxis << endl;
+      //cout << "pAxis" << pAxis << endl;
       double result = fabs(cos(pAxis.Angle(thrustAxisO)));
       return result;
     }
@@ -1733,7 +1728,7 @@ namespace Belle2 {
     VARIABLE_GROUP("Continuum Suppression");
     REGISTER_VARIABLE("cosTBTO"  , cosTBTO , "cosine of angle between thrust axis of B and thrust axis of ROE");
     REGISTER_VARIABLE("cosTBz"   , cosTBz  , "cosine of angle between thrust axis of B and z-axis");
-    REGISTER_VARIABLE("a_thrust"  , cosTPTO , "cosine of angle between thrust axis of given particle and thrust axis of ROE");
+    REGISTER_VARIABLE("cosTPTO"  , cosTPTO , "cosine of angle between thrust axis of given particle and thrust axis of ROE");
     REGISTER_VARIABLE("thrustBm" , thrustBm, "magnitude of the B thrust axis");
     REGISTER_VARIABLE("thrustOm" , thrustOm, "magnitude of the ROE thrust axis");
     REGISTER_VARIABLE("R2"       , R2      , "reduced Fox-Wolfram moment R2");

@@ -63,7 +63,7 @@ namespace Belle2 {
     GearDir gd = GearDir("/Detector/DetectorComponent[@name=\"CDC\"]/Content");
     gd.append("/SensitiveDetector");
     m_thresholdEnergyDeposit =  Unit::convertValue(gd.getDouble("EnergyDepositionThreshold"), "eV");
-    m_thresholdEnergyDeposit *= GeV;  //GeV to MeV
+    m_thresholdEnergyDeposit *= CLHEP::GeV;  //GeV to MeV
     m_thresholdKineticEnergy = 0.0; // Dummy to avoid a warning (tentative).
     //    B2INFO("Threshold energy " << m_thresholdEnergyDeposit);
 
@@ -158,8 +158,8 @@ namespace Belle2 {
     // Calculate cell ID
     CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
 
-    TVector3 tposIn(posIn.x() / cm, posIn.y() / cm, posIn.z() / cm);
-    TVector3 tposOut(posOut.x() / cm, posOut.y() / cm, posOut.z() / cm);
+    TVector3 tposIn(posIn.x() / CLHEP::cm, posIn.y() / CLHEP::cm, posIn.z() / CLHEP::cm);
+    TVector3 tposOut(posOut.x() / CLHEP::cm, posOut.y() / CLHEP::cm, posOut.z() / CLHEP::cm);
     const unsigned idIn = cdcg.cellId(layerId, tposIn);
     const unsigned idOut = cdcg.cellId(layerId, tposOut);
 #if defined(CDC_DEBUG)
@@ -170,7 +170,7 @@ namespace Belle2 {
     // Calculate drift length
     std::vector<int> wires = WireId_in_hit_order(idIn, idOut, cdcg.nWiresInLayer(layerId));
     G4double sint(0.);
-    const G4double s_in_layer = stepLength / cm;
+    const G4double s_in_layer = stepLength / CLHEP::cm;
     G4double xint[6] = {0};
 
     const G4ThreeVector momOut(out.GetMomentum().x(), out.GetMomentum().y(),
@@ -178,7 +178,7 @@ namespace Belle2 {
     const G4double speedIn  =  in.GetVelocity();
     const G4double speedOut = out.GetVelocity();
     const G4double speed    = 0.5 * (speedIn + speedOut);
-    const G4double speedInCmPerNs = speed / cm;
+    const G4double speedInCmPerNs = speed / CLHEP::cm;
 
     const unsigned int nWires = wires.size();
     G4double tofBefore = in.GetGlobalTime();
@@ -231,13 +231,13 @@ namespace Belle2 {
         if (Bfield[0] == 0. && Bfield[1] == 0. &&
             Bfield[2] != 0.) m_nonUniformField = 0;
 
-        const G4double B_kG[3] = {Bfield[0] / kilogauss,
-                                  Bfield[1] / kilogauss,
-                                  Bfield[2] / kilogauss
+        const G4double B_kG[3] = {Bfield[0] / CLHEP::kilogauss,
+                                  Bfield[1] / CLHEP::kilogauss,
+                                  Bfield[2] / CLHEP::kilogauss
                                  };
 
-        const HepPoint3D  x(pos[0] / cm, pos[1] / cm, pos[2] / cm);
-        const HepVector3D p(momIn.x() / GeV, momIn.y() / GeV, momIn.z() / GeV);
+        const HepPoint3D  x(pos[0] / CLHEP::cm, pos[1] / CLHEP::cm, pos[2] / CLHEP::cm);
+        const HepVector3D p(momIn.x() / CLHEP::GeV, momIn.y() / CLHEP::GeV, momIn.z() / CLHEP::GeV);
         Helix tmp(x, p, charge);
         tmp.bFieldZ(B_kG[2]);
         tmp.ignoreErrorMatrix();
@@ -316,14 +316,14 @@ namespace Belle2 {
           G4ThreeVector bwp(bck.x(), bck.y(), bck.z());
           G4ThreeVector fwp(fwd.x(), fwd.y(), fwd.z());
           G4ThreeVector hitPosition, wirePosition;
-          distance = ClosestApproach(bwp, fwp, posIn / cm, posOut / cm,
+          distance = ClosestApproach(bwp, fwp, posIn / CLHEP::cm, posOut / CLHEP::cm,
                                      hitPosition, wirePosition);
           if (m_wireSag) {
             G4double ywb_sag, ywf_sag;
             cdcg.getWirSagEffect(layerId, wires[i], wirePosition.z(), ywb_sag, ywf_sag);
             bwp.setY(ywb_sag);
             fwp.setY(ywf_sag);
-            distance = ClosestApproach(bwp, fwp, posIn / cm, posOut / cm,
+            distance = ClosestApproach(bwp, fwp, posIn / CLHEP::cm, posOut / CLHEP::cm,
                                        hitPosition, wirePosition);
           }
           std::cout << "line distance= " << distance << std::endl;
@@ -336,14 +336,14 @@ namespace Belle2 {
         G4ThreeVector bwp(bck.x(), bck.y(), bck.z());
         G4ThreeVector fwp(fwd.x(), fwd.y(), fwd.z());
         G4ThreeVector hitPosition, wirePosition;
-        distance = ClosestApproach(bwp, fwp, posIn / cm, posOut / cm,
+        distance = ClosestApproach(bwp, fwp, posIn / CLHEP::cm, posOut / CLHEP::cm,
                                    hitPosition, wirePosition);
         if (m_wireSag) {
           G4double ywb_sag, ywf_sag;
           cdcg.getWirSagEffect(layerId, wires[i], wirePosition.z(), ywb_sag, ywf_sag);
           bwp.setY(ywb_sag);
           fwp.setY(ywf_sag);
-          distance = ClosestApproach(bwp, fwp, posIn / cm, posOut / cm,
+          distance = ClosestApproach(bwp, fwp, posIn / CLHEP::cm, posOut / CLHEP::cm,
                                      hitPosition, wirePosition);
         }
 
@@ -354,9 +354,9 @@ namespace Belle2 {
         posW.setY(wirePosition.y());
         posW.setZ(wirePosition.z());
         //tentative setting
-        pOnTrack.setX(0.5 * (momIn.x() + momOut.x()) / GeV);
-        pOnTrack.setY(0.5 * (momIn.y() + momOut.y()) / GeV);
-        pOnTrack.setZ(0.5 * (momIn.z() + momOut.z()) / GeV);
+        pOnTrack.setX(0.5 * (momIn.x() + momOut.x()) / CLHEP::GeV);
+        pOnTrack.setY(0.5 * (momIn.y() + momOut.y()) / CLHEP::GeV);
+        pOnTrack.setZ(0.5 * (momIn.z() + momOut.z()) / CLHEP::GeV);
       }  //end of magneticfiled on or off
 
 #if defined(CDC_DEBUG)
@@ -368,8 +368,8 @@ namespace Belle2 {
         std::cout << "toolargedriftl" << std::endl;
       }
 #endif
-      distance *= cm;  onTrack *= cm;  posW *= cm;
-      pOnTrack *= GeV;
+      distance *= CLHEP::cm;  onTrack *= CLHEP::cm;  posW *= CLHEP::cm;
+      pOnTrack *= CLHEP::GeV;
 
       G4ThreeVector posTrack(onTrack.x(), onTrack.y(), onTrack.z());
       G4ThreeVector mom(pOnTrack.x(), pOnTrack.y(), pOnTrack.z());
@@ -384,7 +384,7 @@ namespace Belle2 {
       if (nWires == 1) {
 
         //        saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep, s_in_layer * cm, momIn, posW, posIn, posOut, posTrack, lr, newLrRaw, newLr, speed);
-        saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep, s_in_layer * cm, pOnTrack, posW, posIn, posOut, posTrack, lr, newLrRaw, newLr, speed);
+        saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep, s_in_layer * CLHEP::cm, pOnTrack, posW, posIn, posOut, posTrack, lr, newLrRaw, newLr, speed);
 #if defined(CDC_DEBUG)
         std::cout << "saveSimHit" << std::endl;
         std::cout << "momIn    = " << momIn    << std::endl;
@@ -398,12 +398,12 @@ namespace Belle2 {
         if (i + 1 <= nWires - 1) {
           cel2 = wires[i + 1] + 1;
         }
-        const G4double s2 = t.GetTrackLength() / cm;  //at post-step
+        const G4double s2 = t.GetTrackLength() / CLHEP::cm;  //at post-step
         G4double s1 = (s2 - s_in_layer);  //at pre-step; varied later
         G4ThreeVector din = momIn;
         if (din.mag() != 0.) din /= momIn.mag();
 
-        G4double  vent[6] = {posIn.x() / cm, posIn.y() / cm, posIn.z() / cm, din.x(), din.y(), din.z()};
+        G4double  vent[6] = {posIn.x() / CLHEP::cm, posIn.y() / CLHEP::cm, posIn.z() / CLHEP::cm, din.x(), din.y(), din.z()};
 
         G4ThreeVector dot(momOut.x(), momOut.y(), momOut.z());
         if (dot.mag() != 0.) {
@@ -413,7 +413,7 @@ namespace Belle2 {
           dot = din;
         }
 
-        G4double  vext[6] = {posOut.x() / cm, posOut.y() / cm, posOut.z() / cm, dot.x(), dot.y(), dot.z()};
+        G4double  vext[6] = {posOut.x() / CLHEP::cm, posOut.y() / CLHEP::cm, posOut.z() / CLHEP::cm, dot.x(), dot.y(), dot.z()};
 
         if (i > 0) {
           for (int j = 0; j < 6; ++j) vent[j] = xint[j];
@@ -444,12 +444,12 @@ namespace Belle2 {
           }
           edep_in_cell = edep * (sint - s1) / s_in_layer;
 
-          const G4ThreeVector x_In(vent[0]*cm, vent[1]*cm, vent[2]*cm);
-          const G4ThreeVector x_Out(xint[0]*cm, xint[1]*cm, xint[2]*cm);
+          const G4ThreeVector x_In(vent[0]*CLHEP::cm, vent[1]*CLHEP::cm, vent[2]*CLHEP::cm);
+          const G4ThreeVector x_Out(xint[0]*CLHEP::cm, xint[1]*CLHEP::cm, xint[2]*CLHEP::cm);
           const G4ThreeVector p_In(momBefore * vent[3], momBefore * vent[4], momBefore * vent[5]);
 
           //          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (sint - s1) * cm, p_In, posW, x_In, x_Out, posTrack, lr, newLrRaw, newLr, speed);
-          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (sint - s1) * cm, pOnTrack, posW, x_In, x_Out, posTrack, lr, newLrRaw, newLr, speed);
+          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (sint - s1) * CLHEP::cm, pOnTrack, posW, x_In, x_Out, posTrack, lr, newLrRaw, newLr, speed);
 #if defined(CDC_DEBUG)
           std::cout << "saveSimHit" << std::endl;
           std::cout << "p_In    = " << p_In     << std::endl;
@@ -473,11 +473,11 @@ namespace Belle2 {
           }
           edep_in_cell = edep * (s2 - sint) / s_in_layer;
 
-          const G4ThreeVector x_In(vent[0]*cm, vent[1]*cm, vent[2]*cm);
+          const G4ThreeVector x_In(vent[0]*CLHEP::cm, vent[1]*CLHEP::cm, vent[2]*CLHEP::cm);
           const G4ThreeVector p_In(momBefore * vent[3], momBefore * vent[4], momBefore * vent[5]);
 
           //          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (s2 - sint) * cm, p_In, posW, x_In, posOut, posTrack, lr, newLrRaw, newLr, speed);
-          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (s2 - sint) * cm, pOnTrack, posW, x_In, posOut, posTrack, lr, newLrRaw, newLr, speed);
+          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (s2 - sint) * CLHEP::cm, pOnTrack, posW, x_In, posOut, posTrack, lr, newLrRaw, newLr, speed);
 #if defined(CDC_DEBUG)
           std::cout << "saveSimHit" << std::endl;
           std::cout << "p_In    = " << p_In     << std::endl;
@@ -558,20 +558,20 @@ namespace Belle2 {
     simHit->setWireID(layerId, wireId);
     simHit->setTrackId(trackID);
     simHit->setPDGCode(pid);
-    simHit->setDriftLength(distance / cm);
-    simHit->setFlightTime(CorrectTof / ns);
-    simHit->setGlobalTime(CorrectTof / ns);
-    simHit->setEnergyDep(edep / GeV);
-    simHit->setStepLength(stepLength / cm);
-    TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);
+    simHit->setDriftLength(distance / CLHEP::cm);
+    simHit->setFlightTime(CorrectTof / CLHEP::ns);
+    simHit->setGlobalTime(CorrectTof / CLHEP::ns);
+    simHit->setEnergyDep(edep / CLHEP::GeV);
+    simHit->setStepLength(stepLength / CLHEP::cm);
+    TVector3 momentum(mom.getX() / CLHEP::GeV, mom.getY() / CLHEP::GeV, mom.getZ() / CLHEP::GeV);
     simHit->setMomentum(momentum);
-    TVector3 posWire(posW.getX() / cm, posW.getY() / cm, posW.getZ() / cm);
+    TVector3 posWire(posW.getX() / CLHEP::cm, posW.getY() / CLHEP::cm, posW.getZ() / CLHEP::cm);
     simHit->setPosWire(posWire);
-    TVector3 positionIn(posIn.getX() / cm, posIn.getY() / cm, posIn.getZ() / cm);
+    TVector3 positionIn(posIn.getX() / CLHEP::cm, posIn.getY() / CLHEP::cm, posIn.getZ() / CLHEP::cm);
     simHit->setPosIn(positionIn);
-    TVector3 positionOut(posOut.getX() / cm, posOut.getY() / cm, posOut.getZ() / cm);
+    TVector3 positionOut(posOut.getX() / CLHEP::cm, posOut.getY() / CLHEP::cm, posOut.getZ() / CLHEP::cm);
     simHit->setPosOut(positionOut);
-    TVector3 positionTrack(posTrack.getX() / cm, posTrack.getY() / cm, posTrack.getZ() / cm);
+    TVector3 positionTrack(posTrack.getX() / CLHEP::cm, posTrack.getY() / CLHEP::cm, posTrack.getZ() / CLHEP::cm);
     simHit->setPosTrack(positionTrack);
     simHit->setPosFlag(lr);
     simHit->setLeftRightPassageRaw(newLrRaw);
@@ -604,8 +604,8 @@ namespace Belle2 {
     simEBHit->setPhi(phi);
     simEBHit->setTrackId(trackID);
     simEBHit->setPDGCode(pid);
-    simEBHit->setEnergyDep(edep / GeV);
-    TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);
+    simEBHit->setEnergyDep(edep / CLHEP::GeV);
+    TVector3 momentum(mom.getX() / CLHEP::GeV, mom.getY() / CLHEP::GeV, mom.getZ() / CLHEP::GeV);
     simEBHit->setMomentum(momentum);
 
     B2DEBUG(150, "HitNumber: " << m_EBhitNumber);

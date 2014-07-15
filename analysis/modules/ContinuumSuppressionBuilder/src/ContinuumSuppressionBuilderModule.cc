@@ -72,7 +72,7 @@ void ContinuumSuppressionBuilderModule::event()
     // Create relation: Particle <-> ContinuumSuppression
     particle->addRelationTo(qqVars);
 
-    std::vector<TVector3> p3_cms_sigA, p3_cms_sigB, p3_cms_roe;
+    std::vector<TVector3> p3_cms_sigA, p3_cms_sigB, p3_cms_roe, p3_cms_all;
     std::vector<int> Q_sigA, Q_sigB, Q_roe;
 
     std::vector<float> ksfwFS0;
@@ -87,6 +87,7 @@ void ContinuumSuppressionBuilderModule::event()
     float thrustOm = -1;
     float cosTBTO  = -1;
     float cosTBz   = -1;
+    float R2       = -1;
 
     // Kinematically allowed maximum momentum for mbc>5.2
     // sqrt(5.29^2 - 5.2^2) ~ 1.0GeV
@@ -121,6 +122,7 @@ void ContinuumSuppressionBuilderModule::event()
     for (unsigned i = 0; i < sigFsp.size(); i++) {
       PCmsLabTransform T;
       TLorentzVector p_cms = T.rotateLabToCms() * sigFsp[i]->get4Vector();
+      p3_cms_all.push_back(p_cms.Vect());
       p3_cms_sigB.push_back(p_cms.Vect());
       Q_sigB.push_back(sigFsp[i]->getCharge());
       p_cms_missB -= p_cms;
@@ -151,6 +153,7 @@ void ContinuumSuppressionBuilderModule::event()
           PCmsLabTransform T;
           TLorentzVector p_cms = T.rotateLabToCms() * particle.get4Vector();
           if (p_cms.Rho() > P_MAX) continue;
+          p3_cms_all.push_back(p_cms.Vect());
           p3_cms_roe.push_back(p_cms.Vect());
           Q_roe.push_back(particle.getCharge());
           p_cms_missA -= p_cms;
@@ -178,6 +181,7 @@ void ContinuumSuppressionBuilderModule::event()
           PCmsLabTransform T;
           TLorentzVector p_cms = T.rotateLabToCms() * p_lab;
           if (p_cms.Rho() > P_MAX) continue;
+          p3_cms_all.push_back(p_cms.Vect());
           p3_cms_roe.push_back(p_cms.Vect());
           Q_roe.push_back(0);
           p_cms_missA -= p_cms;
@@ -203,6 +207,7 @@ void ContinuumSuppressionBuilderModule::event()
         PCmsLabTransform T;
         TLorentzVector p_cms = T.rotateLabToCms() * p_lab;
         if (p_cms.Rho() > P_MAX) continue;
+        p3_cms_all.push_back(p_cms.Vect());
         p3_cms_roe.push_back(p_cms.Vect());
         Q_roe.push_back(0);
         p_cms_missA -= p_cms;
@@ -218,6 +223,10 @@ void ContinuumSuppressionBuilderModule::event()
       thrustOm = thrustO.Mag();
       cosTBTO  = fabs(cos(thrustB.Angle(thrustO)));
       cosTBz   = fabs(thrustB.CosTheta());
+
+      // Fox-Wolfram Moments: Uses all final-state tracks (= sigB + ROE)
+      FoxWolfram FW(foxwolfram(p3_cms_all.begin(), p3_cms_all.end(), SelfFunc(TVector3())));
+      R2 = FW.R(2);
 
       // KSFW moments
       KsfwMoments KsfwM(Hso0_max,
@@ -283,6 +292,7 @@ void ContinuumSuppressionBuilderModule::event()
     qqVars->addThrustOm(thrustOm);
     qqVars->addCosTBTO(cosTBTO);
     qqVars->addCosTBz(cosTBz);
+    qqVars->addR2(R2);
     qqVars->addKsfwFS0(ksfwFS0);
     qqVars->addKsfwFS1(ksfwFS1);
   }

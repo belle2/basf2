@@ -17,6 +17,7 @@
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/Thrust.h>
+#include <analysis/utility/FoxWolfram.h>
 #include <analysis/utility/KsfwMoments.h>
 
 #include <string>

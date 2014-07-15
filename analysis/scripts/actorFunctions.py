@@ -265,7 +265,78 @@ def PostCutDetermination(particleName, postCutConfig, signalProbability):
     return {'PostCut_' + particleName: {'cutstring': str(postCutConfig.value) + ' < getExtraInfo(SignalProbability)', 'range': (postCutConfig.value, 1)}}
 
 
-def WriteAnalysisFileForChannel(particleName, channelName, channelList, preCutConfig, preCutHistogram, preCut, mvaConfig, signalProbability):
+def WriteAnalysisFileForMVA(particleName, channelName, particleList, mvaConfig, signalProbability):
+    """
+    Creates a pdf document with the PreCut and Training plots
+        @param particleName name of the particle
+        @param channelName name of the channel
+        @param particleList ParticleList name of the channel
+        @param mvaConfig configuration for mva
+        @param signalProbability config filename for TMVA training
+    """
+
+    if signalProbability is None:
+        B2INFO("Write MVA tex file for channel " + channelName + " and charged conjugated. But channel is ignored.")
+        return {'MVATex_' + channelName: None}
+
+    ROOT.gROOT.SetBatch(True)
+
+    # Create TMVA Plots
+    tmva_filename = signalProbability[:-7] + '.root'  # Strip .config of filename
+
+    overtrainingPlot = particleList + '_overtraining.png'
+    if not os.path.isfile(overtrainingPlot):
+        subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/mvas.C(\\"{f}\\",3)"'.format(f=tmva_filename)], shell=True)
+        subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=overtrainingPlot)], shell=True)
+
+    rocPlot = particleList + '_roc.png'
+    if not os.path.isfile(rocPlot):
+        subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/efficiencies.C(\\"{f}\\")"'.format(f=tmva_filename)], shell=True)
+        subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=rocPlot)], shell=True)
+
+    # Create diag plots
+    diagPlotFile = particleList + '_diag_' + mvaConfig.name + '.pdf'
+    if not os.path.isfile(diagPlotFile):
+        B2INFO("plot " + diagPlotFile + " doesn't exist, creating it")
+        makeDiagPlots(tmva_filename, particleList)
+
+    # Get number of events in training
+    rootfile = ROOT.TFile(tmva_filename)
+    testTree = rootfile.Get('TestTree')
+    nsignal = testTree.GetEntries('className == "Signal"')
+    nbckgrd = testTree.GetEntries('className == "Background"')
+
+    placeholders = {}
+
+    placeholders['particleName'] = particleName
+    placeholders['channelName'] = channelName
+
+    placeholders['mvaNSignal'] = int(nsignal)
+    placeholders['mvaNBackground'] = int(nbckgrd)
+
+    placeholders['mvaName'] = mvaConfig.name
+    placeholders['mvaType'] = mvaConfig.type
+    placeholders['mvaConfig'] = mvaConfig.config
+    placeholders['mvaVariables'] = ', '.join(mvaConfig.variables)
+    placeholders['mvaTarget'] = mvaConfig.target
+    placeholders['mvaTargetCluster'] = mvaConfig.targetCluster
+
+    placeholders['mvaROCPlot'] = rocPlot
+    placeholders['mvaOvertrainingPlot'] = overtrainingPlot
+    placeholders['mvaDiagPlot'] = diagPlotFile
+
+    filename = 'MVA_' + particleList + '.tex'
+    if not os.path.isfile(filename):
+        template = Template(file(ROOT.Belle2.FileSystem.findFile('analysis/scripts/FullEventInterpretationMVATemplate.tex'), 'r').read())
+        page = template.substitute(placeholders)
+        file(filename, 'w').write(page)
+        B2INFO("Write MVA tex file for channel " + channelName + " and charged conjugated.")
+    else:
+        B2INFO("Write MVA tex file for channel " + channelName + " and charged conjugated. But file already exists, nothing to do here.")
+    return {'MVATex_' + channelName: (filename, placeholders)}
+
+
+def WriteAnalysisFileForChannel(particleName, channelName, channelList, preCutConfig, preCutHistogram, preCut, mvaTexFile):
     """
     Creates a pdf document with the PreCut and Training plots
         @param particleName name of the particle
@@ -274,28 +345,14 @@ def WriteAnalysisFileForChannel(particleName, channelName, channelList, preCutCo
         @param preCutConfig configuration for pre cut
         @param preCutHistogram preCutHistogram (filename, histogram postfix)
         @param preCut used preCuts for this channel
-        @param mvaConfig configuration for mva
-        @param signalProbability config filename for TMVA training
+        @param mvaTexFile .tex file produced for network
     """
 
-    if signalProbability is None or preCut is None:
+    if mvaTexFile is None or preCut is None:
         B2INFO("Write analysis tex file for channel " + channelName + " and charged conjugated. But channel is ignored.")
         return {'Tex_' + channelName: None}
 
     ROOT.gROOT.SetBatch(True)
-
-    # Create TMVA Plots
-    tmva_filename = signalProbability[:-7] + '.root'  # Strip .config of filename
-
-    overtrainingPlot = channelList + '_overtraining.png'
-    if not os.path.isfile(overtrainingPlot):
-        subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/mvas.C(\\"{f}\\",3)"'.format(f=tmva_filename)], shell=True)
-        subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=overtrainingPlot)], shell=True)
-
-    rocPlot = channelList + '_roc.png'
-    if not os.path.isfile(rocPlot):
-        subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/efficiencies.C(\\"{f}\\")"'.format(f=tmva_filename)], shell=True)
-        subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=rocPlot)], shell=True)
 
     # Create PreCut Hist Plots
     rootfile = ROOT.TFile(preCutHistogram[0])
@@ -315,14 +372,7 @@ def WriteAnalysisFileForChannel(particleName, channelName, channelList, preCutCo
             ul.Draw()
             canvas.SaveAs(plotName)
 
-    # Create diag plots
-    diagPlotFile = channelList + '_diag_' + mvaConfig.name + '.pdf'
-    if not os.path.isfile(diagPlotFile):
-        B2WARNING("plot " + diagPlotFile + " doesn't exist, creating it")
-        makeDiagPlots(tmva_filename, channelList)
-
     # Calculate purity and efficiency for this channel
-    # ...
     signal_hist = rootfile.Get(keys.At(0).GetName())
     background_hist = rootfile.Get(keys.At(2).GetName())
 
@@ -352,17 +402,7 @@ def WriteAnalysisFileForChannel(particleName, channelName, channelList, preCutCo
     placeholders['preCutSignalPlot'] = channelList + '_signal.png'
     placeholders['preCutBackgroundPlot'] = channelList + '_background.png'
     placeholders['preCutRatioPlot'] = channelList + '_ratio.png'
-
-    placeholders['mvaName'] = mvaConfig.name
-    placeholders['mvaType'] = mvaConfig.type
-    placeholders['mvaConfig'] = mvaConfig.config
-    placeholders['mvaVariables'] = ', '.join(mvaConfig.variables)
-    placeholders['mvaTarget'] = mvaConfig.target
-    placeholders['mvaTargetCluster'] = mvaConfig.targetCluster
-
-    placeholders['mvaROCPlot'] = rocPlot
-    placeholders['mvaOvertrainingPlot'] = overtrainingPlot
-    placeholders['mvaDiagPlot'] = diagPlotFile
+    placeholders['mvaTexFile'] = mvaTexFile[0][:-4]
 
     filename = channelList + '.tex'
     if not os.path.isfile(filename):
@@ -399,17 +439,26 @@ def WriteAnalysisFileForParticle(particleName, postCutConfig, postCut, texfiles)
         placeholders['particleNSignal'] = 0
         placeholders['particleNBackground'] = 0
         for texfile, channelPlaceholders in texfiles:
-            placeholders['particleNSignal'] += channelPlaceholders['channelNSignal']
-            placeholders['particleNBackground'] += channelPlaceholders['channelNBackground']
-            placeholders['channelInputs'] += '\include{' + texfile[:-4] + '}\n'
+            if 'channelNSignal' in channelPlaceholders:
+                B2WARNING("normal channel, " + texfile)
+                placeholders['particleNSignal'] += channelPlaceholders['channelNSignal']
+                placeholders['particleNBackground'] += channelPlaceholders['channelNBackground']
+                placeholders['channelInputs'] += '\include{' + texfile[:-4] + '}\n'
+            else:
+                placeholders['particleNSignal'] += channelPlaceholders['mvaNSignal']
+                placeholders['particleNBackground'] += channelPlaceholders['mvaNBackground']
+                placeholders['channelInputs'] += '\include{' + texfile[:-4] + '}\n'
 
         template = Template(file(ROOT.Belle2.FileSystem.findFile('analysis/scripts/FullEventInterpretationParticleTemplate.tex'), 'r').read())
         page = template.substitute(placeholders)
 
         file(filename, 'w').write(page)
 
-        subprocess.call(['pdflatex', filename])
-        B2INFO("Write analysis tex file and create pdf for particle " + particleName + " and charged conjugated.")
+        ret = subprocess.call(['pdflatex', '-halt-on-error', filename])
+        if ret == 0:
+            B2INFO("Write analysis tex file and create pdf for particle " + particleName + " and charged conjugated.")
+        else:
+            B2ERROR("pdflatex failed for file '" + filename + "', please check.")
     else:
         B2INFO("Write analysis tex file and create pdf for particle " + particleName + " and charged conjugated. But file already exists, nothing to do here.")
 

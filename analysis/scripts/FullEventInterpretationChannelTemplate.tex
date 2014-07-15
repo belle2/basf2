@@ -1,6 +1,6 @@
 \cprotect\section{Overview: \verb|${channelName}|}
-\subsection{Pre-cut determination}
 \FloatBarrier
+\subsection{Pre-cut determination}
 \begin{figure}[htb]
   \centering
   \begin{subfigure}[b]{0.42\textwidth}
@@ -22,31 +22,10 @@
   \caption{Variable \emph{${preCutVariable}} for combinations of daughter candidates of this channel.
            The PreCut range $$ ${preCutRange} $$ for this channel is marked with vertical lines in the plots above.
            The PreCuts were determined on variable \emph{${preCutVariable}} with a required total signal efficiency ${preCutEfficiency}.
-           For this channel only the efficiency is ${channelEfficiency} with a purity of ${channelPurity}.}
+           For this channel only the efficiency is ${channelEfficiency} with a purity of ${channelPurity}, corresponding to
+           ${channelNSignal} signal and ${channelNBackground} background events.}
+
 \end{figure}
 
-\FloatBarrier
-\clearpage
-\subsection{MVA}
-
-\begin{figure}[htb]
-  \centering
-  \begin{subfigure}[b]{0.42\textwidth}
-    \includegraphics[width=\textwidth]{${mvaROCPlot}}
-    \caption{Purity over efficiency plot}
-  \end{subfigure}\hfill
-  \begin{subfigure}[b]{0.42\textwidth}
-    \includegraphics[width=\textwidth]{${mvaOvertrainingPlot}}
-    \caption{Overtraining plot}
-  \end{subfigure}
-  \hfill
-  \begin{subfigure}[b]{0.42\textwidth}
-    \includegraphics[width=\textwidth]{${mvaDiagPlot}}
-    \caption{Diag plot}
-  \end{subfigure}
-  \caption{TMVA Plots for ${mvaType}/${mvaName} using the following configuration: ${mvaConfig}.
-           Used target was variable \emph{${mvaTarget}}. The training used ${channelNSignal} signal
-           and ${channelNBackground} background events.}
-\end{figure}
-
-
+%MVA sections go here
+\input{${mvaTexFile}}

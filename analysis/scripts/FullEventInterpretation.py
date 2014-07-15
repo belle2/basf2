@@ -263,6 +263,13 @@ def FullEventInterpretation(path, particles):
 
         ################ Information ACTORS #################
         for channel in particle.channels:
+            seq.addFunction(WriteAnalysisFileForMVA,
+                            particleName='Name_' + particle.name,
+                            channelName='Name_' + channel.name,
+                            particleList='ParticleList_' + channel.name + '_' + particle.name,
+                            mvaConfig='MVAConfig_' + channel.name,
+                            signalProbability='SignalProbability_' + channel.name + '_' + particle.name)
+
             seq.addFunction(WriteAnalysisFileForChannel,
                             particleName='Name_' + particle.name,
                             channelName='Name_' + channel.name,
@@ -270,14 +277,21 @@ def FullEventInterpretation(path, particles):
                             preCutConfig='PreCutConfig_' + particle.name,
                             preCutHistogram='PreCutHistogram_' + channel.name,
                             preCut='PreCut_' + channel.name,
-                            mvaConfig='MVAConfig_' + channel.name,
-                            signalProbability='SignalProbability_' + channel.name + '_' + particle.name)
+                            mvaTexFile='MVATex_' + channel.name)
+
+        if particle.isFSP:
+            seq.addFunction(WriteAnalysisFileForMVA,
+                            particleName='Name_' + particle.name,
+                            channelName='Name_' + particle.name,
+                            particleList='RawParticleList_' + particle.name,
+                            mvaConfig='MVAConfig_' + particle.name,
+                            signalProbability='SignalProbability_' + particle.name)
 
         seq.addFunction(WriteAnalysisFileForParticle,
                         particleName='Name_' + particle.name,
                         postCutConfig='PostCutConfig_' + particle.name,
                         postCut='PostCut_' + particle.name,
-                        texfiles=['Tex_' + channel.name for channel in particle.channels])
+                        texfiles=['Tex_' + channel.name for channel in particle.channels] + (['MVATex_' + particle.name] if particle.isFSP else []))
 
     #TODO: don't hardcode B0/B+ here
     seq.addFunction(VariablesToNTuple,

@@ -1,0 +1,24 @@
+\clearpage
+
+\FloatBarrier
+\subsection{MVA}
+
+\begin{figure}[htb]
+  \centering
+  \begin{subfigure}[b]{0.42\textwidth}
+    \includegraphics[width=\textwidth]{${mvaROCPlot}}
+    \caption{Purity over efficiency plot}
+  \end{subfigure}\hfill
+  \begin{subfigure}[b]{0.42\textwidth}
+    \includegraphics[width=\textwidth]{${mvaOvertrainingPlot}}
+    \caption{Overtraining plot}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.42\textwidth}
+    \includegraphics[width=\textwidth]{${mvaDiagPlot}}
+    \caption{Diag plot}
+  \end{subfigure}
+  \caption{TMVA Plots for ${mvaType}/${mvaName} using the following configuration: ${mvaConfig}.
+           Used target was variable \emph{${mvaTarget}}. The training used ${mvaNSignal} signal
+           and ${mvaNBackground} background events.}
+\end{figure}

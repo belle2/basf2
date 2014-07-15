@@ -1,4 +1,18 @@
 =========================================================
+How to use : from Yamagata-san's e-mail on Jul.15, 2014 (rev.??? )
+
+
+
+1, compile
+$ make 
+
+2, edit eb0.sh
+If you wan to read data from COPPERs with hostnames of cpr010, cpr011 and cpr012.
+./eb0 cpr010:33000 cpr011:33000 cpr012:33000   
+
+
+
+=========================================================
 How to use : from Yamagata-san's e-mail on Jul.27, 2013 (rev. 6369)
 
 

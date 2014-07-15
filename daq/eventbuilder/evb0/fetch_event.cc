@@ -1,78 +1,97 @@
-#include "send_header_and_trailer.h"
-#include "raw_copper_header_and_trailer.h"
-
-#include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
+#include <assert.h>
+#include <unistd.h>
+#include "b2eb_format.h"
+#include "strferror.h"
 
-#define MAX_EVENT_SIZE  (10 * 1024 * 1024)
-#define MAXNODE   16
+int verbose = 0;
+int output = 0;
 
-#define WORDSIZE  (sizeof(uint32_t))
-
-void* fetch_event(FILE* fp, char* p_orig, int bufsize)
+int
+main(int argc, char** argv)
 {
-  char* p = p_orig;
-  int ret;
-  struct SendHeader s_h;
-  struct SendTrailer s_t;
+  uint32_t nword;
 
-  struct RawCopperHeader_fixed_part c_h_f;
-  struct RawCopperHeader_node c_h_n[MAXNODE];
-  struct RawCopperHeader_end_of_header c_h_e;
-
-  struct RawCopperTrailer c_t;
-
-  assert(bufsize > sizeof(s_h));
-
-  ret = fread(&s_h, sizeof(s_h), 1, fp);
-  if (ret == 0 && feof(fp)) {
-    return 0;
-  }
-  assert(ret == 1);
-  assert(bufsize > s_h.nword * WORDSIZE);
-  assert(4 == s_h.nword_in_header);
-  memcpy(p, &s_h, sizeof(s_h));
-  p += sizeof(s_h);
-
-  ret = fread(&c_h_f, sizeof(c_h_f), 1, fp);
-  assert(ret == 1);
-  assert(bufsize - sizeof(s_h)*WORDSIZE > c_h_f.nword * WORDSIZE);
-  assert(c_h_f.magic == 0x7FFF0004);
-  assert(sizeof(c_h_f) + sizeof(c_h_e) + c_h_f.number_of_node * sizeof(c_h_n[0]) ==
-         c_h_f.nword_in_header * WORDSIZE);
-  memcpy(p, &c_h_f, sizeof(c_h_f));
-  p += sizeof(c_h_f);
-
-  for (int i = 0; i < c_h_f.number_of_node; i++) {
-    struct RawCopperHeader_node& n = c_h_n[i];
-    ret = fread(&n, sizeof(n), 1, fp);
-    assert(ret == 1);
-    memcpy(p, &n, sizeof(n));
-    p += sizeof(n);
+  int ch;
+  while (-1 != (ch = getopt(argc, argv, "Ov"))) {
+    switch (ch) {
+      case 'O':
+        output = 1;
+        break;
+      case 'v':
+        verbose++;
+        break;
+    }
   }
 
-  ret = fread(&c_h_e, sizeof(c_h_e), 1, fp);
-  assert(ret == 1);
-  assert(c_h_e.magic == 0x7FFF0005);
-  memcpy(p, &c_h_e, sizeof(c_h_e));
-  p += sizeof(c_h_e);
+  for (int e = 0; ; e++) {
+    int ret;
+    uint32_t buffer[1 * 1024 * 1024];
 
-  ret = fread(p, (s_h.nword - s_h.nword_in_header - c_h_f.nword_in_header) * WORDSIZE, 1, fp);
-  assert(ret == 1);
+    if (feof(stdin)) {
+      break;
+    }
+    /* read header */
+    ret = fread(&buffer[0], sizeof(buffer[0]), 1, stdin);
+    if (ret != 1) {
+      if (0 != ferror(stdin)) {
+        fprintf(stderr, "fread error: %s\n", strferror(stdin, "r"));
+        abort();
+      }
+      break;
+    }
 
-  uint32_t* lp = (uint32_t*)p_orig;
-  assert(lp[s_h.nword - 1] == 0x7FFF0007);
+    nword = buffer[0];
+    if (verbose) {
+      fprintf(stderr, "event#=%d nword=%d\n", e, nword);
+    }
 
-  return p_orig;
-}
+    /* read body */
+    ret = fread(&buffer[1], sizeof(buffer[0]), nword - 1, stdin);
+    if (ret != nword - 1) {
+      int j;
+      fprintf(stderr, "nevent = %d, request to fread %d, but returned %d\n",
+              e, nword - 1, ret);
+      for (j = 0; j < ret + 1; j++) {
+        if (j % 8 == 0)
+          fprintf(stderr, "%4d = ", j);
+        fprintf(stderr, " %08x", buffer[j]);
+        if (j % 8 == 7)
+          fputc('\n', stderr);
+      }
+      if (j % 8 != 0)
+        fputc('\n', stderr);
+    }
+    assert(ret == nword - 1);
 
-main()
-{
-  int i = 0;
-  static char p [MAX_EVENT_SIZE];
+    uint32_t e2 = buffer[4];
 
-  while (p == fetch_event(stdin, p, MAX_EVENT_SIZE)) {
-    fprintf(stderr, "%d\n", i++);
+    if (verbose > 1) {
+      fprintf(stderr, "event_number %d(from file head)/%d(data)\n", e, e2);
+    }
+
+    if (verbose > 2) {
+      for (int i = 0; i < nword; i++) {
+        fprintf(stderr, "%d %08x\n", i, buffer[i]);
+      }
+    }
+
+    if (buffer[nword - 2] == 'TTD ' || buffer[nword - 2] == 'TLU ') {
+      assert(buffer[nword - 1] == 0x7FFF0000);
+    } else {
+      assert(buffer[nword - 1] == 0x7FFF0007);
+    }
+
+    if (verbose > 1) {
+      fprintf(stderr, "-2 %08x\n", buffer[nword - 2]);
+      fprintf(stderr, "-1 %08x\n", buffer[nword - 1]);
+    }
+
+    if (output)
+      fwrite(buffer, 4 * buffer[0], 1, stdout);
   }
+  exit(0);
 }

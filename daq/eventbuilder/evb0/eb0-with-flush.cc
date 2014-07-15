@@ -56,12 +56,16 @@ void*
 flush_stdout(void*)
 {
   while (1) {
+    printf("Check 1\n");
     poll(NULL, 0, 100); /* 100ms sleep */
-    if (0 == ftrylockfile(stdout)) {
-      // fputs("flush!\n", stderr);
+    printf("Check 2\n");
+    if (ftrylockfile(stdout)) {
+      printf("Check 3\n");
       fflush(stdout);
       funlockfile(stdout);
+      printf("Check 4\n");
     }
+    printf("Check 5\n");
   }
 }
 

@@ -44,7 +44,7 @@ namespace Belle2 {
      * Default constructor.
      * All private members are set to 0 (all vectors are empty).
      */
-    ContinuumSuppression() : m_thrustO(0.0, 0.0, 0.0), m_thrustBm(0.0), m_thrustOm(0.0), m_cosTBTO(0.0), m_cosTBz(0.0) {};
+    ContinuumSuppression() : m_thrustO(0.0, 0.0, 0.0), m_thrustBm(0.0), m_thrustOm(0.0), m_cosTBTO(0.0), m_cosTBz(0.0), m_R2(0.0) {};
 
     // setters
     /**
@@ -81,6 +81,13 @@ namespace Belle2 {
      * @param Float cosine of the angle between the thrust axis of the B and the z-axis
      */
     void addCosTBz(float cosTBz);
+
+    /**
+     * Add Fox-Wolfram moment R2.
+     *
+     * @param Float Fox-Wolgram moment R2
+     */
+    void addR2(float R2);
 
     /**
      * Add vector of KSFW moments, Et, and mm2 for final state = 0.
@@ -143,6 +150,15 @@ namespace Belle2 {
     }
 
     /**
+     * Get Fox-Wolfram moment R2.
+     *
+     * @return Float Fox-Wolfram moment R2
+     */
+    float getR2(void) const {
+      return m_R2;
+    }
+
+    /**
      * Get vector of KSFW moments, Et, and mm2 for final state = 0.
      *
      * @return vector of KSFW moments, Et, and mm2 for final state = 0
@@ -170,6 +186,7 @@ namespace Belle2 {
     float m_thrustOm;   /**< magnitude of ROE thrust axis */
     float m_cosTBTO;    /**< cosine of the angle between the thrust axis of the B and the thrust axis of the ROE */
     float m_cosTBz;     /**< cosine of the angle between the thrust axis of the B and the z-axis */
+    float m_R2;         /**< reduced Fox-Wolfram moment R2 */
 
     std::vector<float> m_ksfwFS0;  /**< vector of KSFW moments, Et, and mm2 for final state = 0 */
     std::vector<float> m_ksfwFS1;  /**< vector of KSFW moments, Et, and mm2 for final state = 1 */

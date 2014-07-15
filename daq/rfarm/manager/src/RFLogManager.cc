@@ -49,7 +49,7 @@ int RFLogManager::OpenLogFile(int today)
 {
   char filename[1024];
   if (m_logdir[0] != 0)
-    sprintf(filename, "%s/%s_d%6.6d.log", m_id, m_logdir, today);
+    sprintf(filename, "%s/%s_d%6.6d.log", m_logdir, m_id, today);
   else
     sprintf(filename, "%s_d%6.6d.log", m_id, today);
 
@@ -58,6 +58,13 @@ int RFLogManager::OpenLogFile(int today)
     fprintf(stderr, "RfLogManager(%s) : error to open file %s\n",
             m_id, filename);
     perror("RFLogManager");
+  } else {
+    // Make symbolic link to "latest.log"
+    char slinkname[1024];
+    sprintf(slinkname, "latest.log");
+    unlink(slinkname);
+    symlink(filename, slinkname);
+    printf("RFLogManager: symbolic link to %s\n", slinkname);
   }
   return m_fd;
 }

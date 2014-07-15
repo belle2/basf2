@@ -27,13 +27,10 @@ def makeDiagPlot(outputPrefix, tmvaFile, methodName):
     nbins = 100
     varPrefix = ''  # there's also a prob_MethodName variable, but not sure what it is. it definitely looks odd.
     probabilityVar = varPrefix + methodName
-    bgHist = ROOT.TH1F('background' + probabilityVar, 'background', nbins,
-                       0.0, 1.0)
-    testTree.Project('background' + probabilityVar, probabilityVar,
-                     'classID == 0')
-    signalHist = ROOT.TH1F('signal' + probabilityVar, 'signal', nbins, 0.0,
-                           1.0)
-    testTree.Project('signal' + probabilityVar, probabilityVar, 'classID == 1')
+    bgHist = ROOT.TH1F('background' + probabilityVar, 'background', nbins, 0.0, 1.0)
+    testTree.Project('background' + probabilityVar, probabilityVar, 'className == "Background"')
+    signalHist = ROOT.TH1F('signal' + probabilityVar, 'signal', nbins, 0.0, 1.0)
+    testTree.Project('signal' + probabilityVar, probabilityVar, 'className == "Signal"')
 
     import array
 
@@ -69,7 +66,7 @@ def makeDiagPlot(outputPrefix, tmvaFile, methodName):
     purityPerBin.GetXaxis().SetRangeUser(0.0, 1.0)
     purityPerBin.GetYaxis().SetRangeUser(0.0, 1.0)
     purityPerBin.Draw('APZ')
-    diagonal = ROOT.TLine(0.0, 1.0, 1.0, 0.0)
+    diagonal = ROOT.TLine(0.0, 0.0, 1.0, 1.0)
     diagonal.SetLineColor(ROOT.kAzure)
     diagonal.Draw()
     canvas.SaveAs(outputPrefix + '_diag_' + methodName + '.pdf')

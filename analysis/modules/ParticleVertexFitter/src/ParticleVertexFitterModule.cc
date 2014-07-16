@@ -24,6 +24,9 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
+// utilities
+#include <analysis/utility/PCmsLabTransform.h>
+
 // Magnetic field
 #include <geometry/bfieldmap/BFieldMap.h>
 
@@ -67,18 +70,25 @@ namespace Belle2 {
 
   void ParticleVertexFitterModule::initialize()
   {
+
+    // magnetic field
     m_Bfield = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
+    // RAVE setup
     analysis::RaveSetup::initialize(1, m_Bfield);
     B2INFO("ParticleVertexFitterModule : magnetic field = " << m_Bfield);
 
-    TVector3 beamSpot(0, 0, 0);
-    TMatrixDSym beamSpotCov(3);
-    beamSpotCov(0, 0) = 1e-03; beamSpotCov(1, 1) = 5.9e-06;
-    if (m_withConstraint.compare(std::string("ipprofile")) == 0) beamSpotCov(2, 2) = 1.9e-02; // from TDR
-    if (m_withConstraint.compare(std::string("iptube")) == 0) beamSpotCov(2, 2) = 1000;
+    m_BeamSpotCenter = TVector3(0., 0., 0.);
+    m_beamSpotCov.ResizeTo(3, 3);
+    // from gaussian fit using TDR values
+    m_beamSpotCov(0, 0) = 6.18e-4 * 6.18e-4; m_beamSpotCov(1, 1) = 5.9e-6 * 5.9e-06;
+    if (m_withConstraint.compare(std::string("ipprofile")) == 0) {
+      m_beamSpotCov(2, 2) = 154e-4 * 154e-4;
+      m_beamSpotCov(0, 2) = TMath::Tan(-1.11e-2) * m_beamSpotCov(0, 0) * m_beamSpotCov(2, 2);
+    }
+    if (m_withConstraint.compare(std::string("iptube")) == 0) findConstraintBoost(10000);
 
     if (m_withConstraint.compare(std::string("ipprofile")) == 0 || m_withConstraint.compare(std::string("iptube")) == 0)
-      analysis::RaveSetup::getInstance()->setBeamSpot(beamSpot, beamSpotCov);
+      analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
 
     if (m_decayString.compare(std::string("")) != 0)
       m_decaydescriptor.init(m_decayString);
@@ -95,6 +105,7 @@ namespace Belle2 {
   {
     //TODO: set magnetic field for each run
     //m_Bfield = BFieldMap::Instance().getBField(TVector3(0,0,0)).Z();
+    //TODO: set IP spot size for each run
   }
 
   void ParticleVertexFitterModule::event()
@@ -843,12 +854,64 @@ namespace Belle2 {
     HepPoint3D pos(0.0, 0.0, 0.0);
     CLHEP::HepSymMatrix covMatrix(3, 0);
 
-    covMatrix[0][0] = 1e-03;
-    covMatrix[1][1] = 5.9e-06;
-    covMatrix[2][2] = 1.9e-02;
+    //covMatrix[0][0] = 1e-03;
+    //covMatrix[1][1] = 5.9e-06;
+    //covMatrix[2][2] = 1.9e-02;
+
+    covMatrix[0][0] = m_beamSpotCov(0, 0);
+    covMatrix[0][1] = m_beamSpotCov(0, 1);
+    covMatrix[0][2] = m_beamSpotCov(0, 2);
+    covMatrix[1][0] = m_beamSpotCov(1, 0);
+    covMatrix[1][1] = m_beamSpotCov(1, 1);
+    covMatrix[1][2] = m_beamSpotCov(1, 2);
+    covMatrix[2][0] = m_beamSpotCov(2, 0);
+    covMatrix[2][1] = m_beamSpotCov(2, 1);
+    covMatrix[2][2] = m_beamSpotCov(2, 2);
 
     kv.setIpProfile(pos, covMatrix);
   }
+
+
+  void ParticleVertexFitterModule::findConstraintBoost(double cut)
+  {
+
+    PCmsLabTransform T;
+
+    TVector3 boost = T.getBoostVector().BoostVector();
+    TVector3 boostDir = boost.Unit();
+
+    TMatrix beamSpotCov(3, 3);
+    beamSpotCov(0, 0) = 1e-03 * 1e-03; beamSpotCov(1, 1) = 5.9e-06 * 5.9e-06; beamSpotCov(2, 2) = cut * cut;
+    double thetab = boostDir.Theta();
+    double phib = boostDir.Phi();
+
+    double stb = TMath::Sin(thetab);
+    double ctb = TMath::Cos(thetab);
+    double spb = TMath::Sin(phib);
+    double cpb = TMath::Cos(phib);
+
+
+    TMatrix rz(3, 3);  rz(2, 2) = 1;
+    rz(0, 0) = cpb; rz(0, 1) = spb;
+    rz(1, 0) = -1 * spb; rz(1, 1) = cpb;
+
+    TMatrix ry(3, 3);  ry(1, 1) = 1;
+    ry(0, 0) = ctb; ry(0, 2) = -1 * stb;
+    ry(2, 0) = stb; ry(2, 2) = ctb;
+
+    TMatrix r(3, 3);  r.Mult(rz, ry);
+    TMatrix rt(3, 3); rt.Transpose(r);
+
+    TMatrix TubePart(3, 3);  TubePart.Mult(rt, m_beamSpotCov);
+    TMatrix Tube(3, 3); Tube.Mult(TubePart, r);
+
+    m_beamSpotCov(0, 0) = Tube(0, 0);  m_beamSpotCov(0, 1) = Tube(0, 1);  m_beamSpotCov(0, 2) = Tube(0, 2);
+    m_beamSpotCov(1, 0) = Tube(1, 0);  m_beamSpotCov(1, 1) = Tube(1, 1);  m_beamSpotCov(1, 2) = Tube(1, 2);
+    m_beamSpotCov(2, 0) = Tube(2, 0);  m_beamSpotCov(2, 1) = Tube(2, 1);  m_beamSpotCov(2, 2) = Tube(2, 2);
+
+  }
+
+
 
 } // end Belle2 namespace
 

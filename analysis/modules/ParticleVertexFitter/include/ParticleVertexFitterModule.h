@@ -91,6 +91,8 @@ namespace Belle2 {
     std::string m_withConstraint; /**< additional constraint on vertex */
     std::string m_decayString   ; /**< daughter particles selection */
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of decays to look for. */
+    TVector3 m_BeamSpotCenter;    /**< Beam spot position */
+    TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
 
     /**
      * Main steering routine
@@ -208,6 +210,8 @@ namespace Belle2 {
     /**  check if all the Daughters (o grand-daugthers) are selected for the vertex fit*/
     bool allSelectedDaughters(const Particle* mother, std::vector<const Particle*> tracksVertex);
 
+    /**  calculate iptube constraint (quasi cilinder along boost direction) for RAVE fit*/
+    void findConstraintBoost(double cut);
   };
 
 } // Belle2 namespace

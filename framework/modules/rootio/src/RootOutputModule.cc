@@ -17,7 +17,9 @@
 #include <framework/core/FileCatalog.h>
 #include <framework/core/RandomNumbers.h>
 
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 #include <TCint.h>
+#endif
 #include <TClonesArray.h>
 #include <TBaseClass.h>
 #include <TTreeIndex.h>
@@ -132,9 +134,14 @@ void RootOutputModule::initialize()
       if (!hasStreamers(entryClass))
         B2ERROR("The version number in the ClassDef() macro for class " << entryClass->GetName() << " must be at least 1 to enable I/O!");
 
-      //does this class have a custom streamer? (magic from from TTree.cxx)
       int splitLevel = m_splitLevel;
-      if (gCint->ClassInfo_RootFlag(entryClass->GetClassInfo()) & 1) {
+      //does this class have a custom streamer? (magic from from TTree.cxx)
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,0,0)
+      bool hasCustomStreamer = entryClass->TestBit(TClass::kHasCustomStreamerMember);
+#else
+      bool hasCustomStreamer = gCint->ClassInfo_RootFlag(entryClass->GetClassInfo()) & 1;
+#endif
+      if (hasCustomStreamer) {
         B2DEBUG(100, entryClass->GetName() << " has custom streamer, setting split level -1 for this branch.");
 
         splitLevel = -1;

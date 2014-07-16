@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
 from basf2 import *
+
+# avoid race conditions beetween pyroot and GUI thread
+from ROOT import PyConfig
+PyConfig.StartGuiThread = False
 
 from simulation import add_simulation
 from reconstruction import add_reconstruction
@@ -27,13 +30,11 @@ main.add_module(eventinfosetter)
 main.add_module(particlegun)
 
 # detecor simulation
-components = [
-    'MagneticField',
-    'BeamPipe',
-    #'PXD',
-    #'SVD',
-    'CDC',
-    ]
+components = ['MagneticField',
+              'BeamPipe',
+              #'PXD',
+              #'SVD',
+              'CDC']
 add_simulation(main, components)
 # or add_simulation(main) to simulate all detectors
 

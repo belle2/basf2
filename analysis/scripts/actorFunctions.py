@@ -317,13 +317,16 @@ def WriteAnalysisFileForMVA(particleName, channelName, particleList, mvaConfig, 
     placeholders['mvaName'] = mvaConfig.name
     placeholders['mvaType'] = mvaConfig.type
     placeholders['mvaConfig'] = mvaConfig.config
-    placeholders['mvaVariables'] = ', '.join(mvaConfig.variables)
     placeholders['mvaTarget'] = mvaConfig.target
     placeholders['mvaTargetCluster'] = mvaConfig.targetCluster
 
     placeholders['mvaROCPlot'] = rocPlot
     placeholders['mvaOvertrainingPlot'] = overtrainingPlot
     placeholders['mvaDiagPlot'] = diagPlotFile
+
+    placeholders['mvaVariables'] = ''
+    for v in mvaConfig.variables:
+        placeholders['mvaVariables'] += '\\texttt{' + v.replace('_', '\_') + '} \\\\'
 
     filename = 'MVA_' + particleList + '.tex'
     if not os.path.isfile(filename):
@@ -443,11 +446,11 @@ def WriteAnalysisFileForParticle(particleName, postCutConfig, postCut, texfiles)
                 B2WARNING("normal channel, " + texfile)
                 placeholders['particleNSignal'] += channelPlaceholders['channelNSignal']
                 placeholders['particleNBackground'] += channelPlaceholders['channelNBackground']
-                placeholders['channelInputs'] += '\include{' + texfile[:-4] + '}\n'
+                placeholders['channelInputs'] += '\input{' + texfile[:-4] + '}\n'
             else:
                 placeholders['particleNSignal'] += channelPlaceholders['mvaNSignal']
                 placeholders['particleNBackground'] += channelPlaceholders['mvaNBackground']
-                placeholders['channelInputs'] += '\include{' + texfile[:-4] + '}\n'
+                placeholders['channelInputs'] += '\input{' + texfile[:-4] + '}\n'
 
         template = Template(file(ROOT.Belle2.FileSystem.findFile('analysis/scripts/FullEventInterpretationParticleTemplate.tex'), 'r').read())
         page = template.substitute(placeholders)

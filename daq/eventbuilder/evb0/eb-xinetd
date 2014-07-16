@@ -7,8 +7,8 @@ service eb0
 #	disable = no
 	port = 5101
 	wait = no
-	user = b2daq
-	server = /home/usr/b2daq/eb/eb0.sh
+	user = yamadas
+	server = /home/usr/yamadas/basf2/release/daq/eventbuilder/evb0/eb0.sh
 }
 
 service eb1tx
@@ -20,7 +20,7 @@ service eb1tx
 #	disable = no
 	port = 5111
 	wait = no
-	user = b2daq
+	user = ${USER}
 	server = /home/usr/b2daq/eb/eb1tx.sh
 }
 
@@ -33,7 +33,7 @@ service eb1rx
 	disable = no
 	port = 5121
 	wait = no
-	user = b2daq
+	user = ${USER}
 	server = /home/usr/b2daq/eb/eb1rx.sh
 }
 
@@ -46,7 +46,7 @@ service eb2tx
 	disable = no
 	port = 5131
 	wait = no
-	user = b2daq
+	user = ${USER}
 	server = /home/usr/b2daq/eb/eb2tx.sh
 }
 
@@ -59,6 +59,6 @@ service eb2rx
 	disable = no
 	port = 5141
 	wait = no
-	user = b2daq
+	user = ${USER}
 	server = /home/usr/b2daq/eb/eb2rx.sh
 }

@@ -93,7 +93,7 @@ namespace Belle2 {
      * @param object object to select, must be inside a StoreArray
      */
     void select(const TObject* object);
-  protected:
+
     /** Stores data associated with an arrow. */
     struct Arrow {
       std::string name; /**< label. */

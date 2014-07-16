@@ -302,9 +302,9 @@ def WriteAnalysisFileForMVA(particleName, channelName, particleList, mvaConfig, 
 
     # Get number of events in training
     rootfile = ROOT.TFile(tmva_filename)
-    testTree = rootfile.Get('TestTree')
-    nsignal = testTree.GetEntries('className == "Signal"')
-    nbckgrd = testTree.GetEntries('className == "Background"')
+    trainTree = rootfile.Get('TrainTree')
+    nsignal = trainTree.GetEntries('className == "Signal"')
+    nbckgrd = trainTree.GetEntries('className == "Background"')
 
     placeholders = {}
 

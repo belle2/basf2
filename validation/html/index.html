@@ -1,0 +1,91 @@
+<!DOCTYPE html> 
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>basf2 Validation</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<!-- Load stylesheets -->
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/main.css">
+		
+    </head>
+    <body>
+      
+      <!-- This is the layer that is shown while new plots are created -->
+      <div id="outer">
+	<div id="table-container">
+          <div id="table-cell">
+	    <img src="images/refresh.png">
+               <h1>Images are being created!</h1>
+          </div>
+	</div>
+      </div>
+
+		<!-- 'wrap' makes the sites width static and centers it on the screen-->
+		<div id='wrap'>
+
+			<div id='navigation'>
+			  <div id='menu'>
+				<div class='revisions menuhead'><img src="images/list.png">&nbsp; Revisions</div>
+				<div id='revisions' class='submenu' style='display: block; position: relative;'></div>
+				
+				<div class='packages menuhead'><img src="images/cubes.png">&nbsp; Packages</div>
+				<div id='packages' class='submenu'></div>
+				
+				<div class='filters menuhead'><img src="images/filter.png">&nbsp; Filters</div>
+				<div id='filters' class='submenu'>
+				  Display only those with: <br>
+				  <input type="checkbox" name="filters" value="p_value_leq_0_01">&nbsp; pvalue < 0.01 <br>
+				  <input type="checkbox" name="filters" value="p_value_leq_1">&nbsp; pvalue < 1 <br>
+				</div>
+				
+				<div class='menuhead readlogs'><img src="images/file-text.png">&nbsp; Read Logs</div>
+				
+				<div class='menuhead reportbug'><img src="images/bug.png">&nbsp; Report Bug</div>
+			  </div>
+			  <div class="lastmodified"></div>
+			</div>
+			
+			<div id="loglist">
+			  <div id="loglist_handle">Read Logs <div class='close'><img src='images/close.png'></div></div>
+			  <div id="loglist_content"></div>
+			</div>
+
+			<div id="logreader">
+			  <div id="logreader_handle">Read Logs <div class='close'><img src='images/close.png'></div></div>
+			  <pre contenteditable  id="logreader_content"></pre>
+			</div>
+
+			<div id="content"></div> 
+			
+		</div>
+
+		<!-- Load JavaScript last to speed up site creation -->
+		<script src="js/jquery-1.11.1.min.js" type="text/javascript"></script>
+		<script src="js/jquery-ui.min.js" type="text/javascript"></script>
+		<script src="js/loadcontent.js" type="text/javascript"></script>
+
+		<script src="js/toggle-menus.js" type="text/javascript"></script>
+		<script src="js/make-plots.js" type="text/javascript"></script>
+		<script src="js/read-logs.js" type="text/javascript"></script>
+		<script src="js/apply-filters.js" type="text/javascript"></script>
+		<script src="js/window-resize.js" type="text/javascript"></script>
+		<script src="js/ping-server.js" type="text/javascript"></script>
+
+		<script type="text/x-mathjax-config">
+		 MathJax.Hub.Config({
+		    tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]},
+		    "HTML-CSS": { preferredFont: "STIX" }
+		 });
+		</script>
+		<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    </body>
+</html>

@@ -198,7 +198,8 @@ namespace Belle2 {
     }
 
 
-#if defined(__CINT__) || defined(R__DICTIONARY_FILENAME)
+#if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
+
     /**
      * @{
      * Define versions without template arguments, only available from python modules.

@@ -158,6 +158,15 @@ namespace Belle2 {
       /** 7x7 errror matrix of the mother particle after the fit */
       TMatrixFSym m_fitted7Cov;
 
+
+    private:
+
+      /** Convert the error matrix from P-M to P-E. It Requires an input error matrit in the form X,P,M */
+      TMatrixDSym ErrorMatrixMassToEnergy(TLorentzVector p4, TMatrixDSym MassErr);
+
+      /** Convert the error matrix from P-E to P-M. It Requires an input error matrit in the form X,P,E */
+      TMatrixDSym ErrorMatrixEnergyToMass(TLorentzVector p4, TMatrixDSym EnergyErr);
+
     };
   }
 

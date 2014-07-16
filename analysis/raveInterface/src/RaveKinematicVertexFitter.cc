@@ -68,18 +68,30 @@ void RaveKinematicVertexFitter::addTrack(const Particle* aParticlePtr)
 {
 
   rave::Vector7D raveState(aParticlePtr->getX(), aParticlePtr->getY(), aParticlePtr->getZ(), aParticlePtr->getPx(), aParticlePtr->getPy(), aParticlePtr->getPz(), aParticlePtr->getMass());
-  TMatrixFSym cov = aParticlePtr->getMomentumVertexErrorMatrix();
+  TMatrixDSym covP = aParticlePtr->getMomentumVertexErrorMatrix();
 
-  rave::Covariance7D raveCov(cov(4, 4), cov(4, 5), cov(4, 6), // x x , x y, x z
-                             cov(5, 5), cov(5, 6), cov(6, 6), // y y , y z, z z
-                             cov(0, 4), cov(1, 4), cov(2, 4), // x px , x py, x pz
-                             cov(0, 5), cov(1, 5), cov(2, 5), // y px , y py, y pz
-                             cov(0, 6), cov(1, 6), cov(2, 6), // z px , z py, z pz
-                             cov(0, 0), cov(1, 0), cov(2, 0), // px px , px py, px pz
-                             cov(1, 1), cov(1, 2), cov(2, 2), // py py , py pz, pz pz
-                             cov(4, 3), cov(5, 3), cov(6, 3), // x m , y m, z m
-                             cov(0, 3), cov(1, 3), cov(2, 3), // px m, py m, pz m
-                             cov(3, 3)); // mm
+  TMatrixDSym covE(7);
+  for (int i = 0; i < 7; i++) {
+    for (int j = 0; j < 7; j++) {
+      if (i < 3 && j < 3) covE(i, j) = covP(i + 4, j + 4);
+      if (i > 2 && j > 2) covE(i, j) = covP(i - 3, j - 3);
+      if (i < 3 && j > 2) covE(i, j) = covP(i + 4, j - 3);
+      if (i > 2 && j < 3) covE(i, j) = covP(i - 3, j + 4);
+    }
+  }
+
+  TMatrixDSym cov = ErrorMatrixEnergyToMass(aParticlePtr->get4Vector(), covE);
+
+  rave::Covariance7D raveCov(cov(0, 0), cov(0, 1), cov(0, 2), // x x , x y, x z
+                             cov(1, 1), cov(1, 2), cov(2, 2), // y y , y z, z z
+                             cov(0, 3), cov(0, 4), cov(0, 5), // x px , x py, x pz
+                             cov(1, 3), cov(1, 4), cov(1, 5), // y px , y py, y pz
+                             cov(2, 3), cov(2, 4), cov(2, 5), // z px , z py, z pz
+                             cov(3, 3), cov(3, 4), cov(3, 5), // px px , px py, px pz
+                             cov(4, 4), cov(4, 5), cov(5, 5), // py py , py pz, pz pz
+                             cov(0, 6), cov(1, 6), cov(2, 6), // x m , y m, z m
+                             cov(3, 6), cov(4, 6), cov(5, 6), // px m, py m, pz m
+                             cov(6, 6)); // mm
 
   rave::TransientTrackKinematicParticle aRaveParticle(raveState, raveCov, rave::Charge(aParticlePtr->getCharge()), 1, 1);
   // 1 and 1 are dummy values for chi2 and ndf. the are not used for the vertex fit
@@ -121,9 +133,6 @@ int RaveKinematicVertexFitter::fit()
 
   ndf = 2 * m_inputParticles.size();
 
-  //if (m_useBeamSpot == true) {
-  //ndf += 3;
-  //}
   if (ndf < 4 && m_vertFit) {
     return -1;
   }
@@ -237,14 +246,10 @@ int RaveKinematicVertexFitter::fit()
   if (m_vertFit) {
     rave::KinematicVertex fittedVertex = m_fittedResult.currentDecayVertex();
 
-
     m_fittedNdf = fittedVertex.ndf();
     m_fittedChi2 = fittedVertex.chiSquared();
     m_fittedPValue = ROOT::Math::chisquared_cdf_c(m_fittedChi2, m_fittedNdf);
     m_fittedPos.SetXYZ(fittedVertex.position().x(), fittedVertex.position().y(), fittedVertex.position().z());
-
-    //m_raveVertices = RaveSetup::s_instance->m_raveVertexFactory->create(m_raveTracks, m_useBeamSpot);
-    //nOfVertices = m_raveVertices.size();
 
   } else {
     m_fittedNdf = m_fittedParticle.ndof();
@@ -258,40 +263,53 @@ int RaveKinematicVertexFitter::fit()
 
   m_fitted7Cov.ResizeTo(7, 7);
 
-  m_fitted7Cov(3, 0) = fittedCov.dpxm();  m_fitted7Cov(0, 3) = m_fitted7Cov(3, 0);
-  m_fitted7Cov(3, 1) = fittedCov.dpym();  m_fitted7Cov(1, 3) = m_fitted7Cov(3, 1);
-  m_fitted7Cov(3, 2) = fittedCov.dpzm();  m_fitted7Cov(2, 3) = m_fitted7Cov(3, 2);
-  m_fitted7Cov(3, 3) = fittedCov.dmm();   m_fitted7Cov(3, 3) = m_fitted7Cov(3, 3);
-  m_fitted7Cov(3, 4) = fittedCov.dxm();   m_fitted7Cov(4, 3) = m_fitted7Cov(3, 4);
-  m_fitted7Cov(3, 5) = fittedCov.dym();   m_fitted7Cov(5, 3) = m_fitted7Cov(3, 5);
-  m_fitted7Cov(3, 6) = fittedCov.dzm();   m_fitted7Cov(6, 3) = m_fitted7Cov(3, 6);
+  TMatrixDSym fitted7CovM(7);
 
-  m_fitted7Cov(0, 0) = fittedCov.dpxpx(); m_fitted7Cov(0, 0) = m_fitted7Cov(0, 0);
-  m_fitted7Cov(0, 1) = fittedCov.dpxpy(); m_fitted7Cov(1, 0) = m_fitted7Cov(0, 1);
-  m_fitted7Cov(0, 2) = fittedCov.dpxpz(); m_fitted7Cov(2, 0) = m_fitted7Cov(0, 2);
-  m_fitted7Cov(0, 4) = fittedCov.dxpx();  m_fitted7Cov(4, 0) = m_fitted7Cov(0, 4);
-  m_fitted7Cov(0, 5) = fittedCov.dypx();  m_fitted7Cov(5, 0) = m_fitted7Cov(0, 5);
-  m_fitted7Cov(0, 6) = fittedCov.dzpx();  m_fitted7Cov(6, 0) = m_fitted7Cov(0, 6);
+  fitted7CovM(3, 6) = fittedCov.dpxm();  fitted7CovM(6, 3) = fitted7CovM(3, 6);
+  fitted7CovM(4, 6) = fittedCov.dpym();  fitted7CovM(6, 4) = fitted7CovM(4, 6);
+  fitted7CovM(5, 6) = fittedCov.dpzm();  fitted7CovM(6, 5) = fitted7CovM(5, 6);
+  fitted7CovM(6, 6) = fittedCov.dmm();   fitted7CovM(6, 6) = fitted7CovM(6, 6);
+  fitted7CovM(0, 6) = fittedCov.dxm();   fitted7CovM(6, 0) = fitted7CovM(0, 6);
+  fitted7CovM(1, 6) = fittedCov.dym();   fitted7CovM(6, 1) = fitted7CovM(1, 6);
+  fitted7CovM(2, 6) = fittedCov.dzm();   fitted7CovM(6, 2) = fitted7CovM(2, 6);
 
-  m_fitted7Cov(1, 1) = fittedCov.dpypy(); m_fitted7Cov(1, 1) = m_fitted7Cov(1, 1);
-  m_fitted7Cov(1, 2) = fittedCov.dpypz(); m_fitted7Cov(2, 1) = m_fitted7Cov(1, 2);
-  m_fitted7Cov(1, 4) = fittedCov.dxpy();  m_fitted7Cov(4, 1) = m_fitted7Cov(1, 4);
-  m_fitted7Cov(1, 5) = fittedCov.dypy();  m_fitted7Cov(5, 1) = m_fitted7Cov(1, 5);
-  m_fitted7Cov(1, 6) = fittedCov.dzpy();  m_fitted7Cov(6, 1) = m_fitted7Cov(1, 6);
+  fitted7CovM(3, 3) = fittedCov.dpxpx(); fitted7CovM(3, 3) = fitted7CovM(3, 3);
+  fitted7CovM(3, 4) = fittedCov.dpxpy(); fitted7CovM(4, 3) = fitted7CovM(3, 4);
+  fitted7CovM(3, 5) = fittedCov.dpxpz(); fitted7CovM(5, 3) = fitted7CovM(3, 5);
+  fitted7CovM(3, 0) = fittedCov.dxpx();  fitted7CovM(0, 3) = fitted7CovM(3, 0);
+  fitted7CovM(3, 1) = fittedCov.dypx();  fitted7CovM(1, 3) = fitted7CovM(3, 1);
+  fitted7CovM(3, 2) = fittedCov.dzpx();  fitted7CovM(2, 3) = fitted7CovM(3, 2);
 
-  m_fitted7Cov(2, 2) = fittedCov.dpzpz(); m_fitted7Cov(2, 2) = m_fitted7Cov(2, 2);
-  m_fitted7Cov(2, 4) = fittedCov.dxpz();  m_fitted7Cov(4, 2) = m_fitted7Cov(2, 4);
-  m_fitted7Cov(2, 5) = fittedCov.dypz();  m_fitted7Cov(5, 2) = m_fitted7Cov(2, 5);
-  m_fitted7Cov(2, 6) = fittedCov.dzpz();  m_fitted7Cov(6, 2) = m_fitted7Cov(2, 6);
+  fitted7CovM(4, 4) = fittedCov.dpypy(); fitted7CovM(4, 4) = fitted7CovM(4, 4);
+  fitted7CovM(4, 5) = fittedCov.dpypz(); fitted7CovM(5, 4) = fitted7CovM(4, 5);
+  fitted7CovM(4, 0) = fittedCov.dxpy();  fitted7CovM(0, 4) = fitted7CovM(4, 0);
+  fitted7CovM(4, 1) = fittedCov.dypy();  fitted7CovM(1, 4) = fitted7CovM(4, 1);
+  fitted7CovM(4, 2) = fittedCov.dzpy();  fitted7CovM(2, 4) = fitted7CovM(4, 2);
 
-  m_fitted7Cov(4, 4) = fittedCov.dxx();   m_fitted7Cov(4, 4) = m_fitted7Cov(4, 4);
-  m_fitted7Cov(4, 5) = fittedCov.dxy();   m_fitted7Cov(5, 4) = m_fitted7Cov(4, 5);
-  m_fitted7Cov(4, 6) = fittedCov.dxz();   m_fitted7Cov(6, 4) = m_fitted7Cov(4, 6);
+  fitted7CovM(5, 5) = fittedCov.dpzpz(); fitted7CovM(5, 5) = fitted7CovM(5, 5);
+  fitted7CovM(5, 0) = fittedCov.dxpz();  fitted7CovM(0, 5) = fitted7CovM(5, 0);
+  fitted7CovM(5, 1) = fittedCov.dypz();  fitted7CovM(1, 5) = fitted7CovM(5, 1);
+  fitted7CovM(5, 2) = fittedCov.dzpz();  fitted7CovM(2, 5) = fitted7CovM(5, 2);
 
-  m_fitted7Cov(5, 5) = fittedCov.dyy();   m_fitted7Cov(5, 5) = m_fitted7Cov(5, 5);
-  m_fitted7Cov(5, 6) = fittedCov.dyz();   m_fitted7Cov(6, 5) = m_fitted7Cov(5, 6);
+  fitted7CovM(0, 0) = fittedCov.dxx();   fitted7CovM(0, 0) = fitted7CovM(0, 0);
+  fitted7CovM(0, 1) = fittedCov.dxy();   fitted7CovM(1, 0) = fitted7CovM(0, 1);
+  fitted7CovM(0, 2) = fittedCov.dxz();   fitted7CovM(2, 0) = fitted7CovM(0, 2);
 
-  m_fitted7Cov(6, 6) = fittedCov.dzz();   m_fitted7Cov(6, 6) = m_fitted7Cov(6, 6);
+  fitted7CovM(1, 1) = fittedCov.dyy();   fitted7CovM(1, 1) = fitted7CovM(1, 1);
+  fitted7CovM(1, 2) = fittedCov.dyz();   fitted7CovM(2, 1) = fitted7CovM(1, 2);
+
+  fitted7CovM(2, 2) = fittedCov.dzz();   fitted7CovM(2, 2) = fitted7CovM(2, 2);
+
+  TMatrixDSym fitted7CovE = ErrorMatrixMassToEnergy(m_fitted4Vector, fitted7CovM);
+
+  for (int i = 0; i < 7; i++) {
+    for (int j = 0; j < 7; j++) {
+      if (i < 4 && j < 4) m_fitted7Cov(i, j) = fitted7CovE(i + 3, j + 3);
+      if (i > 3 && j > 3) m_fitted7Cov(i, j) = fitted7CovE(i - 4, j - 4);
+      if (i < 4 && j > 3) m_fitted7Cov(i, j) = fitted7CovE(i + 3, j - 4);
+      if (i > 3 && j < 4) m_fitted7Cov(i, j) = fitted7CovE(i - 4, j + 3);
+    }
+  }
 
   return 1;
 
@@ -347,6 +365,65 @@ TMatrixDSym RaveKinematicVertexFitter::getVertexErrorMatrix()
 
   return posErr;
 }
+
+
+TMatrixDSym RaveKinematicVertexFitter::ErrorMatrixMassToEnergy(TLorentzVector p4, TMatrixDSym MassErr)
+{
+
+  TMatrix jac(7, 7);
+  for (int i = 0; i < 7; i++) {
+    for (int j = 0; j < 7; j++) {
+      if (i == j) jac(i, j) = 1; else jac(i, j) = 0;
+    }
+  }
+  jac(6, 3) = p4.Px() / p4.E();
+  jac(6, 4) = p4.Py() / p4.E();
+  jac(6, 5) = p4.Pz() / p4.E();
+  jac(6, 6) = p4.M() / p4.E();
+
+
+  TMatrix jact(7, 7); jact.Transpose(jac);
+  TMatrix EnergyErrPart(7, 7); EnergyErrPart.Mult(jac, MassErr);
+  TMatrix EnergyErrTemp(7, 7); EnergyErrTemp.Mult(EnergyErrPart, jact);
+
+  TMatrixDSym EnergyErr(7);
+  for (int i = 0; i < 7; i++) {
+    for (int j = 0; j < 7; j++) {
+      EnergyErr(i, j) = EnergyErrTemp(i, j);
+    }
+  }
+
+  return EnergyErr;
+}
+
+TMatrixDSym RaveKinematicVertexFitter::ErrorMatrixEnergyToMass(TLorentzVector p4, TMatrixDSym EnergyErr)
+{
+
+  TMatrix jac(7, 7);
+  for (int i = 0; i < 7; i++) {
+    for (int j = 0; j < 7; j++) {
+      if (i == j) jac(i, j) = 1; else jac(i, j) = 0;
+    }
+  }
+  jac(6, 3) = -1 * p4.Px() / p4.M();
+  jac(6, 4) = -1 * p4.Py() / p4.M();
+  jac(6, 5) = -1 * p4.Pz() / p4.M();
+  jac(6, 6) = p4.E() / p4.M();
+
+  TMatrix jact(7, 7); jact.Transpose(jac);
+  TMatrix MassErrPart(7, 7); MassErrPart.Mult(jac, EnergyErr);
+  TMatrix MassErrTemp(7, 7); MassErrTemp.Mult(MassErrPart, jact);
+
+  TMatrixDSym MassErr(7);
+  for (int i = 0; i < 7; i++) {
+    for (int j = 0; j < 7; j++) {
+      MassErr(i, j) = MassErrTemp(i, j);
+    }
+  }
+
+  return MassErr;
+}
+
 
 // int RaveKinematicVertexFitter::updateDauthers()
 // {

@@ -3,7 +3,7 @@
 * Copyright(C) 2010 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Christian Oswald                                         *
+* Contributors: Christian Oswald, Luigi Li Gioi                          *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -29,6 +29,8 @@ namespace Belle2 {
     float* m_fP;
     /** Momentum in lab system (px py pz e). */
     float** m_fP4;
+    /** Momentum Error in lab system (px py pz e). */
+    float** m_fEP4;
     /** Mass. */
     float* m_fM;
     /** Create branches in m_tree - this function should be called by the constructor only. */

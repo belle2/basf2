@@ -1,0 +1,10 @@
+#!/bin/sh
+rm -f output.dat
+i=1
+while [ $i -le $1 ]
+do
+  echo $i
+  basf2 -n 10 ../tracking/examples/CDCLegendrePatternReco-withinput.py -- --input ../tmp/MCEvtGenData_output.root >> output.dat
+
+  i=`expr $i + 1`
+done

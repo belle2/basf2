@@ -7,8 +7,8 @@ service eb0
 #	disable = no
 	port = 5101
 	wait = no
-	user = yamadas
-	server = /home/usr/yamadas/basf2/release/daq/eventbuilder/evb0/eb0.sh
+	user = g0cdc
+	server = /home/g0cdc/belle2/releases/v20140711/daq/eventbuilder/evb0/eb0.sh
 }
 
 service eb1tx
@@ -20,8 +20,8 @@ service eb1tx
 #	disable = no
 	port = 5111
 	wait = no
-	user = ${USER}
-	server = /home/usr/b2daq/eb/eb1tx.sh
+	user = g0cdc
+	server = /home/g0cdc/belle2/releases/v20140711/daq/eventbuilder/evb0/eb1tx.sh
 }
 
 service eb1rx
@@ -33,8 +33,8 @@ service eb1rx
 	disable = no
 	port = 5121
 	wait = no
-	user = ${USER}
-	server = /home/usr/b2daq/eb/eb1rx.sh
+	user = g0cdc
+	server = /home/g0cdc/belle2/releases/v20140711/daq/eventbuilder/evb0/eb1rx.sh
 }
 
 service eb2tx
@@ -46,8 +46,8 @@ service eb2tx
 	disable = no
 	port = 5131
 	wait = no
-	user = ${USER}
-	server = /home/usr/b2daq/eb/eb2tx.sh
+	user = g0cdc
+	server = /home/g0cdc/belle2/releases/v20140711/daq/eventbuilder/evb0/eb2tx.sh
 }
 
 service eb2rx
@@ -59,6 +59,6 @@ service eb2rx
 	disable = no
 	port = 5141
 	wait = no
-	user = ${USER}
-	server = /home/usr/b2daq/eb/eb2rx.sh
+	user = g0cdc
+	server = /home/g0cdc/belle2/releases/v20140711/daq/eventbuilder/evb0/eb2rx.sh
 }

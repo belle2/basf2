@@ -15,11 +15,11 @@ stdFSParticles()
 stdLooseFSParticles()
 stdLightMesons()
 
-makeParticle('K*0 -> K-:all pi+:all', {'M': (0.6, 1.2)})
+makeParticle('K*0 -> K-:all pi+:all', '0.6 < M < 1.2')
 matchMCTruth('K*0')
 
 # Prepare the B candidates
-makeParticle('B0 -> K*0 gamma:all', {'M': (5.2, 5.4)})
+makeParticle('B0 -> K*0 gamma:all', '5.2 < M 5.4')
 matchMCTruth('B0')
 
 ntupleFile('../Bd_Kstgamma.ntup.root')
@@ -37,8 +37,8 @@ tools = [
     'MCHierarchy',
     'B0 -> [K*0 -> ^K+ ^pi-] ^gamma',
     'PID',
-    'B0 -> [K*0 -> ^K+ ^pi-] gamma',
-    ]
+    'B0 -> [K*0 -> ^K+ ^pi-] gamma']
+
 ntupleTree('Bd_Kstgamma_tuple', 'B0', tools)
 
 ##########
@@ -51,8 +51,8 @@ eventtools = [
     'DetectorStatsRec',
     'B-',
     'DetectorStatsSim',
-    'B-',
-    ]
+    'B-']
+
 ntupleTree('eventtuple', '', eventtools)
 
 summaryOfLists(['K*0', 'B0'])

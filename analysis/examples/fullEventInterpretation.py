@@ -64,7 +64,7 @@ mvaConfig_D = Particle.MVAConfiguration(
 mvaConfig_B = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     # name='NeuroBayes', type='Plugin', config='!H:V:CreateMVAPdfs:NtrainingIter=0:Preprocessing=122:ShapeTreat=DIAG:TrainingMethod=BFGS',
-    variables=['daughterProductOf(getExtraInfo(SignalProbability))', 'p', 'pt', 'p_CMS', 'pt_CMS'],
+    variables=['daughterProductOf(getExtraInfo(SignalProbability))', 'deltaE'],
     target='isSignal', targetCluster=1
 )
 

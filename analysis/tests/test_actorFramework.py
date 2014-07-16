@@ -43,7 +43,13 @@ class TestFunction(unittest.TestCase):
 
 
 class MockModule(Module):
-    pass
+    def __init__(self, name='NoName', isParallelCertified=True):
+        super(MockModule, self).__init__()
+        self.name = name
+        self.has_property = isParallelCertified
+
+    def has_properties(self, *args):
+        return self.has_property
 
 
 class TestFunction(object):
@@ -135,6 +141,76 @@ class TestSequence(unittest.TestCase):
         # Because fun returns None!
         self.assertEqual(len(path.modules()), 0)
         self.assertEqual(t.calls, 2)
+
+    def test_optimize_parallel_processing(self):
+        def a1(path):
+            path.add_module(MockModule('a1', isParallelCertified=True))
+            return {'a1': 1}
+
+        def a2(path, a1):
+            path.add_module(MockModule('a2', isParallelCertified=False))
+            return {'a2': 1}
+
+        def a3(path, a2):
+            path.add_module(MockModule('a3', isParallelCertified=True))
+            return {'a3': 1}
+
+        def b1(path):
+            path.add_module(MockModule('b1', isParallelCertified=True))
+            return {'b1': 1}
+
+        def b2(path, b1):
+            path.add_module(MockModule('b2', isParallelCertified=True))
+            return {'b2': 1}
+
+        def b3(path, b2):
+            path.add_module(MockModule('b3', isParallelCertified=True))
+            return {'b3': 1}
+
+        def c1(path):
+            path.add_module(MockModule('c1', isParallelCertified=True))
+            return {'c1': 1}
+
+        def c2(path, c1):
+            path.add_module(MockModule('c2', isParallelCertified=True))
+            return {'c2': 1}
+
+        def c3(path, c2):
+            path.add_module(MockModule('c3', isParallelCertified=False))
+            return {'c3': 1}
+
+        def d(path, a3, b3, c3):
+            path.add_module(MockModule('d', isParallelCertified=True))
+            return {}
+
+        self.s.addFunction(a1, path='Path')
+        self.s.addFunction(a2, path='Path', a1='a1')
+        self.s.addFunction(a3, path='Path', a2='a2')
+
+        self.s.addFunction(b1, path='Path')
+        self.s.addFunction(b2, path='Path', b1='b1')
+        self.s.addFunction(b3, path='Path', b2='b2')
+
+        self.s.addFunction(c1, path='Path')
+        self.s.addFunction(c2, path='Path', c1='c1')
+        self.s.addFunction(c3, path='Path', c2='c2')
+
+        self.s.addFunction(d, path='Path', a3='a3', b3='b3', c3='c3')
+
+        path = create_path()
+        self.s.run(path, False)
+
+        self.assertEqual(len(path.modules()), 10)
+        self.assertEqual(path.modules()[0].name, 'a1')
+        self.assertEqual(path.modules()[1].name, 'b1')
+        self.assertEqual(path.modules()[2].name, 'c1')
+        self.assertEqual(path.modules()[3].name, 'b2')
+        self.assertEqual(path.modules()[4].name, 'c2')
+        self.assertEqual(path.modules()[5].name, 'b3')
+        self.assertEqual(path.modules()[6].name, 'a2')
+        self.assertEqual(path.modules()[7].name, 'a3')
+        self.assertEqual(path.modules()[8].name, 'c3')
+        self.assertEqual(path.modules()[9].name, 'd')
 
 if __name__ == '__main__':
     unittest.main()

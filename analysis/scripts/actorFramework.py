@@ -153,6 +153,7 @@ class Sequence(object):
         # If there are no ready actors, the resolution of the dependencies is finished (and maybe incomplete).
         actors = [actor for actor in self.seq]
         results = dict()
+        results['Path'] = True
         chain = []
         while True:
             ready = filter(lambda item: all(requirement in results for requirement in item.requires), actors)
@@ -176,6 +177,10 @@ class Sequence(object):
             needed += list(reversed([actor for actor in level if any((r in actor.provides and actor.provides[r] is not None) for n in needed for r in n.requires)]))
         needed = list(reversed(needed))
 
+        # Some modules are certified for parallel processing. Modules which aren't certified should run as late as possible!
+        # Otherwise they slow down all following modules! Therefore we try to move these modules to the end of the needed list.
+        needed = self.optimizeForParallelProcessing(needed)
+
         # The modules in the basf2 path added by the actors are crucial to the FullEventInterpretation
         # Therefore we add the filled path objects of the needed actors to the main basf2 path given as an argument to this function
         for actor in needed:
@@ -185,6 +190,40 @@ class Sequence(object):
         if verbose:
             self.createDotGraphic(needed)
             self.printMissingDependencies(actors, results.keys())
+
+    def optimizeForParallelProcessing(self, needed):
+        """
+        Reorder the needed modules to optimize for parallel processing without violating the their requirements.
+        Essentialy moving all non-parallel-processing certified modules at the end of the list.
+        @param needed actors
+        """
+        def isPPC(actor):
+            return all([module.has_properties(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED) for module in actor.path.modules()])
+
+        pp = filter(isPPC, needed)
+        if(len(pp) == len(needed)):
+            return needed
+
+        while True:
+            firstSingleCoreActor = filter(lambda x: not isPPC(x), needed)[0]
+            firstSingleCoreIndex = needed.index(firstSingleCoreActor)
+
+            def canActorRunBeforeFirstSingleCoreActor(actor):
+                if not isPPC(actor):
+                    return False
+                index = needed.index(actor)
+                if index <= firstSingleCoreIndex:
+                    return True
+                provides = sum([other.provides.keys() for other in needed[firstSingleCoreIndex:index]], [])
+                return not any([r in provides for r in actor.requires])
+
+            optimized = filter(lambda actor: canActorRunBeforeFirstSingleCoreActor(actor), needed)
+            optimized += filter(lambda actor: actor not in optimized, needed)
+            if optimized == needed:
+                break
+            needed = optimized
+
+        return optimized
 
     def printMissingDependencies(self, unresolved, provided):
         """

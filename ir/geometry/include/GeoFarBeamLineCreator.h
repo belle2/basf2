@@ -30,7 +30,8 @@ namespace Belle2 {
   namespace ir {
     /** The struct for FarBeamLineElement */
     struct FarBeamLineElement {
-      G4Transform3D transform; /** Transformation */
+      /** Transformation */
+      G4Transform3D transform;
       G4VSolid* geo;           /** Solid volume */
     };
 

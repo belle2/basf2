@@ -30,7 +30,8 @@ namespace Belle2 {
   namespace ir {
     /** The struct for CryostatElement */
     struct CryostatElement {
-      G4Transform3D transform; /** Transformation */
+      /** Transformation */
+      G4Transform3D transform;
       G4VSolid* geo;           /** Solid volume */
       G4LogicalVolume* logi;   /** Logical volume */
     };

@@ -34,45 +34,54 @@ namespace Belle2 {
     float m_fR2;      /** reduced Fox-Wolfram moment R2 */
 
     // For final state = 0
-    float m_k0mm2;    /** missing mass squared */
-    float m_k0et;     /** transverse energy */
-    float m_k0hso00;  /** Hso(0,0) */
-    float m_k0hso01;  /** Hso(0,1) */
-    float m_k0hso02;  /** Hso(0,2) */
-    float m_k0hso03;  /** Hso(0,3) */
-    float m_k0hso04;  /** Hso(0,4) */
-    float m_k0hso10;  /** Hso(1,0) */
-    float m_k0hso12;  /** Hso(1,2) */
-    float m_k0hso14;  /** Hso(1,4) */
-    float m_k0hso20;  /** Hso(2,0) */
-    float m_k0hso22;  /** Hso(2,2) */
-    float m_k0hso24;  /** Hso(2,4) */
-    float m_k0hoo0;   /** Roo(0) */
-    float m_k0hoo1;   /** Roo(1) */
-    float m_k0hoo2;   /** Roo(2) */
-    float m_k0hoo3;   /** Roo(3) */
-    float m_k0hoo4;   /** Roo(4) */
+    float m_fk0mm2;    /** missing mass squared */
+    float m_fk0et;     /** transverse energy */
+    float m_fk0hso00;  /** Hso(0,0) */
+    float m_fk0hso01;  /** Hso(0,1) */
+    float m_fk0hso02;  /** Hso(0,2) */
+    float m_fk0hso03;  /** Hso(0,3) */
+    float m_fk0hso04;  /** Hso(0,4) */
+    float m_fk0hso10;  /** Hso(1,0) */
+    float m_fk0hso12;  /** Hso(1,2) */
+    float m_fk0hso14;  /** Hso(1,4) */
+    float m_fk0hso20;  /** Hso(2,0) */
+    float m_fk0hso22;  /** Hso(2,2) */
+    float m_fk0hso24;  /** Hso(2,4) */
+    float m_fk0hoo0;   /** Roo(0) */
+    float m_fk0hoo1;   /** Roo(1) */
+    float m_fk0hoo2;   /** Roo(2) */
+    float m_fk0hoo3;   /** Roo(3) */
+    float m_fk0hoo4;   /** Roo(4) */
 
     // For final state = 1
-    float m_k1mm2;    /** missing mass squared */
-    float m_k1et;     /** transverse energy */
-    float m_k1hso00;  /** Hso(0,0) */
-    float m_k1hso01;  /** Hso(0,1) */
-    float m_k1hso02;  /** Hso(0,2) */
-    float m_k1hso03;  /** Hso(0,3) */
-    float m_k1hso04;  /** Hso(0,4) */
-    float m_k1hso10;  /** Hso(1,0) */
-    float m_k1hso12;  /** Hso(1,2) */
-    float m_k1hso14;  /** Hso(1,4) */
-    float m_k1hso20;  /** Hso(2,0) */
-    float m_k1hso22;  /** Hso(2,2) */
-    float m_k1hso24;  /** Hso(2,4) */
-    float m_k1hoo0;   /** Roo(0) */
-    float m_k1hoo1;   /** Roo(1) */
-    float m_k1hoo2;   /** Roo(2) */
-    float m_k1hoo3;   /** Roo(3) */
-    float m_k1hoo4;   /** Roo(4) */
+    float m_fk1mm2;    /** missing mass squared */
+    float m_fk1et;     /** transverse energy */
+    float m_fk1hso00;  /** Hso(0,0) */
+    float m_fk1hso01;  /** Hso(0,1) */
+    float m_fk1hso02;  /** Hso(0,2) */
+    float m_fk1hso03;  /** Hso(0,3) */
+    float m_fk1hso04;  /** Hso(0,4) */
+    float m_fk1hso10;  /** Hso(1,0) */
+    float m_fk1hso12;  /** Hso(1,2) */
+    float m_fk1hso14;  /** Hso(1,4) */
+    float m_fk1hso20;  /** Hso(2,0) */
+    float m_fk1hso22;  /** Hso(2,2) */
+    float m_fk1hso24;  /** Hso(2,4) */
+    float m_fk1hoo0;   /** Roo(0) */
+    float m_fk1hoo1;   /** Roo(1) */
+    float m_fk1hoo2;   /** Roo(2) */
+    float m_fk1hoo3;   /** Roo(3) */
+    float m_fk1hoo4;   /** Roo(4) */
 
+    float m_fcc1;      /** Cleo Cone 1 */
+    float m_fcc2;      /** Cleo Cone 2 */
+    float m_fcc3;      /** Cleo Cone 3 */
+    float m_fcc4;      /** Cleo Cone 4 */
+    float m_fcc5;      /** Cleo Cone 5 */
+    float m_fcc6;      /** Cleo Cone 6 */
+    float m_fcc7;      /** Cleo Cone 7 */
+    float m_fcc8;      /** Cleo Cone 8 */
+    float m_fcc9;      /** Cleo Cone 9 */
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();

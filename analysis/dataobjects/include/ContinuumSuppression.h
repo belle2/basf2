@@ -105,6 +105,13 @@ namespace Belle2 {
      */
     void addKsfwFS1(std::vector<float> ksfwFS1);
 
+    /**
+     * Add vector of Cleo Cones
+     *
+     * @param vector of Cleo Cones
+     */
+    void addCleoCones(std::vector<float> cleoCones);
+
     // getters
     /**
      * Get ROE thrust axis.
@@ -178,6 +185,14 @@ namespace Belle2 {
       return m_ksfwFS1;
     }
 
+    /**
+     * Get vector of Cleo Cones.
+     *
+     * @return vector of Cleo Cones
+     */
+    std::vector<float> getCleoCones(void) const {
+      return m_cleoCones;
+    }
 
   private:
 
@@ -192,6 +207,8 @@ namespace Belle2 {
 
     std::vector<float> m_ksfwFS0;  /**< vector of KSFW moments, Et, and mm2 for final state = 0 */
     std::vector<float> m_ksfwFS1;  /**< vector of KSFW moments, Et, and mm2 for final state = 1 */
+
+    std::vector<float> m_cleoCones;  /**< vector of Cleo Cones */
 
     ClassDef(ContinuumSuppression, 1) /**< class definition */
 

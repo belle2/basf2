@@ -56,5 +56,9 @@ void ContinuumSuppression::addKsfwFS1(std::vector<float> KsfwFS1)
   m_ksfwFS1 = KsfwFS1;
 }
 
+void ContinuumSuppression::addCleoCones(std::vector<float> CleoCones)
+{
+  m_cleoCones = CleoCones;
+}
 
 ClassImp(ContinuumSuppression)

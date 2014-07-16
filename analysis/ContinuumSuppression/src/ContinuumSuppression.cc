@@ -23,6 +23,7 @@
 #include <analysis/utility/Thrust.h>
 #include <analysis/utility/KsfwMoments.h>
 #include <analysis/utility/FoxWolfram.h>
+#include <analysis/utility/CleoCones.h>
 
 
 namespace Belle2 {
@@ -43,6 +44,9 @@ namespace Belle2 {
 
     std::vector<float> ksfwFS0;
     std::vector<float> ksfwFS1;
+
+    std::vector<float> cleoConesAll;
+    std::vector<float> cleoConesRoe;
 
     double et[2];
 
@@ -190,6 +194,14 @@ namespace Belle2 {
       cosTBTO  = fabs(cos(thrustB.Angle(thrustO)));
       cosTBz   = fabs(thrustB.CosTheta());
 
+      // Cleo Cones
+      // TODO: make the following option configurable:
+      //       calculate the momentum flow for all particles in the event
+      //       vs only those in the roe.
+      CleoCones cc(p3_cms_all, p3_cms_roe, thrustB, true, true);
+      cleoConesAll = cc.cleo_cone_with_all();
+      cleoConesRoe = cc.cleo_cone_with_roe();
+
       // Fox-Wolfram Moments: Uses all final-state tracks (= sigB + ROE)
       FoxWolfram FW(foxwolfram(p3_cms_all.begin(), p3_cms_all.end(), SelfFunc(TVector3())));
       R2 = FW.R(2);
@@ -261,6 +273,7 @@ namespace Belle2 {
     qqVars->addR2(R2);
     qqVars->addKsfwFS0(ksfwFS0);
     qqVars->addKsfwFS1(ksfwFS1);
-
+    qqVars->addCleoCones(cleoConesAll);
+    // TODO: add cleo cones calculated from roe only.
   }
 }

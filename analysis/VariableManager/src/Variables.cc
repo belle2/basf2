@@ -1023,7 +1023,7 @@ namespace Belle2 {
       return 1.0;
     }
 
-    // Continuum Suppression  -------------------------------
+    // Continuum Suppression related ------------------------
 
     double thrustBm(const Particle* particle)
     {
@@ -1594,6 +1594,132 @@ namespace Belle2 {
       return result;
     }
 
+    double cc1(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> cleoCones = qq->getCleoCones();
+      result = cleoCones.at(0);
+
+      return result;
+    }
+
+    double cc2(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> cleoCones = qq->getCleoCones();
+      result = cleoCones.at(1);
+
+      return result;
+    }
+
+    double cc3(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> cleoCones = qq->getCleoCones();
+      result = cleoCones.at(2);
+
+      return result;
+    }
+
+    double cc4(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> cleoCones = qq->getCleoCones();
+      result = cleoCones.at(3);
+
+      return result;
+    }
+
+    double cc5(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> cleoCones = qq->getCleoCones();
+      result = cleoCones.at(4);
+
+      return result;
+    }
+
+    double cc6(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> cleoCones = qq->getCleoCones();
+      result = cleoCones.at(5);
+
+      return result;
+    }
+
+    double cc7(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> cleoCones = qq->getCleoCones();
+      result = cleoCones.at(6);
+
+      return result;
+    }
+
+    double cc8(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> cleoCones = qq->getCleoCones();
+      result = cleoCones.at(7);
+
+      return result;
+    }
+
+    double cc9(const Particle* particle)
+    {
+      double result = -99.0;
+
+      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+      if (!qq)
+        return result;
+
+      std::vector<float> cleoCones = qq->getCleoCones();
+      result = cleoCones.at(8);
+
+      return result;
+    }
+
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
@@ -1768,5 +1894,14 @@ namespace Belle2 {
     REGISTER_VARIABLE("k1hoo2"   , k1hoo2  , "Roo(2)   for FS=1");
     REGISTER_VARIABLE("k1hoo3"   , k1hoo3  , "Roo(3)   for FS=1");
     REGISTER_VARIABLE("k1hoo4"   , k1hoo4  , "Roo(4)   for FS=1");
+    REGISTER_VARIABLE("cc1"      , cc1     , "Cleo Cone 1");
+    REGISTER_VARIABLE("cc2"      , cc2     , "Cleo Cone 2");
+    REGISTER_VARIABLE("cc3"      , cc3     , "Cleo Cone 3");
+    REGISTER_VARIABLE("cc4"      , cc4     , "Cleo Cone 4");
+    REGISTER_VARIABLE("cc5"      , cc5     , "Cleo Cone 5");
+    REGISTER_VARIABLE("cc6"      , cc6     , "Cleo Cone 6");
+    REGISTER_VARIABLE("cc7"      , cc7     , "Cleo Cone 7");
+    REGISTER_VARIABLE("cc8"      , cc8     , "Cleo Cone 8");
+    REGISTER_VARIABLE("cc9"      , cc9     , "Cleo Cone 9");
   }
 }

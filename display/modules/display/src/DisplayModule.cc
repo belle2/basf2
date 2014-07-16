@@ -18,7 +18,6 @@
 #include <TApplication.h>
 #include <TGeoManager.h>
 #include <TEveManager.h>
-#include <TSystem.h>
 
 using namespace Belle2;
 
@@ -43,10 +42,6 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
   addParam("hideObjects", m_hideObjects, "Objects which are to be hidden (can be manually re-enabled in tree view). Names correspond to the object names in the 'Event'. (Note that this won't work for objects somewhere deep in the tree, only for those immediately below 'Event'.)", {});
   addParam("GFTrackCandidatesColName", m_trackCandidateColName, "Name of collection holding the genfit::TrackCandidates", std::string(""));
   addParam("GFTrackColName", m_gftrackColName, "Name of collection holding the genfit::Tracks", std::string(""));
-
-  //make sure dictionaries for PXDrecohits are loaded
-  //needs to be done here to have dictionaries available during RootInput::initialize()
-  gSystem->Load("libpxd");
 
   //create gApplication so we can use graphics support. Needs to be done before ROOT has a chance to do it for us.
   if ((!gApplication) || (gApplication && gApplication->TestBit(TApplication::kDefaultApplication))) {

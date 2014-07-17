@@ -150,6 +150,18 @@ namespace {
     EXPECT_TRUE(a.check(nullptr));
     a.init("[1 < 2 < 3 or 3 > 4 ] and [ 5 < 6 or 7 > 6 ]");
     EXPECT_TRUE(a.check(nullptr));
+    a.init("[1 < 2 < 3 or 3 > 4 ] or [ 5 < 6 and 7 > 6 ]");
+    EXPECT_TRUE(a.check(nullptr));
+
+    a.init("1 < 2 and 3 < 4 or 5 > 6");
+    EXPECT_TRUE(a.check(nullptr));
+    a.init("1 < 2 or 3 < 4 and 5 > 6");
+    EXPECT_TRUE(a.check(nullptr));
+    a.init("1 < 2 and 4 < 3 or 6 > 5");
+    EXPECT_TRUE(a.check(nullptr));
+    a.init("1 < 2 or 4 < 3 and 6 > 5");
+    EXPECT_TRUE(a.check(nullptr));
+
 
   }
 

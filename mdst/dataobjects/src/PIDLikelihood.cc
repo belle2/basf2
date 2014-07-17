@@ -69,13 +69,18 @@ double PIDLikelihood::getProbability(const Const::ChargedStable& p1,
   if (ratio == 0) return 0;
 
   double dlogl = getLogL(p2, set) - getLogL(p1, set);
+  double res;
   if (dlogl < 0) {
     double elogl = exp(dlogl);
-    return ratio / (ratio + elogl);
+    res = ratio / (ratio + elogl);
   } else {
     double elogl = exp(-dlogl) * ratio; // to prevent overflow for very large dlogl
-    return elogl / (1.0 + elogl);
+    res = elogl / (1.0 + elogl);
   }
+  //TODO: only necessary if one wants to use mcprod1405 MC sample. Remove when there's a good replacement.
+  if (isfinite(res))
+    return res;
+  return 0;
 }
 
 double PIDLikelihood::getProbability(const Const::ChargedStable& part,

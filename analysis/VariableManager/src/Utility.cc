@@ -84,17 +84,17 @@ bool Belle2::Variable::Cut::processLogicConditions(std::string str)
   unsigned long int begin = findMatchedParenthesis(str);
   unsigned long int pos = 0;
 
-  if ((pos =  str.find(" and ", begin)) != std::string::npos) {
-    operation = AND;
-    left = new Cut(str.substr(0, pos));
-    right = new Cut(str.substr(pos + 5));
-    return true;
-  }
-
-  if ((pos =  str.find(" or ", begin)) != std::string::npos) {
+  if ((pos =  str.find(" or ", begin)) != std::string::npos && str.substr(begin, pos - begin).find("[") == std::string::npos) {
     operation = OR;
     left = new Cut(str.substr(0, pos));
     right = new Cut(str.substr(pos + 4));
+    return true;
+  }
+
+  if ((pos =  str.find(" and ", begin)) != std::string::npos && str.substr(begin, pos - begin).find("[") == std::string::npos) {
+    operation = AND;
+    left = new Cut(str.substr(0, pos));
+    right = new Cut(str.substr(pos + 5));
     return true;
   }
 
@@ -218,7 +218,16 @@ float Belle2::Variable::Cut::get(const Particle* p)
 void Belle2::Variable::Cut::print()
 {
 
-  std::cout << operation << std::endl;
+  switch (operation) {
+    case EMPTY: std::cout << "EMPTY" << std::endl; break;
+    case NONE: std::cout << "NONE" << std::endl; break;
+    case AND: std::cout << "AND" << std::endl; break;
+    case OR: std::cout << "OR" << std::endl; break;
+    case LT: std::cout << "LT" << std::endl; break;
+    case LE: std::cout << "LE" << std::endl; break;
+    case GT: std::cout << "GT" << std::endl; break;
+    case GE: std::cout << "GE" << std::endl; break;
+  }
   if (left != nullptr) {
     std::cout << "Left " << std::endl;
     left->print();

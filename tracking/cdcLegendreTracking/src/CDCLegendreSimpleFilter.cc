@@ -10,19 +10,12 @@
 
 
 #include <tracking/cdcLegendreTracking/CDCLegendreSimpleFilter.h>
-//#include <tracking/cdcLegendreTracking/filter/CDCLegendreFilterCandidate.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
 
-#include <cstdlib>
-#include <list>
-#include <map>
 
 using namespace std;
 
 using namespace Belle2;
 using namespace TrackFinderCDCLegendre;
-
 
 
 double SimpleFilter::getAssigmentProbability(TrackHit* hit, TrackCandidate* track)

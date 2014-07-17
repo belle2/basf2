@@ -1,7 +1,5 @@
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackingSortHit.h>
 
-#include <boost/tuple/tuple.hpp>
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
 
 using namespace std;
 using namespace Belle2;

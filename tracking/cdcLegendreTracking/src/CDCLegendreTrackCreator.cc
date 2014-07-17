@@ -10,24 +10,6 @@
 
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackCreator.h>
 
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackFitter.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackingSortHit.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackDrawer.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreQuadTree.h>
-#include <tracking/cdcLegendreTracking/CDCLegendrePatternChecker.h>
-
-#include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Const.h>
-#include <cdc/dataobjects/CDCHit.h>
-#include "genfit/TrackCand.h"
-
-#include <cmath>
-#include <cstdlib>
-#include <iomanip>
-#include <string>
-
 using namespace std;
 using namespace Belle2;
 using namespace TrackFinderCDCLegendre;

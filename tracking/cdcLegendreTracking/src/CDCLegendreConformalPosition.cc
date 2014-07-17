@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <tracking/cdcLegendreTracking/CDCLegendreConformalPosition.h>
-#include <cdc/geometry/CDCGeometryPar.h>
 
 using namespace std;
 using namespace Belle2;

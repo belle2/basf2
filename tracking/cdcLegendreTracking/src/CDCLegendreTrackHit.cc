@@ -9,17 +9,7 @@
  **************************************************************************/
 
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreWireCenter.h>
 
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
-
-#include <cdc/geometry/CDCGeometryPar.h>
-#include <cdc/translators/SimpleTDCCountTranslator.h>
-
-#include <cmath>
-#include <TMath.h>
-
-#include <iostream>
 using namespace std;
 using namespace Belle2;
 using namespace CDC;

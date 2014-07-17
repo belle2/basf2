@@ -10,16 +10,19 @@
 
 #pragma once
 
+
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
+
+#include <cstdlib>
 #include <fstream>
 #include <vector>
 #include <list>
 #include <map>
 
+
 namespace Belle2 {
   namespace TrackFinderCDCLegendre {
-
-    class TrackCandidate;
-    class TrackHit;
 
     class SimpleFilter {
 

@@ -7,20 +7,27 @@
 
 #pragma once
 
-#include "cdc/geometry/CDCGeometryPar.h"
-#include "cdc/translators/SimpleTDCCountTranslator.h"
 
-#include <fstream>
+#include <tracking/cdcLegendreTracking/CDCLegendreWireCenter.h>
+
+#include "cdc/translators/SimpleTDCCountTranslator.h"
+#include "cdc/geometry/CDCGeometryPar.h"
+#include "mdst/dataobjects/MCParticle.h"
+#include "cdc/dataobjects/CDCHit.h"
+
 #include "genfit/Track.h"
 #include "genfit/TrackCand.h"
+#include "framework/datastore/StoreArray.h"
+#include "framework/gearbox/Const.h"
 
-class TVector2;
-//class TrackCand;
-//class Track;
+#include <boost/foreach.hpp>
+#include "TVector2.h"
+
+#include <fstream>
+#include <iomanip>
+#include <cmath>
 
 namespace Belle2 {
-  class CDCHit;
-  class MCParticle;
 
   namespace TrackFinderCDCLegendre {
 

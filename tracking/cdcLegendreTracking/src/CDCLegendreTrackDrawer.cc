@@ -9,23 +9,6 @@
  **************************************************************************/
 
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackDrawer.h>
-#include "tracking/cdcLegendreTracking/CDCLegendreNiceDrawing.h"
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
-
-#include "framework/datastore/StoreArray.h"
-#include "cdc/dataobjects/CDCHit.h"
-
-#include "TF1.h"
-#include "TCanvas.h"
-#include "TGraph.h"
-#include "TAxis.h"
-#include "TEllipse.h"
-#include "TLine.h"
-
-#include <iomanip>
-#include <fstream>
-
 
 using namespace Belle2;
 using namespace TrackFinderCDCLegendre;

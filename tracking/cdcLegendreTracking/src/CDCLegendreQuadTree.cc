@@ -9,26 +9,7 @@
  **************************************************************************/
 
 #include <tracking/cdcLegendreTracking/CDCLegendreQuadTree.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreFastHough.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreQuadTreeCandidateCreator.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreConformalPosition.h>
-#include "tracking/cdcLegendreTracking/CDCLegendreQuadTreeNeighborFinder.h"
 
-#include <cmath>
-#include <cstdlib>
-#include <iomanip>
-#include <string>
-
-#include <boost/foreach.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/utility.hpp>
-
-#include <iostream>
-#include <sstream>
-#include <algorithm>
-#include <memory>
-#include <cmath>
 
 using namespace std;
 using namespace Belle2;

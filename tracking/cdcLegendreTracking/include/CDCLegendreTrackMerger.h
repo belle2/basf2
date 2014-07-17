@@ -9,20 +9,28 @@
  **************************************************************************/
 
 #pragma once
+
+
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackFitter.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreFastHough.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackCreator.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
+
+
+#include <cdc/geometry/CDCGeometryPar.h>
+
 #include <list>
 #include <set>
 #include <cstdlib>
 #include <vector>
+#include <cmath>
 
 namespace Belle2 {
   namespace TrackFinderCDCLegendre {
 
-    class TrackHit;
-    class TrackCandidate;
-    class TrackFitter;
     class FastHough;
     class TrackCreator;
-
 
     /* TODO: Check whether track overlaps with other tracks; may be try to sort tracks according to number of inresections/overlappings, some weights might be applied
      * if track sharing more than, for example, 50% of hits, that track should be definitely splitted into few*/

@@ -9,17 +9,6 @@
  **************************************************************************/
 
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackMerger.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreFastHough.h>
-
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackFitter.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackCreator.h>
-
-
-#include <cdc/geometry/CDCGeometryPar.h>
-
-#include <cmath>
 
 #define SQR(x) ((x)*(x))
 

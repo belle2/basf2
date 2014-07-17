@@ -10,14 +10,16 @@
 
 #pragma once
 
+#include <tracking/cdcLegendreTracking/CDCLegendreConformalPosition.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreQuadTree.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
+
 #include <vector>
+#include <algorithm>
+#include <cmath>
 
 namespace Belle2 {
   namespace TrackFinderCDCLegendre {
-
-    class TrackHit;
-    class QuadTree;
-    class ConformalPosition;
 
     class FastHough {
     public:

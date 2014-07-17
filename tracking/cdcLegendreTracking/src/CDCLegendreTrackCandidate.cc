@@ -7,20 +7,11 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
 
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackFitter.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreQuadTree.h>
 
 
 
-#include <framework/datastore/StoreArray.h>
-#include <cmath>
-#include <cstdlib>
-#include "TMath.h"
-#include "boost/foreach.hpp"
-#include <iostream>
 #define SQR(x) ((x)*(x)) //we will use it in least squares fit
 
 

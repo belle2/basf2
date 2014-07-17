@@ -1,14 +1,17 @@
 #pragma once
 
+
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackCreator.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
+
 #include <mdst/dataobjects/HitPatternCDC.h>
 
 namespace Belle2 {
-  class HitPatternCDC;
+
   namespace TrackFinderCDCLegendre {
 
-    class TrackHit;
     class TrackCreator;
-    class TrackCandidate;
 
     /** Class for working with hit patterns. */
     /* TODO: Check whether track overlaps with other tracks; may be try to sort tracks according to number of inresections/overlappings, some weights might be applied

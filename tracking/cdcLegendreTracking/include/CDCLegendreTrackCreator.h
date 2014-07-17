@@ -9,24 +9,37 @@
  **************************************************************************/
 
 #pragma once
-#include <list>
-#include <set>
-#include <cstdlib>
-#include <vector>
+
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackDrawer.h>
+#include <tracking/cdcLegendreTracking/CDCLegendrePatternChecker.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackFitter.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreQuadTree.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackingSortHit.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
+
+#include "genfit/TrackCand.h"
+#include <cdc/dataobjects/CDCHit.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Const.h>
 
 #include <cstdlib>
+#include <list>
+#include <set>
+#include <vector>
+
+#include <cmath>
 #include <iomanip>
 #include <string>
+
 using namespace std;
 
 namespace Belle2 {
   namespace TrackFinderCDCLegendre {
 
-    class TrackHit;
-    class TrackCandidate;
-    class TrackFitter;
-    class TrackDrawer;
     class QuadTree;
+    class TrackDrawer;
+    class TrackFitter;
 
     class TrackCreator {
     public:

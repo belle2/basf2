@@ -18,16 +18,35 @@
 
 #pragma once
 
+#include "tracking/cdcLegendreTracking/CDCLegendreQuadTreeNeighborFinder.h"
+#include <tracking/cdcLegendreTracking/CDCLegendreQuadTreeCandidateCreator.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreFastHough.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreConformalPosition.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
+
 #include <framework/logging/Logger.h>
+
+#include <boost/foreach.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <boost/utility.hpp>
 
 #include <set>
 #include <vector>
 #include <algorithm>
 
+#include <cstdlib>
+#include <iomanip>
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <algorithm>
+#include <memory>
+#include <cmath>
+
 namespace Belle2 {
   namespace TrackFinderCDCLegendre {
 
-    class TrackHit;
+    class QuadTreeNeighborFinder;
 
     class QuadTree {
 

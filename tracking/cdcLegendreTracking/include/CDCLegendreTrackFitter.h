@@ -10,18 +10,30 @@
 
 #pragma once
 
-#include <list>
-#include <cstdlib>
-#include <vector>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
+
+#include <framework/datastore/StoreArray.h>
+
+#include <boost/foreach.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <boost/utility.hpp>
 
 #include "TVector3.h"
 
+#include <cstdlib>
+#include <iomanip>
+#include <string>
+#include <list>
+#include <vector>
+#include <cmath>
+#include <iostream>
 
 namespace Belle2 {
   namespace TrackFinderCDCLegendre {
 
-    class TrackHit;
     class TrackCandidate;
+    class TrackHit;
 
     class TrackFitter {
     public:

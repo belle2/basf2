@@ -9,15 +9,6 @@
 **************************************************************************/
 
 #include <tracking/cdcLegendreTracking/CDCLegendreQuadTreeCandidateCreator.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreQuadTree.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackFitter.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackCreator.h>
-#include <tracking/cdcLegendreTracking/CDCLegendrePatternChecker.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackMerger.h>
-
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
-#include <algorithm>
 
 using namespace std;
 using namespace Belle2;

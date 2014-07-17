@@ -9,21 +9,6 @@
  **************************************************************************/
 
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackFitter.h>
-#include <framework/datastore/StoreArray.h>
-
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
-#include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
-
-#include <cstdlib>
-#include <iomanip>
-#include <string>
-
-#include <boost/foreach.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/utility.hpp>
-#include <cmath>
-#include <iostream>
-
 
 #define SQR(x) ((x)*(x)) //we will use it in least squares fit
 

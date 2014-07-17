@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/CDCHit.h>
 
 namespace Belle2 {

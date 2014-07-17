@@ -10,20 +10,29 @@
 
 #pragma once
 
+#include <tracking/cdcLegendreTracking/CDCLegendrePatternChecker.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackMerger.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackCreator.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackFitter.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreQuadTree.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
+
 #include <set>
 #include <list>
 #include <vector>
 
+#include <algorithm>
+
+
 namespace Belle2 {
+
   namespace TrackFinderCDCLegendre {
 
-
-    class TrackHit;
+    class TrackCreator;
     class QuadTree;
     class TrackFitter;
-    class TrackCreator;
     class TrackMerger;
-
 
     class QuadTreeCandidateCreator {
 

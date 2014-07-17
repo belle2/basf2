@@ -10,15 +10,28 @@
 
 #pragma once
 
+
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackFitter.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreQuadTree.h>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
+
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
+
 #include "TVector3.h"
 #include "TVector2.h"
+
+#include "boost/foreach.hpp"
+
 #include <list>
-#include <mdst/dataobjects/HitPatternCDC.h>
+#include <cmath>
+#include <cstdlib>
+#include <iostream>
+#include "TMath.h"
 
 namespace Belle2 {
   namespace TrackFinderCDCLegendre {
 
-    class TrackHit;
     class QuadTree;
 
     /** Class for track candidates after CDC pattern recognition. */

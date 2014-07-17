@@ -6,9 +6,6 @@
  */
 
 #include "tracking/cdcLegendreTracking/CDCLegendreQuadTreeNeighborFinder.h"
-#include <tracking/cdcLegendreTracking/CDCLegendreQuadTree.h>
-#include <algorithm>
-#include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;

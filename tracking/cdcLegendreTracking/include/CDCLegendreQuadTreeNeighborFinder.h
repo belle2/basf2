@@ -7,14 +7,17 @@
 
 #pragma once
 
+#include <tracking/cdcLegendreTracking/CDCLegendreQuadTree.h>
+
+#include <framework/logging/Logger.h>
 #include <algorithm>
 
 
 namespace Belle2 {
   namespace TrackFinderCDCLegendre {
 
-
     class QuadTree;
+
     class QuadTreeNeighborFinder {
     public:
       QuadTreeNeighborFinder() {};

@@ -20,37 +20,25 @@ namespace Belle2 {
 
     class TrackCandidate;
     class TrackHit;
-//  class CDCLegendreFilterCandidate;
 
     class SimpleFilter {
 
     public:
 
 
-      /**
-       * Constructor
-       */
+      /** Constructor */
       SimpleFilter() {};
 
       ~SimpleFilter() {};
 
-      /**
-       * Returns probability of hit assignment to track. TODO: more robust criteria should be implemented
-       */
+      /** Returns probability of hit assignment to track. TODO: more robust criteria should be implemented */
       double getAssigmentProbability(TrackHit* hit, TrackCandidate* track);
 
-      /**
-       * Hits reassignment;
-       */
+      /** Hits reassignment */
       void processTracks(std::list<TrackCandidate*>& trackList);
 
-      /**
-       * Append unused hits to tracks
-       */
+      /** Append unused hits to tracks */
       void appenUnusedHits(std::list<TrackCandidate*>& trackList, std::vector<TrackHit*> AxialHitList);
-
-//    void trackCore();
-
 
     private:
 

@@ -45,112 +45,97 @@ namespace Belle2 {
        * @param drawCands Sets whether track candidates should be drawn
        * @param mcParticlesColName Name of MC particles in StoreArray
        */
-      NiceDrawing(std::string& TrackCandColName, std::string& trackColName,
-                  std::string& HitColName, std::string& StoreDirectory, bool drawMCSignal,
-                  bool drawCands, std::string& mcParticlesColName);
+      NiceDrawing(std::string& TrackCandColName,
+                  std::string& trackColName,
+                  std::string& HitColName,
+                  std::string& StoreDirectory,
+                  bool drawMCSignal,
+                  bool drawCands,
+                  std::string& mcParticlesColName);
 
-      /**
-       * Prepare variables and CDC stucture
-       */
+      /** Prepare variables and CDC stucture */
       void initialize();
 
-      /**
-       * Process event
-       */
+      /** Process event */
       void event();
 
-      /**
-       * Initialization of colors
-       */
+      /** Initialization of colors */
       void initColorVec();
 
-      /**
-       * Initialize wires
-       */
+      /** Initialize wires */
       void initWireString();
 
-      /**
-       * Get position of wire
-       */
+      /** Get position of wire */
       TVector2 getWirePosition(int iLayer, int iWire);
 
-      /**
-       * Circle drawing
-       */
-      void drawCircle(std::stringstream& drawString, TVector2 position, double radius, std::string color, double linewidth = 1);
+      /** Circle drawing */
+      void drawCircle(std::stringstream& drawString,
+                      TVector2 position,
+                      double radius,
+                      std::string color,
+                      double linewidth = 1);
 
-      /**
-       * Arc drawing
-       */
-      void drawArc(std::stringstream& drawString, TVector2 position, TVector2 center, double radius, int charge, std::string color, double linewidth = 1);
+      /** Arc drawing */
+      void drawArc(std::stringstream& drawString,
+                   TVector2 position,
+                   TVector2 center,
+                   double radius,
+                   int charge,
+                   std::string color,
+                   double linewidth = 1);
 
-      /**
-       * Translate coordinates from normal space to svg space
-       */
+      /** Translate coordinates from normal space to svg space */
       TVector3 translateCircle(TVector2 center, double radius);
 
-      /**
-       * Initialize svg file
-       */
+      /** Initialize svg file */
       void initFig();
 
-      /**
-       * Finalize svg file
-       */
+      /** Finalize svg file */
       void finalizeFile();
 
-      /**
-       * Draw wires in svg file
-       */
+      /** Draw wires in svg file */
       void drawWires();
 
-      /**
-       * Draw hits in svg file
-       */
+      /** Draw hits in svg file */
       void drawCDCHits();
 
-      /**
-       * Draw given hit
-       */
-      void drawCDCHit(std::stringstream& drawString, CDCHit* TrackHit, std::string hitColor);
+      /** Draw given hit */
+      void drawCDCHit(std::stringstream& drawString,
+                      CDCHit* TrackHit,
+                      std::string hitColor);
 
-      /**
-       * Track drawing function
-       */
-      void drawAnyTrack(std::stringstream& drawString, TVector2 momentum, int charge, std::string trackColor, TVector2 position, int linewidth = 2);
+      /** Track drawing function */
+      void drawAnyTrack(std::stringstream& drawString,
+                        TVector2 momentum,
+                        int charge,
+                        std::string trackColor,
+                        TVector2 position,
+                        int linewidth = 2);
 
-      /**
-       * Taking information about tracks and draw them
-       */
+      /**Taking information about tracks and draw them */
       void drawTrackCands();
 
-      /**
-       * Draws track candidate
-       */
-      void drawTrackCand(std::stringstream& drawString, genfit::TrackCand* TrackCand, std::string hitColor);
+      /** Draws track candidate */
+      void drawTrackCand(std::stringstream& drawString,
+                         genfit::TrackCand* TrackCand,
+                         std::string hitColor);
 
-      /**
-       * Taking information about MC tracks and draw them
-       */
+      /** Taking information about MC tracks and draw them */
       void drawMCTracks();
 
-      /**
-       * Draws MC track
-       */
-      void drawMCTrack(std::stringstream& drawString, MCParticle* mcPart, std::string trackColor);
+      /** Draws MC track*/
+      void drawMCTrack(std::stringstream& drawString,
+                       MCParticle* mcPart,
+                       std::string trackColor);
 
 //    void drawTracks();
 
 //    void drawTrack(std::stringstream& drawSting, genfit::Track* track, std::string color);
 
-      /**
-       * Get color by index
-       */
+      /** Get color by index */
       std::string getColor(int i);
 
-      /**
-       * Returns position of track end
-       */
+      /** Returns position of track end */
       std::pair<TVector2, TVector2> getIntersect(TVector2 center, TVector2 position);
 
     protected:

@@ -22,8 +22,7 @@ namespace Belle2 {
       /** Check pattern of curlers*/
       void checkCurler(std::pair<std::vector<TrackHit*>, std::pair<double, double> >* track);
 
-      /**
-       * Check pattern of hits:
+      /** Check pattern of hits:
        * in between of innermost and outermost SLayers should be no empty SLayers;
        * argument of function allows define minimal number of axial hits in each SLayer
        */

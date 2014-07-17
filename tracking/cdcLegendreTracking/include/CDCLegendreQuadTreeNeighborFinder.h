@@ -20,34 +20,22 @@ namespace Belle2 {
       QuadTreeNeighborFinder() {};
       ~QuadTreeNeighborFinder() {};
 
-      /**
-       * Get static instance of the class
-       */
+      /** Get static instance of the class */
       static QuadTreeNeighborFinder& Instance();
 
-      /**
-       * Controls process of neighbors finding
-       */
+      /** Controls process of neighbors finding */
       void controller(QuadTree*, QuadTree*, QuadTree*);
 
-      /**
-       * One level up in the tree
-       */
+      /** One level up in the tree */
       void levelUp(QuadTree*, QuadTree*);
 
-      /**
-       * One level down in the tree
-       */
+      /** One level down in the tree */
       void levelDown(QuadTree*, QuadTree*);
 
-      /**
-       * Trying to find neighbors to node
-       */
+      /** Trying to find neighbors to node */
       void findNeighbors(QuadTree*, QuadTree*, QuadTree*);
 
-      /**
-       * Checks if nodes are neighbors
-       */
+      /** Checks if nodes are neighbors */
       bool compareNodes(QuadTree*, QuadTree*);
 
     private:

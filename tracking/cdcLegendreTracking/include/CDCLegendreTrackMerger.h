@@ -29,36 +29,27 @@ namespace Belle2 {
     class TrackMerger {
     public:
 
-      TrackMerger(std::list<TrackCandidate*>& trackList, std::list<TrackCandidate*>& trackletList, std::list<TrackCandidate*>& stereoTrackletList, TrackFitter* cdcLegendreTrackFitter, FastHough* cdcLegendreFastHough, TrackCreator* cdcLegendreTrackCreator);
+      TrackMerger(std::list<TrackCandidate*>& trackList, std::list<TrackCandidate*>& trackletList,
+                  std::list<TrackCandidate*>& stereoTrackletList, TrackFitter* cdcLegendreTrackFitter,
+                  FastHough* cdcLegendreFastHough, TrackCreator* cdcLegendreTrackCreator);
 
 
-      /**
-       * The track finding often finds two curling tracks, originating from the same particle. This function merges them.
-       */
+      /** The track finding often finds two curling tracks, originating from the same particle. This function merges them. */
       void doTracksMerging();
 
-      /**
-       * Trying to merge tracks
-       */
+      /** Trying to merge tracks */
       double tryToMergeAndFit(TrackCandidate* cand1, TrackCandidate* cand2, bool remove_hits = true);
 
-      /**
-       * Trying select core of the tracks and fit them together, then add good hits
-       */
+      /** Trying select core of the tracks and fit them together, then add good hits */
       double selectCoreMergeFit(TrackCandidate* cand1, TrackCandidate* cand2);
 
-      /**
-       * Calculate distance between track and hit
-       */
+      /** Calculate distance between track and hit */
       double checkDist(TrackHit* hit, TrackCandidate* cand);
 
-      /**
-       * Split tracks into positive and negative parts
-       */
+      /** Split tracks into positive and negative parts */
       void splitTracks();
 
-      /**
-       * check whether tracks are overlapping;
+      /** Check whether tracks are overlapping;
        * for overlapping tracks try to merge them or make clear separation
        */
       void checkOverlapping();
@@ -87,20 +78,17 @@ namespace Belle2 {
       /**
        * Function which adds stereo tracklets to the track
        * Uses simple combinations of tracks
-       * also theta angle determination implemented; for each tracklet which possibly can belong to the track theta angle are calculated, and then voting for better theta angle done
+       * also theta angle determination implemented; for each tracklet which possibly can belong to the track theta angle are
+       * calculated, and then voting for better theta angle done
        */
       void addStereoTracklesToTrack();
 
-      /**
-       * Set stereowire z position
+      /** Set stereowire z position
        * first, estimate z-position of wires, fine ajustment of z position using info about drift time
-       *
        */
       double fitStereoTrackletsToTrack(TrackCandidate*, TrackCandidate*);
 
-      /**
-       * Extend tracklet using conformal transformation with respect to given point
-       */
+      /** Extend tracklet using conformal transformation with respect to given point */
       void extendTracklet(TrackCandidate* tracklet, std::vector<TrackHit*>& m_AxialHitList);
 
 

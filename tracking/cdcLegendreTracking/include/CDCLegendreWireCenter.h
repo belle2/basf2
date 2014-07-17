@@ -19,14 +19,10 @@ namespace Belle2 {
 
       ~WireCenter();
 
-      /**
-       * Get static instance of the class
-       */
+      /** Get static instance of the class */
       static WireCenter& Instance();
 
-      /**
-       * Get center of wire
-       */
+      /** Get center of wire */
       inline double getCenter(int iCLayer) const {return m_wireCentersArray[iCLayer];};
 
     private:

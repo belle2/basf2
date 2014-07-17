@@ -35,7 +35,8 @@ namespace Belle2 {
 
 
       /** Constructor to create a CDCTrackHit from a CDCHit object.
-       * Some member variables of CDCHit are copied and other to CDCTrackHit specific variables are initialized (e.g. the position of the hit wire in normal space and in the conformal plane).
+       * Some member variables of CDCHit are copied and other to CDCTrackHit specific variables are initialized
+       * (e.g. the position of the hit wire in normal space and in the conformal plane).
        */
       TrackHit(CDCHit* hit, int iHit);
 

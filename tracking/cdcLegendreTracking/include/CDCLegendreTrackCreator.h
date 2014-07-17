@@ -37,21 +37,19 @@ namespace Belle2 {
        * @param track construction of std::pairs, describing the track candidate by the axial hits, belonging to it and the parameter r and theta
        * @param trackHitList list of all track hits, which are used for track finding. Hits belonging to the track candidate will be deleted from it.
        */
-      void createLegendreTrackCandidate(const std::pair<std::vector<TrackHit*>, std::pair<double, double> >& track, std::pair<double, double>& ref_point);
+      void createLegendreTrackCandidate(
+        const std::pair<std::vector<TrackHit*>, std::pair<double, double> >& track,
+        std::pair<double, double>& ref_point);
 
       /**
        * Create track candidate using CDCLegendreQuadTree nodes and return pointer to created candidate
        */
       TrackCandidate* createLegendreTrackCandidate(std::vector<QuadTree*> nodeList);
 
-      /**
-       * Create tracklet using vector of hits and store it
-       */
+      /** Create tracklet using vector of hits and store it */
       TrackCandidate* createLegendreTracklet(std::vector<TrackHit*>& hits);
 
-      /**
-       * Create stereo tracklet using vector of hits and store it
-       */
+      /** Create stereo tracklet using vector of hits and store it */
       TrackCandidate* createLegendreStereoTracklet(std::vector<QuadTree*> nodeList);
 
       /**
@@ -79,19 +77,13 @@ namespace Belle2 {
        */
       void sortHits(std::vector<TrackHit*>& hitIndices, int charge);
 
-      /**
-       * Appends new unused hits from set of hits which might belong to current track
-       */
+      /** Appends new unused hits from set of hits which might belong to current track */
       void appendNewHits(TrackCandidate* track);
 
-      /**
-       * Move candidate between two collections
-       */
+      /** Move candidate between two collections */
       void moveCandidate(list<TrackCandidate*>&, list<TrackCandidate*>&, TrackCandidate*);
 
-      /**
-       * Remove candidate from given list
-       */
+      /** Remove candidate from given list */
       void removeFromList(list<TrackCandidate*>&, TrackCandidate*);
 
     private:

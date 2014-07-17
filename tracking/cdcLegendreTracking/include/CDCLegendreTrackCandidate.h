@@ -46,9 +46,7 @@ namespace Belle2 {
        */
       TrackCandidate(TrackCandidate& candidate);
 
-      /*
-       * Construct track candidate using information from CDCLegendreQuadTree nodes
-       */
+      /** Construct track candidate using information from CDCLegendreQuadTree nodes */
       TrackCandidate(const std::vector<QuadTree*>& nodeList);
 
       /** Destructor. */
@@ -63,12 +61,12 @@ namespace Belle2 {
       TrackCandidate(double theta, double r, int charge,
                      const std::vector<TrackHit*>& trackHitList);
 
-      /**Return vector of assigned hits.*/
+      /** Return vector of assigned hits.*/
       inline std::vector<TrackHit*>& getTrackHits() {
         return m_TrackHits;
       }
 
-      /**Return pattern of assigned axial and stereo hits.*/
+      /** Return pattern of assigned axial and stereo hits.*/
       inline HitPatternCDC getHitPattern() const {
         return m_hitPattern;
       }
@@ -83,17 +81,17 @@ namespace Belle2 {
         return m_r;
       }
 
-      /**Return Xc value of track.*/
+      /** Return Xc value of track.*/
       inline double getXc() const {
         return m_xc;
       }
 
-      /**Return Yc value of track.*/
+      /** Return Yc value of track.*/
       inline double getYc() const {
         return m_yc;
       }
 
-      /**Return charge hypotheses of track.
+      /** Return charge hypotheses of track.
        * Might also be curler or two tracks.
        */
       inline int getCharge() const {
@@ -101,9 +99,7 @@ namespace Belle2 {
       }
 
 
-      /**
-       * Reestimate charge sign
-       */
+      /** Reestimate charge sign */
       void reestimateCharge() {
         m_charge = getChargeAssumption(m_theta, m_r, m_TrackHits);
       }
@@ -202,44 +198,29 @@ namespace Belle2 {
        */
       double getLayerWaight();
 
-      /**
-       * Checks the contributing hits and removes stereo hits, that do not fit to the rest of the track
-       */
+      /**  Checks the contributing hits and removes stereo hits, that do not fit to the rest of the track */
       void CheckStereoHits();
 
-      /**
-       * Remove "bad" hits
-       */
+      /** Remove "bad" hits */
       void clearBadHits();
 
-      /**
-       * set chi2 after fitting
-       */
+      /** set chi2 after fitting */
       void setChi2(double chi2) {
         m_chi2 = chi2;
       }
 
-      /**
-       * Get chi2 square of circular fit
-       */
+      /** Get chi2 square of circular fit */
       double getChi2() const {
         return m_chi2;
       }
 
-      /**
-       * set type of the track
-       */
+      /** set type of the track */
       void setCandidateType(int type) {m_type = type;};
 
-      /**
-       * get type of the track (see enum CandidateType)
-       */
+      /** get type of the track (see enum CandidateType) */
       inline int getCandidateType() const {return m_type;};
 
     private:
-
-      /** Empty constructor. */
-//    CDCLegendreTrackCandidate() : m_charge(0) {};
 
       std::vector<TrackHit*> m_TrackHits; /**< vector to store TrackCandidateHits belonging to this TrackCandidate */
       std::vector<QuadTree*> m_nodes; /**< vector to store nodes containing hits which belong to the candidate */
@@ -280,12 +261,10 @@ namespace Belle2 {
        */
       double getZMomentumEstimation(TVector2 mom2) const;
 
-      /**
-       * Updates m_axialHits, m_stereoHits, and m_allHits
-       */
+      /** Updates m_axialHits, m_stereoHits, and m_allHits */
       void determineHitNumbers();
 
-      /**Return pattern of assigned axial and stereo hits.*/
+      /** Return pattern of assigned axial and stereo hits. */
       void makeHitPattern();
 
     }; //end class CDCLegendreTrackCandidate

@@ -53,8 +53,13 @@ namespace Belle2 {
        * Only bins with more bins than the current maximum are further investigated where the current maximum is determined of the configured threshold or the number of hits of an already found track candidate.
        */
       void FastHoughNormal(std::pair<std::vector<TrackHit*>, std::pair<double, double> >* candidate,
-                           const std::vector<TrackHit*>& hits, const int level, const int theta_min,
-                           const int theta_max, const double r_min, const double r_max, const unsigned limit);
+                           const std::vector<TrackHit*>& hits,
+                           const int level,
+                           const int theta_min,
+                           const int theta_max,
+                           const double r_min,
+                           const double r_max,
+                           const unsigned limit);
 
       /**
        * @brief Recursively called function to perform the Fast Hough algorithm, modified to deliver the candidates which passes limitation on number of hits
@@ -68,15 +73,23 @@ namespace Belle2 {
        * At each step, the remaining voting plane is divided in 2x2 squares and the voting procedure is performed in each of them, following NIM A 592 (456 - 462).
        * Only bins with more bins than the current maximum are further investigated where the current maximum is determined of the configured threshold or the number of hits of an already found track candidate.
        */
-      void MaxFastHough(const std::vector<TrackHit*>& hits, const int level, const int theta_min, const int theta_max,
-                        const double r_min, const double r_max);
+      void MaxFastHough(const std::vector<TrackHit*>& hits,
+                        const int level,
+                        const int theta_min,
+                        const int theta_max,
+                        const double r_min,
+                        const double r_max);
 
       /**
        * Same logic as in MaxFastHough, but looks only for HighPt tracks;
        * starts with 2x2 binning, but when reached desired dr resolution (which defined as 2*Rcell) makes 1xN binning and finish algorithm in one iteration
        */
-      void MaxFastHoughHighPt(const std::vector<TrackHit*>& hits, const int theta_min, const int theta_max,
-                              double r_min, double r_max, int level);
+      void MaxFastHoughHighPt(const std::vector<TrackHit*>& hits,
+                              const int theta_min,
+                              const int theta_max,
+                              double r_min,
+                              double r_max,
+                              int level);
 
 
       /** Set limitation on number of hits in candidate */

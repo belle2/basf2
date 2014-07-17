@@ -41,7 +41,7 @@ namespace Belle2 {
       void processTracks(std::list<TrackCandidate*>& trackList);
 
       /** Append unused hits to tracks */
-      void appenUnusedHits(std::list<TrackCandidate*>& trackList, std::vector<TrackHit*> AxialHitList);
+      void appenUnusedHits(std::list<TrackCandidate*>& trackList, std::vector<TrackHit*>& AxialHitList);
 
     private:
 

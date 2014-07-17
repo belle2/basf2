@@ -376,7 +376,7 @@ void FastHough::MaxFastHough(const std::vector<TrackHit*>& hits, const int level
             && fabs((r[r_index] + r[r_index + 1]) / 2) > m_rc)
           return;
 
-        voted_hits[t_index][r_index].erase(std::remove_if(voted_hits[t_index][r_index].begin(), voted_hits[t_index][r_index].end(), [](TrackHit * hit) {return hit->getHitUsage() != TrackHit::not_used;}), voted_hits[t_index][r_index].end());
+        voted_hits[t_index][r_index].erase(std::remove_if(voted_hits[t_index][r_index].begin(), voted_hits[t_index][r_index].end(), [&](TrackHit * hit) {return hit->getHitUsage() != TrackHit::not_used;}), voted_hits[t_index][r_index].end());
 
         for (TrackHit * hit : voted_hits[t_index][r_index]) {
           hit->setHitUsage(TrackHit::used_in_cand);
@@ -597,7 +597,7 @@ void FastHough::MaxFastHoughHighPt(const std::vector<TrackHit*>& hits, const int
           return;
         }
 
-        voted_hits[t_index][r_index].erase(std::remove_if(voted_hits[t_index][r_index].begin(), voted_hits[t_index][r_index].end(), [](TrackHit * hit) {return hit->getHitUsage() != TrackHit::not_used;}), voted_hits[t_index][r_index].end());
+        voted_hits[t_index][r_index].erase(std::remove_if(voted_hits[t_index][r_index].begin(), voted_hits[t_index][r_index].end(), [&](TrackHit * hit) {return hit->getHitUsage() != TrackHit::not_used;}), voted_hits[t_index][r_index].end());
 
         for (TrackHit * hit : voted_hits[t_index][r_index]) {
           hit->setHitUsage(TrackHit::used_in_cand);

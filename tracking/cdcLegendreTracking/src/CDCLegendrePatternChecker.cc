@@ -36,7 +36,7 @@ void PatternChecker::checkCurler(
   for (int ii = 0; ii < getMaxSLayer(&pattern_P); ii++) {
     if (pattern_P.getSLayerNHits(ii) <= 2)
       track->first.erase(std::remove_if(track->first.begin(), track->first.end(),
-      [&center, &charge, &ii](TrackHit * hit) {
+      [&, &center, &charge, &ii](TrackHit * hit) {
       if ((hit->getSuperlayerId() == ii) && (hit->getCurvatureSignWrt(center.first, center.second) == TrackCandidate::charge_positive)) {
         hit->setHitUsage(TrackHit::bad);
         return true;
@@ -51,7 +51,7 @@ void PatternChecker::checkCurler(
   for (int ii = 0; ii < getMaxSLayer(&pattern_N); ii++) {
     if (pattern_P.getSLayerNHits(ii) <= 2)
       track->first.erase(std::remove_if(track->first.begin(), track->first.end(),
-      [&center, &charge, &ii](TrackHit * hit) {
+      [&, &center, &charge, &ii](TrackHit * hit) {
       if ((hit->getSuperlayerId() == ii) && (hit->getCurvatureSignWrt(center.first, center.second) == TrackCandidate::charge_negative)) {
         hit->setHitUsage(TrackHit::bad);
         return true;
@@ -65,7 +65,7 @@ void PatternChecker::checkCurler(
 
   if (pattern_P.getNHits() > pattern_N.getNHits()) {
     track->first.erase(std::remove_if(track->first.begin(), track->first.end(),
-    [&center, &charge](TrackHit * hit) {
+    [&, &center, &charge](TrackHit * hit) {
       if (hit->getCurvatureSignWrt(center.first, center.second) != TrackCandidate::charge_positive) {
         hit->setHitUsage(TrackHit::bad);
         return true;
@@ -75,7 +75,7 @@ void PatternChecker::checkCurler(
     }), track->first.end());
   } else {
     track->first.erase(std::remove_if(track->first.begin(), track->first.end(),
-    [&center, &charge](TrackHit * hit) {
+    [&, &center, &charge](TrackHit * hit) {
       if (hit->getCurvatureSignWrt(center.first, center.second) != TrackCandidate::charge_negative) {
         hit->setHitUsage(TrackHit::bad);
         return true;
@@ -171,7 +171,7 @@ bool PatternChecker::checkCandidate(TrackCandidate* track, int minNHitsSLayer)
     trackletHits.clear();
   }
 
-  track->getTrackHits().erase(std::remove_if(track->getTrackHits().begin(), track->getTrackHits().end(), [&patterns, &index_longest](TrackHit * hit) {return not patterns[index_longest].hasLayer(hit->getLayerId());}), track->getTrackHits().end());
+  track->getTrackHits().erase(std::remove_if(track->getTrackHits().begin(), track->getTrackHits().end(), [&, &patterns, &index_longest](TrackHit * hit) {return not patterns[index_longest].hasLayer(hit->getLayerId());}), track->getTrackHits().end());
 
   track->setCandidateType(TrackCandidate::tracklet);
 
@@ -246,7 +246,7 @@ void PatternChecker::clearBadHits(std::pair<std::vector<TrackHit*>, std::pair<do
                                   std::pair<double, double>& ref_point)
 {
   track->first.erase(std::remove_if(track->first.begin(), track->first.end(),
-  [&track, &ref_point](TrackHit * hit) {
+  [&, &track, &ref_point](TrackHit * hit) {
     double R = fabs(1. / track->second.second);
     double x0_track = cos(track->second.first) / track->second.second + ref_point.first;
     double y0_track = sin(track->second.first) / track->second.second + ref_point.second;

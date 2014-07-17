@@ -86,7 +86,7 @@ TrackCandidate::TrackCandidate(const std::vector<QuadTree*>& nodeList) :
 
   m_charge = TrackCandidate::getChargeAssumption(m_theta, m_r, m_TrackHits);
 
-  m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(), [this](TrackHit * hit) {
+  m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(), [&, this](TrackHit * hit) {
     return ((this->m_charge == charge_positive || this->m_charge == charge_negative)
             && hit->getCurvatureSignWrt(getXc(), getYc()) != this->m_charge);
   })
@@ -286,13 +286,13 @@ void TrackCandidate::addHit(TrackHit* hit)
 
 void TrackCandidate::removeHit(TrackHit* hit)
 {
-  m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(),
-  [&hit](TrackHit * trackHit) {
+  /*  m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(),
+  [&, &hit](TrackHit * trackHit) {
     return trackHit == hit;
   }), m_TrackHits.end());
-  /*
-    m_TrackHits.erase(std::remove(m_TrackHits.begin(), m_TrackHits.end(), hit), m_TrackHits.end());
   */
+  m_TrackHits.erase(std::remove(m_TrackHits.begin(), m_TrackHits.end(), hit), m_TrackHits.end());
+
 
   makeHitPattern();
 
@@ -439,7 +439,7 @@ void TrackCandidate::clearBadHits()
   double x0_track = cos(this->m_theta) / this->m_r + m_ref_x;
   double y0_track = sin(this->m_theta) / this->m_r + m_ref_y;
   m_TrackHits.erase(std::remove_if(m_TrackHits.begin(), m_TrackHits.end(),
-  [&R, &x0_track, &y0_track](TrackHit * hit) {
+  [&, &R, &x0_track, &y0_track](TrackHit * hit) {
     double x0_hit = hit->getOriginalWirePosition().X();
     double y0_hit = hit->getOriginalWirePosition().Y();
     double dist = fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftLength();

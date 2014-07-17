@@ -263,7 +263,7 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
     B2DEBUG(100, "Copying hits set");
 
     std::vector<TrackHit*> hits_vector;
-    std::copy_if(hits_set.begin(), hits_set.end(), std::back_inserter(hits_vector), [](TrackHit * hit) {return (hit->getHitUsage() == TrackHit::not_used);});
+    std::copy_if(hits_set.begin(), hits_set.end(), std::back_inserter(hits_vector), [&](TrackHit * hit) {return (hit->getHitUsage() == TrackHit::not_used);});
     if (not m_multipleCandidateSearch) {
       std::vector<TrackHit*> c_list;
       std::pair<std::vector<TrackHit*>, std::pair<double, double> > candidate = std::make_pair(c_list, std::make_pair(-999, -999));
@@ -330,7 +330,7 @@ void CDCLegendreTrackingModule::DoSteppedTrackFinding()
 
 
   std::vector<TrackHit*> hits_vector_unused; //temporary array;
-  std::copy_if(hits_set.begin(), hits_set.end(), std::back_inserter(hits_vector_unused), [](TrackHit * hit) {return (hit->getHitUsage() != TrackHit::used_in_track);});
+  std::copy_if(hits_set.begin(), hits_set.end(), std::back_inserter(hits_vector_unused), [&](TrackHit * hit) {return (hit->getHitUsage() != TrackHit::used_in_track);});
   m_cdcLegendreTrackDrawer->drawConformalHits(hits_vector_unused, -1, false);
   m_cdcLegendreTrackDrawer->drawLegendreHits(hits_vector_unused, -1, false);
 
@@ -473,6 +473,7 @@ void CDCLegendreTrackingModule::processTracks()
   }
 
   m_cdcLegendreTrackMerger->doTracksMerging();
+
 
   for (TrackCandidate * cand : m_trackList) {
     cand->reestimateCharge();

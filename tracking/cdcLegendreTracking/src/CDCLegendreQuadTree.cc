@@ -186,12 +186,12 @@ void QuadTree::buildNeighborhood(int levelNeighborhood)
 void QuadTree::provideHitSet(const std::set<TrackHit*>& hits_set)
 {
   m_hits.clear();
-  std::copy_if(hits_set.begin(), hits_set.end(), std::back_inserter(m_hits), [](TrackHit * hit) {return (hit->getHitUsage() == TrackHit::not_used);});
+  std::copy_if(hits_set.begin(), hits_set.end(), std::back_inserter(m_hits), [&](TrackHit * hit) {return (hit->getHitUsage() == TrackHit::not_used);});
 }
 
 void QuadTree::cleanHitsInNode()
 {
-  m_hits.erase(std::remove_if(m_hits.begin(), m_hits.end(), [](TrackHit * hit) {return hit->getHitUsage() != TrackHit::not_used;}), m_hits.end());
+  m_hits.erase(std::remove_if(m_hits.begin(), m_hits.end(), [&](TrackHit * hit) {return hit->getHitUsage() != TrackHit::not_used;}), m_hits.end());
 }
 
 void QuadTree::clearTree()

@@ -94,6 +94,10 @@ void SimpleFilter::processTracks(std::list<TrackCandidate*>& m_trackList)
     B2INFO("Processing: Cand hits vector size = " << cand->getTrackHits().size());
     B2INFO("Processing: Cand R = " << cand->getR());
 
+    for (TrackHit * hit : cand->getTrackHits()) {
+      hit->setHitUsage(TrackHit::used_in_track);
+    }
+
     if (cand->getTrackHits().size() == 0)continue;
 
     for (TrackHit * hit : cand->getTrackHits()) {
@@ -119,7 +123,8 @@ void SimpleFilter::processTracks(std::list<TrackCandidate*>& m_trackList)
       if (bestHitProb > prob) {
 //          filterCandidate->getLegendreCandidate()->removeHit(hit);
         BestCandidate->addHit(hit);
-        cand->removeHit(hit);
+//        cand->removeHit(hit);
+        hit->setHitUsage(TrackHit::bad);
 //        B2INFO("Hit has been reassigned.");
       }
 
@@ -127,10 +132,28 @@ void SimpleFilter::processTracks(std::list<TrackCandidate*>& m_trackList)
 //      }
 
     }
+    cand->getTrackHits().erase(std::remove_if(cand->getTrackHits().begin(), cand->getTrackHits().end(),
+    [&](TrackHit * hit) {
+      /*
+            if(hit->getHitUsage() == TrackHit::bad) {
+              hit->setHitUsage(TrackHit::used_in_track);
+              return true;
+            } else {
+              return false;
+            }
+      */
+      return hit->getHitUsage() == TrackHit::bad;
+    }),
+    cand->getTrackHits().end());
 
   }
 
 
+  for (TrackCandidate * cand : m_trackList) {
+    for (TrackHit * hit : cand->getTrackHits()) {
+      hit->setHitUsage(TrackHit::used_in_track);
+    }
+  }
 }
 
 /*
@@ -183,12 +206,12 @@ void SimpleFilter::trackCore()
 */
 
 
-void SimpleFilter::appenUnusedHits(std::list<TrackCandidate*>& m_trackList, std::vector<TrackHit*> AxialHitList)
+void SimpleFilter::appenUnusedHits(std::list<TrackCandidate*>& m_trackList, std::vector<TrackHit*>& AxialHitList)
 {
   for (TrackHit * hit : AxialHitList) {
     if (hit->getHitUsage() != TrackHit::not_used) continue;
     double bestHitProb = 0;
-    TrackCandidate* BestCandidate;
+    TrackCandidate* BestCandidate = NULL;
 
     for (TrackCandidate * cand : m_trackList) {
       double probTemp = getAssigmentProbability(hit, cand);

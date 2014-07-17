@@ -31,10 +31,12 @@ namespace Belle2 {
     //                                   std::vector<std::vector<std::vector<genfit::Track*>*>*>* tracks_grid);
     double m_CDC_wall_radius;
     double m_chi2_max;
+    double m_merge_radius;
     std::string m_VXDGFTracksColName;
     std::string m_CDCGFTracksColName;
     std::string m_GFTracksColName;
     std::string m_TrackCandColName;
+    std::string m_UnMergedCands;
     //std::string m_mcParticlesColName;
     //position at which a cdc track crosses  the cdc wall
     //std::vector<std::vector<std::vector<TVector3>*>*>* m_cdc_tracks_position;
@@ -57,11 +59,12 @@ namespace Belle2 {
     int m_npair;
     int m_ntruepair;
     int m_ncdc_trk;
-    int m_nVXD_trk;
+    int m_nvxd_trk;
     double m_trk_mrg_eff;
     std::vector<int>* m_match_vec;
     std::vector<int>* m_true_match_vec;
     std::vector<int>* m_right_match_vec;
+    std::vector<int>* m_loop_match_vec;
     std::vector<float>* m_chi2_vec;
     std::vector<float>* m_dist_vec;
     std::vector<float>* m_dx_vec;
@@ -79,10 +82,10 @@ namespace Belle2 {
     std::vector<float>* m_momy_vec;
     std::vector<float>* m_momz_vec;
     std::vector<float>* m_mom_vec;
-    std::vector<float>* m_VXDmomx_vec;
-    std::vector<float>* m_VXDmomy_vec;
-    std::vector<float>* m_VXDmomz_vec;
-    std::vector<float>* m_VXDmom_vec;
+    std::vector<float>* m_vxdmomx_vec;
+    std::vector<float>* m_vxdmomy_vec;
+    std::vector<float>* m_vxdmomz_vec;
+    std::vector<float>* m_vxdmom_vec;
   };
 }
 #endif

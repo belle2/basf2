@@ -78,7 +78,7 @@ void GFTrackSplitterModule::event()
   StoreArray<genfit::Track> GFTracksColName(m_GFTracksColName);
   unsigned int nTracks = GFTracksColName.getEntries();
 
-  B2INFO("GFTrackSplitter: input Number of Tracks: " << nTracks);
+  B2INFO("GFTrackSplitter: total number of tracks (CDC+VXD): " << nTracks);
   if (nTracks == 0) B2WARNING("GFTracksColName is empty!");
 
   StoreArray<genfit::Track> si_mcTracks(m_SiGFTracksColName);

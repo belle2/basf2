@@ -6,5 +6,6 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::Variable::Manager-;
+#pragma link C++ class Belle2::Variable::Manager::Var-;
 
 #endif

@@ -84,30 +84,37 @@ namespace Belle2 {
       /** functions stored take a const Particle* and return double. */
       typedef std::function<double(const Particle*)> FunctionPtr;
       //typedef double(*FunctionPtr)(const Particle*);
+#endif
 
       /** Struct containing the function used for calculation and the description. */
       struct Var {
         std::string name; /**< Unique identifier of the function, used as key. */
+#ifndef __CINT__
         FunctionPtr function; /**< Pointer to function. */
+#endif
         std::string description; /**< Description of what this function does. */
         std::string group; /**< Associated group. */
 
+#if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
+        /** dummy ctor for root. */
+        Var() {}
+#else
         /** Constructor. */
         Var(std::string n, FunctionPtr f, std::string d, std::string g = "") : name(n), function(f), description(d), group(g) { }
-      };
 #endif
+      };
 
       /** get singleton instance. */
       static Manager& Instance();
 
 
-#ifndef __CINT__
       /** Get the variable belonging to the given key.
        *
        * Returns NULL if name not found.
        */
       const Var* getVariable(const std::string& name);
 
+#ifndef __CINT__
       /** Return list of all variables (in order registered). */
       std::vector<const Var*> getVariables() const { return m_variablesInRegistrationOrder; }
 

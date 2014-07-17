@@ -57,7 +57,6 @@ REG_MODULE(PXDPacker)
 
 using boost::crc_optimal;
 typedef crc_optimal<32, 0x04C11DB7, 0, 0, false, false> dhh_crc_32_type;
-// const unsigned int CRC_INIT = 0x00000000;
 
 ///******************************************************************
 ///*********************** Main packer code *************************
@@ -71,6 +70,8 @@ PXDPackerModule::PXDPackerModule() :
   setDescription("Pack PXD Hits to raw data object");
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  addParam("PXDDigitsName", m_PXDDigitsName, "The name of the StoreArray of PXDDigits to be processed", std::string(""));
+  addParam("RawPXDsName", m_RawPXDsName, "The name of the StoreArray of generated RawPXDs", std::string(""));
   addParam("dhh_to_dhhc", m_dhh_to_dhhc,  "DHH to DHHC mapping (DHHC_ID, DHH1, DHH2, ..., DHH5) ; -1 disable port");
 
 }
@@ -79,7 +80,8 @@ void PXDPackerModule::initialize()
 {
   B2INFO("PXD Packer --> Init");
   //Register output collections
-  m_storeRaws.registerAsPersistent();
+  m_storeRaws.registerAsPersistent(m_RawPXDsName);
+  storeDigits.required(m_PXDDigitsName);
 
   m_packed_events = 0;
 
@@ -265,7 +267,6 @@ void PXDPackerModule::append_int32(unsigned int w)
 
 void PXDPackerModule::start_frame(void)
 {
-  //m_current_crc.reset(CRC_INIT);
   m_current_frame.clear();
 }
 
@@ -273,7 +274,7 @@ void PXDPackerModule::pack_dhhc(int dhhc_id, int dhh_active, int* dhh_ids)
 {
   B2INFO("PXD Packer --> pack_dhhc ID " << dhhc_id << " DHH act: " << dhh_active);
 
-  /// HLT frame ??? format still t.b.d.
+  /// HLT frame ??? format still t.b.d. TODO
   start_frame();
   append_int32((DHHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG << 27) | (m_trigger_nr & 0xFFFF));
   append_int32(0xCAFE0000);// HLT HEADER
@@ -289,7 +290,7 @@ void PXDPackerModule::pack_dhhc(int dhhc_id, int dhh_active, int* dhh_ids)
   start_frame();
   append_int32((DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START << 27) | ((dhhc_id & 0xF) << 21) | ((dhh_active & 0x1F) << 16) | (m_trigger_nr & 0xFFFF));
   append_int16(m_trigger_nr >> 16);
-  append_int16(0x00000000); // TT 11-0 | Type
+  append_int16(0x00000000); // TT 11-0 | Type --- fill with something usefull TODO
   append_int16(0x00000000); // TT 27-12
   append_int16(0x00000000); // TT 43-28
   append_int16(m_run_nr_word1); // Run Nr 7-0 | Subrunnr 7-0
@@ -383,9 +384,10 @@ void PXDPackerModule::pack_dhh(int dhh_id, int dhp_active)
           col = it->getUCellID();
           if (row < ladder_min_row || row > ladder_max_row || col < ladder_min_col || col > ladder_max_col) {
             B2ERROR("ROW/COL out of range col: " << col << " row: " << row);
-          } else
+          } else {
             // fill ADC ... convert float to unsigned char ... and how about common mode?
             halfladder_pixmap[row][col] = (unsigned char) it->getCharge(); // scaling??
+          }
         }
       }
     }
@@ -465,7 +467,7 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhh_id, int dhh_reformat)
 
   start_frame();
   /// DHP data Frame
-  append_int32((DHHC_FRAME_HEADER_DATA_TYPE_ONSEN_DHP << 27) | ((dhh_id & 0x3F) << 20) | ((dhh_reformat & 0x1) << 19) | ((chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
+  append_int32((DHHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD << 27) | ((dhh_id & 0x3F) << 20) | ((dhh_reformat & 0x1) << 19) | ((chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
   append_int32((DHP_FRAME_HEADER_DATA_TYPE_ZSD << 29) | ((dhh_id & 0x3F) << 18) | ((chip_id & 0x03) << 16) | (frame_id & 0xFFFF));
   for (int row = 0; row < PACKER_NUM_ROWS; row++) { // should be variable
     bool rowstart;

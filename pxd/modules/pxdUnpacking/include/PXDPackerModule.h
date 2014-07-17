@@ -50,6 +50,9 @@ namespace Belle2 {
 
     private:
 
+      std::string m_PXDDigitsName;  /**< The name of the StoreArray of PXDDigits to be processed */
+      std::string m_RawPXDsName;  /**< The name of the StoreArray of generated RawPXDs */
+
       /** Parameter dhhc<->dhh list, mapping from steering file */
       std::vector< std::vector<int >> m_dhh_to_dhhc;
 
@@ -114,7 +117,7 @@ namespace Belle2 {
       void append_int32(unsigned int w);//! cat 32value value to frame
       void add_frame_to_payload(void);//! Add Frame to Event payload
 
-      /** Store start of Vxd Detetcor related digits */
+      /** Store start of Vxd Detector related digits */
       std::map <VxdID , int> startOfVxdID;
 
       unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS];//! temporary hitmap buffer for pixel to raw data conversion

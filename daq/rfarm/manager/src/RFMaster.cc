@@ -11,7 +11,7 @@
 using namespace std;
 using namespace Belle2;
 
-// #define DESY
+//#define DESY
 
 RFMaster::RFMaster(string conffile)
 {
@@ -84,10 +84,10 @@ int RFMaster::Configure(NSMmsg*, NSMcontext*)
       nnodes++;
     }
   }
-  while (RFNSM_Status::Instance().get_flag() != nnodes) sleep(1);
-  printf("RFMaster:: distributor configured\n");
+  //  while (RFNSM_Status::Instance().get_flag() != nnodes) sleep(1);
+  sleep(10);
 
-  //  sleep(10);
+  printf("RFMaster:: distributor configured\n");
 
   // 3. Configure collector
   char* collector = m_conf->getconf("collector", "nodename");

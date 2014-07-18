@@ -142,7 +142,8 @@ int RFEventServer::UnConfigure(NSMmsg*, NSMcontext*)
   for (int i = 0; i < m_nnodes; i++) {
     if (m_pid_sender[i] != 0) {
       printf("RFEventServer:: killing sender pid=%d\n", m_pid_sender[i]);
-      kill(m_pid_sender[i], SIGINT);
+      //      kill(m_pid_sender[i], SIGINT);
+      kill(m_pid_sender[i], SIGKILL);
       waitpid(m_pid_sender[i], &status, 0);
     }
   }

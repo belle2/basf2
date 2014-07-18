@@ -30,13 +30,26 @@ CDCSZFitter::~CDCSZFitter()
 {
 }
 
+void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ,
+                         const CDCStereoRecoSegment2D& stereoSegment,
+                         const CDCTrajectory2D& axialTrajectory2D) const
+{
+  //recostruct the stereo segment
+  CDCRecoSegment3D reconstructedStereoSegment;
+  for (const CDCRecoHit2D & recoHit2D : stereoSegment) {
+    CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit2D, axialTrajectory2D);
+    reconstructedStereoSegment.push_back(recoHit3D);
+  }
 
-void
-CDCSZFitter::updateOptimizeSZDistance(
-  CDCTrajectorySZ& trajectorySZ,
-  FloatType* observations,
-  size_t nObservations
-) const
+  update(trajectorySZ, reconstructedStereoSegment);
+
+}
+
+
+
+void CDCSZFitter::updateOptimizeSZDistance(CDCTrajectorySZ& trajectorySZ,
+                                           FloatType* observations,
+                                           size_t nObservations) const
 {
 
   Map< Matrix< FloatType, Dynamic, Dynamic, RowMajor > > eigenObservation(observations, nObservations, 2);
@@ -75,12 +88,9 @@ CDCSZFitter::updateOptimizeSZDistance(
 }
 
 
-void
-CDCSZFitter::updateOptimizeZDistance(
-  CDCTrajectorySZ& trajectorySZ,
-  FloatType* observations,
-  size_t nObservations
-) const
+void CDCSZFitter::updateOptimizeZDistance(CDCTrajectorySZ& trajectorySZ,
+                                          FloatType* observations,
+                                          size_t nObservations) const
 {
 
   Map< Matrix< FloatType, Dynamic, Dynamic, RowMajor > > eigenObservation(observations, nObservations, 2);

@@ -211,14 +211,7 @@ const CDCTrajectorySZ& SimpleSegmentTripleFilter::getFittedTrajectorySZ(const CD
     const CDCStereoRecoSegment2D* ptrMiddleSegment = segmentTriple.getMiddle();
     const CDCStereoRecoSegment2D middleSegment = *ptrMiddleSegment;
 
-    //recostruct the stereo segment with the hit
-    CDCRecoSegment3D reconstructedMiddle;
-    for (CDCStereoRecoSegment2D::const_iterator itRecoHits = middleSegment.begin();
-         itRecoHits != middleSegment.end(); ++itRecoHits) {
-      reconstructedMiddle.push_back(CDCRecoHit3D::reconstruct(*itRecoHits, trajectory2D));
-    }
-
-    getSZFitter().update(trajectorySZ, reconstructedMiddle);
+    getSZFitter().update(trajectorySZ, middleSegment, trajectory2D);
 
   }
 

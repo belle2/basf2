@@ -13,6 +13,8 @@
 
 #include <tracking/cdcLocalTracking/geometry/Vector2D.h>
 
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
+
 #include <tracking/cdcLocalTracking/fitting/CDCObservations2D.h>
 #include <tracking/cdcLocalTracking/fitting/CDCFitter2D.h>
 #include <tracking/cdcLocalTracking/fitting/CDCRiemannFitter.h>
@@ -203,3 +205,19 @@ TEST_F(CDCLocalTrackingTest, CDCRiemannFitter_LineFit_WithDriftLength)
   testLineFitter(fitter);
 }
 
+
+TEST_F(CDCLocalTrackingTest, CDCRiemannFitter_compileTrackCandidateFit)
+{
+
+  const std::vector<TrackFinderCDCLegendre::TrackHit*> legendreTrackHits;
+
+  {
+    CDCRiemannFitter riemannFitter = CDCRiemannFitter::getFitter();
+    CDCTrajectory2D trajctory2D = riemannFitter.fit(legendreTrackHits);
+  }
+  {
+    CDCKarimakiFitter karimakiFitter = CDCKarimakiFitter::getFitter();
+    CDCTrajectory2D trajctory2D = karimakiFitter.fit(legendreTrackHits);
+  }
+
+}

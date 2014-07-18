@@ -12,11 +12,13 @@
 
 #ifndef __CINT__
 #include <Eigen/Dense>
+#include <tracking/cdcLegendreTracking/CDCLegendreTrackCandidate.h>
 #endif
 
 #include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 #include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
+
 
 namespace Belle2 {
   namespace CDCLocalTracking {
@@ -40,33 +42,41 @@ namespace Belle2 {
       size_t size() const
       { return  m_observations.size() / 3; }
 
+      /// Returns true if there are no observations stored.
+      bool empty() const
+      { return m_observations.empty(); }
+
       /// Removes all observations stored
       void clear()
       { m_observations.clear(); }
 
       /// Reserves enough space for nObservations
-      void reserve(size_t nObservations)
+      void reserve(const size_t& nObservations)
       { m_observations.reserve(nObservations * 3); }
 
       /// Getter for the x value of the observation at the given index
-      FloatType getX(const int iObservation) const
+      FloatType getX(const int& iObservation) const
       { return m_observations[iObservation * 3]; }
 
       /// Getter for the y value of the observation at the  given index
-      FloatType getY(const int iObservation) const
+      FloatType getY(const int& iObservation) const
       { return m_observations[iObservation * 3 + 1]; }
 
       /// Getter for the signed drift radius of the observation at the  given index
-      FloatType getSignedDriftLength(const int iObservation) const
+      FloatType getSignedDriftLength(const int& iObservation) const
       { return m_observations[iObservation * 3 + 2]; }
 
 
-      /// Appends the observed position - drift radius is assumed to be zero
-      void append(const Belle2::CDCLocalTracking::Vector2D& pos2D, const FloatType& signedRadius = 0.0) {
-        m_observations.push_back(pos2D.x());
-        m_observations.push_back(pos2D.y());
+      /// Appends the observed position - drift radius is assumed to be zero if not given
+      void append(const FloatType& x, const FloatType& y, const FloatType& signedRadius = 0.0) {
+        m_observations.push_back(x);
+        m_observations.push_back(y);
         m_observations.push_back(signedRadius);
       }
+
+      /// Appends the observed position - drift radius is assumed to be zero if not given
+      void append(const Belle2::CDCLocalTracking::Vector2D& pos2D, const FloatType& signedRadius = 0.0)
+      { append(pos2D.x(), pos2D.y(), signedRadius); }
 
       /// Appends the observed position - drift radius is take a positiv number
       void append(const Belle2::CDCLocalTracking::CDCWireHit& wireHit)
@@ -119,6 +129,43 @@ namespace Belle2 {
           append(endSegment2D, usePosition);
         }
       }
+
+#ifndef __CINT__
+      /// Appends all wire positions of the hits in the legendre track hits. Always use position since no other mode as long as there are no right left passage information available.
+      void append(const std::vector<TrackFinderCDCLegendre::TrackHit*>& legendreTrackHits, bool usePosition = false)      {
+        for (const TrackFinderCDCLegendre::TrackHit * ptrLegendreTrackHit : legendreTrackHits) {
+          if (not ptrLegendreTrackHit) continue;
+          const TrackFinderCDCLegendre::TrackHit& legendreTrackHit = *ptrLegendreTrackHit;
+          const TVector3&& wirePos = legendreTrackHit.getWirePosition();
+          append(wirePos.X(), wirePos.Y());
+        }
+      }
+#endif
+      /// Get the postion of the first observation.
+      Vector2D getFrontPos2D() const
+      { return empty() ? Vector2D() : Vector2D(getX(0), getY(0)); }
+
+      /// Get the postion of the first observation.
+      Vector2D getBackPos2D() const
+      { return empty() ? Vector2D() : Vector2D(getX(size() - 1), getY(size() - 1)); }
+
+      /// Calculate the total transvers travel distance traversed by these observations comparing the travel distance of first and last position
+      FloatType getTotalPerpS(const CDCTrajectory2D& trajectory2D) const
+      { return trajectory2D.calcPerpSBetween(getFrontPos2D(), getBackPos2D()); }
+
+      /// Checks if the last position of these observations lies at greater travel distance than the first
+      bool isForwardTrajectory(const CDCTrajectory2D& trajectory2D) const
+      { return getTotalPerpS(trajectory2D) > 0.0; }
+
+      /// Checks if the last observation in the vector lies greater or lower travel distance than the last observation.
+      /** Returns:
+       *  * FORWARD if the last observation lies behind the first.
+       *  * BACKWARD if the last observation lies before the first.
+       */
+      ForwardBackwardInfo isCoaligned(const CDCTrajectory2D& trajectory2D) const
+      { return sign(getTotalPerpS(trajectory2D)); }
+
+
 
 
       /// Extracts the observation center that is at the index in the middle.

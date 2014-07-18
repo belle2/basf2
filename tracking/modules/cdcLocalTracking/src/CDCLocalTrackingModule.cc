@@ -103,8 +103,6 @@ void CDCLocalTrackingModule::event()
   CALLGRIND_START_INSTRUMENTATION;
 #endif
 
-
-
   //Start callgrind recording
   //To profile start basf2 with
   //  nohup valgrind --tool=callgrind --instr-atstart=no basf2 [basf2-options] > output.txt &
@@ -113,12 +111,10 @@ void CDCLocalTrackingModule::event()
   // Definitions need callgrind.h
 
 
-
   //fetch the CDCHits from the datastore
   B2DEBUG(100, "Getting the CDCHits from the data store");
   StoreArray <CDCHit> storedCDCHits;
   B2DEBUG(100, "  storedCDCHits.getEntries() == " << storedCDCHits.getEntries());
-
 
 
   //create the wirehits
@@ -129,13 +125,10 @@ void CDCLocalTrackingModule::event()
     B2WARNING("Event with no hits - skipping");
     return;
   }
-  CDCWireHitTopology::CDCWireHitRange allWireHitRange = wireHitTopology.getWireHits();
-
-
 
   //build the segments
   m_recoSegments.clear();
-  m_segmentWorker.apply(allWireHitRange, m_recoSegments);
+  m_segmentWorker.generate(m_recoSegments);
   B2DEBUG(100, "Received " << m_recoSegments.size() << " RecoSegments from worker");
 
 

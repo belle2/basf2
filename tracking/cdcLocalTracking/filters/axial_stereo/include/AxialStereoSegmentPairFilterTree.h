@@ -89,8 +89,17 @@ namespace Belle2 {
 
              BranchOf < float, NAMED("commonFit_szSlope") > , //different fusion fit method
              BranchOf < float, NAMED("commonFit_szSlope_variance") > ,
+
              BranchOf < float, NAMED("szFit_szSlope") > , //different manual reconstruction fit method
-             BranchOf < float, NAMED("mcFit_szSlope") >
+             BranchOf < float, NAMED("mcFit_szSlope") > ,
+
+             BranchOf < float, NAMED("axialFit_curvatureXY") > ,
+             BranchOf < float, NAMED("axialFit_curvatureXY_variance") > ,
+
+             BranchOf < float, NAMED("commonFit_curvatureXY") > ,
+             BranchOf < float, NAMED("commonFit_curvatureXY_variance") > ,
+
+             BranchOf < float, NAMED("mcFit_curvatureXY") >
 
              > AxialStereoSegmentPairFilterTreeBase;
 

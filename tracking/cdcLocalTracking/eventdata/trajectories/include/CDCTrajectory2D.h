@@ -336,6 +336,19 @@ namespace Belle2 {
 
 
     public:
+      /// Getter for the curvature as seen from the xy projection.
+      FloatType getCurvature() const
+      { return getLocalCircle().curvature(); }
+
+      /// Getter for an individual element of the covariance matrix of the local helix parameters.
+      FloatType getLocalCovariance(PerigeeParameterIndex iRow, PerigeeParameterIndex iCol) const
+      { return getLocalCircle().covariance(iRow, iCol); }
+
+      /// Getter for an individual diagonal element of the covariance matrix of the local helix parameters.
+      FloatType getLocalVariance(PerigeeParameterIndex i) const
+      { return getLocalCircle().variance(i); }
+
+
       /// Getter for the circle in global coordinates
       GeneralizedCircle getGlobalCircle() const {
         // Down cast since we do not necessarily wont the covariance matrix transformed as well

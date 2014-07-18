@@ -166,6 +166,15 @@ bool AxialStereoSegmentPairFilterTree::setValues(const CellWeight& mcWeight, con
 
   setValue < NAMED("mcFit_szSlope") > (mcFit.getSZSlope());
 
+  setValue < NAMED("axialFit_curvatureXY") > (axialFit.getCurvature());
+  setValue < NAMED("axialFit_curvatureXY_variance") > (axialFit.getLocalVariance(iCurv));
+
+  setValue < NAMED("commonFit_curvatureXY") > (commonFit.getCurvature());
+  setValue < NAMED("commonFit_curvatureXY_variance") > (commonFit.getLocalVariance(iCurv));
+
+  setValue < NAMED("mcFit_curvatureXY") > (mcFit.getCurvatureXY());
+
+
   /*
   //make a cut - make this more sophisticated at some point
   //double cosDeviation = endCenter.cosWith(pointOnFromTrack);

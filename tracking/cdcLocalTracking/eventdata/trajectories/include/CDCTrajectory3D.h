@@ -141,6 +141,10 @@ namespace Belle2 {
       FloatType getSZSlope() const
       { return getLocalHelix().szSlope(); }
 
+      /// Getter for the curvature as seen from the xy projection.
+      FloatType getCurvatureXY() const
+      { return getLocalHelix().curvatureXY(); }
+
       /// Getter for an individual element of the covariance matrix of the local helix parameters.
       FloatType getLocalCovariance(HelixParameterIndex iRow, HelixParameterIndex iCol) const
       { return getLocalHelix().covariance(iRow, iCol); }

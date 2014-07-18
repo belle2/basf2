@@ -72,7 +72,7 @@ REG_MODULE(arichBtest)
 //-----------------------------------------------------------------
 
 
-arichBtestModule::arichBtestModule() : Module()
+arichBtestModule::arichBtestModule() : Module(), m_end(0), m_events(0), m_file(NULL), m_mwpc(NULL)
 {
   //Set module properties
   setDescription("Module for the ARICH Beamtest data analysis. It creates track form the MWPC hits and reads the HAPD hits");
@@ -85,6 +85,9 @@ arichBtestModule::arichBtestModule() : Module()
   addParam("mwpcTrackMask", m_MwpcTrackMask, "Create track from MWPC layers", defaultMask);
   m_fp = NULL;
   addParam("beamMomentum", m_beamMomentum, "Momentum of the beam [GeV]", 0.0);
+
+  for (int i = 0; i < 32; i++) m_tdc[i] = 0;
+
 }
 
 TNtuple* m_tuple;

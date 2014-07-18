@@ -164,11 +164,11 @@ namespace Belle2 {
 
       /// Getter for the two dimensional trajectory
       CDCTrajectory2D getTrajectory2D() const
-      { return CDCTrajectory2D(getLocalHelix().uncertainCircleXY()); }
+      { return CDCTrajectory2D(getLocalOrigin().xy(), getLocalHelix().uncertainCircleXY()); }
 
       /// Getter for the sz trajectory
       CDCTrajectorySZ getTrajectorySZ() const
-      { return CDCTrajectorySZ(getLocalHelix().lineSZ()); }
+      { return CDCTrajectorySZ(getLocalHelix().lineSZ().passiveMovedAlongSecond(getLocalOrigin().z())); }
 
       /// Getter for the helix in local coordinates.
       const UncertainHelix& getLocalHelix() const

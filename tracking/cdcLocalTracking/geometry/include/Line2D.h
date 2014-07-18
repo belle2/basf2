@@ -241,17 +241,37 @@ namespace Belle2 {
       void moveAlongSecond(const FloatType& second)
       { m_n0 -= n2() * second; }
 
+      /// Return a copy of the line activally moved long the first coordinate
+      Line2D movedAlongFirst(const FloatType& first) const
+      { return Line2D(n0() - n1() * first, n1(), n2()); }
+
+      /// Return a copy of the line activally moved long the first coordinate
+      Line2D movedAlongSecond(const FloatType& second) const
+      { return Line2D(n0() - n2() * second, n1(), n2()); }
+
+
+
       /// Passivelly move the coordinate system  in place by the given vector
       void passiveMoveBy(const Vector2D& by)
       { m_n0 += by.fastParallelComp(n12()); }
 
-      /// Passivelly move the coordinate system in place along the first coordinate
+      /// Passively move the coordinate system in place along the first coordinate
       void passiveMoveAlongFirst(const FloatType& first)
       { m_n0 += n1() * first; }
 
-      /// Passivelly move the coordinate system in place along the second coordinate
+      /// Passively move the coordinate system in place along the second coordinate
       void passiveMoveAlongSecond(const FloatType& second)
       { m_n0 += n2() * second; }
+
+      /// Return a copy of the line passively moved long the first coordinate
+      Line2D passiveMovedAlongFirst(const FloatType& first) const
+      { return Line2D(n0() + n1() * first, n1(), n2()); }
+
+      /// Return a copy of the line passively moved long the first coordinate
+      Line2D passiveMovedAlongSecond(const FloatType& second) const
+      { return Line2D(n0() + n2() * second, n1(), n2()); }
+
+
 
       /// Flips the first coordinate inplace (no difference between active and pasive)
       void flipFirst()

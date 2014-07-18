@@ -54,7 +54,7 @@ namespace Belle2 {
                       const FloatType& n1,
                       const FloatType& n2) :
         m_szLine(n0, n1, n2)
-      { if (not getSZLine().alignedWithFirst()) m_szLine.reverse();}   // make the orientation to by forward with s ( important for the right sign of the distances)
+      { if (not getSZLine().alignedWithFirst()) m_szLine.reverse();}   // make the orientation to be forward with s ( important for the right sign of the distances)
 
       /// Empty destructor
       ~CDCTrajectorySZ() {;}
@@ -119,11 +119,9 @@ namespace Belle2 {
       { m_szLine.setSlopeIntercept(szSlope, startZ); }
 
       /// Setter for the normal parameters of the line.
-      void setN(
-        const FloatType& n0,
-        const FloatType& n1,
-        const FloatType& n2
-      ) {
+      void setN(const FloatType& n0,
+                const FloatType& n1,
+                const FloatType& n2) {
         m_szLine.setN(n0, n1, n2);
         if (not getSZLine().alignedWithFirst()) m_szLine.reverse();
       }

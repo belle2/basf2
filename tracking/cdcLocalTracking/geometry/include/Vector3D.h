@@ -306,6 +306,13 @@ namespace Belle2 {
       /// Setter for the xy projected vector
       inline void setXY(const Vector2D& xy) { m_xy = xy; }
 
+      /// Setter for all three coordinates.
+      inline void set(const FloatType& first,
+                      const FloatType& second,
+                      const FloatType& third)
+      { setX(first); setY(second); setZ(third);}
+
+
       /// Getter for the squared polar radius ( xy projected squared norm )
       inline FloatType polarRSquared() const { return xy().normSquared() ; }
       /// Getter for the polar radius ( xy projected norm )
@@ -317,6 +324,10 @@ namespace Belle2 {
 
       /// Getter for the azimuthal angle
       inline FloatType theta() const { return atan2(polarR(), z()); }
+
+      /// Getter for the cotangents of the azimuthal angle
+      inline FloatType cotTheta() const { return z() / polarR(); }
+
 
     private:
       Vector2D m_xy; ///< Memory for the first and second coordinate available as a vector

@@ -12,6 +12,8 @@
 #pragma link C++ class Belle2::CDCLocalTracking::CDCTrajectory2D+;
 #pragma link C++ class Belle2::CDCLocalTracking::CDCTrajectorySZ+;
 
+#pragma link C++ class Belle2::CDCLocalTracking::CDCTrajectory3D+;
+
 #endif
 
 #endif

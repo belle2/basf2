@@ -7,13 +7,15 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef CDCFITS_H
-#define CDCFITS_H
+#ifndef CDCTRAJECTORIES_H
+#define CDCTRAJECTORIES_H
 
 #include "CDCTrajectory2D.h"
 #include "CDCTrajectorySZ.h"
 
-#endif //CDCFITS_H
+#include "CDCTrajectory3D.h"
+
+#endif // CDCTRAJECTORIES_H
 
 
 

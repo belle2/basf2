@@ -51,6 +51,17 @@ namespace Belle2 {
         m_lineSZ(Line2D::fromSlopeIntercept(szSlope, z0))
       {;}
 
+
+      Helix(const FloatType& curvature,
+            const Vector2D& tangential,
+            const FloatType& impact,
+            const FloatType& szSlope,
+            const FloatType& z0) :
+        m_circleXY(PerigeeCircle::fromPerigeeParameters(curvature, tangential, impact)),
+        m_lineSZ(Line2D::fromSlopeIntercept(szSlope, z0))
+      {;}
+
+
       /// Empty deconstructor
       ~Helix() {;}
 
@@ -59,6 +70,9 @@ namespace Belle2 {
         m_circleXY.setNull();
         m_lineSZ.setNull();
       }
+
+      bool isNull() const
+      { return circleXY().isNull() and lineSZ().isNull(); }
 
       /// Flips the travel direction of the helix in place, pivot point is unchanged.
       inline void reverse() {

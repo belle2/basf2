@@ -18,6 +18,7 @@
 #include <framework/logging/Logger.h>
 #include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
 
+#include "PerigeeCovariance.h"
 
 namespace Belle2 {
 
@@ -77,6 +78,10 @@ namespace Belle2 {
       const TMatrixDSym& matrix() const
       { return m_matrix; }
 
+
+      /// Getter for the perigee subcovariance
+      PerigeeCovariance perigeeCovariance() const
+      { return matrix().GetSub(0, 3, 0, 3); }
 
 
       /// Modifies to helix covariance matrix inplace to represent the reverse travel direction.

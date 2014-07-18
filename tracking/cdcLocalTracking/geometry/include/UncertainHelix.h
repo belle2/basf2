@@ -19,6 +19,7 @@
 #include "Helix.h"
 #include "HelixCovariance.h"
 
+#include "UncertainPerigeeCircle.h"
 
 namespace Belle2 {
 
@@ -46,6 +47,19 @@ namespace Belle2 {
       {;}
 
 
+      /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix. Covariance matrix defaults to a zero matrix
+      UncertainHelix(const FloatType& curvature,
+                     const Vector2D& tangential,
+                     const FloatType& impact,
+                     const FloatType& szSlope,
+                     const FloatType& z0,
+                     const HelixCovariance& helixCovariance = HelixCovariance()) :
+        Helix(curvature, tangential, impact, szSlope, z0),
+        m_helixCovariance(helixCovariance)
+      {;}
+
+
+
       /// Augments a plain helix with a covariance matrix. Covariance defaults to zero.
       UncertainHelix(const Helix& helix,
                      const HelixCovariance& helixCovariance = HelixCovariance()) :
@@ -59,6 +73,10 @@ namespace Belle2 {
 
 
     public:
+      UncertainPerigeeCircle uncertainCircleXY() const
+      { return UncertainPerigeeCircle(circleXY(), helixCovariance().perigeeCovariance());}
+
+
       /// Setter for the whole covariance matrix of the perigee parameters
       inline void setHelixCovariance(const HelixCovariance& helixCovariance)
       { m_helixCovariance = helixCovariance; }

@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include "../include/CDCTrajectory2D.h"
+#include "../include/CDCBField.h"
 
 #include <framework/logging/Logger.h>
 #include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
@@ -21,83 +22,6 @@ using namespace Belle2;
 using namespace CDCLocalTracking;
 
 ClassImpInCDCLocalTracking(CDCTrajectory2D)
-
-//const FloatType CDCTrajectory2D::c_bFieldZMagnitude = 1.5;
-//const SignType CDCTrajectory2D::c_bFieldZSign = PLUS;
-//const FloatType CDCTrajectory2D::c_bFieldZ = c_bFieldZSign * c_bFieldZMagnitude;
-
-namespace {
-  // this class should not really be the provider of this information.
-  // So use the corresponding functions which should eventually change to the correct
-  // information provider.
-  // definitions in source file
-
-  /// Constant for the magnetic field strength in z direction ( in Tesla )
-  const FloatType c_bFieldZMagnitude = 1.5;
-
-  /// Constant for the sign of the magnetic field in z direction. To be checked.
-  const SignType c_bFieldZSign = PLUS; // to be checked
-
-  /// Constant for the signed magnetic field strength in z direction ( in Tesla )
-  const FloatType c_bFieldZ = c_bFieldZSign* c_bFieldZMagnitude;
-
-
-  /// Getter for the absolute magnetic field strength in z direction ( in Tesla )
-  inline const FloatType& getBFieldZMagnitude(const Vector2D& pos2D __attribute__((unused)) = Vector2D(0.0, 0.0))
-  { return c_bFieldZMagnitude; }
-
-  /// Getter for the sign of the magnetic field in z direction
-  inline const SignType& getBFieldZSign()
-  { return c_bFieldZSign; }
-
-  /// Getter for the signed of the magnetic field stength in z direction ( in Tesla )
-  inline const FloatType& getBFieldZ(const Vector2D& pos2D __attribute__((unused)) = Vector2D(0.0, 0.0))
-  { return c_bFieldZ; }
-
-
-
-  /// Conversion helper from clockwise or counterclockwise travel to the charge sign.
-  /** Return the charge sign based on the travel direction on the fitted circle. \n
-   *  With the Lorentz force F = q * v x B \n
-   *  For positively charged particles we have \n
-   *  Counterclockwise travel <-> Bz < 0 \n
-   *  Clockwise travel        <-> Bz > 0 \n
-   *  and opposite for negatively charged. \n
-   *  Hence the charge sign is -CCWInfo * sign(Bz) */
-  SignType ccwInfoToChargeSign(const CCWInfo& ccwInfo)
-  { return - ccwInfo * getBFieldZSign(); }
-
-
-
-  /// Conversion helper from the charge sign to clockwise or counterclockwise travel
-  CCWInfo chargeSignToCCWInfo(const SignType& chargeSign)
-  { return - chargeSign * getBFieldZSign(); }
-
-
-
-  /// Conversion help for charges to clockwise or counterclockwise travel.
-  CCWInfo chargeToCCWInfo(const FloatType& charge)
-  { return chargeSignToCCWInfo(sign(charge)); }
-
-
-
-  /// Conversion helper for momenta to radii
-  FloatType absMom2DToRadius(const FloatType& absMom2D, const FloatType& charge, const Vector2D& pos2D = Vector2D(0.0, 0.0))
-  { return - absMom2D / (charge * getBFieldZ(pos2D)  * 0.00299792458); }
-
-
-  FloatType absMom2DToCurvature(const FloatType& absMom2D, const FloatType& charge, const Vector2D& pos2D = Vector2D(0.0, 0.0))
-  { return - charge * getBFieldZ(pos2D) * 0.00299792458 / absMom2D; }
-
-
-  FloatType curvatureToAbsMom2D(const FloatType& curvature, const Vector2D pos2D = Vector2D(0.0, 0.0))
-  { return std::fabs(getBFieldZ(pos2D) * 0.00299792458 / curvature); }
-
-  FloatType curvatureToAbsMom2D(const FloatType& curvature, const FloatType& charge, const Vector2D& pos2D = Vector2D(0.0, 0.0))
-  { return  - charge *  getBFieldZ(pos2D) * 0.00299792458 / curvature ; }
-
-}
-
 
 
 

@@ -47,6 +47,12 @@ namespace Belle2 {
       {;}
 
 
+      explicit UncertainHelix(const TVectorD& parameters,
+                              const HelixCovariance& helixCovariance = HelixCovariance()) :
+        Helix(parameters),
+        m_helixCovariance(helixCovariance)
+      {;}
+
       /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix. Covariance matrix defaults to a zero matrix
       UncertainHelix(const FloatType& curvature,
                      const Vector2D& tangential,

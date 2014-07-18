@@ -108,3 +108,27 @@ TEST_F(CDCLocalTrackingTest, WireNeighborSymmetry_CW)
 }
 
 
+TEST_F(CDCLocalTrackingTest, WireSkew)
+{
+  // Test if the all wires in the same superlayer have similar skew parameters.
+
+  FloatType skewByICLayer[CDCWireTopology::N_LAYERS];
+  FloatType stereoAngleByICLayer[CDCWireTopology::N_LAYERS];
+
+  const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
+  for (const CDCWireLayer & wireLayer : theWireTopology.getWireLayers()) {
+    const ILayerType iCLayer = wireLayer.getICLayer();
+
+    const CDCWire& firstWire = wireLayer.first();
+    skewByICLayer[iCLayer] = firstWire.getSkew();
+    stereoAngleByICLayer[iCLayer] = firstWire.getStereoAngle();
+
+    for (const CDCWire & wire : wireLayer) {
+      EXPECT_NEAR(skewByICLayer[iCLayer], wire.getSkew(), 10e-7);
+    }
+
+    //B2INFO("ICLayer : " << iCLayer << " Skew : " << skewByICLayer[iCLayer] << " Stereo angle : " << stereoAngleByICLayer[iCLayer]);
+
+  }
+
+}

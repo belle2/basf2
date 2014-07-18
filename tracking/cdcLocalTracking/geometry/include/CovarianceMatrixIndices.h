@@ -10,17 +10,19 @@
 #ifndef COVARIANCEMATRIXINDICES_H
 #define COVARIANCEMATRIXINDICES_H
 
+#include "stddef.h"
+
 namespace Belle2 {
 
   namespace CDCLocalTracking {
 
     /// Helper indices for meaningfull matrix access to the matrices entries
-    constexpr size_t iCurv = 0;
-    constexpr size_t iPhi0 = 1;
-    constexpr size_t iI = 2;
+    const size_t iCurv = 0;
+    const size_t iPhi0 = 1;
+    const size_t iI = 2;
 
-    constexpr size_t iSZ = 3;
-    constexpr size_t iZ0 = 4;
+    const size_t iSZ = 3;
+    const size_t iZ0 = 4;
 
 
   } // namespace CDCLocalTracking

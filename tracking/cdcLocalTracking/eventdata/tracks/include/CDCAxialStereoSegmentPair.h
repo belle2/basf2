@@ -16,6 +16,7 @@
 
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCEntities.h>
 #include <tracking/cdcLocalTracking/eventdata/segments/CDCSegments.h>
+#include <tracking/cdcLocalTracking/eventdata/trajectories/CDCTrajectory3D.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {
@@ -34,7 +35,7 @@ namespace Belle2 {
       /// Constructor from two segments and an assoziated trajectory
       CDCAxialStereoSegmentPair(const CDCRecoSegment2D* startSegment,
                                 const CDCRecoSegment2D* endSegment,
-                                const CDCTrajectory2D& trajectory2D);
+                                const CDCTrajectory3D& trajectory3D);
 
       /// Empty destructor
       ~CDCAxialStereoSegmentPair();
@@ -151,29 +152,24 @@ namespace Belle2 {
 
 
 
-      /// Getter for the two dimensional trajectory.
-      CDCTrajectory2D& getTrajectory2D() const
-      { return m_trajectory2D; }
+      /// Getter for the three dimensional trajectory.
+      CDCTrajectory3D& getTrajectory3D() const
+      { return m_trajectory3D; }
 
-      /// Setter for the two dimensional trajectory.
-      void setTrajectory2D(const CDCTrajectory2D& trajectory2D) const
-      { m_trajectory2D =  trajectory2D; }
+      /// Getter for the two dimensional projection of the common three dimensional trajectory.
+      const CDCTrajectory2D getTrajectory2D() const
+      { return getTrajectory3D().getTrajectory2D(); }
 
-      /// Getter for the sz trajectory.
-      CDCTrajectorySZ& getTrajectorySZ() const
-      { return m_trajectorySZ; }
-
-      /// Setter for the sz trajectory.
-      void setTrajectorySZ(const CDCTrajectorySZ& trajectorySZ) const
-      { m_trajectorySZ = trajectorySZ; }
+      /// Getter for the sz projection of the common three dimensional trajectory.
+      const CDCTrajectorySZ getTrajectorySZ() const
+      { return getTrajectory3D().getTrajectorySZ(); }
 
       /// Invalides the currently stored trajectory information.
-      void clearTrajectories() const {
-        getTrajectory2D().clear();
-        getTrajectorySZ().clear();
-      }
+      void clearTrajectory3D() const
+      { getTrajectory3D().clear(); }
 
-
+      /// Combines the two two dimensional fitted trajectories of the segments to a full three dimensional trajectory.
+      void fuseTrajectories() const;
 
       /// Sets the do not use flag of the segment triple's automaton cell and of the three contained segments
       void setDoNotUse() const {
@@ -209,11 +205,10 @@ namespace Belle2 {
       const CDCRecoSegment2D* m_startSegment; ///< Reference to the start segment
       const CDCRecoSegment2D* m_endSegment; ///< Reference to the end segment
 
-      mutable CDCTrajectory2D m_trajectory2D; ///< Reference to the common two dimensional trajectory
-      mutable CDCTrajectorySZ m_trajectorySZ; ///< Reference to the common sz trajectory
+      /// Memory for the common three dimensional trajectory
+      mutable CDCTrajectory3D m_trajectory3D;
+
       mutable AutomatonCell m_automatonCell; ///< Automaton cell assoziated with the pair of segments
-
-
 
       /** ROOT Macro to make CDCAxialStereoSegmentPair a ROOT class.*/
       ClassDefInCDCLocalTracking(CDCAxialStereoSegmentPair, 1);

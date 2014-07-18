@@ -117,16 +117,16 @@ namespace Belle2 {
       /// Gives the tangential vector to the line
       inline Vector3D tangential3D() const {
         FloatType deltaZ = forwardZ() - backwardZ();
-        return Vector3D(- deltaZ * skew() *  refY(),
-                        deltaZ * skew() *  refX(),
+        return Vector3D(- deltaZ * skew() * refY(),
+                        deltaZ * skew() * refX(),
                         deltaZ);
       }
 
       /// Gives the tangential xy vector to the line
       inline Vector2D tangential2D() const {
         FloatType deltaZ = forwardZ() - backwardZ();
-        return Vector2D(- deltaZ * skew() *  refY(),
-                        deltaZ * skew() *  refX());
+        return Vector2D(- deltaZ * skew() * refY(),
+                        deltaZ * skew() * refX());
       }
 
       /// Gives the forward z coodinate

@@ -16,6 +16,9 @@
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include "TMatrixD.h"
+#include "TVectorD.h"
+
+#include "CovarianceMatrixIndices.h"
 
 #include "Vector2D.h"
 #include "Line2D.h"
@@ -263,6 +266,10 @@ namespace Belle2 {
       inline const Vector2D& tangential() const
       { return m_tangential; }
 
+      /// Gets the polar angle of the direction of flight at the perigee
+      inline const FloatType& phi0() const
+      { return tangentialPhi(); }
+
       /// Getter for the tangtial vector at the perigee
       inline Vector2D tangential(const Vector2D& pos) const
       { return GeneralizedCircle::tangential(pos); }
@@ -270,6 +277,16 @@ namespace Belle2 {
       /// Getter for the perigee point
       inline Vector2D perigee() const
       { return tangential().orthogonal() * impact(); }
+
+      /// Getter for the three perigee parameters in the order defined by CovarianceMatrixIndices.h
+      TVectorD parameters() const {
+        TVectorD result(3);
+        result[iCurv] = curvature();
+        result[iPhi0] = phi0();
+        result[iI] = impact();
+        return result;
+      }
+
 
       /// Gives the minimal polar r the circle reaches (unsigned)
       inline FloatType minimalPolarR() const

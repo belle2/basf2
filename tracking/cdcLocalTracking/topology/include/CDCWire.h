@@ -200,8 +200,14 @@ namespace Belle2 {
       /// Getter for the skew of the wire
       const FloatType& getSkew() const { return getSkewLine().skew(); }
 
-      /// Getter for the stereo angle of the wires
-      FloatType getStereoAngle() const { return std::atan(getSkew() * getMinPolarR()); }
+      /// Getter for the tangents of the stereo angle of the wire.
+      FloatType getTanStereoAngle() const { return getSkew() * getMinPolarR(); }
+
+      /// Getter for the stereo angle of the wire.
+      FloatType getStereoAngle() const { return std::atan(getTanStereoAngle()); }
+
+      /// Getter for the vector pointing from the back end ofthe wire to the front end of the wire
+      Vector3D getWireVector() const { return getSkewLine().tangential3D(); }
 
       /// Getter for the closest distance to the beamline ( z-axes )
       FloatType getMinPolarR() const { return getRefPos2D().norm(); }

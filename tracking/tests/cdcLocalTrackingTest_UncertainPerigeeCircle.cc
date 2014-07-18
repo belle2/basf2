@@ -71,7 +71,7 @@ TEST_F(CDCLocalTrackingTest, PerigeeCircle_passiveMoveByJacobian)
 
 TEST_F(CDCLocalTrackingTest, PerigeeCircle_passiveMovedCovarianceBy)
 {
-  TMatrixDSym perigeeVariance(3, 3);
+  TMatrixDSym perigeeVariance(3);
   perigeeVariance(0, 0) = 1.0;
   perigeeVariance(0, 1) = 0.0;
   perigeeVariance(0, 2) = 0.0;
@@ -165,7 +165,7 @@ TEST_F(CDCLocalTrackingTest, PerigeeCircle_passiveMovedCovarianceBy)
 TEST_F(CDCLocalTrackingTest, PerigeeCircle_passiveMove)
 {
 
-  TMatrixDSym perigeeVariance(3, 3);
+  TMatrixDSym perigeeVariance(3);
   perigeeVariance(0, 0) = 1.0;
   perigeeVariance(0, 1) = 0.3;
   perigeeVariance(0, 2) = 0.5;

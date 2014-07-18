@@ -7,18 +7,24 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#ifndef COVARIANCEMATRIXINDICES_H
+#define COVARIANCEMATRIXINDICES_H
 
-#include "../include/UncertainPerigeeCircle.h"
+namespace Belle2 {
 
-#include <framework/logging/Logger.h>
+  namespace CDCLocalTracking {
 
-#include <boost/math/tools/precision.hpp>
-#include <cmath>
+    /// Helper indices for meaningfull matrix access to the matrices entries
+    constexpr size_t iCurv = 0;
+    constexpr size_t iPhi0 = 1;
+    constexpr size_t iI = 2;
 
-using namespace std;
-using namespace boost::math;
+    constexpr size_t iSZ = 3;
+    constexpr size_t iZ0 = 4;
 
-using namespace Belle2;
-using namespace CDCLocalTracking;
 
-ClassImpInCDCLocalTracking(UncertainPerigeeCircle)
+  } // namespace CDCLocalTracking
+
+} // namespace Belle2
+
+#endif // COVARIANCEMATRIXINDICES_H

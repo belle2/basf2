@@ -295,6 +295,26 @@ FloatType GeneralizedCircle::lengthOnCurve(const Vector2D& from, const Vector2D&
 
 
 
+FloatType GeneralizedCircle::arcLengthTo(const Vector2D& to) const
+{
+  const Vector2D from = perigee();
+
+  ForwardBackwardInfo lengthSign = isForwardOrBackwardOf(from, to);
+  if (lengthSign == INVALID_INFO) return NAN;
+
+  // Handling the rare case that from and to correspond to opposing points on the circle
+  if (lengthSign == UNKNOWN_INFO) lengthSign = 1;
+
+  const Vector2D& closestAtFrom = from;
+  Vector2D closestAtTo = closest(to);
+  FloatType directDistance = closestAtFrom.distance(closestAtTo);
+
+  return lengthSign * arcLengthFactor(directDistance) * directDistance;
+
+}
+
+
+
 FloatType GeneralizedCircle::arcLengthFactor(const FloatType& directDistance) const
 {
   FloatType x = directDistance * curvature() / 2.0;

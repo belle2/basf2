@@ -128,6 +128,7 @@ namespace Belle2 {
 
       /// Flips orientation the line in place
       void reverse() { scaleN(-1.0); }
+
       /// Returns a copy of the line with the reversed orientation
       Line2D reversed() const { return Line2D(-n0(), -n1(), -n2()); }
 
@@ -206,8 +207,10 @@ namespace Belle2 {
 
       /// Gives the tangential vector in the direction of positiv advance on the line
       Vector2D tangential() const { return normal().orthogonal(); }
+
       /// Getter for the unit normal vector of the line
       const Vector2D& normal() const { return n12(); }
+
       /// Getter for the gradient of the distance field
       const Vector2D& gradient() const { return n12(); }
 
@@ -245,10 +248,29 @@ namespace Belle2 {
       /// Passivelly move the coordinate system in place along the first coordinate
       void passiveMoveAlongFirst(const FloatType& first)
       { m_n0 += n1() * first; }
+
       /// Passivelly move the coordinate system in place along the second coordinate
       void passiveMoveAlongSecond(const FloatType& second)
       { m_n0 += n2() * second; }
+
+      /// Flips the first coordinate inplace (no difference between active and pasive)
+      void flipFirst()
+      { m_n12.flipFirst(); }
+
+      /// Flips the first coordinate inplace (no difference between active and pasive)
+      void flipSecond()
+      { m_n12.flipSecond(); }
+
+      /// Makes a copy of the line with the first coordinate flipped (no difference between active and pasive)
+      Line2D flippedFirst() const
+      { return Line2D(n0(), n12().flippedFirst()); }
+
+      /// Makes a copy of the line with the second coordinate flipped (no difference between active and pasive)
+      Line2D flippedSecond() const
+      { return Line2D(n0(), n12().flippedSecond()); }
       /**@}*/
+
+
 
       /** @name Line as a function of the first coordinate
        */

@@ -15,31 +15,18 @@
 #include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
+#include "TMatrixD.h"
+
 #include "Vector2D.h"
 #include "Line2D.h"
 #include "Circle2D.h"
-#include "BoundSkewLine.h"
-
 #include "GeneralizedCircle.h"
 
 namespace Belle2 {
 
   namespace CDCLocalTracking {
 
-    ///A generalized circle
-    /** Makes a smooth generalization from a two dimensional normal line ( like Line2D ) to a circle \n
-     *  The parameterisation is best suited for low curvature circle. The representation takes four \n
-     *  parameters. They correspond to the normal circle parameters like \n
-     *  n0 = (m_x*m_x + m_y*m_y - r*r)/2r \n
-     *  n1 = -m_x/r \n
-     *  n2 = -m_y/r \n
-     *  n3 = 1/2r \n
-     *  where the normalization condtion is n1*n1 + n2*n2 - 4 * n0 * n3 = 1. \n
-     *  The overall sign is fixed in the following way: If the last parameter is positiv the circle \n
-     *  is assummed to be orientated counterclockwise else the circle is assummed to be orientated clockwise.\n
-     *  The parameters n1 and n2 are indeed a vector in two dimensions and we keep them stored as Vector2D. \n
-     *  Additionally we can represent a line with same parameters by setting n3 = 0. Compare Line2D.
-     */
+    /// Extension of the generalized circle also caching the perigee coordinates.
     class PerigeeCircle : public GeneralizedCircle {
 
     public:
@@ -251,10 +238,14 @@ namespace Belle2 {
         GeneralizedCircle::passiveMoveBy(by);
         receivePerigeeParameters();
       }
+      /// Computes the Jacobi matrix for a move of the coordinate system by the given vector.
+      TMatrixD passiveMoveByJacobian(const Vector2D& by) const;
+
+      /// Puts the Jacobi matrix for a move of the coordinate system by the given vector in the given matrix as an output argument
+      void passiveMoveByJacobian(const Vector2D& by, TMatrixD& jacobian) const;
 
       /// Calculates the point, which lies at the give perpendicular travel distance (counted from the perigee)
       Vector2D atPerpS(const FloatType& perpS) const;
-
 
       ///Getter for the signed curvature.
       inline const FloatType& curvature() const
@@ -265,11 +256,11 @@ namespace Belle2 {
       { return m_impact; }
 
       /// Gets the polar angle of the direction of flight at the perigee
-      inline FloatType tangentialPhi() const
+      inline const FloatType& tangentialPhi() const
       { return m_tangentialPhi; }
 
       /// Getter for the tangtial vector at the perigee
-      inline Vector2D tangential() const
+      inline const Vector2D& tangential() const
       { return m_tangential; }
 
       /// Getter for the tangtial vector at the perigee
@@ -287,6 +278,7 @@ namespace Belle2 {
       /// Gives the maximal polar r the circle reaches
       inline FloatType maximalPolarR() const
       { return fabs(impact() + 2 * radius()); }
+
 
       /// Debug helper
       friend std::ostream& operator<<(std::ostream& output, const PerigeeCircle& circle) {
@@ -310,7 +302,6 @@ namespace Belle2 {
 
     }; //class
 
-    //typedef PerigeeCircle GeneralizedCircle;
 
   } // namespace CDCLocalTracking
 } // namespace Belle2

@@ -230,6 +230,23 @@ namespace Belle2 {
       /// Same as reversed()
       inline Vector2D operator-() const { return reversed(); }
 
+      /// Flips the first coordinate inplace (no difference between active and passive)
+      void flipFirst()
+      { m_x = -x(); }
+
+      /// Flips the first coordinate inplace (no difference between active and passive)
+      void flipSecond()
+      { m_y = -y(); }
+
+      /// Makes a copy of the vector with the first coordinate flipped (no difference between active and passive)
+      Vector2D flippedFirst() const
+      { return Vector2D(-x(), y()); }
+
+      /// Makes a copy of the vector with the second coordinate flipped (no difference between active and passive)
+      Vector2D flippedSecond() const
+      { return Vector2D(x(), -y()); }
+
+
       /// Transforms the vector to conformal space inplace
       /** Applies the conformal map in the self-inverse from  X = x / (x^2 + y^2) and Y = y / (x^2 +y^2) inplace */
       inline void conformalTransform() { divide(normSquared()); }

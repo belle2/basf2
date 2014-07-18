@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include "../include/PerigeeCircle.h"
+#include "../include/CovarianceMatrixIndices.h"
 
 #include <framework/logging/Logger.h>
 
@@ -132,4 +133,78 @@ Vector2D PerigeeCircle::atPerpS(const FloatType& perpS) const
   FloatType atX =  perpS * cosc(perpS * curvature()) + impact();
   FloatType atY =  -perpS * sinc_pi(perpS * curvature());
   return Vector2D::compose(-n12().unit(), atX, atY);
+}
+
+
+
+TMatrixD PerigeeCircle::passiveMoveByJacobian(const Vector2D& by) const
+{
+  TMatrixD jacobian(3, 3);
+  passiveMoveByJacobian(by, jacobian);
+  return jacobian;
+}
+
+
+
+void PerigeeCircle::passiveMoveByJacobian(const Vector2D& by, TMatrixD& jacobian) const
+{
+
+  // In this frame of reference we have d=0,  phi= + or - PI
+  Vector2D coordinateVector = tangential();
+
+  //Vector2D delta = perigee() - by;
+  Vector2D delta = by - perigee();
+
+  FloatType deltaParallel = coordinateVector.fastParallelComp(delta);
+  FloatType deltaOrthogonal = coordinateVector.fastOrthogonalComp(delta);
+
+  FloatType halfA = fastDistance(by);
+  FloatType A = 2 * halfA;
+
+  //B2INFO("A = " << A);
+  //B2INFO("A = " << 2 * deltaOrthogonal + curvature() * delta.normSquared());
+
+  Vector2D CB = gradient(by).orthogonal();
+  //FloatType C = CB.first();
+  //FloatType B = CB.second();
+
+  //B2INFO("B = " << B);
+  //B2INFO("C = " << C);
+
+  FloatType u = 1 + curvature() * impact(); //= n12().polarR()
+
+  FloatType U = sqrt(1 + curvature() * A);
+
+  //B2INFO("U = " << U);
+
+  FloatType nu = 1 + curvature() * deltaOrthogonal;
+
+  //B2INFO("nu = " << nu);
+
+  FloatType xi = 1.0 / CB.normSquared();
+
+  //B2INFO("xi = " << xi);
+
+  FloatType lambda = halfA / ((1 + U) * (1 + U) * U);
+  FloatType mu = 1.0 / (U * (U + 1)) + curvature() * lambda;
+
+  //B2INFO("lambda = " << lambda);
+  //B2INFO("mu = " << mu);
+
+  FloatType zeta = delta.normSquared();
+
+  //B2INFO("zeta = " << zeta);
+
+  jacobian(iCurv, iCurv) = 1;
+  jacobian(iCurv, iPhi0) = 0;
+  jacobian(iCurv, iI) = 0;
+
+  jacobian(iPhi0, iCurv) = xi * deltaParallel;
+  jacobian(iPhi0, iPhi0) = xi * u * nu;
+  jacobian(iPhi0, iI) = -xi * curvature() * curvature() * deltaParallel;
+
+  jacobian(iI, iCurv) = mu * zeta - lambda * A;
+  jacobian(iI, iPhi0) = 2 * mu * u * deltaParallel;
+  jacobian(iI, iI) = 2 * mu * nu;
+
 }

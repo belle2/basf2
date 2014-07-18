@@ -398,6 +398,10 @@ namespace Belle2 {
       inline Vector2D center() const
       { return n12().divided(-2 * n3()); }
 
+      /// Gives the perimeter of the circle.
+      inline FloatType perimeter() const
+      { return 2 * PI * radius(); }
+
       /// Gives the orientation of the circle
       /**
        * The circle can be either orientated counterclockwise or clockwise.
@@ -427,6 +431,9 @@ namespace Belle2 {
        * For the line case the length is the distance component parallel to the line.
        */
       FloatType lengthOnCurve(const Vector2D& from, const Vector2D& to) const;
+
+      /// Calculates the arc length between the perigee and the given point.
+      FloatType arcLengthTo(const Vector2D& point) const;
 
       /// Helper function the calculate the factor between the length of a secant line and the length on the arc.
       /**

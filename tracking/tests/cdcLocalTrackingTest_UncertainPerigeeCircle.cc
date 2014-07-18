@@ -71,7 +71,7 @@ TEST_F(CDCLocalTrackingTest, PerigeeCircle_passiveMoveByJacobian)
 
 TEST_F(CDCLocalTrackingTest, PerigeeCircle_passiveMovedCovarianceBy)
 {
-  TMatrixD perigeeVariance(3, 3);
+  TMatrixDSym perigeeVariance(3, 3);
   perigeeVariance(0, 0) = 1.0;
   perigeeVariance(0, 1) = 0.0;
   perigeeVariance(0, 2) = 0.0;
@@ -87,7 +87,7 @@ TEST_F(CDCLocalTrackingTest, PerigeeCircle_passiveMovedCovarianceBy)
   UncertainPerigeeCircle circle(1.0, -PI / 2, 0.0, perigeeVariance);
 
   {
-    TMatrixD noMoveVariance = circle.passiveMovedCovarianceBy(Vector2D(0.0, 0.0));
+    TMatrixDSym noMoveVariance = circle.passiveMovedCovarianceBy(Vector2D(0.0, 0.0));
     EXPECT_NEAR(1.0, noMoveVariance(0, 0), 10e-7);
     EXPECT_NEAR(0.0, noMoveVariance(0, 1), 10e-7);
     EXPECT_NEAR(0.0, noMoveVariance(0, 2), 10e-7);
@@ -102,7 +102,7 @@ TEST_F(CDCLocalTrackingTest, PerigeeCircle_passiveMovedCovarianceBy)
   }
 
   {
-    TMatrixD noChangeMoveVariance = circle.passiveMovedCovarianceBy(Vector2D(-1.0, 0.0));
+    TMatrixDSym noChangeMoveVariance = circle.passiveMovedCovarianceBy(Vector2D(-1.0, 0.0));
     EXPECT_NEAR(1.0, noChangeMoveVariance(0, 0), 10e-7);
     EXPECT_NEAR(0.0, noChangeMoveVariance(0, 1), 10e-7);
     EXPECT_NEAR(0.0, noChangeMoveVariance(0, 2), 10e-7);
@@ -118,7 +118,7 @@ TEST_F(CDCLocalTrackingTest, PerigeeCircle_passiveMovedCovarianceBy)
 
 
   {
-    TMatrixD transformedVariance = circle.passiveMovedCovarianceBy(Vector2D(2.0, 0.0));
+    TMatrixDSym transformedVariance = circle.passiveMovedCovarianceBy(Vector2D(2.0, 0.0));
 
     EXPECT_NEAR(1.0, transformedVariance(0, 0), 10e-7);
 
@@ -139,7 +139,7 @@ TEST_F(CDCLocalTrackingTest, PerigeeCircle_passiveMovedCovarianceBy)
 
   {
     // Should be same as before
-    TMatrixD transformedVariance = circle.passiveMovedCovarianceBy(Vector2D(2.5, 0.0));
+    TMatrixDSym transformedVariance = circle.passiveMovedCovarianceBy(Vector2D(2.5, 0.0));
 
     EXPECT_NEAR(1, transformedVariance(0, 0), 10e-7);
 
@@ -158,21 +158,14 @@ TEST_F(CDCLocalTrackingTest, PerigeeCircle_passiveMovedCovarianceBy)
   }
 
 
-
-  {
-    TMatrixD transformedVariance = circle.passiveMovedCovarianceBy(Vector2D(2.5, 0.0));
-
-
-
-  }
-
 }
 
 
 
 TEST_F(CDCLocalTrackingTest, PerigeeCircle_passiveMove)
 {
-  TMatrixD perigeeVariance(3, 3);
+
+  TMatrixDSym perigeeVariance(3, 3);
   perigeeVariance(0, 0) = 1.0;
   perigeeVariance(0, 1) = 0.3;
   perigeeVariance(0, 2) = 0.5;
@@ -198,7 +191,7 @@ TEST_F(CDCLocalTrackingTest, PerigeeCircle_passiveMove)
 
   //circle.perigeeCovariance().Print();
 
-  TMatrixD twiceMovedVariance  = circle.perigeeCovariance();
+  TMatrixDSym twiceMovedVariance  = circle.perigeeCovariance();
 
   EXPECT_NEAR(perigeeVariance(0, 0), twiceMovedVariance(0, 0), 10e-7);
   EXPECT_NEAR(perigeeVariance(0, 1), twiceMovedVariance(0, 1), 10e-7);
@@ -211,5 +204,6 @@ TEST_F(CDCLocalTrackingTest, PerigeeCircle_passiveMove)
   EXPECT_NEAR(perigeeVariance(2, 0), twiceMovedVariance(2, 0), 10e-7);
   EXPECT_NEAR(perigeeVariance(2, 1), twiceMovedVariance(2, 1), 10e-7);
   EXPECT_NEAR(perigeeVariance(2, 2), twiceMovedVariance(2, 2), 10e-7);
+
 }
 

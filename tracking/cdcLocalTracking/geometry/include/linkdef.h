@@ -20,7 +20,12 @@
 #pragma link C++ class Belle2::CDCLocalTracking::GeneralizedCircle+;
 
 #pragma link C++ class Belle2::CDCLocalTracking::PerigeeCircle+;
+#pragma link C++ class Belle2::CDCLocalTracking::PerigeeCovariance+;
 #pragma link C++ class Belle2::CDCLocalTracking::UncertainPerigeeCircle+;
+
+#pragma link C++ class Belle2::CDCLocalTracking::Helix+;
+#pragma link C++ class Belle2::CDCLocalTracking::HelixCovariance+;
+#pragma link C++ class Belle2::CDCLocalTracking::UncertainHelix+;
 
 #pragma link C++ class Belle2::CDCLocalTracking::BoundSkewLine+;
 

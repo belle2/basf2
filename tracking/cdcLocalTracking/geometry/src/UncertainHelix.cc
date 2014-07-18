@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/UncertainPerigeeCircle.h"
+#include "../include/UncertainHelix.h"
 
 #include <framework/logging/Logger.h>
 
@@ -21,4 +21,4 @@ using namespace boost::math;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-ClassImpInCDCLocalTracking(UncertainPerigeeCircle)
+ClassImpInCDCLocalTracking(UncertainHelix)

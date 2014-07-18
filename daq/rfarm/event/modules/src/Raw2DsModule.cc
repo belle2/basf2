@@ -13,7 +13,7 @@
 #include "framework/datastore/StoreObjPtr.h"
 #include "framework/dataobjects/EventMetaData.h"
 
-#define DESY
+// #define DESY
 
 using namespace std;
 using namespace Belle2;
@@ -102,8 +102,8 @@ void Raw2DsModule::registerRawCOPPERs()
 
   int* evtbuf = new int[MAXEVTSIZE];
   while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
-    //    usleep(100);
-    usleep(20);
+    usleep(100);
+    //    usleep(20);
   }
 
   B2INFO("Raw2Ds: got an event from RingBuffer, size=" << size <<

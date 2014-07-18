@@ -78,8 +78,8 @@ void Ds2RbufModule::event()
   for (;;) {
     int stat = m_rbuf->insq((int*)msg->buffer(), (msg->size() - 1) / 4 + 1);
     if (stat >= 0) break;
-    //    usleep(200);
-    usleep(20);
+    usleep(100);
+    //    usleep(20);
   }
 
   B2INFO("Ds2Rbuf: objs sent in buffer. Size = " << msg->size());

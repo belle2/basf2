@@ -7,9 +7,6 @@
 //-
 
 #include <rawdata/modules/DummyDataPacker.h>
-#include <sys/mman.h>
-//#define MAXEVTSIZE 400000000
-#define CHECKEVT 5000
 
 using namespace std;
 using namespace Belle2;
@@ -25,10 +22,11 @@ REG_MODULE(DummyDataPacker)
 
 DummyDataPackerModule::DummyDataPackerModule() : Module()
 {
-  //Set module properties
+  ///Set module properties
   setDescription("an Example to pack data to a RawCOPPER object");
-//  setPropertyFlags(c_Input | c_ParallelProcessingCertified);
-  addParam("MaxEventNum", max_nevt, "Maximum event number in one run", -1);
+
+  ///  maximum # of events to produce( -1 : inifinite)
+  addParam("MaxEventNum", max_nevt, "Maximum event number to make", -1);
 
   B2INFO("DummyDataPacker: Constructor done.");
 }
@@ -47,11 +45,11 @@ void DummyDataPackerModule::initialize()
 
   // Open message handler
   //  m_msghandler = new MsgHandler(m_compressionLevel);
-  //  m_msghandler = new MsgHandler;
 
-  // Initialize EvtMetaData
+  /// Initialize EvtMetaData
   m_eventMetaDataPtr.registerAsPersistent();
-  //  raw_datablkarray.registerPersistent();
+
+  ///  raw_datablkarray.registerPersistent();
   rawcprarray.registerPersistent();
 
   n_basf2evt = 0;
@@ -65,12 +63,12 @@ void DummyDataPackerModule::initialize()
 void DummyDataPackerModule::event()
 {
 
-//   // Make RawCOPPER array
-//   rawcprarray.create();
+  //    Make RawCOPPER array
+  rawcprarray.create();
 
-//   //
-//   // Fill event info (These values will be stored in RawHeader )
-//   //
+  //
+  // Fill event info (These values will be stored in RawHeader )
+  //
   RawCOPPERPackerInfo rawcprpacker_info;
   rawcprpacker_info.exp_num = 1;
   rawcprpacker_info.run_subrun_num = 2; // run number : 14bits, subrun # : 8bits
@@ -94,26 +92,23 @@ void DummyDataPackerModule::event()
     buf1[ i ] = i;
   }
 
-  nwords_2nd = 2 * (n_basf2evt % 10);
+  nwords_2nd = (n_basf2evt + 1) % 10;
   buf2 = new int[ nwords_2nd];
   for (int i = 0; i < nwords_2nd; i++) {
-    buf2[ i ] = -i;
+    buf2[ i ] = i + 1;
   }
 
-  nwords_3rd = (n_basf2evt + 1)  % 10;
+  nwords_3rd = 3 * (n_basf2evt + 2) % 10;
   buf3 = new int[ nwords_3rd];
   for (int i = 0; i < nwords_3rd; i++) {
-    buf3[ i ] = i + 1;
+    buf3[ i ] = i + 2;
   }
 
-  nwords_4th = 2 * (n_basf2evt + 1)  % 10;
+  nwords_4th = 4 * (n_basf2evt + 3)  % 10;
   buf4 = new int[ nwords_4th];
-
   for (int i = 0; i < nwords_4th; i++) {
-    buf4[ i ] = - i - 1;
+    buf4[ i ] = i + 3;
   }
-
-
 
   raw_copper->PackDetectorBuf(buf1, nwords_1st,
                               buf2, nwords_2nd,
@@ -121,10 +116,10 @@ void DummyDataPackerModule::event()
                               buf4, nwords_4th,
                               rawcprpacker_info);
 
-  delete buf1;
-  delete buf2;
-  delete buf3;
-  delete buf4;
+  delete [] buf1;
+  delete [] buf2;
+  delete [] buf3;
+  delete [] buf4;
 
   //
   // Update EventMetaData : Not affect on the output

@@ -59,11 +59,17 @@ namespace Belle2 {
       /// Getter for the oriented wire hit with the opposite orientation.
       const Belle2::CDCLocalTracking::CDCRLWireHit* getReverseOf(const Belle2::CDCLocalTracking::CDCRLWireHit& rlWireHit) const;
 
+      /// Getter for the wire hit that is based on the given CDCHit.
+      const Belle2::CDCLocalTracking::CDCWireHit* getWireHit(const Belle2::CDCHit* ptrHit) const;
+
       /// Getter for the two oriented wire hits that are based on the given wire hit
       std::pair<const Belle2::CDCLocalTracking::CDCRLWireHit*, const Belle2::CDCLocalTracking::CDCRLWireHit*> getRLWireHitPair(const Belle2::CDCLocalTracking::CDCWireHit& wireHit) const;
 
-      /// Getter for the oriented wire hit that is based on the given wire hit with a specific right left passage hypotheses
+      /// Getter for the oriented wire hit that is based on the given wire hit with a specific right left passage hypotheses.
       const Belle2::CDCLocalTracking::CDCRLWireHit* getRLWireHit(const Belle2::CDCLocalTracking::CDCWireHit& wireHit, const RightLeftInfo& rlInfo) const;
+
+      /// Getter for the oriented wire hit that is based on the given CDCHit with a specific right left passafe hypotheses.
+      const Belle2::CDCLocalTracking::CDCRLWireHit* getRLWireHit(const Belle2::CDCHit* ptrHit, const RightLeftInfo& rlInfo) const;
 
       /// Getter for a coaligned subrange of wire hits
       template<class Coaligned>

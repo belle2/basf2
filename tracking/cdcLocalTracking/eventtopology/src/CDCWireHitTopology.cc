@@ -45,8 +45,12 @@ size_t CDCWireHitTopology::fill(const std::string& cdcHitsStoreArrayName)
   m_rlWireHits.reserve(2 * nHits);
 
   for (size_t iHit = 0; iHit < nHits; ++iHit) {
-    CDCHit* hit = cdcHits[iHit];
-    m_wireHits.push_back(CDCWireHit(hit, iHit));
+    CDCHit* ptrHit = cdcHits[iHit];
+    CDCHit& hit = *ptrHit;
+    if (iHit != hit.getArrayIndex()) {
+      B2ERROR("CDCHit.getArrayIndex() produced wrong result. Expected : " << iHit << " Actual : " << hit.getArrayIndex());
+    }
+    m_wireHits.push_back(CDCWireHit(ptrHit, iHit));
   }
 
   m_wireHits.ensureSorted();
@@ -97,6 +101,28 @@ const CDCRLWireHit* CDCWireHitTopology::getReverseOf(const CDCRLWireHit& rlWireH
 
 }
 
+
+/// Getter for the wire hit that is based on the given CDCHit.
+const CDCWireHit* CDCWireHitTopology::getWireHit(const CDCHit* ptrHit) const
+{
+  if (not ptrHit) return nullptr;
+  const CDCHit& hit = *ptrHit;
+
+  CDCWireHitRange wireHitRange = getWireHits(hit);
+  if (wireHitRange.empty()) {
+    B2WARNING("No CDCWireHit for the CDCHit in the CDCWireHitTopology.");
+    return nullptr;
+  }
+
+  const CDCWireHit& wireHit =  wireHitRange.front();
+  return &wireHit;
+
+}
+
+
+
+
+
 std::pair<const CDCRLWireHit*, const CDCRLWireHit*> CDCWireHitTopology::getRLWireHitPair(const CDCWireHit& wireHit) const
 {
 
@@ -130,3 +156,9 @@ const Belle2::CDCLocalTracking::CDCRLWireHit* CDCWireHitTopology::getRLWireHit(c
 
 }
 
+
+const Belle2::CDCLocalTracking::CDCRLWireHit* CDCWireHitTopology::getRLWireHit(const Belle2::CDCHit* ptrHit, const RightLeftInfo& rlInfo) const
+{
+  const CDCWireHit* ptrWireHit = getWireHit(ptrHit);
+  return  ptrWireHit ? getRLWireHit(*ptrWireHit, rlInfo) : nullptr;
+}

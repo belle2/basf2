@@ -73,6 +73,16 @@ namespace Belle2 {
 
         /// End of the range for range based for.
         const_iterator end() const { return this->second;}
+
+        /// Checks if the begin equals the end iterator, hence if the range is empty.
+        bool empty() const { return this->first == this->second; }
+
+        /// Returns the derefenced begin iterator.
+        const T& front() const { return *begin(); }
+
+        /// Returns the derefenced end iterator
+        const T& back() const { return *end(); }
+
       };
 
 

@@ -17,6 +17,8 @@
 
 #include <tracking/cdcLocalTracking/mclookup/CDCMCMap.h>
 
+#include <tracking/cdcLocalTracking/eventdata/entities/CDCEntities.h>
+
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 
@@ -53,7 +55,7 @@ namespace Belle2 {
       void fillPrimarySimHits();
 
       /// Helper function to find the closest primary hit for the given CDCSimHit from the same MCParticle - nullptr if no suitable hit can be found
-      const CDCSimHit* getClosestPrimarySimHit(const CDCSimHit*  ptrSimHit) const;
+      const CDCSimHit* getClosestPrimarySimHit(const CDCSimHit* ptrSimHit) const;
 
     public:
       /// Look up and return the closest primary simulated hit for the given CDCHit - nullptr if no suitable hit can be found
@@ -69,6 +71,30 @@ namespace Belle2 {
     public:
       /// Look up the Monte Carlo right left passage information for the given hit.
       RightLeftInfo getRLInfo(const CDCHit* ptrHit) const;
+
+      /// Look up the position of the primary ionisation from related simulated hit.
+      Vector3D getRecoPos3D(const CDCHit* ptrHit) const;
+
+      /// Look up the position of the primary ionisation from the closest primary simulated hit.
+      /// If no primary sim hit is available use the secondary simulated hit position
+      Vector3D getClosestPrimaryRecoPos3D(const CDCHit* ptrHit) const;
+
+    public:
+      /// Retrieve the wire hit including right left passage information from Monte Carlo from the wire hit topology.
+      const CDCRLWireHit* getRLWireHit(const CDCHit* ptrHit) const;
+
+      /// Construct an CDCRecoHit3D from the (potential secondary) CDCSimHit information related to the CDCHit.
+      CDCRecoHit3D getRecoHit3D(const CDCHit* ptrHit) const;
+
+      /// Construct an CDCRecoHit3D from the closest primary CDCSimHit information related to the CDCHit.
+      CDCRecoHit3D getClosestPrimaryRecoHit3D(const CDCHit* ptrHit) const;
+
+      /// Construct an CDCRecoHit2D from the (potential secondary) CDCSimHit information related to the CDCHit.
+      CDCRecoHit2D getRecoHit2D(const CDCHit* ptrHit) const;
+
+      /// Construct an CDCRecoHit2D from the closest primary CDCSimHit information related to the CDCHit.
+      CDCRecoHit2D getClosestPrimaryRecoHit2D(const CDCHit* ptrHit) const;
+
 
     private:
       /// Reference to the CDCMCMap to be used in this event

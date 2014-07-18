@@ -11,6 +11,7 @@
 #include "../include/CDCSimHitLookUp.h"
 
 #include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
+#include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
 
 #include <vector>
 
@@ -101,12 +102,12 @@ const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCSimHit* ptrSi
 
   const CDCMCMap& mcMap = *m_ptrMCMap;
 
-  //Check if the CDCSimHit was reassigned from a secondary particle to its primary particle
+  // Check if the CDCSimHit was reassigned from a secondary particle to its primary particle.
   if (not mcMap.isReassignedSecondary(ptrSimHit)) {
     return ptrSimHit;
   } else {
 
-    //Try to find the hit on the same wire from the primary particle
+    // Try to find the hit on the same wire from the primary particle.
     const MCParticle* ptrMCParticle = mcMap.getMCParticle(ptrSimHit);
     if (not ptrMCParticle) {
       return nullptr;
@@ -125,13 +126,13 @@ const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCSimHit* ptrSi
 
       if (wireTopology.areNeighbors(primarySimHit.getWireID(), wireID) or primarySimHit.getWireID() == wireID) {
 
-        // Found a hit on the same wire from the primary particle
+        // Found a hit on the same wire from the primary particle.
         primarySimHitsOnSameOrNeighborWire.push_back(ptrPrimarySimHit);
       }
     }
 
 
-    //Now from the neighboring primary CDCSimHits pick to one with the smallest distance to the secondary CDCSimHit
+    // Now from the neighboring primary CDCSimHits pick to one with the smallest distance to the secondary CDCSimHit.
     auto itClosestPrimarySimHit = std::min_element(primarySimHitsOnSameOrNeighborWire.begin(),
                                                    primarySimHitsOnSameOrNeighborWire.end(),
     [&simHit](const CDCSimHit * primarySimHit, const CDCSimHit * otherPrimarySimHit) -> bool {
@@ -146,7 +147,7 @@ const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCSimHit* ptrSi
     });
 
     if (itClosestPrimarySimHit != primarySimHitsOnSameOrNeighborWire.end()) {
-      //Found primary simulated hit for secondary hit
+      // Found primary simulated hit for secondary hit.
       return *itClosestPrimarySimHit;
 
     } else {
@@ -257,9 +258,83 @@ RightLeftInfo CDCSimHitLookUp::getRLInfo(const CDCHit* ptrHit) const
 }
 
 
+Vector3D CDCSimHitLookUp::getRecoPos3D(const CDCHit* ptrHit) const
+{
+  if (not m_ptrMCMap) {
+    B2WARNING("CDCMCMap not set. Cannot find reconstructed position");
+    return Vector3D();
+  }
+
+  const CDCMCMap& mcMap = *m_ptrMCMap;
+  const CDCSimHit* ptrSimHit = mcMap.getSimHit(ptrHit);
+
+  if (not ptrSimHit) {
+    B2WARNING("No CDCSimHit related to CDCHit");
+    return Vector3D();
+  }
+
+  const CDCSimHit& simHit = *ptrSimHit;
+  return simHit.getPosTrack();
+}
+
+
+Vector3D CDCSimHitLookUp::getClosestPrimaryRecoPos3D(const CDCHit* ptrHit) const
+{
+  const CDCSimHit* ptrPrimarySimHit =  getClosestPrimarySimHit(ptrHit);
+  if (ptrPrimarySimHit) {
+    const CDCSimHit& primarySimHit = *ptrPrimarySimHit;
+    return primarySimHit.getPosTrack();
+  } else {
+    return getRecoPos3D(ptrHit);
+  }
+}
+
+
+const CDCRLWireHit* CDCSimHitLookUp::getRLWireHit(const CDCHit* ptrHit) const
+{
+  if (not ptrHit) return nullptr;
+
+  RightLeftInfo rlInfo = getRLInfo(ptrHit);
+
+  const CDCWireHitTopology& theWireHitTopology = CDCWireHitTopology::getInstance();
+  const CDCRLWireHit* ptrRLWireHit = theWireHitTopology.getRLWireHit(ptrHit, rlInfo);
+
+  return ptrRLWireHit;
+}
+
+
+CDCRecoHit3D CDCSimHitLookUp::getRecoHit3D(const CDCHit* ptrHit) const
+{
+  const CDCRLWireHit* ptrRLWireHit = getRLWireHit(ptrHit);
+  if (not ptrRLWireHit) return CDCRecoHit3D();
+
+  Vector3D recoPos3D = getRecoPos3D(ptrHit);
+
+  return CDCRecoHit3D(ptrRLWireHit, recoPos3D);
+}
 
 
 
+CDCRecoHit3D CDCSimHitLookUp::getClosestPrimaryRecoHit3D(const CDCHit* ptrHit) const
+{
+  const CDCRLWireHit* ptrRLWireHit = getRLWireHit(ptrHit);
+  if (not ptrRLWireHit) return CDCRecoHit3D();
+
+  Vector3D recoPos3D = getClosestPrimaryRecoPos3D(ptrHit);
+
+  return CDCRecoHit3D(ptrRLWireHit, recoPos3D);
+}
 
 
 
+CDCRecoHit2D CDCSimHitLookUp::getRecoHit2D(const CDCHit* ptrHit) const
+{
+  return getRecoHit3D(ptrHit).getRecoHit2D();
+}
+
+
+
+CDCRecoHit2D CDCSimHitLookUp::getClosestPrimaryRecoHit2D(const CDCHit* ptrHit) const
+{
+  return getClosestPrimaryRecoHit3D(ptrHit).getRecoHit2D();
+}

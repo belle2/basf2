@@ -140,8 +140,23 @@ CDCRecoHit3D CDCRecoHit3D::average(const CDCRecoHit3D& first , const CDCRecoHit3
 CDCRecoHit3D::~CDCRecoHit3D()
 {;}
 
-/** indicator if the hit is in the cdc or already outside its boundaries.
-    Checks for z to be in the range of the wire. */
+
+
+CDCRecoHit2D CDCRecoHit3D::getRecoHit2D() const
+{
+  const CDCWire& wire = getWire();
+  const BoundSkewLine& skewLine = wire.getSkewLine();
+
+  FloatType recoPosZ = getRecoPos3D().z();
+
+  Vector2D wirePos = skewLine.pos2DAtZ(recoPosZ);
+
+  Vector2D displacement2D = getRecoPos3D().xy() - wirePos;
+  return CDCRecoHit2D(m_rlWireHit, displacement2D);
+
+}
+
+
 bool CDCRecoHit3D::isInCDC() const
 {
 

@@ -89,7 +89,16 @@ float CDCMCHitLookUp::getRefDriftLength(const CDCHit* ptrHit) const
 }
 
 
+const TVector3 CDCMCHitLookUp::getRecoPos3D(const CDCHit* ptrHit) const
+{
+  return CDCMCManager::getSimHitLookUp().getRecoPos3D(ptrHit);
+}
 
+
+const TVector3 CDCMCHitLookUp::getClosestPrimaryRecoPos3D(const CDCHit* ptrHit) const
+{
+  return CDCMCManager::getSimHitLookUp().getClosestPrimaryRecoPos3D(ptrHit);
+}
 
 
 bool CDCMCHitLookUp::isReassignedSecondary(const CDCHit* ptrHit) const

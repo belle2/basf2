@@ -182,6 +182,8 @@ namespace Belle2 {
       void setRLWireHit(const CDCRLWireHit* rlWireHit)
       { m_rlWireHit = rlWireHit; }
 
+      /// Constructs a two dimensional reconstructed hit by carrying out the stereo ! projection to the wire reference postion
+      CDCRecoHit2D getRecoHit2D() const;
 
 
       /// Getter for the right left passage information,

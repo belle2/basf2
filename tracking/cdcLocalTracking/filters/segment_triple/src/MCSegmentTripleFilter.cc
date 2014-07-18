@@ -127,58 +127,12 @@ void MCSegmentTripleFilter::setTrajectoryOf(const CDCSegmentTriple& segmentTripl
     return;
   }
 
-  //const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
-
   const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
-  const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
 
-  const CDCHit* ptrFirstHit = mcSegmentLookUp.getFirstHit(ptrStartSegment);
+  CDCTrajectory3D trajectory3D = mcSegmentLookUp.getTrajectory3D(ptrStartSegment);
 
-  const CDCSimHit* ptrPrimarySimHit = mcHitLookUp.getClosestPrimarySimHit(ptrFirstHit);
-
-
-  if (not ptrPrimarySimHit) {
-    // If there is no primary SimHit simply use the secondary simhit as reference
-    ptrPrimarySimHit = mcHitLookUp.getSimHit(ptrFirstHit);
-    if (not ptrPrimarySimHit) {
-      B2WARNING("First simhit of CDCRecoSegment is nullptr. Could not set fits.");
-      return;
-    }
-  }
-
-  const CDCSimHit& primarySimHit = *ptrPrimarySimHit;
-
-  Vector3D mom3D = primarySimHit.getMomentum();
-  Vector3D pos3D = primarySimHit.getPosTrack();
-
-
-
-  int pdgCode = primarySimHit.getPDGCode();
-  const TParticlePDG* ptrTPDGParticle = TDatabasePDG::Instance()->GetParticle(pdgCode);
-
-  if (not ptrTPDGParticle) {
-    B2WARNING("No particle for PDG code " << pdgCode << ". Could not set fits");
-  }
-
-  const TParticlePDG& tPDGParticle = *ptrTPDGParticle;
-
-  double charge = tPDGParticle.Charge() / 3.0;
-
-  SignType chargeSign = sign(charge);
-
-  CDCTrajectory2D trajectory2D;
-  trajectory2D.setPosMom2D(pos3D.xy(), mom3D.xy(), charge);
-
-  SignType settedChargeSign = trajectory2D.getChargeSign();
-
-  if (chargeSign != settedChargeSign) {
-    B2WARNING("Charge sign of mc particle is not the same as the one of the fit");
-  }
-
-  CDCTrajectorySZ trajectorySZ(mom3D.z() / mom3D.polarR(), pos3D.z());
-
-  segmentTriple.setTrajectory2D(trajectory2D);
-  segmentTriple.setTrajectorySZ(trajectorySZ);
+  segmentTriple.setTrajectory2D(trajectory3D.getTrajectory2D());
+  segmentTriple.setTrajectorySZ(trajectory3D.getTrajectorySZ());
 
 }
 

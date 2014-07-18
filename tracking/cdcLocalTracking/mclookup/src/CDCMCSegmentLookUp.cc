@@ -11,6 +11,8 @@
 #include "../include/CDCMCSegmentLookUp.h"
 #include "../include/CDCMCManager.h"
 
+#include <TDatabasePDG.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
@@ -206,3 +208,57 @@ ForwardBackwardInfo CDCMCSegmentLookUp::areAlignedInMCTrack(const CDCRecoSegment
 
 
 
+
+
+CDCTrajectory3D CDCMCSegmentLookUp::getTrajectory3D(const CDCRecoSegment2D* ptrSegment2D) const
+{
+  CDCTrajectory3D trajectory3D;
+
+  if (not ptrSegment2D) {
+    B2WARNING("Segment is nullptr. Could not get fit.");
+    return trajectory3D;
+  }
+
+  const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
+
+  const CDCHit* ptrFirstHit = getFirstHit(ptrSegment2D);
+  const CDCSimHit* ptrPrimarySimHit = mcHitLookUp.getClosestPrimarySimHit(ptrFirstHit);
+
+  if (not ptrPrimarySimHit) {
+    // If there is no primary SimHit simply use the secondary simhit as reference
+    ptrPrimarySimHit = mcHitLookUp.getSimHit(ptrFirstHit);
+    if (not ptrPrimarySimHit) {
+      B2WARNING("First simhit of CDCRecoSegment is nullptr. Could not get fit.");
+      return trajectory3D;
+    }
+  }
+
+  const CDCSimHit& primarySimHit = *ptrPrimarySimHit;
+
+  Vector3D mom3D = primarySimHit.getMomentum();
+  Vector3D pos3D = primarySimHit.getPosTrack();
+
+  int pdgCode = primarySimHit.getPDGCode();
+  const TParticlePDG* ptrTPDGParticle = TDatabasePDG::Instance()->GetParticle(pdgCode);
+
+  if (not ptrTPDGParticle) {
+    B2WARNING("No particle for PDG code " << pdgCode << ". Could not get fit");
+    return trajectory3D;
+  }
+
+  const TParticlePDG& tPDGParticle = *ptrTPDGParticle;
+
+  double charge = tPDGParticle.Charge() / 3.0;
+
+  SignType chargeSign = sign(charge);
+
+  trajectory3D.setPosMom3D(pos3D, mom3D, charge);
+
+  SignType settedChargeSign = trajectory3D.getChargeSign();
+
+  if (chargeSign != settedChargeSign) {
+    B2WARNING("Charge sign of mc particle is not the same as the one of the fit");
+  }
+
+  return trajectory3D;
+}

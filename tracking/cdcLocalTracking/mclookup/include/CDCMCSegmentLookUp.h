@@ -14,6 +14,7 @@
 #include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
 
 #include <tracking/cdcLocalTracking/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/cdcLocalTracking/eventdata/trajectories/CDCTrajectories.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
@@ -182,6 +183,9 @@ namespace Belle2 {
       ForwardBackwardInfo areAlignedInMCTrack(const CDCRecoSegment2D* ptrStartSegment2D, const CDCRecoSegment2D* ptrendSegment2D) const;
 
 
+
+      /** Returns the trajectory of the segment */
+      CDCTrajectory3D getTrajectory3D(const CDCRecoSegment2D* ptrSegment2D) const;
 
     private:
       /// Storage for the map from reconstructed segments to their matched Monte Carlo Track Id

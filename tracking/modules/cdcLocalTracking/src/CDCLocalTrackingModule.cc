@@ -16,18 +16,19 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 
 //in type
-#include <mdst/dataobjects/MCParticle.h>
-
-#include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
 
+#ifdef CDCLOCALTRACKING_USE_MC_INFORMATION
+#include <mdst/dataobjects/MCParticle.h>
+#include <cdc/dataobjects/CDCSimHit.h>
 #include <tracking/cdcLocalTracking/mclookup/CDCMCManager.h>
-#include <tracking/cdcLocalTracking/mclookup/CDCMCHitLookUp.h>
+//#include <tracking/cdcLocalTracking/mclookup/CDCMCHitLookUp.h>
+#endif
 
 
-//#include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
+
 
 //out type
 #include "genfit/TrackCand.h"
@@ -69,7 +70,7 @@ void CDCLocalTrackingModule::initialize()
   //StoreArray with digitized CDCHits
   StoreArray <CDCHit>::required();
 
-#ifdef CDCLOCALTRACKING_USE_MC_FILTERS
+#ifdef CDCLOCALTRACKING_USE_MC_INFORMATION
   StoreArray <CDCSimHit>::required();
   StoreArray <MCParticle>::required();
 #endif
@@ -92,7 +93,7 @@ void CDCLocalTrackingModule::event()
 
 
 
-#ifdef CDCLOCALTRACKING_USE_MC_FILTERS
+#ifdef CDCLOCALTRACKING_USE_MC_INFORMATION
   CDCMCManager::getInstance().clear();
   CDCMCManager::getInstance().fill();
 #endif

@@ -45,77 +45,91 @@
 namespace Belle2 {
   namespace CDCLocalTracking {
 
+    // First stage filter setup
+
+#if  !defined CDCLOCALTRACKING_USE_MC_FILTERS_FIRST_STAGE && \
+  !defined CDCLOCALTRACKING_USE_EVALUATE_FILTERS_FIRST_STAGE && \
+  !defined CDCLOCALTRACKING_USE_SIMPLE_FILTERS_FIRST_STAGE
+#define CDCLOCALTRACKING_USE_SIMPLE_FILTERS_FIRST_STAGE
+#endif
+
+#if defined CDCLOCALTRACKING_USE_MC_FILTERS_FIRST_STAGE || \
+  defined CDCLOCALTRACKING_USE_EVALUATE_FILTERS_FIRST_STAGE
+#ifndef CDCLOCALTRACKING_USE_MC_INFORMATION
+#error "Use of Monte Carlo Filters requested in second stage, but Monte Carlo information is not setup with CDCLOCALTRACKING_USE_MC_INFORMATION."
+#endif
+#endif
 
 
-#ifdef CDCLOCALTRACKING_USE_MC_FILTERS
-#ifdef CDCLOCALTRACKING_USE_EVALUATE_FILTERS
+
+#ifdef CDCLOCALTRACKING_USE_SIMPLE_FILTERS_FIRST_STAGE
+    typedef SimpleFacetFilter FacetFilter;
+    typedef SimpleFacetNeighborChooser FacetNeighborChooser;
+#endif
+
+#ifdef CDCLOCALTRACKING_USE_MC_FILTERS_FIRST_STAGE
+    typedef MCFacetFilter FacetFilter;
+    typedef MCFacetNeighborChooser FacetNeighborChooser;
+#endif
+
+#ifdef CDCLOCALTRACKING_USE_EVALUATE_FILTERS_FIRST_STAGE
     typedef EvaluateFacetFilter<SimpleFacetFilter> FacetFilter;
     typedef EvaluateFacetNeighborChooser<SimpleFacetNeighborChooser> FacetNeighborChooser;
-
-#else
-    typedef SimpleFacetFilter FacetFilter;
-    typedef SimpleFacetNeighborChooser FacetNeighborChooser;
-
-    //typedef MCFacetFilter FacetFilter;
-    //typedef MCFacetNeighborChooser FacetNeighborChooser;
-
-#endif
-#else
-    typedef SimpleFacetFilter FacetFilter;
-    typedef SimpleFacetNeighborChooser FacetNeighborChooser;
-
 #endif
 
 
 
 
-
-
-#ifdef CDCLOCALTRACKING_USE_MC_FILTERS
-#ifdef CDCLOCALTRACKING_USE_EVALUATE_FILTERS
-
-    typedef EvaluateAxialAxialSegmentPairFilter< SimpleAxialAxialSegmentPairFilter> AxialAxialSegmentPairFilter;
-    typedef MCSegmentTripleFilter SegmentTripleFilter;
-    typedef MCSegmentTripleNeighborChooser SegmentTripleNeighborChooser;
-
-#else
-
-    typedef MCAxialAxialSegmentPairFilter AxialAxialSegmentPairFilter;
-    typedef MCSegmentTripleFilter SegmentTripleFilter;
-    typedef MCSegmentTripleNeighborChooser SegmentTripleNeighborChooser;
-
+    // Second stage filter setup
+    // Segment triple tracking
+#if !defined CDCLOCALTRACKING_USE_MC_FILTERS_SECOND_STAGE && \
+  !defined CDCLOCALTRACKING_USE_EVALUATE_FILTERS_SECOND_STAGE && \
+  !defined CDCLOCALTRACKING_USE_SIMPLE_FILTERS_SECOND_STAGE
+#define CDCLOCALTRACKING_USE_SIMPLE_FILTERS_SECOND_STAGE
 #endif
 
-#else
+#if defined CDCLOCALTRACKING_USE_MC_FILTERS_SECOND_STAGE || \
+  defined CDCLOCALTRACKING_USE_EVALUATE_FILTERS_SECOND_STAGE
+#ifndef CDCLOCALTRACKING_USE_MC_INFORMATION
+#error "Use of Monte Carlo Filters requested in second stage, but Monte Carlo information is not setup with CDCLOCALTRACKING_USE_MC_INFORMATION."
+#endif
+#endif
 
+#ifdef CDCLOCALTRACKING_USE_SIMPLE_FILTERS_SECOND_STAGE
     typedef SimpleAxialAxialSegmentPairFilter AxialAxialSegmentPairFilter;
     typedef SimpleSegmentTripleFilter SegmentTripleFilter;
     typedef SimpleSegmentTripleNeighborChooser SegmentTripleNeighborChooser;
+#endif
 
+#ifdef CDCLOCALTRACKING_USE_MC_FILTERS_SECOND_STAGE
+    typedef MCAxialAxialSegmentPairFilter AxialAxialSegmentPairFilter;
+    typedef MCSegmentTripleFilter SegmentTripleFilter;
+    typedef MCSegmentTripleNeighborChooser SegmentTripleNeighborChooser;
+#endif
+
+#ifdef CDCLOCALTRACKING_USE_EVALUATE_FILTERS_SECOND_STAGE
+    typedef EvaluateAxialAxialSegmentPairFilter< SimpleAxialAxialSegmentPairFilter> AxialAxialSegmentPairFilter;
+    typedef MCSegmentTripleFilter SegmentTripleFilter;
+    typedef MCSegmentTripleNeighborChooser SegmentTripleNeighborChooser;
 #endif
 
 
 
-
-#ifdef CDCLOCALTRACKING_USE_MC_FILTERS
-#ifdef CDCLOCALTRACKING_USE_EVALUATE_FILTERS
-
-    typedef EvaluateAxialStereoSegmentPairFilter< SimpleAxialStereoSegmentPairFilter> AxialStereoSegmentPairFilter;
-    typedef MCAxialStereoSegmentPairNeighborChooser AxialStereoSegmentPairNeighborChooser;
-
-#else
-    typedef MCAxialStereoSegmentPairFilter AxialStereoSegmentPairFilter;
-    typedef MCAxialStereoSegmentPairNeighborChooser AxialStereoSegmentPairNeighborChooser;
-
-#endif
-
-#else
+    // Segment pair tracking
+#ifdef CDCLOCALTRACKING_USE_SIMPLE_FILTERS_SECOND_STAGE
     typedef SimpleAxialStereoSegmentPairFilter AxialStereoSegmentPairFilter;
     typedef SimpleAxialStereoSegmentPairNeighborChooser AxialStereoSegmentPairNeighborChooser;
-
-
 #endif
 
+#ifdef CDCLOCALTRACKING_USE_MC_FILTERS_SECOND_STAGE
+    typedef MCAxialStereoSegmentPairFilter AxialStereoSegmentPairFilter;
+    typedef MCAxialStereoSegmentPairNeighborChooser AxialStereoSegmentPairNeighborChooser;
+#endif
+
+#ifdef CDCLOCALTRACKING_USE_EVALUATE_FILTERS_SECOND_STAGE
+    typedef EvaluateAxialStereoSegmentPairFilter< SimpleAxialStereoSegmentPairFilter> AxialStereoSegmentPairFilter;
+    typedef MCAxialStereoSegmentPairNeighborChooser AxialStereoSegmentPairNeighborChooser;
+#endif
 
 
   } // end namespace CDCLocalTracking

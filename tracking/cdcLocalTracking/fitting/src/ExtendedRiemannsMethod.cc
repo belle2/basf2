@@ -69,12 +69,13 @@ void ExtendedRiemannsMethod::update(CDCTrajectory2D& trajectory2D,
     perigeeCircle.reverse();
   }
 
-  perigeeCircle.passiveMoveBy(-ref);
+  trajectory2D.setLocalOrigin(ref);
+  trajectory2D.setLocalCircle(perigeeCircle);
 
-  trajectory2D.setCircle(perigeeCircle);
-
+  //perigeeCircle.passiveMoveBy(-ref);
+  //trajectory2D.setCircle(perigeeCircle);
   // Logical start position of the travel distance scale
-  trajectory2D.setStartPos2D(cenralPoint);
+  //trajectory2D.setStartPos2D(cenralPoint);
 }
 
 

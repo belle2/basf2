@@ -588,7 +588,7 @@ class CDCDataobjectsConverter:
             xrange(nItems))
         return self.IterableToSVG(iterItems, **kwd)
 
-    def CDCTrajectory2DToSVG(self, fit, **kwd):
+    def CDCTrajectory2DToSVG(self, trajectory, **kwd):
         """Maps a CDCTrajectory to a circle section arc at the reference start position on the trajectory until it exits the CDC."""
 
         svgElements = []
@@ -596,9 +596,9 @@ class CDCDataobjectsConverter:
         styleDict = {'stroke': 'black', 'stroke-width': '0.02'}
         styleDict.update(kwd)
 
-        if fit.getCircle().isCircle():
+        if trajectory.getGlobalCircle().isCircle():
 
-            charge = fit.getChargeSign()
+            charge = trajectory.getChargeSign()
 
             if charge > 0:
                 styleDict['stroke'] = 'red'
@@ -610,15 +610,15 @@ class CDCDataobjectsConverter:
 
             styleDict['fill'] = 'none'
 
-            radius = fit.getCircle().absRadius()
+            radius = trajectory.getGlobalCircle().absRadius()
 
-            center = fit.getCircle().center()
+            center = trajectory.getGlobalCircle().center()
             centerPoint = (center.x(), center.y())
 
-            start = fit.getStartPos2D()
+            start = trajectory.getLocalOrigin()
             startPoint = (start.x(), start.y())
 
-            trajectoryExit = fit.getExit()
+            trajectoryExit = trajectory.getExit()
             exitPoint = (trajectoryExit.x(), trajectoryExit.y())
 
             if trajectoryExit.hasNAN():
@@ -635,7 +635,7 @@ class CDCDataobjectsConverter:
                 else:
                     sweep_flag = 1
 
-                if fit.calcPerpS(trajectoryExit) > 0:
+                if trajectory.calcPerpS(trajectoryExit) > 0:
                     # check if exit point is on the close or
                     # on the far side of the circle
                     long_arc = 0
@@ -651,13 +651,13 @@ class CDCDataobjectsConverter:
                     **styleDict
                     )
                 svgElements.append(circleArcElement)
-        elif fit.getCircle().isLine():
+        elif trajectory.getGlobalCircle().isLine():
 
             # print "isline"
-            start = fit.getStartPos2D()
+            start = trajectory.getLocalOrigin()
             startPoint = (start.x(), start.y())
 
-            trajectoryExit = fit.getExit()
+            trajectoryExit = trajectory.getExit()
             exitPoint = (trajectoryExit.x(), trajectoryExit.y())
 
             # print  "fitted line", fromPoint, toPoint

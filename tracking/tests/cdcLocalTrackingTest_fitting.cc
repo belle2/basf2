@@ -69,7 +69,8 @@ namespace {
     CDCTrajectory2D trajectory2D;
     fitter.update(trajectory2D, observations2D);
 
-    const UncertainPerigeeCircle& fittedCircle = trajectory2D.getCircle();
+    trajectory2D.setLocalOrigin(Vector2D(0.0, 0.0));
+    const UncertainPerigeeCircle& fittedCircle = trajectory2D.getLocalCircle();
 
     EXPECT_NEAR(generalCircle.perigee().x(), fittedCircle.perigee().x(), 10e-7) <<
         "Fitter " << typeid(fitter).name() << " failed.";
@@ -94,7 +95,7 @@ namespace {
     B2INFO("Chi2 " << chi2);
 
     B2INFO("Covariance matrix:");
-    trajectory2D.getCircle().perigeeCovariance().Print();
+    fittedCircle.perigeeCovariance().Print();
     return trajectory2D;
   }
 
@@ -115,12 +116,12 @@ namespace {
 
     fitter.update(trajectory2D, observations2D);
 
-    const UncertainPerigeeCircle& fittedCircle = trajectory2D.getCircle();
+    trajectory2D.setLocalOrigin(Vector2D(0.0, 0.0));
+    const UncertainPerigeeCircle& fittedCircle = trajectory2D.getLocalCircle();
 
-    EXPECT_EQ(0.0, fittedCircle.curvature()) <<
-                                             "Fitter " << typeid(fitter).name() << " failed.";
+    EXPECT_EQ(0.0, fittedCircle.curvature()) << "Fitter " << typeid(fitter).name() << " failed.";
 
-    Vector2D perigee = trajectory2D.getPerigee();
+    Vector2D perigee = trajectory2D.getGlobalPerigee();
     EXPECT_NEAR(0.0, perigee.x(), 10e-7);
     EXPECT_NEAR(-0.5, perigee.y(), 10e-7);
 
@@ -135,7 +136,9 @@ TEST_F(CDCLocalTrackingTest, ExtendedRiemannsMethod_GeneralCircleFit_NoDriftLeng
 {
   const CDCFitter2D<ExtendedRiemannsMethod> fitter;
   CDCTrajectory2D trajectory2D = testGeneralCircleFitter(fitter, false);
-  UncertainPerigeeCircle perigeeCircle = trajectory2D.getCircle();
+
+  trajectory2D.setLocalOrigin(Vector2D(0.0, 0.0));
+  const UncertainPerigeeCircle& perigeeCircle = trajectory2D.getLocalCircle();
   TMatrixD perigeeCovariance = perigeeCircle.perigeeCovariance();
 
   //EXPECT_NEAR(0.0003644, perigeeCovariance(0, 0), 10e-7);

@@ -57,13 +57,13 @@ namespace Belle2 {
       /// Getter for the start fitted position of track. Does not account for the forward backward info.
       Vector3D getStartFitPos3D() const {
         const FloatType z = getStartTrajectorySZ().getStartZ();
-        return Vector3D(getStartTrajectory2D().getStartPos2D() , z);
+        return Vector3D(getStartTrajectory2D().getLocalOrigin(), z);
       }
 
       /// Getter for the end fitted position of track. Does not account for the forward backward info.
       Vector3D getEndFitPos3D() const {
         const FloatType z = getEndTrajectorySZ().getStartZ();
-        return Vector3D(getEndTrajectory2D().getStartPos2D() , z);
+        return Vector3D(getEndTrajectory2D().getLocalOrigin(), z);
       }
 
 

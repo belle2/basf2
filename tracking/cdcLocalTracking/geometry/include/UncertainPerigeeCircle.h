@@ -52,6 +52,20 @@ namespace Belle2 {
         checkCovarianceMatrix();
       }
 
+
+
+      /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix. Covariance matrix defaults to a zero matrix
+      UncertainPerigeeCircle(const FloatType& curvature,
+                             const Vector2D& tangential,
+                             const FloatType& impact,
+                             const TMatrixD& perigeeCovariance = TMatrixD(3, 3)) :
+        PerigeeCircle(PerigeeCircle::fromPerigeeParameters(curvature, tangential, impact)),
+        m_perigeeCovariance(perigeeCovariance) {
+        checkCovarianceMatrix();
+      }
+
+
+
       /// Augments a plain perigee circle with a covariance matrix. Covariance defaults to zero
       UncertainPerigeeCircle(const PerigeeCircle& perigeeCircle,
                              const TMatrixD& perigeeCovariance = TMatrixD(3, 3)) :

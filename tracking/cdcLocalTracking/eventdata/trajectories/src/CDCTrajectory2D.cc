@@ -22,69 +22,151 @@ using namespace CDCLocalTracking;
 
 ClassImpInCDCLocalTracking(CDCTrajectory2D)
 
+//const FloatType CDCTrajectory2D::c_bFieldZMagnitude = 1.5;
+//const SignType CDCTrajectory2D::c_bFieldZSign = PLUS;
+//const FloatType CDCTrajectory2D::c_bFieldZ = c_bFieldZSign * c_bFieldZMagnitude;
+
+namespace {
+  // this class should not really be the provider of this information.
+  // So use the corresponding functions which should eventually change to the correct
+  // information provider.
+  // definitions in source file
+
+  /// Constant for the magnetic field strength in z direction ( in Tesla )
+  const FloatType c_bFieldZMagnitude = 1.5;
+
+  /// Constant for the sign of the magnetic field in z direction. To be checked.
+  const SignType c_bFieldZSign = PLUS; // to be checked
+
+  /// Constant for the signed magnetic field strength in z direction ( in Tesla )
+  const FloatType c_bFieldZ = c_bFieldZSign* c_bFieldZMagnitude;
 
 
-CDCTrajectory2D::CDCTrajectory2D(const Vector2D& startPoint,
-                                 const Vector2D& startMomentum,
+  /// Getter for the absolute magnetic field strength in z direction ( in Tesla )
+  inline const FloatType& getBFieldZMagnitude(const Vector2D& pos2D __attribute__((unused)) = Vector2D(0.0, 0.0))
+  { return c_bFieldZMagnitude; }
+
+  /// Getter for the sign of the magnetic field in z direction
+  inline const SignType& getBFieldZSign()
+  { return c_bFieldZSign; }
+
+  /// Getter for the signed of the magnetic field stength in z direction ( in Tesla )
+  inline const FloatType& getBFieldZ(const Vector2D& pos2D __attribute__((unused)) = Vector2D(0.0, 0.0))
+  { return c_bFieldZ; }
+
+
+
+  /// Conversion helper from clockwise or counterclockwise travel to the charge sign.
+  /** Return the charge sign based on the travel direction on the fitted circle. \n
+   *  With the Lorentz force F = q * v x B \n
+   *  For positively charged particles we have \n
+   *  Counterclockwise travel <-> Bz < 0 \n
+   *  Clockwise travel        <-> Bz > 0 \n
+   *  and opposite for negatively charged. \n
+   *  Hence the charge sign is -CCWInfo * sign(Bz) */
+  SignType ccwInfoToChargeSign(const CCWInfo& ccwInfo)
+  { return - ccwInfo * getBFieldZSign(); }
+
+
+
+  /// Conversion helper from the charge sign to clockwise or counterclockwise travel
+  CCWInfo chargeSignToCCWInfo(const SignType& chargeSign)
+  { return - chargeSign * getBFieldZSign(); }
+
+
+
+  /// Conversion help for charges to clockwise or counterclockwise travel.
+  CCWInfo chargeToCCWInfo(const FloatType& charge)
+  { return chargeSignToCCWInfo(sign(charge)); }
+
+
+
+  /// Conversion helper for momenta to radii
+  FloatType absMom2DToRadius(const FloatType& absMom2D, const FloatType& charge, const Vector2D& pos2D = Vector2D(0.0, 0.0))
+  { return - absMom2D / (charge * getBFieldZ(pos2D)  * 0.00299792458); }
+
+
+  FloatType absMom2DToCurvature(const FloatType& absMom2D, const FloatType& charge, const Vector2D& pos2D = Vector2D(0.0, 0.0))
+  { return - charge * getBFieldZ(pos2D) * 0.00299792458 / absMom2D; }
+
+
+  FloatType curvatureToAbsMom2D(const FloatType& curvature, const Vector2D pos2D = Vector2D(0.0, 0.0))
+  { return std::fabs(getBFieldZ(pos2D) * 0.00299792458 / curvature); }
+
+  FloatType curvatureToAbsMom2D(const FloatType& curvature, const FloatType& charge, const Vector2D& pos2D = Vector2D(0.0, 0.0))
+  { return  - charge *  getBFieldZ(pos2D) * 0.00299792458 / curvature ; }
+
+}
+
+
+
+
+CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
+                                 const Vector2D& mom2D,
                                  const FloatType& charge) :
-  m_perigeeCircle(),
-  m_startPos2D(startPoint)
-{
+  m_localOrigin(pos2D),
+  m_localPerigeeCircle(absMom2DToCurvature(mom2D.norm(), charge, pos2D), mom2D.unit(), 0.0)
 
-  setStartPosMom2D(startPoint, startMomentum, charge);
+{
+}
+
+
+
+void CDCTrajectory2D::setPosMom2D(const Vector2D& pos2D,
+                                  const Vector2D& mom2D,
+                                  const FloatType& charge)
+{
+  m_localOrigin = pos2D;
+  m_localPerigeeCircle = UncertainPerigeeCircle(absMom2DToCurvature(mom2D.norm(), charge, pos2D), mom2D.unit(), 0.0);
+
+  // FloatType mom = mom2D.norm();
+  // FloatType r = momToRadius(mom, charge);
+
+  // SignType chargeSign = sign(charge);
+  // CCWInfo orientation = chargeSignToCCWInfo(chargeSign);
+
+  // // For counterclockwise travel the circle center is to the left viewed from the travel direction
+  // // For clockwise travel to the right
+  // // Use the correct orthogonal vector to the center
+  // Vector2D posToCenter = mom2D.orthogonal(orientation);
+
+  // // Scale to have the length of the radius to have it point exactly to the circle center
+  // posToCenter.scale(r / mom);
+
+  // //same memory different name
+  // Vector2D& circleCenter = posToCenter.add(pos2D);
+
+  // m_perigeeCircle = PerigeeCircle::fromCenterAndRadius(circleCenter, r, orientation);
+
+  // setStartPos2D(pos2D);
 
 }
 
 
-FloatType CDCTrajectory2D::setStartPos2D(const Vector2D& point)
-{
 
-  FloatType result = calcPerpS(point);
-  m_startPos2D = getClosest(point);
-  //cout << "New projTravelDistanceRef " << m_projTravelDistanceRef << endl;
-  return result;
+SignType CDCTrajectory2D::getChargeSign() const
+{
+  return ccwInfoToChargeSign(getLocalCircle().orientation());
 }
 
-void
-CDCTrajectory2D::setStartPosMom2D(
-  const Vector2D& pos2D,
-  const Vector2D& mom2D,
-  FloatType charge
-)
+
+
+FloatType CDCTrajectory2D::getAbsMom2D() const
 {
-
-  FloatType mom = mom2D.norm();
-  FloatType r = momToRadius(mom, charge);
-
-  SignType chargeSign = sign(charge);
-  CCWInfo orientation = chargeSignToCCWInfo(chargeSign);
-
-  // For counterclockwise travel the circle center is to the left viewed from the travel direction
-  // For clockwise travel to the right
-  // Use the correct orthogonal vector to the center
-  Vector2D posToCenter = mom2D.orthogonal(orientation);
-
-  // Scale to have the length of the radius to have it point exactly to the circle center
-  posToCenter.scale(r / mom);
-
-  //same memory different name
-  Vector2D& circleCenter = posToCenter.add(pos2D);
-
-  m_perigeeCircle = PerigeeCircle::fromCenterAndRadius(circleCenter, r, orientation);
-
-  setStartPos2D(pos2D);
-
+  return curvatureToAbsMom2D(getLocalCircle().curvature());
 }
 
-Vector3D CDCTrajectory2D::reconstruct3D(const BoundSkewLine& skewLine) const
+
+
+Vector3D CDCTrajectory2D::reconstruct3D(const BoundSkewLine& globalSkewLine) const
 {
+  Vector2D globalRefPos2D = globalSkewLine.refPos2D();
+  PerigeeCircle globalCircle = getGlobalCircle();
 
-  const Vector2D& refPos2D = skewLine.refPos2D();
+  FloatType firstorder = globalCircle.fastDistance(globalRefPos2D);
 
-  FloatType firstorder = getCircle().fastDistance(refPos2D);
-
-  FloatType crossComponent = refPos2D.cross(getCircle().n12());
-  FloatType quadraticComponent = refPos2D.normSquared() * getCircle().n3();
+  FloatType crossComponent = globalRefPos2D.cross(globalCircle.n12());
+  FloatType quadraticComponent = globalRefPos2D.normSquared() * globalCircle.n3();
 
   const FloatType& a = quadraticComponent;
   const FloatType& b = crossComponent;
@@ -98,7 +180,7 @@ Vector3D CDCTrajectory2D::reconstruct3D(const BoundSkewLine& skewLine) const
   // Take the solution with the smaller deviation from the reference position
   const FloatType& smallerSolution = solutionsSkewTimesDeltaZ.second;
 
-  return skewLine.pos3DAtDeltaZTimesSkew(smallerSolution);
+  return globalSkewLine.pos3DAtDeltaZTimesSkew(smallerSolution);
 
 }
 
@@ -111,7 +193,7 @@ Vector2D CDCTrajectory2D::getInnerExit() const
 
   FloatType innerPolarR = innerMostLayer.getInnerPolarR();
 
-  return getCircle().samePolarRForwardOf(getStartPos2D(), innerPolarR);
+  return getGlobalCircle().samePolarRForwardOf(getLocalOrigin(), innerPolarR);
 
 }
 
@@ -123,7 +205,7 @@ Vector2D CDCTrajectory2D::getOuterExit() const
 
   FloatType outerPolarR = outerMostLayer.getOuterPolarR();
 
-  return getCircle().samePolarRForwardOf(getStartPos2D(), outerPolarR);
+  return getGlobalCircle().samePolarRForwardOf(getLocalOrigin(), outerPolarR);
 
 }
 
@@ -132,7 +214,7 @@ Vector2D CDCTrajectory2D::getExit() const
   Vector2D outerExit = getOuterExit();
   Vector2D innerExit = getInnerExit();
 
-  return getCircle().chooseNextForwardOf(getStartPos2D(), outerExit, innerExit);
+  return getGlobalCircle().chooseNextForwardOf(getLocalOrigin(), outerExit, innerExit);
 
 }
 
@@ -246,7 +328,7 @@ ISuperLayerType CDCTrajectory2D::getMaximalISuperLayer() const
 
 ISuperLayerType CDCTrajectory2D::getStartISuperLayer() const
 {
-  FloatType startPolarR = getStartPos2D().polarR();
+  FloatType startPolarR = getLocalOrigin().polarR();
   return getISuperLayerAtPolarR(startPolarR);
 }
 
@@ -260,9 +342,6 @@ ISuperLayerType CDCTrajectory2D::getMinimalISuperLayer() const
 
 
 
-const FloatType CDCTrajectory2D::c_bFieldZMagnitude = 1.5;
-const SignType CDCTrajectory2D::c_bFieldZSign = PLUS;
-const FloatType CDCTrajectory2D::c_bFieldZ = c_bFieldZSign * c_bFieldZMagnitude;
 
 
 

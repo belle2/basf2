@@ -67,9 +67,8 @@ namespace Belle2 {
         FloatType deltaZTimesSkew = (z - refZ()) * skew();
 
         return Vector3D(1 * refX() - deltaZTimesSkew * refY() ,
-                        deltaZTimesSkew * refX() +               1 * refY() ,
+                        deltaZTimesSkew * refX() + 1 * refY() ,
                         z);
-
 
       }
 
@@ -79,14 +78,14 @@ namespace Belle2 {
         FloatType deltaZTimesSkew = (z - refZ()) * skew();
 
         return Vector2D(1 * refX() - deltaZTimesSkew * refY() ,
-                        deltaZTimesSkew * refX() +               1 * refY());
+                        deltaZTimesSkew * refX() + 1 * refY());
 
       }
       /// Gives the three dimensional position of the line at the given ( z - reference z ) * skew value
       inline Vector3D pos3DAtDeltaZTimesSkew(const FloatType& deltaZTimesSkew) const {
 
         return Vector3D(1 * refX() - deltaZTimesSkew * refY() ,
-                        deltaZTimesSkew * refX() +               1 * refY() ,
+                        deltaZTimesSkew * refX() + 1 * refY() ,
                         deltaZTimesSkew / skew() + refZ());
 
       }

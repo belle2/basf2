@@ -166,18 +166,14 @@ void MCSegmentTripleFilter::setTrajectoryOf(const CDCSegmentTriple& segmentTripl
 
   SignType chargeSign = sign(charge);
 
-
-
   CDCTrajectory2D trajectory2D;
-  trajectory2D.setStartPosMom2D(pos3D.xy(), mom3D.xy(), chargeSign);
+  trajectory2D.setPosMom2D(pos3D.xy(), mom3D.xy(), charge);
 
   SignType settedChargeSign = trajectory2D.getChargeSign();
 
   if (chargeSign != settedChargeSign) {
     B2WARNING("Charge sign of mc particle is not the same as the one of the fit");
   }
-
-
 
   CDCTrajectorySZ trajectorySZ(mom3D.z() / mom3D.polarR(), pos3D.z());
 

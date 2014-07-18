@@ -34,25 +34,27 @@ namespace Belle2 {
     public:
 
       /// Default constructor for ROOT compatibility.
-      CDCTrajectory2D() : m_perigeeCircle(), m_startPos2D() {;}
+      CDCTrajectory2D() : m_localOrigin(), m_localPerigeeCircle() {;}
 
       /// Constructs a trajectory from a generalized circle.
       /** Constructs a trajectory which is described by the given circle \n
        *  The start point is set to the closest approach to the origin */
       CDCTrajectory2D(const UncertainPerigeeCircle& perigeeCircle) :
-        m_perigeeCircle(perigeeCircle),
-        m_startPos2D(perigeeCircle.perigee()) {;}
+        m_localOrigin(0.0, 0.0),
+        m_localPerigeeCircle(perigeeCircle)
+      {;}
 
       /// Constructs a trajectory from a generalized circle and a start point
       /** Constructs a trajectory which is described by the given circle and \n
        *  starts in the given point. To point is taken to the closest appoach \n
        *  on the circle. */
       CDCTrajectory2D(
-        const UncertainPerigeeCircle& perigeeCircle,
-        const Vector2D& startPoint
+        const Vector2D& localOrigin,
+        const UncertainPerigeeCircle& localPerigeeCircle
       ) :
-        m_perigeeCircle(perigeeCircle),
-        m_startPos2D(perigeeCircle.closest(startPoint)) {;}
+        m_localOrigin(localOrigin),
+        m_localPerigeeCircle(localPerigeeCircle)
+      {;}
 
       /// Construct a trajectory with given start point, momentum at the start point and given charge.
       CDCTrajectory2D(const Vector2D& startPoint, const Vector2D& startMomentum, const FloatType& charge);
@@ -64,7 +66,7 @@ namespace Belle2 {
 
       /// Checks if the circle is already set to a valid value
       bool isFitted() const
-      { return not getCircle().isNull(); }
+      { return not getLocalCircle().isNull(); }
 
       /// Calculate the travel distance from the start position of the trajectory.
       /** Returns the travel distance on the trajectory from the start point to \n
@@ -73,7 +75,7 @@ namespace Belle2 {
        *  If you have a heavily curling track you have care about the feasibility of this \n
        *  calculation. */
       FloatType calcPerpS(const Vector2D& point) const
-      { return getCircle().lengthOnCurve(m_startPos2D, point); }
+      { return getLocalCircle().lengthOnCurve(Vector2D(0.0, 0.0), point - getLocalOrigin()); }
 
 
       /// Calculate the travel distance between the two given positions
@@ -83,7 +85,7 @@ namespace Belle2 {
        *  If you have a heavily curling track you have care about the feasibility of this \n
        *  calculation. */
       FloatType calcPerpSBetween(const Vector2D& fromPoint, const Vector2D& toPoint) const
-      { return getCircle().lengthOnCurve(fromPoint, toPoint); }
+      { return getLocalCircle().lengthOnCurve(fromPoint - getLocalOrigin(), toPoint - getLocalOrigin()); }
 
       /// Gives the three dimensional point which is on the skew line as well as on the circle in the xy projection
       /** This method makes the reconstruction of the z coordinate possble by using the skewness \n
@@ -92,21 +94,20 @@ namespace Belle2 {
       Vector3D reconstruct3D(const BoundSkewLine& skewLine) const;
 
     public:
-
-      /// Calculates the closest approach on the trajectory to the origin
-      Vector2D getPerigee() const
-      { return getCircle().perigee(); }
+      /// Calculates the closest approach on the trajectory to the global origin
+      Vector2D getGlobalPerigee() const
+      { return getGlobalCircle().perigee(); }
 
       /// Calculates the closest approach on the trajectory to the given point
       Vector2D getClosest(const Vector2D& point) const
-      { return getCircle().closest(point); }
+      { return getLocalCircle().closest(point - getLocalOrigin()) + getLocalOrigin(); }
 
       /// Calculates the close point with the same polarR on the trajectory to the given point
       /** This returns the point where the trajectory reaches as certain distance from the origin \n
        *  ( in the xy projection ). It is useful to estimate where the trajectory reaches a  \n
        *  specific wire layer. */
       Vector2D getCloseSamePolarR(const Vector2D& point) const
-      { return getCircle().samePolarR(point); }
+      { return getGlobalCircle().samePolarR(point); }
 
       /// Calculates the point where the trajectory meets the outer wall of the CDC.
       /** This method returns the first point in forward flight direction from the start
@@ -133,27 +134,27 @@ namespace Belle2 {
 
       /// Calculates the distance from point the trajectory as seen from the xy projection
       FloatType getDist2D(const Vector2D& point) const
-      {  return getCircle().distance(point); }
+      {  return getLocalCircle().distance(point - getLocalOrigin()); }
 
       /// Checks if the given point is to the right or to the left of the trajectory
       SignType isRightOrLeft(const Vector2D& point) const
-      { return getCircle().isRightOrLeft(point); }
+      { return getLocalCircle().isRightOrLeft(point - getLocalOrigin()); }
 
       /// Getter for the maximal distance from the origin
       FloatType getMaximalPolarR() const
-      { return  getCircle().maximalPolarR(); }
+      { return  getGlobalCircle().maximalPolarR(); }
 
       /// Getter for the minimal distance from the origin - same as absolute value of the impact parameter
       FloatType getMinimalPolarR() const
-      { return  getCircle().minimalPolarR(); }
+      { return  getGlobalCircle().minimalPolarR(); }
 
       /// Getter for the signed impact parameter of the trajectory
-      FloatType getImpact() const
-      { return  getCircle().impact(); }
+      FloatType getGlobalImpact() const
+      { return  getGlobalCircle().impact(); }
 
       /// Indicates if the trajectory is moving outwards or inwards (to or away from the origin) from the start point on
       bool isMovingOutward() const
-      { return getStartUnitMom2D().dot(getStartPos2D()) > 0; }
+      { return getStartUnitMom2D().dot(getLocalOrigin()) > 0; }
 
     private:
       /// Indicates which superlayer is traversed after the given one, considering if you want to follow the trajectory in the forward or backward direction and if the trajectory is currently moving outward or inward (interpreted in the forward direction) or might curling back in the current layer.
@@ -182,7 +183,7 @@ namespace Belle2 {
       /// Indicates the maximal superlayer the trajectory traverses
       ISuperLayerType getMaximalISuperLayer() const;
 
-      /// Indicates the maximal superlayer the trajectory traverses
+      /// Indicates the superlayer the trajectory starts in.
       ISuperLayerType getStartISuperLayer() const;
 
       /// Indicates the minimal superlayer the trajectory traverses
@@ -286,83 +287,25 @@ namespace Belle2 {
       { return getUnitMom2D(entity.getBackRecoPos2D()); }
 
 
-
-
-
-    private:
-      // this class should not really be the provider of this information.
-      // So use the corresponding functions which should eventually change to the correct
-      // information provider.
-      // definitions in source file
-
-      /// Constant for the magnetic field strength in z direction ( in Tesla )
-      static const FloatType c_bFieldZMagnitude; // = 1.5;
-
-      /// Constant for the sign of the magnetic field in z direction. To be checked.
-      static const SignType c_bFieldZSign;  // = PLUS; // to be checked
-
-      /// Constant for the signed magnetic field strength in z direction ( in Tesla )
-      static const FloatType c_bFieldZ; //  = c_bFieldZSign * c_bFieldZMagnitude;
-
-    private:
-      /// Getter for the absolute magnetic field strength in z direction ( in Tesla )
-      inline const FloatType& getBFieldZMagnitude() const
-      { return c_bFieldZMagnitude; }
-
-      /// Getter for the sign of the magnetic field in z direction
-      inline const SignType& getBFieldZSign() const
-      { return c_bFieldZSign; }
-
-      /// Getter for the signed of the magnetic field stength in z direction ( in Tesla )
-      inline const FloatType& getBFieldZ() const
-      { return c_bFieldZ; }
-
-      /// Conversion helper for momenta to radii
-      inline FloatType momToRadius(const FloatType& mom, const FloatType& charge) const
-      { return mom / (std::fabs(charge) * getBFieldZMagnitude()  * 0.00299792458); }
-
-
-      /// Conversion helper for radii to momenta
-      inline FloatType radiusToMom(const FloatType& r) const
-      { return getBFieldZMagnitude() * 0.00299792458 * r; }
-
-      /// Conversion helper from clockwise or counterclockwise travel to the charge sign.
-      /** Return the charge sign based on the travel direction on the fitted circle. \n
-       *  With the Lorentz force F = q * v x B \n
-       *  For positively charged particles we have \n
-       *  Counterclockwise travel <-> Bz < 0 \n
-       *  Clockwise travel        <-> Bz > 0 \n
-       *  and opposite for negatively charged. \n
-       *  Hence the charge sign is -CCWInfo * sign(Bz) */
-      inline SignType ccwInfoToChargeSign(const CCWInfo& ccwInfo) const
-      { return - ccwInfo * getBFieldZSign(); }
-
-      /// Conversion helper from the charge sign to clockwise or counterclockwise travel
-      inline SignType chargeSignToCCWInfo(const SignType& chargeSign) const
-      { return - chargeSign * getBFieldZSign(); }
-
     public:
-
       /// Gets the charge sign of the trajectory
-      SignType getChargeSign() const
-      { return ccwInfoToChargeSign(getCircle().orientation()) ; }
+      SignType getChargeSign() const;
 
       /// Reverses the trajectory in place
       void reverse()
-      { m_perigeeCircle.reverse(); }
+      { m_localPerigeeCircle.reverse(); }
 
       /// Returns the reverse trajectory as a copy
       CDCTrajectory2D reversed() const
-      { return CDCTrajectory2D(getCircle().reversed()) ; }
+      { return CDCTrajectory2D(getLocalOrigin(), getLocalCircle().reversed()) ; }
 
       /// Get unit momentum vector at a specific postion
       /** Return the unit travel direction at the closest approach to the position */
       inline Vector2D getUnitMom2D(const Vector2D& point) const
-      { return getCircle().tangential(point); }
+      { return getLocalCircle().tangential(point - getLocalOrigin()); }
 
       /// Get the estimation for the absolute value of the transvers momentum
-      inline FloatType getAbsMom2D() const
-      { return radiusToMom(getCircle().absRadius()); }
+      FloatType getAbsMom2D() const;
 
       /// Get the momentum at the start point of the trajectory
       inline Vector2D getStartMom2D() const
@@ -370,56 +313,90 @@ namespace Belle2 {
 
       /// Get the unit momentum at the start point of the trajectory
       inline Vector2D getStartUnitMom2D() const
-      { return  getUnitMom2D(getStartPos2D());  }
+      { return  getLocalCircle().tangential();  }
 
-      /// Get the start point of the track
-      const Vector2D& getStartPos2D() const
-      { return m_startPos2D; }
 
-      /// Setter for the start point of the trajectory
-      /** This takes the given point to the closest approach on the trajectory and \n
-       *  sets it as new start position of the trajectory. \n
-       *  Hence it also sets up a new reference position for all travel distances. \n
+      //FloatType setStartPos2D(const Vector2D& point);
+
+      /// Setter for start point and momentum at the start point subjected to the charge sign.
+      void setPosMom2D(const Vector2D& pos2D, const Vector2D& mom2D, const FloatType& charge);
+
+
+
+      /// Clears all information from this trajectoy
+      void clear() {
+        m_localOrigin.set(0.0, 0.0);
+        m_localPerigeeCircle.setNull();
+      }
+
+
+
+    public:
+      /// Getter for the circle in global coordinates
+      GeneralizedCircle getGlobalCircle() const {
+        // Down cast since we do not necessarily wont the covariance matrix transformed as well
+        GeneralizedCircle result(m_localPerigeeCircle);
+        result.passiveMoveBy(-getLocalOrigin());
+        return result;
+      }
+
+      /// Setter for the generalized circle that describes the trajectory.
+      void setGlobalCircle(const UncertainPerigeeCircle& perigeeCircle) {
+        m_localPerigeeCircle = perigeeCircle;
+        m_localPerigeeCircle.passiveMoveBy(getLocalOrigin());
+      }
+
+
+      /// Getter for the cirlce in local coordinates
+      const UncertainPerigeeCircle& getLocalCircle() const
+      { return m_localPerigeeCircle; }
+
+      /// Setter for the generalized circle that describes the trajectory.
+      void setLocalCircle(const UncertainPerigeeCircle& localPerigeeCircle)
+      { m_localPerigeeCircle = localPerigeeCircle; }
+
+
+
+      /// Getter for the origin of the local coordinate system
+      const Vector2D& getLocalOrigin() const
+      { return m_localOrigin; }
+
+      /// Setter for the origin of the local coordinate system.
+      /** This sets the origin point the local circle representation is subjected. The local circle is also changed such that the set of points in global space is not changed on repositioning the local parameterisation.
+       *  It also implicitly sets up a new reference position for all travel distances. \n
        *  To be able to keep track how the travel distances have to be shifted by this change \n
        *  the setter returns the value by which the coordinate s parameter was moved ( passively ). \n
        *  The relation "old traveldistance - return value == new traveldistance" holds. \n
        *  (if they are not to far away from the reference points, up to the discontinuity at the \n
        *  far point on the circle) \n
-       *  @return Original travel distance to the new start point */
-      FloatType setStartPos2D(const Vector2D& point);
-
-      /// Setter for start point and momentum at the start point subjected to the charge sign.
-      void setStartPosMom2D(const Vector2D& pos, const Vector2D& mom, FloatType charge);
-
-      /// Clears all information from this trajectoy
-      void clear() {
-        m_perigeeCircle.setNull();
-        m_startPos2D.set(0.0, 0.0);
+       *  @return Travel distance from the old to the new origin point */
+      FloatType setLocalOrigin(const Vector2D& localOrigin) {
+        FloatType result = calcPerpS(localOrigin);
+        m_localPerigeeCircle.passiveMoveBy(localOrigin - m_localOrigin);
+        m_localOrigin = localOrigin;
+        // cout << "New projTravelDistanceRef " << m_projTravelDistanceRef << endl;
+        return result;
       }
 
-    public:
-      /// Getter for the generalized circle that describes the trajectory.
-      //const GeneralizedCircle& getGenCircle() const
-      //{ return m_perigeeCircle; }
 
-      /// Setter for the generalized circle that describes the trajectory.
-      void setCircle(const UncertainPerigeeCircle& perigeeCircle)
-      { m_perigeeCircle = perigeeCircle; }
-
-      /// Getter for the circle in perigee coordinates
-      const UncertainPerigeeCircle& getCircle() const
-      { return m_perigeeCircle; }
 
     public:
       /// Output helper for debugging
-      friend std::ostream& operator<<(std::ostream& output, const CDCTrajectory2D& trajectory2D)
-      { return output << trajectory2D.getCircle();  }
+      friend std::ostream& operator<<(std::ostream& output, const CDCTrajectory2D& trajectory2D) {
+        return output << "Local origin : " << trajectory2D.getLocalOrigin() <<  ", "
+               << "local circle : " << trajectory2D.getLocalCircle();
+      }
 
 
     private:
-      UncertainPerigeeCircle m_perigeeCircle; ///< Memory for the generalized circle describing the trajectory
-      Vector2D m_startPos2D; ///< Memory for the start position of the trajectory
+      /// Memory for local coordinate origin of the circle representing the trajectory in global coordinates
+      Vector2D m_localOrigin;
 
+      /// Memory for the generalized circle describing the trajectory in coordinates from the local origin
+      UncertainPerigeeCircle m_localPerigeeCircle;
+
+      /// Memory for the start position of the trajectory
+      //Vector2D m_startPos2D;
 
       /// ROOT Macro to make CDCTrajectory2D a ROOT class.
       ClassDefInCDCLocalTracking(CDCTrajectory2D, 1);

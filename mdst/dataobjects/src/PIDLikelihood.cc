@@ -78,7 +78,7 @@ double PIDLikelihood::getProbability(const Const::ChargedStable& p1,
     res = elogl / (1.0 + elogl);
   }
   //TODO: only necessary if one wants to use mcprod1405 MC sample. Remove when there's a good replacement.
-  if (isfinite(res))
+  if (std::isfinite(res))
     return res;
   return 0;
 }

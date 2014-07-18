@@ -123,10 +123,11 @@ void DqmHistoManagerModule::event()
     (msg->header())->reserved[1] = nobjs;
     (msg->header())->reserved[2] = 0;
 
-    printf("DqmHistoManger: dumping histos.....%d (of %d) histos\n",
-           nobjs, nkeys);
-
-    m_sock->send(msg);
+    if (nobjs > 0) {
+      printf("DqmHistoManger: dumping histos.....%d (of %d) histos\n",
+             nobjs, nkeys);
+      m_sock->send(msg);
+    }
 
     delete(msg);
 

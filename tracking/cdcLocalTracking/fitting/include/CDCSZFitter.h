@@ -29,6 +29,9 @@ namespace Belle2 {
       /** Destructor. */
       ~CDCSZFitter();
 
+      /// Getter for a standard sz line fitter instance.
+      static const CDCSZFitter& getFitter();
+
       /// Returns a fitted trajectory
       CDCTrajectorySZ fit(const CDCStereoRecoSegment2D& stereoSegment,
                           const CDCTrajectory2D& axialTrajectory2D) const {

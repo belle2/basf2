@@ -30,6 +30,30 @@ CDCSZFitter::~CDCSZFitter()
 {
 }
 
+
+
+
+
+namespace {
+  CDCSZFitter* g_szFitter = nullptr;
+}
+
+
+
+
+
+const CDCSZFitter& CDCSZFitter::getFitter()
+{
+  if (not g_szFitter) {
+    g_szFitter = new CDCSZFitter();
+  }
+  return *g_szFitter;
+}
+
+
+
+
+
 void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ,
                          const CDCStereoRecoSegment2D& stereoSegment,
                          const CDCTrajectory2D& axialTrajectory2D) const

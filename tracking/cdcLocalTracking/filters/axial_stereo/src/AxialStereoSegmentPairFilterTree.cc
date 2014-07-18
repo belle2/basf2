@@ -11,6 +11,7 @@
 #include "../include/AxialStereoSegmentPairFilterTree.h"
 
 #include <tracking/cdcLocalTracking/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/cdcLocalTracking/fitting/CDCSZFitter.h>
 
 using namespace std;
 using namespace Belle2;
@@ -27,8 +28,8 @@ AxialStereoSegmentPairFilterTree::~AxialStereoSegmentPairFilterTree()
 
 bool AxialStereoSegmentPairFilterTree::setValues(const CellWeight& mcWeight, const CellWeight& prWeight, const CDCAxialStereoSegmentPair& axialStereoSegmentPair)
 {
-  const CDCAxialRecoSegment2D* ptrStartSegment = axialStereoSegmentPair.getStartSegment();
-  const CDCAxialRecoSegment2D* ptrEndSegment = axialStereoSegmentPair.getEndSegment();
+  const CDCRecoSegment2D* ptrStartSegment = axialStereoSegmentPair.getStartSegment();
+  const CDCRecoSegment2D* ptrEndSegment = axialStereoSegmentPair.getEndSegment();
 
   if (ptrStartSegment == nullptr) {
     B2ERROR("EvaluateAxialStereoSegmentPairFilter::isGoodAxialStereoSegmentPair invoked with nullptr as start segment");
@@ -40,14 +41,27 @@ bool AxialStereoSegmentPairFilterTree::setValues(const CellWeight& mcWeight, con
     return false;
   }
 
-  const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
-  const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
+  const CDCRecoSegment2D& startSegment = *ptrStartSegment;
+  const CDCRecoSegment2D& endSegment = *ptrEndSegment;
 
   const CDCTrajectory2D& startFit =  startSegment.getTrajectory2D();
   const CDCTrajectory2D& endFit = endSegment.getTrajectory2D();
 
   const CDCTrajectory3D& commonFit3D = axialStereoSegmentPair.getTrajectory3D();
   const CDCTrajectory2D commonFit = commonFit3D.getTrajectory2D();
+
+
+
+  const CDCAxialRecoSegment2D* ptrAxialSegment = axialStereoSegmentPair.getAxialSegment();
+  const CDCStereoRecoSegment2D* ptrStereoSegment = axialStereoSegmentPair.getStereoSegment();
+
+  const CDCAxialRecoSegment2D& axialSegment = *ptrAxialSegment;
+  const CDCStereoRecoSegment2D& stereoSegment = *ptrStereoSegment;
+
+  const CDCTrajectory2D& axialFit = axialSegment.getTrajectory2D();
+  const CDCSZFitter& szFitter = CDCSZFitter::getFitter();
+
+  const CDCTrajectorySZ szFit = szFitter.fit(stereoSegment, axialFit);
 
   const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
   const CDCTrajectory3D mcFit = mcSegmentLookUp.getTrajectory3D(ptrStartSegment);
@@ -148,6 +162,8 @@ bool AxialStereoSegmentPairFilterTree::setValues(const CellWeight& mcWeight, con
 
   setValue < NAMED("commonFit_szSlope") > (commonFit3D.getSZSlope());
   setValue < NAMED("commonFit_szSlope_variance") > (commonFit3D.getLocalVariance(iSZ));
+  setValue < NAMED("szFit_szSlope") > (szFit.getSZSlope());
+
   setValue < NAMED("mcFit_szSlope") > (mcFit.getSZSlope());
 
   /*

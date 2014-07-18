@@ -140,7 +140,7 @@ namespace Belle2 {
       }
 
 
-      bool allowBackward = true;
+      bool allowBackward = false;
       CellWeight mcWeight = getMCAxialStereoSegmentPairFilter().isGoodAxialStereoSegmentPair(axialStereoSegmentPair, allowBackward);
 
       // Forget about the Monte Carlo fit

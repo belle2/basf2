@@ -77,7 +77,6 @@ CellWeight SimpleAxialStereoSegmentPairFilter::isGoodAxialStereoSegmentPair(cons
     return NOT_A_CELL;
   }
 
-
   // Check if there is a positive gap between start and end segment
   //FloatType startFitGap = startFit.getPerpSGap(startSegment, endSegment);
   //FloatType endFitGap = endFit.getPerpSGap(startSegment, endSegment);
@@ -93,14 +92,8 @@ CellWeight SimpleAxialStereoSegmentPairFilter::isGoodAxialStereoSegmentPair(cons
     return NOT_A_CELL;
   }
 
-
-  // combine axial and stereo fit to three dimensional trajectory
-  axialStereoSegmentPair.fuseTrajectories();
-
-  const CDCTrajectory3D& combinedFit = axialStereoSegmentPair.getTrajectory3D();
-
+  const CDCTrajectory3D& combinedFit = getFittedTrajectory3D(axialStereoSegmentPair);
   combinedFit.getChi2();
-
 
   return startSegment.size() + endSegment.size();
 
@@ -116,6 +109,27 @@ const CDCTrajectory2D& SimpleAxialStereoSegmentPairFilter::getFittedTrajectory2D
     getRiemannFitter().update(trajectory2D, segment);
   }
   return trajectory2D;
+
+}
+
+
+
+/// Returns the three dimensional trajectory of the axial stereo segment pair. Also fits it if necessary.
+const CDCTrajectory3D& SimpleAxialStereoSegmentPairFilter::getFittedTrajectory3D(const CDCAxialStereoSegmentPair& axialStereoSegmentPair) const
+{
+  const CDCAxialRecoSegment2D* ptrStartSegment = axialStereoSegmentPair.getStartSegment();
+  const CDCAxialRecoSegment2D* ptrEndSegment = axialStereoSegmentPair.getEndSegment();
+
+  const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
+  const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
+
+  //do fits if still necessary.
+  const CDCTrajectory2D& startFit = getFittedTrajectory2D(startSegment);
+  const CDCTrajectory2D& endFit = getFittedTrajectory2D(endSegment);
+
+  // combine axial and stereo fit to three dimensional trajectory
+  axialStereoSegmentPair.fuseTrajectories();
+  return axialStereoSegmentPair.getTrajectory3D();
 
 }
 

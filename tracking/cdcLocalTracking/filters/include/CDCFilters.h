@@ -25,7 +25,9 @@
 #include <tracking/cdcLocalTracking/filters/axial_axial/MCAxialAxialSegmentPairFilter.h>
 #include <tracking/cdcLocalTracking/filters/axial_axial/EvaluateAxialAxialSegmentPairFilter.h>
 
+#include <tracking/cdcLocalTracking/filters/axial_stereo/SimpleAxialStereoSegmentPairFilter.h>
 #include <tracking/cdcLocalTracking/filters/axial_stereo/MCAxialStereoSegmentPairFilter.h>
+#include <tracking/cdcLocalTracking/filters/axial_stereo/EvaluateAxialStereoSegmentPairFilter.h>
 
 #include <tracking/cdcLocalTracking/filters/axial_stereo_axial_stereo/MCAxialStereoSegmentPairNeighborChooser.h>
 
@@ -48,25 +50,21 @@ namespace Belle2 {
 #ifdef CDCLOCALTRACKING_USE_MC_FILTERS
 #ifdef CDCLOCALTRACKING_USE_EVALUATE_FILTERS
 
-    typedef CDCLocalTracking::EvaluateFacetFilter <
-    CDCLocalTracking::SimpleFacetFilter
-    > FacetFilter;
+    typedef EvaluateFacetFilter<SimpleFacetFilter> FacetFilter;
 
-    typedef CDCLocalTracking::EvaluateFacetNeighborChooser <
-    CDCLocalTracking::SimpleFacetNeighborChooser
-    > FacetNeighborChooser;
+    typedef EvaluateFacetNeighborChooser<SimpleFacetNeighborChooser> FacetNeighborChooser;
 
 #else
 
-    typedef CDCLocalTracking::MCFacetFilter FacetFilter;
-    typedef CDCLocalTracking::MCFacetNeighborChooser FacetNeighborChooser;
+    typedef MCFacetFilter FacetFilter;
+    typedef MCFacetNeighborChooser FacetNeighborChooser;
 
 #endif
 
 #else
 
-    typedef CDCLocalTracking::SimpleFacetFilter FacetFilter;
-    typedef CDCLocalTracking::SimpleFacetNeighborChooser FacetNeighborChooser;
+    typedef SimpleFacetFilter FacetFilter;
+    typedef SimpleFacetNeighborChooser FacetNeighborChooser;
 
 #endif
 
@@ -78,31 +76,25 @@ namespace Belle2 {
 #ifdef CDCLOCALTRACKING_USE_MC_FILTERS
 #ifdef CDCLOCALTRACKING_USE_EVALUATE_FILTERS
 
-    //No optimizing filters and choosers for segment triples yet.
-    typedef CDCLocalTracking::EvaluateAxialAxialSegmentPairFilter <
-    CDCLocalTracking::SimpleAxialAxialSegmentPairFilter
-    > AxialAxialSegmentPairFilter;
-
-    typedef CDCLocalTracking::MCSegmentTripleFilter SegmentTripleFilter;
-    typedef CDCLocalTracking::MCSegmentTripleNeighborChooser SegmentTripleNeighborChooser;
+    typedef EvaluateAxialAxialSegmentPairFilter< SimpleAxialAxialSegmentPairFilter> AxialAxialSegmentPairFilter;
+    typedef MCSegmentTripleFilter SegmentTripleFilter;
+    typedef MCSegmentTripleNeighborChooser SegmentTripleNeighborChooser;
 
 #else
 
-    typedef CDCLocalTracking::EvaluateAxialAxialSegmentPairFilter <
-    CDCLocalTracking::SimpleAxialAxialSegmentPairFilter
-    > AxialAxialSegmentPairFilter;
+    typedef EvaluateAxialAxialSegmentPairFilter< SimpleAxialAxialSegmentPairFilter> AxialAxialSegmentPairFilter;
 
-    //typedef CDCLocalTracking::MCAxialAxialSegmentPairFilter AxialAxialSegmentPairFilter;
-    typedef CDCLocalTracking::MCSegmentTripleFilter SegmentTripleFilter;
-    typedef CDCLocalTracking::MCSegmentTripleNeighborChooser SegmentTripleNeighborChooser;
+    //typedef MCAxialAxialSegmentPairFilter AxialAxialSegmentPairFilter;
+    typedef MCSegmentTripleFilter SegmentTripleFilter;
+    typedef MCSegmentTripleNeighborChooser SegmentTripleNeighborChooser;
 
 #endif
 
 #else
 
-    typedef CDCLocalTracking::SimpleAxialAxialSegmentPairFilter AxialAxialSegmentPairFilter;
-    typedef CDCLocalTracking::SimpleSegmentTripleFilter SegmentTripleFilter;
-    typedef CDCLocalTracking::SimpleSegmentTripleNeighborChooser SegmentTripleNeighborChooser;
+    typedef SimpleAxialAxialSegmentPairFilter AxialAxialSegmentPairFilter;
+    typedef SimpleSegmentTripleFilter SegmentTripleFilter;
+    typedef SimpleSegmentTripleNeighborChooser SegmentTripleNeighborChooser;
 
 #endif
 
@@ -113,18 +105,19 @@ namespace Belle2 {
 #ifdef CDCLOCALTRACKING_USE_MC_FILTERS
 #ifdef CDCLOCALTRACKING_USE_EVALUATE_FILTERS
 
-    //No optimizing filters and choosers for segment triples yet.
-    typedef MCAxialStereoSegmentPairFilter AxialStereoSegmentPairFilter;
+    typedef EvaluateAxialStereoSegmentPairFilter< SimpleAxialStereoSegmentPairFilter> AxialStereoSegmentPairFilter;
     typedef MCAxialStereoSegmentPairNeighborChooser AxialStereoSegmentPairNeighborChooser;
 
 #else
-    typedef MCAxialStereoSegmentPairFilter AxialStereoSegmentPairFilter;
+    typedef EvaluateAxialStereoSegmentPairFilter< SimpleAxialStereoSegmentPairFilter> AxialStereoSegmentPairFilter;
+
+    //typedef MCAxialStereoSegmentPairFilter AxialStereoSegmentPairFilter;
     typedef MCAxialStereoSegmentPairNeighborChooser AxialStereoSegmentPairNeighborChooser;
 
 #endif
 
 #else
-    typedef MCAxialStereoSegmentPairFilter AxialStereoSegmentPairFilter;
+    typedef SimpleAxialStereoSegmentPairFilter AxialStereoSegmentPairFilter;
     typedef MCAxialStereoSegmentPairNeighborChooser AxialStereoSegmentPairNeighborChooser;
 
 #endif

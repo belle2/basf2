@@ -42,8 +42,11 @@ namespace Belle2 {
       /// Checks if a pair of axial segments is a good combination
       CellWeight isGoodAxialStereoSegmentPair(const CDCAxialStereoSegmentPair& axialStereoSegmentPair);
 
-      /// Returns the trajectory of the axial segment. Also fits it if necessary.
+      /// Returns the trajectory of the segment. Also fits it if necessary.
       const CDCTrajectory2D& getFittedTrajectory2D(const CDCAxialRecoSegment2D& segment) const;
+
+      /// Returns the three dimensional trajectory of the axial stereo segment pair. Also fits it if necessary.
+      const CDCTrajectory3D& getFittedTrajectory3D(const CDCAxialStereoSegmentPair& segmentPair) const;
 
       /// Returns the xy fitter instance that is used by this filter
       const CDCRiemannFitter& getRiemannFitter() const

@@ -29,7 +29,11 @@ CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
                                  const Vector3D& mom3D,
                                  const FloatType& charge) :
   m_localOrigin(pos3D),
-  m_localHelix(absMom2DToCurvature(mom3D.xy().norm(), charge, pos3D), mom3D.xy().unit(), 0.0, mom3D.cotTheta(), 0.0)
+  m_localHelix(absMom2DToCurvature(mom3D.xy().norm(), charge, pos3D),
+               mom3D.xy().unit(),
+               0.0,
+               mom3D.cotTheta(),
+               0.0)
 {
 }
 
@@ -58,7 +62,19 @@ SignType CDCTrajectory3D::getChargeSign() const
 
 FloatType CDCTrajectory3D::getAbsMom3D() const
 {
-  return curvatureToAbsMom2D(getLocalHelix().circleXY().curvature());
+  FloatType szSlope = getLocalHelix().szSlope();
+
+  FloatType factor2DTo3D = hypot(1, szSlope);
+
+  FloatType curvatureXY = getLocalHelix().curvatureXY();
+
+  FloatType absMom2D =  curvatureToAbsMom2D(curvatureXY);
+
+  return factor2DTo3D * absMom2D;
+
+  FloatType absMomZ = absMom2D * szSlope;
+
+  return hypot(absMom2D, absMomZ);
 }
 
 

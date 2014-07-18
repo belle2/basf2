@@ -307,6 +307,10 @@ namespace Belle2 {
       /// Get the estimation for the absolute value of the transvers momentum
       FloatType getAbsMom2D() const;
 
+      /// Get the momentum at the support point of the trajectory
+      inline Vector2D getMom2DAtSupport() const
+      { return  getStartUnitMom2D() *= getAbsMom2D();  }
+
       /// Get the momentum at the start point of the trajectory
       inline Vector2D getStartMom2D() const
       { return  getStartUnitMom2D() *= getAbsMom2D();  }
@@ -315,12 +319,12 @@ namespace Belle2 {
       inline Vector2D getStartUnitMom2D() const
       { return  getLocalCircle().tangential();  }
 
-
-      //FloatType setStartPos2D(const Vector2D& point);
-
       /// Setter for start point and momentum at the start point subjected to the charge sign.
       void setPosMom2D(const Vector2D& pos2D, const Vector2D& mom2D, const FloatType& charge);
 
+      /// Get the support point of the trajectory in global coordinates
+      inline Vector2D getSupport() const
+      { return getLocalCircle().perigee() + getLocalOrigin(); }
 
 
       /// Clears all information from this trajectoy

@@ -27,6 +27,10 @@
 #include "cdcLocalTracking/HelixCovariance.cc"
 #include "cdcLocalTracking/UncertainPerigeeCircle.cc"
 
+#include "cdcLocalTracking/CDCBField.cc"
+#include "cdcLocalTracking/CDCTrajectory2D.cc"
+#include "cdcLocalTracking/CDCTrajectory3D.cc"
+
 
 #include "cdcLocalTracking/fitting.cc"
 #include "cdcLocalTracking/CDCObservations2D.cc"

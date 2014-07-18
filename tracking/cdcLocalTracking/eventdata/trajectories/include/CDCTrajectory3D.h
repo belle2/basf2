@@ -122,6 +122,10 @@ namespace Belle2 {
       { return  getLocalHelix().tangential();  }
 
 
+      /// Get the support point of the trajectory in global coordinates
+      inline Vector3D getSupport() const
+      { return getLocalHelix().support() + getLocalOrigin(); }
+
 
       /// Setter for start point and momentum at the start point subjected to the charge sign.
       void setPosMom3D(const Vector3D& pos3D, const Vector3D& mom3D, const FloatType& charge);

@@ -45,11 +45,11 @@ namespace Belle2 {
     /// Getter for the sign of the magnetic field in z direction
     const SignType& getBFieldZSign();
 
-    /// Getter for the signed of the magnetic field stength in z direction ( in Tesla )
+    /// Getter for the signed magnetic field stength in z direction ( in Tesla )
     const FloatType& getBFieldZ(const Vector2D& pos2D = Vector2D(0.0, 0.0));
 
-    /// Getter for the signed of the magnetic field stength in z direction ( in Tesla )
-    const FloatType& getBFieldZ(const Vector3D& pos3D = Vector3D(0.0, 0.0, 0.0));
+    /// Getter for the signed magnetic field stength in z direction ( in Tesla )
+    const FloatType& getBFieldZ(const Vector3D& pos3D);
 
     /// Conversion helper from clockwise or counterclockwise travel to the charge sign.
     /** Return the charge sign based on the travel direction on the fitted circle. \n

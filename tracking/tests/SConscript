@@ -12,6 +12,7 @@ env['LIBS'] = [
     'cdc', 'cdc_dataobjects',
     'simulation_dataobjects',
     'framework',
+    'geometry',
     'Geom',
 #   'genfit2',
     '$ROOT_LIBS',

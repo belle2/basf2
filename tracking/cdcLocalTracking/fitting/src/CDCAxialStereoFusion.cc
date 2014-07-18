@@ -29,14 +29,17 @@ TMatrixD CDCLocalTracking::calcAmbiguity(const CDCRecoSegment2D& segment,
   for (const CDCRecoHit2D & recoHit2D : segment) {
     const Vector2D& recoPos2D = recoHit2D.getRecoPos2D();
     const Vector2D localRecoPos2D = recoPos2D - localOrigin2D;
-    const Vector2D tangential = localCircle.tangential(localRecoPos2D);
+    //const Vector2D tangential = localCircle.tangential(localRecoPos2D);
+    const Vector2D normal = localCircle.normal(localRecoPos2D);
 
     const Vector3D& wireVector = recoHit2D.getWire().getWireVector();
 
     // Check sign
-    zeta -= wireVector.xy().cross(tangential) / wireVector.z();
+    zeta += wireVector.xy().dot(normal) / wireVector.z();
 
   }
+
+  zeta /= nHits;
 
   TMatrixD result(3, 5);
   result.Zero();

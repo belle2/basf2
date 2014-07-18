@@ -21,14 +21,11 @@ using namespace CDCLocalTracking;
 
 
 
-void
-TrackCreator::create(
-  const std::vector<CDCSegmentTripleTrack>& segmentTripleTracks,
-  std::vector<CDCTrack>& tracks
-) const
+void TrackCreator::create(const std::vector<CDCSegmentTripleTrack>& segmentTripleTracks,
+                          std::vector<CDCTrack>& tracks) const
 {
 
-  BOOST_FOREACH(const CDCSegmentTripleTrack & segmentTripleTrack, segmentTripleTracks) {
+  for (const CDCSegmentTripleTrack & segmentTripleTrack : segmentTripleTracks) {
 
     tracks.push_back(CDCTrack());
     CDCTrack& track = tracks.back();
@@ -40,11 +37,27 @@ TrackCreator::create(
 
 
 
-void
-TrackCreator::create(
-  const CDCSegmentTripleTrack& segmentTripleTrack,
-  CDCTrack& track
-) const
+
+void TrackCreator::create(const std::vector<CDCAxialStereoSegmentPairTrack>& axialStereoSegmentPairTracks,
+                          std::vector<CDCTrack>& tracks) const
+{
+
+  for (const CDCAxialStereoSegmentPairTrack & axialStereoSegmentPairTrack : axialStereoSegmentPairTracks) {
+
+    tracks.push_back(CDCTrack());
+    CDCTrack& track = tracks.back();
+    create(axialStereoSegmentPairTrack, track);
+
+  }
+
+}
+
+
+
+
+
+void TrackCreator::create(const CDCSegmentTripleTrack& segmentTripleTrack,
+                          CDCTrack& track) const
 {
 
   //B2DEBUG(200,"Lenght of segmentTripleTrack is " << segmentTripleTrack.size() );
@@ -96,10 +109,69 @@ TrackCreator::create(
 }
 
 
-bool TrackCreator::create(
-  const CDCAxialRecoSegment2D& segment,
-  CDCTrack& track
-) const
+
+
+
+void TrackCreator::create(const CDCAxialStereoSegmentPairTrack& axialStereoSegmentPairTrack,
+                          CDCTrack& track) const
+{
+
+  //B2DEBUG(200,"Lenght of segmentTripleTrack is " << segmentTripleTrack.size() );
+  if (not  axialStereoSegmentPairTrack.empty()) {
+
+    CDCAxialStereoSegmentPairTrack::const_iterator itSegmentPair = axialStereoSegmentPairTrack.begin();
+    const CDCAxialStereoSegmentPair* ptrFirstSegmentPair = *itSegmentPair++;
+
+    if (not ptrFirstSegmentPair) B2ERROR("Nullptr encounter in CDCAxialStereoSegmentPairTrack");
+    const CDCAxialStereoSegmentPair& firstSegmentPair = *ptrFirstSegmentPair;
+
+    // Set the start fits of the track to the ones of the first segment
+    track.setStartTrajectory2D(firstSegmentPair.getTrajectory2D());
+    track.setStartTrajectorySZ(firstSegmentPair.getTrajectorySZ());
+
+    FloatType perpSOffset = 0.0;
+    appendStartRecoHits3D(firstSegmentPair, perpSOffset, track);
+
+    while (itSegmentPair != axialStereoSegmentPairTrack.end()) {
+
+      const CDCAxialStereoSegmentPair* ptrSecondSegmentPair = *itSegmentPair++;
+      if (not ptrSecondSegmentPair) B2ERROR("Nullptr encounter in CDCAxialStereoSegmentPairTrack");
+
+
+      const CDCAxialStereoSegmentPair& firstSegmentPair = *ptrFirstSegmentPair;
+      const CDCAxialStereoSegmentPair& secondSegmentPair = *ptrSecondSegmentPair;
+
+      perpSOffset = appendAverageStartEnd(firstSegmentPair,
+                                          secondSegmentPair,
+                                          perpSOffset,
+                                          track);
+
+      ptrFirstSegmentPair = ptrSecondSegmentPair;
+
+    }
+
+    const CDCAxialStereoSegmentPair& lastSegmentPair = *ptrFirstSegmentPair;
+    appendEndRecoHits3D(lastSegmentPair, perpSOffset, track);
+
+    // Set the end fits of the track to the ones of the first segment
+    CDCTrajectory2D endTrajectory2D = lastSegmentPair.getTrajectory2D();
+    CDCTrajectorySZ endTrajectorySZ = lastSegmentPair.getTrajectorySZ();
+
+
+    // Set the reference point on the trajectories to the last reconstructed hit
+    FloatType perpSShift = endTrajectory2D.setLocalOrigin(track.getEndRecoHit3D().getRecoPos2D());
+    endTrajectorySZ.passiveMoveS(perpSShift);
+    //Both fits now have the travel distance scale from the last hit as it should be
+    track.setEndTrajectory2D(endTrajectory2D);
+    track.setEndTrajectorySZ(endTrajectorySZ);
+
+  }
+
+}
+
+
+bool TrackCreator::create(const CDCAxialRecoSegment2D& segment,
+                          CDCTrack& track) const
 {
 
   CDCTrajectorySZ trajectorySZ(0, 0); // line with z = 0*s + 0 best we can assume for axial segments only
@@ -121,7 +193,6 @@ bool TrackCreator::create(
 
     track.setStartTrajectorySZ(trajectorySZ);
 
-
     track.setStartTrajectory2D(trajectory2D);
 
     //Shift fit to the last reco hit and assigne the end fit of the track as well
@@ -139,12 +210,9 @@ bool TrackCreator::create(
 
 
 
-void
-TrackCreator::appendStartRecoHits3D(
-  const CDCSegmentTriple& triple,
-  FloatType perpSOffset,
-  CDCRecoSegment3D& recohits3D
-) const
+void TrackCreator::appendStartRecoHits3D(const CDCSegmentTriple& triple,
+                                         FloatType perpSOffset,
+                                         CDCRecoSegment3D& recohits3D) const
 {
   const CDCRecoSegment2D* startSegment = triple.getStart();
   if (startSegment != nullptr) {
@@ -158,12 +226,9 @@ TrackCreator::appendStartRecoHits3D(
 
 
 
-void
-TrackCreator::appendMiddleRecoHits3D(
-  const CDCSegmentTriple& triple,
-  FloatType perpSOffset,
-  CDCRecoSegment3D& recohits3D
-) const
+void TrackCreator::appendMiddleRecoHits3D(const CDCSegmentTriple& triple,
+                                          FloatType perpSOffset,
+                                          CDCRecoSegment3D& recohits3D) const
 {
   const CDCRecoSegment2D* middleSegment = triple.getMiddle();
   if (middleSegment != nullptr) {
@@ -177,12 +242,9 @@ TrackCreator::appendMiddleRecoHits3D(
 
 
 
-void
-TrackCreator::appendEndRecoHits3D(
-  const CDCSegmentTriple& triple,
-  FloatType perpSOffset,
-  CDCRecoSegment3D& recohits3D
-) const
+void TrackCreator::appendEndRecoHits3D(const CDCSegmentTriple& triple,
+                                       FloatType perpSOffset,
+                                       CDCRecoSegment3D& recohits3D) const
 {
   const CDCRecoSegment2D* endSegment = triple.getEnd();
   if (endSegment != nullptr) {
@@ -198,14 +260,55 @@ TrackCreator::appendEndRecoHits3D(
 
 
 
-void
-TrackCreator::appendRecoHits3D(
-  const CDCRecoSegment2D& segment,
-  const CDCTrajectory2D& trajectory2D,
-  const CDCTrajectorySZ& trajectorySZ,
-  FloatType perpSOffset,
-  CDCRecoSegment3D& recohits3D
-) const
+void TrackCreator::appendStartRecoHits3D(const CDCAxialStereoSegmentPair& pair,
+                                         FloatType perpSOffset,
+                                         CDCRecoSegment3D& recohits3D) const
+{
+
+  const CDCRecoSegment2D* ptrStartSegment = pair.getStartSegment();
+  if (ptrStartSegment != nullptr) {
+    const CDCRecoSegment2D& startSegment = *ptrStartSegment;
+    appendRecoHits3D(startSegment,
+                     pair.getTrajectory2D(),
+                     pair.getTrajectorySZ(),
+                     perpSOffset,
+                     recohits3D);
+  }
+}
+
+
+void TrackCreator::appendEndRecoHits3D(const CDCAxialStereoSegmentPair& pair,
+                                       FloatType perpSOffset,
+                                       CDCRecoSegment3D& recohits3D) const
+{
+  const CDCRecoSegment2D* ptrEndSegment = pair.getEndSegment();
+  if (ptrEndSegment != nullptr) {
+    const CDCRecoSegment2D& endSegment = *ptrEndSegment;
+    appendRecoHits3D(endSegment,
+                     pair.getTrajectory2D(),
+                     pair.getTrajectorySZ(),
+                     perpSOffset,
+                     recohits3D);
+  }
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+void TrackCreator::appendRecoHits3D(const CDCRecoSegment2D& segment,
+                                    const CDCTrajectory2D& trajectory2D,
+                                    const CDCTrajectorySZ& trajectorySZ,
+                                    FloatType perpSOffset,
+                                    CDCRecoSegment3D& recohits3D) const
 {
   BOOST_FOREACH(const CDCRecoHit2D & recohit2D, segment) {
     //for ( CDCRecoSegment2D::const_iterator itRecoHit2D = segment->begin();
@@ -223,79 +326,134 @@ TrackCreator::appendRecoHits3D(
 
 
 
-FloatType
-TrackCreator::appendAverageStartEnd(
-  const CDCSegmentTriple& triple,
-  const CDCSegmentTriple& followingTriple,
-  FloatType perpSOffset,
-  CDCRecoSegment3D& recohits3D
-) const
+FloatType TrackCreator::appendAverageStartEnd(const CDCSegmentTriple& triple,
+                                              const CDCSegmentTriple& followingTriple,
+                                              FloatType perpSOffset,
+                                              CDCRecoSegment3D& recoHits3D) const
 {
 
-  //if the end segment of this and the following segment match
-  const CDCAxialRecoSegment2D* endSegment = triple.getEnd();
-  const CDCAxialRecoSegment2D* followingStartSegment = followingTriple.getStart();
+  const CDCRecoSegment2D* ptrEndSegment = triple.getEnd();
+  const CDCRecoSegment2D* ptrFollowingStartSegment = followingTriple.getStart();
 
-  if (endSegment == followingStartSegment and
-      followingStartSegment != nullptr and
-      not followingStartSegment->empty()) {
+  if (ptrEndSegment == ptrFollowingStartSegment and
+      ptrFollowingStartSegment != nullptr) {
 
     //followingStartSegment and endSegment point to the same object
-    //hence they have the same recohits
+    //hence they have the same two dimensional recohits
     //make RecoHits3D from the fits stored in the triples and average them
+    const CDCRecoSegment2D& commonSegment = *ptrEndSegment;
 
-    //get the start point of the perpS scale from the getEnd() segment
-    const CDCRecoHit2D& firstRecoHit2D = endSegment->front() ;
-    CDCRecoHit3D firstRecoHit3DFromEnd  =
-      CDCRecoHit3D::reconstruct(firstRecoHit2D,
-                                triple.getTrajectory2D(),
-                                triple.getTrajectorySZ());
-
-    FloatType startPerpSOfEnd = firstRecoHit3DFromEnd.getPerpS();
-
-    BOOST_FOREACH(const CDCRecoHit2D & recoHit2D, *endSegment) {
-
-      CDCRecoHit3D recoHit3DFromEnd   =
-        CDCRecoHit3D::reconstruct(recoHit2D,
-                                  triple.getTrajectory2D(),
-                                  triple.getTrajectorySZ());
-
-      CDCRecoHit3D recoHit3DFromNext =
-        CDCRecoHit3D::reconstruct(recoHit2D,
-                                  followingTriple.getTrajectory2D(),
-                                  followingTriple.getTrajectorySZ());
-
-      // make an offset that the both perpS scales of the getEnd() segment
-      // and followingSegmentTriple
-      // match on the first recohit
-      recoHit3DFromNext.shiftPerpS(startPerpSOfEnd);
-
-      recohits3D.push_back(CDCRecoHit3D::average(recoHit3DFromEnd , recoHit3DFromNext));
-      CDCRecoHit3D& recoHit3DAverage = recohits3D.back();
-
-      // we have to take special care about the travel distance
-      // that the following segments can be aligned with
-      // (at least) increasing order
-      recoHit3DAverage.shiftPerpS(perpSOffset);
-
-    }
-
-
-    const CDCRecoHit2D& lastRecoHit2D = followingStartSegment->back() ;
-    CDCRecoHit3D lastRecoHit3DFromNext =
-      CDCRecoHit3D::reconstruct(lastRecoHit2D,
-                                followingTriple.getTrajectory2D(),
-                                followingTriple.getTrajectorySZ());
-
-    FloatType newPrepSOffset =
-      recohits3D.back().getPerpS() - lastRecoHit3DFromNext.getPerpS();
-
-    return newPrepSOffset;
+    return appendAverage(commonSegment,
+                         triple.getTrajectory2D(),
+                         triple.getTrajectorySZ(),
+                         perpSOffset,
+                         followingTriple.getTrajectory2D(),
+                         followingTriple.getTrajectorySZ(),
+                         recoHits3D);
 
   } else {
     return perpSOffset;
   }
+
 }
 
 
 
+
+
+
+FloatType TrackCreator::appendAverageStartEnd(const CDCAxialStereoSegmentPair& pair,
+                                              const CDCAxialStereoSegmentPair& followingPair,
+                                              FloatType perpSOffset,
+                                              CDCRecoSegment3D& recoHits3D) const
+{
+
+  const CDCRecoSegment2D* ptrEndSegment = pair.getEndSegment();
+  const CDCRecoSegment2D* ptrFollowingStartSegment = followingPair.getStartSegment();
+
+  if (ptrEndSegment == ptrFollowingStartSegment and
+      ptrFollowingStartSegment != nullptr) {
+
+    //followingStartSegment and endSegment point to the same object
+    //hence they have the same two dimensional recohits
+    //make RecoHits3D from the fits stored in the triples and average them
+    const CDCRecoSegment2D& commonSegment = *ptrEndSegment;
+
+    return appendAverage(commonSegment,
+                         pair.getTrajectory2D(),
+                         pair.getTrajectorySZ(),
+                         perpSOffset,
+                         followingPair.getTrajectory2D(),
+                         followingPair.getTrajectorySZ(),
+                         recoHits3D);
+
+  } else {
+    return perpSOffset;
+  }
+
+}
+
+
+FloatType TrackCreator::appendAverage(const CDCRecoSegment2D& segment,
+                                      const CDCTrajectory2D& trajectory2D,
+                                      const CDCTrajectorySZ& trajectorySZ,
+                                      FloatType perpSOffset,
+                                      const CDCTrajectory2D& followingTrajectory2D,
+                                      const CDCTrajectorySZ& followingTrajectorySZ,
+                                      CDCRecoSegment3D& recoHits3D) const
+{
+  if (segment.empty()) return perpSOffset;
+
+  const CDCRecoHit2D& firstRecoHit2D = segment.front();
+
+  CDCRecoHit3D firstRecoHit3D =
+    CDCRecoHit3D::reconstruct(firstRecoHit2D,
+                              trajectory2D,
+                              trajectorySZ);
+
+  FloatType firstPerpS = firstRecoHit3D.getPerpS();
+
+
+  CDCRecoHit3D followingFirstRecoHit3D =
+    CDCRecoHit3D::reconstruct(firstRecoHit2D,
+                              followingTrajectory2D,
+                              followingTrajectorySZ);
+
+  FloatType followingFirstPerpS = followingFirstRecoHit3D.getPerpS();
+
+  FloatType followingPerpSOffSet = firstPerpS + perpSOffset - followingFirstPerpS;
+
+  for (const CDCRecoHit2D & recoHit2D : segment) {
+
+    CDCRecoHit3D recoHit3D =
+      CDCRecoHit3D::reconstruct(recoHit2D,
+                                trajectory2D,
+                                trajectorySZ);
+
+    recoHit3D.shiftPerpS(perpSOffset);
+
+
+    CDCRecoHit3D followingRecoHit3D =
+      CDCRecoHit3D::reconstruct(recoHit2D,
+                                followingTrajectory2D,
+                                followingTrajectorySZ);
+
+    followingRecoHit3D.shiftPerpS(followingPerpSOffSet);
+
+    recoHits3D.push_back(CDCRecoHit3D::average(recoHit3D, followingRecoHit3D));
+
+  }
+
+
+  const CDCRecoHit2D& lastRecoHit2D = segment.back() ;
+
+  CDCRecoHit3D followingLastRecoHit3D =
+    CDCRecoHit3D::reconstruct(lastRecoHit2D,
+                              followingTrajectory2D,
+                              followingTrajectorySZ);
+
+  FloatType newPrepSOffset = recoHits3D.back().getPerpS() - followingLastRecoHit3D.getPerpS();
+
+  return newPrepSOffset;
+
+}

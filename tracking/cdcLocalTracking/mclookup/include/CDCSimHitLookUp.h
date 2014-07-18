@@ -44,6 +44,9 @@ namespace Belle2 {
       ~CDCSimHitLookUp();
 
     public:
+      /// Getter for the singletone instance
+      static const CDCSimHitLookUp& getInstance();
+
       /// Clear all information from the last event
       void clear();
 

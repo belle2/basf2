@@ -39,7 +39,7 @@ namespace Belle2 {
 
     public:
       /// Getter for the singletone instance
-      static CDCMCTrackStore& getInstance();
+      static const CDCMCTrackStore& getInstance();
 
     public:
       /// Clear all Monte Carlo hits

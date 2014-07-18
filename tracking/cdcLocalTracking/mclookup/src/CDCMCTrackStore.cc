@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include "../include/CDCMCTrackStore.h"
+#include "../include/CDCMCManager.h"
 
 #include <tracking/cdcLocalTracking/algorithms/WeightedNeighborhood.h>
 #include <tracking/cdcLocalTracking/algorithms/Clusterizer.h>
@@ -34,6 +35,12 @@ CDCMCTrackStore::~CDCMCTrackStore()
 {
 }
 
+
+
+const CDCMCTrackStore& CDCMCTrackStore::getInstance()
+{
+  return CDCMCManager::getMCTrackStore();
+}
 
 
 void CDCMCTrackStore::clear()

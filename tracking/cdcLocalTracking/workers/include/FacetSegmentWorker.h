@@ -72,10 +72,9 @@ namespace Belle2 {
       }
 
 
+
       /// Generates the segments from the event topology.
-      template<class CDCWireHitRange>
-      inline void apply(const CDCWireHitRange&,
-                        std::vector< CDCRecoSegment2D >& outputSegments) {
+      inline void generate(std::vector< CDCRecoSegment2D >& outputSegments) {
 
         m_segments2D.clear();
         outputSegments.clear();
@@ -165,7 +164,7 @@ namespace Belle2 {
           } // end for cluster
 
 
-          //TODO: combine matching segments or here
+          //TODO: or combine matching segments here
 
         } // end for superlayer
 
@@ -205,7 +204,7 @@ namespace Belle2 {
         for (const CDCRecoTangentVector & tangentSegment : m_recoTangentSegments) {
           storedTangentSegments.appendNew(tangentSegment);
         }
-        B2DEBUG(100, "  Created " << storedTangentSegments.getEntries()  << " CDCRecoTangentSegment");
+        B2DEBUG(100, "  Created " << storedTangentSegments.getEntries() << " CDCRecoTangentSegment");
 
         // IO selected segments without tangents
         B2DEBUG(100, "  Creating the StoreArray for the selected CDCRecoHit2DSegments");

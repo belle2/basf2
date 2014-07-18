@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include "../include/CDCSimHitLookUp.h"
+#include "../include/CDCMCManager.h"
 
 #include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
 #include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
@@ -29,6 +30,13 @@ CDCSimHitLookUp::CDCSimHitLookUp()
 CDCSimHitLookUp::~CDCSimHitLookUp()
 {
 }
+
+
+const CDCSimHitLookUp& CDCSimHitLookUp::getInstance()
+{
+  return CDCMCManager::getSimHitLookUp();
+}
+
 
 
 void CDCSimHitLookUp::clear()

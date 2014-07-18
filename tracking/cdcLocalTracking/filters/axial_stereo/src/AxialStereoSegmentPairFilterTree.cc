@@ -87,11 +87,11 @@ bool AxialStereoSegmentPairFilterTree::setValues(const CellWeight& mcWeight, con
   setValue < NAMED("startSegment_iSuperLayer") > (startSegment.getISuperLayer());
   setValue < NAMED("endSegment_iSuperLayer") > (endSegment.getISuperLayer());
 
-  // Super layers numbers of segments
+  // Super layers numbers of fits
   setValue < NAMED("startFit_startISuperLayer") > (startFit.getStartISuperLayer());
   setValue < NAMED("endFit_startISuperLayer") > (endFit.getStartISuperLayer());
 
-  // Super layer extrapolation
+  // Super layer coarse extrapolation
   setValue < NAMED("startFit_nextISuperLayer") > (startFit.getNextISuperLayer());
   setValue < NAMED("startFit_nextAxialISuperLayer") > (startFit.getNextAxialISuperLayer());
 
@@ -117,7 +117,6 @@ bool AxialStereoSegmentPairFilterTree::setValues(const CellWeight& mcWeight, con
   setValue < NAMED("commonFit_isForwardOrBackwardTo_endSegment") > (commonFit.isForwardOrBackwardTo(endSegment));
 
 
-
   setValue < NAMED("startFit_perpSGap") > (startFit.getPerpSGap(startSegment, endSegment));
   setValue < NAMED("endFit_perpSGap") > (endFit.getPerpSGap(startSegment, endSegment));
   setValue < NAMED("commonFit_perpSGap") > (commonFit.getPerpSGap(startSegment, endSegment));
@@ -130,21 +129,17 @@ bool AxialStereoSegmentPairFilterTree::setValues(const CellWeight& mcWeight, con
   setValue < NAMED("endFit_perpSBackOffset") > (endFit.getPerpSBackOffset(startSegment, endSegment));
   setValue < NAMED("commonFit_perpSBackOffset") > (commonFit.getPerpSBackOffset(startSegment, endSegment));
 
+
+  // Proximity indicators
   setValue < NAMED("startFit_dist2DToCenter_endSegment") > (startFit.getDist2DToCenter(endSegment));
   setValue < NAMED("endFit_dist2DToCenter_startSegment") > (endFit.getDist2DToCenter(startSegment));
 
   setValue < NAMED("startFit_dist2DToFront_endSegment") > (startFit.getDist2DToFront(endSegment));
   setValue < NAMED("endFit_dist2DToBack_startSegment") > (endFit.getDist2DToBack(startSegment));
 
+  // Momentum agreement
   setValue < NAMED("startFit_absMom2D") > (startFit.getAbsMom2D());
   setValue < NAMED("endFit_absMom2D") > (endFit.getAbsMom2D());
-
-  // Vector2D startCOM = startSegment.getCenterOfMass2D();
-  // Vector2D endCOM = endSegment.getCenterOfMass2D();
-  // Vector2D startCenter = startFit.getClosest(startCOM);
-  // Vector2D endCenter = endFit.getClosest(endCOM);
-  // Vector2D startExtrapolatedToEndCenter = startFit.getClosest(endCenter);
-  // Vector2D endExtrapolatedToStartCenter = endFit.getClosest(startCenter);
 
   Vector2D startMomAtCenter = startFit.getUnitMom2DAtCenter(startSegment);
   Vector2D endMomAtCenter = endFit.getUnitMom2DAtCenter(endSegment);
@@ -156,6 +151,7 @@ bool AxialStereoSegmentPairFilterTree::setValues(const CellWeight& mcWeight, con
   setValue < NAMED("momAngleAtCenter_endSegment") > (endMomAtCenter.angleWith(startMomAtExtrapolation));
 
 
+  // Fit variance and chi2
   setValue < NAMED("startFit_chi2") > (startFit.getChi2());
   setValue < NAMED("endFit_chi2") > (endFit.getChi2());
   setValue < NAMED("commonFit_chi2") > (commonFit3D.getChi2());
@@ -174,11 +170,5 @@ bool AxialStereoSegmentPairFilterTree::setValues(const CellWeight& mcWeight, con
 
   setValue < NAMED("mcFit_curvatureXY") > (mcFit.getCurvatureXY());
 
-
-  /*
-  //make a cut - make this more sophisticated at some point
-  //double cosDeviation = endCenter.cosWith(pointOnFromTrack);
-  //double tolerance = cos(PI / 180);
-  */
   return true;
 }

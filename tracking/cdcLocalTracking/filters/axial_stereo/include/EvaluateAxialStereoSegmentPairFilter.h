@@ -88,7 +88,6 @@ namespace Belle2 {
     {
       m_realAxialStereoSegmentPairFilter.clear();
       m_mcAxialStereoSegmentPairFilter.clear();
-      //Nothing to do...
     }
 
     template<class RealAxialStereoSegmentPairFilter>

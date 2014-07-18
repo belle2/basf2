@@ -1,4 +1,4 @@
-/**************************************************************************
+/**************************************************************************b
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
@@ -20,7 +20,7 @@
 namespace Belle2 {
   namespace CDCLocalTracking {
 
-    /// Filter for the constuction of axial to axial segment pairs based on simple criterions
+    /// ROOT Tree structure declaration for the evaluation of axial to stereo segment pair filters.
     typedef StaticTypedTree <
     //BranchOf < Float_t, NAMED("mcWeight") > ,
     //BranchOf < Float_t, NAMED("prWeight") > ,
@@ -87,10 +87,10 @@ namespace Belle2 {
              BranchOf < float, NAMED("endFit_chi2") > ,
              BranchOf < float, NAMED("commonFit_chi2") > ,
 
-             BranchOf < float, NAMED("commonFit_szSlope") > , //different fusion fit method
+             BranchOf < float, NAMED("commonFit_szSlope") > , //fusion fit method
              BranchOf < float, NAMED("commonFit_szSlope_variance") > ,
 
-             BranchOf < float, NAMED("szFit_szSlope") > , //different manual reconstruction fit method
+             BranchOf < float, NAMED("szFit_szSlope") > , //'manual' reconstruction fit method
              BranchOf < float, NAMED("mcFit_szSlope") > ,
 
              BranchOf < float, NAMED("axialFit_curvatureXY") > ,
@@ -103,7 +103,7 @@ namespace Belle2 {
 
              > AxialStereoSegmentPairFilterTreeBase;
 
-    /// Class managing the output in the evaluation of axial to axial segment pair filters.
+    /// Class managing the output in the evaluation of axial to stereo segment pair filters.
     class AxialStereoSegmentPairFilterTree : public AxialStereoSegmentPairFilterTreeBase {
 
     public:
@@ -114,7 +114,7 @@ namespace Belle2 {
       ~AxialStereoSegmentPairFilterTree();
 
     public:
-      /// Fills the object with the information gather from the given segment to segment pair instance.
+      /// Fills the object with the information gathered from the given segment to segment pair instance.
       bool setValues(const CellWeight& mcWeight, const CellWeight& prWeight, const CDCAxialStereoSegmentPair& axialStereoSegmentPair);
 
     }; // end class AxialStereoSegmentPairFilterVars

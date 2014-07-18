@@ -24,10 +24,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <tracking/cdcLocalTracking/mclookup/CDCMCManager.h>
-//#include <tracking/cdcLocalTracking/mclookup/CDCMCHitLookUp.h>
 #endif
-
-
 
 
 //out type
@@ -64,7 +61,7 @@ void CDCLocalTrackingModule::initialize()
   StoreArray <genfit::TrackCand>::registerPersistent(m_param_gfTrackCandColName);
 
   m_segmentWorker.initialize();
-  m_segmentTripleTrackingWorker.initialize();
+  //m_segmentTripleTrackingWorker.initialize();
   m_segmentPairTrackingWorker.initialize();
 
   //StoreArray with digitized CDCHits
@@ -158,7 +155,7 @@ void CDCLocalTrackingModule::endRun()
 void CDCLocalTrackingModule::terminate()
 {
   m_segmentWorker.terminate();
-  m_segmentTripleTrackingWorker.terminate();
+  //m_segmentTripleTrackingWorker.terminate();
   m_segmentPairTrackingWorker.terminate();
 
 #ifdef HAS_CALLGRIND

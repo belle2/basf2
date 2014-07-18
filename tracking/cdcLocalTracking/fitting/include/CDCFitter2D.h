@@ -69,7 +69,7 @@ namespace Belle2 {
 
         ForwardBackwardInfo isCoaligned = hits.isCoaligned(trajectory2D);
         if (isCoaligned == BACKWARD) trajectory2D.reverse();
-        else if (isCoaligned != FORWARD) B2WARNING("Fit cannot be oriented correctly");
+        //else if (isCoaligned != FORWARD) B2WARNING("Fit cannot be oriented correctly");
       }
 
       /// Update the trajectory with a fit to the observations.
@@ -78,7 +78,7 @@ namespace Belle2 {
 
 
       //set which information should be used from the recohits
-      //usePositionAndOrientation is standard
+      //useOnlyOrientation is standard
 
       /// Setup the fitter to use only the reconstructed positions of the hits
       void useOnlyPosition() { m_usePosition = true; m_useOrientation = false;}

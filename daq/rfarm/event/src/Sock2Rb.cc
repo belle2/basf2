@@ -45,8 +45,8 @@ int Sock2Rb::ReceiveEvent(void)
   for (;;) {
     stat = m_rbuf->insq((int*)msg->buffer(), (msg->size() - 1) / 4 + 1);
     if (stat >= 0) break;
-    //    usleep(200);
-    usleep(20);
+    usleep(100);
+    //    usleep(20);
   }
   delete msg;
   return stat;

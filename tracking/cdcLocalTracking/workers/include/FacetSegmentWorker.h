@@ -135,7 +135,7 @@ namespace Belle2 {
             //create the facets
             B2DEBUG(100, "Creating the CDCRecoFacets");
             m_facets.clear();
-            m_facetCreator.createFacets(cluster, m_wirehitNeighborhood , m_facets);
+            m_facetCreator.createFacets(cluster, m_wirehitNeighborhood, m_facets);
             B2DEBUG(100, "  Created " << m_facets.size()  << " CDCRecoFacets");
 
             //create the facet neighborhood

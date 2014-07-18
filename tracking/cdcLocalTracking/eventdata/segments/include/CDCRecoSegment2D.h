@@ -36,6 +36,15 @@ namespace Belle2 {
         B2DEBUG(200, "CDCRecoSegment::swap");
       }
 
+      /// Defines segments and superlayers to be coaligned.
+      friend bool operator<(const CDCRecoSegment2D& segment, const CDCWireSuperLayer& wireSuperLayer)
+      { return segment.getISuperLayer() < wireSuperLayer.getISuperLayer(); }
+
+      /// Defines segments and superlayers to be coaligned.
+      friend bool operator<(const CDCWireSuperLayer& wireSuperLayer, const CDCRecoSegment2D& segment)
+      { return wireSuperLayer.getISuperLayer() < segment.getISuperLayer(); }
+
+
       /// Getter for the automaton cell.
       AutomatonCell& getAutomatonCell() { return m_automatonCell; }
 

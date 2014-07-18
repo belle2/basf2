@@ -145,6 +145,10 @@ namespace Belle2 {
       UncertainPerigeeCircle getLocalCircle() const
       { return getLocalHelix().uncertainCircleXY(); }
 
+      /// Getter for the chi2 value of the fit
+      FloatType getChi2() const
+      { return getLocalHelix().chi2(); }
+
       /// Getter for the two dimensional trajectory
       CDCTrajectory2D getTrajectory2D() const
       { return CDCTrajectory2D(getLocalHelix().uncertainCircleXY()); }

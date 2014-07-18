@@ -53,7 +53,7 @@ namespace Belle2 {
       void initialize() {
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
-        StoreArray < CDCAxialStereoSegmentPairs >::registerTransient("CDCAxialStereoSegmentPairs");
+        StoreArray < CDCAxialStereoSegmentPair >::registerTransient("CDCAxialStereoSegmentPairs");
         StoreArray < CDCTrack >::registerTransient("CDCTracks");
 #endif
 
@@ -129,7 +129,7 @@ namespace Belle2 {
         // IO segment triples
         B2DEBUG(100, "  Creating the StoreArray for the CDCAxialStereoSegmentPair");
         StoreArray < CDCAxialStereoSegmentPair > storedAxialStereoSegmentPairs("CDCAxialStereoSegmentPairs");
-        storedSegmentTriples.create();
+        storedAxialStereoSegmentPairs.create();
         for (const CDCAxialStereoSegmentPair & axialStereoSegmentPair :  m_axialStereoSegmentPairs) {
           storedAxialStereoSegmentPairs.appendNew(axialStereoSegmentPair);
         }

@@ -29,11 +29,8 @@ namespace Belle2 {
     class AxialStereoSegmentPairCreator {
 
     private:
-      /// Iterator type of the input segments;
-      typedef std::vector<CDCRecoSegment2D>::const_iterator CDCRecoSegmentIterator;
-
       /// Iterator range type usable with range based for of input segments.
-      typedef boost::iterator_range<CDCRecoSegmentIterator> CDCRecoSegmentRange;
+      typedef std::vector<const CDCRecoSegment2D* > CDCRecoSegmentRange;
 
       /// Storage structure type for axial segements by their superlayer id
       typedef CDCRecoSegmentRange SegmentRangesBySuperLayer[CDCWireTopology::N_SUPERLAYERS];
@@ -66,7 +63,10 @@ namespace Belle2 {
         ISuperLayerType lastISuperLayer = INNER_ISUPERLAYER;
 
         for (const CDCRecoSegment2D & segment : segments) {
-          if (lastISuperLayer > segment.getISuperLayer()) return false;
+          if (lastISuperLayer > segment.getISuperLayer()) {
+            B2ERROR("not " << lastISuperLayer << " > " <<  segment.getISuperLayer());
+            return false;
+          }
           lastISuperLayer = segment.getISuperLayer();
         }
         return true;
@@ -78,25 +78,18 @@ namespace Belle2 {
       inline void create(const std::vector<CDCRecoSegment2D>& segments,
                          std::vector<CDCAxialStereoSegmentPair>& axialStereoSegmentPairs) const {
 
-        if (not checkSegmentsSortedBySuperLayer(segments)) {
-          B2ERROR("Given CDCRecoSegments are not sorted by superlayer");
-          return;
-        }
 
         SegmentRangesBySuperLayer segmentRangesBySuperLayer;
 
-        CDCRecoSegmentIterator itBeginSegmentsInSuperLayer = std::begin(segments);
-        const CDCRecoSegmentIterator itEndSegments = std::end(segments);
-
-        for (ISuperLayerType iSuperLayer = 0; iSuperLayer < CDCWireTopology::N_SUPERLAYERS; ++iSuperLayer) {
-          std::pair<CDCRecoSegmentIterator, CDCRecoSegmentIterator> itPairSegmentsInSuperLayer = std::equal_range(itBeginSegmentsInSuperLayer, itEndSegments, iSuperLayer);
-          segmentRangesBySuperLayer[iSuperLayer] = CDCRecoSegmentRange(itPairSegmentsInSuperLayer.first, itPairSegmentsInSuperLayer.second);
-          //End iterator is the start of the next superlayer
-          itBeginSegmentsInSuperLayer = itPairSegmentsInSuperLayer.second;
+        for (const CDCRecoSegment2D & segment : segments) {
+          const CDCRecoSegment2D* ptrSegment = &segment;
+          ISuperLayerType iSuperLayer = segment.getISuperLayer();
+          segmentRangesBySuperLayer[iSuperLayer].push_back(ptrSegment);
         }
 
         create(segmentRangesBySuperLayer, axialStereoSegmentPairs);
 
+        std::sort(std::begin(axialStereoSegmentPairs), std::end(axialStereoSegmentPairs));
 
       }
 
@@ -143,15 +136,12 @@ namespace Belle2 {
 
         CDCAxialStereoSegmentPair axialStereoSegmentPair;
 
-        for (const CDCRecoSegment2D & startSegment : startSegments) {
-          for (const CDCRecoSegment2D & endSegment : endSegments) {
+        for (const CDCRecoSegment2D * ptrStartSegment : startSegments) {
+          for (const CDCRecoSegment2D * ptrEndSegment : endSegments) {
 
-            const CDCRecoSegment2D* ptrStartSegment = &startSegment;
-            const CDCRecoSegment2D* ptrEndSegment = &endSegment;
-
-            if (&ptrStartSegment == &ptrEndSegment) continue; //Just for safety
+            if (ptrStartSegment == ptrEndSegment) continue; //Just for safety
             axialStereoSegmentPair.setSegments(ptrStartSegment, ptrEndSegment);
-            axialStereoSegmentPair.clearTrajectories();
+            axialStereoSegmentPair.clearTrajectory3D();
 
             if (axialStereoSegmentPair.getTrajectory2D().isFitted()) {
               B2ERROR("CDCAxialAxialSegmentPair still fitted after clearing.")

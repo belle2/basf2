@@ -80,8 +80,10 @@ namespace Belle2 {
 
 
       /// Getter for the perigee subcovariance
-      PerigeeCovariance perigeeCovariance() const
-      { return matrix().GetSub(0, 3, 0, 3); }
+      PerigeeCovariance perigeeCovariance() const {
+        //Note upper bound is inclusive (not exclusive like in e.g. Python)
+        return matrix().GetSub(0, 2, 0, 2);
+      }
 
 
       /// Modifies to helix covariance matrix inplace to represent the reverse travel direction.

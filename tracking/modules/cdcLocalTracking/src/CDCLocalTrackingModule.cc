@@ -63,7 +63,8 @@ void CDCLocalTrackingModule::initialize()
   StoreArray <genfit::TrackCand>::registerPersistent(m_param_gfTrackCandColName);
 
   m_segmentWorker.initialize();
-  m_trackingWorker.initialize();
+  m_segmentTripleTrackingWorker.initialize();
+  m_segmentPairTrackingWorker.initialize();
 
   //StoreArray with digitized CDCHits
   StoreArray <CDCHit>::required();
@@ -89,14 +90,21 @@ void CDCLocalTrackingModule::event()
 {
   B2DEBUG(100, "########## CDCLocalTracking begin ##########");
 
+
+
 #ifdef CDCLOCALTRACKING_USE_MC_FILTERS
   CDCMCManager::getInstance().clear();
   CDCMCManager::getInstance().fill();
 #endif
 
+
+
 #ifdef HAS_CALLGRIND
   CALLGRIND_START_INSTRUMENTATION;
 #endif
+
+
+
   //Start callgrind recording
   //To profile start basf2 with
   //  nohup valgrind --tool=callgrind --instr-atstart=no basf2 [basf2-options] > output.txt &
@@ -104,10 +112,14 @@ void CDCLocalTrackingModule::event()
   // Do a callgrind_control -b for an intermediate output or callgrind_control -b -e
   // Definitions need callgrind.h
 
+
+
   //fetch the CDCHits from the datastore
   B2DEBUG(100, "Getting the CDCHits from the data store");
   StoreArray <CDCHit> storedCDCHits;
   B2DEBUG(100, "  storedCDCHits.getEntries() == " << storedCDCHits.getEntries());
+
+
 
   //create the wirehits
   B2DEBUG(100, "Creating all CDCWireHits");
@@ -119,15 +131,22 @@ void CDCLocalTrackingModule::event()
   }
   CDCWireHitTopology::CDCWireHitRange allWireHitRange = wireHitTopology.getWireHits();
 
+
+
   //build the segments
   m_recoSegments.clear();
   m_segmentWorker.apply(allWireHitRange, m_recoSegments);
   B2DEBUG(100, "Received " << m_recoSegments.size() << " RecoSegments from worker");
 
+
+
   //build the gfTracks
   StoreArray < genfit::TrackCand > storedGFTrackCands(m_param_gfTrackCandColName);
   storedGFTrackCands.create();
-  m_trackingWorker.apply(m_recoSegments, storedGFTrackCands);
+  //m_segmentTripleTrackingWorker.apply(m_recoSegments, storedGFTrackCands);
+  m_segmentPairTrackingWorker.apply(m_recoSegments, storedGFTrackCands);
+
+
 
   //End callgrind recording
 #ifdef HAS_CALLGRIND
@@ -145,7 +164,8 @@ void CDCLocalTrackingModule::endRun()
 void CDCLocalTrackingModule::terminate()
 {
   m_segmentWorker.terminate();
-  m_trackingWorker.terminate();
+  m_segmentTripleTrackingWorker.terminate();
+  m_segmentPairTrackingWorker.terminate();
 
 #ifdef HAS_CALLGRIND
   CALLGRIND_DUMP_STATS;

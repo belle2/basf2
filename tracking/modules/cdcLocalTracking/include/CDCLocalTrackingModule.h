@@ -21,6 +21,8 @@
 #include <tracking/cdcLocalTracking/workers/FacetSegmentWorker.h>
 #include <tracking/cdcLocalTracking/workers/SegmentTripleTrackingWorker.h>
 
+#include <tracking/cdcLocalTracking/workers/SegmentPairTrackingWorker.h>
+
 namespace Belle2 {
 
   /// Module for the cellular automaton tracking for the CDC
@@ -67,7 +69,14 @@ namespace Belle2 {
     CDCLocalTracking::AxialAxialSegmentPairFilter,
                      CDCLocalTracking::SegmentTripleFilter,
                      CDCLocalTracking::SegmentTripleNeighborChooser
-                     > m_trackingWorker;
+                     > m_segmentTripleTrackingWorker;
+
+    /// Worker to carry out the second stage generating tracks from segments utilizing pairs of segments.
+    CDCLocalTracking::SegmentPairTrackingWorker <
+    CDCLocalTracking::AxialStereoSegmentPairFilter,
+                     CDCLocalTracking::AxialStereoSegmentPairNeighborChooser
+                     > m_segmentPairTrackingWorker;
+
 
   }; // end class
 } // end namespace Belle2

@@ -88,6 +88,10 @@ TEST_F(CDCLocalTrackingTest, PerigeeCircle_passiveMovedCovarianceBy)
 
   {
     TMatrixDSym noMoveVariance = circle.passiveMovedCovarianceBy(Vector2D(0.0, 0.0));
+
+    EXPECT_EQ(3, noMoveVariance.GetNrows());
+    EXPECT_EQ(3, noMoveVariance.GetNcols());
+
     EXPECT_NEAR(1.0, noMoveVariance(0, 0), 10e-7);
     EXPECT_NEAR(0.0, noMoveVariance(0, 1), 10e-7);
     EXPECT_NEAR(0.0, noMoveVariance(0, 2), 10e-7);
@@ -103,6 +107,10 @@ TEST_F(CDCLocalTrackingTest, PerigeeCircle_passiveMovedCovarianceBy)
 
   {
     TMatrixDSym noChangeMoveVariance = circle.passiveMovedCovarianceBy(Vector2D(-1.0, 0.0));
+
+    EXPECT_EQ(3, noChangeMoveVariance.GetNrows());
+    EXPECT_EQ(3, noChangeMoveVariance.GetNcols());
+
     EXPECT_NEAR(1.0, noChangeMoveVariance(0, 0), 10e-7);
     EXPECT_NEAR(0.0, noChangeMoveVariance(0, 1), 10e-7);
     EXPECT_NEAR(0.0, noChangeMoveVariance(0, 2), 10e-7);
@@ -119,6 +127,9 @@ TEST_F(CDCLocalTrackingTest, PerigeeCircle_passiveMovedCovarianceBy)
 
   {
     TMatrixDSym transformedVariance = circle.passiveMovedCovarianceBy(Vector2D(2.0, 0.0));
+
+    EXPECT_EQ(3, transformedVariance.GetNrows());
+    EXPECT_EQ(3, transformedVariance.GetNcols());
 
     EXPECT_NEAR(1.0, transformedVariance(0, 0), 10e-7);
 
@@ -140,6 +151,9 @@ TEST_F(CDCLocalTrackingTest, PerigeeCircle_passiveMovedCovarianceBy)
   {
     // Should be same as before
     TMatrixDSym transformedVariance = circle.passiveMovedCovarianceBy(Vector2D(2.5, 0.0));
+
+    EXPECT_EQ(3, transformedVariance.GetNrows());
+    EXPECT_EQ(3, transformedVariance.GetNcols());
 
     EXPECT_NEAR(1, transformedVariance(0, 0), 10e-7);
 

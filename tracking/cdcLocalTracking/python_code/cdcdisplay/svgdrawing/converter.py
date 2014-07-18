@@ -69,6 +69,7 @@ class CDCDataobjectsConverter:
                 Belle2.CDCLocalTracking.CDCWireHitCluster: self.CDCGenericHitCollectionToSVG,
                 Belle2.CDCLocalTracking.CDCRecoSegment2D: self.CDCGenericHitCollectionToSVG,
                 Belle2.CDCLocalTracking.CDCAxialAxialSegmentPair: self.CDCAxialAxialSegmentPairToSVG,
+                Belle2.CDCLocalTracking.CDCAxialStereoSegmentPair: self.CDCAxialStereoSegmentPairToSVG,
                 Belle2.CDCLocalTracking.CDCSegmentTriple: self.CDCSegmentTripleToSVG,
                 Belle2.CDCLocalTracking.CDCTrack: self.CDCGenericHitCollectionToSVG,
                 Belle2.CDCLocalTracking.CDCTrajectory2D: self.CDCTrajectory2DToSVG,
@@ -471,21 +472,51 @@ class CDCDataobjectsConverter:
 
         return groupElement
 
-    def CDCAxialAxialSegmentPairToSVG(self, segmentTriple, **kwd):
+    def CDCAxialAxialSegmentPairToSVG(self, axialAxialPair, **kwd):
         """Maps a CDCAxialAxialSegmentPair to a line connecting the center of masses of the two segments."""
 
         childElements = []
         defaultStyleDict = {'stroke': 'black', 'stroke-width': '0.02'}
         defaultStyleDict.update(kwd)
 
-        startSegment = segmentTriple.getStart()
-        endSegment = segmentTriple.getEnd()
+        startSegment = axialAxialPair.getStart()
+        endSegment = axialAxialPair.getEnd()
 
         startElement = self.toSVG(startSegment, **kwd)
         endElement = self.toSVG(endSegment, **kwd)
 
-        comStart = segmentTriple.getStart().getCenterOfMass2D()
-        comEnd = segmentTriple.getEnd().getCenterOfMass2D()
+        comStart = startSegment.getCenterOfMass2D()
+        comEnd = endSegment.getCenterOfMass2D()
+
+        arrowStyleDict = dict(defaultStyleDict)
+        arrowStyleDict['marker-end'] = 'url(#markerEndArrow)'
+
+        fromPoint1 = (comStart.x(), comStart.y())
+        toPoint1 = (comEnd.x(), comEnd.y())
+
+        arrowElement1 = self.svgElementFactory.createLine(fromPoint1,
+                toPoint1, **arrowStyleDict)
+        childElements.append(arrowElement1)
+
+        groupElement = self.svgElementFactory.createGroup(*childElements)
+
+        return groupElement
+
+    def CDCAxialStereoSegmentPairToSVG(self, axialStereoPair, **kwd):
+        """Maps a CDCAxialAxialSegmentPair to a line connecting the center of masses of the two segments."""
+
+        childElements = []
+        defaultStyleDict = {'stroke': 'black', 'stroke-width': '0.02'}
+        defaultStyleDict.update(kwd)
+
+        startSegment = axialStereoPair.getStartSegment()
+        endSegment = axialStereoPair.getEndSegment()
+
+        startElement = self.toSVG(startSegment, **kwd)
+        endElement = self.toSVG(endSegment, **kwd)
+
+        comStart = startSegment.getCenterOfMass2D()
+        comEnd = endSegment.getCenterOfMass2D()
 
         arrowStyleDict = dict(defaultStyleDict)
         arrowStyleDict['marker-end'] = 'url(#markerEndArrow)'

@@ -25,11 +25,17 @@
 #include <tracking/cdcLocalTracking/filters/axial_axial/MCAxialAxialSegmentPairFilter.h>
 #include <tracking/cdcLocalTracking/filters/axial_axial/EvaluateAxialAxialSegmentPairFilter.h>
 
+#include <tracking/cdcLocalTracking/filters/axial_stereo/MCAxialStereoSegmentPairFilter.h>
+
+#include <tracking/cdcLocalTracking/filters/axial_stereo_axial_stereo/MCAxialStereoSegmentPairNeighborChooser.h>
+
+
 #include <tracking/cdcLocalTracking/filters/segment_triple/SimpleSegmentTripleFilter.h>
 #include <tracking/cdcLocalTracking/filters/segment_triple_segment_triple/SimpleSegmentTripleNeighborChooser.h>
 
 #include <tracking/cdcLocalTracking/filters/segment_triple/MCSegmentTripleFilter.h>
 #include <tracking/cdcLocalTracking/filters/segment_triple_segment_triple/MCSegmentTripleNeighborChooser.h>
+
 
 
 
@@ -97,6 +103,29 @@ namespace Belle2 {
     typedef CDCLocalTracking::SimpleAxialAxialSegmentPairFilter AxialAxialSegmentPairFilter;
     typedef CDCLocalTracking::SimpleSegmentTripleFilter SegmentTripleFilter;
     typedef CDCLocalTracking::SimpleSegmentTripleNeighborChooser SegmentTripleNeighborChooser;
+
+#endif
+
+
+
+
+
+#ifdef CDCLOCALTRACKING_USE_MC_FILTERS
+#ifdef CDCLOCALTRACKING_USE_EVALUATE_FILTERS
+
+    //No optimizing filters and choosers for segment triples yet.
+    typedef MCAxialStereoSegmentPairFilter AxialStereoSegmentPairFilter;
+    typedef MCAxialStereoSegmentPairNeighborChooser AxialStereoSegmentPairNeighborChooser;
+
+#else
+    typedef MCAxialStereoSegmentPairFilter AxialStereoSegmentPairFilter;
+    typedef MCAxialStereoSegmentPairNeighborChooser AxialStereoSegmentPairNeighborChooser;
+
+#endif
+
+#else
+    typedef MCAxialStereoSegmentPairFilter AxialStereoSegmentPairFilter;
+    typedef MCAxialStereoSegmentPairNeighborChooser AxialStereoSegmentPairNeighborChooser;
 
 #endif
 

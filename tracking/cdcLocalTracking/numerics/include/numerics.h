@@ -97,19 +97,18 @@ namespace Belle2 {
         //essentially this is the zero position of a line
         smallSolution = - c / b
         bigSolution = std::numeric_limits<FloatType>::infinity() ;
-
-      } else */
-      {
-
-        const double discriminant = ((double)b) * b - 4 * a * c;
-        const double root = sqrt(discriminant);
-
-        const double bigSum = (b > 0) ? -b - root : -b + root;
-
-        bigSolution = bigSum / 2 / a;
-        smallSolution = 2 * c / bigSum;
-
+      return result;
       }
+      */
+
+      const double discriminant = ((double)b) * b - 4 * a * c;
+      const double root = sqrt(discriminant);
+
+      const double bigSum = (b > 0) ? -b - root : -b + root;
+
+      bigSolution = bigSum / 2 / a;
+      smallSolution = 2 * c / bigSum;
+
       return result;
     }
 

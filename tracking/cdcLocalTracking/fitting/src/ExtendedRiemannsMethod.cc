@@ -317,7 +317,7 @@ namespace {
     reduce(iReducedN3, iN1) = 2 * n0 / rotN1;
 
 
-    // Instead of doing the two transformations seperatly we combine matrices and apply a single transformation
+    // Instead of doing the two transformations seperatly we combine the matrices and apply a single transformation.
     // This saves one matrix multiplication.
     // Matrix<FloatType, 4, 4> rotS = rot * s * rot.transpose();
     // Matrix<FloatType, 3, 3> reducedNInvV = reduce * rotS * reduce.transpose();
@@ -325,7 +325,7 @@ namespace {
     Matrix< FloatType, 3, 4 > rotAndReduce = reduce * rot;
     Matrix< FloatType, 3, 3> reducedNInvCov = rotAndReduce * s * rotAndReduce.transpose();
 
-    //Zero out the unconsidered Parameters before inversion. Keep one the diagonal.
+    //Zero out the unconsidered parameters before inversion. Keep one on the diagonal.
     if (lineConstrained) {
       reducedNInvCov.row(iReducedN3) = Matrix<FloatType, 1, 3>::Zero();
       reducedNInvCov.col(iReducedN3) = Matrix<FloatType, 3, 1>::Zero();
@@ -351,7 +351,7 @@ namespace {
     // 3. Translate to perigee
     Matrix< FloatType, 3, 3 > perigeeJ;
 
-    FloatType normN12 = fabs(rotN1); // = 1 / hypot(n1, n2);
+    FloatType normN12 = fabs(rotN1); // = hypot(n1, n2);
     FloatType denominator = (1 + normN12) * (1 + normN12) * normN12;
     perigeeJ(iCurv, iReducedN0) = 0;
     perigeeJ(iCurv, iReducedN2) = 0;

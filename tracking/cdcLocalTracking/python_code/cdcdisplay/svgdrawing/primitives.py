@@ -136,13 +136,13 @@ class Bound:
             d_parts = d_value.split(' ')
             if d_parts[0] == 'M' and d_parts[3] == 'A' and len(d_parts) == 11 \
                 and d_parts[4] == d_parts[5]:
-        # Path is a circle arc
-        # d_value = "M {x0} {y0} A {r} {r} {rotation} {long_arc}
-        # {sweep_flag} {x1} {y1}"
+                # Path is a circle arc
+                # d_value = "M {x0} {y0} A {r} {r} {rotation} {long_arc}
+                # {sweep_flag} {x1} {y1}"
                 x0 = float(d_parts[1])
                 y0 = float(d_parts[2])
                 r = float(d_parts[4])
-        # r = float(d_parts[5])
+                # r = float(d_parts[5])
                 rotation = float(d_parts[6])
 
                 long_arc = int(d_parts[7]) != 0
@@ -299,7 +299,7 @@ class SVGPrimitivesFactory:
         circleElement.setAttribute('cy', repr(cy))
 
         circleElement.setAttribute('r', repr(radius))
-                # the stroke-width fills the rest
+        # the stroke-width fills the rest
 
         for (attrName, attrValue) in kwd.iteritems():
             circleElement.setAttribute(attrName, str(attrValue))
@@ -352,9 +352,9 @@ class SVGPrimitivesFactory:
         else:
             sweep_flag = 0
 
-    # Compose path specification
-    # d_value = "M {x0} {y0} A {rx} {ry} {rotation}
-    # {long_arc} {sweep_flag} {x1} {y1}"
+        # Compose path specification
+        # d_value = "M {x0} {y0} A {rx} {ry} {rotation}
+        # {long_arc} {sweep_flag} {x1} {y1}"
 
         d_value_parts = [
             'M',

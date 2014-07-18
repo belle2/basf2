@@ -197,7 +197,7 @@ class CDCDataobjectsConverter:
         styleDict = {'stroke': 'yellow', 'stroke-width': '0.02'}
         styleDict.update(kwd)
 
-    # mark trackPoint where hit occured
+        # mark trackPoint where hit occured
         simhitVector = cdcsimhit.getPosTrack()
         simhitPoint = (simhitVector.X(), simhitVector.Y())
 
@@ -377,7 +377,7 @@ class CDCDataobjectsConverter:
         wire = wirehit.getWire()
         wireSVGElement = self.toSVG(wire, **kwd)
 
-    # defaultStyleDict = {'stroke':'black','stroke-width':'0.1','fill':'none'}
+        # defaultStyleDict = {'stroke':'black','stroke-width':'0.1','fill':'none'}
         defaultStyleDict = {'stroke': 'black', 'stroke-width': '0.02',
                             'fill': 'none'}
 
@@ -457,7 +457,7 @@ class CDCDataobjectsConverter:
         lineElement = self.svgElementFactory.createLine(fromPoint, toPoint,
                 **styleDict)
 
-    # supportPoints
+        # supportPoints
         supportPointRadius = 0.015
 
         self.styleFillUpdate(styleDict)
@@ -508,9 +508,9 @@ class CDCDataobjectsConverter:
         defaultStyleDict = {'stroke': 'black', 'stroke-width': '0.02'}
         defaultStyleDict.update(kwd)
 
-    # print segmentTriple.getStartISuperLayer(),
-    # segmentTriple.getMiddleISuperLayer(), segmentTriple.getEndISuperLayer()
-    # print "plot segments"
+        # print segmentTriple.getStartISuperLayer(),
+        # segmentTriple.getMiddleISuperLayer(), segmentTriple.getEndISuperLayer()
+        # print "plot segments"
 
         startSegment = segmentTriple.getStart()
         middleSegment = segmentTriple.getMiddle()
@@ -520,15 +520,15 @@ class CDCDataobjectsConverter:
         middleElement = self.toSVG(middleSegment, **kwd)
         endElement = self.toSVG(endSegment, **kwd)
 
-    # childElements.append(startElement)
-    # childElements.append(middleElement)
-    # childElements.append(endElement)
+        # childElements.append(startElement)
+        # childElements.append(middleElement)
+        # childElements.append(endElement)
 
-    # print "Start", startSegment.size()
-    # print type(startSegment)
-    # print dir(startSegment)
+        # print "Start", startSegment.size()
+        # print type(startSegment)
+        # print dir(startSegment)
 
-    # print "plotted segments"
+        # print "plotted segments"
 
         xyFit = segmentTriple.getTrajectory2D()
 
@@ -536,25 +536,25 @@ class CDCDataobjectsConverter:
         comMiddle = segmentTriple.getMiddle().getCenterOfMass2D()
         comEnd = segmentTriple.getEnd().getCenterOfMass2D()
 
-    # print "comStart", comStart.x(),comStart.y()
-    # print "comMiddle", comMiddle.x(),comMiddle.y()
-    # print "comStart", comEnd.x(),comEnd.y()
+        # print "comStart", comStart.x(),comStart.y()
+        # print "comMiddle", comMiddle.x(),comMiddle.y()
+        # print "comStart", comEnd.x(),comEnd.y()
 
-    # print "get closest approaches"
+        # print "get closest approaches"
 
         fitPointStart = xyFit.getClosest(comStart)
         fitPointMiddle = xyFit.getClosest(comMiddle)
         fitPointEnd = xyFit.getClosest(comEnd)
 
-    # print "fitPointStart", fitPointStart.x(),fitPointStart.y()
-    # print "fitPointMiddle", fitPointMiddle.x(),fitPointMiddle.y()
-    # print "fitPointEnd", fitPointEnd.x(),fitPointEnd.y()
+        # print "fitPointStart", fitPointStart.x(),fitPointStart.y()
+        # print "fitPointMiddle", fitPointMiddle.x(),fitPointMiddle.y()
+        # print "fitPointEnd", fitPointEnd.x(),fitPointEnd.y()
 
         startPointElement = self.toSVG(fitPointStart, **kwd)
         middlePointElement = self.toSVG(fitPointMiddle, **kwd)
         endPointElement = self.toSVG(fitPointEnd, **kwd)
 
-    # print "got central points"
+        # print "got central points"
 
         arrowStyleDict = dict(defaultStyleDict)
         arrowStyleDict['marker-end'] = 'url(#markerEndArrow)'
@@ -574,7 +574,7 @@ class CDCDataobjectsConverter:
         childElements.append(arrowElement2)
 
         fitElement = self.toSVG(xyFit)
-    # childElements.append(fitElement)
+        # childElements.append(fitElement)
 
         groupElement = self.svgElementFactory.createGroup(*childElements)
 
@@ -622,8 +622,8 @@ class CDCDataobjectsConverter:
             exitPoint = (trajectoryExit.x(), trajectoryExit.y())
 
             if trajectoryExit.hasNAN():
-        # no exit
-        # draw full circle
+                # no exit
+                # draw full circle
                 circleElement = \
                     self.svgElementFactory.createCircle(centerPoint, radius,
                         **styleDict)
@@ -636,8 +636,8 @@ class CDCDataobjectsConverter:
                     sweep_flag = 1
 
                 if fit.calcPerpS(trajectoryExit) > 0:
-          # check if exit point is on the close or
-          # on the far side of the circle
+                    # check if exit point is on the close or
+                    # on the far side of the circle
                     long_arc = 0
                 else:
                     long_arc = 1
@@ -653,14 +653,14 @@ class CDCDataobjectsConverter:
                 svgElements.append(circleArcElement)
         elif fit.getCircle().isLine():
 
-      # print "isline"
+            # print "isline"
             start = fit.getStartPos2D()
             startPoint = (start.x(), start.y())
 
             trajectoryExit = fit.getExit()
             exitPoint = (trajectoryExit.x(), trajectoryExit.y())
 
-      # print  "fitted line", fromPoint, toPoint
+            # print  "fitted line", fromPoint, toPoint
 
             styleDict = {'stroke': 'black', 'stroke-width': '0.02'}
             styleDict.update(kwd)

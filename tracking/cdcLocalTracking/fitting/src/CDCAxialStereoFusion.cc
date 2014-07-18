@@ -39,10 +39,14 @@ TMatrixD CDCLocalTracking::calcAmbiguity(const CDCRecoSegment2D& segment,
   }
 
   TMatrixD result(3, 5);
-  result.UnitMatrix();
+  result.Zero();
 
-  result(iPhi0, iSZ) = zeta;
-  result(iI, iZ0) = -zeta;
+  result(iCurv, iCurv) = 1.0;
+  result(iPhi0, iPhi0) = 1.0;
+  result(iI, iI)       = 1.0;
+
+  result(iPhi0, iSZ)   = zeta;
+  result(iI, iZ0)      = -zeta;
 
   return result;
 

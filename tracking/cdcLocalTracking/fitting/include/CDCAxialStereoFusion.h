@@ -15,10 +15,10 @@
 
 #include <tracking/cdcLocalTracking/eventdata/trajectories/CDCTrajectories.h>
 #include <tracking/cdcLocalTracking/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/cdcLocalTracking/eventdata/tracks/CDCAxialStereoSegmentPair.h>
 
 #include "TMatrixD.h"
 #include "TVectorD.h"
-
 
 namespace Belle2 {
   namespace CDCLocalTracking {
@@ -28,6 +28,8 @@ namespace Belle2 {
 
     CDCTrajectory3D fuseTrajectories(const CDCRecoSegment2D& startSegment,
                                      const CDCRecoSegment2D& endSegment);
+
+    void fuseTrajectories(const CDCAxialStereoSegmentPair& axialStereoSegmentPair);
 
   } // end namespace CDCLocalTracking
 } // namespace Belle2

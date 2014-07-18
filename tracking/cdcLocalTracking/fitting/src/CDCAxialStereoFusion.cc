@@ -165,3 +165,29 @@ CDCTrajectory3D CDCLocalTracking::fuseTrajectories(const CDCRecoSegment2D& start
   return CDCTrajectory3D(localOrigin3D, resultHelix);
 
 }
+
+
+
+void CDCLocalTracking::fuseTrajectories(const CDCAxialStereoSegmentPair& axialStereoSegmentPair)
+{
+  const CDCRecoSegment2D* ptrStartSegment = axialStereoSegmentPair.getStartSegment();
+  const CDCRecoSegment2D* ptrEndSegment = axialStereoSegmentPair.getEndSegment();
+
+  if (not ptrStartSegment) {
+    B2WARNING("Start segment unset.");
+    return;
+  }
+
+  if (not ptrEndSegment) {
+    B2WARNING("End segment unset.");
+    return;
+  }
+
+  const CDCRecoSegment2D& startSegment = *ptrStartSegment;
+  const CDCRecoSegment2D& endSegment = *ptrEndSegment;
+
+  CDCTrajectory3D trajectory3D = fuseTrajectories(startSegment, endSegment);
+  axialStereoSegmentPair.setTrajectory3D(trajectory3D);
+
+}
+

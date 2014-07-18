@@ -10,8 +10,6 @@
 
 #include "../include/CDCAxialStereoSegmentPair.h"
 
-#include <tracking/cdcLocalTracking/fitting/CDCAxialStereoFusion.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
@@ -54,30 +52,3 @@ CDCAxialStereoSegmentPair::CDCAxialStereoSegmentPair(const CDCAxialRecoSegment2D
 CDCAxialStereoSegmentPair::~CDCAxialStereoSegmentPair()
 {
 }
-
-
-void CDCAxialStereoSegmentPair::fuseTrajectories() const
-{
-
-  clearTrajectory3D();
-
-  const CDCRecoSegment2D* ptrStartSegment = getStartSegment();
-  const CDCRecoSegment2D* ptrEndSegment = getEndSegment();
-
-  if (not ptrStartSegment) {
-    B2WARNING("Start segment unset.");
-    return;
-  }
-
-  if (not ptrEndSegment) {
-    B2WARNING("End segment unset.");
-    return;
-  }
-
-  const CDCRecoSegment2D& startSegment = *ptrStartSegment;
-  const CDCRecoSegment2D& endSegment = *ptrEndSegment;
-
-  m_trajectory3D = ::fuseTrajectories(startSegment, endSegment);
-
-}
-

@@ -11,6 +11,7 @@
 #include "../include/SimpleAxialStereoSegmentPairFilter.h"
 
 #include <framework/logging/Logger.h>
+#include <tracking/cdcLocalTracking/fitting/CDCAxialStereoFusion.h>
 
 using namespace std;
 using namespace Belle2;
@@ -78,24 +79,47 @@ CellWeight SimpleAxialStereoSegmentPairFilter::isGoodAxialStereoSegmentPair(cons
   }
 
   // Check if there is a positive gap between start and end segment
-  //FloatType startFitGap = startFit.getPerpSGap(startSegment, endSegment);
-  //FloatType endFitGap = endFit.getPerpSGap(startSegment, endSegment);
+  FloatType startFitGap = startFit.getPerpSGap(startSegment, endSegment);
+  FloatType endFitGap = endFit.getPerpSGap(startSegment, endSegment);
 
-  //if (startFitGap < 0 or startFitGap > 100 or endFitGap < 0 or endFitGap > 100) {
-  //  return NOT_A_CELL;
-  //}
+  if (startFitGap < -5 or startFitGap > 50 or endFitGap < -5 or endFitGap > 50) {
+    return NOT_A_CELL;
+  }
 
   FloatType startFitFrontOffset = startFit.getPerpSFrontOffset(startSegment, endSegment);
   FloatType endFitBackOffset = endFit.getPerpSBackOffset(startSegment, endSegment);
 
-  if (startFitFrontOffset < 0 or endFitBackOffset < 0) {
+  if (startFitFrontOffset < 0 or startFitFrontOffset > 50 or endFitBackOffset < 0 or endFitBackOffset > 50) {
     return NOT_A_CELL;
   }
 
-  const CDCTrajectory3D& combinedFit = getFittedTrajectory3D(axialStereoSegmentPair);
-  combinedFit.getChi2();
+  // Momentum agreement cut
+  Vector2D startMomAtCenter = startFit.getUnitMom2DAtCenter(startSegment);
+  Vector2D endMomAtCenter = endFit.getUnitMom2DAtCenter(endSegment);
 
-  return startSegment.size() + endSegment.size();
+  Vector2D startMomAtExtrapolation = startFit.getUnitMom2DAtCenter(endSegment);
+  Vector2D endMomAtExtrapolation = endFit.getUnitMom2DAtCenter(startSegment);
+
+  FloatType momAngleAtStartCenter = startMomAtCenter.angleWith(endMomAtExtrapolation);
+  FloatType momAngleAtEndCenter = endMomAtCenter.angleWith(startMomAtExtrapolation);
+
+  if (momAngleAtEndCenter > 1 or momAngleAtStartCenter > 1) {
+    return NOT_A_CELL;
+  }
+
+  // Proximity cut
+  FloatType startFit_dist2DToFront_endSegment = startFit.getDist2DToFront(endSegment);
+  FloatType endFit_dist2DToBack_startSegment = endFit.getDist2DToBack(startSegment);
+
+  if (startFit_dist2DToFront_endSegment < 10 and  endFit_dist2DToBack_startSegment < 10)
+    return startSegment.size() + endSegment.size();
+  else {
+    return NOT_A_CELL;
+  }
+
+  // const CDCTrajectory3D& combinedFit = getFittedTrajectory3D(axialStereoSegmentPair);
+  // combinedFit.getChi2();
+  // return startSegment.size() + endSegment.size();
 
 }
 
@@ -124,11 +148,10 @@ const CDCTrajectory3D& SimpleAxialStereoSegmentPairFilter::getFittedTrajectory3D
   const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
 
   //do fits if still necessary.
-  const CDCTrajectory2D& startFit = getFittedTrajectory2D(startSegment);
-  const CDCTrajectory2D& endFit = getFittedTrajectory2D(endSegment);
+  getFittedTrajectory2D(startSegment);
+  getFittedTrajectory2D(endSegment);
 
-  // combine axial and stereo fit to three dimensional trajectory
-  axialStereoSegmentPair.fuseTrajectories();
+  fuseTrajectories(axialStereoSegmentPair);
   return axialStereoSegmentPair.getTrajectory3D();
 
 }

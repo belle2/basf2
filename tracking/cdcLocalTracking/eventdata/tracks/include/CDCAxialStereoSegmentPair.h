@@ -150,7 +150,9 @@ namespace Belle2 {
         else return INVALID_INFO;
       }
 
-
+      /// Setter for the three dimensional trajectory
+      void setTrajectory3D(const CDCTrajectory3D& trajectory3D) const
+      { m_trajectory3D = trajectory3D; }
 
       /// Getter for the three dimensional trajectory.
       CDCTrajectory3D& getTrajectory3D() const
@@ -167,9 +169,6 @@ namespace Belle2 {
       /// Invalides the currently stored trajectory information.
       void clearTrajectory3D() const
       { getTrajectory3D().clear(); }
-
-      /// Combines the two two dimensional fitted trajectories of the segments to a full three dimensional trajectory.
-      void fuseTrajectories() const;
 
       /// Sets the do not use flag of the segment triple's automaton cell and of the three contained segments
       void setDoNotUse() const {

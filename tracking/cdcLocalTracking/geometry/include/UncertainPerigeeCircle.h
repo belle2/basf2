@@ -90,6 +90,14 @@ namespace Belle2 {
       const PerigeeCovariance& perigeeCovariance() const
       { return m_perigeeCovariance; }
 
+      /// Getter for individual elements of the covariance matrix
+      FloatType covariance(const PerigeeParameterIndex& iRow, const PerigeeParameterIndex& iCol) const
+      { return perigeeCovariance().matrix()(iRow, iCol); }
+
+      /// Getter for individual diagonal elements of the covariance matrix
+      FloatType variance(const PerigeeParameterIndex& i) const
+      { return perigeeCovariance().matrix()(i, i); }
+
       /// Getter for the chi square value of the circle fit
       const FloatType& chi2() const
       { return m_chi2; }

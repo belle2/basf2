@@ -18,7 +18,7 @@
 #include "TMatrixD.h"
 #include "TVectorD.h"
 
-#include "CovarianceMatrixIndices.h"
+#include "PerigeeParameterIndex.h"
 
 #include "Vector2D.h"
 #include "Line2D.h"
@@ -278,12 +278,12 @@ namespace Belle2 {
       inline Vector2D perigee() const
       { return tangential().orthogonal() * impact(); }
 
-      /// Getter for the three perigee parameters in the order defined by CovarianceMatrixIndices.h
+      /// Getter for the three perigee parameters in the order defined by PerigeeParameterIndex.h
       TVectorD parameters() const {
         TVectorD result(3);
-        result[iCurv] = curvature();
-        result[iPhi0] = phi0();
-        result[iI] = impact();
+        result(iCurv) = curvature();
+        result(iPhi0) = phi0();
+        result(iI) = impact();
         return result;
       }
 

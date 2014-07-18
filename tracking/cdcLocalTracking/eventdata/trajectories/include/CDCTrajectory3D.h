@@ -133,6 +133,19 @@ namespace Belle2 {
       }
 
     public:
+      /// Getter for the slope of z over the transverse travel distance s.
+      FloatType getSZSlope() const
+      { return getLocalHelix().szSlope(); }
+
+      /// Getter for an individual element of the covariance matrix of the local helix parameters.
+      FloatType getLocalCovariance(HelixParameterIndex iRow, HelixParameterIndex iCol) const
+      { return getLocalHelix().covariance(iRow, iCol); }
+
+      /// Getter for an individual diagonal element of the covariance matrix of the local helix parameters.
+      FloatType getLocalVariance(HelixParameterIndex i) const
+      { return getLocalHelix().variance(i); }
+
+
       /// Getter for the circle in global coordinates
       GeneralizedCircle getGlobalCircle() const {
         // Down cast since we do not necessarily wont the covariance matrix transformed as well

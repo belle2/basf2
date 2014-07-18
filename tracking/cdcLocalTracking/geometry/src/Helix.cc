@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include "../include/Helix.h"
-#include "../include/CovarianceMatrixIndices.h"
+#include "../include/HelixParameterIndex.h"
 
 using namespace std;
 
@@ -30,10 +30,10 @@ TMatrixD Helix::passiveMoveByJacobian(const Vector3D& by) const
   FloatType m = szSlope();
   FloatType sArc = circleXY().arcLengthTo(by.xy());
 
-  jacobian(4, 0) = m * (jacobian(1, 0) - sArc) / curv;
-  jacobian(4, 1) = m * (jacobian(1, 1) - 1.) / curv;
-  jacobian(4, 2) = m * jacobian(1, 2) / curv;
-  jacobian(4, 3) = sArc;
+  jacobian(iZ0, iCurv) = m * (jacobian(iPhi0, iCurv) - sArc) / curv;
+  jacobian(iZ0, iPhi0) = m * (jacobian(iPhi0, iPhi0) - 1.) / curv;
+  jacobian(iZ0, iI)    = m *  jacobian(iPhi0, iI) / curv;
+  jacobian(iZ0, iSZ)   = sArc;
 
   return jacobian;
 }

@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include "../include/PerigeeCovariance.h"
-#include "../include/CovarianceMatrixIndices.h"
+#include "../include/PerigeeParameterIndex.h"
 
 using namespace std;
 using namespace Belle2;
@@ -19,7 +19,6 @@ ClassImpInCDCLocalTracking(PerigeeCovariance)
 
 void PerigeeCovariance::reverse()
 {
-
   // Sign of impact and curvature are reversed by a reversion of the perigee parameters,
   // while the tangential phi0 gets only an offset by a constant.
   // Hence corraletions between
@@ -33,6 +32,5 @@ void PerigeeCovariance::reverse()
 
   m_matrix(iPhi0, iI) = -m_matrix(iPhi0, iI);
   m_matrix(iI, iPhi0) = -m_matrix(iI, iPhi0);
-
 
 }

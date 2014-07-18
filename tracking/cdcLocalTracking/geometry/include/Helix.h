@@ -17,7 +17,7 @@
 #include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
-#include "CovarianceMatrixIndices.h"
+#include "HelixParameterIndex.h"
 
 #include "Vector2D.h"
 #include "Line2D.h"
@@ -47,8 +47,8 @@ namespace Belle2 {
       {;}
 
       explicit Helix(const TVectorD& parameters) :
-        m_circleXY(PerigeeCircle::fromPerigeeParameters(parameters[iCurv], parameters[iPhi0], parameters[iI])),
-        m_lineSZ(Line2D::fromSlopeIntercept(parameters[iSZ], parameters[iZ0]))
+        m_circleXY(PerigeeCircle::fromPerigeeParameters(parameters(iCurv), parameters(iPhi0), parameters(iI))),
+        m_lineSZ(Line2D::fromSlopeIntercept(parameters(iSZ), parameters(iZ0)))
       {;}
 
       Helix(const FloatType& curvature,
@@ -201,14 +201,14 @@ namespace Belle2 {
       const  FloatType& phi0() const
       { return tangentialPhi(); }
 
-      /// Getter for the five helix parameters in the order defined by CovarianceMatrixIndices.h
+      /// Getter for the five helix parameters in the order defined by HelixParameterIndex.h and PerigeeParameterIndex.h
       TVectorD parameters() const {
         TVectorD result(5);
-        result[iCurv] = curvatureXY();
-        result[iPhi0] = phi0();
-        result[iI] = impactXY();
-        result[iSZ] = szSlope();
-        result[iZ0] = z0();
+        result(iCurv) = curvatureXY();
+        result(iPhi0) = phi0();
+        result(iI) = impactXY();
+        result(iSZ) = szSlope();
+        result(iZ0) = z0();
         return result;
       }
 

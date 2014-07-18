@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include "../include/PerigeeCircle.h"
-#include "../include/CovarianceMatrixIndices.h"
 
 #include <framework/logging/Logger.h>
 

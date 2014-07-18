@@ -91,6 +91,14 @@ namespace Belle2 {
       const HelixCovariance& helixCovariance() const
       { return m_helixCovariance; }
 
+      /// Getter for individual elements of the covariance matrix
+      FloatType covariance(const HelixParameterIndex& iRow, const HelixParameterIndex& iCol) const
+      { return helixCovariance().matrix()(iRow, iCol); }
+
+      /// Getter for individual diagonal elements of the covariance matrix
+      FloatType variance(const HelixParameterIndex& i) const
+      { return helixCovariance().matrix()(i, i); }
+
       /// Getter for the chi square value of the helix fit
       const FloatType& chi2() const
       { return m_chi2; }

@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include "../include/HelixCovariance.h"
-#include "../include/CovarianceMatrixIndices.h"
+#include "../include/HelixParameterIndex.h"
 
 using namespace std;
 using namespace Belle2;

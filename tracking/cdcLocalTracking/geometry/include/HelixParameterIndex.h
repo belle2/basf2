@@ -7,26 +7,31 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef COVARIANCEMATRIXINDICES_H
-#define COVARIANCEMATRIXINDICES_H
+#ifndef HELIXPARAMETERINDEX_H
+#define HELIXPARAMETERINDEX_H
 
-#include "stddef.h"
+#include "PerigeeParameterIndex.h"
 
 namespace Belle2 {
 
   namespace CDCLocalTracking {
 
-    /// Helper indices for meaningfull matrix access to the matrices entries
-    const size_t iCurv = 0;
-    const size_t iPhi0 = 1;
-    const size_t iI = 2;
+    /// Helper indices for meaningfull access in a vector or matrix assoziated with helix parameters.
+    typedef PerigeeParameterIndex HelixParameterIndex;
 
-    const size_t iSZ = 3;
-    const size_t iZ0 = 4;
+    // Implicit from PerigeeParameterIndex
+    //const HelixParameterIndex iCurv = 0;
+    //const HelixParameterIndex iPhi0 = 1;
+    //const HelixParameterIndex iI = 2;
 
+    /// Constant to address the szSlope in a vector or matrix assoziated with helix parameters
+    const HelixParameterIndex iSZ = 3;
+
+    /// Constant to address the z reference point in a vector or matrix assoziated with helix parameters
+    const HelixParameterIndex iZ0 = 4;
 
   } // namespace CDCLocalTracking
 
 } // namespace Belle2
 
-#endif // COVARIANCEMATRIXINDICES_H
+#endif // HELIXPARAMETERINDEX_H

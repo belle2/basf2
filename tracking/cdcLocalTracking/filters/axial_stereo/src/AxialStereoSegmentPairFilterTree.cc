@@ -10,6 +10,8 @@
 
 #include "../include/AxialStereoSegmentPairFilterTree.h"
 
+#include <tracking/cdcLocalTracking/mclookup/CDCMCSegmentLookUp.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
@@ -46,6 +48,10 @@ bool AxialStereoSegmentPairFilterTree::setValues(const CellWeight& mcWeight, con
 
   const CDCTrajectory3D& commonFit3D = axialStereoSegmentPair.getTrajectory3D();
   const CDCTrajectory2D commonFit = commonFit3D.getTrajectory2D();
+
+  const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
+  const CDCTrajectory3D mcFit = mcSegmentLookUp.getTrajectory3D(ptrStartSegment);
+
 
   //setValue < NAMED("mcWeight") > (mcWeight);
   //setValue < NAMED("prWeight") > (prWeight);
@@ -139,6 +145,10 @@ bool AxialStereoSegmentPairFilterTree::setValues(const CellWeight& mcWeight, con
   setValue < NAMED("startFit_chi2") > (startFit.getChi2());
   setValue < NAMED("endFit_chi2") > (endFit.getChi2());
   setValue < NAMED("commonFit_chi2") > (commonFit3D.getChi2());
+
+  setValue < NAMED("commonFit_szSlope") > (commonFit3D.getSZSlope());
+  setValue < NAMED("commonFit_szSlope_variance") > (commonFit3D.getLocalVariance(iSZ));
+  setValue < NAMED("mcFit_szSlope") > (mcFit.getSZSlope());
 
   /*
   //make a cut - make this more sophisticated at some point

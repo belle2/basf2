@@ -8,19 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* This file provides the implementation of the common test fixture to all
-   test of the CDCLocalTracking code. */
-
-#include "cdcLocalTrackingTest.h"
-
-#include <string>
-#include <vector>
-
 #include <gtest/gtest.h>
+#include "CDCLocalTrackingTest.h"
 
-#include <framework/gearbox/Gearbox.h>
-#include <framework/logging/Logger.h>
-
+#include <tracking/cdcLocalTracking/eventdata/entities/CDCGenHit.h>
+#include <tracking/cdcLocalTracking/topology/CDCWire.h>
 #include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
 
 using namespace std;
@@ -28,33 +20,20 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
-
-void CDCLocalTrackingTest::SetUpTestCase()
+// Tests if CDCGenHitVector can handle CDCWireHits
+TEST_F(CDCLocalTrackingTest, CDCGenHit_totalOrdering)
 {
+  CDCGenHit lowestGenHit;
+  CDCGenHit secondLowestGenHit(WireID(0, 0, 1), Vector2D(0.0, 0.0));
+  CDCGenHit thirdLowestGenHit(WireID(0, 0, 1), Vector2D(0.0, 1.0));
 
-  //Setup the gearbox
-  Gearbox& gearbox = Gearbox::getInstance();
-
-  vector<string> backends;
-  backends.push_back("file:");
-  gearbox.setBackends(backends);
-
-  B2INFO("Start open gearbox.");
-  gearbox.open("geometry/Belle2.xml");
-  B2INFO("Finished open gearbox.");
-
-  //Also preload the CDCGeometry
-  const CDCWireTopology& wireTopology __attribute__((unused)) = CDCWireTopology::getInstance();
+  ASSERT_LT(lowestGenHit, secondLowestGenHit);
+  ASSERT_LT(secondLowestGenHit, thirdLowestGenHit);
+  ASSERT_LT(lowestGenHit, thirdLowestGenHit);
 
 }
 
-void CDCLocalTrackingTest::TearDownTestCase()
-{
 
-  Gearbox& gearbox = Gearbox::getInstance();
-  gearbox.close();
-
-}
 
 
 

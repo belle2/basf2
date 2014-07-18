@@ -11,7 +11,7 @@
 #include <boost/python.hpp>
 
 #include <gtest/gtest.h>
-#include "cdcLocalTrackingTest.h"
+#include "CDCLocalTrackingTest.h"
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>

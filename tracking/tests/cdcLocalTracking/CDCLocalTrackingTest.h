@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef CDCLOCALTRACKINGTEST_H_
-#define CDCLOCALTRACKINGTEST_H_
+#ifndef CDCLOCALTRACKINGTEST_H
+#define CDCLOCALTRACKINGTEST_H
 
 #include <gtest/gtest.h>
 

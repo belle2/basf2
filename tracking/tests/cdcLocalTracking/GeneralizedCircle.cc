@@ -9,13 +9,12 @@
  **************************************************************************/
 
 #include <gtest/gtest.h>
-#include "cdcLocalTrackingTest.h"
+#include "CDCLocalTrackingTest.h"
 
 #include <tracking/cdcLocalTracking/geometry/Vector2D.h>
 #include <tracking/cdcLocalTracking/geometry/GeneralizedCircle.h>
 
 using namespace std;
-
 using namespace Belle2;
 using namespace CDCLocalTracking;
 

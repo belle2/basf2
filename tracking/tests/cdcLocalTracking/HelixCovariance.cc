@@ -9,24 +9,24 @@
  **************************************************************************/
 
 #include <gtest/gtest.h>
-//#include "cdcLocalTrackingTest.h"
+#include "CDCLocalTrackingTest.h"
 
-#include <tracking/cdcLocalTracking/tempro/pp_pow.h>
+#include <tracking/cdcLocalTracking/geometry/HelixCovariance.h>
 
 using namespace std;
 
-TEST(TemproTest, BELLE2_PP_POW)
+using namespace Belle2;
+using namespace CDCLocalTracking;
+
+
+
+TEST_F(CDCLocalTrackingTest, HelixCovariance_perigeeCovariance)
 {
+  HelixCovariance helixCovariance;
+  PerigeeCovariance perigeeCovariance = helixCovariance.perigeeCovariance();
 
-  static_assert(1 == BELLE2_PP_POW(1, 0), "BELLE2_PP_POW gives wrong value for 1**0, should be 1");
-  static_assert(1 == BELLE2_PP_POW(0, 0), "BELLE2_PP_POW gives wrong value for 0**0, should be 1");
-
-  static_assert(0 == BELLE2_PP_POW(0, 5), "BELLE2_PP_POW gives wrong value for 0**5, should be 0");
-
-  static_assert(8 == BELLE2_PP_POW(2, 3), "BELLE2_PP_POW gives wrong value for 2**3, should be 8");
-  static_assert(27 == BELLE2_PP_POW(3, 3), "BELLE2_PP_POW gives wrong value for 2**3, should be 27");
-
-  static_assert(42 == BOOST_PP_ADD(BELLE2_PP_POW(2, 5), 10), "The answer is not 42");
+  EXPECT_EQ(3, perigeeCovariance.matrix().GetNrows());
+  EXPECT_EQ(3, perigeeCovariance.matrix().GetNcols());
 
 }
 

@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <gtest/gtest.h>
-#include "cdcLocalTrackingTest.h"
+#include "CDCLocalTrackingTest.h"
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>

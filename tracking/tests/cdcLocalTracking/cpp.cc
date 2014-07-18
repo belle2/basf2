@@ -9,18 +9,12 @@
  **************************************************************************/
 
 /*
-This file contains test to check the behaviour of ROOT.
+This file contains test to check the behaviour of the c++ programming language.
 Its purpose is mainly to asure the programmer that his assumptions about run time behaviour are correct.
 */
 
-
 #include <gtest/gtest.h>
-#include "cdcLocalTrackingTest.h"
-
-#include "TMatrixD.h"
-
-#include <tracking/cdcLocalTracking/numerics/numerics.h>
-
+#include "CDCLocalTrackingTest.h"
 
 using namespace std;
 
@@ -28,34 +22,11 @@ using namespace Belle2;
 using namespace CDCLocalTracking;
 
 
-TEST_F(CDCLocalTrackingTest, ROOT_TMatrixD)
+TEST_F(CDCLocalTrackingTest, cpp_float)
 {
-  TMatrixD jacobian(2, 2);
-  jacobian[0][0] = 0;
-  jacobian[0][1] = 1;
-
-  jacobian[1][0] = -1;
-  jacobian[1][1] = 0;
-
-
-  TMatrixD covariance(2, 2);
-  covariance[0][0] = 1;
-  covariance[0][1] = 1;
-
-  covariance[1][0] = 1;
-  covariance[1][1] = 0;
-
-  //result = J * V * J^T
-  TMatrixD left(2, 2);
-  left.Mult(jacobian, covariance);
-
-  TMatrixD result(2, 2);
-  result.MultT(left, jacobian);
-
-  EXPECT_EQ(0, result[0][0]);
-  EXPECT_EQ(-1, result[0][1]);
-  EXPECT_EQ(-1, result[1][0]);
-  EXPECT_EQ(1, result[1][1]);
+  EXPECT_TRUE(signbit(-0.0));
+  EXPECT_FALSE(signbit(0.0));
+  EXPECT_FALSE(signbit(NAN));
 }
 
 

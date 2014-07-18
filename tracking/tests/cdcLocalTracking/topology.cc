@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <gtest/gtest.h>
-#include "cdcLocalTrackingTest.h"
+#include "CDCLocalTrackingTest.h"
 
 #include <framework/gearbox/Gearbox.h>
 #include <framework/logging/Logger.h>

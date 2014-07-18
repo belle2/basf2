@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <gtest/gtest.h>
-#include "cdcLocalTrackingTest.h"
+#include "CDCLocalTrackingTest.h"
 
 #include <tracking/cdcLocalTracking/geometry/Vector2D.h>
 

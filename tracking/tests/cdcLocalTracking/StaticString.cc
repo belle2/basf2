@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <gtest/gtest.h>
-//#include "cdcLocalTrackingTest.h"
 
 #include <tracking/cdcLocalTracking/tempro/StaticString.h>
 #include <tracking/cdcLocalTracking/tempro/Named.h>

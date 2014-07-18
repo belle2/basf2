@@ -9,34 +9,24 @@
  **************************************************************************/
 
 #include <gtest/gtest.h>
-#include "cdcLocalTrackingTest.h"
 
-#include <tracking/cdcLocalTracking/numerics/numerics.h>
-
+#include <tracking/cdcLocalTracking/tempro/pp_pow.h>
 
 using namespace std;
 
-using namespace Belle2;
-using namespace CDCLocalTracking;
-
-
-TEST_F(CDCLocalTrackingTest, numerics_sign)
+TEST(TemproTest, BELLE2_PP_POW)
 {
-  EXPECT_EQ(PLUS, sign(0.0));
-  EXPECT_EQ(MINUS, sign(-0.0));
-  EXPECT_EQ(INVALID_SIGN, sign(NAN));
 
-  EXPECT_TRUE(isValidSign(PLUS));
-  EXPECT_TRUE(isValidSign(MINUS));
-  EXPECT_TRUE(isValidSign(ZERO));
+  static_assert(1 == BELLE2_PP_POW(1, 0), "BELLE2_PP_POW gives wrong value for 1**0, should be 1");
+  static_assert(1 == BELLE2_PP_POW(0, 0), "BELLE2_PP_POW gives wrong value for 0**0, should be 1");
 
-  EXPECT_FALSE(isValidSign(INVALID_SIGN));
-  EXPECT_FALSE(isValidSign(7));
+  static_assert(0 == BELLE2_PP_POW(0, 5), "BELLE2_PP_POW gives wrong value for 0**5, should be 0");
 
-  EXPECT_EQ(MINUS, oppositeSign(PLUS));
-  EXPECT_EQ(PLUS, oppositeSign(MINUS));
-  EXPECT_EQ(ZERO, oppositeSign(ZERO));
-  EXPECT_EQ(INVALID_SIGN, oppositeSign(INVALID_SIGN));
+  static_assert(8 == BELLE2_PP_POW(2, 3), "BELLE2_PP_POW gives wrong value for 2**3, should be 8");
+  static_assert(27 == BELLE2_PP_POW(3, 3), "BELLE2_PP_POW gives wrong value for 2**3, should be 27");
+
+  static_assert(42 == BOOST_PP_ADD(BELLE2_PP_POW(2, 5), 10), "The answer is not 42");
+
 }
 
 

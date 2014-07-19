@@ -24,9 +24,9 @@ using namespace CDCLocalTracking;
 
 TEST_F(CDCLocalTrackingTest, cpp_float)
 {
-  EXPECT_TRUE(signbit(-0.0));
-  EXPECT_FALSE(signbit(0.0));
-  EXPECT_FALSE(signbit(NAN));
+  EXPECT_TRUE(std::signbit(-0.0));
+  EXPECT_FALSE(std::signbit(0.0));
+  EXPECT_FALSE(std::signbit(NAN));
 }
 
 

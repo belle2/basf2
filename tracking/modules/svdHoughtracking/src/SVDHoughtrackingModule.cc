@@ -49,7 +49,7 @@ using namespace Belle2::SVD;
 
 /* Options */
 //#define INJECT_GHOSTS
-#define DBG_THETA
+//#define DBG_THETA
 
 #undef B2DEBUG
 #define B2DEBUG(level, streamText) \
@@ -125,7 +125,7 @@ SVDHoughtrackingModule::SVDHoughtrackingModule() : Module(), curTrackEff(0.0), t
   addParam("UseSensorFilter", m_useSensorFilter,
            "Use the Sensor layer filter", bool(true));
   addParam("UseRadiusFilter", m_useRadiusFilter,
-           "Use the Sensor layer filter", bool(true));
+           "Use radius filter", bool(true));
   addParam("UseHashPurify", m_useHashPurify,
            "Chose the Hash (true), or the List purifier", bool(false));
   addParam("UseTrackMerger", m_useTrackMerger,
@@ -141,6 +141,8 @@ SVDHoughtrackingModule::SVDHoughtrackingModule() : Module(), curTrackEff(0.0), t
   /* ROIS */
   addParam("CreateROIs", m_createROI,
            "Create Region of Interests", bool(true));
+  addParam("CreatePXDMap", m_createPXDMap,
+           "Create a gnuplot hitmap of the PXD?", bool(false));
   addParam("AnalyseROIVerbose", m_analyseROIVerbose,
            "Verbose output of ROI analyser", bool(false));
   addParam("PXDExtrapolation", m_PXDExtrapolation,
@@ -1407,7 +1409,9 @@ SVDHoughtrackingModule::pxdExtrapolation()
     if (m_createROI) {
       createROI();
       /* Create a PXD hit map with ROIs for the last event */
-      createPXDMap();
+      if (m_createPXDMap) {
+        createPXDMap();
+      }
     }
 
     analyseROI();

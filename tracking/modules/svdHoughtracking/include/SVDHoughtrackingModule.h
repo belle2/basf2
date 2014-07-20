@@ -447,6 +447,7 @@ namespace Belle2 {
       bool m_useThetaExtrapolation;
       /* ROIs */
       bool m_createROI;
+      bool m_createPXDMap;
       bool m_analyseROIVerbose;
       bool m_PXDExtrapolation;
       bool m_PXDTbExtrapolation;

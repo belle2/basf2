@@ -118,6 +118,32 @@ namespace Belle2 {
     typedef std::pair<unsigned int, coord2dPair> houghDbgPair;
 
     /*
+     * Hough ROI class.
+     */
+    class SVDHoughROI {
+    public:
+      /** Constructor for hough ROI */
+      SVDHoughROI(VxdID _sensorID, TVector2 _v1, TVector2 _v2): sensorID(_sensorID),
+        v1(_v1), v2(_v2) {
+      }
+
+      ~SVDHoughROI() {}
+
+      /** Get sensor ID */
+      VxdID getSensorID() { return sensorID; }
+      /** Get v1 and v2 */
+      TVector2 getV1() { return v1; }
+      TVector2 getV2() { return v2; }
+    private:
+      /** Sensor ID */
+      VxdID sensorID;
+      /** v1 (down left edge) and v2 (upper right edge) */
+      TVector2 v1;
+      TVector2 v2;
+      /** Pixel IDs */
+    };
+
+    /*
      * Hough Candidates class.
      */
     class SVDHoughTrackCand {
@@ -235,6 +261,15 @@ namespace Belle2 {
       /** Convert SimHits into the cluster format */
       void convertSimHits();
 
+      /** Create ROI */
+      void createROI();
+
+      /** Create PXD Pixel map with ROIs */
+      void createPXDMap();
+
+      /** Analyse ROI */
+      void analyseROI();
+
       /** Mix True and Sim hits for background simulation */
       void mixTrueSimHits();
 
@@ -260,10 +295,11 @@ namespace Belle2 {
 
       /** Fast intercept finder */
       int fastInterceptFinder2d(houghMap&, bool, TVector2, TVector2, TVector2, TVector2,
-                                unsigned int, unsigned int, unsigned int, std::vector<houghDbgPair>&);
+                                unsigned int, unsigned int, unsigned int, std::vector<houghDbgPair>&,
+                                unsigned int);
 
       /** Layer filter */
-      bool layerFilter(bool*);
+      bool layerFilter(bool*, unsigned int);
 
       /** Print Hough candidates */
       void printHoughCandidates();
@@ -301,8 +337,12 @@ namespace Belle2 {
       sensorMap get_next_hit(sensorMap, unsigned short, bool*);
       int sector_track_fit(sensorMap*);
       void fullHoughTracking();
+      /** Extrapolation */
       void pxdExtrapolation();
       void pxdExtrapolationPhi();
+      void pxdExtrapolationTheta();
+      void pxdExtrapolationFull();
+      void pxdTestExtrapolationPhi();
       void pxdSingleExtrapolation();
       void pxdStraightExtrapolation();
       void createResiduals();
@@ -310,6 +350,7 @@ namespace Belle2 {
       void analyseClusterStrips();
       void analyseExtrapolatedHits();
       void analyseExtrapolatedPhi();
+      void analyseExtrapolatedFull();
 
       /** Plot hough lines in gnuplot */
       void houghTrafoPlot(bool);
@@ -384,11 +425,13 @@ namespace Belle2 {
       std::ofstream statout;
 
       // 3. Options
+      /* Clustering */
       bool m_useClusters;
       bool m_useFPGAClusters;
       bool m_analyseFPGAClusters;
       bool m_useTrueHitClusters;
       bool m_useSimHitClusters;
+      /* Tracking */
       bool m_fullTrackingPipeline;
       bool m_writeHoughSpace;
       bool m_writeHoughSectors;
@@ -400,9 +443,14 @@ namespace Belle2 {
       bool m_useThetaOnly;
       bool m_compareMCParticle;
       bool m_compareMCParticleVerbose;
+      bool m_usePhiExtrapolation;
+      bool m_useThetaExtrapolation;
+      /* ROIs */
+      bool m_createROI;
+      bool m_analyseROIVerbose;
       bool m_PXDExtrapolation;
       bool m_PXDTbExtrapolation;
-      bool m_usePhiExtrapolation;
+      /* Verbose */
       bool m_printTrackInfo;
       bool m_printStatistics;
 
@@ -451,6 +499,12 @@ namespace Belle2 {
       std::vector<SVDHoughTrackCand> n_houghTrackCand;
       std::vector<SVDHoughTrackCand> p_houghTrackCand;
 
+      /** Extrapolated local hits */
+      std::vector<houghPair> extrapolatedHits;
+
+      /* ROIs */
+      std::vector<SVDHoughROI> pxdROI;
+
       /** Pointer to the SensorInfo of the current sensor */
       const SensorInfo*  m_currentSensorInfo;
 
@@ -459,6 +513,11 @@ namespace Belle2 {
       double totFakeTracks;
       unsigned int totTracks;
       unsigned int runNumber;
+
+      /** Current ROI performance efficiency */
+      double curROIEff;
+      unsigned int totROITrueHits;
+      unsigned int curHitsInROIs;
 
       /** Const for testbeam radius */
       double dist_thres[3];
@@ -497,17 +556,30 @@ namespace Belle2 {
       TH1D* m_histEffPhi;
       /** Histogram for Theta-distribution */
       TH1D* m_histThetaDist;
+      TH1D* m_histProjectedThetaDist;
       TH1D* m_histThetaPhiDist;
       /** Histogram for correctly reconstructed tracks in Theta */
       TH1D* m_histThetaRecon;
+      TH1D* m_histProjectedThetaRecon;
       /** Histogram for efficiency vs Theta */
       TH1D* m_histEffTheta;
+      TH1D* m_histEffProjectedTheta;
       /** Histogram for fake rate vs pT (only in phi while reconstruction in theta is not proved) */
       TH1D* m_histPtFakePhi;
+      /** Histogram for fake rate vs pT*/
+      TH1D* m_histPtFake;
+      /** Missed hit distribution */
+      TH1D* m_histMissedTheta;
+      TH1D* m_histMissedPhi;
 
       /** Histograms for ROIs */
       TH1D* m_histROIDiffPhi;
+      TH1D* m_histROIDiffPhiPx;
       TH1D* m_histROIDiffTheta;
+      TH1D* m_histROIDiffThetaPx;
+      /** Histograms for PXD occupancy plots */
+      TH2D* m_histROIPXD_l1;
+      TH2D* m_histROIPXD_l2;
 
       /* List of coord SVD clusters */
       clusterMap cluster_map;
@@ -581,6 +653,10 @@ namespace Belle2 {
                                 "set style line 1 lt rgb \"#A00000\" lw 1 pt 1\n"
                                 "set style line 2 lt rgb \"#00A000\" lw 1 pt 6\n"
                                 "set style line 3 lt rgb \"#000000\" lw 1 pt 6\n"
+                                "set style line 13 lt rgb 'black' lw 1 pt 6\n"
+                                "set style line 14 lt rgb 'yellow' lw 1 pt 6\n"
+                                "set style line 15 lt rgb 'green' lw 1 pt 6\n"
+                                "set style line 16 lt rgb 'red' lw 1 pt 6\n"
                                 "\n"
                                 "# Points\n"
                                 "#set style points 3 lt rgb \"#0000A0\" pt 1\n"

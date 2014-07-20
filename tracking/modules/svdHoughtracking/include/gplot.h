@@ -29,6 +29,10 @@ set style line 81 lt rgb \"#808080\"\n\
 set style line 1 lt rgb \"#A00000\" lw 1 pt 1\n\
 set style line 2 lt rgb \"#00A000\" lw 1 pt 6\n\
 set style line 3 lt rgb \"#000000\" lw 1 pt 6\n\
+set style line 13 lt rgb 'black' lw 1 pt 6\n\
+set style line 14 lt rgb 'yellow' lw 1 pt 6\n\
+set style line 15 lt rgb 'green' lw 1 pt 6\n\
+set style line 16 lt rgb 'red' lw 1 pt 6\n\
 \n\
 # Points\n\
 #set style points 3 lt rgb \"#0000A0\" pt 1\n\
@@ -66,6 +70,10 @@ set style line 81 lt rgb \"#808080\"\n\
 set style line 1 lt rgb \"#A00000\" lw 1 pt 1\n\
 set style line 2 lt rgb \"#00A000\" lw 1 pt 6\n\
 set style line 3 lt rgb \"#000000\" lw 1 pt 6\n\
+set style line 13 lt rgb 'black' lw 1 pt 6\n\
+set style line 14 lt rgb 'yellow' lw 1 pt 6\n\
+set style line 15 lt rgb 'green' lw 1 pt 6\n\
+set style line 16 lt rgb 'red' lw 1 pt 6\n\
 \n\
 # Points\n\
 #set style points 3 lt rgb \"#0000A0\" pt 1\n\

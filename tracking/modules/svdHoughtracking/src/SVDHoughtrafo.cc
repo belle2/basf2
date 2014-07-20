@@ -116,6 +116,7 @@ SVDHoughtrackingModule::houghTrafoPlot(bool n_side)
   string p_load = "dbg/p_rect.plot";
   string fmt;
   houghPair hp;
+  VxdID sensorID;
 
   if (n_side) {
     if ((fp = gplotCreate(n_path.c_str(), NULL, GPLOT_TMPL1)) == NULL) {
@@ -125,10 +126,12 @@ SVDHoughtrackingModule::houghTrafoPlot(bool n_side)
     gplotSetLoad(fp, n_load.c_str());
     for (auto it = n_hough.begin(); it != n_hough.end(); ++it) {
       hp = it->second;
+      sensorID = hp.first;
       pos = hp.second;
       fmt_s.str("");
       fmt_s.clear();
-      fmt_s << "plot " << pos.X() << " * cos(x) + " << pos.Y() << " * sin(x) notitle linestyle 1" << endl;
+      fmt_s << "plot " << pos.X() << " * cos(x) + " << pos.Y() << " * sin(x) notitle linestyle "
+            << sensorID.getLayerNumber() + 10 << endl;
       fmt = fmt_s.str();
       gplotInsert(fp, fmt.c_str(), GPLOT_LINE);
     }
@@ -140,10 +143,12 @@ SVDHoughtrackingModule::houghTrafoPlot(bool n_side)
     gplotSetLoad(fp, p_load.c_str());
     for (auto it = p_hough.begin(); it != p_hough.end(); ++it) {
       hp = it->second;
+      sensorID = hp.first;
       pos = hp.second;
       fmt_s.str("");
       fmt_s.clear();
-      fmt_s << "plot " << pos.X() << " * cos(x) + " << pos.Y() << " * sin(x) notitle linestyle 1" << endl;
+      fmt_s << "plot " << pos.X() << " * cos(x) + " << pos.Y() << " * sin(x) notitle linestyle "
+            << sensorID.getLayerNumber() + 10 << endl;
       fmt = fmt_s.str();
       gplotInsert(fp, fmt.c_str(), GPLOT_LINE);
     }
@@ -155,12 +160,20 @@ SVDHoughtrackingModule::houghTrafoPlot(bool n_side)
  * Very simple sensor filter.
  */
 bool
-SVDHoughtrackingModule::layerFilter(bool* layer)
+SVDHoughtrackingModule::layerFilter(bool* layer, unsigned int minLines)
 {
-  if (layer[0] == true && layer[1] == true && layer[2] == true && layer[3] == true) {
+  unsigned int lcnt = 0;
+
+  /* Count number of found layers */
+  for (int i = 0; i < 4; ++i) {
+    if (layer[i] == true) {
+      ++lcnt;
+    }
+  }
+
+  if (lcnt >= minLines) {
     return (true);
   }
-  //B2DEBUG(1, " !!!!$$$$$!!!! Test: " << layer[0] << " " << layer[1] << " " << layer[2] << " " << layer[3]);
 
   return (false);
 }
@@ -173,8 +186,9 @@ SVDHoughtrackingModule::layerFilter(bool* layer)
  */
 int
 SVDHoughtrackingModule::fastInterceptFinder2d(houghMap& hits, bool n_side, TVector2 v1_s,
-                                              TVector2 v2_s, TVector2 v3_s, TVector2 v4_s, unsigned int iterations, unsigned int critIterations,
-                                              unsigned int maxIterations, vector<houghDbgPair>& dbg_rect)
+                                              TVector2 v2_s, TVector2 v3_s, TVector2 v4_s, unsigned int iterations,
+                                              unsigned int critIterations, unsigned int maxIterations,
+                                              vector<houghDbgPair>& dbg_rect, unsigned int min_lines)
 {
   int i, j, idx;
   int br = 0;
@@ -227,8 +241,8 @@ SVDHoughtrackingModule::fastInterceptFinder2d(houghMap& hits, bool n_side, TVect
           }
         }
       }
-      if (cnt_tracks >= m_minimumLines) {
-        if (m_useSensorFilter && !layerFilter(layerHit)) {
+      if (cnt_tracks >= min_lines) {
+        if (m_useSensorFilter && !layerFilter(layerHit, min_lines)) {
           B2DEBUG(250, "  Kicked out by sensor filter");
         } else {
           if (iterations >= dbg_start_iteration) {
@@ -237,7 +251,7 @@ SVDHoughtrackingModule::fastInterceptFinder2d(houghMap& hits, bool n_side, TVect
 
           if (iterations != critIterations && !br) {
             fastInterceptFinder2d(hits, n_side, v1, v2, v3, v4, iterations + 1, critIterations, maxIterations,
-                                  dbg_rect);
+                                  dbg_rect, min_lines);
           } else {
             if (n_side) {
               n_houghCand.push_back(SVDHoughCand(cand_dx, make_pair(v1, v2)));
@@ -560,7 +574,7 @@ SVDHoughtrackingModule::compareList(std::vector<unsigned int>& a, std::vector<un
     }
   }
 
-  if (contains && cnt > 3) {
+  if (contains && cnt >= m_minimumLines) {
     return (true);
   } else {
     return (false);

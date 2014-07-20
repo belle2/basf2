@@ -49,6 +49,7 @@ using namespace Belle2::SVD;
 
 /* Options */
 //#define INJECT_GHOSTS
+#define DBG_THETA
 
 #undef B2DEBUG
 #define B2DEBUG(level, streamText) \
@@ -66,7 +67,7 @@ REG_MODULE(SVDHoughtracking)
 //-----------------------------------------------------------------
 
 SVDHoughtrackingModule::SVDHoughtrackingModule() : Module(), curTrackEff(0.0), totFakeTracks(0.0), totTracks(0),
-  m_rootFile(0), m_histROIy(0), m_histROIz(0), m_histSimHits(0)
+  curROIEff(0.0), totROITrueHits(0), curHitsInROIs(0), m_rootFile(0), m_histROIy(0), m_histROIz(0), m_histSimHits(0)
 {
   //Set module properties
   setDescription("Hough tracking algorithm for SVD data");
@@ -136,13 +137,20 @@ SVDHoughtrackingModule::SVDHoughtrackingModule() : Module(), curTrackEff(0.0), t
   addParam("CompareWithMCParticle", m_compareMCParticle,
            "Compare reconstructed tracks with MC Particles?", bool(false));
   addParam("CompareWithMCParticleVerbose", m_compareMCParticleVerbose,
-           "Compare reconstructed tracks with MC Particles?", bool(false));
+           "Verbose output of the comparator function", bool(false));
+  /* ROIS */
+  addParam("CreateROIs", m_createROI,
+           "Create Region of Interests", bool(true));
+  addParam("AnalyseROIVerbose", m_analyseROIVerbose,
+           "Verbose output of ROI analyser", bool(false));
   addParam("PXDExtrapolation", m_PXDExtrapolation,
            "Run PXD extrapolation?", bool(false));
   addParam("PXDTbExtrapolation", m_PXDTbExtrapolation,
            "Use testbeam extrapolation", bool(false));
   addParam("UsePhiExtrapolation", m_usePhiExtrapolation,
-           "Use Phi extrapolation to PXD", bool(true));
+           "Use Phi extrapolation to PXD", bool(false));
+  addParam("UseThetaExtrapolation", m_useThetaExtrapolation,
+           "Use Phi extrapolation to PXD", bool(false));
   addParam("PrintTrackInfo", m_printTrackInfo,
            "Use testbeam extrapolation", bool(false));
   addParam("PrintStatistics", m_printStatistics,
@@ -190,6 +198,8 @@ SVDHoughtrackingModule::SVDHoughtrackingModule() : Module(), curTrackEff(0.0), t
 void
 SVDHoughtrackingModule::initialize()
 {
+  int theta_bins = 133; /* Number of bins in theta */
+  int phi_bins = 360; /* Number of bins in phi */
   TDirectory* clusterDir, *houghDir, *effDir, *roiDir;
   StoreArray<SVDHoughCluster>::registerPersistent(m_storeHoughCluster, DataStore::c_Event, false);
   StoreArray<SVDHoughTrack>::registerPersistent(m_storeHoughTrack, DataStore::c_Event, false);
@@ -263,37 +273,56 @@ SVDHoughtrackingModule::initialize()
     effDir = m_rootFile->mkdir("Efficiency");
     effDir->cd();
     /* Histogram for pT-distribution */
-    m_histPtDist = new TH1D("pTDist", "pT-Distribution", 195, 0.05, 2.0);
+    m_histPtDist = new TH1D("pTDist", "pT-Distribution", 396, 0.02, 2.0);
     /* Histogram for correctly reconstructed tracks in pT */
-    m_histPtPhiRecon = new TH1D("pTPhirecon", "pT of reconstructed tracks in Phi", 195, 0.05, 2.0);
-    m_histPtThetaRecon = new TH1D("pTThetarecon", "pT of reconstructed tracks in Theta", 195, 0.05, 2.0);
+    m_histPtPhiRecon = new TH1D("pTPhirecon", "pT of reconstructed tracks in Phi", 396, 0.02, 2.0);
+    m_histPtThetaRecon = new TH1D("pTThetarecon", "pT of reconstructed tracks in Theta", 396, 0.02, 2.0);
     /* Histogram for efficiency vs pT (only in phi while reconstruction in theta is not proved) */
-    m_histPtEffPhi = new TH1D("pTEffPhi", "Efficiency vs pT (in Phi)", 195, 0.05, 2.0);
-    m_histPtEffTheta = new TH1D("pTEffTheta", "Efficiency vs pT (in Theta)", 195, 0.05, 2.0);
+    m_histPtEffPhi = new TH1D("pTEffPhi", "Efficiency vs pT (in Phi)", 396, 0.02, 2.0);
+    m_histPtEffTheta = new TH1D("pTEffTheta", "Efficiency vs pT (in Theta)", 396, 0.02, 2.0);
     /* Histogram for Phi-distribution */
-    m_histPhiDist = new TH1D("PhiDist", "Phi-Distribution", 360, -180, 180);
+    m_histPhiDist = new TH1D("PhiDist", "Phi-Distribution", phi_bins, -180, 180);
     /* Histogram for correctly reconstructed tracks in Phi */
-    m_histPhiRecon = new TH1D("Phirecon", "Phi of reconstructed tracks", 360, -180, 180);
+    m_histPhiRecon = new TH1D("Phirecon", "Phi of reconstructed tracks", phi_bins, -180, 180);
     /* Histogram for efficiency vs phi */
-    m_histEffPhi = new TH1D("EffPhi", "Efficiency vs Phi", 360, -180, 180);
+    m_histEffPhi = new TH1D("EffPhi", "Efficiency vs Phi", phi_bins, -180, 180);
     /* Histogram for Theta-distribution */
-    m_histThetaDist = new TH1D("ThetaDist", "Theta-Distribution", 133, 17, 150);
-    m_histThetaPhiDist = new TH1D("ThetaPhiDist", "Theta Eff vs Phi", 360, -180, 180);
+    m_histThetaDist = new TH1D("ThetaDist", "Theta-Distribution", theta_bins, 17, 150);
+    m_histProjectedThetaDist = new TH1D("ProjThetaDist", "Projected Theta Distribution", 181, 0, 180);
+    m_histThetaPhiDist = new TH1D("ThetaPhiDist", "Theta Eff vs Phi", phi_bins, -180, 180);
     /* Histogram for correctly reconstructed tracks in Theta */
-    m_histThetaRecon = new TH1D("Thetarecon", "Theta of reconstructed tracks", 133, 17, 150);
+    m_histThetaRecon = new TH1D("Thetarecon", "Theta of reconstructed tracks", theta_bins, 17, 150);
+    m_histProjectedThetaRecon = new TH1D("ProjThetarecon", "Projected Theta of reconstructed tracks", 181, 0, 180);
     /* Histogram for efficiency vs Theta */
-    m_histEffTheta = new TH1D("EffTheta", "Efficiency vs Theta", 133, 17, 150);     // Only to fill, if theta can be reconstructed
+    m_histEffTheta = new TH1D("EffTheta", "Efficiency vs Theta", theta_bins, 17, 150);
+    m_histEffProjectedTheta = new TH1D("EffProjTheta", "Efficiency vs Projected Theta", 181, 0, 180);
     /* Histogram for fake rate vs pT (only in phi while reconstruction in theta is not proved) */
-    m_histPtFakePhi = new TH1D("pTFake", "Fake rate vs pT (in Phi)", 200, 0.0, 2.0);
+    m_histPtFakePhi = new TH1D("pTFakePhi", "Fake rate vs pT (in Phi)", 396, 0.02, 2.0);
+    /* Histogram for fake rate vs pT (only in phi while reconstruction in theta is not proved) */
+    m_histPtFake = new TH1D("pTFake", "Fake rate vs pT", 396, 0.02, 2.0);
+    /* Missed hit distribution */
+    m_histMissedTheta = new TH1D("MissedHitTheta", "Missing Hits vs Theta", theta_bins, 17, 150);
+    m_histMissedPhi = new TH1D("MissedHitPhi", "Missing Hits vs Phi", phi_bins, -180, 180);
 
     /* ROI plots */
     roiDir = m_rootFile->mkdir("ROI");
     roiDir->cd();
     /* Distance difference in Phi */
-    m_histROIDiffPhi = new TH1D("ROIDiffPhi", "Difference in Phi", 100, 0.0, 1.0);
+    m_histROIDiffPhi = new TH1D("ROIDiffPhi", "Difference in Phi", 500, 0.0, 0.3);
     m_histROIDiffPhi->GetXaxis()->SetTitle("distance [cm]");
+    m_histROIDiffPhiPx = new TH1D("ROIDiffPhiPx", "Difference in Phi", 60, 0.0, 60.0);
+    m_histROIDiffPhiPx->GetXaxis()->SetTitle("distance [px]");
     m_histROIDiffTheta = new TH1D("ROIDiffTheta", "Difference in Theta", 100, 0.0, 1.0);
     m_histROIDiffTheta->GetXaxis()->SetTitle("distance [cm]");
+    m_histROIDiffThetaPx = new TH1D("ROIDiffThetaPx", "Difference in Phi", 60, 0.0, 60.0);
+    m_histROIDiffThetaPx->GetXaxis()->SetTitle("distance [px]");
+    /* Plot occupancy in PXD */
+    m_histROIPXD_l1 = new TH2D("PXDROIL1", "Occupancy and ROIs in PXD", 768 * 2, 0.0, 4.48 * 2.0,
+                               (250 + 20) * 8, 0.0, 8 * (1.20 + 0.20));
+    m_histROIPXD_l1->GetXaxis()->SetTitle("");
+    m_histROIPXD_l2 = new TH2D("PXDROIL2", "Occupancy and ROIs in PXD", 768 * 2, 0.0, 6.144 * 2.0,
+                               (250 + 20) * 12, 0.0, 1 * (1.25 + 0.20));
+    m_histROIPXD_l2->GetXaxis()->SetTitle("");
   }
 
   B2INFO("SVDHoughtracking initilized");
@@ -332,13 +361,25 @@ SVDHoughtrackingModule::endRun()
   if (m_printStatistics) {
     B2INFO("End of Run: Hough Statistics: ");
     B2INFO("  Total tracks found: " << totTracks);
-    B2INFO("  Track total efficency: " << curTrackEff / (double) runNumber);
-    B2INFO("  Track Theta efficency: " << curTrackEffN / (double) runNumber);
-    B2INFO("  Track Phi efficency: " << curTrackEffP / (double) runNumber);
-    B2INFO("  Fake Rate: " << totFakeTracks / (double) runNumber);
+    B2INFO("  Track total efficiency: " << curTrackEff / ((double) runNumber));
+    B2INFO("  Track Theta efficiency: " << curTrackEffN / ((double) runNumber));
+    B2INFO("  Track Phi efficiency: " << curTrackEffP / ((double) runNumber));
+    B2INFO("  Fake Rate: " << totFakeTracks / ((double) runNumber));
     B2INFO("  Total time: " << totClockCycles << " ms");
-    B2INFO("  Average time: " << totClockCycles / (double) runNumber << " ms");
+    B2INFO("  Average time: " << totClockCycles / ((double) runNumber) << " ms");
     B2INFO("  Min R: " << minR << " Max R: " << maxR);
+
+    if (m_PXDExtrapolation) {
+      B2INFO("  Average hits found: " << totROITrueHits / ((double) runNumber));
+      B2INFO("  Average Hits in ROIs: " << ((double) curHitsInROIs) / ((double) runNumber));
+      B2INFO("  ROI efficiency: " << curROIEff / ((double) runNumber));
+      B2INFO("  DRF: " << ((double) totROITrueHits) / ((double) curHitsInROIs));
+    } else {
+      B2INFO("  Average hits found: " << "disabled");
+      B2INFO("  Average Hits in ROIs: " << "disabled");
+      B2INFO("  ROI efficiency: " << "disabled");
+      B2INFO("  DRF: " << "disabled");
+    }
   }
 
   /* Statistics output */
@@ -349,7 +390,8 @@ SVDHoughtrackingModule::endRun()
     /* Check if stat file already exists, if not write legend */
     if (statout.tellp() == 0) {
       statout << "#Hash" << "\t" << "CritN" << "\t" << "CritP" << "\t" << "RectN" << "\t" << "RectP"
-              << "\t" << "EffP" << "\t" << "EffN" << "\t" << "EffTot" << "\t" << "Fake" << endl;
+              << "\t" << "EffP" << "\t" << "EffN" << "\t" << "EffTot" << "\t" << "Fake" << "\t" << "ROI-Eff"
+              << "\t" << "DRF" << endl;
     }
 
     if (m_useHashPurify) {
@@ -364,7 +406,10 @@ SVDHoughtrackingModule::endRun()
             << boost::format("%1.3f") % (curTrackEffP / (double) runNumber) << "\t"
             << boost::format("%1.3f") % (curTrackEffN / (double) runNumber) << "\t"
             << boost::format("%1.3f") % (curTrackEff / (double) runNumber) << "\t"
-            << (totFakeTracks / (double) runNumber) << endl;
+            << (totFakeTracks / ((double) runNumber)) << "\t"
+            << boost::format("%1.3f") % (curROIEff / ((double) runNumber)) << "\t"
+            << boost::format("%1.3f") % (((double) totROITrueHits) / ((double) curHitsInROIs)) << "\t"
+            << endl;
 
     /* Close Statistic output */
     statout.close();
@@ -393,6 +438,11 @@ SVDHoughtrackingModule::endRun()
     m_histEffTheta->SetName("EffTheta");
     m_histEffTheta->SetTitle("Efficiency vs theta");
     m_histEffTheta->GetXaxis()->SetTitle("#theta [deg]");
+
+    *m_histEffProjectedTheta = (*m_histProjectedThetaRecon) / (*m_histProjectedThetaDist);
+    m_histEffProjectedTheta->SetName("EffRrojTheta");
+    m_histEffProjectedTheta->SetTitle("Efficiency vs projected theta");
+    m_histEffProjectedTheta->GetXaxis()->SetTitle("projected #theta [deg]");
   }
 }
 
@@ -892,7 +942,8 @@ SVDHoughtrackingModule::trackingPipeline()
   v3_s.Set((M_PI / 2 - 0.0f), (-1.0 * scale_y * rect_size));
   v4_s.Set((-1.0 * ((M_PI / 2)) - 0.0f), (-1.0 * scale_y * rect_size));
   /* Run intercept finder */
-  fastInterceptFinder2d(p_hough, false, v1_s, v2_s, v3_s, v4_s, 0, m_critIterationsP, m_maxIterationsP, p_rect);
+  fastInterceptFinder2d(p_hough, false, v1_s, v2_s, v3_s, v4_s, 0, m_critIterationsP,
+                        m_maxIterationsP, p_rect, m_minimumLines);
   /* Debug */
   if (m_writeHoughSectors) {
     gplotRect("dbg/p_rect.plot", p_rect);
@@ -910,7 +961,8 @@ SVDHoughtrackingModule::trackingPipeline()
   v3_s.Set((M_PI / 2 - 0.0f), (-1.0 * scale_y * rect_size));
   v4_s.Set((-1.0 * ((M_PI / 2)) - 0.0f), (-1.0 * scale_y * rect_size));
   /* Run intercept finder */
-  fastInterceptFinder2d(n_hough, true, v1_s, v2_s, v3_s, v4_s, 0, m_critIterationsN, m_maxIterationsN, n_rect);
+  fastInterceptFinder2d(n_hough, true, v1_s, v2_s, v3_s, v4_s, 0, m_critIterationsN,
+                        m_maxIterationsN, n_rect, m_minimumLines);
   /* Debug */
   if (m_writeHoughSectors) {
     gplotRect("dbg/n_rect.plot", n_rect);
@@ -1031,7 +1083,7 @@ SVDHoughtrackingModule::fac3d()
         }
 
         if (n_tc.X() > 0.0) {
-          theta = n_tc.X(); // (M_PI) - n_tc.X();
+          theta = -1.0 * n_tc.X(); // (M_PI) - n_tc.X();
         } else {
           theta = -1.0 * n_tc.X(); //(M_PI / 2) - n_tc.X();
         }
@@ -1340,9 +1392,342 @@ SVDHoughtrackingModule::pxdExtrapolation()
 
   if (m_usePhiExtrapolation) {
     pxdExtrapolationPhi();
+    //pxdTestExtrapolationPhi();
     analyseExtrapolatedPhi();
+  } else if (m_useThetaExtrapolation) {
+    pxdExtrapolationTheta();
   } else {
-    pxdSingleExtrapolation();
+    //pxdSingleExtrapolation();
+    pxdExtrapolationFull();
+
+    /* Analyse extrapolated hits */
+    analyseExtrapolatedFull();
+
+    /* create ROIs */
+    if (m_createROI) {
+      createROI();
+      /* Create a PXD hit map with ROIs for the last event */
+      createPXDMap();
+    }
+
+    analyseROI();
+  }
+}
+
+/*
+ * This function is for testing what influence the not precise angle
+ * has on the reconstruction.
+ */
+void
+SVDHoughtrackingModule::pxdTestExtrapolationPhi()
+{
+  StoreArray<SVDHoughTrack> storeHoughTrack(m_storeHoughTrack);
+  StoreArray<SVDHoughCluster> storeExtrapolatedHits(m_storeExtrapolatedHitsName);
+  double pxdShift[] = {0.35, 0.35};
+  double x, y;
+  double mph_x, mph_y;
+  double a, b, angle;
+  TVector3 mph_pos;
+  TGeoHMatrix transfMatrix;
+  double* rotMatrix, *transMatrix;
+  int nTracks;
+  VxdID sensor;
+
+  B2DEBUG(200, "PXD Phi Extrapolation: ");
+
+  /*
+   * For testing variations in the reco track parameters only!
+   */
+  nTracks = 1;
+  for (int i = 0; i < nTracks; ++i) {
+    SVDHoughTrack* htrack = storeHoughTrack[0];
+    double r = -170.667 * 1.0;
+    double tphi = 0.64577 - (M_PI / 2.0);
+
+    VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+    BOOST_FOREACH(VxdID layer, geo.getLayers(SensorInfo::PXD)) {
+      BOOST_FOREACH(VxdID ladder, geo.getLadders(layer)) {
+        sensor = ladder;
+        sensor.setSensorNumber(1);
+        const PXD::SensorInfo* currentSensor = dynamic_cast<const PXD::SensorInfo*>(&VXD::GeoCache::get(sensor));
+        transfMatrix = currentSensor->getTransformation();
+        rotMatrix = transfMatrix.GetRotationMatrix();
+        transMatrix = transfMatrix.GetTranslation();
+        double width = currentSensor->getWidth();
+        double length = currentSensor->getLength();
+        double shift = pxdShift[sensor.getLayerNumber() - 1];
+        double z_shift = 0.0;
+        double phi = acos(rotMatrix[2]);
+        double radius = sqrt((transMatrix[0] * transMatrix[0] + transMatrix[1] * transMatrix[1]));
+
+        if (asin(rotMatrix[0]) > 0.01) {
+          phi = 2 * M_PI - phi;
+        }
+
+        if (phi > M_PI) {
+          phi = phi - M_PI * 2 ;
+        }
+
+        angle = tphi - phi;
+        a = radius * cos(angle) - fabs(r) * (pow(fabs(sin(angle)), 2.0));
+        B2DEBUG(200, "  -> a: " << a << " angle: " << angle << " Phi: " << phi
+                << " tphi-phi: " << fabs((htrack->getTrackPhi() - phi)));
+        if ((pow(fabs(a), 2.0) - pow(radius, 2.0)) >= 0.0 &&
+            fabs((htrack->getTrackPhi() - phi)) < (M_PI / 2.0)) {
+          x = a + sqrt(pow(fabs(a), 2.0) - pow(radius, 2.0));
+          b = -1 * pow(fabs(x), 2.0) + (2 * x * r);
+          B2DEBUG(200, "    -> x: " << x << " b: " << b);
+
+          if (b >= 0.0) {
+            y = x * sin(angle) + sqrt(b) * cos(angle);
+
+            B2DEBUG(200, "    --> y = " << y << " a: " << a << " x: " << x << " b: " << b << " angle: " << angle);
+            if (y < (shift + (width / 2.0)) && y > (shift + (width / -2.0))) {
+              B2DEBUG(200, "  Found in PXD Sensor ID: " << sensor << "\tPhi: "
+                      << phi / Unit::deg << " Radius: " << radius << " Shift: " << z_shift
+                      << " Width: " << width << " Length: " << length);
+              B2DEBUG(200, "      Candidate is: " << radius << ", " << y);
+              mph_x = radius * cos(phi) - y * sin(phi);
+              mph_y = radius * sin(phi) + y * cos(phi);
+              B2DEBUG(200, "       -> Transformed: " << mph_x << ", " << mph_y);
+              mph_pos.SetXYZ(mph_x, mph_y, 0.0);
+
+              storeExtrapolatedHits.appendNew(SVDHoughCluster(0, mph_pos, sensor));
+            }
+          }
+        }
+
+        /* Debug output for transformation- and translation Matrix */
+        B2DEBUG(2000, "  Transformation Matrix: " << endl
+                << "\t" << boost::format("%2.3f") % rotMatrix[0]
+                << "\t" << boost::format("%2.3f") % rotMatrix[1]
+                << "\t" << boost::format("%2.3f") % rotMatrix[2] << endl
+                << "\t" << boost::format("%2.3f") % rotMatrix[3]
+                << "\t" << boost::format("%2.3f") % rotMatrix[4]
+                << "\t" << boost::format("%2.3f") % rotMatrix[5] << endl
+                << "\t" << boost::format("%2.3f") % rotMatrix[6]
+                << "\t" << boost::format("%2.3f") % rotMatrix[7]
+                << "\t" << boost::format("%2.3f") % rotMatrix[8] << endl);
+        B2DEBUG(2000, "  Translation Matrix: " << endl
+                << "\t" << boost::format("%2.3f") % transMatrix[0]
+                << "\t" << boost::format("%2.3f") % transMatrix[1]
+                << "\t" << boost::format("%2.3f") % transMatrix[2] << endl);
+      }
+    }
+  }
+}
+
+/*
+ * Full Extrapolation to PXD layers.
+ */
+void
+SVDHoughtrackingModule::pxdExtrapolationFull()
+{
+  StoreArray<SVDHoughTrack> storeHoughTrack(m_storeHoughTrack);
+  StoreArray<SVDHoughCluster> storeExtrapolatedHits(m_storeExtrapolatedHitsName);
+  //double pxdShift[] = {0.35, 0.35};
+  double pxdZ1Shift[] = {4.8013, -2.0013};
+  double pxdZ2Shift[] = {6.1513, -2.3513};
+  double minY[] = { -0.42, -0.42};
+  double maxY[] = {0.83, 0.83};
+  double z_shift;
+  double x, y;
+  double mph_x, mph_y, mph_z;
+  double a, b, angle;
+  TVector3 mph_pos;
+  TGeoHMatrix transfMatrix;
+  double* rotMatrix, *transMatrix;
+  int nTracks, idx;
+  VxdID sensorID;
+  bool found;
+
+  B2DEBUG(200, "PXD Full Extrapolation: ");
+
+  extrapolatedHits.clear(); /* Clear last extrapolated hits */
+
+  nTracks = storeHoughTrack.getEntries();
+  idx = 0;
+  for (int i = 0; i < nTracks; ++i) {
+    SVDHoughTrack* htrack = storeHoughTrack[i];
+    double r = htrack->getTrackR();
+    double tphi = htrack->getTrackPhi() - (M_PI / 2.0);
+    double ttheta = htrack->getTrackTheta();
+
+    B2DEBUG(200, "  Track info r:" << r << " phi: " << tphi << " theta: " << ttheta)
+
+    found = false;
+    VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+    BOOST_FOREACH(VxdID layer, geo.getLayers(SensorInfo::PXD)) {
+      BOOST_FOREACH(VxdID ladder, geo.getLadders(layer)) {
+        BOOST_FOREACH(VxdID sensorID, geo.getSensors(ladder)) {
+          const PXD::SensorInfo* currentSensor = dynamic_cast<const PXD::SensorInfo*>(&VXD::GeoCache::get(sensorID));
+          transfMatrix = currentSensor->getTransformation();
+          rotMatrix = transfMatrix.GetRotationMatrix();
+          transMatrix = transfMatrix.GetTranslation();
+          double width = currentSensor->getWidth();
+          double length = currentSensor->getLength();
+          //double shift = pxdShift[sensorID.getLayerNumber() - 1];
+          double phi = acos(rotMatrix[2]);
+          double radius = sqrt((transMatrix[0] * transMatrix[0] + transMatrix[1] * transMatrix[1]));
+
+          /* Get z_shift for sensor */
+          if (sensorID.getLayerNumber() == 1) {
+            z_shift = pxdZ1Shift[sensorID.getSensorNumber() - 1];
+          } else {
+            z_shift = pxdZ2Shift[sensorID.getSensorNumber() - 1];
+          }
+
+          if (asin(rotMatrix[0]) > 0.01) {
+            phi = 2.0 * M_PI - phi;
+          }
+
+          if (phi > M_PI) {
+            phi = phi - M_PI * 2.0;
+          }
+
+          angle = tphi - phi;
+          a = radius * cos(angle) - fabs(r) * (pow(fabs(sin(angle)), 2.0));
+          if ((pow(fabs(a), 2.0) - pow(radius, 2.0)) >= 0.0 &&
+              fabs((htrack->getTrackPhi() - phi)) < (M_PI / 2.0)) {
+            x = a + sqrt(pow(fabs(a), 2.0) - pow(radius, 2.0));
+            b = -1 * pow(fabs(x), 2.0) - (2 * x * fabs(r));
+
+            if (b >= 0.0) {
+              y = x * sin(angle) + sqrt(b) * cos(angle);
+
+              //if (y < (shift + (width / 2.0)) && y > (shift + (width / -2.0))) {
+              if (y < maxY[sensorID.getLayerNumber() - 1] && y > minY[sensorID.getLayerNumber() - 1]) {
+                mph_x = radius * cos(phi) - y * sin(phi);
+                mph_y = radius * sin(phi) + y * cos(phi);
+                mph_z = mph_y / tan(ttheta);
+
+                if (mph_z > ((length / -2.0) + z_shift) && mph_z < ((length / 2.0) + z_shift)) {
+                  B2DEBUG(200, "    ->Found in PXD Sensor ID: " << sensorID << "\tPhi: "
+                          << phi / Unit::deg << " Radius: " << radius << " Shift: " << z_shift
+                          << " Width: " << width << " Length: " << length);
+                  B2DEBUG(200, "        Candidate is: " << radius << ", " << y);
+                  B2DEBUG(200, "         -> Transformed: " << mph_x << ", " << mph_y << ", " << mph_z);
+                  mph_pos.SetXYZ(mph_x, mph_y, mph_z);
+
+                  static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+                  const VXD::SensorInfoBase& info = geo.get(sensorID);
+                  TVector3 local_pos = info.pointToLocal(mph_pos);
+
+                  //extrapolatedHits.push_back(std::make_pair(sensorID, TVector2(y - shift, mph_z - z_shift)));
+                  extrapolatedHits.push_back(std::make_pair(sensorID, TVector2(local_pos.X(), local_pos.Y())));
+
+                  storeExtrapolatedHits.appendNew(SVDHoughCluster(idx, mph_pos, sensorID));
+                  ++idx;
+                  found = true;
+                  break;
+                } else {
+                  B2DEBUG(200, "    !Failed in PXD Sensor ID: " << sensorID << "\tPhi: "
+                          << phi / Unit::deg << " Radius: " << radius << " Shift: " << z_shift
+                          << " Width: " << width << " Length: " << length);
+                  B2DEBUG(200, "      Candidate was: " << radius << ", " << y);
+                }
+              } else {
+                B2DEBUG(200, "    !Failed at y = " << y << " a: " << a << " x: " << x << " b: " << b << " angle: " << angle);
+              }
+            } else {
+              B2DEBUG(200, "    !Failed at x: " << x << " b: " << b << " a: " << a << " angle: " << angle
+                      << " Sensor-Phi: " << phi << " |tphi-phi|: " << fabs((htrack->getTrackPhi() - phi)));
+            }
+          } else {
+            B2DEBUG(200, "    !Failed at a: " << a << " angle: " << angle << " Sensor-Phi: " << phi
+                    << " |tphi-phi|: " << fabs((htrack->getTrackPhi() - phi)));
+          }
+        }
+
+        if (found) {
+          //break;
+        }
+      }
+    }
+  }
+}
+
+/*
+ * Take the hough tracks and to the extrapolation to the PXD
+ * layer.
+ */
+void
+SVDHoughtrackingModule::pxdExtrapolationTheta()
+{
+  StoreArray<SVDHoughTrack> storeHoughTrack(m_storeHoughTrack);
+  StoreArray<SVDHoughCluster> storeExtrapolatedHits(m_storeExtrapolatedHitsName);
+  double pxdShift[] = {0.35, 0.35};
+  double x, y;
+  double mph_x, mph_y;
+  double a, b, angle;
+  TVector3 mph_pos;
+  TGeoHMatrix transfMatrix;
+  double* rotMatrix, *transMatrix;
+  int nTracks;
+  VxdID sensor;
+
+  B2DEBUG(200, "PXD Phi Extrapolation: ");
+
+  nTracks = storeHoughTrack.getEntries();
+  for (int i = 0; i < nTracks; ++i) {
+    SVDHoughTrack* htrack = storeHoughTrack[0];
+    double r = htrack->getTrackR();
+    double tphi = htrack->getTrackPhi() - (M_PI / 2.0);
+
+    VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+    BOOST_FOREACH(VxdID layer, geo.getLayers(SensorInfo::PXD)) {
+      BOOST_FOREACH(VxdID ladder, geo.getLadders(layer)) {
+        sensor = ladder;
+        sensor.setSensorNumber(1);
+        const PXD::SensorInfo* currentSensor = dynamic_cast<const PXD::SensorInfo*>(&VXD::GeoCache::get(sensor));
+        transfMatrix = currentSensor->getTransformation();
+        rotMatrix = transfMatrix.GetRotationMatrix();
+        transMatrix = transfMatrix.GetTranslation();
+        double width = currentSensor->getWidth();
+        double length = currentSensor->getLength();
+        double shift = pxdShift[sensor.getLayerNumber() - 1];
+        double z_shift = 0.0;
+        double phi = acos(rotMatrix[2]);
+        double radius = sqrt((transMatrix[0] * transMatrix[0] + transMatrix[1] * transMatrix[1]));
+
+        if (asin(rotMatrix[0]) > 0.01) {
+          phi = 2 * M_PI - phi;
+        }
+
+        if (phi > M_PI) {
+          phi = phi - M_PI * 2 ;
+        }
+
+        angle = tphi - phi;
+        a = radius * cos(angle) - fabs(r) * (pow(fabs(sin(angle)), 2.0));
+        B2DEBUG(200, "  -> a: " << a << " angle: " << angle << " Phi: " << phi
+                << " tphi-phi: " << fabs((htrack->getTrackPhi() - phi)));
+        if ((pow(fabs(a), 2.0) - pow(radius, 2.0)) >= 0.0 &&
+            fabs((htrack->getTrackPhi() - phi)) < (M_PI / 2.0)) {
+          x = a + sqrt(pow(fabs(a), 2.0) - pow(radius, 2.0));
+          b = -1 * pow(fabs(x), 2.0) + (2 * x * r);
+          B2DEBUG(200, "    -> x: " << x << " b: " << b);
+
+          if (b >= 0.0) {
+            y = x * sin(angle) + sqrt(b) * cos(angle);
+
+            B2DEBUG(200, "    --> y = " << y << " a: " << a << " x: " << x << " b: " << b << " angle: " << angle);
+            if (y < (shift + (width / 2.0)) && y > (shift + (width / -2.0))) {
+              B2DEBUG(200, "  Found in PXD Sensor ID: " << sensor << "\tPhi: "
+                      << phi / Unit::deg << " Radius: " << radius << " Shift: " << z_shift
+                      << " Width: " << width << " Length: " << length);
+              B2DEBUG(200, "      Candidate is: " << radius << ", " << y);
+              mph_x = radius * cos(phi) - y * sin(phi);
+              mph_y = radius * sin(phi) + y * cos(phi);
+              B2DEBUG(200, "       -> Transformed: " << mph_x << ", " << mph_y);
+              mph_pos.SetXYZ(mph_x, mph_y, 0.0);
+
+              storeExtrapolatedHits.appendNew(SVDHoughCluster(0, mph_pos, sensor));
+            }
+          }
+        }
+      }
+    }
   }
 }
 
@@ -1399,24 +1784,26 @@ SVDHoughtrackingModule::pxdExtrapolationPhi()
 
         angle = tphi - phi;
         a = radius * cos(angle) - fabs(r) * (pow(fabs(sin(angle)), 2.0));
-        B2DEBUG(200, "--> a: " << a << " angle: " << angle << " Phi: " << phi
-                << " tphi-phi " << fabs((htrack->getTrackPhi() - phi)));
+        B2DEBUG(200, "  -> a: " << a << " angle: " << angle << " Phi: " << phi
+                << " tphi-phi: " << fabs((htrack->getTrackPhi() - phi)));
         if ((pow(fabs(a), 2.0) - pow(radius, 2.0)) >= 0.0 &&
             fabs((htrack->getTrackPhi() - phi)) < (M_PI / 2.0)) {
           x = a + sqrt(pow(fabs(a), 2.0) - pow(radius, 2.0));
           b = -1 * pow(fabs(x), 2.0) + (2 * x * r);
+          B2DEBUG(200, "    -> x: " << x << " b: " << b);
+
           if (b >= 0.0) {
             y = x * sin(angle) + sqrt(b) * cos(angle);
 
-            B2DEBUG(200, "--> y = " << y << " a: " << a << " x: " << x << " b: " << b << " angle: " << angle);
+            B2DEBUG(200, "    --> y = " << y << " a: " << a << " x: " << x << " b: " << b << " angle: " << angle);
             if (y < (shift + (width / 2.0)) && y > (shift + (width / -2.0))) {
               B2DEBUG(200, "  Found in PXD Sensor ID: " << sensor << "\tPhi: "
                       << phi / Unit::deg << " Radius: " << radius << " Shift: " << z_shift
                       << " Width: " << width << " Length: " << length);
-              B2DEBUG(200, "  Candidate is: " << radius << ", " << y);
+              B2DEBUG(200, "      Candidate is: " << radius << ", " << y);
               mph_x = radius * cos(phi) - y * sin(phi);
               mph_y = radius * sin(phi) + y * cos(phi);
-              B2DEBUG(200, "  -> Transformed: " << mph_x << ", " << mph_y);
+              B2DEBUG(200, "       -> Transformed: " << mph_x << ", " << mph_y);
               mph_pos.SetXYZ(mph_x, mph_y, 0.0);
 
               storeExtrapolatedHits.appendNew(SVDHoughCluster(0, mph_pos, sensor));
@@ -1594,7 +1981,95 @@ SVDHoughtrackingModule::pxdSingleExtrapolation()
 }
 
 /*
- * analyer tool for the extrapolated hits and check for its performance
+ * Analyer tool for the extrapolated hits and check for its performance
+ * in the pxd detector.
+ */
+void
+SVDHoughtrackingModule::analyseExtrapolatedFull()
+{
+  StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
+  StoreArray<PXDTrueHit> storePXDTrueHits(m_storePXDTrueHitsName);
+  PXDTrueHit* currHit;
+  MCParticle* particle;
+  TVector2 local_pos;
+  TVector2 mph_pos;
+  VxdID sensorID, mph_sensorID;
+  int nPXD, nMCParticles;
+  int nMcTrue;
+  double distance, min_distance;
+  double min_distance_u, min_distance_v;
+
+  RelationArray mcParticlesToTrueHits(storeMCParticles, storePXDTrueHits);
+
+  nPXD = storePXDTrueHits.getEntries();
+  nMcTrue = mcParticlesToTrueHits.getEntries();
+  nMCParticles = storeMCParticles.getEntries();
+
+  B2DEBUG(200, "Analyze extrapolated hits: " << nPXD << " PXD TrueHits and "
+          << extrapolatedHits.size() << " extrapolated Hits");
+
+  if (!mcParticlesToTrueHits.isValid()) {
+    B2WARNING("  Relation Array not valid!");
+  }
+
+
+  B2DEBUG(200, "  Number of MCParticles: " << nMCParticles);
+  for (int i = 0; i < nMcTrue; ++i) {
+    B2DEBUG(200, "  nMCTrueRelation: " << i);
+    particle = storeMCParticles[i];
+    if (particle->getMother() == NULL) {
+      B2DEBUG(200, "  I'm a primary!");
+    }
+    for (unsigned int j = 0; j < mcParticlesToTrueHits[i].getToIndices().size(); j++) {
+      B2DEBUG(200, "    Hit id: " << mcParticlesToTrueHits[i].getToIndex(j));
+    }
+  }
+
+
+  if (nPXD == 0) {
+    return;
+  }
+
+  for (auto it = extrapolatedHits.begin(); it != extrapolatedHits.end(); ++it) {
+    mph_sensorID = it->first;
+    mph_pos = it->second;
+    min_distance = 1e+99;
+    B2DEBUG(200, "  Extrapolated hit SensorID: " << mph_sensorID << " Coord: "
+            << mph_pos.X() << ", " << mph_pos.Y());
+
+    for (int i = 0; i < nPXD; ++i) {
+      currHit = storePXDTrueHits[i];
+      sensorID = currHit->getSensorID();
+
+      local_pos.Set(currHit->getU(), currHit->getV());
+      B2DEBUG(200, "    PXD hit SensorID: " << sensorID << " Coord: " << local_pos.X() << ", " << local_pos.Y());
+
+      if (mph_sensorID != sensorID) {
+        continue;
+      }
+
+      distance = sqrt(pow(fabs(local_pos.X() - mph_pos.X()), 2.0)
+                      + pow(fabs(local_pos.Y() - mph_pos.Y()), 2.0));
+
+      if (distance < min_distance) {
+        min_distance = distance;
+        min_distance_u = fabs(local_pos.X() - mph_pos.X());
+        min_distance_v = fabs(local_pos.Y() - mph_pos.Y());
+      }
+    }
+
+    m_histROIDiffPhi->Fill(min_distance_u);
+    m_histROIDiffTheta->Fill(min_distance_v);
+    m_histROIDiffPhiPx->Fill(min_distance_u / 0.005);
+    m_histROIDiffThetaPx->Fill(min_distance_v / 0.0075);
+
+    B2DEBUG(100, "  => Min distance: " << min_distance << " u (x): " << min_distance_u << " v (y): "
+            << min_distance_v);
+  }
+}
+
+/*
+ * Analyer tool for the extrapolated hits and check for its performance
  * in the pxd detector.
  */
 void
@@ -1605,25 +2080,33 @@ SVDHoughtrackingModule::analyseExtrapolatedPhi()
   PXDTrueHit* currHit;
   TVector3 local_pos, pos;
   TVector3 dist, mph_pos;
-  VxdID sensorID;
+  VxdID sensorID, mph_sensorID;
   int nPXD, nMPH;
   double distance, min_distance;
 
-  B2DEBUG(200, "Analyze extrapolated Phi hits");
-
   nPXD = storePXDTrueHits.getEntries();
   nMPH = storeExtrapolatedHits.getEntries();
+
+  B2DEBUG(200, "Analyze extrapolated Phi hits: " << nPXD << " PXD TrueHits and "
+          << nMPH << " extrapolated Hits");
+
   if (nPXD == 0 || nMPH == 0) {
     return;
   }
 
   for (int j = 0; j < nMPH; ++j) {
     mph_pos = storeExtrapolatedHits[j]->getHitPos();
+    mph_sensorID = storeExtrapolatedHits[j]->getSensorID();
     min_distance = 1e+99;
 
     for (int i = 0; i < nPXD; ++i) {
       currHit = storePXDTrueHits[i];
       sensorID = currHit->getSensorID();
+
+      if (mph_sensorID.getLayerNumber() != sensorID.getLayerNumber() /*||
+            mph_sensorID.getLadderNumber() != sensorID.getLadderNumber()*/) {
+        continue;
+      }
 
       local_pos.SetX(currHit->getU());
       local_pos.SetY(currHit->getV());
@@ -1639,20 +2122,23 @@ SVDHoughtrackingModule::analyseExtrapolatedPhi()
       B2DEBUG(200, "     Global Position: " << pos.X() << ", " << pos.Y() << ", " << pos.Z());
 
       dist = mph_pos - pos;
-      distance = dist.Mag();
+      //distance = dist.Mag();
+      distance = sqrt(pow(fabs(mph_pos.X() - pos.X()), 2.0) + pow(fabs(mph_pos.Y() - pos.Y()), 2.0));
 
       if (distance < min_distance) {
         min_distance = distance;
       }
     }
-    m_histROIDiffPhi->Fill(min_distance);
 
-    B2DEBUG(100, "   Min distance: " << min_distance);
+    m_histROIDiffPhi->Fill(min_distance);
+    m_histROIDiffPhiPx->Fill(min_distance / 0.005);
+
+    B2DEBUG(100, "  => Min distance: " << min_distance << endl);
   }
 }
 
 /*
- * analyer tool for the extrapolated hits and check for its performance
+ * Analyer tool for the extrapolated hits and check for its performance
  * in the pxd detector.
  */
 void
@@ -1904,6 +2390,391 @@ SVDHoughtrackingModule::noiseFilter(float* samples, int size, float* peak_sample
 }
 
 /*
+ * Analyse ROIs using first the TrueHits to check if the relevant
+ * Hits are inside and then go over all SimHits to also include
+ * background.
+ */
+void
+SVDHoughtrackingModule::analyseROI()
+{
+  StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
+  StoreArray<PXDTrueHit> storePXDTrueHits(m_storePXDTrueHitsName);
+  StoreArray<PXDSimHit> storePXDSimHit(m_storePXDSimHitsName);
+  PXDTrueHit* currHit;
+  MCParticle* particle;
+  TVector3 pos, last_pos, local_pos;
+  TVector3 diff, vec, abs_pos;
+  TVector2 hit_pos;
+  TVector2 v1, v2;
+  VxdID sensorID, roi_sensorID;
+  VxdID last_sensorID;
+  int i, nMCParticles, nSimHit;
+  int nMcTrue, nROI;
+  int foundHits;
+  unsigned int corrFound;
+  unsigned int primaryTracks = 0;
+  unsigned int nHits;
+  bool layer[2], found_layer[2];
+  double dist;
+
+
+  RelationArray mcParticlesToTrueHits(storeMCParticles, storePXDTrueHits);
+
+  nMcTrue = mcParticlesToTrueHits.getEntries();
+  nMCParticles = storeMCParticles.getEntries();
+  nROI = pxdROI.size();
+
+  B2DEBUG(200, "Analyze ROIs: " << nROI);
+
+  if (!mcParticlesToTrueHits.isValid()) {
+    B2WARNING("  Relation Array not valid!");
+  }
+
+  B2DEBUG(200, "  Number of MCParticles: " << nMCParticles);
+  foundHits = 0;
+  corrFound = 0;
+  nHits = 0;
+  for (int i = 0; i < nMcTrue; ++i) {
+    particle = storeMCParticles[i];
+    layer[0] = false;
+    layer[1] = false;
+    found_layer[0] = false;
+    found_layer[1] = false;
+    if (particle->getMother() == NULL) {
+      ++primaryTracks;
+      /* Iterate over all TrueHits in a detector */
+      for (unsigned int j = 0; j < mcParticlesToTrueHits[i].getToIndices().size(); j++) {
+        currHit = storePXDTrueHits[mcParticlesToTrueHits[i].getToIndex(j)];
+        sensorID = currHit->getSensorID();
+        hit_pos.Set(currHit->getU(), currHit->getV());
+        layer[sensorID.getLayerNumber() - 1] = true;
+
+        B2DEBUG(200, "    Hit id: " << mcParticlesToTrueHits[i].getToIndex(j) << " hit in sensor " << sensorID
+                << " pos: " << hit_pos.X() << ", " << hit_pos.Y());
+        /* Iterate over all ROIs */
+        for (int k = 0; k < nROI; ++k) {
+          roi_sensorID = pxdROI[k].getSensorID();
+          if (roi_sensorID == sensorID) {
+            v1 = pxdROI[k].getV1();
+            v2 = pxdROI[k].getV2();
+            B2DEBUG(200, "      ROI v1: " << v1.X() << ", " << v1.Y() << " v2: "
+                    << v2.X() << ", " << v2.Y());
+
+            if (hit_pos.Y() >= v1.X() && hit_pos.Y() <= v2.X() &&
+                hit_pos.X() >= v1.Y() && hit_pos.X() <= v2.Y()) {
+              found_layer[sensorID.getLayerNumber() - 1] = true;
+              ++foundHits;
+            }
+          }
+        }
+      }
+
+      if (layer[0] == true) {
+        ++nHits;
+      }
+      if (layer[1] == true) {
+        ++nHits;
+      }
+
+      /* Accept ROIs for this track if either 1 ist found in both layers, or at
+       * lest two
+       */
+      if (found_layer[0] == true && found_layer[1] == true) {
+        corrFound += 2;
+      } else if (foundHits > 1) {
+        corrFound += 2;
+      } else if ((found_layer[0] == true || found_layer[1] == true) &&
+                 (mcParticlesToTrueHits[i].getToIndices().size() < 2)) {
+        corrFound += 1;
+      }
+    }
+  }
+  totROITrueHits += nHits;
+
+  nSimHit = storePXDSimHit.getEntries();
+  /* Count numbers of clustered SimHits inside ROIs */
+  svd_sensor_cluster_map.clear();
+  dist = 1E+50;
+  for (i = 0; i < nSimHit; ++i) {
+    vec = storePXDSimHit[i]->getPosIn();
+    VxdID sensorID = storePXDSimHit[i]->getSensorID();
+    static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+
+    /* Convert local to global position */
+    const VXD::SensorInfoBase& info = geo.get(sensorID);
+    abs_pos = info.pointToGlobal(storePXDSimHit[i]->getPosIn());
+    pos = abs_pos;
+
+    if (i == 0) {
+      if (i == (nSimHit - 1)) {
+        for (int k = 0; k < nROI; ++k) {
+          roi_sensorID = pxdROI[k].getSensorID();
+          if (roi_sensorID == last_sensorID) {
+            v1 = pxdROI[k].getV1();
+            v2 = pxdROI[k].getV2();
+
+            if (vec.Y() >= v1.X() && vec.Y() <= v2.X() &&
+                vec.X() >= v1.Y() && vec.X() <= v2.Y()) {
+              ++curHitsInROIs;
+            }
+          }
+        }
+        ++totROITrueHits;
+      }
+    } else {
+      //diff = pos - last_pos;
+      diff = abs_pos - last_pos;
+      dist = diff.Mag();
+
+      if (fabs(dist) < 0.02 && i != (nSimHit - 1)) {
+      } else {
+        for (int k = 0; k < nROI; ++k) {
+          roi_sensorID = pxdROI[k].getSensorID();
+          if (roi_sensorID == last_sensorID) {
+            v1 = pxdROI[k].getV1();
+            v2 = pxdROI[k].getV2();
+
+            if (vec.Y() >= v1.X() && vec.Y() <= v2.X() &&
+                vec.X() >= v1.Y() && vec.X() <= v2.Y()) {
+              ++curHitsInROIs;
+            }
+          }
+        }
+        ++totROITrueHits;
+      }
+    }
+
+    last_pos = abs_pos;
+    last_sensorID = sensorID;
+  }
+
+  B2DEBUG(200, "  -> Total ROIs: " << nHits << " Correct found: " << corrFound);
+
+  if (nHits > 0) {
+    curROIEff += ((double) corrFound) / ((double) nHits);
+  }
+}
+
+/*
+ * Calculate Region of Interests (ROI).
+ */
+void
+SVDHoughtrackingModule::createROI()
+{
+  StoreArray<SVDHoughCluster> storeExtrapolatedHits(m_storeExtrapolatedHitsName);
+  SVDHoughCluster* currHit;
+  double size_v = 12.0;
+  double size_u = 160.0;
+  double offset_x, offset_y;
+  double x, y;
+  int nExHits;
+  bool fixedSize = true;
+  VxdID sensorID;
+  TVector3 pos, local_pos;
+  TVector2 v1, v2;
+  ofstream of_l1, of_l2;
+
+  /* Clear ROI vector first */
+  pxdROI.clear();
+
+  of_l1.open("dbg/rois_l1.dat", ofstream::out);
+  of_l2.open("dbg/rois_l2.dat", ofstream::out);
+
+  B2DEBUG(200, "Create ROIs: ");
+
+  nExHits = storeExtrapolatedHits.getEntries();
+  for (int i = 0; i < nExHits; ++i) {
+    currHit = storeExtrapolatedHits[i];
+    pos = currHit->getHitPos();
+    sensorID = currHit->getSensorID();
+
+    static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+    const VXD::SensorInfoBase& info = geo.get(sensorID);
+    local_pos = info.pointToLocal(pos);
+
+    const PXD::SensorInfo* currentSensor = dynamic_cast<const PXD::SensorInfo*>(&VXD::GeoCache::get(sensorID));
+    double width = currentSensor->getWidth();
+    double length = currentSensor->getLength();
+
+    /* For lower left edge */
+    if (fixedSize) {
+      x = local_pos.Y() - ((size_u / 2.0) * 0.0075);
+      y = local_pos.X() - ((size_v / 2.0) * 0.0050);
+    }
+    if (x < (length / -2.0)) {
+      x = length / -2.0;
+    }
+    if (y < (width / -2.0)) {
+      y = width / -2.0;
+    }
+    v1.Set(x, y);
+
+    /* For lower left edge */
+    if (fixedSize) {
+      x = local_pos.Y() + ((size_u / 2.0) * 0.0075);
+      y = local_pos.X() + ((size_v / 2.0) * 0.0050);
+    }
+    if (x > (length / 2.0)) {
+      x = length / 2.0;
+    }
+    if (y > (width / 2.0)) {
+      y = width / 2.0;
+    }
+    v2.Set(x, y);
+
+    B2DEBUG(200, "  Local position of ROI in sensor: " << sensorID << " Coord: "
+            << local_pos.Y() << " " << local_pos.X() << " v1: " <<
+            v1.X() << ", " << v1.Y() << " v2: " << v2.X() << ", " << v2.Y());
+    pxdROI.push_back(SVDHoughROI(sensorID, v1, v2));
+
+    if (sensorID.getLayerNumber() == 1) {
+      offset_x = 4.48 * (sensorID.getSensorNumber() - 1) + 4.48 / 2.0;
+      offset_y = (1.25 + 0.2) * (sensorID.getLadderNumber() - 1) + 1.25 / 2.0;
+
+      of_l1 << "set object rect from " << v1.X() + offset_x << ", "
+            << v1.Y() + offset_y << " to " << v2.X() + offset_x << ", "
+            << v2.Y() + offset_y << " " << "fc rgb \"green\" fs solid 0.5 behind"
+            << endl;
+    } else {
+      offset_x = 6.144 * (sensorID.getSensorNumber() - 1) + 6.144 / 2.0;
+      offset_y = (1.25 + 0.2) * (sensorID.getLadderNumber() - 1) + 1.25 / 2.0;
+
+      of_l2 << "set object rect from " << v1.X() + offset_x << ", "
+            << v1.Y() + offset_y << " to " << v2.X() + offset_x << ", "
+            << v2.Y() + offset_y << " " << "fc rgb \"green\" fs solid 0.5 behind"
+            << endl;
+    }
+  }
+
+  of_l1.close();
+  of_l2.close();
+}
+
+/*
+ * For occupancy and ROI reduction studies, convert the PXD Sim hits
+ * into a local format.
+ */
+void
+SVDHoughtrackingModule::createPXDMap()
+{
+  StoreArray<PXDSimHit> storePXDSimHit(m_storePXDSimHitsName);
+  StoreArray<PXDTrueHit> storePXDTrueHits(m_storePXDTrueHitsName);
+  int i, cluster_cnt;
+  int nSimHit, nTrueHit;
+  double dist;
+  double u, v;
+  VxdID sensorID, last_sensorID;
+  TVector3 pos, last_pos, local_pos;
+  TVector3 diff, vec, abs_pos;
+  TVector2 truehit_pos;
+  ofstream of_l1, of_l2;
+
+  clusterMap pos_map;
+  sensorMap sensor_cluster;
+  std::map<int, TVector3> cpy_map = pos_map;
+  std::map<int, TVector3>::iterator iter, inner_iter;
+  TVector3 clusterDelta(0.15, 0.15, 0.15);
+  PXDTrueHit* currTrueHit;
+
+  nSimHit = storePXDSimHit.getEntries();
+  nTrueHit = storePXDTrueHits.getEntries();
+  if (nSimHit == 0 && nTrueHit == 0) {
+    return;
+  }
+
+  of_l1.open("dbg/pxd_occ_l1.dat", ofstream::out);
+  of_l2.open("dbg/pxd_occ_l2.dat", ofstream::out);
+
+  B2DEBUG(200, "Create PXD map: " << nSimHit);
+
+  /* First convert to absolute hits and save into a map */
+  svd_sensor_cluster_map.clear();
+  dist = 1E+50;
+  cluster_cnt = 0;
+  for (i = 0; i < nSimHit; ++i) {
+    vec = storePXDSimHit[i]->getPosIn();
+    VxdID sensorID = storePXDSimHit[i]->getSensorID();
+    static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+
+    /* Convert local to global position */
+    const VXD::SensorInfoBase& info = geo.get(sensorID);
+    abs_pos = info.pointToGlobal(storePXDSimHit[i]->getPosIn());
+    pos = abs_pos;
+
+    if (i == 0) {
+      if (i == (nSimHit - 1)) {
+        B2DEBUG(200, "  Add in Layer " << sensorID.getLayerNumber() << " sensor: " << sensorID << " coord: "
+                << vec.X() << " " << vec.Y() << " " << vec.Z());
+        if (sensorID.getLayerNumber() == 1) {
+          v = 4.48 * (sensorID.getSensorNumber() - 1) + vec.Y() + 4.48 / 2.0;
+          u = (1.2 + 0.2) * (sensorID.getLadderNumber() - 1) + vec.X() + 1.2 / 2.0;
+          m_histROIPXD_l1->Fill(v, u);
+          of_l1 << v << " " << u << endl;
+        } else {
+          v = 6.144 * (sensorID.getSensorNumber() - 1) + vec.Y() + 6.144 / 2.0;
+          u = (1.25 + 0.2) * (sensorID.getLadderNumber() - 1) + vec.X() + 1.25 / 2.0;
+          m_histROIPXD_l2->Fill(v, u);
+          of_l2 << v << " " << u << endl;
+        }
+        ++cluster_cnt;
+      }
+    } else {
+      //diff = pos - last_pos;
+      diff = abs_pos - last_pos;
+      dist = diff.Mag();
+      B2DEBUG(250, "   Distance: " << dist);
+
+      if (fabs(dist) < 0.02 && i != (nSimHit - 1)) {
+      } else {
+        B2DEBUG(200, "  Add in sensor: " << last_sensorID << " coord: " << vec.X() << " " << vec.Y() << " " << vec.Z()
+                << " Layer " << last_sensorID.getLayerNumber() << " Ladder: " << last_sensorID.getLadderNumber()
+                << " Sensor: " << last_sensorID.getSensorNumber());
+        if (last_sensorID.getLayerNumber() == 1) {
+          v = 4.48 * (last_sensorID.getSensorNumber() - 1) + vec.Y() + 4.48 / 2.0;
+          u = (1.2 + 0.2) * (last_sensorID.getLadderNumber() - 1) + vec.X() + 1.2 / 2.0;
+          m_histROIPXD_l1->Fill(v, u);
+          of_l1 << v << " " << u << endl;
+        } else {
+          v = 6.144 * (last_sensorID.getSensorNumber() - 1) + vec.Y() + 6.144 / 2.0;
+          u = (1.25 + 0.2) * (last_sensorID.getLadderNumber() - 1) + vec.X() + 1.25 / 2.0;
+          m_histROIPXD_l2->Fill(v, u);
+          of_l2 << v << " " << u << endl;
+        }
+        ++cluster_cnt;
+      }
+    }
+
+    //last_pos = pos;
+    last_pos = abs_pos;
+    last_sensorID = sensorID;
+  }
+
+  for (int i = 0; i < nTrueHit; ++i) {
+    currTrueHit = storePXDTrueHits[i];
+    sensorID = currTrueHit->getSensorID();
+
+    truehit_pos.Set(currTrueHit->getU(), currTrueHit->getV());
+    B2DEBUG(200, "    Add PXD TrueHit SensorID: " << sensorID << " Coord: "
+            << local_pos.X() << ", " << local_pos.Y());
+    if (sensorID.getLayerNumber() == 1) {
+      v = 4.48 * (sensorID.getSensorNumber() - 1) + truehit_pos.Y() + 4.48 / 2.0;
+      u = (1.2 + 0.2) * (sensorID.getLadderNumber() - 1) + truehit_pos.X() + 1.2 / 2.0;
+      m_histROIPXD_l1->Fill(v, u);
+      of_l1 << v << " " << u << endl;
+    } else {
+      v = 6.144 * (sensorID.getSensorNumber() - 1) + truehit_pos.Y() + 6.144 / 2.0;
+      u = (1.25 + 0.2) * (sensorID.getLadderNumber() - 1) + truehit_pos.X() + 1.25 / 2.0;
+      m_histROIPXD_l2->Fill(v, u);
+      of_l2 << v << " " << u << endl;
+    }
+    ++cluster_cnt;
+  }
+
+  of_l1.close();
+  of_l2.close();
+}
+
+/*
  * To bypass the FPGA cluster algorithm, we can directly convert
  * SimHits into the cluster format.
  */
@@ -1916,6 +2787,7 @@ SVDHoughtrackingModule::convertSimHits()
   int i, cluster_cnt;
   int nSimHit;
   double dist;
+  float time;
   VxdID sensorID, last_sensorID;
   TVector3 pos, last_pos, local_pos;
   TVector3 diff, vec, abs_pos;
@@ -1946,16 +2818,23 @@ SVDHoughtrackingModule::convertSimHits()
   cluster_cnt = 0;
   for (i = 0; i < nSimHit; ++i) {
     vec = storeSVDSimHit[i]->getPosIn();
+    time = storeSVDSimHit[i]->getGlobalTime();
     VxdID sensorID = storeSVDSimHit[i]->getSensorID();
     static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+
+    /* Don't want off trigger hits */
+    if (time < 0.0f || time > 6.0f) {
+      continue;
+    }
 
     /* Convert local to global position */
     const VXD::SensorInfoBase& info = geo.get(sensorID);
     abs_pos = info.pointToGlobal(storeSVDSimHit[i]->getPosIn());
     pos = abs_pos;
 
-    B2DEBUG(250, " Local sim Pos: " << vec.X() << " " << vec.Y() << " " << vec.Z()
-            << " Abs pos: " << abs_pos.X() << " " << abs_pos.Y() << " " << abs_pos.Z() << " Sensor ID: " << sensorID);
+    B2DEBUG(250, " Local SimHit Pos: " << vec.X() << " " << vec.Y() << " " << vec.Z()
+            << " Abs pos: " << abs_pos.X() << " " << abs_pos.Y() << " " << abs_pos.Z()
+            << " Time: " << time << " " << " Sensor ID: " << sensorID);
 
     if (i == 0) {
       if (i == (nSimHit - 1)) {
@@ -2433,6 +3312,7 @@ SVDHoughtrackingModule::trackAnalyseMCParticle()
   track_match_p = new bool[nMCParticles]();
   track_match = new bool[nMCParticles]();
   nPrimary = 0;
+  pT = 0.0;
 
   if (m_compareMCParticleVerbose) {
     B2INFO("MCParticle Comparison: ");
@@ -2450,6 +3330,9 @@ SVDHoughtrackingModule::trackAnalyseMCParticle()
       /* Write Phi and Theta into histogram */
       m_histPhiDist->Fill(mom.Phi() / Unit::deg);
       m_histThetaDist->Fill(mom.Theta() / Unit::deg);
+      //projected_theta = atan(fabs(mom.Y()) / fabs(mom.Z())); /* Calculate the projected theta */
+      projected_theta = atan(mom.Y() / mom.Z()); /* Calculate the projected theta */
+      m_histProjectedThetaDist->Fill(projected_theta / Unit::deg);
 
       B2DEBUG(250, "  MCParticleInfo: Mom Vec: " << mom.X() << " " << mom.Y() << " " << mom.Z());
       if (m_compareMCParticleVerbose) {
@@ -2496,8 +3379,6 @@ SVDHoughtrackingModule::trackAnalyseMCParticle()
           m_r = r;
         }
 
-        //projected_theta = (M_PI / 2.0) * (1.0 / acos(mom.Theta() - M_PI / 4.0) - 0.5);
-        projected_theta = atan(fabs(mom.Y()) / fabs(mom.Z()));
         //if (fabs((theta - (mom.Theta() * sin(mom.Phi())))) < fabs(min_theta)) {
         if (fabs(theta - projected_theta) < fabs(min_theta)) {
           min_theta = theta - projected_theta;
@@ -2505,9 +3386,21 @@ SVDHoughtrackingModule::trackAnalyseMCParticle()
           //  min_theta = ((storeHoughTrack[j]->getTrackTheta() - (mom.Theta())));
         }
 
-        B2DEBUG(150, "  MCP " << i << " with Track (" << phi << ", "
+#ifdef DBG_THETA
+        ofstream os_angles;
+        os_angles.open("dbg/angles.dat", ofstream::out | ofstream::app);
+        os_angles << mom.Theta() / Unit::deg << "\t" << projected_theta / Unit::deg << "\t"
+                  << theta / Unit::deg << "\t" << mom.Phi() / Unit::deg << "\t"
+                  << phi / Unit::deg << endl;
+        os_angles.close();
+#endif
+
+
+        B2DEBUG(150, "  MCP " << i << " Mom: " << mom.X() << ", " << mom.Y() << ", " << mom.Z()
+                << " with Track (" << phi << ", "
                 << theta << ") " << j << " Difference: phi = "
-                << min_phi << " theta = " << min_theta);
+                << min_phi << " theta = " << min_theta << " projected theta: " << projected_theta << " ("
+                << projected_theta / Unit::deg << ")");
       }
       min_theta /= Unit::deg;
       min_phi /= Unit::deg;
@@ -2516,6 +3409,12 @@ SVDHoughtrackingModule::trackAnalyseMCParticle()
       if (nTracks != 0) {
         m_histHoughDiffPhi->Fill(min_phi);
         m_histHoughDiffTheta->Fill(min_theta);
+      }
+
+      /* Missing hit plots for MCParticle track in Phi and Theta */
+      if (nTracks == 0) {
+        m_histMissedTheta->Fill(mom.Theta() / Unit::deg);
+        m_histMissedPhi->Fill(mom.Phi() / Unit::deg);
       }
 
       if (usePhi) {
@@ -2554,6 +3453,7 @@ SVDHoughtrackingModule::trackAnalyseMCParticle()
           /* Efficiency vs pT (only in phi while reconstruction in theta is not proved) */
           m_histPtThetaRecon->Fill(pT);
           m_histThetaRecon->Fill(mom.Theta() / Unit::deg); /* Efficiency vs Theta */
+          m_histProjectedThetaRecon->Fill(projected_theta / Unit::deg); /* Efficiency vs Theta */
           m_histThetaPhiDist->Fill(mom.Phi() / Unit::deg); /* Efficiency of Theta vs Phi */
 
           track_match_n[i] = true;
@@ -2603,11 +3503,14 @@ SVDHoughtrackingModule::trackAnalyseMCParticle()
   totTracks += (unsigned int) nTracks;
   if ((nTracks - nCorrRecoP) > 0) {
     totFakeTracks += (double)(nTracks - nCorrRecoP);
+    m_histPtFake->Fill(pT, (nTracks - nCorrRecoP));
   }
   B2DEBUG(1, "   Fake tracks: " << totFakeTracks << " " << nTracks << " " << nCorrRecoP);
   ++run;
 
-  delete track_match;
+  delete[] track_match_n;
+  delete[] track_match_p;
+  delete[] track_match;
 }
 
 /*

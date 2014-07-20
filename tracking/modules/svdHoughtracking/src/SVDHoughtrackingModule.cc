@@ -2581,8 +2581,10 @@ SVDHoughtrackingModule::createROI()
   /* Clear ROI vector first */
   pxdROI.clear();
 
-  of_l1.open("dbg/rois_l1.dat", ofstream::out);
-  of_l2.open("dbg/rois_l2.dat", ofstream::out);
+  if (m_createPXDMap) {
+    of_l1.open("dbg/rois_l1.dat", ofstream::out);
+    of_l2.open("dbg/rois_l2.dat", ofstream::out);
+  }
 
   B2DEBUG(200, "Create ROIs: ");
 
@@ -2631,27 +2633,31 @@ SVDHoughtrackingModule::createROI()
             v1.X() << ", " << v1.Y() << " v2: " << v2.X() << ", " << v2.Y());
     pxdROI.push_back(SVDHoughROI(sensorID, v1, v2));
 
-    if (sensorID.getLayerNumber() == 1) {
-      offset_x = 4.48 * (sensorID.getSensorNumber() - 1) + 4.48 / 2.0;
-      offset_y = (1.25 + 0.2) * (sensorID.getLadderNumber() - 1) + 1.25 / 2.0;
+    if (m_createPXDMap) {
+      if (sensorID.getLayerNumber() == 1) {
+        offset_x = 4.48 * (sensorID.getSensorNumber() - 1) + 4.48 / 2.0;
+        offset_y = (1.25 + 0.2) * (sensorID.getLadderNumber() - 1) + 1.25 / 2.0;
 
-      of_l1 << "set object rect from " << v1.X() + offset_x << ", "
-            << v1.Y() + offset_y << " to " << v2.X() + offset_x << ", "
-            << v2.Y() + offset_y << " " << "fc rgb \"green\" fs solid 0.5 behind"
-            << endl;
-    } else {
-      offset_x = 6.144 * (sensorID.getSensorNumber() - 1) + 6.144 / 2.0;
-      offset_y = (1.25 + 0.2) * (sensorID.getLadderNumber() - 1) + 1.25 / 2.0;
+        of_l1 << "set object rect from " << v1.X() + offset_x << ", "
+              << v1.Y() + offset_y << " to " << v2.X() + offset_x << ", "
+              << v2.Y() + offset_y << " " << "fc rgb \"green\" fs solid 0.5 behind"
+              << endl;
+      } else {
+        offset_x = 6.144 * (sensorID.getSensorNumber() - 1) + 6.144 / 2.0;
+        offset_y = (1.25 + 0.2) * (sensorID.getLadderNumber() - 1) + 1.25 / 2.0;
 
-      of_l2 << "set object rect from " << v1.X() + offset_x << ", "
-            << v1.Y() + offset_y << " to " << v2.X() + offset_x << ", "
-            << v2.Y() + offset_y << " " << "fc rgb \"green\" fs solid 0.5 behind"
-            << endl;
+        of_l2 << "set object rect from " << v1.X() + offset_x << ", "
+              << v1.Y() + offset_y << " to " << v2.X() + offset_x << ", "
+              << v2.Y() + offset_y << " " << "fc rgb \"green\" fs solid 0.5 behind"
+              << endl;
+      }
     }
   }
 
-  of_l1.close();
-  of_l2.close();
+  if (m_createPXDMap) {
+    of_l1.close();
+    of_l2.close();
+  }
 }
 
 /*

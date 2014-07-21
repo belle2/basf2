@@ -21,6 +21,7 @@
 
 // dataobjects
 #include <analysis/dataobjects/RestOfEvent.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 
 #include <mdst/dataobjects/MCParticle.h>
@@ -636,38 +637,157 @@ namespace Belle2 {
       return MCMatching::getMCTruthStatus(part);
     }
 
-    double isMuon(const Particle* part)
-    {
-      MCParticle* mcParticle = NULL;
-      if (!(part->getRelated<MCParticle>())) {return -1.0;}//if there is no mcparticle (e.g. not in training modus
-      else mcParticle = part->getRelated<MCParticle>();
-      if ((TMath::Abs(mcParticle->getPDG()) == 13) && (TMath::Abs(mcParticle->getMother()->getPDG()) == 511)) {
-        return 1.0;
-      } else if (TMath::Abs(mcParticle->getMother()->getMother() != nullptr && TMath::Abs(mcParticle->getPDG()) == 13) && (TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511)) {
-        //first check if there was a mother otherwise seg fault
-        return 1.0;
-      } else return 0.0;
-    }
+    // Flavour tagging variables
 
-    double isKaon(const Particle* part)
+    double isRestOfEventOfB0(const Particle*)
     {
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      Particle* part = roe->getRelated<Particle>();
       const MCParticle* mcParticle = part->getRelated<MCParticle>();
       if (mcParticle == nullptr) {return -1.0;} //if there is no mcparticle (e.g. not in training modus)
-      else if ((TMath::Abs(mcParticle->getPDG()) == 321) && (TMath::Abs(mcParticle->getMother()->getPDG()) == 511)) {
+      else if (mcParticle->getPDG() == 511) {
         return 1.0;
-      } else if (TMath::Abs(mcParticle->getMother()->getMother() != nullptr && TMath::Abs(mcParticle->getPDG()) == 321) && (TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511)) {
-        //first check if there was a mother otherwise seg fault
-        return 1.0;
-      } else return 0.0;
+      }
+      return 0.0;
     }
 
-    double isSlowPion(const Particle* part)
+    double isRestOfEventOfB0bar(const Particle*)
     {
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      Particle* part = roe->getRelated<Particle>();
       const MCParticle* mcParticle = part->getRelated<MCParticle>();
       if (mcParticle == nullptr) {return -1.0;} //if there is no mcparticle (e.g. not in training modus)
-      else if ((TMath::Abs(mcParticle->getPDG()) == 211) && (TMath::Abs(mcParticle->getMother()->getPDG()) == 413) && (TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511)) {
+      else if (mcParticle->getPDG() == -511) {
         return 1.0;
-      } else return 0.0;
+      }
+      return 0.0;
+    }
+
+    double isElectronFromB(const Particle* part)
+    {
+      const MCParticle* mcParticle = part->getRelated<MCParticle>();
+      if (mcParticle == nullptr) {
+        return 0.0;
+      } else if (mcParticle->getMother() != nullptr
+                 && mcParticle->getMother()->getMother() != nullptr
+                 && mcParticle->getPDG() == -11 // TODO removed TMath::Abs here to test if electron are hadnlet correctly, but now there's a segfault!
+                 && mcParticle->getMother()->getPDG() == 511) {
+        return 1.0;
+      } else {
+        return 0.0;
+      }
+    }
+
+    double isMuonFromB(const Particle* part)
+    {
+      const MCParticle* mcParticle = part->getRelated<MCParticle>();
+      if (mcParticle == nullptr) {
+        return 0.0;
+      } else if (mcParticle->getMother() != nullptr
+                 && mcParticle->getMother()->getMother() != nullptr
+                 && TMath::Abs(mcParticle->getPDG()) == 13
+                 && TMath::Abs(mcParticle->getMother()->getPDG()) == 511) {
+        return 1.0;
+      } else {
+        return 0.0;
+      }
+    }
+
+    double isKaonFromB(const Particle* part)
+    {
+      const MCParticle* mcParticle = part->getRelated<MCParticle>();
+      if (mcParticle == nullptr) {
+        return 0.0;
+      } else if (mcParticle->getMother() != nullptr
+                 && mcParticle->getMother()->getMother() != nullptr
+                 && TMath::Abs(mcParticle->getPDG()) == 321
+                 && TMath::Abs(mcParticle->getMother()->getPDG()) > 400
+                 && TMath::Abs(mcParticle->getMother()->getPDG()) < 500
+                 && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511) {
+        return 1.0;
+      } else {
+        return 0.0;
+      }
+    }
+
+    double isSlowPionFromB(const Particle* part)
+    {
+      const MCParticle* mcParticle = part->getRelated<MCParticle>();
+      if (mcParticle == nullptr) {
+        return 0.0;
+      } else if (mcParticle->getMother() != nullptr
+                 && mcParticle->getMother()->getMother() != nullptr
+                 && TMath::Abs(mcParticle->getPDG()) == 211
+                 && TMath::Abs(mcParticle->getMother()->getPDG()) == 413
+                 && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511) {
+        return 1.0;
+      } else {
+        return 0.0;
+      }
+    }
+
+    double bestQRElectron(const Particle*)
+    {
+      StoreObjPtr<ParticleList> electrons("e+:ROE");
+      float maximum_q = 0;
+      float maximum_r = 0;
+      for (unsigned int i = 0; i < electrons->getListSize(); ++i) {
+        Particle* p = electrons->getParticle(i);
+        float r = p->getExtraInfo("isElectronFromB");
+        if (r > maximum_r) {
+          maximum_r = r;
+          maximum_q = p->getCharge();
+        }
+      }
+      return maximum_r * maximum_q;
+    }
+
+    double bestQRMuon(const Particle*)
+    {
+      StoreObjPtr<ParticleList> muons("mu+:ROE");
+      float maximum_q = 0;
+      float maximum_r = 0;
+      for (unsigned int i = 0; i < muons->getListSize(); ++i) {
+        Particle* p = muons->getParticle(i);
+        float r = p->getExtraInfo("isMuonFromB");
+        if (r > maximum_r) {
+          maximum_r = r;
+          maximum_q = p->getCharge();
+        }
+      }
+      return maximum_r * maximum_q;
+    }
+
+    double bestQRKaon(const Particle*)
+    {
+      StoreObjPtr<ParticleList> kaons("K+:ROE");
+      float maximum_q = 0;
+      float maximum_r = 0;
+      for (unsigned int i = 0; i < kaons->getListSize(); ++i) {
+        Particle* p = kaons->getParticle(i);
+        float r = p->getExtraInfo("isKaonFromB");
+        if (r > maximum_r) {
+          maximum_r = r;
+          maximum_q = p->getCharge();
+        }
+      }
+      return maximum_r * maximum_q;
+    }
+
+    double bestQRSlowPion(const Particle*)
+    {
+      StoreObjPtr<ParticleList> pions("pi+:ROE");
+      float maximum_q = 0;
+      float maximum_r = 0;
+      for (unsigned int i = 0; i < pions->getListSize(); ++i) {
+        Particle* p = pions->getParticle(i);
+        float r = p->getExtraInfo("isSlowPionFromB");
+        if (r > maximum_r) {
+          maximum_r = r;
+          maximum_q = p->getCharge();
+        }
+      }
+      return maximum_r * maximum_q;
     }
 
     // RestOfEvent related --------------------------------------------------
@@ -1860,9 +1980,18 @@ namespace Belle2 {
     REGISTER_VARIABLE("mcPDG",    particleMCMatchPDGCode, "The PDG code of matched MCParticle");
     REGISTER_VARIABLE("abs_mcPDG", particleAbsMCMatchPDGCode, "The absolute PDG code of matched MCParticle");
     REGISTER_VARIABLE("mcStatus", particleMCMatchStatus,  "The bit pattern indicating the quality of MC match (see MCMatching::MCMatchStatus)");
-    REGISTER_VARIABLE("isMuon", isMuon,  "Checks if the track (given as a dummy particle) was really a Muon. 1.0 if true otherwise 0.0");
-    REGISTER_VARIABLE("isKaon", isKaon,  "Checks if the track (given as a dummy particle) was really a Kaon. 1.0 if true otherwise 0.0");
-    REGISTER_VARIABLE("isSlowPion", isSlowPion,  "Checks if the track (given as a dummy particle) was really a slow Pion. 1.0 if true otherwise 0.0");
+
+    VARIABLE_GROUP("Flavour tagging");
+    REGISTER_VARIABLE("isRestOfEventOfB0", isRestOfEventOfB0,  "[Eventbased] Check if current RestOfEvent is related to a B0");
+    REGISTER_VARIABLE("isRestOfEventOfB0bar", isRestOfEventOfB0bar,  "[Eventbased] Check if current RestOfEvent is related to a B0 B0bar");
+    REGISTER_VARIABLE("isElectronFromB", isElectronFromB,  "Checks if the track was really a Kaon from a B. 1.0 if true otherwise 0.0");
+    REGISTER_VARIABLE("isMuonFromB", isMuonFromB,  "Checks if the track was really a Muon from a B. 1.0 if true otherwise 0.0");
+    REGISTER_VARIABLE("isKaonFromB", isKaonFromB,  "Checks if the track was really a Electron from a B. 1.0 if true otherwise 0.0");
+    REGISTER_VARIABLE("isSlowPionFromB", isSlowPionFromB,  "Checks if the track was really a slow Pion from a B. 1.0 if true otherwise 0.0");
+    REGISTER_VARIABLE("bestQRElectron", bestQRElectron,  "[Eventbased] q*r where r is maximum getExtraInfo(isElectron) in e+:ROE list.");
+    REGISTER_VARIABLE("bestQRMuon", bestQRMuon,  "[Eventbased] q*r where r is maximum getExtraInfo(isMuon) in mu+:ROE list.");
+    REGISTER_VARIABLE("bestQRSlowPion", bestQRSlowPion,  "[Eventbased] q*r where r is maximum getExtraInfo(isSlowPion) in pi+:ROE list.");
+    REGISTER_VARIABLE("bestQRKaon", bestQRKaon,  "[Eventbased] q*r where r is maximum getExtraInfo(isKaon) in K+:ROE list.");
 
     VARIABLE_GROUP("Rest Of Event");
     REGISTER_VARIABLE("isInRestOfEvent",  isInRestOfEvent,  "1.0 of track, cluster of given particle is found in rest of event. 0 otherwise.");
@@ -1898,12 +2027,12 @@ namespace Belle2 {
     REGISTER_VARIABLE("clusterTrackMatch", eclClusterTrackMatched,    "number of charged track matched to this cluster");
 
     VARIABLE_GROUP("Event");
-    REGISTER_VARIABLE("isContinuumEvent",  isContinuumEvent,  "true if event doesn't contain an Y(4S)");
-    REGISTER_VARIABLE("nTracks",  nTracks,  "number of tracks in the event");
-    REGISTER_VARIABLE("nECLClusters", nECLClusters, "number of ECL in the event");
-    REGISTER_VARIABLE("nKLMClusters", nKLMClusters, "number of KLM in the event");
-    REGISTER_VARIABLE("ECLEnergy", ECLEnergy, "total energy in ECL in the event");
-    REGISTER_VARIABLE("KLMEnergy", KLMEnergy, "total energy in KLM in the event");
+    REGISTER_VARIABLE("isContinuumEvent",  isContinuumEvent,  "[Eventbased] true if event doesn't contain an Y(4S)");
+    REGISTER_VARIABLE("nTracks",  nTracks,  "[Eventbased] number of tracks in the event");
+    REGISTER_VARIABLE("nECLClusters", nECLClusters, "[Eventbased] number of ECL in the event");
+    REGISTER_VARIABLE("nKLMClusters", nKLMClusters, "[Eventbased] number of KLM in the event");
+    REGISTER_VARIABLE("ECLEnergy", ECLEnergy, "[Eventbased] total energy in ECL in the event");
+    REGISTER_VARIABLE("KLMEnergy", KLMEnergy, "[Eventbased] total energy in KLM in the event");
 
     VARIABLE_GROUP("Continuum Suppression");
     REGISTER_VARIABLE("cosTBTO"  , cosTBTO , "cosine of angle between thrust axis of B and thrust axis of ROE");

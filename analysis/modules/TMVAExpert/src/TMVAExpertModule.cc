@@ -98,7 +98,11 @@ namespace Belle2 {
       for (unsigned i = 0; i < list->getListSize(); ++i) {
         Particle* particle = list->getParticle(i);
         float targetValue = m_method->analyse(particle, m_signalFraction);
-        particle->addExtraInfo(m_signalProbabilityName, targetValue);
+        if (particle->hasExtraInfo(m_signalProbabilityName)) {
+          B2WARNING("Extra Info with given name is already set! I won't set it again!")
+        } else {
+          particle->addExtraInfo(m_signalProbabilityName, targetValue);
+        }
       }
     }
     if (m_listNames.empty()) {

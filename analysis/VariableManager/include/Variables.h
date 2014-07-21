@@ -361,24 +361,58 @@ namespace Belle2 {
     double particleMCMatchStatus(const Particle* particle);
 
     /**
-    * return 1 if (dummy) Particle was a Muon, 0 otherwise
-    */
-    double isMuon(const Particle* particle);
-
-    /**
-     * return 1 if (dummy) Particle was a Kaon, 0 otherwise
-     */
-    double isKaon(const Particle* particle);
-
-    /**
      * return 1 if Particle was in RestOfEventObject, 0 otherwise
      */
     double isInRestOfEvent(const Particle* particle);
 
     /**
+     * return 1 if (dummy) Particle was a Electron, 0 otherwise
+     */
+    double isElectronFromB(const Particle* particle);
+
+    /**
+    * return 1 if (dummy) Particle was a Muon, 0 otherwise
+    */
+    double isMuonFromB(const Particle* particle);
+
+    /**
+     * return 1 if (dummy) Particle was a Kaon, 0 otherwise
+     */
+    double isKaonFromB(const Particle* particle);
+
+    /**
      * return 1 if (dummy) Particle was a slow Pion, 0 otherwise
      */
-    double isSlowPion(const Particle* part);
+    double isSlowPionFromB(const Particle* part);
+
+    /**
+     * return 1 if (dummy)
+     */
+    double isRestOfEventOfB0(const Particle*);
+
+    /**
+     * return 1 if (dummy)
+     */
+    double isRestOfEventOfB0bar(const Particle*);
+
+    /**
+    * returns q*r for maximum r
+    */
+    double bestQRElectron(const Particle*);
+    /**
+    * returns q*r for maximum r
+    */
+    double bestQRMuon(const Particle*);
+
+    /**
+     * returns q*r for maximum r
+     */
+    double bestQRSlowPion(const Particle*);
+
+    /**
+     * returns q*r for maximum r
+     */
+    double bestQRKaon(const Particle*);
 
     /**
      * return number of remaining tracks as given by the related RestOfEvent object

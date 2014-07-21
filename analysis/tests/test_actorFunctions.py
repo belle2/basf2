@@ -39,19 +39,19 @@ class TestCopyParticleLists(unittest.TestCase):
         self.path = MockPath()
 
     def test_without_nones(self):
-        result = CopyParticleLists(self.path, 'D+', ['D+:1', 'D+:2', 'D+:3'], {'cutstring': ''}, None)
+        result = CopyParticleLists(self.path, 'D+', None, ['D+:1', 'D+:2', 'D+:3'], {'cutstring': ''}, None)
         self.assertDictEqual(result, {'ParticleList_D+': 'D+:5cd7f2d37f66c44b92dbd64e10ada329133b6a63',
                                       'ParticleList_D-': 'D-:5cd7f2d37f66c44b92dbd64e10ada329133b6a63'})
         self.assertEqual(len(self.path.modules), 1)
 
     def test_with_nones(self):
-        result = CopyParticleLists(self.path, 'D+', ['D+:1', None, 'D+:3', None], {'cutstring': ''}, None)
+        result = CopyParticleLists(self.path, 'D+', None, ['D+:1', None, 'D+:3', None], {'cutstring': ''}, None)
         self.assertDictEqual(result, {'ParticleList_D+': 'D+:fc01399545fea42891ffc8fc0b07b52de3317544',
                                       'ParticleList_D-': 'D-:fc01399545fea42891ffc8fc0b07b52de3317544'})
         self.assertEqual(len(self.path.modules), 1)
 
     def test_only_nones(self):
-        result = CopyParticleLists(self.path, 'D+', [None, None], {'cutstring': ''}, None)
+        result = CopyParticleLists(self.path, 'D+', None, [None, None], {'cutstring': ''}, None)
         self.assertDictEqual(result, {'ParticleList_D+': None,
                                       'ParticleList_D-': None})
         self.assertEqual(len(self.path.modules), 0)
@@ -63,14 +63,14 @@ class TestMakeAndMatchParticleList(unittest.TestCase):
 
     def test_with_precut(self):
         result = MakeAndMatchParticleList(self.path, 'D+', 'D+ -> pi+ K-', ['pi+', 'K-'], {'cutstring': '0 < M < 10'})
-        self.assertDictEqual(result, {'ParticleList_D+ -> pi+ K-_D+': 'D+:a82b536fc03a4a03b3e7f73db062250ec59a1f4f',
-                                      'ParticleList_D+ -> pi+ K-_D-': 'D-:a82b536fc03a4a03b3e7f73db062250ec59a1f4f'})
+        self.assertDictEqual(result, {'RawParticleList_D+ -> pi+ K-_D+': 'D+:a82b536fc03a4a03b3e7f73db062250ec59a1f4f',
+                                      'RawParticleList_D+ -> pi+ K-_D-': 'D-:a82b536fc03a4a03b3e7f73db062250ec59a1f4f'})
         self.assertEqual(len(self.path.modules), 2)
 
     def test_without_precut(self):
         result = MakeAndMatchParticleList(self.path, 'D+', 'D+ -> pi+ K-', ['pi+', 'K-'], None)
-        self.assertDictEqual(result, {'ParticleList_D+ -> pi+ K-_D+': None,
-                                      'ParticleList_D+ -> pi+ K-_D-': None})
+        self.assertDictEqual(result, {'RawParticleList_D+ -> pi+ K-_D+': None,
+                                      'RawParticleList_D+ -> pi+ K-_D-': None})
         self.assertEqual(len(self.path.modules), 0)
 
 

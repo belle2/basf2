@@ -84,7 +84,7 @@ preCutConfiguration_DStar = Particle.PreCutConfiguration(
     purity=0.0001,
 )
 
-partial = False
+partial = True
 
 particles = []
 particles.append(Particle('pi+', mvaConfig_chargedFSP))

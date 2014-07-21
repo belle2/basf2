@@ -154,6 +154,7 @@ class Sequence(object):
         actors = [actor for actor in self.seq]
         results = dict()
         results['Path'] = True
+        results['None'] = None
         chain = []
         while True:
             ready = filter(lambda item: all(requirement in results for requirement in item.requires), actors)

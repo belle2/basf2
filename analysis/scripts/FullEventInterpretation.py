@@ -189,6 +189,7 @@ def FullEventInterpretation(path, particles):
             seq.addFunction(CopyParticleLists,
                             path='Path',
                             particleName='Name_' + particle.name,
+                            channelName='None',
                             inputLists=['RawParticleList_' + particle.name],
                             postCut='PostCut_' + particle.name,
                             pdf='PDF_' + particle.name)
@@ -203,9 +204,18 @@ def FullEventInterpretation(path, particles):
             seq.addFunction(CopyParticleLists,
                             path='Path',
                             particleName='Name_' + particle.name,
-                            inputLists=['ParticleList_' + channel.name + '_' + particle.name for channel in particle.complete_channels],
+                            channelName='None',
+                            inputLists=['RawParticleList_' + channel.name + '_' + particle.name for channel in particle.complete_channels],
                             postCut='PostCut_' + particle.name,
                             pdf='PDF_' + particle.name)
+            for channel in particle.incomplete_channels:
+                seq.addFunction(CopyParticleLists,
+                                path='Path',
+                                particleName='Name_' + particle.name,
+                                channelName='Name_' + channel.name,
+                                inputLists=['RawParticleList_' + channel.name + '_' + particle.name],
+                                postCut='PostCut_' + particle.name,
+                                pdf='PDF_' + particle.name)
 
         ############# PRECUT DETERMINATION ############
         # Intermediate PreCut part of FullReconstruction algorithm.
@@ -256,7 +266,7 @@ def FullEventInterpretation(path, particles):
                                     particleName='Name_' + particle.name,
                                     channelName='Name_' + channel.name,
                                     mvaConfig='MVAConfig_' + channel.name,
-                                    particleList='ParticleList_' + channel.name + '_' + particle.name,
+                                    particleList='RawParticleList_' + channel.name + '_' + particle.name,
                                     daughterSignalProbabilities=['SignalProbability_' + daughter for daughter in channel.daughters])
                 seq.addResource('SignalProbability_' + particle.name, 'Dummy', requires=['SignalProbability_' + channel.name + '_' + particle.name for channel in particle.channels], strict=False)
                 seq.addResource('SignalProbability_' + pdg.conjugate(particle.name), 'Dummy', requires=['SignalProbability_' + particle.name])
@@ -266,14 +276,14 @@ def FullEventInterpretation(path, particles):
             seq.addFunction(WriteAnalysisFileForMVA,
                             particleName='Name_' + particle.name,
                             channelName='Name_' + channel.name,
-                            particleList='ParticleList_' + channel.name + '_' + particle.name,
+                            particleList='RawParticleList_' + channel.name + '_' + particle.name,
                             mvaConfig='MVAConfig_' + channel.name,
                             signalProbability='SignalProbability_' + channel.name + '_' + particle.name)
 
             seq.addFunction(WriteAnalysisFileForChannel,
                             particleName='Name_' + particle.name,
                             channelName='Name_' + channel.name,
-                            channelList='ParticleList_' + channel.name + '_' + particle.name,
+                            channelList='RawParticleList_' + channel.name + '_' + particle.name,
                             preCutConfig='PreCutConfig_' + particle.name,
                             preCutHistogram='PreCutHistogram_' + channel.name,
                             preCut='PreCut_' + channel.name,

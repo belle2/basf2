@@ -40,27 +40,40 @@ def SelectParticleList(path, particleName):
             'RawParticleList_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
 
 
-def CopyParticleLists(path, particleName, inputLists, postCut, pdf):
+def CopyParticleLists(path, particleName, channelName, inputLists, postCut, pdf):
     """
     Creates a ParticleList gathering up all particles in the given inputLists
         @param path the basf2 path
         @param particleName returned key is named ParticleList_{particleName} corresponding ParticleList is stored as {particleName}:{hash}
+        @param channelName if not None returned key is named ParticleList_{channelName}_{particleName} corresponding ParticleList is stored as {particleName}:{hash}
         @param inputLists names of inputLists which are copied to the new list
         @param postCut cuts which are applied after the reconstruction of the particle
         @param pdf dependency to particle overview pdf, to trigger the generation of the overview PDF as soon as the particle is available
     """
     inputLists = actorFramework.removeNones(inputLists)
-    if inputLists == []:
-        B2INFO("Gather Particle List for particle " + particleName + " and charged conjugated. But there are no particles to gather :-(.")
-        return {'ParticleList_' + particleName: None, 'ParticleList_' + pdg.conjugate(particleName): None}
 
-    userLabel = actorFramework.createHash(particleName, inputLists)
+    if inputLists == []:
+        if channelName is None:
+            B2INFO("Gather Particle List for particle " + particleName + " and charged conjugated. But there are no particles to gather :-(.")
+            return {'ParticleList_' + particleName: None,
+                    'ParticleList_' + pdg.conjugate(particleName): None}
+        else:
+            B2INFO("Gather Particle List for particle " + particleName + " " + channelName + " and charged conjugated. But there are no particles to gather :-(.")
+            return {'ParticleList_' + channelName + '_' + particleName: None,
+                    'ParticleList_' + channelName + '_' + pdg.conjugate(particleName): None}
+
+    userLabel = actorFramework.createHash(particleName, channelName, inputLists, postCut)
     outputList = particleName + ':' + userLabel
     modularAnalysis.cutAndCopyLists(outputList, inputLists, postCut['cutstring'], path=path)
 
-    B2INFO("Gather Particle List for particle " + particleName + " and charged conjugated")
-    return {'ParticleList_' + particleName: outputList,
-            'ParticleList_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
+    if channelName is None:
+        B2INFO("Gather Particle List for particle " + particleName + " and charged conjugated")
+        return {'ParticleList_' + particleName: outputList,
+                'ParticleList_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
+    else:
+        B2INFO("Gather Particle List for particle " + particleName + " " + channelName + " and charged conjugated")
+        return {'ParticleList_' + channelName + '_' + particleName: outputList,
+                'ParticleList_' + channelName + '_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
 
 
 def MakeAndMatchParticleList(path, particleName, channelName, inputLists, preCut):
@@ -74,7 +87,8 @@ def MakeAndMatchParticleList(path, particleName, channelName, inputLists, preCut
     """
     if preCut is None:
         B2INFO("Make and Match Particle List for channel " + channelName + " and charged conjugated. But the channel is ignored :-(.")
-        return {'ParticleList_' + channelName + '_' + particleName: None, 'ParticleList_' + channelName + '_' + pdg.conjugate(particleName): None}
+        return {'RawParticleList_' + channelName + '_' + particleName: None,
+                'RawParticleList_' + channelName + '_' + pdg.conjugate(particleName): None}
 
     userLabel = actorFramework.createHash(particleName, channelName, inputLists, preCut)
     outputList = particleName + ':' + userLabel + ' ==> ' + ' '.join(inputLists)
@@ -82,8 +96,8 @@ def MakeAndMatchParticleList(path, particleName, channelName, inputLists, preCut
     modularAnalysis.makeParticle(outputList, preCut['cutstring'], path=path)
     modularAnalysis.matchMCTruth(listName, path=path)
     B2INFO("Make and Match Particle List for channel " + channelName + " and charged conjugated.")
-    return {'ParticleList_' + channelName + '_' + particleName: listName,
-            'ParticleList_' + channelName + '_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
+    return {'RawParticleList_' + channelName + '_' + particleName: listName,
+            'RawParticleList_' + channelName + '_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
 
 
 def SignalProbability(path, particleName, channelName, mvaConfig, particleList, daughterSignalProbabilities=[]):
@@ -360,10 +374,16 @@ def WriteAnalysisFileForChannel(particleName, channelName, channelList, preCutCo
         @param preCut used preCuts for this channel
         @param mvaTexFile .tex file produced for network
     """
+    placeholders = {}
+
+    placeholders['particleName'] = particleName
+    placeholders['channelName'] = channelName
+    placeholders['isIgnored'] = False
 
     if mvaTexFile is None or preCut is None:
+        placeholders['isIgnored'] = True
         B2INFO("Write analysis tex file for channel " + channelName + " and charged conjugated. But channel is ignored.")
-        return {'Tex_' + channelName: None}
+        return {'Tex_' + channelName: (None, placeholders)}
 
     ROOT.gROOT.SetBatch(True)
 
@@ -395,11 +415,6 @@ def WriteAnalysisFileForChannel(particleName, channelName, channelList, preCutCo
 
     purity = nsignal / (nsignal + nbckgrd)
     efficiency = nsignal / ntotalsignal
-
-    placeholders = {}
-
-    placeholders['particleName'] = particleName
-    placeholders['channelName'] = channelName
 
     placeholders['channelNSignal'] = int(nsignal)
     placeholders['channelNBackground'] = int(nbckgrd)
@@ -441,11 +456,19 @@ def WriteAnalysisFileForParticle(particleName, postCutConfig, postCut, texfiles)
 
         placeholders = {}
         placeholders['NChannels'] = len(texfiles)
-        texfiles = actorFramework.removeNones(texfiles)
+
+        placeholders['channelListAsItems'] = ""
+        for texfile, channelPlaceholders in texfiles:
+            if texfile is None:
+                placeholders['channelListAsItems'] += "\\item {name} was ignored\n".format(name=channelPlaceholders['channelName'])
+            else:
+                placeholders['channelListAsItems'] += "\\item {name}\n".format(name=channelPlaceholders['channelName'])
+
+        texfiles = [(x, y) for x, y in texfiles if x is not None]
         placeholders['NUsedChannels'] = len(texfiles)
 
         a, b = postCut['range']
-        placeholders['postCutRange'] = 'Ignored' if postCut is None else '({:.2f},'.format(a) + ' {:.2f}'.format(b) + ')'
+        placeholders['postCutRange'] = 'Ignored' if postCut is None else '({:.5f},'.format(a) + ' {:.5f}'.format(b) + ')'
 
         placeholders['particleName'] = particleName
         placeholders['channelInputs'] = ""

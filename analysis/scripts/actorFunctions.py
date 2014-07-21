@@ -265,6 +265,13 @@ def PostCutDetermination(particleName, postCutConfig, signalProbability):
     return {'PostCut_' + particleName: {'cutstring': str(postCutConfig.value) + ' < getExtraInfo(SignalProbability)', 'range': (postCutConfig.value, 1)}}
 
 
+def escapeForLatex(someString):
+    """
+    Used to escape user strings for LaTex.
+    """
+    return someString.replace('\\', r'\\').replace('_', r'\_').replace('^', r'\^{}')
+
+
 def WriteAnalysisFileForMVA(particleName, channelName, particleList, mvaConfig, signalProbability):
     """
     Creates a pdf document with the PreCut and Training plots
@@ -324,9 +331,12 @@ def WriteAnalysisFileForMVA(particleName, channelName, particleList, mvaConfig, 
     placeholders['mvaOvertrainingPlot'] = overtrainingPlot
     placeholders['mvaDiagPlot'] = diagPlotFile
 
+    from variables import variables
     placeholders['mvaVariables'] = ''
     for v in mvaConfig.variables:
-        placeholders['mvaVariables'] += '\\texttt{' + v.replace('_', '\_') + '} \\\\'
+        varName = escapeForLatex(v)
+        description = escapeForLatex(variables.getVariable(v).description)
+        placeholders['mvaVariables'] += r'\texttt{' + varName + r'} & ' + description + r' \\'
 
     filename = 'MVA_' + particleList + '.tex'
     if not os.path.isfile(filename):

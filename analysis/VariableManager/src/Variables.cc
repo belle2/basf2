@@ -644,7 +644,7 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       Particle* part = roe->getRelated<Particle>();
       const MCParticle* mcParticle = part->getRelated<MCParticle>();
-      if (mcParticle == nullptr) {return -1.0;} //if there is no mcparticle (e.g. not in training modus)
+      if (mcParticle == nullptr) {return -999.0;} //if there is no mcparticle (e.g. not in training modus)
       else if (mcParticle->getPDG() == 511) {
         return 1.0;
       }
@@ -656,7 +656,7 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       Particle* part = roe->getRelated<Particle>();
       const MCParticle* mcParticle = part->getRelated<MCParticle>();
-      if (mcParticle == nullptr) {return -1.0;} //if there is no mcparticle (e.g. not in training modus)
+      if (mcParticle == nullptr) {return -999.0;} //if there is no mcparticle (e.g. not in training modus)
       else if (mcParticle->getPDG() == -511) {
         return 1.0;
       }

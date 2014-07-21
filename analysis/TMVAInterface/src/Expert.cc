@@ -148,7 +148,7 @@ namespace Belle2 {
       // If signalToBackgroundRatio is negative, it's assumed that the mva output corresponds to a probability
       std::vector<float> mva_results(m_readers.size());
       for (unsigned int i = 0; i < m_readers.size(); ++i) {
-        if (m_reverse[m_signalClass]) {
+        if (m_reverse[i]) {
           if (signalFraction < 0 and signalFraction > -1.5)
             mva_results[i] = 1 - m_readers[i]->EvaluateMVA(m_methods[i]->getName());
           else if (signalFraction < -1.5 and signalFraction > -2.5)

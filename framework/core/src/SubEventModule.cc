@@ -109,7 +109,10 @@ void deepCopy(const DataStore::StoreObjMap& orig, DataStore::StoreObjMap& dest)
 void restoreContents(const DataStore::StoreObjMap& orig, DataStore::StoreObjMap& dest)
 {
   for (auto entry : orig) {
-    *(dest[entry.first]) = *entry.second;
+    auto& destEntry = *dest[entry.first];
+    auto& srcEntry = *entry.second;
+    if (srcEntry.ptr == nullptr)
+      destEntry.ptr = nullptr;
   }
 }
 
@@ -147,6 +150,9 @@ void SubEventModule::event()
     //restore datastore
     restoreContents(eventMapCopy, eventMap);
   }
+
+  objectEntry->object = nullptr;
+  objectEntry->ptr = nullptr;
 
   //cleanup
   for (auto entry : eventMapCopy) {

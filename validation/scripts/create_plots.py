@@ -427,6 +427,8 @@ def create_RootObjects_from_file(root_file, is_reference):
                 root_object_type = 'TH2'
             else:
                 root_object_type = 'TH1'
+        elif root_object.InheritsFrom('TASImage'):
+            root_object_type = 'TASImage'
         else:
             root_object_type = None
 
@@ -487,6 +489,11 @@ def create_RootObjects_from_file(root_file, is_reference):
             # n-tuples :-)
             root_object = ntuple_values
 
+        elif root_object_type == 'TASImage':
+            # TODO Set this to correct values
+            description = None
+            check = None
+            contact = None
         # If it is neither an histogram nor an n-tuple, we skip it!
         else:
             continue
@@ -705,6 +712,8 @@ class Plotuple:
             self.create_histogram_plot('1D')
         elif self.type == 'TH2':
             self.create_histogram_plot('2D')
+        elif self.type == 'TASImage':
+            self.create_image_plot()
         elif self.type == 'TNtuple':
             self.create_ntuple_table()
         else:
@@ -749,6 +758,83 @@ class Plotuple:
         self.reference.object.DrawCopy(self.reference.object.GetOption())
         canvas.Update()
         canvas.GetFrame().SetFillColor(ROOT.kWhite)
+
+    def create_image_plot(self):
+        """
+        Creates image plot
+        """
+
+        # Create a ROOT canvas on which we will draw our histograms
+        if len(self.elements) > 4:
+            canvas = ROOT.TCanvas('', '', 700, 1050)
+        else:
+            canvas = ROOT.TCanvas('', '', 700, 525)
+
+        # Split the canvas into enough parts to fit all image_objects
+        # Find numbers x and y so that x*y = N (number of histograms to be
+        # plotted), and x,y close to sqrt(N)
+
+        if len(self.list_of_root_objects) == 1:
+            x = y = 1
+        elif len(self.list_of_root_objects) == 2:
+            x = 2
+            y = 1
+        else:
+            x = 2
+            y = int(math.floor((len(self.list_of_root_objects) + 1) / 2))
+
+        # Actually split the canvas and go to the first pad ('sub-canvas')
+        canvas.Divide(x, y)
+        pad = canvas.cd(1)
+        pad.SetFillColor(ROOT.kWhite)
+
+        # If there is a reference object, plot it first
+        if self.reference is not None:
+            self.draw_ref(pad)
+
+        # Now draw the normal plots
+        for plot in reversed(self.elements):
+
+            # Get the index of the current plot
+            index = index_from_revision(plot.revision)
+
+            # Set line properties accordingly
+            plot.object.SetLineColor(get_style(index).GetLineColor())
+            plot.object.SetLineWidth(get_style(index).GetLineWidth())
+            plot.object.SetLineStyle(get_style(index).GetLineStyle())
+
+            # Switch to the correct sub-panel of the canvas. If a ref-plot
+            # exists, we have to go one panel further compared to the
+            # no-ref-case
+            if self.reference is not None:
+                i = 2
+            else:
+                i = 1
+
+            pad = canvas.cd(self.elements.index(plot) + i)
+            pad.SetFillColor(ROOT.kWhite)
+
+            # Draw the reference on the canvas
+            plot.object.DrawCopy(plot.object.GetOption())
+            pad.Update()
+            pad.GetFrame().SetFillColor(ROOT.kWhite)
+
+            # Write the title in the correct color
+            title = pad.GetListOfPrimitives().FindObject('title')
+            if title:
+                title.SetTextColor(get_style(index).GetLineColor())
+
+        # Create the folder in which the plot is then stored
+        path = ('./html/plots/{0}/'.format('_'.join(sorted(list_of_revisions)))
+                + self.package)
+        if not os.path.isdir(path):
+            os.makedirs(path)
+
+        # Save the plot as PNG and PDF
+        canvas.Print(path + '/%s.png' % self.key)
+        canvas.Print(path + '/%s.pdf' % self.key)
+
+        self.file = './{0}/'.format('/'.join(path.split('/')[2:])) + self.key
 
     def create_histogram_plot(self, mode):
         """

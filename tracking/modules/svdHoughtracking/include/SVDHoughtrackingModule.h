@@ -565,13 +565,20 @@ namespace Belle2 {
       /** Histogram for efficiency vs Theta */
       TH1D* m_histEffTheta;
       TH1D* m_histEffProjectedTheta;
-      /** Histogram for fake rate vs pT (only in phi while reconstruction in theta is not proved) */
+      TH1D* m_histEffThetaPhi;
+      /** Histogram for fake rate vs pT */
       TH1D* m_histPtFakePhi;
+      TH1D* m_histFakePhi;
+      TH1D* m_histFakeTheta;
       /** Histogram for fake rate vs pT*/
       TH1D* m_histPtFake;
       /** Missed hit distribution */
       TH1D* m_histMissedTheta;
       TH1D* m_histMissedPhi;
+      /** Average Fake histograms */
+      TH1D* m_histPtAverageFake;
+      TH1D* m_histPhiAverageFake;
+      TH1D* m_histThetaAverageFake;
 
       /** Histograms for ROIs */
       TH1D* m_histROIDiffPhi;

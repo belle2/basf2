@@ -636,6 +636,19 @@ namespace Belle2 {
       return MCMatching::getMCTruthStatus(part);
     }
 
+    double isMuon(const Particle* part)
+    {
+      MCParticle* mcParticle = NULL;
+      if (!(part->getRelated<MCParticle>())) {return -1.0;}//if there is no mcparticle (e.g. not in training modus
+      else mcParticle = part->getRelated<MCParticle>();
+      if ((TMath::Abs(mcParticle->getPDG()) == 13) && (TMath::Abs(mcParticle->getMother()->getPDG()) == 511)) {
+        return 1.0;
+      } else if (TMath::Abs(mcParticle->getMother()->getMother() != nullptr && TMath::Abs(mcParticle->getPDG()) == 13) && (TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511)) {
+        //first check if there was a mother otherwise seg fault
+        return 1.0;
+      } else return 0.0;
+    }
+
     double isKaon(const Particle* part)
     {
       const MCParticle* mcParticle = part->getRelated<MCParticle>();
@@ -647,7 +660,6 @@ namespace Belle2 {
         return 1.0;
       } else return 0.0;
     }
-
 
     double isSlowPion(const Particle* part)
     {
@@ -703,6 +715,42 @@ namespace Belle2 {
     }
 
     // Recoil Kinematics related ---------------------------------------------
+
+    double particleP_CMS_missing(const Particle* particle)
+    {
+      double result = -1.0;
+
+      if (!(particle->getExtraInfo("p_CMS_missing"))) return result;
+
+      return particle->getExtraInfo("p_CMS_missing");
+    }
+
+    double particleCosTheta_Missing(const Particle* particle)
+    {
+      double result = -1.0;
+
+      if (!(particle->getExtraInfo("cosTheta_missing"))) return result;
+
+      return particle->getExtraInfo("cosTheta_missing");
+    }
+
+    double particleClassifiedFlavor(const Particle* particle)
+    {
+      double result = -1.0;
+
+      if (!(particle->getExtraInfo("Class_Flavor"))) return result;
+
+      return particle->getExtraInfo("Class_Flavor");
+    }
+
+    double particleMCFlavor(const Particle* particle)
+    {
+      double result = -0.0;
+
+      if (!(particle->getExtraInfo("MC_Flavor"))) return result;
+
+      return particle->getExtraInfo("MC_Flavor");
+    }
 
     double recoilMomentum(const Particle* particle)
     {
@@ -1812,8 +1860,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("mcPDG",    particleMCMatchPDGCode, "The PDG code of matched MCParticle");
     REGISTER_VARIABLE("abs_mcPDG", particleAbsMCMatchPDGCode, "The absolute PDG code of matched MCParticle");
     REGISTER_VARIABLE("mcStatus", particleMCMatchStatus,  "The bit pattern indicating the quality of MC match (see MCMatching::MCMatchStatus)");
+    REGISTER_VARIABLE("isMuon", isMuon,  "Checks if the track (given as a dummy particle) was really a Muon. 1.0 if true otherwise 0.0");
     REGISTER_VARIABLE("isKaon", isKaon,  "Checks if the track (given as a dummy particle) was really a Kaon. 1.0 if true otherwise 0.0");
-    REGISTER_VARIABLE("isSlowPion", isSlowPion,  "Checks if the track (given as a dummy particle) was really a Kaon. 1.0 if true otherwise 0.0");
+    REGISTER_VARIABLE("isSlowPion", isSlowPion,  "Checks if the track (given as a dummy particle) was really a slow Pion. 1.0 if true otherwise 0.0");
 
     VARIABLE_GROUP("Rest Of Event");
     REGISTER_VARIABLE("isInRestOfEvent",  isInRestOfEvent,  "1.0 of track, cluster of given particle is found in rest of event. 0 otherwise.");
@@ -1830,6 +1879,11 @@ namespace Belle2 {
     REGISTER_VARIABLE("eRecoil",  recoilEnergy,   "energy recoiling against given Particle");
     REGISTER_VARIABLE("mRecoil",  recoilMass,        "invariant mass of the system recoiling against given Particle");
     REGISTER_VARIABLE("m2Recoil", recoilMassSquared, "invariant mass squared of the system recoiling against given Particle");
+
+    REGISTER_VARIABLE("p_CMS_missing",  particleP_CMS_missing,    "CMS momentum magnitude missing in Btag");
+    REGISTER_VARIABLE("cosTheta_missing",  particleCosTheta_Missing,    "CMS momentum missing in Btag cosine of polar angle");
+    REGISTER_VARIABLE("BtagClassFlavor",  particleClassifiedFlavor,    "Flavour of Btag from trained Method");
+    REGISTER_VARIABLE("BtagMCFlavor",  particleMCFlavor,    "Flavour of Btag from MC");
 
     REGISTER_VARIABLE("eextra", extraEnergy, "extra energy in the calorimeter that is not associated to the given Particle");
 

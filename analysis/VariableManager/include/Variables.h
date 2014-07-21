@@ -361,6 +361,11 @@ namespace Belle2 {
     double particleMCMatchStatus(const Particle* particle);
 
     /**
+    * return 1 if (dummy) Particle was a Muon, 0 otherwise
+    */
+    double isMuon(const Particle* particle);
+
+    /**
      * return 1 if (dummy) Particle was a Kaon, 0 otherwise
      */
     double isKaon(const Particle* particle);
@@ -388,6 +393,26 @@ namespace Belle2 {
      * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
      */
     double nROEClusters(const Particle* particle);
+
+    /**
+     * return CMS momentum magnitude missing in Btag
+     */
+    double particleP_CMS_missing(const Particle* particle);
+
+    /**
+     * return CMS momentum missing in Btag cosine of polar angle
+     */
+    double particleCosTheta_Missing(const Particle* particle);
+
+    /**
+     * Flavour of Btag from trained Method
+     */
+    double particleClassifiedFlavor(const Particle* particle);
+
+    /**
+     * Flavour of Btag from MC
+     */
+    double particleMCFlavor(const Particle* particle);
 
     /**
      * return magnitude of 3-momentum recoiling against given Particle

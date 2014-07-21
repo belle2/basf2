@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# Thomas Keck & Moritz Gelb
 
 from basf2 import *
 from modularAnalysis import *
@@ -32,7 +33,7 @@ for symbol, category in trackLevelParticles:
     # Select Particles in ROE for different categories of flavour tagging.
     selectParticle(particleList, 'isInRestOfEvent > 0.5', path=roe_path)
     if not isTMVAMethodAvailable(methodPrefix):
-        variables = ['p_CMS', 'pt_CMS', 'cosTheta', 'p', 'pt', 'chiProb', 'Kid', 'Kid_dEdx', 'Kid_TOP', 'Kid_ARICH', 'piid', 'piid_dEdx', 'piid_TOP', 'piid_ARICH']
+        variables = ['p_CMS', 'pt_CMS', 'cosTheta', 'p', 'pt', 'chiProb', 'Kid', 'Kid_dEdx', 'Kid_TOP', 'Kid_ARICH', 'piid', 'piid_dEdx', 'piid_TOP', 'piid_ARICH', 'charge']
         trainTMVAMethod(particleList, variables=variables, target=targetVariable, prefix=methodPrefix, path=roe_path)
         trackLevelReady = False
     else:
@@ -42,15 +43,16 @@ eventLevelReady = trackLevelReady
 if trackLevelReady:
     variables = ['bestQRKaon', 'bestQRSlowPion', 'bestQRElectron', 'bestQRMuon']
     if not isTMVAMethodAvailable('B0Tagger'):
-        trainTMVAMethod([], variables=variables, target='isRestOfEventOfB0', prefix='B0Tagger', path=roe_path)
+        trainTMVAMethod([], variables=variables, target='isMajorityInRestOfEventFromB0', prefix='B0Tagger', path=roe_path)
         eventLevelReady = False
     else:
-        applyTMVAMethod([], signalProbabilityName='isRestOfEventOfB0', prefix='B0Tagger', path=roe_path)
+        applyTMVAMethod([], signalProbabilityName='isMajorityInRestOfEventFromB0', prefix='B0Tagger', path=roe_path)
+
     if not isTMVAMethodAvailable('B0barTagger'):
-        trainTMVAMethod([], variables=variables, target='isRestOfEventOfB0bar', prefix='B0barTagger', path=roe_path)
+        trainTMVAMethod([], variables=variables, target='isMajorityInRestOfEventFromB0', prefix='B0barTagger', path=roe_path)
         eventLevelReady = False
     else:
-        applyTMVAMethod([], signalProbabilityName='isRestOfEventOfB0bar', prefix='B0barTagger', path=roe_path)
+        applyTMVAMethod([], signalProbabilityName='isMajorityInRestOfEventFromB0', prefix='B0barTagger', path=roe_path)
 
     class RemoveExtraInfoModule(Module):
         def event(self):
@@ -67,9 +69,9 @@ if eventLevelReady:
         def event(self):
             roe = Belle2.PyStoreObj("RestOfEvent")
             info = Belle2.PyStoreObj("EventExtraInfo")
-            b_probability = info.obj().getExtraInfo("isRestOfEventOfB0")
-            bbar_probability = info.obj().getExtraInfo("isRestOfEventOfB0bar")
-            particle = roe.obj().getRelated("Particle")
+            b_probability = info.obj().getExtraInfo("isMajorityInRestOfEventFromB0")
+            bbar_probability = info.obj().getExtraInfo("isMajorityInRestOfEventFromB0")
+            particle = roe.obj().getRelated("Particles")
             particle.addExtraInfo("b_probability", b_probability)
             particle.addExtraInfo("bbar_probability", bbar_probability)
 

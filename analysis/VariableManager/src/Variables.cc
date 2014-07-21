@@ -639,6 +639,46 @@ namespace Belle2 {
 
     // Flavour tagging variables
 
+    double isMajorityInRestOfEventFromB0(const Particle*)
+    {
+      int vote = 0;
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      for (auto & track : roe->getTracks()) {
+        const MCParticle* mcParticle = track->getRelated<MCParticle>();
+        while (mcParticle != nullptr) {
+          if (mcParticle->getPDG() == 511) {
+            vote++;
+            break;
+          }
+          if (mcParticle->getPDG() == -511) {
+            vote--;
+            break;
+          }
+          mcParticle = mcParticle->getMother();
+        }
+      }
+      return vote > 0;
+    }
+
+    double isMajorityInRestOfEventFromB0bar(const Particle*)
+    {
+      int vote = 0;
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      for (auto & track : roe->getTracks()) {
+        const MCParticle* mcParticle = track->getRelated<MCParticle>();
+        while (mcParticle != nullptr) {
+          if (mcParticle->getPDG() == 511) {
+            vote++;
+          }
+          if (mcParticle->getPDG() == -511) {
+            vote--;
+          }
+          mcParticle = mcParticle->getMother();
+        }
+      }
+      return vote < 0;
+    }
+
     double isRestOfEventOfB0(const Particle*)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
@@ -670,8 +710,8 @@ namespace Belle2 {
         return 0.0;
       } else if (mcParticle->getMother() != nullptr
                  && mcParticle->getMother()->getMother() != nullptr
-                 && mcParticle->getPDG() == -11 // TODO removed TMath::Abs here to test if electron are hadnlet correctly, but now there's a segfault!
-                 && mcParticle->getMother()->getPDG() == 511) {
+                 && TMath::Abs(mcParticle->getPDG()) == 11
+                 && TMath::Abs(mcParticle->getMother()->getPDG()) == 511) {
         return 1.0;
       } else {
         return 0.0;
@@ -1982,6 +2022,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("mcStatus", particleMCMatchStatus,  "The bit pattern indicating the quality of MC match (see MCMatching::MCMatchStatus)");
 
     VARIABLE_GROUP("Flavour tagging");
+    REGISTER_VARIABLE("isMajorityInRestOfEventFromB0", isMajorityInRestOfEventFromB0, "[Eventbased] Check if the majority of the tracks in the current RestOfEvent are from a B0");
+    REGISTER_VARIABLE("isMajorityInRestOfEventFromB0bar", isMajorityInRestOfEventFromB0bar, "[Eventbased] Check if the majority of the tracks in the current RestOfEvent are from a B0bar");
     REGISTER_VARIABLE("isRestOfEventOfB0", isRestOfEventOfB0,  "[Eventbased] Check if current RestOfEvent is related to a B0");
     REGISTER_VARIABLE("isRestOfEventOfB0bar", isRestOfEventOfB0bar,  "[Eventbased] Check if current RestOfEvent is related to a B0 B0bar");
     REGISTER_VARIABLE("isElectronFromB", isElectronFromB,  "Checks if the track was really a Kaon from a B. 1.0 if true otherwise 0.0");

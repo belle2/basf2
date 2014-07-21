@@ -388,6 +388,16 @@ namespace Belle2 {
     /**
      * return 1 if (dummy)
      */
+    double isMajorityInRestOfEventFromB0(const Particle*);
+
+    /**
+     * return 1 if (dummy)
+     */
+    double isMajorityInRestOfEventFromB0bar(const Particle*);
+
+    /**
+     * return 1 if (dummy)
+     */
     double isRestOfEventOfB0(const Particle*);
 
     /**

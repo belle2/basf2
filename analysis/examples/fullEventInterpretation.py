@@ -88,6 +88,8 @@ partial = True
 
 particles = []
 particles.append(Particle('pi+', mvaConfig_chargedFSP))
+particles.append(Particle('e+', mvaConfig_chargedFSP))
+particles.append(Particle('mu+', mvaConfig_chargedFSP))
 particles.append(Particle('K+', mvaConfig_chargedFSP))
 particles.append(Particle('gamma', mvaConfig_gamma))
 

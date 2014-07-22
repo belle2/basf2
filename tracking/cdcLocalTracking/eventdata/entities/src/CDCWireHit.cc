@@ -45,16 +45,16 @@ namespace {
 
 
 
-
+  /*
   typedef CDC::SimpleTDCCountTranslator TDCCountTranslator;
   TDCCountTranslator& getTDCCountTranslatorInstance()
   { return getSimpleTDCCountTranslatorInstance(); }
+  */
 
-  /*
   typedef CDC::RealisticTDCCountTranslator TDCCountTranslator;
   RealisticTDCCountTranslator& getTDCCountTranslatorInstance()
   { return getRealisticTDCCountTranslatorInstance(); }
-  */
+
 }
 
 

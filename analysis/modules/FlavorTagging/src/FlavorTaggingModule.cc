@@ -122,8 +122,8 @@ namespace Belle2 {
 
     //training definition for Kaons
 //  Teacher in Track Level
-    std::string m_methodPrefix_Kaon_TL = "TMVA_Kaon_TL";
-    std::string m_target_Kaon_TL = "isKaonFromB";
+    m_methodPrefix_Kaon_TL = "TMVA_Kaon_TL";
+    m_target_Kaon_TL = "isKaonFromB";
     m_variables_Kaon_TL = {"charge", "p_CMS", "cosTheta", "K_vs_piid"};
     tuple<std::string, std::string, std::string> method_Kaon_TL_0("MLP", "MLP", "H:!V:VarTransform=Norm:NCycles=10000:HiddenLayers=3*N:NeuronType=tanh:TrainingMethod=BP:TestRate=10:EpochMonitoring=False:Sampling=1:SamplingEpoch=1:BPMode=sequential:ConvergenceImprove=1e-30:ConvergenceTests=-1:UseRegulator=False:UpdateLimit=10000:CalculateErrors=False");
     tuple<std::string, std::string, std::string> method_Kaon_TL_1("FastBDT", "Plugin", "H:!V:CreateMVAPdfs:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3");
@@ -183,19 +183,19 @@ namespace Belle2 {
       for (auto & x : m_methods_Muon_TL) {
         methods_Muon_TL.push_back(TMVAInterface::Method(std::get<0>(x), std::get<1>(x), std::get<2>(x), m_variables_Muon_TL));
       }
-      m_teacher_Muon_TL = new TMVAInterface::Teacher(m_methodPrefix_Muon_TL, m_workingDirectory, m_target_Muon_TL, methods_Muon_TL);
+      m_teacher_Muon_TL = new TMVAInterface::Teacher(m_methodPrefix_Muon_TL, m_workingDirectory, m_target_Muon_TL, methods_Muon_TL, false);
 
       std::vector<TMVAInterface::Method> methods_Kaon_TL;
       for (auto & x : m_methods_Kaon_TL) {
         methods_Kaon_TL.push_back(TMVAInterface::Method(std::get<0>(x), std::get<1>(x), std::get<2>(x), m_variables_Kaon_TL));
       }
-      m_teacher_Kaon_TL = new TMVAInterface::Teacher(m_methodPrefix_Kaon_TL, m_workingDirectory, m_target_Kaon_TL, methods_Kaon_TL);
+      m_teacher_Kaon_TL = new TMVAInterface::Teacher(m_methodPrefix_Kaon_TL, m_workingDirectory, m_target_Kaon_TL, methods_Kaon_TL, false);
 
       std::vector<TMVAInterface::Method> methods_SlowPion_TL;
       for (auto & x : m_methods_SlowPion_TL) {
         methods_SlowPion_TL.push_back(TMVAInterface::Method(std::get<0>(x), std::get<1>(x), std::get<2>(x), m_variables_SlowPion_TL));
       }
-      m_teacher_SlowPion_TL = new TMVAInterface::Teacher(m_methodPrefix_SlowPion_TL, m_workingDirectory, m_target_SlowPion_TL, methods_SlowPion_TL);
+      m_teacher_SlowPion_TL = new TMVAInterface::Teacher(m_methodPrefix_SlowPion_TL, m_workingDirectory, m_target_SlowPion_TL, methods_SlowPion_TL, false);
 
     }
 

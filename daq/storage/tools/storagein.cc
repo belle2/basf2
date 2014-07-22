@@ -91,6 +91,10 @@ int main(int argc, char** argv)
           runno = data.getRunNumber();
           B2INFO("storagein: new run detected : exp="
                  << expno << " runno=" << runno);
+          SharedEventBuffer::Header* iheader = ibuf.getHeader();
+          iheader->expno = expno;
+          iheader->runno = runno;
+          iheader->subno = subno;
           if (info.isAvailable()) {
             info.setExpNumber(expno);
             info.setRunNumber(runno);

@@ -186,8 +186,9 @@ unsigned int SharedEventBuffer::read(int* buf)
           } else {
             unsigned int count = m_nword - i_r;
             memcpy(buf, (m_buf + i_r + 1), sizeof(int) * count);
-            if (nword > count)
+            if (nword > count) {
               memcpy(buf + count, m_buf, sizeof(int) * (nword - count));
+            }
             break;
           }
         }

@@ -36,12 +36,14 @@ int main(int argc, char** argv)
     info.open(argv[6], atoi(argv[7]));
   }
   SharedEventBuffer ibuf;
-  ibuf.open(argv[1], atoi(argv[2]), true);
+  ibuf.open(argv[1], atoi(argv[2]) * 1000000);
   const std::string dir = argv[3];
   SharedEventBuffer obuf;
-  obuf.open(argv[4], atoi(argv[5]), true);
+  obuf.open(argv[4], atoi(argv[5]) * 1000000, true);
   B2INFO("storagerecord: started recording.");
-  info.reportRunning();
+  if (use_info) {
+    info.reportRunning();
+  }
   int* evtbuf = new int[1000000];
   unsigned long long nbyte_in = 0;
   unsigned long long nbyte_out = 0;

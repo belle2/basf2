@@ -181,6 +181,15 @@ namespace Belle2 {
       { return getRLWireHit().getRLInfo(); }
 
 
+      /// Getter for the drift length at the wire reference position.
+      FloatType getRefDriftLength() const
+      { return getRLWireHit().getRefDriftLength(); }
+
+      /// Getter for the uncertainty in the drift length at the wire reference position.
+      FloatType getRefDriftLengthVariance() const
+      { return getRLWireHit().getRefDriftLengthVariance(); }
+
+
 
       /// Getter for the position in the reference plane
       Vector2D getRecoPos2D() const
@@ -224,9 +233,14 @@ namespace Belle2 {
       Vector2D getCenterOfMass2D() const
       { return getRecoPos2D(); }
 
+      /// Calculates the simple distance of the reconstructed position to a circle trajectory
+      FloatType getDist2D(const CDCTrajectory2D& trajectory2D) const
+      { return trajectory2D.getDist2D(getRecoPos2D()); }
+
+
       /// Calculates the squared distance of the reconstructed position to a circle as see from the transvers plane.
       FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const
-      { FloatType distance = trajectory2D.getDist2D(getRecoPos2D()); return distance * distance; }
+      { FloatType distance = getDist2D(trajectory2D); return distance * distance; }
 
 
       /// Getter for the oriented wire hit assoziated with the reconstructed hit.

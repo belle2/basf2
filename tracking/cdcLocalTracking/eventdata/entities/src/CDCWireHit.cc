@@ -26,7 +26,6 @@ namespace {
   // Setup instance for the tdc count translation
 
   SimpleTDCCountTranslator* s_simpleTDCCountTranslator = nullptr;
-
   SimpleTDCCountTranslator& getSimpleTDCCountTranslatorInstance()
   {
     if (not s_simpleTDCCountTranslator) s_simpleTDCCountTranslator = new SimpleTDCCountTranslator();
@@ -36,7 +35,6 @@ namespace {
 
 
   RealisticTDCCountTranslator* s_realisticTDCCountTranslator = nullptr;
-
   RealisticTDCCountTranslator& getRealisticTDCCountTranslatorInstance()
   {
     if (not s_realisticTDCCountTranslator) s_realisticTDCCountTranslator = new RealisticTDCCountTranslator();
@@ -44,16 +42,9 @@ namespace {
   }
 
 
-
-  /*
-  typedef CDC::SimpleTDCCountTranslator TDCCountTranslator;
-  TDCCountTranslator& getTDCCountTranslatorInstance()
+  TDCCountTranslatorBase& getTDCCountTranslatorInstance()
   { return getSimpleTDCCountTranslatorInstance(); }
-  */
-
-  typedef CDC::RealisticTDCCountTranslator TDCCountTranslator;
-  RealisticTDCCountTranslator& getTDCCountTranslatorInstance()
-  { return getRealisticTDCCountTranslatorInstance(); }
+  //{ return getRealisticTDCCountTranslatorInstance(); }
 
 }
 
@@ -88,7 +79,7 @@ CDCWireHit::CDCWireHit(const CDCHit* ptrHit):
   }
   const CDCHit& hit = *ptrHit;
 
-  TDCCountTranslator& translator = getTDCCountTranslatorInstance();
+  TDCCountTranslatorBase& translator = getTDCCountTranslatorInstance();
 
   float initialTOFEstimate = 0;
 

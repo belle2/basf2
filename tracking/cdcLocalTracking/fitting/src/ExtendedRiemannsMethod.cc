@@ -46,9 +46,10 @@ void ExtendedRiemannsMethod::update(CDCTrajectory2D& trajectory2D,
   if (not nObservations) return;
 
   Vector2D origin = Vector2D(0.0, 0.0);
-  Vector2D cenralPoint = observations2D.getCentralPoint();
+  Vector2D centralPoint = observations2D.getCentralPoint();
 
-  const Vector2D& ref = origin;
+  const Vector2D& ref = isOriginConstrained() ? origin : centralPoint;
+  //const Vector2D& ref = origin;
   //const Vector2D& ref = centralPoint;
 
   observations2D.passiveMoveBy(ref);

@@ -83,6 +83,12 @@ namespace Belle2 {
         /// Returns the derefenced end iterator
         const T& back() const { return *end(); }
 
+        /// Returns the object at index i
+        const T& at(size_t pos) const { return *(begin() + pos); }
+
+        /// Returns the total number of objects in this range
+        size_t size() const { return std::distance(begin(), end()); }
+
       };
 
 
@@ -139,6 +145,8 @@ namespace Belle2 {
 
       /// Empty deconstructor
       ~SortableVector() {;}
+
+      operator const_range() { return const_range(begin(), end()); }
 
       ///Defines an ordering of sortable vector instance by lexicographical comparison
       bool operator<(SortableVector<T> const& rhs) const

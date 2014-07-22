@@ -80,10 +80,12 @@ namespace Belle2 {
       CDCRLWireHitRange getRLWireHits(const Coaligned& coaligned) const { return m_rlWireHits.equal_range(coaligned); }
 
       /// Getter for the wire hits
-      CDCWireHitRange getWireHits() const { return CDCWireHitRange(m_wireHits.begin(), m_wireHits.end()); }
+      const Belle2::CDCLocalTracking::SortableVector<Belle2::CDCLocalTracking::CDCWireHit>& getWireHits() const
+      { return m_wireHits; }
 
       /// Getter for the wire hits
-      CDCRLWireHitRange getRLWireHits() const { return CDCRLWireHitRange(m_rlWireHits.begin(), m_rlWireHits.end()); }
+      const Belle2::CDCLocalTracking::SortableVector<Belle2::CDCLocalTracking::CDCRLWireHit>& getRLWireHits() const
+      { return m_rlWireHits; }
 
     private:
       SortableVector<CDCWireHit> m_wireHits; ///< Memory for the wire hits to be stored

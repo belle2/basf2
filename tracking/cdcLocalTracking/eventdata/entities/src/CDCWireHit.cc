@@ -10,50 +10,123 @@
 
 #include "../include/CDCWireHit.h"
 
+#include <cdc/translators/SimpleTDCCountTranslator.h>
+#include <cdc/translators/RealisticTDCCountTranslator.h>
 
 #include <cmath>
 
 using namespace std;
 using namespace Belle2;
+using namespace CDC;
 using namespace CDCLocalTracking;
 
 ClassImpInCDCLocalTracking(CDCWireHit)
 
+namespace {
+  // Setup instance for the tdc count translation
+
+  SimpleTDCCountTranslator* s_simpleTDCCountTranslator = nullptr;
+
+  SimpleTDCCountTranslator& getSimpleTDCCountTranslatorInstance()
+  {
+    if (not s_simpleTDCCountTranslator) s_simpleTDCCountTranslator = new SimpleTDCCountTranslator();
+    return *s_simpleTDCCountTranslator;
+  }
+
+
+
+  RealisticTDCCountTranslator* s_realisticTDCCountTranslator = nullptr;
+
+  RealisticTDCCountTranslator& getRealisticTDCCountTranslatorInstance()
+  {
+    if (not s_realisticTDCCountTranslator) s_realisticTDCCountTranslator = new RealisticTDCCountTranslator();
+    return *s_realisticTDCCountTranslator;
+  }
+
+
+
+
+  typedef CDC::SimpleTDCCountTranslator TDCCountTranslator;
+  TDCCountTranslator& getTDCCountTranslatorInstance()
+  { return getSimpleTDCCountTranslatorInstance(); }
+
+  /*
+  typedef CDC::RealisticTDCCountTranslator TDCCountTranslator;
+  RealisticTDCCountTranslator& getTDCCountTranslatorInstance()
+  { return getRealisticTDCCountTranslatorInstance(); }
+  */
+}
+
+
+
 CDCWireHit::CDCWireHit():
   m_wire(&(CDCWire::getLowest())),
-  m_hit(nullptr), m_iHit(-1),
-  m_refDriftLength(0),
+  m_hit(nullptr),
+  m_refDriftLength(0.0),
+  m_refDriftLengthVariance(0.0),
   m_automatonCell(1)
 {;}
 
 CDCWireHit::CDCWireHit(const CDCWire* wire):
   m_wire(wire),
   m_hit(nullptr),
-  m_iHit(-1),
   m_refDriftLength(0.0),
+  m_refDriftLengthVariance(0.0),
   m_automatonCell(1)
 {;}
 
-CDCWireHit::CDCWireHit(const CDCHit* hit, int iHit):
-  m_wire(CDCWire::getInstance(*hit)),
-  m_hit(hit),
-  m_iHit(iHit),
+CDCWireHit::CDCWireHit(const CDCHit* ptrHit):
+  m_wire(ptrHit ? CDCWire::getInstance(*ptrHit) : nullptr),
+  m_hit(ptrHit),
   m_refDriftLength(0.0),
+  m_refDriftLengthVariance(0.0),
   m_automatonCell(1)
 {
-  m_refDriftLength = CDCWireHit::TDCCountTranslatorInstance().getDriftLength(hit->getTDCCount());
-  //m_refDriftLength = CDCWireHit::TDCCountTranslatorInstance().getDriftLength(hit->getTDCCount(),
-  //                                                                           getWire().getWireID(),
-  //                                                                           0,
-  //                                                                           false,
-  //                                                                           getWire().getRefZ() ) ;
+  if (not ptrHit) {
+    B2ERROR("CDCWireHit constructor invoked with nullptr CDCHit");
+    return;
+  }
+  const CDCHit& hit = *ptrHit;
+
+  TDCCountTranslator& translator = getTDCCountTranslatorInstance();
+
+  float initialTOFEstimate = 0;
+
+  // TODO: check left right correspondence to bool
+  float refDriftLengthRight = translator.getDriftLength(hit.getTDCCount(),
+                                                        getWireID(),
+                                                        initialTOFEstimate,
+                                                        false, //bool leftRight
+                                                        getWire().getRefZ());
+
+  float refDriftLengthLeft = translator.getDriftLength(hit.getTDCCount(),
+                                                       getWireID(),
+                                                       initialTOFEstimate,
+                                                       true, //bool leftRight
+                                                       getWire().getRefZ());
+
+
+  m_refDriftLength = (refDriftLengthLeft + refDriftLengthRight) / 2.0;
+
+  m_refDriftLengthVariance = translator.getDriftLengthResolution(m_refDriftLength,
+                             getWireID(),
+                             false, //bool leftRight ?
+                             -999.9, // meaning unclear ?
+                             -999.9 // meaning unclear ?
+                                                                );
+
+
 }
+
+
+
+
 
 CDCWireHit::CDCWireHit(const WireID& wireID, const FloatType& driftLength):
   m_wire(CDCWire::getInstance(wireID)),
   m_hit(nullptr),
-  m_iHit(-1),
   m_refDriftLength(driftLength),
+  m_refDriftLengthVariance(getSimpleTDCCountTranslatorInstance().getDriftLengthResolution(driftLength, wireID, false, NAN, NAN)),
   m_automatonCell(1)
 {;}
 
@@ -61,7 +134,7 @@ CDCWireHit::CDCWireHit(const WireID& wireID, const FloatType& driftLength):
 CDCWireHit::~CDCWireHit() {;}
 
 
-CDCWireHit::TDCCountTranslator* CDCWireHit::m_tdcCountTranslator = nullptr;
+
 
 
 

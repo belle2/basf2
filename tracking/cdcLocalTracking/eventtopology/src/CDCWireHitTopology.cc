@@ -40,18 +40,18 @@ size_t CDCWireHitTopology::fill(const std::string& cdcHitsStoreArrayName)
   StoreArray<CDCHit> cdcHits(cdcHitsStoreArrayName);
 
   //create the wirehits into a collection
-  size_t nHits = cdcHits.getEntries();
+  Index nHits = cdcHits.getEntries();
   m_wireHits.reserve(nHits);
   m_rlWireHits.reserve(2 * nHits);
 
-  for (size_t iHit = 0; iHit < nHits; ++iHit) {
+  for (Index iHit = 0; iHit < nHits; ++iHit) {
     CDCHit* ptrHit = cdcHits[iHit];
     CDCHit& hit = *ptrHit;
     if (iHit != hit.getArrayIndex()) {
       B2ERROR("CDCHit.getArrayIndex() produced wrong result. Expected : " << iHit << " Actual : " << hit.getArrayIndex());
     }
 
-    m_wireHits.push_back(CDCWireHit(ptrHit, iHit));
+    m_wireHits.push_back(CDCWireHit(ptrHit));
 
     const WireID wireID(hit.getID());
     if (wireID.getEWire() != hit.getID()) {

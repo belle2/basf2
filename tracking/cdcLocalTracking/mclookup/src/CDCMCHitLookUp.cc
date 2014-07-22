@@ -83,7 +83,7 @@ float CDCMCHitLookUp::getRefDriftLength(const CDCHit* ptrHit) const
 {
 
   if (not ptrHit) return NAN;
-  CDCWireHit wireHit(ptrHit, 0);
+  CDCWireHit wireHit(ptrHit);
   return wireHit.getRefDriftLength();
 
 }

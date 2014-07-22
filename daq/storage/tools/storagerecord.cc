@@ -92,7 +92,7 @@ int main(int argc, char** argv)
       info.addInputNBytes(nbyte_in);
     }
     if (file != NULL) {
-      file->write((char*)evtbuf);
+      //file->write((char*)evtbuf);
       int nbyte = evtbuf[0];
       int nword = (nbyte - 1) / 4 + 1;
       if (count_out % interval == 0 && obuf.isWritable(nword)) {
@@ -108,6 +108,7 @@ int main(int argc, char** argv)
     } else {
       B2ERROR("storagerecord: no run was initialzed for recording");
     }
+    //usleep(1000);
   }
   return 0;
 }

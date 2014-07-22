@@ -34,51 +34,57 @@ int main(int argc, char** argv)
   bool use_info = (argc > 6);
   if (use_info) {
     info.open(argv[5], atoi(argv[6]));
+    //info.init();
+    //info.clear();
   }
   SharedEventBuffer ibuf;
   ibuf.open(argv[1], atoi(argv[2]) * 1000000, true);
   TCPSocket socket(argv[3], atoi(argv[4]));
   B2INFO("storagein: Connected to eb2.");
-  info.reportRunning();
   int* evtbuf = new int[1000000];
   BinData data;
   data.setBuffer(evtbuf);
   Time t0;
-  unsigned long long nbyte_in = 0;
-  unsigned int count_in = 0;
-  unsigned long long nbyte_out = 0;
-  unsigned int count_out = 0;
   int expno = 0;
   int runno = 0;
   int subno = 0;
   int ntried = 0;
   while (true) {
-    try {
-      socket.connect();
-      socket.setBufferSize(4 * 1024 * 1024);
-      ntried = 0;
-      if (info.isAvailable()) {
-        info.setInputPort(socket.getLocalPort());
+    while (socket.get_fd() <= 0) {
+      try {
+        socket.connect();
+        socket.setBufferSize(32 * 1024 * 1024);
+        ntried = 0;
+        if (info.isAvailable()) {
+          info.setInputPort(socket.getLocalPort());
+          info.setInputAddress(socket.getLocalAddress());
+        }
+        break;
+      } catch (const IOException& e) {
+        socket.close();
+        if (info.isAvailable()) {
+          info.setInputPort(0);
+          info.setInputAddress(0);
+        }
+        B2WARNING("storagein: failed to connect to eb2 (try=" << ntried++ << ")");
+        sleep(5);
       }
-    } catch (const IOException& e) {
-      socket.close();
-      if (info.isAvailable()) info.setInputPort(0);
-      B2WARNING("storagein: failed to connect to eb2 (try=" << ntried++ << ")");
-      sleep(5);
-      continue;
     }
+    info.reportReady();
     try {
       TCPSocketReader reader(socket);
       B2INFO("storagein: Cconnected to eb2.");
       while (true) {
-        reader.read(evtbuf, sizeof(int));
+        int nbyte_in = reader.read(evtbuf, sizeof(int));
+        if (info.getInputNBytes() == 0) {
+          info.reportRunning();
+        }
         unsigned int nbyte = (evtbuf[0] - 1) * sizeof(int);
         reader.read((evtbuf + 1), nbyte);
         nbyte_in += nbyte;
-        if (info.isAvailable() && count_in % 10 == 0) {
-          info.setInputCount(count_in);
+        if (info.isAvailable()) {
+          info.setInputCount(1);
           info.addInputNBytes(nbyte_in);
-          nbyte_in = 0;
         }
         if (expno > data.getExpNumber() || runno > data.getRunNumber()) {
           B2INFO("storagein: old run event detected : exp="
@@ -103,19 +109,13 @@ int main(int argc, char** argv)
             info.setInputNBytes(0);
             info.setOutputCount(0);
             info.setOutputNBytes(0);
-            nbyte_in = nbyte;
-            nbyte_out = 0;
-            count_in = 1;
-            count_out = 0;
           }
         }
-        nbyte_out += ibuf.write(evtbuf, evtbuf[0]);
-        count_out++;
-        data.getByteSize();
-        if (info.isAvailable() && count_out % 10 == 0) {
-          info.setOutputCount(count_out);
+        int nbyte_out = ibuf.write(evtbuf, evtbuf[0]);
+        //data.getByteSize();
+        if (info.isAvailable()) {
+          info.addOutputCount(1);
           info.addOutputNBytes(nbyte_out);
-          nbyte_out = 0;
         }
       }
     } catch (const IOException& e) {

@@ -116,7 +116,8 @@ namespace Belle2 {
       }
 
       /// Appends all reconstructed hits from the two axial segments, usePosition indicates whether the absolute position shall be used instead of the oriented wire hit information.
-      void append(const CDCAxialAxialSegmentPair& axialAxialSegmentPair, bool usePosition = false) {
+      void append(const CDCAxialAxialSegmentPair& axialAxialSegmentPair,
+                  bool usePosition = false) {
         const CDCRecoSegment2D* ptrStartSegment2D = axialAxialSegmentPair.getStart();
         if (ptrStartSegment2D) {
           const CDCRecoSegment2D& startSegment2D = *ptrStartSegment2D;
@@ -132,7 +133,8 @@ namespace Belle2 {
 
 #ifndef __CINT__
       /// Appends all wire positions of the hits in the legendre track hits. Always use position since no other mode as long as there are no right left passage information available.
-      void append(const std::vector<TrackFinderCDCLegendre::TrackHit*>& legendreTrackHits, bool usePosition = false)      {
+      void append(const std::vector<TrackFinderCDCLegendre::TrackHit*>& legendreTrackHits,
+                  bool usePosition  __attribute__((unused)) = false) {
         for (const TrackFinderCDCLegendre::TrackHit * ptrLegendreTrackHit : legendreTrackHits) {
           if (not ptrLegendreTrackHit) continue;
           const TrackFinderCDCLegendre::TrackHit& legendreTrackHit = *ptrLegendreTrackHit;

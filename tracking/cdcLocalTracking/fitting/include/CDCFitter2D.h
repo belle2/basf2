@@ -54,6 +54,13 @@ namespace Belle2 {
         return result;
       }
 
+      /// Fits the segment
+      CDCTrajectory2D fit(const CDCRecoSegment2D& segment) const {
+        CDCTrajectory2D result;
+        update(result, segment);
+        return result;
+      }
+
       /// Updates a given trajectory with a fit to a collection of hits typs, which are convertable to observation circles.
       template<class Hits>
       void update(CDCTrajectory2D& trajectory2D, const Hits& hits) const {

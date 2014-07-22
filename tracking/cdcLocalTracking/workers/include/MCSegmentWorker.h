@@ -46,6 +46,9 @@ namespace Belle2 {
       }
 
       /// Generates the segments from the event topology.
+      std::vector<Belle2::CDCLocalTracking::CDCRecoSegment2D>& generate();
+
+      /// Generates the segments from the event topology.
       void generate(std::vector<Belle2::CDCLocalTracking::CDCRecoSegment2D>& outputSegments);
 
     private:

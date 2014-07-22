@@ -128,6 +128,8 @@ namespace Belle2 {
        *  in member map object for fast look up for repeated calls.*/
       ITrackType getMCTrackId(const CDCRecoSegment2D* ptrSegment2D) const;
 
+      /// Getter for the mc particle matched to this segment
+      const MCParticle* getMCParticle(const CDCRecoSegment2D* ptrSegment2D) const;
 
 
       /// Getter for the first hit in the segment which has the Monte Carlo track id matched to this segment

@@ -86,6 +86,13 @@ ITrackType CDCMCSegmentLookUp::getMCTrackId(const CDCRecoSegment2D* ptrSegment2D
 
 
 
+const MCParticle* CDCMCSegmentLookUp::getMCParticle(const CDCRecoSegment2D* ptrSegment2D) const
+{
+  const CDCHit* ptrHit = getFirstHit(ptrSegment2D);
+  const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
+  return mcHitLookUp.getMCParticle(ptrHit);
+}
+
 
 
 const CDCHit* CDCMCSegmentLookUp::getFirstHit(const CDCRecoSegment2D* ptrSegment2D) const

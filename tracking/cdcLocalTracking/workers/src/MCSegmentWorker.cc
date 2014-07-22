@@ -17,6 +17,11 @@ using namespace std;
 using namespace Belle2;
 using namespace CDCLocalTracking;
 
+std::vector< CDCRecoSegment2D >& MCSegmentWorker::generate()
+{
+  generate(m_segments2D);
+  return m_segments2D;
+}
 
 void MCSegmentWorker::generate(std::vector< CDCRecoSegment2D >& outputSegments)
 {

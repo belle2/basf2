@@ -17,7 +17,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// The type of the wire ids enumerating wires within a given layer
-    typedef signed short IWireType;
+    typedef unsigned short IWireType;
 
     /// Constant making an invalid wire id
     const IWireType INVALID_IWIRE = 32767;

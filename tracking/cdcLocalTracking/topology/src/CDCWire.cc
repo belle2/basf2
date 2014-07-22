@@ -56,7 +56,15 @@ const CDCWire* CDCWire::getInstance(const CDCHit& hit)
   if (not CDCWireTopology::getInstance().isValidIWire(WireID(hit.getID()))) {
     B2FATAL("Invalid wire id of cdc hit " <<  WireID(hit.getID()));
   }
-  return &(CDCWireTopology::getInstance().getWire(WireID(hit.getID())));
+
+  const CDCWire& wire = CDCWireTopology::getInstance().getWire(WireID(hit.getID()));
+
+  if (wire.getEWire() != hit.getID()) {
+    B2ERROR("WireID.getEWire() differs from CDCHit.getID()");
+    B2ERROR("WireID.getEWire() : " << wire.getEWire());
+    B2ERROR("CDCHit.getEWire() : " << hit.getID());
+  }
+  return &wire;
 
 }
 

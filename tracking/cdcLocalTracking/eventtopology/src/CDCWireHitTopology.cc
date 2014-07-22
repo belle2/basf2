@@ -50,7 +50,23 @@ size_t CDCWireHitTopology::fill(const std::string& cdcHitsStoreArrayName)
     if (iHit != hit.getArrayIndex()) {
       B2ERROR("CDCHit.getArrayIndex() produced wrong result. Expected : " << iHit << " Actual : " << hit.getArrayIndex());
     }
+
     m_wireHits.push_back(CDCWireHit(ptrHit, iHit));
+
+    const WireID wireID(hit.getID());
+    if (wireID.getEWire() != hit.getID()) {
+      B2ERROR("WireID.getEWire() differs from CDCHit.getID()");
+    }
+
+    const CDCWireHit& wireHit = m_wireHits.back();
+    if (hit.getID() != wireHit.getWire().getEWire()) {
+      B2ERROR("CDCHit.getID() differs from CDCWireHit.getWire().getEWire()");
+    }
+    if (hit.getArrayIndex() != wireHit.getStoreIHit()) {
+      B2ERROR("CDCHit.getArrayIndex() differs from CDCWireHit.getStoreIHit");
+    }
+
+
   }
 
   m_wireHits.ensureSorted();

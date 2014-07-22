@@ -40,7 +40,7 @@ namespace Belle2 {
 
       /// Returns the number of observations stored
       size_t size() const
-      { return  m_observations.size() / 3; }
+      { return  m_observations.size() / 4; }
 
       /// Returns true if there are no observations stored.
       bool empty() const
@@ -52,39 +52,45 @@ namespace Belle2 {
 
       /// Reserves enough space for nObservations
       void reserve(const size_t& nObservations)
-      { m_observations.reserve(nObservations * 3); }
+      { m_observations.reserve(nObservations * 4); }
 
-      /// Getter for the x value of the observation at the given index
+      /// Getter for the x value of the observation at the given index.
       FloatType getX(const int& iObservation) const
-      { return m_observations[iObservation * 3]; }
+      { return m_observations[iObservation * 4]; }
 
-      /// Getter for the y value of the observation at the  given index
+      /// Getter for the y value of the observation at the given index.
       FloatType getY(const int& iObservation) const
-      { return m_observations[iObservation * 3 + 1]; }
+      { return m_observations[iObservation * 4 + 1]; }
 
-      /// Getter for the signed drift radius of the observation at the  given index
-      FloatType getSignedDriftLength(const int& iObservation) const
-      { return m_observations[iObservation * 3 + 2]; }
+      /// Getter for the signed drift radius of the observation at the given index.
+      FloatType getDriftLength(const int& iObservation) const
+      { return m_observations[iObservation * 4 + 2]; }
+
+      /// Getter for the weight / inverse variance of the observation at the given index.
+      FloatType getWeight(const int& iObservation) const
+      { return m_observations[iObservation * 4 + 3]; }
+
 
 
       /// Appends the observed position - drift radius is assumed to be zero if not given
-      void append(const FloatType& x, const FloatType& y, const FloatType& signedRadius = 0.0) {
+      void append(const FloatType& x, const FloatType& y, const FloatType& signedRadius = 0.0, const FloatType& weight = 1.0) {
         m_observations.push_back(x);
         m_observations.push_back(y);
         m_observations.push_back(signedRadius);
+        m_observations.push_back(weight);
       }
 
       /// Appends the observed position - drift radius is assumed to be zero if not given
-      void append(const Belle2::CDCLocalTracking::Vector2D& pos2D, const FloatType& signedRadius = 0.0)
-      { append(pos2D.x(), pos2D.y(), signedRadius); }
+      void append(const Belle2::CDCLocalTracking::Vector2D& pos2D, const FloatType& signedRadius = 0.0, const FloatType& weight = 1.0)
+      { append(pos2D.x(), pos2D.y(), signedRadius, weight); }
 
       /// Appends the observed position - drift radius is take a positiv number
       void append(const Belle2::CDCLocalTracking::CDCWireHit& wireHit)
-      { append(wireHit.getRefPos2D(), wireHit.getRefDriftLength()); }
+      { append(wireHit.getRefPos2D(), wireHit.getRefDriftLength(), 1.0 / wireHit.getRefDriftLengthVariance()); }
 
       /// Appends the observed position - drift radius is signed number according to the orientation
       void append(const Belle2::CDCLocalTracking::CDCRLWireHit& rlWireHit)
-      { append(rlWireHit.getRefPos2D(), rlWireHit.getSignedRefDriftLength()); }
+      { append(rlWireHit.getRefPos2D(), rlWireHit.getSignedRefDriftLength(), 1.0 / rlWireHit.getRefDriftLengthVariance()); }
 
       /// Appends the two observed position - drift radius is signed number according to the orientation
       void append(const Belle2::CDCLocalTracking::CDCRLWireHitPair& rlWireHitPair) {
@@ -102,7 +108,10 @@ namespace Belle2 {
       /// Appends the observed position - drift radius is signed number according to the orientation
       void append(const Belle2::CDCLocalTracking::CDCRecoHit2D& recoHit2D, bool usePosition = false) {
         if (usePosition) {
-          append(recoHit2D.getRecoPos2D());
+          const Vector2D& recoPos2D = recoHit2D.getRecoPos2D();
+          const FloatType driftLength = 0.0;
+          const FloatType weight = 1.0 / recoHit2D.getWireHit().getRefDriftLengthVariance();
+          append(recoPos2D, driftLength, weight);
         } else {
           append(recoHit2D.getRLWireHit());
         }
@@ -139,7 +148,9 @@ namespace Belle2 {
           if (not ptrLegendreTrackHit) continue;
           const TrackFinderCDCLegendre::TrackHit& legendreTrackHit = *ptrLegendreTrackHit;
           const TVector3&& wirePos = legendreTrackHit.getWirePosition();
-          append(wirePos.X(), wirePos.Y());
+          const FloatType driftLength = 0.0;
+          const FloatType weight = 1.0;
+          append(wirePos.X(), wirePos.Y(), driftLength, weight);
         }
       }
 #endif
@@ -187,7 +198,6 @@ namespace Belle2 {
       /// Returns the observations structured as an Eigen matrix
       /** This returns a reference to the stored observations. Note that operations may alter the content of the underlying memory and render it useless for subceeding calculations.*/
       EigenObservationMatrix getObservationMatrix();
-
 
       /// Constructs a symmetric matrix of weighted sums of x, y, r^2 and drift lengts as relevant for circle fits.
       /** Cumulates weights, x positions, y positions, quadratic polar radii and signed drift legnths and products thereof
@@ -275,7 +285,7 @@ namespace Belle2 {
 #endif
 
     private:
-      std::vector<FloatType> m_observations; ///< Memory for the individual observations. Arrangement of values is x,y, drift raduis, x, y, .....
+      std::vector<FloatType> m_observations; ///< Memory for the individual observations. Arrangement of values is x,y, drift raduis, weight, x, y, .....
 
       /** ROOT Macro to make CDCObservation2D a ROOT class.*/
       ClassDefInCDCLocalTracking(CDCObservations2D, 1);

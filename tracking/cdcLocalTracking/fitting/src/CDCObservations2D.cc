@@ -33,20 +33,15 @@ CDCObservations2D::~CDCObservations2D()
 
 size_t CDCObservations2D::getNObservationsWithDriftRadius() const
 {
-
-  // Obtain an iterator an advance it to the first drift radius
-  std::vector<FloatType>::const_iterator itDriftRadius = m_observations.begin();
-  std::advance(itDriftRadius, 2);
-
   size_t result = 0;
+  Index nObservations = size();
 
-  //Every thrid element is a drift radius
-  for (; itDriftRadius < m_observations.end(); std::advance(itDriftRadius, 3)) {
-
-    bool hasDriftRadius = (*itDriftRadius != 0.0);
-    result += hasDriftRadius ? 1 : 0;
-
+  for (Index iObservation = 0; iObservation < nObservations; ++iObservation) {
+    const FloatType& driftLength = getDriftLength(iObservation);
+    bool hasDriftLength = (driftLength != 0.0);
+    result += hasDriftLength ? 1 : 0;
   }
+
   return result;
 }
 
@@ -55,9 +50,10 @@ size_t CDCObservations2D::getNObservationsWithDriftRadius() const
 CDCObservations2D::EigenObservationMatrix CDCObservations2D::getObservationMatrix()
 {
 
-  size_t nObservations = m_observations.size() / 3;
+  size_t nObservations = size();
   FloatType* rawObservations = &(m_observations.front());
-  Map< Matrix< FloatType, Dynamic, Dynamic, RowMajor > > eigenObservations(rawObservations, nObservations, 3);
+
+  Map< Matrix< FloatType, Dynamic, Dynamic, RowMajor > > eigenObservations(rawObservations, nObservations, 4);
   return eigenObservations;
 
 }
@@ -70,10 +66,14 @@ Vector2D CDCObservations2D::getCentralPoint() const
 
   size_t iCentralObservation = nObservations / 2;
 
-  FloatType centralX = m_observations[iCentralObservation * 3];
-  FloatType centralY = m_observations[iCentralObservation * 3 + 1];
+  FloatType centralX = getX(iCentralObservation);
+  FloatType centralY = getY(iCentralObservation);
 
   return Vector2D(centralX, centralY);
+
+  // May refine somehow ?
+  // EigenObservationMatrix eigenObservations = getObservationMatrix();
+  // RowVector2f meanPoint = eigenObservations.leftCols<2>.colwise().mean();
 }
 
 
@@ -94,9 +94,6 @@ Vector2D CDCObservations2D::centralize()
   passiveMoveBy(centralPoint);
   return centralPoint;
 
-  // May refine somehow
-  // EigenObservationMatrix eigenObservations = getObservationMatrix();
-  // RowVector2f meanPoint = eigenObservations.leftCols<2>.colwise().mean();
 }
 
 
@@ -121,7 +118,7 @@ Eigen::Matrix<FloatType, 5, 5> CDCObservations2D::getWXYRLSumMatrix()
   projectedPoints.col(iR2) = eigenObservation.leftCols<2>().rowwise().squaredNorm() - eigenObservation.col(2).rowwise().squaredNorm();
   projectedPoints.col(iL) = eigenObservation.col(2);
 
-  Array< FloatType, Dynamic, 1 > weights = Array<FloatType, Dynamic, 1>::Constant(nObservations, 1.0);
+  Array< FloatType, Dynamic, 1 > weights = eigenObservation.col(3);
   Matrix< FloatType, Dynamic, 5 > weightedProjectedPoints = projectedPoints.array().colwise() * weights;
   Matrix< FloatType, 5, 5 > sumMatrix  =  weightedProjectedPoints.transpose() * projectedPoints;
 
@@ -150,7 +147,7 @@ Eigen::Matrix<FloatType, 4, 4> CDCObservations2D::getWXYLSumMatrix()
   projectedPoints.col(iY) = eigenObservation.col(1);
   projectedPoints.col(iL) = eigenObservation.col(2);
 
-  Array< FloatType, Dynamic, 1 > weights = Array<FloatType, Dynamic, 1>::Constant(nObservations, 1.0);
+  Array< FloatType, Dynamic, 1 > weights = eigenObservation.col(3);
   Matrix< FloatType, Dynamic, 4 > weightedProjectedPoints = projectedPoints.array().colwise() * weights;
   Matrix< FloatType, 4, 4 > sumMatrix  =  weightedProjectedPoints.transpose() * projectedPoints;
 
@@ -181,7 +178,7 @@ Eigen::Matrix<FloatType, 4, 4> CDCObservations2D::getWXYRSumMatrix()
   projectedPoints.col(iY) = eigenObservation.col(1);
   projectedPoints.col(iR2) = eigenObservation.leftCols<2>().rowwise().squaredNorm() - eigenObservation.col(2).rowwise().squaredNorm();
 
-  Array< FloatType, Dynamic, 1 > weights = Array<FloatType, Dynamic, 1>::Constant(nObservations, 1.0);
+  Array< FloatType, Dynamic, 1 > weights = eigenObservation.col(3);
   Matrix< FloatType, Dynamic, 4 > weightedProjectedPoints = projectedPoints.array().colwise() * weights;
   Matrix< FloatType, 4, 4 > sumMatrix  =  weightedProjectedPoints.transpose() * projectedPoints;
   return sumMatrix;
@@ -204,11 +201,10 @@ Eigen::Matrix<FloatType, 3, 3> CDCObservations2D::getWXYSumMatrix()
   projectedPoints.col(iX) = eigenObservation.col(0);
   projectedPoints.col(iY) = eigenObservation.col(1);
 
-  Array< FloatType, Dynamic, 1 > weights = Array<FloatType, Dynamic, 1>::Constant(nObservations, 1.0);
+  Array< FloatType, Dynamic, 1 > weights = eigenObservation.col(3);
   Matrix< FloatType, Dynamic, 3 > weightedProjectedPoints = projectedPoints.array().colwise() * weights;
   Matrix< FloatType, 3, 3 > sumMatrix  =  weightedProjectedPoints.transpose() * projectedPoints;
 
   return sumMatrix;
-
 }
 

@@ -19,6 +19,9 @@
 #include <rawdata/dataobjects/RawSVD.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 
+#include <rawdata/dataobjects/RawHeader_v0.h>
+#include <rawdata/dataobjects/RawTrailer_v0.h>
+
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 

@@ -111,7 +111,7 @@ void Root2RawModule::event()
   hdr.SetNumEventsinPacket(1);
   hdr.SetNodeID(0);
   hdr.SetNumNodesinPacket(nblock);
-  RawHeader rhdr;
+  RawHeader_v0 rhdr;
   rhdr.SetBuffer(svdarray[0]->GetBuffer(0));
   hdr.SetEventNumber(rhdr.GetEveNo());
   hdr.SetNodeID(0);

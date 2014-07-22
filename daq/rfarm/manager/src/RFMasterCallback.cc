@@ -60,11 +60,15 @@ bool RFMasterCallback::perform(const NSMMessage& msg) throw()
     result = status();
   }
   if (result) {
+    getNode().setError(0);
     com->replyOK(getNode());
     return true;
   } else {
     //getNode().setState(NSMState::ERROR_ES);
-    com->replyError(getReply());
+    if (getNode().getError() == 0) {
+      getNode().setError(255);
+    }
+    com->replyError(getNode().getError(), getReply());
   }
   return false;
 }

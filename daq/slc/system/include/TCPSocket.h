@@ -30,6 +30,7 @@ namespace Belle2 {
     void setBufferSize(int size) throw(IOException);
     void print();
     const std::string getLocalIP();
+    int getLocalAddress();
     int getLocalPort();
 
   public:

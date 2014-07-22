@@ -140,9 +140,20 @@ const std::string TCPSocket::getLocalIP()
   memset(&sa, 0, sizeof(sockaddr_in));
   socklen_t sa_len = sizeof(sa);
   if (getsockname(m_fd, (struct sockaddr*)&sa, (socklen_t*)&sa_len) != 0) {
-    return 0;
+    return "";
   }
   return inet_ntoa(sa.sin_addr);
+}
+
+int TCPSocket::getLocalAddress()
+{
+  sockaddr_in sa;
+  memset(&sa, 0, sizeof(sockaddr_in));
+  socklen_t sa_len = sizeof(sa);
+  if (getsockname(m_fd, (struct sockaddr*)&sa, (socklen_t*)&sa_len) != 0) {
+    return 0;
+  }
+  return sa.sin_addr.s_addr;
 }
 
 int TCPSocket::getLocalPort()

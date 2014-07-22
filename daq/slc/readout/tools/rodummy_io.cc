@@ -66,8 +66,6 @@ int main(int argc, char** argv)
   info.init();
   info.clear();
   LogFile::info("starting ro dummy.");
-  usleep(500000);
-  info.reportRunning();
 
   int ssock = open_server_socket("0.0.0.0", atoi(argv[5]));
 

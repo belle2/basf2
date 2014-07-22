@@ -14,8 +14,7 @@ DAQLogMessage::DAQLogMessage() throw()
   setRevision(g_revision);
   addInt("date", Date().get());
   addText("nodename", "");
-  addEnumList("priority", "DEBUG,INFO,NOTICE,WARNING,ERROR,FATAL");
-  addEnum("priority", "");
+  addChar("priority", 0);
   addText("message", "");
 }
 
@@ -28,8 +27,7 @@ DAQLogMessage::DAQLogMessage(const std::string& nodename,
   setRevision(g_revision);
   addInt("date", Date().get());
   addText("nodename", nodename);
-  addEnumList("priority", "DEBUG,INFO,NOTICE,WARNING,ERROR,FATAL");
-  addEnum("priority", "");
+  addChar("priority", 0);
   setPriority(priority);
   addText("message", message);
 }
@@ -44,8 +42,7 @@ DAQLogMessage::DAQLogMessage(const std::string& nodename,
   setRevision(g_revision);
   addInt("date", date.get());
   addText("nodename", nodename);
-  addEnumList("priority", "DEBUG,INFO,NOTICE,WARNING,ERROR,FATAL");
-  addEnum("priority", "");
+  addChar("priority", 0);
   setPriority(priority);
   addText("message", message);
 }
@@ -57,14 +54,13 @@ DAQLogMessage::DAQLogMessage(const DAQLogMessage& log) throw()
   setRevision(g_revision);
   addInt("date", 0);
   addText("nodename", "");
-  addEnumList("priority", "DEBUG,INFO,NOTICE,WARNING,ERROR,FATAL");
-  addEnum("priority", "");
+  addChar("priority", 0);
   addText("message", "");
 }
 
 void DAQLogMessage::setPriority(LogFile::Priority priority) throw()
 {
-  setEnum("priority", (int)priority);
+  setChar("priority", (char)priority);
 }
 
 void DAQLogMessage::setNodeName(const std::string& name) throw()
@@ -94,12 +90,12 @@ void DAQLogMessage::setDate(const Date& date) throw()
 
 LogFile::Priority DAQLogMessage::getPriority() const throw()
 {
-  return (LogFile::Priority) getEnumId("priority");
+  return (LogFile::Priority) getChar("priority");
 }
 
 int DAQLogMessage::getPriorityInt() const throw()
 {
-  return getEnumId("priority");
+  return getChar("priority");
 }
 
 const std::string DAQLogMessage::getNodeName() const throw()

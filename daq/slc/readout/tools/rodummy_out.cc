@@ -26,8 +26,7 @@ int main(int argc, char** argv)
     return 1;
   }
   RunInfoBuffer info;
-  info.open(argv[1], sizeof(ronode_info), false);
-  ronode_info* sinfo = (ronode_info*)info.getReserved();
+  info.open(argv[1], atoi(argv[2]));
   LogFile::info("starting ro dummy.");
   usleep(500000);
   info.reportRunning();
@@ -37,44 +36,36 @@ int main(int argc, char** argv)
   int expno = 1;
   int runno = 1;
   int subno = 0;
-  sinfo->io[0].port = IO_NOTUSED;
-  sinfo->io[0].count = 0;
-  sinfo->io[0].nbyte = 0;
+  info.setInputPort(0);
+  info.setInputCount(0);
+  info.setInputNBytes(0);
   while (true) {
     TCPSocket socket(argv[3], atoi(argv[4]));
     try {
       socket.connect();
       socket.setBufferSize(4 * 1024 * 1024);
-      sinfo->io[1].port = socket.getLocalPort();
+      info.setOutputPort(socket.getLocalPort());
     } catch (const IOException& e) {
-      sinfo->io[1].port = IO_DISCONNECTED;
+      info.setOutputPort(-1);
       socket.close();
       sleep(5);
       continue;
     }
     LogFile::info("connected port=%d", socket.getLocalPort());
-    sinfo->stime = Time().getSecond();
     count = 0;
     while (true) {
       try {
         socket.select(0, 0);
       } catch (const IOException& e) {
-        sinfo->io[1].port = IO_DISCONNECTED;
+        info.setOutputPort(-1);
         break;
       }
-      sinfo->expno = expno;
-      sinfo->runno = runno;
-      sinfo->subno = subno;
-      sinfo->io[1].count = count;
-      sinfo->io[1].nbyte += (int)(rand() / (double)RAND_MAX * 1024000);
+      info.setExpNumber(expno);
+      info.setRunNumber(runno);
+      info.setSubNumber(subno);
+      info.setOutputCount(count);
+      info.addOutputNBytes((int)(rand() / (double)RAND_MAX * 1024000));
       count++;
-      /*
-      if (count % 100 == 0) {
-      LogFile::info("%d %d %d %d %f", sinfo->expno,
-          sinfo->runno, sinfo->subno,
-          sinfo->io[1].count, sinfo->io[1].nbyte);
-      }
-      */
       usleep(500);
     }
     LogFile::info("disconnected.");

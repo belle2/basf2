@@ -82,10 +82,14 @@ bool HVCallback::perform(const NSMMessage& msg) throw()
     }
   }
   if (result) {
+    getNode().setError(0);
     com->replyOK(getNode());
   } else {
-    getNode().setState(HVState::ERROR_ES);
-    com->replyError(getReply());
+    if (getNode().getError() == 0) {
+      getNode().setError(255);
+    }
+    //getNode().setState(HVState::ERROR_ES);
+    com->replyError(getNode().getError(), getReply());
   }
   LogFile::debug(getNode().getState().getLabel());
   return result;

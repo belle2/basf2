@@ -12,19 +12,18 @@ public class FieldInfo {
     static public final int FLOAT = 6;
     static public final int DOUBLE = 7;
     static public final int TEXT = 8;
-    static public final int ENUM = 9;
-    static public final int OBJECT = 10;
-    static public final int NSM_CHAR = 11;
-    static public final int NSM_INT16 = 12;
-    static public final int NSM_INT32 = 13;
-    static public final int NSM_INT64 = 14;
-    static public final int NSM_BYTE8 = 15;
-    static public final int NSM_UINT16 = 16;
-    static public final int NSM_UINT32 = 17;
-    static public final int NSM_UINT64 = 18;
-    static public final int NSM_FLOAT = 19;
-    static public final int NSM_DOUBLE = 20;
-    static public final int NSM_OBJECT = 21;
+    static public final int OBJECT = 9;
+    static public final int NSM_CHAR = 10;
+    static public final int NSM_INT16 = 11;
+    static public final int NSM_INT32 = 12;
+    static public final int NSM_INT64 = 13;
+    static public final int NSM_BYTE8 = 14;
+    static public final int NSM_UINT16 = 15;
+    static public final int NSM_UINT32 = 16;
+    static public final int NSM_UINT64 = 17;
+    static public final int NSM_FLOAT = 18;
+    static public final int NSM_DOUBLE = 19;
+    static public final int NSM_OBJECT = 20;
 
     public static class Property {
 
@@ -109,7 +108,7 @@ public class FieldInfo {
 
     };
 
-    static private HashMap<String, FieldInfo> g_info_m = new HashMap<String, FieldInfo>();
+    static private HashMap<String, FieldInfo> g_info_m = new HashMap<>();
 
     static public FieldInfo getInfo(String name) {
         if (g_info_m.containsKey(name)) {
@@ -126,7 +125,7 @@ public class FieldInfo {
     }
 
     static public void clearInfoList() {
-        g_info_m = new HashMap<String, FieldInfo>();
+        g_info_m = new HashMap<>();
     }
 
     private String m_name = "";
@@ -168,8 +167,6 @@ public class FieldInfo {
                 return "double precision";
             case TEXT:
                 return "text";
-            case ENUM:
-                return "int";
             case OBJECT:
                 return "int";
         }

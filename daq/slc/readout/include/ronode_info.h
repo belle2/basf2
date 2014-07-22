@@ -7,16 +7,17 @@
 const int ronode_info_revision = 1;
 
 struct ronode_info {
-  int reserved[2];
+  unsigned int nodeid;
+  unsigned int state;
+  unsigned int eflag;
   unsigned int expno;
   unsigned int runno;
   unsigned int subno;
-  unsigned int stime;
   struct io_info {
-    int reserved[2];
     int port;
+    unsigned int addr;
     unsigned int count;
-    long long nbyte;
+    unsigned long long nbyte;
   } io[2];
 };
 

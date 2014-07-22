@@ -27,7 +27,6 @@ drop function if exists addtable(text, boolean, boolean);
 drop function if exists addconfig(text, text, text, int);
 drop function if exists addlogger(text, text);
 drop function if exists addfield(text, int, text, int, int);
-drop function if exists fieldid(text, text, text);
 drop function if exists loggerid(text, text, int);
 drop function if exists addrunnumber(int, int, int, boolean);
 
@@ -37,7 +36,6 @@ drop table if exists loggerinfo_names;
 drop table if exists loggerinfo;
 drop table if exists configinfo_names;
 drop table if exists configinfo;
-drop table if exists "fieldinfo.type.enum";
 drop table if exists "fieldinfo.type";
 drop table if exists "fieldinfo";
 drop table if exists tableinfo;
@@ -119,7 +117,6 @@ insert into "fieldinfo.type" (name, alias) values ('long', 'bigint');
 insert into "fieldinfo.type" (name, alias) values ('float', 'float');
 insert into "fieldinfo.type" (name, alias) values ('double', 'double precision');
 insert into "fieldinfo.type" (name, alias) values ('text', 'text');
-insert into "fieldinfo.type" (name, alias) values ('enum', 'int');
 insert into "fieldinfo.type" (name, alias) values ('object', 'int');
 /* insert into "fieldinfo.type" (name, alias) values ('date', 'timestamp');*/
 insert into "fieldinfo.type" (name, alias) values ('nsm::char', 'smallint');
@@ -133,11 +130,6 @@ insert into "fieldinfo.type" (name, alias) values ('nsm::uint64', 'bigint');
 insert into "fieldinfo.type" (name, alias) values ('nsm::float', 'float');
 insert into "fieldinfo.type" (name, alias) values ('nsm::double', 'double precision');
 insert into "fieldinfo.type" (name, alias) values ('nsm::object', 'bigint');
-
-create table "fieldinfo.type.enum" (
-  fieldid int references fieldinfo(id), 
-  name text, index int, unique (fieldid, name, index)
-);
 
 create table configinfo (
   record_time timestamp with time zone not null default current_timestamp, 
@@ -314,15 +306,6 @@ create or replace function fieldnames(text, int) returns setof fieldinfo_names a
   from fieldinfo, tableinfo
   where fieldinfo.tableid = tableinfo.id
   and tableinfo.name = $1 and tableinfo.revision = $2;
-$$ language sql;
-
-create or replace function fieldid(text, text, text) returns int as $$
-  select "fieldinfo.type.enum".index
-  from fieldinfo, "fieldinfo.type.enum", tableinfo
-  where fieldinfo.name = $2
-  and "fieldinfo.type.enum".name = $3
-  and fieldinfo.tableid = tableinfo.id
-  and tableinfo.name = $1;
 $$ language sql;
 
 create or replace function configid(text, text, text, int) returns int as $$

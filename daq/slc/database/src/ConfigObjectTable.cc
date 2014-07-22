@@ -40,17 +40,11 @@ throw()
     }
     FieldInfoTable ftable(m_db);
     FieldInfoList finfo_v = ftable.getList(tablename, revision);
-    EnumNameList enum_m_m;
     std::stringstream ss;
     ss << "select configid" << ((!tinfo.isRoot()) ? ", index " : "");
     for (FieldInfoList::iterator it = finfo_v.begin();
          it != finfo_v.end(); it++) {
       ss << ", " << it->setSQL();
-      FieldInfo::Type type = it->getType();
-      if (type == FieldInfo::ENUM)  {
-        enum_m_m.insert(EnumNameList::value_type(it->getName(),
-                                                 ftable.getEnums(*it)));
-      }
     }
     ConfigInfo cinfo(configname, nodename, tablename, revision);
     const std::string tablename_imp =
@@ -73,16 +67,58 @@ throw()
              it != finfo_v.end(); it++) {
           it->setSQL(record, obj);
           std::string name = it->getName();
-          if (it->getType() == FieldInfo::ENUM) {
-            obj.addEnum(name, record.get(name), enum_m_m[name]);
-          } else if (it->getType() == FieldInfo::OBJECT) {
-            StringList str_v = StringUtil::split(record.get(name), ',');
-            if (str_v.size() > 3) {
-              obj.addObjects(name, getList(str_v[0], str_v[1], str_v[2],
-                                           atoi(str_v[3].c_str())));
-            } else {
-              obj.addObject(name, ConfigObject());
-            }
+          if (it->getType() == FieldInfo::OBJECT) {
+            obj.addObjects(name, getList(record.getInt(name)));
+          }
+        }
+        obj_v.push_back(obj);
+      }
+    } catch (const DBHandlerException& e) {
+      LogFile::error("error on DB acess: %s", e.what());
+    }
+  }
+  return obj_v;
+}
+
+ConfigObjectList ConfigObjectTable::getList(int confid, bool isroot)
+throw()
+{
+  ConfigObjectList obj_v;
+  if (m_db != NULL) {
+    std::string nodename;
+    std::string configname;
+    std::string tablename;
+    int revision = 0;
+    m_db->execute("select name, node, \"table\", revision from "
+                  "confignames() where id = %d;", confid);
+    DBRecordList record_v(m_db->loadRecords());
+    if (record_v.size() > 0) {
+      configname = record_v[0].get("name");
+      nodename = record_v[0].get("node");
+      tablename = record_v[0].get("table");
+      revision = record_v[0].getInt("revision");
+    }
+    FieldInfoTable ftable(m_db);
+    FieldInfoList finfo_v = ftable.getList(tablename, revision);
+    try {
+      m_db->execute("select * from \"configinfo:%s:%d\" where configid = %d;",
+                    tablename.c_str(), revision, confid);
+      DBRecordList record_v(m_db->loadRecords());
+      for (size_t i = 0; i < record_v.size(); i++) {
+        DBRecord& record(record_v[i]);
+        ConfigObject obj;
+        obj.setName(configname);
+        obj.setNode(nodename);
+        obj.setTable(tablename);
+        obj.setRevision(revision);
+        obj.setId(record.getInt("configid"));
+        if (record.hasField("index")) obj.setIndex(record.getInt("index"));
+        for (FieldInfoList::iterator it = finfo_v.begin();
+             it != finfo_v.end(); it++) {
+          it->setSQL(record, obj);
+          std::string name = it->getName();
+          if (it->getType() == FieldInfo::OBJECT) {
+            obj.addObjects(name, getList(record.getInt(name)));
           }
         }
         obj_v.push_back(obj);
@@ -98,6 +134,13 @@ ConfigObject ConfigObjectTable::get(const std::string& configname,
                                     const std::string& nodename) throw()
 {
   ConfigObjectList list = getList(configname, nodename, "", 0);
+  if (list.size() > 0) return list[0];
+  return ConfigObject();
+}
+
+ConfigObject ConfigObjectTable::get(int confid) throw()
+{
+  ConfigObjectList list = getList(confid, true);
   if (list.size() > 0) return list[0];
   return ConfigObject();
 }

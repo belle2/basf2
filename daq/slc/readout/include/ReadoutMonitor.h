@@ -3,6 +3,7 @@
 
 #include <daq/slc/runcontrol/RCCallback.h>
 
+#include <daq/slc/readout/IOInfo.h>
 #include <daq/slc/readout/ronode_info.h>
 #include <daq/slc/readout/ronode_status.h>
 
@@ -20,7 +21,6 @@ namespace Belle2 {
 
   public:
     void run();
-    static int checkConnection(const std::string& proc_name, int port);
 
   private:
     RCCallback* m_callback;

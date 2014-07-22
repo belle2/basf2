@@ -31,12 +31,9 @@ int main(int argc, char** argv)
   }
   const unsigned interval = 10;
   RunInfoBuffer info;
-  storage_info* sinfo = NULL;
   const bool use_info = (argc > 7);
   if (use_info) {
-    info.open(argv[6], sizeof(storage_info) / sizeof(int), argc > 6);
-    sinfo = (storage_info*)info.getReserved();
-    sinfo->nodeid = atoi(argv[7]);
+    info.open(argv[6], atoi(argv[7]));
   }
   SharedEventBuffer ibuf;
   ibuf.open(argv[1], atoi(argv[2]), true);
@@ -46,26 +43,32 @@ int main(int argc, char** argv)
   B2INFO("storagerecord: started recording.");
   info.reportRunning();
   int* evtbuf = new int[1000000];
-  unsigned long long datasize = 0;
-  unsigned int count = 0;
+  unsigned long long nbyte_in = 0;
+  unsigned long long nbyte_out = 0;
+  unsigned int count_in = 0;
+  unsigned int count_out = 0;
   unsigned int expno = 0;
   unsigned int runno = 0;
-  unsigned int count_out = 0;
+  unsigned int subno = 0;
   SeqFile* file = NULL;
   while (true) {
-    ibuf.read(evtbuf);
+    unsigned int nbyte = ibuf.read(evtbuf);
     ibuf.lock();
     SharedEventBuffer::Header* iheader = ibuf.getHeader();
     if (expno < iheader->expno || runno < iheader->runno) {
       expno = iheader->expno;
       runno = iheader->runno;
       ibuf.unlock();
-      if (sinfo != NULL) {
-        sinfo->expno = expno;
-        sinfo->runno = runno;
-        sinfo->subno = 0;
-        sinfo->stime = Time().getSecond();
-        count = 0;
+      if (use_info) {
+        info.setExpNumber(expno);
+        info.setRunNumber(runno);
+        info.setSubNumber(subno);
+        info.setInputCount(0);
+        info.setInputNBytes(0);
+        info.setOutputCount(0);
+        info.setOutputNBytes(0);
+        nbyte_in = nbyte_out = 0;
+        count_in = count_out = 0;
       }
       obuf.lock();
       SharedEventBuffer::Header* oheader = ibuf.getHeader();
@@ -80,20 +83,25 @@ int main(int argc, char** argv)
     } else {
       ibuf.unlock();
     }
+    count_in++;
+    nbyte_in += nbyte;
+    if (use_info && count_in % 10 == 0) {
+      info.setInputCount(count_in);
+      info.addInputNBytes(nbyte_in);
+    }
     if (file != NULL) {
-      //file->write((char*)evtbuf);
+      file->write((char*)evtbuf);
       int nbyte = evtbuf[0];
       int nword = (nbyte - 1) / 4 + 1;
       if (count_out % interval == 0 && obuf.isWritable(nword)) {
         obuf.write(evtbuf, nword);
       }
       count_out++;
-      count++;
-      datasize += nbyte;
-      if (sinfo != NULL && count % 10 == 0) {
-        sinfo->nbyte += datasize;
-        sinfo->count = count;
-        datasize = 0;
+      nbyte_out += nbyte;
+      if (use_info && count_out % 10 == 0) {
+        info.setOutputCount(count_out);
+        info.addOutputNBytes(nbyte_out);
+        nbyte_out = 0;
       }
     } else {
       B2ERROR("storagerecord: no run was initialzed for recording");

@@ -70,10 +70,7 @@ void StorageDeserializerModule::initialize()
     if (m_nodename.size() == 0 || m_nodeid < 0) {
       m_shmflag = 0;
     } else {
-      m_info.open(m_nodename, sizeof(storage_info) / sizeof(int), m_shmflag > 1);
-      m_sinfo = (storage_info*)m_info.getReserved();
-      memset(m_sinfo, 0, sizeof(storage_info));
-      m_sinfo->nodeid = m_nodeid;
+      m_info.open(m_nodename, m_nodeid);
     }
   }
   StoreArray<RawPXD>::registerPersistent();
@@ -86,6 +83,10 @@ void StorageDeserializerModule::initialize()
     MsgHandler handler(m_compressionLevel);
     if (m_package.decode(handler)) {
       m_package.restore(false);
+      if (m_info.isAvailable()) {
+        m_info.setInputNBytes(m_package.getData().getByteSize());
+        m_info.setInputCount(1);
+      }
       break;
     }
   }
@@ -102,14 +103,28 @@ void StorageDeserializerModule::event()
       MsgHandler handler(m_compressionLevel);
       if (m_package.decode(handler)) {
         m_package.restore();
+        if (m_info.isAvailable()) {
+          m_info.addInputNBytes(m_package.getData().getByteSize());
+          m_info.setInputCount(m_count);
+        }
         break;
       }
     }
     StoreObjPtr<EventMetaData> evtmetadata;
     if (evtmetadata.isValid()) {
+      if (m_expno != evtmetadata->getExperiment() ||
+          m_runno != evtmetadata->getRun()) {
+        m_info.setInputNBytes(m_package.getData().getByteSize());
+        m_info.setInputCount(1);
+      }
       m_expno = evtmetadata->getExperiment();
       m_runno = evtmetadata->getRun();
       m_evtno = evtmetadata->getEvent();
+      if (m_info.isAvailable()) {
+        m_info.setExpNumber(m_expno);
+        m_info.setRunNumber(m_runno);
+        //m_info.setSubNumber(m_subno);
+      }
       break;
     } else {
       B2WARNING("NO event meta data " << m_package.getData().getExpNumber() << "." <<

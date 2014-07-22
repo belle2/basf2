@@ -2,6 +2,7 @@
 
 #include "daq/slc/readout/ronode_info.h"
 #include "daq/slc/readout/ronode_status.h"
+#include "daq/slc/readout/RunInfoBuffer.h"
 
 #include <daq/slc/nsm/NSMCommunicator.h>
 
@@ -19,24 +20,14 @@
 
 using namespace Belle2;
 
-int ReadoutMonitor::checkConnection(const std::string& proc_name, int port)
-{
-  std::string cmd =
-    StringUtil::form("/usr/sbin/lsof -a -i TCP:%d | "
-                     "grep ESTABLISHED | wc -l", port);
-  FILE* file = popen(cmd.c_str(), "r");
-  char str[1024];
-  memset(str, '\0', 1024);
-  fread(str, 1, 1024 - 1, file);
-  pclose(file);
-  std::string s = str;
-  return atoi(s.c_str());
-}
-
 void ReadoutMonitor::run()
 {
+  /*
   int interval = 2;
   ronode_info info;
+  std::vector<IOInfo> ioinfo;
+  ioinfo.push_back(IOInfo());
+  ioinfo.push_back(IOInfo());
   while (true) {
     sleep(interval);
     memcpy(&info, m_info, sizeof(ronode_info));
@@ -45,10 +36,14 @@ void ReadoutMonitor::run()
     m_status->expno = info.expno;
     m_status->runno = info.runno;
     m_status->subno = info.subno;
-    m_status->stime = info.stime;
     m_status->ctime = ctime;
     unsigned int dcount[2];
     float dnbyte[2];
+    for (int i = 0; i < 2; i++) {
+      ioinfo[i].setLocalAddress(info.io[i].addr);
+      ioinfo[i].setLocalPort(info.io[i].port);
+    }
+    IOInfo::checkTCP(ioinfo);
     for (int i = 0; i < 2; i++) {
       if (info.io[i].port == 0) {
         m_status->io[i].port = 0;//not used
@@ -58,7 +53,7 @@ void ReadoutMonitor::run()
         }
         m_status->io[i].port = -1;//offline
       } else {
-        if (checkConnection("", info.io[i].port) > 0) {
+        if (ioinfo[i].getState() == 1) {
           m_status->io[i].port = info.io[i].port;
         } else {
           if (m_status->io[i].port > 0) {
@@ -75,6 +70,11 @@ void ReadoutMonitor::run()
           m_status->io[i].rate = dnbyte[i] / length / 1000000.;
           m_status->io[i].count = info.io[i].count;
           m_status->io[i].nbyte = info.io[i].nbyte;
+    if (i == 0) {
+      m_status->io[i].nqueue = ioinfo[i].getRXQueue();
+    } else {
+      m_status->io[i].nqueue = ioinfo[i].getTXQueue();
+    }
         }
       } else {
         m_status->io[i].freq = 0;
@@ -82,6 +82,7 @@ void ReadoutMonitor::run()
         m_status->io[i].rate = 0;
         m_status->io[i].count = 0;
         m_status->io[i].nbyte = 0;
+  m_status->io[i].nqueue = 0;
       }
     }
 
@@ -89,11 +90,12 @@ void ReadoutMonitor::run()
       m_status->state = 2;//not ready
     } else if (dcount[0] > 0 || dcount[1] > 0) {
       m_status->state = 4;//running
-    } else if (info.stime > 0) {
+    } else if (info.state >= RunInfoBuffer::READY) {
       m_status->state = 3;//ready
     } else {
       m_status->state = 1;//unknown
     }
     //LogFile::debug("state =%d", m_status->state);
   }
+  */
 }

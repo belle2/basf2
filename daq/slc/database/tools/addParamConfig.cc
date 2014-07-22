@@ -116,8 +116,6 @@ int main(int argc, char** argv)
           cobj.setRevision(crevision);
           obj.addObject(name, cobj);
         } break;
-        case FieldInfo::ENUM:
-          obj.addEnum(name, value); break;
         default: break;
       }
     }

@@ -1,8 +1,0 @@
-
-#define NSMREQ_ONLINE   0x1000
-#define NSMREQ_OFFLINE  0x1001
-#define NSMREQ_START    0x1002
-#define NSMREQ_RUN      0x1003
-#define NSMREQ_DONE     0x1004
-#define NSMREQ_STOP     0x1005
-

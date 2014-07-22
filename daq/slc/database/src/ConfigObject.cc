@@ -51,9 +51,6 @@ void ConfigObject::copy(const ConfigObject& obj)
       case FieldInfo::DOUBLE: addDouble(name, obj.getDouble(name)); break;
       case FieldInfo::TEXT:   addText(name, obj.getText(name)); break;
       case FieldInfo::OBJECT: addObjects(name, obj.getObjects(name)); break;
-      case FieldInfo::ENUM:
-        addEnum(name, obj.getEnum(name), obj.getEnumList(name));
-        break;
       default: break;
     }
   }
@@ -108,16 +105,6 @@ void ConfigObject::readObject(Reader& reader) throw(IOException)
         }
         addObjects(name, obj_v);
       }; break;
-      case FieldInfo::ENUM: {
-        EnumList enum_m;
-        int nenum = reader.readInt();
-        for (int n = 0; n < nenum; n++) {
-          std::string ename = reader.readString();
-          int id = reader.readInt();
-          enum_m.insert(EnumList::value_type(ename, id));
-        }
-        addEnum(name, reader.readString(), enum_m);
-      } break;
       default: break;
     }
   }
@@ -153,16 +140,6 @@ void ConfigObject::writeObject(Writer& writer) const throw(IOException)
           obj_v[n].writeObject(writer);
         }
       }; break;
-      case FieldInfo::ENUM: {
-        const EnumList& enum_m(getEnumList(name));
-        writer.writeInt(enum_m.size());
-        for (EnumList::const_iterator it = enum_m.begin();
-             it != enum_m.end(); it++) {
-          writer.writeString(it->first);
-          writer.writeInt(it->second);
-        }
-        writer.writeString(getEnum(name));
-      }; break;
       default: break;
     }
   }
@@ -177,12 +154,6 @@ const void* ConfigObject::getValue(const std::string& name) const throw()
 const std::string ConfigObject::getText(const std::string& name) const throw()
 {
   if (!hasText(name)) return "";
-  return m_text_m[name];
-}
-
-const std::string ConfigObject::getEnum(const std::string& name) const throw()
-{
-  if (!hasEnum(name)) return "";
   return m_text_m[name];
 }
 
@@ -222,24 +193,6 @@ void ConfigObject::addText(const std::string& name,
   } else {
     m_text_m[name] = value;
   }
-}
-
-void ConfigObject::addEnum(const std::string& name, const std::string& value,
-                           const EnumList& enum_m) throw()
-{
-  if (!hasField(name)) {
-    add(name, FieldInfo::Property(FieldInfo::ENUM, 0));
-    m_text_m.insert(FieldTextList::value_type(name, value));
-    addEnumList(name, enum_m);
-  } else {
-    m_text_m[name] = value;
-  }
-}
-
-void ConfigObject::addEnum(const std::string& name,
-                           const std::string& value) throw()
-{
-  addEnum(name, value, EnumList());
 }
 
 void ConfigObject::addObject(const std::string& name,

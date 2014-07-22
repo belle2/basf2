@@ -1,11 +1,17 @@
 #ifndef _Belle2_COPPERCallback_h
 #define _Belle2_COPPERCallback_h
 
-#include "HSLBController.h"
+#include "FEEController.h"
+#include "TTRXController.h"
+#include "COPPERController.h"
+#include "COPPERConfig.h"
 
 #include "daq/slc/readout/ProcessController.h"
+#include "daq/slc/readout/FlowMonitor.h"
 
 #include "daq/slc/runcontrol/RCCallback.h"
+
+#include "daq/slc/nsm/NSMData.h"
 
 namespace Belle2 {
 
@@ -13,13 +19,13 @@ namespace Belle2 {
 
   public:
     COPPERCallback(const NSMNode& node,
-                   const std::string& rc_config);
+                   FEEController* fee);
     virtual ~COPPERCallback() throw();
 
   public:
     virtual void init() throw();
     virtual void term() throw();
-    virtual bool boot() throw();
+    virtual void timeout() throw();
     virtual bool load() throw();
     virtual bool start() throw();
     virtual bool stop() throw();
@@ -27,13 +33,16 @@ namespace Belle2 {
     virtual bool pause() throw();
     virtual bool recover() throw();
     virtual bool abort() throw();
+    bool bootBasf2() throw();
 
   private:
     ProcessController m_con;
-    HSLBController m_hslbcon_v[4];
-    int m_confno;
-    std::string m_path;
-    std::string m_hostname;
+    FEEController* m_fee;
+    TTRXController m_ttrx;
+    COPPERController m_copper;
+    FlowMonitor m_flow;
+    COPPERConfig m_config;
+    NSMData m_data;
 
   };
 

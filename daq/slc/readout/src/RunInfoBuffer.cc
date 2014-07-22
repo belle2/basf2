@@ -9,14 +9,13 @@ using namespace Belle2;
 size_t RunInfoBuffer::size() throw()
 {
   return m_mutex.size() + m_cond.size() +
-         sizeof(unsigned int) * 5 + m_bufsize;
+         sizeof(ronode_info);
 }
 
 bool RunInfoBuffer::open(const std::string& nodename,
-                         int bufsize, bool recreate)
+                         int nodeid, bool recreate)
 {
   m_nodename = nodename;
-  m_bufsize = bufsize;
   std::string username = getenv("USER");
   m_path = "/run_info_" + username + "_" + nodename;
   //if (recreate) SharedMemory::unlink(_path);
@@ -33,25 +32,26 @@ bool RunInfoBuffer::open(const std::string& nodename,
   buf += m_mutex.size();
   m_cond = MCond(buf);
   buf += m_cond.size();
-  m_buf = (unsigned int*)buf;
+  m_info = (ronode_info*)buf;
   if (recreate) init();
+  if (nodeid > 0) setNodeId(nodeid);
   return true;
 }
 
 bool RunInfoBuffer::init()
 {
-  if (m_buf == NULL) return false;
+  if (m_info == NULL) return false;
   m_mutex.init();
   m_cond.init();
-  memset(m_buf, 0, sizeof(unsigned int) * 5 + m_bufsize);
+  memset(m_info, 0, sizeof(ronode_info));
   return true;
 }
 
 void RunInfoBuffer::clear()
 {
-  if (m_buf == NULL) return;
+  if (m_info == NULL) return;
   m_mutex.lock();
-  memset(m_buf, 0, sizeof(unsigned int) * 5 + m_bufsize);
+  memset(m_info, 0, sizeof(ronode_info));
   m_mutex.unlock();
 }
 
@@ -70,37 +70,37 @@ bool RunInfoBuffer::unlink()
 
 bool RunInfoBuffer::lock() throw()
 {
-  if (m_buf == NULL) return false;
+  if (m_info == NULL) return false;
   return m_mutex.lock();
 }
 
 bool RunInfoBuffer::unlock() throw()
 {
-  if (m_buf == NULL) return false;
+  if (m_info == NULL) return false;
   return m_mutex.unlock();
 }
 
 bool RunInfoBuffer::wait() throw()
 {
-  if (m_buf == NULL) return false;
+  if (m_info == NULL) return false;
   return m_cond.wait(m_mutex);
 }
 
 bool RunInfoBuffer::wait(int time) throw()
 {
-  if (m_buf == NULL) return false;
+  if (m_info == NULL) return false;
   return m_cond.wait(m_mutex, time, 0);
 }
 
 bool RunInfoBuffer::notify() throw()
 {
-  if (m_buf == NULL) return false;
+  if (m_info == NULL) return false;
   return m_cond.broadcast();
 }
 
 bool RunInfoBuffer::waitRunning(int timeout)
 {
-  if (m_buf == NULL) return false;
+  if (m_info == NULL) return false;
   lock();
   if (getState() != RunInfoBuffer::RUNNING) {
     if (!wait(timeout)) {
@@ -114,7 +114,7 @@ bool RunInfoBuffer::waitRunning(int timeout)
 
 bool RunInfoBuffer::reportRunning()
 {
-  if (m_buf == NULL) return false;
+  if (m_info == NULL) return false;
   lock();
   setState(RunInfoBuffer::RUNNING);
   notify();
@@ -122,11 +122,11 @@ bool RunInfoBuffer::reportRunning()
   return true;
 }
 
-bool RunInfoBuffer::reportError()
+bool RunInfoBuffer::reportError(EFlag eflag)
 {
-  if (m_buf == NULL) return false;
+  if (m_info == NULL) return false;
   lock();
-  setState(RunInfoBuffer::ERROR);
+  setErrorFlag(eflag);
   notify();
   unlock();
   return true;
@@ -134,7 +134,7 @@ bool RunInfoBuffer::reportError()
 
 bool RunInfoBuffer::reportReady()
 {
-  if (m_buf == NULL) return false;
+  if (m_info == NULL) return false;
   lock();
   setState(RunInfoBuffer::READY);
   notify();
@@ -144,7 +144,7 @@ bool RunInfoBuffer::reportReady()
 
 bool RunInfoBuffer::reportNotReady()
 {
-  if (m_buf == NULL) return false;
+  if (m_info == NULL) return false;
   lock();
   setState(RunInfoBuffer::NOTREADY);
   notify();

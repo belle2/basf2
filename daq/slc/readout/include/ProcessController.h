@@ -29,7 +29,7 @@ namespace Belle2 {
     }
 
   public:
-    bool init(const std::string& name, int bufsize = 0);
+    bool init(const std::string& name, int nodeid = 0);
     void clear();
     bool load(int timeout);
     bool start();
@@ -47,6 +47,7 @@ namespace Belle2 {
     void clearArguments() { m_arg_v = std::vector<std::string>(); }
     const RCState& getState() const { return m_state; }
     void setState(const RCState& state) { m_state = state; }
+    bool isAlive() throw() { return m_fork.isAlive(); }
 
   public:
     void lock() { m_mutex.lock(); }

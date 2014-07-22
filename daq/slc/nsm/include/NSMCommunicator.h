@@ -44,11 +44,12 @@ namespace Belle2 {
                      int npar, const int* pars,
                      int len, const char* data) throw(NSMHandlerException);
     void replyOK(const NSMNode& node) throw(NSMHandlerException);
-    void replyError(const std::string& message = "") throw(NSMHandlerException);
+    void replyError(int error, const std::string& message = "")
+    throw(NSMHandlerException);
     bool sendLog(const DAQLogMessage& log);
     bool sendLog(const NSMNode& node, const DAQLogMessage& log);
     bool sendError(const std::string& message);
-    bool sendError(const ERRORNo& e, const std::string& nodename,
+    bool sendError(int error, //const std::string& nodename,
                    const std::string& message);
     bool sendFatal(const std::string& message);
     void sendState(const NSMNode& node) throw(NSMHandlerException);
@@ -71,6 +72,8 @@ namespace Belle2 {
       return isConnected(node.getName());
     }
     bool isConnected(const std::string& node) throw();
+    const std::string getNodeHost(const std::string& nodename) throw();
+    const std::string getNodeHost() throw();
 
   private:
     int m_id;

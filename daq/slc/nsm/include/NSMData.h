@@ -66,9 +66,7 @@ namespace Belle2 {
     virtual DBObject& getObject(const std::string& name, int index = 0) throw();
     virtual const std::string getText(const std::string&) const throw() { return ""; }
     virtual void addText(const std::string&, const std::string&) throw() {}
-    virtual void addEnum(const std::string&, const std::string&) throw() {}
     virtual void setObject(const std::string&, int, const Belle2::DBObject&) throw() {}
-    virtual const std::string getEnum(const std::string&) const throw() { return ""; }
 
 
   public:

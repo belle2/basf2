@@ -61,7 +61,6 @@ namespace Belle2 {
     int m_ibuf_size;
     SharedEventBuffer m_ibuf;
     RunInfoBuffer m_info;
-    storage_info* m_sinfo;
     int m_compressionLevel;
     int m_nodeid;
     std::string m_nodename;

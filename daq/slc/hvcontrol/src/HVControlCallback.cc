@@ -102,7 +102,7 @@ void HVControlCallback::monitor() throw()
   status->state = s.getId();
   count++;
   if (!s_org.isError() && s.isError()) {
-    getCommunicator()->replyError(getReply());
+    getCommunicator()->replyError(255, getReply());
   } else if ((s_org.isTransition() && s.isStable()) ||
              (s_org != HVState::OFF_S && s == HVState::OFF_S) ||
              (count >= 3 && s != HVState::OFF_S)) {

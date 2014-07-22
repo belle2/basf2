@@ -13,7 +13,7 @@ namespace Belle2 {
   public:
     enum Type {
       BOOL = 1, CHAR, SHORT, INT, LONG,
-      FLOAT, DOUBLE, TEXT, ENUM, OBJECT,
+      FLOAT, DOUBLE, TEXT, OBJECT,
       NSM_CHAR, NSM_INT16, NSM_INT32, NSM_INT64,
       NSM_BYTE8, NSM_UINT16, NSM_UINT32,
       NSM_UINT64, NSM_FLOAT, NSM_DOUBLE,

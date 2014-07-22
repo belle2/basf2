@@ -19,6 +19,8 @@ namespace Belle2 {
                              int revision) throw();
     ConfigObject get(const std::string& configname,
                      const std::string& nodename) throw();
+    ConfigObjectList getList(int confid, bool isroot = false) throw();
+    ConfigObject get(int confid) throw();
     void add(const ConfigObject& obj, bool isroot = true)
     throw(DBHandlerException);
     void add(const ConfigObjectList& obj, bool isroot = false) throw();

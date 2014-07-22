@@ -1,4 +1,4 @@
 nodename,  config,   hostname,   type
-ROPC01,   default,     cpr001, copper
-ROPC01,   default,     cpr002, copper
-ROPC01,   default,      ttd01,    ttd
+ROPC01,   default,     cpr001,      0
+ROPC01,   default,     cpr002,      0
+ROPC01,   default,      ttd01,      1

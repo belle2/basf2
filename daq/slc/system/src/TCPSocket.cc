@@ -134,6 +134,17 @@ void TCPSocket::print()
   printf("Local port is: %d\n", (int) ntohs(sa.sin_port));
 }
 
+const std::string TCPSocket::getLocalIP()
+{
+  sockaddr_in sa;
+  memset(&sa, 0, sizeof(sockaddr_in));
+  socklen_t sa_len = sizeof(sa);
+  if (getsockname(m_fd, (struct sockaddr*)&sa, (socklen_t*)&sa_len) != 0) {
+    return 0;
+  }
+  return inet_ntoa(sa.sin_addr);
+}
+
 int TCPSocket::getLocalPort()
 {
   sockaddr_in sa;

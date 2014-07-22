@@ -14,9 +14,8 @@ public abstract class DBObject implements Serializable {
     private String m_node = "";
     private String m_table = "";
     private boolean m_isconfig;
-    private ArrayList<String> m_name_v = new ArrayList<String>();
-    private HashMap<String, FieldInfo.Property> m_pro_m = new HashMap<String, FieldInfo.Property>();
-    private HashMap<String, HashMap<String, Integer>> m_enum_m_m = new HashMap<String, HashMap<String, Integer>>();
+    private ArrayList<String> m_name_v = new ArrayList<>();
+    private HashMap<String, FieldInfo.Property> m_pro_m = new HashMap<>();
 
     public int getId() {
         return m_id;
@@ -89,17 +88,12 @@ public abstract class DBObject implements Serializable {
     public boolean hasValue(String name) {
         return hasField(name)
                 && m_pro_m.get(name).getType() != FieldInfo.TEXT
-                && m_pro_m.get(name).getType() != FieldInfo.ENUM
                 && m_pro_m.get(name).getType() != FieldInfo.OBJECT
                 && m_pro_m.get(name).getType() != FieldInfo.NSM_OBJECT;
     }
 
     public boolean hasText(String name) {
         return hasField(name) && m_pro_m.get(name).getType() == FieldInfo.TEXT;
-    }
-
-    public boolean hasEnum(String name) {
-        return hasField(name) && m_pro_m.get(name).getType() == FieldInfo.ENUM;
     }
 
     public boolean hasObject(String name, int index) {
@@ -110,46 +104,6 @@ public abstract class DBObject implements Serializable {
 
     public boolean hasObject(String name) {
         return hasObject(name, 0);
-    }
-
-    public HashMap<String, Integer> getEnumList(String name) {
-        return m_enum_m_m.get(name);
-    }
-
-    public int getEnumId(String name) {
-        if (!hasEnum(name)) {
-            return 0;
-        }
-        return m_enum_m_m.get(name).get(getEnum(name));
-    }
-
-    public void setEnum(String name, int value) {
-        if (hasEnum(name)) {
-            HashMap<String, Integer> enum_m = m_enum_m_m.get(name);
-            for (String label : enum_m.keySet()) {
-                if (value == enum_m.get(label)) {
-                    setEnum(name, label);
-                    return;
-                }
-            }
-        }
-    }
-
-    public void addEnumList(String name, HashMap<String, Integer> enum_m) {
-        if (!m_enum_m_m.containsKey(name)) {
-            m_enum_m_m.put(name, enum_m);
-        }
-    }
-
-    public void addEnumList(String name, String str) {
-        if (!m_enum_m_m.containsKey(name)) {
-            String[] name_v = str.split(",");
-            HashMap<String, Integer> enum_m = new HashMap<String, Integer>();
-            for (int i = 0; i < name_v.length; i++) {
-                enum_m.put(name_v[i], i + 1);
-            }
-            addEnumList(name, enum_m);
-        }
     }
 
     public void add(String name, FieldInfo.Property pro) {
@@ -207,7 +161,7 @@ public abstract class DBObject implements Serializable {
         if (hasField(name)) {
             switch (getProperty(name).getType()) {
                 case FieldInfo.BOOL:
-                    setBool(name, value == "true" || value == "t");
+                    setBool(name, (value == "true" || value == "t"));
                     break;
                 case FieldInfo.NSM_CHAR:
                 case FieldInfo.NSM_BYTE8:
@@ -240,9 +194,6 @@ public abstract class DBObject implements Serializable {
                 case FieldInfo.TEXT:
                     setText(name, value);
                     break;
-                case FieldInfo.ENUM:
-                    setEnum(name, value);
-                    break;
                 default:
                     break;
             }
@@ -253,10 +204,6 @@ public abstract class DBObject implements Serializable {
         addText(name, value);
     }
 
-    public void setEnum(String name, String value) {
-        addEnum(name, value);
-    }
-
     public boolean isConfig() {
         return m_isconfig;
     }
@@ -265,9 +212,8 @@ public abstract class DBObject implements Serializable {
         m_index = 0;
         m_id = 0;
         m_name = "";
-        m_name_v = new ArrayList<String>();
-        m_pro_m = new HashMap<String, FieldInfo.Property>();
-        m_enum_m_m = new HashMap<String, HashMap<String, Integer>>();
+        m_name_v = new ArrayList<>();
+        m_pro_m = new HashMap<>();
     }
 
     public boolean getBool(String name) {
@@ -358,18 +304,6 @@ public abstract class DBObject implements Serializable {
         addValue(name, FieldInfo.TEXT, value);
     }
 
-    public void addEnum(String name, String value) {
-        addEnum(name, value, new HashMap<String, Integer>());
-    }
-
-    public void addEnum(String name, String value,
-            HashMap<String, Integer> enum_m) {
-        addValue(name, FieldInfo.ENUM, value);
-        if (!m_enum_m_m.containsKey(name)) {
-            m_enum_m_m.put(name, enum_m);
-        }
-    }
-
     public void setBool(String name, boolean value) {
         setValue(name, FieldInfo.BOOL, value);
     }
@@ -441,9 +375,6 @@ public abstract class DBObject implements Serializable {
                     }
                     break;
                 }
-                case FieldInfo.ENUM:
-                    System.out.print(getEnum(name));
-                    break;
                 case FieldInfo.NSM_CHAR:
                     System.out.print(getChar(name));
                     break;
@@ -508,7 +439,5 @@ public abstract class DBObject implements Serializable {
     abstract public Object getValue(String name);
 
     abstract public String getText(String name);
-
-    abstract public String getEnum(String name);
 
 }

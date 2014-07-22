@@ -31,12 +31,9 @@ int main(int argc, char** argv)
     return 1;
   }
   RunInfoBuffer info;
-  storage_info* sinfo = NULL;
   bool use_info = (argc > 6);
   if (use_info) {
-    info.open(argv[5], sizeof(storage_info) / sizeof(int), argc > 6);
-    sinfo = (storage_info*)info.getReserved();
-    sinfo->nodeid = atoi(argv[6]);
+    info.open(argv[5], atoi(argv[6]));
   }
   SharedEventBuffer ibuf;
   ibuf.open(argv[1], atoi(argv[2]) * 1000000, true);
@@ -46,20 +43,26 @@ int main(int argc, char** argv)
   int* evtbuf = new int[1000000];
   BinData data;
   data.setBuffer(evtbuf);
-  unsigned long long nbyte = 0;
   Time t0;
-  unsigned int count = 0;
+  unsigned long long nbyte_in = 0;
+  unsigned int count_in = 0;
+  unsigned long long nbyte_out = 0;
+  unsigned int count_out = 0;
   int expno = 0;
   int runno = 0;
+  int subno = 0;
   int ntried = 0;
   while (true) {
     try {
       socket.connect();
       socket.setBufferSize(4 * 1024 * 1024);
       ntried = 0;
-      if (use_info) sinfo->connection = 1;
+      if (info.isAvailable()) {
+        info.setInputPort(socket.getLocalPort());
+      }
     } catch (const IOException& e) {
       socket.close();
+      if (info.isAvailable()) info.setInputPort(0);
       B2WARNING("storagein: failed to connect to eb2 (try=" << ntried++ << ")");
       sleep(5);
       continue;
@@ -67,10 +70,16 @@ int main(int argc, char** argv)
     try {
       TCPSocketReader reader(socket);
       B2INFO("storagein: Cconnected to eb2.");
-      if (use_info) sinfo->connection = 1;
       while (true) {
         reader.read(evtbuf, sizeof(int));
-        reader.read((evtbuf + 1), (evtbuf[0] - 1) * sizeof(int));
+        unsigned int nbyte = (evtbuf[0] - 1) * sizeof(int);
+        reader.read((evtbuf + 1), nbyte);
+        nbyte_in += nbyte;
+        if (info.isAvailable() && count_in % 10 == 0) {
+          info.setInputCount(count_in);
+          info.addInputNBytes(nbyte_in);
+          nbyte_in = 0;
+        }
         if (expno > data.getExpNumber() || runno > data.getRunNumber()) {
           B2INFO("storagein: old run event detected : exp="
                  << data.getExpNumber() << " runno="
@@ -80,27 +89,34 @@ int main(int argc, char** argv)
         } else if (expno < data.getExpNumber() || runno < data.getRunNumber()) {
           expno = data.getExpNumber();
           runno = data.getRunNumber();
-          B2INFO("storagein: new run detected : exp=" << expno << " runno=" << runno);
-          if (sinfo != NULL) {
-            sinfo->expno = expno;
-            sinfo->runno = runno;
-            sinfo->subno = 0;
-            sinfo->stime = Time().getSecond();
-            count = 0;
+          B2INFO("storagein: new run detected : exp="
+                 << expno << " runno=" << runno);
+          if (info.isAvailable()) {
+            info.setExpNumber(expno);
+            info.setRunNumber(runno);
+            info.setSubNumber(subno);
+            info.setInputCount(0);
+            info.setInputNBytes(0);
+            info.setOutputCount(0);
+            info.setOutputNBytes(0);
+            nbyte_in = nbyte;
+            nbyte_out = 0;
+            count_in = 1;
+            count_out = 0;
           }
         }
-        ibuf.write(evtbuf, evtbuf[0]);
-        count++;
-        nbyte += data.getByteSize();
-        if (sinfo != NULL && count % 10 == 0) {
-          sinfo->count = count;
-          sinfo->nbyte += nbyte;
-          nbyte = 0;
+        nbyte_out += ibuf.write(evtbuf, evtbuf[0]);
+        count_out++;
+        data.getByteSize();
+        if (info.isAvailable() && count_out % 10 == 0) {
+          info.setOutputCount(count_out);
+          info.addOutputNBytes(nbyte_out);
+          nbyte_out = 0;
         }
       }
     } catch (const IOException& e) {
       socket.close();
-      if (use_info) sinfo->connection = 0;
+      if (info.isAvailable()) info.setInputPort(0);
       B2WARNING("storagein: Connection to eb2 broken.");
       sleep(5);
     }

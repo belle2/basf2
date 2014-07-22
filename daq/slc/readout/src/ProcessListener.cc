@@ -25,16 +25,16 @@ void ProcessListener::run()
   NSMNode& node(m_con->getCallback()->getNode());
   unsigned int state = m_con->getInfo().getState();
   switch (state) {
-    case RunInfoBuffer::ERROR:
+      //case RunInfoBuffer::ERROR:
     case RunInfoBuffer::RUNNING:
       LogFile::error("Forked process %s was crashed", process_name.c_str());
       comm->sendError(StringUtil::form("Foked process %s was crashed", process_name.c_str()));
-      m_con->setState(RCState::ERROR_ES);
+      //m_con->setState(RCState::ERROR_ES);
       break;
     case RunInfoBuffer::READY:
       LogFile::warning("Forked process %s was not started", process_name.c_str());
       comm->sendError(StringUtil::form("Foked process %s was no started", process_name.c_str()));
-      m_con->setState(RCState::ERROR_ES);
+      m_con->getInfo().reportError(RunInfoBuffer::PROCESS_DOWN);
       break;
     case RunInfoBuffer::NOTREADY:
     default:

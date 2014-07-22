@@ -45,6 +45,8 @@ namespace Belle2 {
     void setStateDemand(const RCState& state) throw() { m_state_demand = state; }
     virtual bool perform(const NSMMessage& msg) throw();
     virtual void update() throw() {}
+    void sendPause(const NSMNode& node) throw();
+    void sendPause() throw();
 
   protected:
     bool preload(const NSMMessage& msg) throw();

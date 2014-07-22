@@ -54,12 +54,18 @@ namespace Belle2 {
       m_header->nevent_nboard = (m_header->nevent_nboard & 0xFFFF0000) | (nb & 0xFFFF);
       return getNBoard();
     };
+    void setWordSize(int nword) { m_header->nword = nword; };
     int getWordSize() const { return m_header->nword; };
     int getByteSize() const { return m_header->nword * 4; };
     int getHeaderWordSize() const { return m_header->nword_in_header; };
     int getHeaderByteSize() const { return m_header->nword_in_header * 4; };
     int getBodyByteSize() const {
       return getByteSize() - sizeof(BinHeader) - sizeof(BinTrailer);
+    }
+    void setBodyWordSize(int nword) {
+      setWordSize(nword + (sizeof(BinHeader) + sizeof(BinTrailer)) / 4);
+      m_trailer = (BinTrailer*)(m_body + getBodyWordSize());
+      m_trailer->magic = TRAILER_MAGIC;
     }
     int getBodyWordSize() const { return (getBodyByteSize() / 4); };
     unsigned int getTrailerMagic() {

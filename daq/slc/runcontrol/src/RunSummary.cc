@@ -10,13 +10,8 @@ RunSummary::RunSummary(const NSMNode& node)
   setTable("runsummary");
   setRevision(1);
   addInt("runsetting", 0);
-  addEnumList("state",
-              "INITIAL,CONFIGURED,READY,RUNNING,PAUSED,"
-              "BOOTING,LOADING,STARTING,STOPPING,"
-              "ERROR,FATAL,RECOVERING,ABORTING");
-  addEnum("state", "INITIAL");
-  addEnumList("cause", "manual,auto,runend,error,error_manual");
-  addEnum("cause", "manual");
+  addText("state", "NOTREADY");
+  addText("cause", "manual");//"manual,auto,runend,error,error_manual"
 }
 
 RunSummary::~RunSummary() throw()
@@ -25,17 +20,17 @@ RunSummary::~RunSummary() throw()
 
 void RunSummary::setState(const NSMNode& node)
 {
-  setEnum("state", node.getState().getLabel());
+  setText("state", node.getState().getLabel());
 }
 
 void RunSummary::setCause(Cause cause)
 {
   switch (cause) {
-    case MANUAL: setEnum("cause", "manual"); break;
-    case AUTO: setEnum("cause", "auto"); break;
-    case RUNEND: setEnum("cause", "runend"); break;
-    case ERROR: setEnum("cause", "error"); break;
-    case ERROR_MANUAL: setEnum("cause", "error_manual"); break;
+    case MANUAL: setText("cause", "manual"); break;
+    case AUTO: setText("cause", "auto"); break;
+    case RUNEND: setText("cause", "runend"); break;
+    case ERROR: setText("cause", "error"); break;
+    case ERROR_MANUAL: setText("cause", "error_manual"); break;
   }
 }
 
@@ -54,11 +49,7 @@ void RunSummary::setNodeState(const NSMNodeList& node_v)
     obj.setTable("runsummary.node");
     obj.setRevision(1);
     obj.setIndex(i);
-    obj.addEnumList("state",
-                    "INITIAL,CONFIGURED,READY,RUNNING,PAUSED,"
-                    "BOOTING,LOADING,STARTING,STOPPING,"
-                    "ERROR,FATAL,RECOVERING,ABORTING");
-    obj.addEnum("state", node_v[i].getState().getLabel());
+    obj.addText("state", node_v[i].getState().getLabel());
     obj_v.push_back(obj);
   }
   addObjects("node", obj_v);

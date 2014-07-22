@@ -13,7 +13,7 @@ namespace Belle2 {
 
   public:
     NSMNode(const std::string& name = "")
-      : m_name(name), m_id(-1), m_index(-1) {}
+      : m_name(name), m_id(-1), m_index(-1), m_error(0) {}
     virtual ~NSMNode() throw() {}
 
   public:
@@ -24,6 +24,7 @@ namespace Belle2 {
     const NSMState& getState() const throw() { return m_state; }
     Connection& getConnection() throw() { return m_connection; }
     const Connection& getConnection() const throw() { return m_connection; }
+    void setError(int error) throw() { m_error = error; }
     bool isSynchronized() const throw() { return m_sync; }
     int getIndex() const throw() { return m_index; }
     void setName(const std::string& name) throw() { m_name = name; }
@@ -35,11 +36,13 @@ namespace Belle2 {
     void setConnection(const Connection& connection) throw() {
       m_connection = connection;
     }
+    int getError() const throw() { return m_error; }
 
   protected:
     std::string m_name;
     int m_id;
     int m_index;
+    unsigned int m_error;
     bool m_used;
     bool m_sync;
     NSMState m_state;

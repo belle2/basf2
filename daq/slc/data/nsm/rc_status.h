@@ -11,8 +11,15 @@ namespace Belle2 {
 
   struct rc_status {
     struct node_status {
+      uint32 error;
       uint32 state;
       uint32 configid;
+      uint32 eflag;
+      struct io_status {
+        uint32 nqueue;
+        uint32 state;
+        uint32 count;
+      } io[2];
     } node[20];
     uint32 nnodes;
     uint32 state;

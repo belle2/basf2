@@ -3,6 +3,9 @@
 #include <daq/slc/database/ConfigObjectTable.h>
 
 #include <daq/slc/system/LogFile.h>
+#include <daq/slc/system/TCPSocket.h>
+#include <daq/slc/system/TCPSocketReader.h>
+#include <daq/slc/system/TCPSocketWriter.h>
 
 #include <daq/slc/nsm/NSMCommunicator.h>
 
@@ -21,6 +24,26 @@ RCCallback::RCCallback(const NSMNode& node) throw()
   add(RCCommand::STATECHECK);
   add(RCCommand::TRIGFT);
   getNode().setState(RCState::NOTREADY_S);
+}
+
+void RCCallback::sendPause() throw()
+{
+  NSMCommunicator* com = getCommunicator();
+  if (com != NULL) {
+    sendPause(com->getMaster());
+  }
+}
+
+void RCCallback::sendPause(const NSMNode& node) throw()
+{
+  try {
+    NSMCommunicator* com = getCommunicator();
+    if (com != NULL && node.getName().size() > 0) {
+      com->sendRequest(NSMMessage(node, RCCommand::PAUSE,
+                                  getNode().getState().getLabel()));
+    }
+  } catch (const NSMHandlerException& e) {
+  }
 }
 
 bool RCCallback::perform(const NSMMessage& msg) throw()
@@ -58,12 +81,16 @@ bool RCCallback::perform(const NSMMessage& msg) throw()
     }
   }
   if (result) {
+    getNode().setError(0);
     state = cmd.nextState();
     if (state != Enum::UNKNOWN)
       getNode().setState(state);
     com->replyOK(getNode());
   } else {
-    com->replyError(getReply());
+    if (getNode().getError() == 0) {
+      getNode().setError(255);
+    }
+    com->replyError(getNode().getError(), getReply());
   }
   return true;
 }
@@ -73,29 +100,45 @@ bool RCCallback::preload(const NSMMessage& msg) throw()
   if (msg.getNParams() < 1) {
     LogFile::debug("Loading method is not defined");
   } else if (msg.getParam(0) == NSMCommand::DBGET.getId()) {
-    if (m_db == NULL) {
-      setReply("Not ready for DB access");
-      LogFile::error("Not ready for DB access");
-      return false;
-    } else {
-      std::string runtype;
-      if (msg.getLength() > 0) {
-        runtype = msg.getData();
-      } else {
-        setReply("No runtype were given");
-        LogFile::error("No runtype were given");
+    if (msg.getNParams() > 3 && msg.getParam(2) > 0) {
+      TCPSocket socket(getCommunicator()->getNodeHost(), msg.getParam(2));
+      try {
+        socket.connect();
+        TCPSocketWriter writer(socket);
+        writer.writeInt(msg.getParam(3));
+        TCPSocketReader reader(socket);
+        m_config.getObject().readObject(reader);
+      } catch (const IOException& e) {
+        LogFile::error(e.what());
+        socket.close();
         return false;
       }
-      try {
-        m_db->connect();
-        std::string nodename = getNode().getName();
-        ConfigObjectTable table(m_db);
-        m_config.setObject(table.get(runtype, nodename));
-        m_db->close();
-      } catch (const DBHandlerException& e) {
-        setReply("DB access error");
-        LogFile::error("DB access error");
+      socket.close();
+    } else {
+      if (m_db == NULL) {
+        setReply("Not ready for DB access");
+        LogFile::error("Not ready for DB access");
         return false;
+      } else {
+        std::string runtype;
+        if (msg.getLength() > 0) {
+          runtype = msg.getData();
+        } else {
+          setReply("No runtype were given");
+          LogFile::error("No runtype were given");
+          return false;
+        }
+        try {
+          m_db->connect();
+          std::string nodename = getNode().getName();
+          ConfigObjectTable table(m_db);
+          m_config.setObject(table.get(runtype, nodename));
+          m_db->close();
+        } catch (const DBHandlerException& e) {
+          setReply("DB access error");
+          LogFile::error("DB access error");
+          return false;
+        }
       }
     }
   } else if (msg.getParam(0) == NSMCommand::DBSET.getId()) {

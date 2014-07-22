@@ -64,7 +64,6 @@ void DBObject::print() const throw()
         }
         break;
       }
-      case FieldInfo::ENUM:   std::cout << getEnum(name); break;
       case FieldInfo::NSM_CHAR:   std::cout << getChar(name); break;
       case FieldInfo::NSM_INT16:  std::cout << getShort(name); break;
       case FieldInfo::NSM_INT32:  std::cout << getInt(name); break;
@@ -102,7 +101,6 @@ void DBObject::reset() throw()
   m_index = 0;
   m_name_v = FieldNameList();
   m_pro_m = FieldPropertyList();
-  m_enum_m_m = EnumNameList();
 }
 
 FieldInfo::Property DBObject::getProperty(const std::string& name) const throw()
@@ -129,7 +127,6 @@ bool DBObject::hasValue(const std::string& name) const throw()
 {
   return hasField(name) &&
          m_pro_m[name].getType() != FieldInfo::TEXT &&
-         m_pro_m[name].getType() != FieldInfo::ENUM &&
          m_pro_m[name].getType() != FieldInfo::OBJECT &&
          m_pro_m[name].getType() != FieldInfo::NSM_OBJECT;
 }
@@ -137,11 +134,6 @@ bool DBObject::hasValue(const std::string& name) const throw()
 bool DBObject::hasText(const std::string& name) const throw()
 {
   return hasField(name) && m_pro_m[name].getType() == FieldInfo::TEXT;
-}
-
-bool DBObject::hasEnum(const std::string& name) const throw()
-{
-  return hasField(name) && m_pro_m[name].getType() == FieldInfo::ENUM;
 }
 
 bool DBObject::hasObject(const std::string& name, int index) const throw()
@@ -228,17 +220,6 @@ double DBObject::getDouble(const std::string& name, int index) const throw()
   return ((double*)value)[index];
 }
 
-const EnumList& DBObject::getEnumList(const std::string& name) const throw()
-{
-  return m_enum_m_m[name];
-}
-
-int DBObject::getEnumId(const std::string& name) const throw()
-{
-  if (!hasEnum(name)) return 0;
-  return m_enum_m_m[name][getEnum(name)];
-}
-
 void DBObject::setBool(const std::string& name, bool value, int index) throw()
 {
   setValue(name, &value, index);
@@ -292,41 +273,6 @@ void DBObject::setFloat(const std::string& name, float value, int index) throw()
 void DBObject::setDouble(const std::string& name, double value, int index) throw()
 {
   setValue(name, &value, index);
-}
-
-void DBObject::setEnum(const std::string& name, int value) throw()
-{
-  if (hasEnum(name)) {
-    EnumList& enum_m(m_enum_m_m[name]);
-    for (EnumList::iterator it = enum_m.begin();
-         it != enum_m.end(); it++) {
-      if (value == it->second) {
-        setEnum(name, it->first);
-        return;
-      }
-    }
-  }
-}
-
-void DBObject::addEnumList(const std::string& name,
-                           const EnumList& enum_m) throw()
-{
-  if (m_enum_m_m.find(name) == m_enum_m_m.end()) {
-    m_enum_m_m.insert(EnumNameList::value_type(name, enum_m));
-  }
-}
-
-void DBObject::addEnumList(const std::string& name,
-                           const std::string& str) throw()
-{
-  if (m_enum_m_m.find(name) == m_enum_m_m.end()) {
-    StringList name_v = StringUtil::split(str, ',');
-    EnumList enum_m;
-    for (size_t i = 0; i < name_v.size(); i++) {
-      enum_m.insert(EnumList::value_type(name_v[i], i + 1));
-    }
-    addEnumList(name, enum_m);
-  }
 }
 
 void DBObject::add(const std::string& name, FieldInfo::Property pro) throw()
@@ -388,7 +334,6 @@ void DBObject::setValueText(const std::string& name,
       case FieldInfo::NSM_UINT32: setUInt(name, strtoul(value.c_str(), NULL, 0)); break;
       case FieldInfo::NSM_UINT64: setULong(name, strtoul(value.c_str(), NULL, 0)); break;
       case FieldInfo::TEXT:       setText(name, value); break;
-      case FieldInfo::ENUM:       setEnum(name, value); break;
       default: break;
     }
   }

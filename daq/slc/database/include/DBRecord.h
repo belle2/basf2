@@ -18,6 +18,9 @@ namespace Belle2 {
   public:
     std::vector<std::string>& getFieldNames() throw() { return m_name_v; }
     DBFieldList& getFieldValues() throw() { return m_value_m; }
+    bool hasField(const std::string& name) throw() {
+      return m_value_m.find(name) != m_value_m.end();
+    }
     size_t getNFields() const throw() { return m_name_v.size(); }
     const std::string get(const std::string& name) const throw();
     const std::string get(int i) const throw();

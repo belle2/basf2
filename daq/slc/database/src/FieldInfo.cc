@@ -62,7 +62,6 @@ const std::string FieldInfo::getTypeAlias() const throw()
     case FLOAT:  return "float";
     case DOUBLE: return "double precision";
     case TEXT:   return "text";
-    case ENUM:   return "int";
     case OBJECT: return "int";
     case NSM_CHAR:   return "char";
     case NSM_INT16:  return "smallint";
@@ -90,7 +89,6 @@ const std::string FieldInfo::getTypeName() const throw()
     case FLOAT:  return "float";
     case DOUBLE: return "double";
     case TEXT:   return "text";
-    case ENUM:   return "enum";
     case OBJECT: return "object";
     case NSM_CHAR:   return "nsm::char";
     case NSM_INT16:  return "nsm::int16";
@@ -127,11 +125,6 @@ const std::string FieldInfo::getSQL(const DBObject& obj,
       case FLOAT:  ss << putNumber(obj.getFloat(name)); break;
       case DOUBLE: ss << putNumber(obj.getDouble(name)); break;
       case TEXT:   ss << "'" << obj.getText(name) << "'"; break;
-      case ENUM:
-        ss << StringUtil::form("(select fieldid from fieldid('%s', '%s', '%s'))",
-                               obj.getTable().c_str(), name.c_str(),
-                               obj.getEnum(name).c_str());
-        break;
       case OBJECT:
         ss << "(" << getSQL(obj.getObject(name)) << ")";
         break;
@@ -171,23 +164,6 @@ const std::string FieldInfo::setSQL() const throw()
   std::stringstream ss;
   const std::string name = getName();
   switch (getType()) {
-    case OBJECT: {
-      ss << StringUtil::form("tablename_by_configinfo(%s) "
-                             "as \"%s\" ", name.c_str(), name.c_str());
-      /*
-      ss << StringUtil::form("(select configinfo.name||','||nodeinfo.name"
-           "||','||tableinfo.name||','||tableinfo.revision "
-           "as \"%s\" from configinfo, nodeinfo, tableinfo "
-           "where configinfo.nodeid = nodeinfo.id and "
-           "nodeinfo.name = '%s' and configinfo.tableid = tableinfo.id "
-           "and configinfo.name = '%s') ",
-           name.c_str(), name.c_str(), name.c_str());
-      */
-    }; break;
-    case ENUM:  {
-      ss << "(select name from \"fieldinfo.type.enum\" where index = \""
-         << name << "\" and fieldid = " << getId() << ") as \"" << name << "\"";
-    }; break;
     default: ss << "\"" << name << "\" "; break;
   }
   return ss.str();
@@ -208,7 +184,6 @@ void FieldInfo::setSQL(const DBRecord& record,
     case DOUBLE: obj.addDouble(name, atof(value.c_str())); break;
     case TEXT:   obj.addText(name, value); break;
     case OBJECT: break;
-    case ENUM:   break;
     case NSM_CHAR:   obj.addChar(name, atoi(value.c_str())); break;
     case NSM_INT16:  obj.addShort(name, atoi(value.c_str())); break;
     case NSM_INT32:  obj.addInt(name, atoi(value.c_str())); break;

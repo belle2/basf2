@@ -24,15 +24,11 @@ namespace Belle2 {
     ConfigObjectList& getObjects(const std::string& name) throw();
     const ConfigObjectList& getObjects(const std::string& name) const throw();
     void addObjects(const std::string& name, const ConfigObjectList& obj) throw();
-    void addEnum(const std::string& name, const std::string& value,
-                 const EnumList& enum_m) throw();
-    void addEnum(const std::string& name, const std::string& value) throw();
 
   public:
     virtual void reset() throw();
     virtual const void* getValue(const std::string& name) const throw();
     virtual const std::string getText(const std::string& name) const throw();
-    virtual const std::string getEnum(const std::string& name) const throw();
     virtual void addText(const std::string& name, const std::string& value) throw();
     virtual void addValue(const std::string& name, const void* value,
                           FieldInfo::Type type, int length) throw();

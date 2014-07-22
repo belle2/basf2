@@ -44,8 +44,8 @@ namespace Belle2 {
     virtual bool start() throw() { return send(getMessage()); }
     virtual bool stop() throw() { return send(getMessage()); }
     virtual bool recover() throw() { return send(getMessage()); }
+    virtual bool pause() throw();
     virtual bool resume() throw() { return send(getMessage()); }
-    virtual bool pause() throw() { return send(getMessage()); }
     virtual bool abort() throw() { return send(getMessage()); }
     virtual bool trigft() throw() { return send(getMessage()); }
     virtual bool stateCheck() throw() { return true; }
@@ -65,6 +65,27 @@ namespace Belle2 {
     RunNumberInfo m_info;
     NSMData m_data;
     std::vector<RCCallback*> m_callbacks;
+
+  private:
+    class ConfigProvider {
+
+    public:
+      static const int PORT = 20020;
+
+    public:
+      ConfigProvider(RunControlCallback* callback,
+                     const std::string hostname, int port)
+        : m_callback(callback), m_hostname(hostname), m_port(port) {
+      }
+
+    public:
+      void run();
+
+    private:
+      RunControlCallback* m_callback;
+      std::string m_hostname;
+      int m_port;
+    };
 
   };
 

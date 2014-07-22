@@ -79,13 +79,11 @@ void StorageOutputModule::event()
     m_obuf.unlock();
     RunInfoBuffer& info(StorageDeserializerModule::getInfo());
     if (info.isAvailable()) {
-      storage_info* sinfo = (storage_info*)info.getReserved();
-      sinfo->expno = expno;
-      sinfo->runno = runno;
-      sinfo->subno = subno;
-      sinfo->count = 0;
-      sinfo->nbyte = 0;
-      sinfo->stime = Time().getSecond();
+      info.setExpNumber(expno);
+      info.setRunNumber(runno);
+      info.setSubNumber(subno);
+      info.setOutputCount(0);
+      info.setOutputNBytes(0);
     }
   }
   // Stream DataStore in EvtMessage
@@ -102,9 +100,8 @@ void StorageOutputModule::event()
   if (m_count % 10 == 0) {
     RunInfoBuffer& info(StorageDeserializerModule::getInfo());
     if (info.isAvailable()) {
-      storage_info* sinfo = (storage_info*)info.getReserved();
-      sinfo->count = m_count;
-      sinfo->nbyte += m_nbyte;
+      info.setOutputCount(m_count);
+      info.addOutputNBytes(m_nbyte);
     }
     m_count_0 = m_count;
     m_nbyte = 0;

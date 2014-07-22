@@ -56,13 +56,8 @@ ConfigObject DBObjectLoader::load(const std::string& path,
           obj.addObject(name, load(path, ctablename));
           */
           obj.addObject(name, ConfigObject());
-        } else if (type_s == "enum") {
-          value = StringUtil::replace(value.substr(pos + 1), ")", "");
-          obj.addEnumList(name, value);
-          obj.addEnum(name, "");
         }
-        if (type != FieldInfo::TEXT &&
-            type != FieldInfo::OBJECT && type != FieldInfo::ENUM) {
+        if (type != FieldInfo::TEXT && type != FieldInfo::OBJECT) {
           value = StringUtil::replace(value.substr(pos + 1), ")", "");
         }
         obj.setValueText(name, value);

@@ -70,17 +70,6 @@ public class ConfigObject extends DBObject {
                 }
                 ;
                 break;
-                case FieldInfo.ENUM: {
-                    HashMap<String, Integer> enum_m = new HashMap<>();
-                    int nenum = reader.readInt();
-                    for (int n = 0; n < nenum; n++) {
-                        String ename = reader.readString();
-                        int id = reader.readInt();
-                        enum_m.put(ename, id);
-                    }
-                    addEnum(name, reader.readString(), enum_m);
-                }
-                break;
                 default:
                     break;
             }
@@ -131,17 +120,6 @@ public class ConfigObject extends DBObject {
                     for (ConfigObject obj : obj_v) {
                         obj.writeObject(writer);
                     }
-                }
-                ;
-                break;
-                case FieldInfo.ENUM: {
-                    HashMap<String, Integer> enum_m = getEnumList(name);
-                    writer.writeInt(enum_m.size());
-                    for (String label : enum_m.keySet()) {
-                        writer.writeString(label);
-                        writer.writeInt(getEnumId(label));
-                    }
-                    writer.writeString(getEnum(name));
                 }
                 ;
                 break;
@@ -203,14 +181,6 @@ public class ConfigObject extends DBObject {
     @Override
     public String getText(String name) {
         if (!hasText(name)) {
-            return "";
-        }
-        return (String)m_value_m.get(name);
-    }
-
-    @Override
-    public String getEnum(String name) {
-        if (!hasEnum(name)) {
             return "";
         }
         return (String)m_value_m.get(name);

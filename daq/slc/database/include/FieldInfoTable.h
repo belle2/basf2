@@ -12,7 +12,6 @@ namespace Belle2 {
 
   class DBObject;
 
-  typedef std::map<std::string, int> EnumList;
   typedef std::vector<FieldInfo> FieldInfoList;
   typedef std::map<std::string, FieldInfoList> FieldInfoListMap;
 
@@ -27,7 +26,6 @@ namespace Belle2 {
                           int revision = 0);
     int add(const FieldInfo& info);
     int createTable(const DBObject& obj, bool isroot);
-    EnumList getEnums(const FieldInfo& info) throw(DBHandlerException);
 
   private:
     DBInterface* m_db;

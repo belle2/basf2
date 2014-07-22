@@ -20,6 +20,10 @@ extern "C" {
 #include <sys/select.h>
 #include <errno.h>
 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 #define NSM_DEBUGMODE 1
 
 using namespace Belle2;
@@ -120,12 +124,13 @@ throw(NSMHandlerException)
   }
 }
 
-void NSMCommunicator::replyError(const std::string& message)
+void NSMCommunicator::replyError(int error, const std::string& message)
 throw(NSMHandlerException)
 {
   if (m_master_node.getName().size() > 0 &&
       b2nsm_nodeid(m_master_node.getName().c_str()) >= 0) {
-    sendRequest(NSMMessage(m_master_node, NSMCommand::ERROR, message));
+    sendRequest(NSMMessage(m_master_node, NSMCommand::ERROR,
+                           error, message));
   }
 }
 
@@ -159,25 +164,18 @@ bool NSMCommunicator::sendLog(const NSMNode& node,
 
 bool NSMCommunicator::sendError(const std::string& message)
 {
-  try {
-    if (m_master_node.getName().size() > 0) {
-      sendRequest(NSMMessage(m_master_node, NSMCommand::ERROR, message));
-    }
-  } catch (const NSMHandlerException& e) {
-    return false;
-  }
-  return true;
+  int error = 255;
+  return sendError(error, message);
 }
 
-bool NSMCommunicator::sendError(const ERRORNo& eno,
-                                const std::string& nodename,
+bool NSMCommunicator::sendError(int error,
                                 const std::string& message)
 {
   try {
     if (m_master_node.getName().size() > 0 &&
         b2nsm_nodeid(m_master_node.getName().c_str()) >= 0) {
       sendRequest(NSMMessage(m_master_node, NSMCommand::ERROR,
-                             eno.getId(), nodename + "\n" + message));
+                             error, message));
     }
   } catch (const NSMHandlerException& e) {
     return false;
@@ -330,4 +328,29 @@ bool NSMCommunicator::isConnected(const std::string& node) throw()
   bool is_online = getNodeIdByName(node) >= 0 &&
                    getNodePidByName(node) > 0;
   return is_online;
+}
+
+const std::string NSMCommunicator::getNodeHost(const std::string& nodename)
+throw()
+{
+#if NSM_PACKAGE_VERSION >= 1914
+  NSMsys* sys = m_nsmc->sysp;
+  for (int inod = 0; inod < NSMSYS_MAX_NOD; inod++) {
+    NSMnod& nod(sys->nod[inod]);
+    if (! nod.name[0]) continue;
+    if (nodename == nod.name) {
+      sockaddr_in addr;
+      addr.sin_addr.s_addr = nod.ipaddr;
+      return inet_ntoa(addr.sin_addr);
+    }
+  }
+#else
+#warning "Wrong version of nsm2. try source daq/slc/extra/nsm2/export.sh"
+#endif
+  return "";
+}
+
+const std::string NSMCommunicator::getNodeHost() throw()
+{
+  return getNodeHost(m_master_node.getName());
 }

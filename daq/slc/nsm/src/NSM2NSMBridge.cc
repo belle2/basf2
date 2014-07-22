@@ -32,7 +32,7 @@ void NSM2NSMBridge::init() throw(NSMHandlerException)
     try {
       NSMNode& node(m_callback[i]->getNode());
       m_nsm_comm[i] = new NSMCommunicator();
-      if (m_port[i] > 0 && m_callback != NULL) {
+      if (m_port[i] > 0 && m_callback[i] != NULL) {
         m_nsm_comm[i]->init(node, m_host[i], m_port[i]);
         m_nsm_comm[i]->setCallback(m_callback[i]);
         m_callback[i]->init();
@@ -58,10 +58,14 @@ void NSM2NSMBridge::run() throw()
       int i = NSMCommunicator::select(timeout, m_nsm_comm, 2);
       if (i >= 0) {
         NSMMessage& msg(m_nsm_comm[i]->getMessage());
-        m_callback[i]->perform(msg);
+        if (m_callback[i] != NULL) {
+          m_callback[i]->perform(msg);
+        }
       } else {
         for (int i = 0; i < 2; i++) {
-          m_callback[i]->timeout();
+          if (m_callback[i] != NULL) {
+            m_callback[i]->timeout();
+          }
         }
       }
     }

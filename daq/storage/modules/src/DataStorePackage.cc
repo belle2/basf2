@@ -28,7 +28,8 @@ bool DataStorePackage::decode(MsgHandler& msghandler)
     m_data_hlt.setBuffer(m_data.getBody());
   }
   if (m_data_hlt.getBuffer() == NULL || m_data_hlt.getTrailerMagic() != BinData::TRAILER_MAGIC) {
-    B2ERROR(__FILE__ << ":" << __LINE__ << " Bad tarailer magic for HLT = " << m_data_hlt.getTrailerMagic());
+    B2ERROR(__FILE__ << ":" << __LINE__ << " Bad tarailer magic for HLT = "
+            << m_data_hlt.getTrailerMagic());
     return false;
   }
   m_objlist = std::vector<TObject*>();

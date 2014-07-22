@@ -22,6 +22,7 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
+  /*
   const int interval = (argc > 1) ? atoi(argv[1]) : 2;
   ConfigFile config("storage");
   std::vector<RunInfoBuffer> info_v;
@@ -81,16 +82,11 @@ int main(int argc, char** argv)
       if (i == 2) {
         ss << "---------------------------------------------------------------------------------" << std::endl;
       }
-      /*
-      ss << info_v[i].getName() << " : Count = " << sinfo_out->count[i] << ", Freq = "
-      << sinfo_out->freq[i] << " [kHz], Rate = "
-      << sinfo_out->rate[i] << " [MB/s], DataSize = "
-      << sinfo_out->evtsize[i] << " [kB/event]" << std::endl;
-      */
     }
     ss << "---------------------------------------------------------------------------------" << std::endl
        << std::endl;
     fputs(ss.str().c_str(), stdout);
   }
+  */
   return 0;
 }

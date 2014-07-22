@@ -13,8 +13,6 @@ namespace Belle2 {
 
   typedef std::vector<std::string> FieldNameList;
   typedef std::map<std::string, FieldInfo::Property> FieldPropertyList;
-  typedef std::map<std::string, int> EnumList;
-  typedef std::map<std::string, EnumList> EnumNameList;
 
   class DBObject : public Serializable {
 
@@ -43,18 +41,11 @@ namespace Belle2 {
     bool hasField(const std::string& name) const throw();
     bool hasValue(const std::string& name) const throw();
     bool hasText(const std::string& name) const throw();
-    bool hasEnum(const std::string& name) const throw();
     bool hasObject(const std::string& name, int index = -1) const throw();
     bool hasArray(const std::string& name) const throw();
-    int getEnumId(const std::string& name) const throw();
-    const EnumList& getEnumList(const std::string& name) const throw();
     void add(const std::string& name, FieldInfo::Property pro) throw();
-    void addEnumList(const std::string& name, const EnumList& enum_m) throw();
-    void addEnumList(const std::string& name, const std::string& str) throw();
     void setValue(const std::string& name, const std::string& value) throw();
     void setText(const std::string& name, const std::string& value) throw() { addText(name, value); }
-    void setEnum(const std::string& name, const std::string& value) throw() { addEnum(name, value); }
-    void setEnum(const std::string& name, int value) throw();
     bool isConfig() const throw() { return m_isconfig; }
 
   public:
@@ -102,7 +93,6 @@ namespace Belle2 {
     virtual const void* getValue(const std::string& name) const throw() = 0;
     virtual const std::string getText(const std::string& name) const throw() = 0;
     virtual void addText(const std::string& name, const std::string& value) throw() = 0;
-    virtual void addEnum(const std::string& name, const std::string& value) throw() = 0;
     virtual void addValue(const std::string& name, const void* value,
                           FieldInfo::Type type, int length) throw() = 0;
     virtual void setValue(const std::string& name, const void* value, int index) throw() = 0;
@@ -111,7 +101,6 @@ namespace Belle2 {
     virtual DBObject& getObject(const std::string& name, int i = 0) throw() = 0;
     virtual const DBObject& getObject(const std::string& name, int i = 0) const throw() = 0;
     virtual void setObject(const std::string& name, int index, const DBObject& obj) throw() = 0;
-    virtual const std::string getEnum(const std::string& name) const throw() = 0;
     virtual const std::string getValueText(const std::string& name) const throw();
 
   private:
@@ -124,7 +113,6 @@ namespace Belle2 {
     bool m_isconfig;
     mutable FieldNameList m_name_v;
     mutable FieldPropertyList m_pro_m;
-    mutable EnumNameList m_enum_m_m;
 
   };
 

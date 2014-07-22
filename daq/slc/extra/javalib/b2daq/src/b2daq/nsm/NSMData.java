@@ -166,16 +166,7 @@ public class NSMData extends DBObject {
     }
 
     @Override
-    public void addEnum(String name, String value) {
-    }
-
-    @Override
     public void setObject(String name, int index, DBObject obj) {
-    }
-
-    @Override
-    public String getEnum(String name) {
-        return "";
     }
 
     @Override

@@ -15,7 +15,8 @@ TMPDIR  = ./tmp
 LIBDIR  = ./lib
 
 LIBS    += -lm -lpthread -ldl -lz -lrt
-LIBS    += ./mgt/*.o
+LIBS    += -L./mgt/ -lmgt
+LIBS    += -L./ttrx/ -lttrx
 LIBS    += -L$(BELLE2_LIB) -ldaq #-ldaq_slc_database
 LIBS    += -L$(BELLE2EX_LIB) -lnsm2_corelib -lnsm2_b2lib
 LIBS    += $(shell xml2-config --libs)
@@ -35,11 +36,14 @@ OBJS   = $(SRCS:$(SRCDIR)/%.cc=$(TMPDIR)/%.o)
 
 .PHONY : all clean mgt ttrx
 
-all: mgt $(TARGETS)
+all: mgt ttrx $(TARGETS)
 	@ install -m755 -p $(BINDIR)/* $(BELLE2_LOCAL_DIR)/bin/$(BELLE2_SUBDIR)
 
 mgt: 
 	@ make -C mgt
+
+ttrx: 
+	@ make -C ttrx
 
 force:
 	@ $(RM) $(BINDIR)/*
@@ -49,6 +53,7 @@ clean:
 	@ echo '<< cleaning directory >>'
 	@ $(RM) $(BINDIR) $(TMPDIR)
 	@ make -C mgt/ clean
+	@ make -C ttrx/ clean
 	@ $(RM) *~ */*~ \#*\#* */\#*\#*
 
 $(TARGETS): $(BINDIR)/% : %.cc $(OBJS)

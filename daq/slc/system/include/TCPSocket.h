@@ -29,6 +29,7 @@ namespace Belle2 {
     int connect(const std::string& ip, unsigned short port) throw(IOException);
     void setBufferSize(int size) throw(IOException);
     void print();
+    const std::string getLocalIP();
     int getLocalPort();
 
   public:

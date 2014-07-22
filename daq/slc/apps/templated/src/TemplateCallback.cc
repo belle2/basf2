@@ -37,7 +37,7 @@ bool TemplateCallback::load() throw()
 {
   getConfig().getObject().print();
   std::string workername = "woerker:" + getNode().getName();
-  m_con.init(workername, sizeof(ronode_info));
+  m_con.init(workername);
   m_con.clearArguments();
   if (getNode().getName().find("CPR") != std::string::npos) {
     m_con.setExecutable("rodummy_out");
@@ -50,7 +50,7 @@ bool TemplateCallback::load() throw()
   m_con.addArgument(m_port);
   m_con.load(-1);
   m_thread = PThread(new ReadoutMonitor(this,
-                                        (ronode_info*)m_con.getInfo().getReserved(),
+                                        (ronode_info*)m_con.getInfo().get(),
                                         (ronode_status*)m_data.get()));
   return true;
 }

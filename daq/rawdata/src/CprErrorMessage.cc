@@ -34,7 +34,7 @@ CprErrorMessage::~CprErrorMessage()
 void CprErrorMessage::PrintError(const int shmflag, RunInfoBuffer* nsm_status, string err_str)
 {
   if (shmflag > 0) {
-    nsm_status->reportError();
+    nsm_status->reportError(RunInfoBuffer::CPRFIFO_FULL);//need to implement error flag
   }
   PrintError(err_str.c_str());
 }
@@ -44,7 +44,7 @@ void CprErrorMessage::PrintError(const int shmflag, RunInfoBuffer* nsm_status, c
 {
   string err_str = err_message;
   if (shmflag > 0) {
-    nsm_status->reportError();
+    nsm_status->reportError(RunInfoBuffer::CPRFIFO_FULL);//need to implement error flag
   }
   PrintError(err_message, file, func_name, line);
 }

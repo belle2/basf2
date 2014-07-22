@@ -132,16 +132,7 @@ int FieldInfoTable::createTable(const DBObject& obj, bool isroot)
                                          obj.getRevision(), isroot));
       for (FieldInfoList::iterator it = info_v.begin(); it != info_v.end(); it++) {
         FieldInfo& info(*it);
-        int id = add(info);
-        if (info.getType() == FieldInfo::ENUM) {
-          const EnumList& enum_m(obj.getEnumList(info.getName()));
-          for (EnumList::const_iterator it = enum_m.begin();
-               it != enum_m.end(); it++) {
-            m_db->execute("insert into \"fieldinfo.type.enum\" "
-                          "(name, index, fieldid) values ('%s', %d, %d);",
-                          it->first.c_str(), it->second, id);
-          }
-        }
+        add(info);
       }
       return id;
     } catch (const DBHandlerException& e) {
@@ -151,17 +142,3 @@ int FieldInfoTable::createTable(const DBObject& obj, bool isroot)
   return 0;
 }
 
-EnumList FieldInfoTable::getEnums(const FieldInfo& info)
-throw(DBHandlerException)
-{
-  EnumList enum_m;
-  m_db->execute("select name, index from \"fieldinfo.type.enum\" "
-                "where fieldid = %d;", info.getId());
-  DBRecordList record_v(m_db->loadRecords());
-  for (size_t i = 0; i < record_v.size(); i++) {
-    DBRecord& record(record_v[i]);
-    enum_m.insert(EnumList::value_type(record.get("name"),
-                                       record.getInt("id")));
-  }
-  return enum_m;
-}

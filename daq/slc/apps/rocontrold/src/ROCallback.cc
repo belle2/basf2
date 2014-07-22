@@ -40,7 +40,6 @@ bool ROCallback::load() throw()
   if (m_con.load(30)) {
     LogFile::debug("load succeded");
     return true;
-  } else {
   }
   LogFile::error("load timeout");
   return false;

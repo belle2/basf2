@@ -19,9 +19,8 @@ namespace Belle2 {
    */
 
   /**
-   * Class to store TOP digitized hits (output of TOPDigi)
-   * relation to TOPSimHit
-   * filled in top/modules/TOPDigitizer/src/TOPDigiModule.cc
+   * Class to store TOP digitized hits (output of TOPDigitizer or raw data unpacker)
+   * relations to TOPSimHits, MCParticles
    */
 
   class TOPDigit : public RelationsObject {
@@ -40,11 +39,13 @@ namespace Belle2 {
       m_channelID(0),
       m_TDC(0),
       m_ADC(0),
+      m_pulseWidth(0),
       m_hardChannelID(0),
       m_quality(c_Junk)
     {}
 
-    /** Almost full constructor
+    /**
+     * Almost full constructor
      * @param barID     bar ID
      * @param channelID channel ID
      * @param TDC       digitized detection time
@@ -54,25 +55,25 @@ namespace Belle2 {
       m_channelID(channelID),
       m_TDC(TDC),
       m_ADC(0),
+      m_pulseWidth(0),
       m_hardChannelID(0),
       m_quality(c_Good)
     {}
 
-    /** Full constructor
-     * @param barID     bar ID
-     * @param channelID software channel ID
-     * @param TDC       digitized detection time
-     * @param ADC       digitized pulse height or integrated charge
-     * @param hardChID  hardware channel ID
+    /** Set digitized pulse height or integrated charge
+     * @param ADC pulse heigth or integrated charge
      */
-    TOPDigit(int barID, int channelID, int TDC, int ADC, unsigned hardChID):
-      m_barID(barID),
-      m_channelID(channelID),
-      m_TDC(TDC),
-      m_ADC(ADC),
-      m_hardChannelID(hardChID),
-      m_quality(c_Good)
-    {}
+    void setADC(int ADC) {m_ADC = ADC;}
+
+    /** Set digitized pulse width
+     * @param width pulse width
+     */
+    void setPulseWidth(int width) {m_pulseWidth = width;}
+
+    /** Set hardware channel ID (0-based)
+     * @param chID hardware channel ID
+     */
+    void setHardwareChannelID(int chID) {m_hardChannelID = chID;}
 
     /** Set hit quality
      * @param quality hit quality
@@ -104,20 +105,26 @@ namespace Belle2 {
      */
     int getADC() const { return m_ADC; }
 
+    /** Get digitized pulse width
+     * @return digitized pulse width
+     */
+    int getPulseWidth() const { return m_pulseWidth; }
+
     /** Get hardware channel ID
      * @return hardware channel ID
      */
-    int getHardChannelID() const { return m_hardChannelID; }
+    int getHardwareChannelID() const { return m_hardChannelID; }
 
   private:
     int m_barID;               /**< bar ID (1-based) */
     int m_channelID;           /**< software channel ID (1-based) */
     int m_TDC;                 /**< digitized time */
     int m_ADC;                 /**< digitized pulse height or charge (to be decided) */
+    int m_pulseWidth;          /**< digitized pulse width */
     unsigned m_hardChannelID;  /**< hardware channel ID (0-based) */
     EHitQuality m_quality;     /**< hit quality */
 
-    ClassDef(TOPDigit, 3); /**< ClassDef */
+    ClassDef(TOPDigit, 4); /**< ClassDef */
 
   };
 

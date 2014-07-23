@@ -35,14 +35,16 @@ namespace Belle2 {
   public:
     SVDHoughCluster(): trackID(0), hitPos(), sensorID(0) {}
 
-    SVDHoughCluster(unsigned int id, TVector3 pos, VxdID sensID = 0): trackID(id), hitPos(pos),
-      sensorID(sensID) {}
+    SVDHoughCluster(unsigned int id, TVector3 pos, VxdID sensID = 0, unsigned int _qOH = 0): trackID(id), hitPos(pos),
+      sensorID(sensID), qOH(_qOH) {}
 
     unsigned int getClusterID() { return trackID; }
+    unsigned int getQOH() { return qOH; }
     TVector3 getHitPos() { return hitPos; }
     VxdID getSensorID() { return sensorID; }
 
     void setClusterID(unsigned int id) { trackID = id; }
+    void setQOH(unsigned int val) { qOH = val; }
     void setHitPos(TVector3 pos) { hitPos = pos; }
     void setSensorID(VxdID sensID) { sensorID = sensID; }
 
@@ -50,6 +52,7 @@ namespace Belle2 {
     unsigned int trackID;
     TVector3 hitPos;
     VxdID sensorID;
+    unsigned int qOH;
 
     ClassDef(SVDHoughCluster, 1)
 

@@ -38,7 +38,8 @@ namespace Belle2 {
       /// Default constructor for ROOT compatibility.
       UncertainPerigeeCircle() :
         PerigeeCircle(),
-        m_perigeeCovariance()
+        m_perigeeCovariance(),
+        m_chi2(0.0)
       {;}
 
       /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix. Covariance matrix defaults to a zero matrix
@@ -47,7 +48,8 @@ namespace Belle2 {
                              const FloatType& impact,
                              const PerigeeCovariance& perigeeCovariance = PerigeeCovariance()) :
         PerigeeCircle(PerigeeCircle::fromPerigeeParameters(curvature, tangentialPhi, impact)),
-        m_perigeeCovariance(perigeeCovariance)
+        m_perigeeCovariance(perigeeCovariance),
+        m_chi2(0.0)
       {;}
 
 
@@ -58,7 +60,8 @@ namespace Belle2 {
                              const FloatType& impact,
                              const PerigeeCovariance& perigeeCovariance = PerigeeCovariance()) :
         PerigeeCircle(PerigeeCircle::fromPerigeeParameters(curvature, tangential, impact)),
-        m_perigeeCovariance(perigeeCovariance)
+        m_perigeeCovariance(perigeeCovariance),
+        m_chi2(0.0)
       {;}
 
 
@@ -67,7 +70,8 @@ namespace Belle2 {
       UncertainPerigeeCircle(const PerigeeCircle& perigeeCircle,
                              const PerigeeCovariance& perigeeCovariance = PerigeeCovariance()) :
         PerigeeCircle(perigeeCircle),
-        m_perigeeCovariance(perigeeCovariance)
+        m_perigeeCovariance(perigeeCovariance),
+        m_chi2(0.0)
       {;}
 
 
@@ -75,7 +79,8 @@ namespace Belle2 {
       UncertainPerigeeCircle(const GeneralizedCircle& generalizedCircle,
                              const PerigeeCovariance& perigeeCovariance = PerigeeCovariance()) :
         PerigeeCircle(generalizedCircle),
-        m_perigeeCovariance(perigeeCovariance)
+        m_perigeeCovariance(perigeeCovariance),
+        m_chi2(0.0)
       {;}
 
       /// Empty destructor

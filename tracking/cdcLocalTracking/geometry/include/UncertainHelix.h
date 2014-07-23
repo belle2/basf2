@@ -32,7 +32,8 @@ namespace Belle2 {
       /// Default constructor for ROOT compatibility.
       UncertainHelix() :
         Helix(),
-        m_helixCovariance()
+        m_helixCovariance(),
+        m_chi2(0.0)
       {;}
 
       /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix. Covariance matrix defaults to a zero matrix
@@ -43,14 +44,16 @@ namespace Belle2 {
                      const FloatType& z0,
                      const HelixCovariance& helixCovariance = HelixCovariance()) :
         Helix(curvature, tangentialPhi, impact, szSlope, z0),
-        m_helixCovariance(helixCovariance)
+        m_helixCovariance(helixCovariance),
+        m_chi2(0.0)
       {;}
 
 
       explicit UncertainHelix(const TVectorD& parameters,
                               const HelixCovariance& helixCovariance = HelixCovariance()) :
         Helix(parameters),
-        m_helixCovariance(helixCovariance)
+        m_helixCovariance(helixCovariance),
+        m_chi2(0.0)
       {;}
 
       /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix. Covariance matrix defaults to a zero matrix
@@ -61,7 +64,8 @@ namespace Belle2 {
                      const FloatType& z0,
                      const HelixCovariance& helixCovariance = HelixCovariance()) :
         Helix(curvature, tangential, impact, szSlope, z0),
-        m_helixCovariance(helixCovariance)
+        m_helixCovariance(helixCovariance),
+        m_chi2(0.0)
       {;}
 
 
@@ -70,7 +74,8 @@ namespace Belle2 {
       UncertainHelix(const Helix& helix,
                      const HelixCovariance& helixCovariance = HelixCovariance()) :
         Helix(helix),
-        m_helixCovariance(helixCovariance)
+        m_helixCovariance(helixCovariance),
+        m_chi2(0.0)
       {;}
 
 

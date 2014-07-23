@@ -21,6 +21,11 @@ eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
 main.add_module(eventinfosetter)
 
+# Histogram manager immediately after master module
+histo = register_module('HistoManager')
+histo.param('histoFileName', 'DQMhistograms.root')  # File to save histograms
+main.add_module(histo)
+
 # Gearbox: access to database (xml files)
 gearbox = register_module('Gearbox')
 main.add_module(gearbox)
@@ -96,6 +101,10 @@ topreco = register_module('TOPReconstructor')
 topreco.logging.log_level = LogLevel.DEBUG  # remove or comment to suppress printout
 topreco.logging.debug_level = 2  # or set level to 0 to suppress printout
 main.add_module(topreco)
+
+# TOP DQM
+topdqm = register_module('TOPDQM')
+main.add_module(topdqm)
 
 # Output
 output = register_module('RootOutput')

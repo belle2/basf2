@@ -64,15 +64,15 @@ TRGCDCHoughFinder::TRGCDCHoughFinder(const string & name,
       _peakFinder("PeakFinder"),
       _peakMin(peakMin) {
 
-    //...Make Hough planes...
+    //...Make Hough lanes...
     _plane[0] = new TCHPlaneMulti2("circle hough plus",
                                    _circleH,
                                    nX,
                                    0,
                                    2 * M_PI,
                                    nY,
-                                   0.7,
-                                   3,
+                                   0.9615,
+                                   3.204,
                                    5);
     _plane[1] = new TCHPlaneMulti2("circle hough minus",
                                    _circleH,
@@ -80,8 +80,8 @@ TRGCDCHoughFinder::TRGCDCHoughFinder(const string & name,
                                    0,
                                    2 * M_PI,
                                    nY,
-                                   0.7,
-                                   3,
+                                   0.9615,
+                                   3.204,
                                    5);
 
     //...Set charge...

@@ -74,6 +74,12 @@ class TRGCDCPeakFinder {
     /// Makes regions.
     void regions(TRGCDCHoughPlane & hp, const unsigned threshold) const;
 
+///////////////
+
+	///p1p2
+	void p1p2(TRGCDCHoughPlane & hp, const unsigned threshold) const;
+
+///////////////
   private:
 
     /// Name

@@ -36,7 +36,7 @@ class TRGCDCHoughTransformationCircle
   public:// Selectors
     /// returns Y coordinate in a Hough parameter plane.
     virtual float y(float xReal, float yReal, float x) const;
-
+	
     /// returns true if Y diverges in given region.
     virtual bool diverge(float xReal, float yReal, float x0, float x1) const;
 

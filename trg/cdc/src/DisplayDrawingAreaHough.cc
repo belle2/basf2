@@ -157,8 +157,10 @@ TRGCDCDisplayDrawingAreaHough::on_button_press_event(GdkEventButton * e) {
     //...Debug...
     _x = xR(e->x);
     _y = yR(e->y);
-//  cout << "x=" << e->x << ",y=" << e->y << endl;
-//  cout << "cx0=" << cx0 << ",cy0=" << cy0 << endl;
+  cout <<"***********************"<<endl;
+  cout << "x=" << e->x << ",y=" << e->y << endl;
+  cout << "cx0=" << cx0 << ",cy0=" << cy0 << endl;
+  cout <<"************************"<<endl;
     
     return true;
 }

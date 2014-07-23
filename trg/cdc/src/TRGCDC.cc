@@ -13,7 +13,11 @@
 
 #define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
-
+/////////////////
+#include <math.h>
+#include <iostream>
+#include <fstream>
+/////////////////
 #include "framework/datastore/StoreArray.h"
 #include "framework/datastore/RelationArray.h"
 #include "mdst/dataobjects/MCParticle.h"
@@ -2082,15 +2086,29 @@ TRGCDC::fastSimulation(void) {
     }
 
     //...2D tracker : Hough finder...
-
+    cout<<"################start##########"<<endl;
     vector<TCTrack *> trackList;
-/*
     if (_perfect2DFinder)
         _pFinder->doit(trackList);
     else
         _hFinder->doit(trackList);
-*/
+    cout<<"################end##########"<<endl;
+    cout<<"Number of tracks: "<<trackList.size()<<endl;
 
+    for(unsigned iTrack=0; iTrack<trackList.size(); iTrack++){
+const TCRelation& trackRelation = trackList[iTrack]->relation();
+const MCParticle& trackMCParticle = trackRelation.mcParticle(0);
+cout<<"Pt: "<<trackMCParticle.getMomentum().Pt()<<endl;
+	ofstream vhdlxOut("/home/ph202/p1p2/MCpt", fstream::app);//test
+	vhdlxOut << trackMCParticle.getMomentum().Pt() <<endl;
+	ofstream phiout("/home/ph202/p1p2/MCphi", fstream::app);
+	if(trackMCParticle.getCharge()>0)
+	{phiout << (trackMCParticle.getMomentum().Phi()-M_PI/2)*360/(2*M_PI)<< endl;}
+	if(trackMCParticle.getCharge()<0 && (trackMCParticle.getMomentum().Phi()+M_PI/2)<0)
+	{phiout << ((trackMCParticle.getMomentum().Phi()+M_PI/2)+2*M_PI)*360/(2*M_PI)<< endl;}
+	else if(trackMCParticle.getCharge()<0 && (trackMCParticle.getMomentum().Phi()+M_PI/2)>0)
+	{phiout << (trackMCParticle.getMomentum().Phi()+M_PI/2)*360/(2*M_PI)<< endl;}
+}
 
     //...Perfect position test...
     if (trackList.size()) {

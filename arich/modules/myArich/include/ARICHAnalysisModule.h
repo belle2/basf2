@@ -119,7 +119,7 @@ namespace Belle2 {
     Float_t m_trueMomentum[3]; /**< Momentum of aeroHit (GEANT4) */
     Float_t m_momentum[3]; /**< Momentum of extrapolated particle */
     Float_t m_logl[5]; /**< Log likelihood (ARICHReco) */
-    Int_t   m_detPhotons; /**< Detected photons in a ring (ARICHReco) */
+    Int_t   m_detPhotons[5]; /**< Detected photons in a ring (ARICHReco) */
     Float_t m_expPhotons[5]; /**< Theoretically expected photons (ARICHReco) */
 
   };

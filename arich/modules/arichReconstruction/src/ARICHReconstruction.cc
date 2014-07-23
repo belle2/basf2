@@ -294,6 +294,8 @@ namespace Belle2 {
     static double  n0[c_noOfAerogels]; //const factor in dN/dE formula
     static TVector3 anorm[c_noOfAerogels];
     static double padSize;
+    static double padArea;
+    static int padNum;
     static double angmir;
     static int nMirSeg;
     static int first = 1;
@@ -309,6 +311,8 @@ namespace Belle2 {
     if (first) {
 
       padSize = m_arichGeoParameters->getDetectorPadSize();
+      padArea = padSize / Unit::m * padSize / Unit::m;
+      padNum = m_arichGeoParameters->getDetectorXPadNumber() * m_arichGeoParameters->getDetectorXPadNumber();
       nMirSeg = m_arichGeoParameters->getNMirrors();
       angmir  = m_arichGeoParameters->getMirrorsStartAngle();
       thickness[nAerogelLayers] = 0;
@@ -338,8 +342,6 @@ namespace Belle2 {
       ARICHTrack* track =  &arichTracks[i];
       // Reconstructed photons within expected cone
       int nDetPhotons[5] = {0, 0, 0, 0, 0};
-      double padArea = padSize / Unit::m * padSize / Unit::m;
-      int padNum = m_arichGeoParameters->getDetectorXPadNumber() * m_arichGeoParameters->getDetectorXPadNumber();
 
       // loop over all particle hypotheses
       for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {

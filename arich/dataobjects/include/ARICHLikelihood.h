@@ -32,7 +32,7 @@ namespace Belle2 {
     /*! default constructor */
 
     ARICHLikelihood(): m_flag(0), m_logL_e(0), m_logL_mu(0), m_logL_pi(0), m_logL_K(0),
-      m_logL_p(0), m_Nphot(0), m_Nphot_e(0), m_Nphot_mu(0), m_Nphot_pi(0),
+      m_logL_p(0), m_NphotD_e(0), m_NphotD_mu(0), m_NphotD_pi(0), m_NphotD_K(0), m_NphotD_p(0), m_Nphot_e(0), m_Nphot_mu(0), m_Nphot_pi(0),
       m_Nphot_K(0), m_Nphot_p(0) {
     }
 
@@ -43,7 +43,11 @@ namespace Belle2 {
      * @param logL_pi:  pion log likelihood
      * @param logL_K:   kaon log likelihood
      * @param logL_p:   proton log likelihood
-     * @param Nphot:    detected photons
+     * @param NphotD_e: detected photons in electron expected ring
+     * @param NphotD_e: detected photons in muon expected ring
+     * @param NphotD_e: detected photons in pion expected ring
+     * @param NphotD_e: detected photons in kaon expected ring
+     * @param NphotD_e: detected photons in proton expected ring
      * @param Nphot_e:  expected photons for electron
      * @param Nphot_mu: expected photons for muon
      * @param Nphot_pi: expected photons for pion
@@ -57,7 +61,11 @@ namespace Belle2 {
                     double logL_pi,
                     double logL_K,
                     double logL_p,
-                    int Nphot,
+                    int NphotD_e,
+                    int NphotD_mu,
+                    int NphotD_pi,
+                    int NphotD_K,
+                    int NphotD_p,
                     double Nphot_e,
                     double Nphot_mu,
                     double Nphot_pi,
@@ -69,7 +77,11 @@ namespace Belle2 {
       m_logL_pi = (float) logL_pi;
       m_logL_K  = (float) logL_K;
       m_logL_p  = (float) logL_p;
-      m_Nphot = Nphot;
+      m_NphotD_e = NphotD_e;
+      m_NphotD_mu = NphotD_mu;
+      m_NphotD_pi = NphotD_pi;
+      m_NphotD_K = NphotD_K;
+      m_NphotD_p = NphotD_p;
       m_Nphot_e  = (float) Nphot_e;
       m_Nphot_mu = (float) Nphot_mu;
       m_Nphot_pi = (float) Nphot_pi;
@@ -80,18 +92,22 @@ namespace Belle2 {
     /*! full constructor
      * @param flag:         reconstruction flag
      * @param logL:         log likelihoods in order e, mu, pi, K, p
-     * @param Nphot:        detected photons
+     * @param NphotD:       detected photons in e,mu,pi,K,p ring
      * @param Nphot_expect: number of expected photons in order e, mu, pi, K, p
      */
 
-    ARICHLikelihood(int flag, double logL[5], int Nphot, double Nphot_expect[5]) {
+    ARICHLikelihood(int flag, double logL[5], int NphotD[5], double Nphot_expect[5]) {
       m_flag = flag;
       m_logL_e  = (float) logL[0];
       m_logL_mu = (float) logL[1];
       m_logL_pi = (float) logL[2];
       m_logL_K  = (float) logL[3];
       m_logL_p  = (float) logL[4];
-      m_Nphot = Nphot;
+      m_NphotD_e = NphotD[0];
+      m_NphotD_mu = NphotD[1];
+      m_NphotD_pi = NphotD[2];
+      m_NphotD_K = NphotD[3];
+      m_NphotD_p = NphotD[4];
       m_Nphot_e  = (float) Nphot_expect[0];
       m_Nphot_mu = (float) Nphot_expect[1];
       m_Nphot_pi = (float) Nphot_expect[2];
@@ -129,10 +145,30 @@ namespace Belle2 {
      */
     double getLogL_p() const {return m_logL_p;}
 
-    /*! Get number of detected photons
-     * @return number of detected photons
+    /*! Get number of detected photons in electron expected ring
+     * @return number of detected photons  in electron expected ring
      */
-    int getNphot() const {return m_Nphot;}
+    int getNphotD_e() const {return m_NphotD_e;}
+
+    /*! Get number of detected photons in muon expected ring
+     * @return number of detected photons in muon expected ring
+     */
+    int getNphotD_mu() const {return m_NphotD_mu;}
+
+    /*! Get number of detected photons in pion expected ring
+     * @return number of detected photons in pion expected ring
+     */
+    int getNphotD_pi() const {return m_NphotD_pi;}
+
+    /*! Get number of detected photons in kaon expected ring
+     * @return number of detected photons in kaon expected ring
+     */
+    int getNphotD_K() const {return m_NphotD_K;}
+
+    /*! Get number of detected photons in proton expected ring
+     * @return number of detected photons in proton expected ring
+     */
+    int getNphotD_p() const {return m_NphotD_p;}
 
     /*! Get number of expected photons for electron
      * @return number of expected photons for electron
@@ -166,7 +202,11 @@ namespace Belle2 {
     float m_logL_pi;    /**< log likelihood for pion hypothesis */
     float m_logL_K;     /**< log likelihood for kaon hypothesis */
     float m_logL_p;     /**< log likelihood for proton hypothesis */
-    int m_Nphot;         /**< number of detected photons */
+    int m_NphotD_e;     /**< number of detected photons in electron expected ring */
+    int m_NphotD_mu;    /**< number of detected photons in muon expected ring */
+    int m_NphotD_pi;    /**< number of detected photons in pion expected ring */
+    int m_NphotD_K;     /**< number of detected photons in kaon expected ring */
+    int m_NphotD_p;     /**< number of detected photons in proton expected ring */
     float m_Nphot_e;    /**< number of expected photons for electron hypothesis */
     float m_Nphot_mu;   /**< number of expected photons for muon hypothesis */
     float m_Nphot_pi;   /**< number of expected photons for pion hypothesis */

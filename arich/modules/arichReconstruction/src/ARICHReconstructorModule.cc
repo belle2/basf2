@@ -164,7 +164,7 @@ namespace Belle2 {
         B2DEBUG(50, "Number of expected photons " << expectedPhotons[0]);
         B2DEBUG(50, "Number of detected photons " << detectedPhotons);
 
-        arichLikelihoods.appendNew(track->getFlag(), likelihoods, detectedPhotons[2], expectedPhotons);
+        arichLikelihoods.appendNew(track->getFlag(), likelihoods, detectedPhotons, expectedPhotons);
 
         // Add relations
         int last = arichLikelihoods.getEntries() - 1;
@@ -234,7 +234,7 @@ namespace Belle2 {
         track->getLikelihood(likelihoods);
         track->getDetectedPhotons(detectedPhotons);
 
-        arichLikelihoods.appendNew(track->getFlag(), likelihoods, detectedPhotons[2], expectedPhotons);
+        arichLikelihoods.appendNew(track->getFlag(), likelihoods, detectedPhotons, expectedPhotons);
 
         int last = arichLikelihoods.getEntries() - 1;
         int aeroIndex = track->getAeroIndex();

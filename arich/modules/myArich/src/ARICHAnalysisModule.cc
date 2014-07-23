@@ -61,8 +61,7 @@ namespace Belle2 {
     m_pdg(0),
     m_mpdg(0),
     m_status(0),
-    m_flag(-1),
-    m_detPhotons(0)
+    m_flag(-1)
   {
     // set module description (e.g. insert text)
     setDescription("The module saves variables needed for performance analysis, such as postion and momentum of the hit, likelihoods for hypotheses and number of photons.");
@@ -80,6 +79,7 @@ namespace Belle2 {
     for (int k = 0; k < 5; k++) {
       m_logl[k] = 0;
       m_expPhotons[k] = 0;
+      m_detPhotons[k] = 0;
     };
 
   }
@@ -104,7 +104,7 @@ namespace Belle2 {
     tree->Branch("m_flag", &m_flag, "m_flag/I");
     tree->Branch("m_prodVertex", &m_prodVertex, "x/F:y/F:z/F");
     tree->Branch("m_logl", &m_logl, "e/F:mu/F:pi/F:K/F:p/F");
-    tree->Branch("m_detPhotons", &m_detPhotons, "m_detPhotons/I");
+    tree->Branch("m_detPhotons", &m_detPhotons, "e/I:mu/I:pi/I:K/I:p/I");
     tree->Branch("m_expPhotons", &m_expPhotons, "e/F:mu/F:pi/F:K/F:p/F");
     tree->Branch("m_truePosition", &m_truePosition, "x/F:y/F:z/F");
     tree->Branch("m_position", &m_position, "x/F:y/F:z/F");
@@ -170,7 +170,11 @@ namespace Belle2 {
         m_logl[2] = arich->getLogL_pi();
         m_logl[3] = arich->getLogL_K();
         m_logl[4] = arich->getLogL_p();
-        m_detPhotons = arich->getNphot();
+        m_detPhotons[0] = arich->getNphotD_e();
+        m_detPhotons[1] = arich->getNphotD_mu();
+        m_detPhotons[2] = arich->getNphotD_pi();
+        m_detPhotons[3] = arich->getNphotD_K();
+        m_detPhotons[4] = arich->getNphotD_p();
         m_expPhotons[0] = arich->getNphot_e();
         m_expPhotons[1] = arich->getNphot_mu();
         m_expPhotons[2] = arich->getNphot_pi();

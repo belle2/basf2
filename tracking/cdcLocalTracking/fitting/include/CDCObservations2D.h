@@ -140,8 +140,23 @@ namespace Belle2 {
         }
       }
 
+      /// Appends all the reference wire positions. Always use position since there is no other mode. For cross check to legendre finder.
+      void append(const std::vector<const Belle2::CDCLocalTracking::CDCWire*>& wires,
+                  bool usePosition  __attribute__((unused)) = false) {
+        for (const CDCWire * ptrWire : wires) {
+          if (not ptrWire) continue;
+          const CDCWire& wire = *ptrWire;
+          const Vector2D& wirePos = wire.getRefPos2D();
+          const FloatType driftLength = 0.0;
+          const FloatType weight = 1.0;
+          append(wirePos.y(), wirePos.y(), driftLength, weight);
+        }
+      }
+
+
+
 #ifndef __CINT__
-      /// Appends all wire positions of the hits in the legendre track hits. Always use position since no other mode as long as there are no right left passage information available.
+      /// Appends all wire positions of the hits in the legendre track hits. Always use position since there is no other mode as long as there are no right left passage information available.
       void append(const std::vector<TrackFinderCDCLegendre::TrackHit*>& legendreTrackHits,
                   bool usePosition  __attribute__((unused)) = false) {
         for (const TrackFinderCDCLegendre::TrackHit * ptrLegendreTrackHit : legendreTrackHits) {

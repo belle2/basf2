@@ -61,6 +61,15 @@ namespace Belle2 {
         return result;
       }
 
+      /// Fits to the wire positions
+      CDCTrajectory2D fit(const std::vector<const Belle2::CDCLocalTracking::CDCWire*>& wires) const {
+        CDCTrajectory2D result;
+        update(result, wires);
+        return result;
+      }
+
+
+
       /// Updates a given trajectory with a fit to a collection of hits typs, which are convertable to observation circles.
       template<class Hits>
       void update(CDCTrajectory2D& trajectory2D, const Hits& hits) const {

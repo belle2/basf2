@@ -44,6 +44,12 @@ namespace Belle2 {
       friend bool operator<(const CDCWireSuperLayer& wireSuperLayer, const CDCRecoSegment2D& segment)
       { return wireSuperLayer.getISuperLayer() < segment.getISuperLayer(); }
 
+      /// Getter for the vector of wires the hits of this segment are based on in the same order
+      std::vector<const Belle2::CDCLocalTracking::CDCWire*> getWireSegment() const {
+        std::vector<const Belle2::CDCLocalTracking::CDCWire*> wireSegment;
+        for (const CDCRecoHit2D & recoHit2D : *this) wireSegment.push_back(&(recoHit2D.getWire()));
+        return wireSegment;
+      }
 
       /// Getter for the automaton cell.
       AutomatonCell& getAutomatonCell() { return m_automatonCell; }

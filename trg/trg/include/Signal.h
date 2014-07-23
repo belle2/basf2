@@ -74,6 +74,9 @@ class TRGSignal {
     /// returns true if signal is active in given clock position.
     bool state(int clockPosition) const;
 
+    /// returns true if signal is active and rising edge in give clock position.
+    bool riseEdge(int clockPosition) const;
+
     /// returns a list of clock position of state change.
     std::vector<int> stateChanges(void) const;
 
@@ -263,6 +266,26 @@ TRGSignal::state(int a) const {
 	return last;
     }
     return false;
+    
+}
+
+inline
+bool
+TRGSignal::riseEdge(int a) const{
+   if(_history.size()){
+      bool last = false;
+      for (unsigned i= 0;i<_history.size();i++){
+        if(_history[i].time()<a){
+          continue;
+        }else if(_history[i].time()==a){
+            last = _history[i].edge();
+        }else if(_history[i].time() > a){
+          break;
+        }
+      }
+      return last;
+   }else
+   return false;
 }
 
 inline

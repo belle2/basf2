@@ -200,6 +200,12 @@ namespace {
   }
 
 
+
+  // Declare function as currently unused to avoid compiler warning
+  UncertainPerigeeCircle fitSeperateOffset(Matrix< FloatType, 4, 1 > means,
+                                           Matrix< FloatType, 4, 4 > c,
+                                           bool lineConstrained) __attribute__((__unused__));
+
   /// Variant without drift circles and seperating the offset before the matrix solving
   UncertainPerigeeCircle fitSeperateOffset(Matrix< FloatType, 4, 1 > means,
                                            Matrix< FloatType, 4, 4 > c,

@@ -35,6 +35,10 @@ namespace {
 
 
   RealisticTDCCountTranslator* s_realisticTDCCountTranslator = nullptr;
+
+  // Declare function as currently unused to avoid compiler warning
+  RealisticTDCCountTranslator& getRealisticTDCCountTranslatorInstance()  __attribute__((__unused__));
+
   RealisticTDCCountTranslator& getRealisticTDCCountTranslatorInstance()
   {
     if (not s_realisticTDCCountTranslator) s_realisticTDCCountTranslator = new RealisticTDCCountTranslator();

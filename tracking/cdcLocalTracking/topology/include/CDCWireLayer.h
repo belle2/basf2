@@ -135,7 +135,7 @@ namespace Belle2 {
 
       /// Checks if the given wire id belongs to a valid wire in this layer
       inline bool isValidIWire(const IWireType& iWire) const
-      { return iWire < int(size()); }
+      { return 0 <= iWire and iWire < int(size()); }
 
       /// Gives the wire by its id in the layer.
       const CDCWire& getWire(const IWireType& iWire) const

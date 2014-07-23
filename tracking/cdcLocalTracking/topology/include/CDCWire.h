@@ -120,7 +120,7 @@ namespace Belle2 {
        *  It increases counterclockwise in the same layer from the wire with
        *  wire id zero.
        *  Ranging from 0 to 35711 but discontinuously. ( See WireID class for details. )*/
-      IWireType getEWire() const { return getWireID().getEWire(); }
+      unsigned short getEWire() const { return getWireID().getEWire(); }
 
       /// Getter for the wire id within its layer
       /**  Gives the layer id within its superlayer \n

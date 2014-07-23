@@ -81,7 +81,7 @@ namespace Belle2 {
                                   const Vector3D& pos3D = Vector3D(0.0, 0.0, 0.0));
 
     FloatType curvatureToAbsMom2D(const FloatType& curvature,
-                                  const Vector2D pos2D = Vector2D(0.0, 0.0));
+                                  const Vector2D& pos2D = Vector2D(0.0, 0.0));
 
     FloatType curvatureToAbsMom2D(const FloatType& curvature,
                                   const FloatType& charge,

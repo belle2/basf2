@@ -51,7 +51,7 @@ namespace Belle2 {
       template<class CDCRecoFacetIterator>
       boost::iterator_range<CDCRecoFacetIterator> getPossibleNeighbors(const CDCRecoFacet& recoFacet, const CDCRecoFacetIterator& itBegin, const CDCRecoFacetIterator& itEnd) const {
 
-        const CDCRLWireHitPair rearRLWireHitPair = recoFacet.getRearRLWireHitPair();
+        const CDCRLWireHitPair& rearRLWireHitPair = recoFacet.getRearRLWireHitPair();
 
         std::pair<CDCRecoFacetIterator, CDCRecoFacetIterator> itPairPossibleNeighbors = std::equal_range(itBegin, itEnd, rearRLWireHitPair);
         return boost::iterator_range<CDCRecoFacetIterator>(itPairPossibleNeighbors.first, itPairPossibleNeighbors.second);

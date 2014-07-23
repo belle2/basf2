@@ -24,7 +24,7 @@ TMatrixD CDCLocalTracking::calcAmbiguity(const CDCRecoSegment2D& segment,
   FloatType zeta = 0;
 
   const Vector2D& localOrigin2D = trajectory2D.getLocalOrigin();
-  const UncertainPerigeeCircle localCircle = trajectory2D.getLocalCircle();
+  const UncertainPerigeeCircle& localCircle = trajectory2D.getLocalCircle();
 
   for (const CDCRecoHit2D & recoHit2D : segment) {
     const Vector2D& recoPos2D = recoHit2D.getRecoPos2D();

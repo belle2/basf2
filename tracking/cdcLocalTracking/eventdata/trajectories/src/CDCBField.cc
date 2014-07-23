@@ -96,7 +96,7 @@ FloatType CDCLocalTracking::absMom2DToCurvature(const FloatType& absMom2D,
 
 
 FloatType CDCLocalTracking::curvatureToAbsMom2D(const FloatType& curvature,
-                                                const Vector2D pos2D)
+                                                const Vector2D& pos2D)
 {
   return std::fabs(getBFieldZ(pos2D) * 0.00299792458 / curvature);
 }

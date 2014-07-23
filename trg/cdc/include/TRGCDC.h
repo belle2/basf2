@@ -42,6 +42,7 @@ class TRGCDCSegment;
 class TRGCDCSegmentHit;
 class TRGCDCFrontEnd;
 class TRGCDCMerger;
+class TRGCDCTSFBoard;
 class TRGCDCTrackSegmentFinder;
 class TRGCDCPerfectFinder;
 class TRGCDCHoughFinder;
@@ -71,6 +72,8 @@ class TRGCDC {
                               bool perfect3DFinder = false,
 			      const std::string & innerTSLUTDataFile = "?",
 			      const std::string & outerTSLUTDataFile = "?",
+			      const std::string & innerTSLUTFile = "?",
+			      const std::string & outerTSLUTFile = "?",
 			      const std::string & tsfLUTSL0DataFile = "?",
 			      const std::string & tsfLUTSL1DataFile = "?",
 			      const std::string & tsfLUTSL2DataFile = "?",
@@ -113,6 +116,8 @@ class TRGCDC {
 	   bool perfect3DFinder,
 	   const std::string & innerTSLUTDataFile,
 	   const std::string & outerTSLUTDataFile,
+	   const std::string & innerTSLUTFile,
+	   const std::string & outerTSLUTFile,
 	   const std::string & tsfLUTSL0DataFile,
 	   const std::string & tsfLUTSL1DataFile,
 	   const std::string & tsfLUTSL2DataFile,
@@ -390,6 +395,11 @@ class TRGCDC {
     /// returns a merger board.
     const TRGCDCMerger * merger(unsigned id) const;
 
+    /// returns a TSF board.
+    //const TRGCDCTSFBoard * tsfboard(unsigned id) const;
+    const TRGCDCTrackSegmentFinder * tsfboard(unsigned id) const;
+
+
   private:
 
     /// classify hits.
@@ -441,6 +451,12 @@ class TRGCDC {
 
     /// The filename of LUT for outer track segments.
     std::string _outerTSLUTDataFilename;
+
+    /// The filename of LUT for the inner-most track segments.
+    std::string _innerTSLUTFilename;
+
+    /// The filename of LUT for outer track segments.
+    std::string _outerTSLUTFilename;
 
     /// The filename of LUT for track segment finder SL0.
     std::string _tsfLUTSL0DataFilename;
@@ -597,6 +613,10 @@ class TRGCDC {
 
     /// CDC trigger merger boards.
     std::vector<TRGCDCMerger *> _mergers;
+
+    /// CDC trigger tsf boards.
+//    std::vector <TRGCDCTSFBoard *> _tsfboards;
+    std::vector <TRGCDCTrackSegmentFinder *> _tsfboards;
 
     /// Track Segement Finder.
     TRGCDCTrackSegmentFinder* _tsFinder;
@@ -891,6 +911,18 @@ inline
 const TRGCDCMerger *
 TRGCDC::merger(unsigned a) const {
     return _mergers[a];
+}
+
+//inline
+//const TRGCDCTSFBoard *
+//TRGCDC::tsfboard(unsigned a) const{
+//    return _tsfboards[a];
+//}
+
+inline
+const TRGCDCTrackSegmentFinder *
+TRGCDC::tsfboard(unsigned a)const{
+	return _tsfboards[a];
 }
 
 inline

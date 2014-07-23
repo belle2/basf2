@@ -102,7 +102,8 @@ class TRGCDCMerger
 
   public:// Configuration
 
-    TRGSignalBundle* output(void) { return _mosb;};
+    //TRGSignalBundle* output(void) { return _mosb;};
+    TRGSignalBundle* output(void) const { return _mosb;};
 
     void push_back(const TRGCDCFrontEnd *);
 

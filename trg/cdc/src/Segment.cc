@@ -47,6 +47,7 @@ TRGCDCSegment::TRGCDCSegment(unsigned id,
 			     const TCLUT * lut,
 			     const TRGClock & clock,
 			     const TRGCDCEventTime * eventTime,
+			     const std::string & TSLUTFile,
 			     const std::vector<const TCWire *> & cells)
     : TCCell(id,
 	     layer.size(),
@@ -56,7 +57,9 @@ TRGCDCSegment::TRGCDCSegment(unsigned id,
       _lut(lut),
       _wires(cells),
       _signal(std::string("TS_") + TRGUtil::itostring(id), clock),
-      _eventTime(eventTime) {
+      _eventTime(eventTime),
+      m_TSLUTFileName(TSLUTFile){
+      m_TSLUT = new TCLUT();
 }
 
 
@@ -75,6 +78,17 @@ TRGCDCSegment::initialize(bool fevtTime){
     nWires[2*i+1]=cdcp.nWiresInLayer(12*i+10)*2;
     nWires[2*(i+1)]=cdcp.nWiresInLayer(12*(i+1)+4)*2;
   }
+}
+
+
+void
+TRGCDCSegment::initialize(){
+    if(center().superLayerId()){
+      m_TSLUT->setDataFile(m_TSLUTFileName, 12);
+    }
+    else{
+      m_TSLUT->setDataFile(m_TSLUTFileName, 16);
+    }
 }
 
 void
@@ -230,6 +244,8 @@ TCSegment::simulateWithoutClock(bool logicLUTFlag) {
 
       //...Signal simulation...
       TRGSignal l0, l1, l2, l3, l4;
+TRGSignal wo1,wo2,wo3,wo4;
+TRGSignal all;
       if (n == 11) {
 
         //...Simple simulation assuming 3:2:1:2:3 shape...
@@ -243,6 +259,11 @@ TCSegment::simulateWithoutClock(bool logicLUTFlag) {
         //l2.dump();
         //l3.dump();
         //l4.dump();
+wo1 = l1 & l3 & l4;
+wo2 = l0 & l3 & l4;
+wo3 = l0 & l1 & l4;
+wo4 = l0 & l1 & l3;
+all = l2 & (wo1 | wo2 | wo3 | wo4);
 
       }
       else if (n == 15) {
@@ -253,10 +274,15 @@ TCSegment::simulateWithoutClock(bool logicLUTFlag) {
         l2 = signals[3] | signals[4] | signals[5];
         l3 = signals[6] | signals[7] | signals[8] | signals[9];
         l4 = signals[10] |signals[11] | signals[12] | signals[13] |signals[14];
+wo1 = l2 & l3 & l4;
+wo2 = l1 & l3 & l4;
+wo3 = l1 & l2 & l4;
+wo4 = l1 & l2 & l3;
+all = l0 &(wo1|wo2|wo3|wo4);
       }
 
       //...Coincidence of all layers...
-      TRGSignal all = l0 & l1 & l2 & l3 & l4;
+//      TRGSignal all = l0 & l1 & l2 & l3 & l4;
 
       if (all.nEdges()) {
         //cout<<"TSF is found"<<endl;
@@ -374,7 +400,7 @@ TCSegment::simulateWithClock(bool logicLUTFlag) {
 
       if ( logicLUTFlag == 0 ) {
         ////// TS logic Finder
-        bool tsL0=0,tsL1=0,tsL2=0,tsL3=0,tsL4=0;
+        bool tsL0,tsL1,tsL2,tsL3,tsL4=0;
         if(tsSize == 11) {
           //cout<<"Outer TS"<<endl;
           //...Simple simulation assuming 3:2:1:2:3 shape...
@@ -479,7 +505,7 @@ TRGCDCSegment::phiPosition(void) const {
 	dphi=atan(dphi/wireR[superLayerId()]/1000);
 	if(lutcomp==0){phi-=dphi;}
 	else if(lutcomp==1){phi+=dphi;}
-	else{/* phi=phi; */}
+	else{phi=phi;}
 	
 	return phi;
 }

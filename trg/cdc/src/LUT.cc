@@ -22,6 +22,7 @@
 #include "trg/cdc/Track.h"
 #include "trg/cdc/Link.h"
 #include <cstdlib>
+#include <math.h>
 
 using namespace std;
 
@@ -32,10 +33,13 @@ namespace Belle2{
     }
 
     TRGCDCLUT::TRGCDCLUT(const string & name, const TRGCDC &TRGCDC)
-	: _name(name),
-	  _cdc(TRGCDC){
+	: _name(name){
+//	  _cdc(TRGCDC){
     }
     
+    TRGCDCLUT::TRGCDCLUT(){
+    }
+
     TRGCDCLUT::~TRGCDCLUT(){
     }
 	
@@ -49,7 +53,25 @@ namespace Belle2{
 	    cout << "              LUT is not initialized yet" << endl;
 	    return;
 	}
-	if(std::strstr(filename.c_str(),"LRLUT.coe")){
+	if (std::strstr(filename.c_str(),"innerLRLUT_v2.1.coe")){
+		for (int i=0;i<=32768;i++){
+			openFile >> coeTrash >> coeComp;
+			istringstream iComp(coeComp);
+			if(i!=0){
+				iComp>>m_LRLUTIN[i-1];
+			}
+		}
+	}
+	else if(strstr(filename.c_str(),"outerLRLUT_v2.1.coe")){
+		for (int i=0;i<=2048;i++){
+			openFile >> coeTrash >>  coeComp;
+			istringstream iComp(coeComp);
+			if(i!=0){
+				iComp >> m_LRLUT[i-1];
+			}
+		}
+	}
+	else if(std::strstr(filename.c_str(),"LRLUT.coe")){
 		for(int i=0; i<2048;i++){
 		    openFile >> lutcomp;
 		    m_LRLUT[i]=lutcomp;
@@ -149,6 +171,7 @@ namespace Belle2{
 	     << filename << endl;
     }
 
+
 	/// using pattenr(ptn) and supler layer id(slid) to check left/right
   int TRGCDCLUT::getLRLUT(int ptn,int slid) const {
 	  if(slid) return m_LRLUT[ptn];
@@ -167,6 +190,45 @@ namespace Belle2{
     else if(slid == 7) return m_HitLRLUTSL7[ptn];
     else if(slid == 8) return m_HitLRLUTSL8[ptn];
     else return "00000";
+  }
+
+  double TRGCDCLUT::getValue(double id) const{
+    int range=pow(2, m_bitsize);
+    if(id>=range){
+      return 0;
+    }
+    else{
+      return double(m_data[id]);
+    }
+//      return m_data[id];
+  }
+
+
+  void TRGCDCLUT::setDataFile(const string & filename, int nInputBit){
+    m_bitsize=nInputBit;
+    m_name= filename;
+
+    ifstream openFile;
+    string tmpstr;
+    int tmpint;
+    int i=0;
+    int range=pow(2,nInputBit);
+    openFile.open(filename.c_str());
+    m_data.resize(range);
+    while(getline(openFile,tmpstr)){
+      if(!(tmpstr.size()==0)){
+      if(tmpstr[0]>='0' && tmpstr[0]<='9'){
+        tmpint=atoi(tmpstr.c_str());
+        m_data[i]=tmpint;
+        i++;
+      }
+      else{
+	continue;
+      }
+
+    }
+    }
+    
   }
 }
 

@@ -67,6 +67,11 @@ cdctrg.param('ConfigFile', os.path.join(basf2datadir,"trg/cdc/TRGCDCConfig_0_201
 
 #cdctrg.param('makeRootFile', True)
 
+#TSLUT (latest version @ 2014.07)
+cdctrg.param('InnerTSLUTFile', os.path.join(basf2datadir,"trg/cdc/innerLUT_v2.2.coe"))
+cdctrg.param('OuterTSLUTFile', os.path.join(basf2datadir,"trg/cdc/outerLUT_v2.2.coe"))
+
+#L/R LUTs (old version). will be removed.
 cdctrg.param('InnerTSLUTDataFile', os.path.join(basf2datadir,"trg/cdc/LRLUTIN.coe"))
 cdctrg.param('OuterTSLUTDataFile', os.path.join(basf2datadir,"trg/cdc/LRLUT.coe"))
 cdctrg.param('TSFLUTSL0DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL0.coe"))
@@ -78,6 +83,7 @@ cdctrg.param('TSFLUTSL5DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL
 cdctrg.param('TSFLUTSL6DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL6.coe"))
 cdctrg.param('TSFLUTSL7DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL7.coe"))
 cdctrg.param('TSFLUTSL8DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL8.coe"))
+
 cdctrg.param('DebugLevel', 10)
 cdctrg.param('CurlBackStop', 1)
 cdctrg.param('SimulationMode', 2)

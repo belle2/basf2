@@ -15,6 +15,7 @@
 #define TRGCDCSegment_FLAG_
 
 #include <vector>
+#include "trg/cdc/LUT.h"
 #include "trg/cdc/Cell.h"
 
 #ifdef TRGCDC_SHORT_NAMES
@@ -40,9 +41,10 @@ class TRGCDCSegment : public TRGCDCCell {
     TRGCDCSegment(unsigned id,
 		  const TRGCDCLayer & layer,
 		  const TRGCDCWire & w,
-		  const TRGCDCLUT * lut,
+		  const TRGCDCLUT * lut,   // Will be removed.
 		  const TRGClock & clock,
 		  const TRGCDCEventTime * eventTime,
+		  const std::string & TSLUTFile,
 		  const std::vector<const TRGCDCWire *> & wires);
 
     /// Destructor
@@ -73,6 +75,9 @@ class TRGCDCSegment : public TRGCDCCell {
 
     /// returns LUT.
     const TRGCDCLUT * LUT(void) const;
+
+    /// returns (new) LUT
+    TRGCDCLUT * nLUT(void) ;
 
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
@@ -123,8 +128,10 @@ class TRGCDCSegment : public TRGCDCCell {
 
   private:
 
+    TRGCDCLUT * m_TSLUT;
+
     /// LookUp Table.
-    const TRGCDCLUT * const _lut;
+    const TRGCDCLUT * const _lut;  //Will be Removed.
 
     /// Wires.
     std::vector<const TRGCDCWire *> _wires;
@@ -141,6 +148,8 @@ class TRGCDCSegment : public TRGCDCCell {
     /// EventTime class.
     const TRGCDCEventTime * const _eventTime;
 
+    /// TS LUT file name.
+    std::string m_TSLUTFileName;
   // Friends
     friend class TRGCDC;
 };
@@ -180,10 +189,18 @@ TRGCDCSegment::hit(void) const {
     return  (const TRGCDCSegmentHit *) TRGCDCCell::hit();
 }
 
+// *** Will be removed. -KT
 inline
 const TRGCDCLUT *
 TRGCDCSegment::LUT(void) const {
+//    std::cout << "this function(LUT in Segment.h) will be replaced by new function -ktkim " << std::endl;
     return _lut;
+}
+
+inline
+TRGCDCLUT *
+TRGCDCSegment::nLUT(void)  {  //will be LUT()   -KT
+    return m_TSLUT;
 }
 
 inline

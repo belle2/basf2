@@ -34,6 +34,9 @@ class TRGCDCLUT {
     /// Contructor.
     TRGCDCLUT(const std::string & name, const TRGCDC &);
 
+    //TRGCDCLUT (void);
+    TRGCDCLUT();
+
     /// Destructor
     virtual ~TRGCDCLUT();
 
@@ -42,13 +45,23 @@ class TRGCDCLUT {
     /// returns name.
     std::string name(void) const;
 
+    std::string tmpname(void);
+
     /// returns version.
     std::string version(void) const;
 
-    /// initialize LookUpTable(LUT)
+    /// initialize LookUpTable(LUT).
     void initialize(const std::string & filename);
 
+    /// set LUT data.
+    void setDataFile(const std::string &filename, int);
+
+    /// get LUT Values
+    double getValue(double) const;
+
     /// get LR componet from pattern id. Return value 0:right(decrease phi), 1:left(increase phi), 2:not determined
+    /// get LRLUT component from pattern id.
+    /// return value 0: No TSHIT, 01: Right, 10: Left, 11: Not determined.
     int getLRLUT(int,int) const;
 
     /// get Hit LR component from pattern id.
@@ -58,11 +71,20 @@ class TRGCDCLUT {
 
   private:
 
+    /// LUT data
+    std::vector<int> m_data;
+
+    /// Input bit size
+    int m_bitsize; 
+
+    /// LUT name.
+    std::string m_name;
+
     /// Name.
     const std::string _name;
 
     /// CDCTRG.
-    const TRGCDC & _cdc;
+    //const TRGCDC & _cdc;
 
     /// left/right lookuptable except for inner-most super layer
     int m_LRLUT[2048];
@@ -91,6 +113,11 @@ TRGCDCLUT::name(void) const {
     return _name;
 }
 
+inline
+std::string
+TRGCDCLUT::tmpname(void){
+	return m_name;
+}
 
 } // namespace Belle2
 

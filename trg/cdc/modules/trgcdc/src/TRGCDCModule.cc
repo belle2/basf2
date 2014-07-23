@@ -37,6 +37,8 @@ TRGCDCModule::TRGCDCModule()
       _configFilename("TRGCDCConfig.dat"),
       _innerTSLUTDataFilename("undefined"),
       _outerTSLUTDataFilename("undefined"),
+      _innerTSLUTFilename("undefined"),
+      _outerTSLUTFilename("undefined"),
       _tsfLUTSL0DataFilename("undefined"),
       _tsfLUTSL1DataFilename("undefined"),
       _tsfLUTSL2DataFilename("undefined"),
@@ -74,7 +76,8 @@ TRGCDCModule::TRGCDCModule()
 
     string desc = "TRGCDCModule(" + version() + ")";
     setDescription(desc);
-    setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+//    setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+    setPropertyFlags(c_ParallelProcessingCertified);
 
     addParam("DebugLevel", _debugLevel, "TRGCDC debug level", _debugLevel);
     addParam("ConfigFile",
@@ -89,6 +92,14 @@ TRGCDCModule::TRGCDCModule()
              _outerTSLUTDataFilename,
              "The filename of LUT for outer track segments",
              _outerTSLUTDataFilename);
+    addParam("InnerTSLUTFile",
+	     _innerTSLUTFilename,
+	     "The filename of LUT for inner-most track segments",
+	     _innerTSLUTFilename);
+    addParam("OuterTSLUTFile",
+	     _outerTSLUTFilename,
+	     "The filename of LUT for outer track segments",
+	     _outerTSLUTFilename);
     addParam("TSFLUTSL0DataFile",
              _tsfLUTSL0DataFilename,
              "The filename of LUT for TSF SL0",
@@ -285,6 +296,8 @@ TRGCDCModule::beginRun() {
 				 _perfect3DFinder,
 				 _innerTSLUTDataFilename,
 				 _outerTSLUTDataFilename,
+				 _innerTSLUTFilename,
+				 _outerTSLUTFilename,
 				 _tsfLUTSL0DataFilename,
 				 _tsfLUTSL1DataFilename,
 				 _tsfLUTSL2DataFilename,

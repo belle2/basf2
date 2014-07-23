@@ -70,6 +70,12 @@ class TRGCDCModule : public Module {
     /// The filename of LUT for outer track segments.
     std::string _outerTSLUTDataFilename;
 
+    /// The filename of LUT for the inner-most track segments.(tmp)
+    std::string _innerTSLUTFilename;
+
+    /// The filename of LUT for outer track segments.(tmp)
+    std::string _outerTSLUTFilename;
+
     /// The filename of LUT for track segment finder SL0.
     std::string _tsfLUTSL0DataFilename;
 

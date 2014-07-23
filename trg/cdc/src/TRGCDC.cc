@@ -96,6 +96,8 @@ TRGCDC::getTRGCDC(const string & configFile,
                   bool perfect3DFinder,
                   const string & innerTSLUTDataFile,
                   const string & outerTSLUTDataFile,
+		  const string & innerTSLUTFile,
+		  const string & outerTSLUTFile,
                   const string & tsfLUTSL0DataFile,
                   const string & tsfLUTSL1DataFile,
                   const string & tsfLUTSL2DataFile,
@@ -136,6 +138,8 @@ TRGCDC::getTRGCDC(const string & configFile,
                           perfect3DFinder,
                           innerTSLUTDataFile,
                           outerTSLUTDataFile,
+			  innerTSLUTFile,
+			  outerTSLUTFile,
                           tsfLUTSL0DataFile,
                           tsfLUTSL1DataFile,
                           tsfLUTSL2DataFile,
@@ -187,6 +191,8 @@ TRGCDC::TRGCDC(const string & configFile,
                bool perfect3DFinder,
                const string & innerTSLUTDataFile,
                const string & outerTSLUTDataFile,
+	       const string & innerTSLUTFile,
+	       const string & outerTSLUTFile,
                const string & tsfLUTSL0DataFile,
                const string & tsfLUTSL1DataFile,
                const string & tsfLUTSL2DataFile,
@@ -222,6 +228,8 @@ TRGCDC::TRGCDC(const string & configFile,
       _perfect3DFinder(perfect3DFinder),
       _innerTSLUTDataFilename(innerTSLUTDataFile),
       _outerTSLUTDataFilename(outerTSLUTDataFile),
+      _innerTSLUTFilename(innerTSLUTFile),
+      _outerTSLUTFilename(outerTSLUTFile),
       _tsfLUTSL0DataFilename(tsfLUTSL0DataFile),
       _tsfLUTSL1DataFilename(tsfLUTSL1DataFile),
       _tsfLUTSL2DataFilename(tsfLUTSL2DataFile),
@@ -419,8 +427,8 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
         }
     }
 
-
-    //...LUT for LR decision : common to all TS...
+//******* Will be removed -KT
+    //...LUT for LR decision : common to all TS... 
     _luts.push_back(new TCLUT("TS LUTs", * this));
     _luts.back()->initialize(_innerTSLUTDataFilename);
     _luts.back()->initialize(_outerTSLUTDataFilename);
@@ -541,15 +549,42 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
             }
 
             //...Create a track segment...
-            TRGCDCSegment * ts = new TRGCDCSegment(idTS++,
-                                                   * layer,
-                                                   w,
-                                                   _luts.back(),
-                                                   _clockD,
-                                                   _eventTime.back(),
-                                                   cells);
+//            TRGCDCSegment * ts = new TRGCDCSegment(idTS++,
+//                                                   * layer,
+//                                                   w,
+//                                                   _luts.back(),
+//                                                   _clockD,
+//                                                   _eventTime.back(),
+//						   _innerTSLUTFilename,
+//						   _outerTSLUTFilename,
+//                                                   cells);
+    
+            TRGCDCSegment * ts;
+	if(w.superLayerId()){
 
+            ts = new TRGCDCSegment(idTS++,
+                                   * layer,
+                                   w,
+                                   _luts.back(),  //Will be Removed.
+                                   _clockD,
+                                   _eventTime.back(),
+				   _outerTSLUTFilename,
+                                   cells);
+	}
+
+	else{
+            ts = new TRGCDCSegment(idTS++,
+                                   * layer,
+                                   w,
+                                   _luts.back(),  // Will be removed.
+                                   _clockD,
+                                   _eventTime.back(),
+				   _innerTSLUTFilename,
+                                   cells);
+  	}
+    	    ts->initialize();
             tstmp=ts;
+
             //...Store it...
             _tss.push_back(ts);
             _tsSL[i].push_back(ts);
@@ -584,10 +619,12 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
         }
     }
 
-/*-----------------comment_begin-------------------
+//*-----------------comment_begin-------------------
 
     //...Track Segment Finder...
     _tsFinder = new TSFinder(*this, _fileTSF, _fLogicLUTTSF);
+
+   // _tsFinder->initialize(_innerTSLUTFilename, _outerTSLUTFilename);
 
     //...Perfect 2D Finder...
     _pFinder = new TCPFinder("Perfect2DFinder", * this);
@@ -615,8 +652,7 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
     _fitter3D->initialize();
 
 
-----------------comment_end----------------
-*/
+//----------------comment_end----------------*/
 
     //...For module simulation (Front-end)...
     configure();
@@ -625,7 +661,7 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
     m_eventNum = 1;
 
 
-/*----------------comment_begin-------------------
+//----------------comment_begin-------------------
 
     //...Initialize root file...
     if(_makeRootFile) m_file = new TFile((char*)_rootTRGCDCFilename.c_str(), "RECREATE");
@@ -670,8 +706,8 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
     m_treeROOTInput->Branch("rootTRGHitInformation", &m_rootTRGHitInformation,32000,0);
     m_treeROOTInput->Branch("rootTRGRawInformation", &m_rootTRGRawInformation,32000,0);
 
-----------------comment_end----------------
-*/
+//----------------comment_end----------------
+
 
 
         cout << "               -------------End TRGCDC initialization-------------"<< endl;
@@ -682,7 +718,7 @@ void
 TRGCDC::terminate(void) {
 
         cout << "               -------------A TRGCDC is terminated-------------"<< endl;
-/*
+///*
     if(_tsFinder) {
         _tsFinder->terminate();
     }
@@ -696,7 +732,7 @@ TRGCDC::terminate(void) {
         m_file->Write();
         m_file->Close();
     }
-*/
+//*/
         cout << "               -------------End of termination-------------"<< endl;
 
 }
@@ -1918,6 +1954,7 @@ TRGCDC::~TRGCDC() {
     if (_fitter3D)
         delete _fitter3D;
 
+//******* Will be removed -KT
     for (unsigned i = 0; i < _luts.size(); i++)
         delete _luts[i];
 
@@ -1974,7 +2011,7 @@ TRGCDC::fastSimulation(void) {
     const bool trackSegmentSimulationOnly = _fastSimulationMode & 1;
     const bool trackSegmentClockSimulation = _fastSimulationMode & 2;
 
-    //_tsFinder->doit(_tss, trackSegmentClockSimulation, _segmentHits, _segmentHitsSL);
+    _tsFinder->doit(_tss, trackSegmentClockSimulation, _segmentHits, _segmentHitsSL);
 
     //    //...Store TS hits...
     //    const unsigned n = _tss.size();
@@ -2396,7 +2433,6 @@ TRGCDC::firmwareSimulation(void) {
 
     //const bool trackSegmentSimulationOnly = _fastSimulationMode & 1;
     const bool trackSegmentClockSimulation = _fastSimulationMode & 2;
-
     //...Front ends...
     const unsigned nFronts = _fronts.size();
     for (unsigned i = 0; i < nFronts; i++) {
@@ -2407,7 +2443,7 @@ TRGCDC::firmwareSimulation(void) {
 
         //...Skip other layers to speed up simulation
     //    if ( !(i==254 || i==278) ) continue;
-	if ( i > 49 || i < 10 ) continue;
+//	if ( i > 49 || i < 10 ) continue;
 
         //...FE simulation...
 
@@ -2457,18 +2493,23 @@ TRGCDC::firmwareSimulation(void) {
     //  }
     //}
 
-
     //// 2013,1003: physjg: add to simulate Mergers
     const unsigned nMergers = _mergers.size();
     ////    cout << "Merger no: " << nMergers << endl;
     for (unsigned i = 0; i < nMergers; i++) {
 
-	if ( i > 19 || i < 0 ) continue;
+	//if ( i > 19 || i < 0 ) continue;
 
       _mergers[i]->simulate(); 
 
     }
 
+
+    const unsigned nTSFBoards = _tsfboards.size();
+    for (unsigned i=0;i<nTSFBoards; i++){
+//	if ( i > 1 || i < 0 ) continue;
+	_tsfboards[i]->simulateBoard();
+}
     //...TSF...
     //_tsFinder->doit(_tss, trackSegmentClockSimulation, _segmentHits, _segmentHitsSL);
 
@@ -2688,12 +2729,14 @@ TRGCDC::configure(void) {
         //
         // Or I can put this part inside the new FrontEnd creation part, well, seems not good in coding
 
+	bool newMerger=false;
+        TCMerger * m = 0;
         if (newFrontEnd) {
-            TCMerger * m = 0;
             if (mid != 99999) {
                 if (mid < _mergers.size())
                     m = _mergers[mid];
                 if (! m) {
+		    newMerger = true;
                     const string name = "CDCMerger_" + TRGUtil::itostring(mid);
                     TCMerger::unitType mt = TCMerger::unknown;
                     if (_wires[wid]->superLayerId() == 0) 
@@ -2719,6 +2762,44 @@ TRGCDC::configure(void) {
                 m->appendInput(ch);
             }
         }
+	
+	if (newMerger){
+//	  TCTSFBoard * t=0;
+	  TSFinder * t=0;
+	  if(tid !=99999){
+	    if(tid<_tsfboards.size())
+	      t=_tsfboards[tid];
+	    if(!t){
+	      const string name = "CDCTSFBoard_"+TRGUtil::itostring(tid);
+	      TSFinder::boardType tt=TSFinder::unknown;
+	      if(_wires[wid]->superLayerId()==0)
+	        //tt=TCTSFBoard::innerType;
+	        tt=TSFinder::innerType;
+	      else
+	        //tt=TCTSFBoard::outerType;
+	        tt=TSFinder::outerType;
+//	      t = new TCTSFBoard(name,
+	      t = new TSFinder(*this,
+				 name,
+				 tt,
+				 _clock,
+				 _clockD,
+				 _clockUser3125,
+				 _clockUser6250,
+				 _tsSL[tid]);
+ //  t->initialize(_innerTSLUTFilename, _outerTSLUTFilename);
+	      _tsfboards.push_back(t);
+	    }
+	    t->push_back(m);
+	  }
+
+	  if(m && t){
+	    const string n = m->name() + string("-")+t->name();
+	    TRGChannel * chmt = new TRGChannel (n, *m, *t);
+	    m->appendOutput(chmt);
+	    t->appendInput(chmt);
+	  }
+	}
 
         ++lines;
     }

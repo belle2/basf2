@@ -1644,6 +1644,7 @@ SVDHoughtrackingModule::pxdExtrapolationFull()
   TVector3 mph_pos;
   TGeoHMatrix transfMatrix;
   double* rotMatrix, *transMatrix;
+  unsigned int qOH; /* quality of hit */
   int nTracks, idx;
   VxdID sensorID;
   bool found;
@@ -1661,6 +1662,15 @@ SVDHoughtrackingModule::pxdExtrapolationFull()
     double ttheta = htrack->getTrackTheta();
 
     B2DEBUG(200, "  Track info r:" << r << " phi: " << tphi << " theta: " << ttheta)
+
+    /* Determine qOH */
+    if (r > 500.0) {
+      qOH = 2;
+    } else if (r > 250) {
+      qOH = 1;
+    } else {
+      qOH = 0;
+    }
 
     found = false;
     VXD::GeoCache& geo = VXD::GeoCache::getInstance();
@@ -1723,7 +1733,7 @@ SVDHoughtrackingModule::pxdExtrapolationFull()
                   //extrapolatedHits.push_back(std::make_pair(sensorID, TVector2(y - shift, mph_z - z_shift)));
                   extrapolatedHits.push_back(std::make_pair(sensorID, TVector2(local_pos.X(), local_pos.Y())));
 
-                  storeExtrapolatedHits.appendNew(SVDHoughCluster(idx, mph_pos, sensorID));
+                  storeExtrapolatedHits.appendNew(SVDHoughCluster(idx, mph_pos, sensorID, qOH));
                   ++idx;
                   found = true;
                   break;
@@ -2696,6 +2706,7 @@ SVDHoughtrackingModule::createROI()
     currHit = storeExtrapolatedHits[i];
     pos = currHit->getHitPos();
     sensorID = currHit->getSensorID();
+    unsigned qOH = currHit->getQOH();
 
     static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
     const VXD::SensorInfoBase& info = geo.get(sensorID);
@@ -2705,11 +2716,26 @@ SVDHoughtrackingModule::createROI()
     double width = currentSensor->getWidth();
     double length = currentSensor->getLength();
 
-    /* For lower left edge */
+    /* Determine size of ROI */
     if (fixedSize) {
-      x = local_pos.Y() - ((size_u / 2.0) * 0.0075);
-      y = local_pos.X() - ((size_v / 2.0) * 0.0050);
+      size_v = 12.0;
+      size_u = 160.0;
+    } else {
+      switch (qOH) {
+        case 1:
+          size_v = 10;
+          size_u = 64;
+          break;
+        case 2:
+          size_v = 8;
+          size_u = 16;
+          break;
+      }
     }
+
+    /* For lower left edge */
+    x = local_pos.Y() - ((size_u / 2.0) * 0.0075);
+    y = local_pos.X() - ((size_v / 2.0) * 0.0050);
     if (x < (length / -2.0)) {
       x = length / -2.0;
     }
@@ -2719,10 +2745,8 @@ SVDHoughtrackingModule::createROI()
     v1.Set(x, y);
 
     /* For lower left edge */
-    if (fixedSize) {
-      x = local_pos.Y() + ((size_u / 2.0) * 0.0075);
-      y = local_pos.X() + ((size_v / 2.0) * 0.0050);
-    }
+    x = local_pos.Y() + ((size_u / 2.0) * 0.0075);
+    y = local_pos.X() + ((size_v / 2.0) * 0.0050);
     if (x > (length / 2.0)) {
       x = length / 2.0;
     }

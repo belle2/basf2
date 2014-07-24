@@ -20,6 +20,8 @@ namespace Belle2 {
       unsigned int count_out;
       unsigned long long nword_in;
       unsigned long long nword_out;
+      unsigned short nwriter;
+      unsigned short nreader;
     };
 
   public:
@@ -51,8 +53,9 @@ namespace Belle2 {
     int* getBuffer() throw() { return m_buf; }
     bool isWritable(int nword) throw();
     bool isReadable(int nword) throw();
-    unsigned int write(const int* buf, unsigned int nword, unsigned int serial = 0);
-    unsigned int read(int* buf);
+    unsigned int write(const int* buf, unsigned int nword,
+                       bool fouce, unsigned int serial = 0);
+    unsigned int read(int* buf, bool fouce);
 
   private:
     std::string m_path;

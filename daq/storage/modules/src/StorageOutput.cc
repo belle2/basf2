@@ -49,7 +49,7 @@ void StorageOutputModule::initialize()
   m_expno = m_runno = -1;
   m_count = m_count_0 = 0;
   if (m_obuf_name.size() > 0 && m_obuf_size > 0) {
-    m_obuf.open(m_obuf_name.c_str(), m_obuf_size);
+    m_obuf.open(m_obuf_name.c_str(), m_obuf_size * 1000000);
   } else {
     B2ERROR("Failed to load arguments for shared buffer (" <<
             m_obuf_name.c_str() << ":" << m_obuf_size << ")");
@@ -89,7 +89,7 @@ void StorageOutputModule::event()
   // Stream DataStore in EvtMessage
   EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
   m_obuf.write((int*)msg->buffer(), (msg->size() - 1) / 4 + 1,
-               StorageDeserializerModule::getPackage().getSerial());
+               false, StorageDeserializerModule::getPackage().getSerial());
   m_nbyte += msg->size();
   delete msg;
   if (m_count < 10000 && (m_count < 10 || (m_count > 10 && m_count < 100 && m_count % 10 == 0) ||

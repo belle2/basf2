@@ -86,12 +86,14 @@ int main(int argc, char** argv)
           info.setInputCount(1);
           info.addInputNBytes(nbyte_in);
         }
+        //data.print();
         if (expno > data.getExpNumber() || runno > data.getRunNumber()) {
           B2INFO("storagein: old run event detected : exp="
                  << data.getExpNumber() << " runno="
                  << data.getRunNumber() << " current = ("
                  << expno << "," << runno << ")");
-          continue;
+          return 1;
+          //continue;
         } else if (expno < data.getExpNumber() || runno < data.getRunNumber()) {
           expno = data.getExpNumber();
           runno = data.getRunNumber();
@@ -111,7 +113,7 @@ int main(int argc, char** argv)
             info.setOutputNBytes(0);
           }
         }
-        int nbyte_out = ibuf.write(evtbuf, evtbuf[0]);
+        int nbyte_out = ibuf.write(evtbuf, evtbuf[0], true);
         //data.getByteSize();
         if (info.isAvailable()) {
           info.addOutputCount(1);

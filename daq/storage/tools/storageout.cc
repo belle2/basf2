@@ -37,7 +37,7 @@ int main(int argc, char** argv)
     info.open(argv[4], atoi(argv[5]));
   }
   SharedEventBuffer ibuf;
-  ibuf.open(argv[1], atoi(argv[2]));
+  ibuf.open(argv[1], atoi(argv[2]) * 1000000);
   int* evtbuf = new int[1000000];
   unsigned long long nbyte_in = 0;
   unsigned long long nbyte_out = 0;
@@ -56,7 +56,7 @@ int main(int argc, char** argv)
       info.setInputPort(port);
     }
     while (true) {
-      unsigned int nbyte = ibuf.read(evtbuf);
+      unsigned int nbyte = ibuf.read(evtbuf, false);
       ibuf.lock();
       SharedEventBuffer::Header* iheader = ibuf.getHeader();
       if (expno < iheader->expno || runno < iheader->runno) {

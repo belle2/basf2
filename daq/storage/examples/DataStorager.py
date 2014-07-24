@@ -49,7 +49,7 @@ output = register_module('StorageOutput')
 # output.param('StorageDir', argv[2])
 output.param('OutputBufferName', argv[3])
 output.param('OutputBufferSize', int(argv[4]))
-output.param('compressionLevel', 1)
+output.param('compressionLevel', 0)
 
 # histo = register_module('DqmHistoManager')
 # histo.param('HostName', 'belle-rpc2')
@@ -63,7 +63,7 @@ main = create_path()
 
 # Add modules to main path
 main.add_module(deserializer)
-main.add_module(output)
+# main.add_module(output)
 # main.add_module(histo)
 # main.add_module(monitor)
 

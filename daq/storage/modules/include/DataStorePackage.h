@@ -8,6 +8,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/MsgHandler.h>
+#include <framework/pcore/DataStoreStreamer.h>
 
 #include <daq/slc/system/Mutex.h>
 #include <rawdata/dataobjects/RawPXD.h>
@@ -42,31 +43,20 @@ namespace Belle2 {
     }
 
   public:
-    bool decode(MsgHandler& msghandler);
-    void restore(bool init = true);
-    void copy(DataStorePackage& package);
+    bool restore();
     unsigned int getSerial() const { return m_serial; }
     void setSerial(unsigned int serial) { m_serial = serial; }
-    int getNObjects() const { return m_nobjs; }
-    int getNArrays() const { return m_narrays; }
-    DataStore::EDurability getDurability() const { return m_durability; }
-    std::vector<TObject*> getObjects() const { return m_objlist; }
-    std::vector<std::string> getNameList() const { return m_namelist; }
     const BinData& getData() const { return m_data; }
     const BinData& getHLTData() const { return  m_data_hlt; }
     const BinData& getPXDData() const { return m_data_pxd; }
 
   private:
     unsigned int m_serial;
-    int m_nobjs;
-    int m_narrays;
-    DataStore::EDurability m_durability;
-    std::vector<TObject*> m_objlist;
-    std::vector<std::string> m_namelist;
     BinData m_data;
     BinData m_data_hlt;
     BinData m_data_pxd;
     int* m_buf;
+    DataStoreStreamer m_streamer;
 
   };
 

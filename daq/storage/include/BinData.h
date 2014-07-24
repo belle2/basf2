@@ -72,6 +72,8 @@ namespace Belle2 {
       m_trailer = (BinTrailer*)(m_body + getBodyWordSize());
       return m_trailer->magic;
     }
+    int getNodeId() const { return m_header->node_id; };
+    void setNodeId(int id) { m_header->node_id = id; };
 
   public:
     unsigned int recvEvent(TCPSocket& socket) throw(IOException);
@@ -79,6 +81,7 @@ namespace Belle2 {
     int* getBuffer() { return m_buf; }
     const int* getBuffer() const { return m_buf; }
     void setBuffer(void* buf);
+    void print() throw();
 
   public:
     BinHeader* getHeader() { return m_header; };

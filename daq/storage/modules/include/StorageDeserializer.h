@@ -12,6 +12,8 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
+#include <rawdata/dataobjects/RawCOPPER.h>
+
 #include <daq/storage/SharedEventBuffer.h>
 #include <daq/storage/storage_info.h>
 
@@ -70,6 +72,9 @@ namespace Belle2 {
     unsigned int m_runno;
     unsigned int m_evtno;
     unsigned long long m_datasize;
+    MsgHandler* m_handler;
+
+    StoreArray<RawCOPPER> rawcprarray;
 
   };
 

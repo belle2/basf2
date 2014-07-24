@@ -3,6 +3,7 @@
 #include "daq/slc/base/StringUtil.h"
 
 #include <cstring>
+#include <cstdio>
 
 using namespace Belle2;
 
@@ -58,4 +59,20 @@ throw(IOException)
 unsigned int BinData::sendEvent(TCPSocket& socket) const throw(IOException)
 {
   return socket.write(m_buf, getByteSize());
+}
+
+void BinData::print() throw()
+{
+  printf("headerwords=%d, nwords=%d, nboard=%d, nevent=%d, evtno=%d, expno=%d, runno=%d, subno=%d, nodeid=%d, trailer=%04x\n",
+         getHeaderWordSize(),
+         getWordSize(),
+         //  getBodyWordSize(),
+         getNBoard(),
+         getNEvent(),
+         getEventNumber(),
+         getExpNumber(),
+         getRunNumber(),
+         getSubNumber(),
+         getNodeId(),
+         getTrailerMagic());
 }

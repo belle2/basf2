@@ -124,12 +124,16 @@ bool SharedEventBuffer::isReadable(int nword) throw()
 }
 
 unsigned int SharedEventBuffer::write(const int* buf, unsigned int nword,
-                                      unsigned int serial)
+                                      bool fouce, unsigned int serial)
 {
   if (m_buf == NULL) return 0;
   if (nword == 0) return 0;
   if (nword > m_nword) return -1;
   m_mutex.lock();
+  m_header->nwriter++;
+  while (!fouce && m_header->nreader > 0) {
+    m_cond.wait(m_mutex);
+  }
   unsigned int i_w = 0;
   unsigned int i_r = 0;
   while (true) {
@@ -154,19 +158,26 @@ unsigned int SharedEventBuffer::write(const int* buf, unsigned int nword,
       }
       break;
     }
+    m_header->nwriter--;
     m_cond.wait(m_mutex);
+    m_header->nwriter++;
   }
   m_header->nword_in += nword + 1;
   unsigned int count = ++m_header->count_in;
+  m_header->nwriter--;
   m_cond.broadcast();
   m_mutex.unlock();
   return count;
 }
 
-unsigned int SharedEventBuffer::read(int* buf)
+unsigned int SharedEventBuffer::read(int* buf, bool fouce)
 {
   if (m_buf == NULL) return 0;
   m_mutex.lock();
+  m_header->nreader++;
+  while (!fouce && m_header->nwriter > 0) {
+    m_cond.wait(m_mutex);
+  }
   unsigned int i_w = 0;
   unsigned int i_r = 0;
   unsigned int nword = 0;
@@ -194,10 +205,13 @@ unsigned int SharedEventBuffer::read(int* buf)
         }
       }
     }
+    m_header->nreader--;
     m_cond.wait(m_mutex);
+    m_header->nreader++;
   }
   m_header->nword_out += nword + 1;
   unsigned int count = ++m_header->count_out;
+  m_header->nreader--;
   m_cond.broadcast();
   m_mutex.unlock();
   return count;

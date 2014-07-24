@@ -42,7 +42,7 @@ StorageDeserializerModule::StorageDeserializerModule() : Module()
 
   addParam("CompressionLevel", m_compressionLevel, "Compression level", 0);
   addParam("InputBufferName", m_ibuf_name, "Input buffer name", std::string(""));
-  addParam("InputBufferSize", m_ibuf_size, "Input buffer size", 100000000);
+  addParam("InputBufferSize", m_ibuf_size, "Input buffer size", 100);
   addParam("NodeName", m_nodename, "Node(subsystem) name", std::string(""));
   addParam("NodeID", m_nodeid, "Node(subsystem) ID", 0);
   addParam("UseShmFlag", m_shmflag, "Use shared memory to communicate with Runcontroller", 0);
@@ -61,7 +61,7 @@ void StorageDeserializerModule::initialize()
 {
   B2INFO("StorageDeserializer: initialize() started.");
   if (m_ibuf_name.size() > 0 && m_ibuf_size > 0) {
-    m_ibuf.open(m_ibuf_name, m_ibuf_size);
+    m_ibuf.open(m_ibuf_name, m_ibuf_size * 1000000);
   } else {
     B2ERROR("Failed to load arguments for shared buffer (" <<
             m_ibuf_name.c_str() << ":" << m_ibuf_size << ")");
@@ -73,16 +73,17 @@ void StorageDeserializerModule::initialize()
       m_info.open(m_nodename, m_nodeid);
     }
   }
+  m_handler = new MsgHandler(m_compressionLevel);
+
   StoreArray<RawPXD>::registerPersistent();
   if (m_shmflag > 0) {
     m_info.reportRunning();
   }
   m_count = 0;
+  //rawcprarray.registerPersistent();
   while (true) {
-    m_package.setSerial(m_ibuf.read((int*)m_package.getData().getBuffer()));
-    MsgHandler handler(m_compressionLevel);
-    if (m_package.decode(handler)) {
-      m_package.restore(false);
+    m_package.setSerial(m_ibuf.read((int*)m_package.getData().getBuffer(), false));
+    if (m_package.restore()) {
       if (m_info.isAvailable()) {
         m_info.setInputNBytes(m_package.getData().getByteSize());
         m_info.setInputCount(1);
@@ -96,45 +97,43 @@ void StorageDeserializerModule::initialize()
 void StorageDeserializerModule::event()
 {
   m_count++;
+  //printf("StorageDeserializerModule::event(1) %d\n", m_count);
   if (m_count == 1) return;
   while (true) {
-    while (true) {
-      m_package.setSerial(m_ibuf.read((int*)m_package.getData().getBuffer()));
-      MsgHandler handler(m_compressionLevel);
-      if (m_package.decode(handler)) {
-        m_package.restore();
-        if (m_info.isAvailable()) {
-          m_info.addInputNBytes(m_package.getData().getByteSize());
-          m_info.setInputCount(m_count);
-        }
-        break;
-      }
-    }
-    StoreObjPtr<EventMetaData> evtmetadata;
-    if (evtmetadata.isValid()) {
-      if (m_expno != evtmetadata->getExperiment() ||
-          m_runno != evtmetadata->getRun()) {
-        m_info.setInputNBytes(m_package.getData().getByteSize());
-        m_info.setInputCount(1);
-      }
-      m_expno = evtmetadata->getExperiment();
-      m_runno = evtmetadata->getRun();
-      m_evtno = evtmetadata->getEvent();
+    m_package.setSerial(m_ibuf.read((int*)m_package.getData().getBuffer(), false));
+    if (m_package.restore()) {
       if (m_info.isAvailable()) {
-        m_info.setExpNumber(m_expno);
-        m_info.setRunNumber(m_runno);
-        //m_info.setSubNumber(m_subno);
+        m_info.addInputNBytes(m_package.getData().getByteSize());
+        m_info.setInputCount(m_count);
       }
       break;
-    } else {
-      B2WARNING("NO event meta data " << m_package.getData().getExpNumber() << "." <<
-                m_package.getData().getRunNumber() << "." <<
-                m_package.getData().getEventNumber() << " nword = " <<
-                m_package.getData().getWordSize());
-      B2WARNING("Last event meta data " << m_expno << "." << m_runno << "." << m_evtno);
-      DataStore::Instance().reset();
     }
   }
+  //printf("StorageDeserializerModule::event(2) %d\n", m_count);
+  StoreObjPtr<EventMetaData> evtmetadata;
+  if (evtmetadata.isValid()) {
+    if (m_expno != evtmetadata->getExperiment() ||
+        m_runno != evtmetadata->getRun()) {
+      m_info.setInputNBytes(m_package.getData().getByteSize());
+      m_info.setInputCount(1);
+    }
+    m_expno = evtmetadata->getExperiment();
+    m_runno = evtmetadata->getRun();
+    m_evtno = evtmetadata->getEvent();
+    if (m_info.isAvailable()) {
+      m_info.setExpNumber(m_expno);
+      m_info.setRunNumber(m_runno);
+      //m_info.setSubNumber(m_subno);
+    }
+  } else {
+    B2WARNING("NO event meta data " << m_package.getData().getExpNumber() << "." <<
+              m_package.getData().getRunNumber() << "." <<
+              m_package.getData().getEventNumber() << " nword = " <<
+              m_package.getData().getWordSize());
+    B2WARNING("Last event meta data " << m_expno << "." << m_runno << "." << m_evtno);
+    DataStore::Instance().reset();
+  }
+  //printf("StorageDeserializerModule::event(3) %d\n", m_count);
 }
 
 void StorageDeserializerModule::beginRun()

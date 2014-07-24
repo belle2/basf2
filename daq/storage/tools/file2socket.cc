@@ -49,29 +49,19 @@ int main(int argc, char** argv)
   Time t0;
   double datasize = 0;
   while (true) {
-    //int sstat = read(fd, buf, MAXBUF);
     int sstat = read(fd, buf, sizeof(int));
     if (sstat <= 0) {
       lseek(fd, 0, SEEK_SET);
-      //return 0;
       continue;
     }
     int* recsize = (int*)buf;
     int rstat = read(fd, buf + sizeof(int), (*recsize - 1) * 4);
     if (rstat <= 0) break;
-    /*
-    if (nrec % 1000 == 0) {
-      printf("record %d: size = %d event = %d\n",
-             nrec, recsize[0], recsize[4]);
-    }
-    */
     socket.write(buf, *recsize * 4);
-    //socket.write(buf, sstat);
-    //usleep(10);
     nrec++;
     datasize += sstat;
     datasize += rstat;
-    const int nth = 100000;
+    const int nth = 10000;
     if (nrec % nth == 0) {
       Time t;
       double freq = nth / (t.get() - t0.get()) / 1000. ;

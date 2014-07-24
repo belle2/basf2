@@ -22,113 +22,112 @@
 
 
 namespace Belle2 {
-  namespace TOP {
+  using namespace TOP;
+
+  /**
+   * TOP reconstruction module.
+   */
+  class TOPReconstructorModule : public Module {
+
+  public:
 
     /**
-     * TOP reconstruction module.
+     * Constructor
      */
-    class TOPReconstructorModule : public Module {
+    TOPReconstructorModule();
 
-    public:
+    /**
+     * Destructor
+     */
+    virtual ~TOPReconstructorModule();
 
-      /**
-       * Constructor
-       */
-      TOPReconstructorModule();
+    /**
+     * Initialize the Module.
+     *
+     * This method is called at the beginning of data processing.
+     */
+    virtual void initialize();
 
-      /**
-       * Destructor
-       */
-      virtual ~TOPReconstructorModule();
+    /**
+     * Called when entering a new run.
+     *
+     * Set run dependent things like run header parameters, alignment, etc.
+     */
+    virtual void beginRun();
 
-      /**
-       * Initialize the Module.
-       *
-       * This method is called at the beginning of data processing.
-       */
-      virtual void initialize();
+    /**
+     * Event processor.
+     *
+     */
+    virtual void event();
 
-      /**
-       * Called when entering a new run.
-       *
-       * Set run dependent things like run header parameters, alignment, etc.
-       */
-      virtual void beginRun();
+    /**
+     * End-of-run action.
+     *
+     * Save run-related stuff, such as statistics.
+     */
+    virtual void endRun();
 
-      /**
-       * Event processor.
-       *
-       */
-      virtual void event();
+    /**
+     * Termination action.
+     *
+     * Clean-up, close files, summarize statistics, etc.
+     */
+    virtual void terminate();
 
-      /**
-       * End-of-run action.
-       *
-       * Save run-related stuff, such as statistics.
-       */
-      virtual void endRun();
+    /**
+     * Prints module parameters.
+     */
+    void printModuleParams() const;
 
-      /**
-       * Termination action.
-       *
-       * Clean-up, close files, summarize statistics, etc.
-       */
-      virtual void terminate();
+  private:
 
-      /**
-       * Prints module parameters.
-       */
-      void printModuleParams() const;
+    // Private methods
 
-    private:
+    /**
+     * Return extrapolated hit on TOP, if any
+     * @param track a pointer to reconstructed track
+     * @param chargedStable particle hypothesis used for extrapolation
+     * @return a pointer to extrapolated hit or NULL
+     */
+    const ExtHit* getExtHit(const Track* track, Const::ChargedStable chargedStable);
 
-      // Private methods
+    // Module steering parameters
+    std::string m_inputTracks;       /**< reconstructed tracks (input) */
+    std::string m_inputExtHits;      /**< Ext reconstructed hits (input) */
+    std::string m_inputDigits;       /**< Digitized data (input) */
+    std::string m_inputBarHits;      /**< MC particle hit (to set relation to) */
+    std::string m_outputLikelihoods; /**< TOP log likelihoods (output) */
+    double m_minBkgPerBar;    /**< minimal assumed background photons per bar */
+    double m_scaleN0;         /**< scale factor for N0 */
+    double m_sigmaRphi;    /**< track smearing in Rphi (r.m.s) */
+    double m_sigmaZ;       /**< track smearing in Z (r.m.s) */
+    double m_sigmaTheta;   /**< track smearing in Theta (r.m.s) */
+    double m_sigmaPhi;     /**< track smearing in Phi (r.m.s) */
+    double m_maxTime;      /**< optional time limit for photons */
 
-      /**
-       * Return extrapolated hit on TOP, if any
-       * @param track a pointer to reconstructed track
-       * @param chargedStable particle hypothesis used for extrapolation
-       * @return a pointer to extrapolated hit or NULL
-       */
-      const ExtHit* getExtHit(const Track* track, Const::ChargedStable chargedStable);
+    // others
+    int m_debugLevel;      /**< debug level from logger */
+    bool m_smearTrack;     /**< set to true, if at least one sigma > 0 */
 
-      // Module steering parameters
-      std::string m_inputTracks;       /**< reconstructed tracks (input) */
-      std::string m_inputExtHits;      /**< Ext reconstructed hits (input) */
-      std::string m_inputDigits;       /**< Digitized data (input) */
-      std::string m_inputBarHits;      /**< MC particle hit (to set relation to) */
-      std::string m_outputLikelihoods; /**< TOP log likelihoods (output) */
-      double m_minBkgPerBar;    /**< minimal assumed background photons per bar */
-      double m_scaleN0;         /**< scale factor for N0 */
-      double m_sigmaRphi;    /**< track smearing in Rphi (r.m.s) */
-      double m_sigmaZ;       /**< track smearing in Z (r.m.s) */
-      double m_sigmaTheta;   /**< track smearing in Theta (r.m.s) */
-      double m_sigmaPhi;     /**< track smearing in Phi (r.m.s) */
-      double m_maxTime;      /**< optional time limit for photons */
+    // Geometry parameters
 
-      // others
-      int m_debugLevel;      /**< debug level from logger */
-      bool m_smearTrack;     /**< set to true, if at least one sigma > 0 */
+    TOPGeometryPar* m_topgp;   /**< geometry parameters */
 
-      // Geometry parameters
+    // space for TOP bars including wedges
 
-      TOPGeometryPar* m_topgp;   /**< geometry parameters */
+    double m_R1;   /**< inner radius */
+    double m_R2;   /**< outer radius */
+    double m_Z1;   /**< backward z */
+    double m_Z2;   /**< forward z */
 
-      // space for TOP bars including wedges
+    // Masses of particle hypotheses
 
-      double m_R1;   /**< inner radius */
-      double m_R2;   /**< outer radius */
-      double m_Z1;   /**< backward z */
-      double m_Z2;   /**< forward z */
+    enum {c_Nhyp = 5};        /**< number of hypotheses */
+    double m_Masses[c_Nhyp];  /**< particle masses */
 
-      // Masses of particle hypotheses
+  };
 
-      enum {c_Nhyp = 5};        /**< number of hypotheses */
-      double m_Masses[c_Nhyp];  /**< particle masses */
-
-    };
-
-  } // top namespace
 } // Belle2 namespace
 
 #endif // TOPRECONSTRUCTORMODULE_H

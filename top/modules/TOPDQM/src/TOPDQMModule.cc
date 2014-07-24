@@ -125,7 +125,7 @@ namespace Belle2 {
     // Register histograms (calls back defineHisto)
     REG_HISTOGRAM;
 
-    StoreArray<TOPDigit>::required();
+    StoreArray<TOPDigit>::required(m_storeDigitsName);
 
   }
 
@@ -136,7 +136,7 @@ namespace Belle2 {
   void TOPDQMModule::event()
   {
 
-    StoreArray<TOPDigit> digits;
+    StoreArray<TOPDigit> digits(m_storeDigitsName);
 
     for (TOPDigit & digit : digits) {
       m_barHits->Fill(digit.getBarID());

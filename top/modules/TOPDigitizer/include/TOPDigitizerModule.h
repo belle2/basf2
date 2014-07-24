@@ -15,78 +15,80 @@
 #include <top/geometry/TOPGeometryPar.h>
 #include <string>
 
+
 namespace Belle2 {
-  namespace TOP {
-    //! TOP digitizer module.
-    /*
-     * This module takes hits form G4 simulation (TOPSimHit),
-     * applies TTS, T0jitter and do spatial and time digitization
-     * (QE moved to the simulation: applied in SensitiveBar, SensitivePMT)
-     * output to TOPDigiHit.
+
+  using namespace TOP;
+
+  //! TOP digitizer module.
+  /*
+   * This module takes hits form G4 simulation (TOPSimHit),
+   * applies TTS, T0jitter and do spatial and time digitization
+   * (QE moved to the simulation: applied in SensitiveBar, SensitivePMT)
+   * output to TOPDigiHit.
+   */
+  class TOPDigitizerModule : public Module {
+
+  public:
+
+    //! Constructor.
+    TOPDigitizerModule();
+
+    //! Destructor.
+    virtual ~TOPDigitizerModule();
+
+    /**
+     * Initialize the Module.
+     * This method is called at the beginning of data processing.
      */
-    class TOPDigitizerModule : public Module {
+    virtual void initialize();
 
-    public:
+    /**
+     * Called when entering a new run.
+     * Set run dependent things like run header parameters, alignment, etc.
+     */
+    virtual void beginRun();
 
-      //! Constructor.
-      TOPDigitizerModule();
+    /**
+     * Event processor.
+     * Convert TOPSimHits to TOPDigiHits.
+     */
+    virtual void event();
 
-      //! Destructor.
-      virtual ~TOPDigitizerModule();
+    /**
+     * End-of-run action.
+     * Save run-related stuff, such as statistics.
+     */
+    virtual void endRun();
 
-      /**
-       * Initialize the Module.
-       * This method is called at the beginning of data processing.
-       */
-      virtual void initialize();
+    /**
+     * Termination action.
+     * Clean-up, close files, summarize statistics, etc.
+     */
+    virtual void terminate();
 
-      /**
-       * Called when entering a new run.
-       * Set run dependent things like run header parameters, alignment, etc.
-       */
-      virtual void beginRun();
+    /**
+     * Prints module parameters.
+     */
+    void printModuleParams() const;
 
-      /**
-       * Event processor.
-       * Convert TOPSimHits to TOPDigiHits.
-       */
-      virtual void event();
+  private:
 
-      /**
-       * End-of-run action.
-       * Save run-related stuff, such as statistics.
-       */
-      virtual void endRun();
+    std::string m_inputSimHits;    /**< Input collection name */
+    std::string m_outputDigits;    /**< Output collection name */
+    double m_timeZeroJitter;       /**< r.m.s of T0 jitter */
+    double m_electronicJitter;     /**< r.m.s of electronic jitter */
+    double m_electronicEfficiency; /**< electronic efficiency */
+    double m_darkNoise;            /**< uniform dark noise (hits per bar) */
 
-      /**
-       * Termination action.
-       * Clean-up, close files, summarize statistics, etc.
-       */
-      virtual void terminate();
+    //! Geometry parameters reading object
+    TOPGeometryPar* m_topgp;
 
-      /**
-       * Prints module parameters.
-       */
-      void printModuleParams() const;
+    //! Returns random number according to TTS distribution
+    double PMT_TTS();
 
-    private:
+  };
 
-      std::string m_inputSimHits;    /**< Input collection name */
-      std::string m_outputDigits;    /**< Output collection name */
-      double m_timeZeroJitter;       /**< r.m.s of T0 jitter */
-      double m_electronicJitter;     /**< r.m.s of electronic jitter */
-      double m_electronicEfficiency; /**< electronic efficiency */
-      double m_darkNoise;            /**< uniform dark noise (hits per bar) */
-
-      //! Geometry parameters reading object
-      TOPGeometryPar* m_topgp;
-
-      //! Returns random number according to TTS distribution
-      double PMT_TTS();
-
-    };
-
-  } // top namespace
 } // Belle2 namespace
 
 #endif // TOPDIGITIZERMODULE_H

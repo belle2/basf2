@@ -1,32 +1,8 @@
 \clearpage
-\cprotect\section{Overview: \verb|${channelName}|}
+\cprotect\subsection{Channel: \verb|${channelName}|}
 \FloatBarrier
-\subsection{Pre-cut determination}
-\begin{figure}[htb]
-  \centering
-  \begin{subfigure}[b]{0.42\textwidth}
-    \includegraphics[width=\textwidth]{${preCutAllPlot}}
-    \caption{All possible combinations}
-  \end{subfigure}\hfill
-  \begin{subfigure}[b]{0.42\textwidth}
-    \includegraphics[width=\textwidth]{${preCutSignalPlot}}
-    \caption{Only signal combinations}
-  \end{subfigure}\hfill
-  \begin{subfigure}[b]{0.42\textwidth}
-    \includegraphics[width=\textwidth]{${preCutBackgroundPlot}}
-    \caption{Only background combinations}
-  \end{subfigure}\hfill
-  \begin{subfigure}[b]{0.42\textwidth}
-    \includegraphics[width=\textwidth]{${preCutRatioPlot}}
-    \caption{Ratio of signal and background histograms}
-  \end{subfigure}
-  \caption{Variable \emph{${preCutVariable}} for combinations of daughter candidates of this channel.
-           The PreCut range $$ ${preCutRange} $$ for this channel is marked with vertical lines in the plots above.
-           The PreCuts were determined on variable \emph{${preCutVariable}} with a required total signal efficiency ${preCutEfficiency}.
-           For this channel only the efficiency is ${channelEfficiency} with a purity of ${channelPurity}, corresponding to
-           ${channelNSignal} signal and ${channelNBackground} background events.}
-
-\end{figure}
-
-%MVA sections go here
+\clearpage
+\input{${preCutTexFile}}
+\clearpage
 \input{${mvaTexFile}}
+

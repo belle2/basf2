@@ -160,6 +160,9 @@ def FullEventInterpretation(path, particles):
     # Add the basf2 module path
     seq = actorFramework.Sequence()
 
+    # Add MCParticle counter to get the correct number of true electrons,... in the sample.
+    seq.addFunction(CountMCParticles, path='Path')
+
     # Now loop over all given particles, foreach particle we add some Resources and Actors.
     for particle in particles:
         ########## RESOURCES #############
@@ -191,8 +194,7 @@ def FullEventInterpretation(path, particles):
                             particleName='Name_' + particle.name,
                             channelName='None',
                             inputLists=['RawParticleList_' + particle.name],
-                            postCut='PostCut_' + particle.name,
-                            pdf='PDF_' + particle.name)
+                            postCut='PostCut_' + particle.name)
         else:
             for channel in particle.channels:
                 seq.addFunction(MakeAndMatchParticleList,
@@ -206,16 +208,14 @@ def FullEventInterpretation(path, particles):
                             particleName='Name_' + particle.name,
                             channelName='None',
                             inputLists=['RawParticleList_' + channel.name + '_' + particle.name for channel in particle.complete_channels],
-                            postCut='PostCut_' + particle.name,
-                            pdf='PDF_' + particle.name)
+                            postCut='PostCut_' + particle.name)
             for channel in particle.incomplete_channels:
                 seq.addFunction(CopyParticleLists,
                                 path='Path',
                                 particleName='Name_' + particle.name,
                                 channelName='Name_' + channel.name,
                                 inputLists=['RawParticleList_' + channel.name + '_' + particle.name],
-                                postCut='PostCut_' + particle.name,
-                                pdf='PDF_' + particle.name)
+                                postCut='PostCut_' + particle.name)
 
         ############# PRECUT DETERMINATION ############
         # Intermediate PreCut part of FullReconstruction algorithm.
@@ -273,35 +273,31 @@ def FullEventInterpretation(path, particles):
 
         ################ Information ACTORS #################
         for channel in particle.channels:
-            seq.addFunction(WriteAnalysisFileForMVA,
-                            particleName='Name_' + particle.name,
-                            channelName='Name_' + channel.name,
-                            particleList='RawParticleList_' + channel.name + '_' + particle.name,
-                            mvaConfig='MVAConfig_' + channel.name,
-                            signalProbability='SignalProbability_' + channel.name + '_' + particle.name)
 
             seq.addFunction(WriteAnalysisFileForChannel,
                             particleName='Name_' + particle.name,
                             channelName='Name_' + channel.name,
-                            channelList='RawParticleList_' + channel.name + '_' + particle.name,
                             preCutConfig='PreCutConfig_' + particle.name,
-                            preCutHistogram='PreCutHistogram_' + channel.name,
                             preCut='PreCut_' + channel.name,
-                            mvaTexFile='MVATex_' + channel.name)
+                            preCutHistogram='PreCutHistogram_' + channel.name,
+                            mvaConfig='MVAConfig_' + channel.name,
+                            signalProbability='SignalProbability_' + channel.name + '_' + particle.name,
+                            postCutConfig='PostCutConfig_' + particle.name,
+                            postCut='PostCut_' + particle.name)
 
         if particle.isFSP:
-            seq.addFunction(WriteAnalysisFileForMVA,
+            seq.addFunction(WriteAnalysisFileForFSParticle,
                             particleName='Name_' + particle.name,
-                            channelName='Name_' + particle.name,
-                            particleList='RawParticleList_' + particle.name,
                             mvaConfig='MVAConfig_' + particle.name,
-                            signalProbability='SignalProbability_' + particle.name)
-
-        seq.addFunction(WriteAnalysisFileForParticle,
-                        particleName='Name_' + particle.name,
-                        postCutConfig='PostCutConfig_' + particle.name,
-                        postCut='PostCut_' + particle.name,
-                        texfiles=['Tex_' + channel.name for channel in particle.channels] + (['MVATex_' + particle.name] if particle.isFSP else []))
+                            signalProbability='SignalProbability_' + particle.name,
+                            postCutConfig='PostCutConfig_' + particle.name,
+                            postCut='PostCut_' + particle.name,
+                            mcCounts='MCParticleCounts')
+        else:
+            seq.addFunction(WriteAnalysisFileForCombinedParticle,
+                            particleName='Name_' + particle.name,
+                            channelPlaceholders=['Placeholders_' + channel.name for channel in particle.channels],
+                            mcCounts='MCParticleCounts')
 
     #TODO: don't hardcode B0/B+ here
     seq.addFunction(VariablesToNTuple,
@@ -317,12 +313,14 @@ def FullEventInterpretation(path, particles):
                     signalProbability='SignalProbability_B+')
 
     seq.addFunction(WriteAnalysisFileSummary,
-                    pdffiles=['PDF_' + particle.name for particle in particles],
+                    finalStateParticlePlaceholders=['Placeholders_' + particle.name for particle in particles if particle.isFSP],
+                    combinedParticlePlaceholders=['Placeholders_' + particle.name for particle in particles if not particle.isFSP],
                     ntuples=['VariablesToNTuple_B0'])  # , 'VariablesToNTuple_B+'])
 
     seq.addNeeded('SignalProbability_B+')
     seq.addNeeded('SignalProbability_B0')
     seq.addNeeded('ParticleList_B0')
     seq.addNeeded('ParticleList_B+')
+    seq.addNeeded('FEIsummary.pdf')
 
     seq.run(path, args.verbose)

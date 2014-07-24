@@ -18,11 +18,44 @@ import pdg
 
 import actorFramework
 import preCutDetermination
-from makeDiagPlotForTMVA import makeDiagPlots
-from makeMbcPlot import makeMbcPlot
+import automaticReporting
+
 import os
 import subprocess
+import json
 from string import Template
+import IPython
+
+
+def CountMCParticles(path):
+    """
+    Counts the number of MC Particles for every pdg code in all events
+        @param path the basf2 path
+    """
+    filename = 'mcParticlesCount.json'
+    if not os.path.isfile(filename):
+        class MCParticleCounter(Module):
+            def initialize(self):
+                self.counter = {}
+
+            def event(self):
+                particles = ROOT.Belle2.PyStoreArray("MCParticles")
+                for particle in particles:
+                    pdg = abs(particle.getPDG())
+                    if pdg not in self.counter:
+                        self.counter[pdg] = 0
+                    self.counter[pdg] += 1
+
+            def terminate(self):
+                json.dump(self.counter, open(filename, 'w'))
+
+        path.add_module(MCParticleCounter())
+        B2INFO("Count number of MCParticles for every pdg code seperatly")
+        return {}
+    else:
+        counter = json.load(open(filename, 'r'))
+        B2INFO("Loaded number of MCParticles for every pdg code seperatly")
+        return {'MCParticleCounts': counter}
 
 
 def SelectParticleList(path, particleName):
@@ -40,7 +73,7 @@ def SelectParticleList(path, particleName):
             'RawParticleList_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
 
 
-def CopyParticleLists(path, particleName, channelName, inputLists, postCut, pdf):
+def CopyParticleLists(path, particleName, channelName, inputLists, postCut):
     """
     Creates a ParticleList gathering up all particles in the given inputLists
         @param path the basf2 path
@@ -48,7 +81,6 @@ def CopyParticleLists(path, particleName, channelName, inputLists, postCut, pdf)
         @param channelName if not None returned key is named ParticleList_{channelName}_{particleName} corresponding ParticleList is stored as {particleName}:{hash}
         @param inputLists names of inputLists which are copied to the new list
         @param postCut cuts which are applied after the reconstruction of the particle
-        @param pdf dependency to particle overview pdf, to trigger the generation of the overview PDF as soon as the particle is available
     """
     inputLists = actorFramework.removeNones(inputLists)
 
@@ -279,251 +311,83 @@ def PostCutDetermination(particleName, postCutConfig, signalProbability):
     return {'PostCut_' + particleName: {'cutstring': str(postCutConfig.value) + ' < getExtraInfo(SignalProbability)', 'range': (postCutConfig.value, 1)}}
 
 
-def escapeForLatex(someString):
-    """
-    Used to escape user strings for LaTex.
-    """
-    return someString.replace('\\', r'\\').replace('_', r'\_').replace('^', r'\^{}')
-
-
-def WriteAnalysisFileForMVA(particleName, channelName, particleList, mvaConfig, signalProbability):
+def WriteAnalysisFileForChannel(particleName, channelName, preCutConfig, preCut, preCutHistogram, mvaConfig, signalProbability, postCutConfig, postCut):
     """
     Creates a pdf document with the PreCut and Training plots
         @param particleName name of the particle
         @param channelName name of the channel
-        @param particleList ParticleList name of the channel
+        @param preCutConfig configuration for pre cut
+        @param preCutHistogram preCutHistogram (filename, histogram postfix)
+        @param preCut used preCuts for this channel
         @param mvaConfig configuration for mva
         @param signalProbability config filename for TMVA training
     """
 
-    if signalProbability is None:
-        B2INFO("Write MVA tex file for channel " + channelName + " and charged conjugated. But channel is ignored.")
-        return {'MVATex_' + channelName: None}
-
-    ROOT.gROOT.SetBatch(True)
-
-    # Create TMVA Plots
-    tmva_filename = signalProbability[:-7] + '.root'  # Strip .config of filename
-
-    overtrainingPlot = particleList + '_overtraining.png'
-    if not os.path.isfile(overtrainingPlot):
-        subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/mvas.C(\\"{f}\\",3)"'.format(f=tmva_filename)], shell=True)
-        subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=overtrainingPlot)], shell=True)
-
-    rocPlot = particleList + '_roc.png'
-    if not os.path.isfile(rocPlot):
-        subprocess.call(['root -l -q -b "$BELLE2_EXTERNALS_DIR/src/root/tmva/test/efficiencies.C(\\"{f}\\")"'.format(f=tmva_filename)], shell=True)
-        subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=rocPlot)], shell=True)
-
-    # Create diag plots
-    diagPlotFile = particleList + '_diag_' + mvaConfig.name + '.pdf'
-    if not os.path.isfile(diagPlotFile):
-        B2INFO("plot " + diagPlotFile + " doesn't exist, creating it")
-        makeDiagPlots(tmva_filename, particleList)
-
-    # Get number of events in training
-    rootfile = ROOT.TFile(tmva_filename)
-    trainTree = rootfile.Get('TrainTree')
-    nsignal = trainTree.GetEntries('className == "Signal"')
-    nbckgrd = trainTree.GetEntries('className == "Background"')
-
     placeholders = {}
-
-    placeholders['particleName'] = particleName
-    placeholders['channelName'] = channelName
-
-    placeholders['mvaNSignal'] = int(nsignal)
-    placeholders['mvaNBackground'] = int(nbckgrd)
-
-    placeholders['mvaName'] = mvaConfig.name
-    placeholders['mvaType'] = mvaConfig.type
-    placeholders['mvaConfig'] = mvaConfig.config
-    placeholders['mvaTarget'] = mvaConfig.target
-    placeholders['mvaTargetCluster'] = mvaConfig.targetCluster
-
-    placeholders['mvaROCPlot'] = rocPlot
-    placeholders['mvaOvertrainingPlot'] = overtrainingPlot
-    placeholders['mvaDiagPlot'] = diagPlotFile
-
-    from variables import variables
-    placeholders['mvaVariables'] = ''
-    for v in mvaConfig.variables:
-        varName = escapeForLatex(v)
-        description = escapeForLatex(variables.getVariable(v).description)
-        placeholders['mvaVariables'] += r'\texttt{' + varName + r'} & ' + description + r' \\'
-
-    filename = 'MVA_' + particleList + '.tex'
-    if not os.path.isfile(filename):
-        template = Template(file(ROOT.Belle2.FileSystem.findFile('analysis/scripts/FullEventInterpretationMVATemplate.tex'), 'r').read())
-        page = template.substitute(placeholders)
-        file(filename, 'w').write(page)
-        B2INFO("Write MVA tex file for channel " + channelName + " and charged conjugated.")
-    else:
-        B2INFO("Write MVA tex file for channel " + channelName + " and charged conjugated. But file already exists, nothing to do here.")
-    return {'MVATex_' + channelName: (filename, placeholders)}
-
-
-def WriteAnalysisFileForChannel(particleName, channelName, channelList, preCutConfig, preCutHistogram, preCut, mvaTexFile):
-    """
-    Creates a pdf document with the PreCut and Training plots
-        @param particleName name of the particle
-        @param channelName name of the channel
-        @param channelList ParticleList name of the channel
-        @param preCutConfig configuration for pre cut
-        @param preCutHistogram preCutHistogram (filename, histogram postfix)
-        @param preCut used preCuts for this channel
-        @param mvaTexFile .tex file produced for network
-    """
-    placeholders = {}
-
     placeholders['particleName'] = particleName
     placeholders['channelName'] = channelName
     placeholders['isIgnored'] = False
+    placeholders = automaticReporting.createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut)
+    placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, postCut)
 
-    if mvaTexFile is None or preCut is None:
-        placeholders['isIgnored'] = True
-        B2INFO("Write analysis tex file for channel " + channelName + " and charged conjugated. But channel is ignored.")
-        return {'Tex_' + channelName: (None, placeholders)}
+    hash = actorFramework.createHash(placeholders)
+    placeholders['texFile'] = '{name}_channel_{hash}.tex'.format(name=placeholders['particleName'], hash=hash)
+    if not os.path.isfile(placeholders['texFile']):
+        automaticReporting.createTexFile(placeholders['texFile'], 'analysis/scripts/FullEventInterpretationChannelTemplate.tex', placeholders)
 
-    ROOT.gROOT.SetBatch(True)
-
-    # Create PreCut Hist Plots
-    rootfile = ROOT.TFile(preCutHistogram[0])
-    names = ['signal', 'all', 'background', 'ratio']
-    keys = rootfile.GetListOfKeys()
-    lc, uc = preCut['range']
-    for (name, key) in zip(names, keys):
-        plotName = channelList + '_' + name + '.png'
-        if not os.path.isfile(plotName):
-            canvas = ROOT.TCanvas(name + channelList + '_canvas', name, 600, 400)
-            canvas.cd()
-            hist = rootfile.Get(key.GetName())
-            hist.Draw()
-            ll = ROOT.TLine(lc, 0, lc, hist.GetMaximum())
-            ul = ROOT.TLine(uc, 0, uc, hist.GetMaximum())
-            ll.Draw()
-            ul.Draw()
-            canvas.SaveAs(plotName)
-
-    # Calculate purity and efficiency for this channel
-    signal_hist = rootfile.Get(keys.At(0).GetName())
-    background_hist = rootfile.Get(keys.At(2).GetName())
-
-    ntotalsignal = signal_hist.Integral()
-    nsignal = preCutDetermination.GetNumberOfEventsInRange(signal_hist, (lc, uc))
-    nbckgrd = preCutDetermination.GetNumberOfEventsInRange(background_hist, (lc, uc))
-
-    purity = nsignal / (nsignal + nbckgrd)
-    efficiency = nsignal / ntotalsignal
-
-    placeholders['channelNSignal'] = int(nsignal)
-    placeholders['channelNBackground'] = int(nbckgrd)
-    placeholders['channelPurity'] = '{:.5f}'.format(purity)
-    placeholders['channelEfficiency'] = '{:.3f}'.format(efficiency)
-
-    placeholders['preCutVariable'] = preCutConfig.variable
-    placeholders['preCutEfficiency'] = '{:.2f}'.format(preCutConfig.efficiency)
-    a, b = preCut['range']
-    placeholders['preCutRange'] = 'Ignored' if preCut is None else '({:.2f},'.format(a) + ' {:.2f}'.format(b) + ')'
-
-    placeholders['preCutAllPlot'] = channelList + '_all.png'
-    placeholders['preCutSignalPlot'] = channelList + '_signal.png'
-    placeholders['preCutBackgroundPlot'] = channelList + '_background.png'
-    placeholders['preCutRatioPlot'] = channelList + '_ratio.png'
-    placeholders['mvaTexFile'] = mvaTexFile[0][:-4]
-
-    filename = channelList + '.tex'
-    if not os.path.isfile(filename):
-        template = Template(file(ROOT.Belle2.FileSystem.findFile('analysis/scripts/FullEventInterpretationChannelTemplate.tex'), 'r').read())
-        page = template.substitute(placeholders)
-        file(filename, 'w').write(page)
-        B2INFO("Write analysis tex file for channel " + channelName + " and charged conjugated.")
-    else:
-        B2INFO("Write analysis tex file for channel " + channelName + " and charged conjugated. But file already exists, nothing to do here.")
-    return {'Tex_' + channelName: (filename, placeholders)}
+    B2INFO("Written analysis tex file for channel " + channelName)
+    return {'Placeholders_' + channelName: placeholders}
 
 
-def WriteAnalysisFileForParticle(particleName, postCutConfig, postCut, texfiles):
+def WriteAnalysisFileForFSParticle(particleName, mvaConfig, signalProbability, postCutConfig, postCut, mcCounts):
     """
     Creates a pdf document with the PreCut and Training plots
         @param particleName name of the particle
-        @param preCutConfig configuration for post cut
-        @param preCut used postCut for this particle
-        @param texfiles list of tex filenames
+        @param mvaConfig configuration for mva
+        @param signalProbability config filename for TMVA training
     """
-    filename = particleName + '.tex'
-    if not os.path.isfile(filename):
 
-        placeholders = {}
-        placeholders['NChannels'] = len(texfiles)
+    placeholders = {}
+    placeholders['particleName'] = particleName
+    placeholders['isIgnored'] = False
+    placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, postCut)
+    placeholders = automaticReporting.createFSParticleTexFile(placeholders, mcCounts)
 
-        placeholders['channelListAsItems'] = ""
-        for texfile, channelPlaceholders in texfiles:
-            if texfile is None:
-                placeholders['channelListAsItems'] += "\\item {name} was ignored\n".format(name=channelPlaceholders['channelName'])
-            else:
-                placeholders['channelListAsItems'] += "\\item {name}\n".format(name=channelPlaceholders['channelName'])
-
-        texfiles = [(x, y) for x, y in texfiles if x is not None]
-        placeholders['NUsedChannels'] = len(texfiles)
-
-        a, b = postCut['range']
-        placeholders['postCutRange'] = 'Ignored' if postCut is None else '({:.5f},'.format(a) + ' {:.5f}'.format(b) + ')'
-
-        placeholders['particleName'] = particleName
-        placeholders['channelInputs'] = ""
-        placeholders['particleNSignal'] = 0
-        placeholders['particleNBackground'] = 0
-        for texfile, channelPlaceholders in texfiles:
-            if 'channelNSignal' in channelPlaceholders:
-                B2WARNING("normal channel, " + texfile)
-                placeholders['particleNSignal'] += channelPlaceholders['channelNSignal']
-                placeholders['particleNBackground'] += channelPlaceholders['channelNBackground']
-                placeholders['channelInputs'] += '\input{' + texfile[:-4] + '}\n'
-            else:
-                placeholders['particleNSignal'] += channelPlaceholders['mvaNSignal']
-                placeholders['particleNBackground'] += channelPlaceholders['mvaNBackground']
-                placeholders['channelInputs'] += '\input{' + texfile[:-4] + '}\n'
-
-        template = Template(file(ROOT.Belle2.FileSystem.findFile('analysis/scripts/FullEventInterpretationParticleTemplate.tex'), 'r').read())
-        page = template.substitute(placeholders)
-
-        file(filename, 'w').write(page)
-
-        ret = subprocess.call(['pdflatex', '-halt-on-error', filename])
-        if ret == 0:
-            B2INFO("Write analysis tex file and create pdf for particle " + particleName + " and charged conjugated.")
-        else:
-            B2ERROR("pdflatex failed for file '" + filename + "', please check.")
-    else:
-        B2INFO("Write analysis tex file and create pdf for particle " + particleName + " and charged conjugated. But file already exists, nothing to do here.")
-
-    return {'PDF_' + particleName: filename[:-4] + '.pdf'}
+    B2INFO("Written analysis tex file for final state particle " + particleName)
+    return {'Placeholders_' + particleName: placeholders}
 
 
-def WriteAnalysisFileSummary(pdffiles, ntuples):
+def WriteAnalysisFileForCombinedParticle(particleName, channelPlaceholders, mcCounts):
+    """
+    Creates a pdf document with the PreCut and Training plots
+        @param particleName name of the particle
+        @param channelPlaceholders list of all tex placeholder dictionaries of all channels
+    """
+
+    placeholders = {'channels': channelPlaceholders}
+    placeholders['particleName'] = particleName
+    placeholders['isIgnored'] = False
+    placeholders = automaticReporting.createCombinedParticleTexFile(placeholders, channelPlaceholders, mcCounts)
+
+    B2INFO("Written analysis tex file for intermediate particle " + particleName)
+    return {'Placeholders_' + particleName: placeholders}
+
+
+def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePlaceholders, ntuples):
     """
     Creates a pdf summarizing all networks trained.
         @param texfiles list of tex filenames
     """
 
-    #gather the previously produced PDFs
-    fileList = []
-    for fileName in pdffiles:
-        #fileName = f[4:] + '.pdf'
-        if os.path.isfile(fileName):
-            fileList.append(fileName)
+    placeholders = automaticReporting.createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, ntuples)
 
-    #create Mbc plots
-    B2WARNING("i got these ntuples: " + str(ntuples))
-    for ntupleFile in ntuples:
-        outputFile = ntupleFile[:-5] + '_mbc.pdf'
-        makeMbcPlot(ntupleFile, outputFile)
-        fileList.append(outputFile)
-
-    #TODO: overall efficiencies in our channels
-
-    subprocess.call(['pdfunite'] + fileList + ['FEIsummary.pdf'])
+    for i in range(0, 2):
+        ret = subprocess.call(['pdflatex', '-halt-on-error', placeholders['texFile']])
+        if ret == 0:
+            B2INFO("Created FEI summary PDF.")
+        else:
+            B2ERROR("pdflatex failed to create FEI summary PDF, please check.")
 
     # Return None - Therefore Particle List depends not on TMVAExpert directly
-    return {'PDF_FEIsummary': None}
+    B2INFO("Created analysis summary pdf file ")
+    return {'FEIsummary.pdf': None}

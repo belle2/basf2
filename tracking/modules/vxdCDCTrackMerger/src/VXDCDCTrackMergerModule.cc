@@ -1,4 +1,4 @@
-#include <tracking/modules/vxdCDCTrackMerger/inc/VXDCDCTrackMergerModule.h>
+#include <tracking/modules/vxdCDCTrackMerger/VXDCDCTrackMergerModule.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/StoreArray.h>

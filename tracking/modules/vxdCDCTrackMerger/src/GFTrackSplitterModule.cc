@@ -1,4 +1,4 @@
-#include <tracking/modules/vxdCDCTrackMerger/inc/GFTrackSplitterModule.h>
+#include <tracking/modules/vxdCDCTrackMerger/GFTrackSplitterModule.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>

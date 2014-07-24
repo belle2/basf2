@@ -1,5 +1,5 @@
-#include <tracking/modules/vxdCDCTrackMerger/inc/VXDCDCTrackMergerAnalysisModule.h>
-#include <tracking/modules/vxdCDCTrackMerger/inc/VXDCDCTrackMergerModule.h>
+#include <tracking/modules/vxdCDCTrackMerger/VXDCDCTrackMergerAnalysisModule.h>
+#include <tracking/modules/vxdCDCTrackMerger/VXDCDCTrackMergerModule.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>

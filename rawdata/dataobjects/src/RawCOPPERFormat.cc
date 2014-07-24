@@ -16,6 +16,101 @@ using namespace Belle2;
 ClassImp(RawCOPPERFormat);
 
 
+RawCOPPERFormat::RawCOPPERFormat()
+{
+  m_nwords = 0;
+  m_num_nodes = 0;
+  m_num_events = 0;
+  m_buffer = NULL;
+
+}
+
+
+//
+// Functions for RawDataBlock
+//
+
+
+void RawCOPPERFormat::PrintData(int* buf, int nwords)
+{
+  printf("[DEBUG] ");
+  for (int i = 0; i < nwords; i++) {
+    printf("%.8x ", buf[ i ]);
+    if (i % 10 == 9) printf("\n[DEBUG] ");
+  }
+  printf("\n[DEBUG] ");
+  printf("\n");
+  return;
+}
+
+
+int RawCOPPERFormat::TotalBufNwords()
+{
+  return m_nwords;
+}
+
+
+int RawCOPPERFormat::GetBlockNwords(int n)
+{
+  int size;
+  if (n == (m_num_events * m_num_nodes) - 1) {
+    size =  m_nwords - GetBufferPos(n);
+  } else {
+    size = GetBufferPos(n + 1) - GetBufferPos(n);
+  }
+  return size;
+}
+
+
+int* RawCOPPERFormat::GetWholeBuffer()
+{
+  return m_buffer;
+}
+
+int* RawCOPPERFormat::GetBuffer(int n)
+{
+  int pos_nwords = GetBufferPos(n);
+  return &(m_buffer[ pos_nwords ]);
+}
+
+
+
+
+void RawCOPPERFormat::SetBuffer(int* bufin, int nwords, int malloc_flag, int num_events, int num_nodes)
+{
+  if (malloc_flag  == 1) {
+    printf("RawCOPPER format class does not delete m_buffer. Please specify 0 for malloc_flag. Exiting...\n");
+    exit(1);
+  }
+
+  if (bufin == NULL) {
+    printf("[DEBUG] bufin is NULL. Exting...\n");
+    exit(1);
+  }
+
+//   if (!m_use_prealloc_buf && m_buffer != NULL) delete[] m_buffer;
+//   if (malloc_flag == 0) {
+//     m_use_prealloc_buf = true;
+//   } else {
+//     m_use_prealloc_buf = false;
+//   }
+
+  m_nwords = nwords;
+  m_buffer = bufin;
+
+  m_num_nodes = num_nodes;
+  m_num_events = num_events;
+
+  // Set length at the first word of the buffer
+
+  //
+  // Assign header and trailer
+  //
+
+}
+
+
+
 unsigned int  RawCOPPERFormat::CalcXORChecksum(int* buf, int nwords)
 {
   unsigned int checksum = 0;

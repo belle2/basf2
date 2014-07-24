@@ -790,7 +790,7 @@ void PreRawCOPPERFormat_latest::CopyReducedData(RawDataBlock* raw_datablk, int* 
   raw_datablk->SetBuffer(buf_to, pos_nwords_to, 0,
                          raw_datablk->GetNumEvents(), raw_datablk->GetNumNodes());
 
-  if (malloc_flag_from == 1) { delete buf_from;}
+  if (malloc_flag_from == 1) { delete[] buf_from;}
   return ;
 }
 

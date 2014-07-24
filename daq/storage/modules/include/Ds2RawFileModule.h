@@ -58,8 +58,8 @@ namespace Belle2 {
     int m_compressionLevel;
 
     //! RingBuffer ID
-    std::string m_rbufname;
-    RingBuffer* m_rbuf;
+    //std::string m_rbufname;
+    //RingBuffer* m_rbuf;
 
     //! Messaage handler (obsolete)
     MsgHandler* m_msghandler;

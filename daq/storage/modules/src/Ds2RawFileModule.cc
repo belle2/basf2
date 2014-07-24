@@ -32,12 +32,12 @@ Ds2RawFileModule::Ds2RawFileModule() : Module()
   //Set module properties
   setDescription("Encode DataStore into RingBuffer");
 
-  addParam("RingBufferName", m_rbufname, "Name of RingBuffer",
-           string("OutputRbuf"));
+  //addParam("RingBufferName", m_rbufname, "Name of RingBuffer",
+  //         string("OutputRbuf"));
   addParam("CompressionLevel", m_compressionLevel, "Compression level",
            0);
 
-  m_rbuf = NULL;
+  //m_rbuf = NULL;
   m_nsent = 0;
   m_compressionLevel = 0;
 
@@ -54,7 +54,7 @@ void Ds2RawFileModule::initialize()
 {
 
   //  m_rbuf = new RingBuffer(m_rbufname.c_str(), RBUFSIZE);
-  m_rbuf = new RingBuffer(m_rbufname.c_str());
+  //m_rbuf = new RingBuffer(m_rbufname.c_str());
   //  m_msghandler = new MsgHandler(m_compressionLevel);
   m_streamer = new DataStoreStreamer(m_compressionLevel);
   m_file = open("file.data", O_CREAT | O_RDWR | O_TRUNC, 0644);

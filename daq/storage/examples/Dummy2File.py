@@ -21,8 +21,8 @@ from basf2 import *
 import sys
 argvs = sys.argv
 
-if len(argvs) < 3:
-    print 'Usage : DummyDataPacker.py <# of events> <output filename>'
+if len(argvs) < 2:
+    print 'Usage : DummyDataPacker.py <# of events>'
     sys.exit()
 
 # Set the log level to show only error and fatal messages

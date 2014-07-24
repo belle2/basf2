@@ -8,15 +8,17 @@
 \usepackage{lmodern}
 \usepackage{cprotect}
 \usepackage{placeins}
+\usepackage{multicol}
 \usepackage{booktabs} %professional tables
 \usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+
 \author{Thomas Keck\\
 Christian Pulvermacher}
 \begin{document}
 
-\setlength{\textfloatsep}{5pt plus 1.0pt minus 1.0pt}
-\setlength{\floatsep}{5pt plus 1.0pt minus 1.0pt}
-\setlength{\intextsep}{5pt plus 1.0pt minus 1.0pt}
+%\setlength{\textfloatsep}{5pt plus 1.0pt minus 1.0pt}
+%\setlength{\floatsep}{5pt plus 1.0pt minus 1.0pt}
+%\setlength{\intextsep}{5pt plus 1.0pt minus 1.0pt}
 
 \date{\today}
 \title{Full Event Interpretation Report}
@@ -30,50 +32,75 @@ and resulting purities and efficiencies. In ${overallSignalEfficiencyInPercent} 
 the full event interpretation reconstructed a B meson decay correctly.
 \end{abstract}
 
+\begin{center}
+\includegraphics{random.jpg}
+\end{center}
 \clearpage
 
 \tableofcontents
 
-
 \FloatBarrier
 \clearpage
-\section{Final state particles}
+\section{Summary}
 For each final state particle a multivariate analysis method was trained without any previous cut
 on the candidates. Afterwards the signal probability calculated by the method was used to perform
 a post cut on the final state particles. This reduces combinatorics in the following stages of the full
 event interpretation.
+\begin{center}
 \begin{table}[h]
 \caption{Final state particle efficiency and purity before and after the applied post cut.}
-\begin{tabular}{p{0.10\textwidth}p{0.18\textwidth}|p{0.12\textwidth}p{0.12\textwidth}|p{0.12\textwidth}p{0.12\textwidth}}
-Final state particle & Post Cut on Signal Probability &  Efficiency before post cut & Efficiency after post cut  & Purity before post cut & Purity after post cut \\ \hline
+\centering
+\begin{tabular}{c|rr|rr}
+\toprule
+Final state &  \multicolumn{2}{c}{Efficiency in \%}  &  \multicolumn{2}{c}{Purity in \%} \\
+particle    &  detector & post cut   &  detector & post cut \\
+\midrule
 ${finalStateParticleEPTable}
+\bottomrule
 \end{tabular}
 \end{table}
-
+\end{center}
 \FloatBarrier
-\clearpage
-${finalStateParticleInputs}
-
-\section{Intermediate particles}
 For each decay channel of each intermediate particle a multivariate analysis method was trained after performing a fast pre cut
 on the candidates. Afterwards the signal probability calculated by the method was used to perform
 a post cut on the intermediate particle candidates. This reduces combinatorics in the following stages of the full
 event interpretation.
+\begin{center}
 \begin{table}[h]
 \caption{Intermediate particle efficiency and purity before and after the applied pre and post cut.}
-\begin{tabular}{p{0.10\textwidth}p{0.18\textwidth}|p{0.8\textwidth}p{0.8\textwidth}p{0.8\textwidth}|p{0.8\textwidth}p{0.8\textwidth}p{0.8\textwidth}}
-Particle & Post Cut on Signal Probability &  Efficiency before pre cut & Efficiency before post cut & Efficiency after post cut  & Purity before pre cut & Purity before post cut & Purity after post cut \\ \hline
+\centering
+\begin{tabular}{c|rrr|rrr}
+\toprule
+Intermediate &  \multicolumn{3}{c}{Efficiency in \%}  &  \multicolumn{3}{c}{Purity in \%} \\
+particle     &  detector & pre cut & post cut   &  detector & pre cut & post cut \\
+\midrule
 ${combinedParticleEPTable}
+\bottomrule
 \end{tabular}
 \end{table}
+\end{center}
+
+\begin{figure}
+\includegraphics[width=\textwidth]{${mbcPlot}}
+\caption{Beam constrained mass of all final B candidates with different cuts on the signal probability. Dashed lines
+represents only background candidates. Solid lines represent all candiates.}
+\end{figure}
+
 \FloatBarrier
 \clearpage
+\section{Particles configuration}
+%\begin{multicols}{2}
+\begin{verbatim}
+${particleConfigurations}
+\end{verbatim}
+%\end{multicols}
+\FloatBarrier
+\clearpage
+\section{Final state particles}
+${finalStateParticleInputs}
 
+\FloatBarrier
+\clearpage
 ${combinedParticleInputs}
-
-\FloatBarrier
-\clearpage
-\section{MBC Plots}
-${mbcInputs}
 
 \end{document}

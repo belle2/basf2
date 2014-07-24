@@ -41,44 +41,55 @@ def createTexFile(filename, templateFilename, placeholders):
     B2INFO("Write tex file " + filename + ".")
 
 
-def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, ntuples):
+def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, ntuples, mcCounts, particles):
 
     placeholders = {}
+
+    input = '\n\n'.join([str(p) for p in particles])
+    output = ''
+    count = 0
+    for c in input:
+        output += c
+        count += 1
+        if c == '\n':
+            count = 0
+        if count >= 75:
+            if c in ':, ' or count == 90:
+                output += '\n          '
+                count = 10
+
+    placeholders['particleConfigurations'] = output
 
     placeholders['finalStateParticleInputs'] = ""
     placeholders['finalStateParticleEPTable'] = ""
     for particlePlaceholder in finalStateParticlePlaceholders:
         placeholders['finalStateParticleInputs'] += '\input{' + particlePlaceholder['texFile'] + '}\n'
         placeholders['finalStateParticleEPTable'] += particlePlaceholder['particleName'] + ' & '
-        placeholders['finalStateParticleEPTable'] += particlePlaceholder['postCutRange'] + ' & '
-        placeholders['finalStateParticleEPTable'] += '{:.2f}'.format(efficiency(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNTrueSignal'])) + ' & '
-        placeholders['finalStateParticleEPTable'] += '{:.2f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNTrueSignal'])) + ' & '
-        placeholders['finalStateParticleEPTable'] += '{:.2f}'.format(purity(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNBackground'])) + ' & '
-        placeholders['finalStateParticleEPTable'] += '{:.2f}'.format(purity(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNBackgroundAfterPostCut'])) + r'\\' + '\n'
+        placeholders['finalStateParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
+        placeholders['finalStateParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
+        placeholders['finalStateParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNBackground']) * 100) + ' & '
+        placeholders['finalStateParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNBackgroundAfterPostCut']) * 100) + r'\\' + '\n'
 
     placeholders['combinedParticleInputs'] = ""
     placeholders['combinedParticleEPTable'] = ""
     for particlePlaceholder in combinedParticlePlaceholders:
         placeholders['combinedParticleInputs'] += '\input{' + particlePlaceholder['texFile'] + '}\n'
         placeholders['combinedParticleEPTable'] += particlePlaceholder['particleName'] + ' & '
-        placeholders['combinedParticleEPTable'] += particlePlaceholder['postCutRange'] + ' & '
-        placeholders['combinedParticleEPTable'] += '{:.2f}'.format(efficiency(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNTrueSignal'])) + ' & '
-        placeholders['combinedParticleEPTable'] += '{:.2f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPreCut'], particlePlaceholder['particleNTrueSignal'])) + ' & '
-        placeholders['combinedParticleEPTable'] += '{:.2f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNTrueSignal'])) + ' & '
-        placeholders['combinedParticleEPTable'] += '{:.2f}'.format(purity(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNBackground'])) + ' & '
-        placeholders['combinedParticleEPTable'] += '{:.2f}'.format(purity(particlePlaceholder['particleNSignalAfterPreCut'], particlePlaceholder['particleNBackground'])) + ' & '
-        placeholders['combinedParticleEPTable'] += '{:.2f}'.format(purity(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNBackgroundAfterPostCut'])) + r'\\' + '\n'
+        placeholders['combinedParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
+        placeholders['combinedParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPreCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
+        placeholders['combinedParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
+        placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNBackground']) * 100) + ' & '
+        placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPreCut'], particlePlaceholder['particleNBackground']) * 100) + ' & '
+        placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNBackgroundAfterPostCut']) * 100) + r'\\' + '\n'
 
-    #create Mbc plots
-    placeholders['mbcInputs'] = ''
     for ntupleFile in ntuples:
-        mbcFilename = ntupleFile[:-5] + '_mbc.png'
+        mbcFilename = ntupleFile[:-5] + '_mbc.pdf'
         makeMbcPlot(ntupleFile, mbcFilename)
-        placeholders['mbcInputs'] += '\includegraphics{' + mbcFilename + '}\n'
+        placeholders['mbcPlot'] = mbcFilename
 
     placeholders['NSignal'] = 0
     placeholders['NBackground'] = 0
-    placeholders['NEvents'] = 5000000  # TODO Get # of events
+    placeholders['NEvents'] = mcCounts['NEvents']
 
     for bPlaceholder in combinedParticlePlaceholders:
         if bPlaceholder['particleName'] in ['B+', 'B0', 'B-', 'B0bar']:
@@ -128,9 +139,9 @@ def createCombinedParticleTexFile(placeholders, channelPlaceholders, mcCounts):
     placeholders['channelListAsItems'] = ""
     for channelPlaceholder in channelPlaceholders:
         if channelPlaceholder['isIgnored'] is None:
-            placeholders['channelListAsItems'] += "\\item {name} was ignored\n".format(name=channelPlaceholder['channelName'])
+            placeholders['channelListAsItems'] += "\\item \\verb|{name}| was ignored\n".format(name=channelPlaceholder['channelName'])
         else:
-            placeholders['channelListAsItems'] += "\\item {name}\n".format(name=channelPlaceholder['channelName'])
+            placeholders['channelListAsItems'] += "\\item \\verb|{name}|\n".format(name=channelPlaceholder['channelName'])
 
     placeholders['channelInputs'] = ""
     placeholders['particleNSignal'] = 0
@@ -139,7 +150,7 @@ def createCombinedParticleTexFile(placeholders, channelPlaceholders, mcCounts):
     placeholders['particleNBackgroundAfterPreCut'] = 0
     placeholders['particleNSignalAfterPostCut'] = 0
     placeholders['particleNBackgroundAfterPostCut'] = 0
-    placeholders['particleNTrueSignal'] = mcCounts.get(pdg.from_name(placeholders['particleName']), 0)
+    placeholders['particleNTrueSignal'] = mcCounts.get(str(pdg.from_name(placeholders['particleName'])), 0)
 
     placeholders['postCutRange'] = 'Ignored'
     for channelPlaceholder in channelPlaceholders:

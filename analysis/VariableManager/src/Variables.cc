@@ -295,7 +295,7 @@ namespace Belle2 {
       if (!pid) return 0.5;
 
       Const::PIDDetectorSet set = Const::CDC + Const::SVD;
-      return pid->getProbability(Const::pion, Const::electron);
+      return pid->getProbability(Const::pion, Const::electron, set);
     }
 
     double particleElectrondEdxId(const Particle* part)

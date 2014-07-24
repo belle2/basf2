@@ -112,6 +112,36 @@ class Particle(object):
                                                    mvaConfig=mvaConfig, isIncomplete=isIncomplete))
         return self
 
+    def __str__(self):
+        """ Convert particle object in a readable string which contains all configuration informations """
+        output = '{name}\n'.format(name=self.name)
+        output += '    PreCutConfiguration: variable={p.variable}, method={p.method}, efficiency={p.efficiency}, purity={p.purity}\n'.format(p=self.preCutConfig)
+        output += '    PostCutConfiguration: value={p.value}\n'.format(p=self.postCutConfig)
+
+        def compareMVAConfig(x, y):
+            return x.name == y.name and x.type == y.type and x.config == y.config and x.target == y.target and x.targetCluster == y.targetCluster
+
+        if not self.isFSP:
+            sameMVAConfig = all(compareMVAConfig(channel.mvaConfig, self.mvaConfig) for channel in self.channels)
+            commonVariables = reduce(lambda x, y: set(x).intersection(y), [channel.mvaConfig.variables for channel in self.channels])
+            if sameMVAConfig:
+                output += '    All channels use the same MVA configuration\n'
+                output += '    MVAConfiguration: name={m.name}, type={m.type}, target={m.target}, targetCluster={m.targetCluster}, config={m.config}\n'.format(m=self.mvaConfig)
+            output += '    Shared Variables: ' + ', '.join(commonVariables) + '\n'
+
+            for channel in self.channels:
+                output += '    {name}'.format(name=channel.name)
+                if channel.isIncomplete:
+                    output += ' + additional not reconstructed daughters'
+                output += '\n'
+                if not sameMVAConfig:
+                    output += '        MVAConfiguration: name={m.name}, type={m.type}, config={m.config}, target={m.target}, targetCluster={m.targetCluster}\n'.format(m=self.mvaConfig)
+                output += '        Individual Variables: ' + ', '.join(set(channel.mvaConfig.variables).difference(commonVariables)) + '\n'
+        else:
+            output += '    MVAConfiguration: name={m.name}, type={m.type}, config={m.config}, target={m.target}, targetCluster={m.targetCluster}\n'.format(m=self.mvaConfig)
+            output += '    Variables: ' + ', '.join(self.mvaConfig.variables) + '\n'
+        return output
+
 
 def addIncompleteChannels(particles, verbose):
     """
@@ -168,6 +198,7 @@ def FullEventInterpretation(path, particles):
         ########## RESOURCES #############
         # Add all information the user has provided as resources to the sequence, so our function can require them
         seq.addResource('Name_' + particle.name, particle.name)
+        seq.addResource('ParticleObject_' + particle.name, particle)
         seq.addResource('PreCutConfig_' + particle.name, particle.preCutConfig)
         seq.addResource('PostCutConfig_' + particle.name, particle.postCutConfig)
 
@@ -315,8 +346,9 @@ def FullEventInterpretation(path, particles):
     seq.addFunction(WriteAnalysisFileSummary,
                     finalStateParticlePlaceholders=['Placeholders_' + particle.name for particle in particles if particle.isFSP],
                     combinedParticlePlaceholders=['Placeholders_' + particle.name for particle in particles if not particle.isFSP],
-                    ntuples=['VariablesToNTuple_B0'])  # , 'VariablesToNTuple_B+'])
-
+                    ntuples=['VariablesToNTuple_B0'],  # , 'VariablesToNTuple_B+'])
+                    mcCounts='MCParticleCounts',
+                    particles=['ParticleObject_' + particle.name for particle in particles])
     seq.addNeeded('SignalProbability_B+')
     seq.addNeeded('SignalProbability_B0')
     seq.addNeeded('ParticleList_B0')

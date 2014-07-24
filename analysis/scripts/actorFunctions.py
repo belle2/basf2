@@ -36,9 +36,10 @@ def CountMCParticles(path):
     if not os.path.isfile(filename):
         class MCParticleCounter(Module):
             def initialize(self):
-                self.counter = {}
+                self.counter = {'NEvents': 0}
 
             def event(self):
+                self.counter['NEvents'] += 1
                 particles = ROOT.Belle2.PyStoreArray("MCParticles")
                 for particle in particles:
                     pdg = abs(particle.getPDG())
@@ -373,13 +374,13 @@ def WriteAnalysisFileForCombinedParticle(particleName, channelPlaceholders, mcCo
     return {'Placeholders_' + particleName: placeholders}
 
 
-def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePlaceholders, ntuples):
+def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePlaceholders, ntuples, mcCounts, particles):
     """
     Creates a pdf summarizing all networks trained.
         @param texfiles list of tex filenames
     """
 
-    placeholders = automaticReporting.createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, ntuples)
+    placeholders = automaticReporting.createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, ntuples, mcCounts, particles)
 
     for i in range(0, 2):
         ret = subprocess.call(['pdflatex', '-halt-on-error', placeholders['texFile']])

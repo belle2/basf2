@@ -18,8 +18,6 @@
 #include <TString.h>
 #include <TSystem.h>
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
 
 #include <sstream>
 
@@ -75,8 +73,6 @@ namespace Belle2 {
           m_tree->SetBranchAddress(Variable::makeROOTCompatible(variables[i]->name).c_str(), &m_input[i]);
         m_tree->SetBranchAddress(Variable::makeROOTCompatible(m_target_var->name).c_str(), &m_target);
       }
-
-
 
       TBranch* targetBranch  = m_tree->GetBranch(Variable::makeROOTCompatible(m_target_var->name).c_str());
       targetBranch->SetAddress(&m_target);
@@ -161,68 +157,18 @@ namespace Belle2 {
       if (m_cluster_count.size() <= 1) {
         B2ERROR("Found less than two clusters in sample, no training necessary!")
         return;
-      }
-
-      if (m_cluster_count.size() > 2) {
-        B2FATAL("Found more than two clusters in sample. This isn't supported at the moment (the necessary logic is already implemented but the combination of the classifier outputs is missing")
-        return;
-      }
-
-      // Train the found clusters against each other
-      for (auto & x : m_cluster_count) {
-        for (auto & y : m_cluster_count) {
-
-          if (x.first == y.first)
-            break;
-
-          std::stringstream signal;
-          std::stringstream bckgrd;
-          signal << x.first;
-          bckgrd << y.first;
-          std::string jobName = m_prefix + "_" + signal.str() + "_vs_" + bckgrd.str();
-
-          {
-
-            boost::property_tree::ptree node;
-            // Intitialize TMVA and ROOT stuff
-            TMVA::Tools::Instance();
-            TMVA::Factory factory(jobName, m_file, factoryOption);
-
-            // Add variables to the factory
-            for (auto & var : m_methods[0].getVariables()) {
-              factory.AddVariable(Variable::makeROOTCompatible(var->name));
-            }
-
-            // Copy Events from original tree to new signal and background tree.
-            // Unfortunatly this is necessary because TMVA internally uses vectors to store the data,
-            // therefore TMVA looses its out-of-core capability.
-            // The options nTrain_Background and nTest_Background (same for *_Signal) are applied
-            // after this transformation to vectors, therefore they're too late to prevent a allocation of huge amount of memory
-            // if one has many backgruond events.
-            factory.AddSignalTree(m_tree->CopyTree(TCut((Variable::makeROOTCompatible(m_target_var->name) + " == " + signal.str()).c_str()))->CopyTree("", "", maxEventsPerClass == 0 ? x.second : maxEventsPerClass));
-            factory.AddBackgroundTree(m_tree->CopyTree(TCut((Variable::makeROOTCompatible(m_target_var->name) + " == " + bckgrd.str()).c_str()))->CopyTree("", "", maxEventsPerClass == 0 ? y.second : maxEventsPerClass));
-            factory.PrepareTrainingAndTestTree("", prepareOption);
-
-            // Append the trained methods to the config xml file
-            for (auto & method : m_methods) {
-              boost::property_tree::ptree method_node;
-              method_node.put("SignalID", x.first);
-              method_node.put("BackgroundID", y.first);
-              method_node.put("MethodName", method.getName());
-              method_node.put("MethodType", method.getTypeAsString());
-              method_node.put("Samplefile", m_prefix + ".root");
-              method_node.put("Weightfile", std::string("weights/") + jobName + std::string("_") + method.getName() + std::string(".weights.xml"));
-              factory.BookMethod(method.getType(), method.getName(), method.getConfig());
-              node.add_child("Methods.Method", method_node);
-            }
-
-            factory.TrainAllMethods();
-            factory.TestAllMethods();
-            factory.EvaluateAllMethods();
-
-            pt.add_child("Setup.Trainings.Training", node);
-          }
-
+      } else if (m_cluster_count.size() ==  2) {
+        int maxId = m_cluster_count.begin()->first;
+        for (const auto & pair : m_cluster_count) {
+          if (pair.first > maxId)
+            maxId = pair.first;
+        }
+        auto node = trainClass(factoryOption, prepareOption, maxEventsPerClass, maxId);
+        pt.add_child("Setup.Trainings.Training", node);
+      } else {
+        for (const auto & pair : m_cluster_count) {
+          auto node = trainClass(factoryOption, prepareOption, maxEventsPerClass, pair.first);
+          pt.add_child("Setup.Trainings.Training", node);
         }
       }
 
@@ -230,6 +176,68 @@ namespace Belle2 {
       boost::property_tree::xml_parser::write_xml(m_prefix + ".config", pt, std::locale(), settings);
       gSystem->ChangeDirectory(oldDirectory.c_str());
     }
+
+    boost::property_tree::ptree Teacher::trainClass(std::string factoryOption, std::string prepareOption, unsigned int maxEventsPerClass, int signalClass)
+    {
+
+      std::stringstream signal;
+      signal << signalClass;
+      std::string jobName = m_prefix + "_" + signal.str();
+
+      boost::property_tree::ptree node;
+
+      TMVA::Tools::Instance();
+      TMVA::Factory factory(jobName, m_file, factoryOption);
+
+      // Add variables to the factory
+      for (auto & var : m_methods[0].getVariables()) {
+        factory.AddVariable(Variable::makeROOTCompatible(var->name));
+      }
+
+      auto signalCut = TCut((Variable::makeROOTCompatible(m_target_var->name) + " == " + signal.str()).c_str());
+      unsigned int signalEvents = (maxEventsPerClass == 0) ? m_cluster_count[signalClass] : maxEventsPerClass;
+
+      auto backgroundCut = TCut((Variable::makeROOTCompatible(m_target_var->name) + " != " + signal.str()).c_str());
+      unsigned int backgroundEvents = 0;
+      if (maxEventsPerClass == 0) {
+        for (const auto & pair : m_cluster_count) {
+          if (pair.first != signalClass)
+            backgroundEvents += pair.second;
+        }
+      } else {
+        backgroundEvents = maxEventsPerClass;
+      }
+
+      // Copy Events from original tree to new signal and background tree.
+      // Unfortunatly this is necessary because TMVA internally uses vectors to store the data,
+      // therefore TMVA looses its out-of-core capability.
+      // The options nTrain_Background and nTest_Background (same for *_Signal) are applied
+      // after this transformation to vectors, therefore they're too late to prevent a allocation of huge amount of memory
+      // if one has many backgruond events.
+      factory.AddSignalTree(m_tree->CopyTree(signalCut)->CopyTree("", "", signalEvents));
+      factory.AddBackgroundTree(m_tree->CopyTree(backgroundCut)->CopyTree("", "", backgroundEvents));
+      factory.PrepareTrainingAndTestTree("", prepareOption);
+
+      // Append the trained methods to the config xml file
+      for (auto & method : m_methods) {
+        boost::property_tree::ptree method_node;
+        method_node.put("SignalID", signalClass);
+        method_node.put("MethodName", method.getName());
+        method_node.put("MethodType", method.getTypeAsString());
+        method_node.put("Samplefile", m_prefix + ".root");
+        method_node.put("Weightfile", std::string("weights/") + jobName + std::string("_") + method.getName() + std::string(".weights.xml"));
+        factory.BookMethod(method.getType(), method.getName(), method.getConfig());
+        node.add_child("Methods.Method", method_node);
+      }
+
+      factory.TrainAllMethods();
+      factory.TestAllMethods();
+      factory.EvaluateAllMethods();
+
+      return node;
+
+    }
+
   }
 }
 

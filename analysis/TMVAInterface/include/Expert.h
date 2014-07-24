@@ -9,23 +9,26 @@
 
 #pragma once
 
+#include <analysis/TMVAInterface/Method.h>
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/VariableManager/Manager.h>
+
+#include <TMVA/Reader.h>
+#include <TMVA/Tools.h>
+#include <TSystem.h>
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+
+#include <fstream>
 #include <vector>
 #include <string>
 #include <map>
-
-/**
- * Forward declaration
- */
-namespace TMVA {
-  class Reader;
-}
+#include <memory>
 
 namespace Belle2 {
 
-  class Particle;
-
   namespace TMVAInterface {
-    class Method;
 
     /**
      * Interface to ROOT TMVA Reader.
@@ -44,21 +47,6 @@ namespace Belle2 {
       Expert(std::string prefix, std::string workingDirectory, std::string methodName, int signalClass);
 
       /**
-       * Disallow copy
-       */
-      Expert(const Expert&) = delete;
-
-      /**
-       * Disallow assign
-       */
-      Expert& operator=(const Expert&) = delete;
-
-      /**
-       * Destructor, closes outputFile, deletes TMVA::Reader
-       */
-      ~Expert();
-
-      /**
        * Analyse a Particle with the given method and calculates signal probability
        * @param particle the particle which should be analysed
        * @param signalFraction which is used to transform the method output to a probability. -1 to disable the transformation.
@@ -66,14 +54,33 @@ namespace Belle2 {
        */
       float analyse(const Particle*, float signalFraction = -1);
 
+
     private:
-      std::vector<TMVA::Reader*> m_readers; /**< Vector of TMVA::Reader, which steers the booked TMVA method, foreach cluster */
-      std::vector<float> m_input; /**< Pointers to the input variables */
+      /**
+       * Load variables from config file
+       */
+      std::vector<std::string> getVariablesFromXML(const boost::property_tree::ptree& pt) const;
+
+      /**
+       * Load class fractions from config file
+       */
+      std::map<int, float> getClassFractionsFromXML(const boost::property_tree::ptree& pt) const;
+
+      /**
+       * Load TMVA::Reader from config file
+       */
+      std::shared_ptr<TMVA::Reader> getReaderFromXML(const boost::property_tree::ptree& pt);
+
+    private:
       int m_signalClass; /**< Class which is considered as signal */
-      std::vector<Method*> m_methods; /**< methods used by the expert to classify */
-      std::map<int, float> m_clusters; /**< map of cluster id and cluster fraction */
-      std::vector<bool> m_reverse; /**< true if signalClass was considered background in the training */
-      std::vector<int> m_against; /**< cluster ID against signalClass was trained */
+      std::string m_methodName; /**< name of the method which is used for the expert */
+      bool m_reverse; /**< true if the reader returns background probability */
+      std::map<int, float> m_classFractions; /**< class fraction in training sample */
+
+      std::shared_ptr<TMVA::Reader> m_reader; /**<TMVA::Reader, which steers the booked TMVA method */
+      std::vector<float> m_input; /**< Store place for the input variables */
+      std::vector<const Variable::Manager::Var*> m_variables; /**< Pointers to the input variables */
+
     };
   }
 }

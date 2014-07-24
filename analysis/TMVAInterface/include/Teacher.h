@@ -12,6 +12,9 @@
 #include <analysis/TMVAInterface/Method.h>
 #include <analysis/VariableManager/Manager.h>
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+
 #include <vector>
 #include <string>
 
@@ -77,6 +80,12 @@ namespace Belle2 {
        * @param maxEventsPerClass maximum number of events given to TMVA per class. TMVA internally uses a vector instead of a tree and therefore looses out-of-core ability.
        */
       void train(std::string factoryOption = "!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification", std::string prepareOption = "SplitMode=random:!V", unsigned int maxEventsPerClass = 0);
+
+    private:
+      /**
+       * Train a class against the rest and return ptree with the configuration of the resulting trainig.
+       */
+      boost::property_tree::ptree trainClass(std::string factoryOption, std::string prepareOption, unsigned int maxEventsPerClass, int signalClass);
 
     private:
       std::string m_prefix; /**< used to identify the outputted training files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml */

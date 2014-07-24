@@ -45,18 +45,23 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
 
     placeholders = {}
 
+    # Prettify config output
     input = '\n\n'.join([str(p) for p in particles])
     output = ''
     count = 0
+    first_sep = 0
     for c in input:
         output += c
         count += 1
+        if first_sep == 0 and c in ':':
+            first_sep = count
         if c == '\n':
             count = 0
         if count >= 75:
             if c in ':, ' or count == 90:
-                output += '\n          '
-                count = 10
+                output += '\n' + ' ' * first_sep
+                count = first_sep
+                first_sep = 0
 
     placeholders['particleConfigurations'] = output
 
@@ -202,8 +207,8 @@ def createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut):
         signal_hist = rootfile.Get(rootfile.GetListOfKeys().At(0).GetName())
         background_hist = rootfile.Get(rootfile.GetListOfKeys().At(2).GetName())
 
-        placeholders['channelNSignal'] = signal_hist.Integral()
-        placeholders['channelNBackground'] = background_hist.Integral()
+        placeholders['channelNSignal'] = preCutDetermination.GetNumberOfEvents(signal_hist)
+        placeholders['channelNBackground'] = preCutDetermination.GetNumberOfEvents(background_hist)
         placeholders['channelPurity'] = '{:.5f}'.format(purity(placeholders['channelNSignal'], placeholders['channelNBackground']))
 
         if preCut is not None:

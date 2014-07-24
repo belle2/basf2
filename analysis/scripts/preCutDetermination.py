@@ -196,6 +196,14 @@ def GetNumberOfEventsInRange(histogram, (a, b)):
     return histogram.Integral(histogram.FindBin(a), histogram.FindBin(b))
 
 
+def GetNumberOfEvents(histogram):
+    """
+    Calculates the number of events in the given histograms includeing underflow and overflow bin
+    @param histograms Histograms
+    """
+    return histogram.Integral(0, histogram.GetNbinsX() + 1)
+
+
 def GetIgnoredChannels(signal, bckgrd, cuts):
     """
     Returns the channels which should be ignored because the cuts are very tight and therefore

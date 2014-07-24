@@ -28,6 +28,9 @@ namespace Belle2 {
     Teacher::Teacher(std::string prefix, std::string workingDirectory, std::string target, std::vector<Method> methods, bool useExistingData) : m_prefix(prefix), m_workingDirectory(workingDirectory), m_methods(methods), m_file(nullptr), m_tree(nullptr)
     {
 
+      // Change the workling directory to the user defined working directory
+      std::string oldDirectory = gSystem->WorkingDirectory();
+      gSystem->ChangeDirectory(m_workingDirectory.c_str());
 
       // Get Pointer to Variable::Manager::Var for the provided target name
       Variable::Manager& manager = Variable::Manager::Instance();
@@ -85,6 +88,8 @@ namespace Belle2 {
         else
           it->second++;
       }
+
+      gSystem->ChangeDirectory(oldDirectory.c_str());
 
     }
 

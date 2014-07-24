@@ -406,6 +406,7 @@ def trainTMVAMethod(
              )],
     target='isSignal',
     prefix='TMVA',
+    workingDirectory='.',
     path=analysis_main,
     ):
     """
@@ -415,6 +416,7 @@ def trainTMVAMethod(
     @param methods list of tuples (name, type, config) of the TMVA methods
     @param target variable registered in VariableManager which is used as target
     @param prefix prefix which is used to identify the weight files created by TMVA
+    @param workingDirectory in which the config file and the weight file directory are created
     @param path         modules are added to this path
     """
 
@@ -423,6 +425,7 @@ def trainTMVAMethod(
     teacher.param('methods', methods)
     teacher.param('variables', variables)
     teacher.param('target', target)
+    teacher.param('workingDirectory', workingDirectory)
     teacher.param('listNames', decayString)
     path.add_module(teacher)
 
@@ -431,7 +434,9 @@ def applyTMVAMethod(
     decayString,
     method='FastBDT',
     signalProbabilityName='isSignal',
+    signalFraction=-1,
     prefix='TMVA',
+    workingDirectory='.',
     path=analysis_main,
     ):
     """
@@ -439,15 +444,19 @@ def applyTMVAMethod(
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param method name of the TMVA method
     @param target name which is used to store signalProbability in extra info of the particle
+    @param signalFraction to calculate probability, -1 if no transformation, -2 to use training signal/background
     @param prefix prefix which is used to identify the weight files created by TMVA
+    @param workingDirectory in which the expert finds the config file and the weight file directory
     @param path         modules are added to this path
     """
 
     expert = register_module('TMVAExpert')
     expert.param('prefix', prefix)
     expert.param('method', method)
+    expert.param('workingDirectory', workingDirectory)
     expert.param('listNames', decayString)
     expert.param('signalProbabilityName', signalProbabilityName)
+    expert.param('signalFraction', signalFraction)
     path.add_module(expert)
 
 

@@ -48,7 +48,7 @@ namespace Belle2 {
              "you trained the method with pdg as target variable. Or 1 if you trained with isSignal as target.", 1);
     addParam("signalFraction", m_signalFraction, "signalFraction to calculate probability, -1 if no transformation of the method output should be performed, -2 if training signal/background ratio should be used. If you want to use "
              "this feature, you have to set the option createMVAPDFs in the TMVATeacher or the method config string", -1.0f);
-    m_method = nullptr;
+
   }
 
   TMVAExpertModule::~TMVAExpertModule()
@@ -68,7 +68,7 @@ namespace Belle2 {
       StoreObjPtr<ParticleExtraInfoMap>::registerPersistent("", DataStore::c_Event, false); //allow reregistration
     }
 
-    m_method = new TMVAInterface::Expert(m_methodPrefix, m_workingDirectory, m_methodName, m_signalClass);
+    m_method = std::make_shared<TMVAInterface::Expert>(m_methodPrefix, m_workingDirectory, m_methodName, m_signalClass);
 
   }
 
@@ -83,11 +83,7 @@ namespace Belle2 {
 
   void TMVAExpertModule::terminate()
   {
-    if (m_method !=  nullptr) {
-      delete m_method;
-      m_method = nullptr;
-    }
-
+    m_method.reset();
   }
 
   void TMVAExpertModule::event()

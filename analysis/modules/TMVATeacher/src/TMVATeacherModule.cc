@@ -27,7 +27,6 @@ namespace Belle2 {
                    "e.g. isSignal for signal and background cluster or abs_PDG to define different MC-PDGs as clusters. "
                    "The clusters are trained against each other. "
                    "See also https://belle2.cc.kek.jp/~twiki/bin/view/Software/TMVA for detailed instructions.");
-    //setPropertyFlags(c_ParallelProcessingCertified);
 
     std::vector<std::string> empty;
     addParam("listNames", m_listNames, "Particles from these ParticleLists are used as input. If no name is given the teacher is applied to every event once, and one can only use variables which accept nullptr as Particle*", empty);
@@ -44,7 +43,6 @@ namespace Belle2 {
     addParam("trainOncePerJob", m_trainOncePerJob, "If true, training is performed once per job (in the terminate method instead of in the endRun method)", true);
     addParam("maxEventsPerClass", m_maxEventsPerClass, "Maximum number of events per class passed to TMVA. 0 means no limit.", static_cast<unsigned int>(0));
 
-    m_teacher = nullptr;
   }
 
   TMVATeacherModule::~TMVATeacherModule()
@@ -70,7 +68,7 @@ namespace Belle2 {
         config = std::string("CreateMVAPdfs:") + config;
       methods.push_back(TMVAInterface::Method(std::get<0>(x), std::get<1>(x), config, m_variables));
     }
-    m_teacher = new TMVAInterface::Teacher(m_methodPrefix, m_workingDirectory, m_target, methods, m_useExistingData);
+    m_teacher = std::make_shared<TMVAInterface::Teacher>(m_methodPrefix, m_workingDirectory, m_target, methods, m_useExistingData);
   }
 
   void TMVATeacherModule::beginRun()
@@ -84,8 +82,7 @@ namespace Belle2 {
     if (not m_doNotTrain) {
       m_teacher->train(m_factoryOption, m_prepareOption, m_maxEventsPerClass);
     }
-    delete m_teacher;
-    m_teacher = nullptr;
+    m_teacher.reset();
   }
 
   void TMVATeacherModule::endRun()

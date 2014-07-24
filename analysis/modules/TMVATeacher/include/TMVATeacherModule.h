@@ -12,6 +12,8 @@
 #include <framework/core/Module.h>
 #include <analysis/TMVAInterface/Teacher.h>
 
+#include <memory>
+
 namespace Belle2 {
 
   class TMVATeacher;
@@ -89,7 +91,7 @@ namespace Belle2 {
     bool m_trainOncePerJob; /**< Perform TMVA training once per job (in the terminate method instead of in the endRun method) */
     unsigned int m_maxEventsPerClass; /**< Maximum nuber of events per class passed to TMVA */
 
-    TMVAInterface::Teacher* m_teacher; /**< Used TMVA method */
+    std::shared_ptr<TMVAInterface::Teacher> m_teacher; /**< Used TMVA method */
 
   };
 

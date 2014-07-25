@@ -488,6 +488,7 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ev
 
 #ifndef NO_DATA_CHECK
         try {
+
           temp_rawcopper->CheckData(0, m_prev_evenum, &cur_evenum,
                                     m_prev_copper_ctr, &cur_copper_ctr,
                                     m_prev_runsubrun_no, &m_runsubrun_no);
@@ -599,6 +600,7 @@ void DeSerializerPCModule::event()
     RawDataBlock temp_rawdatablk;
     setRecvdBuffer(&temp_rawdatablk, &malloc_flag_from);
 
+    //    temp_rawdatablk.PrintData( temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords() );
     checkData(&temp_rawdatablk, &eve_copper_0);
 
 //     PreRawCOPPERFormat_latest pre_rawcopper_latest;

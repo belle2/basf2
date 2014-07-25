@@ -18,34 +18,43 @@
 ######################################################
 
 from basf2 import *
+import sys
+argvs = sys.argv
 
 # Set the log level to show only error and fatal messages
 set_log_level(LogLevel.ERROR)
-# set_log_level(LogLevel.INFO)
+set_log_level(LogLevel.INFO)
 
-# input
-# input = register_module('RootInput')
-input = register_module('SeqRootInput')
-input.param('inputFileName', '/home/usr/yamadas/e0000r000634.binary')
+# Dummy data generator
+print argvs[1]
+print argvs[2]
+print argvs[3]
+max_event = int(argvs[3])
+nodeid = int(argvs[2])
+packer = register_module('DummyDataSource')
+# packer.param('MaxEventNum', max_event)
+packer.param('NodeID', nodeid)
 
-# output
-output = register_module('PrintData')
-
-# dump
+# File output
 dump = register_module('RootOutput')
-dump.param('outputFileName', 'temp.root')
+dump.param('outputFileName', 'root_output.root')
 
-# Histogram
-# hist = register_module('HistoExercise1')
+# Sender
+sender = register_module('Serializer')
+sender.param('DestPort', 33000)
+# sender.param('LocalHostName', 'cpr006')
+sender.param('LocalHostName', argvs[1])
 
 # Create main path
 main = create_path()
 
 # Add modules to main path
-main.add_module(input)
-main.add_module(output)
-# main.add_module(hist)
+main.add_module(packer)
+# if use_shm_flag != 0:
+#    main.add_module(histo)
+#    main.add_module(monitor)
 # main.add_module(dump)
+main.add_module(sender)
 
 # Process all events
 process(main)

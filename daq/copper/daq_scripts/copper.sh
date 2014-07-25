@@ -6,4 +6,5 @@ source  ~/.bash_profile
 #
 # Read data form COPPER FIFO
 #
-${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvSendCOPPER.sh $1 $2 $3 $4 $5
+#${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvSendCOPPER.sh $1 $2 $3 $4 $5 # Read from COPPER FIFO
+${BELLE2_LOCAL_DIR}/daq/copper/daq_scripts/RecvSendCOPPERDummy.sh $1 $2 # Dummy data produced by COPPER CPU

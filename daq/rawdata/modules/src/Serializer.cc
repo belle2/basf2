@@ -600,6 +600,8 @@ void SerializerModule::event()
 
   //  StoreArray<RawCOPPER> rawcprarray;
   StoreArray<RawDataBlock> raw_dblkarray;
+
+
   for (int j = 0; j < raw_dblkarray.getEntries(); j++) {
     //    int* buf;
     //    int m_size_byte = 0;

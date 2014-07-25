@@ -26,7 +26,6 @@ using namespace Belle2;
 // Register module in the framework
 REG_MODULE(VariablesToNtuple)
 
-//TODO rename this .cc file: +Module
 
 VariablesToNtupleModule::VariablesToNtupleModule() :
   Module(),

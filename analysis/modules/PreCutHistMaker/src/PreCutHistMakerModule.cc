@@ -19,7 +19,10 @@
 #include <analysis/dataobjects/Particle.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/pcore/ProcHandler.h>
+#include <framework/core/Environment.h>
 
+#include <TFile.h>
 #include <TH1F.h>
 
 #include <algorithm>
@@ -35,13 +38,14 @@ REG_MODULE(PreCutHistMaker)
 PreCutHistMakerModule::PreCutHistMakerModule():
   m_pdg(0),
   m_var(nullptr),
-  m_histogramSignal(nullptr),
-  m_histogramAll(nullptr),
+  m_histogramSignal("", DataStore::c_Persistent),
+  m_histogramAll("", DataStore::c_Persistent),
   m_generator_signal(nullptr),
   m_generator_all(nullptr)
 {
   setDescription("Saves distribution of a variable of combined particles (from input ParticleLists) into histogram 'all'. If the daughters can be combined into a correctly reconstructed (!) particle of specified type, save variable value for this combination to a histogram called 'signal'. This is equivalent to running ParticleCombiner on the given lists and saving the variable value of Particles with isSignal == 1 and everything else, but much faster (since Particles don't need to be saved).");
-  setPropertyFlags(c_ParallelProcessingCertified); //histograms are saved through HistModule, so this is ok
+  //setPropertyFlags(c_ParallelProcessingCertified); //histograms are saved through HistModule, so this is ok
+  setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
   addParam("decayString", m_decayString, "Decay to reconstruct, see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString ");
 
@@ -59,8 +63,6 @@ PreCutHistMakerModule::~PreCutHistMakerModule()
 
 void PreCutHistMakerModule::initialize()
 {
-  setFilename(m_fileName);
-
   StoreArray<MCParticle>::required();
   StoreArray<Particle>::required();
 
@@ -113,15 +115,19 @@ void PreCutHistMakerModule::initialize()
     l.isRequired();
   }
 
+  std::string signalName(std::string("signal") + m_channelName);
+  std::string allName(std::string("all") + m_channelName);
+  m_histogramSignal.registerAsTransient(signalName);
+  m_histogramAll.registerAsTransient(allName);
   if (m_customBinning.size() > 0) {
-    m_histogramSignal = new TH1F((std::string("signal") + m_channelName).c_str(), "signal", m_customBinning.size() - 1, &m_customBinning[0]);
-    m_histogramAll = new TH1F((std::string("all") + m_channelName).c_str(), "all", m_customBinning.size() - 1, &m_customBinning[0]);
+    m_histogramSignal.construct(signalName.c_str(), "signal", m_customBinning.size() - 1, &m_customBinning[0]);
+    m_histogramAll.construct(allName.c_str(), "all", m_customBinning.size() - 1, &m_customBinning[0]);
   } else {
     int nbins;
     double xlow, xhigh;
     std::tie(nbins, xlow, xhigh) = m_histParams;
-    m_histogramSignal = new TH1F((std::string("signal") + m_channelName).c_str(), "signal", nbins, xlow, xhigh);
-    m_histogramAll = new TH1F((std::string("all") + m_channelName).c_str(), "all", nbins, xlow, xhigh);
+    m_histogramSignal.construct(signalName.c_str(), "signal", nbins, xlow, xhigh);
+    m_histogramAll.construct(allName.c_str(), "all", nbins, xlow, xhigh);
   }
 
   Variable::Manager& manager = Variable::Manager::Instance();
@@ -263,7 +269,7 @@ void PreCutHistMakerModule::saveCombinationsForSignal()
       continue;
     }
     //B2WARNING("passed");
-    m_histogramSignal->Fill(m_var->function(part));
+    m_histogramSignal->get().Fill(m_var->function(part));
   }
 
 }
@@ -273,7 +279,7 @@ void PreCutHistMakerModule::saveAllCombinations()
   m_generator_all->init();
   while (m_generator_all->loadNext()) {
     const Particle part = m_generator_all->getCurrentParticle();
-    m_histogramAll->Fill(m_var->function(&part));
+    m_histogramAll->get().Fill(m_var->function(&part));
   }
 }
 
@@ -341,16 +347,23 @@ void PreCutHistMakerModule::event()
 
 void PreCutHistMakerModule::terminate()
 {
-  saveHists();
+  if (Environment::Instance().getNumberProcesses() == 0 or ProcHandler::isOutputProcess()) {
+    B2INFO("Writing hists to " << m_fileName);
+    TFile* m_file = new TFile(m_fileName.c_str(), "RECREATE");
+    if (!m_file->IsOpen()) {
+      B2FATAL("Could not create file " << m_fileName);
+      return;
+    }
+    m_file->cd();
+    m_histogramSignal->get().Write();
+    m_histogramSignal->get().SetDirectory(nullptr);
+    m_histogramAll->get().Write();
+    m_histogramAll->get().SetDirectory(nullptr);
+
+    B2INFO("Closing file " << m_fileName);
+    delete m_file;
+  }
 
   delete m_generator_signal;
   delete m_generator_all;
-  delete m_histogramAll;
-  delete m_histogramSignal;
-}
-
-void PreCutHistMakerModule::writeHists()
-{
-  m_histogramSignal->Write();
-  m_histogramAll->Write();
 }

@@ -10,10 +10,11 @@
 
 #pragma once
 
-#include <framework/pcore/HistModule.h>
+#include <framework/core/Module.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/pcore/RootMergeable.h>
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
@@ -23,8 +24,6 @@
 #include <vector>
 #include <set>
 
-class TH1F;
-
 namespace Belle2 {
   class Particle;
   class MCParticle;
@@ -32,7 +31,7 @@ namespace Belle2 {
   /**
    * Saves distribution of a variable of combined particles (from input ParticleLists) into histogram 'all'. If the daughters can be combined into a correctly reconstructed (!) particle of specified type, save variable value for this combination to a histogram called 'signal'. This is equivalent to running ParticleCombiner on the given lists and saving the variable value of Particles with isSignal == 1 and everything else, but much faster (since Particles don't need to be saved).
   */
-  class PreCutHistMakerModule : public HistModule {
+  class PreCutHistMakerModule : public Module {
 
   public:
 
@@ -56,9 +55,6 @@ namespace Belle2 {
     virtual void event();
 
     virtual void terminate();
-
-    /** implement HistModule interface. */
-    virtual void writeHists();
 
 
   private:
@@ -89,8 +85,8 @@ namespace Belle2 {
     std::string m_variable; /**< Variable for which the distributions are calculated */
     const Variable::Manager::Var* m_var; /**< Pointer to variable stored in the variable manager */
     std::vector<StoreObjPtr<ParticleList>> m_tmpLists; /**< temporary particle lists (contain subsets of contents of input lists, filled from MC truth). */
-    TH1F* m_histogramSignal; /**< signal histogram for combined particle. */
-    TH1F* m_histogramAll; /**< signal histogram for combined particle. */
+    StoreObjPtr<RootMergeable<TH1F>> m_histogramSignal; /**< signal histogram for combined particle. */
+    StoreObjPtr<RootMergeable<TH1F>> m_histogramAll; /**< signal histogram for combined particle. */
 
     ParticleGenerator* m_generator_signal; /**< Combines particles for signal (not everything is signal, so we run MCMatching for the limited number of candidates produced). */
     ParticleGenerator* m_generator_all; /**< Combines particles for signal+background. */

@@ -987,7 +987,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
     const TVector3& vertex = particle->getProductionVertex();
     const int pdg = particle->getPDG();
     TParticle tparticle(pdg, particle->getStatus(),
-                        (particle->getMother() ? particle->getMother()->getIndex() - 1 : 0), 0, particle->getFirstDaughter(), particle->getLastDaughter(),
+                        (particle->getMother() ? particle->getMother()->getIndex() : 0), 0, particle->getFirstDaughter(), particle->getLastDaughter(),
                         p.x(), p.y(), p.z(), particle->getEnergy(),
                         vertex.x(), vertex.y(), vertex.z(), particle->getProductionTime());
     TEveMCTrack mctrack;
@@ -995,7 +995,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
     mctrack.fTDecay = particle->getDecayTime();
     mctrack.fVDecay.Set(particle->getDecayVertex());
     mctrack.fDecayed = !boost::math::isinf(mctrack.fTDecay);
-    mctrack.fIndex = particle->getIndex() - 1;
+    mctrack.fIndex = particle->getIndex();
     m_mcparticleTracks[particle].track = new TEveTrack(&mctrack, m_trackpropagator);
 
     //Check if there is a trajectory stored for this particle
@@ -1055,7 +1055,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
     //set track title (for popup)
     TString momLabel = "";
     if (particle->getMother()) {
-      momLabel = TString::Format("\nMother: Idx=%d, PDG=%d)", particle->getMother()->getIndex() - 1, particle->getMother()->getPDG());
+      momLabel = TString::Format("\nMother: Idx=%d, PDG=%d)", particle->getMother()->getIndex(), particle->getMother()->getPDG());
       m_mcparticleTracks[particle].parentParticle = particle->getMother();
     }
 
@@ -1072,7 +1072,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
                                                    "Chg=%d, PDG=%d (%s)\n"
                                                    "pT=%.3f, pZ=%.3f\nV=(%.3f, %.3f, %.3f)"
                                                    "%s",
-                                                   particle->getIndex() - 1,
+                                                   particle->getIndex(),
                                                    (int)particle->getCharge(), particle->getPDG(), particle_name.Data(),
                                                    mctrack.Pt(), mctrack.Pz(), mctrack.Vx(), mctrack.Vy(), mctrack.Vz(),
                                                    momLabel.Data()));
@@ -1103,7 +1103,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
     }
 
     //create point set for hits
-    const TString pointsTitle = TString::Format("SimHits for MCParticle %d (%s)", particle->getIndex() - 1, particle_name.Data());
+    const TString pointsTitle = TString::Format("SimHits for MCParticle %d (%s)", particle->getIndex(), particle_name.Data());
     m_mcparticleTracks[particle].simhits = new TEvePointSet(pointsTitle);
     m_mcparticleTracks[particle].simhits->SetTitle(pointsTitle);
     m_mcparticleTracks[particle].simhits->SetMarkerStyle(6);

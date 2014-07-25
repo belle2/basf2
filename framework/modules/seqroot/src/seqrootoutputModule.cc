@@ -82,7 +82,7 @@ void SeqRootOutputModule::beginRun()
 void SeqRootOutputModule::event()
 {
   // Stream DataStore in EvtMessage
-  EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
+  EvtMessage* msg = m_streamer->streamDataStore(false);
 
   // Store EvtMessage
   int stat = m_file->write(msg->buffer());

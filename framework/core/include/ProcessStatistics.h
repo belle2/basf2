@@ -12,12 +12,17 @@
 #ifndef FRAMEWORK_CORE_PROCESSSTATISTICS_H
 #define FRAMEWORK_CORE_PROCESSSTATISTICS_H
 
-#include <framework/core/Module.h>
 #include <framework/core/ModuleStatistics.h>
 #include <framework/utilities/Utils.h>
+
+#include <framework/pcore/Mergeable.h>
+
 #include <map>
 
+
 namespace Belle2 {
+  class Module;
+
   /**
    * Class to collect call statistics for all modules
    *
@@ -77,13 +82,35 @@ namespace Belle2 {
    * >>> foo = register_module("Foo")
    * >>> statistics.set_name(foo,"Footastic")
    */
-  class ProcessStatistics {
+  class ProcessStatistics : public Mergeable {
   public:
-    /** Map type used to store module statistics */
-    typedef std::map<Module*, ModuleStatistics> StatisticsMap;
+    /** Constructor. */
+    ProcessStatistics(): m_global("global"), m_globalTime(0), m_globalMemory(0), m_moduleTime(0), m_moduleMemory(0), m_suspendedTime(0), m_suspendedMemory(0) { }
 
-    /** Return singleton instance of the statistics */
-    static ProcessStatistics& getInstance();
+    /** type used to store module statistics */
+    typedef std::vector<ModuleStatistics> StatisticsMap;
+
+    /**
+     * Return string with statistics for all modules.
+     *
+     * Can be used in steering file with 'print statistics'.
+     *
+     * @param type    counter type to use for statistics
+     * @param modules map of modules to use. If NULL, default map will be
+     *                used
+     */
+    std::string getStatisticsString(ModuleStatistics::EStatisticCounters type = ModuleStatistics::c_Event,
+                                    const ProcessStatistics::StatisticsMap* modules = 0);
+
+    /** Get global statistics. */
+    ModuleStatistics& getGlobal() { return m_global; }
+
+    /** Get entire statistics map. */
+    StatisticsMap& getAll() { return m_stats; }
+
+//We don't want CINT to see anything about Module
+#if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
+#else
 
     /** Start timer for global measurement */
     void startGlobal() { setCounters(m_globalTime, m_globalMemory); }
@@ -118,90 +145,50 @@ namespace Belle2 {
     void stopModule(Module* module, ModuleStatistics::EStatisticCounters type) {
       setCounters(m_moduleTime, m_moduleMemory,
                   m_moduleTime, m_moduleMemory);
-      m_modules[module].add(type, m_moduleTime, m_moduleMemory);
+      m_stats[getIndex(module)].add(type, m_moduleTime, m_moduleMemory);
     }
 
     /** Init module statistics: Set name from module if still empty and
      * remember initialization index for display
      */
-    void initModule(Module* module) {
-      ModuleStatistics& stats = m_modules[module];
-      if (stats.getName().empty()) {
-        stats.setName(module->getName());
-      }
-      stats.setIndex(m_modules.size() - 1);
-    }
+    void initModule(Module* module);
 
-    /** Clear collected statistics but keep names of modules */
-    void clear() {
-      m_global.clear();
-      for (auto & stats : m_modules) { stats.second.clear(); }
-    }
-
-    /** @name Python API
-     * Memberfunctions used by the python API
-     */
-    /**@{*/
-
-    /**
-     * Return string with statistics for all modules.
-     *
-     * Can be used in steering file with 'print statistics'.
-     *
-     * @param type    counter type to use for statistics
-     * @param modules map of modules to use. If NULL, default map will be
-     *                used
-     */
-    std::string getStatistics(ModuleStatistics::EStatisticCounters type = ModuleStatistics::c_Event,
-                              StatisticsMap* modules = 0);
-
-    /**
-     * Return string with statistics for selected modules
-     * @param pyList python list of modules to show
-     * @param type   counter type to use for statistics
-     */
-    std::string getModuleStatistics(const boost::python::list& pyList,
-                                    ModuleStatistics::EStatisticCounters type = ModuleStatistics::c_Event);
-
-    /**
-     * Set name for module in statistics.
-     *
-     * Normally, all modules get assigned their default name which is
-     * used to register them. If multiple instances of the same module
-     * are present at the same time, this can be used to distuingish
-     * between them
-     *
-     * @param module Shared pointer to the Module for which a name is
-     *               to be defined
-     * @param name   Name to show in statistics
-     */
-    void setModuleName(const ModulePtr& module, const std::string& name) {
-      m_modules[module.get()].setName(name);
-    }
 
     /**
      * Get statistics for single module
      * @param module Shared pointer to the Module for which the
      *               statistics should be obtained
      */
-    const ModuleStatistics& get(const ModulePtr& module) {
-      return m_modules[module.get()];
+    ModuleStatistics& getStatistics(Module* module) {
+      return m_stats[getIndex(module)];
     }
 
-    /** Get statistics for all modules as python list */
-    boost::python::list getAll();
+    /** get m_stats index for given module, inserting it if not found. */
+    int getIndex(Module* module) {
+      auto indexIt = m_modulesToStatsIndex.find(module);
+      if (indexIt == m_modulesToStatsIndex.end()) {
+        int index = m_stats.size();
+        m_modulesToStatsIndex[module] = index;
+        m_stats.emplace_back();
+        return index;
+      } else {
+        return indexIt->second;
+      }
+    }
+#endif
 
-    /** Define python wrappers to make functionality avaiable in python */
-    static void exposePythonAPI();
+    /** Merge other ProcessStatistics object into this one. */
+    virtual void merge(const Mergeable* other);
 
-    /**@}*/
+    /** Clear collected statistics but keep names of modules */
+    virtual void clear();
+
+
   private:
-    /** Private constructor due to singleton pattern */
-    ProcessStatistics() = default;
     /** Prohibit copy constructor */
-    ProcessStatistics(const ProcessStatistics&) = delete;
+    ProcessStatistics(const ProcessStatistics&);
     /** Prohibit assignment operator */
-    ProcessStatistics& operator=(ProcessStatistics&) = delete;
+    ProcessStatistics& operator=(ProcessStatistics&);
 
     /** Set counters time and memory to contain the current clock value
      * and memory consumption respectively.
@@ -217,26 +204,32 @@ namespace Belle2 {
     }
 
     /** Statistics object for global time and memory consumption */
-    ModuleStatistics m_global {"global"};
-    /** map of module statistics */
-    StatisticsMap m_modules;
+    ModuleStatistics m_global;
+    /** module statistics */
+    StatisticsMap m_stats;
+
+    std::map<Module*, int> m_modulesToStatsIndex; //!< transient, maps Module* to m_stats index
+
+    //the following are used for the (process-local) time-keeping
 
     /** store clock counter for global time consumption */
-    double m_globalTime {0};
+    double m_globalTime; //! (transient)
     /** store heap size for global memory consumption in KB */
-    double m_globalMemory {0};
+    double m_globalMemory; //! (transient)
     /** store clock counter for time consumption by modules */
-    double m_moduleTime {0};
+    double m_moduleTime; //! (transient)
     /** store heap size for memory consumption by modules */
-    double m_moduleMemory {0};
+    double m_moduleMemory; //! (transient)
     /** store clock counter for suspended measurement. Generally this
      * would be a stack of values but we know that we need at most one
      * element so we keep it a plain double. */
-    double m_suspendedTime {0};
+    double m_suspendedTime; //! (transient)
     /** store heap size for suspended measurement. Generally this
      * would be a stack of values but we know that we need at most one
      * element so we keep it a plain double. */
-    double m_suspendedMemory {0};
+    double m_suspendedMemory; //! (transient)
+
+    ClassDef(ProcessStatistics, 1); /**< Class to collect call statistics for all modules. */
   };
 
 } //Belle2 namespace

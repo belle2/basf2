@@ -13,9 +13,9 @@
 
 #include <framework/pybasf2/Framework.h>
 #include <framework/pybasf2/LogPythonInterface.h>
+#include <framework/pybasf2/ProcessStatisticsPython.h>
 #include <framework/core/Module.h>
 #include <framework/core/Path.h>
-#include <framework/core/ProcessStatistics.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/core/ModuleParamInfoPython.h>
 #include <framework/core/FileCatalog.h>
@@ -82,7 +82,7 @@ BOOST_PYTHON_MODULE(pybasf2)
   Path::exposePythonAPI();
   Framework::exposePythonAPI();
   ModuleParamInfoPython::exposePythonAPI();
-  ProcessStatistics::exposePythonAPI();
+  ProcessStatisticsPython::exposePythonAPI();
   LogPythonInterface::exposePythonAPI();
   RandomNumbers::exposePythonAPI();
   Gearbox::exposePythonAPI();

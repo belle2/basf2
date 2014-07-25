@@ -437,6 +437,7 @@ std::vector<std::string> DataStore::getListOfRelationsForArray(const StoreAccess
 
 void DataStore::clearMaps(EDurability durability)
 {
+  B2DEBUG(100, "Invalidating objects for durability " << durability);
   for (auto & mapEntry : m_storeObjMap[durability]) {
     mapEntry.second->ptr = nullptr;
   }

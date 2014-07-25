@@ -14,6 +14,7 @@
 #include <framework/core/Path.h>
 #include <framework/core/Module.h>
 #include <framework/core/PathIterator.h>
+#include <framework/core/ProcessStatistics.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
@@ -129,6 +130,9 @@ namespace Belle2 {
 
     /** EventMetaData is used by processEvent()/processCore(). */
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
+
+    /** Also used in a number of places. */
+    StoreObjPtr<ProcessStatistics> m_processStatisticsPtr;
 
     /** Are we currently in a run? If yes, processEndRun() needs to do something. */
     bool m_inRun;

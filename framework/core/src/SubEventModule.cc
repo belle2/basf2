@@ -50,56 +50,6 @@ SubEventModule::~SubEventModule()
 {
 }
 
-void SubEventModule::initialize()
-{
-  m_loopOver.isRequired();
-
-  ProcessStatistics::getInstance().suspendGlobal();
-
-  //register loop object (!array, transient, errorIfExisting)
-  const DataStore::StoreEntry* arrayEntry = DataStore::Instance().getStoreObjectMap(DataStore::c_Event).at(m_loopOver.getName());
-  TClass* arrayClass = static_cast<TClonesArray*>(arrayEntry->object)->GetClass();
-  DataStore::Instance().registerEntry(m_objectName, DataStore::c_Event, arrayClass, false, true, true);
-
-  processInitialize(m_moduleList);
-
-  //yes, we're still in initalize()
-  DataStore::Instance().setInitializeActive(true);
-
-  //don't screw up statistics for this module
-  ProcessStatistics::getInstance().startModule();
-  ProcessStatistics::getInstance().resumeGlobal();
-}
-
-void SubEventModule::terminate()
-{
-  ProcessStatistics::getInstance().suspendGlobal();
-  processTerminate(m_moduleList);
-
-  //don't screw up statistics for this module
-  ProcessStatistics::getInstance().startModule();
-  ProcessStatistics::getInstance().resumeGlobal();
-}
-
-void SubEventModule::beginRun()
-{
-  ProcessStatistics::getInstance().suspendGlobal();
-  processBeginRun();
-
-  //don't screw up statistics for this module
-  ProcessStatistics::getInstance().startModule();
-  ProcessStatistics::getInstance().resumeGlobal();
-}
-void SubEventModule::endRun()
-{
-  ProcessStatistics::getInstance().suspendGlobal();
-  processEndRun();
-
-  //don't screw up statistics for this module
-  ProcessStatistics::getInstance().startModule();
-  ProcessStatistics::getInstance().resumeGlobal();
-}
-
 void deepCopy(const DataStore::StoreObjMap& orig, DataStore::StoreObjMap& dest)
 {
   for (auto entry : orig) {
@@ -116,12 +66,81 @@ void restoreContents(const DataStore::StoreObjMap& orig, DataStore::StoreObjMap&
   }
 }
 
+
+void SubEventModule::initialize()
+{
+  m_loopOver.isRequired();
+
+  StoreObjPtr<ProcessStatistics> processStatistics("", DataStore::c_Persistent);
+  processStatistics->suspendGlobal();
+
+  //register loop object (!array, transient, errorIfExisting)
+  const DataStore::StoreEntry* arrayEntry = DataStore::Instance().getStoreObjectMap(DataStore::c_Event).at(m_loopOver.getName());
+  TClass* arrayClass = static_cast<TClonesArray*>(arrayEntry->object)->GetClass();
+  DataStore::Instance().registerEntry(m_objectName, DataStore::c_Event, arrayClass, false, true, true);
+
+  processInitialize(m_moduleList);
+
+  //yes, we're still in initalize()
+  DataStore::Instance().setInitializeActive(true);
+
+  //don't screw up statistics for this module
+  processStatistics->startModule();
+  processStatistics->resumeGlobal();
+}
+
+void SubEventModule::terminate()
+{
+  StoreObjPtr<ProcessStatistics> processStatistics("", DataStore::c_Persistent);
+  processStatistics->suspendGlobal();
+
+  //get event map and make a deep copy of the StoreEntry objects
+  //(we want to revert changes to the StoreEntry objects, but not to the arrays/objects)
+  DataStore::StoreObjMap& persistentMap = DataStore::Instance().getStoreObjectMap(DataStore::c_Persistent);
+  DataStore::StoreObjMap persistentMapCopy;
+  deepCopy(persistentMap, persistentMapCopy);
+
+  processTerminate(m_moduleList);
+
+  restoreContents(persistentMapCopy, persistentMap);
+  //cleanup
+  for (auto entry : persistentMapCopy) {
+    delete entry.second;
+  }
+
+  //don't screw up statistics for this module
+  processStatistics->startModule();
+  processStatistics->resumeGlobal();
+}
+
+void SubEventModule::beginRun()
+{
+  StoreObjPtr<ProcessStatistics> processStatistics("", DataStore::c_Persistent);
+  processStatistics->suspendGlobal();
+  processBeginRun();
+
+  //don't screw up statistics for this module
+  processStatistics->startModule();
+  processStatistics->resumeGlobal();
+}
+void SubEventModule::endRun()
+{
+  StoreObjPtr<ProcessStatistics> processStatistics("", DataStore::c_Persistent);
+  processStatistics->suspendGlobal();
+  processEndRun();
+
+  //don't screw up statistics for this module
+  processStatistics->startModule();
+  processStatistics->resumeGlobal();
+}
+
 void SubEventModule::event()
 {
   //disable statistics for subevent
   const bool noStats = Environment::Instance().getNoStats();
+  StoreObjPtr<ProcessStatistics> processStatistics("", DataStore::c_Persistent);
   //Environment::Instance().setNoStats(true);
-  ProcessStatistics::getInstance().suspendGlobal();
+  processStatistics->suspendGlobal();
 
   const int numEntries = m_loopOver.getEntries();
 
@@ -162,6 +181,6 @@ void SubEventModule::event()
   Environment::Instance().setNoStats(noStats);
 
   //don't screw up statistics for this module
-  ProcessStatistics::getInstance().startModule();
-  ProcessStatistics::getInstance().resumeGlobal();
+  processStatistics->startModule();
+  processStatistics->resumeGlobal();
 }

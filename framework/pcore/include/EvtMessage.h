@@ -26,7 +26,7 @@ namespace Belle2 {
     Long64_t time_usec; /**< seconds part of timeval. */
     UInt_t src; /**< source IP. */
     UInt_t dest; /**< destination IP. */
-    UInt_t durability; /**< DataStore::EDurability. */
+    UInt_t alsoReserved; /**< obsolete member removed, can be replaced with something else. */
     UInt_t nObjects; /**< #objects in message. */
     UInt_t nArrays; /**< #objects in message. */
     UInt_t reserved[7]; /**< Reserved for future use. Don't ever use these directly. */

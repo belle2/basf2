@@ -17,6 +17,7 @@
 [INFO] 
 [INFO] ----------------------------------------------------------------------------
 [INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
 [INFO] 
 [INFO] ============================================================================
 [INFO] In module ReturnFalse1Condition
@@ -41,6 +42,7 @@
 [INFO] 
 [INFO] ----------------------------------------------------------------------------
 [INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
 [INFO] 
 [INFO] ============================================================================
 [INFO] In module ReturnFalse1Condition

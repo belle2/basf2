@@ -13,7 +13,6 @@
 #define FRAMEWORK_CORE_MODULESTATISTICS_H
 
 #include <framework/utilities/CalcMeanCov.h>
-#include <array>
 #include <string>
 
 namespace Belle2 {
@@ -43,7 +42,7 @@ namespace Belle2 {
     };
 
     /** Construct with a given name */
-    ModuleStatistics(const std::string& name = ""): m_name(name) {}
+    ModuleStatistics(const std::string& name = ""): m_index(0), m_name(name) {}
 
     /** Add a time and memory measurment to the counter of a given type.
      * @param type Type of counter to add the value to
@@ -53,6 +52,13 @@ namespace Belle2 {
     void add(EStatisticCounters type, float time, float memory) {
       m_stats[type].add(time, memory);
       m_stats[c_Total].add(time, memory);
+    }
+
+    /** Add statistics for each category. */
+    void update(const ModuleStatistics& other) {
+      for (int i = c_Init; i <= c_Total; i++) {
+        m_stats[i].add(other.m_stats[i]);
+      }
     }
 
     /** Set the name of the module for display */
@@ -106,11 +112,11 @@ namespace Belle2 {
     }
   private:
     /** display index of the module */
-    int m_index {0};
+    int m_index;
     /** name of module */
-    std::string m_name {""};
+    std::string m_name;
     /** array with  mean/covariance for all counters */
-    std::array < CalcMeanCov<2, float>, c_Total + 1 > m_stats;
+    CalcMeanCov<2, float> m_stats[c_Total + 1];
   };
 
 } //Belle2 namespace

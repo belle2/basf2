@@ -17,7 +17,6 @@
 #include <sys/types.h>
 
 #include <vector>
-#include <queue>
 #include <string>
 
 namespace Belle2 {
@@ -49,13 +48,13 @@ namespace Belle2 {
     // DataStore->EvtMessage
     /** Store DataStore objects in EvtMessage
      *
-     *  @param durability Durability of DataStore objects to be streamed
+     *  @param addPersistentDurability By default, only c_Event data is streamed. Setting this to true will add c_Persistent data to the EvtMessage.
      *  @param streamTransientObjects Should objects/arrays registered as transient be streamed?
+     *  @param removeEmptyArrays DANGEROUS, don't use.
      *  @return pointer to EvtMessage, caller is responsible for deletion
-     *
      */
-    EvtMessage* streamDataStore(DataStore::EDurability durability, bool streamTransientObjects = false,
-                                bool removeEmptyArrays = false);
+    EvtMessage* streamDataStore(bool addPersistentDurability, bool streamTransientObjects = false, bool removeEmptyArrays = false);
+
 
     // EvtMessage->DataStore
     /** Restore DataStore objects from EvtMessage
@@ -90,12 +89,30 @@ namespace Belle2 {
     void setDecoderStatus(int);
     /** Ask Itoh-san about this. */
     int  getDecoderStatus();
+
+    /** Is the given object of a type that can be merged? */
+    static bool isMergeable(const TObject* object);
+
+    /** assuming object is mergeable, clear its contents.
+     *
+     * Use this after sending it to prevent sending the same data again in the next event.
+     */
+    static void clearMergeable(TObject* object);
+
+    /** Assuming both objects are mergeable, merge 'received' into 'existing'. */
+    static void mergeIntoExisting(TObject* existing, const TObject* received);
+
   private:
 
-    /** bits to store in TObject. */
+    /** bits to store in TObject.
+     *
+     * Bits 14-23 are available for use in derived classes, and are reused here to transmit additional information. This is really quite ugly and should be replaced with some more sane way of transmitting object-level data.
+     * All bits are checked before using them, so if they are used by other code we know what happens.
+     */
     enum ETObjectBits {
       c_IsTransient = BIT(19), /**< The corresponding StoreEntry is transient. */
-      c_IsNull = BIT(20) /**< object is not valid for current event, set StoreEntry::ptr to NULL. */
+      c_IsNull = BIT(20), /**< object is not valid for current event, set StoreEntry::ptr to NULL. */
+      c_PersistentDurability = BIT(21) /**< Object is of persistent durability. */
     };
 
     /** MsgHandler
@@ -134,25 +151,8 @@ namespace Belle2 {
     int m_decstat[c_maxThreads];
     //MsgHandler* m_pmsghandler[c_maxThreads];
     //    char* m_evtbuf[c_maxThreads];
-    std::queue<char*> m_evtbuf[c_maxThreads];
+    //std::queue<char*> m_evtbuf[c_maxThreads];
 
-    //@{
-    /** Object arrays in temporary buffer
-     *
-     */
-
-    //    int m_nobjs[c_maxThreads];
-    //    int m_narrays[c_maxThreads];
-    //    DataStore::EDurability m_durability[c_maxThreads];
-    //    std::vector<TObject*> m_objlist[c_maxThreads];
-    //    std::vector<std::string> m_namelist[c_maxThreads];
-
-    std::queue<int> m_nobjs;
-    std::queue<int> m_narrays;
-    std::queue<DataStore::EDurability> m_durability;
-    std::queue<std::vector<TObject*>> m_objlist;
-    std::queue<std::vector<std::string>> m_namelist;
-    //@}
   };
 
   // Function to hook DataStoreStreamer::decodeEvtMessage to pthread

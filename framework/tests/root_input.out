@@ -21,6 +21,7 @@
 [INFO] ----------------------------------------------------------------------------
 [INFO] Type                 Name                       #Entries      <Persistent>
 [INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
 [INFO] 
 [INFO] ============================================================================
 [INFO] EXP:        0        RUN:        1        EVT:        1
@@ -37,6 +38,7 @@
 [INFO] ----------------------------------------------------------------------------
 [INFO] Type                 Name                       #Entries      <Persistent>
 [INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
 [INFO] 
 [INFO] ============================================================================
 [INFO] EXP:        0        RUN:        1        EVT:        2
@@ -53,6 +55,7 @@
 [INFO] ----------------------------------------------------------------------------
 [INFO] Type                 Name                       #Entries      <Persistent>
 [INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
 [INFO] 
 [INFO] ============================================================================
 [INFO] EXP:        0        RUN:        1        EVT:        3
@@ -69,6 +72,7 @@
 [INFO] ----------------------------------------------------------------------------
 [INFO] Type                 Name                       #Entries      <Persistent>
 [INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
 [INFO] 
 [INFO] ============================================================================
 [INFO] EXP:        0        RUN:        1        EVT:        4
@@ -85,6 +89,7 @@
 [INFO] ----------------------------------------------------------------------------
 [INFO] Type                 Name                       #Entries      <Persistent>
 [INFO] FileMetaData         FileMetaData
+[INFO] ProcessStatistics    ProcessStatistics
 [INFO] 
 [INFO] ============================================================================
 [INFO] ------------------------------------------------------------------------

@@ -13,7 +13,6 @@
 #define FRAMEWORK_UTILITIES_CALCMEANCOV_H
 
 #include <cmath>
-#include <array>
 
 namespace Belle2 {
 
@@ -34,18 +33,26 @@ namespace Belle2 {
    */
   template<int N = 1, class RealType = double>
   class CalcMeanCov {
+#ifndef __CINT__
     static_assert(N > 0, "Number of parameters, N, must be positive");
+#endif
   public:
+    /** default constructor. */
+    CalcMeanCov() { clear(); }
+
     /** type of float variable to use for calculations and storage */
     typedef RealType value_type;
 
     /** Clear all values */
     void clear() {
       m_entries = 0;
-      m_mean.fill(0);
-      m_covariance.fill(0);
+      for (int i = 0; i < N; i++)
+        m_mean[i] = 0;
+      for (int i = 0; i < N * (N + 1) / 2; i++)
+        m_covariance[i] = 0;
     }
 
+#ifndef __CINT__
     /** Update mean and covariance by adding a new, weighted entry.
      * @param weight weight of the entry
      * @param values values for all parameters. The number of parameters
@@ -168,8 +175,10 @@ namespace Belle2 {
     }
 
     /**@}*/
+#endif
 
   private:
+#ifndef __CINT__
     /** Add a single value for parameter i and update mean and covariance.
      * @see addArrayValues
      * @tparam i index of the parameter
@@ -239,14 +248,15 @@ namespace Belle2 {
     constexpr int getIndex(int i, int j) const {
       return (i < j) ? ((j + 1) * j / 2 + i) : ((i + 1) * i / 2 + j);
     }
+#endif
 
     /** Store the sum of weights */
-    value_type m_entries {0};
+    value_type m_entries;
     /** Store the mean values for all parameters */
-    std::array <value_type, N> m_mean {{0}};
+    value_type m_mean[N];
     /** Store the triangular covariance matrix for all parameters in
      * continous memory. Actual covariance is m_covariance[getIndex(i,j)]/m_entries */
-    std::array < value_type, (N * (N + 1) / 2) > m_covariance {{0}};
+    value_type m_covariance[N * (N + 1) / 2];
   };
 
 } //Belle2 namespace

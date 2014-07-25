@@ -13,6 +13,7 @@
 #include <framework/pcore/RxModule.h>
 #include <framework/pcore/TxModule.h>
 #include <framework/pcore/HistModule.h>
+#include <framework/pcore/DataStoreStreamer.h>
 
 #include <framework/core/Environment.h>
 #include <framework/logging/LogSystem.h>
@@ -254,6 +255,10 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
 
   //we're one of the forked processes
   if (localPath != nullptr) {
+    if (!m_procHandler->isOutputProcess()) {
+      DataStoreStreamer::removeSideEffects();
+    }
+
     ModulePtrList localModules = localPath->buildModulePathList();
     ModulePtrList procinitmodules = getModulesWithFlag(localModules, Module::c_InternalSerializer);
     //dump_modules("processInitialize for ", procinitmodules);

@@ -6,5 +6,8 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::Mergeable+;
+#pragma link C++ class Belle2::RootMergeable<TNtuple>+;
+#pragma link C++ class Belle2::RootMergeable<TH1F>+;
+#pragma link C++ class Belle2::RootMergeable<TH2F>+;
 
 #endif

@@ -115,6 +115,16 @@ void DataStoreStreamer::mergeIntoExisting(TObject* existing, const TObject* rece
   Mergeable* existingObject = static_cast<Mergeable*>(existing);
   existingObject->merge(static_cast<const Mergeable*>(received));
 }
+void DataStoreStreamer::removeSideEffects()
+{
+  const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(DataStore::c_Persistent);
+  for (const auto & entryPair : map) {
+    DataStore::StoreEntry* entry = entryPair.second;
+    if (isMergeable(entry->object)) {
+      static_cast<Mergeable*>(entry->object)->removeSideEffects();
+    }
+  }
+}
 
 
 // Stream DataStore

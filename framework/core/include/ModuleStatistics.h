@@ -51,7 +51,8 @@ namespace Belle2 {
      */
     void add(EStatisticCounters type, float time, float memory) {
       m_stats[type].add(time, memory);
-      m_stats[c_Total].add(time, memory);
+      if (type != c_Total)
+        m_stats[c_Total].add(time, memory);
     }
 
     /** Add statistics for each category. */

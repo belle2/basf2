@@ -15,14 +15,12 @@
 #include <top/geometry/TOPGeometryPar.h>
 #include <string>
 
-#include <top/reconstruction/TOPtrack.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <framework/gearbox/Const.h>
 
 
 namespace Belle2 {
-  using namespace TOP;
 
   /**
    * TOP reconstruction module.
@@ -112,7 +110,7 @@ namespace Belle2 {
 
     // Geometry parameters
 
-    TOPGeometryPar* m_topgp;   /**< geometry parameters */
+    TOP::TOPGeometryPar* m_topgp;   /**< geometry parameters */
 
     // space for TOP bars including wedges
 

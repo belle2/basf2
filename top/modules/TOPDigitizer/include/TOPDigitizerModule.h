@@ -18,10 +18,8 @@
 
 namespace Belle2 {
 
-  using namespace TOP;
-
-  //! TOP digitizer module.
-  /*
+  /**
+   * TOP digitizer.
    * This module takes hits form G4 simulation (TOPSimHit),
    * applies TTS, T0jitter and do spatial and time digitization
    * (QE moved to the simulation: applied in SensitiveBar, SensitivePMT)
@@ -31,10 +29,14 @@ namespace Belle2 {
 
   public:
 
-    //! Constructor.
+    /**
+     * Constructor
+     */
     TOPDigitizerModule();
 
-    //! Destructor.
+    /**
+     * Destructor
+     */
     virtual ~TOPDigitizerModule();
 
     /**
@@ -74,6 +76,12 @@ namespace Belle2 {
 
   private:
 
+    /**
+     * Returns random number according to TTS distribution
+     * @return random number according to TTS distribution
+     */
+    double PMT_TTS();
+
     std::string m_inputSimHits;    /**< Input collection name */
     std::string m_outputDigits;    /**< Output collection name */
     double m_timeZeroJitter;       /**< r.m.s of T0 jitter */
@@ -81,11 +89,7 @@ namespace Belle2 {
     double m_electronicEfficiency; /**< electronic efficiency */
     double m_darkNoise;            /**< uniform dark noise (hits per bar) */
 
-    //! Geometry parameters reading object
-    TOPGeometryPar* m_topgp;
-
-    //! Returns random number according to TTS distribution
-    double PMT_TTS();
+    TOP::TOPGeometryPar* m_topgp;  /**< geometry parameters */
 
   };
 

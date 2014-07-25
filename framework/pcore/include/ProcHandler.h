@@ -53,7 +53,7 @@ namespace Belle2 {
      *
      * Return values mean:
      *  -1:     no parallel processing used (or global process)
-     *  <10000  one of the main processes (between input and output paths)
+     *  <10000  one of the main processes (between input and output paths). In range 0..Environment::getInstance().getNumberProcesses()-1.
      *  >=10000 input path
      *  >=20000 output path
      */

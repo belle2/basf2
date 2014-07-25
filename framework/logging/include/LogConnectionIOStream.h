@@ -13,7 +13,7 @@
 
 #include <framework/logging/LogConnectionBase.h>
 
-#include <iostream>
+#include <iosfwd>
 
 namespace Belle2 {
 
@@ -59,7 +59,7 @@ namespace Belle2 {
 
   private:
 
-    std::ostream* m_stream;  /**< The output stream used for sending the log message.*/
+    std::ostream& m_stream;  /**< The output stream used for sending the log message.*/
     bool m_color;            /**< Flag for color output.*/
 
   };

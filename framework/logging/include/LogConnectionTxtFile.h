@@ -14,7 +14,7 @@
 #include <framework/logging/LogConnectionBase.h>
 
 #include <string>
-#include <fstream>
+#include <iosfwd>
 
 namespace Belle2 {
 

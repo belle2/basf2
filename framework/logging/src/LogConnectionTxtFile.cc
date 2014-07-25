@@ -10,6 +10,7 @@
 
 #include <framework/logging/LogConnectionTxtFile.h>
 #include <framework/logging/LogMessage.h>
+#include <fstream>
 
 using namespace Belle2;
 using namespace std;

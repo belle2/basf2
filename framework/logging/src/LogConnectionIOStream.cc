@@ -11,25 +11,26 @@
 #include <framework/logging/LogConnectionIOStream.h>
 #include <framework/logging/LogMessage.h>
 
+#include <iostream>
+
 using namespace Belle2;
 using namespace std;
 
 LogConnectionIOStream::LogConnectionIOStream(ostream& outputStream, bool color) :
+  m_stream(outputStream),
   m_color(color)
 {
-  m_stream = new ostream(outputStream.rdbuf());
 }
 
 
 LogConnectionIOStream::~LogConnectionIOStream()
 {
-  delete m_stream;
 }
 
 
 bool LogConnectionIOStream::isConnected()
 {
-  return (m_stream != NULL);
+  return m_stream.rdbuf() != nullptr;
 }
 
 
@@ -44,12 +45,14 @@ bool LogConnectionIOStream::sendMessage(const LogMessage& message)
         "\x1b[31m",        // Error  : red
         "\x1b[07m\x1b[31m" // Fatal  : red reversed
       };
-      (*m_stream) << color_str[message.getLogLevel()];
+      m_stream << color_str[message.getLogLevel()];
     }
-    (*m_stream) << message;
+    m_stream << message;
     if (m_color) {
-      (*m_stream) << "\x1b[m" << flush;
+      m_stream << "\x1b[m" << flush;
     }
     return true;
-  } else return false;
+  } else {
+    return false;
+  }
 }

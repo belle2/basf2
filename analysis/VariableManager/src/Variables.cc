@@ -562,21 +562,6 @@ namespace Belle2 {
     }
 
 
-    double cosTPTO(const Particle* p)
-    {
-      const ContinuumSuppression* qq = p->getRelated<ContinuumSuppression>();
-      const TVector3 thrustAxisO = qq->getThrustO();
-      //cout << "thrustAxisO" << thrustAxisO << endl;
-
-      const TVector3 pAxis = PCmsLabTransform::labToCms(p->get4Vector()).Vect();
-      //cout << "pAxis" << pAxis << endl;
-      double result = fabs(cos(pAxis.Angle(thrustAxisO)));
-      return result;
-    }
-
-
-
-
     // MC related ------------------------------------------------------------
 
     double isSignal(const Particle* part)
@@ -828,6 +813,53 @@ namespace Belle2 {
         }
       }
       return maximum_r * maximum_q;
+    }
+
+    double p_miss(const Particle*)
+    {
+      TLorentzVector trackiCMSVec;
+      TLorentzVector roeCMSVec;
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      const auto& tracks = roe->getTracks();
+      for (unsigned int i = 0; i < tracks.size(); ++i) {
+        const PIDLikelihood* trackiPidLikelihood = tracks[i]->getRelated<PIDLikelihood>();
+        const Const::ChargedStable trackiChargedStable = trackiPidLikelihood->getMostLikely();
+        double trackiMassHypothesis = trackiChargedStable.getMass();
+        const TrackFitResult* tracki = tracks[i]->getTrackFitResult(trackiChargedStable);
+        if (tracki == nullptr) continue;
+        double energy = sqrt(trackiMassHypothesis * trackiMassHypothesis + (tracki->getMomentum()).Dot(tracki->getMomentum()));
+        TLorentzVector trackiVec(tracki->getMomentum(), energy);
+        trackiCMSVec = PCmsLabTransform::labToCms(trackiVec);
+        roeCMSVec += trackiCMSVec;
+      }
+      double missMom = -roeCMSVec.P();
+      return missMom ;
+    }
+
+    double isThereAKShortinRoe(const Particle*)
+    {
+      StoreObjPtr<ParticleList> KShorts("K_S0:ROE");
+      int flag = KShorts->getListSize();
+      //cout << "flag  " << flag;
+      if (flag == 0) return 0.0;
+      else return 1.0;
+    }
+
+    double cosTPTO(const Particle* p)
+    {
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      const ContinuumSuppression* cs = roe->getRelated<Particle>()->getRelated<ContinuumSuppression>();
+      const TVector3 thrustAxisO = cs->getThrustO(); //thrust is already in cms
+      const TVector3 pAxis = PCmsLabTransform::labToCms(p->get4Vector()).Vect();
+      double result = fabs(cos(pAxis.Angle(thrustAxisO)));
+
+      //const ContinuumSuppression* qq = p->getRelated<ContinuumSuppression>();
+      //const TVector3 thrustAxisO = qq->getThrustO();
+      //cout << "thrustAxisO" << thrustAxisO << endl;
+      //const TVector3 pAxis = PCmsLabTransform::labToCms(p->get4Vector()).Vect();
+      //cout << "pAxis" << pAxis << endl;
+      //double result = fabs(cos(pAxis.Angle(thrustAxisO)));
+      return result;
     }
 
     // RestOfEvent related --------------------------------------------------
@@ -2034,9 +2066,11 @@ namespace Belle2 {
     REGISTER_VARIABLE("bestQRMuon", bestQRMuon,  "[Eventbased] q*r where r is maximum getExtraInfo(isMuon) in mu+:ROE list.");
     REGISTER_VARIABLE("bestQRSlowPion", bestQRSlowPion,  "[Eventbased] q*r where r is maximum getExtraInfo(isSlowPion) in pi+:ROE list.");
     REGISTER_VARIABLE("bestQRKaon", bestQRKaon,  "[Eventbased] q*r where r is maximum getExtraInfo(isKaon) in K+:ROE list.");
+    REGISTER_VARIABLE("p_miss", p_miss,  "Calculates the missing Momentum for a given particle on the tag side.");
+    REGISTER_VARIABLE("isInRestOfEvent",  isInRestOfEvent,  "1.0 of track, cluster of given particle is found in rest of event. 0 otherwise.");
+    REGISTER_VARIABLE("isThereAKShortinRoe",  isThereAKShortinRoe,  "1.0 if there was a K_S0 in the ROE");
 
     VARIABLE_GROUP("Rest Of Event");
-    REGISTER_VARIABLE("isInRestOfEvent",  isInRestOfEvent,  "1.0 of track, cluster of given particle is found in rest of event. 0 otherwise.");
     REGISTER_VARIABLE("nROETracks",  nROETracks,  "number of remaining tracks as given by the related RestOfEvent object");
     REGISTER_VARIABLE("nROEClusters", nROEClusters, "number of remaining ECL clusters as given by the related RestOfEvent object");
 

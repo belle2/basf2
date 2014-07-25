@@ -425,6 +425,20 @@ namespace Belle2 {
     double bestQRKaon(const Particle*);
 
     /**
+     * returns missing Momentum on the tag side (flavor tagging specific variable).
+     *
+     * requires that StoreObjPtr<RestOfEvent> roe("RestOfEvent") exists.
+     */
+    double p_miss(const Particle*);
+
+    /**
+     * 1.0 if there was a K_S0 in the ROE (flavor tagging specific variable).
+     *
+     * requires that StoreObjPtr<ParticleList> KShorts("K_S0:ROE") exists.
+     */
+    double isThereAKShortinRoe(const Particle*);
+
+    /**
      * return number of remaining tracks as given by the related RestOfEvent object
      *
      * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)

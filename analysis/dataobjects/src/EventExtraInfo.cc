@@ -26,6 +26,11 @@ bool EventExtraInfo::hasExtraInfo(const std::string& name) const
 }
 
 
+void EventExtraInfo::removeExtraInfo()
+{
+  eventExtraInfo.clear();
+}
+
 void EventExtraInfo::addExtraInfo(const std::string& name, float value)
 {
   if (hasExtraInfo(name)) {

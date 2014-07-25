@@ -32,6 +32,10 @@ namespace Belle2 {
     /** Return wether the extra info with the given name is set. */
     bool hasExtraInfo(const std::string& name) const;
 
+
+    /** Removes extra info from event */
+    void removeExtraInfo();
+
     /** Sets the user-defined data of given name to the given value.
      *
      * throws std::out_of_range if variable is already set.

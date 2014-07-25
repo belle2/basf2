@@ -11,6 +11,8 @@
 
 #include <framework/core/Module.h>
 #include <analysis/VariableManager/Manager.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/pcore/RootMergeable.h>
 
 #include <TNtuple.h>
 #include <TFile.h>
@@ -50,7 +52,7 @@ namespace Belle2 {
     /** ROOT file for output. */
     TFile* m_file;
     /** The ROOT TNtuple for output. */
-    TNtuple* m_tree;
+    StoreObjPtr<RootMergeable<TNtuple>> m_tree;
     /** List of function pointers corresponding to given variables. */
     std::vector<Variable::Manager::FunctionPtr> m_functions;
 

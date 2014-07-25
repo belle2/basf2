@@ -14,7 +14,8 @@
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
 #include <framework/logging/Logger.h>
-#include <framework/datastore/StoreObjPtr.h>
+#include <framework/pcore/ProcHandler.h>
+#include <framework/core/Environment.h>
 
 #include <cmath>
 #include <algorithm>
@@ -25,11 +26,15 @@ using namespace Belle2;
 // Register module in the framework
 REG_MODULE(VariablesToNtuple)
 
+//TODO rename this .cc file: +Module
 
-VariablesToNtupleModule::VariablesToNtupleModule() : Module()
+VariablesToNtupleModule::VariablesToNtupleModule() :
+  Module(),
+  m_tree("", DataStore::c_Persistent)
 {
   //Set module properties
   setDescription("Calculate variables specified by the user for a given ParticleList and save them into a TNtuple.");
+  setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
   vector<string> emptylist;
   addParam("particleList", m_particleList, "Name of particle list with reconstructed particles. If no list is provided the variables are saved once per event (only possible for event-type variables)", std::string(""));
@@ -39,7 +44,6 @@ VariablesToNtupleModule::VariablesToNtupleModule() : Module()
   addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", string("ntuple"));
 
   m_file = nullptr;
-  m_tree = nullptr;
 }
 
 void VariablesToNtupleModule::initialize()
@@ -80,7 +84,8 @@ void VariablesToNtupleModule::initialize()
     }
   }
 
-  m_tree = new TNtuple(m_treeName.c_str(), "", varlist.c_str());
+  m_tree.registerAsTransient(m_treeName);
+  m_tree.construct(m_treeName.c_str(), "", varlist.c_str());
 }
 
 void VariablesToNtupleModule::event()
@@ -92,7 +97,7 @@ void VariablesToNtupleModule::event()
     for (unsigned int iVar = 0; iVar < nVars; iVar++) {
       vars[iVar] = m_functions[iVar](nullptr);
     }
-    m_tree->Fill(vars.data());
+    m_tree->get().Fill(vars.data());
 
   } else {
     StoreObjPtr<ParticleList> particlelist(m_particleList);
@@ -103,18 +108,20 @@ void VariablesToNtupleModule::event()
         vars[iVar] = m_functions[iVar](particle);
       }
 
-      m_tree->Fill(vars.data());
+      m_tree->get().Fill(vars.data());
     }
   }
 }
 
 void VariablesToNtupleModule::terminate()
 {
-  B2INFO("Writing NTuple " << m_treeName);
-  m_file->cd();
-  m_tree->Write();
+  if (Environment::Instance().getNumberProcesses() == 0 or ProcHandler::isOutputProcess()) {
+    B2INFO("Writing NTuple " << m_treeName);
+    m_file->cd();
+    m_tree->get().Write();
+    m_tree->get().SetDirectory(nullptr);
 
-  B2INFO("Closing file " << m_fileName);
-  delete m_file;
-  m_tree = NULL;
+    B2INFO("Closing file " << m_fileName);
+    delete m_file;
+  }
 }

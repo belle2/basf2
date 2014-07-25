@@ -131,15 +131,13 @@ namespace Belle2 {
       return DataStore::Instance().createObject(0, replace, *this);
     };
 
-    /** Add an existing object to the data store (takes ownership).
+    /** Assign 'object' to this accessor. (takes ownership).
      *
-     *  @param object    The object that should be put in the DataStore.
+     *  @param object    The object that should be put in the DataStore, should be of same type as the one used by this accessor.
      *  @param replace   Should an existing object be replaced?
      *  @return          True if the creation succeeded.
      **/
-    bool assign(TObject* object, bool replace = false) {
-      return DataStore::Instance().createObject(object, replace, *this);
-    };
+    bool assign(TObject* object, bool replace = false);
 
 
     /** Return name under which the object is saved in the DataStore. */
@@ -149,7 +147,7 @@ namespace Belle2 {
     DataStore::EDurability getDurability() const { return m_durability; }
 
     /** Return pair of name and durability under which stored object is saved.  */
-    AccessorParams getAccessorParams() const {return make_pair(m_name, m_durability);};
+    AccessorParams getAccessorParams() const { return make_pair(m_name, m_durability);};
 
     /** Check if two store accessors point to the same object/array. */
     virtual bool operator==(const StoreAccessorBase& other) {

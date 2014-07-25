@@ -9,6 +9,10 @@
  **************************************************************************/
 
 #include <framework/datastore/StoreAccessorBase.h>
+#include <framework/logging/Logger.h>
+
+#include <TClass.h>
+#include <TObject.h>
 
 using namespace Belle2;
 
@@ -26,3 +30,14 @@ std::string StoreAccessorBase::readableName() const
   }
   return str + ")";
 }
+
+bool StoreAccessorBase::assign(TObject* object, bool replace)
+{
+  if (object != nullptr) {
+    if (object->IsA() != getClass()) {
+      B2ERROR("Cannot assign() an object of type '" << object->IsA()->GetName() << "' to " << readableName() << " of type '" << getClass()->GetName() << "'!");
+      return false;
+    }
+  }
+  return DataStore::Instance().createObject(object, replace, *this);
+};

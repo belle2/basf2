@@ -342,10 +342,14 @@ void pEventProcessor::analyzePath(const PathPtr& path)
   PathPtr mainpath(new Path);
   PathPtr outpath(new Path);
 
+  bool createAllPaths = false; //usually we might not need e.g. an output path
   int stage = 0; //0: in, 1: event/main, 2: out
   for (const ModulePtr & module : path->getModules()) {
     //TODO also check conditional path, or have setConditionPath() update module flag...
     const bool hasParallelFlag = module->hasProperties(Module::c_ParallelProcessingCertified);
+
+    if (module->hasProperties(Module::c_TerminateInAllProcesses))
+      createAllPaths = true; //ensure there are all kinds of processes
 
     //update stage?
     if ((stage == 0 and hasParallelFlag) or (stage == 1 and !hasParallelFlag))
@@ -370,11 +374,12 @@ void pEventProcessor::analyzePath(const PathPtr& path)
       outpath->addModule(module);
   }
 
-  if (!inpath->isEmpty())
-    m_inpathlist.push_back(inpath);
+  //if main path is empty, createAllPaths doesn't really matter, since we'll fall back to single-core processing
   if (!mainpath->isEmpty())
     m_mainpathlist.push_back(mainpath);
-  if (!outpath->isEmpty())
+  if (createAllPaths or !inpath->isEmpty())
+    m_inpathlist.push_back(inpath);
+  if (createAllPaths or !outpath->isEmpty())
     m_outpathlist.push_back(outpath);
 }
 

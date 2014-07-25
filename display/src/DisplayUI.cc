@@ -32,6 +32,7 @@
 #include <TGMsgBox.h>
 #include <TGFileDialog.h>
 #include <TGInputDialog.h>
+#include <TGTab.h>
 #include <TGTextEntry.h>
 #include <TGLViewer.h>
 #include <TObject.h>
@@ -286,6 +287,21 @@ void DisplayUI::selectionHandler(TEveElement* eveObj)
   }
 
 }
+void DisplayUI::handleEvent(Event_t* event)
+{
+  //TODO: find a way to make this work if glviewers have focus
+  B2DEBUG(100, "event type " << event->fType << ", code: " << event->fCode)
+  if (event->fType != kGKeyPress) {
+    switch (event->fCode) {
+      case 117: //Page Down
+        next();
+        break;
+      case 112: //Page Up
+        prev();
+        break;
+    }
+  }
+}
 
 bool DisplayUI::startDisplay()
 {
@@ -361,6 +377,9 @@ void DisplayUI::makeGui()
   browser->Connect("CloseWindow()", "TSystem", gSystem, "ExitLoop()");
   browser->Connect("CloseWindow()", "Belle2::DisplayUI", this, "closeAndContinue()");
 
+  //add handler for keyboard events
+  browser->Connect("ProcessedEvent(Event_t*)", "Belle2::DisplayUI", this, "handleEvent(Event_t*)");
+
   browser->StartEmbedding(TRootBrowser::kLeft);
 
   TGMainFrame* frmMain = new TGMainFrame(gClient->GetRoot(), 240, 600);
@@ -375,7 +394,7 @@ void DisplayUI::makeGui()
     TGHorizontalFrame* hf = new TGHorizontalFrame(event_frame);
     {
       m_prevButton = new TGPictureButton(hf, gClient->GetPicture(icondir + "GoBack.gif"));
-      m_prevButton->SetToolTipText("Go to previous event");
+      m_prevButton->SetToolTipText("Go to previous event (Page Up)");
       hf->AddFrame(m_prevButton, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, margin, margin, margin, margin));
       m_prevButton->Connect("Clicked()", "Belle2::DisplayUI", this, "prev()");
 
@@ -397,7 +416,7 @@ void DisplayUI::makeGui()
       }
 
       m_nextButton = new TGPictureButton(hf, gClient->GetPicture(icondir + "GoForward.gif"));
-      m_nextButton->SetToolTipText("Go to next event");
+      m_nextButton->SetToolTipText("Go to next event (Page Down)");
       hf->AddFrame(m_nextButton, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, margin, margin, margin, margin));
       m_nextButton->Connect("Clicked()", "Belle2::DisplayUI", this, "next()");
     }

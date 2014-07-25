@@ -16,6 +16,7 @@ class TGLabel;
 class TGNumberEntry;
 class TGTextEntry;
 class TTimer;
+struct Event_t;
 
 namespace Belle2 {
   //forward declaration needed because CINT balks at inclusion of python headers in ModuleParam...
@@ -145,6 +146,10 @@ namespace Belle2 {
   public: // slots, don't call these manually
     /** Handle special actions when objects are selected. */
     void selectionHandler(TEveElement* eveObj);
+
+    /** Handles keyboard shortcuts. */
+    void handleEvent(Event_t* event);
+
 
   private:
 

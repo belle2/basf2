@@ -66,6 +66,25 @@ namespace Belle2 {
       addWeighted(1.0, values...);
     }
 
+    /** Merge the data set in 'other' into this one. */
+    void add(const CalcMeanCov<N, RealType>& other) {
+      const int n = m_entries + other.m_entries;
+      if (n == 0)
+        return;
+      for (int i = 0; i < N; ++i) {
+        const value_type delta = (other.m_mean[i] - m_mean[i]);
+        //Update covariance matrix
+        for (int j = i; j < N; ++j) {
+          const value_type delta2 = (other.m_mean[j] - m_mean[j]);
+          m_covariance[getIndex(i, j)] += other.m_covariance[getIndex(i, j)]  + m_entries * other.m_entries
+                                          / n * delta * delta2;
+        }
+        //Update mean value
+        m_mean[i] += other.m_entries * delta / n;
+      }
+      m_entries = n;
+    }
+
     /** Update mean and covarianced by adding a new weighted entry.
      * @param weight weight of entry
      * @param values pointer to the first value

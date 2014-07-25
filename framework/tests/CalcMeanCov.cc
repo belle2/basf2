@@ -136,4 +136,35 @@ namespace {
       ASSERT_EQ((templated.getCovariance<1, 2>()), arrayed.getCovariance(1, 2));
     }
   }
+
+  /** Check result of adding two CalcMeanCov sets yields same results as doing it in one set. */
+  TEST(CalcMeanCov, AddingTwoSets)
+  {
+    constexpr int N = 10000;
+    CalcMeanCov<> meancov; //adding one by one
+    CalcMeanCov<> sum;
+    CalcMeanCov<> otherhalf; //added to sum
+
+    for (double gmean : { -5.0, 0.0, 1.0, 3.5, 150.}) {
+      for (double gsigma : {0.1, 1.0, 4.2, 25.}) {
+        for (int i = 0; i < N; ++i) {
+          const double x = gRandom->Gaus(gmean, gsigma);
+          meancov.add(x);
+          if (i % 2 == 0)
+            sum.add(x);
+          else
+            otherhalf.add(x);
+        }
+        sum.add(otherhalf);
+
+        EXPECT_FLOAT_EQ(sum.getEntries(), meancov.getEntries());
+        EXPECT_FLOAT_EQ(sum.getMean(), meancov.getMean());
+        EXPECT_FLOAT_EQ(sum.getStddev(), meancov.getStddev());
+        EXPECT_FLOAT_EQ(sum.getSum(), meancov.getSum());
+        meancov.clear();
+        sum.clear();
+        otherhalf.clear();
+      }
+    }
+  }
 }  // namespace

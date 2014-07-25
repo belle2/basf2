@@ -279,7 +279,8 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
   //  printf("PostRawCOPPER : Eve %.8x block %d finesse %d B2LCRC16 %.8x calculated CRC16 %.8x\n", GetEveNo(n), n, finesse_num,  *buf, temp_crc16 );
 
   if ((unsigned short)(*buf & 0xFFFF) != temp_crc16) {
-    printf("CRC16 error %x %x %d\n", *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
+    PrintData(m_buffer, m_nwords);
+    printf("POST CRC16 error %x %x %d\n", *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
     printf("\n");
     int* temp_buf = GetFINESSEBuffer(n, finesse_num);
     printf("%.8x ", 0);
@@ -377,7 +378,7 @@ int* PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
     poswords_to += SIZE_B2LHSLB_HEADER;
 
     // Fill b2link FEE header
-    packed_buf[ poswords_to + POS_B2LHSLB_MAGIC ] = (rawcpr_info.b2l_ctime & 0x1FFFFFF) << 4;
+    packed_buf[ poswords_to + POS_B2L_CTIME ] = (rawcpr_info.b2l_ctime & 0x1FFFFFF) << 4;
     poswords_to += SIZE_B2LFEE_HEADER;
 
     // copy the 1st Detector Buffer

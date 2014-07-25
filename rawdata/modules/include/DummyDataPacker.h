@@ -54,6 +54,9 @@ namespace Belle2 {
     //! # of events in a run
     int max_nevt;
 
+    //! Node ID
+    int m_nodeid;
+
     //! Number of events
     int n_basf2evt;
 
@@ -68,6 +71,7 @@ namespace Belle2 {
 
     //! RawCOPPER array
     StoreArray<RawCOPPER> rawcprarray;
+
 
   };
 

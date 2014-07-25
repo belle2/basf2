@@ -27,8 +27,6 @@ PreRawCOPPERFormat_latest::~PreRawCOPPERFormat_latest()
 }
 
 
-
-
 int PreRawCOPPERFormat_latest::GetBufferPos(int n)
 {
   if (m_buffer == NULL || m_nwords <= 0) {
@@ -98,6 +96,7 @@ int PreRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
 {
   if (!CheckCOPPERMagic(n)) {
     char err_buf[500];
+    PrintData(m_buffer, m_nwords);
     sprintf(err_buf, "COPPER's magic word is invalid. Maybe it is due to data corruption or different version of the data format.\n %s %s %d\n", __FILE__, __PRETTY_FUNCTION__, __LINE__);
     perror(err_buf);
     exit(1);
@@ -152,6 +151,7 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
   }
 
   if (flag == 0) {
+    PrintData(m_buffer, m_nwords);
     char err_buf[500];
     sprintf(err_buf, "No HSLB data in COPPER data. Exiting...\n%s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -161,7 +161,7 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
   }
 
   if (err_flag == 1) {
-
+    PrintData(m_buffer, m_nwords);
     char err_buf[500];
     sprintf(err_buf, "CORRUPTED DATA: Different event number over HSLBs : slot A 0x%x : B 0x%x :C 0x%x : D 0x%x\n%s %s %d\n",
             eve[ 0 ], eve[ 1 ], eve[ 2 ], eve[ 3 ],
@@ -976,11 +976,13 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
 
 int PreRawCOPPERFormat_latest::CheckB2LHSLBMagicWords(int* finesse_buf, int finesse_nwords)
 {
+
   if ((finesse_buf[ POS_MAGIC_B2LHSLB ] & 0xFFFF0000) == B2LHSLB_HEADER_MAGIC &&
       ((finesse_buf[ finesse_nwords - SIZE_B2LHSLB_TRAILER + POS_CHKSUM_B2LHSLB ] & 0xFFFF0000)
        == B2LHSLB_TRAILER_MAGIC)) {
     return 1;
   } else {
+    PrintData(m_buffer, m_nwords);
     printf("Invalid B2LHSLB magic words 0x%x 0x%x. Exiting... :%s %s %d\n",
            finesse_buf[ POS_MAGIC_B2LHSLB ],
            finesse_buf[ finesse_nwords - SIZE_B2LHSLB_TRAILER + POS_CHKSUM_B2LHSLB ],
@@ -1035,15 +1037,146 @@ int PreRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
 }
 
 int* PreRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
-                                                int* buf_1st, int nwords_1st,
-                                                int* buf_2nd, int nwords_2nd,
-                                                int* buf_3rd, int nwords_3rd,
-                                                int* buf_4th, int nwords_4th,
-                                                RawCOPPERPackerInfo rawcprpacker_info)
+                                                int* detector_buf_1st, int nwords_1st,
+                                                int* detector_buf_2nd, int nwords_2nd,
+                                                int* detector_buf_3rd, int nwords_3rd,
+                                                int* detector_buf_4th, int nwords_4th,
+                                                RawCOPPERPackerInfo rawcpr_info)
 {
-  char err_buf[500];
-  sprintf(err_buf, "This function is not supported . Exiting...\n%s %s %d\n",
-          __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf;
-  throw (err_str);
+  int* packed_buf = NULL;
+
+  int poswords_to = 0;
+  int* detector_buf[ 4 ] = { detector_buf_1st, detector_buf_2nd, detector_buf_3rd, detector_buf_4th };
+  int nwords[ 4 ] = { nwords_1st, nwords_2nd, nwords_3rd, nwords_4th };
+
+  // calculate the event length
+  int length_nwords = tmp_header.GetHdrNwords() + SIZE_COPPER_HEADER + SIZE_COPPER_TRAILER + tmp_trailer.GetTrlNwords();
+
+  for (int i = 0; i < 4; i++) {
+    if (detector_buf[ i ] == NULL || nwords[ i ] <= 0) continue;    // for an empty FINESSE slot
+    length_nwords += nwords[ i ];
+    length_nwords += SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER
+                     + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+  }
+
+  // allocate buffer
+  packed_buf = new int[ length_nwords ];
+  memset(packed_buf, 0, sizeof(int) * length_nwords);
+
+  //
+  // Fill RawHeader
+  //
+  tmp_header.SetBuffer(packed_buf);
+
+  packed_buf[ tmp_header.POS_NWORDS ] = length_nwords; // total length
+  packed_buf[ tmp_header.POS_VERSION_HDRNWORDS ] = 0x7f7f8000 | ((POST_RAWCOPPER_FORMAT_VER1 << 8) & 0x0000ff00)
+                                                   | tmp_header.RAWHEADER_NWORDS; // ver.#, header length
+  packed_buf[ tmp_header.POS_EXP_RUN_NO ] = (rawcpr_info.exp_num << 22)
+                                            | (rawcpr_info.run_subrun_num & 0x003FFFFF);   // exp. and run #
+  packed_buf[ tmp_header.POS_EVE_NO ] = rawcpr_info.eve_num; // eve #
+  packed_buf[ tmp_header.POS_TTCTIME_TRGTYPE ] = (rawcpr_info.tt_ctime & 0x7FFFFFF) << 4;   // tt_ctime
+  packed_buf[ tmp_header.POS_TTUTIME ] = rawcpr_info.tt_utime; // tt_utime
+  packed_buf[ tmp_header.POS_SUBSYS_ID ] = rawcpr_info.node_id; // subsystem(node) ID
+
+
+
+
+  // fill the positions of finesse buffers
+  packed_buf[ tmp_header.POS_OFFSET_1ST_FINESSE ] = tmp_header.RAWHEADER_NWORDS + SIZE_COPPER_HEADER;
+
+  packed_buf[ tmp_header.POS_OFFSET_2ND_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_1ST_FINESSE ];
+  if (nwords[ 0 ] > 0) {
+    packed_buf[ tmp_header.POS_OFFSET_2ND_FINESSE ] +=
+      nwords[ 0 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+  }
+
+  packed_buf[ tmp_header.POS_OFFSET_3RD_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_2ND_FINESSE ];
+  if (nwords[ 1 ] > 0) {
+    packed_buf[ tmp_header.POS_OFFSET_3RD_FINESSE ] +=
+      nwords[ 1 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+  }
+
+  packed_buf[ tmp_header.POS_OFFSET_4TH_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_3RD_FINESSE ];
+  if (nwords[ 2 ] > 0) {
+    packed_buf[ tmp_header.POS_OFFSET_4TH_FINESSE ] += nwords[ 2 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+  }
+  poswords_to += tmp_header.GetHdrNwords();
+
+  // Fill COPPER header
+  packed_buf[ poswords_to + POS_MAGIC_COPPER_1 ] = COPPER_MAGIC_DRIVER_HEADER;
+  packed_buf[ poswords_to + POS_MAGIC_COPPER_2 ] = COPPER_MAGIC_FPGA_HEADER;
+  packed_buf[ poswords_to + POS_EVE_NUM_COPPER ] = rawcpr_info.eve_num;
+
+  int size_b2l_hdrtrl = SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+  if (nwords[ 0 ] != 0)  packed_buf[ poswords_to + POS_CH_A_DATA_LENGTH ] = nwords[ 0 ] + size_b2l_hdrtrl;
+  if (nwords[ 1 ] != 0)  packed_buf[ poswords_to + POS_CH_B_DATA_LENGTH ] = nwords[ 1 ] + size_b2l_hdrtrl;
+  if (nwords[ 2 ] != 0)  packed_buf[ poswords_to + POS_CH_C_DATA_LENGTH ] = nwords[ 2 ] + size_b2l_hdrtrl;
+  if (nwords[ 3 ] != 0)  packed_buf[ poswords_to + POS_CH_D_DATA_LENGTH ] = nwords[ 3 ] + size_b2l_hdrtrl;
+
+  packed_buf[ poswords_to + POS_DATA_LENGTH ] =
+    packed_buf[ poswords_to + POS_CH_A_DATA_LENGTH ] +
+    packed_buf[ poswords_to + POS_CH_B_DATA_LENGTH ] +
+    packed_buf[ poswords_to + POS_CH_C_DATA_LENGTH ] +
+    packed_buf[ poswords_to + POS_CH_D_DATA_LENGTH ] +
+    (SIZE_COPPER_HEADER - SIZE_COPPER_DRIVER_HEADER) +
+    (SIZE_COPPER_TRAILER - SIZE_COPPER_DRIVER_TRAILER);
+
+  poswords_to += SIZE_COPPER_HEADER;
+
+  // Fill FINESSE buffer
+  for (int i = 0; i < 4; i++) {
+
+    if (detector_buf[ i ] == NULL || nwords[ i ] <= 0) continue;     // for an empty FINESSE slot
+
+    // Fill b2link HSLB header
+    packed_buf[ poswords_to + POS_MAGIC_B2LHSLB ] = 0xffaa0000 | (0xffff & rawcpr_info.eve_num);
+    poswords_to += SIZE_B2LHSLB_HEADER;
+    int* crc16_start = &(packed_buf[ poswords_to ]);
+
+    // Fill b2link FEE header
+
+    packed_buf[ poswords_to + POS_TT_CTIME_TYPE ] = (rawcpr_info.tt_ctime & 0x7FFFFFF) << 4;
+    packed_buf[ poswords_to + POS_TT_TAG ] = rawcpr_info.eve_num;
+    packed_buf[ poswords_to + POS_TT_UTIME ] = rawcpr_info.tt_utime;
+    packed_buf[ poswords_to + POS_EXP_RUN ] = (rawcpr_info.exp_num << 22) | (rawcpr_info.run_subrun_num & 0x003FFFFF);   // exp. and run #
+    packed_buf[ poswords_to + POS_B2L_CTIME ] = (rawcpr_info.b2l_ctime & 0x7FFFFFF) << 4;
+    poswords_to += SIZE_B2LFEE_HEADER;
+
+    // copy the 1st Detector Buffer
+    memcpy(packed_buf + poswords_to, detector_buf[ i ], nwords[ i ]*sizeof(int));
+    poswords_to += nwords[ i ];
+
+    // Fill b2link FEE trailer
+    unsigned short crc16 = CalcCRC16LittleEndian(0xffff, crc16_start, nwords[ i ] + SIZE_B2LFEE_HEADER);
+    packed_buf[ poswords_to + POS_CHKSUM_B2LFEE ] = ((0xffff & rawcpr_info.eve_num) << 16) | (crc16 & 0xffff);
+    poswords_to += SIZE_B2LFEE_TRAILER;
+
+    // Fill b2link HSLB trailer
+    packed_buf[ poswords_to + POS_CHKSUM_B2LHSLB ] = 0xff550000;
+    poswords_to += SIZE_B2LHSLB_TRAILER;
+
+  }
+
+  // Fill COPPER trailer
+  packed_buf[ poswords_to + POS_MAGIC_COPPER_3 ] = COPPER_MAGIC_FPGA_TRAILER;
+  packed_buf[ poswords_to + POS_MAGIC_COPPER_4 ] = COPPER_MAGIC_DRIVER_TRAILER;
+  unsigned int chksum = 0;
+  for (int i = tmp_header.GetHdrNwords(); i < poswords_to + (SIZE_COPPER_TRAILER - SIZE_COPPER_DRIVER_TRAILER); i++) {
+    chksum ^= packed_buf[ i ];
+  }
+  packed_buf[ poswords_to + POS_CHKSUM_COPPER ] = chksum;
+  poswords_to += SIZE_COPPER_TRAILER;
+
+  // Calculate RawCOPPER checksum and fill RawTrailer
+  chksum = 0;
+  for (int i = 0; i < poswords_to; i++) {
+    chksum ^= packed_buf[ i ];
+  }
+  packed_buf[ poswords_to + tmp_trailer.POS_CHKSUM ] = chksum;
+  packed_buf[ poswords_to + tmp_trailer.POS_TERM_WORD ] = tmp_trailer.MAGIC_WORD_TERM_TRAILER;
+  poswords_to += tmp_trailer.GetTrlNwords();
+
+  *packed_buf_nwords = poswords_to;
+  return packed_buf;
 }
+

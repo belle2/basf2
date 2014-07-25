@@ -28,6 +28,9 @@ DummyDataPackerModule::DummyDataPackerModule() : Module()
   ///  maximum # of events to produce( -1 : inifinite)
   addParam("MaxEventNum", max_nevt, "Maximum event number to make", -1);
 
+  ///  maximum # of events to produce( -1 : inifinite)
+  addParam("NodeID", m_nodeid, "Node ID", 0);
+
   B2INFO("DummyDataPacker: Constructor done.");
 }
 
@@ -49,7 +52,6 @@ void DummyDataPackerModule::initialize()
   /// Initialize EvtMetaData
   m_eventMetaDataPtr.registerAsPersistent();
 
-  ///  raw_datablkarray.registerPersistent();
   rawcprarray.registerPersistent();
 
   n_basf2evt = 0;
@@ -66,6 +68,7 @@ void DummyDataPackerModule::event()
   //    Make RawCOPPER array
   rawcprarray.create();
 
+
   //
   // Fill event info (These values will be stored in RawHeader )
   //
@@ -73,7 +76,7 @@ void DummyDataPackerModule::event()
   rawcprpacker_info.exp_num = 1;
   rawcprpacker_info.run_subrun_num = 2; // run number : 14bits, subrun # : 8bits
   rawcprpacker_info.eve_num = n_basf2evt;
-  rawcprpacker_info.node_id = 3;
+  rawcprpacker_info.node_id = m_nodeid;
   rawcprpacker_info.tt_ctime = 0x7123456;
   rawcprpacker_info.tt_utime = 0xF1234567;
   rawcprpacker_info.b2l_ctime = 0x7654321;
@@ -83,6 +86,7 @@ void DummyDataPackerModule::event()
   // Prepare buffer to fill dummy data
   //
   RawCOPPER* raw_copper = rawcprarray.appendNew();
+
   int* buf1, *buf2, *buf3, *buf4;
   int nwords_1st = 0, nwords_2nd = 0, nwords_3rd = 0, nwords_4th = 0;
 
@@ -115,6 +119,8 @@ void DummyDataPackerModule::event()
                               buf3, nwords_3rd,
                               buf4, nwords_4th,
                               rawcprpacker_info);
+
+
 
   delete [] buf1;
   delete [] buf2;

@@ -297,6 +297,13 @@ namespace Belle2 {
                          int* detector_buf_4th, int nwords_4th,
                          RawCOPPERPackerInfo rawcprpacker_info);
 
+    //! Pack dummy data (format ver. = -1 -> Select the latest format version)
+    void PackDetectorBuf4DummyData(int* detector_buf_1st, int nwords_1st,
+                                   int* detector_buf_2nd, int nwords_2nd,
+                                   int* detector_buf_3rd, int nwords_3rd,
+                                   int* detector_buf_4th, int nwords_4th,
+                                   RawCOPPERPackerInfo rawcprpacker_info);
+
     enum {
       POS_FORMAT_VERSION = 1,
       FORMAT_MASK = 0x0000FF00

@@ -135,7 +135,7 @@ namespace Belle2 {
      *
      *  @param object    The object that should be put in the DataStore, should be of same type as the one used by this accessor.
      *  @param replace   Should an existing object be replaced?
-     *  @return          True if the creation succeeded.
+     *  @return          True if the assignment succeeded. If false, assign() will delete 'object', do not use it afterwards.
      **/
     bool assign(TObject* object, bool replace = false);
 

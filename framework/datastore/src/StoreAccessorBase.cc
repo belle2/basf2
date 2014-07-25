@@ -33,11 +33,14 @@ std::string StoreAccessorBase::readableName() const
 
 bool StoreAccessorBase::assign(TObject* object, bool replace)
 {
-  if (object != nullptr) {
-    if (object->IsA() != getClass()) {
-      B2ERROR("Cannot assign() an object of type '" << object->IsA()->GetName() << "' to " << readableName() << " of type '" << getClass()->GetName() << "'!");
-      return false;
-    }
+  bool success;
+  if (object != nullptr and object->IsA() != getClass()) {
+    B2ERROR("Cannot assign() an object of type '" << object->IsA()->GetName() << "' to " << readableName() << " of type '" << getClass()->GetName() << "'!");
+    success = false;
+  } else {
+    success = DataStore::Instance().createObject(object, replace, *this);
   }
-  return DataStore::Instance().createObject(object, replace, *this);
-};
+  if (!success)
+    delete object;
+  return success;
+}

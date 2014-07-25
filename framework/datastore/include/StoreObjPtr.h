@@ -142,6 +142,28 @@ namespace Belle2 {
      **/
     inline bool isValid() const {ensureAttached(); return m_storeObjPtr && *m_storeObjPtr;}
 
+    /** Construct an object of type T in this StoreObjPtr, using the provided constructor arguments.
+     *
+     * If this StoreObjPtr already contains an object, this function will fail.
+     *
+     *  @return          True if the creation succeeded.
+     **/
+    template<class ...Args> bool construct(Args&& ... params) {
+      T* t = new T(std::forward<Args>(params)...);
+      return assign(t, false);
+    }
+
+    /** Construct an object of type T in this StoreObjPtr, using the provided constructor arguments.
+     *
+     * If this StoreObjPtr already contains an object, it will be replaced.
+     *
+     *  @return          True if the creation succeeded.
+     **/
+    template<class ...Args> bool constructAndReplace(Args&& ... params) {
+      T* t = new T(std::forward<Args>(params)...);
+      return assign(t, true);
+    }
+
 
     /** Virtual destructor for inherited classes */
     virtual ~StoreObjPtr() {}

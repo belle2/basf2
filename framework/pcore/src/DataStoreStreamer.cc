@@ -250,7 +250,7 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
           DataStore::StoreEntry* entry = DataStore::Instance().getEntry(StoreAccessorBase(namelist.at(i), durability, cl, array));
           bool merge = !array and entry->ptr != NULL and isMergeable(obj);
           if (merge) {
-            B2WARNING("Will now merge " << namelist.at(i));
+            B2DEBUG(100, "Will now merge " << namelist.at(i));
 
             mergeIntoExisting(entry->ptr, obj);
             delete obj;

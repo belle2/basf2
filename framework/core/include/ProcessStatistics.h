@@ -100,7 +100,7 @@ namespace Belle2 {
      *                used
      */
     std::string getStatisticsString(ModuleStatistics::EStatisticCounters type = ModuleStatistics::c_Event,
-                                    const ProcessStatistics::StatisticsMap* modules = 0);
+                                    const ProcessStatistics::StatisticsMap* modules = 0) const;
 
     /** Get global statistics. */
     ModuleStatistics& getGlobal() { return m_global; }

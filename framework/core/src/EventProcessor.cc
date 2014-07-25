@@ -146,16 +146,17 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
   m_mainRNG = gRandom;
 
   LogSystem& logSystem = LogSystem::Instance();
-  ModulePtrList::const_iterator listIter;
   DataStore::Instance().setInitializeActive(true);
 
   m_processStatisticsPtr.registerAsPersistent();
-  //TODO I might want to overwrite it in initialize...
+  //TODO I might want to overwrite it in initialize (e.g. if read from file)
+  //     For parallel processing or subevents, I don't want that, though.
+  //     Maybe make this a function argument?
   if (!m_processStatisticsPtr)
     m_processStatisticsPtr.create();
   m_processStatisticsPtr->startGlobal();
 
-  for (listIter = modulePathList.begin(); listIter != modulePathList.end(); ++listIter) {
+  for (ModulePtrList::const_iterator listIter = modulePathList.begin(); listIter != modulePathList.end(); ++listIter) {
     Module* module = listIter->get();
 
     if (module->hasUnsetForcedParams()) {

@@ -145,12 +145,15 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   analyzePath(spath);
 
 
-  if (!m_inpathlist.empty())
+  if (!m_inpathlist.empty()) {
     B2INFO("Input Path " << m_inpathlist[0]->getPathString());
-  if (!m_mainpathlist.empty())
+  }
+  if (!m_mainpathlist.empty()) {
     B2INFO("Main Path " << m_mainpathlist[0]->getPathString());
-  if (!m_outpathlist.empty())
+  }
+  if (!m_outpathlist.empty()) {
     B2INFO("Output Path " << m_outpathlist[0]->getPathString());
+  }
   if (m_mainpathlist.empty()) {
     B2WARNING("Cannot run any modules in parallel (no c_ParallelProcessingCertified flag), falling back to single-core mode.");
     EventProcessor::process(spath, maxEvent);
@@ -160,8 +163,28 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   //inserts Rx/Tx modules into path (sets up IPC structures)
   preparePaths();
 
+  Path mergedPath;
+  if (!m_inpathlist.empty())
+    mergedPath.addPath(m_inpathlist[0]);
+  mergedPath.addPath(m_mainpathlist[0]);
+  if (!m_outpathlist.empty())
+    mergedPath.addPath(m_outpathlist[0]);
+
+  //init statistics
+  DataStore::Instance().setInitializeActive(true);
+  m_processStatisticsPtr.registerAsPersistent();
+  DataStore::Instance().setInitializeActive(false);
+
+  if (!m_processStatisticsPtr)
+    m_processStatisticsPtr.create();
+  ModulePtrList mergedPathModules = mergedPath.buildModulePathList(); //all modules, including Rx and Tx
+  for (ModulePtrList::const_iterator listIter = mergedPathModules.begin(); listIter != mergedPathModules.end(); ++listIter) {
+    Module* module = listIter->get();
+    m_processStatisticsPtr->initModule(module);
+  }
+
   // 2. Initialization
-  ModulePtrList modulelist = spath->buildModulePathList();;
+  ModulePtrList modulelist = spath->buildModulePathList();
   ModulePtrList initGlobally = getModulesWithoutFlag(modulelist, Module::c_InternalSerializer);
   //dump_modules("Initializing globally: ", initGlobally);
   processInitialize(initGlobally);

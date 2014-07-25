@@ -22,16 +22,19 @@ ClassImp(ProcessStatistics);
 
 void ProcessStatistics::initModule(Module* module)
 {
-  ModuleStatistics& stats = m_stats[getIndex(module)];
+  int index = getIndex(module);
+  ModuleStatistics& stats = m_stats[index];
   if (stats.getName().empty()) {
     stats.setName(module->getName());
   }
-  stats.setIndex(m_stats.size() - 1);
+  stats.setIndex(index);
 }
 
-string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounters mode, const ProcessStatistics::StatisticsMap* modules)
+string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounters mode, const ProcessStatistics::StatisticsMap* modules) const
 {
-  if (!modules) modules = &(getAll());
+  ProcessStatistics* thisNonConst = const_cast<ProcessStatistics*>(this);
+  ModuleStatistics& global = thisNonConst->getGlobal();
+  if (!modules) modules = &(thisNonConst->getAll());
   stringstream out;
   int moduleNameLength = 21; //minimum: 80 characters
   const int lengthOfRest = 80 - moduleNameLength;
@@ -66,7 +69,6 @@ string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounte
   }
 
   out << boost::format("%|" + numWidth + "T=|\n");
-  ModuleStatistics& global = getGlobal();
   out << output
       % "Total"
       % global.getCalls(mode)
@@ -82,37 +84,63 @@ void ProcessStatistics::merge(const Mergeable* other)
 {
   const ProcessStatistics* otherObject = static_cast<const ProcessStatistics*>(other);
 
-  B2WARNING("this:");
-  B2WARNING(this->getStatisticsString());
   /*
-  for (const auto mapEntry : this->m_modules) {
-    B2INFO("ptr " << mapEntry.first << " \t " << mapEntry.second.getIndex() << " \t" << mapEntry.second.getName());
-  }
-  */
+    B2WARNING("this:");
+    B2WARNING(this->getStatisticsString());
 
-  B2WARNING("other:");
-  B2WARNING(const_cast<ProcessStatistics*>(otherObject)->getStatisticsString());
+    B2WARNING("other:");
+    B2WARNING(otherObject->getStatisticsString());
+    */
   /*
-  for (const auto mapEntry : otherObject->m_modules) {
-    B2INFO("ptr " << mapEntry.first << " \t " << mapEntry.second.getIndex() << " \t" << mapEntry.second.getName());
+  for (unsigned int i = 0; i < otherObject->m_stats.size(); i++) {
+    auto otherStats = otherObject->m_stats[i];
+    if ((int)i != otherStats.getIndex()) {
+      B2INFO("i " << i << " \t index" << otherStats.getIndex() << " \t" << otherStats.getName());
+    }
   }
   */
 
   m_global.update(otherObject->m_global);
 
-  for (const auto otherStats : otherObject->m_stats) {
-    for (auto & myStats : this->m_stats) {
-      if (otherStats.getIndex() == myStats.getIndex() and otherStats.getName() == myStats.getName()) {
-        myStats.update(otherStats);
+  for (unsigned int i = 0; i < otherObject->m_stats.size(); i++) {
+    ModuleStatistics& myStats = m_stats[i];
+    const ModuleStatistics& otherStats = otherObject->m_stats[i];
+    if (myStats.getName() == otherStats.getName()) {
+      myStats.update(otherStats);
+    } else {
+      //this is a special module, add it or update if found
+      B2ERROR("mismatch in module names in statistics?");
+      /*
+      bool found = false;
+      for (ModuleStatistics& myStats2 : m_stats) {
+        if (myStats2.getName() == otherStats.getName()) {
+          myStats2.update(otherStats);
+          found = true;
+          break;
+        }
       }
+      if (!found) {
+        int newIndex = m_stats.size();
+        m_stats.push_back(otherStats);
+        m_stats[newIndex].setIndex(newIndex);
+      }
+      */
     }
   }
+  /*
+    for (const auto otherStats : otherObject->m_stats) {
+      for (auto & myStats : this->m_stats) {
+        if (otherStats.getIndex() == myStats.getIndex() and otherStats.getName() == myStats.getName()) {
+          myStats.update(otherStats);
+        }
+      }
+    }
+    */
 
-  //TODO index fudging ?
-
-  B2WARNING("merged stuff:");
-  B2WARNING(this->getStatisticsString());
-
+  /*
+    B2WARNING("merged stuff:");
+    B2WARNING(this->getStatisticsString());
+    */
 }
 
 void ProcessStatistics::clear()

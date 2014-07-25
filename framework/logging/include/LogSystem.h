@@ -41,8 +41,8 @@ namespace Belle2 {
    *    This class is designed as a singleton.
    */
   class LogSystem {
-
   public:
+    static const unsigned int c_errorSummaryMaxLines = 10000; /**< Error log will contain at most this many lines. */
 
     /**
      * Static method to get a reference to the LogSystem instance.

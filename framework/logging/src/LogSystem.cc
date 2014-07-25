@@ -82,7 +82,7 @@ bool LogSystem::sendMessage(LogMessage message)
   if (messageSent) {
     incMessageCounter(logLevel);
   }
-  if (m_printErrorSummary && logLevel >= LogConfig::c_Warning) {
+  if (m_printErrorSummary && logLevel >= LogConfig::c_Warning && m_errorLog.size() < c_errorSummaryMaxLines) {
     m_errorLog.push_back(message);
   }
 
@@ -174,7 +174,8 @@ void LogSystem::printErrorSummary()
 
   int numLogWarn = getMessageCounter(LogConfig::c_Warning);
   int numLogError = getMessageCounter(LogConfig::c_Error);
-  if (m_errorLog.empty())
+  int numLines = m_errorLog.size();
+  if (numLines == 0)
     return; //nothing to do
 
   const LogConfig oldConfig = m_logConfig;
@@ -214,6 +215,9 @@ void LogSystem::printErrorSummary()
     }
   }
   B2INFO("================================================================================\n");
+  if (numLines == c_errorSummaryMaxLines) {
+    B2WARNING("Note: The error log was truncated to " << c_errorSummaryMaxLines << " messages");
+  }
 
   m_printErrorSummary = false; // only do this once (e.g. not again when used through python)
   m_logConfig = oldConfig;

@@ -50,6 +50,7 @@ namespace Belle2 {
     virtual ~RootMergeable() { }
 #if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
 #else
+    /** Constructor, forwards all arguments to T constructor. */
     template<class ...Args> RootMergeable(Args&& ... params) : m_wrapped(std::forward<Args>(params)...) { }
 #endif
 

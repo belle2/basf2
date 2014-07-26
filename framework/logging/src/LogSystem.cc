@@ -174,7 +174,7 @@ void LogSystem::printErrorSummary()
 
   int numLogWarn = getMessageCounter(LogConfig::c_Warning);
   int numLogError = getMessageCounter(LogConfig::c_Error);
-  int numLines = m_errorLog.size();
+  unsigned int numLines = m_errorLog.size();
   if (numLines == 0)
     return; //nothing to do
 

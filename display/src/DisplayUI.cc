@@ -377,8 +377,15 @@ void DisplayUI::makeGui()
   browser->Connect("CloseWindow()", "TSystem", gSystem, "ExitLoop()");
   browser->Connect("CloseWindow()", "Belle2::DisplayUI", this, "closeAndContinue()");
 
-  //add handler for keyboard events
+  //add handler for keyboard events, needs to be done for browser TGFrame as well as frames of all TGLViewers
   browser->Connect("ProcessedEvent(Event_t*)", "Belle2::DisplayUI", this, "handleEvent(Event_t*)");
+  TEveViewerList* viewers = gEve->GetViewers();
+  TEveElement::List_ci end_it = viewers->EndChildren();
+  for (TEveElement::List_i it = viewers->BeginChildren(); it != end_it; ++it) {
+    TEveViewer* v = static_cast<TEveViewer*>(*it);
+    TGLViewer* glv = v->GetGLViewer();
+    glv->GetGLWidget()->Connect("ProcessedEvent(Event_t*)", "Belle2::DisplayUI", this, "handleEvent(Event_t*)");
+  }
 
   browser->StartEmbedding(TRootBrowser::kLeft);
 

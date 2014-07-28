@@ -10,6 +10,7 @@
  **************************************************************************/
 
 #include <framework/pcore/Mergeable.h>
+#include <framework/logging/Logger.h>
 
 #include <TList.h>
 #include <TH1F.h>
@@ -46,19 +47,25 @@ namespace Belle2 {
    */
   template <class T> class RootMergeable : public Mergeable {
   public:
-    RootMergeable() {  }
-    virtual ~RootMergeable() { }
+    RootMergeable() : m_wrapped(nullptr) {  }
+
+    virtual ~RootMergeable() { delete m_wrapped; }
 #if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
 #else
     /** Constructor, forwards all arguments to T constructor. */
-    template<class ...Args> RootMergeable(Args&& ... params) : m_wrapped(std::forward<Args>(params)...) { }
+    template<class ...Args> RootMergeable(Args&& ... params) : m_wrapped(new T(std::forward<Args>(params)...)) { }
 #endif
 
-    /** Get the wrapped root object. */
-    T& get() { return m_wrapped; }
+    void assign(T* p) {
+      delete m_wrapped;
+      m_wrapped = p;
+    }
 
     /** Get the wrapped root object. */
-    const T& get() const { return m_wrapped; }
+    T& get() { return *m_wrapped; }
+
+    /** Get the wrapped root object. */
+    const T& get() const { return *m_wrapped; }
 
     /** Merge object 'other' into this one.
      *
@@ -73,7 +80,7 @@ namespace Belle2 {
       list.SetOwner(false);
       list.Add(&otherMergeable->get());
 
-      m_wrapped.Merge(&list);
+      m_wrapped->Merge(&list);
     }
 
     /** Clear content of this object (e.g. set to zeroes).
@@ -82,7 +89,7 @@ namespace Belle2 {
      * entries) might be added again and again in each event.
      */
     virtual void clear() {
-      m_wrapped.Reset();
+      m_wrapped->Reset();
     }
 
     /** An ugly little method that is called before event() for input and parallel processes.
@@ -91,12 +98,12 @@ namespace Belle2 {
      * it can stay attached (and grow as much as it likes).
      */
     virtual void removeSideEffects() {
-      m_wrapped.SetDirectory(NULL);
+      m_wrapped->SetDirectory(NULL);
     }
   private:
     /** Wrapped root object. */
-    T m_wrapped;
+    T* m_wrapped;
 
-    ClassDef(RootMergeable, 1); /**< Wrap a root histogram or ntuple to make them mergeable. */
+    ClassDef(RootMergeable, 2); /**< Wrap a root histogram or ntuple to make them mergeable. */
   };
 }

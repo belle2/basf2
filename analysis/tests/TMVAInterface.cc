@@ -47,7 +47,21 @@ namespace std {
 
 namespace {
 
-  TEST(TMVAInterface, BuiltinMethodIsConstructedCorrectly)
+  class TMVAInterfaceTest : public ::testing::Test {
+  protected:
+    /** register Particle array + ParticleExtraInfoMap object. */
+    virtual void SetUp() {
+      DataStore::Instance().setInitializeActive(true);
+    }
+
+    /** clear datastore */
+    virtual void TearDown() {
+      DataStore::Instance().setInitializeActive(false);
+      DataStore::Instance().reset();
+    }
+  };
+
+  TEST(TMVAInterfaceTest, BuiltinMethodIsConstructedCorrectly)
   {
     auto method = Method("BoostedDecisionTrees", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100", std::vector<std::string>({"p", "pt", "eid"}));
     EXPECT_EQ(method.getName(), "BoostedDecisionTrees");
@@ -61,13 +75,13 @@ namespace {
   }
 
 
-  TEST(TMVAInterface, BuiltinMethodFailsCorrectly)
+  TEST(TMVAInterfaceTest, BuiltinMethodFailsCorrectly)
   {
     EXPECT_B2ERROR(Method("BoostedDecisionTree", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100", std::vector<std::string>({"p", "DOES_NOT_EXIST", "eid"})));
     EXPECT_DEATH(Method("BoostedDecisionTree", "DOES_NOT_EXIST", "!H:!V:CreateMVAPdfs:NTrees=100", std::vector<std::string>({"p", "pt", "eid"})), ".*");
   }
 
-  TEST(TMVAInterface, PluginMethodIsConstructedCorrectly)
+  TEST(TMVAInterfaceTest, PluginMethodIsConstructedCorrectly)
   {
     auto method = Method("MockPlugin", "Plugin", "!H:!V:CreateMVAPdfs", std::vector<std::string>({"p", "pt", "eid"}));
     EXPECT_EQ(method.getName(), "MockPlugin");
@@ -81,12 +95,12 @@ namespace {
   }
 
 
-  TEST(TMVAInterface, PluginMethodFailsCorrectly)
+  TEST(TMVAInterfaceTest, PluginMethodFailsCorrectly)
   {
     EXPECT_B2ERROR(Method("MockPlugin", "Plugin", "!H:!V:CreateMVAPdfs", std::vector<std::string>({"p", "DOES_NOT_EXIST", "eid"})));
   }
 
-  TEST(TMVAInterface, ExpertErrorHandling)
+  TEST(TMVAInterfaceTest, ExpertErrorHandling)
   {
 
     EXPECT_B2FATAL(Expert expert("TMVA", FileSystem::findFile("/analysis/tests/"), "THIS_IS_NOT_A_VALID_METHOD", 1));
@@ -94,7 +108,7 @@ namespace {
     EXPECT_B2FATAL(Expert expert("NON_EXISTING_PREFIX", FileSystem::findFile("/analysis/tests/"), "MockPlugin", 1));
 
   }
-  TEST(TMVAInterface, ExpertOnSignalRunAnalysisCorrectly)
+  TEST(TMVAInterfaceTest, ExpertOnSignalRunAnalysisCorrectly)
   {
     //network only expects 'eid' and 'p' as input
     //eid isn't set (-> 0.5)
@@ -129,7 +143,7 @@ namespace {
 
   }
 
-  TEST(TMVAInterface, ExpertOnBackgroundRunAnalysisCorrectly)
+  TEST(TMVAInterfaceTest, ExpertOnBackgroundRunAnalysisCorrectly)
   {
     //network only expects 'eid' and 'p' as input
     //eid isn't set (-> 0.5)
@@ -164,11 +178,10 @@ namespace {
 
   }
 
-  TEST(TMVAInterface, TeacherTrainsCorrectly)
+  TEST(TMVAInterfaceTest, TeacherTrainsCorrectly)
   {
     DataStore::Instance().setInitializeActive(true);
     StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
-    DataStore::Instance().setInitializeActive(false);
 
     std::vector<std::string> variables = {"p", "getExtraInfo(someInput)"};
     std::string target = "getExtraInfo(target)";

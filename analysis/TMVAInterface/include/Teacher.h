@@ -50,6 +50,11 @@ namespace Belle2 {
       Teacher(std::string prefix, std::string workingDirectory, std::string target, std::vector<Method> methods, bool useExistingData = false);
 
       /**
+       * Destructor
+       */
+      ~Teacher();
+
+      /**
        * Disallow copy
        */
       Teacher(const Teacher&) = delete;
@@ -60,21 +65,15 @@ namespace Belle2 {
       Teacher& operator=(const Teacher&) = delete;
 
       /**
-       * Destructor, closes outputFile, deletes TMVA::Factory
-       */
-      ~Teacher();
-
-      /**
        * Adds a training sample. The necessary variables are calculated from the provided particle
        * @param particle Particle which serves as training sample, target variable must be available for this particle.
        */
       void addSample(const Particle* particle);
 
       /**
-       * TODO Implement read and write of current sample tree to implement external training via a new tool TMVATeacher tree-var-file + opts
-      void readTree();
+       * Writes tree to a file
+       */
       void writeTree();
-      */
 
       /**
        * Train, test and evaluate all methods
@@ -88,7 +87,7 @@ namespace Belle2 {
       /**
        * Train a class against the rest and return ptree with the configuration of the resulting trainig.
        */
-      boost::property_tree::ptree trainClass(std::string factoryOption, std::string prepareOption, unsigned int maxEventsPerClass, int signalClass);
+      boost::property_tree::ptree trainClass(std::string factoryOption, std::string prepareOption, std::map<int, unsigned int>& cluster_count, unsigned int maxEventsPerClass, int signalClass);
 
     private:
       std::string m_prefix; /**< used to identify the outputted training files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml */
@@ -101,7 +100,6 @@ namespace Belle2 {
       const Variable::Manager::Var* m_target_var; /**< Variable Pointer to target variable */
       int m_target; /**< Storage for the target variable */
       std::vector<float> m_input; /**< Storage for input variables */
-      std::map<int, unsigned int> m_cluster_count; /**< Number of events foreach identified cluster */
     };
 
   }

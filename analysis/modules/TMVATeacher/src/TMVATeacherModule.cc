@@ -74,6 +74,7 @@ namespace Belle2 {
       if (not m_doNotTrain) {
         m_teacher->train(m_factoryOption, m_prepareOption, m_maxEventsPerClass);
       }
+      m_teacher->writeTree();
     }
     m_teacher.reset();
   }

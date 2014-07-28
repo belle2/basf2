@@ -9,6 +9,8 @@
 
 #include <analysis/TMVAInterface/Teacher.h>
 #include <framework/logging/Logger.h>
+#include <framework/pcore/ProcHandler.h>
+#include <framework/core/Environment.h>
 
 #include <TMVA/Factory.h>
 #include <TMVA/Tools.h>
@@ -25,7 +27,9 @@ namespace Belle2 {
 
   namespace TMVAInterface {
 
-    Teacher::Teacher(std::string prefix, std::string workingDirectory, std::string target, std::vector<Method> methods, bool useExistingData) : m_prefix(prefix), m_workingDirectory(workingDirectory), m_methods(methods), m_file(nullptr), m_tree("", DataStore::c_Persistent), {
+    Teacher::Teacher(std::string prefix, std::string workingDirectory, std::string target, std::vector<Method> methods, bool useExistingData) : m_prefix(prefix),
+      m_workingDirectory(workingDirectory), m_methods(methods), m_file(nullptr), m_tree("", DataStore::c_Persistent)
+    {
 
       // Change the workling directory to the user defined working directory
       std::string oldDirectory = gSystem->WorkingDirectory();
@@ -55,49 +59,48 @@ namespace Belle2 {
       std::string tree_name = m_prefix + "_tree";
 
       // Search for an existing tree in the file
+      TTree* tree = nullptr;
       if (useExistingData) {
-        m_file->GetObject((tree_name).c_str(), m_tree);
+        m_file->GetObject((tree_name).c_str(), tree);
       }
 
-      if (m_tree == nullptr) {
+      if (tree == nullptr) {
 
         if (useExistingData)
           B2WARNING("Couldn't find existing data, create new tree")
 
-          m_tree = new TTree(tree_name.c_str(), tree_name.c_str());
+          tree = new TTree(tree_name.c_str(), tree_name.c_str());
 
         for (unsigned int i = 0; i < variables.size(); ++i)
-          m_tree->Branch(Variable::makeROOTCompatible(variables[i]->name).c_str(), &m_input[i]);
-        m_tree->Branch(Variable::makeROOTCompatible(m_target_var->name).c_str(), &m_target);
+          tree->Branch(Variable::makeROOTCompatible(variables[i]->name).c_str(), &m_input[i]);
+        tree->Branch(Variable::makeROOTCompatible(m_target_var->name).c_str(), &m_target);
 
       } else {
         for (unsigned int i = 0; i < variables.size(); ++i)
-          m_tree->SetBranchAddress(Variable::makeROOTCompatible(variables[i]->name).c_str(), &m_input[i]);
-        m_tree->SetBranchAddress(Variable::makeROOTCompatible(m_target_var->name).c_str(), &m_target);
+          tree->SetBranchAddress(Variable::makeROOTCompatible(variables[i]->name).c_str(), &m_input[i]);
+        tree->SetBranchAddress(Variable::makeROOTCompatible(m_target_var->name).c_str(), &m_target);
       }
 
-      TBranch* targetBranch  = m_tree->GetBranch(Variable::makeROOTCompatible(m_target_var->name).c_str());
-      targetBranch->SetAddress(&m_target);
-      int nevent = m_tree->GetEntries();
-      for (int i = 0; i < nevent; i++) {
-        targetBranch->GetEvent(i);
-        auto it = m_cluster_count.find(m_target);
-        if (it == m_cluster_count.end())
-          m_cluster_count[m_target] = 1;
-        else
-          it->second++;
-      }
+      m_tree.registerAsTransient(tree_name, DataStore::c_Persistent);
+      m_tree.construct();
+      m_tree->assign(tree);
 
       gSystem->ChangeDirectory(oldDirectory.c_str());
 
     }
 
-    Teacher::~Teacher()
+    void Teacher::writeTree()
     {
       m_file->cd();
-      m_tree->Write("", TObject::kOverwrite);
-      delete m_tree;
-      m_file->Close();
+      m_tree->get().Write("", TObject::kOverwrite);
+      m_tree->get().SetDirectory(nullptr);
+    }
+
+    Teacher::~Teacher()
+    {
+      if (Environment::Instance().getNumberProcesses() == 0 or ProcHandler::isOutputProcess()) {
+        m_file->Close();
+      }
     }
 
     void Teacher::addSample(const Particle* particle)
@@ -114,15 +117,7 @@ namespace Belle2 {
 
       // The target variable is converted to an integer
       m_target = int(m_target_var->function(particle) + 0.5);
-      m_tree->Fill();
-
-      // Now check if the target id was encountered before,
-      // and update the cluster count accordingly
-      auto it = m_cluster_count.find(m_target);
-      if (it == m_cluster_count.end())
-        m_cluster_count[m_target] = 1;
-      else
-        it->second++;
+      m_tree->get().Fill();
 
       gSystem->ChangeDirectory(oldDirectory.c_str());
     }
@@ -136,10 +131,24 @@ namespace Belle2 {
 
       m_file->cd();
 
+      std::map<int, unsigned int> cluster_count;
+      TBranch* targetBranch  = m_tree->get().GetBranch(Variable::makeROOTCompatible(m_target_var->name).c_str());
+      targetBranch->SetAddress(&m_target);
+
+      int nevent = m_tree->get().GetEntries();
+      for (int i = 0; i < nevent; i++) {
+        targetBranch->GetEvent(i);
+        auto it = cluster_count.find(m_target);
+        if (it == cluster_count.end())
+          cluster_count[m_target] = 1;
+        else
+          it->second++;
+      }
+
       // Calculate the total number of events
       std::vector<int> classesWhichReachedMaximum;
       unsigned int total = 0;
-      for (auto & x : m_cluster_count) {
+      for (auto & x : cluster_count) {
         if (maxEventsPerClass != 0 and x.second > maxEventsPerClass) {
           classesWhichReachedMaximum.push_back(x.first);
         }
@@ -148,7 +157,7 @@ namespace Belle2 {
 
       // Add to the output config xml file the different clusters and their fractions
       boost::property_tree::ptree pt;
-      for (auto & x : m_cluster_count) {
+      for (auto & x : cluster_count) {
         boost::property_tree::ptree node;
         node.put("ID", x.first);
         node.put("Count", x.second);
@@ -164,20 +173,20 @@ namespace Belle2 {
         pt.add_child("Setup.Variables.Variable", node);
       }
 
-      if (m_cluster_count.size() <= 1) {
+      if (cluster_count.size() <= 1) {
         B2ERROR("Found less than two clusters in sample, no training necessary!")
         return;
-      } else if (m_cluster_count.size() ==  2) {
-        int maxId = m_cluster_count.begin()->first;
-        for (const auto & pair : m_cluster_count) {
+      } else if (cluster_count.size() ==  2) {
+        int maxId = cluster_count.begin()->first;
+        for (const auto & pair : cluster_count) {
           if (pair.first > maxId)
             maxId = pair.first;
         }
-        auto node = trainClass(factoryOption, prepareOption, maxEventsPerClass, maxId);
+        auto node = trainClass(factoryOption, prepareOption, cluster_count, maxEventsPerClass, maxId);
         pt.add_child("Setup.Trainings.Training", node);
       } else {
-        for (const auto & pair : m_cluster_count) {
-          auto node = trainClass(factoryOption, prepareOption, maxEventsPerClass, pair.first);
+        for (const auto & pair : cluster_count) {
+          auto node = trainClass(factoryOption, prepareOption, cluster_count, maxEventsPerClass, pair.first);
           pt.add_child("Setup.Trainings.Training", node);
         }
       }
@@ -187,7 +196,7 @@ namespace Belle2 {
       gSystem->ChangeDirectory(oldDirectory.c_str());
     }
 
-    boost::property_tree::ptree Teacher::trainClass(std::string factoryOption, std::string prepareOption, unsigned int maxEventsPerClass, int signalClass)
+    boost::property_tree::ptree Teacher::trainClass(std::string factoryOption, std::string prepareOption, std::map<int, unsigned int>& cluster_count, unsigned int maxEventsPerClass, int signalClass)
     {
 
       std::stringstream signal;
@@ -205,12 +214,12 @@ namespace Belle2 {
       }
 
       auto signalCut = TCut((Variable::makeROOTCompatible(m_target_var->name) + " == " + signal.str()).c_str());
-      unsigned int signalEvents = (maxEventsPerClass == 0) ? m_cluster_count[signalClass] : maxEventsPerClass;
+      unsigned int signalEvents = (maxEventsPerClass == 0) ? cluster_count[signalClass] : maxEventsPerClass;
 
       auto backgroundCut = TCut((Variable::makeROOTCompatible(m_target_var->name) + " != " + signal.str()).c_str());
       unsigned int backgroundEvents = 0;
       if (maxEventsPerClass == 0) {
-        for (const auto & pair : m_cluster_count) {
+        for (const auto & pair : cluster_count) {
           if (pair.first != signalClass)
             backgroundEvents += pair.second;
         }
@@ -224,8 +233,8 @@ namespace Belle2 {
       // The options nTrain_Background and nTest_Background (same for *_Signal) are applied
       // after this transformation to vectors, therefore they're too late to prevent a allocation of huge amount of memory
       // if one has many backgruond events.
-      factory.AddSignalTree(m_tree->CopyTree(signalCut)->CopyTree("", "", signalEvents));
-      factory.AddBackgroundTree(m_tree->CopyTree(backgroundCut)->CopyTree("", "", backgroundEvents));
+      factory.AddSignalTree(m_tree->get().CopyTree(signalCut)->CopyTree("", "", signalEvents));
+      factory.AddBackgroundTree(m_tree->get().CopyTree(backgroundCut)->CopyTree("", "", backgroundEvents));
       factory.PrepareTrainingAndTestTree("", prepareOption);
 
       // Append the trained methods to the config xml file

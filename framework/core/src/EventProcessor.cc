@@ -146,7 +146,6 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
   m_mainRNG = gRandom;
 
   LogSystem& logSystem = LogSystem::Instance();
-  DataStore::Instance().setInitializeActive(true);
 
   m_processStatisticsPtr.registerAsPersistent();
   //TODO I might want to overwrite it in initialize (e.g. if read from file)

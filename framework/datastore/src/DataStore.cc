@@ -46,7 +46,7 @@ DataStore::~DataStore()
 
 void DataStore::reset()
 {
-  m_initializeActive = false;
+  m_initializeActive = true;
   m_currentModule = "";
   m_moduleInfo.clear();
 

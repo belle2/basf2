@@ -72,7 +72,7 @@ def SelectParticleList(path, particleName, particleLabel):
     modularAnalysis.selectParticle(outputList, path=path)
 
     B2INFO("Select Particle List {p} with label {l} in list {list}".format(p=particleName, l=particleLabel, list=outputList))
-    return {'RawParticleList_{p}_{l}'.format(p=particleName, l=particleLabel): outputList}
+    return {'RawParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList}
 
 
 def CopyParticleLists(path, particleName, particleLabel, inputLists, postCuts):
@@ -89,8 +89,8 @@ def CopyParticleLists(path, particleName, particleLabel, inputLists, postCuts):
 
     if inputLists == []:
         B2INFO("Gather Particle List for particle " + particleName + " and charged conjugated. But there are no particles to gather :-(.")
-        return {'ParticleList_{p}_{l}'.format(p=particleName, l=particleLabel): None,
-                'ParticleList_{p}_{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): None}
+        return {'ParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): None,
+                'ParticleList_{p}:{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): None}
 
     userLabel = actorFramework.createHash(particleName, particleLabel, inputLists, postCuts)
     outputList = particleName + ':' + userLabel
@@ -98,8 +98,8 @@ def CopyParticleLists(path, particleName, particleLabel, inputLists, postCuts):
     modularAnalysis.cutAndCopyLists(outputList, inputLists, postCut[0]['cutstring'], path=path)
 
     B2INFO("Gather Particle List {p} with label {l} in list {o}".format(p=particleName, l=particleLabel, o=outputList))
-    return {'ParticleList_{p}_{l}'.format(p=particleName, l=particleLabel): outputList,
-            'ParticleList_{p}_{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): pdg.conjugate(particleName) + ':' + userLabel}
+    return {'ParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList,
+            'ParticleList_{p}:{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): pdg.conjugate(particleName) + ':' + userLabel}
 
 
 def MakeAndMatchParticleList(path, particleName, particleLabel, channelName, inputLists, preCut):
@@ -153,7 +153,7 @@ def SignalProbability(path, particleName, particleLabel, channelName, mvaConfig,
     if particleList is None or any([d is None for d in additionalDependencies]):
         if particleName == channelName:
             B2INFO("Calculate SignalProbability for particle {p} with label {l}, but particle is ignored. This can never happen!".format(p=particleName, l=particleLabel))
-            return{'SignalProbability_{p}_{l}'.format(p=particleName, l=particleLabel): None}
+            return{'SignalProbability_{p}:{l}'.format(p=particleName, l=particleLabel): None}
         else:
             B2INFO("Calculate SignalProbability for channel {c}, but the channel is ignored :-(.".format(c=channelName))
             return {'SignalProbability_{c}'.format(c=channelName): None}
@@ -203,7 +203,7 @@ def SignalProbability(path, particleName, particleLabel, channelName, mvaConfig,
 
         B2INFO("Calculate SignalProbability for particle {p} with label {l} for channel {c}.".format(p=particleName, l=particleLabel, c=channelName))
         if particleName == channelName:
-            return {'SignalProbability_{p}_{l}'.format(p=particleName, l=particleLabel): configFilename}
+            return {'SignalProbability_{p}:{l}'.format(p=particleName, l=particleLabel): configFilename}
         else:
             return {'SignalProbability_{c}'.format(c=channelName): configFilename}
 
@@ -226,7 +226,7 @@ def VariablesToNTuple(path, particleName, particleLabel, particleList, signalPro
         return {'VariablesToNTuple': None}
 
     hash = actorFramework.createHash(particleName, particleLabel, particleList, signalProbability)
-    filename = 'var_{p}_{l}_{h}.root'.format(p=particleName, l=particleLabel, h=hash)
+    filename = 'var_{p}:{l}_{h}.root'.format(p=particleName, l=particleLabel, h=hash)
 
     if not os.path.isfile(filename):
         output = register_module('VariablesToNtuple')
@@ -240,7 +240,7 @@ def VariablesToNTuple(path, particleName, particleLabel, particleList, signalPro
 
     B2INFO("Write variables to ntuple for " + particleList + " and charged conjugated. But file already exists, so nothing to do here.")
     particleName = particleList.split(':')[0]
-    return {'VariablesToNTuple_{p}_{l}'.format(p=particleName, l=particleLabel): filename}
+    return {'VariablesToNTuple_{p}:{l}'.format(p=particleName, l=particleLabel): filename}
 
 
 def CreatePreCutHistogram(path, particleName, particleLabel, channelName, preCutConfig, daughterLists, additionalDependencies):
@@ -306,32 +306,18 @@ def PreCutDetermination(channelNames, preCutConfigs, preCutHistograms):
     return results
 
 
-def PostCutDeterminationFSP(particleName, particleLabel, postCutConfig, signalProbability):
+def PostCutDetermination(names, postCutConfigs, signalProbabilities):
     """
     Determines the PostCut of a particle.
-        @param particleName
-        @param particleLabel
-        @param channelNames names of the channels
-        @param postCutConfig configuration for post cut determination
-        @param signalProbability
-    """
-    result['PostCut_{p}_{l}'.format(p=particleName, l=particleLabel)] = {'cutstring': str(postCutConfig.value) + ' < getExtraInfo(SignalProbability)', 'range': (postCutConfig.value, 1)}
-    B2INFO("Calculate post cut for particle {p} with label {l}".format(p=particleName, l=particleLabel))
-    return result
-
-
-def PostCutDeterminationNonFSP(channelNames, postCutConfigs, signalProbabilities):
-    """
-    Determines the PostCut of a particle.
-        @param channelNames names of the channels
+        @param names names of the channels or the name of the particle
         @param postCutConfig configuration for post cut determination
         @param signalProbabilities of the channels
     """
-    results = {'PostCut_{c}'.format(c=channelName): None for channelName, _, __ in zip(*actorFramework.getNones(channelNames, postCutConfigs, signalProbabilities))}
-    channelNames, postCutConfigs, signalProbabilities = actorFramework.removeNones(channelNames, preCutConfigs, signalProbabilities)
-    for channelName, postCutConfig in zip(channelNames, postCutConfigs):
-        result['PostCut_{c}'.format(c=channelName)] = {'cutstring': str(postCutConfig.value) + ' < getExtraInfo(SignalProbability)', 'range': (postCutConfig.value, 1)}
-        B2INFO("Calculate post cut for channel {c}".format(c=channelName))
+    results = {'PostCut_{n}'.format(n=name): None for name, _, __ in zip(*actorFramework.getNones(names, postCutConfigs, signalProbabilities))}
+    names, postCutConfigs, signalProbabilities = actorFramework.removeNones(names, preCutConfigs, signalProbabilities)
+    for name, postCutConfig in zip(names, postCutConfigs):
+        result['PostCut_{n}'.format(n=name)] = {'cutstring': str(postCutConfig.value) + ' < getExtraInfo(SignalProbability)', 'range': (postCutConfig.value, 1)}
+        B2INFO("Calculate post cut for channel {n}".format(n=name))
     return result
 
 
@@ -382,7 +368,7 @@ def WriteAnalysisFileForFSParticle(particleName, particleLabel, mvaConfig, signa
     placeholders = automaticReporting.createFSParticleTexFile(placeholders, mcCounts)
 
     B2INFO("Written analysis tex file for final state particle " + particleName)
-    return {'Placeholders_{p}_{l}'.format(p=particleName, l=particleLabel): placeholders}
+    return {'Placeholders_{p}:{l}'.format(p=particleName, l=particleLabel): placeholders}
 
 
 def WriteAnalysisFileForCombinedParticle(particleName, particleLabel, channelPlaceholders, mcCounts):
@@ -400,7 +386,7 @@ def WriteAnalysisFileForCombinedParticle(particleName, particleLabel, channelPla
     placeholders = automaticReporting.createCombinedParticleTexFile(placeholders, channelPlaceholders, mcCounts)
 
     B2INFO("Written analysis tex file for intermediate particle " + particleName)
-    return {'Placeholders_{p}_{l}'.format(p=particleName, l=particleLabel): placeholders}
+    return {'Placeholders_{p}:{l}'.format(p=particleName, l=particleLabel): placeholders}
 
 
 def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePlaceholders, ntuples, mcCounts, particles):

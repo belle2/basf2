@@ -51,20 +51,23 @@ class Particle(object):
     ## Create new class called DecayChannel via namedtuple. namedtuples are like a struct in C
     DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, mvaConfig, preCutConfig, postCutConfig')
 
-    def __init__(self, name, mvaConfig, preCutConfig=PreCutConfiguration(variable='Mass', method='S/B', efficiency=0.70, purity=0.001),
-                 postCutConfig=PostCutConfiguration(value=0.0001), label='generic'):
+    def __init__(self, identifier, mvaConfig, preCutConfig=PreCutConfiguration(variable='Mass', method='S/B', efficiency=0.70, purity=0.001),
+                 postCutConfig=PostCutConfiguration(value=0.0001)):
         """
         Creates a Particle without any decay channels. To add decay channels use addChannel method.
-            @param name is the correct pdg name as a string of the particle.
+            @param identifier is the correct pdg name as a string of the particle with an optional additional user label seperated by :
             @param mvaConfig multivariate analysis configuration
             @param preCutConfig intermediate cut configuration
             @param postCutConfig post cut configuration
             @param label additional label for this particle
         """
+        ## Is the correct pdg name as a string of the particle with an optional additional user label seperated by :
+        self.identifier = identifier
+        v = self.identifier.split(':')
         ## The name of the particle as correct pdg name e.g. K+, pi-, D*0.
-        self.name = name
+        self.name = v[0]
         ## Additional label like hasMissing or has2Daughters
-        self.label = label
+        self.label = 'generic' if len(v) < 2 else v[1]
         ## multivariate analysis configuration
         self.mvaConfig = mvaConfig
         ## Decay channels, added by addChannel method.
@@ -93,12 +96,13 @@ class Particle(object):
         @param postCutConfig pre cut configuration
         @param group groups channels into groups with similar kinematic e.g. missing particles, two tracks, three tracks, ...
         """
+        daughters = [d + ':generic' if ':' not in d else d for d in daughters]
         preCutConfig = copy.deepcopy(self.preCutConfig if preCutConfig is None else preCutConfig)
         postCutConfig = copy.deepcopy(self.postCutConfig if postCutConfig is None else postCutConfig)
         mvaConfig = copy.deepcopy(self.mvaConfig if mvaConfig is None else mvaConfig)
         if addExtraVars:
             mvaConfig.variables.extend(['daughter{i}(getExtraInfo(SignalProbability))'.format(i=i) for i in range(0, len(daughters))])
-        self.channels.append(Particle.DecayChannel(name=self.name + '_' + self.label + ' ==> ' + ' '.join(daughters),
+        self.channels.append(Particle.DecayChannel(name=self.identifier + ' ==> ' + ' '.join(daughters),
                                                    daughters=daughters,
                                                    mvaConfig=mvaConfig,
                                                    preCutConfig=preCutConfig,
@@ -107,7 +111,7 @@ class Particle(object):
 
     def __str__(self):
         """ Convert particle object in a readable string which contains all configuration informations """
-        output = '{name} -- {label}\n'.format(name=self.name, label=self.label)
+        output = '{identifier}\n'.format(identifier=self.identifier)
 
         def compareMVAConfig(x, y):
             return x.name == y.name and x.type == y.type and x.config == y.config and x.target == y.target and x.targetCluster == y.targetCluster
@@ -173,13 +177,14 @@ def FullEventInterpretation(path, particles):
     # Now loop over all given particles, foreach particle we add some Resources and Actors.
     for particle in particles:
         ########## RESOURCES #############
-        seq.addResource('Name_{p}_{l}'.format(p=particle.name, l=particle.label), particle.name)
-        seq.addResource('Label_{p}_{l}'.format(p=particle.name, l=particle.label), particle.label)
-        seq.addResource('Object_{p}_{l}'.format(p=particle.name, l=particle.label), particle)
+        seq.addResource('Name_{i}'.format(i=particle.identifier), particle.name)
+        seq.addResource('Label_{i}'.format(i=particle.identifier), particle.label)
+        seq.addResource('Identifier_{i}'.format(i=particle.identifier), particle.identifier)
+        seq.addResource('Object_{i}'.format(i=particle.identifier), particle)
 
         if particle.channels == []:
-            seq.addResource('MVAConfig_{p}_{l}'.format(p=particle.name, l=particle.label), particle.mvaConfig)
-            seq.addResource('PostCutConfig_{p}_{l}'.format(p=particle.name, l=particle.label), particle.postCutConfig)
+            seq.addResource('MVAConfig_{i}'.format(i=particle.identifier), particle.mvaConfig)
+            seq.addResource('PostCutConfig_{i}'.format(i=particle.identifier), particle.postCutConfig)
         for channel in particle.channels:
             seq.addResource('Name_{c}'.format(c=channel.name), channel.name)
             seq.addResource('MVAConfig_{c}'.format(c=channel.name), channel.mvaConfig)
@@ -190,20 +195,20 @@ def FullEventInterpretation(path, particles):
         if particle.isFSP:
             seq.addFunction(SelectParticleList,
                             path='Path',
-                            particleName='Name_{p}_{l}'.format(p=particle.name, l=particle.label),
-                            particleLabel='Label_{p}_{l}'.format(p=particle.name, l=particle.label))
+                            particleName='Name_{i}'.format(i=particle.identifier),
+                            particleLabel='Label_{i}'.format(i=particle.identifier))
             seq.addFunction(CopyParticleLists,
                             path='Path',
-                            particleName='Name_{p}_{l}'.format(p=particle.name, l=particle.label),
-                            particleLabel='Label_{p}_{l}'.format(p=particle.name, l=particle.label),
-                            inputLists=['RawParticleList_{p}_{l}'.format(p=particle.name, l=particle.label)],
-                            postCuts=['PostCut_{p}_{l}'.format(p=particle.name, l=particle.label)])
+                            particleName='Name_{i}'.format(i=particle.identifier),
+                            particleLabel='Label_{i}'.format(i=particle.identifier),
+                            inputLists=['RawParticleList_{i}'.format(i=particle.identifier)],
+                            postCuts=['PostCut_{i}'.format(i=particle.identifier)])
         else:
             for channel in particle.channels:
                 seq.addFunction(MakeAndMatchParticleList,
                                 path='Path',
-                                particleName='Name_{p}_{l}'.format(p=particle.name, l=particle.label),
-                                particleLabel='Label_{p}_{l}'.format(p=particle.name, l=particle.label),
+                                particleName='Name_{i}'.format(i=particle.identifier),
+                                particleLabel='Label_{i}'.format(i=particle.identifier),
                                 channelName='Name_{c}'.format(c=channel.name),
                                 inputLists=['ParticleList_{d}'.format(d=daughter) for daughter in channel.daughters],
                                 preCut='PreCut_{c}'.format(c=channel.name))
@@ -214,8 +219,8 @@ def FullEventInterpretation(path, particles):
 
             seq.addFunction(CopyParticleLists,
                             path='Path',
-                            particleName='Name_{p}_{l}'.format(p=particle.name, l=particle.label),
-                            particleLabel='Label_{p}_{l}'.format(p=particle.name, l=particle.label),
+                            particleName='Name_{i}'.format(i=particle.identifier),
+                            particleLabel='Label_{i}'.format(i=particle.identifier),
                             inputLists=['RawParticleList_{c}'.format(c=channel.name) for channel in channels],
                             postCuts=['PostCut_{c}'.format(c=channel.name) for channel in channels])
 
@@ -233,8 +238,8 @@ def FullEventInterpretation(path, particles):
 
                 seq.addFunction(CreatePreCutHistogram,
                                 path='Path',
-                                particleName='Name_{p}_{l}'.format(p=particle.name, l=particle.label),
-                                particleLabel='Label_{p}_{l}'.format(p=particle.name, l=particle.label),
+                                particleName='Name_{i}'.format(i=particle.identifier),
+                                particleLabel='Label_{i}'.format(i=particle.identifier),
                                 channelName='Name_{c}'.format(c=channel.name),
                                 preCutConfig='PreCutConfig_{c}'.format(c=channel.name),
                                 daughterLists=['ParticleList_{d}'.format(d=daughter) for daughter in channel.daughters],
@@ -242,14 +247,14 @@ def FullEventInterpretation(path, particles):
 
         ############## POSTCUT DETERMINATION #############
         if particle.isFSP:
-            seq.addFunction(PostCutDeterminationFSP,
-                            particleName='Name_{p}_{l}'.format(p=particle.name, l=particle.label),
-                            particleLabel='Label_{p}_{l}'.format(p=particle.name, l=particle.label),
-                            postCutConfig='PostCutConfig_{p}_{l}'.format(p=particle.name, l=particle.label),
-                            signalProbability='SignalProbability_{p}_{l}'.format(p=particle.name, l=particle.label))
+            seq.addFunction(PostCutDetermination,
+                            names=['Identifier_{i}'.format(i=particle.identifier)],
+                            postCutConfigs=['PostCutConfig_{i}'.format(i=particle.identifier)],
+                            signalProbabilities=['SignalProbability_{i}'.format(i=particle.identifier)])
+
         else:
-            seq.addFunction(PostCutDeterminationNonFSP,
-                            channelNames=['Name_{c}'.format(c=channel.name) for channel in particle.channels],
+            seq.addFunction(PostCutDetermination,
+                            names=['Name_{c}'.format(c=channel.name) for channel in particle.channels],
                             postCutConfigs=['PostCutConfig_{c}'.format(c=channel.name) for channel in particle.channels],
                             signalProbabilities=['SignalProbability_{c}'.format(c=channel.name) for channel in particle.channels])
 
@@ -259,11 +264,11 @@ def FullEventInterpretation(path, particles):
             if particle.isFSP:
                 seq.addFunction(SignalProbability,
                                 path='Path',
-                                particleName='Name_{p}_{l}'.format(p=particle.name, l=particle.label),
-                                particleLabel='Label_{p}_{l}'.format(p=particle.name, l=particle.label),
-                                channelName='Name_{p}_{l}'.format(p=particle.name, l=particle.label),
-                                mvaConfig='MVAConfig_{p}_{l}'.format(p=particle.name, l=particle.label),
-                                particleList='RawParticleList_{p}_{l}'.format(p=particle.name, l=particle.label))
+                                particleName='Name_{i}'.format(i=particle.identifier),
+                                particleLabel='Label_{i}'.format(i=particle.identifier),
+                                channelName='Name_{i}'.format(i=particle.identifier),
+                                mvaConfig='MVAConfig_{i}'.format(i=particle.identifier),
+                                particleList='RawParticleList_{i}'.format(i=particle.identifier))
             else:
                 for channel in particle.channels:
 
@@ -275,24 +280,24 @@ def FullEventInterpretation(path, particles):
 
                     seq.addFunction(SignalProbability,
                                     path='Path',
-                                    particleName='Name_{p}_{l}'.format(p=particle.name, l=particle.label),
-                                    particleLabel='Label_{p}_{l}'.format(p=particle.name, l=particle.label),
+                                    particleName='Name_{i}'.format(i=particle.identifier),
+                                    particleLabel='Label_{i}'.format(i=particle.identifier),
                                     channelName='Name_{c}'.format(c=channel.name),
                                     mvaConfig='MVAConfig_{c}'.format(c=channel.name),
                                     particleList='RawParticleList_{c}'.format(c=channel.name),
                                     additionalDependencies=additionalDependencies)
 
-                seq.addResource('SignalProbability_{p}_{l}'.format(p=particle.name, l=particle.label), 'Dummy',
+                seq.addResource('SignalProbability_{i}'.format(i=particle.identifier), 'Dummy',
                                 requires=['SignalProbability_{c}'.format(c=channel.name) for channel in particle.channels], strict=False)
-                seq.addResource('SignalProbability_{p}_{l}'.format(p=pdg.conjugate(particle.name), l=particle.label), 'Dummy',
-                                requires=['SignalProbability_{p}_{l}'.format(p=particle.name, l=particle.label)])
+            seq.addResource('SignalProbability_{p}:{l}'.format(p=pdg.conjugate(particle.name), l=particle.label), 'Dummy',
+                            requires=['SignalProbability_{i}'.format(i=particle.identifier)])
 
         ################ Information ACTORS #################
         for channel in particle.channels:
 
             seq.addFunction(WriteAnalysisFileForChannel,
-                            particleName='Name_{p}_{l}'.format(p=particle.name, l=particle.label),
-                            particleLabel='Label_{p}_{l}'.format(p=particle.name, l=particle.label),
+                            particleName='Name_{i}'.format(i=particle.identifier),
+                            particleLabel='Label_{i}'.format(i=particle.identifier),
                             channelName='Name_{c}'.format(c=channel.name),
                             preCutConfig='PreCutConfig_{c}'.format(c=channel.name),
                             preCut='PreCut_{c}'.format(c=channel.name),
@@ -304,45 +309,45 @@ def FullEventInterpretation(path, particles):
 
         if particle.isFSP:
             seq.addFunction(WriteAnalysisFileForFSParticle,
-                            particleName='Name_{p}_{l}'.format(p=particle.name, l=particle.label),
-                            particleLabel='Label_{p}_{l}'.format(p=particle.name, l=particle.label),
-                            mvaConfig='MVAConfig_{p}_{l}'.format(p=particle.name, l=particle.label),
-                            signalProbability='SignalProbability_{p}_{l}'.format(p=particle.name, l=particle.label),
-                            postCutConfig='PostCutConfig_{p}_{l}'.format(p=particle.name, l=particle.label),
-                            postCut='PostCut_{p}_{l}'.format(p=particle.name, l=particle.label),
+                            particleName='Name_{i}'.format(i=particle.identifier),
+                            particleLabel='Label_{i}'.format(i=particle.identifier),
+                            mvaConfig='MVAConfig_{i}'.format(i=particle.identifier),
+                            signalProbability='SignalProbability_{i}'.format(i=particle.identifier),
+                            postCutConfig='PostCutConfig_{i}'.format(i=particle.identifier),
+                            postCut='PostCut_{i}'.format(i=particle.identifier),
                             mcCounts='MCParticleCounts')
         else:
             seq.addFunction(WriteAnalysisFileForCombinedParticle,
-                            particleName='Name_{p}_{l}'.format(p=particle.name, l=particle.label),
-                            particleLabel='Label_{p}_{l}'.format(p=particle.name, l=particle.label),
-                            channelPlaceholders=['Placeholders_' + channel.name for channel in particle.channels],
+                            particleName='Name_{i}'.format(i=particle.identifier),
+                            particleLabel='Label_{i}'.format(i=particle.identifier),
+                            channelPlaceholders=['Placeholders_{c}'.format(c=channel.name) for channel in particle.channels],
                             mcCounts='MCParticleCounts')
 
     #TODO: don't hardcode B0/B+ here
     seq.addFunction(VariablesToNTuple,
                     path='Path',
-                    particleName='Name_B0_generic',
-                    particleLabel='Label_B0_generic',
-                    particleList='ParticleList_B0_generic',
-                    signalProbability='SignalProbability_B0_generic')
+                    particleName='Name_B0:generic',
+                    particleLabel='Label_B0:generic',
+                    particleList='ParticleList_B0:generic',
+                    signalProbability='SignalProbability_B0:generic')
 
     seq.addFunction(VariablesToNTuple,
                     path='Path',
-                    particleName='Name_B+_generic',
-                    particleLabel='Label_B+_generic',
-                    particleList='ParticleList_B+_generic',
-                    signalProbability='SignalProbability_B+_generic')
+                    particleName='Name_B+:generic',
+                    particleLabel='Label_B+:generic',
+                    particleList='ParticleList_B+:generic',
+                    signalProbability='SignalProbability_B+:generic')
 
     seq.addFunction(WriteAnalysisFileSummary,
-                    finalStateParticlePlaceholders=['Placeholders_{p}_{l}'.format(p=particle.name, l=particle.label) for particle in particles if particle.isFSP],
-                    combinedParticlePlaceholders=['Placeholders_{p}_{l}'.format(p=particle.name, l=particle.label) for particle in particles if not particle.isFSP],
-                    ntuples=['VariablesToNTuple_B0_generic'],  # , 'VariablesToNTuple_B+'])
+                    finalStateParticlePlaceholders=['Placeholders_{i}'.format(i=particle.identifier) for particle in particles if particle.isFSP],
+                    combinedParticlePlaceholders=['Placeholders_{i}'.format(i=particle.identifier) for particle in particles if not particle.isFSP],
+                    ntuples=['VariablesToNTuple_B0:generic'],  # , 'VariablesToNTuple_B+'])
                     mcCounts='MCParticleCounts',
-                    particles=['Object_{p}_{l}'.format(p=particle.name, l=particle.label)for particle in particles])
-    seq.addNeeded('SignalProbability_B+_generic')
-    seq.addNeeded('SignalProbability_B0_generic')
-    seq.addNeeded('ParticleList_B0_generic')
-    seq.addNeeded('ParticleList_B+_generic')
+                    particles=['Object_{i}'.format(i=particle.identifier)for particle in particles])
+    seq.addNeeded('SignalProbability_B+:generic')
+    seq.addNeeded('SignalProbability_B0:generic')
+    seq.addNeeded('ParticleList_B0:generic')
+    seq.addNeeded('ParticleList_B+:generic')
     seq.addNeeded('FEIsummary.pdf')
 
     seq.run(path, args.verbose)

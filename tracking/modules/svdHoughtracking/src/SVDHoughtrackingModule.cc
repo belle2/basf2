@@ -202,6 +202,7 @@ SVDHoughtrackingModule::initialize()
 {
   int theta_bins = 133; /* Number of bins in theta */
   int phi_bins = 360; /* Number of bins in phi */
+  int pt_bins = 396; /* Number of bins pT */
   TDirectory* clusterDir, *houghDir, *effDir, *fakeDir, *roiDir;
   StoreArray<SVDHoughCluster>::registerPersistent(m_storeHoughCluster, DataStore::c_Event, false);
   StoreArray<SVDHoughTrack>::registerPersistent(m_storeHoughTrack, DataStore::c_Event, false);
@@ -280,23 +281,29 @@ SVDHoughtrackingModule::initialize()
     effDir = m_rootFile->mkdir("Efficiency");
     effDir->cd();
     /* Histogram for pT-distribution */
-    m_histPtDist = new TH1D("pTDist", "pT-Distribution", 396, 0.02, 2.0);
+    m_histPtDist = new TH1D("pTDist", "pT-Distribution", pt_bins, 0.02, 2.0);
     m_histPtDist->GetXaxis()->SetTitle(xAxisPt);
     m_histPtDist->GetYaxis()->SetTitle("# tracks");
     /* Histogram for correctly reconstructed tracks in pT */
-    m_histPtPhiRecon = new TH1D("pTPhirecon", "pT of reconstructed tracks in Phi", 396, 0.02, 2.0);
+    m_histPtPhiRecon = new TH1D("pTPhirecon", "pT of reconstructed tracks in Phi", pt_bins, 0.02, 2.0);
     m_histPtPhiRecon->GetXaxis()->SetTitle(xAxisPt);
     m_histPtPhiRecon->GetYaxis()->SetTitle("# reconstructed tracks");
-    m_histPtThetaRecon = new TH1D("pTThetarecon", "pT of reconstructed tracks in Theta", 396, 0.02, 2.0);
+    m_histPtThetaRecon = new TH1D("pTThetarecon", "pT of reconstructed tracks in Theta", pt_bins, 0.02, 2.0);
     m_histPtThetaRecon->GetXaxis()->SetTitle(xAxisPt);
     m_histPtThetaRecon->GetYaxis()->SetTitle("# reconstructed tracks");
+    m_histPtRecon = new TH1D("pTRecon", "pT of reconstructed tracks", pt_bins, 0.02, 2.0);
+    m_histPtRecon->GetXaxis()->SetTitle(xAxisPt);
+    m_histPtRecon->GetYaxis()->SetTitle("# reconstructed tracks");
     /* Histogram for efficiency vs pT (only in phi while reconstruction in theta is not proved) */
-    m_histPtEffPhi = new TH1D("pTEffPhi", "Efficiency vs pT (in Phi)", 396, 0.02, 2.0);
+    m_histPtEffPhi = new TH1D("pTEffPhi", "Efficiency vs pT (in Phi)", pt_bins, 0.02, 2.0);
     m_histPtEffPhi->GetXaxis()->SetTitle(xAxisPt);
     m_histPtEffPhi->GetYaxis()->SetTitle("#epsilon");
-    m_histPtEffTheta = new TH1D("pTEffTheta", "Efficiency vs pT (in Theta)", 396, 0.02, 2.0);
+    m_histPtEffTheta = new TH1D("pTEffTheta", "Efficiency vs pT (in Theta)", pt_bins, 0.02, 2.0);
     m_histPtEffTheta->GetXaxis()->SetTitle(xAxisPt);
     m_histPtEffTheta->GetYaxis()->SetTitle("#epsilon");
+    m_histPtEff = new TH1D("pTEff", "Efficiency vs pT", pt_bins, 0.02, 2.0);
+    m_histPtEff->GetXaxis()->SetTitle(xAxisPt);
+    m_histPtEff->GetYaxis()->SetTitle("#epsilon");
     /* Histogram for Phi-distribution */
     m_histPhiDist = new TH1D("PhiDist", "Phi-Distribution", phi_bins, -180, 180);
     m_histPhiDist->GetXaxis()->SetTitle(xAxisPhi);
@@ -345,7 +352,7 @@ SVDHoughtrackingModule::initialize()
     fakeDir = m_rootFile->mkdir("Fake");
     fakeDir->cd();
     /* Histogram for fake rate vs pT (only in phi while reconstruction in theta is not proved) */
-    m_histPtFakePhi = new TH1D("pTFakePhi", "Fake rate vs pT (in Phi)", 396, 0.02, 2.0);
+    m_histPtFakePhi = new TH1D("pTFakePhi", "Fake rate vs pT (in Phi)", pt_bins, 0.02, 2.0);
     m_histPtFakePhi->GetXaxis()->SetTitle(xAxisPt);
     m_histPtFakePhi->GetYaxis()->SetTitle("# fake tracks");
     /* Histogram for fake rate vs Phi */
@@ -367,7 +374,7 @@ SVDHoughtrackingModule::initialize()
     m_histThetaAverageFake->GetXaxis()->SetTitle(xAxisTheta);
     m_histThetaAverageFake->GetYaxis()->SetTitle("Average # fake tracks");
     /* Histogram for fake rate vs pT (only in phi while reconstruction in theta is not proved) */
-    m_histPtFake = new TH1D("pTFake", "Fake rate vs pT", 396, 0.02, 2.0);
+    m_histPtFake = new TH1D("pTFake", "Fake rate vs pT", pt_bins, 0.02, 2.0);
     m_histPtFake->GetXaxis()->SetTitle("Fake");
     m_histPtFake->GetYaxis()->SetTitle("pT [GeV]");
 
@@ -503,6 +510,13 @@ SVDHoughtrackingModule::endRun()
     m_histPtEffTheta->GetXaxis()->SetTitle(xAxisPt);
     m_histPtEffTheta->GetXaxis()->SetRangeUser(0.0, 2.0);
     m_histPtEffTheta->GetYaxis()->SetRangeUser(0.0, 1.0);
+
+    *m_histPtEff = (*m_histPtRecon) / (*m_histPtDist);
+    m_histPtEff->SetName("pTEff");
+    m_histPtEff->SetTitle("Efficiency vs pT");
+    m_histPtEff->GetXaxis()->SetTitle(xAxisPt);
+    m_histPtEff->GetXaxis()->SetRangeUser(0.0, 2.0);
+    m_histPtEff->GetYaxis()->SetRangeUser(0.0, 1.0);
 
     *m_histEffPhi = (*m_histPhiRecon) / (*m_histPhiDist);
     m_histEffPhi->SetName("EffPhi");
@@ -3597,6 +3611,7 @@ SVDHoughtrackingModule::trackAnalyseMCParticle()
 
           /* Found Theta, check also if Phi was correctly reconstructed */
           if (track_match_p[i]) {
+            m_histPtRecon->Fill(pT);
             track_match[i] = true;
           }
         } else if (m_compareMCParticleVerbose) {

@@ -546,9 +546,11 @@ namespace Belle2 {
       /** Histogram for correctly reconstructed tracks in pT */
       TH1D* m_histPtPhiRecon;
       TH1D* m_histPtThetaRecon;
+      TH1D* m_histPtRecon;
       /** Histogram for efficiency vs pT (only in phi while reconstruction in theta is not proved) */
       TH1D* m_histPtEffPhi;
       TH1D* m_histPtEffTheta;
+      TH1D* m_histPtEff;
       /** Histogram for Phi-distribution */
       TH1D* m_histPhiDist;
       /** Histogram for correctly reconstructed tracks in Phi */

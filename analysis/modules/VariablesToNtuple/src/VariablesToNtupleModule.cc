@@ -83,7 +83,7 @@ void VariablesToNtupleModule::initialize()
     }
   }
 
-  m_tree.registerAsTransient(m_treeName);
+  m_tree.registerAsTransient(m_fileName + m_treeName);
   m_tree.construct(m_treeName.c_str(), "", varlist.c_str());
 }
 

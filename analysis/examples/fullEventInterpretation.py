@@ -76,6 +76,14 @@ preCutConfiguration_nonFSP = Particle.PreCutConfiguration(
     purity=0.0001,
 )
 
+preCutConfiguration_semiLep = Particle.PreCutConfiguration(
+    variable='daughterProductOf(getExtraInfo(SignalProbability))',
+    #variable='M',
+    method='Same',
+    efficiency=0.9,
+    purity=0.0001,
+)
+
 preCutConfiguration_DStar = Particle.PreCutConfiguration(
     #variable='daughterProductOf(getExtraInfo(SignalProbability))',
     variable='Q',
@@ -105,7 +113,7 @@ p.addChannel(['pi-', 'pi+', 'pi0'])
 p.addChannel(['K-', 'K+'])
 particles.append(p)
 
-p = Particle('D0:semileptonic', mvaConfig_D, preCutConfiguration_nonFSP)
+p = Particle('D0:semileptonic', mvaConfig_D, preCutConfiguration_semiLep)
 p.addChannel(['K-', 'e+'])
 p.addChannel(['K-', 'mu+'])
 particles.append(p)
@@ -117,7 +125,7 @@ p.addChannel(['K-', 'pi+', 'pi+', 'pi0'])
 p.addChannel(['K-', 'K+', 'pi+', 'pi0'])
 particles.append(p)
 
-p = Particle('D+:semileptonic', mvaConfig_D, preCutConfiguration_nonFSP)
+p = Particle('D+:semileptonic', mvaConfig_D, preCutConfiguration_semiLep)
 p.addChannel(['K-', 'pi+', 'e+'])
 p.addChannel(['K-', 'pi+', 'mu+'])
 particles.append(p)
@@ -127,7 +135,7 @@ p.addChannel(['D0', 'pi+'])
 p.addChannel(['D+', 'pi0'])
 particles.append(p)
 
-p = Particle('D*+:semileptonic', mvaConfig_D, preCutConfiguration_DStar)
+p = Particle('D*+:semileptonic', mvaConfig_D, preCutConfiguration_semiLep)
 p.addChannel(['D0:semileptonic', 'pi+'])
 p.addChannel(['D+:semileptonic', 'pi0'])
 particles.append(p)
@@ -137,7 +145,7 @@ p.addChannel(['D0', 'pi0'])
 p.addChannel(['D0', 'gamma'])
 particles.append(p)
 
-p = Particle('D*0:semileptonic', mvaConfig_D, preCutConfiguration_DStar)
+p = Particle('D*0:semileptonic', mvaConfig_D, preCutConfiguration_semiLep)
 p.addChannel(['D0:semileptonic', 'pi0'])
 p.addChannel(['D0:semileptonic', 'gamma'])
 particles.append(p)
@@ -153,7 +161,7 @@ p.addChannel(['anti-D*0', 'pi+', 'pi+', 'pi-', 'pi0'])
 p.addChannel(['D-', 'pi+', 'pi+'])
 particles.append(p)
 
-p = Particle('B+:semileptonicD', mvaConfig_B, preCutConfiguration_nonFSP)
+p = Particle('B+:semileptonicD', mvaConfig_B, preCutConfiguration_semiLep)
 p.addChannel(['anti-D0:semileptonic', 'pi+'])
 p.addChannel(['anti-D0:semileptonic', 'pi+', 'pi0'])
 p.addChannel(['anti-D0:semileptonic', 'K+'])
@@ -164,7 +172,7 @@ p.addChannel(['anti-D*0:semileptonic', 'pi+', 'pi+', 'pi-', 'pi0'])
 p.addChannel(['D-:semileptonic', 'pi+', 'pi+'])
 particles.append(p)
 
-p = Particle('B+:semileptonic', mvaConfig_B, preCutConfiguration_nonFSP)
+p = Particle('B+:semileptonic', mvaConfig_B, preCutConfiguration_semiLep)
 p.addChannel(['D0', 'e+'])
 p.addChannel(['D0', 'mu+'])
 particles.append(p)
@@ -180,7 +188,7 @@ p.addChannel(['D*-', 'pi+', 'pi+', 'pi-'])
 p.addChannel(['D*-', 'pi+', 'pi+', 'pi-', 'pi0'])
 particles.append(p)
 
-p = Particle('B0:semileptonicD', mvaConfig_B, preCutConfiguration_nonFSP)
+p = Particle('B0:semileptonicD', mvaConfig_B, preCutConfiguration_semiLep)
 p.addChannel(['anti-D0:semileptonic', 'pi0'])
 p.addChannel(['D-:semileptonic', 'pi+'])
 p.addChannel(['D-:semileptonic', 'pi0', 'pi+'])
@@ -192,7 +200,7 @@ p.addChannel(['D*-:semileptonic', 'pi+', 'pi+', 'pi-', 'pi0'])
 particles.append(p)
 
 
-p = Particle('B0:semileptonic', mvaConfig_B, preCutConfiguration_nonFSP)
+p = Particle('B0:semileptonic', mvaConfig_B, preCutConfiguration_semiLep)
 p.addChannel(['D-', 'e+'])
 p.addChannel(['D-', 'mu+'])
 particles.append(p)

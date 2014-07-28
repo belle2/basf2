@@ -409,8 +409,9 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
     """
 
     finalParticlePlaceholders = []
-    for ntuple in ntuples:
-        finalParticlePlaceholders.append(automaticReporting.createMBCTexFile(ntuple))
+    for ntuple in finalParticleNTuples:
+        if ntuple is not None:
+            finalParticlePlaceholders.append(automaticReporting.createMBCTexFile(ntuple))
     placeholders = automaticReporting.createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticlePlaceholders, mcCounts, particles)
 
     for i in range(0, 2):

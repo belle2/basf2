@@ -87,7 +87,8 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
         placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPreCut'], particlePlaceholder['particleNBackground']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNBackgroundAfterPostCut']) * 100) + r'\\' + '\n'
 
-    for particlePlaceholders in finalParticlePlaceholders:
+    placeholders['mbcInputs'] = ''
+    for particlePlaceholder in finalParticlePlaceholders:
         placeholders['mbcInputs'] += '\input{' + particlePlaceholder['texFile'] + '}\n'
 
     placeholders['NSignal'] = 0
@@ -116,10 +117,10 @@ def createMBCTexFile(ntuple):
     placeholders = {}
     mbcFilename = ntuple[:-5] + '_mbc.pdf'
     makeMbcPlot(ntuple, mbcFilename)
-    placeholders['mbcPlots'] = mbcFilename
+    placeholders['mbcPlot'] = mbcFilename
     placeholders['texFile'] = ntuple[:-5] + '_mbc.tex'
     if not os.path.isfile(placeholders['texFile']):
-        createTexFile(placeholders['texFile'], 'analysis/scripts/FullEventInterpretationSummaryTemplate.tex', placeholders)
+        createTexFile(placeholders['texFile'], 'analysis/scripts/FullEventInterpretationMBCTemplate.tex', placeholders)
     return placeholders
 
 

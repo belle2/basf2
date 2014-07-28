@@ -39,19 +39,19 @@ class TestCopyParticleLists(unittest.TestCase):
         self.path = MockPath()
 
     def test_without_nones(self):
-        result = CopyParticleLists(self.path, 'D+', None, ['D+:1', 'D+:2', 'D+:3'], {'cutstring': ''}, None)
-        self.assertDictEqual(result, {'ParticleList_D+': 'D+:5cd7f2d37f66c44b92dbd64e10ada329133b6a63',
-                                      'ParticleList_D-': 'D-:5cd7f2d37f66c44b92dbd64e10ada329133b6a63'})
+        result = CopyParticleLists(self.path, 'D+', None, ['D+:1', 'D+:2', 'D+:3'], {'cutstring': ''})
+        self.assertDictEqual(result, {'ParticleList_D+': 'D+:1faa07a167fde173f8c899a11716bda4572a4661',
+                                      'ParticleList_D-': 'D-:1faa07a167fde173f8c899a11716bda4572a4661'})
         self.assertEqual(len(self.path.modules), 1)
 
     def test_with_nones(self):
-        result = CopyParticleLists(self.path, 'D+', None, ['D+:1', None, 'D+:3', None], {'cutstring': ''}, None)
-        self.assertDictEqual(result, {'ParticleList_D+': 'D+:fc01399545fea42891ffc8fc0b07b52de3317544',
-                                      'ParticleList_D-': 'D-:fc01399545fea42891ffc8fc0b07b52de3317544'})
+        result = CopyParticleLists(self.path, 'D+', None, ['D+:1', None, 'D+:3', None], {'cutstring': ''})
+        self.assertDictEqual(result, {'ParticleList_D+': 'D+:e58bca9f3d4d28df7fc5a92b3761593052102635',
+                                      'ParticleList_D-': 'D-:e58bca9f3d4d28df7fc5a92b3761593052102635'})
         self.assertEqual(len(self.path.modules), 1)
 
     def test_only_nones(self):
-        result = CopyParticleLists(self.path, 'D+', None, [None, None], {'cutstring': ''}, None)
+        result = CopyParticleLists(self.path, 'D+', None, [None, None], {'cutstring': ''})
         self.assertDictEqual(result, {'ParticleList_D+': None,
                                       'ParticleList_D-': None})
         self.assertEqual(len(self.path.modules), 0)

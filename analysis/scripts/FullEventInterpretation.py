@@ -8,17 +8,17 @@
 # Each Actor has requirements and provides return values.
 # E.g. SignalProbability requires the path, a method, variables and a ParticleList.
 #                        provides SignalProbability for the ParticleList.
-#      CreatePreCutDistribution require among others the SignalProbability for the ParticleLists
-#                        provides PreCutDistribution
-#      PreCutDetermination requires among others a PreCutDistribution
+#      CreatePreCutHistogram require among others the SignalProbability for the ParticleLists
+#                        provides PreCutHistogram
+#      PreCutDetermination requires among others a PreCutHistogram
 #                         provides PreCuts
-#      ParticleListFromChannel requires among others PreCuts
+#      MakeAndMatchParticleList requires among others PreCuts
 # ... and so on ...
 #
 # The actors are added to the Sequence of actors in the FullEventInterpretation function at the end of this file.
 # Afterwards the dependencies between the Actors are solved, and the Actors are called in the correct order, with the required parameters.
 # If no further Actors can be called without satisfying all their requirements, the FullReoncstruction function returns.
-# Therefore the end user has to run the FullEventInterpretation several times, until all Distributions, Classifiers, ... are created.
+# Therefore the end user has to run the FullEventInterpretation several times, until all Histograms, Classifiers, ... are created.
 #
 
 from ROOT import PyConfig
@@ -38,8 +38,7 @@ class Particle(object):
     """
     The Particle class is the only class the end-user gets into contact with.
     The user creates an instance of this class for every particle he wants to reconstruct with the FullReconstruction algorithm,
-    and provides a method (see TMVA Interface), variables (see VariableManager) and the decay channels of the particle.
-    In total this class contains: name, method, variables, efficiency (of preCuts) and all decay channels of a particle.
+    and provides MVAConfiguration, PreCutConfiguration and PostCutConfiguration. These configurations can be overwritten per channel.
     """
 
     ## Create new class called MVAConfiguration via namedtuple. namedtuples are like a struct in C
@@ -55,11 +54,10 @@ class Particle(object):
                  postCutConfig=PostCutConfiguration(value=0.0001)):
         """
         Creates a Particle without any decay channels. To add decay channels use addChannel method.
-            @param identifier is the correct pdg name as a string of the particle with an optional additional user label seperated by :
+            @param identifier is the correct pdg name of the particle as a string with an optional additional user label seperated by :
             @param mvaConfig multivariate analysis configuration
-            @param preCutConfig intermediate cut configuration
+            @param preCutConfig intermediate pre cut configuration
             @param postCutConfig post cut configuration
-            @param label additional label for this particle
         """
         ## Is the correct pdg name as a string of the particle with an optional additional user label seperated by :
         self.identifier = identifier
@@ -87,21 +85,19 @@ class Particle(object):
         """ Returns true if the particle is a final state particle """
         return self.channels == []
 
-    def addChannel(self, daughters, mvaConfig=None, preCutConfig=None, postCutConfig=None, addExtraVars=True):
+    def addChannel(self, daughters, mvaConfig=None, preCutConfig=None, postCutConfig=None):
         """
         Appends a new decay channel to the Particle object.
         @param daughters is a list of pdg particle names e.g. ['pi+','K-']
         @param mvaConfig multivariate analysis configuration
-        @param preCutConfig pre cut configuration
-        @param postCutConfig pre cut configuration
-        @param group groups channels into groups with similar kinematic e.g. missing particles, two tracks, three tracks, ...
+        @param preCutConfig intermediate pre cut configuration
+        @param postCutConfig post cut configuration
         """
         daughters = [d + ':generic' if ':' not in d else d for d in daughters]
         preCutConfig = copy.deepcopy(self.preCutConfig if preCutConfig is None else preCutConfig)
         postCutConfig = copy.deepcopy(self.postCutConfig if postCutConfig is None else postCutConfig)
         mvaConfig = copy.deepcopy(self.mvaConfig if mvaConfig is None else mvaConfig)
-        if addExtraVars:
-            mvaConfig.variables.extend(['daughter{i}(getExtraInfo(SignalProbability))'.format(i=i) for i in range(0, len(daughters))])
+        mvaConfig.variables.extend(['daughter{i}(getExtraInfo(SignalProbability))'.format(i=i) for i in range(0, len(daughters))])
         self.channels.append(Particle.DecayChannel(name=self.identifier + ' ==> ' + ' '.join(daughters),
                                                    daughters=daughters,
                                                    mvaConfig=mvaConfig,
@@ -158,7 +154,7 @@ def FullEventInterpretation(path, particles):
     """
     The Full Event Interpretation algorithm.
     Alle the Actors defined above are added to the sequence and are executed in an order which fulfills all requirements.
-    This function returns if no more Actors can be called without violate some requirements.
+    This function returns if no more Actors can be called without violating some requirements.
         @param path the basf2 module path
         @param particles sequence of particle objects which shall be reconstructed by this algorithm
     """
@@ -167,8 +163,6 @@ def FullEventInterpretation(path, particles):
     parser.add_argument('-verbose', '--verbose', dest='verbose', action='store_true', help='Output additional information')
     parser.add_argument('-nosignal', '--no-signal-classifiers', dest='nosig', action='store_true', help='Do not train classifiers')
     args = parser.parse_args()
-
-    particles = addIncompleteChannels(particles, args.verbose)
 
     # Add the basf2 module path
     seq = actorFramework.Sequence()
@@ -210,7 +204,7 @@ def FullEventInterpretation(path, particles):
                                 particleName='Name_{i}'.format(i=particle.identifier),
                                 particleLabel='Label_{i}'.format(i=particle.identifier),
                                 channelName='Name_{c}'.format(c=channel.name),
-                                inputLists=['ParticleList_{d}'.format(d=daughter) for daughter in channel.daughters],
+                                daughterParticleLists=['ParticleList_{d}'.format(d=daughter) for daughter in channel.daughters],
                                 preCut='PreCut_{c}'.format(c=channel.name))
                 seq.addFunction(FitVertex,
                                 path='Path',
@@ -233,40 +227,36 @@ def FullEventInterpretation(path, particles):
 
             for channel in particle.channels:
                 additionalDependencies = []
-                if channel.preCutConfig.variable == 'daughterProductOfSignalProbability':
+                if 'SignalProbability' in channel.preCutConfig.variable:
                     additionalDependencies = ['SignalProbability_{d}'.format(d=daughter) for daughter in channel.daughters]
 
                 seq.addFunction(CreatePreCutHistogram,
                                 path='Path',
                                 particleName='Name_{i}'.format(i=particle.identifier),
-                                particleLabel='Label_{i}'.format(i=particle.identifier),
                                 channelName='Name_{c}'.format(c=channel.name),
                                 preCutConfig='PreCutConfig_{c}'.format(c=channel.name),
-                                daughterLists=['ParticleList_{d}'.format(d=daughter) for daughter in channel.daughters],
+                                daughterParticleLists=['ParticleList_{d}'.format(d=daughter) for daughter in channel.daughters],
                                 additionalDependencies=additionalDependencies)
 
         ############## POSTCUT DETERMINATION #############
         if particle.isFSP:
             seq.addFunction(PostCutDetermination,
-                            names=['Identifier_{i}'.format(i=particle.identifier)],
+                            identifiers=['Identifier_{i}'.format(i=particle.identifier)],
                             postCutConfigs=['PostCutConfig_{i}'.format(i=particle.identifier)],
                             signalProbabilities=['SignalProbability_{i}'.format(i=particle.identifier)])
 
         else:
             seq.addFunction(PostCutDetermination,
-                            names=['Name_{c}'.format(c=channel.name) for channel in particle.channels],
+                            identifiers=['Name_{c}'.format(c=channel.name) for channel in particle.channels],
                             postCutConfigs=['PostCutConfig_{c}'.format(c=channel.name) for channel in particle.channels],
                             signalProbabilities=['SignalProbability_{c}'.format(c=channel.name) for channel in particle.channels])
 
         ########### SIGNAL PROBABILITY ACTORS #######
-        # The classifier part of the FullReconstruction.
         if not args.nosig:
             if particle.isFSP:
                 seq.addFunction(SignalProbability,
                                 path='Path',
-                                particleName='Name_{i}'.format(i=particle.identifier),
-                                particleLabel='Label_{i}'.format(i=particle.identifier),
-                                channelName='Name_{i}'.format(i=particle.identifier),
+                                identifier='Identifier_{i}'.format(i=particle.identifier),
                                 mvaConfig='MVAConfig_{i}'.format(i=particle.identifier),
                                 particleList='RawParticleList_{i}'.format(i=particle.identifier))
             else:
@@ -280,9 +270,7 @@ def FullEventInterpretation(path, particles):
 
                     seq.addFunction(SignalProbability,
                                     path='Path',
-                                    particleName='Name_{i}'.format(i=particle.identifier),
-                                    particleLabel='Label_{i}'.format(i=particle.identifier),
-                                    channelName='Name_{c}'.format(c=channel.name),
+                                    identifier='Name_{c}'.format(c=channel.name),
                                     mvaConfig='MVAConfig_{c}'.format(c=channel.name),
                                     particleList='RawParticleList_{c}'.format(c=channel.name),
                                     additionalDependencies=additionalDependencies)
@@ -323,31 +311,22 @@ def FullEventInterpretation(path, particles):
                             channelPlaceholders=['Placeholders_{c}'.format(c=channel.name) for channel in particle.channels],
                             mcCounts='MCParticleCounts')
 
-    #TODO: don't hardcode B0/B+ here
-    seq.addFunction(VariablesToNTuple,
-                    path='Path',
-                    particleName='Name_B0:generic',
-                    particleLabel='Label_B0:generic',
-                    particleList='ParticleList_B0:generic',
-                    signalProbability='SignalProbability_B0:generic')
-
-    seq.addFunction(VariablesToNTuple,
-                    path='Path',
-                    particleName='Name_B+:generic',
-                    particleLabel='Label_B+:generic',
-                    particleList='ParticleList_B+:generic',
-                    signalProbability='SignalProbability_B+:generic')
+    finalParticles = [particle for particle in particles if all(particle.identifier not in o.daughters for o in particles)]
+    for finalParticle in finalParticles:
+        seq.addFunction(VariablesToNTuple,
+                        path='Path',
+                        particleIdentifier='Identifier_{i}'.format(i=finalParticle.identifier),
+                        particleList='ParticleList_{i}'.format(i=finalParticle.identifier),
+                        signalProbability='SignalProbability_{i}'.format(i=finalParticle.identifier))
+        seq.addNeeded('SignalProbability_{i}'.format(i=finalParticle.identifier))
+        seq.addNeeded('ParticleList_{i}'.format(i=finalParticle.identifier))
 
     seq.addFunction(WriteAnalysisFileSummary,
                     finalStateParticlePlaceholders=['Placeholders_{i}'.format(i=particle.identifier) for particle in particles if particle.isFSP],
                     combinedParticlePlaceholders=['Placeholders_{i}'.format(i=particle.identifier) for particle in particles if not particle.isFSP],
-                    ntuples=['VariablesToNTuple_B0:generic'],  # , 'VariablesToNTuple_B+'])
+                    finalParticleNTuples=['VariablesToNTuple_{i}'.format(i=finalParticle.identifier) for finalParticle in finalParticles],
                     mcCounts='MCParticleCounts',
                     particles=['Object_{i}'.format(i=particle.identifier)for particle in particles])
-    seq.addNeeded('SignalProbability_B+:generic')
-    seq.addNeeded('SignalProbability_B0:generic')
-    seq.addNeeded('ParticleList_B0:generic')
-    seq.addNeeded('ParticleList_B+:generic')
     seq.addNeeded('FEIsummary.pdf')
 
     seq.run(path, args.verbose)

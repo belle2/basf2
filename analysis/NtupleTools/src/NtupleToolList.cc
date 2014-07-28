@@ -27,6 +27,7 @@
 #include <analysis/NtupleTools/NtupleContinuumSuppressionTool.h>
 #include <analysis/NtupleTools/NtupleMCDecayStringTool.h>
 #include <analysis/NtupleTools/NtupleFlightInfoTool.h>
+#include <analysis/NtupleTools/NtupleMCFlightInfoTool.h>
 
 using namespace Belle2;
 using namespace std;
@@ -86,6 +87,7 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName.compare("ContinuumSuppression") == 0) return new NtupleContinuumSuppressionTool(tree, d);
   else if (strToolName.compare("MCDecayString") == 0) return new NtupleMCDecayStringTool(tree, d);
   else if (strToolName.compare("FlightInfo") == 0) return new NtupleFlightInfoTool(tree, d);
+  else if (strToolName.compare("MCFlightInfo") == 0) return new NtupleMCFlightInfoTool(tree, d);
 
   B2WARNING("NtupleTool " << strToolName << " is not available!");
   return NULL;

@@ -24,11 +24,11 @@ void NtupleFlightInfoTool::setupTree()
   if (strNames.empty()) return;
 
   //flight distance
-  m_tree->Branch((strNames[1] + "_FD").c_str(), &m_fD, (strNames[1] + "FD_/F").c_str());
+  m_tree->Branch((strNames[1] + "_FD").c_str(), &m_fD, (strNames[1] + "FD/F").c_str());
   m_tree->Branch((strNames[1] + "_FDE").c_str(), &m_fDE, (strNames[1] + "_FDE/F").c_str());
 
   //flight time
-  m_tree->Branch((strNames[1] + "_FT").c_str(), &m_fT, (strNames[1] + "FT_/F").c_str());
+  m_tree->Branch((strNames[1] + "_FT").c_str(), &m_fT, (strNames[1] + "FT/F").c_str());
   m_tree->Branch((strNames[1] + "_FTE").c_str(), &m_fTE, (strNames[1] + "_FTE/F").c_str());
 
 }

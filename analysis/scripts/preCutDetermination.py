@@ -36,7 +36,7 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
                     interpolations[channel].GetX(cut, maxima[channel], signal[channel].GetXaxis().GetXmax()))
 
     # One-Side cut S/B ratio constructed
-    elif preCutConfig.method == 'S/B' and preCutConfig.variable in ['daughterProductOf(getExtraInfo(SignalProbability)']:
+    elif preCutConfig.method == 'S/B' and preCutConfig.variable in ['daughterProductOf(getExtraInfo(SignalProbability))']:
 
         def ycut_to_xcuts(channel, cut):
             return (interpolations[channel].GetX(cut, 0, 1), 1)
@@ -49,7 +49,7 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
             return (maxima[channel] - cut * 2, maxima[channel] + cut * 2)
 
     # One sided cut, same for all channels
-    elif preCutConfig.method == 'Same' and preCutConfig.variable in ['daughterProductOf(getExtraInfo(SignalProbability)']:
+    elif preCutConfig.method == 'Same' and preCutConfig.variable in ['daughterProductOf(getExtraInfo(SignalProbability))']:
 
         def ycut_to_xcuts(channel, cut):
             return (cut, 1)

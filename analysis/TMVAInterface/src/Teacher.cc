@@ -63,7 +63,7 @@ namespace Belle2 {
       if (m_tree == nullptr) {
 
         if (useExistingData)
-          B2INFO("Couldn't find existing data, create new tree")
+          B2WARNING("Couldn't find existing data, create new tree")
 
           m_tree = new TTree(tree_name.c_str(), tree_name.c_str());
 
@@ -103,6 +103,10 @@ namespace Belle2 {
 
     void Teacher::addSample(const Particle* particle)
     {
+      // Change the workling directory to the user defined working directory
+      std::string oldDirectory = gSystem->WorkingDirectory();
+      gSystem->ChangeDirectory(m_workingDirectory.c_str());
+
       // Fill the tree with the input variables
       const auto& variables = m_methods[0].getVariables();
       for (unsigned int i = 0; i < variables.size(); ++i) {
@@ -120,6 +124,8 @@ namespace Belle2 {
         m_cluster_count[m_target] = 1;
       else
         it->second++;
+
+      gSystem->ChangeDirectory(oldDirectory.c_str());
     }
 
     void Teacher::train(std::string factoryOption, std::string prepareOption, unsigned int maxEventsPerClass)

@@ -52,7 +52,7 @@ class Particle(object):
     DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, mvaConfig, isIncomplete')
 
     def __init__(self, name, mvaConfig, preCutConfig=PreCutConfiguration(variable='Mass', method='S/B', efficiency=0.70, purity=0.001),
-                 postCutConfig=PostCutConfiguration(value=0.001)):
+                 postCutConfig=PostCutConfiguration(value=0.0001)):
         """
         Creates a Particle without any decay channels. To add decay channels use addChannel method.
             @param name is the correct pdg name as a string of the particle.

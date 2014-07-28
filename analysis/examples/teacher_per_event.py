@@ -40,7 +40,6 @@ teacher.param('prefix', 'TMVA')
 teacher.param('methods', methods)
 teacher.param('variables', variables)
 teacher.param('target', 'isContinuumEvent')
-teacher.param('trainOncePerJob', True)
 main.add_module(teacher)
 
 process(main)

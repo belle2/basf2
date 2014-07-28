@@ -13,6 +13,8 @@
 #include <analysis/dataobjects/ParticleList.h>
 
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/pcore/ProcHandler.h>
+#include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
@@ -28,6 +30,8 @@ namespace Belle2 {
                    "The clusters are trained against each other. "
                    "See also https://belle2.cc.kek.jp/~twiki/bin/view/Software/TMVA for detailed instructions.");
 
+    setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
+
     std::vector<std::string> empty;
     addParam("listNames", m_listNames, "Particles from these ParticleLists are used as input. If no name is given the teacher is applied to every event once, and one can only use variables which accept nullptr as Particle*", empty);
     addParam("methods", m_methods, "Vector of Tuples with (Name, Type, Config) of the methods. Valid types are: BDT, KNN, Fisher, Plugin. For type 'Plugin', the plugin matching the Name attribute will be loaded (e.g. NeuroBayes). The Config is passed to the TMVA Method and is documented in the TMVA UserGuide.");
@@ -40,7 +44,6 @@ namespace Belle2 {
     addParam("createMVAPDFs", m_createMVAPDFs, "Creates the MVA PDFs for signal and background. This is needed to transform the output of the trained method to a probability.", true);
     addParam("useExistingData", m_useExistingData, "Use existing data which is already stored in the $prefix.root file.", false);
     addParam("doNotTrain", m_doNotTrain, "Do not train, create only datafile with samples. Useful if you want to train outside of basf2 with the externTeacher tool.", false);
-    addParam("trainOncePerJob", m_trainOncePerJob, "If true, training is performed once per job (in the terminate method instead of in the endRun method)", true);
     addParam("maxEventsPerClass", m_maxEventsPerClass, "Maximum number of events per class passed to TMVA. 0 means no limit.", static_cast<unsigned int>(0));
 
   }
@@ -55,12 +58,6 @@ namespace Belle2 {
       StoreObjPtr<ParticleList>::required(name);
     }
 
-    if (m_trainOncePerJob)
-      initTeacher();
-  }
-
-  void TMVATeacherModule::initTeacher()
-  {
     std::vector<TMVAInterface::Method> methods;
     for (auto & x : m_methods) {
       std::string config = std::get<2>(x);
@@ -71,30 +68,14 @@ namespace Belle2 {
     m_teacher = std::make_shared<TMVAInterface::Teacher>(m_methodPrefix, m_workingDirectory, m_target, methods, m_useExistingData);
   }
 
-  void TMVATeacherModule::beginRun()
-  {
-    if (!m_trainOncePerJob)
-      initTeacher();
-  }
-
-  void TMVATeacherModule::trainTeacher()
-  {
-    if (not m_doNotTrain) {
-      m_teacher->train(m_factoryOption, m_prepareOption, m_maxEventsPerClass);
-    }
-    m_teacher.reset();
-  }
-
-  void TMVATeacherModule::endRun()
-  {
-    if (!m_trainOncePerJob)
-      trainTeacher();
-  }
-
   void TMVATeacherModule::terminate()
   {
-    if (m_trainOncePerJob)
-      trainTeacher();
+    if (Environment::Instance().getNumberProcesses() == 0 or ProcHandler::isOutputProcess()) {
+      if (not m_doNotTrain) {
+        m_teacher->train(m_factoryOption, m_prepareOption, m_maxEventsPerClass);
+      }
+    }
+    m_teacher.reset();
   }
 
   void TMVATeacherModule::event()

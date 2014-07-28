@@ -45,19 +45,9 @@ namespace Belle2 {
     virtual void initialize();
 
     /**
-     * Called when a new run is started.
-     */
-    virtual void beginRun();
-
-    /**
      * Called for each event.
      */
     virtual void event();
-
-    /**
-     * Called when run ended.
-     */
-    virtual void endRun();
 
     /**
      * Terminates the module.
@@ -65,16 +55,6 @@ namespace Belle2 {
     virtual void terminate();
 
   private:
-
-    /**
-     * Initalizes the TMVA teacher.
-     */
-    void initTeacher();
-
-    /**
-     * Trains TMVA teacher.
-     */
-    void trainTeacher();
 
     std::vector<std::string> m_listNames; /**< input particle list names */
     std::vector<std::string> m_variables; /**< input variables for the TMVA method */
@@ -88,7 +68,6 @@ namespace Belle2 {
 
     bool m_useExistingData; /**< Use existing data if available */
     bool m_doNotTrain; /**< do not train the method, just create the sample file. Useful for external training with externTeacher */
-    bool m_trainOncePerJob; /**< Perform TMVA training once per job (in the terminate method instead of in the endRun method) */
     unsigned int m_maxEventsPerClass; /**< Maximum nuber of events per class passed to TMVA */
 
     std::shared_ptr<TMVAInterface::Teacher> m_teacher; /**< Used TMVA method */

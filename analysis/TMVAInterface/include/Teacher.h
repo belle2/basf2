@@ -12,6 +12,9 @@
 #include <analysis/TMVAInterface/Method.h>
 #include <analysis/VariableManager/Manager.h>
 
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/pcore/RootMergeable.h>
+
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
@@ -93,7 +96,7 @@ namespace Belle2 {
       std::vector<Method> m_methods; /**< Name, Type and Config of methods */
 
       TFile* m_file; /**< stores TTree and training histograms created by TMVA */
-      TTree* m_tree; /**< holds training and test signal samples */
+      StoreObjPtr<RootMergeable<TTree>> m_tree; /**< holds training and test signal samples */
 
       const Variable::Manager::Var* m_target_var; /**< Variable Pointer to target variable */
       int m_target; /**< Storage for the target variable */

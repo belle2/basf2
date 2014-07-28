@@ -25,8 +25,7 @@ namespace Belle2 {
 
   namespace TMVAInterface {
 
-    Teacher::Teacher(std::string prefix, std::string workingDirectory, std::string target, std::vector<Method> methods, bool useExistingData) : m_prefix(prefix), m_workingDirectory(workingDirectory), m_methods(methods), m_file(nullptr), m_tree(nullptr)
-    {
+    Teacher::Teacher(std::string prefix, std::string workingDirectory, std::string target, std::vector<Method> methods, bool useExistingData) : m_prefix(prefix), m_workingDirectory(workingDirectory), m_methods(methods), m_file(nullptr), m_tree("", DataStore::c_Persistent), {
 
       // Change the workling directory to the user defined working directory
       std::string oldDirectory = gSystem->WorkingDirectory();

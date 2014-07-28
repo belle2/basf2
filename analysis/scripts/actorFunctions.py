@@ -133,7 +133,21 @@ def MakeAndMatchParticleList(path, particleName, channelName, inputLists, preCut
             'RawParticleList_' + channelName + '_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
 
 
-def SignalProbability(path, particleName, channelName, mvaConfig, particleList, daughterSignalProbabilities=[]):
+def FitVertex(path, particleName, channelName, particleList):
+    """
+    Fit secondary vertex of this particle
+        @param path the basf2 path
+        @param particleName name of the reconstructed particle
+        @param channelName decay channel name
+        @param particleList the particleList which is fitted
+    """
+    modularAnalysis.fitVertex(particleList, 0)
+    B2INFO("Fitted vertex for channel " + channelName + " and charged conjugated.")
+    return {'VertexFit_' + channelName + '_' + particleName: 'dummy',
+            'VertexFit_' + channelName + '_' + pdg.conjugate(particleName): 'dummy'}
+
+
+def SignalProbability(path, particleName, channelName, mvaConfig, particleList, additionalDependencies=[]):
     """
     Calculates the SignalProbability of a ParticleList. If the files required from TMVAExpert aren't available they're created.
         @param path the basf2 path
@@ -141,14 +155,14 @@ def SignalProbability(path, particleName, channelName, mvaConfig, particleList, 
         @param channelName of channel which is classified
         @param mvaConfig configuration for the multivariate analysis
         @param particleList the particleList which is used for training and classification
-        @param daughterSignalProbabilities all daughter particles need a SignalProbability
+        @param additionalDependencies for variables like SignalProbability of daughters or VertexFit
     """
-    if particleList is None or any([daughterSignalProbability is None for daughterSignalProbability in daughterSignalProbabilities]):
+    if particleList is None or any([d is None for d in additionalDependencies]):
         B2INFO("Calculate SignalProbability for channel " + channelName + " and charged conjugated. But the channel is ignored :-(.")
         return {'SignalProbability_' + channelName + '_' + particleName: None,
                 'SignalProbability_' + channelName + '_' + pdg.conjugate(particleName): None}
 
-    hash = actorFramework.createHash(particleName, channelName, mvaConfig, particleList, daughterSignalProbabilities)
+    hash = actorFramework.createHash(particleName, channelName, mvaConfig, particleList, additionalDependencies)
 
     rootFilename = '{particleList}_{hash}.root'.format(particleList=particleList, hash=hash)
     configFilename = '{particleList}_{hash}.config'.format(particleList=particleList, hash=hash)
@@ -280,19 +294,19 @@ def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughte
     return {}
 
 
-def PreCutDetermination(particleName, channelNames, preCutConfig, preCutHistograms):
+def PreCutDetermination(particleName, channelNames, preCutConfigs, preCutHistograms):
     """
     Determines the PreCuts for all the channels of a particle.
         @param particleName name of the particle
         @param channelNames list of the names of all the channels
-        @param preCutConfig configuration for PreCut determination e.g. signal efficiency for this particle
+        @param preCutConfig configuration for PreCut determination e.g. signal efficiency for this particle for every chanel
         @param preCutHistograms filenames of the histogram files created for every channel by PreCutDistribution
     """
 
-    results = {'PreCut_' + channel: None for channel, _ in zip(*actorFramework.getNones(channelNames, preCutHistograms))}
-    channelNames, preCutHistograms = actorFramework.removeNones(channelNames, preCutHistograms)
+    results = {'PreCut_' + channel: None for channel, _, __ in zip(*actorFramework.getNones(channelNames, preCutHistograms, preCutConfigs))}
+    channelNames, preCutHistograms, preCutConfigs = actorFramework.removeNones(channelNames, preCutHistograms, preCutConfigs)
 
-    cuts = preCutDetermination.CalculatePreCuts(preCutConfig, channelNames, preCutHistograms)
+    cuts = preCutDetermination.CalculatePreCuts(preCutConfigs, channelNames, preCutHistograms)
 
     for (channel, cut) in cuts.iteritems():
         results['PreCut_' + channel] = None if cut['isIgnored'] else cut

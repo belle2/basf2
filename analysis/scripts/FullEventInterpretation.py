@@ -45,13 +45,13 @@ class Particle(object):
     ## Create new class called MVAConfiguration via namedtuple. namedtuples are like a struct in C
     MVAConfiguration = collections.namedtuple('MVAConfiguration', 'name, type, config, variables, target, targetCluster')
     ## Create new class called PreCutConfiguration via namedtuple. namedtuples are like a struct in C
-    PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'variable, method, efficiency, purity')
+    PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'variable, method, efficiency, purity, group')
     ## Create new class called PostCutConfiguration via namedtuple. namedtuples are like a struct in C
     PostCutConfiguration = collections.namedtuple('PostCutConfiguration', 'value')
     ## Create new class called DecayChannel via namedtuple. namedtuples are like a struct in C
-    DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, mvaConfig, isIncomplete')
+    DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, mvaConfig, preCutConfig, isIncomplete')
 
-    def __init__(self, name, mvaConfig, preCutConfig=PreCutConfiguration(variable='Mass', method='S/B', efficiency=0.70, purity=0.001),
+    def __init__(self, name, mvaConfig, preCutConfig=PreCutConfiguration(variable='Mass', method='S/B', efficiency=0.70, purity=0.001, group='generic'),
                  postCutConfig=PostCutConfiguration(value=0.0001)):
         """
         Creates a Particle without any decay channels. To add decay channels use addChannel method.
@@ -96,20 +96,24 @@ class Particle(object):
         """ Returns true if the particle is a final state particle """
         return self.channels == []
 
-    def addChannel(self, daughters, mvaConfig=None, isIncomplete=False, addExtraVars=True):
+    def addChannel(self, daughters, mvaConfig=None, preCutConfig=None, isIncomplete=False, addExtraVars=True):
         """
         Appends a new decay channel to the Particle object.
         @param daughters is a list of pdg particle names e.g. ['pi+','K-']
         @param mvaConfig multivariate analysis configuration
+        @param preCutConfig pre cut configuration
         @param isIncomplete True if the given channel misses some particles like neutrinos or photons.
         @param addExtraVars True if getExtraInfo(SignalProbability) should be added for all daughters
         """
+        preCutConfig = copy.deepcopy(self.preCutConfig if preCutConfig is None else preCutConfig)
         mvaConfig = copy.deepcopy(self.mvaConfig if mvaConfig is None else mvaConfig)
         if addExtraVars:
             mvaConfig.variables.extend(['daughter{i}(getExtraInfo(SignalProbability))'.format(i=i) for i in range(0, len(daughters))])
         self.channels.append(Particle.DecayChannel(name=self.name + ' ==> ' + ' '.join(daughters),
                                                    daughters=daughters,
-                                                   mvaConfig=mvaConfig, isIncomplete=isIncomplete))
+                                                   mvaConfig=mvaConfig,
+                                                   preCutConfig=preCutConfig,
+                                                   isIncomplete=isIncomplete))
         return self
 
     def __str__(self):
@@ -164,7 +168,9 @@ def addIncompleteChannels(particles, verbose):
                             if name in complete_mother_channel.daughters:
                                 daughters = [daughter for daughter in complete_mother_channel.daughters]
                                 daughters[daughters.index(name)] = incomplete_daughter_channel.name + '_' + name
-                                mother.addChannel(daughters, complete_mother_channel.mvaConfig, isIncomplete=True, addExtraVars=False)
+                                preCutConfig = copy.deepcopy(complete_mother_channel.preCutConfig)
+                                preCutConfig.group += '_' + incomplete_daughter_channel.preCutConfig
+                                mother.addChannel(daughters, complete_mother_channel.mvaConfig, preCutConfig, isIncomplete=True, addExtraVars=False)
                                 if verbose:
                                     print "Added new incomplete channel to " + mother.name + " " + str(daughters)
                 processed.append(name)
@@ -199,7 +205,6 @@ def FullEventInterpretation(path, particles):
         # Add all information the user has provided as resources to the sequence, so our function can require them
         seq.addResource('Name_' + particle.name, particle.name)
         seq.addResource('ParticleObject_' + particle.name, particle)
-        seq.addResource('PreCutConfig_' + particle.name, particle.preCutConfig)
         seq.addResource('PostCutConfig_' + particle.name, particle.postCutConfig)
 
         # Add Variables:
@@ -210,6 +215,7 @@ def FullEventInterpretation(path, particles):
         for channel in particle.channels:
             seq.addResource('Name_' + channel.name, channel.name)
             seq.addResource('MVAConfig_' + channel.name, channel.mvaConfig)
+            seq.addResource('PreCutConfig_' + channel.name, channel.preCutConfig)
 
         ########### RECONSTRUCTION ACTORS ##########
         # The Reconstruction part of the FullReconstruction:
@@ -234,6 +240,12 @@ def FullEventInterpretation(path, particles):
                                 channelName='Name_' + channel.name,
                                 inputLists=['ParticleList_' + daughter for daughter in channel.daughters],
                                 preCut='PreCut_' + channel.name)
+                seq.addFunction(FitVertex,
+                                path='Path',
+                                particleName='Name_' + particle.name,
+                                channelName='Name_' + channel.name,
+                                particleList='RawParticleList_' + channel.name + '_' + particle.name)
+
             seq.addFunction(CopyParticleLists,
                             path='Path',
                             particleName='Name_' + particle.name,
@@ -258,20 +270,20 @@ def FullEventInterpretation(path, particles):
             seq.addFunction(PreCutDetermination,
                             particleName='Name_' + particle.name,
                             channelNames=['Name_' + channel.name for channel in particle.channels],
-                            preCutConfig='PreCutConfig_' + particle.name,
+                            preCutConfig=['PreCutConfig_' + channel.name for channel in particle.channels],
                             preCutHistograms=['PreCutHistogram_' + channel.name for channel in particle.channels])
 
             for channel in particle.channels:
 
                 additionalDependencies = []
-                if particle.preCutConfig.variable == 'daughterProductOfSignalProbability':
+                if channel.preCutConfig.variable == 'daughterProductOfSignalProbability':
                     additionalDependencies = ['SignalProbability_' + daughter for daughter in channel.daughters]
 
                 seq.addFunction(CreatePreCutHistogram,
                                 path='Path',
                                 particleName='Name_' + particle.name,
                                 channelName='Name_' + channel.name,
-                                preCutConfig='PreCutConfig_' + particle.name,
+                                preCutConfig='PreCutConfig_' + channel.name,
                                 daughterLists=['ParticleList_' + daughter for daughter in channel.daughters],
                                 additionalDependencies=additionalDependencies)
 
@@ -292,13 +304,20 @@ def FullEventInterpretation(path, particles):
                                 particleList='RawParticleList_' + particle.name)
             else:
                 for channel in particle.channels:
+
+                    additionalDependencies = []
+                    if any('SignalProbability' in variable for variable in channel.mvaConfig.variables):
+                        additionalDependencies += ['SignalProbability_' + daughter for daughter in channel.daughters]
+                    if any(variable in ['dx', 'dy', 'dz', 'dr'] for variable in channel.mvaConfig.variables):
+                        additionalDependencies += ['VertexFit_' + channel.name + '_' + particle.name]
+
                     seq.addFunction(SignalProbability,
                                     path='Path',
                                     particleName='Name_' + particle.name,
                                     channelName='Name_' + channel.name,
                                     mvaConfig='MVAConfig_' + channel.name,
                                     particleList='RawParticleList_' + channel.name + '_' + particle.name,
-                                    daughterSignalProbabilities=['SignalProbability_' + daughter for daughter in channel.daughters])
+                                    additionalDependencies=additionalDependencies)
                 seq.addResource('SignalProbability_' + particle.name, 'Dummy', requires=['SignalProbability_' + channel.name + '_' + particle.name for channel in particle.channels], strict=False)
                 seq.addResource('SignalProbability_' + pdg.conjugate(particle.name), 'Dummy', requires=['SignalProbability_' + particle.name])
 
@@ -308,7 +327,7 @@ def FullEventInterpretation(path, particles):
             seq.addFunction(WriteAnalysisFileForChannel,
                             particleName='Name_' + particle.name,
                             channelName='Name_' + channel.name,
-                            preCutConfig='PreCutConfig_' + particle.name,
+                            preCutConfig='PreCutConfig_' + channel.name,
                             preCut='PreCut_' + channel.name,
                             preCutHistogram='PreCutHistogram_' + channel.name,
                             mvaConfig='MVAConfig_' + channel.name,

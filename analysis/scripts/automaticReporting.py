@@ -41,7 +41,7 @@ def createTexFile(filename, templateFilename, placeholders):
     B2INFO("Write tex file " + filename + ".")
 
 
-def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, ntuples, mcCounts, particles):
+def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticlePlaceholders, mcCounts, particles):
 
     placeholders = {}
 
@@ -87,10 +87,8 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
         placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPreCut'], particlePlaceholder['particleNBackground']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNBackgroundAfterPostCut']) * 100) + r'\\' + '\n'
 
-    for ntupleFile in ntuples:
-        mbcFilename = ntupleFile[:-5] + '_mbc.pdf'
-        makeMbcPlot(ntupleFile, mbcFilename)
-        placeholders['mbcPlot'] = mbcFilename
+    for particlePlaceholders in finalParticlePlaceholders:
+        placeholders['mbcInputs'] += '\input{' + particlePlaceholder['texFile'] + '}\n'
 
     placeholders['NSignal'] = 0
     placeholders['NBackground'] = 0
@@ -105,6 +103,21 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
 
     hash = actorFramework.createHash(placeholders)
     placeholders['texFile'] = 'FEIsummary.tex'
+    if not os.path.isfile(placeholders['texFile']):
+        createTexFile(placeholders['texFile'], 'analysis/scripts/FullEventInterpretationSummaryTemplate.tex', placeholders)
+    return placeholders
+
+
+def createMBCTexFile(ntuple):
+    """
+    Creates a tex document with MBC Plot frmo the given ntuple
+        @param ntuple the ntuple containing the needed information
+    """
+    placeholders = {}
+    mbcFilename = ntuple[:-5] + '_mbc.pdf'
+    makeMbcPlot(ntuple, mbcFilename)
+    placeholders['mbcPlots'] = mbcFilename
+    placeholders['texFile'] = ntuple[:-5] + '_mbc.tex'
     if not os.path.isfile(placeholders['texFile']):
         createTexFile(placeholders['texFile'], 'analysis/scripts/FullEventInterpretationSummaryTemplate.tex', placeholders)
     return placeholders

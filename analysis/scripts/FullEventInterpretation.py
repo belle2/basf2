@@ -60,12 +60,12 @@ class Particle(object):
             @param postCutConfig post cut configuration
         """
         ## Is the correct pdg name as a string of the particle with an optional additional user label seperated by :
-        self.identifier = identifier
+        self.identifier = identifier + ':generic' if len(identifier.split(':')) < 2 else identifier
         v = self.identifier.split(':')
         ## The name of the particle as correct pdg name e.g. K+, pi-, D*0.
         self.name = v[0]
         ## Additional label like hasMissing or has2Daughters
-        self.label = 'generic' if len(v) < 2 else v[1]
+        self.label = v[1]
         ## multivariate analysis configuration
         self.mvaConfig = mvaConfig
         ## Decay channels, added by addChannel method.
@@ -215,14 +215,14 @@ def FullEventInterpretation(path, particles):
                             path='Path',
                             particleName='Name_{i}'.format(i=particle.identifier),
                             particleLabel='Label_{i}'.format(i=particle.identifier),
-                            inputLists=['RawParticleList_{c}'.format(c=channel.name) for channel in channels],
-                            postCuts=['PostCut_{c}'.format(c=channel.name) for channel in channels])
+                            inputLists=['RawParticleList_{c}'.format(c=channel.name) for channel in particle.channels],
+                            postCuts=['PostCut_{c}'.format(c=channel.name) for channel in particle.channels])
 
         ############# PRECUT DETERMINATION ############
-        if not particle.channels.isFSP:
+        if not particle.isFSP:
             seq.addFunction(PreCutDetermination,
                             channelNames=['Name_{c}'.format(c=channel.name) for channel in particle.channels],
-                            preCutConfig=['PreCutConfig_{c}'.format(c=channel.name) for channel in particle.channels],
+                            preCutConfigs=['PreCutConfig_{c}'.format(c=channel.name) for channel in particle.channels],
                             preCutHistograms=['PreCutHistogram_{c}'.format(c=channel.name) for channel in particle.channels])
 
             for channel in particle.channels:
@@ -277,8 +277,9 @@ def FullEventInterpretation(path, particles):
 
                 seq.addResource('SignalProbability_{i}'.format(i=particle.identifier), 'Dummy',
                                 requires=['SignalProbability_{c}'.format(c=channel.name) for channel in particle.channels], strict=False)
-            seq.addResource('SignalProbability_{p}:{l}'.format(p=pdg.conjugate(particle.name), l=particle.label), 'Dummy',
-                            requires=['SignalProbability_{i}'.format(i=particle.identifier)])
+            if particle.name != pdg.conjugate(particle.name):
+                seq.addResource('SignalProbability_{p}:{l}'.format(p=pdg.conjugate(particle.name), l=particle.label), 'Dummy',
+                                requires=['SignalProbability_{i}'.format(i=particle.identifier)])
 
         ################ Information ACTORS #################
         for channel in particle.channels:

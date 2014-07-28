@@ -172,6 +172,11 @@ class TestFitVertex(unittest.TestCase):
         self.assertEqual(parameters['listName'], 'D+:1')
         self.assertEqual(parameters['confidenceLevel'], 0)
 
+    def test_missing_particle_list(self):
+        result = FitVertex(self.path, 'UniqueChannelName', None)
+        self.assertDictEqual(result, {'VertexFit_UniqueChannelName': None})
+        self.assertEqual(len(self.path.modules()), 0)
+
     def test_hash_depends_on_channel_name(self):
         result = FitVertex(self.path, 'other', 'D+:1')
         self.assertTrue('VertexFit_other' in result)

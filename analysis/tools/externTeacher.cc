@@ -134,6 +134,7 @@ int main(int argc, char* argv[])
     std::cout << "\t\t " << var << std::endl;
   }
 
+  DataStore::Instance().setInitializeActive(true);
   std::vector<TMVAInterface::Method> methods;
   methods.push_back(TMVAInterface::Method(methodName, methodType, methodConfig, variables));
   TMVAInterface::Teacher* teacher = new TMVAInterface::Teacher(prefix, workingDirectory, target, methods, true);

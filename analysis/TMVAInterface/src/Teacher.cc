@@ -99,6 +99,7 @@ namespace Belle2 {
     Teacher::~Teacher()
     {
       if (Environment::Instance().getNumberProcesses() == 0 or ProcHandler::isOutputProcess()) {
+        m_tree->get().SetDirectory(nullptr);
         m_file->Close();
       }
     }

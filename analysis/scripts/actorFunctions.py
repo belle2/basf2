@@ -136,6 +136,9 @@ def FitVertex(path, channelName, particleList):
         @param particleList ParticleList name
         @return Resource named VertexFit_{channelName}
     """
+    if particleList is None:
+        B2INFO("Didn't fitted vertex for channel {c}, because channel is ignored.".format(c=channelName))
+        return {'VertexFit_{c}'.format(c=channelName): None}
     modularAnalysis.fitVertex(particleList, 0, path=path)
     B2INFO("Fitted vertex for channel {c}.".format(c=channelName))
     return {'VertexFit_{c}'.format(c=channelName): actorFramework.createHash(channelName, particleList)}
@@ -201,7 +204,7 @@ def PreCutDetermination(channelNames, preCutConfigs, preCutHistograms):
 
     if not all(preCutConfig[0] == preCutConfig for preCutConfig in preCutConfigs):
         B2WARNING("Different pre cuts for channels of the same particle, aren't supported at the moment. Using only first cut.")
-    preCutConfig = preCutConfig[0]
+    preCutConfig = preCutConfigs[0]
 
     for (channelName, cut) in preCutDetermination.CalculatePreCuts(preCutConfig, channelNames, preCutHistograms).iteritems():
         results['PreCut_{c}'.format(c=channelName)] = None if cut['isIgnored'] else cut
@@ -218,11 +221,11 @@ def PostCutDetermination(identifiers, postCutConfigs, signalProbabilities):
         @param Resource named PostCut_{identifier} for every channel providing a dictionary with the key 'cutstring'
     """
     results = {'PostCut_{i}'.format(i=identifier): None for identifier, _, __ in zip(*actorFramework.getNones(identifiers, postCutConfigs, signalProbabilities))}
-    identifiers, postCutConfigs, signalProbabilities = actorFramework.removeNones(identifiers, preCutConfigs, signalProbabilities)
+    identifiers, postCutConfigs, signalProbabilities = actorFramework.removeNones(identifiers, postCutConfigs, signalProbabilities)
     for identifier, postCutConfig in zip(identifiers, postCutConfigs):
-        result['PostCut_{i}'.format(i=identifier)] = {'cutstring': str(postCutConfig.value) + ' < getExtraInfo(SignalProbability)', 'range': (postCutConfig.value, 1)}
+        results['PostCut_{i}'.format(i=identifier)] = {'cutstring': str(postCutConfig.value) + ' < getExtraInfo(SignalProbability)', 'range': (postCutConfig.value, 1)}
         B2INFO("Calculate post cut for {i}".format(i=identifier))
-    return result
+    return results
 
 
 def SignalProbability(path, identifier, particleList, mvaConfig, additionalDependencies=[]):
@@ -297,7 +300,7 @@ def VariablesToNTuple(path, particleIdentifier, particleList, signalProbability)
     """
     if particleList is None or signalProbability is None:
         B2INFO("Write variables to ntuple for particle {p}. But list is ignored.".format(p=particleIdentifier))
-        return {'VariablesToNTuple_{i}'.format(p=particleIdentifier): None}
+        return {'VariablesToNTuple_{i}'.format(i=particleIdentifier): None}
 
     hash = actorFramework.createHash(particleIdentifier, particleList, signalProbability)
     filename = 'var_{i}_{h}.root'.format(p=particleIdentifier, h=hash)
@@ -313,7 +316,7 @@ def VariablesToNTuple(path, particleIdentifier, particleList, signalProbability)
         return {}
 
     B2INFO("Write variables to ntuple for particle {p}. But file already exists, so nothing to do here.".format(p=particleIdentifier))
-    return {'VariablesToNTuple_{i}'.format(p=particleIdentifier): filename}
+    return {'VariablesToNTuple_{i}'.format(i=particleIdentifier): filename}
 
 
 def WriteAnalysisFileForChannel(particleName, particleLabel, channelName, preCutConfig, preCut, preCutHistogram, mvaConfig, signalProbability, postCutConfig, postCut):
@@ -366,6 +369,7 @@ def WriteAnalysisFileForFSParticle(particleName, particleLabel, mvaConfig, signa
     placeholders['particleName'] = particleName
     placeholders['particleLabel'] = particleLabel
     placeholders['isIgnored'] = False
+
     placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, postCut)
     placeholders = automaticReporting.createFSParticleTexFile(placeholders, mcCounts)
 
@@ -404,7 +408,10 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
         @return Resource named FEIsummary.pdf
     """
 
-    placeholders = automaticReporting.createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, ntuples, mcCounts, particles)
+    finalParticlePlaceholders = []
+    for ntuple in ntuples:
+        finalParticlePlaceholders.append(automaticReporting.createMBCTexFile(ntuple))
+    placeholders = automaticReporting.createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticlePlaceholders, mcCounts, particles)
 
     for i in range(0, 2):
         ret = subprocess.call(['pdflatex', '-halt-on-error', placeholders['texFile']])

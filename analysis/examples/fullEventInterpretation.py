@@ -118,8 +118,8 @@ p.addChannel(['K-', 'K+', 'pi+', 'pi0'])
 particles.append(p)
 
 p = Particle('D+:semileptonic', mvaConfig_D, preCutConfiguration_nonFSP)
-p.addChannel(['K-', 'pi+', 'e+'], isIncomplete=True)
-p.addChannel(['K-', 'pi+', 'mu+'], isIncomplete=True)
+p.addChannel(['K-', 'pi+', 'e+'])
+p.addChannel(['K-', 'pi+', 'mu+'])
 particles.append(p)
 
 p = Particle('D*+', mvaConfig_D, preCutConfiguration_DStar)
@@ -165,8 +165,8 @@ p.addChannel(['D-:semileptonic', 'pi+', 'pi+'])
 particles.append(p)
 
 p = Particle('B+:semileptonic', mvaConfig_B, preCutConfiguration_nonFSP)
-p.addChannel(['D0', 'e+'], isIncomplete=True)
-p.addChannel(['D0', 'mu+'], isIncomplete=True)
+p.addChannel(['D0', 'e+'])
+p.addChannel(['D0', 'mu+'])
 particles.append(p)
 
 p = Particle('B0', mvaConfig_B, preCutConfiguration_nonFSP)
@@ -193,8 +193,8 @@ particles.append(p)
 
 
 p = Particle('B0:semileptonic', mvaConfig_B, preCutConfiguration_nonFSP)
-p.addChannel(['D-', 'e+'], isIncomplete=True)
-p.addChannel(['D-', 'mu+'], isIncomplete=True)
+p.addChannel(['D-', 'e+'])
+p.addChannel(['D-', 'mu+'])
 particles.append(p)
 
 main = create_path()

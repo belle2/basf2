@@ -66,8 +66,7 @@ static void signalHandler(int signal)
 
 pEventProcessor::pEventProcessor() : EventProcessor(),
   m_procHandler(new ProcHandler()),
-  m_histoman(nullptr),
-  m_enableRBClearing(true)
+  m_histoman(nullptr)
 {
   g_pEventProcessor = this;
 }
@@ -78,15 +77,6 @@ pEventProcessor::~pEventProcessor()
   delete m_procHandler;
 }
 
-void pEventProcessor::sendTerminationMessage(boost::shared_ptr<RingBuffer> rb)
-{
-  m_enableRBClearing = false;
-  EvtMessage term(NULL, 0, MSG_TERMINATE);
-  while (rb->insq((int*)term.buffer(), term.paddedSize()) < 0) {
-    usleep(20);
-  }
-  m_enableRBClearing = true;
-}
 
 
 void pEventProcessor::gotSigINT()
@@ -95,24 +85,16 @@ void pEventProcessor::gotSigINT()
   if (numSigInts == 0) {
     EventProcessor::writeToStdErr("\nStopping basf2 after all events in buffer are processed. Press Ctrl+C a second time to discard half-processed events.\n");
     //SIGINT is handled independently by input process, so we don't need to do anything special
-  } else if (m_enableRBClearing) {
-    m_enableRBClearing = false;
+  } else {
     EventProcessor::writeToStdErr("\nDiscarding pending events for quicker termination... \n");
     //clear ringbuffers and add terminate message
     const int numProcesses = Environment::Instance().getNumberProcesses();
     for (auto rb : m_rbinlist) {
       rb->clear();
-      for (int i = 0; i < numProcesses; i++) {
-        sendTerminationMessage(rb);
-      }
     }
     for (auto rb : m_rboutlist) {
       rb->clear();
-      sendTerminationMessage(rb);
     }
-    m_enableRBClearing = true;
-  } else {
-    //our process is currently using the RingBuffers, so don't do anything
   }
   numSigInts++;
 }
@@ -290,21 +272,12 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
       B2FATAL("Cannot set SIGINT signal handler\n");
     }
 
-    // 6.0 Build End of data message
     // 6.1 Wait for input path to terminate
     m_procHandler->waitForInputProcesses();
-    // 6.2 Send termination to event processes
-    for (int i = 0; i < numProcesses; i++) {
-      for (auto rb : m_rbinlist) {
-        sendTerminationMessage(rb);
-      }
-    }
+
     // 6.3 Wait for event processes to terminate
     m_procHandler->waitForEventProcesses();
-    // 6.4 Send termination to output processes
-    for (auto rb : m_rboutlist) {
-      sendTerminationMessage(rb);
-    }
+
     m_procHandler->waitForOutputProcesses();
     B2INFO("All processes completed");
 

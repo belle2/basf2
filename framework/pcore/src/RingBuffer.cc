@@ -169,6 +169,7 @@ void RingBuffer::openSHM(int size)
     m_bufinfo->semid = m_semid;
     m_bufinfo->nattached = 1;
     m_bufinfo->mode = 0;
+    m_bufinfo->numAttachedTx = -1;
     m_bufinfo->ninsq = 0;
     m_bufinfo->nremq = 0;
   } else {
@@ -329,6 +330,9 @@ int RingBuffer::insq(const int* buf, int size)
 int RingBuffer::remq(int* buf)
 {
   SemaphoreLocker locker(m_semid);
+  if (m_bufinfo->nbuf < 0) {
+    B2FATAL("RingBuffer: nbuf < 0");
+  }
   if (m_bufinfo->nbuf <= 0) {
     return 0;
   }
@@ -382,6 +386,28 @@ int RingBuffer::numq() const
   return m_bufinfo->nbuf;
 }
 
+void RingBuffer::txAttached()
+{
+  SemaphoreLocker locker(m_semid);
+  if (m_bufinfo->numAttachedTx == -1) //first attach
+    m_bufinfo->numAttachedTx = 0;
+
+  m_bufinfo->numAttachedTx++;
+}
+void RingBuffer::txDetached()
+{
+  SemaphoreLocker locker(m_semid);
+  m_bufinfo->numAttachedTx--;
+  if (m_bufinfo->numAttachedTx < 0) {
+    B2ERROR("RingBuffer: numAttachedTx < 0, check Tx modules for inconsistency!");
+  }
+}
+bool RingBuffer::continueReadingData() const
+{
+  SemaphoreLocker locker(m_semid);
+  return (m_bufinfo->numAttachedTx != 0) or (m_bufinfo->nbuf != 0);
+}
+
 int RingBuffer::ninsq() const
 {
   return m_bufinfo->ninsq;
@@ -427,6 +453,7 @@ void RingBuffer::DumpInfo()
   SemaphoreLocker locker(m_semid);
 
   // Dump control parameters
+  B2INFO("htns");
   printf("***** Ring Buffer Information ***\n");
   printf("path = %s\n", m_pathname.c_str());
   printf("shmsize = %d\n", m_shmsize);
@@ -439,6 +466,7 @@ void RingBuffer::DumpInfo()
   printf("nbuf = %d\n", m_bufinfo->nbuf);
   printf("nattached = %d\n", m_bufinfo->nattached);
   printf("mode = %d\n", m_bufinfo->mode);
+  printf("numAttachedTx = %d\n", m_bufinfo->numAttachedTx);
   printf("ninsq = %d\n", m_bufinfo->ninsq);
   printf("nremq = %d\n", m_bufinfo->ninsq);
 }

@@ -11,7 +11,7 @@
 
 namespace Belle2 {
 
-  /*! A structure to manage ring buffer. Placed on top of the shared memory. */
+  /** A structure to manage ring buffer. Placed on top of the shared memory. */
   struct RingBufInfo {
     int size; /**< ring buffer size, minus this header. */
     int remain; /**< Unsure, always equal to size. */
@@ -24,12 +24,12 @@ namespace Belle2 {
     int redzone; /**< Unused. */
     int readbuf; /**< Unused. */
     int mode; /**< Error state? 0: Normal, 1: buffer full and wptr>rptr, others are complicated. */
-    int msgid; /**< Unused. */
+    int numAttachedTx; /**< # attached sending processes. 0: Processes reading from this buffer should terminate once it's empty. -1: attach pending (initial state) */
     int ninsq; /**< Count insq() calls for this buffer. */
     int nremq; /**< Count remq() calls for this buffer. */
   };
 
-  /*! Class to manage a Ring Buffer placed in an IPC shared memory */
+  /** Class to manage a Ring Buffer placed in an IPC shared memory */
   class RingBuffer {
   public:
     /** Standard size of buffer, in integers (~40MB). */
@@ -59,6 +59,15 @@ namespace Belle2 {
     int spyq(int* buf) const;
     /*! Returns number of entries/buffers in the RingBuffer */
     int numq() const;
+
+    /** Increase #attached Tx counter. */
+    void txAttached();
+    /** Decrease #attached Tx counter. */
+    void txDetached();
+
+    /** If false, the ring buffer is empty and has no attached Tx modules (i.e. no new data is going to be added). Processes should then stop. */
+    bool continueReadingData() const;
+
     /*! Clear the RingBuffer */
     int clear();
 

@@ -46,6 +46,7 @@ TxModule::~TxModule() { }
 
 void TxModule::initialize()
 {
+  m_rbuf->txAttached();
   m_streamer = new DataStoreStreamer(m_compressionLevel);
 
   B2INFO(getName() << " initialized.");
@@ -90,8 +91,9 @@ void TxModule::endRun()
 
 void TxModule::terminate()
 {
-  B2INFO("terminate called")
+  B2INFO("Tx: terminate called");
 
+  m_rbuf->txDetached();
   delete m_streamer;
 }
 

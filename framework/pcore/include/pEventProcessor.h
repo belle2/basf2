@@ -71,9 +71,6 @@ namespace Belle2 {
      */
     void clearFileList();
 
-    /** Insert a termination message at the end of the given RingBuffer. */
-    void sendTerminationMessage(boost::shared_ptr<RingBuffer> rb);
-
     /** Return only modules which have the given Module flag set. */
     static ModulePtrList getModulesWithFlag(const ModulePtrList& modules, Module::EModulePropFlags flag);
     /** Return only modules which do not have the given Module flag set. */
@@ -106,12 +103,6 @@ namespace Belle2 {
 
     /** Pointer to HistoManagerModule, or nullptr if not found. */
     ModulePtr m_histoman;
-
-    /** if false, SIGINT handler will not clear RingBuffers.
-     *
-     * Only set to true in sections using only safe functions (see signal(7)), e.g. waitForProcesses() calls
-     */
-    bool m_enableRBClearing;
 
   };
 

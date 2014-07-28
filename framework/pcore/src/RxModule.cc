@@ -45,18 +45,19 @@ RxModule::~RxModule() { }
 
 void RxModule::readEvent()
 {
-  int size;
   char* evtbuf = new char[EvtMessage::c_MaxEventSize];
-  while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
-    //    printf ( "Rx : evtbuf is not available yet....\n" );
-    //    usleep(100);
+  while (m_rbuf->continueReadingData()) {
+    int size = m_rbuf->remq((int*)evtbuf);
+    if (size != 0) {
+      B2DEBUG(100, "Rx: got an event from RingBuffer, size=" << size);
+
+      // Restore objects in DataStore
+      EvtMessage evtmsg(evtbuf);
+      m_streamer->restoreDataStore(&evtmsg);
+      break;
+    }
     usleep(20);
   }
-  B2DEBUG(100, "Rx: got an event from RingBuffer, size=" << size);
-
-  // Restore objects in DataStore
-  EvtMessage evtmsg(evtbuf);
-  m_streamer->restoreDataStore(&evtmsg);
 
   delete[] evtbuf;
 }

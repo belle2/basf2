@@ -24,8 +24,8 @@ namespace Belle2 {
     void startInputProcess();
     /** Fork and initialize an event process */
     void startEventProcesses(int nproc);
-    /** Fork and initialize an output process */
-    void startOutputProcess(int id);
+    /** There is no real output process, but marks current process as output. */
+    void startOutputProcess();
 
     /** Wait until all forked processes are completed */
     void waitForAllProcesses();
@@ -36,11 +36,8 @@ namespace Belle2 {
     /** Wait until output processes are completed */
     void waitForOutputProcesses();
 
-    /** Return true if the process is mother (aka. global process)
-     *
-     * Also true if no parallel processing is used.
-     */
-    static bool isFramework();
+    /** Returns true if multiple processes have been spawned, false in single-core mode. */
+    static bool parallelProcessingUsed();
     /** Return true if the process is an input process */
     static bool isInputProcess();
     /** Return true if the process is an event process */
@@ -49,10 +46,11 @@ namespace Belle2 {
     static bool isOutputProcess();
 
 
+
     /** Return ID of the current process.
      *
      * Return values mean:
-     *  -1:     no parallel processing used (or global process)
+     *  -1:     no parallel processing used
      *  <10000  one of the main processes (between input and output paths). In range 0..Environment::getInstance().getNumberProcesses()-1.
      *  >=10000 input path
      *  >=20000 output path

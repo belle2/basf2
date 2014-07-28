@@ -64,12 +64,17 @@ namespace Belle2 {
     void txAttached();
     /** Decrease #attached Tx counter. */
     void txDetached();
+    /** Set #attached Tx counter to zero, causing termination of reading processes. Assumed to be atomic. */
+    void kill();
 
     /** If false, the ring buffer is empty and has no attached Tx modules (i.e. no new data is going to be added). Processes should then stop. */
     bool continueReadingData() const;
 
     /*! Clear the RingBuffer */
     int clear();
+
+    /*! Clear the RingBuffer, if the semaphore isn't locked at the moment. See SemaphoreLocker::isLocked() for details */
+    int tryClear();
 
     /*! Return ID of the shared memory */
     int shmid() const;

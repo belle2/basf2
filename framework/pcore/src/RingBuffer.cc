@@ -402,6 +402,10 @@ void RingBuffer::txDetached()
     B2ERROR("RingBuffer: numAttachedTx < 0, check Tx modules for inconsistency!");
   }
 }
+void RingBuffer::kill()
+{
+  m_bufinfo->numAttachedTx = 0;
+}
 bool RingBuffer::continueReadingData() const
 {
   SemaphoreLocker locker(m_semid);
@@ -441,6 +445,13 @@ int RingBuffer::clear()
   m_bufinfo->nremq = 0;
 
   return 0;
+}
+int RingBuffer::tryClear()
+{
+  if (SemaphoreLocker::isLocked(m_semid))
+    return 0;
+
+  return clear();
 }
 
 int RingBuffer::shmid() const

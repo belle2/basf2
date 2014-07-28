@@ -22,6 +22,13 @@ namespace Belle2 {
     /** Destroy the given semaphore. */
     static void destroy(int semId);
 
+    /** Return true if the given semaphore is locked.
+     *
+     * If you know the lock might be held by the current process (e.g. while in a signal handler),
+     * locking is only safe if this returns false.
+     */
+    static bool isLocked(int semId);
+
     /** Lock the semaphore.
      *
      * If the semaphore is locked, this function will block until it can acquire a lock.

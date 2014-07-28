@@ -42,6 +42,8 @@ static void signalHandler(int signal)
     abort();
   } else if (signal == SIGINT) {
     g_pEventProcessor->gotSigINT();
+  } else if (signal == SIGTERM) {
+    g_pEventProcessor->gotSigTERM();
   } else if (signal == SIGCHLD) {
     if (s_PIDofKilledChild != 0)
       return; //only once
@@ -78,7 +80,6 @@ pEventProcessor::~pEventProcessor()
 }
 
 
-
 void pEventProcessor::gotSigINT()
 {
   static int numSigInts = 0;
@@ -87,16 +88,25 @@ void pEventProcessor::gotSigINT()
     //SIGINT is handled independently by input process, so we don't need to do anything special
   } else {
     EventProcessor::writeToStdErr("\nDiscarding pending events for quicker termination... \n");
-    //clear ringbuffers and add terminate message
-    const int numProcesses = Environment::Instance().getNumberProcesses();
+    //clear ringbuffers
     for (auto rb : m_rbinlist) {
       rb->clear();
     }
     for (auto rb : m_rboutlist) {
-      rb->clear();
+      rb->tryClear(); //might deadlock if we're already locked
     }
   }
   numSigInts++;
+}
+
+void pEventProcessor::gotSigTERM()
+{
+  for (auto rb : m_rbinlist) {
+    rb->kill();
+  }
+  for (auto rb : m_rboutlist) {
+    rb->kill(); //atomic, so doesn't lock
+  }
 }
 
 void pEventProcessor::clearFileList()
@@ -186,12 +196,6 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   //disable ROOT's management of TFiles
   clearFileList();
 
-  //If we crash after forking, ROOTs SIGSEGV handler could potentially use huge amounts of memory (scales with numProcesses)
-  /*
-  if (signal(SIGSEGV, signalHandler) == SIG_ERR) {
-    B2FATAL("Cannot setup SIGSEGV signal handler\n");
-  }
-  */
 
   //Path for current process
   PathPtr localPath;
@@ -208,19 +212,6 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     if (signal(SIGINT, SIG_IGN) == SIG_ERR) {
       B2FATAL("Cannot ignore SIGINT signal handler\n");
     }
-
-    // 4. Fork output paths
-    int nout = 0;
-    for (PathPtr & outpath : m_outpathlist) {
-      if ((outpath->getModules()).size() > 0) {
-        m_procHandler->startOutputProcess(nout);
-        if (m_procHandler->isOutputProcess()) {   // In output process
-          localPath = outpath;
-          m_master = localPath->getModules().begin()->get(); //set Rx as master
-        }
-        nout++;
-      }
-    }
   }
 
   if (localPath == nullptr) { //not forked yet
@@ -233,32 +224,17 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     }
   }
 
-  //we're one of the forked processes
-  if (localPath != nullptr) {
-    if (!m_procHandler->isOutputProcess()) {
-      DataStoreStreamer::removeSideEffects();
+  if (localPath == nullptr) { //not forked yet -> this process is the output process
+    m_procHandler->startOutputProcess();
+    if (!m_outpathlist.empty()) {
+      localPath = m_outpathlist[0];
+      m_master = localPath->getModules().begin()->get(); //set Rx as master
     }
-
-    ModulePtrList localModules = localPath->buildModulePathList();
-    ModulePtrList procinitmodules = getModulesWithFlag(localModules, Module::c_InternalSerializer);
-    //dump_modules("processInitialize for ", procinitmodules);
-    processInitialize(procinitmodules);
-
-    if (m_procHandler->isInputProcess())
-      setupSignalHandler();
-
-    processCore(localPath, localModules, maxEvent);
-    prependModulesIfNotPresent(&localModules, terminateGlobally);
-    processTerminate(localModules);
-
-    B2INFO(m_procHandler->getProcessName() << " process finished.");
-    exit(0);
-  } else { // 6. Framework process
 
     //ignore some signals for framework (mother) process, so only child processes will handle them
     //once they are finished, the framework process will clean up IPC structures
-    if (signal(SIGTERM, SIG_IGN) == SIG_ERR) {
-      B2FATAL("Cannot ignore SIGTERM signal handler for main process\n");
+    if (signal(SIGTERM, signalHandler) == SIG_ERR) {
+      B2FATAL("Cannot setup SIGTERM signal handler\n");
     }
     if (signal(SIGQUIT, SIG_IGN) == SIG_ERR) {
       B2FATAL("Cannot ignore SIGQUIT signal handler for main process\n");
@@ -271,38 +247,58 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     if (signal(SIGINT, signalHandler) == SIG_ERR) {
       B2FATAL("Cannot set SIGINT signal handler\n");
     }
-
-    // 6.1 Wait for input path to terminate
-    m_procHandler->waitForInputProcesses();
-
-    // 6.3 Wait for event processes to terminate
-    m_procHandler->waitForEventProcesses();
-
-    m_procHandler->waitForOutputProcesses();
-    B2INFO("All processes completed");
-
-    //finished, disable handler again
-    if (signal(SIGINT, SIG_IGN) == SIG_ERR) {
-      B2FATAL("Cannot ignore SIGINT signal handler\n");
-    }
-
-    HistModule::mergeFiles();
-
-    // 6.5 Remove all ring buffers
-    m_rbinlist.clear();
-    m_rboutlist.clear();
-
-    processTerminate(terminateGlobally);
-
-    B2INFO("Global process: completed");
-
-    //did anything bad happen?
-    if (s_PIDofKilledChild != 0) {
-      //fatal, so we get appropriate return code (IPC cleanup was already done)
-      B2FATAL("Execution stopped, sub-process with PID " << s_PIDofKilledChild << " killed by signal.");
-    }
-
   }
+
+
+  if (!m_procHandler->isOutputProcess()) {
+    DataStoreStreamer::removeSideEffects();
+  }
+
+  if (localPath != nullptr) {
+    ModulePtrList localModules = localPath->buildModulePathList();
+    ModulePtrList procinitmodules = getModulesWithFlag(localModules, Module::c_InternalSerializer);
+    //dump_modules("processInitialize for ", procinitmodules);
+    processInitialize(procinitmodules);
+
+    if (m_procHandler->isInputProcess())
+      setupSignalHandler();
+
+    processCore(localPath, localModules, maxEvent);
+    prependModulesIfNotPresent(&localModules, terminateGlobally);
+    processTerminate(localModules);
+  }
+
+  B2INFO(m_procHandler->getProcessName() << " process finished.");
+
+  //output process does final cleanup, everything else stops here
+  if (!m_procHandler->isOutputProcess()) {
+    exit(0);
+  }
+
+  //TODO: still needed? might be important for cleaning up after crashes
+  m_procHandler->waitForInputProcesses();
+  m_procHandler->waitForEventProcesses();
+  B2INFO("All processes completed");
+
+  //finished, disable handler again
+  if (signal(SIGINT, SIG_IGN) == SIG_ERR) {
+    B2FATAL("Cannot ignore SIGINT signal handler\n");
+  }
+
+  HistModule::mergeFiles();
+
+  // 6.5 Remove all ring buffers
+  m_rbinlist.clear();
+  m_rboutlist.clear();
+
+  B2INFO("Global process: completed");
+
+  //did anything bad happen?
+  if (s_PIDofKilledChild != 0) {
+    //fatal, so we get appropriate return code (IPC cleanup was already done)
+    B2FATAL("Execution stopped, sub-process with PID " << s_PIDofKilledChild << " killed by signal.");
+  }
+
 }
 
 void pEventProcessor::analyzePath(const PathPtr& path)

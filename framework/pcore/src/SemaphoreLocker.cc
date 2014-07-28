@@ -32,6 +32,14 @@ void SemaphoreLocker::destroy(int semId)
   }
 }
 
+bool SemaphoreLocker::isLocked(int semId)
+{
+  int ignored = 0;
+  int val = semctl(semId, 0, GETVAL, ignored);
+  B2WARNING("Semaphore value is : " << val);
+  return (val == 0); //0: locked, 1: unlocked
+
+}
 void SemaphoreLocker::lock()
 {
   struct sembuf sb;

@@ -51,6 +51,12 @@ namespace Belle2 {
      * */
     void gotSigINT();
 
+    /** signal handler for Ctrl+C (async-safe)
+     *
+     * Fairly abrupt termination, but still clean RingBuffers.
+     */
+    void gotSigTERM();
+
   private:
     /** Analyze given path. Fills m_*pathlist objects. */
     void analyzePath(const PathPtr& path);

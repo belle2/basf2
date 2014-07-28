@@ -65,27 +65,15 @@ void ProcHandler::startEventProcesses(int nproc)
   }
 }
 
-void ProcHandler::startOutputProcess(int id)
+void ProcHandler::startOutputProcess()
 {
-  fflush(stdout);
-  fflush(stderr);
-  pid_t pid = fork();
-  if (pid > 0) {   // Mother process
-    m_outputProcessList.push_back(pid);
-    B2INFO("ProcHandler: output process forked. pid = " << pid);
-  } else if (pid < 0) {
-    B2FATAL("fork() failed: " << strerror(errno));
-  } else {
-    s_processID = 20000 + id;
-    //die when parent dies
-    prctl(PR_SET_PDEATHSIG, SIGHUP);
-  }
+  s_processID = 20000;
 }
 
 
-bool ProcHandler::isFramework()
+bool ProcHandler::parallelProcessingUsed()
 {
-  return s_processID == -1;
+  return s_processID != -1;
 }
 
 bool ProcHandler::isInputProcess()
@@ -95,7 +83,7 @@ bool ProcHandler::isInputProcess()
 
 bool ProcHandler::isEventProcess()
 {
-  return (!isFramework() and s_processID < 10000);
+  return (parallelProcessingUsed() and s_processID < 10000);
 }
 
 bool ProcHandler::isOutputProcess()
@@ -116,8 +104,6 @@ std::string ProcHandler::getProcessName()
     return "input";
   if (isOutputProcess())
     return "output";
-  if (isFramework())
-    return "framework";
 
   //shouldn't happen
   return "???";

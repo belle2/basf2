@@ -90,7 +90,7 @@ void RunManager::destroy()
 {
   if (m_instance == nullptr) return;
 
-  if (!ProcHandler::isFramework()) {
+  if (ProcHandler::parallelProcessingUsed() and !ProcHandler::isOutputProcess()) {
     //Attention, ugly:
     //Deleting the runmanager will cause Geant4 to open the geometry and clean up
     //optimizations. This will modify the geometry and hurt parallel processing

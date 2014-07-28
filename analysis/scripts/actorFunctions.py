@@ -59,110 +59,106 @@ def CountMCParticles(path):
         return {'MCParticleCounts': counter}
 
 
-def SelectParticleList(path, particleName):
+def SelectParticleList(path, particleName, particleLabel):
     """
     Creates a ParticleList gathering up all particles with the given particleName
         @param path the basf2 path
-        @param particleName returned key is named ParticleList_{particleName} corresponding ParticleList is stored as {particleName}:{hash}
+        @param particleName
+        @param particleLabel
+        @return key is named RawParticleList_{particleName}_{label} corresponding ParticleList is stored as {particleName}:{hash}
     """
-    userLabel = actorFramework.createHash(particleName)
+    userLabel = actorFramework.createHash(particleName, particleLabel)
     outputList = particleName + ':' + userLabel
     modularAnalysis.selectParticle(outputList, path=path)
 
-    B2INFO("Select Particle List " + outputList + " and charged conjugated")
-    return {'RawParticleList_' + particleName: outputList,
-            'RawParticleList_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
+    B2INFO("Select Particle List {p} with label {l} in list {list}".format(p=particleName, l=particleLabel, list=outputList))
+    return {'RawParticleList_{p}_{l}'.format(p=particleName, l=particleLabel): outputList}
 
 
-def CopyParticleLists(path, particleName, channelName, inputLists, postCut):
+def CopyParticleLists(path, particleName, particleLabel, inputLists, postCuts):
     """
     Creates a ParticleList gathering up all particles in the given inputLists
         @param path the basf2 path
-        @param particleName returned key is named ParticleList_{particleName} corresponding ParticleList is stored as {particleName}:{hash}
-        @param channelName if not None returned key is named ParticleList_{channelName}_{particleName} corresponding ParticleList is stored as {particleName}:{hash}
+        @param particleName
+        @param particleLabel
         @param inputLists names of inputLists which are copied to the new list
-        @param postCut cuts which are applied after the reconstruction of the particle
+        @param postCuts cuts which are applied after the reconstruction of the particle
+        @return  key is named ParticleList_{particleName}_{label} corresponding ParticleList is stored as {particleName}:{hash}
     """
-    inputLists = actorFramework.removeNones(inputLists)
+    inputLists, postCuts = actorFramework.removeNones(inputLists, postCuts)
 
     if inputLists == []:
-        if channelName is None:
-            B2INFO("Gather Particle List for particle " + particleName + " and charged conjugated. But there are no particles to gather :-(.")
-            return {'ParticleList_' + particleName: None,
-                    'ParticleList_' + pdg.conjugate(particleName): None}
-        else:
-            B2INFO("Gather Particle List for particle " + particleName + " " + channelName + " and charged conjugated. But there are no particles to gather :-(.")
-            return {'ParticleList_' + channelName + '_' + particleName: None,
-                    'ParticleList_' + channelName + '_' + pdg.conjugate(particleName): None}
+        B2INFO("Gather Particle List for particle " + particleName + " and charged conjugated. But there are no particles to gather :-(.")
+        return {'ParticleList_{p}_{l}'.format(p=particleName, l=particleLabel): None,
+                'ParticleList_{p}_{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): None}
 
-    userLabel = actorFramework.createHash(particleName, channelName, inputLists, postCut)
+    userLabel = actorFramework.createHash(particleName, particleLabel, inputLists, postCuts)
     outputList = particleName + ':' + userLabel
-    modularAnalysis.cutAndCopyLists(outputList, inputLists, postCut['cutstring'], path=path)
+    # TODO Use only first post cut at the moment
+    modularAnalysis.cutAndCopyLists(outputList, inputLists, postCut[0]['cutstring'], path=path)
 
-    if channelName is None:
-        B2INFO("Gather Particle List for particle " + particleName + " and charged conjugated")
-        return {'ParticleList_' + particleName: outputList,
-                'ParticleList_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
-    else:
-        B2INFO("Gather Particle List for particle " + particleName + " " + channelName + " and charged conjugated")
-        return {'ParticleList_' + channelName + '_' + particleName: outputList,
-                'ParticleList_' + channelName + '_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
+    B2INFO("Gather Particle List {p} with label {l} in list {o}".format(p=particleName, l=particleLabel, o=outputList))
+    return {'ParticleList_{p}_{l}'.format(p=particleName, l=particleLabel): outputList,
+            'ParticleList_{p}_{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): pdg.conjugate(particleName) + ':' + userLabel}
 
 
-def MakeAndMatchParticleList(path, particleName, channelName, inputLists, preCut):
+def MakeAndMatchParticleList(path, particleName, particleLabel, channelName, inputLists, preCut):
     """
     Creates a ParticleList by combining other particleLists via the ParticleCombiner module and match MC truth for this new list.
         @param path the basf2 path
-        @param particleName name of the reconstructed particle, new list is stored as {particleName}:{hash}, where the hash depends on the channel
-        @param channelName describes the combined decay, returned key ParticleList_{channelName}
+        @param particleName name of the reconstructed particle
+        @param particleLabel
+        @param channelName describes the combined decay
         @param inputLists the inputs lists which are combined
         @param preCut cuts which are applied before the combining of the particles
+        @return key is named RawParticleList_{channelName}_{particleName}_{particleLabel} corresponding list is stored as {particleName}:{hash}
     """
+    userLabel = actorFramework.createHash(particleName, particleLabel, channelName, inputLists, preCut)
+    outputList = particleName + ':' + userLabel
+    # If preCut is None this channel is ignored
     if preCut is None:
-        B2INFO("Make and Match Particle List for channel " + channelName + " and charged conjugated. But the channel is ignored :-(.")
-        return {'RawParticleList_' + channelName + '_' + particleName: None,
-                'RawParticleList_' + channelName + '_' + pdg.conjugate(particleName): None}
+        B2INFO("Make and Match Particle List {p} with label {l} for channel {c} in list {o}".format(p=particleName, l=particleLabel, c=channelName, o=outputList))
+        return {'RawParticleList_{c}'.format(c=channelName): None}
 
-    userLabel = actorFramework.createHash(particleName, channelName, inputLists, preCut)
-    outputList = particleName + ':' + userLabel + ' ==> ' + ' '.join(inputLists)
-    listName = particleName + ':' + userLabel
-    modularAnalysis.makeParticle(outputList, preCut['cutstring'], path=path)
-    modularAnalysis.matchMCTruth(listName, path=path)
-    B2INFO("Make and Match Particle List for channel " + channelName + " and charged conjugated.")
-    return {'RawParticleList_' + channelName + '_' + particleName: listName,
-            'RawParticleList_' + channelName + '_' + pdg.conjugate(particleName): pdg.conjugate(particleName) + ':' + userLabel}
+    decayString = outputList + ' ==> ' + ' '.join(inputLists)
+    modularAnalysis.makeParticle(decayString, preCut['cutstring'], path=path)
+    modularAnalysis.matchMCTruth(outputList, path=path)
+    B2INFO("Make and Match Particle List {p} with label {l} for channel {c} in list {o}".format(p=particleName, l=particleLabel, c=channelName, o=outputList))
+    return {'RawParticleList_{c}'.format(c=channelName): outputList}
 
 
-def FitVertex(path, particleName, channelName, particleList):
+def FitVertex(path, channelName, particleList):
     """
     Fit secondary vertex of this particle
         @param path the basf2 path
-        @param particleName name of the reconstructed particle
         @param channelName decay channel name
         @param particleList the particleList which is fitted
     """
     modularAnalysis.fitVertex(particleList, 0)
-    B2INFO("Fitted vertex for channel " + channelName + " and charged conjugated.")
-    return {'VertexFit_' + channelName + '_' + particleName: 'dummy',
-            'VertexFit_' + channelName + '_' + pdg.conjugate(particleName): 'dummy'}
+    B2INFO("Fitted vertex for channel {c} and charged conjugated.".format(c=channelName))
+    return {'VertexFit_{c}'.format(c=channelName): 'dummy'}
 
 
-def SignalProbability(path, particleName, channelName, mvaConfig, particleList, additionalDependencies=[]):
+def SignalProbability(path, particleName, particleLabel, channelName, mvaConfig, particleList, additionalDependencies=[]):
     """
     Calculates the SignalProbability of a ParticleList. If the files required from TMVAExpert aren't available they're created.
         @param path the basf2 path
         @param particleName of the particle which is classified
+        @param particleLabel
         @param channelName of channel which is classified
         @param mvaConfig configuration for the multivariate analysis
         @param particleList the particleList which is used for training and classification
         @param additionalDependencies for variables like SignalProbability of daughters or VertexFit
     """
     if particleList is None or any([d is None for d in additionalDependencies]):
-        B2INFO("Calculate SignalProbability for channel " + channelName + " and charged conjugated. But the channel is ignored :-(.")
-        return {'SignalProbability_' + channelName + '_' + particleName: None,
-                'SignalProbability_' + channelName + '_' + pdg.conjugate(particleName): None}
+        if particleName == channelName:
+            B2INFO("Calculate SignalProbability for particle {p} with label {l}, but particle is ignored. This can never happen!".format(p=particleName, l=particleLabel))
+            return{'SignalProbability_{p}_{l}'.format(p=particleName, l=particleLabel): None}
+        else:
+            B2INFO("Calculate SignalProbability for channel {c}, but the channel is ignored :-(.".format(c=channelName))
+            return {'SignalProbability_{c}'.format(c=channelName): None}
 
-    hash = actorFramework.createHash(particleName, channelName, mvaConfig, particleList, additionalDependencies)
+    hash = actorFramework.createHash(particleName, particleLabel, channelName, mvaConfig, particleList, additionalDependencies)
 
     rootFilename = '{particleList}_{hash}.root'.format(particleList=particleList, hash=hash)
     configFilename = '{particleList}_{hash}.config'.format(particleList=particleList, hash=hash)
@@ -180,7 +176,7 @@ def SignalProbability(path, particleName, channelName, mvaConfig, particleList, 
         teacher.param('maxEventsPerClass', 10000000)
         teacher.param('doNotTrain', True)
         path.add_module(teacher)
-        B2INFO("Calculate SignalProbability for channel " + channelName + " and charged conjugated. Create root file with variables first.")
+        B2INFO("Calculate SignalProbability for particle {p} with label {l} for channel {c}. Create root file with variables first.".format(p=particleName, l=particleLabel, c=channelName))
         return {}
 
     if not os.path.isfile(configFilename):
@@ -205,23 +201,22 @@ def SignalProbability(path, particleName, channelName, mvaConfig, particleList, 
         expert.param('listNames', [particleList])
         path.add_module(expert)
 
-        B2INFO("Calculate SignalProbability for channel " + channelName + " and charged conjugated.")
+        B2INFO("Calculate SignalProbability for particle {p} with label {l} for channel {c}.".format(p=particleName, l=particleLabel, c=channelName))
         if particleName == channelName:
-            return {'SignalProbability_' + particleName: configFilename,
-                    'SignalProbability_' + pdg.conjugate(particleName): configFilename}
+            return {'SignalProbability_{p}_{l}'.format(p=particleName, l=particleLabel): configFilename}
         else:
-            return {'SignalProbability_' + channelName + '_' + particleName: configFilename,
-                    'SignalProbability_' + channelName + '_' + pdg.conjugate(particleName): configFilename}
+            return {'SignalProbability_{c}'.format(c=channelName): configFilename}
 
     B2ERROR("Training of channel " + channelName + " failed")
     return {}
 
 
-def VariablesToNTuple(path, particleName, particleList, signalProbability):
+def VariablesToNTuple(path, particleName, particleLabel, particleList, signalProbability):
     """
     Saves the calculated signal probability for this particle list
         @param path the basf2 path
         @param particleName particleName
+        @param particleLabel
         @param particleList the particleList
         @param signalProbability signalProbability as additional dependency
     """
@@ -230,8 +225,8 @@ def VariablesToNTuple(path, particleName, particleList, signalProbability):
         B2INFO("Write variables to ntuple for " + particleName + " and charged conjugated. But list is ignored.")
         return {'VariablesToNTuple': None}
 
-    hash = actorFramework.createHash(particleName, particleList, signalProbability)
-    filename = 'var_{particleName}_{hash}.root'.format(particleName=particleName, hash=hash)
+    hash = actorFramework.createHash(particleName, particleLabel, particleList, signalProbability)
+    filename = 'var_{p}_{l}_{h}.root'.format(p=particleName, l=particleLabel, h=hash)
 
     if not os.path.isfile(filename):
         output = register_module('VariablesToNtuple')
@@ -245,37 +240,38 @@ def VariablesToNTuple(path, particleName, particleList, signalProbability):
 
     B2INFO("Write variables to ntuple for " + particleList + " and charged conjugated. But file already exists, so nothing to do here.")
     particleName = particleList.split(':')[0]
-    return {'VariablesToNTuple_' + particleName: filename}
+    return {'VariablesToNTuple_{p}_{l}'.format(p=particleName, l=particleLabel): filename}
 
 
-def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughterLists, additionalDependencies):
+def CreatePreCutHistogram(path, particleName, particleLabel, channelName, preCutConfig, daughterLists, additionalDependencies):
     """
     Creates ROOT file with invariant mass and signal probability product histogram of this channel (signal/background)
     for a given particle, before any intermediate cuts are applied.
         @param path the basf2 path
         @param particleName for which this histogram is created
+        @param particleLabel
         @param channelName of the channel
         @param daughterLists all particleLists of all the daughter particles
         @param daughterSignalProbabilities all daughter particles need a SignalProbability
     """
     if any([daughterList is None for daughterList in daughterLists]) or any([x is None for x in additionalDependencies]):
         B2INFO("Create pre cut histogram for channel " + channelName + " and charged conjugated. But channel is ignored.")
-        return {'PreCutHistogram_' + channelName: None}
+        return {'PreCutHistogram_{c}'.format(c=channelName): None}
 
     # Check if the file is available. If the file isn't available yet, create it with
     # the HistMaker Module and return Nothing. If a function is called which depends on
     # the PreCutHistogram, the process will stop, because the PreCutHistogram isn't provided.
-    hash = actorFramework.createHash(particleName, channelName, preCutConfig.variable, daughterLists, additionalDependencies)
-    filename = 'CutHistograms_{pname}_{cname}_{hash}.root'.format(pname=particleName, cname=channelName, hash=hash)
+    hash = actorFramework.createHash(particleName, particleLabel, channelName, preCutConfig.variable, daughterLists, additionalDependencies)
+    filename = 'CutHistograms_{c}_{h}.root'.format(c=channelName, h=hash)
 
     if os.path.isfile(filename):
         B2INFO("Create pre cut histogram for channel " + channelName + " and charged conjugated. But file already exists, so nothing to do here.")
-        return {'PreCutHistogram_' + channelName: (filename, particleName + ':' + hash)}
+        return {'PreCutHistogram_{c}'.format(c=channelName): (filename, particleName + ':' + hash)}
     else:
         # Combine all the particles according to the decay channels
         outputList = particleName + ':' + hash + ' ==> ' + ' '.join(daughterLists)
         pmake = register_module('PreCutHistMaker')
-        pmake.set_name('PreCutHistMaker_' + channelName)
+        pmake.set_name('PreCutHistMaker_{c}'.format(c=channelName))
         pmake.param('fileName', filename)
         pmake.param('decayString', outputList)
         if preCutConfig.variable in ['M']:
@@ -294,42 +290,56 @@ def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughte
     return {}
 
 
-def PreCutDetermination(particleName, channelNames, preCutConfigs, preCutHistograms):
+def PreCutDetermination(channelNames, preCutConfigs, preCutHistograms):
     """
     Determines the PreCuts for all the channels of a particle.
-        @param particleName name of the particle
         @param channelNames list of the names of all the channels
         @param preCutConfig configuration for PreCut determination e.g. signal efficiency for this particle for every chanel
         @param preCutHistograms filenames of the histogram files created for every channel by PreCutDistribution
     """
 
-    results = {'PreCut_' + channel: None for channel, _, __ in zip(*actorFramework.getNones(channelNames, preCutHistograms, preCutConfigs))}
-    channelNames, preCutHistograms, preCutConfigs = actorFramework.removeNones(channelNames, preCutHistograms, preCutConfigs)
-
-    cuts = preCutDetermination.CalculatePreCuts(preCutConfigs, channelNames, preCutHistograms)
-
-    for (channel, cut) in cuts.iteritems():
-        results['PreCut_' + channel] = None if cut['isIgnored'] else cut
-
-    B2INFO("Calculate pre cut for particle " + particleName + " and charged conjugated.")
+    results = {'PreCut_{c}'.format(c=channelName): None for channelName, _, __ in zip(*actorFramework.getNones(channelNames, preCutConfigs, preCutHistograms))}
+    channelNames, preCutConfigs, preCutHistograms = actorFramework.removeNones(channelNames, preCutConfigs, preCutHistograms)
+    for (channelName, cut) in preCutDetermination.CalculatePreCuts(preCutConfigs, channelNames, preCutHistograms).iteritems():
+        results['PreCut_{c}'.format(c=channelName)] = None if cut['isIgnored'] else cut
+        B2INFO("Calculate pre cut for channel {c}".format(c=channelName))
     return results
 
 
-def PostCutDetermination(particleName, postCutConfig, signalProbability):
+def PostCutDeterminationFSP(particleName, particleLabel, postCutConfig, signalProbability):
     """
     Determines the PostCut of a particle.
-        @param particleName name of the particle
+        @param particleName
+        @param particleLabel
+        @param channelNames names of the channels
         @param postCutConfig configuration for post cut determination
-        @param signalProbability of the particle
+        @param signalProbability
     """
-    B2INFO("Calculate post cut for particle " + particleName + " and charged conjugated.")
-    return {'PostCut_' + particleName: {'cutstring': str(postCutConfig.value) + ' < getExtraInfo(SignalProbability)', 'range': (postCutConfig.value, 1)}}
+    result['PostCut_{p}_{l}'.format(p=particleName, l=particleLabel)] = {'cutstring': str(postCutConfig.value) + ' < getExtraInfo(SignalProbability)', 'range': (postCutConfig.value, 1)}
+    B2INFO("Calculate post cut for particle {p} with label {l}".format(p=particleName, l=particleLabel))
+    return result
 
 
-def WriteAnalysisFileForChannel(particleName, channelName, preCutConfig, preCut, preCutHistogram, mvaConfig, signalProbability, postCutConfig, postCut):
+def PostCutDeterminationNonFSP(channelNames, postCutConfigs, signalProbabilities):
+    """
+    Determines the PostCut of a particle.
+        @param channelNames names of the channels
+        @param postCutConfig configuration for post cut determination
+        @param signalProbabilities of the channels
+    """
+    results = {'PostCut_{c}'.format(c=channelName): None for channelName, _, __ in zip(*actorFramework.getNones(channelNames, postCutConfigs, signalProbabilities))}
+    channelNames, postCutConfigs, signalProbabilities = actorFramework.removeNones(channelNames, preCutConfigs, signalProbabilities)
+    for channelName, postCutConfig in zip(channelNames, postCutConfigs):
+        result['PostCut_{c}'.format(c=channelName)] = {'cutstring': str(postCutConfig.value) + ' < getExtraInfo(SignalProbability)', 'range': (postCutConfig.value, 1)}
+        B2INFO("Calculate post cut for channel {c}".format(c=channelName))
+    return result
+
+
+def WriteAnalysisFileForChannel(particleName, particleLabel, channelName, preCutConfig, preCut, preCutHistogram, mvaConfig, signalProbability, postCutConfig, postCut):
     """
     Creates a pdf document with the PreCut and Training plots
         @param particleName name of the particle
+        @param particleLabel
         @param channelName name of the channel
         @param preCutConfig configuration for pre cut
         @param preCutHistogram preCutHistogram (filename, histogram postfix)
@@ -340,6 +350,7 @@ def WriteAnalysisFileForChannel(particleName, channelName, preCutConfig, preCut,
 
     placeholders = {}
     placeholders['particleName'] = particleName
+    placeholders['particleLabel'] = particleLabel
     placeholders['channelName'] = channelName
     placeholders['isIgnored'] = False
     placeholders = automaticReporting.createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut)
@@ -351,41 +362,45 @@ def WriteAnalysisFileForChannel(particleName, channelName, preCutConfig, preCut,
         automaticReporting.createTexFile(placeholders['texFile'], 'analysis/scripts/FullEventInterpretationChannelTemplate.tex', placeholders)
 
     B2INFO("Written analysis tex file for channel " + channelName)
-    return {'Placeholders_' + channelName: placeholders}
+    return {'Placeholders_{c}'.format(c=channelName): placeholders}
 
 
-def WriteAnalysisFileForFSParticle(particleName, mvaConfig, signalProbability, postCutConfig, postCut, mcCounts):
+def WriteAnalysisFileForFSParticle(particleName, particleLabel, mvaConfig, signalProbability, postCutConfig, postCut, mcCounts):
     """
     Creates a pdf document with the PreCut and Training plots
         @param particleName name of the particle
+        @param particleLabel
         @param mvaConfig configuration for mva
         @param signalProbability config filename for TMVA training
     """
 
     placeholders = {}
     placeholders['particleName'] = particleName
+    placeholders['particleLabel'] = particleLabel
     placeholders['isIgnored'] = False
     placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, postCut)
     placeholders = automaticReporting.createFSParticleTexFile(placeholders, mcCounts)
 
     B2INFO("Written analysis tex file for final state particle " + particleName)
-    return {'Placeholders_' + particleName: placeholders}
+    return {'Placeholders_{p}_{l}'.format(p=particleName, l=particleLabel): placeholders}
 
 
-def WriteAnalysisFileForCombinedParticle(particleName, channelPlaceholders, mcCounts):
+def WriteAnalysisFileForCombinedParticle(particleName, particleLabel, channelPlaceholders, mcCounts):
     """
     Creates a pdf document with the PreCut and Training plots
         @param particleName name of the particle
+        @param particleLabel
         @param channelPlaceholders list of all tex placeholder dictionaries of all channels
     """
 
     placeholders = {'channels': channelPlaceholders}
     placeholders['particleName'] = particleName
+    placeholders['particleLabel'] = particleLabel
     placeholders['isIgnored'] = False
     placeholders = automaticReporting.createCombinedParticleTexFile(placeholders, channelPlaceholders, mcCounts)
 
     B2INFO("Written analysis tex file for intermediate particle " + particleName)
-    return {'Placeholders_' + particleName: placeholders}
+    return {'Placeholders_{p}_{l}'.format(p=particleName, l=particleLabel): placeholders}
 
 
 def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePlaceholders, ntuples, mcCounts, particles):

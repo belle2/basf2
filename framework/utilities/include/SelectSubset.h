@@ -30,13 +30,13 @@ using namespace std;
  *
  * The class SelectSubset selects a subset of objects contained in a given StoreArray
  * creating at the same time a set of relations with objects contained in other StoreArrays
- * that are the natural restrictions to the subset of the relations from or to the original
+ * that are the natural restrictions on the subset of the relations "from" or "to" the original
  * one.
  *
  *  <h1>Creating a subset</h1>
  *  Assuming you have a StoreArray called 'particles' that contains objects of type Particle
  *  you can use SelectSubset to select particles with a given feature and put them
- *  in another StoreArray called 'oddParticles'.
+ *  in another StoreArray called, as an example,'oddParticles'.
  *
  *  <h2> Instantiation</h2>
  *  First you need to instantiate a SelectSubset object in your module:
@@ -49,14 +49,14 @@ using namespace std;
  * \code
 
  StoreArray< Particle > set( "particles" );
- StoreArray< Particle >::required( "particles" ); // or optional. It is up to you.
+ StoreArray< Particle >::required( "particles" ); // or optional. The choice is up to you.
  m_selector.registerSubset( set, "oddParticles");
 
  \endcode
 
  * The SelectSubset class will take care of creating the new StoreArray<Particle>,
-  * register it into the datastore with name "oddParticles" same durability and
- * same persistent attribute of the original one.
+ * register it into the datastore with name "oddParticles" same durability and
+ * same persistent attributes of the original one.
  *
  * <h2> Selection </h2>
  *
@@ -198,7 +198,9 @@ class SelectSubset {
   const bool m_reportErrorIfExisting = true;
 public:
   /** Constructor */
-  SelectSubset() {};
+  SelectSubset():
+    m_setDurability(DataStore::c_Event), m_subsetDurability(DataStore::c_Event)
+  {};
 
   /** Destructor */
   ~SelectSubset() {};
@@ -233,7 +235,6 @@ public:
       relation.registerAsPersistent(m_reportErrorIfExisting);
     }
 
-    //    m_subsetAccessorParams = subset.getAccessorParams();
     return true;
 
   }
@@ -337,11 +338,27 @@ public:
     return registerRelationsFromSubsetToSubset(relations ...);
   }
 
-  bool registerRelationsFromOtherToSubset(void) { return true; }
-  bool registerRelationsFromSubsetToOther(void) { return true; }
-  bool registerRelationsFromSubsetToSubset(void) { return true; }
+  /** This method is the actual worker. It selects the elements, fill the subset and
+   * all the relations in which the subset is involved.
+   *  @param f the pointer to the function (or a nameless lambda expression) returning
+   *  true for the elements to be selected and false for the others.
+   */
 
   void Select(std::function<bool (const StoredClass*)> f);
+
+private:
+  /** Empty method to stop here the recursion of the variadic template.
+   */
+  bool registerRelationsFromOtherToSubset(void) { return true; }
+
+  /** Empty method to stop here the recursion of the variadic template.
+   */
+  bool registerRelationsFromSubsetToOther(void) { return true; }
+
+  /** Empty method to stop here the recursion of the variadic template.
+   */
+  bool registerRelationsFromSubsetToSubset(void) { return true; }
+
 
 };
 

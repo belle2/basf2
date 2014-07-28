@@ -172,9 +172,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     mergedPath.addPath(m_outpathlist[0]);
 
   //init statistics
-  DataStore::Instance().setInitializeActive(true);
   m_processStatisticsPtr.registerAsPersistent();
-  DataStore::Instance().setInitializeActive(false);
 
   if (!m_processStatisticsPtr)
     m_processStatisticsPtr.create();

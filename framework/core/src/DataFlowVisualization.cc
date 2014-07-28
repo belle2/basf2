@@ -174,11 +174,9 @@ void DataFlowVisualization::executeModuleAndCreateIOPlot(const std::string& modu
   // call initialize() method
   //may throw some ERRORs, but that's OK.
   // TODO:(ignore missing inputs)
-  DataStore::Instance().setInitializeActive(true);
   gearboxPtr->initialize();
   DataStore::Instance().setModule(modulePtr->getName());
   modulePtr->initialize();
-  DataStore::Instance().setInitializeActive(false);
 
   // create plot
   const std::string filename = module + ".dot";

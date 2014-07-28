@@ -81,9 +81,6 @@ void SubEventModule::initialize()
 
   processInitialize(m_moduleList);
 
-  //yes, we're still in initalize()
-  DataStore::Instance().setInitializeActive(true);
-
   //don't screw up statistics for this module
   processStatistics->startModule();
   processStatistics->resumeGlobal();

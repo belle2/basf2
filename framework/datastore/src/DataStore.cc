@@ -34,7 +34,7 @@ DataStore& DataStore::Instance()
 }
 
 
-DataStore::DataStore() : m_initializeActive(false)
+DataStore::DataStore() : m_initializeActive(true)
 {
 }
 

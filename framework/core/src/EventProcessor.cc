@@ -182,7 +182,6 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
       m_master = module;
     }
   }
-  DataStore::Instance().setInitializeActive(false);
   m_processStatisticsPtr->stopGlobal(ModuleStatistics::c_Init);
 }
 
@@ -276,6 +275,7 @@ bool EventProcessor::processEvent(PathIterator moduleIter, EventMetaData* previo
 
 void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& modulePathList, long maxEvent)
 {
+  DataStore::Instance().setInitializeActive(false);
   m_moduleList = modulePathList;
   //Remember the previous event meta data, and identify end of data meta data
   EventMetaData previousEventMetaData;

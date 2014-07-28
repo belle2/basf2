@@ -303,7 +303,7 @@ def VariablesToNTuple(path, particleIdentifier, particleList, signalProbability)
         return {'VariablesToNTuple_{i}'.format(i=particleIdentifier): None}
 
     hash = actorFramework.createHash(particleIdentifier, particleList, signalProbability)
-    filename = 'var_{i}_{h}.root'.format(p=particleIdentifier, h=hash)
+    filename = 'var_{i}_{h}.root'.format(i=particleIdentifier, h=hash)
 
     if not os.path.isfile(filename):
         output = register_module('VariablesToNtuple')
@@ -312,10 +312,10 @@ def VariablesToNTuple(path, particleIdentifier, particleList, signalProbability)
         output.param('fileName', filename)
         output.param('treeName', 'variables')
         path.add_module(output)
-        B2INFO("Write variables to ntuple for particle {p}.".format(p=particleIdentifier))
+        B2INFO("Write variables to ntuple for particle {i}.".format(i=particleIdentifier))
         return {}
 
-    B2INFO("Write variables to ntuple for particle {p}. But file already exists, so nothing to do here.".format(p=particleIdentifier))
+    B2INFO("Write variables to ntuple for particle {i}. But file already exists, so nothing to do here.".format(i=particleIdentifier))
     return {'VariablesToNTuple_{i}'.format(i=particleIdentifier): filename}
 
 

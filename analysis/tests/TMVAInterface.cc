@@ -47,20 +47,6 @@ namespace std {
 
 namespace {
 
-  class TMVAInterfaceTest : public ::testing::Test {
-  protected:
-    /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp() {
-      DataStore::Instance().setInitializeActive(true);
-    }
-
-    /** clear datastore */
-    virtual void TearDown() {
-      DataStore::Instance().setInitializeActive(false);
-      DataStore::Instance().reset();
-    }
-  };
-
   TEST(TMVAInterfaceTest, BuiltinMethodIsConstructedCorrectly)
   {
     auto method = Method("BoostedDecisionTrees", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100", std::vector<std::string>({"p", "pt", "eid"}));

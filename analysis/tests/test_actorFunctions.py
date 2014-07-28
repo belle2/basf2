@@ -11,131 +11,176 @@ import os
 
 class MockPath(object):
     def __init__(self):
-        self.modules = []
+        self.mmodules = []
 
     def add_module(self, module):
-        self.modules.append(module)
+        self.mmodules.append(module)
+
+    def modules(self):
+        return self.mmodules
 
 
 class TestSelectParticleList(unittest.TestCase):
     def setUp(self):
         self.path = MockPath()
+        self.standardHash = '578e965dbcc8088a0f596181d9f662ee6d23c6ab'
 
-    def test_flavour_specific(self):
-        result = SelectParticleList(self.path, 'e+')
-        self.assertDictEqual(result, {'RawParticleList_e+': 'e+:f85be0cdd943c9ad2f4d050d79ef49a870352bba',
-                                      'RawParticleList_e-': 'e-:f85be0cdd943c9ad2f4d050d79ef49a870352bba'})
-        self.assertEqual(len(self.path.modules), 1)
+    def test_standard(self):
+        result = SelectParticleList(self.path, 'e+', 'generic')
+        self.assertTrue('RawParticleList_e+:generic' in result)
+        self.assertEqual(result['RawParticleList_e+:generic'], 'e+:' + self.standardHash)
+        self.assertDictEqual(result, {'RawParticleList_e+:generic': 'e+:' + self.standardHash})
+        self.assertEqual(len(self.path.modules()), 1)
 
-    def test_self_conjugated(self):
-        result = SelectParticleList(self.path, 'J/Psi')
-        self.assertDictEqual(result, {'RawParticleList_J/Psi': 'J/Psi:8534a63998eabdb26f4cda1cb905ab2ab0aa4a2c',
-                                      'RawParticleList_J/Psi': 'J/Psi:8534a63998eabdb26f4cda1cb905ab2ab0aa4a2c'})
-        self.assertEqual(len(self.path.modules), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertEqual(parameters['decayString'], 'e+:' + self.standardHash)
+        self.assertEqual(parameters['cut'], '')
+        self.assertEqual(parameters['persistent'], False)
 
+    def test_hash_depends_on_particle_name(self):
+        result = SelectParticleList(self.path, 'K+', 'generic')
+        self.assertTrue('RawParticleList_K+:generic' in result)
+        self.assertTrue(result['RawParticleList_K+:generic'] != 'K+:' + self.standardHash)
 
-class TestCopyParticleLists(unittest.TestCase):
-    def setUp(self):
-        self.path = MockPath()
-
-    def test_without_nones(self):
-        result = CopyParticleLists(self.path, 'D+', None, ['D+:1', 'D+:2', 'D+:3'], {'cutstring': ''})
-        self.assertDictEqual(result, {'ParticleList_D+': 'D+:1faa07a167fde173f8c899a11716bda4572a4661',
-                                      'ParticleList_D-': 'D-:1faa07a167fde173f8c899a11716bda4572a4661'})
-        self.assertEqual(len(self.path.modules), 1)
-
-    def test_with_nones(self):
-        result = CopyParticleLists(self.path, 'D+', None, ['D+:1', None, 'D+:3', None], {'cutstring': ''})
-        self.assertDictEqual(result, {'ParticleList_D+': 'D+:e58bca9f3d4d28df7fc5a92b3761593052102635',
-                                      'ParticleList_D-': 'D-:e58bca9f3d4d28df7fc5a92b3761593052102635'})
-        self.assertEqual(len(self.path.modules), 1)
-
-    def test_only_nones(self):
-        result = CopyParticleLists(self.path, 'D+', None, [None, None], {'cutstring': ''})
-        self.assertDictEqual(result, {'ParticleList_D+': None,
-                                      'ParticleList_D-': None})
-        self.assertEqual(len(self.path.modules), 0)
+    def test_hash_depends_on_particle_label(self):
+        result = SelectParticleList(self.path, 'e+', 'other')
+        self.assertTrue('RawParticleList_e+:other' in result)
+        self.assertTrue(result['RawParticleList_e+:other'] != 'e+:' + self.standardHash)
 
 
 class TestMakeAndMatchParticleList(unittest.TestCase):
     def setUp(self):
         self.path = MockPath()
+        self.standardHash = '1a558c640b3ddffa3a9d6a8eb860897123270b36'
 
-    def test_with_precut(self):
-        result = MakeAndMatchParticleList(self.path, 'D+', 'D+ -> pi+ K-', ['pi+', 'K-'], {'cutstring': '0 < M < 10'})
-        self.assertDictEqual(result, {'RawParticleList_D+ -> pi+ K-_D+': 'D+:a82b536fc03a4a03b3e7f73db062250ec59a1f4f',
-                                      'RawParticleList_D+ -> pi+ K-_D-': 'D-:a82b536fc03a4a03b3e7f73db062250ec59a1f4f'})
-        self.assertEqual(len(self.path.modules), 2)
+    def test_standard(self):
+        result = MakeAndMatchParticleList(self.path, 'D+', 'generic', 'D+ChannelUnique', ['pi+', 'K-'], {'cutstring': '0 < M < 10'})
+        self.assertTrue('RawParticleList_D+ChannelUnique' in result)
+        self.assertEqual(result['RawParticleList_D+ChannelUnique'], 'D+:' + self.standardHash)
+        self.assertDictEqual(result, {'RawParticleList_D+ChannelUnique': 'D+:' + self.standardHash})
+        self.assertEqual(len(self.path.modules()), 2)
 
-    def test_without_precut(self):
-        result = MakeAndMatchParticleList(self.path, 'D+', 'D+ -> pi+ K-', ['pi+', 'K-'], None)
-        self.assertDictEqual(result, {'RawParticleList_D+ -> pi+ K-_D+': None,
-                                      'RawParticleList_D+ -> pi+ K-_D-': None})
-        self.assertEqual(len(self.path.modules), 0)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertEqual(parameters['decayString'], 'D+:' + self.standardHash + ' ==> pi+ K-')
+        self.assertEqual(parameters['cut'], '0 < M < 10')
+        self.assertEqual(parameters['persistent'], False)
+
+        parameters = {p.name: p.values for p in self.path.modules()[1].available_params()}
+        self.assertEqual(parameters['listName'], 'D+:' + self.standardHash)
+
+    def test_missing_precut(self):
+        result = MakeAndMatchParticleList(self.path, 'D+', 'generic', 'D+ChannelUnique', ['pi+', 'K-'], None)
+        self.assertDictEqual(result, {'RawParticleList_D+ChannelUnique': None})
+        self.assertEqual(len(self.path.modules()), 0)
+
+    def test_hash_depends_on_particle_name(self):
+        result = MakeAndMatchParticleList(self.path, 'B+', 'generic', 'D+ChannelUnique', ['pi+', 'K-'], {'cutstring': '0 < M < 10'})
+        self.assertTrue('RawParticleList_D+ChannelUnique' in result)
+        self.assertTrue(result['RawParticleList_D+ChannelUnique'] != 'B+:' + self.standardHash)
+
+    def test_hash_depends_on_particle_label(self):
+        result = MakeAndMatchParticleList(self.path, 'D+', 'other', 'D+ChannelUnique', ['pi+', 'K-'], {'cutstring': '0 < M < 10'})
+        self.assertTrue('RawParticleList_D+ChannelUnique' in result)
+        self.assertTrue(result['RawParticleList_D+ChannelUnique'] != 'D+:' + self.standardHash)
+
+    def test_hash_depends_on_channel_name(self):
+        result = MakeAndMatchParticleList(self.path, 'D+', 'generic', 'other', ['pi+', 'K-'], {'cutstring': '0 < M < 10'})
+        self.assertTrue('RawParticleList_other' in result)
+        self.assertTrue(result['RawParticleList_other'] != 'D+:' + self.standardHash)
+
+    def test_hash_depends_on_daughters(self):
+        result = MakeAndMatchParticleList(self.path, 'D+', 'generic', 'D+ChannelUnique', ['K+', 'K-'], {'cutstring': '0 < M < 10'})
+        self.assertTrue('RawParticleList_D+ChannelUnique' in result)
+        self.assertTrue(result['RawParticleList_D+ChannelUnique'] != 'D+:' + self.standardHash)
+
+    def test_hash_depends_on_cut(self):
+        result = MakeAndMatchParticleList(self.path, 'D+', 'generic', 'D+ChannelUnique', ['pi+', 'K-'], {'cutstring': '0.1 < M < 10'})
+        self.assertTrue('RawParticleList_D+ChannelUnique' in result)
+        self.assertTrue(result['RawParticleList_D+ChannelUnique'] != 'D+:' + self.standardHash)
 
 
-mvaConfig = Particle.MVAConfiguration(
-    name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=['p', 'pt', 'p_CMS', 'pt_CMS', 'chiProb'],
-    target='isSignal', targetCluster=1
-)
-
-
-class TestSignalProbability(unittest.TestCase):
+class TestCopyParticleLists(unittest.TestCase):
     def setUp(self):
         self.path = MockPath()
+        self.standardHash = 'fc5afcc45e39bf38c1923f7992c31fe290c92a7d'
 
-    def test_non_fsp_teacher(self):
-        hash = '3727bb77c7f7f5577ea2eade97adea69e3eec95e'
-        filename = 'D+:1_{hash}'.format(hash=hash)
-        open(filename + '.root', 'a').close()
-        open(filename + '.config', 'a').close()
-        os.remove(filename + '.root')
-        os.remove(filename + '.config')
-        result = SignalProbability(self.path, 'D+', 'D+ -> pi+ K-', mvaConfig, 'D+:1', ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
-        self.assertDictEqual(result, {})
-        self.assertEqual(len(self.path.modules), 1)
+    def test_standard(self):
+        result = CopyParticleLists(self.path, 'D+', 'generic', ['D+:1', 'D+:2', 'D+:3'], [{'cutstring': '0.1 < M'}] * 3)
+        self.assertDictEqual(result, {'ParticleList_D+:generic': 'D+:' + self.standardHash,
+                                      'ParticleList_D-:generic': 'D-:' + self.standardHash})
+        self.assertEqual(len(self.path.modules()), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertEqual(parameters['outputListName'], 'D+:' + self.standardHash)
+        self.assertListEqual(parameters['inputListNames'], ['D+:1', 'D+:2', 'D+:3'])
+        self.assertEqual(parameters['cut'], '0.1 < M')
 
-    def test_non_fsp_expert(self):
-        hash = '3727bb77c7f7f5577ea2eade97adea69e3eec95e'
-        filename = 'D+:1_{hash}'.format(hash=hash)
-        open(filename + '.root', 'a').close()
-        open(filename + '.config', 'a').close()
-        result = SignalProbability(self.path, 'D+', 'D+ -> pi+ K-', mvaConfig, 'D+:1', ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
-        self.assertDictEqual(result, {'SignalProbability_D+ -> pi+ K-_D+': 'D+:1_' + hash + '.config',
-                                      'SignalProbability_D+ -> pi+ K-_D-': 'D+:1_' + hash + '.config'})
-        os.remove(filename + '.root')
-        os.remove(filename + '.config')
-        self.assertEqual(len(self.path.modules), 1)
+    def test_some_missing_daughter_lists(self):
+        result = CopyParticleLists(self.path, 'D+', 'generic', ['D+:1', 'D+:2', 'D+:3', None], [{'cutstring': '0.1 < M'}] * 4)
+        self.assertDictEqual(result, {'ParticleList_D+:generic': 'D+:' + self.standardHash,
+                                      'ParticleList_D-:generic': 'D-:' + self.standardHash})
+        self.assertEqual(len(self.path.modules()), 1)
 
-    def test_non_fsp_with_nones(self):
-        result = SignalProbability(self.path, 'D+', 'D+ -> pi+ K-', mvaConfig, 'D+:1', [None, 'SignalProbabilityHashK'])
-        self.assertDictEqual(result, {'SignalProbability_D+ -> pi+ K-_D+': None,
-                                      'SignalProbability_D+ -> pi+ K-_D-': None})
-        self.assertEqual(len(self.path.modules), 0)
+    def test_some_missing_post_cuts(self):
+        result = CopyParticleLists(self.path, 'D+', 'generic', ['D+:1', 'D+:2', 'D+:3', 'D+:4'], [{'cutstring': '0.1 < M'}] * 3 + [None])
+        self.assertDictEqual(result, {'ParticleList_D+:generic': 'D+:' + self.standardHash,
+                                      'ParticleList_D-:generic': 'D-:' + self.standardHash})
+        self.assertEqual(len(self.path.modules()), 1)
 
-    def test_fsp_teacher(self):
-        hash = 'd02f42dce674a689665bce945e81cfafe92c547f'
-        filename = 'e+:1_{hash}'.format(hash=hash)
-        open(filename + '.root', 'a').close()
-        open(filename + '.config', 'a').close()
-        os.remove(filename + '.root')
-        os.remove(filename + '.config')
-        result = SignalProbability(self.path, 'e+', 'e+', mvaConfig, 'e+:1')
-        self.assertDictEqual(result, {})
-        self.assertEqual(len(self.path.modules), 1)
+    def test_all_missing_daughter_lists(self):
+        result = CopyParticleLists(self.path, 'D+', 'generic', [None, None, None], [{'cutstring': '0.1 < M'}] * 3)
+        self.assertDictEqual(result, {'ParticleList_D+:generic': None,
+                                      'ParticleList_D-:generic': None})
+        self.assertEqual(len(self.path.modules()), 0)
 
-    def test_fsp_expert(self):
-        hash = 'd02f42dce674a689665bce945e81cfafe92c547f'
-        filename = 'e+:1_{hash}'.format(hash=hash)
-        open(filename + '.root', 'a').close()
-        open(filename + '.config', 'a').close()
-        result = SignalProbability(self.path, 'e+', 'e+', mvaConfig, 'e+:1')
-        os.remove(filename + '.root')
-        os.remove(filename + '.config')
-        self.assertDictEqual(result, {'SignalProbability_e+': 'e+:1_' + hash + '.config',
-                                      'SignalProbability_e-': 'e+:1_' + hash + '.config'})
-        self.assertEqual(len(self.path.modules), 1)
+    def test_all_missing_post_cuts(self):
+        result = CopyParticleLists(self.path, 'D+', 'generic', ['D+:1', 'D+:2', 'D+:3'], [None, None, None])
+        self.assertDictEqual(result, {'ParticleList_D+:generic': None,
+                                      'ParticleList_D-:generic': None})
+        self.assertEqual(len(self.path.modules()), 0)
+
+    def test_hash_depends_on_particle_name(self):
+        result = CopyParticleLists(self.path, 'B+', 'generic', ['D+:1', 'D+:2', 'D+:3'], [{'cutstring': '0.1 < M'}] * 3)
+        self.assertTrue('ParticleList_B+:generic' in result)
+        self.assertTrue(result['ParticleList_B+:generic'] != 'B+:' + self.standardHash)
+
+    def test_hash_depends_on_particle_label(self):
+        result = CopyParticleLists(self.path, 'D+', 'other', ['D+:1', 'D+:2', 'D+:3'], [{'cutstring': '0.1 < M'}] * 3)
+        self.assertTrue('ParticleList_D+:other' in result)
+        self.assertTrue(result['ParticleList_D+:other'] != 'D+:' + self.standardHash)
+
+    def test_hash_depends_on_daughters(self):
+        result = CopyParticleLists(self.path, 'D+', 'generic', ['D+:1', 'D+:2', 'D+:4'], [{'cutstring': '0.1 < M'}] * 3)
+        self.assertTrue('ParticleList_D+:generic' in result)
+        self.assertTrue(result['ParticleList_D+:generic'] != 'D+:' + self.standardHash)
+
+    def test_hash_depends_on_post_cuts(self):
+        result = CopyParticleLists(self.path, 'D+', 'generic', ['D+:1', 'D+:2', 'D+:3'], [{'cutstring': '0.2 < M'}] * 3)
+        self.assertTrue('ParticleList_D+:generic' in result)
+        self.assertTrue(result['ParticleList_D+:generic'] != 'D+:' + self.standardHash)
+
+
+class TestFitVertex(unittest.TestCase):
+    def setUp(self):
+        self.path = MockPath()
+        self.standardHash = 'a3d3b90034404d7fcecdfe984d106d4c05677338'
+
+    def test_standard(self):
+        result = FitVertex(self.path, 'UniqueChannelName', 'D+:1')
+        self.assertDictEqual(result, {'VertexFit_UniqueChannelName': self.standardHash})
+        self.assertEqual(len(self.path.modules()), 2)
+        parameters = {p.name: p.values for p in self.path.modules()[1].available_params()}
+        self.assertEqual(parameters['listName'], 'D+:1')
+        self.assertEqual(parameters['confidenceLevel'], 0)
+
+    def test_hash_depends_on_channel_name(self):
+        result = FitVertex(self.path, 'other', 'D+:1')
+        self.assertTrue('VertexFit_other' in result)
+        self.assertTrue(result['VertexFit_other'] != self.standardHash)
+
+    def test_hash_depends_on_particle_list(self):
+        result = FitVertex(self.path, 'UniqueChannelName', 'D+:2')
+        self.assertTrue('VertexFit_UniqueChannelName' in result)
+        self.assertTrue(result['VertexFit_UniqueChannelName'] != self.standardHash)
 
 
 preCutConfig = Particle.PreCutConfiguration(
@@ -149,51 +194,198 @@ preCutConfig = Particle.PreCutConfiguration(
 class TestCreatePreCutHistogram(unittest.TestCase):
     def setUp(self):
         self.path = MockPath()
+        self.standardHash = 'b008fcee89f8f867af9d0904e9b2727878948598'
+        self.standardFilename = 'CutHistograms_UniqueChannelName:{hash}.root'.format(hash=self.standardHash)
+        open(self.standardFilename, 'a').close()
 
-    def test_create_hist(self):
-        hash = 'f75ee3533d3c9475373e59ef33e236faf7548a39'
-        filename = 'CutHistograms_D+_D+ -> pi+ K-_{hash}.root'.format(hash=hash)
-        open(filename, 'a').close()
-        os.remove(filename)
-        result = CreatePreCutHistogram(self.path, 'D+', 'D+ -> pi+ K-', preCutConfig, ['pi+:1', 'K+:1'], [])
+    def tearDown(self):
+        if os.path.isfile(self.standardFilename):
+            os.remove(self.standardFilename)
+
+    def test_standard(self):
+        os.remove(self.standardFilename)
+        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
         self.assertDictEqual(result, {})
-        self.assertEqual(len(self.path.modules), 1)
+        self.assertEqual(len(self.path.modules()), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertEqual(parameters['fileName'], self.standardFilename)
+        self.assertEqual(parameters['decayString'], 'D+:' + self.standardHash + ' ==> pi+:1 K+:1')
+        self.assertEqual(parameters['variable'], 'M')
 
     def test_nothing_to_do(self):
-        hash = 'b5119ce3e4709ebb035b7fec050621d1354c2b32'
-        filename = 'CutHistograms_D+_D+ -> pi+ K-_{hash}.root'.format(hash=hash)
-        open(filename, 'a').close()
-        result = CreatePreCutHistogram(self.path, 'D+', 'D+ -> pi+ K-', preCutConfig, ['pi+:1', 'K+:1'], [])
-        os.remove(filename)
-        self.assertDictEqual(result, {'PreCutHistogram_D+ -> pi+ K-': (filename, 'D+:' + hash)})
-        self.assertEqual(len(self.path.modules), 0)
+        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
+        self.assertDictEqual(result, {'PreCutHistogram_UniqueChannelName': (self.standardFilename, 'D+:' + self.standardHash)})
+        self.assertEqual(len(self.path.modules()), 0)
 
-    def test_create_hist_additionalDependency(self):
-        hash = 'ddd94f65a16fe9d92343ff57256fd013684d56e1'
-        filename = 'CutHistograms_D+_D+ -> pi+ K-_{hash}.root'.format(hash=hash)
-        open(filename, 'a').close()
-        os.remove(filename)
-        result = CreatePreCutHistogram(self.path, 'D+', 'D+ -> pi+ K-', preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
+    def test_missing_daughter(self):
+        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', preCutConfig, [None, 'K+:1'], ['bar', 'foo'])
+        self.assertDictEqual(result, {'PreCutHistogram_UniqueChannelName': None})
+        self.assertEqual(len(self.path.modules()), 0)
+
+    def test_missing_additionalDependencies(self):
+        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', preCutConfig, ['pi+:1', 'K+:1'], ['bar', None])
+        self.assertDictEqual(result, {'PreCutHistogram_UniqueChannelName': None})
+        self.assertEqual(len(self.path.modules()), 0)
+
+    def test_hash_depends_on_particle_name(self):
+        result = CreatePreCutHistogram(self.path, 'B+', 'UniqueChannelName', preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
         self.assertDictEqual(result, {})
-        self.assertEqual(len(self.path.modules), 1)
+        self.assertEqual(len(self.path.modules()), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertTrue(parameters['fileName'] != 'CutHistograms_UniqueChannelName:{hash}.root'.format(hash=self.standardHash))
 
-    def test_non_in_daughter(self):
-        hash = 'f75ee3533d3c9475373e59ef33e236faf7548a39'
-        filename = 'CutHistograms_D+_D+ -> pi+ K-_{hash}.root'.format(hash=hash)
-        open(filename, 'a').close()
-        os.remove(filename)
-        result = CreatePreCutHistogram(self.path, 'D+', 'D+ -> pi+ K-', preCutConfig, [None, 'K+:1'], [])
-        self.assertDictEqual(result, {'PreCutHistogram_D+ -> pi+ K-': None})
-        self.assertEqual(len(self.path.modules), 0)
+    def test_hash_depends_on_channel_name(self):
+        result = CreatePreCutHistogram(self.path, 'D+', 'other', preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
+        self.assertDictEqual(result, {})
+        self.assertEqual(len(self.path.modules()), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertTrue(parameters['fileName'] != 'CutHistograms_other:{hash}.root'.format(hash=self.standardHash))
 
-    def test_non_in_additionalDependencies(self):
-        hash = 'ddd94f65a16fe9d92343ff57256fd013684d56e1'
-        filename = 'CutHistograms_D+_D+ -> pi+ K-_{hash}.root'.format(hash=hash)
-        open(filename, 'a').close()
-        os.remove(filename)
-        result = CreatePreCutHistogram(self.path, 'D+', 'D+ -> pi+ K-', preCutConfig, [None, 'K+:1'], ['bar', None])
-        self.assertDictEqual(result, {'PreCutHistogram_D+ -> pi+ K-': None})
-        self.assertEqual(len(self.path.modules), 0)
+    def test_hash_depends_on_pre_cut_variable(self):
+        myPreCutConfig = Particle.PreCutConfiguration(
+            variable='Q',
+            method='Same',
+            efficiency=0.7,
+            purity=0.01
+        )
+        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', myPreCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
+        self.assertDictEqual(result, {})
+        self.assertEqual(len(self.path.modules()), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertTrue(parameters['fileName'] != 'CutHistograms_UniqueChannelName:{hash}.root'.format(hash=self.standardHash))
+
+    def test_hash_doesnt_depends_on_pre_cut_in_general(self):
+        myPreCutConfig = Particle.PreCutConfiguration(
+            variable='M',
+            method='S/B',
+            efficiency=0.6,
+            purity=0.1
+        )
+        os.remove(self.standardFilename)
+        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', myPreCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
+        self.assertDictEqual(result, {})
+        self.assertEqual(len(self.path.modules()), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertTrue(parameters['fileName'] == 'CutHistograms_UniqueChannelName:{hash}.root'.format(hash=self.standardHash))
+
+    def test_hash_depends_on_daughters(self):
+        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', preCutConfig, ['pi+:1', 'K-:1'], ['bar', 'foo'])
+        self.assertDictEqual(result, {})
+        self.assertEqual(len(self.path.modules()), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertTrue(parameters['fileName'] != 'CutHistograms_UniqueChannelName:{hash}.root'.format(hash=self.standardHash))
+
+    def test_hash_depends_on_additional_dependencies(self):
+        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'bla'])
+        self.assertDictEqual(result, {})
+        self.assertEqual(len(self.path.modules()), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertTrue(parameters['fileName'] != 'CutHistograms_UniqueChannelName:{hash}.root'.format(hash=self.standardHash))
+
+
+class TestPreCutDetermination(unittest.TestCase):
+    def setUp(self):
+        self.path = MockPath()
+
+    def test_standard(self):
+        # TODO Write awesome test
+        pass
+
+
+class TestPostCutDetermination(unittest.TestCase):
+    def setUp(self):
+        self.path = MockPath()
+
+    def test_standard(self):
+        # TODO Write awesome test
+        pass
+
+
+mvaConfig = Particle.MVAConfiguration(
+    name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
+    variables=['p', 'pt', 'p_CMS', 'pt_CMS', 'chiProb'],
+    target='isSignal', targetCluster=1
+)
+
+
+class TestSignalProbability(unittest.TestCase):
+    def setUp(self):
+        self.path = MockPath()
+        self.standardHash = '3b16051880492d465eb5f58e7202409bab57ff02'
+        self.standardFilename = 'D+:1_{hash}'.format(hash=self.standardHash)
+        open(self.standardFilename + '.root', 'a').close()
+        open(self.standardFilename + '.config', 'a').close()
+
+    def tearDown(self):
+        if os.path.isfile(self.standardFilename + '.root'):
+            os.remove(self.standardFilename + '.root')
+        if os.path.isfile(self.standardFilename + '.config'):
+            os.remove(self.standardFilename + '.config')
+
+    def test_standard_expert(self):
+        result = SignalProbability(self.path, 'Identifier', 'D+:1', mvaConfig, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        self.assertDictEqual(result, {'SignalProbability_Identifier': self.standardFilename + '.config'})
+        self.assertEqual(len(self.path.modules()), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertEqual(parameters['prefix'], 'D+:1_' + self.standardHash)
+        self.assertEqual(parameters['method'], mvaConfig.name)
+        self.assertEqual(parameters['signalFraction'], -2)
+        self.assertEqual(parameters['signalProbabilityName'], 'SignalProbability')
+        self.assertEqual(parameters['signalClass'], mvaConfig.targetCluster)
+        self.assertEqual(parameters['listNames'], ['D+:1'])
+
+    def test_standard_teacher(self):
+        os.remove(self.standardFilename + '.root')
+        os.remove(self.standardFilename + '.config')
+        result = SignalProbability(self.path, 'Identifier', 'D+:1', mvaConfig, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        self.assertDictEqual(result, {})
+        self.assertEqual(len(self.path.modules()), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertEqual(parameters['prefix'], 'D+:1_' + self.standardHash)
+        self.assertEqual(parameters['methods'], [(mvaConfig.name, mvaConfig.type, mvaConfig.config)])
+        self.assertEqual(parameters['variables'], mvaConfig.variables)
+        self.assertEqual(parameters['target'], mvaConfig.target)
+        self.assertEqual(parameters['doNotTrain'], True)
+        self.assertEqual(parameters['listNames'], ['D+:1'])
+
+    def test_missing_additional_dependencies(self):
+        result = SignalProbability(self.path, 'Identifier', 'D+:1', mvaConfig, ['SignalProbabilityHashPi', None])
+        self.assertDictEqual(result, {'SignalProbability_Identifier': None,
+                                      'SignalProbability_Identifier': None})
+        self.assertEqual(len(self.path.modules()), 0)
+
+    def test_hash_depends_particle_list(self):
+        result = SignalProbability(self.path, 'Identifier', 'B+:1', mvaConfig, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        self.assertDictEqual(result, {})
+        self.assertEqual(len(self.path.modules()), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertTrue(parameters['prefix'] != 'B+:1_' + self.standardHash)
+
+    def test_hash_depends_identifier(self):
+        result = SignalProbability(self.path, 'other', 'D+:1', mvaConfig, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        self.assertDictEqual(result, {})
+        self.assertEqual(len(self.path.modules()), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertTrue(parameters['prefix'] != 'D+:1_' + self.standardHash)
+
+    def test_hash_depends_additional_dependencies(self):
+        result = SignalProbability(self.path, 'Identifier', 'D+:1', mvaConfig, ['SignalProbabilityHashPi', 'test'])
+        self.assertDictEqual(result, {})
+        self.assertEqual(len(self.path.modules()), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertTrue(parameters['prefix'] != 'D+:1_' + self.standardHash)
+
+    def test_hash_depends_mva_config(self):
+        myMvaConfig = Particle.MVAConfiguration(
+            name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
+            variables=['p', 'pt', 'p_CMS', 'pt_CMS', 'chiProb'],
+            target='isSignal', targetCluster=0
+        )
+        result = SignalProbability(self.path, 'Identifier', 'D+:1', myMvaConfig, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        self.assertDictEqual(result, {})
+        self.assertEqual(len(self.path.modules()), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertTrue(parameters['prefix'] != 'D+:1_' + self.standardHash)
 
 
 if __name__ == '__main__':

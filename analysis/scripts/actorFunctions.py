@@ -136,7 +136,7 @@ def FitVertex(path, channelName, particleList):
         @param particleList ParticleList name
         @return Resource named VertexFit_{channelName}
     """
-    modularAnalysis.fitVertex(particleList, 0)
+    modularAnalysis.fitVertex(particleList, 0, path=path)
     B2INFO("Fitted vertex for channel {c}.".format(c=channelName))
     return {'VertexFit_{c}'.format(c=channelName): actorFramework.createHash(channelName, particleList)}
 

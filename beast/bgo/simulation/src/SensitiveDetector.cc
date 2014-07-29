@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <beast/csi/simulation/SensitiveDetector.h>
-#include <beast/csi/dataobjects/CsiSimHit.h>
+#include <beast/bgo/simulation/SensitiveDetector.h>
+#include <beast/bgo/dataobjects/BgoSimHit.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -20,27 +20,27 @@
 #include <G4Step.hh>
 
 namespace Belle2 {
-  /** Namespace to encapsulate code needed for the CSI detector */
-  namespace csi {
+  /** Namespace to encapsulate code needed for the BGO detector */
+  namespace bgo {
 
     SensitiveDetector::SensitiveDetector():
-      Simulation::SensitiveDetectorBase("CsiSensitiveDetector", Const::invalidDetector)
+      Simulation::SensitiveDetectorBase("BgoSensitiveDetector", Const::invalidDetector)
     {
       //Make sure all collections are registered
       StoreArray<MCParticle>   mcParticles;
-      StoreArray<CsiSimHit>  simHits;
-      RelationArray relMCSimHit(mcParticles, simHits);
+      StoreArray<BgoSimHit>  simHits;
+      RelationArray relMBgomHit(mcParticles, simHits);
 
       //Register all collections we want to modify and require those we want to use
       mcParticles.registerAsPersistent();
       simHits.registerAsPersistent();
-      relMCSimHit.registerAsPersistent();
+      relMBgomHit.registerAsPersistent();
 
       //Register the Relation so that the TrackIDs get replaced by the actual
       //MCParticle indices after simulating the events. This is needed as
       //secondary particles might not be stored so everything relating to those
       //particles will be attributed to the last saved mother particle
-      registerMCParticleRelation(relMCSimHit);
+      registerMCParticleRelation(relMBgomHit);
     }
 
     bool SensitiveDetector::step(G4Step* step, G4TouchableHistory*)
@@ -74,12 +74,12 @@ namespace Belle2 {
 
       //Get the datastore arrays
       StoreArray<MCParticle>  mcParticles;
-      StoreArray<CsiSimHit> simHits;
-      RelationArray relMCSimHit(mcParticles, simHits);
+      StoreArray<BgoSimHit> simHits;
+      RelationArray relMBgomHit(mcParticles, simHits);
 
-      StoreArray<CsiSimHit> CsiHits;
-      if (!CsiHits.isValid()) CsiHits.create();
-      CsiSimHit* hit = CsiHits.appendNew(
+      StoreArray<BgoSimHit> BgoHits;
+      if (!BgoHits.isValid()) BgoHits.create();
+      BgoSimHit* hit = BgoHits.appendNew(
                          depEnergy,
                          nielEnergy,
                          tkPDG,
@@ -93,10 +93,10 @@ namespace Belle2 {
 
       //Add Relation between SimHit and MCParticle with a weight of 1. Since
       //the MCParticle index is not yet defined we use the trackID from Geant4
-      relMCSimHit.add(trackID, hit->getArrayIndex(), 1.0);
+      relMBgomHit.add(trackID, hit->getArrayIndex(), 1.0);
 
       return true;
     }
 
-  } //csi namespace
+  } //bgo namespace
 } //Belle2 namespace

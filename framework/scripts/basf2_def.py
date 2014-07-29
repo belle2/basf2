@@ -148,7 +148,18 @@ def nprocess(nproc):
     nproc: number of processes
     """
 
-    fw.set_nprocess(nproc)
+    B2WARNING('Please use set_nprocesses() instead of nprocess()!')
+    fw.set_nprocesses(nproc)
+
+
+def set_nprocesses(nproc):
+    """
+    Sets number of processes for parallel processing
+
+    nproc: number of processes
+    """
+
+    fw.set_nprocesses(nproc)
 
 
 def print_all_modules(moduleList, package=''):

@@ -188,6 +188,7 @@ void Framework::exposePythonAPI()
   .def("list_registered_modules", &Framework::getRegisteredModulesPython)
   .def("create_path", &Framework::createPath)
   .def("process", &Framework::process, process_overloads())
-  .def("set_nprocess", &Framework::setNumberProcesses)
+  .def("set_nprocesses", &Framework::setNumberProcesses)
+  .def("get_nprocesses", &Framework::getNumberProcesses)
   ;
 }

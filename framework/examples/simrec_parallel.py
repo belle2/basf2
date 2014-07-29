@@ -37,17 +37,7 @@ main.add_module(eventinfosetter)
 main.add_module(particlegun)
 
 # detecor simulation
-components = [
-    'MagneticField',
-    'BeamPipe',
-    'PXD',
-    'SVD',
-    'CDC',
-    'TOP',
-    'ARICH',
-    'BKLM',
-    'ECL',
-    ]
+components = ['MagneticField', 'BeamPipe', 'PXD', 'SVD', 'CDC', 'TOP', 'ARICH', 'BKLM', 'ECL']
 add_simulation(main, components)
 # or add_simulation(main) to simulate all detectors
 
@@ -57,8 +47,8 @@ add_reconstruction(main, components)
 main.add_module(output)
 
 # Process events, using 4 parallel processes
-nprocess(4)
+set_nprocesses(4)
 process(main)
 
-# Print call statistics (not really useful with multiple processes)
-# print statistics
+# Print call statistics (also collected for multiple processes)
+print statistics

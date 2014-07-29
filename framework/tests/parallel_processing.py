@@ -173,7 +173,7 @@ if not simulation.has_properties(ModulePropFlags.PARALLELPROCESSINGCERTIFIED):
     B2FATAL("Simulation doesn't have pp flag?")
 
 # Process events
-nprocess(2)
+set_nprocesses(2)
 process(main)
 
 # check wether output file contains correct number of events

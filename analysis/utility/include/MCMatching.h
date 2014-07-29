@@ -83,6 +83,12 @@ namespace Belle2 {
      *
      * To actually find the common mother of all daughters, each time this function is called for a daughter particle, specify the return value from the last call for lastMother.
      *
+     * Note: this looks like an ideal case for applying a more sophisticated algorithm for LCA (lowest common ancestor) problems.
+     * However, our trees aren't very large, so additional preprocessing might slow this down (I saw this when experimenting
+     * with the algorithm). This might still be worth looking into if an algorithm with inexpensive preprocessing were used,
+     * or the preprocessing was done only once per event. See http://community.topcoder.com/tc?module=Static&d1=tutorials&d2=lowestCommonAncestor
+     * for an interesting introduction to related algorithms.
+     *
      * @return index of the first common mother in firstMothers (!), or -1 if not found.
      */
     int findCommonMother(const MCParticle* mcP, const std::vector<int>& firstMothers, int lastMother);

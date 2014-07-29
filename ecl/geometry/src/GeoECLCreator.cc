@@ -94,48 +94,48 @@ namespace Belle2 {
     // warned as unused 20140503 k_forwNRings(13) ,
     // warned as unused 20140503 k_backNRings(10) ;
 
-    const double k_CLR(0.01   * cm);                 // clearance around outside
-//const double k_barCryPullOut    (  0.5   *cm ); // Barrel Crystal pullout
-    const double k_barFinThick(0.05  * cm);         // fin thickness in barrel
-    const double k_barConOuterR(166.0 * cm);        // outer R of barrel container
-    const double k_barConOuterThick(0.8 * cm);      // thickness (eff) of outer skin
-    const double k_barConInnerR(125.01 * cm);       // inner R of barrel container
-    const double k_barConInnerThick(0.15 * cm);     // thickness of inner skin
-    const double k_barConBackZOut(-122.50 * cm);    // Z of container back at outer R
-    const double k_barConBackZIn(-100.58 * cm);     // Z of container back at inner R
-    const double k_barConForwZIn(199.1 * cm);       // Z of container forw at inner R
-    const double k_barConForwZOut(229.0 * cm);      // Z of container forw at outer R
-    const double k_barConEndConThick(0.4 * cm);     // endcone thickess, both ends
-    const double k_barConEndRngThick(0.2 * cm);     // endring thickess, both ends
-    const double k_barConBackRThick(10.5 * cm);     // thickness of sup ring in back
-    const double k_barConForwRThick(9.0 * cm);      // thickness of sup ring in forw
-    const double k_backConFarZ(-145.5 * cm);        // Z of back container back
-    const double k_backConNearZ(-102.0 * cm);       // Z of back container front
-    const double k_forwConFarZ(239.8 * cm);         // Z of forw container back
-    const double k_forwConNearZ(196.0 * cm);        // Z of forw container front
-    const double k_backConNearInnerR(45.0705 * cm); // inner R of back cont (near Z)
-    const double k_backConFarInnerR(67.9125 * cm);  // inner R of back cont (far  Z)
-    const double k_forwConNearInnerR(40.93  * cm);  // inner R of forw cont (near Z)
-    const double k_forwConFarInnerR(51.1387 * cm);  // inner R of forw cont (far  Z)
+    const double k_CLR(0.01   * CLHEP::cm);                 // clearance around outside
+//const double k_barCryPullOut    (  0.5   *CLHEP::cm ); // Barrel Crystal pullout
+    const double k_barFinThick(0.05  * CLHEP::cm);         // fin thickness in barrel
+    const double k_barConOuterR(166.0 * CLHEP::cm);        // outer R of barrel container
+    const double k_barConOuterThick(0.8 * CLHEP::cm);      // thickness (eff) of outer skin
+    const double k_barConInnerR(125.01 * CLHEP::cm);       // inner R of barrel container
+    const double k_barConInnerThick(0.15 * CLHEP::cm);     // thickness of inner skin
+    const double k_barConBackZOut(-122.50 * CLHEP::cm);    // Z of container back at outer R
+    const double k_barConBackZIn(-100.58 * CLHEP::cm);     // Z of container back at inner R
+    const double k_barConForwZIn(199.1 * CLHEP::cm);       // Z of container forw at inner R
+    const double k_barConForwZOut(229.0 * CLHEP::cm);      // Z of container forw at outer R
+    const double k_barConEndConThick(0.4 * CLHEP::cm);     // endcone thickess, both ends
+    const double k_barConEndRngThick(0.2 * CLHEP::cm);     // endring thickess, both ends
+    const double k_barConBackRThick(10.5 * CLHEP::cm);     // thickness of sup ring in back
+    const double k_barConForwRThick(9.0 * CLHEP::cm);      // thickness of sup ring in forw
+    const double k_backConFarZ(-145.5 * CLHEP::cm);        // Z of back container back
+    const double k_backConNearZ(-102.0 * CLHEP::cm);       // Z of back container front
+    const double k_forwConFarZ(239.8 * CLHEP::cm);         // Z of forw container back
+    const double k_forwConNearZ(196.0 * CLHEP::cm);        // Z of forw container front
+    const double k_backConNearInnerR(45.0705 * CLHEP::cm); // inner R of back cont (near Z)
+    const double k_backConFarInnerR(67.9125 * CLHEP::cm);  // inner R of back cont (far  Z)
+    const double k_forwConNearInnerR(40.93  * CLHEP::cm);  // inner R of forw cont (near Z)
+    const double k_forwConFarInnerR(51.1387 * CLHEP::cm);  // inner R of forw cont (far  Z)
 
-    const double k_endConInnerThick(2.0   * cm);    // thickness of inner cone
-    const double k_endConSiWallThick(0.16 * cm);    // thickness of outer side wall
-    const double k_endConOuterThick(2.0  * cm);     // thickness of outer tube
-    const double k_backConNearOuterR(119.015 * cm); // outer R of cont at near Z
-    const double k_backConFarOuterR(149.6 * cm);    // outer R of cont at far Z
-    const double k_backConHflat(20.267 * cm);       // Zlength of "flat" outer radius
-    const double k_forwConNearOuterR(120.04 * cm);  // outer R of cont at near Z
-    const double k_forwConFarOuterR(141.5  * cm);   // outer R of cont at far Z
-    const double k_forwConHflat(10.72 * cm);        // Zlength of "flat" outer radius
-    const double k_endConNearThick(0.3   * cm);     // thickness of front of con
-    const double k_endConFarThick(0.1   * cm);      // thickness of back of con
-    const double k_endConFinThick(0.05  * cm);      // ec's phi fin thickness
-//const double k_endConMetThick   (  1.34  *cm ) ; // ec's metal fitting thickness
+    const double k_endConInnerThick(2.0   * CLHEP::cm);    // thickness of inner cone
+    const double k_endConSiWallThick(0.16 * CLHEP::cm);    // thickness of outer side wall
+    const double k_endConOuterThick(2.0  * CLHEP::cm);     // thickness of outer tube
+    const double k_backConNearOuterR(119.015 * CLHEP::cm); // outer R of cont at near Z
+    const double k_backConFarOuterR(149.6 * CLHEP::cm);    // outer R of cont at far Z
+    const double k_backConHflat(20.267 * CLHEP::cm);       // Zlength of "flat" outer radius
+    const double k_forwConNearOuterR(120.04 * CLHEP::cm);  // outer R of cont at near Z
+    const double k_forwConFarOuterR(141.5  * CLHEP::cm);   // outer R of cont at far Z
+    const double k_forwConHflat(10.72 * CLHEP::cm);        // Zlength of "flat" outer radius
+    const double k_endConNearThick(0.3   * CLHEP::cm);     // thickness of front of con
+    const double k_endConFarThick(0.1   * CLHEP::cm);      // thickness of back of con
+    const double k_endConFinThick(0.05  * CLHEP::cm);      // ec's phi fin thickness
+//const double k_endConMetThick   (  1.34  *CLHEP::cm ) ; // ec's metal fitting thickness
 
-//  const double k_barCryPhiAng  (  2.500*deg ) ; // crystal azimuthal width
-//  const double k_barPhiTiltAng (  1.250*deg ) ; // crystal tilt in phi
-    const double k_barBackAng(52.902 * deg) ;     // theta at container back
-    const double k_barForwAng(32.987 * deg) ;     // theta at container front
+//  const double k_barCryPhiAng  (  2.500*CLHEP::deg ) ; // crystal azimuthal width
+//  const double k_barPhiTiltAng (  1.250*CLHEP::deg ) ; // crystal tilt in phi
+    const double k_barBackAng(52.902 * CLHEP::deg) ;     // theta at container back
+    const double k_barForwAng(32.987 * CLHEP::deg) ;     // theta at container front
 
     const double k_barBackSin(sin(k_barBackAng)) ;
     const double k_barBackCos(cos(k_barBackAng)) ;
@@ -148,8 +148,8 @@ namespace Belle2 {
 
     const double k_barCryInnerR(k_barConInnerR + k_barConInnerThick) ;
 
-    const double k_barCryH(32.0 * cm) ;  // rough
-    const double k_barCryMargin(.8 * cm) ;  // rough, work
+    const double k_barCryH(32.0 * CLHEP::cm) ;  // rough
+    const double k_barCryMargin(.8 * CLHEP::cm) ;  // rough, work
     const double k_barCryOuterQ(k_barCryInnerR + k_barCryH) ;
 
 
@@ -192,49 +192,49 @@ namespace Belle2 {
 
 
 
-    const double k_c1z3(k_barSupForwFarZ + 31.*cm);
-    const double k_c1z2(k_c1z3 - 1.*cm);
-    const double k_c1z1(k_c1z3 - 75.*cm);
-    const double k_c1r1(167.0 * cm);
-    const double k_c1r2(k_c1r1 + 2.0 * cm);
-    const double k_c1r3(k_c1r1 + 32.0 * cm);
+    const double k_c1z3(k_barSupForwFarZ + 31.*CLHEP::cm);
+    const double k_c1z2(k_c1z3 - 1.*CLHEP::cm);
+    const double k_c1z1(k_c1z3 - 75.*CLHEP::cm);
+    const double k_c1r1(167.0 * CLHEP::cm);
+    const double k_c1r2(k_c1r1 + 2.0 * CLHEP::cm);
+    const double k_c1r3(k_c1r1 + 32.0 * CLHEP::cm);
 
-    const double k_c2z1(k_c1z3 - 444.0 * cm);
-    const double k_c2z2(k_c2z1 + 1.0 * cm);
-    const double k_c2z3(k_c2z1 + 75.*cm);
+    const double k_c2z1(k_c1z3 - 444.0 * CLHEP::cm);
+    const double k_c2z2(k_c2z1 + 1.0 * CLHEP::cm);
+    const double k_c2z3(k_c2z1 + 75.*CLHEP::cm);
     const double k_c2r1(k_c1r1);
     const double k_c2r2(k_c1r2);
     const double k_c2r3(k_c1r3);
 
     const double k_l1z1(k_barSupForwFarZ);
-    const double k_l1z2(k_l1z1 + 3.5 * cm);
-    const double k_l1z3(k_l1z1 + 10.0 * cm);
-    const double k_l1r4(k_c1r1 - 0.2 * cm);
-    const double k_l1r3(k_l1r4 - 3.5 * cm);
-    const double k_l1r1(k_l1r4 - 15.8 * cm);
-    const double k_l1r2(k_l1r1 + 2.45 * cm);
-    const double k_l1ang(6.3 * cm / ((k_l1r1 + k_l1r4) / 2.0));
+    const double k_l1z2(k_l1z1 + 3.5 * CLHEP::cm);
+    const double k_l1z3(k_l1z1 + 10.0 * CLHEP::cm);
+    const double k_l1r4(k_c1r1 - 0.2 * CLHEP::cm);
+    const double k_l1r3(k_l1r4 - 3.5 * CLHEP::cm);
+    const double k_l1r1(k_l1r4 - 15.8 * CLHEP::cm);
+    const double k_l1r2(k_l1r1 + 2.45 * CLHEP::cm);
+    const double k_l1ang(6.3 * CLHEP::cm / ((k_l1r1 + k_l1r4) / 2.0));
 
     const double k_l2z3(k_barSupBackFarZ);
-    const double k_l2z2(k_l2z3 - 3.5 * cm);
-    const double k_l2z1(k_l2z3 - 12.0 * cm);
+    const double k_l2z2(k_l2z3 - 3.5 * CLHEP::cm);
+    const double k_l2z1(k_l2z3 - 12.0 * CLHEP::cm);
     const double k_l2r3(k_l1r4);
-    const double k_l2r2(k_l2r3 - 3.5 * cm);
-    const double k_l2r1(k_l2r3 - 11.8 * cm);
-    const double k_l2ang(9.0 * cm / ((k_l2r1 + k_l2r3) / 2.0));
+    const double k_l2r2(k_l2r3 - 3.5 * CLHEP::cm);
+    const double k_l2r1(k_l2r3 - 11.8 * CLHEP::cm);
+    const double k_l2ang(9.0 * CLHEP::cm / ((k_l2r1 + k_l2r3) / 2.0));
 
     // add foil thickness //
-    const double foilthickness = 0.0100 * cm; // crystal wrapping foil 100 um
+    const double foilthickness = 0.0100 * CLHEP::cm; // crystal wrapping foil 100 um
     const double thinfoilthickness = foilthickness * 0.8; // thin crystal wrapping foil 80 um
     const double thinpentafoilthickness = foilthickness * 0.2; // pentagon crystal foil
-    const double brthetafinthickness = 0.0500 * cm; // barrel theta fin 500 um
-    const double brphifinthickness = 0.0500 * cm; // barrel phi fin 500 um
+    const double brthetafinthickness = 0.0500 * CLHEP::cm; // barrel theta fin 500 um
+    const double brphifinthickness = 0.0500 * CLHEP::cm; // barrel phi fin 500 um
     const double avoidov = 1 + 1E-6; // foil inside is a little bit lager than crystal to avoid overlap
     ///////////////////////
 
     GeoECLCreator::GeoECLCreator(): isBeamBkgStudy(0)
     {
-      m_sensitive = new SensitiveDetector("SensitiveDetector", (2 * 24)*eV, 10 * MeV);
+      m_sensitive = new SensitiveDetector("SensitiveDetector", (2 * 24)*CLHEP::eV, 10 * CLHEP::MeV);
       logical_ecl = 0;
       physical_ecl = 0;
       physical_ECLBarrelCylinder = 0;
@@ -284,10 +284,10 @@ namespace Belle2 {
 
 //for outer support
       eclWorld_Z[0] = k_c2z1 + k_CLR; // reverse clearance
-      eclWorld_I[0] = k_l2r3 - 36.0 * cm  - k_CLR;
+      eclWorld_I[0] = k_l2r3 - 36.0 * CLHEP::cm  - k_CLR;
       eclWorld_O[0] = k_l2r3 + k_CLR;
       eclWorld_Z[1] = k_backConFarZ - k_CLR;
-      eclWorld_I[1] = k_l2r3 - 36.0 * cm  - k_CLR;
+      eclWorld_I[1] = k_l2r3 - 36.0 * CLHEP::cm  - k_CLR;
       eclWorld_O[1] = k_l2r3 + k_CLR;
 //45
       eclWorld_Z[2] = k_backConFarZ - k_CLR;
@@ -313,16 +313,16 @@ namespace Belle2 {
       eclWorld_O[7] = k_l2r3 + k_CLR ;
 //for outer support
       eclWorld_Z[8] = k_forwConFarZ + k_CLR;
-      eclWorld_I[8] = k_l2r3  - 42.0 * cm - k_CLR;
+      eclWorld_I[8] = k_l2r3  - 42.0 * CLHEP::cm - k_CLR;
       eclWorld_O[8] = k_l2r3 + k_CLR;
-      eclWorld_Z[9] = k_forwConFarZ + 6.0 * cm + k_CLR;
-      eclWorld_I[9] = k_l2r3  - 42.0 * cm - k_CLR;
+      eclWorld_Z[9] = k_forwConFarZ + 6.0 * CLHEP::cm + k_CLR;
+      eclWorld_I[9] = k_l2r3  - 42.0 * CLHEP::cm - k_CLR;
       eclWorld_O[9] = k_l2r3 + k_CLR;
-      eclWorld_Z[10] = k_forwConFarZ + 6.0 * cm + k_CLR;
-      eclWorld_I[10] = k_l2r3  - 42.0 * cm + 3.0 * cm - k_CLR;
+      eclWorld_Z[10] = k_forwConFarZ + 6.0 * CLHEP::cm + k_CLR;
+      eclWorld_I[10] = k_l2r3  - 42.0 * CLHEP::cm + 3.0 * CLHEP::cm - k_CLR;
       eclWorld_O[10] = k_l2r3 + k_CLR;
       eclWorld_Z[11] = k_c1z3 - k_CLR; // reverse clearance
-      eclWorld_I[11] = k_l2r3  - 42.0 * cm + 3.0 * cm - k_CLR;
+      eclWorld_I[11] = k_l2r3  - 42.0 * CLHEP::cm + 3.0 * CLHEP::cm - k_CLR;
       eclWorld_O[11] = k_l2r3 + k_CLR;
 
 
@@ -332,9 +332,9 @@ namespace Belle2 {
       logical_ecl = new G4LogicalVolume(eclWorld, medAir, "logical_ecl");
       physical_ecl = new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), logical_ecl, "physicalECL", &topVolume, false, 0);
 
-      double DiodeWidth = content.getLength("k_diodewidth") * cm;
-      double DiodeLength = content.getLength("k_diodelength") * cm;
-      double DiodeHeight = content.getLength("k_diodeheight") * cm;
+      double DiodeWidth = content.getLength("k_diodewidth") * CLHEP::cm;
+      double DiodeLength = content.getLength("k_diodelength") * CLHEP::cm;
+      double DiodeHeight = content.getLength("k_diodeheight") * CLHEP::cm;
 
       G4Box* SensorDiode = new G4Box("diode", DiodeWidth / 2, DiodeLength / 2, DiodeHeight / 2);
 
@@ -356,29 +356,29 @@ namespace Belle2 {
       double zsign = 1.;
 
       // add barrel fin parameters and previous crystal parameters/////////
-      double brfink_BLL = 30 * cm;
-      double brfink_Ba = 5.387 * cm;
-      double brfink_Bb = 5.5868 * cm;
-      double brfink_BA = 6.0997 * cm;
-      double brfink_Bh = 5.4504 * cm;
-      double brfink_z_TILTED = 33.667039 * deg;
-      double brfink_phi_TILTED = 1.149806 * deg;
-      double brfink_perpC = 136.08246 * cm;
-      double brfink_phiC = 1.344548 * cm;
-      double brfink_zC = 210.1509 * cm;
-      double brfink_phi_init = 0.0094779 * deg; // add correction
+      double brfink_BLL = 30 * CLHEP::cm;
+      double brfink_Ba = 5.387 * CLHEP::cm;
+      double brfink_Bb = 5.5868 * CLHEP::cm;
+      double brfink_BA = 6.0997 * CLHEP::cm;
+      double brfink_Bh = 5.4504 * CLHEP::cm;
+      double brfink_z_TILTED = 33.667039 * CLHEP::deg;
+      double brfink_phi_TILTED = 1.149806 * CLHEP::deg;
+      double brfink_perpC = 136.08246 * CLHEP::cm;
+      double brfink_phiC = 1.344548 * CLHEP::cm;
+      double brfink_zC = 210.1509 * CLHEP::cm;
+      double brfink_phi_init = 0.0094779 * CLHEP::deg; // add correction
 
 
-      double  prevk_Ba = 5.387 * cm;
-      double  prevk_BA =  6.0997 * cm;
-      double  prevk_Bh =  5.4504 * cm;
-      double  prevk_BH = 6.0997 * cm;;
-      double  prevk_z_TILTED =  33.667039 * deg;
-      double  prevk_phi_TILTED = 1.149806 * deg;
-      double  prevk_perpC = 136.08246 * cm;
-      double  prevk_phiC = 1.344548 * cm;
-      double  prevk_zC = 210.1509 * cm; ;
-      double  prevk_phi_init =  0.0094779 * deg ;
+      double  prevk_Ba = 5.387 * CLHEP::cm;
+      double  prevk_BA =  6.0997 * CLHEP::cm;
+      double  prevk_Bh =  5.4504 * CLHEP::cm;
+      double  prevk_BH = 6.0997 * CLHEP::cm;;
+      double  prevk_z_TILTED =  33.667039 * CLHEP::deg;
+      double  prevk_phi_TILTED = 1.149806 * CLHEP::deg;
+      double  prevk_perpC = 136.08246 * CLHEP::cm;
+      double  prevk_phiC = 1.344548 * CLHEP::cm;
+      double  prevk_zC = 210.1509 * CLHEP::cm; ;
+      double  prevk_phi_init =  0.0094779 * CLHEP::deg ;
       //////////////////////////////////////////////////////////////////////
 
 
@@ -402,17 +402,17 @@ namespace Belle2 {
           layerContent.append((format("/BarrelCrystals/BarrelCrystal[%1%]/") % (iBrCry)).str());
 
 
-          double k_BLL = layerContent.getLength("K_BLL") * cm;
-          double k_Ba = layerContent.getLength("K_Ba")   * cm;
-          double k_Bb = layerContent.getLength("K_Bb")   * cm;
-          double k_Bh = layerContent.getLength("K_Bh")   * cm;
-          double k_BA = layerContent.getLength("K_BA")   * cm;
-          double k_BH = layerContent.getLength("K_BH")   * cm;
+          double k_BLL = layerContent.getLength("K_BLL") * CLHEP::cm;
+          double k_Ba = layerContent.getLength("K_Ba")   * CLHEP::cm;
+          double k_Bb = layerContent.getLength("K_Bb")   * CLHEP::cm;
+          double k_Bh = layerContent.getLength("K_Bh")   * CLHEP::cm;
+          double k_BA = layerContent.getLength("K_BA")   * CLHEP::cm;
+          double k_BH = layerContent.getLength("K_BH")   * CLHEP::cm;
           double k_z_TILTED = layerContent.getAngle("K_z_TILTED") ;
           double k_phi_TILTED = layerContent.getAngle("K_phi_TILTED") ;
-          double k_perpC = layerContent.getLength("K_perpC") * cm ;
+          double k_perpC = layerContent.getLength("K_perpC") * CLHEP::cm ;
           double k_phiC = layerContent.getAngle("K_phiC") ;
-          double k_zC = layerContent.getLength("K_zC") * cm;
+          double k_zC = layerContent.getLength("K_zC") * CLHEP::cm;
           double k_phi_init = layerContent.getAngle("K_phi_init") ; // add correction
 
 
@@ -447,7 +447,7 @@ namespace Belle2 {
           ///////////////////////////////////////////////
 
           if (iBrCry >= 30) {zsign = -1;}
-          G4Transform3D r00 = G4RotateZ3D(90.*zsign * deg);
+          G4Transform3D r00 = G4RotateZ3D(90.*zsign * CLHEP::deg);
           G4Transform3D phi_init = G4RotateZ3D(k_phi_init);
           G4Transform3D tilt_z = G4RotateY3D(k_z_TILTED);
           G4Transform3D tilt_phi = G4RotateZ3D(k_phi_TILTED);
@@ -539,7 +539,7 @@ namespace Belle2 {
 
 
             if (iBrCry >= 30) {zsign = -1;}
-            G4Transform3D r00 = G4RotateZ3D(90.*zsign * deg);
+            G4Transform3D r00 = G4RotateZ3D(90.*zsign * CLHEP::deg);
             G4Transform3D phi_init = G4RotateZ3D(brfink_phi_init);
             G4Transform3D tilt_z = G4RotateY3D(brfink_z_TILTED);
             G4Transform3D tilt_phi = G4RotateZ3D(brfink_phi_TILTED);
@@ -562,8 +562,8 @@ namespace Belle2 {
 
           if (isBeamBkgStudy) {
             for (int iSector = 0; iSector < 72; ++iSector) {//total 72 for Bareel Diode
-              G4Transform3D SectorRot = G4RotateZ3D(360.*iSector / 72 * deg);
-              G4Transform3D SectorRRot = G4RotateZ3D((360.*iSector / 72 - 2.488555) * deg); // replace the 2.494688
+              G4Transform3D SectorRot = G4RotateZ3D(360.*iSector / 72 * CLHEP::deg);
+              G4Transform3D SectorRRot = G4RotateZ3D((360.*iSector / 72 - 2.488555) * CLHEP::deg); // replace the 2.494688
               G4Transform3D BrR = SectorRot * TrD;
               G4Transform3D BrRR = SectorRRot * TrD;
               int DiodeId = (iBrCry - 1) * 144 + iSector * 2 + 1152;
@@ -590,11 +590,11 @@ namespace Belle2 {
       // add barrel phi fin ///////////////////////////////////////////////////////////////////////////////
 
 
-      double brforwangle = 33.003 * deg; // same as Belle I
-      double brbackangle = 52.879 * deg;
+      double brforwangle = 33.003 * CLHEP::deg; // same as Belle I
+      double brbackangle = 52.879 * CLHEP::deg;
 
-      double brphifina = 298.14 * cm / 2; // shorter base
-      double brphifinL = 19.49 * cm / 2; // height
+      double brphifina = 298.14 * CLHEP::cm / 2; // shorter base
+      double brphifinL = 19.49 * CLHEP::cm / 2; // height
 
       double f_xForw = brphifinL / tan(brforwangle);
       double f_xBack = brphifinL / tan(brbackangle);
@@ -604,30 +604,30 @@ namespace Belle2 {
       double brphifinh = brphifinthickness / 2; // thickness
       double brphifintheta = atan(f_dx / brphifinL);
 
-      double brphifin_shorterbaseleft = 100.08 * cm;
-      double cposix = 140.594699 * cm;
-      double cposiy = 6.478866 * cm;
-      double brphitiltphi = 3.7579644 * deg;
-      double brphirmoveout = - 3.50 * cm;
-      double brphizmove =  - 0.0 * cm;
-      double brphimoveperp =   0.0 * cm;
+      double brphifin_shorterbaseleft = 100.08 * CLHEP::cm;
+      double cposix = 140.594699 * CLHEP::cm;
+      double cposiy = 6.478866 * CLHEP::cm;
+      double brphitiltphi = 3.7579644 * CLHEP::deg;
+      double brphirmoveout = - 3.50 * CLHEP::cm;
+      double brphizmove =  - 0.0 * CLHEP::cm;
+      double brphimoveperp =   0.0 * CLHEP::cm;
 
-      G4Transform3D r00 = G4RotateY3D(-90. * deg);
+      G4Transform3D r00 = G4RotateY3D(-90. * CLHEP::deg);
       G4Transform3D tilt_z = G4RotateY3D(0.);
       G4Transform3D central = G4Translate3D(0, 0, (brphifina - brphifin_shorterbaseleft + f_dx));
-      G4Transform3D tilt_psi = G4RotateX3D(0E-6 * deg);
+      G4Transform3D tilt_psi = G4RotateX3D(0E-6 * CLHEP::deg);
       G4Transform3D tilt_phi = G4RotateZ3D(brphitiltphi);
       G4Transform3D cposition = G4Translate3D(cposix + brphirmoveout * cos(brphitiltphi) - brphimoveperp * sin(brphitiltphi), cposiy + brphirmoveout * sin(brphitiltphi) + brphimoveperp * cos(brphitiltphi), brphizmove);
-      //G4Transform3D pos_phi = G4RotateZ3D(brphifin_centercrysphiC + (2.5114444*deg/2) );
+      //G4Transform3D pos_phi = G4RotateZ3D(brphifin_centercrysphiC + (2.5114444*CLHEP::deg/2) );
       //G4Transform3D Tr =  cposition * tilt_phi * tilt_psi * central * tilt_z * r00;
       G4Transform3D Tr =  cposition * tilt_phi * tilt_psi * central * tilt_z * r00;
 
       G4Trap* BrPhiFinShape1 = new G4Trap(format("solidEclBrPhiFinShape1").str().c_str(),
-                                          brphifinL, brphifintheta, 180. * deg,
+                                          brphifinL, brphifintheta, 180. * CLHEP::deg,
                                           brphifinh, brphifinA, brphifinA, 0.,
                                           brphifinh, brphifina, brphifina, 0.);
 
-      double brphifinL2 = 9.46 * cm / 2; // height
+      double brphifinL2 = 9.46 * CLHEP::cm / 2; // height
       double f_xForw2 = 0.;
       double f_xBack2 = brphifinL2 / tan(brbackangle);
       double f_dx2 = (f_xForw2 - f_xBack2) / 2;
@@ -635,15 +635,15 @@ namespace Belle2 {
       double brphifintheta2 = atan(f_dx2 / brphifinL2);
 
       G4Trap* BrPhiFinShape2 = new G4Trap(format("solidEclBrPhiFinShape2").str().c_str(),
-                                          brphifinL2, brphifintheta2, 180. * deg,
+                                          brphifinL2, brphifintheta2, 180. * CLHEP::deg,
                                           brphifinh, brphifinA2, brphifinA2, 0.,
                                           brphifinh, brphifinA, brphifinA, 0.);
 
 
-      double brphifinL3 = 2.94 * cm / 2; // height
+      double brphifinL3 = 2.94 * CLHEP::cm / 2; // height
 
       G4Trap* BrPhiFinShape3 = new G4Trap(format("solidEclBrPhiFinShape3").str().c_str(),
-                                          brphifinL3, 0, 180. * deg,
+                                          brphifinL3, 0, 180. * CLHEP::deg,
                                           brphifinh, brphifinA2, brphifinA2, 0.,
                                           brphifinh, brphifinA2, brphifinA2, 0.);
 
@@ -681,21 +681,21 @@ namespace Belle2 {
         GearDir counter(content);
         counter.append((format("/EndCapCrystals/EndCapCrystal[%1%]/") % (iCry)).str());
 
-        h1 = counter.getLength("K_h1") * cm;
-        h2 = counter.getLength("K_h2") * cm;
-        bl1 = counter.getLength("K_bl1") * cm;
-        bl2 = counter.getLength("K_bl2") * cm;
-        tl1 = counter.getLength("K_tl1") * cm;
-        tl2 = counter.getLength("K_tl2") * cm;
+        h1 = counter.getLength("K_h1") * CLHEP::cm;
+        h2 = counter.getLength("K_h2") * CLHEP::cm;
+        bl1 = counter.getLength("K_bl1") * CLHEP::cm;
+        bl2 = counter.getLength("K_bl2") * CLHEP::cm;
+        tl1 = counter.getLength("K_tl1") * CLHEP::cm;
+        tl2 = counter.getLength("K_tl2") * CLHEP::cm;
         alpha1 = counter.getAngle("K_alpha1");
         alpha2 = counter.getAngle("K_alpha2");
         Rphi1 = counter.getAngle("K_Rphi1") ;
         Rtheta = counter.getAngle("K_Rtheta") ;
         Rphi2 = counter.getAngle("K_Rphi2")  ;
-        Pr = counter.getLength("K_Pr") * cm;
+        Pr = counter.getLength("K_Pr") * CLHEP::cm;
         Ptheta = counter.getAngle("K_Ptheta") ;
         Pphi = counter.getAngle("K_Pphi") ;
-        halflength = 15.0 * cm;
+        halflength = 15.0 * CLHEP::cm;
 
         double fwfoilthickness;
         if (iCry == 5) {
@@ -730,8 +730,8 @@ namespace Belle2 {
 
         if (iCry == 5) { // Pentagon!!
 
-          double smalls = 1E-6 * cm; // small size (near zero) of the tip
-          double trih1 = 0.166375 * cm; // from Belle I code
+          double smalls = 1E-6 * CLHEP::cm; // small size (near zero) of the tip
+          double trih1 = 0.166375 * CLHEP::cm; // from Belle I code
           double tritl1 = smalls;
           double trih2 = (bl2 - smalls) * trih1 / (bl1 - tritl1);
           double tribl1 = bl1;
@@ -742,7 +742,7 @@ namespace Belle2 {
           G4Transform3D Tr = position * m3 * m2 * m1;
 
           G4Trap* FwCrysralShapeTrap = new G4Trap((format("solidEclFwCrystalTrap_%1%") % iCry).str().c_str(), halflength , 0 , 0, h1 , bl1, tl1 , alpha1 , h2 , bl2, tl2, alpha2);
-          G4Trap* FwCrysralShapeTrigon = new G4Trap((format("solidEclFwCrystalTrigon_%1%") % iCry).str().c_str(), halflength , tritheta, 90.*deg , trih1 , tritl1, tribl1 , alpha1 , trih2 , tritl2, tribl2, alpha2);
+          G4Trap* FwCrysralShapeTrigon = new G4Trap((format("solidEclFwCrystalTrigon_%1%") % iCry).str().c_str(), halflength , tritheta, 90.*CLHEP::deg , trih1 , tritl1, tribl1 , alpha1 , trih2 , tritl2, tribl2, alpha2);
           G4Transform3D trigonposition = G4Translate3D(0 , -(h1 + h2 + trih1 + trih2 - smalls) / 2 , 0); // move trigon
           G4UnionSolid* FwCrystalShape = new G4UnionSolid((format("solidEclFwCrystal_%1%") % iCry).str().c_str(), FwCrysralShapeTrap, FwCrysralShapeTrigon, trigonposition);
           G4LogicalVolume* FwCrystal = new G4LogicalVolume(FwCrystalShape, medCsI, (format("logicalEclFwCrystal_%1%") % iCry).str().c_str(), 0, 0, 0);
@@ -764,17 +764,17 @@ namespace Belle2 {
           double cutboxangle = atan((h2 - h1) / halflength / 2); //
 
           G4Trap* FwFoilouttrap = new G4Trap((format("FwFoilouttrap_%1%") % iCry).str().c_str(), fwfoilhalflength , 0 , 0, fwfoilh1,  fwfoilbl1, fwfoiltl1, alpha1 , fwfoilh2, fwfoilbl2, fwfoiltl2, alpha2);
-          G4Box* CutBox = new G4Box("CutBox", 15.*cm, 2.*cm, 50.*cm); // to cut off foil in the attaching side
-          G4Transform3D cutboardtr1 = G4Translate3D(0, -(2.*cm / cos(cutboxangle)) - (h1 + h2) / 2 + trifoilq, 0) * G4RotateY3D(-cutboxangle);
+          G4Box* CutBox = new G4Box("CutBox", 15.*CLHEP::cm, 2.*CLHEP::cm, 50.*CLHEP::cm); // to cut off foil in the attaching side
+          G4Transform3D cutboardtr1 = G4Translate3D(0, -(2.*CLHEP::cm / cos(cutboxangle)) - (h1 + h2) / 2 + trifoilq, 0) * G4RotateY3D(-cutboxangle);
           G4SubtractionSolid* FwFoilouttrapcut = new G4SubtractionSolid((format(" FwFoilouttrapcut_%1%") % iCry).str().c_str(), FwFoilouttrap, CutBox, cutboardtr1);
-          G4Trap* FwFoilouttrigon = new G4Trap((format("FwFoilouttrigon_%1%") % iCry).str().c_str(), halflength , tritheta, 90.*deg , trifoilh1 , trifoiltl1, trifoilbl1 , alpha1 , trifoilh2 , trifoiltl2, trifoilbl2, alpha2);
+          G4Trap* FwFoilouttrigon = new G4Trap((format("FwFoilouttrigon_%1%") % iCry).str().c_str(), halflength , tritheta, 90.*CLHEP::deg , trifoilh1 , trifoiltl1, trifoilbl1 , alpha1 , trifoilh2 , trifoiltl2, trifoilbl2, alpha2);
 
-          G4Transform3D cutboardtr2 = G4Translate3D(0, (2.*cm / cos(cutboxangle)) + (trih1 + trih2) / 2 - trifoilq, 0) * G4RotateY3D(-cutboxangle);
+          G4Transform3D cutboardtr2 = G4Translate3D(0, (2.*CLHEP::cm / cos(cutboxangle)) + (trih1 + trih2) / 2 - trifoilq, 0) * G4RotateY3D(-cutboxangle);
           G4SubtractionSolid* FwFoilouttrigoncut = new G4SubtractionSolid((format(" FwFoilouttrigoncut_%1%") % iCry).str().c_str(), FwFoilouttrigon, CutBox, cutboardtr2);
           G4UnionSolid* FwFoiloutpenta = new G4UnionSolid((format("FwFoiloutpenta_%1%") % iCry).str().c_str(), FwFoilouttrapcut, FwFoilouttrigoncut, trigonposition);
 
           G4Trap* FwFoilintrap = new G4Trap((format("FwFoilintrap_%1%") % iCry).str().c_str(), halflength * avoidov , 0 , 0, h1 * avoidov , bl1 * avoidov, tl1 * avoidov , alpha1 , h2 * avoidov , bl2 * avoidov, tl2 * avoidov, alpha2);
-          G4Trap* FwFoilintrigon = new G4Trap((format("FwFoilintrigon_%1%") % iCry).str().c_str(), halflength * avoidov , tritheta, 90.*deg , trih1 * avoidov , tritl1 * avoidov, tribl1 * avoidov , alpha1 , trih2 * avoidov , tritl2 * avoidov, tribl2 * avoidov, alpha2);
+          G4Trap* FwFoilintrigon = new G4Trap((format("FwFoilintrigon_%1%") % iCry).str().c_str(), halflength * avoidov , tritheta, 90.*CLHEP::deg , trih1 * avoidov , tritl1 * avoidov, tribl1 * avoidov , alpha1 , trih2 * avoidov , tritl2 * avoidov, tribl2 * avoidov, alpha2);
           G4UnionSolid* FwFoilinpenta = new G4UnionSolid((format("FwFoilinpenta_%1%") % iCry).str().c_str(), FwFoilintrap, FwFoilintrigon, trigonposition);
 
           G4SubtractionSolid* FwFoilShape = new G4SubtractionSolid((format("FwFoil_%1%") % iCry).str().c_str(), FwFoiloutpenta, FwFoilinpenta);
@@ -822,7 +822,7 @@ namespace Belle2 {
 
         if (isBeamBkgStudy) {
           for (int iSector = 0; iSector < 16; ++iSector) {//total 16 for EndcapDiode
-            G4Transform3D SectorRot = G4RotateZ3D(360.*iSector / 16 * deg);
+            G4Transform3D SectorRot = G4RotateZ3D(360.*iSector / 16 * CLHEP::deg);
             G4Transform3D FwR = SectorRot * TrD;
             iPhi = iCry - nRing - 1;
             int DiodeId = nRing * 16 + iSector * k_forwMPerRing[iRing] + iPhi ;
@@ -848,21 +848,21 @@ namespace Belle2 {
         GearDir counter(content);
         counter.append((format("/EndCapCrystals/EndCapCrystal[%1%]/") % (iCry)).str());
 
-        h1 = counter.getLength("K_h1") * cm;
-        h2 = counter.getLength("K_h2") * cm;
-        bl1 = counter.getLength("K_bl1") * cm;
-        bl2 = counter.getLength("K_bl2") * cm;
-        tl1 = counter.getLength("K_tl1") * cm;
-        tl2 = counter.getLength("K_tl2") * cm;
+        h1 = counter.getLength("K_h1") * CLHEP::cm;
+        h2 = counter.getLength("K_h2") * CLHEP::cm;
+        bl1 = counter.getLength("K_bl1") * CLHEP::cm;
+        bl2 = counter.getLength("K_bl2") * CLHEP::cm;
+        tl1 = counter.getLength("K_tl1") * CLHEP::cm;
+        tl2 = counter.getLength("K_tl2") * CLHEP::cm;
         alpha1 = counter.getAngle("K_alpha1");
         alpha2 = counter.getAngle("K_alpha2");
         Rphi1 = counter.getAngle("K_Rphi1") ;
         Rtheta = counter.getAngle("K_Rtheta") ;
         Rphi2 = counter.getAngle("K_Rphi2")  ;
-        Pr = counter.getLength("K_Pr") * cm;
+        Pr = counter.getLength("K_Pr") * CLHEP::cm;
         Ptheta = counter.getAngle("K_Ptheta") ;
         Pphi = counter.getAngle("K_Pphi") ;
-        halflength = 15.0 * cm;
+        halflength = 15.0 * CLHEP::cm;
 
         double bwfoilthickness;
         if ((iCry == 110 || iCry == 113 || iCry == 116 || iCry == 119) || (121 <= iCry && iCry <= 128)) {
@@ -924,7 +924,7 @@ namespace Belle2 {
 
         if (isBeamBkgStudy) {
           for (int iSector = 0; iSector < 16; ++iSector) {//total 16 for EndcapDiode
-            G4Transform3D SectorRot = G4RotateZ3D(360.*iSector / 16 * deg);
+            G4Transform3D SectorRot = G4RotateZ3D(360.*iSector / 16 * CLHEP::deg);
             G4Transform3D BwR = SectorRot * TrD;
             iPhi = (iCry - 72) - nRing - 1;
             int DiodeId = nRing * 16 + iSector * k_backMPerRing[iRing] + iPhi + 7776 ;
@@ -941,13 +941,13 @@ namespace Belle2 {
 
 
       for (int iSector = 0; iSector < 16; ++iSector) {//total 16
-        G4Transform3D BrR = G4RotateZ3D(360.*iSector / 16 * deg);
+        G4Transform3D BrR = G4RotateZ3D(360.*iSector / 16 * CLHEP::deg);
         assemblyFwCrystals->MakeImprint(logical_ecl, BrR);
         assemblyFwFoils->MakeImprint(logical_ecl, BrR);  // foil
       }//16 sectior
       for (int iSector = 0; iSector < 72; ++iSector) {//total 72
-        G4Transform3D BrR = G4RotateZ3D(360.*iSector / 72 * deg);
-        G4Transform3D BrRR = G4RotateZ3D((360.*iSector / 72 - 2.488555) * deg); // replace 2.494688
+        G4Transform3D BrR = G4RotateZ3D(360.*iSector / 72 * CLHEP::deg);
+        G4Transform3D BrRR = G4RotateZ3D((360.*iSector / 72 - 2.488555) * CLHEP::deg); // replace 2.494688
         assemblyBrCrystals->MakeImprint(logical_ecl, BrRR);
         assemblyBrCrystals->MakeImprint(logical_ecl, BrR);
         assemblyBrFoils->MakeImprint(logical_ecl, BrRR);  // foil
@@ -957,7 +957,7 @@ namespace Belle2 {
         assemblyBrPhiFins->MakeImprint(logical_ecl, BrR);  // phi fin
       }//iSector
       for (int iSector = 0; iSector < 16; ++iSector) {//total 16
-        G4Transform3D BrR = G4RotateZ3D(360.*iSector / 16 * deg);
+        G4Transform3D BrR = G4RotateZ3D(360.*iSector / 16 * CLHEP::deg);
         assemblyBwCrystals->MakeImprint(logical_ecl, BrR);
         assemblyBwFoils->MakeImprint(logical_ecl, BrR);  // foil
       }//16 sectior
@@ -984,7 +984,7 @@ namespace Belle2 {
       double BarrelCylinder1Rout[4] = {k_c1r2, k_c1r2, k_c1r3, k_c1r3};
 
       G4Polycone* barCy1 =
-        new G4Polycone("ECL Barrel Support Cylinder", 0 * deg, 360.*deg, 4, BarrelCylinder1Z, BarrelCylinder1Rin, BarrelCylinder1Rout);
+        new G4Polycone("ECL Barrel Support Cylinder", 0 * CLHEP::deg, 360.*CLHEP::deg, 4, BarrelCylinder1Z, BarrelCylinder1Rin, BarrelCylinder1Rout);
 
 
       double BarrelCylinder2Z[4] = {k_c2z1, k_c2z2, k_c2z2, k_c2z3};
@@ -992,7 +992,7 @@ namespace Belle2 {
       double BarrelCylinder2Rout[4] = {k_c2r3, k_c2r3, k_c2r2, k_c1r2};
 
       G4Polycone* barCy2 =
-        new G4Polycone("ECL Barrel Support Cylinder", 0 * deg, 360.*deg, 4, BarrelCylinder2Z, BarrelCylinder2Rin, BarrelCylinder2Rout);
+        new G4Polycone("ECL Barrel Support Cylinder", 0 * CLHEP::deg, 360.*CLHEP::deg, 4, BarrelCylinder2Z, BarrelCylinder2Rin, BarrelCylinder2Rout);
 
       G4LogicalVolume* barCy1_logi = new G4LogicalVolume(barCy1, Materials::get("G4_Fe"), "ECLBarrelSupportCylinder1", 0, 0, 0);
       G4LogicalVolume* barCy2_logi = new G4LogicalVolume(barCy2, Materials::get("G4_Fe"), "ECLBarrelSupportCylinder2", 0, 0, 0);
@@ -1016,13 +1016,13 @@ namespace Belle2 {
 //////makeBarrelSuppor/////
 ///////////////////////////
       G4AssemblyVolume* assemblyInnerBarrelSupport = new G4AssemblyVolume();
-      const EclRad InnerBarreloffset = (2.796 - 2.5) * deg;
+      const EclRad InnerBarreloffset = (2.796 - 2.5) * CLHEP::deg;
       const int InnerBarrelnSectors = 144 / 2;
       const EclRad InnerBarreldPhi = 2 * PI / InnerBarrelnSectors;
 
-      const EclCM InnerBarrelw1 = 5.05 / 2 * cm;
+      const EclCM InnerBarrelw1 = 5.05 / 2 * CLHEP::cm;
 //   const EclCM h1 = 2.5;
-      const EclCM InnerBarrelh1 = (2.5 + 0.3) * cm; // additional pusher
+      const EclCM InnerBarrelh1 = (2.5 + 0.3) * CLHEP::cm; // additional pusher
       const EclCM InnerBarrelz11 = k_barCryBackZOut;
       const EclCM InnerBarrelz12 = k_barCryForwZOut;
 //   const EclCM InnerBarrelt1 = InnerBarrelz12 - InnerBarrelz11;
@@ -1052,11 +1052,11 @@ namespace Belle2 {
       G4LogicalVolume* InnerBarrel1_logi = new G4LogicalVolume(InnerBarrel1, Materials::get("G4_Fe"), "ECLInnerBarrel1st", 0, 0, 0);
 
 
-      const EclCM InnerBarrelh2 = 1.6 * cm;
-      const EclCM InnerBarrelz21 = k_barSupBackFarZ + 13.5 * cm;
-      const EclCM InnerBarrelz22 = k_barSupForwFarZ - 12.0 * cm;
+      const EclCM InnerBarrelh2 = 1.6 * CLHEP::cm;
+      const EclCM InnerBarrelz21 = k_barSupBackFarZ + 13.5 * CLHEP::cm;
+      const EclCM InnerBarrelz22 = k_barSupForwFarZ - 12.0 * CLHEP::cm;
 //   const EclCM InnerBarrelt2 = InnerBarrelz12 - InnerBarrelz11;
-      const EclCM InnerBarrelro2 = k_barCryOuterR - 0.21 * cm;
+      const EclCM InnerBarrelro2 = k_barCryOuterR - 0.21 * CLHEP::cm;
       const EclCM InnerBarrelri2 = InnerBarrelro2 - InnerBarrelh2;
       const EclRad InnerBarreldp2 = InnerBarreldPhi - InnerBarreldp1 * 2;
 //   const TripletF mPar2[]={ // PolyCONe parameters
@@ -1082,11 +1082,11 @@ namespace Belle2 {
         new G4Polycone("ECL Inner Barrel 2nd piece", 0, InnerBarreldp2 , 2, InnerBarrel2Z, InnerBarrel2Rin, InnerBarrel2Rout);
       G4LogicalVolume* InnerBarrel2_logi = new G4LogicalVolume(InnerBarrel2, Materials::get("G4_Fe"), "ECLInnerBarrel2nd", 0, 0, 0);
 
-      const EclCM InnerBarrelgap4 = (0.1) * cm;
-      const EclCM InnerBarrelw4 = 0.3 * cm;
+      const EclCM InnerBarrelgap4 = (0.1) * CLHEP::cm;
+      const EclCM InnerBarrelw4 = 0.3 * CLHEP::cm;
       const EclCM InnerBarrelh4 = (InnerBarrelri1 - k_barCryOuterQ) - k_barCryMargin - InnerBarrelgap4;
-      const EclCM InnerBarrelz41 = k_barSupBackFarZ + 10.5 * cm + 1.8 * cm;
-      const EclCM InnerBarrelz42 = k_barSupForwFarZ - 9.0 * cm - 1.0 * cm;
+      const EclCM InnerBarrelz41 = k_barSupBackFarZ + 10.5 * CLHEP::cm + 1.8 * CLHEP::cm;
+      const EclCM InnerBarrelz42 = k_barSupForwFarZ - 9.0 * CLHEP::cm - 1.0 * CLHEP::cm;
 //   const EclCM InnerBarrelt4 = InnerBarrelz42 - InnerBarrelz41;
       const EclCM InnerBarrelro4 = InnerBarrelri1;
       const EclCM InnerBarrelri4 = InnerBarrelro4 - InnerBarrelh4;
@@ -1114,13 +1114,13 @@ namespace Belle2 {
       G4LogicalVolume* InnerBarrel4_logi = new G4LogicalVolume(InnerBarrel4, Materials::get("G4_Fe"), "ECLInnerBarrel4th", 0, 0, 0);
 
 
-      const EclCM InnerBarrelt5 = 0.05 * cm;
-      const EclCM InnerBarrell5 = (5.0 + 329.0) * cm;
+      const EclCM InnerBarrelt5 = 0.05 * CLHEP::cm;
+      const EclCM InnerBarrell5 = (5.0 + 329.0) * CLHEP::cm;
       const EclCM InnerBarrelz51 = InnerBarrelz11;
       const EclCM InnerBarrelz52 = InnerBarrelz51 + InnerBarrell5;
-      const EclCM InnerBarrelr52 = 1.2 / 2 * cm;
+      const EclCM InnerBarrelr52 = 1.2 / 2 * CLHEP::cm;
       const EclCM InnerBarrelr51 = InnerBarrelr52 - InnerBarrelt5;
-      EclCM InnerBarrelr5 = InnerBarrelro1 - 1.25 * cm - 1.58 * cm;
+      EclCM InnerBarrelr5 = InnerBarrelro1 - 1.25 * CLHEP::cm - 1.58 * CLHEP::cm;
       const EclRad InnerBarreldp5 = atan2(InnerBarrelr52, InnerBarrelr5);
       InnerBarrelr5 = sqrt(InnerBarrelr5 * InnerBarrelr5 + InnerBarrelr52 * InnerBarrelr52);
 //   const TripletF mPar5[]={ // PolyCONe parameters
@@ -1145,7 +1145,7 @@ namespace Belle2 {
       double InnerBarrel5Rout[2] = {InnerBarrelr52, InnerBarrelr52};
 
       G4Polycone* InnerBarrel5 =
-        new G4Polycone("ECL Inner Barrel 5th piece", 0 * deg, 360.*deg , 2, InnerBarrel5Z, InnerBarrel5Rin, InnerBarrel5Rout);
+        new G4Polycone("ECL Inner Barrel 5th piece", 0 * CLHEP::deg, 360.*CLHEP::deg , 2, InnerBarrel5Z, InnerBarrel5Rin, InnerBarrel5Rout);
       G4LogicalVolume* InnerBarrel5_logi = new G4LogicalVolume(InnerBarrel5, Materials::get("G4_Fe") , "ECLInnerBarrel5th", 0, 0, 0);
 
 
@@ -1219,7 +1219,7 @@ namespace Belle2 {
       };
 
       G4Polycone* barInnerSupport =
-        new G4Polycone("ECL Barrel Inner Support", 0 * deg, 360.*deg, 12, BarrelInnerSupport1Z, BarrelInnerSupportRin, BarrelInnerSupportRout);
+        new G4Polycone("ECL Barrel Inner Support", 0 * CLHEP::deg, 360.*CLHEP::deg, 12, BarrelInnerSupport1Z, BarrelInnerSupportRin, BarrelInnerSupportRout);
 
       // -------------------- Start Barrel Outer Skin Spec ---------------------
 //  const TripletF osParA[]={  // PCON parameters
@@ -1242,7 +1242,7 @@ namespace Belle2 {
 
 
       G4Polycone* barOuterSkin =
-        new G4Polycone("ECL Barrel Outer Skin", 0 * deg, 360.*deg, 6, BarrelOuterSkinZ, BarrelOuterSkinRin, BarrelOuterSkinRout);
+        new G4Polycone("ECL Barrel Outer Skin", 0 * CLHEP::deg, 360.*CLHEP::deg, 6, BarrelOuterSkinZ, BarrelOuterSkinRin, BarrelOuterSkinRout);
 
 
       G4LogicalVolume* barInnerSupport_logi = new G4LogicalVolume(barInnerSupport, Materials::get("G4_Al"), "ECLBarrelInnerSupport", 0, 0, 0);
@@ -1257,7 +1257,7 @@ namespace Belle2 {
 
       const double BASdelPhi = 2.*PI / 72;
       const double BASoffset = 2.796 * PI / 180.;
-      const double BAScut = 0.5 * cm; // due to the PCON overlap
+      const double BAScut = 0.5 * CLHEP::cm; // due to the PCON overlap
 
 
       double BarrelL1Z[4] = {k_l1z1, k_l1z2, k_l1z2, k_l1z3};
@@ -1315,10 +1315,10 @@ namespace Belle2 {
 
       //backward
       //
-      double BwECSw1 = 13.0 * cm;
-      double BwECSh1 = 18.5 * cm;
-      double BwECSt1 = 4.0 * cm;
-      double BwECSro1 = 149.6 * cm;
+      double BwECSw1 = 13.0 * CLHEP::cm;
+      double BwECSh1 = 18.5 * CLHEP::cm;
+      double BwECSt1 = 4.0 * CLHEP::cm;
+      double BwECSro1 = 149.6 * CLHEP::cm;
       double BwECSri1 = BwECSro1 - BwECSh1;
       double BwECSdp1 = BwECSw1 / ((BwECSro1 + BwECSri1) / 2.0);
       double BwECSdz1 = BwECSt1;
@@ -1343,11 +1343,11 @@ namespace Belle2 {
       G4LogicalVolume* BackEcapP1_logi = new G4LogicalVolume(BackEcapP1, Materials::get("G4_Fe"), "ECLBwECSupport1st", 0, 0, 0);
 
 
-      double BwECSw2 = 6.0 * cm;
-      double BwECSh2 = 13.5 * cm;
-      double BwECSt2 = 21.2 * cm;
-      double BwECSri21 = BwECSri1 + 3.5 * cm;
-      double BwECScut2 = 3.0 * cm;  // guess, I could not find exact fig.
+      double BwECSw2 = 6.0 * CLHEP::cm;
+      double BwECSh2 = 13.5 * CLHEP::cm;
+      double BwECSt2 = 21.2 * CLHEP::cm;
+      double BwECSri21 = BwECSri1 + 3.5 * CLHEP::cm;
+      double BwECScut2 = 3.0 * CLHEP::cm;  // guess, I could not find exact fig.
       double BwECSri22 = BwECSri21 + BwECScut2; //cut2*tan(M_PI/4.0);
       double BwECSro2 = BwECSri21 + BwECSh2;
       double BwECSdp2 = BwECSw2 / ((BwECSro2 + BwECSri21) / 2.0);
@@ -1374,13 +1374,13 @@ namespace Belle2 {
 
 
 
-      double BwECSw3 = 14.0 * cm;
+      double BwECSw3 = 14.0 * CLHEP::cm;
       double BwECSh3 = k_l2r3 - BwECSro2; //18.9;
-      double BwECSt3 = 16.0 * cm;
+      double BwECSt3 = 16.0 * CLHEP::cm;
       double BwECSri3 = BwECSro2;
       double BwECSro3 = BwECSri3 + BwECSh3;
       double BwECSdp3 = BwECSw3 / ((BwECSro3 + BwECSri3) / 2.0);
-      double BwECSz37 = BwECSz11 - 5.7 * cm;
+      double BwECSz37 = BwECSz11 - 5.7 * CLHEP::cm;
       double BwECSz36 = BwECSz37 - BwECSt3;
 //   const TripletF mPar3[]={ // PolyCONe parameters
 //      TripletF(z36, ri3, ro3),
@@ -1407,10 +1407,10 @@ namespace Belle2 {
 
       G4AssemblyVolume* assemblyForwordEndcapSupport = new G4AssemblyVolume();
 
-      EclCM FwECSw_1 = 13.0 * cm;
-      EclCM FwECSh_1 = 17.0 * cm;
-      EclCM FwECSt_1 = 4.0 * cm;
-      EclCM FwECSro_1 = 142.0 * cm;
+      EclCM FwECSw_1 = 13.0 * CLHEP::cm;
+      EclCM FwECSh_1 = 17.0 * CLHEP::cm;
+      EclCM FwECSt_1 = 4.0 * CLHEP::cm;
+      EclCM FwECSro_1 = 142.0 * CLHEP::cm;
       EclCM FwECSri_1 = FwECSro_1 - FwECSh_1;
       EclRad FwECSdp_1 = FwECSw_1 / ((FwECSro_1 + FwECSri_1) / 2.0);
       double FwECSz_11 = k_forwConFarZ;
@@ -1427,10 +1427,10 @@ namespace Belle2 {
 
       G4LogicalVolume* FWEcapP1_logi = new G4LogicalVolume(FWEcapP1, Materials::get("G4_Fe"), "ECLFwECSupport1st", 0, 0, 0);
 
-      EclCM FwECSw_2 = 6.0 * cm;
-      EclCM FwECSh_2 = 13.0 * cm;
-      EclCM FwECSt_2 = 13.7 * cm;
-      EclCM FwECSri_2 = FwECSri_1 + 3.5 * cm;
+      EclCM FwECSw_2 = 6.0 * CLHEP::cm;
+      EclCM FwECSh_2 = 13.0 * CLHEP::cm;
+      EclCM FwECSt_2 = 13.7 * CLHEP::cm;
+      EclCM FwECSri_2 = FwECSri_1 + 3.5 * CLHEP::cm;
       EclCM FwECSro_2 = FwECSri_2 + FwECSh_2;
       EclRad FwECSdp_2 = FwECSw_2 / ((FwECSro_2 + FwECSri_2) / 2.0);
       double FwECSz_21 = FwECSz_12;
@@ -1447,14 +1447,14 @@ namespace Belle2 {
       G4LogicalVolume* FWEcapP2_logi = new G4LogicalVolume(FWEcapP2, Materials::get("G4_Fe"), "ECLFwECSupport2rd", 0, 0, 0);
 
 
-      EclCM FwECSw_3 = 14.0 * cm;
-      EclCM FwECSh_3 = 26.5 * cm;
-      EclCM FwECSt_3 = 7.0 * cm;
+      EclCM FwECSw_3 = 14.0 * CLHEP::cm;
+      EclCM FwECSh_3 = 26.5 * CLHEP::cm;
+      EclCM FwECSt_3 = 7.0 * CLHEP::cm;
       EclCM FwECSri_3 = FwECSri_2;
       EclCM FwECSro_3 = FwECSri_3 + FwECSh_3;
       EclRad FwECSdp_3 = FwECSw_3 / ((FwECSro_3 + FwECSri_3) / 2.0);
       double FwECSz_31 = FwECSz_22;
-      double FwECScut_3 = 3.0 * cm;
+      double FwECScut_3 = 3.0 * CLHEP::cm;
       double FwECSz_32 = FwECSz_31 + FwECSt_3 - FwECScut_3;
       double FwECSz_33 = FwECSz_31 + FwECSt_3;
 
@@ -1475,9 +1475,9 @@ namespace Belle2 {
 
 
       EclCM FwECSw_4 = FwECSw_3;
-      EclCM FwECSh_4 = 16.0 * cm;
-      EclCM FwECSt_4 = 16.0 * cm;
-      EclCM FwECSro_4 = FwECSro_3 + 4.0 * cm;
+      EclCM FwECSh_4 = 16.0 * CLHEP::cm;
+      EclCM FwECSt_4 = 16.0 * CLHEP::cm;
+      EclCM FwECSro_4 = FwECSro_3 + 4.0 * CLHEP::cm;
       EclCM FwECSri_4 = FwECSro_4 - FwECSh_4;
       EclRad FwECSdp_4 = FwECSw_4 / ((FwECSro_4 + FwECSri_4) / 2.0);
       double FwECSz_42 = FwECSz_31;
@@ -1490,7 +1490,7 @@ namespace Belle2 {
 //      TripletF(z_43, ro_4 -3.0, ro_4),
 //      TripletF(z_44, ro_4 -3.0, ro_4);
       double ForwordEndcapSupport4Z[4] = {FwECSz_41, FwECSz_42, FwECSz_43, FwECSz_44};
-      double ForwordEndcapSupport4Rin[4] = {FwECSri_4, FwECSri_4, FwECSro_4 - 3.0 * cm, FwECSro_4 - 3.0 * cm };
+      double ForwordEndcapSupport4Rin[4] = {FwECSri_4, FwECSri_4, FwECSro_4 - 3.0 * CLHEP::cm, FwECSro_4 - 3.0 * CLHEP::cm };
       double ForwordEndcapSupport4Rout[4] = {FwECSro_4, FwECSro_4, FwECSro_4, FwECSro_4};
 
 
@@ -1591,7 +1591,7 @@ namespace Belle2 {
 
 //      const EclRad theta(atan(tanInnerAng)) ;
 
-      const EclCM finGap(0.01 * cm) ;
+      const EclCM finGap(0.01 * CLHEP::cm) ;
       const EclCM pF_a(nearCryOuterR - nearCryInnerR - finGap) ;
       const EclCM pF_A(farCryOuterR - flatCryInnerR - finGap) ;
       const EclCM pF_L(signZ * (flatCryZ - nearCryZ)) ;
@@ -1631,10 +1631,10 @@ namespace Belle2 {
         , Materials::get("G4_Al"), "EndcapPhiFin", 0, 0, 0);
 
       // -- begin; reinforcing bars
-      const EclCM rfL1 = 2.0 * cm;
-      const EclCM rfL2 = 4.0 * cm;
+      const EclCM rfL1 = 2.0 * CLHEP::cm;
+      const EclCM rfL2 = 4.0 * CLHEP::cm;
       const EclCM rfL = rfL1 + rfL2;
-      const EclCM rfThick = 4.0 * cm;
+      const EclCM rfThick = 4.0 * CLHEP::cm;
       const double rfSinPo2 = (rfThick / 2.0) / farCryOuterR;
       const double rfCosPo2 = sqrt(1. -  rfSinPo2 * rfSinPo2);
       const EclCM rfOuterR = farCryOuterR * rfCosPo2; //farCryOuterR;
@@ -1645,7 +1645,7 @@ namespace Belle2 {
       const EclCM rfz2 = rfz3 - signZ * rfL2;
       const EclCM rfz1 = rfz2 - signZ * rfL1;
 
-      const EclCM rfGap(0.1 * cm) ;
+      const EclCM rfGap(0.1 * CLHEP::cm) ;
       const EclCM rf2_a(rfOuterR - rfr2 - rfGap) ;
       const EclCM rf2_A(rfOuterR - rfr3 - rfGap) ;
       const EclCM rf2_L(signZ * (rfz3 - rfz2)) ;

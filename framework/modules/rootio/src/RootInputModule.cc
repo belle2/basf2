@@ -186,6 +186,8 @@ void RootInputModule::readTree()
     if (!entry->isArray) {
       delete entry->object;
       entry->object = 0;
+    } else {
+      static_cast<TClonesArray*>(entry->object)->Delete();
     }
   }
   for (auto storeEntries : m_parentStoreEntries) {
@@ -193,6 +195,8 @@ void RootInputModule::readTree()
       if (!entry->isArray) {
         delete entry->object;
         entry->object = 0;
+      } else {
+        static_cast<TClonesArray*>(entry->object)->Delete();
       }
     }
   }

@@ -144,6 +144,10 @@ namespace {
 
     };
 
+//disable warnings about unused functions
+#if defined(__INTEL_COMPILER)
+#pragma warning disable 177
+#endif
 
     class NamedSet {
 
@@ -632,6 +636,9 @@ namespace {
 
 
     };
+#if defined(__INTEL_COMPILER)
+#pragma warning restore 177
+#endif
 
 
   protected:

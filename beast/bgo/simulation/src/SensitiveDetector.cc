@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <beast/bgo/simulation/SensitiveDetector.h>
-#include <beast/bgo/dataobjects/BgoSimHit.h>
+#include <beast/csi/simulation/SensitiveDetector.h>
+#include <beast/csi/dataobjects/CsiSimHit.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -20,15 +20,15 @@
 #include <G4Step.hh>
 
 namespace Belle2 {
-  /** Namespace to encapsulate code needed for the BGO detector */
-  namespace bgo {
+  /** Namespace to encapsulate code needed for the CSI detector */
+  namespace csi {
 
     SensitiveDetector::SensitiveDetector():
-      Simulation::SensitiveDetectorBase("BgoSensitiveDetector", Const::invalidDetector)
+      Simulation::SensitiveDetectorBase("CsiSensitiveDetector", Const::invalidDetector)
     {
       //Make sure all collections are registered
       StoreArray<MCParticle>   mcParticles;
-      StoreArray<BgoSimHit>  simHits;
+      StoreArray<CsiSimHit>  simHits;
       RelationArray relMCSimHit(mcParticles, simHits);
 
       //Register all collections we want to modify and require those we want to use
@@ -74,12 +74,12 @@ namespace Belle2 {
 
       //Get the datastore arrays
       StoreArray<MCParticle>  mcParticles;
-      StoreArray<BgoSimHit> simHits;
+      StoreArray<CsiSimHit> simHits;
       RelationArray relMCSimHit(mcParticles, simHits);
 
-      StoreArray<BgoSimHit> BgoHits;
-      if (!BgoHits.isValid()) BgoHits.create();
-      BgoSimHit* hit = BgoHits.appendNew(
+      StoreArray<CsiSimHit> CsiHits;
+      if (!CsiHits.isValid()) CsiHits.create();
+      CsiSimHit* hit = CsiHits.appendNew(
                          depEnergy,
                          nielEnergy,
                          tkPDG,
@@ -98,5 +98,5 @@ namespace Belle2 {
       return true;
     }
 
-  } //bgo namespace
+  } //csi namespace
 } //Belle2 namespace

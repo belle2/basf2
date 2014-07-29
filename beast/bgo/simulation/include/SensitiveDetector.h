@@ -7,16 +7,16 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef BGO_SENSITIVEDETECTOR_H
-#define BGO_SENSITIVEDETECTOR_H
+#ifndef CSI_SENSITIVEDETECTOR_H
+#define CSI_SENSITIVEDETECTOR_H
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
 namespace Belle2 {
-  /** Namespace to encapsulate code needed for the BGO detector */
-  namespace bgo {
+  /** Namespace to encapsulate code needed for the CSI detector */
+  namespace csi {
 
-    /** Sensitive Detector implementation of the BGO detector */
+    /** Sensitive Detector implementation of the CSI detector */
     class SensitiveDetector: public Simulation::SensitiveDetectorBase {
     public:
       /** Constructor */
@@ -29,7 +29,7 @@ namespace Belle2 {
       bool step(G4Step* step, G4TouchableHistory*);
     };
 
-  } //bgo namespace
+  } //csi namespace
 } //Belle2 namespace
 
 #endif

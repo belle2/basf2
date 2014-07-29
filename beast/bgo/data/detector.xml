@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Detector xmlns:xi="http://www.w3.org/2001/XInclude">
-  <Name>BGO Detector</Name>
-  <Description>BEAST BGO sub-detector</Description>
+  <Name>CSI Detector</Name>
+  <Description>BEAST CSI sub-detector</Description>
   <!-- Define material and size of the global volume -->
   <Global>
     <material>Air</material>
@@ -14,6 +14,6 @@
   <xi:include href="../../geometry/BasicMaterials.xml"/> 
 
   <!-- include the beast Materials and detector component -->
-  <xi:include href="BGO-Materials.xml"/>
-  <xi:include href="BGO.xml"/>
+  <xi:include href="CSI-Materials.xml"/>
+  <xi:include href="CSI.xml"/>
 </Detector>

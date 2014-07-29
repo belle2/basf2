@@ -114,8 +114,8 @@ namespace Belle2 {
      */
     explicit RelationIndex(const std::string& name = (DataStore::defaultRelationName<FROM, TO>()), DataStore::EDurability durability = DataStore::c_Event):
       m_index(RelationIndexManager::Instance().get<FROM, TO>(RelationArray(name, durability))),
-      m_from(m_index.index().template get<0>()),
-      m_to(m_index.index().template get<1>()) {}
+      m_from(m_index->index().template get<0>()),
+      m_to(m_index->index().template get<1>()) {}
 
     /** Constructor with checks.
      *
@@ -132,11 +132,11 @@ namespace Belle2 {
     RelationIndex(const StoreArray<FROM>& from, const StoreArray<TO>& to, const std::string& name = "",
                   DataStore::EDurability durability = DataStore::c_Event):
       m_index(RelationIndexManager::Instance().get<FROM, TO>(RelationArray(from, to, name, durability))),
-      m_from(m_index.index().template get<0>()),
-      m_to(m_index.index().template get<1>()) {}
+      m_from(m_index->index().template get<0>()),
+      m_to(m_index->index().template get<1>()) {}
 
     /** check if index is based on valid relation. */
-    operator bool() const { return m_index; }
+    operator bool() const { return *(m_index.get()); }
 
     /** Return a range of all elements pointing from the given object.
      *
@@ -227,19 +227,19 @@ namespace Belle2 {
     }
 
     /** Get the AccessorParams of the underlying relation. */
-    const AccessorParams getAccessorParams()     const { return m_index.getAccessorParams(); }
+    const AccessorParams getAccessorParams()     const { return m_index->getAccessorParams(); }
 
     /** Get the AccessorParams of the StoreArray the relation points from. */
-    const AccessorParams getFromAccessorParams() const { return m_index.getFromAccessorParams(); }
+    const AccessorParams getFromAccessorParams() const { return m_index->getFromAccessorParams(); }
 
     /** Get the AccessorParams of the StoreArray the relation points to. */
-    const AccessorParams getToAccessorParams()   const { return m_index.getToAccessorParams(); }
+    const AccessorParams getToAccessorParams()   const { return m_index->getToAccessorParams(); }
 
     /** Get the size of the index. */
-    size_t size() const { return m_index.index().size(); }
+    size_t size() const { return m_index->index().size(); }
   protected:
     /** Reference to the IndexContainer. */
-    const RelationIndexContainer<FROM, TO>& m_index;
+    const boost::shared_ptr<RelationIndexContainer<FROM, TO>> m_index;
 
     /** Reference to the from index. */
     const index_from& m_from;

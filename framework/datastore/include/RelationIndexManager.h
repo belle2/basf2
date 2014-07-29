@@ -13,6 +13,7 @@
 #include <framework/datastore/RelationIndexContainer.h>
 
 #include <boost/array.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <map>
 
@@ -40,27 +41,26 @@ namespace Belle2 {
      *  @param relation Relation to build an index for
      *  @returns A RelationIndexContainer
      */
-    template<class FROM, class TO> const RelationIndexContainer<FROM, TO>& get(const RelationArray& relation) {
+    template<class FROM, class TO> const boost::shared_ptr<RelationIndexContainer<FROM, TO>> get(const RelationArray& relation) {
       //do some type checking...
       relation.isValid();
 
       const std::string& name = relation.getName();
       DataStore::EDurability durability = relation.getDurability();
       RelationMap& relations =  m_cache[durability];
-      RelationIndexContainer<FROM, TO>* indexContainer(0);
+      boost::shared_ptr<RelationIndexContainer<FROM, TO>> indexContainer;
       RelationMap::iterator it = relations.find(name);
       if (it != relations.end()) {
-        indexContainer = dynamic_cast< RelationIndexContainer<FROM, TO>* >(it->second);
-        if (!indexContainer and it->second)
-          delete it->second; //avoid memory leak if type differs
+        //if existing array is of wrong type, we'll overwrite the shared_ptr here, but the index will live on with any RelationIndex objects that use it.
+        indexContainer = boost::dynamic_pointer_cast<RelationIndexContainer<FROM, TO>>(it->second);
       }
       if (!indexContainer) {
-        indexContainer = new RelationIndexContainer<FROM, TO>(relation.getAccessorParams());
+        indexContainer.reset(new RelationIndexContainer<FROM, TO>(relation.getAccessorParams()));
         relations[name] = indexContainer;
       } else {
         indexContainer->rebuild(false);
       }
-      return *indexContainer;
+      return indexContainer;
     }
 
     /** Clear the cache of RelationIndexContainers with the given
@@ -83,11 +83,11 @@ namespace Belle2 {
      *
      * The index is not rebuilt, which makes this mostly useful to do minor changes to the index in DataStore::addRelation().
      */
-    template<class FROM, class TO> RelationIndexContainer<FROM, TO>* getIndexIfExists(const std::string& name, DataStore::EDurability durability) const {
+    template<class FROM, class TO> boost::shared_ptr<RelationIndexContainer<FROM, TO>> getIndexIfExists(const std::string& name, DataStore::EDurability durability) const {
       const RelationMap& relations =  m_cache[durability];
       RelationMap::const_iterator it = relations.find(name);
       if (it != relations.end()) {
-        return dynamic_cast< RelationIndexContainer<FROM, TO>* >(it->second);
+        return boost::dynamic_pointer_cast<RelationIndexContainer<FROM, TO>>(it->second);
       } else {
         return nullptr;
       }
@@ -100,7 +100,7 @@ namespace Belle2 {
     }
 
     /** Maptype to keep track of all Containers of one durability */
-    typedef std::map<std::string, RelationIndexBase* > RelationMap;
+    typedef std::map<std::string, boost::shared_ptr<RelationIndexBase>> RelationMap;
     /** Cachetype for all Containers */
     typedef boost::array<RelationMap, DataStore::c_NDurabilityTypes> RelationCache;
     /** Cache for all Containers */

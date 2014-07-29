@@ -23,10 +23,10 @@ void NtupleMCFlightInfoTool::setupTree()
   if (strNames.empty()) return;
 
   //flight distance
-  m_tree->Branch((strNames[1] + "_FD").c_str(), &m_fD, (strNames[1] + "_MCFD/F").c_str());
+  m_tree->Branch((strNames[1] + "_MCFD").c_str(), &m_fD, (strNames[1] + "_MCFD/F").c_str());
 
   //flight time
-  m_tree->Branch((strNames[1] + "_FT").c_str(), &m_fT, (strNames[1] + "_MCFT/F").c_str());
+  m_tree->Branch((strNames[1] + "_MCFT").c_str(), &m_fT, (strNames[1] + "_MCFT/F").c_str());
 
 }
 

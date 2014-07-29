@@ -162,12 +162,13 @@ namespace Belle2 {
         const vector<TCLink *> & links = aTrack.links(iSL);
         const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
         m_mVector["wirePhi"][iSL] = (double) t_segment->localId()/m_mConstV["nWires"][iSL]*4*m_mConstD["Trg_PI"];
-        m_mVector["lutLR"][iSL] = t_segment->LUT()->getLRLUT(t_segment->hitPattern(),iSL);
+//        m_mVector["lutLR"][iSL] = t_segment->LUT()->getLRLUT(t_segment->hitPattern(),iSL);
+        m_mVector["lutLR"][iSL] = t_segment->nLUT()->getValue(t_segment->hitPattern());
         m_mVector["mcLR"][iSL] = t_segment->hit()->mcLR();
         m_mVector["driftLength"][iSL] = t_segment->hit()->drift();
         if(m_mBool["fmcLR"]==1) m_mVector["LR"][iSL] = m_mVector["mcLR"][iSL];
         else if(m_mBool["fLRLUT"]==1) m_mVector["LR"][iSL] = m_mVector["lutLR"][iSL];
-        else m_mVector["LR"][iSL] = 2;
+        else m_mVector["LR"][iSL] = 3;
       } // End superlayer loop
 
       ////////////////////
@@ -187,7 +188,7 @@ namespace Belle2 {
       // Set phi2DError for 2D fit
       m_mVector["phi2DError"] = vector<double> (5);
       for (unsigned iAx = 0; iAx < 5; iAx++) {
-        if(m_mVector["LR"][2*iAx] != 2) m_mVector["phi2DError"][iAx] = m_mConstV["driftPhi2DError"][iAx];
+        if(m_mVector["LR"][2*iAx] != 3) m_mVector["phi2DError"][iAx] = m_mConstV["driftPhi2DError"][iAx];
         else m_mVector["phi2DError"][iAx] = m_mConstV["wirePhi2DError"][iAx];
       }
       // Calculate phi2D using driftTime.

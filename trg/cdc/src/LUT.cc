@@ -29,7 +29,7 @@ using namespace std;
 namespace Belle2{
 
     std::string TRGCDCLUT::version(void) const{
-	return string("TRGCDCLUT 0.00");
+	return string("TRGCDCLUT 1.00");
     }
 
     TRGCDCLUT::TRGCDCLUT(const string & name, const TRGCDC &TRGCDC)

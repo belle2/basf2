@@ -172,8 +172,8 @@ double Fitter3DUtility::calPhi(double wirePhi, double driftLength, double eventT
   // Change to radian
   t_dPhi=atan(t_dPhi/rr/10);
   // Use LR to add dPhi
-  if(lr == 0) result -= t_dPhi;
-  else if(lr == 1) result += t_dPhi;
+  if(lr == 1) result -= t_dPhi;
+  else if(lr == 2) result += t_dPhi;
   return result;
 }
 

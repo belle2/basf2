@@ -29,14 +29,22 @@ vector<TRGCDCSegmentHit *> TRGCDCSegmentHit::_all;
 TRGCDCSegmentHit::TRGCDCSegmentHit(const TCSegment & w)
 //  : TCCHit((TCCHit &) * w.center().hit()) {
     : TCCHit(w,
-	     w.center().hit()->iCDCHit(),
-	     w.center().hit()->iCDCSimHit(),
-	     w.center().hit()->iMCParticle(),
-	     w.center().hit()->drift(0),
-	     w.center().hit()->dDrift(0),
-	     w.center().hit()->drift(1),
-	     w.center().hit()->dDrift(1),
-	     w.center().hit()->mcLR()) {
+	     //w.center().hit()->iCDCHit(),
+	     //w.center().hit()->iCDCSimHit(),
+	     //w.center().hit()->iMCParticle(),
+	     //w.center().hit()->drift(0),
+	     //w.center().hit()->dDrift(0),
+	     //w.center().hit()->drift(1),
+	     //w.center().hit()->dDrift(1),
+	     //w.center().hit()->mcLR()) {
+	     w.priority().hit()->iCDCHit(),
+	     w.priority().hit()->iCDCSimHit(),
+	     w.priority().hit()->iMCParticle(),
+	     w.priority().hit()->drift(0),
+	     w.priority().hit()->dDrift(0),
+	     w.priority().hit()->drift(1),
+	     w.priority().hit()->dDrift(1),
+	     w.priority().hit()->mcLR()) {
 }
 
 TRGCDCSegmentHit::~TRGCDCSegmentHit() {

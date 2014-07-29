@@ -64,6 +64,12 @@ class TRGCDCSegment : public TRGCDCCell {
     /// returns a center wire.
     const TRGCDCWire & center(void) const;
 
+/// returns priority wire.
+const TRGCDCWire & priority(void) const;
+
+/// compare 2 wires. return faster wire.
+const TRGCDCWire & fasterWire(const TRGCDCWire*, const TRGCDCWire*)const;
+
     /// returns trigger output. Null will returned if no signal.
     const TRGSignal & signal(void) const;
 
@@ -73,11 +79,24 @@ class TRGCDCSegment : public TRGCDCCell {
     /// returns hit pattern.
     unsigned hitPattern(void) const;
 
+    unsigned lutPattern(void) const;
+
     /// returns LUT.
     const TRGCDCLUT * LUT(void) const;
 
+/// return fastest time in TSHit.
+float fastestTime(void)const;
+
+/// return priority time in TSHit.
+float priorityTime(void);
+
+/// return priority cell position in TSHit. 0: no hit, 3: 1st priority, 1: 2nd right, 2: 2nd left
+int priorityPosition(void)const;
+
+bool active(void);
+
     /// returns (new) LUT
-    TRGCDCLUT * nLUT(void) ;
+    const TRGCDCLUT * nLUT(void) const;
 
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
@@ -124,10 +143,11 @@ class TRGCDCSegment : public TRGCDCCell {
     void simulateWithoutClock(bool logicLUTFlag);
 
     /// simulates TF hit time-dependently
-    void simulateWithClock(bool logicLUTFlag);
+  //  void simulateWithClock(bool logicLUTFlag);
 
   private:
 
+    /// LookUp Table. 0: no hit, 1: right, 2: left, 3: not determined.
     TRGCDCLUT * m_TSLUT;
 
     /// LookUp Table.
@@ -150,6 +170,7 @@ class TRGCDCSegment : public TRGCDCCell {
 
     /// TS LUT file name.
     std::string m_TSLUTFileName;
+
   // Friends
     friend class TRGCDC;
 };
@@ -198,8 +219,8 @@ TRGCDCSegment::LUT(void) const {
 }
 
 inline
-TRGCDCLUT *
-TRGCDCSegment::nLUT(void)  {  //will be LUT()   -KT
+const TRGCDCLUT *
+TRGCDCSegment::nLUT(void)  const{  //will be LUT()   -KT
     return m_TSLUT;
 }
 
@@ -214,6 +235,7 @@ TRGCDCSegment::center(void) const {
 inline
 const TRGCDCEventTime *
 TRGCDCSegment::EvtTime(void) const{
+   std::cout << "this function(EvtTime() in Segment class) will be removed. - ktkim" << std::endl;
     return _eventTime;
 }
 

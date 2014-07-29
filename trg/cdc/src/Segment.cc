@@ -192,7 +192,8 @@ TCSegment::simulate(bool clockSimulation, bool logicLUTFlag) {
 	return;
 
     if (clockSimulation)
-	simulateWithClock(logicLUTFlag);
+	cout << "this part is replaced with simulateBoard TrackSegmentFinder class" << endl;
+//	simulateWithClock(logicLUTFlag);
     else
 	simulateWithoutClock(logicLUTFlag);
 }
@@ -244,8 +245,8 @@ TCSegment::simulateWithoutClock(bool logicLUTFlag) {
 
       //...Signal simulation...
       TRGSignal l0, l1, l2, l3, l4;
-TRGSignal wo1,wo2,wo3,wo4;
-TRGSignal all;
+      TRGSignal wo1,wo2,wo3,wo4;
+      TRGSignal all;
       if (n == 11) {
 
         //...Simple simulation assuming 3:2:1:2:3 shape...
@@ -259,11 +260,11 @@ TRGSignal all;
         //l2.dump();
         //l3.dump();
         //l4.dump();
-wo1 = l1 & l3 & l4;
-wo2 = l0 & l3 & l4;
-wo3 = l0 & l1 & l4;
-wo4 = l0 & l1 & l3;
-all = l2 & (wo1 | wo2 | wo3 | wo4);
+        wo1 = l1 & l3 & l4;
+        wo2 = l0 & l3 & l4;
+        wo3 = l0 & l1 & l4;
+        wo4 = l0 & l1 & l3;
+        all = l2 & (wo1|wo2|wo3|wo4);
 
       }
       else if (n == 15) {
@@ -274,11 +275,11 @@ all = l2 & (wo1 | wo2 | wo3 | wo4);
         l2 = signals[3] | signals[4] | signals[5];
         l3 = signals[6] | signals[7] | signals[8] | signals[9];
         l4 = signals[10] |signals[11] | signals[12] | signals[13] |signals[14];
-wo1 = l2 & l3 & l4;
-wo2 = l1 & l3 & l4;
-wo3 = l1 & l2 & l4;
-wo4 = l1 & l2 & l3;
-all = l0 &(wo1|wo2|wo3|wo4);
+        wo1 = l2 & l3 & l4;
+        wo2 = l1 & l3 & l4;
+        wo3 = l1 & l2 & l4;
+        wo4 = l1 & l2 & l3;
+        all = l0 & (wo1|wo2|wo3|wo4);
       }
 
       //...Coincidence of all layers...
@@ -315,9 +316,17 @@ all = l0 &(wo1|wo2|wo3|wo4);
       //cout<<"SuperLayerID: "<<this->superLayerId()<<" hitPattern: "<<this->hitPattern()<<" "<<strHitPattern<<endl;
       //cout<<"LUT result: "<<this->LUT()->getHitLRLUT(this->hitPattern(),this->superLayerId())<<endl;
       //cout<<"Is center hit fired? " << (this->center().hit() != 0)<<endl;
-      int lutHit = atoi(&(this->LUT()->getHitLRLUT(this->hitPattern(),this->superLayerId()).at(4)));
+//      int lutHit = atoi(&(this->LUT()->getHitLRLUT(this->hitPattern(),this->superLayerId()).at(4)));
+      //
       // Only when center wire is hit
-      if(lutHit == 1 && (this->center().hit() != 0) ) {
+ //     if(lutHit == 1 && (this->center().hit() != 0) ) {
+
+//work here
+      //int lutValue = this->nLUT()->getValue(this->hitPattern());
+      int lutValue = this->nLUT()->getValue(this->lutPattern());
+//      if((lutValue != 0) && (this->center().hit() != 0) ) {
+      if((lutValue != 0) && (this->priority().hit() != 0) ) {
+      //if((lutValue != 0) ){
         allSignals.name(name());
         _signal = allSignals;
       }
@@ -339,7 +348,112 @@ all = l0 &(wo1|wo2|wo3|wo4);
 
 }
 
-void
+float
+TCSegment::fastestTime(void)const{
+  float tmpFastTime = 9999;
+  //if((this->nLUT()->getValue(this->hitPattern()))&&(this->center().hit())){
+  //if((this->nLUT()->getValue(this->hitPattern()))&&(this->priority().hit())){
+  if((this->nLUT()->getValue(this->lutPattern()))&&(this->priority().hit())){
+    for(unsigned i=0;i<_wires.size();i++){
+      if(_wires[i]->hit()){
+        float dt= _wires[i]->hit()->drift()*10*1000/40;
+        if(dt< tmpFastTime){
+          tmpFastTime = dt;
+        }
+      }
+    }
+    return tmpFastTime;
+  }
+  else 
+    return -1;
+}
+
+float
+TCSegment::priorityTime(void){
+  if(this->center().hit()){
+    return this->center().hit()->drift()*10*1000/40;
+  } else if(this->nLUT()->getValue(this->lutPattern())){
+  //} else if(this->nLUT()->getValue(this->hitPattern())){
+    const TRGCDCWire* priorityL;
+    const TRGCDCWire* priorityR;
+    if(_wires.size() == 15){
+      priorityL = _wires[2];
+      priorityR = _wires[1];
+    }else{
+      priorityL = _wires[7];
+      priorityR = _wires[6];
+    }
+    return fasterWire(priorityL, priorityR).hit()->drift()*10*1000/40;
+//    if(priorityL->hit()){
+//      tmpTime = priorityL->hit()->drift()*10*1000/40;
+//      if(priorityR->hit()){
+//        if(tmpTime>(priorityR->hit()->drift()*10*1000/40)) tmpTime = priorityR->hit()->drift()*10*1000/40;
+//      }
+//    }else if(priorityR->hit()){
+//      tmpTime = priorityR->hit()->drift()*10*1000/40;
+//    } else tmpTime = -2;
+//    return tmpTime;
+  } else return -1;
+}
+
+int
+TCSegment::priorityPosition(void)const{
+  if(this->center().hit()){
+    return 3;
+  }else if(this->hit()){
+    const TRGCDCWire* priorityL;
+    const TRGCDCWire* priorityR;
+    if(_wires.size() == 15){
+      priorityL = _wires[2];
+      priorityR = _wires[1];
+    }else{
+      priorityL = _wires[7];
+      priorityR = _wires[6];
+    }
+    if(priorityL->hit()){
+      if(priorityR->hit()){
+        if((priorityR->hit()->drift())>(priorityR->hit()->drift())) return 1;
+        else return 2;
+      }else return 2;
+    }else if(priorityR->hit()){
+      return 1;
+    } else return -1;
+  }else return 0;
+}
+
+const TRGCDCWire &
+TCSegment::priority(void) const{
+  if(this->center().hit()){
+    if(_wires.size()==15){
+      return *_wires[0];
+    }else return *_wires[5];
+  } else if(m_TSLUT->getValue(this->lutPattern())){
+  //} else if(m_TSLUT->getValue(this->hitPattern())){
+    if(_wires.size()==15){return fasterWire(_wires[1],_wires[2]);
+    }else return fasterWire(_wires[6],_wires[7]);
+  }else{ 
+    if(_wires.size()==15){
+      return *_wires[0];
+    }else return *_wires[5];
+  }
+}
+
+//bool active(void){
+//  if(nLUT()->getValue(hitPattern())) return true;
+//  else return false;
+//}
+
+const TRGCDCWire &
+TCSegment::fasterWire(const TRGCDCWire* w1, const TRGCDCWire* w2)const{
+  if(w1->hit()){
+    if(w2->hit()){
+      if(w1->hit()->drift()>w2->hit()->drift()) return *w2;
+      else return *w1;
+    }else return *w1;
+  } else return *w2;
+} 
+
+/*void
 TCSegment::simulateWithClock(bool logicLUTFlag) {
 
     //cout<<"Start TSF with clock"<<endl;
@@ -479,7 +593,7 @@ TCSegment::simulateWithClock(bool logicLUTFlag) {
     //cout<<"End TSF with clock"<<endl;
 
     TRGDebug::leaveStage(stage);
-}
+}*/
 
 unsigned
 TRGCDCSegment::hitPattern(void) const {
@@ -492,18 +606,31 @@ TRGCDCSegment::hitPattern(void) const {
     return ptn;
 }
 
+
+unsigned 
+TRGCDCSegment::lutPattern(void) const{
+  unsigned outValue = (this->hitPattern())*2;
+  if (priorityPosition()==2){
+   outValue+=1;
+  }
+  return outValue;
+}
+
 double
 TRGCDCSegment::phiPosition(void) const {
+//  cout << "this function(phiPosition in Segment class) will be removed. for 2D & 3D fitting, calculate this information by your own class" <<endl;
   float evtTime=EvtTime()->getT0();
   evtTime=evtTime*40/1000;
 	double phi=(double)localId()/nWires[superLayerId()]*4*M_PI;
-	int lutcomp=LUT()->getLRLUT(hitPattern(),superLayerId());
+	//int lutcomp=LUT()->getLRLUT(hitPattern(),superLayerId());
+	//int lutcomp=nLUT()->getValue(hitPattern());
+	int lutcomp=nLUT()->getValue(lutPattern());
 	float dphi=hit()->drift()*10;
 	if(flagevtTime){
 		dphi-=evtTime;
 	}
 	dphi=atan(dphi/wireR[superLayerId()]/1000);
-	if(lutcomp==0){phi-=dphi;}
+	if(lutcomp==2){phi-=dphi;}
 	else if(lutcomp==1){phi+=dphi;}
 	else{phi=phi;}
 	

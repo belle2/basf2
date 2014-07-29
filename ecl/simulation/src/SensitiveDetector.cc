@@ -37,6 +37,7 @@
 #include <G4FieldManager.hh>
 #include <G4MagneticField.hh>
 
+#include "CLHEP/Units/PhysicalConstants.h"
 
 //#include "CLHEP/Geometry/Vector3D.h"
 //#include "CLHEP/Geometry/Point3D.h"
@@ -136,7 +137,7 @@ namespace Belle2 {
 
       m_startPos =  preStep.GetPosition();
       m_endPos = postStep.GetPosition();
-      TVector3 position((m_startPos.getX() + m_endPos.getX()) / 2 / cm, (m_startPos.getY() + m_endPos.getY()) / 2 / cm, (m_startPos.getZ() + m_endPos.getZ()) / 2 / cm);
+      TVector3 position((m_startPos.getX() + m_endPos.getX()) / 2 / CLHEP::cm, (m_startPos.getY() + m_endPos.getY()) / 2 / CLHEP::cm, (m_startPos.getZ() + m_endPos.getZ()) / 2 / CLHEP::cm);
       m_WightedPos += position * (aStep->GetTotalEnergyDeposit());
 
       //Save Hit if track leaves volume or is killed
@@ -204,8 +205,8 @@ namespace Belle2 {
       StoreArray<ECLSimHit> eclArray;
       if (!eclArray) eclArray.create();
       RelationArray eclSimHitRel(mcParticles, eclArray);
-      TVector3 momentum(mom.getX() / GeV, mom.getY() / GeV, mom.getZ() / GeV);
-      new(eclArray.nextFreeAddress()) ECLSimHit(cellId + 1, trackID, pid, tof / ns, edep / GeV, momentum, posAve);
+      TVector3 momentum(mom.getX() / CLHEP::GeV, mom.getY() / CLHEP::GeV, mom.getZ() / CLHEP::GeV);
+      new(eclArray.nextFreeAddress()) ECLSimHit(cellId + 1, trackID, pid, tof / CLHEP::ns, edep / CLHEP::GeV, momentum, posAve);
       /*
             m_simhitNumber = eclArray->GetLast() + 1;
             new(eclArray->AddrAt(m_simhitNumber)) ECLSimHit();
@@ -245,16 +246,16 @@ namespace Belle2 {
 
 
       if (m_currentEvnetNumber == m_oldEvnetNumber) {
-        if ((tof / ns) < 8000) {
-          TimeIndex = (int)((tof / ns) / 100);
-          double E_cell = (edep / GeV);
+        if ((tof / CLHEP::ns) < 8000) {
+          TimeIndex = (int)((tof / CLHEP::ns) / 100);
+          double E_cell = (edep / CLHEP::GeV);
           if (ECLHitIndex[cellId][TimeIndex] == -1) {
 
             ECLGeometryPar* eclp = ECLGeometryPar::Instance();
             PosCell =  eclp->GetCrystalPos(cellId);
             VecCell =  eclp->GetCrystalVec(cellId);
             local_pos = (15. - (posAve  - PosCell) * VecCell);
-            T_ave =  6.05 + 0.0749 * local_pos - 0.00112 * local_pos * local_pos + (tof / ns)  ;
+            T_ave =  6.05 + 0.0749 * local_pos - 0.00112 * local_pos * local_pos + (tof / CLHEP::ns)  ;
 
 
             //m_hitNum = eclHitArray->GetLast() + 1;
@@ -276,7 +277,7 @@ namespace Belle2 {
             PosCell =  eclp->GetCrystalPos(cellId);
             VecCell =  eclp->GetCrystalVec(cellId);
             local_pos = (15. - (posAve  - PosCell) * VecCell);
-            T_ave =  6.05 + 0.0749 * local_pos - 0.00112 * local_pos * local_pos + (tof / ns)  ;
+            T_ave =  6.05 + 0.0749 * local_pos - 0.00112 * local_pos * local_pos + (tof / CLHEP::ns)  ;
 
             eclHitArray[m_hitNum]->setEnergyDep(old_edep + E_cell);
             eclHitArray[m_hitNum]->setTimeAve((old_edep * old_TimeAve + E_cell * T_ave) / (old_edep + E_cell));

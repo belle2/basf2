@@ -32,7 +32,8 @@ namespace Belle2 {
     struct FarBeamLineElement {
       /** Transformation */
       G4Transform3D transform;
-      G4VSolid* geo;           /** Solid volume */
+      /** Solid volume */
+      G4VSolid* geo;
     };
 
     class SensitiveDetector;

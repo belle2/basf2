@@ -32,8 +32,10 @@ namespace Belle2 {
     struct CryostatElement {
       /** Transformation */
       G4Transform3D transform;
-      G4VSolid* geo;           /** Solid volume */
-      G4LogicalVolume* logi;   /** Logical volume */
+      /** Solid volume */
+      G4VSolid* geo;
+      /** Logical volume */
+      G4LogicalVolume* logi;
     };
 
     class SensitiveDetector;

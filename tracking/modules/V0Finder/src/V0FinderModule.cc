@@ -50,7 +50,6 @@ V0FinderModule::V0FinderModule() : Module()
   addParam("V0ColName",  m_V0ColName,  "V0 collection name (output)", std::string(""));
 
   //add module parameters here [see one of the following tutorials]
-  addParam("minD0", m_minD0, "Minimum d0 (i.e. distance from z axis in perigee) of candidate track", .2);
   addParam("vertexChi2Cut", m_vertexChi2Cut, "Maximum chi² for the vertex fit (NDF = 1)", 5.);
   addParam("distRfromIP", m_distRfromIP, "Minimum separation of vertex from IP in R (or distZfromIP)", 1.);
   addParam("distZfromIP", m_distZfromIP, "Minimum separation of vertex from IP in Z (or distZfromIP", 0.);

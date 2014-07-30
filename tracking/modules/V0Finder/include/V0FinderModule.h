@@ -64,7 +64,6 @@ namespace Belle2 {
     std::string m_TrackColName;
     std::string m_V0ColName;
 
-    double m_minD0;               // Minimum perigee distance.
     double m_vertexChi2Cut;       // Maximum chi2 of vertex fit.
     double m_distRfromIP;         // minimum required distance from IP in R
     double m_distZfromIP;         // minimum required distance from IP in Z

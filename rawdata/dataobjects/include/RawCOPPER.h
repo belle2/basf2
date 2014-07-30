@@ -28,17 +28,9 @@
 
 //#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 
+
 using namespace std;
 
-#define DETECTOR_MASK 0xFF000000 // tentative
-#define SVD_ID  0x01000000 // tentative
-#define CDC_ID  0x02000000 // tentative
-#define BPID_ID 0x03000000 // tentative
-#define EPID_ID 0x04000000 // tentative
-#define BECL_ID  0x05000000 // tentative
-#define EECL_ID  0x06000000 // tentative
-#define BKLM_ID  0x07000000 // tentative
-#define EKLM_ID  0x08000000 // tentative
 // Divide ECL and KLM to barrel and endcap categories from Itoh-san's suggestion
 // Updated on May 9, 2014
 

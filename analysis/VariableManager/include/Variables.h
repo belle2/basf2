@@ -99,6 +99,22 @@ namespace Belle2 {
     double particlePhi_CMS(const Particle* part);
 
     /**
+     * return cosine of angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle
+     */
+    double cosAngleBetweenMomentumAndVertexVector(const Particle* part);
+
+    /**
+     * return distance relative to interaction point
+     */
+    double particleDistance(const Particle* part);
+
+    /**
+     * return significance of distance relative to interaction point
+     * (distance relative to interaction point)/ ( error on distance measurement )
+     */
+    double particleDistanceSignificance(const Particle* part);
+
+    /**
      * return position in x relative to interaction point
      */
     double particleDX(const Particle* part);
@@ -606,6 +622,11 @@ namespace Belle2 {
      * return total energy in KLM clusters in event
      */
     double KLMEnergy(const Particle*);
+
+    /**
+     * return always zero
+     */
+    double False(const Particle*);
 
   }
 } // Belle2 namespace

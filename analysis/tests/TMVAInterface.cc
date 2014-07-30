@@ -166,7 +166,6 @@ namespace {
 
   TEST(TMVAInterfaceTest, TeacherTrainsCorrectly)
   {
-    DataStore::Instance().setInitializeActive(true);
     StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
 
     std::vector<std::string> variables = {"p", "getExtraInfo(someInput)"};
@@ -176,6 +175,54 @@ namespace {
     methods.push_back(TMVAInterface::Method("MockPlugin", "Plugin", "!H:!V:CreateMVAPdfs", variables));
 
     TMVAInterface::Teacher teacher("unittest", ".", target, methods);
+
+    std::string factoryOption = "!V:Silent:Color:DrawProgressBar:AnalysisType=Classification";
+    std::string prepareOption = "!V:SplitMode=block";
+
+    gRandom->SetSeed(23);
+
+    //add sample
+    unsigned int n = 100;
+    std::set<std::vector<float>> given_samples;
+    for (unsigned int i = 0; i < n; i++) {
+      float target = (i % 2 == 0) * 1.0;
+      TLorentzVector v;
+      v.SetPtEtaPhiM((i % 900) * 0.1, 0.1, i * 0.1, 0.139);
+      Particle p(v, 211);
+      float momentum = v.P();
+      float someInput = i;//gRandom->Gaus() + target * 1.0;
+      p.addExtraInfo("someInput", someInput);
+      p.addExtraInfo("target", target);
+      teacher.addSample(&p);
+      if (i < n / 2) {
+        given_samples.insert({momentum, someInput, target});
+      }
+    }
+
+    teacher.train(factoryOption, prepareOption);
+    MockPluginInspector& inspector = MockPluginInspector::GetInstance();
+
+    EXPECT_EQ(n / 2, inspector.GetTrainEvents().size());
+    std::set<std::vector<float>> received_samples;
+    for (auto event : inspector.GetTrainEvents()) {
+      received_samples.insert(event);
+    }
+
+    EXPECT_EQ(given_samples, received_samples);
+
+  }
+
+  TEST(TMVAInterfaceTest, TeacherDropsConstantVariable)
+  {
+    StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
+
+    std::vector<std::string> variables = {"p", "False", "getExtraInfo(someInput)"};
+    std::string target = "getExtraInfo(target)";
+
+    std::vector<TMVAInterface::Method> methods;
+    methods.push_back(TMVAInterface::Method("MockPlugin", "Plugin", "!H:!V:CreateMVAPdfs", variables));
+
+    TMVAInterface::Teacher teacher("unittest2", ".", target, methods);
 
     std::string factoryOption = "!V:Silent:Color:DrawProgressBar:AnalysisType=Classification";
     std::string prepareOption = "!V:SplitMode=block";

@@ -168,6 +168,23 @@ namespace Belle2 {
       }
 
 
+      // Remove constant variables from all methods,
+      // this is a common problem using TMVA. TMVA checks if a variable is constant
+      // and exits the programm if this is the case!
+      // We need to prevent this, therefore we remove all constant variables here.
+      std::vector<std::string> cleaned_variables;
+      for (auto & x : m_methods[0].getVariables()) {
+        std::string varname = Variable::makeROOTCompatible(x->name);
+        if (m_tree->get().GetMinimum(varname.c_str()) < m_tree->get().GetMaximum(varname.c_str())) {
+          cleaned_variables.push_back(x->name);
+        } else {
+          B2WARNING("Removed variable " << x << " from TMVA training because it's constant!")
+        }
+      }
+      for (auto & method : m_methods) {
+        method = Method(method.getName(), method.getTypeAsString(), method.getConfig(), cleaned_variables);
+      }
+
       for (auto & x : m_methods[0].getVariables()) {
         boost::property_tree::ptree node;
         node.put("Name", x->name);

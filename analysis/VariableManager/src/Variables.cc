@@ -151,6 +151,11 @@ namespace Belle2 {
       return vec.Phi();
     }
 
+    double cosAngleBetweenMomentumAndVertexVector(const Particle* part)
+    {
+      return std::cos(part->getVertex().Angle(part->getMomentum()));
+    }
+
     // vertex or POCA in respect to IP ------------------------------
 
     double particleDX(const Particle* part)
@@ -166,6 +171,17 @@ namespace Belle2 {
     double particleDZ(const Particle* part)
     {
       return part->getZ() - 0; // TODO replace with IP position
+    }
+
+    double particleDistance(const Particle* part)
+    {
+      return part->getVertex().Mag();
+    }
+
+    double particleDistanceSignificance(const Particle* part)
+    {
+      const auto& vertex = part->getVertex();
+      return vertex.Mag2() / sqrt(vertex * (part->getVertexErrorMatrix() * vertex));
     }
 
     double particleDRho(const Particle* part)
@@ -1960,6 +1976,11 @@ namespace Belle2 {
       return result;
     }
 
+    double False(const Particle*)
+    {
+      return 0;
+    }
+
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
@@ -1981,6 +2002,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("cth_CMS", particleCosTheta_CMS, "CMS momentum cosine of polar angle");
     REGISTER_VARIABLE("phi_CMS", particlePhi_CMS, "CMS momentum azimuthal angle in degrees");
 
+    REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVector", cosAngleBetweenMomentumAndVertexVector, "cosine of angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle");
+    REGISTER_VARIABLE("distance", particleDistance, "distance relative to interaction point");
+    REGISTER_VARIABLE("significanceOfDistance", particleDistanceSignificance, "significance of distance relative to interaction point");
     REGISTER_VARIABLE("dx", particleDX, "x in respect to IP");
     REGISTER_VARIABLE("dy", particleDY, "y in respect to IP");
     REGISTER_VARIABLE("dz", particleDZ, "z in respect to IP");
@@ -2093,6 +2117,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("eextra", extraEnergy, "extra energy in the calorimeter that is not associated to the given Particle");
 
     REGISTER_VARIABLE("printParticle", printParticle, "For debugging, print Particle and daughter PDG codes, plus MC match. Returns 0.");
+    REGISTER_VARIABLE("False", False, "returns always 0, used for testing and debugging.");
 
     VARIABLE_GROUP("ECL Cluster related");
     REGISTER_VARIABLE("goodGamma",         goodGamma, "1.0 if photon candidate passes good photon selection criteria");

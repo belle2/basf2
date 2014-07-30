@@ -56,6 +56,10 @@ void EvtBSemiTauonicVectorMesonAmplitude::CalcAmp(EvtParticle* p,
   const double costau = p4dln.dot(p4lln) / p4dln.d3mag() / p4lln.d3mag();
   const double ml = p4l.mass();
 
+  // Set D* mass from its momentum (to take into account fluctuation due to its width)
+  const double orig_mD = CalcHelAmp->getMDst();
+  CalcHelAmp->setMDst(gmd);
+
   // obtain helicity amplitudes
   EvtComplex helamp[3][2]; // Dhel={1,0,-1}, tauhel={1,-1}
   helamp[0][0] = CalcHelAmp->helAmp(ml, 1, 1, w, costau); // note the parameter order is tauhel, Dhel
@@ -131,11 +135,14 @@ void EvtBSemiTauonicVectorMesonAmplitude::CalcAmp(EvtParticle* p,
   amp.vertex(2, 0, spinamp[2][0]);
   amp.vertex(2, 1, spinamp[2][1]);
 
+  // Set D* mass to its original value
+  CalcHelAmp->setMDst(orig_mD);
+
   // consistency check
   double helprob = abs2(helamp[0][0]) + abs2(helamp[0][1]) + abs2(helamp[1][0]) + abs2(helamp[1][1]) + abs2(helamp[2][0]) + abs2(helamp[2][1]);
   double spinprob = abs2(spinamp[0][0]) + abs2(spinamp[0][1]) + abs2(spinamp[1][0]) + abs2(spinamp[1][1]) + abs2(spinamp[2][0]) + abs2(spinamp[2][1]);
-  if (fabs(helprob - spinprob) / helprob > 1E-6) {
-    report(ERROR, "EvtGen") << "EvtBSemiTauonicVectorMesonAmplitude total helicity prob does not match with total spin prob." << std::endl;
+  if (fabs(helprob - spinprob) / helprob > 1E-6 || !finite(helprob) || !finite(spinprob)) {
+    report(ERROR, "EvtGen") << "EvtBSemiTauonicVectorMesonAmplitude total helicity prob does not match with total spin prob, or nan." << std::endl;
     fprintf(stderr, "helprob: %g spinprob: %g\n", helprob, spinprob);
     fprintf(stderr, "helprob: %g spinprob: %g\n", helprob, spinprob);
     fprintf(stderr, "w: %g costau: %g hel probs: %g\t%g\t%g\t%g\t%g\t%g\ttot: %g\n",
@@ -145,6 +152,17 @@ void EvtBSemiTauonicVectorMesonAmplitude::CalcAmp(EvtParticle* p,
     fprintf(stderr, "w: %g costau: %g probs: %g\t%g\t%g\t%g\t%g\t%g\ttot: %g\n",
             w, costau, abs2(spinamp[0][0]), abs2(spinamp[0][1]), abs2(spinamp[1][0]), abs2(spinamp[1][1]), abs2(spinamp[2][0]), abs2(spinamp[2][1]),
             abs2(spinamp[0][0]) + abs2(spinamp[0][1]) + abs2(spinamp[1][0]) + abs2(spinamp[1][1]) + abs2(spinamp[2][0]) + abs2(spinamp[2][1]));
+
+    // Debugging information
+    fprintf(stderr, "q2 by Helamp: %g\n", CalcHelAmp->q2(1, w));
+    fprintf(stderr, "helampSM by Helamp: %g\n", CalcHelAmp->helampSM(ml, 1, 1, w, costau));
+    fprintf(stderr, "Lep by Helamp: %g\n", CalcHelAmp->Lep(ml, 1, 1, CalcHelAmp->q2(1, w), costau));
+    fprintf(stderr, "HadV2 by Helamp: %g\n", CalcHelAmp->HadV2(1, 1, w));
+    fprintf(stderr, "v by Helamp: %g\n", CalcHelAmp->v(ml, CalcHelAmp->v(ml, CalcHelAmp->q2(1, w))));
+
+    fprintf(stderr, "B mass : %g \t nominal %g\n", gmB, EvtPDL::getMeanMass(p->getId()));
+    fprintf(stderr, "D mass : %g \t nominal %g\n", gmd, EvtPDL::getMeanMass(p->getDaug(0)->getId()));
+    fprintf(stderr, "lepton mass : %g \t nominal %g\n", ml, EvtPDL::getMeanMass(p->getDaug(1)->getId()));
 
     // abort();
   }

@@ -46,7 +46,6 @@ pGun.param(param_pGun)
 
 cdcDigitizer = register_module('CDCDigitizer')
 
-
 ext = register_module('Ext')
 ext.param('GFTracksColName', 'GFTracks')
 ext.param('ExtTrackCandsColName', 'ExtTrackCands')

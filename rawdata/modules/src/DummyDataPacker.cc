@@ -32,6 +32,11 @@ DummyDataPackerModule::DummyDataPackerModule() : Module()
   addParam("NodeID", m_nodeid, "Node ID", 0);
 
   B2INFO("DummyDataPacker: Constructor done.");
+
+  // initialize event #
+  n_basf2evt = 0;
+
+
 }
 
 
@@ -53,8 +58,6 @@ void DummyDataPackerModule::initialize()
   m_eventMetaDataPtr.registerAsPersistent();
 
   rawcprarray.registerPersistent();
-
-  n_basf2evt = 0;
 
   B2INFO("DummyDataPacker: initialize() done.");
 }

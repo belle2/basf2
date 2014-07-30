@@ -760,8 +760,9 @@ int* RawCOPPERFormat_v0::PackDetectorBuf(int* packed_buf_nwords,
                                          RawCOPPERPackerInfo rawcprpacker_info)
 {
   char err_buf[500];
-  sprintf(err_buf, "This function is not supported Exiting...\n%s %s %d\n",
-          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  sprintf(err_buf, "This function is not supported (%p %p %d %p %d %p %d %p %d %p ) Exiting...\n%s %s %d\n"
+          , packed_buf_nwords, detector_buf_1st, nwords_1st, detector_buf_2nd, nwords_2nd, detector_buf_3rd,
+          nwords_3rd, detector_buf_4th, nwords_4th, &rawcprpacker_info, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   string err_str = err_buf;
   throw (err_str);
 }

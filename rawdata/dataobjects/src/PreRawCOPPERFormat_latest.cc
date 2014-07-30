@@ -938,9 +938,9 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
   for (int i = 0; i < m_reduced_rawcpr.GetNumEvents() * m_reduced_rawcpr.GetNumNodes(); i++) {
     int nonzero_finesse_buf = 0;
     for (int j = 0; j < 4; j++) {
-      //      pos_nwords_finesse[ j ] = pos_nwords_to;
+
       if (GetFINESSENwords(n, j) > 0) {
-        m_reduced_rawcpr.CheckCRC16(i, j);
+        //        m_reduced_rawcpr.CheckCRC16(i, j);
         nonzero_finesse_buf++;
       }
     }

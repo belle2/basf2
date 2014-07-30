@@ -165,6 +165,8 @@ namespace Belle2 {
     //
     // Get information from "RawCOPPERFormat header" attached by DAQ software
     //
+
+    /// get Experimental # from header
     virtual int GetExpNo(int n) = 0;    //! get Experimental # from header
 
     virtual int GetRunNoSubRunNo(int n) = 0;    //! run# (14bit) restart # (8bit)

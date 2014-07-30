@@ -1,11 +1,10 @@
 #ifndef V0FINDERMODULE_H
 #define V0FINDERMODULE_H
 
-// unique_ptr lives in <memory> but inclusion leads to lots of warnings
-//#include <memory>
+#include <framework/core/Module.h>
 
-#include <framework/core/Module.h>
-#include <framework/core/Module.h>
+#include <string>
+#include <memory>
 
 #include "TH1.h"
 #include "TH2.h"

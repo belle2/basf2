@@ -89,7 +89,7 @@ void EKLM::Reconstructor::create2dHits()
         t = (t1 + t2) / 2;
         if (fastHit(crossPoint, t))
           continue;
-        EKLMHit2d* hit2d = m_hit2dArray.appendNew(EKLMHit2d(hit1, hit2));
+        EKLMHit2d* hit2d = m_hit2dArray.appendNew(hit1, hit2);
         hit2d->setEDep(hit1->getEDep() + hit2->getEDep());
         hit2d->setGlobalPosition(crossPoint);
         hit2d->setChiSq((t1 - t2) * (t1 - t2) /

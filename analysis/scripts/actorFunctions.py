@@ -172,7 +172,7 @@ def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughte
         pmake.param('fileName', filename)
         pmake.param('decayString', outputList)
         pmake.param('variable', preCutConfig.variable)
-        if preCutConfig.variable in ['M']:
+        if preCutConfig.variable in ['M', 'Mbc']:
             mass = pdg.get(pdg.from_name(particleName)).Mass()
             pmake.param('histParams', (200, mass / 2, mass + mass / 2))
         elif preCutConfig.variable in ['Q']:

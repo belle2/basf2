@@ -28,7 +28,7 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
     interpolations = GetInterpolateFunctions(ratio)
 
     # Two-Side cut S/B ratio constructed
-    if preCutConfig.method == 'S/B' and preCutConfig.variable in ['M', 'Q']:
+    if preCutConfig.method == 'S/B' and preCutConfig.variable in ['M', 'Q', 'Mbc']:
         maxima = GetPositionsOfMaxima(signal)
 
         def ycut_to_xcuts(channel, cut):
@@ -42,7 +42,7 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
             return (interpolations[channel].GetX(cut, 0, 1), 1)
 
     # Two sided cut, same for all channels
-    elif preCutConfig.method == 'Same' and preCutConfig.variable in ['M', 'Q']:
+    elif preCutConfig.method == 'Same' and preCutConfig.variable in ['M', 'Q', 'Mbc']:
         maxima = GetPositionsOfMaxima(signal)
 
         def ycut_to_xcuts(channel, cut):

@@ -98,6 +98,7 @@ class Particle(object):
         postCutConfig = copy.deepcopy(self.postCutConfig if postCutConfig is None else postCutConfig)
         mvaConfig = copy.deepcopy(self.mvaConfig if mvaConfig is None else mvaConfig)
         mvaConfig.variables.extend(['daughter{i}(getExtraInfo(SignalProbability))'.format(i=i) for i in range(0, len(daughters))])
+        #mvaConfig.variables.extend(['daughter{i}(p)'.format(i=i) for i in range(0, len(daughters))])
         self.channels.append(Particle.DecayChannel(name=self.identifier + ' ==> ' + ' '.join(daughters),
                                                    daughters=daughters,
                                                    mvaConfig=mvaConfig,
@@ -265,7 +266,8 @@ def FullEventInterpretation(path, particles):
                     additionalDependencies = []
                     if any('SignalProbability' in variable for variable in channel.mvaConfig.variables):
                         additionalDependencies += ['SignalProbability_{d}'.format(d=daughter) for daughter in channel.daughters]
-                    if any(variable in ['dx', 'dy', 'dz', 'dr'] for variable in channel.mvaConfig.variables):
+                    if any(variable in ['dx', 'dy', 'dz', 'dr', 'chiProb', 'significanceOfDistance', 'distance',
+                                        'cosAngleBetweenMomentumAndVertexVector'] for variable in channel.mvaConfig.variables):
                         additionalDependencies += ['VertexFit_{c}'.format(c=channel.name)]
 
                     seq.addFunction(SignalProbability,

@@ -159,19 +159,19 @@ namespace Belle2 {
 //    TGeoHMatrix SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s);
 
     struct straightElement {
-      double x0;        /** Initial position in X */
-      double z0;        /** Initial position in Z */
-      double l;         /**  */
-      double phi;       /** Phi angle */
+      double x0;        /**< Initial position in X */
+      double z0;        /**< Initial position in Z */
+      double l;         /**< Parameter */
+      double phi;       /**< Phi angle */
     };
 
-    /** Senstive Element  */
+    /** Sensitive Element  */
     struct bendingElement {
-      double rt;        /**  */
-      double x0;        /** Initial position in X  */
-      double z0;        /** Initial position in Z  */
-      double sphi;      /** Bending Angle */
-      double dphi;      /** Bending Angle for torus in phi */
+      double rt;        /**< Parameter */
+      double x0;        /**< Initial position in X  */
+      double z0;        /**< Initial position in Z  */
+      double sphi;      /**< Bending Angle */
+      double dphi;      /**< Bending Angle for torus in phi */
     };
 
   };

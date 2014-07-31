@@ -33,8 +33,8 @@ set_log_level(LogLevel.ERROR)
 max_event = int(argvs[1])
 packer = register_module('DummyDataPacker')
 packer.param('MaxEventNum', max_event)
-# root = register_module('RootOutput')
-# root.param('outputFileName', argvs[2])
+#root = register_module('RootOutput')
+#root.param('outputFileName', argvs[2])
 dump = register_module('Ds2RawFile')
 
 # Create main path
@@ -42,7 +42,7 @@ main = create_path()
 
 # Add modules to main path
 main.add_module(packer)
-# main.add_module(root)
+#main.add_module(root)
 main.add_module(dump)
 
 # Process all events

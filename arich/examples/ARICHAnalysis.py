@@ -62,7 +62,7 @@ set_random_seed(1028307)
 # Setting the list of particle codes (PDG codes) for the generated particles
 particlegun.param('pdgCodes', [-211, 211, -321, 321])
 # Setting the number of tracks to be generated per event:
-particlegun.param('nTracks', 4)
+particlegun.param('nTracks', 1)
 # if you set nTracks to 0, then for each PDG code in pdgCodes list a track
 # will be generated on each event.
 # Setting the parameters for the random generation

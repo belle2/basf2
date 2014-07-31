@@ -283,8 +283,6 @@ namespace Belle2 {
     StoreArray<ARICHDigit> arichDigits;
     const unsigned int nPhotonHits = arichDigits.getEntries(); // detected photons
 
-    if (nTracks == 0) return 0;
-
     const unsigned int nAerogelLayers = m_arichGeoParameters->getNumberOfAerogelRadiators();
 
     static double  refractiveInd[c_noOfAerogels];

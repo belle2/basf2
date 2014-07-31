@@ -84,13 +84,14 @@ namespace Belle2 {
   private:
 
     // Input collections
-    std::string m_mcColName;         /**< Input collection name */
-    std::string m_tracksColName;     /**< MDST tracks */
-    std::string m_extHitsColName;    /**< Extrapolated tracks */
+    std::string m_inputAeroHits;     /**< Input AeroHits collection name */
+    std::string m_inputTracks;       /**< MDST tracks collection name*/
+    std::string m_inputExtHits;      /**< Extrapolated tracks collection name*/
 
     // Output collection
-    std::string m_outColName;        /**< Output likelihoods */
-    std::string m_outfileName;       /**< Mame of beamtest analysis output file */
+    std::string m_outputLikelihoods; /**< Output likelihoods collection name*/
+    std::string m_outfileName;       /**< Name of output file containing distribution of reconostructed Cherenkov angle
+*/
 
     // Other members.
     ARICHReconstruction* m_ana;      /**< Class with reconstruction tools */

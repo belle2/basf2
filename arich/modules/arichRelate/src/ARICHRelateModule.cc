@@ -66,7 +66,7 @@ namespace Belle2 {
     StoreArray<ExtHit>::required();
 
     // Prepare the relation matrix for write access
-    RelationArray::registerPersistent<ARICHAeroHit, ExtHit>("", "");
+    RelationArray::registerPersistent<ExtHit, ARICHAeroHit>("", "");
   }
 
   void ARICHRelateModule::beginRun()
@@ -82,7 +82,7 @@ namespace Belle2 {
     StoreArray<ARICHAeroHit> aeroHits("");
 
     // Output: relations
-    RelationArray aeroHitToExt(aeroHits, extHits);
+    RelationArray aeroHitToExt(extHits, aeroHits);
     aeroHitToExt.clear();
 
     int nHits = aeroHits.getEntries();
@@ -96,7 +96,7 @@ namespace Belle2 {
         continue;
       }
 
-      int pdg = particle->getPDG();
+      int pdg = 211;
 
       // Find the track produced by MCParticle
       const Track* track = DataStore::getRelated<Track>(particle);
@@ -109,11 +109,13 @@ namespace Belle2 {
       Const::EDetector myDetID = Const::EDetector::ARICH;
       for (unsigned i = 0; i < extHits.size(); i++) {
         const ExtHit* extHit = extHits[i];
-        if (extHit->getPdgCode() != pdg) continue;
+        if (abs(extHit->getPdgCode()) != pdg) continue;
         if (extHit->getDetectorID() != myDetID) continue;
         if (extHit->getCopyID() != 12345) continue; // aerogel Al support plate
         if (extHit->getStatus() != EXT_EXIT) continue; // particles registered at the EXIT of the Al plate
-        aeroHit->addRelationTo(extHit);
+        extHit->addRelationTo(aeroHit);
+
+        //aeroHit->addRelationTo(extHit);
         break;
       }
     }

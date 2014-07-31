@@ -143,7 +143,7 @@ namespace Belle2 {
         m_prodVertex[0] = prodVertex.X();
         m_prodVertex[1] = prodVertex.Y();
         m_prodVertex[2] = prodVertex.Z();
-        m_flag = particle->getStatus();
+        //       m_flag = particle->getStatus();
 
         const Track* track = DataStore::getRelated<Track>(particle);
         if (track) {

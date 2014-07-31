@@ -42,7 +42,7 @@ main.add_module(eventinfosetter)
 # Particle gun module
 particlegun = register_module('ParticleGun')
 # Setting the random seed for particle generation:
-set_random_seed(12345)
+set_random_seed(123456)
 # Setting the list of particle codes (PDG codes) for the generated particles
 particlegun.param('pdgCodes', [-211, 211, 321, -321])
 # Setting the number of tracks to be generated per event:
@@ -86,7 +86,7 @@ main.add_module(arichREL)
 arichRECO = register_module('ARICHReconstructor')
 arichRECO.logging.log_level = LogLevel.DEBUG
 arichRECO.logging.debug_level = 20
-arichRECO.param('inputTrackType', 1)
+arichRECO.param('inputTrackType', 0)
 main.add_module(arichRECO)
 
 # Add module fpr ARICH efficiency analysis

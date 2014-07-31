@@ -153,8 +153,6 @@ void DummyDataSourceModule::event()
   m_eventMetaDataPtr->setRun(rawcprpacker_info.run_subrun_num);
   m_eventMetaDataPtr->setEvent(n_basf2evt);
 
-  printf("Event # %.8d\n", n_basf2evt);
-  fflush(stdout);
 
   //
   // Monitor
@@ -166,6 +164,11 @@ void DummyDataSourceModule::event()
       fflush(stdout);
       m_eventMetaDataPtr->setEndOfData();
     }
+  }
+
+  if (n_basf2evt % 1000 == 0) {
+    printf("Event # %.8d\n", n_basf2evt);
+    fflush(stdout);
   }
 
   n_basf2evt++;

@@ -166,7 +166,7 @@ void DeSerializerHLTModule::event()
             rawsvd = raw_svdarray.appendNew();
             rawsvd->SetBuffer(temp_buf2, buf_nwords, malloc_flag2, temp_num_events, temp_num_nodes);
             break;
-          case ECL_ID :
+          case BECL_ID :
             RawECL* rawecl;
             rawecl = raw_eclarray.appendNew();
             rawecl->SetBuffer(temp_buf2, buf_nwords, malloc_flag2, temp_num_events, temp_num_nodes);
@@ -181,7 +181,7 @@ void DeSerializerHLTModule::event()
             rawepid = raw_epidarray.appendNew();
             rawepid->SetBuffer(temp_buf2, buf_nwords, malloc_flag2, temp_num_events, temp_num_nodes);
             break;
-          case KLM_ID :
+          case BKLM_ID :
             RawKLM* rawklm;
             rawklm = raw_klmarray.appendNew();
             rawklm->SetBuffer(temp_buf2, buf_nwords, malloc_flag2, temp_num_events, temp_num_nodes);

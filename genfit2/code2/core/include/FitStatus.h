@@ -34,36 +34,42 @@ namespace genfit {
  * @brief Info which information has been pruned from the Track.
  *
  * Possible options:
- * C:  prune all reps except cardinalRep
- * F:  prune all points except first point
- * L:  prune all points except last point
- * FL: prune all points except first and last point
- * W:  prune rawMeasurements from TrackPoints
- * R:  prune referenceInfo from fitterInfos
- * M:  prune measurementInfo from fitterInfos
- * I:  if F, L, or FL is set, prune forward (backward) info of first (last) point
- * U:  if fitterInfo is a KalmanFitterInfo, prune predictions and keep updates
+   * C:  prune all reps except cardinalRep
+   * F:  prune all points except first point (also prune referenceInfo from fitterInfos)
+   * L:  prune all points except last point (also prune referenceInfo from fitterInfos)
+   * FL: prune all points except first and last point (also prune referenceInfo from fitterInfos)
+   * W:  prune rawMeasurements from TrackPoints
+   * R:  prune referenceInfo from fitterInfos
+   * M:  prune measurementInfo from fitterInfos
+   * I:  if F, L, or FL is set, prune forward (backward) info of first (last) point
+   * U:  if fitterInfo is a KalmanFitterInfo, prune predictions and keep updates
  */
 struct PruneFlags {
   PruneFlags();
   void reset();
   //! does not reset! If a flag is already true and is not in opt, it will stay true.
-  void setFlags(Option_t* option);
-  //! check if flags are set
-  bool hasFlags(Option_t* option) const;
+  void setFlags(Option_t* option = "");
+  //! check if all the given flags are set
+  bool hasFlags(Option_t* option = "CFLWRMIU") const;
   //! check if any of the flags is set
   bool isPruned() const;
 
   void Print(const Option_t* = "") const;
 
-  bool C:1;
-  bool F:1;
-  bool L:1;
-  bool W:1;
-  bool R:1;
-  bool M:1;
-  bool I:1;
-  bool U:1;
+private:
+  enum fields { C = 1 << 0,
+		F = 1 << 1,
+		L = 1 << 2,
+		W = 1 << 3,
+		R = 1 << 4,
+		M = 1 << 5,
+		I = 1 << 6,
+		U = 1 << 7 };
+
+  int value; // bitfield composed from above.  ROOT cannot deal with
+	     // bitfield notation, so this is done manually.
+
+  // No ClassDef here.  Update FitStatus version number when changing this.
 };
 
 
@@ -146,7 +152,7 @@ class FitStatus {
   //! has anything in the Track been changed since the fit? -> fit isn't valid anymore
   bool trackHasChanged_;
   //! Prune flags
-  PruneFlags pruneFlags_;  //! Don't stream until issues fixed.
+  PruneFlags pruneFlags_;
   //! fitted charge
   double charge_;
 
@@ -155,7 +161,7 @@ class FitStatus {
   double chi2_;
   double ndf_;
 
-  ClassDef(FitStatus, 2);
+  ClassDef(FitStatus, 3);
 };
 
 } /* End of namespace genfit */

@@ -13,6 +13,7 @@
 
 #include <cdc/dataobjects/WireID.h>
 
+#include <TVector3.h>
 #include <TMath.h>
 
 namespace Belle2 {
@@ -49,6 +50,14 @@ namespace Belle2 {
                                    float timeOfFlightEstimator = 0.,
                                    bool ambiguityDiscrimiator  = false,
                                    float z = 0, float theta = static_cast<float>(TMath::Pi() / 2.)) = 0;
+
+      /** Function for realistic xt and sigma */
+      virtual float getDriftLength(unsigned short tdcCount = 0,
+                                   const TVector3& posWire = TVector3(),
+                                   const TVector3& posTrack = TVector3(),
+                                   const TVector3& momentum = TVector3(),
+                                   const WireID& wireID = WireID(),
+                                   float timeOfFlightEstimator = 0.) = 0;
 
       /** Uncertainty corresponding to drift length from getDriftLength of this class.
        *

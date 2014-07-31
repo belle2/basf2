@@ -33,12 +33,30 @@ namespace Belle2 {
         m_eventTime = eventTime;
       }
 
-      /** */
+      /** Returns drift length corresponding to input TDC-counts. */
       float getDriftLength(unsigned short tdcCount,
                            const WireID& wireID        = WireID(),
                            float timeOfFlightEstimator = 0,
                            bool = false,
                            float z = 0, float = static_cast<float>(TMath::Pi() / 2.));
+
+      /** Dummy function just for compilation */
+      float getDriftLength(unsigned short tdcCount,
+                           const TVector3& posOnWire = TVector3(),
+                           const TVector3& posOnTrack = TVector3(),
+                           const TVector3& momentum = TVector3(),
+                           const WireID& wireID = WireID(),
+                           float timeOfFlightEstimator = 0) {
+        B2FATAL("The 2nd getDriftLength in SimpleTDCCountTranslator is called! Please use the one in RealisticTDCCountTranslator instead.");
+        //the followings are just for compiler warning suppression
+        static_cast<void>(tdcCount);
+        static_cast<void>(posOnWire);
+        static_cast<void>(posOnTrack);
+        static_cast<void>(momentum);
+        static_cast<void>(wireID);
+        static_cast<void>(timeOfFlightEstimator);
+        return 0.;
+      }
 
       /** Uncertainty corresponding to drift length from getDriftLength of this class.
        *

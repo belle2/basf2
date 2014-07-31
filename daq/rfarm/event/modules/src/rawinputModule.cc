@@ -124,7 +124,7 @@ void RawInputModule::registerRawCOPPERs()
     }
 
     // Get subsys id
-    int subsysid = tempcpr.GetSubsysId(cprid);
+    int subsysid = tempcpr.GetSubsysId(cprid) & DETECTOR_MASK;
     //    B2INFO ( "--> subsys ID = " << subsysid << " Block words = " << nwds_buf );
     // Switch to each detector and register RawXXX
     if (subsysid == CDC_ID) {
@@ -135,7 +135,7 @@ void RawInputModule::registerRawCOPPERs()
       //      printf ( "SVD identified\n" );
       StoreArray<RawSVD> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-    } else if (subsysid == BECL_ID) {
+    } else if (subsysid == BECL_ID  || subsysid == EECL_ID) {
       //      printf ( "ECL identified\n" );
       StoreArray<RawECL> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
@@ -147,7 +147,7 @@ void RawInputModule::registerRawCOPPERs()
       //      printf ( "EPID identified\n" );
       StoreArray<RawEPID> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-    } else if (subsysid == BKLM_ID) {
+    } else if (subsysid == BKLM_ID || subsysid == EKLM_ID) {
       //      printf ( "KLM identified\n" );
       StoreArray<RawKLM> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);

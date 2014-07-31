@@ -65,15 +65,6 @@ void StorageOutputModule::beginRun()
 
 void StorageOutputModule::event()
 {
-  StoreArray<RawCOPPER> rawcprarray;
-
-
-  for (int i = 0; i < rawcprarray.getEntries(); i++) {
-    for (int j = 0; j < rawcprarray[ i ]->GetNumEntries(); j++) {
-      //      printf("%d preallocflag %d \n", m_count ,rawcprarray[ i ]->m_use_prealloc_buf );
-
-    }
-  }
   StoreObjPtr<EventMetaData> evtmetadata;
   unsigned int expno = evtmetadata->getExperiment();
   unsigned int runno = evtmetadata->getRun();
@@ -96,25 +87,25 @@ void StorageOutputModule::event()
     }
   }
   // Stream DataStore in EvtMessage
-//   EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
-//   m_obuf.write((int*)msg->buffer(), (msg->size() - 1) / 4 + 1,
-//                false, StorageDeserializerModule::getPackage().getSerial());
-//  m_nbyte += msg->size();
-  //  delete msg;
-//   if (m_count < 10000 && (m_count < 10 || (m_count > 10 && m_count < 100 && m_count % 10 == 0) ||
-//                           (m_count > 100 && m_count < 1000 && m_count % 100 == 0) ||
-//                           (m_count > 1000 && m_count < 10000 && m_count % 1000 == 0))) {
-//     B2INFO("Storage count = " << m_count);
-//   }
-//   if (m_count % 10 == 0) {
-//     RunInfoBuffer& info(StorageDeserializerModule::getInfo());
-//     if (info.isAvailable()) {
-//       info.setOutputCount(m_count);
-//       info.addOutputNBytes(m_nbyte);
-//     }
-//     m_count_0 = m_count;
-//     m_nbyte = 0;
-//   }
+  EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
+  m_obuf.write((int*)msg->buffer(), (msg->size() - 1) / 4 + 1,
+               false, StorageDeserializerModule::getPackage().getSerial());
+  m_nbyte += msg->size();
+  delete msg;
+  if (m_count < 10000 && (m_count < 10 || (m_count > 10 && m_count < 100 && m_count % 10 == 0) ||
+                          (m_count > 100 && m_count < 1000 && m_count % 100 == 0) ||
+                          (m_count > 1000 && m_count < 10000 && m_count % 1000 == 0))) {
+    B2INFO("Storage count = " << m_count);
+  }
+  if (m_count % 10 == 0) {
+    RunInfoBuffer& info(StorageDeserializerModule::getInfo());
+    if (info.isAvailable()) {
+      info.setOutputCount(m_count);
+      info.addOutputNBytes(m_nbyte);
+    }
+    m_count_0 = m_count;
+    m_nbyte = 0;
+  }
   m_count++;
 }
 

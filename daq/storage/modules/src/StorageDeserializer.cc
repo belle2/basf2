@@ -13,7 +13,7 @@
 
 #include <framework/datastore/StoreArray.h>
 
-//#include <rawdata/dataobjects/RawPXD.h>
+#include <rawdata/dataobjects/RawPXD.h>
 
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/system/Time.h>
@@ -75,7 +75,7 @@ void StorageDeserializerModule::initialize()
   }
   m_handler = new MsgHandler(m_compressionLevel);
 
-  //  StoreArray<RawPXD>::registerPersistent();
+  StoreArray<RawPXD>::registerPersistent();
   if (m_shmflag > 0) {
     m_info.reportRunning();
   }
@@ -97,7 +97,7 @@ void StorageDeserializerModule::initialize()
 void StorageDeserializerModule::event()
 {
   m_count++;
-  //  printf("StorageDeserializerModule::event(1) %d\n", m_count);
+  //printf("StorageDeserializerModule::event(1) %d\n", m_count);
   if (m_count == 1) return;
   while (true) {
     m_package.setSerial(m_ibuf.read((int*)m_package.getData().getBuffer(), false));

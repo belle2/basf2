@@ -135,7 +135,7 @@ void RawInputModule::registerRawCOPPERs()
       //      printf ( "SVD identified\n" );
       StoreArray<RawSVD> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-    } else if (subsysid == ECL_ID) {
+    } else if (subsysid == BECL_ID) {
       //      printf ( "ECL identified\n" );
       StoreArray<RawECL> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
@@ -147,7 +147,7 @@ void RawInputModule::registerRawCOPPERs()
       //      printf ( "EPID identified\n" );
       StoreArray<RawEPID> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-    } else if (subsysid == KLM_ID) {
+    } else if (subsysid == BKLM_ID) {
       //      printf ( "KLM identified\n" );
       StoreArray<RawKLM> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);

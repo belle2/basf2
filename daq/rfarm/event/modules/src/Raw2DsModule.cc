@@ -163,7 +163,7 @@ void Raw2DsModule::registerRawCOPPERs()
     } else if ((subsysid & DETECTOR_MASK) == SVD_ID) {
       StoreArray<RawSVD> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-    } else if ((subsysid & DETECTOR_MASK) == ECL_ID) {
+    } else if ((subsysid & DETECTOR_MASK) == BECL_ID) {
       StoreArray<RawECL> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
     } else if ((subsysid & DETECTOR_MASK) == BPID_ID) {
@@ -172,7 +172,7 @@ void Raw2DsModule::registerRawCOPPERs()
     } else if ((subsysid & DETECTOR_MASK) == EPID_ID) {
       StoreArray<RawEPID> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
-    } else if ((subsysid & DETECTOR_MASK) == KLM_ID) {
+    } else if ((subsysid & DETECTOR_MASK) == BKLM_ID) {
       StoreArray<RawKLM> ary;
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
     } else {

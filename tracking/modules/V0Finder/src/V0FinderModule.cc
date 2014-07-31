@@ -255,10 +255,8 @@ void V0FinderModule::event()
   StoreArray < MCParticle > mcParticles;
   unsigned int nMCpart = mcParticles.getEntries();
 
-  if (nMCpart == 0) {
-    B2WARNING("no MC particles");
+  if (nMCpart == 0)
     return;
-  }
 
   RelationArray gfTrToMCpart(GFTracks, mcParticles);
   RelationArray TracksToMCpart(Tracks, mcParticles);
@@ -272,6 +270,10 @@ void V0FinderModule::event()
 
     const std::vector<Belle2::MCParticle*>& daughters = MCpart->getDaughters();
     if (daughters.size() != 2)
+      // Kshort can go to pi- pi+ gamma (BR = 1.8 x 10^-3).  A quick
+      // perusal of the PDG shows no other significant displaced
+      // decays to two charged particles + neutrals.  They will not be
+      // matched.
       continue;
     const MCParticle* daughterPlus = 0;
     const MCParticle* daughterMinus = 0;

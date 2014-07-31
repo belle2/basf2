@@ -101,24 +101,35 @@ void NtupleFlightInfoTool::evalFlightDistance(const Particle* mother, const Part
 
   //covariance matrix of momentum and vertex for the Dz
   //ORDER = px,py,pz,E,x,y,z
-  TMatrixFSym Cov = daughter->getMomentumVertexErrorMatrix();
+  TMatrixFSym dauCov = daughter->getMomentumVertexErrorMatrix();
 
-  //add covariance of the mother's vertices
+  //compute total covariance matrix
+  //ORDER = px dau, py dau, pz dau, E dau, x dau, y dau, z dau, x mum, y mum, z mum
 
-  for (int i = 0; i < 3; i++)
-    for (int j = 0; j < 3; j++)
-      Cov[4 + i][4 + j] = mumCov[i][j];
+  TMatrixFSym Cov(10);
+  for (int i = 0; i < 10; i++)
+    for (int j = 0; j < 10; j++)
+      if (i < 7 && j < 7)
+        Cov[i][j] = dauCov[i][j];
+      else if (i > 6 && j > 6)
+        Cov[i][j] = mumCov[i - 7][j - 7];
+      else
+        Cov[i][j] = 0;
 
-  TMatrixF deriv(7, 1);
-  deriv[0][0] = abs((lX - nX * m_fD) / p);   //px
-  deriv[1][0] = abs((lY - nY * m_fD) / p);   //py
-  deriv[2][0] = abs((lZ - nZ * m_fD) / p);   //pz
-  deriv[3][0] = 0; //E
-  deriv[4][0] = abs(nX);   //vtxX
-  deriv[5][0] = abs(nY);   //vtxY
-  deriv[6][0] = abs(nZ);   //vtxZ
+  TMatrixF deriv(10, 1);
+  deriv[0][0] = (lX - nX * m_fD) / p;   //px Daughter
+  deriv[1][0] = (lY - nY * m_fD) / p;   //py Daughter
+  deriv[2][0] = (lZ - nZ * m_fD) / p;   //pz Daughter
+  deriv[3][0] = 0; //E Daughter
+  deriv[4][0] = nX;   //vtxX Daughter
+  deriv[5][0] = nY;   //vtxY Daughter
+  deriv[6][0] = nZ;   //vtxZ Daughter
+  deriv[7][0] = - nX;   //vtxX Mother
+  deriv[8][0] = - nY;   //vtxY Mother
+  deriv[9][0] = - nZ;   //vtxZ Mother
 
-  TMatrixF tmp(7, 1);
+
+  TMatrixF tmp(10, 1);
   tmp.Mult(Cov, deriv);
 
   TMatrixF result(1, 1);
@@ -126,7 +137,6 @@ void NtupleFlightInfoTool::evalFlightDistance(const Particle* mother, const Part
 
   m_fDE = sqrt(result[0][0]);
 
-  return;
 }
 
 void NtupleFlightInfoTool::evalFlightTime(const Particle* mother, const Particle* daughter)
@@ -160,23 +170,36 @@ void NtupleFlightInfoTool::evalFlightTime(const Particle* mother, const Particle
 
   //covariance matrix of momentum and vertex for the Dz
   //ORDER = px,py,pz,E,x,y,z
-  TMatrixFSym Cov = daughter->getMomentumVertexErrorMatrix();
+  TMatrixFSym dauCov = daughter->getMomentumVertexErrorMatrix();
 
-  //add covariance of the mother's vertices
-  for (int i = 0; i < 3; i++)
-    for (int j = 0; j < 3; j++)
-      Cov[4 + i][4 + j] = mumCov[i][j];
+  //compute total covariance matrix
+  //ORDER = px dau, py dau, pz dau, E dau, x dau, y dau, z dau, x mum, y mum, z mum
 
-  TMatrixF deriv(7, 1);
-  deriv[0][0] = abs((daughter->getPDGMass() / Const::speedOfLight * lX - 2 * pX * m_fT) / p / p); //px
-  deriv[1][0] = abs((daughter->getPDGMass() / Const::speedOfLight * lY - 2 * pY * m_fT) / p / p); //py
-  deriv[2][0] = abs((daughter->getPDGMass() / Const::speedOfLight * lZ - 2 * pZ * m_fT) / p / p); //pz
-  deriv[3][0] = 0; //E
-  deriv[4][0] = abs(daughter->getPDGMass() / Const::speedOfLight * pX / p / p); //vtxX
-  deriv[5][0] = abs(daughter->getPDGMass() / Const::speedOfLight * pY / p / p); //vtxY
-  deriv[6][0] = abs(daughter->getPDGMass() / Const::speedOfLight * pZ / p / p); //vtxZ
+  TMatrixFSym Cov(10);
+  for (int i = 0; i < 10; i++)
+    for (int j = 0; j < 10; j++)
+      if (i < 7 && j < 7)
+        Cov[i][j] = dauCov[i][j];
+      else if (i > 6 && j > 6)
+        Cov[i][j] = mumCov[i - 7][j - 7];
+      else
+        Cov[i][j] = 0;
 
-  TMatrixF tmp(7, 1);
+
+  TMatrixF deriv(10, 1);
+  deriv[0][0] = (daughter->getPDGMass() / Const::speedOfLight * lX - 2 * pX * m_fT) / p / p; //px Daughter
+  deriv[1][0] = (daughter->getPDGMass() / Const::speedOfLight * lY - 2 * pY * m_fT) / p / p; //py Daughter
+  deriv[2][0] = (daughter->getPDGMass() / Const::speedOfLight * lZ - 2 * pZ * m_fT) / p / p; //pz Daughter
+  deriv[3][0] = 0; //E Daughter
+  deriv[4][0] = daughter->getPDGMass() / Const::speedOfLight * pX / p / p; //vtxX Daughter
+  deriv[5][0] = daughter->getPDGMass() / Const::speedOfLight * pY / p / p; //vtxY Daughter
+  deriv[6][0] = daughter->getPDGMass() / Const::speedOfLight * pZ / p / p; //vtxZ Daughter
+  deriv[7][0] = - daughter->getPDGMass() / Const::speedOfLight * pX / p / p; //vtxX Mother
+  deriv[8][0] = - daughter->getPDGMass() / Const::speedOfLight * pY / p / p; //vtxY Mother
+  deriv[9][0] = - daughter->getPDGMass() / Const::speedOfLight * pZ / p / p; //vtxZ Mother
+
+
+  TMatrixF tmp(10, 1);
   tmp.Mult(Cov, deriv);
 
   TMatrixF result(1, 1);
@@ -185,4 +208,5 @@ void NtupleFlightInfoTool::evalFlightTime(const Particle* mother, const Particle
   m_fTE = sqrt(result[0][0]);
 
   return;
+
 }

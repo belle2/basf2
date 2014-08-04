@@ -23,6 +23,10 @@ TObject* PyStoreArray::appendNew()
 
   return m_storeArray->ConstructedAt(getEntries());
 }
+TObject* PyStoreArray::operator [](int i) const
+{
+  return m_storeArray->At(i);
+}
 
 void PyStoreArray::list(int durability)
 {

@@ -24,7 +24,7 @@ RelationContainer::RelationContainer():
 {
 }
 
-const RelationElement& RelationContainer::elements(int i) const
+const RelationElement& RelationContainer::getElement(int i) const
 {
-  return *static_cast<RelationElement*>(m_elements[i]);
+  return *static_cast<RelationElement*>(m_elements.At(i));
 }

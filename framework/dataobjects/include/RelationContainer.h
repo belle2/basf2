@@ -77,8 +77,8 @@ namespace Belle2 {
     /** Get const reference to the elements. */
     const TClonesArray& elements() const { return m_elements; }
 
-    /** Get reference to Relation element i. */
-    const RelationElement& elements(int i) const;
+    /** Get reference to RelationElement at index i. */
+    const RelationElement& getElement(int i) const;
 
     /** Get number of elements. */
     int getEntries() const { return m_elements.GetEntriesFast(); }

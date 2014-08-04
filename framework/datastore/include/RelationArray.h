@@ -365,7 +365,7 @@ namespace Belle2 {
     inline operator bool()  const { return isValid(); }
 
     /** Imitate array functionality. */
-    const RelationElement& operator[](int i) const { assertValid(); return (*m_relations)->elements(i);}
+    const RelationElement& operator[](int i) const { assertValid(); return (*m_relations)->getElement(i);}
 
     /** Get the number of elements. */
     int getEntries() const { return isValid() ? ((*m_relations)->getEntries()) : 0; }

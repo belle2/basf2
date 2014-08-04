@@ -58,8 +58,8 @@ namespace Belle2 {
     /** Does this PyStoreArray contain a valid datastore array?  */
     operator bool() const { return m_storeArray; }
 
-    /** returns object at index i, or null pointer if out of range */
-    TObject* operator [](int i) const { return (m_storeArray and i < getEntries()) ? ((*m_storeArray)[i]) : NULL;}
+    /** returns object at index i, or null pointer if out of range (+error) */
+    TObject* operator [](int i) const;
 
     /** returns number of entries for current event. */
     int getEntries() const { return m_storeArray ? (m_storeArray->GetEntriesFast()) : 0;}

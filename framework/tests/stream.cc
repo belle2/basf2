@@ -39,8 +39,8 @@ namespace {
     EXPECT_TRUE(rel->getToName() == "b");
     EXPECT_EQ(rel->getEntries(), 100);
     for (int i = 0; i < 100; i++) {
-      EXPECT_EQ(rel->elements(i).getToIndex(0), (unsigned int)(i + 1));
-      EXPECT_DOUBLE_EQ(rel->elements(i).getWeight(0), 42.0);
+      EXPECT_EQ(rel->getElement(i).getToIndex(0), (unsigned int)(i + 1));
+      EXPECT_DOUBLE_EQ(rel->getElement(i).getWeight(0), 42.0);
     }
   }
 

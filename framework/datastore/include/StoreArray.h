@@ -176,15 +176,16 @@ namespace Belle2 {
 
     /** Access to the stored objects.
      *
+     * Out-of-bounds accesses produce an error message.
+     *
      *  \param i Array index, should be in 0..getEntries()-1
      *  \return pointer to the object, or NULL if out of bounds
      */
     inline T* operator [](int i) const {
       ensureCreated();
-      if (i >= getEntries() or i < 0)
-        return 0;
-      //type was checked by DataStore, so this is safe
-      return static_cast<T*>((*m_storeArray)->AddrAt(i));
+      //At() checks for out-of-range.
+      //type was checked by DataStore, so the cast is safe.
+      return static_cast<T*>((*m_storeArray)->At(i));
     }
 
     /** Returns address of the next free position of the array.

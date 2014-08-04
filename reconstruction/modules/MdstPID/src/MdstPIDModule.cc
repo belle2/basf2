@@ -93,11 +93,11 @@ namespace Belle2 {
       track->addRelationTo(m_pid);
 
       // set top likelihoods
-      const TOPLikelihood* top = DataStore::getRelated<TOPLikelihood>(track);
+      const TOPLikelihood* top = track->getRelated<TOPLikelihood>();
       if (top) setLikelihoods(top);
 
       // set arich likelihoods
-      const ARICHLikelihood* arich = DataStore::getRelated<ARICHLikelihood>(track);
+      const ARICHLikelihood* arich = track->getRelated<ARICHLikelihood>();
       if (arich) setLikelihoods(arich);
 
       // set dedx likelihoods

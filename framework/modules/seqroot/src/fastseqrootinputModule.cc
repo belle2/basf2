@@ -99,24 +99,21 @@ void FastSeqRootInputModule::initialize()
   // Read the first event in FastSeqRoot file and restore in DataStore.
   // This is necessary to create object tables before TTree initialization
   // if used together with TTree based output (RootOutput module).
-  EvtMessage* evtmsg = NULL;
   // Open input file
   m_file = new SeqFile(m_inputFileName.c_str(), "r");
   if (m_file->status() <= 0)
     B2FATAL("FastSeqRootInput : Error in opening input file : " << m_inputFileName);
   int size;
   char* evtbuf = new char[EvtMessage::c_MaxEventSize];
-  evtmsg = new EvtMessage(evtbuf);
 
   // Read 1st event in DataStore
   size = m_file->read(evtbuf, EvtMessage::c_MaxEventSize);
   if (size > 0) {
-    evtmsg = new EvtMessage(evtbuf);
-    m_streamer->restoreDataStore(evtmsg);
+    EvtMessage evtmsg(evtbuf);
+    m_streamer->restoreDataStore(&evtmsg);
   } else {
     B2FATAL("SeqRootInput : Error in reading first event")
   }
-  delete evtmsg;
   delete[] evtbuf;
 
   // Create a new sustainable thread to read events and queue them

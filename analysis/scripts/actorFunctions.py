@@ -27,36 +27,38 @@ from string import Template
 import IPython
 
 
-def CountMCParticles(path):
+def removeJPsiSlash(filename):
+    return filename.replace('/', '')
+
+
+def CountMCParticles(path, names):
     """
     Counts the number of MC Particles for every pdg code in all events
         @param path the basf2 path
+        @param names of all particles
     """
-    filename = 'mcParticlesCount.json'
+    filename = 'mcParticlesCount.root'
+
     if not os.path.isfile(filename):
-        class MCParticleCounter(Module):
-            def initialize(self):
-                self.counter = {'NEvents': 0}
-
-            def event(self):
-                self.counter['NEvents'] += 1
-                particles = ROOT.Belle2.PyStoreArray("MCParticles")
-                for particle in particles:
-                    pdg = abs(particle.getPDG())
-                    if pdg not in self.counter:
-                        self.counter[pdg] = 0
-                    self.counter[pdg] += 1
-
-            def terminate(self):
-                json.dump(self.counter, open(filename, 'w'))
-
-        path.add_module(MCParticleCounter())
+        output = register_module('VariablesToNtuple')
+        output.param('particleList', particleList)
+        output.param('variables', ['NumberOfMCParticlesInEvent({i})'.format(i=pdg.from_name(name)) for name in names])
+        output.param('fileName', filename)
+        output.param('treeName', 'mccounts')
+        path.add_module(output)
         B2INFO("Count number of MCParticles for every pdg code seperatly")
         return {}
-    else:
-        counter = json.load(open(filename, 'r'))
-        B2INFO("Loaded number of MCParticles for every pdg code seperatly")
-        return {'MCParticleCounts': counter}
+
+    rootfile = ROOT.TFile(filename)
+    countNtuple = rootfile.Get('mccounts')
+    keys = [str(k.GetName()) for k in countNtuple.GetListOfBranches()]
+    getpdg = lambda x: x[len('NumberOfMCParticlesInEvent('):][:-1]
+    counter = {getpdg(key): sum([getattr(t, key) for t in countNtuple]) for key in keys}
+
+    print counter
+
+    B2INFO("Loaded number of MCParticles for every pdg code seperatly")
+    return {'MCParticleCounts': counter}
 
 
 def SelectParticleList(path, particleName, particleLabel):
@@ -160,7 +162,7 @@ def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughte
         return {'PreCutHistogram_{c}'.format(c=channelName): None}
 
     hash = actorFramework.createHash(particleName, channelName, preCutConfig.variable, daughterParticleLists, additionalDependencies)
-    filename = 'CutHistograms_{c}:{h}.root'.format(c=channelName, h=hash)
+    filename = removeJPsiSlash('CutHistograms_{c}:{h}.root'.format(c=channelName, h=hash))
 
     if os.path.isfile(filename):
         B2INFO("Create pre cut histogram for channel {c}. But file already exists, so nothing to do here.".format(c=channelName))
@@ -243,13 +245,13 @@ def SignalProbability(path, identifier, particleList, mvaConfig, additionalDepen
         return{'SignalProbability_{i}'.format(i=identifier): None}
 
     hash = actorFramework.createHash(identifier, mvaConfig, particleList, additionalDependencies)
-    rootFilename = '{particleList}_{hash}.root'.format(particleList=particleList, hash=hash)
-    configFilename = '{particleList}_{hash}.config'.format(particleList=particleList, hash=hash)
+    rootFilename = removeJPsiSlash('{particleList}_{hash}.root'.format(particleList=particleList, hash=hash))
+    configFilename = removeJPsiSlash('{particleList}_{hash}.config'.format(particleList=particleList, hash=hash))
 
     if not os.path.isfile(rootFilename):
         teacher = register_module('TMVATeacher')
         teacher.set_name('TMVATeacher_' + particleList)
-        teacher.param('prefix', particleList + '_' + hash)
+        teacher.param('prefix', removeJPsiSlash(particleList + '_' + hash))
         teacher.param('methods', [(mvaConfig.name, mvaConfig.type, mvaConfig.config)])
         teacher.param('factoryOption', '!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification')
         teacher.param('prepareOption', 'SplitMode=random:!V')
@@ -270,12 +272,12 @@ def SignalProbability(path, identifier, particleList, mvaConfig, additionalDepen
                                                                   target=mvaConfig.target, variables="' '".join(mvaConfig.variables),
                                                                   foption='!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification',
                                                                   poption='SplitMode=random:!V', maxEvents=10000000,
-                                                                  prefix=particleList + '_' + hash), shell=True)
+                                                                  prefix=removeJPsiSlash(particleList + '_' + hash)), shell=True)
 
     if os.path.isfile(configFilename):
         expert = register_module('TMVAExpert')
         expert.set_name('TMVAExpert_' + particleList)
-        expert.param('prefix', particleList + '_' + hash)
+        expert.param('prefix', removeJPsiSlash(particleList + '_' + hash))
         expert.param('method', mvaConfig.name)
         expert.param('signalFraction', -2)  # Use signalFraction from training
         expert.param('signalProbabilityName', 'SignalProbability')
@@ -303,7 +305,7 @@ def VariablesToNTuple(path, particleIdentifier, particleList, signalProbability)
         return {'VariablesToNTuple_{i}'.format(i=particleIdentifier): None}
 
     hash = actorFramework.createHash(particleIdentifier, particleList, signalProbability)
-    filename = 'var_{i}_{h}.root'.format(i=particleIdentifier, h=hash)
+    filename = removeJPsiSlash('var_{i}_{h}.root'.format(i=particleIdentifier, h=hash))
 
     if not os.path.isfile(filename):
         output = register_module('VariablesToNtuple')
@@ -344,7 +346,7 @@ def WriteAnalysisFileForChannel(particleName, particleLabel, channelName, preCut
     placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, postCut)
 
     hash = actorFramework.createHash(placeholders)
-    placeholders['texFile'] = '{name}_channel_{hash}.tex'.format(name=placeholders['particleName'], hash=hash)
+    placeholders['texFile'] = removeJPsiSlash('{name}_channel_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
     if not os.path.isfile(placeholders['texFile']):
         automaticReporting.createTexFile(placeholders['texFile'], 'analysis/scripts/FullEventInterpretationChannelTemplate.tex', placeholders)
 

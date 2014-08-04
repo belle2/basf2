@@ -167,7 +167,7 @@ def FullEventInterpretation(path, particles):
 
     # Add the basf2 module path
     seq = actorFramework.Sequence()
-    seq.addFunction(CountMCParticles, path='Path')
+    seq.addFunction(CountMCParticles, path='Path', names=['Name_{i}'.format(i=particle.identifier) for particle in particles])
 
     # Now loop over all given particles, foreach particle we add some Resources and Actors.
     for particle in particles:

@@ -14,6 +14,10 @@ import subprocess
 from string import Template
 
 
+def removeJPsiSlash(filename):
+    return filename.replace('/', '')
+
+
 def purity(x, y):
     if x == 0:
         return 0.0
@@ -57,11 +61,11 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
             first_sep = count
         if c == '\n':
             count = 0
+            first_sep = 0
         if count >= 75:
             if c in ':, ' or count == 90:
                 output += '\n' + ' ' * first_sep
                 count = first_sep
-                first_sep = 0
 
     placeholders['particleConfigurations'] = output
 
@@ -183,7 +187,7 @@ def createCombinedParticleTexFile(placeholders, channelPlaceholders, mcCounts):
         placeholders['channelInputs'] += '\input{' + channelPlaceholder['texFile'] + '}\n'
 
     hash = actorFramework.createHash(placeholders)
-    placeholders['texFile'] = '{name}_{hash}.tex'.format(name=placeholders['particleName'], hash=hash)
+    placeholders['texFile'] = removeJPsiSlash('{name}_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
     if not os.path.isfile(placeholders['texFile']):
         createTexFile(placeholders['texFile'], 'analysis/scripts/FullEventInterpretationCombinedParticleTemplate.tex', placeholders)
 
@@ -247,23 +251,23 @@ def createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut):
 
         ROOT.gROOT.SetBatch(True)
 
-        placeholders['preCutAllPlot'] = '{name}_preCut_{hash}_all.png'.format(name=placeholders['particleName'], hash=hash)
+        placeholders['preCutAllPlot'] = removeJPsiSlash('{name}_preCut_{hash}_all.png'.format(name=placeholders['particleName'], hash=hash))
         if not os.path.isfile(placeholders['preCutAllPlot']):
             makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutAllPlot'], 0, preCut)
 
-        placeholders['preCutSignalPlot'] = '{name}_preCut_{hash}_signal.png'.format(name=placeholders['particleName'], hash=hash)
+        placeholders['preCutSignalPlot'] = removeJPsiSlash('{name}_preCut_{hash}_signal.png'.format(name=placeholders['particleName'], hash=hash))
         if not os.path.isfile(placeholders['preCutSignalPlot']):
             makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutSignalPlot'], 1, preCut)
 
-        placeholders['preCutBackgroundPlot'] = '{name}_preCut_{hash}_background.png'.format(name=placeholders['particleName'], hash=hash)
+        placeholders['preCutBackgroundPlot'] = removeJPsiSlash('{name}_preCut_{hash}_background.png'.format(name=placeholders['particleName'], hash=hash))
         if not os.path.isfile(placeholders['preCutBackgroundPlot']):
             makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutBackgroundPlot'], 2, preCut)
 
-        placeholders['preCutRatioPlot'] = '{name}_preCut_{hash}_ratio.png'.format(name=placeholders['particleName'], hash=hash)
+        placeholders['preCutRatioPlot'] = removeJPsiSlash('{name}_preCut_{hash}_ratio.png'.format(name=placeholders['particleName'], hash=hash))
         if not os.path.isfile(placeholders['preCutRatioPlot']):
             makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutRatioPlot'], 3, preCut)
 
-        placeholders['preCutTexFile'] = '{name}_preCut_{hash}.tex'.format(name=placeholders['particleName'], hash=hash)
+        placeholders['preCutTexFile'] = removeJPsiSlash('{name}_preCut_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
         placeholders['preCutTemplateFile'] = 'analysis/scripts/FullEventInterpretationPreCutTemplate.tex'
 
     if not os.path.isfile(placeholders['preCutTexFile']):
@@ -371,19 +375,19 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
         # Create plots and texfile if hash changed
         hash = actorFramework.createHash(placeholders)
 
-        placeholders['mvaOvertrainingPlot'] = '{name}_mva_{hash}_overtraining.png'.format(name=placeholders['particleName'], hash=hash)
+        placeholders['mvaOvertrainingPlot'] = removeJPsiSlash('{name}_mva_{hash}_overtraining.png'.format(name=placeholders['particleName'], hash=hash))
         if not os.path.isfile(placeholders['mvaOvertrainingPlot']):
             makeOvertrainingPlot(placeholders['mvaROOTFilename'], placeholders['mvaOvertrainingPlot'])
 
-        placeholders['mvaROCPlot'] = '{name}_mva_{hash}_roc.png'.format(name=placeholders['particleName'], hash=hash)
+        placeholders['mvaROCPlot'] = removeJPsiSlash('{name}_mva_{hash}_roc.png'.format(name=placeholders['particleName'], hash=hash))
         if not os.path.isfile(placeholders['mvaROCPlot']):
             makeROCPlot(placeholders['mvaROOTFilename'], placeholders['mvaROCPlot'])
 
-        placeholders['mvaDiagPlot'] = '{name}_mva_{hash}_diag.png'.format(name=placeholders['particleName'], hash=hash)
+        placeholders['mvaDiagPlot'] = removeJPsiSlash('{name}_mva_{hash}_diag.png'.format(name=placeholders['particleName'], hash=hash))
         if not os.path.isfile(placeholders['mvaDiagPlot']):
             makeDiagPlot(placeholders['mvaROOTFilename'], placeholders['mvaDiagPlot'], placeholders['mvaName'])
 
-        placeholders['mvaTexFile'] = '{name}_mva_{hash}.tex'.format(name=placeholders['particleName'], hash=hash)
+        placeholders['mvaTexFile'] = removeJPsiSlash('{name}_mva_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
         placeholders['mvaTemplateFile'] = 'analysis/scripts/FullEventInterpretationMVATemplate.tex'
 
     if not os.path.isfile(placeholders['mvaTexFile']):

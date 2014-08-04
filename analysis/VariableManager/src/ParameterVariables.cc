@@ -32,7 +32,7 @@ namespace Belle2 {
       StoreArray<MCParticle> mcParticles;
       int counter = 0;
       for (int i = 0; i < mcParticles.getEntries(); ++i) {
-        if (mcParticles[i]->getPDG() == pdg[0])
+        if (abs(mcParticles[i]->getPDG()) == pdg[0])
           counter++;
       }
       return counter;
@@ -80,7 +80,7 @@ namespace Belle2 {
     }
 
     VARIABLE_GROUP("ParameterFunctions");
-    REGISTER_VARIABLE("NumberOfMCParticlesInEvent(pdg)", NumberOfMCParticlesInEvent , "Returns number of MC Particles with the given pdg in the event.");
+    REGISTER_VARIABLE("NumberOfMCParticlesInEvent(pdg)", NumberOfMCParticlesInEvent , "Returns number of MC Particles (including anti particles) with the given pdg in the event.");
     REGISTER_VARIABLE("daughterInvariantMass(i, j, ...)", daughterInvariantMass , "Returns invariant mass of the given daughter particles.");
     REGISTER_VARIABLE("decayAngle(i)", particleDecayAngle, "cosine of the angle between the mother momentum vector and the direction of the i-th daughter in the mother's rest frame");
     REGISTER_VARIABLE("daughterAngle(i,j)", particleDaughterAngle, "cosine of the angle between i-th and j-th daughters, in lab frame");

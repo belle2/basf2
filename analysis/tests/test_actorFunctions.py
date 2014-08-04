@@ -20,6 +20,20 @@ class MockPath(object):
         return self.mmodules
 
 
+class TestCountMCParticles(unittest.TestCase):
+    def setUp(self):
+        self.path = MockPath()
+
+    def test_standard(self):
+        result = CountMCParticles(self.path, ['e+', 'gamma', 'D+'])
+        self.assertDictEqual(result, {})
+        self.assertEqual(len(self.path.modules()), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertListEqual(parameters['variables'], ['NumberOfMCParticlesInEvent(-11)', 'NumberOfMCParticlesInEvent(22)', 'NumberOfMCParticlesInEvent(411)'])
+        self.assertEqual(parameters['fileName'], 'mcParticlesCount.root')
+        self.assertEqual(parameters['treeName'], 'mccounts')
+
+
 class TestSelectParticleList(unittest.TestCase):
     def setUp(self):
         self.path = MockPath()
@@ -159,31 +173,44 @@ class TestCopyParticleLists(unittest.TestCase):
         self.assertTrue(result['ParticleList_D+:generic'] != 'D+:' + self.standardHash)
 
 
+class TestLoadGeometry(unittest.TestCase):
+    def setUp(self):
+        self.path = MockPath()
+
+    def test_standard(self):
+        result = LoadGeometry(self.path)
+        self.assertDictEqual(result, {'Geometry': 'dummy'})
+        self.assertEqual(len(self.path.modules()), 2)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        parameters = {p.name: p.values for p in self.path.modules()[1].available_params()}
+        self.assertListEqual(parameters['components'], ['MagneticField'])
+
+
 class TestFitVertex(unittest.TestCase):
     def setUp(self):
         self.path = MockPath()
-        self.standardHash = 'a3d3b90034404d7fcecdfe984d106d4c05677338'
+        self.standardHash = '85016aeb7051ebf59d0e3e9c1b816b25eaa52722'
 
     def test_standard(self):
-        result = FitVertex(self.path, 'UniqueChannelName', 'D+:1')
+        result = FitVertex(self.path, 'UniqueChannelName', 'D+:1', 'dummy')
         self.assertDictEqual(result, {'VertexFit_UniqueChannelName': self.standardHash})
-        self.assertEqual(len(self.path.modules()), 2)
-        parameters = {p.name: p.values for p in self.path.modules()[1].available_params()}
+        self.assertEqual(len(self.path.modules()), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
         self.assertEqual(parameters['listName'], 'D+:1')
         self.assertEqual(parameters['confidenceLevel'], 0)
 
     def test_missing_particle_list(self):
-        result = FitVertex(self.path, 'UniqueChannelName', None)
+        result = FitVertex(self.path, 'UniqueChannelName', None, 'dummy')
         self.assertDictEqual(result, {'VertexFit_UniqueChannelName': None})
         self.assertEqual(len(self.path.modules()), 0)
 
     def test_hash_depends_on_channel_name(self):
-        result = FitVertex(self.path, 'other', 'D+:1')
+        result = FitVertex(self.path, 'other', 'D+:1', 'dummy')
         self.assertTrue('VertexFit_other' in result)
         self.assertTrue(result['VertexFit_other'] != self.standardHash)
 
     def test_hash_depends_on_particle_list(self):
-        result = FitVertex(self.path, 'UniqueChannelName', 'D+:2')
+        result = FitVertex(self.path, 'UniqueChannelName', 'D+:2', 'dummy')
         self.assertTrue('VertexFit_UniqueChannelName' in result)
         self.assertTrue(result['VertexFit_UniqueChannelName'] != self.standardHash)
 

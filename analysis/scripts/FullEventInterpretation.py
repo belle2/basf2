@@ -168,6 +168,7 @@ def FullEventInterpretation(path, particles):
     # Add the basf2 module path
     seq = actorFramework.Sequence()
     seq.addFunction(CountMCParticles, path='Path', names=['Name_{i}'.format(i=particle.identifier) for particle in particles])
+    seq.addFunction(LoadGeometry, path='Path')
 
     # Now loop over all given particles, foreach particle we add some Resources and Actors.
     for particle in particles:
@@ -210,7 +211,8 @@ def FullEventInterpretation(path, particles):
                 seq.addFunction(FitVertex,
                                 path='Path',
                                 channelName='Name_{c}'.format(c=channel.name),
-                                particleList='RawParticleList_{c}'.format(c=channel.name))
+                                particleList='RawParticleList_{c}'.format(c=channel.name),
+                                geometry='Geometry')
 
             seq.addFunction(CopyParticleLists,
                             path='Path',

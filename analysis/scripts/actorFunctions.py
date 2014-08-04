@@ -41,7 +41,6 @@ def CountMCParticles(path, names):
 
     if not os.path.isfile(filename):
         output = register_module('VariablesToNtuple')
-        output.param('particleList', particleList)
         output.param('variables', ['NumberOfMCParticlesInEvent({i})'.format(i=pdg.from_name(name)) for name in names])
         output.param('fileName', filename)
         output.param('treeName', 'mccounts')
@@ -52,7 +51,7 @@ def CountMCParticles(path, names):
     rootfile = ROOT.TFile(filename)
     countNtuple = rootfile.Get('mccounts')
     keys = [str(k.GetName()) for k in countNtuple.GetListOfBranches()]
-    getpdg = lambda x: x[len('NumberOfMCParticlesInEvent('):][:-1]
+    getpdg = lambda x: x[len('NumberOfMCParticlesInEvent'):]  # makeROOTCompatible removes parenthesis from variable so we don't worry about them here
     counter = {getpdg(key): sum([getattr(t, key) for t in countNtuple]) for key in keys}
 
     print counter
@@ -130,20 +129,43 @@ def CopyParticleLists(path, particleName, particleLabel, inputLists, postCuts):
             'ParticleList_{p}:{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): pdg.conjugate(particleName) + ':' + userLabel}
 
 
-def FitVertex(path, channelName, particleList):
+def LoadGeometry(path):
+    """
+    Loads Geometry module
+    @param path the basf2 path
+    @return Resource named Geometry
+    """
+    gearbox = register_module('Gearbox')
+    path.add_module(gearbox)
+    geometry = register_module('Geometry')
+    geometry.param('components', ['MagneticField'])
+    path.add_module(geometry)
+    return {'Geometry': 'dummy'}
+
+
+def FitVertex(path, channelName, particleList, geometry):
     """
     Fit secondary vertex of all particles in this ParticleList
         @param path the basf2 path
         @param channelName unique name describing the channel
         @param particleList ParticleList name
+        @param additional requirement to ensure that geometry module is loaded
         @return Resource named VertexFit_{channelName}
     """
     if particleList is None:
         B2INFO("Didn't fitted vertex for channel {c}, because channel is ignored.".format(c=channelName))
         return {'VertexFit_{c}'.format(c=channelName): None}
-    modularAnalysis.fitVertex(particleList, 0, path=path)
+
+    pvfit = register_module('ParticleVertexFitter')
+    pvfit.set_name('ParticleVertexFitter_' + particleList)
+    pvfit.param('listName', particleList)
+    pvfit.param('confidenceLevel', 0)
+    pvfit.param('vertexFitter', 'rave')
+    pvfit.param('fitType', 'vertex')
+    path.add_module(pvfit)
+
     B2INFO("Fitted vertex for channel {c}.".format(c=channelName))
-    return {'VertexFit_{c}'.format(c=channelName): actorFramework.createHash(channelName, particleList)}
+    return {'VertexFit_{c}'.format(c=channelName): actorFramework.createHash(channelName, particleList, geometry)}
 
 
 def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughterParticleLists, additionalDependencies):

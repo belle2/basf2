@@ -40,7 +40,7 @@ particles.append(Particle('gamma', mva_gamma))
 ################## PI0 ###############################
 mva_pi0 = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=kinematic_variables + ['daughterAngle'],
+    variables=kinematic_variables + ['daughterAngle(0,1)'],
     target='isSignal', targetCluster=1
 )
 
@@ -70,7 +70,7 @@ mva_KS0 = Particle.MVAConfiguration(
 
 mva_KS0_pi0pi0 = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=['p', 'pt', 'M', 'E', 'daughterAngle'],
+    variables=['p', 'pt', 'M', 'E', 'daughterAngle(0,1)'],
     target='isSignal', targetCluster=1
 )
 

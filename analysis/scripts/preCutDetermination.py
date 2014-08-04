@@ -23,7 +23,6 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
 
     ROOT.gROOT.SetBatch(True)
     files = [ROOT.TFile(filename, 'UPDATE') for filename, _ in preCutHistograms]
-
     signal, bckgrd, ratio = LoadHistogramsFromFiles(files, preCutConfig.variable, channelNames, preCutHistograms)
     interpolations = GetInterpolateFunctions(ratio)
 
@@ -88,8 +87,8 @@ def LoadHistogramsFromFiles(files, variable, channelNames, preCutHistograms):
     @param variable the variable which defines the x-axis of the histograms
     @param channels the channels for which the histograms are loaded
     """
-    signal = dict([(channel, file.Get('signal' + key)) for (_, key), channel, file in zip(preCutHistograms, channelNames, files)])
-    all = dict([(channel, file.Get('all' + key)) for (_, key), channel, file in zip(preCutHistograms, channelNames, files)])
+    signal = dict([(channel, file.GetKey('signal' + key).ReadObj()) for (_, key), channel, file in zip(preCutHistograms, channelNames, files)])
+    all = dict([(channel, file.GetKey('all' + key).ReadObj()) for (_, key), channel, file in zip(preCutHistograms, channelNames, files)])
 
     if any([hist is None for hist in signal.values() + all.values()]):
         raise RuntimeError('Error while opening ROOT file with preCut Histograms')

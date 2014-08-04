@@ -704,6 +704,32 @@ namespace Belle2 {
       return 0.0;
     }
 
+    double isRestOfEventB0Flavor(const Particle*)
+    {
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      Particle* part = roe->getRelated<Particle>();
+      const MCParticle* mcParticle = part->getRelated<MCParticle>();
+      if (mcParticle == nullptr) {return -999.0;} //if there is no mcparticle (e.g. not in training modus)
+      else if (mcParticle->getPDG() == 511) {
+        return 1.0;
+      } else if (mcParticle->getPDG() == -511) {
+        return -1.0;
+      } else return 0;
+    }
+
+    double isRestOfEventB0Flavor_Norm(const Particle*)
+    {
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      Particle* part = roe->getRelated<Particle>();
+      const MCParticle* mcParticle = part->getRelated<MCParticle>();
+      if (mcParticle == nullptr) {return -999.0;} //if there is no mcparticle (e.g. not in training modus)
+      else if (mcParticle->getPDG() == 511) {
+        return 1.0;
+      } else if (mcParticle->getPDG() == -511) {
+        return 0;
+      } else return -1.0;
+    }
+
     double isElectronFromB(const Particle* part)
     {
       const MCParticle* mcParticle = part->getRelated<MCParticle>();
@@ -831,6 +857,201 @@ namespace Belle2 {
       return maximum_r * maximum_q;
     }
 
+    double QRElectron(const Particle*)
+    {
+      StoreObjPtr<ParticleList> electrons("e+:ROE");
+      float maximum_q = 0;
+      float maximum_r = 0;
+      for (unsigned int i = 0; i < electrons->getListSize(); ++i) {
+        Particle* p = electrons->getParticle(i);
+        float r = p->getExtraInfo("isElectronFromB");
+        if (r > maximum_r) {
+          maximum_r = r;
+          maximum_q = p->getCharge();
+        }
+      }
+      return maximum_r * maximum_q;
+    }
+
+    double QRMuon(const Particle*)
+    {
+      StoreObjPtr<ParticleList> muons("mu+:ROE");
+      float maximum_q = 0;
+      float maximum_r = 0;
+      for (unsigned int i = 0; i < muons->getListSize(); ++i) {
+        Particle* p = muons->getParticle(i);
+        float r = p->getExtraInfo("isMuonFromB");
+        if (r > maximum_r) {
+          maximum_r = r;
+          maximum_q = p->getCharge();
+        }
+      }
+      return maximum_r * maximum_q;
+    }
+
+    double QRKaon(const Particle*)
+    {
+      StoreObjPtr<ParticleList> kaons("K+:ROE");
+      float maximum_q = 0;
+      float maximum_r = 0;
+      for (unsigned int i = 0; i < kaons->getListSize(); ++i) {
+        Particle* p = kaons->getParticle(i);
+        float r = p->getExtraInfo("isKaonFromB");
+        if (r > maximum_r) {
+          maximum_r = r;
+          maximum_q = p->getCharge();
+        }
+      }
+      return maximum_r * maximum_q;
+    }
+
+    double QRSlowPion(const Particle*)
+    {
+      StoreObjPtr<ParticleList> pions("pi+:ROE");
+      float maximum_q = 0;
+      float maximum_r = 0;
+      for (unsigned int i = 0; i < pions->getListSize(); ++i) {
+        Particle* p = pions->getParticle(i);
+        float r = p->getExtraInfo("isSlowPionFromB");
+        if (r > maximum_r) {
+          maximum_r = r;
+          maximum_q = p->getCharge();
+        }
+      }
+      return maximum_r * maximum_q;
+    }
+
+    double isElectronRightClass(const Particle*)
+    {
+      StoreObjPtr<ParticleList> electrons("e+:ROE");
+      Particle* nullpart = nullptr;
+      float maximum_q = 0;
+      float maximum_r = 0;
+      int maximum_PDG = 0;
+      int maximum_PDG_Mother = 0;
+      for (unsigned int i = 0; i < electrons->getListSize(); ++i) {
+        Particle* p = electrons->getParticle(i);
+        const MCParticle* MCp = p->getRelated<MCParticle>();
+        float r = p->getExtraInfo("isElectronFromB");
+        if (r > maximum_r) {
+          maximum_r = r;
+          maximum_q = p -> getCharge();
+          if (MCp->getMother() != nullptr && MCp->getMother()->getMother() != nullptr) {
+            maximum_PDG = TMath::Abs(MCp->getPDG());
+            maximum_PDG_Mother = TMath::Abs(MCp->getMother()->getPDG());
+          } else {
+            maximum_PDG = 0;
+            maximum_PDG_Mother = 0;
+          }
+        }
+      }
+      if (maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 11 && maximum_PDG_Mother == 511) {
+        return 1.0;
+      } else {
+        return 0.0;
+      }
+    }
+
+    double isMuonRightClass(const Particle*)
+    {
+
+      StoreObjPtr<ParticleList> muons("mu+:ROE");
+      Particle* nullpart = nullptr;
+      float maximum_q = 0;
+      float maximum_r = 0;
+      int maximum_PDG = 0;
+      int maximum_PDG_Mother = 0;
+      for (unsigned int i = 0; i < muons->getListSize(); ++i) {
+        Particle* p = muons->getParticle(i);
+        const MCParticle* MCp = p->getRelated<MCParticle>();
+        float r = p->getExtraInfo("isMuonFromB");
+        if (r > maximum_r) {
+          maximum_r = r;
+          maximum_q = p -> getCharge();
+          if (MCp->getMother() != nullptr && MCp->getMother()->getMother() != nullptr) {
+            maximum_PDG = TMath::Abs(MCp->getPDG());
+            maximum_PDG_Mother = TMath::Abs(MCp->getMother()->getPDG());
+          } else {
+            maximum_PDG = 0;
+            maximum_PDG_Mother = 0;
+          }
+        }
+      }
+      if (maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 13 && maximum_PDG_Mother == 511) {
+        return 1.0;
+      } else {
+        return 0.0;
+      }
+    }
+
+    double isKaonRightClass(const Particle*)
+    {
+      StoreObjPtr<ParticleList> kaons("K+:ROE");
+      Particle* nullpart = nullptr;
+      float maximum_q = 0;
+      float maximum_r = 0;
+      int maximum_PDG = 0;
+      int maximum_PDG_Mother = 0;
+      int maximum_PDG_Mother_Mother = 0;
+      for (unsigned int i = 0; i < kaons->getListSize(); ++i) {
+        Particle* p = kaons->getParticle(i);
+        const MCParticle* MCp = p->getRelated<MCParticle>();
+        float r = p->getExtraInfo("isKaonFromB");
+        if (r > maximum_r) {
+          maximum_r = r;
+          maximum_q = p -> getCharge();
+          if (MCp->getMother() != nullptr && MCp->getMother()->getMother() != nullptr) {
+            maximum_PDG = TMath::Abs(MCp->getPDG());
+            maximum_PDG_Mother = TMath::Abs(MCp->getMother()->getPDG());
+            maximum_PDG_Mother_Mother =  TMath::Abs(MCp->getMother()->getMother()->getPDG());
+          } else {
+            maximum_PDG = 0;
+            maximum_PDG_Mother = 0;
+          }
+        }
+      }
+      if (maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
+          && maximum_PDG == 321 && maximum_PDG_Mother > 400 && maximum_PDG_Mother < 500 && maximum_PDG_Mother_Mother == 511) {
+        return 1.0;
+      } else {
+        return 0.0;
+      }
+    }
+
+    double isSlowPionRightClass(const Particle*)
+    {
+      StoreObjPtr<ParticleList> pions("pi+:ROE");
+      Particle* nullpart = nullptr;
+      float maximum_q = 0;
+      float maximum_r = 0;
+      int maximum_PDG = 0;
+      int maximum_PDG_Mother = 0;
+      int maximum_PDG_Mother_Mother = 0;
+      for (unsigned int i = 0; i < pions->getListSize(); ++i) {
+        Particle* p = pions->getParticle(i);
+        const MCParticle* MCp = p->getRelated<MCParticle>();
+        float r = p->getExtraInfo("isSlowPionFromB");
+        if (r > maximum_r) {
+          maximum_r = r;
+          maximum_q = p -> getCharge();
+          if (MCp->getMother() != nullptr && MCp->getMother()->getMother() != nullptr) {
+            maximum_PDG = TMath::Abs(MCp->getPDG());
+            maximum_PDG_Mother = TMath::Abs(MCp->getMother()->getPDG());
+            maximum_PDG_Mother_Mother =  TMath::Abs(MCp->getMother()->getMother()->getPDG());
+          } else {
+            maximum_PDG = 0;
+            maximum_PDG_Mother = 0;
+          }
+        }
+      }
+      if (maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
+          && maximum_PDG == 211 && maximum_PDG_Mother == 413 && maximum_PDG_Mother_Mother == 511) {
+        return 1.0;
+      } else {
+        return 0.0;
+      }
+    }
+
     double p_miss(const Particle*)
     {
       TLorentzVector trackiCMSVec;
@@ -924,22 +1145,316 @@ namespace Belle2 {
 
     // Recoil Kinematics related ---------------------------------------------
 
-    double particleP_CMS_missing(const Particle* particle)
+    double recoilMassBtag_Muon(const Particle*)
     {
-      double result = -1.0;
-
-      if (!(particle->getExtraInfo("p_CMS_missing"))) return result;
-
-      return particle->getExtraInfo("p_CMS_missing");
+      TLorentzVector momXchargedtracks; //Momentum of charged X tracks in CMS-System
+      TLorentzVector momXchargedclusters; //Momentum of charged X clusters in CMS-System
+      TLorentzVector momXneutralclusters; //Momentum of neutral X clusters in CMS-System
+      TLorentzVector momX; //Total Momentum of the recoiling X in CMS-System
+      TLorentzVector momMu;  //Momentum of Mu in CMS-System
+      PCmsLabTransform T;
+      StoreObjPtr<ParticleList> muons("mu+:ROE");
+      float maximum_r = 0;
+      for (unsigned int i = 0; i < muons->getListSize(); ++i) {
+        Particle* p = muons->getParticle(i);
+        float r = p->getExtraInfo("isMuonFromB");
+        momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
+        if (r > maximum_r) {
+          maximum_r = r;
+          momMu = T.rotateLabToCms() * p -> get4Vector();
+        }
+      }
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      const auto& ecl = roe->getECLClusters();
+      for (auto & x : ecl) {
+        if (x->isNeutral()) momXneutralclusters += T.rotateLabToCms() * x -> get4Vector();
+        if (!(x->isNeutral())) momXchargedclusters += T.rotateLabToCms() * x -> get4Vector();
+      }
+      const auto& klm = roe->getKLMClusters();
+      for (auto & x : klm) {
+        if (!(x -> getAssociatedTrackFlag()) && !(x -> getAssociatedEclClusterFlag())) {
+          momXneutralclusters += T.rotateLabToCms() * x -> getMomentum();
+        }
+      }
+      TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
+      momX = (momXcharged + momXneutralclusters - momMu) - momMu;
+      return momX.M();
     }
 
-    double particleCosTheta_Missing(const Particle* particle)
+    double recoilMassBtag_Electron(const Particle*)
     {
-      double result = -1.0;
+      TLorentzVector momXchargedtracks; //Momentum of charged X tracks in CMS-System
+      TLorentzVector momXchargedclusters; //Momentum of charged X clusters in CMS-System
+      TLorentzVector momXneutralclusters; //Momentum of neutral X clusters in CMS-System
+      TLorentzVector momX; //Total Momentum of the recoiling X in CMS-System
+      TLorentzVector momE;  //Momentum of Electron in CMS-System
+      PCmsLabTransform T;
+      StoreObjPtr<ParticleList> electrons("e+:ROE");
+      float maximum_r = 0;
+      for (unsigned int i = 0; i < electrons->getListSize(); ++i) {
+        Particle* p = electrons->getParticle(i);
+        float r = p->getExtraInfo("isElectronFromB");
+        momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
+        if (r > maximum_r) {
+          maximum_r = r;
+          momE = T.rotateLabToCms() * p -> get4Vector();
+        }
+      }
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      const auto& ecl = roe->getECLClusters();
+      for (auto & x : ecl) {
+        if (x->isNeutral()) momXneutralclusters += T.rotateLabToCms() * x -> get4Vector();
+        if (!(x->isNeutral())) momXchargedclusters += T.rotateLabToCms() * x -> get4Vector();
+      }
+      const auto& klm = roe->getKLMClusters();
+      for (auto & x : klm) {
+        if (!(x -> getAssociatedTrackFlag()) && !(x -> getAssociatedEclClusterFlag())) {
+          momXneutralclusters += T.rotateLabToCms() * x -> getMomentum();
+        }
+      }
+      TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
+      momX = (momXcharged + momXneutralclusters - momE) - momE;
+      return momX.M();
+    }
 
-      if (!(particle->getExtraInfo("cosTheta_missing"))) return result;
+    double particleP_CMS_Muon(const Particle*)
+    {
+      TLorentzVector momXchargedtracks; //Momentum of charged X tracks in CMS-System
+      TLorentzVector momXchargedclusters; //Momentum of charged X clusters in CMS-System
+      TLorentzVector momXneutralclusters; //Momentum of neutral X clusters in CMS-System
+      TLorentzVector momX; //Total Momentum of the recoiling X in CMS-System
+      TLorentzVector momMu;  //Momentum of Mu in CMS-System
+      PCmsLabTransform T;
+      StoreObjPtr<ParticleList> muons("mu+:ROE");
+      float maximum_r = 0;
+      for (unsigned int i = 0; i < muons->getListSize(); ++i) {
+        Particle* p = muons->getParticle(i);
+        float r = p->getExtraInfo("isMuonFromB");
+        momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
+        if (r > maximum_r) {
+          maximum_r = r;
+          momMu = T.rotateLabToCms() * p -> get4Vector();
+        }
+      }
+      return momMu.P();
+    }
 
-      return particle->getExtraInfo("cosTheta_missing");
+    double particleP_CMS_Electron(const Particle*)
+    {
+      TLorentzVector momXchargedtracks; //Momentum of charged X tracks in CMS-System
+      TLorentzVector momXchargedclusters; //Momentum of charged X clusters in CMS-System
+      TLorentzVector momXneutralclusters; //Momentum of neutral X clusters in CMS-System
+      TLorentzVector momX; //Total Momentum of the recoiling X in CMS-System
+      TLorentzVector momE;  //Momentum of E in CMS-System
+      PCmsLabTransform T;
+      StoreObjPtr<ParticleList> electrons("e+:ROE");
+      float maximum_r = 0;
+      for (unsigned int i = 0; i < electrons->getListSize(); ++i) {
+        Particle* p = electrons->getParticle(i);
+        float r = p->getExtraInfo("isElectronFromB");
+        momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
+        if (r > maximum_r) {
+          maximum_r = r;
+          momE = T.rotateLabToCms() * p -> get4Vector();
+        }
+      }
+      return momE.P();
+    }
+
+    double particleP_CMS_Kaon(const Particle*)
+    {
+      TLorentzVector momXchargedtracks; //Momentum of charged X tracks in CMS-System
+      TLorentzVector momXchargedclusters; //Momentum of charged X clusters in CMS-System
+      TLorentzVector momXneutralclusters; //Momentum of neutral X clusters in CMS-System
+      TLorentzVector momX; //Total Momentum of the recoiling X in CMS-System
+      TLorentzVector momK;  //Momentum of K in CMS-System
+      PCmsLabTransform T;
+      StoreObjPtr<ParticleList> kaons("K+:ROE");
+      float maximum_r = 0;
+      for (unsigned int i = 0; i < kaons->getListSize(); ++i) {
+        Particle* p = kaons->getParticle(i);
+        float r = p->getExtraInfo("isKaonFromB");
+        momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
+        if (r > maximum_r) {
+          maximum_r = r;
+          momK = T.rotateLabToCms() * p -> get4Vector();
+        }
+      }
+      return momK.P();
+    }
+
+    double particleP_CMS_SlowPion(const Particle*)
+    {
+      TLorentzVector momXchargedtracks; //Momentum of charged X tracks in CMS-System
+      TLorentzVector momXchargedclusters; //Momentum of charged X clusters in CMS-System
+      TLorentzVector momXneutralclusters; //Momentum of neutral X clusters in CMS-System
+      TLorentzVector momX; //Total Momentum of the recoiling X in CMS-System
+      TLorentzVector momPi;  //Momentum of Pi in CMS-System
+      PCmsLabTransform T;
+      StoreObjPtr<ParticleList> pions("pi+:ROE");
+      float maximum_r = 0;
+      for (unsigned int i = 0; i < pions->getListSize(); ++i) {
+        Particle* p = pions->getParticle(i);
+        float r = p->getExtraInfo("isSlowPionFromB");
+        momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
+        if (r > maximum_r) {
+          maximum_r = r;
+          momPi = T.rotateLabToCms() * p -> get4Vector();
+        }
+      }
+      return momPi.P();
+    }
+
+    double particleP_CMS_missing_Muon(const Particle*)
+    {
+      TLorentzVector momXchargedtracks; //Momentum of charged X tracks in CMS-System
+      TLorentzVector momXchargedclusters; //Momentum of charged X clusters in CMS-System
+      TLorentzVector momXneutralclusters; //Momentum of neutral X clusters in CMS-System
+      TLorentzVector momX; //Total Momentum of the recoiling X in CMS-System
+      TLorentzVector momMu;  //Momentum of Mu in CMS-System
+      TLorentzVector momMiss;  //Momentum of Anti-v  in CMS-System
+      PCmsLabTransform T;
+      StoreObjPtr<ParticleList> muons("mu+:ROE");
+      float maximum_r = 0;
+      for (unsigned int i = 0; i < muons->getListSize(); ++i) {
+        Particle* p = muons->getParticle(i);
+        float r = p->getExtraInfo("isMuonFromB");
+        momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
+        if (r > maximum_r) {
+          maximum_r = r;
+          momMu = T.rotateLabToCms() * p -> get4Vector();
+        }
+      }
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      const auto& ecl = roe->getECLClusters();
+      for (auto & x : ecl) {
+        if (x->isNeutral()) momXneutralclusters += T.rotateLabToCms() * x -> get4Vector();
+        if (!(x->isNeutral())) momXchargedclusters += T.rotateLabToCms() * x -> get4Vector();
+      }
+      const auto& klm = roe->getKLMClusters();
+      for (auto & x : klm) {
+        if (!(x -> getAssociatedTrackFlag()) && !(x -> getAssociatedEclClusterFlag())) {
+          momXneutralclusters += T.rotateLabToCms() * x -> getMomentum();
+        }
+      }
+      TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
+      momX = (momXcharged + momXneutralclusters - momMu) - momMu;
+      momMiss = -(momX + momMu);
+      return momMiss.Vect().Mag();
+    }
+
+    double particleP_CMS_missing_Electron(const Particle*)
+    {
+      TLorentzVector momXchargedtracks; //Momentum of charged X tracks in CMS-System
+      TLorentzVector momXchargedclusters; //Momentum of charged X clusters in CMS-System
+      TLorentzVector momXneutralclusters; //Momentum of neutral X clusters in CMS-System
+      TLorentzVector momX; //Total Momentum of the recoiling X in CMS-System
+      TLorentzVector momE;  //Momentum of E in CMS-System
+      TLorentzVector momMiss;  //Momentum of Anti-v  in CMS-System
+      PCmsLabTransform T;
+      StoreObjPtr<ParticleList> electrons("e+:ROE");
+      float maximum_r = 0;
+      for (unsigned int i = 0; i < electrons->getListSize(); ++i) {
+        Particle* p = electrons->getParticle(i);
+        float r = p->getExtraInfo("isElectronFromB");
+        momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
+        if (r > maximum_r) {
+          maximum_r = r;
+          momE = T.rotateLabToCms() * p -> get4Vector();
+        }
+      }
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      const auto& ecl = roe->getECLClusters();
+      for (auto & x : ecl) {
+        if (x->isNeutral()) momXneutralclusters += T.rotateLabToCms() * x -> get4Vector();
+        if (!(x->isNeutral())) momXchargedclusters += T.rotateLabToCms() * x -> get4Vector();
+      }
+      const auto& klm = roe->getKLMClusters();
+      for (auto & x : klm) {
+        if (!(x -> getAssociatedTrackFlag()) && !(x -> getAssociatedEclClusterFlag())) {
+          momXneutralclusters += T.rotateLabToCms() * x -> getMomentum();
+        }
+      }
+      TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
+      momX = (momXcharged + momXneutralclusters - momE) - momE;
+      momMiss = -(momX + momE);
+      return momMiss.Vect().Mag();
+    }
+
+    double particleCosTheta_CMS_missing_Muon(const Particle*)
+    {
+      TLorentzVector momXchargedtracks; //Momentum of charged X tracks in CMS-System
+      TLorentzVector momXchargedclusters; //Momentum of charged X clusters in CMS-System
+      TLorentzVector momXneutralclusters; //Momentum of neutral X clusters in CMS-System
+      TLorentzVector momX; //Total Momentum of the recoiling X in CMS-System
+      TLorentzVector momMu;  //Momentum of Mu in CMS-System
+      TLorentzVector momMiss;  //Momentum of Anti-v  in CMS-System
+      PCmsLabTransform T;
+      StoreObjPtr<ParticleList> muons("mu+:ROE");
+      float maximum_r = 0;
+      for (unsigned int i = 0; i < muons->getListSize(); ++i) {
+        Particle* p = muons->getParticle(i);
+        float r = p->getExtraInfo("isMuonFromB");
+        momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
+        if (r > maximum_r) {
+          maximum_r = r;
+          momMu = T.rotateLabToCms() * p -> get4Vector();
+        }
+      }
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      const auto& ecl = roe->getECLClusters();
+      for (auto & x : ecl) {
+        if (x->isNeutral()) momXneutralclusters += T.rotateLabToCms() * x -> get4Vector();
+        if (!(x->isNeutral())) momXchargedclusters += T.rotateLabToCms() * x -> get4Vector();
+      }
+      const auto& klm = roe->getKLMClusters();
+      for (auto & x : klm) {
+        if (!(x -> getAssociatedTrackFlag()) && !(x -> getAssociatedEclClusterFlag())) {
+          momXneutralclusters += T.rotateLabToCms() * x -> getMomentum();
+        }
+      }
+      TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
+      momX = (momXcharged + momXneutralclusters - momMu) - momMu;
+      momMiss = -(momX + momMu);
+      return TMath::Cos(momMu.Angle(momMiss.Vect()));
+    }
+
+    double particleCosTheta_CMS_missing_Electron(const Particle*)
+    {
+      TLorentzVector momXchargedtracks; //Momentum of charged X tracks in CMS-System
+      TLorentzVector momXchargedclusters; //Momentum of charged X clusters in CMS-System
+      TLorentzVector momXneutralclusters; //Momentum of neutral X clusters in CMS-System
+      TLorentzVector momX; //Total Momentum of the recoiling X in CMS-System
+      TLorentzVector momE;  //Momentum of E in CMS-System
+      TLorentzVector momMiss;  //Momentum of Anti-v  in CMS-System
+      PCmsLabTransform T;
+      StoreObjPtr<ParticleList> electrons("e+:ROE");
+      float maximum_r = 0;
+      for (unsigned int i = 0; i < electrons->getListSize(); ++i) {
+        Particle* p = electrons->getParticle(i);
+        float r = p->getExtraInfo("isElectronFromB");
+        momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
+        if (r > maximum_r) {
+          maximum_r = r;
+          momE = T.rotateLabToCms() * p -> get4Vector();
+        }
+      }
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      const auto& ecl = roe->getECLClusters();
+      for (auto & x : ecl) {
+        if (x->isNeutral()) momXneutralclusters += T.rotateLabToCms() * x -> get4Vector();
+        if (!(x->isNeutral())) momXchargedclusters += T.rotateLabToCms() * x -> get4Vector();
+      }
+      const auto& klm = roe->getKLMClusters();
+      for (auto & x : klm) {
+        if (!(x -> getAssociatedTrackFlag()) && !(x -> getAssociatedEclClusterFlag())) {
+          momXneutralclusters += T.rotateLabToCms() * x -> getMomentum();
+        }
+      }
+      TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
+      momX = (momXcharged + momXneutralclusters - momE) - momE;
+      momMiss = -(momX + momE);
+      return TMath::Cos(momE.Angle(momMiss.Vect()));
     }
 
     double particleClassifiedFlavor(const Particle* particle)
@@ -958,6 +1473,100 @@ namespace Belle2 {
       if (!(particle->getExtraInfo("MC_Flavor"))) return result;
 
       return particle->getExtraInfo("MC_Flavor");
+    }
+
+    double E_W_90_Muon(const Particle*)
+    {
+      TLorentzVector momXchargedtracks; //Momentum of charged X tracks in CMS-System
+      TLorentzVector momXchargedclusters; //Momentum of charged X clusters in CMS-System
+      TLorentzVector momXneutralclusters; //Momentum of neutral X clusters in CMS-System
+      TLorentzVector momX; //Total Momentum of the recoiling X in CMS-System
+      TLorentzVector momW; //Momentum of the W-Boson in CMS
+      TLorentzVector momMu;  //Momentum of Mu in CMS-System
+      TLorentzVector momMiss;  //Momentum of Anti-v  in CMS-System
+      PCmsLabTransform T;
+      float E_W_90 = 0 ; // Energy of all charged and neutral clusters in the hemisphere of the W-Boson
+      StoreObjPtr<ParticleList> muons("mu+:ROE");
+      float maximum_r = 0;
+      for (unsigned int i = 0; i < muons->getListSize(); ++i) {
+        Particle* p = muons->getParticle(i);
+        float r = p->getExtraInfo("isMuonFromB");
+        momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
+        if (r > maximum_r) {
+          maximum_r = r;
+          momMu = T.rotateLabToCms() * p -> get4Vector();
+        }
+      }
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      const auto& ecl = roe->getECLClusters();
+      for (auto & x : ecl) {
+        if (x->isNeutral()) momXneutralclusters += T.rotateLabToCms() * x -> get4Vector();
+        if (!(x->isNeutral())) momXchargedclusters += T.rotateLabToCms() * x -> get4Vector();
+      }
+      const auto& klm = roe->getKLMClusters();
+      for (auto & x : klm) {
+        if (!(x -> getAssociatedTrackFlag()) && !(x -> getAssociatedEclClusterFlag())) {
+          momXneutralclusters += T.rotateLabToCms() * x -> getMomentum();
+        }
+      }
+      TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
+      momX = (momXcharged + momXneutralclusters - momMu) - momMu;
+      momMiss = -(momX + momMu);
+      momW = momMu + momMiss;
+      for (auto & i : ecl) {
+        if ((T.rotateLabToCms() * i -> get4Vector()).Vect().Dot(momW.Vect()) > 0) E_W_90 += i -> getEnergy();
+      }
+//       for (auto & i : klm) {
+//         if ((T.rotateLabToCms() * i -> getMomentum()).Vect().Dot(momW.Vect()) > 0) E_W_90 +=;
+//         }
+      return E_W_90;
+    }
+
+    double E_W_90_Electron(const Particle*)
+    {
+      TLorentzVector momXchargedtracks; //Momentum of charged X tracks in CMS-System
+      TLorentzVector momXchargedclusters; //Momentum of charged X clusters in CMS-System
+      TLorentzVector momXneutralclusters; //Momentum of neutral X clusters in CMS-System
+      TLorentzVector momX; //Total Momentum of the recoiling X in CMS-System
+      TLorentzVector momW; //Momentum of the W-Boson in CMS
+      TLorentzVector momE;  //Momentum of E in CMS-System
+      TLorentzVector momMiss;  //Momentum of Anti-v  in CMS-System
+      PCmsLabTransform T;
+      float E_W_90 = 0 ; // Energy of all charged and neutral clusters in the hemisphere of the W-Boson
+      StoreObjPtr<ParticleList> electrons("e+:ROE");
+      float maximum_r = 0;
+      for (unsigned int i = 0; i < electrons->getListSize(); ++i) {
+        Particle* p = electrons->getParticle(i);
+        float r = p->getExtraInfo("isElectronFromB");
+        momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
+        if (r > maximum_r) {
+          maximum_r = r;
+          momE = T.rotateLabToCms() * p -> get4Vector();
+        }
+      }
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      const auto& ecl = roe->getECLClusters();
+      for (auto & x : ecl) {
+        if (x->isNeutral()) momXneutralclusters += T.rotateLabToCms() * x -> get4Vector();
+        if (!(x->isNeutral())) momXchargedclusters += T.rotateLabToCms() * x -> get4Vector();
+      }
+      const auto& klm = roe->getKLMClusters();
+      for (auto & x : klm) {
+        if (!(x -> getAssociatedTrackFlag()) && !(x -> getAssociatedEclClusterFlag())) {
+          momXneutralclusters += T.rotateLabToCms() * x -> getMomentum();
+        }
+      }
+      TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
+      momX = (momXcharged + momXneutralclusters - momE) - momE;
+      momMiss = -(momX + momE);
+      momW = momE + momMiss;
+      for (auto & i : ecl) {
+        if ((T.rotateLabToCms() * i -> get4Vector()).Vect().Dot(momW.Vect()) > 0) E_W_90 += i -> getEnergy();
+      }
+//       for (auto & i : klm) {
+//         if ((T.rotateLabToCms() * i -> getMomentum()).Vect().Dot(momW.Vect()) > 0) E_W_90 +=;
+//         }
+      return E_W_90;
     }
 
     double recoilMomentum(const Particle* particle)
@@ -2038,6 +2647,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("isMajorityInRestOfEventFromB0bar", isMajorityInRestOfEventFromB0bar, "[Eventbased] Check if the majority of the tracks in the current RestOfEvent are from a B0bar");
     REGISTER_VARIABLE("isRestOfEventOfB0", isRestOfEventOfB0,  "[Eventbased] Check if current RestOfEvent is related to a B0");
     REGISTER_VARIABLE("isRestOfEventOfB0bar", isRestOfEventOfB0bar,  "[Eventbased] Check if current RestOfEvent is related to a B0 B0bar");
+    REGISTER_VARIABLE("isRestOfEventB0Flavor", isRestOfEventB0Flavor,  "-1 (1) if current RestOfEvent is related to a B0bar (B0)");
+    REGISTER_VARIABLE("qr_Combined", isRestOfEventB0Flavor_Norm,  "0 (1) if current RestOfEvent is related to a B0bar (B0)");
     REGISTER_VARIABLE("isElectronFromB", isElectronFromB,  "Checks if the track was really a Kaon from a B. 1.0 if true otherwise 0.0");
     REGISTER_VARIABLE("isMuonFromB", isMuonFromB,  "Checks if the track was really a Muon from a B. 1.0 if true otherwise 0.0");
     REGISTER_VARIABLE("isKaonFromB", isKaonFromB,  "Checks if the track was really a Electron from a B. 1.0 if true otherwise 0.0");
@@ -2046,6 +2657,14 @@ namespace Belle2 {
     REGISTER_VARIABLE("bestQRMuon", bestQRMuon,  "[Eventbased] q*r where r is maximum getExtraInfo(isMuon) in mu+:ROE list.");
     REGISTER_VARIABLE("bestQRSlowPion", bestQRSlowPion,  "[Eventbased] q*r where r is maximum getExtraInfo(isSlowPion) in pi+:ROE list.");
     REGISTER_VARIABLE("bestQRKaon", bestQRKaon,  "[Eventbased] q*r where r is maximum getExtraInfo(isKaon) in K+:ROE list.");
+    REGISTER_VARIABLE("QRElectron", QRElectron,  "[Eventbased] q*r where r is calculated from the output of event level in in e+:ROE list.");
+    REGISTER_VARIABLE("QRMuon", QRMuon,  "[Eventbased] q*r where r is calculated from the output of event level in mu+:ROE list.");
+    REGISTER_VARIABLE("QRSlowPion", QRSlowPion,  "[Eventbased] q*r where r is calculated from the output of event level in in pi+:ROE list.");
+    REGISTER_VARIABLE("QRKaon", QRKaon,  "[Eventbased] q*r where r is calculated from the output of event level in in K+:ROE list.");
+    REGISTER_VARIABLE("isElectronRightClass", isElectronRightClass,  "returns 1 if the class track by electron category has the same flavour as the MC target track 0 else also if there is no target track");
+    REGISTER_VARIABLE("isMuonRightClass", isMuonRightClass,  "returns 1 if the class track by muon category has the same flavour as the MC target track 0 else also if there is no target track");
+    REGISTER_VARIABLE("isSlowPionRightClass", isSlowPionRightClass,  "returns 1 if the class track by slow pion category has the same flavour as the MC target track 0 else also if there is no target track");
+    REGISTER_VARIABLE("isKaonRightClass", isKaonRightClass,  "returns 1 if the class track by kaon category has the same flavour as the MC target track 0 else also if there is no target track");
     REGISTER_VARIABLE("p_miss", p_miss,  "Calculates the missing Momentum for a given particle on the tag side.");
     REGISTER_VARIABLE("isInRestOfEvent",  isInRestOfEvent,  "1.0 of track, cluster of given particle is found in rest of event. 0 otherwise.");
     REGISTER_VARIABLE("isThereAKShortinRoe",  isThereAKShortinRoe,  "1.0 if there was a K_S0 in the ROE");
@@ -2064,11 +2683,22 @@ namespace Belle2 {
     REGISTER_VARIABLE("eRecoil",  recoilEnergy,   "energy recoiling against given Particle");
     REGISTER_VARIABLE("mRecoil",  recoilMass,        "invariant mass of the system recoiling against given Particle");
     REGISTER_VARIABLE("m2Recoil", recoilMassSquared, "invariant mass squared of the system recoiling against given Particle");
+    REGISTER_VARIABLE("mRecoilBtagMuon", recoilMassBtag_Muon , "recoiling mass of the Btag system against the target muon");
+    REGISTER_VARIABLE("mRecoilBtagElectron", recoilMassBtag_Electron , "recoiling mass of the Btag system against the target electron");
 
-    REGISTER_VARIABLE("p_CMS_missing",  particleP_CMS_missing,    "CMS momentum magnitude missing in Btag");
-    REGISTER_VARIABLE("cosTheta_missing",  particleCosTheta_Missing,    "CMS momentum missing in Btag cosine of polar angle");
+    REGISTER_VARIABLE("p_CMS_Muon",  particleP_CMS_Muon,    "CMS momentum magnitude of the muon classified as target");
+    REGISTER_VARIABLE("p_CMS_Electron",  particleP_CMS_Electron,    "CMS momentum magnitude of the electron classified as target");
+    REGISTER_VARIABLE("p_CMS_Kaon",  particleP_CMS_Kaon,    "CMS momentum magnitude of the kaon classified as target");
+    REGISTER_VARIABLE("p_CMS_SlowPion",  particleP_CMS_SlowPion,    "CMS momentum magnitude of the slow pion classified as target");
+    REGISTER_VARIABLE("p_CMS_missingMuon",  particleP_CMS_missing_Muon,    "CMS momentum magnitude missing in Btag using muon as target hypothesis");
+    REGISTER_VARIABLE("p_CMS_missingElectron",  particleP_CMS_missing_Electron,    "CMS momentum magnitude missing in Btag using electron as target hypothesis");
+    REGISTER_VARIABLE("cosTheta_missingMuon",  particleCosTheta_CMS_missing_Muon,    "CMS momentum missing in Btag cosine of polar angle using muon as target hypothesis");
+    REGISTER_VARIABLE("cosTheta_missingElectron",  particleCosTheta_CMS_missing_Electron,    "CMS momentum missing in Btag cosine of polar angle using electron as target hypothesis");
     REGISTER_VARIABLE("BtagClassFlavor",  particleClassifiedFlavor,    "Flavour of Btag from trained Method");
     REGISTER_VARIABLE("BtagMCFlavor",  particleMCFlavor,    "Flavour of Btag from MC");
+
+    REGISTER_VARIABLE("EW90Muon", E_W_90_Muon, "Energy in the hemisphere defined by the direction of the virtual W-Boson assuming a semimuonic decay");
+    REGISTER_VARIABLE("EW90Electron", E_W_90_Electron, "Energy in the hemisphere defined by the direction of the virtual W-Boson assuming a semielectronic decay");
 
     REGISTER_VARIABLE("eextra", extraEnergy, "extra energy in the calorimeter that is not associated to the given Particle");
 

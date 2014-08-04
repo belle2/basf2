@@ -187,7 +187,6 @@ namespace Belle2 {
     //  AccessorParams m_subsetAccessorParams;
 
     std::string m_subsetName;
-    std::string m_subsetToSetRelationName;
 
     std::list< std::pair< std::pair<std::string, std::string>, AccessorParams > > m_fromSubsetToOtherNames;
     std::list< std::pair< std::pair<std::string, std::string>, AccessorParams > > m_fromOtherToSubsetNames;
@@ -206,17 +205,13 @@ namespace Belle2 {
     /** Register the StoreArray<StoredClass> that will contain the subset of selected elements
      *  @param set         The StoreArray<StoredClass> from which the elements will be selected
      *  @param subsetName  The name of the StoreArray<StoredClass> that will contain the selected elements
-     *  @param subsetToSetRelationName The optional name of the relation from the subset to the set.
      */
-    bool registerSubset(const StoreArray< StoredClass >& set, const std::string& subsetName,
-                        const std::string& subsetToSetRelationName = std::string("")) {
+    bool registerSubset(const StoreArray< StoredClass >& set, const std::string& subsetName) {
 
       m_setName                 = set.getName() ;
       m_setDurability           = set.getDurability() ;
       m_subsetDurability        = m_setDurability ;
       m_subsetName              = subsetName ;
-      m_subsetToSetRelationName = subsetToSetRelationName != "" ?
-                                  subsetToSetRelationName : DataStore::relationName(m_subsetName, m_setName);
 
 
       bool set_is_transient = DataStore::Instance().getEntry(set)->isTransient;
@@ -225,11 +220,11 @@ namespace Belle2 {
 
       if (set_is_transient) {
         subset.registerAsTransient(m_reportErrorIfExisting);
-        RelationArray relation(subset, set, subsetToSetRelationName, m_subsetDurability);
+        RelationArray relation(subset, set, "", m_subsetDurability);
         relation.registerAsTransient(m_reportErrorIfExisting);
       } else {
         subset.registerAsPersistent(m_reportErrorIfExisting);
-        RelationArray relation(subset, set, subsetToSetRelationName, m_subsetDurability);
+        RelationArray relation(subset, set, "", m_subsetDurability);
         relation.registerAsPersistent(m_reportErrorIfExisting);
       }
 
@@ -368,10 +363,8 @@ namespace Belle2 {
 
     StoreArray<StoredClass> subset(m_subsetName);
     StoreArray<StoredClass> set(m_setName);
-    subset.create();
 
-    RelationArray subsetToSetRelation
-    (m_subsetToSetRelationName);
+    RelationArray subsetToSetRelation(subset, set, "", m_subsetDurability);
 
     typedef RelationElement::index_type index_type;
 
@@ -389,7 +382,7 @@ namespace Belle2 {
 
     // Restrict the domain set relations from the subset To Others
     for (auto relationName : m_fromSubsetToOtherNames) {
-      RelationArray setRelationTo(relationName.first.first);
+      RelationArray setRelationTo(relationName.first.first); //TODO this won't work
       StoreArray< TObject > fakeTo(relationName.second.first, relationName.second.second);
       //    RelationArray subsetRelationTo( relationName.first.second );
       RelationArray subsetRelationTo(subset, fakeTo, relationName.first.second);

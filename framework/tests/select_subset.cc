@@ -1,6 +1,7 @@
 #include <framework/utilities/SelectSubset.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/datastore/RelationsObject.h>
 
 
 #include <gtest/gtest.h>
@@ -884,7 +885,7 @@ namespace {
 
     DataStore::Instance().setInitializeActive(true);
 
-    selector.registerSubset(set, m_TestBench.getSubsetName() , "");
+    selector.registerSubset(set, m_TestBench.getSubsetName());
 
     for (auto other : m_TestBench.getOtherSets()) {
       selector.registerRelationsFromSubsetToOther(other.second.storedArray() , "", "");
@@ -932,6 +933,75 @@ namespace {
       EXPECT_TRUE(testRelationToOther(otherSet));
       EXPECT_TRUE(testRelationFromOther(otherSet));
 
+    }
+  }
+
+  bool hasOddIndex(const RelationsObject* a)
+  {
+    return (a->getArrayIndex() % 2) == 1;
+  }
+
+  TEST_F(SelectSubsetTest, TestWithManyRelations)
+  {
+    //array 'main' with relations: a -> main -> b
+    //create subset:    a -> subsetOfMain -> b
+
+    //LogSystem::Instance().getLogConfig()->setLogLevel(LogConfig::c_Debug);
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray< RelationsObject > arrayMain("main");
+    StoreArray< RelationsObject > arrayA("a");
+    StoreArray< RelationsObject > arrayB("b");
+    arrayMain.registerAsPersistent();
+    arrayA.registerAsPersistent();
+    arrayB.registerAsPersistent();
+    RelationArray::registerPersistent("a", "main");
+    RelationArray::registerPersistent("main", "b");
+
+    SelectSubset< RelationsObject > selectorMain;
+    selectorMain.registerSubset(arrayMain, "subsetOfMain");
+
+    //TODO: remove the extra relationname args
+    selectorMain.registerRelationsFromOtherToSubset(arrayA , "", "");
+    selectorMain.registerRelationsFromSubsetToOther(arrayB , "", "");
+    DataStore::Instance().setInitializeActive(false);
+
+    //fill some data
+    for (int i = 0; i < 10; i++) {
+      auto* mainObj = arrayMain.appendNew();
+      for (int j = 0; j < 2; j++) {
+        auto* aObj = arrayA.appendNew();
+        aObj->addRelationTo(mainObj);
+      }
+      for (int j = 0; j < 10; j++) {
+        auto* bObj = arrayB.appendNew();
+        mainObj->addRelationTo(bObj);
+      }
+    }
+
+    //run selector
+    selectorMain.select(hasOddIndex);
+
+
+    //verify original contents
+    EXPECT_EQ(10, arrayMain.getEntries());
+    EXPECT_EQ(20, arrayA.getEntries());
+    EXPECT_EQ(100, arrayB.getEntries());
+
+
+    StoreArray< RelationsObject > arraySubset("subsetOfMain");
+
+    //verify subset
+    EXPECT_EQ(5, arraySubset.getEntries());
+    for (const RelationsObject & r : arraySubset) {
+      EXPECT_EQ(2, r.getRelationsFrom<RelationsObject>("a").size());
+      EXPECT_EQ(0, r.getRelationsFrom<RelationsObject>("b").size());
+      EXPECT_EQ(10, r.getRelationsTo<RelationsObject>("b").size());
+      EXPECT_EQ(0, r.getRelationsTo<RelationsObject>("a").size());
+
+      //go back to main set, check selection condidition holds
+      EXPECT_EQ(1, r.getRelationsWith<RelationsObject>("main").size());
+      const RelationsObject* originalObject = r.getRelated<RelationsObject>("main");
+      EXPECT_TRUE(hasOddIndex(originalObject));
     }
   }
 

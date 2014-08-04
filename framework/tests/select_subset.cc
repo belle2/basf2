@@ -20,9 +20,6 @@ using namespace Belle2;
 
 
 namespace {
-  /** command x should exit using B2FATAL. */
-#define EXPECT_FATAL(x) EXPECT_EXIT(x,::testing::KilledBySignal(SIGABRT),"");
-
   /** Set up a few arrays and objects in the datastore */
   class SelectSubsetTest : public ::testing::Test {
 
@@ -892,7 +889,8 @@ namespace {
       selector.inheritRelationsFrom(other.second.storedArray());
     }
 
-    selector.registerRelationsFromSubsetToSubset("", "");
+    //inherit set <-> set relations
+    selector.inheritRelationsFrom(set);
 
     DataStore::Instance().setInitializeActive(false);
 

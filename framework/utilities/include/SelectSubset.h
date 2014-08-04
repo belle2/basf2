@@ -18,12 +18,12 @@
 #include <framework/datastore/RelationVector.h>
 #include <framework/logging/Logger.h>
 
-#include <string>
-#include <list>
-#include <unordered_map>
-#include <functional>
-
 #include <TObject.h>
+
+#include <string>
+#include <functional>
+#include <vector>
+
 
 
 namespace Belle2 {
@@ -42,18 +42,18 @@ namespace Belle2 {
    *  <h2> Instantiation</h2>
    *  First you need to instantiate a SelectSubset object in your module:
    *  \code
-   SelectSubset< Particle > m_selector;
-   \endcode
+      SelectSubset< Particle > m_selector;
+      \endcode
    *
    *  <h2> Initialization </h2>
    * In the initialize method of your module you have to initialize the SelectSubset
    * \code
 
-   StoreArray< Particle > set( "particles" );
-   StoreArray< Particle >::required( "particles" ); // or optional. The choice is up to you.
-   m_selector.registerSubset( set, "oddParticles");
+     StoreArray< Particle > set( "particles" );
+     set.isRequired(); // or isOptional(). The choice is up to you.
+     m_selector.registerSubset( set, "oddParticles");
 
-   \endcode
+     \endcode
 
    * The SelectSubset class will take care of creating the new StoreArray<Particle>,
    * register it into the datastore with name "oddParticles" same durability and
@@ -66,17 +66,16 @@ namespace Belle2 {
    * <h3> C++ function </h3>
    * You can define your C++ function and then use it. E.g:
    *  \code
-   bool
-   MySelectionFunction( const Particle * particle){
-  // this function tells if the particle is odd
-  return ( particle->UniqueId() % 2 ) == 1 ;
-  }
-  \endcode
-  Then in the event method of your module:
-  \code
-
-  m_selector.select( MySelectionFunction );
-  \endcode
+      bool
+      MySelectionFunction( const Particle * particle){
+      // this function tells if the particle is odd
+      return ( particle->UniqueId() % 2 ) == 1 ;
+      }
+      \endcode
+   * Then in the event method of your module:
+   * \code
+     m_selector.select( MySelectionFunction );
+     \endcode
 
    * <h3> C++ lambda function </h3>
    * You can specify a lambda expression as parameter of the select method. E.g.:
@@ -110,98 +109,34 @@ namespace Belle2 {
     * restrictions of the relations  from and to the original set.
 
     * <h2> Relations to other StoreArrays</h2>
-    * Assuming that the StoreArray<Particle> has relations To others
-    * StoreArrays of Something and SomethingElse you can tell SelectSubset to produce
-    * a new Relation from the subset to the other StoreArrays by
-    * the following code in your implementation of the Module::initialize() method.
-    * \code
-    void MyModule::initialize(){
-      StoreArray<Something>     StoreArrayOfSomething;
-      StoreArray<SomethingElse> StoreArrayOfSomethingElse;
-      StoreArray<Stuff>         StoreArrayOfStuff;
-
-      m_selector.registerRelationsFromSubsetToOther( StoreArrayOfSomething, "", "",
-          StoreArrayOfSomethingElse, "", "");
-
-      // Or you can add the relations one by one
-      m_selector.registerRelationsFromSubsetToOther( StoreArrayOfStuff, "", "");
-
-      // Or you can use non default relation name. DEPRECATED!
-      m_selector.registerRelationsFromSubsetToOther( StoreArrayOfSomethingElse,
-          "NonDefaultRelationName", "AnotherCrypticalName",);
-
-      \endcode
-        * That's it.
-
-        * <h2> Relations from other StoreArrays</h2>
-        * Assuming that the StoreArray<Particle> has relations From others
-        * StoreArrays of Something and SomethingElse you can tell SelectSubset to produce
-        * a new Relation to the subset from the other StoreArrays by
-        * the following code in your implementation of the Module::initialize() method.
-        * \code
-        void MyModule::initialize(){
-          StoreArray<Something>     StoreArrayOfSomething;
-          StoreArray<SomethingElse> StoreArrayOfSomethingElse;
-          StoreArray<Stuff>         StoreArrayOfStuff;
-
-          m_selector.registerRelationsFromOtherToSubset( StoreArrayOfSomething, "", "",
-              StoreArrayOfSomethingElse, "", "");
-
-          // Or you can add the relations one by one
-          m_selector.registerRelationsFromOtherToSubset( StoreArrayOfStuff, "", "");
-
-          // Or you can use non default relation name. DEPRECATED!
-          m_selector.registerRelationsFromOtherToSubset( StoreArrayOfSomethingElse,
-              "NonDefaultRelationName", "AnotherCrypticalName",);
-
-          \endcode
-            * That's it.
-            * <h2> Relations from the StoreArray to itself</h2>
-            * In some case the original StoreArray can have relation with itself
-            * (E.g. MCparticle mother - daughter relation ).
-            * In this case you have several options:
-            * -  you can restrict the set of "from" elements by using the method
-            * registerRelationsFromSubsetToOther and specifying the original set
-            * as first argument.
-            *
-            * -  you can restrict the set of "to" elements by using the method
-            * registerRelationsFromOtherToSubset and specifying the original set
-            * as first argument.
-            *
-            * - you can restrict bot the "from" element side and the "to" element
-            * side by using:
-            * \code
-            m_selector.registerRelationsFromSubsetToSubset( "","" );
-
-          // Or you can use non default relation name. DEPRECATED!
-          m_selector.registerRelationsFromSubsetToSubset(
-              "NonDefaultRelationName", "AnotherCrypticalName",);
-          \endcode
-            * the choice among the 3 options really depend on the use case, since
-            * generally speaking the 3 relations are not at all equivalents.
-            */
-
+    * <h2> Relations from other StoreArrays</h2>
+    * <h2> Relations from the StoreArray to itself</h2>
+    * If there are relations from objects in the original set to other objects in the same array
+    * (e.g. Particles -> Particles), you can also inherit these by
+    */
   template < typename StoredClass >
   class SelectSubset {
 
     std::string m_setName;
     DataStore::EDurability m_setDurability;
 
+    /** The array we create. */
     StoreArray<StoredClass>* m_subset;
 
     /** array names we inherit relations from. */
     std::vector<std::string> m_inheritFromArrays;
     /** array names we inherit relations to. */
     std::vector<std::string> m_inheritToArrays;
+    /** If true, relations from set objects to set objects are copied. (if both objects are selected!). */
+    bool m_inheritToSelf;
 
 
-    std::list< std::pair<std::string, std::string > > m_fromSubsetToSubsetNames;
-
+    /** how to handle re-registration of subset and relations to/from it? */
     const bool m_reportErrorIfExisting = true;
   public:
     /** Constructor */
     SelectSubset():
-      m_setDurability(DataStore::c_Event), m_subset(nullptr)
+      m_setDurability(DataStore::c_Event), m_subset(nullptr), m_inheritToSelf(false)
     {};
 
     /** Destructor */
@@ -225,6 +160,7 @@ namespace Belle2 {
 
       m_subset = new StoreArray<StoredClass>(subsetName, m_setDurability);
 
+      //TODO: change relation direction to set -> subset?
       if (set_is_transient) {
         m_subset->registerAsTransient(m_reportErrorIfExisting);
         RelationArray relation(*m_subset, set, "", m_subset->getDurability());
@@ -239,55 +175,29 @@ namespace Belle2 {
 
     }
 
-
-    /** Register the Relation from the selected subset to itself.
-     *  @param setRelationName  The name of the relation from the original set to itself.
-     *  @param subsetRelationName The name of the relation from the subset to itself.
-     */
-
-    template<class ... RelationTail >
-    bool registerRelationsFromSubsetToSubset(const std::string& setRelationName,
-                                             const std::string& subsetRelationName,
-                                             RelationTail... relations) {
-
-      StoreArray< StoredClass > set(m_setName, m_setDurability);
-      RelationArray relationFromSetToSet(set, set, setRelationName, m_setDurability);
-      relationFromSetToSet.isRequired();
-
-      RelationArray relationFromSubsetToSubset(*m_subset, *m_subset, subsetRelationName,
-                                               m_setDurability);
-
-      bool array_is_transient = DataStore::Instance().getEntry(set)->isTransient;
-      if (array_is_transient)
-        relationFromSubsetToSubset.registerAsTransient(m_reportErrorIfExisting);
-      else
-        relationFromSubsetToSubset.registerAsPersistent(m_reportErrorIfExisting);
-
-      m_fromSubsetToSubsetNames.push_back({ relationFromSetToSet.getName() ,
-                                            relationFromSubsetToSubset.getName()
-                                          });
-
-      return registerRelationsFromSubsetToSubset(relations ...);
-    }
-
     /** Inherit relations pointing from Other to objects selected into this subset.
      *
      * You can specify an unlimited number of arrays as arguments to this function.
      */
     template<class T, class ... MoreArguments >
     void inheritRelationsFrom(const StoreArray<T>& array, MoreArguments... moreArgs) {
+      if (array.getName() == m_setName) {
+        m_inheritToSelf = true;
+        inheritRelationsFrom(*m_subset, moreArgs...);
+      } else {
+        const_cast<StoreArray<T>&>(array).isRequired();
 
-      const_cast<StoreArray<T>&>(array).isRequired();
+        RelationArray relation(array, *m_subset, "", m_subset->getDurability());
+        if (m_subset->isTransient() or array.isTransient())
+          relation.registerAsTransient(m_reportErrorIfExisting);
+        else
+          relation.registerAsPersistent(m_reportErrorIfExisting);
 
-      RelationArray relation(array, *m_subset, "", m_subset->getDurability());
-      if (m_subset->isTransient() or array.isTransient())
-        relation.registerAsTransient(m_reportErrorIfExisting);
-      else
-        relation.registerAsPersistent(m_reportErrorIfExisting);
+        if (array.getName() != m_subset->getName())
+          m_inheritFromArrays.push_back(array.getName());
 
-      m_inheritFromArrays.push_back(array.getName());
-
-      inheritRelationsFrom(moreArgs ...);
+        inheritRelationsFrom(moreArgs ...);
+      }
     }
 
     /** Inherit relations pointing from objects selected into this subset to Other.
@@ -296,18 +206,23 @@ namespace Belle2 {
      */
     template<class T, class ... MoreArguments >
     void inheritRelationsTo(const StoreArray<T>& array, MoreArguments... moreArgs) {
+      if (array.getName() == m_setName) {
+        m_inheritToSelf = true;
+        inheritRelationsTo(*m_subset, moreArgs...);
+      } else {
+        const_cast<StoreArray<T>&>(array).isRequired();
 
-      const_cast<StoreArray<T>&>(array).isRequired();
+        RelationArray relation(*m_subset, array, "", m_subset->getDurability());
+        if (m_subset->isTransient() or array.isTransient())
+          relation.registerAsTransient(m_reportErrorIfExisting);
+        else
+          relation.registerAsPersistent(m_reportErrorIfExisting);
 
-      RelationArray relation(*m_subset, array, "", m_subset->getDurability());
-      if (m_subset->isTransient() or array.isTransient())
-        relation.registerAsTransient(m_reportErrorIfExisting);
-      else
-        relation.registerAsPersistent(m_reportErrorIfExisting);
+        if (array.getName() != m_subset->getName())
+          m_inheritToArrays.push_back(array.getName());
 
-      m_inheritToArrays.push_back(array.getName());
-
-      inheritRelationsTo(moreArgs ...);
+        inheritRelationsTo(moreArgs ...);
+      }
     }
 
     /** This method is the actual worker. It selects the elements, fill the subset and
@@ -326,11 +241,6 @@ namespace Belle2 {
     */
     void inheritRelationsTo() { }
 
-    /** Empty method to stop the recursion of the variadic template.
-    */
-    bool registerRelationsFromSubsetToSubset(void) { return true; }
-
-
   };
 
 
@@ -341,20 +251,17 @@ namespace Belle2 {
 
     StoreArray<StoredClass> set(m_setName);
 
+    //TODO: change relation direction to set -> subset?
     RelationArray subsetToSetRelation(*m_subset, set, "", m_subset->getDurability());
 
     typedef RelationElement::index_type index_type;
 
-    std::unordered_map< index_type, index_type> setToSubset(set.getEntries());
-    std::unordered_map< index_type, index_type> subsetToSet(set.getEntries());
 
 
     for (index_type indexInSet(0); indexInSet < (index_type) set.getEntries(); indexInSet++) {
       const StoredClass* setObject = set[indexInSet];
       if (f(setObject)) {
         index_type indexInSubset(m_subset->getEntries());
-        setToSubset[ indexInSet    ] = indexInSubset;
-        subsetToSet[ indexInSubset ] = indexInSet;
         subsetToSetRelation.add(indexInSubset, indexInSet);
         const StoredClass* subsetObject = m_subset->appendNew(*setObject);
         for (std::string fromArray : m_inheritFromArrays) {
@@ -375,32 +282,27 @@ namespace Belle2 {
       }
     }
 
+    if (m_inheritToSelf) {
+      for (const StoredClass & subsetObject1 : *m_subset) {
+        //TODO: change relation direction to set -> subset?
+        const StoredClass* setObject1 = subsetObject1.template getRelatedTo<StoredClass>(m_setName);
 
-    // Restrict the image of the relations From set to the subset
-    for (auto relationName : m_fromSubsetToSubsetNames) {
-      RelationArray setRelation(relationName.first);
-      RelationArray subsetRelation(*m_subset, *m_subset, relationName.second);
+        //get all objects in original set related to setObject1
+        const RelationVector<StoredClass>& relations = setObject1->template getRelationsTo<StoredClass>(m_setName);
+        for (int iRel = 0; iRel < relations.size(); iRel++) {
+          const StoredClass* setObject2 = relations.object(iRel);
+          const double weight = relations.weight(iRel);
 
-
-      for (int arrowIndex = 0; arrowIndex < setRelation.getEntries(); arrowIndex ++) {
-        const RelationElement& setRelationElement(setRelation[ arrowIndex ]);
-
-        if (setToSubset.find(setRelationElement.getFromIndex()) == setToSubset.end())
-          continue;
-        for (size_t n = 0 ; n < setRelationElement.getSize() ; n++)
-          if (setToSubset.find(setRelationElement.getToIndex(n)) !=  setToSubset.end())
-            subsetRelation.add(setToSubset[ setRelationElement.getFromIndex() ],
-                               setToSubset[ setRelationElement.getToIndex(n) ],
-                               setRelationElement.getWeight(n));
-
+          //if setObject2 was selected into subset, inherit relation
+          const StoredClass* subsetObject2 = setObject2->template getRelatedFrom<StoredClass>(m_subset->getName());
+          if (subsetObject2) {
+            subsetObject1.addRelationTo(subsetObject2, weight);
+          }
+        }
       }
-
     }
 
   }
-
-
-
 }
 
 #endif

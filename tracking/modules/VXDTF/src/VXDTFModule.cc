@@ -116,13 +116,11 @@ VXDTFModule::VXDTFModule() : Module()
 
   std::vector<std::string> sectorSetup = {"std"};
 
-  vector<int> highestAllowedLayer, minLayer, minState;
-  highestAllowedLayer.push_back(6);
-  minLayer.push_back(3);
-  minState.push_back(2);
+  vector<int>  highestAllowedLayer = {6};
+  vector<int>  minLayer = {3};
+  vector<int>  minState = {2};
 
-  vector<double> reserveHitsThreshold;
-  reserveHitsThreshold.push_back(0.6);
+  vector<double> reserveHitsThreshold = {0.6};
 
   vector<bool> activateTRUE = { true };
   vector<bool> activateFALSE = { false };
@@ -612,12 +610,42 @@ VXDTFModule::~VXDTFModule()
 
 void VXDTFModule::initialize()
 {
+
+  /** REDESIGNCOMMENT INITIALIZE 1:
+   ** short:
+   * safety checks for many parameters
+   *
+   ** long (+personal comments):
+   * safety checks are not done for each parameter, but for those which are often set wrong (by me or others).
+   * one can notice that some parameters appear as variables too.
+   * Reason for this is to make the parameters human readable and work internally with faster data types
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMhighOccupancyThreshold, m_PARAMpdGCode, m_PARAMtuneCutoffs,
+   * m_PARAMreserveHitsThreshold, m_PARAMnameOfInstance, m_PARAMactivateBaselineTF,
+   * m_PARAMcalcQIType, m_PARAMcalcSeedType, m_PARAMfilterOverlappingTCs,
+   * m_PARAMwriteToRoot, m_PARAMrootFileName, m_PARAMsmearMean,
+   * m_PARAMsmearSigma
+   *
+   ** dependency of global in-module variables:
+   * m_chargeSignFactor, m_calcQiType, m_calcSeedType,
+   * m_filterOverlappingTCs, m_rootFilePtr, m_treeEventWisePtr,
+   * m_treeTrackWisePtr, m_rootTimeConsumption, m_rootPvalues,
+   * m_rootChi2, m_rootCircleRadius, m_rootNdf,
+   * m_littleHelperBox
+   *
+   ** dependency of global stuff just because of B2XX-output:
+   * m_PARAMnameOfInstance,
+   *
+   ** in-module-function-calls:
+   */
+
   B2DEBUG(1, "-----------------------------------------------\n       entering VXD CA track finder (" << m_PARAMnameOfInstance << ") - initialize:");
   m_littleHelperBox.resetValues(m_PARAMsmearMean, m_PARAMsmearSigma);
 
   if (m_PARAMhighOccupancyThreshold < 0) { m_PARAMhighOccupancyThreshold = 0; }
 
-  if (m_PARAMpdGCode > 10 and m_PARAMpdGCode < 18) { // in this case, its a lepton. since leptons with positive sign have got negative codes, this must taken into notice
+  if (m_PARAMpdGCode > 10 and m_PARAMpdGCode < 18) { // in this case, its a lepton. since leptons with positive sign have got negative codes, this must be taken into account
     m_chargeSignFactor = 1;
   } else { m_chargeSignFactor = -1; }
 
@@ -639,36 +667,6 @@ void VXDTFModule::initialize()
     B2WARNING(m_PARAMnameOfInstance << ": chosen value (" << m_PARAMactivateBaselineTF << ")for parameter 'activateBaselineTF' is invalid, reseting value to standard (=1)...")
     m_PARAMactivateBaselineTF = 1;
   }
-
-  /// genfit::TrackCandidate
-  StoreArray<genfit::TrackCand>::registerPersistent(m_PARAMgfTrackCandsColName);
-
-  if (gGeoManager == NULL) {
-    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-    geoManager.createTGeoRepresentation();
-  }
-
-  if (!genfit::FieldManager::getInstance()->isInitialized())
-  { genfit::FieldManager::getInstance()->init(new GFGeant4Field()); }
-  if (!genfit::MaterialEffects::getInstance()->isInitialized())
-  { genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface()); }
-
-  genfit::MaterialEffects::getInstance()->setMscModel("Highland");
-
-  /// temporary members for testing purposes (minimal testing routines)
-  if (m_TESTERexpandedTestingRoutines == true) {
-    StoreArray<VXDTFInfoBoard>::registerPersistent(m_PARAMinfoBoardName);
-  }
-
-  // registerPersistence (StoreArrays & RelationArray) for the Collector
-  if (m_PARAMdisplayCollector > 0) {
-    B2DEBUG(10, "VXDTF: Display: Module Collector initPersistent");
-    m_collector.initPersistent();
-  }
-
-  StoreArray<TelCluster>::optional(m_PARAMtelClustersName);
-  StoreArray<PXDCluster>::optional(m_PARAMpxdClustersName);
-  StoreArray<SVDCluster>::optional(m_PARAMsvdClustersName);
 
   B2DEBUG(1, m_PARAMnameOfInstance << "::initialize: chosen calcQIType is '" << m_PARAMcalcQIType << "'")
   if (m_PARAMcalcQIType == "trackLength") {
@@ -724,6 +722,61 @@ void VXDTFModule::initialize()
   }
 
 
+  /** REDESIGNCOMMENT INITIALIZE 2:
+   ** short:
+   * register storearray-related stuff
+   *
+   ** long (+personal comments):
+   * some are only created if their related parameters are set to the values needed.
+   * additionally, one module parameter is not flagged with m_PARAM... but with m_TESTER... (which are parameters related only to testing purposes),
+   * such an inconsistency shall be surpressed for the redesign.
+   * DisplayCollector-related stuff is needed for display and for debugging, therefore always listed for debug-stuff too.
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMgfTrackCandsColName, m_TESTERexpandedTestingRoutines, m_PARAMinfoBoardName,
+   * m_PARAMdisplayCollector, m_PARAMtelClustersName, m_PARAMpxdClustersName,
+   * m_PARAMsvdClustersName
+   *
+   ** dependency of global in-module variables:
+   * m_collector,
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_PARAMnameOfInstance, m_PARAMinfoBoardName, m_PARAMdisplayCollector,
+   * m_collector
+   *
+   ** in-module-function-calls:
+   */
+
+  /// genfit::TrackCandidate
+  StoreArray<genfit::TrackCand>::registerPersistent(m_PARAMgfTrackCandsColName);
+
+  if (gGeoManager == NULL) {
+    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
+    geoManager.createTGeoRepresentation();
+  }
+
+  if (!genfit::FieldManager::getInstance()->isInitialized())
+  { genfit::FieldManager::getInstance()->init(new GFGeant4Field()); }
+  if (!genfit::MaterialEffects::getInstance()->isInitialized())
+  { genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface()); }
+
+  genfit::MaterialEffects::getInstance()->setMscModel("Highland");
+
+  /// temporary members for testing purposes (minimal testing routines)
+  if (m_TESTERexpandedTestingRoutines == true) {
+    StoreArray<VXDTFInfoBoard>::registerPersistent(m_PARAMinfoBoardName);
+  }
+
+  // registerPersistence (StoreArrays & RelationArray) for the Collector
+  if (m_PARAMdisplayCollector > 0) {
+    B2DEBUG(10, "VXDTF: Display: Module Collector initPersistent");
+    m_collector.initPersistent();
+  }
+
+  StoreArray<TelCluster>::optional(m_PARAMtelClustersName);
+  StoreArray<PXDCluster>::optional(m_PARAMpxdClustersName);
+  StoreArray<SVDCluster>::optional(m_PARAMsvdClustersName);
+
   B2DEBUG(1, "       leaving VXD CA track finder (" << m_PARAMnameOfInstance << ") - initialize\n-----------------------------------------------");
 }
 
@@ -735,6 +788,64 @@ void VXDTFModule::initialize()
 
 void VXDTFModule::beginRun()
 {
+  /** REDESIGNCOMMENT BEGINRUN 1:
+   ** short:
+   * setup for sectorMaps
+   *
+   ** long (+personal comments):
+   * all that stuff will move to the sectorMap-Module
+   * does also create dependency to the testbeam package
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMsectorSetup, m_PARAMtuneCutoffs, m_PARAMhighestAllowedLayer,
+   * m_PARAMreserveHitsThreshold, m_PARAMminLayer, m_PARAMminState,
+   * m_PARAMactivateBaselineTF, m_PARAMdisplayCollector
+   * m_PARAMactivateDistance3D, m_PARAMactivateDistanceXY, m_PARAMactivateDistanceZ,
+   * m_PARAMactivateSlopeRZ, m_PARAMactivateNormedDistance3D, m_PARAMactivateAlwaysTrue2Hit,
+   * m_PARAMactivateAlwaysFalse2Hit, m_PARAMactivateRandom2Hit, m_PARAMactivateAngles3DHioC,
+   * m_PARAMactivateAnglesXYHioC, m_PARAMactivateAnglesRZHioC, m_PARAMactivateDeltaSlopeRZHioC,
+   * m_PARAMactivateDistance2IPHioC, m_PARAMactivatePTHioC, m_PARAMactivateHelixParameterFitHioC,
+   * m_PARAMactivateAnglesXY, m_PARAMactivateAnglesRZ, m_PARAMactivateDeltaSlopeRZ,
+   * m_PARAMactivateDistance2IP, m_PARAMactivatePT, m_PARAMactivateHelixParameterFit,
+   * m_PARAMactivateDeltaSOverZ, m_PARAMactivateDeltaSlopeZOverS, m_PARAMactivateAlwaysTrue3Hit,
+   * m_PARAMactivateAlwaysFalse3Hit, m_PARAMactivateRandom3Hit, m_PARAMactivateDeltaPtHioC,
+   * m_PARAMactivateDeltaDistance2IPHioC, m_PARAMactivateZigZagXY, m_PARAMactivateZigZagXYWithSigma,
+   * m_PARAMactivateZigZagRZ, m_PARAMactivateDeltaPt, m_PARAMactivateCircleFit,
+   * m_PARAMactivateDeltaDistance2IP, m_PARAMactivateAlwaysTrue4Hit, m_PARAMactivateAlwaysFalse4Hit,
+   * m_PARAMactivateRandom4Hit
+   * m_PARAMtuneDistance3D, m_PARAMtuneDistanceXY, m_PARAMtuneDistanceZ,
+   * m_PARAMtuneSlopeRZ, m_PARAMtuneNormedDistance3D, m_PARAMtuneAlwaysTrue2Hit,
+   * m_PARAMtuneAlwaysFalse2Hit, m_PARAMtuneRandom2Hit, m_PARAMtuneAngles3DHioC,
+   * m_PARAMtuneAnglesXYHioC, m_PARAMtuneAnglesRZHioC, m_PARAMtuneDeltaSlopeRZHioC,
+   * m_PARAMtuneDistance2IPHioC, m_PARAMtunePTHioC, m_PARAMtuneHelixParameterFitHioC,
+   * m_PARAMtuneAnglesXY, m_PARAMtuneAnglesRZ, m_PARAMtuneDeltaSlopeRZ,
+   * m_PARAMtuneDistance2IP, m_PARAMtunePT, m_PARAMtuneHelixParameterFit,
+   * m_PARAMtuneDeltaSOverZ, m_PARAMtuneDeltaSlopeZOverS, m_PARAMtuneAlwaysTrue3Hit,
+   * m_PARAMtuneAlwaysFalse3Hit, m_PARAMtuneRandom3Hit, m_PARAMtuneDeltaPtHioC,
+   * m_PARAMtuneDeltaDistance2IPHioC, m_PARAMtuneZigZagXY, m_PARAMtuneZigZagXYWithSigma,
+   * m_PARAMtuneZigZagRZ, m_PARAMtuneDeltaPt, m_PARAMtuneCircleFit,
+   * m_PARAMtuneDeltaDistance2IP, m_PARAMtuneAlwaysTrue4Hit, m_PARAMtuneAlwaysFalse4Hit,
+   * m_PARAMtuneRandom4Hit
+   *
+   ** dependency of global in-module variables:
+   * m_usePXDHits, m_useSVDHits, m_useTELHits,
+   * m_nSectorSetups, m_passSetupVector, m_collector,
+   * m_baselinePass
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_PARAMnameOfInstance, m_PARAMactivateAlwaysTrue2Hit, m_PARAMactivateAlwaysFalse2Hit,
+   * m_PARAMactivateRandom2Hit, m_PARAMactivateAlwaysTrue3Hit, m_PARAMactivateAlwaysFalse3Hit,
+   * m_PARAMactivateRandom3Hit, m_PARAMactivateAlwaysTrue4Hit, m_PARAMactivateAlwaysFalse4Hit,
+   * m_PARAMactivateRandom4Hit, m_PARAMhighOccupancyThreshold, m_PARAMtuneAlwaysTrue2Hit,
+   * m_PARAMtuneAlwaysFalse2Hit, m_PARAMtuneRandom2Hit, m_PARAMtuneAlwaysTrue3Hit,
+   * m_PARAMtuneAlwaysFalse3Hit, m_PARAMtuneRandom3Hit, m_PARAMtuneAlwaysTrue4Hit,
+   * m_PARAMtuneAlwaysFalse4Hit, m_PARAMtuneRandom4Hit, m_PARAMdisplayCollector,
+   * m_collector
+   *
+   ** in-module-function-calls:
+   * resetCountersAtBeginRun()
+   */
+
   B2INFO("-----------------------------------------------\n       entering VXD CA track finder (" << m_PARAMnameOfInstance << ") - beginRun.\n       if you want to have some basic infos during begin- and endrun about it, set debug level 1 or 2. Debug level 3 or more gives you event wise output (the higher the level, the more verbose it gets, highest level: 175)");
   B2DEBUG(50, "##### be careful, current TF status does not support more than one run per initialization! #####"); /// WARNING TODO: check whether this is still valid
 

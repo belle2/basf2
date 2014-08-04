@@ -29,7 +29,7 @@ namespace {
   public:
 
     typedef UInt_t KeyElementType;
-    typedef TObject StoredElement;
+    typedef RelationsObject StoredElement;
 
 
     static bool SelectionCriterium(const KeyElementType a) {
@@ -888,8 +888,8 @@ namespace {
     selector.registerSubset(set, m_TestBench.getSubsetName());
 
     for (auto other : m_TestBench.getOtherSets()) {
-      selector.registerRelationsFromSubsetToOther(other.second.storedArray() , "", "");
-      selector.registerRelationsFromOtherToSubset(other.second.storedArray() , "", "");
+      selector.inheritRelationsTo(other.second.storedArray());
+      selector.inheritRelationsFrom(other.second.storedArray());
     }
 
     selector.registerRelationsFromSubsetToSubset("", "");
@@ -957,12 +957,12 @@ namespace {
     RelationArray::registerPersistent("a", "main");
     RelationArray::registerPersistent("main", "b");
 
+    //create subset and relations
     SelectSubset< RelationsObject > selectorMain;
     selectorMain.registerSubset(arrayMain, "subsetOfMain");
+    selectorMain.inheritRelationsFrom(arrayA, arrayB);
+    selectorMain.inheritRelationsTo(arrayB);
 
-    //TODO: remove the extra relationname args
-    selectorMain.registerRelationsFromOtherToSubset(arrayA , "", "");
-    selectorMain.registerRelationsFromSubsetToOther(arrayB , "", "");
     DataStore::Instance().setInitializeActive(false);
 
     //fill some data

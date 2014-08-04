@@ -7,5 +7,7 @@
 
 #pragma link C++ class Belle2::Variable::Manager-;
 #pragma link C++ class Belle2::Variable::Manager::Var-;
+#pragma link C++ class Belle2::Variable::Manager::ParameterVar-;
+#pragma link C++ class Belle2::Variable::Manager::MetaVar-;
 
 #endif

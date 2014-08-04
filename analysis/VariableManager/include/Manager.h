@@ -1,5 +1,7 @@
 #pragma once
 
+#include <analysis/dataobjects/Particle.h>
+
 #include <string>
 #include <map>
 #include <vector>
@@ -7,7 +9,6 @@
 
 namespace Belle2 {
 
-  class Particle;
   namespace Variable {
 
 
@@ -96,42 +97,52 @@ namespace Belle2 {
       typedef std::function<double(const Particle*, const std::vector<double>&)> ParameterFunctionPtr;
       /** meta functions stored take a const std::vector<std::string>& and return a FunctionPtr. */
       typedef std::function<FunctionPtr(const std::vector<std::string>&)> MetaFunctionPtr;
+#endif
 
-      template<class Ptr>
-      struct TemplateVar {
+      struct Var {
         std::string name; /**< Unique identifier of the function, used as key. */
-        Ptr function; /**< Pointer to function. */
+#ifndef __CINT__
+        FunctionPtr function; /**< Pointer to function. */
+#endif
         std::string description; /**< Description of what this function does. */
         std::string group; /**< Associated group. */
-#if defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
-        /* default constructor for ROOT */
-        TemplateVar() {}
+#if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
+        Var() {} /**< default constructor for ROOT */
 #else
-        TemplateVar(std::string n, Ptr f, std::string d, std::string g = "") : name(n), function(f), description(d), group(g) { }
+        Var(std::string n, FunctionPtr f, std::string d, std::string g = "") : name(n), function(f), description(d), group(g) { }
 #endif
       };
 
-      typedef TemplateVar<FunctionPtr> Var;
-      typedef TemplateVar<ParameterFunctionPtr> ParameterVar;
-      typedef TemplateVar<MetaFunctionPtr> MetaVar;
-
-#else
-      struct TemplateVar {
+      struct ParameterVar {
         std::string name; /**< Unique identifier of the function, used as key. */
+#ifndef __CINT__
+        ParameterFunctionPtr function; /**< Pointer to function. */
+#endif
         std::string description; /**< Description of what this function does. */
         std::string group; /**< Associated group. */
-        TemplateVar() {}
+#if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
+        ParameterVar() {} /**< default constructor for ROOT */
+#else
+        ParameterVar(std::string n, ParameterFunctionPtr f, std::string d, std::string g = "") : name(n), function(f), description(d), group(g) { }
+#endif
       };
 
-      typedef TemplateVar Var;
-      typedef TemplateVar ParameterVar;
-      typedef TemplateVar MetaVar;
-
+      struct MetaVar {
+        std::string name; /**< Unique identifier of the function, used as key. */
+#ifndef __CINT__
+        MetaFunctionPtr function; /**< Pointer to function. */
 #endif
+        std::string description; /**< Description of what this function does. */
+        std::string group; /**< Associated group. */
+#if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
+        MetaVar() {} /**< default constructor for ROOT */
+#else
+        MetaVar(std::string n, MetaFunctionPtr f, std::string d, std::string g = "") : name(n), function(f), description(d), group(g) { }
+#endif
+      };
 
       /** get singleton instance. */
       static Manager& Instance();
-
 
       /** Get the variable belonging to the given key.
        *

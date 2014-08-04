@@ -173,6 +173,10 @@ def GetCuts(signal, bckgrd, efficiency, purity, ycut_to_xcuts):
     def pythonPurityFunc(ycut):
         s = sum([GetNumberOfEventsInRange(h, ycut_to_xcuts(channel, ycut[0])) for (channel, h) in signal.iteritems()])
         b = sum([GetNumberOfEventsInRange(h, ycut_to_xcuts(channel, ycut[0])) for (channel, h) in bckgrd.iteritems()])
+        if s == 0:
+            return 0
+        if b == 0:
+            return 1
         return s / float(s + b)
 
     rootEfficiencyFunc = ROOT.TF1('EfficiencyFunction', pythonEfficiencyFunc, 0, 1, 0)

@@ -64,7 +64,7 @@ particles.append(Particle('pi0:incomplete', mva_pi0, pre_pi0_incomplete).addChan
 ################### KS0 ###############################
 mva_KS0 = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=kinematic_variables + vertex_variables + ['daughterAngle'],
+    variables=kinematic_variables + vertex_variables + ['daughterAngle(0,1)'],
     target='isSignal', targetCluster=1
 )
 

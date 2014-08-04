@@ -165,6 +165,10 @@ namespace Belle2 {
     /** Is this an accessor for an array? */
     bool isArray() const { return m_isArray; }
 
+    /** Is this object/array transient? */
+    bool isTransient() const;
+
+
     /** Convert this acessor into a readable string (for messages).
      *
      * e.g. "object EventMetaData (durability: event)"

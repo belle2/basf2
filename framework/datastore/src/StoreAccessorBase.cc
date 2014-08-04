@@ -44,3 +44,12 @@ bool StoreAccessorBase::assign(TObject* object, bool replace)
     delete object;
   return success;
 }
+bool StoreAccessorBase::isTransient() const
+{
+  const DataStore::StoreEntry* entry = DataStore::Instance().getEntry(*this);
+  if (!entry) {
+    B2ERROR("isTransient(): " << readableName() << " doesn't seem to  be registered");
+    return false;
+  }
+  return entry->isTransient;
+}

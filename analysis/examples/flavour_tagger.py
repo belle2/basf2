@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# *********   Flavor  Tagging   *********
-# * Authors: Thomas Keck & Moritz Gelb  *
-# * The whole flavor tagging can be     *
-# * done in this script.                *
+# *********   Flavor  Tagging   *********    *
+# * Authors: Fernando Abudinen, Moritz Gelb  *
+# *.....     and Thomas Keck                 *
+# * The whole flavor tagging can be          *
+# * done in this script.                     *
 # ***************************************
 
 from basf2 import *

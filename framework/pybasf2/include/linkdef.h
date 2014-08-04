@@ -6,7 +6,6 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::PyStoreArray-;
-#pragma link C++ class Belle2::PyRelationArray-;
 #pragma link C++ class Belle2::PyStoreObj-;
 
 #endif

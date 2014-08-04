@@ -76,44 +76,74 @@ namespace Belle2 {
    * \code
      m_selector.select( MySelectionFunction );
      \endcode
-
+   *
    * <h3> C++ lambda function </h3>
    * You can specify a lambda expression as parameter of the select method. E.g.:
    * in the event method of your code:
-   *  \code
-   m_selector.select( []( const Particle * particle )
-   { return  ( particle->UniqueId() % 2 ) == 1 ; } );
-   \endcode
+   * \code
+     m_selector.select( []( const Particle * particle )
+     { return  ( particle->UniqueId() % 2 ) == 1 ; } );
+     \endcode
    * with the advantage of an easy capture of module parameters.
-   * E.g. to count on the fly the number of rejected particles:
-   *  \code
-   int rejected(0);
-   m_selector.select(
-   [& rejected]( const Particle * particle )
-   {
-   if ( ( particle->UniqueId() % 2 ) == 1 )
-   return true;
-   rejected ++;
-   return false;
-   }
-   );
-  B2INFO("The selector rejected " << rejected << " particles." );
-  \endcode
-    * <h1> Relations </h1>
-    * By default the class SelectSubset produces a one to one relation
-    * from the subset to the set by which you can interpret all the relations
-    * from and to the original set. E.g. The original StoreArray<Particle> is
-    * in relation To the StoreArray<MCParticle>. You can use the relation from
-    * the subset to the set and then from the set to the MCParticles. This can
-    * be quite tedious, so you can ask SelectSubset to produce the natural
-    * restrictions of the relations  from and to the original set.
+   * E.g. to count the number of rejected particles:
+   * \code
+     int rejected(0);
+     m_selector.select( [& rejected]( const Particle * particle )
+     {
+       if ( ( particle->UniqueId() % 2 ) == 1 )
+         return true;
+       rejected ++;
+       return false;
+     });
+     B2INFO("The selector rejected " << rejected << " particles." );
+     \endcode
+   *
+   * <h1> Relations </h1>
+   * By default the class SelectSubset produces a one to one relation
+   * from the subset to the set by which you can interpret all the relations
+   * from and to the original set. E.g. The original StoreArray<Particle> is
+   * in relation To the StoreArray<MCParticle>. You can use the relation from
+   * the subset to the set and then from the set to the MCParticles. This can
+   * be quite tedious, so you can ask SelectSubset to produce the natural
+   * restrictions of the relations  from and to the original set.
 
-    * <h2> Relations to other StoreArrays</h2>
-    * <h2> Relations from other StoreArrays</h2>
-    * <h2> Relations from the StoreArray to itself</h2>
-    * If there are relations from objects in the original set to other objects in the same array
-    * (e.g. Particles -> Particles), you can also inherit these by
-    */
+   * <h2> Relations to other StoreArrays</h2>
+   * Assuming there is a relation from your original set to other arrays A and B,
+   * you can inherit these relations for all objects selected into your subset using:
+   * \code
+     StoreArray<A> a;
+     StoreArray<B> b;
+     m_selector.inheritRelationsTo(a, b);
+
+     //alternatively, you can also use multiple calls to the function
+     m_selector.inheritRelationsTo(a);
+     m_selector.inheritRelationsTo(b);
+     \endcode
+   *
+   * <h2> Relations from other StoreArrays</h2>
+   * Relations pointing from objects in other arrays to objects in the original set
+   * can also be inherited in a very similar way:
+   * \code
+     StoreArray<C> c;
+     StoreArray<D> d;
+     m_selector.inheritRelationsFrom(c, d);
+
+     //alternatively, you can also use multiple calls to the function
+     m_selector.inheritRelationsFrom(c);
+     m_selector.inheritRelationsFrom(d);
+     \endcode
+   *
+   * <h2> Relations from the StoreArray to itself</h2>
+   * If there are relations from objects in the original set to other objects in the same array
+   * (e.g. Particles -> Particles), you can also inherit these by doing
+   * \code
+     m_selector.inheritRelationsFrom(set);
+     // or:
+     // m_selector.inheritRelationsTo(set);
+     \endcode
+   * Note that both objects related must pass the selection criteria, or there would
+   * be one missing partner in the relation.
+   */
   template < typename StoredClass >
   class SelectSubset {
 
@@ -130,7 +160,6 @@ namespace Belle2 {
     /** If true, relations from set objects to set objects are copied. (if both objects are selected!). */
     bool m_inheritToSelf;
 
-
     /** how to handle re-registration of subset and relations to/from it? */
     const bool m_reportErrorIfExisting = true;
   public:
@@ -145,8 +174,9 @@ namespace Belle2 {
     /** Register the StoreArray<StoredClass> that will contain the subset of selected elements
      *  @param set         The StoreArray<StoredClass> from which the elements will be selected
      *  @param subsetName  The name of the StoreArray<StoredClass> that will contain the selected elements
+     *  @param subsetTransient should this subset be transient?
      */
-    bool registerSubset(const StoreArray< StoredClass >& set, const std::string& subsetName) {
+    bool registerSubset(const StoreArray< StoredClass >& set, const std::string& subsetName, bool subsetTransient = false) {
       if (m_subset) {
         B2FATAL("SelectSubset::registerSubset() can only be called once!");
         return false;
@@ -156,18 +186,17 @@ namespace Belle2 {
       m_setDurability           = set.getDurability() ;
 
 
-      bool set_is_transient = DataStore::Instance().getEntry(set)->isTransient;
-
       m_subset = new StoreArray<StoredClass>(subsetName, m_setDurability);
+      if (subsetTransient)
+        m_subset->registerAsTransient(m_reportErrorIfExisting);
+      else
+        m_subset->registerAsPersistent(m_reportErrorIfExisting);
+      RelationArray relation(*m_subset, set, "", m_subset->getDurability());
 
       //TODO: change relation direction to set -> subset?
-      if (set_is_transient) {
-        m_subset->registerAsTransient(m_reportErrorIfExisting);
-        RelationArray relation(*m_subset, set, "", m_subset->getDurability());
+      if (subsetTransient or set.isTransient()) {
         relation.registerAsTransient(m_reportErrorIfExisting);
       } else {
-        m_subset->registerAsPersistent(m_reportErrorIfExisting);
-        RelationArray relation(*m_subset, set, "", m_subset->getDurability());
         relation.registerAsPersistent(m_reportErrorIfExisting);
       }
 
@@ -230,7 +259,6 @@ namespace Belle2 {
      *  @param f the pointer to the function (or a nameless lambda expression) returning
      *  true for the elements to be selected and false for the others.
      */
-
     void select(std::function<bool (const StoredClass*)> f);
 
   private:
@@ -266,7 +294,7 @@ namespace Belle2 {
         const StoredClass* subsetObject = m_subset->appendNew(*setObject);
         for (std::string fromArray : m_inheritFromArrays) {
           const RelationVector<TObject>& relations = setObject->template getRelationsFrom<TObject>(fromArray);
-          for (int iRel = 0; iRel < relations.size(); iRel++) {
+          for (unsigned int iRel = 0; iRel < relations.size(); iRel++) {
             //TODO this might be slow, but members of other array might not inherit from RelationsObject. Once genfit::track is fixed,
             //this should be changed into RelationsObject members.
             DataStore::addRelationFromTo(relations.object(iRel), subsetObject, relations.weight(iRel));
@@ -274,7 +302,7 @@ namespace Belle2 {
         }
         for (std::string toArray : m_inheritToArrays) {
           const RelationVector<TObject>& relations = setObject->template getRelationsTo<TObject>(toArray);
-          for (int iRel = 0; iRel < relations.size(); iRel++) {
+          for (unsigned int iRel = 0; iRel < relations.size(); iRel++) {
             subsetObject->addRelationTo(relations.object(iRel), relations.weight(iRel));
           }
         }
@@ -289,7 +317,7 @@ namespace Belle2 {
 
         //get all objects in original set related to setObject1
         const RelationVector<StoredClass>& relations = setObject1->template getRelationsTo<StoredClass>(m_setName);
-        for (int iRel = 0; iRel < relations.size(); iRel++) {
+        for (unsigned int iRel = 0; iRel < relations.size(); iRel++) {
           const StoredClass* setObject2 = relations.object(iRel);
           const double weight = relations.weight(iRel);
 

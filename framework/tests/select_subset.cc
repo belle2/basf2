@@ -944,7 +944,6 @@ namespace {
     //array 'main' with relations: a -> main -> b
     //create subset:    a -> subsetOfMain -> b
 
-    //LogSystem::Instance().getLogConfig()->setLogLevel(LogConfig::c_Debug);
     DataStore::Instance().setInitializeActive(true);
     StoreArray< RelationsObject > arrayMain("main");
     StoreArray< RelationsObject > arrayA("a");
@@ -958,7 +957,7 @@ namespace {
     //create subset and relations
     SelectSubset< RelationsObject > selectorMain;
     selectorMain.registerSubset(arrayMain, "subsetOfMain");
-    selectorMain.inheritRelationsFrom(arrayA, arrayB);
+    selectorMain.inheritRelationsFrom(arrayA);
     selectorMain.inheritRelationsTo(arrayB);
 
     DataStore::Instance().setInitializeActive(false);
@@ -991,13 +990,13 @@ namespace {
     //verify subset
     EXPECT_EQ(5, arraySubset.getEntries());
     for (const RelationsObject & r : arraySubset) {
-      EXPECT_EQ(2, r.getRelationsFrom<RelationsObject>("a").size());
-      EXPECT_EQ(0, r.getRelationsFrom<RelationsObject>("b").size());
-      EXPECT_EQ(10, r.getRelationsTo<RelationsObject>("b").size());
-      EXPECT_EQ(0, r.getRelationsTo<RelationsObject>("a").size());
+      EXPECT_EQ(2u, r.getRelationsFrom<RelationsObject>("a").size());
+      EXPECT_EQ(0u, r.getRelationsFrom<RelationsObject>("b").size());
+      EXPECT_EQ(10u, r.getRelationsTo<RelationsObject>("b").size());
+      EXPECT_EQ(0u, r.getRelationsTo<RelationsObject>("a").size());
 
       //go back to main set, check selection condidition holds
-      EXPECT_EQ(1, r.getRelationsWith<RelationsObject>("main").size());
+      EXPECT_EQ(1u, r.getRelationsWith<RelationsObject>("main").size());
       const RelationsObject* originalObject = r.getRelated<RelationsObject>("main");
       EXPECT_TRUE(hasOddIndex(originalObject));
     }

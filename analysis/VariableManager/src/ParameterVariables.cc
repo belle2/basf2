@@ -32,7 +32,7 @@ namespace Belle2 {
       StoreArray<MCParticle> mcParticles;
       int counter = 0;
       for (int i = 0; i < mcParticles.getEntries(); ++i) {
-        if (abs(mcParticles[i]->getPDG()) == pdg[0])
+        if (mcParticles[i]->getStatus(MCParticle::c_PrimaryParticle) and abs(mcParticles[i]->getPDG()) == pdg[0])
           counter++;
       }
       return counter;

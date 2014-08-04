@@ -7,6 +7,8 @@ std::string Belle2::Variable::makeROOTCompatible(std::string str)
 {
   str.erase(std::remove(str.begin(), str.end(), '('), str.end());
   str.erase(std::remove(str.begin(), str.end(), ')'), str.end());
+  str.erase(std::remove(str.begin(), str.end(), ','), str.end());
+  str.erase(std::remove(str.begin(), str.end(), ' '), str.end());
   return str;
 }
 

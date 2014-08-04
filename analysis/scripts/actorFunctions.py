@@ -290,11 +290,12 @@ def SignalProbability(path, identifier, particleList, mvaConfig, additionalDepen
         B2INFO("Calculate SignalProbability for {i}, but particle/channel is ignored. Run Teacher in extern process.".format(i=identifier))
         subprocess.call("externTeacher --methodName '{name}' --methodType '{type}' --methodConfig '{config}' --target '{target}'"
                         " --variables '{variables}' --factoryOption '{foption}' --prepareOption '{poption}' --prefix '{prefix}'"
-                        " --maxEventsPerClass {maxEvents}".format(name=mvaConfig.name, type=mvaConfig.type, config=mvaConfig.config,
-                                                                  target=mvaConfig.target, variables="' '".join(mvaConfig.variables),
-                                                                  foption='!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification',
-                                                                  poption='SplitMode=random:!V', maxEvents=10000000,
-                                                                  prefix=removeJPsiSlash(particleList + '_' + hash)), shell=True)
+                        " --maxEventsPerClass {maxEvents}"
+                        " > '{prefix}'.log".format(name=mvaConfig.name, type=mvaConfig.type, config=mvaConfig.config,
+                                                   target=mvaConfig.target, variables="' '".join(mvaConfig.variables),
+                                                   foption='!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification',
+                                                   poption='SplitMode=random:!V', maxEvents=10000000,
+                                                   prefix=removeJPsiSlash(particleList + '_' + hash)), shell=True)
 
     if os.path.isfile(configFilename):
         expert = register_module('TMVAExpert')

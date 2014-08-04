@@ -10,6 +10,7 @@ import actorFramework
 import preCutDetermination
 import os
 import re
+import sys
 import subprocess
 from string import Template
 
@@ -222,8 +223,8 @@ def createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut):
         placeholders['preCutROOTFile'] = preCutHistogram[0]
         rootfile = ROOT.TFile(placeholders['preCutROOTFile'])
         # Calculate purity and efficiency for this channel
-        signal_hist = rootfile.Get(rootfile.GetListOfKeys().At(0).GetName())
-        background_hist = rootfile.Get(rootfile.GetListOfKeys().At(2).GetName())
+        signal_hist = rootfile.GetListOfKeys().At(0).ReadObj()
+        background_hist = rootfile.GetListOfKeys().At(2).ReadObj()
 
         placeholders['channelNSignal'] = preCutDetermination.GetNumberOfEvents(signal_hist)
         placeholders['channelNBackground'] = preCutDetermination.GetNumberOfEvents(background_hist)
@@ -280,8 +281,7 @@ def makePreCutPlot(rootFilename, plotName, number, preCut):
     rootfile = ROOT.TFile(rootFilename)
     canvas = ROOT.TCanvas(plotName + '_canvas', plotName, 600, 400)
     canvas.cd()
-    key = rootfile.GetListOfKeys().At(number)
-    hist = rootfile.Get(key.GetName())
+    hist = rootfile.GetListOfKeys().At(number).ReadObj()
     hist.Draw()
     if preCut is not None:
         lc, uc = preCut['range']
@@ -322,18 +322,29 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
 
         # Set mva placeholders
         placeholders['mvaROOTFilename'] = signalProbability[:-7] + '.root'  # Strip .config of filename
+        placeholders['mvaLogFilename'] = signalProbability[:-7] + '.log'  # Strip .config of filename
         placeholders['mvaName'] = mvaConfig.name
         placeholders['mvaType'] = mvaConfig.type
         placeholders['mvaConfig'] = mvaConfig.config
         placeholders['mvaTarget'] = mvaConfig.target
         placeholders['mvaTargetCluster'] = mvaConfig.targetCluster
 
+        # TODO implement performance here from log file
         from variables import variables
+        ranking = getMVARankingFromLogfile(placeholders['mvaLogFilename'])
         placeholders['mvaVariables'] = ''
         for v in mvaConfig.variables:
+            rootName = v.replace('(', '').replace(',', '').replace(' ', '')
+            if rootName in ranking:
+                rank, value = ranking[rootName]
+                rank = str(rank)
+                value = '{:.2f}'.format(value)
+            else:
+                rank = ''
+                value = ''
             varName = escapeForLatex(v)
             description = escapeForLatex(variables.getVariable(v).description)
-            placeholders['mvaVariables'] += r'\texttt{' + varName + r'} & ' + description + r' \\'
+            placeholders['mvaVariables'] += r'\texttt{' + varName + r'} & ' + description + ' & ' + rank + '& ' + value + r' \\'
 
         rootfile = ROOT.TFile(placeholders['mvaROOTFilename'])
 
@@ -345,10 +356,11 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
         placeholders['mvaNTestSignal'] = int(testTree.GetEntries('className == "Signal"'))
         placeholders['mvaNTestBackground'] = int(testTree.GetEntries('className == "Background"'))
 
-        keys = [key.GetName() for key in rootfile.GetListOfKeys() if re.match('^{name}.*_tree$'.format(name=escapeForRegExp(placeholders['particleName'])), key.GetName()) is not None]
+        keys = [key for key in rootfile.GetListOfKeys() if re.match('^{name}.*_tree$'.format(name=removeJPsiSlash(escapeForRegExp(placeholders['particleName']))), key.GetName()) is not None]
         if len(keys) != 1:
+            print [k for k in rootfile.GetListOfKeys()]
             raise RuntimeError("Couldn't find original tree for particle {name} in root file {f} created by tmva".format(name=placeholders['particleName'], f=placeholders['mvaROOTFilename']))
-        originalTree = rootfile.Get(keys[0])
+        originalTree = keys[0].ReadObj()
         placeholders['mvaNCandidates'] = originalTree.GetEntries()
 
         signalSelector = '({isSignal} == {signalCluster})'.format(isSignal=placeholders['mvaTarget'], signalCluster=placeholders['mvaTargetCluster'])
@@ -526,3 +538,23 @@ def makeMbcPlot(fileName, outputFileName):
     canvas.BuildLegend(0.1, 0.65, 0.6, 0.9)
 
     canvas.SaveAs(outputFileName)
+
+
+def getMVARankingFromLogfile(logfile):
+    """
+    Extracts ranking from TMVA logfile and returns dictionary with variable:(rank, value)
+    """
+    ranking = {}
+    ranking_mode = 0
+    with open(logfile, 'r') as f:
+        for line in f:
+            if 'Variable Importance' in line:
+                ranking_mode = 1
+            elif ranking_mode == 1:
+                ranking_mode = 2
+            elif ranking_mode == 2 and '-------' in line:
+                ranking_mode = 0
+            elif ranking_mode == 2:
+                v = line.split(':')
+                ranking[v[2].strip()] = (int(v[1]), float(v[3]))
+    return ranking

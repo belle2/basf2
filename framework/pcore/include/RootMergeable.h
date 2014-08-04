@@ -56,6 +56,7 @@ namespace Belle2 {
     template<class ...Args> RootMergeable(Args&& ... params) : m_wrapped(new T(std::forward<Args>(params)...)) { }
 #endif
 
+    /** Replace wrapped object with p (takes ownership). */
     void assign(T* p) {
       delete m_wrapped;
       m_wrapped = p;

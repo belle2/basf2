@@ -88,7 +88,7 @@ void MCParticle::fixParticleList() const
     //Search all StoreArrays which happen to store MCParticles
     const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(DataStore::c_Event);
     for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
-      TClonesArray* value = dynamic_cast<TClonesArray*>(iter->second->ptr);
+      TClonesArray* value = dynamic_cast<TClonesArray*>(iter->second.ptr);
       if (value && value->GetClass() == Class() && value->IndexOf(this) >= 0) {
         plist = value;
         break;

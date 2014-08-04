@@ -82,9 +82,9 @@ void PrintCollectionsModule::printCollections(DataStore::EDurability durability)
   //-----------------------------
   const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(durability);
   for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
-    if (iter->second->isArray)
+    if (iter->second.isArray)
       continue;
-    const TObject* currCol = iter->second->ptr;
+    const TObject* currCol = iter->second.ptr;
 
     if (currCol != NULL) {
       B2INFO(boost::format("%1% %|20t| %2%") % shorten(currCol->ClassName()) % iter->first);
@@ -96,15 +96,15 @@ void PrintCollectionsModule::printCollections(DataStore::EDurability durability)
   //Print the array information
   //-----------------------------
   for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
-    if (!iter->second->isArray)
+    if (!iter->second.isArray)
       continue;
-    const TClonesArray* currCol = dynamic_cast<TClonesArray*>(iter->second->ptr);
+    const TClonesArray* currCol = dynamic_cast<TClonesArray*>(iter->second.ptr);
 
     long entries = 0;
     if (currCol != NULL)
       entries = currCol->GetEntriesFast();
 
-    const TClonesArray* obj = dynamic_cast<TClonesArray*>(iter->second->object);
+    const TClonesArray* obj = dynamic_cast<TClonesArray*>(iter->second.object);
     std::string type;
     if (obj)
       type = shorten(obj->GetClass()->GetName());

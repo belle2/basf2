@@ -98,7 +98,7 @@ namespace Belle2 {
     };
 
     // Convenient typedefs.
-    typedef std::map<std::string, StoreEntry*> StoreObjMap;  /**< Map for StoreEntries. */
+    typedef std::map<std::string, StoreEntry> StoreObjMap;  /**< Map for StoreEntries. */
     typedef StoreObjMap::iterator StoreObjIter;              /**< Iterator for a StoreEntry map. */
     typedef StoreObjMap::const_iterator StoreObjConstIter;   /**< const_iterator for a StoreEntry map. */
 
@@ -191,7 +191,7 @@ namespace Belle2 {
      *  @param accessor   Encapsulates name, durability, and type
      *  @return           StoreEntry, or NULL if not found
      */
-    StoreEntry* getEntry(const StoreAccessorBase& accessor) const;
+    StoreEntry* getEntry(const StoreAccessorBase& accessor);
 
     /** Produce ERROR message if no entry of the given type is registered in the DataStore.
      *
@@ -216,7 +216,7 @@ namespace Belle2 {
      *  @param accessor   Encapsulates name, durability, and type
      *  @return           Pointer to pointer to object, NULL if none exists
      */
-    TObject** getObject(const StoreAccessorBase& accessor) const;
+    TObject** getObject(const StoreAccessorBase& accessor);
 
     /** Create a new object/array in the DataStore or add an existing one.
      *
@@ -427,7 +427,7 @@ namespace Belle2 {
      *  @param index      The index of the object in the array.
      *  @return           True if the object was found in the data store
      */
-    bool findStoreEntry(const TObject* object, StoreEntry*& entry, int& index) const;
+    bool findStoreEntry(const TObject* object, StoreEntry*& entry, int& index);
 
     /** Returns a list of registered relations (specifically, their names) that point to or from 'array'.
      *

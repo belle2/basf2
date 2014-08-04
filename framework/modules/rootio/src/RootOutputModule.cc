@@ -99,7 +99,7 @@ void RootOutputModule::initialize()
       B2WARNING(c_SteerExcludeBranchNames[ii] << " has duplicate entries.");
     //m_branchNames[ii] and it's exclusion list are now sorted alphabetically and unique
 
-    const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(DataStore::EDurability(ii));
+    DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(DataStore::EDurability(ii));
 
     //check for branch names that are not in the DataStore
     for (unsigned int iBranch = 0; iBranch < m_branchNames[ii].size(); iBranch++) {
@@ -115,10 +115,10 @@ void RootOutputModule::initialize()
 
     //create the tree and branches
     m_tree[ii] = new TTree(c_treeNames[ii].c_str(), c_treeNames[ii].c_str());
-    for (DataStore::StoreObjConstIter iter = map.begin(); iter != map.end(); ++iter) {
+    for (DataStore::StoreObjIter iter = map.begin(); iter != map.end(); ++iter) {
       const std::string& branchName = iter->first;
       //skip transient entries, excluded branches, and branches not in m_branchNames (if it is not empty)
-      if ((iter->second->isTransient && !binary_search(m_branchNames[ii].begin(), m_branchNames[ii].end(), branchName)) ||
+      if ((iter->second.isTransient && !binary_search(m_branchNames[ii].begin(), m_branchNames[ii].end(), branchName)) ||
           binary_search(m_excludeBranchNames[ii].begin(), m_excludeBranchNames[ii].end(), branchName) ||
           (!m_branchNames[ii].empty() && !binary_search(m_branchNames[ii].begin(), m_branchNames[ii].end(), branchName))) {
         //make sure FileMetaData and EventMetaData are always included in the output
@@ -126,9 +126,9 @@ void RootOutputModule::initialize()
             ((branchName != "EventMetaData") || (ii == DataStore::c_Persistent))) continue;
       }
 
-      TClass* entryClass = iter->second->object->IsA();
-      if (iter->second->isArray) {
-        entryClass = static_cast<TClonesArray*>(iter->second->object)->GetClass();
+      TClass* entryClass = iter->second.object->IsA();
+      if (iter->second.isArray) {
+        entryClass = static_cast<TClonesArray*>(iter->second.object)->GetClass();
       }
 
       if (!hasStreamers(entryClass))
@@ -145,14 +145,14 @@ void RootOutputModule::initialize()
         B2DEBUG(100, entryClass->GetName() << " has custom streamer, setting split level -1 for this branch.");
 
         splitLevel = -1;
-        if (iter->second->isArray) {
+        if (iter->second.isArray) {
           //for arrays, we also don't want TClonesArray to go around our streamer
-          static_cast<TClonesArray*>(iter->second->object)->BypassStreamer(kFALSE);
+          static_cast<TClonesArray*>(iter->second.object)->BypassStreamer(kFALSE);
         }
       }
-      m_tree[ii]->Branch(branchName.c_str(), &iter->second->object, bufsize, splitLevel);
-      m_tree[ii]->SetBranchAddress(branchName.c_str(), &iter->second->object);
-      m_entries[ii].push_back(iter->second);
+      m_tree[ii]->Branch(branchName.c_str(), &iter->second.object, bufsize, splitLevel);
+      m_tree[ii]->SetBranchAddress(branchName.c_str(), &iter->second.object);
+      m_entries[ii].push_back(&iter->second);
       B2DEBUG(150, "The branch " << branchName << " was created.");
     }
   }

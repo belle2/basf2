@@ -50,17 +50,11 @@ SubEventModule::~SubEventModule()
 {
 }
 
-void deepCopy(const DataStore::StoreObjMap& orig, DataStore::StoreObjMap& dest)
-{
-  for (auto entry : orig) {
-    dest[entry.first] = new DataStore::StoreEntry(*entry.second);
-  }
-}
 void restoreContents(const DataStore::StoreObjMap& orig, DataStore::StoreObjMap& dest)
 {
   for (auto entry : orig) {
-    auto& destEntry = *dest[entry.first];
-    auto& srcEntry = *entry.second;
+    auto& destEntry = dest[entry.first];
+    auto& srcEntry = entry.second;
     if (srcEntry.ptr == nullptr)
       destEntry.ptr = nullptr;
   }
@@ -75,8 +69,8 @@ void SubEventModule::initialize()
   processStatistics->suspendGlobal();
 
   //register loop object (!array, transient, errorIfExisting)
-  const DataStore::StoreEntry* arrayEntry = DataStore::Instance().getStoreObjectMap(DataStore::c_Event).at(m_loopOver.getName());
-  TClass* arrayClass = static_cast<TClonesArray*>(arrayEntry->object)->GetClass();
+  const DataStore::StoreEntry& arrayEntry = DataStore::Instance().getStoreObjectMap(DataStore::c_Event).at(m_loopOver.getName());
+  TClass* arrayClass = static_cast<TClonesArray*>(arrayEntry.object)->GetClass();
   DataStore::Instance().registerEntry(m_objectName, DataStore::c_Event, arrayClass, false, true, true);
 
   processInitialize(m_moduleList);
@@ -94,16 +88,11 @@ void SubEventModule::terminate()
   //get event map and make a deep copy of the StoreEntry objects
   //(we want to revert changes to the StoreEntry objects, but not to the arrays/objects)
   DataStore::StoreObjMap& persistentMap = DataStore::Instance().getStoreObjectMap(DataStore::c_Persistent);
-  DataStore::StoreObjMap persistentMapCopy;
-  deepCopy(persistentMap, persistentMapCopy);
+  DataStore::StoreObjMap persistentMapCopy = persistentMap;
 
   processTerminate(m_moduleList);
 
   restoreContents(persistentMapCopy, persistentMap);
-  //cleanup
-  for (auto entry : persistentMapCopy) {
-    delete entry.second;
-  }
 
   //don't screw up statistics for this module
   processStatistics->startModule();
@@ -144,19 +133,18 @@ void SubEventModule::event()
   //get event map and make a deep copy of the StoreEntry objects
   //(we want to revert changes to the StoreEntry objects, but not to the arrays/objects)
   DataStore::StoreObjMap& eventMap = DataStore::Instance().getStoreObjectMap(DataStore::c_Event);
-  DataStore::StoreObjMap eventMapCopy;
-  deepCopy(eventMap, eventMapCopy);
+  DataStore::StoreObjMap eventMapCopy = eventMap;
 
   //processCore() resets EventMetaData
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
   const EventMetaData eventMetaDataBack = *eventMetaDataPtr;
 
-  DataStore::StoreEntry* objectEntry = DataStore::Instance().getStoreObjectMap(DataStore::c_Event).at(m_objectName);
+  DataStore::StoreEntry& objectEntry = DataStore::Instance().getStoreObjectMap(DataStore::c_Event).at(m_objectName);
 
   for (int i = 0; i < numEntries; i++) {
     //set loopObject
-    objectEntry->object = m_loopOver[i];
-    objectEntry->ptr = m_loopOver[i];
+    objectEntry.object = m_loopOver[i];
+    objectEntry.ptr = m_loopOver[i];
 
     //stuff usually done in processCore()
     PathIterator moduleIter(m_path);
@@ -167,13 +155,8 @@ void SubEventModule::event()
     restoreContents(eventMapCopy, eventMap);
   }
 
-  objectEntry->object = nullptr;
-  objectEntry->ptr = nullptr;
-
-  //cleanup
-  for (auto entry : eventMapCopy) {
-    delete entry.second;
-  }
+  objectEntry.object = nullptr;
+  objectEntry.ptr = nullptr;
 
   Environment::Instance().setNoStats(noStats);
 

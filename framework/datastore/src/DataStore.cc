@@ -93,23 +93,23 @@ bool DataStore::registerEntry(const std::string& name, EDurability durability,
   info.addEntry(name, ModuleInfo::c_Output, (objClass == RelationContainer::Class()));
 
   // Check whether the map entry already exists
-  const StoreObjConstIter& it = m_storeObjMap[durability].find(name);
+  const auto& it = m_storeObjMap[durability].find(name);
   if (it != m_storeObjMap[durability].end()) {
-    StoreEntry* entry = it->second;
+    StoreEntry& entry = it->second;
 
     // Complain about existing entry
     if (errorIfExisting) {
-      B2ERROR("An " << accessor.readableName() << " of type " << entry->object->ClassName() << " was already registered before. (Multiple calls to registerPersistent() etc. are fine if the errorIfExisting parameter is set to false. For objects you will want to make sure that you don't discard existing data from other modules in that case.");
+      B2ERROR("An " << accessor.readableName() << " of type " << entry.object->ClassName() << " was already registered before. (Multiple calls to registerPersistent() etc. are fine if the errorIfExisting parameter is set to false. For objects you will want to make sure that you don't discard existing data from other modules in that case.");
       return false;
     }
 
     // Check whether the types match
-    if (!checkType(*entry, accessor)) return false;
+    if (!checkType(entry, accessor)) return false;
 
     // Check whether the persistency type matches
-    if (entry->isTransient != transient) {
+    if (entry.isTransient != transient) {
       B2WARNING("Existing " << accessor.readableName() << " has different persistency type than requested. Changing persistency to " << (transient ? "transient" : "persistent") << ".");
-      entry->isTransient = transient;
+      entry.isTransient = transient;
     }
 
     B2DEBUG(100, "An " << accessor.readableName() << " was registered once more (with errorIfExisting=false).");
@@ -123,35 +123,34 @@ bool DataStore::registerEntry(const std::string& name, EDurability durability,
   }
 
   // Add the DataStore entry
-  StoreEntry* entry = new StoreEntry;
-  m_storeObjMap[durability][name] = entry;
-  entry->isArray = array;
-  entry->isTransient = transient;
+  StoreEntry& entry = m_storeObjMap[durability][name];
+  entry.isArray = array;
+  entry.isTransient = transient;
   if (array) {
-    entry->object = new TClonesArray(objClass);
+    entry.object = new TClonesArray(objClass);
   } else {
-    entry->object = static_cast<TObject*>(objClass->New());
+    entry.object = static_cast<TObject*>(objClass->New());
   }
-  entry->name = name;
+  entry.name = name;
 
   B2DEBUG(100, "Successfully registered " << accessor.readableName());
   return true;
 }
 
 
-DataStore::StoreEntry* DataStore::getEntry(const StoreAccessorBase& accessor) const
+DataStore::StoreEntry* DataStore::getEntry(const StoreAccessorBase& accessor)
 {
-  const StoreObjConstIter& it = m_storeObjMap[accessor.getDurability()].find(accessor.getName());
+  const auto& it = m_storeObjMap[accessor.getDurability()].find(accessor.getName());
 
-  if (it != m_storeObjMap[accessor.getDurability()].end() and checkType(*(it->second), accessor)) {
-    return it->second;
+  if (it != m_storeObjMap[accessor.getDurability()].end() and checkType((it->second), accessor)) {
+    return &(it->second);
   } else {
     return nullptr;
   }
 }
 
 
-TObject** DataStore::getObject(const StoreAccessorBase& accessor) const
+TObject** DataStore::getObject(const StoreAccessorBase& accessor)
 {
   StoreEntry* entry = getEntry(accessor);
   if (!entry) {
@@ -191,7 +190,7 @@ bool DataStore::createObject(TObject* object, bool replace, const StoreAccessorB
 }
 
 
-bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& entry, int& index) const
+bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& entry, int& index)
 {
   // check whether the cached information is (still) valid
   if (entry && entry->ptr && (index >= 0)) {
@@ -209,8 +208,8 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
   // search for the object and set the entry and index
   const TClass* objectClass = object->IsA();
   for (auto & mapEntry : m_storeObjMap[c_Event]) {
-    if (mapEntry.second->ptr && mapEntry.second->isArray) {
-      TClonesArray* array = static_cast<TClonesArray*>(mapEntry.second->ptr);
+    if (mapEntry.second.ptr && mapEntry.second.isArray) {
+      TClonesArray* array = static_cast<TClonesArray*>(mapEntry.second.ptr);
       const TClass* arrayClass = array->GetClass();
       if (arrayClass == objectClass) {
         if (object == array->Last()) {
@@ -223,14 +222,14 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
             for (int i = 0; i < nEntries; i++) {
               RelationsObject* relobj = static_cast<RelationsObject*>((*array)[i]);
               relobj->m_cacheArrayIndex = i;
-              relobj->m_cacheDataStoreEntry = mapEntry.second;
+              relobj->m_cacheDataStoreEntry = &mapEntry.second;
             }
           }
           index = array->IndexOf(object);
         }
 
         if (index >= 0) {
-          entry = mapEntry.second;
+          entry = &mapEntry.second;
           return true;
         }
       }
@@ -253,10 +252,10 @@ void DataStore::getArrayNames(std::vector<std::string>& names, const std::string
     }
   } else if (arrayName == "ALL") {
     for (auto & mapEntry : m_storeObjMap[c_Event]) {
-      if (mapEntry.second->ptr && mapEntry.second->isArray) {
-        TClonesArray* array = static_cast<TClonesArray*>(mapEntry.second->ptr);
+      if (mapEntry.second.ptr && mapEntry.second.isArray) {
+        TClonesArray* array = static_cast<TClonesArray*>(mapEntry.second.ptr);
         if (array->GetClass()->InheritsFrom(arrayClass)) {
-          names.push_back(mapEntry.second->name);
+          names.push_back(mapEntry.second.name);
         }
       }
     }
@@ -282,11 +281,11 @@ void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, i
 
   // get the relations from -> to
   const string& relationsName = relationName(fromEntry->name, toEntry->name);
-  const StoreObjConstIter& it = m_storeObjMap[c_Event].find(relationsName);
+  const StoreObjIter& it = m_storeObjMap[c_Event].find(relationsName);
   if (it == m_storeObjMap[c_Event].end()) {
     B2FATAL("No relation '" << relationsName << "' found. Please register it (using RelationArray::registerPersistent()) before trying to add relations.");
   }
-  StoreEntry* entry = it->second;
+  StoreEntry* entry = &(it->second);
 
   // auto create relations if needed
   if (!entry->ptr) {
@@ -336,7 +335,7 @@ std::vector<RelationEntry> DataStore::getRelationsWith(ESearchSide searchSide, c
   // loop over found store arrays
   for (const std::string & name : names) {
     const StoreObjConstIter& arrayIter = m_storeObjMap[c_Event].find(name);
-    if (arrayIter == m_storeObjMap[c_Event].end() or arrayIter->second->ptr == nullptr) continue;
+    if (arrayIter == m_storeObjMap[c_Event].end() or arrayIter->second.ptr == nullptr) continue;
 
     // get the relations from -> to
     const string& relationsName = (searchSide == c_ToSide) ? relationName(entry->name, name) : relationName(name, entry->name);
@@ -383,7 +382,7 @@ RelationEntry DataStore::getRelationWith(ESearchSide searchSide, const TObject* 
   // loop over found store arrays
   for (const std::string & name : names) {
     const StoreObjConstIter& arrayIter = m_storeObjMap[c_Event].find(name);
-    if (arrayIter == m_storeObjMap[c_Event].end() or arrayIter->second->ptr == nullptr) continue;
+    if (arrayIter == m_storeObjMap[c_Event].end() or arrayIter->second.ptr == nullptr) continue;
 
     // get the relations from -> to
     const string& relationsName = (searchSide == c_ToSide) ? relationName(entry->name, name) : relationName(name, entry->name);
@@ -419,8 +418,8 @@ std::vector<std::string> DataStore::getListOfRelationsForArray(const StoreAccess
   //loop over all arrays
   EDurability durability = array.getDurability();
   for (auto & mapEntry : m_storeObjMap[durability]) {
-    if (mapEntry.second->isArray) {
-      const std::string& name = mapEntry.second->name;
+    if (mapEntry.second.isArray) {
+      const std::string& name = mapEntry.second.name;
 
       //check both from & to 'array'
       for (int searchSide = 0; searchSide < c_BothSides; searchSide++) {
@@ -439,7 +438,7 @@ void DataStore::clearMaps(EDurability durability)
 {
   B2DEBUG(100, "Invalidating objects for durability " << durability);
   for (auto & mapEntry : m_storeObjMap[durability]) {
-    mapEntry.second->ptr = nullptr;
+    mapEntry.second.ptr = nullptr;
   }
 }
 
@@ -447,9 +446,7 @@ void DataStore::reset(EDurability durability)
 {
   for (auto & mapEntry : m_storeObjMap[durability]) {
     //delete stored object/array
-    delete mapEntry.second->object;
-    //delete StoreEntry
-    delete mapEntry.second;
+    delete mapEntry.second.object;
   }
   m_storeObjMap[durability].clear();
   //invalidate any cached relations (expect RelationArrays to remain valid)

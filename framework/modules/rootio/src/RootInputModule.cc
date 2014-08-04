@@ -1,7 +1,7 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2012 - Belle II Collaboration                             *
- *                                                                        *
+ :cc
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Heck, Christian Pulvermacher, Thomas Kuhr         *
  *                                                                        *
@@ -229,7 +229,7 @@ void RootInputModule::readTree()
 
 bool RootInputModule::connectBranches(TTree* tree, DataStore::EDurability durability, StoreEntries* storeEntries)
 {
-  const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(durability);
+  DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(durability);
 
   //Go over the branchlist and connect the branches with DataStore entries
   const TObjArray* branches = tree->GetListOfBranches();
@@ -271,13 +271,13 @@ bool RootInputModule::connectBranches(TTree* tree, DataStore::EDurability durabi
       tree->SetBranchStatus(branch->GetName(), 0);
       continue;
     }
-    DataStore::StoreEntry* entry = (map.find(branchName))->second;
-    tree->SetBranchAddress(branch->GetName(), &(entry->object));
-    if (storeEntries) storeEntries->push_back(entry);
+    DataStore::StoreEntry& entry = (map.find(branchName))->second;
+    tree->SetBranchAddress(branch->GetName(), &(entry.object));
+    if (storeEntries) storeEntries->push_back(&entry);
 
     //Read the persistent objects
     if (durability == DataStore::c_Persistent) {
-      entry->ptr = entry->object;
+      entry.ptr = entry.object;
     }
 
     //Keep track of already connected branches

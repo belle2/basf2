@@ -15,11 +15,10 @@ PyStoreObj::PyStoreObj(const std::string& name, int durability):
   m_name(name),
   m_durability(durability)
 {
-  const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(DataStore::EDurability(durability));
-  DataStore::StoreObjConstIter iter = map.find(name);
-  if ((iter != map.end()) && !iter->second->isArray) {
-    m_storeObjPtr = &(iter->second->ptr);
-  }
+  DataStore::StoreEntry* entry = DataStore::Instance().getEntry(StoreAccessorBase(name, DataStore::EDurability(durability), TObject::Class(), false));
+  if (entry)
+    m_storeObjPtr = &(entry->ptr);
+  m_storeObjPtr = DataStore::Instance().getObject(StoreAccessorBase(name, DataStore::EDurability(durability), TObject::Class(), false));
 }
 
 TClass* PyStoreObj::getClass(const std::string& name)
@@ -62,8 +61,8 @@ void PyStoreObj::list(int durability)
 {
   const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(DataStore::EDurability(durability));
   for (const auto & entrypair : map) {
-    if (!entrypair.second->isArray) {
-      const TObject* obj = entrypair.second->object;
+    if (!entrypair.second.isArray) {
+      const TObject* obj = entrypair.second.object;
       if (obj and dynamic_cast<const RelationContainer*>(obj))
         continue; //ignore relations in list
       B2INFO(entrypair.first);

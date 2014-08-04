@@ -11,12 +11,11 @@ namespace Belle2 {
   namespace Variable {
 
 
-
     /** Global list of available variables.
      *
-     *  Each variable is has an associated unique string key through
+     *  Each variable has an associated unique string key through
      *  which it can be accessed. The Manager can be used to get
-     *  an instance of the Variable class for this key. All variables take a
+     *  an instance of the Variable class for this key. All ordinary variables take a
      *  const Particle* and return a double.
      *
      *
@@ -24,12 +23,21 @@ namespace Belle2 {
      *  To simply get a list of all variables registered in the main analysis library,
      *  run <tt>basf2 analysis/scripts/variables.py</tt> .
      *
-     *  <h2>Special variables</h2>
+     *  <h2>Parameter variables</h2>
+     *  Parameter variables take a const Particle* and a const std::vector<double>&. They return a double.
+     *  If a Parameter Variable is accessed via the VariableManager::getVariable a ordinary variable is
+     *  dynamically registered which calls the Parameter variable with the correct parameters.
+
+     *  <h2>Meta variables</h2>
+     *  Meta variables take a const std::vector<std::string>& and return a pointer to a ordinary variable function.
+     *  If a Meta Variable is accessed via the VariableManager::getVariable a ordinary variable is
+     *  dynamically registered which calls the function returned by the meta variable.
+     *
      *  There are a number of meta-variables that can be combined with existing variables to do more powerful calculations:
      *  <dl>
      *  <dt>abs(varName)</dt>
      *   <dd>Return absolute value of variable varName.</dd>
-     *  <dt>daughterN(varName)</dt>
+     *  <dt>daughter(N, varName)</dt>
      *   <dd>(replace N with 0..6) Calculate variable varName for Nth daughter</dd>
      *  <dt>daughterProductOf(varName)</dt>
      *   <dd>Calculate variable varName for each daughter, and return product of values</dd>
@@ -38,8 +46,8 @@ namespace Belle2 {
      *  <dt>getExtraInfo(extraInfoName)</dt>
      *   <dd>Return value of extra info 'extraInfoName' from Particle (see Particle::getExtraInfo()).</dd>
      *  </dl>
-     *  So, if you wanted to get the momentum of the first daughter, you can use "daughter1(p)" anywhere where variable
-     *  names are accepted. Nesting is also possible, e.g. "daughter1(abs(getExtraInfo('SignalProbability')))" can be used.
+     *  So, if you wanted to get the momentum of the first daughter, you can use "daughter(1, p)" anywhere where variable
+     *  names are accepted. Nesting is also possible, e.g. "daughter(1, abs(getExtraInfo(SignalProbability)))" can be used.
      *
      *  <h2>Adding variables</h2>
      *  Variables will automatically register themselves when
@@ -84,28 +92,42 @@ namespace Belle2 {
 #ifndef __CINT__
       /** functions stored take a const Particle* and return double. */
       typedef std::function<double(const Particle*)> FunctionPtr;
-      typedef std::function<double(const Particle*, const std::vector<double>&)> FunctionPtrWithParameters;
-      //typedef double(*FunctionPtr)(const Particle*);
-#endif
+      /** parameter functions stored take a const Particle*, const std::vector<double>& and return double. */
+      typedef std::function<double(const Particle*, const std::vector<double>&)> ParameterFunctionPtr;
+      /** meta functions stored take a const std::vector<std::string>& and return a FunctionPtr. */
+      typedef std::function<FunctionPtr(const std::vector<std::string>&)> MetaFunctionPtr;
 
-      /** Struct containing the function used for calculation and the description. */
-      struct Var {
+      template<class Ptr>
+      struct TemplateVar {
         std::string name; /**< Unique identifier of the function, used as key. */
-#ifndef __CINT__
-        FunctionPtr function; /**< Pointer to function. */
-        FunctionPtrWithParameters pfunction; /**< Pointer to function with parameters. */
-#endif
+        Ptr function; /**< Pointer to function. */
         std::string description; /**< Description of what this function does. */
         std::string group; /**< Associated group. */
-
-#if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
-        /** dummy ctor for root. */
-        Var() {}
+#if defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
+        /* default constructor for ROOT */
+        TemplateVar() {}
 #else
-        /** Constructor. */
-        Var(std::string n, FunctionPtr f, FunctionPtrWithParameters pf, std::string d, std::string g = "") : name(n), function(f), pfunction(pf), description(d), group(g) { }
+        TemplateVar(std::string n, Ptr f, std::string d, std::string g = "") : name(n), function(f), description(d), group(g) { }
 #endif
       };
+
+      typedef TemplateVar<FunctionPtr> Var;
+      typedef TemplateVar<ParameterFunctionPtr> ParameterVar;
+      typedef TemplateVar<MetaFunctionPtr> MetaVar;
+
+#else
+      struct TemplateVar {
+        std::string name; /**< Unique identifier of the function, used as key. */
+        std::string description; /**< Description of what this function does. */
+        std::string group; /**< Associated group. */
+        TemplateVar() {}
+      };
+
+      typedef TemplateVar Var;
+      typedef TemplateVar ParameterVar;
+      typedef TemplateVar MetaVar;
+
+#endif
 
       /** get singleton instance. */
       static Manager& Instance();
@@ -125,11 +147,12 @@ namespace Belle2 {
       void setVariableGroup(const std::string& groupName);
 
       /** Register a variable. */
-      void registerVariable(const std::string& name, Manager::FunctionPtr f, Manager::FunctionPtrWithParameters pf, const std::string& description);
+      void registerVariable(const std::string& name, Manager::FunctionPtr f, const std::string& description);
+      void registerVariable(const std::string& name, Manager::ParameterFunctionPtr f, const std::string& description);
+      void registerVariable(const std::string& name, Manager::MetaFunctionPtr f, const std::string& description);
 
       /** Creates and registers a variable of the form func(varname) */
-      const Var* createVariable(const std::string& name);
-
+      bool createVariable(const std::string& name);
 #endif
 
       /** evaluate variable 'varName' on given Particle.
@@ -142,6 +165,7 @@ namespace Belle2 {
 
       /** Return list of all variable names (in order registered). */
       std::vector<std::string> getNames() const;
+
       /** Print list of all variables with description (in order registered). */
       void printList() const;
 
@@ -156,6 +180,10 @@ namespace Belle2 {
 #ifndef __CINT__
       /** List of registered variables. */
       std::map<std::string, Var*> m_variables;
+      /** List of registered variables. */
+      std::map<std::string, ParameterVar*> m_parameter_variables;
+      /** List of registered variables. */
+      std::map<std::string, MetaVar*> m_meta_variables;
 
       /** List of variables in registration order. */
       std::vector<const Var*> m_variablesInRegistrationOrder;
@@ -167,8 +195,14 @@ namespace Belle2 {
     class Proxy {
     public:
       /** constructor. */
-      Proxy(const std::string& name, Manager::FunctionPtr f, Manager::FunctionPtrWithParameters pf, const std::string& description) {
-        Manager::Instance().registerVariable(name, f, pf, description);
+      Proxy(const std::string& name, Manager::FunctionPtr f, const std::string& description) {
+        Manager::Instance().registerVariable(name, f, description);
+      }
+      Proxy(const std::string& name, Manager::ParameterFunctionPtr f, const std::string& description) {
+        Manager::Instance().registerVariable(name, f, description);
+      }
+      Proxy(const std::string& name, Manager::MetaFunctionPtr f, const std::string& description) {
+        Manager::Instance().registerVariable(name, f, description);
       }
     };
 
@@ -180,6 +214,12 @@ namespace Belle2 {
         Manager::Instance().setVariableGroup(groupName);
       }
     };
+
+    template<typename T>
+    std::function<T> make_function(T* t)
+    {
+      return { t };
+    }
 #endif
 
 
@@ -202,10 +242,7 @@ namespace Belle2 {
      * \sa Manager
      */
 #define REGISTER_VARIABLE(name, function, description) \
-  Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(name, &function, nullptr, description);
-
-#define REGISTER_VARIABLE_WITH_PARAMETERS(name, function, description) \
-  Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(name, nullptr, &function, description);
+  Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(std::string(name), Belle2::Variable::make_function(function), std::string(description));
 
     /** \def VARIABLE_GROUP(groupName)
      *

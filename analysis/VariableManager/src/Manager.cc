@@ -1,7 +1,6 @@
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
@@ -32,146 +31,96 @@ const Variable::Manager::Var* Variable::Manager::getVariable(const std::string& 
 {
   auto mapIter = m_variables.find(name);
   if (mapIter == m_variables.end()) {
-    return createVariable(name);
-  } else {
-    return mapIter->second;
+    if (createVariable(name)) {
+      mapIter = m_variables.find(name);
+      if (mapIter == m_variables.end()) {
+        return nullptr;
+      }
+    }
   }
+  return mapIter->second;
 }
+
 void Variable::Manager::setVariableGroup(const std::string& groupName)
 {
   m_currentGroup = groupName;
 }
 
-const Variable::Manager::Var* Variable::Manager::createVariable(const std::string& name)
+bool Variable::Manager::createVariable(const std::string& name)
 {
 
-  Variable::Manager::FunctionPtr func;
+  boost::match_results<std::string::const_iterator> results;
 
   // Check if name is a simple number
-  const static boost::regex allowedNumberForm("^([0-9]+\\.?[0-9]*)$");
-  boost::match_results<std::string::const_iterator> number;
-  if (boost::regex_match(name, number, allowedNumberForm)) {
-    float float_number;
-    std::stringstream sstream(number[1]) ;
-    sstream >> float_number;
-    func = [float_number](const Particle*) -> double {
+  if (boost::regex_match(name, results, boost::regex("^([0-9]+\\.?[0-9]*)$"))) {
+    float float_number = boost::lexical_cast<float>(results[1]);
+    auto func = [float_number](const Particle*) -> double {
       return float_number;
     };
-  } else {
-    const static boost::regex allowedForm("^([a-zA-Z0-9_]*)\\((.*)\\)$");
-    boost::match_results<std::string::const_iterator> results;
+    Var* var = new Var(name, func, std::string("Returns number ") + name);
+    if (var == nullptr)
+      return false;
+    m_variables[name] = var;
+    m_variablesInRegistrationOrder.push_back(var);
+    return true;
+  }
 
-    if (boost::regex_match(name, results, allowedForm)) {
+  // Check if name is a function call
+  if (boost::regex_match(name, results, boost::regex("^([a-zA-Z0-9_]*)\\((.*)\\)$"))) {
 
-      std::string functionName = results[1];
-      boost::algorithm::trim(functionName);
-      std::vector<std::string> functionArguments = splitOnDelimiterAndConserveParenthesis(results[2], ',', '(', ')');
-      for (auto & str : functionArguments) {
-        boost::algorithm::trim(str);
+    std::string functionName = results[1];
+    boost::algorithm::trim(functionName);
+    std::vector<std::string> functionArguments = splitOnDelimiterAndConserveParenthesis(results[2], ',', '(', ')');
+    for (auto & str : functionArguments) {
+      boost::algorithm::trim(str);
+    }
+
+    // Search function name in parameter variables
+    auto parameterIter = m_parameter_variables.find(functionName);
+    if (parameterIter != m_parameter_variables.end()) {
+
+      std::vector<double> arguments;
+      for (auto & arg : functionArguments) {
+        double number = 0;
+        try {
+          number = boost::lexical_cast<double>(arg);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("Argument for parameter function cannot be converted to float: " << arg);
+        }
+        arguments.push_back(number);
       }
+      auto pfunc = parameterIter->second->function;
+      auto func = [pfunc, arguments](const Particle * particle) -> double { return pfunc(particle, arguments); };
+      Var* var = new Var(name, func, parameterIter->second->description, parameterIter->second->group);
+      if (var == nullptr)
+        return false;
+      m_variables[name] = var;
+      m_variablesInRegistrationOrder.push_back(var);
+      return true;
 
-      if (functionName == "getExtraInfo") {
-        if (functionArguments.size() == 1) {
-          auto extraInfoName = functionArguments[0];
-          func = [extraInfoName](const Particle * particle) -> double {
-            if (particle == nullptr) {
-              StoreObjPtr<EventExtraInfo> eventExtraInfo;
-              return eventExtraInfo->getExtraInfo(extraInfoName);
-            }
-            return particle->getExtraInfo(extraInfoName);
-          };
-        } else {
-          B2FATAL("Wrong number of arguments for meta function getExtraInfo");
-        }
-      }
+    }
 
-      else if (functionName == "daughterProductOf") {
-        if (functionArguments.size() == 1) {
-          const Variable::Manager::Var* var = getVariable(functionArguments[0]);
-          func = [var](const Particle * particle) -> double {
-            double product = 1.0;
-            for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
-              product *= var->function(particle->getDaughter(j));
-            }
-            return product;
-          };
-        } else {
-          B2FATAL("Wrong number of arguments for meta function daughterProductOf");
-        }
-
-      } else if (functionName == "daughterSumOf") {
-        if (functionArguments.size() == 1) {
-          const Variable::Manager::Var* var = getVariable(functionArguments[0]);
-          func = [var](const Particle * particle) -> double {
-            double sum = 0.0;
-            for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
-              sum += var->function(particle->getDaughter(j));
-            }
-            return sum;
-          };
-        } else {
-          B2FATAL("Wrong number of arguments for meta function daughterSumOf");
-        }
-
-      } else if (functionName == "abs") {
-        if (functionArguments.size() == 1) {
-          const Variable::Manager::Var* var = getVariable(functionArguments[0]);
-          func = [var](const Particle * particle) -> double { return std::abs(var->function(particle)); };
-        } else {
-          B2FATAL("Wrong number of arguments for meta function abs");
-        }
-
-      } else if (functionName == "daughter") {
-        if (functionArguments.size() == 2) {
-          int daughterNumber = 0;
-          try {
-            daughterNumber = boost::lexical_cast<int>(functionArguments[0]);
-          } catch (boost::bad_lexical_cast&) {
-            B2FATAL("First argument of daughter meta function must be integer!");
-          }
-          const Variable::Manager::Var* var = getVariable(functionArguments[1]);
-          func = [var, daughterNumber](const Particle * particle) -> double { return var->function(particle->getDaughter(daughterNumber)); };
-        } else {
-          B2FATAL("Wrong number of arguments for meta function daughter");
-        }
-
-      } else if (m_variables.find(functionName) != m_variables.end()) {
-        const Variable::Manager::Var* var = getVariable(functionName);
-        if (var->pfunction == nullptr) {
-          B2FATAL("Functions doesn't takes arguments!");
-        }
-        std::vector<double> arguments;
-        for (auto & arg : functionArguments) {
-          double number = 0;
-          try {
-            number = boost::lexical_cast<double>(arg);
-          } catch (boost::bad_lexical_cast&) {
-            B2FATAL("Any additional argument of a function must be float!");
-          }
-          arguments.push_back(number);
-        }
-        func = [var, arguments](const Particle * particle) -> double { return var->pfunction(particle, arguments); };
-      } else {
-        return nullptr;
-      }
-    } else {
-      return nullptr;
+    // Search function name in meta variables
+    auto metaIter = m_meta_variables.find(functionName);
+    if (metaIter == m_meta_variables.end()) {
+      auto func = metaIter->second->function(functionArguments);
+      Var* var = new Var(name, func, metaIter->second->description, metaIter->second->group);
+      if (var == nullptr)
+        return false;
+      m_variables[name] = var;
+      m_variablesInRegistrationOrder.push_back(var);
+      return true;
     }
   }
 
-  std::string escapedName = name;
-  std::replace(escapedName.begin(), escapedName.end(), '(', '_');
-  std::replace(escapedName.begin(), escapedName.end(), ')', '_');
-
-  Var* var = new Var(name, func, nullptr, name);
-  m_variables[name] = var;
-  m_variablesInRegistrationOrder.push_back(var);
-  return getVariable(name);
+  B2WARNING("Encountered bad variable name " << name << " i don't know what to do with it")
+  return false;
 }
 
-void Variable::Manager::registerVariable(const std::string& name, Variable::Manager::FunctionPtr f, Variable::Manager::FunctionPtrWithParameters pf, const std::string& description)
+
+void Variable::Manager::registerVariable(const std::string& name, Variable::Manager::FunctionPtr f, const std::string& description)
 {
-  if (!f and !pf) {
+  if (!f) {
     B2FATAL("No function provided for variable '" << name << "'.");
   }
 
@@ -183,13 +132,58 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
 
   auto mapIter = m_variables.find(name);
   if (mapIter == m_variables.end()) {
-    Var* var = new Var(name, f, pf, description, m_currentGroup);
+    Var* var = new Var(name, f, description, m_currentGroup);
     m_variables[name] = var;
     m_variablesInRegistrationOrder.push_back(var);
   } else {
     B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");
   }
 }
+
+void Variable::Manager::registerVariable(const std::string& name, Variable::Manager::ParameterFunctionPtr f, const std::string& description)
+{
+  if (!f) {
+    B2FATAL("No function provided for variable '" << name << "'.");
+  }
+
+  const static boost::regex allowedNameRegex("^[a-zA-Z0-9_(),]*$");
+
+  if (!boost::regex_match(name, allowedNameRegex)) {
+    B2FATAL("Variable '" << name << "' contains forbidden characters! Only alphanumeric characters plus underscores (_) are allowed for variable names.");
+  }
+
+  auto mapIter = m_parameter_variables.find(name);
+  if (mapIter == m_parameter_variables.end()) {
+    ParameterVar* var = new ParameterVar(name, f, description, m_currentGroup);
+    std::string rawName = name.substr(0, name.find('(') - 1);
+    m_parameter_variables[rawName] = var;
+  } else {
+    B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");
+  }
+}
+
+void Variable::Manager::registerVariable(const std::string& name, Variable::Manager::MetaFunctionPtr f, const std::string& description)
+{
+  if (!f) {
+    B2FATAL("No function provided for variable '" << name << "'.");
+  }
+
+  const static boost::regex allowedNameRegex("^[a-zA-Z0-9_(),]*$");
+
+  if (!boost::regex_match(name, allowedNameRegex)) {
+    B2FATAL("Variable '" << name << "' contains forbidden characters! Only alphanumeric characters plus underscores (_) are allowed for variable names.");
+  }
+
+  auto mapIter = m_meta_variables.find(name);
+  if (mapIter == m_meta_variables.end()) {
+    MetaVar* var = new MetaVar(name, f, description, m_currentGroup);
+    std::string rawName = name.substr(0, name.find('(') - 1);
+    m_meta_variables[rawName] = var;
+  } else {
+    B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");
+  }
+}
+
 
 std::vector<std::string> Variable::Manager::getNames() const
 {
@@ -204,6 +198,26 @@ void Variable::Manager::printList() const
 {
   std::string group;
   for (const Var * var : getVariables()) {
+    if (var->group != group) {
+      //group changed, print header
+      std::cout << "\n" << var->group << ":\n";
+      group = var->group;
+    }
+    std::cout << std::setw(14) << var->name << "  " << var->description << std::endl;
+  }
+
+  for (auto & pair : m_parameter_variables) {
+    auto* var = pair.second;
+    if (var->group != group) {
+      //group changed, print header
+      std::cout << "\n" << var->group << ":\n";
+      group = var->group;
+    }
+    std::cout << std::setw(14) << var->name << "  " << var->description << std::endl;
+  }
+
+  for (auto & pair : m_meta_variables) {
+    auto* var = pair.second;
     if (var->group != group) {
       //group changed, print header
       std::cout << "\n" << var->group << ":\n";

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PSELECTORFUNCTIONS_H
-#define PSELECTORFUNCTIONS_H
+#pragma once
 
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
@@ -310,43 +309,6 @@ namespace Belle2 {
     double cosTPTO(const Particle* part);
 
     /**
-     * NeuroBayesifys this function
-     * @param part cconst pointer to Particle
-     * @return function value, except if information from ARICH is not available which is set to -999
-     */
-    template<double(*T)(const Particle*)>
-    double NeuroBayesifyARICH(const Particle* particle)
-    {
-
-      const PIDLikelihood* pid = particle->getRelatedTo<PIDLikelihood>();
-      if (!pid)
-        return -999;
-
-      Const::PIDDetectorSet set = Const::ARICH;
-      if (not pid->isAvailable(set))
-        return -999;
-      return T(particle);
-    }
-
-    /**
-     * NeuroBayesifys this function
-     * @return function value, except if information from TOP is not available which is set to -999
-     */
-    template<double(*T)(const Particle*)>
-    double NeuroBayesifyTOP(const Particle* particle)
-    {
-
-      const PIDLikelihood* pid = particle->getRelated<PIDLikelihood>();
-      if (!pid)
-        return -999;
-
-      Const::PIDDetectorSet set = Const::TOP;
-      if (not pid->isAvailable(set))
-        return -999;
-      return T(particle);
-    }
-
-    /**
      * return 1 if ARICH Id is missing
      */
     double particleMissingARICHId(const Particle*);
@@ -583,15 +545,6 @@ namespace Belle2 {
      */
     double eclClusterTrackMatched(const Particle* particle);
 
-    /**
-     * return cosine of the angle between the mother momentum vector and the direction of the first daughter in the mother's rest frame
-     */
-    double particleDecayAngle(const Particle* particle);
-
-    /**
-     * return cosine of the angle between the first two daughters, in lab frame
-     */
-    double particleDaughterAngle(const Particle* particle);
 
     /**
      * returns true if event doesn't contain an Y(4S)
@@ -628,7 +581,7 @@ namespace Belle2 {
      */
     double False(const Particle*);
 
+
   }
 } // Belle2 namespace
 
-#endif

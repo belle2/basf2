@@ -55,12 +55,12 @@ namespace {
     EXPECT_TRUE(nestedDoesNotExist != nullptr);
 
     //re-registration not allowed
-    EXPECT_B2FATAL(Manager::Instance().registerVariable("p", &dummyVar, nullptr, "description"));
+    EXPECT_B2FATAL(Manager::Instance().registerVariable("p", (Manager::FunctionPtr)&dummyVar, "description"));
 
-    EXPECT_B2FATAL(Manager::Instance().registerVariable("something", nullptr, nullptr, "blah"));
+    EXPECT_B2FATAL(Manager::Instance().registerVariable("something", (Manager::FunctionPtr)nullptr, "blah"));
 
 
-    Manager::Instance().registerVariable("testingthedummyvar", &dummyVar, nullptr, "blah");
+    Manager::Instance().registerVariable("testingthedummyvar", (Manager::FunctionPtr)&dummyVar, "blah");
     const Manager::Var* dummy = Manager::Instance().getVariable("testingthedummyvar");
     EXPECT_TRUE(dummy != nullptr);
     EXPECT_TRUE(dummy->description == "blah");
@@ -74,7 +74,7 @@ namespace {
     EXPECT_DOUBLE_EQ(dummy->function(nullptr), 42.0);
 
 
-    Manager::Instance().registerVariable("testingthedummyvarwithparameters", nullptr, &dummyVarWithParameters, "blah");
+    Manager::Instance().registerVariable("testingthedummyvarwithparameters(n)", (Manager::ParameterFunctionPtr)&dummyVarWithParameters, "blah");
     dummy = Manager::Instance().getVariable("testingthedummyvarwithparameters(3)");
     EXPECT_TRUE(dummy != nullptr);
     EXPECT_DOUBLE_EQ(dummy->function(nullptr), 3.0);
@@ -83,7 +83,7 @@ namespace {
     EXPECT_DOUBLE_EQ(Manager::Instance().getVariable("testingthedummyvarwithparameters(3,7,8)")->function(nullptr), 18.0);
 
     //also test the macro (with other name)
-    REGISTER_VARIABLE_WITH_PARAMETERS("testingthedummyvarwithparameters2", dummyVarWithParameters, "something else");
+    REGISTER_VARIABLE("testingthedummyvarwithparameters2(n,m)", dummyVarWithParameters, "something else");
     dummy = Manager::Instance().getVariable("testingthedummyvarwithparameters2(4,5)");
     EXPECT_TRUE(dummy != nullptr);
     EXPECT_DOUBLE_EQ(dummy->function(nullptr), 9.0);
@@ -97,18 +97,18 @@ namespace {
     EXPECT_TRUE(Manager::Instance().getVariables().size() > 0);
 
     //special characters are not allowed!
-    EXPECT_B2FATAL(Manager::Instance().registerVariable(" space", dummyVar, nullptr, "blah"));
-    EXPECT_B2FATAL(Manager::Instance().registerVariable("star*", dummyVar, nullptr, "blah"));
-    EXPECT_B2FATAL(Manager::Instance().registerVariable("*", dummyVar, nullptr, "blah"));
+    EXPECT_B2FATAL(Manager::Instance().registerVariable(" space", (Manager::FunctionPtr)dummyVar, "blah"));
+    EXPECT_B2FATAL(Manager::Instance().registerVariable("star*", (Manager::FunctionPtr)dummyVar, "blah"));
+    EXPECT_B2FATAL(Manager::Instance().registerVariable("*", (Manager::FunctionPtr)dummyVar, "blah"));
 
     //this is ok, though
-    Manager::Instance().registerVariable("abcdef0123945859432689_ZEFUEONHSUTNSXA", dummyVar, nullptr, "blah");
+    Manager::Instance().registerVariable("abcdef0123945859432689_ZEFUEONHSUTNSXA", (Manager::FunctionPtr)dummyVar, "blah");
   }
 
   TEST(VariableTest, Cut)
   {
 
-    Manager::Instance().registerVariable("dummyvar", &dummyVar, nullptr, "blah");
+    Manager::Instance().registerVariable("dummyvar", (Manager::FunctionPtr)&dummyVar, "blah");
 
     Cut a("1.2 < 1.5 ");
     EXPECT_TRUE(a.check(nullptr));

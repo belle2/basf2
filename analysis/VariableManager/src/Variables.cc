@@ -1200,34 +1200,6 @@ namespace Belle2 {
 
     }
 
-    // Decay Kinematics -------------------------------------------------------
-    double particleDecayAngle(const Particle* particle)
-    {
-      double result = 0.0;
-
-      if (particle->getNDaughters() != 2)
-        return result;
-
-      TLorentzVector motherMomentum = particle->get4Vector();
-      TVector3       motherBoost    = -(motherMomentum.BoostVector());
-
-      TLorentzVector daugMomentum = particle->getDaughter(0)->get4Vector();
-      daugMomentum.Boost(motherBoost);
-
-      result = cos(daugMomentum.Angle(motherMomentum.Vect()));
-
-      return result;
-    }
-
-    double particleDaughterAngle(const Particle* particle)
-    {
-      if (particle->getNDaughters() != 2)
-        return 0.0;
-
-      const TVector3 a = particle->getDaughter(0)->getMomentum();
-      const TVector3 b = particle->getDaughter(1)->getMomentum();
-      return cos(a.Angle(b));
-    }
 
     // Event ------------------------------------------------
 
@@ -1981,17 +1953,6 @@ namespace Belle2 {
       return 0;
     }
 
-    double NumberOfParticlesInEvent(const Particle*, const std::vector<double>& pdg)
-    {
-      StoreArray<MCParticle> mcParticles;
-      int counter = 0;
-      for (int i = 0; i < mcParticles.getEntries(); ++i) {
-        if (mcParticles[i]->getPDG() == pdg[0])
-          counter++;
-      }
-      return counter;
-    }
-
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
@@ -2031,9 +1992,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("InvM", particleInvariantMass, "invariant mass (determined from particle's daughter 4-momentum vectors)");
     REGISTER_VARIABLE("ErrM", particleInvariantMassError, "uncertainty of invariant mass (determined from particle's daughter 4-momentum vectors)");
 
-    REGISTER_VARIABLE("decayAngle", particleDecayAngle, "cosine of the angle between the mother momentum vector and the direction of the first daughter in the mother's rest frame");
-    REGISTER_VARIABLE("daughterAngle", particleDaughterAngle, "cosine of the angle between the first two daughters, in lab frame");
-
     VARIABLE_GROUP("PID");
     REGISTER_VARIABLE("eid", particleElectronId, "electron identification probability");
     REGISTER_VARIABLE("muid", particleMuonId, "muon identification probability");
@@ -2067,19 +2025,6 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("eid_ECL", particleElectronIdECL, "electron identification probability from ECL");
     REGISTER_VARIABLE("missing_ECL", particleMissingECL, "1.0 if identification probability from ECL is missing");
-
-    VARIABLE_GROUP("PID variables for NeuroBayes (-999 added)");
-    REGISTER_VARIABLE("NB_eid_TOP", NeuroBayesifyTOP<particleElectronTOPId>, "electron identification probability from TOP (returns -999 when not available)");
-    REGISTER_VARIABLE("NB_muid_TOP", NeuroBayesifyTOP<particleMuonTOPId>, "muon identification probability from TOP (returns -999 when not available)");
-    REGISTER_VARIABLE("NB_piid_TOP", NeuroBayesifyTOP<particlePionTOPId>, "pion identification probability from TOP (returns -999 when not available)");
-    REGISTER_VARIABLE("NB_Kid_TOP", NeuroBayesifyTOP<particleKaonTOPId>, "kaon identification probability from TOP (returns -999 when not available)");
-    REGISTER_VARIABLE("NB_prid_TOP", NeuroBayesifyTOP<particleProtonTOPId>, "proton identification probability from TOP (returns -999 when not available)");
-
-    REGISTER_VARIABLE("NB_eid_ARICH", NeuroBayesifyARICH<particleElectronARICHId>, "electron identification probability from ARICH (returns -999 when not available)");
-    REGISTER_VARIABLE("NB_muid_ARICH", NeuroBayesifyARICH<particleMuonARICHId>, "muon identification probability from ARICH (returns -999 when not available)");
-    REGISTER_VARIABLE("NB_piid_ARICH", NeuroBayesifyARICH<particlePionARICHId>, "pion identification probability from ARICH (returns -999 when not available)");
-    REGISTER_VARIABLE("NB_Kid_ARICH", NeuroBayesifyARICH<particleKaonARICHId>, "kaon identification probability from ARICH (returns -999 when not available)");
-    REGISTER_VARIABLE("NB_prid_ARICH", NeuroBayesifyARICH<particleProtonARICHId>, "proton identification probability from ARICH (returns -999 when not available)");
 
     VARIABLE_GROUP("MC Matching");
     REGISTER_VARIABLE("isSignal", isSignal,               "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
@@ -2145,9 +2090,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("nKLMClusters", nKLMClusters, "[Eventbased] number of KLM in the event");
     REGISTER_VARIABLE("ECLEnergy", ECLEnergy, "[Eventbased] total energy in ECL in the event");
     REGISTER_VARIABLE("KLMEnergy", KLMEnergy, "[Eventbased] total energy in KLM in the event");
-
-    VARIABLE_GROUP("Parameterfunctions");
-    REGISTER_VARIABLE_WITH_PARAMETERS("NumberOfParticlesInEvent"  , NumberOfParticlesInEvent , "Returns number of MC Particles with the given pdg in the event.");
 
     VARIABLE_GROUP("Continuum Suppression");
     REGISTER_VARIABLE("cosTBTO"  , cosTBTO , "cosine of angle between thrust axis of B and thrust axis of ROE");

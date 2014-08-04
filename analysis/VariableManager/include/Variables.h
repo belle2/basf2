@@ -384,6 +384,16 @@ namespace Belle2 {
     double isRestOfEventOfB0bar(const Particle*);
 
     /**
+     * -1 (1) if current RestOfEvent is related to a B0bar (B0)
+     */
+    double isRestOfEventB0Flavor(const Particle*);
+
+    /**
+     * 0 (1) if current RestOfEvent is related to a B0bar (B0)
+     */
+    double isRestOfEventB0Flavor_Norm(const Particle*);
+
+    /**
     * returns q*r for maximum r
     */
     double bestQRElectron(const Particle*);
@@ -401,6 +411,25 @@ namespace Belle2 {
      * returns q*r for maximum r
      */
     double bestQRKaon(const Particle*);
+
+    /**
+    * returns 1 if the class track by electron category has the same flavour as the MC target track 0 else also if there is no target track
+    */
+    double isElectronRightClass(const Particle*);
+    /**
+    * returns returns 1 if the class track by muon category has the same flavour as the MC target track 0 else also if there is no target track
+    */
+    double isMuonRightClass(const Particle*);
+
+    /**
+     * returns 1 if the class track by slow pion category has the same flavour as the MC target track 0 else also if there is no target track
+     */
+    double isSlowPionRightClass(const Particle*);
+
+    /**
+     * returns 1 if the class track by kaon category has the same flavour as the MC target track 0 else also if there is no target track
+     */
+    double isKaonRightClass(const Particle*);
 
     /**
      * returns missing Momentum on the tag side (flavor tagging specific variable).
@@ -431,14 +460,54 @@ namespace Belle2 {
     double nROEClusters(const Particle* particle);
 
     /**
-     * return CMS momentum magnitude missing in Btag
+     * return the recoiling mass of the Btag system against the target muon (needed for Muon category of Flavor Tagging)
      */
-    double particleP_CMS_missing(const Particle* particle);
+    double recoilMassBtag_Muon(const Particle*);
 
     /**
-     * return CMS momentum missing in Btag cosine of polar angle
+     * return the recoiling mass of the Btag system against the target electron (needed for Electron category of Flavor Tagging)
      */
-    double particleCosTheta_Missing(const Particle* particle);
+    double recoilMassBtag_Electron(const Particle*);
+
+    /**
+     * return CMS momentum magnitude missing in Btag assuming a semimuonic decay
+     */
+    double particleP_CMS_missing_Muon(const Particle*);
+
+
+    /**
+     * return CMS momentum magnitude missing in Btag assuming a semielectronic decay
+     */
+    double particleP_CMS_missing_Electron(const Particle*);
+
+    /**
+     * CMS momentum magnitude of the muon as classified target
+     */
+    double particleP_CMS_Muon(const Particle*);
+
+    /**
+    * CMS momentum magnitude of the electron as classified target
+    */
+    double particleP_CMS_Electron(const Particle*);
+
+    /**
+     * CMS momentum magnitude of the kaon as classified target
+     */
+    double particleP_CMS_Kaon(const Particle*);
+
+    /**
+    * CMS momentum magnitude of the slow pion as classified target
+    */
+    double particleP_CMS_SlowPion(const Particle*);
+    /**
+     * return CMS momentum missing in Btag cosine of polar angle assuming a semimuonic decay
+     */
+    double particleCosTheta_CMS_missing_Muon(const Particle*);
+
+    /**
+     * return CMS momentum missing in Btag cosine of polar angle assuming a semielectronic decay
+     */
+    double particleCosTheta_CMS_missing_Electron(const Particle*);
 
     /**
      * Flavour of Btag from trained Method
@@ -449,6 +518,16 @@ namespace Belle2 {
      * Flavour of Btag from MC
      */
     double particleMCFlavor(const Particle* particle);
+
+    /**
+     * return the energy in the hemisphere defined by the direction of the virtual W-Boson assuming a semimuonic decay
+     */
+    double E_W_90_Muon(const Particle*);
+
+    /**
+     * return the energy in the hemisphere defined by the direction of the virtual W-Boson assuming a semielectronic decay
+     */
+    double E_W_90_Electron(const Particle*);
 
     /**
      * return magnitude of 3-momentum recoiling against given Particle

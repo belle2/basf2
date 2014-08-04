@@ -12,7 +12,6 @@
 #include <framework/pcore/RingBuffer.h>
 #include <framework/pcore/RxModule.h>
 #include <framework/pcore/TxModule.h>
-#include <framework/pcore/HistModule.h>
 #include <framework/pcore/DataStoreStreamer.h>
 
 #include <framework/core/Environment.h>
@@ -284,8 +283,6 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   if (signal(SIGINT, SIG_IGN) == SIG_ERR) {
     B2FATAL("Cannot ignore SIGINT signal handler\n");
   }
-
-  HistModule::mergeFiles();
 
   // 6.5 Remove all ring buffers
   m_rbinlist.clear();

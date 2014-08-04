@@ -206,8 +206,10 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
 {
   // check whether the cached information is (still) valid
   if (entry && entry->ptr && (index >= 0)) {
-    if (static_cast<TClonesArray*>(entry->ptr)->At(index) == object) return true;
-    index = static_cast<TClonesArray*>(entry->ptr)->IndexOf(object);
+    const TClonesArray* array = static_cast<TClonesArray*>(entry->ptr);
+    if (array->At(index) == object) return true;
+    B2INFO("findStoreEntry: cached index invalid, probably harmless but odd : " << entry->name << " idx " << index);
+    index = array->IndexOf(object);
     if (index >= 0) return true;
   }
   entry = nullptr;
@@ -221,7 +223,7 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
   const TClass* objectClass = object->IsA();
   for (auto & mapEntry : m_storeObjMap[c_Event]) {
     if (mapEntry.second.ptr && mapEntry.second.isArray) {
-      TClonesArray* array = static_cast<TClonesArray*>(mapEntry.second.ptr);
+      const TClonesArray* array = static_cast<TClonesArray*>(mapEntry.second.ptr);
       const TClass* arrayClass = array->GetClass();
       if (arrayClass == objectClass) {
         if (object == array->Last()) {
@@ -235,9 +237,13 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
               RelationsObject* relobj = static_cast<RelationsObject*>((*array)[i]);
               relobj->m_cacheArrayIndex = i;
               relobj->m_cacheDataStoreEntry = &mapEntry.second;
+              if (relobj == object)
+                index = i;
             }
+          } else {
+            //not a RelationsObject, so no caching
+            index = array->IndexOf(object);
           }
-          index = array->IndexOf(object);
         }
 
         if (index >= 0) {

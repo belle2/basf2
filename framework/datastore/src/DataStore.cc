@@ -316,7 +316,7 @@ void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, i
   TClonesArray& relations = relContainer->elements();
   new(relations.AddrAt(relations.GetLast() + 1)) RelationElement(fromIndex, toIndex, weight);
 
-  boost::shared_ptr<RelationIndexContainer<TObject, TObject>> relIndex = RelationIndexManager::Instance().getIndexIfExists<TObject, TObject>(relationsName, c_Event);
+  std::shared_ptr<RelationIndexContainer<TObject, TObject>> relIndex = RelationIndexManager::Instance().getIndexIfExists<TObject, TObject>(relationsName, c_Event);
   if (relIndex) {
     // add it to index (so we avoid expensive rebuilding later)
     relIndex->index().insert(RelationIndex<TObject, TObject>::Element(fromIndex, toIndex, fromObject, toObject, weight));

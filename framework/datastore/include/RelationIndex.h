@@ -239,7 +239,7 @@ namespace Belle2 {
     size_t size() const { return m_index->index().size(); }
   protected:
     /** Reference to the IndexContainer. */
-    const boost::shared_ptr<RelationIndexContainer<FROM, TO>> m_index;
+    const std::shared_ptr<RelationIndexContainer<FROM, TO>> m_index;
 
     /** Reference to the from index. */
     const index_from& m_from;

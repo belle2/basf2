@@ -36,9 +36,7 @@
 #include <TH2F.h>
 #include <TMath.h>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-
+#include <memory>
 #include <cassert>
 #include <cmath>
 #include <algorithm>
@@ -233,7 +231,7 @@ void DedxPIDModule::event()
       continue;
     }
 
-    boost::shared_ptr<DedxTrack> dedxTrack = boost::make_shared<DedxTrack>();
+    std::shared_ptr<DedxTrack> dedxTrack = std::make_shared<DedxTrack>();
 
     if (m_enableDebugOutput or m_onlyPrimaryParticles) {
       if (num_mcparticles != 0) {

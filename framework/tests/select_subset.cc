@@ -957,6 +957,7 @@ namespace {
     //create subset and relations
     SelectSubset< RelationsObject > selectorMain;
     selectorMain.registerSubset(arrayMain, "subsetOfMain");
+
     selectorMain.inheritRelationsFrom(arrayA);
     selectorMain.inheritRelationsTo(arrayB);
 
@@ -1000,6 +1001,35 @@ namespace {
       const RelationsObject* originalObject = r.getRelated<RelationsObject>("main");
       EXPECT_TRUE(hasOddIndex(originalObject));
     }
+  }
+
+  TEST_F(SelectSubsetTest, InheritAll)
+  {
+    //array 'main' with relations: a -> main -> b
+    //create subset:    a -> subsetOfMain -> b
+
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray< RelationsObject > arrayMain("main");
+    StoreArray< RelationsObject > arrayA("a");
+    StoreArray< RelationsObject > arrayB("b");
+    arrayMain.registerAsPersistent();
+    arrayA.registerAsPersistent();
+    arrayB.registerAsPersistent();
+    RelationArray::registerPersistent("a", "main");
+    RelationArray::registerPersistent("main", "b");
+
+    //create subset and relations
+    SelectSubset< RelationsObject > selectorMain;
+    selectorMain.registerSubset(arrayMain, "subsetOfMain");
+
+    selectorMain.inheritAllRelations();
+
+    DataStore::Instance().setInitializeActive(false);
+
+    //check if the state matches what we expect
+    EXPECT_FALSE(selectorMain.getInheritToSelf());
+    EXPECT_EQ(std::vector<string>({"a"}), selectorMain.getInheritFromArrays());
+    EXPECT_EQ(std::vector<string>({"b"}), selectorMain.getInheritToArrays());
   }
 
 }  // namespace

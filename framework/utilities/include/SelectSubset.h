@@ -17,7 +17,6 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationVector.h>
 #include <framework/datastore/RelationsObject.h>
-#include <framework/logging/Logger.h>
 
 #include <string>
 #include <functional>
@@ -106,7 +105,17 @@ namespace Belle2 {
    * be quite tedious, so you can ask SelectSubset to produce the natural
    * restrictions of the relations  from and to the original set.
 
-   * <h2> Relations to other StoreArrays</h2>
+   * <h2>Automatic inheritance</h2>
+   * If you want your subset to have the same relations as for the original set,
+   * you can simply use
+   * \code
+     m_selector.inheritAllRelations();
+     \endcode
+   *
+   * <h2>Manually specifying relations to inherit</h2>
+   * Alternatively, you can specify the arrays you want to inherit from/to manually:
+   *
+   * <h3> Relations to other StoreArrays</h3>
    * Assuming there is a relation from your original set to other arrays A and B,
    * you can inherit these relations for all objects selected into your subset using:
    * \code
@@ -119,7 +128,7 @@ namespace Belle2 {
      m_selector.inheritRelationsTo(b);
      \endcode
    *
-   * <h2> Relations from other StoreArrays</h2>
+   * <h3> Relations from other StoreArrays</h3>
    * Relations pointing from objects in other arrays to objects in the original set
    * can also be inherited in a very similar way:
    * \code
@@ -132,7 +141,7 @@ namespace Belle2 {
      m_selector.inheritRelationsFrom(d);
      \endcode
    *
-   * <h2> Relations from the StoreArray to itself</h2>
+   * <h3> Relations from the StoreArray to itself</h3>
    * If there are relations from objects in the original set to other objects in the same array
    * (e.g. Particles -> Particles), you can also inherit these by doing
    * \code
@@ -253,12 +262,43 @@ namespace Belle2 {
       }
     }
 
+    /** Automatically inherit all relations to or from the original set.
+     *
+     * Equivalent to calling inheritRelationsFrom()/To() for all related arrays.
+     *
+     * Note: Do not combine with inheritRelationsFrom() and inheritRelationsTo().
+     */
+    void inheritAllRelations() {
+      StoreArray<StoredClass> set(m_setName, m_setDurability);
+      auto arrays = DataStore::Instance().getListOfRelatedArrays(set);
+
+      for (std::string arrayName : arrays) {
+        StoreArray<TObject> array(arrayName, m_setDurability);
+        if (array == *m_subset)
+          continue; // from registerSubset(), ignore
+
+        RelationArray rel1(array, set, "", m_subset->getDurability());
+        if (rel1.isOptional())
+          inheritRelationsFrom(array);
+        RelationArray rel2(set, array, "", m_subset->getDurability());
+        if (rel2.isOptional())
+          inheritRelationsTo(array);
+      }
+    }
+
     /** This method is the actual worker. It selects the elements, fill the subset and
      * all the relations in which the subset is involved.
      *  @param f the pointer to the function (or a nameless lambda expression) returning
      *  true for the elements to be selected and false for the others.
      */
     void select(std::function<bool (const StoredClass*)> f);
+
+    /** Get list of arrays we inherit relations from. */
+    std::vector<std::string> getInheritFromArrays() const { return m_inheritFromArrays; }
+    /** Get list of arrays we inherit relations to. */
+    std::vector<std::string> getInheritToArrays() const { return m_inheritToArrays; }
+    /** Do we inherit relations from original set to itself? */
+    bool getInheritToSelf() const { return m_inheritToSelf; }
 
   private:
     /** Empty method to stop the recursion of the variadic template.

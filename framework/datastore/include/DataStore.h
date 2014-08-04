@@ -420,11 +420,11 @@ namespace Belle2 {
      */
     bool findStoreEntry(const TObject* object, StoreEntry*& entry, int& index);
 
-    /** Returns a list of registered relations (specifically, their names) that point to or from 'array'.
+    /** Returns a list of names of arrays which have registered relations that point to or from 'array'.
      *
      * This may be useful for internal purposes when modifying array contents.
      */
-    std::vector<std::string> getListOfRelationsForArray(const StoreAccessorBase& array) const;
+    std::vector<std::string> getListOfRelatedArrays(const StoreAccessorBase& array) const;
 
 
     //------------------------------ Start and end procedures --------------------------------------------------

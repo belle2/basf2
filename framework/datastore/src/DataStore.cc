@@ -425,12 +425,12 @@ RelationEntry DataStore::getRelationWith(ESearchSide searchSide, const TObject* 
   return RelationEntry(nullptr);
 }
 
-std::vector<std::string> DataStore::getListOfRelationsForArray(const StoreAccessorBase& array) const
+std::vector<std::string> DataStore::getListOfRelatedArrays(const StoreAccessorBase& array) const
 {
-  std::vector<std::string> relations;
+  std::vector<std::string> arrays;
   if (!array.isArray()) {
-    B2ERROR("getListOfRelationsForArray(): " << array.readableName() << " is not an array!");
-    return relations;
+    B2ERROR("getListOfRelatedArrays(): " << array.readableName() << " is not an array!");
+    return arrays;
   }
 
   //loop over all arrays
@@ -444,12 +444,12 @@ std::vector<std::string> DataStore::getListOfRelationsForArray(const StoreAccess
         const string& relationsName = (searchSide == c_ToSide) ? relationName(array.getName(), name) : relationName(name, array.getName());
         const StoreObjConstIter& it = m_storeObjMap[durability].find(relationsName);
         if (it != m_storeObjMap[durability].end())
-          relations.push_back(relationsName);
+          arrays.push_back(name);
       }
     }
   }
 
-  return relations;
+  return arrays;
 }
 
 void DataStore::clearMaps(EDurability durability)

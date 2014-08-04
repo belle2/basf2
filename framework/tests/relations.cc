@@ -75,12 +75,12 @@ namespace {
     RelationArray::registerPersistent("OwnName", profileData.getName());
     DataStore::Instance().setInitializeActive(false);
 
-    EXPECT_FALSE(RelationArray(DataStore::relationName(evtData.getName(), profileData.getName())));
+    EXPECT_FALSE(RelationArray(DataStore::relationName(evtData.getName(), profileData.getName()), DataStore::c_Event));
     relation.create();
     EXPECT_TRUE(RelationArray(evtData, profileData, "", DataStore::c_Event));
     string name = relation.getName();
 
-    RelationArray relationAttachedUsingName(name);
+    RelationArray relationAttachedUsingName(name, DataStore::c_Event);
     //trying to get the accessor params should cause the array to attach (and thus get the appropriate data)
     EXPECT_TRUE(relationAttachedUsingName.getFromAccessorParams() == evtData.getAccessorParams());
     EXPECT_TRUE(relationAttachedUsingName.getToAccessorParams() == profileData.getAccessorParams());
@@ -454,15 +454,15 @@ namespace {
   }
 
 
-  TEST_F(RelationTest, ListOfRelationsForArray)
+  TEST_F(RelationTest, ListOfRelatedArrays)
   {
     //2nd array of this type
     StoreArray<ProfileInfo> profileData2("ProfileInfos2");
 
     //nothing
-    EXPECT_EQ(0u, DataStore::Instance().getListOfRelationsForArray(profileData2).size());
-    EXPECT_EQ(0u, DataStore::Instance().getListOfRelationsForArray(profileData).size());
-    EXPECT_EQ(0u, DataStore::Instance().getListOfRelationsForArray(evtData).size());
+    EXPECT_EQ(0u, DataStore::Instance().getListOfRelatedArrays(profileData2).size());
+    EXPECT_EQ(0u, DataStore::Instance().getListOfRelatedArrays(profileData).size());
+    EXPECT_EQ(0u, DataStore::Instance().getListOfRelatedArrays(evtData).size());
 
     DataStore::Instance().setInitializeActive(true);
     profileData2.registerAsPersistent();
@@ -472,12 +472,12 @@ namespace {
     relation2.registerAsPersistent();
     DataStore::Instance().setInitializeActive(false);
 
-    EXPECT_EQ(1u, DataStore::Instance().getListOfRelationsForArray(profileData2).size());
-    EXPECT_EQ(1u, DataStore::Instance().getListOfRelationsForArray(profileData).size());
-    EXPECT_EQ(2u, DataStore::Instance().getListOfRelationsForArray(evtData).size());
+    EXPECT_EQ(1u, DataStore::Instance().getListOfRelatedArrays(profileData2).size());
+    EXPECT_EQ(1u, DataStore::Instance().getListOfRelatedArrays(profileData).size());
+    EXPECT_EQ(2u, DataStore::Instance().getListOfRelatedArrays(evtData).size());
 
-    EXPECT_EQ(relation2.getName(), DataStore::Instance().getListOfRelationsForArray(profileData2).at(0));
-    EXPECT_EQ(relation.getName(), DataStore::Instance().getListOfRelationsForArray(profileData).at(0));
+    EXPECT_EQ(evtData.getName(), DataStore::Instance().getListOfRelatedArrays(profileData2).at(0));
+    EXPECT_EQ(evtData.getName(), DataStore::Instance().getListOfRelatedArrays(profileData).at(0));
   }
 
   /** Test adding/finding using RelationsObject/RelationsInterface. */

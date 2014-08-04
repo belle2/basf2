@@ -1,6 +1,5 @@
 #include <framework/utilities/SelectSubset.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationArray.h>
 
 
@@ -16,6 +15,7 @@
 #include <algorithm>
 
 using namespace std;
+using namespace Belle2;
 
 
 namespace {
@@ -224,7 +224,7 @@ namespace {
 
         StoreArray< StoredElement >::registerPersistent(getName());
         RelationArray::registerPersistent(getName(),  SetName);
-        RelationArray::registerPersistent(SetName  , getName());
+        RelationArray::registerPersistent(SetName  , getName()); //TODO one of these is wrong! -> getRelationsWith() would return both directions
 
         DataStore::Instance().setInitializeActive(false);
       };
@@ -895,7 +895,7 @@ namespace {
 
     DataStore::Instance().setInitializeActive(false);
 
-    selector.Select(SelectionCriteriumOnElement);
+    selector.select(SelectionCriteriumOnElement);
 
     StoreArray< StoredElement > subset(m_TestBench.getSubsetName());
 

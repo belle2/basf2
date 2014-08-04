@@ -31,46 +31,26 @@ buildContinuumSuppression('B0', path=main)
 roe_path = create_path()
 
 # Variables for categories on track level - are defined in variables.cc
-variables = dict()
-variables['Electron'] = [
-    'p_CMS',
-    'pt_CMS',
-    'p',
-    'pt',
-    'eid',
-    'charge',
-    ]
-variables['Muon'] = [
-    'p_CMS',
-    'pt_CMS',
-    'p',
-    'pt',
-    'muid',
-    'charge',
-    ]
-variables['Kaon'] = [
+variables_TL = dict()
+variables_TL['Electron'] = ['p_CMS', 'pt_CMS', 'p', 'pt', 'eid']
+variables_TL['Muon'] = ['p_CMS', 'pt_CMS', 'p', 'pt', 'muid']
+variables_TL['Kaon'] = [
     'p_CMS',
     'pt_CMS',
     'cosTheta',
-    'p',
     'pt',
-    'chiProb',
     'Kid',
     'Kid_dEdx',
     'Kid_TOP',
-    'Kid_ARICH',
-    'charge',
     'isThereAKShortinRoe',
     ]
-variables['SlowPion'] = [
+variables_TL['SlowPion'] = [
     'p_CMS',
     'pt_CMS',
     'cosTheta',
     'p',
     'pt',
-    'chiProb',
     'pi_vs_edEdxid',
-    'charge',
     'cosTPTO',
     ]
 # Lambdas are missing
@@ -90,13 +70,12 @@ workingDirectory = os.environ['BELLE2_LOCAL_DIR'] \
 trackLevelReady = True
 trackLevelParticles = [('e+', 'Electron'), ('mu+', 'Muon'), ('K+', 'Kaon'),
                        ('pi+', 'SlowPion')]
-
 # signalFraction to calculate probability, -2 if training signal/background ratio should be used
 signalFraction = -2
 
 for (symbol, category) in trackLevelParticles:
     particleList = symbol + ':ROE'
-    methodPrefix = 'TMVA_' + category + '_TL'
+    methodPrefix_TL = 'TMVA_' + category + '_TL'
     targetVariable = 'is' + category + 'FromB'
 
     particleListKShort = 'pi+' + ':inKaonRoe'
@@ -112,13 +91,15 @@ for (symbol, category) in trackLevelParticles:
         fitVertex('K_S0:ROE', 0.01)
         # modify confidence level?!
 
-    if not isTMVAMethodAvailable(methodPrefix):
+    if not isTMVAMethodAvailable(workingDirectory + '/' + methodPrefix_TL):
+        print isTMVAMethodAvailable(workingDirectory + '/' + methodPrefix_TL)
+        print workingDirectory + '/' + methodPrefix_TL
         trainTMVAMethod(
             particleList,
-            variables=variables[category],
+            variables=variables_TL[category],
             target=targetVariable,
             methods=methods,
-            prefix=methodPrefix,
+            prefix=methodPrefix_TL,
             workingDirectory=workingDirectory,
             path=roe_path,
             )
@@ -126,7 +107,7 @@ for (symbol, category) in trackLevelParticles:
     else:
         applyTMVAMethod(
             particleList,
-            prefix=methodPrefix,
+            prefix=methodPrefix_TL,
             signalProbabilityName=targetVariable,
             method=methods[0][0],
             signalFraction=signalFraction,
@@ -135,47 +116,66 @@ for (symbol, category) in trackLevelParticles:
             )
 
 eventLevelReady = trackLevelReady
-if trackLevelReady:
+eventLevelParticles = [('e+', 'Electron'), ('mu+', 'Muon'), ('K+', 'Kaon'),
+                       ('pi+', 'SlowPion')]
+
+variables_EL = dict()
+variables_EL['Electron'] = ['p_CMS_Electron', 'mRecoilBtagElectron',
+                            'p_CMS_missingElectron', 'cosTheta_missingElectron'
+                            , 'EW90Electron']
+variables_EL['Muon'] = ['p_CMS_Muon', 'mRecoilBtagMuon', 'p_CMS_missingMuon',
+                        'cosTheta_missingMuon', 'EW90Muon']
+variables_EL['Kaon'] = ['bestQRKaon', 'p_CMS_Kaon']  # TODO More Event Level Variables
+variables_EL['SlowPion'] = ['bestQRSlowPion', 'p_CMS_SlowPion']  #   TODO More Event Level Variables
+# Lambdas are missing
+
+if eventLevelReady:
+    for (symbol, category) in eventLevelParticles:
+        methodPrefix_EL = 'TMVA_' + category + '_EL'
+        targetVariable = 'is' + category + 'RightClass'
+        if not isTMVAMethodAvailable(workingDirectory + '/' + methodPrefix_EL):
+            print 'hi'
+            trainTMVAMethod(
+                [],
+                variables=variables_EL[category],
+                target=targetVariable,
+                prefix=methodPrefix_EL,
+                methods=methods,
+                workingDirectory=workingDirectory,
+                path=roe_path,
+                )
+            eventLevelReady = False
+        else:
+            applyTMVAMethod(
+                [],
+                prefix=methodPrefix_EL,
+                signalProbabilityName=targetVariable,
+                method=methods[0][0],
+                signalFraction=signalFraction,
+                workingDirectory=workingDirectory,
+                path=roe_path,
+                )
+
+combinerLevelReady = eventLevelReady
+if combinerLevelReady:
     variables = ['bestQRKaon', 'bestQRSlowPion', 'bestQRElectron', 'bestQRMuon'
                  ]
-    if not isTMVAMethodAvailable('B0Tagger'):
+    if not isTMVAMethodAvailable(workingDirectory + '/' + 'B0Tagger'):
         trainTMVAMethod(
             [],
             variables=variables,
-            target='isMajorityInRestOfEventFromB0',
+            target='qr_Combined',
             prefix='B0Tagger',
             methods=methods,
             workingDirectory=workingDirectory,
             path=roe_path,
             )
-        eventLevelReady = False
+        combinerLevelReady = False
     else:
         applyTMVAMethod(
             [],
-            signalProbabilityName='isMajorityInRestOfEventFromB0',
+            signalProbabilityName='qr_Combined',
             prefix='B0Tagger',
-            method=methods[0][0],
-            signalFraction=signalFraction,
-            workingDirectory=workingDirectory,
-            path=roe_path,
-            )
-
-    if not isTMVAMethodAvailable('B0barTagger'):
-        trainTMVAMethod(
-            [],
-            variables=variables,
-            target='isMajorityInRestOfEventFromB0bar',
-            prefix='B0barTagger',
-            methods=methods,
-            workingDirectory=workingDirectory,
-            path=roe_path,
-            )
-        eventLevelReady = False
-    else:
-        applyTMVAMethod(
-            [],
-            signalProbabilityName='isMajorityInRestOfEventFromB0bar',
-            prefix='B0barTagger',
             method=methods[0][0],
             signalFraction=signalFraction,
             workingDirectory=workingDirectory,
@@ -195,7 +195,7 @@ if trackLevelReady:
 
     roe_path.add_module(RemoveExtraInfoModule())
 
-if eventLevelReady:
+if combinerLevelReady:
 
 
     class MoveTaggerInformationToBExtraInfoModule(Module):
@@ -203,13 +203,9 @@ if eventLevelReady:
         def event(self):
             roe = Belle2.PyStoreObj('RestOfEvent')
             info = Belle2.PyStoreObj('EventExtraInfo')
-            b_probability = \
-                info.obj().getExtraInfo('isMajorityInRestOfEventFromB0')
-            bbar_probability = \
-                info.obj().getExtraInfo('isMajorityInRestOfEventFromB0bar')
+            qr_Combined = info.obj().getExtraInfo('qr_Combined')
             particle = roe.obj().getRelated('Particles')
-            particle.addExtraInfo('b_probability', b_probability)
-            particle.addExtraInfo('bbar_probability', bbar_probability)
+            particle.addExtraInfo('qr_Combined', qr_Combined)
             info.obj().removeExtraInfo()
 
 
@@ -217,9 +213,8 @@ if eventLevelReady:
 
 main.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
-if eventLevelReady:
-    variablesToNTuple('B0', ['getExtraInfo(b_probability)',
-                      'getExtraInfo(bbar_probability)'], 'TaggingInformation',
+if combinerLevelReady:
+    variablesToNTuple('B0', 'getExtraInfo(qr_Combined)', 'TaggingInformation',
                       'B0_B0bar_final.root', path=main)
 
 main.add_module(register_module('ProgressBar'))

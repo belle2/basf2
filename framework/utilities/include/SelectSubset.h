@@ -16,9 +16,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationVector.h>
+#include <framework/datastore/RelationsObject.h>
 #include <framework/logging/Logger.h>
-
-#include <TObject.h>
 
 #include <string>
 #include <functional>
@@ -277,31 +276,21 @@ namespace Belle2 {
   SelectSubset< StoredClass >::select(std::function<bool (const StoredClass*)> f)
   {
 
-    StoreArray<StoredClass> set(m_setName);
+    StoreArray<StoredClass> set(m_setName, m_setDurability);
 
     //TODO: change relation direction to set -> subset?
-    RelationArray subsetToSetRelation(*m_subset, set, "", m_subset->getDurability());
-
-    typedef RelationElement::index_type index_type;
-
-
-
-    for (index_type indexInSet(0); indexInSet < (index_type) set.getEntries(); indexInSet++) {
-      const StoredClass* setObject = set[indexInSet];
-      if (f(setObject)) {
-        index_type indexInSubset(m_subset->getEntries());
-        subsetToSetRelation.add(indexInSubset, indexInSet);
-        const StoredClass* subsetObject = m_subset->appendNew(*setObject);
+    for (const StoredClass & setObject : set) {
+      if (f(&setObject)) {
+        const StoredClass* subsetObject = m_subset->appendNew(setObject);
+        subsetObject->addRelationTo(&setObject);
         for (std::string fromArray : m_inheritFromArrays) {
-          const RelationVector<TObject>& relations = setObject->template getRelationsFrom<TObject>(fromArray);
+          const RelationVector<RelationsObject>& relations = setObject.template getRelationsFrom<RelationsObject>(fromArray);
           for (unsigned int iRel = 0; iRel < relations.size(); iRel++) {
-            //TODO this might be slow, but members of other array might not inherit from RelationsObject. Once genfit::track is fixed,
-            //this should be changed into RelationsObject members.
-            DataStore::addRelationFromTo(relations.object(iRel), subsetObject, relations.weight(iRel));
+            relations.object(iRel)->addRelationTo(subsetObject, relations.weight(iRel));
           }
         }
         for (std::string toArray : m_inheritToArrays) {
-          const RelationVector<TObject>& relations = setObject->template getRelationsTo<TObject>(toArray);
+          const RelationVector<RelationsObject>& relations = setObject.template getRelationsTo<RelationsObject>(toArray);
           for (unsigned int iRel = 0; iRel < relations.size(); iRel++) {
             subsetObject->addRelationTo(relations.object(iRel), relations.weight(iRel));
           }

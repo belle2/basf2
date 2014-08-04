@@ -636,9 +636,6 @@ namespace {
 
 
     };
-#if defined(__INTEL_COMPILER)
-#pragma warning restore 177
-#endif
 
 
   protected:

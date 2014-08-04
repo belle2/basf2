@@ -160,7 +160,7 @@ def FitVertex(path, channelName, particleList, geometry):
     pvfit.set_name('ParticleVertexFitter_' + particleList)
     pvfit.param('listName', particleList)
     pvfit.param('confidenceLevel', 0)
-    pvfit.param('vertexFitter', 'rave')
+    pvfit.param('vertexFitter', 'kfitter')
     pvfit.param('fitType', 'vertex')
     path.add_module(pvfit)
 

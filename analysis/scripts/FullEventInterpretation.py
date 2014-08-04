@@ -23,6 +23,7 @@
 
 from ROOT import PyConfig
 PyConfig.IgnoreCommandLineOptions = True
+import ROOT
 
 import pdg
 
@@ -32,6 +33,7 @@ from actorFunctions import *
 import collections
 import argparse
 import copy
+import os
 
 
 class Particle(object):

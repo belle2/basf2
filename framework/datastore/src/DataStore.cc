@@ -54,6 +54,18 @@ void DataStore::reset()
     reset((EDurability)i);
 }
 
+std::string DataStore::defaultObjectName(std::string classname)
+{
+  if (classname == "genfit::Track")
+    return "GF2Track";
+  //Strip qualifiers like namespaces
+  size_t colon = classname.rfind("::");
+  if (colon != std::string::npos) {
+    classname = classname.substr(colon + 2);
+  }
+  return classname;
+}
+
 
 bool DataStore::checkType(const StoreEntry& entry, const StoreAccessorBase& accessor) const
 {

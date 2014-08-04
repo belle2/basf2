@@ -111,16 +111,7 @@ namespace Belle2 {
 
     //--------------------------------- default name stuff -----------------------------------------------------
     /** Return the default storage name for given class name. */
-    static std::string defaultObjectName(std::string classname) {
-      if (classname == "genfit::Track")
-        return "GF2Track";
-      //Strip qualifiers like namespaces
-      size_t colon = classname.rfind("::");
-      if (colon != std::string::npos) {
-        classname = classname.substr(colon + 2);
-      }
-      return classname;
-    }
+    static std::string defaultObjectName(std::string classname);
 
     /** Return the default storage name for an object of the given type. */
     template<class T> static std::string defaultObjectName() {

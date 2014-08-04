@@ -79,10 +79,12 @@ namespace Belle2 {
      *        https://belle2.cc.kek.jp/~twiki/bin/view/Physics/ParticleSelectorFunctions
      */
     class Manager {
+
     public:
 #ifndef __CINT__
       /** functions stored take a const Particle* and return double. */
       typedef std::function<double(const Particle*)> FunctionPtr;
+      typedef std::function<double(const Particle*, const std::vector<double>&)> FunctionPtrWithParameters;
       //typedef double(*FunctionPtr)(const Particle*);
 #endif
 
@@ -91,6 +93,7 @@ namespace Belle2 {
         std::string name; /**< Unique identifier of the function, used as key. */
 #ifndef __CINT__
         FunctionPtr function; /**< Pointer to function. */
+        FunctionPtrWithParameters pfunction; /**< Pointer to function with parameters. */
 #endif
         std::string description; /**< Description of what this function does. */
         std::string group; /**< Associated group. */
@@ -100,7 +103,7 @@ namespace Belle2 {
         Var() {}
 #else
         /** Constructor. */
-        Var(std::string n, FunctionPtr f, std::string d, std::string g = "") : name(n), function(f), description(d), group(g) { }
+        Var(std::string n, FunctionPtr f, FunctionPtrWithParameters pf, std::string d, std::string g = "") : name(n), function(f), pfunction(pf), description(d), group(g) { }
 #endif
       };
 
@@ -122,7 +125,7 @@ namespace Belle2 {
       void setVariableGroup(const std::string& groupName);
 
       /** Register a variable. */
-      void registerVariable(const std::string& name, Manager::FunctionPtr f, const std::string& description);
+      void registerVariable(const std::string& name, Manager::FunctionPtr f, Manager::FunctionPtrWithParameters pf, const std::string& description);
 
       /** Creates and registers a variable of the form func(varname) */
       const Var* createVariable(const std::string& name);
@@ -164,8 +167,8 @@ namespace Belle2 {
     class Proxy {
     public:
       /** constructor. */
-      Proxy(const std::string& name, Manager::FunctionPtr f, const std::string& description) {
-        Manager::Instance().registerVariable(name, f, description);
+      Proxy(const std::string& name, Manager::FunctionPtr f, Manager::FunctionPtrWithParameters pf, const std::string& description) {
+        Manager::Instance().registerVariable(name, f, pf, description);
       }
     };
 
@@ -199,7 +202,10 @@ namespace Belle2 {
      * \sa Manager
      */
 #define REGISTER_VARIABLE(name, function, description) \
-  Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(name, &function, description);
+  Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(name, &function, nullptr, description);
+
+#define REGISTER_VARIABLE_WITH_PARAMETERS(name, function, description) \
+  Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(name, nullptr, &function, description);
 
     /** \def VARIABLE_GROUP(groupName)
      *

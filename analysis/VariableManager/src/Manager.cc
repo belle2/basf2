@@ -1,4 +1,5 @@
 #include <analysis/VariableManager/Manager.h>
+#include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 
@@ -6,6 +7,8 @@
 #include <framework/logging/Logger.h>
 
 #include <boost/regex.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <iostream>
 #include <iomanip>
@@ -44,6 +47,7 @@ const Variable::Manager::Var* Variable::Manager::createVariable(const std::strin
 
   Variable::Manager::FunctionPtr func;
 
+  // Check if name is a simple number
   const static boost::regex allowedNumberForm("^([0-9]+\\.?[0-9]*)$");
   boost::match_results<std::string::const_iterator> number;
   if (boost::regex_match(name, number, allowedNumberForm)) {
@@ -58,18 +62,32 @@ const Variable::Manager::Var* Variable::Manager::createVariable(const std::strin
     boost::match_results<std::string::const_iterator> results;
 
     if (boost::regex_match(name, results, allowedForm)) {
-      if (results[1] == "getExtraInfo") {
-        auto extraInfoName = results[2];
-        func = [extraInfoName](const Particle * particle) -> double {
-          if (particle == nullptr) {
-            StoreObjPtr<EventExtraInfo> eventExtraInfo;
-            return eventExtraInfo->getExtraInfo(extraInfoName);
-          }
-          return particle->getExtraInfo(extraInfoName);
-        };
-      } else {
-        const Variable::Manager::Var* var = getVariable(results[2]);
-        if (results[1] == "daughterProductOf") {
+
+      std::string functionName = results[1];
+      boost::algorithm::trim(functionName);
+      std::vector<std::string> functionArguments = splitOnDelimiterAndConserveParenthesis(results[2], ',', '(', ')');
+      for (auto & str : functionArguments) {
+        boost::algorithm::trim(str);
+      }
+
+      if (functionName == "getExtraInfo") {
+        if (functionArguments.size() == 1) {
+          auto extraInfoName = functionArguments[0];
+          func = [extraInfoName](const Particle * particle) -> double {
+            if (particle == nullptr) {
+              StoreObjPtr<EventExtraInfo> eventExtraInfo;
+              return eventExtraInfo->getExtraInfo(extraInfoName);
+            }
+            return particle->getExtraInfo(extraInfoName);
+          };
+        } else {
+          B2FATAL("Wrong number of arguments for meta function getExtraInfo");
+        }
+      }
+
+      else if (functionName == "daughterProductOf") {
+        if (functionArguments.size() == 1) {
+          const Variable::Manager::Var* var = getVariable(functionArguments[0]);
           func = [var](const Particle * particle) -> double {
             double product = 1.0;
             for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
@@ -77,7 +95,13 @@ const Variable::Manager::Var* Variable::Manager::createVariable(const std::strin
             }
             return product;
           };
-        } else if (results[1] == "daughterSumOf") {
+        } else {
+          B2FATAL("Wrong number of arguments for meta function daughterProductOf");
+        }
+
+      } else if (functionName == "daughterSumOf") {
+        if (functionArguments.size() == 1) {
+          const Variable::Manager::Var* var = getVariable(functionArguments[0]);
           func = [var](const Particle * particle) -> double {
             double sum = 0.0;
             for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
@@ -85,25 +109,50 @@ const Variable::Manager::Var* Variable::Manager::createVariable(const std::strin
             }
             return sum;
           };
-        } else if (results[1] == "abs") {
-          func = [var](const Particle * particle) -> double { return std::abs(var->function(particle)); };
-        } else if (results[1] == "daughter0") {
-          func = [var](const Particle * particle) -> double { return var->function(particle->getDaughter(0)); };
-        } else if (results[1] == "daughter1") {
-          func = [var](const Particle * particle) -> double { return var->function(particle->getDaughter(1)); };
-        } else if (results[1] == "daughter2") {
-          func = [var](const Particle * particle) -> double { return var->function(particle->getDaughter(2)); };
-        } else if (results[1] == "daughter3") {
-          func = [var](const Particle * particle) -> double { return var->function(particle->getDaughter(3)); };
-        } else if (results[1] == "daughter4") {
-          func = [var](const Particle * particle) -> double { return var->function(particle->getDaughter(4)); };
-        } else if (results[1] == "daughter5") {
-          func = [var](const Particle * particle) -> double { return var->function(particle->getDaughter(5)); };
-        } else if (results[1] == "daughter6") {
-          func = [var](const Particle * particle) -> double { return var->function(particle->getDaughter(6)); };
         } else {
-          return nullptr;
+          B2FATAL("Wrong number of arguments for meta function daughterSumOf");
         }
+
+      } else if (functionName == "abs") {
+        if (functionArguments.size() == 1) {
+          const Variable::Manager::Var* var = getVariable(functionArguments[0]);
+          func = [var](const Particle * particle) -> double { return std::abs(var->function(particle)); };
+        } else {
+          B2FATAL("Wrong number of arguments for meta function abs");
+        }
+
+      } else if (functionName == "daughter") {
+        if (functionArguments.size() == 2) {
+          int daughterNumber = 0;
+          try {
+            daughterNumber = boost::lexical_cast<int>(functionArguments[0]);
+          } catch (boost::bad_lexical_cast&) {
+            B2FATAL("First argument of daughter meta function must be integer!");
+          }
+          const Variable::Manager::Var* var = getVariable(functionArguments[1]);
+          func = [var, daughterNumber](const Particle * particle) -> double { return var->function(particle->getDaughter(daughterNumber)); };
+        } else {
+          B2FATAL("Wrong number of arguments for meta function daughter");
+        }
+
+      } else if (m_variables.find(functionName) != m_variables.end()) {
+        const Variable::Manager::Var* var = getVariable(functionName);
+        if (var->pfunction == nullptr) {
+          B2FATAL("Functions doesn't takes arguments!");
+        }
+        std::vector<double> arguments;
+        for (auto & arg : functionArguments) {
+          double number = 0;
+          try {
+            number = boost::lexical_cast<double>(arg);
+          } catch (boost::bad_lexical_cast&) {
+            B2FATAL("Any additional argument of a function must be float!");
+          }
+          arguments.push_back(number);
+        }
+        func = [var, arguments](const Particle * particle) -> double { return var->pfunction(particle, arguments); };
+      } else {
+        return nullptr;
       }
     } else {
       return nullptr;
@@ -114,15 +163,15 @@ const Variable::Manager::Var* Variable::Manager::createVariable(const std::strin
   std::replace(escapedName.begin(), escapedName.end(), '(', '_');
   std::replace(escapedName.begin(), escapedName.end(), ')', '_');
 
-  Var* var = new Var(name, func, name);
+  Var* var = new Var(name, func, nullptr, name);
   m_variables[name] = var;
   m_variablesInRegistrationOrder.push_back(var);
   return getVariable(name);
 }
 
-void Variable::Manager::registerVariable(const std::string& name, Variable::Manager::FunctionPtr f, const std::string& description)
+void Variable::Manager::registerVariable(const std::string& name, Variable::Manager::FunctionPtr f, Variable::Manager::FunctionPtrWithParameters pf, const std::string& description)
 {
-  if (!f) {
+  if (!f and !pf) {
     B2FATAL("No function provided for variable '" << name << "'.");
   }
 
@@ -134,7 +183,7 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
 
   auto mapIter = m_variables.find(name);
   if (mapIter == m_variables.end()) {
-    Var* var = new Var(name, f, description, m_currentGroup);
+    Var* var = new Var(name, f, pf, description, m_currentGroup);
     m_variables[name] = var;
     m_variablesInRegistrationOrder.push_back(var);
   } else {

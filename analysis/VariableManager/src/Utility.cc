@@ -10,6 +10,45 @@ std::string Belle2::Variable::makeROOTCompatible(std::string str)
   return str;
 }
 
+
+unsigned long int Belle2::Variable::findMatchedParenthesis(std::string str, char open, char close)
+{
+  unsigned long int end = 1;
+  if (str[0] == open) {
+    unsigned int count = 1;
+    for (end = 1; end < str.size() and count > 0; ++end) {
+      if (str[end] == open) ++count;
+      else if (str[end] == close) --count;
+    }
+
+    if (count > 0)
+      throw std::runtime_error("String has an invalid format: " + str);
+  }
+  return end - 1;
+}
+
+std::vector<std::string> Belle2::Variable::splitOnDelimiterAndConserveParenthesis(std::string str, char delimiter, char open, char close)
+{
+
+  std::vector<std::string> result;
+  unsigned int lastdelimiter = 0;
+  for (unsigned int i = 0; i < str.size(); ++i) {
+    if (str[i] == open) {
+      i += findMatchedParenthesis(str.substr(i), open, close);
+      continue;
+    }
+    if (str[i] == delimiter) {
+      result.push_back(str.substr(lastdelimiter, i - lastdelimiter));
+      lastdelimiter = i + 1;
+    }
+  }
+  std::string last = str.substr(lastdelimiter);
+  if (last.size() != 0) {
+    result.push_back(last);
+  }
+  return result;
+}
+
 Belle2::Variable::Cut::Cut(Parameter str) : left(nullptr), right(nullptr), operation(EMPTY), number(0), isNumeric(false), var(nullptr) { init(str); }
 
 void Belle2::Variable::Cut::init(Parameter str)
@@ -160,22 +199,6 @@ bool Belle2::Variable::Cut::processTernaryNumericConditions(std::string str)
   }
 
   return false;
-}
-
-unsigned long int Belle2::Variable::Cut::findMatchedParenthesis(std::string str)
-{
-  unsigned long int end = 1;
-  if (str[0] == '[') {
-    unsigned int count = 1;
-    for (end = 1; end < str.size() and count > 0; ++end) {
-      if (str[end] == '[') ++count;
-      else if (str[end] == ']') --count;
-    }
-
-    if (count > 0)
-      throw std::runtime_error("Cut string has an invalid format: " + str);
-  }
-  return end - 1;
 }
 
 bool Belle2::Variable::Cut::check(const Particle* p)

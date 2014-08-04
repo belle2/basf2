@@ -97,7 +97,7 @@ class Particle(object):
         preCutConfig = copy.deepcopy(self.preCutConfig if preCutConfig is None else preCutConfig)
         postCutConfig = copy.deepcopy(self.postCutConfig if postCutConfig is None else postCutConfig)
         mvaConfig = copy.deepcopy(self.mvaConfig if mvaConfig is None else mvaConfig)
-        mvaConfig.variables.extend(['daughter{i}(getExtraInfo(SignalProbability))'.format(i=i) for i in range(0, len(daughters))])
+        mvaConfig.variables.extend(['daughter({i}, getExtraInfo(SignalProbability))'.format(i=i) for i in range(0, len(daughters))])
         #mvaConfig.variables.extend(['daughter{i}(p)'.format(i=i) for i in range(0, len(daughters))])
         self.channels.append(Particle.DecayChannel(name=self.identifier + ' ==> ' + ' '.join(daughters),
                                                    daughters=daughters,

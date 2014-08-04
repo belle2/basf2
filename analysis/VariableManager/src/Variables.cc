@@ -1981,6 +1981,17 @@ namespace Belle2 {
       return 0;
     }
 
+    double NumberOfParticlesInEvent(const Particle*, const std::vector<double>& pdg)
+    {
+      StoreArray<MCParticle> mcParticles;
+      int counter = 0;
+      for (int i = 0; i < mcParticles.getEntries(); ++i) {
+        if (mcParticles[i]->getPDG() == pdg[0])
+          counter++;
+      }
+      return counter;
+    }
+
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
@@ -2134,6 +2145,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("nKLMClusters", nKLMClusters, "[Eventbased] number of KLM in the event");
     REGISTER_VARIABLE("ECLEnergy", ECLEnergy, "[Eventbased] total energy in ECL in the event");
     REGISTER_VARIABLE("KLMEnergy", KLMEnergy, "[Eventbased] total energy in KLM in the event");
+
+    VARIABLE_GROUP("Parameterfunctions");
+    REGISTER_VARIABLE_WITH_PARAMETERS("NumberOfParticlesInEvent"  , NumberOfParticlesInEvent , "Returns number of MC Particles with the given pdg in the event.");
 
     VARIABLE_GROUP("Continuum Suppression");
     REGISTER_VARIABLE("cosTBTO"  , cosTBTO , "cosine of angle between thrust axis of B and thrust axis of ROE");

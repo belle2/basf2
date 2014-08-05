@@ -133,7 +133,7 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
   auto mapIter = m_variables.find(name);
   if (mapIter == m_variables.end()) {
     Var* var = new Var(name, f, description, m_currentGroup);
-    B2INFO("Registered Variable " << name)
+    B2DEBUG(100, "Registered Variable " << name)
     m_variables[name] = var;
     m_variablesInRegistrationOrder.push_back(var);
   } else {
@@ -156,7 +156,7 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
     if (!boost::regex_match(rawName, allowedNameRegex)) {
       B2FATAL("Variable '" << rawName << "' contains forbidden characters! Only alphanumeric characters plus underscores (_) are allowed for variable names.");
     }
-    B2INFO("Registered Parameter Variable " << rawName)
+    B2DEBUG(100, "Registered parameter Variable " << rawName)
     m_parameter_variables[rawName] = var;
   } else {
     B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");
@@ -178,7 +178,7 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
     if (!boost::regex_match(rawName, allowedNameRegex)) {
       B2FATAL("Variable '" << rawName << "' contains forbidden characters! Only alphanumeric characters plus underscores (_) are allowed for variable names.");
     }
-    B2INFO("Registered Meta Variable " << rawName)
+    B2DEBUG(100, "Registered meta Variable " << rawName)
     m_meta_variables[rawName] = var;
   } else {
     B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");

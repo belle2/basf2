@@ -20,7 +20,6 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
-#include <framework/core/Environment.h>
 
 #include <TFile.h>
 #include <TH1F.h>
@@ -347,7 +346,7 @@ void PreCutHistMakerModule::event()
 
 void PreCutHistMakerModule::terminate()
 {
-  if (Environment::Instance().getNumberProcesses() == 0 or ProcHandler::isOutputProcess()) {
+  if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
     B2INFO("Writing hists to " << m_fileName);
     TFile* m_file = new TFile(m_fileName.c_str(), "RECREATE");
     if (!m_file->IsOpen()) {

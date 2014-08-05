@@ -10,7 +10,6 @@
 #include <analysis/TMVAInterface/Teacher.h>
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
-#include <framework/core/Environment.h>
 
 #include <TMVA/Factory.h>
 #include <TMVA/Tools.h>
@@ -98,7 +97,7 @@ namespace Belle2 {
 
     Teacher::~Teacher()
     {
-      if (Environment::Instance().getNumberProcesses() == 0 or ProcHandler::isOutputProcess()) {
+      if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
         m_tree->get().SetDirectory(nullptr);
         m_file->Close();
       }

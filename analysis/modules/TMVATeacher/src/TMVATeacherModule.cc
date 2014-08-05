@@ -14,7 +14,6 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/pcore/ProcHandler.h>
-#include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
@@ -70,7 +69,7 @@ namespace Belle2 {
 
   void TMVATeacherModule::terminate()
   {
-    if (Environment::Instance().getNumberProcesses() == 0 or ProcHandler::isOutputProcess()) {
+    if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
       if (not m_doNotTrain) {
         m_teacher->train(m_factoryOption, m_prepareOption, m_maxEventsPerClass);
       }

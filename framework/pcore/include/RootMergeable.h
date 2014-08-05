@@ -27,7 +27,7 @@ namespace Belle2 {
      create RootMergeable<X> in initalize (call register(As)Transient("", DataStore::c_Persistent) and construct())
      in terminate():
      \code
-     if (Environment::Instance().getNumberProcesses() == 0 or ProcHandler::isOutputProcess()) {
+     if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
        //create TFile (you can also do that in initalize())
        file->cd();
        mergeablePtr->get().Write();

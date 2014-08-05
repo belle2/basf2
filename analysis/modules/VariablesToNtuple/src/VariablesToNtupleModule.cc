@@ -15,7 +15,6 @@
 #include <analysis/VariableManager/Utility.h>
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
-#include <framework/core/Environment.h>
 
 #include <cmath>
 #include <algorithm>
@@ -114,7 +113,7 @@ void VariablesToNtupleModule::event()
 
 void VariablesToNtupleModule::terminate()
 {
-  if (Environment::Instance().getNumberProcesses() == 0 or ProcHandler::isOutputProcess()) {
+  if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
     B2INFO("Writing NTuple " << m_treeName);
     m_file->cd();
     m_tree->get().Write();

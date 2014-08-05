@@ -3161,6 +3161,62 @@ void VXDTFModule::event()
 
 void VXDTFModule::endRun()
 {
+  /** REDESIGNCOMMENT EVENT 17:
+   * * short:
+   * endRun
+   *
+   ** long (+personal comments):
+   * debugging and DQM related stuff is happening here
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMnameOfInstance, m_PARAMcalcSeedType, m_PARAMtuneCutoffs,
+   * m_PARAMcalcQIType, m_PARAMfilterOverlappingTCs, m_PARAMnameOfInstance,
+   * m_PARAMactivateBaselineTF,
+   *
+   ** dependency of global in-module variables:
+   * m_TESTERbadSensors, m_TESTERlogEvents, m_eventCounter,
+   * m_passSetupVector, m_totalPXDClusters, m_totalSVDClusters,
+   * m_totalTELClusters, m_totalSVDClusterCombis, m_badSectorRangeCounter,
+   * m_badFriendCounter, m_TESTERdistortedHitCtr, m_TESTERbadSectorRangeCounterForClusters,
+   * m_TESTERclustersPersSectorNotMatching, m_TESTERovercrowdedStrangeSensors, m_TESTERSVDOccupancy,
+   * m_TESTERtimeConsumption, m_TESTERlogEvents, m_baselinePass,
+   * m_TESTERsucceededBaselineTF, m_TESTERacceptedBrokenHitsTrack, m_TESTERrejectedBrokenHitsTrack,
+   * m_TESTERnoHitsAtEvent, m_TESTERtotalsegmentsSFCtr, m_TESTERdiscardedSegmentsSFCtr,
+   * m_TESTERtotalsegmentsNFCtr, m_TESTERdiscardedSegmentsNFCtr, m_TESTERtriggeredZigZagXY,
+   * m_TESTERtriggeredZigZagXYWithSigma, m_TESTERtriggeredZigZagRZ, m_TESTERtriggeredCircleFit,
+   * m_TESTERtriggeredDpT, m_TESTERapprovedByTCC, m_TESTERcountTotalTCsAfterTCC,
+   * m_TESTERcountTotalTCsAfterTCCFilter, m_TESTERcountTotalTCsFinal, m_TESTERbadHopfieldCtr,
+   * m_TESTERHopfieldLetsOverbookedTCsAliveCtr, m_TESTERfilteredBadSeedTCs, m_TESTERcleanOverlappingSetStartedCtr,
+   * m_TESTERfilteredOverlapsQI, m_TESTERfilteredOverlapsQICtr, m_TESTERNotFilteredOverlapsQI,
+   * m_TESTERgoodFitsCtr, m_TESTERbadFitsCtr, m_TESTERbrokenEventsCtr,
+   * m_TESTERkalmanSkipped, m_TESTERbrokenCaRound, m_TESTERhighOccupancyCtr,
+   * m_TESTERcountTotalUsedIndicesFinal, m_TESTERcountTotalUsedHitsFinal
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_TESTERbadSensors, m_TESTERlogEvents, m_PARAMnameOfInstance,
+   * m_eventCounter, m_passSetupVector, m_PARAMcalcSeedType,
+   * m_PARAMtuneCutoffs, m_PARAMcalcQIType, m_PARAMfilterOverlappingTCs,
+   * m_totalPXDClusters, m_totalSVDClusters, m_totalTELClusters,
+   * m_totalSVDClusterCombis, m_badSectorRangeCounter, m_badFriendCounter,
+   * m_TESTERdistortedHitCtr, m_TESTERbadSectorRangeCounterForClusters, m_TESTERclustersPersSectorNotMatching,
+   * m_TESTERovercrowdedStrangeSensors, m_TESTERSVDOccupancy, m_TESTERtimeConsumption,
+   * m_TESTERlogEvents, m_PARAMnameOfInstance, m_PARAMactivateBaselineTF,
+   * m_baselinePass, m_TESTERsucceededBaselineTF, m_TESTERacceptedBrokenHitsTrack,
+   * m_TESTERrejectedBrokenHitsTrack, m_TESTERnoHitsAtEvent, m_TESTERtotalsegmentsSFCtr,
+   * m_TESTERdiscardedSegmentsSFCtr, m_TESTERtotalsegmentsNFCtr, m_TESTERdiscardedSegmentsNFCtr,
+   * m_TESTERtriggeredZigZagXY, m_TESTERtriggeredZigZagXYWithSigma, m_TESTERtriggeredZigZagRZ,
+   * m_TESTERtriggeredCircleFit, m_TESTERtriggeredDpT, m_TESTERapprovedByTCC,
+   * m_TESTERcountTotalTCsAfterTCC, m_TESTERcountTotalTCsAfterTCCFilter, m_TESTERcountTotalTCsFinal,
+   * m_TESTERbadHopfieldCtr, m_TESTERHopfieldLetsOverbookedTCsAliveCtr, m_TESTERfilteredBadSeedTCs,
+   * m_TESTERcleanOverlappingSetStartedCtr, m_TESTERfilteredOverlapsQI, m_TESTERfilteredOverlapsQICtr,
+   * m_TESTERNotFilteredOverlapsQI, m_TESTERgoodFitsCtr, m_TESTERbadFitsCtr,
+   * m_TESTERbrokenEventsCtr, m_TESTERkalmanSkipped, m_TESTERbrokenCaRound,
+   * m_TESTERhighOccupancyCtr, m_TESTERcountTotalUsedIndicesFinal, m_TESTERcountTotalUsedHitsFinal
+   *
+   ** in-module-function-calls:
+   */
+
+
   vector<string>::iterator newEndOfVector;
   std::vector<EventInfoPackage>::iterator newEndOfAnothterVector;
 

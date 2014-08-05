@@ -13,7 +13,7 @@ using namespace Belle2;
 
 namespace {
   /** test relations. */
-  class RelationTest : public ::testing::Test {
+  class RelationsInternal : public ::testing::Test {
   protected:
     /** fill StoreArrays with entries from 0..9 */
     virtual void SetUp() {
@@ -45,7 +45,7 @@ namespace {
   };
 
   /** Tests the creation of a Relation. */
-  TEST_F(RelationTest, RelationCreate)
+  TEST_F(RelationsInternal, RelationCreate)
   {
     DataStore::Instance().setInitializeActive(true);
     RelationArray relation(evtData, profileData);
@@ -64,7 +64,7 @@ namespace {
   }
 
   /** Check finding of relations. */
-  TEST_F(RelationTest, RelationFind)
+  TEST_F(RelationsInternal, RelationFind)
   {
     EXPECT_FALSE(RelationArray::required(DataStore::relationName(evtData.getName(), profileData.getName())));
 
@@ -97,7 +97,7 @@ namespace {
   }
 
   /** Test that Relations wich points to the wrong arrays yields a FATAL. */
-  TEST_F(RelationTest, RelationWrongDeathTest)
+  TEST_F(RelationsInternal, RelationWrongDeathTest)
   {
     DataStore::Instance().setInitializeActive(true);
     RelationArray relation1(evtData, profileData, "test");
@@ -112,7 +112,7 @@ namespace {
   }
 
   /** */
-  TEST_F(RelationTest, RegistrationWithDefaultNames)
+  TEST_F(RelationsInternal, RegistrationWithDefaultNames)
   {
     //not registered yet
     EXPECT_B2FATAL(relObjData[0]->addRelationTo(profileData[3]));
@@ -132,7 +132,7 @@ namespace {
    *  was inserted and create() was never called). For those, we don't
    *  want the construction of the array fail with a FATAL.
    */
-  TEST_F(RelationTest, RelationDefaultConstructed)
+  TEST_F(RelationsInternal, RelationDefaultConstructed)
   {
     DataStore::Instance().setInitializeActive(true);
     RelationArray array(evtData, profileData, "somethingnew");
@@ -149,7 +149,7 @@ namespace {
   }
 
   /** Check creation of an index. */
-  TEST_F(RelationTest, BuildIndex)
+  TEST_F(RelationsInternal, BuildIndex)
   {
     DataStore::Instance().setInitializeActive(true);
     RelationArray relation(evtData, profileData);
@@ -227,7 +227,7 @@ namespace {
   }
 
   /** Check wether out-of-bound indices are caught by RelationIndex. */
-  TEST_F(RelationTest, InconsistentIndexDeathTest)
+  TEST_F(RelationsInternal, InconsistentIndexDeathTest)
   {
     DataStore::Instance().setInitializeActive(true);
     RelationArray relation(evtData, profileData);
@@ -244,7 +244,7 @@ namespace {
 
 
   /** Check behaviour when attaching to non-existing(=empty) relation */
-  TEST_F(RelationTest, EmptyIndex)
+  TEST_F(RelationsInternal, EmptyIndex)
   {
     DataStore::Instance().setInitializeActive(true);
     RelationArray relation(evtData, profileData);
@@ -259,7 +259,7 @@ namespace {
   }
 
   /** Attaching to relation with from and two swapped, and with different StoreArray of same type. */
-  TEST_F(RelationTest, WrongRelationIndexDeathTest)
+  TEST_F(RelationsInternal, WrongRelationIndexDeathTest)
   {
     DataStore::Instance().setInitializeActive(true);
     RelationArray relation(profileData, evtData, "test");
@@ -286,7 +286,7 @@ namespace {
   }
 
   /** Check contents of previously created relations. */
-  void RelationTest::findRelationsCheckContents()
+  void RelationsInternal::findRelationsCheckContents()
   {
     const EventMetaData* fromObj = (evtData)[0];
     RelationVector<ProfileInfo> toRels = DataStore::getRelationsFromObj<ProfileInfo>(fromObj);
@@ -322,7 +322,7 @@ namespace {
   }
 
   /** Test DataStore members for finding relations. */
-  TEST_F(RelationTest, FindRelations)
+  TEST_F(RelationsInternal, FindRelations)
   {
     DataStore::Instance().setInitializeActive(true);
     RelationArray relation(evtData, profileData);
@@ -356,7 +356,7 @@ namespace {
   }
 
   /** Test DataStore members for adding relations. */
-  TEST_F(RelationTest, AddRelations)
+  TEST_F(RelationsInternal, AddRelations)
   {
     DataStore::Instance().setInitializeActive(true);
     RelationArray relation(evtData, profileData);
@@ -371,7 +371,7 @@ namespace {
   }
 
   /** Test DataStore::getRelationsWith. */
-  TEST_F(RelationTest, GetRelationsWith)
+  TEST_F(RelationsInternal, GetRelationsWith)
   {
     DataStore::Instance().setInitializeActive(true);
     RelationArray relation(evtData, profileData);
@@ -396,7 +396,7 @@ namespace {
   }
 
   /** Test searching all "ALL" storearrays for objects. */
-  TEST_F(RelationTest, SearchAll)
+  TEST_F(RelationsInternal, SearchAll)
   {
     //2nd array of this type
     StoreArray<ProfileInfo> profileData2("ProfileInfos2");
@@ -454,7 +454,7 @@ namespace {
   }
 
 
-  TEST_F(RelationTest, ListOfRelatedArrays)
+  TEST_F(RelationsInternal, ListOfRelatedArrays)
   {
     //2nd array of this type
     StoreArray<ProfileInfo> profileData2("ProfileInfos2");
@@ -479,125 +479,4 @@ namespace {
     EXPECT_EQ(evtData.getName(), DataStore::Instance().getListOfRelatedArrays(profileData2).at(0));
     EXPECT_EQ(evtData.getName(), DataStore::Instance().getListOfRelatedArrays(profileData).at(0));
   }
-
-  /** Test adding/finding using RelationsObject/RelationsInterface. */
-  TEST_F(RelationTest, RelationsObject)
-  {
-    DataStore::Instance().setInitializeActive(true);
-    RelationArray(relObjData, profileData).registerAsPersistent();
-    DataStore::Instance().setInitializeActive(false);
-
-    (relObjData)[0]->addRelationTo((profileData)[0], -42.0);
-
-    RelationVector<ProfileInfo> rels = (relObjData)[0]->getRelationsTo<ProfileInfo>();
-    EXPECT_TRUE(rels.size() == 1);
-    EXPECT_TRUE(rels.object(0) == (profileData)[0]);
-    EXPECT_DOUBLE_EQ(rels.weight(0), -42.0);
-
-    //adding relations to NULL is safe and doesn't do anything
-    (relObjData)[0]->addRelationTo(static_cast<TObject*>(nullptr));
-    (relObjData)[0]->addRelationTo(static_cast<ProfileInfo*>(nullptr));
-
-    //if we cannot create a relation to an actual object given, this is obivously wrong
-    ProfileInfo notInArray;
-    EXPECT_B2FATAL((relObjData)[0]->addRelationTo(&notInArray));
-  }
-
-  /** Test updating of index after using addRelation. */
-  TEST_F(RelationTest, IndexUpdating)
-  {
-    DataStore::Instance().setInitializeActive(true);
-    RelationArray(relObjData, profileData).registerAsPersistent();
-    DataStore::Instance().setInitializeActive(false);
-
-    //not yet set
-    EXPECT_FALSE((relObjData)[0]->getRelated<ProfileInfo>() != NULL);
-
-    (relObjData)[0]->addRelationTo((profileData)[0], -42.0);
-
-    //now it should be found (index updated because RelationContainer was just created)
-    EXPECT_TRUE((relObjData)[0]->getRelated<ProfileInfo>() != NULL);
-
-    //test again with different object
-    EXPECT_FALSE((relObjData)[1]->getRelated<ProfileInfo>() != NULL);
-
-    (relObjData)[1]->addRelationTo((profileData)[0], -42.0);
-
-    //now it should be found (index updated because addRelation marks RelationContainer as modified)
-    EXPECT_TRUE((relObjData)[1]->getRelated<ProfileInfo>() != NULL);
-  }
-
-  /** Test getting array name/index from a RelationsObject. */
-  TEST_F(RelationTest, RelationsObjectArrayIndex)
-  {
-    for (int i = 0; i < relObjData.getEntries(); i++) {
-      EXPECT_TRUE((relObjData)[i]->getArrayName() == relObjData.getName());
-      EXPECT_TRUE((relObjData)[i]->getArrayIndex() == i);
-    }
-
-    RelationsObject bla;
-    EXPECT_TRUE(bla.getArrayName() == "");
-    EXPECT_TRUE(bla.getArrayIndex() == -1);
-  }
-
-  /** Check behaviour of duplicate relations. */
-  TEST_F(RelationTest, DuplicateRelations)
-  {
-    DataStore::Instance().setInitializeActive(true);
-    RelationArray(evtData, relObjData).registerAsPersistent();
-    RelationArray(relObjData, evtData).registerAsPersistent();
-    DataStore::Instance().setInitializeActive(false);
-
-    //more than a single relation in one direction
-    DataStore::Instance().addRelationFromTo((evtData)[0], (relObjData)[1], 1.0);
-    DataStore::Instance().addRelationFromTo((evtData)[0], (relObjData)[1], 2.0);
-
-    //since the relation wasn't consolidated, these should still show up as
-    //seperate things
-    RelationVector<EventMetaData> rels1 = (relObjData)[1]->getRelationsFrom<EventMetaData>();
-    EXPECT_EQ(2u, rels1.size());
-
-
-    //add another one in opposite direction
-    DataStore::Instance().addRelationFromTo((relObjData)[1], (evtData)[0], 1.0);
-    RelationVector<EventMetaData> rels2 = (relObjData)[1]->getRelationsFrom<EventMetaData>();
-    //wasn't _from_ eventmetadata, so no change
-    EXPECT_EQ(2u, rels2.size());
-
-    RelationVector<EventMetaData> rels3 = (relObjData)[1]->getRelationsWith<EventMetaData>();
-    EXPECT_EQ(3u, rels3.size());
-    double sum = 0.0;
-    for (int i = 0; i < (int)rels3.size(); i++) {
-      sum += rels3.weight(i);
-    }
-    EXPECT_DOUBLE_EQ(sum, 1.0 + 1.0 + 2.0);
-  }
-
-  TEST_F(RelationTest, RelationsToSameArray)
-  {
-    DataStore::Instance().setInitializeActive(true);
-    RelationArray relation1(relObjData, relObjData);
-    relation1.registerAsPersistent();
-    DataStore::Instance().setInitializeActive(false);
-
-    relObjData[0]->addRelationTo(relObjData[1]);
-    EXPECT_TRUE(relObjData[0] == relObjData[1]->getRelated<RelationsObject>());
-    EXPECT_TRUE(relObjData[0] == relObjData[1]->getRelatedFrom<RelationsObject>());
-    EXPECT_TRUE(relObjData[1] == relObjData[0]->getRelated<RelationsObject>());
-    EXPECT_TRUE(relObjData[1] == relObjData[0]->getRelatedTo<RelationsObject>());
-    EXPECT_TRUE(nullptr == relObjData[2]->getRelated<RelationsObject>());
-    EXPECT_TRUE(nullptr == relObjData[2]->getRelatedFrom<RelationsObject>());
-    EXPECT_TRUE(nullptr == relObjData[2]->getRelatedTo<RelationsObject>());
-    //still in one direction
-    EXPECT_TRUE(nullptr == relObjData[1]->getRelatedTo<RelationsObject>());
-    EXPECT_TRUE(nullptr == relObjData[0]->getRelatedFrom<RelationsObject>());
-
-    //to same object
-    relObjData[3]->addRelationTo(relObjData[3]);
-    EXPECT_TRUE(relObjData[3] == relObjData[3]->getRelated<RelationsObject>());
-    EXPECT_TRUE(relObjData[3] == relObjData[3]->getRelatedFrom<RelationsObject>());
-    EXPECT_TRUE(relObjData[3] == relObjData[3]->getRelatedTo<RelationsObject>());
-  }
-
-
 }  // namespace

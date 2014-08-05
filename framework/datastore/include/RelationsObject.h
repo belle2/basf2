@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2012 - Belle II Collaboration                             *
+ * Copyright(C) 2012-2014 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Kuhr                                              *
+ * Contributors: Thomas Kuhr, Christian Pulvermacher                      *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,6 +13,7 @@
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/RelationVector.h>
+#include <framework/datastore/RelationEntry.h>
 
 #include <TObject.h>
 
@@ -115,6 +116,9 @@ namespace Belle2 {
       DataStore::Instance().addRelation(this, m_cacheDataStoreEntry, m_cacheArrayIndex, object, weight);
     }
 
+    //====================================================================================================
+    //These return an a vector of relations:
+
     /** Get the relations that point from this object to another store array.
      *
      *  @tparam TO     The class of objects to which the relations point.
@@ -153,6 +157,9 @@ namespace Belle2 {
       return RelationVector<T>(DataStore::Instance().getRelationsWith(DataStore::c_BothSides, this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name));
     }
 
+    //====================================================================================================
+    //These return only the first related object
+
     /** Get the object to which this object has a relation.
      *
      *  @tparam TO     The class of objects to which the relation points.
@@ -187,6 +194,49 @@ namespace Belle2 {
      */
     template <class T> T* getRelated(const std::string& name = "") const {
       return static_cast<T*>(DataStore::Instance().getRelationWith(DataStore::c_BothSides, this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name).object);
+    }
+
+
+    //====================================================================================================
+    //These return an object/weight pair
+
+    /** Get first related object & weight of relation pointing to an array.
+     *
+     *  @tparam TO     The class of objects to which the relation points.
+     *  @param name    The name of the store array to which the relation points.
+     *                 If empty the default store array name for class TO will be used.
+     *                 If the special name "ALL" is given all store arrays containing objects of type TO are considered.
+     *  @return        Pair of first related object and the relation weight, or (NULL, 1.0) if none found.
+     */
+    template <class TO> std::pair<TO*, double> getRelatedToWithWeight(const std::string& name = "") const {
+      RelationEntry entry = DataStore::Instance().getRelationWith(DataStore::c_ToSide, this, m_cacheDataStoreEntry, m_cacheArrayIndex, TO::Class(), name);
+      return std::make_pair(static_cast<TO*>(entry.object), entry.weight);
+    }
+
+    /** Get first related object & weight of relation pointing from an array.
+     *
+     *  @tparam FROM   The class of objects from which the relation points.
+     *  @param name    The name of the store array from which the relation points.
+     *                 If empty the default store array name for class FROM will be used.
+     *                 If the special name "ALL" is given all store arrays containing objects of type FROM are considered.
+     *  @return        Pair of first related object and the relation weight, or (NULL, 1.0) if none found.
+     */
+    template <class FROM> std::pair<FROM*, double> getRelatedFromWithWeight(const std::string& name = "") const {
+      RelationEntry entry = DataStore::Instance().getRelationWith(DataStore::c_FromSide, this, m_cacheDataStoreEntry, m_cacheArrayIndex, FROM::Class(), name);
+      return std::make_pair(static_cast<FROM*>(entry.object), entry.weight);
+    }
+
+    /** Get first related object & weight of relation pointing from/to an array.
+     *
+     *  @tparam T      The class of objects to or from which the relation points.
+     *  @param name    The name of the store array to or from which the relation points.
+     *                 If empty the default store array name for class T will be used.
+     *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
+     *  @return        Pair of first related object and the relation weight, or (NULL, 1.0) if none found.
+     */
+    template <class T> std::pair<T*, double> getRelatedWithWeight(const std::string& name = "") const {
+      RelationEntry entry = DataStore::Instance().getRelationWith(DataStore::c_BothSides, this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name);
+      return std::make_pair(static_cast<T*>(entry.object), entry.weight);
     }
 
     /** Get name of array this object is stored in, or "" if not found. */

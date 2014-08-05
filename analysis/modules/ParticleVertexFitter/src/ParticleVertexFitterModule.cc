@@ -57,9 +57,9 @@ namespace Belle2 {
     // Add parameters
     addParam("listName", m_listName, "name of particle list", string(""));
     addParam("confidenceLevel", m_confidenceLevel,
-             "required confidence level of fit to keep particles in the list", 0.001);
+             "required confidence level of fit to keep particles in the list. Note that even with confidenceLevel == 0.0, errors during the fit might discard Particles in the list.", 0.001);
     addParam("vertexFitter", m_vertexFitter, "kfitter or rave", string("kfitter"));
-    addParam("fitType", m_fitType, "type of the kinematic fit", string("vertex"));
+    addParam("fitType", m_fitType, "type of the kinematic fit (vertex, massvertex, mass)", string("vertex"));
     addParam("withConstraint", m_withConstraint, "additional constraint on vertex", string(""));
     addParam("decayString", m_decayString, "specifies which daughter particles are included in the kinematic fit", string(""));
   }
@@ -223,8 +223,10 @@ namespace Belle2 {
     for (unsigned ichild = 0; ichild < mother->getNDaughters(); ichild++) {
       const Particle* child = mother->getDaughter(ichild);
 
-      if (child->getPValue() < 0)
+      if (child->getPValue() < 0) {
+        B2ERROR("Daughter with PDG code " << child->getPDGCode() << " does not have a valid error matrix.");
         return false; // error matrix not valid
+      }
       bool isPi0 = false;
       if (child->getPDGCode() == 111 && child->getNDaughters() == 2)
         if (child->getDaughter(0)->getPDGCode() == 22 && child->getDaughter(1)->getPDGCode() == 22)

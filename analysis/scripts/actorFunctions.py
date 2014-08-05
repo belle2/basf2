@@ -143,12 +143,13 @@ def LoadGeometry(path):
     return {'Geometry': 'dummy'}
 
 
-def FitVertex(path, channelName, particleList, geometry):
+def FitVertex(path, channelName, particleList, daughterVertices, geometry):
     """
     Fit secondary vertex of all particles in this ParticleList
         @param path the basf2 path
         @param channelName unique name describing the channel
         @param particleList ParticleList name
+        @param daughterVertices to ensure all daughter particles have valid error matrices
         @param additional requirement to ensure that geometry module is loaded
         @return Resource named VertexFit_{channelName}
     """
@@ -165,7 +166,7 @@ def FitVertex(path, channelName, particleList, geometry):
     path.add_module(pvfit)
 
     B2INFO("Fitted vertex for channel {c}.".format(c=channelName))
-    return {'VertexFit_{c}'.format(c=channelName): actorFramework.createHash(channelName, particleList, geometry)}
+    return {'VertexFit_{c}'.format(c=channelName): actorFramework.createHash(channelName, particleList, daughterVertices, geometry)}
 
 
 def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughterParticleLists, additionalDependencies):

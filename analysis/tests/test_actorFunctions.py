@@ -189,10 +189,10 @@ class TestLoadGeometry(unittest.TestCase):
 class TestFitVertex(unittest.TestCase):
     def setUp(self):
         self.path = MockPath()
-        self.standardHash = '85016aeb7051ebf59d0e3e9c1b816b25eaa52722'
+        self.standardHash = 'f6f3978c4c8f896b3fd5b0e7a2f7302a3cf3669d'
 
     def test_standard(self):
-        result = FitVertex(self.path, 'UniqueChannelName', 'D+:1', 'dummy')
+        result = FitVertex(self.path, 'UniqueChannelName', 'D+:1', ['v1', 'v2'], 'dummy')
         self.assertDictEqual(result, {'VertexFit_UniqueChannelName': self.standardHash})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
@@ -200,17 +200,17 @@ class TestFitVertex(unittest.TestCase):
         self.assertEqual(parameters['confidenceLevel'], 0)
 
     def test_missing_particle_list(self):
-        result = FitVertex(self.path, 'UniqueChannelName', None, 'dummy')
+        result = FitVertex(self.path, 'UniqueChannelName', None, ['v1', 'v2'], 'dummy')
         self.assertDictEqual(result, {'VertexFit_UniqueChannelName': None})
         self.assertEqual(len(self.path.modules()), 0)
 
     def test_hash_depends_on_channel_name(self):
-        result = FitVertex(self.path, 'other', 'D+:1', 'dummy')
+        result = FitVertex(self.path, 'other', 'D+:1', ['v1', 'v2'], 'dummy')
         self.assertTrue('VertexFit_other' in result)
         self.assertTrue(result['VertexFit_other'] != self.standardHash)
 
     def test_hash_depends_on_particle_list(self):
-        result = FitVertex(self.path, 'UniqueChannelName', 'D+:2', 'dummy')
+        result = FitVertex(self.path, 'UniqueChannelName', 'D+:2', ['v1', 'v2'], 'dummy')
         self.assertTrue('VertexFit_UniqueChannelName' in result)
         self.assertTrue(result['VertexFit_UniqueChannelName'] != self.standardHash)
 

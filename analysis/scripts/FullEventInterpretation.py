@@ -214,7 +214,10 @@ def FullEventInterpretation(path, particles):
                                 path='Path',
                                 channelName='Name_{c}'.format(c=channel.name),
                                 particleList='RawParticleList_{c}'.format(c=channel.name),
+                                daughterVertices=['VertexFit_{d}'.format(d=daughter) for daughter in channel.daughters],
                                 geometry='Geometry')
+            seq.addResource('VertexFit_{i}'.format(i=particle.identifier), 'Dummy',
+                            requires=['VertexFit_{c}'.format(c=channel.name) for channel in particle.channels], strict=False)
 
             seq.addFunction(CopyParticleLists,
                             path='Path',

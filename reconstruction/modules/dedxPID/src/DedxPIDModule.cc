@@ -274,6 +274,11 @@ void DedxPIDModule::event()
     }
     genfit::StateOnPlane pocaState = fitterInfo->getFittedState(true);
 
+    if (gftrack->getFitStatus(trackrep)->isTrackPruned()) {
+      B2ERROR("GFTrack is pruned, please run DedxPID only on unpruned tracks! Skipping this track.");
+      continue;
+    }
+
     dedxTrack->m_pdg_hyp = fitResult->getParticleType().getPDGCode();
     dedxTrack->m_chi2 = gftrack->getFitStatus(trackrep)->getChi2();
     dedxTrack->m_charge = (short)((gftrack->getFitStatus(trackrep)->getCharge() >= 0) ? 1 : -1);

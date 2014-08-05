@@ -10,6 +10,14 @@
 
 #pragma once
 
+//framework:
+#include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <pxd/dataobjects/PXDCluster.h>
+#include <svd/dataobjects/SVDCluster.h>
+#include <testbeam/vxd/dataobjects/TelCluster.h> /// WARNING produces dependency of testbeam package
+#include <vxd/dataobjects/VxdID.h>
+
 // tracking:
 #include "tracking/vxdCaTracking/VXDTFHit.h"
 #include "tracking/vxdCaTracking/VXDSegmentCell.h"
@@ -24,14 +32,6 @@
 // Includes for the Collector/Display
 #include <tracking/trackFindingVXD/displayInterfaceTF/CollectorTFInfo.h>
 #include <tracking/trackFindingVXD/displayInterfaceTF/ClusterTFInfo.h>
-
-//framework:
-#include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
-#include <pxd/dataobjects/PXDCluster.h>
-#include <svd/dataobjects/SVDCluster.h>
-#include <testbeam/vxd/dataobjects/TelCluster.h> /// WARNING produces dependency of testbeam package
-#include <vxd/dataobjects/VxdID.h>
 
 //C++ base / C++ stl:
 #include <fstream>
@@ -335,6 +335,20 @@ namespace Belle2 {
 
     /** reset all reused containers and delete others which are existing only for one event. */
     void cleanEvent(PassData* currentPass) {
+      /** REDESIGNCOMMENT FINDSENSORS4CLUSTER 1:
+       * * short:
+       *
+       ** long (+personal comments):
+       *
+       ** dependency of module parameters (global):
+       *
+       ** dependency of global in-module variables:
+       * m_allTCsOfEvent, m_tcVectorOverlapped, m_tcVector,
+       *
+       ** dependency of global stuff just because of B2XX-output or debugging only:
+       *
+       ** in-module-function-calls:
+       */
       currentPass->cleanPass();
 
       for (VXDTFTrackCandidate * aTC : m_allTCsOfEvent) { delete  aTC; }
@@ -347,6 +361,25 @@ namespace Belle2 {
 
     /** general Function to write data into a root file*/
     void writeToRootFile(double pValue, double chi2, double circleRadius, int ndf) {
+      /** REDESIGNCOMMENT FINDSENSORS4CLUSTER 1:
+       * * short:
+       *
+       ** long (+personal comments):+
+       * whole function is only for DQM/debugging/testing purposes...
+       *
+       ** dependency of module parameters (global):
+       * m_PARAMwriteToRoot,
+       *
+       ** dependency of global in-module variables:
+       * m_rootPvalues, m_rootChi2, m_rootCircleRadius,
+       * m_rootNdf, m_treeTrackWisePtr
+       *
+       ** dependency of global stuff just because of B2XX-output or debugging only:
+       * m_rootPvalues, m_rootChi2, m_rootCircleRadius,
+       * m_rootNdf, m_treeTrackWisePtr, m_PARAMwriteToRoot
+       *
+       ** in-module-function-calls:
+       */
       if (m_PARAMwriteToRoot == true) {
         m_rootPvalues = pValue;
         m_rootChi2 = chi2;
@@ -390,6 +423,51 @@ namespace Belle2 {
 
 
     void resetCountersAtBeginRun() {
+      /** REDESIGNCOMMENT FINDSENSORS4CLUSTER 1:
+       * * short:
+       *
+       ** long (+personal comments):
+       * all the entries below are the dependencies...
+       *
+       ** dependency of module parameters (global):
+       *
+       ** dependency of global in-module variables:
+       * m_eventCounter, m_badSectorRangeCounter, m_TESTERbadSectorRangeCounterForClusters,
+       * m_TESTERclustersPersSectorNotMatching, m_badFriendCounter, m_totalPXDClusters,
+       * m_totalTELClusters, m_totalSVDClusters, m_totalSVDClusterCombis,
+       * m_TESTERhighOccupancyCtr, m_TESTERtriggeredZigZagXY, m_TESTERtriggeredZigZagXYWithSigma,
+       * m_TESTERtriggeredZigZagRZ, m_TESTERtriggeredDpT, m_TESTERtriggeredCircleFit,
+       * m_TESTERapprovedByTCC, m_TESTERcountTotalTCsAfterTCC, m_TESTERcountTotalTCsAfterTCCFilter,
+       * m_TESTERcountTotalTCsFinal, m_TESTERcountTotalUsedIndicesFinal, m_TESTERcountTotalUsedHitsFinal,
+       * m_TESTERbadHopfieldCtr, m_TESTERHopfieldLetsOverbookedTCsAliveCtr, m_TESTERfilteredOverlapsQI,
+       * m_TESTERNotFilteredOverlapsQI, m_TESTERfilteredOverlapsQICtr, m_TESTERcleanOverlappingSetStartedCtr,
+       * m_TESTERgoodFitsCtr, m_TESTERbadFitsCtr, m_TESTERbrokenEventsCtr,
+       * m_TESTERfilteredBadSeedTCs, m_TESTERdistortedHitCtr, m_TESTERtotalsegmentsSFCtr,
+       * m_TESTERtotalsegmentsNFCtr, m_TESTERdiscardedSegmentsSFCtr, m_TESTERdiscardedSegmentsNFCtr,
+       * m_TESTERbrokenCaRound, m_TESTERkalmanSkipped, m_TESTERovercrowdedStrangeSensors,
+       * m_TESTERstartedBaselineTF, m_TESTERsucceededBaselineTF, m_TESTERnoHitsAtEvent,
+       * m_TESTERacceptedBrokenHitsTrack, m_TESTERrejectedBrokenHitsTrack, m_tcVectorOverlapped,
+       * m_tcVector, m_allTCsOfEvent
+       *
+       ** dependency of global stuff just because of B2XX-output or debugging only:
+       * m_eventCounter, m_badSectorRangeCounter, m_TESTERbadSectorRangeCounterForClusters,
+       * m_TESTERclustersPersSectorNotMatching, m_badFriendCounter, m_totalPXDClusters,
+       * m_totalTELClusters, m_totalSVDClusters, m_totalSVDClusterCombis,
+       * m_TESTERhighOccupancyCtr, m_TESTERtriggeredZigZagXY, m_TESTERtriggeredZigZagXYWithSigma,
+       * m_TESTERtriggeredZigZagRZ, m_TESTERtriggeredDpT, m_TESTERtriggeredCircleFit,
+       * m_TESTERapprovedByTCC, m_TESTERcountTotalTCsAfterTCC, m_TESTERcountTotalTCsAfterTCCFilter,
+       * m_TESTERcountTotalTCsFinal, m_TESTERcountTotalUsedIndicesFinal, m_TESTERcountTotalUsedHitsFinal,
+       * m_TESTERbadHopfieldCtr, m_TESTERHopfieldLetsOverbookedTCsAliveCtr, m_TESTERfilteredOverlapsQI,
+       * m_TESTERNotFilteredOverlapsQI, m_TESTERfilteredOverlapsQICtr, m_TESTERcleanOverlappingSetStartedCtr,
+       * m_TESTERgoodFitsCtr, m_TESTERbadFitsCtr, m_TESTERbrokenEventsCtr,
+       * m_TESTERfilteredBadSeedTCs, m_TESTERdistortedHitCtr, m_TESTERtotalsegmentsSFCtr,
+       * m_TESTERtotalsegmentsNFCtr, m_TESTERdiscardedSegmentsSFCtr, m_TESTERdiscardedSegmentsNFCtr,
+       * m_TESTERbrokenCaRound, m_TESTERkalmanSkipped, m_TESTERovercrowdedStrangeSensors,
+       * m_TESTERstartedBaselineTF, m_TESTERsucceededBaselineTF, m_TESTERnoHitsAtEvent,
+       * m_TESTERacceptedBrokenHitsTrack, m_TESTERrejectedBrokenHitsTrack
+       *
+       ** in-module-function-calls:
+       */
       m_eventCounter = 0;
       m_badSectorRangeCounter = 0;
       m_TESTERbadSectorRangeCounterForClusters = 0;

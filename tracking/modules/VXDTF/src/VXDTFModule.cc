@@ -3161,7 +3161,7 @@ void VXDTFModule::event()
 
 void VXDTFModule::endRun()
 {
-  /** REDESIGNCOMMENT EVENT 17:
+  /** REDESIGNCOMMENT ENDRUN 1:
    * * short:
    * endRun
    *
@@ -3469,6 +3469,23 @@ void VXDTFModule::endRun()
 
 void VXDTFModule::terminate()
 {
+  /** REDESIGNCOMMENT TERMINATE 1:
+   * * short:
+   * root output for track- and event-wise info...
+   *
+   ** long (+personal comments):
+   * only relevant for DQM-stuff
+   *
+   ** dependency of module parameters (global):
+   *
+   ** dependency of global in-module variables:
+   * m_treeTrackWisePtr, m_treeEventWisePtr, m_rootFilePtr,
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_treeTrackWisePtr, m_treeEventWisePtr, m_rootFilePtr,
+   *
+   ** in-module-function-calls:
+   */
   if (m_treeTrackWisePtr != NULL and m_treeEventWisePtr != NULL) {
     m_rootFilePtr->cd(); //important! without this the famework root I/O (SimpleOutput etc) could mix with the root I/O of this module
     m_treeTrackWisePtr->Write();
@@ -3483,6 +3500,19 @@ void VXDTFModule::terminate()
 ///checks state of inner neighbours and removes incompatible and virtual ones
 void VXDTFModule::delFalseFriends(PassData* currentPass, TVector3 primaryVertex)
 {
+  /** REDESIGNCOMMENT DELFALSEFRIENDS 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   *
+   ** dependency of global in-module variables:
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   *
+   ** in-module-function-calls:
+   */
   std::vector<VXDSegmentCell*> segmentsOfSector;
 
   for (VXDSector * aSector : currentPass->sectorVector) {
@@ -3498,6 +3528,22 @@ void VXDTFModule::delFalseFriends(PassData* currentPass, TVector3 primaryVertex)
 ///Recursive CoreFunction of the Track Candidate Collector, stores every possible way starting at a Seed (VXDSegmentCell)
 void VXDTFModule::findTCs(TCsOfEvent& tcList,  VXDTFTrackCandidate* currentTC, short int maxLayer)
 {
+  /** REDESIGNCOMMENT FINDTCS 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   * recursive
+   *
+   ** dependency of module parameters (global):
+   *
+   ** dependency of global in-module variables:
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   *
+   ** in-module-function-calls:
+   * findTCs(tcList, currentTC, maxLayer)
+   * findTCs(tcList, pTCCopy, maxLayer)
+   */
   VXDSegmentCell* pLastSeg = currentTC->getSegments().back(); // get last entry in segList of TC
   if (FullSecID(pLastSeg->getOuterHit()->getSectorName()).getLayerID() != maxLayer) { pLastSeg->setSeed(false); }
 
@@ -3537,6 +3583,23 @@ void VXDTFModule::findTCs(TCsOfEvent& tcList,  VXDTFTrackCandidate* currentTC, s
 
 void VXDTFModule::hopfieldVectorized(TCsOfEvent& tcVector, double omega)
 {
+  /** REDESIGNCOMMENT HOPFIELDVECTORIZED 1:
+   * * short:
+   * ignore this function
+   *
+   ** long (+personal comments):
+   * plan was to use Eigen library instead of TMatrixD-stuff.
+   * didn't work, different behavior of Eigen and root-stuff or simply a bug I wasn't able to find.
+   * Therefore the relevant version of the Hopfield network implementaion is HOPFIELD
+   *
+   ** dependency of module parameters (global):
+   *
+   ** dependency of global in-module variables:
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   *
+   ** in-module-function-calls:
+   */
   int nTCs = tcVector.size();
   B2DEBUG(10, " hopfieldVectorized: dealing with " << nTCs << " overlapping track candidates")
   if (nTCs < 2) { B2FATAL("Hopfield got only " << nTCs << " overlapping TCs! This should not be possible!"); return; }
@@ -3802,6 +3865,28 @@ void VXDTFModule::hopfieldVectorized(TCsOfEvent& tcVector, double omega)
 /// Neuronal network filtering overlapping Track Candidates by searching best subset of TC's
 void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
 {
+  /** REDESIGNCOMMENT HOPFIELD 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   * that function has a lot of debug only output
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMdisplayCollector, m_PARAMDebugMode, m_PARAMnameOfInstance,
+   * m_PARAMqiSmear
+   *
+   ** dependency of global in-module variables:
+   * m_eventCounter, m_collector, m_TESTERbadHopfieldCtr,
+   *
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_eventCounter, m_PARAMdisplayCollector, m_collector,
+   * m_PARAMDebugMode, m_TESTERbadHopfieldCtr, m_PARAMnameOfInstance,
+   * m_PARAMqiSmear
+   *
+   ** in-module-function-calls:
+   * greedy(tcVector)
+   */
   int nTCs = tcVector.size();
   if (nTCs < 2) { B2FATAL("Hopfield got only " << nTCs << " overlapping TCs! This should not be possible!"); return; }
 
@@ -4068,6 +4153,19 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
 
 void VXDTFModule::reserveHits(TCsOfEvent& tcVector, PassData* currentPass)
 {
+  /** REDESIGNCOMMENT RESERVEHITS 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   *
+   ** dependency of global in-module variables:
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   *
+   ** in-module-function-calls:
+   */
   list< pair< double, VXDTFTrackCandidate*> > allTCs;
   double threshold = currentPass->reserveHitsThreshold;
   int countAlive = 0;
@@ -4078,14 +4176,16 @@ void VXDTFModule::reserveHits(TCsOfEvent& tcVector, PassData* currentPass)
     if (tc->getCondition() == false) continue;
     ++countAlive;
     if (tc->isReserved() == true) continue;
-    allTCs.push_back(make_pair(tc->getTrackQuality(), tc));
+    allTCs.push_back({tc->getTrackQuality(), tc});
   }
 
   allTCs.sort();
   allTCs.reverse();
-  int tcsRunreserved = allTCs.size();
-  int limit2Go = int(double(tcsRunreserved) * threshold + 0.5), count2Limit = 0, countSucceeded = 0;
-  B2DEBUG(3, "reserveHits - pass " << currentPass->sectorSetup << ": threshold " << threshold << ", total number of TCs " << tcVector.size() << ", alive " << countAlive << ", & unreserved " << tcsRunreserved << ", results in " << limit2Go << " TCs to be allowed to reserve their hits")
+  int tcsUnreserved = allTCs.size(), // nTCs which haven't reserved their hits
+      limit2Go = int(double(tcsUnreserved) * threshold + 0.5), // nTCs allowed to reserve their hits
+      count2Limit = 0,
+      countSucceeded = 0;
+  B2DEBUG(3, "reserveHits - pass " << currentPass->sectorSetup << ": threshold " << threshold << ", total number of TCs " << tcVector.size() << ", alive " << countAlive << ", & unreserved " << tcsUnreserved << ", results in " << limit2Go << " TCs to be allowed to reserve their hits")
 
   list< pair< double, VXDTFTrackCandidate*> >::iterator currentTC = allTCs.begin();
   while (count2Limit < limit2Go) {
@@ -4093,7 +4193,7 @@ void VXDTFModule::reserveHits(TCsOfEvent& tcVector, PassData* currentPass)
     if (succeeded == true) ++countSucceeded;
     ++currentTC;
     ++count2Limit;
-    if (std::distance(allTCs.begin(), currentTC) > tcsRunreserved) {
+    if (std::distance(allTCs.begin(), currentTC) > tcsUnreserved) {
       B2FATAL(" reserveHits: iterator goes rampage!")
     }
   }
@@ -4106,6 +4206,20 @@ void VXDTFModule::reserveHits(TCsOfEvent& tcVector, PassData* currentPass)
 /// search for nonOverlapping trackCandidates using Greedy algorithm (start with TC of highest QI, remove all TCs incompatible with current TC, if there are still TCs there, repeat step until no incompatible TCs are there any more)
 void VXDTFModule::greedy(TCsOfEvent& tcVector)
 {
+  /** REDESIGNCOMMENT GREEDY 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   *
+   ** dependency of global in-module variables:
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   *
+   ** in-module-function-calls:
+   * greedyRecursive(overlappingTCs, totalSurvivingQI, countSurvivors, countKills)
+   */
   list< pair< double, VXDTFTrackCandidate*> > overlappingTCs;
 
   int countTCsAliveAtStart = 0, countSurvivors = 0, countKills = 0;
@@ -4123,7 +4237,7 @@ void VXDTFModule::greedy(TCsOfEvent& tcVector)
       continue;
     }
 
-    overlappingTCs.push_back(make_pair(qi, tc));
+    overlappingTCs.push_back({qi, tc});
   }
 
   overlappingTCs.sort();
@@ -4142,6 +4256,23 @@ void VXDTFModule::greedyRecursive(std::list< std::pair<double, VXDTFTrackCandida
                                   int& countSurvivors,
                                   int& countKills)
 {
+  /** REDESIGNCOMMENT GREEDYRECURSIVE 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMdisplayCollector,
+   *
+   ** dependency of global in-module variables:
+   * m_collector,
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_PARAMdisplayCollector, m_collector,
+   *
+   ** in-module-function-calls:
+   * greedyRecursive(overlappingTCs, totalSurvivingQI, countSurvivors, countKills)
+   */
   if (overlappingTCs.empty() == true) return;
 
   list< pair<double, VXDTFTrackCandidate*> >::iterator tcEntry = overlappingTCs.begin();
@@ -4197,6 +4328,22 @@ void VXDTFModule::greedyRecursive(std::list< std::pair<double, VXDTFTrackCandida
 /// for that easy situation we dont need the neuronal network or other algorithms for finding the best subset...
 void VXDTFModule::tcDuel(TCsOfEvent& tcVector)
 {
+  /** REDESIGNCOMMENT TCDUEL 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMdisplayCollector,
+   *
+   ** dependency of global in-module variables:
+   * m_collector,
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_PARAMdisplayCollector, m_collector,
+   *
+   ** in-module-function-calls:
+   */
   if (tcVector.at(0)->getTrackQuality() > tcVector.at(1)->getTrackQuality()) {
     tcVector.at(1)->setCondition(false);
 
@@ -4229,6 +4376,20 @@ Belle2::SectorNameAndPointerPair VXDTFModule::searchSector4Hit(VxdID aVxdID,
     vector<double>& uConfig,
     vector<double>& vConfig)
 {
+  /** REDESIGNCOMMENT SEARCHSECTOR4HIT 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   * creates an instance of a VXD::SensorInfoBase every time it is called, could be optimized...
+   *
+   ** dependency of module parameters (global):
+   *
+   ** dependency of global in-module variables:
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   *
+   ** in-module-function-calls:
+   */
   Belle2::MapOfSectors::iterator secMapIter = m_sectorMap.begin();
 
   uint aSecID = 0;
@@ -4275,7 +4436,7 @@ Belle2::SectorNameAndPointerPair VXDTFModule::searchSector4Hit(VxdID aVxdID,
     B2DEBUG(100, "Sec ID not found")
   }
 
-  return make_pair(aFullSecID, secMapIter); // SectorNameAndPointerPair
+  return {aFullSecID, secMapIter}; // SectorNameAndPointerPair
 }
 
 
@@ -4284,6 +4445,26 @@ Belle2::SectorNameAndPointerPair VXDTFModule::searchSector4Hit(VxdID aVxdID,
 /// searches for segments in given pass and returns number of discarded segments
 int VXDTFModule::segFinder(PassData* currentPass)
 {
+  /** REDESIGNCOMMENT SEGFINDER 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMDebugMode, m_PARAMdisplayCollector, m_PARAMkillEventForHighOccupancyThreshold,
+   *
+   ** dependency of global in-module variables:
+   * m_eventCounter, m_collector, m_highOccupancyCase,
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_eventCounter, m_PARAMDebugMode, m_PARAMdisplayCollector,
+   * m_collector,
+   *
+   ** in-module-function-calls:
+   * importCollectorCell(m_aktpassNumber, "", CollectorTFInfo::m_idAlive, acceptedRejectedFilters, mainHit->getCollectorID(), friendHit->getCollectorID())
+   * SegFinderHighOccupancy(currentPass, currentPass->threeHitFilterBox)
+   */
+
   B2DEBUG(10, "segFinder: for this pass: activatedNbFinderTests: " << currentPass->activatedSegFinderTests << ", d3D: " << currentPass->distance3D.first << ", dXY: " << currentPass->distanceXY.first << ", dZ: " << currentPass->distanceZ.first << ", normD3D: " << currentPass->normedDistance3D.first << ", slRZ: " << currentPass->slopeRZ.first << endl << ", activatedHighOccupancySegFinderTests: " << currentPass->activatedHighOccupancySegFinderTests << ", a3Dhioc: " << currentPass->anglesHighOccupancy3D.first << ", aXYhioc: " << currentPass->anglesHighOccupancyXY.first << ", aRZhioc: " << currentPass->anglesHighOccupancyRZ.first << ", d2IPhioc: " << currentPass->distanceHighOccupancy2IP.first << ", dSlRZhioc: " << currentPass->deltaSlopeHighOccupancyRZ.first << ", pThioc: " << currentPass->pTHighOccupancy.first << ", hFithioc: " << currentPass->helixParameterHighOccupancyFit.first)
 
   unsigned int currentFriendID = 0;
@@ -4352,10 +4533,10 @@ int VXDTFModule::segFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(10, " dist3d: segment approved! SectorCombi: " << mainSecID << "/" << friendSecID << ", minCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::distance3D).first << ", calcValue: " << currentPass->twoHitFilterBox.calcDist3D() << ", maxCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::distance3D).second)
-            acceptedRejectedFilters.push_back(make_pair(FilterID::distance3D, true));
+            acceptedRejectedFilters.push_back({FilterID::distance3D, true});
           } else {
             B2DEBUG(10, " dist3d: segment discarded! SectorCombi: " << mainSecID << "/" << friendSecID << ", minCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::distance3D).first << ", calcValue: " << currentPass->twoHitFilterBox.calcDist3D() << ", maxCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::distance3D).second)
-            acceptedRejectedFilters.push_back(make_pair(FilterID::distance3D, false));
+            acceptedRejectedFilters.push_back({FilterID::distance3D, false});
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->twoHitFilterBox.getCutoffs(FilterID::distance3D);
               B2WARNING("dist3D - SectorCombi: " << mainSecID << "/" << friendSecID << ", minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->twoHitFilterBox.calcDist3D() << ", maxCutoff: " << cutoffs.second)
@@ -4368,10 +4549,10 @@ int VXDTFModule::segFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(10, " distxy: segment approved! SectorCombi: " << mainSecID << "/" << friendSecID << ", minCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::distanceXY).first << ", calcValue: " << currentPass->twoHitFilterBox.calcDistXY() << ", maxCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::distanceXY).second)
-            acceptedRejectedFilters.push_back(make_pair(FilterID::distanceXY, true));
+            acceptedRejectedFilters.push_back({FilterID::distanceXY, true});
           } else {
             B2DEBUG(10, " distxy: segment discarded! SectorCombi: " << mainSecID << "/" << friendSecID << ", minCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::distanceXY).first << ", calcValue: " << currentPass->twoHitFilterBox.calcDistXY() << ", maxCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::distanceXY).second)
-            acceptedRejectedFilters.push_back(make_pair(FilterID::distanceXY, false));
+            acceptedRejectedFilters.push_back({FilterID::distanceXY, false});
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->twoHitFilterBox.getCutoffs(FilterID::distanceXY);
               B2WARNING("distxy - SectorCombi: " << mainSecID << "/" << friendSecID << ", minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->twoHitFilterBox.calcDistXY() << ", maxCutoff: " << cutoffs.second)
@@ -4384,10 +4565,10 @@ int VXDTFModule::segFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " distz: segment approved! SectorCombi: " << mainSecID << "/" << friendSecID << ", minCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::distanceZ).first << ", calcValue: " << currentPass->twoHitFilterBox.calcDistZ() << ", maxCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::distanceZ).second)
-            acceptedRejectedFilters.push_back(make_pair(FilterID::distanceZ, true));
+            acceptedRejectedFilters.push_back({FilterID::distanceZ, true});
           } else {
             B2DEBUG(150, " distz: segment discarded! SectorCombi: " << mainSecID << "/" << friendSecID << ", minCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::distanceZ).first << ", calcValue: " << currentPass->twoHitFilterBox.calcDistZ() << ", maxCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::distanceZ).second)
-            acceptedRejectedFilters.push_back(make_pair(FilterID::distanceZ, false));
+            acceptedRejectedFilters.push_back({FilterID::distanceZ, false});
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->twoHitFilterBox.getCutoffs(FilterID::distanceZ);
               B2WARNING("distz - SectorCombi: " << mainSecID << "/" << friendSecID << ", minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->twoHitFilterBox.calcDistZ() << ", maxCutoff: " << cutoffs.second)
@@ -4400,10 +4581,10 @@ int VXDTFModule::segFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " normeddist3d: segment approved! SectorCombi: " << mainSecID << "/" << friendSecID << ", minCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::normedDistance3D).first << ", calcValue: " << currentPass->twoHitFilterBox.calcNormedDist3D() << ", maxCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::normedDistance3D).second)
-            acceptedRejectedFilters.push_back(make_pair(FilterID::normedDistance3D, true));
+            acceptedRejectedFilters.push_back({FilterID::normedDistance3D, true});
           } else {
             B2DEBUG(150, " normeddist3d: segment discarded! SectorCombi: " << mainSecID << "/" << friendSecID << ", minCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::normedDistance3D).first << ", calcValue: " << currentPass->twoHitFilterBox.calcNormedDist3D() << ", maxCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::normedDistance3D).second)
-            acceptedRejectedFilters.push_back(make_pair(FilterID::normedDistance3D, false));
+            acceptedRejectedFilters.push_back({FilterID::normedDistance3D, false});
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->twoHitFilterBox.getCutoffs(FilterID::normedDistance3D);
               B2WARNING("normeddist3d - SectorCombi: " << mainSecID << "/" << friendSecID << ", minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->twoHitFilterBox.calcNormedDist3D() << ", maxCutoff: " << cutoffs.second)
@@ -4416,10 +4597,10 @@ int VXDTFModule::segFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " slopeRZ: segment approved! SectorCombi: " << mainSecID << "/" << friendSecID << ", minCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::slopeRZ).first << ", calcValue: " << currentPass->twoHitFilterBox.calcSlopeRZ() << ", maxCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::slopeRZ).second)
-            acceptedRejectedFilters.push_back(make_pair(FilterID::slopeRZ, true));
+            acceptedRejectedFilters.push_back({FilterID::slopeRZ, true});
           } else {
             B2DEBUG(150, " slopeRZ: segment discarded! SectorCombi: " << mainSecID << "/" << friendSecID << ", minCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::slopeRZ).first << ", calcValue: " << currentPass->twoHitFilterBox.calcSlopeRZ() << ", maxCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::slopeRZ).second)
-            acceptedRejectedFilters.push_back(make_pair(FilterID::slopeRZ, false));
+            acceptedRejectedFilters.push_back({FilterID::slopeRZ, false});
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->twoHitFilterBox.getCutoffs(FilterID::slopeRZ);
               B2WARNING("slopeRZ - SectorCombi: " << mainSecID << "/" << friendSecID << ", minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->twoHitFilterBox.calcSlopeRZ() << ", maxCutoff: " << cutoffs.second)
@@ -4433,10 +4614,10 @@ int VXDTFModule::segFinder(PassData* currentPass)
 //           if (accepted == true) {
 //             simpleSegmentQI++;
 //             B2DEBUG(150, " alwaysTrue2Hit: segment approved! SectorCombi: " << mainSecID << "/" << friendSecID)
-//             acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysTrue2Hit, true));
+//             acceptedRejectedFilters.push_back( {FilterID::alwaysTrue2Hit, true} );
 //           } else {
 //             B2DEBUG(150, " alwaysTrue2Hit: segment discarded! SectorCombi: " << mainSecID << "/" << friendSecID)
-//             acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysTrue2Hit, false));
+//             acceptedRejectedFilters.push_back( {FilterID::alwaysTrue2Hit, false} );
 //           } // else segment not approved
 //         } else { B2DEBUG(175, " alwaysTrue2Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
 //         if (currentPass->alwaysFalse2Hit.first == true) { // min & max!
@@ -4444,10 +4625,10 @@ int VXDTFModule::segFinder(PassData* currentPass)
 //           if (accepted == true) {
 //             simpleSegmentQI++;
 //             B2DEBUG(150, " alwaysFalse2Hit: segment approved! SectorCombi: " << mainSecID << "/" << friendSecID)
-//             acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysFalse2Hit, true));
+//             acceptedRejectedFilters.push_back( {FilterID::alwaysFalse2Hit, true} );
 //           } else {
 //             B2DEBUG(150, " alwaysFalse2Hit: segment discarded! SectorCombi: " << mainSecID << "/" << friendSecID)
-//             acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysFalse2Hit, false));
+//             acceptedRejectedFilters.push_back( {FilterID::alwaysFalse2Hit, false} );
 //           } // else segment not approved
 //         } else { B2DEBUG(175, " alwaysFalse2Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
 //         if (currentPass->random2Hit.first == true) { // min & max!
@@ -4455,10 +4636,10 @@ int VXDTFModule::segFinder(PassData* currentPass)
 //           if (accepted == true) {
 //             simpleSegmentQI++;
 //             B2DEBUG(150, " random2Hit: segment approved! SectorCombi: " << mainSecID << "/" << friendSecID)
-//             acceptedRejectedFilters.push_back(make_pair(FilterID::random2Hit, true));
+//             acceptedRejectedFilters.push_back( {FilterID::random2Hit, true} );
 //           } else {
 //             B2DEBUG(150, " random2Hit: segment discarded! SectorCombi: " << mainSecID << "/" << friendSecID)
-//             acceptedRejectedFilters.push_back(make_pair(FilterID::random2Hit, false));
+//             acceptedRejectedFilters.push_back( {FilterID::random2Hit, false} );
 //           } // else segment not approved
 //         } else { B2DEBUG(175, " random2Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
 
@@ -4559,10 +4740,24 @@ int VXDTFModule::segFinder(PassData* currentPass)
 // changes acceptedRejectedFilters => acceptedFilters, rejectedFilters
 int VXDTFModule::importCollectorCell(int pass_index, std::string died_at, int died_id, std::vector<std::pair<int, bool>> acceptedRejectedFilters, int hit1, int hit2)
 {
+  /** REDESIGNCOMMENT IMPORTCOLLECTORCELL 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   * the whole function is just for debugging/testing/DQM
+   *
+   ** dependency of module parameters (global):
+   *
+   ** dependency of global in-module variables:
+   * m_collector
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_collector
+   *
+   ** in-module-function-calls:
+   */
 
-  std::vector<int> assigned_Hit_IDs;
-  assigned_Hit_IDs.push_back(hit1);
-  assigned_Hit_IDs.push_back(hit2);
+  std::vector<int> assigned_Hit_IDs = { hit1, hit2};
 
   std::vector<int> acceptedFilters;
   std::vector<int> rejectedFilters;
@@ -4589,6 +4784,25 @@ int VXDTFModule::importCollectorCell(int pass_index, std::string died_at, int di
 
 bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters& threeHitFilterBox)
 {
+  /** REDESIGNCOMMENT SEGFINDERHIGHOCCUPANCY 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   * does partially the same as neighborfinder.
+   * Difference is e.g. that instead of combining two neighboring cells,
+   * a cell is combined with a virtual cell which has the shared hit as outer hit and the origin as inner hit.
+   * Maybe an intelligent rewrite allows to replace this one using a more flexible neighborfinder-implementation
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMDebugMode,
+   *
+   ** dependency of global in-module variables:
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_PARAMDebugMode,
+   *
+   ** in-module-function-calls:
+   */
   int simpleSegmentQI = 0;
   vector< pair < int, bool > > acceptedRejectedFilters; // collects for each filter whether it accepted or rejected the current segment. .first is filterID as int, .second is true if accepted, else false
   bool accepted;
@@ -4598,10 +4812,10 @@ bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters&
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " anglesHighOccupancy3D: segment approved!")
-      acceptedRejectedFilters.push_back(make_pair(FilterID::anglesHighOccupancy3D, true));
+      acceptedRejectedFilters.push_back({FilterID::anglesHighOccupancy3D, true});
     } else {
       B2DEBUG(150, " anglesHighOccupancy3D: segment discarded!")
-      acceptedRejectedFilters.push_back(make_pair(FilterID::anglesHighOccupancy3D, false));
+      acceptedRejectedFilters.push_back({FilterID::anglesHighOccupancy3D, false});
       if (m_PARAMDebugMode == true) {
         pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(FilterID::anglesHighOccupancy3D);
         B2WARNING("anglesHighOccupancy3D - minCutoff: " << cutoffs.first << ", calcValue: " << threeHitFilterBox.calcAngle3D() << ", maxCutoff: " << cutoffs.second)
@@ -4614,10 +4828,10 @@ bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters&
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " anglesHighOccupancyxy: segment approved!")
-      acceptedRejectedFilters.push_back(make_pair(FilterID::anglesHighOccupancyXY, true));
+      acceptedRejectedFilters.push_back({FilterID::anglesHighOccupancyXY, true});
     } else {
       B2DEBUG(150, " anglesHighOccupancyxy: segment discarded!")
-      acceptedRejectedFilters.push_back(make_pair(FilterID::anglesHighOccupancyXY, false));
+      acceptedRejectedFilters.push_back({FilterID::anglesHighOccupancyXY, false});
       if (m_PARAMDebugMode == true) {
         pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(FilterID::anglesHighOccupancyXY);
         B2WARNING("anglesHighOccupancyxy - minCutoff: " << cutoffs.first << ", calcValue: " << threeHitFilterBox.calcAngleXY() << ", maxCutoff: " << cutoffs.second)
@@ -4630,10 +4844,10 @@ bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters&
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " anglesHighOccupancyRZ: segment approved!")
-      acceptedRejectedFilters.push_back(make_pair(FilterID::anglesHighOccupancyRZ, true));
+      acceptedRejectedFilters.push_back({FilterID::anglesHighOccupancyRZ, true});
     } else {
       B2DEBUG(150, " anglesHighOccupancyRZ: segment discarded!")
-      acceptedRejectedFilters.push_back(make_pair(FilterID::anglesHighOccupancyRZ, false));
+      acceptedRejectedFilters.push_back({FilterID::anglesHighOccupancyRZ, false});
       if (m_PARAMDebugMode == true) {
         pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(FilterID::anglesHighOccupancyRZ);
         B2WARNING("anglesHighOccupancyRZ - minCutoff: " << cutoffs.first << ", calcValue: " << threeHitFilterBox.calcAngleRZ() << ", maxCutoff: " << cutoffs.second)
@@ -4654,10 +4868,10 @@ bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters&
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " distanceHighOccupancy2IP: segment approved!")
-      acceptedRejectedFilters.push_back(make_pair(FilterID::distanceHighOccupancy2IP, true));
+      acceptedRejectedFilters.push_back({FilterID::distanceHighOccupancy2IP, true});
     } else {
       B2DEBUG(150, " distanceHighOccupancy2IP: segment discarded!")
-      acceptedRejectedFilters.push_back(make_pair(FilterID::distanceHighOccupancy2IP, false));
+      acceptedRejectedFilters.push_back({FilterID::distanceHighOccupancy2IP, false});
       if (m_PARAMDebugMode == true) {
         pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(FilterID::distanceHighOccupancy2IP);
         B2WARNING("distanceHighOccupancy2IP - minCutoff: " << cutoffs.first << ", calcValue: " << threeHitFilterBox.calcCircleDist2IP() << ", maxCutoff: " << cutoffs.second)
@@ -4670,10 +4884,10 @@ bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters&
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " deltaSlopeHighOccupancyRZ: segment approved!")
-      acceptedRejectedFilters.push_back(make_pair(FilterID::deltaSlopeHighOccupancyRZ, true));
+      acceptedRejectedFilters.push_back({FilterID::deltaSlopeHighOccupancyRZ, true});
     } else {
       B2DEBUG(150, " deltaSlopeHighOccupancyRZ: segment discarded!")
-      acceptedRejectedFilters.push_back(make_pair(FilterID::deltaSlopeHighOccupancyRZ, false));
+      acceptedRejectedFilters.push_back({FilterID::deltaSlopeHighOccupancyRZ, false});
       if (m_PARAMDebugMode == true) {
         pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(FilterID::deltaSlopeHighOccupancyRZ);
         B2WARNING("deltaSlopeHighOccupancyRZ - minCutoff: " << cutoffs.first << ", calcValue: " << threeHitFilterBox.calcDeltaSlopeRZ() << ", maxCutoff: " << cutoffs.second)
@@ -4694,10 +4908,10 @@ bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters&
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " pTHighOccupancy: segment approved!")
-      acceptedRejectedFilters.push_back(make_pair(FilterID::pTHighOccupancy, true));
+      acceptedRejectedFilters.push_back({FilterID::pTHighOccupancy, true});
     } else {
       B2DEBUG(150, " pTHighOccupancy: segment discarded!")
-      acceptedRejectedFilters.push_back(make_pair(FilterID::pTHighOccupancy, false));
+      acceptedRejectedFilters.push_back({FilterID::pTHighOccupancy, false});
       if (m_PARAMDebugMode == true) {
         pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(FilterID::pTHighOccupancy);
         B2WARNING("pTHighOccupancy - minCutoff: " << cutoffs.first << ", calcValue: " << threeHitFilterBox.calcPt() << ", maxCutoff: " << cutoffs.second)
@@ -4718,10 +4932,10 @@ bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters&
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " helixParameterHighOccupancyFit: segment approved!")
-      acceptedRejectedFilters.push_back(make_pair(FilterID::helixParameterHighOccupancyFit, true));
+      acceptedRejectedFilters.push_back({FilterID::helixParameterHighOccupancyFit, true});
     } else {
       B2DEBUG(150, " helixParameterHighOccupancyFit: segment discarded!")
-      acceptedRejectedFilters.push_back(make_pair(FilterID::helixParameterHighOccupancyFit, false));
+      acceptedRejectedFilters.push_back({FilterID::helixParameterHighOccupancyFit, false});
       if (m_PARAMDebugMode == true) {
         pair <double, double> cutoffs = threeHitFilterBox.getCutoffs(FilterID::helixParameterHighOccupancyFit);
         B2WARNING("helixParameterHighOccupancyFit - minCutoff: " << cutoffs.first << ", calcValue: " << threeHitFilterBox.calcHelixParameterFit() << ", maxCutoff: " << cutoffs.second)
@@ -4756,6 +4970,23 @@ bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters&
 /// filters neighbouring segments in given pass and returns number of discarded segments
 int VXDTFModule::neighbourFinder(PassData* currentPass)
 {
+  /** REDESIGNCOMMENT NEIGHBOURFINDER 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMDebugMode, m_PARAMdisplayCollector
+   *
+   ** dependency of global in-module variables:
+   * m_highOccupancyCase, m_collector
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_PARAMDebugMode, m_PARAMdisplayCollector, m_collector,
+   *
+   ** in-module-function-calls:
+   * NbFinderHighOccupancy(currentPass, currentPass->fourHitFilterBox)
+   */
   B2DEBUG(10, "nbFinder: for this pass: activatedNbFinderTests: " << currentPass->activatedNbFinderTests << ", a3D: " << currentPass->angles3D.first << ", aXY: " << currentPass->anglesXY.first << ", aRZ: " << currentPass->anglesRZ.first << ", d2IP: " << currentPass->distance2IP.first << ", dSlRZ: " << currentPass->deltaSlopeRZ.first << ", pT: " << currentPass->pT.first << ", hFit: " << currentPass->helixParameterFit.first << ", SOverZ: " << currentPass->deltaSOverZ.first << ", hFit: " << currentPass->deltaSlopeZOverS.first << endl << "activatedHighOccupancyNbFinderTests: " << currentPass->activatedHighOccupancyNbFinderTests << ", dD2IPhioc: " << currentPass->deltaDistanceHighOccupancy2IP.first << ", dPthioc: " << currentPass->deltaPtHighOccupancy.first)
 
   vector< pair < int, bool > > acceptedRejectedFilters; // collects for each filter whether it accepted or rejected the current segment. .first is filterID as int, .second is true if accepted, else false
@@ -4802,10 +5033,10 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " angles3D: segment approved!")
-            acceptedRejectedFilters.push_back(make_pair(FilterID::angles3D, true));
+            acceptedRejectedFilters.push_back({FilterID::angles3D, true});
           } else {
             B2DEBUG(150, " angles3D: segment discarded!")
-            acceptedRejectedFilters.push_back(make_pair(FilterID::angles3D, false));
+            acceptedRejectedFilters.push_back({FilterID::angles3D, false});
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::angles3D);
               B2WARNING("angles3D - SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID) << ", minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcAngle3D() << ", maxCutoff: " << cutoffs.second)
@@ -4818,10 +5049,10 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " anglesXY: segment approved!")
-            acceptedRejectedFilters.push_back(make_pair(FilterID::anglesXY, true));
+            acceptedRejectedFilters.push_back({FilterID::anglesXY, true});
           } else {
             B2DEBUG(150, " anglesXY: segment discarded!")
-            acceptedRejectedFilters.push_back(make_pair(FilterID::anglesXY, false));
+            acceptedRejectedFilters.push_back({FilterID::anglesXY, false});
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::anglesXY);
               B2WARNING("anglesXY - SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID) << ", minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcAngleXY() << ", maxCutoff: " << cutoffs.second)
@@ -4834,10 +5065,10 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " anglesRZ: segment approved!")
-            acceptedRejectedFilters.push_back(make_pair(FilterID::anglesRZ, true));
+            acceptedRejectedFilters.push_back({FilterID::anglesRZ, true});
           } else {
             B2DEBUG(150, " anglesRZ: segment discarded!")
-            acceptedRejectedFilters.push_back(make_pair(FilterID::anglesRZ, false));
+            acceptedRejectedFilters.push_back({FilterID::anglesRZ, false});
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::anglesRZ);
               B2WARNING("anglesRZ - SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID) << ", minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcAngleRZ() << ", maxCutoff: " << cutoffs.second)
@@ -4858,10 +5089,10 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " distance2IP: segment approved!")
-            acceptedRejectedFilters.push_back(make_pair(FilterID::distance2IP, true));
+            acceptedRejectedFilters.push_back({FilterID::distance2IP, true});
           } else {
             B2DEBUG(150, " distance2IP: segment discarded!")
-            acceptedRejectedFilters.push_back(make_pair(FilterID::distance2IP, false));
+            acceptedRejectedFilters.push_back({FilterID::distance2IP, false});
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::distance2IP);
               B2WARNING("distance2IP - SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID) << ", minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcCircleDist2IP() << ", maxCutoff: " << cutoffs.second)
@@ -4874,10 +5105,10 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " deltaSlopeRZ: segment approved!")
-            acceptedRejectedFilters.push_back(make_pair(FilterID::deltaSlopeRZ, true));
+            acceptedRejectedFilters.push_back({FilterID::deltaSlopeRZ, true});
           } else {
             B2DEBUG(150, " deltaSlopeRZ: segment discarded!")
-            acceptedRejectedFilters.push_back(make_pair(FilterID::deltaSlopeRZ, false));
+            acceptedRejectedFilters.push_back({FilterID::deltaSlopeRZ, false});
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::deltaSlopeRZ);
               B2WARNING("deltaSlopeRZ - SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID) << ", minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcDeltaSlopeRZ() << ", maxCutoff: " << cutoffs.second)
@@ -4898,10 +5129,10 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " pT: segment approved!")
-            acceptedRejectedFilters.push_back(make_pair(FilterID::pT, true));
+            acceptedRejectedFilters.push_back({FilterID::pT, true});
           } else {
             B2DEBUG(150, " pT: segment discarded!")
-            acceptedRejectedFilters.push_back(make_pair(FilterID::pT, false));
+            acceptedRejectedFilters.push_back({FilterID::pT, false});
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::pT);
               B2WARNING("pT - SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID) << ", minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcPt() << ", maxCutoff: " << cutoffs.second)
@@ -4923,10 +5154,10 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " helixParameterFit: segment approved!")
-            acceptedRejectedFilters.push_back(make_pair(FilterID::helixParameterFit, true));
+            acceptedRejectedFilters.push_back({FilterID::helixParameterFit, true});
           } else {
             B2DEBUG(150, " helixParameterFit: segment discarded!")
-            acceptedRejectedFilters.push_back(make_pair(FilterID::helixParameterFit, false));
+            acceptedRejectedFilters.push_back({FilterID::helixParameterFit, false});
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::helixParameterFit);
               B2WARNING("helixParameterFit - SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID) << ", minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcHelixParameterFit() << ", maxCutoff: " << cutoffs.second)
@@ -4939,10 +5170,10 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " deltaSOverZ: segment approved!")
-            acceptedRejectedFilters.push_back(make_pair(FilterID::deltaSOverZ, true));
+            acceptedRejectedFilters.push_back({FilterID::deltaSOverZ, true});
           } else {
             B2DEBUG(150, " deltaSOverZ: segment discarded!")
-            acceptedRejectedFilters.push_back(make_pair(FilterID::deltaSOverZ, false));
+            acceptedRejectedFilters.push_back({FilterID::deltaSOverZ, false});
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::deltaSOverZ);
               B2WARNING("deltaSOverZ - SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID) << ", minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcDeltaSOverZ() << ", maxCutoff: " << cutoffs.second)
@@ -4955,10 +5186,10 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           if (accepted == true) {
             simpleSegmentQI++;
             B2DEBUG(150, " deltaSlopeZOverS: segment approved!")
-            acceptedRejectedFilters.push_back(make_pair(FilterID::deltaSlopeZOverS, true));
+            acceptedRejectedFilters.push_back({FilterID::deltaSlopeZOverS, true});
           } else {
             B2DEBUG(150, " deltaSlopeZOverS: segment discarded!")
-            acceptedRejectedFilters.push_back(make_pair(FilterID::deltaSlopeZOverS, false));
+            acceptedRejectedFilters.push_back({FilterID::deltaSlopeZOverS, false});
             if (m_PARAMDebugMode == true) {
               pair <double, double> cutoffs = currentPass->threeHitFilterBox.getCutoffs(FilterID::deltaSlopeZOverS);
               B2WARNING("deltaSlopeZOverS - SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID) << ", minCutoff: " << cutoffs.first << ", calcValue: " << currentPass->threeHitFilterBox.calcDeltaSlopeZOverS() << ", maxCutoff: " << cutoffs.second)
@@ -4972,10 +5203,10 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
 //           if (accepted == true) {
 //             simpleSegmentQI++;
 //             B2DEBUG(150, " alwaysTrue3Hit: segment approved! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
-//             acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysTrue3Hit, true));
+//             acceptedRejectedFilters.push_back( {FilterID::alwaysTrue3Hit, true} );
 //           } else {
 //             B2DEBUG(150, " alwaysTrue3Hit: segment discarded! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
-//             acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysTrue3Hit, false));
+//             acceptedRejectedFilters.push_back( {FilterID::alwaysTrue3Hit, false} );
 //           } // else segment not approved
 //         } else { B2DEBUG(175, " alwaysTrue3Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
 //         if (currentPass->alwaysFalse3Hit.first == true) { // min & max!
@@ -4983,10 +5214,10 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
 //           if (accepted == true) {
 //             simpleSegmentQI++;
 //             B2DEBUG(150, " alwaysFalse3Hit: segment approved! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
-//             acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysFalse3Hit, true));
+//             acceptedRejectedFilters.push_back( {FilterID::alwaysFalse3Hit, true} );
 //           } else {
 //             B2DEBUG(150, " alwaysFalse3Hit: segment discarded! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
-//             acceptedRejectedFilters.push_back(make_pair(FilterID::alwaysFalse3Hit, false));
+//             acceptedRejectedFilters.push_back( {FilterID::alwaysFalse3Hit, false} );
 //           } // else segment not approved
 //         } else { B2DEBUG(175, " alwaysFalse3Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
 //         if (currentPass->random3Hit.first == true) { // min & max!
@@ -4994,10 +5225,10 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
 //           if (accepted == true) {
 //             simpleSegmentQI++;
 //             B2DEBUG(150, " random3Hit: segment approved! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
-//             acceptedRejectedFilters.push_back(make_pair(FilterID::random3Hit, true));
+//             acceptedRejectedFilters.push_back( {FilterID::random3Hit, true} );
 //           } else {
 //             B2DEBUG(150, " random3Hit: segment discarded! SectorCombi: " << mainSecID << "/" << FullSecID(currentFriendID))
-//             acceptedRejectedFilters.push_back(make_pair(FilterID::random3Hit, false));
+//             acceptedRejectedFilters.push_back( {FilterID::random3Hit, false} );
 //           } // else segment not approved
 //         } else { B2DEBUG(175, " random3Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
 
@@ -5108,6 +5339,21 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
 
 bool VXDTFModule::NbFinderHighOccupancy(PassData* currentPass, TcFourHitFilters& fourHitFilterBox)
 {
+  /** REDESIGNCOMMENT NBFINDERHIGHOCCUPANCY 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMDebugMode,
+   *
+   ** dependency of global in-module variables:
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_PARAMDebugMode,
+   *
+   ** in-module-function-calls:
+   */
   int simpleSegmentQI = 0;
   vector< pair < int, bool > > acceptedRejectedFilters; // collects for each filter whether it accepted or rejected the current segment. .first is filterID as int, .second is true if accepted, else false
   bool accepted;
@@ -5126,10 +5372,10 @@ bool VXDTFModule::NbFinderHighOccupancy(PassData* currentPass, TcFourHitFilters&
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " deltaDistanceHighOccupancy2IP: segment approved!")
-      acceptedRejectedFilters.push_back(make_pair(FilterID::deltaDistanceHighOccupancy2IP, true));
+      acceptedRejectedFilters.push_back({FilterID::deltaDistanceHighOccupancy2IP, true});
     } else {
       B2DEBUG(150, " deltaDistanceHighOccupancy2IP: segment discarded!")
-      acceptedRejectedFilters.push_back(make_pair(FilterID::deltaDistanceHighOccupancy2IP, false));
+      acceptedRejectedFilters.push_back({FilterID::deltaDistanceHighOccupancy2IP, false});
       if (m_PARAMDebugMode == true) {
         pair <double, double> cutoffs = fourHitFilterBox.getCutoffs(FilterID::deltaDistanceHighOccupancy2IP);
         B2WARNING("deltaDistanceHighOccupancy2IP - minCutoff: " << cutoffs.first << ", calcValue: " << fourHitFilterBox.deltaDistCircleCenter() << ", maxCutoff: " << cutoffs.second)
@@ -5151,10 +5397,10 @@ bool VXDTFModule::NbFinderHighOccupancy(PassData* currentPass, TcFourHitFilters&
     if (accepted == true) {
       simpleSegmentQI++;
       B2DEBUG(150, " deltaPtHighOccupancy: segment approved!")
-      acceptedRejectedFilters.push_back(make_pair(FilterID::deltapTHighOccupancy, true));
+      acceptedRejectedFilters.push_back({FilterID::deltapTHighOccupancy, true});
     } else {
       B2DEBUG(150, " deltaPtHighOccupancy: segment discarded!")
-      acceptedRejectedFilters.push_back(make_pair(FilterID::deltapTHighOccupancy, false));
+      acceptedRejectedFilters.push_back({FilterID::deltapTHighOccupancy, false});
       if (m_PARAMDebugMode == true) {
         pair <double, double> cutoffs = fourHitFilterBox.getCutoffs(FilterID::deltapTHighOccupancy);
         B2WARNING("deltaPtHighOccupancy - minCutoff: " << cutoffs.first << ", calcValue: " << fourHitFilterBox.deltapT() << ", maxCutoff: " << cutoffs.second)
@@ -5183,6 +5429,22 @@ bool VXDTFModule::NbFinderHighOccupancy(PassData* currentPass, TcFourHitFilters&
 /// uses attribute "state" to find rows of compatible neighbours. State indicates length of row. This allows fast Track candidate collection
 int VXDTFModule::cellularAutomaton(PassData* currentPass)
 {
+  /** REDESIGNCOMMENT CELLULARAUTOMATON 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMdisplayCollector,
+   *
+   ** dependency of global in-module variables:
+   * m_collector, m_TESTERbrokenCaRound
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_PARAMdisplayCollector, m_collector, m_TESTERbrokenCaRound,
+   *
+   ** in-module-function-calls:
+   */
   int activeCells = 1; // is set 1 because of following while loop.
   int deadCells = 0;
   int caRound = 0;
@@ -5292,6 +5554,25 @@ int VXDTFModule::cellularAutomaton(PassData* currentPass)
 /// uses attribute "state" to find rows of compatible neighbours. State indicates length of row. This allows fast Track candidate collection
 void VXDTFModule::tcCollector(PassData* currentPass)
 {
+  /** REDESIGNCOMMENT TCCOLLECTOR 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMdisplayCollector,
+   *
+   ** dependency of global in-module variables:
+   * m_collector, m_aktpassNumber, m_allTCsOfEvent,
+   * m_TESTERcountTotalTCsAfterTCC
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_PARAMdisplayCollector, m_collector, m_aktpassNumber,
+   * m_TESTERcountTotalTCsAfterTCC
+   *
+   ** in-module-function-calls:
+   * findTCs(currentPass->tcVector, pTC, currentPass->highestAllowedLayer)
+   */
   short int mayorLayerID/*, nSegmentsInSector*/;
   int findTCsCounter = 0;
   int tccMinState = currentPass->minState;
@@ -5364,6 +5645,29 @@ void VXDTFModule::tcCollector(PassData* currentPass)
 /** ***** Track Candidate Filter (tcFilter) ***** **/
 int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
 {
+  /** REDESIGNCOMMENT TCFILTER 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMdisplayCollector, m_PARAMDebugMode,
+   *
+   ** dependency of global in-module variables:
+   * m_collector, m_TESTERtriggeredZigZagXY, m_TESTERtriggeredCircleFit,
+   * m_TESTERtriggeredDpT, m_TESTERtriggeredDD2IP, m_TESTERtriggeredZigZagRZ,
+   * m_TESTERapprovedByTCC, m_TESTERcountTotalTCsAfterTCCFilter
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_PARAMdisplayCollector, m_collector, m_TESTERtriggeredZigZagXY,
+   * m_TESTERtriggeredCircleFit, m_TESTERtriggeredDpT, m_PARAMDebugMode,
+   * m_TESTERtriggeredDD2IP, m_TESTERtriggeredZigZagRZ, m_TESTERapprovedByTCC,
+   * m_TESTERcountTotalTCsAfterTCCFilter
+   *
+   ** in-module-function-calls:
+   * doTheCircleFit(currentPass, (*currentTC), nCurrentHits, tcCtr)
+   */
+
   TCsOfEvent::iterator currentTC;
   TVector3* hitA, *hitB, *hitC, *hitD;
   TCsOfEvent tempTCList = currentPass->tcVector;
@@ -5579,7 +5883,7 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
 
       }
 
-      // The following tests are debug-tests WARNING uncomment only if needed!:
+      /// The following tests are debug-tests WARNING uncomment only if needed!:
 //       if (currentPass->alwaysTrue4Hit.first == true) { // min & max!
 //         accepted = currentPass->fourHitFilterBox.checkAlwaysTrue4Hit(FilterID::alwaysTrue4Hit);
 //         if (accepted == true) {
@@ -5727,6 +6031,21 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
 
 void VXDTFModule::calcInitialValues4TCs(PassData* currentPass)
 {
+  /** REDESIGNCOMMENT CALCINITIALVALUES4TCS 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMpdGCode, m_PARAMartificialMomentum,
+   *
+   ** dependency of global in-module variables:
+   * m_calcSeedType, m_KFBackwardFilter, m_chargeSignFactor,
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   *
+   ** in-module-function-calls:
+   */
   int pdgCode = 0;
   pair<TVector3, int> seedValue; // first is momentum vector, second is signCurvature
   pair<double, TVector3> returnValues; // first is chi2, second is momentum vector
@@ -5749,9 +6068,6 @@ void VXDTFModule::calcInitialValues4TCs(PassData* currentPass)
       B2WARNING("calcInitialValues4TCs: unknown seedCalculating type set! Using helixFit instead...")
     }
 
-
-
-
     if (m_KFBackwardFilter == true) {
       aTC->setInitialValue((*currentHits)[0]->hitPosition, seedValue.first, pdgCode); // position, momentum, pdgCode
       B2DEBUG(5, " backward: TC has got seedRadius/momentum/pT of " << (*currentHits)[0]->hitPosition.Perp() << "/" << seedValue.first.Mag() << "/" << seedValue.first.Perp() << "GeV and estimated pdgCode " << pdgCode);
@@ -5760,7 +6076,6 @@ void VXDTFModule::calcInitialValues4TCs(PassData* currentPass)
       B2DEBUG(5, "forward: TC has got seedRadius/momentum/pT of " << (*currentHits).at(currentHits->size() - 1)->hitPosition.Perp() << "/" << seedValue.first.Mag() << "/" << seedValue.first.Perp() << "GeV and estimated pdgCode " << pdgCode);
     }
 
-
   }
 }
 
@@ -5768,6 +6083,21 @@ void VXDTFModule::calcInitialValues4TCs(PassData* currentPass)
 
 void VXDTFModule::calcQIbyLength(TCsOfEvent& tcVector, PassSetupVector& passSetups)
 {
+  /** REDESIGNCOMMENT CALCQIBYLENGTH 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMsmearMean, m_PARAMsmearSigma,
+   *
+   ** dependency of global in-module variables:
+   * m_nSectorSetups,
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   *
+   ** in-module-function-calls:
+   */
   /// setting quality indices and smear result if chosen
   double firstValue = 0.0, rngValue = 0.0, maxLength = 0.0, numTotalLayers;
 
@@ -5804,6 +6134,21 @@ void VXDTFModule::calcQIbyLength(TCsOfEvent& tcVector, PassSetupVector& passSetu
 
 void VXDTFModule::calcQIbyStraightLine(TCsOfEvent& tcVector)
 {
+  /** REDESIGNCOMMENT CALCQIBYSTRAIGHTLINE 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMartificialMomentum, m_PARAMpdGCode,
+   *
+   ** dependency of global in-module variables:
+   * m_KFBackwardFilter,
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   *
+   ** in-module-function-calls:
+   */
   TrackletFilters fitterBox;
   std::pair<double, TVector3> lineFitResult = { 0., TVector3()};
 
@@ -5840,6 +6185,26 @@ void VXDTFModule::calcQIbyStraightLine(TCsOfEvent& tcVector)
 
 void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector)
 {
+  /** REDESIGNCOMMENT CALCQIBYKALMAN 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMdisplayCollector, m_PARAMqiSmear, m_PARAMstoreBrokenQI,
+   *
+   ** dependency of global in-module variables:
+   * m_eventCounter, m_KFBackwardFilter, m_collector,
+   * m_littleHelperBox, m_TESTERgoodFitsCtr, m_TESTERbadFitsCtr,
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_eventCounter, m_PARAMdisplayCollector, m_collector,
+   * m_TESTERgoodFitsCtr, m_TESTERbadFitsCtr,
+   *
+   ** in-module-function-calls:
+   * writeToRootFile(pVal, chi2, currentTC->getEstRadius(), ndf)
+   * writeToRootFile(0, 0, currentTC->getEstRadius(), 0)
+   */
   /// produce GFTrackCands for each currently living TC and calculate real kalman-QI's
   genfit::KalmanFitter kalmanFilter;
 
@@ -5964,6 +6329,21 @@ void VXDTFModule::calcQIbyKalman(TCsOfEvent& tcVector)
 
 genfit::TrackCand VXDTFModule::generateGFTrackCand(VXDTFTrackCandidate* currentTC)
 {
+  /** REDESIGNCOMMENT GENERATEGFTRACKCAND 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   *
+   ** dependency of global in-module variables:
+   * m_eventCounter,
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_eventCounter,
+   *
+   ** in-module-function-calls:
+   */
   genfit::TrackCand newGFTrackCand;
 
   B2DEBUG(50, "VXDTFModule::generateGFTrackCand, after newGFTrackCand")
@@ -6053,6 +6433,24 @@ genfit::TrackCand VXDTFModule::generateGFTrackCand(VXDTFTrackCandidate* currentT
 
 int VXDTFModule::cleanOverlappingSet(TCsOfEvent& tcVector)
 {
+  /** REDESIGNCOMMENT CLEANOVERLAPPINGSET 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMdisplayCollector,
+   *
+   ** dependency of global in-module variables:
+   * m_collector, m_TESTERfilteredOverlapsQI, m_TESTERfilteredOverlapsQICtr,
+   * m_TESTERNotFilteredOverlapsQI, m_eventCounter
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_PARAMdisplayCollector, m_collector, m_TESTERfilteredOverlapsQI,
+   * m_TESTERfilteredOverlapsQICtr, m_TESTERNotFilteredOverlapsQI, m_eventCounter,
+   *
+   ** in-module-function-calls:
+   */
   int nIHits = 0, nJHits = 0, nMergedHits = 0, killedTCs = 0;
   list<int> ihitIDs, jhitIDs, mergedHitIDs;
 
@@ -6125,6 +6523,20 @@ int VXDTFModule::cleanOverlappingSet(TCsOfEvent& tcVector)
 
 string VXDTFModule::EventInfoPackage::Print()
 {
+  /** REDESIGNCOMMENT EVENTINFOPACKAGE::PRINT 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   * only relevant for DQM/debugging/testing
+   *
+   ** dependency of module parameters (global):
+   *
+   ** dependency of global in-module variables:
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   *
+   ** in-module-function-calls:
+   */
   stringstream output;
   output << " timeConsumption of event " << evtNumber << " in microseconds: " << endl;
 
@@ -6154,6 +6566,34 @@ string VXDTFModule::EventInfoPackage::Print()
 
 bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
 {
+  /** REDESIGNCOMMENT BASELINETF 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   * should become its own module
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMnameOfInstance, m_PARAMdisplayCollector,
+   *
+   ** dependency of global in-module variables:
+   * m_eventCounter, m_TESTERrejectedBrokenHitsTrack, m_TESTERtriggeredZigZagXY,
+   * m_collector, m_TESTERtriggeredCircleFit, m_calcQiType,
+   * m_allTCsOfEvent, m_TESTERacceptedBrokenHitsTrack
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_PARAMnameOfInstance, m_eventCounter, m_TESTERrejectedBrokenHitsTrack,
+   * m_TESTERtriggeredZigZagXY, m_PARAMdisplayCollector, m_TESTERtriggeredCircleFit,
+   * m_TESTERacceptedBrokenHitsTrack
+   *
+   ** in-module-function-calls:
+   * findSensor4Cluster(activatedSensors, aClusterInfo)
+   * find2DSVDHits(activatedSensors, clusterHitList)
+   * deliverVXDTFHitWrappedSVDHit(aClusterCombi.uCluster, aClusterCombi.vCluster)
+   * dealWithStrangeSensors(activatedSensors, brokenSensors)
+   * doTheCircleFit(passInfo, newTC, nHits, 0, 0)
+   * calcQIbyStraightLine(singleTC)
+   */
+
   /** overall principle:
    * generate hits (including 1D-hits)
    * sort them to be able to collect TCs (different sorting technique for different cases)
@@ -6304,7 +6744,6 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
     B2DEBUG(3, " " << secNameOutput.str() << " and " <<  nHits << " hits");
   }
 
-
   if (nHits < 3) {
     delete newTC;
     if (nBrokenSensors != 0) { m_TESTERrejectedBrokenHitsTrack++; }
@@ -6424,6 +6863,20 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
 // in the end a map containing illuminated sensors - and each cluster inhabiting them - exists.
 void VXDTFModule::findSensors4Clusters(ActiveSensorsOfEvent& activatedSensors, vector<ClusterInfo>& clusters)
 {
+  /** REDESIGNCOMMENT FINDSENSORS4CLUSTERS 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   *
+   ** dependency of global in-module variables:
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   *
+   ** in-module-function-calls:
+   * findSensor4Cluster(activatedSensors, cluster)
+   */
   for (ClusterInfo & cluster : clusters) {
     if (cluster.isSVD() == false) { continue; }
     findSensor4Cluster(activatedSensors, cluster);
@@ -6435,6 +6888,19 @@ void VXDTFModule::findSensors4Clusters(ActiveSensorsOfEvent& activatedSensors, v
 // store a cluster (as a clusterPtr) in a map(uniID, sensorStruct), where sensorStruct contains 2 vectors (uClusters and vClusters).
 void VXDTFModule::findSensor4Cluster(ActiveSensorsOfEvent& activatedSensors, ClusterInfo& aClusterInfo)
 {
+  /** REDESIGNCOMMENT FINDSENSORS4CLUSTER 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   *
+   ** dependency of global in-module variables:
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   *
+   ** in-module-function-calls:
+   */
   ActiveSensorsOfEvent::iterator sensorIter;
   typedef pair<int, SensorStruct > mapEntry;
 
@@ -6457,6 +6923,21 @@ void VXDTFModule::findSensor4Cluster(ActiveSensorsOfEvent& activatedSensors, Clu
 
 VXDTFHit VXDTFModule::deliverVXDTFHitWrappedSVDHit(ClusterInfo* uClusterInfo, ClusterInfo* vClusterInfo)
 {
+  /** REDESIGNCOMMENT DELIVERVXDTFHITWRAPPEDSVDHIT 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   * here are some hardcoded values. a general way to store such stuff is extremely apprechiated. Ideas?
+   * That function is only needed by the baseLineTF
+   *
+   ** dependency of module parameters (global):
+   *
+   ** dependency of global in-module variables:
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   *
+   ** in-module-function-calls:
+   */
   float timeStampU = 0, timeStampV = 0;
   TVector3 hitLocal;
   TVector3 sigmaVec; // stores globalized vector for sigma values
@@ -6514,10 +6995,29 @@ VXDTFHit VXDTFModule::deliverVXDTFHitWrappedSVDHit(ClusterInfo* uClusterInfo, Cl
 // now we check for each strange sensor whether it makes sense to generate 1D-VXDTFHits or not. we therefore filter by threshold to keep us from stumbling over messy sensors
 std::vector<VXDTFHit> VXDTFModule::dealWithStrangeSensors(ActiveSensorsOfEvent& activatedSensors, BrokenSensorsOfEvent& strangeSensors)
 {
+  /** REDESIGNCOMMENT DEALWITHSTRANGESENSORS 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   * That function is only needed by the baseLineTF
+   *
+   ** dependency of module parameters (global):
+   *
+   ** dependency of global in-module variables:
+   * m_TESTERovercrowdedStrangeSensors,
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_TESTERovercrowdedStrangeSensors,
+   *
+   ** in-module-function-calls:
+   * deliverVXDTFHitWrappedSVDHit(aClusterInfo, NULL)
+   * deliverVXDTFHitWrappedSVDHit(NULL, aClusterInfo)
+   */
   ActiveSensorsOfEvent::iterator itCurrentSensor;
   typedef pair<int, const SVDCluster*> ClusterBundle;
   vector<VXDTFHit> singleSidedHits;
-  int nClusters = 0, threshold = 2;
+  int nClusters = 0,
+      threshold = 2; // if there are 1 or 0 clusters at the sensor (the latter should not occur at all), there can not be formed any u + v - combination of clusters
   singleSidedHits.reserve(strangeSensors.size()*threshold);
   bool takeUside = false;
 
@@ -6552,6 +7052,27 @@ std::vector<VXDTFHit> VXDTFModule::dealWithStrangeSensors(ActiveSensorsOfEvent& 
 // iterate through map of activated sensors & combine each possible combination of clusters. Store them in a vector of structs, where each struct carries an u & a v cluster
 VXDTFModule::BrokenSensorsOfEvent VXDTFModule::find2DSVDHits(ActiveSensorsOfEvent& activatedSensors, std::vector<ClusterHit>& clusterHitList)
 {
+  /** REDESIGNCOMMENT FIND2DSVDHITS 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   * is used by the baseLineTF and the normal one!
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMnameOfInstance,
+   *
+   ** dependency of global in-module variables:
+   * m_TESTERbadSectorRangeCounterForClusters, m_eventCounter, m_TESTERclustersPersSectorNotMatching,
+   * m_TESTERSVDOccupancy, m_PARAMhighOccupancyThreshold, m_highOccupancyCase,
+   * m_TESTERhighOccupancyCtr,
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_TESTERbadSectorRangeCounterForClusters, m_eventCounter, m_TESTERclustersPersSectorNotMatching,
+   * m_TESTERSVDOccupancy, m_PARAMhighOccupancyThreshold, m_highOccupancyCase,
+   * m_TESTERhighOccupancyCtr, m_PARAMnameOfInstance,
+   *
+   ** in-module-function-calls:
+   */
   typedef pair<unsigned int, SensorStruct > mapEntry;
   BrokenSensorsOfEvent strangeSensors;
   int occupancy = m_TESTERSVDOccupancy.size(), numHits = 0;
@@ -6614,6 +7135,24 @@ VXDTFModule::BrokenSensorsOfEvent VXDTFModule::find2DSVDHits(ActiveSensorsOfEven
 
 bool VXDTFModule::doTheCircleFit(PassData* thisPass, VXDTFTrackCandidate* aTc, int nHits, int tcCtr, int addDegreesOfFreedom)
 {
+  /** REDESIGNCOMMENT TERMINATE 1:
+   * * short:
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMdisplayCollector , m_PARAMqiSmear
+   *
+   ** dependency of global in-module variables:
+   * m_TESTERtriggeredCircleFit, m_collector, m_calcQiType,
+   * m_littleHelperBox,
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_TESTERtriggeredCircleFit, m_PARAMdisplayCollector, m_collector,
+   *
+   ** in-module-function-calls:
+   *  writeToRootFile(probability, chi2, estimatedRadius, nHits - 3 + addDegreesOfFreedom)
+   */
   boostNsec duration;
   boostClock::time_point timer = boostClock::now();
   double closestApproachPhi, closestApproachR, estimatedRadius, estimatedCurvature;

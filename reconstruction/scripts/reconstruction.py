@@ -2,6 +2,31 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from ROOT import Belle2
+
+
+class PruneGenfitTracks(Module):
+    """
+    Removes hits from all genfit::Track objects.
+    This needs to be done after the dE/dx PID.
+    """
+
+    # See genfit::Track::prune() doc, empty string for no pruning
+    m_flags = 'FL'
+
+    def __init__(self):
+        # need to call super() _if_ we reimplement the constructor
+        super(PruneGenfitTracks, self).__init__()
+
+        self.set_property_flags(ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
+
+    def event(self):
+        """
+        reimplement Module::event()
+        """
+        tracks = Belle2.PyStoreArray("GF2Tracks")
+        for t in tracks:
+            t.prune(self.m_flags)
 
 
 def add_posttracking_reconstruction(path, components=None):
@@ -135,6 +160,9 @@ def add_reconstruction(path, components=None):
         dEdxPID.param('useCDC', use_cdc)
         path.add_module(dEdxPID)
 
+        # prune genfit tracks
+        path.add_module(PruneGenfitTracks())
+
     # add further reconstruction modules
     add_posttracking_reconstruction(path, components)
 
@@ -170,6 +198,9 @@ def add_mc_reconstruction(path, components=None):
         if components is not None and 'CDC' not in components:
             dEdxPID.param('useCDC', False)
         path.add_module(dEdxPID)
+
+        # prune genfit tracks
+        path.add_module(PruneGenfitTracks())
 
     # add further reconstruction modules
     add_posttracking_reconstruction(path, components)

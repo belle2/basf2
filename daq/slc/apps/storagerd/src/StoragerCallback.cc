@@ -23,14 +23,15 @@ StoragerCallback::~StoragerCallback() throw()
 void StoragerCallback::init() throw()
 {
   LogFile::open("storage");
+  ///*
   ConfigFile config("storage");
   std::string runtype = config.get("runtype");
   NSMMessage msg(getNode(), NSMCommand::DBGET, runtype);
-  msg.setNParams(1);
-  msg.setParam(0, NSMCommand::DBGET.getId());
-  msg.setData(runtype);
+  //msg.setNParams(1);
+  //msg.setParam(0, NSMCommand::DBGET.getId());
+  //msg.setData(runtype);
   preload(msg);
-
+  //*/
   m_data = NSMData("STORAGE_DATA", "storage_info_all",
                    storage_info_all_revision);
   m_data.allocate(getCommunicator());
@@ -49,7 +50,7 @@ bool StoragerCallback::load() throw()
   if (m_thread.is_alive()) m_thread.cancel();
 
   ConfigObject& obj(getConfig().getObject());
-  const size_t nproc = obj.getInt("nworkers");
+  const size_t nproc = obj.getInt("record_nproc");
   m_con = std::vector<ProcessController>();
   for (size_t i = 0; i < 3 + nproc; i++) {
     m_con.push_back(ProcessController(this));
@@ -73,8 +74,8 @@ bool StoragerCallback::load() throw()
   m_con[0].setExecutable("storagein");
   m_con[0].addArgument(ibuf_name);
   m_con[0].addArgument(ibuf_size);
-  m_con[0].addArgument(obj.getText("storagein_host"));
-  m_con[0].addArgument(obj.getValueText("storagein_port"));
+  m_con[0].addArgument(obj.getText("in_host"));
+  m_con[0].addArgument(obj.getValueText("in_port"));
   m_con[0].addArgument("storagein");
   m_con[0].addArgument("1");
   if (!m_con[0].load(20)) {
@@ -89,7 +90,7 @@ bool StoragerCallback::load() throw()
   m_con[1].setExecutable("storagerecord");
   m_con[1].addArgument(rbuf_name);
   m_con[1].addArgument(rbuf_size);
-  m_con[1].addArgument(obj.getText("storagerecord_dir"));
+  m_con[1].addArgument(obj.getText("record_dir"));
   m_con[1].addArgument(obuf_name);
   m_con[1].addArgument(obuf_size);
   m_con[1].addArgument("storagerecord");
@@ -102,11 +103,12 @@ bool StoragerCallback::load() throw()
   }
   LogFile::debug("Booted storagerecord");
 
+  /*
   m_con[2].clearArguments();
   m_con[2].setExecutable("storageout");
   m_con[2].addArgument(obuf_name);
   m_con[2].addArgument(obuf_size);
-  m_con[2].addArgument(obj.getValueText("storageout_port"));
+  m_con[2].addArgument(obj.getValueText("out_port"));
   m_con[2].addArgument("storageout");
   m_con[2].addArgument("3");
   if (!m_con[2].load(10)) {
@@ -115,25 +117,26 @@ bool StoragerCallback::load() throw()
   }
   LogFile::debug("Booted storageout");
   m_thread = PThread(new StoragerMonitor(this));
+  */
 
   for (size_t i = 3; i < m_con.size(); i++) {
     m_con[i].clearArguments();
     m_con[i].setExecutable("basf2");
-    m_con[i].addArgument(obj.getText("scriptpath"));
-    m_con[i].addArgument(obj.getText("ibuf_name"));
-    m_con[i].addArgument(obj.getValueText("ibuf_size"));
-    m_con[i].addArgument(obj.getText("rbuf_name"));
-    m_con[i].addArgument(obj.getValueText("rbuf_size"));
+    m_con[i].addArgument(obj.getText("record_script"));
+    m_con[i].addArgument(ibuf_name);
+    m_con[i].addArgument(ibuf_size);
+    m_con[i].addArgument(rbuf_name);
+    m_con[i].addArgument(rbuf_size);
     m_con[i].addArgument(StringUtil::form("basf2_%d", i - 3));
     m_con[i].addArgument(StringUtil::form("%d", i + 1));
     m_con[i].addArgument("1");
     if (!m_con[i].load(10)) {
-      std::string emsg = StringUtil::form("Failed to start %d-th basf2", i);
+      std::string emsg = StringUtil::form("Failed to start %d-th basf2", i - 3);
       setReply(emsg);
       LogFile::error(emsg);
       return false;
     }
-    LogFile::debug("Booted %d-th basf2", i);
+    LogFile::debug("Booted %d-th basf2", i - 3);
   }
   return true;
 }
@@ -175,7 +178,9 @@ bool StoragerCallback::pause() throw()
 
 bool StoragerCallback::recover() throw()
 {
-  return abort() && load();
+  abort();
+  sleep(3);
+  return load();
 }
 
 bool StoragerCallback::abort() throw()

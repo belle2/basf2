@@ -22,11 +22,11 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
-  /*
-  const int interval = (argc > 1) ? atoi(argv[1]) : 2;
+  /*  const int interval = (argc > 1) ? atoi(argv[1]) : 2;
   ConfigFile config("storage");
+  config.cd("default");
   std::vector<RunInfoBuffer> info_v;
-  info_v.resize(3 + config.getInt("NUM_OF_BASF2_PROCESS"));
+  info_v.resize(3 + config.getInt("record_nproc"));
   info_v[0].open("storagein", sizeof(storage_info) / sizeof(int));
   info_v[1].open("storagerecord", sizeof(storage_info) / sizeof(int));
   info_v[2].open("storageout", sizeof(storage_info) / sizeof(int));

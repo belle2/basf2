@@ -2,5 +2,6 @@ Import('env')
 
 env['TOOLS_LIBS']['runcontrold'] = ['pthread', 'ncurses','readline', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['rccui'] = ['pthread', 'ncurses','readline', '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['rccui_simple'] = ['pthread', 'ncurses','readline', '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
 
 Return('env')

@@ -78,7 +78,7 @@ int main(int argc, char** argv)
   }
 
   while (true) {
-    sleep(1);
+    sleep(2);
     fputs("\033[2J\033[0;0H", stdout);
     rewind(stdout);
     ftruncate(1, 0);
@@ -102,8 +102,8 @@ int main(int argc, char** argv)
       status.io[0].state = ioinfo_v[2 * i].getState();
       status.io[1].state = ioinfo_v[2 * i + 1].getState();
       status.ctime = ctime;
-      unsigned int dcount[2];
-      float dnbyte[2];
+      unsigned int dcount;
+      unsigned long long dnbyte;
       for (int j = 0; j < 2; j++) {
         status.io[j].freq = 0;
         status.io[j].evtsize = 0;
@@ -113,11 +113,11 @@ int main(int argc, char** argv)
         } else {
           status.io[j].nqueue = ioinfo_v[2 * i + j].getTXQueue();
         }
-        if ((dcount[j] = info.io[j].count - status.io[j].count) > 0) {
-          dnbyte[j] = info.io[j].nbyte - nbyte_v[2 * i + j];
-          status.io[j].freq = dcount[j] / length / 1000.;
-          status.io[j].evtsize = dnbyte[j] / dcount[j] / 1000.;
-          status.io[j].rate = dnbyte[j] / length / 1000000.;
+        if ((dcount = info.io[j].count - status.io[j].count) > 0) {
+          dnbyte = info.io[j].nbyte - nbyte_v[2 * i + j];
+          status.io[j].freq = dcount / length / 1000.;
+          status.io[j].evtsize = dnbyte / dcount / 1000.;
+          status.io[j].rate = dnbyte / length / 1000000.;
           status.io[j].count = info.io[j].count;
           nbyte_v[2 * i + j] = info.io[j].nbyte;
         } else {
@@ -125,7 +125,7 @@ int main(int argc, char** argv)
           status.io[j].evtsize = 0;
           status.io[j].rate = 0;
         }
-        printf("%12s:%5d %s | %7s | %6s | %7s | %12u | %6d | %2d\n",
+        printf("%15s:%5d %s | %7s | %6s | %7s | %12u | %6d | %2d\n",
                ip_v[i].c_str(), ioinfo_v[2 * i + j].getLocalPort(),
                ((j == 0) ? "(in) " : "(out)"),
                StringUtil::form("%4.2f", status.io[j].freq).c_str(),

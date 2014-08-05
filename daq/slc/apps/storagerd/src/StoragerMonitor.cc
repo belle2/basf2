@@ -40,8 +40,8 @@ void StoragerMonitor::run()
 {
   NSMNode& node(m_callback->getNode());
   ConfigObject& obj(m_callback->getConfig().getObject());
-  int port_in = obj.getInt("storagein_port");
-  int port_out = obj.getInt("storageout_port");
+  int port_in = obj.getInt("in_port");
+  int port_out = obj.getInt("out_port");
   const int interval = 2;
   std::vector<RunInfoBuffer*> info_v;
   for (size_t i = 0; i < m_callback->getControllers().size(); i++) {

@@ -55,14 +55,13 @@ int main(int argc, char** argv)
     if (use_info) {
       info.setInputPort(port);
     }
+    SharedEventBuffer::Header hdr;
     while (true) {
-      unsigned int nbyte = ibuf.read(evtbuf, false);
-      ibuf.lock();
+      unsigned int nbyte = ibuf.read(evtbuf, false, &hdr);
       SharedEventBuffer::Header* iheader = ibuf.getHeader();
-      if (expno < iheader->expno || runno < iheader->runno) {
-        expno = iheader->expno;
-        runno = iheader->runno;
-        ibuf.unlock();
+      if (expno < hdr.expno || runno < hdr.runno) {
+        expno = hdr.expno;
+        runno = hdr.runno;
         if (use_info) {
           info.setExpNumber(expno);
           info.setRunNumber(runno);
@@ -74,8 +73,6 @@ int main(int argc, char** argv)
           nbyte_in = nbyte_out = 0;
           count_in = count_out = 0;
         }
-      } else {
-        ibuf.unlock();
       }
       count_in++;
       nbyte_in += nbyte;

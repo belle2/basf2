@@ -36,7 +36,7 @@ int main(int argc, char** argv)
   ibuf.open(argv[1], atoi(argv[2]) * 1000000);//, true);
   SharedEventBuffer::Header* hd = ibuf.getHeader();
   while (true) {
-    LogFile::debug("%d %d %d %d %ld ",
+    LogFile::debug("%d %d %d %d %ld",
                    hd->expno, hd->runno, hd->subno,
                    hd->count_in - hd->count_out,
                    hd->nword_in - hd->nword_out);

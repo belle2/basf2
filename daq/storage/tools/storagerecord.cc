@@ -21,8 +21,11 @@
 #include <daq/slc/system/TCPSocketReader.h>
 #include <daq/slc/system/Time.h>
 #include <daq/slc/system/PThread.h>
+#include <daq/slc/system/Mutex.h>
+#include <daq/slc/system/Cond.h>
 
 #include <cstdio>
+#include <cstring>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -31,32 +34,66 @@
 using namespace Belle2;
 
 const unsigned long long MAX_FILE_SIZE = 2048000000;
-int g_fd = 0;
-int g_nfile = 0;
+
+class FileHandler {
+
+private:
+  FILE* file;
+  char* buf;
+
+public:
+  void open(const std::string& dir, int expno, int runno) {
+    static int g_nfile = 0;
+    char filename[1024];
+    if (g_nfile > 0) {
+      sprintf(filename, "%s/e%4.4dr%6.6d.sroot-%d",
+              dir.c_str(), expno, runno, g_nfile);
+    } else {
+      sprintf(filename, "%s/e%4.4dr%6.6d.sroot",
+              dir.c_str(), expno, runno);
+    }
+    g_nfile++;
+    file = fopen(filename, "w");
+    if (file == NULL) {
+      B2ERROR("failed to open file : " << filename);
+    } else {
+      buf = (char*)malloc(MAX_FILE_SIZE / 10);
+      setvbuf(file, buf, _IOFBF, MAX_FILE_SIZE / 10);
+      B2INFO("file " << filename << " opened");
+    }
+  }
+
+  void close() {
+    fclose(file);
+    free(buf);
+  }
+
+  int write(char* evbuf, int nbyte) {
+    return fwrite(evbuf, nbyte, 1, file);
+  }
+
+  operator bool() {
+    return file != NULL;
+  }
+
+};
 
 class FileCloser {
 
+private:
+  FileHandler m_handler;
+
 public:
-  FileCloser(int fd, const std::string& dir, int expno, int runno)
-    : m_fd(fd), m_expno(expno), m_runno(runno), m_dir(dir) {}
+  FileCloser(FileHandler& handler)
+    : m_handler(handler) {}
 
 public:
   void run() {
-    printf("closing old file\n");
-    if (m_fd > 0) close(m_fd);
-    char filename[1024];
-    g_nfile++;
-    sprintf(filename, "%s/e%4.4dr%6.6d.sroot-%d",
-            m_dir.c_str(), m_expno, m_runno, g_nfile);
-    g_fd = open(filename, O_CREAT | O_RDWR | O_TRUNC, 0644);
-    printf("file %s opened\n", filename);
+    m_handler.close();
   }
-private:
-  int m_fd;
-  int m_expno, m_runno;
-  std::string m_dir;
 
 };
+
 
 int main(int argc, char** argv)
 {
@@ -79,24 +116,22 @@ int main(int argc, char** argv)
   if (use_info) {
     info.reportRunning();
   }
+
   int* evtbuf = new int[1000000];
-  unsigned long long nbyte_in = 0;
   unsigned long long nbyte_out = 0;
-  unsigned int count_in = 0;
   unsigned int count_out = 0;
   unsigned int expno = 0;
   unsigned int runno = 0;
   unsigned int subno = 0;
-  SeqFile* file = NULL;
-  int fd = 0;
+  FileHandler file;
+  SharedEventBuffer::Header iheader;
   while (true) {
-    unsigned int nbyte = ibuf.read(evtbuf, true);
-    ibuf.lock();
-    SharedEventBuffer::Header* iheader = ibuf.getHeader();
-    if (expno < iheader->expno || runno < iheader->runno) {
-      expno = iheader->expno;
-      runno = iheader->runno;
-      ibuf.unlock();
+    ibuf.read(evtbuf, true, &iheader);
+    int nbyte = evtbuf[0];
+    int nword = (nbyte - 1) / 4 + 1;
+    if (expno < iheader.expno || runno < iheader.runno) {
+      expno = iheader.expno;
+      runno = iheader.runno;
       if (use_info) {
         info.setExpNumber(expno);
         info.setRunNumber(runno);
@@ -105,51 +140,32 @@ int main(int argc, char** argv)
         info.setInputNBytes(0);
         info.setOutputCount(0);
         info.setOutputNBytes(0);
-        nbyte_in = nbyte_out = 0;
-        count_in = count_out = 0;
+        nbyte_out = 0;
+        count_out = 0;
       }
       obuf.lock();
       SharedEventBuffer::Header* oheader = ibuf.getHeader();
       oheader->expno = expno;
       oheader->runno = runno;
       obuf.unlock();
-      char filename[1024];
-      sprintf(filename, "%s/e%4.4dr%6.6d.sroot",
-              dir.c_str(), expno, runno);
-      //if (file != NULL) delete file;
-      //file = new SeqFile(filename, "w");
-      fd = open(filename, O_CREAT | O_RDWR | O_TRUNC, 0644);
-      printf("file %s opened\n", filename);
-      PThread(new FileCloser(0, dir, expno, runno));
-      B2INFO("storagerecord : new data file " << filename << " initialized");
-    } else {
-      ibuf.unlock();
+      file.open(dir, expno, runno);
     }
-    count_in++;
-    nbyte_in += nbyte;
-    if (use_info && count_in % 10 == 0) {
-      info.setInputCount(count_in);
-      info.addInputNBytes(nbyte_in);
+    if (use_info) {
+      info.addInputCount(1);
+      info.addInputNBytes(nbyte);
     }
-    //if (file != NULL) {
-    if (fd > 0) {
-      //file->write((char*)evtbuf);
-      int nbyte = evtbuf[0];
-      write(fd, (char*)evtbuf, nbyte);
-      int nword = (nbyte - 1) / 4 + 1;
+    if (file) {
+      if (nbyte_out > MAX_FILE_SIZE) {
+        PThread(new FileCloser(file));
+        nbyte_out = 0;
+        file.open(dir, expno, runno);
+      }
+      file.write((char*)evtbuf, nbyte);
+      nbyte_out += nbyte;
       if (count_out % interval == 0 && obuf.isWritable(nword)) {
         obuf.write(evtbuf, nword, true);
       }
       count_out++;
-      nbyte_out += nbyte;
-      if (nbyte_out > MAX_FILE_SIZE) {
-        nbyte_out = 0;
-        //close(fd);
-        //fd = open(filename, O_CREAT | O_RDWR | O_TRUNC, 0644);
-        int fd_c = fd;
-        fd = g_fd;
-        PThread(new FileCloser(fd_c, dir, expno, runno));
-      }
       if (use_info) {
         info.addOutputCount(1);
         info.addOutputNBytes(nbyte);

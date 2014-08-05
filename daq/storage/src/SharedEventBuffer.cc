@@ -5,11 +5,13 @@
 #include <cstring>
 #include <cstdio>
 #include <unistd.h>
+#include <iostream>
 
 using namespace Belle2;
 
 size_t SharedEventBuffer::size() throw()
 {
+  //return m_lock.size() +
   return m_mutex.size() + m_cond.size() +
          sizeof(Header) + sizeof(int) * (m_nword);
 }
@@ -31,6 +33,8 @@ bool SharedEventBuffer::open(const std::string& nodename,
   if (buf == NULL) {
     return false;
   }
+  //m_lock = MRWLock(buf);
+  //buf += m_lock.size();
   m_mutex = MMutex(buf);
   buf += m_mutex.size();
   m_cond = MCond(buf);
@@ -45,20 +49,27 @@ bool SharedEventBuffer::open(const std::string& nodename,
 bool SharedEventBuffer::init()
 {
   if (m_buf == NULL) return false;
+  //m_lock.init();
   m_mutex.init();
   m_cond.init();
   memset(m_header, 0, sizeof(Header));
-  memset(m_buf, 0, (m_nword) * sizeof(int));
+  for (unsigned long long i = 0; i < m_nword; i++) {
+    m_buf[i] = 0;
+  }
   return true;
 }
 
 void SharedEventBuffer::clear()
 {
   if (m_buf == NULL) return;
+  //m_lock.wrlock();
   m_mutex.lock();
   memset(m_header, 0, sizeof(Header));
-  memset(m_buf, 0, (m_nword) * sizeof(int));
+  for (unsigned long long i = 0; i < m_nword; i++) {
+    m_buf[i] = 0;
+  }
   m_mutex.unlock();
+  //m_lock.unlock();
 }
 
 bool SharedEventBuffer::close()
@@ -80,45 +91,65 @@ bool SharedEventBuffer::lock() throw()
   return m_mutex.lock();
 }
 
+//bool SharedEventBuffer::rdlock() throw()
+//{
+//  if (m_buf == NULL) return false;
+//  return m_lock.rdlock();
+//}
+
+//bool SharedEventBuffer::wrlock() throw()
+//{
+//  if (m_buf == NULL) return false;
+//  return m_lock.wrlock();
+//}
+
 bool SharedEventBuffer::unlock() throw()
 {
   if (m_buf == NULL) return false;
   return m_mutex.unlock();
+  //return m_lock.unlock();
 }
 
 bool SharedEventBuffer::wait() throw()
 {
   if (m_buf == NULL) return false;
   return m_cond.wait(m_mutex);
+  //return false;
 }
 
 bool SharedEventBuffer::wait(int time) throw()
 {
   if (m_buf == NULL) return false;
   return m_cond.wait(m_mutex, time, 0);
+  //return false;
 }
 
 bool SharedEventBuffer::notify() throw()
 {
   if (m_buf == NULL) return false;
   return m_cond.broadcast();
+  //return false;
 }
 
 bool SharedEventBuffer::isWritable(int nword) throw()
 {
   if (m_buf == NULL) return false;
+  //m_lock.rdlock();
   m_mutex.lock();
   bool writable = m_header->nword_in - m_header->nword_out < m_nword - (nword + 1);
   m_mutex.unlock();
+  //m_lock.unlock();
   return writable;
 }
 
 bool SharedEventBuffer::isReadable(int nword) throw()
 {
   if (m_buf == NULL) return false;
+  //m_lock.rdlock();
   m_mutex.lock();
   bool readable = m_header->nword_in - m_header->nword_out >= m_nword - (nword + 1);
   m_mutex.unlock();
+  //m_lock.unlock();
   return readable;
 
 }
@@ -129,9 +160,11 @@ unsigned int SharedEventBuffer::write(const int* buf, unsigned int nword,
   if (m_buf == NULL) return 0;
   if (nword == 0) return 0;
   if (nword > m_nword) return -1;
+  //m_lock.wrlock();
   m_mutex.lock();
   m_header->nwriter++;
   while (!fouce && m_header->nreader > 0) {
+    //usleep(100);
     m_cond.wait(m_mutex);
   }
   unsigned int i_w = 0;
@@ -159,6 +192,9 @@ unsigned int SharedEventBuffer::write(const int* buf, unsigned int nword,
       break;
     }
     m_header->nwriter--;
+    //m_lock.unlock();
+    //usleep(100);
+    //m_lock.wrlock();
     m_cond.wait(m_mutex);
     m_header->nwriter++;
   }
@@ -167,15 +203,19 @@ unsigned int SharedEventBuffer::write(const int* buf, unsigned int nword,
   m_header->nwriter--;
   m_cond.broadcast();
   m_mutex.unlock();
+  //m_lock.unlock();
   return count;
 }
 
-unsigned int SharedEventBuffer::read(int* buf, bool fouce)
+unsigned int SharedEventBuffer::read(int* buf, bool fouce,
+                                     SharedEventBuffer::Header* hdr)
 {
   if (m_buf == NULL) return 0;
+  //m_lock.rdlock();
   m_mutex.lock();
   m_header->nreader++;
   while (!fouce && m_header->nwriter > 0) {
+    //usleep(100);
     m_cond.wait(m_mutex);
   }
   unsigned int i_w = 0;
@@ -206,13 +246,20 @@ unsigned int SharedEventBuffer::read(int* buf, bool fouce)
       }
     }
     m_header->nreader--;
+    //m_lock.unlock();
+    //usleep(100);
+    //m_lock.rdlock();
     m_cond.wait(m_mutex);
     m_header->nreader++;
   }
   m_header->nword_out += nword + 1;
   unsigned int count = ++m_header->count_out;
   m_header->nreader--;
+  if (hdr != NULL) {
+    memcpy(hdr, m_header, sizeof(SharedEventBuffer::Header));
+  }
   m_cond.broadcast();
   m_mutex.unlock();
+  //m_lock.unlock();
   return count;
 }

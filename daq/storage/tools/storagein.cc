@@ -75,25 +75,24 @@ int main(int argc, char** argv)
       TCPSocketReader reader(socket);
       B2INFO("storagein: Cconnected to eb2.");
       while (true) {
-        int nbyte_in = reader.read(evtbuf, sizeof(int));
+        reader.read(evtbuf, sizeof(int));
         if (info.getInputNBytes() == 0) {
           info.reportRunning();
         }
         unsigned int nbyte = (evtbuf[0] - 1) * sizeof(int);
+        int nword = evtbuf[0];
         reader.read((evtbuf + 1), nbyte);
-        nbyte_in += nbyte;
+        nbyte = evtbuf[0] * sizeof(int);
         if (info.isAvailable()) {
-          info.setInputCount(1);
-          info.addInputNBytes(nbyte_in);
+          info.addInputCount(1);
+          info.addInputNBytes(nbyte);
         }
-        //data.print();
         if (expno > data.getExpNumber() || runno > data.getRunNumber()) {
           B2INFO("storagein: old run event detected : exp="
                  << data.getExpNumber() << " runno="
                  << data.getRunNumber() << " current = ("
                  << expno << "," << runno << ")");
           return 1;
-          //continue;
         } else if (expno < data.getExpNumber() || runno < data.getRunNumber()) {
           expno = data.getExpNumber();
           runno = data.getRunNumber();
@@ -113,11 +112,10 @@ int main(int argc, char** argv)
             info.setOutputNBytes(0);
           }
         }
-        int nbyte_out = ibuf.write(evtbuf, evtbuf[0], true);
-        //data.getByteSize();
+        ibuf.write(evtbuf, nword, true);
         if (info.isAvailable()) {
           info.addOutputCount(1);
-          info.addOutputNBytes(nbyte_out);
+          info.addOutputNBytes(nbyte);
         }
       }
     } catch (const IOException& e) {

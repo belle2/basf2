@@ -1,6 +1,7 @@
 #include "daq/slc/runcontrol/RCCallback.h"
 
 #include <daq/slc/database/ConfigObjectTable.h>
+#include <daq/slc/database/DBObjectLoader.h>
 
 #include <daq/slc/system/LogFile.h>
 #include <daq/slc/system/TCPSocket.h>
@@ -98,7 +99,13 @@ bool RCCallback::perform(const NSMMessage& msg) throw()
 bool RCCallback::preload(const NSMMessage& msg) throw()
 {
   if (msg.getNParams() < 1) {
-    LogFile::debug("Loading method is not defined");
+    if (m_file.size() > 0) {
+      LogFile::warning("Loading object from file : %s", m_file.c_str());
+      ConfigObject obj = DBObjectLoader::load("", m_file);
+      m_config.setObject(obj);
+    } else {
+      LogFile::debug("Loading method is not defined");
+    }
   } else if (msg.getParam(0) == NSMCommand::DBGET.getId()) {
     if (msg.getNParams() > 3 && msg.getParam(2) > 0) {
       TCPSocket socket(getCommunicator()->getNodeHost(), msg.getParam(2));

@@ -47,6 +47,8 @@ namespace Belle2 {
     virtual void update() throw() {}
     void sendPause(const NSMNode& node) throw();
     void sendPause() throw();
+    void setFile(const std::string file) throw() { m_file = file; }
+
 
   protected:
     bool preload(const NSMMessage& msg) throw();
@@ -57,6 +59,7 @@ namespace Belle2 {
     RCState m_state_demand;
     RCConfig m_config;
     DBInterface* m_db;
+    std::string m_file;
 
   };
 

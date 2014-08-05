@@ -14,6 +14,7 @@
 #include <string.h>
 #include <errno.h>
 #include <netinet/in.h>
+#include <fstream>
 
 #include "daq/slc/system/TCPServerSocket.h"
 #include "daq/slc/system/Time.h"
@@ -48,6 +49,7 @@ int main(int argc, char** argv)
   int nrec = 0;
   Time t0;
   double datasize = 0;
+  std::ofstream fout("test.txt");
   while (true) {
     int sstat = read(fd, buf, sizeof(int));
     if (sstat <= 0) {
@@ -64,13 +66,16 @@ int main(int argc, char** argv)
     const int nth = 10000;
     if (nrec % nth == 0) {
       Time t;
-      double freq = nth / (t.get() - t0.get()) / 1000. ;
-      double rate = datasize / (t.get() - t0.get()) / 1000. / 1000.;
+      double dt = (t.get() - t0.get());
+      double freq = nth / dt  / 1000.;
+      double rate = datasize / dt / 1000. / 1000.;
       printf("Serial = %d Freq = %f [kHz], Rate = %f [MB/s], DataSize = %f [kB/event]\n",
              nrec, freq, rate, datasize / 1000. / nth);
+      fout << dt << " " << freq << " " << rate << " " << (datasize / 1000. / nth) << std::endl;
       t0 = t;
       datasize = 0;
     }
+    if (nrec % 30 == 0) usleep(1000);
   }
   socket.close();
   return 0;

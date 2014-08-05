@@ -48,7 +48,6 @@ svdDumpModule::svdDumpModule() : Module(), m_event(0)
 
 svdDumpModule::~svdDumpModule()
 {
-  if (m_outputFile != NULL) delete m_outputFile; m_outputFile = NULL;
 }
 
 void svdDumpModule::initialize()
@@ -72,6 +71,7 @@ void svdDumpModule::terminate()
   B2INFO("svdDumpModule: terminate() is called.");
 
   m_outputFile->close();
+  delete m_outputFile; m_outputFile = NULL;
 
   return;
 }

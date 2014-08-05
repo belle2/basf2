@@ -308,7 +308,7 @@ def SignalProbability(path, identifier, particleList, mvaConfig, additionalDepen
         expert.param('signalClass', mvaConfig.targetCluster)
         expert.param('listNames', [particleList])
         path.add_module(expert)
-        B2INFO("Calculate SignalProbability for {i}, but particle/channel is ignored.".format(i=identifier))
+        B2INFO("Calculating SignalProbability for {i}".format(i=identifier))
         return{'SignalProbability_{i}'.format(i=identifier): configFilename}
 
     B2ERROR("Training of {i} failed!".format(i=identifier))

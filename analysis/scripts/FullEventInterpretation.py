@@ -201,6 +201,7 @@ def FullEventInterpretation(path, particles):
                             particleLabel='Label_{i}'.format(i=particle.identifier),
                             inputLists=['RawParticleList_{i}'.format(i=particle.identifier)],
                             postCuts=['PostCut_{i}'.format(i=particle.identifier)])
+            seq.addResource('VertexFit_{i}'.format(i=particle.identifier), 'Dummy')
         else:
             for channel in particle.channels:
                 seq.addFunction(MakeAndMatchParticleList,
@@ -225,6 +226,9 @@ def FullEventInterpretation(path, particles):
                             particleLabel='Label_{i}'.format(i=particle.identifier),
                             inputLists=['RawParticleList_{c}'.format(c=channel.name) for channel in particle.channels],
                             postCuts=['PostCut_{c}'.format(c=channel.name) for channel in particle.channels])
+        if particle.name != pdg.conjugate(particle.name):
+            seq.addResource('VertexFit_{p}:{l}'.format(p=pdg.conjugate(particle.name), l=particle.label), 'Dummy',
+                            requires=['VertexFit_{i}'.format(i=particle.identifier)])
 
         ############# PRECUT DETERMINATION ############
         if not particle.isFSP:

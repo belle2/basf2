@@ -731,6 +731,7 @@ void VXDTFModule::initialize()
    * additionally, one module parameter is not flagged with m_PARAM... but with m_TESTER... (which are parameters related only to testing purposes),
    * such an inconsistency shall be surpressed for the redesign.
    * DisplayCollector-related stuff is needed for display and for debugging, therefore always listed for debug-stuff too.
+   * creates dependencies of the testbeam package (TelCluster)
    *
    ** dependency of module parameters (global):
    * m_PARAMgfTrackCandsColName, m_TESTERexpandedTestingRoutines, m_PARAMinfoBoardName,
@@ -794,7 +795,8 @@ void VXDTFModule::beginRun()
    *
    ** long (+personal comments):
    * all that stuff will move to the sectorMap-Module
-   * does also create dependency to the testbeam package
+   * although the baselineTF (only usefull for TB-runs) is filled here too,
+   * this section does not have dependencies of the testbeam package
    *
    ** dependency of module parameters (global):
    * m_PARAMsectorSetup, m_PARAMtuneCutoffs, m_PARAMhighestAllowedLayer,
@@ -1524,6 +1526,25 @@ void VXDTFModule::beginRun()
 
 void VXDTFModule::the_real_event()
 {
+  /** REDESIGNCOMMENT EVENT 1:
+   ** short:
+   * just some preparations to store Infos for debugging and other basic stuff
+   *
+   ** long (+personal comments):
+   * EventInfoPackage is currently storing the info needed for the TFAnalyzerModule to determine the efficiency of the TF
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMdisplayCollector
+   *
+   ** dependency of global in-module variables:
+   * m_eventCounter, m_collector
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_PARAMdisplayCollector, m_collector
+   *
+   ** in-module-function-calls:
+   */
+
   EventInfoPackage thisInfoPackage;
 
   boostClock::time_point beginEvent = boostClock::now();
@@ -1541,7 +1562,33 @@ void VXDTFModule::the_real_event()
   }
 
 
+
   /** Section 3 - importing hits and find their papaSectors.**/
+  /// Section 3a
+  /** REDESIGNCOMMENT EVENT 2:
+   * * short:
+   * Section 3a - prepare/load in- and output StoreArray-stuff, create virtual VXDTFhits
+   *
+   ** long (+personal comments):
+   * this section does have dependencies of the testbeam package
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMtelClustersName, m_PARAMpxdClustersName, m_PARAMsvdClustersName,
+   * m_PARAMgfTrackCandsColName, m_TESTERexpandedTestingRoutines,
+   *
+   ** dependency of global in-module variables:
+   * m_useTELHits, m_usePXDHits, m_useSVDHits,
+   * m_TESTERnoHitsAtEvent, m_TESTERtimeConsumption, m_TESTERlogEvents,
+   * m_passSetupVector,
+   *
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_TESTERtimeConsumption, m_TESTERexpandedTestingRoutines, m_TESTERnoHitsAtEvent,
+   * m_TESTERlogEvents,
+   *
+   ** in-module-function-calls:
+   */
+
   // importing hits
   int nTotalClustersThreshold = 0; // counts maximum number of allowed clusters to execute the baseline TF, is number of layers*2 (for svd it's number of Layers*4 because of 1D-Clusters)
 
@@ -1618,10 +1665,30 @@ void VXDTFModule::the_real_event()
     passNumber--;
   }
 
-
   stopTimer = boostClock::now();
   m_TESTERtimeConsumption.intermediateStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
   thisInfoPackage.sectionConsumption.intermediateStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
+
+
+  /// Section 3b
+  /** REDESIGNCOMMENT EVENT 3:
+   * * short:
+   * Section 3b - store ClusterInfo for all Clusters (PXD, Tel & SVD)
+   *
+   ** long (+personal comments):
+   * contains dependency of testbeam package
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMdisplayCollector
+   *
+   ** dependency of global in-module variables:
+   * m_passSetupVector, m_collector, m_TESTERtimeConsumption,
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_PARAMdisplayCollector, m_collector, m_TESTERtimeConsumption,
+   *
+   ** in-module-function-calls:
+   */
 
   boostClock::time_point timeStamp = boostClock::now();
   vector<ClusterInfo> clustersOfEvent(nTelClusters + nPxdClusters + nSvdClusters); /// contains info which tc uses which clusters
@@ -1646,13 +1713,13 @@ void VXDTFModule::the_real_event()
   if (m_PARAMdisplayCollector > 0) {
 
     for (uint m = 0; m < m_passSetupVector.size(); m++) {
-      for (int i = 0; i < nPxdClusters; ++i) {
+      for (int i = 0  + nTelClusters; i < nPxdClusters + nTelClusters; ++i) {
 
         // importCluster (int passIndex, std::string diedAt, int accepted, int rejected, int detectorType, int relativePosition)
         int clusterid = m_collector.importCluster(m, "", CollectorTFInfo::m_idAlive, vector<int>(), vector<int>(), Const::PXD, i);
 
         // CollectorID safe to connect Cluster to Cluster in Collector
-        clustersOfEvent[i].setCollectorID(clusterid);
+        clustersOfEvent.at(i).setCollectorID(clusterid);
 
       }
     }
@@ -1670,22 +1737,55 @@ void VXDTFModule::the_real_event()
   if (m_PARAMdisplayCollector > 0) {
     for (uint m = 0; m < m_passSetupVector.size(); m++) {
 
-      for (int i = 0; i < nSvdClusters; ++i) {
+      for (int i = 0 + nPxdClusters + nTelClusters; i < nSvdClusters + nPxdClusters + nTelClusters; ++i) {
 
         // importCluster (int passIndex, std::string diedAt, int accepted, int rejected, int detectorType, int relativePosition)
         int clusterid = m_collector.importCluster(m, "", CollectorTFInfo::m_idAlive, vector<int>(), vector<int>(), Const::SVD, i);
 
         // CollectorID safe to connect Cluster to Cluster in Collector
-        clustersOfEvent[i].setCollectorID(clusterid);
+        clustersOfEvent.at(i).setCollectorID(clusterid);
 
       }
     }
   }
 
-
   m_TESTERtimeConsumption.hitSorting += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
   thisInfoPackage.sectionConsumption.hitSorting += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
 
+
+  /// Section 3c
+  /** REDESIGNCOMMENT EVENT 4:
+   * * short:
+   * Section 3c - BaseLineTF
+   *
+   ** long (+personal comments):
+   * That one should probably become its own module, has dependency of the testbeam package.
+   * request: for the case of several TFs executed in the same event, there should be some small container lying in the storeArray which allows these TFs to communicate somehow. E.g. Testbeam: BaseLineTF has found something and is happy with the result, shall be able to inform the following real TFs that they do not have to execute that event any more.
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMactivateBaselineTF, m_PARAMdisplayCollector, m_TESTERexpandedTestingRoutines,
+   * m_PARAMinfoBoardName, m_PARAMwriteToRoot,
+   *
+   ** dependency of global in-module variables:
+   * m_baselinePass, m_TESTERstartedBaselineTF, m_TESTERsucceededBaselineTF,
+   * m_calcQiType, m_collector, m_TESTERcountTotalUsedIndicesFinal,
+   * m_TESTERcountTotalUsedHitsFinal, m_TESTERcountTotalTCsFinal,  m_TESTERtimeConsumption,
+   * m_rootTimeConsumption, m_treeEventWisePtr, m_TESTERlogEvents,
+   * m_eventCounter
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_TESTERstartedBaselineTF, m_TESTERsucceededBaselineTF, m_PARAMdisplayCollector,
+   * m_collector, m_TESTERexpandedTestingRoutines, m_TESTERcountTotalUsedIndicesFinal,
+   * m_TESTERcountTotalUsedHitsFinal, m_TESTERcountTotalTCsFinal, m_TESTERtimeConsumption,
+   * m_rootTimeConsumption, m_treeEventWisePtr, m_TESTERlogEvents,
+   * m_eventCounter
+   *
+   ** in-module-function-calls:
+   * baselineTF(clustersOfEvent, &m_baselinePass)
+   * calcInitialValues4TCs(&m_baselinePass)
+   * generateGFTrackCand(aTC)
+   * cleanEvent(&m_baselinePass)
+   */
 
   timeStamp = boostClock::now();
   /// now follows a bypass for the simplistic case of one hit per layer (or <=2 hits per layer at the SVD ), this shall guarantee the reconstruction of single track events...
@@ -1778,8 +1878,6 @@ void VXDTFModule::the_real_event()
 
         if (m_TESTERexpandedTestingRoutines == true) {
 
-          //B2DEBUG(1, "m_TESTERexpandedTestingRoutines == true 1")
-
           VXDTFInfoBoard newBoard;
           StoreArray<VXDTFInfoBoard> extraInfo4GFTCs(m_PARAMinfoBoardName); // needed since I use it only within if-parenthesis
 
@@ -1830,10 +1928,39 @@ void VXDTFModule::the_real_event()
   }
 
 
+  /// Section 3d
+  /** REDESIGNCOMMENT EVENT 5:
+   * * short:
+   * Section 3d - assign sectors for Tel- and PXD Clusters, then find 2-SVDCluster-Combis and assign sectors to them.
+   * Creates VXDTFHits
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMdisplayCollector, m_PARAMnameOfInstance, m_PARAMkillEventForHighOccupancyThreshold,
+   *
+   *
+   ** dependency of global in-module variables:
+   * m_passSetupVector, m_TESTERbadSensors, m_collector,
+   * m_useSVDHits, m_TESTERbrokenEventsCtr, m_TESTERlogEvents,
+   * m_TESTERdistortedHitCtr, m_badSectorRangeCounter, m_totalSVDClusterCombis,
+   * m_totalPXDClusters, m_totalTELClusters, m_totalSVDClusters,
+   * m_TESTERtimeConsumption
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_eventCounter, m_TESTERbadSensors, m_PARAMdisplayCollector,
+   * m_collector, m_PARAMnameOfInstance, m_TESTERbrokenEventsCtr,
+   * m_TESTERlogEvents, m_TESTERdistortedHitCtr, m_badSectorRangeCounter,
+   * m_totalPXDClusters, m_totalTELClusters, m_totalSVDClusters,
+   * m_totalSVDClusterCombis, m_TESTERtimeConsumption
+   *
+   ** in-module-function-calls:
+   * searchSector4Hit(aVxdID, transformedHitLocal, currentPass->sectorMap, currentPass->secConfigU, currentPass->secConfigV)
+   * findSensors4Clusters(activatedSensors, clustersOfEvent)
+   * find2DSVDHits(activatedSensors, clusterHitList)
+   */
+
   B2DEBUG(3, "VXDTF event " << m_eventCounter << ": size of arrays, PXDCluster: " << nPxdClusters << ", SVDCLuster: " << nSvdClusters << ", nTelClusters: " << nTelClusters << ", clustersOfEvent: " << clustersOfEvent.size());
-
-
-
 
   TVector3 hitLocal, transformedHitLocal, localSensorSize, hitSigma;
   PositionInfo hitInfo;
@@ -1966,7 +2093,7 @@ void VXDTFModule::the_real_event()
         // importHits 2.
         if (m_PARAMdisplayCollector > 0) {
 
-          std::vector<int> assignedIDs = { clustersOfEvent[iPart].getCollectorID() };
+          std::vector<int> assignedIDs = { clustersOfEvent.at(iPart + nTelClusters).getCollectorID() };
 
           int hitID = m_collector.importHit(passNumber, CollectorTFInfo::m_nameHitFinder, CollectorTFInfo::m_idHitFinder, vector<int>(), vector<int>(), assignedIDs, aSecID, hitInfo.hitPosition, hitInfo.hitSigma);
 
@@ -1974,7 +2101,6 @@ void VXDTFModule::the_real_event()
           B2DEBUG(100, "Hit imported = died at hitfinder: " << hitID);
 
         }
-
 
         continue;
       }
@@ -1986,7 +2112,7 @@ void VXDTFModule::the_real_event()
       // importHits 3.
       if (m_PARAMdisplayCollector > 0) {
 
-        std::vector<int> assignedIDs = { clustersOfEvent[iPart].getCollectorID() };
+        std::vector<int> assignedIDs = { clustersOfEvent.at(iPart + nTelClusters).getCollectorID() };
 
         int hitId = m_collector.importHit(passNumber, "", CollectorTFInfo::m_idAlive, vector<int>(), vector<int>(), assignedIDs, aSecID, hitInfo.hitPosition, hitInfo.hitSigma);
 
@@ -2210,9 +2336,32 @@ void VXDTFModule::the_real_event()
 
 
 
-  //clustersOfEvent
-
   /** Section 4 - SEGFINDER **/
+  /** REDESIGNCOMMENT EVENT 6:
+   * * short:
+   * Section 4 - for each activated sector: combine compatible ones and create segments for each accepted combination
+   *
+   ** long (+personal comments):
+   * several TFs will use that section with totally the same interface, therefore generalized approach important (function/class)
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMdisplayCollector, m_PARAMkillEventForHighOccupancyThreshold, m_PARAMnameOfInstance,
+   *
+   *
+   ** dependency of global in-module variables:
+   * m_passSetupVector, m_aktpassNumber, m_TESTERtotalsegmentsSFCtr,
+   * m_TESTERdiscardedSegmentsSFCtr, m_eventCounter, m_TESTERtimeConsumption,
+   * m_TESTERbrokenEventsCtr, m_TESTERlogEvents,
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_aktpassNumber, m_PARAMdisplayCollector, m_TESTERtotalsegmentsSFCtr,
+   * m_TESTERdiscardedSegmentsSFCtr, m_eventCounter, m_TESTERtimeConsumption,
+   * m_PARAMnameOfInstance, m_TESTERbrokenEventsCtr, m_TESTERlogEvents,
+   *
+   ** in-module-function-calls:
+   * segFinder(currentPass)
+   * cleanEvent(currentPass)
+   */
   passNumber = 0;
   for (PassData * currentPass : m_passSetupVector) {
 
@@ -2220,7 +2369,6 @@ void VXDTFModule::the_real_event()
     if (m_PARAMdisplayCollector > 0) {
       m_aktpassNumber = passNumber;
     }
-
 
 
     timeStamp = boostClock::now();
@@ -2255,7 +2403,6 @@ void VXDTFModule::the_real_event()
     stopTimer = boostClock::now();
     m_TESTERtimeConsumption.segFinder += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
     thisInfoPackage.sectionConsumption.segFinder += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-    /** Section 4 - end **/
 
     if (activatedSegments > m_PARAMkillEventForHighOccupancyThreshold) {
       B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of activated segments: " << activatedSegments << ", terminating event! There were " << nTelClusters << "/" << nPxdClusters << "/" << nSvdClusters << "/" << nClusterCombis << " TEL-/PXD-/SVD-clusters/SVD-cluster-combinations.")
@@ -2271,9 +2418,37 @@ void VXDTFModule::the_real_event()
       m_TESTERlogEvents.push_back(thisInfoPackage);
       return;
     }
+    /** Section 4 - end **/
+
+
 
 
     /** Section 5 - NEIGHBOURFINDER **/
+    /** REDESIGNCOMMENT EVENT 7:
+     * * short:
+     * Section 5 - neighbourfinder, checks segments sharing a center hit for valid combinations.
+     * Valid ones are flagged as neighbours and outer segments get a state upgrade (for CA)
+     *
+     ** long (+personal comments):
+     * Like for the segFinder, several different TFs/Modules want to access that part with the same interface
+     *
+     ** dependency of module parameters (global):
+     * m_PARAMkillEventForHighOccupancyThreshold, m_PARAMnameOfInstance
+     *
+     ** dependency of global in-module variables:
+     * m_passSetupVector, m_TESTERtotalsegmentsNFCtr, m_TESTERdiscardedSegmentsNFCtr,
+     * m_TESTERtimeConsumption, m_eventCounter, m_TESTERbrokenEventsCtr,
+     * m_TESTERlogEvents
+     *
+     ** dependency of global stuff just because of B2XX-output or debugging only:
+     * m_TESTERtotalsegmentsNFCtr, m_TESTERdiscardedSegmentsNFCtr, m_TESTERtimeConsumption,
+     * m_PARAMnameOfInstance, m_eventCounter, m_TESTERbrokenEventsCtr,
+     * m_TESTERlogEvents
+     *
+     ** in-module-function-calls:
+     * neighbourFinder(currentPass)
+     * cleanEvent(currentPass)
+     */
     timeStamp = boostClock::now();
     B2DEBUG(5, "pass " << passNumber << ": starting neighbourFinder...");
     discardedSegments = neighbourFinder(currentPass);                       /// calling funtion "neighbourFinder"
@@ -2286,7 +2461,6 @@ void VXDTFModule::the_real_event()
     stopTimer = boostClock::now();
     m_TESTERtimeConsumption.nbFinder += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
     thisInfoPackage.sectionConsumption.nbFinder += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-    /** Section 5 - end **/
 
     if (activatedSegments > m_PARAMkillEventForHighOccupancyThreshold) {
       B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": after nbFinder, total number of activated segments: " << activatedSegments << ", terminating event! There were " << nTelClusters << "/" << nPxdClusters << "/" << nSvdClusters << "/" << nClusterCombis << " TEL-/PXD-/SVD-clusters/SVD-cluster-combinations.")
@@ -2302,8 +2476,32 @@ void VXDTFModule::the_real_event()
       m_TESTERlogEvents.push_back(thisInfoPackage);
       return;
     }
+    /** Section 5 - end **/
+
+
 
     /** Section 6 - Cellular Automaton**/
+    /** REDESIGNCOMMENT EVENT 8:
+     * * short:
+     * Section 6 - Cellular Automaton
+     *
+     ** long (+personal comments):
+     *
+     ** dependency of module parameters (global):
+     * m_PARAMnameOfInstance, m_PARAMdisplayCollector
+     *
+     ** dependency of global in-module variables:
+     * m_eventCounter, m_TESTERbrokenEventsCtr, m_passSetupVector,
+     * m_TESTERtimeConsumption, m_aktpassNumber
+     *
+     ** dependency of global stuff just because of B2XX-output or debugging only:
+     * m_PARAMnameOfInstance, m_eventCounter, m_TESTERbrokenEventsCtr,
+     * m_TESTERtimeConsumption, m_PARAMdisplayCollector, m_aktpassNumber
+     *
+     ** in-module-function-calls:
+     * cellularAutomaton(currentPass)
+     * cleanEvent(currentPass)
+     */
     timeStamp = boostClock::now();
     int numRounds = cellularAutomaton(currentPass);
     B2DEBUG(3, "pass " << passNumber << ": cellular automaton finished in " << numRounds << " rounds");
@@ -2326,16 +2524,38 @@ void VXDTFModule::the_real_event()
     stopTimer = boostClock::now();
     m_TESTERtimeConsumption.cellularAutomaton += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
     thisInfoPackage.sectionConsumption.cellularAutomaton += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-    /** Section 6 - end **/
-
 
     // Set current passNumber for Collector
     if (m_PARAMdisplayCollector > 0) {
       m_aktpassNumber = passNumber;
     }
+    /** Section 6 - end **/
+
 
 
     /** Section 7 - Track Candidate Collector (TCC) **/
+    /** REDESIGNCOMMENT EVENT 9:
+     * * short:
+     * Section 7 - Track Candidate Collector (TCC)
+     *
+     ** long (+personal comments):
+     *
+     ** dependency of module parameters (global):
+     * m_PARAMkillEventForHighOccupancyThreshold, m_PARAMnameOfInstance,
+     *
+     ** dependency of global in-module variables:
+     * m_TESTERtimeConsumption, m_eventCounter, m_TESTERbrokenEventsCtr,
+     * m_passSetupVector, m_TESTERlogEvents,
+     *
+     ** dependency of global stuff just because of B2XX-output or debugging only:
+     * m_TESTERtimeConsumption, m_PARAMnameOfInstance, m_eventCounter,
+     * m_TESTERbrokenEventsCtr, m_TESTERlogEvents,
+     *
+     ** in-module-function-calls:
+     * delFalseFriends(currentPass, currentPass->origin)
+     * tcCollector(currentPass)
+     * cleanEvent(currentPass)
+     */
     timeStamp = boostClock::now();
     int totalTCs = 0;
     delFalseFriends(currentPass, currentPass->origin);
@@ -2368,6 +2588,23 @@ void VXDTFModule::the_real_event()
 
 
     /** Section 8 - tcFilter **/
+    /** REDESIGNCOMMENT EVENT 10:
+     * * short:
+     * Section 8 - tcFilter
+     *
+     ** long (+personal comments):
+     *
+     ** dependency of module parameters (global):
+     *
+     ** dependency of global in-module variables:
+     * m_TESTERtimeConsumption
+     *
+     ** dependency of global stuff just because of B2XX-output or debugging only:
+     * m_TESTERtimeConsumption
+     *
+     ** in-module-function-calls:
+     * tcFilter(currentPass, passNumber)
+     */
     timeStamp = boostClock::now();
     survivingTCs = 0;
     if (int(currentPass->tcVector.size()) != 0) {
@@ -2386,6 +2623,28 @@ void VXDTFModule::the_real_event()
 
 
     /** Section 9 - check overlap */
+    /** REDESIGNCOMMENT EVENT 11:
+     * * short:
+     * Section 9 - check overlap
+     *
+     ** long (+personal comments):
+     * does the overlap check (ClusterInfo::isOverbooked) and additionally calculates initial values for the TCs
+     * This uses the helixFit
+     *
+     ** dependency of module parameters (global):
+     * m_PARAMdisplayCollector,
+     *
+     ** dependency of global in-module variables:
+     * m_tcVectorOverlapped, m_calcQiType, m_tcVector,
+     * m_collector, m_TESTERtimeConsumption, m_eventCounter
+     *
+     ** dependency of global stuff just because of B2XX-output or debugging only:
+     * m_PARAMdisplayCollector, m_collector, m_TESTERtimeConsumption,
+     * m_eventCounter
+     *
+     ** in-module-function-calls:
+     * calcInitialValues4TCs(currentPass)
+     */
     timeStamp = boostClock::now();
     int countOverbookedClusters = 0, clustersReserved = 0;
     m_tcVectorOverlapped.clear(); // July13: should be filled freshly for each pass
@@ -2438,6 +2697,30 @@ void VXDTFModule::the_real_event()
 
 
     /** Section 10 - calc QI for each TC */
+    /** REDESIGNCOMMENT EVENT 12:
+     * * short:
+     * Section 10 - calc QI for each TC
+     *
+     ** long (+personal comments):
+     *
+     ** dependency of module parameters (global):
+     * m_PARAMkillEventForHighOccupancyThreshold, m_PARAMnameOfInstance,
+     *
+     ** dependency of global in-module variables:
+     * m_calcQiType, m_TESTERbrokenEventsCtr, m_eventCounter,
+     * m_passSetupVector, m_TESTERtimeConsumption, m_TESTERlogEvents,
+     * m_TESTERkalmanSkipped, m_tcVector,
+     *
+     ** dependency of global stuff just because of B2XX-output or debugging only:
+     * m_TESTERbrokenEventsCtr, m_PARAMnameOfInstance, m_eventCounter,
+     * m_TESTERtimeConsumption, m_TESTERlogEvents, m_TESTERkalmanSkipped,
+     *
+     ** in-module-function-calls:
+     * cleanEvent(currentPass)
+     * calcQIbyKalman(m_tcVector)
+     * calcQIbyLength(m_tcVector, m_passSetupVector)
+     * calcQIbyStraightLine(m_tcVector)
+     */
     timeStamp = boostClock::now();
     /// since KF is rather slow, Kf will not be used when there are many overlapping TCs. In this case, the simplified QI-calculator will be used.
     bool allowKalman = false;
@@ -2480,6 +2763,25 @@ void VXDTFModule::the_real_event()
 
 
     /** Section 11 - cleanOverlappingSet */
+    /** REDESIGNCOMMENT EVENT 13:
+     * * short:
+     * Section 11 - cleanOverlappingSet
+     *
+     ** long (+personal comments):
+     *
+     ** dependency of module parameters (global):
+     * m_PARAMcleanOverlappingSet,
+     *
+     ** dependency of global in-module variables:
+     * m_tcVectorOverlapped, m_TESTERcleanOverlappingSetStartedCtr,
+     * m_TESTERtimeConsumption,
+     *
+     ** dependency of global stuff just because of B2XX-output or debugging only:
+     * m_TESTERcleanOverlappingSetStartedCtr, m_TESTERtimeConsumption,
+     *
+     ** in-module-function-calls:
+     * cleanOverlappingSet(m_tcVectorOverlapped)
+     */
     timeStamp = boostClock::now();
     if (totalOverlaps > 2 && m_PARAMcleanOverlappingSet == true) {
       int killedTCs = -1;
@@ -2506,6 +2808,24 @@ void VXDTFModule::the_real_event()
 
     /** redo overlapping check - necessary since condition changed through cleanOverlappingSet! */
     /** Section 9b - check overlap 2 */
+    /** REDESIGNCOMMENT EVENT 14:
+     * * short:
+     * Section 9b - check overlap 2
+     *
+     ** long (+personal comments):
+     * redo overlapping check - necessary since condition changed through cleanOverlappingSet
+     *
+     ** dependency of module parameters (global):
+     *
+     ** dependency of global in-module variables:
+     * m_tcVectorOverlapped, m_tcVector, m_TESTERtimeConsumption,
+     *
+     *
+     ** dependency of global stuff just because of B2XX-output or debugging only:
+     * m_TESTERtimeConsumption,
+     *
+     ** in-module-function-calls:
+     */
     timeStamp = boostClock::now();
     countOverbookedClusters = 0;
     // each clusterInfo knows which TCs are using it, following loop therefore checks each for overlapping ones
@@ -2540,6 +2860,29 @@ void VXDTFModule::the_real_event()
 
 
     /** Section 12 - Hopfield */
+    /** REDESIGNCOMMENT EVENT 15:
+     * * short:
+     * Section 12 - Hopfield
+     *
+     ** long (+personal comments):
+     * does also include the reserve hits-step, where hits of the best TCs (highest QI) are blocked for further passes
+     *
+     ** dependency of module parameters (global):
+     * m_PARAMomega,
+     *
+     ** dependency of global in-module variables:
+     * m_filterOverlappingTCs, m_tcVectorOverlapped, m_tcVector,
+     * m_eventCounter, m_TESTERtimeConsumption, m_passSetupVector,
+     *
+     ** dependency of global stuff just because of B2XX-output or debugging only:
+     * m_eventCounter, m_TESTERtimeConsumption,
+     *
+     ** in-module-function-calls:
+     * hopfield(m_tcVectorOverlapped, m_PARAMomega)
+     * greedy(m_tcVectorOverlapped)
+     * tcDuel(m_tcVectorOverlapped)
+     * reserveHits(m_tcVector, currentPass)
+     */
     timeStamp = boostClock::now();
     if (totalOverlaps > 2) { // checking overlapping TCs for best subset, if there are more than 2 different TC's
       if (m_filterOverlappingTCs == 2) {   /// use Hopfield neuronal network
@@ -2584,11 +2927,11 @@ void VXDTFModule::the_real_event()
 
       B2DEBUG(3, "before exporting TCs, length of m_tcVector: " << m_tcVector.size() << " with " << nTCsAlive << "/" << m_tcVector.size() - nTCsAlive << " alive/dead TCs, m_tcVectorOverlapped: " << m_tcVectorOverlapped.size() << " with " << nTCsAliveInOverlapped << "/" << m_tcVectorOverlapped.size() - nTCsAliveInOverlapped << " alive/dead TCs");
     }
+
+    if (passNumber < int(m_passSetupVector.size() - 1)) { reserveHits(m_tcVector, currentPass); }
     /** Section 12 - end */
 
 
-
-    if (passNumber < int(m_passSetupVector.size() - 1)) { reserveHits(m_tcVector, currentPass); }
 
     passNumber++;
   } /// /// /// WARNING WARNING WARNING --- pass loop end --- WARNING WARNING WARNING
@@ -2607,6 +2950,29 @@ void VXDTFModule::the_real_event()
 
 
   /** Section 13 - generateGFTrackCand */
+  /** REDESIGNCOMMENT EVENT 16:
+   * * short:
+   * Section 13 - generateGFTrackCand
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   * m_TESTERexpandedTestingRoutines, m_PARAMinfoBoardName, m_PARAMdisplayCollector,
+   * m_PARAMnameOfInstance,
+   *
+   ** dependency of global in-module variables:
+   * m_tcVector, m_collector, m_TESTERcountTotalUsedHitsFinal,
+   * m_TESTERcountTotalUsedIndicesFinal, m_eventCounter, m_filterOverlappingTCs,
+   * m_TESTERcountTotalTCsFinal
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_TESTERexpandedTestingRoutines, m_PARAMinfoBoardName, m_PARAMdisplayCollector,
+   * m_collector, m_TESTERcountTotalUsedHitsFinal, m_TESTERcountTotalUsedIndicesFinal,
+   * m_TESTERcountTotalTCsFinal,
+   *
+   ** in-module-function-calls:
+   * generateGFTrackCand(currentTC)
+   */
   timeStamp = boostClock::now();
   list<int> tempIndices, totalIndices;// temp: per tc, total, all of them. collects all indices used by final TCs, used to check for final overlapping TCs
   int nTotalHitsInTCs = 0;
@@ -2727,6 +3093,27 @@ void VXDTFModule::the_real_event()
 
 
 
+  /** REDESIGNCOMMENT EVENT 17:
+   * * short:
+   * Section 14 - final stuff of event including cleanup
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMdisplayCollector, m_PARAMwriteToRoot,
+   *
+   ** dependency of global in-module variables:
+   * m_collector, m_passSetupVector, m_rootTimeConsumption,
+   * m_treeEventWisePtr, m_TESTERtimeConsumption, m_TESTERlogEvents
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_PARAMdisplayCollector, m_collector, m_PARAMwriteToRoot,
+   * m_rootTimeConsumption, m_treeEventWisePtr, m_TESTERtimeConsumption,
+   * m_TESTERlogEvents
+   *
+   ** in-module-function-calls:
+   * cleanEvent(currentPass)
+   */
   // Silent Kill = Mark not used objects as deleted
   // Safe Information = Information into StoreArrays
   if (m_PARAMdisplayCollector > 0) {

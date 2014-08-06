@@ -1,7 +1,10 @@
 #ifndef _Belle2_StoragerCallback_hh
 #define _Belle2_StoragerCallback_hh
 
+#include <daq/storage/SharedEventBuffer.h>
+
 #include <daq/slc/readout/ProcessController.h>
+#include <daq/slc/readout/FlowMonitor.h>
 
 #include <daq/slc/runcontrol/RCCallback.h>
 
@@ -20,13 +23,6 @@ namespace Belle2 {
     virtual ~StoragerCallback() throw();
 
   public:
-    size_t getNControllers() const { return m_con.size(); }
-    ProcessController& getController(int n) { return m_con[n]; }
-    std::vector<ProcessController>& getControllers() { return m_con; }
-    NSMData& getData() throw() { return m_data; }
-    const NSMData& getData() const throw() { return m_data; }
-
-  public:
     virtual void init() throw();
     virtual void term() throw();
     virtual bool load() throw();
@@ -36,11 +32,14 @@ namespace Belle2 {
     virtual bool pause() throw();
     virtual bool recover() throw();
     virtual bool abort() throw();
+    virtual void timeout() throw();
 
   private:
     std::vector<ProcessController> m_con;
+    std::vector<FlowMonitor> m_flow;
     NSMData m_data;
-    PThread m_thread;
+    SharedEventBuffer m_ibuf;
+    SharedEventBuffer m_rbuf;
 
   };
 

@@ -23,16 +23,7 @@ StoragerCallback::~StoragerCallback() throw()
 void StoragerCallback::init() throw()
 {
   LogFile::open("storage");
-  ///*
-  ConfigFile config("storage");
-  std::string runtype = config.get("runtype");
-  NSMMessage msg(getNode(), NSMCommand::DBGET, runtype);
-  //msg.setNParams(1);
-  //msg.setParam(0, NSMCommand::DBGET.getId());
-  //msg.setData(runtype);
-  preload(msg);
-  //*/
-  m_data = NSMData("STORAGE_DATA", "storage_info_all",
+  m_data = NSMData("STORAGE_STATUS", "storage_info_all",
                    storage_info_all_revision);
   m_data.allocate(getCommunicator());
 }
@@ -47,8 +38,6 @@ void StoragerCallback::term() throw()
 
 bool StoragerCallback::load() throw()
 {
-  if (m_thread.is_alive()) m_thread.cancel();
-
   ConfigObject& obj(getConfig().getObject());
   const size_t nproc = obj.getInt("record_nproc");
   m_con = std::vector<ProcessController>();
@@ -116,7 +105,6 @@ bool StoragerCallback::load() throw()
     LogFile::warning(emsg);
   }
   LogFile::debug("Booted storageout");
-  m_thread = PThread(new StoragerMonitor(this));
   */
 
   for (size_t i = 3; i < m_con.size(); i++) {
@@ -138,6 +126,15 @@ bool StoragerCallback::load() throw()
     }
     LogFile::debug("Booted %d-th basf2", i - 3);
   }
+
+  m_flow = std::vector<FlowMonitor>();
+  for (size_t i = 0; i < m_con.size(); i++) {
+    FlowMonitor flow;
+    flow.open(&(m_con[i].getInfo()));
+    m_flow.push_back(flow);
+  }
+  m_ibuf.open(ibuf_name, atoi(ibuf_size.c_str()) * 1000000);
+  m_rbuf.open(rbuf_name, atoi(rbuf_size.c_str()) * 1000000);
   return true;
 }
 
@@ -191,3 +188,30 @@ bool StoragerCallback::abort() throw()
   return true;
 }
 
+void StoragerCallback::timeout() throw()
+{
+  storage_info_all* info = (storage_info_all*)m_data.get();
+  for (size_t i = 0; i < m_flow.size(); i++) {
+    ronode_status& status(m_flow[i].monitor());
+    for (int j = 0; j < 2; j++) {
+      info->io[2 * i + j].state = status.io[j].state;
+      info->io[2 * i + j].count = status.io[j].count;
+      info->io[2 * i + j].freq = status.io[j].freq;
+      info->io[2 * i + j].evtsize = status.io[j].evtsize;
+      info->io[2 * i + j].rate = status.io[j].rate;
+    }
+    if (i == 0) { //IN
+      info->ctime = status.ctime;
+      info->expno = status.expno;
+      info->runno = status.runno;
+      info->subno = status.subno;
+      info->io[0].nqueue = status.io[0].nqueue;
+      SharedEventBuffer::Header* hd = m_ibuf.getHeader();
+      info->io[1].nqueue = hd->nword_in - hd->nword_out;
+    } else if (i == 1) {
+      SharedEventBuffer::Header* hd = m_rbuf.getHeader();
+      info->io[2].nqueue = hd->nword_in - hd->nword_out;
+    } else {
+    }
+  }
+}

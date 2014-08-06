@@ -1,8 +1,8 @@
 //+
-// File : rawfile2rb.cc
-// Description : Read raw data dump file and put record in RingBuffer
+// File : flow_monitor.cc
+// Description : Readout flow rate monitor
 //
-// Author : Ryosuke Itoh, IPNS, KEK
+// Author : Tomoyuki Konno, Tokyo Metroplitan University
 // Date : 25 - Sep - 2013
 //-
 

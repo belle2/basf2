@@ -47,6 +47,7 @@ ronode_status& FlowMonitor::monitor()
   m_status.runno = info.runno;
   m_status.subno = info.subno;
   m_status.ctime = ctime;
+
   unsigned int dcount[2];
   float dnbyte[2];
   for (int j = 0; j < 2; j++) {

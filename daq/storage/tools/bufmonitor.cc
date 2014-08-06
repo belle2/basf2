@@ -1,46 +1,50 @@
 //+
-// File : rawfile2rb.cc
-// Description : Read raw data dump file and put record in RingBuffer
+// File : flow_monitor.cc
+// Description : Readout flow rate monitor
 //
-// Author : Ryosuke Itoh, IPNS, KEK
+// Author : Tomoyuki Konno, Tokyo Metroplitan University
 // Date : 25 - Sep - 2013
 //-
 
+#include <daq/slc/nsm/NSMData.h>
+#include <daq/slc/nsm/NSMCommunicator.h>
+
+#include <daq/slc/system/LogFile.h>
+
+#include <daq/slc/base/StringUtil.h>
+
+#include <daq/slc/apps/storagerd/storage_info_all.h>
+
+#include <fstream>
 #include <unistd.h>
 #include <cstdlib>
-
-#include <framework/logging/Logger.h>
-#include <framework/pcore/SeqFile.h>
-
-#include <daq/storage/BinData.h>
-#include <daq/storage/SharedEventBuffer.h>
-
-#include <daq/slc/readout/RunInfoBuffer.h>
-
-#include <daq/slc/system/TCPSocket.h>
-#include <daq/slc/system/TCPSocketReader.h>
-#include <daq/slc/system/Time.h>
-#include <daq/slc/system/LogFile.h>
 
 using namespace Belle2;
 
 int main(int argc, char** argv)
 {
   if (argc < 3) {
-    printf("%s : bufname bufsize\n", argv[0]);
+    LogFile::debug("%s storage monitor", argv[0]);
     return 1;
   }
-  const unsigned interval = 10;
-  RunInfoBuffer info;
-  SharedEventBuffer ibuf;
-  ibuf.open(argv[1], atoi(argv[2]) * 1000000);//, true);
-  SharedEventBuffer::Header* hd = ibuf.getHeader();
+  const std::string stornode = argv[1];
+  const std::string node = argv[2];
+  NSMCommunicator* comm = new NSMCommunicator();
+  comm->init(NSMNode(node));
+  NSMData data(stornode + "_STATUS", "storage_info_all", 1);
+  storage_info_all* info = (storage_info_all*)data.open(comm);
+
   while (true) {
-    LogFile::debug("%d %d %d %d %ld",
-                   hd->expno, hd->runno, hd->subno,
-                   hd->count_in - hd->count_out,
-                   hd->nword_in - hd->nword_out);
-    sleep(1);
+    sleep(2);
+    fputs("\033[2J\033[0;0H", stdout);
+    rewind(stdout);
+    ftruncate(1, 0);
+
+    for (int i = 0; i < 14; i++) {
+      storage_info_all::io_status& nio(info->io[i]);
+      printf("%08u | %08u | %02.2f | %03.2f | %04.2f\n",
+             nio.nqueue, nio.count, nio.freq, nio.evtsize, nio.rate);
+    }
   }
   return 0;
 }

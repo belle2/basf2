@@ -174,116 +174,6 @@ namespace Belle2 {
     double particleDeltaE(const Particle* part);
 
     /**
-     * return electron Id
-     */
-    double particleElectronId(const Particle* part);
-
-    /**
-     * return pion vs electron Id
-     */
-    double particlePionvsElectronId(const Particle* part);
-
-    /**
-     * return pion vs electron Id from dEdx measurement
-     */
-    double particlePionvsElectrondEdxId(const Particle* part);
-
-    /**
-     * return electron Id
-     */
-    double particleElectrondEdxId(const Particle* part);
-
-    /**
-     * return electron Id
-     */
-    double particleElectronTOPId(const Particle* part);
-
-    /**
-     * return electron Id
-     */
-    double particleElectronARICHId(const Particle* part);
-    /**
-     * return muon Id
-     */
-    double particleMuonId(const Particle* part);
-
-    /**
-     * return electron Id
-     */
-    double particleMuondEdxId(const Particle* part);
-
-    /**
-     * return electron Id
-     */
-    double particleMuonTOPId(const Particle* part);
-
-    /**
-     * return electron Id
-     */
-    double particleMuonARICHId(const Particle* part);
-
-    /**
-     * return pion Id
-     */
-    double particlePionId(const Particle* part);
-
-    /**
-     * return electron Id
-     */
-    double particlePiondEdxId(const Particle* part);
-
-    /**
-     * return electron Id
-     */
-    double particlePionTOPId(const Particle* part);
-
-    /**
-     * return electron Id
-     */
-    double particlePionARICHId(const Particle* part);
-
-    /**
-     * return kaon Id
-     */
-    double particleKaonId(const Particle* part);
-
-    /**
-     * return electron Id
-     */
-    double particleKaondEdxId(const Particle* part);
-
-    /**
-     * return electron Id
-     */
-    double particleKaonTOPId(const Particle* part);
-
-    /**
-     * return electron Id
-     */
-    double particleKaonARICHId(const Particle* part);
-
-    /**
-     * return proton Id
-     */
-    double particleProtonId(const Particle* part);
-
-    /**
-     * return electron Id
-     */
-    double particleProtondEdxId(const Particle* part);
-
-    /**
-     * return electron Id
-     */
-    double particleProtonTOPId(const Particle* part);
-
-    /**
-     * return electron Id
-     */
-    double particleProtonARICHId(const Particle* part);
-
-
-    /**
      * return prob(chi^2,ndf) of fit
      */
     double particlePvalue(const Particle* part);
@@ -307,16 +197,6 @@ namespace Belle2 {
        * return cosine of angle between thrust axis of given particle and thrust axis of ROE
        */
     double cosTPTO(const Particle* part);
-
-    /**
-     * return 1 if ARICH Id is missing
-     */
-    double particleMissingARICHId(const Particle*);
-
-    /**
-     * return 1 if TOPId is missing
-     */
-    double particleMissingTOPId(const Particle*);
 
     /**
      * return 1 if Particle is correctly reconstructed (SIGNAL), 0 otherwise

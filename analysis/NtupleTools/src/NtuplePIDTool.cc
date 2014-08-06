@@ -9,7 +9,7 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtuplePIDTool.h>
-#include <analysis/VariableManager/Variables.h>
+#include <analysis/VariableManager/PIDVariables.h>
 #include <framework/gearbox/Const.h>
 #include <TBranch.h>
 

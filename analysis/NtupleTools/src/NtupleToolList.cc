@@ -10,6 +10,7 @@
 #include <analysis/NtupleTools/NtupleMCHierarchyTool.h>
 #include <analysis/NtupleTools/NtupleMCKinematicsTool.h>
 #include <analysis/NtupleTools/NtuplePIDTool.h>
+#include <analysis/NtupleTools/NtupleDeltaLogLTool.h>
 #include <analysis/NtupleTools/NtupleTrackTool.h>
 #include <analysis/NtupleTools/NtupleClusterTool.h>
 #include <analysis/NtupleTools/NtupleRecoStatsTool.h>
@@ -70,6 +71,7 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName.compare("MCHierarchy") == 0) return new NtupleMCHierarchyTool(tree, d);
   else if (strToolName.compare("MCKinematics") == 0) return new NtupleMCKinematicsTool(tree, d);
   else if (strToolName.compare("PID") == 0) return new NtuplePIDTool(tree, d);
+  else if (strToolName.compare("DeltaLogL") == 0) return new NtupleDeltaLogLTool(tree, d);
   else if (strToolName.compare("RecoStats") == 0) return new NtupleRecoStatsTool(tree, d);
   else if (strToolName.compare("DetectorStatsRec") == 0) return new NtupleDetectorStatsRecTool(tree, d);
   else if (strToolName.compare("DetectorStatsSim") == 0) return new NtupleDetectorStatsSimTool(tree, d);

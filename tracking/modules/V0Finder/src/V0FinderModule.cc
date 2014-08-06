@@ -238,12 +238,12 @@ void V0FinderModule::event()
                                                              stPlus.get6DCov(), stPlus.getCharge(),
                                                              Const::pion,
                                                              gfTrackPlus->getFitStatus()->getPVal(),
-                                                             Bz, 0, 0);
+                                                             Bz / 10., 0, 0);
       TrackFitResult* tfrMinusVtx = trackFitResults.appendNew(stMinus.getPos(), stMinus.getMom(),
                                                               stMinus.get6DCov(), stMinus.getCharge(),
                                                               Const::pion,
                                                               gfTrackMinus->getFitStatus()->getPVal(),
-                                                              Bz, 0, 0);
+                                                              Bz / 10., 0, 0);
 
       V0s.appendNew(std::make_pair(tracksPlus[iTrPlus].first, tfrPlusVtx),
                     std::make_pair(tracksMinus[iTrMinus].first, tfrMinusVtx));

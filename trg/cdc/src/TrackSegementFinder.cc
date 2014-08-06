@@ -117,7 +117,6 @@ void TRGCDCTrackSegmentFinder::doit(std::vector<TRGCDCSegment* >& tss, const boo
     // Saves TS information
     saveTSInformation(tss);
 
-//cout << "Hello World1" << endl;
     //...Store TS hits...
     const unsigned n = tss.size();
     for (unsigned i = 0; i < n; i++) {
@@ -412,7 +411,7 @@ TSFinder::findTSHit(TRGSignalVector* eachInput, int tsid){
     fTimeVect.insert(fTimeVect.begin(),fTimeBool,fTimeBool+10);
     //tmpFTime = mkint(fTime->state(changeTime[0]));
     for(unsigned i=0;i<changeTime.size();i++){
-      LUTValue[i] = tsi->nLUT()->getValue(mkint(Hitmap->state(changeTime[i])));
+      LUTValue[i] = tsi->LUT()->getValue(mkint(Hitmap->state(changeTime[i])));
 
       /// output for EvtTime & Low pT tracker module
       if((LUTValue[i])&&(eOUT)){

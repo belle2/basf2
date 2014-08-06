@@ -41,7 +41,6 @@ class TRGCDCSegment : public TRGCDCCell {
     TRGCDCSegment(unsigned id,
 		  const TRGCDCLayer & layer,
 		  const TRGCDCWire & w,
-		  const TRGCDCLUT * lut,   // Will be removed.
 		  const TRGClock & clock,
 		  const TRGCDCEventTime * eventTime,
 		  const std::string & TSLUTFile,
@@ -81,9 +80,6 @@ const TRGCDCWire & fasterWire(const TRGCDCWire*, const TRGCDCWire*)const;
 
     unsigned lutPattern(void) const;
 
-    /// returns LUT.
-    const TRGCDCLUT * LUT(void) const;
-
 /// return fastest time in TSHit.
 float fastestTime(void)const;
 
@@ -93,10 +89,8 @@ float priorityTime(void);
 /// return priority cell position in TSHit. 0: no hit, 3: 1st priority, 1: 2nd right, 2: 2nd left
 int priorityPosition(void)const;
 
-bool active(void);
-
-    /// returns (new) LUT
-    const TRGCDCLUT * nLUT(void) const;
+    /// returns LUT
+    const TRGCDCLUT * LUT(void) const;
 
     /// dumps debug information.
     void dump(const std::string & message = std::string(""),
@@ -151,7 +145,7 @@ bool active(void);
     TRGCDCLUT * m_TSLUT;
 
     /// LookUp Table.
-    const TRGCDCLUT * const _lut;  //Will be Removed.
+//    const TRGCDCLUT * const _lut;  //Will be Removed.
 
     /// Wires.
     std::vector<const TRGCDCWire *> _wires;
@@ -210,17 +204,10 @@ TRGCDCSegment::hit(void) const {
     return  (const TRGCDCSegmentHit *) TRGCDCCell::hit();
 }
 
-// *** Will be removed. -KT
-inline
-const TRGCDCLUT *
-TRGCDCSegment::LUT(void) const {
-//    std::cout << "this function(LUT in Segment.h) will be replaced by new function -ktkim " << std::endl;
-    return _lut;
-}
 
 inline
 const TRGCDCLUT *
-TRGCDCSegment::nLUT(void)  const{  //will be LUT()   -KT
+TRGCDCSegment::LUT(void)  const{
     return m_TSLUT;
 }
 

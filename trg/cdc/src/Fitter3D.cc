@@ -163,7 +163,7 @@ namespace Belle2 {
         const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
         m_mVector["wirePhi"][iSL] = (double) t_segment->localId()/m_mConstV["nWires"][iSL]*4*m_mConstD["Trg_PI"];
 //        m_mVector["lutLR"][iSL] = t_segment->LUT()->getLRLUT(t_segment->hitPattern(),iSL);
-        m_mVector["lutLR"][iSL] = t_segment->nLUT()->getValue(t_segment->hitPattern());
+        m_mVector["lutLR"][iSL] = t_segment->LUT()->getValue(t_segment->hitPattern());
         m_mVector["mcLR"][iSL] = t_segment->hit()->mcLR();
         m_mVector["driftLength"][iSL] = t_segment->hit()->drift();
         if(m_mBool["fmcLR"]==1) m_mVector["LR"][iSL] = m_mVector["mcLR"][iSL];

@@ -64,11 +64,11 @@ class TRGCDCModule : public Module {
     /// Config. file name.
     std::string _configFilename;
 
-    /// The filename of LUT for the inner-most track segments.
-    std::string _innerTSLUTDataFilename;
-
-    /// The filename of LUT for outer track segments.
-    std::string _outerTSLUTDataFilename;
+//    /// The filename of LUT for the inner-most track segments.
+//    std::string _innerTSLUTDataFilename;
+//
+//    /// The filename of LUT for outer track segments.
+//    std::string _outerTSLUTDataFilename;
 
     /// The filename of LUT for the inner-most track segments.(tmp)
     std::string _innerTSLUTFilename;
@@ -76,32 +76,32 @@ class TRGCDCModule : public Module {
     /// The filename of LUT for outer track segments.(tmp)
     std::string _outerTSLUTFilename;
 
-    /// The filename of LUT for track segment finder SL0.
-    std::string _tsfLUTSL0DataFilename;
-
-    /// The filename of LUT for track segment finder SL1.
-    std::string _tsfLUTSL1DataFilename;
-
-    /// The filename of LUT for track segment finder SL2.
-    std::string _tsfLUTSL2DataFilename;
-
-    /// The filename of LUT for track segment finder SL3.
-    std::string _tsfLUTSL3DataFilename;
-
-    /// The filename of LUT for track segment finder SL4.
-    std::string _tsfLUTSL4DataFilename;
-
-    /// The filename of LUT for track segment finder SL5.
-    std::string _tsfLUTSL5DataFilename;
-
-    /// The filename of LUT for track segment finder SL6.
-    std::string _tsfLUTSL6DataFilename;
-
-    /// The filename of LUT for track segment finder SL7.
-    std::string _tsfLUTSL7DataFilename;
-
-    /// The filename of LUT for track segment finder SL8.
-    std::string _tsfLUTSL8DataFilename;
+//    /// The filename of LUT for track segment finder SL0.
+//    std::string _tsfLUTSL0DataFilename;
+//
+//    /// The filename of LUT for track segment finder SL1.
+//    std::string _tsfLUTSL1DataFilename;
+//
+//    /// The filename of LUT for track segment finder SL2.
+//    std::string _tsfLUTSL2DataFilename;
+//
+//    /// The filename of LUT for track segment finder SL3.
+//    std::string _tsfLUTSL3DataFilename;
+//
+//    /// The filename of LUT for track segment finder SL4.
+//    std::string _tsfLUTSL4DataFilename;
+//
+//    /// The filename of LUT for track segment finder SL5.
+//    std::string _tsfLUTSL5DataFilename;
+//
+//    /// The filename of LUT for track segment finder SL6.
+//    std::string _tsfLUTSL6DataFilename;
+//
+//    /// The filename of LUT for track segment finder SL7.
+//    std::string _tsfLUTSL7DataFilename;
+//
+//    /// The filename of LUT for track segment finder SL8.
+//    std::string _tsfLUTSL8DataFilename;
 
     /// The filename of root file for TRGCDC
     std::string _rootTRGCDCFilename;

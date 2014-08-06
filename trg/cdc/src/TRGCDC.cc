@@ -98,19 +98,8 @@ TRGCDC::getTRGCDC(const string & configFile,
                   bool makeRootFile,
                   bool perfect2DFinder,
                   bool perfect3DFinder,
-                  const string & innerTSLUTDataFile,
-                  const string & outerTSLUTDataFile,
 		  const string & innerTSLUTFile,
 		  const string & outerTSLUTFile,
-                  const string & tsfLUTSL0DataFile,
-                  const string & tsfLUTSL1DataFile,
-                  const string & tsfLUTSL2DataFile,
-                  const string & tsfLUTSL3DataFile,
-                  const string & tsfLUTSL4DataFile,
-                  const string & tsfLUTSL5DataFile,
-                  const string & tsfLUTSL6DataFile,
-                  const string & tsfLUTSL7DataFile,
-                  const string & tsfLUTSL8DataFile,
                   const string & rootTRGCDCFile,
                   const string & rootFitter3DFile,
                   unsigned houghFinderMeshX,
@@ -140,19 +129,8 @@ TRGCDC::getTRGCDC(const string & configFile,
                           makeRootFile,
                           perfect2DFinder,
                           perfect3DFinder,
-                          innerTSLUTDataFile,
-                          outerTSLUTDataFile,
 			  innerTSLUTFile,
 			  outerTSLUTFile,
-                          tsfLUTSL0DataFile,
-                          tsfLUTSL1DataFile,
-                          tsfLUTSL2DataFile,
-                          tsfLUTSL3DataFile,
-                          tsfLUTSL4DataFile,
-                          tsfLUTSL5DataFile,
-                          tsfLUTSL6DataFile,
-                          tsfLUTSL7DataFile,
-                          tsfLUTSL8DataFile,
                           rootTRGCDCFile,
                           rootFitter3DFile,
                           houghFinderMeshX,
@@ -193,19 +171,8 @@ TRGCDC::TRGCDC(const string & configFile,
                bool makeRootFile,
                bool perfect2DFinder,
                bool perfect3DFinder,
-               const string & innerTSLUTDataFile,
-               const string & outerTSLUTDataFile,
 	       const string & innerTSLUTFile,
 	       const string & outerTSLUTFile,
-               const string & tsfLUTSL0DataFile,
-               const string & tsfLUTSL1DataFile,
-               const string & tsfLUTSL2DataFile,
-               const string & tsfLUTSL3DataFile,
-               const string & tsfLUTSL4DataFile,
-               const string & tsfLUTSL5DataFile,
-               const string & tsfLUTSL6DataFile,
-               const string & tsfLUTSL7DataFile,
-               const string & tsfLUTSL8DataFile,
                const string & rootTRGCDCFile,
                const string & rootFitter3DFile,
                unsigned houghFinderMeshX,
@@ -230,19 +197,8 @@ TRGCDC::TRGCDC(const string & configFile,
       _makeRootFile(makeRootFile),
       _perfect2DFinder(perfect2DFinder),
       _perfect3DFinder(perfect3DFinder),
-      _innerTSLUTDataFilename(innerTSLUTDataFile),
-      _outerTSLUTDataFilename(outerTSLUTDataFile),
       _innerTSLUTFilename(innerTSLUTFile),
       _outerTSLUTFilename(outerTSLUTFile),
-      _tsfLUTSL0DataFilename(tsfLUTSL0DataFile),
-      _tsfLUTSL1DataFilename(tsfLUTSL1DataFile),
-      _tsfLUTSL2DataFilename(tsfLUTSL2DataFile),
-      _tsfLUTSL3DataFilename(tsfLUTSL3DataFile),
-      _tsfLUTSL4DataFilename(tsfLUTSL4DataFile),
-      _tsfLUTSL5DataFilename(tsfLUTSL5DataFile),
-      _tsfLUTSL6DataFilename(tsfLUTSL6DataFile),
-      _tsfLUTSL7DataFilename(tsfLUTSL7DataFile),
-      _tsfLUTSL8DataFilename(tsfLUTSL8DataFile),
       _rootTRGCDCFilename(rootTRGCDCFile),
       _rootFitter3DFilename(rootFitter3DFile),
       _fLogicLUTTSF(fLogicLUTTSF),
@@ -431,27 +387,10 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
         }
     }
 
-//******* Will be removed -KT
-    //...LUT for LR decision : common to all TS... 
-    _luts.push_back(new TCLUT("TS LUTs", * this));
-    _luts.back()->initialize(_innerTSLUTDataFilename);
-    _luts.back()->initialize(_outerTSLUTDataFilename);
-    _luts.back()->initialize(_tsfLUTSL0DataFilename);
-    _luts.back()->initialize(_tsfLUTSL1DataFilename);
-    _luts.back()->initialize(_tsfLUTSL2DataFilename);
-    _luts.back()->initialize(_tsfLUTSL3DataFilename);
-    _luts.back()->initialize(_tsfLUTSL4DataFilename);
-    _luts.back()->initialize(_tsfLUTSL5DataFilename);
-    _luts.back()->initialize(_tsfLUTSL6DataFilename);
-    _luts.back()->initialize(_tsfLUTSL7DataFilename);
-    _luts.back()->initialize(_tsfLUTSL8DataFilename);
 
     //...event Time...
     _eventTime.push_back(new TCEventTime(*this));
     _eventTime.back()->initialize();
-
-    //  for (unsigned i = 0; _luts.size(); i++)
-    //  _luts[i]->doit();
 
     TRGCDCSegment *tstmp;
 
@@ -556,7 +495,6 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
 //            TRGCDCSegment * ts = new TRGCDCSegment(idTS++,
 //                                                   * layer,
 //                                                   w,
-//                                                   _luts.back(),
 //                                                   _clockD,
 //                                                   _eventTime.back(),
 //						   _innerTSLUTFilename,
@@ -569,7 +507,6 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
             ts = new TRGCDCSegment(idTS++,
                                    * layer,
                                    w,
-                                   _luts.back(),  //Will be Removed.
                                    _clockD,
                                    _eventTime.back(),
 				   _outerTSLUTFilename,
@@ -580,7 +517,6 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
             ts = new TRGCDCSegment(idTS++,
                                    * layer,
                                    w,
-                                   _luts.back(),  // Will be removed.
                                    _clockD,
                                    _eventTime.back(),
 				   _innerTSLUTFilename,
@@ -627,8 +563,6 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
 
     //...Track Segment Finder...
     _tsFinder = new TSFinder(*this, _fileTSF, _fLogicLUTTSF);
-
-   // _tsFinder->initialize(_innerTSLUTFilename, _outerTSLUTFilename);
 
     //...Perfect 2D Finder...
     _pFinder = new TCPFinder("Perfect2DFinder", * this);
@@ -1958,10 +1892,6 @@ TRGCDC::~TRGCDC() {
     if (_fitter3D)
         delete _fitter3D;
 
-//******* Will be removed -KT
-    for (unsigned i = 0; i < _luts.size(); i++)
-        delete _luts[i];
-
 #ifdef TRGCDC_DISPLAY
     if (D)
         delete D;
@@ -2449,8 +2379,6 @@ TRGCDC::firmwareSimulation(void) {
     D->beginningOfEvent();
 #endif
 
-    //const bool trackSegmentSimulationOnly = _fastSimulationMode & 1;
-    const bool trackSegmentClockSimulation = _fastSimulationMode & 2;
     //...Front ends...
     const unsigned nFronts = _fronts.size();
     for (unsigned i = 0; i < nFronts; i++) {

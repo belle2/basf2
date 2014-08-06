@@ -70,19 +70,8 @@ class TRGCDC {
                               bool _makeRootFile = 0,
                               bool perfect2DFinder = false,
                               bool perfect3DFinder = false,
-			      const std::string & innerTSLUTDataFile = "?",
-			      const std::string & outerTSLUTDataFile = "?",
 			      const std::string & innerTSLUTFile = "?",
 			      const std::string & outerTSLUTFile = "?",
-			      const std::string & tsfLUTSL0DataFile = "?",
-			      const std::string & tsfLUTSL1DataFile = "?",
-			      const std::string & tsfLUTSL2DataFile = "?",
-			      const std::string & tsfLUTSL3DataFile = "?",
-			      const std::string & tsfLUTSL4DataFile = "?",
-			      const std::string & tsfLUTSL5DataFile = "?",
-			      const std::string & tsfLUTSL6DataFile = "?",
-			      const std::string & tsfLUTSL7DataFile = "?",
-			      const std::string & tsfLUTSL8DataFile = "?",
 			      const std::string & rootTRGCDCFile = "?",
 			      const std::string & rootFitter3DFile = "?",
                               unsigned houghFinderMeshX = 96,
@@ -114,19 +103,8 @@ class TRGCDC {
            bool makeRootFile,
 	   bool perfect2DFinder,
 	   bool perfect3DFinder,
-	   const std::string & innerTSLUTDataFile,
-	   const std::string & outerTSLUTDataFile,
 	   const std::string & innerTSLUTFile,
 	   const std::string & outerTSLUTFile,
-	   const std::string & tsfLUTSL0DataFile,
-	   const std::string & tsfLUTSL1DataFile,
-	   const std::string & tsfLUTSL2DataFile,
-	   const std::string & tsfLUTSL3DataFile,
-	   const std::string & tsfLUTSL4DataFile,
-	   const std::string & tsfLUTSL5DataFile,
-	   const std::string & tsfLUTSL6DataFile,
-	   const std::string & tsfLUTSL7DataFile,
-	   const std::string & tsfLUTSL8DataFile,
 	   const std::string & rootTRGCDCFile,
 	   const std::string & rootFitter3DFile,
            unsigned houghFinderMeshX,
@@ -447,43 +425,10 @@ class TRGCDC {
     const bool _perfect3DFinder;
 
     /// The filename of LUT for the inner-most track segments.
-    std::string _innerTSLUTDataFilename;
-
-    /// The filename of LUT for outer track segments.
-    std::string _outerTSLUTDataFilename;
-
-    /// The filename of LUT for the inner-most track segments.
     std::string _innerTSLUTFilename;
 
     /// The filename of LUT for outer track segments.
     std::string _outerTSLUTFilename;
-
-    /// The filename of LUT for track segment finder SL0.
-    std::string _tsfLUTSL0DataFilename;
-
-    /// The filename of LUT for track segment finder SL1.
-    std::string _tsfLUTSL1DataFilename;
-
-    /// The filename of LUT for track segment finder SL2.
-    std::string _tsfLUTSL2DataFilename;
-
-    /// The filename of LUT for track segment finder SL3.
-    std::string _tsfLUTSL3DataFilename;
-
-    /// The filename of LUT for track segment finder SL4.
-    std::string _tsfLUTSL4DataFilename;
-
-    /// The filename of LUT for track segment finder SL5.
-    std::string _tsfLUTSL5DataFilename;
-
-    /// The filename of LUT for track segment finder SL6.
-    std::string _tsfLUTSL6DataFilename;
-
-    /// The filename of LUT for track segment finder SL7.
-    std::string _tsfLUTSL7DataFilename;
-
-    /// The filename of LUT for track segment finder SL8.
-    std::string _tsfLUTSL8DataFilename;
 
     /// The filename of root file for TRGCDC.
     std::string _rootTRGCDCFilename;
@@ -635,9 +580,6 @@ class TRGCDC {
 
     /// 3D fitter.
     TRGCDCFitter3D * _fitter3D;
-
-    /// LUT holder.
-    std::vector<TRGCDCLUT *> _luts;
 
     /// EventTime
 //  TRGCDCEventTime *_eventTime;

@@ -44,7 +44,6 @@ namespace Belle2 {
 TRGCDCSegment::TRGCDCSegment(unsigned id,
 			     const TCLayer & layer,
 			     const TCWire & w,
-			     const TCLUT * lut,
 			     const TRGClock & clock,
 			     const TRGCDCEventTime * eventTime,
 			     const std::string & TSLUTFile,
@@ -54,7 +53,6 @@ TRGCDCSegment::TRGCDCSegment(unsigned id,
 	     layer,
 	     w.forwardPosition(),
 	     w.backwardPosition()),
-      _lut(lut),
       _wires(cells),
       _signal(std::string("TS_") + TRGUtil::itostring(id), clock),
       _eventTime(eventTime),
@@ -323,7 +321,7 @@ TCSegment::simulateWithoutClock(bool logicLUTFlag) {
 
 //work here
       //int lutValue = this->nLUT()->getValue(this->hitPattern());
-      int lutValue = this->nLUT()->getValue(this->lutPattern());
+      int lutValue = this->LUT()->getValue(this->lutPattern());
 //      if((lutValue != 0) && (this->center().hit() != 0) ) {
       if((lutValue != 0) && (this->priority().hit() != 0) ) {
       //if((lutValue != 0) ){
@@ -351,9 +349,7 @@ TCSegment::simulateWithoutClock(bool logicLUTFlag) {
 float
 TCSegment::fastestTime(void)const{
   float tmpFastTime = 9999;
-  //if((this->nLUT()->getValue(this->hitPattern()))&&(this->center().hit())){
-  //if((this->nLUT()->getValue(this->hitPattern()))&&(this->priority().hit())){
-  if((this->nLUT()->getValue(this->lutPattern()))&&(this->priority().hit())){
+  if((this->LUT()->getValue(this->lutPattern()))&&(this->priority().hit())){
     for(unsigned i=0;i<_wires.size();i++){
       if(_wires[i]->hit()){
         float dt= _wires[i]->hit()->drift()*10*1000/40;
@@ -372,8 +368,7 @@ float
 TCSegment::priorityTime(void){
   if(this->center().hit()){
     return this->center().hit()->drift()*10*1000/40;
-  } else if(this->nLUT()->getValue(this->lutPattern())){
-  //} else if(this->nLUT()->getValue(this->hitPattern())){
+  } else if(this->LUT()->getValue(this->lutPattern())){
     const TRGCDCWire* priorityL;
     const TRGCDCWire* priorityR;
     if(_wires.size() == 15){
@@ -384,15 +379,6 @@ TCSegment::priorityTime(void){
       priorityR = _wires[6];
     }
     return fasterWire(priorityL, priorityR).hit()->drift()*10*1000/40;
-//    if(priorityL->hit()){
-//      tmpTime = priorityL->hit()->drift()*10*1000/40;
-//      if(priorityR->hit()){
-//        if(tmpTime>(priorityR->hit()->drift()*10*1000/40)) tmpTime = priorityR->hit()->drift()*10*1000/40;
-//      }
-//    }else if(priorityR->hit()){
-//      tmpTime = priorityR->hit()->drift()*10*1000/40;
-//    } else tmpTime = -2;
-//    return tmpTime;
   } else return -1;
 }
 
@@ -428,7 +414,6 @@ TCSegment::priority(void) const{
       return *_wires[0];
     }else return *_wires[5];
   } else if(m_TSLUT->getValue(this->lutPattern())){
-  //} else if(m_TSLUT->getValue(this->hitPattern())){
     if(_wires.size()==15){return fasterWire(_wires[1],_wires[2]);
     }else return fasterWire(_wires[6],_wires[7]);
   }else{ 
@@ -437,11 +422,6 @@ TCSegment::priority(void) const{
     }else return *_wires[5];
   }
 }
-
-//bool active(void){
-//  if(nLUT()->getValue(hitPattern())) return true;
-//  else return false;
-//}
 
 const TRGCDCWire &
 TCSegment::fasterWire(const TRGCDCWire* w1, const TRGCDCWire* w2)const{
@@ -622,9 +602,7 @@ TRGCDCSegment::phiPosition(void) const {
   float evtTime=EvtTime()->getT0();
   evtTime=evtTime*40/1000;
 	double phi=(double)localId()/nWires[superLayerId()]*4*M_PI;
-	//int lutcomp=LUT()->getLRLUT(hitPattern(),superLayerId());
-	//int lutcomp=nLUT()->getValue(hitPattern());
-	int lutcomp=nLUT()->getValue(lutPattern());
+	int lutcomp=LUT()->getValue(lutPattern());
 	float dphi=hit()->drift()*10;
 	if(flagevtTime){
 		dphi-=evtTime;

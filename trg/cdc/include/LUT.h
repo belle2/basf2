@@ -32,9 +32,6 @@ class TRGCDCLUT {
   public:
 
     /// Contructor.
-    TRGCDCLUT(const std::string & name, const TRGCDC &);
-
-    //TRGCDCLUT (void);
     TRGCDCLUT();
 
     /// Destructor
@@ -45,13 +42,8 @@ class TRGCDCLUT {
     /// returns name.
     std::string name(void) const;
 
-    std::string tmpname(void);
-
     /// returns version.
     std::string version(void) const;
-
-    /// initialize LookUpTable(LUT).
-    void initialize(const std::string & filename);
 
     /// set LUT data.
     void setDataFile(const std::string &filename, int);
@@ -59,15 +51,7 @@ class TRGCDCLUT {
     /// get LUT Values
     double getValue(double) const;
 
-    /// get LR componet from pattern id. Return value 0:right(decrease phi), 1:left(increase phi), 2:not determined
-    /// get LRLUT component from pattern id.
-    /// return value 0: No TSHIT, 01: Right, 10: Left, 11: Not determined.
-    int getLRLUT(int,int) const;
-
-    /// get Hit LR component from pattern id.
-    /// (00)(00)(0): Left LR, Right LR, Hit/NotHit
-    /// 00: Not determined. 10: Right, 11: Left
-    std::string getHitLRLUT(int, int) const;
+    int getValue(unsigned) const;
 
   private:
 
@@ -80,28 +64,6 @@ class TRGCDCLUT {
     /// LUT name.
     std::string m_name;
 
-    /// Name.
-    const std::string _name;
-
-    /// CDCTRG.
-    //const TRGCDC & _cdc;
-
-    /// left/right lookuptable except for inner-most super layer
-    int m_LRLUT[2048];
-
-    /// left/right lookuptable for inner-most super layer
-    int m_LRLUTIN[32768];
-
-    /// hit/left/right loopuptabels for each super layer
-    std::string m_HitLRLUTSL0[32768];
-    std::string m_HitLRLUTSL1[2048];
-    std::string m_HitLRLUTSL2[2048];
-    std::string m_HitLRLUTSL3[2048];
-    std::string m_HitLRLUTSL4[2048];
-    std::string m_HitLRLUTSL5[2048];
-    std::string m_HitLRLUTSL6[2048];
-    std::string m_HitLRLUTSL7[2048];
-    std::string m_HitLRLUTSL8[2048];
 
 };
 
@@ -109,13 +71,7 @@ class TRGCDCLUT {
 
 inline
 std::string
-TRGCDCLUT::name(void) const {
-    return _name;
-}
-
-inline
-std::string
-TRGCDCLUT::tmpname(void){
+TRGCDCLUT::name(void)const{
 	return m_name;
 }
 

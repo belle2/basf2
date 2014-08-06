@@ -5240,6 +5240,7 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
             }
             B2DEBUG(50, "neighbourFINDER: segment discarded! simpleSegmentQI = " << simpleSegmentQI << ", threshold: " << currentPass->activatedNbFinderTests << " Outer/inner Segment: " << mainSecID << "/" << FullSecID(currentFriendID) << "/" << FullSecID(currentInnerSeg->getInnerHit()->getSectorName()) << endl << "FilterResults: " << outputStream.str()  << endl)
           }
+          // here 3-hit-cell-discarded update (nbFinder)
           continue;
         }
         if ((m_highOccupancyCase == true) && (currentPass->activatedHighOccupancyNbFinderTests != 0)) {
@@ -5254,6 +5255,7 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
                 }
                 B2DEBUG(50, "NbFINDERHighOccupancy: segment discarded! Outer/inner Segment: " <<  mainSecID << "/" << FullSecID(currentFriendID) << "/" << FullSecID(currentInnerSeg->getInnerHit()->getSectorName()) << endl << "FilterResults: " << outputStream.str() << ", needed threshold: " << currentPass->activatedHighOccupancyNbFinderTests << "\n")
               }
+              // here 3-hit-cell-discarded update (nbFinder high occupancy
               continue;
             }
           }
@@ -5267,6 +5269,7 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           B2DEBUG(50, "neighbourFINDER: current segment is not allowed being seed for CA")
           currentInnerSeg->setSeed(false);
         }
+        // here 3-hit-cell accepted (nbFinder)
       } // iterating through inner segments
     } // iterating through outer segments
   } // iterating through all active sectors - friendFinder

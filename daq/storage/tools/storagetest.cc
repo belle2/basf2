@@ -35,21 +35,19 @@
 using namespace Belle2;
 
 const unsigned long long GB = 1024 * 1024 * 1024;
-const unsigned long long MAX_FILE_SIZE = 2 * GB;
+const unsigned long long MAX_FILE_SIZE = 8 * GB;
 int g_nfile = 0;
-Mutex g_mutex;
 
 class FileHandler {
 
 private:
   FILE* file;
   char* buf;
-  int id;
+
 public:
   FileHandler() {
     file = NULL;
     buf = NULL;
-    id = 0;
   }
   FileHandler(const std::string& dir, int expno, int runno) {
     open(dir, expno, runno);
@@ -57,8 +55,10 @@ public:
 
 public:
   void open(const std::string& dir, int expno, int runno) {
+    if (file != NULL) {
+      close();
+    }
     char filename[1024];
-    g_mutex.lock();
     if (g_nfile > 0) {
       sprintf(filename, "%s/e%4.4dr%6.6d.sroot-%d",
               dir.c_str(), expno, runno, g_nfile);
@@ -67,8 +67,6 @@ public:
               dir.c_str(), expno, runno);
     }
     g_nfile++;
-    id = g_nfile;
-    g_mutex.unlock();
     file = fopen(filename, "w");
     if (file == NULL) {
       B2ERROR("failed to open file : " << filename);
@@ -132,7 +130,6 @@ public:
     : m_handler(handler), m_dir(dir),
       m_expno(expno), m_runno(runno) {}
 
-
 public:
   void run() {
     g_mutex.lock();
@@ -154,18 +151,12 @@ int main(int argc, char** argv)
     printf("rawfile2rb : ibufname path_to_disk [obufname] [nodename, nodeid]\n");
     return 1;
   }
-  nice(-1);
-  const unsigned interval = 10;
   RunInfoBuffer info;
   const bool use_info = (argc > 7);
   if (use_info) {
     info.open(argv[6], atoi(argv[7]));
   }
-  SharedEventBuffer ibuf;
-  ibuf.open(argv[1], atol(argv[2]) * 1000000, true);
   const std::string dir = argv[3];
-  SharedEventBuffer obuf;
-  obuf.open(argv[4], atol(argv[5]) * 1000000, true);
   B2INFO("storagerecord: started recording.");
   if (use_info) {
     info.reportRunning();
@@ -179,8 +170,10 @@ int main(int argc, char** argv)
   unsigned int subno = 0;
   FileHandler file;
   SharedEventBuffer::Header iheader;
+  iheader.expno = 1;
+  iheader.runno = 2;
   while (true) {
-    ibuf.read(evtbuf, true, &iheader);
+    evtbuf[0] = 32600;
     int nbyte = evtbuf[0];
     int nword = (nbyte - 1) / 4 + 1;
     if (expno < iheader.expno || runno < iheader.runno) {
@@ -197,11 +190,6 @@ int main(int argc, char** argv)
         nbyte_out = 0;
         count_out = 0;
       }
-      obuf.lock();
-      SharedEventBuffer::Header* oheader = ibuf.getHeader();
-      oheader->expno = expno;
-      oheader->runno = runno;
-      obuf.unlock();
       g_nfile = 0;
       file.open(dir, expno, runno);
       PThread(new FileCloser(FileHandler(), dir, expno, runno));
@@ -218,10 +206,6 @@ int main(int argc, char** argv)
       }
       file.write((char*)evtbuf, nbyte);
       nbyte_out += nbyte;
-      if (count_out % interval == 0 && obuf.isWritable(nword)) {
-        obuf.write(evtbuf, nword, true);
-      }
-      count_out++;
       if (use_info) {
         info.addOutputCount(1);
         info.addOutputNBytes(nbyte);
@@ -229,7 +213,6 @@ int main(int argc, char** argv)
     } else {
       B2ERROR("storagerecord: no run was initialzed for recording");
     }
-    //usleep(1000);
   }
   return 0;
 }

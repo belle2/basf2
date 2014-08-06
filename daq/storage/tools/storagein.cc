@@ -12,6 +12,7 @@
 #include <framework/logging/Logger.h>
 
 #include <daq/storage/BinData.h>
+#include <daq/storage/EventBuffer.h>
 #include <daq/storage/SharedEventBuffer.h>
 
 #include <daq/slc/readout/RunInfoBuffer.h>
@@ -30,6 +31,7 @@ int main(int argc, char** argv)
                    "[nodename, nodeid]", argv[0]);
     return 1;
   }
+
   RunInfoBuffer info;
   bool use_info = (argc > 6);
   if (use_info) {
@@ -75,14 +77,14 @@ int main(int argc, char** argv)
       TCPSocketReader reader(socket);
       B2INFO("storagein: Cconnected to eb2.");
       while (true) {
-        reader.read(evtbuf, sizeof(int));
+        reader.read(data.getBuffer(), sizeof(int));
         if (info.getInputNBytes() == 0) {
           info.reportRunning();
         }
-        unsigned int nbyte = (evtbuf[0] - 1) * sizeof(int);
-        int nword = evtbuf[0];
-        reader.read((evtbuf + 1), nbyte);
-        nbyte = evtbuf[0] * sizeof(int);
+        unsigned int nbyte = data.getByteSize() - sizeof(int);
+        int nword = data.getWordSize();
+        reader.read((data.getBuffer() + 1), nbyte);
+        nbyte += sizeof(int);
         if (info.isAvailable()) {
           info.addInputCount(1);
           info.addInputNBytes(nbyte);
@@ -112,10 +114,10 @@ int main(int argc, char** argv)
             info.setOutputNBytes(0);
           }
         }
-        ibuf.write(evtbuf, nword, true);
+        ibuf.write(data.getBuffer(), nword, true);
         if (info.isAvailable()) {
           info.addOutputCount(1);
-          info.addOutputNBytes(nbyte);
+          info.addOutputNBytes(nword * sizeof(int));
         }
       }
     } catch (const IOException& e) {

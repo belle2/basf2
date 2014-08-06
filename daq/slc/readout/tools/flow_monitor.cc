@@ -25,6 +25,7 @@
 
 #include <daq/slc/base/StringUtil.h>
 
+#include <fstream>
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
@@ -76,7 +77,7 @@ int main(int argc, char** argv)
     ioinfo_v.push_back(oinfo);
     ip_v.push_back(ip);
   }
-
+  std::ofstream fout("data.txt");
   while (true) {
     sleep(2);
     fputs("\033[2J\033[0;0H", stdout);
@@ -90,6 +91,7 @@ int main(int argc, char** argv)
     }
     IOInfo::checkTCP(ioinfo_v);
     int ctime = Time().get();
+    fout << ctime << " ";
     ronode_info info;
     printf("%d\n", ctime);
     for (size_t i = 0; i < info_v.size(); i++) {
@@ -134,8 +136,14 @@ int main(int argc, char** argv)
                status.io[j].count,
                status.io[j].nqueue,
                status.io[j].state);
+        fout << status.io[j].freq << " ";
+        fout << status.io[j].evtsize << " ";
+        fout << status.io[j].rate << " ";
+        fout << status.io[j].nqueue << " ";
+        fout << status.io[j].state << " ";
       }
     }
+    fout << std::endl;
   }
   return 0;
 }

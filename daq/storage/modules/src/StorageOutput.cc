@@ -88,7 +88,8 @@ void StorageOutputModule::event()
   }
   // Stream DataStore in EvtMessage
   EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
-  m_obuf.write((int*)msg->buffer(), (msg->size() - 1) / 4 + 1,
+  int nword = (msg->size() - 1) / 4 + 1;
+  m_obuf.write((int*)msg->buffer(), nword,
                false, StorageDeserializerModule::getPackage().getSerial());
   m_nbyte += msg->size();
   delete msg;

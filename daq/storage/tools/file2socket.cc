@@ -27,7 +27,7 @@ using namespace std;
 int main(int argc, char** argv)
 {
   if (argc < 4) {
-    printf("ds_socket2rb : filename hostname port\n");
+    printf("ds_socket2rb : filename hostname port interval\n");
     return 1;
   }
 
@@ -41,6 +41,7 @@ int main(int argc, char** argv)
   TCPServerSocket server_socket;
   const std::string host = argv[2];
   server_socket.open(host, atoi(argv[3]));
+  const int ninterval = atoi(argv[4]);
   printf("file2socket::accepting\n");
   TCPSocket socket = server_socket.accept();
   printf("file2socket::accepted\n");
@@ -75,7 +76,7 @@ int main(int argc, char** argv)
       t0 = t;
       datasize = 0;
     }
-    if (nrec % 30 == 0) usleep(1000);
+    if (nrec % ninterval == 0) usleep(1000);
   }
   socket.close();
   return 0;

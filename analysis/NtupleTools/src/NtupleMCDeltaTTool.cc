@@ -8,7 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include <analysis/NtupleTools/NtupleMCTagVertexTool.h>
+#include <analysis/NtupleTools/NtupleMCDeltaTTool.h>
 #include <analysis/VariableManager/Variables.h>
 #include <analysis/dataobjects/Vertex.h>
 #include <cmath>
@@ -19,23 +19,21 @@
 using namespace Belle2;
 using namespace std;
 
-void NtupleMCTagVertexTool::setupTree()
+void NtupleMCDeltaTTool::setupTree()
 {
   vector<string> strNames = m_decaydescriptor.getSelectionNames();
   if (strNames.empty()) return;
-  m_fMCTagVx = 0;
-  m_fMCTagVy = 0;
-  m_fMCTagVz = 0;
+  m_fMCTagPDG = 0;
+  m_fTruthDeltaT = 0;
 
-  m_tree->Branch((strNames[0] + "_TruthTagVx").c_str(), &m_fMCTagVx, (strNames[0] + "_TruthTagVx/F").c_str());
-  m_tree->Branch((strNames[0] + "_TruthTagVy").c_str(), &m_fMCTagVy, (strNames[0] + "_TruthTagVy/F").c_str());
-  m_tree->Branch((strNames[0] + "_TruthTagVz").c_str(), &m_fMCTagVz, (strNames[0] + "_TruthTagVz/F").c_str());
+  m_tree->Branch((strNames[0] + "_mcTagPDG").c_str(), &m_fMCTagPDG, (strNames[0] + "_mcTagPDG/I").c_str());
+  m_tree->Branch((strNames[0] + "_TruthDeltaT").c_str(), &m_fTruthDeltaT, (strNames[0] + "_TruthDeltaT/F").c_str());
 }
 
-void NtupleMCTagVertexTool::eval(const Particle* particle)
+void NtupleMCDeltaTTool::eval(const Particle* particle)
 {
   if (!particle) {
-    printf("NtupleMCTagVertexTool::eval - ERROR, no Particle found!\n");
+    printf("NtupleMCDeltaTTool::eval - ERROR, no Particle found!\n");
     return;
   }
 
@@ -44,9 +42,8 @@ void NtupleMCTagVertexTool::eval(const Particle* particle)
 
   Vertex* Ver = selparticles[0]->getRelatedTo<Vertex>();
   if (Ver) {
-    m_fMCTagVx = Ver->getMCTagVertex().X();
-    m_fMCTagVy = Ver->getMCTagVertex().Y();
-    m_fMCTagVz = Ver->getMCTagVertex().Z();
+    m_fMCTagPDG = Ver->getMCTagBFlavor();
+    m_fTruthDeltaT = Ver->getMCDeltaT();
   }
 }
 

@@ -25,6 +25,8 @@
 #include <analysis/NtupleTools/NtupleExtraEnergyTool.h>
 #include <analysis/NtupleTools/NtupleTagVertexTool.h>
 #include <analysis/NtupleTools/NtupleMCTagVertexTool.h>
+#include <analysis/NtupleTools/NtupleDeltaTTool.h>
+#include <analysis/NtupleTools/NtupleMCDeltaTTool.h>
 #include <analysis/NtupleTools/NtupleContinuumSuppressionTool.h>
 #include <analysis/NtupleTools/NtupleMCDecayStringTool.h>
 #include <analysis/NtupleTools/NtupleFlightInfoTool.h>
@@ -86,6 +88,8 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName.compare("ExtraEnergy") == 0) return new NtupleExtraEnergyTool(tree, d);
   else if (strToolName.compare("TagVertex") == 0) return new NtupleTagVertexTool(tree, d);
   else if (strToolName.compare("MCTagVertex") == 0) return new NtupleMCTagVertexTool(tree, d);
+  else if (strToolName.compare("DeltaT") == 0) return new NtupleDeltaTTool(tree, d);
+  else if (strToolName.compare("MCDeltaT") == 0) return new NtupleMCDeltaTTool(tree, d);
   else if (strToolName.compare("ContinuumSuppression") == 0) return new NtupleContinuumSuppressionTool(tree, d);
   else if (strToolName.compare("MCDecayString") == 0) return new NtupleMCDecayStringTool(tree, d);
   else if (strToolName.compare("FlightInfo") == 0) return new NtupleFlightInfoTool(tree, d);

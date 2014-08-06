@@ -4,6 +4,7 @@
 #include <geometry/bfieldmap/BFieldMap.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <simulation/dataobjects/MCParticleTrajectory.h>
 #include <cdc/dataobjects/CDCSimHit.h>
@@ -124,7 +125,7 @@ namespace Belle2 {
     /** Add this genfit::Track to event data.
      *
      *  Adapted from GenfitDisplay, originally written by Karl Bicker. */
-    void addTrack(const TrackFitResult* fitResult, const genfit::Track* track, const TString& label);
+    void addTrack(const Belle2::Track* belle2Track);
 
     /** Add a genfit::TrackCand, to evaluate track finding. */
     template<class PXDType, class SVDType> void addTrackCandidate(const genfit::TrackCand* trackCand, const TString& label,

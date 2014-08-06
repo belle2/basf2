@@ -221,12 +221,8 @@ void DisplayModule::event()
   if (m_showTrackLevelObjects) {
     //gather track-level objects
     StoreArray<Track> tracks;
-    const int nTracks = tracks.getEntries();
-    for (int i = 0; i < nTracks; i++) {
-      const TrackFitResult* fitResult = tracks[i]->getTrackFitResult(Const::pion);
-      const genfit::Track* gftrack = fitResult->getRelated<genfit::Track>();
-      m_visualizer->addTrack(fitResult, gftrack, TString::Format("Track %d (FitResult: %d)", i, fitResult->getArrayIndex()));
-    }
+    for (const Track & track : tracks)
+      m_visualizer->addTrack(&track);
 
     StoreArray<genfit::GFRaveVertex> vertices;
     const int nVertices = vertices.getEntries();

@@ -279,8 +279,15 @@ void EVEVisualization::addGeometry()
   B2DEBUG(100, "Done.");
 }
 
-void EVEVisualization::addTrack(const TrackFitResult* fitResult, const genfit::Track* track, const TString& label)
+void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 {
+  using namespace genfit;
+  using genfit::Track;
+
+  const TrackFitResult* fitResult = belle2Track->getTrackFitResult(Const::pion);
+  const Track* track = fitResult->getRelated<genfit::Track>();
+  TString label = TString::Format("Track %d (FitResult: %d)", belle2Track->getArrayIndex(), fitResult->getArrayIndex());
+
   // parse the option string ------------------------------------------------------------------------
   bool drawDetectors = false;
   bool drawHits = false;
@@ -294,8 +301,6 @@ void EVEVisualization::addTrack(const TrackFitResult* fitResult, const genfit::T
     }
   }
   // finished parsing the option string -------------------------------------------------------------
-
-  using namespace genfit;
 
   //TODO: move these
   bool refit_ = false;
@@ -315,6 +320,7 @@ void EVEVisualization::addTrack(const TrackFitResult* fitResult, const genfit::T
 
   unsigned int numpoints = track ? track->getNumPointsWithMeasurement() : 0;
   bool isPruned = (track == nullptr);
+
 
   TEveRecTrackD recTrack;
   const TVector3& poca = fitResult->getPosition();
@@ -716,6 +722,7 @@ void EVEVisualization::addTrack(const TrackFitResult* fitResult, const genfit::T
 
   addToGroup("Fitted Tracks", eveTrack);
   addObject(track, eveTrack);
+  addObject(belle2Track, eveTrack);
 }
 
 TEveBox* EVEVisualization::boxCreator(const TVector3& o, TVector3 u, TVector3 v, float ud, float vd, float depth)

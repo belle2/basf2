@@ -28,6 +28,7 @@ using namespace boost::python;
 
 Module::Module() :
   m_name(""),
+  m_type(""),
   m_description("Not set by the author"),
   m_propertyFlags(0),
   m_logConfig(),
@@ -233,6 +234,7 @@ void Module::exposePythonAPI()
   class_<Module, PyModule>("Module")
   .def("__str__", &Module::getPathString)
   .def("name", &Module::getName, return_value_policy<copy_const_reference>())
+  .def("type", &Module::getType, return_value_policy<copy_const_reference>())
   .def("set_name", &Module::setModuleName)
   .def("description", &Module::getDescription, return_value_policy<copy_const_reference>())
   .def("package", &Module::getPackage, return_value_policy<copy_const_reference>())
@@ -259,7 +261,6 @@ void Module::exposePythonAPI()
   .def("event", &PyModule::def_event)
   .def("endRun", &PyModule::def_endRun)
   .def("terminate", &PyModule::def_terminate)
-  .enable_pickling()
   ;
 
   register_ptr_to_python<ModulePtr>();

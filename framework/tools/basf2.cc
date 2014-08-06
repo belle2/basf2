@@ -153,6 +153,8 @@ int main(int argc, char* argv[])
     ("module-io", prog::value<string>(), "Create diagram of inputs and outputs for a single module, saved as ModuleName.dot. To create a PostScript file, use e.g. 'dot ModuleName.dot -Tps -o out.ps'.")
     ("no-stats", "Disable collection of statistics during event processing. Useful for very high-rate applications, but produces empty table with 'print statistics'.")
     ("dry-run", "Read steering file, but do not start any actually start any event processing. Prints information on input/output files that would be used during normal execution.")
+    ("dump-path", prog::value<string>(), "Read steering file, but do not start any actually start any event processing. Pickle the given path instead using the provided filename.")
+    ("execute-path", prog::value<string>(), "Do not read any provided steering file, instead execute the provided pickled path.")
 #ifdef HAS_CALLGRIND
     ("profile", prog::value<string>(), "Name of a module to profile using callgrind. If more than one module of that name is registered only the first one will be profiled.")
 #endif
@@ -307,6 +309,17 @@ int main(int argc, char* argv[])
 
     if (varMap.count("dry-run")) {
       Environment::Instance().setDryRun(true);
+    }
+
+    //Check for version option
+    if (varMap.count("execute-path")) {
+      Environment::Instance().setPicklePath(varMap["execute-path"].as<string>());
+      pythonFile = "execute_pickled_path.py";
+    }
+
+    //Check for version option
+    if (varMap.count("dump-path")) {
+      Environment::Instance().setPicklePath(varMap["dump-path"].as<string>());
     }
 
     //Check for info option

@@ -164,6 +164,13 @@ namespace Belle2 {
     const std::string& getName() const {return m_name;}
 
     /**
+     * Returns the type of the module.
+     *
+     * @return The type of the module as string.
+     */
+    const std::string& getType() const {return m_type;}
+
+    /**
      * Returns the package this module is in.
      */
     const std::string& getPackage() const {return m_package;}
@@ -428,6 +435,7 @@ namespace Belle2 {
     std::list<ModulePtr> getModules() const { return std::list<ModulePtr>(); }
 
     std::string m_name;           /**< The name of the module, saved as a string. */
+    std::string m_type;           /**< The type of the module, saved as a string. */
     std::string m_package;        /**< Package this module is found in (may be empty). */
     std::string m_description;    /**< The description of the module. */
     unsigned int m_propertyFlags; /**< The properties of the module as bitwise or (with |) of EModulePropFlags. */
@@ -609,6 +617,7 @@ namespace Belle2 {
     ModulePtr createModule() const {
       ModulePtr nm(new T());
       nm->m_name = m_moduleName;
+      nm->m_type = m_moduleName;
       nm->m_package = m_package;
       return nm;
     }

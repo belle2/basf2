@@ -160,7 +160,6 @@ void Path::exposePythonAPI()
   .def("add_path", &Path::addPath)
   .def("modules", &_getModulesPython)
   .def("for_each", &Path::forEach)
-  .enable_pickling()
   ;
 
   register_ptr_to_python<PathPtr>();

@@ -29,36 +29,29 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 fw = Framework()
 
 
-def module_getstate(module):
-    return {'name': module.name(), 'parameters': [{'name': parameter.name, 'values': parameter.values} for parameter in module.available_params()]}
+def serialize_module(module):
+    return {'name': module.name(), 'type': module.type(), 'parameters': [{'name': parameter.name, 'values': parameter.values} for parameter in module.available_params()]}
 
 
-def module_setstate(module, module_state):
+def deserialize_module(module_state):
+    module = fw.register_module(module_state['type'])
     module.set_name(module_state['name'])
     for parameter_state in module_state['parameters']:
         module.param(parameter_state['name'], parameter_state['values'])
     return module
 
 
-Module.__getstate_manages_dict = False
-Module.__getstate__ = module_getstate
-Module.__setstate__ = module_setstate
+def serialize_path(path):
+    return {'modules': [serialize_module(module) for module in path.modules()]}
 
 
-def path_getstate(path):
-    return {'modules': [module_getstate(module) for module in path.modules()]}
-
-
-def path_setstate(path, path_state):
+def deserialize_path(path_state):
+    path = fw.create_path()
     for module_state in path_state['modules']:
-        module = module_setstate(Module(), module_state)
+        module = deserialize_module(module_state)
         path.add_module(module)
     return path
 
-
-Path.__getstate_manages_dict = False
-Path.__getstate__ = path_getstate
-Path.__setstate__ = path_setstate
 
 # -----------------------------------------------
 #             Print output

@@ -122,6 +122,20 @@ namespace Belle2 {
     */
     int getNumberProcesses() const;
 
+    /**
+     * Function to set the path to the file where the pickled path is stored
+     *
+     * @param path path to file where the pickled path is stored
+    */
+    void setPicklePath(std::string path);
+
+    /**
+     * Function to get the path to the file where the pickled path is stored
+     *
+     * @return path to file where the pickled path is stored
+    */
+    std::string getPicklePath() const;
+
 
     //--------------------------------------------------
     //                   Python API

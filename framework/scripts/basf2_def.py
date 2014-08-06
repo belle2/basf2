@@ -4,6 +4,8 @@
 from basf2_env import *
 
 import textwrap
+import pickle
+import os
 from subprocess import Popen, PIPE
 
 
@@ -39,8 +41,7 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True):
     act_column_widths = [len(cell) for cell in table[0]]
     for row in table:
         for (col, cell) in enumerate(row):
-            act_column_widths[col] = max(len(str(cell)),
-                    act_column_widths[col])
+            act_column_widths[col] = max(len(str(cell)), act_column_widths[col])
 
     # adjust act_column_widths to comply with user-specified widths
     total_used_width = 0
@@ -135,6 +136,17 @@ def process(path, max_event=0):
                 0 for no limit
     """
 
+    # If a pickle path is set via  --dump-path or --execute-path we do something special
+    pickle_path = fw.get_pickle_path()
+    if pickle_path != '':
+        # If the given path is None and the picklePath is valid we load a path from the pickle file
+        if os.path.isfile(pickle_path) and path is None:
+            path = deserialize_path(pickle.load(open(pickle_path, 'r')))
+        # Otherwise we dump the given path into the pickle file and exit
+        else:
+            pickle.dump(serialize_path(path), open(pickle_path, 'w'))
+            return
+
     if max_event != 0:
         fw.process(path, max_event)
     else:
@@ -224,8 +236,7 @@ def print_params(module, print_values=True, shared_lib_path=None):
             'Default',
             'Current',
             'Steering',
-            'Description',
-            ])
+            'Description'])
     else:
         output.append(['Parameter', 'Type', 'Default', 'Description'])
 
@@ -246,8 +257,7 @@ def print_params(module, print_values=True, shared_lib_path=None):
                 defaultStr,
                 valueStr,
                 paramItem.setInSteering,
-                paramItem.description,
-                ])
+                paramItem.description])
         else:
             output.append([forceString + paramItem.name, paramItem.type,
                           defaultStr, paramItem.description])
@@ -341,5 +351,3 @@ def reset_log():
     """
 
     logging.reset()
-
-

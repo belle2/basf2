@@ -129,6 +129,18 @@ int Framework::getNumberProcesses() const
 }
 
 
+void Framework::setPicklePath(std::string path)
+{
+  Environment::Instance().setPicklePath(path);
+}
+
+
+std::string Framework::getPicklePath() const
+{
+  return Environment::Instance().getPicklePath();
+}
+
+
 //=====================================================================
 //                          Python API
 //=====================================================================
@@ -188,6 +200,7 @@ void Framework::exposePythonAPI()
   .def("list_registered_modules", &Framework::getRegisteredModulesPython)
   .def("create_path", &Framework::createPath)
   .def("process", &Framework::process, process_overloads())
+  .def("get_pickle_path", &Framework::getPicklePath)
   .def("set_nprocesses", &Framework::setNumberProcesses)
   .def("get_nprocesses", &Framework::getNumberProcesses)
   ;

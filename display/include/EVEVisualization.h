@@ -4,6 +4,7 @@
 #include <geometry/bfieldmap/BFieldMap.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 #include <simulation/dataobjects/MCParticleTrajectory.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
@@ -123,7 +124,7 @@ namespace Belle2 {
     /** Add this genfit::Track to event data.
      *
      *  Adapted from GenfitDisplay, originally written by Karl Bicker. */
-    void addTrack(const genfit::Track* track, const TString& label = "");
+    void addTrack(const TrackFitResult* fitResult, const genfit::Track* track, const TString& label);
 
     /** Add a genfit::TrackCand, to evaluate track finding. */
     template<class PXDType, class SVDType> void addTrackCandidate(const genfit::TrackCand* trackCand, const TString& label,
@@ -272,8 +273,8 @@ namespace Belle2 {
     TEveBox* boxCreator(const TVector3& o, TVector3 u, TVector3 v, float ud, float vd, float depth);
 
     /** Create hit visualisation for the given options, and add them to 'eveTrack'. */
-    void makeLines(TEveStraightLineSet* eveTrack, const genfit::StateOnPlane* prevState, const genfit::StateOnPlane* state, const genfit::AbsTrackRep* rep,
-                   const Color_t& color, const Style_t& style, bool drawMarkers, bool drawErrors, double lineWidth = 2, int markerPos = 1);
+    void makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane* prevState, const genfit::StateOnPlane* state, const genfit::AbsTrackRep* rep,
+                   TEvePathMark::EType_e markType, bool drawErrors, int markerPos = 1);
 
     /** enable/disable rendering of the volume 'name', or only its daughters if only_daughters is set. */
     void enableVolume(const char* name, bool only_daughters = false, bool enable = true);

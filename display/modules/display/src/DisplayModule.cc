@@ -3,6 +3,8 @@
 #include <display/dataobjects/DisplayData.h>
 #include <display/DisplayUI.h>
 #include <display/EVEVisualization.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 #include <geometry/GeometryManager.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
 
@@ -34,7 +36,7 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
   addParam("hideSecondaries", m_hideSecondaries, "If true, secondary MCParticles (and hits created by them) will not be shown.", false);
   addParam("showCharged", m_showCharged, "If true, all charged MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.", false);
   addParam("showNeutrals", m_showNeutrals, "If true, all neutral MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.", false);
-  addParam("showTrackLevelObjects", m_showTrackLevelObjects, "If true, fitted genfit::Tracks, GFRave Vertices and ECLCluster objects will be shown in the display.", true);
+  addParam("showTrackLevelObjects", m_showTrackLevelObjects, "If true, fitted Tracks (+genfit::Track), GFRave Vertices and ECLCluster objects will be shown in the display.", true);
   addParam("showTrackCandidates", m_showTrackCandidates, "If true, track candidates (genfit::TrackCand) and reconstructed hitso will be shown in the display.", false);
   addParam("useClusters", m_useClusters, "Use PXD/SVD clusters for track candidate & hit visualisation (instead of TrueHits).", true);
   addParam("automatic", m_automatic, "Non-interactively save visualisations for each event. Note that this still requires an X server, but you can use the 'Xvfb' dummy server by running basf2 using 'xvfb-run -s \"-screen 0 640x480x24\" basf2 ...' to run headless.", false);
@@ -66,6 +68,8 @@ void DisplayModule::initialize()
   StoreArray<BKLMSimHit>::optional();
   StoreArray<EKLMSimHit>::optional();
   StoreArray<ECLCluster>::optional();
+  StoreArray<Track>::optional();
+  StoreArray<TrackFitResult>::optional();
   StoreArray<genfit::Track>::optional(m_gftrackColName);
   StoreArray<genfit::TrackCand>::optional(m_trackCandidateColName);
   StoreArray<genfit::GFRaveVertex>::optional();
@@ -216,10 +220,13 @@ void DisplayModule::event()
 
   if (m_showTrackLevelObjects) {
     //gather track-level objects
-    StoreArray<genfit::Track> gftracks(m_gftrackColName);
-    const int nTracks = gftracks.getEntries();
-    for (int i = 0; i < nTracks; i++)
-      m_visualizer->addTrack(gftracks[i], TString::Format("genfit::Track %d", i));
+    StoreArray<Track> tracks;
+    const int nTracks = tracks.getEntries();
+    for (int i = 0; i < nTracks; i++) {
+      const TrackFitResult* fitResult = tracks[i]->getTrackFitResult(Const::pion);
+      const genfit::Track* gftrack = fitResult->getRelated<genfit::Track>();
+      m_visualizer->addTrack(fitResult, gftrack, TString::Format("Track %d (FitResult: %d)", i, fitResult->getArrayIndex()));
+    }
 
     StoreArray<genfit::GFRaveVertex> vertices;
     const int nVertices = vertices.getEntries();

@@ -48,7 +48,7 @@ display = register_module('Display')
 # interactively by removing its checkmark in the 'Eve' tab.
 #
 # only makes sense when showTrackLevelObjects/showTrackCandidates is used
-display.param('options', 'HM')  # default
+display.param('options', 'MH')  # default
 
 # should hits always be assigned to a particle with c_PrimaryParticle flag?
 display.param('assignHitsToPrimaries', False)

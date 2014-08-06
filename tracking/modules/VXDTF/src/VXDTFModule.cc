@@ -179,7 +179,7 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("activateBaselineTF",
            m_PARAMactivateBaselineTF,
            "there is a baseline trackfinder which catches events with a very small number of hits, e.g. bhabha, cosmic and single-track-events. Settings: 0 = deactivate baseLineTF, 1=activate it and use normal TF as fallback, 2= baseline-TF-only",
-           int(1));
+           int(0));
 
 
   addParam("activateDistance3D",
@@ -599,7 +599,6 @@ VXDTFModule::VXDTFModule() : Module()
            m_PARAMdisplayCollector,
            "Collector operating flag: 0 = no collector, 1 = collect for analysis, 2 = collect for display",
            int(0));
-
 }
 
 

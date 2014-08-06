@@ -21,6 +21,10 @@ class Cluster:
         - Finds the revision of basf2 that will be set up on the cluster.
         """
 
+        # The command to submit a job. 'LOGFILE' will be replaced by the
+        # actual log file name
+        self.submit_command = 'qsub -cwd -o LOGFILE -e LOGFILE -q medium -V'
+
         # The path, where the help files are being created
         # Maybe there should be a special subfolder for them?
         self.path = os.getcwd()
@@ -31,23 +35,20 @@ class Cluster:
         self.logger = logging.getLogger('validate_basf2.clustercontrol')
 
         # We need to set up the same environment on the cluster like on the
-        # local machine. Unfortunately, $BELLE2_RELEASE and
-        # $BELLE2_RELEASE_DIR may contain inconsistent information. We always
-        # want to use the release that was set up most recently. This
-        # information can be extracted from $BELLE2_RELEASE_DIR
+        # local machine. The information can be extracted from $BELLE2_TOOLS,
+        # $BELLE2_RELEASE_DIR and §BELLE2_LOCAL_DIR
+        self.tools = adjust_path(os.environ['BELLE2_TOOLS'])
         belle2_release_dir = os.environ.get('BELLE2_RELEASE_DIR', None)
+        belle2_local_dir = os.environ.get('BELLE2_LOCAL_DIR', None)
+        self.setuprel = 'setuprel'
         if belle2_release_dir is not None:
-            self.revision = 'setuprel ' + belle2_release_dir.split('/')[-1]
-        # If $BELLE2_RELEASE_DIR does not exist, we need to go to the local
-        # folder and perform a setuprel there!
-        else:
-            belle2_local_dir = os.environ.get('BELLE2_LOCAL_DIR', None)
-            self.revision = "MY_BELLE2_DIR={0} setuprel" \
-                            .format(belle2_local_dir)
+            self.setuprel = ' ' + belle2_release_dir.split('/')[-1]
+        if belle2_local_dir is not None:
+            self.setuprel += 'MY_BELLE2_DIR=' + adjust_path(belle2_local_dir) + ' ' + self.setuprel
 
         # Write to log which revision we are using
-        self.logger.debug('Setting up the following revision: {0}'
-                          .format(self.revision))
+        self.logger.debug('Setting up the following release: {0}'
+                          .format(self.setuprel))
 
         # Define the folder in which the log of the cluster messages will be
         # stored (same folder like the log for validate_basf2.py)
@@ -56,28 +57,42 @@ class Cluster:
             os.makedirs(clusterlog_dir)
         self.clusterlog = open(clusterlog_dir + 'clusterlog.log', 'w+')
 
+    def adjust_path(self, path):
+        """
+        This method can be used if path names are different on submission
+        and execution hosts.
+        """
+
+        return path
+
+    def available(self):
+        """
+        The cluster should always be available to accept new jobs.
+        """
+
+        return True
+
     def execute(self, job, options=''):
         """
         Takes a Script object and a string with options and runs it on the
         cluster, either with ROOT or with basf2, depending on the file type.
         """
 
-        # Remember current working directory (to make sure the cwd is the same
-        # after this function has finished)
-        current_cwd = os.getcwd()
-
-        # Define the folder in which the log for this job will be stored. If
-        # the folder does not exist yet, create it!
-        logs_dir = './html/logs/' + job.package + '/'
-        if not os.path.exists(logs_dir):
-            os.makedirs(logs_dir)
+        # Define the folder in which the results (= the ROOT files) should be
+        # created. This is where the files containing plots will end up. By
+        # convention, data files will be stored in the parent dir.
+        # Then make sure the folder exists (create if it does not exist) and
+        # change to cwd to this folder.
+        output_dir = os.path.abspath('./results/current/' + job.package)
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
 
         # Path where log file is supposed to be created
-        log_file = os.path.abspath(logs_dir + job.name + '.log')
+        log_file = output_dir + '/' + job.name + '.log'
 
         # Now we need to distinguish between .py and .C files:
         extension = os.path.splitext(job.path)[1]
-        if extension.lower() == '.c':
+        if extension == '.C':
             # .c files are executed with root
             command = 'root -b -q ' + job.path
         else:
@@ -91,32 +106,20 @@ class Cluster:
         # revision. The execute the command (i.e. run basf2 or ROOT on a
         # steering file). Write the return code of that into a *.done file.
         # Delete the helpfile-shellscript.
-        tmp_name = "script_" + job.name + ".sh"
+        tmp_name = self.path + '/' + 'script_' + job.name + '.sh'
         with open(tmp_name, 'w+') as tmp_file:
             tmp_file.write('#!/bin/bash \n\n' +
                            'BELLE2_NO_TOOLS_CHECK=1 \n' +
-                           'source ~belle2/tools/setup_belle2 \n' +
-                           '{0} \n'.format(self.revision) +
+                           'source {0}/setup_belle2 \n'.format(self.tools) +
+                           '{0} \n'.format(self.setuprel) +
+                           'cd {0} \n'.format(adjust_path(output_dir)) +
                            '{0} \n'.format(command) +
                            'echo $? > {0}/script_{1}.done \n'
                            .format(self.path, job.name) +
-                           'rm {0}/{1}* \n'.format(self.path, tmp_name))
-
-        # Define the folder in which the results (= the ROOT files) should be
-        # created. This is where the files containing plots will end up. By
-        # convention, data files will be stored in the parent dir.
-        # Then make sure the folder exists (create if it does not exist) and
-        # change to cwd to this folder.
-        output_dir = './results/current/' + job.package
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-        os.chdir(output_dir)
+                           'rm {0} \n'.format(tmp_name))
 
         # Prepare the command line command for submission to the cluster
-        params = ['qsub', '-cwd',
-                  '-o', log_file,
-                  '-e', log_file,
-                  '-q', 'medium', '-V', self.path + '/' + tmp_name]
+        params = self.submit_command.replace('LOGFILE', log_file).split() + [tmp_name]
 
         # Log the command we are about the execute
         self.logger.debug(subprocess.list2cmdline(params))
@@ -125,9 +128,6 @@ class Cluster:
         # usually only "Your job [Job ID] has been submitted"). The steering
         # file output will be written to 'log_file' (see above).
         subprocess.Popen(params, stdout=self.clusterlog, stderr=self.clusterlog)
-
-        # Return to previous cwd
-        os.chdir(current_cwd)
 
     def is_job_finished(self, job):
         """

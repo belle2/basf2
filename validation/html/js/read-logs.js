@@ -40,7 +40,7 @@ $(document).ready(function() {
 		
 		// Loop over all files in the package and append them to the list of files
 		for (var log in json[data[pkg]].sort()){
-		    $('#loglist_content').append('<span class="loglink" name="/logs/'+data[pkg]+'/'+json[data[pkg]][log]+'">'+json[data[pkg]][log]+'</span><br>');
+		    $('#loglist_content').append('<span class="loglink" name="/results/current/'+data[pkg]+'/'+json[data[pkg]][log]+'">'+json[data[pkg]][log]+'</span><br>');
 		}
 		$('#loglist_content').append('<br>');
 		

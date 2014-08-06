@@ -84,7 +84,7 @@ def date_from_revision(revision):
     # Reference files do not need a date since there is always just one
     # version of it, which is presumed to be the latest
     if revision == 'reference':
-        return None
+        return 0
     # Regular releases and builds however do have a reasonably well defined
     # 'last modified'-date!
     else:
@@ -126,20 +126,20 @@ def find_root_object(list_of_root_objects, **kwargs):
         return []
 
 
-def serve_existing_plots():
+def serve_existing_plots(list_of_revisions):
     """
-    Uses the global variable 'list_of_revisions', then goes to the folder where
-    the plots for this selection are stored, and replaces the current
-    './html/content.html' with the one from the folder with the plots.
+    Goes to the folder where
+    the plots for the given selection are stored, and replaces the current
+    './content.html' with the one from the folder with the plots.
     :return: No return value
     """
 
     # The path where the content.html should be
-    src = './html/plots/{0}/content.html'.format('_'.join(
+    src = './plots/{0}/content.html'.format('_'.join(
         sorted(list_of_revisions)))
 
     # The path where we need it
-    dst = './html/content.html'
+    dst = './content.html'
 
     # Make sure the file exists before we copy it
     if os.path.isfile(src):
@@ -149,7 +149,7 @@ def serve_existing_plots():
                  'content.html file could not be found!')
 
 
-def get_plot_files():
+def get_plot_files(list_of_revisions):
     """
     Returns a list of all plot files as absolute paths. For this purpose,
     it loops over all revisions in 'list_of_revisions', finds the
@@ -239,9 +239,9 @@ def get_reference_files():
     return results['local'] + results['central']
 
 
-def generate_new_plots():
+def generate_new_plots(list_of_revisions):
     """
-    Uses the global variable 'list_of_revisions' and creates the plots that
+    Creates the plots that
     contain the requested revisions. Each plot (or n-tuple, for that matter)
     is stored in an object of class Plot.
     :return: No return value
@@ -259,7 +259,7 @@ def generate_new_plots():
     # are stored on a different location than the regular plot ROOT files.
 
     # Collect all plot files, i.e. plot ROOT files from the requested revisions
-    list_of_plot_files = get_plot_files()
+    list_of_plot_files = get_plot_files(list_of_revisions)
 
     # If we also want a reference plot, collect the reference ROOT files
     if 'reference' in list_of_revisions:
@@ -288,7 +288,7 @@ def generate_new_plots():
     create_packages_list_html(list_of_packages)
 
     # Open the output file
-    html_output = open('./html/content.html', 'w+')
+    html_output = open('./content.html', 'w+')
 
     # Write meta-data, i.e. creation date and revisions contained in the file
     created = str(datetime.datetime.utcfromtimestamp(int(time.time())))
@@ -310,7 +310,7 @@ def generate_new_plots():
             if not root_objects:
                 continue
 
-            plotuple = Plotuple(root_objects)
+            plotuple = Plotuple(root_objects, list_of_revisions)
 
             html_output.write('\n\n')
             for line in plotuple.html():
@@ -324,10 +324,10 @@ def generate_new_plots():
     # Now copy that file to the folder with the plots
 
     # The path where we need it
-    src = './html/content.html'
+    src = './content.html'
 
     # The path where the content.html should be
-    dst = './html/plots/{0}/content.html'.format('_'.join(sorted(
+    dst = './plots/{0}/content.html'.format('_'.join(sorted(
         list_of_revisions)))
 
     shutil.copyfile(src, dst)
@@ -532,7 +532,7 @@ def create_revision_list_html():
     Creates a HTML-list of all available revisions with checkboxes and the
     font color set accordingly to the line style of the revision in the plots.
     """
-    revisions = open('./html/revisions.html', 'w+')
+    revisions = open('./revisions.html', 'w+')
     revisions.write('<label><input type="checkbox" name="revisions" '
                     ' value="reference" checked>&nbsp;<span '
                     'style="color: black;">reference</span></label><br>\n')
@@ -554,7 +554,7 @@ def create_revision_list_html():
 def create_packages_list_html(list_of_packages):
 
     # Create a file with all available packages
-    with open('./html/packages.html', 'w+') as pkgs:
+    with open('./packages.html', 'w+') as pkgs:
         for pkg in sorted(list_of_packages):
             pkgs.write('<label><input type="checkbox" name="packages" value="{'
                        '0}" checked>&nbsp;<a href="#{0}">{0} »</a><br></label>'
@@ -651,11 +651,12 @@ class Plotuple:
     A Plotuple is either a Plot or an N-Tuple
     """
 
-    def __init__(self, list_of_root_objects):
+    def __init__(self, list_of_root_objects, list_of_revisions):
         """
 
         """
         self.list_of_root_objects = list_of_root_objects
+        self.list_of_revisions = list_of_revisions
         self.warnings = []
 
         # Find the reference element. If we can't find one, set it to 'None'
@@ -825,7 +826,7 @@ class Plotuple:
                 title.SetTextColor(get_style(index).GetLineColor())
 
         # Create the folder in which the plot is then stored
-        path = ('./html/plots/{0}/'.format('_'.join(sorted(list_of_revisions)))
+        path = ('./plots/{0}/'.format('_'.join(sorted(self.list_of_revisions)))
                 + self.package)
         if not os.path.isdir(path):
             os.makedirs(path)
@@ -943,7 +944,7 @@ class Plotuple:
                     title.SetTextColor(get_style(index).GetLineColor())
 
         # Create the folder in which the plot is then stored
-        path = ('./html/plots/{0}/'.format('_'.join(sorted(list_of_revisions)))
+        path = ('./plots/{0}/'.format('_'.join(sorted(self.list_of_revisions)))
                 + self.package)
         if not os.path.isdir(path):
             os.makedirs(path)
@@ -985,7 +986,7 @@ class Plotuple:
         # Now fill the table with values
         # First check if there is a reference object, and in case there is none,
         # create a row which states that no reference object is available
-        if self.reference is None and 'reference' in list_of_revisions:
+        if self.reference is None and 'reference' in self.list_of_revisions:
             line = '<tr><td>reference</td>'
             for _ in columns:
                 line += '<td>n/a</td>'
@@ -1012,7 +1013,7 @@ class Plotuple:
         html.append('</table>')
 
         # Create the folder in which the plot is then stored
-        path = ('./html/plots/{0}/'.format('_'.join(sorted(list_of_revisions)))
+        path = ('./plots/{0}/'.format('_'.join(sorted(self.list_of_revisions)))
                 + self.package)
         if not os.path.isdir(path):
             os.makedirs(path)
@@ -1047,7 +1048,7 @@ class Plotuple:
                     html.append(line + '\n')
             html.append('\n')
         else:
-            html.append('<a href="{0}.pdf"><img src="{0}.png"></a>\n'
+            html.append('<a href="./plots/{0}.pdf"><img src="./plots/{0}.png"></a>\n'
                         .format(self.file))
 
         html.append('</div>\n')
@@ -1075,63 +1076,51 @@ class Plotuple:
 
 
 ################################################################################
-###                     Actual program starts here!                          ###
+###                     Main function starts here!                           ###
 ################################################################################
 
 
-# Change the CWD so that the paths will work
-# This is necessary, because when this script is called by validate_basf2,
-# the cwd is '.', while when it is called by the web server, the cwd is './html'
-if not "html" in os.listdir('.'):
-    os.chdir('..')
-if not "html" in os.listdir('.'):
-    sys.exit("Paths couldn't be set!")
+def create_plots(revisions=None, force=False):
+    """
+    This function generates the plots and html pgae for the requested revisions.
+    By default all available revisions are taken. New plots will ony be
+    created if they don't exist already for the given set of revisions,
+    unless the force option is used.
+    """
 
-# Define the accepted command line flags and read them in
-parser = argparse.ArgumentParser()
-parser.add_argument("-r", "--revisions", help="Takes a list of revisions ("
-                                              "separated by spaces) and "
-                                              "generates the plots for them",
-                    type=str, nargs='*')
-parser.add_argument("-f", "--force", help="Regenerates plots even if the "
-                                          "requested combination exists "
-                                          "already",
-                    action='store_true')
-args = parser.parse_args()
+    # Initialize the list of revisions which we will plot
+    list_of_revisions = []
 
-# Initialize the list of revisions which we will plot
-list_of_revisions = []
+    # Retrieve the desired revisions from the command line arguments and store
+    # them in 'list_of_revisions'
+    if revisions:
+        # Loop over all revisions given on the command line
+        for revision in revisions:
+            # If it is a valid (i.e. available) revision, append it to the list
+            # of revisions that we will include in our plots
+            # 'reference' needs to be treated separately, because it is always a
+            # viable option, but will never be listed in 'available_revisions()'
+            if revision in available_revisions() or revision == 'reference':
+                list_of_revisions.append(revision)
 
-# Retrieve the desired revisions from the command line arguments and store
-# them in 'list_of_revisions'
-if args.revisions:
-    # Loop over all revisions given on the command line
-    for arg in args.revisions:
-        # If it is a valid (i.e. available) revision, append it to the list
-        # of revisions that we will include in our plots
-        # 'reference' needs to be treated separately, because it is always a
-        # viable option, but will never be listed in 'available_revisions()'
-        if arg in available_revisions() or arg == 'reference':
-            list_of_revisions.append(arg)
+    # In case no valid revisions were given, fall back to default and use all
+    # available revisions and reference. The order should now be [reference,
+    # newest_revision, ..., oldest_revision].
+    if not list_of_revisions:
+        list_of_revisions = ['reference'] + available_revisions()
 
-# In case no valid revisions were given, fall back to default and use all
-# available revisions and reference. The order should now be [reference,
-# newest_revision, ..., oldest_revision].
-if not list_of_revisions:
-    list_of_revisions = ['reference'] + available_revisions()
+    # Now we check whether the plots for the selected revisions have been
+    # generated before or not. In the path we use the alphabetical order of the
+    # revisions, not the chronological one (easier to work with on the web server
+    # side)
+    expected_path = './plots/{0}/content.html'.format(
+        '_'.join(sorted(list_of_revisions)))
 
-# Now we check whether the plots for the selected revisions have been
-# generated before or not. In the path we use the alphabetical order of the
-# revisions, not the chronological one (easier to work with on the web server
-# side)
-expected_path = './html/plots/{0}/content.html'.format(
-    '_'.join(sorted(list_of_revisions)))
-
-# If the path exists and we don't want to force the regeneration of plots,
-# serve what's in the archive
-if os.path.exists(expected_path) and not args.force:
-    serve_existing_plots()
-    print 'Served existing plots.'
-# Otherwise: Create the requested plots
-else:
-    generate_new_plots()
+    # If the path exists and we don't want to force the regeneration of plots,
+    # serve what's in the archive
+    if os.path.exists(expected_path) and not force:
+        serve_existing_plots(list_of_revisions)
+        print 'Served existing plots.'
+    # Otherwise: Create the requested plots
+    else:
+        generate_new_plots(list_of_revisions)

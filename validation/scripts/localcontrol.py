@@ -29,7 +29,21 @@ class Local:
         # .execute and .is_finished
         self.logger = logging.getLogger('validate_basf2.localcontrol')
 
+        # Parameter for maximal number of parallel processes
+        self.max_number_of_processes = 10
+
+        # Counter for number of running parallel processes
+        self.current_number_of_processes = 0
+
         return
+
+    def available(self):
+        """
+        Checks whether the number of current parallel processes is below the
+        limit and a new process can be started.
+        """
+
+        return (self.max_number_of_processes > 0) and (self.current_number_of_processes < self.max_number_of_processes)
 
     def execute(self, job, options=''):
         """
@@ -41,15 +55,6 @@ class Local:
         # after this function has finished)
         current_cwd = os.getcwd()
 
-        # Define the folder in which the log for this job will be stored. If
-        # the folder does not exist yet, create it!
-        logs_dir = './html/logs/' + job.package + '/'
-        if not os.path.exists(logs_dir):
-            os.makedirs(logs_dir)
-
-        # Create a logfile for this job and make sure it's empty!
-        log = open(logs_dir + os.path.basename(job.path) + '.log', 'w+')
-
         # Define the folder in which the results (= the ROOT files) should be
         # created. This is where the files containing plots will end up. By
         # convention, data files will be stored in the parent dir.
@@ -60,9 +65,12 @@ class Local:
             os.makedirs(output_dir)
         os.chdir(output_dir)
 
+        # Create a logfile for this job and make sure it's empty!
+        log = open(os.path.basename(job.path) + '.log', 'w+')
+
         # Now we need to distinguish between .py and .C files:
         extension = os.path.splitext(job.path)[1]
-        if extension.lower() == '.c':
+        if extension == '.C':
             # .c files are executed with ROOT. No options available here.
             params = ['root', '-b', '-q', job.path]
         else:
@@ -82,6 +90,9 @@ class Local:
         # Save the connection between the job and the given process-ID
         self.jobs_processes[job] = process
 
+        # Increase the process counter
+        self.current_number_of_processes += 1
+
         # Return to previous cwd
         os.chdir(current_cwd)
 
@@ -96,6 +107,8 @@ class Local:
         # Check if the process has finished or not, and return that together
         # with the return code / exit_status of the process.
         if process.poll() is not None:
+            del self.jobs_processes[job]
+            self.current_number_of_processes = len(self.jobs_processes.keys())
             return [True, process.returncode]
         else:
             return [False, 0]

@@ -15,9 +15,9 @@ import re
 import subprocess
 import sys
 import time
+import shutil
 
-# Import the controls for local multiprocessing and the cluster
-import clustercontrol
+# Import the controls for local multiprocessing
 import localcontrol
 
 # Import XML Parser. Use C-Version, if available
@@ -51,6 +51,15 @@ class Validation:
         globally accessible later on. Does not return anything.
         """
 
+        # Copy the html skeleton if it is not yet available
+        if not os.path.isdir('html'):
+            belle2_local_dir = os.environ.get('BELLE2_LOCAL_DIR', None)
+            if belle2_local_dir is not None and os.path.isdir(belle2_local_dir + '/validation/html'):
+                validation_dir = belle2_local_dir
+            else:
+                validation_dir = os.environ['BELLE2_RELEASE_DIR']
+            shutil.copytree(validation_dir + '/validation/html', 'html')
+
         # Initialize the log as 'None' and then call the method 'create_log()'
         # to create the actual log.
         self.log = None
@@ -65,34 +74,20 @@ class Validation:
         # (as instances of class Script)
         self.list_of_scripts = []   # Script objects
 
-        # Initialize the dict which will hold all paths to steering files in
-        # the form: {'package' : [list of sf paths for this package]}
-        self.dict_of_sf_paths = {}
-
         # A list of all packages from which we have collected steering files
         self.list_of_packages = []
 
         # Now we need to distinguish if we want to run the entire validation
         # (all available packages) or only some specific packages.
-        self.complete_validation = True  # Default is complete validation!
-        self.packages = None             # The specific packages (if applicable)
+        self.packages = None             # The specific packages (if applicable).  Default is complete validation!
 
         # This is where we will store additional arguments for basf2,
         # if we received any from the command line arguments
         self.basf2_options = ''
 
-        # A dictionary which contains all validation folders in the form:
-        # {'name of package':'path to validation folder of package'}
-        self.validation_folders = None
-
         # A variable which holds the mode, i.e. 'local' for local
         # multi-processing and 'cluster' for cluster usage
         self.mode = None
-
-        # The maximum number of processes that may run simultaneosly, as well
-        # as the number of processes that are currently running
-        self.max_number_of_processes = 10
-        self.current_number_of_processes = 0
 
     def build_dependencies(self):
         """
@@ -107,10 +102,9 @@ class Validation:
         # It adds all steering files from the validation-folder as a default
         # dependency, because a lot of scripts depend on one data script that
         # is created by a steering file in the validation-folder.
-        default_depend = filter_list_of_scripts(validation.list_of_scripts,
-                                                PACKAGE='validation')
+        default_depend = [script for script in validation.list_of_scripts if script.package == 'validation']
         for script_object in self.list_of_scripts:
-            if script_object.header_incomplete and script_object.package != \
+            if not script_object.header and script_object.package != \
                     'validation':
                 script_object.dependencies += default_depend
 
@@ -165,7 +159,7 @@ class Validation:
         # information available for debugging later.
 
         # Make sure the folder for the log file exists
-        log_dir = './html/logs/__general__/'
+        log_dir = './results/current/__general__/'
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
 
@@ -190,58 +184,37 @@ class Validation:
         self.list_of_sf_paths.
         """
 
-        # Get all folders that contain steering files
-        local_folders = get_validation_folders('local')
-        central_folders = get_validation_folders('central')
+        # Get all folders that contain steering files, first the local ones
+        validation_folders = get_validation_folders('local')
 
-        # Now we need to get a rid of the duplicates. Everthing that exists
-        # locally does not need to be taken from the central dir.
-
-        # Take all local folders:
-        self.validation_folders = local_folders
-
-        # Only take those central folders that do not have a local match
-        for package in central_folders:
-            if not package in self.validation_folders.keys():
-                self.validation_folders[package] = central_folders[package]
+        # Then add those central folders that do not have a local match
+        for (package, folder) in get_validation_folders('central').items():
+            if not package in validation_folders.keys():
+                validation_folders[package] = folder
 
         # If we are not performing a complete validation, we need to remove
         # all packages that were not given via the '--packages' option
-        if not self.complete_validation:
-            unwanted_keys = [_ for _ in self.validation_folders if _ not
+        if self.packages is not None:
+            unwanted_keys = [_ for _ in validation_folders if _ not
                              in self.packages]
             for unwanted_key in unwanted_keys:
-                del self.validation_folders[unwanted_key]
+                del validation_folders[unwanted_key]
 
         # Now write to self.list_of_packages which packages we have collected
-        self.list_of_packages = self.validation_folders.keys()
+        self.list_of_packages = validation_folders.keys()
 
         # Finally, we collect the steering files from each folder we have
         # collected:
-        for package in self.validation_folders:
+        for (package, folder) in validation_folders.items():
 
-            self.dict_of_sf_paths[package] = []
-
-            # Collect only *.c and *.py files
-            pkg_path = self.validation_folders[package]
-            c_files = scripts_in_dir(pkg_path, '.c')
-            py_files = scripts_in_dir(pkg_path, '.py')
-
+            # Collect only *.C and *.py files
+            c_files = scripts_in_dir(folder, '.C')
+            py_files = scripts_in_dir(folder, '.py')
             for steering_file in c_files + py_files:
-                self.dict_of_sf_paths[package].append(steering_file)
+                self.list_of_scripts.append(Script(steering_file, package))
 
-        # Thats it, now there is a complete dict of all steering files on
-        # which we are going to perform the validation in self.dict_of_sf_paths
-
-    def create_script_objects(self):
-        """
-        Description
-        """
-
-        for package in self.dict_of_sf_paths:
-            for steering_file in self.dict_of_sf_paths[package]:
-                new_script_object = Script(steering_file, package)
-                self.list_of_scripts.append(new_script_object)
+        # Thats it, now there is a complete list of all steering files on
+        # which we are going to perform the validation in self.list_of_scripts
 
     def run_validation(self):
         """
@@ -249,32 +222,35 @@ class Validation:
         scripts, checks which of them are ready for execution, and runs them.
         """
 
+        # Use the local execution for all plotting scripts
+        local_control = localcontrol.Local()
+
         # Depending on the selected mode, load either the controls for the
         # cluster or for local multi-processing
         if self.mode == 'cluster':
-            executioner = clustercontrol.Cluster()
+            import clustercontrol
+            control = clustercontrol.Cluster()
         else:
-            executioner = localcontrol.Local()
+            control = local_control
 
         # This variable is needed for the progress bar function
         progress_bar_lines = 0
         print
 
-        #While there are scripts that have not yet been executed...
-        while not all(__.finished for __ in self.list_of_scripts):
+        # The list of scripts that have to be processed
+        remaining_scripts = [script for script in self.list_of_scripts if script.status == 'waiting']
+
+        # While there are scripts that have not yet been executed...
+        while remaining_scripts:
 
             # Loop over all steering files / Script objects
-            for script_object in self.list_of_scripts:
-
-                # If already executed, skip the script
-                if script_object.finished:
-                    continue
+            for script_object in remaining_scripts:
 
                 # If the script is currently running
-                if script_object.running:
+                if script_object.status == 'running':
 
                     # Check if the script has finished:
-                    result = executioner.is_job_finished(script_object)
+                    result = script_object.control.is_job_finished(script_object)
 
                     # If it has finished:
                     if result[0]:
@@ -282,53 +258,42 @@ class Validation:
                         # Write to log that the script finished
                         self.log.debug('Finished: ' + script_object.path)
 
-                        # Check for the return code
+                        # Check for the return code and set variables correspondingly
+                        script_object.status = 'done'
                         if result[1] != 0:
+                            script_object.status = 'failed'
                             self.log.warning('exit_status was {0} for {1}'
                                              .format(result[1],
                                                      script_object.path))
-
-                        # Set variables correspondingly
-                        script_object.finished = True
-                        script_object.running = False
                         script_object.returncode = result[1]
-                        self.current_number_of_processes -= 1
-                        continue
 
-                    # If not, let the execution continue
+                        # Remove this script from the dependencies of dependent script objects and skip dependent scripts if this one failed
+                        for dependent_script in remaining_scripts:
+                            if script_object in dependent_script.dependencies:
+                                dependent_script.dependencies.remove(script_object)
+                                if result[1] != 0:
+                                    self.log.warning('Skipping ' + dependent_script.path)
+                                    dependent_script.status = 'skipped'
+
+                # Otherwise (the script is waiting) and if it is ready to be executed
+                elif not script_object.dependencies:
+
+                    # Determine the way of execution depending on whether data files are created
+                    if script_object.header and not script_object.header.get('output', []):
+                        script_object.control = local_control
                     else:
-                        continue
-
-                # If the script is neither finished nor currently running,
-                # but ready to be executed
-                if script_object.dependencies == \
-                        script_object.settled_dependencies:
+                        script_object.control = control
 
                     # Do not spawn processes if there are already too many!
-                    if self.current_number_of_processes <= \
-                            self.max_number_of_processes:
+                    if script_object.control.available():
 
                         # Start execution and set attributes for the script
                         self.log.debug('Starting ' + script_object.path)
-                        executioner.execute(script_object, self.basf2_options)
-                        script_object.running = True
-                        self.current_number_of_processes += 1
-                    else:
-                        # Too many processes
-                        pass
+                        script_object.control.execute(script_object, self.basf2_options)
+                        script_object.status = 'running'
 
-            # Loop over all scripts again and update the settled_dependencies
-            for script_object in self.list_of_scripts:
-
-                # Clear the settled_dependencies
-                script_object.settled_dependencies = []
-
-                # Loop over all dependencies
-                for dependency in script_object.dependencies:
-                    # If the dependency has been executed already,
-                    if dependency.finished:
-                        # Append it to the list of settled dependencies
-                        script_object.settled_dependencies.append(dependency)
+            # Update the list of scripts that have to be processed
+            remaining_scripts = [script for script in remaining_scripts if script.status in ['waiting', 'running']]
 
             # Wait for one second before starting again
             time.sleep(1)
@@ -336,6 +301,25 @@ class Validation:
             progress_bar_lines = draw_progress_bar(progress_bar_lines)
 
         print
+
+    def create_plots(self):
+        """
+        This method prepares the html directory for the plots if necessary
+        and creates the plots that include the results from this validation.
+        """
+
+        # Go to the html directory and create a link to the results folder if it is not yet existing
+        save_dir = os.getcwd()
+        os.chdir('html')
+        if not os.path.exists('results'):
+            os.symlink('../results', 'results')
+
+        # import and run plot function
+        from validationplots import create_plots
+        create_plots(force=True)
+
+        # restore original working directory
+        os.chdir(save_dir)
 
 
 class Script:
@@ -352,14 +336,11 @@ class Script:
         self.path = path
         self.name = re.sub(r'[\W_]+', '_', str(os.path.basename(self.path)))
         self.package = package
-        self.dir = os.path.dirname(self.path)
-        self.header = {}
-        self.finished = False
-        self.running = False
-        self.returncode = None
-        self.header_incomplete = False
+        self.header = None
         self.dependencies = []
-        self.settled_dependencies = []
+        self.status = 'waiting'
+        self.control = None
+        self.returncode = None
 
     def dump(self):
         """
@@ -370,54 +351,55 @@ class Script:
 
     def get_dependencies(self):
         """
-        Loops over the dependencies given in the header and tries to find the
+        Loops over the input files given in the header and tries to find the
         corresponding Script objects, which will then be stored in the
         script.dependencies-list
         """
-        # Get a list of all the script in the same directory
-        in_same_pkg = filter_list_of_scripts(validation.list_of_scripts,
-                                             PACKAGE=self.package)
-
-        # Divide that list into .py and .c files, because .py files are
-        # always executed before .c files:
-        py_files = [_ for _ in in_same_pkg if _.path.lower().endswith('py')]
-        c_files = [_ for _ in in_same_pkg if _.path.lower().endswith('c')]
-
-        # Make sure the lists are ordered by the path of the files
-        py_files.sort(key=lambda x: x.path)
-        c_files.sort(key=lambda x: x.path)
-
-        # Now put the two lists back together
-        in_same_pkg = py_files + c_files
-
         # If all necessary header information are available:
-        if not self.header_incomplete:
+        if self.header is not None:
 
-            # If the script simply has no dependencies
-            if not self.header['dependencies']:
-                self.dependencies = []
-            else:
-                # Loop over all the dependencies given in the header information
-                for dependency in self.header['dependencies']:
+            # Loop over all the dependencies given in the header information
+            for root_file in self.header.get('input', []):
 
-                    # Find the script which is responsible for the creation of
-                    # 'dependency' (in the same package or in validation folder)
-                    creator = find_creator(dependency, self.package)
+                # Find the script which is responsible for the creation of
+                # the input file (in the same package or in validation folder)
+                creator = find_creator(root_file, self.package)
 
-                    # If no creator could be found, raise an error!
-                    if creator is None:
-                        validation.log.error('Unmatched dependency for {0}:'
-                                             '{1} has no creator!'
-                                             .format(self.path, dependency))
+                # If no creator could be found, raise an error!
+                if creator is None:
+                    validation.log.error('Unmatched dependency for {0}:'
+                                         '{1} has no creator!'
+                                         .format(self.path, dependency))
+                    self.status = 'skipped'
 
-                    # If creator(s) could be found, add those scripts to the
-                    # list of scripts on which self depends
-                    else:
-                        self.dependencies += creator
+                # If creator(s) could be found, add those scripts to the
+                # list of scripts on which self depends
+                else:
+                    self.dependencies += creator
+
+            # remove double entries
+            self.dependencies = list(set(self.dependencies))
+
         # If the necessary header information are not available:
         else:
             # If there is a script whose name comes before this script, this
             # is presumed as a dependency
+
+            # Get a list of all the script in the same directory
+            in_same_pkg = [script for script in validation.list_of_scripts if script.package == self.package]
+
+            # Divide that list into .py and .c files, because .py files are
+            # always executed before .C files:
+            py_files = [_ for _ in in_same_pkg if _.path.endswith('py')]
+            c_files = [_ for _ in in_same_pkg if _.path.endswith('C')]
+
+            # Make sure the lists are ordered by the path of the files
+            py_files.sort(key=lambda x: x.path)
+            c_files.sort(key=lambda x: x.path)
+
+            # Now put the two lists back together
+            in_same_pkg = py_files + c_files
+
             if in_same_pkg.index(self) - 1 >= 0:
                 predecessor = in_same_pkg[in_same_pkg.index(self) - 1]
                 self.dependencies.append(predecessor)
@@ -428,18 +410,7 @@ class Script:
         XML-header of it and then parse it.
         It then fills the self.header variable with a dict containing the
         values that were read from the XML header.
-        If there is no header, or the XML is corrupt, it will fill the
-        self.header variable with a dict that has all possible keywords,
-        but no actual values, i.e. {'keyword':[]}
         """
-
-        # The dict that contains all accepted keywords, with distinction if
-        # they are mandatory or optional
-        dict_of_keywords = {'mandatory': ['category', 'dependencies', 'output'],
-                            'optional': ['author', 'description']}
-
-        # All keywords as a plain list
-        list_of_keywords = sum(dict_of_keywords.values(), [])
 
         # Read the file as a whole
         with open(self.path, "r") as data:
@@ -449,42 +420,37 @@ class Script:
         pat = re.compile('(<header>.*?</header>)', re.DOTALL | re.M)
 
         # Apply the regex, i.e. filter out the <header>...</header> part of
-        # each steering file. If no such part can be found the result is an
-        # empty dict!
+        # each steering file.
         try:
             xml = pat.findall(steering_file_content)[0].strip()
         except IndexError:
             validation.log.error('No file header found: ' + self.path)
-            self.header = {keyword: [] for keyword in list_of_keywords}
-            self.header_incomplete = True
             return
 
-        # Create an XML tree from the plain XML code. If this fails, the result
-        # is again an empty dict!
+        # Create an XML tree from the plain XML code.
         try:
             xml_tree = XMLTree.ElementTree(XMLTree.fromstring(xml)).getroot()
         except XMLTree.ParseError:
             validation.log.error('Invalid XML in header: ' + self.path)
-            self.header = {keyword: [] for keyword in list_of_keywords}
-            self.header_incomplete = True
             return
+
+        # we have a header
+        self.header = {}
 
         # Loop over that tree
         for branch in xml_tree:
 
-            # The keywords that do not need to parsed into a list
-            simple_strings = ['description', 'category']
+            # The keywords that should be parsed into a list
+            list_tags = ['input', 'output', 'contact']
 
             # Format the values of each branch
-            if branch.tag.strip() in simple_strings:
-                branch_value = re.sub(' +', ' ', branch.text.replace('\n', ''))
-                branch_value = branch_value.strip()
-            # For all other keywords, it is useful to store the information
-            # in a list, e.g. a list of all output files
-            else:
+            if branch.tag.strip() in list_tags:
                 branch_value = [__.strip() for __ in branch.text.split(',')]
                 if branch_value == ['']:
                     branch_value = []
+            else:
+                branch_value = re.sub(' +', ' ', branch.text.replace('\n', ''))
+                branch_value = branch_value.strip()
 
             # Append the branch and its values to the header-dict. This
             # implementation technically allows multiple occurrences of the
@@ -495,76 +461,10 @@ class Script:
             else:
                 self.header[branch.tag.strip()] = branch_value
 
-        # Make sure that every expected keyword at least exists as an empty
-        # key in self.header to avoid IndexErrors (since e.g.
-        # get_dependencies always tries to access
-        # self.header['dependencies'], which will raise an
-        # exception if no dependencies have been stated
-        for mandatory_keyword in dict_of_keywords['mandatory']:
-            if mandatory_keyword not in self.header:
-                self.header[mandatory_keyword] = ''
-                self.header_incomplete = True
-                validation.log.warning('Incomplete header information:' +
-                                       self.path)
-
 
 ###############################################################################
 ###                         Function definitions                             ###
 ################################################################################
-
-def create_plots():
-    """
-    This function starts a new process with the create_plots.py script in it
-    to create the plots that include the results from this validation.
-    """
-    plot_creation = subprocess.Popen(['python', 'create_plots.py', '-f'],
-                                     stdout=open(os.devnull, 'w'),
-                                     stderr=open(os.devnull, 'w'))
-    plot_creation.wait()
-
-
-def filter_list_of_scripts(list_of_scripts, **kwargs):
-    """
-    This function receives a list of script objects and a filter (in
-    **kwargs). It then searches through the given list and returns the subset
-    which matches the filter.
-    If given multiple filters, all filters except for the first one will be
-    ignored. If you need multiple filters, consider nesting this function!
-
-    Syntax:
-    filter_list_of_scripts(desired_property=[list of acceptable values])
-
-    Desired properties are all attributes of a Script object => See the
-    __init__ method for Script objects.
-    """
-
-    if kwargs is not None:
-
-        # Read in the filter and the values we are filtering for
-        sieve, desired_values = kwargs.items()[0]
-
-        # If we don't receive a list of desired values, make it a list!
-        if not isinstance(desired_values, list):
-            desired_values = [desired_values]
-
-        # Holds the lists of matches we have found
-        results = []
-
-        for script_object in list_of_scripts:
-            for value in desired_values:
-
-                # If we are filtering for the path, package, or category
-                if sieve.lower() in vars(script_object).keys():
-                    needle = re.search(value,
-                                       vars(script_object)[sieve.lower()])
-                    if needle is not None:
-                        results.append(script_object)
-
-        return results
-
-    else:
-        return []
-
 
 def find_creator(outputfile, package):
     """
@@ -576,10 +476,7 @@ def find_creator(outputfile, package):
 
     # Get a list of all Script objects for scripts in the given package as well
     # as from the validation-folder
-    candidates = filter_list_of_scripts(validation.list_of_scripts,
-                                        PACKAGE=package)
-    candidates += filter_list_of_scripts(validation.list_of_scripts,
-                                         PACKAGE='validation')
+    candidates = [script for script in validation.list_of_scripts if script.package in [package, 'valiation']]
 
     # Reserve some space for the results we will return
     results = []
@@ -587,17 +484,15 @@ def find_creator(outputfile, package):
     # Loop over all candidates and check if they have 'outputfile' listed
     # under their outputs
     for candidate in candidates:
-        if outputfile in candidate.header['output']:
+        if outputfile in candidate.header.get('output', []):
             results.append(candidate)
 
     # Return our results and warn if there is more than one creator
     if len(results) == 0:
         return None
-    if len(results) == 1:
-        return results
     if len(results) > 1:
         validation.log.warning('Found multiple creators for' + outputfile)
-        return results
+    return results
 
 
 def get_validation_folders(location):
@@ -686,7 +581,7 @@ def scripts_in_dir(dirpath, ext='*'):
 
     # A list of all folder names that will be ignored (e.g. folders that are
     # important for SCons
-    blacklist = ['tools', 'scripts', 'examples']
+    blacklist = ['tools', 'scripts', 'examples', 'html']
 
     # Loop over the given directory and its subdirectories and find all files
     for root, dirs, files in os.walk(dirpath):
@@ -699,7 +594,7 @@ def scripts_in_dir(dirpath, ext='*'):
         for current_file in files:
             # If the file has the requested extension, append its full paths to
             # the results
-            if current_file.lower().endswith(ext):
+            if current_file.endswith(ext):
                 results.append(root + '/' + current_file)
 
     # Return our sorted results
@@ -716,7 +611,7 @@ def draw_progress_bar(delete_lines, barlength=50):
 
     # Get statistics: Number of finished scripts + number of scripts in total
     finished_scripts = len([_ for _ in validation.list_of_scripts if
-                            _.finished])
+                            _.status in ['done', 'failed', 'skipped']])
     all_scripts = len(validation.list_of_scripts)
     percent = 100.0 * finished_scripts / all_scripts
 
@@ -743,7 +638,7 @@ def draw_progress_bar(delete_lines, barlength=50):
 
     # Print the list of currently running scripts:
     running = [os.path.basename(__.path) for __ in validation.list_of_scripts
-               if __.running]
+               if __.status == 'running']
 
     # If nothing is currently running
     if not running:
@@ -781,7 +676,6 @@ try:
     # Now we check whether we are running a complete validation or only
     # validating a certain set of packages:
     if cmd_arguments.packages:
-        validation.complete_validation = False
         validation.packages = cmd_arguments.packages
         validation.log.note('Only validating package(s): {0}'
                             .format(', '.join(validation.packages)))
@@ -809,10 +703,6 @@ try:
     validation.log.note('Collecting steering files...')
     validation.collect_steering_files()
 
-    # Create a script object for every steering file we have collected
-    validation.log.note('Creating Script objects...')
-    validation.create_script_objects()
-
     # Build headers for every script object we have created
     validation.log.note('Building headers for Script objects...')
     validation.build_headers()
@@ -828,7 +718,7 @@ try:
     # Log that the validation has finished and that we are creating plots
     validation.log.note('Validation finished...')
     validation.log.note('Start creating plots...')
-    create_plots()
+    validation.create_plots()
 
     # Log that everything is finished
     validation.log.note('Plots have been created...')

@@ -13,6 +13,8 @@ try:
 except ImportError:
     import json
 
+from validationplots import create_plots
+
 
 class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
     """
@@ -138,27 +140,23 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
 
         # Used to get a list of all log files
         if self.path.startswith('/ajax/listlogs'):
-            loglist = {'general': []}
-            for dir in os.listdir('./logs'):
-                if os.path.isdir('./logs/' + dir):
-                    for file in os.listdir('./logs/' + dir):
-                        print './logs/' + dir
-                        if dir in loglist.keys():
-                            loglist[dir].append(file)
-                        else:
-                            loglist[dir] = [file]
-                else:
-                    loglist['general'].append(dir)
+            loglist = {}
+            for dir in os.listdir('./results/current'):
+                if os.path.isdir('./results/current/' + dir):
+                    for file in os.listdir('./results/current/' + dir):
+                        if file.endswith('.log'):
+                            print './results/current/' + dir
+                            if dir in loglist.keys():
+                                loglist[dir].append(file)
+                            else:
+                                loglist[dir] = [file]
             print loglist
             return (200, json.dumps(loglist), 'application/json')
 
         # Used to generate new plots
         if self.path.startswith('/ajax/makeplots'):
-            # Spawn that new process which creates the requested plots
-            params = ['python', '../create_plots.py', '-r'] + data
-            log.debug(subprocess.list2cmdline(params))
-            process = subprocess.Popen(params)
-            process.wait()
+            log.debug('Creating plots for revisions ' + ', '.join(data))
+            create_plots(revisions=data)
             return (200, json.dumps({}), 'application/json')
 
 
@@ -183,13 +181,20 @@ if __name__ == '__main__':
     if os.environ.get('BELLE2_RELEASE', None) is None:
         sys.exit('Error: No basf2 release set up!')
 
+    # Make sure the output of validate_basf2.py is there
+    if not os.path.isdir('html/results'):
+        sys.exit('Error: No html/results dir found! Run validate_bash2.py first.')
+
+    # Go to the html directory
+    os.chdir('html')
+
     # Setup options for logging
     log.basicConfig(level=log.DEBUG,
                     format='%(asctime)s %(levelname)-8s %(message)s',
                     datefmt='%H:%M:%S')
 
     # Define the server address
-    ip = '129.13.133.6'
+    ip = 'localhost'
     port = 8000
 
     # Start the server!

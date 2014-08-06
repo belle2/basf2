@@ -536,8 +536,8 @@ void GenFitterModule::event()
             double Bx, By, Bz;
             genfit::FieldManager::getInstance()->getFieldVal(poca.X(), poca.Y(), poca.Z(),
                                                              Bx, By, Bz);
-            trackFitResults.appendNew(TrackFitResult(poca, dirInPoca, cov, charge, chargedStable,
-                                                     pVal, Bz / 10., 0, 0));
+            trackFitResults.appendNew(poca, dirInPoca, cov, charge, chargedStable,
+                                      pVal, Bz / 10., 0, 0);
 
             gfTracksToTrackFitResults.add(trackCounter, trackFitResultCounter);
             gfTrackCandidatesToTrackFitResults.add(iCand, trackFitResultCounter);

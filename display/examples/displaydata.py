@@ -22,7 +22,7 @@ class DisplayDataTest(Module):
     def initialize(self):
         """reimplementation of Module::initialize()."""
 
-        Belle2.PyStoreObj("DisplayData").registerAsPersistent()
+        Belle2.PyStoreObj("DisplayData").registerInDataStore()
 
     def event(self):
         """reimplementation of Module::event()."""
@@ -45,13 +45,12 @@ class DisplayDataTest(Module):
         displayData.obj().addArrow("y", pos, pos + TVector3(0, 50, 0))
         displayData.obj().addArrow("z", pos, pos + TVector3(0, 0, 50))
 
-        displayData.obj().addArrow("z=-2m", TVector3(100, 100, -200),
-                TVector3(0, 0, -200), ROOT.kGray)
+        displayData.obj().addArrow("z=-2m", TVector3(100, 100, -200), TVector3(0, 0, -200), ROOT.kGray)
 
         # highlight the first MCParticle
         mcparticles = Belle2.PyStoreArray('MCParticles')
         part = mcparticles[0]
-        if part != None:
+        if part is not None:
             displayData.obj().select(part)
 
 

@@ -32,7 +32,7 @@ class VisualizeVertex(Module):
     def initialize(self):
         """reimplementation of Module::initialize()."""
 
-        Belle2.PyStoreObj("DisplayData").registerAsPersistent()
+        Belle2.PyStoreObj("DisplayData").registerInDataStore()
 
     def event(self):
         """reimplementation of Module::event()."""

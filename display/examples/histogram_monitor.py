@@ -23,18 +23,17 @@ class GenerateHist(Module):
     """Generate some histograms to pass to the display."""
 
     ## histogram for SimHit energy deposition
-    edep_hist = TH1F("CDC_edep", "Energy deposition from CDCSimHits",
-        100, 0.0, 10e-6)
+    edep_hist = TH1F("CDC_edep", "Energy deposition from CDCSimHits", 100, 0.0, 10e-6)
     ## histogram for SimHit positions
     pos_hist = TH3F("CDC_pos", "Positions of CDCSimHits",
-        100, -150.0, 150.0,
-        100, -150.0, 150.0,
-        100, -150.0, 150.0)
+                    100, -150.0, 150.0,
+                    100, -150.0, 150.0,
+                    100, -150.0, 150.0)
 
     def initialize(self):
         """reimplementation of Module::initialize()."""
 
-        Belle2.PyStoreObj("DisplayData").registerAsPersistent()
+        Belle2.PyStoreObj("DisplayData").registerInDataStore()
 
     def event(self):
         """reimplementation of Module::event()."""

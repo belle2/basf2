@@ -66,7 +66,9 @@ namespace Belle2 {
    *  Note that you'll have to register the relation in your module's initialize() function:
    *
       \code
-      RelationArray::registerPersistent<MCParticle, SomeOtherClass>();
+      StoreArray<MCParticle> mcparticles;
+      StoreArray<SomethingOtherClass> otherArray;
+      mcparticles.registerRelationTo(otherArray);
       \endcode
    */
   template <class BASE> class RelationsInterface: public BASE {

@@ -98,7 +98,8 @@ namespace Belle2 {
      */
     static bool registerPersistent(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event,
                                    bool errorIfExisting = false) {
-      return DataStore::Instance().registerEntry(DataStore::arrayName<T>(name), durability, T::Class(), true, false, errorIfExisting);
+      return DataStore::Instance().registerEntry(DataStore::arrayName<T>(name), durability, T::Class(), true, errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0);
+
     }
 
     /** Register an array, that should not be written to the output by default, in the data store.
@@ -111,7 +112,7 @@ namespace Belle2 {
      */
     static bool registerTransient(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event,
                                   bool errorIfExisting = false) {
-      return DataStore::Instance().registerEntry(DataStore::arrayName<T>(name), durability, T::Class(), true, true, errorIfExisting);
+      return DataStore::Instance().registerEntry(DataStore::arrayName<T>(name), durability, T::Class(), true, DataStore::c_DontWriteOut | (errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0));
     }
 
     /** Check whether an array was registered before.
@@ -124,7 +125,7 @@ namespace Belle2 {
      */
     static bool required(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
       std::string arrayName = DataStore::arrayName<T>(name);
-      return DataStore::Instance().require(StoreAccessorBase(arrayName, durability, T::Class(), true));
+      return DataStore::Instance().requireInput(StoreAccessorBase(arrayName, durability, T::Class(), true));
     }
 
     /** Tell the data store about an optional input.
@@ -149,6 +150,45 @@ namespace Belle2 {
      */
     explicit StoreArray(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event):
       StoreAccessorBase(DataStore::arrayName<T>(name), durability, T::Class(), true), m_storeArray(0) {}
+
+
+    /** Register a relation to the given StoreArray.
+     *
+     *  Use this if you want to create relate objects in this array to objects in 'toArray'.
+     *  Must be called in the initialization phase.
+     *
+     * @param toArray    Array the relation should point to (from this StoreArray)
+     * @param durability Durability of the relation.
+     * @param storeFlags ORed combination of DataStore::EStoreFlag flags
+     */
+    template <class TO> bool registerRelationTo(const StoreArray<TO>& toArray, DataStore::EDurability durability = DataStore::c_Event, DataStore::EStoreFlags storeFlags = DataStore::c_WriteOut) const {
+      return DataStore::Instance().registerRelation(*this, toArray, durability, storeFlags);
+    }
+
+    /** Produce error if no relation from this array to 'toArray' has been registered.
+     *
+     * Must be called in initialization phase, aborts job if it fails. (allowing you to catch problems early)
+     *
+     * @param toArray    Array the relation should point to (from this StoreArray)
+     * @param durability Durability of the relation.
+     * @return            True if the relations exists.
+     */
+    template <class TO> bool requireRelationTo(const StoreArray<TO>& toArray, DataStore::EDurability durability = DataStore::c_Event) const {
+      return DataStore::Instance().requireRelation(*this, toArray, durability);
+    }
+
+    /** Tell the data store about a relation that we could make use of. (aka. optional input)
+     *
+     * Mainly useful for creating diagrams of module inputs and outputs.
+     * This must be called in the initialization phase.
+     *
+     * @param toArray    Array the relation should point to (from this StoreArray)
+     * @param durability Durability of the relation.
+     * @return            True if the relations exists.
+     */
+    template <class TO> bool optionalRelationTo(const StoreArray<TO>& toArray, DataStore::EDurability durability = DataStore::c_Event) const {
+      return DataStore::Instance().optionalRelation(*this, toArray, durability);
+    }
 
     /** Delete all entries in this array.
      *

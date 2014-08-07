@@ -49,21 +49,11 @@ namespace Belle2 {
    *  added and also connected with the particles that created them.
    *
    *  As with other data store objects, you should register relations you want
-   *  to store in your implementation of Module::initialize(), e.g. when creating
-   *  a relation from MCParticles to SVDSimHits (with default name):
+   *  to store in your implementation of Module::initialize(), see StoreArray::registerRelationTo()
    *
-   *  \code
-      RelationArray::registerPersistent<MCParticle, SVDSimHit>();
-      \endcode
-   *
-   * or, if you have arrays with non-default names:
-   *  \code
-      //create MCParticles (default name) -> MySVDSimHits relation
-      RelationArray::registerPersistent<MCParticle, SVDSimHit>("", "MySVDSimHits");
-      \endcode
    *
    *  \sa RelationObject for the main user interface to relations.
-   *  \sa RelationIndex provides an interface to quickly find objects
+   *  \sa RelationIndex provides an low-levvel interface to quickly find objects
    *      related to a given FROM/TO side object.
    *  \sa The on-disk data structure is provided by RelationElement objects
    *      in a RelationContainer.
@@ -165,8 +155,7 @@ namespace Belle2 {
     template<class FROM, class TO> static bool registerPersistent(const std::string& fromName, const std::string& toName, DataStore::EDurability durability = DataStore::c_Event,
         bool errorIfExisting = false) {
       const std::string& relName = DataStore::relationName(DataStore::arrayName<FROM>(fromName), DataStore::arrayName<TO>(toName));
-      return DataStore::Instance().registerEntry(relName, durability, RelationContainer::Class(), false, false, errorIfExisting);
-
+      return DataStore::Instance().registerEntry(relName, durability, RelationContainer::Class(), false, errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0);
     }
     /** Register a relation array, that should be written to the output by default, in the data store.
      *  This must be called in the initialization phase.
@@ -191,7 +180,7 @@ namespace Belle2 {
     static bool registerPersistent(const std::string& fromName, const std::string& toName,
                                    DataStore::EDurability durability = DataStore::c_Event, bool errorIfExisting = false) {
       const std::string& relName = DataStore::relationName(fromName, toName);
-      return DataStore::Instance().registerEntry(relName, durability, RelationContainer::Class(), false, false, errorIfExisting);
+      return DataStore::Instance().registerEntry(relName, durability, RelationContainer::Class(), false, (errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0));
     }
 
     /** Register a relation array, that should NOT be written to the output by default, in the data store.
@@ -206,7 +195,8 @@ namespace Belle2 {
     template<class FROM, class TO> static bool registerTransient(const std::string& fromName, const std::string& toName, DataStore::EDurability durability = DataStore::c_Event,
         bool errorIfExisting = false) {
       const std::string& relName = DataStore::relationName(DataStore::arrayName<FROM>(fromName), DataStore::arrayName<TO>(toName));
-      return DataStore::Instance().registerEntry(relName, durability, RelationContainer::Class(), false, true, errorIfExisting);
+      return DataStore::Instance().registerEntry(relName, durability, RelationContainer::Class(), false, DataStore::c_DontWriteOut | (errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0));
+
     }
     /** Register a relation array, that should NOT be written to the output by default, in the data store.
      *  This must be called in the initialization phase.
@@ -231,7 +221,8 @@ namespace Belle2 {
     static bool registerTransient(const std::string& fromName, const std::string& toName,
                                   DataStore::EDurability durability = DataStore::c_Event, bool errorIfExisting = false) {
       const std::string& relName = DataStore::relationName(fromName, toName);
-      return DataStore::Instance().registerEntry(relName, durability, RelationContainer::Class(), false, true, errorIfExisting);
+      return DataStore::Instance().registerEntry(relName, durability, RelationContainer::Class(), false, DataStore::c_DontWriteOut | (errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0));
+
     }
 
     /** Check whether a relation array was registered before.
@@ -246,7 +237,7 @@ namespace Belle2 {
      *  @return            True if the object exists.
      */
     static bool required(const std::string& name, DataStore::EDurability durability = DataStore::c_Event) {
-      return DataStore::Instance().require(StoreAccessorBase(name, durability, RelationContainer::Class(), false));
+      return DataStore::Instance().requireInput(StoreAccessorBase(name, durability, RelationContainer::Class(), false));
     }
 
     /** Tell the data store about an optional input.

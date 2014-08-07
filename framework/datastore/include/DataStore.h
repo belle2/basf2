@@ -46,8 +46,18 @@ namespace Belle2 {
      */
     enum EDurability {
       c_Event,     /**< Object is deleted after event. */
-      c_Persistent /**< Object is available during entire execution time (not related to persistent/transient distinction). */
+      c_Persistent /**< Object is available during entire execution time. */
     };
+
+    /** Flags describing behaviours of objects etc.
+     */
+    enum EStoreFlag {
+      c_WriteOut = 0,                /**< Object/array should be saved by output modules. */
+      c_DontWriteOut = 1 << 0,       /**< Object/array should be NOT saved by output modules. Can be overridden via output module parameters. */
+      c_ErrorIfAlreadyRegistered = 1 << 1,/**< If the object/array was already registered, produce an error (aborting initialisation). */
+    };
+    /** Combination of EStoreFlag flags. */
+    typedef int EStoreFlags;
 
     /** Number of Durability Types.
      *
@@ -67,15 +77,15 @@ namespace Belle2 {
 
     /** A struct for map entries **/
     struct StoreEntry {
-      StoreEntry() : isArray(false), isTransient(false), object(0), ptr(0), name("") {};
+      StoreEntry() : isArray(false), dontWriteOut(false), object(0), ptr(0), name("") {};
       bool        isArray;     /**< Flag that indicates whether the object is a TClonesArray **/
-      bool        isTransient; /**< Flag that indicates whether the object should be written to the output by default **/
+      bool        dontWriteOut; /**< Flag that indicates whether the object should be written to the output by default **/
       TObject*    object;      /**< The pointer to the actual object. Associated memory may exceed object durability, and is kept until the object is replaced.  **/
       TObject*    ptr;         /**< The pointer to the returned object, either equal to 'object' or 0, depending on wether the object was created in the current event **/
       std::string name;        /**< Name of the entry. Equal to the key in the map. **/
     };
 
-    /** Stores information on inputs/outputs of a module, as obtained by require()/optionalInput()/registerEntry(); */
+    /** Stores information on inputs/outputs of a module, as obtained by requireInput()/optionalInput()/registerEntry(); */
     struct ModuleInfo {
       /** Possible types of entries/relations for a module. */
       enum EEntryType {
@@ -167,12 +177,50 @@ namespace Belle2 {
      *  @param durability Decide with which durability map you want to perform the requested action.
      *  @param objClass   The class of the object.
      *  @param array      Whether it is a TClonesArray or not.
-     *  @param transient  Whether the object should be stored to the output by default.
-     *  @param errorIfExisting  Whether to complain if the entry alreay exists.
+     *  @param storeFlags ORed combination of EStoreFlag flags.
      *  @return           True if the registration succeeded.
      */
     bool registerEntry(const std::string& name, EDurability durability,
-                       const TClass* objClass, bool array, bool transient, bool errorIfExisting);
+                       const TClass* objClass, bool array, EStoreFlags storeFlags);
+
+    /** Register a relation in the DataStore map.
+     *
+     *  This must be called in the initialization phase. Otherwise an error is returned.
+     *  @param durability Decide with which durability map you want to perform the requested action.
+     *  @param storeFlags ORed combination of EStoreFlag flags.
+     *  @return           True if the registration succeeded.
+     */
+    bool registerRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability, EStoreFlags storeFlags);
+
+    /** Produce ERROR message if no entry of the given type is registered in the DataStore.
+     *
+     *  @param accessor   Encapsulates name, durability, and type
+     *  @return           True if the requested object exists.
+     */
+    bool requireInput(const StoreAccessorBase& accessor);
+
+    /** Produce ERROR message if no relation of given durability exists between fromArray and toArray (in that direction).
+     *
+     *  @return           True if the requested object exists.
+     */
+    bool requireRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability);
+
+    /** Register the given object/array as an optional input.
+     *
+     *  Mainly useful for creating diagrams of module inputs and outputs.
+     *
+     *  @param accessor   Encapsulates name, durability, and type
+     *  @return           True if the requested object exists.
+     */
+    bool optionalInput(const StoreAccessorBase& accessor);
+
+    /** Register the given relation as an optional input.
+     *
+     *  Mainly useful for creating diagrams of module inputs and outputs.
+     *
+     *  @return           True if the requested object exists.
+     */
+    bool optionalRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability);
 
     /** Check whether an entry with the correct type is registered in the DataStore map and return it.
      *
@@ -183,22 +231,6 @@ namespace Belle2 {
      *  @return           StoreEntry, or NULL if not found
      */
     StoreEntry* getEntry(const StoreAccessorBase& accessor);
-
-    /** Produce ERROR message if no entry of the given type is registered in the DataStore.
-     *
-     *  @param accessor   Encapsulates name, durability, and type
-     *  @return           True if the requested object exists.
-     */
-    bool require(const StoreAccessorBase& accessor);
-
-    /** Register the given object/array as an optional input.
-     *
-     *  Mainly useful for creating diagrams of module inputs and outputs.
-     *
-     *  @param accessor   Encapsulates name, durability, and type
-     *  @return           True if the requested object exists.
-     */
-    bool optionalInput(const StoreAccessorBase& accessor);
 
     /** Get a pointer to a pointer of an object in the DataStore.
      *
@@ -466,7 +498,7 @@ namespace Belle2 {
      */
     void setModule(const std::string& name) { m_currentModule = name; }
 
-    /** return information on inputs/outputs of each module, as obtained by require()/optionalInput()/registerEntry(); */
+    /** return information on inputs/outputs of each module, as obtained by requireInput()/optionalInput()/registerEntry(); */
     const std::map<std::string, ModuleInfo>& getModuleInfoMap() const { return m_moduleInfo; }
 
 
@@ -511,7 +543,7 @@ namespace Belle2 {
     /** Stores the current module, used to fill m_moduleInfo. */
     std::string m_currentModule;
 
-    /** Stores information on inputs/outputs of each module, as obtained by require()/optionalInput()/registerEntry(); */
+    /** Stores information on inputs/outputs of each module, as obtained by requireInput()/optionalInput()/registerEntry(); */
     std::map<std::string, ModuleInfo> m_moduleInfo;
   };
 } // namespace Belle2

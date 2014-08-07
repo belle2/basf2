@@ -82,7 +82,7 @@ namespace Belle2 {
      */
     static bool registerPersistent(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event,
                                    bool errorIfExisting = true) {
-      return DataStore::Instance().registerEntry(DataStore::objectName<T>(name), durability, T::Class(), false, false, errorIfExisting);
+      return DataStore::Instance().registerEntry(DataStore::objectName<T>(name), durability, T::Class(), false, errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0);
     }
 
     /** Register an object, that should not be written to the output by default, in the data store.
@@ -96,7 +96,7 @@ namespace Belle2 {
      */
     static bool registerTransient(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event,
                                   bool errorIfExisting = true) {
-      return DataStore::Instance().registerEntry(DataStore::objectName<T>(name), durability, T::Class(), false, true, errorIfExisting);
+      return DataStore::Instance().registerEntry(DataStore::objectName<T>(name), durability, T::Class(), false, DataStore::c_DontWriteOut | (errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0));
     }
 
     /** Check whether an object was registered before.
@@ -110,7 +110,7 @@ namespace Belle2 {
      */
     static bool required(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
       std::string objName = DataStore::objectName<T>(name);
-      return DataStore::Instance().require(StoreAccessorBase(objName, durability, T::Class(), false));
+      return DataStore::Instance().requireInput(StoreAccessorBase(objName, durability, T::Class(), false));
     }
 
     /** Tell the data store about an optional input.

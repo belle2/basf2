@@ -91,7 +91,7 @@ bool DataStore::checkType(const StoreEntry& entry, const StoreAccessorBase& acce
 
 
 bool DataStore::registerEntry(const std::string& name, EDurability durability,
-                              const TClass* objClass, bool array, bool transient, bool errorIfExisting)
+                              const TClass* objClass, bool array, EStoreFlags storeFlags)
 {
   const StoreAccessorBase accessor(name, durability, objClass, array);
   // Check whether this method is called in the initialization phase
@@ -99,6 +99,7 @@ bool DataStore::registerEntry(const std::string& name, EDurability durability,
     B2ERROR("Attempt to register " << accessor.readableName() << " outside of the initialization phase. Please move calls to registerPersistent() etc. into your Module's initialize() function.");
     return false;
   }
+  const bool dontwriteout = storeFlags & c_DontWriteOut;
 
   //add to current module's outputs
   ModuleInfo& info = m_moduleInfo[m_currentModule];
@@ -110,8 +111,8 @@ bool DataStore::registerEntry(const std::string& name, EDurability durability,
     StoreEntry& entry = it->second;
 
     // Complain about existing entry
-    if (errorIfExisting) {
-      B2ERROR("An " << accessor.readableName() << " of type " << entry.object->ClassName() << " was already registered before. (Multiple calls to registerPersistent() etc. are fine if the errorIfExisting parameter is set to false. For objects you will want to make sure that you don't discard existing data from other modules in that case.");
+    if (storeFlags & c_ErrorIfAlreadyRegistered) {
+      B2ERROR("An " << accessor.readableName() << " of type " << entry.object->ClassName() << " was already registered before. (Multiple calls to registerPersistent() etc. are fine if the c_ErrorIfAlreadyRegistered flag is not set. For objects you will want to make sure that you don't discard existing data from other modules in that case.");
       return false;
     }
 
@@ -119,12 +120,12 @@ bool DataStore::registerEntry(const std::string& name, EDurability durability,
     if (!checkType(entry, accessor)) return false;
 
     // Check whether the persistency type matches
-    if (entry.isTransient != transient) {
-      B2WARNING("Existing " << accessor.readableName() << " has different persistency type than requested. Changing persistency to " << (transient ? "transient" : "persistent") << ".");
-      entry.isTransient = transient;
+    if (entry.dontWriteOut != dontwriteout) {
+      B2WARNING("Existing " << accessor.readableName() << " has different persistency type than requested. Changing to " << (dontwriteout ? "c_DontWriteOut" : "c_WriteOut") << ".");
+      entry.dontWriteOut = dontwriteout;
     }
 
-    B2DEBUG(100, "An " << accessor.readableName() << " was registered once more (with errorIfExisting=false).");
+    B2DEBUG(100, "An " << accessor.readableName() << " was registered once more.");
     return true;
   }
 
@@ -137,7 +138,7 @@ bool DataStore::registerEntry(const std::string& name, EDurability durability,
   // Add the DataStore entry
   StoreEntry& entry = m_storeObjMap[durability][name];
   entry.isArray = array;
-  entry.isTransient = transient;
+  entry.dontWriteOut = dontwriteout;
   if (array) {
     entry.object = new TClonesArray(objClass);
   } else {
@@ -147,6 +148,26 @@ bool DataStore::registerEntry(const std::string& name, EDurability durability,
 
   B2DEBUG(100, "Successfully registered " << accessor.readableName());
   return true;
+}
+
+bool DataStore::registerRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability, EStoreFlags storeFlags)
+{
+  if (!fromArray.isArray())
+    B2FATAL(fromArray.readableName() << " is not an array!");
+  if (!toArray.isArray())
+    B2FATAL(toArray.readableName() << " is not an array!");
+
+  const std::string& relName = relationName(fromArray.getName(), toArray.getName());
+  if ((fromArray.notWrittenOut() or toArray.notWrittenOut()) and !(storeFlags & c_DontWriteOut)) {
+    B2WARNING("You're trying to register a persistent relation " << relName << " from/to an array which is not written out (DataStore::c_DontWriteOut flag)! Relation will also not be saved!");
+    storeFlags |= c_DontWriteOut;
+  }
+
+  if (fromArray.getDurability() > durability or toArray.getDurability() > durability) {
+    B2FATAL("Tried to create a relation '" << relName << "' with a durability larger than the StoreArrays it relates");
+  }
+
+  return DataStore::Instance().registerEntry(relName, durability, RelationContainer::Class(), false, storeFlags);
 }
 
 
@@ -301,7 +322,7 @@ void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, i
   const string& relationsName = relationName(fromEntry->name, toEntry->name);
   const StoreObjIter& it = m_storeObjMap[c_Event].find(relationsName);
   if (it == m_storeObjMap[c_Event].end()) {
-    B2FATAL("No relation '" << relationsName << "' found. Please register it (using RelationArray::registerPersistent()) before trying to add relations.");
+    B2FATAL("No relation '" << relationsName << "' found. Please register it (using StoreArray::registerRelationTo()) before trying to add relations.");
   }
   StoreEntry* entry = &(it->second);
 
@@ -471,7 +492,7 @@ void DataStore::reset(EDurability durability)
   RelationIndexManager::Instance().clear();
 }
 
-bool DataStore::require(const StoreAccessorBase& accessor)
+bool DataStore::requireInput(const StoreAccessorBase& accessor)
 {
   if (m_initializeActive) {
     ModuleInfo& info = m_moduleInfo[m_currentModule];
@@ -493,4 +514,26 @@ bool DataStore::optionalInput(const StoreAccessorBase& accessor)
   }
 
   return (getEntry(accessor) != nullptr);
+}
+
+bool DataStore::requireRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability)
+{
+  if (!fromArray.isArray())
+    B2FATAL(fromArray.readableName() << " is not an array!");
+  if (!toArray.isArray())
+    B2FATAL(toArray.readableName() << " is not an array!");
+
+  const std::string& relName = relationName(fromArray.getName(), toArray.getName());
+  return DataStore::Instance().requireInput(StoreAccessorBase(relName, durability, RelationContainer::Class(), false));
+}
+
+bool DataStore::optionalRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability)
+{
+  if (!fromArray.isArray())
+    B2FATAL(fromArray.readableName() << " is not an array!");
+  if (!toArray.isArray())
+    B2FATAL(toArray.readableName() << " is not an array!");
+
+  const std::string& relName = relationName(fromArray.getName(), toArray.getName());
+  return DataStore::Instance().optionalInput(StoreAccessorBase(relName, durability, RelationContainer::Class(), false));
 }

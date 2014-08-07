@@ -206,7 +206,7 @@ def createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut):
     """
     if preCutHistogram is None:
         hash = actorFramework.createHash(placeholders)
-        placeholders['preCutTexFile'] = '{name}_preCut_{hash}.tex'.format(name=placeholders['particleName'], hash=hash)
+        placeholders['preCutTexFile'] = removeJPsiSlash('{name}_preCut_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
         placeholders['preCutTemplateFile'] = 'analysis/scripts/FullEventInterpretationMissingPreCutTemplate.tex'
         placeholders['isIgnored'] = True
         placeholders['channelPurity'] = 0
@@ -305,7 +305,7 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
 
     if signalProbability is None:
         hash = actorFramework.createHash(placeholders)
-        placeholders['mvaTexFile'] = '{name}_mva_{hash}.tex'.format(name=placeholders['particleName'], hash=hash)
+        placeholders['mvaTexFile'] = removeJPsiSlash('{name}_mva_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
         placeholders['mvaTemplateFile'] = 'analysis/scripts/FullEventInterpretationMissingMVATemplate.tex'
         placeholders['isIgnored'] = True
         placeholders['postCutRange'] = 'Ignored'
@@ -329,7 +329,6 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
         placeholders['mvaTarget'] = mvaConfig.target
         placeholders['mvaTargetCluster'] = mvaConfig.targetCluster
 
-        # TODO implement performance here from log file
         from variables import variables
         ranking = getMVARankingFromLogfile(placeholders['mvaLogFilename'])
         placeholders['mvaVariables'] = ''

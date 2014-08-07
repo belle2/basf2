@@ -41,7 +41,7 @@ def CountMCParticles(path, names):
 
     if not os.path.isfile(filename):
         output = register_module('VariablesToNtuple')
-        output.param('variables', ['NumberOfMCParticlesInEvent({i})'.format(i=pdg.from_name(name)) for name in names])
+        output.param('variables', ['NumberOfMCParticlesInEvent({i})'.format(i=abs(pdg.from_name(name))) for name in names])
         output.param('fileName', filename)
         output.param('treeName', 'mccounts')
         path.add_module(output)
@@ -284,11 +284,11 @@ def SignalProbability(path, identifier, particleList, mvaConfig, additionalDepen
         teacher.param('maxEventsPerClass', 10000000)
         teacher.param('doNotTrain', True)
         path.add_module(teacher)
-        B2INFO("Calculate SignalProbability for {i}, but particle/channel is ignored. Create root file with variables first.".format(i=identifier))
+        B2INFO("Calculate SignalProbability for {i}. Create root file with variables first.".format(i=identifier))
         return {}
 
     if not os.path.isfile(configFilename):
-        B2INFO("Calculate SignalProbability for {i}, but particle/channel is ignored. Run Teacher in extern process.".format(i=identifier))
+        B2INFO("Calculate SignalProbability for {i}. Run Teacher in extern process.".format(i=identifier))
         subprocess.call("externTeacher --methodName '{name}' --methodType '{type}' --methodConfig '{config}' --target '{target}'"
                         " --variables '{variables}' --factoryOption '{foption}' --prepareOption '{poption}' --prefix '{prefix}'"
                         " --maxEventsPerClass {maxEvents}"

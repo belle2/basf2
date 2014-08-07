@@ -30,7 +30,7 @@ fw = Framework()
 
 
 def serialize_module(module):
-    return {'name': module.name(), 'type': module.type(), 'parameters': [{'name': parameter.name, 'values': parameter.values} for parameter in module.available_params()]}
+    return {'name': module.name(), 'type': module.type(), 'parameters': [{'name': parameter.name, 'values': parameter.values} for parameter in module.available_params() if parameter.setInSteering]}
 
 
 def deserialize_module(module_state):

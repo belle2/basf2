@@ -36,15 +36,15 @@ class Cluster:
 
         # We need to set up the same environment on the cluster like on the
         # local machine. The information can be extracted from $BELLE2_TOOLS,
-        # $BELLE2_RELEASE_DIR and §BELLE2_LOCAL_DIR
-        self.tools = adjust_path(os.environ['BELLE2_TOOLS'])
+        # $BELLE2_RELEASE_DIR and $BELLE2_LOCAL_DIR
+        self.tools = self.adjust_path(os.environ['BELLE2_TOOLS'])
         belle2_release_dir = os.environ.get('BELLE2_RELEASE_DIR', None)
         belle2_local_dir = os.environ.get('BELLE2_LOCAL_DIR', None)
         self.setuprel = 'setuprel'
         if belle2_release_dir is not None:
-            self.setuprel = ' ' + belle2_release_dir.split('/')[-1]
+            self.setuprel += ' ' + belle2_release_dir.split('/')[-1]
         if belle2_local_dir is not None:
-            self.setuprel += 'MY_BELLE2_DIR=' + adjust_path(belle2_local_dir) + ' ' + self.setuprel
+            self.setuprel = 'MY_BELLE2_DIR=' + self.adjust_path(belle2_local_dir) + ' ' + self.setuprel
 
         # Write to log which revision we are using
         self.logger.debug('Setting up the following release: {0}'
@@ -112,7 +112,7 @@ class Cluster:
                            'BELLE2_NO_TOOLS_CHECK=1 \n' +
                            'source {0}/setup_belle2 \n'.format(self.tools) +
                            '{0} \n'.format(self.setuprel) +
-                           'cd {0} \n'.format(adjust_path(output_dir)) +
+                           'cd {0} \n'.format(self.adjust_path(output_dir)) +
                            '{0} \n'.format(command) +
                            'echo $? > {0}/script_{1}.done \n'
                            .format(self.path, job.name) +

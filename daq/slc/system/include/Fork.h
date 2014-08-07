@@ -50,9 +50,10 @@ namespace Belle2 {
       return ::waitpid(m_pid, NULL, opt);
     }
     bool cancel() {
-      kill(SIGINT);
-      kill(SIGQUIT);
-      return kill(SIGKILL);
+      return kill(SIGINT);
+      //kill(SIGINT);
+      //kill(SIGQUIT);
+      //return kill(SIGKILL);
     }
 
   private:

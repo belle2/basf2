@@ -82,7 +82,7 @@ void StorageDeserializerModule::initialize()
   m_count = 0;
   //rawcprarray.registerPersistent();
   while (true) {
-    m_package.setSerial(m_ibuf.read((int*)m_package.getData().getBuffer(), false));
+    m_package.setSerial(m_ibuf.read((int*)m_package.getData().getBuffer(), true));
     if (m_package.restore()) {
       if (m_info.isAvailable()) {
         m_info.setInputNBytes(m_package.getData().getByteSize());
@@ -100,7 +100,7 @@ void StorageDeserializerModule::event()
   //printf("StorageDeserializerModule::event(1) %d\n", m_count);
   if (m_count == 1) return;
   while (true) {
-    m_package.setSerial(m_ibuf.read((int*)m_package.getData().getBuffer(), false));
+    m_package.setSerial(m_ibuf.read((int*)m_package.getData().getBuffer(), true));
     if (m_package.restore()) {
       if (m_info.isAvailable()) {
         m_info.addInputNBytes(m_package.getData().getByteSize());

@@ -13,6 +13,7 @@ struct ronode_info {
   unsigned int expno;
   unsigned int runno;
   unsigned int subno;
+  int reserved[4];
   struct io_info {
     int port;
     unsigned int addr;

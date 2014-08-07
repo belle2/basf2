@@ -32,47 +32,49 @@ bool FlowMonitor::close()
 
 ronode_status& FlowMonitor::monitor()
 {
-  m_ioinfo[0].setLocalAddress(m_info->getInputAddress());
-  m_ioinfo[0].setLocalPort(m_info->getInputPort());
-  m_ioinfo[1].setLocalAddress(m_info->getOutputAddress());
-  m_ioinfo[1].setLocalPort(m_info->getOutputPort());
-  IOInfo::checkTCP(m_ioinfo);
-  int ctime = Time().get();
-  ronode_info info;
-  memcpy(&info, m_info->get(), sizeof(ronode_info));
-  float length = ctime - m_status.ctime;
-  m_status.eflag = info.eflag;
-  m_status.state = info.state;
-  m_status.expno = info.expno;
-  m_status.runno = info.runno;
-  m_status.subno = info.subno;
-  m_status.ctime = ctime;
+  if (m_info->isAvailable()) {
+    m_ioinfo[0].setLocalAddress(m_info->getInputAddress());
+    m_ioinfo[0].setLocalPort(m_info->getInputPort());
+    m_ioinfo[1].setLocalAddress(m_info->getOutputAddress());
+    m_ioinfo[1].setLocalPort(m_info->getOutputPort());
+    IOInfo::checkTCP(m_ioinfo);
+    int ctime = Time().get();
+    ronode_info info;
+    memcpy(&info, m_info->get(), sizeof(ronode_info));
+    float length = ctime - m_status.ctime;
+    m_status.eflag = info.eflag;
+    m_status.state = info.state;
+    m_status.expno = info.expno;
+    m_status.runno = info.runno;
+    m_status.subno = info.subno;
+    m_status.ctime = ctime;
 
-  unsigned int dcount[2];
-  float dnbyte[2];
-  for (int j = 0; j < 2; j++) {
-    m_status.io[j].freq = 0;
-    m_status.io[j].evtsize = 0;
-    m_status.io[j].rate = 0;
-    if (m_ioinfo[j].getLocalPort() > 0) {
-      m_status.io[j].state = m_ioinfo[j].getState();
-      if (j == 0) {
-        m_status.io[j].nqueue = m_ioinfo[j].getRXQueue();
-      } else {
-        m_status.io[j].nqueue = m_ioinfo[j].getTXQueue();
-      }
-    }
-    if ((dcount[j] = info.io[j].count - m_status.io[j].count) > 0) {
-      dnbyte[j] = info.io[j].nbyte - m_nbyte[j];
-      m_status.io[j].freq = dcount[j] / length / 1000.;
-      m_status.io[j].evtsize = dnbyte[j] / dcount[j] / 1000.;
-      m_status.io[j].rate = dnbyte[j] / length / 1000000.;
-      m_status.io[j].count = info.io[j].count;
-      m_nbyte[j] = info.io[j].nbyte;
-    } else {
+    unsigned int dcount[2];
+    float dnbyte[2];
+    for (int j = 0; j < 2; j++) {
       m_status.io[j].freq = 0;
       m_status.io[j].evtsize = 0;
       m_status.io[j].rate = 0;
+      if (m_ioinfo[j].getLocalPort() > 0) {
+        m_status.io[j].state = m_ioinfo[j].getState();
+        if (j == 0) {
+          m_status.io[j].nqueue = m_ioinfo[j].getRXQueue();
+        } else {
+          m_status.io[j].nqueue = m_ioinfo[j].getTXQueue();
+        }
+      }
+      if ((dcount[j] = info.io[j].count - m_status.io[j].count) > 0) {
+        dnbyte[j] = info.io[j].nbyte - m_nbyte[j];
+        m_status.io[j].freq = dcount[j] / length / 1000.;
+        m_status.io[j].evtsize = dnbyte[j] / dcount[j] / 1000.;
+        m_status.io[j].rate = dnbyte[j] / length / 1000000.;
+        m_status.io[j].count = info.io[j].count;
+        m_nbyte[j] = info.io[j].nbyte;
+      } else {
+        m_status.io[j].freq = 0;
+        m_status.io[j].evtsize = 0;
+        m_status.io[j].rate = 0;
+      }
     }
   }
   return m_status;

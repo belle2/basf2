@@ -25,17 +25,16 @@
 #include <daq/slc/system/Cond.h>
 
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <queue>
+#include <unistd.h>
+#include <signal.h>
 
 using namespace Belle2;
 
 const unsigned long long GB = 1024 * 1024 * 1024;
-const unsigned long long MAX_FILE_SIZE = 2 * GB;
+const unsigned long long MAX_FILE_SIZE = 8 * GB;
 int g_nfile = 0;
 Mutex g_mutex;
 
@@ -54,17 +53,18 @@ public:
   FileHandler(const std::string& dir, int expno, int runno) {
     open(dir, expno, runno);
   }
+  ~FileHandler() throw() {}
 
 public:
   void open(const std::string& dir, int expno, int runno) {
     char filename[1024];
     g_mutex.lock();
     if (g_nfile > 0) {
-      sprintf(filename, "%s/e%4.4dr%6.6d.sroot-%d",
-              dir.c_str(), expno, runno, g_nfile);
+      sprintf(filename, "%s/e%4.4d/r%4.4d/e%4.4dr%6.6d.sroot-%d",
+              dir.c_str(), expno, runno, expno, runno, g_nfile);
     } else {
-      sprintf(filename, "%s/e%4.4dr%6.6d.sroot",
-              dir.c_str(), expno, runno);
+      sprintf(filename, "%s/e%4.4d/r%4.4d/e%4.4dr%6.6d.sroot",
+              dir.c_str(), expno, runno, expno, runno);
     }
     g_nfile++;
     id = g_nfile;
@@ -114,6 +114,14 @@ public:
     return file;
   }
 
+public:
+  static void closeAll() {
+    while (!g_file_q.empty()) {
+      g_file_q.front().close();
+      g_file_q.pop();
+    }
+  }
+
 private:
   static std::queue<FileHandler> g_file_q;
   static Mutex g_mutex;
@@ -148,13 +156,19 @@ std::queue<FileHandler> FileCloser::g_file_q;
 Mutex FileCloser::g_mutex;
 Cond FileCloser::g_cond;
 
+void signalHandler(int sig)
+{
+  FileCloser::closeAll();
+  exit(1);
+}
+
 int main(int argc, char** argv)
 {
   if (argc < 4) {
     printf("rawfile2rb : ibufname path_to_disk [obufname] [nodename, nodeid]\n");
     return 1;
   }
-  nice(-1);
+  signal(SIGINT, signalHandler);
   const unsigned interval = 10;
   RunInfoBuffer info;
   const bool use_info = (argc > 7);
@@ -203,6 +217,10 @@ int main(int argc, char** argv)
       oheader->runno = runno;
       obuf.unlock();
       g_nfile = 0;
+      char cmd[256];
+      sprintf(cmd, "mkdir -p %s/e%4.4d/r%4.4d",
+              dir.c_str(), expno, runno);
+      system(cmd);
       file.open(dir, expno, runno);
       PThread(new FileCloser(FileHandler(), dir, expno, runno));
     }

@@ -4,21 +4,21 @@
 const int storage_info_all_revision = 1;
 
 struct storage_info_all {
-  uint32 nodeid[20];
-  uint32 state[20];
-  uint32 expno[20];
-  uint32 runno[20];
-  uint32 subno[20];
-  uint64 stime[20];
-  uint64 ctime[20];
-  uint32 count[20];
-  uint64 nbyte[20];
-  double freq[20];
-  double evtsize[20];
-  double rate[20];
-  uint32 connection[2];
-  uint32 rcstate;
-  uint32 nnodes;
+  uint32 reserved[2];
+  uint32 state;
+  uint32 ctime;
+  uint32 eflag;
+  uint32 expno;
+  uint32 runno;
+  uint32 subno;
+  struct io_status {
+    uint32 nqueue;
+    uint32 state;
+    uint32 count;
+    float freq;
+    float evtsize;
+    float rate;
+  } io[14];
 };
 
 #endif

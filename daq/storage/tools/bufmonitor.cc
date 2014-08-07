@@ -39,7 +39,7 @@ int main(int argc, char** argv)
     fputs("\033[2J\033[0;0H", stdout);
     rewind(stdout);
     ftruncate(1, 0);
-
+    printf("%04u.%04u\n", info->expno, info->runno);
     for (int i = 0; i < 14; i++) {
       storage_info_all::io_status& nio(info->io[i]);
       printf("%010u | %08u | %02.2f | %03.2f | %04.2f\n",

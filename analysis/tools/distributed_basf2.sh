@@ -286,6 +286,9 @@ function mergeRootFiles {
   echo "$jobDirectory"
  
 
+  echo "remove symlinks"
+  find $jobDirectory -maxdepth 2 -type l -delete
+
   if [ $(ls "$jobDirectory"/1/*.root | wc -l) -eq 0 ]
   then
     echo "There are no root files to merge"

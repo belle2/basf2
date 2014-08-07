@@ -171,7 +171,7 @@ int main(int argc, char** argv)
     info.reportRunning();
   }
 
-  int* evtbuf = new int[1000000];
+  int* evtbuf = new int[10000000];
   unsigned long long nbyte_out = 0;
   unsigned int count_out = 0;
   unsigned int expno = 0;

@@ -76,7 +76,7 @@ int main(int argc, char** argv)
       t0 = t;
       datasize = 0;
     }
-    if (nrec % ninterval == 0) usleep(1000);
+    if (ninterval > 0 && nrec % ninterval == 0) usleep(1000);
   }
   socket.close();
   return 0;

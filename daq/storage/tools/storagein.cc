@@ -43,7 +43,7 @@ int main(int argc, char** argv)
   ibuf.open(argv[1], atoi(argv[2]) * 1000000, true);
   TCPSocket socket(argv[3], atoi(argv[4]));
   B2INFO("storagein: Connected to eb2.");
-  int* evtbuf = new int[1000000];
+  int* evtbuf = new int[10000000];
   BinData data;
   data.setBuffer(evtbuf);
   Time t0;
@@ -72,15 +72,15 @@ int main(int argc, char** argv)
         sleep(5);
       }
     }
-    info.reportReady();
+    info.reportRunning();
     try {
       TCPSocketReader reader(socket);
       B2INFO("storagein: Cconnected to eb2.");
       while (true) {
         reader.read(data.getBuffer(), sizeof(int));
-        if (info.getInputNBytes() == 0) {
-          info.reportRunning();
-        }
+        //if (info.getInputNBytes() == 0) {
+        //info.reportRunning();
+        //}
         unsigned int nbyte = data.getByteSize() - sizeof(int);
         int nword = data.getWordSize();
         reader.read((data.getBuffer() + 1), nbyte);

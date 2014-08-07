@@ -42,7 +42,7 @@ int main(int argc, char** argv)
 
     for (int i = 0; i < 14; i++) {
       storage_info_all::io_status& nio(info->io[i]);
-      printf("%08u | %08u | %02.2f | %03.2f | %04.2f\n",
+      printf("%010u | %08u | %02.2f | %03.2f | %04.2f\n",
              nio.nqueue, nio.count, nio.freq, nio.evtsize, nio.rate);
     }
   }

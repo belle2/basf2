@@ -38,7 +38,7 @@ int main(int argc, char** argv)
   }
   SharedEventBuffer ibuf;
   ibuf.open(argv[1], atoi(argv[2]) * 1000000);
-  int* evtbuf = new int[1000000];
+  int* evtbuf = new int[10000000];
   unsigned long long nbyte_in = 0;
   unsigned long long nbyte_out = 0;
   unsigned int count_in = 0;

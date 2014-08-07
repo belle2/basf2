@@ -44,6 +44,7 @@ namespace Belle2 {
     const NSMNode& getNode() const throw() { return m_node; }
     void setCommunicator(NSMCommunicator* comm) { m_comm = comm; }
     int getTimeout() const { return m_timeout; }
+    void setTimeout(int timeout) { m_timeout = timeout; }
 
   public:
     void setReply(const std::string& reply) throw() { m_reply = reply; }

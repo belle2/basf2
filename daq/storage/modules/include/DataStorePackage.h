@@ -20,7 +20,7 @@ namespace Belle2 {
   class DataStorePackage {
 
   public:
-    static const unsigned int MAX_BUFFER_WORDS = 1000000;
+    static const unsigned int MAX_BUFFER_WORDS = 10000000;
 
   private:
     static Mutex g_mutex;

@@ -14,6 +14,7 @@ using namespace Belle2;
 StoragerCallback::StoragerCallback(const NSMNode& node)
   : RCCallback(node)
 {
+  setTimeout(1);
 }
 
 StoragerCallback::~StoragerCallback() throw()
@@ -191,7 +192,7 @@ bool StoragerCallback::abort() throw()
 void StoragerCallback::timeout() throw()
 {
   storage_info_all* info = (storage_info_all*)m_data.get();
-  for (size_t i = 0; i < m_flow.size(); i++) {
+  for (size_t i = 0; i < m_flow.size() && i < 14; i++) {
     ronode_status& status(m_flow[i].monitor());
     for (int j = 0; j < 2; j++) {
       info->io[2 * i + j].state = status.io[j].state;

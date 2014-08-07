@@ -156,6 +156,7 @@ function scheduleJobs {
 
   for i in $(seq "$nJobs")
   do
+    unset mcFiles
     declare -a mcFiles
     local count=0
     for mcFile in "${allMcFiles[@]}"
@@ -180,14 +181,18 @@ function resetupJobDirectory {
   echo "$jobDirectory"
   echo "$jobNumber"
 
-  echo "Saving basf2_script"
+  echo "Saving basf2_script and logs"
   mkdir -p "$collectionDirectory"/backup/
   cp "$jobDirectory"/"$jobNumber"/basf2_script.sh "$collectionDirectory"/backup/
+  cp "$jobDirectory"/"$jobNumber"/output.log "$collectionDirectory"/backup/
+  cp "$jobDirectory"/"$jobNumber"/error.log "$collectionDirectory"/backup/
 
   createJobDirectory "$collectionDirectory" "$jobDirectory" "$jobNumber"
 
-  echo "Restoring basf2_script"
+  echo "Restoring basf2_script and logs"
   cp "$collectionDirectory"/backup/basf2_script.sh "$jobDirectory"/"$jobNumber"/
+  cp "$collectionDirectory"/backup/error.log "$jobDirectory"/"$jobNumber"/
+  cp "$collectionDirectory"/backup/output.log "$jobDirectory"/"$jobNumber"/
 
 }
 

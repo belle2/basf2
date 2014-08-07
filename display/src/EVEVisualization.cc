@@ -285,6 +285,10 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
   using genfit::Track;
 
   const TrackFitResult* fitResult = belle2Track->getTrackFitResult(Const::pion);
+  if (!fitResult) {
+    B2ERROR("Track without TrackFitResult skipped.");
+    return;
+  }
   const Track* track = fitResult->getRelated<genfit::Track>();
   TString label = TString::Format("Track %d (FitResult: %d)", belle2Track->getArrayIndex(), fitResult->getArrayIndex());
 

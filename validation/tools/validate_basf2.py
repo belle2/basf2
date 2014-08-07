@@ -279,10 +279,10 @@ class Validation:
                 elif not script_object.dependencies:
 
                     # Determine the way of execution depending on whether data files are created
-                    if script_object.header and not script_object.header.get('output', []):
-                        script_object.control = local_control
-                    else:
+                    if script_object.header and script_object.header.get('output', []):
                         script_object.control = control
+                    else:
+                        script_object.control = local_control
 
                     # Do not spawn processes if there are already too many!
                     if script_object.control.available():

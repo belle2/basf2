@@ -1,6 +1,7 @@
 import logging
 import os
 import subprocess
+import stat
 
 
 class Cluster:
@@ -23,7 +24,8 @@ class Cluster:
 
         # The command to submit a job. 'LOGFILE' will be replaced by the
         # actual log file name
-        self.submit_command = 'qsub -cwd -o LOGFILE -e LOGFILE -q medium -V'
+        # self.submit_command = 'qsub -cwd -o LOGFILE -e LOGFILE -q medium -V'
+        self.submit_command = 'bsub -o LOGFILE -e LOGFILE -q l'
 
         # The path, where the help files are being created
         # Maybe there should be a special subfolder for them?
@@ -117,6 +119,10 @@ class Cluster:
                            'echo $? > {0}/script_{1}.done \n'
                            .format(self.path, job.name) +
                            'rm {0} \n'.format(tmp_name))
+
+        # Make the helpfile-shellscript executable
+        st = os.stat(tmp_name)
+        os.chmod(tmp_name, st.st_mode | stat.S_IEXEC)
 
         # Prepare the command line command for submission to the cluster
         params = self.submit_command.replace('LOGFILE', log_file).split() + [tmp_name]

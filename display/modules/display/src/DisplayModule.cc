@@ -42,7 +42,6 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
   addParam("automatic", m_automatic, "Non-interactively save visualisations for each event. Note that this still requires an X server, but you can use the 'Xvfb' dummy server by running basf2 using 'xvfb-run -s \"-screen 0 640x480x24\" basf2 ...' to run headless.", false);
   addParam("fullGeometry", m_fullGeometry, "Show full geometry instead of simplified shapes. Further details can be enabled by changing the VisLevel option for Eve -> Scenes -> Geometry Scene -> Top_1.", false);
   addParam("hideObjects", m_hideObjects, "Objects which are to be hidden (can be manually re-enabled in tree view). Names correspond to the object names in the 'Event'. (Note that this won't work for objects somewhere deep in the tree, only for those immediately below 'Event'.)", {});
-  addParam("GFTrackCandidatesColName", m_trackCandidateColName, "Name of collection holding the genfit::TrackCandidates", std::string(""));
   addParam("GFTrackColName", m_gftrackColName, "Name of collection holding the genfit::Tracks", std::string(""));
 
   //create gApplication so we can use graphics support. Needs to be done before ROOT has a chance to do it for us.
@@ -71,7 +70,7 @@ void DisplayModule::initialize()
   StoreArray<Track>::optional();
   StoreArray<TrackFitResult>::optional();
   StoreArray<genfit::Track>::optional(m_gftrackColName);
-  StoreArray<genfit::TrackCand>::optional(m_trackCandidateColName);
+  StoreArray<genfit::TrackCand>::optional();
   StoreArray<genfit::GFRaveVertex>::optional();
   StoreObjPtr<DisplayData>::optional();
   StoreArray<PXDCluster>::optional();
@@ -174,16 +173,19 @@ void DisplayModule::event()
   }
 
   if (m_showTrackCandidates) {
-    StoreArray<genfit::TrackCand> gftrackcands(m_trackCandidateColName);
-    const int nCands = gftrackcands.getEntries();
-    for (int i = 0; i < nCands; i++) {
-      if (m_useClusters) {
-        m_visualizer->addTrackCandidate(gftrackcands[i], TString::Format("genfit::TrackCand %d", i),
-                                        StoreArray<PXDCluster>(), StoreArray<SVDCluster>(), StoreArray<CDCHit>());
-      } else {
-        m_visualizer->addTrackCandidate(gftrackcands[i], TString::Format("genfit::TrackCand %d", i),
-                                        StoreArray<PXDTrueHit>(), StoreArray<SVDTrueHit>(), StoreArray<CDCHit>());
-
+    //add all possible track candidate arrays
+    const auto trackCandidateArrays = StoreArray<genfit::TrackCand>::getArrayList();
+    for (std::string colName : trackCandidateArrays) {
+      StoreArray<genfit::TrackCand> gftrackcands(colName);
+      const int nCands = gftrackcands.getEntries();
+      for (int i = 0; i < nCands; i++) {
+        if (m_useClusters) {
+          m_visualizer->addTrackCandidate(colName, gftrackcands[i], TString::Format("%s %d", colName.c_str(), i),
+                                          StoreArray<PXDCluster>(), StoreArray<SVDCluster>(), StoreArray<CDCHit>());
+        } else {
+          m_visualizer->addTrackCandidate(colName, gftrackcands[i], TString::Format("%s %d", colName.c_str(), i),
+                                          StoreArray<PXDTrueHit>(), StoreArray<SVDTrueHit>(), StoreArray<CDCHit>());
+        }
       }
     }
 

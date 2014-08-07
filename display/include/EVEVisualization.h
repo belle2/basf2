@@ -128,7 +128,7 @@ namespace Belle2 {
     void addTrack(const Belle2::Track* belle2Track);
 
     /** Add a genfit::TrackCand, to evaluate track finding. */
-    template<class PXDType, class SVDType> void addTrackCandidate(const genfit::TrackCand* trackCand, const TString& label,
+    template<class PXDType, class SVDType> void addTrackCandidate(const std::string& collectionName, const genfit::TrackCand* trackCand, const TString& label,
         const StoreArray<PXDType>& pxdhits, const StoreArray<SVDType>& svdhits, const StoreArray<CDCHit>& cdchits);
 
     /** Add VXDTF track candidate. */
@@ -339,9 +339,6 @@ namespace Belle2 {
     /** parent object for MC tracks. */
     TEveTrackList* m_tracklist;
 
-    /** parent object for track candidates. */
-    TEveTrackList* m_trackcandlist;
-
     /** Track propagator for MCParticles*/
     TEveTrackPropagator* m_trackpropagator;
 
@@ -365,7 +362,7 @@ namespace Belle2 {
 
   };
 
-  template<class PXDType, class SVDType> void EVEVisualization::addTrackCandidate(const genfit::TrackCand* trackCand, const TString& label,
+  template<class PXDType, class SVDType> void EVEVisualization::addTrackCandidate(const std::string& collectionName, const genfit::TrackCand* trackCand, const TString& label,
       const StoreArray<PXDType>& pxdhits, const StoreArray<SVDType>& svdhits, const StoreArray<CDCHit>& cdchits)
   {
     // parse the option string ------------------------------------------------------------------------
@@ -433,11 +430,6 @@ namespace Belle2 {
       }
     }
 
-    if (!m_trackcandlist) {
-      m_trackcandlist = new TEveTrackList("Track candidates", m_gftrackpropagator);
-      m_trackcandlist->IncDenyDestroy();
-    }
-
     TEveRecTrack rectrack;
     rectrack.fP.Set(track_mom);
     rectrack.fV.Set(track_pos);
@@ -457,7 +449,7 @@ namespace Belle2 {
 
 
     track_lines->AddElement(lines);
-    m_trackcandlist->AddElement(track_lines);
+    addToGroup(collectionName, track_lines);
     addObject(trackCand, track_lines);
   }
 }

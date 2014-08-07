@@ -43,9 +43,6 @@ namespace Belle2 {
     void event(); //< Show genfit::Tracks & hits in event viewer until next event is requested.
     void terminate(); //< terminate gEve to avoid problems with root's cleanup
   private:
-    /** Name of track candidate collection. */
-    std::string m_trackCandidateColName;
-
     /** Array name for genfit::tarcks. */
     std::string m_gftrackColName;
 

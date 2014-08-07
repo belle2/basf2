@@ -88,7 +88,6 @@ const double MIN_P_CUT = 0.00;
 EVEVisualization::EVEVisualization():
   m_fullgeo(false),
   m_assignToPrimaries(false),
-  m_trackcandlist(0),
   m_eclData(0),
   m_unassignedRecoHits(0),
   m_visualRepMap(new VisualRepMap())
@@ -155,7 +154,6 @@ EVEVisualization::~EVEVisualization()
   delete m_eclData;
   delete m_unassignedRecoHits;
   delete m_tracklist;
-  delete m_trackcandlist;
   delete m_trackpropagator;
   delete m_gftrackpropagator;
   delete m_calo3d;
@@ -1175,9 +1173,6 @@ void EVEVisualization::makeTracks()
     }
   }
 
-  if (m_trackcandlist)
-    gEve->AddElement(m_trackcandlist);
-
   m_eclData->DataChanged(); //update limits (Empty() won't work otherwise)
   if (!m_eclData->Empty()) {
     m_eclData->SetAxisFromBins();
@@ -1200,9 +1195,6 @@ void EVEVisualization::clearEvent()
   m_mcparticleTracks.clear();
   m_shownRecohits.clear();
   m_tracklist->DestroyElements();
-  if (m_trackcandlist)
-    m_trackcandlist->DestroyElements();
-
 
   //remove ECL data from event
   m_calo3d->SetData(NULL);

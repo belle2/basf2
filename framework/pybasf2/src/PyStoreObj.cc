@@ -37,24 +37,15 @@ bool PyStoreObj::create(bool replace)
     return false;
 
   return DataStore::Instance().createObject(0, replace, StoreAccessorBase(m_name, DataStore::EDurability(m_durability), cl, false));
-};
-
-bool PyStoreObj::registerAsPersistent(bool errorIfExisting)
-{
-  TClass* cl = getClass(m_name);
-  if (!cl)
-    return false;
-
-  return DataStore::Instance().registerEntry(m_name, DataStore::EDurability(m_durability), cl, false, false, errorIfExisting);
 }
 
-bool PyStoreObj::registerAsTransient(bool errorIfExisting)
+bool PyStoreObj::registerInDataStore(int storeFlags)
 {
   TClass* cl = getClass(m_name);
   if (!cl)
     return false;
 
-  return DataStore::Instance().registerEntry(m_name, DataStore::EDurability(m_durability), cl, false, true, errorIfExisting);
+  return DataStore::Instance().registerEntry(m_name, DataStore::EDurability(m_durability), cl, false, storeFlags);
 }
 
 void PyStoreObj::list(int durability)

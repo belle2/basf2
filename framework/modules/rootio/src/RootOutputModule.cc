@@ -118,7 +118,7 @@ void RootOutputModule::initialize()
     for (DataStore::StoreObjIter iter = map.begin(); iter != map.end(); ++iter) {
       const std::string& branchName = iter->first;
       //skip transient entries, excluded branches, and branches not in m_branchNames (if it is not empty)
-      if ((iter->second.isTransient && !binary_search(m_branchNames[ii].begin(), m_branchNames[ii].end(), branchName)) ||
+      if ((iter->second.dontWriteOut && !binary_search(m_branchNames[ii].begin(), m_branchNames[ii].end(), branchName)) ||
           binary_search(m_excludeBranchNames[ii].begin(), m_excludeBranchNames[ii].end(), branchName) ||
           (!m_branchNames[ii].empty() && !binary_search(m_branchNames[ii].begin(), m_branchNames[ii].end(), branchName))) {
         //make sure FileMetaData and EventMetaData are always included in the output

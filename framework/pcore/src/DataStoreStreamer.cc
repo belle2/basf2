@@ -143,7 +143,7 @@ EvtMessage* DataStoreStreamer::streamDataStore(bool addPersistentDurability, boo
       DataStore::StoreEntry* entry = &it->second;
 
       //skip transient objects/arrays?
-      if (!streamTransientObjects and entry->isTransient)
+      if (!streamTransientObjects and entry->dontWriteOut)
         continue;
 
       //skip empty arrays
@@ -176,7 +176,7 @@ EvtMessage* DataStoreStreamer::streamDataStore(bool addPersistentDurability, boo
         B2FATAL("TObject streamers disabled for " << it->first << "!");
       }
       //store some information in TObject bits to ensure consistent state even if entry->ptr is NULL
-      entry->object->SetBit(c_IsTransient, entry->isTransient);
+      entry->object->SetBit(c_IsTransient, entry->dontWriteOut);
       entry->object->SetBit(c_IsNull, (entry->ptr == NULL));
       entry->object->SetBit(c_PersistentDurability, (durability == DataStore::c_Persistent));
       if (m_msghandler->add(entry->object, it->first)) {
@@ -252,7 +252,7 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
           cl = static_cast<TClonesArray*>(obj)->GetClass();
         if (m_initStatus == 0) { //are we called by the module's initialize() function?
           bool transient = obj->TestBit(c_IsTransient);
-          DataStore::Instance().registerEntry(namelist.at(i), durability, cl, array, transient, false);
+          DataStore::Instance().registerEntry(namelist.at(i), durability, cl, array, transient ? DataStore::c_DontWriteOut : 0);
         }
         //only restore object if it is valid for current event
         bool ptrIsNULL = obj->TestBit(c_IsNull);
@@ -427,7 +427,7 @@ int DataStoreStreamer::restoreDataStoreAsync()
         cl = static_cast<TClonesArray*>(obj)->GetClass();
       if (m_initStatus == 0) { //are we called by the module's initialize() function?
         bool transient = obj->TestBit(c_IsTransient);
-        DataStore::Instance().registerEntry(namelist.at(i), durability, cl, array, transient, false);
+        DataStore::Instance().registerEntry(namelist.at(i), durability, cl, array, transient ? DataStore::c_DontWriteOut : 0);
       }
       //only restore object if it is valid for current event
       bool ptrIsNULL = obj->TestBit(c_IsNull);

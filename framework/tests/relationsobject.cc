@@ -1,5 +1,4 @@
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/ProfileInfo.h>
 #include <framework/datastore/RelationsObject.h>
@@ -16,11 +15,9 @@ namespace {
   protected:
     /** fill StoreArrays with entries from 0..9 */
     virtual void SetUp() {
-      DataStore::Instance().setInitializeActive(true);
       evtData.registerPersistent();
       profileData.registerPersistent();
       relObjData.registerPersistent();
-      DataStore::Instance().setInitializeActive(false);
 
       for (int i = 0; i < 10; ++i) {
         evtData.appendNew();
@@ -42,8 +39,7 @@ namespace {
   /** Test adding/finding using RelationsObject/RelationsInterface. */
   TEST_F(RelationsObjectTest, RelationsObject)
   {
-    DataStore::Instance().setInitializeActive(true);
-    RelationArray(relObjData, profileData).registerAsPersistent();
+    relObjData.registerRelationTo(profileData);
     DataStore::Instance().setInitializeActive(false);
 
     (relObjData)[0]->addRelationTo((profileData)[0], -42.0);
@@ -83,8 +79,7 @@ namespace {
   /** Test updating of index after using addRelation. */
   TEST_F(RelationsObjectTest, IndexUpdating)
   {
-    DataStore::Instance().setInitializeActive(true);
-    RelationArray(relObjData, profileData).registerAsPersistent();
+    relObjData.registerRelationTo(profileData);
     DataStore::Instance().setInitializeActive(false);
 
     //not yet set
@@ -120,9 +115,8 @@ namespace {
   /** Check behaviour of duplicate relations. */
   TEST_F(RelationsObjectTest, DuplicateRelations)
   {
-    DataStore::Instance().setInitializeActive(true);
-    RelationArray(evtData, relObjData).registerAsPersistent();
-    RelationArray(relObjData, evtData).registerAsPersistent();
+    evtData.registerRelationTo(relObjData);
+    relObjData.registerRelationTo(evtData);
     DataStore::Instance().setInitializeActive(false);
 
     //more than a single relation in one direction
@@ -152,9 +146,7 @@ namespace {
 
   TEST_F(RelationsObjectTest, RelationsToSameArray)
   {
-    DataStore::Instance().setInitializeActive(true);
-    RelationArray relation1(relObjData, relObjData);
-    relation1.registerAsPersistent();
+    relObjData.registerRelationTo(relObjData);
     DataStore::Instance().setInitializeActive(false);
 
     relObjData[0]->addRelationTo(relObjData[1]);

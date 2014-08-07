@@ -1,7 +1,7 @@
 #include <framework/utilities/SelectSubset.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationsObject.h>
+#include <framework/datastore/RelationArray.h>
 
 
 #include <gtest/gtest.h>
@@ -153,7 +153,7 @@ namespace {
       // The entity has a name, a set, and some relations with other sets.
       // The entity name is m_name.
       // The set is stored both as a StoreArray named m_name and as an unordered_map
-      // The relations are stored both as RelationArray and as unordered_map so that
+      // The relations are stored both as relation and as unordered_map so that
       // one can check the correctness of the SelectSubset utility.
 
       string m_name;                                    // My name
@@ -206,8 +206,9 @@ namespace {
         // StoreArray
         DataStore::Instance().setInitializeActive(true);
 
-        StoreArray< StoredElement >::registerPersistent(getName());
-        RelationArray::registerPersistent(getName(), getName());
+        StoreArray< StoredElement > array(getName());
+        array.registerInDataStore();
+        array.registerRelationTo(array);
 
         DataStore::Instance().setInitializeActive(false);
       }
@@ -220,9 +221,12 @@ namespace {
 
         DataStore::Instance().setInitializeActive(true);
 
-        StoreArray< StoredElement >::registerPersistent(getName());
-        RelationArray::registerPersistent(getName(),  SetName);
-        RelationArray::registerPersistent(SetName  , getName()); //TODO one of these is wrong! -> getRelationsWith() would return both directions
+        StoreArray< StoredElement > array(getName());
+        StoreArray< StoredElement > otherSet(SetName);
+        array.registerInDataStore();
+        array.registerRelationTo(otherSet);
+        otherSet.registerRelationTo(array);
+        //TODO one of these is wrong! -> getRelationsWith() would return both directions
 
         DataStore::Instance().setInitializeActive(false);
       };
@@ -948,9 +952,9 @@ namespace {
     StoreArray< RelationsObject > arrayMain("main");
     StoreArray< RelationsObject > arrayA("a");
     StoreArray< RelationsObject > arrayB("b");
-    arrayMain.registerAsPersistent();
-    arrayA.registerAsPersistent();
-    arrayB.registerAsPersistent();
+    arrayMain.registerInDataStore();
+    arrayA.registerInDataStore();
+    arrayB.registerInDataStore();
     RelationArray::registerPersistent("a", "main");
     RelationArray::registerPersistent("main", "b");
 
@@ -995,10 +999,11 @@ namespace {
       EXPECT_EQ(0u, r.getRelationsFrom<RelationsObject>("b").size());
       EXPECT_EQ(10u, r.getRelationsTo<RelationsObject>("b").size());
       EXPECT_EQ(0u, r.getRelationsTo<RelationsObject>("a").size());
+      EXPECT_TRUE(nullptr == r.getRelatedTo<RelationsObject>("main"));
 
       //go back to main set, check selection condidition holds
       EXPECT_EQ(1u, r.getRelationsWith<RelationsObject>("main").size());
-      const RelationsObject* originalObject = r.getRelated<RelationsObject>("main");
+      const RelationsObject* originalObject = r.getRelatedFrom<RelationsObject>("main");
       EXPECT_TRUE(hasOddIndex(originalObject));
     }
   }
@@ -1012,11 +1017,11 @@ namespace {
     StoreArray< RelationsObject > arrayMain("main");
     StoreArray< RelationsObject > arrayA("a");
     StoreArray< RelationsObject > arrayB("b");
-    arrayMain.registerAsPersistent();
-    arrayA.registerAsPersistent();
-    arrayB.registerAsPersistent();
-    RelationArray::registerPersistent("a", "main");
-    RelationArray::registerPersistent("main", "b");
+    arrayMain.registerInDataStore();
+    arrayA.registerInDataStore();
+    arrayB.registerInDataStore();
+    arrayA.registerRelationTo(arrayMain);
+    arrayMain.registerRelationTo(arrayB);
 
     //create subset and relations
     SelectSubset< RelationsObject > selectorMain;

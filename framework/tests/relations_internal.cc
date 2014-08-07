@@ -18,9 +18,9 @@ namespace {
     /** fill StoreArrays with entries from 0..9 */
     virtual void SetUp() {
       DataStore::Instance().setInitializeActive(true);
-      evtData.registerPersistent();
-      profileData.registerPersistent();
-      relObjData.registerPersistent();
+      evtData.registerInDataStore();
+      profileData.registerInDataStore();
+      relObjData.registerInDataStore();
       DataStore::Instance().setInitializeActive(false);
 
       for (int i = 0; i < 10; ++i) {
@@ -49,7 +49,7 @@ namespace {
   {
     DataStore::Instance().setInitializeActive(true);
     RelationArray relation(evtData, profileData);
-    relation.registerAsPersistent();
+    relation.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
     EXPECT_FALSE(relation); //creation only happens on write access or explicitly
@@ -68,17 +68,21 @@ namespace {
   {
     EXPECT_FALSE(RelationArray::required(DataStore::relationName(evtData.getName(), profileData.getName())));
 
+    StoreArray<EventMetaData> evtData2;
     DataStore::Instance().setInitializeActive(true);
-    RelationArray relation(evtData, profileData);
-    relation.registerAsPersistent();
-    StoreArray<EventMetaData>::registerPersistent("OwnName");
-    RelationArray::registerPersistent("OwnName", profileData.getName());
+    evtData.registerRelationTo(profileData);
+    evtData2.registerInDataStore("OwnName");
+    evtData2.registerRelationTo(profileData);
     DataStore::Instance().setInitializeActive(false);
 
+    RelationArray relation(evtData, profileData);
     EXPECT_FALSE(RelationArray(DataStore::relationName(evtData.getName(), profileData.getName()), DataStore::c_Event));
     relation.create();
     EXPECT_TRUE(RelationArray(evtData, profileData, "", DataStore::c_Event));
     string name = relation.getName();
+
+    EXPECT_EQ("OwnName", evtData2.getName());
+
 
     RelationArray relationAttachedUsingName(name, DataStore::c_Event);
     //trying to get the accessor params should cause the array to attach (and thus get the appropriate data)
@@ -86,7 +90,6 @@ namespace {
     EXPECT_TRUE(relationAttachedUsingName.getToAccessorParams() == profileData.getAccessorParams());
     EXPECT_TRUE(relationAttachedUsingName);
 
-    StoreArray<EventMetaData> evtData2("OwnName");
     //check for OwnNameToProfileInfos
     EXPECT_FALSE(RelationArray(DataStore::relationName(evtData2.getName(), profileData.getName()), DataStore::c_Event));
     EXPECT_FALSE(RelationArray("OwnNameToProfileInfos", DataStore::c_Event));
@@ -101,7 +104,7 @@ namespace {
   {
     DataStore::Instance().setInitializeActive(true);
     RelationArray relation1(evtData, profileData, "test");
-    relation1.registerAsPersistent();
+    relation1.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
     relation1.create();
@@ -136,7 +139,7 @@ namespace {
   {
     DataStore::Instance().setInitializeActive(true);
     RelationArray array(evtData, profileData, "somethingnew");
-    array.registerAsPersistent();
+    array.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
     RelationContainer* rel = new RelationContainer(); //default constructed object, as written to file
@@ -153,7 +156,7 @@ namespace {
   {
     DataStore::Instance().setInitializeActive(true);
     RelationArray relation(evtData, profileData);
-    relation.registerAsPersistent();
+    relation.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
     relation.add(0, 0, 1.0);
@@ -231,7 +234,7 @@ namespace {
   {
     DataStore::Instance().setInitializeActive(true);
     RelationArray relation(evtData, profileData);
-    relation.registerAsPersistent();
+    relation.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
     relation.add(0, 10, 1.0);
@@ -248,7 +251,7 @@ namespace {
   {
     DataStore::Instance().setInitializeActive(true);
     RelationArray relation(evtData, profileData);
-    relation.registerAsPersistent();
+    relation.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
     RelationIndex<EventMetaData, ProfileInfo> index;
@@ -261,13 +264,15 @@ namespace {
   /** Attaching to relation with from and two swapped, and with different StoreArray of same type. */
   TEST_F(RelationsInternal, WrongRelationIndexDeathTest)
   {
+    StoreArray<EventMetaData> eventData("evts");
+
     DataStore::Instance().setInitializeActive(true);
     RelationArray relation(profileData, evtData, "test");
-    relation.registerAsPersistent();
-    RelationArray(evtData, profileData).registerAsPersistent();
-    StoreArray<EventMetaData>::registerPersistent("evts");
+    relation.registerInDataStore();
+    RelationArray(evtData, profileData).registerInDataStore();
+    eventData.registerInDataStore();
     RelationArray relation2(evtData, profileData, "test2");
-    relation2.registerAsPersistent();
+    relation2.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
     relation.create();
@@ -275,7 +280,6 @@ namespace {
     EXPECT_B2FATAL(rel_t(evtData, profileData, "test"));
     EXPECT_B2FATAL(rel_t("test"));
 
-    StoreArray<EventMetaData> eventData("evts");
     relation2.create();
     EXPECT_B2FATAL(rel_t(eventData, profileData, "test2"));
 
@@ -326,7 +330,7 @@ namespace {
   {
     DataStore::Instance().setInitializeActive(true);
     RelationArray relation(evtData, profileData);
-    relation.registerAsPersistent();
+    relation.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
     //check non-existing relations (registered)
@@ -360,7 +364,7 @@ namespace {
   {
     DataStore::Instance().setInitializeActive(true);
     RelationArray relation(evtData, profileData);
-    relation.registerAsPersistent();
+    relation.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
     DataStore::Instance().addRelationFromTo((evtData)[0], (profileData)[0], 1.0);
@@ -375,7 +379,7 @@ namespace {
   {
     DataStore::Instance().setInitializeActive(true);
     RelationArray relation(evtData, profileData);
-    relation.registerAsPersistent();
+    relation.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
     DataStore::Instance().addRelationFromTo((evtData)[0], (profileData)[0], 1.0);
@@ -402,11 +406,11 @@ namespace {
     StoreArray<ProfileInfo> profileData2("ProfileInfos2");
 
     DataStore::Instance().setInitializeActive(true);
-    profileData2.registerAsPersistent();
+    profileData2.registerInDataStore();
     RelationArray relation(evtData, profileData);
-    relation.registerAsPersistent();
+    relation.registerInDataStore();
     RelationArray relation2(evtData, profileData2);
-    relation2.registerAsPersistent();
+    relation2.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
     DataStore::Instance().addRelationFromTo((evtData)[0], (profileData)[0], 1.0);
@@ -465,11 +469,11 @@ namespace {
     EXPECT_EQ(0u, DataStore::Instance().getListOfRelatedArrays(evtData).size());
 
     DataStore::Instance().setInitializeActive(true);
-    profileData2.registerAsPersistent();
+    profileData2.registerInDataStore();
     RelationArray relation(evtData, profileData);
-    relation.registerAsPersistent();
+    relation.registerInDataStore();
     RelationArray relation2(evtData, profileData2);
-    relation2.registerAsPersistent();
+    relation2.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
     EXPECT_EQ(1u, DataStore::Instance().getListOfRelatedArrays(profileData2).size());

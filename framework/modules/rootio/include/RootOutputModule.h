@@ -27,11 +27,9 @@
 namespace Belle2 {
   /** Write objects from DataStore into a ROOT file.
    *
-   *  To ensure that all objects/arrays are saved correctly, follow the directions
-   *  in the documentation of the StoreArray, StoreObjPtr and RelationArray classes
-   *  regarding the use of registerPersistent().
+   * You can use the RootInputModule to read the data back in.
    *
-   *  @sa EDurability
+   *  @sa DataStore::EDurability
    */
   class RootOutputModule : public Module {
 

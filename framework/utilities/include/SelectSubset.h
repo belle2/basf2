@@ -14,9 +14,9 @@
 
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationVector.h>
 #include <framework/datastore/RelationsObject.h>
+#include <framework/logging/Logger.h>
 
 #include <string>
 #include <functional>
@@ -98,10 +98,10 @@ namespace Belle2 {
    *
    * <h1> Relations </h1>
    * By default the class SelectSubset produces a one to one relation
-   * from the subset to the set by which you can interpret all the relations
+   * from the set to the subset by which you can interpret all the relations
    * from and to the original set. E.g. The original StoreArray<Particle> is
    * in relation To the StoreArray<MCParticle>. You can use the relation from
-   * the subset to the set and then from the set to the MCParticles. This can
+   * the set to the subset and then from the set to the MCParticles. This can
    * be quite tedious, so you can ask SelectSubset to produce the natural
    * restrictions of the relations  from and to the original set.
 
@@ -182,9 +182,9 @@ namespace Belle2 {
     /** Register the StoreArray<StoredClass> that will contain the subset of selected elements
      *  @param set         The StoreArray<StoredClass> from which the elements will be selected
      *  @param subsetName  The name of the StoreArray<StoredClass> that will contain the selected elements
-     *  @param subsetTransient should this subset be transient?
+     *  @param storeFlags ORed combination of DataStore::EStoreFlag flags.
      */
-    bool registerSubset(const StoreArray< StoredClass >& set, const std::string& subsetName, bool subsetTransient = false) {
+    bool registerSubset(const StoreArray< StoredClass >& set, const std::string& subsetName, DataStore::EStoreFlags storeFlags = DataStore::c_ErrorIfAlreadyRegistered) {
       if (m_subset) {
         B2FATAL("SelectSubset::registerSubset() can only be called once!");
         return false;
@@ -195,18 +195,9 @@ namespace Belle2 {
 
 
       m_subset = new StoreArray<StoredClass>(subsetName, m_setDurability);
-      if (subsetTransient)
-        m_subset->registerAsTransient(m_reportErrorIfExisting);
-      else
-        m_subset->registerAsPersistent(m_reportErrorIfExisting);
-      RelationArray relation(*m_subset, set, "", m_subset->getDurability());
+      m_subset->registerInDataStore(storeFlags);
 
-      //TODO: change relation direction to set -> subset?
-      if (subsetTransient or set.isTransient()) {
-        relation.registerAsTransient(m_reportErrorIfExisting);
-      } else {
-        relation.registerAsPersistent(m_reportErrorIfExisting);
-      }
+      set.registerRelationTo(*m_subset, m_subset->getDurability(), storeFlags);
 
       return true;
 
@@ -224,11 +215,10 @@ namespace Belle2 {
       } else {
         const_cast<StoreArray<T>&>(array).isRequired();
 
-        RelationArray relation(array, *m_subset, "", m_subset->getDurability());
-        if (m_subset->isTransient() or array.isTransient())
-          relation.registerAsTransient(m_reportErrorIfExisting);
-        else
-          relation.registerAsPersistent(m_reportErrorIfExisting);
+        DataStore::EStoreFlags flags = DataStore::c_ErrorIfAlreadyRegistered;
+        if (m_subset->notWrittenOut() or array.notWrittenOut())
+          flags |= DataStore::c_DontWriteOut;
+        array.registerRelationTo(*m_subset, m_subset->getDurability(), flags);
 
         if (array.getName() != m_subset->getName())
           m_inheritFromArrays.push_back(array.getName());
@@ -249,11 +239,10 @@ namespace Belle2 {
       } else {
         const_cast<StoreArray<T>&>(array).isRequired();
 
-        RelationArray relation(*m_subset, array, "", m_subset->getDurability());
-        if (m_subset->isTransient() or array.isTransient())
-          relation.registerAsTransient(m_reportErrorIfExisting);
-        else
-          relation.registerAsPersistent(m_reportErrorIfExisting);
+        DataStore::EStoreFlags flags = DataStore::c_ErrorIfAlreadyRegistered;
+        if (m_subset->notWrittenOut() or array.notWrittenOut())
+          flags |= DataStore::c_DontWriteOut;
+        m_subset->registerRelationTo(array, m_subset->getDurability(), flags);
 
         if (array.getName() != m_subset->getName())
           m_inheritToArrays.push_back(array.getName());
@@ -277,11 +266,9 @@ namespace Belle2 {
         if (array == *m_subset)
           continue; // from registerSubset(), ignore
 
-        RelationArray rel1(array, set, "", m_subset->getDurability());
-        if (rel1.isOptional())
+        if (array.optionalRelationTo(set, m_setDurability))
           inheritRelationsFrom(array);
-        RelationArray rel2(set, array, "", m_subset->getDurability());
-        if (rel2.isOptional())
+        if (set.optionalRelationTo(array, m_setDurability))
           inheritRelationsTo(array);
       }
     }
@@ -318,11 +305,10 @@ namespace Belle2 {
 
     StoreArray<StoredClass> set(m_setName, m_setDurability);
 
-    //TODO: change relation direction to set -> subset?
     for (const StoredClass & setObject : set) {
       if (f(&setObject)) {
         const StoredClass* subsetObject = m_subset->appendNew(setObject);
-        subsetObject->addRelationTo(&setObject);
+        setObject.addRelationTo(subsetObject);
         for (std::string fromArray : m_inheritFromArrays) {
           const RelationVector<RelationsObject>& relations = setObject.template getRelationsFrom<RelationsObject>(fromArray);
           for (unsigned int iRel = 0; iRel < relations.size(); iRel++) {
@@ -342,7 +328,7 @@ namespace Belle2 {
     if (m_inheritToSelf) {
       for (const StoredClass & subsetObject1 : *m_subset) {
         //TODO: change relation direction to set -> subset?
-        const StoredClass* setObject1 = subsetObject1.template getRelatedTo<StoredClass>(m_setName);
+        const StoredClass* setObject1 = subsetObject1.template getRelatedFrom<StoredClass>(m_setName);
 
         //get all objects in original set related to setObject1
         const RelationVector<StoredClass>& relations = setObject1->template getRelationsTo<StoredClass>(m_setName);
@@ -351,7 +337,7 @@ namespace Belle2 {
           const double weight = relations.weight(iRel);
 
           //if setObject2 was selected into subset, inherit relation
-          const StoredClass* subsetObject2 = setObject2->template getRelatedFrom<StoredClass>(m_subset->getName());
+          const StoredClass* subsetObject2 = setObject2->template getRelatedTo<StoredClass>(m_subset->getName());
           if (subsetObject2) {
             subsetObject1.addRelationTo(subsetObject2, weight);
           }

@@ -68,10 +68,10 @@ void SubEventModule::initialize()
   StoreObjPtr<ProcessStatistics> processStatistics("", DataStore::c_Persistent);
   processStatistics->suspendGlobal();
 
-  //register loop object (!array, transient, errorIfExisting)
+  //register loop object
   const DataStore::StoreEntry& arrayEntry = DataStore::Instance().getStoreObjectMap(DataStore::c_Event).at(m_loopOver.getName());
   TClass* arrayClass = static_cast<TClonesArray*>(arrayEntry.object)->GetClass();
-  DataStore::Instance().registerEntry(m_objectName, DataStore::c_Event, arrayClass, false, true, true);
+  DataStore::Instance().registerEntry(m_objectName, DataStore::c_Event, arrayClass, false, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
 
   processInitialize(m_moduleList);
 

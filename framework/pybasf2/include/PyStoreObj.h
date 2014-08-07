@@ -40,7 +40,7 @@ namespace Belle2 {
   *
   * <h1>Creating objects</h1>
   * You can also create new objects in your Python basf2 module, using
-  * registerAsPersistent()/registerAsTransient() and create(). Since you
+  * registerInDataStore() and create(). Since you
   * cannot specify the type directly, as with template arguments to StoreObjPtr,
   * the class name is assumed to be identical to the 'name' argument given to the
   * constructor, and to reside in the Belle2 namespace.
@@ -73,21 +73,13 @@ namespace Belle2 {
      **/
     bool create(bool replace = false);
 
-    /** Register the object in the data store and include it in the output by default.
+    /** Register the object in the data store.
      *  This must be called in the initialization phase.
      *
-     *  @param errorIfExisting  Flag whether an error will be reported if the object was already registered.
+     *  @param storeFlags ORed combination of DataStore::EStoreFlag flags. (default: c_WriteOut)
      *  @return            True if the registration succeeded.
      */
-    bool registerAsPersistent(bool errorIfExisting = false);
-
-    /** Register the object in the data store and do not include it in the output by default.
-     *  This must be called in the initialization phase.
-     *
-     *  @param errorIfExisting  Flag whether an error will be reported if the object was already registered.
-     *  @return            True if the registration succeeded.
-     */
-    bool registerAsTransient(bool errorIfExisting = false);
+    bool registerInDataStore(int storeFlags = 0);
 
     /** Does this PyStoreObj contain a valid datastore object?
      *

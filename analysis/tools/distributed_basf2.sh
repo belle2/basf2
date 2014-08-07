@@ -231,8 +231,13 @@ function checkJob {
   then
     echo "Job not finished yet"
   else
-    echo "Job is finished, but was not successful! Rescheduling job."
-    rescheduleJob "$collectionDirectory" "$jobDirectory" "$jobNumber"
+    if [ ! -f "$jobDirectory"/"$jobNumber"/basf2_finished_successfully ]
+    then
+      echo "Job finished during check"
+    else
+      echo "Job is finished, but was not successful! Rescheduling job."
+      rescheduleJob "$collectionDirectory" "$jobDirectory" "$jobNumber"
+    fi
   fi
 
 }

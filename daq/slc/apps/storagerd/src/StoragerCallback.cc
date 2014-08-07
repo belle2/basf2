@@ -9,6 +9,8 @@
 #include "daq/slc/base/StringUtil.h"
 #include "daq/slc/base/ConfigFile.h"
 
+#include <sys/statvfs.h>
+
 using namespace Belle2;
 
 StoragerCallback::StoragerCallback(const NSMNode& node)
@@ -217,7 +219,15 @@ void StoragerCallback::timeout() throw()
     } else if (i == 1) {
       SharedEventBuffer::Header* hd = m_rbuf.getHeader();
       info->io[2].nqueue = hd->nword_in - hd->nword_out;
+      info->nfiles = status.reserved[0];
+      info->nbytes = (float)status.reserved[1];
     } else {
     }
   }
+  struct statvfs statfs;
+  ConfigObject& obj(getConfig().getObject());
+  std::string filepath = obj.getText("record_dir");
+  statvfs(filepath.c_str(), &statfs);
+  info->disksize = (float)statfs.f_frsize * statfs.f_blocks / 1024 / 1024 / 1024;
+  info->diskusage = 100 - ((float)statfs.f_bfree / statfs.f_blocks * 100);
 }

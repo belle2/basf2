@@ -39,7 +39,11 @@ int main(int argc, char** argv)
     fputs("\033[2J\033[0;0H", stdout);
     rewind(stdout);
     ftruncate(1, 0);
-    printf("%04u.%04u\n", info->expno, info->runno);
+    printf("exp = %04u run = %04u\n", info->expno, info->runno);
+    printf("nfile = %4u nbytes = %4.2f [MB]\n", info->nfiles, info->nbytes);
+    printf("disk usage = %3.1f % available disk size = %4.2f [GB]\n",
+           info->diskusage, info->disksize);
+    printf("nqueue | count | freq [kHz] | evtsize [kB] | rate [MB/s]\n");
     for (int i = 0; i < 14; i++) {
       storage_info_all::io_status& nio(info->io[i]);
       printf("%010u | %08u | %02.2f | %03.2f | %04.2f\n",

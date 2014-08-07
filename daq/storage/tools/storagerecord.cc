@@ -36,6 +36,7 @@ using namespace Belle2;
 const unsigned long long GB = 1024 * 1024 * 1024;
 const unsigned long long MAX_FILE_SIZE = 8 * GB;
 int g_nfile = 0;
+int g_nfile_closed = 0;
 Mutex g_mutex;
 
 class FileHandler {
@@ -82,6 +83,7 @@ public:
   void close() {
     if (file != NULL) {
       fclose(file);
+      g_nfile_closed++;
     }
     if (buf != NULL) {
       free(buf);
@@ -156,7 +158,7 @@ std::queue<FileHandler> FileCloser::g_file_q;
 Mutex FileCloser::g_mutex;
 Cond FileCloser::g_cond;
 
-void signalHandler(int sig)
+void signalHandler(int)
 {
   FileCloser::closeAll();
   exit(1);
@@ -243,6 +245,8 @@ int main(int argc, char** argv)
       if (use_info) {
         info.addOutputCount(1);
         info.addOutputNBytes(nbyte);
+        info.get()->reserved[0] = g_nfile_closed;
+        info.get()->reserved[1] = info.getOutputNBytes() / 1024 / 1024;
       }
     } else {
       B2ERROR("storagerecord: no run was initialzed for recording");

@@ -275,6 +275,13 @@ namespace Belle2 {
       return new(nextFreeAddress_internal()) T(std::forward<Args>(params)...);
     }
 
+
+    /** Return list of array names with matching type.  */
+    static std::vector<std::string> getArrayList(DataStore::EDurability durability = DataStore::c_Event) {
+      return DataStore::Instance().getListOfArrays(T::Class(), durability);
+    }
+
+
     /** Raw access to the underlying TClonesArray.
      *
      *  \warning In most cases, you'll want to avoid direct interaction with

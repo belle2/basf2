@@ -458,6 +458,14 @@ namespace Belle2 {
      */
     std::vector<std::string> getListOfRelatedArrays(const StoreAccessorBase& array) const;
 
+    /** Returns a list of names of arrays which are of type arrayClass. */
+    std::vector<std::string> getListOfArrays(const TClass* arrayClass, EDurability durability) const {
+      std::vector<std::string> arrays;
+      getArrayNames(arrays, "ALL", arrayClass, durability);
+      return arrays;
+    }
+
+
 
     //------------------------------ Start and end procedures --------------------------------------------------
     /** Setter for m_initializeActive.
@@ -526,7 +534,7 @@ namespace Belle2 {
      *  @param arrayName  A given array name, the special string "ALL" for all arrays deriving from the given class, or an empty string for the default array name.
      *  @param arrayClass The class of the array(s).
      */
-    void getArrayNames(std::vector<std::string>& names, const std::string& arrayName, const TClass* arrayClass) const;
+    void getArrayNames(std::vector<std::string>& names, const std::string& arrayName, const TClass* arrayClass, EDurability durability = c_Event) const;
 
     /** Map for all objects/arrays in the data store.
      *

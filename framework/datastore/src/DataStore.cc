@@ -277,7 +277,7 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
   return false;
 }
 
-void DataStore::getArrayNames(std::vector<std::string>& names, const std::string& arrayName, const TClass* arrayClass) const
+void DataStore::getArrayNames(std::vector<std::string>& names, const std::string& arrayName, const TClass* arrayClass, EDurability durability) const
 {
   if (arrayName.empty()) {
     static std::unordered_map<const TClass*, string> classToArrayName;
@@ -290,7 +290,7 @@ void DataStore::getArrayNames(std::vector<std::string>& names, const std::string
       names.push_back(result);
     }
   } else if (arrayName == "ALL") {
-    for (auto & mapEntry : m_storeObjMap[c_Event]) {
+    for (auto & mapEntry : m_storeObjMap[durability]) {
       if (mapEntry.second.ptr && mapEntry.second.isArray) {
         TClonesArray* array = static_cast<TClonesArray*>(mapEntry.second.ptr);
         if (array->GetClass()->InheritsFrom(arrayClass)) {

@@ -41,10 +41,10 @@ void StoragerCallback::term() throw()
 
 bool StoragerCallback::load() throw()
 {
-  system("killall storagein 2>&1 /dev/null");
-  system("killall storagerecord 2>&1 /dev/null");
-  system("killall storageout 2>&1 /dev/null");
-  system("killall basf2 2>&1 /dev/null");
+  //system("killall storagein");
+  //system("killall storagerecord");
+  //system("killall storageout");
+  //system("killall basf2");
 
   ConfigObject& obj(getConfig().getObject());
   const size_t nproc = obj.getInt("record_nproc");

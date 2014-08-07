@@ -164,9 +164,9 @@ unsigned int SharedEventBuffer::write(const int* buf, unsigned int nword,
       break;
     }
     m_header->nwriter--;
-    while (!fouce && m_header->nreader > 0) {
-      m_cond.wait(m_mutex);
-    }
+    //while (!fouce && m_header->nreader > 0) {
+    m_cond.wait(m_mutex);
+    //}
     m_header->nwriter++;
   }
   m_header->nword_in += nword + 1;
@@ -214,9 +214,9 @@ unsigned int SharedEventBuffer::read(int* buf, bool fouce,
       }
     }
     m_header->nreader--;
-    while (!fouce && m_header->nwriter > 0) {
-      m_cond.wait(m_mutex);
-    }
+    //while (!fouce && m_header->nwriter > 0) {
+    m_cond.wait(m_mutex);
+    //}
     m_header->nreader++;
   }
   m_header->nword_out += nword + 1;

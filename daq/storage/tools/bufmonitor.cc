@@ -41,8 +41,8 @@ int main(int argc, char** argv)
     ftruncate(1, 0);
     printf("exp = %04u run = %04u\n", info->expno, info->runno);
     printf("nfile = %4u nbytes = %4.2f [MB]\n", info->nfiles, info->nbytes);
-    printf("disk usage = %3.1f % available disk size = %4.2f [GB]\n",
-           info->diskusage, info->disksize);
+    printf("disk usage = %3.1f %% available disk size = %4.2f [TB]\n",
+           (100. - info->diskusage), info->disksize / 1024.);
     printf("nqueue | count | freq [kHz] | evtsize [kB] | rate [MB/s]\n");
     for (int i = 0; i < 14; i++) {
       storage_info_all::io_status& nio(info->io[i]);

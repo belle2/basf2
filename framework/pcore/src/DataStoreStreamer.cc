@@ -222,7 +222,7 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
     //msg doesn't really contain data, set EventMetaData to something equivalent
     StoreObjPtr<EventMetaData> eventMetaData;
     if (m_initStatus == 0)
-      eventMetaData.registerAsPersistent();
+      eventMetaData.registerInDataStore();
     eventMetaData.create();
     eventMetaData->setEndOfData();
   } else {

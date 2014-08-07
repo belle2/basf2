@@ -147,7 +147,7 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 
   LogSystem& logSystem = LogSystem::Instance();
 
-  m_processStatisticsPtr.registerAsPersistent();
+  m_processStatisticsPtr.registerInDataStore();
   //TODO I might want to overwrite it in initialize (e.g. if read from file)
   //     For parallel processing or subevents, I don't want that, though.
   //     Maybe make this a function argument?

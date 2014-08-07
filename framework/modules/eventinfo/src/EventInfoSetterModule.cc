@@ -56,7 +56,7 @@ EventInfoSetterModule::~EventInfoSetterModule()
 void EventInfoSetterModule::initialize()
 {
   //Register the EventMetaData in the data store
-  m_eventMetaDataPtr.registerAsPersistent();
+  m_eventMetaDataPtr.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
 
   //steering file content overwritten via command line arguments?
   int numEventsArgument = Environment::Instance().getNumberEventsOverride();

@@ -41,10 +41,10 @@ void StoragerCallback::term() throw()
 
 bool StoragerCallback::load() throw()
 {
-  //system("killall storagein");
-  //system("killall storagerecord");
-  //system("killall storageout");
-  //system("killall basf2");
+  system("killall storagein");
+  system("killall storagerecord");
+  system("killall storageout");
+  system("killall basf2");
 
   ConfigObject& obj(getConfig().getObject());
   const size_t nproc = obj.getInt("record_nproc");
@@ -88,6 +88,8 @@ bool StoragerCallback::load() throw()
   m_con[1].addArgument(rbuf_name);
   m_con[1].addArgument(rbuf_size);
   m_con[1].addArgument(obj.getText("record_dir"));
+  m_con[1].addArgument(obj.getValueText("record_ndisks"));
+  m_con[1].addArgument(obj.getText("record_file"));
   m_con[1].addArgument(obuf_name);
   m_con[1].addArgument(obuf_size);
   m_con[1].addArgument("storagerecord");
@@ -226,8 +228,12 @@ void StoragerCallback::timeout() throw()
   }
   struct statvfs statfs;
   ConfigObject& obj(getConfig().getObject());
-  std::string filepath = obj.getText("record_dir");
-  statvfs(filepath.c_str(), &statfs);
-  info->disksize = (float)statfs.f_frsize * statfs.f_blocks / 1024 / 1024 / 1024;
-  info->diskusage = 100 - ((float)statfs.f_bfree / statfs.f_blocks * 100);
+  std::string dir = obj.getText("record_dir");
+  int ndisks = obj.getInt("record_ndisks");
+  for (int i = 0; i < ndisks; i++) {
+    std::string path = StringUtil::form("%s%02d", dir.c_str(), i + 1);
+    statvfs(path.c_str(), &statfs);
+    info->disksize[i] = (float)statfs.f_frsize * statfs.f_blocks / 1024 / 1024 / 1024;
+    info->diskusage[i] = 100 - ((float)statfs.f_bfree / statfs.f_blocks * 100);
+  }
 }

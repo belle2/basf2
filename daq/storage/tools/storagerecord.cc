@@ -24,19 +24,24 @@
 #include <daq/slc/system/Mutex.h>
 #include <daq/slc/system/Cond.h>
 
+#include <fstream>
+#include <queue>
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <queue>
 #include <unistd.h>
 #include <signal.h>
+#include <sys/statvfs.h>
 
 using namespace Belle2;
 
 const unsigned long long GB = 1024 * 1024 * 1024;
-const unsigned long long MAX_FILE_SIZE = 8 * GB;
+const unsigned long long MAX_FILE_SIZE = 4 * GB;
 int g_nfile = 0;
 int g_nfile_closed = 0;
+int g_diskid = 0;
+std::string g_filepath;
 Mutex g_mutex;
 
 class FileHandler {
@@ -51,21 +56,58 @@ public:
     buf = NULL;
     id = 0;
   }
-  FileHandler(const std::string& dir, int expno, int runno) {
-    open(dir, expno, runno);
+  FileHandler(const std::string& dir, int ndisks, int expno, int runno) {
+    open(dir, ndisks, expno, runno);
   }
   ~FileHandler() throw() {}
 
 public:
-  void open(const std::string& dir, int expno, int runno) {
+  bool open(const std::string& dir, int ndisks, int expno, int runno) {
     char filename[1024];
     g_mutex.lock();
-    if (g_nfile > 0) {
-      sprintf(filename, "%s/e%4.4d/r%4.4d/e%4.4dr%6.6d.sroot-%d",
-              dir.c_str(), expno, runno, expno, runno, g_nfile);
+    bool available = true;
+    if (ndisks > 0) {
+      int diskid = g_diskid;
+      if (g_diskid == 0) {
+        std::ifstream fin(g_filepath.c_str());
+        fin >> g_diskid;
+        if (g_diskid == 0) g_diskid = 1;
+      }
+      available = false;
+      for (int i = 0; i < ndisks; i++) {
+        struct statvfs statfs;
+        sprintf(filename, "%s%02d", dir.c_str(), g_diskid);
+        statvfs(filename, &statfs);
+        float usage = 1 - ((float)statfs.f_bfree / statfs.f_blocks);
+        if (usage < 0.9) {
+          available = true;
+          break;
+        }
+        g_diskid++;
+        if (g_diskid > ndisks) g_diskid = 1;
+      }
+      if (!available) {
+        B2ERROR("No disk available for writing");
+      }
+      if (diskid != g_diskid) {
+        std::ofstream fout(g_filepath.c_str());
+        fout << g_diskid;
+      }
+      if (g_nfile > 0) {
+        sprintf(filename, "%s%02d/e%4.4dr%6.6d.sroot-%d",
+                dir.c_str(), g_diskid, expno, runno, g_nfile);
+      } else {
+        sprintf(filename, "%s%02d/e%4.4dr%6.6d.sroot",
+                dir.c_str(), g_diskid, expno, runno);
+      }
     } else {
-      sprintf(filename, "%s/e%4.4d/r%4.4d/e%4.4dr%6.6d.sroot",
-              dir.c_str(), expno, runno, expno, runno);
+      if (g_nfile > 0) {
+        sprintf(filename, "%s/e%4.4dr%6.6d.sroot-%d",
+                dir.c_str(), expno, runno, g_nfile);
+      } else {
+        sprintf(filename, "%s/e%4.4dr%6.6d.sroot",
+                dir.c_str(), expno, runno);
+      }
     }
     g_nfile++;
     id = g_nfile;
@@ -73,11 +115,13 @@ public:
     file = fopen(filename, "w");
     if (file == NULL) {
       B2ERROR("failed to open file : " << filename);
+      return false;
     } else {
       buf = (char*)malloc(MAX_FILE_SIZE / 100);
       setvbuf(file, buf, _IOFBF, MAX_FILE_SIZE / 100);
       B2INFO("file " << filename << " opened");
     }
+    return available;
   }
 
   void close() {
@@ -132,21 +176,21 @@ private:
 private:
   FileHandler m_handler;
   std::string m_dir;
+  int m_ndisks;
   int m_expno;
   int m_runno;
 
 public:
   FileCloser(const FileHandler& handler,
              const std::string dir,
-             int expno, int runno)
+             int ndisks, int expno, int runno)
     : m_handler(handler), m_dir(dir),
-      m_expno(expno), m_runno(runno) {}
-
+      m_ndisks(ndisks), m_expno(expno), m_runno(runno) {}
 
 public:
   void run() {
     g_mutex.lock();
-    g_file_q.push(FileHandler(m_dir, m_expno, m_runno));
+    g_file_q.push(FileHandler(m_dir, m_ndisks, m_expno, m_runno));
     g_cond.signal();
     g_mutex.unlock();
     m_handler.close();
@@ -167,21 +211,25 @@ void signalHandler(int)
 int main(int argc, char** argv)
 {
   if (argc < 4) {
-    printf("rawfile2rb : ibufname path_to_disk [obufname] [nodename, nodeid]\n");
+    printf("rawfile2rb : ibufname ibufsize path filepath"
+           "ndisk obufname obufsize [nodename, nodeid]\n");
     return 1;
   }
   signal(SIGINT, signalHandler);
   const unsigned interval = 10;
   RunInfoBuffer info;
-  const bool use_info = (argc > 7);
+  const bool use_info = (argc > 9);
   if (use_info) {
-    info.open(argv[6], atoi(argv[7]));
+    info.open(argv[8], atoi(argv[9]));
   }
   SharedEventBuffer ibuf;
   ibuf.open(argv[1], atol(argv[2]) * 1000000, true);
   const std::string dir = argv[3];
+  int ndisks = atoi(argv[4]);
+  g_filepath = argv[5];
+
   SharedEventBuffer obuf;
-  obuf.open(argv[4], atol(argv[5]) * 1000000, true);
+  obuf.open(argv[6], atol(argv[7]) * 1000000, true);
   B2INFO("storagerecord: started recording.");
   if (use_info) {
     info.reportRunning();
@@ -219,12 +267,8 @@ int main(int argc, char** argv)
       oheader->runno = runno;
       obuf.unlock();
       g_nfile = 0;
-      char cmd[256];
-      sprintf(cmd, "mkdir -p %s/e%4.4d/r%4.4d",
-              dir.c_str(), expno, runno);
-      system(cmd);
-      file.open(dir, expno, runno);
-      PThread(new FileCloser(FileHandler(), dir, expno, runno));
+      file.open(dir, ndisks, expno, runno);
+      PThread(new FileCloser(FileHandler(), dir, ndisks, expno, runno));
     }
     if (use_info) {
       info.addInputCount(1);
@@ -232,7 +276,7 @@ int main(int argc, char** argv)
     }
     if (file) {
       if (nbyte_out > MAX_FILE_SIZE) {
-        PThread(new FileCloser(file, dir, expno, runno));
+        PThread(new FileCloser(file, dir, ndisks, expno, runno));
         nbyte_out = 0;
         file = FileCloser::getFile();
       }

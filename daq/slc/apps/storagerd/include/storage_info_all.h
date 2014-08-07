@@ -13,8 +13,8 @@ struct storage_info_all {
   uint32 subno;
   uint32 nfiles;
   float nbytes;
-  float diskusage;
-  float disksize;
+  float diskusage[12];
+  float disksize[12];
   struct io_status {
     uint32 nqueue;
     uint32 state;

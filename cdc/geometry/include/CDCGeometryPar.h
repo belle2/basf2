@@ -523,6 +523,22 @@ namespace Belle2 {
 
 
       /**
+       * Returns bin no. corresponding to track incident angle (alpha).
+       * @param alpha in rad.
+       */
+
+      int getAlphaBin(const double alpha) const;
+
+
+      /**
+       * Returns bin no. corresponding to track incident angle (theta).
+       * @param theta in rad.
+       */
+
+      int getThetaBin(const double theta) const;
+
+
+      /**
        * Set the desizend wire parameters.
        * @param[in] layerID Layer ID
        * @param[in] cellID Cell ID

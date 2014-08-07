@@ -224,7 +224,7 @@ void CDCGeometryPar::read()
   m_nominalPropSpeed = 27.25;  //in cm/nsec (Belle's result, provided by iwasaki san)
 
   m_nominalSpaceResol = gbxParams.getLength("SenseWire/SpaceResol");
-  m_maxSpaceResol = 10. * m_nominalSpaceResol;
+  m_maxSpaceResol = 5. * m_nominalSpaceResol;
 
   //Replace geometry params. (from input data) upon request
   m_Geometry4Recon = gbxParams.getBool("Geometry4Recon");
@@ -377,14 +377,13 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
       itheta = 6;
     }
 
-    //tentative
-    int lr = 0;
-    if (lrp == 0) lr = 1;
+    int lr = lrp;
 
     for (int i = 0; i < np - 1; ++i) {
       m_XT[iL][lr][ialpha][itheta][i] = xt[i];
     }
 
+    //    m_XT[iL][lr][ialpha][itheta][6] *= -1;
     double bound = m_XT[iL][lr][ialpha][itheta][6];
     int i = np - 1;
     xt[i] = m_XT[iL][lr][ialpha][itheta][0] + bound
@@ -823,42 +822,8 @@ double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer
 
   double dDdt;
 
-  //tentative
-  int ialpha = (alpha >= 0.) ? (alpha * 180. / M_PI + 5.) / 10. : (alpha * 180. / M_PI - 5.) / 10.;
-  ialpha += 9;
-  ialpha = std::max(0, ialpha);
-  ialpha = std::min(18, ialpha);
-
-  /*  for(int i=-90; i<=90; ++i) {
-      double alpha = i*M_PI/180.;
-      int ialpha = (alpha >= 0.) ? (alpha * 180. / M_PI + 5.) / 10. : (alpha * 180. / M_PI - 5.) / 10.;
-      ialpha += 9;
-      ialpha = std::max(0, ialpha);
-      ialpha = std::min(18, ialpha);
-      std::cout <<"alpha,ialpha=" << alpha*180./M_PI <<" "<< ialpha << std::endl;
-      }
-      exit(-1);
-  */
-
-  double th = 180. * theta / M_PI;
-  //hard-coded tentatively
-  int itheta = 0;
-  if (th < 29.0) {
-  } else if (th <  50.0) {
-    itheta = 1;
-  } else if (th <  75.0) {
-    itheta = 2;
-  } else if (th < 105.0) {
-    itheta = 3;
-  } else if (th < 125.0) {
-    itheta = 4;
-  } else if (th < 139.5) {
-    itheta = 5;
-  } else {
-    itheta = 6;
-  }
-  //  ialpha = 9;
-  //  itheta = 3;
+  int ialpha = getAlphaBin(alpha);
+  int itheta = getThetaBin(theta);
 
   const double boundary = m_XT[iCLayer][lr][ialpha][itheta][6];
 
@@ -884,31 +849,8 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
 
   double dist = 0.;
 
-  //tentative
-  int ialpha = (alpha >= 0.) ? (alpha * 180. / M_PI + 5.) / 10. : (alpha * 180. / M_PI - 5.) / 10.;
-  ialpha += 9;
-  ialpha = std::max(0, ialpha);
-  ialpha = std::min(18, ialpha);
-
-  double th = 180. * theta / M_PI;
-  //hard-coded tentatively
-  int itheta = 0;
-  if (th < 29.0) {
-  } else if (th <  50.0) {
-    itheta = 1;
-  } else if (th <  75.0) {
-    itheta = 2;
-  } else if (th < 105.0) {
-    itheta = 3;
-  } else if (th < 125.0) {
-    itheta = 4;
-  } else if (th < 139.5) {
-    itheta = 5;
-  } else {
-    itheta = 6;
-  }
-  //  ialpha = 9;
-  //  itheta = 3;
+  int ialpha = getAlphaBin(alpha);
+  int itheta = getThetaBin(theta);
 
   //  std::cout <<"iCLayer= " << iCLayer << std::endl;
   //  std::cout <<"lr= " << lr << std::endl;
@@ -927,7 +869,7 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
     dist = m_XT[iCLayer][lr][ialpha][itheta][7] * (time - boundary) + m_XT[iCLayer][lr][ialpha][itheta][8];
   }
 
-  if (lr == 1) dist *= -1.;
+  //  if (lr == 1) dist *= -1.;
   //  std::cout <<"dist= " << dist << std::endl;
   //tentative  return std::max(0., dist);
   return fabs(dist);
@@ -939,8 +881,15 @@ double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLa
   //to be replaced with a smarter algorithm...
 
   const double eps = 2.5e-1;
-  const double maxTime = 5000.; //in ns
   const double maxTrials = 100;
+
+  int ialpha = getAlphaBin(alpha);
+  int itheta = getThetaBin(theta);
+
+  double maxTime = 5000.; //in ns
+  if (m_XT[iCLayer][lr][ialpha][itheta][7] == 0.) {
+    maxTime = m_XT[iCLayer][lr][ialpha][itheta][6];
+  }
 
   double t0 = 0.;
   double d0 = getDriftLength(t0, iCLayer, lr, alpha, theta) - dist;
@@ -1058,4 +1007,36 @@ double CDCGeometryPar::getAlpha(const TVector3& posOnWire, const TVector3& momen
 double CDCGeometryPar::getTheta(const TVector3& momentum) const
 {
   return atan2(momentum.Perp(), momentum.z());
+}
+
+int CDCGeometryPar::getAlphaBin(const double alpha) const
+{
+  //tentative
+  int ialpha = (alpha >= 0.) ? (alpha * 180. / M_PI + 5.) / 10. : (alpha * 180. / M_PI - 5.) / 10.;
+  ialpha += 9;
+  ialpha = std::max(0, ialpha);
+  ialpha = std::min(18, ialpha);
+  return ialpha;
+}
+
+int CDCGeometryPar::getThetaBin(const double theta) const
+{
+  double th = 180. * theta / M_PI;
+  //hard-coded tentatively
+  int itheta = 0;
+  if (th < 29.0) {
+  } else if (th <  50.0) {
+    itheta = 1;
+  } else if (th <  75.0) {
+    itheta = 2;
+  } else if (th < 105.0) {
+    itheta = 3;
+  } else if (th < 125.0) {
+    itheta = 4;
+  } else if (th < 139.5) {
+    itheta = 5;
+  } else {
+    itheta = 6;
+  }
+  return itheta;
 }

@@ -59,7 +59,7 @@ void RawCOPPER::SetVersion()
       break;
     default : {
       char err_buf[500];
-      sprintf(err_buf, "Invalid version of a data format(0x%.2x). Exiting...\n %s %s %d\n",
+      sprintf(err_buf, "Invalid version of a data format(0x%.8x = 0x7f7f**..). Exiting...\n %s %s %d\n",
               m_buffer[ POS_FORMAT_VERSION ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
       perror(err_buf);
       string err_str = err_buf; throw (err_str);
@@ -117,21 +117,20 @@ void RawCOPPER::SetVersion(string class_name)
 
 
 
-void RawCOPPER::SetBuffer(int* bufin, int nwords, int malloc_flag, int num_events, int num_nodes)
+void RawCOPPER::SetBuffer(int* bufin, int nwords, int delete_flag, int num_events, int num_nodes)
 {
   if (bufin == NULL) {
     printf("[DEBUG] bufin is NULL. Exting...\n");
     exit(1);
   }
+  if (m_delete_flag && m_buffer != NULL) delete[] m_buffer;
 
-  if (!m_use_prealloc_buf && m_buffer != NULL) delete[] m_buffer;
-
-  if (malloc_flag == 0) {
-    m_use_prealloc_buf = true;
+  if (delete_flag == 0) {
+    m_delete_flag = false;
   } else {
-    m_use_prealloc_buf = false;
+    m_delete_flag = true;
   }
-  //  m_nwords = bufin[0];
+
   m_nwords = nwords;
   m_buffer = bufin;
 
@@ -181,11 +180,11 @@ void RawCOPPER::PackDetectorBuf(
                                          detector_buf_4th, nwords_4th,
                                          rawcprpacker_info);
 
-  int malloc_flag = 1; // Not use preallocated buffer. Delete m_buffer when destructer is called.
-  SetBuffer(packed_buf, m_nwords, malloc_flag, m_num_events, m_num_nodes);
+  int delete_flag = 1; // Not use preallocated buffer. Delete m_buffer when destructer is called.
+  SetBuffer(packed_buf, m_nwords, delete_flag, m_num_events, m_num_nodes);
 
-  malloc_flag = 0; // For m_access, need not to delete m_buffer
-  m_access->SetBuffer(m_buffer, m_nwords, malloc_flag, m_num_events, m_num_nodes);
+  delete_flag = 0; // For m_access, need not to delete m_buffer
+  m_access->SetBuffer(m_buffer, m_nwords, delete_flag, m_num_events, m_num_nodes);
 
   return;
 }
@@ -215,11 +214,11 @@ void RawCOPPER::PackDetectorBuf4DummyData(
                                          detector_buf_4th, nwords_4th,
                                          rawcprpacker_info);
 
-  int malloc_flag = 1; // Not use preallocated buffer. Delete m_buffer when destructer is called.
-  SetBuffer(packed_buf, m_nwords, malloc_flag, m_num_events, m_num_nodes);
+  int delete_flag = 1; // Not use preallocated buffer. Delete m_buffer when destructer is called.
+  SetBuffer(packed_buf, m_nwords, delete_flag, m_num_events, m_num_nodes);
 
-  malloc_flag = 0; // For m_access, need not to delete m_buffer
-  m_access->SetBuffer(m_buffer, m_nwords, malloc_flag, m_num_events, m_num_nodes);
+  delete_flag = 0; // For m_access, need not to delete m_buffer
+  m_access->SetBuffer(m_buffer, m_nwords, delete_flag, m_num_events, m_num_nodes);
 
   return;
 }

@@ -31,8 +31,8 @@ namespace Belle2 {
     //! Destructor
     virtual ~RawDataBlock();
 
-    //! set buffer ( malloc_flag : m_buffer is freeed( = 0 )/ not freeed( = 1 ) in Destructer )
-    virtual void SetBuffer(int* bufin, int nwords, int malloc_flag, int num_events, int num_nodes);
+    //! set buffer ( delete_flag : m_buffer is freeed( = 0 )/ not freeed( = 1 ) in Destructer )
+    virtual void SetBuffer(int* bufin, int nwords, int delete_flag, int num_events, int num_nodes);
 
     //! Get total length of m_buffer
     virtual int TotalBufNwords();
@@ -55,8 +55,8 @@ namespace Belle2 {
     //! get # of events in m_buffer
     virtual int GetNumEvents() { return m_num_events; }
 
-    //! get malloc_flag
-    virtual int GetPreAllocFlag() { return m_use_prealloc_buf; }
+    //! get delete_flag
+    virtual int GetDeleteFlag() { return m_delete_flag; }
 
     //! get size of a data block
     virtual int GetBlockNwords(int n);
@@ -99,8 +99,8 @@ namespace Belle2 {
     /// Buffer
     int* m_buffer; //[m_nwords]
 
-    //! flag for deleting m_buffer in destructer(1:delete, 0: not delete)
-    int m_use_prealloc_buf;
+    //! flag for deleting m_buffer in RawDataBlock destructer(1:delete, 0: not delete)
+    int m_delete_flag;
 
     //! no longer used
     int m_which_part;

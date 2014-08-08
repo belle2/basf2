@@ -94,9 +94,9 @@ void DeSerializerFILEModule::initialize()
 }
 
 
-int* DeSerializerFILEModule::readOneDataBlock(int* malloc_flag, int* size_word, int* data_type)
+int* DeSerializerFILEModule::readOneDataBlock(int* delete_flag, int* size_word, int* data_type)
 {
-  *malloc_flag = 1;
+  *delete_flag = 1;
   //
   // Read 1st word( data size ) of RawDataBlock
   //
@@ -222,14 +222,14 @@ int* DeSerializerFILEModule::readfromFILE(FILE* fp_in, const int size_word, cons
 
 
 #ifndef REDUCED_RAWCOPPER
-int* DeSerializerFILEModule::modify131213SVDdata(int* buf_in, int* buf_in_nwords, int* malloc_flag, unsigned int evenum)
+int* DeSerializerFILEModule::modify131213SVDdata(int* buf_in, int* buf_in_nwords, int* delete_flag, unsigned int evenum)
 {
 
 
 
   // prepare buffer
   int* buf_out = new int[ *buf_in_nwords + 1 ];
-  *malloc_flag = 1;
+  *delete_flag = 1;
   memset(buf_out, 0, sizeof(int) * (*buf_in_nwords + 1));
 
 
@@ -361,8 +361,8 @@ void DeSerializerFILEModule::event()
 
   while (true) {
     int size_word = 0;
-    int malloc_flag = 0;
-    //    int* temp_buf = readOneEventFromCOPPERFIFO(j, &malloc_flag, &size_word);
+    int delete_flag = 0;
+    //    int* temp_buf = readOneEventFromCOPPERFIFO(j, &delete_flag, &size_word);
     int* temp_buf;
 
     if (m_prev_buf_flag == 1) {
@@ -371,7 +371,7 @@ void DeSerializerFILEModule::event()
       m_prev_buf_flag = 0;
     } else {
       int data_type;
-      temp_buf = readOneDataBlock(&malloc_flag, &size_word, &data_type);
+      temp_buf = readOneDataBlock(&delete_flag, &size_word, &data_type);
 
 
       if (temp_buf == 0x0) { // End of File
@@ -385,7 +385,7 @@ void DeSerializerFILEModule::event()
       //
 #ifndef REDUCED_RAWCOPPER
       {
-        int* temp_temp_buf = modify131213SVDdata(temp_buf, &size_word, &malloc_flag, m_dummy_evenum);
+        int* temp_temp_buf = modify131213SVDdata(temp_buf, &size_word, &delete_flag, m_dummy_evenum);
         delete temp_buf;
         temp_buf = temp_temp_buf;
         m_dummy_evenum++;

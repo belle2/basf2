@@ -90,10 +90,10 @@ void PrintDataModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
 
 
   RawFTSW rawftsw;
-  int malloc_flag = 0; // No need to free the buffer
+  int delete_flag = 0; // No need to free the buffer
   int num_event = 1;
   int num_nodes = 1;
-  rawftsw.SetBuffer(buf, nwords, malloc_flag, num_event, num_nodes);
+  rawftsw.SetBuffer(buf, nwords, delete_flag, num_event, num_nodes);
 
 
   timeval tv;
@@ -267,14 +267,14 @@ void PrintDataModule::event()
     for (int j = 0; j < raw_datablkarray[ i ]->GetNumEntries(); j++) {
       int* temp_buf = raw_datablkarray[ i ]->GetBuffer(j);
       int nwords = raw_datablkarray[ i ]->GetBlockNwords(j);
-      int malloc_flag = 0;
+      int delete_flag = 0;
       int num_nodes = 1;
       int num_events = 1;
       if (raw_datablkarray[ i ]->CheckFTSWID(j)) {
         // FTSW data block
         printf("\n===== DataBlock( RawDataBlock(FTSW) ) : Block # %d ", i);
         RawFTSW temp_raw_ftsw;
-        temp_raw_ftsw.SetBuffer(temp_buf, nwords, malloc_flag, num_nodes, num_events);
+        temp_raw_ftsw.SetBuffer(temp_buf, nwords, delete_flag, num_nodes, num_events);
         printFTSWEvent(&temp_raw_ftsw, 0);
       } else if (raw_datablkarray[ i ]->CheckTLUID(j)) {
         // No operation
@@ -283,7 +283,7 @@ void PrintDataModule::event()
         // COPPER data block
         printf("\n===== DataBlock( RawDataBlock(COPPER) ) : Block # %d ", i);
         RawCOPPER temp_raw_copper;
-        temp_raw_copper.SetBuffer(temp_buf, nwords, malloc_flag, num_nodes, num_events);
+        temp_raw_copper.SetBuffer(temp_buf, nwords, delete_flag, num_nodes, num_events);
         printCOPPEREvent(&temp_raw_copper, 0);
 
       }

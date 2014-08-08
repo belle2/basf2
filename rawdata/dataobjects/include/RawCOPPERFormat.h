@@ -59,8 +59,8 @@ namespace Belle2 {
     //
     // Functions for  RawDataBlock
     //
-    //! set buffer ( malloc_flag : m_buffer is freeed( = 0 )/ not freeed( = 1 ) in Destructer )
-    void SetBuffer(int* bufin, int nwords, int malloc_flag, int num_events, int num_nodes);
+    //! set buffer ( delete_flag : m_buffer is freeed( = 0 )/ not freeed( = 1 ) in Destructer )
+    void SetBuffer(int* bufin, int nwords, int delete_flag, int num_events, int num_nodes);
 
     //! Get total length of m_buffer
     virtual int TotalBufNwords();

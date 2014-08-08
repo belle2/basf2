@@ -203,7 +203,7 @@ int DeSerializerPCModule::Connect()
 
 
 
-int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int* num_events_in_sendblock, int* num_nodes_in_sendblock)
+int* DeSerializerPCModule::recvData(int* delete_flag, int* total_buf_nwords, int* num_events_in_sendblock, int* num_nodes_in_sendblock)
 {
 
   int* temp_buf = NULL; // buffer for data-body
@@ -281,7 +281,7 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
   }
 
 
-  temp_buf = getBuffer(*total_buf_nwords, malloc_flag); // this include only data body
+  temp_buf = getNewBuffer(*total_buf_nwords, delete_flag); // this include only data body
   //
   // Read body
   //
@@ -332,7 +332,7 @@ int* DeSerializerPCModule::recvData(int* malloc_flag, int* total_buf_nwords, int
 }
 
 
-void DeSerializerPCModule::setRecvdBuffer(RawDataBlock* temp_raw_datablk, int* malloc_flag)
+void DeSerializerPCModule::setRecvdBuffer(RawDataBlock* temp_raw_datablk, int* delete_flag)
 {
   //
   // Get data from socket
@@ -342,7 +342,7 @@ void DeSerializerPCModule::setRecvdBuffer(RawDataBlock* temp_raw_datablk, int* m
   int num_nodes_in_sendblock = 0;
 
   if (m_start_flag == 0) B2INFO("DeSerializerPC: Reading the 1st packet from eb0...");
-  int* temp_buf = recvData(malloc_flag, &total_buf_nwords, &num_events_in_sendblock,
+  int* temp_buf = recvData(delete_flag, &total_buf_nwords, &num_events_in_sendblock,
                            &num_nodes_in_sendblock);
   if (m_start_flag == 0) {
     B2INFO("DeSerializerPC: Done. the size of the 1st packet " << total_buf_nwords << " words");
@@ -350,8 +350,8 @@ void DeSerializerPCModule::setRecvdBuffer(RawDataBlock* temp_raw_datablk, int* m
   }
   m_totbytes += total_buf_nwords * sizeof(int);
 
-  int temp_malloc_flag = 0;
-  temp_raw_datablk->SetBuffer((int*)temp_buf, total_buf_nwords, temp_malloc_flag,
+  int temp_delete_flag = 0;
+  temp_raw_datablk->SetBuffer((int*)temp_buf, total_buf_nwords, temp_delete_flag,
                               num_events_in_sendblock, num_nodes_in_sendblock);
 
   //
@@ -596,9 +596,9 @@ void DeSerializerPCModule::event()
     //
     // Set buffer to the RawData class stored in DataStore
     //
-    int malloc_flag_from = 0, malloc_flag_to = 0;
+    int delete_flag_from = 0, delete_flag_to = 0;
     RawDataBlock temp_rawdatablk;
-    setRecvdBuffer(&temp_rawdatablk, &malloc_flag_from);
+    setRecvdBuffer(&temp_rawdatablk, &delete_flag_from);
 
     //    temp_rawdatablk.PrintData( temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords() );
     checkData(&temp_rawdatablk, &eve_copper_0);
@@ -614,21 +614,21 @@ void DeSerializerPCModule::event()
     // Copy reduced buffer
     //
 
-    int* buf_to = getBuffer(m_pre_rawcpr.CalcReducedDataSize(&temp_rawdatablk),
-                            &malloc_flag_to);
+    int* buf_to = getNewBuffer(m_pre_rawcpr.CalcReducedDataSize(&temp_rawdatablk),
+                               &delete_flag_to);
 
-    m_pre_rawcpr.CopyReducedData(&temp_rawdatablk, buf_to, malloc_flag_from);
+    m_pre_rawcpr.CopyReducedData(&temp_rawdatablk, buf_to, delete_flag_from);
 
 
 
 
 #else
-    malloc_flag_to = malloc_flag_from;
+    delete_flag_to = delete_flag_from;
 #endif
 
     RawDataBlock* raw_datablk = raw_datablkarray.appendNew();
     raw_datablk->SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
-                           malloc_flag_to, temp_rawdatablk.GetNumEvents(),
+                           delete_flag_to, temp_rawdatablk.GetNumEvents(),
                            temp_rawdatablk.GetNumNodes());
 
     // CRC16 check

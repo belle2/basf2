@@ -99,7 +99,7 @@ namespace Belle2 {
 
     StoreArray<RawDataBlock> raw_dblkarray;
 
-    virtual int* readOneEventFromCOPPERFIFO(const int entry, int* malloc_flag, int* m_size_word);
+    virtual int* readOneEventFromCOPPERFIFO(const int entry, int* delete_flag, int* m_size_word);
     virtual void openCOPPER();
     //! receive data
     virtual int readFD(int fd, char* buf, int data_size_byte);

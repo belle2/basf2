@@ -128,15 +128,15 @@ void DeSerializerHLTModule::event()
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP_PC; j++) {
     // Get a record from socket
     int total_buf_nwords = 0 ;
-    int malloc_flag = 0;
+    int delete_flag = 0;
     int num_events_in_sendblock = 0;
     int num_nodes_in_sendblock = 0;
 
     // Receive data
-    int* temp_buf = recvData(&malloc_flag, &total_buf_nwords,
+    int* temp_buf = recvData(&delete_flag, &total_buf_nwords,
                              &num_events_in_sendblock, &num_nodes_in_sendblock);
     RawCOPPER temp_rawcopper;
-    temp_rawcopper.SetBuffer(temp_buf, total_buf_nwords, malloc_flag, num_events_in_sendblock, num_nodes_in_sendblock);
+    temp_rawcopper.SetBuffer(temp_buf, total_buf_nwords, delete_flag, num_events_in_sendblock, num_nodes_in_sendblock);
 
 
     // Store data to DataStore
@@ -146,8 +146,8 @@ void DeSerializerHLTModule::event()
         int buf_nwords = temp_rawcopper.GetBlockNwords(index);
 
         int* temp_buf2 = NULL;
-        int malloc_flag2 = 0;
-        temp_buf2 = getBuffer(buf_nwords, &malloc_flag2);
+        int delete_flag2 = 0;
+        temp_buf2 = getNewBuffer(buf_nwords, &delete_flag2);
         memcpy(temp_buf2, temp_rawcopper.GetBuffer(index), sizeof(int)*buf_nwords);
         const int temp_num_events = 1;
         const int temp_num_nodes = 1;
@@ -159,37 +159,37 @@ void DeSerializerHLTModule::event()
           case CDC_ID :
             RawCDC* rawcdc;
             rawcdc = raw_cdcarray.appendNew();
-            rawcdc->SetBuffer(temp_buf2, buf_nwords, malloc_flag2, temp_num_events, temp_num_nodes);
+            rawcdc->SetBuffer(temp_buf2, buf_nwords, delete_flag2, temp_num_events, temp_num_nodes);
             break;
           case SVD_ID :
             RawSVD* rawsvd;
             rawsvd = raw_svdarray.appendNew();
-            rawsvd->SetBuffer(temp_buf2, buf_nwords, malloc_flag2, temp_num_events, temp_num_nodes);
+            rawsvd->SetBuffer(temp_buf2, buf_nwords, delete_flag2, temp_num_events, temp_num_nodes);
             break;
           case BECL_ID :
             RawECL* rawecl;
             rawecl = raw_eclarray.appendNew();
-            rawecl->SetBuffer(temp_buf2, buf_nwords, malloc_flag2, temp_num_events, temp_num_nodes);
+            rawecl->SetBuffer(temp_buf2, buf_nwords, delete_flag2, temp_num_events, temp_num_nodes);
             break;
           case BPID_ID :
             RawBPID* rawbpid;
             rawbpid = raw_bpidarray.appendNew();
-            rawbpid->SetBuffer(temp_buf2, buf_nwords, malloc_flag2, temp_num_events, temp_num_nodes);
+            rawbpid->SetBuffer(temp_buf2, buf_nwords, delete_flag2, temp_num_events, temp_num_nodes);
             break;
           case EPID_ID :
             RawEPID* rawepid;
             rawepid = raw_epidarray.appendNew();
-            rawepid->SetBuffer(temp_buf2, buf_nwords, malloc_flag2, temp_num_events, temp_num_nodes);
+            rawepid->SetBuffer(temp_buf2, buf_nwords, delete_flag2, temp_num_events, temp_num_nodes);
             break;
           case BKLM_ID :
             RawKLM* rawklm;
             rawklm = raw_klmarray.appendNew();
-            rawklm->SetBuffer(temp_buf2, buf_nwords, malloc_flag2, temp_num_events, temp_num_nodes);
+            rawklm->SetBuffer(temp_buf2, buf_nwords, delete_flag2, temp_num_events, temp_num_nodes);
             break;
           default :
             RawCOPPER* rawcopper;
             rawcopper = rawcprarray.appendNew();
-            rawcopper->SetBuffer(temp_buf2, buf_nwords, malloc_flag2, temp_num_events, temp_num_nodes);
+            rawcopper->SetBuffer(temp_buf2, buf_nwords, delete_flag2, temp_num_events, temp_num_nodes);
             break;
         }
         // Fill header and trailer
@@ -198,7 +198,7 @@ void DeSerializerHLTModule::event()
 
     m_totbytes += total_buf_nwords * sizeof(int);
 
-    if (malloc_flag == 1) delete temp_buf;
+    if (delete_flag == 1) delete temp_buf;
   }
 
   //

@@ -24,9 +24,9 @@ set_log_level(LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 
 # input
-# input = register_module('RootInput')
-input = register_module('SeqRootInput')
-input.param('inputFileName', '/home/usr/yamadas/e0000r000634.binary')
+input = register_module('RootInput')
+# input = register_module('SeqRootInput')
+# input.param('inputFileName', '/home/usr/yamadas/e0000r000634.binary') # only for SeqRootInput
 
 # output
 output = register_module('PrintData')

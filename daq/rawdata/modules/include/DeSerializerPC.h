@@ -77,10 +77,10 @@ namespace Belle2 {
 
 
     //! receive data
-    virtual int* recvData(int* malloc_flag, int* total_m_size_word, int* num_events_in_sendblock, int* num_nodes_in_sendblock);
+    virtual int* recvData(int* delete_flag, int* total_m_size_word, int* num_events_in_sendblock, int* num_nodes_in_sendblock);
 
     //! attach buffer to RawDataBlock
-    virtual void setRecvdBuffer(RawDataBlock* raw_datablk, int* malloc_flag);
+    virtual void setRecvdBuffer(RawDataBlock* raw_datablk, int* delete_flag);
 
     //! check data contents
     virtual void checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0);

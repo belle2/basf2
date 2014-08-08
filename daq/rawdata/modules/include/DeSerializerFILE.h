@@ -45,14 +45,14 @@ namespace Belle2 {
     virtual void fileOpen();
 
     //! receive data
-    virtual int* readOneDataBlock(int* malloc_flag, int* m_size_word, int* data_type);
+    virtual int* readOneDataBlock(int* delete_flag, int* m_size_word, int* data_type);
 
     //! read data from file
     virtual int* readfromFILE(FILE* fp_in, const int size_word, const int start_word, const int stop_word);
 
 #ifndef REDUCED_RAWCOPPER
     //! read data from file
-    virtual int* modify131213SVDdata(int* buf_in, int* buf_in_nwords, int* malloc_flag, unsigned int evenum);
+    virtual int* modify131213SVDdata(int* buf_in, int* buf_in_nwords, int* delete_flag, unsigned int evenum);
 #endif
 
 

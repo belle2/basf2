@@ -298,14 +298,14 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
 #endif // REDUCED_RAWCOPPER
 
 
-int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* malloc_flag, int* m_size_word)
+int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* delete_flag, int* m_size_word)
 {
 
   // prepare buffer
   *m_size_word = 0;
   int* temp_buf = m_bufary[ entry ];
   temp_buf[0] =  BUF_SIZE_WORD ;
-  *malloc_flag = 0;
+  *delete_flag = 0;
 
 #ifndef DUMMY
   //
@@ -406,7 +406,7 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
   ) {
     // Check buffer size
     if (*m_size_word >  BUF_SIZE_WORD) {
-      *malloc_flag = 1;
+      *delete_flag = 1;
       temp_buf = new int[ *m_size_word ];
 
 
@@ -690,7 +690,7 @@ void DeSerializerCOPPERModule::event()
   //  RawCOPPER* temp_rawcopper;
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP_COPPER; j++) {
     int m_size_word = 0;
-    int malloc_flag = 0;
+    int delete_flag = 0;
     if (m_start_flag == 0) {
       B2INFO("DeSerializerCOPPER: Reading the 1st event from COPPER FIFO...");
     }
@@ -698,7 +698,7 @@ void DeSerializerCOPPERModule::event()
 
     int* temp_buf;
     try {
-      temp_buf = readOneEventFromCOPPERFIFO(j, &malloc_flag, &m_size_word);
+      temp_buf = readOneEventFromCOPPERFIFO(j, &delete_flag, &m_size_word);
     } catch (string err_str) {
 #ifdef NONSTOP
       if (err_str == "EAGAIN") {
@@ -722,7 +722,7 @@ void DeSerializerCOPPERModule::event()
     const int num_nodes = 1;
     const int num_events = 1;
     temp_rawdblk =  raw_dblkarray.appendNew();
-    temp_rawdblk->SetBuffer(temp_buf, m_size_word, malloc_flag, num_events, num_nodes);
+    temp_rawdblk->SetBuffer(temp_buf, m_size_word, delete_flag, num_events, num_nodes);
     // Fill Header and Trailer
 
 #ifndef REDUCED_RAWCOPPER

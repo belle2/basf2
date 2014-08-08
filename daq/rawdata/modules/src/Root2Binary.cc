@@ -78,18 +78,18 @@ void Root2BinaryModule::writeEvent(RawDataBlock* raw_dblk, int* first_flag, int*
     unsigned int prev_eve = *dblk_eve;
     int num_nodes = 1;
     int num_events = 1;
-    int malloc_flag = 0;
+    int delete_flag = 0;
     int nwords = raw_dblk->GetBlockNwords(j);
     int* temp_buf = raw_dblk->GetBuffer(j);
 
 
     if (raw_dblk->CheckFTSWID(j)) {
       RawFTSW temp_raw_ftsw;
-      temp_raw_ftsw.SetBuffer(temp_buf, nwords, malloc_flag, num_nodes, num_events);
+      temp_raw_ftsw.SetBuffer(temp_buf, nwords, delete_flag, num_nodes, num_events);
       *dblk_eve = temp_raw_ftsw.GetEveNo(0);
     } else {
       RawCOPPER temp_raw_copper;
-      temp_raw_copper.SetBuffer(temp_buf, nwords, malloc_flag, num_nodes, num_events);
+      temp_raw_copper.SetBuffer(temp_buf, nwords, delete_flag, num_nodes, num_events);
       *dblk_eve = temp_raw_copper.GetEveNo(0);
     }
 

@@ -116,7 +116,7 @@ namespace Belle2 {
     virtual int* getPreAllocBuf();
 
     //! Getbuffer
-    virtual int* getBuffer(int nwords, int* malloc_flag);
+    virtual int* getNewBuffer(int nwords, int* delete_flag);
 
     // For monitoring
     timeval m_t0;

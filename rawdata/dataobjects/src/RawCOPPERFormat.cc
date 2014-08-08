@@ -76,10 +76,10 @@ int* RawCOPPERFormat::GetBuffer(int n)
 
 
 
-void RawCOPPERFormat::SetBuffer(int* bufin, int nwords, int malloc_flag, int num_events, int num_nodes)
+void RawCOPPERFormat::SetBuffer(int* bufin, int nwords, int delete_flag, int num_events, int num_nodes)
 {
-  if (malloc_flag  == 1) {
-    printf("RawCOPPER format class does not delete m_buffer. Please specify 0 for malloc_flag. Exiting...\n");
+  if (delete_flag  == 1) {
+    printf("RawCOPPER format class does not delete m_buffer. Please specify 0 for delete_flag. Exiting...\n");
     exit(1);
   }
 
@@ -89,7 +89,7 @@ void RawCOPPERFormat::SetBuffer(int* bufin, int nwords, int malloc_flag, int num
   }
 
 //   if (!m_use_prealloc_buf && m_buffer != NULL) delete[] m_buffer;
-//   if (malloc_flag == 0) {
+//   if (delete_flag == 0) {
 //     m_use_prealloc_buf = true;
 //   } else {
 //     m_use_prealloc_buf = false;

@@ -146,7 +146,7 @@ namespace Belle2 {
 
     //! reduce and merge header/trailer
     void CopyReducedData(RawDataBlock* raw_datablk, int* buf_to,
-                         int malloc_flag_from);
+                         int delete_flag_from);
 
     //! calculate reduced data size
     int CalcReducedNwords(int n);

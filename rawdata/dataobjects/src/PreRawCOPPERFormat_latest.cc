@@ -746,12 +746,12 @@ int PreRawCOPPERFormat_latest::CalcReducedDataSize(RawDataBlock* raw_datablk)
         reduced_nwords += raw_datablk->GetBlockNwords(entry_id);
       } else {
         PreRawCOPPERFormat_latest temp_prerawcpr;
-        int temp_malloc_flag = 0, temp_num_eve = 1, temp_num_nodes = 1;
+        int temp_delete_flag = 0, temp_num_eve = 1, temp_num_nodes = 1;
 
         // Call CalcReducedNwords
         temp_prerawcpr.SetBuffer(raw_datablk->GetBuffer(entry_id),
                                  raw_datablk->GetBlockNwords(entry_id),
-                                 temp_malloc_flag, temp_num_eve,
+                                 temp_delete_flag, temp_num_eve,
                                  temp_num_nodes);
         reduced_nwords += temp_prerawcpr.CalcReducedNwords(0);
       }
@@ -762,7 +762,7 @@ int PreRawCOPPERFormat_latest::CalcReducedDataSize(RawDataBlock* raw_datablk)
 }
 
 void PreRawCOPPERFormat_latest::CopyReducedData(RawDataBlock* raw_datablk, int* buf_to,
-                                                int malloc_flag_from)
+                                                int delete_flag_from)
 {
   //
   // Make a reduced buffer a total RawDataBlock (containing multiple data blocks)
@@ -790,7 +790,7 @@ void PreRawCOPPERFormat_latest::CopyReducedData(RawDataBlock* raw_datablk, int* 
   raw_datablk->SetBuffer(buf_to, pos_nwords_to, 0,
                          raw_datablk->GetNumEvents(), raw_datablk->GetNumNodes());
 
-  if (malloc_flag_from == 1) { delete[] buf_from;}
+  if (delete_flag_from == 1) { delete[] buf_from;}
   return ;
 }
 

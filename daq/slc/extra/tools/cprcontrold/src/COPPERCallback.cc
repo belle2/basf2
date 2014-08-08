@@ -17,10 +17,9 @@ using namespace Belle2;
 
 COPPERCallback::COPPERCallback(const NSMNode& node,
                                FEEController* fee)
-  : RCCallback(node)
+  : RCCallback(node), m_fee(fee)
 {
   m_con.setCallback(this);
-  m_fee = fee;
 }
 
 COPPERCallback::~COPPERCallback() throw()
@@ -30,6 +29,7 @@ COPPERCallback::~COPPERCallback() throw()
 void COPPERCallback::init() throw()
 {
   m_con.init(getNode().getName());
+  m_ttrx.open();
   m_copper.open();
   m_flow.open(&m_con.getInfo());
   m_data = NSMData(getNode().getName() + "_STATUS", "ronode_status", 1);
@@ -40,7 +40,9 @@ void COPPERCallback::term() throw()
 {
   m_con.abort();
   m_con.getInfo().unlink();
-  m_fee->close();
+  for (int i = 0; i < 4; i++) {
+    m_hslb[i].close();
+  }
   m_copper.close();
   m_ttrx.close();
 }
@@ -52,18 +54,42 @@ void COPPERCallback::timeout() throw()
   ronode_status& status(m_flow.monitor());
   int eflag = (status.eflag & 0xFF);
   eflag |= m_copper.isFifoFull() << 5;
-  eflag |= m_copper.isFifoEmpty() << 6;
+  eflag |= (getNode().getState() == RCState::RUNNING_S && m_copper.isFifoEmpty()) << 6;
   eflag |= m_copper.isLengthFifoFull() << 7;
   for (int i = 0; i < 4; i++) {
-    m_fee->monitor(i, m_config.getFEE(i));
-    eflag |= m_fee->isBelle2LinkDown(i) << (8 + i);
-    eflag |= m_fee->isCOPPERFifoFull(i) << (12 + i);
-    eflag |= m_fee->isCOPPERLengthFifoFull(i) << (16 + i);
-    eflag |= m_fee->isHSLBFifoFull(i) << (20 + i);
-    eflag |= m_fee->isHSLBCRCError(i) << (24 + i);
+    if (m_config.useHSLB(i)) {
+      m_hslb[i].monitor();
+      eflag |= m_hslb[i].isBelle2LinkDown() << (8 + i);
+      eflag |= m_hslb[i].isCOPPERFifoFull() << (12 + i);
+      eflag |= m_hslb[i].isCOPPERLengthFifoFull() << (16 + i);
+      eflag |= m_hslb[i].isFifoFull() << (20 + i);
+      eflag |= m_hslb[i].isCRCError() << (24 + i);
+    }
   }
   eflag |= m_ttrx.isBelle2LinkError() << 28;
   eflag |= m_ttrx.isLinkUpError() << 29;
+
+  printf("FIFO full               : %s\n", (m_copper.isFifoFull() ? "true" : "false"));
+  printf("FIFO empty              : %s\n", (m_copper.isFifoEmpty() ? "true" : "false"));
+  printf("Length FIFO full        : %s\n",
+         (m_copper.isLengthFifoFull() ? "true" : "false"));
+  printf("\n");
+
+  for (int i = 0; i < 4; i++) {
+    if (m_config.useHSLB(i)) {
+      printf("Belle2 link down        : %s\n", (m_hslb[i].isBelle2LinkDown() ? "true" : "false"));
+      printf("COPPER fifo full        : %s\n", (m_hslb[i].isCOPPERFifoFull() ? "true" : "false"));
+      printf("COPPER length fifo full : %s\n", (m_hslb[i].isCOPPERLengthFifoFull() ? "true" : "false"));
+      printf("HSLB Fifo full          : %s\n", (m_hslb[i].isFifoFull() ? "true" : "false"));
+      printf("HSLB CRC error          : %s\n", (m_hslb[i].isCRCError() ? "true" : "false"));
+      printf("\n");
+    }
+  }
+
+  printf("Belle2 link error       : %s\n", (m_ttrx.isBelle2LinkError() ? "true" : "false"));
+  printf("Link up error           : %s\n", (m_ttrx.isLinkUpError() ? "true" : "false"));
+  printf("\n");
+
   status.eflag = eflag;
   if (getNode().getState() != RCState::RECOVERING_RS && eflag > 0) {
     getNode().setState(RCState::RECOVERING_RS);
@@ -77,8 +103,13 @@ bool COPPERCallback::load() throw()
   m_config.read(getConfig().getObject());
   if (!m_ttrx.isOpened()) {
     m_ttrx.open();
-    m_ttrx.boot(m_config.getSetup().getTTRXFirmware());
-    m_ttrx.monitor();
+    //m_ttrx.boot(m_config.getSetup().getTTRXFirmware());
+  }
+  for (int i = 0; i < 4; i++) {
+    if (m_config.useHSLB(i)) {
+      m_hslb[i].open(i);
+      m_hslb[i].load();
+    }
   }
   return recover();
 }
@@ -106,13 +137,12 @@ bool COPPERCallback::pause() throw()
 bool COPPERCallback::recover() throw()
 {
   if (m_ttrx.isError()) {
-    m_ttrx.boot(m_config.getSetup().getTTRXFirmware());
+    //m_ttrx.boot(m_config.getSetup().getTTRXFirmware());
   }
-  for (size_t i = 0; i < 4; i++) {
-    if (m_config.useHSLB(i)) {
-      if (m_fee->open(i, m_config.getFEE(i))) {
-        m_fee->load(i, m_config.getFEE(i));
-      }
+  for (int i = 0; i < 4; i++) {
+    if (m_config.useHSLB(i) && m_hslb[i].isError()) {
+      //m_hslb[i].boot(m_config.getSetup().getHSLBFirmware());
+      m_hslb[i].load();
     }
   }
   if (bootBasf2()) {
@@ -126,7 +156,6 @@ bool COPPERCallback::recover() throw()
 bool COPPERCallback::abort() throw()
 {
   m_con.abort();
-  m_fee->close();
   getNode().setState(RCState::NOTREADY_S);
   return true;
 }

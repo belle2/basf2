@@ -2,6 +2,7 @@
 #define _Belle2_COPPERCallback_h
 
 #include "FEEController.h"
+#include "HSLBController.h"
 #include "TTRXController.h"
 #include "COPPERController.h"
 #include "COPPERConfig.h"
@@ -36,8 +37,9 @@ namespace Belle2 {
     bool bootBasf2() throw();
 
   private:
-    ProcessController m_con;
     FEEController* m_fee;
+    ProcessController m_con;
+    HSLBController m_hslb[4];
     TTRXController m_ttrx;
     COPPERController m_copper;
     FlowMonitor m_flow;

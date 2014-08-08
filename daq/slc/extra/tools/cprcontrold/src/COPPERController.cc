@@ -109,6 +109,63 @@ copper_info& COPPERController::monitor() throw()
   return m_info;
 }
 
+void COPPERController::print() throw()
+{
+  printf("%x\n", m_info.ff_sta);
+  printf("%x\n", m_info.conf_w_ae[0]);
+  printf("%x\n", m_info.conf_w_ae[1]);
+  printf("%x\n", m_info.conf_w_ae[2]);
+  printf("%x\n", m_info.conf_w_ae[3]);
+  printf("%x\n", m_info.conf_w_ff[0]);
+  printf("%x\n", m_info.conf_w_ff[1]);
+  printf("%x\n", m_info.conf_w_ff[2]);
+  printf("%x\n", m_info.conf_w_ff[3]);
+  printf("%x\n", m_info.conf_w_af[0]);
+  printf("%x\n", m_info.conf_w_af[1]);
+  printf("%x\n", m_info.conf_w_af[2]);
+  printf("%x\n", m_info.conf_w_af[3]);
+  printf("%x\n", m_info.ff_rst);
+  printf("%x\n", m_info.finesse_sta);
+  printf("%x\n", m_info.almfull_enb);
+  printf("%x\n", m_info.version);
+  printf("%x\n", m_info.trgcm);
+  printf("%x\n", m_info.trg_leng);
+  printf("%x\n", m_info.lef_readsel);
+  printf("%x\n", m_info.lef_total);
+  printf("%x\n", m_info.lef[0]);
+  printf("%x\n", m_info.lef[1]);
+  printf("%x\n", m_info.lef_sta);
+  printf("%x\n", m_info.lef_w_ff[0]);
+  printf("%x\n", m_info.lef_w_ff[1]);
+  printf("%x\n", m_info.lef_w_ff[2]);
+  printf("%x\n", m_info.lef_w_ff[3]);
+  printf("%x\n", m_info.lef_w_af[0]);
+  printf("%x\n", m_info.lef_w_af[1]);
+  printf("%x\n", m_info.lef_w_af[2]);
+  printf("%x\n", m_info.lef_w_af[3]);
+  printf("%x\n", m_info.int_sta);
+  printf("%x\n", m_info.int_mask);
+  printf("%x\n", m_info.ff_rw);
+  printf("%x\n", m_info.int_factor);
+  printf("%x\n", m_info.ewrp_w[0]);
+  printf("%x\n", m_info.ewrp_w[1]);
+  printf("%x\n", m_info.ewrp_w[2]);
+  printf("%x\n", m_info.ewrp_w[3]);
+
+  printf("%x\n", m_info.we_counter[0]);
+  printf("%x\n", m_info.we_counter[1]);
+  printf("%x\n", m_info.we_counter[2]);
+  printf("%x\n", m_info.we_counter[3]);
+
+  printf("%x\n", m_info.lwr_dma[0]);
+  printf("%x\n", m_info.lwr_dma[1]);
+  printf("%x\n", m_info.lwr_dma[2]);
+  printf("%x\n", m_info.lwr_dma[3]);
+
+  printf("%x\n", m_info.dma_trans);
+  printf("%x\n", m_info.dma_ts_enb);
+}
+
 bool COPPERController::isFifoFull() throw()
 {
   if (m_fd <= 0) return false;

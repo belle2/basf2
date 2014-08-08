@@ -12,9 +12,11 @@
 using namespace Belle2;
 
 ConfigObject DBObjectLoader::load(const std::string& path,
-                                  const std::string& tablename)
+                                  const std::string& tablename,
+                                  bool search)
 {
   std::string filename = (path.size() == 0) ? tablename : path + "/" + tablename + ".conf";
+  std::cout << filename << std::endl;
   ConfigFile config(filename);
   int revision = config.getInt("revision");
   if (revision <= 0) revision = 1;
@@ -47,7 +49,11 @@ ConfigObject DBObjectLoader::load(const std::string& path,
         else if (type_s == "float") { obj.addFloat(name, 0); }
         else if (type_s == "double") { obj.addDouble(name, 0); }
         else if (type_s == "object") {
-          obj.addObject(name, ConfigObject());
+          ConfigObject cobj;
+          if (search) {
+            cobj = load(path, tablename + "." + name, search);
+          }
+          obj.addObject(name, cobj);
           type = FieldInfo::OBJECT;
         }
         if (type != FieldInfo::TEXT && type != FieldInfo::OBJECT) {

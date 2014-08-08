@@ -4,8 +4,6 @@
 #include <daq/slc/database/ConfigObject.h>
 #include <daq/slc/base/IOException.h>
 
-#include <mgt/mgt.h>
-
 #include "copper_info.h"
 
 namespace Belle2 {
@@ -21,6 +19,7 @@ namespace Belle2 {
     bool close() throw();
     int read(int request) throw(IOException);
     copper_info& monitor() throw();
+    void print() throw();
     const copper_info& getInfo() const throw() {
       return m_info;
     }

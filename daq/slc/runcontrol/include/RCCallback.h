@@ -47,7 +47,11 @@ namespace Belle2 {
     virtual void update() throw() {}
     void sendPause(const NSMNode& node) throw();
     void sendPause() throw();
-    void setFile(const std::string file) throw() { m_file = file; }
+    void setFilePath(const std::string path,
+                     const std::string tablename) throw() {
+      m_path = path;
+      m_tablename = tablename;
+    }
 
 
   protected:
@@ -59,7 +63,8 @@ namespace Belle2 {
     RCState m_state_demand;
     RCConfig m_config;
     DBInterface* m_db;
-    std::string m_file;
+    std::string m_path;
+    std::string m_tablename;
 
   };
 

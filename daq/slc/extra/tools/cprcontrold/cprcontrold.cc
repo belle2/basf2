@@ -12,11 +12,12 @@ int main(int argc, char** argv)
     LogFile::debug("Usage : ./cprcontrold <name>");
     return 1;
   }
-  daemon(0, 0);
+  //daemon(0, 0);
   const std::string name = argv[1];
   LogFile::open("cprcontrold_" + name);
   NSMNode node(name);
   COPPERCallback* callback = new COPPERCallback(node, NULL);
+  callback->setFilePath("/home/usr/tkonno/belle2/release/daq/slc/data/database", "copper");
   NSMNodeDaemon* daemon = new NSMNodeDaemon(callback);
   daemon->run();
 

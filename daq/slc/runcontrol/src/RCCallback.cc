@@ -99,9 +99,9 @@ bool RCCallback::perform(const NSMMessage& msg) throw()
 bool RCCallback::preload(const NSMMessage& msg) throw()
 {
   if (msg.getNParams() < 1) {
-    if (m_file.size() > 0) {
-      LogFile::warning("Loading object from file : %s", m_file.c_str());
-      ConfigObject obj = DBObjectLoader::load("", m_file);
+    if (m_tablename.size() > 0) {
+      LogFile::warning("Loading object from file : %s", m_tablename.c_str());
+      ConfigObject obj = DBObjectLoader::load(m_path, m_tablename, true);
       m_config.setObject(obj);
     } else {
       LogFile::debug("Loading method is not defined");

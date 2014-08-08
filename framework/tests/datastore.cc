@@ -18,24 +18,25 @@ namespace {
   protected:
     /** fill StoreArrays with entries from 0..9 */
     virtual void SetUp() {
+      StoreObjPtr<EventMetaData> evtPtr;
+      StoreArray<EventMetaData> evtData;
+      StoreArray<EventMetaData> evtDataDifferentName("EventMetaDatas_2");
+      StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Persistent);
+      StoreArray<ProfileInfo> profileInfo;
+
       DataStore::Instance().setInitializeActive(true);
-      StoreObjPtr<EventMetaData>::registerPersistent();
-      StoreArray<EventMetaData>::registerPersistent();
-      StoreArray<EventMetaData>::registerPersistent("EventMetaDatas_2");
-      StoreArray<EventMetaData>::registerPersistent("", DataStore::c_Persistent);
-      StoreArray<ProfileInfo>::registerPersistent();
+      evtPtr.registerInDataStore();
+      evtData.registerInDataStore();
+      evtDataDifferentName.registerInDataStore();
+      evtDataDifferentDurability.registerInDataStore();
+      profileInfo.registerInDataStore();
       DataStore::Instance().setInitializeActive(false);
 
-      StoreObjPtr<EventMetaData> evtPtr;
       evtPtr.create();
       evtPtr->setEvent(42);
 
-      StoreArray<EventMetaData> evtData;
-      StoreArray<EventMetaData> evtDataDifferentName("EventMetaDatas_2");
       evtDataDifferentName.create(); //StoreArrays can be explicitly created (can also be omitted)
-      StoreArray<EventMetaData> evtDataDifferentDurability("", DataStore::c_Persistent);
       evtDataDifferentDurability.create();
-      StoreArray<ProfileInfo> profileInfo;
       profileInfo.create();
 
       ProfileInfo profileInfoObject(128, 60.0);
@@ -369,7 +370,7 @@ namespace {
     EXPECT_EQ(i, evtData.getEntries());
   }
 
-  /** test registerPersistent(), optional() */
+  /** test registerInDataStore(), optional() */
   TEST_F(DataStoreTest, DataStoreRegistration)
   {
     StoreObjPtr<EventMetaData> evtPtr("abc123");
@@ -388,16 +389,16 @@ namespace {
     //emulate Module::initialize()
     DataStore::Instance().setInitializeActive(true);
     {
-      EXPECT_TRUE(evtPtr.registerAsPersistent());
-      EXPECT_TRUE(evtArray.registerAsTransient());
+      EXPECT_TRUE(evtPtr.registerInDataStore());
+      EXPECT_TRUE(evtArray.registerInDataStore(DataStore::c_DontWriteOut));
 
       //already registered, ok by default
-      EXPECT_TRUE(evtPtr.registerAsPersistent());
-      EXPECT_TRUE(evtArray.registerAsTransient());
+      EXPECT_TRUE(evtPtr.registerInDataStore());
+      EXPECT_TRUE(evtArray.registerInDataStore(DataStore::c_DontWriteOut));
 
-      //test errorIfExisting (return code=false + B2ERROR)
-      EXPECT_B2ERROR(EXPECT_FALSE(evtPtr.registerAsPersistent(true)));
-      EXPECT_B2ERROR(EXPECT_FALSE(evtArray.registerAsTransient(true)));
+      //test c_ErrorIfAlreadyRegistered (return code=false + B2ERROR)
+      EXPECT_B2ERROR(EXPECT_FALSE(evtPtr.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered)));
+      EXPECT_B2ERROR(EXPECT_FALSE(evtArray.registerInDataStore(DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered)));
     }
     DataStore::Instance().setInitializeActive(false);
 
@@ -415,9 +416,9 @@ namespace {
   TEST_F(DataStoreTest, RegistrationOutsideOfInitializeShouldFail)
   {
     //outside initialize(), registration results in an error
-    EXPECT_B2ERROR(StoreArray<EventMetaData>::registerPersistent("someothernewname"));
-    EXPECT_B2ERROR(StoreArray<EventMetaData>::registerTransient("someothernewname"));
-    EXPECT_FALSE(StoreArray<EventMetaData>::optional("someothernewname"));
+    EXPECT_B2ERROR(StoreArray<EventMetaData>().registerInDataStore("someothernewname"));
+    EXPECT_B2ERROR(StoreArray<EventMetaData>().registerInDataStore("someothernewname", DataStore::c_DontWriteOut));
+    EXPECT_FALSE(StoreArray<EventMetaData>().isOptional("someothernewname"));
 
     //accessing unregistered things doesn't work.
     StoreArray<EventMetaData> someothernewname("someothernewname");
@@ -437,8 +438,8 @@ namespace {
     //inialize(), use names from module paramateres
     DataStore::Instance().setInitializeActive(true);
     {
-      EXPECT_TRUE(events.registerAsPersistent("ThisBeInterestingNameForEvents"));
-      EXPECT_TRUE(profile.registerAsTransient("MyProfileInfoName"));
+      EXPECT_TRUE(events.registerInDataStore("ThisBeInterestingNameForEvents"));
+      EXPECT_TRUE(profile.registerInDataStore("MyProfileInfoName", DataStore::c_DontWriteOut));
 
       //also should work with optional / required
       EXPECT_TRUE(eventsMetaDatas2.isOptional("EventMetaDatas_2"));
@@ -449,6 +450,7 @@ namespace {
     //ok, our objects should now know their name
     EXPECT_EQ("ThisBeInterestingNameForEvents", events.getName());
     EXPECT_TRUE(profile.getName() == "MyProfileInfoName");
+    EXPECT_TRUE(profile.notWrittenOut());
     EXPECT_TRUE(eventsMetaDatas2.getName() == "EventMetaDatas_2");
 
     //accessing data
@@ -466,5 +468,12 @@ namespace {
     EXPECT_EQ(1, events.getEntries());
     StoreArray<EventMetaData> eventsAttachAgain("ThisBeInterestingNameForEvents");
     EXPECT_EQ(1, eventsAttachAgain.getEntries());
+  }
+
+  TEST_F(DataStoreTest, ArrayList)
+  {
+    std::vector<std::string> arrayList = StoreArray<EventMetaData>::getArrayList();
+    std::vector<std::string> exparrayList = {"EventMetaDatas", "EventMetaDatas_2"};
+    EXPECT_EQ(exparrayList, arrayList);
   }
 }  // namespace

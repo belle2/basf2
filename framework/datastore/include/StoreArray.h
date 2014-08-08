@@ -66,7 +66,7 @@ namespace Belle2 {
    *
    *  <h1>Registration of arrays</h1>
    *  Note that you have to register an array in the initialize method of a
-   *  module first (using registerPersistent()) before you can use it.
+   *  module first (using registerInDataStore()) before you can use it.
    *  This procedure is the same  as for objects handled by StoreObjPtr.
    *
    *

@@ -56,7 +56,7 @@ namespace Belle2 {
       c_DontWriteOut = 1 << 0,       /**< Object/array should be NOT saved by output modules. Can be overridden via output module parameters. */
       c_ErrorIfAlreadyRegistered = 1 << 1,/**< If the object/array was already registered, produce an error (aborting initialisation). */
     };
-    /** Combination of EStoreFlag flags. */
+    /** Combination of DataStore::EStoreFlag flags. */
     typedef int EStoreFlags;
 
     /** Number of Durability Types.
@@ -177,7 +177,7 @@ namespace Belle2 {
      *  @param durability Decide with which durability map you want to perform the requested action.
      *  @param objClass   The class of the object.
      *  @param array      Whether it is a TClonesArray or not.
-     *  @param storeFlags ORed combination of EStoreFlag flags.
+     *  @param storeFlags ORed combination of DataStore::EStoreFlag flags.
      *  @return           True if the registration succeeded.
      */
     bool registerEntry(const std::string& name, EDurability durability,
@@ -187,7 +187,7 @@ namespace Belle2 {
      *
      *  This must be called in the initialization phase. Otherwise an error is returned.
      *  @param durability Decide with which durability map you want to perform the requested action.
-     *  @param storeFlags ORed combination of EStoreFlag flags.
+     *  @param storeFlags ORed combination of DataStore::EStoreFlag flags.
      *  @return           True if the registration succeeded.
      */
     bool registerRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability, EStoreFlags storeFlags);

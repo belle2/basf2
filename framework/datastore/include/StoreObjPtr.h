@@ -42,10 +42,12 @@ namespace Belle2 {
    *  \code
       void MyModule::initialize() {
         //register a single cdchit
-        StoreObjPtr<CDCHit>::registerPersistent();
+        StoreObjPtr<CDCHit> cdchit;
+        cdchit.registerInDataStore();
         //register a single cdchit under the name "AnotherHit" and do not write
         //it to the output file by default
-        StoreObjPtr<CDCHit>::registerTransient("AnotherHit");
+        StoreObjPtr<CDCHit> cdchit2;
+        cdchit2.registerInDataStore("AnotherHit", DataStore::c_DontWriteOut);
       }
       \endcode
    *  Before objects can be accessed they have to be created

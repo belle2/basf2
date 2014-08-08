@@ -22,7 +22,7 @@ import sys
 argvs = sys.argv
 
 if len(argvs) < 6:
-    print 'Usage : RecvSendCOPPER.py <COPPER hostname> <COPPER nodeID> <bit flag of FINNESEs> <Use shared memory? yes=1/no=0> <nodename>'
+    print 'Usage : RecvSendCOPPER.py <COPPER hostname> <COPPER node ID> <bit flag of FINNESEs> <Use NSM(Network Shared Memory)? yes=1/no=0> <NSM nodename>'
     sys.exit()
 
 # Set the log level to show only error and fatal messages
@@ -32,7 +32,7 @@ set_log_level(LogLevel.INFO)
 # Reader
 # reader = register_module('HSLBReaderArray')
 reader = register_module('DeSerializerCOPPER')
-reader.param('NodeID', int(argvs[2]))
+reader.param('NodeID', int(argvs[2]))  # COPPER node ID (stored in RawHeader)
 reader.param('FinesseBitFlag', int(argvs[3]))
 use_shm_flag = int(argvs[4])
 reader.param('UseShmFlag', use_shm_flag)

@@ -21,7 +21,7 @@ from basf2 import *
 import sys
 argvs = sys.argv
 if len(argvs) != 4:
-    print 'Usage : RecvStream1.py <Use shared memory? yes=1/no=0> <port # of eb0> <nodename>'
+    print 'Usage : RecvStream1.py <Use NSM(Network Shared Memory)? yes=1/no=0> <port # of eb0> <NSM nodename>'
     sys.exit()
 
 # Set the log level to show only error and fatal messages
@@ -38,7 +38,7 @@ perf = register_module('DAQPerf')
 output = register_module('PrintData')
 
 # Receiver
-receiver.param('NodeID', 3)
+receiver.param('NodeID', 3)  # ROPC node ID (only used for NSM)
 receiver.param('NumConn', 1)
 receiver.param('HostNameFrom', ['localhost', 'cpr007'])
 # receiver.param('HostNameFrom', ['cpr005', 'cpr010'])
@@ -47,7 +47,7 @@ receiver.param('EventDataBufferWords', 4801)
 receiver.param('MaxTime', -1.)
 # receiver.param('MaxEventNum', 10000)
 receiver.param('MaxEventNum', -1)
-receiver.param('NodeName', argvs[3])
+receiver.param('NodeName', argvs[3])  # node name for NSM
 
 use_shm_flag = int(argvs[1])
 receiver.param('UseShmFlag', use_shm_flag)
@@ -92,7 +92,7 @@ main.add_module(receiver)
 # main.add_module(histo)
 # main.add_module(monitor)
 # main.add_module(dump)
-main.add_module(sender)
+# main.add_module(sender)
 
 # main.add_module(output)
 # main.add_module(perf)

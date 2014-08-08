@@ -184,7 +184,7 @@ void DummyDataSourceModule::event()
   }
 
   if (n_basf2evt % 1000 == 0) {
-    printf("Event # %.8d\n", n_basf2evt);
+    printf("Dummy data : Event # %.8d\n", n_basf2evt);
     fflush(stdout);
   }
 

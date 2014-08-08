@@ -632,10 +632,10 @@ void DeSerializerPCModule::event()
                            temp_rawdatablk.GetNumNodes());
 
     // CRC16 check
-//     PostRawCOPPERFormat_latest post_rawcopper_latest;
-//     post_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
-//                                     0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
-    //    post_rawcopper_latest.CheckCRC16(0, 0);
+    PostRawCOPPERFormat_latest post_rawcopper_latest;
+    post_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
+                                    0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
+    post_rawcopper_latest.CheckCRC16(0, 0);
 
 
 
@@ -654,16 +654,16 @@ void DeSerializerPCModule::event()
 
 
   //
-  // Shsared memory
+  // Run stop via NSM (Already obsolete. Need to ask Konno-san about implementation)
   //
-  //   if (m_shmflag != 0) {
-  //     if (n_basf2evt % 10 == 0) {
-  //       if (m_status.isStopped()) {
-  //         printf("[DEBUG] [INFO] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n", max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, getTimeSec() - m_start_time);
-  //         m_eventMetaDataPtr->setEndOfData();
+  //     if (m_shmflag != 0) {
+  //       if (n_basf2evt % 10 == 0) {
+  //  if (m_status.isStopped()) {
+  //           printf("[DEBUG] [INFO] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n", max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, getTimeSec() - m_start_time);
+  //           m_eventMetaDataPtr->setEndOfData();
+  //         }
   //       }
   //     }
-  //   }
 
   //
   // Monitor

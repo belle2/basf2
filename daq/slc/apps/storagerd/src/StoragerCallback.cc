@@ -228,12 +228,14 @@ void StoragerCallback::timeout() throw()
   }
   struct statvfs statfs;
   ConfigObject& obj(getConfig().getObject());
-  std::string dir = obj.getText("record_dir");
-  int ndisks = obj.getInt("record_ndisks");
-  for (int i = 0; i < ndisks; i++) {
-    std::string path = StringUtil::form("%s%02d", dir.c_str(), i + 1);
-    statvfs(path.c_str(), &statfs);
-    info->disksize[i] = (float)statfs.f_frsize * statfs.f_blocks / 1024 / 1024 / 1024;
-    info->diskusage[i] = 100 - ((float)statfs.f_bfree / statfs.f_blocks * 100);
+  if (obj.hasField("record_ndisks")) {
+    std::string dir = obj.getText("record_dir");
+    int ndisks = obj.getInt("record_ndisks");
+    for (int i = 0; i < ndisks; i++) {
+      std::string path = StringUtil::form("%s%02d", dir.c_str(), i + 1);
+      statvfs(path.c_str(), &statfs);
+      info->disksize[i] = (float)statfs.f_frsize * statfs.f_blocks / 1024 / 1024 / 1024;
+      info->diskusage[i] = 100 - ((float)statfs.f_bfree / statfs.f_blocks * 100);
+    }
   }
 }

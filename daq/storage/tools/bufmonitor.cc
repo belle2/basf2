@@ -39,17 +39,39 @@ int main(int argc, char** argv)
     fputs("\033[2J\033[0;0H", stdout);
     rewind(stdout);
     ftruncate(1, 0);
-    printf("exp = %04u run = %04u\n", info->expno, info->runno);
-    printf("nfile = %4u nbytes = %4.2f [GB]\n", info->nfiles, info->nbytes / 1024);
-    for (int i = 0; i < 11; i++) {
-      printf("disk%02d usage = %3.1f %% available disk size = %4.2f [TB]\n",
-             i + 1, (100. - info->diskusage[i]), info->disksize[i] / 1024.);
-    }
-    printf("nqueue | count | freq [kHz] | evtsize [kB] | rate [MB/s]\n");
+    printf(" exp = %04u run = %04u\n", info->expno, info->runno);
+    printf(" # of files: %4u, # of bytes : %4.2f [GB]\n", info->nfiles, info->nbytes / 1024);
+    printf(" rxqueue from eb2rx    : %4.1f [kB]\n", (float)(info->io[0].nqueue / 1024.));
+    printf(" data in input  buffer : %4.1f [kB]\n", (float)(info->io[1].nqueue * 4 / 1024.));
+    printf(" data in record buffer : %4.1f [kB]\n", (float)(info->io[2].nqueue * 4 / 1024.));
+    printf("\n");
+    printf(" %13s |      count | freq [kHz] | rate [MB/s] | evtsize [kB]\n", "node");
     for (int i = 0; i < 14; i++) {
       storage_info_all::io_status& nio(info->io[i]);
-      printf("%010u | %08u | %02.2f | %03.2f | %04.2f\n",
-             nio.nqueue, nio.count, nio.freq, nio.evtsize, nio.rate);
+      if (i == 4 || i == 5) continue;
+      std::string name = "basf2";
+      if (i == 0 || i == 1) {
+        name = "input";
+      } else if (i == 2 || i == 3) {
+        name = "record";
+      } else {
+        name = StringUtil::form("basf2_%d", i / 2);
+      }
+      if (i % 2 == 0) name += " (in)";
+      else name += " (out)";
+      printf(" %-13s | %s | %10s | %11s | %12s\n",
+             name.c_str(),
+             StringUtil::form("%10u", nio.count).c_str(),
+             StringUtil::form("%02.2f", nio.freq).c_str(),
+             StringUtil::form("%04.2f", nio.rate).c_str(),
+             StringUtil::form("%03.2f", nio.evtsize).c_str());
+    }
+    printf("\n");
+    for (int i = 0; i < 11; i++) {
+      printf(" disk%02d : available %5s [%%] (disk size = %4.2f [TB])\n",
+             i + 1,
+             StringUtil::form("%3.1f", (100. - info->diskusage[i])).c_str(),
+             info->disksize[i] / 1024.);
     }
   }
   return 0;

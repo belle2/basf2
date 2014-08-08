@@ -94,18 +94,18 @@ public:
         fout << g_diskid;
       }
       if (g_nfile > 0) {
-        sprintf(filename, "%s%02d/e%4.4dr%6.6d.sroot-%d",
+        sprintf(filename, "%s%02d/storage/e%4.4dr%6.6d.sroot-%d",
                 dir.c_str(), g_diskid, expno, runno, g_nfile);
       } else {
-        sprintf(filename, "%s%02d/e%4.4dr%6.6d.sroot",
+        sprintf(filename, "%s%02d/storage/e%4.4dr%6.6d.sroot",
                 dir.c_str(), g_diskid, expno, runno);
       }
     } else {
       if (g_nfile > 0) {
-        sprintf(filename, "%s/e%4.4dr%6.6d.sroot-%d",
+        sprintf(filename, "%s/storage/e%4.4dr%6.6d.sroot-%d",
                 dir.c_str(), expno, runno, g_nfile);
       } else {
-        sprintf(filename, "%s/e%4.4dr%6.6d.sroot",
+        sprintf(filename, "%s/storage/e%4.4dr%6.6d.sroot",
                 dir.c_str(), expno, runno);
       }
     }
@@ -294,6 +294,7 @@ int main(int argc, char** argv)
       }
     } else {
       B2ERROR("storagerecord: no run was initialzed for recording");
+      return 1;
     }
     //usleep(1000);
   }

@@ -36,7 +36,7 @@ void SpacePointCreatorModule::event()
   spacePoints.create();
 
   for (unsigned int i = 0; i < uint(pxdClusters.getEntries()); ++i) {
-    spacePoints.appendNew((*pxdClusters[i]), i);
+    spacePoints.appendNew((pxdClusters[i]), i);
   }
 }
 

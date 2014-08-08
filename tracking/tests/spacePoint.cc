@@ -55,7 +55,7 @@ namespace Belle2 {
     // create new PXDCluster and fill it with Info getting a Hit which is not at the origin (here, first layer)
 
     PXDCluster aCluster = PXDCluster(aVxdID, 0., 0., 0.1, 0.1, 0, 0, 1, 1, 1, 1, 1, 1);
-    SpacePoint testPoint = SpacePoint(aCluster, 3, &sensorInfoBase);
+    SpacePoint testPoint = SpacePoint(&aCluster, 3, &sensorInfoBase);
 //     SpacePoint testPoint = SpacePoint(aCluster, 3);
 
     EXPECT_DOUBLE_EQ(aVxdID, testPoint.getVxdID());
@@ -76,12 +76,130 @@ namespace Belle2 {
     EXPECT_DOUBLE_EQ(aPosition.X(), testPoint.getPosition().X());
     EXPECT_DOUBLE_EQ(aPosition.Y(), testPoint.getPosition().Y());
     EXPECT_DOUBLE_EQ(aPosition.Z(), testPoint.getPosition().Z());
-    EXPECT_DOUBLE_EQ(globalError.X(), testPoint.getPositionError().X());
-    EXPECT_DOUBLE_EQ(globalError.Y(), testPoint.getPositionError().Y());
-    EXPECT_DOUBLE_EQ(globalError.Z(), testPoint.getPositionError().Z());
+    EXPECT_FLOAT_EQ(globalError.X(), testPoint.getPositionError().X());
+    EXPECT_FLOAT_EQ(globalError.Y(), testPoint.getPositionError().Y());
+    EXPECT_FLOAT_EQ(globalError.Z(), testPoint.getPositionError().Z());
     // normalized coordinates, center of Plane should be at 0.5:
     EXPECT_DOUBLE_EQ(0.5, testPoint.getNormalizedLocalU());
     EXPECT_DOUBLE_EQ(0.5, testPoint.getNormalizedLocalV());
+
+  }
+
+
+
+  /** Test constructor for SVDClsuters
+   * tests the constructor importing a SVDCluster and tests results by
+   * using the getters of the spacePoint...
+   */
+  TEST_F(SpacePointTest, testConstructorSVD)
+  {
+    VxdID aVxdID = VxdID(3, 3, 3), anotherVxdID = VxdID(1, 1, 1);
+    VXD::SensorInfoBase sensorInfoBase = createSensorInfo(aVxdID, 2.3, 4.2);
+    VXD::SensorInfoBase anotherSensorInfoBase = createSensorInfo(anotherVxdID, 2.3, 4.2);
+
+    // create new SVDClusters and fill it with Info getting a Hit which is not at the origin
+    // SVDCluster (VxdID sensorID, bool isU, float position, float positionSigma, double clsTime, double clsTimeSigma, float seedCharge, float clsCharge, unsigned short clsSize)
+    SVDCluster clusterU1 = SVDCluster(aVxdID, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1);
+    SVDCluster clusterV1 = SVDCluster(aVxdID, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1);
+    SVDCluster clusterU2 = SVDCluster(aVxdID, true, 0.23, 0.1, 0.01, 0.001, 1, 1, 1);
+    SVDCluster clusterU3 = SVDCluster(anotherVxdID, true, 0.23, 0.1, 0.01, 0.001, 1, 1, 1);
+
+    // normal u+v = 2D Cluster (order of input irrelevant):
+    SpacePoint testPoint2D = SpacePoint({ {&clusterU1, 1}, {&clusterV1, 2} }, &sensorInfoBase);
+
+    // normal u-only = 1D Cluster, sensorInfoBase is normally not needed, since constructor can create it on its own, but here the geometry is not set up, therefore we have to pass the infoBase:
+    SpacePoint testPoint1D = SpacePoint({ {&clusterU3, 1} }, &anotherSensorInfoBase);
+
+    // should throw, since no clusters given:
+    EXPECT_THROW(SpacePoint({}, &sensorInfoBase), std::runtime_error);
+
+    // should throw, since too many clusters (of same sensor) given:
+    EXPECT_THROW(SpacePoint({ {&clusterU1, 1}, {&clusterV1, 2}, {&clusterU2, 3} }, &sensorInfoBase), std::runtime_error);
+
+    // should throw, since two clusters of same type (but on same sensor) given:
+    EXPECT_THROW(SpacePoint({ {&clusterU1, 1}, {&clusterU2, 2} }, &sensorInfoBase), std::runtime_error);
+
+    // should throw, since two clusters of different sensors given:
+    EXPECT_THROW(SpacePoint({ {&clusterV1, 1}, {&clusterU3, 2} }, &sensorInfoBase), std::runtime_error);
+
+
+
+    // check results for full 2D cluster-combi:
+    TVector3 aPositionFor2D = sensorInfoBase.pointToGlobal(TVector3(clusterU1.getPosition(), clusterV1.getPosition(), 0));
+    TVector3 globalizedVariancesFor2D = sensorInfoBase.vectorToGlobal(
+                                          TVector3(
+                                            clusterU1.getPositionSigma() * clusterU1.getPositionSigma(),
+                                            clusterV1.getPositionSigma() * clusterV1.getPositionSigma(),
+                                            0
+                                          )
+                                        );
+    TVector3 globalErrorFor2D;
+    for (int i = 0; i < 3; i++) { globalErrorFor2D[i] = sqrt(abs(globalizedVariancesFor2D[i])); }
+
+    // vxdID:
+    EXPECT_DOUBLE_EQ(aVxdID, testPoint2D.getVxdID());
+    // global position:
+    EXPECT_DOUBLE_EQ(aPositionFor2D.X(), testPoint2D.getPosition().X());
+    EXPECT_DOUBLE_EQ(aPositionFor2D.Y(), testPoint2D.getPosition().Y());
+    EXPECT_DOUBLE_EQ(aPositionFor2D.Z(), testPoint2D.getPosition().Z());
+    //global error:
+    EXPECT_FLOAT_EQ(globalErrorFor2D.X(), testPoint2D.getPositionError().X());
+    EXPECT_FLOAT_EQ(globalErrorFor2D.Y(), testPoint2D.getPositionError().Y());
+    EXPECT_FLOAT_EQ(globalErrorFor2D.Z(), testPoint2D.getPositionError().Z());
+    //local normalized position:
+    EXPECT_FLOAT_EQ(0.4, testPoint2D.getNormalizedLocalU());
+    EXPECT_FLOAT_EQ(0.6, testPoint2D.getNormalizedLocalV());
+
+
+    // check results for single-cluster-only-case:
+    TVector3 aPositionFor1D = anotherSensorInfoBase.pointToGlobal(TVector3(clusterU3.getPosition(), 0, 0));
+    TVector3 globalizedVariancesFor1D = anotherSensorInfoBase.vectorToGlobal(
+                                          TVector3(
+                                            clusterU3.getPositionSigma() * clusterU3.getPositionSigma(),
+                                            anotherSensorInfoBase.getVSize() * anotherSensorInfoBase.getVSize() / 12.,
+                                            0
+                                          )
+                                        );
+    TVector3 globalErrorFor1D;
+    for (int i = 0; i < 3; i++) { globalErrorFor1D[i] = sqrt(abs(globalizedVariancesFor1D[i])); }
+
+    // vxdID:
+    EXPECT_DOUBLE_EQ(anotherVxdID, testPoint1D.getVxdID());
+    // global position:
+    EXPECT_DOUBLE_EQ(aPositionFor1D.X(), testPoint1D.getPosition().X());
+    EXPECT_DOUBLE_EQ(aPositionFor1D.Y(), testPoint1D.getPosition().Y());
+    EXPECT_DOUBLE_EQ(aPositionFor1D.Z(), testPoint1D.getPosition().Z());
+    //global error:
+    EXPECT_FLOAT_EQ(globalErrorFor1D.X(), testPoint1D.getPositionError().X());
+    EXPECT_FLOAT_EQ(globalErrorFor1D.Y(), testPoint1D.getPositionError().Y());
+    EXPECT_FLOAT_EQ(globalErrorFor1D.Z(), testPoint1D.getPositionError().Z());
+    //local normalized position:
+    EXPECT_FLOAT_EQ(0.6, testPoint1D.getNormalizedLocalU());
+    EXPECT_FLOAT_EQ(0.5, testPoint1D.getNormalizedLocalV()); // center of sensor since v-cluster was not given
+    /*
+
+    // needing globalized position and error:
+    TVector3 aPosition = sensorInfoBase.pointToGlobal(TVector3(aCluster.getU(), aCluster.getV(), 0));
+    TVector3 globalizedVariances = sensorInfoBase.vectorToGlobal(
+      TVector3(
+      aCluster.getUSigma() * aCluster.getUSigma(),
+           aCluster.getVSigma() * aCluster.getVSigma(),
+           0
+      )
+    );
+
+    TVector3 globalError;
+    for (int i = 0; i < 3; i++) { globalError[i] = sqrt(abs(globalizedVariances[i])); }
+
+    EXPECT_DOUBLE_EQ(aPosition.X(), testPoint.getPosition().X());
+    EXPECT_DOUBLE_EQ(aPosition.Y(), testPoint.getPosition().Y());
+    EXPECT_DOUBLE_EQ(aPosition.Z(), testPoint.getPosition().Z());
+    EXPECT_FLOAT_EQ(globalError.X(), testPoint.getPositionError().X());
+    EXPECT_FLOAT_EQ(globalError.Y(), testPoint.getPositionError().Y());
+    EXPECT_FLOAT_EQ(globalError.Z(), testPoint.getPositionError().Z());
+    // normalized coordinates, center of Plane should be at 0.5:
+    EXPECT_DOUBLE_EQ(0.5, testPoint.getNormalizedLocalU());
+    EXPECT_DOUBLE_EQ(0.5, testPoint.getNormalizedLocalV());*/
 
   }
 

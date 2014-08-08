@@ -16,12 +16,11 @@ using namespace Belle2;
 
 ClassImp(SpacePoint)
 
-SpacePoint::SpacePoint(const PXDCluster& pxdCluster, unsigned int indexNumber, const VXD::SensorInfoBase* aSensorInfo) :
-  m_vxdID(pxdCluster.getSensorID())
+SpacePoint::SpacePoint(const PXDCluster* pxdCluster, unsigned int indexNumber, const VXD::SensorInfoBase* aSensorInfo) :
+  m_vxdID(pxdCluster->getSensorID())
 {
+  if (pxdCluster == NULL) { throw InvalidNumberOfClusters(); }
   m_indexNumbers.push_back(indexNumber);
-
-  // TODO missing, detector type import... (distinguishing between TeLescope and PXD Hits)
 
   //We need some handle to translate IDs to local and global
   // coordinates.
@@ -31,33 +30,89 @@ SpacePoint::SpacePoint(const PXDCluster& pxdCluster, unsigned int indexNumber, c
 
   m_position = aSensorInfo->pointToGlobal(
                  TVector3(
-                   pxdCluster.getU(),
-                   pxdCluster.getV(),
+                   pxdCluster->getU(),
+                   pxdCluster->getV(),
                    0
                  )
                );
 
-  //As only variances, but not the sigmas transform linearly,
-  // we need to use some acrobatics
-  // (and some more (abs) since we do not really transform a vector).
-  TVector3 globalizedVariances = aSensorInfo->vectorToGlobal(
-                                   TVector3(
-                                     pxdCluster.getUSigma() * pxdCluster.getUSigma(),
-                                     pxdCluster.getVSigma() * pxdCluster.getVSigma(),
-                                     0
-                                   )
-                                 );
-  for (int i = 0; i < 3; i++) {
-    m_positionError[i] = sqrt(abs(globalizedVariances[i]));
-  }
+  setPositionError(pxdCluster->getUSigma(), pxdCluster->getVSigma(), aSensorInfo);
 
-  m_normalizedLocal = convertLocalToNormalizedCoordinates(make_pair(pxdCluster.getU(), pxdCluster.getV()), m_vxdID, aSensorInfo);
+  m_normalizedLocal = convertLocalToNormalizedCoordinates({ pxdCluster->getU(), pxdCluster->getV() } , m_vxdID, aSensorInfo);
 //   double halfSensorSizeU = 0.5 *  aSensorInfo->getUSize();
 //   double halfSensorSizeV = 0.5 *  aSensorInfo->getVSize();
-//   double localUPosition = pxdCluster.getU() + halfSensorSizeU;
-//   double localVPosition = pxdCluster.getV() + halfSensorSizeV;
+//   double localUPosition = pxdCluster->getU() + halfSensorSizeU;
+//   double localVPosition = pxdCluster->getV() + halfSensorSizeV;
 //   m_normalizedLocal[0] = localUPosition / aSensorInfo->getUSize();
 //   m_normalizedLocal[1] = localVPosition / aSensorInfo->getVSize();
+}
+
+
+
+SpacePoint::SpacePoint(const std::vector<SpacePoint::SVDClusterInformation>& clusters,
+                       const VXD::SensorInfoBase* aSensorInfo)
+{
+  unsigned int nClusters = clusters.size();
+  double uCoord = 0; // 0 = center of Sensor
+  double vCoord = 0; // 0 = center of Sensor
+  double uSigma = -1; // negative sigmas are not possible, setting to -1 for catching cases of missing Cluster
+  double vSigma = -1; // negative sigmas are not possible, setting to -1 for catching cases of missing Cluster
+
+  // do checks for sanity of input:
+  if (nClusters == 0 or nClusters > 2) {
+    throw InvalidNumberOfClusters();
+  } else {
+    vector<VxdID::baseType> vxdIDs;
+    vector<bool> isUType;
+    for (vector<SVDClusterInformation>::const_iterator iter = clusters.begin(); iter < clusters.end(); ++iter) {
+      if (iter->first == NULL) throw InvalidNumberOfClusters();
+      vxdIDs.push_back(iter->first->getSensorID());
+      isUType.push_back(iter->first->isUCluster());
+    }
+
+    auto newEndVxdID = std::unique(vxdIDs.begin(), vxdIDs.end());
+    vxdIDs.resize(std::distance(vxdIDs.begin(), newEndVxdID));
+
+    auto newEndUType = std::unique(isUType.begin(), isUType.end());
+    isUType.resize(std::distance(isUType.begin(), newEndUType));
+
+    if (vxdIDs.size() != 1 or isUType.size() != nClusters) throw IncompatibleClusters();
+  }
+
+  m_vxdID = clusters[0].first->getSensorID();
+
+  //We need some handle to translate IDs to local and global
+  // coordinates.
+  if (aSensorInfo == NULL) {
+    aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(m_vxdID);
+  }
+
+  // retrieve position and sigma-values
+  for (vector<SVDClusterInformation>::const_iterator iter = clusters.begin(); iter < clusters.end(); ++iter) {
+    if (iter->first->isUCluster() == true) {
+      uCoord = iter->first->getPosition();
+      uSigma = iter->first->getPositionSigma();
+    } else {
+      vCoord = iter->first->getPosition();
+      vSigma = iter->first->getPositionSigma();
+    }
+  }
+
+  m_position = aSensorInfo->pointToGlobal(
+                 TVector3(
+                   uCoord,
+                   vCoord,
+                   0
+                 )
+               );
+
+  // if sigma for a coordinate is not known, a uniform distribution over the whole sensor is asumed:
+  if (uSigma < 0) { uSigma = aSensorInfo->getUSize(vCoord) / sqrt(12); }
+  if (vSigma < 0) { vSigma = aSensorInfo->getVSize() / sqrt(12); }
+
+  setPositionError(uSigma, vSigma, aSensorInfo);
+
+  m_normalizedLocal = convertLocalToNormalizedCoordinates({ uCoord, vCoord } , m_vxdID, aSensorInfo);
 }
 
 

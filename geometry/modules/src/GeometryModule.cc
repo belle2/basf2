@@ -23,7 +23,8 @@ REG_MODULE(Geometry);
 GeometryModule::GeometryModule()
 {
   setDescription("Setup geometry description");
-  //setPropertyFlags(c_InitializeInMain);
+  setPropertyFlags(c_ParallelProcessingCertified);
+
   addParam("geometryPath", m_geometryPath,
            "Path where the parameters for the Geometry can be found", string("/Detector"));
   addParam("geometryType", m_geometryType,

@@ -89,7 +89,8 @@ bool StoragerCallback::load() throw()
   m_con[1].addArgument(rbuf_size);
   m_con[1].addArgument(obj.getText("record_dir"));
   m_con[1].addArgument(obj.getValueText("record_ndisks"));
-  m_con[1].addArgument(obj.getText("record_file"));
+  m_con[1].addArgument(obj.getText("record_file_diskid"));
+  m_con[1].addArgument(obj.getText("record_file_nfiles"));
   m_con[1].addArgument(obuf_name);
   m_con[1].addArgument(obuf_size);
   m_con[1].addArgument("storagerecord");

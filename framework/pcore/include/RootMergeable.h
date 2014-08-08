@@ -12,6 +12,7 @@
 #include <framework/pcore/Mergeable.h>
 #include <framework/logging/Logger.h>
 
+#include <TFile.h>
 #include <TList.h>
 #include <TH1F.h>
 #include <TH2F.h>
@@ -24,14 +25,12 @@ namespace Belle2 {
    * \code
      setPropertyFlags(c_Parallelprocessing | c_terminateInAllProcesses);
      \endcode
-     create RootMergeable<X> in initalize (call register(As)Transient("", DataStore::c_Persistent) and construct())
+     create RootMergeable<X> in initalize (call registerInDataStore() and construct())
      in terminate():
      \code
      if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
-       //create TFile (you can also do that in initalize())
-       file->cd();
-       mergeablePtr->get().Write();
-       mergeablePtr->get().SetDirectory(nullptr); // mergeable is owned by DataStore, not TFile!
+       //use TFile you created in initialize()
+       mergeablePtr->write(m_file);
      }
      \endcode
    *
@@ -42,6 +41,8 @@ namespace Belle2 {
    * Be aware that for larger histograms, this way of sharing the data may not be a good idea.
    * E.g. for hundred thousand bins, basf2 would transfer about half a MegaByte in each event,
    * which may take a significant fraction of total processing time.
+   *
+   * TODO: after construction, I should probably do SetDirectory(null) directly, and offer a function to set it explicitly.
    *
    * \sa Mergeable
    */
@@ -67,6 +68,21 @@ namespace Belle2 {
 
     /** Get the wrapped root object. */
     const T& get() const { return *m_wrapped; }
+
+    /** Write the wrapped object into 'file'.
+     *
+     * This function should be prefered to calling Write() by hand.
+     *
+     * \note wrapped object must already be in 'file' before filled, or not part of any file at all. This function will throw an error and might crash if this is not the case.
+     */
+    void write(TFile* file) {
+      if (m_wrapped->GetDirectory() != nullptr and m_wrapped->GetDirectory() != file) {
+        B2ERROR("RootMergeable: wrapped object belongs to other file, Write() might crash. Make sure your histogram/ntuple already belongs to the file you want to save it to before filling (e.g. in initialize())");
+      }
+      file->cd();
+      m_wrapped->Write();
+      m_wrapped->SetDirectory(nullptr);
+    }
 
     /** Merge object 'other' into this one.
      *

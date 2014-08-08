@@ -21,7 +21,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
 
-#include <TFile.h>
 #include <TH1F.h>
 
 #include <algorithm>
@@ -36,6 +35,7 @@ REG_MODULE(PreCutHistMaker)
 
 PreCutHistMakerModule::PreCutHistMakerModule():
   m_pdg(0),
+  m_file(nullptr),
   m_var(nullptr),
   m_histogramSignal("", DataStore::c_Persistent),
   m_histogramAll("", DataStore::c_Persistent),
@@ -43,7 +43,6 @@ PreCutHistMakerModule::PreCutHistMakerModule():
   m_generator_all(nullptr)
 {
   setDescription("Saves distribution of a variable of combined particles (from input ParticleLists) into histogram 'all'. If the daughters can be combined into a correctly reconstructed (!) particle of specified type, save variable value for this combination to a histogram called 'signal'. This is equivalent to running ParticleCombiner on the given lists and saving the variable value of Particles with isSignal == 1 and everything else, but much faster (since Particles don't need to be saved).");
-  //setPropertyFlags(c_ParallelProcessingCertified); //histograms are saved through HistModule, so this is ok
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
   addParam("decayString", m_decayString, "Decay to reconstruct, see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString ");
@@ -113,6 +112,13 @@ void PreCutHistMakerModule::initialize()
   for (auto l : m_inputLists) {
     l.isRequired();
   }
+
+  m_file = new TFile(m_fileName.c_str(), "RECREATE");
+  if (!m_file->IsOpen()) {
+    B2FATAL("Could not create file " << m_fileName);
+    return;
+  }
+  m_file->cd();
 
   std::string signalName(std::string("signal") + m_channelName);
   std::string allName(std::string("all") + m_channelName);
@@ -348,16 +354,9 @@ void PreCutHistMakerModule::terminate()
 {
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
     B2INFO("Writing hists to " << m_fileName);
-    TFile* m_file = new TFile(m_fileName.c_str(), "RECREATE");
-    if (!m_file->IsOpen()) {
-      B2FATAL("Could not create file " << m_fileName);
-      return;
-    }
-    m_file->cd();
-    m_histogramSignal->get().Write();
-    m_histogramSignal->get().SetDirectory(nullptr);
-    m_histogramAll->get().Write();
-    m_histogramAll->get().SetDirectory(nullptr);
+    m_file->Dump();
+    m_histogramSignal->write(m_file);
+    m_histogramAll->write(m_file);
 
     B2INFO("Closing file " << m_fileName);
     delete m_file;

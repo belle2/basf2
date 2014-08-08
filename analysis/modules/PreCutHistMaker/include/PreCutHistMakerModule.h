@@ -20,6 +20,8 @@
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
 #include <analysis/VariableManager/Manager.h>
 
+#include <TFile.h>
+
 #include <string>
 #include <vector>
 #include <set>
@@ -75,6 +77,7 @@ namespace Belle2 {
     std::string m_decayString; /**< decay string. */
     int m_pdg;                /**< PDG code of combined particles */
     std::string m_fileName; /**< save histograms in this file. */
+    TFile* m_file; /**< owns histograms. */
     std::string m_channelName; /**< name of the channel which is reconstructed */
     std::string m_histName; /**< name for the histogram. */
     std::vector<StoreObjPtr<ParticleList>> m_inputLists; /**< input particle lists */

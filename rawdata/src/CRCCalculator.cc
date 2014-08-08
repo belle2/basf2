@@ -1,10 +1,20 @@
 #include <rawdata/CRCCalculator.h>
+#include <string>
 using namespace std;
 
 
 
 unsigned short CalcCRC16LittleEndian(unsigned short crc16, const int buf[], int nwords)
 {
+
+  if (nwords < 0) {
+    char err_buf[500];
+    sprintf(err_buf, "nwords value(%d) is invalid. Cannot calculate CRC16. Exiting...\n %s %s %d\n",
+            nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printf("%s", err_buf); fflush(stdout);
+    string err_str = err_buf;
+    throw (err_str);
+  }
 
   const unsigned short CRC16Table0x1021[ 256 ] = {
     0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50A5, 0x60C6, 0x70E7,

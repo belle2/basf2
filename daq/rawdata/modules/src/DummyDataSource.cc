@@ -96,26 +96,43 @@ void DummyDataSourceModule::event()
 
   nwords_1st = n_basf2evt % 10;
   buf1 = new int[ nwords_1st];
+
   for (int i = 0; i < nwords_1st; i++) {
-    buf1[ i ] = i;
+    if (i == 0) {
+      buf1[ i ] = 0x12345678;
+    } else {
+      buf1[ i ] = (i + 1) * buf1[ i - 1 ];
+    }
   }
 
   nwords_2nd = (n_basf2evt + 1) % 10;
   buf2 = new int[ nwords_2nd];
   for (int i = 0; i < nwords_2nd; i++) {
-    buf2[ i ] = i + 1;
+    if (i == 0) {
+      buf2[ i ] = 0x34567890;
+    } else {
+      buf2[ i ] = (i + 1) * buf2[ i - 1 ];
+    }
   }
 
   nwords_3rd = 3 * (n_basf2evt + 2) % 10;
   buf3 = new int[ nwords_3rd];
   for (int i = 0; i < nwords_3rd; i++) {
-    buf3[ i ] = i + 2;
+    if (i == 0) {
+      buf3[ i ] = 0x56789012;
+    } else {
+      buf3[ i ] = (i + 1) * buf3[ i - 1 ];
+    }
   }
 
   nwords_4th = 4 * (n_basf2evt + 3)  % 10;
   buf4 = new int[ nwords_4th];
   for (int i = 0; i < nwords_4th; i++) {
-    buf4[ i ] = i + 3;
+    if (i == 0) {
+      buf4[ i ] = 0x78901234;
+    } else {
+      buf4[ i ] = (i + 1) * buf4[ i - 1 ];
+    }
   }
 
 #ifdef USE_RAWDATABLOCK

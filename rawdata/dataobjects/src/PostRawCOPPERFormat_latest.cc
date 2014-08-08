@@ -264,12 +264,21 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
   //
   // Calculate CRC16
   //
+  int finesse_nwords = GetFINESSENwords(n, finesse_num);
+  if (finesse_nwords <= 0) {
+    char err_buf[500];
+    sprintf(err_buf, "The specified finesse(%d) seems to be empty(nwords = %d). Cannot calculate CRC16. Exiting...\n %s %s %d\n",
+            finesse_num, finesse_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printf("%s", err_buf); fflush(stdout);
+    string err_str = err_buf;
+    throw (err_str);
+  }
   unsigned short temp_crc16 = CalcCRC16LittleEndian(0xffff, &(m_buffer[ tmp_header.POS_TTCTIME_TRGTYPE ]), 1);
   temp_crc16 = CalcCRC16LittleEndian(temp_crc16, &(m_buffer[ tmp_header.POS_EVE_NO ]), 1);
   temp_crc16 = CalcCRC16LittleEndian(temp_crc16, &(m_buffer[ tmp_header.POS_TTUTIME ]), 1);
   temp_crc16 = CalcCRC16LittleEndian(temp_crc16, &(m_buffer[ tmp_header.POS_EXP_RUN_NO ]), 1);
   int* buf = GetFINESSEBuffer(n, finesse_num) +  SIZE_B2LHSLB_HEADER + POS_B2L_CTIME;
-  int pos_nwords = GetFINESSENwords(n, finesse_num) - (SIZE_B2LHSLB_HEADER + POS_B2L_CTIME + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER);
+  int pos_nwords = finesse_nwords - (SIZE_B2LHSLB_HEADER + POS_B2L_CTIME + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER);
   temp_crc16 = CalcCRC16LittleEndian(temp_crc16, buf, pos_nwords);
 
   //

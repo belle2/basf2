@@ -6,7 +6,6 @@
 
 #include <FEEConfig.h>
 
-#include <mgt/mgt.h>
 #include <mgt/hslb_info.h>
 
 namespace Belle2 {

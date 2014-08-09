@@ -65,7 +65,7 @@ namespace Belle2 {
 
 
 
-    /** Constructor for the case of SVD Hits. up to 2 clusters can be added this way
+    /** Constructor for the case of SVD Hits. 1-2 clusters can be added this way
      *
      * first parameter is a container carrying pairs, where .first is the pointer to the svdCluster, and .second provides its indexNumber for the StoreArray.
      *  It should _not_ be filled with NULL-Pointers (passing a null-pointer will throw an exception).
@@ -105,6 +105,21 @@ namespace Belle2 {
     double getNormalizedLocalV() const { return m_normalizedLocal.second/*m_normalizedLocal[1]*/; }
 
 
+
+    /** return the sensorType of the current spacePoint.
+    *
+    * The return type is equivalent of the type given by SensorInfoBase
+    */
+    VXD::SensorInfoBase::SensorType getType() { return m_sensorType; }
+
+
+
+    /** returns container containing the indices of the clusters in their storeArrays. */
+    std::vector<unsigned int> getClusterIndices() const { return m_indexNumbers; }
+
+
+
+// static converter functions:
 
     /** converts a local hit into sensor-independent relative coordinates.
      *
@@ -164,6 +179,8 @@ namespace Belle2 {
 
 
   protected:
+
+
     /** protected function to set the global position error.
      *
      * It takes care for the transformation of the local sigmas to global error values.
@@ -220,6 +237,16 @@ namespace Belle2 {
      *
      * These index numbers are for the storeArray of svdClusters, if the detector type is Const::SVD, If it is Const::PXD, its for the pxdCluster container, and for Const::Test it is for a telCluster-container carrying all the telescope hits */
     std::vector<unsigned int> m_indexNumbers;
-    ClassDef(SpacePoint, 1)
+
+
+
+    /** stores the SensorType using the scheme of sensorInfoBase.
+     *
+     * Currently there are the following types possible:
+     * PXD, SVD, TEL, VXD
+     */
+    VXD::SensorInfoBase::SensorType m_sensorType;
+
+    ClassDef(SpacePoint, 2) // last member added: m_sensorType;
   };
 }

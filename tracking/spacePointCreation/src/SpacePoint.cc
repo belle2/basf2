@@ -39,12 +39,8 @@ SpacePoint::SpacePoint(const PXDCluster* pxdCluster, unsigned int indexNumber, c
   setPositionError(pxdCluster->getUSigma(), pxdCluster->getVSigma(), aSensorInfo);
 
   m_normalizedLocal = convertLocalToNormalizedCoordinates({ pxdCluster->getU(), pxdCluster->getV() } , m_vxdID, aSensorInfo);
-//   double halfSensorSizeU = 0.5 *  aSensorInfo->getUSize();
-//   double halfSensorSizeV = 0.5 *  aSensorInfo->getVSize();
-//   double localUPosition = pxdCluster->getU() + halfSensorSizeU;
-//   double localVPosition = pxdCluster->getV() + halfSensorSizeV;
-//   m_normalizedLocal[0] = localUPosition / aSensorInfo->getUSize();
-//   m_normalizedLocal[1] = localVPosition / aSensorInfo->getVSize();
+
+  m_sensorType = aSensorInfo->getType();
 }
 
 
@@ -68,6 +64,7 @@ SpacePoint::SpacePoint(const std::vector<SpacePoint::SVDClusterInformation>& clu
       if (iter->first == NULL) throw InvalidNumberOfClusters();
       vxdIDs.push_back(iter->first->getSensorID());
       isUType.push_back(iter->first->isUCluster());
+      m_indexNumbers.push_back(iter->second);
     }
 
     auto newEndVxdID = std::unique(vxdIDs.begin(), vxdIDs.end());
@@ -113,6 +110,8 @@ SpacePoint::SpacePoint(const std::vector<SpacePoint::SVDClusterInformation>& clu
   setPositionError(uSigma, vSigma, aSensorInfo);
 
   m_normalizedLocal = convertLocalToNormalizedCoordinates({ uCoord, vCoord } , m_vxdID, aSensorInfo);
+
+  m_sensorType = aSensorInfo->getType();
 }
 
 
@@ -129,8 +128,6 @@ std::pair<double, double> SpacePoint::convertLocalToNormalizedCoordinates(const 
   // to normalize all positions to numbers between [0,1],
   // where the middle will be 0.5,
   // we need to do some calculation.
-
-
   double sensorSizeU =  aSensorInfo->getUSize(hitLocal.second); // this deals with the case of trapezoidal sensors too
   double sensorSizeV =  aSensorInfo->getVSize();
 
@@ -141,15 +138,7 @@ std::pair<double, double> SpacePoint::convertLocalToNormalizedCoordinates(const 
   localVPosition /= sensorSizeV;
   boundaryCheck(localVPosition, 0, 1);
 
-  // old ones:
-  // double sensorSizeU =  aSensorInfo->getUSize(hitLocal.second);
-  // double sensorSizeV = 0.5 * aSensorInfo->getVSize();
-
-//   B2INFO("localUPosition: " << localUPosition);
-//   B2INFO("localVPosition: " << localVPosition);
-
-
-  return make_pair(localUPosition, localVPosition);
+  return { localUPosition, localVPosition };
 }
 
 
@@ -191,7 +180,7 @@ std::pair<double, double> SpacePoint::convertNormalizedToLocalCoordinates(const 
   double localUPosition = (hitNormalized.first - 0.5) * uSizeAtHit;
   boundaryCheck(localUPosition, -0.5 * aSensorInfo->getUSize(), uSizeAtHit); // restrain hits to sensor boundaries
 
-  return (make_pair(localUPosition, localVPosition));
+  return { localUPosition, localVPosition };
 }
 
 

@@ -234,6 +234,7 @@ void CollectorTFInfo::intEvent()  // Clear Vectors
   m_hitTF.clear();
   m_cellTF.clear();
   m_tfCandTF.clear();
+  m_trackletsTF.clear();
 
 }
 
@@ -729,6 +730,82 @@ void CollectorTFInfo::updateTC(int tcid, std::string diedAt, int diedId, std::ve
   }
 
 }
+
+
+
+/** Tracklet Import, return = trackletID id */
+int CollectorTFInfo::importTracklet(int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, const std::vector<std::pair<int, unsigned int>> assignedCellIDs)
+{
+  B2DEBUG(100, "CollectorTFInfo: importTracklet, passIndex: " << passIndex << ", diet_at: " << diedAt << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size() << ", assignedCellIDs - size: " << assignedCellIDs.size());
+
+  int trackletID = m_trackletsTF.size();
+
+  // A Tracklet is a TrackCandidate internal, but safed seperated
+  TrackCandidateTFInfo newtf(passIndex, trackletID);
+
+  newtf.setDiedAt(diedAt);
+  newtf.setDiedID(diedId);
+
+  newtf.insert_Accepted(accepted);
+  newtf.insert_Rejected(rejected);
+
+  for (auto & currentCell : assignedCellIDs) {
+
+    // Assigned Cell store
+    // Coordinates for assigned Cells store
+    if (currentCell.first < int(m_cellTF.size()) && currentCell.first != -1) {
+      newtf.push_back_AssignedCell(currentCell.first, m_cellTF[currentCell.first].getCoordinates());
+    }
+
+    // vector<int>() = no new neighbours
+    updateCell(currentCell.first, diedAt, diedId, accepted, rejected, -1, -1, currentCell.second, vector<int>());   // ID vom TCCAND.-Filter fehlt
+  }
+
+  m_trackletsTF.push_back(newtf);
+
+  return trackletID;
+}
+
+
+/** update Tracklet */
+// Not used at the moment
+void CollectorTFInfo::updateTracklet(int trackletID, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected)  // Tracklet Update
+{
+  B2DEBUG(100, "CollectorTFInfo: updateTracklet, trackletID: " << trackletID << ", diet_at: " << diedAt << ", accepted-size: " << accepted.size() << ", rejected-size: " << rejected.size());
+
+  if (trackletID >= int(m_trackletsTF.size()) || trackletID == -1) {
+    B2DEBUG(100, "CollectorTFInfo: updateTracklet - Tracklet not found !");
+    return;
+
+  } else {
+    // Reference to change TFCand
+    TrackCandidateTFInfo& currentTfCand = m_trackletsTF.at(trackletID);
+
+    // DiedAt = add to string
+    currentTfCand.setDiedAt(diedAt);
+    currentTfCand.setDiedID(diedId);
+    currentTfCand.insert_Accepted(accepted);
+    currentTfCand.insert_Rejected(rejected);
+
+    // ??? remove TC ID
+    int removeTCID = -1;
+    /* if (diedAt.size() > 0) {
+       removeTCID = trackletID;
+     }
+     } */
+
+    for (auto & currentCell : currentTfCand.getAssignedCell()) {
+      // vector<int>() = no new neighbours
+      // -1 => only update of the TC so no TC-ID needed
+      updateCell(currentCell, diedAt, diedId, accepted, rejected, -1, removeTCID, -1, vector<int>());
+    }
+
+
+  }
+
+}
+
+
 
 
 /** Update Fit Information (fitSuccessful, probabilityValue, assignedGTFC) of TC */

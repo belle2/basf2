@@ -475,13 +475,22 @@ void AnalizerCollectorTFInfo::storeHitInformation(std::string filename, int part
 
     B2DEBUG(100, "SaveHitInformation: i: " << i << ", pass index: " << aHit->getPassIndex() << ", size accepted: " << accepted.size() << ", size rejected: " << rejected.size());
 
-//     for (auto &currentFilter: rejected) {
-//  B2DEBUG(100,"rejected: " << currentFilter);
-//  }
-//
-//     for (auto &currentFilter: accepted) {
-//  B2DEBUG(100,"accepted: " << currentFilter);
-//  }
+    B2DEBUG(100, "SaveHitInformation: Real: " << aHit->getIsReal() << ", Died At: " << aHit->getDiedAt());
+
+
+
+
+    // Tests
+    // FilterID::pT: 16
+//     B2DEBUG(100,"FilterID::pT: " << FilterID::pT);
+
+//      for (auto &currentFilter: rejected) {
+//   B2DEBUG(100,"rejected: " << currentFilter);
+//   }
+
+//      for (auto &currentFilter: accepted) {
+//   B2DEBUG(100,"accepted: " << currentFilter);
+//   }
 
     for (uint u = 0; u < searchfilters.size(); u++) {
       //B2DEBUG(100,"Filter ?: " << searchfilters.at(u));
@@ -501,6 +510,7 @@ void AnalizerCollectorTFInfo::storeHitInformation(std::string filename, int part
         if (searchfilters.at(u) == FilterID::silentSegFinder || searchfilters.at(u) == FilterID::silentTcc) {
           myfile << "1";
         }
+
 
         //myfile << 2;     //not found
       }
@@ -701,6 +711,25 @@ void AnalizerCollectorTFInfo::storeCellInformation(std::string filename, int par
       std::vector<int> rejected = cellTFInfo[i]->getRejected();
 
       B2DEBUG(100, "SaveCellInformation: i: " << i << ", pass index: " << cellTFInfo[i]->getPassIndex() << ", size accepted: " << accepted.size() <<  ", size rejected: " << rejected.size() << ", sizeNeighbours: " << cellTFInfo[i]->sizeNeighbours());
+
+      B2DEBUG(100, "SaveHitInformation: Real: " << cellTFInfo[i]->getIsReal() << ", Died At: " << cellTFInfo[i]->getDiedAt());
+
+
+      // TESTS
+      B2DEBUG(100, "FilterID::pT: " << FilterID::pT);
+
+      for (auto & currentFilter : rejected) {
+        if (FilterID::pT == currentFilter) {
+          B2DEBUG(100, "rejected: " << currentFilter << ", Real: " << cellTFInfo[i]->getIsReal() << ", i: " << i << ", Died At: " << cellTFInfo[i]->getDiedAt());
+        }
+      }
+
+      for (auto & currentFilter : accepted) {
+        if (FilterID::pT == currentFilter) {
+          B2DEBUG(100, "accepted: " << currentFilter << ", Real: " << cellTFInfo[i]->getIsReal() << ", i: " << i << ", Died At: " << cellTFInfo[i]->getDiedAt());
+        }
+      }
+
 
       for (uint u = 0; u < searchfilters.size(); u++) {
         //B2DEBUG(100,"Filter ?: " << searchfilters.at(u));

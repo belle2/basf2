@@ -3303,7 +3303,8 @@ void VXDTFModule::endRun()
   B2DEBUG(1, std::fixed << std::setprecision(2) << " total time consumption in milliseconds: \n " << "HSort\t|baseTF\t|sgFind\t|nbFind\t|CA \t|tcCol\t|tcFlt\t|kalmn\t|chkOvr\t|clnOvr\t|neuNet\t|others\t|\n" << (m_TESTERtimeConsumption.hitSorting.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.baselineTF.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.segFinder.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.nbFinder.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.cellularAutomaton.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.tcc.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.postCAFilter.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.kalmanStuff.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.checkOverlap.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.cleanOverlap.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.neuronalStuff.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.intermediateStuff.count() * 0.001) << "\t|")
 
 //   m_eventCounter
-  B2DEBUG(1, std::fixed << std::setprecision(2) << " mean time consumption in microseconds: \n " << "HSort\t|baseTF\t|sgFind\t|nbFind\t|CA \t|tcCol\t|tcFlt\t|kalmn\t|chkOvr\t|clnOvr\t|neuNet\t|others\t|\n" << (m_TESTERtimeConsumption.hitSorting.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.baselineTF.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.segFinder.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.nbFinder.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.cellularAutomaton.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.tcc.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.postCAFilter.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.kalmanStuff.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.checkOverlap.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.cleanOverlap.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.neuronalStuff.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.intermediateStuff.count() * invNEvents) << "\t|")
+  B2DEBUG(1, std::fixed << std::setprecision(2) << " mean time consumption in microseconds: \n " << "HSort\t|baseTF\t|sgFind\t|nbFind\t|CA \t|tcCol\t|tcFlt\t|kalmn\t|chkOvr\t|clnOvr\t|neuNet\t|others\t|\n" << (m_TESTERtimeConsumption.hitSorting.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.baselineTF.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.segFinder.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.nbFinder.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.cellularAutomaton.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.tcc.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.postCAFilter.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.kalmanStuff.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.checkOverlap.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.cleanOverlap.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.neuronalStuff.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.
+          intermediateStuff.count() * invNEvents) << "\t|")
 
   B2DEBUG(2, "Explanation: HSort: hit sorting, baseTF: baseline TF, sgFind: segment finder , nbFind: neighbouring segments finder, CA: cellular automaton, tcCol: track candidate collector, tcFlt: track candidate filter (e.g. circleFit), kalmn: kalman filter, chkOvr: checking track candidates for overlapping clusters, clnOvr: cleaning track candidates for overlapping clusters, neuNet: neuronal network of Hopfield type, others: everything which was not listed above")
 
@@ -5240,7 +5241,44 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
             }
             B2DEBUG(50, "neighbourFINDER: segment discarded! simpleSegmentQI = " << simpleSegmentQI << ", threshold: " << currentPass->activatedNbFinderTests << " Outer/inner Segment: " << mainSecID << "/" << FullSecID(currentFriendID) << "/" << FullSecID(currentInnerSeg->getInnerHit()->getSectorName()) << endl << "FilterResults: " << outputStream.str()  << endl)
           }
-          // here 3-hit-cell-discarded update (nbFinder)
+
+
+          // Collector-TRACKLET: here 3-hit-cell-discarded update (nbFinder)
+          if (m_PARAMdisplayCollector > 0) {
+            B2DEBUG(100, "VXDTF: Display: Module Collector importTracklet");
+
+            // Filters vectors for update
+            std::vector<int> acceptedFilters;
+            std::vector<int> rejectedFilters;
+
+            for (auto entry : acceptedRejectedFilters) {
+              B2DEBUG(100, "Collector-TRACKLET discarded: acceptedRejected: " << entry.first << "; (T/F): " << entry.second);
+              if (entry.second == true) {
+                acceptedFilters.push_back(entry.first);
+
+              } else {
+                rejectedFilters.push_back(entry.first);
+              }
+
+            }
+
+            std::vector<std::pair<int, unsigned int>> allSegments;
+
+            // Connected Cells => vector for import
+            allSegments.push_back(make_pair(outerSegments[thisOuterSegment]->getCollectorID(), outerSegments[thisOuterSegment]->getState()));
+            allSegments.push_back(make_pair(currentInnerSeg->getCollectorID(), currentInnerSeg->getState()));
+
+            //importTracklet(int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, const std::vector<std::pair<int, unsigned int>> assignedCellIDs)
+
+            // delete possible ???
+            m_collector.importTracklet(m_aktpassNumber, "", CollectorTFInfo::m_idAlive, acceptedFilters, rejectedFilters, allSegments);
+
+          }
+
+
+
+
+
           continue;
         }
         if ((m_highOccupancyCase == true) && (currentPass->activatedHighOccupancyNbFinderTests != 0)) {
@@ -5255,7 +5293,40 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
                 }
                 B2DEBUG(50, "NbFINDERHighOccupancy: segment discarded! Outer/inner Segment: " <<  mainSecID << "/" << FullSecID(currentFriendID) << "/" << FullSecID(currentInnerSeg->getInnerHit()->getSectorName()) << endl << "FilterResults: " << outputStream.str() << ", needed threshold: " << currentPass->activatedHighOccupancyNbFinderTests << "\n")
               }
-              // here 3-hit-cell-discarded update (nbFinder high occupancy
+
+
+              // Collector-TRACKLET: here 3-hit-cell-discarded update (nbFinder high occupancy
+              if (m_PARAMdisplayCollector > 0) {
+                B2DEBUG(100, "VXDTF: Display: Module Collector importTracklet");
+
+                // Filters vectors for update
+                std::vector<int> acceptedFilters;
+                std::vector<int> rejectedFilters;
+
+                for (auto entry : acceptedRejectedFilters) {
+                  B2DEBUG(100, "Collector-TRACKLET discarded High: acceptedRejected: " << entry.first << "; (T/F): " << entry.second);
+                  if (entry.second == true) {
+                    acceptedFilters.push_back(entry.first);
+
+                  } else {
+                    rejectedFilters.push_back(entry.first);
+                  }
+
+                }
+
+                std::vector<std::pair<int, unsigned int>> allSegments;
+
+                // Connected Cells => vector for import
+                allSegments.push_back(make_pair(outerSegments[thisOuterSegment]->getCollectorID(), outerSegments[thisOuterSegment]->getState()));
+                allSegments.push_back(make_pair(currentInnerSeg->getCollectorID(), currentInnerSeg->getState()));
+
+                //importTracklet(int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, const std::vector<std::pair<int, unsigned int>> assignedCellIDs)
+                m_collector.importTracklet(m_aktpassNumber, "", CollectorTFInfo::m_idAlive, acceptedFilters, rejectedFilters, allSegments);
+
+              }
+
+
+
               continue;
             }
           }
@@ -5269,7 +5340,41 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           B2DEBUG(50, "neighbourFINDER: current segment is not allowed being seed for CA")
           currentInnerSeg->setSeed(false);
         }
-        // here 3-hit-cell accepted (nbFinder)
+
+
+
+        // Collector-TRACKLET: here 3-hit-cell accepted (nbFinder)
+        if (m_PARAMdisplayCollector > 0) {
+          B2DEBUG(10, "VXDTF: Display: Module Collector importTracklet");
+
+          // Filters vectors for update
+          std::vector<int> acceptedFilters;
+          std::vector<int> rejectedFilters;
+
+          for (auto entry : acceptedRejectedFilters) {
+            B2DEBUG(10, "Collector-TRACKLET accepted acceptedRejected: " << entry.first << "; (T/F): " << entry.second);
+            if (entry.second == true) {
+              acceptedFilters.push_back(entry.first);
+
+            } else {
+              rejectedFilters.push_back(entry.first);
+            }
+
+          }
+
+          std::vector<std::pair<int, unsigned int>> allSegments;
+
+          // Connected Cells => vector for import
+          allSegments.push_back(make_pair(outerSegments[thisOuterSegment]->getCollectorID(), outerSegments[thisOuterSegment]->getState()));
+          allSegments.push_back(make_pair(currentInnerSeg->getCollectorID(), currentInnerSeg->getState()));
+
+          //importTracklet(int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, const std::vector<std::pair<int, unsigned int>> assignedCellIDs)
+          m_collector.importTracklet(m_aktpassNumber, "", CollectorTFInfo::m_idAlive, acceptedFilters, rejectedFilters, allSegments);
+
+        }
+
+
+
       } // iterating through inner segments
     } // iterating through outer segments
   } // iterating through all active sectors - friendFinder
@@ -5307,6 +5412,9 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
     }
 
     // Collector Cell update with Filters
+
+    // Collector-TRACKLET: TO DELETE
+    /*
     if (m_PARAMdisplayCollector > 0) {
       B2DEBUG(10, "VXDTF: Display: Module Collector updateCell");
 
@@ -5328,6 +5436,8 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
       m_collector.updateCell(currentSeg->getCollectorID(), "", CollectorTFInfo::m_idAlive, acceptedFilters, rejectedFilters, -1, -1, currentSeg->getState(), vector<int>());
 
     }
+    */
+
 
 
   }

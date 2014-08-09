@@ -118,6 +118,12 @@ namespace Belle2 {
     /** update TCand */
     virtual void updateTC(int tcid, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected);  // TC Update
 
+    /** Tracklet Import, return = tracklet id */
+    virtual void updateTracklet(int trackletID, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected);  // Tracklet Updates
+
+    /** update Tracklet */
+    virtual int importTracklet(int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, const std::vector<std::pair<int, unsigned int>> assignedCellIDs);
+
     /** Update Fit Information (fitSuccessful, probabilityValue, assignedGTFC) of TC */
     virtual void updateTCFitInformation(int tcid, bool fitSuccessful, double probabilityValue, int assignedGTFC);
 
@@ -149,6 +155,9 @@ namespace Belle2 {
     std::vector<HitTFInfo> m_hitTF;       /**< used Hits */
     std::vector<CellTFInfo> m_cellTF;       /**< used Cells */
     std::vector<TrackCandidateTFInfo> m_tfCandTF;   /**< used TCand */
+
+    // Tracklets safe
+    std::vector<TrackCandidateTFInfo> m_trackletsTF;   /**< used Tracklets */
 
     // IDs & Strings for diedAt
     const static std::string m_nameHitFinder;   /**< string name of HitFinder*/

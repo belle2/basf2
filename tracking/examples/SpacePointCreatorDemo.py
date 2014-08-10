@@ -37,8 +37,17 @@ geometry.param('components', ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD',
 g4sim = register_module('FullSim')
 g4sim.param('StoreAllSecondaries', True)
 
-spCreator = register_module('SpacePointCreator')
-spCreator.logging.log_level = LogLevel.DEBUG
+spCreatorSingle = register_module('SpacePointCreator')
+spCreatorSingle.logging.log_level = LogLevel.DEBUG
+spCreatorSingle.logging.debug_level = 1
+spCreatorSingle.param('OnlySingleClusterSpacePoints', True)
+spCreatorSingle.param('NameOfInstance', 'singlesOnly')
+
+spCreatorCombi = register_module('SpacePointCreator')
+spCreatorCombi.logging.log_level = LogLevel.DEBUG
+spCreatorCombi.logging.debug_level = 1
+spCreatorCombi.param('OnlySingleClusterSpacePoints', False)
+spCreatorCombi.param('NameOfInstance', 'couplesAllowed')
 
 
 # Create paths
@@ -53,7 +62,8 @@ main.add_module(pxdDigitizer)
 main.add_module(pxdClusterizer)
 main.add_module(svdDigitizer)
 main.add_module(svdClusterizer)
-main.add_module(spCreator)
+main.add_module(spCreatorSingle)
+main.add_module(spCreatorCombi)
 
 
 # Process events

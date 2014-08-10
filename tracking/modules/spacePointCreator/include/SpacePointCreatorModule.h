@@ -24,7 +24,10 @@ namespace Belle2 {
     /** Constructor */
     SpacePointCreatorModule();
 
-    /** Init the module */
+    /** Init the module.
+    *
+    * prepares all store- and relationArrays
+    */
     virtual void initialize();
     /** Show progress */
     virtual void event();
@@ -33,5 +36,16 @@ namespace Belle2 {
 
   protected:
 
+    // Data members
+    std::string m_pxdClustersName; /**< PXDCluster collection name */
+    std::string m_svdClustersName; /**< SVDCluster collection name */
+    std::string m_spacePointsName; /**< SpacePoints collection name */
+    std::string m_relSpacePointsPXDClustersName; /**< SpacePoints <-> PXDClusters relation name */
+    std::string m_relSpacePointsSVDClustersName; /**< SpacePoints <-> SVDClusters relation name */
+
+    //counters for testing
+    unsigned int m_TESTERPXDClusterCtr; /**< counts total number of PXDClusters occured */
+    unsigned int m_TESTERSVDClusterCtr; /**< counts total number of SVDCluster occured */
+    unsigned int m_TESTERSpacePointCtr; /**< counts total number of SpacePoints occured */
   };
 } // end namespace Belle2

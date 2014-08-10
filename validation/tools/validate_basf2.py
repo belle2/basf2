@@ -36,7 +36,7 @@ pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 ################################################################################
 
 class Validation:
-    """
+    """!
     This is the class that provides all global variables, like 'list_of_files'
     etc. There is only one instance of this class with name 'validation. This
     allows to use some kind of namespace, i.e. global variables will always be
@@ -46,7 +46,7 @@ class Validation:
     """
 
     def __init__(self):
-        """
+        """!
         The default constructor. Initializes all those variables that will be
         globally accessible later on. Does not return anything.
         """
@@ -60,39 +60,41 @@ class Validation:
                 validation_dir = os.environ['BELLE2_RELEASE_DIR']
             shutil.copytree(validation_dir + '/validation/html', 'html')
 
+        ## The logging-object for the validation (Instance of the logging-module)
         # Initialize the log as 'None' and then call the method 'create_log()'
         # to create the actual log.
         self.log = None
         self.create_log()
 
-        # This dictionary holds the paths to the local and central release dir
+        ## This dictionary holds the paths to the local and central release dir
         # (or 'None' if one of them does not exist)
         self.basepaths = {'local': os.environ.get('BELLE2_LOCAL_DIR', None),
                           'central': os.environ.get('BELLE2_RELEASE_DIR', None)}
 
-        # Initialize the list which will later hold all steering file objects
+        ## The list which holds all steering file objects
         # (as instances of class Script)
         self.list_of_scripts = []   # Script objects
 
-        # A list of all packages from which we have collected steering files
+        ## A list of all packages from which we have collected steering files
         self.list_of_packages = []
 
-        # Now we need to distinguish if we want to run the entire validation
-        # (all available packages) or only some specific packages.
-        self.packages = None             # The specific packages (if applicable).  Default is complete validation!
+        ## The list of packages to be included in the validation. If we are
+        # running a complete validation, this will be None.
+        self.packages = None
 
-        # This is where we will store additional arguments for basf2,
-        # if we received any from the command line arguments
+        ## Additional arguments for basf2, if we received any from the command
+        # line arguments
         self.basf2_options = ''
 
-        # A variable which holds the mode, i.e. 'local' for local
+        ## A variable which holds the mode, i.e. 'local' for local
         # multi-processing and 'cluster' for cluster usage
         self.mode = None
 
     def build_dependencies(self):
-        """
+        """!
         This method loops over all Script objects in self.list_of_scripts and
         calls their get_dependencies()-method.
+        @return: None
         """
         for script_object in self.list_of_scripts:
             script_object.get_dependencies()
@@ -109,20 +111,22 @@ class Validation:
                 script_object.dependencies += default_depend
 
     def build_headers(self):
-        """
+        """!
         This method loops over all Script objects in self.list_of_scripts and
         calls their get_header()-method.
+        @return: None
         """
         for script_object in self.list_of_scripts:
             script_object.get_header()
 
     def create_log(self):
-        """
+        """!
         Create the logger.
         We use the logging module to create an object which allows us to
         comfortably log everything that happens during the execution of
         this script and even have different levels of importance, such as
         'ERROR' or 'DEBUG'.
+        @return: None
         """
         # Create the log and set its default level to DEBUG, which means that
         # it will store _everything_.
@@ -178,10 +182,11 @@ class Validation:
         self.log.addHandler(file_handler)
 
     def collect_steering_files(self):
-        """
+        """!
         This function will collect all steering files from the local and
         central release directory and will store the corresponding paths in
         self.list_of_sf_paths.
+        @return: None
         """
 
         # Get all folders that contain steering files, first the local ones
@@ -217,9 +222,10 @@ class Validation:
         # which we are going to perform the validation in self.list_of_scripts
 
     def run_validation(self):
-        """
+        """!
         This method runs the actual validation, i.e. it loops over all
         scripts, checks which of them are ready for execution, and runs them.
+        @return: None
         """
 
         # Use the local execution for all plotting scripts
@@ -303,9 +309,10 @@ class Validation:
         print
 
     def create_plots(self):
-        """
+        """!
         This method prepares the html directory for the plots if necessary
         and creates the plots that include the results from this validation.
+        @return: None
         """
 
         # Go to the html directory and create a link to the results folder if it is not yet existing
@@ -323,37 +330,63 @@ class Validation:
 
 
 class Script:
-    """
+    """!
     The object representation of a steering file.
     """
 
     def __init__(self, path, package):
-        """
+        """!
         The default constructor.
         """
 
+        ## Pointer to the script object itself
+        # Is this necessary?
         self._object = self
+
+        ## The (absolute) path of the steering file
         self.path = path
+
+        ## The name of the steering file. Basically the file name of the
+        # steering file, but everything that is not a letter is replaced
+        # by an underscore. Useful e.g. for cluster controls.
         self.name = re.sub(r'[\W_]+', '_', str(os.path.basename(self.path)))
+
+        ## The package to which the steering file belongs
         self.package = package
+
+        ## The information from the file header
         self.header = None
+
+        ## A list of script objects, on which this script depends
         self.dependencies = []
+
+        ## Current status of the script.
+        # Possible values: 'waiting', 'running', 'finished', 'failed'
         self.status = 'waiting'
+
+        ## Which control is used for executing the script, i.e. cluster or
+        # local. Useful when using different script level, e.g. data creation
+        # scripts are being run on the cluster, but plotting scripts are
+        # executed locally
         self.control = None
+
+        ## The returncode of the script. Should be 0 if all went well.
         self.returncode = None
 
     def dump(self):
-        """
+        """!
         Print out all properties = attributes of a script.
+        @return: None
         """
         print
         pp.pprint(vars(self))
 
     def get_dependencies(self):
-        """
+        """!
         Loops over the input files given in the header and tries to find the
         corresponding Script objects, which will then be stored in the
         script.dependencies-list
+        @return: None
         """
         # If all necessary header information are available:
         if self.header is not None:
@@ -405,11 +438,12 @@ class Script:
                 self.dependencies.append(predecessor)
 
     def get_header(self):
-        """
+        """!
         This method opens the file given in self.path, tries to extract the
         XML-header of it and then parse it.
         It then fills the self.header variable with a dict containing the
         values that were read from the XML header.
+        @return: None
         """
 
         # Read the file as a whole
@@ -467,11 +501,15 @@ class Script:
 ################################################################################
 
 def find_creator(outputfile, package):
-    """
+    """!
     This function receives the name of a file and tries to find the file
     in the given package which produces this file, i.e. find the file in
     whose header 'outputfile' is listed under <output></output>.
     It then returns a list of all Scripts who claim to be creating 'outputfile'.
+
+    @param outputfile: The file of which we want to know by which script is
+        created
+    @param package: The package in which we want to search for the creator
     """
 
     # Get a list of all Script objects for scripts in the given package as well
@@ -496,10 +534,14 @@ def find_creator(outputfile, package):
 
 
 def get_validation_folders(location):
-    """
+    """!
     Collects the validation folders for all packages from the stated release
-    directory (either local or central). Returns a dict with the following form:
+    directory (either local or central). Returns a dict with the following
+    form:
     {'name of package':'absolute path to validation folder of package'}
+
+    @param location: The location where we want to search for validation
+        folders (either 'local' or 'central')
     """
 
     # Make sure we only look in existing locations:
@@ -537,9 +579,12 @@ def get_validation_folders(location):
 
 
 def parse_cmd_line_arguments():
-    """
+    """!
     Sets up a parser for command line arguments, parses them and returns the
     arguments.
+    @return: An object containing the parsed command line arguments.
+        Arguments are accessed like they are attributes of the object,
+        i.e. [name_of_object].[desired_argument]
     """
 
     # Set up the command line parser
@@ -568,9 +613,15 @@ def parse_cmd_line_arguments():
 
 
 def scripts_in_dir(dirpath, ext='*'):
-    """
+    """!
     Returns all the files in the given dir (and its subdirs) that have
     the extension 'ext', if an extension is given (default: all extensions)
+
+    @param dirpath: The directory in which we are looking for files
+    @param ext: The extension of the files, which we are looking for.
+        '*' is the wildcard-operator (=all extensions are accepted)
+    @return: A sorted list of all files with the specified extension in the
+        given directory.
     """
 
     # Write to log what we are collecting
@@ -607,6 +658,12 @@ def draw_progress_bar(delete_lines, barlength=50):
     percentage of the scripts has been executed yet.
     It furthermore also shows which scripts are currently running, as well as
     the total runtime of the validation.
+
+    @param delete_lines: The amount of lines which need to be deleted before
+        we can redraw the progress bar
+    @param barlength: The length of the progess bar (in characters)
+    @return: The number of lines that were printed by this function call.
+        Usefule if this function is called repeatedly.
     """
 
     # Get statistics: Number of finished scripts + number of scripts in total

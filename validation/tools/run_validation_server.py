@@ -17,15 +17,22 @@ from validationplots import create_plots
 
 
 class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
-    """
+    """!
     Defines how the BaseHTTPServer handles HTTP Requests (GET or POST)
     """
 
     def logRequest(s):
+        """!
+        Writes the message in 's' to the log, which is by default printed to
+        stdout
+
+        @param s: The string containing the log message
+        @return: None
+        """
         log.debug("%s: %s/%s" % (s.client_address, s.command, s.path))
 
     def do_GET(self):
-        """
+        """!
         How to deal with a GET-request
         """
         path = self.path
@@ -55,7 +62,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
         print
 
     def do_POST(self):
-        """
+        """!
         How to deal with a POST-request
         """
 
@@ -98,6 +105,13 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
         return
 
     def do_GET_FILE(self):
+        """!
+        Deals with GET-requests that request a file from the server (i.e.
+        serves this file, if it exists)
+
+        @return: Tuple of the returncode of request, the file itself,
+            and the file type
+        """
 
         docRoot = './'
         docPath = "%s%s" % (docRoot, self.path)
@@ -133,6 +147,15 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
         return code, doc, file_type
 
     def do_GET_JSON(self, data=None):
+        """!
+        Deals with GET-requests that want some kind of data as an answer.
+        The answer will be returned in JSON-format, hence the name.
+
+        @param data: Information specifying the request, i.e. what kind of
+            data we want as an answer
+        @return: Tuple of returncode, the requested date, and the type
+            (usually 'application/json')
+        """
 
         # Used to check if a web server is running
         if self.path.startswith('/ajax/pingserver'):
@@ -166,7 +189,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 
 def run(ip='', port=8000):
-    """
+    """!
     Runs a BaseHTTPServer on the given address
     """
     server_address = (ip, port)

@@ -14,7 +14,7 @@ class Cluster:
     """
 
     def __init__(self):
-        """
+        """!
         The default constructor.
         - Holds the current working directory, which is also the location of
           the shellscripts that are being sent to the cluster.
@@ -22,15 +22,16 @@ class Cluster:
         - Finds the revision of basf2 that will be set up on the cluster.
         """
 
-        # The command to submit a job. 'LOGFILE' will be replaced by the
+        ## The command to submit a job. 'LOGFILE' will be replaced by the
         # actual log file name
         # self.submit_command = 'qsub -cwd -o LOGFILE -e LOGFILE -q medium -V'
         self.submit_command = 'bsub -o LOGFILE -e LOGFILE -q l'
 
-        # The path, where the help files are being created
+        ## The path, where the help files are being created
         # Maybe there should be a special subfolder for them?
         self.path = os.getcwd()
 
+        ## Contains a reference to the logger-object from validate_basf2
         # Set up the logging functionality for the 'cluster execution'-Class,
         # so we can log to validate_basf2.py's log what is going on in
         # .execute and .is_finished
@@ -39,9 +40,13 @@ class Cluster:
         # We need to set up the same environment on the cluster like on the
         # local machine. The information can be extracted from $BELLE2_TOOLS,
         # $BELLE2_RELEASE_DIR and $BELLE2_LOCAL_DIR
+
+        ## Path to the basf2 tools
         self.tools = self.adjust_path(os.environ['BELLE2_TOOLS'])
         belle2_release_dir = os.environ.get('BELLE2_RELEASE_DIR', None)
         belle2_local_dir = os.environ.get('BELLE2_LOCAL_DIR', None)
+
+        ## The default command for setuprel (may include options?)
         self.setuprel = 'setuprel'
         if belle2_release_dir is not None:
             self.setuprel += ' ' + belle2_release_dir.split('/')[-1]
@@ -57,27 +62,36 @@ class Cluster:
         clusterlog_dir = './html/logs/__general__/'
         if not os.path.exists(clusterlog_dir):
             os.makedirs(clusterlog_dir)
+
+        ## The file object to which all cluster messages will be written
         self.clusterlog = open(clusterlog_dir + 'clusterlog.log', 'w+')
 
     def adjust_path(self, path):
-        """
+        """!
         This method can be used if path names are different on submission
         and execution hosts.
+        @param path: The past that needs to be adjusted
+        @return: The adjusted path
         """
 
         return path
 
     def available(self):
-        """
+        """!
         The cluster should always be available to accept new jobs.
+        @return: Will always return True if the function can be called
         """
 
         return True
 
     def execute(self, job, options=''):
-        """
+        """!
         Takes a Script object and a string with options and runs it on the
         cluster, either with ROOT or with basf2, depending on the file type.
+
+        @param job: The steering file object that should be executed
+        @param options: Options that will be given to the basf2 command
+        @return: None
         """
 
         # Define the folder in which the results (= the ROOT files) should be
@@ -136,10 +150,13 @@ class Cluster:
         subprocess.Popen(params, stdout=self.clusterlog, stderr=self.clusterlog)
 
     def is_job_finished(self, job):
-        """
+        """!
         Checks whether the '.done'-file has been created for a job. If so, it
         returns True, else it returns False.
         Also deletes the .done-File once it has returned True.
+
+        @param job: The job of which we want to know if it finished
+        @return: True if the job has finished, otherwise False
         """
 
         # If there is a file indicating the job is done, that is its name:

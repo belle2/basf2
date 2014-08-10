@@ -577,37 +577,42 @@ class RootObject:
     def __init__(self, revision, package, rootfile, key, root_object,
                  root_object_type, date, description, check, contact,
                  is_reference):
-        """
+        """!
         The constructor. Sets the element up and store the information in a
         dict, but also sets up object variables for simplified access.
 
-        :param revision: The revision of the object, e.g. 'release-00-04-01'
-        :param package: The package of the object, e.g. 'analysis'
-        :param rootfile: The absolute path to the ROOT file that contains
+        @param revision: The revision of the object, e.g. 'release-00-04-01'
+        @param package: The package of the object, e.g. 'analysis'
+        @param rootfile: The absolute path to the ROOT file that contains
                 this object
-        :param key: The key of the object, which is basically its name.
+        @param key: The key of the object, which is basically its name.
                 Example: 'P_Eff_k_e'. For each revision, there should be one
                 object with the same key.
-        :param root_object: The ROOT object itself. Storing works only for
+        @param root_object: The ROOT object itself. Storing works only for
                 histograms.
-        :param root_object_type: The type of the object. Possible values are
+        @param root_object_type: The type of the object. Possible values are
                 'TH1' (1D histogram), 'TH2' (2D histogram), and 'TNtuple'
-        :param date: The date when the containing revision folder was last
+        @param date: The date when the containing revision folder was last
                 modified. Important to find the most recent object.
-        :param description: A short description of what is displayed in the
+        @param description: A short description of what is displayed in the
                 plot. May also contain LaTeX-Code (enclosed in $...$),
                 which will later be parsed by MathJax
-        :param check: A short description of how the data in the plot should
+        @param check: A short description of how the data in the plot should
                 look like, i.e. for example the target location of a peak etc.
-        :param contact: A name or preferably an e-mail address of the person
+        @param contact: A name or preferably an e-mail address of the person
                 who is responsible for this plot and may be contacted in case of
                 problems
-        :param is_reference: A boolean value telling if an object is a
+        @param is_reference: A boolean value telling if an object is a
                 reference object or a normal plot/n-tuple object from a
                 revision. Possible Values: True for reference objects,
                 False for revision objects.
         """
 
+        # TO DO
+        # All of the following could be simplified, if one modified the
+        # find_root_object() method to search through vars(Root-Object)
+
+        ## A dict with all information about the Root-object
         # Have all information as a dictionary so that we can search and
         # filter the objects by properties
         self.data = {'revision': revision,
@@ -624,24 +629,47 @@ class RootObject:
 
         # For convenient access, define the following variables, which are
         # only references to the values from the dict
+
+        ## The revision to which the object belongs to
         self.revision = self.data['revision']
+
+        ## The package to which the object belongs to
         self.package = self.data['package']
+
+        ## The root file to which the object belongs to
         self.rootfile = self.data['rootfile']
+
+        ## The key (more precisely: the name of they) which the object has
+        # within the root file
         self.key = self.data['key']
+
+        ## The root object itself
         self.object = self.data['object']
-        self.revision = self.data['revision']
+
+        ## The type, i.e. whether its a histogram or an n-tuple
         self.type = self.data['type']
+
+        ## The description, what the histogram/n-tuple contains
         self.description = self.data['description']
+
+        ## A brief description how the histogram or the values should look
+        # like (e.g. characteristic peaks etc.)
         self.check = self.data['check']
+
+        ## A contact person for this histogram/n-tuple
         self.contact = self.data['contact']
+
+        ## The date of the object (identical with the date of its rootfile)
         self.date = self.data['date']
+
+        ## Boolean value if it is an object from a reference file or not
         self.is_reference = self.data['is_reference']
 
     def dump(self):
-        """
+        """!
         Allows to print out all information about a RootObject to the command
         line (for debugging purposes).
-        :return: No return value
+        @return: None
         """
         pp.pprint(self.data)
 
@@ -652,14 +680,25 @@ class Plotuple:
     """
 
     def __init__(self, list_of_root_objects, list_of_revisions):
+        """!
+        The default constructor for a Plotuple-object.
+        @param list_of_root_objects: A list of Root-objects which belong
+            together (i.e. should be drawn into one histogram or one table)
+        @param list_of_revisions: The list of revisions (Duh!)
         """
 
-        """
+        ## The list of Root objects in this Plotuple-object
         self.list_of_root_objects = list_of_root_objects
+
+        ## The list of revisions
         self.list_of_revisions = list_of_revisions
+
+        ## A list of all problems that occured with this Plotuple,
+        # e.g. missing reference object, missing meta-information...
         self.warnings = []
 
         # Find the reference element. If we can't find one, set it to 'None'
+        ## The reference-object for this Plotuple object
         self.reference = None
         for root_object in self.list_of_root_objects:
             if root_object.is_reference:
@@ -671,6 +710,7 @@ class Plotuple:
         if self.reference is None:
             self.warnings = ['No reference object']
 
+        ## All elements of the Plotuple that are not the reference-object
         # Get the elements, i.e. all RootObjects except for the
         # reference object. May be either histograms or n-tuples.
         self.elements = sorted([_ for _ in list_of_root_objects if _ is not
@@ -678,20 +718,45 @@ class Plotuple:
                                key=lambda _: _.date,
                                reverse=True)
 
-        # Find the newest element, i.e. the element belonging the revision
-        # whose data were created most recently. Should always be
-        # self.element[0]
+        ## The newest element, i.e. the element belonging the revision
+        # whose data were created most recently.
+        # Should always be self.element[0]
         self.newest = self.elements[0]
 
-        # All available meta-information about the plot:
+        # All available meta-information about the plotuple object:
+
+        ## The key (more precisely: the name of the key) that all elements of
+        # this Plotuple object share
         self.key = self.newest.key
+
+        ## The type of the elements in this Plotuple object
         self.type = self.newest.type
+
+        ## The description of the histogram/n-tuple which this Plotuple object
+        # will yield
         self.description = self.newest.description
+
+        ## The 'Check for ...'-guideline for the histogram/n-tuple which this
+        # Plotuple object will yield
         self.check = self.newest.check
+
+        ## A contact person for the histogram/n-tuple which this Plotuple object
+        # will yield
         self.contact = self.newest.contact
+
+        ## The package to which the elements in this Plotuple object belong
         self.package = self.newest.package
+
+        ## The result of the Chi^2-Test. By default, there is no such result.
+        # If the Chi^2-Test has been performed, this variable holds between
+        # which objects it has been performed.
         self.chi2test_result = 'n/a'
+
+        ## The p-value that the Chi^2-Test returned.
         self.pvalue = 'n/a'
+
+        ## The file, in which the histogram or the HMTL-table (for n-tuples)
+        # are stored (without the file extension!)
         self.file = None
 
         # Deal with incomplete information
@@ -709,6 +774,10 @@ class Plotuple:
         self.create_plotuple()
 
     def create_plotuple(self):
+        """!
+        Creates the histogram/table/image that belongs to this Plotuble-object.
+        """
+
         if self.type == 'TH1':
             self.create_histogram_plot('1D')
         elif self.type == 'TH2':
@@ -718,15 +787,18 @@ class Plotuple:
         elif self.type == 'TNtuple':
             self.create_ntuple_table()
         else:
-
             sys.exit('Tried to create histogram/n-tuple, '
                      'but received invalid type')
 
     def chi2test(self, canvas):
-        """
+        """!
         Takes two RootObject-objects and a canvas. Performs a Chi^2-Test on the
         two histograms and sets the background of the canvas correspondingly.
         Returns the p-value of the Chi^2-Test.
+        @param canvas: Reference to the canvas on which we will draw (chi2test
+            may change the background color of the plot depending on the
+            p-value)
+        @return: None
         """
         pvalue = self.reference.object.Chi2Test(self.newest.object)
 
@@ -742,9 +814,12 @@ class Plotuple:
         self.pvalue = pvalue
 
     def draw_ref(self, canvas):
-        """
+        """!
         Takes a reference RootObject and a (sub)canvas and plots it with the
         correct line-style etc.
+        @param canvas: Reference to the canvas on which we will draw the
+            reference object.
+        @return. None
         """
         # Line is thick and black
         self.reference.object.SetLineColor(ROOT.kBlack)
@@ -761,8 +836,9 @@ class Plotuple:
         canvas.GetFrame().SetFillColor(ROOT.kWhite)
 
     def create_image_plot(self):
-        """
-        Creates image plot
+        """!
+        Creates image plot for TASImage-objects.
+        @return: None
         """
 
         # Create a ROOT canvas on which we will draw our histograms
@@ -838,13 +914,12 @@ class Plotuple:
         self.file = './{0}/'.format('/'.join(path.split('/')[2:])) + self.key
 
     def create_histogram_plot(self, mode):
-        """
-        Takes a list of root_objects with the same key and plots them together in
-        a histogram, which is then given the name of the key. The parameters are:
-        - histogram_objects: a list of RootObjects with the same key, which will
-                             therefore go into the same histogram
-        - mode: determines whether it is a one- or two-dimensional histogram.
-                Accepted values are '1D' and '2D'
+        """!
+        Plots all histogram-objects in this Plotuple together in one histogram,
+        which is then given the name of the key.
+        @param mode: Determines whether it is a one- or two-dimensional histogram.
+            Accepted values are '1D' and '2D'
+        @return: None
         """
 
         # If we don't get a valid 'mode', we can stop right here
@@ -956,12 +1031,9 @@ class Plotuple:
         self.file = './{0}/'.format('/'.join(path.split('/')[2:])) + self.key
 
     def create_ntuple_table(self):
-        """
-        Takes a list of RootObjects (which are n-tuples) and prints them together
-        in one HTML table. Returns a list which contains the following:
-        - List of strings containing the generated HTML lines for the table.
-        - String with "Description"
-        - String with "Check for"
+        """!
+        If the Plotuple-object contains n-tuples, this will create the
+        corresponding HTML-table for it.
         """
 
         # The string which will contain our lines of code
@@ -1025,8 +1097,8 @@ class Plotuple:
         self.file = '{0}/{1}'.format(path, self.key)
 
     def html(self):
-        """
-        :return: The HTML Code for the plot.
+        """!
+        @return: The HTML Code for the plot.
         """
         html = []
 
@@ -1081,11 +1153,14 @@ class Plotuple:
 
 
 def create_plots(revisions=None, force=False):
-    """
+    """!
     This function generates the plots and html pgae for the requested revisions.
     By default all available revisions are taken. New plots will ony be
     created if they don't exist already for the given set of revisions,
     unless the force option is used.
+    @param revisions: The revisions which should be taken into account.
+    @param force: If True, plots are created even if there already is a version
+        of them (which may me deprecated, though)
     """
 
     # Initialize the list of revisions which we will plot

@@ -78,18 +78,18 @@ stdLooseK()
 stdPi0()
 
 # 1. reconstruct D0 in multiple decay modes
-reconDecay('D0:ch1 -> K-:loose pi+:loose', '1.8 < M < 1.9 and 2.5 < p_CMS < 5.5')
-reconDecay('D0:ch2 -> K-:loose pi+:loose pi0:good', '1.8 < M < 1.9 and 2.5 < p_CMS < 5.5')
-reconDecay('D0:ch3 -> K-:loose pi+:loose pi+:loose pi-:loose', '1.8 < M < 1.9 and 2.5 < p_CMS < 5.5')
+reconDecay('D0:ch1 -> K-:loose pi+:loose', '1.8 < M < 1.9 and 2.5 < p_CMS < 5.5', 1)
+reconDecay('D0:ch2 -> K-:loose pi+:loose pi0:good', '1.8 < M < 1.9 and 2.5 < p_CMS < 5.5', 2)
+reconDecay('D0:ch3 -> K-:loose pi+:loose pi+:loose pi-:loose', '1.8 < M < 1.9 and 2.5 < p_CMS < 5.5', 3)
 
 # merge the D0 lists together into one single list
 copyLists('D0:all', ['D0:ch1', 'D0:ch2', 'D0:ch3'])
 
 # 2. reconstruct D+ -> K- pi+ pi+
-reconDecay('D+:kpipi -> K-:loose pi+:loose pi+:loose', '1.8 < M < 1.9 and 2.5 < p_CMS < 5.5')
+reconDecay('D+:kpipi -> K-:loose pi+:loose pi+:loose', '1.8 < M < 1.9 and 2.5 < p_CMS < 5.5', 1)
 
 # 3. reconstruct Ds+ -> K- K+ pi+
-reconDecay('D_s+:kkpi -> K-:loose K+:loose pi+:loose', '1.9 < M < 2.0 and 2.5 < p_CMS < 5.5')
+reconDecay('D_s+:kkpi -> K-:loose K+:loose pi+:loose', '1.9 < M < 2.0 and 2.5 < p_CMS < 5.5', 1)
 
 # perform MC matching (MC truth asociation)
 matchMCTruth('D0:all')

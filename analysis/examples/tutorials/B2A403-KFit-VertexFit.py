@@ -78,7 +78,7 @@ matchMCTruth('D*+')
 
 # create and fill flat Ntuple with MCTruth and kinematic information
 toolsDST = ['EventMetaData', '^D*+']
-toolsDST += ['Kinematics', '^D*+ -> ^D0 pi+']
+toolsDST += ['InvMass[BeforeFit]', '^D*+ -> ^D0 pi+']
 toolsDST += ['CMSKinematics', '^D*+']
 toolsDST += ['Vertex', '^D*+ -> ^D0 pi+']
 toolsDST += ['MCVertex', '^D*+ -> ^D0 pi+']

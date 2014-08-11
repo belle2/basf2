@@ -33,7 +33,7 @@ def stdK(path=analysis_main):
 
 def stdPi0(path=analysis_main):
     goodPhoton(path)
-    reconDecay('pi0:all -> gamma:good gamma:good', '0.11 < M < 0.16',
+    reconDecay('pi0:all -> gamma:good gamma:good', '0.11 < M < 0.16', 1,
                True, path)
     massKFit('pi0:all', 0.0, '', path)
     matchMCTruth('pi0:all', path)

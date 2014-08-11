@@ -70,9 +70,8 @@ matchMCTruth('B0:all')
 
 # create and fill flat Ntuple with MCTruth and kinematic information
 toolsB0 = ['EventMetaData', '^B0']
-toolsB0 += ['Kinematics', '^B0 -> ^D0 ^pi0']
+toolsB0 += ['InvMass[BeforeFit]', 'B0 -> ^D0 ^pi0']
 toolsB0 += ['DeltaEMbc', '^B0']
-toolsB0 += ['MassBeforeFit', 'B0 -> ^D0 ^pi0']
 toolsB0 += ['Cluster', 'B0 -> D0 [pi0 -> ^gamma ^gamma]']
 toolsB0 += ['MCTruth', '^B0 -> ^D0 ^pi0']
 

@@ -74,17 +74,17 @@ stdLooseMu()
 stdPi0()
 
 # 1. reconstruct D0 in multiple decay modes
-reconDecay('D0:ch1 -> K-:loose pi+:loose', '1.8 < M < 1.9')
-reconDecay('D0:ch2 -> K-:loose pi+:loose pi0:good', '1.8 < M < 1.9')
-reconDecay('D0:ch3 -> K-:loose pi+:loose pi+:loose pi-:loose', '1.8 < M < 1.9')
-reconDecay('D0:ch4 -> K-:loose K+:loose', '1.8 < M < 1.9')
-reconDecay('D0:ch5 -> pi-:loose pi+:loose', '1.8 < M < 1.9')
+reconDecay('D0:ch1 -> K-:loose pi+:loose', '1.8 < M < 1.9', 1)
+reconDecay('D0:ch2 -> K-:loose pi+:loose pi0:good', '1.8 < M < 1.9', 2)
+reconDecay('D0:ch3 -> K-:loose pi+:loose pi+:loose pi-:loose', '1.8 < M < 1.9', 3)
+reconDecay('D0:ch4 -> K-:loose K+:loose', '1.8 < M < 1.9', 4)
+reconDecay('D0:ch5 -> pi-:loose pi+:loose', '1.8 < M < 1.9', 5)
 
 # merge the D0 lists together into one single list
 copyLists('D0:all', ['D0:ch1', 'D0:ch2', 'D0:ch3', 'D0:ch4', 'D0:ch5'])
 
 # 2. reconstruct Btag+ -> anti-D0 pi+
-reconDecay('B+:tag -> anti-D0:all pi+:loose', '5.2 < Mbc < 5.29 and abs(deltaE) < 1.0')
+reconDecay('B+:tag -> anti-D0:all pi+:loose', '5.2 < Mbc < 5.29 and abs(deltaE) < 1.0', 1)
 matchMCTruth('B+:tag')
 
 # 3. reconstruct Upsilon(4S) -> Btag+ Bsig- -> Btag+ mu-
@@ -100,6 +100,8 @@ buildRestOfEvent('Upsilon(4S)')
 toolsBTAG = ['MCTruth', '^B- -> ^D0 pi-']
 toolsBTAG += ['Kinematics', 'B- -> ^D0 pi-']
 toolsBTAG += ['DeltaEMbc', '^B-']
+toolsBTAG += ['InvMass', 'B- -> ^D0 pi-']
+toolsBTAG += ['CustomFloats[getExtraInfo(decayModeID)]', '^B- -> ^D0 pi-']
 
 tools4S = ['MCTruth', '^Upsilon(4S) -> ^B- ^mu+']
 tools4S += ['DeltaEMbc', 'Upsilon(4S) -> ^B- mu+']
@@ -107,6 +109,8 @@ tools4S += ['ROEMultiplicities', '^Upsilon(4S)']
 tools4S += ['RecoilKinematics', '^Upsilon(4S)']
 tools4S += ['ExtraEnergy', '^Upsilon(4S)']
 tools4S += ['Kinematics', '^Upsilon(4S) -> [B- -> ^D0 pi-] mu+']
+tools4S += ['InvMass', 'Upsilon(4S) -> [B- -> ^D0 pi-] mu+']
+tools4S += ['CustomFloats[getExtraInfo(decayModeID)]', 'Upsilon(4S) -> [^B- -> ^D0 pi-] mu+']
 
 ntupleFile('B2A305-Btag+SingleMuon-Reconstruction.root')
 ntupleTree('btag', 'B-:tag', toolsBTAG)

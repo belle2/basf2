@@ -63,7 +63,7 @@ matchMCTruth('D*+')
 
 # create and fill flat Ntuple with MCTruth and kinematic information
 toolsDST = ['EventMetaData', '^D*+']
-toolsDST += ['Kinematics', '^D*+ -> ^D0 pi+']
+toolsDST += ['InvMass', '^D*+ -> ^D0 pi+']
 toolsDST += ['CMSKinematics', '^D*+']
 toolsDST += ['PID', 'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
 toolsDST += ['Track', 'D*+ -> [D0 -> ^K- ^pi+] ^pi+']

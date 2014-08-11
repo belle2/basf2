@@ -74,6 +74,7 @@ matchMCTruth('B0')
 # create and fill flat Ntuple with MCTruth and kinematic information
 toolsB0 = ['EventMetaData', '^B0']
 toolsB0 += ['Kinematics', '^B0 -> ^rho0 ^gamma']
+toolsB0 += ['InvMass', 'B0 -> ^rho0 gamma']
 toolsB0 += ['DeltaEMbc', '^B0']
 toolsB0 += ['PID', 'B0 -> [rho0 -> ^pi+ ^pi-] gamma']
 toolsB0 += ['Track', 'B0 -> [rho0 -> ^pi+ ^pi-] gamma']

@@ -366,9 +366,10 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
         placeholders['mvaNTestSignal'] = int(testTree.GetEntries('className == "Signal"'))
         placeholders['mvaNTestBackground'] = int(testTree.GetEntries('className == "Background"'))
 
-        keys = [key for key in rootfile.GetListOfKeys() if re.match('^{name}.*_tree$'.format(name=removeJPsiSlash(escapeForRegExp(placeholders['particleName']))), key.GetName()) is not None]
+        variablefile = ROOT.TFile(placeholders['mvaROOTFilename'])
+        keys = [key for key in variablefile.GetListOfKeys() if re.match('^{name}.*_tree$'.format(name=removeJPsiSlash(escapeForRegExp(placeholders['particleName']))), key.GetName()) is not None]
         if len(keys) != 1:
-            print [k for k in rootfile.GetListOfKeys()]
+            print [k for k in variablefile.GetListOfKeys()]
             raise RuntimeError("Couldn't find original tree for particle {name} in root file {f} created by tmva".format(name=placeholders['particleName'], f=placeholders['mvaROOTFilename']))
         originalTree = keys[0].ReadObj()
         placeholders['mvaNCandidates'] = originalTree.GetEntries()

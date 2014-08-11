@@ -53,6 +53,7 @@ def CountMCParticles(path, names):
     keys = [str(k.GetName()) for k in countNtuple.GetListOfBranches()]
     getpdg = lambda x: x[len('NumberOfMCParticlesInEvent'):]  # makeROOTCompatible removes parenthesis from variable so we don't worry about them here
     counter = {getpdg(key): sum([getattr(t, key) for t in countNtuple]) for key in keys}
+    counter['NEvents'] = countNtuple.GetEntries()
 
     print counter
 

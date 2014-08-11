@@ -326,42 +326,30 @@ void GenFitterModule::event()
       //B2DEBUG(100, "Start values: pos std:   " << sqrt(covSeed(0, 0)) << "  " << sqrt(covSeed(1, 1)) << "  " << sqrt(covSeed(2, 2)));
       B2DEBUG(100, "Start values: pdg:      " << currentPdgCode);
 
-      //initialize track representation and give the seed helix parameters and cov and the pdg code to the track fitter
-      // Do this in two steps, because for now we use the genfit::TrackCand from Genfit 1.
-      genfit::RKTrackRep* trackRep = new genfit::RKTrackRep(currentPdgCode);
-
-
       genfit::MeasurementFactory<genfit::AbsMeasurement> factory;
-
-      genfit::MeasurementProducer <PXDTrueHit, PXDRecoHit>* PXDProducer =  NULL;
-      genfit::MeasurementProducer <SVDTrueHit, SVDRecoHit2D>* SVDProducer =  NULL;
-      genfit::MeasurementProducer <CDCHit, CDCRecoHit>* CDCProducer =  NULL;
-
-      genfit::MeasurementProducer <PXDCluster, PXDRecoHit>* pxdClusterProducer = NULL;
-      genfit::MeasurementProducer <SVDCluster, SVDRecoHit>* svdClusterProducer = NULL;
 
       //create MeasurementProducers for PXD, SVD and CDC and add producers to the factory with correct detector Id
       if (m_useClusters == false) { // use the trueHits
         if (pxdTrueHits.getEntries()) {
-          PXDProducer =  new genfit::MeasurementProducer <PXDTrueHit, PXDRecoHit> (pxdTrueHits.getPtr());
+          auto PXDProducer =  new genfit::MeasurementProducer <PXDTrueHit, PXDRecoHit> (pxdTrueHits.getPtr());
           factory.addProducer(Const::PXD, PXDProducer);
         }
         if (svdTrueHits.getEntries()) {
-          SVDProducer =  new genfit::MeasurementProducer <SVDTrueHit, SVDRecoHit2D> (svdTrueHits.getPtr());
+          auto SVDProducer =  new genfit::MeasurementProducer <SVDTrueHit, SVDRecoHit2D> (svdTrueHits.getPtr());
           factory.addProducer(Const::SVD, SVDProducer);
         }
       } else {
         if (nPXDClusters) {
-          pxdClusterProducer =  new genfit::MeasurementProducer <PXDCluster, PXDRecoHit> (pxdClusters.getPtr());
+          auto pxdClusterProducer =  new genfit::MeasurementProducer <PXDCluster, PXDRecoHit> (pxdClusters.getPtr());
           factory.addProducer(Const::PXD, pxdClusterProducer);
         }
         if (nSVDClusters) {
-          svdClusterProducer =  new genfit::MeasurementProducer <SVDCluster, SVDRecoHit> (svdClusters.getPtr());
+          auto svdClusterProducer =  new genfit::MeasurementProducer <SVDCluster, SVDRecoHit> (svdClusters.getPtr());
           factory.addProducer(Const::SVD, svdClusterProducer);
         }
       }
       if (cdcHits.getEntries()) {
-        CDCProducer =  new genfit::MeasurementProducer <CDCHit, CDCRecoHit> (cdcHits.getPtr());
+        auto CDCProducer =  new genfit::MeasurementProducer <CDCHit, CDCRecoHit> (cdcHits.getPtr());
         factory.addProducer(Const::CDC, CDCProducer);
       }
 
@@ -378,6 +366,7 @@ void GenFitterModule::event()
       covSeed(5, 5) = 0.04e-3;
       aTrackCandPointer->setCovSeed(covSeed);
 
+      genfit::RKTrackRep* trackRep = new genfit::RKTrackRep(currentPdgCode);
       genfit::Track gfTrack(*aTrackCandPointer, factory, trackRep); //create the track with the corresponding track representation
 
       const int nHitsInTrack = gfTrack.getNumPointsWithMeasurement();

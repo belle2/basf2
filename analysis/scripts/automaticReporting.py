@@ -331,14 +331,14 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
         ROOT.gROOT.SetBatch(True)
 
         # Set mva placeholders
+        placeholders['mvaTargetCluster'] = mvaConfig.targetCluster
         placeholders['mvaROOTFilename'] = signalProbability[:-7] + '.root'  # Strip .config of filename
-        placeholders['mvaTMVAFilename'] = signalProbability[:-7] + '_' + placeholders['mvaTargetCluster'] + '.root'  # Strip .config of filename
+        placeholders['mvaTMVAFilename'] = signalProbability[:-7] + '_' + str(placeholders['mvaTargetCluster']) + '.root'  # Strip .config of filename
         placeholders['mvaLogFilename'] = signalProbability[:-7] + '.log'  # Strip .config of filename
         placeholders['mvaName'] = mvaConfig.name
         placeholders['mvaType'] = mvaConfig.type
         placeholders['mvaConfig'] = mvaConfig.config
         placeholders['mvaTarget'] = mvaConfig.target
-        placeholders['mvaTargetCluster'] = mvaConfig.targetCluster
 
         from variables import variables
         ranking = getMVARankingFromLogfile(placeholders['mvaLogFilename'])

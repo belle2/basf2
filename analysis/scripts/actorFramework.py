@@ -168,7 +168,7 @@ class Sequence(object):
                     results.update(actor.provides)
                 except Exception as e:
                     print e.message
-                    print "Failed to execute actor!"
+                    print "Failed to execute actor!", actor.name
                     actor.provides = {'dummy': None}
             chain.append(ready)
 

@@ -29,7 +29,7 @@ class TestCountMCParticles(unittest.TestCase):
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
-        self.assertListEqual(parameters['variables'], ['NumberOfMCParticlesInEvent(-11)', 'NumberOfMCParticlesInEvent(22)', 'NumberOfMCParticlesInEvent(411)'])
+        self.assertListEqual(parameters['variables'], ['NumberOfMCParticlesInEvent(11)', 'NumberOfMCParticlesInEvent(22)', 'NumberOfMCParticlesInEvent(411)'])
         self.assertEqual(parameters['fileName'], 'mcParticlesCount.root')
         self.assertEqual(parameters['treeName'], 'mccounts')
 

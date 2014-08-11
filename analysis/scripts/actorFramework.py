@@ -169,6 +169,7 @@ class Sequence(object):
                 except Exception as e:
                     print e.message
                     print "Failed to execute actor!"
+                    actor.provides = {'dummy': None}
             chain.append(ready)
 
         # Now the chain contains all actors with grantable requirements.

@@ -3,14 +3,10 @@
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
 
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
-
 #include <string>
 #include <iostream>
 #include <stdexcept>
 #include <map>
-#include <tuple>
 
 namespace Belle2 {
 

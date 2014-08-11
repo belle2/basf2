@@ -135,7 +135,7 @@ def createFSParticleTexFile(placeholders, mcCounts):
         @param mvaConfig configuration for mva
         @param signalProbability config filename for TMVA training
     """
-    placeholders['particleNTrueSignal'] = mcCounts.get(str(pdg.from_name(placeholders['particleName'])), 0)
+    placeholders['particleNTrueSignal'] = mcCounts.get(str(abs(pdg.from_name(placeholders['particleName']))), 0)
     placeholders['particleNSignal'] = placeholders['mvaNSignal']
     placeholders['particleNBackground'] = placeholders['mvaNBackground']
     placeholders['particleNSignalAfterPreCut'] = placeholders['mvaNSignal']
@@ -344,7 +344,7 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
         ranking = getMVARankingFromLogfile(placeholders['mvaLogFilename'])
         placeholders['mvaVariables'] = ''
         for v in mvaConfig.variables:
-            rootName = v.replace('(', '').replace(',', '').replace(' ', '')
+            rootName = ROOT.Belle2.Variable.makeROOTCompatible(v)
             if rootName in ranking:
                 rank, value = ranking[rootName]
                 rank = str(rank)

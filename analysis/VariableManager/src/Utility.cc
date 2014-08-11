@@ -3,6 +3,11 @@
 #include <analysis/dataobjects/Particle.h>
 #include <framework/logging/Logger.h>
 
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
+
+#include <tuple>
+
 std::string Belle2::Variable::makeROOTCompatible(std::string str)
 {
   str.erase(std::remove(str.begin(), str.end(), '('), str.end());

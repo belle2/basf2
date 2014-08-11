@@ -228,7 +228,7 @@ def PreCutDetermination(channelNames, preCutConfigs, preCutHistograms):
     if len(channelNames) == 0:
         return results
 
-    if not all(preCutConfig[0] == preCutConfig for preCutConfig in preCutConfigs):
+    if not all(preCutConfigs[0] == preCutConfig for preCutConfig in preCutConfigs):
         B2WARNING("Different pre cuts for channels of the same particle, aren't supported at the moment. Using only first cut.")
     preCutConfig = preCutConfigs[0]
 

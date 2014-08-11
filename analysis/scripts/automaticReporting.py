@@ -341,9 +341,9 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
             else:
                 rank = ''
                 value = ''
-            varName = escapeForLatex(v)
+            varName = addHyphenations(escapeForLatex(v))
             description = escapeForLatex(variables.getVariable(v).description)
-            placeholders['mvaVariables'] += r'\texttt{' + varName + r'} & ' + description + ' & ' + rank + '& ' + value + r' \\'
+            placeholders['mvaVariables'] += varName + ' & ' + description + ' & ' + rank + '& ' + value + r' \\'
 
         rootfile = ROOT.TFile(placeholders['mvaROOTFilename'])
 
@@ -411,6 +411,13 @@ def escapeForLatex(someString):
     Used to escape user strings for LaTex.
     """
     return someString.replace('\\', r'\\').replace('_', r'\_').replace('^', r'\^{}')
+
+
+def addHyphenations(someString):
+    """
+    Adds hyphenations after brackets, and for common variables.
+    """
+    return someString.replace('(', r'(\allowbreak ').replace('getExtraInfo', r'get\-Ex\-tra\-In\-fo').replace('SignalProbability', r'Sig\-nal\-Prob\-a\-bil\-i\-ty')
 
 
 def escapeForRegExp(someString):

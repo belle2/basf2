@@ -254,19 +254,19 @@ def createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut):
 
         placeholders['preCutAllPlot'] = removeJPsiSlash('{name}_preCut_{hash}_all.png'.format(name=placeholders['particleName'], hash=hash))
         if not os.path.isfile(placeholders['preCutAllPlot']):
-            makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutAllPlot'], 0, preCut)
+            makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutAllPlot'], 'all', preCut)
 
         placeholders['preCutSignalPlot'] = removeJPsiSlash('{name}_preCut_{hash}_signal.png'.format(name=placeholders['particleName'], hash=hash))
         if not os.path.isfile(placeholders['preCutSignalPlot']):
-            makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutSignalPlot'], 1, preCut)
+            makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutSignalPlot'], 'signal', preCut)
 
         placeholders['preCutBackgroundPlot'] = removeJPsiSlash('{name}_preCut_{hash}_background.png'.format(name=placeholders['particleName'], hash=hash))
         if not os.path.isfile(placeholders['preCutBackgroundPlot']):
-            makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutBackgroundPlot'], 2, preCut)
+            makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutBackgroundPlot'], 'bckgrd', preCut)
 
         placeholders['preCutRatioPlot'] = removeJPsiSlash('{name}_preCut_{hash}_ratio.png'.format(name=placeholders['particleName'], hash=hash))
         if not os.path.isfile(placeholders['preCutRatioPlot']):
-            makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutRatioPlot'], 3, preCut)
+            makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutRatioPlot'], 'ratio', preCut)
 
         placeholders['preCutTexFile'] = removeJPsiSlash('{name}_preCut_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
         placeholders['preCutTemplateFile'] = 'analysis/scripts/FullEventInterpretationPreCutTemplate.tex'
@@ -277,11 +277,21 @@ def createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut):
     return placeholders
 
 
-def makePreCutPlot(rootFilename, plotName, number, preCut):
+def getKey(rootFile, regexp):
+    """
+    Return TKey in given TFile that matches regexp. If not exactly one matching key is found, throw exception.
+    """
+    keys = [key for key in rootFile.GetListOfKeys() if re.match(regexp, key.GetName()) is not None]
+    if len(keys) != 1:
+        raise RuntimeError("Couldn't find key matching {regexp} in root file {f}".format(regexp=regexp, f=rootFile.GetName()))
+    return keys[0]
+
+
+def makePreCutPlot(rootFilename, plotName, prefix, preCut):
     rootfile = ROOT.TFile(rootFilename)
     canvas = ROOT.TCanvas(plotName + '_canvas', plotName, 600, 400)
     canvas.cd()
-    hist = rootfile.GetListOfKeys().At(number).ReadObj()
+    hist = getKey(rootfile, '^{name}.*$'.format(name=prefix)).ReadObj()
     hist.Draw()
     if preCut is not None:
         lc, uc = preCut['range']

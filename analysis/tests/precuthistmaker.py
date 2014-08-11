@@ -24,7 +24,7 @@ selectParticle('K-', 'Kid > 0.1', path=main)
 selectParticle('pi+', 'piid > 0.1', path=main)
 
 selectParticle('gamma', '', path=main)
-makeParticle('pi0 -> gamma gamma', '0.11 < M < 0.15', path=main)
+reconDecay('pi0 -> gamma gamma', '0.11 < M < 0.15', 0, path=main)
 matchMCTruth('pi0', path=main)
 
 combinedlist = 'D0'
@@ -43,7 +43,7 @@ main.add_module(histmaker)
 #b) make all  combinations and save only signal
 
 #essentially no cuts here, which makes it slow
-makeParticle('D0 -> K- pi+ pi0', '', path=main)
+reconDecay('D0 -> K- pi+ pi0', '', 0, path=main)
 matchMCTruth(combinedlist, path=main)
 
 ntupler = register_module('VariablesToNtuple')

@@ -33,19 +33,19 @@ selectParticle('e+', '', True, myMain)
 selectParticle('gamma', '', True, myMain)
 
 # reconstruct pi0 -> gamma gamma decay
-makeParticle('pi0 -> gamma gamma', '0.05 < M < 1.7', True, myMain)
+reconDecay('pi0 -> gamma gamma', '0.05 < M < 1.7', 1, True, myMain)
 
 # reconstruct D0 -> K- pi+ decay (and c.c.)
-makeParticle('D0 -> K- pi+', '1.800 < M < 1.900', True, myMain)
+reconDecay('D0 -> K- pi+', '1.800 < M < 1.900', 1, True, myMain)
 
 # reconstruct Btag -> D0 pi- (and c.c.)
-makeParticle('B-:tag -> D0 pi-', '5.000 < M < 6.000', True, myMain)
+reconDecay('B-:tag -> D0 pi-', '5.000 < M < 6.000', 1, True, myMain)
 
 # reconstruct Bsig -> pi0 e+ [nu_e] (and c.c.)
-makeParticle('B+:sig -> pi0 e+', '0.000 < M < 6.000', True, myMain)
+reconDecay('B+:sig -> pi0 e+', '0.000 < M < 6.000', 10, True, myMain)
 
 # reconstruct Y(4S) -> Btag Bsig
-makeParticle('Upsilon(4S) -> B-:tag B+:sig', '0.000 < M < 11.000', True, myMain)
+reconDecay('Upsilon(4S) -> B-:tag B+:sig', '0.000 < M < 11.000', 1, True, myMain)
 
 # perform MC matching
 matchMCTruth('pi0', myMain)

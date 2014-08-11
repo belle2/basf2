@@ -55,6 +55,8 @@ namespace Belle2 {
     Variable::Cut::Parameter emptyCut;
     addParam("cut", m_cutParameter, "Selection criteria to be applied", emptyCut);
 
+    addParam("decayMode", m_decayModeID, "Usper specified decay mode identifier", 0);
+
     addParam("persistent", m_persistent,
              "toggle output particle list btw. transient/persistent", false);
 
@@ -140,10 +142,13 @@ namespace Belle2 {
       if (!m_cut.check(&particle))
         continue;
 
-      particles.appendNew(particle);
+      Particle* newParticle = particles.appendNew(particle);
       int iparticle = particles.getEntries() - 1;
 
       outputList->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
+
+      // append to the created particle the user specified decay mode ID
+      newParticle->addExtraInfo("decayModeID", m_decayModeID);
     }
   }
 

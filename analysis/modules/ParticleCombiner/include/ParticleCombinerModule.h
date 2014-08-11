@@ -87,6 +87,8 @@ namespace Belle2 {
     std::string m_listName;   /**< output particle list name */
     std::string m_antiListName;   /**< output anti-particle list name */
 
+    int m_decayModeID; /**< user specified decay mode identifier */
+
     bool m_isSelfConjugatedParticle; /**< flag that indicates whether an anti-particle mother does not exist and should not be reconstructed as well*/
 
     Variable::Cut::Parameter m_cutParameter;  /**< selection criteria */

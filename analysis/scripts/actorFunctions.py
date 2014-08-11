@@ -95,7 +95,7 @@ def MakeAndMatchParticleList(path, particleName, particleLabel, channelName, dau
         return {'RawParticleList_{c}'.format(c=channelName): None}
 
     decayString = outputList + ' ==> ' + ' '.join(daughterParticleLists)
-    modularAnalysis.makeParticle(decayString, preCut['cutstring'], path=path)
+    modularAnalysis.reconDecay(decayString, preCut['cutstring'], 0, path=path)
     modularAnalysis.matchMCTruth(outputList, path=path)
     B2INFO("Make and Match Particle List {p} with label {l} for channel {c} in list {o}".format(p=particleName, l=particleLabel, c=channelName, o=outputList))
     return {'RawParticleList_{c}'.format(c=channelName): outputList}

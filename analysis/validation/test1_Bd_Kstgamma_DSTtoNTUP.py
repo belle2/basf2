@@ -15,11 +15,11 @@ stdFSParticles()
 stdLooseFSParticles()
 stdLightMesons()
 
-makeParticle('K*0 -> K-:all pi+:all', '0.6 < M < 1.2')
+reconDecay('K*0 -> K-:all pi+:all', '0.6 < M < 1.2')
 matchMCTruth('K*0')
 
 # Prepare the B candidates
-makeParticle('B0 -> K*0 gamma:all', '5.2 < M 5.4')
+reconDecay('B0 -> K*0 gamma:all', '5.2 < M 5.4')
 matchMCTruth('B0')
 
 ntupleFile('../Bd_Kstgamma.ntup.root')

@@ -176,9 +176,15 @@ def createCombinedParticleTexFile(placeholders, channelPlaceholders, mcCounts):
     placeholders['particleNBackgroundAfterPostCut'] = 0
     placeholders['particleNTrueSignal'] = mcCounts.get(str(pdg.from_name(placeholders['particleName'])), 0)
 
-    placeholders['postCutRange'] = 'Ignored'
+    if len(channelPlaceholders) > 0:
+        ranges = [channelPlaceholder['postCutRange'] for channelPlaceholder in channelPlaceholders if channelPlaceholder['postCutRange'] != 'Ignored']
+        if not all(ranges[0] == r for r in ranges):
+            B2WARNING("Showing different post cuts for channels of the same particle in the summary file, isn't supported at the moment. Show only first cut.")
+        placeholders['postCutRange'] = ranges[0]
+    else:
+        placeholders['postCutRange'] = 'Ignored'
+
     for channelPlaceholder in channelPlaceholders:
-        placeholders['postCutRange'] = channelPlaceholder['postCutRange']
         placeholders['particleNSignal'] += int(channelPlaceholder['channelNSignal'])
         placeholders['particleNBackground'] += int(channelPlaceholder['channelNBackground'])
         placeholders['particleNSignalAfterPreCut'] += int(channelPlaceholder['channelNSignalAfterPreCut'])

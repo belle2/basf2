@@ -74,7 +74,7 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
     placeholders['finalStateParticleEPTable'] = ""
     for particlePlaceholder in finalStateParticlePlaceholders:
         placeholders['finalStateParticleInputs'] += '\input{' + particlePlaceholder['texFile'] + '}\n'
-        placeholders['finalStateParticleEPTable'] += particlePlaceholder['particleName'] + ' & '
+        placeholders['finalStateParticleEPTable'] += '$' + particlePlaceholder['particleName'] + '$ & '
         placeholders['finalStateParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
         placeholders['finalStateParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
         placeholders['finalStateParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNBackground']) * 100) + ' & '
@@ -84,7 +84,7 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
     placeholders['combinedParticleEPTable'] = ""
     for particlePlaceholder in combinedParticlePlaceholders:
         placeholders['combinedParticleInputs'] += '\input{' + particlePlaceholder['texFile'] + '}\n'
-        placeholders['combinedParticleEPTable'] += particlePlaceholder['particleName'] + ' & '
+        placeholders['combinedParticleEPTable'] += '$' + particlePlaceholder['particleName'] + '$ & '
         placeholders['combinedParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPreCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '

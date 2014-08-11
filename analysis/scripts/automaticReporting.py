@@ -322,6 +322,7 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
 
         # Set mva placeholders
         placeholders['mvaROOTFilename'] = signalProbability[:-7] + '.root'  # Strip .config of filename
+        placeholders['mvaTMVAFilename'] = signalProbability[:-7] + '_' + placeholders['mvaTargetCluster'] + '.root'  # Strip .config of filename
         placeholders['mvaLogFilename'] = signalProbability[:-7] + '.log'  # Strip .config of filename
         placeholders['mvaName'] = mvaConfig.name
         placeholders['mvaType'] = mvaConfig.type
@@ -345,7 +346,7 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
             description = escapeForLatex(variables.getVariable(v).description)
             placeholders['mvaVariables'] += varName + ' & ' + description + ' & ' + rank + '& ' + value + r' \\'
 
-        rootfile = ROOT.TFile(placeholders['mvaROOTFilename'])
+        rootfile = ROOT.TFile(placeholders['mvaTMVAFilename'])
 
         trainTree = rootfile.Get('TrainTree')
         placeholders['mvaNTrainSignal'] = int(trainTree.GetEntries('className == "Signal"'))
@@ -388,15 +389,15 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
 
         placeholders['mvaOvertrainingPlot'] = removeJPsiSlash('{name}_mva_{hash}_overtraining.png'.format(name=placeholders['particleName'], hash=hash))
         if not os.path.isfile(placeholders['mvaOvertrainingPlot']):
-            makeOvertrainingPlot(placeholders['mvaROOTFilename'], placeholders['mvaOvertrainingPlot'])
+            makeOvertrainingPlot(placeholders['mvaTMVAFilename'], placeholders['mvaOvertrainingPlot'])
 
         placeholders['mvaROCPlot'] = removeJPsiSlash('{name}_mva_{hash}_roc.png'.format(name=placeholders['particleName'], hash=hash))
         if not os.path.isfile(placeholders['mvaROCPlot']):
-            makeROCPlot(placeholders['mvaROOTFilename'], placeholders['mvaROCPlot'])
+            makeROCPlot(placeholders['mvaTMVAFilename'], placeholders['mvaROCPlot'])
 
         placeholders['mvaDiagPlot'] = removeJPsiSlash('{name}_mva_{hash}_diag.png'.format(name=placeholders['particleName'], hash=hash))
         if not os.path.isfile(placeholders['mvaDiagPlot']):
-            makeDiagPlot(placeholders['mvaROOTFilename'], placeholders['mvaDiagPlot'], placeholders['mvaName'])
+            makeDiagPlot(placeholders['mvaTMVAFilename'], placeholders['mvaDiagPlot'], placeholders['mvaName'])
 
         placeholders['mvaTexFile'] = removeJPsiSlash('{name}_mva_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
         placeholders['mvaTemplateFile'] = 'analysis/scripts/FullEventInterpretationMVATemplate.tex'

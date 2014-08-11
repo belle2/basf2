@@ -220,10 +220,13 @@ namespace Belle2 {
       signal << signalClass;
       std::string jobName = m_prefix + "_" + signal.str();
 
+      TFile classFile((jobName + ".root").c_str(), "RECREATE");
+      classFile.cd();
+
       boost::property_tree::ptree node;
 
       TMVA::Tools::Instance();
-      TMVA::Factory factory(jobName, m_file, factoryOption);
+      TMVA::Factory factory(jobName, &classFile, factoryOption);
 
       // Add variables to the factory
       for (auto & var : m_methods[0].getVariables()) {

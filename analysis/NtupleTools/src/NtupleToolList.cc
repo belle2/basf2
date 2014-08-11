@@ -3,15 +3,19 @@
 #include <analysis/NtupleTools/NtupleKinematicsTool.h>
 #include <analysis/NtupleTools/NtupleCMSKinematicsTool.h>
 #include <analysis/NtupleTools/NtupleMomentumUncertaintyTool.h>
+#include <analysis/NtupleTools/NtupleInvMassTool.h>
 #include <analysis/NtupleTools/NtupleMassBeforeFitTool.h>
 #include <analysis/NtupleTools/NtupleEventMetaDataTool.h>
 #include <analysis/NtupleTools/NtupleDeltaEMbcTool.h>
+#include <analysis/NtupleTools/NtupleChargeTool.h>
+#include <analysis/NtupleTools/NtuplePDGCodeTool.h>
 #include <analysis/NtupleTools/NtupleMCTruthTool.h>
 #include <analysis/NtupleTools/NtupleMCHierarchyTool.h>
 #include <analysis/NtupleTools/NtupleMCKinematicsTool.h>
 #include <analysis/NtupleTools/NtuplePIDTool.h>
 #include <analysis/NtupleTools/NtupleDeltaLogLTool.h>
 #include <analysis/NtupleTools/NtupleTrackTool.h>
+#include <analysis/NtupleTools/NtupleTrackHitsTool.h>
 #include <analysis/NtupleTools/NtupleClusterTool.h>
 #include <analysis/NtupleTools/NtupleRecoStatsTool.h>
 #include <analysis/NtupleTools/NtupleDetectorStatsRecTool.h>
@@ -31,6 +35,7 @@
 #include <analysis/NtupleTools/NtupleMCDecayStringTool.h>
 #include <analysis/NtupleTools/NtupleFlightInfoTool.h>
 #include <analysis/NtupleTools/NtupleMCFlightInfoTool.h>
+#include <analysis/NtupleTools/NtupleMomentumVectorDeviationTool.h>
 
 using namespace Belle2;
 using namespace std;
@@ -66,9 +71,12 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   if (strToolName.compare("Kinematics") == 0) return new NtupleKinematicsTool(tree, d);
   else if (strToolName.compare("CMSKinematics") == 0) return new NtupleCMSKinematicsTool(tree, d);
   else if (strToolName.compare("MomentumUncertainty") == 0) return new NtupleMomentumUncertaintyTool(tree, d);
+  else if (strToolName.compare("InvMass") == 0) return new NtupleInvMassTool(tree, d, strOption);
   else if (strToolName.compare("MassBeforeFit") == 0) return new NtupleMassBeforeFitTool(tree, d);
   else if (strToolName.compare("EventMetaData") == 0) return new NtupleEventMetaDataTool(tree, d);
   else if (strToolName.compare("DeltaEMbc") == 0) return new NtupleDeltaEMbcTool(tree, d);
+  else if (strToolName.compare("Charge") == 0) return new NtupleChargeTool(tree, d);
+  else if (strToolName.compare("PDGCode") == 0) return new NtuplePDGCodeTool(tree, d);
   else if (strToolName.compare("MCTruth") == 0) return new NtupleMCTruthTool(tree, d);
   else if (strToolName.compare("MCHierarchy") == 0) return new NtupleMCHierarchyTool(tree, d);
   else if (strToolName.compare("MCKinematics") == 0) return new NtupleMCKinematicsTool(tree, d);
@@ -79,6 +87,7 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName.compare("DetectorStatsSim") == 0) return new NtupleDetectorStatsSimTool(tree, d);
   else if (strToolName.compare("MCReconstructible") == 0) return new NtupleMCReconstructibleTool(tree, d);
   else if (strToolName.compare("Track") == 0) return new NtupleTrackTool(tree, d);
+  else if (strToolName.compare("TrackHits") == 0) return new NtupleTrackHitsTool(tree, d);
   else if (strToolName.compare("Cluster") == 0) return new NtupleClusterTool(tree, d);
   else if (strToolName.compare("Vertex") == 0) return new NtupleVertexTool(tree, d);
   else if (strToolName.compare("MCVertex") == 0) return new NtupleMCVertexTool(tree, d);
@@ -94,6 +103,7 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName.compare("MCDecayString") == 0) return new NtupleMCDecayStringTool(tree, d);
   else if (strToolName.compare("FlightInfo") == 0) return new NtupleFlightInfoTool(tree, d);
   else if (strToolName.compare("MCFlightInfo") == 0) return new NtupleMCFlightInfoTool(tree, d);
+  else if (strToolName.compare("MomentumVectorDeviation") == 0) return new NtupleMomentumVectorDeviationTool(tree, d);
 
   B2WARNING("NtupleTool " << strToolName << " is not available!");
   return NULL;

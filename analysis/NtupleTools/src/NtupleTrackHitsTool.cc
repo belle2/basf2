@@ -3,39 +3,39 @@
 * Copyright(C) 2010 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Christian Oswald, Phillip Urquijo, Anze Zupanc           *
+* Contributors: Anze Zupanc                                              *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include <analysis/NtupleTools/NtupleTrackTool.h>
+#include <analysis/NtupleTools/NtupleTrackHitsTool.h>
 #include <analysis/VariableManager/TrackVariables.h>
 #include <TBranch.h>
 
 using namespace Belle2;
 using namespace std;
 
-void NtupleTrackTool::setupTree()
+void NtupleTrackHitsTool::setupTree()
 {
   vector<string> strNames = m_decaydescriptor.getSelectionNames();
   int nDecayProducts = strNames.size();
 
-  m_fD0 = new float[nDecayProducts];
-  m_fZ0 = new float[nDecayProducts];
-  m_fTrPval = new float[nDecayProducts];
+  m_iNCDCHits = new int[nDecayProducts];
+  m_iNSVDHits = new int[nDecayProducts];
+  m_iNPXDHits = new int[nDecayProducts];
 
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    m_tree->Branch((strNames[iProduct] + "_d0").c_str(), &m_fD0[iProduct], (strNames[iProduct] + "_d0/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_z0").c_str(), &m_fZ0[iProduct], (strNames[iProduct] + "_z0/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_TrPval").c_str(), &m_fTrPval[iProduct], (strNames[iProduct] + "_TrPval/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_nCDCHits").c_str(), &m_iNCDCHits[iProduct], (strNames[iProduct] + "_nCDCHits/I").c_str());
+    m_tree->Branch((strNames[iProduct] + "_nSVDHits").c_str(), &m_iNSVDHits[iProduct], (strNames[iProduct] + "_nSVDHits/I").c_str());
+    m_tree->Branch((strNames[iProduct] + "_nPXDHits").c_str(), &m_iNPXDHits[iProduct], (strNames[iProduct] + "_nPXDHits/I").c_str());
   }
 }
 
-void NtupleTrackTool::eval(const Particle* particle)
+void NtupleTrackHitsTool::eval(const Particle* particle)
 {
 
   if (!particle) {
-    printf("NtupleTrackTool::eval - ERROR, no Particle found!\n");
+    printf("NtupleTrackHitsTool::eval - ERROR, no Particle found!\n");
     return;
   }
 
@@ -43,8 +43,8 @@ void NtupleTrackTool::eval(const Particle* particle)
   int nDecayProducts = selparticles.size();
 
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    m_fD0[iProduct]     = Variable::trackD0(selparticles[iProduct]);
-    m_fZ0[iProduct]     = Variable::trackZ0(selparticles[iProduct]);
-    m_fTrPval[iProduct] = Variable::trackPValue(selparticles[iProduct]);
+    m_iNCDCHits[iProduct] = int(Variable::trackNCDCHits(selparticles[iProduct]));
+    m_iNSVDHits[iProduct] = int(Variable::trackNSVDHits(selparticles[iProduct]));
+    m_iNPXDHits[iProduct] = int(Variable::trackNPXDHits(selparticles[iProduct]));
   }
 }

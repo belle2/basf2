@@ -3,13 +3,13 @@
 * Copyright(C) 2010 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Christian Oswald, Luigi Li Gioi                          *
+* Contributors: Anze Zupanc                                              *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLEKINEMATICSTOOL_H
-#define NTUPLEKINEMATICSTOOL_H
+#ifndef NTUPLEPDGCODETOOL_H
+#define NTUPLEPDGCODETOOL_H
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -19,23 +19,22 @@
 
 namespace Belle2 {
 
-  /** NtupleTool to write the kinematics of a Particle
-  (momentum, energy) to a flat ntuple. */
-  class NtupleKinematicsTool : public NtupleFlatTool {
+  /** NtupleTool to write the charge of a Particle to a flat ntuple. */
+
+  class NtuplePDGCodeTool : public NtupleFlatTool {
   private:
-    /** Total momentum. */
-    float* m_fP;
-    /** Momentum in lab system (px py pz e). */
-    float** m_fP4;
-    /** Create branches in m_tree - this function should be called by the constructor only. */
+
+    /** PDGCode. */
+    int* m_iQ;
+
     void setupTree();
   public:
     /** Constuctor. */
-    NtupleKinematicsTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
+    NtuplePDGCodeTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);
   };
 
 } // namepspace Belle2
 
-#endif // NTUPLEKINEMATICSTOOL_H
+#endif // NTUPLEPDGCODETOOL_H

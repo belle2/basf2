@@ -38,7 +38,7 @@ namespace Belle2 {
       const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid) return 0.0;
 
-      Const::ChargedStable thisType = Const::ChargedStable(part->getPDGCode());
+      Const::ChargedStable thisType = Const::ChargedStable(abs(part->getPDGCode()));
 
       return pid->getLogL(thisType) - pid->getLogL(otherHypothesis);
     }

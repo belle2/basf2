@@ -3,7 +3,7 @@
 * Copyright(C) 2010 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Christian Oswald, Phillip Urquijo                        *
+* Contributors: Christian Oswald, Phillip Urquijo, Anze Zupanc           *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -19,15 +19,16 @@
 
 namespace Belle2 {
 
-  /** NtupleTool to write out track quanties for a given Particle
-  (dr, dz, ....) to a flat ntuple. */
+  /** NtupleTool to write out track impact parameters (d0 and z0) and track's fit pValue. */
+
   class NtupleTrackTool : public NtupleFlatTool {
+
   private:
-    /** transverse distance with respect to IP. */
-    float* m_fdr;
-    /** z distance with respect to IP. */
-    float* m_fdz;
-    /** Track fit Pvalue. */
+    /** track's d0 : signed distance to the POCA in the r-phi plane */
+    float* m_fD0;
+    /** track's z0 : z coordinate of the POCA */
+    float* m_fZ0;
+    /** Track fit pValue. */
     float* m_fTrPval;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();

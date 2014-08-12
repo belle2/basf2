@@ -124,6 +124,7 @@ def createMBCTexFile(ntuple):
     makeMbcPlot(ntuple, mbcFilename)
     placeholders['mbcPlot'] = mbcFilename
     placeholders['texFile'] = ntuple[:-5] + '_mbc.tex'
+    placeholders['particleName'] = mbcFilename[4:].split(':', 1)[0]
     if not os.path.isfile(placeholders['texFile']):
         createTexFile(placeholders['texFile'], 'analysis/scripts/FullEventInterpretationMBCTemplate.tex', placeholders)
     return placeholders

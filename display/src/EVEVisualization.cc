@@ -1191,7 +1191,13 @@ void EVEVisualization::clearEvent()
     return;
 
   m_visualRepMap->clear();
-  m_groups.clear();
+  for (auto & groupPair : m_groups) {
+    //store visibility, invalidate pointers
+    if (groupPair.second.group)
+      groupPair.second.visible = groupPair.second.group->GetRnrState();
+    groupPair.second.group = nullptr;
+  }
+
   m_mcparticleTracks.clear();
   m_shownRecohits.clear();
   m_tracklist->DestroyElements();
@@ -1420,10 +1426,11 @@ void EVEVisualization::addToGroup(const std::string& name, TEveElement* elem)
   //slashes at beginning and end are ignored
   const std::string& groupName = boost::algorithm::trim_copy_if(name, boost::algorithm::is_any_of("/"));
 
-  TEveElementList* group = m_groups[groupName];
+  TEveElementList* group = m_groups[groupName].group;
   if (!group) {
     group = new TEveElementList(groupName.c_str(), groupName.c_str());
-    m_groups[groupName] = group;
+    group->SetRnrState(m_groups[groupName].visible);
+    m_groups[groupName].group = group;
 
     //if groupName contains '/', remove last bit and add to parent group
     //e.g. if groupName=A/B/C, call addToGroup("A/B", groupC)

@@ -78,6 +78,14 @@ namespace Belle2 {
       MCParticle* parentParticle; /**< parent particle, or nullptr. */
     };
 
+    /** Group of TEveElements, remembers wether user wants it visible or not. */
+    struct ElementGroup {
+      ElementGroup(): group(nullptr), visible(true) { }
+      TEveElementList* group; /**< Contains elements of this group. Set to nullptr after event. */
+      bool visible; /**< Stores wether this group was visible in last event. */
+    };
+
+
     /** Provide magnetic field values for TEveTrackPropagator. */
     class EveVisBField : public TEveMagField {
     public:
@@ -334,7 +342,7 @@ namespace Belle2 {
     std::map<const MCParticle*, MCTrack> m_mcparticleTracks;
 
     /** name -> grouping element. */
-    std::map<std::string, TEveElementList*> m_groups;
+    std::map<std::string, ElementGroup> m_groups;
 
     /** parent object for MC tracks. */
     TEveTrackList* m_tracklist;

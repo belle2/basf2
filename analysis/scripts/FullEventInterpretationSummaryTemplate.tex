@@ -28,8 +28,8 @@ Christian Pulvermacher}
 
 \begin{abstract}
 This report describes the decay topology of the full event interpretation algorithm.
-It contains performed pre and post cuts, trained multivariate analysis methods
-and resulting purities and efficiencies. In ${overallSignalEfficiencyInPercent} \% of the events
+It contains performed pre- and post-cuts, trained multivariate analysis methods
+and resulting purities and efficiencies. In ${overallSignalEfficiencyInPercent}\,\% of the events
 the full event interpretation reconstructed a B meson decay correctly.
 \end{abstract}
 
@@ -42,16 +42,16 @@ the full event interpretation reconstructed a B meson decay correctly.
 \section{Summary}
 For each final state particle a multivariate analysis method was trained without any previous cut
 on the candidates. Afterwards the signal probability calculated by the method was used to perform
-a post cut on the final state particles. This reduces combinatorics in the following stages of the full
+a post-cut on the final state particles. This reduces combinatorics in the following stages of the full
 event interpretation.
 \begin{center}
 \begin{table}[h]
-\caption{Final state particle efficiency and purity before and after the applied post cut.}
+\caption{Final state particle efficiency and purity before and after the applied post-cut.}
 \centering
 \begin{tabular}{c|rr|rr}
 \toprule
 Final state &  \multicolumn{2}{c}{Efficiency in \%}  &  \multicolumn{2}{c}{Purity in \%} \\
-particle    &  detector & post cut   &  detector & post cut \\
+particle    &  detector & post-cut   &  detector & post-cut \\
 \midrule
 ${finalStateParticleEPTable}
 \bottomrule
@@ -59,18 +59,18 @@ ${finalStateParticleEPTable}
 \end{table}
 \end{center}
 \FloatBarrier
-For each decay channel of each intermediate particle a multivariate analysis method was trained after performing a fast pre cut
+For each decay channel of each intermediate particle a multivariate analysis method was trained after performing a fast pre-cut
 on the candidates. Afterwards the signal probability calculated by the method was used to perform
-a post cut on the intermediate particle candidates. This reduces combinatorics in the following stages of the full
+a post-cut on the intermediate particle candidates. This reduces combinatorics in the following stages of the full
 event interpretation.
 \begin{center}
 \begin{table}[h]
-\caption{Intermediate particle efficiency and purity before and after the applied pre and post cut.}
+\caption{Intermediate particle efficiency and purity before and after the applied pre- and post-cut.}
 \centering
 \begin{tabular}{c|rrr|rrr}
 \toprule
 Intermediate &  \multicolumn{3}{c}{Efficiency in \%}  &  \multicolumn{3}{c}{Purity in \%} \\
-particle     &  detector & pre cut & post cut   &  detector & pre cut & post cut \\
+particle     &  detector & pre-cut & post-cut   &  detector & pre-cut & post-cut \\
 \midrule
 ${combinedParticleEPTable}
 \bottomrule

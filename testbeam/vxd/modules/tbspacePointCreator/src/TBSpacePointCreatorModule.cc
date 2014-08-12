@@ -3,11 +3,11 @@
  * Copyright(C) 2013  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Christian Pulvermacher                                   *
+ * Contributors: Jakob Lettenbichler                                      *
  *                                                                        *
  **************************************************************************/
 
-#include <tracking/modules/spacePointCreator/SpacePointCreatorModule.h>
+#include <testbeam/vxd/modules/tbspacePointCreator/TBSpacePointCreatorModule.h>
 
 #include <tracking/spacePointCreation/SpacePointHelperFunctions.h>
 
@@ -21,11 +21,12 @@ using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(SpacePointCreator)
+REG_MODULE(TBSpacePointCreator)
 
-SpacePointCreatorModule::SpacePointCreatorModule() : Module()
+TBSpacePointCreatorModule::TBSpacePointCreatorModule() : Module()
 {
   setDescription("Imports Clusters of the silicon detectors and converts them to spacePoints.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // 1. Collections.
   addParam("PXDClusters", m_pxdClustersName,
@@ -48,55 +49,67 @@ SpacePointCreatorModule::SpacePointCreatorModule() : Module()
 
 
 
-void SpacePointCreatorModule::initialize()
+void TBSpacePointCreatorModule::initialize()
 {
   // prepare all store- and relationArrays:
   StoreArray<PXDCluster> pxdClusters(m_pxdClustersName);
   StoreArray<SVDCluster> svdClusters(m_svdClustersName);
   StoreArray<SpacePoint> spacePoints(m_spacePointsName);
+  StoreArray<TelCluster> telClusters(m_telClustersName);
 
 
-  spacePoints.registerAsPersistent();
+  spacePoints.registerInDataStore(DataStore::c_DontWriteOut);
   pxdClusters.isOptional();
   svdClusters.isOptional();
+  telClusters.isOptional();
 
-
-  RelationArray relSpacePointsPXDClusters(spacePoints, pxdClusters);
-  RelationArray relSpacePointsSVDClusters(spacePoints, svdClusters);
+//   RelationArray relSpacePointsPXDClusters(spacePoints, pxdClusters);
+//   RelationArray relSpacePointsSVDClusters(spacePoints, svdClusters);
+//   RelationArray relSpacePointsTelClusters(spacePoints, telClusters);
 
 
   //Relations to simulation objects only if the ancestor relations exist
-  if (pxdClusters.isOptional() == true) { relSpacePointsPXDClusters.registerAsPersistent(); }
-  if (svdClusters.isOptional() == true) { relSpacePointsSVDClusters.registerAsPersistent(); }
+  if (pxdClusters.isOptional() == true) { spacePoints.registerRelationTo(pxdClusters); }
+  if (svdClusters.isOptional() == true) { spacePoints.registerRelationTo(svdClusters); }
+  if (telClusters.isOptional() == true) { spacePoints.registerRelationTo(telClusters); }
+//   if (pxdClusters.isOptional() == true) { relSpacePointsPXDClusters.registerAsPersistent(); }
+//   if (svdClusters.isOptional() == true) { relSpacePointsSVDClusters.registerAsPersistent(); }
+//   if (telClusters.isOptional() == true) { relSpacePointsTelClusters.registerAsPersistent(); }
 
 
   // retrieve names again (faster than doing everything in the event):
   m_pxdClustersName = pxdClusters.getName();
   m_svdClustersName = svdClusters.getName();
+  m_telClustersName = telClusters.getName();
   m_spacePointsName = spacePoints.getName();
-  m_relSpacePointsPXDClustersName = relSpacePointsPXDClusters.getName();
-  m_relSpacePointsSVDClustersName = relSpacePointsSVDClusters.getName();
+//   m_relSpacePointsPXDClustersName = relSpacePointsPXDClusters.getName();
+//   m_relSpacePointsSVDClustersName = relSpacePointsSVDClusters.getName();
+//   m_relSpacePointsTelClustersName = relSpacePointsTelClusters.getName();
 
 
-  B2INFO("SpacePointCreatorModule(" << m_nameOfInstance << ")::initialize: names set for containers:\n" <<
+  B2INFO("TBSpacePointCreatorModule(" << m_nameOfInstance << ")::initialize: names set for containers:\n" <<
          "pxdClusters: " << m_pxdClustersName <<
          "\nsvdClusters: " << m_svdClustersName <<
-         "\nspacePoints: " << m_spacePointsName <<
-         "\nrelSpacePointsPXDClusters: " << m_relSpacePointsPXDClustersName <<
-         "\nrelSpacePointsSVDClusters: " << m_relSpacePointsSVDClustersName)
+         "\ntelClusters: " << m_telClustersName <<
+         "\nspacePoints: " << m_spacePointsName)// <<
+//          "\nrelSpacePointsPXDClusters: " << m_relSpacePointsPXDClustersName <<
+//          "\nrelSpacePointsSVDClusters: " << m_relSpacePointsSVDClustersName <<
+//          "\nrelSpacePointsTelClusters: " << m_relSpacePointsTelClustersName)
 
   // set some counters for output:
   m_TESTERPXDClusterCtr = 0;
   m_TESTERSVDClusterCtr = 0;
+  m_TESTERTelClusterCtr = 0;
   m_TESTERSpacePointCtr = 0;
 }
 
 
 
-void SpacePointCreatorModule::event()
+void TBSpacePointCreatorModule::event()
 {
   const StoreArray<PXDCluster> pxdClusters(m_pxdClustersName);
   const StoreArray<SVDCluster> svdClusters(m_svdClustersName);
+  const StoreArray<TelCluster> telClusters(m_telClustersName);
   StoreArray<SpacePoint> spacePoints(m_spacePointsName);
 
   if (spacePoints.isValid() == false) {
@@ -109,6 +122,13 @@ void SpacePointCreatorModule::event()
   if (relSpacePointsPXDClusters) { relSpacePointsPXDClusters.clear(); }
   RelationArray relSpacePointsSVDClusters(spacePoints, svdClusters, m_relSpacePointsSVDClustersName);
   if (relSpacePointsSVDClusters) { relSpacePointsSVDClusters.clear(); }
+  RelationArray relSpacePointsTelClusters(spacePoints, telClusters, m_relSpacePointsTelClustersName);
+  if (relSpacePointsTelClusters) { relSpacePointsTelClusters.clear(); }
+
+
+  for (unsigned int i = 0; i < uint(telClusters.getEntries()); ++i) {
+    spacePoints.appendNew(TBSpacePoint((telClusters[i]), i));
+  }
 
 
   for (unsigned int i = 0; i < uint(pxdClusters.getEntries()); ++i) {
@@ -125,28 +145,27 @@ void SpacePointCreatorModule::event()
 
 
 
-  B2DEBUG(1, "SpacePointCreatorModule(" << m_nameOfInstance << ")::event: spacePoints for single SVDClusters created! Size of arrays:\n" <<
+  B2DEBUG(1, "TBSpacePointCreatorModule(" << m_nameOfInstance << ")::event: spacePoints for single SVDClusters created! Size of arrays:\n" <<
           "pxdClusters: " << pxdClusters.getEntries() <<
-          ", svdClusters: " << svdClusters.getEntries() <<
-          ", spacePoints: " << spacePoints.getEntries() <<
-          ", relSpacePointsPXDClusters: " << relSpacePointsPXDClusters.getEntries() <<
-          ", relSpacePointsSVDClusters: " << relSpacePointsSVDClusters.getEntries())
+          "\nsvdClusters: " << svdClusters.getEntries() <<
+          "\ntelClusters: " << telClusters.getEntries() <<
+          "\nspacePoints: " << spacePoints.getEntries())
 
-  /// WARNING TODO next steps: write simple SVDCluster-Combiner for spacepoints, create relations, think about mcParticle-relations, prepare converter for GFTrackCandidates including clusters to XXTrackCandidates including SpacePoints and vice versa.
+  /// WARNING TODO next steps: create relations, think about mcParticle-relations, prepare converter for GFTrackCandidates including clusters to XXTrackCandidates including SpacePoints and vice versa.
 
   m_TESTERPXDClusterCtr += pxdClusters.getEntries();
   m_TESTERSVDClusterCtr += svdClusters.getEntries();
+  m_TESTERTelClusterCtr += telClusters.getEntries();
   m_TESTERSpacePointCtr += spacePoints.getEntries();
 }
 
 
 
-void SpacePointCreatorModule::terminate()
+void TBSpacePointCreatorModule::terminate()
 {
-  B2INFO("SpacePointCreatorModule(" << m_nameOfInstance << ")::terminate: total number of occured instances:\n" <<
+  B2INFO("TBSpacePointCreatorModule(" << m_nameOfInstance << ")::terminate: total number of occured instances:\n" <<
          "pxdClusters: " << m_TESTERPXDClusterCtr <<
-         ", svdClusters: " << m_TESTERSVDClusterCtr <<
-         ", spacePoints: " << m_TESTERSpacePointCtr)
+         "\nsvdClusters: " << m_TESTERSVDClusterCtr <<
+         "\ntelClusters: " << m_TESTERTelClusterCtr <<
+         "\nspacePoints: " << m_TESTERSpacePointCtr)
 }
-
-

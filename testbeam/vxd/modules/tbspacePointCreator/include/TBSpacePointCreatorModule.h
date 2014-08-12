@@ -14,21 +14,24 @@
 
 #include <vxd/dataobjects/VxdID.h>
 
-#include <tracking/spacePointCreation/SpacePoint.h>
+#include <testbeam/vxd/tracking/spacePointCreation/TBSpacePoint.h>
+
+#include <string>
+
+
 
 namespace Belle2 {
   /**
    * Imports Clusters of the silicon detectors and converts them to spacePoints.
    *
    */
-  class SpacePointCreatorModule : public Module {
+  class TBSpacePointCreatorModule : public Module {
 
   public:
 
 
-
     /** Constructor */
-    SpacePointCreatorModule();
+    TBSpacePointCreatorModule();
 
 
 
@@ -54,9 +57,11 @@ namespace Belle2 {
     // Data members
     std::string m_pxdClustersName; /**< PXDCluster collection name */
     std::string m_svdClustersName; /**< SVDCluster collection name */
+    std::string m_telClustersName; /**< TelCluster collection name */
     std::string m_spacePointsName; /**< SpacePoints collection name */
     std::string m_relSpacePointsPXDClustersName; /**< SpacePoints <-> PXDClusters relation name */
     std::string m_relSpacePointsSVDClustersName; /**< SpacePoints <-> SVDClusters relation name */
+    std::string m_relSpacePointsTelClustersName; /**< SpacePoints <-> TelClusters relation name */
 
 
     // modification parameters
@@ -67,6 +72,7 @@ namespace Belle2 {
     //counters for testing
     unsigned int m_TESTERPXDClusterCtr; /**< counts total number of PXDClusters occured */
     unsigned int m_TESTERSVDClusterCtr; /**< counts total number of SVDCluster occured */
+    unsigned int m_TESTERTelClusterCtr; /**< counts total number of SVDCluster occured */
     unsigned int m_TESTERSpacePointCtr; /**< counts total number of SpacePoints occured */
 
 

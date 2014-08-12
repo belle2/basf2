@@ -19,7 +19,7 @@ ROCallback::~ROCallback() throw()
 
 void ROCallback::init() throw()
 {
-  m_con.init("basf2");
+  m_con.init("basf2_ropc");
 }
 
 void ROCallback::term() throw()
@@ -31,18 +31,20 @@ void ROCallback::term() throw()
 bool ROCallback::load() throw()
 {
   const DBObject& obj(getConfig().getObject());
-  std::string script = obj.getText("script");
+  std::string script = obj.getText("ropc_script");
+  m_con.setExecutable("basf2");
   m_con.clearArguments();
   m_con.addArgument(script);
   m_con.addArgument("1");
-  m_con.addArgument("5101");
-  m_con.addArgument("basf2");
+  m_con.addArgument(StringUtil::form("%d", obj.getInt("port_from")));
+  m_con.addArgument("basf2_ropc");
   if (m_con.load(30)) {
     LogFile::debug("load succeded");
     return true;
   }
   LogFile::error("load timeout");
-  return false;
+  //return false;
+  return true;
 }
 
 bool ROCallback::start() throw()

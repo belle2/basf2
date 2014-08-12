@@ -17,11 +17,12 @@ int main(int argc, char** argv)
     LogFile::debug("Usage : %s <name>", argv[0]);
     return 1;
   }
-  daemon(0, 0);
+  //daemon(0, 0);
   LogFile::open("rocontrold");
   const char* name = argv[1];
   NSMNode node(name);
   ROCallback* callback = new ROCallback(node);
+  callback->setFile("ropc");
   NSMNodeDaemon* daemon = new NSMNodeDaemon(callback);
   daemon->run();
 

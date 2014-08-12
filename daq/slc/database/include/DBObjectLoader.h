@@ -11,6 +11,9 @@ namespace Belle2 {
     static ConfigObject load(const std::string& path,
                              const std::string& tablename,
                              bool search = false);
+    static ConfigObject load(const std::string& tablename) {
+      return load("", tablename);
+    }
 
   };
 

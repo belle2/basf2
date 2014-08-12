@@ -22,9 +22,8 @@ int main(int argc, char** argv)
   LogFile::open("storage");
   const char* name = argv[1];
   NSMNode node(name);
-  ConfigFile config("slowcontrol", "storage");
   StoragerCallback* callback = new StoragerCallback(node);
-  callback->setFilePath("/home/usr/stordaq/belle2/release/daq/slc/data/config/", "storage");
+  callback->setFile("storage");
   NSMNodeDaemon* daemon = new NSMNodeDaemon(callback);
   daemon->run();
 

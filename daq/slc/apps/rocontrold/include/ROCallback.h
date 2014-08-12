@@ -3,7 +3,10 @@
 
 #include "daq/slc/readout/ProcessController.h"
 
+#include <daq/slc/nsm/NSMData.h>
+
 #include "daq/slc/runcontrol/RCCallback.h"
+#include "daq/slc/readout/FlowMonitor.h"
 
 namespace Belle2 {
 
@@ -23,9 +26,12 @@ namespace Belle2 {
     virtual bool pause() throw();
     virtual bool recover() throw();
     virtual bool abort() throw();
+    virtual void timeout() throw();
 
   private:
     ProcessController m_con;
+    FlowMonitor m_flow;
+    NSMData m_data;
 
   };
 

@@ -14,7 +14,9 @@ namespace Belle2 {
   class TemplateCallback : public RCCallback {
 
   public:
-    TemplateCallback(const NSMNode& node, const std::string& host, const std::string& port);
+    TemplateCallback(const NSMNode& node,
+                     const std::string& host,
+                     const std::string& port);
     virtual ~TemplateCallback() throw();
 
   public:

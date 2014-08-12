@@ -103,7 +103,7 @@ void DeSerializerPCModule::initialize()
     if (m_nodename.size() == 0 || m_nodeid < 0) {
       m_shmflag = 0;
     } else {
-      m_status.open(m_nodename, m_nodeid);
+      g_status.open(m_nodename, m_nodeid);
     }
   }
 
@@ -127,7 +127,7 @@ int DeSerializerPCModule::recvFD(int sock, char* buf, int data_size_byte, int fl
       } else {
         char err_buf[500];
         sprintf(err_buf, "Failed to receive data(%s). Exiting...", strerror(errno));
-        print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         sleep(1234567);
         exit(-1);
       }
@@ -153,7 +153,7 @@ int DeSerializerPCModule::Connect()
     if (host == NULL) {
       char err_buf[100];
       sprintf(err_buf, "hostname(%s) cannot be resolved(%s). Check /etc/hosts. Exiting...", m_hostname_from[ i ].c_str(), strerror(errno));
-      print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(1);
     }
@@ -195,6 +195,15 @@ int DeSerializerPCModule::Connect()
 #ifdef DEBUG
     printf("[DEBUG] TCP_NODELAY %d\n", val);
 #endif
+    if (g_status.isAvailable()) {
+      sockaddr_in sa;
+      memset(&sa, 0, sizeof(sockaddr_in));
+      socklen_t sa_len = sizeof(sa);
+      if (getsockname(m_socket[i], (struct sockaddr*)&sa, (socklen_t*)&sa_len) == 0) {
+        g_status.setInputPort(ntohs(sa.sin_port));
+        g_status.setInputAddress(sa.sin_addr.s_addr);
+      }
+    }
 
   }
   printf("[DEBUG] Initialization finished\n");
@@ -247,7 +256,7 @@ int* DeSerializerPCModule::recvData(int* delete_flag, int* total_buf_nwords, int
       char err_buf[500];
       sprintf(err_buf, "CORRUPTED DATA: Different # of events or nodes over data sources( %d %d %d %d ). Exiting...\n",
               *num_events_in_sendblock , temp_num_events , *num_nodes_in_sendblock , temp_num_nodes);
-      print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(1);
 #endif
@@ -268,7 +277,7 @@ int* DeSerializerPCModule::recvData(int* delete_flag, int* total_buf_nwords, int
       printData(send_hdr_buf, SendHeader::SENDHDR_NWORDS);
       char err_buf[500];
       sprintf(err_buf, "CORRUPTED DATA: Too large event : Header %d %d %d %d\n", i, temp_num_events, temp_num_nodes, send_hdr.GetTotalNwords());
-      print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(123456);
       exit(1);
 
@@ -306,7 +315,7 @@ int* DeSerializerPCModule::recvData(int* delete_flag, int* total_buf_nwords, int
       char err_buf[500];
       sprintf(err_buf, "CORRUPTED DATA: Length written on SendHeader(%d) is invalid. Actual data size is %d. Exting...",
               (int)(*total_buf_nwords * sizeof(int)), temp_length);
-      print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(-1);
     }
@@ -317,7 +326,7 @@ int* DeSerializerPCModule::recvData(int* delete_flag, int* total_buf_nwords, int
     char err_buf[500];
     sprintf(err_buf, "CORRUPTED DATA: Received data size (%d byte) is not same as expected one (%d) from Sendheader. Exting...",
             total_recvd_byte, (int)(*total_buf_nwords * sizeof(int)));
-    print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(1234567);
     exit(-1);
   }
@@ -362,7 +371,7 @@ void DeSerializerPCModule::setRecvdBuffer(RawDataBlock* temp_raw_datablk, int* d
     char err_buf[500];
     sprintf(err_buf, "CORRUPTED DATA: Inconsistent SendHeader value. # of nodes(%d) times # of events(%d) differs from # of entries(%d). Exiting...",
             num_nodes_in_sendblock, num_events_in_sendblock, num_entries);
-    print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(1234567);
     exit(-1);
   }
@@ -425,7 +434,7 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ev
           temp_rawftsw->CheckData(0, m_prev_evenum, &cur_evenum, m_prev_runsubrun_no, &m_runsubrun_no);
           eve_array[ entry_id ] = cur_evenum;
         } catch (string err_str) {
-          print_err.PrintError(m_shmflag, &m_status, err_str);
+          print_err.PrintError(m_shmflag, &g_status, err_str);
           exit(1);
         }
 #endif
@@ -452,7 +461,7 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ev
           temp_rawtlu->CheckData(0, m_prev_evenum, &cur_evenum);
           eve_array[ entry_id ] = cur_evenum;
         } catch (string err_str) {
-          print_err.PrintError(m_shmflag, &m_status, err_str);
+          print_err.PrintError(m_shmflag, &g_status, err_str);
           exit(1);
         }
 #endif
@@ -494,7 +503,7 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ev
                                     m_prev_runsubrun_no, &m_runsubrun_no);
           eve_array[ entry_id ] = cur_evenum;
         } catch (string err_str) {
-          print_err.PrintError(m_shmflag, &m_status, err_str);
+          print_err.PrintError(m_shmflag, &g_status, err_str);
           exit(1);
         }
 #endif
@@ -528,7 +537,7 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ev
                  m,  eve_array[ m ], utime_array[ m ], ctime_type_array[ m ]);
         }
         sprintf(err_buf, "CORRUPTED DATA: Event or Time record mismatch. Exiting...");
-        print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         sleep(1234567);
         exit(-1);
       }
@@ -566,9 +575,9 @@ void DeSerializerPCModule::event()
     // Connect to eb0: This should be here because we want Serializer first to accept connection from eb1tx
     //
     Connect();
-    if (m_shmflag > 0) {
+    if (g_status.isAvailable()) {
       B2INFO("DeSerializerPC: Waiting for Start...\n");
-      m_status.reportRunning();
+      g_status.reportRunning();
     }
     m_start_time = getTimeSec();
     n_basf2evt = 0;
@@ -664,7 +673,7 @@ void DeSerializerPCModule::event()
   //
   //     if (m_shmflag != 0) {
   //       if (n_basf2evt % 10 == 0) {
-  //  if (m_status.isStopped()) {
+  //  if (g_status.isStopped()) {
   //           printf("[DEBUG] [INFO] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n", max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, getTimeSec() - m_start_time);
   //           m_eventMetaDataPtr->setEndOfData();
   //         }
@@ -683,8 +692,12 @@ void DeSerializerPCModule::event()
     }
   }
 
-  if (n_basf2evt % 2000 == 0 || n_basf2evt < 10) {
+  if (n_basf2evt % 20000 == 0 || n_basf2evt < 10) {
     RateMonitor(eve_copper_0);
+  }
+  if (g_status.isAvailable()) {
+    g_status.setInputNBytes(m_totbytes);
+    g_status.setInputCount(n_basf2evt);
   }
 
   n_basf2evt++;

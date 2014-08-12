@@ -210,7 +210,7 @@ namespace Belle2 {
     int m_shmfd_sta;
 
     //! buffer class to communicate with NSM client
-    RunInfoBuffer m_status;
+    static RunInfoBuffer g_status;
 
     //! buffer for shared memory
     //int* m_cfg_buf;
@@ -250,6 +250,11 @@ namespace Belle2 {
 #endif
 
   private:
+
+  public:
+    static RunInfoBuffer& getStatus() {
+      return g_status;
+    }
 
 
   };

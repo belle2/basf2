@@ -16,6 +16,7 @@ namespace Belle2 {
     FlowMonitor() {
       m_ioinfo.push_back(IOInfo());
       m_ioinfo.push_back(IOInfo());
+      m_info = NULL;
     }
     ~FlowMonitor() {}
 
@@ -25,6 +26,7 @@ namespace Belle2 {
     ronode_status& monitor();
     const ronode_status& getStatus() const { return m_status; }
     ronode_status& getStatus() { return m_status; }
+    bool isAvailable() const { return m_info != NULL; }
 
   private:
     std::string m_nodename;

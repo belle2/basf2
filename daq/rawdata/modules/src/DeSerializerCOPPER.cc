@@ -112,7 +112,7 @@ void DeSerializerCOPPERModule::initialize()
     if (m_nodename.size() == 0 || m_nodeid < 0) {
       m_shmflag = 0;
     } else {
-      m_status.open(m_nodename, m_nodeid);
+      g_status.open(m_nodename, m_nodeid);
     }
   }
 
@@ -159,7 +159,7 @@ void DeSerializerCOPPERModule::initializeCOPPER()
   //
   if (! m_use_slot) {
     char err_buf[100] = "Slot is not specified. Exiting...";
-    print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   } else {
     int slot;
@@ -261,7 +261,7 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
             raw_copper->GetMagicFPGAHeader(cprblock),
             raw_copper->GetMagicFPGATrailer(cprblock),
             raw_copper->GetMagicDriverTrailer(cprblock));
-    print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(12345678);
     exit(-1);
   }
@@ -275,7 +275,7 @@ void DeSerializerCOPPERModule::fillNewRawCOPPERHeader(RawCOPPER* raw_copper)
 
     char err_buf[500];
     sprintf(err_buf, "CORRUPTED DATA: Invalid event_number. Exiting...: cur 32bit eve %x preveve %x\n",  cur_ftsw_eve32, m_prev_ftsweve32);
-    print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 
     printf("[DEBUG] i= %d : num entries %d : Tot words %d\n", 0 , raw_copper->GetNumEntries(), raw_copper->TotalBufNwords());
     printData(raw_copper->GetBuffer(0), raw_copper->TotalBufNwords());
@@ -335,7 +335,7 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
         ) {
           char err_buf[500];
           sprintf("EAGAIN return in the middle of an event( COPPER driver should't do this.). Exting...", strerror(errno));
-          print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
           exit(-1);
         }
 #ifdef NONSTOP
@@ -361,7 +361,7 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
       } else {
         char err_buf[500];
         sprintf("Failed to read data from COPPER(%s). Exiting...", strerror(errno));
-        print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         exit(-1);
       }
     } else {
@@ -457,7 +457,7 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
               *m_size_word * sizeof(int) - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS * sizeof(int),
               m_bufary[ entry ][ m_pre_rawcpr.POS_DATA_LENGTH ]);
 #endif
-      print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(-1);
     }
   } else if (
@@ -473,17 +473,17 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
     sprintf(err_buf, "CORRUPTED DATA: Read more than data size. Exiting...: %d %d %d %d %d\n",
             recvd_byte, *m_size_word * sizeof(int) , RawTrailer::RAWTRAILER_NWORDS * sizeof(int),
             m_bufary[ entry ][ RawCOPPER::POS_DATA_LENGTH ],  RawCOPPER::POS_DATA_LENGTH);
-    print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 #else
 //     sprintf(err_buf, "CORRUPTED DATA: Read more than data size. Exiting...: %d %d %d %d %d\n",
 //             recvd_byte, *m_size_word * sizeof(int) , ReducedRawTrailer::RAWTRAILER_NWORDS * sizeof(int),
 //             m_bufary[ entry ][ PreRawCOPPER::POS_DATA_LENGTH ],  PreRawCOPPER::POS_DATA_LENGTH);
-//     print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//     print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 
     sprintf(err_buf, "CORRUPTED DATA: Read more than data size. Exiting...: %d %d %d %d %d\n",
             recvd_byte, *m_size_word * sizeof(int) , m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS * sizeof(int),
             m_bufary[ entry ][ m_pre_rawcpr.POS_DATA_LENGTH ],  m_pre_rawcpr.POS_DATA_LENGTH);
-    print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 #endif
 
     exit(-1);
@@ -540,7 +540,7 @@ void DeSerializerCOPPERModule::openCOPPER()
   if ((m_cpr_fd = open("/dev/copper/copper", O_RDONLY)) == -1) {
     char err_buf[500];
     sprintf("Failed to open Finesse(%s). Exiting... ", strerror(errno));
-    print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
 
@@ -579,7 +579,7 @@ int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte)
         if (n > 0) {
           char err_buf[500];
           sprintf("EAGAIN return in the middle of an event( COPPER driver should't do this.). Exting...", strerror(errno));
-          print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
           exit(-1);
         }
 #ifdef NONSTOP
@@ -600,7 +600,7 @@ int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte)
       } else {
         char err_buf[500];
         sprintf("Failed to read data from COPPER(%s). Exting...", strerror(errno));
-        print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         exit(-1);
       }
     } else {
@@ -671,10 +671,9 @@ void DeSerializerCOPPERModule::event()
     openCOPPER();
     B2INFO("Done.\n");    fflush(stderr);
 #endif
-    if (m_shmflag > 0) {
-
+    if (g_status.isAvailable()) {
       B2INFO("DeSerializerCOPPER: Waiting for Start...\n");
-      m_status.reportRunning();
+      g_status.reportRunning();
     }
     //
     // for DESY test
@@ -710,7 +709,7 @@ void DeSerializerCOPPERModule::event()
         break;
       }
 #endif
-      print_err.PrintError(m_shmflag, &m_status, err_str);
+      print_err.PrintError(m_shmflag, &g_status, err_str);
       exit(1);
     }
 
@@ -739,7 +738,7 @@ void DeSerializerCOPPERModule::event()
       m_prev_runsubrun_no = m_runsubrun_no;
       //    fillNewRawCOPPERHeader( &temp_rawcopper );
     } catch (string err_str) {
-      print_err.PrintError(m_shmflag, &m_status, err_str);
+      print_err.PrintError(m_shmflag, &g_status, err_str);
       exit(1);
     }
 
@@ -785,6 +784,10 @@ void DeSerializerCOPPERModule::event()
   //  if (n_basf2evt % 100 == 0 || n_basf2evt < 10) {
   if (n_basf2evt % 100 == 0) {
     RateMonitor(m_prev_ftsweve32);
+  }
+  if (g_status.isAvailable()) {
+    g_status.setInputNBytes(m_totbytes);
+    g_status.setInputCount(n_basf2evt);
   }
 
   n_basf2evt++;

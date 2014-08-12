@@ -416,7 +416,7 @@ void DeSerializerFILEModule::event()
                                    m_prev_run_no, &m_run_no);
 
         } catch (string err_str) {
-          print_err.PrintError(m_shmflag, &m_status, err_str);
+          print_err.PrintError(m_shmflag, &g_status, err_str);
           exit(1);
         }
         m_prev_run_no = m_run_no; // The place of this update depends on # of nodes

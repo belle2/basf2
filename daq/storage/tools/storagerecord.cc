@@ -112,7 +112,7 @@ public:
     }
     g_nfiles++;
     std::ofstream fout(g_file_nfiles.c_str());
-    fout << g_nfiles;
+    fout << g_nfiles << " " << expno << " " << runno;
     id = g_nfiles;
     g_mutex.unlock();
     file = fopen(filename, "w");
@@ -220,10 +220,6 @@ int main(int argc, char** argv)
     return 1;
   }
   signal(SIGINT, signalHandler);
-  {
-    std::ifstream fin(g_file_nfiles.c_str());
-    fin >> g_nfiles;
-  }
   const unsigned interval = 10;
   RunInfoBuffer info;
   const bool use_info = (argc > 10);
@@ -237,6 +233,10 @@ int main(int argc, char** argv)
   g_file_diskid = argv[5];
   g_file_nfiles = argv[6];
 
+  unsigned int expno_tmp = 0;
+  unsigned int runno_tmp = 0;
+  std::ifstream fin(g_file_nfiles.c_str());
+  fin >> g_nfiles >> expno_tmp >> runno_tmp;
   SharedEventBuffer obuf;
   obuf.open(argv[7], atol(argv[8]) * 1000000, true);
   B2INFO("storagerecord: started recording.");
@@ -272,10 +272,15 @@ int main(int argc, char** argv)
       }
       obuf.lock();
       SharedEventBuffer::Header* oheader = ibuf.getHeader();
+
       oheader->expno = expno;
       oheader->runno = runno;
       obuf.unlock();
-      g_nfiles = 0;
+      if (expno_tmp != expno || runno_tmp != runno) {
+        g_nfiles = 0;
+        expno_tmp = 0;
+        runno_tmp = 0;
+      }
       std::ofstream fout(g_file_nfiles.c_str());
       fout << g_nfiles;
       file.open(dir, ndisks, expno, runno);

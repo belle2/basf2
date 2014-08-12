@@ -22,6 +22,8 @@ REG_MODULE(DeSerializer)
 //                 Implementation
 //-----------------------------------------------------------------
 
+RunInfoBuffer DeSerializerModule::g_status;
+
 DeSerializerModule::DeSerializerModule() : Module()
 {
   //Set module properties
@@ -289,8 +291,6 @@ void DeSerializerModule::RateMonitor(unsigned int nevt)
   m_prev_time = cur_time;
   m_prev_totbytes = m_totbytes;
   m_prev_nevt = nevt;
-
-
 
 }
 

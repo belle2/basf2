@@ -11,10 +11,11 @@ using namespace Belle2;
 TemplateCallback::TemplateCallback(const NSMNode& node,
                                    const std::string& host,
                                    const std::string& port)
-  : RCCallback(node), m_con(this)
+  : RCCallback(node)
 {
   m_host = host;
   m_port = port;
+  m_con.setCallback(this);
 }
 
 TemplateCallback::~TemplateCallback() throw()
@@ -67,7 +68,6 @@ bool TemplateCallback::start() throw()
 
 bool TemplateCallback::stop() throw()
 {
-  m_con.stop();
   return true;
 }
 

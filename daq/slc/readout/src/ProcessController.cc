@@ -76,7 +76,13 @@ bool ProcessController::stop()
 bool ProcessController::abort()
 {
   m_info.clear();
-  m_fork.cancel();
+  m_fork.kill(SIGINT);
+  //if (m_fork.isAlive()) {
+  if (getExecutable() == "basf2") {
+    usleep(10000);
+    LogFile::debug("Quiting " + getExecutable());
+    m_fork.kill(SIGQUIT);
+  }
   return true;
 }
 

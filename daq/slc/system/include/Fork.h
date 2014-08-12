@@ -39,9 +39,9 @@ namespace Belle2 {
     ~Fork() throw() {}
 
   public:
-    pid_t get_id() { return m_pid; }
-    bool isAlive() { return m_pid > 0; }
-    bool kill(int signo) {
+    pid_t get_id() const { return m_pid; }
+    bool isAlive() const { return m_pid > 0; }
+    bool kill(int signo) const {
       if (m_pid < 0) return false;
       return ::kill(m_pid, signo) == 0;
     }

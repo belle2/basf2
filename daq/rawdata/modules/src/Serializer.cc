@@ -7,6 +7,7 @@
 //-
 #include <daq/rawdata/modules/DAQConsts.h>
 #include <daq/rawdata/modules/Serializer.h>
+#include <daq/rawdata/modules/DeSerializer.h>
 
 using namespace std;
 using namespace Belle2;
@@ -456,6 +457,11 @@ void SerializerModule::Accept()
   //   int flag = 1;
   //   ret = setsockopt(fd_accept, IPPROTO_TCP, TCP_NODELAY, (char*)&flag, sizeof(flag) );
   m_socket = fd_accept;
+  RunInfoBuffer& status(DeSerializerModule::getStatus());
+  if (status.isAvailable()) {
+    status.setOutputPort(ntohs(sock_accept.sin_port));
+    status.setOutputAddress(sock_accept.sin_addr.s_addr);
+  }
 
   return;
 
@@ -681,5 +687,10 @@ void SerializerModule::event()
     //     m_prev_nevt = n_basf2evt;
   }
   n_basf2evt++;
+  RunInfoBuffer& status(DeSerializerModule::getStatus());
+  if (status.isAvailable()) {
+    status.setOutputNBytes(m_totbytes);
+    status.setOutputCount(n_basf2evt);
+  }
 
 }

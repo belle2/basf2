@@ -23,7 +23,7 @@ int main(int argc, char** argv)
   const char* name = argv[1];
   NSMNode node(name);
   StoragerCallback* callback = new StoragerCallback(node);
-  callback->setFile("storage");
+  callback->setFilePath("storage");
   NSMNodeDaemon* daemon = new NSMNodeDaemon(callback);
   daemon->run();
 

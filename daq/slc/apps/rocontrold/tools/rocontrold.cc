@@ -22,7 +22,7 @@ int main(int argc, char** argv)
   const char* name = argv[1];
   NSMNode node(name);
   ROCallback* callback = new ROCallback(node);
-  callback->setFile("ropc");
+  callback->setFilePath("ropc");
   NSMNodeDaemon* daemon = new NSMNodeDaemon(callback);
   daemon->run();
 

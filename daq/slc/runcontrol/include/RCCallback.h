@@ -52,7 +52,9 @@ namespace Belle2 {
       m_path = path;
       m_tablename = tablename;
     }
-
+    void setFilePath(const std::string tablename) throw() {
+      setFilePath("", tablename);
+    }
 
   protected:
     bool preload(const NSMMessage& msg) throw();

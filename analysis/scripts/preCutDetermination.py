@@ -31,27 +31,27 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
         maxima = GetPositionsOfMaxima(signal)
 
         def ycut_to_xcuts(channel, cut):
-            return (interpolations[channel].GetX(cut, signal[channel].GetXaxis().GetXmin(), maxima[channel]),
-                    interpolations[channel].GetX(cut, maxima[channel], signal[channel].GetXaxis().GetXmax()))
+            return [interpolations[channel].GetX(cut, signal[channel].GetXaxis().GetXmin(), maxima[channel]),
+                    interpolations[channel].GetX(cut, maxima[channel], signal[channel].GetXaxis().GetXmax())]
 
     # One-Side cut S/B ratio constructed
     elif preCutConfig.method == 'S/B' and preCutConfig.variable in ['daughterProductOf(getExtraInfo(SignalProbability))']:
 
         def ycut_to_xcuts(channel, cut):
-            return (interpolations[channel].GetX(cut, 0, 1), 1)
+            return [interpolations[channel].GetX(cut, 0, 1), 1]
 
     # Two sided cut, same for all channels
     elif preCutConfig.method == 'Same' and preCutConfig.variable in ['M', 'Q', 'Mbc']:
         maxima = GetPositionsOfMaxima(signal)
 
         def ycut_to_xcuts(channel, cut):
-            return (maxima[channel] - cut * 2, maxima[channel] + cut * 2)
+            return [maxima[channel] - cut * 2, maxima[channel] + cut * 2]
 
     # One sided cut, same for all channels
     elif preCutConfig.method == 'Same' and preCutConfig.variable in ['daughterProductOf(getExtraInfo(SignalProbability))']:
 
         def ycut_to_xcuts(channel, cut):
-            return (cut, 1)
+            return [cut, 1]
 
     else:
         raise RuntimeError('Given PreCutConfiguration is not implemented. Please check that method and used variables are compatible.')
@@ -63,6 +63,10 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
 
         cuts = GetCuts(signal, bckgrd, preCutConfig.efficiency, preCutConfig.purity, ycut_to_xcuts)
         for (channel, range) in cuts.iteritems():
+            # Modify the range to match the bin boundaries
+            axis = signal[channel].GetXaxis()
+            range[0] = axis.GetBinLowEdge(axis.FindBin(range[0]))
+            range[1] = axis.GetBinUpEdge(axis.FindBin(range[1]))
             result[channel] = {'range': range, 'isIgnored': False,
                                'cutstring': str(range[0]) + " <= " + preCutConfig.variable + " <= " + str(range[1]),
                                'nBackground': GetNumberOfEventsInRange(bckgrd[channel], range),

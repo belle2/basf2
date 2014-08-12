@@ -89,7 +89,7 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
         placeholders['combinedParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPreCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNBackground']) * 100) + ' & '
-        placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPreCut'], particlePlaceholder['particleNBackground']) * 100) + ' & '
+        placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPreCut'], particlePlaceholder['particleNBackgroundAfterPreCut']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNBackgroundAfterPostCut']) * 100) + r'\\' + '\n'
 
     placeholders['mbcInputs'] = ''
@@ -298,13 +298,21 @@ def makePreCutPlot(rootFilename, plotName, prefix, preCut):
     canvas = ROOT.TCanvas(plotName + '_canvas', plotName, 600, 400)
     canvas.cd()
     hist = getKey(rootfile, '^{name}.*$'.format(name=prefix)).ReadObj()
-    hist.Draw()
     if preCut is not None:
         lc, uc = preCut['range']
-        ll = ROOT.TLine(lc, 0, lc, hist.GetMaximum())
-        ul = ROOT.TLine(uc, 0, uc, hist.GetMaximum())
+        d = uc - lc
+        lr = lc - 4 * d
+        ur = uc + 4 * d
+        lm = hist.GetXaxis().GetXmin()
+        um = hist.GetXaxis().GetXmax()
+        hist.GetXaxis().SetRangeUser(lr if lr > lm else lm, ur if ur < um else um)
+        hist.Draw()
+        ll = ROOT.TLine(lc if lc > lm else lm, 0, lc if lc > lm else lm, hist.GetMaximum())
+        ul = ROOT.TLine(uc if uc < um else um, 0, uc if uc < um else um, hist.GetMaximum())
         ll.Draw()
         ul.Draw()
+    else:
+        hist.Draw()
     canvas.SaveAs(plotName)
 
 

@@ -179,8 +179,10 @@ namespace Belle2 {
           // Try out using weighting the observations by the squared drift length.
           // Reduces the distance measure to a relative measure counting din drift lengths.
           // Using the squared drift length makes the chi2 unitless.
-          const FloatType sqrtWeight = usePosition ? 1.0 : 1 / wireHit.getRefDriftLength();
-          append(wirePos, driftLength, sqrtWeight * sqrtWeight);
+          // Limited at the bottom by the nominal uncertainty of the drift time (as introduced in CDC::SimpleTDCCountTranslator)
+          const FloatType pseudoVariance = (usePosition ? 0.0 : wireHit.getRefDriftLength() * wireHit.getRefDriftLength()) + SIMPLE_DRIFT_LENGTH_VARIANCE;
+          const FloatType weight = 1 / pseudoVariance;
+          append(wirePos, driftLength, weight);
         }
       }
 

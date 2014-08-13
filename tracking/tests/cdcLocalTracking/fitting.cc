@@ -13,6 +13,8 @@
 
 #include <tracking/cdcLocalTracking/geometry/Vector2D.h>
 
+#include <cdc/translators/SimpleTDCCountTranslator.h>
+
 #include <tracking/cdcLegendreTracking/CDCLegendreTrackHit.h>
 
 #include <tracking/cdcLocalTracking/fitting/CDCObservations2D.h>
@@ -221,3 +223,20 @@ TEST_F(CDCLocalTrackingTest, CDCRiemannFitter_compileTrackCandidateFit)
   }
 
 }
+
+
+
+TEST_F(CDCLocalTrackingTest, SIMPLE_DRIFT_LENGTH_VARIANCE_isconsistent)
+{
+  CDC::SimpleTDCCountTranslator simpleTDCCountTranslator;
+
+  FloatType driftLength = 0.0;
+  const WireID wireID;
+  bool rl = false;
+
+  FloatType defaultDriftLengthVariance = simpleTDCCountTranslator.getDriftLengthResolution(driftLength, wireID, rl, 0.0, 0.0);
+  EXPECT_NEAR(SIMPLE_DRIFT_LENGTH_VARIANCE, defaultDriftLengthVariance, 10e-7);
+
+}
+
+

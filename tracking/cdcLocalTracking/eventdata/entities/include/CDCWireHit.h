@@ -26,13 +26,14 @@
 namespace Belle2 {
   namespace CDCLocalTracking {
 
+    const FloatType SIMPLE_DRIFT_LENGTH_VARIANCE  = 0.000169;
+
     /// Class representing a hit wire in the central drift chamber
     /** This class combines the measurement informations from a CDCHit with the geometry informations. \n
      *  It forms the basis of all other higher level tracking objects.
      *  It contains an AutomataCell since we want to use it with the Clusterizer which makes use of the cell state. \n
      *  Additionally contains references to both the CDCWire instance from the CDCTopology and the CDCHit from the StoreArray of the event. \n
      */
-
     class CDCWireHit : public UsedTObject {
 
     public:

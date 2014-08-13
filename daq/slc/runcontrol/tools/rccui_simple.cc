@@ -23,6 +23,7 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <vector>
 
 extern "C" {
 #include <readline/readline.h>
@@ -46,11 +47,14 @@ int main(int argc, char** argv)
   }
   ConfigFile config("slowcontrol", "rc");
   std::string nodename = argv[1];
-  std::string rcnodename = argv[2];
   NSMNode node(nodename);
-  NSMNode rcnode(rcnodename);//config.get("rc.nsm.name"));
+  std::vector<NSMNode> rcnode_v;
+  for (int i = 1; i < argc; i++) {
+    rcnode_v.push_back(NSMNode(argv[i]));
+  }
   NSMCommunicator* comm = new NSMCommunicator();
-  comm->init(node, config.get("nsm.local.host"), config.getInt("nsm.local.port"));
+  //comm->init(node, config.get("nsm.local.host"), config.getInt("nsm.local.port"));
+  comm->init(node);
   HIST_ENTRY* history = NULL;
   int nhistory = 0;
   char* prompt = (char*)malloc(nodename.size() + 3);
@@ -78,7 +82,9 @@ int main(int argc, char** argv)
       continue;
     }
     try {
-      comm->sendRequest(NSMMessage(rcnode, cmd));
+      for (size_t i = 0; i < rcnode_v.size(); i++) {
+        comm->sendRequest(NSMMessage(rcnode_v[i], cmd));
+      }
     } catch (const NSMHandlerException& e) {
     }
   }

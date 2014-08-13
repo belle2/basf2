@@ -459,8 +459,11 @@ void SerializerModule::Accept()
   m_socket = fd_accept;
   RunInfoBuffer& status(DeSerializerModule::getStatus());
   if (status.isAvailable()) {
-    status.setOutputPort(ntohs(sock_accept.sin_port));
-    status.setOutputAddress(sock_accept.sin_addr.s_addr);
+    //status.setOutputPort(ntohs(sock_accept.sin_port));
+    //status.setOutputAddress(sock_accept.sin_addr.s_addr);
+    status.setOutputPort(ntohs(sock_listen.sin_port));
+    status.setOutputAddress(sock_listen.sin_addr.s_addr);
+    printf("%d %x\n", (int)ntohs(sock_listen.sin_port), (int)sock_listen.sin_addr.s_addr);
   }
 
   return;
@@ -690,7 +693,8 @@ void SerializerModule::event()
   RunInfoBuffer& status(DeSerializerModule::getStatus());
   if (status.isAvailable()) {
     status.setOutputNBytes(m_totbytes);
-    status.setOutputCount(n_basf2evt);
+    status.addOutputCount(raw_dblkarray.getEntries());
+    //status.setOutputCount(n_basf2evt);
   }
 
 }

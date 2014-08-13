@@ -1,6 +1,9 @@
 #include "COPPERCallback.h"
 
+#include <daq/slc/readout/ronode_status.h>
+
 #include <daq/slc/system/LogFile.h>
+
 #include <daq/slc/nsm/NSMCommunicator.h>
 
 #include <daq/slc/base/StringUtil.h>
@@ -28,11 +31,12 @@ COPPERCallback::~COPPERCallback() throw()
 
 void COPPERCallback::init() throw()
 {
-  m_con.init(getNode().getName());
+  m_con.init("basf2_" + getNode().getName(), 1);
   m_ttrx.open();
   m_copper.open();
   m_flow.open(&m_con.getInfo());
-  m_data = NSMData(getNode().getName() + "_STATUS", "ronode_status", 1);
+  m_data = NSMData(getNode().getName() + "_STATUS", "ronode_status",
+                   ronode_status_revision);
   m_data.allocate(getCommunicator());
 }
 
@@ -51,8 +55,7 @@ void COPPERCallback::timeout() throw()
 {
   m_ttrx.monitor();
   m_copper.monitor();
-  ronode_status& status(m_flow.monitor());
-  int eflag = (status.eflag & 0xFF);
+  int eflag = 0;
   eflag |= m_copper.isFifoFull() << 5;
   eflag |= (getNode().getState() == RCState::RUNNING_S && m_copper.isFifoEmpty()) << 6;
   eflag |= m_copper.isLengthFifoFull() << 7;
@@ -69,33 +72,51 @@ void COPPERCallback::timeout() throw()
   eflag |= m_ttrx.isBelle2LinkError() << 28;
   eflag |= m_ttrx.isLinkUpError() << 29;
 
-  printf("FIFO full               : %s\n", (m_copper.isFifoFull() ? "true" : "false"));
-  printf("FIFO empty              : %s\n", (m_copper.isFifoEmpty() ? "true" : "false"));
-  printf("Length FIFO full        : %s\n",
-         (m_copper.isLengthFifoFull() ? "true" : "false"));
-  printf("\n");
-
+  if (m_copper.isFifoFull()) {
+    LogFile::warning("FIFO full");
+  }
+  if (m_copper.isFifoEmpty()) {
+    LogFile::warning("FIFO empty");
+  }
+  if (m_copper.isLengthFifoFull()) {
+    LogFile::warning("Length FIFO full");
+  }
   for (int i = 0; i < 4; i++) {
     if (m_config.useHSLB(i)) {
-      printf("Belle2 link down        : %s\n", (m_hslb[i].isBelle2LinkDown() ? "true" : "false"));
-      printf("COPPER fifo full        : %s\n", (m_hslb[i].isCOPPERFifoFull() ? "true" : "false"));
-      printf("COPPER length fifo full : %s\n", (m_hslb[i].isCOPPERLengthFifoFull() ? "true" : "false"));
-      printf("HSLB Fifo full          : %s\n", (m_hslb[i].isFifoFull() ? "true" : "false"));
-      printf("HSLB CRC error          : %s\n", (m_hslb[i].isCRCError() ? "true" : "false"));
-      printf("\n");
+      if (m_hslb[i].isBelle2LinkDown()) {
+        LogFile::error("Belle2 link down");
+      }
+      if (m_hslb[i].isCOPPERFifoFull()) {
+        LogFile::warning("COPPER fifo full");
+      }
+      if (m_hslb[i].isCOPPERLengthFifoFull()) {
+        LogFile::warning("COPPER length fifo full");
+      }
+      if (m_hslb[i].isFifoFull()) {
+        LogFile::warning("HSLB %d fifo full", i);
+      }
+      if (m_hslb[i].isCRCError()) {
+        LogFile::warning("HSLB %d CRC error", i);
+      }
     }
   }
 
-  printf("Belle2 link error       : %s\n", (m_ttrx.isBelle2LinkError() ? "true" : "false"));
-  printf("Link up error           : %s\n", (m_ttrx.isLinkUpError() ? "true" : "false"));
-  printf("\n");
-
-  status.eflag = eflag;
-  if (getNode().getState() != RCState::RECOVERING_RS && eflag > 0) {
-    getNode().setState(RCState::RECOVERING_RS);
-    sendPause();
+  if (m_ttrx.isBelle2LinkError()) {
+    LogFile::error("Belle2 link error\n");
   }
-  memcpy(m_data.get(), &status, sizeof(ronode_status));
+  if (m_ttrx.isLinkUpError()) {
+    LogFile::error("Link up error\n");
+  }
+
+  if (m_data.isAvailable() && m_flow.isAvailable()) {
+    ronode_status& status(m_flow.monitor());
+    status.eflag |= (eflag & 0xFF);
+    if (getNode().getState() != RCState::RECOVERING_RS && eflag > 0) {
+      getNode().setState(RCState::RECOVERING_RS);
+      sendPause();
+    }
+    memcpy(m_data.get(), &status, sizeof(ronode_status));
+  }
 }
 
 bool COPPERCallback::load() throw()
@@ -156,30 +177,30 @@ bool COPPERCallback::recover() throw()
 bool COPPERCallback::abort() throw()
 {
   m_con.abort();
-  getNode().setState(RCState::NOTREADY_S);
+  //getNode().setState(RCState::NOTREADY_S);
   return true;
 }
 
 bool COPPERCallback::bootBasf2() throw()
 {
-  if (!m_con.isAlive()) {
-    int flag = 0;
-    for (size_t i = 0; i < 4; i++) {
-      if (m_config.useHSLB(i)) flag += 1 << i;
-    }
-    m_con.clearArguments();
-    m_con.addArgument(m_config.getBasf2Script());
-    m_con.addArgument(m_config.getHostname());
-    m_con.addArgument(m_config.getCopperId().substr(3));
-    m_con.addArgument(StringUtil::form("%d", flag));
-    m_con.addArgument("1");
-    m_con.addArgument("basf2");
-    if (m_con.load(30)) {
-      LogFile::debug("load succeded");
-      return true;
-    }
-    LogFile::debug("load timeout");
-    return false;
+  //if (m_con.isAlive()) {
+  system("killall basf2");
+  int flag = 0;
+  for (size_t i = 0; i < 4; i++) {
+    if (m_config.useHSLB(i)) flag += 1 << i;
   }
-  return true;
+  m_con.clearArguments();
+  m_con.addArgument(m_config.getBasf2Script());
+  m_con.addArgument(m_config.getHostname());
+  m_con.addArgument(m_config.getCopperId().substr(3));
+  m_con.addArgument(StringUtil::form("%d", flag));
+  m_con.addArgument("1");
+  m_con.addArgument("basf2_" + getNode().getName());
+  if (m_con.load(30)) {
+    LogFile::debug("load succeded");
+    return true;
+  }
+  LogFile::debug("load timeout");
+  return false;
+
 }

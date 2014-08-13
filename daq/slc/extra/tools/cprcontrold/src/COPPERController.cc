@@ -62,14 +62,16 @@ copper_info& COPPERController::monitor() throw()
     m_info.conf_w_af[1] = read(CPRIOGET_CONF_WB_AF);
     m_info.conf_w_af[2] = read(CPRIOGET_CONF_WC_AF);
     m_info.conf_w_af[3] = read(CPRIOGET_CONF_WD_AF);
-    m_info.ff_rst = read(CPRIOGET_FF_RST);
+    //m_info.ff_rst = read(CPRIOGET_FF_RST);
     m_info.finesse_sta = read(CPRIOGET_FINESSE_STA);
-    m_info.almfull_enb = read(CPRIOGET_ALMFULL_ENB);
+    //m_info.almfull_enb = read(CPRIOGET_ALMFULL_ENB);
     m_info.version = read(CPRIOGET_VERSION);
-    m_info.trgcm = read(CPRIOGET_TRGCM);
-    m_info.trg_leng = read(CPRIOGET_TRG_LENG);
-    m_info.lef_readsel = read(CPRIOGET_LEF_READSEL);
-    m_info.lef_total = read(CPRIOGET_LEF_TOTAL);
+
+    //m_info.trgcm = read(CPRIOGET_TRGCM);
+    //m_info.trg_leng = read(CPRIOGET_TRG_LENG);
+    //m_info.lef_readsel = read(CPRIOGET_LEF_READSEL);
+    //m_info.lef_total = read(CPRIOGET_LEF_TOTAL);
+    ///*
     m_info.lef[0] = read(CPRIOGET_LEF_AB);
     m_info.lef[1] = read(CPRIOGET_LEF_CD);
     m_info.lef_sta = read(CPRIOGET_LEF_STA);
@@ -81,27 +83,32 @@ copper_info& COPPERController::monitor() throw()
     m_info.lef_w_af[1] = read(CPRIOGET_LEF_WB_AF);
     m_info.lef_w_af[2] = read(CPRIOGET_LEF_WC_AF);
     m_info.lef_w_af[3] = read(CPRIOGET_LEF_WD_AF);
-    m_info.int_sta = read(CPRIOGET_INT_STA);
-    m_info.int_mask = read(CPRIOGET_INT_MASK);
-    m_info.ff_rw = read(CPRIOGET_FF_RW);
-    m_info.int_factor = read(CPRIOGET_INT_FACTOR);
+    //*/
+    //m_info.int_sta = read(CPRIOGET_INT_STA);
+    //m_info.int_mask = read(CPRIOGET_INT_MASK);
+    //m_info.ff_rw = read(CPRIOGET_FF_RW);
+    //m_info.int_factor = read(CPRIOGET_INT_FACTOR);
+    /*
     m_info.ewrp_w[0] = read(CPRIOGET_EWRP_WA);
     m_info.ewrp_w[1] = read(CPRIOGET_EWRP_WB);
     m_info.ewrp_w[2] = read(CPRIOGET_EWRP_WC);
     m_info.ewrp_w[3] = read(CPRIOGET_EWRP_WD);
-
     m_info.we_counter[0] = read(CPRIOGET_WEA_COUNTER);
     m_info.we_counter[1] = read(CPRIOGET_WEB_COUNTER);
     m_info.we_counter[2] = read(CPRIOGET_WEC_COUNTER);
     m_info.we_counter[3] = read(CPRIOGET_WED_COUNTER);
+    */
 
+    /*
     m_info.lwr_dma[0] = read(CPRIOGET_LWRA_DMA);
     m_info.lwr_dma[1] = read(CPRIOGET_LWRB_DMA);
     m_info.lwr_dma[2] = read(CPRIOGET_LWRC_DMA);
     m_info.lwr_dma[3] = read(CPRIOGET_LWRD_DMA);
-
+    */
+    /*
     m_info.dma_trans = read(CPRIOGET_DMA_TRANS);
     m_info.dma_ts_enb = read(CPRIOGET_TS_ENV);
+    */
   } catch (const IOException& e) {
     ::close(m_fd);
     m_fd = -1;

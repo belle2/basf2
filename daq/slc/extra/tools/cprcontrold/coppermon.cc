@@ -17,13 +17,14 @@ int main()
   hslb.open(0);
 
   while (true) {
+    ///*
     copper.monitor();
     printf("FIFO full               : %s\n", (copper.isFifoFull() ? "true" : "false"));
     printf("FIFO empty              : %s\n", (copper.isFifoEmpty() ? "true" : "false"));
     printf("Length FIFO full        : %s\n",
            (copper.isLengthFifoFull() ? "true" : "false"));
     printf("\n");
-
+    //*/
     hslb.monitor();
     printf("Belle2 link down        : %s\n", (hslb.isBelle2LinkDown() ? "true" : "false"));
     printf("COPPER fifo full        : %s\n", (hslb.isCOPPERFifoFull() ? "true" : "false"));

@@ -4,7 +4,7 @@
 const int ronode_status_revision = 1;
 
 struct ronode_status {
-  uint32 reserved[2];
+  uint32 reserved[3];
   uint32 nodeid;
   uint32 state;
   uint32 ctime;

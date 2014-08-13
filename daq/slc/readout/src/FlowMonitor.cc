@@ -51,8 +51,8 @@ ronode_status& FlowMonitor::monitor()
     m_status.reserved[1] = info.reserved[1];
     m_status.ctime = ctime;
 
-    unsigned int dcount[2];
-    float dnbyte[2];
+    unsigned int dcount;
+    double dnbyte;
     for (int j = 0; j < 2; j++) {
       m_status.io[j].freq = 0;
       m_status.io[j].evtsize = 0;
@@ -65,11 +65,11 @@ ronode_status& FlowMonitor::monitor()
           m_status.io[j].nqueue = m_ioinfo[j].getTXQueue();
         }
       }
-      if ((dcount[j] = info.io[j].count - m_status.io[j].count) > 0) {
-        dnbyte[j] = info.io[j].nbyte - m_nbyte[j];
-        m_status.io[j].freq = dcount[j] / length / 1000.;
-        m_status.io[j].evtsize = dnbyte[j] / dcount[j] / 1000.;
-        m_status.io[j].rate = dnbyte[j] / length / 1000000.;
+      if ((dcount = info.io[j].count - m_status.io[j].count) > 0) {
+        dnbyte = info.io[j].nbyte - m_nbyte[j];
+        m_status.io[j].freq = dcount / length / 1000.;
+        m_status.io[j].evtsize = dnbyte / dcount / 1000.;
+        m_status.io[j].rate = dnbyte / length / 1000000.;
         m_status.io[j].count = info.io[j].count;
         m_nbyte[j] = info.io[j].nbyte;
       } else {

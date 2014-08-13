@@ -17,7 +17,7 @@ int main(int argc, char** argv)
   LogFile::open("cprcontrold_" + name);
   NSMNode node(name);
   COPPERCallback* callback = new COPPERCallback(node, NULL);
-  callback->setFilePath("/home/usr/tkonno/belle2/release/daq/slc/data/database", "copper");
+  callback->setFilePath("database/copper");
   NSMNodeDaemon* daemon = new NSMNodeDaemon(callback);
   daemon->run();
 

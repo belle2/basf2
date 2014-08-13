@@ -112,6 +112,7 @@ void DeSerializerCOPPERModule::initialize()
     if (m_nodename.size() == 0 || m_nodeid < 0) {
       m_shmflag = 0;
     } else {
+      printf("nodename = %s\n", m_nodename.c_str());
       g_status.open(m_nodename, m_nodeid);
     }
   }
@@ -787,7 +788,7 @@ void DeSerializerCOPPERModule::event()
   }
   if (g_status.isAvailable()) {
     g_status.setInputNBytes(m_totbytes);
-    g_status.setInputCount(n_basf2evt);
+    g_status.setInputCount(m_prev_ftsweve32);
   }
 
   n_basf2evt++;

@@ -15,11 +15,18 @@ using namespace Belle2;
 using namespace CDCLocalTracking;
 
 
+FloatType dCurvOverDSZByISuperLayer[NSUPERLAYERS] = {0.0, 0.0027, 0.0, -0.0017, 0.0, 0.00116, 0.0, -0.000791};
+
+FloatType dPhi0OverDZ0ByISuperLayer[NSUPERLAYERS] = {0.0, -0.0023, 0.0, 0.0012, 0.0, -0.00097, 0.0, 0.00080};
+
+
+
 TMatrixD CDCAxialStereoFusion::calcAmbiguity(const CDCRecoSegment2D& segment,
                                              const CDCTrajectory2D& trajectory2D)
 {
 
   size_t nHits = segment.size();
+  ISuperLayerType iSuperLayer = segment.getISuperLayer();
 
   FloatType zeta = 0;
 
@@ -46,8 +53,14 @@ TMatrixD CDCAxialStereoFusion::calcAmbiguity(const CDCRecoSegment2D& segment,
   result(iPhi0, iPhi0) = 1.0;
   result(iI, iI)       = 1.0;
 
-  result(iPhi0, iSZ)   = zeta;
-  result(iI, iZ0)      = -zeta;
+  // result(iCurv,iSZ)    = -2.0 * dPhi0OverDZ0ByISuperLayer[iSuperLayer];
+  result(iCurv, iSZ)    = dCurvOverDSZByISuperLayer[iSuperLayer];
+  result(iPhi0, iZ0)    = -dPhi0OverDZ0ByISuperLayer[iSuperLayer];
+
+  result(iPhi0, iSZ)   =   zeta;
+  result(iI, iZ0)      = - zeta;
+
+  // result.Print();
 
   return result;
 

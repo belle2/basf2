@@ -352,30 +352,40 @@ FloatType GeneralizedCircle::arcLengthFactor(const FloatType& directDistance) co
 
 
 
+
 FloatType GeneralizedCircle::distance(const Vector2D& point) const
 {
-
   //this is the approximated distance also used for the fit
   //can be correct for second order deviations if nessecary
   const FloatType fastD = fastDistance(point);
+  return distance(fastD);
+}
 
-  if (fastD == 0.0 or isLine()) {
+
+
+
+
+FloatType GeneralizedCircle::distance(const FloatType& fastDistance) const
+{
+  if (fastDistance == 0.0 or isLine()) {
     //special case for unfitted state
     //and line
-    return fastD;
+    return fastDistance;
   } else {
 
     const FloatType a = n3();
     const FloatType b = 1;
-    const FloatType c = -fastD;
+    const FloatType c = -fastDistance;
 
     std::pair<FloatType, FloatType> distance12 = solveQuadraticABC(a, b, c);
 
-    //take the small solution which has always the same sign of the fastD
+    //take the small solution which has always the same sign of the fastDistance
     return distance12.second;
 
   }
 }
+
+
 
 std::pair<Vector2D, Vector2D> GeneralizedCircle::intersections(const GeneralizedCircle& generalizedCircle) const
 {

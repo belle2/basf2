@@ -154,7 +154,7 @@ namespace Belle2 {
       { scaleN(-1); }
 
       /// Transforms the generalized circle to conformal space inplace
-      /** Applies the conformal map in the self-inverse from  X = x / (x^2 + y^2) and Y = y / (x^2 +y^2) inplace
+      /** Applies the conformal map in the self-inverse form  X = x / (x^2 + y^2) and Y = y / (x^2 +y^2) inplace
        *  It works most easily by the exchange of the circle parameters n0 <-> n3 */
       inline void conformalTransform()
       { std::swap(m_n0, m_n3); }
@@ -337,6 +337,13 @@ namespace Belle2 {
 
       /// Gives the proper distance of the point to the circle line retaining the sign of the fast distance.
       FloatType distance(const Vector2D& point) const;
+
+      /// Helper function to translate the fast linearized distance measure of the generalized circle to the proper distance from the circle retaining the sign of the distance.
+      FloatType distance(const FloatType& fastDistance) const;
+
+      /// Helper function to translate the proper distance to the linearized distance measure of the generalized circle retaining the sign of the distance.
+      FloatType fastDistance(const FloatType& distance) const
+      { return (distance * n3() + 1.0) * distance; }
 
       /// Gives the signed distance of the origin to the circle
       inline FloatType impact() const

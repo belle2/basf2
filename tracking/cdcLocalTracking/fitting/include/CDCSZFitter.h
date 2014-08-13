@@ -65,8 +65,27 @@ namespace Belle2 {
       { for (const CDCRecoHit3D & recoHit3D : recoHits3D) appendSZ(observationsSZ, recoHit3D); }
 
       /// Appends the s and z value of the given hit to the observation matrix
-      void appendSZ(CDCObservations2D& observationsSZ, const Belle2::CDCLocalTracking::CDCRecoHit3D& recohit) const
-      { appendSZ(observationsSZ, recohit.getPerpS(), recohit.getRecoPos3D().z()); }
+      void appendSZ(CDCObservations2D& observationsSZ, const Belle2::CDCLocalTracking::CDCRecoHit3D& recoHit3D) const {
+        // Translate the drift length uncertainty to a uncertainty in z
+        // by the taking the projected wire vector part parallel to the displacement
+        // as a proportionality factor to the z direction.
+        const CDCWire& wire = recoHit3D.getWire();
+        const Vector3D& wireVector = wire.getWireVector();
+        const Vector2D disp2D = recoHit3D.getRecoDisp2D();
+
+        FloatType dispNorm = disp2D.norm();
+
+        FloatType zeta = 1.0;
+        zeta = wireVector.xy().dot(disp2D) / wireVector.z() / dispNorm;
+        // zeta = wireVector.xy().norm() / wireVector.z();
+
+        FloatType weight = 1.0;
+        weight = zeta * zeta / SIMPLE_DRIFT_LENGTH_VARIANCE;
+        // B2INFO("weight " << weight);
+        // B2INFO("zeta " << zeta);
+
+        appendSZ(observationsSZ, recoHit3D.getPerpS(), recoHit3D.getRecoPos3D().z(), weight);
+      }
 
       /// Appends the s and z value of the given hit to the observation matrix
       void appendSZ(CDCObservations2D& observationsSZ, const FloatType& s, const FloatType& z, const FloatType& weight = 1.0) const

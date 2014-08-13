@@ -182,8 +182,6 @@ namespace Belle2 {
       void setRLWireHit(const CDCRLWireHit* rlWireHit)
       { m_rlWireHit = rlWireHit; }
 
-      /// Constructs a two dimensional reconstructed hit by carrying out the stereo ! projection to the wire reference postion
-      CDCRecoHit2D getRecoHit2D() const;
 
 
       /// Getter for the right left passage information,
@@ -201,6 +199,15 @@ namespace Belle2 {
       /// Projects the hit's reconstructed position onto the given two dimensional trajectory
       Vector2D getRecoPos2D(const CDCTrajectory2D& trajectory2D) const
       { return trajectory2D.getClosest(getRecoPos2D()); }
+
+      /// Gets the displacement from the wire position in the xy plain at the reconstructed position
+      Vector2D getRecoDisp2D() const;
+
+      /// Constructs a two dimensional reconstructed hit by carrying out the stereo ! projection to the wire reference postion
+      CDCRecoHit2D getRecoHit2D() const
+      { return CDCRecoHit2D(m_rlWireHit, getRecoDisp2D()); }
+
+
 
       /// Adjust the travel distance by the given value.
       void shiftPerpS(FloatType perpSOffSet)

@@ -142,19 +142,17 @@ CDCRecoHit3D::~CDCRecoHit3D()
 
 
 
-CDCRecoHit2D CDCRecoHit3D::getRecoHit2D() const
+Vector2D CDCRecoHit3D::getRecoDisp2D() const
 {
   const CDCWire& wire = getWire();
   const BoundSkewLine& skewLine = wire.getSkewLine();
-
-  FloatType recoPosZ = getRecoPos3D().z();
+  const FloatType& recoPosZ = getRecoPos3D().z();
 
   Vector2D wirePos = skewLine.pos2DAtZ(recoPosZ);
-
-  Vector2D displacement2D = getRecoPos3D().xy() - wirePos;
-  return CDCRecoHit2D(m_rlWireHit, displacement2D);
-
+  Vector2D disp2D = getRecoPos3D().xy() - wirePos;
+  return disp2D;
 }
+
 
 
 bool CDCRecoHit3D::isInCDC() const

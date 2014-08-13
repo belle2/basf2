@@ -109,6 +109,10 @@ namespace Belle2 {
       { return getWireHit().getPerpS(trajectory2D); }
 
 
+      /// Reconstuct the wire reference position onto the given trajectory
+      Vector2D getRecoPos2D(const CDCTrajectory2D& trajectory2D) const
+      { return getWireHit().getRecoPos2D(trajectory2D);}
+
       /// Access the object methods and methods from a pointer in the same way.
       /** In situations where the type is not known to be a pointer or a reference there is no way to tell \n
        *  if one should use the dot '.' or operator '->' for method look up. \n
@@ -147,6 +151,14 @@ namespace Belle2 {
       /// Same as getPerpS().
       FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
       { return getPerpS(trajectory2D); }
+
+      /// Same as getRecoPos2D()
+      Vector2D getFrontRecoPos2D(const CDCTrajectory2D& trajectory2D) const
+      { return getRecoPos2D(trajectory2D); }
+
+      /// Same as getRecoPos2D()
+      Vector2D getBackRecoPos2D(const CDCTrajectory2D& trajectory2D) const
+      { return getRecoPos2D(trajectory2D); }
 
       /// Calculates the squared distance of the oriented hit to a circle as see from the transvers plane.
       FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const {

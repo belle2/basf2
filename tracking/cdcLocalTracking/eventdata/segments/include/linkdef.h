@@ -11,6 +11,7 @@
 
 #pragma link C++ class Belle2::CDCLocalTracking::CDCWireHitCluster+;
 #pragma link C++ class Belle2::CDCLocalTracking::CDCWireHitSegment+;
+#pragma link C++ class Belle2::CDCLocalTracking::CDCRLWireHitSegment+;
 #pragma link C++ class Belle2::CDCLocalTracking::CDCRecoSegment2D+;
 
 #endif

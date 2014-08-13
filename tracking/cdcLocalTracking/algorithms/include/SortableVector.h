@@ -162,6 +162,8 @@ namespace Belle2 {
       friend void swap(SortableVector<T>& lhs, SortableVector<T>& rhs)
       { std::swap(lhs.m_items, rhs.m_items); std::swap(lhs.m_isSorted, rhs.m_isSorted); B2DEBUG(200, "SortableVector::swap");}
 
+      /// Returns the raw std::vector.
+      const std::vector<T>& items() const { return m_items; }
 
       /// The begin of the container
       iterator begin() { return m_items.begin(); }

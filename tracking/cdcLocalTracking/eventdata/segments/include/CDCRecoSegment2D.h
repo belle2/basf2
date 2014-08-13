@@ -15,6 +15,11 @@
 
 #include <tracking/cdcLocalTracking/eventdata/collections/CDCRecoHit2DVector.h>
 #include "CDCWireHitSegment.h"
+#include "CDCRLWireHitSegment.h"
+
+#include "CDCRecoTangentSegment.h"
+#include "CDCRecoFacetSegment.h"
+
 
 namespace Belle2 {
   namespace CDCLocalTracking {
@@ -28,6 +33,25 @@ namespace Belle2 {
 
       /// Empty deconstructor
       ~CDCRecoSegment2D() {;}
+
+      /// Averages the recostructed positions from hits that overlap in adjacent tangents in the given tangent segment
+      static CDCRecoSegment2D condense(const CDCRecoTangentSegment& recoTangentSegment);
+
+      /// Averages the recostructed positions from hits that overlap in adjacent tangents in the given tangent path
+      static CDCRecoSegment2D condense(const std::vector<const Belle2::CDCLocalTracking::CDCRecoTangent* >& recoTangentPath);
+
+      /// Averages the recostructed positions from hits that overlap in adjacent facets in the given facet segment.
+      static CDCRecoSegment2D condense(const CDCRecoFacetSegment& recoFacetSegment);
+
+      /// Averages the recostructed positions from hits that overlap in adjacent facet in the given facet path.
+      static CDCRecoSegment2D condense(const std::vector<const Belle2::CDCLocalTracking::CDCRecoFacet* >& recoFacetPath);
+
+
+      /// Reconstruct from wire hits with attached right left passage hypotheses by constructing tangents between adjacent hits pairs and averaging the reconstucted position.
+      static CDCRecoSegment2D reconstructUsingTangents(const CDCRLWireHitSegment& rlWireHitSegment);
+
+      /// Reconstruct from wire hits with attached right left passage hypotheses by constructing facets between adjacent hits triples and averaging the reconstucted position.
+      static CDCRecoSegment2D reconstructUsingFacets(const CDCRLWireHitSegment& rlWireHitSegment);
 
       ///Implements the standard swap idiom
       friend void swap(CDCRecoSegment2D& lhs, CDCRecoSegment2D& rhs) {
@@ -62,6 +86,16 @@ namespace Belle2 {
         }
         return wireHitSegment;
       }
+
+      /// Getter for the vector of wires the hits of this segment are based on in the same order
+      CDCRLWireHitSegment getRLWireHitSegment() const {
+        CDCRLWireHitSegment rlWireHitSegment;
+        for (const CDCRecoHit2D & recoHit2D : *this) {
+          rlWireHitSegment.push_back(&(recoHit2D.getRLWireHit()));
+        }
+        return rlWireHitSegment;
+      }
+
 
       /// Getter for the automaton cell.
       AutomatonCell& getAutomatonCell() { return m_automatonCell; }

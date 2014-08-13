@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef CDCWIREHITSEGMENT_H_
-#define CDCWIREHITSEGMENT_H_
+#ifndef CDCRLWIREHITSEGMENT_H_
+#define CDCRLWIREHITSEGMENT_H_
 
 #include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
@@ -20,28 +20,28 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// A segment consisting of two dimensional reconsturcted hits
-    class CDCWireHitSegment :  public CDCGenHitVector<const Belle2::CDCLocalTracking::CDCWireHit*> {
+    class CDCRLWireHitSegment :  public CDCGenHitVector<const Belle2::CDCLocalTracking::CDCRLWireHit*> {
     public:
 
       /// Default constructor for ROOT compatibility.
-      CDCWireHitSegment() {;}
+      CDCRLWireHitSegment() {;}
 
       /// Empty deconstructor
-      ~CDCWireHitSegment() {;}
+      ~CDCRLWireHitSegment() {;}
 
       /// Defines wire hit segments and superlayers to be coaligned.
-      friend bool operator<(const CDCWireHitSegment& wireHitSegment, const CDCWireSuperLayer& wireSuperLayer)
-      { return wireHitSegment.getISuperLayer() < wireSuperLayer.getISuperLayer(); }
+      friend bool operator<(const CDCRLWireHitSegment& rlWireHitSegment, const CDCWireSuperLayer& wireSuperLayer)
+      { return rlWireHitSegment.getISuperLayer() < wireSuperLayer.getISuperLayer(); }
 
       /// Defines segments and superlayers to be coaligned.
-      friend bool operator<(const CDCWireSuperLayer& wireSuperLayer, const CDCWireHitSegment& wireHitSegment)
-      { return wireSuperLayer.getISuperLayer() < wireHitSegment.getISuperLayer(); }
+      friend bool operator<(const CDCWireSuperLayer& wireSuperLayer, const CDCRLWireHitSegment& rlWireHitSegment)
+      { return wireSuperLayer.getISuperLayer() < rlWireHitSegment.getISuperLayer(); }
 
       /// Getter for the vector of wires the hits of this segment are based on in the same order
       std::vector<const Belle2::CDCLocalTracking::CDCWire*> getWireSegment() const {
         std::vector<const Belle2::CDCLocalTracking::CDCWire*> wireSegment;
-        for (const CDCWireHit * ptrWireHit : *this) {
-          ptrWireHit ? wireSegment.push_back(&(ptrWireHit->getWire())) : wireSegment.push_back(nullptr);
+        for (const CDCRLWireHit * ptrRLWireHit : *this) {
+          ptrRLWireHit ? wireSegment.push_back(&(ptrRLWireHit->getWire())) : wireSegment.push_back(nullptr);
         }
         return wireSegment;
       }
@@ -80,11 +80,11 @@ namespace Belle2 {
       mutable CDCTrajectory2D m_trajectory2D; ///< Memory for the two dimensional trajectory fitted to this segment
 
     private:
-      /// ROOT Macro to make CDCWireHitSegment a ROOT class.
-      ClassDefInCDCLocalTracking(CDCWireHitSegment, 1);
+      /// ROOT Macro to make CDCRLWireHitSegment a ROOT class.
+      ClassDefInCDCLocalTracking(CDCRLWireHitSegment, 1);
 
-    }; //end class CDCWireHitSegment
+    }; //end class CDCRLWireHitSegment
 
   } // end namespace CDCLocalTracking
 } // end namespace Belle2
-#endif // CDCWIREHITSEGMENT_H_
+#endif // CDCRLWIREHITSEGMENT_H_

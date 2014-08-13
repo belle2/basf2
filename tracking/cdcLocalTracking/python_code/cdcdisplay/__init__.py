@@ -408,47 +408,46 @@ class CDCSVGDisplayModule(Module):
         if self.draw_segments:
             styleDict = {'stroke': attributemaps.listColors,
                          'stroke-width': '0.5'}
-            self.draw_storearray('CDCRecoHit2DSegmentsSelected', styleDict)
+            self.draw_storearray('CDCRecoSegment2Ds', styleDict)
 
         if self.draw_segments_mctrackid:
             styleDict = {'stroke': attributemaps.SegmentMCTrackIdColorMap(),
                          'stroke-width': '0.5'}
-            self.draw_storearray('CDCRecoHit2DSegmentsSelected', styleDict)
+            self.draw_storearray('CDCRecoSegment2Ds', styleDict)
 
         if self.draw_segments_fbinfo:
             styleDict = {'stroke': attributemaps.SegmentFBInfoColorMap(),
                          'stroke-width': '0.5'}
-            self.draw_storearray('CDCRecoHit2DSegmentsSelected', styleDict)
+            self.draw_storearray('CDCRecoSegment2Ds', styleDict)
 
         if self.draw_segments_firstInTrackId:
             styleDict = \
                 {'stroke': attributemaps.SegmentFirstInTrackIdColorMap(),
                  'stroke-width': '0.5'}
-            self.draw_storearray('CDCRecoHit2DSegmentsSelected', styleDict)
+            self.draw_storearray('CDCRecoSegment2Ds', styleDict)
 
         if self.draw_segments_lastInTrackId:
             styleDict = \
                 {'stroke': attributemaps.SegmentLastInTrackIdColorMap(),
                  'stroke-width': '0.5'}
-            self.draw_storearray('CDCRecoHit2DSegmentsSelected', styleDict)
+            self.draw_storearray('CDCRecoSegment2Ds', styleDict)
 
         if self.draw_segments_firstNPassedSuperLayers:
             styleDict = \
                 {'stroke': attributemaps.SegmentFirstNPassedSuperLayersColorMap(),
                  'stroke-width': '0.5'}
-            self.draw_storearray('CDCRecoHit2DSegmentsSelected', styleDict)
+            self.draw_storearray('CDCRecoSegment2Ds', styleDict)
 
         if self.draw_segments_lastNPassedSuperLayers:
             styleDict = \
                 {'stroke': attributemaps.SegmentLastNPassedSuperLayersColorMap(),
                  'stroke-width': '0.5'}
-            self.draw_storearray('CDCRecoHit2DSegmentsSelected', styleDict)
+            self.draw_storearray('CDCRecoSegment2Ds', styleDict)
 
         # Mimic axial to axial pair selection
         if self.draw_mcaxialaxialpairs:
             print 'Draw axial to axial segment pairs'
-            segment_storearray = \
-                Belle2.PyStoreArray('CDCRecoHit2DSegmentsSelected')
+            segment_storearray = Belle2.PyStoreArray('CDCRecoSegment2Ds')
             if segment_storearray:
                 print '#Segment', segment_storearray.getEntries()
                 axial_segments = [segment for segment in segment_storearray
@@ -477,8 +476,7 @@ class CDCSVGDisplayModule(Module):
         # Mimic axial to stereo pair selection
         if self.draw_mcaxialstereopairs:
             print 'Draw axial to axial segment pairs'
-            segment_storearray = \
-                Belle2.PyStoreArray('CDCRecoHit2DSegmentsSelected')
+            segment_storearray = Belle2.PyStoreArray('CDCRecoSegment2Ds')
             if segment_storearray:
                 print '#Segment', segment_storearray.getEntries()
                 axial_segments = [segment for segment in segment_storearray
@@ -521,8 +519,7 @@ class CDCSVGDisplayModule(Module):
 
         if self.draw_mcsegmenttriples:
             print 'Draw axial to axial segment pairs'
-            segment_storearray = \
-                Belle2.PyStoreArray('CDCRecoHit2DSegmentsSelected')
+            segment_storearray = Belle2.PyStoreArray('CDCRecoSegment2Ds')
             if segment_storearray:
                 print '#Segment', segment_storearray.getEntries()
                 axial_segments = [segment for segment in segment_storearray
@@ -632,8 +629,9 @@ class CDCSVGDisplayModule(Module):
             print 'Drawing segment triple fits'
             segmentTriple_storearray = Belle2.PyStoreArray('CDCSegmentTriples')
             if segmentTriple_storearray:
-                print '#2D Trajectories from', \
-                    segmentTriple_storearray.getEntries(), 'segment triples'
+                print '#2D Trajectories', \
+                    segmentTriple_storearray.getEntries(), \
+                    'from segment triples'
 
                 iterSegmentTriples = iter(segmentTriple_storearray)
                 iterTrajectories = (segmentTriple.getTrajectory2D()
@@ -643,26 +641,14 @@ class CDCSVGDisplayModule(Module):
         # Draw the fits to the segments
         if self.draw_segment_trajectories:
             print 'Drawing the fits to the selected RecoHit2DSegments'
-            segment_storearray = \
-                Belle2.PyStoreArray('CDCRecoHit2DSegmentsSelected')
+            segment_storearray = Belle2.PyStoreArray('CDCRecoSegment2Ds')
             if segment_storearray:
-                print '#Trajectories', segment_storearray.getEntries()
-                for segment in segment_storearray:
-                    if segment.getStereoType() == 0:
-
-                        fitter = Belle2.CDCLocalTracking.CDCRiemannFitter()
-                        # fitter.useOnlyPosition()
-                        fitter.useOnlyOrientation()
-                        # fitter.usePositionAndOrientation()
-                        trajectory2D = fitter.fit(segment)
-                        plotter.append(trajectory2D, **{'stroke': 'black',
-                                       'stroke-width': '0.2'})
-
-                        com = segment.getCenterOfMass2D()
-                        plotter.append(com)
-
-                        centralPoint = trajectory2D.getClosest(com)
-                        plotter.append(centralPoint)
+                print '#2D Trajectories', segment_storearray.getEntries(), \
+                    'from segments'
+                iterSegments = iter(segment_storearray)
+                iterTrajectories = (segment.getTrajectory2D() for segment in
+                    iterSegments)
+                plotter.append(iterTrajectories)
 
         # Draw the trajectories of the genfit track candidates
         if self.draw_gftrackcand_trajectories:

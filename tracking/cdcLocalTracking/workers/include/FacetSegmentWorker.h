@@ -52,8 +52,8 @@ namespace Belle2 {
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
         StoreArray < CDCRecoTangentVector >::registerTransient("CDCRecoTangentSegments");
-        StoreArray < CDCRecoSegment2D >::registerTransient("CDCRecoHit2DSegmentsSelected");
-        StoreArray < CDCWireHitCluster >::registerTransient("CDCWireHitClusters");
+        StoreArray < CDCRecoSegment2D >::registerTransient();
+        StoreArray < CDCWireHitCluster >::registerTransient();
 #endif
 
         m_clustersInSuperLayer.reserve(20);
@@ -188,9 +188,9 @@ namespace Belle2 {
         // IO wire hit clusters
 
         B2DEBUG(100, "  Creating the StoreArray for the CDCWireHitClusters");
-        StoreArray < CDCWireHitCluster > storedClusters("CDCWireHitClusters");
+        StoreArray < CDCWireHitCluster > storedClusters;
         storedClusters.create();
-        B2DEBUG(100, "  Do creating the CDCWireHitCluster in the StoreArray");
+        B2DEBUG(100, "  Do creating the CDCWireHitClusters in the StoreArray");
         for (const CDCWireHitCluster & cluster : m_clusters) {
           storedClusters.appendNew(cluster);
         }
@@ -207,15 +207,15 @@ namespace Belle2 {
         B2DEBUG(100, "  Created " << storedTangentSegments.getEntries() << " CDCRecoTangentSegment");
 
         // IO selected segments without tangents
-        B2DEBUG(100, "  Creating the StoreArray for the selected CDCRecoHit2DSegments");
-        StoreArray < CDCRecoSegment2D > storedSegments2D("CDCRecoHit2DSegmentsSelected");
+        B2DEBUG(100, "  Creating the StoreArray for the selected CDCRecoSegment2Ds");
+        StoreArray < CDCRecoSegment2D > storedSegments2D;
         storedSegments2D.create();
-        B2DEBUG(100, "  Copying the selected CDCRecoHit2DSegments to the StoreArray");
+        B2DEBUG(100, "  Copying the selected CDCRecoSegment2Ds to the StoreArray");
         for (const CDCRecoSegment2D & segment2D : m_segments2D) {
           storedSegments2D.appendNew(segment2D);
         }
         B2DEBUG(100, "  Created " << storedSegments2D.getEntries()  <<
-                " selected CDCRecoSegment2D");
+                " selected CDCRecoSegment2Ds");
 #endif
 
       }

@@ -49,7 +49,8 @@ RootInputModule::RootInputModule() : Module(), m_counterNumber(0), m_tree(0), m_
   addParam(c_SteerBranchNames[1], m_branchNames[1], "Names of branches to be read into persistent map. Empty means all branches. (FileMetaData is always read)", emptyvector);
 
   addParam(c_SteerExcludeBranchNames[0], m_excludeBranchNames[0], "Names of branches NOT to be read into event map. Takes precedence over branchNames.", emptyvector);
-  addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1], "Names of branches NOT to be read into persistent map. Takes precedence over branchNamesPersistent.", emptyvector);
+  vector<string> excludePersistent({"ProcessStatistics"});
+  addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1], "Names of branches NOT to be read into persistent map. Takes precedence over branchNamesPersistent.", excludePersistent);
 
   addParam("parentLevel", m_parentLevel, "Number of generations of parent files to be read.", 0);
 }

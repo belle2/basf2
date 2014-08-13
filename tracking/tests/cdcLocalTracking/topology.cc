@@ -128,7 +128,7 @@ TEST_F(CDCLocalTrackingTest, WireSkew)
       EXPECT_NEAR(stereoAngleByICLayer[iCLayer], wire.getStereoAngle(), 10e-7);
     }
 
-    //B2INFO("ICLayer : " << iCLayer << " Skew : " << skewByICLayer[iCLayer] << " Stereo angle : " << stereoAngleByICLayer[iCLayer]);
+    B2INFO("ICLayer : " << iCLayer << " Skew : " << skewByICLayer[iCLayer] << " Stereo angle : " << stereoAngleByICLayer[iCLayer]);
 
   }
 

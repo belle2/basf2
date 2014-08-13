@@ -63,12 +63,15 @@ namespace Belle2 {
        *  if one should use the dot '.' or operator '->' for method look up. \n
        *  So this function defines the -> operator for the object. \n
        *  No matter you have a pointer or an object access is given with '->'*/
-      const CDCRecoFacet* operator->() const { return this; }
+      const CDCRecoFacet* operator->() const
+      { return this; }
 
       /// Allow automatic taking of the address.
-      /** Essentially pointers to objects is a class of the object itself.
-       *  This method activally exposes this inheritance to be able to write algorithms that work for objects and poiinters alike without code duplication. */
-      operator const Belle2::CDCLocalTracking::CDCRecoFacet* () const { return this; }
+      /** Essentially pointers to (lvalue) objects is a subclass of the object itself.
+       *  This method activally exposes this inheritance to be able to write algorithms that work for objects and poiinters alike without code duplication.
+       *  \note Once reference qualifiers become available use an & after the trailing const to constrain the cast to lvalues.*/
+      operator const Belle2::CDCLocalTracking::CDCRecoFacet* () const
+      { return this; }
 
 
 
@@ -84,8 +87,11 @@ namespace Belle2 {
       const ParameterLine2D& getMiddleToEndLine() const
       { return m_middleToEnd; }
 
+
+
       /// Construct and stores the three tangential lines corresponding to the three pairs of wire hits.
       void adjustLines() const;
+
 
 
       /// Getter for the recostructed position at the first hit averaged from the two touching points of the tangential lines

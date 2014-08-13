@@ -45,6 +45,7 @@ namespace Belle2 {
       { return getStartSegment() == rhs.getStartSegment() and getEndSegment() == rhs.getEndSegment(); }
 
 
+
       /// Total ordering sheme comparing the segment pointers.
       bool operator<(CDCAxialStereoSegmentPair const& rhs) const {
         return (getStartSegment() < rhs.getStartSegment()  or
@@ -60,6 +61,13 @@ namespace Belle2 {
       friend bool operator<(const CDCRecoSegment2D* segment,
                             const CDCAxialStereoSegmentPair& axialStereoSegmentPair)
       { return segment < axialStereoSegmentPair.getStartSegment(); }
+
+      /// Allow automatic taking of the address.
+      /** Essentially pointers to (lvalue) objects is a subclass of the object itself.
+       *  This method activally exposes this inheritance to be able to write algorithms that work for objects and poiinters alike without code duplication.
+       *  \note Once reference qualifiers become available use an & after the trailing const to constrain the cast to lvalues.*/
+      operator const Belle2::CDCLocalTracking::CDCAxialStereoSegmentPair* () const { return this; }
+
 
 
       /// Checks if both stored segments are not nullptr. Returns true if check is succeded.

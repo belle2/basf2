@@ -62,11 +62,16 @@ namespace Belle2 {
                             const CDCAxialStereoSegmentPair& axialStereoSegmentPair)
       { return segment < axialStereoSegmentPair.getStartSegment(); }
 
+
+
       /// Allow automatic taking of the address.
       /** Essentially pointers to (lvalue) objects is a subclass of the object itself.
-       *  This method activally exposes this inheritance to be able to write algorithms that work for objects and poiinters alike without code duplication.
-       *  \note Once reference qualifiers become available use an & after the trailing const to constrain the cast to lvalues.*/
-      operator const Belle2::CDCLocalTracking::CDCAxialStereoSegmentPair* () const { return this; }
+       *  This method activally exposes this inheritance to be able to write algorithms
+       *  that work for objects and poiinters alike without code duplication.
+       *  \note Once reference qualifiers become available use an & after the trailing const
+       *  to constrain the cast to lvalues.*/
+      operator const Belle2::CDCLocalTracking::CDCAxialStereoSegmentPair* () const
+      { return this; }
 
 
 

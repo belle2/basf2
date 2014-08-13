@@ -18,7 +18,6 @@
 #include <tracking/cdcLocalTracking/topology/CDCWireTopology.h>
 #include <tracking/cdcLocalTracking/eventtopology/CDCWireHitTopology.h>
 
-#include <tracking/cdcLocalTracking/algorithms/NeighborhoodBuilder.h>
 #include <tracking/cdcLocalTracking/filters/wirehit_wirehit/WireHitNeighborChooser.h>
 
 #include <tracking/cdcLocalTracking/algorithms/MultipassCellularPathFinder.h>
@@ -44,7 +43,7 @@ namespace Belle2 {
       /** Destructor.*/
       ~FacetSegmentWorker() {;}
 
-      /// Forwards the initialize method of the module to the facet creator and the neighborhood builder
+      /// Forwards the initialize method of the module to the facet creator and the neighborhood chooser
       void initialize() {
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
@@ -56,16 +55,16 @@ namespace Belle2 {
         m_clustersInSuperLayer.reserve(20);
 
         m_facetCreator.initialize();
-        m_facetNeighborhoodBuilder.initialize();
+        m_facetNeighborChooser.initialize();
 
       }
 
 
 
-      /// Forwards the terminate method of the module to the facet creator and the neighborhood builder
+      /// Forwards the terminate method of the module to the facet creator and the neighborhood chooser
       void terminate() {
         m_facetCreator.terminate();
-        m_facetNeighborhoodBuilder.terminate();
+        m_facetNeighborChooser.terminate();
       }
 
 
@@ -87,22 +86,28 @@ namespace Belle2 {
         for (const CDCWireSuperLayer & wireSuperLayer : wireTopology.getWireSuperLayers()) {
 
           const CDCWireHitTopology::CDCWireHitRange wireHitsInSuperlayer = wireHitTopology.getWireHits(wireSuperLayer);
-
           //create the neighborhood
           B2DEBUG(100, "Creating the CDCWireHit neighborhood");
           m_wirehitNeighborhood.clear();
+
           B2DEBUG(100, "  Append clockwise neighborhood");
-          m_clockwise_neighborhoodBuilder.append(wireHitsInSuperlayer, m_wirehitNeighborhood);
+          m_wirehitNeighborhood.appendUsing<WireHitNeighborChooser<CW_NEIGHBOR>>(wireHitsInSuperlayer);
+
           B2DEBUG(100, "  Append clockwise out neighborhood");
-          m_clockwiseOut_neighborhoodBuilder.append(wireHitsInSuperlayer, m_wirehitNeighborhood);
+          m_wirehitNeighborhood.appendUsing<WireHitNeighborChooser<CW_OUT_NEIGHBOR>>(wireHitsInSuperlayer);
+
           B2DEBUG(100, "  Append clockwise in neighborhood");
-          m_clockwiseIn_neighborhoodBuilder.append(wireHitsInSuperlayer, m_wirehitNeighborhood);
+          m_wirehitNeighborhood.appendUsing<WireHitNeighborChooser<CW_IN_NEIGHBOR>>(wireHitsInSuperlayer);
+
           B2DEBUG(100, "  Append counter clockwise neighborhood");
-          m_counterClockwise_neighborhoodBuilder.append(wireHitsInSuperlayer, m_wirehitNeighborhood);
+          m_wirehitNeighborhood.appendUsing<WireHitNeighborChooser<CCW_NEIGHBOR>>(wireHitsInSuperlayer);
+
           B2DEBUG(100, "  Append counter clockwise out neighborhood");
-          m_counterClockwiseOut_neighborhoodBuilder.append(wireHitsInSuperlayer, m_wirehitNeighborhood);
+          m_wirehitNeighborhood.appendUsing<WireHitNeighborChooser<CCW_OUT_NEIGHBOR>>(wireHitsInSuperlayer);
+
           B2DEBUG(100, "  Append counter clockwise in neighborhood");
-          m_counterClockwiseIn_neighborhoodBuilder.append(wireHitsInSuperlayer, m_wirehitNeighborhood);
+          m_wirehitNeighborhood.appendUsing<WireHitNeighborChooser<CCW_IN_NEIGHBOR>>(wireHitsInSuperlayer);
+
 
           bool isSymmetric = m_wirehitNeighborhood.isSymmetric();
           B2DEBUG(100, "  Check symmetry " << isSymmetric);
@@ -135,15 +140,15 @@ namespace Belle2 {
             //create the facet neighborhood
             B2DEBUG(100, "Creating the CDCRecoFacet neighborhood");
             m_facetsNeighborhood.clear();
-            m_facetNeighborhoodBuilder.create(m_facets, m_facetsNeighborhood);
+            m_facetsNeighborhood.createUsing(m_facetNeighborChooser, m_facets);
             B2DEBUG(100, "  Created " << m_facetsNeighborhood.size()  << " FacetsNeighborhoods");
 
             //Apply the cellular automaton in a multipass manner
             m_facetPaths.clear();
             m_cellularPathFinder.apply(m_facets, m_facetsNeighborhood, m_facetPaths);
 
-            //save the tangents for display only
 #ifdef CDCLOCALTRACKING_USE_ROOT
+            //save the tangents for display only
             for (std::vector<const CDCRecoFacet*> facetPath : m_facetPaths) {
               m_recoTangentSegments.push_back(CDCRecoTangentSegment::condense(facetPath));
             }
@@ -210,9 +215,6 @@ namespace Belle2 {
 
 
     private:
-      //typedefs
-
-    private:
       //object pools
       /// Neighborhood type for wire hits
       typedef WeightedNeighborhood<const CDCWireHit> CDCWireHitNeighborhood;
@@ -254,41 +256,8 @@ namespace Belle2 {
       /// Instance of the facet creator
       FacetCreator<FacetFilter> m_facetCreator;
 
-      //neighborhood builders
-      /// Type of the neighborhood relation builder.
-      NeighborhoodBuilder<CDCWireHit, WireHitNeighborChooser<CW_OUT_NEIGHBOR> >
-      /// Instance of the neighborhood builder.
-      m_clockwiseOut_neighborhoodBuilder;
-
-      /// Type of the neighborhood relation builder.
-      NeighborhoodBuilder<CDCWireHit, WireHitNeighborChooser<CW_NEIGHBOR> >
-      /// Instance of the neighborhood builder.
-      m_clockwise_neighborhoodBuilder;
-
-      /// Type of the neighborhood relation builder.
-      NeighborhoodBuilder<CDCWireHit, WireHitNeighborChooser<CW_IN_NEIGHBOR> >
-      /// Instance of the neighborhood builder.
-      m_clockwiseIn_neighborhoodBuilder;
-
-      /// Type of the neighborhood relation builder.
-      NeighborhoodBuilder<CDCWireHit, WireHitNeighborChooser<CCW_OUT_NEIGHBOR> >
-      /// Instance of the neighborhood builder.
-      m_counterClockwiseOut_neighborhoodBuilder;
-
-      /// Type of the neighborhood relation builder.
-      NeighborhoodBuilder<CDCWireHit, WireHitNeighborChooser<CCW_NEIGHBOR> >
-      /// Instance of the neighborhood builder.
-      m_counterClockwise_neighborhoodBuilder;
-
-      /// Type of the neighborhood relation builder.
-      NeighborhoodBuilder<CDCWireHit, WireHitNeighborChooser<CCW_IN_NEIGHBOR> >
-      /// Instance of the neighborhood builder.
-      m_counterClockwiseIn_neighborhoodBuilder;
-
-      /// Type of the neighborhood relation builder.
-      NeighborhoodBuilder<CDCRecoFacet, FacetNeighborChooser>
-      /// Instance of the neighborhood builder.
-      m_facetNeighborhoodBuilder;
+      /// Instance of the filter used in edge / neighborhood creation.
+      FacetNeighborChooser m_facetNeighborChooser;
 
       //cellular automaton
       /// Instance of the cellular automaton path finder

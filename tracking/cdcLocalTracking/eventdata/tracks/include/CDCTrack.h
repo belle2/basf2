@@ -16,6 +16,8 @@
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoHit3D.h>
 #include <tracking/cdcLocalTracking/eventdata/collections/CDCRecoHit3DVector.h>
 
+#include <tracking/cdcLocalTracking/eventdata/trajectories/CDCTrajectories.h>
+
 #include <tracking/cdcLocalTracking/eventdata/segments/CDCSegments.h>
 
 #include "genfit/TrackCand.h"
@@ -33,11 +35,22 @@ namespace Belle2 {
       /// Empty destructor
       ~CDCTrack() {;}
 
+
+
+      /// Copies the hit and trajectory content of this track to the Genfit track candidate
+      void fillInto(genfit::TrackCand& trackCand) const;
+
+
+
       /// Getter for the first reconstructed hit in the track. Does not account for the forward backward info.
-      const Belle2::CDCLocalTracking::CDCRecoHit3D& getStartRecoHit3D() const { return front(); }
+      const Belle2::CDCLocalTracking::CDCRecoHit3D& getStartRecoHit3D() const
+      { return front(); }
 
       /// Getter for the last reconstructed hit in the track. Does not account for the forward backward info.
-      const Belle2::CDCLocalTracking::CDCRecoHit3D& getEndRecoHit3D() const { return back(); }
+      const Belle2::CDCLocalTracking::CDCRecoHit3D& getEndRecoHit3D() const
+      { return back(); }
+
+
 
       /// Getter for the superlayer id the track starts from. Does not account for the forward backward info.
       ILayerType getStartISuperLayer() const
@@ -46,6 +59,8 @@ namespace Belle2 {
       /// Getter for the superlayer id the track ends in. Does not account for the forward backward info.
       ILayerType getEndISuperLayer() const
       { return getEndRecoHit3D().getISuperLayer(); }
+
+
 
       /// Getter for the position of the first reconstructed hit. Does not account for the forward backward info.
       const Vector3D& getStartRecoPos3D() const
@@ -56,85 +71,65 @@ namespace Belle2 {
       { return getEndRecoHit3D().getRecoPos3D(); }
 
 
+
       /// Getter for the start fitted position of track. Does not account for the forward backward info.
-      Vector3D getStartFitPos3D() const {
-        const FloatType z = getStartTrajectorySZ().getStartZ();
-        return Vector3D(getStartTrajectory2D().getLocalOrigin(), z);
-      }
+      Vector3D getStartFitPos3D() const
+      { return getStartTrajectory3D().getSupport(); }
 
       /// Getter for the end fitted position of track. Does not account for the forward backward info.
-      Vector3D getEndFitPos3D() const {
-        const FloatType z = getEndTrajectorySZ().getStartZ();
-        return Vector3D(getEndTrajectory2D().getLocalOrigin(), z);
-      }
-
+      Vector3D getEndFitPos3D() const
+      { return getEndTrajectory3D().getSupport(); }
 
       /// Getter for the momentum at the start position. Does not account for the forward backward info.
-      Vector3D getStartFitMom3D() const {
-
-        Vector3D startMom(getStartTrajectory2D().getStartMom2D(), 0.0);
-        const FloatType pt = startMom.polarR();
-        const FloatType pz = getStartTrajectorySZ().mapPtToPz(pt);
-        startMom.setZ(pz);
-        return startMom;
-
-      }
+      Vector3D getStartFitMom3D() const
+      { return getStartTrajectory3D().getUnitMom3DAtSupport(); }
 
       /// Getter for the momentum at the end position. Does not account for the forward backward info.
-      Vector3D getEndFitMom3D() const {
-        Vector3D startMom(getEndTrajectory2D().getStartMom2D(), 0.0);
-        const FloatType pt = startMom.polarR();
-        const FloatType pz = getEndTrajectorySZ().mapPtToPz(pt);
-        startMom.setZ(pz);
-        return startMom;
-      }
+      Vector3D getEndFitMom3D() const
+      { return getEndTrajectory3D().getUnitMom3DAtSupport(); }
+
+
 
       /// Getter for the charge sign. Does not account for the forward backward info.
-      SignType getChargeSign() const
-      { return getStartTrajectory2D().getChargeSign(); }
+      SignType getStartChargeSign() const
+      { return getStartTrajectory3D().getChargeSign(); }
 
-      /// Getter for an PID estimation. Does not account for the forward backward info.
-      int getPID() const {
-        // dummy pid - dont know if one can make this assumption better at this point
-        // Muon id 13 has negativ charge, so the correctly charged (anti)muon is
-        return getChargeSign() * (-13);
-      }
-
-      /// Copies the hit and trajectory content of this track to the Genfit track candidate
-      void fillInto(genfit::TrackCand& trackCand) const;
-
-      /// Getter for the two dimensional trajectory. Does not account for the forward backward info.
-      const CDCTrajectory2D& getStartTrajectory2D() const
-      { return m_startTrajectory2D; }
-
-      /// Setter for the two dimensional trajectory.
-      void setStartTrajectory2D(const CDCTrajectory2D& startTrajectory2D)
-      { m_startTrajectory2D = startTrajectory2D; }
-
-      /// Getter for the sz trajectory at the start of the track.
-      const CDCTrajectorySZ& getStartTrajectorySZ() const
-      { return m_startTrajectorySZ; }
-
-      /// Setter for the sz trajectory at the start of the track.
-      void setStartTrajectorySZ(const CDCTrajectorySZ& startTrajectorySZ)
-      { m_startTrajectorySZ = startTrajectorySZ; }
+      /// Getter for the charge sign. Does not account for the forward backward info.
+      SignType getEndChargeSign() const
+      { return getEndTrajectory3D().getChargeSign(); }
 
 
-      /// Getter for the two dimensional trajectory. The travel distance is set relative to the last reconstructed hit
-      const CDCTrajectory2D& getEndTrajectory2D() const
-      { return m_endTrajectory2D; }
 
-      /// Setter for the two dimensional trajectory. The travel distance should be set relative to the last reconstructed hit
-      void setEndTrajectory2D(const CDCTrajectory2D& endTrajectory2D)
-      { m_endTrajectory2D = endTrajectory2D; }
+      /// Setter for the two dimensional trajectory. The trajectory should start at the start of the track and follow its direction.
+      void setStartTrajectory3D(const CDCTrajectory2D& startTrajectory2D,
+                                const CDCTrajectorySZ& startTrajectorySZ)
+      { m_startTrajectory3D = CDCTrajectory3D(startTrajectory2D, startTrajectorySZ); }
 
-      /// Getter for the sz trajectory at the end of the track. The travel distance is set relative to the last reconstructed hit
-      const CDCTrajectorySZ& getEndTrajectorySZ() const
-      { return m_endTrajectorySZ; }
+      /// Setter for the three dimensional trajectory. The trajectory should start at the END of the track and follow it in the reverse direction.
+      void setEndTrajectory3D(const CDCTrajectory2D& endTrajectory2D,
+                              const CDCTrajectorySZ& endTrajectorySZ)
+      { m_endTrajectory3D = CDCTrajectory3D(endTrajectory2D, endTrajectorySZ); }
 
-      /// Setter for the sz trajectory at the end of the track. The travel distance should be set relative to the last reconstructed hit
-      void setEndTrajectorySZ(const CDCTrajectorySZ& endTrajectorySZ)
-      { m_endTrajectorySZ = endTrajectorySZ; }
+
+
+      /// Setter for the two dimensional trajectory. The trajectory should start at the start of the track and follow its direction.
+      void setStartTrajectory3D(const CDCTrajectory3D& startTrajectory3D)
+      { m_startTrajectory3D = startTrajectory3D; }
+
+      /// Setter for the three dimensional trajectory. The trajectory should start at the END of the track and follow it in the reverse direction.
+      void setEndTrajectory3D(const CDCTrajectory3D& endTrajectory3D)
+      { m_endTrajectory3D = endTrajectory3D; }
+
+
+
+      /// Getter for the two dimensional trajectory. The trajectory should start at the start of the track and follow its direction.
+      const CDCTrajectory3D& getStartTrajectory3D() const
+      { return m_startTrajectory3D; }
+
+      /// Getter for the three dimensional trajectory. The trajectory should start at the END of the track and follow it in the reverse direction.
+      const CDCTrajectory3D& getEndTrajectory3D() const
+      { return m_endTrajectory3D; }
+
 
 
       /// Getter for the forward backward indicator variable
@@ -146,14 +141,8 @@ namespace Belle2 {
       {  m_fbInfo = fbInfo; }
 
     private:
-
-      //CDCRecoHit3DVector m_hits; // now inherited
-
-      CDCTrajectory2D m_startTrajectory2D; ///< Memory for the two dimensional trajectory at the start of the track
-      CDCTrajectorySZ m_startTrajectorySZ; ///< Memory for the sz trajectory at the start of the track
-
-      CDCTrajectory2D m_endTrajectory2D; ///< Memory for the two dimensional trajectory at the end of the track
-      CDCTrajectorySZ m_endTrajectorySZ; ///< Memory for the sz trajectory at the end of the track
+      CDCTrajectory3D m_startTrajectory3D; ///< Memory for the three dimensional trajectory at the start of the track
+      CDCTrajectory3D m_endTrajectory3D; ///< Memory for the three dimensional trajectory at the end of the track
 
       ForwardBackwardInfo m_fbInfo; ///< Memory for the forward backward indicator
 

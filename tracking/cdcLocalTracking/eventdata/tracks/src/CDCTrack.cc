@@ -25,37 +25,12 @@ ClassImpInCDCLocalTracking(CDCTrack)
 
 void CDCTrack::fillInto(genfit::TrackCand& trackCand) const
 {
-  // FIXME : Update with new uncertain fits
-
-  Vector3D position;
-  Vector3D momentum;
-
   // Translate the trajectory information
   if (getFBInfo() == BACKWARD) {
-    position = getEndFitPos3D();
-    momentum = getEndFitMom3D();
-
+    getEndTrajectory3D().fillInto(trackCand);
   } else {
-    position = getStartFitPos3D();
-    momentum = getStartFitMom3D();
-
+    getStartTrajectory3D().fillInto(trackCand);
   }
-
-  // The initial covariance matrix is calculated from these errors and it is important (!!) that it is not completely wrong - took them from Oksana
-  // Currently unused
-  TVector3 posError;
-  posError.SetXYZ(2.0, 2.0, 2.0);
-  TVector3 momError;
-  momError.SetXYZ(0.1, 0.1, 0.5);
-
-  // Set the start parameters
-  SignType q = getChargeSign();
-  trackCand.setPosMomSeed(position, momentum, q);
-
-  // int pdg = track.getPID();
-  // gfTrackCand.setPosMomSeedAndPdgCode(position, momentum, pdg);
-
-
 
 
 

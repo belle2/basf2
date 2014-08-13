@@ -67,8 +67,7 @@ void TrackCreator::create(const CDCSegmentTripleTrack& segmentTripleTrack,
     const CDCSegmentTriple* firstTriple = *itSegmentTriple++;
 
     // Set the start fits of the track to the ones of the first segment
-    track.setStartTrajectory2D(firstTriple->getTrajectory2D());
-    track.setStartTrajectorySZ(firstTriple->getTrajectorySZ());
+    track.setStartTrajectory3D(firstTriple->getTrajectory2D(), firstTriple->getTrajectorySZ());
 
     FloatType perpSOffset = 0.0;
     appendStartRecoHits3D(*firstTriple, perpSOffset, track);
@@ -99,10 +98,7 @@ void TrackCreator::create(const CDCSegmentTripleTrack& segmentTripleTrack,
     endTrajectorySZ.passiveMoveS(perpSShift);
     //Both fits now have the travel distance scale from the last hit as it should be
 
-    track.setEndTrajectory2D(endTrajectory2D);
-    track.setEndTrajectorySZ(endTrajectorySZ);
-
-
+    track.setEndTrajectory3D(endTrajectory2D, endTrajectorySZ);
 
   }
 
@@ -126,8 +122,7 @@ void TrackCreator::create(const CDCAxialStereoSegmentPairTrack& axialStereoSegme
     const CDCAxialStereoSegmentPair& firstSegmentPair = *ptrFirstSegmentPair;
 
     // Set the start fits of the track to the ones of the first segment
-    track.setStartTrajectory2D(firstSegmentPair.getTrajectory2D());
-    track.setStartTrajectorySZ(firstSegmentPair.getTrajectorySZ());
+    track.setStartTrajectory3D(firstSegmentPair.getTrajectory2D(), firstSegmentPair.getTrajectorySZ());
 
     FloatType perpSOffset = 0.0;
     appendStartRecoHits3D(firstSegmentPair, perpSOffset, track);
@@ -162,8 +157,7 @@ void TrackCreator::create(const CDCAxialStereoSegmentPairTrack& axialStereoSegme
     FloatType perpSShift = endTrajectory2D.setLocalOrigin(track.getEndRecoHit3D().getRecoPos2D());
     endTrajectorySZ.passiveMoveS(perpSShift);
     //Both fits now have the travel distance scale from the last hit as it should be
-    track.setEndTrajectory2D(endTrajectory2D);
-    track.setEndTrajectorySZ(endTrajectorySZ);
+    track.setEndTrajectory3D(endTrajectory2D, endTrajectorySZ);
 
   }
 
@@ -190,18 +184,14 @@ bool TrackCreator::create(const CDCAxialRecoSegment2D& segment,
 
     appendRecoHits3D(segment, trajectory2D, trajectorySZ, 0.0, track);
 
-
-    track.setStartTrajectorySZ(trajectorySZ);
-
-    track.setStartTrajectory2D(trajectory2D);
+    track.setStartTrajectory3D(trajectory2D, trajectorySZ);
 
     //Shift fit to the last reco hit and assigne the end fit of the track as well
     FloatType perpSShift = trajectory2D.setLocalOrigin(track.getEndRecoHit3D().getRecoPos2D());
     trajectorySZ.passiveMoveS(perpSShift); //this does not really do anythin for the line z = 0*s + 0
     // mentioned only for completeness
 
-    track.setEndTrajectory2D(trajectory2D);
-    track.setEndTrajectorySZ(trajectorySZ);
+    track.setEndTrajectory3D(trajectory2D, trajectorySZ);
     return true;
 
   }

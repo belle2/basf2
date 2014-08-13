@@ -25,11 +25,9 @@ CDCRecoHit3D::CDCRecoHit3D():
 {;}
 
 
-CDCRecoHit3D::CDCRecoHit3D(
-  const CDCRLWireHit* rlWireHit,
-  const Vector3D& recoPos3D,
-  FloatType perpS
-) :
+CDCRecoHit3D::CDCRecoHit3D(const CDCRLWireHit* rlWireHit,
+                           const Vector3D& recoPos3D,
+                           FloatType perpS) :
   m_rlWireHit(rlWireHit),
   m_recoPos3D(recoPos3D),
   m_perpS(perpS)
@@ -37,7 +35,8 @@ CDCRecoHit3D::CDCRecoHit3D(
   if (rlWireHit == nullptr) B2ERROR("Initialization of three dimensional reconstructed hit with nullptr as oriented wire hit");
 }
 
-CDCRecoHit3D CDCRecoHit3D::fromSimHit(const CDCWireHit* wireHit, const CDCSimHit& simHit)
+CDCRecoHit3D CDCRecoHit3D::fromSimHit(const CDCWireHit* wireHit,
+                                      const CDCSimHit& simHit)
 {
 
   //prepS cannot be deduced from the flightTime in this context
@@ -58,40 +57,29 @@ CDCRecoHit3D CDCRecoHit3D::fromSimHit(const CDCWireHit* wireHit, const CDCSimHit
 }
 
 
-CDCRecoHit3D CDCRecoHit3D::reconstruct(
-  const CDCRecoHit2D& recoHit,
-  const CDCTrajectory2D& trajectory2D
-)
+
+CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit2D,
+                                       const CDCTrajectory2D& trajectory2D)
 {
-
-  StereoType stereoType = recoHit.getStereoType();
-  if (stereoType == STEREO_V or stereoType == STEREO_U) {
-
-    BoundSkewLine skewLine = recoHit.getSkewLine();
-    Vector3D reconstructedPoint = trajectory2D.reconstruct3D(skewLine);
-    FloatType perpS = trajectory2D.calcPerpS(reconstructedPoint.xy());
-    return CDCRecoHit3D(&(recoHit.getRLWireHit()), reconstructedPoint, perpS);
-
-  } else if (stereoType == AXIAL) {
-    Vector2D recoPos2D = trajectory2D.getClosest(recoHit.getRecoPos2D());
-    FloatType perpS    = trajectory2D.calcPerpS(recoPos2D);
-
-    //for axial wire we can not determine the z coordinate by looking at the xy projection only
-    //we set it to a not a number here
-    FloatType z        = std::numeric_limits<FloatType>::quiet_NaN();
-
-    return CDCRecoHit3D(&(recoHit.getRLWireHit()), Vector3D(recoPos2D, z), perpS);
-  } else {
-    B2ERROR("Reconstruction on invalid wire");
-    return CDCRecoHit3D();
-  }
+  Vector3D recoPos3D = recoHit2D.reconstruct3D(trajectory2D);
+  FloatType perpS = trajectory2D.calcPerpS(recoPos3D.xy());
+  return CDCRecoHit3D(&(recoHit2D.getRLWireHit()), recoPos3D, perpS);
 }
 
-CDCRecoHit3D CDCRecoHit3D::reconstruct(
-  const CDCRecoHit2D& recoHit,
-  const CDCTrajectory2D& trajectory2D,
-  const CDCTrajectorySZ& trajectorySZ
-)
+
+CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRLWireHit& rlWireHit,
+                                       const CDCTrajectory2D& trajectory2D)
+{
+  Vector3D recoPos3D = rlWireHit.reconstruct3D(trajectory2D);
+  FloatType perpS = trajectory2D.calcPerpS(recoPos3D.xy());
+  return CDCRecoHit3D(&rlWireHit, recoPos3D, perpS);
+}
+
+
+
+CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit,
+                                       const CDCTrajectory2D& trajectory2D,
+                                       const CDCTrajectorySZ& trajectorySZ)
 {
 
   StereoType stereoType = recoHit.getStereoType();
@@ -124,7 +112,7 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(
   }
 }
 
-CDCRecoHit3D CDCRecoHit3D::average(const CDCRecoHit3D& first , const CDCRecoHit3D& second)
+CDCRecoHit3D CDCRecoHit3D::average(const CDCRecoHit3D& first, const CDCRecoHit3D& second)
 {
   if (first.getRLWireHit() == second.getRLWireHit()) {
     return CDCRecoHit3D(&(first.getRLWireHit()),

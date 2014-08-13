@@ -49,7 +49,9 @@ namespace Belle2 {
       CDCRecoHit3D();
 
       /// Constructor taking all stored variables of the reconstructed hit.
-      CDCRecoHit3D(const CDCRLWireHit* rlWireHit, const Vector3D& position, FloatType perpS = 0);
+      CDCRecoHit3D(const CDCRLWireHit* rlWireHit,
+                   const Vector3D& position,
+                   FloatType perpS = 0);
 
     public:
 
@@ -72,11 +74,14 @@ namespace Belle2 {
        *  can be used to get z information. The reconstucted hit lies exactly on the fitted trajectory \n
        *  as seen from the xy plane. Hence also xy position and transvers travel distance are available. \n
        *  Only the stereo hits have then the full information to go head and make the sz trajectory. */
-      static CDCRecoHit3D
-      reconstruct(
-        const CDCRecoHit2D& recoHit,
-        const CDCTrajectory2D& trajectory2D
-      );
+      static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit,
+                                      const CDCTrajectory2D& trajectory2D);
+
+      /// Reconstructs the three dimensional hit from the wire hit and the given right left passage information by shifting it to a z coordinate, where it touches the two dimensional trajectory from the side indicated by the right left passage.
+      static CDCRecoHit3D reconstruct(const CDCRLWireHit& rlWireHit,
+                                      const CDCTrajectory2D& trajectory2D);
+
+
 
       /// Reconstructs the three dimensional hit from the two dimensional, the two dimensional trajectory and sz trajectory.
       /** For two dimensional reconstructed hits on axial wires this reconstructs \n
@@ -88,18 +93,16 @@ namespace Belle2 {
        *  as in the reconstuct() method before. However the z coordinate is set to the value of the sz trajectory \n
        *  at just calculated the transvers travel distance, since the trajectory should be more exact than the shifting \n
        *  along the wire.*/
-      static CDCRecoHit3D
-      reconstruct(
-        const CDCRecoHit2D& recoHit,
-        const CDCTrajectory2D& trajectory2D,
-        const CDCTrajectorySZ& trajectorySZ
-      );
+      static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit,
+                                      const CDCTrajectory2D& trajectory2D,
+                                      const CDCTrajectorySZ& trajectorySZ);
 
       /// Constructs the average of two reconstructed hit positions. \n
       /** Averages the hit positions and the travel distance. The function averages only reconstructed hits \n
        *  assoziated with the same wire hit. If not all recostructed hits are on the same wire hit, the first hit \n
        *  is returned unchanged. Also averages the right left passage information with averageInfo(). */
-      static CDCRecoHit3D average(const CDCRecoHit3D& first , const CDCRecoHit3D& second);
+      static CDCRecoHit3D average(const CDCRecoHit3D& first,
+                                  const CDCRecoHit3D& second);
 
       /// Empty deconstructor
       ~CDCRecoHit3D();

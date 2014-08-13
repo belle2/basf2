@@ -141,16 +141,27 @@ CDCRecoHit2D CDCRecoHit2D::reversed() const
   return CDCRecoHit2D(CDCWireHitTopology::getInstance().getReverseOf(getRLWireHit()), getRecoDisp2D());
 }
 
+
+Vector3D CDCRecoHit2D::reconstruct3D(const CDCTrajectory2D& trajectory2D) const
+{
+  StereoType stereoType = getStereoType();
+  if (stereoType == STEREO_V or stereoType == STEREO_U) {
+    const BoundSkewLine skewLine = getSkewLine();
+    return trajectory2D.reconstruct3D(skewLine);
+
+  } else {
+    Vector2D recoPos2D = trajectory2D.getClosest(getRecoPos2D());
+    //for axial wire we can not determine the z coordinate by looking at the xy projection only
+    //we set it to a not a number here
+    FloatType z        = std::numeric_limits<FloatType>::quiet_NaN();
+    return Vector3D(recoPos2D, z);
+
+  }
+}
+
+
 Vector2D CDCRecoHit2D::getRecoPos2D(const CDCTrajectory2D& trajectory2D) const
 {
-
-  StereoType stereoType = getStereoType();
-  if (stereoType == AXIAL) {
-    return trajectory2D.getClosest(getRecoPos2D());
-  } else {
-    const BoundSkewLine skewLine = getSkewLine();
-    Vector3D recoPos3D = trajectory2D.reconstruct3D(skewLine);
-    return recoPos3D.xy();
-  }
-
+  /// FIXME: Think about if this is the correct behaviour.
+  return reconstruct3D(trajectory2D).xy();
 }

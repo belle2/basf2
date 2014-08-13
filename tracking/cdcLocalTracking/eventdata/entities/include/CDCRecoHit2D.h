@@ -203,6 +203,13 @@ namespace Belle2 {
       void snapToDriftCircle()
       { m_recoDisp2D.normalizeTo(getRLWireHit().getRefDriftLength()); }
 
+      /// Reconstruct the three dimensional position (especially of stereo hits)
+      /// by terminating the z coordinate such that the reconstucted position lies on the
+      /// given two dimensional trajectory as the reference reconstructed position is
+      /// moved parallel to the stereo wire.
+      /// For axial hits the point of closest approach on the trajectory is returned.
+      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D) const;
+
       /// Projects the hit's reconstructed position onto the given trajectory
       Vector2D getRecoPos2D(const CDCTrajectory2D& trajectory2D) const;
 

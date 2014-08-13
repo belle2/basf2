@@ -109,9 +109,9 @@ namespace {
 
 
   /// Variant with drift circles
-  UncertainPerigeeCircle fit(const Matrix< FloatType, 5, 5 >& sumMatrix,
-                             bool lineConstrained = false,
-                             bool originConstrained = false)
+  PerigeeCircle fit(const Matrix< FloatType, 5, 5 >& sumMatrix,
+                    bool lineConstrained = false,
+                    bool originConstrained = false)
   {
     // Solve the normal equation X * n = y
     if (lineConstrained) {
@@ -148,9 +148,9 @@ namespace {
 
 
   /// Variant without drift circles
-  UncertainPerigeeCircle fit(Matrix< FloatType, 4, 4 > sumMatrix,
-                             bool lineConstrained = false,
-                             bool originConstrained = false)
+  PerigeeCircle fit(Matrix< FloatType, 4, 4 > sumMatrix,
+                    bool lineConstrained = false,
+                    bool originConstrained = false)
   {
     // Solve the normal equation min_n  n^T * X * n
     // n is the smallest eigenvector
@@ -207,14 +207,14 @@ namespace {
 
 
   // Declare function as currently unused to avoid compiler warning
-  UncertainPerigeeCircle fitSeperateOffset(Matrix< FloatType, 4, 1 > means,
-                                           Matrix< FloatType, 4, 4 > c,
-                                           bool lineConstrained) __attribute__((__unused__));
+  PerigeeCircle fitSeperateOffset(Matrix< FloatType, 4, 1 > means,
+                                  Matrix< FloatType, 4, 4 > c,
+                                  bool lineConstrained) __attribute__((__unused__));
 
   /// Variant without drift circles and seperating the offset before the matrix solving
-  UncertainPerigeeCircle fitSeperateOffset(Matrix< FloatType, 4, 1 > means,
-                                           Matrix< FloatType, 4, 4 > c,
-                                           bool lineConstrained = false)
+  PerigeeCircle fitSeperateOffset(Matrix< FloatType, 4, 1 > means,
+                                  Matrix< FloatType, 4, 4 > c,
+                                  bool lineConstrained = false)
   {
     // Solve the normal equation min_n  n^T * c * n
     // for the plane normal and move the plain by the offset
@@ -423,9 +423,9 @@ UncertainPerigeeCircle ExtendedRiemannsMethod::fit(CDCObservations2D& observatio
       // B2INFO("Not origin constrained.");
       resultCircle = fitSeperateOffset(meansNoL, cNoL, isLineConstrained());
 
-    } else
+    } else {
       resultCircle = ::fit(sNoL, isLineConstrained(), isOriginConstrained());
-
+    }
 
     chi2 = calcChi2(resultCircle, sNoL);
     perigeeCovariance = calcCovariance(resultCircle, sNoL, isLineConstrained(), isOriginConstrained());

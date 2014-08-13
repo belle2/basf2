@@ -96,6 +96,16 @@ namespace Belle2 {
         return rlWireHitSegment;
       }
 
+      /// Makes a copy of the segment with the reversed hits in the opposite order.
+      CDCRecoSegment2D reversed() const {
+        CDCRecoSegment2D reverseSegment;
+        reverseSegment.reserve(size());
+        for (const CDCRecoHit2D & recohit : reverseRange()) {
+          reverseSegment.push_back(recohit.reversed());
+        }
+        return reverseSegment;
+      }
+
 
       /// Getter for the automaton cell.
       AutomatonCell& getAutomatonCell() { return m_automatonCell; }

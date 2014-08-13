@@ -27,10 +27,8 @@
 #include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
 
 #include <tracking/cdcLocalTracking/creators/FacetCreator.h>
-#include <tracking/cdcLocalTracking/creators/RecoSegmentCreator.h>
 #include <tracking/cdcLocalTracking/creators/TangentSegmentCreator.h>
 
-#include <tracking/cdcLocalTracking/creators/SegmentReverser.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {
@@ -122,8 +120,6 @@ namespace Belle2 {
           m_clusters.insert(m_clusters.end(), m_clustersInSuperLayer.begin(), m_clustersInSuperLayer.end());
 #endif
 
-          //double d;
-          //std::cin >> d;
 
           for (CDCWireHitCluster & cluster : m_clustersInSuperLayer) {
             //size_t nSegmentsBefore = m_segments2D.size();
@@ -155,7 +151,13 @@ namespace Belle2 {
 
             // reduce the CDCRecoFacetPtrSegment directly to the selected vector
             B2DEBUG(100, "Reduce the CDCRecoFacetPtrSegment to RecoSegment2D");
-            m_recoSegmentCreator.create(m_facetPaths, m_segments2D);
+            //Make enough space for the segments condensed from the facet paths and their reversed versions.
+            m_segments2D.reserve(m_segments2D.size() + 2 * m_facetPaths.size());
+            for (const std::vector<const CDCRecoFacet* >& facetPath : m_facetPaths) {
+              m_segments2D.push_back(CDCRecoSegment2D::condense(facetPath));
+              m_segments2D.push_back(m_segments2D.back().reversed());
+              // ^ Save because we reserved the memory beforehand.
+            }
 
             //TODO: combine matching segments here
 
@@ -167,11 +169,6 @@ namespace Belle2 {
           //TODO: or combine matching segments here
 
         } // end for superlayer
-
-        //make both orientations available
-        B2DEBUG(100, "Reversing CDCReco2DSegments");
-        m_segmentReverser.appendReversed(m_segments2D);
-        B2DEBUG(100, "  Created " << m_segments2D.size()  << " selected CDCRecoSegment2Ds after reversion");
 
         copyToDataStoreForDebug();
 
@@ -187,35 +184,26 @@ namespace Belle2 {
 #ifdef CDCLOCALTRACKING_USE_ROOT
         // IO wire hit clusters
 
-        B2DEBUG(100, "  Creating the StoreArray for the CDCWireHitClusters");
         StoreArray < CDCWireHitCluster > storedClusters;
         storedClusters.create();
-        B2DEBUG(100, "  Do creating the CDCWireHitClusters in the StoreArray");
         for (const CDCWireHitCluster & cluster : m_clusters) {
           storedClusters.appendNew(cluster);
         }
-        B2DEBUG(100, "  Created " << storedClusters.getEntries()  << " CDCWireHitClusters");
 
         // IO segments with tangents
-        B2DEBUG(100, "  Creating the StoreArray for the CDCRecoTangentSegment");
         StoreArray < CDCRecoTangentVector > storedTangentSegments("CDCRecoTangentSegments");
         storedTangentSegments.create();
-        B2DEBUG(100, "  Do creating the CDCRecoTangentSegment in the StoreArray");
         for (const CDCRecoTangentVector & tangentSegment : m_recoTangentSegments) {
           storedTangentSegments.appendNew(tangentSegment);
         }
-        B2DEBUG(100, "  Created " << storedTangentSegments.getEntries() << " CDCRecoTangentSegment");
+
 
         // IO selected segments without tangents
-        B2DEBUG(100, "  Creating the StoreArray for the selected CDCRecoSegment2Ds");
         StoreArray < CDCRecoSegment2D > storedSegments2D;
         storedSegments2D.create();
-        B2DEBUG(100, "  Copying the selected CDCRecoSegment2Ds to the StoreArray");
         for (const CDCRecoSegment2D & segment2D : m_segments2D) {
           storedSegments2D.appendNew(segment2D);
         }
-        B2DEBUG(100, "  Created " << storedSegments2D.getEntries()  <<
-                " selected CDCRecoSegment2Ds");
 #endif
 
       }
@@ -306,14 +294,8 @@ namespace Belle2 {
       /// Instance of the cellular automaton path finder
       MultipassCellularPathFinder<CDCRecoFacet> m_cellularPathFinder;
 
-      /// Instance of the segment creator.
-      RecoSegmentCreator m_recoSegmentCreator;
-
       /// Instance of the tangent segment creator.
       TangentSegmentCreator m_tangentSegmentCreator;
-
-      /// Instance of the segment reverser.
-      SegmentReverser m_segmentReverser;
 
     }; // end class FacetSegmentWorker
   } //end namespace CDCLocalTracking

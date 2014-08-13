@@ -39,6 +39,15 @@ CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
 
 
 
+CDCTrajectory3D::CDCTrajectory3D(const CDCTrajectory2D& trajectory2D,
+                                 const CDCTrajectorySZ& trajectorySZ) :
+  m_localOrigin(trajectory2D.getLocalOrigin()),
+  m_localHelix(trajectory2D.getLocalCircle(), trajectorySZ.getSZLine())
+{
+}
+
+
+
 void CDCTrajectory3D::setPosMom3D(const Vector3D& pos3D,
                                   const Vector3D& mom3D,
                                   const FloatType& charge)

@@ -35,6 +35,16 @@ namespace Belle2 {
       { m_matrix.Zero(); }
 
 
+      /// Merges the covariance matrix of perigee and sz parameters
+      HelixCovariance(const PerigeeCovariance& perigeeCovariance,
+                      const SZCovariance& szCovariance) :
+        m_matrix(5) {
+        m_matrix.Zero();
+        m_matrix.SetSub(perigeeCovariance.matrix().GetRowLwb(), perigeeCovariance.matrix());
+        m_matrix.SetSub(szCovariance.matrix().GetRowLwb(), szCovariance.matrix());
+      }
+
+
 
       /// Setup the covariance with the given covariance matrx
       explicit HelixCovariance(const TMatrixDSym& covarianceMatrix) :

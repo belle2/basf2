@@ -60,6 +60,10 @@ namespace Belle2 {
                       const Vector3D& startMomentum,
                       const FloatType& charge);
 
+      /// Construct a three dimensional trajectory from a two dimensional circular trajectory and sz linear trajectory
+      CDCTrajectory3D(const CDCTrajectory2D& trajectory2D,
+                      const CDCTrajectorySZ& trajectorySZ);
+
       /// Empty destructor
       ~CDCTrajectory3D() {;}
 

@@ -84,6 +84,19 @@ namespace Belle2 {
       {;}
 
 
+      /// Augments a plain helix with a covariance matrix. Covariance defaults to zero.
+      UncertainHelix(const UncertainPerigeeCircle& uncertainPerigeeCircle,
+                     const UncertainSZLine& uncertainSZLine) :
+
+        Helix(uncertainPerigeeCircle, uncertainSZLine), //copies line and circle without uncertainties
+        m_helixCovariance(uncertainPerigeeCircle.perigeeCovariance(), uncertainSZLine.szCovariance()),
+        m_chi2(uncertainPerigeeCircle.chi2() + uncertainSZLine.chi2())
+      {;}
+
+
+
+
+
       /// Empty destructor
       ~UncertainHelix() {;}
 

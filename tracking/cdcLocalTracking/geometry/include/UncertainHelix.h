@@ -43,18 +43,20 @@ namespace Belle2 {
                      const FloatType& impact,
                      const FloatType& szSlope,
                      const FloatType& z0,
-                     const HelixCovariance& helixCovariance = HelixCovariance()) :
+                     const HelixCovariance& helixCovariance = HelixCovariance(),
+                     const FloatType& chi2 = 0.0) :
         Helix(curvature, tangentialPhi, impact, szSlope, z0),
         m_helixCovariance(helixCovariance),
-        m_chi2(0.0)
+        m_chi2(chi2)
       {;}
 
 
       explicit UncertainHelix(const TVectorD& parameters,
-                              const HelixCovariance& helixCovariance = HelixCovariance()) :
+                              const HelixCovariance& helixCovariance = HelixCovariance(),
+                              const FloatType& chi2 = 0.0) :
         Helix(parameters),
         m_helixCovariance(helixCovariance),
-        m_chi2(0.0)
+        m_chi2(chi2)
       {;}
 
       /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix. Covariance matrix defaults to a zero matrix
@@ -63,20 +65,22 @@ namespace Belle2 {
                      const FloatType& impact,
                      const FloatType& szSlope,
                      const FloatType& z0,
-                     const HelixCovariance& helixCovariance = HelixCovariance()) :
+                     const HelixCovariance& helixCovariance = HelixCovariance(),
+                     const FloatType& chi2 = 0.0) :
         Helix(curvature, tangential, impact, szSlope, z0),
         m_helixCovariance(helixCovariance),
-        m_chi2(0.0)
+        m_chi2(chi2)
       {;}
 
 
 
       /// Augments a plain helix with a covariance matrix. Covariance defaults to zero.
       UncertainHelix(const Helix& helix,
-                     const HelixCovariance& helixCovariance = HelixCovariance()) :
+                     const HelixCovariance& helixCovariance = HelixCovariance(),
+                     const FloatType& chi2 = 0.0) :
         Helix(helix),
         m_helixCovariance(helixCovariance),
-        m_chi2(0.0)
+        m_chi2(chi2)
       {;}
 
 

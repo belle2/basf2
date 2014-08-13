@@ -46,10 +46,11 @@ namespace Belle2 {
       UncertainPerigeeCircle(const FloatType& curvature,
                              const FloatType& tangentialPhi,
                              const FloatType& impact,
-                             const PerigeeCovariance& perigeeCovariance = PerigeeCovariance()) :
+                             const PerigeeCovariance& perigeeCovariance = PerigeeCovariance(),
+                             const FloatType& chi2 = 0.0) :
         PerigeeCircle(PerigeeCircle::fromPerigeeParameters(curvature, tangentialPhi, impact)),
         m_perigeeCovariance(perigeeCovariance),
-        m_chi2(0.0)
+        m_chi2(chi2)
       {;}
 
 
@@ -58,29 +59,32 @@ namespace Belle2 {
       UncertainPerigeeCircle(const FloatType& curvature,
                              const Vector2D& tangential,
                              const FloatType& impact,
-                             const PerigeeCovariance& perigeeCovariance = PerigeeCovariance()) :
+                             const PerigeeCovariance& perigeeCovariance = PerigeeCovariance(),
+                             const FloatType& chi2 = 0.0) :
         PerigeeCircle(PerigeeCircle::fromPerigeeParameters(curvature, tangential, impact)),
         m_perigeeCovariance(perigeeCovariance),
-        m_chi2(0.0)
+        m_chi2(chi2)
       {;}
 
 
 
       /// Augments a plain perigee circle with a covariance matrix. Covariance defaults to zero
       UncertainPerigeeCircle(const PerigeeCircle& perigeeCircle,
-                             const PerigeeCovariance& perigeeCovariance = PerigeeCovariance()) :
+                             const PerigeeCovariance& perigeeCovariance = PerigeeCovariance(),
+                             const FloatType& chi2 = 0.0) :
         PerigeeCircle(perigeeCircle),
         m_perigeeCovariance(perigeeCovariance),
-        m_chi2(0.0)
+        m_chi2(chi2)
       {;}
 
 
       /// Augments a plain perigee circle with a covariance matrix. Covariance defaults to zero
       UncertainPerigeeCircle(const GeneralizedCircle& generalizedCircle,
-                             const PerigeeCovariance& perigeeCovariance = PerigeeCovariance()) :
+                             const PerigeeCovariance& perigeeCovariance = PerigeeCovariance(),
+                             const FloatType& chi2 = 0.0) :
         PerigeeCircle(generalizedCircle),
         m_perigeeCovariance(perigeeCovariance),
-        m_chi2(0.0)
+        m_chi2(chi2)
       {;}
 
       /// Empty destructor

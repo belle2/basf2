@@ -38,19 +38,21 @@ namespace Belle2 {
       /// Composes an uncertain sz line from the  perigee parameters and a 2x2 covariance matrix. Covariance matrix defaults to a zero matrix.
       UncertainSZLine(const FloatType& szSlope,
                       const FloatType& z0,
-                      const SZCovariance& szCovariance = SZCovariance()) :
+                      const SZCovariance& szCovariance = SZCovariance(),
+                      const FloatType chi2 = 0.0) :
         Line2D(Line2D::fromSlopeIntercept(szSlope, z0)),
         m_szCovariance(szCovariance),
-        m_chi2(0.0)
+        m_chi2(chi2)
       {;}
 
 
       /// Augments a plain two dimensional line with a covariance matrix. Covariance defaults to zero.
       UncertainSZLine(const Line2D& line2D,
-                      const SZCovariance& szCovariance = SZCovariance()) :
+                      const SZCovariance& szCovariance = SZCovariance(),
+                      const FloatType chi2 = 0.0) :
         Line2D(line2D),
         m_szCovariance(szCovariance),
-        m_chi2(0.0)
+        m_chi2(chi2)
       {;}
 
 

@@ -624,7 +624,7 @@ class CDCDataobjectsConverter:
 
         svgElements = []
 
-        styleDict = {'stroke': 'black', 'stroke-width': '0.02'}
+        styleDict = {'stroke': 'black', 'stroke-width': '0.2'}
         styleDict.update(kwd)
 
         if trajectory.getGlobalCircle().isCircle():

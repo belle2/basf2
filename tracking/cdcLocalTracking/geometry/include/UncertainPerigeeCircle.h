@@ -97,11 +97,11 @@ namespace Belle2 {
 
       /// Getter for individual elements of the covariance matrix
       FloatType covariance(const PerigeeParameterIndex& iRow, const PerigeeParameterIndex& iCol) const
-      { return perigeeCovariance().matrix()(iRow, iCol); }
+      { return perigeeCovariance()(iRow, iCol); }
 
       /// Getter for individual diagonal elements of the covariance matrix
       FloatType variance(const PerigeeParameterIndex& i) const
-      { return perigeeCovariance().matrix()(i, i); }
+      { return perigeeCovariance()(i, i); }
 
       /// Getter for the chi square value of the circle fit
       const FloatType& chi2() const
@@ -116,6 +116,7 @@ namespace Belle2 {
       inline void setNull() {
         PerigeeCircle::setNull();
         m_perigeeCovariance.setNull();
+        m_chi2 = 0.0;
       }
 
     public:

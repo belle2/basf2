@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef PERIGEECOVARIANCE_H
-#define PERIGEECOVARIANCE_H
+#ifndef SZCOVARIANCE_H
+#define SZCOVARIANCE_H
 
 #include <cmath>
 #include <iostream>
@@ -18,32 +18,32 @@
 #include <framework/logging/Logger.h>
 #include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
 
-#include "PerigeeParameterIndex.h"
+#include "HelixParameterIndex.h"
 
 namespace Belle2 {
 
   namespace CDCLocalTracking {
 
     /// Class representing the covariance matrix of a set of perigee parameters.
-    class PerigeeCovariance : public UsedTObject {
+    class SZCovariance : public UsedTObject {
 
     public:
       /// Default constructor for ROOT compatibility.
-      PerigeeCovariance() :
-        m_matrix(3)
+      SZCovariance() :
+        m_matrix(iSZ, iZ0) //From to indices
       { m_matrix.Zero(); }
 
 
 
       /// Setup the covariance with the given covariance matrx
-      PerigeeCovariance(const TMatrixDSym& covarianceMatrix) :
+      SZCovariance(const TMatrixDSym& covarianceMatrix) :
         m_matrix(covarianceMatrix)
       { checkMatrix(); }
 
 
 
       /// Empty destructor
-      ~PerigeeCovariance() {;}
+      ~SZCovariance() {;}
 
       /// Down cast operator to symmetric matrix
       operator const TMatrixDSym& () const
@@ -53,11 +53,15 @@ namespace Belle2 {
     private:
       /// Checks the covariance matrix for consistence
       inline void checkMatrix() const {
-        if (matrix().GetNrows() != 3 or matrix().GetNcols() != 3) {
-          B2ERROR("Perigee covariance matrix is a  " <<
+        if (matrix().GetNrows() != 2 or
+            matrix().GetNcols() != 2 or
+            matrix().GetColLwb() != iSZ or
+            matrix().GetColUpb() != iZ0) {
+          B2ERROR("SZ covariance matrix is a  " <<
                   matrix().GetNrows() << "x" <<
-                  matrix().GetNcols() << " matrix. " <<
-                  "Expected 3x3 matrix."
+                  matrix().GetNcols() << " matrix starting from " <<
+                  matrix().GetColLwb() << ". " <<
+                  "Expected 2x2 matrix starting from "  << iSZ << "."
                  );
         }
       }
@@ -65,7 +69,7 @@ namespace Belle2 {
 
 
     public:
-      /// Setter for the whole covariance matrix of the perigee parameters.
+      /// Setter for the whole covariance matrix of the sz parameters
       inline void setMatrix(const TMatrixDSym& covarianceMatrix) {
         checkMatrix();
         m_matrix = covarianceMatrix;
@@ -73,27 +77,26 @@ namespace Belle2 {
 
 
 
-      /// Getter for the whole covariance matrix of the perigee parameters.
+      /// Getter for the whole covariance matrix of the sz parameters
       const TMatrixDSym& matrix() const
       { return m_matrix; }
 
       /// Non constant access to the matrix elements return a reference to the underlying matrix entry.
-      double& operator()(const PerigeeParameterIndex& iRow, const PerigeeParameterIndex& iCol)
+      double& operator()(const HelixParameterIndex& iRow, const HelixParameterIndex& iCol)
       { return m_matrix(iRow, iCol); }
 
       /// Constant access to the matrix elements.
-      double operator()(const PerigeeParameterIndex& iRow, const PerigeeParameterIndex& iCol) const
+      double operator()(const HelixParameterIndex& iRow, const HelixParameterIndex& iCol) const
       { return m_matrix(iRow, iCol); }
 
 
 
-      /// Modifies to perigee covariance matrix inplace to represent the reverse travel direction.
+      /// Modifies to sz covariance matrix inplace to represent the reverse travel direction.
       void reverse();
 
-
-      /// Returns the perigee covariance for the reversed travel direction as a copy.
-      PerigeeCovariance reversed() const {
-        PerigeeCovariance result(*this);
+      /// Returns the sz covariance for the reversed travel direction as a copy.
+      SZCovariance reversed() const {
+        SZCovariance result(*this);
         result.reverse();
         return result;
       }
@@ -113,8 +116,8 @@ namespace Belle2 {
 
       /// Transforms the covariance by the given jacobian matrix in place.
       void similarityTransform(const TMatrixD& jacobian) {
-        if (jacobian.GetNrows() != 3 or jacobian.GetNcols() != 3) {
-          B2ERROR("Cannot transform PerigeeCovariance with a " <<
+        if (jacobian.GetNrows() != 2 or jacobian.GetNcols() != 2) {
+          B2ERROR("Cannot transform SZCovariance with a " <<
                   jacobian.GetNrows() << "x"  <<
                   jacobian.GetNcols() << " inplace.");
           return;
@@ -134,14 +137,14 @@ namespace Belle2 {
 
 
     private:
-      /// Memory for the 3x3 matrix presentation of the covariance.
+      /// Memory for the 2x2 matrix presentation of the covariance.
       TMatrixDSym m_matrix;
 
-      /// ROOT Macro to make PerigeeCovariance a ROOT class.
-      ClassDefInCDCLocalTracking(PerigeeCovariance, 1);
+      /// ROOT Macro to make SZCovariance a ROOT class.
+      ClassDefInCDCLocalTracking(SZCovariance, 1);
 
     }; //class
 
   } // namespace CDCLocalTracking
 } // namespace Belle2
-#endif // PERIGEECOVARIANCE_H
+#endif // SZCOVARIANCE_H

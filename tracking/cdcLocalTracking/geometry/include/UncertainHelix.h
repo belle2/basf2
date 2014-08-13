@@ -20,6 +20,7 @@
 #include "HelixCovariance.h"
 
 #include "UncertainPerigeeCircle.h"
+#include "UncertainSZLine.h"
 
 namespace Belle2 {
 
@@ -84,9 +85,13 @@ namespace Belle2 {
 
 
     public:
+      /// Projects the helix into the xy plain carrying over the relevant parts of the convariance matrix.
       UncertainPerigeeCircle uncertainCircleXY() const
       { return UncertainPerigeeCircle(circleXY(), helixCovariance().perigeeCovariance());}
 
+      /// Reduces the helix to an sz line carrying over the relevant parts of the convariance matrix.
+      UncertainSZLine uncertainSZLine() const
+      { return UncertainSZLine(lineSZ(), helixCovariance().szCovariance());}
 
       /// Setter for the whole covariance matrix of the perigee parameters
       inline void setHelixCovariance(const HelixCovariance& helixCovariance)
@@ -98,11 +103,11 @@ namespace Belle2 {
 
       /// Getter for individual elements of the covariance matrix
       FloatType covariance(const HelixParameterIndex& iRow, const HelixParameterIndex& iCol) const
-      { return helixCovariance().matrix()(iRow, iCol); }
+      { return helixCovariance()(iRow, iCol); }
 
       /// Getter for individual diagonal elements of the covariance matrix
       FloatType variance(const HelixParameterIndex& i) const
-      { return helixCovariance().matrix()(i, i); }
+      { return helixCovariance()(i, i); }
 
       /// Getter for the chi square value of the helix fit
       const FloatType& chi2() const
@@ -116,6 +121,7 @@ namespace Belle2 {
       inline void setNull() {
         Helix::setNull();
         m_helixCovariance.setNull();
+        m_chi2 = 0.0;
       }
 
     public:

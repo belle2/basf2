@@ -21,7 +21,7 @@ void PerigeeCovariance::reverse()
 {
   // Sign of impact and curvature are reversed by a reversion of the perigee parameters,
   // while the tangential phi0 gets only an offset by a constant.
-  // Hence corraletions between
+  // Hence correlations between
   // * curvature and phi
   // * phi and impact
   // aquire a minus sign

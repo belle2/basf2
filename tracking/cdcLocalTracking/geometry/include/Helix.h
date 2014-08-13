@@ -203,7 +203,7 @@ namespace Belle2 {
 
       /// Getter for the five helix parameters in the order defined by HelixParameterIndex.h and PerigeeParameterIndex.h
       TVectorD parameters() const {
-        TVectorD result(5);
+        TVectorD result(iCurv, iZ0);
         result(iCurv) = curvatureXY();
         result(iPhi0) = phi0();
         result(iI) = impactXY();

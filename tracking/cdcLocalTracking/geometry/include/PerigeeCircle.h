@@ -280,7 +280,7 @@ namespace Belle2 {
 
       /// Getter for the three perigee parameters in the order defined by PerigeeParameterIndex.h
       TVectorD parameters() const {
-        TVectorD result(3);
+        TVectorD result(iCurv, iI);
         result(iCurv) = curvature();
         result(iPhi0) = phi0();
         result(iI) = impact();

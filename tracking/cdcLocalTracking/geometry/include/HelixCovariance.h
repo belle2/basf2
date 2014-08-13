@@ -19,6 +19,7 @@
 #include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
 
 #include "PerigeeCovariance.h"
+#include "SZCovariance.h"
 
 namespace Belle2 {
 
@@ -48,7 +49,7 @@ namespace Belle2 {
 
 
       /// Down cast operator to symmetric matrix
-      operator TMatrixDSym() const
+      operator const TMatrixDSym& () const
       { return m_matrix; }
 
 
@@ -78,11 +79,26 @@ namespace Belle2 {
       const TMatrixDSym& matrix() const
       { return m_matrix; }
 
+      /// Non constant access to the matrix elements return a reference to the underlying matrix entry.
+      double& operator()(const HelixParameterIndex& iRow, const HelixParameterIndex& iCol)
+      { return m_matrix(iRow, iCol); }
+
+      /// Constant access to the matrix elements.
+      double operator()(const HelixParameterIndex& iRow, const HelixParameterIndex& iCol) const
+      { return m_matrix(iRow, iCol); }
+
+
 
       /// Getter for the perigee subcovariance
       PerigeeCovariance perigeeCovariance() const {
         //Note upper bound is inclusive (not exclusive like in e.g. Python)
-        return matrix().GetSub(0, 2, 0, 2);
+        return matrix().GetSub(iCurv, iI, iCurv, iI);
+      }
+
+      /// Getter for the sz subcovariance
+      SZCovariance szCovariance() const {
+        //Note upper bound is inclusive (not exclusive like in e.g. Python)
+        return matrix().GetSub(iSZ, iZ0, iSZ, iZ0);
       }
 
 

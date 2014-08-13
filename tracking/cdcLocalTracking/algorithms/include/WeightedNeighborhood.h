@@ -12,14 +12,10 @@
 
 #include <iostream>
 #include <map>
-#include <limits>
 
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
 #include "NeighborWeight.h"
-
-#include <boost/type_traits/remove_pointer.hpp>
-
 
 namespace Belle2 {
   namespace CDCLocalTracking {
@@ -37,16 +33,6 @@ namespace Belle2 {
     template<class Item>
     class WeightedNeighborhood {
 
-
-      /// Item type with a pointer star removed
-      typedef typename boost::remove_pointer<Item>::type BareItem;
-
-      /// Reference type of the items the neighborhood is related to
-      typedef BareItem&   ItemRef;
-
-      /// Pointer type of the items the neighborhood is related to
-      typedef BareItem const*   ItemPtr; //making the pointer constant since we do not want to change the object. the contained data stays as is.
-
     private:
 
       /// Structure keeping a pointer to the item and the weight
@@ -57,7 +43,7 @@ namespace Belle2 {
       struct WeightedItemPtr {
 
         /// Constructor bundeling the original item and the weight of a relation
-        WeightedItemPtr(const ItemPtr& itemPtr , const Weight& weight) :
+        WeightedItemPtr(const Item* itemPtr , const NeighborWeight& weight) :
           m_itemPtr(itemPtr), m_weight(weight) {;}
 
         /// Comparison operator establishing a total ordering considering the pointer first and the weight second
@@ -65,21 +51,23 @@ namespace Belle2 {
         { return m_itemPtr < other.m_itemPtr or (m_itemPtr == other.m_itemPtr and m_weight < other.m_weight); }
 
         /// Getter for the pointer to the original item
-        ItemPtr getItemPtr() const { return m_itemPtr; }
+        const Item* getItemPtr() const
+        { return m_itemPtr; }
 
         /// Getter for the weight
-        Weight getWeight() const { return m_weight; }
+        NeighborWeight getWeight() const
+        { return m_weight; }
 
       private:
-        ItemPtr m_itemPtr; ///< Member to store the pointer to the item
-        Weight m_weight; ///< Member to store the weight of the neighbor relation
+        const Item* m_itemPtr; ///< Member to store the pointer to the item
+        NeighborWeight m_weight; ///< Member to store the weight of the neighbor relation
 
       };
 
 
     private:
       /// Multimap that stores the neighborhood relations
-      typedef std::multimap<WeightedItemPtr, ItemPtr> Container;
+      typedef std::multimap<WeightedItemPtr, const Item*> Container;
 
       /// Value type of the neighborhood aka std::pair<const WeightedItemPtr,NeighborPtr>
       typedef typename Container::value_type value_type;
@@ -103,22 +91,33 @@ namespace Belle2 {
         /// Constructor taking the raw iterator to be wrapped
         iterator(const container_const_iterator& it) : container_const_iterator(it) {;}
 
-        /// Getter to the pointer to the neighboring item
-        ItemPtr getNeighbor()
-        { return (*this)->second; }
-
         /// Getter to the pointer to the original item
-        ItemPtr getItem()
+        const Item* getItem()
         { return (*this)->first.getItemPtr(); }
 
         /// Getter for the weight assoziated with the neighborhood relation
-        Weight getWeight()
+        NeighborWeight getWeight()
         { return (*this)->first.getWeight(); }
+
+        /// Getter to the pointer to the neighboring item
+        const Item* getNeighbor()
+        { return (*this)->second; }
       };
 
       /// Iterator range type for a pair of iterators representing all the neighbors of a specific item.
-      typedef std::pair<iterator, iterator> range;
+      class range : public std::pair<iterator, iterator> {
+      public:
+        range(const iterator& begin, const iterator& end) : std::pair<iterator, iterator>(begin, end) {;}
+        range(const std::pair<iterator, iterator> itPair) : std::pair<iterator, iterator>(itPair) {;}
 
+        /// Begin of the range for range based for.
+        iterator begin() const
+        { return this->first; }
+
+        /// End of the range for range based for.
+        iterator end() const
+        { return this->second; }
+      };
 
       /// Default constructor
       WeightedNeighborhood() {;}
@@ -143,11 +142,9 @@ namespace Belle2 {
        *  Copys of the pointers are stored in the underlying multimap. \n
        *  Additionally a weight can be given. If omited the weight defaults to one. \n
        */
-      inline void insert(
-        const ItemPtr& itemPtr,
-        const ItemPtr& neighborPtr,
-        Weight weight = 1
-      )
+      inline void insert(const Item* itemPtr,
+                         const Item* neighborPtr,
+                         const NeighborWeight& weight = 1)
       { m_neighbors.insert(WeightedRelation(WeightedItemPtr(itemPtr, weight) , neighborPtr)); }
 
       /// Inserts a new relation by pointers
@@ -155,43 +152,11 @@ namespace Belle2 {
        *  Copys of the pointers are stored in the underlying multimap. \n
        *  Additionally a weight must be given in the middle.
        */
-      inline void insert(
-        ItemPtr itemPtr,
-        Weight weight,
-        ItemPtr neighborPtr
-      )
+      inline void insert(const Item* itemPtr,
+                         const NeighborWeight& weight,
+                         const Item* neighborPtr)
       { m_neighbors.insert(WeightedRelation(WeightedItemPtr(itemPtr, weight) , neighborPtr)); }
 
-
-      /// Inserts a new relation by references.
-      /** Inserts a new relation. The item and neighbor are given by reference. \n
-       *  Since the neighborhood stores pointers to the items, the addresses are taken
-       *  out and stored in the multimap.
-       *  Copys of the pointers are stored in the underlying multimap. \n
-       *  Additionally a weight can be given. If omited the weight defaults to one. \n
-       */
-      inline void insert(
-        ItemRef itemRef,
-        ItemRef neighborRef,
-        Weight weight
-      )
-      { insert(&(itemRef), &(neighborRef), weight); }
-
-
-      /// Inserts a new relation by references.
-      /** Inserts a new relation. The item and neighbor are given by reference. \n
-       *  Since the neighborhood stores pointers to the items, the addresses are taken
-       *  out and stored in the multimap.
-       *  Copys of the pointers are stored in the underlying multimap. \n
-       *  Additionally a weight must be given in the middle. \n
-       */
-      inline void insert(
-        ItemRef itemRef,
-        Weight weight,
-        ItemRef neighborRef
-      )
-      { insert(&(itemRef), weight, &(neighborRef)); }
-      /**@}*/
 
       /** @name Retrival of neigbors
        *  Important since the multimap stores pointers the _same_ object address that have been \n
@@ -203,37 +168,24 @@ namespace Belle2 {
       /**@{*/
 
       /// Checks if the item given by pointers has neighbors in the neighborhood
-      bool hasNeighbors(ItemPtr itemPtr) const
+      bool hasNeighbors(const Item* itemPtr) const
       { return getLightestNeighbor(itemPtr) != m_neighbors.end(); }
-
-      /// Checks if the item given by reference has neighbors in the neighborhood
-      bool hasNeighbors(ItemRef itemRef) const
-      { return hasNeighbors(&itemRef); }
 
       /// Returns an iterator to the neighbor with the least weight by pointer
       /** If the item given by pointer has neighbors in the neighborhood return \n
        *  an iterator pointing to the one with the smallest weight. \n
        *  If their are no neighbors to the item given return the end() of the neighborhood. */
-      iterator getLightestNeighbor(ItemPtr itemPtr) const {
-
+      iterator getLightestNeighbor(const Item* itemPtr) const {
         iterator lowerBound = m_neighbors.lower_bound(WeightedItemPtr(itemPtr, LOWEST_WEIGHT));
         return lowerBound.getItem() == itemPtr ? lowerBound : m_neighbors.end();
 
       }
 
-      /// Returns an iterator to the neighbor with the smallest weight by pointer
-      /** If the item given by reference has neighbors in the neighborhood return \n
-       *  an iterator pointing to the one with the smallest weight. \n
-       *  If their are no neighbors to the item given return the end() of the neighborhood. */
-      iterator getLightestNeighbor(ItemRef itemRef) const
-      { return getLightestNeighbor(&itemRef); }
-
-
       /// Returns an iterator to the neighbor with the highest weight by pointer
       /** If the item given by pointer has neighbors in the neighborhood return \n
        *  an iterator pointing to the one with the highest weight. \n
        *  If their are no neighbors to the item given return the end() of the neighborhood. */
-      iterator getHeaviestNeighbor(ItemPtr itemPtr) const {
+      iterator getHeaviestNeighbor(const Item* itemPtr) const {
 
         iterator upperBound = m_neighbors.upper_bound(WeightedItemPtr(itemPtr, HIGHEST_WEIGHT));
 
@@ -243,56 +195,71 @@ namespace Belle2 {
 
       }
 
-      /// Returns an iterator to the neighbor with the highest weight by pointer
-      /** If the item given by reference has neighbors in the neighborhood return \n
-       *  an iterator pointing to the one with the highest weight. \n
-       *  If their are no neighbors to the item given return the end() of the neighborhood. */
-      iterator getHeaviestNeighbor(ItemRef itemRef) const
-      { return getHeaviestNeighbor(&itemRef); }
-
-
       /// Same as equal_range()
-      range getNeighborRange(ItemPtr itemPtr) const
+      range getNeighborRange(const Item* itemPtr) const
       { return equal_range(itemPtr); }
-
-      /// Same as equal_range()
-      range getNeighborRange(ItemRef itemRef) const
-      { return equal_range(&itemRef); }
-
 
       /// Returns an iterator range representing all neighbors.
       /** Returns the range of all neighbors to the item given by pointer as a pair of iterators. \n
        *  The range is sorted internally by the weight of the neighbor from smallest to biggest. \n
        *  If there are no neighbor an empty range will be returned.
        *  @return a pair of iterators for the range of neighbors */
-      range equal_range(ItemPtr itemPtr) const {
-
+      range equal_range(const Item* itemPtr) const {
         iterator lowerBound(m_neighbors.lower_bound(WeightedItemPtr(itemPtr, LOWEST_WEIGHT)));
         iterator upperBound(m_neighbors.upper_bound(WeightedItemPtr(itemPtr, HIGHEST_WEIGHT)));
         return range(lowerBound, upperBound);
-
       }
+
+      range equal_range(const Item* itemPtr, const NeighborWeight& weight) const
+      { return range(m_neighbors.equal_range(WeightedItemPtr(itemPtr, weight))); }
       /**@}*/
 
-      /// Returns an iterator range representing all neighbors.
-      /** Returns the range of all neighbors to the item given by reference. \n
-       *  The range is sorted internally by the weight of the neighbor from smallest to biggest. \n
-       *  If there are no neighbor an empty range will be returned.
-       *  @return a pair of iterators for the range of neighbors */
-      range equal_range(ItemRef itemRef) const
-      { return equal_range(&itemRef); }
-
       /// Returns the begin of all neighborhood relations
-      iterator begin() const { return iterator(m_neighbors.begin()) ;}
+      iterator begin() const
+      { return iterator(m_neighbors.begin()) ;}
 
       /// Returns the end of all neighborhood relations
-      iterator end()  const { return iterator(m_neighbors.end()) ;}
+      iterator end() const
+      { return iterator(m_neighbors.end()) ;}
 
       /// Returns the number of neighborhood relations
-      size_t size() { return m_neighbors.size(); }
+      size_t size()
+      { return m_neighbors.size(); }
 
       /// Drops all stored neighborhood relations
-      void clear() {  m_neighbors.clear(); }
+      void clear()
+      { m_neighbors.clear(); }
+
+
+      bool areNeighborsWithWeight(const Item* itemPtr,
+                                  const NeighborWeight& weight,
+                                  const Item* neighborPtr) const {
+        range neighborRange = equal_range(itemPtr, weight);
+
+        for (iterator itRelation = neighborRange.first;
+             itRelation != neighborRange.second;
+             ++itRelation) {
+
+          if (itRelation.getNeighbor() == neighborPtr) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      bool areNeighbors(const Item* itemPtr, const Item* neighborPtr) const {
+        range neighborRange = equal_range(itemPtr);
+
+        for (iterator itRelation = neighborRange.first;
+             itRelation != neighborRange.second;
+             ++itRelation) {
+
+          if (itRelation.getNeighbor() == neighborPtr) {
+            return true;
+          }
+        }
+        return false;
+      }
 
       /// Checks for the symmetry of the neighborhood
       /** Explicitly checks for each neighborhood relation, if their is an inverse relation \n
@@ -300,31 +267,17 @@ namespace Belle2 {
       bool isSymmetric() const {
         bool result = true;
         for (iterator itNeighborPairs = begin();
-             itNeighborPairs !=  end(); ++itNeighborPairs) {
+             itNeighborPairs != end(); ++itNeighborPairs) {
 
-          const ItemPtr& itemPtr = itNeighborPairs.getItem();
-          const Weight& weight = itNeighborPairs.getWeight();
-          const ItemPtr& neighborPtr = itNeighborPairs.getNeighbor();
+          const Item* itemPtr = itNeighborPairs.getItem();
+          const NeighborWeight& weight = itNeighborPairs.getWeight();
+          const Item* neighborPtr = itNeighborPairs.getNeighbor();
 
-          //search for an inverse pair
-          bool found = false;
-          range neighborsOfNeighborRange = equal_range(neighborPtr);
-
-          for (iterator itNeighborOfNeighbor = neighborsOfNeighborRange.first;
-               itNeighborOfNeighbor != neighborsOfNeighborRange.second and not found;
-               ++itNeighborOfNeighbor) {
-
-            if (itNeighborOfNeighbor.getNeighbor() == itemPtr and
-                itNeighborOfNeighbor.getWeight() == weight) {
-              found = true;
-            }
-          }
-          if (not found) {
+          if (not areNeighborsWithWeight(neighborPtr, weight, itemPtr)) {
             B2WARNING(" Neighborhood is not symmetric in " << *itemPtr <<
                       " to " << *neighborPtr);
             result = false;
           }
-
         }
         return result;
       }
@@ -382,7 +335,7 @@ namespace Belle2 {
         for (const Item & item : itemRange) {
           for (const Item & possibleNeighbor : chooser.getPossibleNeighbors(item, std::begin(itemRange), std::end(itemRange))) {
 
-            Weight weight = chooser.isGoodNeighbor(item, possibleNeighbor);
+            NeighborWeight weight = chooser.isGoodNeighbor(item, possibleNeighbor);
 
             if (not isNotANeighbor(weight)) {
               // The neighborhood takes references and keeps them

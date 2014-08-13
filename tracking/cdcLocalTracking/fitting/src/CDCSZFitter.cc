@@ -147,6 +147,30 @@ namespace {
 
 
 
+void CDCSZFitter::update(const CDCAxialStereoSegmentPair& axialStereoSegmentPair) const
+{
+  const CDCStereoRecoSegment2D* ptrStereoSegment = axialStereoSegmentPair.getStereoSegment();
+  const CDCAxialRecoSegment2D* ptrAxialSegment = axialStereoSegmentPair.getAxialSegment();
+
+  if (not ptrStereoSegment or not ptrAxialSegment) return;
+
+  const CDCStereoRecoSegment2D& stereoSegment = *ptrStereoSegment;
+  const CDCAxialRecoSegment2D& axialSegment = *ptrAxialSegment;
+  const CDCTrajectory2D& axialTrajectory2D = axialSegment.getTrajectory2D();
+
+  CDCTrajectorySZ trajectorySZ;
+  trajectorySZ.clear();
+
+  update(trajectorySZ, stereoSegment, axialTrajectory2D);
+
+  CDCTrajectory3D trajectory3D(axialTrajectory2D, trajectorySZ);
+
+  axialStereoSegmentPair.setTrajectory3D(trajectory3D);
+
+}
+
+
+
 
 void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ,
                          const CDCStereoRecoSegment2D& stereoSegment,

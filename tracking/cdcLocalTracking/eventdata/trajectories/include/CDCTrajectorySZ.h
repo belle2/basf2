@@ -17,7 +17,7 @@
 
 #include <tracking/cdcLocalTracking/geometry/Vector2D.h>
 #include <tracking/cdcLocalTracking/geometry/Vector3D.h>
-#include <tracking/cdcLocalTracking/geometry/Line2D.h>
+#include <tracking/cdcLocalTracking/geometry/UncertainSZLine.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {
@@ -38,6 +38,12 @@ namespace Belle2 {
 
 
       /// Constructs the trajectory from the given two dimensional sz line.
+      CDCTrajectorySZ(const UncertainSZLine& szLine) :
+        m_szLine(szLine)
+      {;}
+
+
+      /// Constructs the trajectory from the given two dimensional sz line.
       CDCTrajectorySZ(const Line2D& szLine) :
         m_szLine(szLine)
       {;}
@@ -53,7 +59,7 @@ namespace Belle2 {
       CDCTrajectorySZ(const FloatType& n0,
                       const FloatType& n1,
                       const FloatType& n2) :
-        m_szLine(n0, n1, n2)
+        m_szLine(Line2D(n0, n1, n2))
       { if (not getSZLine().alignedWithFirst()) m_szLine.reverse();}   // make the orientation to be forward with s ( important for the right sign of the distances)
 
       /// Empty destructor
@@ -89,7 +95,8 @@ namespace Belle2 {
       { return getSZLine().distance(Vector2D(s, z)) ; }
 
       /// Gets the slope over the travel distance coordinate
-      inline  FloatType getSZSlope() const { return getSZLine().slope(); }
+      inline  FloatType getSZSlope() const
+      { return getSZLine().slope(); }
 
       /// Gets the z coordinate at zero travel distance
       /** This gives the z position at the start point ( zero travel distance ) */
@@ -107,12 +114,17 @@ namespace Belle2 {
       { m_szLine.passiveMoveAlongFirst(deltaS); }
 
       /// Getter for the line in sz space
-      const Line2D& getSZLine() const
+      const UncertainSZLine& getSZLine() const
       { return m_szLine; }
 
       /// Setter for the line in sz space
       void setSZLine(const Line2D& szLine)
       { m_szLine = szLine; }
+
+      /// Setter for the line in sz space
+      void setSZLine(const UncertainSZLine& szLine)
+      { m_szLine = szLine; }
+
 
       /// Setter for slope and intercept of the line
       void setSlopeIntercept(const FloatType& szSlope, const FloatType& startZ)
@@ -135,7 +147,7 @@ namespace Belle2 {
       { m_szLine.setNull(); }
 
     private:
-      Line2D m_szLine; ///< Memory for the line representation
+      UncertainSZLine m_szLine; ///< Memory for the line representation
 
       /// ROOT Macro to make CDCTrajectorySZ a ROOT class.
       ClassDefInCDCLocalTracking(CDCTrajectorySZ, 1);
@@ -143,4 +155,4 @@ namespace Belle2 {
     }; //class
   } // namespace CDCLocalTracking
 } // namespace Belle2
-#endif // CDCTRAJECTORYSZ
+#endif // CDCTRAJECTORYSZ_H

@@ -114,6 +114,7 @@ TEST_F(CDCLocalTrackingTest, WireSkew)
 
   FloatType skewByICLayer[CDCWireTopology::N_LAYERS];
   FloatType stereoAngleByICLayer[CDCWireTopology::N_LAYERS];
+  FloatType refPolarRByICLayer[CDCWireTopology::N_LAYERS];
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
   for (const CDCWireLayer & wireLayer : theWireTopology.getWireLayers()) {
@@ -122,13 +123,19 @@ TEST_F(CDCLocalTrackingTest, WireSkew)
     const CDCWire& firstWire = wireLayer.first();
     skewByICLayer[iCLayer] = firstWire.getSkew();
     stereoAngleByICLayer[iCLayer] = firstWire.getStereoAngle();
+    refPolarRByICLayer[iCLayer] = firstWire.getRefPolarR();
 
     for (const CDCWire & wire : wireLayer) {
       EXPECT_NEAR(skewByICLayer[iCLayer], wire.getSkew(), 10e-7);
       EXPECT_NEAR(stereoAngleByICLayer[iCLayer], wire.getStereoAngle(), 10e-7);
+      EXPECT_NEAR(refPolarRByICLayer[iCLayer], wire.getRefPolarR(), 10e-7);
     }
 
-    B2INFO("ICLayer : " << iCLayer << " Skew : " << skewByICLayer[iCLayer] << " Stereo angle : " << stereoAngleByICLayer[iCLayer]);
+    B2INFO("ICLayer : " << iCLayer <<
+           " Skew : " << skewByICLayer[iCLayer] <<
+           " Stereo angle : " << stereoAngleByICLayer[iCLayer] <<
+           " Ref. polarR " << refPolarRByICLayer[iCLayer]
+          );
 
   }
 

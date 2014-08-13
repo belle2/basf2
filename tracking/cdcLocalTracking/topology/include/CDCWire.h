@@ -209,6 +209,9 @@ namespace Belle2 {
       /// Getter for the vector pointing from the back end ofthe wire to the front end of the wire
       Vector3D getWireVector() const { return getSkewLine().tangential3D(); }
 
+      /// Getter for the polar radius at the wire reference position
+      FloatType getRefPolarR() const { return getRefPos2D().norm(); }
+
       /// Getter for the closest distance to the beamline ( z-axes )
       FloatType getMinPolarR() const { return getRefPos2D().norm(); }
 

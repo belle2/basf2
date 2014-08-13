@@ -11,16 +11,16 @@
 #ifndef CELLULARPATHFOLLOWER_H_
 #define CELLULARPATHFOLLOWER_H_
 
-#include<vector>
-
-#include <framework/logging/Logger.h>
+#include <tracking/cdcLocalTracking/algorithms/WeightedNeighborhood.h>
+#include <tracking/cdcLocalTracking/algorithms/AutomatonCell.h>
 
 #include <tracking/cdcLocalTracking/algorithms/CellWeight.h>
 #include <tracking/cdcLocalTracking/algorithms/NeighborWeight.h>
 
-#include <tracking/cdcLocalTracking/algorithms/AutomatonCell.h>
-#include <tracking/cdcLocalTracking/algorithms/WeightedNeighborhood.h>
+#include <framework/logging/Logger.h>
 
+#include <vector>
+#include <limits>
 
 namespace Belle2 {
 

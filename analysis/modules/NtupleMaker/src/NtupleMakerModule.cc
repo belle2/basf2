@@ -30,18 +30,25 @@ int NtupleMakerModule::m_nTrees = 0;
 NtupleMakerModule::NtupleMakerModule() : Module()
 {
   m_tree = NULL;
+  m_nCands = 0;
+  m_iCand = 0;
+
   //Set module properties
   setDescription("Make a TTree with the properties of selected decay products. See https://belle2.cc.kek.jp/~twiki/bin/view/Physics/NtupleMaker for an introduction.");
   //Parameter definition
-  addParam("fileName", m_fileName, "Name of ROOT file for output", string("test.root"));
-  addParam("treeName", m_treeName, "Name of TTree to be filled.", string("test"));
-  addParam("comment", m_comment, "Comment about the content of the TTree.", string("No comment."));
+  addParam("fileName", m_fileName, "Name of ROOT file for output", string(""));
+  addParam("treeName", m_treeName, "Name of TTree to be filled.", string(""));
+  addParam("comment", m_comment, "Comment about the content of the TTree.", string(""));
   addParam("tools", m_toolNames, "List of tools and decay descriptors. Available tools are described in https://belle2.cc.kek.jp/~twiki/bin/view/Physics/NtupleTool", vector<string>());
   addParam("listName", m_listName, "Name of particle list with reconstructed particles.", string(""));
 }
 
 void NtupleMakerModule::initialize()
 {
+  if (m_fileName.empty() && m_treeName.empty()) {
+    B2FATAL("Invalid inputs. Please set a vaild root output file name (fileName) or valid TTree name (treeName) module parameters.");
+  }
+
   // Initializing the output root file
   if (!m_file) m_file = new TFile(m_fileName.c_str(), "RECREATE");
   if (!m_file->IsOpen()) {
@@ -50,6 +57,9 @@ void NtupleMakerModule::initialize()
   }
 
   m_file->cd();
+
+  if (m_treeName.empty())
+    return;
 
   // check if TTree with that name already exists
   if (m_file->Get(m_treeName.c_str())) {
@@ -74,25 +84,23 @@ void NtupleMakerModule::initialize()
     if (ntool) m_tools.push_back(ntool);
   }
 
-  // book two variables in the data store to save the number of
-  //  candidates per event and the current candidate index
-  StoreObjPtr< TParameter<Int_t> >::registerTransient(m_treeName + "_nCands");
-  StoreObjPtr< TParameter<Int_t> >::registerTransient(m_treeName + "_iCand");
+  // Add by default 2 Branches to each tree
+  // number of candidates in the event
+  // candidate index
+  m_tree->Branch("nCands", &m_nCands, "m_nCands/I");
+  m_tree->Branch("iCand",  &m_iCand,  "m_iCand/I");
 }
 
 void NtupleMakerModule::event()
 {
+  if (m_treeName.empty())
+    return;
+
+  m_nCands = 0;
+  m_iCand  = 0;
+
   // number of NtupleTools
   int nTools = m_tools.size();
-
-  // Number of candidates in this event?
-  StoreObjPtr< TParameter<int> > nCands(m_treeName + "_nCands");
-  nCands.create();
-  nCands->SetVal(-1);
-  // candidate index?
-  StoreObjPtr< TParameter<int> > iCand(m_treeName + "_iCand");
-  iCand.create();
-  iCand->SetVal(-1);
 
   // If no particle list name is specified, just call every
   // ntuple Tool with a NULL pointer for the particle argument
@@ -111,9 +119,9 @@ void NtupleMakerModule::event()
     return;
   }
 
-  nCands->SetVal(particlelist->getListSize());
+  m_nCands = particlelist->getListSize();
   for (unsigned i = 0; i < particlelist->getListSize(); i++) {
-    iCand->SetVal(i);
+    m_iCand = int(i);
     const Particle* b = particlelist->getParticle(i);
     // loop over all NtupleTools and fill the tree
     for (int iTool = 0; iTool < nTools; ++iTool) m_tools[iTool].eval(b);
@@ -123,14 +131,16 @@ void NtupleMakerModule::event()
 
 void NtupleMakerModule::terminate()
 {
+  if (m_nTrees == 0) {
+    B2INFO("Close file " << m_fileName);
+    m_file->Close();
+    m_file = NULL;
+    return;
+  }
+
   B2INFO("Terminate TTree " << m_treeName);
   m_file->cd();
   m_tree->Write();
   m_nTrees--;
   B2INFO("Remaining unsaved Trees: " << m_nTrees);
-  if (m_nTrees == 0) {
-    B2INFO("Close file " << m_fileName);
-    m_file->Close();
-    m_file = NULL;
-  }
 }

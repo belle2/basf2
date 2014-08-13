@@ -104,7 +104,14 @@ namespace Belle2 {
           return nullptr;
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
-        auto func = [var, daughterNumber](const Particle * particle) -> double { return var->function(particle->getDaughter(daughterNumber)); };
+        auto func = [var, daughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (daughterNumber >= int(particle->getNDaughters()))
+            return -999;
+          else
+            return var->function(particle->getDaughter(daughterNumber));
+        };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function daughter");

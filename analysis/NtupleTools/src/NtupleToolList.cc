@@ -64,9 +64,13 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   }
 
   B2INFO(" -> creating Ntuple tool: " << strToolName);
+
+  // print out options in the individual tools if neccessary
+  /*
   if (strOption.compare(std::string("")) != 0) {
     B2INFO("   -> using these options: " << strOption);
   }
+  */
 
   if (strToolName.compare("Kinematics") == 0) return new NtupleKinematicsTool(tree, d);
   else if (strToolName.compare("CMSKinematics") == 0) return new NtupleCMSKinematicsTool(tree, d);

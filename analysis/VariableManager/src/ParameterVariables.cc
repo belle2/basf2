@@ -40,10 +40,18 @@ namespace Belle2 {
 
     double daughterInvariantMass(const Particle* particle, const std::vector<double>& daughter_indexes)
     {
+      if (!particle)
+        return 0.0;
+
       TLorentzVector sum;
       const std::vector<Particle*> daughters = particle->getDaughters();
+      int nDaughters = int(daughters.size());
+
       for (auto & double_daughter : daughter_indexes) {
         int daughter = static_cast<int>(double_daughter + 0.5);
+        if (daughter >= nDaughters)
+          return 0.0;
+
         sum += daughters[daughter]->get4Vector();
       }
 
@@ -53,12 +61,18 @@ namespace Belle2 {
     // Decay Kinematics -------------------------------------------------------
     double particleDecayAngle(const Particle* particle, const std::vector<double>& daughters)
     {
+      if (!particle)
+        return 0.0;
+
       double result = 0.0;
 
       TLorentzVector motherMomentum = particle->get4Vector();
       TVector3       motherBoost    = -(motherMomentum.BoostVector());
 
       int daughter = static_cast<int>(daughters[0] + 0.5);
+      if (daughter >= int(particle->getNDaughters()))
+        return 0.0;
+
       TLorentzVector daugMomentum = particle->getDaughter(daughter)->get4Vector();
       daugMomentum.Boost(motherBoost);
 
@@ -69,11 +83,18 @@ namespace Belle2 {
 
     double particleDaughterAngle(const Particle* particle, const std::vector<double>& daughters)
     {
-      if (particle->getNDaughters() != 2)
+      if (!particle)
+        return 0.0;
+
+      int nDaughters = int(particle->getNDaughters());
+      if (nDaughters != 2)
         return 0.0;
 
       int daughter1 = static_cast<int>(daughters[0] + 0.5);
       int daughter2 = static_cast<int>(daughters[1] + 0.5);
+      if (daughter1 >= nDaughters || daughter2 >= nDaughters)
+        return 0.0;
+
       const TVector3 a = particle->getDaughter(daughter1)->getMomentum();
       const TVector3 b = particle->getDaughter(daughter2)->getMomentum();
       return cos(a.Angle(b));

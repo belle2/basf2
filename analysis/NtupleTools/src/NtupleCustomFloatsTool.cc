@@ -3,7 +3,7 @@
 * Copyright(C) 2010 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Christian Oswald                                         *
+* Contributors: Christian Oswald, Anze Zupanc                            *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -12,6 +12,7 @@
 #include <framework/logging/Logger.h>
 #include <TBranch.h>
 #include <boost/algorithm/string.hpp>
+#include <boost/regex.hpp>
 
 using namespace Belle2;
 using namespace std;
@@ -23,7 +24,7 @@ void NtupleCustomFloatsTool::setupTree()
   if (m_strOption.empty()) {
     B2ERROR("No variables specified for the NtupleCustomFloatsTool!");
   }
-  B2INFO("Option is: " << m_strOption);
+  //B2INFO("Option is: " << m_strOption);
   boost::split(m_strVarNames, m_strOption, boost::is_any_of(":"));
 
   int nVars = m_strVarNames.size();
@@ -47,11 +48,31 @@ void NtupleCustomFloatsTool::setupTree()
       string varName = m_strVarNames[iVar];
       varName.erase(std::remove(varName.begin(), varName.end(), '('), varName.end());
       varName.erase(std::remove(varName.begin(), varName.end(), ')'), varName.end());
-      // TODO: remove getExtraInfo etx from the name
-      //varName.erase(std::remove(varName.begin(), varName.end(), 'getExtraInfo'), varName.end());
+      varName.erase(std::remove(varName.begin(), varName.end(), ','), varName.end());
+
+      // getExtraInfoVariableName -> VariableName
+      boost::erase_all(varName, "getExtraInfo");
+
+      // daughter0VariableName -> d0_VariableName
+      boost::regex re("daughter([0-9])");
+      varName = boost::regex_replace(varName, re, "d$1_");
+
+      // daughterInvariantMass01 -> d01_M
+      re = boost::regex("daughterInvariantMass(\\d+)");
+      varName = boost::regex_replace(varName, re, "d$1_M");
+
+      // decayAngle0 -> d0_decayAngle
+      re = boost::regex("decayAngle([0-9])");
+      varName = boost::regex_replace(varName, re, "d$1_decayAngle");
+
+      // daughterAngle01 -> d01_angle
+      re = boost::regex("daughterAngle(\\d+)");
+      varName = boost::regex_replace(varName, re, "d$1_angle");
 
       varName = (strNames[iProduct] + "__" + varName);
       m_tree->Branch(varName.c_str(), &m_fVars[iPos], (varName + "/F").c_str());
+
+      B2INFO("   " << iPos << ") " << m_strVarNames[iVar] << " -> " << varName);
     }
   }
 }

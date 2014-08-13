@@ -3,7 +3,7 @@
 * Copyright(C) 2010 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Christian Oswald                                         *
+* Contributors: Christian Oswald, Anze Zupanc                            *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -27,32 +27,49 @@ namespace Belle2 {
   to a TTree. A ParticleList of reconstructed particles (e.g. B mesons)
   needs to be provided. The properties of any daughter of the provided
   particles can be written to the TTree. The daughters are
-  selected with a string parameter, e.g. 'B -> D ^pi (D -> ^K ^pi)'. This
+  selected with a string parameter, e.g. 'B+ -> [anti-D0 -> ^K+ ^pi-] ^pi+'. This
   string will be converted to a DecayDescriptor object by a separate
   parser object (not implemented yet). The properties of the selected
   daughters (momentum, mass, etc.) are evaluated by NtupleTool objects. */
   class NtupleMakerModule : public Module {
   private:
+
     /** Name of ROOT file for output. */
     std::string m_fileName;
+
     /** ROOT file for output. */
     static TFile* m_file;
+
     /** Number of TTrees which are not yet written to TFile. */
     static int m_nTrees;
+
     /** Name of the TTree. */
     std::string m_treeName;
+
     /** Comment about the content of the TTree */
     std::string m_comment;
+
     /** The ROOT TTree for output. */
     TTree* m_tree;
+
     /** Parameter provided by basf2 script: ntuple tool, decay string, ntuple tool, decay string.... */
     std::vector<std::string> m_toolNames;
+
     /** Output Tools */
     boost::ptr_vector<NtupleFlatTool> m_tools;
+
     /** List of the DecayDescriptor objects corresponding to the m_tools. */
     std::vector<DecayDescriptor> m_decaydescriptors;
+
     /** Name of particle list with reconstructed particles. */
     std::string m_listName;
+
+    /** Total number of candidates in given event */
+    int m_nCands;
+
+    /** Candidate index */
+    int m_iCand;
+
   public:
     /** Constructor. */
     NtupleMakerModule();

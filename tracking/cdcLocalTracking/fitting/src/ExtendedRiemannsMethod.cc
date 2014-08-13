@@ -187,11 +187,16 @@ namespace {
 
       } else {
         Matrix< FloatType, 4, 4 > X = sumMatrix.block<4, 4>(0, 0);
+        //B2INFO("Matrix is :" << endl << X);
+
         SelfAdjointEigenSolver< Matrix<FloatType, 4, 4> > eigensolver(X);
         Matrix<FloatType, 4, 1> n = eigensolver.eigenvectors().col(0);
         if (eigensolver.info() != Success) {
           B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
         }
+
+        //B2INFO("Eigenvalues are :" << endl << eigensolver.eigenvalues());
+        //B2INFO("Eigenvector is :" << endl << n);
         return PerigeeCircle::fromN(n(iW), n(iX), n(iY), n(iR2));
 
       }
@@ -390,12 +395,6 @@ UncertainPerigeeCircle ExtendedRiemannsMethod::fit(CDCObservations2D& observatio
   // The same as above without drift lengths
   Matrix<FloatType, 4, 4> sNoL = s.block<4, 4>(0, 0);
 
-  // Matrix of averages
-  //Matrix< FloatType, 4, 4> aNoL = sNoL / sNoL(iW);
-  // Measurement means
-  //Matrix< FloatType, 4, 1> meansNoL = aNoL.row(iW);
-  // Covariance matrix
-  //Matrix< FloatType, 4, 4> cNoL = aNoL - meansNoL * meansNoL.transpose();
 
   // Parameters to be fitted
   UncertainPerigeeCircle resultCircle;
@@ -412,11 +411,21 @@ UncertainPerigeeCircle ExtendedRiemannsMethod::fit(CDCObservations2D& observatio
     perigeeCovariance = calcCovariance(resultCircle, sNoL, isLineConstrained(), isOriginConstrained());
 
   } else {
-    resultCircle = ::fit(sNoL, isLineConstrained(), isOriginConstrained());
-    //Alternative implementations for comparision
-    // if (not isOriginConstrained()){
-    //   resultCircle = fitSeperateOffset(meansNoL, cNoL, isLineConstrained());
-    //}
+    // B2INFO("Fit without drift radii.");
+    if (not isOriginConstrained()) {
+      // Alternative implementation for comparision
+      // Matrix of averages
+      Matrix< FloatType, 4, 4> aNoL = sNoL / sNoL(iW);
+      // Measurement means
+      Matrix< FloatType, 4, 1> meansNoL = aNoL.row(iW);
+      // Covariance matrix
+      Matrix< FloatType, 4, 4> cNoL = aNoL - meansNoL * meansNoL.transpose();
+      // B2INFO("Not origin constrained.");
+      resultCircle = fitSeperateOffset(meansNoL, cNoL, isLineConstrained());
+
+    } else
+      resultCircle = ::fit(sNoL, isLineConstrained(), isOriginConstrained());
+
 
     chi2 = calcChi2(resultCircle, sNoL);
     perigeeCovariance = calcCovariance(resultCircle, sNoL, isLineConstrained(), isOriginConstrained());

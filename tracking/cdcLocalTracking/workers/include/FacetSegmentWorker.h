@@ -27,7 +27,6 @@
 #include <tracking/cdcLocalTracking/eventdata/CDCEventData.h>
 
 #include <tracking/cdcLocalTracking/creators/FacetCreator.h>
-#include <tracking/cdcLocalTracking/creators/TangentSegmentCreator.h>
 
 
 namespace Belle2 {
@@ -49,7 +48,7 @@ namespace Belle2 {
       void initialize() {
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
-        StoreArray < CDCRecoTangentVector >::registerTransient("CDCRecoTangentSegments");
+        StoreArray < CDCRecoTangentSegment >::registerTransient();
         StoreArray < CDCRecoSegment2D >::registerTransient();
         StoreArray < CDCWireHitCluster >::registerTransient();
 #endif
@@ -145,8 +144,9 @@ namespace Belle2 {
 
             //save the tangents for display only
 #ifdef CDCLOCALTRACKING_USE_ROOT
-            B2DEBUG(100, "Reduce the CDCRecoFacetPtrSegment to RecoSegment2D");
-            m_tangentSegmentCreator.create(m_facetPaths, m_recoTangentSegments);
+            for (std::vector<const CDCRecoFacet*> facetPath : m_facetPaths) {
+              m_recoTangentSegments.push_back(CDCRecoTangentSegment::condense(facetPath));
+            }
 #endif
 
             // reduce the CDCRecoFacetPtrSegment directly to the selected vector
@@ -234,7 +234,7 @@ namespace Belle2 {
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
       /// Memory for the tangent segments extracted from the paths
-      std::vector< CDCRecoTangentVector > m_recoTangentSegments;
+      std::vector< CDCRecoTangentSegment > m_recoTangentSegments;
 
       /// Memory for the hit clusters
       std::vector<CDCWireHitCluster> m_clusters;
@@ -294,8 +294,6 @@ namespace Belle2 {
       /// Instance of the cellular automaton path finder
       MultipassCellularPathFinder<CDCRecoFacet> m_cellularPathFinder;
 
-      /// Instance of the tangent segment creator.
-      TangentSegmentCreator m_tangentSegmentCreator;
 
     }; // end class FacetSegmentWorker
   } //end namespace CDCLocalTracking

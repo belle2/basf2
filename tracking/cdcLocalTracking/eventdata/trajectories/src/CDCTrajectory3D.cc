@@ -61,6 +61,26 @@ void CDCTrajectory3D::setPosMom3D(const Vector3D& pos3D,
 }
 
 
+void CDCTrajectory3D::fillInto(genfit::TrackCand& trackCand) const
+{
+  Vector3D position = getSupport();
+  Vector3D momentum = getMom3DAtSupport();
+
+  // The initial covariance matrix is calculated from these errors and it is important (!!) that it is not completely wrong - took them from Oksana
+  // Currently unused
+  TVector3 posError;
+  posError.SetXYZ(2.0, 2.0, 2.0);
+  TVector3 momError;
+  momError.SetXYZ(0.1, 0.1, 0.5);
+
+  // Set the start parameters
+  SignType q = getChargeSign();
+  trackCand.setPosMomSeed(position, momentum, q);
+
+}
+
+
+
 
 SignType CDCTrajectory3D::getChargeSign() const
 {

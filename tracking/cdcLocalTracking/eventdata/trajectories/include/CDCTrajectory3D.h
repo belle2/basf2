@@ -27,6 +27,7 @@
 #include "CDCTrajectory2D.h"
 #include "CDCTrajectorySZ.h"
 
+#include "genfit/TrackCand.h"
 
 namespace Belle2 {
 
@@ -74,6 +75,10 @@ namespace Belle2 {
       bool isNull() const
       { return m_localHelix.isNull(); }
 
+
+    public:
+      /// Copies the trajectory information to the Genfit track candidate
+      void fillInto(genfit::TrackCand& trackCand) const;
 
 
     public:

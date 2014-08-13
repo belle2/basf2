@@ -87,11 +87,11 @@ namespace Belle2 {
       FloatType calcPerpSBetween(const Vector2D& fromPoint, const Vector2D& toPoint) const
       { return getLocalCircle().lengthOnCurve(fromPoint - getLocalOrigin(), toPoint - getLocalOrigin()); }
 
-      /// Gives the three dimensional point which is on the skew line as well as on the circle in the xy projection
-      /** This method makes the reconstruction of the z coordinate possble by using the skewness \n
+      /// Gives the three dimensional point which is on the skew line and has the given proper (signed) distance to the circle in the xy projection
+      /** This method makes the reconstruction of the z coordinate possible by using the skewness \n
        *  stereo layer of the stereo wires.  The point is determined such that it is on the given \n
-       *  skew line as well as on the circular trajector in the xy projection. */
-      Vector3D reconstruct3D(const BoundSkewLine& skewLine) const;
+       *  skew line and has the (signed) distance given as optional second parameter to the circular trajectory in the xy projection. */
+      Vector3D reconstruct3D(const BoundSkewLine& skewLine, const FloatType& distance = 0.0) const;
 
     public:
       /// Calculates the closest approach on the trajectory to the global origin

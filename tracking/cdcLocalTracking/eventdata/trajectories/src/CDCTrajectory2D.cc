@@ -82,30 +82,29 @@ FloatType CDCTrajectory2D::getAbsMom2D() const
 
 
 
-Vector3D CDCTrajectory2D::reconstruct3D(const BoundSkewLine& globalSkewLine) const
+Vector3D CDCTrajectory2D::reconstruct3D(const BoundSkewLine& globalSkewLine, const FloatType& distance) const
 {
   Vector2D globalRefPos2D = globalSkewLine.refPos2D();
   PerigeeCircle globalCircle = getGlobalCircle();
 
-  FloatType firstorder = globalCircle.fastDistance(globalRefPos2D);
+  // Translate the proper distance to the linearized distances measure
+  FloatType fastDistance = distance != 0.0 ? globalCircle.fastDistance(distance) : 0.0;
+
+  FloatType firstOrder = globalCircle.fastDistance(globalRefPos2D) - fastDistance;
 
   FloatType crossComponent = globalRefPos2D.cross(globalCircle.n12());
   FloatType quadraticComponent = globalRefPos2D.normSquared() * globalCircle.n3();
 
   const FloatType& a = quadraticComponent;
   const FloatType& b = crossComponent;
-  const FloatType& c = firstorder;
+  const FloatType& c = firstOrder;
 
   std::pair<FloatType, FloatType> solutionsSkewTimesDeltaZ = solveQuadraticABC(a, b, c);
-
-  //std::pair<FloatType,FloatType> invSolutions = CDCLocalTracking::solveQuadraticPQ(crossComponent, firstorder*quadraticComponent);
-  //FloatType deltaZTimesSkew = firstorder / invSolutions.first;
 
   // Take the solution with the smaller deviation from the reference position
   const FloatType& smallerSolution = solutionsSkewTimesDeltaZ.second;
 
   return globalSkewLine.pos3DAtDeltaZTimesSkew(smallerSolution);
-
 }
 
 

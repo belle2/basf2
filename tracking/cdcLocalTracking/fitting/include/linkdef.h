@@ -22,6 +22,8 @@
 #pragma link C++ class Belle2::CDCLocalTracking::CDCRiemannFitter+;
 #pragma link C++ class Belle2::CDCLocalTracking::CDCKarimakiFitter+;
 
+#pragma link C++ class Belle2::CDCLocalTracking::CDCAxialStereoFusion+;
+
 #pragma link C++ class Belle2::CDCLocalTracking::CDCSZFitter+;
 
 #endif

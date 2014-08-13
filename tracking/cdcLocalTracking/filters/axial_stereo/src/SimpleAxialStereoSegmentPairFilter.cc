@@ -151,7 +151,7 @@ const CDCTrajectory3D& SimpleAxialStereoSegmentPairFilter::getFittedTrajectory3D
   getFittedTrajectory2D(startSegment);
   getFittedTrajectory2D(endSegment);
 
-  fuseTrajectories(axialStereoSegmentPair);
+  CDCAxialStereoFusion::fuseTrajectories(axialStereoSegmentPair);
   return axialStereoSegmentPair.getTrajectory3D();
 
 }

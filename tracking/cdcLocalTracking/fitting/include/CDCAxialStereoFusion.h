@@ -23,14 +23,22 @@
 namespace Belle2 {
   namespace CDCLocalTracking {
 
-    TMatrixD calcAmbiguity(const CDCRecoSegment2D& segment,
-                           const CDCTrajectory2D& trajectory2D);
+    class CDCAxialStereoFusion : public UsedTObject {
 
-    CDCTrajectory3D fuseTrajectories(const CDCRecoSegment2D& startSegment,
-                                     const CDCRecoSegment2D& endSegment);
+    public:
+      static TMatrixD calcAmbiguity(const CDCRecoSegment2D& segment,
+                                    const CDCTrajectory2D& trajectory2D);
 
-    void fuseTrajectories(const CDCAxialStereoSegmentPair& axialStereoSegmentPair);
+      static CDCTrajectory3D fuseTrajectories(const CDCRecoSegment2D& startSegment,
+                                              const CDCRecoSegment2D& endSegment);
 
+      static void fuseTrajectories(const CDCAxialStereoSegmentPair& axialStereoSegmentPair);
+
+    public:
+      /** ROOT Macro to make CDCAxialStereoFusion a ROOT class.*/
+      ClassDefInCDCLocalTracking(CDCAxialStereoFusion, 1);
+
+    }; // end class
   } // end namespace CDCLocalTracking
 } // namespace Belle2
 #endif // CDCAXIALSTEREOFUSION_H

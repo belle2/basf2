@@ -15,8 +15,8 @@ using namespace Belle2;
 using namespace CDCLocalTracking;
 
 
-TMatrixD CDCLocalTracking::calcAmbiguity(const CDCRecoSegment2D& segment,
-                                         const CDCTrajectory2D& trajectory2D)
+TMatrixD CDCAxialStereoFusion::calcAmbiguity(const CDCRecoSegment2D& segment,
+                                             const CDCTrajectory2D& trajectory2D)
 {
 
   size_t nHits = segment.size();
@@ -33,8 +33,6 @@ TMatrixD CDCLocalTracking::calcAmbiguity(const CDCRecoSegment2D& segment,
     const Vector2D normal = localCircle.normal(localRecoPos2D);
 
     const Vector3D& wireVector = recoHit2D.getWire().getWireVector();
-
-    // Check sign
     zeta += wireVector.xy().dot(normal) / wireVector.z();
 
   }
@@ -58,8 +56,8 @@ TMatrixD CDCLocalTracking::calcAmbiguity(const CDCRecoSegment2D& segment,
 
 
 
-CDCTrajectory3D CDCLocalTracking::fuseTrajectories(const CDCRecoSegment2D& startSegment,
-                                                   const CDCRecoSegment2D& endSegment)
+CDCTrajectory3D CDCAxialStereoFusion::fuseTrajectories(const CDCRecoSegment2D& startSegment,
+                                                       const CDCRecoSegment2D& endSegment)
 {
 
   if (startSegment.empty()) {
@@ -175,7 +173,7 @@ CDCTrajectory3D CDCLocalTracking::fuseTrajectories(const CDCRecoSegment2D& start
 
 
 
-void CDCLocalTracking::fuseTrajectories(const CDCAxialStereoSegmentPair& axialStereoSegmentPair)
+void CDCAxialStereoFusion::fuseTrajectories(const CDCAxialStereoSegmentPair& axialStereoSegmentPair)
 {
   const CDCRecoSegment2D* ptrStartSegment = axialStereoSegmentPair.getStartSegment();
   const CDCRecoSegment2D* ptrEndSegment = axialStereoSegmentPair.getEndSegment();

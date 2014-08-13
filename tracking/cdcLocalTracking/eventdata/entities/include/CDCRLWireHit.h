@@ -113,6 +113,10 @@ namespace Belle2 {
       Vector2D getRecoPos2D(const CDCTrajectory2D& trajectory2D) const
       { return getWireHit().getRecoPos2D(trajectory2D);}
 
+      /// Reconstruct the three dimensional position (especially of stereo hits)
+      /// by terminating the z coordinate assuming the drift circle touches the two dimensional trajectory in the xy projection.
+      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D) const;
+
       /// Access the object methods and methods from a pointer in the same way.
       /** In situations where the type is not known to be a pointer or a reference there is no way to tell \n
        *  if one should use the dot '.' or operator '->' for method look up. \n

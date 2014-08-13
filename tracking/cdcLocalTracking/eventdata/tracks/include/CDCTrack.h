@@ -18,6 +18,8 @@
 
 #include <tracking/cdcLocalTracking/eventdata/segments/CDCSegments.h>
 
+#include "genfit/TrackCand.h"
+
 namespace Belle2 {
   namespace CDCLocalTracking {
 
@@ -97,6 +99,9 @@ namespace Belle2 {
         // Muon id 13 has negativ charge, so the correctly charged (anti)muon is
         return getChargeSign() * (-13);
       }
+
+      /// Copies the hit and trajectory content of this track to the Genfit track candidate
+      void fillInto(genfit::TrackCand& trackCand) const;
 
       /// Getter for the two dimensional trajectory. Does not account for the forward backward info.
       const CDCTrajectory2D& getStartTrajectory2D() const

@@ -16,7 +16,9 @@
 #include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
 
 //Unpacked version for ROOT dictionary generation
+#include <tracking/cdcLocalTracking/topology/CDCWireUnpackedFromNamespaces.h>
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCEntitiesUnpackedFromNamespaces.h>
+
 
 namespace Belle2 {
   namespace CDCLocalTracking {

@@ -17,6 +17,8 @@
 #pragma link C++ class Belle2::CDCLocalTracking::SortableVector<CDCGenHit>+;
 
 //to use
+#pragma link C++ class Belle2::CDCLocalTracking::SortableVector<CDCWire>+;
+#pragma link C++ class Belle2::CDCLocalTracking::SortableVector<const CDCWire*>+;
 #pragma link C++ class Belle2::CDCLocalTracking::SortableVector<CDCWireHit>+;
 #pragma link C++ class Belle2::CDCLocalTracking::SortableVector<const CDCWireHit *>+;
 #pragma link C++ class Belle2::CDCLocalTracking::SortableVector<CDCRLWireHit>+;

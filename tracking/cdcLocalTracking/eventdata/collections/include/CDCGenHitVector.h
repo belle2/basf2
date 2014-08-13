@@ -88,7 +88,7 @@ namespace Belle2 {
 
     public:
       /// Erases all tracking entities assoziated with specific wire from the vector.
-      void eraseAll(const CDCWire& wire) {
+      void eraseAll(const Belle2::CDCLocalTracking::CDCWire& wire) {
         this->erase(remove_if(this->begin(), this->end(), HasWirePredicate(wire)), this->end());
         //remove erase idiom
       }
@@ -99,7 +99,7 @@ namespace Belle2 {
       }
 
       /// Checks if any stored tracking entity is assoziated with a specific wire.
-      bool hasWire(const CDCWire& wire) const {
+      bool hasWire(const Belle2::CDCLocalTracking::CDCWire& wire) const {
         const_iterator found = std::find_if(this->begin(), this->end(), HasWirePredicate(wire));
         return found != this->end();
       }
@@ -111,7 +111,7 @@ namespace Belle2 {
       }
 
       /// Copy all entities in this collection assoziated with a specific wire to the given collection.
-      void collectForWire(const CDCWire& wire, CDCGenHitVector<T>& collect) const {
+      void collectForWire(const Belle2::CDCLocalTracking::CDCWire& wire, CDCGenHitVector<T>& collect) const {
         input_iterator inputTo = collect.input();
         for (const_iterator itItem = this->begin(); itItem != this->end(); ++itItem) {
           if ((*itItem)->hasWire(wire)) inputTo = *itItem;

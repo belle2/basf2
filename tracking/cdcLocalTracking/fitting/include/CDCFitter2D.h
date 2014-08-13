@@ -49,6 +49,7 @@ namespace Belle2 {
       /// Fits a collection of hits typs which are convertable to observation circles.
       template<class Hits>
       CDCTrajectory2D fit(const Hits& hits) const {
+        //B2INFO("Called generic.");
         CDCTrajectory2D result;
         update(result, hits);
         return result;
@@ -56,6 +57,7 @@ namespace Belle2 {
 
       /// Fits the segment
       CDCTrajectory2D fit(const CDCRecoSegment2D& segment) const {
+        //B2INFO("Called const CDCRecoSegment2D& segment.");
         CDCTrajectory2D result;
         update(result, segment);
         return result;
@@ -63,10 +65,20 @@ namespace Belle2 {
 
       /// Fits to the wire positions
       CDCTrajectory2D fit(const std::vector<const Belle2::CDCLocalTracking::CDCWire*>& wires) const {
+        //B2INFO("Called const std::vector<const Belle2::CDCLocalTracking::CDCWire*>& wires.");
         CDCTrajectory2D result;
         update(result, wires);
         return result;
       }
+
+      /// Fits to the wire positions
+      CDCTrajectory2D fit(const CDCWireHitSegment& wireHits) const {
+        //B2INFO("Called CDCWireSegment wireHits.");
+        CDCTrajectory2D result;
+        update(result, wireHits);
+        return result;
+      }
+
 
 
 

@@ -101,8 +101,10 @@ Vector2D CDCObservations2D::centralize()
 
 Eigen::Matrix<FloatType, 5, 5> CDCObservations2D::getWXYRLSumMatrix()
 {
-  CDCObservations2D::EigenObservationMatrix&&  eigenObservation = getObservationMatrix();
+  CDCObservations2D::EigenObservationMatrix&& eigenObservation = getObservationMatrix();
   size_t nObservations = size();
+
+  //B2INFO("Matrix of observations: " << endl << eigenObservation);
 
   Matrix< FloatType, Dynamic, 5 > projectedPoints(nObservations, 5);
 
@@ -122,6 +124,8 @@ Eigen::Matrix<FloatType, 5, 5> CDCObservations2D::getWXYRLSumMatrix()
   Matrix< FloatType, Dynamic, 5 > weightedProjectedPoints = projectedPoints.array().colwise() * weights;
   Matrix< FloatType, 5, 5 > sumMatrix  =  weightedProjectedPoints.transpose() * projectedPoints;
 
+  //B2INFO("Matrix of sums: " << endl << sumMatrix);
+
   return sumMatrix;
 }
 
@@ -132,7 +136,7 @@ Eigen::Matrix<FloatType, 5, 5> CDCObservations2D::getWXYRLSumMatrix()
 Eigen::Matrix<FloatType, 4, 4> CDCObservations2D::getWXYLSumMatrix()
 {
 
-  CDCObservations2D::EigenObservationMatrix&&  eigenObservation = getObservationMatrix();
+  CDCObservations2D::EigenObservationMatrix&& eigenObservation = getObservationMatrix();
   size_t nObservations = size();
 
   Matrix< FloatType, Dynamic, 4 > projectedPoints(nObservations, 4);
@@ -163,7 +167,7 @@ Eigen::Matrix<FloatType, 4, 4> CDCObservations2D::getWXYLSumMatrix()
 Eigen::Matrix<FloatType, 4, 4> CDCObservations2D::getWXYRSumMatrix()
 {
 
-  CDCObservations2D::EigenObservationMatrix&&  eigenObservation = getObservationMatrix();
+  CDCObservations2D::EigenObservationMatrix&& eigenObservation = getObservationMatrix();
   size_t nObservations = size();
 
   Matrix< FloatType, Dynamic, 4 > projectedPoints(nObservations, 4);
@@ -188,7 +192,7 @@ Eigen::Matrix<FloatType, 4, 4> CDCObservations2D::getWXYRSumMatrix()
 
 Eigen::Matrix<FloatType, 3, 3> CDCObservations2D::getWXYSumMatrix()
 {
-  CDCObservations2D::EigenObservationMatrix&&  eigenObservation = getObservationMatrix();
+  CDCObservations2D::EigenObservationMatrix&& eigenObservation = getObservationMatrix();
   size_t nObservations = size();
 
   Matrix< FloatType, Dynamic, 3 > projectedPoints(nObservations, 3);

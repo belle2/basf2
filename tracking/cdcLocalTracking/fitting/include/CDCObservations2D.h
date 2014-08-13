@@ -73,7 +73,24 @@ namespace Belle2 {
 
 
       /// Appends the observed position - drift radius is assumed to be zero if not given
-      void append(const FloatType& x, const FloatType& y, const FloatType& signedRadius = 0.0, const FloatType& weight = 1.0) {
+      void append(const FloatType& x,
+                  const FloatType& y,
+                  const FloatType& signedRadius = 0.0,
+                  const FloatType& weight = 1.0) {
+
+        if (std::isnan(x)) return;
+        if (std::isnan(y)) return;
+
+        if (std::isnan(signedRadius)) {
+          B2WARNING("Signed radius is nan. Skipping observation");
+          return;
+        }
+
+        if (std::isnan(weight)) {
+          B2WARNING("Weight is nan. Skipping observation");
+          return;
+        }
+
         m_observations.push_back(x);
         m_observations.push_back(y);
         m_observations.push_back(signedRadius);
@@ -142,14 +159,28 @@ namespace Belle2 {
 
       /// Appends all the reference wire positions. Always use position since there is no other mode. For cross check to legendre finder.
       void append(const std::vector<const Belle2::CDCLocalTracking::CDCWire*>& wires,
-                  bool usePosition  __attribute__((unused)) = false) {
+                  bool usePosition  __attribute__((__unused__)) = false) {
         for (const CDCWire * ptrWire : wires) {
           if (not ptrWire) continue;
           const CDCWire& wire = *ptrWire;
           const Vector2D& wirePos = wire.getRefPos2D();
           const FloatType driftLength = 0.0;
           const FloatType weight = 1.0;
-          append(wirePos.y(), wirePos.y(), driftLength, weight);
+          append(wirePos, driftLength, weight);
+        }
+      }
+
+      void append(const CDCWireHitSegment& wireHits, bool usePosition  = false) {
+        for (const CDCWireHit * ptrWireHit : wireHits) {
+          if (not ptrWireHit) continue;
+          const CDCWireHit& wireHit = *ptrWireHit;
+          const Vector2D& wirePos = wireHit.getRefPos2D();
+          const FloatType driftLength = 0.0;
+          // Try out using weighting the observations by the squared drift length.
+          // Reduces the distance measure to a relative measure counting din drift lengths.
+          // Using the squared drift length makes the chi2 unitless.
+          const FloatType sqrtWeight = usePosition ? 1.0 : 1 / wireHit.getRefDriftLength();
+          append(wirePos, driftLength, sqrtWeight * sqrtWeight);
         }
       }
 

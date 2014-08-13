@@ -7,67 +7,44 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef CDCRECOSEGMENT2D_H_
-#define CDCRECOSEGMENT2D_H_
+#ifndef CDCWIREHITSEGMENT_H_
+#define CDCWIREHITSEGMENT_H_
 
 #include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
 #include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
 
-#include <tracking/cdcLocalTracking/eventdata/collections/CDCRecoHit2DVector.h>
-#include "CDCWireHitSegment.h"
+#include <tracking/cdcLocalTracking/eventdata/collections/CDCGenHitVector.h>
+
 
 namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// A segment consisting of two dimensional reconsturcted hits
-    class CDCRecoSegment2D : public CDCRecoHit2DVector {
+    class CDCWireHitSegment :  public CDCGenHitVector<const Belle2::CDCLocalTracking::CDCWireHit*> {
     public:
 
       /// Default constructor for ROOT compatibility.
-      CDCRecoSegment2D() {;}
+      CDCWireHitSegment() {;}
 
       /// Empty deconstructor
-      ~CDCRecoSegment2D() {;}
+      ~CDCWireHitSegment() {;}
 
-      ///Implements the standard swap idiom
-      friend void swap(CDCRecoSegment2D& lhs, CDCRecoSegment2D& rhs) {
-        SortableVector<CDCRecoHit2D>& rawLHS = lhs;
-        SortableVector<CDCRecoHit2D>& rawRHS = rhs;
-        rawLHS.swap(rawRHS);
-        B2DEBUG(200, "CDCRecoSegment::swap");
-      }
+      /// Defines wire hit segments and superlayers to be coaligned.
+      friend bool operator<(const CDCWireHitSegment& wireHitSegment, const CDCWireSuperLayer& wireSuperLayer)
+      { return wireHitSegment.getISuperLayer() < wireSuperLayer.getISuperLayer(); }
 
       /// Defines segments and superlayers to be coaligned.
-      friend bool operator<(const CDCRecoSegment2D& segment, const CDCWireSuperLayer& wireSuperLayer)
-      { return segment.getISuperLayer() < wireSuperLayer.getISuperLayer(); }
-
-      /// Defines segments and superlayers to be coaligned.
-      friend bool operator<(const CDCWireSuperLayer& wireSuperLayer, const CDCRecoSegment2D& segment)
-      { return wireSuperLayer.getISuperLayer() < segment.getISuperLayer(); }
+      friend bool operator<(const CDCWireSuperLayer& wireSuperLayer, const CDCWireHitSegment& wireHitSegment)
+      { return wireSuperLayer.getISuperLayer() < wireHitSegment.getISuperLayer(); }
 
       /// Getter for the vector of wires the hits of this segment are based on in the same order
       std::vector<const Belle2::CDCLocalTracking::CDCWire*> getWireSegment() const {
         std::vector<const Belle2::CDCLocalTracking::CDCWire*> wireSegment;
-        for (const CDCRecoHit2D & recoHit2D : *this) {
-          wireSegment.push_back(&(recoHit2D.getWire()));
+        for (const CDCWireHit * ptrWireHit : *this) {
+          ptrWireHit ? wireSegment.push_back(&(ptrWireHit->getWire())) : wireSegment.push_back(nullptr);
         }
         return wireSegment;
       }
-
-      /// Getter for the vector of wires the hits of this segment are based on in the same order
-      CDCWireHitSegment getWireHitSegment() const {
-        CDCWireHitSegment wireHitSegment;
-        for (const CDCRecoHit2D & recoHit2D : *this) {
-          wireHitSegment.push_back(&(recoHit2D.getWireHit()));
-        }
-        return wireHitSegment;
-      }
-
-      /// Getter for the automaton cell.
-      AutomatonCell& getAutomatonCell() { return m_automatonCell; }
-
-      /// Constant getter for the automaton cell.
-      AutomatonCell& getAutomatonCell() const { return m_automatonCell; }
 
       /// Getter for the two dimensional trajectory fitted to the segment
       CDCTrajectory2D& getTrajectory2D() const
@@ -83,35 +60,31 @@ namespace Belle2 {
 
       /// Reconstructs a point on the attached trajectory close to the front of the segment
       Vector2D getFrontRecoPos2D() const
-      { return front().getFrontRecoPos2D(getTrajectory2D()); }
+      { return front()->getFrontRecoPos2D(getTrajectory2D()); }
 
       /// Reconstructs a point on the given trajectory close to the front of the segment
       Vector2D getFrontRecoPos2D(const CDCTrajectory2D& trajectory2D) const
-      { return front().getFrontRecoPos2D(trajectory2D); }
-
+      { return front()->getFrontRecoPos2D(trajectory2D); }
 
       /// Reconstructs a point on the attached trajectory close to the back of the segment
       Vector2D getBackRecoPos2D() const
-      { return back().getBackRecoPos2D(getTrajectory2D()); }
+      { return back()->getBackRecoPos2D(getTrajectory2D()); }
 
       /// Reconstructs a point on the attached trajectory close to the back of the segment
       Vector2D getBackRecoPos2D(const CDCTrajectory2D& trajectory2D) const
-      { return back().getBackRecoPos2D(trajectory2D); }
+      { return back()->getBackRecoPos2D(trajectory2D); }
 
 
 
     private:
-      mutable AutomatonCell m_automatonCell; ///< Memory for the automaton cell. It is declared mutable because it can vary rather freely despite of the hit content might be required fixed
       mutable CDCTrajectory2D m_trajectory2D; ///< Memory for the two dimensional trajectory fitted to this segment
 
     private:
-      /// ROOT Macro to make CDCRecoSegment2D a ROOT class.
-      ClassDefInCDCLocalTracking(CDCRecoSegment2D, 1);
-
-
+      /// ROOT Macro to make CDCWireHitSegment a ROOT class.
+      ClassDefInCDCLocalTracking(CDCWireHitSegment, 1);
 
     }; //end class CDCRecoSegment2D
 
   } // end namespace CDCLocalTracking
 } // end namespace Belle2
-#endif // CDCRECOSEGMENT2D_H_
+#endif // CDCWIREHITSEGMENT_H_

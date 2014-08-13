@@ -11,6 +11,7 @@
 #define CDCSEGMENTS_H
 
 #include "CDCWireHitCluster.h"
+#include "CDCWireHitSegment.h"
 #include "CDCRecoSegment2D.h"
 #include "CDCRecoSegment3D.h"
 

@@ -20,7 +20,7 @@
 #pragma link C++ class Belle2::CDCLocalTracking::SortableVector<CDCWire>+;
 #pragma link C++ class Belle2::CDCLocalTracking::SortableVector<const CDCWire*>+;
 #pragma link C++ class Belle2::CDCLocalTracking::SortableVector<CDCWireHit>+;
-#pragma link C++ class Belle2::CDCLocalTracking::SortableVector<const CDCWireHit *>+;
+#pragma link C++ class Belle2::CDCLocalTracking::SortableVector<const CDCWireHit*>+;
 #pragma link C++ class Belle2::CDCLocalTracking::SortableVector<CDCRLWireHit>+;
 #pragma link C++ class Belle2::CDCLocalTracking::SortableVector<CDCRecoHit2D>+;
 #pragma link C++ class Belle2::CDCLocalTracking::SortableVector<CDCRecoTangent>+;

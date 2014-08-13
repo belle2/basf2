@@ -16,7 +16,6 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <tracking/cdcLocalTracking/algorithms/WeightedNeighborhood.h>
-#include <tracking/cdcLocalTracking/algorithms/NeighborhoodBuilder.h>
 
 #include <tracking/cdcLocalTracking/algorithms/Clusterizer.h>
 #include <tracking/cdcLocalTracking/algorithms/MultipassCellularPathFinder.h>
@@ -51,14 +50,14 @@ namespace Belle2 {
         StoreArray < CDCTrack >::registerTransient("CDCTracks");
 #endif
         m_segmentTripleCreator.initialize();
-        m_segmentTriple_neighborhoodBuilder.initialize();
+        m_segmentTripleNeighborChooser.initialize();
 
       }
 
       /// Forwards the terminate method of the module to the segment creator and the neighborhood builder
       void terminate() {
         m_segmentTripleCreator.terminate();
-        m_segmentTriple_neighborhoodBuilder.terminate();
+        m_segmentTripleNeighborChooser.terminate();
       }
 
 
@@ -75,7 +74,7 @@ namespace Belle2 {
         //create the segment triple neighorhood
         B2DEBUG(100, "Creating the CDCSegmentTriple neighborhood");
         m_segmentTripleNeighborhood.clear();
-        m_segmentTriple_neighborhoodBuilder.create(m_segmentTriples, m_segmentTripleNeighborhood);
+        m_segmentTripleNeighborhood.createUsing(m_segmentTripleNeighborChooser, m_segmentTriples);
         B2DEBUG(100, "  Created " << m_segmentTripleNeighborhood.size()  << " SegmentTripleNeighborhoods");
 
         //multiple passes if growMany is active and one track is created at a time
@@ -157,9 +156,8 @@ namespace Belle2 {
       /// Instance of the segment triple creator
       SegmentTripleCreator<AxialAxialSegmentPairFilter, SegmentTripleFilter> m_segmentTripleCreator;
 
-      //neighborhood builders
-      /// Instance of the segment triple neighborhoos builder
-      NeighborhoodBuilder <CDCSegmentTriple, SegmentTripleNeighborChooser > m_segmentTriple_neighborhoodBuilder;
+      /// Instance of the segment triple neighbor chooser
+      SegmentTripleNeighborChooser m_segmentTripleNeighborChooser;
 
       //cellular automat
       /// Instance of the cellular automaton.

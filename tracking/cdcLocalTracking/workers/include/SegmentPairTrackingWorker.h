@@ -16,7 +16,6 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <tracking/cdcLocalTracking/algorithms/WeightedNeighborhood.h>
-#include <tracking/cdcLocalTracking/algorithms/NeighborhoodBuilder.h>
 
 #include <tracking/cdcLocalTracking/algorithms/Clusterizer.h>
 #include <tracking/cdcLocalTracking/algorithms/MultipassCellularPathFinder.h>
@@ -56,7 +55,7 @@ namespace Belle2 {
 #endif
 
         m_axialStereoSegmentPairCreator.initialize();
-        m_axialStereoSegmentPairNeighborhoodBuilder.initialize();
+        m_axialStereoSegmentPairNeighborChooser.initialize();
 
       }
 
@@ -65,7 +64,7 @@ namespace Belle2 {
       /// Forwards the terminate method of the module to the segment creator and the neighborhood builder.
       void terminate() {
         m_axialStereoSegmentPairCreator.terminate();
-        m_axialStereoSegmentPairNeighborhoodBuilder.terminate();
+        m_axialStereoSegmentPairNeighborChooser.terminate();
       }
 
 
@@ -83,7 +82,7 @@ namespace Belle2 {
         //create the segment pair neighborhood
         B2DEBUG(100, "Creating the CDCAxialStereoSegmentPair neighborhood");
         m_axialStereoSegmentPairNeighborhood.clear();
-        m_axialStereoSegmentPairNeighborhoodBuilder.create(m_axialStereoSegmentPairs, m_axialStereoSegmentPairNeighborhood);
+        m_axialStereoSegmentPairNeighborhood.createUsing(m_axialStereoSegmentPairNeighborChooser, m_axialStereoSegmentPairs);
         B2DEBUG(100, "  Created " << m_axialStereoSegmentPairNeighborhood.size()  << " AxialStereoPairNeighborhoods");
 
         //multiple passes if growMany is active and one track is created at a time
@@ -166,11 +165,8 @@ namespace Belle2 {
       /// Instance of the axial stereo segment pair creator.
       AxialStereoSegmentPairCreator<AxialStereoSegmentPairFilter> m_axialStereoSegmentPairCreator;
 
-      //neighborhood builders
-      /// Instance of the axial stereo pair neighborhoods builder
-      NeighborhoodBuilder <CDCAxialStereoSegmentPair, AxialStereoSegmentPairNeighorChooser > m_axialStereoSegmentPairNeighborhoodBuilder;
-
-
+      /// Instance of the axial stereo pair neighbor chooser
+      AxialStereoSegmentPairNeighorChooser m_axialStereoSegmentPairNeighborChooser;
 
       //cellular automat
       /// Instance of the cellular automaton.

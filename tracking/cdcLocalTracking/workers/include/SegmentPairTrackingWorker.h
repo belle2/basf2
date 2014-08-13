@@ -28,8 +28,6 @@
 #include <tracking/cdcLocalTracking/creators/TrackCreator.h>
 #include <tracking/cdcLocalTracking/creators/SingleSegmentTrackCreator.h>
 #include <tracking/cdcLocalTracking/creators/TrackOrientator.h>
-#include <tracking/cdcLocalTracking/creators/GFTrackCandCreator.h>
-
 
 namespace Belle2 {
   namespace CDCLocalTracking {
@@ -106,9 +104,10 @@ namespace Belle2 {
         m_trackOrientator.markOrientation(m_tracks);
 
         //create the gftracks
-        B2DEBUG(100, "Creating the genfit::TrackCands");
-        m_gfTrackCandCreator.create(m_tracks, storedGFTrackCands);
-        B2DEBUG(100, "  Created " << storedGFTrackCands.getEntries()  << " genfit::TrackCands");
+        for (const CDCTrack & track : m_tracks) {
+          genfit::TrackCand* ptrTrackCand = storedGFTrackCands.appendNew();
+          track.fillInto(*ptrTrackCand);
+        }
 
         copyToDataStoreForDebug();
 
@@ -124,22 +123,17 @@ namespace Belle2 {
       void copyToDataStoreForDebug() const {
 
 #ifdef CDCLOCALTRACKING_USE_ROOT
-
         // IO for monitoring in python
         // IO segment triples
-        B2DEBUG(100, "  Creating the StoreArray for the CDCAxialStereoSegmentPair");
         StoreArray < CDCAxialStereoSegmentPair > storedAxialStereoSegmentPairs("CDCAxialStereoSegmentPairs");
         storedAxialStereoSegmentPairs.create();
         for (const CDCAxialStereoSegmentPair & axialStereoSegmentPair :  m_axialStereoSegmentPairs) {
           storedAxialStereoSegmentPairs.appendNew(axialStereoSegmentPair);
         }
-        B2DEBUG(100, "  Created " << storedAxialStereoSegmentPairs.getEntries()  << " CDCAxialStereoSegmentPairs");
 
         // IO tracks
-        B2DEBUG(100, "  Creating the StoreArray for the CDCTracks");
         StoreArray < CDCTrack > storedTracks("CDCTracks");
         storedTracks.create();
-        B2DEBUG(100, "  Copying the CDCTracks to the StoreArray");
         for (const CDCTrack & track : m_tracks) {
           storedTracks.appendNew(track);
         }
@@ -190,10 +184,6 @@ namespace Belle2 {
 
       /// Instance of the orientation fixer
       TrackOrientator m_trackOrientator;
-
-      /// Instance of track to the genfit translater
-      GFTrackCandCreator m_gfTrackCandCreator;
-
 
 
     }; // end class SegmentPairTrackingWorker

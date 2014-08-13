@@ -58,11 +58,11 @@ namespace Belle2 {
 
         /// Constructor bundeling the original item and the weight of a relation
         WeightedItemPtr(const ItemPtr& itemPtr , const Weight& weight) :
-          m_itemPtr(itemPtr)      , m_weight(weight) {;}
+          m_itemPtr(itemPtr), m_weight(weight) {;}
 
         /// Comparison operator establishing a total ordering considering the pointer first and the weight second
         inline bool operator<(const WeightedItemPtr& other) const
-        { return m_itemPtr < other.m_itemPtr or (m_itemPtr == other.m_itemPtr  and m_weight < other.m_weight); }
+        { return m_itemPtr < other.m_itemPtr or (m_itemPtr == other.m_itemPtr and m_weight < other.m_weight); }
 
         /// Getter for the pointer to the original item
         ItemPtr getItemPtr() const { return m_itemPtr; }
@@ -329,6 +329,73 @@ namespace Belle2 {
         return result;
       }
 
+
+      /** @name Strutured creation of neighborhoods
+        */
+
+      /** Often on faces the problem of having to build a neighborhood relation between elements of the \n
+       *  same kind. To find suitable neighbors in a general container it would take an amount of time \n
+       *  proportional to n*n to compare all available elements to each other, which is often to long. \n
+       *  However if we can sort the sequence we can improve look up speed to an element by a great deal. \n
+       *  All tracking entities we want to build neighborhoods for are therefore already made sortable. \n
+       *  But the improved look up speed only helps if the neighbors are not scattered around randomly over \n
+       *  the sorted range but are close together in a specific section of the range. The time complexity drops \n
+       *  than to n*log n + n * m where n is the number of elements in the collection and m the expected number \n
+       *  of neighbors.
+       *
+       *  Since we already sorted out the arrangement of entities during their creation, we have to define \n
+       *  the region where to look for neighbors. We keep the general logic for look up the same \n
+       *  but vary the definition of what a neighborhood is supposed to be we factor the later out into \n
+       *  a strategy object called the NeighborChooser with the following interface methods : \n
+       *  * getPossibleNeighbors(item, itBegin, itEnd) returns a range iterable object of items which are possible neighbors \n
+       *
+       *  * isGoodNeighbor(item, neighborItem) checks every neighboring object and returns a weight to indicate the quality of the neighbor.\n
+       *    It returns NOT_A_NEIGHBOR (NaN) in case the neighbor is invalid and shall not be saved.\n
+       */
+      /**@{*/
+      /// Clears the neighborhood and creates relations between elements in the given range using an instance of the NeighborChooser given as first template argument.
+      template<class NeighborChooser, class ItemRange>
+      void createUsing(const ItemRange& itemRange) {
+        clear();
+        appendUsing<NeighborChooser>(itemRange);
+      }
+
+      /// Clears the neighborhood and creates relations between elements in the given range using the NeighborChooser given as first function argument.
+      template<class NeighborChooser, class ItemRange>
+      void createUsing(const NeighborChooser& chooser, const ItemRange& itemRange) {
+        clear();
+        appendUsing(chooser, itemRange);
+      }
+
+      /// Appends relations between elements in the given range using an instance of the NeighborChooser given as first template argument to the existing neighborhood.
+      template<class NeighborChooser, class ItemRange>
+      void appendUsing(const ItemRange& itemRange) {
+        NeighborChooser chooser;
+        appendUsing(chooser, itemRange);
+      }
+
+      /// Appends relations between elements in the given range using the NeighborChooser given as first function argument to the existing neighborhood.
+      template<class NeighborChooser, class ItemRange>
+      void appendUsing(const NeighborChooser& chooser, const ItemRange& itemRange) {
+        //forget everything from former creations
+        chooser.clear();
+        for (const Item & item : itemRange) {
+          for (const Item & possibleNeighbor : chooser.getPossibleNeighbors(item, std::begin(itemRange), std::end(itemRange))) {
+
+            Weight weight = chooser.isGoodNeighbor(item, possibleNeighbor);
+
+            if (not isNotANeighbor(weight)) {
+              // The neighborhood takes references and keeps them
+              insert(item, possibleNeighbor, weight);
+            }
+
+          } //end for possibleNeighbor
+
+        }
+      }
+      /**@}*/
+
+
       /// Output operator to help debugging
       friend std::ostream& operator<<(std::ostream& output, const WeightedNeighborhood& neighborhood) {
         for (iterator itNeighbor = neighborhood.begin();
@@ -344,6 +411,10 @@ namespace Belle2 {
         }
         return output;
       }
+
+
+
+
 
     }; //class
   } // end namespace WeightedNeighborhood

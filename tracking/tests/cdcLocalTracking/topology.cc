@@ -134,9 +134,31 @@ TEST_F(CDCLocalTrackingTest, WireSkew)
     B2INFO("ICLayer : " << iCLayer <<
            " Skew : " << skewByICLayer[iCLayer] <<
            " Stereo angle : " << stereoAngleByICLayer[iCLayer] <<
-           " Ref. polarR " << refPolarRByICLayer[iCLayer]
+           " Ref. polarR : " << refPolarRByICLayer[iCLayer]
           );
 
   }
+
+}
+
+
+
+TEST_F(CDCLocalTrackingTest, RefPolarRVersusZInSuperLayers)
+{
+  const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
+  for (const CDCWireSuperLayer & wireSuperLayer : theWireTopology.getWireSuperLayers()) {
+    if (wireSuperLayer.getStereoType() == AXIAL) {
+      EXPECT_EQ(0.0, wireSuperLayer.getRefPolarRZSlope());
+    }
+
+    B2INFO("ISuperLayer : " << wireSuperLayer.getISuperLayer() <<
+           " Inner ref. z : " << wireSuperLayer.getInnerRefZ() <<
+           " Outer ref. z : " << wireSuperLayer.getOuterRefZ() <<
+           " PolarR Z slope : " << wireSuperLayer.getRefPolarRZSlope()
+          );
+
+  }
+
+
 
 }

@@ -198,31 +198,37 @@ namespace Belle2 {
        */
       StereoType getStereoType() const { return first().getStereoType(); }
 
-      ///Getter for the averaged skew of all wires in this layer
+      /// Getter for the averaged skew of all wires in this layer
       const FloatType& getSkew() const { return m_skew; }
 
-      ///Getter for the average stereo angle of all wires in this layer
+      /// Getter for the average stereo angle of all wires in this layer
       FloatType getStereoAngle() const { return std::atan(getSkew() * getMinPolarR()); }
 
-      ///Getter for the closest distance to the beamline ( z-axes ) of all wires in this layer
+      /// Getter for the closest distance to the beamline ( z-axes ) of all wires in this layer
       const FloatType& getMinPolarR() const { return m_minPolarR; }
 
-      ///Getter for the average distance to the beamline ( z-axes ) at the forward joint points of all wires in this layer
+      /// Getter for the  common (averaged) polar radius at the wire reference point
+      const FloatType& getRefPolarR() const { return m_refPolarR; }
+
+      /// Getter for the common (averaged) z component of the wire reference point
+      const FloatType& getRefZ() const { return m_refZ; }
+
+      /// Getter for the average distance to the beamline ( z-axes ) at the forward joint points of all wires in this layer
       const FloatType& getForwardPolarR() const { return m_forwardPolarR; };
 
-      ///Getter for the average distance to the beamline ( z-axes ) at the backward joint points of all wires in this layer
+      /// Getter for the average distance to the beamline ( z-axes ) at the backward joint points of all wires in this layer
       const FloatType& getBackwardPolarR() const { return m_backwardPolarR; };
 
-      ///Getter for the average z coordinate at the forward joint points of all wires in this layer
+      /// Getter for the average z coordinate at the forward joint points of all wires in this layer
       const FloatType& getForwardZ() const { return m_forwardZ; }
 
-      ///Getter for the average z coordinate at the backward joint points of all wires in this layer
+      /// Getter for the average z coordinate at the backward joint points of all wires in this layer
       const FloatType& getBackwardZ() const { return m_backwardZ; }
 
-      ///Getter for the average polar angle of the forward joint points of the wires relativ to their references
+      /// Getter for the average polar angle of the forward joint points of the wires relativ to their references
       const FloatType& getForwardPhiToRef() const { return m_forwardPhiToRef; }
 
-      ///Getter for the average polar angle of the backward joint points of the wires relativ to their references
+      /// Getter for the average polar angle of the backward joint points of the wires relativ to their references
       const FloatType& getBackwardPhiToRef() const { return m_backwardPhiToRef; }
 
       /// Getter for the average polar angle range covered by the wires relativ to their respective reference points.
@@ -275,6 +281,9 @@ namespace Belle2 {
       //@{
       FloatType m_skew; ///< Storage for average skew
       FloatType m_minPolarR; ///< Storage for minimal distance from beamline
+
+      FloatType m_refPolarR; ///< Storage for common (averaged) polar radius of all wire reference positions.
+      FloatType m_refZ; ///< Storage for common (averaged) z coordinate of all wire reference positions.
 
       FloatType m_forwardPolarR; ///< Storage for average distance from beamline of forward wire ends
       FloatType m_backwardPolarR; ///< Storage for average distance from beamline of backward wire ends

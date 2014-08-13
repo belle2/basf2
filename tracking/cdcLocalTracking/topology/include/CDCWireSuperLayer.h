@@ -150,6 +150,14 @@ namespace Belle2 {
       /// Getter for the outer radius of the layer as retrived from the CDCGeometryPar by the outer most layer
       FloatType getOuterPolarR() const { return last().getOuterPolarR(); }
 
+      /// Getter for the (fitted) z of the reference wire reference points at the inner polarR of this super layer.
+      FloatType getInnerRefZ() const { return m_innerRefZ; }
+
+      /// Getter for the (fitted) z of the reference wire reference points at the outer polarR of this super layer.
+      FloatType getOuterRefZ() const { return m_outerRefZ; }
+
+      /// Getter for (fitted) proporitionality factor between the increasing polar radius and the refernce z coordinate in this superlayer.
+      FloatType getRefPolarRZSlope() const { return m_refPolarRZSlope; }
       /**@}*/
 
       /** @name Closest neighborhood
@@ -289,6 +297,15 @@ namespace Belle2 {
       /// End of the layer range.
       /** Stores iterator pointing to the stored vector<CDCWireLayer> in the related CDCWireTopology object. */
       const_iterator m_end;
+
+      /// Memory for the (fitted) z of the reference wire reference points at the inner polarR of this super layer.
+      FloatType m_innerRefZ;
+
+      /// Memory for the (fitted) z of the reference wire reference points at the outer polarR of this super layer.
+      FloatType m_outerRefZ;
+
+      /// Memory for (fitted) proporitionality factor between the increasing polar radius and the refernce z coordinate in this superlayer.
+      FloatType m_refPolarRZSlope;
 
       /** ROOT Macro to make CDCWireSuperLayer a ROOT class.*/
       ClassDefInCDCLocalTracking(CDCWireSuperLayer, 1);

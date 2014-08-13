@@ -26,6 +26,8 @@ CDCWireLayer::CDCWireLayer() :
   m_shift(INVALID_INFO),
   m_skew(0.0),
   m_minPolarR(1000000.0),
+  m_refZ(0.0),
+  m_refPolarR(0.0),
   m_forwardPolarR(0.0), m_backwardPolarR(0.0),
   m_forwardZ(0.0), m_backwardZ(0.0),
   m_forwardPhiToRef(0.0), m_backwardPhiToRef(0.0),
@@ -43,6 +45,8 @@ CDCWireLayer::CDCWireLayer(const const_iterator& begin, const const_iterator& en
   m_shift(INVALID_INFO),
   m_skew(0.0),
   m_minPolarR(1000000.0),
+  m_refZ(0.0),
+  m_refPolarR(0.0),
   m_forwardPolarR(0.0) , m_backwardPolarR(0.0),
   m_forwardZ(0.0) , m_backwardZ(0.0),
   m_forwardPhiToRef(0.0), m_backwardPhiToRef(0.0),
@@ -82,6 +86,8 @@ void CDCWireLayer::initialize()
   // average values from wires
   m_skew = 0.0;
   m_minPolarR = 1000000.0;
+  m_refZ = 0.0;
+  m_refPolarR = 0.0;
   m_forwardPolarR = 0.0;
   m_backwardPolarR = 0.0;
   m_forwardZ = 0.0;
@@ -100,6 +106,9 @@ void CDCWireLayer::initialize()
     FloatType minROfWire = wire.getMinPolarR();
     m_minPolarR = std::min(minROfWire, m_minPolarR);
 
+    m_refZ += wire.getRefZ();
+    m_refPolarR += wire.getRefPolarR();
+
     //calculate the forward nad backward r in the xy projection. take the average
     m_forwardPolarR  += wire.getForwardPolarR();
     m_backwardPolarR += wire.getBackwardPolarR();
@@ -113,7 +122,12 @@ void CDCWireLayer::initialize()
     m_backwardPhiToRef += wire.getBackwardPhiToRef();
 
   }
+
   m_skew /= nWiresInLayer;
+
+  m_refZ /= nWiresInLayer;
+  m_refPolarR /= nWiresInLayer;
+
   m_forwardPolarR /= nWiresInLayer;
   m_backwardPolarR /= nWiresInLayer;
 

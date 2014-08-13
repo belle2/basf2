@@ -12,6 +12,9 @@
 
 #include <cdc/geometry/CDCGeometryPar.h>
 
+#include <tracking/cdcLocalTracking/fitting/CDCObservations2D.h>
+#include <tracking/cdcLocalTracking/fitting/CDCSZFitter.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
@@ -21,9 +24,16 @@ using namespace CDCLocalTracking;
 ClassImpInCDCLocalTracking(CDCWireSuperLayer)
 
 CDCWireSuperLayer::CDCWireSuperLayer() {;}
+
 CDCWireSuperLayer::CDCWireSuperLayer(const const_iterator& begin, const const_iterator& end):
-  m_begin(begin), m_end(end)
-{ initialize(); }
+  m_begin(begin),
+  m_end(end),
+  m_innerRefZ(0.0),
+  m_outerRefZ(0.0),
+  m_refPolarRZSlope(0.0)
+{
+  initialize();
+}
 
 void CDCWireSuperLayer::initialize()
 {
@@ -35,8 +45,15 @@ void CDCWireSuperLayer::initialize()
   const Vector3D& layerZeroRef3D = layerZero.first().getRefPos3D();
   const Vector2D& layerZeroRef2D = layerZeroRef3D.xy();
 
-  for (const_iterator itLayer = begin(); itLayer != end(); ++itLayer) {
-    const CDCWireLayer& layer = *itLayer;
+  // Prepare a fit to z versus the polarR slope at the reference coordinates
+  CDCObservations2D observations2D;
+  CDCSZFitter szFitter;
+
+  observations2D.clear();
+  observations2D.reserve(size());
+
+  for (const CDCWireLayer & layer : *this) {
+    // Set the numbering shift of each layer within this superlayer
     if (isEven(layer.getILayer())) {
       layer.setShift(ZERO);
     } else {
@@ -45,7 +62,19 @@ void CDCWireSuperLayer::initialize()
 
       layer.setShift(layerRefPos2D.isCCWOrCWOf(layerZeroRef2D));
     }
+
+    observations2D.append(layer.getRefPolarR(), layer.getRefZ());
+
   }
+
+  CDCTrajectorySZ zVersusPolarR;
+  szFitter.update(zVersusPolarR, observations2D);
+
+  const UncertainSZLine& polarRZLine = zVersusPolarR.getSZLine();
+
+  m_refPolarRZSlope = polarRZLine.slope();
+  m_innerRefZ = polarRZLine.map(getInnerPolarR());
+  m_outerRefZ = polarRZLine.map(getOuterPolarR());
 
 
   /*

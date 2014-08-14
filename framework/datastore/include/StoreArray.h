@@ -268,6 +268,10 @@ namespace Belle2 {
      * \code
        myStoreArray.appendNew(some ctor arguments);
        \endcode
+
+     * \note since all arguments are passed to the constructor of class T,
+     *       doing something like appendNew(T(ctor arguments)) is unnecessary. This would construct a temporary object of class T,
+     *       then copy-construct another T object in the array and destroy the temporary object again.
      *
      *  \return pointer to the created object
      */

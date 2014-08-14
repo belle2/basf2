@@ -15,9 +15,9 @@ namespace {
   protected:
     /** fill StoreArrays with entries from 0..9 */
     virtual void SetUp() {
-      evtData.registerPersistent();
-      profileData.registerPersistent();
-      relObjData.registerPersistent();
+      evtData.registerInDataStore();
+      profileData.registerInDataStore();
+      relObjData.registerInDataStore();
 
       for (int i = 0; i < 10; ++i) {
         evtData.appendNew();

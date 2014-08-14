@@ -45,10 +45,11 @@ namespace {
   /** Test opening SQLite db and accessing nodes from Gearbox */
   TEST(GearBox, SQLite)
   {
-    DataStore::Instance().setInitializeActive(true);
-    StoreObjPtr<EventMetaData>::registerPersistent();
-    DataStore::Instance().setInitializeActive(false);
     StoreObjPtr<EventMetaData> eventMetaDataPtr;
+    DataStore::Instance().setInitializeActive(true);
+    eventMetaDataPtr.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
+
     eventMetaDataPtr.create();
     eventMetaDataPtr->setExperiment(1);
     eventMetaDataPtr->setRun(1);

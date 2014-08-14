@@ -40,13 +40,15 @@ ProfileModule::ProfileModule() : Module(), m_outputFileName(""), m_timeOffset(Ut
 
 void ProfileModule::initialize()
 {
+  StoreObjPtr<ProfileInfo> profileInfoPtr;
+  StoreObjPtr<ProfileInfo> profileInfoStartPtr("ProfileInfo_Start", DataStore::c_Persistent);
+  StoreObjPtr<ProfileInfo> profileInfoEndPtr("ProfileInfo_End", DataStore::c_Persistent);
   // Register the profile info objects in the data store
-  StoreObjPtr<ProfileInfo>::registerPersistent("ProfileInfo_Start", DataStore::c_Persistent);
-  StoreObjPtr<ProfileInfo>::registerPersistent("ProfileInfo_End", DataStore::c_Persistent);
-  StoreObjPtr<ProfileInfo>::registerPersistent();
+  profileInfoPtr.registerInDataStore();
+  profileInfoStartPtr.registerInDataStore();
+  profileInfoEndPtr.registerInDataStore();
 
   // Store and print profile info at initialization
-  StoreObjPtr<ProfileInfo> profileInfoStartPtr("ProfileInfo_Start", DataStore::c_Persistent);
   profileInfoStartPtr.create();
   profileInfoStartPtr->set(m_timeOffset);
   m_initializeInfo.mem = profileInfoStartPtr->getMemory();

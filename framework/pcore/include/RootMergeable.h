@@ -25,7 +25,8 @@ namespace Belle2 {
    * \code
      setPropertyFlags(c_Parallelprocessing | c_terminateInAllProcesses);
      \endcode
-     create RootMergeable<X> in initalize (call registerInDataStore() and construct())
+     create RootMergeable<X> in initalize (or in your constructor) of durability DataStore::c_Persistent,
+     register it by calling registerInDataStore() and construct() the actual histogram.
      in terminate():
      \code
      if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {

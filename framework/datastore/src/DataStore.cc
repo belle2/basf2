@@ -96,7 +96,7 @@ bool DataStore::registerEntry(const std::string& name, EDurability durability,
   const StoreAccessorBase accessor(name, durability, objClass, array);
   // Check whether this method is called in the initialization phase
   if (!m_initializeActive) {
-    B2ERROR("Attempt to register " << accessor.readableName() << " outside of the initialization phase. Please move calls to registerPersistent() etc. into your Module's initialize() function.");
+    B2ERROR("Attempt to register " << accessor.readableName() << " outside of the initialization phase. Please move calls to registerInDataStore() into your Module's initialize() function.");
     return false;
   }
   const bool dontwriteout = storeFlags & c_DontWriteOut;
@@ -112,7 +112,7 @@ bool DataStore::registerEntry(const std::string& name, EDurability durability,
 
     // Complain about existing entry
     if (storeFlags & c_ErrorIfAlreadyRegistered) {
-      B2ERROR("An " << accessor.readableName() << " of type " << entry.object->ClassName() << " was already registered before. (Multiple calls to registerPersistent() etc. are fine if the c_ErrorIfAlreadyRegistered flag is not set. For objects you will want to make sure that you don't discard existing data from other modules in that case.");
+      B2ERROR("An " << accessor.readableName() << " of type " << entry.object->ClassName() << " was already registered before. (Multiple calls to registerInDataStore() are fine if the c_ErrorIfAlreadyRegistered flag is not set. For objects you will want to make sure that you don't discard existing data from other modules in that case.");
       return false;
     }
 

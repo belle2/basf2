@@ -80,7 +80,8 @@ void RootOutputModule::initialize()
   const int bufsize = 32000;
 
   //create a file level metadata object in the data store
-  StoreObjPtr<FileMetaData>::registerPersistent("", DataStore::c_Persistent, false);
+  StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
+  fileMetaData.registerInDataStore();
 
   m_outputFileName = getOutputFile();
   TDirectory* dir = gDirectory;

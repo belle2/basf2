@@ -14,12 +14,12 @@ namespace {
   protected:
     /** fill StoreArrays with entries from 0..9 */
     virtual void SetUp() {
-      DataStore::Instance().setInitializeActive(true);
-      StoreArray<EventMetaData>::registerPersistent();
-      StoreArray<ProfileInfo>::registerPersistent();
       evtData = new StoreArray<EventMetaData>;
       profileData = new StoreArray<ProfileInfo>;
-      RelationArray::registerPersistent(evtData->getName(), profileData->getName());
+      DataStore::Instance().setInitializeActive(true);
+      evtData->registerInDataStore();
+      profileData->registerInDataStore();
+      evtData->registerRelationTo(*profileData);
       DataStore::Instance().setInitializeActive(false);
 
       for (int i = 0; i < 10; ++i) {

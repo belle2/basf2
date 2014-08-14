@@ -152,7 +152,7 @@ namespace Belle2 {
      *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
      *  @return            True if the registration succeeded.
      */
-    template<class FROM, class TO> static bool registerPersistent(const std::string& fromName, const std::string& toName, DataStore::EDurability durability = DataStore::c_Event,
+    template<class FROM, class TO> static bool __attribute__((deprecated("Please use StoreArray::registerRelationTo() instead"))) registerPersistent(const std::string& fromName, const std::string& toName, DataStore::EDurability durability = DataStore::c_Event,
         bool errorIfExisting = false) {
       const std::string& relName = DataStore::relationName(DataStore::arrayName<FROM>(fromName), DataStore::arrayName<TO>(toName));
       return DataStore::Instance().registerEntry(relName, durability, RelationContainer::Class(), false, errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0);
@@ -164,24 +164,10 @@ namespace Belle2 {
      *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
      *  @return            True if the registration succeeded.
      */
-    template<class FROM, class TO> static bool registerPersistent(DataStore::EDurability durability = DataStore::c_Event, bool errorIfExisting = false) {
+    template<class FROM, class TO> static bool __attribute__((deprecated("Please use StoreArray::registerRelationTo() instead"))) registerPersistent(DataStore::EDurability durability = DataStore::c_Event, bool errorIfExisting = false) {
       return registerPersistent<FROM, TO>("", "", durability, errorIfExisting);
     }
 
-    /** Register a relation array, that should be written to the output by default, in the data store.
-     *  This must be called in the initialization phase.
-     *
-     *  @param fromName    Name of from-array
-     *  @param toName      Name of to-array
-     *  @param durability  Specifies lifetime of array in question.
-     *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
-     *  @return            True if the registration succeeded.
-     */
-    static bool registerPersistent(const std::string& fromName, const std::string& toName,
-                                   DataStore::EDurability durability = DataStore::c_Event, bool errorIfExisting = false) {
-      const std::string& relName = DataStore::relationName(fromName, toName);
-      return DataStore::Instance().registerEntry(relName, durability, RelationContainer::Class(), false, (errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0));
-    }
 
     /** Register a relation array, that should NOT be written to the output by default, in the data store.
      *  This must be called in the initialization phase.
@@ -192,7 +178,7 @@ namespace Belle2 {
      *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
      *  @return            True if the registration succeeded.
      */
-    template<class FROM, class TO> static bool registerTransient(const std::string& fromName, const std::string& toName, DataStore::EDurability durability = DataStore::c_Event,
+    template<class FROM, class TO> static bool __attribute__((deprecated("Please use StoreArray::registerRelationTo() instead"))) registerTransient(const std::string& fromName, const std::string& toName, DataStore::EDurability durability = DataStore::c_Event,
         bool errorIfExisting = false) {
       const std::string& relName = DataStore::relationName(DataStore::arrayName<FROM>(fromName), DataStore::arrayName<TO>(toName));
       return DataStore::Instance().registerEntry(relName, durability, RelationContainer::Class(), false, DataStore::c_DontWriteOut | (errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0));
@@ -205,53 +191,11 @@ namespace Belle2 {
      *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
      *  @return            True if the registration succeeded.
      */
-    template<class FROM, class TO> static bool registerTransient(DataStore::EDurability durability = DataStore::c_Event,
+    template<class FROM, class TO> static bool __attribute__((deprecated("Please use StoreArray::registerRelationTo() instead"))) registerTransient(DataStore::EDurability durability = DataStore::c_Event,
         bool errorIfExisting = false) {
       return registerTransient<FROM, TO>("", "", durability, errorIfExisting);
     }
-    /** Register a relation array, that should NOT be written to the output by default, in the data store.
-     *  This must be called in the initialization phase.
-     *
-     *  @param fromName    Name of from-array
-     *  @param toName      Name of to-array
-     *  @param durability  Specifies lifetime of array in question.
-     *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
-     *  @return            True if the registration succeeded.
-     */
-    static bool registerTransient(const std::string& fromName, const std::string& toName,
-                                  DataStore::EDurability durability = DataStore::c_Event, bool errorIfExisting = false) {
-      const std::string& relName = DataStore::relationName(fromName, toName);
-      return DataStore::Instance().registerEntry(relName, durability, RelationContainer::Class(), false, DataStore::c_DontWriteOut | (errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0));
 
-    }
-
-    /** Check whether a relation array was registered before.
-     *
-     *  It will cause an error if the object does not exist.
-     *  You can use this in your module's initialize() function to require
-     *  some relation to be registered. If it is absent, the execution will abort,
-     *  allowing you to catch errors like missing modules early.
-     *
-     *  @param name        Name under which the relation array is stored.
-     *  @param durability  Specifies lifetime of relation array in question.
-     *  @return            True if the object exists.
-     */
-    static bool required(const std::string& name, DataStore::EDurability durability = DataStore::c_Event) {
-      return DataStore::Instance().requireInput(StoreAccessorBase(name, durability, RelationContainer::Class(), false));
-    }
-
-    /** Tell the data store about an optional input.
-     *
-     *  Mainly useful for creating diagrams of module inputs and outputs.
-     *  This must be called in the initialization phase.
-     *
-     *  @param name        Name under which the relation array is stored.
-     *  @param durability  Specifies lifetime of relation array in question.
-     *  @return            True if the object exists.
-     */
-    static bool optional(const std::string& name, DataStore::EDurability durability = DataStore::c_Event) {
-      return DataStore::Instance().optionalInput(StoreAccessorBase(name, durability, RelationContainer::Class(), false));
-    }
 
     /** Create an empty relation array in the data store.
      *

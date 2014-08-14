@@ -48,10 +48,10 @@ namespace {
   TEST_F(RelationsInternal, RelationCreate)
   {
     DataStore::Instance().setInitializeActive(true);
-    RelationArray relation(evtData, profileData);
-    relation.registerInDataStore();
+    evtData.registerRelationTo(profileData);
     DataStore::Instance().setInitializeActive(false);
 
+    RelationArray relation(evtData, profileData);
     EXPECT_FALSE(relation); //creation only happens on write access or explicitly
     //since we provided arguments to constructor, these should be available even before create()
     EXPECT_TRUE(relation.getFromAccessorParams() == evtData.getAccessorParams());
@@ -66,7 +66,8 @@ namespace {
   /** Check finding of relations. */
   TEST_F(RelationsInternal, RelationFind)
   {
-    EXPECT_FALSE(RelationArray::required(DataStore::relationName(evtData.getName(), profileData.getName())));
+    EXPECT_FALSE(evtData.optionalRelationTo(profileData));
+    EXPECT_FALSE(evtData.requireRelationTo(profileData));
 
     StoreArray<EventMetaData> evtData2;
     DataStore::Instance().setInitializeActive(true);
@@ -122,8 +123,8 @@ namespace {
     EXPECT_B2FATAL(DataStore::Instance().addRelationFromTo((evtData)[0], (profileData)[1], 2.0));
 
     DataStore::Instance().setInitializeActive(true);
-    RelationArray::registerPersistent<RelationsObject, ProfileInfo>(relObjData.getName(), "");
-    RelationArray::registerPersistent<EventMetaData, ProfileInfo>(evtData.getName(), "");
+    relObjData.registerRelationTo(profileData);
+    evtData.registerRelationTo(profileData);
     DataStore::Instance().setInitializeActive(false);
 
     //profileData has default name, so this should be ok now
@@ -138,7 +139,7 @@ namespace {
   TEST_F(RelationsInternal, RelationDefaultConstructed)
   {
     DataStore::Instance().setInitializeActive(true);
-    RelationArray array(evtData, profileData, "somethingnew");
+    RelationArray array(evtData, profileData);
     array.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
@@ -148,17 +149,17 @@ namespace {
     EXPECT_FALSE(array.isValid());
 
     //shouldn't die here
-    RelationIndex<EventMetaData, ProfileInfo> index(evtData, profileData, "somethingnew");
+    RelationIndex<EventMetaData, ProfileInfo> index(evtData, profileData);
   }
 
   /** Check creation of an index. */
   TEST_F(RelationsInternal, BuildIndex)
   {
     DataStore::Instance().setInitializeActive(true);
-    RelationArray relation(evtData, profileData);
-    relation.registerInDataStore();
+    evtData.registerRelationTo(profileData);
     DataStore::Instance().setInitializeActive(false);
 
+    RelationArray relation(evtData, profileData);
     relation.add(0, 0, 1.0);
     relation.add(0, 1, 2.0);
     relation.add(0, 2, 3.0);
@@ -233,10 +234,10 @@ namespace {
   TEST_F(RelationsInternal, InconsistentIndexDeathTest)
   {
     DataStore::Instance().setInitializeActive(true);
-    RelationArray relation(evtData, profileData);
-    relation.registerInDataStore();
+    evtData.registerRelationTo(profileData);
     DataStore::Instance().setInitializeActive(false);
 
+    RelationArray relation(evtData, profileData);
     relation.add(0, 10, 1.0);
     typedef RelationIndex<EventMetaData, ProfileInfo> rel_t;
     EXPECT_B2FATAL(rel_t relIndex);
@@ -250,8 +251,7 @@ namespace {
   TEST_F(RelationsInternal, EmptyIndex)
   {
     DataStore::Instance().setInitializeActive(true);
-    RelationArray relation(evtData, profileData);
-    relation.registerInDataStore();
+    evtData.registerRelationTo(profileData);
     DataStore::Instance().setInitializeActive(false);
 
     RelationIndex<EventMetaData, ProfileInfo> index;
@@ -329,8 +329,7 @@ namespace {
   TEST_F(RelationsInternal, FindRelations)
   {
     DataStore::Instance().setInitializeActive(true);
-    RelationArray relation(evtData, profileData);
-    relation.registerInDataStore();
+    evtData.registerRelationTo(profileData);
     DataStore::Instance().setInitializeActive(false);
 
     //check non-existing relations (registered)
@@ -347,6 +346,7 @@ namespace {
     RelationVector<ProfileInfo> fromRels2 = DataStore::getRelationsToObj<ProfileInfo>(toObj);
     EXPECT_EQ(fromRels2.size(), 0u);
 
+    RelationArray relation(evtData, profileData);
     relation.add(0, 0, 1.0);
     relation.add(0, 1, 2.0);
     relation.add(0, 2, -3.0);
@@ -363,8 +363,7 @@ namespace {
   TEST_F(RelationsInternal, AddRelations)
   {
     DataStore::Instance().setInitializeActive(true);
-    RelationArray relation(evtData, profileData);
-    relation.registerInDataStore();
+    evtData.registerRelationTo(profileData);
     DataStore::Instance().setInitializeActive(false);
 
     DataStore::Instance().addRelationFromTo((evtData)[0], (profileData)[0], 1.0);
@@ -378,8 +377,7 @@ namespace {
   TEST_F(RelationsInternal, GetRelationsWith)
   {
     DataStore::Instance().setInitializeActive(true);
-    RelationArray relation(evtData, profileData);
-    relation.registerInDataStore();
+    evtData.registerRelationTo(profileData);
     DataStore::Instance().setInitializeActive(false);
 
     DataStore::Instance().addRelationFromTo((evtData)[0], (profileData)[0], 1.0);
@@ -407,10 +405,8 @@ namespace {
 
     DataStore::Instance().setInitializeActive(true);
     profileData2.registerInDataStore();
-    RelationArray relation(evtData, profileData);
-    relation.registerInDataStore();
-    RelationArray relation2(evtData, profileData2);
-    relation2.registerInDataStore();
+    evtData.registerRelationTo(profileData);
+    evtData.registerRelationTo(profileData2);
     DataStore::Instance().setInitializeActive(false);
 
     DataStore::Instance().addRelationFromTo((evtData)[0], (profileData)[0], 1.0);
@@ -470,10 +466,8 @@ namespace {
 
     DataStore::Instance().setInitializeActive(true);
     profileData2.registerInDataStore();
-    RelationArray relation(evtData, profileData);
-    relation.registerInDataStore();
-    RelationArray relation2(evtData, profileData2);
-    relation2.registerInDataStore();
+    evtData.registerRelationTo(profileData);
+    evtData.registerRelationTo(profileData2);
     DataStore::Instance().setInitializeActive(false);
 
     EXPECT_EQ(1u, DataStore::Instance().getListOfRelatedArrays(profileData2).size());

@@ -955,8 +955,8 @@ namespace {
     arrayMain.registerInDataStore();
     arrayA.registerInDataStore();
     arrayB.registerInDataStore();
-    RelationArray::registerPersistent("a", "main");
-    RelationArray::registerPersistent("main", "b");
+    arrayA.registerRelationTo(arrayMain);
+    arrayMain.registerRelationTo(arrayB);
 
     //create subset and relations
     SelectSubset< RelationsObject > selectorMain;

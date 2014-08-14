@@ -21,7 +21,8 @@ namespace Belle2 {
    * \code
      setPropertyFlags(c_Parallelprocessing | c_terminateInAllProcesses);
      \endcode
-     create MapMergeable<X> in initalize (call register(As)Transient("", DataStore::c_Persistent) and construct())
+     create MapMergeable<X> in initalize (or in your constructor) of durability DataStore::c_Persistent,
+     register it by calling registerInDataStore() and construct() the actual histogram.
    *
    * This should work out of the box for std::map. Additional template instantiations need
    * an entry in framework/pcore/include/linkdef.h, please contact the framework librarian if your use

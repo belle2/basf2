@@ -49,17 +49,19 @@ int main(int argc, char** argv)
         if (shmid > 0) {
           if (mode == 0 || (unnamed == 0 && mode == 2) ||
               (unnamed != 0 && mode == 1)) {
-            shmctl(shmid, IPC_RMID, (struct shmid_ds*) 0);
-            printf("SHM %d deleted. ", shmid);
-            deleted = true;
+            if (shmctl(shmid, IPC_RMID, (struct shmid_ds*) NULL) == 0) {
+              printf("SHM %d deleted. ", shmid);
+              deleted = true;
+            }
           }
         }
         if (semid > 0) {
           if (mode == 0 || (unnamed == 0 && mode == 2) ||
               (unnamed != 0 && mode == 1)) {
-            semctl(semid, 1, IPC_RMID);
-            printf("SEM %d deleted. ", semid);
-            deleted = true;
+            if (semctl(semid, 1, IPC_RMID) == 0) {
+              printf("SEM %d deleted. ", semid);
+              deleted = true;
+            }
           }
         }
         if (deleted) {

@@ -84,10 +84,7 @@ public class RunStateLabelController {
         text.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent e) {
-                if (text.getText().matches("INITIAL")) {
-                    load.setDisable(true);
-                    recover.setDisable(false);
-                } else if (text.getText().matches("CONFIGURED")) {
+                if (text.getText().matches("NOTREADY")) {
                     load.setDisable(false);
                     recover.setDisable(false);
                 } else if (text.getText().matches("READY")) {
@@ -95,7 +92,7 @@ public class RunStateLabelController {
                     recover.setDisable(false);
                 } else if (text.getText().matches("RUNNING")) {
                     load.setDisable(true);
-                    recover.setDisable(true);
+                    recover.setDisable(false);
                 } else if (text.getText().matches("RECOVERING")) {
                     load.setDisable(true);
                     recover.setDisable(true);

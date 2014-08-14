@@ -265,6 +265,7 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
                     if (cobj.hasObject("node")) {
                         int n = 0;
                         for (ConfigObject obj : cobj.getObjects("node")) {
+                            System.out.println("node["+n+"].state="+data.getObject("node", n).getInt("state"));
                             statelabel_v[n].update(data.getObject("node", n).getInt("state"));
                             n++;
                         }

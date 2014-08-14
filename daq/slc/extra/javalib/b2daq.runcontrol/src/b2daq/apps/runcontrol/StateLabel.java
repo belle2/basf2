@@ -71,10 +71,6 @@ public class StateLabel extends AnchorPane {
         heightProperty().addListener(listener);
         final ContextMenu cmenu = new ContextMenu();
         final AnchorPane pane = this;
-        MenuItem boot = new MenuItem("BOOT");
-        MenuItem load = new MenuItem("LOAD");
-        MenuItem recover = new MenuItem("RECOVER");
-        MenuItem abort = new MenuItem("ABORT");
         cmenu.getItems().addAll(boot, load, recover, abort);
         boot.setOnAction(new EventHandler<ActionEvent>() {
             @Override

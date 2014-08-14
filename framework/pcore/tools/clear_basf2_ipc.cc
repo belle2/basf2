@@ -49,6 +49,14 @@ int main(int argc, char** argv)
         if (shmid > 0) {
           if (mode == 0 || (unnamed == 0 && mode == 2) ||
               (unnamed != 0 && mode == 1)) {
+
+            shmid_ds shmInfo;
+            shmctl(shmid, IPC_STAT, &shmInfo);
+            //Don't remove SHM segments which still have a process attached
+            //Note that nattch counter is decreased by both shmdt() and exit()
+            if (shmInfo.shm_nattch != 0)
+              continue;
+
             if (shmctl(shmid, IPC_RMID, (struct shmid_ds*) NULL) == 0) {
               printf("SHM %d deleted. ", shmid);
               deleted = true;

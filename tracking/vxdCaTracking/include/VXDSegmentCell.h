@@ -27,9 +27,6 @@ namespace Belle2 {
   //  class VXDSector;
   //  class VXDTFHit;
 
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /** The VXD SegmentCell class
    * This class represents segments of track candidates needed for the Cellular automaton (CA) implemented in the VXDTF.
@@ -162,5 +159,4 @@ namespace Belle2 {
     int m_collector_id; /**< ID of the Cell in the Collector */
   };
 
-  /** @}*/
 } //Belle2 namespace

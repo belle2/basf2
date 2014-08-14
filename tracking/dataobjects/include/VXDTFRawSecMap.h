@@ -21,9 +21,6 @@
 #include <TObject.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /** The Sector Map Container used by the Filter Calculator Module
    * This class is needed for calculating a sectorMap for the VXDTF.
@@ -473,5 +470,4 @@ namespace Belle2 {
     ClassDef(VXDTFRawSecMap, 4)
   };
 
-  /** @}*/
 } //Belle2 namespace

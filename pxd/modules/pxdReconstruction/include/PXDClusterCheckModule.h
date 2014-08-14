@@ -21,9 +21,6 @@ namespace Belle2 {
   class RelationElement;
 
   namespace PXD {
-    /** \addtogroup modules
-     * @{
-     */
 
     /** The PXDClusterCheck module.
      *
@@ -48,7 +45,6 @@ namespace Belle2 {
       std::string m_clustersNew;
     };//end class declaration
 
-    /** @}*/
 
   } //end PXD namespace;
 } // end namespace Belle2

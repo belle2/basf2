@@ -15,9 +15,6 @@
 #include <vxd/dataobjects/VxdID.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /** The SVD Cluster class
    * This class stores all information about reconstructed SVD clusters.
@@ -132,7 +129,6 @@ namespace Belle2 {
 
   };
 
-  /** @}*/
 
 } //Belle2 namespace
 #endif

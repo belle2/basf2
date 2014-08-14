@@ -188,5 +188,4 @@ namespace Belle2 {
     bool m_useDistance4sort; /**< if activated, sectors are sorted by distance to origin, if false, they are sorted by layerID */
   };
 
-  /** @}*/
 } //Belle2 namespace

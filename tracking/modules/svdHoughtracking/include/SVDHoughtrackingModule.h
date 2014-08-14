@@ -698,7 +698,6 @@ namespace Belle2 {
 
     };//end class declaration
 
-    /** @}*/
 
   } // end namespace SVD
 } // end namespace Belle2

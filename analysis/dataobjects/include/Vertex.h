@@ -21,9 +21,6 @@
 
 namespace Belle2 {
 
-  /** \addtogroup dataobjects
-   * @{
-   */
 
 
   /**

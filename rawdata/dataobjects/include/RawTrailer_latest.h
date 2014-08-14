@@ -21,9 +21,6 @@
 /* #define        MAGIC_WORD_TERM_TRAILER 0x7fff0006 */
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-    * @{
-    */
 
   /**
    * The Raw Trailer class ver.1 ( the latest version since May, 2014 )

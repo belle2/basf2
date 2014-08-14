@@ -17,9 +17,6 @@
 #include <root/TMath.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /**
    * The SVD digit class.
@@ -58,7 +55,6 @@ namespace Belle2 {
 
   }; // class SVDHoughCluster
 
-  /** @}*/
 
 } // end namespace Belle2
 

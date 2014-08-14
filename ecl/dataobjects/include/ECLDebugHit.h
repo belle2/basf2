@@ -14,9 +14,6 @@
 #include  <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /*! Class to store the average of ECLSimHit  on crystals for debug only
    * input for digitization module (ECLDigitizer).
@@ -77,7 +74,6 @@ namespace Belle2 {
 
   };
 
-  /** @}*/
 } // end namespace Belle2
 
 #endif

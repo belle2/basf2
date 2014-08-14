@@ -15,9 +15,6 @@
 #include <vxd/dataobjects/VxdID.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-    * @{
-    */
 
   /** The TEL Cluster class
     * This class stores all information about reconstructed TEL clusters
@@ -142,7 +139,6 @@ namespace Belle2 {
     ClassDef(TelCluster, 1)
   };
 
-  /** @}*/
 
 } //Belle2 namespace
 #endif

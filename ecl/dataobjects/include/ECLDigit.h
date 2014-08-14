@@ -13,9 +13,6 @@
 
 #include <framework/datastore/RelationsObject.h>
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /*! Class to store ECL digitized hits (output of ECLDigi)
    * relation to ECLHit
@@ -85,7 +82,6 @@ namespace Belle2 {
     ClassDef(ECLDigit, 1);/**< ClassDef */
 
   };
-  /** @}*/
 } // end namespace Belle2
 
 #endif

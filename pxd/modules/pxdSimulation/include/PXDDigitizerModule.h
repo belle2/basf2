@@ -84,9 +84,6 @@ namespace Belle2 {
     /** Map of all hits in all Sensors */
     typedef std::map<VxdID, Sensor> Sensors;
 
-    /** \addtogroup modules
-     * @{
-     */
 
     /** The PXD Digitizer module.
      * This module is responsible for converting the simulated energy
@@ -222,7 +219,6 @@ namespace Belle2 {
 
     };//end class declaration
 
-    /** @}*/
 
   } // end namespace PXD
 } // end namespace Belle2

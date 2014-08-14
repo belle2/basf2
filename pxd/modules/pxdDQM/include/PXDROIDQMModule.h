@@ -21,9 +21,6 @@
 namespace Belle2 {
 
   namespace PXD {
-    /** \addtogroup modules
-    * @{
-    */
     /** The raw PXD DQM module.
      *
      * Creates basic DQM for Raw PXD data and Pixels
@@ -74,7 +71,6 @@ namespace Belle2 {
 
     };//end class declaration
 
-    /** @}*/
 
   } //end PXD namespace;
 } // end namespace Belle2

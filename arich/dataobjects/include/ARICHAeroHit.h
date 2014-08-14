@@ -16,9 +16,6 @@
 
 namespace Belle2 {
 
-  /** \addtogroup dataobjects
-   *@ {
-   */
 
   //! Datastore class that holds information on track parameters at the entrance in aerogel.
   /*!  For now this information comes from "ARICHSensitiveAero" sensitive detector. This should be replaced with the information from tracking.

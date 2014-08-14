@@ -24,9 +24,6 @@ namespace Belle2 {
 
 #define ONSEN_MAX_TYPE_ERR  32
 
-    /** \addtogroup modules
-     * @{
-     */
 
     /** The PXDUnpackerDesy1314 module.
      *
@@ -104,7 +101,6 @@ namespace Belle2 {
 
     };//end class declaration
 
-    /** @}*/
 
   } //end PXD namespace;
 } // end namespace Belle2

@@ -16,9 +16,6 @@
 
 namespace Belle2 {
 
-  /** \addtogroup dataobjects
-   *@ {
-   */
 
   //! ARICHDigit class for storing photon hit information.
   /*! This class holds the ARICH hit information after digitization (obtained from ARICHSimHit after ARICHDigitizer module). Contains only module number, channel number and global time.

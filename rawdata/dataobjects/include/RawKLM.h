@@ -18,9 +18,6 @@
 #include <TObject.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-    * @{
-    */
 
   /**
    * The Raw KLM class

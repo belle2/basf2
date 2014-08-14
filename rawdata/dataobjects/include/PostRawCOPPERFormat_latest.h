@@ -29,9 +29,6 @@ using namespace std;
 //#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-    * @{
-    */
 
   /**
    * The Raw COPPER class ver.1 ( the latest version since May, 2014 )

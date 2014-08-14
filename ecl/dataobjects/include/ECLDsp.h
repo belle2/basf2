@@ -13,9 +13,6 @@
 
 #include <framework/datastore/RelationsObject.h>
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /*! Class to store ECL simulated rawdata of Dsp array for fit
    *  before digitization fit (output of ECLDsp)
@@ -60,7 +57,6 @@ namespace Belle2 {
     ClassDef(ECLDsp, 1);/**< ClassDef */
 
   };
-  /** @}*/
 } // end namespace Belle2
 
 #endif

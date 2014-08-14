@@ -19,9 +19,6 @@
 
 namespace Belle2 {
   namespace SVD {
-    /** \addtogroup modules
-     * @{
-     */
 
     /** The SVDDigitSorter module.
      *
@@ -64,7 +61,6 @@ namespace Belle2 {
 
     };//end class declaration
 
-    /** @}*/
 
   } //end SVD namespace;
 } // end namespace Belle2

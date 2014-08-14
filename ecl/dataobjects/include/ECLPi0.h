@@ -21,9 +21,6 @@
 
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /*! Class to store ECL Showers which are reconstructed from ECLDigit as Belle method
    * relation to ECLGamma
@@ -215,7 +212,6 @@ namespace Belle2 {
     ClassDef(ECLPi0, 1);/**< ClassDef */
 
   };
-  /** @}*/
 } // end namespace Belle2
 
 

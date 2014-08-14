@@ -34,9 +34,6 @@
 
 namespace Belle2 {
 
-  /** \addtogroup modules
-   * @{
-   */
   /** The HLT ROI DQM module.
    *
    * Creates basic DQM for ROI creation on HLT
@@ -103,7 +100,6 @@ namespace Belle2 {
 
   };//end class declaration
 
-  /** @}*/
 
 } // end namespace Belle2
 

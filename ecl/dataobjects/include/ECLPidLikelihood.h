@@ -16,9 +16,6 @@
 #include <cmath>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /** Container for likelihoods with ECL PID (ECLElectronIdModule)
    */
@@ -61,6 +58,5 @@ namespace Belle2 {
 
     ClassDef(ECLPidLikelihood, 1); /**< Build ROOT dictionary */
   };
-  /*! @} */
 }
 #endif

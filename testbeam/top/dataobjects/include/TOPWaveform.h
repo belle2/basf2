@@ -14,9 +14,6 @@
 #include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /**
    * Class to store IRS waveforms
@@ -110,7 +107,6 @@ namespace Belle2 {
 
   };
 
-  /** @}*/
 
 } // end namespace Belle2
 

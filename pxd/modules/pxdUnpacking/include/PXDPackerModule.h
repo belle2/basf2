@@ -24,9 +24,6 @@ namespace Belle2 {
 #define PACKER_NUM_ROWS 768
 #define PACKER_NUM_COLS 250
 
-    /** \addtogroup modules
-     * @{
-     */
 
     /** The PXDPacker module.
      *
@@ -126,7 +123,6 @@ namespace Belle2 {
 
     };//end class declaration
 
-    /** @}*/
 
   } //end PXD namespace;
 } // end namespace Belle2

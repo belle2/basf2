@@ -16,9 +16,6 @@
 #include <TObject.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-    * @{
-    */
 
   /** The PXD Raw Adc class
     * This class stores information about Raw Adc for Pedestals
@@ -76,7 +73,6 @@ namespace Belle2 {
     ClassDef(PXDRawPedestal, 1)
   };
 
-  /** @}*/
 
 } //Belle2 namespace
 #endif

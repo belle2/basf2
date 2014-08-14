@@ -16,10 +16,6 @@
 #include <TVector3.h>
 
 namespace Belle2 {
-  /**
-   * \addtogroup modules
-   * @{ BeamspotScanModule @}
-   */
 
   /**
    * Scans beam parameters and produces data file for particle gun array

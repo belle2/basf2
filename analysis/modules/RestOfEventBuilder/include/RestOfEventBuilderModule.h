@@ -20,10 +20,6 @@
 #include <vector>
 
 namespace Belle2 {
-  /**
-   * \addtogroup modules
-   * @{ RestOfEventBuilderModule @}
-   */
 
   /**
    * Creates for each Particle in given ParticleList an RestOfEvent dataobject and makes BASF2 relation between them.

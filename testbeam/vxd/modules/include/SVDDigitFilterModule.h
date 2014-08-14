@@ -16,9 +16,6 @@
 
 namespace Belle2 {
   /**
-   * \addtogroup modules
-   * @{ SVDDigitFilterModule @}
-   */
 
   /**
    * Performs the easiest possible preselection of SVD digits

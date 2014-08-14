@@ -18,12 +18,6 @@
 
 namespace Belle2 {
 
-  /** @addtogroup CDC_dataobjects
-   *  @ingroup dataobjects
-   *  @{ WireID
-   *  @todo WireID : Rootification might not be necessary; On the other hand, it opens as well the use via Python.
-   *  @}
-   */
   /** Class to identify a wire inside the CDC.
    *
    *  There are three representations for this: <br>

@@ -137,7 +137,6 @@ namespace Belle2 {
     Unit(const Unit&);
     Unit& operator=(const Unit&);
     ~Unit() {};
-    /** @} */
   };
 
 }

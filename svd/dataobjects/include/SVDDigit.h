@@ -19,9 +19,6 @@
 #include <string>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /**
    * The SVD digit class.
@@ -172,7 +169,6 @@ namespace Belle2 {
 
   }; // class SVDDigit
 
-  /** @}*/
 
 } // end namespace Belle2
 

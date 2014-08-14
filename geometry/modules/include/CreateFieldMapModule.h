@@ -16,9 +16,6 @@
 
 namespace Belle2 {
   /**
-   * \addtogroup modules
-   * @{ CreateFieldMapModule @}
-   */
 
   /**
    * Create Field maps of the Belle II magnetic field used in the simulation

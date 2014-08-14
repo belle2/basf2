@@ -25,12 +25,6 @@
 //#include <boost/shared_ptr.hpp> // produces trouble for cint because of "Error: void type variable can not be declared "
 
 namespace Belle2 {
-  /** @addtogroup CDC_dataobjects
-   *  @ingroup dataobjects
-   *  @{ CDCRecoHit
-   *  @todo CDCRecoHit : once we go to ROOT 6, the pointer should be replaced with shared_ptr.
-   *  @}
-   */
   /** This class is used to transfer CDC information to the track fit. */
   class CDCRecoHit : public genfit::WireMeasurement  {
 

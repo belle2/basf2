@@ -15,9 +15,6 @@
 
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-    * @{
-    */
 
   /**
     * Class SimHitBase - A common base for subdetector SimHits.
@@ -67,7 +64,6 @@ namespace Belle2 {
     ClassDef(SimHitBase, 2)
   };
 
-  /** @}*/
 
 } // end namespace Belle2
 

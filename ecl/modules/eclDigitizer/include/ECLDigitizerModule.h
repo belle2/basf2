@@ -17,12 +17,6 @@
 namespace Belle2 {
   namespace ECL {
     /**
-     *  \addtogroup modules
-     *  @{
-     *  \addtogroup ECL_modules
-     *  \ingroup modules
-     *  @{ECLDigitizerModule  @} @}
-     */
 
 
     /** The ECLDigitizer module.

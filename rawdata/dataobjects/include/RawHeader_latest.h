@@ -19,9 +19,6 @@
 //#define HEADER_SIZE 16
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-    * @{
-    */
 
   /**
    * The Raw Header class ver.1 ( the latest version since May, 2014 )

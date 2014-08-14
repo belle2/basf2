@@ -16,10 +16,6 @@
 
 
 namespace Belle2 {
-  /**
-   * \addtogroup modules
-   * @{ PXDdigiFilterModule @}
-   */
 
   /**
    * The module produce a StoreArray of PXDDigit inside the ROIs.

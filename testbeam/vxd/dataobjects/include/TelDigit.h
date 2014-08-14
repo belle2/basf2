@@ -16,9 +16,6 @@
 #include <TObject.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-    * @{
-    */
 
   /**
    * The EUDET telescope digit class.
@@ -70,7 +67,6 @@ namespace Belle2 {
 
   }; // class TelDigit
 
-  /** @}*/
 
 } // end namespace Belle2
 

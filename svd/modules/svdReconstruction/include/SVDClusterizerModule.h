@@ -27,9 +27,6 @@
 namespace Belle2 {
 
   namespace SVD {
-    /** \addtogroup modules
-     * @{
-     */
 
     /** SVDClusterizerModule: The SVD Clusterizer.
      *
@@ -170,7 +167,6 @@ namespace Belle2 {
 
     };//end class declaration
 
-    /** @}*/
 
   } //end SVD namespace;
 } // end namespace Belle2

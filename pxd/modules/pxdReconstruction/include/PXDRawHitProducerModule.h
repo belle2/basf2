@@ -18,9 +18,6 @@
 
 namespace Belle2 {
   namespace PXD {
-    /** \addtogroup modules
-     * @{
-     */
 
     /** The PXDRawHitProducer module.
      *
@@ -47,7 +44,6 @@ namespace Belle2 {
       std::string m_storeDigitsName;
     };//end class declaration
 
-    /** @}*/
 
   } //end PXD namespace;
 } // end namespace Belle2

@@ -18,11 +18,6 @@
 
 
 namespace Belle2 {
-  /** @addtogroup CDC_dataobjects
-   *  @ingroup dataobjects
-   *  @{ CDCHit
-   *  @}
-   */
   /** Class that is the result of the unpacker in raw data and the result of the Digitizer in simulation.
    *
    *  This class is optimized for low disc usage. For reconstruction purposes use the corresponding

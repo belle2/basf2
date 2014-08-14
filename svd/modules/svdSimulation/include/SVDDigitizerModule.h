@@ -38,9 +38,6 @@ namespace Belle2 {
     typedef std::map<VxdID, Sensor> Sensors;
 
 
-    /** \addtogroup modules
-     * @{
-     */
 
     /** The SVD Digitizer module.
      * This module is responsible for converting the simulated energy
@@ -221,7 +218,6 @@ namespace Belle2 {
 
     };//end class declaration
 
-    /** @}*/
 
   } // end namespace SVD
 } // end namespace Belle2

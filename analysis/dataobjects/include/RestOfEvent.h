@@ -25,9 +25,6 @@ namespace Belle2 {
 
   // TODO: Add support for the MdstVee dataobjects when they become available.
 
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /**
    * This is a general purpose class for collecting reconstructed MDST data objects
@@ -182,7 +179,6 @@ namespace Belle2 {
 
   };
 
-  /** @}*/
 
 } // end namespace Belle2
 

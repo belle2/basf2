@@ -16,9 +16,6 @@
 
 namespace Belle2 {
 
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /** ClassECLSimHit - Geant4 simulated hit for the ECL.
     *
@@ -150,7 +147,6 @@ namespace Belle2 {
     ClassDef(ECLSimHit, 3);/**< the class title */
 
   };
-  /** @}*/
 } // end namespace Belle2
 
 #endif

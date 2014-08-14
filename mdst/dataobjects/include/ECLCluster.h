@@ -20,9 +20,6 @@
 #include <TMatrixFSym.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /*! Class to store ECLCluster reconstructed from ECLDigit as Belle method
    * relation to ECLShower

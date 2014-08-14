@@ -13,9 +13,6 @@
 #include <TObject.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-    * @{
-    */
 
   /**
    * The Raw PXD class.
@@ -61,7 +58,6 @@ namespace Belle2 {
     ClassDef(RawPXD, 1)
   }; // class RawPXD
 
-  /** @}*/
 
 } // end namespace Belle2
 

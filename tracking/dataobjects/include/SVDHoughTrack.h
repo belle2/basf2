@@ -17,9 +17,6 @@
 
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /**
    * The SVD Hough Track class.
@@ -87,7 +84,6 @@ namespace Belle2 {
 
   }; // class SVDHoughTrack
 
-  /** @}*/
 
 } // end namespace Belle2
 

@@ -14,9 +14,6 @@
 #include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /*! Class to store TOP log likelihoods (output of TOPReconstructor)
    * relation from Tracks
@@ -175,7 +172,6 @@ namespace Belle2 {
 
   };
 
-  /** @}*/
 
 } // end namespace Belle2
 

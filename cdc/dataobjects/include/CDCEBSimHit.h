@@ -17,12 +17,6 @@
 #include <TVector3.h>
 
 namespace Belle2 {
-  /** @addtogroup CDC_dataobjects
-   *  @ingroup dataobjects
-   *  @{ CDCEBSimHit
-   *  @todo CDCEBSimHit : calling a double to save phi a wire id is kind of strange...
-   *  @}
-   */
   /**
    * This SimHit type is used for background studies.
    *  EB stands for electronic board.

@@ -14,9 +14,6 @@
 #include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /*! Class to store ECLTrig, still need to be study
    * relation to ECLHit
@@ -56,7 +53,6 @@ namespace Belle2 {
     ClassDef(ECLTrig, 1);/**< ClassDef */
 
   };
-  /** @}*/
 } // end namespace Belle2
 
 #endif

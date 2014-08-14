@@ -16,9 +16,6 @@
 
 namespace Belle2 {
 
-  /** \addtogroup dataobjects
-   *@ {
-   */
 
   //! Class ARICHSimHit - Geant4 simulated hit for ARICH.
   /*!

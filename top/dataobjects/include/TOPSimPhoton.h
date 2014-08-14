@@ -15,9 +15,6 @@
 #include <TVector3.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /*! Class to store Cherenkov photons at emission and at detection
    * relation to TOPSimHit
@@ -160,7 +157,6 @@ namespace Belle2 {
 
   };
 
-  /** @}*/
 
 } // end namespace Belle2
 

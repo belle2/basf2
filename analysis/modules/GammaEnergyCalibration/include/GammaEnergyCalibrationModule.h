@@ -19,10 +19,6 @@
 #include <analysis/dataobjects/Particle.h>
 
 namespace Belle2 {
-  /**
-   * \addtogroup modules
-   * @{ GammaEnergyCalibrationModule @}
-   */
 
   /**
    * Calibrates energy of the photons

@@ -14,9 +14,6 @@
 #include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /**
    * Class to store beam test data for any counter other than TOP
@@ -96,7 +93,6 @@ namespace Belle2 {
 
   };
 
-  /** @}*/
 
 } // end namespace Belle2
 

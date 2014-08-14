@@ -17,10 +17,6 @@
 
 
 namespace Belle2 {
-  /**
-   * \addtogroup modules
-   * @{ GenfitVisModule @}
-   */
 
   /**
    * Visualize genfit::Tracks using the genfit::EventDisplay.

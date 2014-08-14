@@ -16,9 +16,6 @@
 #include <TObject.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-    * @{
-    */
 
   /** The PXD Raw Hit class
     * This class stores information about PXD Pixel hits
@@ -116,7 +113,6 @@ namespace Belle2 {
     ClassDef(PXDRawHit, 2)
   };
 
-  /** @}*/
 
 } //Belle2 namespace
 #endif

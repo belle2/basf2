@@ -21,9 +21,6 @@
 #include <TMatrixFSym.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /*! Class to store ECL Gamma which are selected with criteria as Belle from ECL Shower
    * relation to ECLShower
@@ -105,7 +102,6 @@ namespace Belle2 {
     ClassDef(ECLGamma, 1); /**< ClassDef  */
 
   };
-  /** @}*/
 } // end namespace Belle2
 
 #endif

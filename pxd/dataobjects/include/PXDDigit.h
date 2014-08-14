@@ -16,9 +16,6 @@
 #include <TObject.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-    * @{
-    */
 
   /**
    * The PXD digit class.
@@ -109,7 +106,6 @@ namespace Belle2 {
 
   }; // class PXDDigit
 
-  /** @}*/
 
 } // end namespace Belle2
 

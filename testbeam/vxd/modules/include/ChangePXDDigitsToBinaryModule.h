@@ -16,10 +16,6 @@
 #include <pxd/dataobjects/PXDDigit.h>
 
 namespace Belle2 {
-  /**
-   * \addtogroup modules
-   * @{ ChangePXDDigitsToBinaryModule @}
-   */
 
   /**
    * This module changes specified PXD sensors to binary readout to emulate EUDET telescopes.

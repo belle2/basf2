@@ -17,9 +17,6 @@
 #include <math.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /*! Class to store ECL Showers which are reconstructed from ECLDigit as Belle method
    * relation to ECLDigit
@@ -280,7 +277,6 @@ namespace Belle2 {
     ClassDef(ECLShower, 1);/**< ClassDef */
 
   };
-  /** @}*/
 } // end namespace Belle2
 
 #endif

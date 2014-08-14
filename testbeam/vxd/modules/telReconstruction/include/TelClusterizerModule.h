@@ -26,9 +26,6 @@ namespace Belle2 {
   class RelationElement;
 
   namespace TEL {
-    /** \addtogroup modules
-     * @{
-     */
 
     /** The TelClusterizer module.
      *
@@ -130,7 +127,6 @@ namespace Belle2 {
 
     };//end class declaration
 
-    /** @}*/
 
   } //end Tel namespace;
 } // end namespace Belle2

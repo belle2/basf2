@@ -16,9 +16,6 @@
 #include <TObject.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-    * @{
-    */
 
   /**
    * The PXD frame class.
@@ -77,7 +74,6 @@ namespace Belle2 {
 
   }; // class PXDFrame
 
-  /** @}*/
 
 } // end namespace Belle2
 

@@ -26,13 +26,6 @@ namespace Belle2 {
   template< class T >
   class StoreArray;
 
-  /**
-   *  \addtogroup modules
-   *  @{
-   *  \addtogroup tracking_modules
-   *  \ingroup modules
-   *  @{ StandardTrackingPerformanceModule @} @}
-   */
 
   /** This module takes the MCParticle and the genfit::Track collection as input and
    * writes out a root file with some information of the reconstructed tracks.

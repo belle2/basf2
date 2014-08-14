@@ -19,9 +19,6 @@
 
 namespace Belle2 {
 
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /**
    * This is a class for collecting variables used in continuum suppression. These variables
@@ -214,7 +211,6 @@ namespace Belle2 {
 
   };
 
-  /** @}*/
 
 } // end namespace Belle2
 

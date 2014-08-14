@@ -16,9 +16,6 @@
 #include <TVector3.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /*! Class to store simulated hits of Cherenkov photons on PMT's
    * input for digitization module (TOPDigitizer).
@@ -118,7 +115,6 @@ namespace Belle2 {
 
   };
 
-  /** @}*/
 
 } // end namespace Belle2
 

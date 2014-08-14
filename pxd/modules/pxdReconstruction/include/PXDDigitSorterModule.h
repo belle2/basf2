@@ -18,9 +18,6 @@
 
 namespace Belle2 {
   namespace PXD {
-    /** \addtogroup modules
-     * @{
-     */
 
     /** The PXDDigitSorter module.
      *
@@ -62,7 +59,6 @@ namespace Belle2 {
       std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredPixelsList;
     };//end class declaration
 
-    /** @}*/
 
   } //end PXD namespace;
 } // end namespace Belle2

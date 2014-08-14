@@ -15,9 +15,6 @@
 #include <TVector3.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /*! Class to store track parameters of incoming MC particles
    * relation to MCParticle
@@ -134,7 +131,6 @@ namespace Belle2 {
 
   };
 
-  /** @}*/
 
 } // end namespace Belle2
 

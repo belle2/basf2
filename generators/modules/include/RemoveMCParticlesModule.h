@@ -17,9 +17,6 @@
 
 namespace Belle2 {
 
-  /** \addtogroup modules
-   * @{
-   */
 
   /** The RemoveMCParticles module.
    *
@@ -70,7 +67,6 @@ namespace Belle2 {
     MCParticleGraph m_mpg; /**<ParticleGraph used for reformatting MCParticle collection */
   };
 
-  /** @}*/
 
 } // end namespace Belle2
 

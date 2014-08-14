@@ -15,9 +15,6 @@
 
 namespace Belle2 {
 
-  /** \addtogroup dataobjects
-   *@ {
-   */
 
 
   /** This is a class to store ARICH likelihoods in the datastore.

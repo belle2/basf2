@@ -14,9 +14,6 @@
 #include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /**
    * Class to store TOP digitized hits (output of TOPDigitizer or raw data unpacker)
@@ -128,7 +125,6 @@ namespace Belle2 {
 
   };
 
-  /** @}*/
 
 } // end namespace Belle2
 

@@ -15,9 +15,6 @@
 #include <TObject.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-    * @{
-    */
 
   /** The PXD Raw ROIs class
     * This class stores information about the ROIs processed by ONSEN
@@ -123,7 +120,6 @@ namespace Belle2 {
     ClassDef(PXDRawROIs, 1)
   };
 
-  /** @}*/
 
 } //Belle2 namespace
 #endif

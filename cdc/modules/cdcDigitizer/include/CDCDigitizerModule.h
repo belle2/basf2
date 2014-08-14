@@ -27,15 +27,6 @@
 
 namespace Belle2 {
 
-  /** @addtogroup CDC_modules
-   *  @ingroup modules
-   *  @{CDCDigitizerModule
-   *  @todo CDCDigitizerModule: Event time jitter needs a different approach than the one, which is taken here; Instead of adding
-   *        a constant to all events, there needs to be an event by event time jitter, most likely determined by
-   *        the trigger time uncertainties; <br>
-   *        If the definition of the time format in the CDCHit is changed, it needs to be changed here, too, and in the SimpleDriftTimeTranslator.
-   *  @}
-   */
   /** The Class for Detailed Digitization of CDC.
    *
    *  Currently a float Gaussian with steerable parameters is used for the digitization.

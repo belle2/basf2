@@ -34,13 +34,6 @@
 #include <tracking/cdcLegendreTracking/CDCLegendreSimpleFilter.h>
 
 namespace Belle2 {
-  /**
-   *  \addtogroup modules
-   *  @{
-   *  \addtogroup tracking_modules
-   *  \ingroup modules
-   *  @{ CDCLegendreTrackingModule @} @}
-   */
 
   /** Forward declaration to avoid including the corresponding header file
   class TrackHit;

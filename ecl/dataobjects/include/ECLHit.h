@@ -14,9 +14,6 @@
 #include <simulation/dataobjects/SimHitBase.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /*! Class to store simulated hits which equate to average of ECLSImHit  on crystals
    * input for digitization module (ECLDigitizer).
@@ -90,7 +87,6 @@ namespace Belle2 {
 
   };
 
-  /** @}*/
 } // end namespace Belle2
 
 #endif

@@ -25,9 +25,6 @@ namespace Belle2 {
   class RelationElement;
 
   namespace PXD {
-    /** \addtogroup modules
-     * @{
-     */
 
     /** The PXDClusterizer module.
      *
@@ -140,7 +137,6 @@ namespace Belle2 {
 
     };//end class declaration
 
-    /** @}*/
 
   } //end PXD namespace;
 } // end namespace Belle2

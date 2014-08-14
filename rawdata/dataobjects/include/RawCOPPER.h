@@ -43,9 +43,6 @@ using namespace std;
 
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-    * @{
-    */
 
   /**
    * The Raw COPPER class

@@ -21,9 +21,6 @@
 #include <TObject.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-   * @{
-   */
 
   /** A simple TObject-wrapper for std::vector of VXDTFRawSecMap (contains full raw SecMap info created in filterCalculatorModule)
    */
@@ -54,5 +51,4 @@ namespace Belle2 {
     ClassDef(SecMapVector, 1)
   };
 
-  /** @}*/
 } //Belle2 namespace

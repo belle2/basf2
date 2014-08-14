@@ -15,9 +15,6 @@
 #include <vxd/dataobjects/VxdID.h>
 
 namespace Belle2 {
-  /** \addtogroup dataobjects
-    * @{
-    */
 
   /** The PXD Cluster class
     * This class stores all information about reconstructed PXD clusters
@@ -162,7 +159,6 @@ namespace Belle2 {
     ClassDef(PXDCluster, 3)
   };
 
-  /** @}*/
 
 } //Belle2 namespace
 #endif

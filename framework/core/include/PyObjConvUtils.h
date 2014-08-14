@@ -176,6 +176,7 @@ namespace Belle2 {
       GetTuple(tuple, pyList, SizeT < N - 1 > ());
       pyList.append(convertToPythonObject(std::get < N - 1 > (tuple)));
     }
+    /** @} */
 
     /**
      * Writes content of a std::tuple to a python tuple.
@@ -296,6 +297,7 @@ namespace Belle2 {
       SetTuple(tuple, pyTuple, SizeT < N - 1 > ());
       std::get < N - 1 > (tuple) = convertPythonObject(pyTuple[N - 1], std::get < N - 1 > (tuple));
     }
+    /** @} */
 
     /**
      * Reads std::tuple from a python object.

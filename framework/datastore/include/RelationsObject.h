@@ -273,6 +273,7 @@ namespace Belle2 {
     TObject* getRelatedTo(const std::string& name) const { return getRelatedTo<TObject>(name); }
     TObject* getRelatedFrom(const std::string& name) const { return getRelatedFrom<TObject>(name); }
     TObject* getRelated(const std::string& name) const { return getRelated<TObject>(name); }
+    /** @} */
 #endif
 
   private:

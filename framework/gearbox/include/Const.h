@@ -466,6 +466,7 @@ namespace Belle2 {
     Const(const Const&) { };
     Const& operator=(const Const&) { return *this; };
     ~Const() {};
+    /** @} */
 
   };
 }

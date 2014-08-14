@@ -328,22 +328,6 @@ namespace Belle2 {
       }
     }
 
-    /** Constructor which accepts the AccessorParams of the relation.
-     *
-     *  This constructor will only assign existing relations and will not create
-     *  new ones since it lacks the information on the StoreArrays to relate
-     *
-     *  @param params     AccessorParams for the (existing) Relation
-     */
-    explicit RelationArray(const AccessorParams& params):
-      StoreAccessorBase(params.first, params.second, RelationContainer::Class(), false),
-      m_relations(0) {
-      if (params.first == "") {
-        B2FATAL("Cannot guess relation name, please supply correct name");
-        return;
-      }
-    }
-
     /** Empty destructor */
     ~RelationArray() {}
 
@@ -474,6 +458,22 @@ namespace Belle2 {
     const_iterator end() const { assertValid(); return const_iterator(this, getEntries()); }
 
   private:
+    /** Constructor which accepts the AccessorParams of the relation.
+     *
+     *  This constructor will only assign existing relations and will not create
+     *  new ones since it lacks the information on the StoreArrays to relate
+     *
+     *  @param params     AccessorParams for the (existing) Relation
+     */
+    explicit RelationArray(const AccessorParams& params):
+      StoreAccessorBase(params.first, params.second, RelationContainer::Class(), false),
+      m_relations(0) {
+      if (params.first == "") {
+        B2FATAL("Cannot guess relation name, please supply correct name");
+        return;
+      }
+    }
+
 
     /** Return address where the next RelationElement should be created. */
     RelationElement* next() {
@@ -540,6 +540,9 @@ namespace Belle2 {
 
     /** Pointer that actually holds the relations. */
     RelationContainer** m_relations;
+
+    template<class FROM, class TO> friend class RelationIndex;
+    template<class FROM, class TO> friend class RelationIndexContainer;
 
   };
 

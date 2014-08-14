@@ -17,7 +17,7 @@ namespace Belle2 {
     /** Unlock. */
     ~SemaphoreLocker() { unlock(); }
 
-    /** Create a new semaphore and initialize it. Returns the semaphore id or dies with an error. */
+    /** Create a new semaphore and initialize it. Returns the semaphore id or value < 0 on error. */
     static int create(key_t semkey);
     /** Destroy the given semaphore. */
     static void destroy(int semId);

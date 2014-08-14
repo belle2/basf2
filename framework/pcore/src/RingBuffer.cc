@@ -147,12 +147,17 @@ void RingBuffer::openSHM(int size)
   }
   m_shmadr = (int*) shmat(m_shmid, 0, 0);
   if (m_shmadr == (int*) - 1) {
-    B2FATAL("RingBuffer::shmat() failed");
+    B2FATAL("RingBuffer: Attaching to shared memory segment via shmat() failed");
     return;
   }
 
   // 2. Open Semaphore
   m_semid = SemaphoreLocker::create(m_semkey);
+  if (m_semid < 0) {
+    cleanup();
+    B2FATAL("Aborting execution because we couldn't create a semaphore (see previous error messages for details).");
+    return;
+  }
   SemaphoreLocker locker(m_semid); //prevent simultaneous initialization
 
   // 3. Initialize control parameters

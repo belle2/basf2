@@ -11,13 +11,10 @@
 // Own include
 #include <analysis/modules/ParticleSelector/ParticleSelectorModule.h>
 
-#include <framework/core/ModuleManager.h>
-
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -59,7 +56,7 @@ namespace Belle2 {
     addParam("cut", m_cutParameter, "Selection criteria to be applied", emptyCut);
 
     addParam("persistent", m_persistent,
-             "toggle newly created particle list btw. transient/persistent", false);
+             "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
 
     // initializing the rest of private memebers
     m_pdgCode = 0;
@@ -88,14 +85,12 @@ namespace Belle2 {
     m_antiListName             = Belle2::EvtPDLUtil::antiParticleListName(m_pdgCode, mother->getLabel());
 
 
-    if (m_persistent) {
-      StoreObjPtr<ParticleList>::registerPersistent(m_listName, DataStore::c_Event, false);
-      if (!m_isSelfConjugatedParticle)
-        StoreObjPtr<ParticleList>::registerPersistent(m_antiListName, DataStore::c_Event, false);
-    } else {
-      StoreObjPtr<ParticleList>::registerTransient(m_listName, DataStore::c_Event, false);
-      if (!m_isSelfConjugatedParticle)
-        StoreObjPtr<ParticleList>::registerTransient(m_antiListName, DataStore::c_Event, false);
+    StoreObjPtr<ParticleList> particleList(m_listName);
+    DataStore::EStoreFlags flags = m_persistent ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
+    particleList.registerInDataStore(flags);
+    if (!m_isSelfConjugatedParticle) {
+      StoreObjPtr<ParticleList> antiParticleList(m_antiListName);
+      antiParticleList.registerInDataStore(flags);
     }
 
     m_cut.init(m_cutParameter);

@@ -219,7 +219,7 @@ namespace {
 
       StoreObjPtr<ParticleList> list(listName);
       DataStore::Instance().setInitializeActive(true);
-      list.registerAsPersistent();
+      list.registerInDataStore();
       DataStore::Instance().setInitializeActive(false);
 
       if (not list.isValid())
@@ -230,7 +230,7 @@ namespace {
         antiListName = Belle2::EvtPDLUtil::antiParticleListName(pdgCode, mother->getLabel());
         StoreObjPtr<ParticleList> antiList(antiListName);
         DataStore::Instance().setInitializeActive(true);
-        antiList.registerAsPersistent();
+        antiList.registerInDataStore();
         DataStore::Instance().setInitializeActive(false);
         if (not antiList.isValid())
           antiList.create();

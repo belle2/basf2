@@ -58,7 +58,7 @@ namespace Belle2 {
     addParam("decayMode", m_decayModeID, "Usper specified decay mode identifier", 0);
 
     addParam("persistent", m_persistent,
-             "toggle output particle list btw. transient/persistent", false);
+             "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
 
     // initializing the rest of private memebers
     m_pdgCode   = 0;
@@ -101,14 +101,12 @@ namespace Belle2 {
     }
     m_generator = new ParticleGenerator(m_decayString);
 
-    if (m_persistent) {
-      StoreObjPtr<ParticleList>::registerPersistent(m_listName);
-      if (!m_isSelfConjugatedParticle)
-        StoreObjPtr<ParticleList>::registerPersistent(m_antiListName);
-    } else {
-      StoreObjPtr<ParticleList>::registerTransient(m_listName);
-      if (!m_isSelfConjugatedParticle)
-        StoreObjPtr<ParticleList>::registerTransient(m_antiListName);
+    StoreObjPtr<ParticleList> particleList(m_listName);
+    DataStore::EStoreFlags flags = m_persistent ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
+    particleList.registerInDataStore(flags);
+    if (!m_isSelfConjugatedParticle) {
+      StoreObjPtr<ParticleList> antiParticleList(m_antiListName);
+      antiParticleList.registerInDataStore(flags);
     }
 
     m_cut.init(m_cutParameter);

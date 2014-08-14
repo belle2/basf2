@@ -5,7 +5,6 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 
@@ -258,12 +257,12 @@ namespace {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
     virtual void SetUp() {
-      DataStore::Instance().setInitializeActive(true);
       StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
-      StoreArray<Particle>::registerPersistent();
-      StoreArray<MCParticle>::registerPersistent();
-      RelationArray::registerPersistent<Particle, MCParticle>();
-      DataStore::Instance().setInitializeActive(false);
+      StoreArray<Particle> particles;
+      StoreArray<MCParticle> mcparticles;
+      particles.registerInDataStore();
+      mcparticles.registerInDataStore();
+      particles.registerRelationTo(mcparticles);
     }
 
     /** clear datastore */

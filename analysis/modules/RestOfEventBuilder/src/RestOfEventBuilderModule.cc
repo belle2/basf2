@@ -11,15 +11,14 @@
 #include <analysis/modules/RestOfEventBuilder/RestOfEventBuilderModule.h>
 
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/Particle.h>
 
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 
 #include <framework/logging/Logger.h>
 
@@ -54,18 +53,19 @@ void RestOfEventBuilderModule::initialize()
 {
   // input
   StoreObjPtr<ParticleList>::required(m_particleList);
-  StoreArray<Particle>::required();
+  StoreArray<Particle> particles;
+  particles.isRequired();
 
   // output
-  StoreArray<RestOfEvent>::registerPersistent();
-  RelationArray::registerPersistent<Particle, RestOfEvent>();
+  StoreArray<RestOfEvent> roeArray;
+  roeArray.registerInDataStore();
+  particles.registerRelationTo(roeArray);
 }
 
 void RestOfEventBuilderModule::event()
 {
   // input Particle
   StoreObjPtr<ParticleList> plist(m_particleList);
-  StoreObjPtr<Particle>     particles;
 
   // output
   StoreArray<RestOfEvent> roeArray;
@@ -74,7 +74,7 @@ void RestOfEventBuilderModule::event()
     const Particle* particle = plist->getParticle(i);
 
     // create RestOfEvent object
-    RestOfEvent* roe = roeArray.appendNew(RestOfEvent());
+    RestOfEvent* roe = roeArray.appendNew();
 
     // create relation: Particle <-> RestOfEvent
     particle->addRelationTo(roe);

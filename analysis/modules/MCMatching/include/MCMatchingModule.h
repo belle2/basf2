@@ -12,6 +12,8 @@
 #define MCMATCHINGMODULE_H
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <string>
 
 
@@ -20,7 +22,7 @@ namespace Belle2 {
   /**
    * MC matching module: module performs MC matching (sets the relation Particle -> MCParticle) for all particles
    * and its (grand)^N-daughter particles in the user-specified ParticleList. The MC matching algorithm is implemented
-   * in analysis/utility/mcParticleMatching.h
+   * in the MCMatching namespace.
    */
   class MCMatchingModule : public Module {
 
@@ -68,7 +70,7 @@ namespace Belle2 {
   private:
 
     std::string m_listName;  /**< steering variable: name of the input ParticleList */
-
+    StoreObjPtr<ParticleList> m_plist; /**< the input ParticleList. */
   };
 }
 #endif

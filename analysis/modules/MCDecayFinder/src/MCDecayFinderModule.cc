@@ -13,7 +13,6 @@
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <string>
 
@@ -26,50 +25,44 @@ REG_MODULE(MCDecayFinder)
 MCDecayFinderModule::MCDecayFinderModule() : Module()
 {
   //Set module properties
-  setDescription("Find decays in MCParticle list matching a given DecayString.");
+  setDescription("Find decays in MCParticle list matching a given DecayString and create Particles from them.");
   //Parameter definition
-  addParam("decayString", m_strDecay, "DecayDescriptor string.", string(""));
-  addParam("listName", m_strListName, "Name of the output particle list", string(""));
-  addParam("persistent", m_persistent,
-           "toggle output particle list btw. transient/persistent", false);
+  addParam("decayString", m_strDecay, "DecayDescriptor string.");
+  addParam("listName", m_listName, "Name of the output particle list");
+  addParam("persistent", m_persistent, "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
 }
 
 void MCDecayFinderModule::initialize()
 {
   B2WARNING("This is an untested prototype. Do not use for any production purposes.");
 
-  if (m_strDecay.empty()) B2ERROR("No decay descriptor string provided.");
   m_decaydescriptor.init(m_strDecay);
-  if (m_strListName.empty()) B2ERROR("No name of output particle list provided.");
 
-  m_particleStore = std::string("FoundParticles") + m_strListName;
+  m_particleStore = std::string("FoundParticles") + m_listName;
   B2INFO("particle store used: " << m_particleStore);
 
   // Register output particle list, particle store and relation to MCParticles
+  StoreObjPtr<ParticleList> particleList(m_listName);
+  StoreArray<Particle> particles(m_particleStore);
+  StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
+  StoreArray<MCParticle> mcparticles;
 
-  if (m_persistent) {
-    StoreObjPtr<ParticleList>::registerPersistent(m_strListName);
-    StoreArray<Particle>::registerPersistent(m_particleStore);
-    StoreObjPtr<ParticleExtraInfoMap>::registerPersistent("", DataStore::c_Event, false); //allow reregistration
-    RelationArray::registerPersistent<Particle, MCParticle>(m_particleStore, "");
-  } else {
-    StoreObjPtr<ParticleList>::registerTransient(m_strListName);
-    StoreArray<Particle>::registerTransient(m_particleStore);
-    StoreObjPtr<ParticleExtraInfoMap>::registerTransient("", DataStore::c_Event, false); //allow reregistration
-    RelationArray::registerTransient<Particle, MCParticle>(m_particleStore, "");
-  }
+  DataStore::EStoreFlags flags = m_persistent ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
+  particleList.registerInDataStore(flags);
+  particles.registerInDataStore(flags);
+  extraInfoMap.registerInDataStore();
+  particles.registerRelationTo(mcparticles, DataStore::c_Event, flags);
 }
 
 void MCDecayFinderModule::event()
 {
   // particle store (working space)
   StoreArray<Particle> particles(m_particleStore);
-  particles.create();
 
   // Get output particle list
-  StoreObjPtr<ParticleList> outputList(m_strListName);
+  StoreObjPtr<ParticleList> outputList(m_listName);
   outputList.create();
-  outputList->initialize(m_decaydescriptor.getMother()->getPDGCode(), m_strListName);
+  outputList->initialize(m_decaydescriptor.getMother()->getPDGCode(), m_listName);
   outputList->setParticleCollectionName(m_particleStore);
 
   // retrieve list of MCParticles
@@ -205,22 +198,20 @@ int MCDecayFinderModule::write(DecayTree<MCParticle>* decay)
   StoreArray<Particle> particles(m_particleStore);
   // Input MCParticle array
   StoreArray<MCParticle> mcparticles;
-  // Relation between particles and MCParticles
-  RelationArray particle2mcparticle(particles, mcparticles);
 
   // Create new Particle in particles array
-  particles.appendNew(decay->getObj());
+  Particle* newParticle = particles.appendNew(decay->getObj());
 
   // set relation between the created Particle and the MCParticle
-  int iIndex = particles.getEntries() - 1;
-  particle2mcparticle.add(iIndex, decay->getObj()->getArrayIndex());
+  newParticle->addRelationTo(decay->getObj());
+  const int iIndex = particles.getEntries() - 1;
 
   // Now save also daughters of this MCParticle and set the daughter relation
   vector< DecayTree<MCParticle>* > daughters = decay->getDaughters();
   int nDaughers = daughters.size();
   for (int i = 0; i < nDaughers; ++i) {
     int iIndexDaughter = write(daughters[i]);
-    particles[iIndex]->appendDaughter(iIndexDaughter);
+    newParticle->appendDaughter(iIndexDaughter);
   }
   return iIndex;
 }

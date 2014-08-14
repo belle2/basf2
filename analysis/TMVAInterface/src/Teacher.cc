@@ -80,7 +80,7 @@ namespace Belle2 {
         tree->SetBranchAddress(Variable::makeROOTCompatible(m_target_var->name).c_str(), &m_target);
       }
 
-      m_tree.registerAsTransient(tree_name, DataStore::c_Persistent);
+      m_tree.registerInDataStore(tree_name, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
       m_tree.construct();
       m_tree->assign(tree);
 

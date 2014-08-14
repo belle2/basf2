@@ -12,8 +12,6 @@
 #include <analysis/modules/ParticleListManipulator/ParticleListManipulatorModule.h>
 
 
-#include <framework/core/ModuleManager.h>
-
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -61,7 +59,7 @@ namespace Belle2 {
     addParam("cut", m_cutParameter, "Selection criteria to be applied", emptyCut);
 
     addParam("persistent", m_persistent,
-             "toggle newly created particle list btw. transient/persistent", false);
+             "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
 
     // initializing the rest of private memebers
     m_pdgCode   = 0;
@@ -104,14 +102,12 @@ namespace Belle2 {
         B2ERROR("Invalid input ParticleList name: " << m_inputListNames[i]);
     }
 
-    if (m_persistent) {
-      StoreObjPtr<ParticleList>::registerPersistent(m_outputListName, DataStore::c_Event, false);
-      if (!m_isSelfConjugatedParticle)
-        StoreObjPtr<ParticleList>::registerPersistent(m_outputAntiListName, DataStore::c_Event, false);
-    } else {
-      StoreObjPtr<ParticleList>::registerTransient(m_outputListName, DataStore::c_Event, false);
-      if (!m_isSelfConjugatedParticle)
-        StoreObjPtr<ParticleList>::registerTransient(m_outputAntiListName, DataStore::c_Event, false);
+    StoreObjPtr<ParticleList> particleList(m_outputListName);
+    DataStore::EStoreFlags flags = m_persistent ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
+    particleList.registerInDataStore(flags);
+    if (!m_isSelfConjugatedParticle) {
+      StoreObjPtr<ParticleList> antiParticleList(m_outputAntiListName);
+      antiParticleList.registerInDataStore(flags);
     }
 
     for (unsigned i = 0; i < m_inputListNames.size(); i++) {
@@ -171,10 +167,6 @@ namespace Belle2 {
   }
 
   void ParticleListManipulatorModule::terminate()
-  {
-  }
-
-  void ParticleListManipulatorModule::printModuleParams() const
   {
   }
 

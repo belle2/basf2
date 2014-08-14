@@ -12,10 +12,8 @@
 #include <analysis/modules/ParticleLoader/ParticleLoaderModule.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 
 // framework aux
 #include <framework/gearbox/Const.h>
@@ -61,12 +59,23 @@ namespace Belle2 {
 
   void ParticleLoaderModule::initialize()
   {
-    StoreArray<Particle>::registerPersistent();
-    StoreObjPtr<ParticleExtraInfoMap>::registerPersistent("", DataStore::c_Event, false); //allow reregistration
-    RelationArray::registerPersistent<Particle, PIDLikelihood>();
-    RelationArray::registerPersistent<Particle, MCParticle>();
+    StoreArray<Particle> particles;
+    StoreArray<MCParticle> mcparticles;
+    StoreArray<PIDLikelihood> pidlikelihoods;
+    StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
+
+    particles.registerInDataStore();
+    extraInfoMap.registerInDataStore();
+    //register relations if these things exists
+    if (mcparticles.isOptional()) {
+      particles.registerRelationTo(mcparticles);
+    }
+    if (pidlikelihoods.isOptional()) {
+      particles.registerRelationTo(pidlikelihoods);
+    }
 
     if (m_useMCParticles) {
+      mcparticles.isRequired();
       B2INFO("ParticleLoader: Loading Particle(s) from final state primary MCParticle(s)");
     } else {
       B2INFO("ParticleLoader: Loading Particle(s) from reconstructed Track(s) (as e/mu/pi/K/p), neutral ECLCluster(s) (as photons) and neutral KLMClusters (as Klongs)");
@@ -79,14 +88,13 @@ namespace Belle2 {
 
   void ParticleLoaderModule::event()
   {
-    StoreArray<Particle> Particles;
-    if (Particles.isValid()) {
-      B2INFO("ParticleLoader::loadFromFile size=" << Particles.getEntries());
+    StoreArray<Particle> particles;
+    if (particles.isValid()) {
+      B2INFO("ParticleLoader::loadFromFile size=" << particles.getEntries());
       B2WARNING("loadFromFile not fully implemented yet and may result in double counting!");
       return;
     }
 
-    Particles.create();
     StoreObjPtr<ParticleExtraInfoMap> particleExtraInfoMap;
     if (not particleExtraInfoMap) {
       particleExtraInfoMap.create();
@@ -112,7 +120,7 @@ namespace Belle2 {
   {
 
     StoreArray<MCParticle> mcParticles;
-    StoreArray<Particle> Particles;
+    StoreArray<Particle> particles;
 
     unsigned int bitmask = MCParticle::c_PrimaryParticle;
     const int Npdg = 7;
@@ -123,13 +131,13 @@ namespace Belle2 {
       if (!mc->hasStatus(bitmask)) continue;
       for (int k = 0; k < Npdg; k++) {
         if (abs(mc->getPDG()) == pdgCode[k]) {
-          Particle* newPart = Particles.appendNew(mc);
+          Particle* newPart = particles.appendNew(mc);
           newPart->addRelationTo(mc);
           break;
         }
       }
     }
-    //B2INFO("ParticleLoader::loadFromMCParticles size=" << Particles.getEntries());
+    //B2INFO("ParticleLoader::loadFromMCParticles size=" << particles.getEntries());
   }
 
   void ParticleLoaderModule::loadFromReconstruction()
@@ -137,7 +145,7 @@ namespace Belle2 {
     StoreArray<Track> Tracks;
     StoreArray<ECLCluster> ECLClusters;
     StoreArray<KLMCluster> KLMClusters;
-    StoreArray<Particle> Particles;
+    StoreArray<Particle> particles;
 
     const Const::ChargedStable charged[] = {Const::electron,
                                             Const::muon,
@@ -154,7 +162,7 @@ namespace Belle2 {
       for (int k = 0; k < 5; k++) {
         Particle particle(track, charged[k]);
         if (particle.getParticleType() == Particle::c_Track) { // should always hold but...
-          Particle* newPart = Particles.appendNew(particle);
+          Particle* newPart = particles.appendNew(particle);
           if (pid)
             newPart->addRelationTo(pid);
           if (mcParticle)
@@ -175,7 +183,7 @@ namespace Belle2 {
       Particle particle(cluster);
 
       if (particle.getParticleType() == Particle::c_ECLCluster) { // should always hold but...
-        Particle* newPart = Particles.appendNew(particle);
+        Particle* newPart = particles.appendNew(particle);
 
         if (mcParticle)
           newPart->addRelationTo(mcParticle);
@@ -194,14 +202,14 @@ namespace Belle2 {
       Particle particle(cluster);
 
       if (particle.getParticleType() == Particle::c_KLMCluster) { // should always hold but...
-        Particle* newPart = Particles.appendNew(particle);
+        Particle* newPart = particles.appendNew(particle);
 
         if (mcParticle)
           newPart->addRelationTo(mcParticle);
       }
     }
 
-    //B2INFO("ParticleLoader::loadFromReconstruction size=" << Particles.getEntries());
+    //B2INFO("ParticleLoader::loadFromReconstruction size=" << particles.getEntries());
   }
 } // end Belle2 namespace
 

@@ -12,13 +12,10 @@
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 
 // dataobjects
 #include <mdst/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 
 // utility
 #include <analysis/utility/MCMatching.h>
@@ -39,7 +36,7 @@ namespace Belle2 {
 
   MCMatchingModule::MCMatchingModule() : Module()
   {
-    setDescription("Module performs MC matching (sets relation Particle->MCParticle) for all particles (and its (grand)^N-daughter particles) in the ParticleList. The relation can be used in conjuction with MCMatching::MCMatchStatus flags, e.g. using the isSignal or mcPDG & mcStatus variables.");
+    setDescription("Performs MC matching (sets relation Particle->MCParticle) for all particles (and its (grand)^N-daughter particles) in the ParticleList. The relation can be used in conjuction with MCMatching::MCMatchStatus flags, e.g. using the isSignal or mcPDG & mcStatus variables.");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     addParam("listName", m_listName, "Name of the input ParticleList.", string(""));
@@ -52,10 +49,12 @@ namespace Belle2 {
 
   void MCMatchingModule::initialize()
   {
-    StoreArray<Particle>::required();
-    StoreArray<MCParticle>::required();
-    StoreObjPtr<ParticleList>::required(m_listName);
-    RelationArray::registerPersistent<Particle, MCParticle>();
+    StoreArray<Particle> particles;
+    StoreArray<MCParticle> mcparticles;
+    particles.isRequired();
+    mcparticles.isRequired();
+    particles.registerRelationTo(mcparticles);
+    m_plist.isRequired(m_listName);
   }
 
   void MCMatchingModule::beginRun()
@@ -64,15 +63,13 @@ namespace Belle2 {
 
   void MCMatchingModule::event()
   {
-
-    StoreObjPtr<ParticleList> plist(m_listName);
-    if (!plist) {
+    if (!m_plist) {
       B2ERROR("ParticleList " << m_listName << " not found");
       return;
     }
 
-    for (unsigned i = 0; i < plist->getListSize(); i++) {
-      const Particle* part = plist->getParticle(i);
+    for (unsigned i = 0; i < m_plist->getListSize(); i++) {
+      const Particle* part = m_plist->getParticle(i);
 
       MCMatching::setMCTruth(part);
     }

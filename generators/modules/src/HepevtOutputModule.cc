@@ -52,7 +52,7 @@ void HepevtOutputModule::initialize()
 
 void HepevtOutputModule::event()
 {
-  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
   StoreArray<MCParticle> mcPartCollection;
 
   int nPart = mcPartCollection.getEntries();
@@ -82,6 +82,7 @@ void HepevtOutputModule::event()
       int motherIndex = 0;
       if (mcPart.getMother() != NULL) motherIndex = mcPart.getMother()->getIndex();
 
+      // cppcheck-suppress zerodiv
       m_fileStream << format("%5i%12i%10i%10i%10i%10i") % isthep % mcPart.getPDG() % motherIndex % motherIndex % mcPart.getFirstDaughter() % mcPart.getLastDaughter();
       m_fileStream << format("%15.6f%15.6f%15.6f%15.6f%15.6f") % mom.X() % mom.Y() % mom.Z() % mcPart.getEnergy() % mcPart.getMass();
       m_fileStream << format("%15.6f%15.6f%15.6f%15.6f\n") % mcPart.getVertex().X() % mcPart.getVertex().Y() % mcPart.getVertex().Z() % mcPart.getProductionTime();

@@ -24,7 +24,6 @@
 #include <TBaseClass.h>
 #include <TTreeIndex.h>
 #include <TProcessID.h>
-#include <TSystem.h>
 
 #include <time.h>
 
@@ -61,8 +60,8 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), 
   addParam("updateFileCatalog", m_updateFileCatalog, "Flag that specifies whether the file metadata catalog is updated.", true);
 
   vector<string> emptyvector;
-  addParam(c_SteerBranchNames[0], m_branchNames[0], "Names of branches to be written from event map. Empty means all branches. Transient objects added here will also be saved. (EventMetaData is always saved)", emptyvector);
-  addParam(c_SteerBranchNames[1], m_branchNames[1], "Names of branches to be written from persistent map. Empty means all branches. Transient objects added here will also be saved. (FileMetaData is always saved)", emptyvector);
+  addParam(c_SteerBranchNames[0], m_branchNames[0], "Names of branches to be written from event map. Empty means all branches. Objects with c_DontWriteOut flag added here will also be saved. (EventMetaData is always saved)", emptyvector);
+  addParam(c_SteerBranchNames[1], m_branchNames[1], "Names of branches to be written from persistent map. Empty means all branches. Objects with c_DontWriteOut flag added here will also be saved. (FileMetaData is always saved)", emptyvector);
 
   addParam(c_SteerExcludeBranchNames[0], m_excludeBranchNames[0], "Names of branches NOT to be written from event map. Branches also in branchNames are not written.", emptyvector);
   addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1], "Names of branches NOT to be written from persistent map. Branches also in branchNamesPersistent are not written.", emptyvector);
@@ -73,9 +72,6 @@ RootOutputModule::~RootOutputModule() { }
 
 void RootOutputModule::initialize()
 {
-  //needed if parallel processing is used
-  gSystem->Load("libdataobjects");
-
   //buffer size in bytes (default value used by root)
   const int bufsize = 32000;
 

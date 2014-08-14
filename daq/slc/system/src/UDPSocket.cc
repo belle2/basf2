@@ -33,22 +33,25 @@ UDPSocket::UDPSocket(unsigned int port,
 {
   m_addr.sin_port = htons(port);
   m_addr.sin_family = AF_INET;
-  //m_addr.sin_addr.s_addr = inet_addr(hostname.c_str());
-  m_addr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
+  m_addr.sin_addr.s_addr = inet_addr(hostname.c_str());
+  //m_addr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
   if ((m_fd = ::socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
     throw (IOException("Failed to create socket"));
   }
-  // if (boardcast) {
-  int yes = 1;
-  setsockopt(m_fd, SOL_SOCKET, SO_BROADCAST,
-             (char*)&yes, sizeof(yes));
-  //}
+  if (boardcast) {
+    int yes = 1;
+    setsockopt(m_fd, SOL_SOCKET, SO_BROADCAST,
+               (char*)&yes, sizeof(yes));
+  }
 }
 
-int UDPSocket::bind(unsigned int port)
+int UDPSocket::bind(unsigned int port, const std::string& hostname)
 throw (IOException)
 {
   m_addr.sin_port = htons(port);
+  if (hostname.size() > 0) {
+    m_addr.sin_addr.s_addr = inet_addr(hostname.c_str());
+  }
   return bind();
 }
 

@@ -22,7 +22,8 @@ namespace Belle2 {
 
   public:
     int bind() throw(IOException);
-    int bind(unsigned int port) throw(IOException);
+    int bind(unsigned int port, const std::string& hostname = "")
+    throw(IOException);
     const std::string getHostName() const throw();
     unsigned int getPort() const throw();
     unsigned int getAddress() const throw();
@@ -33,6 +34,7 @@ namespace Belle2 {
 
   private:
     struct sockaddr_in m_addr;
+    struct sockaddr_in m_multi;
 
   };
 

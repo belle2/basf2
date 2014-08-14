@@ -16,7 +16,6 @@
 //datastore types
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/DataStore.h>
 
 #include <framework/gearbox/Const.h>
@@ -147,18 +146,11 @@ void MCTrackMatcherModule::initialize()
 
 
   //Purity relation - for each PRTrack to store the purest MCTrack
-  RelationArray mcToPRPurityRelation(storeMCTrackCands, storePRTrackCands);
-
+  storeMCTrackCands.registerRelationTo(storePRTrackCands);
   //Efficiency relation - for each MCTrack to store the most efficient PRTrack
-  RelationArray prToMCEfficiencyRelation(storePRTrackCands, storeMCTrackCands);
-
+  storePRTrackCands.registerRelationTo(storeMCTrackCands);
   //MC matching relation
-  RelationArray prToMCParticleRelation(storePRTrackCands, storeMCParticles);
-
-  //Register to save to the root output
-  mcToPRPurityRelation.registerAsPersistent();
-  prToMCEfficiencyRelation.registerAsPersistent();
-  prToMCParticleRelation.registerAsPersistent();
+  storePRTrackCands.registerRelationTo(storeMCParticles);
 
 
   //Require the hits or clusters in case they should be used

@@ -12,7 +12,6 @@
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 
 // data objects:
 #include <mdst/dataobjects/PIDLikelihood.h>
@@ -49,11 +48,13 @@ namespace Belle2 {
 
   void MdstPIDModule::initialize()
   {
+    StoreArray<Track> tracks;
+    StoreArray<PIDLikelihood> pidLikelihoods;
     // data store registration
-    StoreArray<PIDLikelihood>::registerPersistent();
-    RelationArray::registerPersistent<Track, PIDLikelihood>();
+    pidLikelihoods.registerInDataStore();
+    tracks.registerRelationTo(pidLikelihoods);
 
-    StoreArray<Track>::required();
+    tracks.isRequired();
     StoreArray<TOPLikelihood>::optional();
     StoreArray<ARICHLikelihood>::optional();
     StoreArray<DedxLikelihood>::optional();

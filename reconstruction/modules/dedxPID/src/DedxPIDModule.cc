@@ -5,7 +5,6 @@
 #include <reconstruction/dataobjects/DedxLikelihood.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Const.h>
 #include <framework/utilities/FileSystem.h>
 
@@ -101,14 +100,20 @@ void DedxPIDModule::initialize()
     B2ERROR("No PDFFile given and debug output disabled. DedxPID module will produce no output!");
   }
 
+  StoreArray<Track> tracks;
+  StoreArray<genfit::Track> gfTracks;
+  StoreArray<TrackFitResult> trackfitResults;
+  StoreArray<genfit::TrackCand> trackCandidates;
   //required inputs
-  StoreArray<genfit::Track>::required();
-  StoreArray<Track>::required();
-  StoreArray<TrackFitResult>::required();
-  StoreArray<genfit::TrackCand>::required();
+  tracks.isRequired();
+  gfTracks.isRequired();
+  trackfitResults.isRequired();
+  trackCandidates.isRequired();
 
   //optional inputs
-  StoreArray<MCParticle>::optional();
+  StoreArray<MCParticle> mcparticles;
+  mcparticles.isOptional();
+  tracks.optionalRelationTo(mcparticles);
   if (m_useCDC)
     StoreArray<CDCHit>::required();
   else
@@ -124,13 +129,15 @@ void DedxPIDModule::initialize()
 
   //register outputs (if needed)
   if (m_enableDebugOutput) {
-    StoreArray<DedxTrack>::registerPersistent();
-    RelationArray::registerPersistent<Track, DedxTrack>();
+    StoreArray<DedxTrack> dedxTracks;
+    dedxTracks.registerInDataStore();
+    tracks.registerRelationTo(dedxTracks);
   }
 
   if (!m_pdfFile.empty()) {
-    StoreArray<DedxLikelihood>::registerPersistent();
-    RelationArray::registerPersistent<Track, DedxLikelihood>();
+    StoreArray<DedxLikelihood> dedxLikelihoods;
+    dedxLikelihoods.registerInDataStore();
+    tracks.registerRelationTo(dedxLikelihoods);
 
     //load pdfs
     TFile* pdf_file = new TFile(m_pdfFile.c_str(), "READ");

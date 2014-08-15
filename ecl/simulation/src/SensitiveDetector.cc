@@ -206,7 +206,7 @@ namespace Belle2 {
       if (!eclArray) eclArray.create();
       RelationArray eclSimHitRel(mcParticles, eclArray);
       TVector3 momentum(mom.getX() / CLHEP::GeV, mom.getY() / CLHEP::GeV, mom.getZ() / CLHEP::GeV);
-      new(eclArray.nextFreeAddress()) ECLSimHit(cellId + 1, trackID, pid, tof / CLHEP::ns, edep / CLHEP::GeV, momentum, posAve);
+      eclArray.appendNew(cellId + 1, trackID, pid, tof / CLHEP::ns, edep / CLHEP::GeV, momentum, posAve);
       /*
             m_simhitNumber = eclArray->GetLast() + 1;
             new(eclArray->AddrAt(m_simhitNumber)) ECLSimHit();
@@ -260,7 +260,7 @@ namespace Belle2 {
 
             //m_hitNum = eclHitArray->GetLast() + 1;
             //new(eclHitArray->AddrAt(m_hitNum)) ECLHit();
-            new(eclHitArray.nextFreeAddress()) ECLHit();
+            eclHitArray.appendNew();
             m_hitNum = eclHitArray.getEntries() - 1;
             ECLHitIndex[cellId][TimeIndex] = m_hitNum;
             eclHitArray[m_hitNum]->setCellId(cellId + 1);

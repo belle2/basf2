@@ -161,7 +161,7 @@ void ECLReconstructorModule::event()
       //... Vishal
       StoreArray<ECLCluster> eclMdstArray;
       if (!eclMdstArray) eclMdstArray.create();
-      new(eclMdstArray.nextFreeAddress()) ECLCluster();
+      eclMdstArray.appendNew();
       int i_Mdst = eclMdstArray.getEntries() - 1;
 
       //Object for relation of ECLCluster to others
@@ -176,7 +176,7 @@ void ECLReconstructorModule::event()
 
         StoreArray<ECLHitAssignment> eclHaArray;
         if (!eclHaArray) eclHaArray.create();
-        new(eclHaArray.nextFreeAddress()) ECLHitAssignment();
+        eclHaArray.appendNew();
         m_HANum = eclHaArray.getEntries() - 1;
 
         eclHaArray[m_HANum]->setShowerId(nShower);
@@ -236,7 +236,7 @@ void ECLReconstructorModule::event()
 
       StoreArray<ECLShower> eclRecShowerArray;
       if (!eclRecShowerArray) eclRecShowerArray.create();
-      new(eclRecShowerArray.nextFreeAddress()) ECLShower();
+      eclRecShowerArray.appendNew();
       m_hitNum = eclRecShowerArray.getEntries() - 1;
       eclRecShowerArray[m_hitNum]->setShowerId(nShower);
       eclRecShowerArray[m_hitNum]->setEnergy((float) sEnergy);

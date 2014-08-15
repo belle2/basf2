@@ -175,14 +175,14 @@ void ECLDigitizerModule::event()
 
         StoreArray<ECLDsp> eclDspArray;
         if (!eclDspArray) eclDspArray.create();
-        new(eclDspArray.nextFreeAddress()) ECLDsp();
+        eclDspArray.appendNew();
         m_hitNum = eclDspArray.getEntries() - 1;
         eclDspArray[m_hitNum]->setCellId(iECLCell + 1);
         eclDspArray[m_hitNum]->setDspA(FitA);
 
         StoreArray<ECLDigit> eclDigiArray;
         if (!eclDigiArray) eclDigiArray.create();
-        new(eclDigiArray.nextFreeAddress()) ECLDigit();
+        eclDigiArray.appendNew();
         m_hitNum1 = eclDigiArray.getEntries() - 1;
         eclDigiArray[m_hitNum1]->setCellId(iECLCell + 1);//iECLCell + 1= 1~8736
         eclDigiArray[m_hitNum1]->setAmp(energyFit[iECLCell]);//E (GeV) = energyFit/20000;
@@ -195,7 +195,7 @@ void ECLDigitizerModule::event()
 
   StoreArray<ECLTrig> eclTrigArray;
   if (!eclTrigArray) eclTrigArray.create();
-  new(eclTrigArray.nextFreeAddress()) ECLTrig();
+  eclTrigArray.appendNew();
   m_hitNum2 = eclTrigArray.getEntries() - 1;
   eclTrigArray[m_hitNum2]->setTimeTrig(DeltaT * 12. / 508.); //t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
 

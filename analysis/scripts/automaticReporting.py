@@ -357,19 +357,26 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
 
         from variables import variables
         ranking = getMVARankingFromLogfile(placeholders['mvaLogFilename'])
-        placeholders['mvaVariables'] = ''
+        lines_by_rank = dict()
         for v in mvaConfig.variables:
             rootName = ROOT.Belle2.Variable.makeROOTCompatible(v)
             if rootName in ranking:
                 rank, value = ranking[rootName]
-                rank = str(rank)
+                rankStr = str(rank)
                 value = '{:.2f}'.format(value)
             else:
-                rank = ''
+                rank = 900 + len(lines_by_rank)  # nonsensical value to add it at the end
+                rankStr = ''
                 value = ''
             varName = addHyphenations(escapeForLatex(v))
             description = escapeForLatex(variables.getVariable(v).description)
-            placeholders['mvaVariables'] += varName + ' & ' + description + ' & ' + rank + '& ' + value + r' \\'
+            if rank in lines_by_rank:
+                raise runtime_error("Rank %d occurs more than once! Something is wrong in TMVA or in our parsing of the variable ranking." % (rank))
+            lines_by_rank[rank] = varName + ' & ' + description + ' & ' + rankStr + '& ' + value + r' \\'
+
+        placeholders['mvaVariables'] = ''
+        for key in sorted(lines_by_rank):
+            placeholders['mvaVariables'] += lines_by_rank[key]
 
         rootfile = ROOT.TFile(placeholders['mvaTMVAFilename'])
 

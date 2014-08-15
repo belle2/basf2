@@ -111,7 +111,7 @@ void ECLShowertoClusterModule::event()
     if (i_Shower == 0) eclMdstArray.clear(); // This clar the previous
     // stored data object of ECLCluster
     if (!eclMdstArray) eclMdstArray.create();
-    new(eclMdstArray.nextFreeAddress()) ECLCluster();
+    eclMdstArray.appendNew();
     int i_Mdst = eclMdstArray.getEntries() - 1;
 
     float Mdst_Error[6] = {

@@ -168,7 +168,8 @@ def GetCuts(signal, bckgrd, efficiency, purity, ycut_to_xcuts):
     nSignal = sum([value.GetEntries() for value in signal.values()])
 
     if nSignal == 0:
-        B2WARNING("No signal present")
+        channels = [channel for channel in signal.iterkeys()]
+        B2WARNING("No signal present in any of these channels: " + (", ".join(channels)))
         return {channel: (0, 0) for channel in signal.iterkeys()}
 
     def pythonEfficiencyFunc(ycut):

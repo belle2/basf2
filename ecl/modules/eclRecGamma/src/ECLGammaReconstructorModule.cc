@@ -132,7 +132,7 @@ void ECLGammaReconstructorModule::event()
 
     if (!m_extMatch) { //no match to track => assign as gamma
       if (!gammaArray) gammaArray.create();
-      new(gammaArray.nextFreeAddress()) ECLGamma();
+      gammaArray.appendNew();
       m_GNum = gammaArray.getEntries() - 1;
       gammaArray[m_GNum]->setShowerId(m_showerId);
       eclGammaToShower.add(m_GNum, iShower);

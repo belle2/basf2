@@ -24,15 +24,13 @@ namespace Belle2 {
 
   /** In the store you can park objects that have to be accessed by various modules.
    *
-   *  Normal users should try to access the store via StoreAccessorBase-derived classes like
+   *  Normal users should to access the store via StoreAccessorBase-derived classes like
    *  StoreObjPtr or StoreArray.
    *
-   *  The store saves objects/arrays with a unique (name, durability) key.
-   *  Currently the store supports either the storage of single objects (that inherit from TObject)
-   *  or TClonesArrays which can store a large number of objects of the same type.
-   *  Besides that, you have to chose the durability of the things you want to store. <br>
-   *  Currently you can chose between lifetimes of event and persistent.
-   *  basf2 deletes the objects from the store according to the durability map in which the objects are stored.
+   *  Nomenclature:
+   *  - Entry: unique (name, durability) key that can store an array/object. Entries are created using registerEntry().
+   *  - Object: In this context, can mean an array or object stored in an entry, see e.g. createObject(), getObject()
+   *  - Durability: defines duration that objects are valid, see DataStore::EDurability.
    *
    *  @sa EDurability StoreObjPtr StoreArray RelationsObject
    *  @author <a href="mailto:belle2_software@bpost.kek.jp?subject=DataStore">The basf2 developers</a>
@@ -42,18 +40,18 @@ namespace Belle2 {
     //----------------------------------- enums and typedefs ---------------------------------------------------
     /** Durability types.
      *
-     *  These types are used to identify the map used in the DataStore.
+     * Defines how long an object should be valid.
      */
     enum EDurability {
-      c_Event,     /**< Object is deleted after event. */
+      c_Event,     /**< Object is valid for one event, so there will be a different object in each event. */
       c_Persistent /**< Object is available during entire execution time. */
     };
 
     /** Flags describing behaviours of objects etc.
      */
     enum EStoreFlag {
-      c_WriteOut = 0,                /**< Object/array should be saved by output modules. */
-      c_DontWriteOut = 1 << 0,       /**< Object/array should be NOT saved by output modules. Can be overridden via output module parameters. */
+      c_WriteOut = 0,                /**< Object/array should be saved by output modules. (default) */
+      c_DontWriteOut = 1 << 0,       /**< Object/array should be NOT saved by output modules. Can be overridden using the 'branchNames' parameter of RootOutput. */
       c_ErrorIfAlreadyRegistered = 1 << 1,/**< If the object/array was already registered, produce an error (aborting initialisation). */
     };
     /** Combination of DataStore::EStoreFlag flags. */

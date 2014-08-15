@@ -43,8 +43,8 @@ namespace Belle2 {
      * Defines how long an object should be valid.
      */
     enum EDurability {
-      c_Event,     /**< Object is valid for one event, so there will be a different object in each event. */
-      c_Persistent /**< Object is available during entire execution time. */
+      c_Event,     /**< Different object in each event, all objects/arrays are invalidated after event() function has been called on last module in path.  */
+      c_Persistent /**< Object is available during entire execution time. Objects are never invalidated and are accessible even after process(Path) returns. */
     };
 
     /** Flags describing behaviours of objects etc.

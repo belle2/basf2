@@ -336,10 +336,6 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
   }
 
   m_processStatisticsPtr->stopGlobal(ModuleStatistics::c_Term);
-
-  //Delete persistent data in DataStore
-  //TODO: do i want this? guess not.
-  //DataStore::Instance().invalidateData(DataStore::c_Persistent);
 }
 
 

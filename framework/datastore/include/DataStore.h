@@ -28,7 +28,7 @@ namespace Belle2 {
    *  StoreObjPtr or StoreArray.
    *
    *  Nomenclature:
-   *  - Entry: unique (name, durability) key that can store an array/object. Entries are created using registerEntry().
+   *  - Entry: unique (name, durability) key that can store an array/object, see StoreEntry. Entries are created using registerEntry().
    *  - Object: In this context, can mean an array or object stored in an entry, see e.g. createObject(), getObject()
    *  - Durability: defines duration that objects are valid, see DataStore::EDurability.
    *
@@ -73,7 +73,7 @@ namespace Belle2 {
     };
 
 
-    /** A struct for map entries **/
+    /** Wraps a stored array/object, stored under unique (name, durability) key. */
     struct StoreEntry {
       StoreEntry() : isArray(false), dontWriteOut(false), object(0), ptr(0), name("") {};
       bool        isArray;     /**< Flag that indicates whether the object is a TClonesArray **/
@@ -106,9 +106,9 @@ namespace Belle2 {
     };
 
     // Convenient typedefs.
-    typedef std::map<std::string, StoreEntry> StoreObjMap;  /**< Map for StoreEntries. */
-    typedef StoreObjMap::iterator StoreObjIter;              /**< Iterator for a StoreEntry map. */
-    typedef StoreObjMap::const_iterator StoreObjConstIter;   /**< const_iterator for a StoreEntry map. */
+    typedef std::map<std::string, StoreEntry> StoreEntryMap;  /**< Map for StoreEntries. */
+    typedef StoreEntryMap::iterator StoreEntryIter;              /**< Iterator for a StoreEntry map. */
+    typedef StoreEntryMap::const_iterator StoreEntryConstIter;   /**< const_iterator for a StoreEntry map. */
 
     //--------------------------------- Instance ---------------------------------------------------------------
     /** Instance of singleton Store.
@@ -253,7 +253,7 @@ namespace Belle2 {
      *
      * This is intended to be used for input/output or other framework-internal modules.
      */
-    StoreObjMap& getStoreObjectMap(EDurability durability) { return m_storeObjMap[durability]; }
+    StoreEntryMap& getStoreEntryMap(EDurability durability) { return m_storeEntryMap[durability]; }
 
 
     /** Add a relation from an object in a store array to another object in a store array.
@@ -475,7 +475,7 @@ namespace Belle2 {
     /** Are we currently initializing modules? */
     bool getInitializeActive() const { return m_initializeActive; }
 
-    /** Clears maps of a specified durability.
+    /** Clears all registered StoreEntry objects of a specified durability, invalidating all objects.
      *
      *  Called by the framework. Users should usually not use this function without a good reason.
      *
@@ -487,7 +487,7 @@ namespace Belle2 {
 
     /** Frees memory occopied by data store items and removes all objects from the map.
      *
-     *  Afterwards, m_storeObjMap[durability] is empty.
+     *  Afterwards, m_storeEntryMap[durability] is empty.
      *  Called by the framework. Users should usually not use this function without good reason.
      */
     void reset(EDurability durability);
@@ -534,11 +534,8 @@ namespace Belle2 {
      */
     void getArrayNames(std::vector<std::string>& names, const std::string& arrayName, const TClass* arrayClass, EDurability durability = c_Event) const;
 
-    /** Map for all objects/arrays in the data store.
-     *
-     * They map the name to a TObject pointer, separated by durability.
-     */
-    StoreObjMap m_storeObjMap[c_NDurabilityTypes];
+    /** Maps (name, durability) key to StoreEntry objects. */
+    StoreEntryMap m_storeEntryMap[c_NDurabilityTypes];
 
     /** True if modules are currently being initialized.
      *

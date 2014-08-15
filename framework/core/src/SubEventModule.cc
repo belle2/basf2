@@ -50,7 +50,7 @@ SubEventModule::~SubEventModule()
 {
 }
 
-void restoreContents(const DataStore::StoreObjMap& orig, DataStore::StoreObjMap& dest)
+void restoreContents(const DataStore::StoreEntryMap& orig, DataStore::StoreEntryMap& dest)
 {
   for (auto entry : orig) {
     auto& destEntry = dest[entry.first];
@@ -69,7 +69,7 @@ void SubEventModule::initialize()
   processStatistics->suspendGlobal();
 
   //register loop object
-  const DataStore::StoreEntry& arrayEntry = DataStore::Instance().getStoreObjectMap(DataStore::c_Event).at(m_loopOver.getName());
+  const DataStore::StoreEntry& arrayEntry = DataStore::Instance().getStoreEntryMap(DataStore::c_Event).at(m_loopOver.getName());
   TClass* arrayClass = static_cast<TClonesArray*>(arrayEntry.object)->GetClass();
   DataStore::Instance().registerEntry(m_objectName, DataStore::c_Event, arrayClass, false, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
 
@@ -87,8 +87,8 @@ void SubEventModule::terminate()
 
   //get event map and make a deep copy of the StoreEntry objects
   //(we want to revert changes to the StoreEntry objects, but not to the arrays/objects)
-  DataStore::StoreObjMap& persistentMap = DataStore::Instance().getStoreObjectMap(DataStore::c_Persistent);
-  DataStore::StoreObjMap persistentMapCopy = persistentMap;
+  DataStore::StoreEntryMap& persistentMap = DataStore::Instance().getStoreEntryMap(DataStore::c_Persistent);
+  DataStore::StoreEntryMap persistentMapCopy = persistentMap;
 
   processTerminate(m_moduleList);
 
@@ -132,14 +132,14 @@ void SubEventModule::event()
 
   //get event map and make a deep copy of the StoreEntry objects
   //(we want to revert changes to the StoreEntry objects, but not to the arrays/objects)
-  DataStore::StoreObjMap& eventMap = DataStore::Instance().getStoreObjectMap(DataStore::c_Event);
-  DataStore::StoreObjMap eventMapCopy = eventMap;
+  DataStore::StoreEntryMap& eventMap = DataStore::Instance().getStoreEntryMap(DataStore::c_Event);
+  DataStore::StoreEntryMap eventMapCopy = eventMap;
 
   //processCore() resets EventMetaData
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
   const EventMetaData eventMetaDataBack = *eventMetaDataPtr;
 
-  DataStore::StoreEntry& objectEntry = DataStore::Instance().getStoreObjectMap(DataStore::c_Event).at(m_objectName);
+  DataStore::StoreEntry& objectEntry = DataStore::Instance().getStoreEntryMap(DataStore::c_Event).at(m_objectName);
 
   for (int i = 0; i < numEntries; i++) {
     //set loopObject

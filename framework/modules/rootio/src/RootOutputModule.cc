@@ -96,7 +96,7 @@ void RootOutputModule::initialize()
       B2WARNING(c_SteerExcludeBranchNames[ii] << " has duplicate entries.");
     //m_branchNames[ii] and it's exclusion list are now sorted alphabetically and unique
 
-    DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(DataStore::EDurability(ii));
+    DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::EDurability(ii));
 
     //check for branch names that are not in the DataStore
     for (unsigned int iBranch = 0; iBranch < m_branchNames[ii].size(); iBranch++) {
@@ -112,7 +112,7 @@ void RootOutputModule::initialize()
 
     //create the tree and branches
     m_tree[ii] = new TTree(c_treeNames[ii].c_str(), c_treeNames[ii].c_str());
-    for (DataStore::StoreObjIter iter = map.begin(); iter != map.end(); ++iter) {
+    for (DataStore::StoreEntryIter iter = map.begin(); iter != map.end(); ++iter) {
       const std::string& branchName = iter->first;
       //skip transient entries, excluded branches, and branches not in m_branchNames (if it is not empty)
       if ((iter->second.dontWriteOut && !binary_search(m_branchNames[ii].begin(), m_branchNames[ii].end(), branchName)) ||

@@ -106,8 +106,8 @@ bool DataStore::registerEntry(const std::string& name, EDurability durability,
   info.addEntry(name, ModuleInfo::c_Output, (objClass == RelationContainer::Class()));
 
   // Check whether the map entry already exists
-  const auto& it = m_storeObjMap[durability].find(name);
-  if (it != m_storeObjMap[durability].end()) {
+  const auto& it = m_storeEntryMap[durability].find(name);
+  if (it != m_storeEntryMap[durability].end()) {
     StoreEntry& entry = it->second;
 
     // Complain about existing entry
@@ -136,7 +136,7 @@ bool DataStore::registerEntry(const std::string& name, EDurability durability,
   }
 
   // Add the DataStore entry
-  StoreEntry& entry = m_storeObjMap[durability][name];
+  StoreEntry& entry = m_storeEntryMap[durability][name];
   entry.isArray = array;
   entry.dontWriteOut = dontwriteout;
   if (array) {
@@ -173,9 +173,9 @@ bool DataStore::registerRelation(const StoreAccessorBase& fromArray, const Store
 
 DataStore::StoreEntry* DataStore::getEntry(const StoreAccessorBase& accessor)
 {
-  const auto& it = m_storeObjMap[accessor.getDurability()].find(accessor.getName());
+  const auto& it = m_storeEntryMap[accessor.getDurability()].find(accessor.getName());
 
-  if (it != m_storeObjMap[accessor.getDurability()].end() and checkType((it->second), accessor)) {
+  if (it != m_storeEntryMap[accessor.getDurability()].end() and checkType((it->second), accessor)) {
     return &(it->second);
   } else {
     return nullptr;
@@ -242,7 +242,7 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
 
   // search for the object and set the entry and index
   const TClass* objectClass = object->IsA();
-  for (auto & mapEntry : m_storeObjMap[c_Event]) {
+  for (auto & mapEntry : m_storeEntryMap[c_Event]) {
     if (mapEntry.second.ptr && mapEntry.second.isArray) {
       const TClonesArray* array = static_cast<TClonesArray*>(mapEntry.second.ptr);
       const TClass* arrayClass = array->GetClass();
@@ -290,7 +290,7 @@ void DataStore::getArrayNames(std::vector<std::string>& names, const std::string
       names.push_back(result);
     }
   } else if (arrayName == "ALL") {
-    for (auto & mapEntry : m_storeObjMap[durability]) {
+    for (auto & mapEntry : m_storeEntryMap[durability]) {
       if (mapEntry.second.ptr && mapEntry.second.isArray) {
         TClonesArray* array = static_cast<TClonesArray*>(mapEntry.second.ptr);
         if (array->GetClass()->InheritsFrom(arrayClass)) {
@@ -320,8 +320,8 @@ void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, i
 
   // get the relations from -> to
   const string& relationsName = relationName(fromEntry->name, toEntry->name);
-  const StoreObjIter& it = m_storeObjMap[c_Event].find(relationsName);
-  if (it == m_storeObjMap[c_Event].end()) {
+  const StoreEntryIter& it = m_storeEntryMap[c_Event].find(relationsName);
+  if (it == m_storeEntryMap[c_Event].end()) {
     B2FATAL("No relation '" << relationsName << "' found. Please register it (using StoreArray::registerRelationTo()) before trying to add relations.");
   }
   StoreEntry* entry = &(it->second);
@@ -373,8 +373,8 @@ std::vector<RelationEntry> DataStore::getRelationsWith(ESearchSide searchSide, c
 
   // loop over found store arrays
   for (const std::string & name : names) {
-    const StoreObjConstIter& arrayIter = m_storeObjMap[c_Event].find(name);
-    if (arrayIter == m_storeObjMap[c_Event].end() or arrayIter->second.ptr == nullptr) continue;
+    const StoreEntryConstIter& arrayIter = m_storeEntryMap[c_Event].find(name);
+    if (arrayIter == m_storeEntryMap[c_Event].end() or arrayIter->second.ptr == nullptr) continue;
 
     // get the relations from -> to
     const string& relationsName = (searchSide == c_ToSide) ? relationName(entry->name, name) : relationName(name, entry->name);
@@ -420,8 +420,8 @@ RelationEntry DataStore::getRelationWith(ESearchSide searchSide, const TObject* 
 
   // loop over found store arrays
   for (const std::string & name : names) {
-    const StoreObjConstIter& arrayIter = m_storeObjMap[c_Event].find(name);
-    if (arrayIter == m_storeObjMap[c_Event].end() or arrayIter->second.ptr == nullptr) continue;
+    const StoreEntryConstIter& arrayIter = m_storeEntryMap[c_Event].find(name);
+    if (arrayIter == m_storeEntryMap[c_Event].end() or arrayIter->second.ptr == nullptr) continue;
 
     // get the relations from -> to
     const string& relationsName = (searchSide == c_ToSide) ? relationName(entry->name, name) : relationName(name, entry->name);
@@ -456,15 +456,15 @@ std::vector<std::string> DataStore::getListOfRelatedArrays(const StoreAccessorBa
 
   //loop over all arrays
   EDurability durability = array.getDurability();
-  for (auto & mapEntry : m_storeObjMap[durability]) {
+  for (auto & mapEntry : m_storeEntryMap[durability]) {
     if (mapEntry.second.isArray) {
       const std::string& name = mapEntry.second.name;
 
       //check both from & to 'array'
       for (int searchSide = 0; searchSide < c_BothSides; searchSide++) {
         const string& relationsName = (searchSide == c_ToSide) ? relationName(array.getName(), name) : relationName(name, array.getName());
-        const StoreObjConstIter& it = m_storeObjMap[durability].find(relationsName);
-        if (it != m_storeObjMap[durability].end())
+        const StoreEntryConstIter& it = m_storeEntryMap[durability].find(relationsName);
+        if (it != m_storeEntryMap[durability].end())
           arrays.push_back(name);
       }
     }
@@ -476,18 +476,18 @@ std::vector<std::string> DataStore::getListOfRelatedArrays(const StoreAccessorBa
 void DataStore::clearMaps(EDurability durability)
 {
   B2DEBUG(100, "Invalidating objects for durability " << durability);
-  for (auto & mapEntry : m_storeObjMap[durability]) {
+  for (auto & mapEntry : m_storeEntryMap[durability]) {
     mapEntry.second.ptr = nullptr;
   }
 }
 
 void DataStore::reset(EDurability durability)
 {
-  for (auto & mapEntry : m_storeObjMap[durability]) {
+  for (auto & mapEntry : m_storeEntryMap[durability]) {
     //delete stored object/array
     delete mapEntry.second.object;
   }
-  m_storeObjMap[durability].clear();
+  m_storeEntryMap[durability].clear();
   //invalidate any cached relations (expect RelationArrays to remain valid)
   RelationIndexManager::Instance().clear();
 }

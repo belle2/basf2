@@ -230,7 +230,7 @@ void RootInputModule::readTree()
 
 bool RootInputModule::connectBranches(TTree* tree, DataStore::EDurability durability, StoreEntries* storeEntries)
 {
-  DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(durability);
+  DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(durability);
 
   //Go over the branchlist and connect the branches with DataStore entries
   const TObjArray* branches = tree->GetListOfBranches();

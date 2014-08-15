@@ -50,7 +50,7 @@ bool PyStoreObj::registerInDataStore(int storeFlags)
 
 void PyStoreObj::list(int durability)
 {
-  const DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(DataStore::EDurability(durability));
+  const DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::EDurability(durability));
   for (const auto & entrypair : map) {
     if (!entrypair.second.isArray) {
       const TObject* obj = entrypair.second.object;

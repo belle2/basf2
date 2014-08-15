@@ -117,7 +117,7 @@ void DataStoreStreamer::mergeIntoExisting(TObject* existing, const TObject* rece
 }
 void DataStoreStreamer::removeSideEffects()
 {
-  DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(DataStore::c_Persistent);
+  DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::c_Persistent);
   for (auto & entryPair : map) {
     DataStore::StoreEntry& entry = entryPair.second;
     if (isMergeable(entry.object)) {
@@ -138,8 +138,8 @@ EvtMessage* DataStoreStreamer::streamDataStore(bool addPersistentDurability, boo
   int nobjs = 0;
   DataStore::EDurability durability = DataStore::c_Event;
   while (true) {
-    DataStore::StoreObjMap& map = DataStore::Instance().getStoreObjectMap(durability);
-    for (DataStore::StoreObjIter it = map.begin(); it != map.end(); ++it) {
+    DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(durability);
+    for (DataStore::StoreEntryIter it = map.begin(); it != map.end(); ++it) {
       DataStore::StoreEntry* entry = &it->second;
 
       //skip transient objects/arrays?

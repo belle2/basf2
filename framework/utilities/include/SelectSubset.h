@@ -154,30 +154,14 @@ namespace Belle2 {
    */
   template < typename StoredClass >
   class SelectSubset {
-
-    std::string m_setName;
-    DataStore::EDurability m_setDurability;
-
-    /** The array we create. */
-    StoreArray<StoredClass>* m_subset;
-
-    /** array names we inherit relations from. */
-    std::vector<std::string> m_inheritFromArrays;
-    /** array names we inherit relations to. */
-    std::vector<std::string> m_inheritToArrays;
-    /** If true, relations from set objects to set objects are copied. (if both objects are selected!). */
-    bool m_inheritToSelf;
-
-    /** how to handle re-registration of subset and relations to/from it? */
-    const bool m_reportErrorIfExisting = true;
   public:
     /** Constructor */
     SelectSubset():
-      m_setDurability(DataStore::c_Event), m_subset(nullptr), m_inheritToSelf(false)
+      m_set(nullptr), m_subset(nullptr), m_inheritToSelf(false)
     {};
 
     /** Destructor */
-    ~SelectSubset() {};
+    ~SelectSubset() { delete m_subset; };
 
     /** Register the StoreArray<StoredClass> that will contain the subset of selected elements
      *  @param set         The StoreArray<StoredClass> from which the elements will be selected
@@ -185,16 +169,14 @@ namespace Belle2 {
      *  @param storeFlags ORed combination of DataStore::EStoreFlag flags.
      */
     bool registerSubset(const StoreArray< StoredClass >& set, const std::string& subsetName, DataStore::EStoreFlags storeFlags = DataStore::c_ErrorIfAlreadyRegistered) {
-      if (m_subset) {
+      if (m_set or m_subset) {
         B2FATAL("SelectSubset::registerSubset() can only be called once!");
         return false;
       }
 
-      m_setName                 = set.getName() ;
-      m_setDurability           = set.getDurability() ;
+      m_set = &set;
 
-
-      m_subset = new StoreArray<StoredClass>(subsetName, m_setDurability);
+      m_subset = new StoreArray<StoredClass>(subsetName, m_set->getDurability());
       m_subset->registerInDataStore(storeFlags);
 
       set.registerRelationTo(*m_subset, m_subset->getDurability(), storeFlags);
@@ -209,7 +191,7 @@ namespace Belle2 {
      */
     template<class T, class ... MoreArguments >
     void inheritRelationsFrom(const StoreArray<T>& array, MoreArguments... moreArgs) {
-      if (array.getName() == m_setName) {
+      if (array.getName() == m_set->getName()) {
         m_inheritToSelf = true;
         inheritRelationsFrom(*m_subset, moreArgs...);
       } else {
@@ -233,7 +215,7 @@ namespace Belle2 {
      */
     template<class T, class ... MoreArguments >
     void inheritRelationsTo(const StoreArray<T>& array, MoreArguments... moreArgs) {
-      if (array.getName() == m_setName) {
+      if (array.getName() == m_set->getName()) {
         m_inheritToSelf = true;
         inheritRelationsTo(*m_subset, moreArgs...);
       } else {
@@ -258,17 +240,16 @@ namespace Belle2 {
      * Note: Do not combine with inheritRelationsFrom() and inheritRelationsTo().
      */
     void inheritAllRelations() {
-      StoreArray<StoredClass> set(m_setName, m_setDurability);
-      auto arrays = DataStore::Instance().getListOfRelatedArrays(set);
+      auto arrays = DataStore::Instance().getListOfRelatedArrays(*m_set);
 
       for (std::string arrayName : arrays) {
-        StoreArray<TObject> array(arrayName, m_setDurability);
+        StoreArray<TObject> array(arrayName, m_set->getDurability());
         if (array == *m_subset)
           continue; // from registerSubset(), ignore
 
-        if (array.optionalRelationTo(set, m_setDurability))
+        if (array.optionalRelationTo(*m_set, m_set->getDurability()))
           inheritRelationsFrom(array);
-        if (set.optionalRelationTo(array, m_setDurability))
+        if (m_set->optionalRelationTo(array, m_set->getDurability()))
           inheritRelationsTo(array);
       }
     }
@@ -295,6 +276,21 @@ namespace Belle2 {
     */
     void inheritRelationsTo() { }
 
+    /** The array we use as input. */
+    const StoreArray<StoredClass>* m_set;
+    /** The array we create. */
+    StoreArray<StoredClass>* m_subset;
+
+    /** array names we inherit relations from. */
+    std::vector<std::string> m_inheritFromArrays;
+    /** array names we inherit relations to. */
+    std::vector<std::string> m_inheritToArrays;
+    /** If true, relations from set objects to set objects are copied. (if both objects are selected!). */
+    bool m_inheritToSelf;
+
+    /** how to handle re-registration of subset and relations to/from it? */
+    const bool m_reportErrorIfExisting = true;
+
   };
 
 
@@ -302,10 +298,7 @@ namespace Belle2 {
   void
   SelectSubset< StoredClass >::select(std::function<bool (const StoredClass*)> f)
   {
-
-    StoreArray<StoredClass> set(m_setName, m_setDurability);
-
-    for (const StoredClass & setObject : set) {
+    for (const StoredClass & setObject : *m_set) {
       if (f(&setObject)) {
         const StoredClass* subsetObject = m_subset->appendNew(setObject);
         setObject.addRelationTo(subsetObject);
@@ -328,10 +321,10 @@ namespace Belle2 {
     if (m_inheritToSelf) {
       for (const StoredClass & subsetObject1 : *m_subset) {
         //TODO: change relation direction to set -> subset?
-        const StoredClass* setObject1 = subsetObject1.template getRelatedFrom<StoredClass>(m_setName);
+        const StoredClass* setObject1 = subsetObject1.template getRelatedFrom<StoredClass>(m_set->getName());
 
         //get all objects in original set related to setObject1
-        const RelationVector<StoredClass>& relations = setObject1->template getRelationsTo<StoredClass>(m_setName);
+        const RelationVector<StoredClass>& relations = setObject1->template getRelationsTo<StoredClass>(m_set->getName());
         for (unsigned int iRel = 0; iRel < relations.size(); iRel++) {
           const StoredClass* setObject2 = relations.object(iRel);
           const double weight = relations.weight(iRel);

@@ -477,13 +477,11 @@ namespace Belle2 {
 
     /** Clears all registered StoreEntry objects of a specified durability, invalidating all objects.
      *
-     *  Called by the framework. Users should usually not use this function without a good reason.
+     *  Called by the framework once the given durability is over. Users should usually not use this function without a good reason.
      *
      *  Memory occupied by objects/arrays is only freed once a new object is created in its place (in createObject()).
-     *
-     *  @param durability Decides which map is cleared.
      */
-    void clearMaps(EDurability durability = c_Event);
+    void invalidateData(EDurability durability);
 
     /** Frees memory occopied by data store items and removes all objects from the map.
      *

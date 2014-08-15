@@ -205,7 +205,7 @@ namespace {
     EXPECT_EQ(evtPtr->getEvent(), (unsigned long)42);
 
     //clear event map (evtPtr is now invalid!)
-    DataStore::Instance().clearMaps(DataStore::c_Event);
+    DataStore::Instance().invalidateData(DataStore::c_Event);
 
     //right now this is NULL, since no object was actually created yet
     StoreObjPtr<EventMetaData> a;

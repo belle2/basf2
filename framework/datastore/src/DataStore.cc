@@ -473,7 +473,7 @@ std::vector<std::string> DataStore::getListOfRelatedArrays(const StoreAccessorBa
   return arrays;
 }
 
-void DataStore::clearMaps(EDurability durability)
+void DataStore::invalidateData(EDurability durability)
 {
   B2DEBUG(100, "Invalidating objects for durability " << durability);
   for (auto & mapEntry : m_storeEntryMap[durability]) {

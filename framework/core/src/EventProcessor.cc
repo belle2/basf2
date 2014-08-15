@@ -297,7 +297,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
     endProcess = processEvent(moduleIter, &previousEventMetaData);
 
     //Delete event related data in DataStore
-    DataStore::Instance().clearMaps(DataStore::c_Event);
+    DataStore::Instance().invalidateData(DataStore::c_Event);
 
     currEvent++;
     if ((maxEvent > 0) && (currEvent >= maxEvent)) endProcess = true;
@@ -339,7 +339,7 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
 
   //Delete persistent data in DataStore
   //TODO: do i want this? guess not.
-  //DataStore::Instance().clearMaps(DataStore::c_Persistent);
+  //DataStore::Instance().invalidateData(DataStore::c_Persistent);
 }
 
 

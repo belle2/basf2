@@ -141,7 +141,7 @@ void ECLHitDebugModule::event()
 //        cout<<iECLCell<<" "<<E_cell[iECLCell][TimeIndex]<<" "<<Tof_ave[iECLCell][TimeIndex] + T_ave[iECLCell][TimeIndex] <<endl;
         //m_hitNum = eclHitArray->GetLast() + 1;
         //new(eclHitArray->AddrAt(m_hitNum)) ECLDebugHit();
-        new(eclHitArray.nextFreeAddress()) ECLDebugHit();
+        eclHitArray.appendNew();
         m_hitNum = eclHitArray.getEntries() - 1;
         eclHitArray[m_hitNum]->setCellId(iECLCell + 1);
         eclHitArray[m_hitNum]->setEnergyDep(E_cell[iECLCell][TimeIndex]);

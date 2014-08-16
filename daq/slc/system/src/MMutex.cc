@@ -1,4 +1,4 @@
-#include "daq/slc/readout/MMutex.h"
+#include "daq/slc/system/MMutex.h"
 
 using namespace Belle2;
 

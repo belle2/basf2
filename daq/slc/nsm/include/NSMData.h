@@ -6,10 +6,9 @@
 
 #include <daq/slc/database/DBObject.h>
 
-#include <daq/slc/readout/SharedMemory.h>
-#include "daq/slc/readout/MMutex.h"
-#include "daq/slc/readout/MCond.h"
-
+#include <daq/slc/system/SharedMemory.h>
+#include "daq/slc/system/MMutex.h"
+#include "daq/slc/system/MCond.h"
 #include <daq/slc/system/TCPSocket.h>
 #include <daq/slc/system/Mutex.h>
 

@@ -1,4 +1,4 @@
-#include "daq/slc/readout/SharedMemory.h"
+#include "daq/slc/system/SharedMemory.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>

@@ -1,9 +1,9 @@
 #ifndef _Belle2_NSMDataHeader_h
 #define _Belle2_NSMDataHeader_h
 
-#include <daq/slc/readout/SharedMemory.h>
-#include "daq/slc/readout/MMutex.h"
-#include "daq/slc/readout/MCond.h"
+#include <daq/slc/system/SharedMemory.h>
+#include "daq/slc/system/MMutex.h"
+#include "daq/slc/system/MCond.h"
 
 namespace Belle2 {
 

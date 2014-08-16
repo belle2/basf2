@@ -36,9 +36,9 @@ FILE* master_logfp = 0;
 void
 xreopenlog()
 {
-  static int logid = -1;
+  //static int logid = -1;
   static char logprefix[1024];
-  static int  isdirprefix = 0;
+  //static int  isdirprefix = 0;
   char logfile[1024];
   time_t now = time(0);
   tm* cur = localtime(&now);
@@ -115,7 +115,7 @@ xlogtime(char* buf)
 int
 xgetargs(char* buf, char* argv[])
 {
-  int i, argc = 0, inword = 0, inquote = 0;
+  int /*i,*/ argc = 0, inword = 0, inquote = 0;
   char* p = buf;
 
   while (*p) {
@@ -152,7 +152,7 @@ xgetargs(char* buf, char* argv[])
 //
 // ----------------------------------------------------------------------
 void
-ok_handler(NSMmsg* msg, NSMcontext*)
+ok_handler(NSMmsg*, NSMcontext*)
 {
   xprintlog("OK received");
 }
@@ -160,7 +160,7 @@ ok_handler(NSMmsg* msg, NSMcontext*)
 //
 // ----------------------------------------------------------------------
 void
-error_handler(NSMmsg* msg, NSMcontext*)
+error_handler(NSMmsg*, NSMcontext*)
 {
   xprintlog("ERROR received");
 }
@@ -173,14 +173,14 @@ main(int argc, char** argv)
   const char* program  = argv[0];
   const char* nodename = argv[1]; // need to check before using
 
-  char* buf = 0;
-  char* input = 0;
-  char* prev = 0;
+  //char* buf = 0;
+  //char* input = 0;
+  //char* prev = 0;
   char* av[128];
   int ac;
   char* prompt;
 
-  int ret;
+  //int ret;
 
   xreopenlog();
 

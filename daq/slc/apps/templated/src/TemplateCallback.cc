@@ -1,7 +1,5 @@
 #include "daq/slc/apps/templated/TemplateCallback.h"
 
-#include <daq/slc/readout/ReadoutMonitor.h>
-
 #include <daq/slc/system/LogFile.h>
 
 #include <daq/slc/base/StringUtil.h>
@@ -50,9 +48,6 @@ bool TemplateCallback::load() throw()
   m_con.addArgument(m_host);
   m_con.addArgument(m_port);
   m_con.load(-1);
-  m_thread = PThread(new ReadoutMonitor(this,
-                                        (ronode_info*)m_con.getInfo().get(),
-                                        (ronode_status*)m_data.get()));
   return true;
 }
 

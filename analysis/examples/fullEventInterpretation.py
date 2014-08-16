@@ -59,7 +59,7 @@ pre_pi0_incomplete = Particle.PreCutConfiguration(
 )
 
 particles.append(Particle('pi0', mva_pi0, pre_pi0).addChannel(['gamma', 'gamma']))
-particles.append(Particle('pi0:incomplete', mva_pi0, pre_pi0_incomplete).addChannel(['gamma']))
+#particles.append(Particle('pi0:incomplete', mva_pi0, pre_pi0_incomplete).addChannel(['gamma']))
 
 ################### KS0 ###############################
 mva_KS0 = Particle.MVAConfiguration(
@@ -87,7 +87,7 @@ p.addChannel(['pi0', 'pi0'], mva_KS0_pi0pi0)
 particles.append(p)
 
 ######################## D0 #########################
-
+"""
 mva_D0 = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables + vertex_variables,
@@ -134,7 +134,7 @@ p.addChannel(['K-', 'pi0', 'mu+'])
 p.addChannel(['K_S0', 'pi-', 'e+'])
 p.addChannel(['K_S0', 'pi-', 'mu+'])
 particles.append(p)
-
+"""
 ######################## D+ #########################
 
 mva_DPlus = Particle.MVAConfiguration(
@@ -210,7 +210,7 @@ p.addChannel(['D+:semileptonic', 'pi0'])
 particles.append(p)
 
 ######################## D*0 #########################
-
+"""
 mva_DStar0 = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables + vertex_variables,
@@ -240,7 +240,7 @@ p = Particle('D*0:semileptonic', mva_DStar0, pre_DStar0_semileptonic)
 p.addChannel(['D0:semileptonic', 'pi0'])
 p.addChannel(['D0:semileptonic', 'gamma'])
 particles.append(p)
-
+"""
 ######################## D_s+ #########################
 
 mva_DS = Particle.MVAConfiguration(
@@ -313,7 +313,7 @@ particles.append(p)
 
 
 ################### B+ ##############################
-
+"""
 mva_BPlus = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=['daughterProductOf(getExtraInfo(SignalProbability))', 'deltaE'] + vertex_variables,
@@ -365,7 +365,7 @@ p.addChannel(['anti-D*0:semileptonic', 'pi+', 'pi+', 'pi-'])
 p.addChannel(['anti-D*0:semileptonic', 'pi+', 'pi+', 'pi-', 'pi0'])
 p.addChannel(['D-:semileptonic', 'pi+', 'pi+'])
 particles.append(p)
-
+"""
 ################### B0 ##############################
 
 mva_B0 = Particle.MVAConfiguration(
@@ -392,7 +392,7 @@ p = Particle('B0', mva_B0, pre_B0)
 p.addChannel(['D-', 'pi+'])
 p.addChannel(['D-', 'pi0', 'pi+'])
 p.addChannel(['D-', 'pi+', 'pi+', 'pi-'])
-p.addChannel(['anti-D0', 'pi0'])
+#p.addChannel(['anti-D0', 'pi0'])
 p.addChannel(['D_s+', 'D-'])
 p.addChannel(['D*-', 'pi+'])
 p.addChannel(['D*-', 'pi0', 'pi+'])
@@ -409,7 +409,7 @@ particles.append(p)
 p = Particle('B0:semileptonic', mva_B0, pre_B0)
 p.addChannel(['D-', 'e+'])
 p.addChannel(['D-', 'mu+'])
-p.addChannel(['anti-D0:semileptonic', 'pi0'])
+#p.addChannel(['anti-D0:semileptonic', 'pi0'])
 p.addChannel(['D-:semileptonic', 'pi+'])
 p.addChannel(['D-:semileptonic', 'pi0', 'pi+'])
 p.addChannel(['D-:semileptonic', 'pi+', 'pi+', 'pi-'])

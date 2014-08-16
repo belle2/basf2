@@ -448,6 +448,9 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
         else:
             B2ERROR("pdflatex failed to create FEI summary PDF, please check.")
 
+    if ret == 0:
+        automaticReporting.sendMail()
+
     # Return None - Therefore Particle List depends not on TMVAExpert directly
     B2INFO("Created analysis summary pdf file.")
     return {'FEIsummary.pdf': None}

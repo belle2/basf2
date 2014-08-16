@@ -598,3 +598,59 @@ def getMVARankingFromLogfile(logfile):
                 v = line.split(':')
                 ranking[v[2].strip()] = (int(v[1]), float(v[3]))
     return ranking
+
+
+def sendMail():
+    import smtplib
+    from email.MIMEMultipart import MIMEMultipart
+    from email.MIMEBase import MIMEBase
+    from email.MIMEText import MIMEText
+    from email.Utils import COMMASPACE, formatdate
+    from email import Encoders
+    import random
+
+    fromMail = 'nordbert@kit.edu'
+    toMails = ['t.keck@online.de', 'christian.pulvermacher@kit.edu']
+
+    ClicheBegin = ['Hello', 'Congratulations!', 'Whats up?', 'Dear Sir/Madam', 'Howdy!']
+    Person = ['I\'m', 'Nordbert is']
+    StateOfMind = ['happy', 'cheerful', 'joyful', 'delighted', 'lucky']
+    VerbAnnounce = ['announce', 'declare', 'make public', 'make known', 'report', 'publicize', 'broadcast', 'publish']
+    PossesivePronoun = ['our', 'my', 'your']
+    Adjective = ['awesome', 'revolutionary', 'gorgeous', 'beautiful', 'spectacular', 'splendid', 'superb', 'wonderful', 'impressive', 'amazing', 'stunning', 'breathtaking', 'incredible']
+    VerbFinished = ('has', ['finished', 'completed', 'terminated', 'concluded'])
+    Motivation = [('Keep on your', Adjective, 'work!'), (Person, 'so proud of you!'), (['Enjoy this', 'Relax a'], 'moment and have a', ['cookie', '\bn ice', 'bath', 'day off'], '\b.')]
+    ClicheEnd = ['Best regards', 'Yours sincerely', 'Kind regards', 'Yours faithfully', 'See you', 'cu']
+
+    def generate_sentence(term):
+        if isinstance(term, str):
+            return term
+        if isinstance(term, list):
+            return generate_sentence(term[random.randint(0, len(term) - 1)])
+        if isinstance(term, tuple):
+            return " ".join([generate_sentence(subterm) for subterm in term])
+        raise RuntimeError('Invalid type received in sentence generator')
+
+    sentence = (ClicheBegin, '\n\n', Person, StateOfMind, 'to', VerbAnnounce, 'that', PossesivePronoun, Adjective, 'Full Event Interpretation', VerbFinished,
+                '\b.\n\nThat\'s', Adjective, '\b!\n', Motivation, '\n\n', ClicheEnd, '\b,\n', ['', ('the', [Adjective, StateOfMind])], 'Nordbert')
+
+    text = MIMEText(re.sub('.\b', '', generate_sentence(sentence)))
+
+    filename = 'FEIsummary.pdf'
+    pdf = MIMEBase('application', "octet-stream")
+    pdf.set_payload(open(filename, "rb").read())
+    Encoders.encode_base64(pdf)
+    pdf.add_header('Content-Disposition', 'attachment; filename="%s"' % os.path.basename(filename))
+
+    msg = MIMEMultipart()
+    msg['From'] = fromMail
+    msg['To'] = COMMASPACE.join(toMails)
+    msg['Date'] = formatdate(localtime=True)
+    msg['Subject'] = 'Congratulations!'
+    msg.attach(text)
+    msg.attach(pdf)
+
+    server = smtplib.SMTP('smtp.kit.edu')
+    #server.login(fromMail, 'Not necessary for kit.edu :-)')
+    server.sendmail(fromMail, toMails, msg.as_string())
+    server.quit()

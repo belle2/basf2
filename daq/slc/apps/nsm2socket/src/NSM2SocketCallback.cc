@@ -125,6 +125,8 @@ void NSM2SocketCallback::timeout() throw()
       if (n % 5 == 0 || opennew) {
         msg.setNodeName(data.getName());
         msg.setRequestName(NSMCommand::NSMSET);
+        //data.print();
+        data.update();
         msg.setData(data);
         m_bridge->sendMessage(msg);
       }

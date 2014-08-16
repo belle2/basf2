@@ -1,6 +1,8 @@
+
 #include "daq/slc/runcontrol/RunControlMasterCallback.h"
 
 #include <daq/slc/nsm/NSM2NSMBridge.h>
+#include <daq/slc/nsm/NSMNodeDaemon.h>
 
 #include <daq/slc/database/PostgreSQLInterface.h>
 
@@ -30,14 +32,19 @@ int main(int argc, char** argv)
   const std::string name = config.get("nsm.nodename");
   NSMNode node(name);
   RunControlCallback* callback = new RunControlCallback(node);
-  RunControlMasterCallback* master_callback = new RunControlMasterCallback(node, callback);
+  //RunControlMasterCallback* master_callback = new RunControlMasterCallback(node, callback);
   callback->setDB(db);
+  NSMNodeDaemon* daemon = new NSMNodeDaemon(callback,
+                                            config.get("nsm.local.host"),
+                                            config.getInt("nsm.local.port"));
+  /*
   NSM2NSMBridge* daemon = new NSM2NSMBridge(callback,
                                             config.get("nsm.local.host"),
                                             config.getInt("nsm.local.port"),
                                             master_callback,
                                             config.get("nsm.global.host"),
                                             config.getInt("nsm.global.port"));
+  */
   daemon->run();
   return 0;
 }

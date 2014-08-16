@@ -32,6 +32,7 @@ namespace Belle2 {
     const std::string getLocalIP();
     int getLocalAddress();
     int getLocalPort();
+    unsigned int getAddress() throw(IOException);
 
   public:
     virtual size_t write(const void* v, size_t count) throw(IOException);

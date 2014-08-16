@@ -13,13 +13,13 @@ namespace Belle2 {
     // constructors and destructor
   public:
     SharedMemory() throw();
-    SharedMemory(const std::string&, size_t);
+    SharedMemory(const std::string& path, size_t size);
     SharedMemory(const SharedMemory&) throw();
     ~SharedMemory() throw();
 
     // member functions;
   public:
-    bool open(const std::string&, size_t);
+    bool open(const std::string& path, size_t size);
     bool open();
     void close();
     bool unlink();

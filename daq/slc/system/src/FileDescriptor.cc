@@ -60,6 +60,32 @@ bool FileDescriptor::select(int sec, int usec) throw(IOException)
   }
 }
 
+bool FileDescriptor::select2(int sec, int usec) throw(IOException)
+{
+  if (m_fd <= 0) {
+    return false;
+  }
+  fd_set fds;
+  FD_ZERO(&fds);
+  FD_SET(m_fd, &fds);
+  int ret;
+  if (sec >= 0 && usec >= 0) {
+    timeval t = {sec, usec};
+    ret = ::select(FD_SETSIZE, NULL, &fds, NULL, &t);
+  } else {
+    ret = ::select(FD_SETSIZE, NULL, &fds, NULL, NULL);
+  }
+  if (ret < 0) {
+    perror("select");
+    throw (IOException("Failed to select"));
+  }
+  if (FD_ISSET(m_fd, &fds)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 bool FileDescriptor::close() throw()
 {
   if (m_fd > 0) {

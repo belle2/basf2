@@ -38,10 +38,10 @@ ronode_status& FlowMonitor::monitor()
     m_ioinfo[1].setLocalAddress(m_info->getOutputAddress());
     m_ioinfo[1].setLocalPort(m_info->getOutputPort());
     IOInfo::checkTCP(m_ioinfo);
-    int ctime = Time().get();
+    unsigned int ctime = Time().getSecond();
     ronode_info info;
     memcpy(&info, m_info->get(), sizeof(ronode_info));
-    float length = ctime - m_status.ctime;
+    double length = ctime - m_status.ctime;
     m_status.eflag = info.eflag;
     m_status.state = info.state;
     m_status.expno = info.expno;
@@ -51,7 +51,7 @@ ronode_status& FlowMonitor::monitor()
     m_status.reserved[1] = info.reserved[1];
     m_status.ctime = ctime;
 
-    unsigned int dcount;
+    double dcount;
     double dnbyte;
     for (int j = 0; j < 2; j++) {
       m_status.io[j].freq = 0;

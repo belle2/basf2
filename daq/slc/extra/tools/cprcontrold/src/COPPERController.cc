@@ -110,6 +110,7 @@ copper_info& COPPERController::monitor() throw()
     m_info.dma_ts_enb = read(CPRIOGET_TS_ENV);
     */
   } catch (const IOException& e) {
+    printf("IO error : %s", e.what());
     ::close(m_fd);
     m_fd = -1;
   }
@@ -176,7 +177,8 @@ void COPPERController::print() throw()
 bool COPPERController::isFifoFull() throw()
 {
   if (m_fd <= 0) return false;
-  return (m_info.ff_sta & 0xff) == 0x3c;
+  return (m_info.ff_sta & 0xff) == 0x3c
+         || (m_info.ff_sta & 0xff) == 0x2c;
 }
 
 bool COPPERController::isFifoEmpty() throw()

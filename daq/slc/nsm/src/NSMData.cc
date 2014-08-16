@@ -6,6 +6,10 @@
 #include <daq/slc/base/Writer.h>
 #include <daq/slc/base/Reader.h>
 
+#include <daq/slc/system/TCPSocketWriter.h>
+#include <daq/slc/system/TCPSocketReader.h>
+#include <daq/slc/system/Time.h>
+
 #include <nsm2/belle2nsm.h>
 extern "C" {
 #include <nsm2/nsmlib2.h>
@@ -16,8 +20,15 @@ extern "C" {
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 using namespace Belle2;
+
+TCPSocket NSMData::g_socket;
+Mutex NSMData::g_mutex;
 
 NSMData::NSMData(const std::string& dataname,
                  const std::string& format, int revision)
@@ -28,6 +39,7 @@ throw() : DBObject(), m_allocated(false),
   setFormat(format);
   setRevision(revision);
   setConfig(false);
+  m_en = NULL;
 }
 
 NSMData::NSMData()
@@ -35,6 +47,7 @@ throw() : DBObject(), m_allocated(false),
   m_pdata(NULL), m_size(0), m_offset(0)
 {
   setConfig(false);
+  m_en = NULL;
 }
 
 NSMData::NSMData(const NSMData& data) throw()
@@ -49,6 +62,7 @@ NSMData::NSMData(const NSMData& data) throw()
   setIndex(data.getIndex());
   setName(data.getName());
   m_pdata = NULL;
+  m_en = data.m_en;
   if (m_allocated) {
     m_pdata = malloc(m_size);
     memcpy(m_pdata, data.m_pdata, m_size);
@@ -118,9 +132,10 @@ void NSMData::setValue(const std::string& name, const void* data,
   }
 }
 
-void* NSMData::open(NSMCommunicator* comm)
+void* NSMData::open(NSMCommunicator* /*comm*/)
 throw(NSMHandlerException)
 {
+  /*
   b2nsm_context(comm->getContext());
   if ((m_pdata = b2nsm_openmem(getName().c_str(), getFormat().c_str(),
                                getRevision())) == NULL) {
@@ -130,11 +145,69 @@ throw(NSMHandlerException)
   setNode(comm->getNode().getName());
   parse();
   return m_pdata;
+  */
+  NSMDataStore& dstore(NSMDataStore::getStore());
+  if (!dstore.isOpend()) {
+    dstore.open();
+  }
+  m_en = dstore.get(getName());
+  if (m_en == NULL) {
+    try {
+      g_mutex.lock();
+      if (!g_socket.select2(0, 0)) {
+        g_socket.close();
+        g_socket.connect("127.0.0.1", 9020);
+      }
+      TCPSocketWriter writer(g_socket);
+      TCPSocketReader reader(g_socket);
+      writer.writeInt(NSMCommand::NSMGET.getId());
+      writer.writeInt(m_size);
+      writer.writeInt(getRevision());
+      writer.writeString(getName());
+      g_mutex.unlock();
+      int ntried = 0;
+      while (true) {
+        if ((m_en = dstore.get(getName())) != NULL) {
+          break;
+        }
+        usleep(100000);
+        ntried++;
+        if (ntried > 30) {
+          break;
+        }
+      }
+      if (m_en == NULL) {
+        g_mutex.unlock();
+        throw (NSMHandlerException("Data %s not registered yet",
+                                   getName().c_str()));
+      }
+    } catch (const IOException& e) {
+      g_socket.close();
+      g_mutex.unlock();
+      throw (NSMHandlerException("Connection error to datad"));
+    }
+  }
+  parse();
+  std::string path;
+  if (m_en->addr > 0) {
+    sockaddr_in sa;
+    sa.sin_addr.s_addr = m_en->addr;
+    path = StringUtil::form("%s:%s",
+                            inet_ntoa(sa.sin_addr),
+                            getName().c_str());
+  } else {
+    path = "127.0.0.1:" + getName();
+  }
+  m_mem.open(path, m_size);
+  m_pdata = (char*)m_mem.map();
+  setPointer();
+  return m_pdata;
 }
 
-void* NSMData::allocate(NSMCommunicator* comm, int interval)
+void* NSMData::allocate(NSMCommunicator* /*comm*/, int /*interval*/)
 throw(NSMHandlerException)
 {
+  /*
   b2nsm_context(comm->getContext());
   if ((m_pdata = b2nsm_allocmem(getName().c_str(), getFormat().c_str(),
                                 getRevision(), interval)) == NULL) {
@@ -145,6 +218,73 @@ throw(NSMHandlerException)
   parse();
   memset(m_pdata, 0, m_size);
   return m_pdata;
+  */
+  parse();
+  m_mem.open("127.0.0.1:" + getName(), m_size);
+  m_pdata = (char*)m_mem.map();
+  setPointer();
+  NSMDataStore& dstore(NSMDataStore::getStore());
+  if (!dstore.isOpend()) {
+    dstore.open();
+  }
+  m_en = dstore.add(0, m_size, getRevision(),
+                    getName(), getFormat(), 0);
+  return m_pdata;
+}
+
+void NSMData::setPointer()
+{
+  const FieldNameList& name_v(getFieldNames());
+  for (FieldNameList::const_iterator it = name_v.begin();
+       it != name_v.end(); it++) {
+    const std::string& name(*it);
+    const FieldInfo::Property& pro(getProperty(name));
+    size_t length = pro.getLength();
+    if (length == 0) length = 1;
+    if (pro.getType() == FieldInfo::NSM_OBJECT) {
+      NSMDataList& data_v(getObjects(name));
+      for (size_t i = 0; i < length; i++) {
+        data_v[i].set((char*)m_pdata + pro.getOffset() + data_v[i].getSize()*i);
+      }
+    }
+  }
+}
+
+bool NSMData::update() throw()
+{
+  if (m_en == NULL || m_en->addr == 0) return true;
+  unsigned int utime = m_en->utime;
+  if (Time().get() - utime < 1) {
+    return false;
+  }
+  try {
+    g_mutex.lock();
+    if (!g_socket.select2(0, 0)) {
+      g_socket.close();
+      g_socket.connect("127.0.0.1", 9020);
+    }
+    TCPSocketWriter writer(g_socket);
+    TCPSocketReader reader(g_socket);
+    writer.writeInt(NSMCommand::NSMGET.getId());
+    writer.writeInt(m_size);
+    writer.writeInt(getRevision());
+    writer.writeString(getName());
+    g_mutex.unlock();
+    NSMDataStore& dstore(NSMDataStore::getStore());
+    int ntried = 0;
+    dstore.lock();
+    while (utime == m_en->utime) {
+      if (dstore.wait(1)) break;
+      ntried++;
+      if (ntried > 3) break;
+    }
+    dstore.unlock();
+  } catch (const IOException& e) {
+    g_socket.close();
+    g_mutex.unlock();
+    std::cout << e.what() << std::endl;
+  }
+  return m_en->utime != utime;
 }
 
 void* NSMData::parse(const char* incpath, bool malloc_new)

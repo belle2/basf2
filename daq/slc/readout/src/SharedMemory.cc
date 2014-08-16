@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <stdio.h>
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <errno.h>
@@ -34,14 +35,22 @@ bool SharedMemory::open(const std::string& path, size_t size)
   int fd = ::shm_open(path.c_str(), O_CREAT | O_EXCL | O_RDWR, 0666);
   if (fd < 0) {
     if (errno != EEXIST) {
+      perror("shm_oepn");
       return false;
     }
     fd = ::shm_open(path.c_str(), O_CREAT | O_RDWR, 0666);
     if (fd < 0) {
+      perror("shm_oepn");
       return false;
     }
   }
-  ::ftruncate(fd, size);
+  struct stat st;
+  fstat(fd, &st);
+  if (st.st_size < (int)size) {
+    ::ftruncate(fd, size);
+  } else {
+    size = st.st_size;
+  }
   m_fd = fd;
   m_path = path;
   m_size = size;
@@ -60,9 +69,11 @@ void SharedMemory::close()
 
 void* SharedMemory::map(size_t offset, size_t size)
 {
+  errno = 0;
   void* addr = ::mmap(NULL, size, PROT_READ | PROT_WRITE,
                       MAP_SHARED, m_fd, offset);
   if (addr == MAP_FAILED) {
+    perror("mmap");
     addr = NULL;
   }
   m_addr = addr;

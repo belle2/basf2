@@ -47,7 +47,10 @@ namespace Belle2 {
                const std::string& obj) throw();
     NSMMessage(const NSMCommand& cmd) throw();
     NSMMessage(const NSMMessage& msg) throw();
-    virtual ~NSMMessage() throw() {}
+    virtual ~NSMMessage() throw() {
+      if (m_data != NULL && getLength() > 0)
+        delete [] m_data;
+    }
 
   public:
     const NSMMessage& operator=(const NSMMessage& msg) throw();
@@ -100,7 +103,7 @@ namespace Belle2 {
   private:
     mutable NSMcontext* m_nsmc;
     NSMmsg m_nsm_msg;
-    int m_data[NSM_TCPDATSIZ];
+    char* m_data;
     mutable std::string m_nodename;
     mutable std::string m_reqname;
 

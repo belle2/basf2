@@ -22,9 +22,20 @@
 
 using namespace Belle2;
 
+UDPSocket::UDPSocket()
+{
+  m_addr.sin_family = AF_INET;
+  m_addr.sin_addr.s_addr = INADDR_ANY;
+}
+
 UDPSocket::UDPSocket(unsigned int port)
 {
   m_addr.sin_port = htons(port);
+  m_addr.sin_family = AF_INET;
+  m_addr.sin_addr.s_addr = INADDR_ANY;
+  if ((m_fd = ::socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+    throw (IOException("Failed to create socket"));
+  }
 }
 
 UDPSocket::UDPSocket(unsigned int port,
@@ -34,11 +45,29 @@ UDPSocket::UDPSocket(unsigned int port,
   m_addr.sin_port = htons(port);
   m_addr.sin_family = AF_INET;
   m_addr.sin_addr.s_addr = inet_addr(hostname.c_str());
-  //m_addr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
   if ((m_fd = ::socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
     throw (IOException("Failed to create socket"));
   }
   if (boardcast) {
+    m_addr.sin_addr.s_addr |= 0xFF << 24;
+    int yes = 1;
+    setsockopt(m_fd, SOL_SOCKET, SO_BROADCAST,
+               (char*)&yes, sizeof(yes));
+  }
+}
+
+UDPSocket::UDPSocket(unsigned int port,
+                     unsigned int addr,
+                     bool boardcast)
+{
+  m_addr.sin_port = htons(port);
+  m_addr.sin_family = AF_INET;
+  m_addr.sin_addr.s_addr = addr;
+  if ((m_fd = ::socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+    throw (IOException("Failed to create socket"));
+  }
+  if (boardcast) {
+    m_addr.sin_addr.s_addr |= 0xFF << 24;
     int yes = 1;
     setsockopt(m_fd, SOL_SOCKET, SO_BROADCAST,
                (char*)&yes, sizeof(yes));
@@ -48,6 +77,9 @@ UDPSocket::UDPSocket(unsigned int port,
 int UDPSocket::bind(unsigned int port, const std::string& hostname)
 throw (IOException)
 {
+  if (m_fd <= 0 && (m_fd = ::socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+    throw (IOException("Failed to create socket"));
+  }
   m_addr.sin_port = htons(port);
   if (hostname.size() > 0) {
     m_addr.sin_addr.s_addr = inet_addr(hostname.c_str());
@@ -57,14 +89,6 @@ throw (IOException)
 
 int UDPSocket::bind() throw (IOException)
 {
-  if (m_fd > 0) {
-    throw (IOException("Socket is working already."));
-  }
-  m_addr.sin_family = AF_INET;
-  m_addr.sin_addr.s_addr = INADDR_ANY;
-  if ((m_fd = ::socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-    throw (IOException("Failed to create socket"));
-  }
   if (::bind(m_fd, (struct sockaddr*)&m_addr, sizeof(m_addr)) < 0) {
     close();
     throw (IOException("Failed to bind socket port=%d",
@@ -103,9 +127,11 @@ size_t UDPSocket::read(void* buf, size_t count) throw(IOException)
 {
   size_t c = 0;
   int ret;
+  socklen_t addrlen = sizeof(m_remote_addr);
   while (true) {
     errno = 0;
-    ret = recv(m_fd, ((unsigned char*)buf + c), (count - c), 0);
+    ret = recvfrom(m_fd, ((unsigned char*)buf + c), (count - c), 0,
+                   (struct sockaddr*)&m_remote_addr, &addrlen);
     if (ret <= 0) {
       switch (errno) {
         case EINTR: continue;
@@ -133,4 +159,19 @@ unsigned int UDPSocket::getAddress() const throw()
 unsigned int UDPSocket::getPort() const throw()
 {
   return ntohs(m_addr.sin_port);
+}
+
+const std::string UDPSocket::getRemoteHostName() const throw()
+{
+  return inet_ntoa(m_remote_addr.sin_addr);
+}
+
+unsigned int UDPSocket::getRemoteAddress() const throw()
+{
+  return m_remote_addr.sin_addr.s_addr;
+}
+
+unsigned int UDPSocket::getRemotePort() const throw()
+{
+  return ntohs(m_remote_addr.sin_port);
 }

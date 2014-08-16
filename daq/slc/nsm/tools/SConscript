@@ -2,5 +2,8 @@ Import('env')
 
 env['TOOLS_LIBS']['nsmtest'] = ['daq', 'framework', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['nsmtest2'] = ['daq', 'framework', '$PGSQL_LIBS']
+env['TOOLS_LIBS']['datad'] = ['pthread', 'ncurses', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['datatest'] = ['pthread', 'ncurses', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['datatest2'] = ['pthread', 'ncurses', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
 
 Return('env')

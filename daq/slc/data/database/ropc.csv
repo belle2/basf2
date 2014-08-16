@@ -1,2 +1,2 @@
- nodename,      config,   ropcid, hostname,  port,    basf2script, eb0_host, eb0_port,    hostlist
-   ROPC01, CDC:default, ropc5001,   ropc01, 36000, RecvStream1.py,   ropc01,    33000, CDC:default
+ nodename,      config, host_from, port_from, host_to, port_to, ropc_nodeid, ropc_script
+   ROPC01, CDC:default,    ropc01,      5101,  ropc01,   36000,           3, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvStream1.py

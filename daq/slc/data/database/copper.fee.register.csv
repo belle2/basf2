@@ -1,15 +1,8 @@
 nodename,         config,   paramname, address, size
-  CPR010, CDC:V03,      WINDOW,    0x63,    1
-  CPR010, CDC:V03,       DELAY,    0x64,    1
-  CPR010, CDC:V03,       ADCTH,    0x61,    2
-  CPR010, CDC:V03,       TDCTH,    0x65,    1
-  CPR010, CDC:V03,        DACL,    0x66,    1
-  CPR010, CDC:V03,        DACH,    0x66,    1
-  CPR010, CDC:V03,       PDSTL,    0x01,    1
-  CPR011, CDC:V03,      WINDOW,    0x63,    1
-  CPR011, CDC:V03,       DELAY,    0x64,    1
-  CPR011, CDC:V03,       ADCTH,    0x61,    2
-  CPR011, CDC:V03,       TDCTH,    0x65,    1
-  CPR011, CDC:V03,        DACL,    0x66,    1
-  CPR011, CDC:V03,        DACH,    0x66,    1
-  CPR011, CDC:V03,       PDSTL,    0x01,    1
+  CPR002, CDC:V03,      WINDOW,    0x63,    1
+  CPR002, CDC:V03,       DELAY,    0x64,    1
+  CPR002, CDC:V03,       ADCTH,    0x61,    2
+  CPR002, CDC:V03,       TDCTH,    0x65,    1
+  CPR002, CDC:V03,        DACL,    0x66,    1
+  CPR002, CDC:V03,        DACH,    0x66,    1
+  CPR002, CDC:V03,       PDSTL,    0x01,    1

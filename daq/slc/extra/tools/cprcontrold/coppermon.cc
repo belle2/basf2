@@ -17,6 +17,9 @@ int main()
   hslb.open(0);
 
   while (true) {
+    fputs("\033[2J\033[0;0H", stdout);
+    rewind(stdout);
+    ftruncate(1, 0);
     ///*
     copper.monitor();
     printf("FIFO full               : %s\n", (copper.isFifoFull() ? "true" : "false"));

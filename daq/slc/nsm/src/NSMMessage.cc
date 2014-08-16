@@ -11,6 +11,7 @@ extern "C" {
 
 #include <daq/slc/system/BufferedReader.h>
 #include <daq/slc/system/BufferedWriter.h>
+#include <daq/slc/system/StreamSizeCounter.h>
 
 #include <daq/slc/base/Reader.h>
 #include <daq/slc/base/Writer.h>
@@ -23,7 +24,8 @@ void NSMMessage::init() throw()
 {
   m_nsmc = NULL;
   memset(&m_nsm_msg, 0, sizeof(NSMmsg));
-  memset(m_data, 0, sizeof(m_data));
+  m_data = NULL;
+  setLength(0);
 }
 
 NSMMessage::NSMMessage() throw()
@@ -108,6 +110,7 @@ NSMMessage::NSMMessage(const NSMCommand& cmd) throw()
 
 NSMMessage::NSMMessage(const NSMMessage& msg) throw()
 {
+  init();
   *this = msg;
 }
 
@@ -115,7 +118,15 @@ const NSMMessage& NSMMessage::operator=(const NSMMessage& msg) throw()
 {
   m_nsmc = msg.m_nsmc;
   memcpy(&m_nsm_msg, &(msg.m_nsm_msg), sizeof(m_nsm_msg));
-  memcpy(m_data, msg.m_data, sizeof(m_data));
+  if (m_data != NULL && getLength() > 0) {
+    delete [] m_data;
+    m_data = NULL;
+  }
+  if (msg.getLength() > 0) {
+    m_data = new char [msg.getLength()];
+    memcpy(m_data, msg.m_data, msg.getLength());
+  }
+  setLength(msg.getLength());
   m_nodename = msg.m_nodename;
   m_reqname = msg.m_reqname;
   return *this;
@@ -266,29 +277,42 @@ void NSMMessage::setParam(int i, unsigned int v) throw()
 
 void NSMMessage::getData(Serializable& obj) const throw(IOException)
 {
-  BufferedReader reader(sizeof(m_data), (unsigned char*)m_data);
+  BufferedReader reader(getLength(), (unsigned char*)m_data);
   reader.readObject(obj);
 }
 
 void NSMMessage::setData(const Serializable& obj) throw(IOException)
 {
-  BufferedWriter writer(sizeof(m_data), (unsigned char*)m_data);
+  StreamSizeCounter counter;
+  counter.writeObject(obj);
+  if (m_data != NULL && getLength() > 0) {
+    delete [] m_data;
+    m_data = NULL;
+  }
+  m_data = new char[counter.count()];
+  setLength(counter.count());
+  BufferedWriter writer(counter.count(), (unsigned char*)m_data);
   writer.writeObject(obj);
-  m_nsm_msg.len = writer.count();
 }
 
 void NSMMessage::setData(int len, const char* data)  throw()
 {
-  memset(m_data, 0, sizeof(m_data));
+  if (m_data != NULL && getLength() > 0) {
+    delete [] m_data;
+    m_data = NULL;
+    setLength(0);
+  }
   if (len > 0 && data != NULL) {
-    m_nsm_msg.len = len;
+    m_data = new char[len];
+    setLength(len);
+    memset(m_data, 0, len);
     memcpy(m_data, data, len);
   }
 }
 
 void NSMMessage::setData(const std::string& text)  throw()
 {
-  setData(text.size(), text.c_str());
+  setData(text.size() + 1, text.c_str());
 }
 
 int NSMMessage::try_read(int sock, char* buf, int datalen)
@@ -314,6 +338,7 @@ size_t NSMMessage::read(NSMcontext* nsmc) throw(NSMHandlerException)
   int ret = 0;
   NSMtcphead hp;
   int datalen = sizeof(NSMtcphead);
+  int len = m_nsm_msg.len;
   if ((ret = try_read(sock, (char*)&hp, datalen)) < 0) {
     throw (NSMHandlerException("Failed to read header"));
   }
@@ -338,7 +363,11 @@ size_t NSMMessage::read(NSMcontext* nsmc) throw(NSMHandlerException)
 
   datalen = m_nsm_msg.len;
   if (datalen > 0) {
-    memset(m_data, 0, sizeof(m_data));
+    if (m_data != NULL && len != datalen) {
+      delete [] m_data;
+    }
+    m_data = new char[datalen];
+    memset(m_data, 0, datalen);
     if ((ret = try_read(sock, (char*)m_data, datalen)) < 0) {
       throw (NSMHandlerException("Failed to read data"));
     }
@@ -355,9 +384,16 @@ void NSMMessage::readObject(Reader& reader) throw(IOException)
   for (int i = 0; i < getNParams(); i++) {
     setParam(i, reader.readInt());
   }
+  size_t len = getLength();
   setLength(reader.readInt());
   if (getLength() > 0) {
-    reader.read(m_data, getLength());
+    if (m_data != NULL && len > 0) {
+      delete [] m_data;
+    }
+    len = getLength();
+    m_data = new char[len];
+    memset(m_data, 0, len);
+    reader.read(m_data, len);
   }
 }
 

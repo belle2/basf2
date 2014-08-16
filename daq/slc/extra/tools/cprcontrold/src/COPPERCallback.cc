@@ -107,15 +107,24 @@ void COPPERCallback::timeout() throw()
   if (m_ttrx.isLinkUpError()) {
     LogFile::error("Link up error\n");
   }
-
+  ronode_status* nsm = (ronode_status*)m_data.get();
   if (m_data.isAvailable() && m_flow.isAvailable()) {
     ronode_status& status(m_flow.monitor());
     status.eflag |= (eflag & 0xFF);
-    if (getNode().getState() != RCState::RECOVERING_RS && eflag > 0) {
+    /*
+    if ((getNode().getState() != RCState::RUNNING_S ||
+    getNode().getState() != RCState::READY_S) && eflag > 0) {
       getNode().setState(RCState::RECOVERING_RS);
       sendPause();
     }
-    memcpy(m_data.get(), &status, sizeof(ronode_status));
+    */
+    memcpy(nsm, &status, sizeof(ronode_status));
+  }
+
+  if (((eflag >> 8) & 0xF) == 0) {
+    nsm->io[0].state = 1;
+  } else {
+    nsm->io[0].state = -1;
   }
 }
 
@@ -177,7 +186,7 @@ bool COPPERCallback::recover() throw()
 bool COPPERCallback::abort() throw()
 {
   m_con.abort();
-  //getNode().setState(RCState::NOTREADY_S);
+  getNode().setState(RCState::NOTREADY_S);
   return true;
 }
 

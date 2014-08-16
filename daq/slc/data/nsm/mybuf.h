@@ -1,10 +1,10 @@
-#ifndef ronode_status_h
-#define ronode_status_h
+#ifndef mybuf_h
+#define mybuf_h
 
-const int ronode_status_revision = 3;
+const int mybuf_revision = 3;
 
-struct ronode_status {
-  uint32 reserved[3];
+struct mybuf {
+  uint32 reserved[300000];
   uint32 nodeid;
   uint32 state;
   uint32 ctime;

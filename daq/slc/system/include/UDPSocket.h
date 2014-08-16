@@ -14,9 +14,13 @@ namespace Belle2 {
     friend class TCPServerSocket;
 
   public:
-    UDPSocket(unsigned int port = 0);
+    UDPSocket();
+    UDPSocket(unsigned int port);
     UDPSocket(unsigned int port,
               const std::string& hostname,
+              bool boardcast = false);
+    UDPSocket(unsigned int port,
+              unsigned int addr,
               bool boardcast = false);
     virtual ~UDPSocket() throw() {}
 
@@ -27,6 +31,9 @@ namespace Belle2 {
     const std::string getHostName() const throw();
     unsigned int getPort() const throw();
     unsigned int getAddress() const throw();
+    const std::string getRemoteHostName() const throw();
+    unsigned int getRemotePort() const throw();
+    unsigned int getRemoteAddress() const throw();
 
   public:
     virtual size_t write(const void* v, size_t count) throw(IOException);
@@ -34,7 +41,7 @@ namespace Belle2 {
 
   private:
     struct sockaddr_in m_addr;
-    struct sockaddr_in m_multi;
+    struct sockaddr_in m_remote_addr;
 
   };
 

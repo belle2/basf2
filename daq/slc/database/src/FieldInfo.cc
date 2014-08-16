@@ -25,6 +25,16 @@ const std::string putNumber(T num)
   return ss.str();
 }
 
+template<>
+const std::string putNumber(char num)
+{
+  if (isnan(num)) return "'nan'";
+  if (isinf(num)) return "'infinity'";
+  std::stringstream ss;
+  ss << (int)num;
+  return ss.str();
+}
+
 int FieldInfo::Property::getTypeSize() const throw()
 {
   switch (m_type) {

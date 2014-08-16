@@ -36,6 +36,7 @@ int main(int argc, char** argv)
 
   while (true) {
     sleep(2);
+    data.update();
     fputs("\033[2J\033[0;0H", stdout);
     rewind(stdout);
     ftruncate(1, 0);
@@ -43,20 +44,21 @@ int main(int argc, char** argv)
     //printf(" rxqueue from eb0    : %4.1f [kB]\n", (float)(info->io[0].nqueue / 1024.));
     printf(" txqueue to eb0    : %4.1f [kB]\n", (float)(info->io[1].nqueue / 1024.));
     printf("\n");
-    printf(" %17s |      count | freq [kHz] | rate [MB/s] | evtsize [kB]\n", "socket");
+    printf(" %18s |      count | freq [kHz] | rate [MB/s] | evtsize [kB]\n", "socket");
     for (int i = 0; i < 2; i++) {
       std::string name = "";
       int state = 0;
       if (i == 0) {
-        name = "hslb   --> copper";
-        state = ((info->eflag >> 8) & 0xF) == 0;
+        name = "hslb   ---> copper";
+        //state = ((info->eflag >> 8) & 0xF) == 0;
+        state = info->io[i].state;
       } else if (i == 1) {
-        name = "copper --> eb0   ";
+        name = "copper ---> eb0   ";
         state = info->io[i].state;
       }
       if (state != 1) {
         name = "\x1b[49m\x1b[31m" +
-               StringUtil::replace(name, "-->", "-x->");
+               StringUtil::replace(name, "--->", "-x->");
       } else {
         name = "\x1b[49m\x1b[32m" + name;
       }

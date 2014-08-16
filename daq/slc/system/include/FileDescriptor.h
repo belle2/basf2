@@ -16,6 +16,7 @@ namespace Belle2 {
   public:
     int get_fd() const throw();
     bool select(int sec = -1, int usec = -1) throw(IOException);
+    bool select2(int sec = -1, int usec = -1) throw(IOException);
     bool close() throw();
 
   protected:

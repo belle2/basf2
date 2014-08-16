@@ -36,6 +36,7 @@ int main(int argc, char** argv)
 
   while (true) {
     sleep(2);
+    data.update();
     fputs("\033[2J\033[0;0H", stdout);
     rewind(stdout);
     ftruncate(1, 0);
@@ -47,13 +48,13 @@ int main(int argc, char** argv)
     for (int i = 0; i < 2; i++) {
       std::string name = "";
       if (i == 0) {
-        name = "eb0  --> ropc ";
+        name = "eb0  ---> ropc ";
       } else if (i == 1) {
-        name = "ropc --> eb1tx";
+        name = "ropc ---> eb1tx";
       }
       if (info->io[i].state != 1) {
         name = "\x1b[49m\x1b[31m" +
-               StringUtil::replace(name, "-->", "-x->");
+               StringUtil::replace(name, "--->", "-x->");
       } else {
         name = "\x1b[49m\x1b[32m" + name;
       }

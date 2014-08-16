@@ -2,8 +2,16 @@
 #define _Belle2_NSMData_hh
 
 #include "daq/slc/nsm/NSMHandlerException.h"
+#include "daq/slc/nsm/NSMDataStore.h"
 
 #include <daq/slc/database/DBObject.h>
+
+#include <daq/slc/readout/SharedMemory.h>
+#include "daq/slc/readout/MMutex.h"
+#include "daq/slc/readout/MCond.h"
+
+#include <daq/slc/system/TCPSocket.h>
+#include <daq/slc/system/Mutex.h>
 
 #include <daq/slc/base/StringUtil.h>
 
@@ -49,6 +57,7 @@ namespace Belle2 {
     throw(NSMHandlerException);
     void* parse(const char* inc_dir = NULL, bool allocated = false)
     throw(NSMHandlerException);
+    bool update() throw();
     void* get() throw() { return m_pdata; }
     const void* get() const throw() { return m_pdata; }
     const NSMDataList& getObjects(const std::string& name) const throw();
@@ -74,6 +83,8 @@ namespace Belle2 {
     virtual void writeObject(Writer& writer) const throw(IOException);
 
   private:
+    void set(void* pdata) throw() { m_pdata = pdata; }
+    void setPointer();
     int initProperties() throw();
 #if NSM_PACKAGE_VERSION >= 1914
     NSMparse* parse(NSMparse* ptr, int& length,
@@ -86,6 +97,12 @@ namespace Belle2 {
     int m_size;
     int m_offset;
     mutable NSMDataListMap m_data_v_m;
+    SharedMemory m_mem;
+    NSMDataStore::Entry* m_en;
+
+  private:
+    static TCPSocket g_socket;
+    static Mutex g_mutex;
 
   };
 

@@ -4,7 +4,6 @@
 #include "daq/storage/storage_info.h"
 
 #include "daq/slc/readout/SharedMemory.h"
-//#include "daq/slc/readout/MRWLock.h"
 #include "daq/slc/readout/MMutex.h"
 #include "daq/slc/readout/MCond.h"
 

@@ -16,8 +16,8 @@ EXTBINDIR=$(EXTDIR)/bin/$(BELLE2_EXTERNALS_SUBDIR)
 
 #all: $(OBJS)
 all: $(LIB)
-	@ mkdir -p $(EXTINCDIR)/mgt/
-	@ install -m 644 -p *.h $(EXTINCDIR)/mgt/
+	@ mkdir -p $(EXTINCDIR)/ttrx/
+	@ install -m 644 -p *.h $(EXTINCDIR)/ttrx/
 	@ install -m 644 -p $(LIB) $(EXTLIBDIR)/
 
 clean:

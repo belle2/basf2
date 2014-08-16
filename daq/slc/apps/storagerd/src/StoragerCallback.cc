@@ -1,8 +1,5 @@
 #include "daq/slc/apps/storagerd/StoragerCallback.h"
-#include "daq/slc/apps/storagerd/StoragerMonitor.h"
 #include "daq/slc/apps/storagerd/storage_info_all.h"
-
-#include "daq/storage/storage_info.h"
 
 #include "daq/slc/system/LogFile.h"
 

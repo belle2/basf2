@@ -1,8 +1,8 @@
-#include "daq/slc/runcontrol/RunControlMasterCallback.h"
+#include "daq/slc/apps/runcontrold/RunControlMasterCallback.h"
 
-#include <daq/slc/runcontrol/RunSetting.h>
-#include <daq/slc/runcontrol/RunSummary.h>
-#include <daq/slc/runcontrol/rc_status.h>
+#include <daq/slc/apps/runcontrold/RunSetting.h>
+#include <daq/slc/apps/runcontrold/RunSummary.h>
+#include <daq/slc/apps/runcontrold/rc_status.h>
 
 #include <daq/slc/database/DBInterface.h>
 #include <daq/slc/database/LoggerObjectTable.h>

@@ -1,5 +1,6 @@
 #include <daq/slc/nsm/NSMNodeDaemon.h>
 #include <daq/slc/nsm/NSMData.h>
+#include <daq/slc/nsm/NSMCommunicator.h>
 
 #include <daq/slc/readout/mybuf.h>
 
@@ -15,8 +16,9 @@ int main(int argc, char** argv)
     LogFile::debug("Usage : %s ", argv[0]);
     return 1;
   }
+  NSMCommunicator com(argv[1]);
   NSMData data("RODATA1", "mybuf", mybuf_revision);
-  mybuf* status = (mybuf*)data.allocate(NULL);
+  mybuf* status = (mybuf*)data.allocate(&com);
   unsigned int count = 0;
   while (true) {
     status->io[0].count = ++count;

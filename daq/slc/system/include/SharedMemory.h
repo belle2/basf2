@@ -31,6 +31,7 @@ namespace Belle2 {
     const std::string& getPath() const throw() { return m_path; }
     size_t size() const throw() { return m_size; }
     int getfd() const throw() { return m_fd; }
+    bool truncate(size_t size) throw();
 
     // operators
   public:

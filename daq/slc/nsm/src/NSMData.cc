@@ -8,6 +8,7 @@
 
 #include <daq/slc/system/TCPSocketWriter.h>
 #include <daq/slc/system/TCPSocketReader.h>
+#include <daq/slc/system/UDPSocket.h>
 #include <daq/slc/system/Time.h>
 
 #include <nsm2/belle2nsm.h>
@@ -24,6 +25,27 @@ extern "C" {
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+
+const unsigned short BUFFER_MAX = 10240;
+const unsigned int UDP_TCP_PORT = 9021;
+
+namespace Belle2 {
+
+  struct NSMDataPaket {
+    struct Header {
+      unsigned short paketid;
+      unsigned short flag;
+      unsigned short id;
+      unsigned short revision;
+      unsigned int max;
+      unsigned int offset;
+      unsigned int size;
+    };
+    Header hdr;
+    char buf[BUFFER_MAX];
+  };
+
+}
 
 using namespace Belle2;
 
@@ -132,7 +154,7 @@ void NSMData::setValue(const std::string& name, const void* data,
   }
 }
 
-void* NSMData::open(NSMCommunicator* /*comm*/)
+void* NSMData::open(NSMCommunicator* comm)
 throw(NSMHandlerException)
 {
   /*
@@ -152,39 +174,42 @@ throw(NSMHandlerException)
   }
   m_en = dstore.get(getName());
   if (m_en == NULL) {
+    UDPSocket udp;
+    NSMDataPaket paket;
+    paket.hdr.flag = NSMCommand::NSMGET.getId();
+    paket.hdr.max = m_size;
+    paket.hdr.revision = getRevision();
+    std::string name = getName();
     try {
       g_mutex.lock();
-      if (!g_socket.select2(0, 0)) {
-        g_socket.close();
-        g_socket.connect("127.0.0.1", 9020);
-      }
-      TCPSocketWriter writer(g_socket);
-      TCPSocketReader reader(g_socket);
-      writer.writeInt(NSMCommand::NSMGET.getId());
-      writer.writeInt(m_size);
-      writer.writeInt(getRevision());
-      writer.writeString(getName());
+      std::string hostname = "255.255.255.255";
+      if (comm != NULL) hostname = comm->getHostName();
+      udp = UDPSocket(UDP_TCP_PORT, hostname, true);
+      paket.hdr.id = 0;
+      strcpy(paket.buf, name.c_str());
+      udp.write(&paket, sizeof(NSMDataPaket::Header) + name.size() + 1);
       g_mutex.unlock();
-      int ntried = 0;
-      while (true) {
-        if ((m_en = dstore.get(getName())) != NULL) {
-          break;
-        }
-        usleep(100000);
-        ntried++;
-        if (ntried > 30) {
-          break;
-        }
-      }
-      if (m_en == NULL) {
-        g_mutex.unlock();
-        throw (NSMHandlerException("Data %s not registered yet",
-                                   getName().c_str()));
-      }
+      udp.close();
     } catch (const IOException& e) {
-      g_socket.close();
       g_mutex.unlock();
-      throw (NSMHandlerException("Connection error to datad"));
+      udp.close();
+      throw (NSMHandlerException("Connection error to datad %s", e.what()));
+    }
+    int ntried = 0;
+    while (true) {
+      if ((m_en = dstore.get(getName())) != NULL) {
+        break;
+      }
+      usleep(100000);
+      ntried++;
+      if (ntried > 30) {
+        break;
+      }
+    }
+    if (m_en == NULL) {
+      g_mutex.unlock();
+      throw (NSMHandlerException("Data %s not registered yet",
+                                 getName().c_str()));
     }
   }
   parse();
@@ -257,18 +282,17 @@ bool NSMData::update() throw()
   if (Time().get() - utime < 1) {
     return false;
   }
+  UDPSocket udp;
   try {
+    NSMDataPaket paket;
+    paket.hdr.flag = NSMCommand::NSMGET.getId();
+    paket.hdr.max = m_size;
+    paket.hdr.revision = getRevision();
     g_mutex.lock();
-    if (!g_socket.select2(0, 0)) {
-      g_socket.close();
-      g_socket.connect("127.0.0.1", 9020);
-    }
-    TCPSocketWriter writer(g_socket);
-    TCPSocketReader reader(g_socket);
-    writer.writeInt(NSMCommand::NSMGET.getId());
-    writer.writeInt(m_size);
-    writer.writeInt(getRevision());
-    writer.writeString(getName());
+    udp = UDPSocket(UDP_TCP_PORT, m_en->addr);
+    paket.hdr.id = m_en->rid;
+    udp.write(&paket, sizeof(NSMDataPaket::Header));
+    udp.close();
     g_mutex.unlock();
     NSMDataStore& dstore(NSMDataStore::getStore());
     int ntried = 0;
@@ -280,7 +304,7 @@ bool NSMData::update() throw()
     }
     dstore.unlock();
   } catch (const IOException& e) {
-    g_socket.close();
+    udp.close();
     g_mutex.unlock();
     std::cout << e.what() << std::endl;
   }

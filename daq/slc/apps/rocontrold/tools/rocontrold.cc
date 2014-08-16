@@ -20,10 +20,12 @@ int main(int argc, char** argv)
   //daemon(0, 0);
   LogFile::open("rocontrold");
   const char* name = argv[1];
+  const char* hostname = argv[2];
+  const int port = atoi(argv[3]);
   NSMNode node(name);
   ROCallback* callback = new ROCallback(node);
   callback->setFilePath("ropc");
-  NSMNodeDaemon* daemon = new NSMNodeDaemon(callback);
+  NSMNodeDaemon* daemon = new NSMNodeDaemon(callback, hostname, port);
   daemon->run();
 
   return 0;

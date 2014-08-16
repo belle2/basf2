@@ -1,6 +1,7 @@
 #include "daq/slc/runcontrol/RCCommand.h"
 #include "daq/slc/runcontrol/RCState.h"
-#include "daq/slc/runcontrol/rc_status.h"
+
+#include "daq/slc/apps/runcontrold/rc_status.h"
 
 #include <daq/slc/nsm/NSMCommunicator.h>
 #include <daq/slc/nsm/NSMData.h>
@@ -53,8 +54,8 @@ int main(int argc, char** argv)
     rcnode_v.push_back(NSMNode(argv[i]));
   }
   NSMCommunicator* comm = new NSMCommunicator();
-  //comm->init(node, config.get("nsm.local.host"), config.getInt("nsm.local.port"));
-  comm->init(node);
+  comm->init(node, config.get("nsm.local.host"),
+             config.getInt("nsm.local.port"));
   HIST_ENTRY* history = NULL;
   int nhistory = 0;
   char* prompt = (char*)malloc(nodename.size() + 3);

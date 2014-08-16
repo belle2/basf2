@@ -1,4 +1,4 @@
-#include "daq/slc/runcontrol/RunSummary.h"
+#include "daq/slc/apps/runcontrold/RunSummary.h"
 
 using namespace Belle2;
 

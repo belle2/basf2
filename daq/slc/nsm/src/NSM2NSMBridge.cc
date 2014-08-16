@@ -31,12 +31,14 @@ void NSM2NSMBridge::init() throw(NSMHandlerException)
   for (int i = 0; i < 2; i++) {
     try {
       NSMNode& node(m_callback[i]->getNode());
-      m_nsm_comm[i] = new NSMCommunicator();
+      m_nsm_comm[i] = new NSMCommunicator(m_host[i], m_port[i]);
       if (m_port[i] > 0 && m_callback[i] != NULL) {
         m_nsm_comm[i]->init(node, m_host[i], m_port[i]);
         m_nsm_comm[i]->setCallback(m_callback[i]);
         m_callback[i]->init();
       }
+      LogFile::info("Connected to NSM2 daemon (%s:%d)",
+                    m_host[i].c_str(), m_port[i]);
     } catch (const NSMHandlerException& e) {
       LogFile::fatal("Failed to connect NSM network (%s:%d). "
                      "Terminating process ",
@@ -45,8 +47,6 @@ void NSM2NSMBridge::init() throw(NSMHandlerException)
       m_nsm_comm[i] = NULL;
       exit(1);
     }
-    LogFile::debug("Connected to NSM2 daemon (%s:%d)",
-                   m_host[i].c_str(), m_port[i]);
   }
 }
 

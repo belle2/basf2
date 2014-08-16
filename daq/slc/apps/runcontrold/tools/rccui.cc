@@ -1,6 +1,7 @@
 #include "daq/slc/runcontrol/RCCommand.h"
 #include "daq/slc/runcontrol/RCState.h"
-#include "daq/slc/runcontrol/rc_status.h"
+
+#include "daq/slc/apps/runcontrold/rc_status.h"
 
 #include <daq/slc/nsm/NSMCommunicator.h>
 #include <daq/slc/nsm/NSMData.h>

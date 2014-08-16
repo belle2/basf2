@@ -21,9 +21,7 @@
 #include <arpa/inet.h>
 
 const unsigned short BUFFER_MAX = 10240;
-const unsigned int UDP_TCP_PORT = 9020;
-
-std::string g_hostname;
+const unsigned int UDP_TCP_PORT = 9021;
 
 Belle2::NSMDataStore& g_dstore(Belle2::NSMDataStore::getStore());
 
@@ -64,7 +62,7 @@ namespace Belle2 {
         socket.read((char*)&paket, sizeof(paket));
         std::string remotehost = socket.getRemoteHostName();
         unsigned int addr = socket.getRemoteAddress();
-        if (g_hostname == remotehost) continue;
+        //if (g_hostname == remotehost) continue;
         if (paket.hdr.flag == NSMCommand::NSMSET.getId()) {
           NSMDataStore::Entry* en = g_dstore.get(addr, paket.hdr.id);
           if (en == NULL) {
@@ -82,25 +80,26 @@ namespace Belle2 {
             g_mutex.lock();
             g_mem_m.insert(MemoryList::value_type(name, cmem));
             g_mutex.unlock();
-          }
-          en->size = paket.hdr.max;
-          if (g_mem_m.find(en->name) == g_mem_m.end()) {
-            SharedMemory cmem;
-            std::string path = StringUtil::form("%s:%s",
-                                                remotehost.c_str(),
-                                                en->name);
-            cmem.open(path, en->size);
-            cmem.map();
-            g_mutex.lock();
-            g_mem_m.insert(MemoryList::value_type(en->name, cmem));
-            g_mutex.unlock();
-          }
-          SharedMemory& mem(g_mem_m[en->name]);
-          char* buf = (char*)mem.map();
-          memcpy((buf + paket.hdr.offset), paket.buf, paket.hdr.size);
-          if (paket.hdr.size + paket.hdr.offset == paket.hdr.max) {
-            en->utime = Time().getSecond();
-            g_dstore.signal();
+          } else {
+            en->size = paket.hdr.max;
+            if (g_mem_m.find(en->name) == g_mem_m.end()) {
+              SharedMemory cmem;
+              std::string path = StringUtil::form("%s:%s",
+                                                  remotehost.c_str(),
+                                                  en->name);
+              cmem.open(path, en->size);
+              cmem.map();
+              g_mutex.lock();
+              g_mem_m.insert(MemoryList::value_type(en->name, cmem));
+              g_mutex.unlock();
+            }
+            SharedMemory& mem(g_mem_m[en->name]);
+            char* buf = (char*)mem.map();
+            memcpy((buf + paket.hdr.offset), paket.buf, paket.hdr.size);
+            if (paket.hdr.size + paket.hdr.offset == paket.hdr.max) {
+              en->utime = Time().getSecond();
+              g_dstore.signal();
+            }
           }
         } else if (paket.hdr.flag == NSMCommand::NSMGET.getId()) {
           if (paket.hdr.id == 0) {
@@ -157,58 +156,6 @@ namespace Belle2 {
     }
   };
 
-  class TCPListener {
-  public:
-    TCPListener(const TCPSocket& socket)
-      : m_socket(socket) {}
-
-  private:
-    TCPSocket m_socket;
-
-  public:
-    void run() {
-      try {
-        LogFile::info("Accepted connection from : %s", m_socket.getIP().c_str());
-        TCPSocketReader reader(m_socket);
-        while (true) {
-          NSMDataPaket paket;
-          paket.hdr.flag = reader.readInt();
-          paket.hdr.max = reader.readInt();
-          paket.hdr.revision = reader.readInt();
-          std::string name = reader.readString();
-          g_mutex.lock();
-          UDPSocket udp;
-          try {
-            if (paket.hdr.flag == NSMCommand::NSMGET.getId()) {
-              NSMDataStore::Entry* en = g_dstore.get(name);
-              if (en == NULL) {
-                LogFile::debug("Sending UDP request with broadcast");
-                udp = UDPSocket(UDP_TCP_PORT, g_hostname, true);
-                paket.hdr.id = 0;
-                strcpy(paket.buf, name.c_str());
-                udp.write(&paket, sizeof(NSMDataPaket::Header) + name.size() + 1);
-              } else if (en->addr == 0) {
-                LogFile::warning("Should be local memory :%s", name.c_str());
-              } else {
-                udp = UDPSocket(UDP_TCP_PORT, en->addr);
-                paket.hdr.id = en->rid;
-                udp.write(&paket, sizeof(NSMDataPaket::Header));
-              }
-            }
-            udp.close();
-            g_mutex.unlock();
-          } catch (const IOException& e) {
-            udp.close();
-            m_socket.close();
-            g_mutex.unlock();
-            return;
-          }
-        }
-      } catch (const IOException& e) {
-        m_socket.close();
-      }
-    }
-  };
 }
 
 using namespace Belle2;
@@ -221,22 +168,19 @@ void signaleHandler(int)
 
 int main(int argc, char** argv)
 {
-  signal(SIGINT, signaleHandler);
-  signal(SIGQUIT, signaleHandler);
-  if (argc < 3) {
-    LogFile::debug("Usage : %s hostname port", argv[0]);
+  if (argc < 1) {
+    LogFile::debug("Usage : %s [nmemories]", argv[0]);
     return 1;
   }
-  g_hostname = argv[1];
-  int max = (argc > 2) ? atoi(argv[2]) : 0;
-  TCPServerSocket server;
-  server.open("0.0.0.0", UDP_TCP_PORT);
+  daemon(0, 0);
+  LogFile::open("datad");
+  signal(SIGINT, signaleHandler);
+  signal(SIGQUIT, signaleHandler);
+  signal(SIGTERM, signaleHandler);
+  int max = (argc > 1) ? atoi(argv[1]) : 5;
   g_dstore.open(max);
   g_dstore.init();
-  PThread(new UDPListener());
-  while (true) {
-    PThread(new TCPListener(server.accept()));
-  }
+  UDPListener().run();
 
   return 0;
 }

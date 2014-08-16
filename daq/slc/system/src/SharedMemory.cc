@@ -44,16 +44,9 @@ bool SharedMemory::open(const std::string& path, size_t size)
       return false;
     }
   }
-  struct stat st;
-  fstat(fd, &st);
-  if (st.st_size < (int)size) {
-    ::ftruncate(fd, size);
-  } else {
-    size = st.st_size;
-  }
   m_fd = fd;
   m_path = path;
-  m_size = size;
+  truncate(size);
   return true;
 }
 
@@ -66,6 +59,20 @@ void SharedMemory::close()
 {
   if (m_fd > 0) ::close(m_fd);
 }
+
+bool SharedMemory::truncate(size_t size) throw()
+{
+  if (size > 0) {
+    ::ftruncate(m_fd, size);
+    m_size = size;
+  } else {
+    struct stat st;
+    fstat(m_fd, &st);
+    m_size = st.st_size;
+  }
+  return m_size > 0;
+}
+
 
 void* SharedMemory::map(size_t offset, size_t size)
 {

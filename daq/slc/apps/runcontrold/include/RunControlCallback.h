@@ -1,11 +1,12 @@
 #ifndef _Belle2_RunControlCallback_h
 #define _Belle2_RunControlCallback_h
 
+#include "daq/slc/apps/runcontrold/RunSetting.h"
+#include "daq/slc/apps/runcontrold/RunSummary.h"
+
 #include "daq/slc/runcontrol/RCCallback.h"
 
 #include "daq/slc/database/RunNumberInfoTable.h"
-#include "daq/slc/runcontrol/RunSetting.h"
-#include "daq/slc/runcontrol/RunSummary.h"
 
 #include <daq/slc/nsm/NSMData.h>
 #include <daq/slc/nsm/NSMNode.h>

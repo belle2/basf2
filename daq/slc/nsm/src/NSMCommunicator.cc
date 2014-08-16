@@ -44,11 +44,7 @@ throw(NSMHandlerException)
 #if NSM_PACKAGE_VERSION >= 1914
   if (host.size() > 0) m_host = host;
   if (port > 0) m_port = port;
-  if (m_host.size() == 0 || m_port <= 0) {
-    m_nsmc = b2nsm_init(node.getName().c_str());
-  } else {
-    m_nsmc = b2nsm_init2(node.getName().c_str(), 0, host.c_str(), port, port);
-  }
+  m_nsmc = b2nsm_init2(node.getName().c_str(), 0, host.c_str(), port, port);
   if (m_nsmc == NULL) {
     m_id = -1;
     throw (NSMHandlerException("Error during init2 (%s=>%s:%d): %s",

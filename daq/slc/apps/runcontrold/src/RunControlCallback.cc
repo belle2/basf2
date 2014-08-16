@@ -1,8 +1,8 @@
-#include "daq/slc/runcontrol/RunControlCallback.h"
+#include "daq/slc/apps/runcontrold/RunControlCallback.h"
 
-#include <daq/slc/runcontrol/RunSetting.h>
-#include <daq/slc/runcontrol/RunSummary.h>
-#include <daq/slc/runcontrol/rc_status.h>
+#include <daq/slc/apps/runcontrold/RunSetting.h>
+#include <daq/slc/apps/runcontrold/RunSummary.h>
+#include <daq/slc/apps/runcontrold/rc_status.h>
 
 #include <daq/slc/readout/ronode_status.h>
 
@@ -86,11 +86,7 @@ void RunControlCallback::update() throw()
   }
   for (size_t i = 0; i < m_node_v.size(); i++) {
     status->node[i].error = m_node_v[i].getError();
-    LogFile::debug("old node [%d] (%s) state = %d", i, m_node_v[i].getName().c_str(),
-                   (int)status->node[i].state);
     status->node[i].state = m_node_v[i].getState().getId();
-    LogFile::debug("new node [%d] (%s) state = %d", i, m_node_v[i].getName().c_str(),
-                   (int)status->node[i].state);
     DBObject& obj(obj_v[i].getObject("runtype"));
     status->node[i].configid = obj.getId();
     NSMData& data(m_data_v[i]);
@@ -171,8 +167,9 @@ bool RunControlCallback::ok() throw()
   if (msg.getLength() > 0) {
     RCState state(msg.getData());
     const std::string nodename = msg.getNodeName();
-    LogFile::debug("%s >> OK (%s) (RC=%s)",
-                   nodename.c_str(), msg.getData(), getNode().getState().getLabel());
+    //LogFile::debug("%s >> OK (%s) (RC=%s)",
+    //             nodename.c_str(), msg.getData(),
+    //getNode().getState().getLabel());
     NSMNodeIterator it = find(nodename);
     if (it != m_node_v.end()) {
       NSMCommunicator& com(*getCommunicator());
@@ -184,7 +181,8 @@ bool RunControlCallback::ok() throw()
         for (size_t i = 0; i < nobj; i++) {
           if (m_node_v[i].getState() == RCState::RECOVERING_RS) {
             try {
-              getCommunicator()->sendRequest(NSMMessage(m_node_v[i], RCCommand::RECOVER));
+              getCommunicator()->sendRequest(NSMMessage(m_node_v[i],
+                                                        RCCommand::RECOVER));
             } catch (const IOException& e) {
               LogFile::warning(e.what());
             }
@@ -246,7 +244,7 @@ bool RunControlCallback::error() throw()
       }
     }
   }
-  return true;//?
+  return true;
 }
 
 RunControlCallback::NSMNodeIterator
@@ -364,7 +362,8 @@ bool RunControlCallback::send(NSMMessage msg) throw()
         if (tstate != Enum::UNKNOWN) m_node_v[i].setState(tstate);
       }
       if (i < nobj - 1 &&
-          !getConfig().getObject().getObject("node", i + 1).getBool("sequential")) {
+          !getConfig().getObject().getObject("node", i + 1).
+          getBool("sequential")) {
         msg.setNodeName(m_node_v[i + 1]);
         send(msg);
       }

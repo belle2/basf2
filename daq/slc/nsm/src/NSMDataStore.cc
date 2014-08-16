@@ -19,11 +19,12 @@ NSMDataStore NSMDataStore::g_store;
 
 bool NSMDataStore::open(unsigned short max)
 {
-  if (!m_mem.open("NSMDataStore",
-                  m_mutex.size() + m_cond.size() +
-                  sizeof(Header) + sizeof(Entry) * max)) {
+  size_t size = (max > 0) ? m_mutex.size() + m_cond.size() +
+                sizeof(Header) + sizeof(Entry) * max : 0;
+  if (!m_mem.open("NSMDataStore", size)) {
     return false;
   }
+  m_mem.truncate(0);
   char* buf = (char*)m_mem.map();
   m_buf = buf;
   m_mutex = MMutex(buf);

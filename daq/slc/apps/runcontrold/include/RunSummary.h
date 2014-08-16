@@ -1,7 +1,7 @@
 #ifndef _Belle2_RunSummary_h
 #define _Belle2_RunSummary_h
 
-#include "daq/slc/runcontrol/RunSetting.h"
+#include "daq/slc/apps/runcontrold/RunSetting.h"
 
 #include <daq/slc/nsm/NSMNode.h>
 #include <daq/slc/nsm/NSMData.h>

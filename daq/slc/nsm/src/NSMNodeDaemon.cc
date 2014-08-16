@@ -24,12 +24,8 @@ void NSMNodeDaemon::init() throw(NSMHandlerException)
 {
   try {
     NSMNode& node(m_callback->getNode());
-    m_nsm_comm = new NSMCommunicator();
-    if (m_port < 0) {
-      m_nsm_comm->init(node);
-    } else {
-      m_nsm_comm->init(node, m_host, m_port);
-    }
+    m_nsm_comm = new NSMCommunicator(m_host, m_port);
+    m_nsm_comm->init(node, m_host, m_port);
     if (m_callback != NULL) {
       m_nsm_comm->setCallback(m_callback);
       m_callback->init();

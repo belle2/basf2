@@ -12,6 +12,7 @@
 #include <daq/slc/system/LogFile.h>
 
 #include <daq/slc/base/StringUtil.h>
+#include <daq/slc/base/ConfigFile.h>
 
 #include <daq/slc/apps/storagerd/storage_info_all.h>
 
@@ -29,8 +30,11 @@ int main(int argc, char** argv)
   }
   const std::string stornode = argv[1];
   const std::string node = argv[2];
+  ConfigFile config("slowcontrol");
   NSMCommunicator* comm = new NSMCommunicator();
-  comm->init(NSMNode(node));
+  comm->init(NSMNode(node),
+             config.get("nsm.local.host"),
+             config.getInt("nsm.local.port"));
   NSMData data(stornode + "_STATUS", "storage_info_all", 1);
   storage_info_all* info = (storage_info_all*)data.open(comm);
 

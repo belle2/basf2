@@ -153,7 +153,6 @@ void NSM2SocketBridge::run() throw()
         sendError(ERRORNo::DATABASE, nodename, "Failed to read DB list");
       }
     } else if (cmd == NSMCommand::NSMGET) {
-      LogFile::debug("'%s'", msg.getData());
       StringList argv = StringUtil::split(msg.getData(), ' ', 2);
       try {
         int revision = (msg.getNParams() > 0) ? msg.getParam(0) : 0;

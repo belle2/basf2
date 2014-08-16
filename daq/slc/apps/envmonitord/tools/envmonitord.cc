@@ -29,12 +29,14 @@ int main(int argc, char** argv)
     return 1;
   }
   LogFile::open("envmonitord");
+  ConfigFile config("slowcontrol", "envmon");
   const char* name = argv[1];
   NSMNode node(name);
   NSMCommunicator comm;
-  comm.init(node);
+  comm.init(node,
+            config.get("nsm.local.host"),
+            config.getInt("nsm.local.port"));
 
-  ConfigFile config("slowcontrol", "envmon");
   PostgreSQLInterface db(config.get("database.host"),
                          config.get("database.dbname"),
                          config.get("database.user"),

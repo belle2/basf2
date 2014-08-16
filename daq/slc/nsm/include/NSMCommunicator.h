@@ -29,13 +29,12 @@ namespace Belle2 {
     throw(NSMHandlerException);
 
   public:
-    NSMCommunicator(const std::string& host = "",
-                    int port = -1) throw();
+    NSMCommunicator(const std::string& host = "", int port = -1) throw();
     ~NSMCommunicator() throw() {}
 
   public:
     void init(const NSMNode& node,
-              const std::string& host = "", int port = -1)
+              const std::string& host, int port)
     throw(NSMHandlerException);
     bool wait(int sec) throw(NSMHandlerException);
     void setCallback(NSMCallback* callback) throw(NSMHandlerException);
@@ -74,6 +73,8 @@ namespace Belle2 {
     bool isConnected(const std::string& node) throw();
     const std::string getNodeHost(const std::string& nodename) throw();
     const std::string getNodeHost() throw();
+    const std::string& getHostName() throw() { return m_host; }
+    int getPort() throw() { return m_port; }
 
   private:
     int m_id;

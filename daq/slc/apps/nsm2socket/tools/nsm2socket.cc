@@ -38,6 +38,7 @@ int main(int argc, char** argv)
     LogFile::debug("usage: %s <port>", argv[0]);
     return 1;
   }
+  daemon(0, 0);
   ConfigFile config("slowcontrol");
   DBInterface* db = new PostgreSQLInterface(config.get("database.host"),
                                             config.get("database.dbname"),

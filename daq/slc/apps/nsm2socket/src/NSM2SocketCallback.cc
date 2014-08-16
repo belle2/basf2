@@ -119,7 +119,7 @@ void NSM2SocketCallback::timeout() throw()
       bool opennew = false;
       if (!data.isAvailable()) {
         data.open(getCommunicator());
-        LogFile::debug("open NSM data (%s) ", data.getName().c_str());
+        LogFile::info("open NSM data (%s) ", data.getName().c_str());
         opennew = true;
       }
       if (n % 5 == 0 || opennew) {

@@ -1,4 +1,5 @@
 #include <daq/slc/nsm/NSMNodeDaemon.h>
+#include <daq/slc/nsm/NSMCommunicator.h>
 #include <daq/slc/nsm/NSMData.h>
 #include <daq/slc/nsm/NSMDataStore.h>
 
@@ -16,12 +17,14 @@ int main(int argc, char** argv)
     LogFile::debug("Usage : %s ", argv[0]);
     return 1;
   }
+  NSMCommunicator com(argv[1]);
   NSMData data("RODATA1", "mybuf", mybuf_revision);
   mybuf* status = NULL;
   while (status == NULL) {
     try {
-      status = (mybuf*)data.open(NULL);
+      status = (mybuf*)data.open(&com);
     } catch (const NSMHandlerException& e) {
+      LogFile::error(e.what());
       status = NULL;
     }
   }

@@ -1,4 +1,4 @@
-#include "daq/slc/runcontrol/RunSetting.h"
+#include "daq/slc/apps/runcontrold/RunSetting.h"
 
 using namespace Belle2;
 

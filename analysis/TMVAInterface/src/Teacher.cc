@@ -122,7 +122,7 @@ namespace Belle2 {
       gSystem->ChangeDirectory(oldDirectory.c_str());
     }
 
-    void Teacher::train(std::string factoryOption, std::string prepareOption, unsigned int maxEventsPerClass)
+    void Teacher::train(std::string factoryOption, std::string prepareOption, unsigned long int maxEventsPerClass)
     {
 
       // Change the workling directory to the user defined working directory
@@ -131,12 +131,12 @@ namespace Belle2 {
 
       m_file->cd();
 
-      std::map<int, unsigned int> cluster_count;
+      std::map<int, unsigned long int> cluster_count;
       TBranch* targetBranch  = m_tree->get().GetBranch(Variable::makeROOTCompatible(m_target_var->name).c_str());
       targetBranch->SetAddress(&m_target);
 
-      int nevent = m_tree->get().GetEntries();
-      for (int i = 0; i < nevent; i++) {
+      unsigned long int nevent = m_tree->get().GetEntries();
+      for (unsigned long int i = 0; i < nevent; i++) {
         targetBranch->GetEvent(i);
         auto it = cluster_count.find(m_target);
         if (it == cluster_count.end())
@@ -147,7 +147,7 @@ namespace Belle2 {
 
       // Calculate the total number of events
       std::vector<int> classesWhichReachedMaximum;
-      unsigned int total = 0;
+      unsigned long int total = 0;
       for (auto & x : cluster_count) {
         if (maxEventsPerClass != 0 and x.second > maxEventsPerClass) {
           classesWhichReachedMaximum.push_back(x.first);
@@ -213,7 +213,7 @@ namespace Belle2 {
       gSystem->ChangeDirectory(oldDirectory.c_str());
     }
 
-    boost::property_tree::ptree Teacher::trainClass(std::string factoryOption, std::string prepareOption, std::map<int, unsigned int>& cluster_count, unsigned int maxEventsPerClass, int signalClass)
+    boost::property_tree::ptree Teacher::trainClass(std::string factoryOption, std::string prepareOption, std::map<int, unsigned long int>& cluster_count, unsigned long int maxEventsPerClass, int signalClass)
     {
 
       std::stringstream signal;
@@ -234,10 +234,10 @@ namespace Belle2 {
       }
 
       auto signalCut = TCut((Variable::makeROOTCompatible(m_target_var->name) + " == " + signal.str()).c_str());
-      unsigned int signalEvents = (maxEventsPerClass == 0) ? cluster_count[signalClass] : maxEventsPerClass;
+      unsigned long int signalEvents = (maxEventsPerClass == 0) ? cluster_count[signalClass] : maxEventsPerClass;
 
       auto backgroundCut = TCut((Variable::makeROOTCompatible(m_target_var->name) + " != " + signal.str()).c_str());
-      unsigned int backgroundEvents = 0;
+      unsigned long int backgroundEvents = 0;
       if (maxEventsPerClass == 0) {
         for (const auto & pair : cluster_count) {
           if (pair.first != signalClass)

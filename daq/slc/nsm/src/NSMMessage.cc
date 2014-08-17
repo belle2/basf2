@@ -24,8 +24,6 @@ void NSMMessage::init() throw()
 {
   m_nsmc = NULL;
   memset(&m_nsm_msg, 0, sizeof(NSMmsg));
-  m_data = NULL;
-  setLength(0);
 }
 
 NSMMessage::NSMMessage() throw()
@@ -118,15 +116,8 @@ const NSMMessage& NSMMessage::operator=(const NSMMessage& msg) throw()
 {
   m_nsmc = msg.m_nsmc;
   memcpy(&m_nsm_msg, &(msg.m_nsm_msg), sizeof(m_nsm_msg));
-  if (m_data != NULL && getLength() > 0) {
-    delete [] m_data;
-    m_data = NULL;
-  }
-  if (msg.getLength() > 0) {
-    m_data = new char [msg.getLength()];
-    memcpy(m_data, msg.m_data, msg.getLength());
-  }
-  setLength(msg.getLength());
+  m_data = msg.m_data;
+  m_nsm_msg.len = msg.m_nsm_msg.len;
   m_nodename = msg.m_nodename;
   m_reqname = msg.m_reqname;
   return *this;
@@ -239,14 +230,19 @@ unsigned int NSMMessage::getLength() const throw()
   return m_nsm_msg.len;
 }
 
-void NSMMessage::setLength(unsigned int len) throw()
+/*
+void NSMMessage::m_nsm_msg.len =unsigned int len) throw()
 {
-  m_nsm_msg.len = len;
+  if (m_nsm_msg.len != len) {
+    m_nsm_
+  }
+
 }
+*/
 
 const char* NSMMessage::getData() const throw()
 {
-  if (m_nsm_msg.len > 0) return (const char*)m_data;
+  if (m_nsm_msg.len > 0) return (const char*)m_data.ptr();
   else return NULL;
 }
 
@@ -277,7 +273,7 @@ void NSMMessage::setParam(int i, unsigned int v) throw()
 
 void NSMMessage::getData(Serializable& obj) const throw(IOException)
 {
-  BufferedReader reader(getLength(), (unsigned char*)m_data);
+  BufferedReader reader(getLength(), (unsigned char*)m_data.ptr());
   reader.readObject(obj);
 }
 
@@ -285,28 +281,20 @@ void NSMMessage::setData(const Serializable& obj) throw(IOException)
 {
   StreamSizeCounter counter;
   counter.writeObject(obj);
-  if (m_data != NULL && getLength() > 0) {
-    delete [] m_data;
-    m_data = NULL;
+  m_data = Buffer(counter.count());
+  m_nsm_msg.len = counter.count();
+  if (counter.count() > 0) {
+    BufferedWriter writer(counter.count(), (unsigned char*)m_data.ptr());
+    writer.writeObject(obj);
   }
-  m_data = new char[counter.count()];
-  setLength(counter.count());
-  BufferedWriter writer(counter.count(), (unsigned char*)m_data);
-  writer.writeObject(obj);
 }
 
 void NSMMessage::setData(int len, const char* data)  throw()
 {
-  if (m_data != NULL && getLength() > 0) {
-    delete [] m_data;
-    m_data = NULL;
-    setLength(0);
-  }
+  m_nsm_msg.len = len;
   if (len > 0 && data != NULL) {
-    m_data = new char[len];
-    setLength(len);
-    memset(m_data, 0, len);
-    memcpy(m_data, data, len);
+    m_data = Buffer(len);
+    memcpy(m_data.ptr(), data, len);
   }
 }
 
@@ -338,7 +326,6 @@ size_t NSMMessage::read(NSMcontext* nsmc) throw(NSMHandlerException)
   int ret = 0;
   NSMtcphead hp;
   int datalen = sizeof(NSMtcphead);
-  int len = m_nsm_msg.len;
   if ((ret = try_read(sock, (char*)&hp, datalen)) < 0) {
     throw (NSMHandlerException("Failed to read header"));
   }
@@ -363,12 +350,8 @@ size_t NSMMessage::read(NSMcontext* nsmc) throw(NSMHandlerException)
 
   datalen = m_nsm_msg.len;
   if (datalen > 0) {
-    if (m_data != NULL && len != datalen) {
-      delete [] m_data;
-    }
-    m_data = new char[datalen];
-    memset(m_data, 0, datalen);
-    if ((ret = try_read(sock, (char*)m_data, datalen)) < 0) {
+    m_data = Buffer(datalen);
+    if ((ret = try_read(sock, (char*)m_data.ptr(), datalen)) < 0) {
       throw (NSMHandlerException("Failed to read data"));
     }
     count += ret;
@@ -384,16 +367,11 @@ void NSMMessage::readObject(Reader& reader) throw(IOException)
   for (int i = 0; i < getNParams(); i++) {
     setParam(i, reader.readInt());
   }
-  size_t len = getLength();
-  setLength(reader.readInt());
-  if (getLength() > 0) {
-    if (m_data != NULL && len > 0) {
-      delete [] m_data;
-    }
-    len = getLength();
-    m_data = new char[len];
-    memset(m_data, 0, len);
-    reader.read(m_data, len);
+  size_t len = reader.readInt();
+  m_nsm_msg.len = len;
+  if (len > 0) {
+    m_data = Buffer(len);
+    reader.read(m_data.ptr(), len);
   }
 }
 
@@ -407,6 +385,6 @@ void NSMMessage::writeObject(Writer& writer) const throw(IOException)
   }
   writer.writeInt(getLength());
   if (getLength() > 0) {
-    writer.write(m_data, getLength());
+    writer.write(m_data.ptr(), getLength());
   }
 }

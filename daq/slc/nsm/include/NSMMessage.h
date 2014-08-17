@@ -10,6 +10,8 @@ extern "C" {
 #include "daq/slc/nsm/NSMCommand.h"
 #include "daq/slc/nsm/NSMNode.h"
 
+#include <daq/slc/system/Buffer.h>
+
 #include <daq/slc/base/Serializable.h>
 
 namespace Belle2 {
@@ -47,10 +49,7 @@ namespace Belle2 {
                const std::string& obj) throw();
     NSMMessage(const NSMCommand& cmd) throw();
     NSMMessage(const NSMMessage& msg) throw();
-    virtual ~NSMMessage() throw() {
-      if (m_data != NULL && getLength() > 0)
-        delete [] m_data;
-    }
+    virtual ~NSMMessage() throw() { }
 
   public:
     const NSMMessage& operator=(const NSMMessage& msg) throw();
@@ -79,7 +78,7 @@ namespace Belle2 {
     void setRequestName() throw();
     void setNodeName(const std::string& name) throw();
     void setNodeName(const NSMNode& node) throw();
-    void setLength(unsigned int len) throw();
+    //void setLength(unsigned int len) throw();
     void setRequestId(unsigned short id) throw();
     void setSequenceId(unsigned short id) throw();
     void setNodeId(unsigned short id) throw();
@@ -103,7 +102,7 @@ namespace Belle2 {
   private:
     mutable NSMcontext* m_nsmc;
     NSMmsg m_nsm_msg;
-    char* m_data;
+    Buffer m_data;
     mutable std::string m_nodename;
     mutable std::string m_reqname;
 

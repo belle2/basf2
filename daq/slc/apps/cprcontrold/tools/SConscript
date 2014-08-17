@@ -3,5 +3,6 @@ Import('env')
 env['TOOLS_LIBS']['cprcontrold'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib', 'pthread', 'mgt', 'ttrx']
 env['TOOLS_LIBS']['cprmonitor'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib', 'pthread', 'mgt', 'ttrx']
 env['TOOLS_LIBS']['coppermon'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib', 'pthread', 'mgt', 'ttrx']
+env['TOOLS_LIBS']['cprcontrold_dummy'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib', 'pthread', 'mgt', 'ttrx']
 
 Return('env')

@@ -1,5 +1,6 @@
 #include <daq/slc/nsm/NSMNodeDaemon.h>
 #include <daq/slc/nsm/NSMData.h>
+#include <daq/slc/nsm/NSMDataPaket.h>
 
 #include <daq/slc/system/Mutex.h>
 #include <daq/slc/system/Cond.h>
@@ -20,9 +21,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-const unsigned short BUFFER_MAX = 10240;
-const unsigned int UDP_TCP_PORT = 9021;
-
 Belle2::NSMDataStore& g_dstore(Belle2::NSMDataStore::getStore());
 
 namespace Belle2 {
@@ -36,25 +34,11 @@ Belle2::Mutex g_mutex;
 
 namespace Belle2 {
 
-  struct NSMDataPaket {
-    struct Header {
-      unsigned short paketid;
-      unsigned short flag;
-      unsigned short id;
-      unsigned short revision;
-      unsigned int max;
-      unsigned int offset;
-      unsigned int size;
-    };
-    Header hdr;
-    char buf[BUFFER_MAX];
-  };
-
   class UDPListener {
 
   public:
     void run() {
-      UDPSocket socket(UDP_TCP_PORT);
+      UDPSocket socket(NSMDataPaket::PORT);
       socket.bind();
       NSMDataPaket paket;
       while (true) {
@@ -112,10 +96,10 @@ namespace Belle2 {
               paket.hdr.flag = NSMCommand::NSMSET.getId();
               paket.hdr.max = en->size;
               paket.hdr.id = en->id;
-              memset(paket.buf, 0, BUFFER_MAX);
+              memset(paket.buf, 0, NSMDataPaket::BUFFER_MAX);
               strcpy(paket.buf, str.c_str());
               paket.hdr.size = str.size() + 1;
-              UDPSocket socket_r(UDP_TCP_PORT, remotehost);
+              UDPSocket socket_r(NSMDataPaket::PORT, remotehost);
               socket_r.write(&paket, sizeof(NSMDataPaket::Header) + paket.hdr.size);
               socket_r.close();
             }
@@ -136,11 +120,11 @@ namespace Belle2 {
               paket.hdr.offset = 0;
               paket.hdr.max = en->size;
               paket.hdr.paketid = 0;
-              UDPSocket socket_r(UDP_TCP_PORT, remotehost);
+              UDPSocket socket_r(NSMDataPaket::PORT, remotehost);
               char* buf = (char*)mem.map();
               while (paket.hdr.offset < paket.hdr.max) {
                 int size = (paket.hdr.max - paket.hdr.offset);
-                paket.hdr.size = (size < BUFFER_MAX) ? size : BUFFER_MAX;
+                paket.hdr.size = (size < NSMDataPaket::BUFFER_MAX) ? size : NSMDataPaket::BUFFER_MAX;
                 memcpy(paket.buf, (buf + paket.hdr.offset), paket.hdr.size);
                 socket_r.write(&paket, sizeof(NSMDataPaket::Header) + paket.hdr.size);
                 paket.hdr.offset += paket.hdr.size;

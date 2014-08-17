@@ -1,4 +1,4 @@
-#include "daq/slc/apps/cprcontrold/COPPERCallback.h"
+#include "daq/slc/apps/cprcontrold/COPPERDummyCallback.h"
 
 #include <daq/slc/readout/ronode_status.h>
 
@@ -18,18 +18,17 @@
 
 using namespace Belle2;
 
-COPPERCallback::COPPERCallback(const NSMNode& node,
-                               FEEController* fee)
-  : RCCallback(node), m_fee(fee)
+COPPERDummyCallback::COPPERDummyCallback(const NSMNode& node)
+  : RCCallback(node), m_fee(NULL)
 {
   m_con.setCallback(this);
 }
 
-COPPERCallback::~COPPERCallback() throw()
+COPPERDummyCallback::~COPPERDummyCallback() throw()
 {
 }
 
-void COPPERCallback::init() throw()
+void COPPERDummyCallback::init() throw()
 {
   m_con.init("basf2_" + getNode().getName(), 1);
   m_ttrx.open();
@@ -40,7 +39,7 @@ void COPPERCallback::init() throw()
   m_data.allocate(getCommunicator());
 }
 
-void COPPERCallback::term() throw()
+void COPPERDummyCallback::term() throw()
 {
   m_con.abort();
   m_con.getInfo().unlink();
@@ -51,7 +50,7 @@ void COPPERCallback::term() throw()
   m_ttrx.close();
 }
 
-void COPPERCallback::timeout() throw()
+void COPPERDummyCallback::timeout() throw()
 {
   m_ttrx.monitor();
   m_copper.monitor();
@@ -71,66 +70,40 @@ void COPPERCallback::timeout() throw()
   }
   eflag |= m_ttrx.isBelle2LinkError() << 28;
   eflag |= m_ttrx.isLinkUpError() << 29;
-
-  NSMCommunicator& com(*getCommunicator());
-  const std::string name = getNode().getName();
-  if (getNode().getState() == RCState::RUNNING_S &&
-      m_copper.isFifoFull()) {
-    std::string msg = "COPPER FIFO full";
-    LogFile::warning(msg);
-    com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
+  if (m_copper.isFifoFull()) {
+    //LogFile::warning("FIFO full");
   }
-  if (getNode().getState() == RCState::RUNNING_S &&
-      m_copper.isFifoEmpty()) {
-    std::string msg = "COPPER FIFO empty";
-    LogFile::warning(msg);
-    com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
+  if (m_copper.isFifoEmpty()) {
+    //LogFile::warning("FIFO empty");
   }
   if (m_copper.isLengthFifoFull()) {
-    std::string msg = "COPPER length FIFO full";
-    LogFile::warning(msg);
-    com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
+    //LogFile::warning("Length FIFO full");
   }
   for (int i = 0; i < 4; i++) {
     if (m_config.useHSLB(i)) {
       if (m_hslb[i].isBelle2LinkDown()) {
-        std::string msg = StringUtil::form("HSLB %c Belle2 link down", (char)(i + 'a'));
-        LogFile::error(msg);
-        com.sendLog(DAQLogMessage(name, LogFile::ERROR, msg));
+        //LogFile::error("Belle2 link down");
       }
-      if (getNode().getState() == RCState::RUNNING_S &&
-          m_hslb[i].isCOPPERFifoFull()) {
-        std::string msg = StringUtil::form("HSLB %c COPPER fifo full", (char)(i + 'a'));
-        LogFile::warning(msg);
-        com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
+      if (m_hslb[i].isCOPPERFifoFull()) {
+        //LogFile::warning("COPPER fifo full");
       }
       if (m_hslb[i].isCOPPERLengthFifoFull()) {
-        std::string msg = StringUtil::form("HSLB %c COPPER length fifo full", (char)(i + 'a'));
-        LogFile::warning(msg);
-        com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
+        //LogFile::warning("COPPER length fifo full");
       }
       if (m_hslb[i].isFifoFull()) {
-        std::string msg = StringUtil::form("HSLB %c fifo full", (char)(i + 'a'));
-        LogFile::warning(msg);
-        com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
+        //LogFile::warning("HSLB %d fifo full", i);
       }
       if (m_hslb[i].isCRCError()) {
-        std::string msg = StringUtil::form("HSLB %c CRC error", (char)(i + 'a'));
-        LogFile::warning(msg);
-        com.sendLog(DAQLogMessage(name, LogFile::WARNING, msg));
+        //LogFile::warning("HSLB %d CRC error", i);
       }
     }
   }
 
   if (m_ttrx.isBelle2LinkError()) {
-    std::string msg = "TTRX Belle2 link error\n";
-    LogFile::error(msg);
-    com.sendLog(DAQLogMessage(name, LogFile::ERROR, msg));
+    //LogFile::error("Belle2 link error\n");
   }
   if (m_ttrx.isLinkUpError()) {
-    std::string msg = "TTRX Link up error\n";
-    LogFile::error(msg);
-    com.sendLog(DAQLogMessage(name, LogFile::ERROR, msg));
+    //LogFile::error("Link up error\n");
   }
   ronode_status* nsm = (ronode_status*)m_data.get();
   if (m_data.isAvailable() && m_flow.isAvailable()) {
@@ -153,7 +126,7 @@ void COPPERCallback::timeout() throw()
   }
 }
 
-bool COPPERCallback::load() throw()
+bool COPPERDummyCallback::load() throw()
 {
   m_config.read(getConfig().getObject());
   if (!m_ttrx.isOpened()) {
@@ -163,33 +136,33 @@ bool COPPERCallback::load() throw()
   for (int i = 0; i < 4; i++) {
     if (m_config.useHSLB(i)) {
       m_hslb[i].open(i);
-      m_hslb[i].load();
+      //m_hslb[i].load();
     }
   }
   return recover();
 }
 
-bool COPPERCallback::start() throw()
+bool COPPERDummyCallback::start() throw()
 {
   return m_con.start();
 }
 
-bool COPPERCallback::stop() throw()
+bool COPPERDummyCallback::stop() throw()
 {
   return m_con.stop();
 }
 
-bool COPPERCallback::resume() throw()
+bool COPPERDummyCallback::resume() throw()
 {
   return true;
 }
 
-bool COPPERCallback::pause() throw()
+bool COPPERDummyCallback::pause() throw()
 {
   return true;
 }
 
-bool COPPERCallback::recover() throw()
+bool COPPERDummyCallback::recover() throw()
 {
   if (m_ttrx.isError()) {
     //m_ttrx.boot(m_config.getSetup().getTTRXFirmware());
@@ -197,7 +170,7 @@ bool COPPERCallback::recover() throw()
   for (int i = 0; i < 4; i++) {
     if (m_config.useHSLB(i) && m_hslb[i].isError()) {
       //m_hslb[i].boot(m_config.getSetup().getHSLBFirmware());
-      m_hslb[i].load();
+      //m_hslb[i].load();
     }
   }
   if (bootBasf2()) {
@@ -208,14 +181,14 @@ bool COPPERCallback::recover() throw()
 
 }
 
-bool COPPERCallback::abort() throw()
+bool COPPERDummyCallback::abort() throw()
 {
   m_con.abort();
   getNode().setState(RCState::NOTREADY_S);
   return true;
 }
 
-bool COPPERCallback::bootBasf2() throw()
+bool COPPERDummyCallback::bootBasf2() throw()
 {
   //if (m_con.isAlive()) {
   system("killall basf2");

@@ -100,6 +100,7 @@ throw(NSMHandlerException)
 {
 #if NSM_PACKAGE_VERSION >= 1914
   b2nsm_context(m_nsmc);
+  //LogFile::debug("%s >> %s", node.c_str(), cmd.c_str());
   if (b2nsm_sendany(node.c_str(), cmd.c_str(),
                     npar, (int*) pars, len, data, NULL) < 0) {
     m_id = -1;

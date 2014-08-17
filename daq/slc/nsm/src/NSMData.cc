@@ -1,5 +1,6 @@
 #include "daq/slc/nsm/NSMData.h"
 
+#include "daq/slc/nsm/NSMDataPaket.h"
 #include "daq/slc/nsm/NSMCommunicator.h"
 
 #include <daq/slc/base/StringUtil.h>
@@ -25,27 +26,6 @@ extern "C" {
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-
-const unsigned short BUFFER_MAX = 10240;
-const unsigned int UDP_TCP_PORT = 9021;
-
-namespace Belle2 {
-
-  struct NSMDataPaket {
-    struct Header {
-      unsigned short paketid;
-      unsigned short flag;
-      unsigned short id;
-      unsigned short revision;
-      unsigned int max;
-      unsigned int offset;
-      unsigned int size;
-    };
-    Header hdr;
-    char buf[BUFFER_MAX];
-  };
-
-}
 
 using namespace Belle2;
 
@@ -184,7 +164,7 @@ throw(NSMHandlerException)
       g_mutex.lock();
       std::string hostname = "255.255.255.255";
       if (comm != NULL) hostname = comm->getHostName();
-      udp = UDPSocket(UDP_TCP_PORT, hostname, true);
+      udp = UDPSocket(NSMDataPaket::PORT, hostname, true);
       paket.hdr.id = 0;
       strcpy(paket.buf, name.c_str());
       udp.write(&paket, sizeof(NSMDataPaket::Header) + name.size() + 1);
@@ -289,7 +269,7 @@ bool NSMData::update() throw()
     paket.hdr.max = m_size;
     paket.hdr.revision = getRevision();
     g_mutex.lock();
-    udp = UDPSocket(UDP_TCP_PORT, m_en->addr);
+    udp = UDPSocket(NSMDataPaket::PORT, m_en->addr);
     paket.hdr.id = m_en->rid;
     udp.write(&paket, sizeof(NSMDataPaket::Header));
     udp.close();

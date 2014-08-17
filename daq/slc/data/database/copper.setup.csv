@@ -1,2 +1,7 @@
  nodename,  config, crate, slot, hostname, serialid, copperid,     prpmc,     ttrx, ttrx_firmware,        hslb_a,        hslb_b, hslb_c, hslb_d,   hslb_firmware
+   CPR001, CDC:V03,     1,    1,   cpr001,  E11C046,  cpr5013, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
    CPR002, CDC:V03,     1,    1,   cpr002,  E11C046,  cpr5013, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR003, CDC:V03,     1,    1,   cpr003,  E11C046,  cpr5013, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR004, CDC:V03,     1,    1,   cpr004,  E11C046,  cpr5013, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR005, CDC:V03,     1,    1,   cpr005,  E11C046,  cpr5013, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR006, CDC:V03,     1,    1,   cpr006,  E11C046,  cpr5013, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit

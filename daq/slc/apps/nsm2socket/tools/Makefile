@@ -5,8 +5,8 @@ CP      = cp -f
 
 BELLE2_LIB = $(BELLE2_DAQ_SLC)/lib/$(BELLE2_SUBDIR)
 BELLE2_INC = $(BELLE2_DAQ_SLC)/include
-BELLE2EX_LIB = $(BELLE2_DAQ_SLC)/lib/$(BELLE2_EXTERNALS_SUBDIR)
-BELLE2EX_INC = $(BELLE2_DAQ_SLC)/include
+BELLE2EX_LIB = $(BELLE2_EXTERNAL_LOCAL_DIR)/lib/$(shell echo `uname -s`_`uname -m`)/opt
+BELLE2EX_INC = $(BELLE2_EXTERNAL_LOCAL_DIR)/include
 
 BINDIR  = $(BELLE2_DAQ_SLC)/bin
 SRCDIR  = $(BELLE2_DAQ_SLC)/src
@@ -14,11 +14,11 @@ INCDIR  = $(BELLE2_DAQ_SLC)/include
 TMPDIR  = $(BELLE2_DAQ_SLC)/tmp
 LIBDIR  = $(BELLE2_DAQ_SLC)/lib
 
-LIBS    += -lm -lpthread -ldl -lz -lrt -lpq -lreadline -L/usr/pgsql-9.3/lib -lpq
+LIBS    += -lm -lpthread -ldl -lz -lrt -lpq -lreadline -lncurses -L/usr/pgsql-9.2/lib -lpq
 LIBS    += -L$(BELLE2_LIB) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database -ldaq_slc_nsm -ldaq_slc_runcontrol -ldaq_slc_hvcontrol -ldaq_slc_apps_nsm2socket
 LIBS    += -L$(BELLE2EX_LIB) -lnsm2_corelib -lnsm2_b2lib
 
-CFLAGS   = -g -Wall -fPIC -D_REENTRANT -I/usr/pgsql-9.3/include
+CFLAGS   = -g -Wall -fPIC -D_REENTRANT -I/usr/pgsql-9.2/include
 CFLAGS  += -I$(BELLE2_DAQ_SLC)/include -I.
 CFLAGS  += -I$(BELLE2_INC)
 CFLAGS  += -I$(BELLE2EX_INC)

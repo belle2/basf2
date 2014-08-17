@@ -207,8 +207,8 @@ bool RunControlCallback::ok() throw()
         m_msg_tmp.setNodeName(*it);
         update();
         RCCommand cmd(m_msg_tmp.getRequestName());
-        if (cmd.isAvailable(it->getState()))
-          send(m_msg_tmp);
+        //if (cmd.isAvailable(it->getState()))
+        //  send(m_msg_tmp);
       }
     } else {
       LogFile::error("OK request from Unknown node: %s",
@@ -361,13 +361,9 @@ bool RunControlCallback::send(NSMMessage msg) throw()
         RCState tstate = cmd.nextTState();
         if (tstate != Enum::UNKNOWN) m_node_v[i].setState(tstate);
       }
-      if (i < nobj - 1 &&
-          !getConfig().getObject().getObject("node", i + 1).
-          getBool("sequential")) {
+      if (!ismaster) return true;
+      if (i < nobj - 1)
         msg.setNodeName(m_node_v[i + 1]);
-        send(msg);
-      }
-      break;
     }
   }
   return true;

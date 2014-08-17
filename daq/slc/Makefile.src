@@ -21,7 +21,10 @@ DEPS     = $(OBJS:%.o=%.d)
 
 CFLAGS   = -g -fPIC -O2 -Wall
 CFLAGS  += -I$(SLCDIR)/include
+CFLAGS  += -I$(BELLE2_EXTERNAL_LOCAL_DIR)/include
+CFLAGS  += -I$(PGSQL_LIB_PATH)/include
 CFLAGS  += $(EXTERNAL_CFLAGS)
+
 
 .PHONY : all clean
 

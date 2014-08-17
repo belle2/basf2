@@ -8,14 +8,16 @@ INCDIR  = $(BELLE2_DAQ_SLC)/include
 TMPDIR  = $(BELLE2_DAQ_SLC)/tmp
 LIBDIR  = $(BELLE2_DAQ_SLC)/lib
 
-LIBS    += -lm -lpthread -ldl -lz -lrt -lpq -lreadline -lncurses -L$(PGSQL_LIB_PATH)/lib -lpq
-LIBS    += -L$(LIBDIR) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database -ldaq_slc_nsm -ldaq_slc_hvcontrol -ldaq_slc_hvcontrol_arich
+LIBS    += -lm -lpthread -ldl -lz -lrt -lpq -lreadline -lncurses
+LIBS    += -L$(PGSQL_LIB_PATH)/lib -lpq
+LIBS    += -L$(LIBDIR) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database -ldaq_slc_nsm 
 LIBS    += -lnsm2_corelib -lnsm2_b2lib
 
-CFLAGS   = -g -Wall -fPIC -D_REENTRANT -I$(PGSQL_LIB_PATH)/include
-CFLAGS  += -I$(BELLE2_DAQ_SLC)/include -I.
+CFLAGS   = -g -Wall -fPIC -D_REENTRANT
+CFLAGS  += -I$(INCDIR) -I$(PGSQL_LIB_PATH)/include -I.
 
-MAINS   = $(wildcard *.cc)
+#MAINS   = $(wildcard *.cc)
+MAINS   = datad.cc
 TARGETS = $(MAINS:%.cc=$(BINDIR)/%)
 
 SRCS   = $(wildcard $(SRCDIR)/*.cc)
@@ -25,7 +27,7 @@ OBJS   = $(SRCS:$(SRCDIR)/%.cc=$(TMPDIR)/%.o)
 .PHONY : all clean 
 
 all: $(TARGETS)
-#	@ install -m755 -p $(BINDIR)/* $(BELLE2_LOCAL_DIR)/bin/$(BELLE2_SUBDIR)
+#	@ install -m755 -p $(BINDIR)/* $(BELLE2_LOCAL_DIR)/bin
 
 force:
 	@ $(RM) $(BINDIR)/*

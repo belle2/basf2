@@ -7,7 +7,7 @@ using namespace Belle2;
 Buffer::Buffer()
 throw() : m_memory(NULL), m_size(0), m_allocated(false) {}
 
-Buffer::Buffer(size_t size, unsigned char* memory) throw()
+Buffer::Buffer(unsigned int size, unsigned char* memory) throw()
   : m_memory(memory), m_size(size), m_allocated(false)
 {
   if (memory == NULL) {

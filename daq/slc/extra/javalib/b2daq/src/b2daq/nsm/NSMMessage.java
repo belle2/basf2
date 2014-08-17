@@ -111,7 +111,7 @@ public class NSMMessage implements Serializable {
     }
 
     public String getData() {
-        return new String(_data);
+        return new String(_data).replace("\0", "");
     }
 
     public void getData(Serializable obj) {
@@ -142,11 +142,12 @@ public class NSMMessage implements Serializable {
         if (data == null) {
             return;
         }
-        _data = new byte[data.length()];
+        _data = new byte[data.length()+1];
         byte[] d = data.getBytes();
         for (int i = 0; i < data.length(); i++) {
             _data[i] = d[i];
         }
+        _data[data.length()] = '\0';
     }
 
     public void setData(Serializable data) {

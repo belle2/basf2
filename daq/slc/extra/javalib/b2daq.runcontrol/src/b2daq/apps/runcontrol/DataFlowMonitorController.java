@@ -105,21 +105,21 @@ public class DataFlowMonitorController implements Initializable, NSMObserver {
                 ConfigObject cobj = NSMListenerService.getDB(label_nodename.getText());
                 if (cobj != null) {
                     if (cobj.getTable().matches("copper")) {
-                        c_in.setVisible(false);
-                        label_src.setVisible(false);
-                        label_dest.setText("EB0");
-                    } else if (cobj.getTable().matches("ropc")) {
-                        label_src.setText("EB0");
                         //c_in.setVisible(false);
-                        label_dest.setText("EB1TX");
+                        //label_src.setVisible(false);
+                        label_src.setText("HSLB");
+                        label_dest.setText("eb0");
+                    } else if (cobj.getTable().matches("ropc")) {
+                        label_src.setText("eb0");
+                        //c_in.setVisible(false);
+                        label_dest.setText("eb1tx");
                     }
                 }
-                NSMData data = NSMListenerService.getData("STATUS_" + label_nodename.getText());
+                NSMData data = NSMListenerService.getData(label_nodename.getText()+"_STATUS");
+                System.out.println("label_nodename : "+label_nodename.getText());
                 if (data == null || !data.getFormat().matches("ronode_status")) {
                     return;
                 }
-                //System.out.println(data.getName() + ":" + data.getFormat()+" "+ data.getInt("state"));
-                //data.print();
                 label_runno.setText(String.format("%04d.%04d.%03d", data.getInt("expno"),
                         data.getInt("runno"), data.getInt("subno")));
                 state.update(RCState.get(data.getInt("state")));
@@ -140,7 +140,8 @@ public class DataFlowMonitorController implements Initializable, NSMObserver {
                     flow.setSize(cdata.getFloat("evtsize"));
                     gr_rate[i].addPoint(cdata.getFloat("freq"));
                     gr_size[i].addPoint(cdata.getFloat("evtsize"));
-                    setConnection(c[i], cdata.getInt("port"));
+                    System.out.println("io["+i+"]state="+cdata.getInt("state"));
+                    setConnection(c[i], cdata.getInt("state"));
                 }
                 c_in.update();
                 c_out.update();
@@ -166,7 +167,7 @@ public class DataFlowMonitorController implements Initializable, NSMObserver {
     }
 
     void setNodeName(String nodename) {
-        this.label_nodename.setText(nodename);
+        this.label_nodename.setText(nodename.replace("_STATUS", ""));
     }
 
     String getNodeName() {

@@ -71,6 +71,20 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
     private Label label_node3;
     @FXML
     private Label label_node4;
+    @FXML
+    private Label label_node5;
+    @FXML
+    private Label label_node6;
+    @FXML
+    private Label label_node7;
+    @FXML
+    private Label label_node8;
+    @FXML
+    private Label label_node9;
+    @FXML
+    private Label label_node10;
+    @FXML
+    private Label label_node11;
 
     @FXML
     private Rectangle rect_rc;
@@ -84,6 +98,20 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
     private Rectangle rect_node3;
     @FXML
     private Rectangle rect_node4;
+    @FXML
+    private Rectangle rect_node5;
+    @FXML
+    private Rectangle rect_node6;
+    @FXML
+    private Rectangle rect_node7;
+    @FXML
+    private Rectangle rect_node8;
+    @FXML
+    private Rectangle rect_node9;
+    @FXML
+    private Rectangle rect_node10;
+    @FXML
+    private Rectangle rect_node11;
 
     @FXML
     private Text text_rc;
@@ -97,6 +125,21 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
     private Text text_node3;
     @FXML
     private Text text_node4;
+    @FXML
+    private Text text_node5;
+    @FXML
+    private Text text_node6;
+    @FXML
+    private Text text_node7;
+    @FXML
+    private Text text_node8;
+    @FXML
+    private Text text_node9;
+    @FXML
+    private Text text_node10;
+    @FXML
+    private Text text_node11;
+
     @FXML
     private GridPane summary_grid;
     @FXML
@@ -120,14 +163,20 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        label_v = new Label[]{label_node0, label_node1,
-            label_node2, label_node3, label_node4
+        label_v = new Label[]{label_node0, label_node1, label_node2,
+            label_node3, label_node4, label_node5,
+            label_node6, label_node7, label_node8, 
+            label_node9, label_node10, label_node11
         };
-        rect_v = new Rectangle[]{rect_node0, rect_node1,
-            rect_node2, rect_node3, rect_node4
+        rect_v = new Rectangle[]{rect_node0, rect_node1, rect_node2,
+            rect_node3, rect_node4, rect_node5,
+            rect_node6, rect_node7, rect_node8,
+            rect_node9, rect_node10, rect_node11
         };
-        text_v = new Text[]{text_node0, text_node1,
-            text_node2, text_node3, text_node4
+        text_v = new Text[]{text_node0, text_node1, text_node2,
+            text_node3, text_node4, text_node5, 
+            text_node6, text_node7, text_node8, 
+            text_node9, text_node10, text_node11
         };
         statelabel_v = new RunStateLabelController[label_v.length];
         for (int i = 0; i < label_v.length; i++) {
@@ -220,7 +269,7 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
             String dataname = msg.getNodeName();
             NSMData data = NSMListenerService.getData(dataname);
             Tab tab = null;
-            String nodename = msg.getNodeName().replace("STATUS_", "");
+            String nodename = msg.getNodeName().replace("_STATUS", "");
             for (Tab t : tabpane_mon.getTabs()) {
                 if (data.getFormat().matches("ronode_status")
                         && t.getText().matches(nodename)) {

@@ -60,16 +60,17 @@ namespace Belle2 {
    *
    * first parameter is a storeArray containing SVDClusters.
    * second parameter is a storeArra containing SpacePoints (will be filled in the function).
+   * third parameter tels the spacePoint where to get the name of the storeArray containing the related clusters
    *
-   * TODO: currently not used, but will probably be needed for Single-Cluster-SpacePoint-studies, should probably be steered by parameter.
    */
   void provideSVDClusterSingles(const StoreArray<SVDCluster>& svdClusters,
-                                StoreArray<SpacePoint>& spacePoints)
+                                StoreArray<SpacePoint>& spacePoints,
+                                unsigned short svdClustersIndex)
   {
     for (unsigned int i = 0; i < uint(svdClusters.getEntries()); ++i) {
       SpacePoint::SVDClusterInformation currentCluster = {svdClusters[i], i};
       std::vector<SpacePoint::SVDClusterInformation> currentClusterCombi = { currentCluster };
-      spacePoints.appendNew(currentClusterCombi);
+      spacePoints.appendNew(currentClusterCombi, svdClustersIndex);
       spacePoints[spacePoints.getEntries() - 1]->addRelationTo(svdClusters[i]);
     }
   }
@@ -80,9 +81,11 @@ namespace Belle2 {
    *
    * first parameter is a storeArray containing SVDClusters.
    * second parameter is a storeArra containing SpacePoints (will be filled in the function).
+   * third parameter tels the spacePoint where to get the name of the storeArray containing the related clusters
    */
   void provideSVDClusterCombinations(const StoreArray<SVDCluster>& svdClusters,
-                                     StoreArray<SpacePoint>& spacePoints);
+                                     StoreArray<SpacePoint>& spacePoints,
+                                     unsigned short svdClustersIndex);
 
 
 

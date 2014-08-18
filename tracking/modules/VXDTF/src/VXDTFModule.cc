@@ -3334,117 +3334,118 @@ void VXDTFModule::endRun()
     B2DEBUG(2, "q99 event: " << m_TESTERlogEvents.at(q99).Print());
     B2DEBUG(2, "fastest event: " << m_TESTERlogEvents.at(numLoggedEvents - 1).Print());
     B2DEBUG(1, "manually calculated mean: " << meanTimeConsumption / numLoggedEvents << ", and median: " << m_TESTERlogEvents.at(median).totalTime.count() << " of time consumption per event");
+
+    vector<EventInfoPackage> logEventsCopy = m_TESTERlogEvents; // copying original since we want to change the internal order now for several times and do not want to break the original
+    vector<EventInfoPackage> infoQ(5); // for each value we want to find the key figures, we store one entry. first is min, third is median, last is max
+    stringstream telClusterStream, pxdClusterStream, svdClusterStream, svdHitStream, twoHitCombiStream, twoHitActivatedStream, twoHitDiscardedStream;
+
+    // sort by nTelClusters:
+    std::sort(
+      logEventsCopy.begin(),
+      logEventsCopy.end(),
+      [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.numTELCluster < b.numTELCluster; }
+    );
+    infoQ.at(0).numTELCluster = logEventsCopy.at(0).numTELCluster;
+    infoQ.at(1).numTELCluster = logEventsCopy.at(q25).numTELCluster;
+    infoQ.at(2).numTELCluster = logEventsCopy.at(median).numTELCluster;
+    infoQ.at(3).numTELCluster = logEventsCopy.at(q75).numTELCluster;
+    infoQ.at(4).numTELCluster = logEventsCopy.at(numLoggedEvents - 1).numTELCluster;
+    telClusterStream << infoQ[0].numTELCluster << " / " << infoQ[1].numTELCluster << " / " << infoQ[2].numTELCluster << " / " << infoQ[3].numTELCluster << " / " << infoQ[4].numTELCluster << "\n";
+
+    // sort by nPxdClusters:
+    std::sort(
+      logEventsCopy.begin(),
+      logEventsCopy.end(),
+      [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.numPXDCluster < b.numPXDCluster; }
+    );
+    infoQ.at(0).numPXDCluster = logEventsCopy.at(0).numPXDCluster;
+    infoQ.at(1).numPXDCluster = logEventsCopy.at(q25).numPXDCluster;
+    infoQ.at(2).numPXDCluster = logEventsCopy.at(median).numPXDCluster;
+    infoQ.at(3).numPXDCluster = logEventsCopy.at(q75).numPXDCluster;
+    infoQ.at(4).numPXDCluster = logEventsCopy.at(numLoggedEvents - 1).numPXDCluster;
+    pxdClusterStream << infoQ[0].numPXDCluster << " / " << infoQ[1].numPXDCluster << " / " << infoQ[2].numPXDCluster << " / " << infoQ[3].numPXDCluster << " / " << infoQ[4].numPXDCluster << "\n";
+
+    // sort by nSVDClusters:
+    std::sort(
+      logEventsCopy.begin(),
+      logEventsCopy.end(),
+      [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.numSVDCluster < b.numSVDCluster; }
+    );
+    infoQ.at(0).numSVDCluster = logEventsCopy.at(0).numSVDCluster;
+    infoQ.at(1).numSVDCluster = logEventsCopy.at(q25).numSVDCluster;
+    infoQ.at(2).numSVDCluster = logEventsCopy.at(median).numSVDCluster;
+    infoQ.at(3).numSVDCluster = logEventsCopy.at(q75).numSVDCluster;
+    infoQ.at(4).numSVDCluster = logEventsCopy.at(numLoggedEvents - 1).numSVDCluster;
+    svdClusterStream << infoQ[0].numSVDCluster << " / " << infoQ[1].numSVDCluster << " / " << infoQ[2].numSVDCluster << " / " << infoQ[3].numSVDCluster << " / " << infoQ[4].numSVDCluster << "\n";
+
+    // sort by nSVDClusterCombis:
+    std::sort(
+      logEventsCopy.begin(),
+      logEventsCopy.end(),
+      [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.numSVDHits < b.numSVDHits; }
+    );
+    infoQ.at(0).numSVDHits = logEventsCopy.at(0).numSVDHits;
+    infoQ.at(1).numSVDHits = logEventsCopy.at(q25).numSVDHits;
+    infoQ.at(2).numSVDHits = logEventsCopy.at(median).numSVDHits;
+    infoQ.at(3).numSVDHits = logEventsCopy.at(q75).numSVDHits;
+    infoQ.at(4).numSVDHits = logEventsCopy.at(numLoggedEvents - 1).numSVDHits;
+    svdHitStream << infoQ[0].numSVDHits << " / " << infoQ[1].numSVDHits << " / " << infoQ[2].numSVDHits << " / " << infoQ[3].numSVDHits << " / " << infoQ[4].numSVDHits << "\n";
+
+    // sort by 2HitCombis:
+    std::sort(
+      logEventsCopy.begin(),
+      logEventsCopy.end(),
+      [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.numHitCombisTotal < b.numHitCombisTotal; }
+    );
+    infoQ.at(0).numHitCombisTotal = logEventsCopy.at(0).numHitCombisTotal;
+    infoQ.at(1).numHitCombisTotal = logEventsCopy.at(q25).numHitCombisTotal;
+    infoQ.at(2).numHitCombisTotal = logEventsCopy.at(median).numHitCombisTotal;
+    infoQ.at(3).numHitCombisTotal = logEventsCopy.at(q75).numHitCombisTotal;
+    infoQ.at(4).numHitCombisTotal = logEventsCopy.at(numLoggedEvents - 1).numHitCombisTotal;
+    twoHitCombiStream << infoQ[0].numHitCombisTotal << " / " << infoQ[1].numHitCombisTotal << " / " << infoQ[2].numHitCombisTotal << " / " << infoQ[3].numHitCombisTotal << " / " << infoQ[4].numHitCombisTotal << "\n";
+
+    // sort by 2HitCombisActivated:
+    std::sort(
+      logEventsCopy.begin(),
+      logEventsCopy.end(),
+      [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.segFinderActivated < b.segFinderActivated; }
+    );
+    infoQ.at(0).segFinderActivated = logEventsCopy.at(0).segFinderActivated;
+    infoQ.at(1).segFinderActivated = logEventsCopy.at(q25).segFinderActivated;
+    infoQ.at(2).segFinderActivated = logEventsCopy.at(median).segFinderActivated;
+    infoQ.at(3).segFinderActivated = logEventsCopy.at(q75).segFinderActivated;
+    infoQ.at(4).segFinderActivated = logEventsCopy.at(numLoggedEvents - 1).segFinderActivated;
+    twoHitActivatedStream << infoQ[0].segFinderActivated << " / " << infoQ[1].segFinderActivated << " / " << infoQ[2].segFinderActivated << " / " << infoQ[3].segFinderActivated << " / " << infoQ[4].segFinderActivated << "\n";
+
+    // sort by 2HitCombisDiscarded:
+    std::sort(
+      logEventsCopy.begin(),
+      logEventsCopy.end(),
+      [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.segFinderDiscarded < b.segFinderDiscarded; }
+    );
+    infoQ.at(0).segFinderDiscarded = logEventsCopy.at(0).segFinderDiscarded;
+    infoQ.at(1).segFinderDiscarded = logEventsCopy.at(q25).segFinderDiscarded;
+    infoQ.at(2).segFinderDiscarded = logEventsCopy.at(median).segFinderDiscarded;
+    infoQ.at(3).segFinderDiscarded = logEventsCopy.at(q75).segFinderDiscarded;
+    infoQ.at(4).segFinderDiscarded = logEventsCopy.at(numLoggedEvents - 1).segFinderDiscarded;
+    twoHitDiscardedStream << infoQ[0].segFinderDiscarded << " / " << infoQ[1].segFinderDiscarded << " / " << infoQ[2].segFinderDiscarded << " / " << infoQ[3].segFinderDiscarded << " / " << infoQ[4].segFinderDiscarded << "\n";
+
+    B2INFO(" VXDTF - endRun: ###############\n" <<
+           "within " << m_eventCounter << " events, there were a total number of " << m_TESTERcountTotalTCsFinal << " TCs " <<
+           "and " << float(m_TESTERcountTotalTCsFinal) * invNEvents << " TCs per event" <<
+           "(" << m_TESTERbrokenEventsCtr << " events killed for high occupancy).\n" <<
+           "Mean track length (indices/hits): " << float(m_TESTERcountTotalUsedIndicesFinal) / float(m_TESTERcountTotalTCsFinal) << "/" << float(m_TESTERcountTotalUsedHitsFinal) / float(m_TESTERcountTotalTCsFinal) << "\n\
+	min / q0.25 / median / q0.75 / max\n" <<
+           "nTelClusters           " << telClusterStream.str() <<
+           "nPxdClusters           " << pxdClusterStream.str() <<
+           "nSVDClusters           " << svdClusterStream.str() <<
+           "nSVDClusterCombis      " << svdHitStream.str() <<
+           "2HitCombis             " << twoHitCombiStream.str() <<
+           "2HitCombisActivated    " << twoHitActivatedStream.str() <<
+           "2HitCombisDiscarded    " << twoHitDiscardedStream.str() <<
+           "VXDTF -endRun - end ###############")
   }
 
-  vector<EventInfoPackage> logEventsCopy = m_TESTERlogEvents; // copying original since we want to change the internal order now for several times and do not want to break the original
-  vector<EventInfoPackage> infoQ(5); // for each value we want to find the key figures, we store one entry. first is min, third is median, last is max
-  stringstream telClusterStream, pxdClusterStream, svdClusterStream, svdHitStream, twoHitCombiStream, twoHitActivatedStream, twoHitDiscardedStream;
-
-  // sort by nTelClusters:
-  std::sort(
-    logEventsCopy.begin(),
-    logEventsCopy.end(),
-    [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.numTELCluster < b.numTELCluster; }
-  );
-  infoQ.at(0).numTELCluster = logEventsCopy.at(0).numTELCluster;
-  infoQ.at(1).numTELCluster = logEventsCopy.at(q25).numTELCluster;
-  infoQ.at(2).numTELCluster = logEventsCopy.at(median).numTELCluster;
-  infoQ.at(3).numTELCluster = logEventsCopy.at(q75).numTELCluster;
-  infoQ.at(4).numTELCluster = logEventsCopy.at(numLoggedEvents - 1).numTELCluster;
-  telClusterStream << infoQ[0].numTELCluster << " / " << infoQ[1].numTELCluster << " / " << infoQ[2].numTELCluster << " / " << infoQ[3].numTELCluster << " / " << infoQ[4].numTELCluster << "\n";
-
-  // sort by nPxdClusters:
-  std::sort(
-    logEventsCopy.begin(),
-    logEventsCopy.end(),
-    [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.numPXDCluster < b.numPXDCluster; }
-  );
-  infoQ.at(0).numPXDCluster = logEventsCopy.at(0).numPXDCluster;
-  infoQ.at(1).numPXDCluster = logEventsCopy.at(q25).numPXDCluster;
-  infoQ.at(2).numPXDCluster = logEventsCopy.at(median).numPXDCluster;
-  infoQ.at(3).numPXDCluster = logEventsCopy.at(q75).numPXDCluster;
-  infoQ.at(4).numPXDCluster = logEventsCopy.at(numLoggedEvents - 1).numPXDCluster;
-  pxdClusterStream << infoQ[0].numPXDCluster << " / " << infoQ[1].numPXDCluster << " / " << infoQ[2].numPXDCluster << " / " << infoQ[3].numPXDCluster << " / " << infoQ[4].numPXDCluster << "\n";
-
-  // sort by nSVDClusters:
-  std::sort(
-    logEventsCopy.begin(),
-    logEventsCopy.end(),
-    [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.numSVDCluster < b.numSVDCluster; }
-  );
-  infoQ.at(0).numSVDCluster = logEventsCopy.at(0).numSVDCluster;
-  infoQ.at(1).numSVDCluster = logEventsCopy.at(q25).numSVDCluster;
-  infoQ.at(2).numSVDCluster = logEventsCopy.at(median).numSVDCluster;
-  infoQ.at(3).numSVDCluster = logEventsCopy.at(q75).numSVDCluster;
-  infoQ.at(4).numSVDCluster = logEventsCopy.at(numLoggedEvents - 1).numSVDCluster;
-  svdClusterStream << infoQ[0].numSVDCluster << " / " << infoQ[1].numSVDCluster << " / " << infoQ[2].numSVDCluster << " / " << infoQ[3].numSVDCluster << " / " << infoQ[4].numSVDCluster << "\n";
-
-  // sort by nSVDClusterCombis:
-  std::sort(
-    logEventsCopy.begin(),
-    logEventsCopy.end(),
-    [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.numSVDHits < b.numSVDHits; }
-  );
-  infoQ.at(0).numSVDHits = logEventsCopy.at(0).numSVDHits;
-  infoQ.at(1).numSVDHits = logEventsCopy.at(q25).numSVDHits;
-  infoQ.at(2).numSVDHits = logEventsCopy.at(median).numSVDHits;
-  infoQ.at(3).numSVDHits = logEventsCopy.at(q75).numSVDHits;
-  infoQ.at(4).numSVDHits = logEventsCopy.at(numLoggedEvents - 1).numSVDHits;
-  svdHitStream << infoQ[0].numSVDHits << " / " << infoQ[1].numSVDHits << " / " << infoQ[2].numSVDHits << " / " << infoQ[3].numSVDHits << " / " << infoQ[4].numSVDHits << "\n";
-
-  // sort by 2HitCombis:
-  std::sort(
-    logEventsCopy.begin(),
-    logEventsCopy.end(),
-    [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.numHitCombisTotal < b.numHitCombisTotal; }
-  );
-  infoQ.at(0).numHitCombisTotal = logEventsCopy.at(0).numHitCombisTotal;
-  infoQ.at(1).numHitCombisTotal = logEventsCopy.at(q25).numHitCombisTotal;
-  infoQ.at(2).numHitCombisTotal = logEventsCopy.at(median).numHitCombisTotal;
-  infoQ.at(3).numHitCombisTotal = logEventsCopy.at(q75).numHitCombisTotal;
-  infoQ.at(4).numHitCombisTotal = logEventsCopy.at(numLoggedEvents - 1).numHitCombisTotal;
-  twoHitCombiStream << infoQ[0].numHitCombisTotal << " / " << infoQ[1].numHitCombisTotal << " / " << infoQ[2].numHitCombisTotal << " / " << infoQ[3].numHitCombisTotal << " / " << infoQ[4].numHitCombisTotal << "\n";
-
-  // sort by 2HitCombisActivated:
-  std::sort(
-    logEventsCopy.begin(),
-    logEventsCopy.end(),
-    [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.segFinderActivated < b.segFinderActivated; }
-  );
-  infoQ.at(0).segFinderActivated = logEventsCopy.at(0).segFinderActivated;
-  infoQ.at(1).segFinderActivated = logEventsCopy.at(q25).segFinderActivated;
-  infoQ.at(2).segFinderActivated = logEventsCopy.at(median).segFinderActivated;
-  infoQ.at(3).segFinderActivated = logEventsCopy.at(q75).segFinderActivated;
-  infoQ.at(4).segFinderActivated = logEventsCopy.at(numLoggedEvents - 1).segFinderActivated;
-  twoHitActivatedStream << infoQ[0].segFinderActivated << " / " << infoQ[1].segFinderActivated << " / " << infoQ[2].segFinderActivated << " / " << infoQ[3].segFinderActivated << " / " << infoQ[4].segFinderActivated << "\n";
-
-  // sort by 2HitCombisDiscarded:
-  std::sort(
-    logEventsCopy.begin(),
-    logEventsCopy.end(),
-    [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.segFinderDiscarded < b.segFinderDiscarded; }
-  );
-  infoQ.at(0).segFinderDiscarded = logEventsCopy.at(0).segFinderDiscarded;
-  infoQ.at(1).segFinderDiscarded = logEventsCopy.at(q25).segFinderDiscarded;
-  infoQ.at(2).segFinderDiscarded = logEventsCopy.at(median).segFinderDiscarded;
-  infoQ.at(3).segFinderDiscarded = logEventsCopy.at(q75).segFinderDiscarded;
-  infoQ.at(4).segFinderDiscarded = logEventsCopy.at(numLoggedEvents - 1).segFinderDiscarded;
-  twoHitDiscardedStream << infoQ[0].segFinderDiscarded << " / " << infoQ[1].segFinderDiscarded << " / " << infoQ[2].segFinderDiscarded << " / " << infoQ[3].segFinderDiscarded << " / " << infoQ[4].segFinderDiscarded << "\n";
-
-  B2INFO(" VXDTF - endRun: ###############\n" <<
-         "within " << m_eventCounter << " events, there were a total number of " << m_TESTERcountTotalTCsFinal << " TCs " <<
-         "and " << float(m_TESTERcountTotalTCsFinal) * invNEvents << " TCs per event" <<
-         "(" << m_TESTERbrokenEventsCtr << " events killed for high occupancy).\n" <<
-         "Mean track length (indices/hits): " << float(m_TESTERcountTotalUsedIndicesFinal) / float(m_TESTERcountTotalTCsFinal) << "/" << float(m_TESTERcountTotalUsedHitsFinal) / float(m_TESTERcountTotalTCsFinal) << "\n\
-                       min / q0.25 / median / q0.75 / max\n" <<
-         "nTelClusters           " << telClusterStream.str() <<
-         "nPxdClusters           " << pxdClusterStream.str() <<
-         "nSVDClusters           " << svdClusterStream.str() <<
-         "nSVDClusterCombis      " << svdHitStream.str() <<
-         "2HitCombis             " << twoHitCombiStream.str() <<
-         "2HitCombisActivated    " << twoHitActivatedStream.str() <<
-         "2HitCombisDiscarded    " << twoHitDiscardedStream.str() <<
-         "VXDTF -endRun - end ###############")
 
   // runWise cleanup:
   for (PassData * currentPass : m_passSetupVector) {

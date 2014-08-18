@@ -57,15 +57,49 @@ void SpacePointCreatorModule::initialize()
   svdClusters.isOptional();
 
 
-  //Relations to simulation objects only if the ancestor relations exist
-  if (pxdClusters.isOptional() == true) { spacePoints.registerRelationTo(pxdClusters, DataStore::c_Event, DataStore::c_DontWriteOut); }
-  if (svdClusters.isOptional() == true) { spacePoints.registerRelationTo(svdClusters, DataStore::c_Event, DataStore::c_DontWriteOut); }
+  //prepare collecting info for SpacePoints:
+  unsigned short cntActivatedClusterTypes = 0;
+  vector<string> collectionNames; // will contain the names of the cluster storeArrays
 
 
-  // retrieve names again (faster than doing everything in the event):
-  m_pxdClustersName = pxdClusters.getName();
-  m_svdClustersName = svdClusters.getName();
+  if (pxdClusters.isOptional() == true) {
+
+    //Relations to cluster objects only if the ancestor relations exist:
+    spacePoints.registerRelationTo(pxdClusters, DataStore::c_Event, DataStore::c_DontWriteOut);
+
+    // retrieve name again (faster than doing everything in the event):
+    m_pxdClustersName = pxdClusters.getName();
+
+    // prepare metaInfo for the SpacePoints containing the names for the Cluster-Containers:
+    collectionNames.push_back(m_pxdClustersName);
+    m_pxdClustersIndex = cntActivatedClusterTypes;
+    cntActivatedClusterTypes++;
+
+  }
+
+
+  if (svdClusters.isOptional() == true) {
+
+    //Relations to cluster objects only if the ancestor relations exist:
+    spacePoints.registerRelationTo(svdClusters, DataStore::c_Event, DataStore::c_DontWriteOut);
+
+    // retrieve name again (faster than doing everything in the event):
+    m_svdClustersName = svdClusters.getName();
+
+    // prepare metaInfo for the SpacePoints containing the names for the Cluster-Containers:
+    collectionNames.push_back(m_svdClustersName);
+    m_svdClustersIndex = cntActivatedClusterTypes;
+    cntActivatedClusterTypes++;
+
+  }
+
+
+  // retrieve name for spacePoint too (faster than doing everything in the event):
   m_spacePointsName = spacePoints.getName();
+
+
+  // store the collected names in the MetaInfo of the SpacePoints:
+  SpacePoint initMetaData = SpacePoint(collectionNames);
 
 
   B2INFO("SpacePointCreatorModule(" << m_nameOfInstance << ")::initialize: names set for containers:\n" <<
@@ -95,15 +129,15 @@ void SpacePointCreatorModule::event()
 
 
   for (unsigned int i = 0; i < uint(pxdClusters.getEntries()); ++i) {
-    spacePoints.appendNew((pxdClusters[i]), i);
+    spacePoints.appendNew((pxdClusters[i]), i, m_pxdClustersIndex);
     spacePoints[spacePoints.getEntries() - 1]->addRelationTo(pxdClusters[i]);
   }
 
 
   if (m_onlySingleClusterSpacePoints == true) {
-    provideSVDClusterSingles(svdClusters, spacePoints); /// WARNING TODO: missing: possibility to allow storing of u- or v-type clusters only!
+    provideSVDClusterSingles(svdClusters, spacePoints, m_svdClustersIndex); /// WARNING TODO: missing: possibility to allow storing of u- or v-type clusters only!
   } else {
-    provideSVDClusterCombinations(svdClusters, spacePoints);
+    provideSVDClusterCombinations(svdClusters, spacePoints, m_svdClustersIndex);
   }
 
 
@@ -114,7 +148,19 @@ void SpacePointCreatorModule::event()
           ", svdClusters: " << svdClusters.getEntries() <<
           ", spacePoints: " << spacePoints.getEntries())
 
-  /// WARNING TODO next steps: write simple SVDCluster-Combiner for spacepoints, create relations, think about mcParticle-relations, prepare converter for GFTrackCandidates including clusters to XXTrackCandidates including SpacePoints and vice versa.
+
+  if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 10, PACKAGENAME()) == true) {
+    for (int index = 0; index < spacePoints.getEntries(); index++) {
+      const SpacePoint* sp = spacePoints[index];
+
+      B2DEBUG(10, "SpacePointCreatorModule(" << m_nameOfInstance << ")::event: spacePoint " << index <<
+              " with type " << sp->getType() <<
+              " is  tied to a cluster in: " << sp->getClusterStoreName())
+    }
+  }
+
+
+  /// WARNING TODO next steps: create relations, think about mcParticle-relations, prepare converter for GFTrackCandidates including clusters to XXTrackCandidates including SpacePoints and vice versa.
 
   m_TESTERPXDClusterCtr += pxdClusters.getEntries();
   m_TESTERSVDClusterCtr += svdClusters.getEntries();

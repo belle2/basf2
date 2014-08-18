@@ -11,13 +11,25 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <vxd/dataobjects/VxdID.h>
 
+#include <pxd/reconstruction/PXDRecoHit.h>
+#include <svd/reconstruction/SVDRecoHit.h>
+// #include <framework/gearbox/Const.h>
+
+#include <../../externals/v00-05-02/include/boost/concept_check.hpp>
+
 using namespace std;
 using namespace Belle2;
 
 ClassImp(SpacePoint)
 
-SpacePoint::SpacePoint(const PXDCluster* pxdCluster, unsigned int indexNumber, const VXD::SensorInfoBase* aSensorInfo) :
-  m_vxdID(pxdCluster->getSensorID())
+SpacePointMetaInfo SpacePoint::m_metaInfo = SpacePointMetaInfo();
+
+SpacePoint::SpacePoint(const PXDCluster* pxdCluster,
+                       unsigned int indexNumber,
+                       unsigned short nameIndex,
+                       const VXD::SensorInfoBase* aSensorInfo) :
+  m_vxdID(pxdCluster->getSensorID()),
+  m_nameIndex(nameIndex)
 {
   if (pxdCluster == NULL) { throw InvalidNumberOfClusters(); }
   m_indexNumbers.push_back(indexNumber);
@@ -46,7 +58,9 @@ SpacePoint::SpacePoint(const PXDCluster* pxdCluster, unsigned int indexNumber, c
 
 
 SpacePoint::SpacePoint(const std::vector<SpacePoint::SVDClusterInformation>& clusters,
-                       const VXD::SensorInfoBase* aSensorInfo)
+                       unsigned short nameIndex,
+                       const VXD::SensorInfoBase* aSensorInfo) :
+  m_nameIndex(nameIndex)
 {
   unsigned int nClusters = clusters.size();
   double uCoord = 0; // 0 = center of Sensor
@@ -112,6 +126,35 @@ SpacePoint::SpacePoint(const std::vector<SpacePoint::SVDClusterInformation>& clu
   m_normalizedLocal = convertLocalToNormalizedCoordinates({ uCoord, vCoord } , m_vxdID, aSensorInfo);
 
   m_sensorType = aSensorInfo->getType();
+}
+
+
+
+vector< genfit::PlanarMeasurement > SpacePoint::getGenfitCompatible()
+{
+  vector< genfit::PlanarMeasurement > collectedMeasurements;
+
+
+  // get the related clusters to this spacePoint and create a genfit::PlanarMeasurement for each of them:
+  if (getType() == VXD::SensorInfoBase::SensorType::SVD) {
+
+    auto relatedClusters = this->getRelationsTo<SVDCluster>(getClusterStoreName());
+    for (unsigned i = 0; i < relatedClusters.size(); i++) {
+      collectedMeasurements.push_back(SVDRecoHit(relatedClusters[i]));
+    }
+
+  } else if (getType() == VXD::SensorInfoBase::SensorType::PXD) {
+
+    collectedMeasurements.push_back(
+      PXDRecoHit(this->getRelatedTo<PXDCluster>(getClusterStoreName()))
+    );
+
+  } else {
+    throw InvalidDetectorType();
+  }
+
+
+  return move(collectedMeasurements);
 }
 
 
@@ -194,11 +237,15 @@ TVector3 SpacePoint::getGlobalCoordinates(const std::pair<double, double>& hitLo
     aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID);
   }
 
-  return aSensorInfo->pointToGlobal(
-           TVector3(
-             hitLocal.first,
-             hitLocal.second,
-             0
-           )
-         );
+  return move(aSensorInfo->pointToGlobal(
+                TVector3(
+                  hitLocal.first,
+                  hitLocal.second,
+                  0
+                )
+              )
+             );
 }
+
+
+

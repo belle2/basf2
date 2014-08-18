@@ -19,7 +19,9 @@ namespace Belle2 {
 
 
   /// stores all possible 2-Cluster-combinations
-  void provideSVDClusterCombinations(const StoreArray<SVDCluster>& svdClusters, StoreArray<SpacePoint>& spacePoints)
+  void provideSVDClusterCombinations(const StoreArray<SVDCluster>& svdClusters,
+                                     StoreArray<SpacePoint>& spacePoints,
+                                     unsigned short svdClustersIndex)
   {
     unordered_map<VxdID::baseType, ClustersOnSensor> activatedSensors; // collects one entry per sensor, each entry will contain all Clusters on it TODO: better to use a sorted vector/list?
     vector<vector<SpacePoint::SVDClusterInformation> > foundCombinations; // collects all combinations of Clusters which were possible (condition: 1u+1v-Cluster on the same sensor)
@@ -39,7 +41,7 @@ namespace Belle2 {
 
 
     for (auto & clusterCombi : foundCombinations) {
-      spacePoints.appendNew(clusterCombi);
+      spacePoints.appendNew(clusterCombi, svdClustersIndex);
       for (auto & cluster : clusterCombi) {
         spacePoints[spacePoints.getEntries() - 1]->addRelationTo(cluster.first);
       }

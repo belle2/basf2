@@ -12,6 +12,7 @@
 // framework
 #include <framework/datastore/RelationsObject.h>
 #include <framework/core/FrameworkExceptions.h>
+#include <framework/logging/Logger.h>
 // vxd
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
@@ -19,11 +20,15 @@
 #include <pxd/dataobjects/PXDCluster.h>
 //svd
 #include <svd/dataobjects/SVDCluster.h>
+// tracking
+#include <tracking/spacePointCreation/SpacePointMetaInfo.h>
+// genfit
+#include <genfit/PlanarMeasurement.h>
 
-#include <framework/logging/Logger.h>
 
 // stl:
 #include <vector>
+#include <string>
 #include <utility> // std::pair
 #include <math.h>
 
@@ -43,6 +48,9 @@ namespace Belle2 {
     /** exception for the case that the user filled an invalid combination of clusters into the constructor (e.g. they are not from the same sensor or both are u clusters) */
     BELLE2_DEFINE_EXCEPTION(IncompatibleClusters, "SpacePoint::Constructor: given combination of SVDCluster is not allowed!");
 
+    /** exception for the case that the detectorType is not supported by the SpacePoint */
+    BELLE2_DEFINE_EXCEPTION(InvalidDetectorType, ("SpacePoint: the detector type given is not supported!"));
+
 
 
 
@@ -52,29 +60,46 @@ namespace Belle2 {
 
 
 
-    /** Constructor for the case of PXD Hits. For the case of TelHits, there will be a SpacePoint-Inheriting Class adding a TelCluster-feature
+    /** Constructor for */
+    SpacePoint(std::vector<std::string>& names) {
+      m_metaInfo.addNames(names);
+    }
+
+
+
+    /** Constructor for the case of PXD Hits.
+    *
+    * For the case of TelHits, there will be a SpacePoint-Inheriting Class adding a TelCluster-feature
      *
      * first parameter is pointer to cluster (passing a null-pointer will throw an exception)
      * second is the index number of the cluster in its storeArray.
-     * third parameter, a sensorInfo can be passed for testing purposes.
+     * third is the index number of the name of the storeArray stored in metaInfo.
+    * fourth parameter, a sensorInfo can be passed for testing purposes.
      *  If no sensorInfo is passed, the constructor gets its own pointer to it.
      */
     SpacePoint(const PXDCluster* pxdCluster,
                unsigned int indexNumber,
+               unsigned short nameIndex,
                const VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
 
-    /** Constructor for the case of SVD Hits. 1-2 clusters can be added this way
+    /** Constructor for the case of SVD Hits.
+    *
+    * 1-2 clusters can be added this way
      *
-     * first parameter is a container carrying pairs, where .first is the pointer to the svdCluster, and .second provides its indexNumber for the StoreArray.
-     *  It should _not_ be filled with NULL-Pointers (passing a null-pointer will throw an exception).
-     *  1 - 2 Clusters are allowed that way, if there are passed more than that or less, an exception will be thrown.
-     * second parameter, a sensorInfo can be passed for testing purposes.
-     *  If no sensorInfo is passed, the constructor gets its own pointer to it.
+     * first parameter is a container carrying pairs,
+    *   where .first is the pointer to the svdCluster,
+    *   and .second provides its indexNumber for the StoreArray.
+     * It should _not_ be filled with NULL-Pointers (passing a null-pointer will throw an exception).
+     * 1 - 2 Clusters are allowed that way, if there are passed more than that or less, an exception will be thrown.
+    * second is the index number of the name of the storeArray stored in metaInfo
+    * third parameter, a sensorInfo can be passed for testing purposes.
+     * If no sensorInfo is passed, the constructor gets its own pointer to it.
      *
      */
     SpacePoint(const std::vector<Belle2::SpacePoint::SVDClusterInformation>& clusters,
+               unsigned short nameIndex,
                const VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
@@ -110,13 +135,29 @@ namespace Belle2 {
     *
     * The return type is equivalent of the type given by SensorInfoBase
     */
-    VXD::SensorInfoBase::SensorType getType() { return m_sensorType; }
+    VXD::SensorInfoBase::SensorType getType() const { return m_sensorType; }
 
 
 
     /** returns container containing the indices of the clusters in their storeArrays. */
-    std::vector<unsigned int> getClusterIndices() const { return m_indexNumbers; }
+    const std::vector<unsigned int>& getClusterIndices() const { return m_indexNumbers; }
 
+
+
+    /** returns the name of the storeArray containing the cluster this spacePoint is related to. */
+    const std::string getClusterStoreName() const { return m_metaInfo.getName(m_nameIndex); }
+
+
+
+    /** returns a vector of genfit::PlanarMeasurement, which is needed for genfit::track.
+    *
+    * This member ensures compatibility with genfit2.
+    * The return type is detector independent,
+    * but each entry will be of the same detector type,
+    * since a spacePoint can not contain clusters of different sensors
+    * and therefore of different detector types.
+    */
+    virtual std::vector<genfit::PlanarMeasurement> getGenfitCompatible();
 
 
 // static converter functions:
@@ -247,6 +288,18 @@ namespace Belle2 {
      */
     VXD::SensorInfoBase::SensorType m_sensorType;
 
-    ClassDef(SpacePoint, 2) // last member added: m_sensorType;
+
+
+    /** contains metaInfo to be able to store memory-intensive data like names for relations */
+    static SpacePointMetaInfo m_metaInfo;
+
+
+
+    /** is the index number of the name of the storeArray stored in m_metaInfo. */
+    unsigned short m_nameIndex;
+
+
+
+    ClassDef(SpacePoint, 4) // last member added: m_nameIndex;
   };
 }

@@ -25,3 +25,5 @@
 #include "vxdtf/clustertfinfo.cc"
 #include "vxdtf/celltfinfo.cc"
 #include "vxdtf/vXDTFRawSecMap.cc"
+
+#include "vxdtf/sandBox4Testing.cc"

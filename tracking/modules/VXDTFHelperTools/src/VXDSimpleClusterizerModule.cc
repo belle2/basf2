@@ -14,8 +14,7 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
-#include <pxd/geometry/SensorInfo.h>
-#include <svd/geometry/SensorInfo.h>
+#include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoCache.h>
 // // #include <vxd/simulation/SensitiveDetector.h>
 
@@ -183,9 +182,9 @@ void VXDSimpleClusterizerModule::event()
     double u = -20;
     double v = -20;
     if (m_setMeasSigma < 0.0) {
-      const PXD::SensorInfo& geometry = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(aVXDId));
-      sigmaU = geometry.getUPitch(uTrue) * m_uniSigma;
-      sigmaV = geometry.getVPitch(vTrue) * m_uniSigma;
+      const VXD::SensorInfoBase* sensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(aVXDId);
+      sigmaU = sensorInfo->getUPitch(uTrue) * m_uniSigma;
+      sigmaV = sensorInfo->getVPitch(vTrue) * m_uniSigma;
     }
     B2DEBUG(1000, "sigU sigV: " << sigmaU << " " << sigmaV);
 
@@ -260,9 +259,9 @@ void VXDSimpleClusterizerModule::event()
     double u = -20;
     double v = -20;
     if (m_setMeasSigma < 0.0) {
-      const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(aVXDId));
-      sigmaU = geometry.getUPitch(uTrue) * m_uniSigma;
-      sigmaV = geometry.getVPitch(vTrue) * m_uniSigma;
+      const VXD::SensorInfoBase* sensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(aVXDId);
+      sigmaU = sensorInfo->getUPitch(uTrue) * m_uniSigma;
+      sigmaV = sensorInfo->getVPitch(vTrue) * m_uniSigma;
     }
     B2DEBUG(1000, "sigU sigV: " << sigmaU << " " << sigmaV);
 

@@ -55,7 +55,7 @@ namespace Belle2 {
     // create new PXDCluster and fill it with Info getting a Hit which is not at the origin (here, first layer)
 
     PXDCluster aCluster = PXDCluster(aVxdID, 0., 0., 0.1, 0.1, 0, 0, 1, 1, 1, 1, 1, 1);
-    SpacePoint testPoint = SpacePoint(&aCluster, 3, &sensorInfoBase);
+    SpacePoint testPoint = SpacePoint(&aCluster, 3, 0, &sensorInfoBase); // the 3, 0 are without further relevance here, just to get the constructor going
 //     SpacePoint testPoint = SpacePoint(aCluster, 3);
 
     EXPECT_DOUBLE_EQ(aVxdID, testPoint.getVxdID());
@@ -105,22 +105,22 @@ namespace Belle2 {
     SVDCluster clusterU3 = SVDCluster(anotherVxdID, true, 0.23, 0.1, 0.01, 0.001, 1, 1, 1);
 
     // normal u+v = 2D Cluster (order of input irrelevant):
-    SpacePoint testPoint2D = SpacePoint({ {&clusterU1, 1}, {&clusterV1, 2} }, &sensorInfoBase);
+    SpacePoint testPoint2D = SpacePoint({ {&clusterU1, 1}, {&clusterV1, 2} }, 0, &sensorInfoBase); // the 0 is without further relevance here, just to get the constructor going
 
     // normal u-only = 1D Cluster, sensorInfoBase is normally not needed, since constructor can create it on its own, but here the geometry is not set up, therefore we have to pass the infoBase:
-    SpacePoint testPoint1D = SpacePoint({ {&clusterU3, 1} }, &anotherSensorInfoBase);
+    SpacePoint testPoint1D = SpacePoint({ {&clusterU3, 1} }, 0, &anotherSensorInfoBase); // the 0 is without further relevance here, just to get the constructor going
 
     // should throw, since no clusters given:
-    EXPECT_THROW(SpacePoint({}, &sensorInfoBase), std::runtime_error);
+    EXPECT_THROW(SpacePoint({}, 0, &sensorInfoBase), std::runtime_error);
 
     // should throw, since too many clusters (of same sensor) given:
-    EXPECT_THROW(SpacePoint({ {&clusterU1, 1}, {&clusterV1, 2}, {&clusterU2, 3} }, &sensorInfoBase), std::runtime_error);
+    EXPECT_THROW(SpacePoint({ {&clusterU1, 1}, {&clusterV1, 2}, {&clusterU2, 3} }, 0, &sensorInfoBase), std::runtime_error);
 
     // should throw, since two clusters of same type (but on same sensor) given:
-    EXPECT_THROW(SpacePoint({ {&clusterU1, 1}, {&clusterU2, 2} }, &sensorInfoBase), std::runtime_error);
+    EXPECT_THROW(SpacePoint({ {&clusterU1, 1}, {&clusterU2, 2} }, 0, &sensorInfoBase), std::runtime_error);
 
     // should throw, since two clusters of different sensors given:
-    EXPECT_THROW(SpacePoint({ {&clusterV1, 1}, {&clusterU3, 2} }, &sensorInfoBase), std::runtime_error);
+    EXPECT_THROW(SpacePoint({ {&clusterV1, 1}, {&clusterU3, 2} }, 0, &sensorInfoBase), std::runtime_error);
 
 
 

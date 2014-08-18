@@ -52,7 +52,7 @@ class Particle(object):
     ## Create new class called DecayChannel via namedtuple. namedtuples are like a struct in C
     DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, mvaConfig, preCutConfig, postCutConfig')
 
-    def __init__(self, identifier, mvaConfig, preCutConfig=PreCutConfiguration(variable='Mass', method='S/B', efficiency=0.70, purity=0.001),
+    def __init__(self, identifier, mvaConfig, preCutConfig=PreCutConfiguration(variable='M', method='S/B', efficiency=0.70, purity=0.001),
                  postCutConfig=PostCutConfiguration(value=0.0001)):
         """
         Creates a Particle without any decay channels. To add decay channels use addChannel method.

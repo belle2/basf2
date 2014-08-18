@@ -23,8 +23,13 @@
 namespace Belle2 {
 
 
-  /** small struct for storing all clusters of the same sensor in one container */
+  /** small struct for storing all clusters of the same sensor in one container.
+   *
+   * members should only be filled using the single addCluster-function described below.
+   */
   struct ClustersOnSensor {
+
+  public:
 
     /** member function to automatically add the cluster to its corresponding entry */
     void addCluster(SpacePoint::SVDClusterInformation& entry) {
@@ -59,7 +64,15 @@ namespace Belle2 {
    * TODO: currently not used, but will probably be needed for Single-Cluster-SpacePoint-studies, should probably be steered by parameter.
    */
   void provideSVDClusterSingles(const StoreArray<SVDCluster>& svdClusters,
-                                StoreArray<SpacePoint>& spacePoints);
+                                StoreArray<SpacePoint>& spacePoints)
+  {
+    for (unsigned int i = 0; i < uint(svdClusters.getEntries()); ++i) {
+      SpacePoint::SVDClusterInformation currentCluster = {svdClusters[i], i};
+      std::vector<SpacePoint::SVDClusterInformation> currentClusterCombi = { currentCluster };
+      spacePoints.appendNew(currentClusterCombi);
+      spacePoints[spacePoints.getEntries() - 1]->addRelationTo(svdClusters[i]);
+    }
+  }
 
 
 
@@ -80,8 +93,8 @@ namespace Belle2 {
    *
    * for each u cluster, a v cluster is combined to a possible combination.
    */
-  void findPossibleCombinations(const ClustersOnSensor& aSensor,
-                                std::vector<std::vector<SpacePoint::SVDClusterInformation> >& foundCombinations)
+  inline void findPossibleCombinations(const ClustersOnSensor& aSensor,
+                                       std::vector<std::vector<SpacePoint::SVDClusterInformation> >& foundCombinations)
   {
     for (const SpacePoint::SVDClusterInformation & uCluster : aSensor.clustersU) {
       for (const SpacePoint::SVDClusterInformation & vCluster : aSensor.clustersV) {

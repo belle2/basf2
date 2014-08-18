@@ -18,18 +18,6 @@ using namespace std;
 namespace Belle2 {
 
 
-  /// simply store one spacePoint for each SVDCluster:
-  void provideSVDClusterSingles(const StoreArray<SVDCluster>& svdClusters, StoreArray<SpacePoint>& spacePoints)
-  {
-    for (unsigned int i = 0; i < uint(svdClusters.getEntries()); ++i) {
-      SpacePoint::SVDClusterInformation currentCluster = {svdClusters[i], i};
-      vector<SpacePoint::SVDClusterInformation> currentClusterCombi = { currentCluster };
-      spacePoints.appendNew(currentClusterCombi);
-    }
-  }
-
-
-
   /// stores all possible 2-Cluster-combinations
   void provideSVDClusterCombinations(const StoreArray<SVDCluster>& svdClusters, StoreArray<SpacePoint>& spacePoints)
   {
@@ -52,6 +40,9 @@ namespace Belle2 {
 
     for (auto & clusterCombi : foundCombinations) {
       spacePoints.appendNew(clusterCombi);
+      for (auto & cluster : clusterCombi) {
+        spacePoints[spacePoints.getEntries() - 1]->addRelationTo(cluster.first);
+      }
     }
   }
 

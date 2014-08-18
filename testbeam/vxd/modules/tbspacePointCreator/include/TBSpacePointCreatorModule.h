@@ -59,9 +59,6 @@ namespace Belle2 {
     std::string m_svdClustersName; /**< SVDCluster collection name */
     std::string m_telClustersName; /**< TelCluster collection name */
     std::string m_spacePointsName; /**< SpacePoints collection name */
-    std::string m_relSpacePointsPXDClustersName; /**< SpacePoints <-> PXDClusters relation name */
-    std::string m_relSpacePointsSVDClustersName; /**< SpacePoints <-> SVDClusters relation name */
-    std::string m_relSpacePointsTelClustersName; /**< SpacePoints <-> TelClusters relation name */
 
 
     // modification parameters

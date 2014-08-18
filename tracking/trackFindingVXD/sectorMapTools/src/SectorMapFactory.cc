@@ -58,7 +58,7 @@ void SectorMapFactory::importRootMap()
   } catch (exception& e) {
     B2FATAL("SectorMapFactory::importRootMap: could not load sectorMap. Reason: exception thrown:\n"
             << e.what() << "," <<
-            "\nthis means you have to check whether the sectorMaps stored in " <<
+            "\nthis means: you have to check whether the sectorMaps stored in " <<
             "\n ../tracking/data/VXDTFindex.xml and/or in ../testbeam/vxd/data/VXDTFindexTF.xml " <<
             "\n are uncommented and locally unpacked and available!")
   }

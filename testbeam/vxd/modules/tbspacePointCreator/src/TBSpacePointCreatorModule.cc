@@ -35,10 +35,7 @@ TBSpacePointCreatorModule::TBSpacePointCreatorModule() : Module()
            "SVDCluster collection name", string(""));
   addParam("SpacePoints", m_spacePointsName,
            "SpacePoints collection name", string(""));
-  addParam("RelSpacePointsPXDClusters", m_relSpacePointsPXDClustersName,
-           "SpacePoints <-> PXDClusters relation name", string(""));
-  addParam("RelSpacePointsSVDClusters", m_relSpacePointsSVDClustersName,
-           "SpacePoints <-> SVDClusters relation name", string(""));
+
 
   // 2.Modification parameters:
   addParam("NameOfInstance", m_nameOfInstance,
@@ -63,18 +60,12 @@ void TBSpacePointCreatorModule::initialize()
   svdClusters.isOptional();
   telClusters.isOptional();
 
-//   RelationArray relSpacePointsPXDClusters(spacePoints, pxdClusters);
-//   RelationArray relSpacePointsSVDClusters(spacePoints, svdClusters);
-//   RelationArray relSpacePointsTelClusters(spacePoints, telClusters);
-
 
   //Relations to simulation objects only if the ancestor relations exist
-  if (pxdClusters.isOptional() == true) { spacePoints.registerRelationTo(pxdClusters); }
-  if (svdClusters.isOptional() == true) { spacePoints.registerRelationTo(svdClusters); }
-  if (telClusters.isOptional() == true) { spacePoints.registerRelationTo(telClusters); }
-//   if (pxdClusters.isOptional() == true) { relSpacePointsPXDClusters.registerAsPersistent(); }
-//   if (svdClusters.isOptional() == true) { relSpacePointsSVDClusters.registerAsPersistent(); }
-//   if (telClusters.isOptional() == true) { relSpacePointsTelClusters.registerAsPersistent(); }
+  //Relations to simulation objects only if the ancestor relations exist
+  if (pxdClusters.isOptional() == true) { spacePoints.registerRelationTo(pxdClusters, DataStore::c_Event, DataStore::c_DontWriteOut); }
+  if (svdClusters.isOptional() == true) { spacePoints.registerRelationTo(svdClusters, DataStore::c_Event, DataStore::c_DontWriteOut); }
+  if (telClusters.isOptional() == true) { spacePoints.registerRelationTo(telClusters, DataStore::c_Event, DataStore::c_DontWriteOut); }
 
 
   // retrieve names again (faster than doing everything in the event):
@@ -82,19 +73,13 @@ void TBSpacePointCreatorModule::initialize()
   m_svdClustersName = svdClusters.getName();
   m_telClustersName = telClusters.getName();
   m_spacePointsName = spacePoints.getName();
-//   m_relSpacePointsPXDClustersName = relSpacePointsPXDClusters.getName();
-//   m_relSpacePointsSVDClustersName = relSpacePointsSVDClusters.getName();
-//   m_relSpacePointsTelClustersName = relSpacePointsTelClusters.getName();
 
 
   B2INFO("TBSpacePointCreatorModule(" << m_nameOfInstance << ")::initialize: names set for containers:\n" <<
          "pxdClusters: " << m_pxdClustersName <<
          "\nsvdClusters: " << m_svdClustersName <<
          "\ntelClusters: " << m_telClustersName <<
-         "\nspacePoints: " << m_spacePointsName)// <<
-//          "\nrelSpacePointsPXDClusters: " << m_relSpacePointsPXDClustersName <<
-//          "\nrelSpacePointsSVDClusters: " << m_relSpacePointsSVDClustersName <<
-//          "\nrelSpacePointsTelClusters: " << m_relSpacePointsTelClustersName)
+         "\nspacePoints: " << m_spacePointsName)
 
   // set some counters for output:
   m_TESTERPXDClusterCtr = 0;
@@ -118,21 +103,16 @@ void TBSpacePointCreatorModule::event()
     spacePoints.getPtr()->Clear();
   }
 
-  RelationArray relSpacePointsPXDClusters(spacePoints, pxdClusters, m_relSpacePointsPXDClustersName);
-  if (relSpacePointsPXDClusters) { relSpacePointsPXDClusters.clear(); }
-  RelationArray relSpacePointsSVDClusters(spacePoints, svdClusters, m_relSpacePointsSVDClustersName);
-  if (relSpacePointsSVDClusters) { relSpacePointsSVDClusters.clear(); }
-  RelationArray relSpacePointsTelClusters(spacePoints, telClusters, m_relSpacePointsTelClustersName);
-  if (relSpacePointsTelClusters) { relSpacePointsTelClusters.clear(); }
-
 
   for (unsigned int i = 0; i < uint(telClusters.getEntries()); ++i) {
     spacePoints.appendNew(TBSpacePoint((telClusters[i]), i));
+    spacePoints[spacePoints.getEntries() - 1]->addRelationTo(telClusters[i]);
   }
 
 
   for (unsigned int i = 0; i < uint(pxdClusters.getEntries()); ++i) {
     spacePoints.appendNew((pxdClusters[i]), i);
+    spacePoints[spacePoints.getEntries() - 1]->addRelationTo(pxdClusters[i]);
   }
 
 

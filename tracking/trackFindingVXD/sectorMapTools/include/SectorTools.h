@@ -171,7 +171,7 @@ namespace Belle2 {
   protected:
     /** returns true if value is between 0-1, false if not */
     static void throwBoundary(double value) {
-      if (value > 1 or value < 0) {
+      if (value > 1. or value < 0.) {
         throw Out_of_bounds();
       }
     }

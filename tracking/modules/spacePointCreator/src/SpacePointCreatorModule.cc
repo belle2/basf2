@@ -34,10 +34,6 @@ SpacePointCreatorModule::SpacePointCreatorModule() : Module()
            "SVDCluster collection name", string(""));
   addParam("SpacePoints", m_spacePointsName,
            "SpacePoints collection name", string(""));
-  addParam("RelSpacePointsPXDClusters", m_relSpacePointsPXDClustersName,
-           "SpacePoints <-> PXDClusters relation name", string(""));
-  addParam("RelSpacePointsSVDClusters", m_relSpacePointsSVDClustersName,
-           "SpacePoints <-> SVDClusters relation name", string(""));
 
   // 2.Modification parameters:
   addParam("NameOfInstance", m_nameOfInstance,
@@ -56,34 +52,26 @@ void SpacePointCreatorModule::initialize()
   StoreArray<SpacePoint> spacePoints(m_spacePointsName);
 
 
-  spacePoints.registerAsPersistent();
+  spacePoints.registerInDataStore(DataStore::c_DontWriteOut);
   pxdClusters.isOptional();
   svdClusters.isOptional();
 
 
-  RelationArray relSpacePointsPXDClusters(spacePoints, pxdClusters);
-  RelationArray relSpacePointsSVDClusters(spacePoints, svdClusters);
-
-
   //Relations to simulation objects only if the ancestor relations exist
-  if (pxdClusters.isOptional() == true) { relSpacePointsPXDClusters.registerAsPersistent(); }
-  if (svdClusters.isOptional() == true) { relSpacePointsSVDClusters.registerAsPersistent(); }
+  if (pxdClusters.isOptional() == true) { spacePoints.registerRelationTo(pxdClusters, DataStore::c_Event, DataStore::c_DontWriteOut); }
+  if (svdClusters.isOptional() == true) { spacePoints.registerRelationTo(svdClusters, DataStore::c_Event, DataStore::c_DontWriteOut); }
 
 
   // retrieve names again (faster than doing everything in the event):
   m_pxdClustersName = pxdClusters.getName();
   m_svdClustersName = svdClusters.getName();
   m_spacePointsName = spacePoints.getName();
-  m_relSpacePointsPXDClustersName = relSpacePointsPXDClusters.getName();
-  m_relSpacePointsSVDClustersName = relSpacePointsSVDClusters.getName();
 
 
   B2INFO("SpacePointCreatorModule(" << m_nameOfInstance << ")::initialize: names set for containers:\n" <<
          "pxdClusters: " << m_pxdClustersName <<
          "\nsvdClusters: " << m_svdClustersName <<
-         "\nspacePoints: " << m_spacePointsName <<
-         "\nrelSpacePointsPXDClusters: " << m_relSpacePointsPXDClustersName <<
-         "\nrelSpacePointsSVDClusters: " << m_relSpacePointsSVDClustersName)
+         "\nspacePoints: " << m_spacePointsName)
 
   // set some counters for output:
   m_TESTERPXDClusterCtr = 0;
@@ -105,14 +93,10 @@ void SpacePointCreatorModule::event()
     spacePoints.getPtr()->Clear();
   }
 
-  RelationArray relSpacePointsPXDClusters(spacePoints, pxdClusters, m_relSpacePointsPXDClustersName);
-  if (relSpacePointsPXDClusters) { relSpacePointsPXDClusters.clear(); }
-  RelationArray relSpacePointsSVDClusters(spacePoints, svdClusters, m_relSpacePointsSVDClustersName);
-  if (relSpacePointsSVDClusters) { relSpacePointsSVDClusters.clear(); }
-
 
   for (unsigned int i = 0; i < uint(pxdClusters.getEntries()); ++i) {
     spacePoints.appendNew((pxdClusters[i]), i);
+    spacePoints[spacePoints.getEntries() - 1]->addRelationTo(pxdClusters[i]);
   }
 
 
@@ -128,9 +112,7 @@ void SpacePointCreatorModule::event()
   B2DEBUG(1, "SpacePointCreatorModule(" << m_nameOfInstance << ")::event: spacePoints for single SVDClusters created! Size of arrays:\n" <<
           "pxdClusters: " << pxdClusters.getEntries() <<
           ", svdClusters: " << svdClusters.getEntries() <<
-          ", spacePoints: " << spacePoints.getEntries() <<
-          ", relSpacePointsPXDClusters: " << relSpacePointsPXDClusters.getEntries() <<
-          ", relSpacePointsSVDClusters: " << relSpacePointsSVDClusters.getEntries())
+          ", spacePoints: " << spacePoints.getEntries())
 
   /// WARNING TODO next steps: write simple SVDCluster-Combiner for spacepoints, create relations, think about mcParticle-relations, prepare converter for GFTrackCandidates including clusters to XXTrackCandidates including SpacePoints and vice versa.
 

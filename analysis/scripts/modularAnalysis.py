@@ -409,6 +409,7 @@ def applyTMVAMethod(
     method='FastBDT',
     signalProbabilityName='isSignal',
     signalFraction=-1,
+    signalClass=0,
     prefix='TMVA',
     workingDirectory='.',
     path=analysis_main,
@@ -419,6 +420,7 @@ def applyTMVAMethod(
     @param method name of the TMVA method
     @param target name which is used to store signalProbability in extra info of the particle
     @param signalFraction to calculate probability, -1 if no transformation, -2 to use training signal/background
+    @param signalClass is the cluster to calculate the probability of beeing signal
     @param prefix prefix which is used to identify the weight files created by TMVA
     @param workingDirectory in which the expert finds the config file and the weight file directory
     @param path         modules are added to this path
@@ -431,6 +433,7 @@ def applyTMVAMethod(
     expert.param('listNames', decayString)
     expert.param('signalProbabilityName', signalProbabilityName)
     expert.param('signalFraction', signalFraction)
+    expert.param('signalClass', signalClass)
     path.add_module(expert)
 
 

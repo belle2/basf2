@@ -1,0 +1,27 @@
+ nodename,  config, crate, slot, hostname, serialid, copperid,     prpmc,     ttrx, ttrx_firmware,        hslb_a,        hslb_b, hslb_c, hslb_d,   hslb_firmware
+   CPR5001, ECL:V01,1,1,  cpr5001,  E11C046,  cpr5001, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5002, ECL:V01,1,2,  cpr5002,  E11C046,  cpr5002, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5003, ECL:V01,1,3,  cpr5003,  E11C046,  cpr5003, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5004, ECL:V01,1,4,  cpr5004,  E11C046,  cpr5004, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5005, ECL:V01,1,5,  cpr5005,  E11C046,  cpr5005, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5006, ECL:V01,1,6,  cpr5006,  E11C046,  cpr5006, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5007, ECL:V01,1,7,  cpr5007,  E11C046,  cpr5007, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5008, ECL:V01,1,8,  cpr5008,  E11C046,  cpr5008, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5009, ECL:V01,1,9,  cpr5009,  E11C046,  cpr5009, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5010, ECL:V01,1,10,  cpr5010,  E11C046,  cpr5010, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5011, ECL:V01,1,11,  cpr5011,  E11C046,  cpr5011, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5012, ECL:V01,1,12,  cpr5012,  E11C046,  cpr5012, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5013, ECL:V01,1,13,  cpr5013,  E11C046,  cpr5013, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5014, ECL:V01,2,1,  cpr5014,  E11C046,  cpr5014, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5015, ECL:V01,3,2,  cpr5015,  E11C046,  cpr5015, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5016, ECL:V01,4,3,  cpr5016,  E11C046,  cpr5016, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5017, ECL:V01,5,4,  cpr5017,  E11C046,  cpr5017, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5018, ECL:V01,6,5,  cpr5018,  E11C046,  cpr5018, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5019, ECL:V01,7,6,  cpr5019,  E11C046,  cpr5019, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5020, ECL:V01,8,7,  cpr5020,  E11C046,  cpr5020, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5021, ECL:V01,9,8,  cpr5021,  E11C046,  cpr5021, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5022, ECL:V01,10,9,  cpr5022,  E11C046,  cpr5022, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5023, ECL:V01,11,10,  cpr5023,  E11C046,  cpr5023, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5024, ECL:V01,12,11,  cpr5024,  E11C046,  cpr5024, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5025, ECL:V01,13,12,  cpr5025,  E11C046,  cpr5025, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit
+   CPR5026, ECL:V01,14,13,  cpr5026,  E11C046,  cpr5026, RP-2-0080, 1303T156,   tt5r019.bit, HSLB-V3-3-295, HSLB-V3-3-296,      ,      , hslb_rck015.bit

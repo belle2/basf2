@@ -46,7 +46,7 @@ void RunControlCallback::init() throw()
     for (size_t i = 0; i < obj_v.size(); i++) {
       ConfigObject& obj(obj_v[i]);
       NSMData data(obj.getText("dataname"), obj.getText("format"),
-                   obj.getInt("revision"));
+                   obj.getInt("file_revision"));
       m_data_v.push_back(data);
     }
   }

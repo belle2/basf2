@@ -44,7 +44,20 @@ UDPSocket::UDPSocket(unsigned int port,
 {
   m_addr.sin_port = htons(port);
   m_addr.sin_family = AF_INET;
-  m_addr.sin_addr.s_addr = inet_addr(hostname.c_str());
+  if (hostname.size() > 0) {
+    struct hostent* host = NULL;
+    host = gethostbyname(hostname.c_str());
+    if (host == NULL) {
+      unsigned long addr = inet_addr(hostname.c_str());
+      if ((signed long) addr < 0) {
+        throw (std::exception());
+        throw (IOException("Wrong host name or ip"));
+      } else {
+        host = gethostbyaddr((char*)&addr, sizeof(addr), AF_INET);
+      }
+    }
+    m_addr.sin_addr.s_addr = (*(unsigned long*) host->h_addr_list[0]);
+  }
   if ((m_fd = ::socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
     throw (IOException("Failed to create socket"));
   }
@@ -82,7 +95,18 @@ throw (IOException)
   }
   m_addr.sin_port = htons(port);
   if (hostname.size() > 0) {
-    m_addr.sin_addr.s_addr = inet_addr(hostname.c_str());
+    struct hostent* host = NULL;
+    host = gethostbyname(hostname.c_str());
+    if (host == NULL) {
+      unsigned long addr = inet_addr(hostname.c_str());
+      if ((signed long) addr < 0) {
+        throw (std::exception());
+        throw (IOException("Wrong host name or ip"));
+      } else {
+        host = gethostbyaddr((char*)&addr, sizeof(addr), AF_INET);
+      }
+    }
+    m_addr.sin_addr.s_addr = (*(unsigned long*) host->h_addr_list[0]);
   }
   return bind();
 }

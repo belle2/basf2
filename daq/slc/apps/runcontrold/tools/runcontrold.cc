@@ -31,7 +31,8 @@ int main(int argc, char** argv)
   const std::string name = config.get("nsm.nodename");
   NSMNode node(name);
   RunControlCallback* callback = new RunControlCallback(node);
-  RunControlMasterCallback* master_callback = new RunControlMasterCallback(node, callback);
+  RunControlMasterCallback* master_callback =
+    new RunControlMasterCallback(node, callback);
   callback->setDB(db);
   /*NSMNodeDaemon* daemon = new NSMNodeDaemon(callback,
                                             config.get("nsm.local.host"),

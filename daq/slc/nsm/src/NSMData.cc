@@ -134,106 +134,107 @@ void NSMData::setValue(const std::string& name, const void* data,
   }
 }
 
-void* NSMData::open(NSMCommunicator* comm)
+void* NSMData::open(NSMCommunicator* comm, bool isnative)
 throw(NSMHandlerException)
 {
-  /*
-  b2nsm_context(comm->getContext());
-  if ((m_pdata = b2nsm_openmem(getName().c_str(), getFormat().c_str(),
-                               getRevision())) == NULL) {
-    throw (NSMHandlerException("Failed to open data memory %s",
-                               nsmlib_strerror(comm->getContext())));
-  }
-  setNode(comm->getNode().getName());
-  parse();
-  return m_pdata;
-  */
-  NSMDataStore& dstore(NSMDataStore::getStore());
-  if (!dstore.isOpend()) {
-    dstore.open();
-  }
-  m_en = dstore.get(getName());
-  if (m_en == NULL) {
-    UDPSocket udp;
-    NSMDataPaket paket;
-    paket.hdr.flag = NSMCommand::NSMGET.getId();
-    paket.hdr.max = m_size;
-    paket.hdr.revision = getRevision();
-    std::string name = getName();
-    try {
-      g_mutex.lock();
-      std::string hostname = "255.255.255.255";
-      if (comm != NULL) hostname = comm->getHostName();
-      udp = UDPSocket(NSMDataPaket::PORT, hostname, true);
-      paket.hdr.id = 0;
-      strcpy(paket.buf, name.c_str());
-      udp.write(&paket, sizeof(NSMDataPaket::Header) + name.size() + 1);
-      g_mutex.unlock();
-      udp.close();
-    } catch (const IOException& e) {
-      g_mutex.unlock();
-      udp.close();
-      throw (NSMHandlerException("Connection error to datad %s", e.what()));
+  if (isnative) {
+    b2nsm_context(comm->getContext());
+    if ((m_pdata = b2nsm_openmem(getName().c_str(), getFormat().c_str(),
+                                 getRevision())) == NULL) {
+      throw (NSMHandlerException("Failed to open data memory %s",
+                                 nsmlib_strerror(comm->getContext())));
     }
-    int ntried = 0;
-    while (true) {
-      if ((m_en = dstore.get(getName())) != NULL) {
-        break;
-      }
-      usleep(100000);
-      ntried++;
-      if (ntried > 30) {
-        break;
-      }
-    }
-    if (m_en == NULL) {
-      g_mutex.unlock();
-      throw (NSMHandlerException("Data %s not registered yet",
-                                 getName().c_str()));
-    }
-  }
-  parse();
-  std::string path;
-  if (m_en->addr > 0) {
-    sockaddr_in sa;
-    sa.sin_addr.s_addr = m_en->addr;
-    path = StringUtil::form("%s:%s",
-                            inet_ntoa(sa.sin_addr),
-                            getName().c_str());
+    setNode(comm->getNode().getName());
+    parse();
   } else {
-    path = "127.0.0.1:" + getName();
+    NSMDataStore& dstore(NSMDataStore::getStore());
+    if (!dstore.isOpend()) {
+      dstore.open();
+    }
+    m_en = dstore.get(getName());
+    if (m_en == NULL) {
+      UDPSocket udp;
+      NSMDataPaket paket;
+      paket.hdr.flag = NSMCommand::NSMGET.getId();
+      paket.hdr.max = m_size;
+      paket.hdr.revision = getRevision();
+      std::string name = getName();
+      try {
+        g_mutex.lock();
+        std::string hostname = "255.255.255.255";
+        if (comm != NULL) hostname = comm->getHostName();
+        udp = UDPSocket(NSMDataPaket::PORT, hostname, true);
+        paket.hdr.id = 0;
+        strcpy(paket.buf, name.c_str());
+        udp.write(&paket, sizeof(NSMDataPaket::Header) + name.size() + 1);
+        g_mutex.unlock();
+        udp.close();
+      } catch (const IOException& e) {
+        g_mutex.unlock();
+        udp.close();
+        throw (NSMHandlerException("Connection error to datad %s", e.what()));
+      }
+      int ntried = 0;
+      while (true) {
+        if ((m_en = dstore.get(getName())) != NULL) {
+          break;
+        }
+        usleep(100000);
+        ntried++;
+        if (ntried > 30) {
+          break;
+        }
+      }
+      if (m_en == NULL) {
+        g_mutex.unlock();
+        throw (NSMHandlerException("Data %s not registered yet",
+                                   getName().c_str()));
+      }
+    }
+    parse();
+    std::string path;
+    if (m_en->addr > 0) {
+      sockaddr_in sa;
+      sa.sin_addr.s_addr = m_en->addr;
+      path = StringUtil::form("%s:%s",
+                              inet_ntoa(sa.sin_addr),
+                              getName().c_str());
+    } else {
+      path = "127.0.0.1:" + getName();
+    }
+    m_mem.open(path, m_size);
+    m_pdata = (char*)m_mem.map();
+    setPointer();
   }
-  m_mem.open(path, m_size);
-  m_pdata = (char*)m_mem.map();
-  setPointer();
   return m_pdata;
 }
 
-void* NSMData::allocate(NSMCommunicator* /*comm*/, int /*interval*/)
+void* NSMData::allocate(NSMCommunicator* comm,
+                        bool isnative, int interval)
 throw(NSMHandlerException)
 {
-  /*
-  b2nsm_context(comm->getContext());
-  if ((m_pdata = b2nsm_allocmem(getName().c_str(), getFormat().c_str(),
-                                getRevision(), interval)) == NULL) {
-    throw (NSMHandlerException("Failed to allocate data memory %s",
-                               nsmlib_strerror(comm->getContext())));
+  if (isnative) {
+    b2nsm_context(comm->getContext());
+    if ((m_pdata = b2nsm_allocmem(getName().c_str(), getFormat().c_str(),
+                                  getRevision(), interval)) == NULL) {
+      throw (NSMHandlerException("Failed to allocate data memory %s",
+                                 nsmlib_strerror(comm->getContext())));
+    }
+    setNode(comm->getNode().getName());
+    parse();
+    memset(m_pdata, 0, m_size);
+  } else {
+    parse();
+    m_mem.open("127.0.0.1:" + getName(), m_size);
+    m_pdata = (char*)m_mem.map();
+    setPointer();
+    NSMDataStore& dstore(NSMDataStore::getStore());
+    if (!dstore.isOpend()) {
+      dstore.open();
+    }
+    m_en = dstore.add(0, m_size, getRevision(),
+                      getName(), getFormat(), 0);
   }
-  setNode(comm->getNode().getName());
-  parse();
-  memset(m_pdata, 0, m_size);
-  return m_pdata;
-  */
-  parse();
-  m_mem.open("127.0.0.1:" + getName(), m_size);
-  m_pdata = (char*)m_mem.map();
-  setPointer();
-  NSMDataStore& dstore(NSMDataStore::getStore());
-  if (!dstore.isOpend()) {
-    dstore.open();
-  }
-  m_en = dstore.add(0, m_size, getRevision(),
-                    getName(), getFormat(), 0);
   return m_pdata;
 }
 

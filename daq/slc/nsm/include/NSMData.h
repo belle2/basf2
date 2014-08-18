@@ -51,8 +51,11 @@ namespace Belle2 {
     void setFormat(const std::string& format) throw() { setTable(format); }
     void setSize(int size) throw() { m_size = size; }
     bool isAvailable() throw() { return (m_pdata != NULL); }
-    void* open(NSMCommunicator* comm) throw(NSMHandlerException);
-    void* allocate(NSMCommunicator* comm, int interval = 3)
+    void* open(NSMCommunicator* comm,
+               bool isnative = false) throw(NSMHandlerException);
+    void* allocate(NSMCommunicator* comm,
+                   bool isnative = false,
+                   int interval = 3)
     throw(NSMHandlerException);
     void* parse(const char* inc_dir = NULL, bool allocated = false)
     throw(NSMHandlerException);

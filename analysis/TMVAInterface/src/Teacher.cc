@@ -122,6 +122,25 @@ namespace Belle2 {
       gSystem->ChangeDirectory(oldDirectory.c_str());
     }
 
+    void Teacher::addClassSample(const Particle* particle, int classid)
+    {
+      // Change the workling directory to the user defined working directory
+      std::string oldDirectory = gSystem->WorkingDirectory();
+      gSystem->ChangeDirectory(m_workingDirectory.c_str());
+
+      // Fill the tree with the input variables
+      const auto& variables = m_methods[0].getVariables();
+      for (unsigned int i = 0; i < variables.size(); ++i) {
+        m_input[i] = variables[i]->function(particle);
+      }
+
+      // The target variable is converted to an integer
+      m_target = classid;
+      m_tree->get().Fill();
+
+      gSystem->ChangeDirectory(oldDirectory.c_str());
+    }
+
     void Teacher::train(std::string factoryOption, std::string prepareOption, unsigned long int maxEventsPerClass)
     {
 

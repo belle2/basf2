@@ -198,6 +198,7 @@ def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughte
         pmake.param('fileName', filename)
         pmake.param('decayString', outputList)
         pmake.param('variable', preCutConfig.variable)
+        pmake.param('inverseSamplingRate', 100)
         if preCutConfig.variable in ['M', 'Mbc']:
             mass = pdg.get(pdg.from_name(particleName)).Mass()
             pmake.param('histParams', (200, mass / 2, mass + mass / 2))
@@ -272,6 +273,9 @@ def SignalProbability(path, identifier, particleList, mvaConfig, additionalDepen
     rootFilename = removeJPsiSlash('{particleList}_{hash}.root'.format(particleList=particleList, hash=hash))
     configFilename = removeJPsiSlash('{particleList}_{hash}.config'.format(particleList=particleList, hash=hash))
 
+    if(mvaConfig.targetCluster != 1):
+        B2WARNING("Background Sampling is hardcoded to class 0. If you use another targetCluster than 1 this indicates that you want to change this!")
+
     if not os.path.isfile(rootFilename):
         teacher = register_module('TMVATeacher')
         teacher.set_name('TMVATeacher_' + particleList)
@@ -283,6 +287,7 @@ def SignalProbability(path, identifier, particleList, mvaConfig, additionalDepen
         teacher.param('target', mvaConfig.target)
         teacher.param('listNames', [particleList])
         teacher.param('maxEventsPerClass', 10000000)
+        teacher.param('inverseSamplingRates', {0: 100})
         teacher.param('doNotTrain', True)
         path.add_module(teacher)
         B2INFO("Calculate SignalProbability for {i}. Create root file with variables first.".format(i=identifier))
@@ -307,6 +312,7 @@ def SignalProbability(path, identifier, particleList, mvaConfig, additionalDepen
         expert.param('signalFraction', -2)  # Use signalFraction from training
         expert.param('signalProbabilityName', 'SignalProbability')
         expert.param('signalClass', mvaConfig.targetCluster)
+        expert.param('inverseSamplingRates', {0: 100})
         expert.param('listNames', [particleList])
         path.add_module(expert)
         B2INFO("Calculating SignalProbability for {i}".format(i=identifier))

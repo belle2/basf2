@@ -56,6 +56,11 @@ namespace Belle2 {
 
   private:
 
+    /**
+     * Checks if given sample should be used in training
+     */
+    bool checkSampling(int target);
+
     std::vector<std::string> m_listNames; /**< input particle list names */
     std::vector<std::string> m_variables; /**< input variables for the TMVA method */
     std::string m_target; /**< target used by multivariate analysis method has to be integer valued variable which defines clusters in the sample. */
@@ -71,6 +76,9 @@ namespace Belle2 {
     unsigned int m_maxEventsPerClass; /**< Maximum nuber of events per class passed to TMVA */
 
     std::shared_ptr<TMVAInterface::Teacher> m_teacher; /**< Used TMVA method */
+    const Variable::Manager::Var* m_target_var; /**< Variable Pointer to target variable */
+    std::map<int, unsigned int> m_inverseSamplingRates; /**< Inverse sampling rates for class id */
+    std::map<int, unsigned int> m_iSamples; /**< Number of samples with this class id */
 
   };
 

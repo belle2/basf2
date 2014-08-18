@@ -52,6 +52,7 @@ PreCutHistMakerModule::PreCutHistMakerModule():
   addParam("fileName", m_fileName, "Name of the TFile where the histograms are saved.");
   addParam("variable", m_variable, "Variable for which the distributions are calculated");
   addParam("customBinning", m_customBinning, "Custom binning, which is used instead of histParams. Specify low-edges for each bin, with nbins+1 entries.", std::vector<float>());
+  addParam("inverseSamplingRate", m_inverseSamplingRate, "Inverse Sampling rate for 'all' histogram.", static_cast<unsigned int>(1));
 
 }
 
@@ -96,12 +97,11 @@ void PreCutHistMakerModule::initialize()
     onlySignal_decayString << " " << listName;
 
     m_tmpLists.emplace_back(listName);
-    m_tmpLists.back().registerInDataStore(DataStore::c_DontWriteOut);
+    m_tmpLists.back().registerAsTransient(false);
     bool isSelfConjugated = !(Belle2::EvtPDLUtil::hasAntiParticle(daughterPDG));
     if (!isSelfConjugated) {
       std::string antiListName = Belle2::EvtPDLUtil::antiParticleListName(daughterPDG, "HistMaker");
-      StoreObjPtr<ParticleList> antiList(antiListName, DataStore::c_Event);
-      antiList.registerInDataStore(DataStore::c_DontWriteOut);
+      StoreObjPtr<ParticleList>::registerTransient(antiListName, DataStore::c_Event, false);
     }
   }
 
@@ -123,8 +123,8 @@ void PreCutHistMakerModule::initialize()
 
   std::string signalName(std::string("signal") + m_channelName);
   std::string allName(std::string("all") + m_channelName);
-  m_histogramSignal.registerInDataStore(signalName, DataStore::c_DontWriteOut);
-  m_histogramAll.registerInDataStore(allName, DataStore::c_DontWriteOut);
+  m_histogramSignal.registerAsTransient(signalName);
+  m_histogramAll.registerAsTransient(allName);
   if (m_customBinning.size() > 0) {
     m_histogramSignal.construct(signalName.c_str(), "signal", m_customBinning.size() - 1, &m_customBinning[0]);
     m_histogramAll.construct(allName.c_str(), "all", m_customBinning.size() - 1, &m_customBinning[0]);
@@ -145,6 +145,8 @@ void PreCutHistMakerModule::initialize()
 
   m_generator_all = new ParticleGenerator(m_decayString);
   m_generator_signal = new ParticleGenerator(onlySignal_decayString.str());
+
+  m_iEvent = 0;
 }
 
 
@@ -282,10 +284,13 @@ void PreCutHistMakerModule::saveCombinationsForSignal()
 
 void PreCutHistMakerModule::saveAllCombinations()
 {
-  m_generator_all->init();
-  while (m_generator_all->loadNext()) {
-    const Particle part = m_generator_all->getCurrentParticle();
-    m_histogramAll->get().Fill(m_var->function(&part));
+  m_iEvent++;
+  if (m_iEvent % m_inverseSamplingRate == 0) {
+    m_generator_all->init();
+    while (m_generator_all->loadNext()) {
+      const Particle part = m_generator_all->getCurrentParticle();
+      m_histogramAll->get().Fill(m_var->function(&part), m_inverseSamplingRate);
+    }
   }
 }
 
@@ -355,6 +360,7 @@ void PreCutHistMakerModule::terminate()
 {
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
     B2INFO("Writing hists to " << m_fileName);
+    m_file->Dump();
     m_histogramSignal->write(m_file);
     m_histogramAll->write(m_file);
 

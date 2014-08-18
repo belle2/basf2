@@ -65,6 +65,12 @@ namespace Belle2 {
 
   private:
 
+    /**
+     * Reweights probability using the given samplingRates
+     * @param samplesProbability probability calculated frmo sampled training
+     */
+    float fixProbabilityUsingSamplingRates(float sampledProbability);
+
     std::vector<std::string> m_listNames; /**< input particle list names */
     std::string m_methodName; /**< name of the TMVA method specified in the training by TMVATeacher */
     std::string m_methodPrefix; /**< common prefix for the methods trained by TMVATeacher */
@@ -73,7 +79,8 @@ namespace Belle2 {
     int m_signalClass; /**< Class which is considered signal.  */
     std::shared_ptr<TMVAInterface::Expert> m_method; /**< Method used to calculate the target variable */
     float m_signalFraction; /**< signalFraction to calculate probability, -1 if no transformation of the method output should be performed */
-
+    std::map<int, unsigned int> m_inverseSamplingRates; /**< Inverse sampling rates for class id */
+    double m_samplingRateCorrectionFactor; /**< Sampling Rate correction factor */
   };
 
 } // Belle2 namespace

@@ -94,6 +94,9 @@ namespace Belle2 {
     ParticleGenerator* m_generator_signal; /**< Combines particles for signal (not everything is signal, so we run MCMatching for the limited number of candidates produced). */
     ParticleGenerator* m_generator_all; /**< Combines particles for signal+background. */
 
+    unsigned int m_inverseSamplingRate; /**< Sampling rate for 'all' histogram. */
+    unsigned long int m_iEvent; /**< Event counter, used for sampling rate */
+
   };
 
 } // Belle2 namespace

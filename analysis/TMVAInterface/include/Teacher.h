@@ -71,6 +71,13 @@ namespace Belle2 {
       void addSample(const Particle* particle);
 
       /**
+       * Adds a training sample. The necessary variables are calculated from the provided particle
+       * @param particle Particle which serves as training sample, target variable must be available for this particle.
+       * @param classid class to which this sample belongs
+       */
+      void addClassSample(const Particle* particle, int classid);
+
+      /**
        * Writes tree to a file
        */
       void writeTree();

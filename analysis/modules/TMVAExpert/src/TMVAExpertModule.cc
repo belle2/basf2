@@ -48,6 +48,8 @@ namespace Belle2 {
              "you trained the method with pdg as target variable. Or 1 if you trained with isSignal as target.", 1);
     addParam("signalFraction", m_signalFraction, "signalFraction to calculate probability, -1 if no transformation of the method output should be performed, -2 if training signal/background ratio should be used. If you want to use "
              "this feature, you have to set the option createMVAPDFs in the TMVATeacher or the method config string", -1.0f);
+    std::map<int, unsigned int> defaultInverseSamplingRates;
+    addParam("inverseSamplingRates", m_inverseSamplingRates, "Map of class id and inverse sampling rate for this class.", defaultInverseSamplingRates);
 
   }
 
@@ -70,6 +72,23 @@ namespace Belle2 {
 
     m_method = std::make_shared<TMVAInterface::Expert>(m_methodPrefix, m_workingDirectory, m_methodName, m_signalClass);
 
+    bool firstEncounteredBackground = true;
+    unsigned int signalInverseSamplingRate = 1;
+    unsigned int commonInverseSamplingRate = 1;
+    for (auto & inverseSamplingRate : m_inverseSamplingRates) {
+      if (inverseSamplingRate.first == m_signalClass) {
+        signalInverseSamplingRate = inverseSamplingRate.second;
+        continue;
+      }
+      if (firstEncounteredBackground) {
+        firstEncounteredBackground = false;
+        commonInverseSamplingRate = inverseSamplingRate.second;
+      }
+      if (commonInverseSamplingRate != inverseSamplingRate.second)
+        B2ERROR("Different Sampling rates for background classes isn't supported.")
+      }
+    m_samplingRateCorrectionFactor = static_cast<double>(commonInverseSamplingRate) / signalInverseSamplingRate;
+
   }
 
 
@@ -86,6 +105,11 @@ namespace Belle2 {
     m_method.reset();
   }
 
+  float TMVAExpertModule::fixProbabilityUsingSamplingRates(float sampledProbability)
+  {
+    return sampledProbability / (sampledProbability + m_samplingRateCorrectionFactor * (1 - sampledProbability));
+  }
+
   void TMVAExpertModule::event()
   {
     for (auto & listName : m_listNames) {
@@ -93,7 +117,8 @@ namespace Belle2 {
       // Calculate target Value for Particles
       for (unsigned i = 0; i < list->getListSize(); ++i) {
         Particle* particle = list->getParticle(i);
-        float targetValue = m_method->analyse(particle, m_signalFraction);
+        float targetValue = fixProbabilityUsingSamplingRates(m_method->analyse(particle, m_signalFraction));
+
         if (particle->hasExtraInfo(m_signalProbabilityName)) {
           B2WARNING("Extra Info with given name is already set! I won't set it again!")
         } else {
@@ -105,7 +130,7 @@ namespace Belle2 {
       StoreObjPtr<EventExtraInfo> eventExtraInfo;
       if (not eventExtraInfo.isValid())
         eventExtraInfo.create();
-      float targetValue = m_method->analyse(nullptr, m_signalFraction);
+      float targetValue = fixProbabilityUsingSamplingRates(m_method->analyse(nullptr, m_signalFraction));
       eventExtraInfo->addExtraInfo(m_signalProbabilityName, targetValue);
     }
   }

@@ -44,6 +44,8 @@ namespace Belle2 {
     addParam("useExistingData", m_useExistingData, "Use existing data which is already stored in the $prefix.root file.", false);
     addParam("doNotTrain", m_doNotTrain, "Do not train, create only datafile with samples. Useful if you want to train outside of basf2 with the externTeacher tool.", false);
     addParam("maxEventsPerClass", m_maxEventsPerClass, "Maximum number of events per class passed to TMVA. 0 means no limit.", static_cast<unsigned int>(0));
+    std::map<int, unsigned int> defaultInverseSamplingRates;
+    addParam("inverseSamplingRates", m_inverseSamplingRates, "Map of class id and inverse sampling rate for this class.", defaultInverseSamplingRates);
 
   }
 
@@ -65,6 +67,10 @@ namespace Belle2 {
       methods.push_back(TMVAInterface::Method(std::get<0>(x), std::get<1>(x), config, m_variables));
     }
     m_teacher = std::make_shared<TMVAInterface::Teacher>(m_methodPrefix, m_workingDirectory, m_target, methods, m_useExistingData);
+
+    Variable::Manager& manager = Variable::Manager::Instance();
+    m_target_var =  manager.getVariable(m_target);
+
   }
 
   void TMVATeacherModule::terminate()
@@ -78,6 +84,19 @@ namespace Belle2 {
     m_teacher.reset();
   }
 
+  bool TMVATeacherModule::checkSampling(int target)
+  {
+    if (m_inverseSamplingRates.find(target) != m_inverseSamplingRates.end()) {
+      if (m_iSamples.find(target) == m_iSamples.end()) {
+        m_iSamples[target] = 0;
+      }
+      m_iSamples[target]++;
+      if (m_iSamples[target] % m_inverseSamplingRates[target] != 0)
+        return false;
+    }
+    return true;
+  }
+
   void TMVATeacherModule::event()
   {
     for (auto & listName : m_listNames) {
@@ -85,12 +104,18 @@ namespace Belle2 {
       // Calculate Signal Probability for Particles
       for (unsigned i = 0; i < list->getListSize(); ++i) {
         const Particle* particle = list->getParticle(i);
-        m_teacher->addSample(particle);
+        int target = int(m_target_var->function(particle) + 0.5);
+        if (checkSampling(target)) {
+          m_teacher->addClassSample(particle, target);
+        }
       }
     }
 
     if (m_listNames.empty()) {
-      m_teacher->addSample(nullptr);
+      int target = int(m_target_var->function(nullptr) + 0.5);
+      if (checkSampling(target)) {
+        m_teacher->addClassSample(nullptr, target);
+      }
     }
   }
 

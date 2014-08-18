@@ -13,9 +13,6 @@
 
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
-// #include <framework/gearbox/Const.h>
-
-#include <../../externals/v00-05-02/include/boost/concept_check.hpp>
 
 using namespace std;
 using namespace Belle2;

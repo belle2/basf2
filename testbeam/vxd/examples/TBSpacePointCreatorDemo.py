@@ -42,9 +42,11 @@ telDigitizer.param('ElectronicNoise', 200)
 telDigitizer.param('NoiseSN', 5.0)
 
 pxdClusterizer = register_module('PXDClusterizer')
+pxdClusterizer.param('Clusters', 'myPersonalPXDClusters')
 svdClusterizer = register_module('SVDClusterizer')
+svdClusterizer.param('Clusters', 'myPersonalSVDClusters')
 telClusterizer = register_module('TelClusterizer')
-telClusterizer.param('Clusters', 'TelClusters')
+telClusterizer.param('Clusters', 'myPersonalTelClusters')
 
 gearbox = register_module('Gearbox')
 # use simple testbeam geometry
@@ -97,15 +99,21 @@ g4sim.param('StoreAllSecondaries', True)
 
 spCreatorSingle = register_module('TBSpacePointCreator')
 spCreatorSingle.logging.log_level = LogLevel.DEBUG
-spCreatorSingle.logging.debug_level = 1
+spCreatorSingle.logging.debug_level = 10
 spCreatorSingle.param('OnlySingleClusterSpacePoints', True)
 spCreatorSingle.param('NameOfInstance', 'singlesOnly')
+spCreatorSingle.param('PXDClusters', 'myPersonalPXDClusters')
+spCreatorSingle.param('SVDClusters', 'myPersonalSVDClusters')
+spCreatorSingle.param('TelClusters', 'myPersonalTelClusters')
 
 spCreatorCombi = register_module('TBSpacePointCreator')
 spCreatorCombi.logging.log_level = LogLevel.DEBUG
-spCreatorCombi.logging.debug_level = 1
+spCreatorCombi.logging.debug_level = 10
 spCreatorCombi.param('OnlySingleClusterSpacePoints', False)
 spCreatorCombi.param('NameOfInstance', 'couplesAllowed')
+spCreatorCombi.param('PXDClusters', 'myPersonalPXDClusters')
+spCreatorCombi.param('SVDClusters', 'myPersonalSVDClusters')
+spCreatorCombi.param('TelClusters', 'myPersonalTelClusters')
 
 # Create paths
 main = create_path()

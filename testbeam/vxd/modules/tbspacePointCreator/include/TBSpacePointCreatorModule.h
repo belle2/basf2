@@ -56,8 +56,11 @@ namespace Belle2 {
 
     // Data members
     std::string m_pxdClustersName; /**< PXDCluster collection name */
+    unsigned short m_pxdClustersIndex; /**< PXDCluster collection index number - created for SpacePointMetaInfo */
     std::string m_svdClustersName; /**< SVDCluster collection name */
+    unsigned short m_svdClustersIndex; /**< SVDCluster collection index number - created for SpacePointMetaInfo */
     std::string m_telClustersName; /**< TelCluster collection name */
+    unsigned short m_telClustersIndex; /**< TelCluster collection index number - created for SpacePointMetaInfo */
     std::string m_spacePointsName; /**< SpacePoints collection name */
 
 

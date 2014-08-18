@@ -33,6 +33,8 @@ TBSpacePointCreatorModule::TBSpacePointCreatorModule() : Module()
            "PXDCluster collection name", string(""));
   addParam("SVDClusters", m_svdClustersName,
            "SVDCluster collection name", string(""));
+  addParam("TelClusters", m_telClustersName,
+           "TelCluster collection name", string(""));
   addParam("SpacePoints", m_spacePointsName,
            "SpacePoints collection name", string(""));
 
@@ -61,18 +63,65 @@ void TBSpacePointCreatorModule::initialize()
   telClusters.isOptional();
 
 
-  //Relations to simulation objects only if the ancestor relations exist
-  //Relations to simulation objects only if the ancestor relations exist
-  if (pxdClusters.isOptional() == true) { spacePoints.registerRelationTo(pxdClusters, DataStore::c_Event, DataStore::c_DontWriteOut); }
-  if (svdClusters.isOptional() == true) { spacePoints.registerRelationTo(svdClusters, DataStore::c_Event, DataStore::c_DontWriteOut); }
-  if (telClusters.isOptional() == true) { spacePoints.registerRelationTo(telClusters, DataStore::c_Event, DataStore::c_DontWriteOut); }
+  //prepare collecting info for SpacePoints:
+  unsigned short cntActivatedClusterTypes = 0;
+  vector<string> collectionNames; // will contain the names of the cluster storeArrays
 
 
-  // retrieve names again (faster than doing everything in the event):
-  m_pxdClustersName = pxdClusters.getName();
-  m_svdClustersName = svdClusters.getName();
-  m_telClustersName = telClusters.getName();
+  if (pxdClusters.isOptional() == true) {
+
+    //Relations to cluster objects only if the ancestor relations exist:
+    spacePoints.registerRelationTo(pxdClusters, DataStore::c_Event, DataStore::c_DontWriteOut);
+
+    // retrieve name again (faster than doing everything in the event):
+    m_pxdClustersName = pxdClusters.getName();
+
+    // prepare metaInfo for the SpacePoints containing the names for the Cluster-Containers:
+    collectionNames.push_back(m_pxdClustersName);
+    m_pxdClustersIndex = cntActivatedClusterTypes;
+    cntActivatedClusterTypes++;
+
+  }
+
+
+  if (svdClusters.isOptional() == true) {
+
+    //Relations to cluster objects only if the ancestor relations exist:
+    spacePoints.registerRelationTo(svdClusters, DataStore::c_Event, DataStore::c_DontWriteOut);
+
+    // retrieve name again (faster than doing everything in the event):
+    m_svdClustersName = svdClusters.getName();
+
+    // prepare metaInfo for the SpacePoints containing the names for the Cluster-Containers:
+    collectionNames.push_back(m_svdClustersName);
+    m_svdClustersIndex = cntActivatedClusterTypes;
+    cntActivatedClusterTypes++;
+
+  }
+
+
+  if (telClusters.isOptional() == true) {
+
+    //Relations to cluster objects only if the ancestor relations exist:
+    spacePoints.registerRelationTo(telClusters, DataStore::c_Event, DataStore::c_DontWriteOut);
+
+    // retrieve name again (faster than doing everything in the event):
+    m_telClustersName = telClusters.getName();
+
+    // prepare metaInfo for the SpacePoints containing the names for the Cluster-Containers:
+    collectionNames.push_back(m_telClustersName);
+    m_telClustersIndex = cntActivatedClusterTypes;
+    cntActivatedClusterTypes++;
+
+  }
+
+
+  // retrieve name for spacePoint too (faster than doing everything in the event):
   m_spacePointsName = spacePoints.getName();
+
+
+  // store the collected names in the MetaInfo of the SpacePoints:
+  SpacePoint initMetaData = SpacePoint(collectionNames);
 
 
   B2INFO("TBSpacePointCreatorModule(" << m_nameOfInstance << ")::initialize: names set for containers:\n" <<
@@ -80,6 +129,7 @@ void TBSpacePointCreatorModule::initialize()
          "\nsvdClusters: " << m_svdClustersName <<
          "\ntelClusters: " << m_telClustersName <<
          "\nspacePoints: " << m_spacePointsName)
+
 
   // set some counters for output:
   m_TESTERPXDClusterCtr = 0;
@@ -105,21 +155,21 @@ void TBSpacePointCreatorModule::event()
 
 
   for (unsigned int i = 0; i < uint(telClusters.getEntries()); ++i) {
-    spacePoints.appendNew(TBSpacePoint((telClusters[i]), i));
+    spacePoints.appendNew(TBSpacePoint((telClusters[i]), i, m_telClustersIndex));
     spacePoints[spacePoints.getEntries() - 1]->addRelationTo(telClusters[i]);
   }
 
 
   for (unsigned int i = 0; i < uint(pxdClusters.getEntries()); ++i) {
-    spacePoints.appendNew((pxdClusters[i]), i);
+    spacePoints.appendNew((pxdClusters[i]), i, m_pxdClustersIndex);
     spacePoints[spacePoints.getEntries() - 1]->addRelationTo(pxdClusters[i]);
   }
 
 
   if (m_onlySingleClusterSpacePoints == true) {
-    provideSVDClusterSingles(svdClusters, spacePoints); /// WARNING TODO: missing: possibility to allow storing of u- or v-type clusters only!
+    provideSVDClusterSingles(svdClusters, spacePoints, m_svdClustersIndex); /// WARNING TODO: missing: possibility to allow storing of u- or v-type clusters only!
   } else {
-    provideSVDClusterCombinations(svdClusters, spacePoints);
+    provideSVDClusterCombinations(svdClusters, spacePoints, m_svdClustersIndex);
   }
 
 
@@ -130,6 +180,19 @@ void TBSpacePointCreatorModule::event()
           "\nsvdClusters: " << svdClusters.getEntries() <<
           "\ntelClusters: " << telClusters.getEntries() <<
           "\nspacePoints: " << spacePoints.getEntries())
+
+
+  if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 10, PACKAGENAME()) == true) {
+    for (int index = 0; index < spacePoints.getEntries(); index++) {
+      const SpacePoint* sp = spacePoints[index];
+
+      B2DEBUG(10, "SpacePointCreatorModule(" << m_nameOfInstance << ")::event: spacePoint " << index <<
+              " with type " << sp->getType() <<
+              " and VxdID " << VxdID(sp->getVxdID()) <<
+              " is tied to a cluster in: " << sp->getClusterStoreName())
+    }
+  }
+
 
   /// WARNING TODO next steps: create relations, think about mcParticle-relations, prepare converter for GFTrackCandidates including clusters to XXTrackCandidates including SpacePoints and vice versa.
 

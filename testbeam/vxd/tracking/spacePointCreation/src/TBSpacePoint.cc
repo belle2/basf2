@@ -11,13 +11,23 @@
 #include <testbeam/vxd/tracking/spacePointCreation/TBSpacePoint.h>
 #include <vxd/dataobjects/VxdID.h>
 
+#include <pxd/reconstruction/PXDRecoHit.h>
+#include <svd/reconstruction/SVDRecoHit.h>
+#include <testbeam/vxd/reconstruction/TelRecoHit.h>
+
 using namespace std;
 using namespace Belle2;
 
 ClassImp(TBSpacePoint)
 
-TBSpacePoint::TBSpacePoint(const TelCluster* telCluster, unsigned int indexNumber, const VXD::SensorInfoBase* aSensorInfo)
+SpacePointMetaInfo SpacePoint::m_metaInfo = SpacePointMetaInfo();
+
+TBSpacePoint::TBSpacePoint(const TelCluster* telCluster,
+                           unsigned int indexNumber,
+                           unsigned short nameIndex,
+                           const VXD::SensorInfoBase* aSensorInfo)
 {
+  SpacePoint::m_nameIndex = nameIndex;
   SpacePoint::m_vxdID = telCluster->getSensorID();
   if (telCluster == NULL) { throw SpacePoint::InvalidNumberOfClusters(); }
   SpacePoint::m_indexNumbers.push_back(indexNumber);
@@ -41,4 +51,39 @@ TBSpacePoint::TBSpacePoint(const TelCluster* telCluster, unsigned int indexNumbe
   SpacePoint::m_normalizedLocal = SpacePoint::convertLocalToNormalizedCoordinates({ telCluster->getU(), telCluster->getV() } , SpacePoint::m_vxdID, aSensorInfo);
 
   SpacePoint::m_sensorType = aSensorInfo->getType();
+}
+
+
+
+vector< genfit::PlanarMeasurement > TBSpacePoint::getGenfitCompatible()
+{
+  vector< genfit::PlanarMeasurement > collectedMeasurements;
+
+
+  // get the related clusters to this spacePoint and create a genfit::PlanarMeasurement for each of them:
+  if (getType() == VXD::SensorInfoBase::SensorType::SVD) {
+
+    auto relatedClusters = this->getRelationsTo<SVDCluster>(SpacePoint::getClusterStoreName());
+    for (unsigned i = 0; i < relatedClusters.size(); i++) {
+      collectedMeasurements.push_back(SVDRecoHit(relatedClusters[i]));
+    }
+
+  } else if (getType() == VXD::SensorInfoBase::SensorType::PXD) {
+
+    collectedMeasurements.push_back(
+      PXDRecoHit(this->getRelatedTo<PXDCluster>(SpacePoint::getClusterStoreName()))
+    );
+
+  } else if (getType() == VXD::SensorInfoBase::SensorType::TEL) {
+
+    collectedMeasurements.push_back(
+      TelRecoHit(this->getRelatedTo<TelCluster>(SpacePoint::getClusterStoreName()))
+    );
+
+  } else {
+    throw SpacePoint::InvalidDetectorType();
+  }
+
+
+  return move(collectedMeasurements);
 }

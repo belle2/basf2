@@ -43,6 +43,9 @@ namespace Belle2 {
     struct sockaddr_in m_addr;
     struct sockaddr_in m_remote_addr;
 
+  private:
+    static unsigned int findSubnet(unsigned int addr);
+
   };
 
 }

@@ -85,6 +85,12 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
     private Label label_node10;
     @FXML
     private Label label_node11;
+    @FXML
+    private Label label_node12;
+    @FXML
+    private Label label_node13;
+    @FXML
+    private Label label_node14;
 
     @FXML
     private Rectangle rect_rc;
@@ -112,6 +118,12 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
     private Rectangle rect_node10;
     @FXML
     private Rectangle rect_node11;
+    @FXML
+    private Rectangle rect_node12;
+    @FXML
+    private Rectangle rect_node13;
+    @FXML
+    private Rectangle rect_node14;
 
     @FXML
     private Text text_rc;
@@ -139,6 +151,12 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
     private Text text_node10;
     @FXML
     private Text text_node11;
+    @FXML
+    private Text text_node12;
+    @FXML
+    private Text text_node13;
+    @FXML
+    private Text text_node14;
 
     @FXML
     private GridPane summary_grid;
@@ -166,17 +184,20 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
         label_v = new Label[]{label_node0, label_node1, label_node2,
             label_node3, label_node4, label_node5,
             label_node6, label_node7, label_node8, 
-            label_node9, label_node10, label_node11
+            label_node9, label_node10, label_node11,
+            label_node12, label_node13, label_node14
         };
         rect_v = new Rectangle[]{rect_node0, rect_node1, rect_node2,
             rect_node3, rect_node4, rect_node5,
             rect_node6, rect_node7, rect_node8,
-            rect_node9, rect_node10, rect_node11
+            rect_node9, rect_node10, rect_node11,
+            rect_node12, rect_node13, rect_node14
         };
         text_v = new Text[]{text_node0, text_node1, text_node2,
             text_node3, text_node4, text_node5, 
             text_node6, text_node7, text_node8, 
-            text_node9, text_node10, text_node11
+            text_node9, text_node10, text_node11,
+            text_node12, text_node13, text_node14
         };
         statelabel_v = new RunStateLabelController[label_v.length];
         for (int i = 0; i < label_v.length; i++) {

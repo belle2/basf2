@@ -10,17 +10,36 @@
 #include <sstream>
 #include <vector>
 
+#include <unistd.h>
+#include <errno.h>
+
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <arpa/inet.h>
-
-#include <unistd.h>
 #include <sys/select.h>
 #include <netinet/in.h>
-#include <errno.h>
 #include <netdb.h>
+#include <arpa/inet.h>
 
 using namespace Belle2;
+
+unsigned int UDPSocket::findSubnet(unsigned int addr)
+{
+  struct ifaddrs* ifa_list;
+  struct ifaddrs* ifa;
+  int n;
+  char addrstr[256], netmaskstr[256];
+  if (getifaddrs(&ifa_list) != 0) return 0;
+  for (ifa = ifa_list; ifa != NULL; ifa = ifa->ifa_next) {
+    memset(addrstr, 0, sizeof(addrstr));
+    memset(netmaskstr, 0, sizeof(netmaskstr));
+    if (ifa->ifa_addr->sa_family == AF_INET &&
+        addr == ((struct sockaddr_in*)ifa->ifa_addr)->sin_addr.s_addr) {
+      addr |= ~(((struct sockaddr_in*)ifa->ifa_netmask)->sin_addr.s_addr);
+    }
+  }
+  freeifaddrs(ifa_list);
+  return addr;
+}
 
 UDPSocket::UDPSocket()
 {
@@ -62,7 +81,8 @@ UDPSocket::UDPSocket(unsigned int port,
     throw (IOException("Failed to create socket"));
   }
   if (boardcast) {
-    m_addr.sin_addr.s_addr |= 0xFF << 24;
+    unsigned int addr = m_addr.sin_addr.s_addr;
+    m_addr.sin_addr.s_addr = findSubnet(addr);
     int yes = 1;
     setsockopt(m_fd, SOL_SOCKET, SO_BROADCAST,
                (char*)&yes, sizeof(yes));
@@ -80,7 +100,7 @@ UDPSocket::UDPSocket(unsigned int port,
     throw (IOException("Failed to create socket"));
   }
   if (boardcast) {
-    m_addr.sin_addr.s_addr |= 0xFF << 24;
+    m_addr.sin_addr.s_addr = findSubnet(addr);
     int yes = 1;
     setsockopt(m_fd, SOL_SOCKET, SO_BROADCAST,
                (char*)&yes, sizeof(yes));

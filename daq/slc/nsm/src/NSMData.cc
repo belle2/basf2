@@ -167,26 +167,27 @@ throw(NSMHandlerException)
         paket.hdr.id = 0;
         strcpy(paket.buf, name.c_str());
         udp.write(&paket, sizeof(NSMDataPaket::Header) + name.size() + 1);
-        g_mutex.unlock();
         udp.close();
+        g_mutex.unlock();
       } catch (const IOException& e) {
-        g_mutex.unlock();
         udp.close();
+        g_mutex.unlock();
         throw (NSMHandlerException("Connection error to datad %s", e.what()));
       }
       int ntried = 0;
+      g_dstore.lock();
       while (true) {
         if ((m_en = dstore.get(getName())) != NULL) {
           break;
         }
-        usleep(100000);
+        g_dstore.wait(1);
         ntried++;
-        if (ntried > 30) {
+        if (ntried > 3) {
           break;
         }
       }
+      g_dstore.unlock();
       if (m_en == NULL) {
-        g_mutex.unlock();
         throw (NSMHandlerException("Data %s not registered yet",
                                    getName().c_str()));
       }

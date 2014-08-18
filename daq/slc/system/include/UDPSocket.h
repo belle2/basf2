@@ -26,7 +26,9 @@ namespace Belle2 {
 
   public:
     int bind() throw(IOException);
-    int bind(unsigned int port, const std::string& hostname = "")
+    int bind(unsigned int port,
+             const std::string& hostname = "",
+             bool broadcast = true)
     throw(IOException);
     const std::string getHostName() const throw();
     unsigned int getPort() const throw();

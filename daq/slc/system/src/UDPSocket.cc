@@ -83,7 +83,9 @@ UDPSocket::UDPSocket(unsigned int port,
   }
   if (boardcast) {
     unsigned int addr = m_addr.sin_addr.s_addr;
-    m_addr.sin_addr.s_addr = findSubnet(addr);
+    if ((addr = findSubnet(addr)) > 0) {
+      m_addr.sin_addr.s_addr = addr;
+    }
     int yes = 1;
     setsockopt(m_fd, SOL_SOCKET, SO_BROADCAST,
                (char*)&yes, sizeof(yes));
@@ -101,14 +103,18 @@ UDPSocket::UDPSocket(unsigned int port,
     throw (IOException("Failed to create socket"));
   }
   if (boardcast) {
-    m_addr.sin_addr.s_addr = findSubnet(addr);
+    addr = m_addr.sin_addr.s_addr;
+    if ((addr = findSubnet(addr)) > 0) {
+      m_addr.sin_addr.s_addr = addr;
+    }
     int yes = 1;
     setsockopt(m_fd, SOL_SOCKET, SO_BROADCAST,
                (char*)&yes, sizeof(yes));
   }
 }
 
-int UDPSocket::bind(unsigned int port, const std::string& hostname)
+int UDPSocket::bind(unsigned int port,
+                    const std::string& hostname, bool broadcast)
 throw (IOException)
 {
   if (m_fd <= 0 && (m_fd = ::socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
@@ -128,6 +134,12 @@ throw (IOException)
       }
     }
     m_addr.sin_addr.s_addr = (*(unsigned long*) host->h_addr_list[0]);
+    if (broadcast) {
+      unsigned int addr = m_addr.sin_addr.s_addr;
+      if ((addr = findSubnet(addr)) > 0) {
+        m_addr.sin_addr.s_addr = addr;
+      }
+    }
   }
   return bind();
 }

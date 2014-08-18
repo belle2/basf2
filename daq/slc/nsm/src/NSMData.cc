@@ -175,18 +175,18 @@ throw(NSMHandlerException)
         throw (NSMHandlerException("Connection error to datad %s", e.what()));
       }
       int ntried = 0;
-      g_dstore.lock();
+      dstore.lock();
       while (true) {
         if ((m_en = dstore.get(getName())) != NULL) {
           break;
         }
-        g_dstore.wait(1);
+        dstore.wait(1);
         ntried++;
         if (ntried > 3) {
           break;
         }
       }
-      g_dstore.unlock();
+      dstore.unlock();
       if (m_en == NULL) {
         throw (NSMHandlerException("Data %s not registered yet",
                                    getName().c_str()));

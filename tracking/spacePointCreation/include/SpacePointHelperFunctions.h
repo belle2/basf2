@@ -70,8 +70,8 @@ namespace Belle2 {
     for (unsigned int i = 0; i < uint(svdClusters.getEntries()); ++i) {
       SpacePoint::SVDClusterInformation currentCluster = {svdClusters[i], i};
       std::vector<SpacePoint::SVDClusterInformation> currentClusterCombi = { currentCluster };
-      spacePoints.appendNew(currentClusterCombi, svdClustersIndex);
-      spacePoints[spacePoints.getEntries() - 1]->addRelationTo(svdClusters[i]);
+      SpacePoint* newSP = spacePoints.appendNew(currentClusterCombi, svdClustersIndex);
+      newSP->addRelationTo(svdClusters[i]);
     }
   }
 

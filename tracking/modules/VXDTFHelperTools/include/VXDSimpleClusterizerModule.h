@@ -58,6 +58,12 @@ namespace Belle2 {
     virtual void terminate() {}
 
   protected:
+    std::string m_pxdTrueHitsName; /**< PXDTrueHit collection name */
+    std::string m_svdTrueHitsName; /**< SVDTrueHit collection name */
+    std::string m_mcParticlesName; /**< MCParticle collection name */
+    std::string m_pxdClustersName; /**< PXDCluster collection name */
+    std::string m_svdClustersName; /**< SVDCluster collection name */
+
     double m_energyThresholdU; /**< set energy threshold for SVDClusters in u-direction in GeV (standard is 17.4E-6) */
     double m_energyThresholdV; /**< set energy threshold for SVDClusters in v-direction in GeV (standard is 28.6E-6) */
     double m_energyThreshold; /**< set energy threshold for PXDClusters in GeV (standard is 7E-6) */

@@ -3,7 +3,7 @@
  * Copyright(C) 2013  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Christian Pulvermacher                                   *
+ * Contributors: Jakob Lettenbichler                                      *
  *                                                                        *
  **************************************************************************/
 
@@ -107,6 +107,7 @@ void SpacePointCreatorModule::initialize()
          "\nsvdClusters: " << m_svdClustersName <<
          "\nspacePoints: " << m_spacePointsName)
 
+
   // set some counters for output:
   m_TESTERPXDClusterCtr = 0;
   m_TESTERSVDClusterCtr = 0;
@@ -119,18 +120,13 @@ void SpacePointCreatorModule::event()
 {
   const StoreArray<PXDCluster> pxdClusters(m_pxdClustersName);
   const StoreArray<SVDCluster> svdClusters(m_svdClustersName);
+
   StoreArray<SpacePoint> spacePoints(m_spacePointsName);
-
-  if (spacePoints.isValid() == false) {
-    spacePoints.create();
-  } else {
-    spacePoints.getPtr()->Clear();
-  }
-
+  spacePoints.clear();
 
   for (unsigned int i = 0; i < uint(pxdClusters.getEntries()); ++i) {
-    spacePoints.appendNew((pxdClusters[i]), i, m_pxdClustersIndex);
-    spacePoints[spacePoints.getEntries() - 1]->addRelationTo(pxdClusters[i]);
+    SpacePoint* newSP = spacePoints.appendNew((pxdClusters[i]), i, m_pxdClustersIndex);
+    newSP->addRelationTo(pxdClusters[i]);
   }
 
 
@@ -155,12 +151,13 @@ void SpacePointCreatorModule::event()
 
       B2DEBUG(10, "SpacePointCreatorModule(" << m_nameOfInstance << ")::event: spacePoint " << index <<
               " with type " << sp->getType() <<
-              " is  tied to a cluster in: " << sp->getClusterStoreName())
+              " and VxdID " << VxdID(sp->getVxdID()) <<
+              " is tied to a cluster in: " << sp->getClusterStoreName())
     }
   }
 
 
-  /// WARNING TODO next steps: create relations, think about mcParticle-relations, prepare converter for GFTrackCandidates including clusters to XXTrackCandidates including SpacePoints and vice versa.
+  /// WARNING TODO next steps: think about mcParticle-relations and how to deal with multi-pass-setups, create container like VXDTFTrackCandidate compatible with spacePoints
 
   m_TESTERPXDClusterCtr += pxdClusters.getEntries();
   m_TESTERSVDClusterCtr += svdClusters.getEntries();

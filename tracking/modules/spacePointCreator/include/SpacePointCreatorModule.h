@@ -16,6 +16,10 @@
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 
+#include <string>
+
+
+
 namespace Belle2 {
   /**
    * Imports Clusters of the silicon detectors and converts them to spacePoints.

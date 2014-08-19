@@ -41,9 +41,9 @@ namespace Belle2 {
 
 
     for (auto & clusterCombi : foundCombinations) {
-      spacePoints.appendNew(clusterCombi, svdClustersIndex);
+      SpacePoint* newSP = spacePoints.appendNew(clusterCombi, svdClustersIndex);
       for (auto & cluster : clusterCombi) {
-        spacePoints[spacePoints.getEntries() - 1]->addRelationTo(cluster.first);
+        newSP->addRelationTo(cluster.first);
       }
     }
   }

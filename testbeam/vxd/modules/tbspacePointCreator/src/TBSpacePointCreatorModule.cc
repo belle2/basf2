@@ -145,24 +145,19 @@ void TBSpacePointCreatorModule::event()
   const StoreArray<PXDCluster> pxdClusters(m_pxdClustersName);
   const StoreArray<SVDCluster> svdClusters(m_svdClustersName);
   const StoreArray<TelCluster> telClusters(m_telClustersName);
+
   StoreArray<SpacePoint> spacePoints(m_spacePointsName);
-
-  if (spacePoints.isValid() == false) {
-    spacePoints.create();
-  } else {
-    spacePoints.getPtr()->Clear();
-  }
-
+  spacePoints.clear();
 
   for (unsigned int i = 0; i < uint(telClusters.getEntries()); ++i) {
-    spacePoints.appendNew(TBSpacePoint((telClusters[i]), i, m_telClustersIndex));
-    spacePoints[spacePoints.getEntries() - 1]->addRelationTo(telClusters[i]);
+    SpacePoint* newSP = spacePoints.appendNew(TBSpacePoint((telClusters[i]), i, m_telClustersIndex));
+    newSP->addRelationTo(telClusters[i]);
   }
 
 
   for (unsigned int i = 0; i < uint(pxdClusters.getEntries()); ++i) {
-    spacePoints.appendNew((pxdClusters[i]), i, m_pxdClustersIndex);
-    spacePoints[spacePoints.getEntries() - 1]->addRelationTo(pxdClusters[i]);
+    SpacePoint* newSP = spacePoints.appendNew((pxdClusters[i]), i, m_pxdClustersIndex);
+    newSP->addRelationTo(pxdClusters[i]);
   }
 
 
@@ -194,7 +189,7 @@ void TBSpacePointCreatorModule::event()
   }
 
 
-  /// WARNING TODO next steps: create relations, think about mcParticle-relations, prepare converter for GFTrackCandidates including clusters to XXTrackCandidates including SpacePoints and vice versa.
+  /// WARNING TODO next steps: think about mcParticle-relations and how to deal with multi-pass-setups, create container like VXDTFTrackCandidate compatible with spacePoints
 
   m_TESTERPXDClusterCtr += pxdClusters.getEntries();
   m_TESTERSVDClusterCtr += svdClusters.getEntries();
@@ -212,3 +207,5 @@ void TBSpacePointCreatorModule::terminate()
          "\ntelClusters: " << m_TESTERTelClusterCtr <<
          "\nspacePoints: " << m_TESTERSpacePointCtr)
 }
+
+

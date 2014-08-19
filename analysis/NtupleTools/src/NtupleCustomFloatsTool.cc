@@ -69,6 +69,18 @@ void NtupleCustomFloatsTool::setupTree()
       re = boost::regex("daughterAngle(\\d+)");
       varName = boost::regex_replace(varName, re, "d$1_angle");
 
+      // massDifference0 -> DeltaM0
+      re = boost::regex("massDifference([0-9])");
+      varName = boost::regex_replace(varName, re, "DeltaM$1");
+
+      // massDifferenceError0 -> ErrDeltaM0
+      re = boost::regex("massDifferenceError([0-9])");
+      varName = boost::regex_replace(varName, re, "ErrDeltaM$1");
+
+      // massDifferenceSignificance0 -> SigDeltaM0
+      re = boost::regex("massDifferenceSignificance([0-9])");
+      varName = boost::regex_replace(varName, re, "SigDeltaM$1");
+
       varName = (strNames[iProduct] + "__" + varName);
       m_tree->Branch(varName.c_str(), &m_fVars[iPos], (varName + "/F").c_str());
 

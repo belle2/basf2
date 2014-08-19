@@ -154,6 +154,11 @@ namespace Belle2 {
     double particleInvariantMassError(const Particle* part);
 
     /**
+     * return signed deviation of particle's invariant mass from its nominal mass
+     */
+    double particleInvariantMassSignificance(const Particle* part);
+
+    /**
      * return released energy in decay
      */
     double particleQ(const Particle* part);

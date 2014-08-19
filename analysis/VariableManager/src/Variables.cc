@@ -245,6 +245,15 @@ namespace Belle2 {
       return TMath::Sqrt(result);
     }
 
+    double particleInvariantMassSignificance(const Particle* part)
+    {
+      float invMass = part->getMass();
+      float nomMass = part->getPDGMass();
+      float massErr = particleInvariantMassError(part);
+
+      return (invMass - nomMass) / massErr;
+    }
+
     // released energy --------------------------------------------------
 
     double particleQ(const Particle* part)
@@ -2356,6 +2365,7 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("InvM", particleInvariantMass, "invariant mass (determined from particle's daughter 4-momentum vectors)");
     REGISTER_VARIABLE("ErrM", particleInvariantMassError, "uncertainty of invariant mass (determined from particle's daughter 4-momentum vectors)");
+    REGISTER_VARIABLE("SigM", particleInvariantMassSignificance, "signed deviation of particle's invariant mass from its nominal mass");
 
     VARIABLE_GROUP("MC Matching");
     REGISTER_VARIABLE("isSignal", isSignal,               "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");

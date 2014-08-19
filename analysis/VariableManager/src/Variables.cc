@@ -21,6 +21,7 @@
 
 // dataobjects
 #include <analysis/dataobjects/RestOfEvent.h>
+#include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 
@@ -29,12 +30,14 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 
+
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <TLorentzVector.h>
+#include <TRandom.h>
 #include <TVectorF.h>
 #include <TVector3.h>
 
@@ -485,14 +488,26 @@ namespace Belle2 {
     double isRestOfEventB0Flavor_Norm(const Particle*)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      Particle* part = roe->getRelated<Particle>();
-      const MCParticle* mcParticle = part->getRelated<MCParticle>();
-      if (mcParticle == nullptr) {return -999.0;} //if there is no mcparticle (e.g. not in training modus)
-      else if (mcParticle->getPDG() == 511) {
-        return 1.0;
-      } else if (mcParticle->getPDG() == -511) {
+      float q_MC = 0; //Flavor of B
+      for (auto & track : roe->getTracks()) {
+        const MCParticle* mcParticle = track->getRelated<MCParticle>();
+        while (mcParticle != nullptr) {
+          if (mcParticle->getPDG() == 511) {
+            q_MC++;
+            break;
+          }
+          if (mcParticle->getPDG() == -511) {
+            q_MC--;
+            break;
+          }
+          mcParticle = mcParticle->getMother();
+        }
+      }
+      if (q_MC > 0) {
+        return 1;
+      } else if (q_MC < 0) {
         return 0;
-      } else return -1.0;
+      } else return gRandom->Uniform(0, 1);
     }
 
     double isElectronFromB(const Particle* part)
@@ -624,66 +639,78 @@ namespace Belle2 {
 
     double QRElectron(const Particle*)
     {
-      StoreObjPtr<ParticleList> electrons("e+:ROE");
-      float maximum_q = 0;
-      float maximum_r = 0;
-      for (unsigned int i = 0; i < electrons->getListSize(); ++i) {
-        Particle* p = electrons->getParticle(i);
-        float r = p->getExtraInfo("isElectronFromB");
-        if (r > maximum_r) {
-          maximum_r = r;
+      StoreObjPtr<EventExtraInfo> Info("EventExtraInfo");
+      float p = Info -> getExtraInfo("isElectronRightClass"); //Gets the probability of beeing right classified flavour from the event level
+      float r = TMath::Abs(2 * p - 1); //Definition of the dilution factor
+      StoreObjPtr<ParticleList> muons("e+:ROE");
+      float maximum_q = 0; //Flavour of the track selected as target
+      float maximum_p_track = 0; //Probability of being the target track from the track level
+      for (unsigned int i = 0; i < muons->getListSize(); ++i) {
+        Particle* p = muons->getParticle(i);
+        float x = p->getExtraInfo("isElectronFromB");
+        if (x > maximum_p_track) {
+          maximum_p_track = x;
           maximum_q = p->getCharge();
         }
       }
-      return maximum_r * maximum_q;
+      return 0.5 * (maximum_q * r + 1);
     }
 
     double QRMuon(const Particle*)
     {
+      StoreObjPtr<EventExtraInfo> Info("EventExtraInfo");
+      float p = Info -> getExtraInfo("isElectronRightClass"); //Gets the probability of beeing right classified flavour from the event level
+      float r = TMath::Abs(2 * p - 1); //Definition of the dilution factor
       StoreObjPtr<ParticleList> muons("mu+:ROE");
-      float maximum_q = 0;
-      float maximum_r = 0;
+      float maximum_q = 0; //Flavour of the track selected as target
+      float maximum_p_track = 0; //Probability of being the target track from the track level
       for (unsigned int i = 0; i < muons->getListSize(); ++i) {
         Particle* p = muons->getParticle(i);
-        float r = p->getExtraInfo("isMuonFromB");
-        if (r > maximum_r) {
-          maximum_r = r;
+        float x = p->getExtraInfo("isMuonFromB");
+        if (x > maximum_p_track) {
+          maximum_p_track = x;
           maximum_q = p->getCharge();
         }
       }
-      return maximum_r * maximum_q;
+      return 0.5 * (maximum_q * r + 1);
     }
 
     double QRKaon(const Particle*)
     {
-      StoreObjPtr<ParticleList> kaons("K+:ROE");
-      float maximum_q = 0;
-      float maximum_r = 0;
-      for (unsigned int i = 0; i < kaons->getListSize(); ++i) {
-        Particle* p = kaons->getParticle(i);
-        float r = p->getExtraInfo("isKaonFromB");
-        if (r > maximum_r) {
-          maximum_r = r;
+      StoreObjPtr<EventExtraInfo> Info("EventExtraInfo");
+      float p = Info -> getExtraInfo("isElectronRightClass"); //Gets the probability of beeing right classified flavour from the event level
+      float r = TMath::Abs(2 * p - 1); //Definition of the dilution factor
+      StoreObjPtr<ParticleList> muons("K+:ROE");
+      float maximum_q = 0; //Flavour of the track selected as target
+      float maximum_p_track = 0; //Probability of being the target track from the track level
+      for (unsigned int i = 0; i < muons->getListSize(); ++i) {
+        Particle* p = muons->getParticle(i);
+        float x = p->getExtraInfo("isKaonFromB");
+        if (x > maximum_p_track) {
+          maximum_p_track = x;
           maximum_q = p->getCharge();
         }
       }
-      return maximum_r * maximum_q;
+      return 0.5 * (maximum_q * r + 1);
     }
 
     double QRSlowPion(const Particle*)
     {
-      StoreObjPtr<ParticleList> pions("pi+:ROE");
-      float maximum_q = 0;
-      float maximum_r = 0;
-      for (unsigned int i = 0; i < pions->getListSize(); ++i) {
-        Particle* p = pions->getParticle(i);
-        float r = p->getExtraInfo("isSlowPionFromB");
-        if (r > maximum_r) {
-          maximum_r = r;
+      StoreObjPtr<EventExtraInfo> Info("EventExtraInfo");
+      float p = Info -> getExtraInfo("isElectronRightClass"); //Gets the probability of beeing right classified flavour from the event level
+      float r = TMath::Abs(2 * p - 1); //Definition of the dilution factor
+      StoreObjPtr<ParticleList> muons("pi+:ROE");
+      float maximum_q = 0; //Flavour of the track selected as target
+      float maximum_p_track = 0; //Probability of being the target track from the track level
+      for (unsigned int i = 0; i < muons->getListSize(); ++i) {
+        Particle* p = muons->getParticle(i);
+        float x = p->getExtraInfo("isSlowPionFromB");
+        if (x > maximum_p_track) {
+          maximum_p_track = x;
           maximum_q = p->getCharge();
         }
       }
-      return maximum_r * maximum_q;
+      return 0.5 * (maximum_q * r + 1);
     }
 
     double isElectronRightClass(const Particle*)

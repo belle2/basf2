@@ -13,6 +13,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 
+#include <algorithm>
 #include <sstream>
 
 using namespace std;
@@ -33,7 +34,7 @@ void ProcessStatistics::initModule(Module* module)
 string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounters mode, const ProcessStatistics::StatisticsMap* modules) const
 {
   ProcessStatistics* thisNonConst = const_cast<ProcessStatistics*>(this);
-  ModuleStatistics& global = thisNonConst->getGlobal();
+  const ModuleStatistics& global = thisNonConst->getGlobal();
   if (!modules) modules = &(thisNonConst->getAll());
   stringstream out;
   int moduleNameLength = 21; //minimum: 80 characters
@@ -51,21 +52,16 @@ string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounte
   out << outputheader % "Name" % "Calls" % "Memory(MB)" % "Time(s)" % "Time(ms)/Call";
   out << boost::format("%|" + numWidth + "T=|\n");
 
-  const int numModules = modules->size();
-  for (int iModule = 0; iModule < numModules; iModule++) {
-    //find Module with ID = iModule, to list them by initialisation
-    for (const ModuleStatistics & stats : *modules) {
-      if (stats.getIndex() != iModule)
-        continue;
-
-      out << output
-          % stats.getName()
-          % stats.getCalls(mode)
-          % (stats.getMemorySum(mode) / 1024)
-          % (stats.getTimeSum(mode) / Unit::s)
-          % (stats.getTimeMean(mode) / Unit::ms)
-          % (stats.getTimeStddev(mode) / Unit::ms);
-    }
+  StatisticsMap modulesSortedByIndex(*modules);
+  sort(modulesSortedByIndex.begin(), modulesSortedByIndex.end(), [](const ModuleStatistics & a, const ModuleStatistics & b) { return a.getIndex() < b.getIndex(); });
+  for (const ModuleStatistics & stats : modulesSortedByIndex) {
+    out << output
+        % stats.getName()
+        % stats.getCalls(mode)
+        % (stats.getMemorySum(mode) / 1024)
+        % (stats.getTimeSum(mode) / Unit::s)
+        % (stats.getTimeMean(mode) / Unit::ms)
+        % (stats.getTimeStddev(mode) / Unit::ms);
   }
 
   out << boost::format("%|" + numWidth + "T=|\n");
@@ -84,22 +80,6 @@ void ProcessStatistics::merge(const Mergeable* other)
 {
   const ProcessStatistics* otherObject = static_cast<const ProcessStatistics*>(other);
 
-  /*
-    B2WARNING("this:");
-    B2WARNING(this->getStatisticsString());
-
-    B2WARNING("other:");
-    B2WARNING(otherObject->getStatisticsString());
-    */
-  /*
-  for (unsigned int i = 0; i < otherObject->m_stats.size(); i++) {
-    auto otherStats = otherObject->m_stats[i];
-    if ((int)i != otherStats.getIndex()) {
-      B2INFO("i " << i << " \t index" << otherStats.getIndex() << " \t" << otherStats.getName());
-    }
-  }
-  */
-
   m_global.update(otherObject->m_global);
 
   for (unsigned int i = 0; i < otherObject->m_stats.size(); i++) {
@@ -108,39 +88,9 @@ void ProcessStatistics::merge(const Mergeable* other)
     if (myStats.getName() == otherStats.getName()) {
       myStats.update(otherStats);
     } else {
-      //this is a special module, add it or update if found
       B2ERROR("mismatch in module names in statistics?");
-      /*
-      bool found = false;
-      for (ModuleStatistics& myStats2 : m_stats) {
-        if (myStats2.getName() == otherStats.getName()) {
-          myStats2.update(otherStats);
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        int newIndex = m_stats.size();
-        m_stats.push_back(otherStats);
-        m_stats[newIndex].setIndex(newIndex);
-      }
-      */
     }
   }
-  /*
-    for (const auto otherStats : otherObject->m_stats) {
-      for (auto & myStats : this->m_stats) {
-        if (otherStats.getIndex() == myStats.getIndex() and otherStats.getName() == myStats.getName()) {
-          myStats.update(otherStats);
-        }
-      }
-    }
-    */
-
-  /*
-    B2WARNING("merged stuff:");
-    B2WARNING(this->getStatisticsString());
-    */
 }
 
 void ProcessStatistics::clear()

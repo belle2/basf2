@@ -409,9 +409,9 @@ class TestSignalProbability(unittest.TestCase):
 
     def test_hash_depends_mva_config(self):
         myMvaConfig = Particle.MVAConfiguration(
-            name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
+            name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=2',
             variables=['p', 'pt', 'p_CMS', 'pt_CMS', 'chiProb'],
-            target='isSignal', targetCluster=0
+            target='isSignal', targetCluster=1
         )
         result = SignalProbability(self.path, 'Identifier', 'D+:1', myMvaConfig, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
         self.assertDictEqual(result, {})

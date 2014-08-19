@@ -198,7 +198,7 @@ def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughte
         pmake.param('fileName', filename)
         pmake.param('decayString', outputList)
         pmake.param('variable', preCutConfig.variable)
-        pmake.param('inverseSamplingRate', 100)
+        pmake.param('inverseSamplingRate', 10)
         if preCutConfig.variable in ['M', 'Mbc']:
             mass = pdg.get(pdg.from_name(particleName)).Mass()
             pmake.param('histParams', (200, mass / 2, mass + mass / 2))
@@ -287,7 +287,7 @@ def SignalProbability(path, identifier, particleList, mvaConfig, additionalDepen
         teacher.param('target', mvaConfig.target)
         teacher.param('listNames', [particleList])
         teacher.param('maxEventsPerClass', 10000000)
-        teacher.param('inverseSamplingRates', {0: 100})
+        teacher.param('inverseSamplingRates', {0: 10})
         teacher.param('doNotTrain', True)
         path.add_module(teacher)
         B2INFO("Calculate SignalProbability for {i}. Create root file with variables first.".format(i=identifier))
@@ -312,7 +312,7 @@ def SignalProbability(path, identifier, particleList, mvaConfig, additionalDepen
         expert.param('signalFraction', -2)  # Use signalFraction from training
         expert.param('signalProbabilityName', 'SignalProbability')
         expert.param('signalClass', mvaConfig.targetCluster)
-        expert.param('inverseSamplingRates', {0: 100})
+        expert.param('inverseSamplingRates', {0: 10})
         expert.param('listNames', [particleList])
         path.add_module(expert)
         B2INFO("Calculating SignalProbability for {i}".format(i=identifier))
@@ -424,6 +424,7 @@ def WriteAnalysisFileForCombinedParticle(particleName, particleLabel, channelPla
     placeholders['particleName'] = particleName
     placeholders['particleLabel'] = particleLabel
     placeholders['isIgnored'] = False
+
     placeholders = automaticReporting.createCombinedParticleTexFile(placeholders, channelPlaceholders, mcCounts)
 
     B2INFO("Written analysis tex file for intermediate particle {p} with label {l}.".format(p=particleName, l=particleLabel))
@@ -455,7 +456,10 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
             B2ERROR("pdflatex failed to create FEI summary PDF, please check.")
 
     if ret == 0:
-        automaticReporting.sendMail()
+        filename = 'sent_mail'
+        if not os.path.isfile(filename):
+            automaticReporting.sendMail()
+            open(filename, 'w').close()
 
     # Return None - Therefore Particle List depends not on TMVAExpert directly
     B2INFO("Created analysis summary pdf file.")

@@ -14,6 +14,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/DecayHashMap.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <analysis/utility/MCMatching.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 
@@ -29,6 +30,7 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
     addParam("listName", m_listName, "Particles from these ParticleList are used as input.");
     addParam("motherPDGs", m_motherPDGs, "PDG codes of potential mother particles (absolute values)", std::vector<int>({511, 521, 531}));
+    addParam("removeFSR", m_removeFSR, "If true, final state radiation (FSR) photons are removed from the decay string.", true);
   }
 
   ParticleMCDecayStringModule::~ParticleMCDecayStringModule()
@@ -39,17 +41,8 @@ namespace Belle2 {
   {
     StoreObjPtr<ParticleList>::required(m_listName);
 
-    StoreObjPtr<DecayHashMap>::registerPersistent("", DataStore::c_Event, false);
-  }
-
-  void ParticleMCDecayStringModule::beginRun()
-  {
-
-  }
-
-  void ParticleMCDecayStringModule::endRun()
-  {
-
+    StoreObjPtr<DecayHashMap> dMap;
+    dMap.registerAsPersistent();
   }
 
   void ParticleMCDecayStringModule::terminate()
@@ -119,6 +112,9 @@ namespace Belle2 {
 
   std::string ParticleMCDecayStringModule::buildDecayString(const MCParticle& mcPMother, const MCParticle& mcPMatched)
   {
+    if (m_removeFSR and mcPMother.getPDG() == 22 and MCMatching::isFSR(&mcPMother))
+      return "";
+
     std::stringstream ss;
     ss << " ";
     if (mcPMother.getArrayIndex() == mcPMatched.getArrayIndex()) {

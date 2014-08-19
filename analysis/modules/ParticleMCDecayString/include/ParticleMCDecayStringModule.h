@@ -40,19 +40,10 @@ namespace Belle2 {
     virtual void initialize();
 
     /**
-     * Called when a new run is started.
-     */
-    virtual void beginRun();
-
-    /**
      * Called for each event.
      */
     virtual void event();
 
-    /**
-     * Called when run ended.
-     */
-    virtual void endRun();
 
     /**
      * Terminates the module.
@@ -75,6 +66,8 @@ namespace Belle2 {
     std::string m_listName; /**< Name of the particle list **/
 
     std::vector<int> m_motherPDGs; /**< List of potential mother particles **/
+
+    bool m_removeFSR; /**< If true, final state radiation (FSR) photons are removed from the decay string. */
 
     const std::string c_ExtraInfoName = "DecayHash"; /**< Name of the extraInfo, which is stored in each Particle **/
   };

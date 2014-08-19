@@ -14,7 +14,7 @@
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/base/ConfigFile.h>
 
-#include <daq/slc/apps/storagerd/storage_info_all.h>
+#include <daq/slc/apps/storagerd/storage_status.h>
 
 #include <fstream>
 #include <unistd.h>
@@ -35,8 +35,8 @@ int main(int argc, char** argv)
   comm->init(NSMNode(node),
              config.get("nsm.local.host"),
              config.getInt("nsm.local.port"));
-  NSMData data(stornode + "_STATUS", "storage_info_all", 1);
-  storage_info_all* info = (storage_info_all*)data.open(comm);
+  NSMData data(stornode + "_STATUS", "storage_status", 1);
+  storage_status* info = (storage_status*)data.open(comm);
 
   while (true) {
     sleep(2);
@@ -51,7 +51,7 @@ int main(int argc, char** argv)
     printf("\n");
     printf(" %13s |      count | freq [kHz] | rate [MB/s] | evtsize [kB]\n", "node");
     for (int i = 0; i < 14; i++) {
-      storage_info_all::io_status& nio(info->io[i]);
+      storage_status::io_status& nio(info->io[i]);
       if (i == 4 || i == 5) continue;
       std::string name = "basf2";
       if (i == 0 || i == 1) {

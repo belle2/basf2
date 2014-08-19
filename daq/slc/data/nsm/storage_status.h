@@ -1,9 +1,9 @@
-#ifndef storage_info_all_h
-#define storage_info_all_h
+#ifndef storage_status_h
+#define storage_status_h
 
-const int storage_info_all_revision = 1;
+const int storage_status_revision = 1;
 
-struct storage_info_all {
+struct storage_status {
   uint32 reserved[2];
   uint32 state;
   uint32 ctime;

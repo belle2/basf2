@@ -1,5 +1,6 @@
 Import('env')
 
 env['TOOLS_LIBS']['storagerd'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['storagemonitor'] = ['daq', 'framework', '$ROOT_LIBS', 'nsm2_b2lib' ]
 
 Return('env')

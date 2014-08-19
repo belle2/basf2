@@ -1,6 +1,6 @@
    nodename,  config, hostnode,        dataname,         format, file_revision
  RUNCONTROL, default,  STORAGE,  STORAGE_STATUS, storage_status,        1
- RUNCONTROL, default,      HLT,      HLT_STATUS,     hlt_status,        1
+ RUNCONTROL, default,      HLT,      HLT_STATUS,     rfunitinfo,        1
  RUNCONTROL, default, ECL01, ECL01_STATUS,      rc_status,        1
  RUNCONTROL, default, ECL02, ECL02_STATUS,      rc_status,        1
  RUNCONTROL, default,      TTD,      TTD_STATUS,     ttd_status,        1

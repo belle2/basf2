@@ -6,6 +6,5 @@ env['TOOLS_LIBS']['storageout'] = ['daq', 'framework', '$ROOT_LIBS' ]
 env['TOOLS_LIBS']['storagemonitor'] = ['daq', 'framework', '$ROOT_LIBS' ]
 env['TOOLS_LIBS']['storagerecord'] = ['daq', 'framework', '$ROOT_LIBS', 'pthread' ]
 env['TOOLS_LIBS']['storagetest'] = ['daq', 'framework', '$ROOT_LIBS', 'pthread' ]
-env['TOOLS_LIBS']['bufmonitor'] = ['daq', 'framework', '$ROOT_LIBS', 'nsm2_b2lib' ]
 
 Return('env')

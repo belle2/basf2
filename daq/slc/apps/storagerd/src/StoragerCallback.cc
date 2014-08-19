@@ -1,5 +1,5 @@
 #include "daq/slc/apps/storagerd/StoragerCallback.h"
-#include "daq/slc/apps/storagerd/storage_info_all.h"
+#include "daq/slc/apps/storagerd/storage_status.h"
 
 #include "daq/slc/system/LogFile.h"
 
@@ -23,8 +23,8 @@ StoragerCallback::~StoragerCallback() throw()
 void StoragerCallback::init() throw()
 {
   LogFile::open("storage");
-  m_data = NSMData("STORAGE_STATUS", "storage_info_all",
-                   storage_info_all_revision);
+  m_data = NSMData("STORAGE_STATUS", "storage_status",
+                   storage_status_revision);
   m_data.allocate(getCommunicator());
 }
 
@@ -198,7 +198,7 @@ bool StoragerCallback::abort() throw()
 
 void StoragerCallback::timeout() throw()
 {
-  storage_info_all* info = (storage_info_all*)m_data.get();
+  storage_status* info = (storage_status*)m_data.get();
   for (size_t i = 0; i < m_flow.size() && i < 14; i++) {
     ronode_status& status(m_flow[i].monitor());
     for (int j = 0; j < 2; j++) {

@@ -75,7 +75,7 @@ bool RFMasterCallback::perform(const NSMMessage& msg) throw()
 
 void RFMasterCallback::init() throw()
 {
-  m_master->SetNodeInfo((RfNodeInfo*)m_data.allocate(getCommunicator()));
+  m_master->SetNodeInfo((RfNodeInfo*)m_data.allocate(getCommunicator(), true));
   char* conffile = getenv("RFARM_CONFFILE");
   RFConf conf(conffile);
   char* format = conf.getconf("system", "nsmdata");

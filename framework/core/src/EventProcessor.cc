@@ -140,7 +140,7 @@ static void signalHandler(int)
   EventProcessor::writeToStdErr("Received Ctrl+C, basf2 will exit safely. (Press Ctrl+\\ (SIGQUIT) to abort immediately - this may break output files.)\n");
 }
 
-void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
+bool EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 {
   //store main RNG to be able to restore it later
   m_mainRNG = gRandom;
@@ -181,8 +181,13 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
       B2DEBUG(100, "Found master module " << module->getName());
       m_master = module;
     }
+
+    if (ctrl_c) {
+      return true;;
+    }
   }
   m_processStatisticsPtr->stopGlobal(ModuleStatistics::c_Init);
+  return false;
 }
 
 void EventProcessor::setupSignalHandler()

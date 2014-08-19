@@ -78,6 +78,12 @@ pEventProcessor::~pEventProcessor()
   delete m_procHandler;
 }
 
+void pEventProcessor::cleanup()
+{
+  m_rbinlist.clear();
+  m_rboutlist.clear();
+}
+
 
 void pEventProcessor::gotSigINT()
 {
@@ -152,6 +158,8 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     return;
   }
 
+  setupSignalHandler();
+
   //inserts Rx/Tx modules into path (sets up IPC structures)
   preparePaths();
 
@@ -177,7 +185,15 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   ModulePtrList modulelist = spath->buildModulePathList();
   ModulePtrList initGlobally = getModulesWithoutFlag(modulelist, Module::c_InternalSerializer);
   //dump_modules("Initializing globally: ", initGlobally);
-  processInitialize(initGlobally);
+  if (processInitialize(initGlobally)) {
+    cleanup();
+    B2FATAL("Execution stopped by user (via SIGINT)");
+  }
+
+  //initialization finished, disable handler again
+  if (signal(SIGINT, SIG_IGN) == SIG_ERR) {
+    B2FATAL("Cannot ignore SIGINT signal handler\n");
+  }
 
   ModulePtrList terminateGlobally = getModulesWithFlag(modulelist, Module::c_TerminateInAllProcesses);
 
@@ -203,14 +219,6 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   m_procHandler->startInputProcess();
   if (m_procHandler->isInputProcess()) {   // In input process
     localPath = m_inpathlist[0];
-  }
-
-  if (localPath == nullptr) { //not forked yet
-    // for all processes except the input process (already started by now)
-    // ignore SIGINT so we can do our own handling to ensure safe termination.
-    if (signal(SIGINT, SIG_IGN) == SIG_ERR) {
-      B2FATAL("Cannot ignore SIGINT signal handler\n");
-    }
   }
 
   if (localPath == nullptr) { //not forked yet
@@ -284,10 +292,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     B2FATAL("Cannot ignore SIGINT signal handler\n");
   }
 
-  // 6.5 Remove all ring buffers
-  m_rbinlist.clear();
-  m_rboutlist.clear();
-
+  cleanup();
   B2INFO("Global process: completed");
 
   //did anything bad happen?

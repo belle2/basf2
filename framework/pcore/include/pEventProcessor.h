@@ -58,6 +58,8 @@ namespace Belle2 {
     void gotSigTERM();
 
   private:
+    /** clean up IPC resources. */
+    void cleanup();
     /** Analyze given path. Fills m_*pathlist objects. */
     void analyzePath(const PathPtr& path);
 

@@ -37,9 +37,9 @@ namespace Belle2 {
       \code
       //retrieve all CDCSimHits for given particle
       const MCParticle* particle = particles[i];
-      RelationVector<CDCSimHit> cdcRelations = particle->getRelationsTo<CDCSimHit>();
-      for (unsigned int iHit = 0; iHit < cdcRelations.size(); iHit++) {
-        const CDCSimHit *simhit = cdcRelations[iHit];
+
+      //range-based for loop over RelationVector<CDCSimHit>
+      for (const CDCSimHit& simhit : particle->getRelationsTo<CDCSimHit>()) {
         //...
       }
       \endcode
@@ -54,6 +54,21 @@ namespace Belle2 {
         //nothing found, do some error handling here
       }
       \endcode
+   *
+   *  Weigths are available when looping over the RelationVector returned by getRelations(),
+   *  as in this example:
+      \code
+      //retrieve all CDCSimHits for given particle
+      const MCParticle* particle = particles[i];
+      RelationVector<CDCSimHit> cdcRelations = particle->getRelationsTo<CDCSimHit>();
+      for (unsigned int iHit = 0; iHit < cdcRelations.size(); iHit++) {
+        const CDCSimHit *simhit = cdcRelations[iHit];
+        double weight = cdcRelations.weight(iHit);
+        //...
+      }
+      \endcode
+
+   *  or for at most one relation, using getRelatedWithWeight(), getRelatedFromWithWeight(), and getRelatedToWithWeight().
    *
    *  <h1>Adding relations</h1>
    *  Creating new relations is also fairly straightforward:
@@ -88,7 +103,7 @@ namespace Belle2 {
      *  Cached values are cleared.
      *  @param relationsInterface  The object that should be copied.
      */
-    RelationsInterface(const RelationsInterface& relationsInterface): BASE(relationsInterface), m_cacheDataStoreEntry(0), m_cacheArrayIndex(-1) {}
+    RelationsInterface(const RelationsInterface& relationsInterface): BASE(relationsInterface), m_cacheDataStoreEntry(NULL), m_cacheArrayIndex(-1) {}
 
     /** Assignment operator.
      *

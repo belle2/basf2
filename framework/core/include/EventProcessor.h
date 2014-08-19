@@ -86,7 +86,7 @@ namespace Belle2 {
      *
      * @return true if execution should stop.
      */
-    bool processEvent(PathIterator moduleIter, EventMetaData* previousEventMetaData);
+    bool processEvent(PathIterator moduleIter);
 
     /**
      * Terminates the modules.
@@ -131,6 +131,9 @@ namespace Belle2 {
 
     /** EventMetaData is used by processEvent()/processCore(). */
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
+
+    /** Stores state of EventMetaData before it was last changed. Useful since processEndRun() needs info about which run it needs to end. */
+    EventMetaData m_previousEventMetaData;
 
     /** Also used in a number of places. */
     StoreObjPtr<ProcessStatistics> m_processStatisticsPtr;

@@ -194,7 +194,7 @@ void EventProcessor::setupSignalHandler()
   }
 }
 
-bool EventProcessor::processEvent(PathIterator moduleIter, EventMetaData* previousEventMetaData)
+bool EventProcessor::processEvent(PathIterator moduleIter)
 {
   LogSystem& logSystem = LogSystem::Instance();
   const bool collectStats = !Environment::Instance().getNoStats();
@@ -228,29 +228,24 @@ bool EventProcessor::processEvent(PathIterator moduleIter, EventMetaData* previo
     if (module == m_master) {
 
       //Check for a change of the run
-      if ((m_eventMetaDataPtr->getExperiment() != previousEventMetaData->getExperiment()) ||
-          (m_eventMetaDataPtr->getRun() != previousEventMetaData->getRun())) {
+      if ((m_eventMetaDataPtr->getExperiment() != m_previousEventMetaData.getExperiment()) ||
+          (m_eventMetaDataPtr->getRun() != m_previousEventMetaData.getRun())) {
 
         if (collectStats)
           m_processStatisticsPtr->suspendGlobal();
-        //End the previous run
-        EventMetaData newEventMetaData = *m_eventMetaDataPtr;
-        *m_eventMetaDataPtr = *previousEventMetaData;
-        processEndRun();
-        *m_eventMetaDataPtr = newEventMetaData;
 
-        //Start a new run
+        processEndRun();
         processBeginRun();
 
         if (collectStats)
           m_processStatisticsPtr->resumeGlobal();
       }
 
-      *previousEventMetaData = *m_eventMetaDataPtr;
+      m_previousEventMetaData = *m_eventMetaDataPtr;
 
     } else {
       //Check for a second master module
-      if (m_eventMetaDataPtr && (*m_eventMetaDataPtr != *previousEventMetaData)) {
+      if (m_eventMetaDataPtr && (*m_eventMetaDataPtr != m_previousEventMetaData)) {
         B2FATAL("Two master modules were discovered: " << m_master->getName() << " and " << module->getName());
       }
     }
@@ -272,7 +267,6 @@ bool EventProcessor::processEvent(PathIterator moduleIter, EventMetaData* previo
     }
   } //end module loop
   return false;
-
 }
 
 void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& modulePathList, long maxEvent)
@@ -280,8 +274,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
   DataStore::Instance().setInitializeActive(false);
   m_moduleList = modulePathList;
   //Remember the previous event meta data, and identify end of data meta data
-  EventMetaData previousEventMetaData;
-  previousEventMetaData.setEndOfData(); //invalid start state
+  m_previousEventMetaData.setEndOfData(); //invalid start state
 
   const bool collectStats = !Environment::Instance().getNoStats();
 
@@ -294,9 +287,8 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 
     gRandom = m_mainRNG;
 
-    //Loop over the modules in the current path
     PathIterator moduleIter(startPath);
-    endProcess = processEvent(moduleIter, &previousEventMetaData);
+    endProcess = processEvent(moduleIter);
 
     //Delete event related data in DataStore
     DataStore::Instance().invalidateData(DataStore::c_Event);
@@ -309,7 +301,6 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 
   //End last run
   m_eventMetaDataPtr.create();
-  *m_eventMetaDataPtr = previousEventMetaData;
   processEndRun();
 }
 
@@ -382,6 +373,9 @@ void EventProcessor::processEndRun()
   ModulePtrList::const_iterator listIter;
   m_processStatisticsPtr->startGlobal();
 
+  const EventMetaData newEventMetaData = *m_eventMetaDataPtr;
+  *m_eventMetaDataPtr = m_previousEventMetaData;
+
   for (listIter = m_moduleList.begin(); listIter != m_moduleList.end(); ++listIter) {
     Module* module = listIter->get();
 
@@ -397,6 +391,7 @@ void EventProcessor::processEndRun()
     logSystem.setModuleLogConfig(NULL);
   }
   gRandom = m_mainRNG;
+  *m_eventMetaDataPtr = newEventMetaData;
 
   m_processStatisticsPtr->stopGlobal(ModuleStatistics::c_EndRun);
 }

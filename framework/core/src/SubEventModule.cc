@@ -14,7 +14,6 @@
 #include <framework/core/ProcessStatistics.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 
 using namespace Belle2;
@@ -135,11 +134,10 @@ void SubEventModule::event()
   DataStore::StoreEntryMap& eventMap = DataStore::Instance().getStoreEntryMap(DataStore::c_Event);
   DataStore::StoreEntryMap eventMapCopy = eventMap;
 
-  //processCore() resets EventMetaData
-  StoreObjPtr<EventMetaData> eventMetaDataPtr;
-  const EventMetaData eventMetaDataBack = *eventMetaDataPtr;
-
   DataStore::StoreEntry& objectEntry = DataStore::Instance().getStoreEntryMap(DataStore::c_Event).at(m_objectName);
+
+  //don't call processBeginRun/EndRun() again (we do that in our implementations)
+  m_previousEventMetaData = *(StoreObjPtr<EventMetaData>());
 
   for (int i = 0; i < numEntries; i++) {
     //set loopObject
@@ -148,8 +146,7 @@ void SubEventModule::event()
 
     //stuff usually done in processCore()
     PathIterator moduleIter(m_path);
-    EventMetaData previousEventMetaData(eventMetaDataBack);
-    processEvent(moduleIter, &previousEventMetaData);
+    processEvent(moduleIter);
 
     //restore datastore
     restoreContents(eventMapCopy, eventMap);

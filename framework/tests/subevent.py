@@ -4,7 +4,9 @@ from basf2 import *
 path = create_path()
 
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [5])
+eventinfosetter.param('evtNumList', [5, 1])
+eventinfosetter.param('runList', [0, 1])
+eventinfosetter.param('expList', [0, 1])
 path.add_module(eventinfosetter)
 
 pgun = register_module('ParticleGun')
@@ -22,6 +24,10 @@ class TestModule(Module):
 
         part = Belle2.PyStoreObj('MCParticle')
         B2INFO("MCPart: " + str(part.obj().getIndex()))
+
+    def beginRun(self):
+        """reimplementation of Module::beginRun()."""
+        B2INFO("TestModule: beginRun()")
 
 
 subeventpath = create_path()

@@ -34,7 +34,7 @@ namespace Belle2 {
     // Output
     StoreArray<ContinuumSuppression> qqArray;
     // Create ContinuumSuppression object
-    ContinuumSuppression* qqVars = qqArray.appendNew(ContinuumSuppression());
+    ContinuumSuppression* qqVars = qqArray.appendNew();
 
     // Create relation: Particle <-> ContinuumSuppression
     particle->addRelationTo(qqVars);

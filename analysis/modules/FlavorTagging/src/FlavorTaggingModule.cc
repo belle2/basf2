@@ -21,9 +21,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/core/ModuleManager.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -163,9 +161,11 @@ namespace Belle2 {
     //TO DO: choose method etc in steering file also adapt design: see teacher.py
     StoreArray<MCParticle>::optional();
     //store array for dummy particle:
-    StoreArray<Particle>::required(); //if we don't need them anymore, ok. If not, we have to adapt it for each category.
-    StoreArray<ContinuumSuppression>::registerPersistent();
-    RelationArray::registerPersistent<Particle, ContinuumSuppression>();
+    StoreArray<Particle> particles;
+    particles.isRequired(); //if we don't need them anymore, ok. If not, we have to adapt it for each category.
+    StoreArray<ContinuumSuppression> csArray;
+    csArray.registerInDataStore();
+    particles.registerRelationTo(csArray);
 
     if ((m_mode == 1) || (m_mode == 2)) {
       m_expert_Muon_TL = new TMVAInterface::Expert(m_methodPrefix_Muon_EL, m_workingDirectory, m_methodName_Muon_TL, m_signalCluster_Muon_TL);

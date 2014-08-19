@@ -15,7 +15,6 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 
 
 #include <analysis/ContinuumSuppression/ContinuumSuppression.h>
@@ -47,11 +46,13 @@ void ContinuumSuppressionBuilderModule::initialize()
 {
   // Input
   StoreObjPtr<ParticleList>::required(m_particleList);
-  StoreArray<Particle>::required();
+  StoreArray<Particle> particles;
+  particles.isRequired();
 
   // Output
-  StoreArray<ContinuumSuppression>::registerPersistent();
-  RelationArray::registerPersistent<Particle, ContinuumSuppression>();
+  StoreArray<ContinuumSuppression> csArray;
+  csArray.registerInDataStore();
+  particles.registerRelationTo(csArray);
 }
 
 void ContinuumSuppressionBuilderModule::event()

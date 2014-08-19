@@ -10,13 +10,10 @@
 
 #include <analysis/modules/TagVertex/TagVertexModule.h>
 
-#include <framework/core/ModuleManager.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -86,11 +83,14 @@ namespace Belle2 {
     B2INFO("TagVertexModule : magnetic field = " << m_Bfield);
 
 
+    //TODO: this won't work with nonstandard name for Particle array (e.g. will fail when adding relations)
+    //input
+    StoreArray<Particle> particles;
+    particles.isRequired();
     // output
-    StoreArray<Vertex>::registerPersistent();
-    RelationArray::registerPersistent<Particle, Vertex>();
-
-
+    StoreArray<Vertex> verArray;
+    verArray.registerInDataStore();
+    particles.registerRelationTo(verArray);
 
   }
 
@@ -127,7 +127,7 @@ namespace Belle2 {
 
       // save information in the Vertex StoreArray
       if (ok) {
-        Vertex* ver = verArray.appendNew(Vertex());
+        Vertex* ver = verArray.appendNew();
         // create relation: Particle <-> Vertex
         particle->addRelationTo(ver);
         // fill Vertex with content

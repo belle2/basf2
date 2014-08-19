@@ -12,7 +12,6 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
 
@@ -67,10 +66,13 @@ void BKLMReconstructorModule::initialize()
   StoreArray<BKLMDigit>::required();
 
   // Force creation and persistence of BKLM output datastores and relations
-  StoreArray<BKLMHit1d>::registerPersistent();
-  StoreArray<BKLMHit2d>::registerPersistent();
-  RelationArray::registerPersistent<BKLMHit1d, BKLMDigit>();
-  RelationArray::registerPersistent<BKLMHit2d, BKLMHit1d>();
+  StoreArray<BKLMHit1d> hit1ds;
+  hit1ds.registerInDataStore();
+  StoreArray<BKLMHit2d> hit2ds;
+  hit2ds.registerInDataStore();
+  StoreArray<BKLMDigit> digits;
+  hit1ds.registerRelationTo(digits);
+  hit2ds.registerRelationTo(hit1ds);
 
   m_GeoPar = Belle2::bklm::GeometryPar::instance();
 
@@ -97,35 +99,27 @@ void BKLMReconstructorModule::event()
   if (volIDToDigits.empty()) return;
 
   StoreArray<BKLMHit1d> hit1ds;
-  RelationArray hit1dToDigits(hit1ds, digits);
 
-  std::vector<unsigned int> indices;
   std::vector<BKLMDigit*> cluster;
   int oldVolID = volIDToDigits.begin()->first;
   double averageTime = digits[volIDToDigits.begin()->second]->getTime();
 
   for (std::map<int, int>::iterator iVolMap = volIDToDigits.begin(); iVolMap != volIDToDigits.end(); ++iVolMap) {
-    int d = iVolMap->second;
-    BKLMDigit* digit = digits[d];
+    BKLMDigit* digit = digits[iVolMap->second];
     if ((iVolMap->first > oldVolID + 1) || (std::fabs(digit->getTime() - averageTime) > m_DtMax)) {
-      hit1ds.appendNew(cluster);
-      hit1dToDigits.add(hit1ds.getEntries() - 1, indices);
-      indices.clear();
+      hit1ds.appendNew(cluster); // also creates relation hit1d to each digit in cluster
       cluster.clear();
     }
-    double n = (double)(indices.size());
+    double n = (double)(cluster.size());
     averageTime = (n * averageTime + digit->getTime()) / (n + 1.0);
-    indices.push_back(d);
     cluster.push_back(digit);
     oldVolID = iVolMap->first;
   }
-  hit1ds.appendNew(cluster);
-  hit1dToDigits.add(hit1ds.getEntries() - 1, indices);
+  hit1ds.appendNew(cluster); // also creates relation hit1d to each digit in cluster
 
   // Construct StoreArray<BKLMHit2D> from orthogonal same-module hits in StoreArray<BKLMHit1D>
 
   StoreArray<BKLMHit2d> hit2ds;
-  RelationArray hit2dToHit1d(hit2ds, hit1ds);
 
   for (int i = 0; i < hit1ds.getEntries(); ++i) {
     int moduleID = hit1ds[i]->getModuleID() & BKLM_MODULEID_MASK;
@@ -143,11 +137,8 @@ void BKLMReconstructorModule::event()
       if (std::fabs(phiTime - zTime) > m_DtMax) continue;
       CLHEP::Hep3Vector global = m->localToGlobal(local);
       double time = 0.5 * (phiTime + zTime) - global.mag() / Const::speedOfLight;
-      BKLMHit2d* hit2d = hit2ds.appendNew(hit1ds[phiIndex], hit1ds[zIndex], global, time);
+      BKLMHit2d* hit2d = hit2ds.appendNew(hit1ds[phiIndex], hit1ds[zIndex], global, time); // also creates relations hit2d to each hit1d
       if (fabs(time - m_PromptTime) > m_PromptWindow) hit2d->isOutOfTime();
-      hit2dToHit1d.add(hit2ds.getEntries() - 1, i);
-      hit2dToHit1d.add(hit2ds.getEntries() - 1, j);
-
     }
   }
 

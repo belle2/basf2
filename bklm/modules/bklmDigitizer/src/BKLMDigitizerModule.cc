@@ -12,7 +12,6 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <bklm/geometry/GeometryPar.h>
@@ -68,15 +67,17 @@ BKLMDigitizerModule::~BKLMDigitizerModule()
 
 void BKLMDigitizerModule::initialize()
 {
-  StoreArray<BKLMSimHit>::required();
+  StoreArray<BKLMSimHit> bklmSimHit;
+  bklmSimHit.required();
 
   // Force creation and persistence of BKLM output datastores
-  StoreArray<BKLMDigit>::registerPersistent();
-  RelationArray::registerPersistent<BKLMSimHit, BKLMDigit>();
+  StoreArray<BKLMDigit> bklmDigit;
+  bklmDigit.registerInDataStore();
+  bklmSimHit.registerRelationTo(bklmDigit);
   try {
     m_fitter = new EKLM::FPGAFitter(m_nDigitizations);
   } catch (std::bad_alloc& ba) {
-    B2FATAL("Memory allocation error of FPGAFitter")
+    B2FATAL("Memory allocation error of EKLM::FPGAFitter")
   }
 }
 
@@ -95,19 +96,17 @@ void BKLMDigitizerModule::event()
   if (simHits.getEntries() == 0) return;
 
   StoreArray<BKLMDigit> digits;
-  RelationArray simHitToDigit(simHits, digits);
 
   unsigned int nDigit = 0;
   unsigned int d = 0;
 
-  std::vector<unsigned int> indices;
   std::map<int, std::vector<std::pair<int, BKLMSimHit*> > > volIDToSimHits;
   for (int h = 0; h < simHits.getEntries(); ++h) {
     BKLMSimHit* simHit = simHits[h];
     if (simHit->inRPC()) {
-      indices.clear();
       if (simHit->getStripMin() > 0) {
         for (int s = simHit->getStripMin(); s <= simHit->getStripMax(); ++s) {
+          /* DIVOT - replaced by new code
           BKLMDigit digit(simHit, s);
           for (d = 0; d < nDigit; ++d) {
             if (digit.match(digits[d])) break;
@@ -118,10 +117,21 @@ void BKLMDigitizerModule::event()
           } else {
             // DIVOT need pileup of RPC hits here
           }
-          indices.push_back(d);
+          simHit->addRelationTo(digits[d]);  // 1 RPC hit to many digits
+          */
+          int moduleID = (simHit->getModuleID() & ~BKLM_STRIP_MASK) | ((s - 1) << BKLM_STRIP_BIT);
+          for (d = 0; d < nDigit; ++d) {
+            if (((digits[d]->getModuleID() ^ moduleID) & BKLM_MODULESTRIPID_MASK) == 0) break;
+          }
+          if (d == nDigit) {
+            digits.appendNew(simHit, s);
+            nDigit++;
+          } else {
+            // DIVOT need pileup of RPC hits here
+          }
+          simHit->addRelationTo(digits[d]);  // 1 RPC hit to many digits
         }
       }
-      simHitToDigit.add(h, indices);  // 1 RPC hit to many digits
     } else {
       int volID = simHit->getModuleID() & BKLM_MODULESTRIPID_MASK;
       std::map<int, std::vector<std::pair<int, BKLMSimHit*> > >::iterator it = volIDToSimHits.find(volID);
@@ -152,16 +162,14 @@ void BKLMDigitizerModule::digitize(const std::map<int, std::vector<std::pair<int
 {
 
   StoreArray<BKLMSimHit> simHits;
-  RelationArray simHitToDigit(simHits, digits);
 
   // Digitize the pulse(s) in each scintillator strip (identified by volumeID)
   for (std::map<int, std::vector<std::pair<int, BKLMSimHit*> > >::const_iterator iVolMap = volIDToSimHits.begin(); iVolMap != volIDToSimHits.end(); ++iVolMap) {
 
     // Make one BKLMDigit for each scintillator strip then add relations to this BKLMDigit from each BKLMSimHit
     BKLMDigit* digit = digits.appendNew((iVolMap->second.front()).second);
-    int d = digits.getEntries() - 1;
     for (std::vector<std::pair<int, BKLMSimHit*> >::const_iterator iSimHit = iVolMap->second.begin(); iSimHit != iVolMap->second.end(); ++iSimHit) {
-      simHitToDigit.add(iSimHit->first, d);
+      simHits[iSimHit->first]->addRelationTo(digit);
     }
 
     struct EKLM::FPGAFitParams fitParams;

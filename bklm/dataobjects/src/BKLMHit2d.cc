@@ -50,6 +50,9 @@ BKLMHit2d::BKLMHit2d(const BKLMHit1d* hitPhi, const BKLMHit1d* hitZ, const CLHEP
   m_GlobalPosition[2] = globalPos.z();
   m_Time = time;
   m_EDep = hitPhi->getEDep() + hitZ->getEDep();
+
+  addRelationTo(hitPhi);
+  addRelationTo(hitZ);
 }
 
 // Copy constructor

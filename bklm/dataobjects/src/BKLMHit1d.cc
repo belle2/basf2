@@ -48,15 +48,17 @@ BKLMHit1d::BKLMHit1d(const std::vector<BKLMDigit*>& digits) :
   int mask = BKLM_MODULEID_MASK | BKLM_PLANE_MASK;
   m_ModuleID = digits.front()->getModuleID();
   for (std::vector<BKLMDigit*>::const_iterator iDigit = digits.begin(); iDigit != digits.end(); ++iDigit) {
-    if ((((*iDigit)->getModuleID() ^ m_ModuleID) & mask) != 0) {
+    BKLMDigit* digit = *iDigit;
+    if (((digit->getModuleID() ^ m_ModuleID) & mask) != 0) {
       B2WARNING("Attempt to combine non-parallel or distinct-module BKLMDigits")
       continue;
     }
-    m_Time += (*iDigit)->getTime();
-    m_EDep += (*iDigit)->getEDep();
-    int strip = (*iDigit)->getStrip();
+    m_Time += digit->getTime();
+    m_EDep += digit->getEDep();
+    int strip = digit->getStrip();
     stripMin = std::min(stripMin, strip);
     stripMax = std::max(stripMax, strip);
+    addRelationTo(digit);
   }
 
   if (stripMax >= stripMin) {

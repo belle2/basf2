@@ -12,7 +12,6 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
 
@@ -62,9 +61,12 @@ void BKLMK0LReconstructorModule::initialize()
   StoreArray<BKLMHit2d>::required();
 
   // Force creation and persistence of output datastore and relation
-  StoreArray<KLMCluster>::registerPersistent();
-  RelationArray::registerPersistent<KLMCluster, BKLMHit2d>();
-  RelationArray::registerPersistent<KLMCluster, ECLCluster>();
+  StoreArray<KLMCluster> klmCluster;
+  klmCluster.registerInDataStore();
+  // DIVOT StoreArray<BKLMHit2d> bklmHit2d;
+  // DIVOT klmCluster.registerRelationTo(bklmHit2d);
+  StoreArray<ECLCluster> eclCluster;
+  klmCluster.registerRelationTo(eclCluster);
 
   m_KaonMassSq = Const::Klong.getMass() * Const::Klong.getMass();
   m_MaxHitConeAngle = m_MaxHitConeAngle * M_PI / 180.0;
@@ -104,7 +106,6 @@ AddedToExistingCluster: ;
 
   StoreArray<KLMCluster> klmClusters;
   StoreArray<ECLCluster> eclClusters;
-  RelationArray klmToEcl(klmClusters, eclClusters);
   for (unsigned int j = 0; j < clusterIndices.size(); ++j) {
     int layers[NLAYER + 1] = { 0 };
     unsigned int nHits = clusterIndices[j].size();
@@ -129,18 +130,18 @@ AddedToExistingCluster: ;
                             nlayers,
                             hit2ds[clusterIndices[j][innermost]]->getLayer(),
                             mom.x(), mom.y(), mom.z());
-    int bestIndex = 0;
+    ECLCluster* bestECLCluster = NULL;
     double bestOpeningAngle = M_PI;
     for (int m = 0; m < eclClusters.getEntries(); ++m) {
       double openingAngle = mom.Angle(eclClusters[m]->getMomentum());
       if (openingAngle < bestOpeningAngle) {
         bestOpeningAngle = openingAngle;
-        bestIndex = m;
+        bestECLCluster = eclClusters[m];
       }
     }
     if (bestOpeningAngle < m_MaxKLMECLConeAngle) {
       cluster->setAssociatedEclClusterFlag();
-      klmToEcl.add(j, bestIndex);
+      cluster->addRelationTo(bestECLCluster);
     }
   }
 

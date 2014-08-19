@@ -58,10 +58,9 @@ namespace Belle2 {
       StoreArray<BKLMSimHitPosition> simHitPositions;
       RelationArray particleToSimHits(particles, simHits);
       registerMCParticleRelation(particleToSimHits);
-      StoreArray<BKLMSimHit>::registerPersistent();
-      StoreArray<BKLMSimHitPosition>::registerPersistent();
-      RelationArray::registerPersistent<MCParticle, BKLMSimHit>();
-      RelationArray::registerPersistent<BKLMSimHitPosition, BKLMSimHit>();
+      simHits.registerInDataStore();
+      simHitPositions.registerInDataStore();
+      simHitPositions.registerRelationTo(simHits);
     }
 
     //-----------------------------------------------------
@@ -88,8 +87,6 @@ namespace Belle2 {
       StoreArray<BKLMSimHitPosition> simHitPositions;
       if (!simHitPositions.isValid()) simHitPositions.create();
       StoreArray<MCParticle> particles;
-      RelationArray particleToSimHits(particles, simHits);
-      RelationArray positionToSimHits(simHitPositions, simHits);
 
       // It is not necessary to detect motion from one volume to another (or track death
       // in the RPC gas volume).  Experimentation shows that most tracks pass through the
@@ -132,7 +129,7 @@ namespace Belle2 {
         if (postStep->GetProcessDefinedStep() != 0) {
           if (postStep->GetProcessDefinedStep()->GetProcessType() == fDecay) { moduleID |= BKLM_DECAYED_MASK; }
         }
-        int trackID = track->GetTrackID();
+        const MCParticle* particle = particles[track->GetTrackID()];
         if (baseDepth == 0) {
           moduleID |= BKLM_INRPC_MASK;
           int phiStripLower = -1;
@@ -142,17 +139,17 @@ namespace Belle2 {
           convertHitToRPCStrips(lHitPos, m, phiStripLower, phiStripUpper, zStripLower, zStripUpper);
           if (zStripLower > 0) {
             int moduleIDZ = moduleID | ((zStripLower - 1) << BKLM_STRIP_BIT) | ((zStripUpper - 1) << BKLM_MAXSTRIP_BIT);
-            simHits.appendNew(moduleIDZ, propagationTimes.z(), time, eDep);
-            particleToSimHits.add(trackID, simHits.getEntries() - 1);
-            simHitPositions.appendNew(gHitPos.x(), gHitPos.y(), gHitPos.z());
-            positionToSimHits.add(simHitPositions.getEntries() - 1, simHits.getEntries() - 1);
+            BKLMSimHit* simHit = simHits.appendNew(moduleIDZ, propagationTimes.z(), time, eDep);
+            particle->addRelationTo(simHit);
+            BKLMSimHitPosition* simHitPosition = simHitPositions.appendNew(gHitPos.x(), gHitPos.y(), gHitPos.z());
+            simHitPosition->addRelationTo(simHit);
           }
           if (phiStripLower > 0) {
             moduleID |= ((phiStripLower - 1) << BKLM_STRIP_BIT) | ((phiStripUpper - 1) << BKLM_MAXSTRIP_BIT) | BKLM_PLANE_MASK;
-            simHits.appendNew(moduleID, propagationTimes.y(), time, eDep);
-            particleToSimHits.add(trackID, simHits.getEntries() - 1);
-            simHitPositions.appendNew(gHitPos.x(), gHitPos.y(), gHitPos.z());
-            positionToSimHits.add(simHitPositions.getEntries() - 1, simHits.getEntries() - 1);
+            BKLMSimHit* simHit = simHits.appendNew(moduleID, propagationTimes.y(), time, eDep);
+            particle->addRelationTo(simHit);
+            BKLMSimHitPosition* simHitPosition = simHitPositions.appendNew(gHitPos.x(), gHitPos.y(), gHitPos.z());
+            simHitPosition->addRelationTo(simHit);
           }
         } else {
           int scint = hist->GetCopyNumber(0);
@@ -162,10 +159,10 @@ namespace Belle2 {
             moduleID |= BKLM_PLANE_MASK;
             propTime = propagationTimes.y();
           }
-          simHits.appendNew(moduleID, propTime, time, eDep);
-          particleToSimHits.add(trackID, simHits.getEntries() - 1);
-          simHitPositions.appendNew(gHitPos.x(), gHitPos.y(), gHitPos.z());
-          positionToSimHits.add(simHitPositions.getEntries() - 1, simHits.getEntries() - 1);
+          BKLMSimHit* simHit = simHits.appendNew(moduleID, propTime, time, eDep);
+          particle->addRelationTo(simHit);
+          BKLMSimHitPosition* simHitPosition = simHitPositions.appendNew(gHitPos.x(), gHitPos.y(), gHitPos.z());
+          simHitPosition->addRelationTo(simHit);
         }
         return true;
       }

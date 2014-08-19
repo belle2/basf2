@@ -1,0 +1,14 @@
+#!/bin/bash
+
+killall nsmd2 1&>2 /dev/null
+killall datad 1&>2 /dev/null
+
+cd $HOME/belle2/release
+source ../tools/setup_belle2
+setuprel
+nsm2log=`getconfig $1 logfile.dir`/nsm2
+mkdir -p $nsm2log
+nsm2host=`getconfig $1 nsm.global.host`
+nsm2port=`getconfig $1 nsm.global.port`
+nsmd2 -p $nsm2port -h $nsm2host -l $nsm2log
+datad -d 100

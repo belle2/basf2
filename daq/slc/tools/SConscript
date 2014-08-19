@@ -2,5 +2,6 @@ Import('env')
 
 env['TOOLS_LIBS']['shmclean'] = ['rt']
 env['TOOLS_LIBS']['nsmcui']  = ['nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['getconfig']  = ['daq']
 
 Return('env')

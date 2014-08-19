@@ -43,7 +43,7 @@ bool StoragerCallback::load() throw()
   system("killall basf2");
 
   m_file.read("storage");
-  const size_t nproc = m_file.getInt("record_nproc");
+  const size_t nproc = m_file.getInt("record.nproc");
   m_con = std::vector<ProcessController>();
   for (size_t i = 0; i < 3 + nproc; i++) {
     m_con.push_back(ProcessController(this));
@@ -55,19 +55,19 @@ bool StoragerCallback::load() throw()
     m_con[i].init(StringUtil::form("basf2_%d", i - 3), i);
   }
 
-  const std::string ibuf_name = m_file.get("ibuf_name");
-  const std::string rbuf_name = m_file.get("rbuf_name");
-  const std::string obuf_name = m_file.get("obuf_name");
-  const std::string ibuf_size = m_file.get("ibuf_size");
-  const std::string rbuf_size = m_file.get("rbuf_size");
-  const std::string obuf_size = m_file.get("obuf_size");
+  const std::string ibuf_name = m_file.get("input.buf.name");
+  const std::string rbuf_name = m_file.get("record.buf.name");
+  const std::string obuf_name = m_file.get("out.buf.name");
+  const std::string ibuf_size = m_file.get("input.buf.size");
+  const std::string rbuf_size = m_file.get("record.buf.size");
+  const std::string obuf_size = m_file.get("output.buf.size");
 
   m_con[0].clearArguments();
   m_con[0].setExecutable("storagein");
   m_con[0].addArgument(ibuf_name);
   m_con[0].addArgument(ibuf_size);
-  m_con[0].addArgument(m_file.get("in_host"));
-  m_con[0].addArgument(m_file.get("in_port"));
+  m_con[0].addArgument(m_file.get("input.socket.host"));
+  m_con[0].addArgument(m_file.get("input.socket.port"));
   m_con[0].addArgument("storagein");
   m_con[0].addArgument("1");
   if (!m_con[0].load(20)) {
@@ -82,10 +82,10 @@ bool StoragerCallback::load() throw()
   m_con[1].setExecutable("storagerecord");
   m_con[1].addArgument(rbuf_name);
   m_con[1].addArgument(rbuf_size);
-  m_con[1].addArgument(m_file.get("record_dir"));
-  m_con[1].addArgument(m_file.get("record_ndisks"));
-  m_con[1].addArgument(m_file.get("record_file_diskid"));
-  m_con[1].addArgument(m_file.get("record_file_nfiles"));
+  m_con[1].addArgument(m_file.get("record.dir"));
+  m_con[1].addArgument(m_file.get("record.ndisks"));
+  m_con[1].addArgument(m_file.get("record.file.diskid"));
+  m_con[1].addArgument(m_file.get("record.file.nfiles"));
   m_con[1].addArgument(obuf_name);
   m_con[1].addArgument(obuf_size);
   m_con[1].addArgument("storagerecord");
@@ -101,9 +101,9 @@ bool StoragerCallback::load() throw()
   /*
   m_con[2].clearArguments();
   m_con[2].setExecutable("storageout");
-  m_con[2].addArgument(obuf_name);
-  m_con[2].addArgument(obuf_size);
-  m_con[2].addArgument(m_file.get("out_port"));
+  m_con[2].addArgument(output.buf.name);
+  m_con[2].addArgument(output.buf.size);
+  m_con[2].addArgument(m_file.get("output.socketport"));
   m_con[2].addArgument("storageout");
   m_con[2].addArgument("3");
   if (!m_con[2].load(10)) {
@@ -116,7 +116,7 @@ bool StoragerCallback::load() throw()
   for (size_t i = 3; i < m_con.size(); i++) {
     m_con[i].clearArguments();
     m_con[i].setExecutable("basf2");
-    m_con[i].addArgument(m_file.get("record_script"));
+    m_con[i].addArgument(m_file.get("record.script"));
     m_con[i].addArgument(ibuf_name);
     m_con[i].addArgument(ibuf_size);
     m_con[i].addArgument(rbuf_name);
@@ -224,9 +224,9 @@ void StoragerCallback::timeout() throw()
     }
   }
   struct statvfs statfs;
-  if (m_file.hasKey("record_ndisks")) {
-    std::string dir = m_file.get("record_dir");
-    int ndisks = m_file.getInt("record_ndisks");
+  if (m_file.hasKey("record.ndisks")) {
+    std::string dir = m_file.get("record.dir");
+    int ndisks = m_file.getInt("record.ndisks");
     for (int i = 0; i < ndisks; i++) {
       std::string path = StringUtil::form("%s%02d", dir.c_str(), i + 1);
       statvfs(path.c_str(), &statfs);

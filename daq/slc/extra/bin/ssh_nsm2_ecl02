@@ -1,0 +1,17 @@
+#!/bin/bash
+
+dir="~/belle2/release/daq/slc/extra/bin"
+ssh ecl02 "${dir}/boot_nsm2_local ecl02"
+ssh cpr5014 "${dir}/boot_nsm2_local cpr5014"
+ssh cpr5015 "${dir}/boot_nsm2_local cpr5015"
+ssh cpr5016 "${dir}/boot_nsm2_local cpr5016"
+ssh cpr5017 "${dir}/boot_nsm2_local cpr5017"
+ssh cpr5018 "${dir}/boot_nsm2_local cpr5018"
+ssh cpr5019 "${dir}/boot_nsm2_local cpr5019"
+ssh cpr5020 "${dir}/boot_nsm2_local cpr5020"
+ssh cpr5021 "${dir}/boot_nsm2_local cpr5021"
+ssh cpr5022 "${dir}/boot_nsm2_local cpr5022"
+ssh cpr5023 "${dir}/boot_nsm2_local cpr5023"
+ssh cpr5024 "${dir}/boot_nsm2_local cpr5024"
+ssh cpr5025 "${dir}/boot_nsm2_local cpr5025"
+ssh cpr5026 "${dir}/boot_nsm2_local cpr5026"

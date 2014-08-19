@@ -1,3 +1,0 @@
-#!/bin/bash
-
-java -jar ~/belle2/release/daq/slc/extra/javalib/b2gui/jars/b2gui-exe.jar >& /dev/null&

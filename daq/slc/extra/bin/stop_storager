@@ -1,4 +1,0 @@
-killall storagerd
-killall storagein
-killall storageout
-killall basf2

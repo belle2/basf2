@@ -1,0 +1,9 @@
+#!/bin/bash
+
+dir="~/belle2/release/daq/slc/extra/bin"
+ssh ropc02 "${dir}/boot_nsm2_global ropc02"
+ssh hltctl "${dir}/boot_nsm2_global hltctl"
+ssh stordaq@storage "${dir}/boot_nsm2_global storage"
+ssh ttd "${dir}/boot_nsm2_global ttd"
+ssh ecl01 "${dir}/boot_nsm2_global ecl01"
+ssh ecl02 "${dir}/boot_nsm2_global ecl02"

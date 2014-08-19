@@ -63,7 +63,7 @@ main = create_path()
 
 # Add modules to main path
 main.add_module(deserializer)
-main.add_module(output)
+# main.add_module(output)
 # main.add_module(histo)
 # main.add_module(monitor)
 

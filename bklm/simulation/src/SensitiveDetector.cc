@@ -88,6 +88,7 @@ namespace Belle2 {
       StoreArray<BKLMSimHitPosition> simHitPositions;
       if (!simHitPositions.isValid()) simHitPositions.create();
       StoreArray<MCParticle> particles;
+      RelationArray particleToSimHits(particles, simHits);
 
       // It is not necessary to detect motion from one volume to another (or track death
       // in the RPC gas volume).  Experimentation shows that most tracks pass through the
@@ -130,7 +131,7 @@ namespace Belle2 {
         if (postStep->GetProcessDefinedStep() != 0) {
           if (postStep->GetProcessDefinedStep()->GetProcessType() == fDecay) { moduleID |= BKLM_DECAYED_MASK; }
         }
-        const MCParticle* particle = particles[track->GetTrackID()];
+        int trackID = track->GetTrackID();
         if (baseDepth == 0) {
           moduleID |= BKLM_INRPC_MASK;
           int phiStripLower = -1;
@@ -141,14 +142,14 @@ namespace Belle2 {
           if (zStripLower > 0) {
             int moduleIDZ = moduleID | ((zStripLower - 1) << BKLM_STRIP_BIT) | ((zStripUpper - 1) << BKLM_MAXSTRIP_BIT);
             BKLMSimHit* simHit = simHits.appendNew(moduleIDZ, propagationTimes.z(), time, eDep);
-            particle->addRelationTo(simHit);
+            particleToSimHits.add(trackID, simHits.getEntries() - 1);
             BKLMSimHitPosition* simHitPosition = simHitPositions.appendNew(gHitPos.x(), gHitPos.y(), gHitPos.z());
             simHitPosition->addRelationTo(simHit);
           }
           if (phiStripLower > 0) {
             moduleID |= ((phiStripLower - 1) << BKLM_STRIP_BIT) | ((phiStripUpper - 1) << BKLM_MAXSTRIP_BIT) | BKLM_PLANE_MASK;
             BKLMSimHit* simHit = simHits.appendNew(moduleID, propagationTimes.y(), time, eDep);
-            particle->addRelationTo(simHit);
+            particleToSimHits.add(trackID, simHits.getEntries() - 1);
             BKLMSimHitPosition* simHitPosition = simHitPositions.appendNew(gHitPos.x(), gHitPos.y(), gHitPos.z());
             simHitPosition->addRelationTo(simHit);
           }
@@ -161,7 +162,7 @@ namespace Belle2 {
             propTime = propagationTimes.y();
           }
           BKLMSimHit* simHit = simHits.appendNew(moduleID, propTime, time, eDep);
-          particle->addRelationTo(simHit);
+          particleToSimHits.add(trackID, simHits.getEntries() - 1);
           BKLMSimHitPosition* simHitPosition = simHitPositions.appendNew(gHitPos.x(), gHitPos.y(), gHitPos.z());
           simHitPosition->addRelationTo(simHit);
         }

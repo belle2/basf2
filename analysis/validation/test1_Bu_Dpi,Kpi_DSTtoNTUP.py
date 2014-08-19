@@ -13,12 +13,12 @@ loadReconstructedParticles()
 stdFSParticles()
 stdLooseFSParticles()
 
-reconDecay('D0 -> K-:all pi+:all', '1.7 < M <2.0')
+reconstructDecay('D0 -> K-:all pi+:all', '1.7 < M <2.0')
 applyCuts('D0', '1.81 < M < 1.91')
 matchMCTruth('D0')
 
 # Prepare the B candidates
-reconDecay('B- -> D0 pi-:all', '5.2 < M < 5.4')
+reconstructDecay('B- -> D0 pi-:all', '5.2 < M < 5.4')
 applyCuts('B-', '5.2 < M < 5.4')
 matchMCTruth('B-')
 

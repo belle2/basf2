@@ -27,7 +27,7 @@
 from basf2 import *
 from modularAnalysis import inputMdst
 from modularAnalysis import loadReconstructedParticles
-from modularAnalysis import reconDecay
+from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
@@ -68,7 +68,7 @@ loadReconstructedParticles()
 goodPhoton()
 
 # construct pi0 candidates
-reconDecay('pi0 -> gamma:good gamma:good', '0.1 < M < 1.8')
+reconstructDecay('pi0 -> gamma:good gamma:good', '0.1 < M < 1.8')
 # perform mass fit
 massKFit('pi0', 0.0, '')
 # perform MC matching

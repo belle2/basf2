@@ -13,13 +13,13 @@ loadReconstructedParticles()
 stdFSParticles()
 stdLooseFSParticles()
 
-reconDecay('J/psi -> mu-:all mu+:all', '2.8 < M < 3.3')
+reconstructDecay('J/psi -> mu-:all mu+:all', '2.8 < M < 3.3')
 matchMCTruth('J/psi')
-reconDecay('K_S0 -> pi-:all pi+:all', '0.4 < M < 0.6')
+reconstructDecay('K_S0 -> pi-:all pi+:all', '0.4 < M < 0.6')
 matchMCTruth('K_S0')
 
 # Prepare the B candidates
-reconDecay('B0 -> J/psi K_S0', '5.2 < M < 5.4')
+reconstructDecay('B0 -> J/psi K_S0', '5.2 < M < 5.4')
 matchMCTruth('B0')
 
 # ----> NtupleMaker module

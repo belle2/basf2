@@ -40,7 +40,7 @@ from basf2 import *
 from modularAnalysis import inputMdst
 from modularAnalysis import loadReconstructedParticles
 from modularAnalysis import fillParticleList
-from modularAnalysis import reconDecay
+from modularAnalysis import reconstructDecay
 from modularAnalysis import copyLists
 from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
@@ -74,21 +74,21 @@ stdLooseMu()
 stdPi0()
 
 # 1. reconstruct D0 in multiple decay modes
-reconDecay('D0:ch1 -> K-:loose pi+:loose', '1.8 < M < 1.9', 1)
-reconDecay('D0:ch2 -> K-:loose pi+:loose pi0:good', '1.8 < M < 1.9', 2)
-reconDecay('D0:ch3 -> K-:loose pi+:loose pi+:loose pi-:loose', '1.8 < M < 1.9', 3)
-reconDecay('D0:ch4 -> K-:loose K+:loose', '1.8 < M < 1.9', 4)
-reconDecay('D0:ch5 -> pi-:loose pi+:loose', '1.8 < M < 1.9', 5)
+reconstructDecay('D0:ch1 -> K-:loose pi+:loose', '1.8 < M < 1.9', 1)
+reconstructDecay('D0:ch2 -> K-:loose pi+:loose pi0:good', '1.8 < M < 1.9', 2)
+reconstructDecay('D0:ch3 -> K-:loose pi+:loose pi+:loose pi-:loose', '1.8 < M < 1.9', 3)
+reconstructDecay('D0:ch4 -> K-:loose K+:loose', '1.8 < M < 1.9', 4)
+reconstructDecay('D0:ch5 -> pi-:loose pi+:loose', '1.8 < M < 1.9', 5)
 
 # merge the D0 lists together into one single list
 copyLists('D0:all', ['D0:ch1', 'D0:ch2', 'D0:ch3', 'D0:ch4', 'D0:ch5'])
 
 # 2. reconstruct Btag+ -> anti-D0 pi+
-reconDecay('B+:tag -> anti-D0:all pi+:loose', '5.2 < Mbc < 5.29 and abs(deltaE) < 1.0', 1)
+reconstructDecay('B+:tag -> anti-D0:all pi+:loose', '5.2 < Mbc < 5.29 and abs(deltaE) < 1.0', 1)
 matchMCTruth('B+:tag')
 
 # 3. reconstruct Upsilon(4S) -> Btag+ Bsig- -> Btag+ mu-
-reconDecay('Upsilon(4S) -> B-:tag mu+:loose', "")
+reconstructDecay('Upsilon(4S) -> B-:tag mu+:loose', "")
 
 # perform MC matching (MC truth asociation)
 matchMCTruth('Upsilon(4S)')

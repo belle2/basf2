@@ -21,7 +21,7 @@
 from basf2 import *
 from modularAnalysis import inputMdstList
 from modularAnalysis import loadReconstructedParticles
-from modularAnalysis import reconDecay
+from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
@@ -61,12 +61,12 @@ stdLoosePi()
 
 # reconstruct rho -> pi+ pi- decay
 # keep only candidates with 0.6 < M(pi+pi-) < 1.0 GeV
-reconDecay('rho0 -> pi+:loose pi-:loose', '0.6 < M < 1.0')
+reconstructDecay('rho0 -> pi+:loose pi-:loose', '0.6 < M < 1.0')
 
 # reconstruct B0 -> rho0 gamma decay
 # keep only candidates with Mbc > 5.2 GeV
 # and -2 < Delta E < 2 GeV
-reconDecay('B0 -> rho0 gamma:highE', '5.2 < Mbc < 5.29 and abs(deltaE) < 2.0')
+reconstructDecay('B0 -> rho0 gamma:highE', '5.2 < Mbc < 5.29 and abs(deltaE) < 2.0')
 
 # perform MC matching (MC truth asociation)
 matchMCTruth('B0')

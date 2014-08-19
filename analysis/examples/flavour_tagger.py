@@ -21,9 +21,9 @@ loadReconstructedParticles(path=main)
 selectParticle('mu+', 'muid >= 0.5', path=main)
 selectParticle('pi+', 'piid >= 0.5', path=main)
 
-reconDecay('J/psi -> mu+ mu-', '3.0<=M<=3.2', 1, path=main)
-reconDecay('K_S0 -> pi+ pi-', '0.25<=M<=0.75', 1, path=main)
-reconDecay('B0 -> K_S0 J/psi', '5.2 <= M <= 5.4', 1, path=main)
+reconstructDecay('J/psi -> mu+ mu-', '3.0<=M<=3.2', 1, path=main)
+reconstructDecay('K_S0 -> pi+ pi-', '0.25<=M<=0.75', 1, path=main)
+reconstructDecay('B0 -> K_S0 J/psi', '5.2 <= M <= 5.4', 1, path=main)
 matchMCTruth('B0', path=main)
 
 # Tag side B_tag
@@ -87,8 +87,8 @@ for (symbol, category) in trackLevelParticles:
         applyCuts('K+:ROE', '0.1<Kid', path=roe_path)
         selectParticle(particleListKShort, 'isInRestOfEvent > 0.5',
                        path=roe_path)
-        reconDecay('K_S0:ROE -> pi+:inKaonRoe pi-:inKaonRoe', '0.40<=M<=0.60',
-                   1, path=roe_path)
+        reconstructDecay('K_S0:ROE -> pi+:inKaonRoe pi-:inKaonRoe',
+                         '0.40<=M<=0.60', 1, path=roe_path)
         fitVertex('K_S0:ROE', 0.01)
         # modify confidence level?!
 

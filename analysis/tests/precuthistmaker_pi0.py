@@ -37,7 +37,7 @@ main.add_module(histmaker)
 #b) make all  combinations and save only signal
 
 #essentially no cuts here, which makes it slow
-reconDecay('pi0 -> gamma gamma', '', 0, path=main)
+reconstructDecay('pi0 -> gamma gamma', '', 0, path=main)
 matchMCTruth('pi0', path=main)
 
 ntupler = register_module('VariablesToNtuple')

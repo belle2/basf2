@@ -340,7 +340,7 @@ def applyCuts(list_name, cut, path=analysis_main):
     path.add_module(pselect)
 
 
-def reconDecay(
+def reconstructDecay(
     decayString,
     cut,
     dmID=0,

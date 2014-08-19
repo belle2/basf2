@@ -33,8 +33,8 @@ def stdK(path=analysis_main):
 
 def stdPi0(path=analysis_main):
     goodPhoton(path)
-    reconDecay('pi0:all -> gamma:good gamma:good', '0.11 < M < 0.16', 1,
-               True, path)
+    reconstructDecay('pi0:all -> gamma:good gamma:good', '0.11 < M < 0.16', 1,
+                     True, path)
     massKFit('pi0:all', 0.0, '', path)
     matchMCTruth('pi0:all', path)
 
@@ -79,3 +79,5 @@ def goodPhoton(path=analysis_main):
 def stdHighEPhoton(path=analysis_main):
     stdPhoton(path)
     cutAndCopyList('gamma:highE', 'gamma:all', '1.5 < E < 100', True, path)
+
+

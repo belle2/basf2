@@ -13,15 +13,17 @@ def stdLightMesons(path=analysis_main):
 
 
 def stdLooseKS0(path=analysis_main):
-    reconDecay('K_S0:loose -> pi-:loose pi+:loose', '0.4 < M < 0.6', 1, True,
-               path)
+    reconstructDecay('K_S0:loose -> pi-:loose pi+:loose', '0.4 < M < 0.6', 1,
+                     True, path)
 
 
 def stdRho(path=analysis_main):
-    reconDecay('rho0:loose -> pi-:loose pi+:loose', '0.5 < M < 1.0', 1, True,
-               path)
+    reconstructDecay('rho0:loose -> pi-:loose pi+:loose', '0.5 < M < 1.0', 1,
+                     True, path)
 
 
 def stdKstar(path=analysis_main):
-    reconDecay('K*0:loose -> pi-:loose K+:loose', '0.8 < M < 1.1', 1, True,
-               path)
+    reconstructDecay('K*0:loose -> pi-:loose K+:loose', '0.8 < M < 1.1', 1,
+                     True, path)
+
+

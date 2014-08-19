@@ -26,7 +26,7 @@
 from basf2 import *
 from modularAnalysis import inputMdstList
 from modularAnalysis import loadReconstructedParticles
-from modularAnalysis import reconDecay
+from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
@@ -54,7 +54,7 @@ stdPi0()
 
 # reconstruct D0 -> pi0 pi0 decay
 # keep only candidates with 1.7 < M(pi0pi0) < 2.0 GeV
-reconDecay('D0:pi0pi0 -> pi0:good pi0:good', '1.7 < M < 2.0')
+reconstructDecay('D0:pi0pi0 -> pi0:good pi0:good', '1.7 < M < 2.0')
 
 # perform mass fit using KFit
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
@@ -63,7 +63,7 @@ massKFit('D0:pi0pi0', 0.0)
 # reconstruct B0 -> D0 pi0 decay
 # keep only candidates with Mbc > 5.24 GeV
 # and -1 < Delta E < 1 GeV
-reconDecay('B0:all -> D0:pi0pi0 pi0:good', '5.24 < Mbc < 5.29 and abs(deltaE) < 1.0')
+reconstructDecay('B0:all -> D0:pi0pi0 pi0:good', '5.24 < Mbc < 5.29 and abs(deltaE) < 1.0')
 
 # perform MC matching (MC truth asociation)
 matchMCTruth('B0:all')

@@ -33,7 +33,7 @@ namespace Belle2 {
     ParticleExtraInfoMap(): TObject() { }
 
     /** Return reference to map with given ID. */
-    IndexMap& getMap(unsigned int mapID) { return m_maps[mapID]; }
+    const IndexMap& getMap(unsigned int mapID) const { return m_maps[mapID]; }
 
     /** Find index for name in the given map, or return 0 if not found. */
     unsigned int getIndex(unsigned int mapID, const std::string& name) const;
@@ -54,8 +54,8 @@ namespace Belle2 {
     unsigned int getNMaps() const { return m_maps.size(); }
 
   private:
-    /** check if all entries in 'oldMap' prior to insertIndex are found in 'map'. */
-    static bool compatible(const IndexMap& oldMap, const IndexMap& map, unsigned int insertIndex);
+    /** check if all entries in 'oldMap' prior to insertIndex are found in 'map' (with same idx). */
+    static bool isCompatible(const IndexMap& oldMap, const IndexMap& map, unsigned int insertIndex);
 
     std::vector<IndexMap> m_maps; /**< List of string -> index maps. */
 

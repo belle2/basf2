@@ -20,13 +20,9 @@ unsigned int ParticleExtraInfoMap::getMapForNewVar(const std::string& name)
 {
   const unsigned int insertIndex = 1; //0 reserved
   for (unsigned int iMap = 0; iMap < m_maps.size(); iMap++) {
-    try {
-      if (m_maps[iMap].at(name) == insertIndex) {
-        return iMap;
-      }
-    } catch (...) {
-      //not found, ok.
-    }
+    const auto it = m_maps[iMap].find(name);
+    if (it != m_maps[iMap].end() and it->second == insertIndex)
+      return iMap;
   }
   //nothing found, add new map
   IndexMap map;
@@ -57,16 +53,13 @@ unsigned int ParticleExtraInfoMap::getMapForNewVar(const std::string& name, unsi
 
   for (unsigned int iMap = 0; iMap < m_maps.size(); iMap++) {
     const IndexMap& map = m_maps[iMap];
-    try {
-      if (map.at(name) == insertIndex) {
-        //seems promising
-        if (compatible(oldMap, map, insertIndex)) {
-          //compatible with oldMap, can be used
-          return iMap;
-        }
+    const auto it = map.find(name);
+    if (it != map.end() and it->second == insertIndex) {
+      //seems promising
+      if (isCompatible(oldMap, map, insertIndex)) {
+        //compatible with oldMap, can be used
+        return iMap;
       }
-    } catch (...) {
-      continue; //some key wasn't found, got to next map
     }
   }
 
@@ -83,11 +76,12 @@ unsigned int ParticleExtraInfoMap::getMapForNewVar(const std::string& name, unsi
   return m_maps.size() - 1;
 }
 
-bool ParticleExtraInfoMap::compatible(const IndexMap& oldMap, const IndexMap& map, unsigned int insertIndex)
+bool ParticleExtraInfoMap::isCompatible(const IndexMap& oldMap, const IndexMap& map, unsigned int insertIndex)
 {
   for (const auto & pair : oldMap) {
     if (pair.second < insertIndex) {
-      if (map.at(pair.first) != pair.second) {
+      const auto it = map.find(pair.first);
+      if (it == map.end() or it->second != pair.second) {
         //mismatch
         return false;
       }

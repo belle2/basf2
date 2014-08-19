@@ -238,7 +238,7 @@ namespace Belle2 {
 
     TLorentzVector vec(0., 0., 0., 0.);
     for (unsigned i = 0; i < m_particles.size(); i++) {
-      vec = vec + m_particles[i]->get4Vector();
+      vec += m_particles[i]->get4Vector();
     }
 
     switch (iParticleType) {

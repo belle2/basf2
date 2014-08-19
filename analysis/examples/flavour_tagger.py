@@ -10,6 +10,7 @@
 
 from basf2 import *
 from modularAnalysis import *
+import variables as mc_variables
 from ROOT import Belle2
 import os
 
@@ -159,15 +160,17 @@ if eventLevelReady:
 
 combinerLevelReady = eventLevelReady
 if combinerLevelReady:
-    variables = ['bestQRKaon', 'bestQRSlowPion', 'bestQRElectron', 'bestQRMuon'
-                 ]
+    variables = ['QRElectron', 'QRMuon', 'QRKaon', 'QRSlowPion']
+    method_Combiner = [('FastBDT', 'Plugin',
+                       '!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3'
+                       )]
     if not isTMVAMethodAvailable(workingDirectory + '/' + 'B0Tagger'):
         trainTMVAMethod(
             [],
             variables=variables,
             target='qr_Combined',
             prefix='B0Tagger',
-            methods=methods,
+            methods=method_Combiner,
             workingDirectory=workingDirectory,
             path=roe_path,
             )
@@ -177,11 +180,33 @@ if combinerLevelReady:
             [],
             signalProbabilityName='qr_Combined',
             prefix='B0Tagger',
-            method=methods[0][0],
+            signalClass=1,
+            method=method_Combiner[0][0],
             signalFraction=signalFraction,
             workingDirectory=workingDirectory,
             path=roe_path,
             )
+
+if combinerLevelReady:
+
+
+    class MoveTaggerInformationToBExtraInfoModule(Module):
+
+        def event(self):
+            roe = Belle2.PyStoreObj('RestOfEvent')
+            info = Belle2.PyStoreObj('EventExtraInfo')
+            instance = Belle2.PyStoreObj('EventExtraInfo')
+            someParticle = Belle2.Particle(None)
+            qr_Combined = 2 * (info.obj().getExtraInfo('qr_Combined') - 0.5)
+            qr_MC = 2 * (mc_variables.variables.evaluate('qr_Combined',
+                         someParticle) - 0.5)
+            particle = roe.obj().getRelated('Particles')
+            particle.addExtraInfo('qr_Combined', qr_Combined)
+            particle.addExtraInfo('qr_MC', qr_MC)
+            info.obj().removeExtraInfo()
+
+
+    roe_path.add_module(MoveTaggerInformationToBExtraInfoModule())
 
 
     class RemoveExtraInfoModule(Module):
@@ -196,28 +221,12 @@ if combinerLevelReady:
 
     roe_path.add_module(RemoveExtraInfoModule())
 
-if combinerLevelReady:
-
-
-    class MoveTaggerInformationToBExtraInfoModule(Module):
-
-        def event(self):
-            roe = Belle2.PyStoreObj('RestOfEvent')
-            info = Belle2.PyStoreObj('EventExtraInfo')
-            qr_Combined = info.obj().getExtraInfo('qr_Combined')
-            particle = roe.obj().getRelated('Particles')
-            particle.addExtraInfo('qr_Combined', qr_Combined)
-            info.obj().removeExtraInfo()
-
-
-    roe_path.add_module(MoveTaggerInformationToBExtraInfoModule())
-
 main.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 if combinerLevelReady:
-    variablesToNTuple('B0', 'getExtraInfo(qr_Combined)', 'TaggingInformation',
-                      'B0_B0bar_final.root', path=main)
-
+    variablesToNTuple('B0', ['getExtraInfo(qr_Combined)', 'getExtraInfo(qr_MC)'
+                      ], 'TaggingInformation', workingDirectory
+                      + '/B0_B0bar_final.root', path=main)
 main.add_module(register_module('ProgressBar'))
 process(main)
 print statistics

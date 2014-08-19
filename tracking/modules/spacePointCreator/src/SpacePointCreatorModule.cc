@@ -47,14 +47,9 @@ SpacePointCreatorModule::SpacePointCreatorModule() : Module()
 void SpacePointCreatorModule::initialize()
 {
   // prepare all store- and relationArrays:
-  StoreArray<PXDCluster> pxdClusters(m_pxdClustersName);
-  StoreArray<SVDCluster> svdClusters(m_svdClustersName);
-  StoreArray<SpacePoint> spacePoints(m_spacePointsName);
-
-
-  spacePoints.registerInDataStore(DataStore::c_DontWriteOut);
-  pxdClusters.isOptional();
-  svdClusters.isOptional();
+  m_spacePoints.registerInDataStore(m_spacePointsName, DataStore::c_DontWriteOut);
+  m_pxdClusters.isOptional(m_pxdClustersName);
+  m_svdClusters.isOptional(m_svdClustersName);
 
 
   //prepare collecting info for SpacePoints:
@@ -62,13 +57,13 @@ void SpacePointCreatorModule::initialize()
   vector<string> collectionNames; // will contain the names of the cluster storeArrays
 
 
-  if (pxdClusters.isOptional() == true) {
+  if (m_pxdClusters.isOptional() == true) {
 
     //Relations to cluster objects only if the ancestor relations exist:
-    spacePoints.registerRelationTo(pxdClusters, DataStore::c_Event, DataStore::c_DontWriteOut);
+    m_spacePoints.registerRelationTo(m_pxdClusters, DataStore::c_Event, DataStore::c_DontWriteOut);
 
     // retrieve name again (faster than doing everything in the event):
-    m_pxdClustersName = pxdClusters.getName();
+    m_pxdClustersName = m_pxdClusters.getName();
 
     // prepare metaInfo for the SpacePoints containing the names for the Cluster-Containers:
     collectionNames.push_back(m_pxdClustersName);
@@ -78,13 +73,13 @@ void SpacePointCreatorModule::initialize()
   }
 
 
-  if (svdClusters.isOptional() == true) {
+  if (m_svdClusters.isOptional() == true) {
 
     //Relations to cluster objects only if the ancestor relations exist:
-    spacePoints.registerRelationTo(svdClusters, DataStore::c_Event, DataStore::c_DontWriteOut);
+    m_spacePoints.registerRelationTo(m_svdClusters, DataStore::c_Event, DataStore::c_DontWriteOut);
 
     // retrieve name again (faster than doing everything in the event):
-    m_svdClustersName = svdClusters.getName();
+    m_svdClustersName = m_svdClusters.getName();
 
     // prepare metaInfo for the SpacePoints containing the names for the Cluster-Containers:
     collectionNames.push_back(m_svdClustersName);
@@ -95,7 +90,7 @@ void SpacePointCreatorModule::initialize()
 
 
   // retrieve name for spacePoint too (faster than doing everything in the event):
-  m_spacePointsName = spacePoints.getName();
+  m_spacePointsName = m_spacePoints.getName();
 
 
   // store the collected names in the MetaInfo of the SpacePoints:
@@ -118,36 +113,29 @@ void SpacePointCreatorModule::initialize()
 
 void SpacePointCreatorModule::event()
 {
-  const StoreArray<PXDCluster> pxdClusters(m_pxdClustersName);
-  const StoreArray<SVDCluster> svdClusters(m_svdClustersName);
 
-  StoreArray<SpacePoint> spacePoints(m_spacePointsName);
-  spacePoints.clear();
-
-  for (unsigned int i = 0; i < uint(pxdClusters.getEntries()); ++i) {
-    SpacePoint* newSP = spacePoints.appendNew((pxdClusters[i]), i, m_pxdClustersIndex);
-    newSP->addRelationTo(pxdClusters[i]);
+  for (unsigned int i = 0; i < uint(m_pxdClusters.getEntries()); ++i) {
+    SpacePoint* newSP = m_spacePoints.appendNew((m_pxdClusters[i]), i, m_pxdClustersIndex);
+    newSP->addRelationTo(m_pxdClusters[i]);
   }
 
 
   if (m_onlySingleClusterSpacePoints == true) {
-    provideSVDClusterSingles(svdClusters, spacePoints, m_svdClustersIndex); /// WARNING TODO: missing: possibility to allow storing of u- or v-type clusters only!
+    provideSVDClusterSingles(m_svdClusters, m_spacePoints, m_svdClustersIndex); /// WARNING TODO: missing: possibility to allow storing of u- or v-type clusters only!
   } else {
-    provideSVDClusterCombinations(svdClusters, spacePoints, m_svdClustersIndex);
+    provideSVDClusterCombinations(m_svdClusters, m_spacePoints, m_svdClustersIndex);
   }
 
 
-
-
   B2DEBUG(1, "SpacePointCreatorModule(" << m_nameOfInstance << ")::event: spacePoints for single SVDClusters created! Size of arrays:\n" <<
-          "pxdClusters: " << pxdClusters.getEntries() <<
-          ", svdClusters: " << svdClusters.getEntries() <<
-          ", spacePoints: " << spacePoints.getEntries())
+          "pxdClusters: " << m_pxdClusters.getEntries() <<
+          ", svdClusters: " << m_svdClusters.getEntries() <<
+          ", spacePoints: " << m_spacePoints.getEntries())
 
 
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 10, PACKAGENAME()) == true) {
-    for (int index = 0; index < spacePoints.getEntries(); index++) {
-      const SpacePoint* sp = spacePoints[index];
+    for (int index = 0; index < m_spacePoints.getEntries(); index++) {
+      const SpacePoint* sp = m_spacePoints[index];
 
       B2DEBUG(10, "SpacePointCreatorModule(" << m_nameOfInstance << ")::event: spacePoint " << index <<
               " with type " << sp->getType() <<
@@ -159,9 +147,9 @@ void SpacePointCreatorModule::event()
 
   /// WARNING TODO next steps: think about mcParticle-relations and how to deal with multi-pass-setups, create container like VXDTFTrackCandidate compatible with spacePoints
 
-  m_TESTERPXDClusterCtr += pxdClusters.getEntries();
-  m_TESTERSVDClusterCtr += svdClusters.getEntries();
-  m_TESTERSpacePointCtr += spacePoints.getEntries();
+  m_TESTERPXDClusterCtr += m_pxdClusters.getEntries();
+  m_TESTERSVDClusterCtr += m_svdClusters.getEntries();
+  m_TESTERSpacePointCtr += m_spacePoints.getEntries();
 }
 
 

@@ -5,6 +5,8 @@ import os
 import shutil
 from basf2 import *
 
+logging.log_level = LogLevel.ERROR
+
 from basf2 import Module
 from ROOT import Belle2
 
@@ -39,7 +41,6 @@ geometry = register_module('Geometry')
 pgun = register_module('ParticleGun')
 g4sim = register_module('FullSim')
 # make the simulation less noisy
-g4sim.logging.log_level = LogLevel.ERROR
 
 main = create_path()
 

@@ -17,6 +17,11 @@ std::string Belle2::Variable::makeROOTCompatible(std::string str)
   return str;
 }
 
+bool almostEqualFloat(const float& a, const float& b)
+{
+  assert(sizeof(float) == sizeof(int));
+  return abs(*(int*)&a - * (int*)&b) <= 2;
+}
 
 unsigned long int Belle2::Variable::findMatchedParenthesis(std::string str, char open, char close)
 {
@@ -176,6 +181,18 @@ bool Belle2::Variable::Cut::processBinaryNumericConditions(std::string str)
     right = new Cut(str.substr(pos + 1));
     return true;
   }
+  if ((pos =  str.find("==")) != std::string::npos) {
+    operation = EQ;
+    left = new Cut(str.substr(0, pos));
+    right = new Cut(str.substr(pos + 2));
+    return true;
+  }
+  if ((pos =  str.find("!=")) != std::string::npos) {
+    operation = NE;
+    left = new Cut(str.substr(0, pos));
+    right = new Cut(str.substr(pos + 2));
+    return true;
+  }
 
   return false;
 }
@@ -185,24 +202,17 @@ bool Belle2::Variable::Cut::processTernaryNumericConditions(std::string str)
 
   unsigned long int pos1 = 0;
   unsigned long int pos2 = 0;
-  if (((pos1 =  str.find("<")) != std::string::npos) and
-      ((pos2 =  str.find("<", pos1 + 1)) != std::string::npos or (pos2 =  str.find(">", pos1 + 1)) != std::string::npos)) {
-    operation = AND;
-    left = new Cut(str.substr(0, pos2));
-    if (str[pos1 + 1] == '=')
-      pos1++;
-    right = new Cut(str.substr(pos1 + 1));
-    return true;
-  }
-
-  if (((pos1 =  str.find(">")) != std::string::npos) and
-      ((pos2 =  str.find("<", pos1 + 1)) != std::string::npos or (pos2 =  str.find(">", pos1 + 1)) != std::string::npos)) {
-    operation = AND;
-    left = new Cut(str.substr(0, pos2));
-    if (str[pos1 + 1] == '=')
-      pos1++;
-    right = new Cut(str.substr(pos1 + 1));
-    return true;
+  for (auto & c : {"<", ">", "!", "="}) {
+    if (((pos1 =  str.find(c)) != std::string::npos) and
+        ((pos2 =  str.find("<", pos1 + 2)) != std::string::npos or (pos2 =  str.find(">", pos1 + 2)) != std::string::npos
+         or (pos2 =  str.find("!", pos1 + 2)) != std::string::npos or (pos2 =  str.find("=", pos1 + 2)) != std::string::npos)) {
+      operation = AND;
+      left = new Cut(str.substr(0, pos2));
+      if (str[pos1 + 1] == '=')
+        pos1++;
+      right = new Cut(str.substr(pos1 + 1));
+      return true;
+    }
   }
 
   return false;
@@ -227,6 +237,10 @@ bool Belle2::Variable::Cut::check(const Particle* p)
       return left->get(p) > right->get(p);
     case GE:
       return left->get(p) >= right->get(p);
+    case EQ:
+      return almostEqualFloat(left->get(p), right->get(p));
+    case NE:
+      return not almostEqualFloat(left->get(p), right->get(p));
   }
   throw std::runtime_error("Cut string has an invalid format: Invalid Operation");
   return false;
@@ -257,6 +271,8 @@ void Belle2::Variable::Cut::print()
     case LE: std::cout << "LE" << std::endl; break;
     case GT: std::cout << "GT" << std::endl; break;
     case GE: std::cout << "GE" << std::endl; break;
+    case EQ: std::cout << "EQ" << std::endl; break;
+    case NE: std::cout << "NE" << std::endl; break;
   }
   if (left != nullptr) {
     std::cout << "Left " << std::endl;

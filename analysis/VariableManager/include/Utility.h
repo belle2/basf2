@@ -57,7 +57,7 @@ namespace Belle2 {
      *
      * Valid cuts can contain:
      * 1. Logic conditions: and, or
-     * 2. Numeric conditions: <, <=, >, >=
+     * 2. Numeric conditions: <, <=, >, >=, ==, !=
      * 3. Parenthesis []
      * 4. Floats
      * 5. Variables registered in the VariableManager
@@ -67,6 +67,8 @@ namespace Belle2 {
      * daughter0(M) < daughter1(M)
      * [M > 1.5 or M < 0.5] and 0.2 < getExtraInfo(SignalProbability) < 0.7
      *
+     * == and != conditions are evaluated not exactly because we deal with flaoting point values
+     * instead two floating point number are equal if their distance in their integral ordering is less than 3.
      */
     class Cut {
 
@@ -149,6 +151,8 @@ namespace Belle2 {
         LE,
         GT,
         GE,
+        EQ,
+        NE,
       };
 
       Cut* left; /**< Left-side cut */

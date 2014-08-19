@@ -18,10 +18,11 @@ def inputMdst(filename, path=analysis_main):
     roinput = register_module('RootInput')
     roinput.param('inputFileName', filename)
     path.add_module(roinput)
-    gearbox = register_module('Gearbox')
-    path.add_module(gearbox)
     progress = register_module('Progress')
     path.add_module(progress)
+
+    gearbox = register_module('Gearbox')
+    path.add_module(gearbox)
 
 
 def inputMdstList(filelist, path=analysis_main):
@@ -35,10 +36,11 @@ def inputMdstList(filelist, path=analysis_main):
     roinput = register_module('RootInput')
     roinput.param('inputFileNames', filelist)
     path.add_module(roinput)
-    gearbox = register_module('Gearbox')
-    path.add_module(gearbox)
     progress = register_module('Progress')
     path.add_module(progress)
+
+    gearbox = register_module('Gearbox')
+    path.add_module(gearbox)
 
 
 def outputMdst(filename, path=analysis_main):

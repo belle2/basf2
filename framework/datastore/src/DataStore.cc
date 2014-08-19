@@ -158,10 +158,12 @@ bool DataStore::registerRelation(const StoreAccessorBase& fromArray, const Store
     B2FATAL(toArray.readableName() << " is not an array!");
 
   const std::string& relName = relationName(fromArray.getName(), toArray.getName());
+  /*
   if ((fromArray.notWrittenOut() or toArray.notWrittenOut()) and !(storeFlags & c_DontWriteOut)) {
     B2WARNING("You're trying to register a persistent relation " << relName << " from/to an array which is not written out (DataStore::c_DontWriteOut flag)! Relation will also not be saved!");
     storeFlags |= c_DontWriteOut;
   }
+  */
 
   if (fromArray.getDurability() > durability or toArray.getDurability() > durability) {
     B2FATAL("Tried to create a relation '" << relName << "' with a durability larger than the StoreArrays it relates");

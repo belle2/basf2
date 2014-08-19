@@ -58,7 +58,7 @@
     <Variable VarIndex="0" Expression="p_CMS" Label="p_CMS" Title="p_CMS" Unit="" Internal="p_CMS" Type="F" Min="6.38258643e-04" Max="3.04221420e+01"/>
     <Variable VarIndex="1" Expression="cosTheta" Label="cosTheta" Title="cosTheta" Unit="" Internal="cosTheta" Type="F" Min="-9.99998927e-01" Max="9.99995768e-01"/>
     <Variable VarIndex="2" Expression="ErrM" Label="ErrM" Title="ErrM" Unit="" Internal="ErrM" Type="F" Min="4.70399531e-03" Max="1.59342560e+02"/>
-    <Variable VarIndex="3" Expression="decayAngle" Label="decayAngle" Title="decayAngle" Unit="" Internal="decayAngle" Type="F" Min="-9.99971807e-01" Max="9.99974906e-01"/>
+    <Variable VarIndex="3" Expression="decayAngle0" Label="decayAngle0" Title="decayAngle0" Unit="" Internal="decayAngle0" Type="F" Min="-9.99971807e-01" Max="9.99974906e-01"/>
     <Variable VarIndex="4" Expression="daughter0E" Label="daughter0E" Title="daughter0E" Unit="" Internal="daughter0E" Type="F" Min="6.00000396e-02" Max="3.67101021e+01"/>
     <Variable VarIndex="5" Expression="daughter1E" Label="daughter1E" Title="daughter1E" Unit="" Internal="daughter1E" Type="F" Min="6.00000396e-02" Max="3.67101021e+01"/>
     <Variable VarIndex="6" Expression="daughter0clusterE9E25" Label="daughter0clusterE9E25" Title="daughter0clusterE9E25" Unit="" Internal="daughter0clusterE9E25" Type="F" Min="2.41658650e-02" Max="1.00000000e+00"/>

@@ -228,23 +228,6 @@ namespace Belle2 {
       return static_cast<T*>((*m_storeArray)->At(i));
     }
 
-    /** Returns address of the next free position of the array.
-     *
-     *  To add an element to the array, use:
-     *  \code
-        new (myStoreArray.nextFreeAddress()) T(some ctor arguments);
-        \endcode
-     *  which constructs a new T object at the end of myStoreArray.
-     *
-     *  \warning Legacy function, use the much safer
-     *           appendNew(some ctor arguments) instead.
-     *
-     *  \return pointer to address just past the last array element
-     */
-    inline T* nextFreeAddress() __attribute__((deprecated("Please use StoreArray::appendNew(ctor arguments...) instead of placement-new."))) {
-      return nextFreeAddress_internal();
-    }
-
     /** Construct a new T object at the end of the array.
      *
      *  Appends a new object to the array, and returns a pointer so
@@ -253,7 +236,7 @@ namespace Belle2 {
      *
      *  \return pointer to the created object
      */
-    inline T* appendNew() { return new(nextFreeAddress_internal()) T(); }
+    inline T* appendNew() { return new(nextFreeAdress()) T(); }
 
     /** Construct a new T object directly at the end of the array.
      *
@@ -276,7 +259,7 @@ namespace Belle2 {
      *  \return pointer to the created object
      */
     template<class ...Args> T* appendNew(Args&& ... params) {
-      return new(nextFreeAddress_internal()) T(std::forward<Args>(params)...);
+      return new(nextFreeAdress()) T(std::forward<Args>(params)...);
     }
 
 
@@ -307,11 +290,9 @@ namespace Belle2 {
   private:
     /** Returns address of the next free position of the array.
      *
-     * TODO: rename to nextFreeAddress() once the public function is removed.
-     *
      *  \return pointer to address just past the last array element
      */
-    inline T* nextFreeAddress_internal() {
+    inline T* nextFreeAdress() {
       ensureCreated();
       return static_cast<T*>((*m_storeArray)->AddrAt(getEntries()));
     }

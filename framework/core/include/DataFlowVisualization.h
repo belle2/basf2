@@ -24,29 +24,28 @@ namespace Belle2 {
     /** Constructor. */
     DataFlowVisualization(const std::map<std::string, DataStore::ModuleInfo>& moduleInfo);
 
-    /** Create graphs with datastore inputs/outputs of each module
+    /** Create graphs with datastore inputs/outputs of each module in path
      *
      * @param filename         file saved to (in DOT format).
-     * @param path             main module path of steering file.
-     * @param steeringFileFlow create single graph showing data flow in current steering file.
+     * @param path             Path to visualize.
      * */
-    void generateModulePlots(const std::string& filename, const Path& path, bool steeringFileFlow = false);
-
-    /** Create I/O graph for a single module (written to file). */
-    void generateModulePlot(std::ofstream& file, const std::string& module, bool steeringFileFlow = false);
-
-    /** Create a subgraph for the given Path (including conditional paths). */
-    void plotPath(std::ofstream& file, const Path& path, const std::string& pathName = "");
+    void visualizePath(const std::string& filename, const Path& path);
 
     /** Create independent I/O graph for a single module (without requiring a steering file).
      *
      * Output will be saved to ModuleName.dot.
      */
     static void executeModuleAndCreateIOPlot(const std::string& module);
+  private:
+    /** Create I/O graph for a single module (written to file). */
+    void generateModulePlot(std::ofstream& file, const std::string& module, bool steeringFileFlow = false);
+
+    /** Create a subgraph for the given Path (including conditional paths). */
+    void plotPath(std::ofstream& file, const Path& path, const std::string& pathName = "");
 
     /** If the given array name isn't found in any of info's fields, it is added to m_unknownArrays (and true returned).*/
     bool checkArrayUnknown(const std::string& name, const DataStore::ModuleInfo& info);
-  private:
+
     /** Stores information on inputs/outputs of each module, as obtained by require()/createEntry(); */
     const std::map<std::string, DataStore::ModuleInfo>& m_moduleInfo;
 

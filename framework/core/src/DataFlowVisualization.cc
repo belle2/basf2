@@ -36,42 +36,40 @@ DataFlowVisualization::DataFlowVisualization(const std::map<std::string, DataSto
   m_arrowcolor[MInfo::c_Output] = "firebrick";
 }
 
-void DataFlowVisualization::generateModulePlots(const std::string& filename, const Path& path, bool steeringFileFlow)
+void DataFlowVisualization::visualizePath(const std::string& filename, const Path& path)
 {
   std::ofstream file(filename.c_str());
-  if (steeringFileFlow) {
-    file << "digraph allModules {\n";
-    file << "  rankdir=LR;\n"; //left -> right
-    file << "  compound=true;\n"; //allow edges to subgraphs
-  }
+  file << "digraph allModules {\n";
+  file << "  rankdir=LR;\n"; //left -> right
+  file << "  compound=true;\n"; //allow edges to subgraphs
 
   const ModulePtrList& moduleList = path.getModules();
   //for steering file data flow graph, we may get multiple definitions of each node
   //graphviz merges these into the last one, so we'll go through module list in reverse (all boxes should be coloured as outputs)
+  const bool steeringFileFlow = true;
   for (ModulePtrList::const_reverse_iterator it = moduleList.rbegin(); it != moduleList.rend(); ++it) {
     const std::string& name = (*it)->getName();
     generateModulePlot(file, name, steeringFileFlow);
   }
 
-  if (steeringFileFlow) {
-    plotPath(file, path);
+  plotPath(file, path);
 
-    //add nodes
-    for (std::set<std::string>::const_iterator it = m_allOutputs.begin(); it != m_allOutputs.end(); ++it) {
-      file << "  \"" << *it << "\" [shape=box,style=filled,fillcolor=" << m_fillcolor[MInfo::c_Output] << "];\n";
-    }
-    for (std::set<std::string>::const_iterator it = m_allInputs.begin(); it != m_allInputs.end(); ++it) {
-      if (m_allOutputs.count(*it) == 0)
-        file << "  \"" << *it << "\" [shape=box,style=filled,fillcolor=" << m_fillcolor[MInfo::c_Input] << "];\n";
-    }
-    for (std::set<std::string>::const_iterator it = m_unknownArrays.begin(); it != m_unknownArrays.end(); ++it) {
-      if (m_allOutputs.count(*it) == 0 && m_allInputs.count(*it) == 0)
-        file << "  \"" << *it << "\" [shape=box,style=filled,fillcolor=" << unknownfillcolor << "];\n";
-    }
-
-
-    file << "}\n\n";
+  //add nodes
+  for (std::set<std::string>::const_iterator it = m_allOutputs.begin(); it != m_allOutputs.end(); ++it) {
+    file << "  \"" << *it << "\" [shape=box,style=filled,fillcolor=" << m_fillcolor[MInfo::c_Output] << "];\n";
   }
+  for (std::set<std::string>::const_iterator it = m_allInputs.begin(); it != m_allInputs.end(); ++it) {
+    if (m_allOutputs.count(*it) == 0)
+      file << "  \"" << *it << "\" [shape=box,style=filled,fillcolor=" << m_fillcolor[MInfo::c_Input] << "];\n";
+  }
+  for (std::set<std::string>::const_iterator it = m_unknownArrays.begin(); it != m_unknownArrays.end(); ++it) {
+    if (m_allOutputs.count(*it) == 0 && m_allInputs.count(*it) == 0)
+      file << "  \"" << *it << "\" [shape=box,style=filled,fillcolor=" << unknownfillcolor << "];\n";
+  }
+
+  file << "}\n\n";
+
+  B2INFO("Data flow diagram created. You can use 'dot dataflow.dot -Tps -o dataflow.ps' to create a PostScript file from it.");
 }
 
 void DataFlowVisualization::plotPath(std::ofstream& file, const Path& path, const std::string& pathName)

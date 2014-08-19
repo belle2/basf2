@@ -101,10 +101,7 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
   //do we want to visualize DataStore input/ouput?
   if (Environment::Instance().getVisualizeDataFlow()) {
     DataFlowVisualization v(DataStore::Instance().getModuleInfoMap());
-    //single graph for entire steering file
-    v.generateModulePlots("dataflow.dot", *startPath, true);
-
-    B2INFO("Data flow diagram created. You can use 'dot dataflow.dot -Tps -o dataflow.ps' to create a PostScript file from it.");
+    v.visualizePath("dataflow.dot", *startPath);
   }
 
   //Don't start processing in case of no master module

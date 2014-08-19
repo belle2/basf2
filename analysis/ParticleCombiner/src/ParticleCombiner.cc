@@ -10,11 +10,9 @@
 
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
 
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 
 #include <algorithm>
@@ -171,7 +169,6 @@ namespace Belle2 {
   bool ParticleGenerator::loadNextParticle(bool useAntiParticle)
   {
 
-    StoreArray<Particle> Particles;
     while (true) {
 
       // Load next index combination if available
@@ -181,9 +178,9 @@ namespace Belle2 {
         const auto& indices = particleIndexGenerator.getCurrentIndices();
 
         for (unsigned int i = 0; i < numberOfLists; i++) {
-          const auto& liste = m_plists[i]->getList(types[i], types[i] == ParticleList::c_FlavorSpecificParticle ? useAntiParticle : false);
-          m_indices[i] =  liste[ indices[i] ];
-          m_particles[i] = Particles[ m_indices[i] ];
+          const auto& list = m_plists[i]->getList(types[i], types[i] == ParticleList::c_FlavorSpecificParticle ? useAntiParticle : false);
+          m_indices[i] =  list[ indices[i] ];
+          m_particles[i] = m_particleArray[ m_indices[i] ];
         }
 
         if (not currentCombinationHasDifferentSources()) continue;
@@ -208,8 +205,6 @@ namespace Belle2 {
 
   bool ParticleGenerator::loadNextSelfConjugatedParticle()
   {
-
-    StoreArray<Particle> Particles;
     while (true) {
 
       // Load next index combination if available
@@ -219,7 +214,7 @@ namespace Belle2 {
 
         for (unsigned int i = 0; i < numberOfLists; i++) {
           m_indices[i] = m_plists[i]->getList(ParticleList::c_SelfConjugatedParticle, false) [ indices[i] ];
-          m_particles[i] = Particles[ m_indices[i] ];
+          m_particles[i] = m_particleArray[ m_indices[i] ];
         }
 
         if (not currentCombinationHasDifferentSources()) continue;
@@ -254,7 +249,7 @@ namespace Belle2 {
   bool ParticleGenerator::currentCombinationHasDifferentSources()
   {
 
-    StoreArray<Particle> Particles;
+    StoreArray<Particle> m_particleArray;
     std::vector<Particle*> stack = m_particles;
     static std::vector<int> sources; // stack for particle sources
     sources.clear();
@@ -270,7 +265,7 @@ namespace Belle2 {
         }
         sources.push_back(source);
       } else {
-        for (unsigned i = 0; i < daughters.size(); i++) stack.push_back(Particles[daughters[i]]);
+        for (unsigned i = 0; i < daughters.size(); i++) stack.push_back(m_particleArray[daughters[i]]);
       }
     }
     return true;

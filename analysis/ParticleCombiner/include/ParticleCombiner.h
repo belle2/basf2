@@ -11,6 +11,7 @@
 #pragma once
 
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/Particle.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -167,6 +168,7 @@ namespace Belle2 {
     ListIndexGenerator listIndexGenerator;   /**< listIndexGenerator makes the combinations of the types of sublists of the ParticleLists */
     ParticleIndexGenerator particleIndexGenerator; /**< particleIndexGenerator makes the combinations of indices stored in the sublists of the ParticleLists */
 
+    const StoreArray<Particle> m_particleArray; /**< Global list of particles. */
     std::vector<Particle*> m_particles; /**< Pointers to the particle objects of the current combination */
     std::vector<int> m_indices;         /**< Indices stored in the ParticleLists of the current combination */
     std::unordered_set<std::set<int>> m_usedCombinations; /**< already used combinations (as sets of indices). */

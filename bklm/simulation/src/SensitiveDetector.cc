@@ -56,11 +56,12 @@ namespace Belle2 {
       StoreArray<MCParticle> particles;
       StoreArray<BKLMSimHit> simHits;
       StoreArray<BKLMSimHitPosition> simHitPositions;
-      RelationArray particleToSimHits(particles, simHits);
-      registerMCParticleRelation(particleToSimHits);
       simHits.registerInDataStore();
       simHitPositions.registerInDataStore();
+      particles.registerRelationTo(simHits);
       simHitPositions.registerRelationTo(simHits);
+      RelationArray particleToSimHits(particles, simHits);
+      registerMCParticleRelation(particleToSimHits);
     }
 
     //-----------------------------------------------------

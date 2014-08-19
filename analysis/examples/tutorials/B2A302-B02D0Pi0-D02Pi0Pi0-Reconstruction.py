@@ -71,7 +71,7 @@ toolsPI0 += ['Kinematics', '^pi0 -> ^gamma ^gamma']
 toolsPI0 += ['MassBeforeFit', '^pi0']
 toolsPI0 += ['EventMetaData', '^pi0']
 toolsPI0 += ['Cluster', 'pi0 -> ^gamma ^gamma']
-toolsPI0 += ['CustomFloats[getExtraInfo(BDT):decayAngle]', '^pi0']
+toolsPI0 += ['CustomFloats[getExtraInfo(BDT):decayAngle(0)]', '^pi0']
 
 # write out the flat ntuple
 ntupleFile('B2A302-B02D0Pi0-D02Pi0Pi0-Reconstruction.root')

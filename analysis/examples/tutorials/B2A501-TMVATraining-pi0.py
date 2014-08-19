@@ -80,11 +80,11 @@ variables = [
     'p_CMS',
     'cosTheta',
     'ErrM',
-    'decayAngle',
-    'daughter0(E)',
-    'daughter1(E)',
-    'daughter0(clusterE9E25)',
-    'daughter1(clusterE9E25)']
+    'decayAngle(0)',
+    'daughter(0,E)',
+    'daughter(1,E)',
+    'daughter(0,clusterE9E25)',
+    'daughter(1,clusterE9E25)']
 
 # define the methods
 # in this case Likelihood and BDT are defined
@@ -102,7 +102,6 @@ teacher.param('methods', methods)
 teacher.param('variables', variables)
 teacher.param('target', 'isSignal')
 teacher.param('listNames', ['pi0'])
-teacher.param('trainOncePerJob', True)
 
 analysis_main.add_module(teacher)
 

@@ -119,6 +119,14 @@ namespace Belle2 {
     bool isFSP(const MCParticle* p);
 
     /**
+     * Returns true if given MCParticle is a final state radiation (FSR) photon.
+     * Assumes PDG code of p is 22.
+     *
+     * Note: this is a bit rough, needs some changes to EvtGen to determine this reliably.
+     */
+    bool isFSR(const MCParticle* p);
+
+    /**
      * Finds final state particles given in vector of generated particles that
      * are not given in vector of reconstructed final state particles,
      * returns flags describing what kind of FSPs are missing.

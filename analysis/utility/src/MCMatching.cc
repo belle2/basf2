@@ -274,6 +274,22 @@ bool MCMatching::isFSP(const MCParticle* p)
   }
 }
 
+bool MCMatching::isFSR(const MCParticle* p)
+{
+  const MCParticle* mother = p->getMother();
+  if (!mother) {
+    B2ERROR("The hell? why would this gamma not have a mother?");
+    return false; //?
+  }
+
+  int ndaug = mother->getNDaughters();
+  if (ndaug > 2) { // M -> A B (...) gamma is probably FSR
+    return true;
+  } else { // M -> A gamma is probably a decay
+    return false;
+  }
+}
+
 int MCMatching::getMissingParticleFlags(const std::vector<const Particle*>& reconstructedFSPs, const std::vector<const MCParticle*>& generatedFSPs)
 {
   int flags = 0;
@@ -299,14 +315,10 @@ int MCMatching::getMissingParticleFlags(const std::vector<const Particle*>& reco
       const int absGeneratedPDG = abs(generatedPDG);
       if (generatedPDG == 22) { //missing photon
         if (!(flags & c_MissFSR) or !(flags & c_MissGamma)) {
-          if (genFSP->getMother()) {
-            int ndaug = genFSP->getMother()->getNDaughters();
-            if (ndaug > 2) { // M -> A B (...) gamma is probably FSP
-              flags |= c_MissFSR;
-            } else if (ndaug == 2) { // M -> A gamma is probably a decay
-              flags |= c_MissGamma;
-            }
-          }
+          if (isFSR(genFSP))
+            flags |= c_MissFSR;
+          else
+            flags |= c_MissGamma;
         }
 
       } else if (absGeneratedPDG == 12 || absGeneratedPDG == 14 || absGeneratedPDG == 16) { // missing neutrino

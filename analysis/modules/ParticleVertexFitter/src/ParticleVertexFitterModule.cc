@@ -246,8 +246,8 @@ namespace Belle2 {
 
     const Particle* g1Orig = pi0Orig->getDaughter(0);
     const Particle* g2Orig = pi0Orig->getDaughter(1);
-    Particle* g1Temp = new Particle(g1Orig->get4Vector(), 22);
-    Particle* g2Temp = new Particle(g2Orig->get4Vector(), 22);
+    Particle g1Temp(g1Orig->get4Vector(), 22);
+    Particle g2Temp(g2Orig->get4Vector(), 22);
 
     TMatrixFSym g1ErrMatrix = g1Orig->getMomentumVertexErrorMatrix();
     TMatrixFSym g2ErrMatrix = g2Orig->getMomentumVertexErrorMatrix();
@@ -258,20 +258,20 @@ namespace Belle2 {
     TMatrixFSym errMatrix(3);
     for (int i = 0; i < 3; i++)
       for (int j = 0; j < 3; j++)
-        errMatrix[i][j] = posErrorMatrix[i][j];
+        errMatrix(i, j) = posErrorMatrix[i][j];
 
     g1ErrMatrix.SetSub(4, errMatrix);
     g2ErrMatrix.SetSub(4, errMatrix);
 
-    g1Temp->updateMomentum(g1Orig->get4Vector(), pos, g1ErrMatrix, 1.0);
-    g2Temp->updateMomentum(g2Orig->get4Vector(), pos, g2ErrMatrix, 1.0);
+    g1Temp.updateMomentum(g1Orig->get4Vector(), pos, g1ErrMatrix, 1.0);
+    g2Temp.updateMomentum(g2Orig->get4Vector(), pos, g2ErrMatrix, 1.0);
 
     // perform the mass fit for pi0
     analysis::MassFitKFit km;
     km.setMagneticField(m_Bfield);
 
-    addParticleToKfitter(km, g1Temp);
-    addParticleToKfitter(km, g2Temp);
+    addParticleToKfitter(km, &g1Temp);
+    addParticleToKfitter(km, &g2Temp);
 
     km.setVertex(kv.getVertex());
     km.setVertexError(kv.getVertexError());
@@ -279,16 +279,11 @@ namespace Belle2 {
 
     int err = km.doFit();
     if (err != 0) {
-      delete g1Temp;
-      delete g2Temp;
-
       return false;
     }
 
     bool ok = makeKMassMother(km, pi0Temp);
 
-    delete g1Temp;
-    delete g2Temp;
     return ok;
   }
 

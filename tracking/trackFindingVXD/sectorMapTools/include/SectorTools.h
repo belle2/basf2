@@ -153,8 +153,11 @@ namespace Belle2 {
       if (uInt(vConfig.size()) > 0) { vMax = vConfig.size() - 1 ; }
 
 //       // reconstructing indices for the u and v cuts by using the sectorID:
-      uInt vIndex = (secID) % vMax ; // 1-based
-      uInt uIndex = (secID - vIndex) / vMax;
+      uInt uIndex = 0, vIndex = 0;
+      if (vMax != 0) {
+        vIndex = (secID) % vMax ; // 1-based
+        uIndex = (secID - vIndex) / vMax;
+      }
 
       B2DEBUG(100, "SECID: " << secID << ", vIndex: " << vIndex << ", uIndex: " << uIndex << ", vMax:" << vMax);
       B2DEBUG(100, "uConfig.at(uIndex + 1): " << uConfig.at(uIndex + 1) << ", uConfig.at(uIndex): " << uConfig.at(uIndex));

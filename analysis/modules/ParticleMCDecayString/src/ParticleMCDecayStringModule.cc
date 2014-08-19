@@ -42,7 +42,7 @@ namespace Belle2 {
     StoreObjPtr<ParticleList>::required(m_listName);
 
     StoreObjPtr<DecayHashMap> dMap;
-    dMap.registerAsPersistent();
+    dMap.registerInDataStore();
   }
 
   void ParticleMCDecayStringModule::terminate()

@@ -97,11 +97,12 @@ void PreCutHistMakerModule::initialize()
     onlySignal_decayString << " " << listName;
 
     m_tmpLists.emplace_back(listName);
-    m_tmpLists.back().registerAsTransient(false);
+    m_tmpLists.back().registerInDataStore(DataStore::c_DontWriteOut);
     bool isSelfConjugated = !(Belle2::EvtPDLUtil::hasAntiParticle(daughterPDG));
     if (!isSelfConjugated) {
       std::string antiListName = Belle2::EvtPDLUtil::antiParticleListName(daughterPDG, "HistMaker");
-      StoreObjPtr<ParticleList>::registerTransient(antiListName, DataStore::c_Event, false);
+      StoreObjPtr<ParticleList> antiList(antiListName, DataStore::c_Event);
+      antiList.registerInDataStore(DataStore::c_DontWriteOut);
     }
   }
 
@@ -123,8 +124,8 @@ void PreCutHistMakerModule::initialize()
 
   std::string signalName(std::string("signal") + m_channelName);
   std::string allName(std::string("all") + m_channelName);
-  m_histogramSignal.registerAsTransient(signalName);
-  m_histogramAll.registerAsTransient(allName);
+  m_histogramSignal.registerInDataStore(signalName, DataStore::c_DontWriteOut);
+  m_histogramAll.registerInDataStore(allName, DataStore::c_DontWriteOut);
   if (m_customBinning.size() > 0) {
     m_histogramSignal.construct(signalName.c_str(), "signal", m_customBinning.size() - 1, &m_customBinning[0]);
     m_histogramAll.construct(allName.c_str(), "all", m_customBinning.size() - 1, &m_customBinning[0]);
@@ -360,7 +361,6 @@ void PreCutHistMakerModule::terminate()
 {
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
     B2INFO("Writing hists to " << m_fileName);
-    m_file->Dump();
     m_histogramSignal->write(m_file);
     m_histogramAll->write(m_file);
 

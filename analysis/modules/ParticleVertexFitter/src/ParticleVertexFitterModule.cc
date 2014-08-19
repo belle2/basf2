@@ -150,20 +150,18 @@ namespace Belle2 {
     }
 
     if (m_withConstraint.compare(std::string("ipprofile")) != 0 &&
-        m_withConstraint.compare(std::string("iptube")) != 0 && m_withConstraint.compare(std::string("")) != 0) {
-      B2ERROR("ParticleVertexFitter: " << m_withConstraint << " ***invalid Constraint ");
-      return false;
-    }
-
+        m_withConstraint.compare(std::string("iptube")) != 0 &&
+        m_withConstraint.compare(std::string("")) != 0)
+      B2FATAL("ParticleVertexFitter: " << m_withConstraint << " ***invalid Constraint ");
 
     bool ok = false;
     // fits with KFitter
     if (m_vertexFitter.compare(std::string("kfitter")) == 0) {
       // TODO: add this functionality
       if (m_decayString.compare(std::string("")) != 0)
-        B2ERROR("ParticleVertexFitter: kfitter does not support yet selection of daughters via decay string!") ;
+        B2FATAL("ParticleVertexFitter: kfitter does not support yet selection of daughters via decay string!") ;
       if (m_withConstraint.compare(std::string("iptube")) == 0)
-        B2ERROR("ParticleVertexFitter: kfitter does not support yet the iptube constraint ");
+        B2FATAL("ParticleVertexFitter: kfitter does not support yet the iptube constraint ");
 
       // vertex fit
       if (m_fitType.compare(std::string("vertex")) == 0) {
@@ -179,7 +177,7 @@ namespace Belle2 {
       // mass-constrained vertex fit
       if (m_fitType.compare(std::string("massvertex")) == 0) {
         if (m_withConstraint.compare(std::string("ipprofile")) == 0 || m_withConstraint.compare(std::string("iptube")) == 0) {
-          B2ERROR("ParticleVertexFitter: Invalid options - mass-constrained fit using kfitter does not work with iptube or ipprofile constraint.");
+          B2FATAL("ParticleVertexFitter: Invalid options - mass-constrained fit using kfitter does not work with iptube or ipprofile constraint.");
         } else {
           ok = doKMassVertexFit(mother);
         }
@@ -188,7 +186,7 @@ namespace Belle2 {
       // mass fit
       if (m_fitType.compare(std::string("mass")) == 0) {
         if (m_withConstraint.compare(std::string("ipprofile")) == 0 || m_withConstraint.compare(std::string("iptube")) == 0) {
-          B2ERROR("ParticleVertexFitter: Invalid options - mass fit using kfitter does not work with iptube or ipprofile constraint.");
+          B2FATAL("ParticleVertexFitter: Invalid options - mass fit using kfitter does not work with iptube or ipprofile constraint.");
         } else {
           ok = doKMassFit(mother);
         }
@@ -198,7 +196,7 @@ namespace Belle2 {
       if (m_fitType.compare(std::string("vertex")) != 0
           && m_fitType.compare(std::string("massvertex")) != 0
           && m_fitType.compare(std::string("mass")) != 0)
-        B2ERROR("ParticleVertexFitter: " << m_fitType << " ***invalid fit type for the Kfitter ");
+        B2FATAL("ParticleVertexFitter: " << m_fitType << " ***invalid fit type for the Kfitter ");
     }
 
     // fits using Rave
@@ -299,7 +297,7 @@ namespace Belle2 {
     if (mother->getNDaughters() < 2) return false;
 
     if (ipTubeConstraint)
-      B2ERROR("[ParticleVertexFitterModule::doKVertexFit] ipTubeConstraint is not supported yet!");
+      B2FATAL("[ParticleVertexFitterModule::doKVertexFit] ipTubeConstraint is not supported yet!");
 
     std::vector<const Particle*> fitChildren;
     std::vector<const Particle*> pi0Children;
@@ -309,11 +307,15 @@ namespace Belle2 {
     if (!validChildren)
       return false;
 
-    if (pi0Children.size() > 1)
+    if (pi0Children.size() > 1) {
       B2ERROR("[ParticleVertexFitterModule::doKVertexFit] Vertex fit using KFitter does not support fit with multiple pi0s (yet).");
+      return false;
+    }
 
-    if (fitChildren.size() < 2)
+    if (fitChildren.size() < 2) {
       B2ERROR("[ParticleVertexFitterModule::doKVertexFit] Number of particles with valid error matrix entering the vertex fit using KFitter is less than 2.");
+      return false;
+    }
 
     // Initialise the Fitter
     analysis::VertexFitKFit kv;
@@ -379,11 +381,15 @@ namespace Belle2 {
     if (!validChildren)
       return false;
 
-    if (pi0Children.size() > 1)
+    if (pi0Children.size() > 1) {
       B2ERROR("[ParticleVertexFitterModule::doKVertexFit] MassVertex fit using KFitter does not support fit with multiple pi0s (yet).");
+      return false;
+    }
 
-    if (fitChildren.size() < 2)
+    if (fitChildren.size() < 2) {
       B2ERROR("[ParticleVertexFitterModule::doKVertexFit] Number of particles with valid error matrix entering the vertex fit using KFitter is less than 2.");
+      return false;
+    }
 
     bool ok = false;
     if (pi0Children.size() == 0) {

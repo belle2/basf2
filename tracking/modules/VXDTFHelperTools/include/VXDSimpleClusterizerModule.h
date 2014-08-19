@@ -33,7 +33,7 @@ namespace Belle2 {
 
     /** Destructor of the module.
      */
-    virtual ~VXDSimpleClusterizerModule();
+    virtual ~VXDSimpleClusterizerModule() {}
 
     /** Initialize the Module.
      * This method is called only once before the actual event processing starts.
@@ -55,7 +55,7 @@ namespace Belle2 {
 
     /** End of the event processing.
      */
-    virtual void terminate();
+    virtual void terminate() {}
 
   protected:
     double m_energyThresholdU; /**< set energy threshold for SVDClusters in u-direction in GeV (standard is 17.4E-6) */

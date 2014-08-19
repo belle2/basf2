@@ -287,8 +287,7 @@ def SignalProbability(path, identifier, particleList, mvaConfig, additionalDepen
         teacher.param('variables', mvaConfig.variables)
         teacher.param('target', mvaConfig.target)
         teacher.param('listNames', [particleList])
-        teacher.param('maxEventsPerClass', 10000000)
-        teacher.param('inverseSamplingRates', {0: 10})
+        #teacher.param('inverseSamplingRates', {0: 10})
         teacher.param('doNotTrain', True)
         path.add_module(teacher)
         B2INFO("Calculate SignalProbability for {i}. Create root file with variables first.".format(i=identifier))
@@ -313,7 +312,7 @@ def SignalProbability(path, identifier, particleList, mvaConfig, additionalDepen
         expert.param('signalFraction', -2)  # Use signalFraction from training
         expert.param('signalProbabilityName', 'SignalProbability')
         expert.param('signalClass', mvaConfig.targetCluster)
-        expert.param('inverseSamplingRates', {0: 10})
+        #expert.param('inverseSamplingRates', {0: 10})
         expert.param('listNames', [particleList])
         path.add_module(expert)
         B2INFO("Calculating SignalProbability for {i}".format(i=identifier))

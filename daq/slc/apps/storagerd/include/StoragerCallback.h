@@ -12,6 +12,8 @@
 
 #include <daq/slc/system/PThread.h>
 
+#include <daq/slc/base/ConfigFile.h>
+
 #include <vector>
 
 namespace Belle2 {
@@ -40,6 +42,7 @@ namespace Belle2 {
     NSMData m_data;
     SharedEventBuffer m_ibuf;
     SharedEventBuffer m_rbuf;
+    ConfigFile m_file;
 
   };
 

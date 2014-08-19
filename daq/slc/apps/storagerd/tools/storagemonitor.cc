@@ -30,11 +30,11 @@ int main(int argc, char** argv)
   }
   const std::string stornode = argv[1];
   const std::string node = argv[2];
-  ConfigFile config("slowcontrol");
+  ConfigFile config("slowcontrol", "storage");
   NSMCommunicator* comm = new NSMCommunicator();
   comm->init(NSMNode(node),
-             config.get("nsm.local.host"),
-             config.getInt("nsm.local.port"));
+             config.get("nsm.global.host"),
+             config.getInt("nsm.global.port"));
   NSMData data(stornode + "_STATUS", "storage_status", 1);
   storage_status* info = (storage_status*)data.open(comm);
 

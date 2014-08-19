@@ -1,28 +1,33 @@
 #include "daq/slc/system/Daemon.h"
 
+#include <daq/slc/system/LogFile.h>
+
 #include <stdlib.h>
 #include <sys/types.h>
+#include <unistd.h>
+#include <cstdlib>
+#include <cstring>
 #include <unistd.h>
 
 using namespace Belle2;
 
-Daemon::Daemon()
+bool Daemon::start(const char* logfile,
+                   int argc, char** argv)
 {
-
-}
-
-Daemon::~Daemon() throw()
-{
-
-}
-
-int Daemon::start() throw()
-{
-  if (daemon(0, 0) < 0) {
-    exit(-1);
+  bool isdaemon = false;
+  for (int i = 1; i < argc; i++) {
+    if (strcmp(argv[i], "-d") == 0) {
+      isdaemon = true;
+    } else if (strcmp(argv[i], "-h") == 0) {
+      LogFile::debug("Usage : %s [-d]", argv[0]);
+      return false;
+    }
   }
-  run();
-  return ::getpid();
+  LogFile::open(logfile);
+  if (isdaemon) {
+    daemon(0, 0);
+  }
+  return true;
 }
 
 

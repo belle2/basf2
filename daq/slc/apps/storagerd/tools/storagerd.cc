@@ -3,28 +3,24 @@
 #include <daq/slc/nsm/NSMNodeDaemon.h>
 
 #include <daq/slc/system/LogFile.h>
+#include <daq/slc/system/Daemon.h>
 
-#include <daq/slc/base/StringUtil.h>
 #include <daq/slc/base/ConfigFile.h>
-
-#include <cstdlib>
-#include <unistd.h>
 
 using namespace Belle2;
 
 int main(int argc, char** argv)
 {
-  if (argc < 2) {
-    LogFile::debug("Usage : %s <name>", argv[0]);
+  ConfigFile config("slowcontrol", argv[1]);
+  const std::string hostname = config.get("nsm.global.host");
+  const int port = config.getInt("nsm.global.port");
+  std::string name = config.get("nsm.nodename");
+  if (!Daemon::start(("storagerd." + name).c_str(), argc - 1, argv + 1)) {
     return 1;
   }
-  //daemon(0, 0);
-  LogFile::open("storage");
-  const char* name = argv[1];
   NSMNode node(name);
   StoragerCallback* callback = new StoragerCallback(node);
-  callback->setFilePath("storage");
-  NSMNodeDaemon* daemon = new NSMNodeDaemon(callback);
+  NSMNodeDaemon* daemon = new NSMNodeDaemon(callback, hostname, port);
   daemon->run();
 
   return 0;

@@ -6,12 +6,8 @@ namespace Belle2 {
   class Daemon {
 
   public:
-    Daemon();
-    virtual ~Daemon() throw();
-
-  public:
-    int start() throw();
-    virtual void run() throw() = 0;
+    static bool start(const char* logfile,
+                      int argc, char** argv);
 
   };
 

@@ -65,12 +65,13 @@ bool SharedMemory::truncate(size_t size) throw()
   if (size > 0) {
     ::ftruncate(m_fd, size);
     m_size = size;
+    return true;
   } else {
     struct stat st;
     fstat(m_fd, &st);
     m_size = st.st_size;
   }
-  return m_size > 0;
+  return false;
 }
 
 

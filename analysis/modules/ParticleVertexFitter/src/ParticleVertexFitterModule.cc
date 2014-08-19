@@ -341,8 +341,8 @@ namespace Belle2 {
       // 1. refit pi0 to previously determined vertex
       // 2. redo the fit using all particles (including pi0 this time)
 
-      Particle* pi0Temp = new Particle(pi0Children[0]->get4Vector(), 111);
-      ok = redoPi0MassFit(pi0Temp, pi0Children[0], kv) ;
+      Particle pi0Temp(pi0Children[0]->get4Vector(), 111);
+      ok = redoPi0MassFit(&pi0Temp, pi0Children[0], kv) ;
       if (!ok)
         return false;
 
@@ -352,7 +352,7 @@ namespace Belle2 {
 
       for (unsigned iChild = 0; iChild < fitChildren.size(); iChild++)
         addParticleToKfitter(kv2, fitChildren[iChild]);
-      addParticleToKfitter(kv2, pi0Temp);
+      addParticleToKfitter(kv2, &pi0Temp);
 
       if (ipProfileConstraint)
         addIPProfileToKFitter(kv2);
@@ -363,7 +363,6 @@ namespace Belle2 {
         return false;
 
       ok = makeKVertexMother(kv2, mother);
-      delete pi0Temp;
     }
 
     return ok;
@@ -423,8 +422,8 @@ namespace Belle2 {
       if (err != 0)
         return false;
 
-      Particle* pi0Temp = new Particle(pi0Children[0]->get4Vector(), 111);
-      ok = redoPi0MassFit(pi0Temp, pi0Children[0], kv) ;
+      Particle pi0Temp(pi0Children[0]->get4Vector(), 111);
+      ok = redoPi0MassFit(&pi0Temp, pi0Children[0], kv) ;
       if (!ok)
         return false;
 
@@ -434,7 +433,7 @@ namespace Belle2 {
 
       for (unsigned iChild = 0; iChild < fitChildren.size(); iChild++)
         addParticleToKfitter(kmv2, fitChildren[iChild]);
-      addParticleToKfitter(kmv2, pi0Temp);
+      addParticleToKfitter(kmv2, &pi0Temp);
 
       kmv2.setInvariantMass(mother->getPDGMass());
       err = kmv2.doFit();
@@ -443,7 +442,6 @@ namespace Belle2 {
         return false;
 
       ok = makeKMassVertexMother(kmv2, mother);
-      delete pi0Temp;
     }
 
     return ok;

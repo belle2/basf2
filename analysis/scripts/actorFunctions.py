@@ -164,6 +164,7 @@ def FitVertex(path, channelName, particleList, daughterVertices, geometry):
     pvfit.param('confidenceLevel', 0)
     pvfit.param('vertexFitter', 'kfitter')
     pvfit.param('fitType', 'vertex')
+    pvfit.param('dontDiscardOnError', True)
     path.add_module(pvfit)
 
     B2INFO("Fitted vertex for channel {c}.".format(c=channelName))

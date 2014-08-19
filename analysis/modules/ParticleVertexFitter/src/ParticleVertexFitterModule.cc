@@ -62,6 +62,7 @@ namespace Belle2 {
     addParam("fitType", m_fitType, "type of the kinematic fit (vertex, massvertex, mass)", string("vertex"));
     addParam("withConstraint", m_withConstraint, "additional constraint on vertex", string(""));
     addParam("decayString", m_decayString, "specifies which daughter particles are included in the kinematic fit", string(""));
+    addParam("dontDiscardOnError", m_dontDiscardOnError, "If an error occurs during the fit, don't remove the corresponding Particle from the list", false);
   }
 
   ParticleVertexFitterModule::~ParticleVertexFitterModule()
@@ -121,7 +122,7 @@ namespace Belle2 {
     for (unsigned i = 0; i < plist->getListSize(); i++) {
       Particle* particle = plist->getParticle(i);
       bool ok = doVertexFit(particle);
-      if (!ok) toRemove.push_back(particle->getArrayIndex());
+      if (!ok and !m_dontDiscardOnError) toRemove.push_back(particle->getArrayIndex());
     }
     plist->removeParticles(toRemove);
   }

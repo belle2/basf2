@@ -90,6 +90,7 @@ namespace Belle2 {
     std::string m_fitType;        /**< type of the kinematic fit */
     std::string m_withConstraint; /**< additional constraint on vertex */
     std::string m_decayString   ; /**< daughter particles selection */
+    bool m_dontDiscardOnError;    /**< If an error occurs during the fit, don't remove the corresponding Particle from the list. */
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of decays to look for. */
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */

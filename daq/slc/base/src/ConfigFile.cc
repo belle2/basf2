@@ -38,14 +38,6 @@ void ConfigFile::read(const std::string& filename, bool overload)
   std::string dir = "";
   while (fin && getline(fin, s)) {
     if (s.size() == 0 || s.at(0) == '#') continue;
-    if (s.find("!cd") != std::string::npos) {
-      dir = StringUtil::replace(StringUtil::replace(StringUtil::replace(s, "!cd", ""),
-                                                    " ", ""), "\t", "");
-      if (dir.size() > 0) {
-        m_dir_v.push_back(dir);
-      }
-      continue;
-    }
     std::vector<std::string> str_v = StringUtil::split(s, ':');
     if (str_v.size() >= 2) {
       std::string label = StringUtil::replace(StringUtil::replace(str_v[0],
@@ -53,7 +45,8 @@ void ConfigFile::read(const std::string& filename, bool overload)
       std::string value = "";
       if (str_v.size() > 2) {
         for (size_t i = 2; i < str_v.size(); i++) {
-          str_v[1] += ":" + str_v[i];
+          str_v[1].append(":");
+          str_v[1].append(str_v[i]);
         }
       }
       size_t i = 0;
@@ -63,37 +56,13 @@ void ConfigFile::read(const std::string& filename, bool overload)
         if (str_v[1].at(i) == '"') {
           for (i++ ; i < str_v[1].size(); i++) {
             if (str_v[1].at(i) == '"') break;
-            value += str_v[1].at(i);
+            value.append(1, str_v[1].at(i));
           }
           break;
         }
-        if (str_v[1].at(i) == '$') {
-          i++;
-          if (str_v[1].at(i) == '{') {
-            for (i++ ; i < str_v[1].size(); i++) {
-              if (str_v[1].at(i) == '}') break;
-              value += str_v[1].at(i);
-            }
-          }
-          const char* env = getenv(value.c_str());
-          if (env != NULL) {
-            value = env;
-          } else if (m_value_m.find(value) != m_value_m.end()) {
-            value = m_value_m[value];
-          }
-          continue;
-        }
-        value += str_v[1].at(i);
+        value.append(1, str_v[1].at(i));
       }
-      if (dir.size() > 0) {
-        label = dir + "." + label;
-      }
-      if (m_value_m.find(label) == m_value_m.end()) {
-        m_value_m.insert(ValueList::value_type(label, value));
-        m_label_v.push_back(label);
-      } else if (overload) {
-        m_value_m[label] = value;
-      }
+      add(label, value, overload);
     }
   }
   fin.close();
@@ -106,16 +75,8 @@ void ConfigFile::clear()
 
 const std::string ConfigFile::get(const std::string& label)
 {
-  std::string label_in = (m_dir.size() > 0) ? m_dir + "." + label : label;
-  if (m_value_m.find(label_in) != m_value_m.end()) {
-    return m_value_m[label_in];
-  } else {
-    const char* env = getenv(label_in.c_str());
-    if (env != NULL) {
-      std::string value = env;
-      m_value_m.insert(ValueList::value_type(label_in, value));
-      return value;
-    }
+  if (m_value_m.find(label) != m_value_m.end()) {
+    return m_value_m[label];
   }
   return "";
 }
@@ -134,10 +95,15 @@ double ConfigFile::getFloat(const std::string& label)
   else return 0;
 }
 
-void ConfigFile::add(const std::string& label, const std::string& value)
+void ConfigFile::add(const std::string& label,
+                     const std::string& value, bool overload)
 {
-  m_value_m.insert(ValueList::value_type(label, value));
-  m_label_v.push_back(label);
+  if (m_value_m.find(label) == m_value_m.end()) {
+    m_value_m.insert(ValueList::value_type(label, value));
+    m_label_v.push_back(label);
+  } else if (overload) {
+    m_value_m[label] = value;
+  }
 }
 
 void ConfigFile::write(const std::string& path)

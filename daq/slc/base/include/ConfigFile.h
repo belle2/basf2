@@ -33,12 +33,10 @@ namespace Belle2 {
     const std::string get(const std::string& label);
     int getInt(const std::string& label);
     double getFloat(const std::string& label);
-    void cd() { m_dir = ""; }
-    void cd(const std::string& dir);
     ValueList& getValues() { return m_value_m; }
     std::vector<std::string>& getLabels() { return m_label_v; }
-    std::vector<std::string>& getDirectories() { return m_dir_v; }
-    void add(const std::string& label, const std::string& value);
+    void add(const std::string& label,
+             const std::string& value, bool overload);
     void write(const std::string& path);
 
   private:
@@ -46,7 +44,6 @@ namespace Belle2 {
 
   private:
     ValueList m_value_m;
-    std::vector<std::string> m_dir_v;
     std::vector<std::string> m_label_v;
     std::string m_dir;
 
@@ -56,11 +53,6 @@ namespace Belle2 {
   {
     return m_value_m.find((m_dir.size() > 0) ? m_dir + "." + label : label)
            != m_value_m.end();
-  }
-
-  inline void ConfigFile::cd(const std::string& dir)
-  {
-    m_dir = (m_dir.size() > 0) ? m_dir + "." + dir : dir;
   }
 
 };

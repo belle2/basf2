@@ -11,36 +11,14 @@ using namespace Belle2;
 
 StringList StringUtil::split(const std::string& str, const char type, size_t max)
 {
-  std::stringstream ss;
   StringList str_v;
-  char c;
-  size_t m = 0;
-  for (size_t n = 0; n < str.size(); n++) {
-    c = str.at(n);
-    if (c == type) {
-      std::string s = ss.str();
-      if (s.size() > 0) {
-        while (s.at(0) == ' ' || s.at(0) == '\t' || s.at(0) == '\n') {
-          s.erase(0, 1);
-        }
-        while (s.at(s.size() - 1) == ' ' ||
-               s.at(s.size() - 1) == '\t' || s.at(s.size() - 1) == '\n') {
-          s.erase(s.size() - 1, 1);
-        }
-      }
-      str_v.push_back(s);
-      ss.str("");
-      m++;
-      if (max > 0 && m >= max) {
-        break;
-      }
-    } else {
-      ss << c;
-    }
+  size_t current = 0, found;
+  while ((found = str.find_first_of(type, current)) != std::string::npos) {
+    str_v.push_back(std::string(str, current, found - current));
+    current = found + 1;
   }
-  if (ss.str().size() > 0) {
-    if (max > 0 && m >= max) str_v[m - 1] += ss.str();
-    else str_v.push_back(ss.str());
+  if (str.size() - current > 0) {
+    str_v.push_back(std::string(str, current, str.size() - current));
   }
   while (max > 0 && str_v.size() < max) {
     str_v.push_back("");

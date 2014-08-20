@@ -20,8 +20,6 @@ ConfigObject DBObjectLoader::load(const std::string& path,
   ConfigFile config(filename);
   int revision = config.getInt("revision");
   if (revision <= 0) revision = 1;
-  std::vector<std::string>& label_v(config.getDirectories());
-  config.cd();
   ConfigObject obj;
   obj.setTable(tablename);
   obj.setRevision(revision);

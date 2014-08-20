@@ -22,7 +22,6 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -77,15 +76,23 @@ namespace Belle2 {
 
   void TOPDigitizerModule::initialize()
   {
-    // data store registration
-    StoreArray<TOPDigit>::registerPersistent(m_outputDigits);
-    RelationArray::registerPersistent<TOPDigit, TOPSimHit>(m_outputDigits, m_inputSimHits);
-    RelationArray::registerPersistent<TOPDigit, MCParticle>(m_outputDigits, "");
+    // input
 
-    StoreArray<TOPSimHit>::required(m_inputSimHits);
-    StoreArray<MCParticle>::optional();
+    StoreArray<TOPSimHit> topSimHits(m_inputSimHits);
+    topSimHits.isRequired();
 
-    // store electronics jitter and efficiency to make it known for reconstruction
+    StoreArray<MCParticle> mcParticles;
+    mcParticles.isOptional();
+
+    // output
+
+    StoreArray<TOPDigit> topDigits(m_outputDigits);
+    topDigits.registerInDataStore();
+    topDigits.registerRelationTo(topSimHits);
+    topDigits.registerRelationTo(mcParticles);
+
+    // store electronics jitter and efficiency to make it known to reconstruction
+
     m_topgp->setELjitter(m_electronicJitter);
     m_topgp->setELefficiency(m_electronicEfficiency);
   }

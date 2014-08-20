@@ -23,7 +23,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 
@@ -39,17 +38,21 @@ namespace Belle2 {
       Simulation::SensitiveDetectorBase("TOP", Const::TOP),
       m_topgp(TOPGeometryPar::Instance())
     {
-      // registration
-      StoreArray<TOPSimHit>::registerPersistent();
-      RelationArray::registerPersistent<MCParticle, TOPSimHit>();
-      StoreArray<TOPSimPhoton>::registerTransient();
-      RelationArray::registerTransient<TOPSimHit, TOPSimPhoton>();
 
-      // additional registration of MCParticle relation (required for correct relations)
-      StoreArray<MCParticle> particles;
-      StoreArray<TOPSimHit>  hits;
-      RelationArray  relation(particles, hits);
+      StoreArray<MCParticle> mcParticles;
+
+      StoreArray<TOPSimHit> simHits;
+      simHits.registerInDataStore();
+      mcParticles.registerRelationTo(simHits);
+
+      StoreArray<TOPSimPhoton> simPhotons;
+      simPhotons.registerInDataStore(DataStore::c_DontWriteOut);
+      simHits.registerRelationTo(simPhotons, DataStore::c_Event,
+                                 DataStore::c_DontWriteOut);
+
+      RelationArray  relation(mcParticles, simHits);
       registerMCParticleRelation(relation);
+
     }
 
 

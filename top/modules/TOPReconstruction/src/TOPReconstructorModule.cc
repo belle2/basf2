@@ -30,8 +30,6 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -100,6 +98,31 @@ namespace Belle2 {
 
   void TOPReconstructorModule::initialize()
   {
+    // input
+
+    StoreArray<TOPDigit> topDigits(m_inputDigits);
+    topDigits.isRequired();
+
+    StoreArray<Track> tracks(m_inputTracks);
+    tracks.isRequired();
+
+    StoreArray<ExtHit> extHits(m_inputExtHits);
+    extHits.isRequired();
+
+    StoreArray<MCParticle> mcParticles;
+    mcParticles.isOptional();
+
+    StoreArray<TOPBarHit> barHits(m_inputBarHits);
+    barHits.isOptional();
+
+    // output
+
+    StoreArray<TOPLikelihood> topLikelihoods(m_outputLikelihoods);
+    topLikelihoods.registerInDataStore();
+    topLikelihoods.registerRelationTo(extHits);
+    topLikelihoods.registerRelationTo(barHits);
+    tracks.registerRelationTo(topLikelihoods);
+
     // check for module debug level
 
     if (getLogConfig().getLogLevel() == LogConfig::c_Debug) {
@@ -118,19 +141,6 @@ namespace Belle2 {
 
     m_smearTrack = m_sigmaRphi > 0 || m_sigmaZ > 0 || m_sigmaTheta > 0 ||
                    m_sigmaPhi > 0;
-
-    // Data store registration
-
-    StoreArray<TOPLikelihood>::registerPersistent(m_outputLikelihoods);
-    RelationArray::registerPersistent<Track, TOPLikelihood>(m_inputTracks, m_outputLikelihoods);
-    RelationArray::registerPersistent<TOPLikelihood, ExtHit>(m_outputLikelihoods, m_inputExtHits);
-    RelationArray::registerPersistent<TOPLikelihood, TOPBarHit>(m_outputLikelihoods, m_inputBarHits);
-
-    StoreArray<TOPDigit>::required(m_inputDigits);
-    StoreArray<Track>::required(m_inputTracks);
-    StoreArray<ExtHit>::required(m_inputExtHits);
-    StoreArray<MCParticle>::optional();
-    StoreArray<TOPBarHit>::optional(m_inputBarHits);
 
     // Configure TOP detector
 

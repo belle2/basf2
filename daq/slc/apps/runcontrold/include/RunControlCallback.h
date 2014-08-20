@@ -24,7 +24,8 @@ namespace Belle2 {
     typedef std::vector<NSMData> NSMDataList;
 
   public:
-    RunControlCallback(const NSMNode& node);
+    RunControlCallback(const NSMNode& node,
+                       const std::string& runtype);
     virtual ~RunControlCallback() throw() {}
 
   public:
@@ -66,6 +67,7 @@ namespace Belle2 {
     RunNumberInfo m_info;
     NSMData m_data;
     std::vector<RCCallback*> m_callbacks;
+    std::string m_runtype_default;
 
   private:
     class ConfigProvider {

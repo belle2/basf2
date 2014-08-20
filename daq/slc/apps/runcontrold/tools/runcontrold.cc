@@ -24,7 +24,8 @@ int main(int argc, char** argv)
                                             config.get("database.password"),
                                             config.getInt("database.port"));
   NSMNode node(name);
-  RunControlCallback* callback = new RunControlCallback(node);
+  RunControlCallback* callback =
+    new RunControlCallback(node, config.get("runtype"));
   RunControlMasterCallback* master_callback =
     new RunControlMasterCallback(node, callback);
   callback->setDB(db);

@@ -24,22 +24,23 @@
 
 using namespace Belle2;
 
-RunControlCallback::RunControlCallback(const NSMNode& node)
+RunControlCallback::RunControlCallback(const NSMNode& node,
+                                       const std::string& runtype)
   : RCCallback(node), m_setting(node)
 {
   add(RCCommand::EXCLUDE);
   add(RCCommand::INCLUDE);
-  m_data = NSMData(node.getName() + "_STATUS", "rc_status", rc_status_revision);
+  m_data = NSMData(node.getName() + "_STATUS",
+                   "rc_status", rc_status_revision);
+  m_runtype_default = runtype;
 }
 
 void RunControlCallback::init() throw()
 {
-  ConfigFile config("runcontrol");
-  std::string runtype = config.get("runtype");
-  NSMMessage msg(getNode(), NSMCommand::DBGET, runtype);
+  NSMMessage msg(getNode(), NSMCommand::DBGET, m_runtype_default);
   msg.setNParams(1);
   msg.setParam(0, NSMCommand::DBGET.getId());
-  msg.setData(runtype);
+  msg.setData(m_runtype_default);
   preload(msg);
   {
     ConfigObjectList& obj_v(getConfig().getObject().getObjects("nsmdata"));

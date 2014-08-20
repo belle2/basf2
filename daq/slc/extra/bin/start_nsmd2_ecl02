@@ -1,36 +1,28 @@
 #!/bin/bash
 
+cd $HOME/belle2/release
+source ../tools/setup_belle2
+setuprel
+
 dir="${HOME}/belle2/release/daq/slc/extra/bin"
 
 echo "killing nsmd2"
-ssh cpr5014 "killall nsmd2 1&>2 /dev/null;killall datad 1&>2 /dev/null"
-ssh cpr5015 "killall nsmd2 1&>2 /dev/null;killall datad 1&>2 /dev/null"
-ssh cpr5016 "killall nsmd2 1&>2 /dev/null;killall datad 1&>2 /dev/null"
-ssh cpr5017 "killall nsmd2 1&>2 /dev/null;killall datad 1&>2 /dev/null"
-ssh cpr5018 "killall nsmd2 1&>2 /dev/null;killall datad 1&>2 /dev/null"
-ssh cpr5019 "killall nsmd2 1&>2 /dev/null;killall datad 1&>2 /dev/null"
-ssh cpr5020 "killall nsmd2 1&>2 /dev/null;killall datad 1&>2 /dev/null"
-ssh cpr5021 "killall nsmd2 1&>2 /dev/null;killall datad 1&>2 /dev/null"
-ssh cpr5022 "killall nsmd2 1&>2 /dev/null;killall datad 1&>2 /dev/null"
-ssh cpr5023 "killall nsmd2 1&>2 /dev/null;killall datad 1&>2 /dev/null"
-ssh cpr5024 "killall nsmd2 1&>2 /dev/null;killall datad 1&>2 /dev/null"
-ssh cpr5025 "killall nsmd2 1&>2 /dev/null;killall datad 1&>2 /dev/null"
-ssh cpr5026 "killall nsmd2 1&>2 /dev/null;killall datad 1&>2 /dev/null"
-ssh ecl02 "killall nsmd2 1&>2 /dev/null;killall datad 1&>2 /dev/null"
+for i in $(seq 5014 5026)
+do
+echo "killing nsmd2 in cpr${i}"
+ssh cpr${i} "killall nsmd2 > /dev/null 2> /dev/null; killall datad > /dev/null 2> /dev/null"
+done
+echo "killing nsmd2 in ecl01"
+ssh ecl02 "killall nsmd2 > /dev/null 2> /dev/null; killall datad > /dev/null 2> /dev/null"
 
 echo "booting nsmd2"
-ssh ecl02 "${dir}/boot_nsmd2_local ecl02"&
-ssh cpr5014 "${dir}/boot_nsmd2_local cpr5014"&
-ssh cpr5015 "${dir}/boot_nsmd2_local cpr5015"&
-ssh cpr5016 "${dir}/boot_nsmd2_local cpr5016"&
-ssh cpr5017 "${dir}/boot_nsmd2_local cpr5017"&
-ssh cpr5018 "${dir}/boot_nsmd2_local cpr5018"&
-ssh cpr5019 "${dir}/boot_nsmd2_local cpr5019"&
-ssh cpr5020 "${dir}/boot_nsmd2_local cpr5020"&
-ssh cpr5021 "${dir}/boot_nsmd2_local cpr5021"&
-ssh cpr5022 "${dir}/boot_nsmd2_local cpr5022"&
-ssh cpr5023 "${dir}/boot_nsmd2_local cpr5023"&
-ssh cpr5024 "${dir}/boot_nsmd2_local cpr5024"&
-ssh cpr5025 "${dir}/boot_nsmd2_local cpr5025"&
-ssh cpr5026 "${dir}/boot_nsmd2_local cpr5026"&
+for i in $(seq 5014 5026)
+do
+echo "booting nsmd2 in cpr${i}"
+arr=($(getconfig cpr${i} logfile.dir nsm.local.host nsm.local.port))
+ssh cpr${i} "${dir}/boot_nsmd2 ${arr[1]} ${arr[2]} ${arr[3]}"
+done
+echo "booting nsmd2 in ecl02"
+arr=($(getconfig ecl02 logfile.dir nsm.local.host nsm.local.port))
+ssh ecl01 "${dir}/boot_nsmd2 ${arr[1]} ${arr[2]} ${arr[3]}"
 sleep 5

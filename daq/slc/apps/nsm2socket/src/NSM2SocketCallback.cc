@@ -101,10 +101,12 @@ void NSM2SocketCallback::timeout() throw()
     m_node_m[nodename] = isonline2;
     if (isonline && !isonline2) {
       //m_bridge->sendError(ERRORNo::NSMONLINE, nodename, "Lost PID");
+      LogFile::error("Node %s got down.", nodename.c_str());
       m_bridge->sendLog(DAQLogMessage(getNode().getName(), LogFile::ERROR,
                                       StringUtil::form("Node %s got down.",
                                                        nodename.c_str())));
     } else if (!isonline && isonline2) {
+      LogFile::notice("Node %s got up.", nodename.c_str());
       m_bridge->sendLog(DAQLogMessage(getNode().getName(), LogFile::NOTICE,
                                       StringUtil::form("Node %s got up.",
                                                        nodename.c_str())));

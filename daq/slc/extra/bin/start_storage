@@ -1,0 +1,5 @@
+#!/bin/bash
+
+dir="~/belle2/release/daq/slc/extra/bin"
+echo "booting runcontrold in store01"
+ssh store01 "${dir}/boot_daemon storagerd store01"

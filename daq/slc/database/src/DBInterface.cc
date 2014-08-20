@@ -31,7 +31,6 @@ void DBInterface::execute(const char* text, ...) throw(DBHandlerException)
   va_start(ap, text);
   vsprintf(m_buf, text, ap);
   va_end(ap);
-  //LogFile::debug(m_buf);
-  //std::cout << m_buf << std::endl;
+  //std::cerr << m_buf << std::endl;
   execute_imp(m_buf);
 }

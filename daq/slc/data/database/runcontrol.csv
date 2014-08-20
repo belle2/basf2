@@ -1,4 +1,5 @@
  nodename,  config, ismaster, runlength,    node, nsmdata
+RUNCONTROL, debug:storage,true,480, debug:storage, debug:storage
 RUNCONTROL, test:daq:none,true,480, test:daq:none, default
 RUNCONTROL, test:daq:aux,true,480, test:daq:aux, default
 RUNCONTROL, test:daq:i,true,480, test:daq:i, default

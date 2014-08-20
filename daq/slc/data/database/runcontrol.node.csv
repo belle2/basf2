@@ -1,4 +1,5 @@
    nodename,  config, used,                           runtype, type, dbmode, sequential
+RUNCONTROL, debug:storage, true, STORAGE/storage/1/default,0,1, false
 RUNCONTROL, test:daq:none, true, STORAGE/storage/1/default,0,1, false
 RUNCONTROL, test:daq:none, true, HLT/hlt/1/default,0,1, false
 RUNCONTROL, test:daq:none, true, ECL01/runcontrol/1/default,0,1, false

@@ -50,7 +50,6 @@ ConfigObject DBObjectLoader::load(const std::string& path,
       }
       if (type != FieldInfo::TEXT && type != FieldInfo::OBJECT) {
         value = StringUtil::replace(value.substr(pos + 1), ")", "");
-        std::cout << name << " " << value << " " << type_s << std::endl;
       }
       obj.setValueText(name, value);
     } else {

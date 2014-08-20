@@ -1,4 +1,5 @@
    nodename,  config, hostnode,        dataname,         format, file_revision
+ RUNCONTROL, debug:storage,  STORAGE,  STORAGE_STATUS, ronode_status,        3
  RUNCONTROL, default,  STORAGE,  STORAGE_STATUS, ronode_status,        3
  RUNCONTROL, default,      HLT,      HLT_STATUS,     rfunitinfo,        1
  RUNCONTROL, default, ECL01, ECL01_STATUS,      rc_status,        1

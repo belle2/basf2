@@ -42,27 +42,28 @@ void ConfigFile::read(const std::string& filename, bool overload)
     if (str_v.size() >= 2) {
       std::string label = StringUtil::replace(StringUtil::replace(str_v[0],
                                                                   " ", ""), "\t", "");
-      std::string value = "";
       if (str_v.size() > 2) {
         for (size_t i = 2; i < str_v.size(); i++) {
           str_v[1].append(":");
           str_v[1].append(str_v[i]);
         }
       }
+      std::string value = "";
       size_t i = 0;
+      std::stringstream ss;
       for (; i < str_v[1].size(); i++) {
         if (str_v[1].at(i) == '#' || str_v[1].at(i) == '\n') break;
         if (str_v[1].at(i) == ' ' || str_v[1].at(i) == '\t') continue;
         if (str_v[1].at(i) == '"') {
           for (i++ ; i < str_v[1].size(); i++) {
             if (str_v[1].at(i) == '"') break;
-            value.append(1, str_v[1].at(i));
+            ss << str_v[1].at(i);
           }
           break;
         }
-        value.append(1, str_v[1].at(i));
+        ss << str_v[1].at(i);
       }
-      add(label, value, overload);
+      add(label, ss.str(), overload);
     }
   }
   fin.close();

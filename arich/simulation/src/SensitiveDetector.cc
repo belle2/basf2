@@ -33,14 +33,12 @@ namespace Belle2 {
       m_arichgp(ARICHGeometryPar::Instance())
     {
 
-      StoreArray<ARICHSimHit>::registerPersistent();
-      RelationArray::registerPersistent<MCParticle, ARICHSimHit>();
-
       StoreArray<MCParticle> particles;
       StoreArray<ARICHSimHit> hits;
       RelationArray relation(particles, hits);
       registerMCParticleRelation(relation);
-
+      hits.registerInDataStore();
+      particles.registerRelationTo(hits);
     }
 
 
@@ -81,23 +79,21 @@ namespace Belle2 {
       //Get module ID number
       const G4int moduleID = preStep.GetTouchableHandle()->GetReplicaNumber(1);
       //Get photon energy
-      const G4double energy = track.GetKineticEnergy() / eV;
+      const G4double energy = track.GetKineticEnergy() / CLHEP::eV;
 
       //------------------------------------------------------------
       //                Create ARICHSimHit and save it to datastore
       //------------------------------------------------------------
 
-      TVector2 locpos(localPosition.x() / cm, localPosition.y() / cm);
+      TVector2 locpos(localPosition.x() / CLHEP::cm, localPosition.y() / CLHEP::cm);
       StoreArray<ARICHSimHit> arichSimHits;
       if (!arichSimHits.isValid()) arichSimHits.create();
       ARICHSimHit* simHit = arichSimHits.appendNew(moduleID, locpos, globalTime, energy);
 
-
       // add relation to MCParticle
       StoreArray<MCParticle> mcParticles;
-      RelationArray  arichSimHitRel(mcParticles, arichSimHits);
-      int parentID = track.GetParentID();
-      arichSimHitRel.add(parentID, simHit->getArrayIndex());
+      RelationArray arichSimHitRel(mcParticles, arichSimHits);
+      arichSimHitRel.add(track.GetParentID(), simHit->getArrayIndex());
 
       // after detection photon track is killed
       track.SetTrackStatus(fStopAndKill);

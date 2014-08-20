@@ -118,7 +118,7 @@ namespace Belle2 {
         G4Material* medPoly = man->FindOrBuildMaterial("G4_POLYETHYLENE");
         G4Material* boron   = man->FindOrBuildMaterial("G4_B");
         // 30% borated polyethylene = SWX210
-        G4Material* boratedpoly30 = new G4Material("BoratedPoly30", 1.19 * g / cm3, 2);
+        G4Material* boratedpoly30 = new G4Material("BoratedPoly30", 1.19 * CLHEP::g / CLHEP::cm3, 2);
         boratedpoly30->AddMaterial(boron, 0.30);
         boratedpoly30->AddMaterial(medPoly, 0.70);
 

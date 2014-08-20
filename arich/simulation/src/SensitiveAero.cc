@@ -32,14 +32,13 @@ namespace Belle2 {
     SensitiveAero::SensitiveAero():
       Simulation::SensitiveDetectorBase("ARICH", Const::ARICH)
     {
-      StoreArray<ARICHAeroHit>::registerPersistent();
-      RelationArray::registerPersistent<MCParticle, ARICHAeroHit>();
 
       StoreArray<MCParticle> particles;
       StoreArray<ARICHAeroHit> hits;
       RelationArray relation(particles, hits);
-      registerMCParticleRelation(relation, RelationArray::c_deleteElement);
-
+      registerMCParticleRelation(relation);
+      hits.registerInDataStore();
+      particles.registerRelationTo(hits);
     }
 
     bool SensitiveAero::step(G4Step* aStep, G4TouchableHistory*)
@@ -83,10 +82,12 @@ namespace Belle2 {
         ARICHAeroHit* hit = arichAeroHits.appendNew(PDGEncoding, TPosition, TMomentum);
 
         // Create relation to MCParticle
+
         StoreArray<MCParticle> mcParticles;
-        RelationArray  arichAeroHitRel(mcParticles, arichAeroHits);
+        RelationArray arichAeroHitRel(mcParticles, arichAeroHits);
         arichAeroHitRel.add(trackID, hit->getArrayIndex());
       }
+
       return true;
     }
 

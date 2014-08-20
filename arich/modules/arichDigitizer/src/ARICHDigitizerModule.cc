@@ -87,7 +87,8 @@ namespace Belle2 {
     // QE at 400nm (3.1eV) applied in SensitiveDetector
     m_maxQE = m_arichgp->QE(3.1);
 
-    StoreArray<ARICHDigit>::registerPersistent();
+    StoreArray<ARICHDigit> digits;
+    digits.registerInDataStore();
   }
 
   void ARICHDigitizerModule::beginRun()

@@ -193,7 +193,7 @@ namespace Belle2 {
         GearDir hapdparam(content, nodestr);
         //BOOST_FOREACH(const GearDir & runparam, content.getNodes(nodestr)) {
         m_aerogeldx     =  hapdparam.getLength("aerogeldx", 0);
-        m_framedx       =  hapdparam.getLength("framedx", 0) * mm / Unit::mm ;
+        m_framedx       =  hapdparam.getLength("framedx", 0) * CLHEP::mm / Unit::mm ;
         m_rotation1     =  hapdparam.getDouble("rotation", 0);
         m_configuration =  hapdparam.getInt("setup", 0);
         m_comment1      =  hapdparam.getString("comment", "");
@@ -303,8 +303,8 @@ namespace Belle2 {
     {
 
 
-      G4double   density = (RefractiveIndex - 1) / 0.21 * g / cm3;
-      B2INFO("Creating ARICH " << aeroname << " n=" << RefractiveIndex << " density=" << density / g * cm3 << " g/cm3");
+      G4double   density = (RefractiveIndex - 1) / 0.21 * CLHEP::g / CLHEP::cm3;
+      B2INFO("Creating ARICH " << aeroname << " n=" << RefractiveIndex << " density=" << density / CLHEP::g * CLHEP::cm3 << " g/cm3");
       Materials& materials = Materials::getInstance();
       G4Material* _aerogel = new G4Material(aeroname, density, 4);
       _aerogel->AddElement(materials.getElement("O")  ,   0.665);
@@ -322,8 +322,8 @@ namespace Belle2 {
       G4double  AerogelAbsorption[NBins];
       G4double  AerogelRayleigh[NBins];
 
-      G4double MaxPhotonEnergy = 5 * eV;
-      G4double MinPhotonEnergy = 1.5 * eV;
+      G4double MaxPhotonEnergy = 5 * CLHEP::eV;
+      G4double MinPhotonEnergy = 1.5 * CLHEP::eV;
 
       for (G4int i = 0; i < NBins; i++) {
 
@@ -333,8 +333,8 @@ namespace Belle2 {
         AerogelRindex[i]    = RefractiveIndex;
         AerogelAbsorption[i] = AerogelAbsorbtionLength;
 
-        const G4double Lambda0 = 400 * 1e-6 * mm;
-        const G4double Lambda  = 1240 * eV / energy * 1e-6 * mm;
+        const G4double Lambda0 = 400 * 1e-6 * CLHEP::mm;
+        const G4double Lambda  = 1240 * CLHEP::eV / energy * 1e-6 * CLHEP::mm;
         G4double x = Lambda / Lambda0;
         AerogelRayleigh[i]  = AerogelTransmissionLength * x * x * x * x;
       }
@@ -370,13 +370,13 @@ namespace Belle2 {
       // experimental box
 
       GearDir boxParams(content, "ExperimentalBox");
-      double xBox = boxParams.getLength("xSize") * mm / Unit::mm;
-      double yBox = boxParams.getLength("ySize") * mm / Unit::mm;
-      double zBox = boxParams.getLength("zSize") * mm / Unit::mm;
+      double xBox = boxParams.getLength("xSize") * CLHEP::mm / Unit::mm;
+      double yBox = boxParams.getLength("ySize") * CLHEP::mm / Unit::mm;
+      double zBox = boxParams.getLength("zSize") * CLHEP::mm / Unit::mm;
 
-      double xoffset = boxParams.getLength("beamcenter/x")  * mm  / Unit::mm;
-      double yoffset = boxParams.getLength("beamcenter/y")  * mm  / Unit::mm;
-      double zoffset = boxParams.getLength("beamcenter/z")  * mm  / Unit::mm - zBox / 2.;
+      double xoffset = boxParams.getLength("beamcenter/x")  * CLHEP::mm  / Unit::mm;
+      double yoffset = boxParams.getLength("beamcenter/y")  * CLHEP::mm  / Unit::mm;
+      double zoffset = boxParams.getLength("beamcenter/z")  * CLHEP::mm  / Unit::mm - zBox / 2.;
       G4ThreeVector roffset(xoffset, yoffset, zoffset);
 
       TVector3 sh(boxParams.getLength("beamcenter/x"), boxParams.getLength("beamcenter/y"), boxParams.getLength("beamcenter/z") - boxParams.getLength("zSize") / 2.);
@@ -405,13 +405,13 @@ namespace Belle2 {
       ARICHTracking* m_mwpc = new ARICHTracking[4];
       m_arichbtgp->setMwpc(m_mwpc);
       BOOST_FOREACH(const GearDir & mwpc, content.getNodes("tracking/mwpc")) {
-        double x = mwpc.getLength("size/x")  * mm / Unit::mm;
-        double y = mwpc.getLength("size/y")  * mm / Unit::mm;
-        double z = mwpc.getLength("size/z")  * mm / Unit::mm;
+        double x = mwpc.getLength("size/x")  * CLHEP::mm / Unit::mm;
+        double y = mwpc.getLength("size/y")  * CLHEP::mm / Unit::mm;
+        double z = mwpc.getLength("size/z")  * CLHEP::mm / Unit::mm;
 
-        double px = mwpc.getLength("position/x")  * mm / Unit::mm;
-        double py = mwpc.getLength("position/y")  * mm / Unit::mm;
-        double pz = mwpc.getLength("position/z")  * mm / Unit::mm;
+        double px = mwpc.getLength("position/x")  * CLHEP::mm / Unit::mm;
+        double py = mwpc.getLength("position/y")  * CLHEP::mm / Unit::mm;
+        double pz = mwpc.getLength("position/z")  * CLHEP::mm / Unit::mm;
 
         G4Box* mwpcBox = new G4Box("MwpcBox", x / 2., y / 2., z / 2.);
         G4LogicalVolume* mwpcVol = new G4LogicalVolume(mwpcBox, Materials::get(mwpc.getString("material"))  , "ARICH.mwpc");
@@ -460,14 +460,14 @@ namespace Belle2 {
       // experimental frame consisting of detector plane, aerogel and mirrors
 
       GearDir frameParams(content, "Frame");
-      double xFrame = frameParams.getLength("xSize")  * mm / Unit::mm;
-      double yFrame = frameParams.getLength("ySize")  * mm / Unit::mm;
-      double zFrame = frameParams.getLength("zSize")  * mm / Unit::mm;
+      double xFrame = frameParams.getLength("xSize")  * CLHEP::mm / Unit::mm;
+      double yFrame = frameParams.getLength("ySize")  * CLHEP::mm / Unit::mm;
+      double zFrame = frameParams.getLength("zSize")  * CLHEP::mm / Unit::mm;
       string envMat = frameParams.getString("material");
 
-      double px = frameParams.getLength("position/x") * mm /  Unit::mm;
-      double py = frameParams.getLength("position/y") * mm /  Unit::mm;
-      double pz = frameParams.getLength("position/z") * mm /  Unit::mm;
+      double px = frameParams.getLength("position/x") * CLHEP::mm /  Unit::mm;
+      double py = frameParams.getLength("position/y") * CLHEP::mm /  Unit::mm;
+      double pz = frameParams.getLength("position/z") * CLHEP::mm /  Unit::mm;
 
       G4Material* envMaterial = Materials::get(envMat);
 
@@ -477,14 +477,14 @@ namespace Belle2 {
       G4ThreeVector    frameOrigin0(m_framedx + px, py, pz); // rotation point of the detector frame wrt beamcenter
       G4ThreeVector    frameOrigin = frameOrigin0 + roffset;
       G4RotationMatrix frameRotation;
-      frameRotation.rotateY(-m_rotation1 * degree);
+      frameRotation.rotateY(-m_rotation1 * CLHEP::degree);
       G4Transform3D frameTransformation = G4Transform3D(frameRotation, frameOrigin);
 
       new G4PVPlacement(frameTransformation, lenvBox, "ARICH.frame", topVolume, false, 1);
       //setVisibility(*lenvBox, false);
 
-      TVector3 rotationCenter =  TVector3(frameOrigin0.x() *  Unit::mm / mm, frameOrigin0.y() *  Unit::mm / mm,  frameOrigin0.z() *  Unit::mm / mm);
-      m_arichbtgp->setFrameRotation(m_rotation1 * degree);
+      TVector3 rotationCenter =  TVector3(frameOrigin0.x() *  Unit::mm / CLHEP::mm, frameOrigin0.y() *  Unit::mm / CLHEP::mm,  frameOrigin0.z() *  Unit::mm / CLHEP::mm);
+      m_arichbtgp->setFrameRotation(m_rotation1 * CLHEP::degree);
       m_arichbtgp->setRotationCenter(rotationCenter);
 
 
@@ -509,8 +509,8 @@ namespace Belle2 {
       GearDir moduleParam(hapdcontent, "Detector/Module");
       G4LogicalVolume* detModule = buildModule(moduleParam);
 
-      double detZpos = hapdcontent.getLength("Detector/Plane/zPosition") * mm / Unit::mm;
-      double detThick = hapdcontent.getLength("Detector/Module/moduleZSize") * mm / Unit::mm;
+      double detZpos = hapdcontent.getLength("Detector/Plane/zPosition") * CLHEP::mm / Unit::mm;
+      double detThick = hapdcontent.getLength("Detector/Module/moduleZSize") * CLHEP::mm / Unit::mm;
       int nModules = m_arichgp->getNMCopies();
 
       for (int i = 1; i <= nModules; i++) {
@@ -542,11 +542,11 @@ namespace Belle2 {
       }
       // place aerogel tiles
       GearDir aerogelParam(content, "Aerogel");
-      double sizeX = aerogelParam.getLength("tileXSize") * mm / Unit::mm;
-      double sizeY = aerogelParam.getLength("tileYSize") * mm / Unit::mm;
-      double posX  = aerogelParam.getLength("tileXPos")   * mm / Unit::mm;
-      double posY  = aerogelParam.getLength("tileYPos")   * mm / Unit::mm;
-      double posZ  = aerogelParam.getLength("tileZPos")   * mm / Unit::mm;
+      double sizeX = aerogelParam.getLength("tileXSize") * CLHEP::mm / Unit::mm;
+      double sizeY = aerogelParam.getLength("tileYSize") * CLHEP::mm / Unit::mm;
+      double posX  = aerogelParam.getLength("tileXPos")   * CLHEP::mm / Unit::mm;
+      double posY  = aerogelParam.getLength("tileYPos")   * CLHEP::mm / Unit::mm;
+      double posZ  = aerogelParam.getLength("tileZPos")   * CLHEP::mm / Unit::mm;
       double posZ0 = posZ;
       double meanrefind = 0;
       double meantrlen  = 0;
@@ -567,13 +567,13 @@ namespace Belle2 {
       for (unsigned int ilayer = 0; ilayer < m_agelthickness.size(); ilayer++) {
         char aeroname[100];
         sprintf(aeroname, "Aerogel%d", ilayer + 1);
-        double sizeZ = m_agelthickness[ilayer] * mm / Unit::mm;
+        double sizeZ = m_agelthickness[ilayer] * CLHEP::mm / Unit::mm;
         string tileMat(aeroname);
         G4Material* tileMaterial = Materials::get(tileMat);
         if (!m_arichbtgp->getAverageAgel()) {
           m_arichgp->setAeroRefIndex(ilayer, m_agelrefind[ilayer]);
-          m_arichgp->setAerogelZPosition(ilayer, (posZ - zFrame / 2.) * Unit::mm / mm);
-          m_arichgp->setAerogelThickness(ilayer, sizeZ * Unit::mm / mm);
+          m_arichgp->setAerogelZPosition(ilayer, (posZ - zFrame / 2.) * Unit::mm / CLHEP::mm);
+          m_arichgp->setAerogelThickness(ilayer, sizeZ * Unit::mm / CLHEP::mm);
           m_arichgp->setAeroTransLength(ilayer, m_ageltrlen[ilayer]);
         }
 
@@ -589,8 +589,8 @@ namespace Belle2 {
       if (m_arichbtgp->getAverageAgel() && m_agelthickness.size()) {
         B2INFO("Average aerogel will be used in the reconstruction ");
         m_arichgp->setAeroRefIndex(0, meanrefind / m_agelthickness.size());
-        m_arichgp->setAerogelZPosition(0, (posZ0 - zFrame)* Unit::mm / mm);
-        m_arichgp->setAerogelThickness(0, posZ  * Unit::mm / mm);
+        m_arichgp->setAerogelZPosition(0, (posZ0 - zFrame)* Unit::mm / CLHEP::mm);
+        m_arichgp->setAerogelThickness(0, posZ  * Unit::mm / CLHEP::mm);
         if (meantrlen > 0 && posZ > 0) meantrlen = 1 / meantrlen / posZ;
         m_arichgp->setAeroTransLength(0, meantrlen);
       }
@@ -598,9 +598,9 @@ namespace Belle2 {
 
       // place mirrors
       GearDir mirrorsParam(mirrorcontent, "Mirrors");
-      double height    = mirrorsParam.getLength("height") * mm / Unit::mm;
-      double width     = mirrorsParam.getLength("width") * mm / Unit::mm;
-      double thickness = mirrorsParam.getLength("thickness") * mm / Unit::mm;
+      double height    = mirrorsParam.getLength("height") * CLHEP::mm / Unit::mm;
+      double width     = mirrorsParam.getLength("width") * CLHEP::mm / Unit::mm;
+      double thickness = mirrorsParam.getLength("thickness") * CLHEP::mm / Unit::mm;
       string mirrMat   = mirrorsParam.getString("material");
       G4Material* mirrMaterial = Materials::get(mirrMat);
       G4Box* mirrBox = new G4Box("mirrBox", thickness / 2., height / 2., width / 2.);
@@ -612,9 +612,9 @@ namespace Belle2 {
       new G4LogicalSkinSurface("mirrorsSurface", lmirror, optSurf);
       int iMirror = 0;
       BOOST_FOREACH(const GearDir & mirror, mirrorsParam.getNodes("Mirror")) {
-        double xpos = mirror.getLength("xPos") * mm / Unit::mm;
-        double ypos = mirror.getLength("yPos") * mm / Unit::mm;
-        double zpos = mirror.getLength("zPos") * mm / Unit::mm;
+        double xpos = mirror.getLength("xPos") * CLHEP::mm / Unit::mm;
+        double ypos = mirror.getLength("yPos") * CLHEP::mm / Unit::mm;
+        double zpos = mirror.getLength("zPos") * CLHEP::mm / Unit::mm;
         double angle = mirror.getAngle("angle") / Unit::rad;
         G4ThreeVector origin(xpos, ypos, zpos + width / 2. - zFrame / 2.);
         G4RotationMatrix Ra;

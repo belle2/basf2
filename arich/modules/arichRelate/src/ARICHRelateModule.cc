@@ -58,6 +58,7 @@ namespace Belle2 {
   }
 
   void ARICHRelateModule::initialize()
+
   {
     // Dependecies check
     StoreArray<MCParticle>::required();
@@ -66,7 +67,9 @@ namespace Belle2 {
     StoreArray<ExtHit>::required();
 
     // Prepare the relation matrix for write access
-    RelationArray::registerPersistent<ExtHit, ARICHAeroHit>("", "");
+    StoreArray<ARICHAeroHit> aeroHits;
+    StoreArray<ExtHit> extHits;
+    extHits.registerRelationTo(aeroHits);
   }
 
   void ARICHRelateModule::beginRun()
@@ -80,10 +83,6 @@ namespace Belle2 {
     StoreArray<Track> mdstTracks("");
     StoreArray<ExtHit> extHits("");
     StoreArray<ARICHAeroHit> aeroHits("");
-
-    // Output: relations
-    RelationArray aeroHitToExt(extHits, aeroHits);
-    aeroHitToExt.clear();
 
     int nHits = aeroHits.getEntries();
     B2DEBUG(50, "No. of hits " << nHits);
@@ -114,13 +113,9 @@ namespace Belle2 {
         if (extHit->getCopyID() != 12345) continue; // aerogel Al support plate
         if (extHit->getStatus() != EXT_EXIT) continue; // particles registered at the EXIT of the Al plate
         extHit->addRelationTo(aeroHit);
-
-        //aeroHit->addRelationTo(extHit);
         break;
       }
     }
-
-    aeroHitToExt.consolidate();
   }
 
 

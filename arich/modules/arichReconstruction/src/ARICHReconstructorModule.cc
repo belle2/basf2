@@ -109,10 +109,17 @@ namespace Belle2 {
     // CPU time start
     m_timeCPU = clock() * Unit::us;
 
-    StoreArray<ARICHLikelihood>::registerPersistent(m_outputLikelihoods);
-    RelationArray::registerPersistent<ARICHAeroHit, ARICHLikelihood>(m_inputAeroHits, m_outputLikelihoods);
-    RelationArray::registerPersistent<Track, ARICHLikelihood>(m_inputTracks, m_outputLikelihoods);
-    RelationArray::registerPersistent<ExtHit, ARICHAeroHit>(m_inputExtHits, m_inputAeroHits);
+    StoreArray<ARICHLikelihood> likelihoods(m_outputLikelihoods);
+    StoreArray<Track> tracks;
+    StoreArray<ExtHit> extHits;
+    StoreArray<ARICHAeroHit> aeroHits;
+
+    likelihoods.registerInDataStore();
+
+    tracks.registerRelationTo(likelihoods);
+    extHits.registerRelationTo(aeroHits);
+    aeroHits.registerRelationTo(likelihoods);
+
   }
 
   void ARICHReconstructorModule::beginRun()
@@ -131,11 +138,6 @@ namespace Belle2 {
     // input AeroHits
     StoreArray<ARICHAeroHit> arichAeroHits(m_inputAeroHits);
 
-    // output relation of likelihoods to AeroHits (needed for simple MC studies w/o tracking)
-    RelationArray aeroHitToArich(arichAeroHits, arichLikelihoods);
-    aeroHitToArich.clear();
-
-
     // track information from CDC reconstructed tracks
     if (m_inputTrackType == 0) {
 
@@ -143,10 +145,6 @@ namespace Belle2 {
 
       // Input: reconstructed tracks
       StoreArray<Track> mdstTracks(m_inputTracks);
-
-      // Output - relations
-      RelationArray trackToArich(mdstTracks, arichLikelihoods);
-      trackToArich.clear();
 
       std::vector<ARICHTrack> arichTracks;
       getTracks(arichTracks, Const::pion);
@@ -168,16 +166,15 @@ namespace Belle2 {
         B2DEBUG(50, "Number of expected photons " << expectedPhotons[0]);
         B2DEBUG(50, "Number of detected photons " << detectedPhotons);
 
-        arichLikelihoods.appendNew(track->getFlag(), likelihoods, detectedPhotons, expectedPhotons);
+        ARICHLikelihood* like = arichLikelihoods.appendNew(track->getFlag(), likelihoods, detectedPhotons, expectedPhotons);
 
         // Add relations
-        int last = arichLikelihoods.getEntries() - 1;
-        trackToArich.add(track->getTrackID(), last);
-        int aeroIndex = track->getAeroIndex();
-        if (aeroIndex >= 0) {
-          aeroHitToArich.add(aeroIndex, last);
-          // extHitToAeroHit.add(track->getHitID(),aeroIndex);
-          //aeroHitToExt.add(aeroIndex, track->getHitID());
+        const Track* mdstTrack =  mdstTracks[track->getTrackID()];
+        mdstTrack->addRelationTo(like);
+
+        if (track->getAeroIndex() > -1) {
+          const ARICHAeroHit* aeroHit = arichAeroHits[track->getAeroIndex()];
+          aeroHit->addRelationTo(like);
         } else {
           B2DEBUG(50, "No AeroHit for Track " << track->getTrackID());
         }
@@ -218,12 +215,11 @@ namespace Belle2 {
         track->getLikelihood(likelihoods);
         track->getDetectedPhotons(detectedPhotons);
 
-        arichLikelihoods.appendNew(track->getFlag(), likelihoods, detectedPhotons, expectedPhotons);
+        ARICHLikelihood* like = arichLikelihoods.appendNew(track->getFlag(), likelihoods, detectedPhotons, expectedPhotons);
 
-        int last = arichLikelihoods.getEntries() - 1;
-        int aeroIndex = track->getAeroIndex();
-        if (aeroIndex >= 0) {
-          aeroHitToArich.add(aeroIndex, last);
+        if (track->getAeroIndex() > -1) {
+          const ARICHAeroHit* aeroHit = arichAeroHits[track->getAeroIndex()];
+          aeroHit->addRelationTo(like);
         } else {
           B2DEBUG(50, "No AeroHit for Track " << track->getTrackID());
         }

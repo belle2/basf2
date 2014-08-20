@@ -13,7 +13,6 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <framework/gearbox/Const.h>
 #include <simulation/kernel/ExtManager.h>
@@ -36,6 +35,8 @@ class G4String;
 namespace genfit { class Track; }
 
 namespace Belle2 {
+
+  class Track;
 
   /** The geant4e-based track extrapolation module.
    *
@@ -111,7 +112,7 @@ namespace Belle2 {
     void getStartPoint(const genfit::Track*, int, G4ThreeVector&, G4ThreeVector&, G4ErrorTrajErr&);
 
     //! Create another extrapolation hit for a track candidate
-    void createHit(const G4ErrorFreeTrajState*, ExtHitStatus, int, int, StoreArray<ExtHit>&, RelationArray&);
+    void createHit(const G4ErrorFreeTrajState*, ExtHitStatus, Track*, int);
 
     //! Pointer to the ExtManager singleton
     Simulation::ExtManager* m_ExtMgr;

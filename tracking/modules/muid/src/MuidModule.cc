@@ -23,7 +23,6 @@
 #include <genfit/Exception.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -321,11 +320,16 @@ void MuidModule::initialize()
   }
 
   // Register output and relation arrays' persistence
-  StoreArray<Muid>::registerPersistent();
-  StoreArray<MuidHit>::registerPersistent();
-  RelationArray::registerPersistent<Track, Muid>();
-  RelationArray::registerPersistent<Track, MuidHit>();
-  RelationArray::registerPersistent<Track, KLMCluster>();
+  StoreArray<Track> tracks(m_TracksColName);
+  StoreArray<Muid> muids(m_MuidsColName);
+  StoreArray<MuidHit> muidHits(m_MuidHitsColName);
+  StoreArray<KLMCluster> klmClusters(m_KLMClustersColName);
+  muids.registerInDataStore();
+  muidHits.registerInDataStore();
+  klmClusters.registerInDataStore();
+  tracks.registerRelationTo(muids);
+  tracks.registerRelationTo(muidHits);
+  tracks.registerRelationTo(klmClusters);
 
   return;
 
@@ -368,11 +372,7 @@ void MuidModule::event()
 
   StoreArray<Track> tracks(m_TracksColName);
   StoreArray<Muid> muids(m_MuidsColName);
-  StoreArray<MuidHit> muidHits(m_MuidHitsColName);
   StoreArray<KLMCluster> klmClusters(m_KLMClustersColName);
-  RelationArray trackToMuid(tracks, muids);
-  RelationArray trackToMuidHits(tracks, muidHits);
-  RelationArray trackToKLMCluster(tracks, klmClusters);
 
   G4Point3D position;
   G4Vector3D momentum;
@@ -388,7 +388,7 @@ void MuidModule::event()
       if (chargedStable == Const::electron || chargedStable == Const::muon) pdgCode = -pdgCode;
 
       Muid* muid = muids.appendNew(pdgCode); // pdgCode doesn't know charge yet
-      trackToMuid.add(t, muids.getEntries() - 1);
+      tracks[t]->addRelationTo(muid);
 
       const TrackFitResult* trackFit = tracks[t]->getTrackFitResult(chargedStable);
       if (!trackFit) {
@@ -424,7 +424,7 @@ void MuidModule::event()
         // Ignore the zero-length step by PropagateOneStep() at each boundary
         if (step->GetStepLength() > 0.0) {
           m_TOF += step->GetDeltaTime();
-          if (createHit(state, t, pdgCode, muidHits, trackToMuidHits)) {
+          if (createHit(state, tracks[t], pdgCode)) {
             // Force geant4e to update its G4Track from the Kalman-updated state
             m_ExtMgr->GetPropagator()->SetStepN(0);
           }
@@ -456,7 +456,7 @@ void MuidModule::event()
                                    klmClusters[c]->getPosition().Z());
         if (position.angle(clusterDirection) < m_MaxClusterTrackConeAngle) {
           klmClusters[c]->setAssociatedTrackFlag();
-          trackToKLMCluster.add(t, c);
+          tracks[t]->addRelationTo(klmClusters[c]);
           break;
         }
       }
@@ -639,8 +639,7 @@ void MuidModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
 // Write another volume-entry point on track.
 // The track state will be modified here by the Kalman fitter.
 
-bool MuidModule::createHit(G4ErrorFreeTrajState* state, int trackID, int pdgCode,
-                           StoreArray<MuidHit>& muidHits, RelationArray& trackToMuidHits)
+bool MuidModule::createHit(G4ErrorFreeTrajState* state, Track* track, int pdgCode)
 {
 
   Point point;
@@ -727,8 +726,9 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, int trackID, int pdgCode
   // Create a new MuidHit and RelationEntry between it and the track.
   // Adjust geant4e's position, momentum and covariance based on matching hit and tell caller to update the geant4e state.
   if (point.chi2 >= 0.0) {
-    muidHits.appendNew(pdgCode, point.inBarrel, point.isForward, point.sector, point.layer, point.position, point.positionAtHitPlane, m_TOF, point.time, point.chi2);
-    trackToMuidHits.add(trackID, muidHits.getEntries() - 1);
+    StoreArray<MuidHit> muidHits(m_MuidHitsColName);
+    MuidHit* muidHit = muidHits.appendNew(pdgCode, point.inBarrel, point.isForward, point.sector, point.layer, point.position, point.positionAtHitPlane, m_TOF, point.time, point.chi2);
+    track->addRelationTo(muidHit);
     G4Point3D newPos(point.position.X()*cm, point.position.Y()*cm, point.position.Z()*cm);
     state->SetPosition(newPos);
     G4Vector3D newMom(point.momentum.X()*GeV, point.momentum.Y()*GeV, point.momentum.Z()*GeV);

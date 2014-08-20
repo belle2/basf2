@@ -14,7 +14,6 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -203,8 +202,10 @@ void ExtModule::initialize()
   }
 
   // Register output and relation arrays
-  StoreArray<ExtHit>::registerPersistent();
-  RelationArray::registerPersistent<Track, ExtHit>();
+  StoreArray<ExtHit> extHits(m_ExtHitsColName);
+  StoreArray<Track> tracks(m_TracksColName);
+  extHits.registerInDataStore();
+  tracks.registerRelationTo(extHits);
 
   return;
 
@@ -236,21 +237,19 @@ void ExtModule::event()
   // Pion hypothesis:  extrapolate until calorimeter exit
   // Other hypotheses: extrapolate up to but not including calorimeter
 
-  StoreArray<Track> Tracks(m_TracksColName);
-  StoreArray<ExtHit> extHits(m_ExtHitsColName);
-  RelationArray TrackToExtHits(Tracks, extHits);
+  StoreArray<Track> tracks(m_TracksColName);
 
   G4ThreeVector position;
   G4ThreeVector momentum;
   G4ErrorTrajErr covG4e(5, 0);
 
-  for (int t = 0; t < Tracks.getEntries(); ++t) {
+  for (int t = 0; t < tracks.getEntries(); ++t) {
 
     for (unsigned int hypothesis = 0; hypothesis < m_ChargedStable.size(); ++hypothesis) {
 
       Const::ChargedStable chargedStable = m_ChargedStable[hypothesis];
 
-      const TrackFitResult* trackFit = Tracks[t]->getTrackFitResult(chargedStable);
+      const TrackFitResult* trackFit = tracks[t]->getTrackFitResult(chargedStable);
       if (!trackFit) {
         B2ERROR("No valid TrackFitResult for PDGcode " <<
                 chargedStable.getPDGCode() << ": extrapolation not possible")
@@ -285,26 +284,26 @@ void ExtModule::event()
         const G4int    postStatus = step->GetPostStepPoint()->GetStepStatus();
         // First step on this track?
         if (preStatus == fUndefined) {
-          createHit(state, EXT_FIRST, t, pdgCode, extHits, TrackToExtHits);
+          createHit(state, EXT_FIRST, tracks[t], pdgCode);
         }
         // Ignore the zero-length step by PropagateOneStep() at each boundary
         if (step->GetStepLength() > 0.0) {
           if (preStatus == fGeomBoundary) {      // first step in this volume?
-            createHit(state, EXT_ENTER, t, pdgCode, extHits, TrackToExtHits);
+            createHit(state, EXT_ENTER, tracks[t], pdgCode);
           }
           m_TOF += step->GetDeltaTime();
           // Last step in this volume?
           if (postStatus == fGeomBoundary) {
-            createHit(state, EXT_EXIT, t, pdgCode, extHits, TrackToExtHits);
+            createHit(state, EXT_EXIT, tracks[t], pdgCode);
           }
         }
         // Post-step momentum too low?
         if (errCode || (track->GetMomentum().mag() < minP)) {
-          createHit(state, EXT_STOP, t, pdgCode, extHits, TrackToExtHits);
+          createHit(state, EXT_STOP, tracks[t], pdgCode);
           break;
         }
         if (m_Target->GetDistanceFromPoint(track->GetPosition()) < 0.0) {
-          createHit(state, EXT_ESCAPE, t, pdgCode, extHits, TrackToExtHits);
+          createHit(state, EXT_ESCAPE, tracks[t], pdgCode);
           break;
         }
         // Stop extrapolating as soon as the track curls inward too much
@@ -655,9 +654,10 @@ G4ErrorTrajErr ExtModule::fromPhasespaceToG4e(const TVector3& momentum, const TM
 }
 
 // write another volume-entry or volume-exit point on track
-void ExtModule::createHit(const G4ErrorFreeTrajState* state, ExtHitStatus status, int trackID, int pdgCode,
-                          StoreArray<ExtHit>& extHits, RelationArray& TrackToExtHits)
+void ExtModule::createHit(const G4ErrorFreeTrajState* state, ExtHitStatus status, Track* track, int pdgCode)
 {
+
+  StoreArray<ExtHit> extHits(m_ExtHitsColName);
 
   G4StepPoint* stepPoint = state->GetG4Track()->GetStep()->GetPreStepPoint();
   G4TouchableHandle preTouch = stepPoint->GetTouchableHandle();
@@ -676,7 +676,7 @@ void ExtModule::createHit(const G4ErrorFreeTrajState* state, ExtHitStatus status
   Const::EDetector detID(Const::EDetector::invalidDetector);
   int copyID(0);
   getVolumeID(preTouch, detID, copyID);
-  extHits.appendNew(pdgCode, detID, copyID, status, m_TOF, pos, mom, fromG4eToPhasespace(state));
-  TrackToExtHits.add(trackID, extHits.getEntries() - 1);
+  ExtHit* extHit = extHits.appendNew(pdgCode, detID, copyID, status, m_TOF, pos, mom, fromG4eToPhasespace(state));
+  track->addRelationTo(extHit);
 
 }

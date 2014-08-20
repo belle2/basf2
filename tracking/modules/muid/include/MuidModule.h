@@ -13,7 +13,6 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <framework/gearbox/Const.h>
 #include <simulation/kernel/ExtManager.h>
@@ -39,6 +38,7 @@ namespace Belle2 {
   class Muid;
   class MuidHit;
   class MuidPar;
+  class Track;
 
   //! possible intersection of extrapolated track with a KLM layer
   struct Point {
@@ -142,7 +142,7 @@ namespace Belle2 {
     void getStartPoint(const genfit::Track*, int, G4Point3D&, G4Vector3D&, G4ErrorTrajErr&);
 
     //! Add an extrapolation point for the track
-    bool createHit(G4ErrorFreeTrajState*, int, int, StoreArray<MuidHit>&, RelationArray&);
+    bool createHit(G4ErrorFreeTrajState*, Track*, int);
 
     //! Find the intersection point of the track with the crossed BKLM plane
     bool findBarrelIntersection(const TVector3&, Point&);

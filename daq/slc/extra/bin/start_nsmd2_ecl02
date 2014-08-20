@@ -12,7 +12,8 @@ do
 echo "killing nsmd2 in cpr${i}"
 ssh cpr${i} "killall nsmd2 > /dev/null 2> /dev/null; killall datad > /dev/null 2> /dev/null"
 done
-echo "killing nsmd2 in ecl01"
+
+echo "killing nsmd2 in ecl02"
 ssh ecl02 "killall nsmd2 > /dev/null 2> /dev/null; killall datad > /dev/null 2> /dev/null"
 
 echo "booting nsmd2"
@@ -20,9 +21,10 @@ for i in $(seq 5014 5026)
 do
 echo "booting nsmd2 in cpr${i}"
 arr=($(getconfig cpr${i} logfile.dir nsm.local.host nsm.local.port))
-ssh cpr${i} "${dir}/boot_nsmd2 ${arr[1]} ${arr[2]} ${arr[3]}"
+ssh cpr${i} "${dir}/boot_nsmd2 ${arr[0]} ${arr[1]} ${arr[2]}"
 done
+
 echo "booting nsmd2 in ecl02"
 arr=($(getconfig ecl02 logfile.dir nsm.local.host nsm.local.port))
-ssh ecl01 "${dir}/boot_nsmd2 ${arr[1]} ${arr[2]} ${arr[3]}"
+ssh ecl02 "${dir}/boot_nsmd2 ${arr[0]} ${arr[1]} ${arr[2]}"
 sleep 5

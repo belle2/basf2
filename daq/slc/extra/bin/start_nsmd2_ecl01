@@ -21,10 +21,10 @@ for i in $(seq 5003 5013)
 do
 echo "booting nsmd2 in cpr${i}"
 arr=($(getconfig cpr${i} logfile.dir nsm.local.host nsm.local.port))
-ssh cpr${i} "${dir}/boot_nsmd2 ${arr[1]} ${arr[2]} ${arr[3]}"
+ssh cpr${i} "${dir}/boot_nsmd2 ${arr[0]} ${arr[1]} ${arr[2]}"
 done
 
 echo "booting nsmd2 in ecl01"
 arr=($(getconfig ecl01 logfile.dir nsm.local.host nsm.local.port))
-ssh ecl01 "${dir}/boot_nsmd2 ${arr[1]} ${arr[2]} ${arr[3]}"
+ssh ecl01 "${dir}/boot_nsmd2 ${arr[0]} ${arr[1]} ${arr[2]}"
 sleep 5

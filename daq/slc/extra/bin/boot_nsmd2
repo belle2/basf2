@@ -9,4 +9,4 @@ nsm2host=$2
 nsm2port=$3
 nsmd2 -b -p $nsm2port -h $nsm2host -l $nsm2log > /dev/null 2> /dev/null < /dev/null &
 datad -d 100
-echo "booted nsmd2 (hostname=${nsm2host}, port=$nsm2port)"
+echo "booted nsmd2 (hostname=${nsm2host}, port=${nsm2port})"

@@ -6,5 +6,6 @@ killall $1 1&>2 /dev/null
 cd $HOME/belle2/release
 source ../tools/setup_belle2
 setuprel
+export NSM2_INCDIR=$BELLE2_LOCAL_DIR/daq/slc/data/nsm
 $1 $2 -d
 

@@ -7,5 +7,6 @@ nsm2log=`getconfig $1 logfile.dir`/nsm2
 mkdir -p $nsm2log
 nsm2host=`getconfig $1 nsm.local.host`
 nsm2port=`getconfig $1 nsm.local.port`
-nsmd2 -p $nsm2port -h $nsm2host -l $nsm2log
+nsmd2 -b -p $nsm2port -h $nsm2host -l $nsm2log 1&>2 /dev/null &
 datad -d 100
+echo "booted nsmd2 (hostname=${nsm2host}, port=$nsm2port)"

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+killall basf2 1&>2 /dev/null
+killall $1 1&>2 /dev/null
+
+cd $HOME/belle2/release
+source ../tools/setup_belle2
+setuprel
+$1 $2 -d
+

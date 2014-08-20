@@ -21,7 +21,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 
@@ -41,15 +40,16 @@ namespace Belle2 {
       m_detectorID(detectorID), m_type(type), m_energyDeposit(0),
       m_meanTime(0), m_meanX(0), m_meanY(0), m_meanZ(0), m_trackID(0)
     {
-      // registration
-      StoreArray<TOPTBSimHit>::registerPersistent();
-      RelationArray::registerPersistent<MCParticle, TOPTBSimHit>();
 
-      // additional registration of MCParticle relation (required for correct relations)
-      StoreArray<MCParticle> particles;
-      StoreArray<TOPTBSimHit>  hits;
-      RelationArray  relation(particles, hits);
-      registerMCParticleRelation(relation, RelationArray::c_deleteElement);
+      StoreArray<MCParticle> mcParticles;
+
+      StoreArray<TOPTBSimHit> simHits;
+      simHits.registerInDataStore();
+      mcParticles.registerRelationTo(simHits);
+
+      RelationArray  relation(mcParticles, simHits);
+      registerMCParticleRelation(relation);
+
     }
 
 

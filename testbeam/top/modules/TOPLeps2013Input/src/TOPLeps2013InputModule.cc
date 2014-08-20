@@ -17,7 +17,6 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -161,17 +160,31 @@ namespace Belle2 {
     m_entryCounter = 0;
 
     // data store objects registration
-    StoreObjPtr<EventMetaData>::registerPersistent();
-    StoreArray<TOPDigit>::registerPersistent();
-    StoreArray<Track>::registerPersistent();
-    StoreArray<TrackFitResult>::registerPersistent();
-    StoreArray<ExtHit>::registerPersistent();
-    RelationArray::registerPersistent<Track, ExtHit>();
+
+    StoreObjPtr<EventMetaData> evtMetaData;
+    evtMetaData.registerInDataStore();
+
+    StoreArray<TOPDigit> digits;
+    digits.registerInDataStore();
+
+    StoreArray<Track> tracks;
+    tracks.registerInDataStore();
+
+    StoreArray<TrackFitResult> trackFitResults;
+    trackFitResults.registerInDataStore();
+
+    StoreArray<ExtHit> extHits;
+    extHits.registerInDataStore();
+
+    tracks.registerRelationTo(extHits);
+
   }
+
 
   void TOPLeps2013InputModule::beginRun()
   {
   }
+
 
   void TOPLeps2013InputModule::event()
   {
@@ -202,8 +215,6 @@ namespace Belle2 {
     trackFitResults.create();
     StoreArray<ExtHit> extHits;
     extHits.create();
-    RelationArray trackToExtHits(tracks, extHits);
-    trackToExtHits.clear();
 
     // read from ntuple and select event
     bool select = false;

@@ -14,18 +14,13 @@ using namespace Belle2;
 bool Daemon::start(const char* logfile,
                    int argc, char** argv)
 {
-  bool isdaemon = false;
   for (int i = 1; i < argc; i++) {
     if (strcmp(argv[i], "-d") == 0) {
-      isdaemon = true;
+      daemon(0, 0);
     } else if (strcmp(argv[i], "-h") == 0) {
       LogFile::debug("Usage : %s [-d]", argv[0]);
       return false;
     }
-  }
-  LogFile::open(logfile);
-  if (isdaemon) {
-    daemon(0, 0);
   }
   return true;
 }

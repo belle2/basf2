@@ -41,7 +41,7 @@ int main(int argc, char** argv)
   signal(SIGQUIT, signaleHandler);
   signal(SIGTERM, signaleHandler);
 
-  unsigned int maxmem = 5;
+  unsigned int maxmem = 50;
   UDPSocket socket(NSMDataPaket::PORT);
   try {
     socket.bind();

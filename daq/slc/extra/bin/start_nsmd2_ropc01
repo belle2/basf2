@@ -1,0 +1,22 @@
+#!/bin/bash
+
+dir="${HOME}/belle2/release/daq/slc/extra/bin"
+
+echo "killing nsmd2"
+for i in $(seq 1 6)
+do
+echo "killing nsmd2 in cpr00${i}"
+ssh cpr00${i} "killall nsmd2 1&>2 /dev/null;killall datad 1&>2 /dev/null"
+done
+echo "killing nsmd2 in ropc01"
+ssh ropc01 "killall nsmd2 1&>2 /dev/null;killall datad 1&>2 /dev/null"
+
+echo "booting nsmd2"
+for i in $(seq 1 6)
+do
+echo "booting nsmd2 in cpr00${i}"
+ssh cpr00${i} "${dir}/boot_nsmd2_local cpr00${i}"
+done
+echo "booting nsmd2 in ropc01"
+ssh ropc01 "${dir}/boot_nsmd2_local ropc01"
+sleep 5

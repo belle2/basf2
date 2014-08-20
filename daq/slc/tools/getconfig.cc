@@ -9,7 +9,8 @@ int main(int argc, char** argv)
   if (argc < 3) return 1;
   ConfigFile file("slowcontrol", argv[1]);
   for (int i = 2; i < argc; i++) {
-    std::cout << file.get(argv[i]) << " " << std::endl;
+    std::cout << file.get(argv[i]) << " ";
   }
+  std::cout << std::endl;
   return 0;
 }

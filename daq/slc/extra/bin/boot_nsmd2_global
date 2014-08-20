@@ -6,9 +6,10 @@ killall datad 1&>2 /dev/null
 cd $HOME/belle2/release
 source ../tools/setup_belle2
 setuprel
-nsm2log=`getconfig $1 logfile.dir`/nsm2
+arr=($(getconfig $1 logfile.dir nsm.global.host nsm.global.port))
+nsm2log=${arr[0]}/nsm2
 mkdir -p $nsm2log
-nsm2host=`getconfig $1 nsm.global.host`
-nsm2port=`getconfig $1 nsm.global.port`
-nsmd2 -p $nsm2port -h $nsm2host -l $nsm2log
+nsm2host=${arr[1]}
+nsm2port=${arr[2]}
+nsmd2 -b -p $nsm2port -h $nsm2host -l $nsm2log 1&>2 /dev/null &
 datad -d 100

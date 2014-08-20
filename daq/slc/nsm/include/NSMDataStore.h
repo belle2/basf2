@@ -31,8 +31,8 @@ namespace Belle2 {
       unsigned int size;
       unsigned int utime;
       unsigned int revision;
-      char name[56];
-      char format[64];
+      char name[32];
+      char format[32];
     };
 
   private:

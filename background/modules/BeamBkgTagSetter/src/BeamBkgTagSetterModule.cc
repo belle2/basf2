@@ -17,7 +17,6 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -97,7 +96,7 @@ namespace Belle2 {
     }
 
     StoreObjPtr<BackgroundMetaData> bkgMetaData("", DataStore::c_Persistent);
-    bkgMetaData.registerAsPersistent();
+    bkgMetaData.registerInDataStore();
     if (!bkgMetaData.isValid())
       bkgMetaData.create();
     bkgMetaData->setBackgroundType(m_backgroundType);

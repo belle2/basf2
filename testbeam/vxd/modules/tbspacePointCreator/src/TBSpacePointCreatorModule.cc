@@ -137,11 +137,14 @@ void TBSpacePointCreatorModule::initialize()
 void TBSpacePointCreatorModule::event()
 {
 
+  B2DEBUG(2, "TBSpacePointCreatorModule(" << m_nameOfInstance << ")::event: starting with telClusters...")
   storeSingleCluster(m_telClusters, m_spacePoints, m_telClustersIndex);
 
+  B2DEBUG(2, "TBSpacePointCreatorModule(" << m_nameOfInstance << ")::event: continuing with pxdClusters...")
   storeSingleCluster(m_pxdClusters, m_spacePoints, m_pxdClustersIndex);
 
 
+  B2DEBUG(2, "TBSpacePointCreatorModule(" << m_nameOfInstance << ")::event: doing svdClusters...")
   if (m_onlySingleClusterSpacePoints == true) {
     provideSVDClusterSingles(m_svdClusters, m_spacePoints, m_svdClustersIndex); /// WARNING TODO: missing: possibility to allow storing of u- or v-type clusters only!
   } else {

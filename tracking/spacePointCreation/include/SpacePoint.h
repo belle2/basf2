@@ -144,9 +144,9 @@ namespace Belle2 {
 
     /** returns the name of the storeArray containing the cluster this spacePoint is related to. */
     const std::string getClusterStoreName() const {
-      const StoreObjPtr<SpacePointMetaInfo> metaInfo;
+      const StoreObjPtr<SpacePointMetaInfo> metaInfo("", DataStore::c_Persistent);
       return metaInfo->getName(m_nameIndex);
-    } /// ### !!! WARNING !!! ###
+    }
 
 
 

@@ -56,7 +56,7 @@ vector< genfit::PlanarMeasurement > TBSpacePoint::getGenfitCompatible() const
 {
   vector< genfit::PlanarMeasurement > collectedMeasurements;
 
-  const StoreObjPtr<SpacePointMetaInfo> metaInfo;
+  const StoreObjPtr<SpacePointMetaInfo> metaInfo("", DataStore::c_Persistent);
 
   // get the related clusters to this spacePoint and create a genfit::PlanarMeasurement for each of them:
   if (getType() == VXD::SensorInfoBase::SensorType::SVD) {

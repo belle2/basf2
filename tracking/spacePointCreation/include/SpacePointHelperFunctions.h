@@ -18,8 +18,6 @@
 #include <vxd/dataobjects/VxdID.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
-#include <../../externals/v00-05-02/include/boost/concept_check.hpp>
-
 
 #include <unordered_map>
 

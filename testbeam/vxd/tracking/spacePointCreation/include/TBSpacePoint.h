@@ -65,9 +65,9 @@ namespace Belle2 {
     TBSpacePoint(const PXDCluster* pxdCluster,
                  unsigned int indexNumber,
                  unsigned short nameIndex,
-                 const VXD::SensorInfoBase* aSensorInfo = NULL) {
-      SpacePoint(pxdCluster, indexNumber, nameIndex, aSensorInfo);
-    }
+                 const VXD::SensorInfoBase* aSensorInfo = NULL) :
+      SpacePoint(pxdCluster, indexNumber, nameIndex, aSensorInfo)
+    {}
 
 
 
@@ -87,9 +87,9 @@ namespace Belle2 {
      */
     TBSpacePoint(const std::vector<Belle2::SpacePoint::SVDClusterInformation>& clusters,
                  unsigned short nameIndex,
-                 const VXD::SensorInfoBase* aSensorInfo = NULL) {
-      SpacePoint(clusters, nameIndex, aSensorInfo);
-    }
+                 const VXD::SensorInfoBase* aSensorInfo = NULL) :
+      SpacePoint(clusters, nameIndex, aSensorInfo)
+    {}
 
 
 

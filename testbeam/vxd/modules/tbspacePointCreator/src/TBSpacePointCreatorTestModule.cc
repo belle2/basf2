@@ -7,9 +7,11 @@
  *                                                                        *
  **************************************************************************/
 
-#include <tracking/modules/spacePointCreator/SpacePointCreatorTestModule.h>
+#include <testbeam/vxd/modules/tbspacePointCreator/TBSpacePointCreatorTestModule.h>
 
 #include <tracking/spacePointCreation/SpacePointHelperFunctions.h>
+
+#include <testbeam/vxd/tracking/spacePointCreation/TBSpacePoint.h>
 
 #include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
@@ -21,13 +23,13 @@ using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(SpacePointCreatorTest)
+REG_MODULE(TBSpacePointCreatorTest)
 
-SpacePointCreatorTestModule::SpacePointCreatorTestModule() :
+TBSpacePointCreatorTestModule::TBSpacePointCreatorTestModule() :
   Module(),
   m_spMetaInfo("", DataStore::c_Persistent)
 {
-  setDescription("Tester module for the validity of the SpacePointCreatorModule.");
+  setDescription("Tester module for the validity of the TBSpacePointCreatorModule.");
 
   // 1. Collections.
   addParam("PXDClusters", m_pxdClustersName,
@@ -46,7 +48,7 @@ SpacePointCreatorTestModule::SpacePointCreatorTestModule() :
 
 
 
-void SpacePointCreatorTestModule::initialize()
+void TBSpacePointCreatorTestModule::initialize()
 {
   // prepare all store- and relationArrays:
   m_spacePoints.isRequired(m_spacePointsName);
@@ -71,7 +73,7 @@ void SpacePointCreatorTestModule::initialize()
   m_spacePointsName = m_spacePoints.getName();
 
 
-  B2INFO("SpacePointCreatorTestModule(" << m_nameOfInstance << ")::initialize: names found for containers:\n" <<
+  B2INFO("TBSpacePointCreatorTestModule(" << m_nameOfInstance << ")::initialize: names found for containers:\n" <<
          "pxdClusters: " << m_pxdClustersName <<
          "\nsvdClusters: " << m_svdClustersName <<
          "\nspacePoints: " << m_spacePointsName <<
@@ -87,12 +89,12 @@ void SpacePointCreatorTestModule::initialize()
 
 
 
-void SpacePointCreatorTestModule::event()
+void TBSpacePointCreatorTestModule::event()
 {
 
-  B2DEBUG(2, "SpacePointCreatorTestModule(" << m_nameOfInstance << "): starting event with " << m_spacePoints.getEntries() << " spacePoints")
+  B2DEBUG(2, "TBSpacePointCreatorTestModule(" << m_nameOfInstance << "): starting event with " << m_spacePoints.getEntries() << " spacePoints")
   for (unsigned int i = 0; i < uint(m_spacePoints.getEntries()); ++i) {
-    B2DEBUG(2, " Executing SpacePoint " << i)
+    B2DEBUG(2, " Executing SpacePoint " << i << endl)
     const SpacePoint* sp = m_spacePoints[i];
 
     vector<unsigned int> indices;
@@ -116,6 +118,15 @@ void SpacePointCreatorTestModule::event()
 
       B2DEBUG(2, " SpacePoint " << i <<
               " got pointer to PXDCluster with index " << aCluster->getArrayIndex() <<
+              " stored in Array " << aCluster->getArrayName())
+    } else if (sp->getType() == VXD::SensorInfoBase::SensorType::TEL) {
+      B2DEBUG(2, " SpacePoint " << i << " is attached to TelCluster of StoreArray " << sp->getClusterStoreName())
+      const TelCluster* aCluster = sp->getRelatedTo<TelCluster>(sp->getClusterStoreName());
+      indices.push_back(aCluster->getArrayIndex());
+      clusterContainer = aCluster->getArrayName();
+
+      B2DEBUG(2, " SpacePoint " << i <<
+              " got pointer to TelCluster with index " << aCluster->getArrayIndex() <<
               " stored in Array " << aCluster->getArrayName())
     } else { B2ERROR(" SpacePoint is of unknown type " << sp->getType()) }
 
@@ -163,9 +174,9 @@ void SpacePointCreatorTestModule::event()
 
 
 
-void SpacePointCreatorTestModule::terminate()
+void TBSpacePointCreatorTestModule::terminate()
 {
-  B2INFO("SpacePointCreatorTestModule(" << m_nameOfInstance << ")::terminate: total number of occured instances:\n" <<
+  B2INFO("TBSpacePointCreatorTestModule(" << m_nameOfInstance << ")::terminate: total number of occured instances:\n" <<
          "pxdClusters: " << m_TESTERPXDClusterCtr <<
          ", svdClusters: " << m_TESTERSVDClusterCtr <<
          ", spacePoints: " << m_TESTERSpacePointCtr)

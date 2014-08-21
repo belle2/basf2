@@ -64,9 +64,9 @@ int main(int argc, char** argv)
       if (i % 2 == 0) name += " (in)";
       else name += " (out)";
       if (nio.freq == 0) {
-        name = "\x1b[49m\x1b[31m" + name;
+        printf("\x1b[49m\x1b[31m");
       } else {
-        name = "\x1b[49m\x1b[32m" + name;
+        printf("\x1b[49m\x1b[32m");
       }
       printf(" %-13s | %s | %10s | %11s | %12s\x1b[49m\x1b[39m\n",
              name.c_str(),

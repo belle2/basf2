@@ -2,4 +2,4 @@
 
 dir="~/belle2/release/daq/slc/extra/bin"
 echo "booting runcontrold in store01"
-ssh store01.b2nsm.kek.jp "${dir}/boot_daemon storagerd store01"
+ssh storage "${dir}/boot_daemon storagerd store01"

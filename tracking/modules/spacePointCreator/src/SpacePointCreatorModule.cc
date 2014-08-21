@@ -23,7 +23,9 @@ using namespace Belle2;
 
 REG_MODULE(SpacePointCreator)
 
-SpacePointCreatorModule::SpacePointCreatorModule() : Module()
+SpacePointCreatorModule::SpacePointCreatorModule() :
+  Module(),
+  m_spMetaInfo("", DataStore::c_Persistent)
 {
   setDescription("Imports Clusters of the silicon detectors and converts them to spacePoints.");
 
@@ -52,11 +54,12 @@ void SpacePointCreatorModule::initialize()
   m_svdClusters.isOptional(m_svdClustersName);
 
 
-  //prepare collecting info for SpacePoints:
-  unsigned short cntActivatedClusterTypes = 0;
-  vector<string> collectionNames; // will contain the names of the cluster storeArrays
+  // there shall be only one, therefore no names for it.
+  m_spMetaInfo.registerInDataStore();
+  if (m_spMetaInfo.isValid() == false) { m_spMetaInfo.create(); }
 
 
+  m_pxdClustersIndex = std::numeric_limits<short unsigned int>::max();
   if (m_pxdClusters.isOptional() == true) {
 
     //Relations to cluster objects only if the ancestor relations exist:
@@ -66,13 +69,11 @@ void SpacePointCreatorModule::initialize()
     m_pxdClustersName = m_pxdClusters.getName();
 
     // prepare metaInfo for the SpacePoints containing the names for the Cluster-Containers:
-    collectionNames.push_back(m_pxdClustersName);
-    m_pxdClustersIndex = cntActivatedClusterTypes;
-    cntActivatedClusterTypes++;
-
+    m_pxdClustersIndex = m_spMetaInfo->addName(m_pxdClustersName);
   }
 
 
+  m_svdClustersIndex = std::numeric_limits<short unsigned int>::max();
   if (m_svdClusters.isOptional() == true) {
 
     //Relations to cluster objects only if the ancestor relations exist:
@@ -82,10 +83,7 @@ void SpacePointCreatorModule::initialize()
     m_svdClustersName = m_svdClusters.getName();
 
     // prepare metaInfo for the SpacePoints containing the names for the Cluster-Containers:
-    collectionNames.push_back(m_svdClustersName);
-    m_svdClustersIndex = cntActivatedClusterTypes;
-    cntActivatedClusterTypes++;
-
+    m_svdClustersIndex = m_spMetaInfo->addName(m_svdClustersName);
   }
 
 
@@ -93,14 +91,13 @@ void SpacePointCreatorModule::initialize()
   m_spacePointsName = m_spacePoints.getName();
 
 
-  // store the collected names in the MetaInfo of the SpacePoints:
-  SpacePoint initMetaData = SpacePoint(collectionNames);
-
-
   B2INFO("SpacePointCreatorModule(" << m_nameOfInstance << ")::initialize: names set for containers:\n" <<
          "pxdClusters: " << m_pxdClustersName <<
          "\nsvdClusters: " << m_svdClustersName <<
-         "\nspacePoints: " << m_spacePointsName)
+         "\nspacePoints: " << m_spacePointsName <<
+         "\nspacePointsMetaInfo-storeObjPtr: " << m_spMetaInfo.getName() <<
+         "\nindex for pxdClusters (short::max means, its not set): " << m_pxdClustersIndex <<
+         "\nindex for svdClusters (short::max means, its not set): " << m_svdClustersIndex)
 
 
   // set some counters for output:
@@ -114,10 +111,7 @@ void SpacePointCreatorModule::initialize()
 void SpacePointCreatorModule::event()
 {
 
-  for (unsigned int i = 0; i < uint(m_pxdClusters.getEntries()); ++i) {
-    SpacePoint* newSP = m_spacePoints.appendNew((m_pxdClusters[i]), i, m_pxdClustersIndex);
-    newSP->addRelationTo(m_pxdClusters[i]);
-  }
+  storeSingleCluster(m_pxdClusters, m_spacePoints, m_pxdClustersIndex);
 
 
   if (m_onlySingleClusterSpacePoints == true) {

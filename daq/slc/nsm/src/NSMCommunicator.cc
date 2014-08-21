@@ -282,7 +282,7 @@ void NSMCommunicator::readContext(NSMcontext* nsmc) throw()
     if ((m_master_node.getName().size() == 0 ||
          !isConnected(m_master_node)) &&
         cmd != NSMCommand::OK && cmd != NSMCommand::ERROR &&
-        strlen(master_name) > 0) {
+        cmd != NSMCommand::LOG && strlen(master_name) > 0) {
       m_master_node = NSMNode(master_name);
     }
   }

@@ -1,10 +1,10 @@
 #!/bin/bash
 
 dir=""
-if [ $# -gt 2 ]; then
+if [ $# -gt 3 ]; then
     dir=$4
 else
-    dir=$BELLE2_LOCAL_DIR
+    dir=$BELLE2_LOCAL_DIR/daq/slc/extra/bin
 fi
 echo "booting nsmd2 in $1"
 ssh $2@$1 "${dir}/boot_nsmd2 "`getconfig $1 logfile.dir nsm.${3}.host nsm.${3}.port`

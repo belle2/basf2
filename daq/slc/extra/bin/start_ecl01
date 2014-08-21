@@ -1,7 +1,7 @@
 #!/bin/bash
 
 dir="~/belle2/release/daq/slc/extra/bin"
-for i in $(seq 5001 5013)
+for i in $(seq 5001 50013)
 do
 echo "booting cprcontrold in cpr${i}"
 ssh cpr${i} "${dir}/boot_daemon cprcontrold cpr${i}"

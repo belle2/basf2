@@ -60,8 +60,8 @@ bool RCCallback::perform(const NSMMessage& msg) throw()
   bool result = true;
   if (state != Enum::UNKNOWN) {
     getNode().setState(state);
-    LogFile::debug("%s >> %s (%s)", msg.getNodeName(),
-                   cmd.getLabel(), state.getLabel());
+    //LogFile::debug("%s >> %s (%s)", msg.getNodeName(),
+    //               cmd.getLabel(), state.getLabel());
     //com->replyOK(getNode());
     setReply("");
     if (cmd == RCCommand::LOAD) {
@@ -141,6 +141,8 @@ bool RCCallback::preload(const NSMMessage& msg) throw()
           std::string nodename = getNode().getName();
           ConfigObjectTable table(m_db);
           m_config.setObject(table.get(runtype, nodename));
+          m_config.getObject().print();
+          LogFile::info("Loaded from DB %s:%s", nodename.c_str(), runtype.c_str());
           m_db->close();
         } catch (const DBHandlerException& e) {
           setReply("DB access error");

@@ -172,9 +172,9 @@ bool RunControlCallback::ok() throw()
   if (msg.getLength() > 0) {
     RCState state(msg.getData());
     const std::string nodename = msg.getNodeName();
-    //LogFile::debug("%s >> OK (%s) (RC=%s)",
-    //             nodename.c_str(), msg.getData(),
-    //getNode().getState().getLabel());
+    LogFile::debug("%s >> OK (%s) (RC=%s)",
+                   nodename.c_str(), msg.getData(),
+                   getNode().getState().getLabel());
     NSMNodeIterator it = find(nodename);
     if (it != m_node_v.end()) {
       NSMCommunicator& com(*getCommunicator());
@@ -364,17 +364,20 @@ bool RunControlCallback::send(NSMMessage msg) throw()
           pars[3] = 0;
           com.sendRequest(NSMMessage(m_node_v[i], RCCommand::TRIGFT, 4, pars));
         }
-        msg.setParam(0, NSMCommand::DBGET.getId());
-        msg.setParam(1, cobj.getId());
         if (m_port > 0) {
           msg.setNParams(4);
+          msg.setParam(0, NSMCommand::DBGET.getId());
+          msg.setParam(1, cobj.getId());
           msg.setParam(2, m_port);
           msg.setParam(3, i);
         } else {
           msg.setNParams(2);
+          msg.setParam(0, NSMCommand::DBGET.getId());
+          msg.setParam(1, cobj.getId());
         }
       }
       if (cmd.isAvailable(m_node_v[i].getState())) {
+        LogFile::debug("%s>>%s", cmd.getLabel(), m_node_v[i].getName().c_str());
         com.sendRequest(msg);
         RCState tstate = cmd.nextTState();
         if (tstate != Enum::UNKNOWN) m_node_v[i].setState(tstate);

@@ -193,6 +193,7 @@ bool RunControlCallback::ok() throw()
       NSMNodeIterator it = synchronize(node);
       if (state.isStable() && it == m_node_v.end()) {
         RCState state_org(getNode().getState());
+        LogFile::debug("%s >> %s", getNode().getName().c_str(), state.getLabel());
         getNode().setState(state);
         update();
         if (state != state_org) {

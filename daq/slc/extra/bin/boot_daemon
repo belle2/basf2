@@ -1,6 +1,6 @@
 #!/bin/bash
 
-killall basf2 1&>2 /dev/null
+#killall basf2 1&>2 /dev/null
 killall $1 1&>2 /dev/null
 
 cd $HOME/belle2/release

@@ -8,7 +8,7 @@ env['LIBS'] = ['$ROOT_LIBS', 'Geom',
                'boost_python', 'boost_filesystem',
                '$PYTHON_LIBS', '$XML_LIBS',
                'framework', 'nsm2_b2lib', 'nsm2_corelib', 'pthread'
-		,'ttrx', 'mgt'
+#		,'ttrx', 'mgt'
 		]
 
 Return('env')

@@ -25,7 +25,8 @@ namespace Belle2 {
 
   public:
     RunControlCallback(const NSMNode& node,
-                       const std::string& runtype);
+                       const std::string& runtype,
+                       const int port);
     virtual ~RunControlCallback() throw() {}
 
   public:
@@ -68,6 +69,7 @@ namespace Belle2 {
     NSMData m_data;
     std::vector<RCCallback*> m_callbacks;
     std::string m_runtype_default;
+    int m_port;
 
   private:
     class ConfigProvider {
@@ -80,6 +82,7 @@ namespace Belle2 {
                      const std::string hostname, int port)
         : m_callback(callback), m_hostname(hostname), m_port(port) {
       }
+
 
     public:
       void run();

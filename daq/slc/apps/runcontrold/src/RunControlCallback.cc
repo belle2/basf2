@@ -25,7 +25,8 @@
 using namespace Belle2;
 
 RunControlCallback::RunControlCallback(const NSMNode& node,
-                                       const std::string& runtype)
+                                       const std::string& runtype,
+                                       int port)
   : RCCallback(node), m_setting(node)
 {
   add(RCCommand::EXCLUDE);
@@ -33,6 +34,7 @@ RunControlCallback::RunControlCallback(const NSMNode& node,
   m_data = NSMData(node.getName() + "_STATUS",
                    "rc_status", rc_status_revision);
   m_runtype_default = runtype;
+  m_port = port;
 }
 
 void RunControlCallback::init() throw()
@@ -64,7 +66,9 @@ void RunControlCallback::init() throw()
   }
   getNode().setState(Enum::UNKNOWN);
   timeout();
-  PThread(new ConfigProvider(this, "0.0.0.0", ConfigProvider::PORT));
+  if (m_port > 0) {
+    PThread(new ConfigProvider(this, "0.0.0.0", m_port));
+  }
 }
 
 void RunControlCallback::update() throw()
@@ -360,11 +364,15 @@ bool RunControlCallback::send(NSMMessage msg) throw()
           pars[3] = 0;
           com.sendRequest(NSMMessage(m_node_v[i], RCCommand::TRIGFT, 4, pars));
         }
-        msg.setNParams(4);
         msg.setParam(0, NSMCommand::DBGET.getId());
         msg.setParam(1, cobj.getId());
-        msg.setParam(2, ConfigProvider::PORT);
-        msg.setParam(3, i);
+        if (m_port > 0) {
+          msg.setNParams(4);
+          msg.setParam(2, m_port);
+          msg.setParam(3, i);
+        } else {
+          msg.setNParams(2);
+        }
       }
       if (cmd.isAvailable(m_node_v[i].getState())) {
         com.sendRequest(msg);
@@ -377,36 +385,6 @@ bool RunControlCallback::send(NSMMessage msg) throw()
     }
   }
   return true;
-}
-
-void RunControlCallback::ConfigProvider::run()
-{
-  TCPServerSocket server(m_hostname, m_port);
-  try {
-    server.open();
-  } catch (const IOException& e) {
-    LogFile::error("failed to open server socket (%s:%d)",
-                   m_hostname.c_str(), m_port);
-    exit(1);
-  }
-  while (true) {
-    TCPSocket socket;
-    try {
-      socket = server.accept();
-      TCPSocketReader reader(socket);
-      size_t i = reader.readInt();
-      const size_t nobj = m_callback->getConfig().getObject().getNObjects("node");
-      if (i < nobj) {
-        const DBObject& obj(m_callback->getConfig().getObject().getObject("node", i));
-        const DBObject& cobj(obj.getObject("runtype"));
-        TCPSocketWriter writer(socket);
-        writer.writeObject(cobj);
-      }
-    } catch (const IOException& e) {
-      LogFile::error(e.what());
-    }
-    socket.close();
-  }
 }
 
 bool RunControlCallback::pause() throw()
@@ -451,3 +429,34 @@ bool RunControlCallback::pause() throw()
   }
   return false;
 }
+
+void RunControlCallback::ConfigProvider::run()
+{
+  TCPServerSocket server(m_hostname, m_port);
+  try {
+    server.open();
+  } catch (const IOException& e) {
+    LogFile::error("failed to open server socket (%s:%d)",
+                   m_hostname.c_str(), m_port);
+    exit(1);
+  }
+  while (true) {
+    TCPSocket socket;
+    try {
+      socket = server.accept();
+      TCPSocketReader reader(socket);
+      size_t i = reader.readInt();
+      const size_t nobj = m_callback->getConfig().getObject().getNObjects("node");
+      if (i < nobj) {
+        const DBObject& obj(m_callback->getConfig().getObject().getObject("node", i));
+        const DBObject& cobj(obj.getObject("runtype"));
+        TCPSocketWriter writer(socket);
+        writer.writeObject(cobj);
+      }
+    } catch (const IOException& e) {
+      LogFile::error(e.what());
+    }
+    socket.close();
+  }
+}
+

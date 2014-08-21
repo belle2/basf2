@@ -90,11 +90,14 @@ bool StoragerCallback::load() throw()
   m_con[1].addArgument(obuf_size);
   m_con[1].addArgument("storagerecord");
   m_con[1].addArgument("2");
+  LogFile::debug("debug");
   if (!m_con[1].load(10)) {
+    /*
     std::string emsg = "storageout: Not accepted connection from EXPRECO";
     setReply(emsg);
     LogFile::error(emsg);
     return false;
+    */
   }
   LogFile::debug("Booted storagerecord");
 

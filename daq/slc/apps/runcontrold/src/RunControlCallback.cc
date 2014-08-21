@@ -351,6 +351,14 @@ bool RunControlCallback::send(NSMMessage msg) throw()
       if (cmd == RCCommand::LOAD) {
         const DBObject& obj(getConfig().getObject().getObject("node", i));
         const DBObject& cobj(obj.getObject("runtype"));
+        if (cobj.getTable() == "ttd") {
+          int pars[4];
+          pars[0] = cobj.getShort("trigger_type");
+          pars[1] = cobj.getShort("dummy_rate");
+          pars[2] = cobj.getShort("trigger_limit");
+          pars[3] = 0;
+          com.sendRequest(NSMMessage(m_node_v[i], RCCommand::TRIGFT, 4, pars));
+        }
         msg.setNParams(4);
         msg.setParam(0, NSMCommand::DBGET.getId());
         msg.setParam(1, cobj.getId());

@@ -13,9 +13,9 @@ dir="${HOME}/belle2/release/daq/slc/extra/bin"
 #done
 
 #for host in (ropc02 hlt01 storage ttd ecl01 ecl02)
-for host in "ropc02" "store01" "ecl01" "ecl02"
+for host in "store01" #"ropc02" "store01" "ecl01" "ecl02"
 do
 echo "booting nsmd2 in ${host}"
 arr=($(getconfig $host logfile.dir nsm.global.host nsm.global.port))
-ssh $host "${dir}/boot_nsmd2 ${arr[0]} ${arr[1]} ${arr[2]}"
+ssh ${host}.b2nsm.kek.jp "${dir}/boot_nsmd2 ${arr[0]} ${arr[1]} ${arr[2]}"
 done

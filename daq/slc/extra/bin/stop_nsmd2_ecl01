@@ -1,0 +1,13 @@
+#!/bin/bash
+
+cd $HOME/belle2/release
+source ../tools/setup_belle2
+setuprel
+cd -
+
+echo "killing nsmd2"
+for i in $(seq 5001 5013)
+do
+ssh tkonno@cpr${i} "killall nsmd2 datad > /dev/null"
+done
+killall nsmd2 datad > /dev/null

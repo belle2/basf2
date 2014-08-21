@@ -8,5 +8,5 @@ ssh cpr${i} "${dir}/boot_daemon cprcontrold cpr${i}"
 done
 echo "booting rocontrold in ecl02"
 ssh ecl02 "${dir}/boot_daemon rocontrold ropc_ecl02"
-echo "booting runcontrold in ecl02"
+echo "booting ecl02 runcontrold in ecl02"
 ssh ecl02 "${dir}/boot_daemon runcontrold ecl02"

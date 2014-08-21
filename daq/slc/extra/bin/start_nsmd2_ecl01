@@ -3,28 +3,12 @@
 cd $HOME/belle2/release
 source ../tools/setup_belle2
 setuprel
-
-dir="${HOME}/belle2/release/daq/slc/extra/bin"
-
-echo "killing nsmd2"
-for i in $(seq 5001 5013)
-do
-echo "killing nsmd2 in cpr${i}"
-ssh cpr${i} "killall nsmd2 > /dev/null 2> /dev/null; killall datad > /dev/null 2> /dev/null"
-done
-
-echo "killing nsmd2 in ecl01"
-ssh ecl01 "killall nsmd2 > /dev/null 2> /dev/null; killall datad > /dev/null 2> /dev/null"
+cd -
 
 echo "booting nsmd2"
 for i in $(seq 5001 5013)
 do
-echo "booting nsmd2 in cpr${i}"
-arr=($(getconfig cpr${i} logfile.dir nsm.local.host nsm.local.port))
-ssh cpr${i} "${dir}/boot_nsmd2 ${arr[0]} ${arr[1]} ${arr[2]}"
+./boot_nsmd2_ssh cpr${i} tkonno local
 done
 
-echo "booting nsmd2 in ecl01"
-arr=($(getconfig ecl01 logfile.dir nsm.local.host nsm.local.port))
-ssh ecl01 "${dir}/boot_nsmd2 ${arr[0]} ${arr[1]} ${arr[2]}"
-sleep 5
+./boot_nsmd2_ssh ecl01 tkonno local

@@ -27,3 +27,9 @@
    ECL02, default, true,      CPR6006/copper/1/ECL:V01,0,1,      false
    ECL02, default, true,      CPR6007/copper/1/ECL:V01,0,1,      false
    ECL02, default, true,      CPR6008/copper/1/ECL:V01,0,1,      false
+   ECL, default, true,ECL01/runcontrol/1/default,0,1,      false
+   ECL, default, true,ECL02/runcontrol/1/default,0,1,      false
+   ECL, default, true,TTD/ttd/1/default,0,1,      false
+   ECL,debug:dummycpu, true,ECL01/runcontrol/1/default,0,1,      false
+   ECL,debug:dummycpu, true,ECL02/runcontrol/1/default,0,1,      false
+   ECL,debug:dummycpu, true,TTD/ttd/1/default,0,1,      false

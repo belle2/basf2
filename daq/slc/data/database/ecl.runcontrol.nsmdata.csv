@@ -27,3 +27,6 @@
    ECL02, default,  CPR6006,  CPR6006_STATUS,  ronode_status,3
    ECL02, default,  CPR6007,  CPR6007_STATUS,  ronode_status,3
    ECL02, default,  CPR6008,  CPR6008_STATUS,  ronode_status,3
+   ECL, default,ECL01,  ECL01_STATUS,rc_status,2
+   ECL, default,ECL02,  ECL02_STATUS,rc_status,2
+   ECL, default,TTD,  TTD_STATUS,ttd_status,1

@@ -3,18 +3,12 @@
 cd $HOME/belle2/release
 source ../tools/setup_belle2
 setuprel
+cd -
 
 dir="${HOME}/belle2/release/daq/slc/extra/bin"
 
-#for host in (ropc02 hlt01 storage ttd ecl01 ecl02)
-#do
-#echo "killing nsmd2 in ${host}"
-#ssh $host "killall nsmd2 > /dev/null 2> /dev/null; killall datad > /dev/null 2> /dev/null"
-#done
+./boot_nsmd2_ssh ropc02 tkonno global 
+./boot_nsmd2_ssh store01 tkonno global 
+./boot_nsmd2_ssh ecl01 tkonno global 
+./boot_nsmd2_ssh ecl02 tkonno global 
 
-for host in  "ropc02" "store01" "ecl01" "ecl02"
-do
-echo "booting nsmd2 in ${host}"
-arr=($(getconfig $host logfile.dir nsm.global.host nsm.global.port))
-ssh ${host}.b2nsm.kek.jp "${dir}/boot_nsmd2 ${arr[0]} ${arr[1]} ${arr[2]}"
-done

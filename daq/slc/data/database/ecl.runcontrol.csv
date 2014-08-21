@@ -3,3 +3,5 @@
  ECL02, default,false,480, default, default
  ECL01, debug:dummycpu,false,480, debug:dummycpu, default
  ECL02, debug:dummycpu,false,480, debug:dummycpu, default
+ ECL, default,false,480, default, default
+ ECL, debug:dummycpu,false,480, debug:dummycpu, default

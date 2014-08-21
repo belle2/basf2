@@ -223,16 +223,18 @@ bool COPPERCallback::bootBasf2() throw()
   for (size_t i = 0; i < 4; i++) {
     if (m_config.useHSLB(i)) flag += 1 << i;
   }
+  ConfigFile conf("copper");
   m_con.clearArguments();
-  m_con.addArgument(StringUtil::form("%s/%s", getenv("BELLE2_LOCAL_DIR"),
-                                     m_config.getBasf2Script().c_str()));
-  m_con.addArgument(m_config.getHostname());
-  m_con.addArgument(m_config.getCopperId().substr(3));
-  m_con.addArgument(StringUtil::form("%d", flag));
-  m_con.addArgument("1");
-  m_con.addArgument("basf2_" + getNode().getName());
+  //m_con.addArgument(StringUtil::form("%s/%s", getenv("BELLE2_LOCAL_DIR"),
+  //                                   m_config.getBasf2Script().c_str()));
+  m_con.addArgument(StringUtil::form(conf.get("readout.script"));
+                    m_con.addArgument(m_config.getHostname());
+                    m_con.addArgument(m_config.getCopperId().substr(3));
+                    m_con.addArgument(StringUtil::form("%d", flag));
+                    m_con.addArgument("1");
+                    m_con.addArgument("basf2_" + getNode().getName());
   if (m_con.load(30)) {
-    LogFile::debug("load succeded");
+  LogFile::debug("load succeded");
     return true;
   }
   LogFile::debug("load timeout");

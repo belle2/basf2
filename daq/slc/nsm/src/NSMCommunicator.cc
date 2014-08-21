@@ -264,6 +264,7 @@ throw(NSMHandlerException)
       if (FD_ISSET(com[i]->m_nsmc->sock, &fds)) {
         com[i]->readContext(com[i]->m_nsmc);
         b2nsm_context(com[i]->m_nsmc);
+        //LogFile::debug("select from %d (node=%s)", i, com[i]->getNode().getName().c_str());
         return i;
       }
     }

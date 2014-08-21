@@ -49,6 +49,7 @@ void RCCallback::sendPause(const NSMNode& node) throw()
 
 bool RCCallback::perform(const NSMMessage& msg) throw()
 {
+  //LogFile::debug("%s >> %s", msg.getNodeName(), msg.getData());
   if (NSMCallback::perform(msg)) return true;
   const RCCommand cmd = msg.getRequestName();
   if (cmd.isAvailable(getNode().getState()) == NSMCommand::DISABLED) {

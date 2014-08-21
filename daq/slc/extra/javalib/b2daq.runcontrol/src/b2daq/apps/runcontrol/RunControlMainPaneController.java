@@ -262,10 +262,12 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
         } else if (command.equals(NSMCommand.DBSET)) {
             ConfigObject cobj = NSMListenerService.getDB(msg.getNodeName());
             if (cobj != null) {
+                //System.out.println(cobj.getName() + " " + cobj.getTable() + " " + NSMListenerService.getNSMConfig().getNsmTarget());
                 //cobj.print();
                 copperEditorController.handleOnReceived(msg);
                 networkconfigController.add(cobj);
-                if (cobj.getTable().matches("runcontrol")) {
+                if (cobj.getNode().matches(NSMListenerService.getNSMConfig().getNsmTarget()) && 
+                        cobj.getTable().matches("runcontrol")) {
                     label_runtype.setText(cobj.getName());
                     if (cobj.hasObject("node")) {
                         int count = 0;
@@ -280,7 +282,7 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
                                 label_m.put(name, statelabel_v[count]);
                             }
                             count++;
-                            System.out.println(name+":"+obj.getObject("runtype").getId());
+                            //System.out.println(name+":"+obj.getObject("runtype").getId());
                             NSMListenerService.requestDBGet(name, obj.getObject("runtype").getId());
                         }
                     }
@@ -364,6 +366,7 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
                 if (label_m.containsKey(str_v[0])) {
                     state.copy(str_v[1]);
                     label_m.get(str_v[0]).update(state.getId());
+                    System.out.println("" + str_v[0] + " = " + state.getLabel());
                 }
             } else {
                 System.out.println("'" + msg.getData() + "' " + msg.getData().contains(" "));

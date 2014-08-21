@@ -276,11 +276,11 @@ public abstract class DBObject implements Serializable {
         addValue(name, FieldInfo.BOOL, value);
     }
 
-    public void addChar(String name, int value) {
+    public void addChar(String name, char value) {
         addValue(name, FieldInfo.CHAR, value);
     }
 
-    public void addShort(String name, int value) {
+    public void addShort(String name, short value) {
         addValue(name, FieldInfo.SHORT, value);
     }
 

@@ -249,7 +249,6 @@ namespace Belle2 {
   bool ParticleGenerator::currentCombinationHasDifferentSources()
   {
 
-    StoreArray<Particle> m_particleArray;
     std::vector<Particle*> stack = m_particles;
     static std::vector<int> sources; // stack for particle sources
     sources.clear();

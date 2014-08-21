@@ -33,14 +33,18 @@ namespace Belle2 {
   BkgSensitiveDetector::BkgSensitiveDetector(const char* subDett, int iden):
     Simulation::SensitiveDetectorBase("BKG", Const::invalidDetector), m_trackID(0), m_startPos(0., 0., 0.), m_startMom(0., 0., 0.), m_startTime(0), m_startEnergy(0), m_energyDeposit(0), m_trackLength(0.)
   {
+    // registration of store arrays and relations
+
     StoreArray<MCParticle> mcParticles;
     StoreArray<BeamBackHit> beamBackHits;
 
-    RelationArray  relBeamBackHitToMCParticle(mcParticles, beamBackHits);
-    registerMCParticleRelation(relBeamBackHitToMCParticle);
+    beamBackHits.registerInDataStore();
+    mcParticles.registerRelationTo(beamBackHits);
 
-    beamBackHits.registerAsPersistent();
-    relBeamBackHitToMCParticle.registerAsPersistent();
+    // additional registration of MCParticle relation
+
+    RelationArray  relation(mcParticles, beamBackHits);
+    registerMCParticleRelation(relation);
 
     std::string subDet = subDett;
     if (subDet == "IR")    m_subDet = 0;

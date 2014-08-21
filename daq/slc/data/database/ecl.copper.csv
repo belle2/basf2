@@ -1,27 +1,53 @@
  nodename,   config, copperid,   setup, hslb_a, hslb_b, hslb_c, hslb_d, dmalimit,     fee,                                                            basf2script, eb0_host, eb0_port
-  CPR5001,  ECL:V01,  cpr5001, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5002,  ECL:V01,  cpr5002, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5003,  ECL:V01,  cpr5003, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5004,  ECL:V01,  cpr5004, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5005,  ECL:V01,  cpr5005, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5006,  ECL:V01,  cpr5006, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5007,  ECL:V01,  cpr5007, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5008,  ECL:V01,  cpr5008, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5009,  ECL:V01,  cpr5009, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5010,  ECL:V01,  cpr5010, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5011,  ECL:V01,  cpr5011, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5012,  ECL:V01,  cpr5012, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5013,  ECL:V01,  cpr5013, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
-  CPR5014,  ECL:V01,  cpr5014, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR5015,  ECL:V01,  cpr5015, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR5016,  ECL:V01,  cpr5016, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR5017,  ECL:V01,  cpr5017, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR5018,  ECL:V01,  cpr5018, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR6001,  ECL:V01,  cpr6001, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR6002,  ECL:V01,  cpr6002, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR6003,  ECL:V01,  cpr6003, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR6004,  ECL:V01,  cpr6004, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR6005,  ECL:V01,  cpr6005, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR6006,  ECL:V01,  cpr6006, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR6007,  ECL:V01,  cpr6007, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
-  CPR6008,  ECL:V01,  cpr6008, ECL:V01,   true,  false,  false,  false,100, ECL:V01, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR5001,  ECL:V01,  cpr5001, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5002,  ECL:V01,  cpr5002, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5003,  ECL:V01,  cpr5003, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5004,  ECL:V01,  cpr5004, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5005,  ECL:V01,  cpr5005, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5006,  ECL:V01,  cpr5006, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5007,  ECL:V01,  cpr5007, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5008,  ECL:V01,  cpr5008, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5009,  ECL:V01,  cpr5009, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5010,  ECL:V01,  cpr5010, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5011,  ECL:V01,  cpr5011, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5012,  ECL:V01,  cpr5012, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5013,  ECL:V01,  cpr5013, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl01,33000
+  CPR5014,  ECL:V01,  cpr5014, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR5015,  ECL:V01,  cpr5015, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR5016,  ECL:V01,  cpr5016, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR5017,  ECL:V01,  cpr5017, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR5018,  ECL:V01,  cpr5018, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR6001,  ECL:V01,  cpr6001, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR6002,  ECL:V01,  cpr6002, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR6003,  ECL:V01,  cpr6003, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR6004,  ECL:V01,  cpr6004, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR6005,  ECL:V01,  cpr6005, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR6006,  ECL:V01,  cpr6006, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR6007,  ECL:V01,  cpr6007, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR6008,  ECL:V01,  cpr6008, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPER.py,    ecl02,33000
+  CPR5001,debug:cpudummy,  cpr5001, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl01,33000
+  CPR5002,debug:cpudummy,  cpr5002, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl01,33000
+  CPR5003,debug:cpudummy,  cpr5003, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl01,33000
+  CPR5004,debug:cpudummy,  cpr5004, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl01,33000
+  CPR5005,debug:cpudummy,  cpr5005, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl01,33000
+  CPR5006,debug:cpudummy,  cpr5006, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl01,33000
+  CPR5007,debug:cpudummy,  cpr5007, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl01,33000
+  CPR5008,debug:cpudummy,  cpr5008, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl01,33000
+  CPR5009,debug:cpudummy,  cpr5009, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl01,33000
+  CPR5010,debug:cpudummy,  cpr5010, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl01,33000
+  CPR5011,debug:cpudummy,  cpr5011, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl01,33000
+  CPR5012,debug:cpudummy,  cpr5012, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl01,33000
+  CPR5013,debug:cpudummy,  cpr5013, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl01,33000
+  CPR5014,debug:cpudummy,  cpr5014, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33000
+  CPR5015,debug:cpudummy,  cpr5015, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33000
+  CPR5016,debug:cpudummy,  cpr5016, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33000
+  CPR5017,debug:cpudummy,  cpr5017, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33000
+  CPR5018,debug:cpudummy,  cpr5018, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33000
+  CPR6001,debug:cpudummy,  cpr6001, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33000
+  CPR6002,debug:cpudummy,  cpr6002, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33000
+  CPR6003,debug:cpudummy,  cpr6003, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33000
+  CPR6004,debug:cpudummy,  cpr6004, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33000
+  CPR6005,debug:cpudummy,  cpr6005, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33000
+  CPR6006,debug:cpudummy,  cpr6006, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33000
+  CPR6007,debug:cpudummy,  cpr6007, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33000
+  CPR6008,debug:cpudummy,  cpr6008, ECL:V01,   true,  false,  false,  false,100, ECL:V01,daq/rawdata/examples/RecvSendCOPPERDummy.py,    ecl02,33000

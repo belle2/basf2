@@ -17,6 +17,8 @@
 
 #include <daq/slc/base/ConfigFile.h>
 
+#include <cstdlib>
+
 using namespace std;
 using namespace Belle2;
 
@@ -34,8 +36,8 @@ int main(int argc, char** argv)
   ConfigFile slc_config("slolwcontrol", "hlt");
   const std::string global_host = slc_config.get("nsm.global.host");
   const int global_port = slc_config.getInt("nsm.global.port");
-  const std::string local_host = slc_config.get("nsm.local.host");
-  const int local_port = slc_config.getInt("nsm.local.port");
+  const std::string local_host = conf.getconf("master", "host");
+  const int local_port = atoi(getenv("NSM2_PORT"));
   RFMasterCallback* callback = new RFMasterCallback(node, data, master);
   RFRunControlCallback* rccallback =
     new RFRunControlCallback(NSMNode("HLT"), master, callback);

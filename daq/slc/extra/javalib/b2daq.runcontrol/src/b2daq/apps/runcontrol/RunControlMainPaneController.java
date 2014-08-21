@@ -334,10 +334,11 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
                 } else {
                     runSettingsController.update(cobj, data);
                     rcStateController.update(data.getInt("state"));
+                    //System.out.println("rc.state="+data.getInt("state"));
                     if (cobj.hasObject("node")) {
                         int n = 0;
                         for (ConfigObject obj : cobj.getObjects("node")) {
-                            System.out.println("node["+n+"].state="+data.getObject("node", n).getInt("state"));
+                            //System.out.println("node["+n+"].state="+data.getObject("node", n).getInt("state"));
                             statelabel_v[n].update(data.getObject("node", n).getInt("state"));
                             n++;
                         }
@@ -366,7 +367,7 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
                 if (label_m.containsKey(str_v[0])) {
                     state.copy(str_v[1]);
                     label_m.get(str_v[0]).update(state.getId());
-                    System.out.println("" + str_v[0] + " = " + state.getLabel());
+                    //System.out.println("" + str_v[0] + " = " + state.getLabel());
                 }
             } else {
                 System.out.println("'" + msg.getData() + "' " + msg.getData().contains(" "));

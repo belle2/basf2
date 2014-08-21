@@ -119,7 +119,8 @@ bool StoragerCallback::load() throw()
   for (size_t i = 3; i < m_con.size(); i++) {
     m_con[i].clearArguments();
     m_con[i].setExecutable("basf2");
-    m_con[i].addArgument(m_file.get("record.script"));
+    m_con[i].addArgument(StringUtil::form("%s/%s", getenv("BELLE2_LOCAL_DIR"),
+                                          m_file.get("record.script").c_str()));
     m_con[i].addArgument(ibuf_name);
     m_con[i].addArgument(ibuf_size);
     m_con[i].addArgument(rbuf_name);

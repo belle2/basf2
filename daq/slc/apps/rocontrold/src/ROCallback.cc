@@ -39,10 +39,10 @@ void ROCallback::term() throw()
 bool ROCallback::load() throw()
 {
   const DBObject& obj(getConfig().getObject());
-  std::string script = obj.getText("ropc_script");
   m_con.setExecutable("basf2");
   m_con.clearArguments();
-  m_con.addArgument(script);
+  m_con.addArgument(StringUtil::form("%s/%s", getenv("BELLE2_LOCAL_DIR"),
+                                     obj.getText("ropc.script").c_str()));
   m_con.addArgument("1");
   m_con.addArgument(StringUtil::form("%d", obj.getInt("port_from")));
   m_con.addArgument("basf2_" + getNode().getName());

@@ -1,7 +1,13 @@
  nodename,   config, copperid,   setup, hslb_a, hslb_b, hslb_c, hslb_d, dmalimit,     fee,       basf2script, eb0_host, eb0_port
-   CPR001,  CDC:V03,  cpr5010, CDC:V03,   true,  false,  false,  false,      100, CDC:V03, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPERDummy.py,   ropc01,    33000
-   CPR002,  CDC:V03,  cpr5010, CDC:V03,   true,  false,  false,  false,      100, CDC:V03, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPER.py,   ropc01,    33000
-   CPR003,  CDC:V03,  cpr5010, CDC:V03,   true,  false,  false,  false,      100, CDC:V03, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPERDummy.py,   ropc01,    33000
-   CPR004,  CDC:V03,  cpr5010, CDC:V03,   true,  false,  false,  false,      100, CDC:V03, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPERDummy.py,   ropc01,    33000
-   CPR005,  CDC:V03,  cpr5010, CDC:V03,   true,  false,  false,  false,      100, CDC:V03, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPERDummy.py,   ropc01,    33000
-   CPR006,  CDC:V03,  cpr5010, CDC:V03,   true,  false,  false,  false,      100, CDC:V03, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvSendCOPPERDummy.py,   ropc01,    33000
+   CPR001,  CDC:V03,  cpr5010, CDC:V03,   true,  false,  false,  false,100, CDC:V03,daq/rawdata/examples/RecvSendCOPPER.py,   ropc01,33000
+   CPR002,  CDC:V03,  cpr5010, CDC:V03,   true,  false,  false,  false,100, CDC:V03,daq/rawdata/examples/RecvSendCOPPER.py,   ropc01,33000
+   CPR003,  CDC:V03,  cpr5010, CDC:V03,   true,  false,  false,  false,100, CDC:V03,daq/rawdata/examples/RecvSendCOPPER.py,   ropc01,33000
+   CPR004,  CDC:V03,  cpr5010, CDC:V03,   true,  false,  false,  false,100, CDC:V03,daq/rawdata/examples/RecvSendCOPPER.py,   ropc01,33000
+   CPR005,  CDC:V03,  cpr5010, CDC:V03,   true,  false,  false,  false,100, CDC:V03,daq/rawdata/examples/RecvSendCOPPER.py,   ropc01,33000
+   CPR006,  CDC:V03,  cpr5010, CDC:V03,   true,  false,  false,  false,100, CDC:V03,daq/rawdata/examples/RecvSendCOPPER.py,   ropc01,33000
+   CPR001, debug:dummydata,  cpr5010, CDC:V03,   true,  false,  false,  false,100, CDC:V03,daq/rawdata/examples/RecvSendCOPPERDummy.py,   ropc01,33000
+   CPR002, debug:dummydata,  cpr5010, CDC:V03,   true,  false,  false,  false,100, CDC:V03,daq/rawdata/examples/RecvSendCOPPERDummy.py,   ropc01,33000
+   CPR003, debug:dummydata,  cpr5010, CDC:V03,   true,  false,  false,  false,100, CDC:V03,daq/rawdata/examples/RecvSendCOPPERDummy.py,   ropc01,33000
+   CPR004, debug:dummydata,  cpr5010, CDC:V03,   true,  false,  false,  false,100, CDC:V03,daq/rawdata/examples/RecvSendCOPPERDummy.py,   ropc01,33000
+   CPR005, debug:dummydata,  cpr5010, CDC:V03,   true,  false,  false,  false,100, CDC:V03,daq/rawdata/examples/RecvSendCOPPERDummy.py,   ropc01,33000
+   CPR006, debug:dummydata,  cpr5010, CDC:V03,   true,  false,  false,  false,100, CDC:V03,daq/rawdata/examples/RecvSendCOPPERDummy.py,   ropc01,33000

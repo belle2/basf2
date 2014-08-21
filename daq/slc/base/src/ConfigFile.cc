@@ -61,6 +61,24 @@ void ConfigFile::read(const std::string& filename, bool overload)
           }
           break;
         }
+        if (str_v[1].at(i) == '$') {
+          i++;
+          if (str_v[1].at(i) == '{') {
+            for (i++ ; i < str_v[1].size(); i++) {
+              if (str_v[1].at(i) == '}') break;
+              ss << str_v[1].at(i);
+            }
+          }
+          std::string tmp = ss.str();
+          const char* env = getenv(tmp.c_str());
+          ss.str("");
+          if (env != NULL) {
+            ss << env;
+          } else if (m_value_m.find(tmp) != m_value_m.end()) {
+            ss << m_value_m[tmp];
+          }
+          continue;
+        }
         ss << str_v[1].at(i);
       }
       add(label, ss.str(), overload);

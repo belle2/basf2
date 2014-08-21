@@ -224,7 +224,8 @@ bool COPPERCallback::bootBasf2() throw()
     if (m_config.useHSLB(i)) flag += 1 << i;
   }
   m_con.clearArguments();
-  m_con.addArgument(m_config.getBasf2Script());
+  m_con.addArgument(StringUtil::form("%s/%s", getenv("BELLE2_LOCAL_DIR"),
+                                     m_config.getBasf2Script().c_str()));
   m_con.addArgument(m_config.getHostname());
   m_con.addArgument(m_config.getCopperId().substr(3));
   m_con.addArgument(StringUtil::form("%d", flag));

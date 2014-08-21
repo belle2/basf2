@@ -1,3 +1,3 @@
  nodename,      config, host_from, port_from, host_to, port_to, ropc_nodeid, ropc_script
-   ROPC501, ECL:default,    ecl01,      5101,  ecl01,   36000,           3, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvStream1.py
-   ROPC502, ECL:default,    ecl01,      5101,  ecl01,   36000,           3, /home/usr/tkonno/belle2/release/daq/rawdata/examples/RecvStream1.py
+   ROPC501, ECL:default,    ecl01,      5101,  ecl01,   36000,           3,daq/rawdata/examples/RecvStream1.py
+   ROPC502, ECL:default,    ecl01,      5101,  ecl01,   36000,           3,daq/rawdata/examples/RecvStream1.py

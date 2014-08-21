@@ -22,6 +22,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
+#include <daq/slc/readout/RunInfoBuffer.h>
+
 #include <rawdata/dataobjects/RawCOPPER.h>
 
 #define USE_RAWDATABLOCK
@@ -77,6 +79,16 @@ namespace Belle2 {
     //! RawDataBlock array
     StoreArray<RawDataBlock> raw_datablkarray;
 #endif
+
+    double m_totbytes;
+    //! Node name
+    std::string m_nodename;
+
+    //! Use shared memory
+    int m_shmflag;
+
+    //! start flag
+    int m_start_flag;
 
   };
 

@@ -26,14 +26,16 @@ set_log_level(LogLevel.ERROR)
 set_log_level(LogLevel.INFO)
 
 # Dummy data generator
-print argvs[1]
-print argvs[2]
-print argvs[3]
-max_event = int(argvs[3])
-nodeid = int(argvs[2])
+# print argvs[1]
+# print argvs[2]
+# print argvs[3]
+# max_event = int(argvs[3])
+# nodeid = int(argvs[2])
 packer = register_module('DummyDataSource')
-# packer.param('MaxEventNum', max_event)
-packer.param('NodeID', nodeid)
+packer.param('NodeID', int(argvs[2]))  # COPPER node ID (stored in RawHeader)
+use_shm_flag = int(argvs[4])
+packer.param('UseShmFlag', use_shm_flag)
+packer.param('NodeName', argvs[5])
 
 # File output
 dump = register_module('RootOutput')

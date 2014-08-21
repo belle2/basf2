@@ -7,6 +7,7 @@
 //-
 
 #include <daq/rawdata/modules/DummyDataSource.h>
+#include <daq/rawdata/modules/DeSerializer.h>
 
 using namespace std;
 using namespace Belle2;
@@ -30,6 +31,10 @@ DummyDataSourceModule::DummyDataSourceModule() : Module()
 
   ///  maximum # of events to produce( -1 : inifinite)
   addParam("NodeID", m_nodeid, "Node ID", 0);
+
+  addParam("NodeName", m_nodename, "Node(subsystem) name", std::string(""));
+
+  addParam("UseShmFlag", m_shmflag, "Use shared memory to communicate with Runcontroller", 0);
 
   B2INFO("DummyDataSource: Constructor done.");
 }
@@ -59,6 +64,17 @@ void DummyDataSourceModule::initialize()
   rawcprarray.registerPersistent();
 
   n_basf2evt = 0;
+  m_start_flag = 0;
+
+  if (m_shmflag > 0) {
+    if (m_nodename.size() == 0 || m_nodeid < 0) {
+      m_shmflag = 0;
+    } else {
+      printf("nodename = %s\n", m_nodename.c_str());
+      RunInfoBuffer& status(DeSerializerModule::getStatus());
+      status.open(m_nodename, m_nodeid);
+    }
+  }
 
   B2INFO("DummyDataSource: initialize() done.");
 }
@@ -71,7 +87,14 @@ void DummyDataSourceModule::event()
 
   //    Make RawCOPPER array
   rawcprarray.create();
-
+  if (m_start_flag == 0) {
+    m_start_flag = 1;
+    RunInfoBuffer& status(DeSerializerModule::getStatus());
+    if (status.isAvailable()) {
+      B2INFO("DeSerializerCOPPER: Waiting for Start...\n");
+      status.reportRunning();
+    }
+  }
 
   //
   // Fill event info (These values will be stored in RawHeader )
@@ -189,5 +212,10 @@ void DummyDataSourceModule::event()
   }
 
   n_basf2evt++;
+  RunInfoBuffer& status(DeSerializerModule::getStatus());
+  if (status.isAvailable()) {
+    status.addInputNBytes(1);
+    status.setInputCount(n_basf2evt);
+  }
   return;
 }

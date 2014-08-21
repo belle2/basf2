@@ -11,7 +11,6 @@
 
 #include <tracking/spacePointCreation/SpacePointHelperFunctions.h>
 
-#include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
 
 #include <limits>       // std::numeric_limits

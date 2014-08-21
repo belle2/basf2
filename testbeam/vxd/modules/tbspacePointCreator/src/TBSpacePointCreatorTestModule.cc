@@ -13,7 +13,6 @@
 
 #include <testbeam/vxd/tracking/spacePointCreation/TBSpacePoint.h>
 
-#include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
 
 

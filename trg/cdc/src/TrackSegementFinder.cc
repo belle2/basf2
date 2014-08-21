@@ -407,7 +407,7 @@ TSFinder::findTSHit(TRGSignalVector* eachInput, int tsid){
   int * LUTValue = new int[changeTime.size()];
   if(changeTime.size()){
     fTime->state(changeTime[0]).copy2bool(fTimeBool);
-    fTimeBool[10]=true;
+    fTimeBool[9]=true;
     fTimeVect.insert(fTimeVect.begin(),fTimeBool,fTimeBool+10);
     //tmpFTime = mkint(fTime->state(changeTime[0]));
     for(unsigned i=0;i<changeTime.size();i++){
@@ -467,9 +467,10 @@ TSFinder::findTSHit(TRGSignalVector* eachInput, int tsid){
     }
 
   }
-result.push_back(resultT);
-result.push_back(resultE);
+  result.push_back(resultT);
+  result.push_back(resultE);
 
+  delete LUTValue;
   return result;
 }
 

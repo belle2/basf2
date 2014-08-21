@@ -159,7 +159,9 @@ namespace Belle2 {
 
       /** Register a variable. */
       void registerVariable(const std::string& name, Manager::FunctionPtr f, const std::string& description);
+      /** Register a variable that takes floating-point arguments (see Variable::Manager::ParameterFunctionPtr). */
       void registerVariable(const std::string& name, Manager::ParameterFunctionPtr f, const std::string& description);
+      /** Register a meta-variable that takes string arguments and returns a variable(see Variable::Manager::MetaFunctionPtr). */
       void registerVariable(const std::string& name, Manager::MetaFunctionPtr f, const std::string& description);
 
       /** Creates and registers a variable of the form func(varname) */
@@ -253,7 +255,7 @@ namespace Belle2 {
      * \sa Manager
      */
 #define REGISTER_VARIABLE(name, function, description) \
-  Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(std::string(name), Belle2::Variable::make_function(function), std::string(description));
+  static Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(std::string(name), Belle2::Variable::make_function(function), std::string(description));
 
     /** \def VARIABLE_GROUP(groupName)
      *
@@ -261,7 +263,7 @@ namespace Belle2 {
      * \sa Manager
      */
 #define VARIABLE_GROUP(groupName) \
-  GroupProxy VARMANAGER_MAKE_UNIQUE(_variablegroupproxy)(groupName);
+  static GroupProxy VARMANAGER_MAKE_UNIQUE(_variablegroupproxy)(groupName);
 
   }
 }

@@ -2,6 +2,6 @@
  RUNCONTROL, debug:storage,  STORAGE,  STORAGE_STATUS, ronode_status,        3
  RUNCONTROL, default,  STORAGE,  STORAGE_STATUS, ronode_status,        3
  RUNCONTROL, default,      HLT,      HLT_STATUS,     rfunitinfo,        1
- RUNCONTROL, default, ECL01, ECL01_STATUS,      rc_status,        1
- RUNCONTROL, default, ECL02, ECL02_STATUS,      rc_status,        1
+ RUNCONTROL, default, ECL01, ECL01_STATUS,      rc_status,        2
+ RUNCONTROL, default, ECL02, ECL02_STATUS,      rc_status,        2
  RUNCONTROL, default,      TTD,      TTD_STATUS,     ronode_status,        3

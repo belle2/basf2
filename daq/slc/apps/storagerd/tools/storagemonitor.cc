@@ -63,7 +63,12 @@ int main(int argc, char** argv)
       }
       if (i % 2 == 0) name += " (in)";
       else name += " (out)";
-      printf(" %-13s | %s | %10s | %11s | %12s\n",
+      if (nio.freq == 0) {
+        name = "\x1b[49m\x1b[31m" + name;
+      } else {
+        name = "\x1b[49m\x1b[32m" + name;
+      }
+      printf(" %-13s | %s | %10s | %11s | %12s\x1b[49m\x1b[39m\n",
              name.c_str(),
              StringUtil::form("%10u", nio.count).c_str(),
              StringUtil::form("%02.2f", nio.freq).c_str(),
@@ -72,9 +77,14 @@ int main(int argc, char** argv)
     }
     printf("\n");
     for (int i = 0; i < 11; i++) {
-      printf(" disk%02d : available %5s [%%] (disk size = %4.2f [TB])\n",
-             i + 1,
-             StringUtil::form("%3.1f", (100. - info->diskusage[i])).c_str(),
+      float available = 100. - info->diskusage[i];
+      if (available <= 10) {
+        printf("\x1b[49m\x1b[31m");
+      } else {
+        printf("\x1b[49m\x1b[32m");
+      }
+      printf(" disk%02d : available %5s [%%] (disk size = %4.2f [TB])\x1b[49m\x1b[39m\n",
+             i + 1, StringUtil::form("%3.1f", available).c_str(),
              info->disksize[i] / 1024.);
     }
   }

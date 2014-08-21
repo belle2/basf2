@@ -106,7 +106,7 @@ void RFMasterCallback::timeout() throw()
   unitinfo->updatetime = Time().get();
   for (size_t i = 0; i < m_data_v.size(); i++) {
     if (!m_data_v[i].isAvailable()) {
-      m_data_v[i].open(getCommunicator());
+      m_data_v[i].open(getCommunicator(), true);
     }
     if (m_data_v[i].isAvailable()) {
       RfUnitInfo::RfNodeInfo* nodeinfo_o = &unitinfo->nodeinfo[i];

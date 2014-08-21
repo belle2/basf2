@@ -81,18 +81,28 @@ public:
         statvfs(filename, &statfs);
         float usage = 1 - ((float)statfs.f_bfree / statfs.f_blocks);
         if (usage < 0.9) {
-          available = true;
-          break;
+          sprintf(filename, "%s%02d/storage/full_flag", dir.c_str(), g_diskid);
+          std::ifstream fin(filename);
+          int flag = 0;
+          fin >> flag;
+          if (flag != 1) {
+            available = true;
+            break;
+          }
         }
         g_diskid++;
         if (g_diskid > ndisks) g_diskid = 1;
       }
       if (!available) {
-        B2ERROR("No disk available for writing");
+        B2FATAL("No disk available for writing");
       }
       if (diskid != g_diskid) {
         std::ofstream fout(g_file_diskid.c_str());
         fout << g_diskid;
+        fout.close();
+        sprintf(filename, "%s%02d/storage/full_flag", dir.c_str(), diskid);
+        fout.open(filename);
+        fout << 1;
       }
       if (g_nfiles > 0) {
         sprintf(filename, "%s%02d/storage/e%4.4dr%6.6d.sroot-%d",

@@ -106,7 +106,8 @@ void RunControlCallback::update() throw()
     }
   }
   for (size_t i = 0; i < m_callbacks.size(); i++) {
-    if (m_callbacks[i]->getCommunicator() != NULL) {
+    if (m_callbacks[i] != this &&
+        m_callbacks[i]->getCommunicator() != NULL) {
       m_callbacks[i]->update();
     }
   }
@@ -123,8 +124,7 @@ void RunControlCallback::timeout() throw()
       node.setState(Enum::UNKNOWN);
       continue;
     }
-    if (state == Enum::UNKNOWN ||
-        (state.isStable() && state != RCState::RUNNING_S)) {
+    if (state != RCState::RUNNING_S) {
       try {
         com.sendRequest(NSMMessage(node, RCCommand::STATECHECK));
       } catch (const NSMHandlerException& e) {
@@ -172,9 +172,9 @@ bool RunControlCallback::ok() throw()
   if (msg.getLength() > 0) {
     RCState state(msg.getData());
     const std::string nodename = msg.getNodeName();
-    LogFile::debug("%s >> OK (%s) (RC=%s)",
+    LogFile::debug("%s >> OK (%s) (RC=%s) %s",
                    nodename.c_str(), msg.getData(),
-                   getNode().getState().getLabel());
+                   getNode().getState().getLabel(), state.getLabel());
     NSMNodeIterator it = find(nodename);
     if (it != m_node_v.end()) {
       NSMCommunicator& com(*getCommunicator());
@@ -194,31 +194,23 @@ bool RunControlCallback::ok() throw()
           }
         }
       }
-      NSMNodeIterator it = synchronize(node);
-      if (state.isStable() && it == m_node_v.end()) {
+      if (state.isStable() && synchronize(node)) {
         RCState state_org(getNode().getState());
-        LogFile::debug("%s >> %s", getNode().getName().c_str(), state.getLabel());
-        getNode().setState(state);
-        update();
         if (state != state_org) {
+          getNode().setState(state);
+          LogFile::debug("%s >> %s", getNode().getName().c_str(),
+                         state.getLabel());
           com.replyOK(getNode());
           for (size_t i = 0; i < m_callbacks.size(); i++) {
-            if (m_callbacks[i]->getCommunicator() != NULL) {
+            if (m_callbacks[i] != this &&
+                m_callbacks[i]->getCommunicator() != NULL) {
               m_callbacks[i]->getCommunicator()->replyOK(getNode());
             }
           }
+          m_msg_tmp.setRequestName(Enum::UNKNOWN);
         }
-        m_msg_tmp.setRequestName(Enum::UNKNOWN);
-      } else if (it != m_node_v.end()) {
-        m_msg_tmp.setNodeName(*it);
-        update();
-        RCCommand cmd(m_msg_tmp.getRequestName());
-        //if (cmd.isAvailable(it->getState()))
-        //  send(m_msg_tmp);
       }
-    } else {
-      LogFile::error("OK request from Unknown node: %s",
-                     nodename.c_str());
+      update();
     }
   }
   return true;
@@ -243,7 +235,8 @@ bool RunControlCallback::error() throw()
       com.sendLog(log);
       if (log.getPriority() > LogFile::WARNING) {
         for (size_t i = 0; i < m_callbacks.size(); i++) {
-          if (m_callbacks[i]->getCommunicator() != NULL) {
+          if (m_callbacks[i] != this &&
+              m_callbacks[i]->getCommunicator() != NULL) {
             m_callbacks[i]->getCommunicator()->sendLog(log);
           }
         }
@@ -263,19 +256,18 @@ RunControlCallback::find(const std::string& nodename) throw()
   return m_node_v.end();
 }
 
-RunControlCallback::NSMNodeIterator
-RunControlCallback::synchronize(NSMNode& node) throw()
+//RunControlCallback::NSMNodeIterator
+bool RunControlCallback::synchronize(NSMNode& node) throw()
 {
   RCState state = node.getState();
+  if (!state.isStable()) return false;
   NSMNodeIterator it = m_node_v.begin();
   for (; it != m_node_v.end(); it++) {
     if (state != it->getState()) {
-      if (state.isStable()) return it;
-      break;
+      return false;
     }
-    if (node.getName() == it->getName()) return ++it;
   }
-  return m_node_v.end();
+  return true;
 }
 
 void RunControlCallback::prepareRun(NSMMessage& msg) throw()

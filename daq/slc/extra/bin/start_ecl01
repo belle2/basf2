@@ -1,13 +1,13 @@
 #!/bin/bash
 
 dir="~/belle2/release/daq/slc/extra/bin"
-for i in $(seq 5001 50013)
-do
-echo "booting cprcontrold in cpr${i}"
-ssh cpr${i} "${dir}/boot_daemon cprcontrold cpr${i}"
-done
-echo "booting rocontrold in ecl01"
-ssh ecl01 "${dir}/boot_daemon rocontrold ropc_ecl01"
+#for i in $(seq 5001 5013)
+#do
+#echo "booting cprcontrold in cpr${i}"
+#ssh cpr${i} "${dir}/boot_daemon cprcontrold cpr${i}"
+#done
+#echo "booting rocontrold in ecl01"
+#ssh ecl01 "${dir}/boot_daemon rocontrold ropc_ecl01"
 echo "booting ecl01 runcontrold in ecl01"
 ssh ecl01 "${dir}/boot_daemon runcontrold ecl01"
 echo "booting ecl runcontrold in ecl01"

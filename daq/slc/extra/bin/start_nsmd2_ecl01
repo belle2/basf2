@@ -6,7 +6,7 @@ setuprel
 cd -
 
 echo "booting nsmd2"
-for i in $(seq 5001 50013)
+for i in $(seq 5001 5013)
 do
 ./boot_nsmd2_ssh cpr${i} tkonno local
 done

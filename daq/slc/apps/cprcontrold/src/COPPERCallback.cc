@@ -74,6 +74,7 @@ void COPPERCallback::timeout() throw()
 
   NSMCommunicator& com(*getCommunicator());
   const std::string name = getNode().getName();
+  /*
   if (getNode().getState() == RCState::RUNNING_S &&
       m_copper.isFifoFull()) {
     std::string msg = "COPPER FIFO full";
@@ -123,15 +124,16 @@ void COPPERCallback::timeout() throw()
   }
 
   if (m_ttrx.isBelle2LinkError()) {
-    std::string msg = "TTRX Belle2 link error\n";
+    std::string msg = "TTRX Belle2 link error";
     LogFile::error(msg);
     com.sendLog(DAQLogMessage(name, LogFile::ERROR, msg));
   }
   if (m_ttrx.isLinkUpError()) {
-    std::string msg = "TTRX Link up error\n";
+    std::string msg = "TTRX Link up error";
     LogFile::error(msg);
     com.sendLog(DAQLogMessage(name, LogFile::ERROR, msg));
   }
+  */
   ronode_status* nsm = (ronode_status*)m_data.get();
   if (m_data.isAvailable() && m_flow.isAvailable()) {
     ronode_status& status(m_flow.monitor());

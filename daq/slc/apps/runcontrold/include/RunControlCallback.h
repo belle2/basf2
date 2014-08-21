@@ -57,7 +57,7 @@ namespace Belle2 {
     void prepareRun(NSMMessage& msg) throw();
     void postRun(NSMMessage& msg) throw();
     NSMNodeIterator find(const std::string& nodename) throw();
-    NSMNodeIterator synchronize(NSMNode& node) throw();
+    bool synchronize(NSMNode& node) throw();
     virtual bool isManual() { return true; }
 
   protected:

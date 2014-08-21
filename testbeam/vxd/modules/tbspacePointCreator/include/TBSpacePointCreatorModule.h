@@ -11,6 +11,7 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 #include <vxd/dataobjects/VxdID.h>
 
@@ -65,7 +66,8 @@ namespace Belle2 {
     unsigned short m_telClustersIndex; /**< TelCluster collection index number - created for SpacePointMetaInfo */
     StoreArray<TelCluster> m_telClusters; /**< the storeArray for telClusters as member, is faster than recreating link for each event */
     std::string m_spacePointsName; /**< SpacePoints collection name */
-    StoreArray<SpacePoint> m_spacePoints; /**< the storeArray for spacePoints as member, is faster than recreating link for each event */
+    StoreArray<TBSpacePoint> m_spacePoints; /**< the storeArray for TBspacePoints as member, is faster than recreating link for each event */
+    StoreObjPtr<SpacePointMetaInfo> m_spMetaInfo; /**< collects meta info relevant for all (TB)SpacePoints */
 
     // modification parameters
     std::string m_nameOfInstance; /**< allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module */

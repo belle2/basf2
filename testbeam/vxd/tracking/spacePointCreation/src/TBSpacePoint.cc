@@ -10,7 +10,6 @@
 
 #include <testbeam/vxd/tracking/spacePointCreation/TBSpacePoint.h>
 #include <vxd/dataobjects/VxdID.h>
-
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <testbeam/vxd/reconstruction/TelRecoHit.h>
@@ -19,8 +18,6 @@ using namespace std;
 using namespace Belle2;
 
 ClassImp(TBSpacePoint)
-
-SpacePointMetaInfo SpacePoint::m_metaInfo = SpacePointMetaInfo();
 
 TBSpacePoint::TBSpacePoint(const TelCluster* telCluster,
                            unsigned int indexNumber,
@@ -55,15 +52,16 @@ TBSpacePoint::TBSpacePoint(const TelCluster* telCluster,
 
 
 
-vector< genfit::PlanarMeasurement > TBSpacePoint::getGenfitCompatible()
+vector< genfit::PlanarMeasurement > TBSpacePoint::getGenfitCompatible() const
 {
   vector< genfit::PlanarMeasurement > collectedMeasurements;
 
+  const StoreObjPtr<SpacePointMetaInfo> metaInfo;
 
   // get the related clusters to this spacePoint and create a genfit::PlanarMeasurement for each of them:
   if (getType() == VXD::SensorInfoBase::SensorType::SVD) {
 
-    auto relatedClusters = this->getRelationsTo<SVDCluster>(SpacePoint::getClusterStoreName());
+    auto relatedClusters = this->getRelationsTo<SVDCluster>(metaInfo->getName(SpacePoint::m_nameIndex));
     for (unsigned i = 0; i < relatedClusters.size(); i++) {
       collectedMeasurements.push_back(SVDRecoHit(relatedClusters[i]));
     }
@@ -71,13 +69,13 @@ vector< genfit::PlanarMeasurement > TBSpacePoint::getGenfitCompatible()
   } else if (getType() == VXD::SensorInfoBase::SensorType::PXD) {
 
     collectedMeasurements.push_back(
-      PXDRecoHit(this->getRelatedTo<PXDCluster>(SpacePoint::getClusterStoreName()))
+      PXDRecoHit(this->getRelatedTo<PXDCluster>(metaInfo->getName(SpacePoint::m_nameIndex)))
     );
 
   } else if (getType() == VXD::SensorInfoBase::SensorType::TEL) {
 
     collectedMeasurements.push_back(
-      TelRecoHit(this->getRelatedTo<TelCluster>(SpacePoint::getClusterStoreName()))
+      TelRecoHit(this->getRelatedTo<TelCluster>(metaInfo->getName(SpacePoint::m_nameIndex)))
     );
 
   } else {

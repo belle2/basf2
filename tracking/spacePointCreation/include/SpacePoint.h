@@ -11,6 +11,7 @@
 
 // framework
 #include <framework/datastore/RelationsObject.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/logging/Logger.h>
 // vxd
@@ -53,17 +54,9 @@ namespace Belle2 {
 
 
 
-
     /** Default constructor for the ROOT IO. */
     SpacePoint()
     {}
-
-
-
-    /** Constructor for */
-    SpacePoint(std::vector<std::string>& names) {
-      m_metaInfo.addNames(names);
-    }
 
 
 
@@ -101,6 +94,11 @@ namespace Belle2 {
     SpacePoint(const std::vector<Belle2::SpacePoint::SVDClusterInformation>& clusters,
                unsigned short nameIndex,
                const VXD::SensorInfoBase* aSensorInfo = NULL);
+
+
+
+    /** virtual destructor to prevent undefined behavior for inherited classes */
+    virtual ~SpacePoint() {}
 
 
 
@@ -145,7 +143,10 @@ namespace Belle2 {
 
 
     /** returns the name of the storeArray containing the cluster this spacePoint is related to. */
-    const std::string getClusterStoreName() const { return m_metaInfo.getName(m_nameIndex); }
+    const std::string getClusterStoreName() const {
+      const StoreObjPtr<SpacePointMetaInfo> metaInfo;
+      return metaInfo->getName(m_nameIndex);
+    } /// ### !!! WARNING !!! ###
 
 
 
@@ -157,7 +158,7 @@ namespace Belle2 {
     * since a spacePoint can not contain clusters of different sensors
     * and therefore of different detector types.
     */
-    virtual std::vector<genfit::PlanarMeasurement> getGenfitCompatible();
+    virtual std::vector<genfit::PlanarMeasurement> getGenfitCompatible() const ;
 
 
 // static converter functions:
@@ -290,16 +291,11 @@ namespace Belle2 {
 
 
 
-    /** contains metaInfo to be able to store memory-intensive data like names for relations */
-    static SpacePointMetaInfo m_metaInfo;
-
-
-
     /** is the index number of the name of the storeArray stored in m_metaInfo. */
     unsigned short m_nameIndex;
 
 
 
-    ClassDef(SpacePoint, 4) // last member added: m_nameIndex;
+    ClassDef(SpacePoint, 4) // last member added: m_nameIndex;, last removed: m_metaInfo
   };
 }

@@ -49,6 +49,10 @@ spCreatorCombi.logging.debug_level = 1
 spCreatorCombi.param('OnlySingleClusterSpacePoints', False)
 spCreatorCombi.param('NameOfInstance', 'couplesAllowed')
 
+spCreatorTest = register_module('SpacePointCreatorTest')
+spCreatorTest.logging.log_level = LogLevel.DEBUG
+spCreatorTest.logging.debug_level = 20
+spCreatorTest.param('NameOfInstance', 'SPTester')
 
 # Create paths
 main = create_path()
@@ -64,6 +68,7 @@ main.add_module(svdDigitizer)
 main.add_module(svdClusterizer)
 main.add_module(spCreatorSingle)
 main.add_module(spCreatorCombi)
+main.add_module(spCreatorTest)
 
 
 # Process events

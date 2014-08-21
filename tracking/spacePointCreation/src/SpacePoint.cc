@@ -9,8 +9,8 @@
  **************************************************************************/
 
 #include <tracking/spacePointCreation/SpacePoint.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <vxd/dataobjects/VxdID.h>
-
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 
@@ -18,8 +18,6 @@ using namespace std;
 using namespace Belle2;
 
 ClassImp(SpacePoint)
-
-SpacePointMetaInfo SpacePoint::m_metaInfo = SpacePointMetaInfo();
 
 SpacePoint::SpacePoint(const PXDCluster* pxdCluster,
                        unsigned int indexNumber,
@@ -127,15 +125,16 @@ SpacePoint::SpacePoint(const std::vector<SpacePoint::SVDClusterInformation>& clu
 
 
 
-vector< genfit::PlanarMeasurement > SpacePoint::getGenfitCompatible()
+vector< genfit::PlanarMeasurement > SpacePoint::getGenfitCompatible() const
 {
   vector< genfit::PlanarMeasurement > collectedMeasurements;
 
+  const StoreObjPtr<SpacePointMetaInfo> metaInfo;
 
   // get the related clusters to this spacePoint and create a genfit::PlanarMeasurement for each of them:
   if (getType() == VXD::SensorInfoBase::SensorType::SVD) {
 
-    auto relatedClusters = this->getRelationsTo<SVDCluster>(getClusterStoreName());
+    auto relatedClusters = this->getRelationsTo<SVDCluster>(metaInfo->getName(m_nameIndex));
     for (unsigned i = 0; i < relatedClusters.size(); i++) {
       collectedMeasurements.push_back(SVDRecoHit(relatedClusters[i]));
     }
@@ -143,7 +142,7 @@ vector< genfit::PlanarMeasurement > SpacePoint::getGenfitCompatible()
   } else if (getType() == VXD::SensorInfoBase::SensorType::PXD) {
 
     collectedMeasurements.push_back(
-      PXDRecoHit(this->getRelatedTo<PXDCluster>(getClusterStoreName()))
+      PXDRecoHit(this->getRelatedTo<PXDCluster>(metaInfo->getName(m_nameIndex)))
     );
 
   } else {

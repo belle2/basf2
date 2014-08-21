@@ -31,17 +31,23 @@ namespace Belle2 {
 
 
 
-    /** the typical constructor to be used.
-     *
-     * expects a vector of names for storeArrays.
+    /** destructor */
+    ~SpacePointMetaInfo() {}
+
+
+
+    /** constructor - expects a vector of names for storeArrays to be stored.
      * */
     SpacePointMetaInfo(std::vector<std::string>& names):
       m_names4StoreArrays(names) {}
 
 
 
-    /** to add a single name, use this setter. */
-    void addName(std::string aName) { m_names4StoreArrays.push_back(aName); }
+    /** to add a single name, use this setter. it returns the position of the added name in its container */
+    unsigned int addName(std::string aName) {
+      m_names4StoreArrays.push_back(aName);
+      return m_names4StoreArrays.size() - 1;
+    }
 
 
 
@@ -57,6 +63,8 @@ namespace Belle2 {
 
 
 
+    /** returns number of names stored in metaInfo */
+    unsigned int getnNames() const { return m_names4StoreArrays.size(); }
   protected:
 
 
@@ -67,6 +75,8 @@ namespace Belle2 {
      */
     std::vector<std::string> m_names4StoreArrays;
 
+    /** counts how many times a constructor was called, having metaInfo as member, destructors reduce this counter. */
+//  static int m_usageCounter;
 
     ClassDef(SpacePointMetaInfo, 0) // last member added: m_names4StoreArrays;
   };

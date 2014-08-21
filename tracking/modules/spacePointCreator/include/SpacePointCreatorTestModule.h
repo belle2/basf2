@@ -23,17 +23,17 @@
 
 namespace Belle2 {
   /**
-   * Imports Clusters of the silicon detectors and converts them to spacePoints.
+   * Tester module for the validity of the SpacePointCreatorModule.
    *
    */
-  class SpacePointCreatorModule : public Module {
+  class SpacePointCreatorTestModule : public Module {
 
   public:
 
 
 
     /** Constructor */
-    SpacePointCreatorModule();
+    SpacePointCreatorTestModule();
 
 
 
@@ -70,7 +70,7 @@ namespace Belle2 {
 
     // modification parameters
     std::string m_nameOfInstance; /**< allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module */
-    bool m_onlySingleClusterSpacePoints; /**< standard is false. If activated, the module will not try to find combinations of U and V clusters for the SVD any more. Does not affect pixel-type Clusters */
+//     bool m_onlySingleClusterSpacePoints; /**< standard is false. If activated, the module will not try to find combinations of U and V clusters for the SVD any more. Does not affect pixel-type Clusters */
 
 
     //counters for testing

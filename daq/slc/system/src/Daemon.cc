@@ -22,6 +22,7 @@ bool Daemon::start(const char* logfile,
       return false;
     }
   }
+  LogFile::open(logfile);
   return true;
 }
 

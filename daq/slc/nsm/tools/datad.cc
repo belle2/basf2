@@ -46,7 +46,7 @@ int main(int argc, char** argv)
   try {
     socket.bind();
   } catch (const IOException& e) {
-    LogFile::error("UDP port %u is already in use. Exiting process", NSMDataPaket::PORT);
+    //LogFile::error("UDP port %u is already in use. Exiting process", NSMDataPaket::PORT);
     return 1;
   }
 

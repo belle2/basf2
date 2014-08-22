@@ -24,6 +24,9 @@
 #include <G4ThreeVector.hh>
 #include <G4RotationMatrix.hh>
 
+#include <top/geometry/TOPQbar.h>
+
+
 #define MAXPTS_TTS 10
 #define MAXPTS_QE 100
 
@@ -40,9 +43,6 @@ namespace Belle2 {
 
     public:
 
-      /**< Constructor */
-      TOPGeometryPar();
-
       /**< Destructor */
       virtual ~TOPGeometryPar();
 
@@ -56,8 +56,6 @@ namespace Belle2 {
        */
       void Initialize(const GearDir& content);
 
-      /**< Generic clear function */
-      void clear(void);
 
       /** Generic print function, possibility to add debug information */
       void Print(void) const;
@@ -169,6 +167,16 @@ namespace Belle2 {
        * @return sigma alpha of quartz
        */
       double getSigmaAlpha() const {return m_SigmaAlpha; }
+
+      /**
+       * Returns Q-bar geometry object
+       * @param ID Q-bar ID
+       * @return pointer to Q-bar or NULL
+       */
+      const TOPQbar* getQbar(int ID) const {
+        if (ID < 1 || ID > (int) m_bars.size()) return NULL;
+        return &m_bars[ID - 1];
+      }
 
       //! Parameters of the PMT
 
@@ -431,6 +439,12 @@ namespace Belle2 {
 
     private:
 
+      /**< Constructor */
+      TOPGeometryPar();
+
+      /**< Generic clear function */
+      void clear(void);
+
       //! Quartz bar parameters
 
       int m_Nbars;          /**< number of bars */
@@ -450,6 +464,7 @@ namespace Belle2 {
       double m_Gwidth2;     /**< glue thickness between segments 1 and 2 */
       double m_Gwidth3;     /**< glue thickness between segment 3 and mirror */
       double m_SigmaAlpha;  /**< surface roughness of quartz */
+      std::vector<TOPQbar> m_bars; /**< geometry of the bars */
 
       //! PMT parameters
 

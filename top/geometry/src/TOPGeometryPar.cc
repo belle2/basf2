@@ -163,6 +163,17 @@ namespace Belle2 {
       m_Gwidth3 = barParams.getLength("Glue/Thicknes3");
       m_SigmaAlpha = barParams.getDouble("Surface/SigmaAlpha");
 
+      double saved_unit = m_unit;
+      m_unit = Unit::cm;
+      double phi = m_phi0 - M_PI / 2.0;
+      double Dphi = 2 * M_PI / m_Nbars;
+      for (int i = 0; i < m_Nbars; i++) {
+        TOPQbar bar(m_Qwidth, m_Qthickness, getZ1(), getZ2(), m_Radius, 0.0, phi, i + 1);
+        m_bars.push_back(bar);
+        phi += Dphi;
+      }
+      m_unit = saved_unit;
+
       //! PMT's
 
       GearDir detParams(content, "PMTs");

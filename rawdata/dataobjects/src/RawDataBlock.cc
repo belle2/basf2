@@ -16,7 +16,7 @@ ClassImp(RawDataBlock);
 RawDataBlock::RawDataBlock()
 {
   m_nwords = 0;
-  m_delete_flag = true;
+  m_use_prealloc_buf = 0;
   m_buffer = NULL;
   m_num_nodes = 0;
   m_num_events = 0;
@@ -25,7 +25,7 @@ RawDataBlock::RawDataBlock()
 
 RawDataBlock::~RawDataBlock()
 {
-  if (m_delete_flag && m_buffer != NULL) {
+  if (!m_use_prealloc_buf && m_buffer != NULL) {
     delete[] m_buffer;
   }
 }
@@ -131,12 +131,12 @@ void RawDataBlock::SetBuffer(int* bufin, int nwords, int delete_flag, int num_ev
     exit(1);
   }
 
-  if (m_delete_flag && m_buffer != NULL) delete[] m_buffer;
+  if (!m_use_prealloc_buf && m_buffer != NULL) delete[] m_buffer;
 
   if (delete_flag == 0) {
-    m_delete_flag = false;
+    m_use_prealloc_buf = true;
   } else {
-    m_delete_flag = true;
+    m_use_prealloc_buf = false;
   }
   //  m_nwords = bufin[0];
   m_nwords = nwords;

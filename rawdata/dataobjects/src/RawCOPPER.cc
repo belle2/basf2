@@ -123,12 +123,12 @@ void RawCOPPER::SetBuffer(int* bufin, int nwords, int delete_flag, int num_event
     printf("[DEBUG] bufin is NULL. Exting...\n");
     exit(1);
   }
-  if (m_delete_flag && m_buffer != NULL) delete[] m_buffer;
+  if (!m_use_prealloc_buf && m_buffer != NULL) delete[] m_buffer;
 
   if (delete_flag == 0) {
-    m_delete_flag = false;
+    m_use_prealloc_buf = true;
   } else {
-    m_delete_flag = true;
+    m_use_prealloc_buf = false;
   }
 
   m_nwords = nwords;

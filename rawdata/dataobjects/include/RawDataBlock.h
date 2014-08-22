@@ -55,8 +55,8 @@ namespace Belle2 {
     //! get # of events in m_buffer
     virtual int GetNumEvents() { return m_num_events; }
 
-    //! get delete_flag
-    virtual int GetDeleteFlag() { return m_delete_flag; }
+    //! get malloc_flag
+    virtual int GetPreAllocFlag() { return m_use_prealloc_buf; }
 
     //! get size of a data block
     virtual int GetBlockNwords(int n);
@@ -99,8 +99,9 @@ namespace Belle2 {
     /// Buffer
     int* m_buffer; //[m_nwords]
 
-    //! flag for deleting m_buffer in RawDataBlock destructer(1:delete, 0: not delete)
-    int m_delete_flag;
+    //! flag for deleting m_buffer in destructer( 0:delete, 1: not delete)
+    //! When using pre-allocated buffer, the buffer should be reused and not deleted in the destructer
+    int m_use_prealloc_buf;
 
     //! no longer used
     int m_which_part;

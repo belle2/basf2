@@ -10,10 +10,8 @@
 
 #pragma once
 
-#include <analysis/dataobjects/Particle.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
-
 namespace Belle2 {
+  class Particle;
 
   namespace Variable {
 

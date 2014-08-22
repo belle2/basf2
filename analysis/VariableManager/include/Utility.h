@@ -1,12 +1,8 @@
 #pragma once
 
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/dataobjects/Particle.h>
 
 #include <string>
-#include <iostream>
-#include <stdexcept>
-#include <map>
 
 namespace Belle2 {
 
@@ -15,8 +11,8 @@ namespace Belle2 {
   namespace Variable {
 
     /**
-    * Remove () from variable names, because ROOT doesn't like them
-    */
+     * Remove special characters that ROOT dislikes in branch names, e.g. (, ), :, etc
+     */
     std::string makeROOTCompatible(std::string str);
 
     /**

@@ -20,6 +20,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 // dataobjects
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/ParticleList.h>
@@ -29,6 +30,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 
 
 // framework aux

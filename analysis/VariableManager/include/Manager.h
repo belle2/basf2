@@ -1,13 +1,12 @@
 #pragma once
 
-#include <analysis/dataobjects/Particle.h>
-
 #include <string>
 #include <map>
 #include <vector>
 #include <functional>
 
 namespace Belle2 {
+  class Particle;
 
   namespace Variable {
 

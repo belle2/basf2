@@ -214,7 +214,7 @@ void Variable::Manager::printList() const
       std::cout << "\n" << var->group << ":\n";
       group = var->group;
     }
-    std::cout << std::setw(14) << var->name << "  " << var->description << std::endl;
+    std::cout << std::setw(30) << var->name << "  " << var->description << std::endl;
   }
 
   for (auto & pair : m_meta_variables) {
@@ -224,7 +224,7 @@ void Variable::Manager::printList() const
       std::cout << "\n" << var->group << ":\n";
       group = var->group;
     }
-    std::cout << std::setw(14) << var->name << "  " << var->description << std::endl;
+    std::cout << std::setw(30) << var->name << "  " << var->description << std::endl;
   }
 }
 

@@ -1,19 +1,20 @@
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/dataobjects/Particle.h>
 #include <framework/logging/Logger.h>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include <tuple>
+#include <iostream>
+#include <stdexcept>
 
 std::string Belle2::Variable::makeROOTCompatible(std::string str)
 {
-  str.erase(std::remove(str.begin(), str.end(), '('), str.end());
-  str.erase(std::remove(str.begin(), str.end(), ')'), str.end());
-  str.erase(std::remove(str.begin(), str.end(), ','), str.end());
-  str.erase(std::remove(str.begin(), str.end(), ' '), str.end());
+  boost::algorithm::erase_all(str, "(");
+  boost::algorithm::erase_all(str, ")");
+  boost::algorithm::erase_all(str, ",");
+  boost::algorithm::erase_all(str, ":");
+  boost::algorithm::erase_all(str, " ");
   return str;
 }
 
@@ -96,10 +97,8 @@ void Belle2::Variable::Cut::init(Parameter str)
 
 void Belle2::Variable::Cut::clean()
 {
-  if (left != nullptr)
-    delete left;
-  if (right != nullptr)
-    delete right;
+  delete left;
+  delete right;
   left = nullptr;
   right = nullptr;
 }

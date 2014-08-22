@@ -212,8 +212,13 @@ namespace {
     EXPECT_FALSE(a.check(nullptr));
     a.init("1 < 2 or 3 == 4 and 5 > 6");
     EXPECT_TRUE(a.check(nullptr));
+  }
 
-
+  TEST(VariableTest, makeROOTCompatible)
+  {
+    EXPECT_EQ("", makeROOTCompatible(""));
+    EXPECT_EQ("", makeROOTCompatible(":() (),"));
+    EXPECT_EQ("cba", makeROOTCompatible("c:()b (),a"));
   }
 
 }  // namespace

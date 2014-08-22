@@ -122,6 +122,18 @@ namespace Belle2 {
        */
       void unpack_dhp_raw(void* data, unsigned int len, unsigned int dhh_ID, unsigned dhh_DHPport, VxdID vxd_id);
 
+      /** Unpack DHP/FCE data within one DHH frame
+       * @param data pointer to dhp data
+       * @param len length of dhp data
+       * @param dhh_first_readout_frame_lo 16 bit of the first readout frame from DHH Start
+       * @param dhh_ID raw DHH ID from DHHC frame
+       * @param dhh_DHPport raw DHP port from DHHC frame
+       * @param dhh_reformat flag if DHH did reformatting
+       * @param toffset triggered row (offset)
+       * @param vxd_id vertex Detector ID
+       */
+      void unpack_fce(void* data, unsigned int frame_len, unsigned int dhh_first_readout_frame_id_lo, unsigned int dhh_ID, unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id);
+
       int nr5bits(int i) const;/// helper function to "count" nr of set bits within lower 5 bits
 
 

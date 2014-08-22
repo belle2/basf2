@@ -27,19 +27,15 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     PXDRawROIs():
-      m_2timesNrROIs(0), m_header1(0), m_header2(0), m_header3(0), m_header4(0), m_rois(0) {};
+      m_2timesNrROIs(0), m_rois(0) {};
 
 
     /** Constructor with data
      * @param nrroi Nr of Rois to follow in data ptr.
-     * @param h1 Header 1 - HLT Header
-     * @param h2 Header 2 - HLT Trigger Nr
-     * @param h3 Header 3 - DATCON Header
-     * @param h4 Header 4 - DATCON Trigger Nr
      * @param data pointer to ROIs .
      */
-    PXDRawROIs(unsigned int nrroi, unsigned int h1, unsigned int h2, unsigned int h3, unsigned int h4, unsigned int* data):
-      m_2timesNrROIs(2 * nrroi), m_header1(h1), m_header2(h2), m_header3(h3), m_header4(h4), m_rois(0) {
+    PXDRawROIs(unsigned int nrroi, unsigned int* data):
+      m_2timesNrROIs(2 * nrroi), m_rois(0) {
       m_rois = new int[m_2timesNrROIs];
       for (unsigned int i = 0; i < m_2timesNrROIs; i++) m_rois[i] = ((data[i] >> 16) & 0xFFFF) | ((data[i] & 0xFFFF) << 16); // word swap
     };
@@ -108,16 +104,12 @@ namespace Belle2 {
 
   protected:
     unsigned int m_2timesNrROIs;/**< Number of ROIs times two (size of one ROI is 2*32bit) */
-    unsigned int m_header1;/**< HLT Header */
-    unsigned int m_header2;/**< HTL Trigger NR */
-    unsigned int m_header3;/**< DATCON Header */
-    unsigned int m_header4;/**< DATCON trigger NR */
     int* m_rois; // [m_2timesNrROIs] /**< Buffer of size 2*m_NrROIs ints  */
 
 
     // ~PXDRawROIs();
 
-    ClassDef(PXDRawROIs, 1)
+    ClassDef(PXDRawROIs, 2)
   };
 
 

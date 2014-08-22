@@ -258,12 +258,12 @@ struct dhhc_direct_readout_frame_zsd : public dhhc_direct_readout_frame {
 struct dhhc_onsen_trigger_frame {
   const dhhc_frame_header_word0 word0;
   const unsigned short trignr0;
-  const unsigned int magic1;/// ?? brauch ich nicht
+  const unsigned int magic1;/// redundant
   const unsigned int trignr1;
   const unsigned int trigtag1;
-  const unsigned int magic2;/// ?? brauch ich nicht
-  const unsigned int trignr2;/// ?? brauch ich nicht
-  const unsigned int trigtag2;/// ?? brauch ich nicht
+  const unsigned int magic2;/// redundant
+  const unsigned int trignr2;/// redundant, DATCON check
+  const unsigned int trigtag2;/// redundant, DATCON check
   const unsigned int crc32;
 
   inline unsigned int getFixedSize(void) const {
@@ -280,118 +280,138 @@ struct dhhc_onsen_trigger_frame {
   };
   void print(void) const {
     word0.print();
-    B2INFO("DHHC Trigger Frame TNRLO $" << hex << trignr0);
+    B2INFO("ONSEN Trigger Frame TNRLO $" << hex << trignr0);
   };
-  unsigned int check_error(void) const {
-    return 0;
-  }
+  unsigned int check_error(bool ignore_datcon_flag = false) const {
+    unsigned int m_errorMask = 0;
+    if ((magic1 & 0xFFFF) != 0xCAFE) {
+      B2ERROR("ONSEN Trigger Magic 1 error $" << hex << magic1);
+      m_errorMask |= ONSEN_ERR_FLAG_HLTROI_MAGIC;
+    }
+    if ((magic2 & 0xFFFF) != 0xCAFE) {
+      B2ERROR("ONSEN Trigger Magic 2 error $" << hex << magic2);
+      m_errorMask |= ONSEN_ERR_FLAG_HLTROI_MAGIC;
+    }
+    if (magic2 == 0x0000CAFE && trignr2 == 0x00000000) {
+      if (!ignore_datcon_flag) B2WARNING("ONSEN Trigger Frame: No DATCON data " << hex << trignr1 << "!=$" << trignr2);
+      m_errorMask |= ONSEN_ERR_FLAG_NO_DATCON;
+    } else {
+      if (trignr1 != trignr2) {
+        B2ERROR("ONSEN Trigger Frame Trigger Nr Mismatch $" << hex << trignr1 << "!=$" << trignr2);
+        m_errorMask |= ONSEN_ERR_FLAG_MERGER_TRIGNR;
+      }
+    }
+    return m_errorMask;
+  };
 };
 
 struct dhhc_onsen_roi_frame {
   const dhhc_frame_header_word0 word0;/// mainly empty
   const unsigned short trignr0;// not used
-  const unsigned int magic1;// not clear what will remain here, as this info will go to trigger frame.
-  const unsigned int trignr1;// not clear what will remain here, as this info will go to trigger frame.
-  const unsigned int trigtag1;// not clear what will remain here, as this info will go to trigger frame.
-  const unsigned int magic2;// not clear what will remain here, as this info will go to trigger frame.
-  const unsigned int trignr2;// not clear what will remain here, as this info will go to trigger frame.
-  const unsigned int trigtag2;// not clear what will remain here, as this info will go to trigger frame.
+  ///const unsigned int magic1;// REMOVED this info is not in the onsen trigger frame.
+  ///const unsigned int trignr1;// REMOVED  this info is not in the onsen trigger frame.
+  ///const unsigned int trigtag1;// REMOVED this info is not in the onsen trigger frame.
+  ///const unsigned int magic2;// REMOVED this info is not in the onsen trigger frame.
+  ///const unsigned int trignr2;// REMOVED this info is not in the onsen trigger frame.
+  ///const unsigned int trigtag2;// REMOVED this info is not in the onsen trigger frame.
   /// plus n* ROIs (64 bit)
   /// plus checksum 32bit
 
   inline unsigned short get_trig_nr0(void) const {
     return trignr0;
   };
-  inline unsigned int get_trig_nr1(void) const {
-    return trignr1;
-  };
-  inline unsigned int get_trig_nr2(void) const {
-    return trignr2;
-  };
-  unsigned int check_error(bool ignore_datcon_flag = false) const {
+//   inline unsigned int get_trig_nr1(void) const {
+//     return trignr1;
+//   };
+//   inline unsigned int get_trig_nr2(void) const {
+//     return trignr2;
+//   };
+  unsigned int check_error(void) const {
     unsigned int m_errorMask = 0;
-    if ((magic1 & 0xFFFF) != 0xCAFE) {
-      B2ERROR("DHHC HLT/ROI Magic 1 error $" << hex << magic1);
-      m_errorMask |= ONSEN_ERR_FLAG_HLTROI_MAGIC;
-    }
-    if ((magic2 & 0xFFFF) != 0xCAFE) {
-      B2ERROR("DHHC HLT/ROI Magic 2 error $" << hex << magic2);
-      m_errorMask |= ONSEN_ERR_FLAG_HLTROI_MAGIC;
-    }
-    if (magic2 == 0x0000CAFE && trignr2 == 0x00000000) {
-      if (!ignore_datcon_flag) B2WARNING("DHHC HLT/ROI Frame: No DATCON data " << hex << trignr1 << "!=$" << trignr2);
-      m_errorMask |= ONSEN_ERR_FLAG_NO_DATCON;
-    } else {
-      if (trignr1 != trignr2) {
-        B2ERROR("DHHC HLT/ROI Frame Trigger Nr Mismatch $" << hex << trignr1 << "!=$" << trignr2);
-        m_errorMask |= ONSEN_ERR_FLAG_MERGER_TRIGNR;
-      }
-    }
+//     if ((magic1 & 0xFFFF) != 0xCAFE) {
+//       B2ERROR("DHHC HLT/ROI Magic 1 error $" << hex << magic1);
+//       m_errorMask |= ONSEN_ERR_FLAG_HLTROI_MAGIC;
+//     }
+//     if ((magic2 & 0xFFFF) != 0xCAFE) {
+//       B2ERROR("DHHC HLT/ROI Magic 2 error $" << hex << magic2);
+//       m_errorMask |= ONSEN_ERR_FLAG_HLTROI_MAGIC;
+//     }
+//     if (magic2 == 0x0000CAFE && trignr2 == 0x00000000) {
+//       if (!ignore_datcon_flag) B2WARNING("DHHC HLT/ROI Frame: No DATCON data " << hex << trignr1 << "!=$" << trignr2);
+//       m_errorMask |= ONSEN_ERR_FLAG_NO_DATCON;
+//     } else {
+//       if (trignr1 != trignr2) {
+//         B2ERROR("DHHC HLT/ROI Frame Trigger Nr Mismatch $" << hex << trignr1 << "!=$" << trignr2);
+//         m_errorMask |= ONSEN_ERR_FLAG_MERGER_TRIGNR;
+//       }
+//     }
     return m_errorMask;
   };
   void print(void) const {
     word0.print();
-    B2INFO("DHHC HLT/ROI Frame for Trigger HLT, DATCON: $" << hex << trignr1 << ", $" << trignr2);
+    B2INFO("DHHC HLT/ROI Frame");
   };
 
   unsigned int check_inner_crc(unsigned int length) const {
-    if (length < 8) {
-      B2ERROR("DHHC ONSEN HLT/ROI Frame too small!!!");
-      return ONSEN_ERR_FLAG_MERGER_CRC;
-    }
-    unsigned char* d;
-    dhh_crc_32_type bocrc;
-    char crcbuffer[65536 * 2]; /// 128kB
-    d = (unsigned char*) &magic1;/// without the DHHC header as its only an inner checksum!!!
-
-    if (length > 65536 * 2) {
-      B2WARNING("DHHC ONSEN HLT/ROI Frame CRC FAIL because of too large packet (>128kB)!");
-    } else {
-      for (unsigned int k = 0; k < length - 4; k += 2) { // -4
-        crcbuffer[k] = d[k + 1];
-        crcbuffer[k + 1] = d[k];
-      }
-      bocrc.process_bytes(crcbuffer, length - 8); /// -4
-    }
-    unsigned int c;
-    c = bocrc.checksum();
-
-    boost::spirit::endian::ubig32_t crc32;
-    crc32 = *(boost::spirit::endian::ubig32_t*)(crcbuffer + length - 8);  /// -4
-
-    if (c == crc32) {
-//       if (verbose)
-//         B2INFO("DHHC ONSEN HLT/ROI Frame CRC OK: " << hex << c << "==" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
-//                << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " len $" << length);
-      return 0;// O.K.
-    } else {
-//       crc_error++;
-//       if (verbose) {
-      B2ERROR("DHHC ONSEN HLT/ROI Frame CRC FAIL: " << hex << c << "!=" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
-              << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " len $" << length);
-      /// others would be interessting but possible subjects to access outside of buffer
-      /// << " " << * (unsigned int*)(d + length - 2) << " " << * (unsigned int*)(d + length + 0) << " " << * (unsigned int*)(d + length + 2));
-      //if (length <= 64) {
-      //  for (unsigned int i = 0; i < length / 4; i++) {
-      //    B2ERROR("== " << i << "  $" << hex << ((unsigned int*)d)[i]);
-      //  }
-      //}
-//       };
-//       error_flag = true;
-      return ONSEN_ERR_FLAG_MERGER_CRC;
-    }
+    /// Parts of the data are now in the ONSEN Triogger frame, therefore the inner CRC cannot be checked that easily!
+//     if (length < 8) {
+//       B2ERROR("DHHC ONSEN HLT/ROI Frame too small!!!");
+//       return ONSEN_ERR_FLAG_MERGER_CRC;
+//     }
+//     unsigned char* d;
+//     dhh_crc_32_type bocrc;
+//     char crcbuffer[65536 * 2]; /// 128kB
+//     d = (unsigned char*) &magic1;/// without the DHHC header as its only an inner checksum!!!
+//
+//     if (length > 65536 * 2) {
+//       B2WARNING("DHHC ONSEN HLT/ROI Frame CRC FAIL because of too large packet (>128kB)!");
+//     } else {
+//       for (unsigned int k = 0; k < length - 4; k += 2) { // -4
+//         crcbuffer[k] = d[k + 1];
+//         crcbuffer[k + 1] = d[k];
+//       }
+//       bocrc.process_bytes(crcbuffer, length - 8); /// -4
+//     }
+//     unsigned int c;
+//     c = bocrc.checksum();
+//
+//     boost::spirit::endian::ubig32_t crc32;
+//     crc32 = *(boost::spirit::endian::ubig32_t*)(crcbuffer + length - 8);  /// -4
+//
+//     if (c == crc32) {
+// //       if (verbose)
+// //         B2INFO("DHHC ONSEN HLT/ROI Frame CRC OK: " << hex << c << "==" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
+// //                << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " len $" << length);
+//       return 0;// O.K.
+//     } else {
+// //       crc_error++;
+// //       if (verbose) {
+//       B2ERROR("DHHC ONSEN HLT/ROI Frame CRC FAIL: " << hex << c << "!=" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
+//               << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " len $" << length);
+//       /// others would be interessting but possible subjects to access outside of buffer
+//       /// << " " << * (unsigned int*)(d + length - 2) << " " << * (unsigned int*)(d + length + 0) << " " << * (unsigned int*)(d + length + 2));
+//       //if (length <= 64) {
+//       //  for (unsigned int i = 0; i < length / 4; i++) {
+//       //    B2ERROR("== " << i << "  $" << hex << ((unsigned int*)d)[i]);
+//       //  }
+//       //}
+// //       };
+// //       error_flag = true;
+//       return ONSEN_ERR_FLAG_MERGER_CRC;
+//     }
     return 0;// never reached
   };
   void save(StoreArray<PXDRawROIs>& sa, unsigned int length, unsigned int* data) const {
     // not clear what will remain here, as part of data (headers) will go to trigger frame.
-    if (length < 4 + 4 + 4 * 4) {
+    if (length < 4 + 4) {
       B2ERROR("DHHC ONSEN HLT/ROI Frame too small to hold any ROIs, did not save anything!");
       return;
     }
     unsigned int l;
-    l = (length - 4 - 4 - 4 * 4) / 8;
+    l = (length - 4 - 4) / 8;
     // for(unsigned int i=0; i<l*2; i++) data[5+i]=((data[5+i]>>16)&0xFFFF)| ((data[5+i]&0xFFFF)<<16);// dont do it here ... CRC will fail
-    sa.appendNew(l, magic1, trignr1, magic2, trignr2, &data[5]);
+//     sa.appendNew(l, magic1, trignr1, magic2, trignr2, &data[5]);
+    sa.appendNew(l, &data[1]);
   }
 
 };
@@ -574,9 +594,7 @@ public:
         break;
       case DHHC_FRAME_HEADER_DATA_TYPE_ONSEN_FCE:
       case DHHC_FRAME_HEADER_DATA_TYPE_FCE_RAW:
-        B2INFO("Error: FCE type not yet supported ");
         s = 0; /// size is not a fixed number
-//         error_flag = true;
         break;
       case DHHC_FRAME_HEADER_DATA_TYPE_COMMODE:
         s = data_commode_frame->getFixedSize();
@@ -644,10 +662,10 @@ void PXDUnpackerModule::initialize()
 {
   StoreArray<RawPXD>::required(m_RawPXDsName);
   //Register output collections
-  m_storeRawHits.registerAsPersistent(m_PXDRawHitsName);
-  m_storeRawAdc.registerAsPersistent(m_PXDRawAdcsName);
-  m_storeRawPedestal.registerAsPersistent(m_PXDRawPedestalsName);
-  m_storeROIs.registerAsPersistent(m_PXDRawROIsName);
+  m_storeRawHits.registerInDataStore(m_PXDRawHitsName);
+  m_storeRawAdc.registerInDataStore(m_PXDRawAdcsName);
+  m_storeRawPedestal.registerInDataStore(m_PXDRawPedestalsName);
+  m_storeROIs.registerInDataStore(m_PXDRawROIsName);
   /// actually, later we do not want to store ROIs and Pedestals into output file ...  aside from debugging
 
   B2INFO("HeaderEndianSwap: " << m_headerEndianSwap);
@@ -871,6 +889,36 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
   }
 };
 
+void PXDUnpackerModule::unpack_fce(void* data, unsigned int frame_len, unsigned int dhh_first_readout_frame_id_lo, unsigned int dhh_ID, unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id)
+{
+  unsigned int nr_words = frame_len / 2; // frame_len in bytes (excl. CRC)!!!
+  unsigned short* dhp_fce = (unsigned short*)data;
+
+  /// Actually, the format is not fixed yet, thus any depacking is guessing right now :-/
+  /// It seems, there is nod DHP Frame header here
+//   for(unsigned int i=0; i<nr_words; i++){
+//     if((dhp_fce[i]&0x8000)==0){
+//       B2INFO("Cluster Start Row ");
+  /*
+    * Start Of Row
+      – SOR[15]: ’0’ Start of Row flag
+      – SOR[14]: Start of Cluster flag
+      – SOR[13:12]: dE/dx information (to be filled by the Karlsruhe group)
+      – SOR[11:10]: DHP index
+      – SOR[9:0]: Row Address
+  */
+//     }else{
+//       B2INFO("... Pixel Word ");
+  /*
+   * Pixel word
+      – PW[15]: ’1’ Pixel word flag
+      – PW[14]: Increment row flag. ’1’ - Increment row address, ’0’ - keep row address
+      – PW[13:8]: Column address
+      – PW[7:0]: ADC value
+  */
+//     }
+//   }
+}
 
 void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned int dhh_first_readout_frame_id_lo, unsigned int dhh_ID, unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id)
 {
@@ -1131,6 +1179,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, const int len, const int F
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_ONSEN_FCE:
     case DHHC_FRAME_HEADER_DATA_TYPE_FCE_RAW: {
+      B2INFO("Error: FCE type not yet supported ");
       countedDHHCFrames++;
 
       if (verbose) hw->print();
@@ -1139,6 +1188,14 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, const int len, const int F
         m_errorMask |= ONSEN_ERR_FLAG_DHH_START_ID;
       }
       m_errorMask |= dhhc.check_crc();
+      found_mask_active_dhp |= 1 << dhhc.data_direct_readout_frame->getDHPPort();
+
+      unpack_dhp(data, len - 4,
+                 dhh_first_readout_frame_id_lo,
+                 dhhc.data_direct_readout_frame->getDHHId(),
+                 dhhc.data_direct_readout_frame->getDHPPort(),
+                 dhhc.data_direct_readout_frame->getDataReformattedFlag(),
+                 dhh_first_offset, currentVxdId);
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_COMMODE: {
@@ -1295,8 +1352,8 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, const int len, const int F
     case DHHC_FRAME_HEADER_DATA_TYPE_ONSEN_ROI:
       countedDHHCFrames += 0; /// DO NOT COUNT!!!!
       if (verbose) dhhc.data_onsen_roi_frame->print();
-      m_errorMask |= dhhc.data_onsen_roi_frame->check_error(ignore_datcon_flag);
-      m_errorMask |= dhhc.data_onsen_roi_frame->check_inner_crc(len - 4); /// CRC is without the DHHC header
+      m_errorMask |= dhhc.data_onsen_roi_frame->check_error();// dummy
+      m_errorMask |= dhhc.data_onsen_roi_frame->check_inner_crc(len - 4); /// CRC is without the DHHC header, dummy see reason in function
       m_errorMask |= dhhc.check_crc();
       if (!m_doNotStore) dhhc.data_onsen_roi_frame->save(m_storeROIs, len, (unsigned int*) data);
       break;
@@ -1308,7 +1365,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, const int len, const int F
 //   n_meta_subrun_nr=evtPtr->getSubrun();
 //   m_meta_experiment=evtPtr->getExperiment();
       if (verbose) dhhc.data_onsen_trigger_frame->print();
-      m_errorMask |= dhhc.data_onsen_trigger_frame->check_error();
+      m_errorMask |= dhhc.data_onsen_trigger_frame->check_error(ignore_datcon_flag);
       m_errorMask |= dhhc.check_crc();
       if (Frame_Number != 0) {
         B2ERROR("ONSEN TRG Frame must be the first one.");

@@ -17,6 +17,7 @@
 #include <framework/utilities/ArrayIterator.h>
 
 #include <TClonesArray.h>
+#include <stdexcept>
 
 namespace Belle2 {
   /** Accessor to arrays stored in the data store.
@@ -216,16 +217,18 @@ namespace Belle2 {
 
     /** Access to the stored objects.
      *
-     * Out-of-bounds accesses produce an error message.
+     *  Out-of-bounds accesses throw an std::out_of_range exception
      *
      *  \param i Array index, should be in 0..getEntries()-1
-     *  \return pointer to the object, or NULL if out of bounds
+     *  \return pointer to the object
      */
     inline T* operator [](int i) const {
       ensureCreated();
-      //At() checks for out-of-range.
-      //type was checked by DataStore, so the cast is safe.
-      return static_cast<T*>((*m_storeArray)->At(i));
+      //At() checks for out-of-range and returns NULL in that case
+      TObject* obj = (*m_storeArray)->At(i);
+      if (obj == nullptr)
+        throw std::out_of_range("Out-of-range access in StoreArray::operator[], for " + readableName());
+      return static_cast<T*>(obj); //type was checked by DataStore, so the cast is safe.
     }
 
     /** Construct a new T object at the end of the array.
@@ -312,6 +315,7 @@ namespace Belle2 {
         const_cast<StoreArray*>(this)->create();
       }
     }
+
     /** Pointer that actually holds the TClonesArray. */
     TClonesArray** m_storeArray;
 

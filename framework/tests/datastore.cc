@@ -194,8 +194,8 @@ namespace {
   {
     StoreArray<EventMetaData> evtData;
     EXPECT_TRUE(evtData[0] != NULL);
-    EXPECT_TRUE(evtData[-1] == NULL);
-    EXPECT_TRUE(evtData[10] == NULL);
+    EXPECT_THROW(evtData[-1], std::out_of_range);
+    EXPECT_THROW(evtData[10], std::out_of_range);
   }
 
   /** check data store clearing */

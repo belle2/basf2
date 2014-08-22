@@ -16,14 +16,18 @@
 namespace Belle2 {
   /** Generic iterator class for arrays, allowing use of STL algorithms, range-based for etc.
    *
-   * It only requires that ArrayType provides operator[int] returning pointers to ValueType, you can then
+   * Implements all operations required for a forward iterator. Note that wether objects can actually
+   * be added (i.e. extending the array) depends on the implementation of operator[].
+   *
+   * It only requires that ArrayType provides operator[int] returning pointers or references to ValueType, you can then
    * return ArrayIterator objects * with indices 0 and size() from begin() and end(). You should also define
    * iterator and const_iterator typedefs as part of ArrayType. See StoreArray for examples.
    *
-   * Note that dereferencing an iterator returns a reference to the object pointed to instead of a pointer.
+   * Note that dereferencing an iterator via * returns a reference to ValueType, regardless of wether ArrayType::operator[]
+   * returns ValueType* or ValueType&.
    */
   template <class ArrayType, class ValueType>
-  class ArrayIterator : public std::iterator<std::input_iterator_tag, ValueType> {
+  class ArrayIterator : public std::iterator<std::forward_iterator_tag, ValueType> {
     /** dereference if argument is a pointer to ValueType. */
     static ValueType& deref_if_needed(ValueType& t) { return t; }
     /** dereference if argument is a pointer to ValueType. */
@@ -43,7 +47,7 @@ namespace Belle2 {
 
     /** postfix increment. */
     ArrayIterator<ArrayType, ValueType> operator++(int) {
-      ArrayIterator<ArrayType, ValueType> old = *this;
+      ArrayIterator<ArrayType, ValueType> old(*this);
       ++(*this);
       return old;
     }
@@ -56,7 +60,7 @@ namespace Belle2 {
     /** dereference. */
     ValueType& operator*() const { return deref_if_needed((*m_array)[m_index]); }
     /** dereference. */
-    ValueType* operator->() const { return &(**this); }
+    ValueType* operator->() const { return &(operator*()); }
 
   private:
     const ArrayType* m_array; /**< Array to iterate over. */

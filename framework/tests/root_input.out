@@ -1,9 +1,6 @@
 [INFO] Steering file: framework/tests/root_input.py
 >>> basf2 Python environment set
 >>> Framework object created: fw
-[INFO] Added file root_input.root
-[INFO] Opened tree 'persistent' with 1 entries.
-[INFO] Opened tree 'tree' with 5 entries.
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------

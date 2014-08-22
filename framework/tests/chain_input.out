@@ -1,10 +1,6 @@
 [INFO] Steering file: framework/tests/chain_input.py
 >>> basf2 Python environment set
 >>> Framework object created: fw
-[INFO] Added file chaintest_1.root
-[INFO] Added file chaintest_2.root
-[INFO] Opened tree 'persistent' with 2 entries.
-[INFO] Opened tree 'tree' with 27 entries.
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------

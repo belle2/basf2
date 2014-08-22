@@ -6,9 +6,6 @@
 
 from basf2 import *
 
-import os
-import shutil
-
 from ROOT import Belle2
 
 
@@ -28,12 +25,6 @@ class TestModule(Module):
                 print 'truehit %d => hit %d' % (truehit.getArrayIndex(), hit.getArrayIndex())
 
 
-# copy input file into current dir to avoid having the full path in .out file
-try:
-    shutil.copy(Belle2.FileSystem.findFile('framework/tests/seqroot_input.sroot'), '.')
-except:
-    pass  # we're probably in tests/ directory, no copy necessary
-
 # ============================================================================
 # Now lets create the necessary modules to perform a simulation
 
@@ -42,7 +33,7 @@ except:
 progress = register_module('Progress')
 # Set input filename
 input = register_module('SeqRootInput')
-input.param('inputFileName', 'seqroot_input.sroot')
+input.param('inputFileName', Belle2.FileSystem.findFile('framework/tests/seqroot_input.sroot'))
 input.logging.log_level = LogLevel.WARNING  # ignore read rate
 
 eventinfo = register_module('EventInfoPrinter')

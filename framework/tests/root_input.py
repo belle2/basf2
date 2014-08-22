@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
-import shutil
 from basf2 import *
 
 from basf2 import Module
@@ -13,17 +11,11 @@ class NoopModule(Module):
     """Doesn't do anything."""
 
 
-# copy input file into current dir to avoid having the full path in .out file
-try:
-    shutil.copy(Belle2.FileSystem.findFile('framework/tests/root_input.root'), '.')
-except:
-    pass  # we're probably in tests/ directory, no copy necessary
-
 input = register_module('RootInput')
 eventinfo = register_module('EventInfoPrinter')
 printcollections = register_module('PrintCollections')
 
-input.param('inputFileName', 'root_input.root')
+input.param('inputFileName', Belle2.FileSystem.findFile('framework/tests/root_input.root'))
 # load all branches, minus PXDClusters
 input.param('branchNames', [
     'EventMetaData',
@@ -33,6 +25,7 @@ input.param('branchNames', [
     'PXDTrueHits',
     'PXDClusters', ])
 input.param('excludeBranchNames', ['PXDClusters'])
+input.logging.log_level = LogLevel.WARNING
 
 main = create_path()
 

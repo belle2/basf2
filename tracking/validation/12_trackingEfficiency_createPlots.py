@@ -147,7 +147,7 @@ def calculate_efficiency_in_pt(data_tree):
 
     number_bins = 62
     pt_lower = -0.025
-    pt_upper = 3.075
+    pt_upper = 4.025
 
     hist_pt_gen = TH1F('hPtGen', 'hPtGen', number_bins, pt_lower, pt_upper)
     hist_pt_rec = TH1F('hPtRec', 'hPtRec', number_bins, pt_lower, pt_upper)
@@ -159,6 +159,8 @@ def calculate_efficiency_in_pt(data_tree):
     # final hist
     efficiency_hist = TH1F('hEfficiency', 'hEfficiency', number_bins,
                            pt_lower, pt_upper)
+    efficiency_hist.SetMinimum(0)
+    efficiency_hist.SetMaximum(1.05)
 
     description = \
         'Events with 10 muon tracks with fixed transverse momentum are generated using the ParticleGun (500 events for each pt value). The events are reconstructed with VXDTF+Trasan+MCTrackCandCombiner. This plot shows the single track reconstruction efficiency over the transverse momentum. (Contact: %s)' \
@@ -319,7 +321,7 @@ def create_momentum_resolution_plot(data_tree):
 
     number_bins = 62
     pt_lower = -0.025
-    pt_upper = 3.075
+    pt_upper = 4.025
 
     sigma_pt_values = calculate_momentum_resolution2(data_tree)
 
@@ -330,22 +332,21 @@ def create_momentum_resolution_plot(data_tree):
     fit_pt_res_values = []
     fit_pt_res_errors = []
 
-    for ibin in range(1, number_bins + 1):
+    for (pt_value, sigma_pt_value) in sigma_pt_values.iteritems():
+        ibin = hist_resolution.FindBin(pt_value)
         bin_center = hist_resolution.GetBinCenter(ibin)
 
-        for (pt_value, sigma_pt_value) in sigma_pt_values.iteritems():
-            if pt_value + DELTA_PT > bin_center > pt_value - DELTA_PT:
-                sigma_pt_over_pt = 0
-                if sigma_pt_value[0] != -999:
-                    sigma_pt_over_pt = sigma_pt_value[0] / pt_value
-                    sigma_pt_error_over_pt = sigma_pt_value[1] / pt_value
+        sigma_pt_over_pt = 0
+        if sigma_pt_value[0] != -999:
+            sigma_pt_over_pt = sigma_pt_value[0] / pt_value
+            sigma_pt_error_over_pt = sigma_pt_value[1] / pt_value
 
-                    fit_pt_res_values.append(sigma_pt_over_pt)
-                    fit_pt_res_errors.append(sigma_pt_error_over_pt)
-                    fit_pt_values.append(bin_center)
+            fit_pt_res_values.append(sigma_pt_over_pt)
+            fit_pt_res_errors.append(sigma_pt_error_over_pt)
+            fit_pt_values.append(bin_center)
 
-                hist_resolution.SetBinContent(ibin, sigma_pt_over_pt)
-                hist_resolution.SetBinError(ibin, sigma_pt_error_over_pt)
+        hist_resolution.SetBinContent(ibin, sigma_pt_over_pt)
+        hist_resolution.SetBinError(ibin, sigma_pt_error_over_pt)
 
     hist_resolution.SetTitle('Momentum resolution')
     hist_resolution.SetXTitle('pt in GeV/c')
@@ -362,7 +363,7 @@ def create_momentum_resolution_plot(data_tree):
 
     hist_resolution.Write()
 
-    fit_parameters = fit_resolution(fit_pt_values, fit_pt_res_values, 1, fit_pt_res_errors)
+    #fit_parameters = fit_resolution(fit_pt_values, fit_pt_res_values, 1, fit_pt_res_errors)
 
 
 def get_scaled_rms_90(values, scale_factor=0.79):
@@ -537,7 +538,7 @@ def draw_impact_parameter(data_tree):
 
     number_bins = 62
     lower_edge = -0.025
-    upper_edge = 3.075
+    upper_edge = 4.025
 
     hist_impact_parameter_d0 = TH1F('hd0resolution', 'hd0resolution',
                                     number_bins, lower_edge, upper_edge)
@@ -551,20 +552,14 @@ def draw_impact_parameter(data_tree):
     hist_impact_parameter_z.SetXTitle('pt in GeV/c')
     hist_impact_parameter_z.SetYTitle('#sigma_{z}')
 
-    for ibin in xrange(1, number_bins + 1):
-        bin_center = hist_impact_parameter_d0.GetBinCenter(ibin)
-
-        (is_in_list, pt_value) = value_in_list(bin_center, PT_VALUES)
-
-        if is_in_list:
-            hist_impact_parameter_d0.SetBinContent(ibin,
-                                                   d0_resolutions[pt_value][0])
-            hist_impact_parameter_d0.SetBinError(ibin,
-                                                 d0_resolutions[pt_value][1])
-            hist_impact_parameter_z.SetBinContent(ibin,
-                                                  z_resolutions[pt_value][0])
-            hist_impact_parameter_z.SetBinError(ibin,
-                                                z_resolutions[pt_value][1])
+    for pt in PT_VALUES:
+        ibin = hist_impact_parameter_d0.FindBin(pt)
+        if (d0_resolutions[pt][0] > 0 and d0_resolutions[pt][1] > 0):
+            hist_impact_parameter_d0.SetBinContent(ibin, d0_resolutions[pt][0])
+            hist_impact_parameter_d0.SetBinError(ibin, d0_resolutions[pt][1])
+        if (z_resolutions[pt][0] > 0 and z_resolutions[pt][1] > 0):
+            hist_impact_parameter_z.SetBinContent(ibin, z_resolutions[pt][0])
+            hist_impact_parameter_z.SetBinError(ibin, z_resolutions[pt][1])
 
     hist_impact_parameter_d0.Write()
     hist_impact_parameter_z.Write()

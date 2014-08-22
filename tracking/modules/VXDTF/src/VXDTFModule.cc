@@ -117,7 +117,7 @@ VXDTFModule::VXDTFModule() : Module()
   std::vector<std::string> sectorSetup = {"std"};
 
   vector<int>  highestAllowedLayer = {6};
-  vector<int>  minLayer = {3};
+  vector<int>  minLayer = {4};
   vector<int>  minState = {2};
 
   vector<double> reserveHitsThreshold = {0.6};
@@ -126,11 +126,9 @@ VXDTFModule::VXDTFModule() : Module()
   vector<bool> activateFALSE = { false };
   vector<bool> activateZigZagXY = { false, true, true }; // 1st, 2nd, 3rd-pass
   vector<double> tuneZERO = { 0 };
-  vector<double> tuneCircleFit = { 0.00001, 0.001, 0.001 }; // 1st, 2nd, 3rd-pass chi2-threshold
+  vector<double> tuneCircleFit = { 00000001 }; // 1st, 2nd, 3rd-pass chi2-threshold
 
   vector<string> rootFileNameVals = {"VXDTFoutput", "UPDATE"};
-
-
 
   //Set module properties
   setDescription("Trackfinder for the SVD using cellular automaton techniques, kalman filter (genfit) and a hopfield network as well.");
@@ -150,7 +148,7 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("tuneCutoffs",
            m_PARAMtuneCutoffs,
            "for rapid changes of all cutoffs (no personal xml files needed), reduces/enlarges the range of the cutoffs in percent (lower and upper values are changed by this value). Only valid in range -99% < x < +1000%",
-           double(0.0));
+           double(0.22));
   addParam("GFTrackCandidatesColName",
            m_PARAMgfTrackCandsColName,
            "Name of collection holding the genfit::TrackCandidates (output)",
@@ -197,7 +195,7 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("activateSlopeRZ",
            m_PARAMactivateSlopeRZ,
            " set True/False for each setup individually",
-           activateFALSE);
+           activateTRUE);
   addParam("activateNormedDistance3D",
            m_PARAMactivateNormedDistance3D,
            " set True/False for each setup individually",
@@ -222,11 +220,11 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("activateDistance2IPHioC",
            m_PARAMactivateDistance2IPHioC,
            " set True/False for each setup individually",
-           activateTRUE);
+           activateFALSE);
   addParam("activatePTHioC",
            m_PARAMactivatePTHioC,
            " set True/False for each setup individually",
-           activateTRUE);
+           activateFALSE);
   addParam("activateHelixParameterFitHioC",
            m_PARAMactivateHelixParameterFitHioC,
            " set True/False for each setup individually",
@@ -286,7 +284,7 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("activateAnglesXY",
            m_PARAMactivateAnglesXY,
            " set True/False for each setup individually",
-           activateTRUE);
+           activateFALSE);
   addParam("activateAnglesRZ",
            m_PARAMactivateAnglesRZ,
            " set True/False for each setup individually",
@@ -294,7 +292,7 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("activateDeltaSlopeRZ",
            m_PARAMactivateDeltaSlopeRZ,
            " set True/False for each setup individually",
-           activateFALSE);
+           activateTRUE);
   addParam("activateDistance2IP",
            m_PARAMactivateDistance2IP,
            " set True/False for each setup individually",
@@ -302,7 +300,7 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("activatePT",
            m_PARAMactivatePT,
            " set True/False for each setup individually",
-           activateTRUE);
+           activateFALSE);
   addParam("activateHelixParameterFit",
            m_PARAMactivateHelixParameterFit,
            " set True/False for each setup individually",
@@ -331,7 +329,7 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("activateDeltaPt",
            m_PARAMactivateDeltaPt,
            " set True/False for each setup individually",
-           activateTRUE);
+           activateFALSE);
   addParam("activateDeltaDistance2IP",
            m_PARAMactivateDeltaDistance2IP,
            " set True/False for each setup individually",
@@ -339,7 +337,7 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("activateCircleFit",
            m_PARAMactivateCircleFit,
            " set True/False for each setup individually",
-           activateTRUE);
+           activateFALSE);
 
 
   addParam("tuneDistance3D",
@@ -430,7 +428,7 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("highOccupancyThreshold",
            m_PARAMhighOccupancyThreshold,
            "if there are more hit-combinations at a sensor than chosen threshhold, a special high-occupancy-mode will be used to filter more hits",
-           int(17));
+           int(400));
   addParam("killBecauseOfOverlappsThreshold",
            m_PARAMkillBecauseOfOverlappsThreshold,
            "if there are more TCs overlapping than chosen threshold value, event kalman gets replaced by circleFit. If there are 10 times more than threshold value of TCs, the complete event gets aborted",
@@ -438,7 +436,7 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("killEventForHighOccupancyThreshold",
            m_PARAMkillEventForHighOccupancyThreshold,
            "if there are more segments than threshold value, the complete event gets aborted",
-           int(5000));
+           int(5500));
 
   addParam("tccMinLayer",
            m_PARAMminLayer,
@@ -548,7 +546,7 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("cleanOverlappingSet",
            m_PARAMcleanOverlappingSet,
            "when true, TCs which are found more than once (possible because of multipass) will get filtered",
-           bool(true));
+           bool(false));
 
   addParam("qiSmear",
            m_PARAMqiSmear,
@@ -561,7 +559,7 @@ VXDTFModule::VXDTFModule() : Module()
   addParam("smearSigma",
            m_PARAMsmearSigma,
            " when qiSmear = True, degree of perturbation can be set here",
-           double(0.0001));
+           double(0.000001));
 
   addParam("calcQIType",
            m_PARAMcalcQIType,

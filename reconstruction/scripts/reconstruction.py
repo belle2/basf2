@@ -145,10 +145,12 @@ def add_reconstruction(path, components=None):
                 vxd_trackfinder.param('sectorSetup', ['secMapEvtGenOnR10933June2014SVDStd-moreThan500MeV_SVD',
                                                       'secMapEvtGenOnR10933June2014SVDStd-125to500MeV_SVD',
                                                       'secMapEvtGenOnR10933June2014SVDStd-30to125MeV_SVD'])
+                vxd_trackfinder.param('tuneCutoffs', 0.22)
             else:
                 vxd_trackfinder.param('sectorSetup', ['secMapEvtGenOnR10933June2014VXDStd-moreThan500MeV_PXDSVD',
                                                       'secMapEvtGenOnR10933June2014VXDStd-125to500MeV_PXDSVD',
                                                       'secMapEvtGenOnR10933June2014VXDStd-30to125MeV_PXDSVD'])
+                vxd_trackfinder.param('tuneCutoffs', 0.06)
             path.add_module(vxd_trackfinder)
 
         # track merging

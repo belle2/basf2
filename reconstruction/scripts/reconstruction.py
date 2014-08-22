@@ -189,12 +189,20 @@ def add_mc_reconstruction(path, components=None):
 
         # find MCTracks in CDC, SVD, and PXD
         mc_trackfinder = register_module('TrackFinderMCTruth')
+        # Default setting in the module may be either way, therefore
+        # accomodate both cases explicitly.
         if components is None or 'PXD' in components:
             mc_trackfinder.param('UsePXDHits', 1)
+        else:
+            mc_trackfinder.param('UsePXDHits', 0)
         if components is None or 'SVD' in components:
             mc_trackfinder.param('UseSVDHits', 1)
+        else:
+            mc_trackfinder.param('UseSVDHits', 0)
         if components is None or 'CDC' in components:
             mc_trackfinder.param('UseCDCHits', 1)
+        else:
+            mc_trackfinder.param('UseCDCHits', 0)
         path.add_module(mc_trackfinder)
 
         # track fitting

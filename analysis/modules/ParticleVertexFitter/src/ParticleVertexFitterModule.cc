@@ -82,22 +82,22 @@ namespace Belle2 {
     m_beamSpotCov.ResizeTo(3, 3);
     // from gaussian fit using TDR values
     m_beamSpotCov(0, 0) = 6.18e-4 * 6.18e-4; m_beamSpotCov(1, 1) = 5.9e-6 * 5.9e-06;
-    if (m_withConstraint.compare(std::string("ipprofile")) == 0) {
+    if (m_withConstraint == "ipprofile") {
       m_beamSpotCov(2, 2) = 154e-4 * 154e-4;
       m_beamSpotCov(0, 2) = TMath::Tan(-1.11e-2) * m_beamSpotCov(0, 0) * m_beamSpotCov(2, 2);
     }
-    if (m_withConstraint.compare(std::string("iptube")) == 0) findConstraintBoost(10000);
+    if (m_withConstraint == "iptube") findConstraintBoost(10000);
 
-    if (m_withConstraint.compare(std::string("ipprofile")) == 0 || m_withConstraint.compare(std::string("iptube")) == 0)
+    if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube")
       analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
 
-    if (m_decayString.compare(std::string("")) != 0)
+    if (m_decayString != "")
       m_decaydescriptor.init(m_decayString);
 
     B2INFO("ParticleVertexFitter: Performing " << m_fitType << " fit on " << m_listName << " using " << m_vertexFitter);
-    if (m_decayString.compare(std::string("")) != 0)
+    if (m_decayString != "")
       B2INFO("ParticleVertexFitter: Using specified decay string: " << m_decayString);
-    if (m_withConstraint.compare(std::string("")) != 0)
+    if (m_withConstraint != "")
       B2INFO("ParticleVertexFitter: Additional " << m_withConstraint << " will be applied");
 
   }
@@ -150,25 +150,25 @@ namespace Belle2 {
       return false;
     }
 
-    if (m_withConstraint.compare(std::string("ipprofile")) != 0 &&
-        m_withConstraint.compare(std::string("iptube")) != 0 &&
-        m_withConstraint.compare(std::string("")) != 0)
+    if (m_withConstraint != "ipprofile" &&
+        m_withConstraint != "iptube" &&
+        m_withConstraint != "")
       B2FATAL("ParticleVertexFitter: " << m_withConstraint << " ***invalid Constraint ");
 
     bool ok = false;
     // fits with KFitter
-    if (m_vertexFitter.compare(std::string("kfitter")) == 0) {
+    if (m_vertexFitter == "kfitter") {
       // TODO: add this functionality
-      if (m_decayString.compare(std::string("")) != 0)
+      if (m_decayString != "")
         B2FATAL("ParticleVertexFitter: kfitter does not support yet selection of daughters via decay string!") ;
-      if (m_withConstraint.compare(std::string("iptube")) == 0)
+      if (m_withConstraint == "iptube")
         B2FATAL("ParticleVertexFitter: kfitter does not support yet the iptube constraint ");
 
       // vertex fit
-      if (m_fitType.compare(std::string("vertex")) == 0) {
-        if (m_withConstraint.compare(std::string("ipprofile")) == 0) {
+      if (m_fitType == "vertex") {
+        if (m_withConstraint == "ipprofile") {
           ok = doKVertexFit(mother, true, false);
-        } else if (m_withConstraint.compare(std::string("iptube")) == 0) {
+        } else if (m_withConstraint == "iptube") {
           ok = doKVertexFit(mother, false, true);
         } else {
           ok = doKVertexFit(mother, false, false);
@@ -176,8 +176,8 @@ namespace Belle2 {
       }
 
       // mass-constrained vertex fit
-      if (m_fitType.compare(std::string("massvertex")) == 0) {
-        if (m_withConstraint.compare(std::string("ipprofile")) == 0 || m_withConstraint.compare(std::string("iptube")) == 0) {
+      if (m_fitType == "massvertex") {
+        if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube") {
           B2FATAL("ParticleVertexFitter: Invalid options - mass-constrained fit using kfitter does not work with iptube or ipprofile constraint.");
         } else {
           ok = doKMassVertexFit(mother);
@@ -185,8 +185,8 @@ namespace Belle2 {
       }
 
       // mass fit
-      if (m_fitType.compare(std::string("mass")) == 0) {
-        if (m_withConstraint.compare(std::string("ipprofile")) == 0 || m_withConstraint.compare(std::string("iptube")) == 0) {
+      if (m_fitType == "mass") {
+        if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube") {
           B2FATAL("ParticleVertexFitter: Invalid options - mass fit using kfitter does not work with iptube or ipprofile constraint.");
         } else {
           ok = doKMassFit(mother);
@@ -194,17 +194,17 @@ namespace Belle2 {
       }
 
       // invalid KFitter fit type
-      if (m_fitType.compare(std::string("vertex")) != 0
-          && m_fitType.compare(std::string("massvertex")) != 0
-          && m_fitType.compare(std::string("mass")) != 0)
+      if (m_fitType != "vertex"
+          && m_fitType != "massvertex"
+          && m_fitType != "mass")
         B2FATAL("ParticleVertexFitter: " << m_fitType << " ***invalid fit type for the Kfitter ");
     }
 
     // fits using Rave
-    if (m_vertexFitter.compare(std::string("rave")) == 0) ok = doRaveFit(mother);
+    if (m_vertexFitter == "rave") ok = doRaveFit(mother);
 
     // invalid fitter
-    if (m_vertexFitter.compare(std::string("kfitter")) != 0 && m_vertexFitter.compare(std::string("rave")) != 0)
+    if (m_vertexFitter != "kfitter" && m_vertexFitter != "rave")
       B2ERROR("ParticleVertexFitter: " << m_vertexFitter << " ***invalid vertex fitter ");
 
     if (!ok) return false;
@@ -644,10 +644,10 @@ namespace Belle2 {
     if (mother->getNDaughters() < 2) return false;
 
     analysis::RaveKinematicVertexFitter rf;
-    if (m_fitType.compare(std::string("mass")) == 0) rf.setVertFit(false);
+    if (m_fitType == "mass") rf.setVertFit(false);
 
 
-    if (m_decayString.compare(std::string("")) == 0) {
+    if (m_decayString.empty()) {
       rf.addMother(mother);
     } else {
       std::vector<const Particle*> tracksVertex = m_decaydescriptor.getSelectionParticles(mother);
@@ -734,13 +734,13 @@ namespace Belle2 {
 
     int nVert = 0;
     bool okFT = false;
-    if (m_fitType.compare(std::string("vertex")) == 0) {
+    if (m_fitType == "vertex") {
       okFT = true;
       nVert = rf.fit();
       rf.updateMother();
       if (nVert != 1) return false;
     }
-    if (m_fitType.compare(std::string("mass")) == 0) {
+    if (m_fitType == "mass") {
       // add protection
       okFT = true;
       rf.setMassConstFit(true);
@@ -749,7 +749,7 @@ namespace Belle2 {
       rf.updateMother();
       if (nVert != 1) return false;
     };
-    if (m_fitType.compare(std::string("massvertex")) == 0) {
+    if (m_fitType == "massvertex") {
       okFT = true;
       rf.setMassConstFit(true);
       nVert = rf.fit();

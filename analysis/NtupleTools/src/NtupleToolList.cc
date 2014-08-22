@@ -67,47 +67,47 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
 
   // print out options in the individual tools if neccessary
   /*
-  if (strOption.compare(std::string("")) != 0) {
+  if (strOption != "") {
     B2INFO("   -> using these options: " << strOption);
   }
   */
 
-  if (strToolName.compare("Kinematics") == 0) return new NtupleKinematicsTool(tree, d);
-  else if (strToolName.compare("CMSKinematics") == 0) return new NtupleCMSKinematicsTool(tree, d);
-  else if (strToolName.compare("MomentumUncertainty") == 0) return new NtupleMomentumUncertaintyTool(tree, d);
-  else if (strToolName.compare("InvMass") == 0) return new NtupleInvMassTool(tree, d, strOption);
-  else if (strToolName.compare("MassBeforeFit") == 0) return new NtupleMassBeforeFitTool(tree, d);
-  else if (strToolName.compare("EventMetaData") == 0) return new NtupleEventMetaDataTool(tree, d);
-  else if (strToolName.compare("DeltaEMbc") == 0) return new NtupleDeltaEMbcTool(tree, d);
-  else if (strToolName.compare("Charge") == 0) return new NtupleChargeTool(tree, d);
-  else if (strToolName.compare("PDGCode") == 0) return new NtuplePDGCodeTool(tree, d);
-  else if (strToolName.compare("MCTruth") == 0) return new NtupleMCTruthTool(tree, d);
-  else if (strToolName.compare("MCHierarchy") == 0) return new NtupleMCHierarchyTool(tree, d);
-  else if (strToolName.compare("MCKinematics") == 0) return new NtupleMCKinematicsTool(tree, d);
-  else if (strToolName.compare("PID") == 0) return new NtuplePIDTool(tree, d);
-  else if (strToolName.compare("DeltaLogL") == 0) return new NtupleDeltaLogLTool(tree, d);
-  else if (strToolName.compare("RecoStats") == 0) return new NtupleRecoStatsTool(tree, d);
-  else if (strToolName.compare("DetectorStatsRec") == 0) return new NtupleDetectorStatsRecTool(tree, d);
-  else if (strToolName.compare("DetectorStatsSim") == 0) return new NtupleDetectorStatsSimTool(tree, d);
-  else if (strToolName.compare("MCReconstructible") == 0) return new NtupleMCReconstructibleTool(tree, d);
-  else if (strToolName.compare("Track") == 0) return new NtupleTrackTool(tree, d);
-  else if (strToolName.compare("TrackHits") == 0) return new NtupleTrackHitsTool(tree, d);
-  else if (strToolName.compare("Cluster") == 0) return new NtupleClusterTool(tree, d);
-  else if (strToolName.compare("Vertex") == 0) return new NtupleVertexTool(tree, d);
-  else if (strToolName.compare("MCVertex") == 0) return new NtupleMCVertexTool(tree, d);
-  else if (strToolName.compare("CustomFloats") == 0) return new NtupleCustomFloatsTool(tree, d, strOption);
-  else if (strToolName.compare("ROEMultiplicities") == 0) return new NtupleROEMultiplicitiesTool(tree, d);
-  else if (strToolName.compare("RecoilKinematics") == 0) return new NtupleRecoilKinematicsTool(tree, d);
-  else if (strToolName.compare("ExtraEnergy") == 0) return new NtupleExtraEnergyTool(tree, d);
-  else if (strToolName.compare("TagVertex") == 0) return new NtupleTagVertexTool(tree, d);
-  else if (strToolName.compare("MCTagVertex") == 0) return new NtupleMCTagVertexTool(tree, d);
-  else if (strToolName.compare("DeltaT") == 0) return new NtupleDeltaTTool(tree, d);
-  else if (strToolName.compare("MCDeltaT") == 0) return new NtupleMCDeltaTTool(tree, d);
-  else if (strToolName.compare("ContinuumSuppression") == 0) return new NtupleContinuumSuppressionTool(tree, d);
-  else if (strToolName.compare("MCDecayString") == 0) return new NtupleMCDecayStringTool(tree, d);
-  else if (strToolName.compare("FlightInfo") == 0) return new NtupleFlightInfoTool(tree, d);
-  else if (strToolName.compare("MCFlightInfo") == 0) return new NtupleMCFlightInfoTool(tree, d);
-  else if (strToolName.compare("MomentumVectorDeviation") == 0) return new NtupleMomentumVectorDeviationTool(tree, d);
+  if (strToolName == "Kinematics") return new NtupleKinematicsTool(tree, d);
+  else if (strToolName == "CMSKinematics") return new NtupleCMSKinematicsTool(tree, d);
+  else if (strToolName == "MomentumUncertainty") return new NtupleMomentumUncertaintyTool(tree, d);
+  else if (strToolName == "InvMass") return new NtupleInvMassTool(tree, d, strOption);
+  else if (strToolName == "MassBeforeFit") return new NtupleMassBeforeFitTool(tree, d);
+  else if (strToolName == "EventMetaData") return new NtupleEventMetaDataTool(tree, d);
+  else if (strToolName == "DeltaEMbc") return new NtupleDeltaEMbcTool(tree, d);
+  else if (strToolName == "Charge") return new NtupleChargeTool(tree, d);
+  else if (strToolName == "PDGCode") return new NtuplePDGCodeTool(tree, d);
+  else if (strToolName == "MCTruth") return new NtupleMCTruthTool(tree, d);
+  else if (strToolName == "MCHierarchy") return new NtupleMCHierarchyTool(tree, d);
+  else if (strToolName == "MCKinematics") return new NtupleMCKinematicsTool(tree, d);
+  else if (strToolName == "PID") return new NtuplePIDTool(tree, d);
+  else if (strToolName == "DeltaLogL") return new NtupleDeltaLogLTool(tree, d);
+  else if (strToolName == "RecoStats") return new NtupleRecoStatsTool(tree, d);
+  else if (strToolName == "DetectorStatsRec") return new NtupleDetectorStatsRecTool(tree, d);
+  else if (strToolName == "DetectorStatsSim") return new NtupleDetectorStatsSimTool(tree, d);
+  else if (strToolName == "MCReconstructible") return new NtupleMCReconstructibleTool(tree, d);
+  else if (strToolName == "Track") return new NtupleTrackTool(tree, d);
+  else if (strToolName == "TrackHits") return new NtupleTrackHitsTool(tree, d);
+  else if (strToolName == "Cluster") return new NtupleClusterTool(tree, d);
+  else if (strToolName == "Vertex") return new NtupleVertexTool(tree, d);
+  else if (strToolName == "MCVertex") return new NtupleMCVertexTool(tree, d);
+  else if (strToolName == "CustomFloats") return new NtupleCustomFloatsTool(tree, d, strOption);
+  else if (strToolName == "ROEMultiplicities") return new NtupleROEMultiplicitiesTool(tree, d);
+  else if (strToolName == "RecoilKinematics") return new NtupleRecoilKinematicsTool(tree, d);
+  else if (strToolName == "ExtraEnergy") return new NtupleExtraEnergyTool(tree, d);
+  else if (strToolName == "TagVertex") return new NtupleTagVertexTool(tree, d);
+  else if (strToolName == "MCTagVertex") return new NtupleMCTagVertexTool(tree, d);
+  else if (strToolName == "DeltaT") return new NtupleDeltaTTool(tree, d);
+  else if (strToolName == "MCDeltaT") return new NtupleMCDeltaTTool(tree, d);
+  else if (strToolName == "ContinuumSuppression") return new NtupleContinuumSuppressionTool(tree, d);
+  else if (strToolName == "MCDecayString") return new NtupleMCDecayStringTool(tree, d);
+  else if (strToolName == "FlightInfo") return new NtupleFlightInfoTool(tree, d);
+  else if (strToolName == "MCFlightInfo") return new NtupleMCFlightInfoTool(tree, d);
+  else if (strToolName == "MomentumVectorDeviation") return new NtupleMomentumVectorDeviationTool(tree, d);
 
   B2WARNING("NtupleTool " << strToolName << " is not available!");
   return NULL;

@@ -157,7 +157,7 @@ namespace Belle2 {
   bool TagVertexModule::doVertexFit(Particle* Breco)
   {
 
-    if (m_useConstraint.compare(std::string("breco")) == 0) {
+    if (m_useConstraint == "breco") {
 
     }
 
@@ -171,10 +171,10 @@ namespace Belle2 {
     }
 
     ok = false;
-    if (m_useConstraint.compare(std::string("breco")) == 0) ok = findConstraint(Breco);
-    if (m_useConstraint.compare(std::string("boostcut")) == 0) ok = findConstraintBoost(0.03);
-    if (m_useConstraint.compare(std::string("boost")) == 0) ok = findConstraintBoost(2);
-    if (m_useConstraint.compare(std::string("no")) == 0) ok = true;
+    if (m_useConstraint == "breco") ok = findConstraint(Breco);
+    if (m_useConstraint == "boostcut") ok = findConstraintBoost(0.03);
+    if (m_useConstraint == "boost") ok = findConstraintBoost(2);
+    if (m_useConstraint == "no") ok = true;
     if (!ok) {
       B2ERROR("TagVertex: No correct fit constraint");
       return false;
@@ -487,7 +487,7 @@ namespace Belle2 {
 
     // apply constraint
     analysis::RaveSetup::getInstance()->unsetBeamSpot();
-    if (m_useConstraint.compare(std::string("no")) != 0) analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_tube);
+    if (m_useConstraint != "no") analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_tube);
 
 
     analysis::RaveVertexFitter rFit;

@@ -70,7 +70,7 @@ namespace Belle2 {
     /** Get the wrapped root object. */
     const T& get() const { return *m_wrapped; }
 
-    /** Write the wrapped object into 'file'.
+    /** Write the wrapped object into 'file', overwriting existing objects of same name.
      *
      * This function should be prefered to calling Write() by hand.
      *
@@ -81,7 +81,7 @@ namespace Belle2 {
         B2ERROR("RootMergeable: wrapped object belongs to other file, Write() might crash. Make sure your histogram/ntuple already belongs to the file you want to save it to before filling (e.g. in initialize())");
       }
       file->cd();
-      m_wrapped->Write();
+      m_wrapped->Write(nullptr, TObject::kOverwrite);
       m_wrapped->SetDirectory(nullptr);
     }
 

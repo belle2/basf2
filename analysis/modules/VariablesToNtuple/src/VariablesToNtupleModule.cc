@@ -115,9 +115,7 @@ void VariablesToNtupleModule::terminate()
 {
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
     B2INFO("Writing NTuple " << m_treeName);
-    m_file->cd();
-    m_tree->get().Write();
-    m_tree->get().SetDirectory(nullptr);
+    m_tree->write(m_file);
 
     B2INFO("Closing file " << m_fileName);
     delete m_file;

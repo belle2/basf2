@@ -22,6 +22,8 @@ NSM2NSMBridge::NSM2NSMBridge(NSMCallback* callback1,
   for (int i = 0; i < 2; i++) {
     if (m_callback[i] != NULL && host[i].size() > 0 && port[i] > 0) {
       m_daemon[i] = new NSMNodeDaemon(m_callback[i], host[i], port[i]);
+    } else {
+      m_daemon[i] = NULL;
     }
   }
 }
@@ -30,10 +32,9 @@ void NSM2NSMBridge::run() throw()
 {
   try {
     const int timeout = m_callback[0]->getTimeout();
-    NSMCommunicator* com[2] = {
-      (m_daemon[0] != NULL) ? m_daemon[0]->getCommunicator() : NULL,
-      (m_daemon[1] != NULL) ? m_daemon[1]->getCommunicator() : NULL
-    };
+    NSMCommunicator* com[2] = {NULL, NULL};
+    if (m_daemon[0] != NULL) com[0] = m_daemon[0]->getCommunicator();
+    if (m_daemon[1] != NULL) com[1] = m_daemon[1]->getCommunicator();
     while (true) {
       int i = NSMCommunicator::select(timeout, com, 2);
       if (i >= 0 && m_daemon[i] != NULL) {

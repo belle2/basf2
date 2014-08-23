@@ -68,12 +68,17 @@ throw()
           it->setSQL(record, obj);
           std::string name = it->getName();
           if (it->getType() == FieldInfo::OBJECT) {
-            obj.addObjects(name, getList(record.getInt(name)));
+            int id = record.getInt(name);
+            if (id == 0) {
+              LogFile::error("%s:%s", configname.c_str(), nodename.c_str());
+            }
+            obj.addObjects(name, getList(id));
           }
         }
         obj_v.push_back(obj);
       }
     } catch (const DBHandlerException& e) {
+      LogFile::error("%s:%s", configname.c_str(), nodename.c_str());
       LogFile::error("error on DB acess: %s", e.what());
     }
   }
@@ -124,6 +129,7 @@ throw()
         obj_v.push_back(obj);
       }
     } catch (const DBHandlerException& e) {
+      LogFile::error("%s:%s", configname.c_str(), nodename.c_str());
       LogFile::error("error on DB acess: %s", e.what());
     }
   }

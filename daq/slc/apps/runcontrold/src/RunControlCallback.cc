@@ -116,6 +116,7 @@ void RunControlCallback::timeout() throw()
     }
     if (state != RCState::RUNNING_S) {
       try {
+        LogFile::debug("STATECHECK>>%s", node.getName().c_str());
         com.sendRequest(NSMMessage(node, RCCommand::STATECHECK));
       } catch (const NSMHandlerException& e) {
         LogFile::warning("Failed to send statecheck : %s",
@@ -161,11 +162,14 @@ bool RunControlCallback::ok() throw()
   if (msg.getLength() > 0) {
     RCState state(msg.getData());
     const std::string nodename = msg.getNodeName();
-    LogFile::debug("%s >> OK (%s) (RC=%s) %s",
-                   nodename.c_str(), msg.getData(),
-                   getNode().getState().getLabel(), state.getLabel());
     NSMNodeIterator it = find(nodename);
-    if (it != m_node_v.end()) {
+    if (state == NSMState::UNKNOWN) {
+      LogFile::error("got unknown state (%s) from %s",
+                     msg.getData(), nodename.c_str());
+    } else if (it != m_node_v.end()) {
+      LogFile::debug("%s >> OK (%s) (RC=%s) %s",
+                     nodename.c_str(), msg.getData(),
+                     getNode().getState().getLabel(), state.getLabel());
       NSMCommunicator& com(*getCommunicator());
       NSMNode& node(*it);
       node.setState(state);
@@ -353,8 +357,10 @@ bool RunControlCallback::send(NSMMessage msg) throw()
         RCState tstate = cmd.nextTState();
         if (tstate != Enum::UNKNOWN) m_node_v[i].setState(tstate);
       }
-      if (i < nobj - 1)
+      if (i < nobj - 1) {
         msg.setNodeName(m_node_v[i + 1]);
+        usleep(10000);
+      }
     }
   }
   return true;

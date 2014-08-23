@@ -46,11 +46,11 @@ throw()
 
 NSMMessage& NSMCallback::getMessage()
 {
-  return m_comm->getMessage();
+  return m_msg;
 }
 
 void NSMCallback::setMessage(NSMMessage& msg)
 {
-  m_comm->setMessage(msg);
+  m_msg = msg;
 }
 

@@ -62,6 +62,9 @@ void NSMNodeDaemon::push()
 
 void NSMNodeDaemon::push(const NSMMessage& msg)
 {
+  LogFile::debug("NSMNodeDaemon::push %s >> %s",
+                 msg.getNodeName(),
+                 msg.getRequestName());
   m_mutex.lock();
   m_msg_q.push(msg);
   m_cond.signal();
@@ -71,7 +74,7 @@ void NSMNodeDaemon::push(const NSMMessage& msg)
 void NSMNodeDaemon::pop(NSMMessage& msg)
 {
   m_mutex.lock();
-  if (m_msg_q.empty()) {
+  while (m_msg_q.empty()) {
     m_cond.wait(m_mutex);
   }
   msg = m_msg_q.front();
@@ -84,6 +87,7 @@ void NSMNodeDaemon::Handler::run()
   NSMMessage msg;
   while (true) {
     m_daemon->pop(msg);
+    m_callback->setMessage(msg);
     m_callback->perform(msg);
   }
 }

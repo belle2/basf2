@@ -60,6 +60,7 @@ namespace Belle2 {
     NSMNode m_node;
     NSMCommunicator* m_comm;
     NSMRequestList m_cmd_v;
+    NSMMessage m_msg;
     int m_timeout;
 
   };

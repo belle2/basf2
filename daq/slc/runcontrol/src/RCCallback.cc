@@ -53,7 +53,6 @@ void RCCallback::sendPause(const NSMNode& node) throw()
 
 bool RCCallback::perform(const NSMMessage& msg) throw()
 {
-  //LogFile::debug("%s >> %s", msg.getNodeName(), msg.getRequestName());
   if (NSMCallback::perform(msg)) return true;
   const RCCommand cmd = msg.getRequestName();
   if (cmd.isAvailable(getNode().getState()) == NSMCommand::DISABLED) {
@@ -64,8 +63,8 @@ bool RCCallback::perform(const NSMMessage& msg) throw()
   bool result = true;
   if (state != Enum::UNKNOWN) {
     getNode().setState(state);
-    //LogFile::debug("%s >> %s (%s)", msg.getNodeName(),
-    //               cmd.getLabel(), state.getLabel());
+    LogFile::debug("%s >> %s (%s)", msg.getNodeName(),
+                   cmd.getLabel(), state.getLabel());
     setReply("");
     if (cmd == RCCommand::LOAD) {
       result = preload(msg) && load();

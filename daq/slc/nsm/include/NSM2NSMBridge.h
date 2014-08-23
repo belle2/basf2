@@ -2,8 +2,7 @@
 #define _Belle2_NSM2NSMBridge_hh
 
 #include "daq/slc/nsm/NSMCallback.h"
-#include "daq/slc/nsm/NSMData.h"
-#include "daq/slc/nsm/NSMCommunicator.h"
+#include "daq/slc/nsm/NSMNodeDaemon.h"
 
 namespace Belle2 {
 
@@ -18,13 +17,10 @@ namespace Belle2 {
 
   public:
     void run() throw();
-    void init() throw(NSMHandlerException);
 
   private:
     NSMCallback* m_callback[2];
-    std::string m_host[2];
-    int m_port[2];
-    NSMCommunicator* m_nsm_comm[2];
+    NSMNodeDaemon* m_daemon[2];
 
   };
 

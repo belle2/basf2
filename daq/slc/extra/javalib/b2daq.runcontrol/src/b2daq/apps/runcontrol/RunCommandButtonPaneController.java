@@ -8,6 +8,7 @@ package b2daq.apps.runcontrol;
 import b2daq.logger.core.LogMessage;
 import b2daq.nsm.NSMListenerService;
 import b2daq.core.LogLevel;
+import b2daq.nsm.NSMCommand;
 import b2daq.nsm.NSMMessage;
 import b2daq.runcontrol.core.RCCommand;
 import b2daq.runcontrol.core.RCState;
@@ -94,6 +95,8 @@ public class RunCommandButtonPaneController implements Initializable {
             }
             m_rcmain.getLabelRunType().setText(runtype);
             msg.setData(runtype);
+            msg.setNParams(1);
+            msg.setParam(0, NSMCommand.DBGET.getId());
             m_rcmain.getLogView().add(new LogMessage("LOCAL", LogLevel.INFO,
                     "Selected run type : " + runtype));
         } else if (cmd.equals(RCCommand.START)) {

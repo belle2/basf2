@@ -256,7 +256,7 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
         } else if (command.equals(NSMCommand.LISTSET)) {
             if (msg.getNParams() > 0 && msg.getParam(0) > 0) {
                 namelist = msg.getData().split("\n");
-                //System.out.println(namelist[0]);
+                System.out.println(msg.getData());
                 commandButtonController.clearStack();
             }
         } else if (command.equals(NSMCommand.DBSET)) {

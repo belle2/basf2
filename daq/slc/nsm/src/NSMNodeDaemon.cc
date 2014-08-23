@@ -1,6 +1,7 @@
 #include "daq/slc/nsm/NSMNodeDaemon.h"
 
 #include <daq/slc/system/LogFile.h>
+#include <daq/slc/system/PThread.h>
 
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/base/Date.h>
@@ -14,50 +15,74 @@ NSMNodeDaemon::NSMNodeDaemon(NSMCallback* callback,
                              const std::string host, int port)
 {
   m_callback = callback;
-  m_host = host;
-  m_port = port;
-  m_nsm_comm = NULL;
-  init();
-}
-
-void NSMNodeDaemon::init() throw(NSMHandlerException)
-{
   try {
     NSMNode& node(m_callback->getNode());
-    m_nsm_comm = new NSMCommunicator(m_host, m_port);
-    m_nsm_comm->init(node, m_host, m_port);
+    m_com = new NSMCommunicator(host, port);
+    m_com->init(node, host, port);
     if (m_callback != NULL) {
-      m_nsm_comm->setCallback(m_callback);
+      m_com->setCallback(m_callback);
       m_callback->init();
     }
   } catch (const NSMHandlerException& e) {
     LogFile::fatal("Failed to connect NSM network (%s:%d). "
                    "Terminating process ",
-                   m_host.c_str(), m_port);
-    delete m_nsm_comm;
-    m_nsm_comm = NULL;
+                   host.c_str(), port);
+    delete m_com;
+    m_com = NULL;
     exit(1);
   }
+  PThread(new Handler(this, callback));
   LogFile::debug("Connected to NSM2 daemon (%s:%d)",
-                 m_host.c_str(), m_port);
+                 host.c_str(), port);
 }
 
 void NSMNodeDaemon::run() throw()
 {
   try {
     while (true) {
-      if (m_nsm_comm->wait(m_callback->getTimeout())) {
-        NSMMessage& msg(m_nsm_comm->getMessage());
-        m_callback->perform(msg);
+      if (m_com->wait(m_callback->getTimeout())) {
+        push();
       } else {
         m_callback->timeout();
       }
     }
   } catch (const std::exception& e) {
-    LogFile::fatal("NSM node daemon : Caught exception (%s:%d %s). "
-                   "Terminate process...",
-                   m_host.c_str(), m_port, e.what());
+    LogFile::fatal("NSM node daemon : Caught exception : %s"
+                   "Terminate process...", e.what());
     m_callback->setReply(e.what());
   }
   m_callback->term();
+}
+
+
+void NSMNodeDaemon::push()
+{
+  push(m_com->getMessage());
+}
+
+void NSMNodeDaemon::push(const NSMMessage& msg)
+{
+  m_mutex.lock();
+  m_msg_q.push(msg);
+  m_mutex.unlock();
+}
+
+void NSMNodeDaemon::pop(NSMMessage& msg)
+{
+  m_mutex.lock();
+  if (m_msg_q.empty()) {
+    m_cond.wait(m_mutex);
+  }
+  msg = m_msg_q.front();
+  m_msg_q.pop();
+  m_mutex.unlock();
+}
+
+void NSMNodeDaemon::Handler::run()
+{
+  NSMMessage msg;
+  while (true) {
+    m_daemon->pop(msg);
+    m_callback->perform(msg);
+  }
 }

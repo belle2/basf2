@@ -114,26 +114,57 @@ throw(NSMHandlerException)
 void NSMCommunicator::replyOK(const NSMNode& node)
 throw(NSMHandlerException)
 {
-  if (m_master_node.getName().size() > 0 &&
-      b2nsm_nodeid(m_master_node.getName().c_str()) >= 0) {
-    sendRequest(NSMMessage(m_master_node, NSMCommand::OK,
-                           node.getState().getLabel()));
+  for (NSMNodeList::iterator it = m_masters.begin();
+       it != m_masters.end();) {
+    if (b2nsm_nodeid(it->first.c_str()) < 0) {
+      m_masters.erase(it++);
+    } else {
+      try {
+        sendRequest(NSMMessage(it->second, NSMCommand::OK,
+                               node.getState().getLabel()));
+        it++;
+      } catch (const NSMHandlerException& e) {
+        m_masters.erase(it++);
+      }
+    }
   }
 }
 
 void NSMCommunicator::replyError(int error, const std::string& message)
 throw(NSMHandlerException)
 {
-  if (m_master_node.getName().size() > 0 &&
-      b2nsm_nodeid(m_master_node.getName().c_str()) >= 0) {
-    sendRequest(NSMMessage(m_master_node, NSMCommand::ERROR,
-                           error, message));
+  for (NSMNodeList::iterator it = m_masters.begin();
+       it != m_masters.end();) {
+    if (b2nsm_nodeid(it->first.c_str()) < 0) {
+      m_masters.erase(it++);
+    } else {
+      try {
+        sendRequest(NSMMessage(it->second, NSMCommand::ERROR,
+                               error, message));
+        it++;
+      } catch (const NSMHandlerException& e) {
+        m_masters.erase(it++);
+      }
+    }
   }
 }
 
 bool NSMCommunicator::sendLog(const DAQLogMessage& log)
 {
-  return sendLog(m_master_node, log);
+  for (NSMNodeList::iterator it = m_masters.begin();
+       it != m_masters.end();) {
+    if (b2nsm_nodeid(it->first.c_str()) < 0) {
+      m_masters.erase(it++);
+    } else {
+      try {
+        sendLog(it->second, log);
+        it++;
+      } catch (const NSMHandlerException& e) {
+        m_masters.erase(it++);
+      }
+    }
+  }
+  return true;
 }
 
 bool NSMCommunicator::sendLog(const NSMNode& node,
@@ -168,38 +199,56 @@ bool NSMCommunicator::sendError(const std::string& message)
 bool NSMCommunicator::sendError(int error,
                                 const std::string& message)
 {
-  try {
-    if (m_master_node.getName().size() > 0 &&
-        b2nsm_nodeid(m_master_node.getName().c_str()) >= 0) {
-      sendRequest(NSMMessage(m_master_node, NSMCommand::ERROR,
-                             error, message));
+  for (NSMNodeList::iterator it = m_masters.begin();
+       it != m_masters.end();) {
+    if (b2nsm_nodeid(it->first.c_str()) < 0) {
+      m_masters.erase(it++);
+    } else {
+      try {
+        sendRequest(NSMMessage(it->second, NSMCommand::ERROR, error, message));
+        it++;
+      } catch (const NSMHandlerException& e) {
+        m_masters.erase(it++);
+      }
     }
-  } catch (const NSMHandlerException& e) {
-    return false;
   }
   return true;
 }
 
 bool NSMCommunicator::sendFatal(const std::string& message)
 {
-  try {
-    if (m_master_node.getName().size() > 0 &&
-        b2nsm_nodeid(m_master_node.getName().c_str()) >= 0) {
-      sendRequest(NSMMessage(m_master_node, NSMCommand::FATAL, message));
+  for (NSMNodeList::iterator it = m_masters.begin();
+       it != m_masters.end();) {
+    if (b2nsm_nodeid(it->first.c_str()) < 0) {
+      m_masters.erase(it++);
+    } else {
+      try {
+        sendRequest(NSMMessage(it->second, NSMCommand::FATAL, message));
+        it++;
+      } catch (const NSMHandlerException& e) {
+        m_masters.erase(it++);
+      }
     }
-  } catch (const NSMHandlerException& e) {
-    return false;
   }
   return true;
 }
 
 void NSMCommunicator::sendState(const NSMNode& node) throw(NSMHandlerException)
 {
-  if (m_master_node.getName().size() > 0 &&
-      b2nsm_nodeid(m_master_node.getName().c_str()) >= 0) {
-    std::string text = StringUtil::form("%s %s", node.getName().c_str(),
-                                        node.getState().getLabel());
-    sendRequest(NSMMessage(m_master_node, NSMCommand::STATE, text));
+  std::string text = StringUtil::form("%s %s", node.getName().c_str(),
+                                      node.getState().getLabel());
+  for (NSMNodeList::iterator it = m_masters.begin();
+       it != m_masters.end();) {
+    if (b2nsm_nodeid(it->first.c_str()) < 0) {
+      m_masters.erase(it++);
+    } else {
+      try {
+        sendRequest(NSMMessage(it->second, NSMCommand::STATE, text));
+        it++;
+      } catch (const NSMHandlerException& e) {
+        m_masters.erase(it++);
+      }
+    }
   }
 }
 
@@ -277,13 +326,20 @@ void NSMCommunicator::readContext(NSMcontext* nsmc) throw()
   if (nsmc == NULL || nsmc == m_nsmc) {
     m_message.read(m_nsmc);
     m_message.setRequestName();
-    const char* master_name = m_message.getNodeName();
+    const char* nodename = m_message.getNodeName();
     NSMCommand cmd(m_message.getRequestName());
-    if ((m_master_node.getName().size() == 0 ||
-         !isConnected(m_master_node)) &&
-        cmd != NSMCommand::OK && cmd != NSMCommand::ERROR &&
-        cmd != NSMCommand::LOG && strlen(master_name) > 0) {
-      m_master_node = NSMNode(master_name);
+    if (cmd != NSMCommand::OK && cmd != NSMCommand::ERROR &&
+        cmd != NSMCommand::LOG && strlen(nodename) > 0 &&
+        m_masters.find(nodename) == m_masters.end()) {
+      for (NSMNodeList::iterator it = m_masters.begin();
+           it != m_masters.end();) {
+        if (!isConnected(it->second)) {
+          m_masters.erase(it++);
+        } else {
+          it++;
+        }
+      }
+      m_masters.insert(NSMNodeList::value_type(nodename, NSMNode(nodename)));
     }
   }
 }
@@ -350,5 +406,24 @@ throw()
 
 const std::string NSMCommunicator::getNodeHost() throw()
 {
-  return getNodeHost(m_master_node.getName());
+#if NSM_PACKAGE_VERSION >= 1914
+  if (!getMessage().getMsg()) return "";
+  unsigned int nodeid = getMessage().getMsg()->node;
+  NSMsys* sys = m_nsmc->sysp;
+  if (nodeid < NSMSYS_MAX_NOD) {
+    NSMnod& nod(sys->nod[nodeid]);
+    if (!nod.name[0]) return "";
+    sockaddr_in addr;
+    addr.sin_addr.s_addr = nod.ipaddr;
+    return inet_ntoa(addr.sin_addr);
+  }
+#else
+#warning "Wrong version of nsm2. try source daq/slc/extra/nsm2/export.sh"
+#endif
+  return "";
 }
+
+//const std::string NSMCommunicator::getNodeHost() throw()
+//{
+//  return getNodeHost(m_master_node.getName());
+//}

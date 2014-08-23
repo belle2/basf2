@@ -155,8 +155,7 @@ bool RunControlCallback::log() throw()
       LoggerObjectTable(getDB()).add(log, true);
       getDB()->close();
       NSMCommunicator& com(*getCommunicator());
-      if (nodename != com.getMaster().getName() &&
-          log.getPriority() > LogFile::INFO) {
+      if (log.getPriority() > LogFile::INFO) {
         com.sendLog(log);
       }
     } catch (const DBHandlerException& e) {
@@ -230,8 +229,7 @@ bool RunControlCallback::error() throw()
     LoggerObjectTable(getDB()).add(log, true);
     getDB()->close();
     NSMCommunicator& com(*getCommunicator());
-    if (nodename != com.getMaster().getName() &&
-        log.getPriority() > LogFile::INFO) {
+    if (log.getPriority() > LogFile::INFO) {
       com.sendLog(log);
       if (log.getPriority() > LogFile::WARNING) {
         for (size_t i = 0; i < m_callbacks.size(); i++) {
@@ -326,22 +324,13 @@ bool RunControlCallback::send(NSMMessage msg) throw()
 {
   NSMCommunicator& com(*getCommunicator());
   RCCommand cmd = msg.getRequestName();
-  bool ismaster = com.getMaster().getName() == std::string(msg.getNodeName());
-  for (size_t i = 0; !ismaster && i < m_callbacks.size(); i++) {
-    if (m_callbacks[i]->getCommunicator() != NULL) {
-      ismaster = m_callbacks[i]->getCommunicator()->getMaster().getName()
-                 == std::string(msg.getNodeName());
-    }
+  msg.setNodeName(m_node_v[0]);
+  if (cmd == RCCommand::START) {
+    prepareRun(msg);
+  } else if (cmd == RCCommand::STOP || cmd == RCCommand::ABORT) {
+    postRun(msg);
   }
-  if (ismaster) {
-    msg.setNodeName(m_node_v[0]);
-    if (cmd == RCCommand::START) {
-      prepareRun(msg);
-    } else if (cmd == RCCommand::STOP || cmd == RCCommand::ABORT) {
-      postRun(msg);
-    }
-    m_msg_tmp = msg;
-  }
+  m_msg_tmp = msg;
   const size_t nobj = getConfig().getObject().getNObjects("node");
   for (size_t i = 0; i < nobj; i++) {
     if (msg.getNodeName() == m_node_v[i].getName()) {
@@ -374,7 +363,6 @@ bool RunControlCallback::send(NSMMessage msg) throw()
         RCState tstate = cmd.nextTState();
         if (tstate != Enum::UNKNOWN) m_node_v[i].setState(tstate);
       }
-      if (!ismaster) return true;
       if (i < nobj - 1)
         msg.setNodeName(m_node_v[i + 1]);
     }

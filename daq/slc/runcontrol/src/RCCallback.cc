@@ -31,7 +31,11 @@ void RCCallback::sendPause() throw()
 {
   NSMCommunicator* com = getCommunicator();
   if (com != NULL) {
-    sendPause(com->getMaster());
+    const NSMNodeList& masters(com->getMasters());
+    for (NSMNodeList::const_iterator it = masters.begin();
+         it != masters.end(); it++) {
+      sendPause(it->second);
+    }
   }
 }
 

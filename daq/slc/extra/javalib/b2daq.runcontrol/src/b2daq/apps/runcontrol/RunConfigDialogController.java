@@ -7,6 +7,7 @@ package b2daq.apps.runcontrol;
 
 import b2daq.io.ConfigTree;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -40,6 +41,7 @@ public class RunConfigDialogController implements Initializable {
     private TreeView tree_runtype;
 
     private boolean isOK = false;
+    private HashMap<TreeItem, String> map = new HashMap<>();
 
     @FXML
     private void handleOKButton() {
@@ -83,7 +85,7 @@ public class RunConfigDialogController implements Initializable {
                     Object oldValue, Object newValue) {
                 TreeItem<String> item = (TreeItem<String>) newValue;
                 if (item != null && item.isLeaf()) {
-                    input.setText(item.getValue());
+                    input.setText(map.get(item));
                 }
             }
 
@@ -100,9 +102,11 @@ public class RunConfigDialogController implements Initializable {
 
     private TreeItem<String> createTree(ConfigTree.Branch branch) {
         TreeItem<String> root = new TreeItem<String>(branch.getName());
+        map.put(root, branch.getName());
         for (ConfigTree.Leaf leaf : branch.getLeafs()) {
-            if (!leaf.isLeaf()) {
+            if (leaf.isLeaf()) {
                 TreeItem<String> item = new TreeItem<String>(leaf.getName());
+                map.put(item, leaf.getLabel());
                 root.getChildren().add(item);
             } else {
                 root.getChildren().add(createTree((ConfigTree.Branch) leaf));

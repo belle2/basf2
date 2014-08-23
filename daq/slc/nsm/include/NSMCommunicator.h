@@ -22,6 +22,8 @@ namespace Belle2 {
   class NSMCallback;
   class NSMMessage;
 
+  typedef std::map<std::string, NSMNode> NSMNodeList;
+
   class NSMCommunicator {
 
   public:
@@ -63,7 +65,7 @@ namespace Belle2 {
     void setMessage(const NSMMessage& msg) throw() { m_message = msg; }
     void setId(int id) throw() { m_id = id; }
     const NSMNode& getNode() const throw() { return m_node; }
-    const NSMNode& getMaster() const throw() { return m_master_node; }
+    const NSMNodeList& getMasters() const throw() { return m_masters; }
     int getNodeIdByName(const std::string& name) throw(NSMHandlerException);
     int getNodePidByName(const std::string& name) throw(NSMHandlerException);
     void setContext(NSMcontext* nsmc) throw(NSMHandlerException);
@@ -82,7 +84,7 @@ namespace Belle2 {
     NSMcontext* m_nsmc;
     std::string m_host;
     int m_port;
-    NSMNode m_master_node;
+    NSMNodeList m_masters;
     NSMNode m_node;
 
   };

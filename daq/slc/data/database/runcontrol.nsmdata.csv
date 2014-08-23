@@ -3,4 +3,3 @@
  RUNCONTROL, default,  STORAGE,  STORAGE_STATUS, ronode_status,        3
  RUNCONTROL, default,      HLT,      HLT_STATUS,     rfunitinfo,        1
  RUNCONTROL, default, ECL, ECL_STATUS,      rc_status,        2
- RUNCONTROL, default,      TTD,      TTD_STATUS,     ronode_status,        3

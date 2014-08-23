@@ -24,6 +24,9 @@ addParamConfig ECL ropc ${DIR}/ecl.ropc.csv
 addParamConfig DAQ hlt ${DIR}/hlt.csv
 addParamConfig DAQ storage ${DIR}/storage.csv
 addParamConfig DAQ ttd ${DIR}/ttd.csv
+addParamConfig DAQ runcontrol.node ${DIR}/ecl0102.runcontrol.node.csv
+addParamConfig DAQ runcontrol.nsmdata ${DIR}/ecl0102.runcontrol.nsmdata.csv
+addParamConfig DAQ runcontrol ${DIR}/ecl0102.runcontrol.csv
 addParamConfig DAQ runcontrol.node ${DIR}/ecl.runcontrol.node.csv
 addParamConfig DAQ runcontrol.nsmdata ${DIR}/ecl.runcontrol.nsmdata.csv
 addParamConfig DAQ runcontrol ${DIR}/ecl.runcontrol.csv

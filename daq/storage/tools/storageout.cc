@@ -58,7 +58,6 @@ int main(int argc, char** argv)
     SharedEventBuffer::Header hdr;
     while (true) {
       unsigned int nbyte = ibuf.read(evtbuf, false, &hdr);
-      SharedEventBuffer::Header* iheader = ibuf.getHeader();
       if (expno < hdr.expno || runno < hdr.runno) {
         expno = hdr.expno;
         runno = hdr.runno;

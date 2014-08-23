@@ -27,6 +27,7 @@ namespace Belle2 {
     static unsigned int g_filesize;
     static Mutex g_mutex;
     static Priority g_threshold;
+    static std::string g_filename;
 
     // member functions
   public:

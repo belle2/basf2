@@ -2,5 +2,6 @@ Import('env')
 
 env['TOOLS_LIBS']['udprecv'] = ['pthread', 'ncurses','readline', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['udpsend'] = ['pthread', 'ncurses','readline', '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['logfiletest'] = ['daq', 'framework']
 
 Return('env')

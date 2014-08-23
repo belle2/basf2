@@ -21,13 +21,15 @@ std::ofstream LogFile::g_stream;
 unsigned int LogFile::g_filesize = 0;
 Mutex LogFile::g_mutex;
 LogFile::Priority LogFile::g_threshold;
+std::string LogFile::g_filename;
 
 void LogFile::open(const std::string& filename, Priority threshold)
 {
   if (!g_opened) {
     ConfigFile config("slowcontrol");
+    g_filename = filename;
     g_filepath = config.get("logfile.dir") + "/" + filename
-                 + "." +  Date().toString("%Y.%m.%d") + ".log";
+                 + Date().toString(".%Y.%m.%d.log");
     g_threshold = threshold;
     g_opened = true;
     open();
@@ -122,12 +124,14 @@ int LogFile::put_impl(const std::string& msg, Priority priority, va_list ap)
   }
   Date date;
   if (g_filesize >= 1024 * 1024 * 2) {
-    /*
     g_stream.close();
+    ConfigFile config("slowcontrol");
     rename(g_filepath.c_str(),
-           (g_filepath + "." + date.toString("%Y.%m.%d.%H.%M")).c_str());
+           (config.get("logfile.dir") + "/" + g_filename +
+            date.toString(".%Y.%m.%d.%H.%M.log")).c_str());
+    g_mutex.unlock();
     open();
-    */
+    g_mutex.lock();
   }
   std::stringstream ss;
   ss << "[" << date.toString();

@@ -94,16 +94,6 @@ void RunControlCallback::update() throw()
     status->node[i].state = m_node_v[i].getState().getId();
     DBObject& obj(obj_v[i].getObject("runtype"));
     status->node[i].configid = obj.getId();
-    NSMData& data(m_data_v[i]);
-    if (data.isAvailable()) {
-      data.update();
-      if (data.getFormat() == "ronode_status") {
-        ronode_status* rs = (ronode_status*)data.get();
-        status->node[i].eflag = rs->eflag;
-      } else {
-        status->node[i].eflag = 0;
-      }
-    }
   }
   for (size_t i = 0; i < m_callbacks.size(); i++) {
     if (m_callbacks[i] != this &&

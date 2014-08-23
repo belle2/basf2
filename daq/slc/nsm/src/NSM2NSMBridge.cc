@@ -29,12 +29,12 @@ NSM2NSMBridge::NSM2NSMBridge(NSMCallback* callback1,
 void NSM2NSMBridge::run() throw()
 {
   try {
+    const int timeout = m_callback[0]->getTimeout();
+    NSMCommunicator* com[2] = {
+      (m_daemon[0] != NULL) ? m_daemon[0]->getCommunicator() : NULL,
+      (m_daemon[1] != NULL) ? m_daemon[1]->getCommunicator() : NULL
+    };
     while (true) {
-      int timeout = m_callback[0]->getTimeout();
-      NSMCommunicator* com[2] = {
-        m_daemon[0]->getCommunicator(),
-        m_daemon[1]->getCommunicator()
-      };
       int i = NSMCommunicator::select(timeout, com, 2);
       if (i >= 0 && m_daemon[i] != NULL) {
         m_daemon[i]->push();

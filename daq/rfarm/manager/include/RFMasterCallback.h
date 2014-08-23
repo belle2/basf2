@@ -1,6 +1,8 @@
 #ifndef _Belle2_RFMasterCallback_hh
 #define _Belle2_RFMasterCallback_hh
 
+#include "daq/rfarm/manager/RFConf.h"
+
 #include <daq/slc/nsm/NSMCallback.h>
 #include <daq/slc/nsm/NSMData.h>
 
@@ -16,7 +18,8 @@ namespace Belle2 {
   public:
     RFMasterCallback(const NSMNode& node,
                      const NSMData& data,
-                     RFMaster* master);
+                     RFMaster* master,
+                     const char* confile);
     virtual ~RFMasterCallback() throw();
 
   public:
@@ -33,6 +36,7 @@ namespace Belle2 {
     virtual bool resume() throw();
     virtual bool restart() throw();
     virtual bool status() throw();
+    void reply(bool result);
 
   public:
     void setCallback(RFRunControlCallback* callback) {
@@ -44,6 +48,9 @@ namespace Belle2 {
     RFMaster* m_master;
     std::vector<NSMData> m_data_v;
     RFRunControlCallback* m_callback;
+    RFConf m_conf;
+    int m_st_conf;
+    int m_st_unconf;
 
   };
 

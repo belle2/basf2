@@ -23,32 +23,10 @@ namespace Belle2 {
     void run() throw();
     void init() throw(NSMHandlerException);
     NSMCommunicator* getCommunicator() { return m_com; }
-    void push(const NSMMessage& msg);
-    void push();
-    void pop(NSMMessage& msg);
 
   private:
     NSMCallback* m_callback;
     NSMCommunicator* m_com;
-    Mutex m_mutex;
-    Cond m_cond;
-    std::queue<NSMMessage> m_msg_q;
-
-  private:
-    class Handler {
-
-    public:
-      Handler(NSMNodeDaemon* daemon, NSMCallback* callback)
-        : m_daemon(daemon), m_callback(callback) {}
-
-    public:
-      void run();
-
-    private:
-      NSMNodeDaemon* m_daemon;
-      NSMCallback* m_callback;
-
-    };
 
   };
 

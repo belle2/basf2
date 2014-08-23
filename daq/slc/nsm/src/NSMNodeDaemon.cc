@@ -27,11 +27,8 @@ NSMNodeDaemon::NSMNodeDaemon(NSMCallback* callback,
     LogFile::fatal("Failed to connect NSM network (%s:%d). "
                    "Terminating process ",
                    host.c_str(), port);
-    delete m_com;
-    m_com = NULL;
     exit(1);
   }
-  PThread(new Handler(this, callback));
   LogFile::debug("Connected to NSM2 daemon (%s:%d)",
                  host.c_str(), port);
 }
@@ -41,7 +38,9 @@ void NSMNodeDaemon::run() throw()
   try {
     while (true) {
       if (m_com->wait(m_callback->getTimeout())) {
-        push();
+        NSMMessage& msg(m_com->getMessage());
+        m_callback->setMessage(msg);
+        m_callback->perform(msg);
       } else {
         m_callback->timeout();
       }
@@ -52,42 +51,4 @@ void NSMNodeDaemon::run() throw()
     m_callback->setReply(e.what());
   }
   m_callback->term();
-}
-
-
-void NSMNodeDaemon::push()
-{
-  push(m_com->getMessage());
-}
-
-void NSMNodeDaemon::push(const NSMMessage& msg)
-{
-  LogFile::debug("NSMNodeDaemon::push %s >> %s",
-                 msg.getNodeName(),
-                 msg.getRequestName());
-  m_mutex.lock();
-  m_msg_q.push(msg);
-  m_cond.signal();
-  m_mutex.unlock();
-}
-
-void NSMNodeDaemon::pop(NSMMessage& msg)
-{
-  m_mutex.lock();
-  while (m_msg_q.empty()) {
-    m_cond.wait(m_mutex);
-  }
-  msg = m_msg_q.front();
-  m_msg_q.pop();
-  m_mutex.unlock();
-}
-
-void NSMNodeDaemon::Handler::run()
-{
-  NSMMessage msg;
-  while (true) {
-    m_daemon->pop(msg);
-    m_callback->setMessage(msg);
-    m_callback->perform(msg);
-  }
 }

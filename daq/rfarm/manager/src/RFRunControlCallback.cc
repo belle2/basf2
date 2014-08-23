@@ -1,5 +1,6 @@
 #include "daq/rfarm/manager/RFRunControlCallback.h"
 
+#include "daq/rfarm/manager/RFCommand.h"
 #include "daq/rfarm/manager/RFMaster.h"
 #include "daq/rfarm/manager/RFMasterCallback.h"
 
@@ -31,31 +32,41 @@ void RFRunControlCallback::init() throw()
 
 bool RFRunControlCallback::load() throw()
 {
-  m_callback->setMessage(getMessage());
-  return m_callback->configure();
+  NSMMessage& msg(getMessage());
+  msg.setRequestName(RFCommand::RF_CONFIGURE);
+  m_callback->setMessage(msg);
+  return m_callback->perform(msg);
 }
 
 bool RFRunControlCallback::start() throw()
 {
-  m_callback->setMessage(getMessage());
-  return m_callback->start();
+  NSMMessage& msg(getMessage());
+  msg.setRequestName(RFCommand::RF_START);
+  m_callback->setMessage(msg);
+  return m_callback->perform(msg);
 }
 
 bool RFRunControlCallback::stop() throw()
 {
-  m_callback->setMessage(getMessage());
-  return m_callback->stop();
+  NSMMessage& msg(getMessage());
+  msg.setRequestName(RFCommand::RF_STOP);
+  m_callback->setMessage(msg);
+  return m_callback->perform(msg);
 }
 
 bool RFRunControlCallback::recover() throw()
 {
-  m_callback->setMessage(getMessage());
-  return m_callback->unconfigure() && m_callback->configure();
+  NSMMessage& msg(getMessage());
+  msg.setRequestName(RFCommand::RF_RESTART);
+  m_callback->setMessage(msg);
+  return m_callback->perform(msg);
 }
 
 bool RFRunControlCallback::abort() throw()
 {
-  m_callback->setMessage(getMessage());
-  return m_callback->unconfigure();
+  NSMMessage& msg(getMessage());
+  msg.setRequestName(RFCommand::RF_UNCONFIGURE);
+  m_callback->setMessage(msg);
+  return m_callback->perform(msg);
 }
 

@@ -38,7 +38,9 @@ void NSM2NSMBridge::run() throw()
     while (true) {
       int i = NSMCommunicator::select(timeout, com, 2);
       if (i >= 0 && m_daemon[i] != NULL) {
-        m_daemon[i]->push();
+        NSMMessage& msg(com[i]->getMessage());
+        m_callback[i]->setMessage(msg);
+        m_callback[i]->perform(msg);
       } else {
         for (int i = 0; i < 2; i++) {
           if (m_callback[i] != NULL) {

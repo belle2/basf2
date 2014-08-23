@@ -64,6 +64,7 @@ void NSMNodeDaemon::push(const NSMMessage& msg)
 {
   m_mutex.lock();
   m_msg_q.push(msg);
+  m_cond.signal();
   m_mutex.unlock();
 }
 

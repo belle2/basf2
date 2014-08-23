@@ -195,7 +195,7 @@ void edit(const std::string& str)
         for (size_t i = 0; i < hvconfig.getNChannels(); i++) {
           HVChannel& channel(hvconfig.getChannel(i));
           HVValue& value(value_v[i]);
-          if (((index >= 0 && index == j) ||
+          if (((index >= 0 && index == (int)j) ||
                (configname.size() == 0 || configname == value.getConfigName())) &&
               (crate == -1 || crate == channel.getCrate()) &&
               (slot == -1 || slot == channel.getSlot()) &&

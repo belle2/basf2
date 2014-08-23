@@ -85,7 +85,7 @@ throw()
   return obj_v;
 }
 
-ConfigObjectList ConfigObjectTable::getList(int confid, bool isroot)
+ConfigObjectList ConfigObjectTable::getList(int confid, bool)
 throw()
 {
   ConfigObjectList obj_v;

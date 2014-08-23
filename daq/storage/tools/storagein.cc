@@ -36,8 +36,6 @@ int main(int argc, char** argv)
   bool use_info = (argc > 6);
   if (use_info) {
     info.open(argv[5], atoi(argv[6]));
-    //info.init();
-    //info.clear();
   }
   SharedEventBuffer ibuf;
   ibuf.open(argv[1], atoi(argv[2]) * 1000000, true);
@@ -78,9 +76,6 @@ int main(int argc, char** argv)
       B2INFO("storagein: Cconnected to eb2.");
       while (true) {
         reader.read(data.getBuffer(), sizeof(int));
-        //if (info.getInputNBytes() == 0) {
-        //info.reportRunning();
-        //}
         unsigned int nbyte = data.getByteSize() - sizeof(int);
         int nword = data.getWordSize();
         reader.read((data.getBuffer() + 1), nbyte);

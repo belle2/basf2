@@ -57,7 +57,7 @@ bool StoragerCallback::load() throw()
 
   const std::string ibuf_name = m_file.get("input.buf.name");
   const std::string rbuf_name = m_file.get("record.buf.name");
-  const std::string obuf_name = m_file.get("out.buf.name");
+  const std::string obuf_name = m_file.get("output.buf.name");
   const std::string ibuf_size = m_file.get("input.buf.size");
   const std::string rbuf_size = m_file.get("record.buf.size");
   const std::string obuf_size = m_file.get("output.buf.size");
@@ -92,12 +92,10 @@ bool StoragerCallback::load() throw()
   m_con[1].addArgument("2");
   LogFile::debug("debug");
   if (!m_con[1].load(10)) {
-    /*
-    std::string emsg = "storageout: Not accepted connection from EXPRECO";
+    std::string emsg = "storageout: Failed to start";
     setReply(emsg);
     LogFile::error(emsg);
     return false;
-    */
   }
   LogFile::debug("Booted storagerecord");
 

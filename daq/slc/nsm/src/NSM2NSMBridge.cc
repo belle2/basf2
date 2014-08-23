@@ -21,7 +21,6 @@ NSM2NSMBridge::NSM2NSMBridge(NSMCallback* callback1,
   const int port[2] = {port1, port2};
   for (int i = 0; i < 2; i++) {
     if (m_callback[i] != NULL && host[i].size() > 0 && port[i] > 0) {
-      NSMNode& node(m_callback[i]->getNode());
       m_daemon[i] = new NSMNodeDaemon(m_callback[i], host[i], port[i]);
     }
   }

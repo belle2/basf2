@@ -25,12 +25,13 @@ using namespace Belle2;
 int main(int argc, char** argv)
 {
   if (argc < 3) {
-    LogFile::debug("%s storage monitor", argv[0]);
+    LogFile::debug("%s storage monitor [config]", argv[0]);
     return 1;
   }
   const std::string stornode = argv[1];
   const std::string node = argv[2];
-  ConfigFile config("slowcontrol", "storage");
+  ConfigFile config("slowcontrol");
+  if (argc > 4) config.read(argv[3]);
   NSMCommunicator* comm = new NSMCommunicator();
   comm->init(NSMNode(node),
              config.get("nsm.global.host"),

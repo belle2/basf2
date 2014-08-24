@@ -79,7 +79,8 @@ void NSMCommunicator::setCallback(NSMCallback* callback) throw(NSMHandlerExcepti
   }
 }
 
-void NSMCommunicator::sendRequest(const NSMMessage& msg) throw(NSMHandlerException)
+void NSMCommunicator::sendRequest(const NSMMessage& msg)
+throw(NSMHandlerException)
 {
 #if NSM_PACKAGE_VERSION >= 1914
   const char* nodename = msg.getNodeName();

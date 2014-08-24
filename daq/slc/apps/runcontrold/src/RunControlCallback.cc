@@ -108,7 +108,7 @@ void RunControlCallback::timeout() throw()
       node.setState(Enum::UNKNOWN);
       continue;
     }
-    if (state == NSMState::UNKNOWN) {
+    if (!state.isStable()) {
       try {
         com.sendRequest(NSMMessage(node, RCCommand::STATECHECK));
       } catch (const NSMHandlerException& e) {
@@ -141,7 +141,7 @@ bool RunControlCallback::log() throw()
       if (log.getPriority() > LogFile::INFO) {
         NSMCommunicator* com = getCommunicator();
         com->sendLog(log);
-        if (m_callback) {
+        if (m_callback && m_callback->getCommunicator()) {
           NSMCommunicator* com_g = m_callback->getCommunicator();
           com_g->sendLog(log);
         }
@@ -197,7 +197,7 @@ bool RunControlCallback::perform(const NSMMessage& msg) throw()
   if (!result) {
     NSMCommunicator& com(*getCommunicator());
     com.replyError(getNode().getError(), getReply());
-    if (m_callback) {
+    if (m_callback && m_callback->getCommunicator()) {
       NSMCommunicator& com_g(*m_callback->getCommunicator());
       com_g.replyError(getNode().getError(), getReply());
     }
@@ -221,7 +221,7 @@ bool RunControlCallback::ok() throw()
       NSMNode& node(*it);
       node.setState(state);
       com.sendState(node);
-      if (m_callback) {
+      if (m_callback && m_callback->getCommunicator()) {
         NSMCommunicator& com_g(*m_callback->getCommunicator());
         com_g.sendState(node);
       }
@@ -246,7 +246,7 @@ bool RunControlCallback::ok() throw()
                          nodename.c_str(), msg.getData(),
                          getNode().getState().getLabel(), state.getLabel());
           com.replyOK(getNode());
-          if (m_callback) {
+          if (m_callback && m_callback->getCommunicator()) {
             NSMCommunicator& com_g(*m_callback->getCommunicator());
             com_g.replyOK(getNode());
           }
@@ -274,7 +274,7 @@ bool RunControlCallback::error() throw()
     if (log.getPriority() > LogFile::INFO) {
       NSMCommunicator& com(*getCommunicator());
       com.sendLog(log);
-      if (m_callback) {
+      if (m_callback && m_callback->getCommunicator()) {
         NSMCommunicator& com_g(*m_callback->getCommunicator());
         com_g.sendLog(log);
       }
@@ -442,7 +442,7 @@ bool RunControlCallback::pause() throw()
     }
   }
   try {
-    if (m_callback) {
+    if (m_callback && m_callback->getCommunicator()) {
       m_callback->sendPause();
       return true;
     }

@@ -35,6 +35,7 @@ RunControlCallback::RunControlCallback(const NSMNode& node,
                    "rc_status", rc_status_revision);
   m_runtype_default = runtype;
   m_port = port;
+  m_callback = NULL;
 }
 
 void RunControlCallback::init() throw()
@@ -95,18 +96,11 @@ void RunControlCallback::update() throw()
     DBObject& obj(obj_v[i].getObject("runtype"));
     status->node[i].configid = obj.getId();
   }
-  for (size_t i = 0; i < m_callbacks.size(); i++) {
-    if (m_callbacks[i] != this &&
-        m_callbacks[i]->getCommunicator() != NULL) {
-      m_callbacks[i]->update();
-    }
-  }
 }
 
 void RunControlCallback::timeout() throw()
 {
   NSMCommunicator& com(*getCommunicator());
-  m_msg_tmp.setRequestName(Enum::UNKNOWN);
   for (size_t i = 0; i < m_node_v.size(); i++) {
     NSMNode& node(m_node_v[i]);
     RCState state(node.getState());
@@ -114,9 +108,8 @@ void RunControlCallback::timeout() throw()
       node.setState(Enum::UNKNOWN);
       continue;
     }
-    if (state != RCState::RUNNING_S) {
+    if (state == NSMState::UNKNOWN) {
       try {
-        LogFile::debug("STATECHECK>>%s", node.getName().c_str());
         com.sendRequest(NSMMessage(node, RCCommand::STATECHECK));
       } catch (const NSMHandlerException& e) {
         LogFile::warning("Failed to send statecheck : %s",
@@ -145,9 +138,13 @@ bool RunControlCallback::log() throw()
       getDB()->connect();
       LoggerObjectTable(getDB()).add(log, true);
       getDB()->close();
-      NSMCommunicator& com(*getCommunicator());
       if (log.getPriority() > LogFile::INFO) {
-        com.sendLog(log);
+        NSMCommunicator* com = getCommunicator();
+        com->sendLog(log);
+        if (m_callback) {
+          NSMCommunicator* com_g = m_callback->getCommunicator();
+          com_g->sendLog(log);
+        }
       }
     } catch (const DBHandlerException& e) {
       LogFile::error("DB errir : %s", e.what());
@@ -155,6 +152,59 @@ bool RunControlCallback::log() throw()
   }
   return true;
 }
+
+bool RunControlCallback::perform(const NSMMessage& msg) throw()
+{
+  if (NSMCallback::perform(msg)) return true;
+  const RCCommand cmd = msg.getRequestName();
+  if (cmd.isAvailable(getNode().getState()) == NSMCommand::DISABLED) {
+    return false;
+  }
+  if (cmd == RCCommand::STATECHECK) {
+    NSMCommunicator& com(*getCommunicator());
+    com.replyOK(getNode());
+    if (m_callback) {
+      NSMCommunicator& com_g(*m_callback->getCommunicator());
+      com_g.replyOK(getNode());
+    }
+    return true;
+  }
+  RCState state = cmd.nextTState();
+  bool result = true;
+  if (state != Enum::UNKNOWN) {
+    getNode().setState(state);
+    LogFile::debug("%s >> %s (%s)", msg.getNodeName(),
+                   cmd.getLabel(), state.getLabel());
+    setReply("");
+    if (cmd == RCCommand::LOAD) {
+      result = preload(msg) && load();
+    } else if (cmd == RCCommand::START) {
+      result = start();
+    } else if (cmd == RCCommand::STOP) {
+      result = stop();
+    } else if (cmd == RCCommand::RECOVER) {
+      result = recover();
+    } else if (cmd == RCCommand::RESUME) {
+      result = resume();
+    } else if (cmd == RCCommand::PAUSE) {
+      result = pause();
+    } else if (cmd == RCCommand::ABORT) {
+      result = abort();
+    } else if (cmd == RCCommand::TRIGFT) {
+      result = trigft();
+    }
+  }
+  if (!result) {
+    NSMCommunicator& com(*getCommunicator());
+    com.replyError(getNode().getError(), getReply());
+    if (m_callback) {
+      NSMCommunicator& com_g(*m_callback->getCommunicator());
+      com_g.replyError(getNode().getError(), getReply());
+    }
+  }
+  return true;
+}
+
 
 bool RunControlCallback::ok() throw()
 {
@@ -167,20 +217,21 @@ bool RunControlCallback::ok() throw()
       LogFile::error("got unknown state (%s) from %s",
                      msg.getData(), nodename.c_str());
     } else if (it != m_node_v.end()) {
-      LogFile::debug("%s >> OK (%s) (RC=%s) %s",
-                     nodename.c_str(), msg.getData(),
-                     getNode().getState().getLabel(), state.getLabel());
       NSMCommunicator& com(*getCommunicator());
       NSMNode& node(*it);
       node.setState(state);
       com.sendState(node);
+      if (m_callback) {
+        NSMCommunicator& com_g(*m_callback->getCommunicator());
+        com_g.sendState(node);
+      }
       if (state == RCState::PAUSED_S) {
         const size_t nobj = getConfig().getObject().getNObjects("node");
         for (size_t i = 0; i < nobj; i++) {
           if (m_node_v[i].getState() == RCState::RECOVERING_RS) {
             try {
-              getCommunicator()->sendRequest(NSMMessage(m_node_v[i],
-                                                        RCCommand::RECOVER));
+              com.sendRequest(NSMMessage(m_node_v[i],
+                                         RCCommand::RECOVER));
             } catch (const IOException& e) {
               LogFile::warning(e.what());
             }
@@ -191,16 +242,14 @@ bool RunControlCallback::ok() throw()
         RCState state_org(getNode().getState());
         if (state != state_org) {
           getNode().setState(state);
-          LogFile::debug("%s >> %s", getNode().getName().c_str(),
-                         state.getLabel());
+          LogFile::debug("%s >> OK (%s) (RC=%s) %s",
+                         nodename.c_str(), msg.getData(),
+                         getNode().getState().getLabel(), state.getLabel());
           com.replyOK(getNode());
-          for (size_t i = 0; i < m_callbacks.size(); i++) {
-            if (m_callbacks[i] != this &&
-                m_callbacks[i]->getCommunicator() != NULL) {
-              m_callbacks[i]->getCommunicator()->replyOK(getNode());
-            }
+          if (m_callback) {
+            NSMCommunicator& com_g(*m_callback->getCommunicator());
+            com_g.replyOK(getNode());
           }
-          m_msg_tmp.setRequestName(Enum::UNKNOWN);
         }
       }
       update();
@@ -222,16 +271,12 @@ bool RunControlCallback::error() throw()
     getDB()->connect();
     LoggerObjectTable(getDB()).add(log, true);
     getDB()->close();
-    NSMCommunicator& com(*getCommunicator());
     if (log.getPriority() > LogFile::INFO) {
+      NSMCommunicator& com(*getCommunicator());
       com.sendLog(log);
-      if (log.getPriority() > LogFile::WARNING) {
-        for (size_t i = 0; i < m_callbacks.size(); i++) {
-          if (m_callbacks[i] != this &&
-              m_callbacks[i]->getCommunicator() != NULL) {
-            m_callbacks[i]->getCommunicator()->sendLog(log);
-          }
-        }
+      if (m_callback) {
+        NSMCommunicator& com_g(*m_callback->getCommunicator());
+        com_g.sendLog(log);
       }
     }
   }
@@ -324,7 +369,6 @@ bool RunControlCallback::send(NSMMessage msg) throw()
   } else if (cmd == RCCommand::STOP || cmd == RCCommand::ABORT) {
     postRun(msg);
   }
-  m_msg_tmp = msg;
   const size_t nobj = getConfig().getObject().getNObjects("node");
   for (size_t i = 0; i < nobj; i++) {
     if (msg.getNodeName() == m_node_v[i].getName()) {
@@ -398,9 +442,8 @@ bool RunControlCallback::pause() throw()
     }
   }
   try {
-    NSMCommunicator* com = m_callbacks[1]->getCommunicator();
-    if (com != NULL) {
-      m_callbacks[1]->sendPause();
+    if (m_callback) {
+      m_callback->sendPause();
       return true;
     }
   } catch (const IOException& e) {

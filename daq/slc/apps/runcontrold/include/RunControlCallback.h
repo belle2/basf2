@@ -30,6 +30,7 @@ namespace Belle2 {
     virtual ~RunControlCallback() throw() {}
 
   public:
+    virtual bool perform(const NSMMessage& msg) throw();
     virtual void init() throw();
     virtual void timeout() throw();
     virtual void update() throw();
@@ -38,8 +39,8 @@ namespace Belle2 {
     virtual bool error() throw();
     virtual bool log() throw();
     NSMData& getData() { return m_data; }
-    void addCallback(RCCallback* callback) throw() {
-      m_callbacks.push_back(callback);
+    void setCallback(RCCallback* callback) throw() {
+      m_callback = callback;
     }
 
   public:
@@ -62,12 +63,11 @@ namespace Belle2 {
 
   protected:
     RunSetting m_setting;
+    RCCallback* m_callback;
     NSMNodeList m_node_v;
     NSMDataList m_data_v;
-    NSMMessage m_msg_tmp;
     RunNumberInfo m_info;
     NSMData m_data;
-    std::vector<RCCallback*> m_callbacks;
     std::string m_runtype_default;
     int m_port;
 

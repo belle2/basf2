@@ -26,7 +26,7 @@ RunControlMasterCallback::RunControlMasterCallback(const NSMNode& node,
   m_data = NSMData(node.getName() + "_STATUS",
                    "rc_status", rc_status_revision);
   m_callback = callback;
-  callback->addCallback(this);
+  callback->setCallback(this);
 }
 
 void RunControlMasterCallback::init() throw()

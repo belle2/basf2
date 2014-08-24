@@ -163,7 +163,7 @@ bool RunControlCallback::perform(const NSMMessage& msg) throw()
   if (cmd == RCCommand::STATECHECK) {
     NSMCommunicator& com(*getCommunicator());
     com.replyOK(getNode());
-    if (m_callback) {
+    if (m_callback && m_callback->getCommunicator()) {
       NSMCommunicator& com_g(*m_callback->getCommunicator());
       com_g.replyOK(getNode());
     }

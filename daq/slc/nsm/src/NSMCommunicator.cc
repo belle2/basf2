@@ -1,6 +1,7 @@
 #include "daq/slc/nsm/NSMCommunicator.h"
 
 #include <daq/slc/system/LogFile.h>
+#include <daq/slc/runcontrol/RCCommand.h>
 
 #include <daq/slc/nsm/NSMCallback.h>
 
@@ -315,8 +316,8 @@ void NSMCommunicator::readContext(NSMcontext* nsmc) throw()
     const char* nodename = m_message.getNodeName();
     NSMCommand cmd(m_message.getRequestName());
     if (cmd != NSMCommand::OK && cmd != NSMCommand::ERROR &&
-        cmd != NSMCommand::LOG && strlen(nodename) > 0 &&
-        m_masters.find(nodename) == m_masters.end()) {
+        cmd != NSMCommand::LOG && cmd != RCCommand::STATE &&
+        strlen(nodename) > 0 && m_masters.find(nodename) == m_masters.end()) {
       m_masters.insert(NSMNodeList::value_type(nodename, NSMNode(nodename)));
     }
   }

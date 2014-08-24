@@ -38,7 +38,8 @@ namespace Belle2 {
 
   public:
     NSMMessage& getMessage();
-    void setMessage(NSMMessage& msg);
+    const NSMMessage& getMessage() const;
+    void setMessage(const NSMMessage& msg);
     NSMCommunicator* getCommunicator() { return m_comm; }
     NSMNode& getNode() throw() { return m_node; }
     const NSMNode& getNode() const throw() { return m_node; }

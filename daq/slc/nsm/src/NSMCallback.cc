@@ -49,7 +49,12 @@ NSMMessage& NSMCallback::getMessage()
   return m_msg;
 }
 
-void NSMCallback::setMessage(NSMMessage& msg)
+const NSMMessage& NSMCallback::getMessage() const
+{
+  return m_msg;
+}
+
+void NSMCallback::setMessage(const NSMMessage& msg)
 {
   m_msg = msg;
 }

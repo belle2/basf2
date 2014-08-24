@@ -101,7 +101,6 @@ throw(NSMHandlerException)
 {
 #if NSM_PACKAGE_VERSION >= 1914
   b2nsm_context(m_nsmc);
-  //LogFile::debug("%s >> %s", node.c_str(), cmd.c_str());
   if (b2nsm_sendany(node.c_str(), cmd.c_str(),
                     npar, (int*) pars, len, data, NULL) < 0) {
     m_id = -1;
@@ -116,16 +115,13 @@ void NSMCommunicator::replyOK(const NSMNode& node)
 throw(NSMHandlerException)
 {
   for (NSMNodeList::iterator it = m_masters.begin();
-       it != m_masters.end();) {
-    if (b2nsm_nodeid(it->first.c_str()) < 0) {
-      m_masters.erase(it++);
-    } else {
+       it != m_masters.end(); it++) {
+    if (b2nsm_nodeid(it->first.c_str()) >= 0) {
       try {
+        LogFile::debug("OK >> %s", it->second.getName().c_str());
         sendRequest(NSMMessage(it->second, NSMCommand::OK,
                                node.getState().getLabel()));
-        it++;
       } catch (const NSMHandlerException& e) {
-        m_masters.erase(it++);
       }
     }
   }
@@ -135,16 +131,12 @@ void NSMCommunicator::replyError(int error, const std::string& message)
 throw(NSMHandlerException)
 {
   for (NSMNodeList::iterator it = m_masters.begin();
-       it != m_masters.end();) {
-    if (b2nsm_nodeid(it->first.c_str()) < 0) {
-      m_masters.erase(it++);
-    } else {
+       it != m_masters.end(); it++) {
+    if (b2nsm_nodeid(it->first.c_str()) >= 0) {
       try {
         sendRequest(NSMMessage(it->second, NSMCommand::ERROR,
                                error, message));
-        it++;
       } catch (const NSMHandlerException& e) {
-        m_masters.erase(it++);
       }
     }
   }
@@ -153,15 +145,12 @@ throw(NSMHandlerException)
 bool NSMCommunicator::sendLog(const DAQLogMessage& log)
 {
   for (NSMNodeList::iterator it = m_masters.begin();
-       it != m_masters.end();) {
-    if (b2nsm_nodeid(it->first.c_str()) < 0) {
-      m_masters.erase(it++);
-    } else {
+       it != m_masters.end(); it++) {
+    if (b2nsm_nodeid(it->first.c_str()) >= 0) {
       try {
+        LogFile::debug("LOG >> %s", it->second.getName().c_str());
         sendLog(it->second, log);
-        it++;
       } catch (const NSMHandlerException& e) {
-        m_masters.erase(it++);
       }
     }
   }
@@ -201,15 +190,11 @@ bool NSMCommunicator::sendError(int error,
                                 const std::string& message)
 {
   for (NSMNodeList::iterator it = m_masters.begin();
-       it != m_masters.end();) {
-    if (b2nsm_nodeid(it->first.c_str()) < 0) {
-      m_masters.erase(it++);
-    } else {
+       it != m_masters.end(); it++) {
+    if (b2nsm_nodeid(it->first.c_str()) >= 0) {
       try {
         sendRequest(NSMMessage(it->second, NSMCommand::ERROR, error, message));
-        it++;
       } catch (const NSMHandlerException& e) {
-        m_masters.erase(it++);
       }
     }
   }
@@ -219,15 +204,11 @@ bool NSMCommunicator::sendError(int error,
 bool NSMCommunicator::sendFatal(const std::string& message)
 {
   for (NSMNodeList::iterator it = m_masters.begin();
-       it != m_masters.end();) {
-    if (b2nsm_nodeid(it->first.c_str()) < 0) {
-      m_masters.erase(it++);
-    } else {
+       it != m_masters.end(); it++) {
+    if (b2nsm_nodeid(it->first.c_str()) >= 0) {
       try {
         sendRequest(NSMMessage(it->second, NSMCommand::FATAL, message));
-        it++;
       } catch (const NSMHandlerException& e) {
-        m_masters.erase(it++);
       }
     }
   }
@@ -239,15 +220,12 @@ void NSMCommunicator::sendState(const NSMNode& node) throw(NSMHandlerException)
   std::string text = StringUtil::form("%s %s", node.getName().c_str(),
                                       node.getState().getLabel());
   for (NSMNodeList::iterator it = m_masters.begin();
-       it != m_masters.end();) {
-    if (b2nsm_nodeid(it->first.c_str()) < 0) {
-      m_masters.erase(it++);
-    } else {
+       it != m_masters.end(); it++) {
+    if (b2nsm_nodeid(it->first.c_str()) >= 0) {
       try {
+        LogFile::debug("STATE >> %s", it->second.getName().c_str());
         sendRequest(NSMMessage(it->second, NSMCommand::STATE, text));
-        it++;
       } catch (const NSMHandlerException& e) {
-        m_masters.erase(it++);
       }
     }
   }
@@ -314,7 +292,6 @@ throw(NSMHandlerException)
       if (FD_ISSET(com[i]->m_nsmc->sock, &fds)) {
         com[i]->readContext(com[i]->m_nsmc);
         b2nsm_context(com[i]->m_nsmc);
-        //LogFile::debug("select from %d (node=%s)", i, com[i]->getNode().getName().c_str());
         return i;
       }
     }
@@ -332,14 +309,6 @@ void NSMCommunicator::readContext(NSMcontext* nsmc) throw()
     if (cmd != NSMCommand::OK && cmd != NSMCommand::ERROR &&
         cmd != NSMCommand::LOG && strlen(nodename) > 0 &&
         m_masters.find(nodename) == m_masters.end()) {
-      for (NSMNodeList::iterator it = m_masters.begin();
-           it != m_masters.end();) {
-        if (!isConnected(it->second)) {
-          m_masters.erase(it++);
-        } else {
-          it++;
-        }
-      }
       m_masters.insert(NSMNodeList::value_type(nodename, NSMNode(nodename)));
     }
   }

@@ -117,6 +117,7 @@ void RunControlCallback::timeout() throw()
     }
     if (!state.isStable()) {
       try {
+        LogFile::debug("STATECHECK >> %s", node.getName().c_str());
         com.sendRequest(NSMMessage(node, RCCommand::STATECHECK));
       } catch (const NSMHandlerException& e) {
         LogFile::warning("Failed to send statecheck : %s",

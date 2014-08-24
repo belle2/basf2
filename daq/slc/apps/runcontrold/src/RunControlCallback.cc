@@ -75,9 +75,6 @@ void RunControlCallback::init() throw()
 void RunControlCallback::update() throw()
 {
   rc_status* status = (rc_status*)m_data.get();
-  status->state = getNode().getState().getId();
-  status->configid = getConfig().getObject().getId();
-  status->nnodes = m_node_v.size();
   ConfigObjectList& obj_v(getConfig().getObject().getObjects("node"));
   for (size_t i = 0; i < m_data_v.size(); i++) {
     NSMData& data(m_data_v[i]);
@@ -90,12 +87,22 @@ void RunControlCallback::update() throw()
       }
     }
   }
+  RCState state(m_node_v[0].getState());
   for (size_t i = 0; i < m_node_v.size(); i++) {
     status->node[i].error = m_node_v[i].getError();
     status->node[i].state = m_node_v[i].getState().getId();
     DBObject& obj(obj_v[i].getObject("runtype"));
     status->node[i].configid = obj.getId();
+    if (state != m_node_v[i].getState()) {
+      state = RCState::UNKNOWN;
+    }
   }
+  if (state != RCState::UNKNOWN) {
+    getNode().setState(state);
+  }
+  status->state = getNode().getState().getId();
+  status->configid = getConfig().getObject().getId();
+  status->nnodes = m_node_v.size();
 }
 
 void RunControlCallback::timeout() throw()

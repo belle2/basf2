@@ -67,7 +67,7 @@ main.add_module(pxdClusterizer)
 main.add_module(svdDigitizer)
 main.add_module(svdClusterizer)
 main.add_module(spCreatorSingle)
-main.add_module(spCreatorCombi)
+#main.add_module(spCreatorCombi)
 main.add_module(spCreatorTest)
 
 

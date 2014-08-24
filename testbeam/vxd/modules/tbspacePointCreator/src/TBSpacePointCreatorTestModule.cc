@@ -15,7 +15,9 @@
 
 #include <framework/logging/Logger.h>
 
-
+#include <genfit/Track.h>
+#include <genfit/AbsTrackRep.h>
+#include <genfit/RKTrackRep.h>
 
 
 using namespace std;
@@ -28,13 +30,15 @@ TBSpacePointCreatorTestModule::TBSpacePointCreatorTestModule() :
   Module(),
   m_spMetaInfo("", DataStore::c_Persistent)
 {
-  setDescription("Tester module for the validity of the TBSpacePointCreatorModule.");
+  setDescription("Tester module for the validity of the TBSpacePointCreatorModule. TODO: at the moment, the genfit-output can only verified visually (by checking, whether the detector types match the number of dimensions stored in the trackPoint)! when full reco chain is working, this testerModule should be extended! -> verification that input cluster(s) is/are converted to genfit-stuff shall be resilient!");
 
   // 1. Collections.
   addParam("PXDClusters", m_pxdClustersName,
            "PXDCluster collection name", string(""));
   addParam("SVDClusters", m_svdClustersName,
            "SVDCluster collection name", string(""));
+  addParam("TelClusters", m_telClustersName,
+           "TelCluster collection name", string(""));
   addParam("SpacePoints", m_spacePointsName,
            "SpacePoints collection name", string(""));
 
@@ -53,6 +57,7 @@ void TBSpacePointCreatorTestModule::initialize()
   m_spacePoints.isRequired(m_spacePointsName);
   m_pxdClusters.isOptional(m_pxdClustersName);
   m_svdClusters.isOptional(m_svdClustersName);
+  m_telClusters.isOptional(m_telClustersName);
   m_spMetaInfo.isRequired();
 
 
@@ -67,6 +72,10 @@ void TBSpacePointCreatorTestModule::initialize()
     m_svdClustersName = m_svdClusters.getName();
   }
 
+  if (m_telClusters.isOptional() == true) {
+    // retrieve name again (faster than doing everything in the event):
+    m_telClustersName = m_telClusters.getName();
+  }
 
   // retrieve name for spacePoint too (faster than doing everything in the event):
   m_spacePointsName = m_spacePoints.getName();
@@ -75,15 +84,12 @@ void TBSpacePointCreatorTestModule::initialize()
   B2INFO("TBSpacePointCreatorTestModule(" << m_nameOfInstance << ")::initialize: names found for containers:\n" <<
          "pxdClusters: " << m_pxdClustersName <<
          "\nsvdClusters: " << m_svdClustersName <<
+         "\ntelClusters: " << m_telClustersName <<
          "\nspacePoints: " << m_spacePointsName <<
          "\nspacePointsMetaInfo-storeObjPtr: " << m_spMetaInfo.getName() <<
          "\nspacePointsMetaInfo # of names stored: " << m_spMetaInfo->getnNames())
 
-
-  // set some counters for output:
-  m_TESTERPXDClusterCtr = 0;
-  m_TESTERSVDClusterCtr = 0;
-  m_TESTERSpacePointCtr = 0;
+  B2WARNING("TODO: at the moment, the genfit-output can only verified visually (by checking, whether the detector types match the number of dimensions stored in the trackPoint)! when full reco chain is working, this testerModule should be extended! -> verification that input cluster(s) is/are converted to genfit-stuff shall be resilient!")
 }
 
 
@@ -91,12 +97,29 @@ void TBSpacePointCreatorTestModule::initialize()
 void TBSpacePointCreatorTestModule::event()
 {
 
-  B2DEBUG(2, "TBSpacePointCreatorTestModule(" << m_nameOfInstance << "): starting event with " << m_spacePoints.getEntries() << " spacePoints")
-  for (unsigned int i = 0; i < uint(m_spacePoints.getEntries()); ++i) {
+  uint nPXDClusters = m_pxdClusters.getEntries();
+  uint nSVDClusters = m_svdClusters.getEntries();
+  uint nTelClusters = m_telClusters.getEntries();
+  uint nSpacePoints = m_spacePoints.getEntries();
+
+  if (nSVDClusters == 0 and nTelClusters == 0 and nPXDClusters == 0 and nSpacePoints != 0)
+  { B2ERROR("TBSpacePointCreatorTestModule(" << m_nameOfInstance << "): there are " << nSpacePoints << " spacePoints although there are no Clusters! Check settings!") }
+
+  if (nSpacePoints == 0 and (nSVDClusters != 0 or nTelClusters != 0 or nPXDClusters != 0))
+  { B2ERROR("TBSpacePointCreatorTestModule(" << m_nameOfInstance << "): there are no spacePoints although there are " << nPXDClusters << "/" << nSVDClusters << "/" << nTelClusters << "  PXD/SVD/Tel Clusters! Check settings!") }
+
+  if (nSpacePoints == 0 or (nSVDClusters == 0 and nTelClusters == 0 and nPXDClusters == 0)) {
+    B2WARNING("TBSpacePointCreatorTestModule(" << m_nameOfInstance << "): no input-data for testing in current event! Skipping it...")
+    return;
+  }
+
+
+  B2DEBUG(2, "TBSpacePointCreatorTestModule(" << m_nameOfInstance << "): starting event with " << nSpacePoints << " spacePoints")
+  for (unsigned int i = 0; i < nSpacePoints; ++i) {
     B2DEBUG(2, " Executing SpacePoint " << i << endl)
     const SpacePoint* sp = m_spacePoints[i];
 
-    vector<unsigned int> indices;
+    vector<unsigned int> indices; // WARNING: nothing is happening with them yet -> write some sort of test!
     string clusterContainer = "";
 
     if (sp->getType() == VXD::SensorInfoBase::SensorType::SVD) {
@@ -135,50 +158,29 @@ void TBSpacePointCreatorTestModule::event()
             ", VxdID: " << VxdID(sp->getVxdID()) <<
             ", storeName for Cluster(says SpacePoint): " << sp->getClusterStoreName() <<
             ", storeName for Cluster(says Cluster): " << clusterContainer)
+
   }
-//   storeSingleCluster(m_pxdClusters, m_spacePoints, m_pxdClustersIndex);
-//
-//
-//   if (m_onlySingleClusterSpacePoints == true) {
-//     provideSVDClusterSingles(m_svdClusters, m_spacePoints, m_svdClustersIndex); /// WARNING TODO: missing: possibility to allow storing of u- or v-type clusters only!
-//   } else {
-//     provideSVDClusterCombinations(m_svdClusters, m_spacePoints, m_svdClustersIndex);
-//   }
-//
-//
-//   B2DEBUG(1, "SpacePointCreatorTestModule(" << m_nameOfInstance << ")::event: spacePoints for single SVDClusters created! Size of arrays:\n" <<
-//           "pxdClusters: " << m_pxdClusters.getEntries() <<
-//           ", svdClusters: " << m_svdClusters.getEntries() <<
-//           ", spacePoints: " << m_spacePoints.getEntries())
-//
-//
-//   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 10, PACKAGENAME()) == true) {
-//     for (int index = 0; index < m_spacePoints.getEntries(); index++) {
-//       const SpacePoint* sp = m_spacePoints[index];
-//
-//    B2DEBUG(10, "SpacePointCreatorTestModule(" << m_nameOfInstance << ")::event: spacePoint " << index <<
-//               " with type " << sp->getType() <<
-//               " and VxdID " << VxdID(sp->getVxdID()) <<
-//               " is tied to a cluster in: " << sp->getClusterStoreName())
-//     }
-//   }
-//
-//
-//   /// WARNING TODO next steps: think about mcParticle-relations and how to deal with multi-pass-setups, create container like VXDTFTrackCandidate compatible with spacePoints
-//
-//   m_TESTERPXDClusterCtr += m_pxdClusters.getEntries();
-//   m_TESTERSVDClusterCtr += m_svdClusters.getEntries();
-//   m_TESTERSpacePointCtr += m_spacePoints.getEntries();
+
+
+  B2DEBUG(1, "testGenfitCompatibility: feed the track with spacePoints ported to genfit compatible stuff")
+  genfit::AbsTrackRep* trackRep = new genfit::RKTrackRep(211);
+  genfit::Track track(trackRep, m_spacePoints[0]->getPosition(), TVector3(23., 42., 5.));
+  // feed the track with spacePoints ported to genfit compatible stuff:
+  // is rather complicated since the assignment operator is protected:
+  std::vector< std::pair<VXD::SensorInfoBase::SensorType, genfit::AbsMeasurement*> > hitOutput;
+  for (auto & aSP : m_spacePoints) {
+    std::vector<genfit::PlanarMeasurement> tempMeasurements = aSP.getGenfitCompatible();
+    for (genfit::PlanarMeasurement & measurement : tempMeasurements) {
+      hitOutput.push_back({aSP.getType(), measurement.clone()});
+    }
+  }
+
+  for (unsigned i = 0; i < hitOutput.size(); i++) {
+    track.insertMeasurement(hitOutput[i].second);
+    genfit::TrackPoint* point = track.getPointWithMeasurement(i);
+    genfit::AbsMeasurement* rawPoint = point->getRawMeasurement();
+    B2DEBUG(2, " executing AbsMeasurement " << i << " with detectorID(PXD = 0,SVD=1,TEL=2,VXD=-1) : " << hitOutput[i].first << ":\n")
+    point->Print();
+    B2DEBUG(2, " converted absMeasurement is of detID: " << rawPoint->getDetId() << ", hitID: " << rawPoint->getHitId())
+  }
 }
-
-
-
-void TBSpacePointCreatorTestModule::terminate()
-{
-  B2INFO("TBSpacePointCreatorTestModule(" << m_nameOfInstance << ")::terminate: total number of occured instances:\n" <<
-         "pxdClusters: " << m_TESTERPXDClusterCtr <<
-         ", svdClusters: " << m_TESTERSVDClusterCtr <<
-         ", spacePoints: " << m_TESTERSpacePointCtr)
-}
-
-

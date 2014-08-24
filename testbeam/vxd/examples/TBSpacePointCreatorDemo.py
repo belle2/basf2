@@ -119,6 +119,9 @@ spCreatorTest = register_module('TBSpacePointCreatorTest')
 spCreatorTest.logging.log_level = LogLevel.DEBUG
 spCreatorTest.logging.debug_level = 20
 spCreatorTest.param('NameOfInstance', 'SPTester')
+spCreatorTest.param('PXDClusters', 'myPersonalPXDClusters')
+spCreatorTest.param('SVDClusters', 'myPersonalSVDClusters')
+spCreatorTest.param('TelClusters', 'myPersonalTelClusters')
 spCreatorTest.param('SpacePoints', 'TBSpacePoints')
 
 # Create paths

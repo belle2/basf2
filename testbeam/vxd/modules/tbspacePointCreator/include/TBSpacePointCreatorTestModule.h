@@ -16,6 +16,7 @@
 #include <vxd/dataobjects/VxdID.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
+#include <testbeam/vxd/dataobjects/TelCluster.h>
 
 #include <string>
 
@@ -23,8 +24,19 @@
 
 namespace Belle2 {
   /**
-   * Tester module for the validity of the SpacePointCreatorModule.
+   * Tester module for the validity of the TBSpacePointCreatorModule.
    *
+   * The important thing compared to the SpacePointCreatorModule of the tracking package is:
+   * both test for spacePoints,
+   * but the TBSpacePointCreator does use a StoreArray of <TBSpcePint> and applies a StoreArray<SpacePoint> as mask on it.
+   * This ensures that the TBSpacePoints can safely be treated as SpacePoints for track finding purposes
+   * and do only need a separate Creator-Module in the testbeam package (TBSpacePointCreator instead of SpacePointCreator)
+   *
+   * Info Jakob (Aug 24, 2014)
+   * TODO: at the moment, the genfit-output can only verified visually
+   * (by checking, whether the detector types match the number of dimensions stored in the trackPoint)!
+   * when full reco chain is working, this testerModule should be extended!
+   * -> verification that input cluster(s) is/are converted to genfit-stuff shall be resilient!
    */
   class TBSpacePointCreatorTestModule : public Module {
 
@@ -49,7 +61,7 @@ namespace Belle2 {
 
 
     /** final output with mini-feedback */
-    virtual void terminate();
+    virtual void terminate() {}
 
 
 
@@ -63,6 +75,9 @@ namespace Belle2 {
     std::string m_svdClustersName; /**< SVDCluster collection name */
     unsigned short m_svdClustersIndex; /**< SVDCluster collection index number - created for SpacePointMetaInfo */
     StoreArray<SVDCluster> m_svdClusters; /**< the storeArray for svdClusters as member, is faster than recreating link for each event */
+    std::string m_telClustersName; /**< TelCluster collection name */
+    unsigned short m_telClustersIndex; /**< TelCluster collection index number - created for SpacePointMetaInfo */
+    StoreArray<TelCluster> m_telClusters; /**< the storeArray for telClusters as member, is faster than recreating link for each event */
     std::string m_spacePointsName; /**< SpacePoints collection name */
     StoreArray<SpacePoint> m_spacePoints; /**< the storeArray for spacePoints as member, is faster than recreating link for each event */
     StoreObjPtr<SpacePointMetaInfo> m_spMetaInfo; /**< collects meta info relevant for all (TB)SpacePoints */
@@ -70,14 +85,6 @@ namespace Belle2 {
 
     // modification parameters
     std::string m_nameOfInstance; /**< allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module */
-//     bool m_onlySingleClusterSpacePoints; /**< standard is false. If activated, the module will not try to find combinations of U and V clusters for the SVD any more. Does not affect pixel-type Clusters */
-
-
-    //counters for testing
-    unsigned int m_TESTERPXDClusterCtr; /**< counts total number of PXDClusters occured */
-    unsigned int m_TESTERSVDClusterCtr; /**< counts total number of SVDCluster occured */
-    unsigned int m_TESTERSpacePointCtr; /**< counts total number of SpacePoints occured */
-
 
   };
 } // end namespace Belle2

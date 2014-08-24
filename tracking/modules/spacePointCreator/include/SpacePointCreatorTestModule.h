@@ -25,6 +25,11 @@ namespace Belle2 {
   /**
    * Tester module for the validity of the SpacePointCreatorModule.
    *
+   * Info Jakob (Aug 24, 2014)
+   * TODO: at the moment, the genfit-output can only verified visually
+   * (by checking, whether the detector types match the number of dimensions stored in the trackPoint)!
+   * when full reco chain is working, this testerModule should be extended!
+   * -> verification that input cluster(s) is/are converted to genfit-stuff shall be resilient!
    */
   class SpacePointCreatorTestModule : public Module {
 
@@ -49,7 +54,7 @@ namespace Belle2 {
 
 
     /** final output with mini-feedback */
-    virtual void terminate();
+    virtual void terminate() {}
 
 
 
@@ -70,14 +75,6 @@ namespace Belle2 {
 
     // modification parameters
     std::string m_nameOfInstance; /**< allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module */
-//     bool m_onlySingleClusterSpacePoints; /**< standard is false. If activated, the module will not try to find combinations of U and V clusters for the SVD any more. Does not affect pixel-type Clusters */
-
-
-    //counters for testing
-    unsigned int m_TESTERPXDClusterCtr; /**< counts total number of PXDClusters occured */
-    unsigned int m_TESTERSVDClusterCtr; /**< counts total number of SVDCluster occured */
-    unsigned int m_TESTERSpacePointCtr; /**< counts total number of SpacePoints occured */
-
 
   };
 } // end namespace Belle2

@@ -54,8 +54,10 @@ TBSpacePoint::TBSpacePoint(const TelCluster* telCluster,
 
 vector< genfit::PlanarMeasurement > TBSpacePoint::getGenfitCompatible() const
 {
+  // XYRecoHit will be stored as their base-class, which is detector-independent.
   vector< genfit::PlanarMeasurement > collectedMeasurements;
 
+  // used for retrieving the name of the storeArrays:
   const StoreObjPtr<SpacePointMetaInfo> metaInfo("", DataStore::c_Persistent);
 
   // get the related clusters to this spacePoint and create a genfit::PlanarMeasurement for each of them:

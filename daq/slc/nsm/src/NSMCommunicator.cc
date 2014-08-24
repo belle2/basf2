@@ -123,6 +123,8 @@ throw(NSMHandlerException)
                                node.getState().getLabel()));
       } catch (const NSMHandlerException& e) {
       }
+    } else {
+      LogFile::debug("%s is not online. ", it->first.c_str());
     }
   }
 }

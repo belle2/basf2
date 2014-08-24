@@ -116,14 +116,14 @@ throw(NSMHandlerException)
 {
   for (NSMNodeList::iterator it = m_masters.begin();
        it != m_masters.end(); it++) {
-    if (b2nsm_nodeid(it->first.c_str()) >= 0) {
-      try {
-        LogFile::debug("OK >> %s", it->second.getName().c_str());
-        sendRequest(NSMMessage(it->second, NSMCommand::OK,
-                               node.getState().getLabel()));
-      } catch (const NSMHandlerException& e) {
-      }
-    } else {
+    //if (b2nsm_nodeid(it->first.c_str()) >= 0) {
+    try {
+      LogFile::debug("OK >> %s", it->second.getName().c_str());
+      sendRequest(NSMMessage(it->second, NSMCommand::OK,
+                             node.getState().getLabel()));
+    } catch (const NSMHandlerException& e) {
+      //}
+      //} else {
       LogFile::debug("%s is not online. ", it->first.c_str());
     }
   }
@@ -134,12 +134,13 @@ throw(NSMHandlerException)
 {
   for (NSMNodeList::iterator it = m_masters.begin();
        it != m_masters.end(); it++) {
-    if (b2nsm_nodeid(it->first.c_str()) >= 0) {
-      try {
-        sendRequest(NSMMessage(it->second, NSMCommand::ERROR,
-                               error, message));
-      } catch (const NSMHandlerException& e) {
-      }
+    //if (b2nsm_nodeid(it->first.c_str()) >= 0) {
+    try {
+      sendRequest(NSMMessage(it->second, NSMCommand::ERROR,
+                             error, message));
+    } catch (const NSMHandlerException& e) {
+      LogFile::debug("%s is not online. ", it->first.c_str());
+      //}
     }
   }
 }
@@ -148,12 +149,13 @@ bool NSMCommunicator::sendLog(const DAQLogMessage& log)
 {
   for (NSMNodeList::iterator it = m_masters.begin();
        it != m_masters.end(); it++) {
-    if (b2nsm_nodeid(it->first.c_str()) >= 0) {
-      try {
-        LogFile::debug("LOG >> %s", it->second.getName().c_str());
-        sendLog(it->second, log);
-      } catch (const NSMHandlerException& e) {
-      }
+    //if (b2nsm_nodeid(it->first.c_str()) >= 0) {
+    try {
+      LogFile::debug("LOG >> %s", it->second.getName().c_str());
+      sendLog(it->second, log);
+    } catch (const NSMHandlerException& e) {
+      LogFile::debug("%s is not online. ", it->first.c_str());
+      //}
     }
   }
   return true;
@@ -164,8 +166,8 @@ bool NSMCommunicator::sendLog(const NSMNode& node,
 {
 #if NSM_PACKAGE_VERSION >= 1914
   try {
-    if (node.getName().size() > 0 &&
-        b2nsm_nodeid(node.getName().c_str()) >= 0) {
+    if (node.getName().size() > 0
+        /*&& b2nsm_nodeid(node.getName().c_str()) >= 0*/) {
       NSMMessage msg(node, NSMCommand::LOG);
       msg.setNParams(2);
       msg.setParam(0, (int)log.getPriority());
@@ -174,6 +176,7 @@ bool NSMCommunicator::sendLog(const NSMNode& node,
       sendRequest(msg);
     }
   } catch (const NSMHandlerException& e) {
+    LogFile::debug("%s is not online. ", node.getName().c_str());
     return false;
   }
 #else
@@ -193,11 +196,12 @@ bool NSMCommunicator::sendError(int error,
 {
   for (NSMNodeList::iterator it = m_masters.begin();
        it != m_masters.end(); it++) {
-    if (b2nsm_nodeid(it->first.c_str()) >= 0) {
-      try {
-        sendRequest(NSMMessage(it->second, NSMCommand::ERROR, error, message));
-      } catch (const NSMHandlerException& e) {
-      }
+    //if (b2nsm_nodeid(it->first.c_str()) >= 0) {
+    try {
+      sendRequest(NSMMessage(it->second, NSMCommand::ERROR, error, message));
+    } catch (const NSMHandlerException& e) {
+      LogFile::debug("%s is not online. ", it->first.c_str());
+      //}
     }
   }
   return true;
@@ -207,11 +211,12 @@ bool NSMCommunicator::sendFatal(const std::string& message)
 {
   for (NSMNodeList::iterator it = m_masters.begin();
        it != m_masters.end(); it++) {
-    if (b2nsm_nodeid(it->first.c_str()) >= 0) {
-      try {
-        sendRequest(NSMMessage(it->second, NSMCommand::FATAL, message));
-      } catch (const NSMHandlerException& e) {
-      }
+    //if (b2nsm_nodeid(it->first.c_str()) >= 0) {
+    try {
+      sendRequest(NSMMessage(it->second, NSMCommand::FATAL, message));
+    } catch (const NSMHandlerException& e) {
+      LogFile::debug("%s is not online. ", it->first.c_str());
+      //}
     }
   }
   return true;
@@ -223,12 +228,13 @@ void NSMCommunicator::sendState(const NSMNode& node) throw(NSMHandlerException)
                                       node.getState().getLabel());
   for (NSMNodeList::iterator it = m_masters.begin();
        it != m_masters.end(); it++) {
-    if (b2nsm_nodeid(it->first.c_str()) >= 0) {
-      try {
-        LogFile::debug("STATE >> %s", it->second.getName().c_str());
-        sendRequest(NSMMessage(it->second, NSMCommand::STATE, text));
-      } catch (const NSMHandlerException& e) {
-      }
+    //if (b2nsm_nodeid(it->first.c_str()) >= 0) {
+    try {
+      LogFile::debug("STATE >> %s", it->second.getName().c_str());
+      sendRequest(NSMMessage(it->second, NSMCommand::STATE, text));
+    } catch (const NSMHandlerException& e) {
+      LogFile::debug("%s is not online. ", it->first.c_str());
+      //}
     }
   }
 }

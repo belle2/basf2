@@ -127,8 +127,8 @@ bool RCCallback::preload(const NSMMessage& msg) throw()
     } else {
       if (m_db == NULL) {
         setReply("Not ready for DB access");
-        LogFile::error("Not ready for DB access");
-        return false;
+        LogFile::warning("Not ready for DB access");
+        return true;
       } else {
         std::string runtype;
         if (msg.getLength() > 0) {

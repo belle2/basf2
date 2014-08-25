@@ -37,7 +37,7 @@ ProcessStatistics* ProcessStatisticsPython::getWrapped()
   return &(*stats);
 }
 
-string ProcessStatisticsPython::getStatisticsString(ModuleStatistics::EStatisticCounters mode, const ProcessStatistics::StatisticsMap* modules)
+string ProcessStatisticsPython::getStatisticsString(ModuleStatistics::EStatisticCounters mode, const std::vector<ModuleStatistics>* modules)
 {
   if (!getWrapped())
     return "";
@@ -48,7 +48,7 @@ string ProcessStatisticsPython::getModuleStatistics(const boost::python::list& m
 {
   if (!getWrapped())
     return "";
-  ProcessStatistics::StatisticsMap modules;
+  std::vector<ModuleStatistics> modules;
   int nList = boost::python::len(modulesPyList);
   for (int i = 0; i < nList; ++i) {
     extract<ModulePtr> checkValue(modulesPyList[i]);
@@ -68,7 +68,7 @@ boost::python::list ProcessStatisticsPython::getAll()
   boost::python::list result;
   if (!getWrapped())
     return result;
-  for (ProcessStatistics::StatisticsMap::value_type & module : getWrapped()->getAll()) {
+  for (auto & module : getWrapped()->getAll()) {
     result.append(module);
   }
   return result;

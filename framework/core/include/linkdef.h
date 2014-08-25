@@ -7,7 +7,7 @@
 
 #pragma link C++ class Belle2::CalcMeanCov<2, float>+;
 #pragma link C++ class Belle2::ModuleStatistics+;
-#pragma link C++ class std::vector<Belle2::ModuleStatistics>+;
+#pragma link C++ class vector<Belle2::ModuleStatistics>+;
 #pragma link C++ class Belle2::ProcessStatistics+;
 
 #endif

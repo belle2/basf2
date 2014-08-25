@@ -31,7 +31,7 @@ void ProcessStatistics::initModule(Module* module)
   stats.setIndex(index);
 }
 
-string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounters mode, const ProcessStatistics::StatisticsMap* modules) const
+string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounters mode, const std::vector<ModuleStatistics>* modules) const
 {
   ProcessStatistics* thisNonConst = const_cast<ProcessStatistics*>(this);
   const ModuleStatistics& global = thisNonConst->getGlobal();
@@ -52,7 +52,7 @@ string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounte
   out << outputheader % "Name" % "Calls" % "Memory(MB)" % "Time(s)" % "Time(ms)/Call";
   out << boost::format("%|" + numWidth + "T=|\n");
 
-  StatisticsMap modulesSortedByIndex(*modules);
+  std::vector<ModuleStatistics> modulesSortedByIndex(*modules);
   sort(modulesSortedByIndex.begin(), modulesSortedByIndex.end(), [](const ModuleStatistics & a, const ModuleStatistics & b) { return a.getIndex() < b.getIndex(); });
   for (const ModuleStatistics & stats : modulesSortedByIndex) {
     out << output

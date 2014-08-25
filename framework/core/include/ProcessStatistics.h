@@ -87,9 +87,6 @@ namespace Belle2 {
     /** Constructor. */
     ProcessStatistics(): m_global("global"), m_globalTime(0), m_globalMemory(0), m_moduleTime(0), m_moduleMemory(0), m_suspendedTime(0), m_suspendedMemory(0) { }
 
-    /** type used to store module statistics */
-    typedef std::vector<ModuleStatistics> StatisticsMap;
-
     /**
      * Return string with statistics for all modules.
      *
@@ -100,13 +97,13 @@ namespace Belle2 {
      *                used
      */
     std::string getStatisticsString(ModuleStatistics::EStatisticCounters type = ModuleStatistics::c_Event,
-                                    const ProcessStatistics::StatisticsMap* modules = 0) const;
+                                    const std::vector<Belle2::ModuleStatistics>* modules = 0) const;
 
     /** Get global statistics. */
     ModuleStatistics& getGlobal() { return m_global; }
 
     /** Get entire statistics map. */
-    StatisticsMap& getAll() { return m_stats; }
+    std::vector<Belle2::ModuleStatistics>& getAll() { return m_stats; }
 
 //We don't want CINT to see anything about Module
 #if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
@@ -206,7 +203,7 @@ namespace Belle2 {
     /** Statistics object for global time and memory consumption */
     ModuleStatistics m_global;
     /** module statistics */
-    StatisticsMap m_stats;
+    std::vector<Belle2::ModuleStatistics> m_stats;
 
     std::map<Module*, int> m_modulesToStatsIndex; //!< transient, maps Module* to m_stats index
 

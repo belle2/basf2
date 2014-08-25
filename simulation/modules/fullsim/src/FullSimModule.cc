@@ -111,7 +111,8 @@ FullSimModule::~FullSimModule()
 void FullSimModule::initialize()
 {
   //Register the collections we want to use
-  StoreArray<MCParticle>::registerPersistent(m_mcParticleOutputColName);
+  StoreArray<MCParticle> mcParticles(m_mcParticleOutputColName);
+  mcParticles.registerInDataStore();
   StoreArray<MCParticle>::required(m_mcParticleInputColName);
   StoreObjPtr<EventMetaData>::required();
 

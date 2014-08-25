@@ -96,7 +96,9 @@ namespace {
 
     //getting a base class is OK
     EXPECT_TRUE(StoreArray<TObject>("EventMetaDatas").isValid());
-    EXPECT_TRUE(StoreObjPtr<TObject>("EventMetaData").isValid());
+    StoreObjPtr<TObject> emd("EventMetaData");
+    EXPECT_TRUE(emd.isValid());
+    EXPECT_EQ(std::string("Belle2::EventMetaData"), std::string(emd->GetName()));
   }
 
   /** check meta data. */

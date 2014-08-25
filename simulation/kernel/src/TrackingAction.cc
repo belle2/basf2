@@ -48,8 +48,13 @@ void TrackingAction::setStoreTrajectories(int store, double angularTolerance, do
   m_angularTolerance = angularTolerance;
   m_distanceTolerance = distanceTolerance;
   if (store) {
-    m_storeMCTrajectories.registerAsPersistent();
-    m_relMCTrajectories.registerAsPersistent();
+    // registration of store arrays and relations
+    m_storeMCTrajectories.registerInDataStore();
+    StoreArray<MCParticle> mcParticles;
+    mcParticles.registerRelationTo(m_storeMCTrajectories);
+
+    // additional registration of MCParticle relation
+    // (note: m_relMCTrajectories is already defined by TrackingAction::TrackingAction)
     SensitiveDetectorBase::registerMCParticleRelation(m_relMCTrajectories, RelationArray::c_negativeWeight);
   }
 }

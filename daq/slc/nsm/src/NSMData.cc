@@ -296,7 +296,8 @@ throw(NSMHandlerException)
   char fmtstr[256];
   if ((ptr = nsmlib_parsefile(getFormat().c_str(),
                               getRevision(), incpath, fmtstr)) == NULL) {
-    throw (NSMHandlerException("Failed to parse header file"));
+    throw (NSMHandlerException("Failed to parse header file (%s:%d) : %s",
+                               getFormat().c_str(), getRevision(), nsmlib_parseerr(NULL)));
   }
   int length;
   std::string name_in;

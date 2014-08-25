@@ -8,8 +8,6 @@
 // Date : 25 - June - 2013
 //-
 
-#define MAX_NODES 10
-
 // Node info placed in NSM shared memory
 namespace Belle2 {
 
@@ -30,7 +28,7 @@ namespace Belle2 {
       float evtrate_out;
       float loadave;
       float r_reserved[9];
-    } nodeinfo[MAX_NODES];
+    } nodeinfo[24];
     unsigned int nnodes;
     unsigned int updatetime;
     int reserved[2];

@@ -7,6 +7,8 @@
 #include <daq/slc/nsm/NSMCommunicator.h>
 #include <daq/slc/base/StringUtil.h>
 
+#include <daq/slc/system/LogFile.h>
+
 #include <unistd.h>
 
 using namespace Belle2;
@@ -69,4 +71,3 @@ bool RFRunControlCallback::abort() throw()
   m_callback->setMessage(msg);
   return m_callback->perform(msg);
 }
-

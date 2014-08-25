@@ -19,7 +19,7 @@ struct rfunitinfo {
     float evtrate_out;
     float loadave;
     float r_reserved[9];
-  } nodeinfo[MAX_NODES];
+  } nodeinfo[10];
   uint32 nnodes;
   uint32 updatetime;
   int32 reserved[2];

@@ -30,10 +30,12 @@ int main(int argc, char** argv)
   NSMNode node(conf.getconf("master", "nodename"));
   NSMData data(node.getName(), conf.getconf("system", "nsmdata"), 1);
   RFMaster* master = new RFMaster(argv[1]);
-  ConfigFile file("slolwcontrol", "hlt");
+  ConfigFile file("slowcontrol", "hlt");
   RFMasterCallback* callback = new RFMasterCallback(node, data, master, argv[1]);
   RFRunControlCallback* rccallback =
     new RFRunControlCallback(file.get("nsm.nodename"), master, callback);
+  LogFile::debug("%s:%d", file.get("nsm.global.host").c_str(),
+                 file.getInt("nsm.global.port"));
   NSM2NSMBridge* daemon = new NSM2NSMBridge(callback,
                                             conf.getconf("master", "host"),
                                             atoi(getenv("NSM2_PORT")),

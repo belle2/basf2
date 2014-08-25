@@ -1,0 +1,5 @@
+Import('env')
+
+env['TOOLS_LIBS']['rfarmmonitor'] = ['daq', 'framework', '$ROOT_LIBS', 'nsm2_b2lib' ]
+
+Return('env')

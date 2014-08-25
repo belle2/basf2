@@ -27,6 +27,14 @@ RFMasterCallback::RFMasterCallback(const NSMNode& node,
 {
   m_st_conf = 0;
   m_st_unconf = 0;
+  add(RFCommand::RF_CONFIGURE);
+  add(RFCommand::RF_UNCONFIGURE);
+  add(RFCommand::RF_START);
+  add(RFCommand::RF_STOP);
+  add(RFCommand::RF_RESTART);
+  add(RFCommand::RF_RESUME);
+  add(RFCommand::RF_PAUSE);
+  add(RFCommand::RF_STATUS);
 }
 
 RFMasterCallback::~RFMasterCallback() throw()
@@ -44,6 +52,9 @@ bool RFMasterCallback::perform(const NSMMessage& msg) throw()
     return error();
   }
   bool result = false;
+  LogFile::debug("RFMasterCallback : %s >> %s",
+                 msg.getNodeName(),
+                 cmd.getLabel());
   if (cmd == RFCommand::RF_CONFIGURE) {
     m_st_conf = 1;
     return configure();
@@ -111,20 +122,28 @@ void RFMasterCallback::timeout() throw()
   RfUnitInfo* unitinfo = (RfUnitInfo*)m_callback->getData().get();
   unitinfo->nnodes = m_data_v.size();
   unitinfo->updatetime = Time().get();
-  for (size_t i = 0; i < m_data_v.size(); i++) {
-    if (!m_data_v[i].isAvailable()) {
-      m_data_v[i].open(getCommunicator(), true);
+  try {
+    for (size_t i = 0; i < m_data_v.size(); i++) {
+      if (!m_data_v[i].isAvailable()) {
+        m_data_v[i].open(getCommunicator(), true);
+      }
+      if (m_data_v[i].isAvailable()) {
+        RfUnitInfo::RfNodeInfo* nodeinfo_o = &unitinfo->nodeinfo[i];
+        RfNodeInfo* nodeinfo_i = (RfNodeInfo*)m_data_v[i].get();
+        memcpy(nodeinfo_o, nodeinfo_i, sizeof(RfNodeInfo));
+      }
     }
-    if (m_data_v[i].isAvailable()) {
-      RfUnitInfo::RfNodeInfo* nodeinfo_o = &unitinfo->nodeinfo[i];
-      RfNodeInfo* nodeinfo_i = (RfNodeInfo*)m_data_v[i].get();
-      memcpy(nodeinfo_o, nodeinfo_i, sizeof(RfNodeInfo));
-    }
+  } catch (const NSMHandlerException& e) {
+
   }
 }
 
 bool RFMasterCallback::ok() throw()
 {
+  LogFile::debug("%s << %s (%d, %d)",
+                 getMessage().getRequestName(),
+                 getMessage().getNodeName(),
+                 m_st_conf, m_st_unconf);
   if (m_st_conf > 0) {
     if (m_st_conf > 1000) {
       m_st_conf -= 1000;
@@ -148,7 +167,6 @@ bool RFMasterCallback::ok() throw()
 
 bool RFMasterCallback::error() throw()
 {
-  RFNSM_Status::Instance().set_flag(-1);
   return true;
 }
 
@@ -207,7 +225,7 @@ bool RFMasterCallback::unconfigure() throw()
   NSMcontext* nsmc =  getCommunicator()->getContext();
   b2nsm_context(nsmc);
 
-  switch (m_st_conf % 1000) {
+  switch (m_st_unconf % 1000) {
     case 1: {
       char* roisender = m_conf.getconf("roisender", "nodename");
       RFNSM_Status::Instance().set_flag(0);

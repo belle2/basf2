@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [ -e $HOME/belle2/latest ]; then
+cd $HOME/belle2/latest
+else 
+cd $HOME/belle2/release
+fi
+source ../tools/setup_belle2
+setuprel
+cd -
+
+./boot_nsmd2_ssh hlt01 hltdaq global

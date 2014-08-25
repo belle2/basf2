@@ -63,7 +63,7 @@ bool RCCallback::perform(const NSMMessage& msg) throw()
   bool result = true;
   if (state != Enum::UNKNOWN) {
     getNode().setState(state);
-    LogFile::debug("%s >> %s (%s)", msg.getNodeName(),
+    LogFile::debug("RCCallback : %s >> %s (%s)", msg.getNodeName(),
                    cmd.getLabel(), state.getLabel());
     setReply("");
     if (cmd == RCCommand::LOAD) {

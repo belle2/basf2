@@ -3,7 +3,11 @@
 #killall basf2 1&>2 /dev/null
 #killall $1 1&>2 /dev/null
 
-cd $HOME/belle2/release
+if [ -e $HOME/belle2/latest ]; then
+    cd $HOME/belle2/latest
+else
+    cd $HOME/belle2/release
+fi
 source ../tools/setup_belle2
 setuprel
 export NSM2_INCDIR=$BELLE2_LOCAL_DIR/daq/slc/data/nsm

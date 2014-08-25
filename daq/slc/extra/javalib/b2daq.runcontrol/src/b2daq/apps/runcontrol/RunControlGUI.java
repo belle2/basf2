@@ -6,12 +6,17 @@
 package b2daq.apps.runcontrol;
 
 import b2daq.logger.core.LogMessage;
+import b2daq.nsm.NSMCommand;
 import b2daq.nsm.NSMDataProperty;
 import b2daq.nsm.NSMListenerService;
+import b2daq.nsm.NSMMessage;
+import b2daq.runcontrol.core.RCCommand;
 import b2daq.ui.NSM2Socket;
 import b2daq.ui.NetworkConfigPaneController;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
@@ -20,6 +25,7 @@ import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 /**
@@ -34,12 +40,21 @@ public class RunControlGUI extends Application {
     @Override
     public void start(Stage stage) {
         try {
-            NSM2Socket socket = NSM2Socket.connect((arguments.length>1?arguments[1]:".runcontrol.init"),
-                    null, 9090, null, 8122, "RC_GUI", "ARICH_RC", 
-                    new String [] {"ARICH_RC_STATUS:rc_status:1"},
-                    "Login to Belle II Run control", 
+            FileChooser fc = new FileChooser();
+            fc.setTitle("select file");
+            //fc.setInitialDirectory(new File(System.getProperty("user.home")));
+            //fc.getExtensionFilters().add(new ExtensionFilter("HTML", "*.html", "*.htm"));
+
+            File f = fc.showOpenDialog(stage);
+            System.out.println(f.getPath());
+            NSM2Socket socket = NSM2Socket.connect(f.getPath(),//(arguments.length > 1 ? arguments[1] : ".runcontrol.init"),
+                    null, 9090, null, 8122, "RC_GUI", "ARICH_RC",
+                    new String[]{"ARICH_RC_STATUS:rc_status:1"},
+                    "Login to Belle II Run control",
                     "NSM set up for run control");
-            if (socket == null) return;
+            if (socket == null) {
+                return;
+            }
             URL location = getClass().getResource("RunControlMainPane.fxml");
             loader = new FXMLLoader();
             loader.setLocation(location);
@@ -63,6 +78,7 @@ public class RunControlGUI extends Application {
             stage.setScene(scene);
             stage.show();
         } catch (IOException ex) {
+            ex.printStackTrace();;
             Logger.getLogger(RunControlGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -81,7 +97,12 @@ public class RunControlGUI extends Application {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        arguments = args;
+        arguments = new String[args.length];
+        int i = 0;
+        for (String arg : args) {
+            arguments[i] = arg;
+            i++;
+        }
         launch(args);
     }
 

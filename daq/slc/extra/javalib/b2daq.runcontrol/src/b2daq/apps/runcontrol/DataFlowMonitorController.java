@@ -122,7 +122,17 @@ public class DataFlowMonitorController implements Initializable, NSMObserver {
                 }
                 label_runno.setText(String.format("%04d.%04d.%03d", data.getInt("expno"),
                         data.getInt("runno"), data.getInt("subno")));
-                state.update(RCState.get(data.getInt("state")));
+                switch (data.getInt("state")) {
+                    case 0:
+                    state.update(RCState.NOTREADY_S);
+                    break;
+                    case 1:
+                    state.update(RCState.READY_S);
+                    break;
+                    case 2:
+                    state.update(RCState.RUNNING_S);
+                    break;
+                }
                 if (table_stat.getItems().size() < data.getNObjects("io")) {
                     table_stat.getItems().clear();
                     for (int i = 0; i < data.getNObjects("io"); i++) {
@@ -140,7 +150,7 @@ public class DataFlowMonitorController implements Initializable, NSMObserver {
                     flow.setSize(cdata.getFloat("evtsize"));
                     gr_rate[i].addPoint(cdata.getFloat("freq"));
                     gr_size[i].addPoint(cdata.getFloat("evtsize"));
-                    System.out.println("io["+i+"]state="+cdata.getInt("state"));
+                    //System.out.println("io["+i+"]state="+cdata.getInt("state"));
                     setConnection(c[i], cdata.getInt("state"));
                 }
                 c_in.update();

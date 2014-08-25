@@ -173,9 +173,8 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
     private Label[] label_v = null;
     private Rectangle[] rect_v = null;
     private Text[] text_v = null;
-
     private String[] namelist = null;
-
+    
     private final HashMap<String, RunStateLabelController> label_m
             = new HashMap<>();
 
@@ -233,6 +232,7 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
         runSettingsController.getFieldOperator1().textProperty().addListener(listener);
         runSettingsController.readyProperty().addListener(listener);
         networkconfigController.setState(true, true);
+        NSMListenerService.request(new NSMMessage(NSMListenerService.getNSMConfig().getNsmTarget(), RCCommand.STATECHECK));
     }
 
     @Override
@@ -282,7 +282,6 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
                                 label_m.put(name, statelabel_v[count]);
                             }
                             count++;
-                            //System.out.println(name+":"+obj.getObject("runtype").getId());
                             NSMListenerService.requestDBGet(name, obj.getObject("runtype").getId());
                         }
                     }

@@ -97,16 +97,12 @@ void Path::forEach(std::string objectName, std::string foreach, PathPtr path)
 
 void Path::fillModulePathList(ModulePtrList& modList) const
 {
-  ModulePtrList::const_iterator moduleIter;
-  const ModulePtrList& currModList = getModules();
-
-  for (moduleIter = currModList.begin(); moduleIter != currModList.end(); ++moduleIter) {
-    const Module* module = moduleIter->get();
+  for (const ModulePtr & module : getModules()) {
 
     //If module was not already added to the list, add it.
-    ModulePtrList::iterator findIter = find_if(modList.begin(), modList.end(), bind2nd(ModulePtrOperatorsEq(), *moduleIter));
+    ModulePtrList::iterator findIter = find(modList.begin(), modList.end(), module);
     if (findIter == modList.end()) {
-      modList.push_back(*moduleIter);
+      modList.push_back(module);
 
       //If the module has a condition, call the method recursively
       if (module->hasCondition()) {
@@ -143,10 +139,9 @@ std::string Path::getPathString() const
 boost::python::list _getModulesPython(const Path* path)
 {
   boost::python::list returnList;
-  const std::list<ModulePtr>& modules = path->getModules();
 
-  for (std::list<ModulePtr>::const_iterator listIter = modules.begin(); listIter != modules.end(); ++listIter)
-    returnList.append(boost::python::object(ModulePtr(*listIter)));
+  for (const ModulePtr & module : path->getModules())
+    returnList.append(boost::python::object(ModulePtr(module)));
 
   return returnList;
 }

@@ -20,7 +20,6 @@
 
 #include <list>
 #include <string>
-#include <set>
 
 namespace boost {
   namespace python {
@@ -434,7 +433,7 @@ namespace Belle2 {
     /** no submodules. */
     std::list<ModulePtr> getModules() const { return std::list<ModulePtr>(); }
 
-    std::string m_name;           /**< The name of the module, saved as a string. */
+    std::string m_name;           /**< The name of the module, saved as a string (user-modifiable) */
     std::string m_type;           /**< The type of the module, saved as a string. */
     std::string m_package;        /**< Package this module is found in (may be empty). */
     std::string m_description;    /**< The description of the module. */
@@ -514,28 +513,6 @@ namespace Belle2 {
   //             Define convenient typdefs
   //------------------------------------------------------
 
-  /**
-   * Class that defines the < comparison operator ModulePtrs. Used to declare a set of ModulePtrs.
-   */
-  struct ModulePtrOperators {
-    //! Comparison operator for two ModulePtr.
-    bool operator()(const ModulePtr& a, const ModulePtr& b) {
-      return a.get() < b.get();
-    }
-  };
-
-  /**
-   * Class that defines the equality operator for ModulePtrs.
-   */
-  struct ModulePtrOperatorsEq: public std::binary_function<ModulePtr, ModulePtr, bool> {
-    //! Equality operator for two ModulePtr.
-    bool operator()(const ModulePtr& a, const ModulePtr& b) const {
-      return a.get() == b.get();
-    }
-  };
-
-  /** Defines a std::set of shared module pointers.*/
-  typedef std::set<ModulePtr, ModulePtrOperators> ModulePtrSet;
   /** Defines a std::list of shared module pointers.*/
   typedef std::list<ModulePtr> ModulePtrList;
 
@@ -611,8 +588,7 @@ namespace Belle2 {
 
     /**
      * Creates a new module and returns a shared pointer to it.
-     * Instances of modules can only be created by this method.
-     * @return A shared pointer to the created module instance.
+     * Instances of modules should only be created by this method.
      */
     ModulePtr createModule() const {
       ModulePtr nm(new T());

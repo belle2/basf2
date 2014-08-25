@@ -120,8 +120,6 @@ int PostRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
       sprintf(err_buf, "Invalid finesse # : %s %s %d\n",
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       string err_str = err_buf; throw (err_str);
-      exit(1);
-
   }
 
   if (nwords < 0 || nwords > 1e6) {

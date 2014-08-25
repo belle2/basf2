@@ -7,6 +7,7 @@ namespace Belle2 {
    */
   struct RawCOPPERPackerInfo {
 
+    /// Experiment number (10bit)
     unsigned int exp_num; /// Experiment number (10bit)
 
     unsigned int run_subrun_num; /// Run # and subrun # ( 22bit )

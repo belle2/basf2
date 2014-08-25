@@ -55,13 +55,17 @@ namespace Belle2 {
     //! set contents of header
     void SetNwords(int nwords);
 
-    void SetEveNo(unsigned int eve_no);    //! set contents of header
+    //! set contents of header
+    void SetEveNo(unsigned int eve_no);
 
-    void SetSubsysId(int subsys_id);    //! set contents of header
+    //! set contents of header
+    void SetSubsysId(int subsys_id);
 
-    void SetDataType(int data_type);    //! set contents of header
+    //! set contents of header
+    void SetDataType(int data_type);
 
-    void SetTruncMask(int trunc_mask);    //! set contents of header
+    //! set contents of header
+    void SetTruncMask(int trunc_mask);
 
     //    void SetB2LFEEHdrPart(unsigned int word1, unsigned int word2);   //! set contents of header
     //     void SetFTSW2Words(int* ftsw_buf);
@@ -72,6 +76,7 @@ namespace Belle2 {
     /// Set a word consists of exp #, run # and subrun #
     void SetExpRunNumber(int* exprun_buf);
 
+    //! set contents of header
     void SetOffset1stFINESSE(int offset_1st_FINESSE);    //! set contents of header
 
     void SetOffset2ndFINESSE(int offset_2nd_FINESSE);    //! set contents of header

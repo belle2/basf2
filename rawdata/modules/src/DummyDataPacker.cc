@@ -55,7 +55,7 @@ void DummyDataPackerModule::initialize()
   //  m_msghandler = new MsgHandler(m_compressionLevel);
 
   /// Initialize EvtMetaData
-  m_eventMetaDataPtr.registerAsPersistent();
+  m_eventMetaDataPtr.registerInDataStore();
 
   rawcprarray.registerPersistent();
 

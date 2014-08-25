@@ -35,6 +35,7 @@ namespace Belle2 {
     //! Destructor
     ~RawTrailer_latest();
 
+    //! set buffer
     void CheckBuffer(); //! set buffer
 
     int* GetBuffer(); //! return buffer

@@ -55,6 +55,7 @@ namespace Belle2 {
     //! set contents of header
     void SetNwords(int nwords);
 
+    //! set contents of header
     void SetEveNo(unsigned int eve_no);    //! set contents of header
 
     void SetSubsysId(int subsys_id);    //! set contents of header
@@ -72,6 +73,7 @@ namespace Belle2 {
     /// Set a word consists of exp #, run # and subrun #
     void SetExpRunNumber(int* exprun_buf);
 
+    //! set contents of header
     void SetOffset1stFINESSE(int offset_1st_FINESSE);    //! set contents of header
 
     void SetOffset2ndFINESSE(int offset_2nd_FINESSE);    //! set contents of header
@@ -85,6 +87,7 @@ namespace Belle2 {
     /// Add nodeinfo in trace area
     int AddNodeInfo(int node_id);
 
+    //! get contents of header
     int GetNwords();  //! get contents of header
 
     int GetHdrNwords();  //! get contents of header

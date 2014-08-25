@@ -68,13 +68,13 @@ class Particle(object):
         self.name = v[0]
         ## Additional label like hasMissing or has2Daughters
         self.label = v[1]
-        ## multivariate analysis configuration
+        ## multivariate analysis configuration (see MVAConfiguration)
         self.mvaConfig = mvaConfig
-        ## Decay channels, added by addChannel method.
+        ## DecayChannel objects added by addChannel() method.
         self.channels = []
-        ## intermediate cut configuration
+        ## intermediate cut configuration (see PreCutConfiguration)
         self.preCutConfig = preCutConfig
-        ## post cut configuration
+        ## post cut configuration (see PostCutConfiguration)
         self.postCutConfig = postCutConfig
 
     @property

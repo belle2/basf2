@@ -237,9 +237,12 @@ class Sequence(object):
         @param unresolved unresolved actors
         @param provided provided values
         """
-        print "The following functors have missing dependencies:"
-        for actor in unresolved:
-            print actor.name, 'needs', [r for r in actor.requires if r not in provided]
+        if len(unresolved) == 0:
+            print "All functor dependencies could be fulfilled."
+        else:
+            print "The following functors have missing dependencies:"
+            for actor in unresolved:
+                print actor.name, 'needs', [r for r in actor.requires if r not in provided]
 
     def createDotGraphic(self, needed):
         """

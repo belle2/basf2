@@ -93,6 +93,8 @@ namespace Belle2 {
 
     /** Create a default object in the data store.
      *
+     *  This only works after registerInDataStore() has been called by this or another module.
+     *
      *  @param replace   Should an existing object be replaced?
      *  @return          True if the creation succeeded.
      **/

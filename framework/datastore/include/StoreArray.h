@@ -274,8 +274,9 @@ namespace Belle2 {
 
     /** Raw access to the underlying TClonesArray.
      *
-     *  \warning In most cases, you'll want to avoid direct interaction with
-     *           TClonesArrays and use StoreArray functions like operator[],
+     *  \warning TClonesArray is dangerously easy to misuse. Whatever you do will probably
+     *           be slow, leak memory, and murder your pets.
+     *           In most cases, you'll want to use StoreArray functions like operator[],
      *           getEntries() or appendNew() instead.
      */
     TClonesArray* getPtr() const { ensureCreated(); return *m_storeArray;}

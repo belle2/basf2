@@ -121,7 +121,8 @@ def createMBCTexFile(ntuple):
     """
     placeholders = {}
     mbcFilename = ntuple[:-5] + '_mbc.pdf'
-    makeMbcPlot(ntuple, mbcFilename)
+    if not os.path.isfile(mbcFilename):
+        makeMbcPlot(ntuple, mbcFilename)
     placeholders['mbcPlot'] = mbcFilename
     placeholders['texFile'] = ntuple[:-5] + '_mbc.tex'
     placeholders['particleName'] = mbcFilename[4:].split(':', 1)[0]

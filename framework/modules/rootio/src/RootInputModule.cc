@@ -184,21 +184,11 @@ void RootInputModule::readTree()
 
   //Make sure transient members of objects are reinitialised
   for (auto entry : m_storeEntries) {
-    if (!entry->isArray) {
-      delete entry->object;
-      entry->object = 0;
-    } else {
-      static_cast<TClonesArray*>(entry->object)->Delete();
-    }
+    entry->resetForGetEntry();
   }
   for (auto storeEntries : m_parentStoreEntries) {
     for (auto entry : storeEntries) {
-      if (!entry->isArray) {
-        delete entry->object;
-        entry->object = 0;
-      } else {
-        static_cast<TClonesArray*>(entry->object)->Delete();
-      }
+      entry->resetForGetEntry();
     }
   }
 

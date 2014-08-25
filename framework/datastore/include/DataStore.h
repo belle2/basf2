@@ -9,6 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include <framework/datastore/StoreEntry.h>
+
 #include <vector>
 #include <string>
 #include <set>
@@ -74,14 +76,7 @@ namespace Belle2 {
 
 
     /** Wraps a stored array/object, stored under unique (name, durability) key. */
-    struct StoreEntry {
-      StoreEntry() : isArray(false), dontWriteOut(false), object(0), ptr(0), name("") {};
-      bool        isArray;     /**< Flag that indicates whether the object is a TClonesArray **/
-      bool        dontWriteOut; /**< Flag that indicates whether the object should be written to the output by default **/
-      TObject*    object;      /**< The pointer to the actual object. Associated memory may exceed object durability, and is kept until the object is replaced.  **/
-      TObject*    ptr;         /**< The pointer to the returned object, either equal to 'object' or 0, depending on wether the object was created in the current event **/
-      std::string name;        /**< Name of the entry. Equal to the key in the map. **/
-    };
+    typedef Belle2::StoreEntry StoreEntry;
 
     /** Stores information on inputs/outputs of a module, as obtained by requireInput()/optionalInput()/registerEntry(); */
     struct ModuleInfo {

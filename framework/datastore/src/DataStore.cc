@@ -211,16 +211,11 @@ bool DataStore::createObject(TObject* object, bool replace, const StoreAccessorB
   if (object) {
     delete entry->object;
     entry->object = object;
+    entry->ptr = entry->object;
   } else {
-    if (accessor.isArray()) {
-      static_cast<TClonesArray*>(entry->object)->Delete();
-    } else {
-      delete entry->object;
-      entry->object = static_cast<TObject*>(accessor.getClass()->New());
-    }
+    entry->recreate();
   }
 
-  entry->ptr = entry->object;
   return true;
 }
 
@@ -330,14 +325,12 @@ void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, i
 
   // auto create relations if needed
   if (!entry->ptr) {
-    delete entry->object;
-    RelationContainer* relations = new RelationContainer;
+    entry->recreate();
+    RelationContainer* relations = static_cast<RelationContainer*>(entry->ptr);
     relations->setFromName(fromEntry->name);
     relations->setFromDurability(c_Event);
     relations->setToName(toEntry->name);
     relations->setToDurability(c_Event);
-    entry->object = relations;
-    entry->ptr = entry->object;
   }
 
   // add relation

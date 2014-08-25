@@ -28,3 +28,10 @@ const RelationElement& RelationContainer::getElement(int i) const
 {
   return *static_cast<RelationElement*>(m_elements.At(i));
 }
+void RelationContainer::Clear(Option_t*)
+{
+  m_elements.Delete();
+  m_fromName.clear();
+  m_toName.clear();
+  m_modified = true;
+}

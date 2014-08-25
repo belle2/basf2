@@ -63,13 +63,8 @@ namespace Belle2 {
               m_fromDurability == -1 and m_toDurability == -1);
     }
 
-    /** Clear container to free memory. */
-    virtual void Clear(Option_t* = "") {
-      m_elements.Delete();
-      m_fromName = "";
-      m_toName = "";
-      m_modified = true;
-    }
+    /** Clear container to free memory. Prefer to deleting objects of this type. */
+    virtual void Clear(Option_t* = "");
 
     /** Get reference to the elements. */
     TClonesArray& elements() { return m_elements; }

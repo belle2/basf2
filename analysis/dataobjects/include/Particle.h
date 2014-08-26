@@ -540,6 +540,16 @@ namespace Belle2 {
     /** Return wether the extra info with the given name is set. */
     bool hasExtraInfo(const std::string& name) const;
 
+    /** Return the id of the associated ParticleExtraInfoMap or -1 if no map is set. */
+    int getExtraInfoMap() const {
+      return m_extraInfo.size() > 0 ? m_extraInfo[0] : -1;
+    }
+
+    /** Return the size of the extra info array */
+    unsigned int getExtraInfoSize() const {
+      return m_extraInfo.size();
+    }
+
     /** Sets the user-defined data of given name to the given value.
      *
      * throws std::runtime_error if variable is already set.

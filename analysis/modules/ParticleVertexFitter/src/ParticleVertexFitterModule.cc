@@ -123,6 +123,7 @@ namespace Belle2 {
       Particle* particle = plist->getParticle(i);
       bool ok = doVertexFit(particle);
       if (!ok and !m_dontDiscardOnError) toRemove.push_back(particle->getArrayIndex());
+      else if (!ok) particle->setPValue(-3);
     }
     plist->removeParticles(toRemove);
   }

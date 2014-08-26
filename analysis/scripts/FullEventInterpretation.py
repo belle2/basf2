@@ -171,6 +171,7 @@ def FullEventInterpretation(path, particles):
     seq = actorFramework.Sequence()
     seq.addFunction(CountMCParticles, path='Path', names=['Name_{i}'.format(i=particle.identifier) for particle in particles])
     seq.addFunction(LoadGeometry, path='Path')
+    seq.addFunction(LoadParticles, path='Path')
 
     # Now loop over all given particles, foreach particle we add some Resources and Actors.
     for particle in particles:
@@ -194,7 +195,8 @@ def FullEventInterpretation(path, particles):
             seq.addFunction(SelectParticleList,
                             path='Path',
                             particleName='Name_{i}'.format(i=particle.identifier),
-                            particleLabel='Label_{i}'.format(i=particle.identifier))
+                            particleLabel='Label_{i}'.format(i=particle.identifier),
+                            additionalDependencies=['ParticleLoader'])
             seq.addFunction(CopyParticleLists,
                             path='Path',
                             particleName='Name_{i}'.format(i=particle.identifier),
@@ -334,6 +336,9 @@ def FullEventInterpretation(path, particles):
                         signalProbability='SignalProbability_{i}'.format(i=finalParticle.identifier))
         seq.addNeeded('SignalProbability_{i}'.format(i=finalParticle.identifier))
         seq.addNeeded('ParticleList_{i}'.format(i=finalParticle.identifier))
+
+    seq.addNeeded('SignalProbability_K_S0:generic'.format(i=finalParticle.identifier))
+    seq.addNeeded('ParticleList_K_S0:generic'.format(i=finalParticle.identifier))
 
     seq.addFunction(WriteAnalysisFileSummary,
                     finalStateParticlePlaceholders=['Placeholders_{i}'.format(i=particle.identifier) for particle in particles if particle.isFSP],

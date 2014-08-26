@@ -13,6 +13,8 @@
 
 from basf2 import *
 import ROOT
+from ROOT import Belle2
+
 import modularAnalysis
 import pdg
 
@@ -27,7 +29,62 @@ from string import Template
 import IPython
 
 
+class InputFile(object):
+    def __init__(self, filename='input.root'):
+        if os.path.isfile(filename):
+            ROOT.gSystem.Load('libdataobjects')
+            self.rootfile = ROOT.TFile(filename)
+            self.tree = self.rootfile.Get('tree')
+            self.persistent = self.rootfile.Get('persistent')
+
+    def treeContainsObject(self, name):
+        return hasattr(self, 'tree') and any(branch.GetName() == name for branch in self.tree.GetListOfBranches())
+
+    def persistentContainsObject(self, name):
+        return hasattr(self, 'persistent') and any(branch.GetName() == name for branch in self.persistent.GetListOfBranches())
+
+    def getFirstParticleInList(self, particleListName):
+        particleList = Belle2.ParticleList()
+        self.tree.SetBranchAddress(particleListName, particleList)
+        i = 0
+        N = self.tree.GetEntries()
+        while i < N:
+            self.tree.GetEntry(i)
+            for k in [Belle2.ParticleList.c_FlavorSpecificParticle, Belle2.ParticleList.c_SelfConjugatedParticle]:
+                for j in [True, False]:
+                    vec = particleList.getList(k, j)
+                    if len(vec) > 0:
+                        self.tree.ResetBranchAddress(self.tree.GetBranch(particleListName))
+                        return self.tree.Particles[vec[0]]
+            i += 1
+        self.tree.ResetBranchAddress(self.tree.GetBranch(particleListName))
+        return None
+
+    def particleListHasSignalProbability(self, particleListName):
+        if self.treeContainsObject(particleListName):
+            p = self.getFirstParticleInList(particleListName)
+            if p is None:
+                return False
+            mapId = p.getExtraInfoMap()
+            if mapId == -1:
+                return False
+            index = self.tree.ParticleExtraInfoMap.getIndex(mapId, 'SignalProbability')
+            return index > 0 and index < p.getExtraInfoSize()
+        else:
+            return False
+
+    def particleListHasVertexFit(self, particleListName):
+        if self.treeContainsObject(particleListName):
+            p = self.getFirstParticleInList(particleListName)
+            return p is not None and (p.getPValue() >= 0 or p.getPValue() < -2)
+        else:
+            return False
+
+
 def removeJPsiSlash(filename):
+    """
+    Removes the character / from the given filename
+    """
     return filename.replace('/', '')
 
 
@@ -59,17 +116,37 @@ def CountMCParticles(path, names):
     return {'MCParticleCounts': counter}
 
 
-def SelectParticleList(path, particleName, particleLabel):
+def LoadParticles(path):
+    """
+    Loads Particles
+    @param path the basf2 path
+    @return Resource named ParticleLoader
+    """
+    if InputFile().treeContainsObject('Particles'):
+        B2INFO("Preload Particles Array")
+        return {'ParticleLoader': 'dummy', 'NotNeeded': None}
+    B2INFO("Load Particles Array")
+    path.add_module(register_module('ParticleLoader'))
+    return {'ParticleLoader': 'dummy'}
+
+
+def SelectParticleList(path, particleName, particleLabel, additionalDependencies):
     """
     Creates a ParticleList gathering up all particles with the given particleName
         @param path the basf2 path
         @param particleName valid pdg particle name
         @param particleLabel user defined label
+        @param additionalDependencies like particle loader
         @return Resource named RawParticleList_{particleName}:{particleLabel} corresponding ParticleList is stored as {particleName}:{hash}
     """
     userLabel = actorFramework.createHash(particleName, particleLabel)
     outputList = particleName + ':' + userLabel
-    modularAnalysis.selectParticle(outputList, path=path)
+
+    if InputFile().treeContainsObject(outputList):
+        B2INFO("Preload Particle List {p} with label {l} in list {list}".format(p=particleName, l=particleLabel, list=outputList))
+        return {'RawParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList, 'NotNeeded': None}
+
+    modularAnalysis.selectParticle(outputList, persistent=True, path=path)
 
     B2INFO("Select Particle List {p} with label {l} in list {list}".format(p=particleName, l=particleLabel, list=outputList))
     return {'RawParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList}
@@ -88,8 +165,8 @@ def MakeAndMatchParticleList(path, particleName, particleLabel, channelName, dau
     """
     userLabel = actorFramework.createHash(particleName, particleLabel, channelName, daughterParticleLists, preCut)
     outputList = particleName + ':' + userLabel
-    # check if particle list is preloaded
-    if False:
+
+    if InputFile().treeContainsObject(outputList):
         B2INFO("Preload Particle List {p} with label {l} for channel {c} in list {o}".format(p=particleName, l=particleLabel, c=channelName, o=outputList))
         return {'RawParticleList_{c}'.format(c=channelName): outputList, 'NotNeeded': None}
 
@@ -99,7 +176,7 @@ def MakeAndMatchParticleList(path, particleName, particleLabel, channelName, dau
         return {'RawParticleList_{c}'.format(c=channelName): None}
 
     decayString = outputList + ' ==> ' + ' '.join(daughterParticleLists)
-    modularAnalysis.reconstructDecay(decayString, preCut['cutstring'], 0, path=path)
+    modularAnalysis.reconstructDecay(decayString, preCut['cutstring'], 0, persistent=True, path=path)
     modularAnalysis.matchMCTruth(outputList, path=path)
     B2INFO("Make and Match Particle List {p} with label {l} for channel {c} in list {o}".format(p=particleName, l=particleLabel, c=channelName, o=outputList))
     return {'RawParticleList_{c}'.format(c=channelName): outputList}
@@ -119,8 +196,7 @@ def CopyParticleLists(path, particleName, particleLabel, inputLists, postCuts):
     userLabel = actorFramework.createHash(particleName, particleLabel, inputLists, postCuts)
     outputList = particleName + ':' + userLabel
 
-    # check if particle list is preloaded
-    if False:
+    if InputFile().treeContainsObject(outputList):
         B2INFO("Preload Particle List {p} with label {l} in list {o}".format(p=particleName, l=particleLabel, o=outputList))
         return {'ParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList,
                 'ParticleList_{p}:{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): pdg.conjugate(particleName) + ':' + userLabel,
@@ -133,7 +209,7 @@ def CopyParticleLists(path, particleName, particleLabel, inputLists, postCuts):
 
     if not all(postCuts[0] == postCut for postCut in postCuts):
         B2WARNING("Different post cuts for ParticleLists which are gathered up in the same list isn't supported at the moment. Using only first cut.")
-    modularAnalysis.cutAndCopyLists(outputList, inputLists, postCuts[0]['cutstring'], path=path)
+    modularAnalysis.cutAndCopyLists(outputList, inputLists, postCuts[0]['cutstring'], persistent=True, path=path)
 
     B2INFO("Gather Particle List {p} with label {l} in list {o}".format(p=particleName, l=particleLabel, o=outputList))
     return {'ParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList,
@@ -168,6 +244,12 @@ def FitVertex(path, channelName, particleList, daughterVertices, geometry):
         B2INFO("Didn't fitted vertex for channel {c}, because channel is ignored.".format(c=channelName))
         return {'VertexFit_{c}'.format(c=channelName): None}
 
+    hash = actorFramework.createHash(channelName, particleList, daughterVertices, geometry)
+
+    if InputFile().particleListHasVertexFit(particleList):
+        B2INFO("Preloaded fitted vertex for channel {c}.".format(c=channelName))
+        return {'VertexFit_{c}'.format(c=channelName): hash, 'NotNeeded': None}
+
     pvfit = register_module('ParticleVertexFitter')
     pvfit.set_name('ParticleVertexFitter_' + particleList)
     pvfit.param('listName', particleList)
@@ -178,7 +260,7 @@ def FitVertex(path, channelName, particleList, daughterVertices, geometry):
     path.add_module(pvfit)
 
     B2INFO("Fitted vertex for channel {c}.".format(c=channelName))
-    return {'VertexFit_{c}'.format(c=channelName): actorFramework.createHash(channelName, particleList, daughterVertices, geometry)}
+    return {'VertexFit_{c}'.format(c=channelName): hash}
 
 
 def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughterParticleLists, additionalDependencies):
@@ -315,6 +397,10 @@ def SignalProbability(path, identifier, particleList, mvaConfig, additionalDepen
                                                    prefix=removeJPsiSlash(particleList + '_' + hash)), shell=True)
 
     if os.path.isfile(configFilename):
+        if InputFile().particleListHasSignalProbability(particleList):
+            B2INFO("Preloaded SignalProbability for {i}".format(i=identifier))
+            return{'SignalProbability_{i}'.format(i=identifier): configFilename, 'NotNeeded': None}
+
         expert = register_module('TMVAExpert')
         expert.set_name('TMVAExpert_' + particleList)
         expert.param('prefix', removeJPsiSlash(particleList + '_' + hash))
@@ -468,7 +554,7 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
     if ret == 0:
         filename = 'sent_mail'
         if not os.path.isfile(filename):
-            automaticReporting.sendMail()
+            #automaticReporting.sendMail()
             open(filename, 'w').close()
 
     # Return None - Therefore Particle List depends not on TMVAExpert directly

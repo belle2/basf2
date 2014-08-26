@@ -40,7 +40,7 @@ class TestSelectParticleList(unittest.TestCase):
         self.standardHash = '578e965dbcc8088a0f596181d9f662ee6d23c6ab'
 
     def test_standard(self):
-        result = SelectParticleList(self.path, 'e+', 'generic')
+        result = SelectParticleList(self.path, 'e+', 'generic', [])
         self.assertTrue('RawParticleList_e+:generic' in result)
         self.assertEqual(result['RawParticleList_e+:generic'], 'e+:' + self.standardHash)
         self.assertDictEqual(result, {'RawParticleList_e+:generic': 'e+:' + self.standardHash})
@@ -49,15 +49,15 @@ class TestSelectParticleList(unittest.TestCase):
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
         self.assertEqual(parameters['decayString'], 'e+:' + self.standardHash)
         self.assertEqual(parameters['cut'], '')
-        self.assertEqual(parameters['persistent'], False)
+        self.assertEqual(parameters['persistent'], True)
 
     def test_hash_depends_on_particle_name(self):
-        result = SelectParticleList(self.path, 'K+', 'generic')
+        result = SelectParticleList(self.path, 'K+', 'generic', [])
         self.assertTrue('RawParticleList_K+:generic' in result)
         self.assertTrue(result['RawParticleList_K+:generic'] != 'K+:' + self.standardHash)
 
     def test_hash_depends_on_particle_label(self):
-        result = SelectParticleList(self.path, 'e+', 'other')
+        result = SelectParticleList(self.path, 'e+', 'other', [])
         self.assertTrue('RawParticleList_e+:other' in result)
         self.assertTrue(result['RawParticleList_e+:other'] != 'e+:' + self.standardHash)
 
@@ -77,7 +77,7 @@ class TestMakeAndMatchParticleList(unittest.TestCase):
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
         self.assertEqual(parameters['decayString'], 'D+:' + self.standardHash + ' ==> pi+ K-')
         self.assertEqual(parameters['cut'], '0 < M < 10')
-        self.assertEqual(parameters['persistent'], False)
+        self.assertEqual(parameters['persistent'], True)
 
         parameters = {p.name: p.values for p in self.path.modules()[1].available_params()}
         self.assertEqual(parameters['listName'], 'D+:' + self.standardHash)
@@ -127,6 +127,7 @@ class TestCopyParticleLists(unittest.TestCase):
         self.assertEqual(parameters['outputListName'], 'D+:' + self.standardHash)
         self.assertListEqual(parameters['inputListNames'], ['D+:1', 'D+:2', 'D+:3'])
         self.assertEqual(parameters['cut'], '0.1 < M')
+        self.assertEqual(parameters['persistent'], True)
 
     def test_some_missing_daughter_lists(self):
         result = CopyParticleLists(self.path, 'D+', 'generic', ['D+:1', 'D+:2', 'D+:3', None], [{'cutstring': '0.1 < M'}] * 4)

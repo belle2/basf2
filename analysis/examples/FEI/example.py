@@ -120,11 +120,13 @@ particles.append(p)
 
 main = create_path()
 main.add_module(register_module('RootInput'))
-main.add_module(register_module('ParticleLoader'))
+
+# if das erste mal do mein stuff
 
 FullEventInterpretation(main, particles)
 
 main.add_module(register_module('ProgressBar'))
+main.add_module(register_module('RootOutput'))
 
 # show constructed path
 print main

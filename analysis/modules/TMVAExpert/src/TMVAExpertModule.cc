@@ -117,11 +117,10 @@ namespace Belle2 {
       // Calculate target Value for Particles
       for (unsigned i = 0; i < list->getListSize(); ++i) {
         Particle* particle = list->getParticle(i);
-        float targetValue = fixProbabilityUsingSamplingRates(m_method->analyse(particle, m_signalFraction));
-
         if (particle->hasExtraInfo(m_signalProbabilityName)) {
           B2WARNING("Extra Info with given name is already set! I won't set it again!")
         } else {
+          float targetValue = fixProbabilityUsingSamplingRates(m_method->analyse(particle, m_signalFraction));
           particle->addExtraInfo(m_signalProbabilityName, targetValue);
         }
       }
@@ -130,8 +129,12 @@ namespace Belle2 {
       StoreObjPtr<EventExtraInfo> eventExtraInfo;
       if (not eventExtraInfo.isValid())
         eventExtraInfo.create();
-      float targetValue = fixProbabilityUsingSamplingRates(m_method->analyse(nullptr, m_signalFraction));
-      eventExtraInfo->addExtraInfo(m_signalProbabilityName, targetValue);
+      if (eventExtraInfo->hasExtraInfo(m_signalProbabilityName)) {
+        B2WARNING("Extra Info with given name is already set! I won't set it again!")
+      } else {
+        float targetValue = fixProbabilityUsingSamplingRates(m_method->analyse(nullptr, m_signalFraction));
+        eventExtraInfo->addExtraInfo(m_signalProbabilityName, targetValue);
+      }
     }
   }
 

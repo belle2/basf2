@@ -36,7 +36,7 @@ int main(int argc, char** argv)
   comm->init(NSMNode(node),
              config.get("nsm.global.host"),
              config.getInt("nsm.global.port"));
-  NSMData data(stornode + "_STATUS", "storage_status", 1);
+  NSMData data(stornode + "_STATUS", "storage_status", storage_status_revision);
   storage_status* info = (storage_status*)data.open(comm);
 
   while (true) {

@@ -10,6 +10,5 @@ for i in $(seq 5001 5013)
 do
 ./boot_nsmd2_ssh cpr${i} tkonno local
 done
-
 ./boot_nsmd2_ssh ecl01 tkonno local
 ./boot_nsmd2_ssh ecl01 tkonno global

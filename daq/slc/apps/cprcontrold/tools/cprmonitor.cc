@@ -45,8 +45,8 @@ int main(int argc, char** argv)
     rewind(stdout);
     ftruncate(1, 0);
     //printf(" exp = %04u run = %04u\n", info->expno, info->runno);
-    //printf(" rxqueue from eb0    : %4.1f [kB]\n", (float)(info->io[0].nqueue / 1024.));
-    printf(" txqueue to eb0    : %4.1f [kB]\n", (float)(info->io[1].nqueue / 1024.));
+    //printf(" rxqueue from eb0    : %4.1f [kB]\n", (float)(info->nqueue_in / 1024.));
+    printf(" txqueue to eb0    : %4.1f [kB]\n", (float)(info->nqueue_out / 1024.));
     printf("\n");
     printf(" %18s |      count | freq [kHz] | rate [MB/s] | evtsize [kB]\n", "socket");
     for (int i = 0; i < 2; i++) {
@@ -55,10 +55,10 @@ int main(int argc, char** argv)
       if (i == 0) {
         name = "hslb   ---> copper";
         //state = ((info->eflag >> 8) & 0xF) == 0;
-        state = info->io[i].state;
+        state = info->connection_in;
       } else if (i == 1) {
         name = "copper ---> eb0   ";
-        state = info->io[i].state;
+        state = info->connection_out;
       }
       if (state != 1) {
         name = "\x1b[49m\x1b[31m" +
@@ -66,12 +66,21 @@ int main(int argc, char** argv)
       } else {
         name = "\x1b[49m\x1b[32m" + name;
       }
-      printf(" %-15s | %s | %10s | %11s | %12s\x1b[49m\x1b[39m\n",
-             name.c_str(),
-             StringUtil::form("%10u", info->io[i].count).c_str(),
-             StringUtil::form("%02.2f", info->io[i].freq).c_str(),
-             StringUtil::form("%04.2f", info->io[i].rate).c_str(),
-             StringUtil::form("%03.2f", info->io[i].evtsize).c_str());
+      if (i == 0) {
+        printf(" %-15s | %s | %10s | %11s | %12s\x1b[49m\x1b[39m\n",
+               name.c_str(),
+               StringUtil::form("%10u", info->nevent_in).c_str(),
+               StringUtil::form("%02.2f", info->evtrate_in).c_str(),
+               StringUtil::form("%04.2f", info->flowrate_in).c_str(),
+               StringUtil::form("%03.2f", info->evtsize_in).c_str());
+      } else if (i == 1) {
+        printf(" %-15s | %s | %10s | %11s | %12s\x1b[49m\x1b[39m\n",
+               name.c_str(),
+               StringUtil::form("%10u", info->nevent_out).c_str(),
+               StringUtil::form("%02.2f", info->evtrate_out).c_str(),
+               StringUtil::form("%04.2f", info->flowrate_out).c_str(),
+               StringUtil::form("%03.2f", info->evtsize_out).c_str());
+      }
     }
   }
   return 0;

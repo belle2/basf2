@@ -120,9 +120,9 @@ void COPPERDummyCallback::timeout() throw()
   }
 
   if (((eflag >> 8) & 0xF) == 0) {
-    nsm->io[0].state = 1;
+    nsm->connection_in = 1;
   } else {
-    nsm->io[0].state = -1;
+    nsm->connection_in = -1;
   }
 }
 

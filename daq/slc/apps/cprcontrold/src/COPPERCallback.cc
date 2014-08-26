@@ -73,7 +73,7 @@ void COPPERCallback::timeout() throw()
   eflag |= m_ttrx.isBelle2LinkError() << 28;
   eflag |= m_ttrx.isLinkUpError() << 29;
 
-  NSMCommunicator& com(*getCommunicator());
+  //NSMCommunicator& com(*getCommunicator());
   const std::string name = getNode().getName();
   /*
   if (getNode().getState() == RCState::RUNNING_S &&
@@ -228,7 +228,7 @@ bool COPPERCallback::bootBasf2() throw()
   m_con.clearArguments();
   //m_con.addArgument(StringUtil::form("%s/%s", getenv("BELLE2_LOCAL_DIR"),
   //                                   m_config.getBasf2Script().c_str()));
-  //m_con.addArgument(conf.get("readout.script"));
+  m_con.addArgument(conf.get("readout.script"));
   m_con.addArgument(m_config.getHostname());
   m_con.addArgument(m_config.getCopperId().substr(3));
   m_con.addArgument(StringUtil::form("%d", flag));

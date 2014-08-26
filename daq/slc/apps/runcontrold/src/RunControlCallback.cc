@@ -517,7 +517,7 @@ bool RunControlCallback::log() throw()
       getDB()->connect();
       LoggerObjectTable(getDB()).add(log, true);
       getDB()->close();
-      if (log.getPriority() > LogFile::INFO) {
+      if (log.getPriority() > LogFile::WARNING) {
         NSMCommunicator* com = getCommunicator();
         com->sendLog(log);
         if (m_callback && m_callback->getCommunicator()) {

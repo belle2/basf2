@@ -30,7 +30,14 @@ import IPython
 
 
 class InputFile(object):
+    """
+    Class checks the input file for already existing ParticleLists
+    so these lists don't have to be created again
+    """
     def __init__(self, filename='input.root'):
+        """
+        Open input file. Get tree and persistent object
+        """
         if os.path.isfile(filename):
             ROOT.gSystem.Load('libdataobjects')
             self.rootfile = ROOT.TFile(filename)
@@ -38,12 +45,21 @@ class InputFile(object):
             self.persistent = self.rootfile.Get('persistent')
 
     def treeContainsObject(self, name):
+        """
+        Returns true if the tree object contains a branch with the given name
+        """
         return hasattr(self, 'tree') and any(branch.GetName() == name for branch in self.tree.GetListOfBranches())
 
     def persistentContainsObject(self, name):
+        """
+        Returns true if the persistent object contains a branch with the given name
+        """
         return hasattr(self, 'persistent') and any(branch.GetName() == name for branch in self.persistent.GetListOfBranches())
 
     def getFirstParticleInList(self, particleListName):
+        """
+        Returns the particle object of the first valid particle in the given particle list
+        """
         particleList = Belle2.ParticleList()
         self.tree.SetBranchAddress(particleListName, particleList)
         i = 0
@@ -61,6 +77,9 @@ class InputFile(object):
         return None
 
     def particleListHasSignalProbability(self, particleListName):
+        """
+        Returns true if the given particle list contains an extra info named SignalProbability
+        """
         if self.treeContainsObject(particleListName):
             p = self.getFirstParticleInList(particleListName)
             if p is None:
@@ -74,6 +93,9 @@ class InputFile(object):
             return False
 
     def particleListHasVertexFit(self, particleListName):
+        """
+        Returns true if the given particle list contains particles on which a vertex fit was performed
+        """
         if self.treeContainsObject(particleListName):
             p = self.getFirstParticleInList(particleListName)
             return p is not None and (p.getPValue() >= 0 or p.getPValue() < -2)
@@ -556,7 +578,7 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
     if ret == 0:
         filename = 'sent_mail'
         if not os.path.isfile(filename):
-            #automaticReporting.sendMail()
+            automaticReporting.sendMail()
             open(filename, 'w').close()
 
     # Return None - Therefore Particle List depends not on TMVAExpert directly

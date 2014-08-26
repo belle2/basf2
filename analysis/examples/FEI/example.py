@@ -121,8 +121,6 @@ particles.append(p)
 main = create_path()
 main.add_module(register_module('RootInput'))
 
-# if das erste mal do mein stuff
-
 FullEventInterpretation(main, particles)
 
 main.add_module(register_module('ProgressBar'))

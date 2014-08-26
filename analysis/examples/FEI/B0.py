@@ -92,6 +92,13 @@ mva_D0 = Particle.MVAConfiguration(
     target='isSignal', targetCluster=1
 )
 
+mva_D0_withoutVertex = Particle.MVAConfiguration(
+    name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
+    variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables,
+    target='isSignal', targetCluster=1
+)
+
+
 pre_D0 = Particle.PreCutConfiguration(
     variable='M',
     method='S/B',
@@ -109,7 +116,7 @@ p.addChannel(['pi-', 'pi+'])
 p.addChannel(['pi-', 'pi+', 'pi+', 'pi-'])
 p.addChannel(['pi-', 'pi+', 'pi0'])
 p.addChannel(['pi-', 'pi+', 'pi0', 'pi0'])
-p.addChannel(['K_S0', 'pi0'])
+p.addChannel(['K_S0', 'pi0'], mva_D0_withoutVertex)
 p.addChannel(['K_S0', 'pi+', 'pi-'])
 p.addChannel(['K_S0', 'pi+', 'pi-', 'pi0'])
 p.addChannel(['K-', 'K+'])
@@ -125,6 +132,13 @@ mva_DPlus = Particle.MVAConfiguration(
     target='isSignal', targetCluster=1
 )
 
+mva_DPlus_withoutVertex = Particle.MVAConfiguration(
+    name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
+    variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables,
+    target='isSignal', targetCluster=1
+)
+
+
 pre_DPlus = Particle.PreCutConfiguration(
     variable='M',
     method='S/B',
@@ -137,7 +151,7 @@ p.addChannel(['K-', 'pi+', 'pi+'])
 p.addChannel(['K-', 'pi+', 'pi+', 'pi0'])
 p.addChannel(['K-', 'K+', 'pi+'])
 p.addChannel(['K-', 'K+', 'pi+', 'pi0'])
-p.addChannel(['pi+', 'pi0'])
+p.addChannel(['pi+', 'pi0'], mva_DPlus_withoutVertex)
 p.addChannel(['pi+', 'pi+', 'pi-'])
 p.addChannel(['pi+', 'pi+', 'pi-', 'pi0'])
 p.addChannel(['K_S0', 'pi+'])
@@ -155,6 +169,12 @@ mva_DStarPlus = Particle.MVAConfiguration(
     target='isSignal', targetCluster=1
 )
 
+mva_DStarPlus_withoutVertex = Particle.MVAConfiguration(
+    name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
+    variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables,
+    target='isSignal', targetCluster=1
+)
+
 pre_DStarPlus = Particle.PreCutConfiguration(
     variable='Q',
     method='S/B',
@@ -164,14 +184,14 @@ pre_DStarPlus = Particle.PreCutConfiguration(
 
 p = Particle('D*+', mva_DStarPlus, pre_DStarPlus)
 p.addChannel(['D0', 'pi+'])
-p.addChannel(['D+', 'pi0'])
-p.addChannel(['D+', 'gamma'])
+p.addChannel(['D+', 'pi0'], mva_DStarPlus_withoutVertex)
+p.addChannel(['D+', 'gamma'], mva_DStarPlus_withoutVertex)
 particles.append(p)
 
 ######################## D*0 #########################
 mva_DStar0 = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables + vertex_variables,
+    variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables,
     target='isSignal', targetCluster=1
 )
 
@@ -221,7 +241,7 @@ particles.append(p)
 
 mva_DStarS = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables + vertex_variables,
+    variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables,
     target='isSignal', targetCluster=1
 )
 
@@ -265,9 +285,16 @@ mva_B0 = Particle.MVAConfiguration(
     target='isSignal', targetCluster=1
 )
 
+mva_B0_withoutVertex = Particle.MVAConfiguration(
+    name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
+    variables=['daughterProductOf(getExtraInfo(SignalProbability))', 'deltaE'],
+    target='isSignal', targetCluster=1
+)
+
+
 pre_B0 = Particle.PreCutConfiguration(
     variable='Mbc',
-    method='S/B',
+    method='Same',
     efficiency=0.9,
     purity=0.0001,
 )
@@ -276,7 +303,7 @@ p = Particle('B0', mva_B0, pre_B0)
 p.addChannel(['D-', 'pi+'])
 p.addChannel(['D-', 'pi0', 'pi+'])
 p.addChannel(['D-', 'pi+', 'pi+', 'pi-'])
-p.addChannel(['anti-D0', 'pi0'])
+p.addChannel(['anti-D0', 'pi0'], mva_B0_withoutVertex)
 p.addChannel(['anti-D0', 'pi+', 'pi-'])
 p.addChannel(['D-', 'D0', 'K+'])
 p.addChannel(['D-', 'D*0', 'K+'])

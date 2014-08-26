@@ -229,5 +229,6 @@ def GetIgnoredChannels(signal, bckgrd, cuts):
     @param cuts cuts on the x-axis of the channels
     """
     def isIgnored(channel):
-        return abs(cuts[channel][0] - cuts[channel][1]) < 1e-4 or GetNumberOfEventsInRange(signal[channel], cuts[channel]) < 100 or GetNumberOfEventsInRange(bckgrd[channel], cuts[channel]) < 100
+        binWidth = signal[channel].GetBinWidth(signal[channel].FindBin(cuts[channel][0]))
+        return abs(cuts[channel][0] - cuts[channel][1]) <= binWidth or GetNumberOfEventsInRange(signal[channel], cuts[channel]) < 100 or GetNumberOfEventsInRange(bckgrd[channel], cuts[channel]) < 100
     return [channel for channel in signal.iterkeys() if isIgnored(channel)]

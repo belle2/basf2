@@ -203,6 +203,7 @@ bool StoragerCallback::abort() throw()
 
 void StoragerCallback::timeout() throw()
 {
+  if (!m_data.isAvailable()) return;
   storage_status* info = (storage_status*)m_data.get();
   info->ctime = Time().getSecond();
   info->nnodes = m_flow.size();

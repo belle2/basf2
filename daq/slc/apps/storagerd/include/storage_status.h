@@ -24,7 +24,7 @@ namespace Belle2 {
     float nbytes;
     float loadavg;
     struct disk_status {
-      int nfiles;
+      int32 nfiles;
       float available;
       float size;
     } disk[12];

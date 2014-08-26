@@ -27,18 +27,6 @@ namespace Belle2 {
     /** Base class for all Sensitive Detectors to create hits during simulation. */
     class SensitiveDetectorBase : public G4VSensitiveDetector {
     public:
-//      /** Enum to specify all subdetectors which could produce Hits in the simulation.
-//       * Used to automatically set the SeenIn-flags of the MCParticles
-//       */
-      //      enum DetectorComponent {
-      //        PXD = MCParticle::c_SeenInPXD,      /**< Pixel detector */
-      //        SVD = MCParticle::c_SeenInSVD,      /**< Strip detector */
-      //        CDC = MCParticle::c_SeenInCDC,      /**< Drift chamber  */
-      //        TOP = MCParticle::c_SeenInTOP,      /**< Time of Propagation */
-      //        ECL = MCParticle::c_LastSeenInECL,  /**< Calorimeter */
-      //        KLM = MCParticle::c_LastSeenInKLM,  /**< KLM */
-      //        Other = 0                           /**< Any other component */
-      //      };
 
       /** Create a new Sensitive detecor with a given name and belonging to a given subdetector.
        * @param name name of the sensitive detector

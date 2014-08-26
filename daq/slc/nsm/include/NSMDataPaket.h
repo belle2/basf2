@@ -5,7 +5,7 @@ namespace Belle2 {
 
   struct NSMDataPaket {
 
-    static const unsigned short BUFFER_MAX = 10240;
+    static const unsigned short BUFFER_MAX = 492;
     static const unsigned int PORT = 9021;
 
     struct Header {

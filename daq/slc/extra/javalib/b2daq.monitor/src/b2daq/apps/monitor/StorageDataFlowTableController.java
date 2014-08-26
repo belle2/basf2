@@ -95,6 +95,7 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
                 if (data == null || !data.getFormat().matches("storage_status")) {
                     return;
                 }
+                data.print();
                 label_runno.setText(String.format("%04d.%04d.%03d", data.getInt("expno"),
                         data.getInt("runno"), data.getInt("subno")));
                 switch (data.getInt("state")) {
@@ -118,7 +119,7 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
                     NSMData cdata = (NSMData)data.getObject("disk", i);
                     DiskUsage disk = (DiskUsage)table_disk.getItems().get(i);
                     disk.setStatus(cdata.getFloat("available")<=10?"FULL":"FINE");
-                    disk.setAvailable(cdata.getInt("available"));
+                    disk.setAvailable(cdata.getFloat("available"));
                     disk.setSize(cdata.getFloat("size"));
                 }
                 if (table_stat.getItems().size() < data.getInt("nnodes")) {
@@ -132,7 +133,7 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
                 int connected_in = 1;
                 int connected_out = -1;
                 for (int i = 0; i < data.getInt("nnodes"); i++) {
-                    NSMData cdata = (NSMData)data.getObject("ro", i);
+                    NSMData cdata = (NSMData)data.getObject("node", i);
                     if (i == 0) {
                         connected_out = (data.getInt("connection_out") == 1)?1:-1;
                     } else if (data.getInt("connection_out") != 1) {
@@ -187,7 +188,7 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
 
     static StorageDataFlowTableController create(String name) {
         try {
-            FXMLLoader loader = new FXMLLoader(StorageDataFlowTableController.class.getResource("RORCDataFlowTable.fxml"));
+            FXMLLoader loader = new FXMLLoader(StorageDataFlowTableController.class.getResource("StorageDataFlowTable.fxml"));
             loader.load();
             StorageDataFlowTableController controller = loader.getController();
             controller.setNodeName(name);

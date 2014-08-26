@@ -22,6 +22,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
 /**
@@ -38,8 +39,8 @@ public class MonitorGUI extends Application {
         try {
             FileChooser fc = new FileChooser();
             fc.setTitle("select file");
-            //fc.setInitialDirectory(new File(System.getProperty("user.home")));
-            //fc.getExtensionFilters().add(new ExtensionFilter("HTML", "*.html", "*.htm"));
+            fc.setInitialDirectory(new File(System.getProperty("user.home")));
+            fc.getExtensionFilters().add(new ExtensionFilter("init", "*.init"));
 
             File f = fc.showOpenDialog(stage);
             System.out.println(f.getPath());

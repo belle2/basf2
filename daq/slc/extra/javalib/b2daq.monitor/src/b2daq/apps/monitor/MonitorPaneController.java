@@ -86,7 +86,9 @@ public class MonitorPaneController implements Initializable, NSMObserver {
             Tab tab = null;
             String nodename = msg.getNodeName().replace("_STATUS", "");
             for (Tab t : tabpane_mon.getTabs()) {
-                if (data.getFormat().matches("rorc_status")
+                if ((data.getFormat().matches("rorc_status") ||
+                     data.getFormat().matches("storage_status") ||
+                     data.getFormat().matches("rfunitinfo"))
                         && t.getText().matches(nodename)) {
                     tab = t;
                     flowmonitors.get(nodename).handleOnReceived(msg);
@@ -95,6 +97,7 @@ public class MonitorPaneController implements Initializable, NSMObserver {
             }
             if (tab == null) {
                 if (data.getFormat().matches("rorc_status")) {
+                    data.print();
                     RORCDataFlowTableController flowmonitor = RORCDataFlowTableController.create(nodename);
                     tab = new Tab();
                     tab.setText(flowmonitor.getNodeName());
@@ -102,14 +105,16 @@ public class MonitorPaneController implements Initializable, NSMObserver {
                     tab.setClosable(false);
                     tabpane_mon.getTabs().add(tab);
                     flowmonitors.put(nodename, flowmonitor);
+                    flowmonitor.handleOnReceived(msg);
                 } else if (data.getFormat().matches("storage_status")) {
-                    RORCDataFlowTableController flowmonitor = RORCDataFlowTableController.create(nodename);
+                    StorageDataFlowTableController flowmonitor = StorageDataFlowTableController.create(nodename);
                     tab = new Tab();
                     tab.setText(flowmonitor.getNodeName());
                     tab.setContent(flowmonitor.getPane());
                     tab.setClosable(false);
                     tabpane_mon.getTabs().add(tab);
                     flowmonitors.put(nodename, flowmonitor);
+                    flowmonitor.handleOnReceived(msg);
                 }
             }
         } else if (command.equals(RCCommand.OK)) {

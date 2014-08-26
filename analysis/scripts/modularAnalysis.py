@@ -411,7 +411,7 @@ def applyTMVAMethod(
     method='FastBDT',
     signalProbabilityName='isSignal',
     signalFraction=-1,
-    signalClass=0,
+    signalClass=1,
     prefix='TMVA',
     workingDirectory='.',
     path=analysis_main,

@@ -99,18 +99,21 @@ bool ROCallback::abort() throw()
 
 void ROCallback::timeout() throw()
 {
-  if (m_data.isAvailable() && m_flow.isAvailable()) {
+  if (m_data.isAvailable()) {
     ronode_status* nsm = (ronode_status*)m_data.get();
-    ronode_status& status(m_flow.monitor());
-    uint32 stime = nsm->stime;
-    memcpy(nsm, &status, sizeof(ronode_status));
-    nsm->stime = stime;
+    if (m_flow.isAvailable()) {
+      ronode_status& status(m_flow.monitor());
+      uint32 stime = nsm->stime;
+      memcpy(nsm, &status, sizeof(ronode_status));
+      nsm->stime = stime;
+    }
     double loads[3];
     if (getloadavg(loads, 3) > 0) {
       nsm->loadavg = (float)loads[0];
     } else {
       nsm->loadavg = -1;
     }
+    LogFile::debug("Load average = %f", nsm->loadavg);
   }
 }
 

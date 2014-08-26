@@ -135,17 +135,19 @@ void COPPERCallback::timeout() throw()
     com.sendLog(DAQLogMessage(name, LogFile::ERROR, msg));
   }
   */
-  if (m_data.isAvailable() && m_flow.isAvailable()) {
+  if (m_data.isAvailable()) {
     ronode_status* nsm = (ronode_status*)m_data.get();
-    ronode_status& status(m_flow.monitor());
-    status.eflag |= (eflag & 0xFF);
-    uint32 stime = nsm->stime;
-    memcpy(nsm, &status, sizeof(ronode_status));
-    nsm->stime = stime;
-    if (((eflag >> 8) & 0xF) == 0) {
-      nsm->connection_in = 1;
-    } else {
-      nsm->connection_in = -1;
+    if (m_flow.isAvailable()) {
+      ronode_status& status(m_flow.monitor());
+      status.eflag |= (eflag & 0xFF);
+      uint32 stime = nsm->stime;
+      memcpy(nsm, &status, sizeof(ronode_status));
+      nsm->stime = stime;
+      if (((eflag >> 8) & 0xF) == 0) {
+        nsm->connection_in = 1;
+      } else {
+        nsm->connection_in = -1;
+      }
     }
     double loads[3];
     if (getloadavg(loads, 3) > 0) {
@@ -153,6 +155,7 @@ void COPPERCallback::timeout() throw()
     } else {
       nsm->loadavg = -1;
     }
+    LogFile::debug("loadavg = %f", nsm->loadavg);
   }
 }
 

@@ -181,6 +181,7 @@ void RunControlCallback::update() throw()
     status->node[i].configid = obj.getId();
     if (isro && m_data_v[i].isAvailable() &&
         m_data_v[i].getFormat() == "ronode_status") {
+      m_data_v[i].update();
       rorc_status::ro_status* rost = &(((rorc_status*)data)->ro[i]);
       ronode_status* ronode = (ronode_status*)m_data_v[i].get();
       rost->nevent_in = ronode->nevent_in;

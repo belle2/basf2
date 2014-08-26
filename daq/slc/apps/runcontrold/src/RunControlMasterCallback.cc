@@ -52,6 +52,10 @@ bool RunControlMasterCallback::perform(const NSMMessage& msg) throw()
 {
   msg.getNodeName();
   RCCommand cmd(msg.getRequestName());
+  LogFile::debug("%s >> %s (cmd = %s)",
+                 msg.getNodeName(),
+                 msg.getRequestName(),
+                 cmd.getLabel());
   if (cmd == RCCommand::STATECHECK) {
     getCommunicator()->replyOK(m_callback->getNode());
     return true;

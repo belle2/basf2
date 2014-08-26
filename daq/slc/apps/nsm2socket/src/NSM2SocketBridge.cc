@@ -50,7 +50,7 @@ bool NSM2SocketBridge::sendMessage(const NSMMessage& msg) throw()
 
 bool NSM2SocketBridge::sendLog(const DAQLogMessage& log) throw()
 {
-  NSMMessage msg(m_callback->getNode().getName());
+  NSMMessage msg(m_callback->getNode());
   msg.setRequestName(NSMCommand::LOG);
   msg.setNParams(2);
   msg.setParam(0, (int)log.getPriority());
@@ -63,7 +63,8 @@ bool NSM2SocketBridge::sendError(const ERRORNo& eno,
                                  const std::string& nodename,
                                  const std::string& message) throw()
 {
-  NSMMessage msg(nodename);
+  NSMNode node(nodename);
+  NSMMessage msg(node);
   msg.setRequestName(NSMCommand::ERROR);
   msg.setNParams(1);
   msg.setParam(0, eno.getId());
@@ -88,7 +89,7 @@ void NSM2SocketBridge::run() throw()
 {
   sleep(5);
   while (true) {
-    NSMMessage msg_out(m_callback->getNode().getName());
+    NSMMessage msg_out(m_callback->getNode());
     NSMMessage msg;
     if (!recieveMessage(msg)) {
       return;
@@ -172,7 +173,8 @@ void NSM2SocketBridge::run() throw()
                               LogFile::WARNING, message));
         return;
       }
-    } else if (HVCommand(reqname) != Enum::UNKNOWN ||
+    } else if (NSMCommand(reqname) != Enum::UNKNOWN ||
+               HVCommand(reqname) != Enum::UNKNOWN ||
                RCCommand(reqname) != Enum::UNKNOWN) {
       m_callback->sendRequest(msg);
     } else {

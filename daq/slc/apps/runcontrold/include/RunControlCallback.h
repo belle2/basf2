@@ -26,7 +26,8 @@ namespace Belle2 {
   public:
     RunControlCallback(const NSMNode& node,
                        const std::string& runtype,
-                       const int port);
+                       const std::string& format,
+                       int revision, const int port);
     virtual ~RunControlCallback() throw() {}
 
   public:
@@ -53,6 +54,8 @@ namespace Belle2 {
     virtual bool abort() throw() { return send(getMessage()); }
     virtual bool trigft() throw() { return send(getMessage()); }
     virtual bool stateCheck() throw() { return true; }
+    virtual bool exclude() throw();
+    virtual bool include() throw();
 
   protected:
     void prepareRun(NSMMessage& msg) throw();

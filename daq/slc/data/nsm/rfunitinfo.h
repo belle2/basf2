@@ -1,27 +1,37 @@
-#define MAX_NODES 10
+#ifndef _Belle2_rfunitinfo_h
+#define _Belle2_rfunitinfo_h
 
-const int rfunitinfo_revision = 1;
+extern "C" {
+#include <nsm2/nsm2.h>
+}
 
-struct rfunitinfo {
-  struct rfnodeinfo {
-    int32 sysstate;
-    int32 nevent_in;
-    int32 nqueue_in;
-    int32 nevent_out;
-    int32 nqueue_out;
-    int32 error;
-    int32 i_reserved[9];
-    float flowrate_in;
-    float flowrate_out;
-    float avesize_in;
-    float avesize_out;
-    float evtrate_in;
-    float evtrate_out;
-    float loadave;
-    float r_reserved[9];
-  } nodeinfo[10];
-  uint32 nnodes;
-  uint32 updatetime;
-  int32 reserved[2];
-};
+namespace Belle2 {
 
+  const int rfunitinfo_revision = 2;
+
+  struct rfunitinfo {
+    struct rfnodeinfo {
+      int32 state;
+      int32 nevent_in;
+      int32 nqueue_in;
+      int32 nevent_out;
+      int32 nqueue_out;
+      int32 eflag;
+      int32 i_reserved[9];
+      float flowrate_in;
+      float flowrate_out;
+      float evtsize_in;
+      float evtsize_out;
+      float evtrate_in;
+      float evtrate_out;
+      float loadave;
+      float r_reserved[9];
+    } nodeinfo[24];
+    uint32 nnodes;
+    uint32 ctime;
+    int32 reserved[2];
+  };
+
+}
+
+#endif

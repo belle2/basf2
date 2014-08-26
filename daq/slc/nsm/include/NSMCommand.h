@@ -19,6 +19,8 @@ namespace Belle2 {
     static const NSMCommand DBSET;
     static const NSMCommand LISTGET;
     static const NSMCommand LISTSET;
+    static const NSMCommand EXCLUDE;
+    static const NSMCommand INCLUDE;
 
   public:
     static const int SUGGESTED = 2;
@@ -30,6 +32,7 @@ namespace Belle2 {
     NSMCommand(const Enum& e) throw() : Enum(e) {}
     NSMCommand(const NSMCommand& cmd) throw() : Enum(cmd) {}
     NSMCommand(const char* label) throw() { *this = label; }
+    NSMCommand(const std::string& label) throw() { *this = label; }
     NSMCommand(int id) throw() { *this = id; }
     ~NSMCommand() throw() {}
 

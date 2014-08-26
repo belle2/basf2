@@ -19,8 +19,6 @@ namespace Belle2 {
     static const RCCommand ABORT;
     static const RCCommand STATECHECK;
     static const RCCommand TRIGFT;
-    static const RCCommand EXCLUDE;
-    static const RCCommand INCLUDE;
 
   public:
     RCCommand() throw() {}

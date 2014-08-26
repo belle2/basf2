@@ -96,6 +96,7 @@ public:
       if (!available) {
         B2FATAL("No disk available for writing");
       }
+
       if (diskid != g_diskid) {
         std::ofstream fout(g_file_diskid.c_str());
         fout << g_diskid;
@@ -316,7 +317,8 @@ int main(int argc, char** argv)
         info.addOutputCount(1);
         info.addOutputNBytes(nbyte);
         info.get()->reserved[0] = g_nfiles_closed;
-        info.get()->reserved[1] = info.getOutputNBytes() / 1024 / 1024;
+        info.get()->reserved[1] = g_diskid;
+        info.get()->reserved_f[0] = (float)info.getOutputNBytes() / 1024. / 1024.;
       }
     } else {
       B2ERROR("storagerecord: no run was initialzed for recording");

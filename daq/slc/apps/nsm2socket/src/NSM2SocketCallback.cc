@@ -27,8 +27,6 @@ throw() : NSMCallback(node, 1)
   add(RCCommand::STATE);
   add(RCCommand::STATECHECK);
   add(RCCommand::TRIGFT);
-  add(RCCommand::EXCLUDE);
-  add(RCCommand::INCLUDE);
   add(HVCommand::CONFIGURE);
   add(HVCommand::STANDBY);
   add(HVCommand::SHOULDER);
@@ -116,7 +114,7 @@ void NSM2SocketCallback::timeout() throw()
   for (NSMDataList::iterator it = m_data_m.begin();
        it != m_data_m.end(); it++) {
     NSMData& data(it->second);
-    NSMMessage msg(getNode().getName());
+    NSMMessage msg(getNode());
     try {
       bool opennew = false;
       if (!data.isAvailable()) {

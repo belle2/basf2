@@ -1,28 +1,49 @@
-#ifndef storage_status_h
-#define storage_status_h
+#ifndef _Belle2_storage_status_h
+#define _Belle2_storage_status_h
 
-const int storage_status_revision = 1;
+extern "C" {
+#include <nsm2/nsm2.h>
+}
 
-struct storage_status {
-  uint32 reserved[2];
-  uint32 state;
-  uint32 ctime;
-  uint32 eflag;
-  uint32 expno;
-  uint32 runno;
-  uint32 subno;
-  uint32 nfiles;
-  float nbytes;
-  float diskusage[12];
-  float disksize[12];
-  struct io_status {
-    uint32 nqueue;
+namespace Belle2 {
+
+  const int storage_status_revision = 1;
+
+  struct storage_status {
+    uint32 stime;
+    uint32 ctime;
     uint32 state;
-    uint32 count;
-    float freq;
-    float evtsize;
-    float rate;
-  } io[14];
-};
+    uint32 eflag;
+    uint32 expno;
+    uint32 runno;
+    uint32 subno;
+    uint32 nfiles;
+    uint32 diskid;
+    uint32 nnodes;
+    float nbytes;
+    float loadave;
+    float diskusage[12];
+    float disksize[12];
+    struct node_status {
+      uint32 eflag;
+      uint32 ctime;
+      uint32 nevent_in;
+      uint32 nqueue_in;
+      uint32 connection_in;
+      uint32 connection_out;
+      uint32 nevent_out;
+      uint32 nqueue_out;
+      int32 reserved_i[2];
+      float evtrate_in;
+      float evtsize_in;
+      float flowrate_in;
+      float evtrate_out;
+      float evtsize_out;
+      float flowrate_out;
+      float reserved_f[2];
+    } node[8];
 
+  };
+
+}
 #endif

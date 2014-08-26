@@ -130,6 +130,42 @@ throw(NSMHandlerException)
   }
 }
 
+void NSMCommunicator::sendExclude(const NSMNode& node)
+throw(NSMHandlerException)
+{
+  for (NSMNodeList::iterator it = m_masters.begin();
+       it != m_masters.end(); it++) {
+    //if (b2nsm_nodeid(it->first.c_str()) >= 0) {
+    try {
+      LogFile::debug("EXCLUDE >> %s", it->second.getName().c_str());
+      sendRequest(NSMMessage(it->second, NSMCommand::EXCLUDE,
+                             node.getName()));
+    } catch (const NSMHandlerException& e) {
+      //}
+      //} else {
+      LogFile::debug("%s is not online. ", it->first.c_str());
+    }
+  }
+}
+
+void NSMCommunicator::sendInclude(const NSMNode& node)
+throw(NSMHandlerException)
+{
+  for (NSMNodeList::iterator it = m_masters.begin();
+       it != m_masters.end(); it++) {
+    //if (b2nsm_nodeid(it->first.c_str()) >= 0) {
+    try {
+      LogFile::debug("INCLUDE >> %s", it->second.getName().c_str());
+      sendRequest(NSMMessage(it->second, NSMCommand::INCLUDE,
+                             node.getName()));
+    } catch (const NSMHandlerException& e) {
+      //}
+      //} else {
+      LogFile::debug("%s is not online. ", it->first.c_str());
+    }
+  }
+}
+
 void NSMCommunicator::replyError(int error, const std::string& message)
 throw(NSMHandlerException)
 {

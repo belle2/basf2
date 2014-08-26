@@ -15,6 +15,8 @@ const NSMCommand NSMCommand::DBSET(403, "DBSET");
 const NSMCommand NSMCommand::DBGET(404, "DBGET");
 const NSMCommand NSMCommand::LISTSET(405, "LISTSET");
 const NSMCommand NSMCommand::LISTGET(406, "LISTGET");
+const NSMCommand NSMCommand::EXCLUDE(511, "EXCLUDE");
+const NSMCommand NSMCommand::INCLUDE(512, "INCLUDE");
 
 const NSMCommand& NSMCommand::operator=(const std::string& label) throw()
 {
@@ -30,6 +32,8 @@ const NSMCommand& NSMCommand::operator=(const std::string& label) throw()
   else if (label == DBGET.getLabel()) *this = DBGET;
   else if (label == LISTSET.getLabel()) *this = LISTSET;
   else if (label == LISTGET.getLabel()) *this = LISTGET;
+  else if (label == EXCLUDE.getLabel()) *this = EXCLUDE;
+  else if (label == INCLUDE.getLabel()) *this = INCLUDE;
   else *this = Enum::UNKNOWN;
   return *this;
 }
@@ -48,6 +52,8 @@ const NSMCommand& NSMCommand::operator=(int id) throw()
   else if (id == DBGET.getId()) *this = DBGET;
   else if (id == LISTSET.getId()) *this = LISTSET;
   else if (id == LISTGET.getId()) *this = LISTGET;
+  else if (id == EXCLUDE.getId()) *this = EXCLUDE;
+  else if (id == INCLUDE.getId()) *this = INCLUDE;
   else *this = Enum::UNKNOWN;
   return *this;
 }

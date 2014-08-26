@@ -2,6 +2,7 @@
 #include "daq/slc/apps/storagerd/storage_status.h"
 
 #include "daq/slc/system/LogFile.h"
+#include "daq/slc/system/Time.h"
 
 #include "daq/slc/base/StringUtil.h"
 
@@ -149,6 +150,8 @@ bool StoragerCallback::load() throw()
 
 bool StoragerCallback::start() throw()
 {
+  storage_status* status = (storage_status*)m_data.get();
+  status->stime = Time().getSecond();
   for (size_t i = 0; i < m_con.size(); i++) {
     std::string name = m_con[i].getName();
     if (!m_con[i].start()) {
@@ -200,29 +203,35 @@ bool StoragerCallback::abort() throw()
 void StoragerCallback::timeout() throw()
 {
   storage_status* info = (storage_status*)m_data.get();
+  info->ctime = Time().getSecond();
+  info->nnodes = m_flow.size();
   for (size_t i = 0; i < m_flow.size() && i < 14; i++) {
-    ronode_status& status(m_flow[i].monitor());
-    for (int j = 0; j < 2; j++) {
-      info->io[2 * i + j].state = status.io[j].state;
-      info->io[2 * i + j].count = status.io[j].count;
-      info->io[2 * i + j].freq = status.io[j].freq;
-      info->io[2 * i + j].evtsize = status.io[j].evtsize;
-      info->io[2 * i + j].rate = status.io[j].rate;
-    }
+    ronode_status& rostatus(m_flow[i].monitor());
+    info->node[i].connection_in = rostatus.connection_in;
+    info->node[i].nevent_in = rostatus.nevent_in;
+    info->node[i].evtrate_in = rostatus.evtrate_in;
+    info->node[i].evtsize_in = rostatus.evtsize_in;
+    info->node[i].flowrate_in = rostatus.flowrate_in;
+    info->node[i].connection_out = rostatus.connection_out;
+    info->node[i].nevent_out = rostatus.nevent_out;
+    info->node[i].evtrate_out = rostatus.evtrate_out;
+    info->node[i].evtsize_out = rostatus.evtsize_out;
+    info->node[i].flowrate_out = rostatus.flowrate_out;
     if (i == 0) { //IN
-      info->ctime = status.ctime;
-      info->expno = status.expno;
-      info->runno = status.runno;
-      info->subno = status.subno;
-      info->io[0].nqueue = status.io[0].nqueue;
+      info->eflag = rostatus.eflag;
+      info->ctime = rostatus.ctime;
+      info->expno = rostatus.expno;
+      info->runno = rostatus.runno;
+      info->subno = rostatus.subno;
+      info->node[0].nqueue_in = rostatus.nqueue_in;
       SharedEventBuffer::Header* hd = m_ibuf.getHeader();
-      info->io[1].nqueue = hd->nword_in - hd->nword_out;
+      info->node[0].nqueue_out = hd->nword_in - hd->nword_out;
     } else if (i == 1) {
       SharedEventBuffer::Header* hd = m_rbuf.getHeader();
-      info->io[2].nqueue = hd->nword_in - hd->nword_out;
-      info->nfiles = status.reserved[0];
-      info->nbytes = (float)status.reserved[1];
-    } else {
+      info->node[1].nqueue_out = hd->nword_in - hd->nword_out;
+      info->nfiles = rostatus.reserved_i[0];
+      info->diskid = rostatus.reserved_i[1];
+      info->nbytes = rostatus.reserved_f[0];
     }
   }
   struct statvfs statfs;

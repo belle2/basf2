@@ -18,6 +18,8 @@ NSMCallback::NSMCallback(const NSMNode& node, int timeout) throw()
   add(NSMCommand::FATAL);
   add(NSMCommand::LOG);
   add(NSMCommand::STATE);
+  add(NSMCommand::EXCLUDE);
+  add(NSMCommand::INCLUDE);
   m_timeout = timeout;
 }
 
@@ -40,6 +42,10 @@ throw()
     return log();
   } else if (cmd == NSMCommand::STATE) {
     return state();
+  } else if (cmd == NSMCommand::EXCLUDE) {
+    return exclude();
+  } else if (cmd == NSMCommand::INCLUDE) {
+    return include();
   }
   return false;
 }

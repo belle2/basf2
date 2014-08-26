@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.web.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import b2daq.apps.monitor.*?>
+<?scenebuilder-classpath-element ../classes?>
+
+<TabPane prefHeight="602.0" prefWidth="840.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.apps.monitor.MonitorPaneController">
+    <tabs>
+        <Tab closable="false" text="Monitor">
+            <content>
+                <TabPane fx:id="tabpane_mon">
+                </TabPane>
+            </content>
+        </Tab>
+        <Tab closable="false" text="Network ">
+            <content>
+                <fx:include fx:id="networkconfig" source="NetworkConfigPane.fxml" />
+            </content>
+        </Tab>
+    </tabs>
+</TabPane>

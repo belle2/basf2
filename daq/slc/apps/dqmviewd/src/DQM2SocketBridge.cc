@@ -64,7 +64,7 @@ void DQM2SocketBridge::run() throw()
 {
   sleep(5);
   while (true) {
-    NSMMessage msg_out(m_callback->getNode().getName());
+    NSMMessage msg_out(m_callback->getNode());
     NSMMessage msg;
     if (!recieveMessage(msg)) {
       return;

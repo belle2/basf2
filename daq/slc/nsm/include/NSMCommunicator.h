@@ -44,6 +44,8 @@ namespace Belle2 {
     void sendRequest(const std::string& node, const std::string& cmd,
                      int npar, const int* pars,
                      int len, const char* data) throw(NSMHandlerException);
+    void sendExclude(const NSMNode& node) throw(NSMHandlerException);
+    void sendInclude(const NSMNode& node) throw(NSMHandlerException);
     void replyOK(const NSMNode& node) throw(NSMHandlerException);
     void replyError(int error, const std::string& message = "")
     throw(NSMHandlerException);

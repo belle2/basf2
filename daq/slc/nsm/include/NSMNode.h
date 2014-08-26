@@ -13,7 +13,9 @@ namespace Belle2 {
 
   public:
     NSMNode(const std::string& name = "")
-      : m_name(name), m_id(-1), m_index(-1), m_error(0) {}
+      : m_name(name), m_id(-1), m_index(-1), m_error(0) {
+      m_excluded = false;
+    }
     virtual ~NSMNode() throw() {}
 
   public:
@@ -37,12 +39,15 @@ namespace Belle2 {
       m_connection = connection;
     }
     int getError() const throw() { return m_error; }
+    bool isExcluded() const throw() { return m_excluded; }
+    void setExcluded(bool excluded) throw() { m_excluded = excluded; }
 
   protected:
     std::string m_name;
     int m_id;
     int m_index;
     unsigned int m_error;
+    bool m_excluded;
     bool m_used;
     bool m_sync;
     NSMState m_state;

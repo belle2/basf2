@@ -33,6 +33,8 @@ namespace Belle2 {
     virtual bool fatal() throw() { return true; }
     virtual bool log() throw() { return true; }
     virtual bool state() throw() { return true; }
+    virtual bool exclude() throw() { return true; }
+    virtual bool include() throw() { return true; }
     virtual void timeout() throw() {}
     bool isReady() const throw();
 

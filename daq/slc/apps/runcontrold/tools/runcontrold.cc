@@ -26,7 +26,9 @@ int main(int argc, char** argv)
   const int port = config.getInt("provider.port");
   NSMNode node(name);
   RunControlCallback* callback =
-    new RunControlCallback(node, config.get("runtype"), port);
+    new RunControlCallback(node, config.get("runtype"),
+                           config.get("nsm.mem.format"),
+                           config.getInt("nsm.mem.revision"), port);
   RunControlMasterCallback* master_callback =
     new RunControlMasterCallback(node, callback);
   callback->setDB(db);

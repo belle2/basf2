@@ -4,6 +4,7 @@
 #include "daq/slc/readout/ronode_status.h"
 
 #include <daq/slc/system/LogFile.h>
+#include <daq/slc/system/Time.h>
 
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/base/ConfigFile.h>
@@ -58,12 +59,15 @@ bool ROCallback::load() throw()
 
 bool ROCallback::start() throw()
 {
-  m_con.start();
-  return true;
+  ronode_status* status = (ronode_status*)m_data.get();
+  status->stime = Time().getSecond();
+  return m_con.start();
 }
 
 bool ROCallback::stop() throw()
 {
+  ronode_status* status = (ronode_status*)m_data.get();
+  status->stime = 0;
   return true;
 }
 
@@ -96,9 +100,11 @@ bool ROCallback::abort() throw()
 void ROCallback::timeout() throw()
 {
   if (m_data.isAvailable() && m_flow.isAvailable()) {
-    ronode_status* status = (ronode_status*)m_data.get();
-    ronode_status& info(m_flow.monitor());
-    memcpy(status, &info, sizeof(ronode_status));
+    ronode_status* nsm = (ronode_status*)m_data.get();
+    ronode_status& status(m_flow.monitor());
+    uint32 stime = nsm->stime;
+    memcpy(nsm, &status, sizeof(ronode_status));
+    nsm->stime = stime;
   }
 }
 

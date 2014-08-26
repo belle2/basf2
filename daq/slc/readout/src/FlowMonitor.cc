@@ -47,36 +47,53 @@ ronode_status& FlowMonitor::monitor()
     m_status.expno = info.expno;
     m_status.runno = info.runno;
     m_status.subno = info.subno;
-    m_status.reserved[0] = info.reserved[0];
-    m_status.reserved[1] = info.reserved[1];
+    m_status.reserved_i[0] = info.reserved[0];
+    m_status.reserved_i[1] = info.reserved[1];
+    m_status.reserved_f[0] = info.reserved_f[0];
+    m_status.reserved_f[1] = info.reserved_f[1];
+    m_status.reserved_f[2] = info.reserved_f[2];
+    m_status.reserved_f[3] = info.reserved_f[3];
     m_status.ctime = ctime;
 
     double dcount;
     double dnbyte;
-    for (int j = 0; j < 2; j++) {
-      m_status.io[j].freq = 0;
-      m_status.io[j].evtsize = 0;
-      m_status.io[j].rate = 0;
-      if (m_ioinfo[j].getLocalPort() > 0) {
-        m_status.io[j].state = m_ioinfo[j].getState();
-        if (j == 0) {
-          m_status.io[j].nqueue = m_ioinfo[j].getRXQueue();
-        } else {
-          m_status.io[j].nqueue = m_ioinfo[j].getTXQueue();
-        }
-      }
-      if ((dcount = info.io[j].count - m_status.io[j].count) > 0) {
-        dnbyte = info.io[j].nbyte - m_nbyte[j];
-        m_status.io[j].freq = dcount / length / 1000.;
-        m_status.io[j].evtsize = dnbyte / dcount / 1000.;
-        m_status.io[j].rate = dnbyte / length / 1000000.;
-        m_status.io[j].count = info.io[j].count;
-        m_nbyte[j] = info.io[j].nbyte;
-      } else {
-        m_status.io[j].freq = 0;
-        m_status.io[j].evtsize = 0;
-        m_status.io[j].rate = 0;
-      }
+    m_status.evtrate_in = 0;
+    m_status.evtsize_in = 0;
+    m_status.flowrate_in = 0;
+    m_status.evtrate_out = 0;
+    m_status.evtsize_out = 0;
+    m_status.flowrate_out = 0;
+    if (m_ioinfo[0].getLocalPort() > 0) {
+      m_status.connection_in = m_ioinfo[0].getState();
+      m_status.nqueue_in = m_ioinfo[0].getRXQueue();
+    }
+    if (m_ioinfo[1].getLocalPort() > 0) {
+      m_status.connection_out = m_ioinfo[1].getState();
+      m_status.nqueue_out = m_ioinfo[1].getRXQueue();
+    }
+    if ((dcount = info.io[0].count - m_status.nevent_in) > 0) {
+      dnbyte = info.io[0].nbyte - m_nbyte[0];
+      m_status.evtrate_in = dcount / length / 1000.;
+      m_status.evtsize_in = dnbyte / dcount / 1000.;
+      m_status.flowrate_in = dnbyte / length / 1000000.;
+      m_status.nevent_in = info.io[0].count;
+      m_nbyte[0] = info.io[0].nbyte;
+    } else {
+      m_status.evtrate_in = 0;
+      m_status.evtsize_in = 0;
+      m_status.flowrate_in = 0;
+    }
+    if ((dcount = info.io[1].count - m_status.nevent_out) > 0) {
+      dnbyte = info.io[1].nbyte - m_nbyte[1];
+      m_status.evtrate_out = dcount / length / 1000.;
+      m_status.evtsize_out = dnbyte / dcount / 1000.;
+      m_status.flowrate_out = dnbyte / length / 1000000.;
+      m_status.nevent_out = info.io[1].count;
+      m_nbyte[1] = info.io[1].nbyte;
+    } else {
+      m_status.evtrate_out = 0;
+      m_status.evtsize_out = 0;
+      m_status.flowrate_out = 0;
     }
   }
   return m_status;

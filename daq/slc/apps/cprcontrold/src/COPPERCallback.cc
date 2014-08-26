@@ -3,6 +3,7 @@
 #include <daq/slc/readout/ronode_status.h>
 
 #include <daq/slc/system/LogFile.h>
+#include <daq/slc/system/Time.h>
 
 #include <daq/slc/nsm/NSMCommunicator.h>
 
@@ -134,24 +135,18 @@ void COPPERCallback::timeout() throw()
     com.sendLog(DAQLogMessage(name, LogFile::ERROR, msg));
   }
   */
-  ronode_status* nsm = (ronode_status*)m_data.get();
   if (m_data.isAvailable() && m_flow.isAvailable()) {
+    ronode_status* nsm = (ronode_status*)m_data.get();
     ronode_status& status(m_flow.monitor());
     status.eflag |= (eflag & 0xFF);
-    /*
-    if ((getNode().getState() != RCState::RUNNING_S ||
-    getNode().getState() != RCState::READY_S) && eflag > 0) {
-      getNode().setState(RCState::RECOVERING_RS);
-      sendPause();
-    }
-    */
+    uint32 stime = nsm->stime;
     memcpy(nsm, &status, sizeof(ronode_status));
-  }
-
-  if (((eflag >> 8) & 0xF) == 0) {
-    nsm->io[0].state = 1;
-  } else {
-    nsm->io[0].state = -1;
+    nsm->stime = stime;
+    if (((eflag >> 8) & 0xF) == 0) {
+      nsm->connection_in = 1;
+    } else {
+      nsm->connection_in = -1;
+    }
   }
 }
 
@@ -173,11 +168,15 @@ bool COPPERCallback::load() throw()
 
 bool COPPERCallback::start() throw()
 {
+  ronode_status* status = (ronode_status*)m_data.get();
+  status->stime = Time().getSecond();
   return m_con.start();
 }
 
 bool COPPERCallback::stop() throw()
 {
+  ronode_status* status = (ronode_status*)m_data.get();
+  status->stime = 0;
   return m_con.stop();
 }
 

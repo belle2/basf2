@@ -46,35 +46,44 @@ int main(int argc, char** argv)
     ftruncate(1, 0);
     printf(" exp = %04u run = %04u\n", info->expno, info->runno);
     printf(" # of files: %4u, # of bytes : %4.2f [GB]\n", info->nfiles, info->nbytes / 1024);
-    printf(" rxqueue from eb2rx    : %4.1f [kB]\n", (float)(info->io[0].nqueue / 1024.));
-    printf(" data in input  buffer : %4.1f [kB]\n", (float)(info->io[1].nqueue * 4 / 1024.));
-    printf(" data in record buffer : %4.1f [kB]\n", (float)(info->io[2].nqueue * 4 / 1024.));
+    printf(" rxqueue from eb2rx    : %4.1f [kB]\n", (float)(info->node[0].nqueue_in / 1024.));
+    printf(" data in input  buffer : %4.1f [kB]\n", (float)(info->node[0].nqueue_out * 4 / 1024.));
+    printf(" data in record buffer : %4.1f [kB]\n", (float)(info->node[1].nqueue_in * 4 / 1024.));
     printf("\n");
-    printf(" %13s |      count | freq [kHz] | rate [MB/s] | evtsize [kB]\n", "node");
-    for (int i = 0; i < 14; i++) {
-      storage_status::io_status& nio(info->io[i]);
-      if (i == 4 || i == 5) continue;
+    printf(" %13s | in |      count | freq [kHz] | rate [MB/s] | evtsize [kB]", "node");
+    printf(" out |      count | freq [kHz] | rate [MB/s] | evtsize [kB]\n");
+    for (int i = 0; i < 7; i++) {
+      storage_status::node_status& node(info->node[i]);
+      if (i == 2) continue;
       std::string name = "basf2";
-      if (i == 0 || i == 1) {
+      if (i == 0) {
         name = "input";
-      } else if (i == 2 || i == 3) {
+      } else if (i == 1) {
         name = "record";
       } else {
         name = StringUtil::form("basf2_%d", i / 2);
       }
-      if (i % 2 == 0) name += " (in)";
-      else name += " (out)";
-      if (nio.freq == 0) {
+      printf(" %-13s ", name.c_str());
+      if (node.evtrate_in == 0) {
         printf("\x1b[49m\x1b[31m");
       } else {
         printf("\x1b[49m\x1b[32m");
       }
-      printf(" %-13s | %s | %10s | %11s | %12s\x1b[49m\x1b[39m\n",
-             name.c_str(),
-             StringUtil::form("%10u", nio.count).c_str(),
-             StringUtil::form("%02.2f", nio.freq).c_str(),
-             StringUtil::form("%04.2f", nio.rate).c_str(),
-             StringUtil::form("%03.2f", nio.evtsize).c_str());
+      printf("| %s | %10s | %11s | %12s \x1b[49m\x1b[39m",
+             StringUtil::form("%10u", node.nevent_in).c_str(),
+             StringUtil::form("%02.2f", node.evtrate_in).c_str(),
+             StringUtil::form("%04.2f", node.flowrate_in).c_str(),
+             StringUtil::form("%03.2f", node.evtsize_in).c_str());
+      if (node.evtrate_out == 0) {
+        printf("\x1b[49m\x1b[31m");
+      } else {
+        printf("\x1b[49m\x1b[32m");
+      }
+      printf("| %s | %10s | %11s | %12s\x1b[49m\x1b[39m\n",
+             StringUtil::form("%10u", node.nevent_out).c_str(),
+             StringUtil::form("%02.2f", node.evtrate_out).c_str(),
+             StringUtil::form("%04.2f", node.flowrate_out).c_str(),
+             StringUtil::form("%03.2f", node.evtsize_out).c_str());
     }
     printf("\n");
     for (int i = 0; i < 11; i++) {

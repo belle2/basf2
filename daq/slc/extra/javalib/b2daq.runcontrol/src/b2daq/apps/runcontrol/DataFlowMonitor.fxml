@@ -27,7 +27,7 @@
                     <children>
                         <HBox alignment="CENTER_LEFT" minHeight="35.0" prefHeight="49.0" prefWidth="292.0" VBox.vgrow="NEVER">
                             <children>
-                                <Label text="R/O State:">
+                                <Label text="HLT State:">
                                     <HBox.margin>
                                         <Insets right="10.0" />
                                     </HBox.margin>
@@ -37,18 +37,18 @@
                         </HBox>
                         <GridPane hgap="10.0">
                             <columnConstraints>
-                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="93.0" minWidth="10.0" prefWidth="54.0" />
-                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="141.0" minWidth="0.0" prefWidth="30.0" />
-                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="189.0" minWidth="10.0" prefWidth="76.0" />
-                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="169.0" minWidth="10.0" prefWidth="27.0" />
-                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="135.0" minWidth="10.0" prefWidth="69.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="93.0" minWidth="10.0" prefWidth="45.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="141.0" minWidth="0.0" prefWidth="29.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="189.0" minWidth="10.0" prefWidth="62.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="169.0" minWidth="10.0" prefWidth="30.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="135.0" minWidth="10.0" prefWidth="71.0" />
                             </columnConstraints>
                             <rowConstraints>
                                 <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
                             </rowConstraints>
                             <children>
-                                <Label fx:id="label_src" text="Sender" />
-                                <Label fx:id="label_dest" text="Receiver" GridPane.columnIndex="4" />
+                                <Label fx:id="label_src" text="eb1rx" />
+                                <Label fx:id="label_dest" text="eb2tx" GridPane.columnIndex="4" />
                                 <CanvasPanel minHeight="10.0" minWidth="20.0" prefHeight="30.0" prefWidth="20.0" GridPane.columnIndex="1">
                                     <canvas>
                                         <HistogramCanvas fx:id="c_in" fillColor="transparent" lineColor="transparent" name="c_node0_cur_gr" stat="false" title="">
@@ -62,7 +62,7 @@
                                         </HistogramCanvas>
                                     </canvas>
                                 </CanvasPanel>
-                                <Label fx:id="label_nodename" minHeight="45.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="45.0" prefWidth="82.0" text="NODENAME" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="SOMETIMES">
+                                <Label fx:id="label_nodename" minHeight="45.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="45.0" prefWidth="99.0" text="node" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="SOMETIMES">
                                     <font>
                                         <Font name="System Bold" size="13.0" />
                                     </font>
@@ -107,31 +107,31 @@
                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                     </HBox.margin>
                 </VBox>
-                <TableView fx:id="table_stat" prefHeight="215.0" prefWidth="523.0">
+                <TableView fx:id="table_stat" prefHeight="125.0" prefWidth="555.0">
                     <columns>
                         <TableColumn fx:id="col_io" prefWidth="40.0" text="I/O">
                             <cellValueFactory>
                                 <PropertyValueFactory property="iotype" />
                             </cellValueFactory>
                         </TableColumn>
-                        <TableColumn fx:id="col_count" text="Count">
+                        <TableColumn fx:id="col_count" prefWidth="64.0" text="Count">
                             <cellValueFactory>
                                 <PropertyValueFactory property="count" />
                             </cellValueFactory>
                         </TableColumn>
-                        <TableColumn fx:id="col_rate" prefWidth="129.0" text="Count rate [Hz]">
+                        <TableColumn fx:id="col_rate" prefWidth="127.0" text="Count rate [Hz]">
                             <cellValueFactory>
                                 <PropertyValueFactory property="freq" />
                             </cellValueFactory>
                         </TableColumn>
-                        <TableColumn fx:id="col_size" prefWidth="126.0" text="Event size [kB]">
-                            <cellValueFactory>
-                                <PropertyValueFactory property="size" />
-                            </cellValueFactory>
-                        </TableColumn>
-                        <TableColumn fx:id="col_size1" prefWidth="140.0" text="Event rate [kB/s]">
+                        <TableColumn fx:id="col_size1" prefWidth="140.0" text="Flow rate [kB/s]">
                             <cellValueFactory>
                                 <PropertyValueFactory property="rate" />
+                            </cellValueFactory>
+                        </TableColumn>
+                        <TableColumn fx:id="col_size" prefWidth="117.0" text="Event size [kB]">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="size" />
                             </cellValueFactory>
                         </TableColumn>
                     </columns>
@@ -162,8 +162,8 @@
                                     <GLine lineColor="red" lineWidth="2" x1="0.52" x2="0.58" y1="0.15" y2="0.15" />
                                     <GText alignment="midle left" fontSize="0.6" text="Input" x="0.35" y="0.19" />
                                     <GText alignment="midle left" fontSize="0.6" text="Output" x="0.60" y="0.19" />
-                                    <GText alignment="midle center" angle="270" fontSize="0.7" text="Event size" x="0.04" y="0.6" />
-                                    <GText alignment="midle center" angle="270" fontSize="0.7" text="[kB/event]" x="0.07" y="0.6" />
+                                    <GText alignment="midle center" angle="270" fontSize="0.7" text="Count rate" x="0.04" y="0.6" />
+                                    <GText alignment="midle center" angle="270" fontSize="0.7" text="[kHz]" x="0.07" y="0.6" />
                                 </FXCollections>
                             </shapes>
                         </HistogramCanvas>
@@ -183,8 +183,8 @@
                             </histograms>
                             <shapes>
                                 <FXCollections fx:factory="observableArrayList">
-                                    <GText alignment="midle center" angle="270" fontSize="0.7" text="Event rate" x="0.04" y="0.4" />
-                                    <GText alignment="midle center" angle="270" fontSize="0.7" text="[kHz]" x="0.07" y="0.4" />
+                                    <GText alignment="midle center" angle="270" fontSize="0.7" text="Flow rate" x="0.04" y="0.4" />
+                                    <GText alignment="midle center" angle="270" fontSize="0.7" text="[kB/s]" x="0.07" y="0.4" />
                                 </FXCollections>
                             </shapes>
                         </HistogramCanvas>

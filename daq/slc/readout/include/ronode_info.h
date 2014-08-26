@@ -1,8 +1,9 @@
-#ifndef ronode_info_h
-#define ronode_info_h
+#ifndef _Belle2_ronode_info_h
+#define _Belle2_ronode_info_h
 
-#define IO_NOTUSED 0
-#define IO_DISCONNECTED -1
+extern "C" {
+#include <nsm2/nsm2.h>
+}
 
 const int ronode_info_revision = 1;
 
@@ -14,6 +15,7 @@ struct ronode_info {
   unsigned int runno;
   unsigned int subno;
   unsigned int reserved[2];
+  float reserved_f[4];
   struct io_info {
     int port;
     unsigned int addr;

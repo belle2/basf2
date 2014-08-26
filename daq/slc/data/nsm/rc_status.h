@@ -7,15 +7,9 @@ extern "C" {
 
 namespace Belle2 {
 
-  const int rc_status_revision = 2;
+  const int rc_status_revision = 4;
 
   struct rc_status {
-    struct node_status {
-      uint32 error;
-      uint32 state;
-      uint32 configid;
-      uint32 eflag;
-    } node[20];
     uint32 nnodes;
     uint32 state;
     uint32 configid;
@@ -24,6 +18,12 @@ namespace Belle2 {
     uint32 subno;
     uint32 stime;
     uint32 ctime;
+    struct node_status {
+      uint32 state;
+      uint32 configid;
+      uint32 excluded;
+      uint32 eflag;
+    } node[20];
   };
 
 }

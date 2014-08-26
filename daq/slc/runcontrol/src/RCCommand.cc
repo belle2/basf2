@@ -13,8 +13,6 @@ const RCCommand RCCommand::RECOVER(107, "RECOVER");
 const RCCommand RCCommand::ABORT(108, "ABORT");
 const RCCommand RCCommand::TRIGFT(109, "TRIGFT");
 const RCCommand RCCommand::STATECHECK(110, "STATECHECK");
-const RCCommand RCCommand::EXCLUDE(111, "EXCLUDE");
-const RCCommand RCCommand::INCLUDE(112, "INCLUDE");
 
 const RCCommand& RCCommand::operator=(const std::string& label) throw()
 {
@@ -28,8 +26,6 @@ const RCCommand& RCCommand::operator=(const std::string& label) throw()
   else if (label == ABORT.getLabel()) *this = ABORT;
   else if (label == TRIGFT.getLabel()) *this = TRIGFT;
   else if (label == STATECHECK.getLabel()) *this = STATECHECK;
-  else if (label == EXCLUDE.getLabel()) *this = EXCLUDE;
-  else if (label == INCLUDE.getLabel()) *this = INCLUDE;
   else *this = Enum::UNKNOWN;
   return *this;
 }
@@ -46,8 +42,6 @@ const RCCommand& RCCommand::operator=(int id) throw()
   else if (id == ABORT.getId()) *this = ABORT;
   else if (id == STATECHECK.getId()) *this = STATECHECK;
   else if (id == TRIGFT.getId()) *this = TRIGFT;
-  else if (id == EXCLUDE.getId()) *this = EXCLUDE;
-  else if (id == INCLUDE.getId()) *this = INCLUDE;
   else *this = Enum::UNKNOWN;
   return *this;
 }
@@ -76,8 +70,7 @@ int RCCommand::isAvailable(const RCState& state) const throw()
   } else if (*this == RESUME && state == RCState::PAUSED_S) {
     return ENABLED;
   } else if (*this == RECOVER || *this == STATECHECK ||
-             *this == ABORT || *this == RECOVER ||
-             *this == EXCLUDE || *this == INCLUDE) {
+             *this == ABORT || *this == RECOVER) {
     return ENABLED;
   } else if (state == RCState::ERROR_ES) {
     return ENABLED;

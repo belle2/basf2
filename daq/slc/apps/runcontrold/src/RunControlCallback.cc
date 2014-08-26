@@ -3,6 +3,7 @@
 #include <daq/slc/apps/runcontrold/RunSetting.h>
 #include <daq/slc/apps/runcontrold/RunSummary.h>
 #include <daq/slc/apps/runcontrold/rc_status.h>
+#include <daq/slc/apps/runcontrold/rorc_status.h>
 
 #include <daq/slc/readout/ronode_status.h>
 
@@ -12,6 +13,7 @@
 #include <daq/slc/nsm/NSMCommunicator.h>
 
 #include <daq/slc/system/LogFile.h>
+#include <daq/slc/system/Time.h>
 #include <daq/slc/system/TCPServerSocket.h>
 #include <daq/slc/system/TCPSocketReader.h>
 #include <daq/slc/system/TCPSocketWriter.h>
@@ -26,13 +28,11 @@ using namespace Belle2;
 
 RunControlCallback::RunControlCallback(const NSMNode& node,
                                        const std::string& runtype,
-                                       int port)
+                                       const std::string& format,
+                                       int revision, int port)
   : RCCallback(node), m_setting(node)
 {
-  add(RCCommand::EXCLUDE);
-  add(RCCommand::INCLUDE);
-  m_data = NSMData(node.getName() + "_STATUS",
-                   "rc_status", rc_status_revision);
+  m_data = NSMData(node.getName() + "_STATUS", format, revision);
   m_runtype_default = runtype;
   m_port = port;
   m_callback = NULL;
@@ -149,7 +149,6 @@ void RunControlCallback::timeout() throw()
 
 void RunControlCallback::update() throw()
 {
-  rc_status* status = (rc_status*)m_data.get();
   ConfigObjectList& obj_v(getConfig().getObject().getObjects("node"));
   for (size_t i = 0; i < m_data_v.size(); i++) {
     NSMData& data(m_data_v[i]);
@@ -164,10 +163,6 @@ void RunControlCallback::update() throw()
   }
   RCState state(m_node_v[0].getState());
   for (size_t i = 0; i < m_node_v.size(); i++) {
-    status->node[i].error = m_node_v[i].getError();
-    status->node[i].state = m_node_v[i].getState().getId();
-    DBObject& obj(obj_v[i].getObject("runtype"));
-    status->node[i].configid = obj.getId();
     if (state != m_node_v[i].getState()) {
       state = RCState::UNKNOWN;
     }
@@ -175,9 +170,48 @@ void RunControlCallback::update() throw()
   if (state != RCState::UNKNOWN) {
     getNode().setState(state);
   }
+  void* data = m_data.get();
+  rc_status* status = (rc_status*)data;
+  bool isro = m_data.getFormat().find("rorc_status") != std::string::npos;
+  for (size_t i = 0; i < m_node_v.size(); i++) {
+    status->node[i].eflag = m_node_v[i].getError();
+    status->node[i].state = m_node_v[i].getState().getId();
+    status->node[i].excluded = m_node_v[i].isExcluded();
+    DBObject& obj(obj_v[i].getObject("runtype"));
+    status->node[i].configid = obj.getId();
+    if (isro && m_data_v[i].isAvailable() &&
+        m_data_v[i].getFormat() == "ronode_status") {
+      rorc_status::ro_status* rost = &(((rorc_status*)data)->ro[i]);
+      ronode_status* ronode = (ronode_status*)m_data_v[i].get();
+      rost->nevent_in = ronode->nevent_in;
+      rost->nqueue_in = ronode->nqueue_in;
+      rost->connection_in = ronode->connection_in;
+      rost->nevent_out = ronode->nevent_out;
+      rost->nqueue_out = ronode->nqueue_out;
+      rost->connection_out = ronode->connection_out;
+      rost->reserved_i[0] = ronode->reserved_i[0];
+      rost->reserved_i[1] = ronode->reserved_i[1];
+      rost->evtrate_in = ronode->evtrate_in;
+      rost->evtsize_in = ronode->evtsize_in;
+      rost->flowrate_in = ronode->flowrate_in;
+      rost->evtrate_out = ronode->evtrate_out;
+      rost->evtsize_out = ronode->evtsize_out;
+      rost->flowrate_out = ronode->flowrate_out;
+      rost->loadave = ronode->loadave;
+      rost->reserved_f[0] = ronode->reserved_f[0];
+      rost->reserved_f[1] = ronode->reserved_f[1];
+      rost->reserved_f[2] = ronode->reserved_f[2];
+      rost->reserved_f[3] = ronode->reserved_f[3];
+      rost->reserved_f[4] = ronode->reserved_f[4];
+    }
+  }
   status->state = getNode().getState().getId();
   status->configid = getConfig().getObject().getId();
   status->nnodes = m_node_v.size();
+  status->expno = m_info.getExpNumber();
+  status->runno = m_info.getRunNumber();
+  status->subno = m_info.getSubNumber();
+  status->ctime = Time().getSecond();
 }
 
 bool RunControlCallback::ok() throw()
@@ -274,7 +308,7 @@ bool RunControlCallback::synchronize(NSMNode& node) throw()
   if (!state.isStable()) return false;
   NSMNodeIterator it = m_node_v.begin();
   for (; it != m_node_v.end(); it++) {
-    if (state != it->getState()) {
+    if (!it->isExcluded() && state != it->getState()) {
       return false;
     }
   }
@@ -287,26 +321,36 @@ void RunControlCallback::prepareRun(NSMMessage& msg) throw()
   size_t expno = (msg.getNParams() > 0) ? msg.getParam(0) : 0;
   size_t runno = (msg.getNParams() > 1) ? msg.getParam(1) : 0;
   size_t subno = (msg.getNParams() > 2) ? msg.getParam(2) : 0;
-  RunNumberInfoTable table(getDB());
-  m_info = table.add(expno, runno, subno);
-  msg.setNParams(3);
-  msg.setParam(0, m_info.getExpNumber());
-  msg.setParam(1, m_info.getRunNumber());
-  msg.setParam(2, m_info.getSubNumber());
-  rc_status* status = (rc_status*)m_data.get();
-  status->expno = m_info.getExpNumber();
-  status->runno = m_info.getRunNumber();
-  status->subno = m_info.getSubNumber();
-  status->stime = m_info.getRecordTime();
-  m_setting.setRunNumber(m_info);
-  if (msg.getLength() > 0) {
-    StringList str_v = StringUtil::split(msg.getData(), '\n', 2);
-    m_setting.setOperators(str_v[0]);
-    m_setting.setComment(str_v[1]);
+  size_t stime = (msg.getNParams() > 3) ? msg.getParam(3) : 0;
+  if (msg.getNParams() < 2) {
+    RunNumberInfoTable table(getDB());
+    m_info = table.add(expno, runno, subno);
+    msg.setNParams(4);
+    msg.setParam(0, m_info.getExpNumber());
+    msg.setParam(1, m_info.getRunNumber());
+    msg.setParam(2, m_info.getSubNumber());
+    msg.setParam(3, m_info.getRecordTime());
+    expno = m_info.getExpNumber();
+    runno = m_info.getRunNumber();
+    subno = m_info.getSubNumber();
+    stime = m_info.getRecordTime();
+    m_setting.setRunNumber(m_info);
+    if (msg.getLength() > 0) {
+      StringList str_v = StringUtil::split(msg.getData(), '\n', 2);
+      m_setting.setOperators(str_v[0]);
+      m_setting.setComment(str_v[1]);
+    }
   }
+  rc_status* status = (rc_status*)m_data.get();
+  status->expno = expno;
+  status->runno = runno;
+  status->subno = subno;
+  status->stime = stime;
+  status->configid = getConfig().getObject().getId();
   m_setting.setRunControl(getConfig().getObject());
   LoggerObjectTable(getDB()).add(m_setting);
   getDB()->close();
+  update();
 }
 
 void RunControlCallback::postRun(NSMMessage&) throw()
@@ -344,7 +388,7 @@ bool RunControlCallback::send(NSMMessage msg) throw()
   }
   const size_t nobj = getConfig().getObject().getNObjects("node");
   for (size_t i = 0; i < nobj; i++) {
-    if (msg.getNodeName() == m_node_v[i].getName()) {
+    if (!m_node_v[i].isExcluded() && msg.getNodeName() == m_node_v[i].getName()) {
       if (cmd == RCCommand::LOAD) {
         const DBObject& obj(getConfig().getObject().getObject("node", i));
         const DBObject& cobj(obj.getObject("runtype"));
@@ -486,4 +530,36 @@ bool RunControlCallback::log() throw()
     }
   }
   return true;
+}
+
+bool RunControlCallback::exclude() throw()
+{
+  const NSMMessage& msg(getMessage());
+  NSMNodeIterator it = find(msg.getNodeName());
+  try {
+    if (it != m_node_v.end()) {
+      NSMNode& node(*it);
+      node.setExcluded(true);
+    }
+    return true;
+  } catch (const NSMHandlerException& e) {
+
+  }
+  return false;
+}
+
+bool RunControlCallback::include() throw()
+{
+  const NSMMessage& msg(getMessage());
+  NSMNodeIterator it = find(msg.getNodeName());
+  try {
+    if (it != m_node_v.end()) {
+      NSMNode& node(*it);
+      node.setExcluded(false);
+    }
+    return true;
+  } catch (const NSMHandlerException& e) {
+
+  }
+  return false;
 }

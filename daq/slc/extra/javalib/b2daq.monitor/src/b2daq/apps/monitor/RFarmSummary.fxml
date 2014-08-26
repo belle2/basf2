@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import b2daq.hvcontrol.ui.*?>
+<?import javafx.collections.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.cell.*?>
+<?import b2daq.dqm.graphics.*?>
+<?import b2daq.dqm.ui.*?>
+<?import b2daq.dqm.core.*?>
+<?import b2daq.graphics.*?>
+<?import b2daq.runcontrol.ui.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="482.0" prefWidth="806.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <HBox prefHeight="64.0" prefWidth="806.0">
+            <children>
+                <VBox maxWidth="343.0" prefHeight="195.0" prefWidth="343.0" HBox.hgrow="NEVER">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" minHeight="35.0" prefHeight="49.0" prefWidth="292.0" VBox.vgrow="NEVER">
+                            <children>
+                                <Label text="HLT State:">
+                                    <HBox.margin>
+                                        <Insets right="10.0" />
+                                    </HBox.margin>
+                                </Label>
+                                <RCStateLabel fx:id="state" HBox.hgrow="ALWAYS" />
+                            </children>
+                        </HBox>
+                        <GridPane hgap="10.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="93.0" minWidth="10.0" prefWidth="42.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="141.0" minWidth="0.0" prefWidth="30.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="189.0" minWidth="10.0" prefWidth="97.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="169.0" minWidth="10.0" prefWidth="38.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="135.0" minWidth="10.0" prefWidth="45.0" />
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                            </rowConstraints>
+                            <children>
+                                <Label fx:id="label_src" text="eb1rx" />
+                                <Label fx:id="label_dest" text="eb2tx" GridPane.columnIndex="4" />
+                                <CanvasPanel minHeight="10.0" minWidth="20.0" prefHeight="30.0" prefWidth="20.0" GridPane.columnIndex="1">
+                                    <canvas>
+                                        <HistogramCanvas fx:id="c_in" fillColor="transparent" lineColor="transparent" name="c_node0_cur_gr" stat="false" title="">
+                                            <shapes>
+                                                <FXCollections fx:factory="observableArrayList">
+                                                    <GArrow headLength="0.3" headWidth="0.1" length="0.6" lineColor="red" lineWidth="2" width="0.4" x="0.05" y="0.3" />
+                                                    <GLine lineColor="red" lineWidth="2" x1="0.1" x2="0.9" y1="0.1" y2="0.9" />
+                                                    <GLine lineColor="red" lineWidth="2" x1="0.9" x2="0.1" y1="0.1" y2="0.9" />
+                                                </FXCollections>
+                                            </shapes>
+                                        </HistogramCanvas>
+                                    </canvas>
+                                </CanvasPanel>
+                                <Label fx:id="label_nodename" minHeight="45.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="45.0" prefWidth="99.0" text="hltin / hltout" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="SOMETIMES">
+                                    <font>
+                                        <Font name="System Bold" size="13.0" />
+                                    </font>
+                                </Label>
+                                <CanvasPanel minHeight="10.0" minWidth="10.0" prefHeight="30.0" prefWidth="47.0" GridPane.columnIndex="3">
+                                    <canvas>
+                                        <HistogramCanvas fx:id="c_out" fillColor="transparent" lineColor="transparent" name="c_node0_cur_gr" stat="false" title="">
+                                            <shapes>
+                                                <FXCollections fx:factory="observableArrayList">
+                                                    <GArrow headLength="0.3" headWidth="0.1" length="0.6" lineColor="red" lineWidth="2" width="0.4" x="0.05" y="0.3" />
+                                                    <GLine lineColor="red" lineWidth="2" x1="0.1" x2="0.9" y1="0.1" y2="0.9" />
+                                                    <GLine lineColor="red" lineWidth="2" x1="0.9" x2="0.1" y1="0.1" y2="0.9" />
+                                                </FXCollections>
+                                            </shapes>
+                                        </HistogramCanvas>
+                                    </canvas>
+                                </CanvasPanel>
+                            </children>
+                        </GridPane>
+                    </children>
+                    <HBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                    </HBox.margin>
+                </VBox>
+                <VBox prefHeight="85.0" prefWidth="425.0">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" minHeight="30.0" prefHeight="35.0" prefWidth="863.0" VBox.vgrow="ALWAYS">
+                            <children>
+                                <Label text="Run #:">
+                                    <HBox.margin>
+                                        <Insets right="10.0" />
+                                    </HBox.margin>
+                                </Label>
+                                <Label fx:id="label_runno" text="0000.0000.000" />
+                            </children>
+                            <VBox.margin>
+                                <Insets left="10.0" right="10.0" top="10.0" />
+                            </VBox.margin>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" minHeight="30.0" prefHeight="115.0" prefWidth="459.0">
+                            <children>
+                                <Label text="Update time:">
+                                    <HBox.margin>
+                                        <Insets right="10.0" />
+                                    </HBox.margin>
+                                </Label>
+                                <Label fx:id="label_ctime" text="--:--:-- ----/--/--" />
+                            </children>
+                            <VBox.margin>
+                                <Insets bottom="10.0" left="10.0" right="10.0" />
+                            </VBox.margin>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+        <TableView prefHeight="400.0" prefWidth="717.0" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="col_node" prefWidth="75.0" text="Node" />
+                <TableColumn fx:id="col_state" prefWidth="70.0" text="State" />
+                <TableColumn fx:id="col_loadave" text="Load ave" />
+                <TableColumn fx:id="col_count" text="Count" />
+                <TableColumn prefWidth="392.0" text="Flow rate">
+                    <columns>
+                        <TableColumn fx:id="col_flowrate_in" text="In" />
+                        <TableColumn fx:id="col_flowrate_out" minWidth="0.0" text="Out" />
+                    </columns>
+                </TableColumn>
+                <TableColumn prefWidth="392.0" text="Event rate">
+                    <columns>
+                        <TableColumn fx:id="col_evtrate_in" text="In" />
+                        <TableColumn fx:id="col_evtrate_out" minWidth="0.0" text="Out" />
+                    </columns>
+                </TableColumn>
+                <TableColumn prefWidth="132.0" text="Event size">
+                    <columns>
+                        <TableColumn fx:id="col_evtsize_in" text="In" />
+                        <TableColumn fx:id="col_evtsize_out" minWidth="0.0" text="Out" />
+                    </columns>
+                </TableColumn>
+            </columns>
+            <VBox.margin>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="5.0" />
+            </VBox.margin>
+        </TableView>
+    </children>
+</VBox>

@@ -122,7 +122,7 @@ function runJobBasf2 {
   echo "$jobNumber"
 
   cd "$jobDirectory"/"$jobNumber"
-  qsub -cwd -q medium -e error.log -o output.log -V basf2_script.sh | cut -f 3 -d ' ' > basf2_jobid
+  qsub -cwd -q short,medium,long -e error.log -o output.log -V basf2_script.sh | cut -f 3 -d ' ' > basf2_jobid
   cd -
 }
 
@@ -231,7 +231,7 @@ function checkJob {
   then
     echo "Job not finished yet"
   else
-    if [ ! -f "$jobDirectory"/"$jobNumber"/basf2_finished_successfully ]
+    if [ -f "$jobDirectory"/"$jobNumber"/basf2_finished_successfully ]
     then
       echo "Job finished during check"
     else
@@ -326,7 +326,7 @@ function main {
   fi
   scheduleJobs "$collectionDirectory" "$jobDirectory" "$nJobs"
 
-  sleep 10
+  sleep 300
 
   checkJobs "$collectionDirectory" "$jobDirectory"
   while [ $? -eq 0 ]
@@ -336,7 +336,7 @@ function main {
       echo "Too many jobs fail, I won't suffer this no more! Goodbye"
       exit 1
     fi
-    sleep 10
+    sleep 300
     checkJobs "$collectionDirectory" "$jobDirectory"
   done
 
@@ -345,5 +345,5 @@ function main {
 
 allMcFiles=( "$@" )
 setupEnvironment "/storage/6/tkeck/"
-main "collection" "jobs" "../basf2/analysis/examples/fullEventInterpretation.py" "5"
+main "FEI" "jobs" "../basf2/analysis/examples/fullEventInterpretation.py" "1000"
 

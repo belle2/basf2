@@ -163,13 +163,13 @@ class Sequence(object):
                 break
             for actor in ready:
                 results['Path'] = actor.path = basf2.create_path()
-                try:
-                    actor.provides = actor(results)
-                    results.update(actor.provides)
-                except Exception as e:
-                    print e.message
-                    print "Failed to execute actor!", actor.name
-                    actor.provides = {'dummy': None}
+                #try:
+                actor.provides = actor(results)
+                results.update(actor.provides)
+                #except Exception as e:
+                #    print e.message
+                #    print "Failed to execute actor!", actor.name
+                #    actor.provides = {'dummy': None}
             chain.append(ready)
 
         # Now the chain contains all actors with grantable requirements.

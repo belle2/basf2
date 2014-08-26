@@ -327,7 +327,7 @@ def FullEventInterpretation(path, particles):
                             channelPlaceholders=['Placeholders_{c}'.format(c=channel.name) for channel in particle.channels],
                             mcCounts='MCParticleCounts')
 
-    finalParticles = [particle for particle in particles if all(particle.identifier not in o.daughters for o in particles)]
+    finalParticles = [particle for particle in particles if all(particle.identifier not in o.daughters and pdg.conjugate(particle.name) + ':' + particle.label not in o.daughters for o in particles)]
     for finalParticle in finalParticles:
         seq.addFunction(VariablesToNTuple,
                         path='Path',

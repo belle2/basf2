@@ -170,7 +170,7 @@ def GetCuts(signal, bckgrd, efficiency, purity, ycut_to_xcuts):
     if nSignal == 0:
         channels = [channel for channel in signal.iterkeys()]
         B2WARNING("No signal present in any of these channels: " + (", ".join(channels)))
-        return {channel: (0, 0) for channel in signal.iterkeys()}
+        return {channel: [0, 0] for channel in signal.iterkeys()}
 
     def pythonEfficiencyFunc(ycut):
         return sum([GetNumberOfEventsInRange(s, ycut_to_xcuts(channel, ycut[0])) for (channel, s) in signal.iteritems()]) / float(nSignal)

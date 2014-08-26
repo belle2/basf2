@@ -131,7 +131,7 @@ def CountMCParticles(path, names):
     countNtuple = rootfile.Get('mccounts')
     keys = [str(k.GetName()) for k in countNtuple.GetListOfBranches()]
     getpdg = lambda x: x[len('NumberOfMCParticlesInEvent'):]  # makeROOTCompatible removes parenthesis from variable so we don't worry about them here
-    counter = {getpdg(key): sum([getattr(t, key) for t in countNtuple]) for key in keys}
+    counter = {getpdg(branch): countNtuple.GetEntries("Sum$({branch})".format(branch=branch)) for branch in keys}
     counter['NEvents'] = countNtuple.GetEntries()
 
     B2INFO("Loaded number of MCParticles for every pdg code seperatly")

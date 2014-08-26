@@ -116,6 +116,7 @@ def CountMCParticles(path, names):
         @param path the basf2 path
         @param names of all particles
     """
+    B2INFO("Load number of MCParticles for every pdg code seperatly")
     filename = 'mcParticlesCount.root'
 
     if not os.path.isfile(filename):
@@ -149,11 +150,12 @@ def LoadParticles(path):
     @param path the basf2 path
     @return Resource named ParticleLoader
     """
+    B2INFO("Adding ParticleLoader")
     if InputFile().treeContainsObject('Particles'):
         B2INFO("Preload Particles Array")
         return {'ParticleLoader': 'dummy', 'NotNeeded': None}
-    B2INFO("Load Particles Array")
     path.add_module(register_module('ParticleLoader'))
+    B2INFO("Added Particles Array")
     return {'ParticleLoader': 'dummy'}
 
 
@@ -166,6 +168,7 @@ def SelectParticleList(path, particleName, particleLabel, additionalDependencies
         @param additionalDependencies like particle loader
         @return Resource named RawParticleList_{particleName}:{particleLabel} corresponding ParticleList is stored as {particleName}:{hash}
     """
+    B2INFO("Enter: Select Particle List {p} with label {l}".format(p=particleName, l=particleLabel))
     userLabel = actorFramework.createHash(particleName, particleLabel)
     outputList = particleName + ':' + userLabel
 
@@ -190,6 +193,7 @@ def MakeAndMatchParticleList(path, particleName, particleLabel, channelName, dau
         @param preCut dictionary containing 'cutstring', a string which defines the cut which is applied before the combination of the daughter particles.
         @return Resource named RawParticleList_{channelName} corresponding list is stored as {particleName}:{hash}
     """
+    B2INFO("Enter: Make and Match Particle List {p} with label {l} for channel {c}".format(p=particleName, l=particleLabel, c=channelName))
     userLabel = actorFramework.createHash(particleName, particleLabel, channelName, daughterParticleLists, preCut)
     outputList = particleName + ':' + userLabel
 
@@ -219,6 +223,7 @@ def CopyParticleLists(path, particleName, particleLabel, inputLists, postCuts):
         @param postCuts list of dictionaries containing 'cutstring', a string which defines the cut which is applied after the reconstruction of the particle.
         @return Resource named ParticleList_{particleName}:{particleLabel} corresponding ParticleList is stored as {particleName}:{hash}
     """
+    B2INFO("Enter: Gather Particle List {p} with label {l}".format(p=particleName, l=particleLabel))
     inputLists, postCuts = actorFramework.removeNones(inputLists, postCuts)
     userLabel = actorFramework.createHash(particleName, particleLabel, inputLists, postCuts)
     outputList = particleName + ':' + userLabel
@@ -249,11 +254,13 @@ def LoadGeometry(path):
     @param path the basf2 path
     @return Resource named Geometry
     """
+    B2INFO("Adding Geometry and Gearbox to Path")
     gearbox = register_module('Gearbox')
     path.add_module(gearbox)
     geometry = register_module('Geometry')
     geometry.param('components', ['MagneticField'])
     path.add_module(geometry)
+    B2INFO("Added Geometry and Gearbox to Path")
     return {'Geometry': 'dummy'}
 
 
@@ -267,6 +274,7 @@ def FitVertex(path, channelName, particleList, daughterVertices, geometry):
         @param additional requirement to ensure that geometry module is loaded
         @return Resource named VertexFit_{channelName}
     """
+    B2INFO("Enter: Fitted vertex for channel {c}.".format(c=channelName))
     if particleList is None:
         B2INFO("Didn't fitted vertex for channel {c}, because channel is ignored.".format(c=channelName))
         return {'VertexFit_{c}'.format(c=channelName): None}
@@ -301,6 +309,7 @@ def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughte
         @param additionalDependencies like SignalProbability of all daughter particles if needed.
         @return Resource named PreCutHistogram_{channelName} providing root filename 'CutHistograms_{channelName}:{hash}.root'
     """
+    B2INFO("Enter: Create pre cut histogram for channel {c}.".format(c=channelName))
     if any([daughterParticleList is None for daughterParticleList in daughterParticleLists]) or any([x is None for x in additionalDependencies]):
         B2INFO("Create pre cut histogram for channel {c}. But channel is ignored.".format(c=channelName))
         return {'PreCutHistogram_{c}'.format(c=channelName): None}
@@ -340,7 +349,7 @@ def PreCutDetermination(channelNames, preCutConfigs, preCutHistograms):
         @param preCutHistograms filenames of the histogram files created for every channel by CreatePreCutHistogram
         @param Resource named PreCut_{channelName} for every channel providing a dictionary with the key 'cutstring'
     """
-
+    B2INFO("Enter: Calculation of pre cuts")
     results = {'PreCut_{c}'.format(c=channelName): None for channelName, _, __ in zip(*actorFramework.getNones(channelNames, preCutConfigs, preCutHistograms))}
     for channelName in channelNames:
         B2INFO("Calculate pre cut for channel {c}".format(c=channelName))
@@ -367,6 +376,7 @@ def PostCutDetermination(identifiers, postCutConfigs, signalProbabilities):
         @param signalProbabilities of the channels
         @param Resource named PostCut_{identifier} for every channel providing a dictionary with the key 'cutstring'
     """
+    B2INFO("Enter: Calculation of post cuts")
     results = {'PostCut_{i}'.format(i=identifier): None for identifier, _, __ in zip(*actorFramework.getNones(identifiers, postCutConfigs, signalProbabilities))}
     identifiers, postCutConfigs, signalProbabilities = actorFramework.removeNones(identifiers, postCutConfigs, signalProbabilities)
     for identifier, postCutConfig in zip(identifiers, postCutConfigs):
@@ -385,6 +395,7 @@ def SignalProbability(path, identifier, particleList, mvaConfig, additionalDepen
         @param additionalDependencies for variables like SignalProbability of daughters or VertexFit
         @return Resource named SignalProbability_{identifier} providing config filename
     """
+    B2INFO("Enter: Calculate SignalProbability for {i}. Run Teacher in extern process.".format(i=identifier))
     if particleList is None or any([d is None for d in additionalDependencies]):
         B2INFO("Calculate SignalProbability for {i}, but particle/channel is ignored".format(i=identifier))
         return{'SignalProbability_{i}'.format(i=identifier): None}
@@ -456,6 +467,7 @@ def VariablesToNTuple(path, particleIdentifier, particleList, signalProbability)
         @param signalProbability signalProbability as additional dependency
         @return Resource named VariablesToNTuple_{particleIdentifier} providing root filename
     """
+    B2INFO("Enter: Write variables to ntuple for particle {i}".format(i=particleIdentifier))
     if particleList is None or signalProbability is None:
         B2INFO("Write variables to ntuple for particle {p}. But list is ignored.".format(p=particleIdentifier))
         return {'VariablesToNTuple_{i}'.format(i=particleIdentifier): None}

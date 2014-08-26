@@ -154,14 +154,20 @@ class Sequence(object):
         # All ready actors are called with their required values and the results are updated with the provided return values of the actor.
         # Then all ready actors are added as a list to the chain.
         # If there are no ready actors, the resolution of the dependencies is finished (and maybe incomplete).
+        if verbose:
+            print "Start execution of Sequence"
         actors = [actor for actor in self.seq]
         results = dict()
         results['Path'] = True
         results['None'] = None
         chain = []
         while True:
+            if verbose:
+                print "Search for actors which are ready for execution"
             ready = filter(lambda item: all(requirement in results for requirement in item.requires), actors)
             actors = filter(lambda item: not all(requirement in results for requirement in item.requires), actors)
+            if verbose:
+                print "Found {n} actors which are ready for execution".format(n=len(ready))
             if len(ready) == 0:
                 break
             if nProcesses > 1:
@@ -176,7 +182,8 @@ class Sequence(object):
                 for actor in ready:
                     results['Path'] = actor.path = basf2.create_path()
                     actor.provides = actor(results)
-
+            if verbose:
+                print "Updating result dictionary"
             for actor in ready:
                 results.update(actor.provides)
             chain.append(ready)
@@ -187,6 +194,8 @@ class Sequence(object):
         # Every actor which provides a requirement of a needed actor is also needed, unless the provided value is None or the key NotNeeded.
         # We loop over the chain in reversed direction and add all needed actors to needed.
         # In the end we reverse the needed list, therefore every actor in the lists depends only on the previous actors in the list.
+        if verbose:
+            print "Select needed modules"
         needed = [actor for level in chain for actor in level if len(actor.provides) == 0]
         for level in reversed(chain):
             needed += list(reversed([actor for actor in level if 'NotNeeded' not in actor.provides and any((r in actor.provides and actor.provides[r] is not None) for n in needed for r in n.requires)]))
@@ -194,6 +203,8 @@ class Sequence(object):
 
         # Some modules are certified for parallel processing. Modules which aren't certified should run as late as possible!
         # Otherwise they slow down all following modules! Therefore we try to move these modules to the end of the needed list.
+        if verbose:
+            print "Optimize path"
         needed = self.optimizeForParallelProcessing(needed)
 
         # The modules in the basf2 path added by the actors are crucial to the FullEventInterpretation
@@ -205,6 +216,8 @@ class Sequence(object):
         if verbose:
             self.createDotGraphic(needed)
             self.printMissingDependencies(actors, results.keys())
+        if verbose:
+            print "Finished execution of Sequence"
 
     def optimizeForParallelProcessing(self, needed):
         """

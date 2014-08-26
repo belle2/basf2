@@ -197,11 +197,19 @@ def GetCuts(signal, bckgrd, efficiency, purity, ycut_to_xcuts):
 def GetNumberOfEventsInRange(histogram, (a, b)):
     """
     Calculates the number of events in the given histograms between a and b
+    Beware of nasty bug here, if b is exactly the upper edge of a bin, we had to make sure
+    that we don't count one bin more than we should!
     @param histograms Histograms
     @param a lower boundary
     @param b upper boundary
     """
-    return histogram.Integral(histogram.FindBin(a), histogram.FindBin(b))
+    low = histogram.FindBin(a)
+    if histogram.FindBin(a + histogram.GetBinWidth(low) / 2.0) != low:
+        low += 1
+    high = histogram.FindBin(b)
+    if histogram.FindBin(b - histogram.GetBinWidth(high) / 2.0) != high:
+        high -= 1
+    return histogram.Integral(low, high)
 
 
 def GetNumberOfEvents(histogram):
@@ -215,7 +223,7 @@ def GetNumberOfEvents(histogram):
 def GetIgnoredChannels(signal, bckgrd, cuts):
     """
     Returns the channels which should be ignored because the cuts are very tight and therefore
-    there's not enough statistic for an training.
+    there's not enough statistic for a training.
     @param signal signal histograms of the channels
     @param bckgrd background histograms of the channels
     @param cuts cuts on the x-axis of the channels

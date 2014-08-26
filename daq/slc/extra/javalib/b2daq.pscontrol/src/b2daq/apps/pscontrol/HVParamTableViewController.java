@@ -80,7 +80,6 @@ public class HVParamTableViewController implements Initializable {
         col_rampup.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<HVStatusProperty, Float>>() {
             @Override
             public void handle(TableColumn.CellEditEvent<HVStatusProperty, Float> t) {
-                System.out.println("KONNO");
                 for (Object item : table_hvconfig.getItems()) {
                     HVStatusProperty pro = ((HVStatusProperty) item);
                     pro.setTurnon(false);

@@ -83,9 +83,9 @@ public class DataFlowMonitorController implements Initializable, NSMObserver {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        c = new HistogramCanvas [] {c_in, c_out};
-        gr_rate = new TimedGraph1D[] {gr_rate_in, gr_rate_out};
-        gr_size = new TimedGraph1D[] {gr_size_in, gr_size_out};
+        c = new HistogramCanvas[]{c_in, c_out};
+        gr_rate = new TimedGraph1D[]{gr_rate_in, gr_rate_out};
+        gr_size = new TimedGraph1D[]{gr_size_in, gr_size_out};
         table_stat.getStyleClass().add("dataflow-table");
     }
 
@@ -115,8 +115,8 @@ public class DataFlowMonitorController implements Initializable, NSMObserver {
                         label_dest.setText("eb1tx");
                     }
                 }
-                NSMData data = NSMListenerService.getData(label_nodename.getText()+"_STATUS");
-                System.out.println("label_nodename : "+label_nodename.getText());
+                NSMData data = NSMListenerService.getData(label_nodename.getText() + "_STATUS");
+                System.out.println("label_nodename : " + label_nodename.getText());
                 if (data == null || !data.getFormat().matches("ronode_status")) {
                     return;
                 }
@@ -124,36 +124,49 @@ public class DataFlowMonitorController implements Initializable, NSMObserver {
                         data.getInt("runno"), data.getInt("subno")));
                 switch (data.getInt("state")) {
                     case 0:
-                    state.update(RCState.NOTREADY_S);
-                    break;
+                        state.update(RCState.NOTREADY_S);
+                        break;
                     case 1:
-                    state.update(RCState.READY_S);
-                    break;
+                        state.update(RCState.READY_S);
+                        break;
                     case 2:
-                    state.update(RCState.RUNNING_S);
-                    break;
+                        state.update(RCState.RUNNING_S);
+                        break;
                 }
-                if (table_stat.getItems().size() < data.getNObjects("io")) {
-                    table_stat.getItems().clear();
-                    for (int i = 0; i < data.getNObjects("io"); i++) {
-                        table_stat.getItems().add(new DataFlow((i==0?"IN":"OUT")));
-                    }
+                if (table_stat.getItems().size() == 0) {
+                    table_stat.getItems().add(new DataFlow());
+                    table_stat.getItems().add(new DataFlow());
                 }
                 long ctime = 1000l * data.getInt("ctime");
                 label_ctime.setText(dateformat.format(new Date(ctime)));
-                for (int i = 0; i < data.getNObjects("io"); i++) {
-                    NSMData cdata = (NSMData)data.getObject("io", i);
-                    DataFlow flow = (DataFlow)table_stat.getItems().get(i);
-                    flow.setCount(cdata.getInt("count"));
-                    flow.setFreq(cdata.getFloat("freq"));
-                    flow.setRate(cdata.getFloat("rate"));
-                    flow.setSize(cdata.getFloat("evtsize"));
-                    gr_rate[i].addPoint(cdata.getFloat("freq"));
-                    gr_size[i].addPoint(cdata.getFloat("evtsize"));
-                    //System.out.println("io["+i+"]state="+cdata.getInt("state"));
-                    setConnection(c[i], cdata.getInt("state"));
+                {
+                    DataFlow flow = (DataFlow) table_stat.getItems().get(0);
+                    if (flow.getNode().isEmpty()) {
+                        flow.setNode("In");
+                    }
+                    flow.setNqueueIn(data.getInt("nqueue_in"));
+                    flow.setNeventIn(data.getInt("nevent_in"));
+                    flow.setEvtrateIn(data.getFloat("evtrate_in"));
+                    flow.setFlowrateIn(data.getFloat("flowrate_in"));
+                    flow.setEvtsizeIn(data.getFloat("evtsize_in"));
+                    gr_rate_in.addPoint(data.getFloat("evtrate_in"));
+                    gr_size_in.addPoint(data.getFloat("evtsize_in"));
+                    setConnection(c_in, data.getInt("connection_in"));
                 }
-                c_in.update();
+                {
+                    DataFlow flow = (DataFlow) table_stat.getItems().get(1);
+                    if (flow.getNode().isEmpty()) {
+                        flow.setNode("Out");
+                    }
+                    flow.setNqueueIn(data.getInt("nqueue_out"));
+                    flow.setNeventIn(data.getInt("nevent_out"));
+                    flow.setEvtrateIn(data.getFloat("evtrate_out"));
+                    flow.setFlowrateIn(data.getFloat("flowrate_out"));
+                    flow.setEvtsizeIn(data.getFloat("evtsize_out"));
+                    gr_rate_out.addPoint(data.getFloat("evtrate_out"));
+                    gr_size_out.addPoint(data.getFloat("evtsize_out"));
+                    setConnection(c_out, data.getInt("connection_out"));
+                }
                 c_out.update();
                 c_rate.update();
                 c_size.update();

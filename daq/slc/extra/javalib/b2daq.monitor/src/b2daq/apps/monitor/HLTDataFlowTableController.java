@@ -8,7 +8,6 @@ package b2daq.apps.monitor;
 import b2daq.database.ConfigObject;
 import b2daq.dqm.graphics.HistogramCanvas;
 import b2daq.graphics.GShape;
-import b2daq.hvcontrol.core.HVState;
 import b2daq.logger.core.LogMessage;
 import b2daq.nsm.NSMCommand;
 import b2daq.nsm.NSMData;
@@ -28,19 +27,17 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.util.Callback;
 
 /**
  * FXML Controller class
  *
  * @author tkonno
  */
-public class StorageDataFlowTableController implements Initializable, NSMObserver {
+public class HLTDataFlowTableController implements Initializable, NSMObserver {
 
     @FXML
     private VBox pane;
@@ -61,8 +58,6 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
     @FXML
     private TableView table_stat;
     @FXML
-    private TableView table_disk;
-    @FXML
     private Label label_nodename;
     static private final SimpleDateFormat dateformat = new SimpleDateFormat("HH:mm:ss yyyy/MM/dd");
 
@@ -72,28 +67,8 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         table_stat.getStyleClass().add("dataflow-table");
-        label_src.setText("eb2rx");
-        label_dest.setText("expreco");
-        table_disk.setRowFactory(new Callback<TableView<DiskUsage>, TableRow<DiskUsage>>() {
-            @Override
-            public TableRow<DiskUsage> call(TableView<DiskUsage> tableView) {
-                final TableRow<DiskUsage> row = new TableRow<DiskUsage>() {
-                    @Override
-                    protected void updateItem(DiskUsage usage, boolean empty) {
-                        super.updateItem(usage, empty);
-                        if (!isEmpty()) {
-                            getStyleClass().removeAll("disk-full", "disk-fine");
-                            if (usage.getAvailable() < 10) {
-                                getStyleClass().add("disk-full");
-                            } else {
-                                getStyleClass().add("disk-fine");
-                            }
-                        }
-                    }
-                };
-                return row;
-            }
-        });
+        label_src.setText("eb1rx");
+        label_dest.setText("eb2tx");
     }
 
     @Override
@@ -109,62 +84,51 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
         try {
             NSMCommand command = new NSMCommand(msg.getReqName());
             if (command.equals(NSMCommand.NSMSET)) {
-                NSMData data = NSMListenerService.getData(label_nodename.getText() + "_STATUS");
-                if (data == null || !data.getFormat().matches("storage_status")) {
+                NSMData data = NSMListenerService.getData(label_nodename.getText()+"_STATUS");
+                ConfigObject cobj = NSMListenerService.getDB(label_nodename.getText());
+                if (data == null || !data.getFormat().matches("rfunitinfo")) {
                     return;
                 }
-                label_runno.setText(String.format("%04d.%04d.%03d", data.getInt("expno"),
-                        data.getInt("runno"), data.getInt("subno")));
+                //label_runno.setText(String.format("%04d.%04d.%03d", data.getInt("expno"),
+                //        data.getInt("runno"), data.getInt("subno")));
+                //data.print();
                 switch (data.getInt("state")) {
                     case 0:
-                        state.update(RCState.NOTREADY_S);
-                        break;
+                    state.update(RCState.NOTREADY_S);
+                    break;
                     case 1:
-                        state.update(RCState.READY_S);
-                        break;
+                    state.update(RCState.READY_S);
+                    break;
                     case 2:
-                        state.update(RCState.RUNNING_S);
-                        break;
+                    state.update(RCState.RUNNING_S);
+                    break;
                 }
-                if (table_disk.getItems().size() < data.getInt("ndisks")) {
-                    table_disk.getItems().clear();
-                    for (int i = 0; i < data.getInt("ndisks"); i++) {
-                        table_disk.getItems().add(new DiskUsage(String.format("disk%02d", i)));
-                    }
-                }
-                for (int i = 0; i < data.getInt("ndisks"); i++) {
-                    NSMData cdata = (NSMData) data.getObject("disk", i);
-                    DiskUsage disk = (DiskUsage) table_disk.getItems().get(i);
-                    disk.setStatus(100 - cdata.getFloat("available") <= 10 ? "FULL" : "FINE");
-                    disk.setAvailable(100 - cdata.getFloat("available"));
-                    disk.setSize(cdata.getFloat("size") / 1024f);
-                }
-                if (table_stat.getItems().size() < 7/*data.getInt("nnodes")*/) {
+                if (table_stat.getItems().size() < data.getInt("nnodes")) {
                     table_stat.getItems().clear();
-                    for (int i = 0; i < 7/*data.getInt("nnodes")*/; i++) {
+                    for (int i = 0; i < data.getInt("nnodes"); i++) {
                         table_stat.getItems().add(new DataFlow());
                     }
                 }
                 long ctime = 1000l * data.getInt("ctime");
                 label_ctime.setText(dateformat.format(new Date(ctime)));
                 int connected_in = 1;
-                int connected_out = 0;
-                for (int i = 0; i < 7/*data.getInt("nnodes")*/; i++) {
-                    NSMData cdata = (NSMData) data.getObject("node", i);
+                int connected_out = -1;
+                for (int i = 0; i < data.getInt("nnodes"); i++) {
+                    NSMData cdata = (NSMData)data.getObject("nodeinfo", i);
                     if (i == 0) {
-                        connected_in = (cdata.getInt("connection_in") > 0) ? 1 : -1;
+                        connected_out = (cdata.getInt("connection_out") == 1)?1:-1;
+                    } else {
+                        if (cdata.getInt("connection_out") != 1) {
+                            connected_in = -1;
+                        }
                     }
-                    DataFlow flow = (DataFlow) table_stat.getItems().get(i);
+                    DataFlow flow = (DataFlow)table_stat.getItems().get(i);
                     if (flow.getNode().isEmpty()) {
-                        String name = "";
-                        if (i == 0) {
-                            name = "in";
-                        } else if (i == 1) {
-                            name = "record";
-                        } else if (i == 2) {
-                            name = "out";
-                        } else {
-                            name = String.format("basf2%d", i - 3);
+                        String name ="";
+                        switch (i) {
+                            case 0: name = "distributer"; break;
+                            case 1: name = "collector"; break;
+                            default : name = String.format("worker-%02d", (i-2)); break;
                         }
                         flow.setNode(name);
                     }
@@ -185,7 +149,7 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Logger.getLogger(StorageDataFlowTableController.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(HLTDataFlowTableController.class.getName()).log(Level.SEVERE, null, e);
         }
     }
 
@@ -206,16 +170,16 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
         return label_nodename.getText();
     }
 
-    static StorageDataFlowTableController create(String name) {
+    static HLTDataFlowTableController create(String name) {
         try {
-            FXMLLoader loader = new FXMLLoader(StorageDataFlowTableController.class.getResource("StorageDataFlowTable.fxml"));
+            FXMLLoader loader = new FXMLLoader(HLTDataFlowTableController.class.getResource("HLTDataFlowTable.fxml"));
             loader.load();
-            StorageDataFlowTableController controller = loader.getController();
+            HLTDataFlowTableController controller = loader.getController();
             controller.setNodeName(name);
             return controller;
         } catch (IOException e) {
             e.printStackTrace();
-            Logger.getLogger(StorageDataFlowTableController.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(HLTDataFlowTableController.class.getName()).log(Level.SEVERE, null, e);
         }
         return null;
     }

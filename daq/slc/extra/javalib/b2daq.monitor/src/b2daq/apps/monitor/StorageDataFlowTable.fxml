@@ -19,11 +19,11 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox fx:id="pane" alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="843.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.apps.monitor.StorageDataFlowTableController">
+<VBox fx:id="pane" alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="587.0" prefWidth="843.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.apps.monitor.StorageDataFlowTableController">
     <children>
-        <VBox prefHeight="85.0" prefWidth="425.0">
+        <VBox prefHeight="396.0" prefWidth="843.0" VBox.vgrow="ALWAYS">
             <children>
-                <HBox prefHeight="64.0" prefWidth="806.0">
+                <HBox prefHeight="324.0" prefWidth="843.0" VBox.vgrow="ALWAYS">
                     <children>
                         <VBox maxWidth="368.0" prefHeight="215.0" prefWidth="368.0" HBox.hgrow="NEVER">
                             <children>
@@ -40,10 +40,10 @@
                                 <GridPane hgap="10.0" prefHeight="30.0" prefWidth="210.0">
                                     <columnConstraints>
                                         <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="93.0" minWidth="10.0" prefWidth="46.0" />
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="141.0" minWidth="0.0" prefWidth="38.0" />
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="189.0" minWidth="10.0" prefWidth="56.0" />
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="169.0" minWidth="10.0" prefWidth="44.0" />
-                                        <ColumnConstraints halignment="LEFT" maxWidth="142.0" minWidth="10.0" prefWidth="116.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="141.0" minWidth="0.0" prefWidth="40.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="189.0" minWidth="10.0" prefWidth="73.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="169.0" minWidth="10.0" prefWidth="40.0" />
+                                        <ColumnConstraints halignment="LEFT" maxWidth="142.0" minWidth="10.0" prefWidth="97.0" />
                                     </columnConstraints>
                                     <rowConstraints>
                                         <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
@@ -69,7 +69,7 @@
                                                 <Font name="System Bold" size="13.0" />
                                             </font>
                                         </Label>
-                                        <CanvasPanel minHeight="10.0" minWidth="10.0" prefHeight="30.0" prefWidth="47.0" GridPane.columnIndex="3">
+                                        <CanvasPanel minHeight="10.0" minWidth="8.0" prefHeight="30.0" prefWidth="80.0" GridPane.columnIndex="3">
                                             <canvas>
                                                 <HistogramCanvas fx:id="c_out" fillColor="transparent" lineColor="transparent" name="c_node0_cur_gr" stat="false" title="">
                                                     <shapes>
@@ -110,7 +110,7 @@
                                         <Insets />
                                     </VBox.margin>
                                 </HBox>
-                                <HBox alignment="CENTER_LEFT" minHeight="30.0" prefHeight="35.0" prefWidth="863.0" VBox.vgrow="ALWAYS">
+                                <HBox alignment="CENTER_LEFT" minHeight="30.0" prefHeight="44.0" prefWidth="340.0" VBox.vgrow="ALWAYS">
                                     <children>
                                         <Label text="Queue in socket from eb2rx:">
                                             <HBox.margin>
@@ -179,19 +179,19 @@
                                         <PropertyValueFactory property="status" />
                                     </cellValueFactory>
                                 </TableColumn>
-                                <TableColumn fx:id="col_nfiles" prefWidth="88.0" text="# of files">
+                                <TableColumn fx:id="col_nfiles" prefWidth="88.0" text="# of files" visible="false">
                                     <cellValueFactory>
                                         <PropertyValueFactory property="nfiles" />
                                     </cellValueFactory>
                                 </TableColumn>
-                                <TableColumn fx:id="col_available" prefWidth="107.0" text="Available [%]">
+                                <TableColumn fx:id="col_available" prefWidth="178.0" text="Available [%]">
                                     <cellValueFactory>
                                         <PropertyValueFactory property="available" />
                                     </cellValueFactory>
                                 </TableColumn>
-                                <TableColumn fx:id="col_disk" prefWidth="117.0" text="Disk size [TB]">
+                                <TableColumn fx:id="col_size" prefWidth="131.0" text="Disk size [TB]">
                                     <cellValueFactory>
-                                        <PropertyValueFactory property="disk" />
+                                        <PropertyValueFactory property="size" />
                                     </cellValueFactory>
                                 </TableColumn>
                             </columns>
@@ -206,73 +206,68 @@
                 </HBox>
             </children>
         </VBox>
-        <TableView fx:id="table_stat" editable="true" prefHeight="301.0" prefWidth="823.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
+        <TableView fx:id="table_stat" editable="true" prefHeight="330.0" prefWidth="823.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
             <columns>
                 <TableColumn fx:id="col_node" prefWidth="75.0" text="Node">
                     <cellValueFactory>
                         <PropertyValueFactory property="node" />
                     </cellValueFactory>
                 </TableColumn>
-                <TableColumn fx:id="col_state" prefWidth="70.0" text="State">
+                <TableColumn fx:id="col_state" prefWidth="70.0" text="State" visible="false">
                     <cellValueFactory>
                         <PropertyValueFactory property="state" />
                     </cellValueFactory>
                 </TableColumn>
-                <TableColumn fx:id="col_loadave" text="Load avg">
-                    <cellValueFactory>
-                        <PropertyValueFactory property="loadavg" />
-                    </cellValueFactory>
-                </TableColumn>
                 <TableColumn prefWidth="392.0" text="Event count">
                     <columns>
-                        <TableColumn fx:id="col_nevent_in" text="In">
+                        <TableColumn fx:id="col_nevent_in" minWidth="80.0" text="In">
                             <cellValueFactory>
                                 <PropertyValueFactory property="neventIn" />
                             </cellValueFactory>
                         </TableColumn>
-                        <TableColumn fx:id="col_nevent_out" minWidth="0.0" text="Out">
+                        <TableColumn fx:id="col_nevent_out" minWidth="80.0" text="Out">
                             <cellValueFactory>
                                 <PropertyValueFactory property="neventOut" />
                             </cellValueFactory>
                         </TableColumn>
                     </columns>
                 </TableColumn>
-                <TableColumn prefWidth="392.0" text="Flow rate">
+                <TableColumn prefWidth="392.0" text="Flow rate [MB/s]">
                     <columns>
-                        <TableColumn fx:id="col_flowrate_in" prefWidth="70.0" text="In">
+                        <TableColumn fx:id="col_flowrate_in" minWidth="80.0" text="In">
                             <cellValueFactory>
                                 <PropertyValueFactory property="flowrateIn" />
                             </cellValueFactory>
                         </TableColumn>
-                        <TableColumn fx:id="col_flowrate_out" minWidth="0.0" prefWidth="70.0" text="Out">
+                        <TableColumn fx:id="col_flowrate_out" minWidth="80.0" text="Out">
                             <cellValueFactory>
                                 <PropertyValueFactory property="flowrateOut" />
                             </cellValueFactory>
                         </TableColumn>
                     </columns>
                 </TableColumn>
-                <TableColumn prefWidth="392.0" text="Event rate">
+                <TableColumn prefWidth="392.0" text="Event rate [kHz]">
                     <columns>
-                        <TableColumn fx:id="col_evtrate_in" prefWidth="70.0" text="In">
+                        <TableColumn fx:id="col_evtrate_in" minWidth="80.0" text="In">
                             <cellValueFactory>
                                 <PropertyValueFactory property="evtrateIn" />
                             </cellValueFactory>
                         </TableColumn>
-                        <TableColumn fx:id="col_evtrate_out" minWidth="0.0" prefWidth="70.0" text="Out">
+                        <TableColumn fx:id="col_evtrate_out" minWidth="80.0" text="Out">
                             <cellValueFactory>
                                 <PropertyValueFactory property="evtrateOut" />
                             </cellValueFactory>
                         </TableColumn>
                     </columns>
                 </TableColumn>
-                <TableColumn prefWidth="132.0" text="Event size">
+                <TableColumn prefWidth="132.0" text="Event size [kB]">
                     <columns>
-                        <TableColumn fx:id="col_evtsize_in" prefWidth="70.0" text="In">
+                        <TableColumn fx:id="col_evtsize_in" minWidth="80.0" text="In">
                             <cellValueFactory>
                                 <PropertyValueFactory property="evtsizeOut" />
                             </cellValueFactory>
                         </TableColumn>
-                        <TableColumn fx:id="col_evtsize_out" minWidth="0.0" prefWidth="70.0" text="Out">
+                        <TableColumn fx:id="col_evtsize_out" minWidth="80.0" text="Out">
                             <cellValueFactory>
                                 <PropertyValueFactory property="evtsizeOut" />
                             </cellValueFactory>

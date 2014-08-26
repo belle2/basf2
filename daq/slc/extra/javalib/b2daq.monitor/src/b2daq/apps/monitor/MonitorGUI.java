@@ -70,8 +70,9 @@ public class MonitorGUI extends Application {
             Scene scene = new Scene(root);
             scene.getStylesheets().add(LogMessage.getCSSPath());
             scene.getStylesheets().add(DataFlowMonitorController.class.getResource("DataFlowMonitor.css").toExternalForm());
+            scene.getStylesheets().add(StorageDataFlowTableController.class.getResource("StorageDataFlowTable.css").toExternalForm());
             stage.setTitle("Belle II Monitor GUI");
-            stage.getIcons().add(new Image(MonitorGUI.class.getResource("runcontrol.png").toExternalForm()));
+            stage.getIcons().add(new Image(MonitorGUI.class.getResource("mon.png").toExternalForm()));
             stage.setScene(scene);
             stage.show();
         } catch (IOException ex) {

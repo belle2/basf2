@@ -97,7 +97,7 @@ public class MonitorPaneController implements Initializable, NSMObserver {
             }
             if (tab == null) {
                 if (data.getFormat().matches("rorc_status")) {
-                    data.print();
+                    //data.print();
                     RORCDataFlowTableController flowmonitor = RORCDataFlowTableController.create(nodename);
                     tab = new Tab();
                     tab.setText(flowmonitor.getNodeName());
@@ -108,6 +108,15 @@ public class MonitorPaneController implements Initializable, NSMObserver {
                     flowmonitor.handleOnReceived(msg);
                 } else if (data.getFormat().matches("storage_status")) {
                     StorageDataFlowTableController flowmonitor = StorageDataFlowTableController.create(nodename);
+                    tab = new Tab();
+                    tab.setText(flowmonitor.getNodeName());
+                    tab.setContent(flowmonitor.getPane());
+                    tab.setClosable(false);
+                    tabpane_mon.getTabs().add(tab);
+                    flowmonitors.put(nodename, flowmonitor);
+                    flowmonitor.handleOnReceived(msg);
+                } else if (data.getFormat().matches("rfunitinfo")) {
+                    HLTDataFlowTableController flowmonitor = HLTDataFlowTableController.create(nodename);
                     tab = new Tab();
                     tab.setText(flowmonitor.getNodeName());
                     tab.setContent(flowmonitor.getPane());

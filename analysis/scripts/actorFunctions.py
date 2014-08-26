@@ -55,8 +55,6 @@ def CountMCParticles(path, names):
     counter = {getpdg(key): sum([getattr(t, key) for t in countNtuple]) for key in keys}
     counter['NEvents'] = countNtuple.GetEntries()
 
-    print counter
-
     B2INFO("Loaded number of MCParticles for every pdg code seperatly")
     return {'MCParticleCounts': counter}
 
@@ -90,6 +88,11 @@ def MakeAndMatchParticleList(path, particleName, particleLabel, channelName, dau
     """
     userLabel = actorFramework.createHash(particleName, particleLabel, channelName, daughterParticleLists, preCut)
     outputList = particleName + ':' + userLabel
+    # check if particle list is preloaded
+    if False:
+        B2INFO("Preload Particle List {p} with label {l} for channel {c} in list {o}".format(p=particleName, l=particleLabel, c=channelName, o=outputList))
+        return {'RawParticleList_{c}'.format(c=channelName): outputList, 'NotNeeded': None}
+
     # If preCut is None this channel is ignored
     if preCut is None:
         B2INFO("Make and Match Particle List {p} with label {l} for channel {c} in list {o}".format(p=particleName, l=particleLabel, c=channelName, o=outputList))
@@ -115,6 +118,13 @@ def CopyParticleLists(path, particleName, particleLabel, inputLists, postCuts):
     inputLists, postCuts = actorFramework.removeNones(inputLists, postCuts)
     userLabel = actorFramework.createHash(particleName, particleLabel, inputLists, postCuts)
     outputList = particleName + ':' + userLabel
+
+    # check if particle list is preloaded
+    if False:
+        B2INFO("Preload Particle List {p} with label {l} in list {o}".format(p=particleName, l=particleLabel, o=outputList))
+        return {'ParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList,
+                'ParticleList_{p}:{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): pdg.conjugate(particleName) + ':' + userLabel,
+                'NotNeeded': None}
 
     if inputLists == []:
         B2INFO("Gather Particle List {p} with label {l} in list {o}. But there are no particles to gather :-(.".format(p=particleName, l=particleLabel, o=outputList))
@@ -319,7 +329,7 @@ def SignalProbability(path, identifier, particleList, mvaConfig, additionalDepen
         return{'SignalProbability_{i}'.format(i=identifier): configFilename}
 
     B2ERROR("Training of {i} failed!".format(i=identifier))
-    return {}
+    return {'NotNeeded': None}
 
 
 def VariablesToNTuple(path, particleIdentifier, particleList, signalProbability):
@@ -382,7 +392,7 @@ def WriteAnalysisFileForChannel(particleName, particleLabel, channelName, preCut
         automaticReporting.createTexFile(placeholders['texFile'], 'analysis/scripts/FullEventInterpretationChannelTemplate.tex', placeholders)
 
     B2INFO("Written analysis tex file for channel {c}.".format(c=channelName))
-    return {'Placeholders_{c}'.format(c=channelName): placeholders}
+    return {'Placeholders_{c}'.format(c=channelName): placeholders, 'NotNeeded': None}
 
 
 def WriteAnalysisFileForFSParticle(particleName, particleLabel, mvaConfig, signalProbability, postCutConfig, postCut, mcCounts):
@@ -407,7 +417,7 @@ def WriteAnalysisFileForFSParticle(particleName, particleLabel, mvaConfig, signa
     placeholders = automaticReporting.createFSParticleTexFile(placeholders, mcCounts)
 
     B2INFO("Written analysis tex file for final state particle {p} with label {l}.".format(p=particleName, l=particleLabel))
-    return {'Placeholders_{p}:{l}'.format(p=particleName, l=particleLabel): placeholders}
+    return {'Placeholders_{p}:{l}'.format(p=particleName, l=particleLabel): placeholders, 'NotNeeded': None}
 
 
 def WriteAnalysisFileForCombinedParticle(particleName, particleLabel, channelPlaceholders, mcCounts):
@@ -428,7 +438,7 @@ def WriteAnalysisFileForCombinedParticle(particleName, particleLabel, channelPla
     placeholders = automaticReporting.createCombinedParticleTexFile(placeholders, channelPlaceholders, mcCounts)
 
     B2INFO("Written analysis tex file for intermediate particle {p} with label {l}.".format(p=particleName, l=particleLabel))
-    return {'Placeholders_{p}:{l}'.format(p=particleName, l=particleLabel): placeholders}
+    return {'Placeholders_{p}:{l}'.format(p=particleName, l=particleLabel): placeholders, 'NotNeeded': None}
 
 
 def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticleNTuples, mcCounts, particles):
@@ -463,4 +473,4 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
 
     # Return None - Therefore Particle List depends not on TMVAExpert directly
     B2INFO("Created analysis summary pdf file.")
-    return {'FEIsummary.pdf': None}
+    return {'FEIsummary.pdf': None, 'NotNeeded': None}

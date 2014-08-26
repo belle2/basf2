@@ -142,6 +142,36 @@ class TestSequence(unittest.TestCase):
         self.assertEqual(len(path.modules()), 0)
         self.assertEqual(t.calls, 2)
 
+    def test_returned_key_NotNeeded_is_not_needed(self):
+        self.s.addResource('b1', 1, ['a'])
+        self.s.addResource('a', 2)
+        self.s.addResource('b2', 3, ['b1', 'a'])
+
+        def fun(a, b):
+            return {'result': a * sum(b), 'NotNeeded': None}
+        t = TestFunction(fun)
+
+        self.s.addFunction(t, path='Path', a='a', b=['b1', 'b2'])
+
+        path = create_path()
+        self.s.run(path, False)
+
+        # Expect no module in main path
+        self.assertEqual(len(path.modules()), 0)
+        self.assertEqual(t.calls, 1)
+        self.assertDictEqual(t.result, {'result': 8, 'NotNeeded': None})
+        self.assertDictEqual(t.kwargs, {'a': 2, 'b': [1, 3]})
+        self.assertTupleEqual(t.args, tuple())
+
+        # Add needed result and try again
+        self.s.addNeeded('result')
+        self.s.run(path, False)
+
+        # But modules should still be not in the path
+        # Because fun returns NotNeeded!
+        self.assertEqual(len(path.modules()), 0)
+        self.assertEqual(t.calls, 2)
+
     def test_optimize_parallel_processing(self):
         def a1(path):
             path.add_module(MockModule('a1', isParallelCertified=True))

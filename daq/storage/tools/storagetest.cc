@@ -164,7 +164,7 @@ int main(int argc, char** argv)
 
   int* evtbuf = new int[10000000];
   unsigned long long nbyte_out = 0;
-  unsigned int count_out = 0;
+  //unsigned int count_out = 0;
   unsigned int expno = 0;
   unsigned int runno = 0;
   unsigned int subno = 0;
@@ -175,7 +175,7 @@ int main(int argc, char** argv)
   while (true) {
     evtbuf[0] = 32600;
     int nbyte = evtbuf[0];
-    int nword = (nbyte - 1) / 4 + 1;
+    //int nword = (nbyte - 1) / 4 + 1;
     if (expno < iheader.expno || runno < iheader.runno) {
       expno = iheader.expno;
       runno = iheader.runno;
@@ -188,7 +188,7 @@ int main(int argc, char** argv)
         info.setOutputCount(0);
         info.setOutputNBytes(0);
         nbyte_out = 0;
-        count_out = 0;
+        //count_out = 0;
       }
       g_nfile = 0;
       file.open(dir, expno, runno);

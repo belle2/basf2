@@ -387,14 +387,16 @@ def SignalProbability(path, identifier, particleList, mvaConfig, additionalDepen
 
     if not os.path.isfile(configFilename):
         B2INFO("Calculate SignalProbability for {i}. Run Teacher in extern process.".format(i=identifier))
-        subprocess.call("externTeacher --methodName '{name}' --methodType '{type}' --methodConfig '{config}' --target '{target}'"
-                        " --variables '{variables}' --factoryOption '{foption}' --prepareOption '{poption}' --prefix '{prefix}'"
-                        " --maxEventsPerClass {maxEvents}"
-                        " > '{prefix}'.log".format(name=mvaConfig.name, type=mvaConfig.type, config=mvaConfig.config,
-                                                   target=mvaConfig.target, variables="' '".join(mvaConfig.variables),
-                                                   foption='!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification',
-                                                   poption='SplitMode=random:!V', maxEvents=10000000,
-                                                   prefix=removeJPsiSlash(particleList + '_' + hash)), shell=True)
+        command = ("externTeacher --methodName '{name}' --methodType '{type}' --methodConfig '{config}' --target '{target}'"
+                   " --variables '{variables}' --factoryOption '{foption}' --prepareOption '{poption}' --prefix '{prefix}'"
+                   " --maxEventsPerClass {maxEvents}"
+                   " > '{prefix}'.log".format(name=mvaConfig.name, type=mvaConfig.type, config=mvaConfig.config,
+                                              target=mvaConfig.target, variables="' '".join(mvaConfig.variables),
+                                              foption='!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification',
+                                              poption='SplitMode=random:!V', maxEvents=10000000,
+                                              prefix=removeJPsiSlash(particleList + '_' + hash)))
+        B2INFO("Use following command to invoke teacher\n" + command)
+        subprocess.call(command, shell=True)
 
     if os.path.isfile(configFilename):
         if InputFile().particleListHasSignalProbability(particleList):

@@ -103,7 +103,7 @@ public class NSMSocket {
     protected void close() {
         try {
             m_socket.close();
-        } catch (Exception ex) {
+        } catch (Exception e) {
         }
     }
 

@@ -197,7 +197,7 @@ void RunControlCallback::update() throw()
       rost->evtrate_out = ronode->evtrate_out;
       rost->evtsize_out = ronode->evtsize_out;
       rost->flowrate_out = ronode->flowrate_out;
-      rost->loadave = ronode->loadave;
+      rost->loadavg = ronode->loadavg;
       rost->reserved_f[0] = ronode->reserved_f[0];
       rost->reserved_f[1] = ronode->reserved_f[1];
       rost->reserved_f[2] = ronode->reserved_f[2];

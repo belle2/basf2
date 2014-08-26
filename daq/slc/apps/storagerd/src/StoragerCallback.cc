@@ -7,6 +7,7 @@
 #include "daq/slc/base/StringUtil.h"
 
 #include <sys/statvfs.h>
+#include <stdlib.h>
 
 using namespace Belle2;
 
@@ -237,12 +238,18 @@ void StoragerCallback::timeout() throw()
   struct statvfs statfs;
   if (m_file.hasKey("record.ndisks")) {
     std::string dir = m_file.get("record.dir");
-    int ndisks = m_file.getInt("record.ndisks");
-    for (int i = 0; i < ndisks; i++) {
+    info->ndisks = m_file.getInt("record.ndisks");
+    for (unsigned int i = 0; i < info->ndisks; i++) {
       std::string path = StringUtil::form("%s%02d", dir.c_str(), i + 1);
       statvfs(path.c_str(), &statfs);
-      info->disksize[i] = (float)statfs.f_frsize * statfs.f_blocks / 1024 / 1024 / 1024;
-      info->diskusage[i] = 100 - ((float)statfs.f_bfree / statfs.f_blocks * 100);
+      info->disk[i].size = (float)statfs.f_frsize * statfs.f_blocks / 1024 / 1024 / 1024;
+      info->disk[i].available = 100 - ((float)statfs.f_bfree / statfs.f_blocks * 100);
     }
+  }
+  double loads[3];
+  if (getloadavg(loads, 3) > 0) {
+    info->loadavg = (float)loads[0];
+  } else {
+    info->loadavg = -1;
   }
 }

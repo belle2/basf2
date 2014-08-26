@@ -31,7 +31,7 @@ namespace Belle2 {
     float evtrate_out;
     float evtsize_out;
     float flowrate_out;
-    float loadave;
+    float loadavg;
     float reserved_f[5];
   };
 

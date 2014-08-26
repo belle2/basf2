@@ -20,7 +20,7 @@ public class DataFlow {
 
     private final SimpleStringProperty node = new SimpleStringProperty("");
     private final SimpleIntegerProperty state = new SimpleIntegerProperty(0);
-    private final SimpleFloatProperty loadave = new SimpleFloatProperty(0);
+    private final SimpleFloatProperty loadavg = new SimpleFloatProperty(0);
     private final SimpleIntegerProperty connection_in = new SimpleIntegerProperty(0);
     private final SimpleIntegerProperty nqueue_in = new SimpleIntegerProperty(0);
     private final SimpleIntegerProperty nevent_in = new SimpleIntegerProperty(0);
@@ -44,8 +44,8 @@ public class DataFlow {
         return state.get();
     }
 
-    public float getLoadAve() {
-        return loadave.get();
+    public float getLoadavg() {
+        return loadavg.get();
     }
 
     public int getConnectionIn() {
@@ -104,8 +104,8 @@ public class DataFlow {
         this.state.set(state);
     }
 
-    public void setLoadAve(float loadave) {
-        this.loadave.set(loadave);
+    public void setLoadavg(float loadavg) {
+        this.loadavg.set(loadavg);
     }
 
     public void setConnectionIn(int connection) {
@@ -164,8 +164,8 @@ public class DataFlow {
         return state;
     }
 
-    public FloatProperty loadAveProperty() {
-        return loadave;
+    public FloatProperty loadavgProperty() {
+        return loadavg;
     }
 
     public IntegerProperty connectionInProperty() {

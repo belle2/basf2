@@ -6,7 +6,6 @@
 package b2daq.apps.monitor;
 
 import b2daq.database.ConfigObject;
-import b2daq.dqm.core.TimedGraph1D;
 import b2daq.dqm.graphics.HistogramCanvas;
 import b2daq.graphics.GShape;
 import b2daq.logger.core.LogMessage;
@@ -38,7 +37,7 @@ import javafx.scene.paint.Color;
  *
  * @author tkonno
  */
-public class DataFlowMonitorController implements Initializable, NSMObserver {
+public class RORCDataFlowTableController implements Initializable, NSMObserver {
 
     @FXML
     private VBox pane;
@@ -145,7 +144,7 @@ public class DataFlowMonitorController implements Initializable, NSMObserver {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Logger.getLogger(DataFlowMonitorController.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(RORCDataFlowTableController.class.getName()).log(Level.SEVERE, null, e);
         }
     }
 
@@ -166,16 +165,16 @@ public class DataFlowMonitorController implements Initializable, NSMObserver {
         return label_nodename.getText();
     }
 
-    static DataFlowMonitorController create(String name) {
+    static RORCDataFlowTableController create(String name) {
         try {
-            FXMLLoader loader = new FXMLLoader(DataFlowMonitorController.class.getResource("DataFlowMonitor.fxml"));
+            FXMLLoader loader = new FXMLLoader(RORCDataFlowTableController.class.getResource("RORCDataFlowTable.fxml"));
             loader.load();
-            DataFlowMonitorController controller = loader.getController();
+            RORCDataFlowTableController controller = loader.getController();
             controller.setNodeName(name);
             return controller;
         } catch (IOException e) {
             e.printStackTrace();
-            Logger.getLogger(DataFlowMonitorController.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(RORCDataFlowTableController.class.getName()).log(Level.SEVERE, null, e);
         }
         return null;
     }

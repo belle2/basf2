@@ -6,7 +6,6 @@
 package b2daq.apps.monitor;
 
 import b2daq.database.ConfigObject;
-import b2daq.dqm.core.TimedGraph1D;
 import b2daq.dqm.graphics.HistogramCanvas;
 import b2daq.graphics.GShape;
 import b2daq.logger.core.LogMessage;
@@ -38,7 +37,7 @@ import javafx.scene.paint.Color;
  *
  * @author tkonno
  */
-public class DataFlowMonitorController implements Initializable, NSMObserver {
+public class StorageDataFlowTableController implements Initializable, NSMObserver {
 
     @FXML
     private VBox pane;
@@ -58,6 +57,8 @@ public class DataFlowMonitorController implements Initializable, NSMObserver {
     private Label label_ctime;
     @FXML
     private TableView table_stat;
+    @FXML
+    private TableView table_disk;
     @FXML
     private Label label_nodename;
     static private final SimpleDateFormat dateformat = new SimpleDateFormat("HH:mm:ss yyyy/MM/dd");
@@ -87,11 +88,11 @@ public class DataFlowMonitorController implements Initializable, NSMObserver {
             if (command.equals(NSMCommand.NSMSET)) {
                 NSMData data = NSMListenerService.getData(label_nodename.getText()+"_STATUS");
                 ConfigObject cobj = NSMListenerService.getDB(label_nodename.getText());
-                if (cobj == null) {
-                    NSMListenerService.requestDBGet(label_nodename.getText(), 
-                            data.getInt("configid", 0));
-                }
-                if (data == null || !data.getFormat().matches("rorc_status")) {
+                //if (cobj == null) {
+                //NSMListenerService.requestDBGet(label_nodename.getText(), 
+                //        data.getInt("configid", 0));
+                //}
+                if (data == null || !data.getFormat().matches("storage_status")) {
                     return;
                 }
                 label_runno.setText(String.format("%04d.%04d.%03d", data.getInt("expno"),
@@ -106,6 +107,19 @@ public class DataFlowMonitorController implements Initializable, NSMObserver {
                     case 2:
                     state.update(RCState.RUNNING_S);
                     break;
+                }
+                if (table_disk.getItems().size() < data.getInt("ndisks")) {
+                    table_disk.getItems().clear();
+                    for (int i = 0; i < data.getInt("ndisks"); i++) {
+                        table_disk.getItems().add(new DiskUsage(String.format("disk%02d", i)));
+                    }
+                }
+                for (int i = 0; i < data.getInt("ndisks"); i++) {
+                    NSMData cdata = (NSMData)data.getObject("disk", i);
+                    DiskUsage disk = (DiskUsage)table_disk.getItems().get(i);
+                    disk.setStatus(cdata.getFloat("available")<=10?"FULL":"FINE");
+                    disk.setAvailable(cdata.getInt("available"));
+                    disk.setSize(cdata.getFloat("size"));
                 }
                 if (table_stat.getItems().size() < data.getInt("nnodes")) {
                     table_stat.getItems().clear();
@@ -125,8 +139,13 @@ public class DataFlowMonitorController implements Initializable, NSMObserver {
                         connected_in = -1;
                     }
                     DataFlow flow = (DataFlow)table_stat.getItems().get(i);
-                    if (cobj != null && flow.getNode().isEmpty()) {
-                        flow.setNode(cobj.getObject("node", i).getObject("runtype").getNode());
+                    if (flow.getNode().isEmpty()) {
+                        String name = "";
+                        if (i == 0) name = "in";
+                        else if (i == 1) name = "record";
+                        else if (i == 2) name = "out";
+                        else name = String.format("basf2%d", i-3);
+                        flow.setNode(name);
                     }
                     flow.setLoadavg(cdata.getFloat("loadavg"));
                     flow.setNqueueIn(cdata.getInt("nqueue_in"));
@@ -145,7 +164,7 @@ public class DataFlowMonitorController implements Initializable, NSMObserver {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Logger.getLogger(DataFlowMonitorController.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(StorageDataFlowTableController.class.getName()).log(Level.SEVERE, null, e);
         }
     }
 
@@ -166,16 +185,16 @@ public class DataFlowMonitorController implements Initializable, NSMObserver {
         return label_nodename.getText();
     }
 
-    static DataFlowMonitorController create(String name) {
+    static StorageDataFlowTableController create(String name) {
         try {
-            FXMLLoader loader = new FXMLLoader(DataFlowMonitorController.class.getResource("DataFlowMonitor.fxml"));
+            FXMLLoader loader = new FXMLLoader(StorageDataFlowTableController.class.getResource("RORCDataFlowTable.fxml"));
             loader.load();
-            DataFlowMonitorController controller = loader.getController();
+            StorageDataFlowTableController controller = loader.getController();
             controller.setNodeName(name);
             return controller;
         } catch (IOException e) {
             e.printStackTrace();
-            Logger.getLogger(DataFlowMonitorController.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(StorageDataFlowTableController.class.getName()).log(Level.SEVERE, null, e);
         }
         return null;
     }

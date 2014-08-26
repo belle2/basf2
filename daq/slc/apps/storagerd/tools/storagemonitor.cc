@@ -87,7 +87,7 @@ int main(int argc, char** argv)
     }
     printf("\n");
     for (int i = 0; i < 11; i++) {
-      float available = 100. - info->diskusage[i];
+      float available = 100. - info->disk[i].available;
       if (available <= 10) {
         printf("\x1b[49m\x1b[31m");
       } else {
@@ -95,7 +95,7 @@ int main(int argc, char** argv)
       }
       printf(" disk%02d : available %5s [%%] (disk size = %4.2f [TB])\x1b[49m\x1b[39m\n",
              i + 1, StringUtil::form("%3.1f", available).c_str(),
-             info->disksize[i] / 1024.);
+             info->disk[i].size / 1024.);
     }
   }
   return 0;

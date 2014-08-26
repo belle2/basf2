@@ -7,7 +7,7 @@ extern "C" {
 
 namespace Belle2 {
 
-  const int storage_status_revision = 1;
+  const int storage_status_revision = 3;
 
   struct storage_status {
     uint32 stime;
@@ -18,19 +18,23 @@ namespace Belle2 {
     uint32 runno;
     uint32 subno;
     uint32 nfiles;
+    uint32 ndisks;
     uint32 diskid;
     uint32 nnodes;
     float nbytes;
-    float loadave;
-    float diskusage[12];
-    float disksize[12];
+    float loadavg;
+    struct disk_status {
+      int nfiles;
+      float available;
+      float size;
+    } disk[12];
     struct node_status {
+      uint32 connection_in;
+      uint32 connection_out;
       uint32 eflag;
       uint32 ctime;
       uint32 nevent_in;
       uint32 nqueue_in;
-      uint32 connection_in;
-      uint32 connection_out;
       uint32 nevent_out;
       uint32 nqueue_out;
       int32 reserved_i[2];

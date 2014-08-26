@@ -9,14 +9,12 @@ import b2daq.core.LogLevel;
 import b2daq.database.ConfigObject;
 import b2daq.logger.core.LogMessage;
 import b2daq.nsm.NSMCommand;
-import b2daq.nsm.NSMConfig;
 import b2daq.nsm.NSMData;
 import b2daq.nsm.NSMDataProperty;
 import b2daq.nsm.NSMListenerService;
 import b2daq.nsm.NSMMessage;
 import b2daq.nsm.NSMObserver;
 import b2daq.runcontrol.core.RCCommand;
-import b2daq.runcontrol.core.RCState;
 import b2daq.ui.NetworkConfigPaneController;
 import java.net.URL;
 import java.util.Date;
@@ -37,7 +35,7 @@ public class MonitorPaneController implements Initializable, NSMObserver {
     @FXML
     private NetworkConfigPaneController networkconfigController;
 
-    private final HashMap<String, DataFlowMonitorController> flowmonitors = new HashMap<>();
+    private final HashMap<String, NSMObserver> flowmonitors = new HashMap<>();
     private String[] namelist = null;
     @FXML
     private TabPane tabpane_mon;
@@ -88,21 +86,31 @@ public class MonitorPaneController implements Initializable, NSMObserver {
             Tab tab = null;
             String nodename = msg.getNodeName().replace("_STATUS", "");
             for (Tab t : tabpane_mon.getTabs()) {
-                if (data.getFormat().matches("ronode_status")
+                if (data.getFormat().matches("rorc_status")
                         && t.getText().matches(nodename)) {
                     tab = t;
                     flowmonitors.get(nodename).handleOnReceived(msg);
                     break;
                 }
             }
-            if (data.getFormat().matches("ronode_status") && tab == null) {
-                DataFlowMonitorController flowmonitor = DataFlowMonitorController.create(nodename);
-                tab = new Tab();
-                tab.setText(flowmonitor.getNodeName());
-                tab.setContent(flowmonitor.getPane());
-                tab.setClosable(false);
-                tabpane_mon.getTabs().add(tab);
-                flowmonitors.put(nodename, flowmonitor);
+            if (tab == null) {
+                if (data.getFormat().matches("rorc_status")) {
+                    RORCDataFlowTableController flowmonitor = RORCDataFlowTableController.create(nodename);
+                    tab = new Tab();
+                    tab.setText(flowmonitor.getNodeName());
+                    tab.setContent(flowmonitor.getPane());
+                    tab.setClosable(false);
+                    tabpane_mon.getTabs().add(tab);
+                    flowmonitors.put(nodename, flowmonitor);
+                } else if (data.getFormat().matches("storage_status")) {
+                    RORCDataFlowTableController flowmonitor = RORCDataFlowTableController.create(nodename);
+                    tab = new Tab();
+                    tab.setText(flowmonitor.getNodeName());
+                    tab.setContent(flowmonitor.getPane());
+                    tab.setClosable(false);
+                    tabpane_mon.getTabs().add(tab);
+                    flowmonitors.put(nodename, flowmonitor);
+                }
             }
         } else if (command.equals(RCCommand.OK)) {
         } else if (command.equals(RCCommand.STATE)) {
@@ -115,6 +123,7 @@ public class MonitorPaneController implements Initializable, NSMObserver {
 
     @Override
     public void log(LogMessage log) {
+        System.out.println(log.getMessage());
     }
 
     public NetworkConfigPaneController getNetworkConfig() {

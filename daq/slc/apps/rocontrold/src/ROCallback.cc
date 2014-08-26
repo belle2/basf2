@@ -105,6 +105,12 @@ void ROCallback::timeout() throw()
     uint32 stime = nsm->stime;
     memcpy(nsm, &status, sizeof(ronode_status));
     nsm->stime = stime;
+    double loads[3];
+    if (getloadavg(loads, 3) > 0) {
+      nsm->loadavg = (float)loads[0];
+    } else {
+      nsm->loadavg = -1;
+    }
   }
 }
 

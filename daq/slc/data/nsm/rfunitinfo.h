@@ -24,7 +24,7 @@ namespace Belle2 {
       float evtsize_out;
       float evtrate_in;
       float evtrate_out;
-      float loadave;
+      float loadavg;
       float r_reserved[9];
     } nodeinfo[24];
     uint32 nnodes;

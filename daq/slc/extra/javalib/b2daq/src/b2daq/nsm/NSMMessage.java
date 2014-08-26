@@ -14,7 +14,7 @@ import b2daq.runcontrol.core.RCCommand;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class NSMMessage implements Serializable {
+public final class NSMMessage implements Serializable {
 
     private String _reqname = "";
     private String _nodename = "";
@@ -162,10 +162,11 @@ public class NSMMessage implements Serializable {
             Writer writer = new DataWriter(ostream);
             writer.writeObject(data);
             _data = ostream.toByteArray();
-        } catch (Exception e) {
+        } catch (IOException e) {
         }
     }
 
+    @Override
     public void readObject(Reader reader) throws IOException {
         setReqName(reader.readString());
         setNodeName(reader.readString());
@@ -185,6 +186,7 @@ public class NSMMessage implements Serializable {
         }
     }
 
+    @Override
     public void writeObject(Writer writer) throws IOException {
         writer.writeString(getReqName());
         writer.writeString(getNodeName());

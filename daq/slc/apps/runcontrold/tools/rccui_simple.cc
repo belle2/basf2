@@ -46,7 +46,7 @@ int main(int argc, char** argv)
     LogFile::debug("Usage : ./rccui nodename rcnode");
     return 1;
   }
-  ConfigFile config("slowcontrol", "rc");
+  ConfigFile config("slowcontrol", "store01");
   std::string nodename = argv[1];
   NSMNode node(nodename);
   std::vector<NSMNode> rcnode_v;
@@ -54,8 +54,8 @@ int main(int argc, char** argv)
     rcnode_v.push_back(NSMNode(argv[i]));
   }
   NSMCommunicator* comm = new NSMCommunicator();
-  comm->init(node, config.get("nsm.local.host"),
-             config.getInt("nsm.local.port"));
+  comm->init(node, config.get("nsm.global.host"),
+             config.getInt("nsm.global.port"));
   HIST_ENTRY* history = NULL;
   int nhistory = 0;
   char* prompt = (char*)malloc(nodename.size() + 3);

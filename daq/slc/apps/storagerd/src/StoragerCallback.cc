@@ -207,7 +207,9 @@ void StoragerCallback::timeout() throw()
   storage_status* info = (storage_status*)m_data.get();
   info->ctime = Time().getSecond();
   info->nnodes = m_flow.size();
-  for (size_t i = 0; i < m_flow.size() && i < 14; i++) {
+  bool connected = false;
+  bool writing = false;
+  for (size_t i = 0; i < m_flow.size() && i < 7; i++) {
     ronode_status& rostatus(m_flow[i].monitor());
     info->node[i].connection_in = rostatus.connection_in;
     info->node[i].nevent_in = rostatus.nevent_in;
@@ -228,13 +230,23 @@ void StoragerCallback::timeout() throw()
       info->node[0].nqueue_in = rostatus.nqueue_in;
       SharedEventBuffer::Header* hd = m_ibuf.getHeader();
       info->node[0].nqueue_out = hd->nword_in - hd->nword_out;
+      connected = (info->node[0].connection_in > 0);
+      LogFile::debug("connected= %s, %d", (connected ? "true" : "false"),
+                     info->node[0].connection_in);
     } else if (i == 1) {
       SharedEventBuffer::Header* hd = m_rbuf.getHeader();
       info->node[1].nqueue_out = hd->nword_in - hd->nword_out;
       info->nfiles = rostatus.reserved_i[0];
       info->diskid = rostatus.reserved_i[1];
       info->nbytes = rostatus.reserved_f[0];
+      writing = (rostatus.flowrate_out > 0);
     }
+  }
+  if (connected) {
+    if (writing) info->state = 2;
+    else info->state = 1;
+  } else {
+    info->state = 0;
   }
   struct statvfs statfs;
   if (m_file.hasKey("record.ndisks")) {

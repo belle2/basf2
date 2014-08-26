@@ -45,21 +45,21 @@ int main(int argc, char** argv)
     fputs("\033[2J\033[0;0H", stdout);
     rewind(stdout);
     ftruncate(1, 0);
-    printf(" nnodes = %u update time = %s\n", info->nnodes, Date(info->updatetime).toString());
+    printf(" nnodes = %u update time = %s\n", info->nnodes, Date(info->ctime).toString());
     printf("\n");
     printf(" node #  | sysstate |      nevent | nqueue | error |  flow rate | event size | event rate |   load ave\n");
-    for (int i = 0; i < MAX_NODES; i++) {
+    for (int i = 0; i < 22; i++) {
       rfunitinfo::rfnodeinfo& node(info->nodeinfo[i]);
       printf(" %d (in)  | %8d | %12d | %6d | %5d | %10s | %10s | %10s | %10s \n",
-             i, node.sysstate, node.nevent_in, node.nqueue_in, node.error,
+             i, node.state, node.nevent_in, node.nqueue_in, node.eflag,
              StringUtil::form("%02.2f", node.flowrate_in).c_str(),
-             StringUtil::form("%02.2f", node.avesize_in).c_str(),
+             StringUtil::form("%02.2f", node.evtsize_in).c_str(),
              StringUtil::form("%02.2f", node.evtrate_in).c_str(),
-             StringUtil::form("%02.2f", node.loadave).c_str());
+             StringUtil::form("%02.2f", node.loadavg).c_str());
       printf(" %d (out) | -------- | %12d | %6d | ----- | %10s | %10s | %10s | ----------- \n",
              i, node.nevent_out, node.nqueue_out,
              StringUtil::form("%02.2f", node.flowrate_out).c_str(),
-             StringUtil::form("%02.2f", node.avesize_out).c_str(),
+             StringUtil::form("%02.2f", node.evtsize_out).c_str(),
              StringUtil::form("%02.2f", node.evtrate_out).c_str());
     }
     printf("\n");

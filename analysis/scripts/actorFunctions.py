@@ -321,9 +321,9 @@ def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughte
         pmake.param('inverseSamplingRate', 10)
         if preCutConfig.variable in ['M', 'Mbc']:
             mass = pdg.get(pdg.from_name(particleName)).Mass()
-            pmake.param('histParams', (200, mass / 2, mass + mass / 2))
+            pmake.param('histParams', (500, mass / 2, mass + mass / 2))
         elif preCutConfig.variable in ['Q']:
-            pmake.param('histParams', (200, -1, 1))
+            pmake.param('histParams', (500, -1, 1))
         else:
             pmake.param('customBinning', list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])))
         path.add_module(pmake)
@@ -493,13 +493,16 @@ def WriteAnalysisFileForChannel(particleName, particleLabel, channelName, preCut
         @return Resource named Placeholders_{channelName} providing latex placeholders of this channel
     """
 
+    B2INFO("Write analysis tex file for channel {c}.".format(c=channelName))
     placeholders = {}
     placeholders['particleName'] = particleName
     placeholders['particleLabel'] = particleLabel
     placeholders['channelName'] = channelName
     placeholders['isIgnored'] = False
     placeholders = automaticReporting.createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut)
+    B2INFO("Write analysis tex file for channel {c}.".format(c=channelName))
     placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, postCut)
+    B2INFO("Write analysis tex file for channel {c}.".format(c=channelName))
 
     hash = actorFramework.createHash(placeholders)
     placeholders['texFile'] = removeJPsiSlash('{name}_channel_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
@@ -523,6 +526,7 @@ def WriteAnalysisFileForFSParticle(particleName, particleLabel, mvaConfig, signa
         @return Resource named Placeholders_{particleName}:{particleLabel} providing latex placeholders of this particle
     """
 
+    B2INFO("Write analysis tex file for final state particle {p} with label {l}.".format(p=particleName, l=particleLabel))
     placeholders = {}
     placeholders['particleName'] = particleName
     placeholders['particleLabel'] = particleLabel
@@ -545,6 +549,7 @@ def WriteAnalysisFileForCombinedParticle(particleName, particleLabel, channelPla
         @return Resource named Placeholders_{particleName}:{particleLabel} providing latex placeholders of this particle
     """
 
+    B2INFO("Write analysis tex file for intermediate particle {p} with label {l}.".format(p=particleName, l=particleLabel))
     placeholders = {'channels': channelPlaceholders}
     placeholders['particleName'] = particleName
     placeholders['particleLabel'] = particleLabel
@@ -567,6 +572,7 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
         @return Resource named FEIsummary.pdf
     """
 
+    B2INFO("Create analysis summary pdf file.")
     finalParticlePlaceholders = []
     for ntuple in finalParticleNTuples:
         if ntuple is not None:

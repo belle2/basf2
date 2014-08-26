@@ -165,6 +165,7 @@ def FullEventInterpretation(path, particles):
     parser = argparse.ArgumentParser()
     parser.add_argument('-verbose', '--verbose', dest='verbose', action='store_true', help='Output additional information')
     parser.add_argument('-nosignal', '--no-signal-classifiers', dest='nosig', action='store_true', help='Do not train classifiers')
+    parser.add_argument('-nproc', '--nProcesses', dest='nProcesses', type=int, default=1, help='Use n processes to execute actors parallel')
     args = parser.parse_args()
 
     # Add the basf2 module path
@@ -348,4 +349,4 @@ def FullEventInterpretation(path, particles):
                     particles=['Object_{i}'.format(i=particle.identifier)for particle in particles])
     seq.addNeeded('FEIsummary.pdf')
 
-    seq.run(path, args.verbose)
+    seq.run(path, args.verbose, args.nProcesses)

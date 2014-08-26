@@ -63,25 +63,25 @@ namespace Belle2 {
 
   private:
 
-    std::string m_gfTrackCandsColName;
-    std::string m_PXDInterceptListName;
-    std::string m_ROIListName;
+    std::string m_gfTrackCandsColName; /**< TrackCand list name */
+    std::string m_PXDInterceptListName; /**< Intercept list name */
+    std::string m_ROIListName; /**< ROI list name */
 
     TFile* m_rootFilePtr; /**< pointer at root file used for storing infos for debugging and validating purposes */
-    std::string m_rootFileName;
+    std::string m_rootFileName; /**< root file name */
     bool m_writeToRoot; /**< if true, a rootFile named by m_rootFileName will be filled with info */
 
     int m_rootEvent;   /**<  event number*/
 
     //graphs & histos - results
-    Double_t pt[6]  = {1.5, 0.75, 0.4, 0.25, 0.15, 0.05};
-    Double_t ptErr[6]    = { 0.5, 0.25, 0.1, 0.05, 0.05, 0.05};
-    TGraphErrors* m_gEff;
-    TH1F* m_h1digiIn;
-    TH1F* m_h1digiOut2;
-    TH1F* m_h1digiOut3;
-    TH1F* m_h1digiOut4;
-    TH1F* m_h1digiOut5;
+    Double_t pt[6]  = {1.5, 0.75, 0.4, 0.25, 0.15, 0.05}; /**< bin edges (in pt = transverse momentum)*/
+    Double_t ptErr[6]    = { 0.5, 0.25, 0.1, 0.05, 0.05, 0.05}; /**< bin widths (transverse momentum) */
+    TGraphErrors* m_gEff; /**< efficiency graph */
+    TH1F* m_h1digiIn; /**< digits contained in ROI histogram*/
+    TH1F* m_h1digiOut2; /**< lost digit: ROI exist with right vxdID */
+    TH1F* m_h1digiOut3; /**< lost digit: ROI exist with wrong vxdID */
+    TH1F* m_h1digiOut4; /**< lost digit: ROI does not exist, intercept with right vxdID */
+    TH1F* m_h1digiOut5; /**< lost digit: ROI does not exist, intercept with wrong vxdID */
 
     //histograms
     TH1F* m_h1ptAll; /**< distribution of transverse momentum for all PDXDigits*/
@@ -149,61 +149,61 @@ namespace Belle2 {
     TH1F* m_h1LambdaBad_timeL1; /**< distribution of phi when no ROI and intercept has wrong vxdID and GlobalTime<1*/
     TH1F* m_h1LambdaBad_timeG1; /**< distribution of phi when no ROI and intercept has wrong vxdID and GlobalTime<1*/
 
-    TH1F* m_hNhits;
-    TH1F* m_hNhitsBad;
+    TH1F* m_hNhits; /**< number of hits per candidate*/
+    TH1F* m_hNhitsBad; /**< number of hits per candidate, no digits in ROI*/
 
-    TH2F* m_h2Map;
-    TH2F* m_h2MapBad_L1;
-    TH2F* m_h2MapBad_L2;
+    TH2F* m_h2Map; /**<sensor perp,phi */
+    TH2F* m_h2MapBad_L1; /**<sensor perp,phi - no digit in - layer2*/
+    TH2F* m_h2MapBad_L2; /**<sensor perp,phi - no digit in - layer1*/
 
     //variables
-    double m_globalTime;
-    double m_coorU;
-    double m_coorV;
-    double m_sigmaU;
-    double m_sigmaV;
-    int m_vxdID;
+    double m_globalTime; /**< global hit time */
+    double m_coorU; /**< intercept U coordinate*/
+    double m_coorV; /**< intercept V coordinate*/
+    double m_sigmaU; /**< intercept U stat error*/
+    double m_sigmaV; /**< intercept V stat error*/
+    int m_vxdID; /**< VXD ID*/
 
-    double m_coorUmc;
-    double m_coorVmc;
-    int m_Uidmc;
-    int m_Vidmc;
-    int m_vxdIDmc;
-    double pT;
-    double m_momXmc;
-    double m_momYmc;
-    double m_momZmc;
-    double m_thetamc;
+    double m_coorUmc; /**< true intercept U coordinate*/
+    double m_coorVmc; /**< true intercept V coordinate*/
+    int m_Uidmc; /**< true intercept U id  */
+    int m_Vidmc; /**< true intercept V id  */
+    int m_vxdIDmc; /**< true intercept VXD id  */
+    double pT; /**< transverse momentum */
+    double m_momXmc; /**< true p along X */
+    double m_momYmc;/**< true p along Y */
+    double m_momZmc; /**< true p along Z */
+    double m_thetamc; /**< true theta*/
     //    double m_theta;
-    double m_costhetamc;
-    double m_costhetaMCPart;
-    double m_phimc;
-    double m_lambdamc;
+    double m_costhetamc; /**< true cos theta */
+    double m_costhetaMCPart; /**< cos theta of MC particle */
+    double m_phimc;  /**< true phi */
+    double m_lambdamc;  /**< true lambda = pi/2 - theta*/
 
-    unsigned int n_tracks;
-    unsigned int n_tracksWithDigits;
-    unsigned int npxdDigit[6];
-    unsigned int npxdDigitInROI[6];
-    unsigned int n_pxdDigit;
-    unsigned int n_pxdDigitInROI;
+    unsigned int n_tracks; /**< number of tracks */
+    unsigned int n_tracksWithDigits; /**< number of tracks with digits */
+    unsigned int npxdDigit[6]; /**< number of pxd digits in bins of pt*/
+    unsigned int npxdDigitInROI[6]; /**< number of pxd digits inside ROI in bins of pt*/
+    unsigned int n_pxdDigit; /**< number of pxd digits*/
+    unsigned int n_pxdDigitInROI; /**< number of pxd digits*/
     //    unsigned int n_noHit;
-    unsigned int n_noHit2;
-    unsigned int n_noHit3;
-    unsigned int n_noROI4;
-    unsigned int n_noROI5;
-    unsigned int nnoHit2[6];
-    unsigned int nnoHit3[6];
-    unsigned int nnoROI4[6];
-    unsigned int nnoROI5[6];
+    unsigned int n_noHit2; /**< number of lost digits: no hit, correct vxdID*/
+    unsigned int n_noHit3;/**< number of lost digits: no hit, wrong vxdID*/
+    unsigned int n_noROI4; /**< number of lost digits: no ROI, intercepts with correct vxdID*/
+    unsigned int n_noROI5; /**< number of lost digits: no ROI, intercepts with wrong vxdID*/
+    unsigned int nnoHit2[6]; /**< number of lost digits in bins of pt: no hit, correct vxdID*/
+    unsigned int nnoHit3[6]; /**< number of lost digits in bins of pt: no hit, wrong vxdID*/
+    unsigned int nnoROI4[6];  /**< number of lost digits in bins of pt: no ROI, intercepts with correct vxdID*/
+    unsigned int nnoROI5[6];  /**< number of lost digits in bins of pt: no ROI, intercepts with wrong vxdID*/
 
-    unsigned int NtrackHit;
-    unsigned int NtrackNoHit2;
-    unsigned int NtrackNoHit3;
-    unsigned int NtrackNoROI4;
-    unsigned int NtrackNoROI5;
+    unsigned int NtrackHit; /**< nuner of tracks with hits */
+    unsigned int NtrackNoHit2; /**< nuner of tracks with no digits in ROI (correct vxdID) */
+    unsigned int NtrackNoHit3; /**< nuner of tracks with no digits in ROI (wrong vxdID) */
+    unsigned int NtrackNoROI4; /**< nuner of tracks with no ROI (intercept with correct vxdID) */
+    unsigned int NtrackNoROI5; /**< nuner of tracks with no ROI (intercept with wrong vxdID) */
 
 
-    int m_nNoMCPart;
+    int m_nNoMCPart; /**< number of tracks with no MC particles*/
   };
 
 }

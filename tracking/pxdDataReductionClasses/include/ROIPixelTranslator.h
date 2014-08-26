@@ -28,6 +28,8 @@ namespace Belle2 {
      */
     ROIPixelTranslator(const ROIinfo*  theROIinfo);
 
+    /** Second Constructor.
+     */
     ROIPixelTranslator(double sigmaSystU, double sigmaSystV,
                        double numSigmaTotU, double numSigmaTotV,
                        double maxWidthU, double maxWidthV);

@@ -27,7 +27,8 @@ namespace Belle2 {
 
     virtual ~ROIDetPlane();
 
-    VxdID getSensorInfo() {return m_sensorInfo;}; /**< return the sensor ID*/
+    /**return the sensor ID*/
+    VxdID getSensorInfo() {return m_sensorInfo;};
 
   private:
     VxdID m_sensorInfo; /**< the sensor ID*/

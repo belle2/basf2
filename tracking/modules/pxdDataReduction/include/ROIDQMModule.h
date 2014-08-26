@@ -51,7 +51,7 @@ namespace Belle2 {
 
     virtual void endRun();
 
-    std::string m_PXDDigitsName;
+    std::string m_PXDDigitsName; /**< digit list name*/
 
   private:
 
@@ -63,40 +63,43 @@ namespace Belle2 {
     TDirectory* m_InterDir;
     TDirectory* m_ROIDir;
 
-    //map of histograms to be filled once per intercept
+    /** typedef: histograms to be filled once per intercept + filling function*/
     typedef std::pair< TH1*, std::function< void(TH1* , const PXDIntercept*) > > InterHistoAndFill;
+    /** map of histograms to be filled once per intercept */
     std::unordered_multimap<Belle2::VxdID, InterHistoAndFill, std::function<size_t (const Belle2::VxdID&)> > hInterDictionary;
 
-    //map of histograms to be filled once per roi
+    /** typedef: histograms to be filled once per roi + filling function*/
     typedef std::pair< TH1*, std::function< void(TH1* , const ROIid*) > > ROIHistoAndFill;
+    /** map of histograms to be filled once per roi */
     std::unordered_multimap<Belle2::VxdID, ROIHistoAndFill, std::function<size_t (const Belle2::VxdID&)> > hROIDictionary;
 
-    //map of histograms to be filled once per event
+    /** struct: histograms to be filled once per event + filling fucntion + accumulate function*/
     struct ROIHistoAccumulateAndFill {
-      TH1* hPtr;
-      std::function< void (const ROIid*, double&) > accumulate;   //accumulate
-      std::function< void (TH1*, double&) > fill;   //fill
-      double value;
+      TH1* hPtr;  /**< histogram pointer */
+      std::function< void (const ROIid*, double&) > accumulate;   /**< accumulate function*/
+      std::function< void (TH1*, double&) > fill;   /**< fill function */
+      double value; /**< value used to fill*/
     };
+    /** map of histograms to be filled once per event */
     std::unordered_multimap<Belle2::VxdID, ROIHistoAccumulateAndFill&, std::function<size_t (const Belle2::VxdID&) > > hROIDictionaryEvt;
 
-    void createHistosDictionaries();
-    void fillSensorROIHistos(const ROIid* roi);
-    void fillSensorInterHistos(const PXDIntercept* inter);
+    void createHistosDictionaries(); /**< create the dictionary*/
+    void fillSensorROIHistos(const ROIid* roi); /**< fill histograms per sensor, filled once per ROI */
+    void fillSensorInterHistos(const PXDIntercept* inter); /**< fill histograms per sensor, filled once per intercept */
 
-    int m_numModules;
+    int m_numModules; /**< number of modules*/
 
-    TH1F* hnROIs;
-    TH1F* hnInter;
-    TH1F* harea;
-    TH1F* hredFactor;
-    TH2F* hCellUV;
-    int n_events;
+    TH1F* hnROIs; /**< number of ROIs*/
+    TH1F* hnInter; /**< number of intercpets*/
+    TH1F* harea; /**< ROis area */
+    TH1F* hredFactor; /**< reduction factor*/
+    TH2F* hCellUV; /**< U,V cells */
+    int n_events; /**< number of events*/
 
-    TH2F* h_HitRow_CellU;
-    TH2F* h_HitCol_CellV;
+    TH2F* h_HitRow_CellU; /**< pxdRawHit ROW vs CellID U*/
+    TH2F* h_HitCol_CellV; /**< pxdRawHit ROW vs CellID U*/
 
-    virtual void defineHisto();
+    virtual void defineHisto(); /**< define histograms*/
 
   };//end class declaration
 

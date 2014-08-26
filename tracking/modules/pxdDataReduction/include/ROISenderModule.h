@@ -59,20 +59,20 @@ namespace Belle2 {
   protected:
 
 
-    std::string  m_messageQueueName;
-    const char* m_messageQueueNameCstring;
-    std::string  m_ROIpayloadName;
+    std::string  m_messageQueueName; /**< message queue name*/
+    const char* m_messageQueueNameCstring; /**< message queue name c string */
+    std::string  m_ROIpayloadName; /**< ROI payload name*/
 
-    int          m_messageQueueDepth;
-    int          m_messageQueueMsgSize;
+    int          m_messageQueueDepth; /**< message queue depth*/
+    int          m_messageQueueMsgSize; /**< message queue message size*/
 
   private:
-    mqd_t        m_messageQueue;
+    mqd_t        m_messageQueue; /**< message queue*/
 
 
-    void openMessageQueue(const char* log_string);
-    void closeMessageQueue(const char* log_string);
-    void unlinkMessageQueue(const char* log_string);
+    void openMessageQueue(const char* log_string); /**< open message queue*/
+    void closeMessageQueue(const char* log_string); /**< close message queue*/
+    void unlinkMessageQueue(const char* log_string); /**< unlink message queue*/
   };
 }
 #endif

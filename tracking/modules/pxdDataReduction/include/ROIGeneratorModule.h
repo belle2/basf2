@@ -53,20 +53,20 @@ namespace Belle2 {
 
   protected:
 
-    std::string m_ROIListName;
-    int m_divider;
-    int m_layer  ;
-    int m_ladder ;
-    int m_sensor ;
+    std::string m_ROIListName; /**< ROi list name*/
+    int m_divider; /**< generate one ROI every m_divider event*/
+    int m_layer  ; /**< layer */
+    int m_ladder ; /**< ladder*/
+    int m_sensor ; /**< sensor*/
 
-    int m_minU   ;
-    int m_maxU   ;
+    int m_minU   ; /**< min U*/
+    int m_maxU   ; /**< max U*/
 
-    int m_minV   ;
-    int m_maxV   ;
+    int m_minV   ; /**< min V*/
+    int m_maxV   ; /**< max V*/
 
 
-    int m_nROIs;
+    int m_nROIs; /**< number of ROIs per event*/
 
   };
 }

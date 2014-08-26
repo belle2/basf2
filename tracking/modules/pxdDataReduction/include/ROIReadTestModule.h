@@ -55,9 +55,9 @@ namespace Belle2 {
 
   protected:
 
-    std::string m_outfileName;
-    std::string m_ROIpayloadName;
-    FILE* m_pFile;
+    std::string m_outfileName; /**< produced file name*/
+    std::string m_ROIpayloadName; /**< ROI payload name*/
+    FILE* m_pFile; /**< file*/
 
   };
 }

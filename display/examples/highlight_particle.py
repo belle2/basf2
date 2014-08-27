@@ -52,14 +52,14 @@ main.add_module(register_module('Gearbox'))
 main.add_module(register_module('Geometry'))
 
 
-selectParticle('K-', [], path=main)
-selectParticle('pi+', [], path=main)
-selectParticle('gamma', [], path=main)
+selectParticle('K-', 'Kid > 0.1', path=main)
+selectParticle('pi+', 'piid > 0.1', path=main)
+selectParticle('gamma', '', path=main)
 
-makeParticle('pi0 -> gamma gamma', {'M': (0.110, 0.150)}, path=main)
+reconstructDecay('pi0 -> gamma gamma', '0.110 < M < 0.150', path=main)
 
-makeParticle('D0 -> K- pi+', {'M': (1.7, 2.0)}, path=main)
-makeParticle('D*+ -> D0 pi+', {'M': (1.9, 2.1)}, path=main)
+reconstructDecay('D0 -> K- pi+', '1.7 < M < 2.0', path=main)
+reconstructDecay('D*+ -> D0 pi+', '1.9 < M < 2.1', path=main)
 
 
 main.add_module(HighlighterModule())

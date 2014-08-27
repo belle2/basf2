@@ -226,7 +226,7 @@ namespace Belle2 {
      * element so we keep it a plain double. */
     double m_suspendedMemory; //! (transient)
 
-    ClassDef(ProcessStatistics, 1); /**< Class to collect call statistics for all modules. */
+    ClassDef(ProcessStatistics, 2); /**< Class to collect call statistics for all modules. */
   };
 
 } //Belle2 namespace

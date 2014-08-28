@@ -113,7 +113,7 @@ void ROCallback::timeout() throw()
     } else {
       nsm->loadavg = -1;
     }
-    LogFile::debug("Load average = %f", nsm->loadavg);
+    //LogFile::debug("Load average = %f", nsm->loadavg);
   }
 }
 

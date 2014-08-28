@@ -155,7 +155,6 @@ void COPPERCallback::timeout() throw()
     } else {
       nsm->loadavg = -1;
     }
-    LogFile::debug("loadavg = %f", nsm->loadavg);
   }
 }
 

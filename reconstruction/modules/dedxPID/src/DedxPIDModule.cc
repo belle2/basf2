@@ -282,8 +282,8 @@ void DedxPIDModule::event()
     genfit::StateOnPlane pocaState = fitterInfo->getFittedState(true);
 
     if (gftrack->getFitStatus(trackrep)->isTrackPruned()) {
-      B2ERROR("GFTrack is pruned, please run DedxPID only on unpruned tracks! Skipping this track.");
-      continue;
+      B2FATAL("GFTrack is pruned, please run DedxPID only on unpruned tracks! Aborting.");
+      return;
     }
 
     dedxTrack->m_pdg_hyp = fitResult->getParticleType().getPDGCode();

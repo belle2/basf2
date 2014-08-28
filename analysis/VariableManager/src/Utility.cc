@@ -4,18 +4,15 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/regex.hpp>
 
 #include <iostream>
 #include <stdexcept>
 
 std::string Belle2::Variable::makeROOTCompatible(std::string str)
 {
-  boost::algorithm::erase_all(str, "(");
-  boost::algorithm::erase_all(str, ")");
-  boost::algorithm::erase_all(str, ",");
-  boost::algorithm::erase_all(str, ":");
-  boost::algorithm::erase_all(str, " ");
-  return str;
+  const static boost::regex blackList("[^a-zA-Z0-9_]");
+  return boost::regex_replace(str, blackList, "");
 }
 
 bool almostEqualFloat(const float& a, const float& b)

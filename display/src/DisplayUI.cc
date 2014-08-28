@@ -36,13 +36,8 @@
 #include <TGTextEntry.h>
 #include <TGLViewer.h>
 #include <TObject.h>
-#include <TObjArray.h>
-#include <TObjString.h>
 #include <TROOT.h>
 #include <TSystem.h>
-
-#include <boost/scoped_ptr.hpp>
-
 
 
 using namespace Belle2;
@@ -223,7 +218,7 @@ void DisplayUI::showJumpToEventDialog()
   if (!eventMetaData)
     return; //this should not actually happen.
 
-  char returnString[256];
+  char returnString[256]; //magic length specified by TGInputDialog. Note that it still overwrites the stack if you paste something long enough.
   new TGInputDialog(gEve->GetBrowser()->GetClient()->GetDefaultRoot(), gEve->GetBrowser(),
                     "Jump to event '#evt/#run/#exp':",
                     TString::Format("%lu/%lu/%lu", eventMetaData->getEvent(), eventMetaData->getRun(), eventMetaData->getExperiment()),
@@ -231,27 +226,13 @@ void DisplayUI::showJumpToEventDialog()
   if (returnString[0] == '\0')
     return; //cancelled
 
-  boost::scoped_ptr<TObjArray> stringList(TString(returnString).Tokenize("/"));
-  if (stringList->GetEntriesFast() != 3) {
+  long event, run, exp;
+  returnString[255] = '\0'; //I don't trust root to terminate the string correctly
+  if (sscanf(returnString, "%ld/%ld/%ld", &event, &run, &exp) != 3) {
     B2WARNING("Wrong format!");
     return;
   }
-  const TString& evt = static_cast<TObjString*>(stringList->At(0))->GetString();
-  const TString& run = static_cast<TObjString*>(stringList->At(1))->GetString();
-  const TString& exp = static_cast<TObjString*>(stringList->At(2))->GetString();
-  if (!evt.IsDec()) {
-    B2WARNING("Event number is not numeric?");
-    return;
-  }
-  if (!run.IsDec()) {
-    B2WARNING("Run number is not numeric?");
-    return;
-  }
-  if (!exp.IsDec()) {
-    B2WARNING("Experiment number is not numeric?");
-    return;
-  }
-  goToEvent(evt.Atoll(), run.Atoll(), exp.Atoll());
+  goToEvent(event, run, exp);
 }
 
 void DisplayUI::clearEvent()

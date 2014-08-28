@@ -102,7 +102,7 @@ namespace Belle2 {
     int  m_pathfd; /**< Associated file descriptor. */
     key_t m_shmkey; /**< SHM key, see shmget(2). */
     key_t m_semkey; /**< Semaphore key, see semget(2). */
-    char* m_strbuf; /**< file name containing ids of shm and sema for private shared mem */
+    std::string m_semshmFileName; /**< file path containing ids of shm and sema for private shared mem, used for easier cleanup if we fail to do things properly */
 
     int  m_shmid; /**< ID of shared memory segment. (See shmget(2)) */
     int* m_shmadr; /**< Address of attached shared memory segment. (See shmat(2)) */

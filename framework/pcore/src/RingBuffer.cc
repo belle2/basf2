@@ -27,6 +27,7 @@
 #include <cstdlib>
 
 #include <fstream>
+#include <stdexcept>
 
 using namespace std;
 using namespace Belle2;
@@ -42,16 +43,6 @@ RingBuffer::RingBuffer(int size)
   m_semkey = IPC_PRIVATE;
 
   openSHM(size);
-
-  // Leave id of shm and semaphore in file name
-  m_strbuf = new char[1024];
-  sprintf(m_strbuf, "/tmp/SHM%d-SEM%d-UNNAMED", m_shmid, m_semid);
-  int fd = open(m_strbuf, O_CREAT | O_TRUNC | O_RDWR, 0644);
-  if (fd < 0) {
-    B2WARNING("RingBuffer ID file could not be created.");
-  } else {
-    close(fd);
-  }
 
   B2INFO("RingBuffer initialization done");
 }
@@ -102,17 +93,6 @@ RingBuffer::RingBuffer(const char* name, unsigned int size)
     close(m_pathfd);
   }
 
-  // Leave id of shm and semaphore in file name
-  if (m_new) {
-    m_strbuf = new char[1024];
-    sprintf(m_strbuf, "/tmp/SHM%d-SEM%d-RB_%s", m_shmid, m_semid, name);
-    int fd = open(m_strbuf, O_CREAT | O_TRUNC | O_RDWR, 0644);
-    if (fd < 0) {
-      B2WARNING("RingBuffer ID file could not be created.");
-    } else {
-      close(fd);
-    }
-  }
 
   B2INFO("RingBuffer initialization done with shm=" << m_shmid);
 }
@@ -128,7 +108,6 @@ void RingBuffer::openSHM(int size)
   unsigned int sizeBytes = size * sizeof(int);
   m_shmid = shmget(m_shmkey, sizeBytes, IPC_CREAT | 0644);
   if (m_shmid < 0) {
-    //    perror ( "RingBuffer:shmget" );
     unsigned int maxSizeBytes = size;
     ifstream shmax("/proc/sys/kernel/shmmax");
     if (shmax.good())
@@ -187,6 +166,17 @@ void RingBuffer::openSHM(int size)
   m_remq_counter = 0;
   m_insq_counter = 0;
 
+  if (m_new) {
+    // Leave id of shm and semaphore in file name
+    m_semshmFileName = "/tmp/SHM" + to_string(m_shmid) + "-SEM" + to_string(m_semid) + "-UNNAMED";
+    int fd = open(m_semshmFileName.c_str(), O_CREAT | O_TRUNC | O_RDWR, 0644);
+    if (fd < 0) {
+      B2WARNING("RingBuffer ID file could not be created.");
+    } else {
+      close(fd);
+    }
+  }
+
   B2DEBUG(100, "buftop = " << m_buftop << ", end = " << (m_buftop + m_bufinfo->size));
 }
 
@@ -201,7 +191,7 @@ void RingBuffer::cleanup()
       //      close(m_pathfd);
       unlink(m_pathname.c_str());
     }
-    unlink(m_strbuf);
+    unlink(m_semshmFileName.c_str());
   }
 }
 
@@ -224,7 +214,7 @@ int RingBuffer::insq(const int* buf, int size)
     m_bufinfo->wptr = 0;
     m_bufinfo->rptr = 0;
     if (size > m_bufinfo->size + 2) {
-      B2ERROR("[RingBuffer::insq ()] Inserted item is too large! (" << m_bufinfo->size + 2 << " < " << size << ")");
+      throw std::runtime_error("[RingBuffer::insq ()] Inserted item (size: " + std::to_string(size) + ") is larger than RingBuffer (size: " + std::to_string(m_bufinfo->size + 2) + ")!");
       return -1;
     }
     m_bufinfo->mode = 0;
@@ -337,8 +327,9 @@ int RingBuffer::remq(int* buf)
   SemaphoreLocker locker(m_semid);
   if (m_bufinfo->nbuf < 0) {
     B2FATAL("RingBuffer: nbuf < 0");
+    throw std::runtime_error("[RingBuffer::remq ()] number of entries is negative: " + std::to_string(m_bufinfo->nbuf));
   }
-  if (m_bufinfo->nbuf <= 0) {
+  if (m_bufinfo->nbuf == 0) {
     return 0;
   }
   //  printf ( "remq : nbuf = %d\n", m_bufinfo->nbuf );
@@ -469,7 +460,6 @@ void RingBuffer::DumpInfo()
   SemaphoreLocker locker(m_semid);
 
   // Dump control parameters
-  B2INFO("htns");
   printf("***** Ring Buffer Information ***\n");
   printf("path = %s\n", m_pathname.c_str());
   printf("shmsize = %d\n", m_shmsize);

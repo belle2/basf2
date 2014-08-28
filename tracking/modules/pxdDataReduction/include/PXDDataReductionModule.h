@@ -64,24 +64,24 @@ namespace Belle2 {
 
   protected:
 
-    ROIPixelTranslator* m_thePixelTranslator;
-    PXDInterceptor* m_thePXDInterceptor;
-    std::string m_gfTrackCandsColName;
-    std::string m_PXDInterceptListName;
-    std::string m_ROIListName;
-    std::string m_badTracksListName;
-    std::string m_gfTracksListName;
+    ROIPixelTranslator* m_thePixelTranslator; /**< the pixel translator object*/
+    PXDInterceptor* m_thePXDInterceptor; /**< the pxd interceptor object*/
+    std::string m_gfTrackCandsColName; /**< TrackCand list name*/
+    std::string m_PXDInterceptListName; /**< intercept list name*/
+    std::string m_ROIListName; /**< ROI list name*/
+    std::string m_badTracksListName; /**< bad track list name*/
+    std::string m_gfTracksListName; /**< track list name*/
 
     int m_numIterKalmanFilter; /**< number of iterations of the Kalman Filter*/
 
-    double m_sigmaSystU;
-    double m_sigmaSystV;
-    double m_numSigmaTotU;
-    double m_numSigmaTotV;
-    double m_maxWidthU;
-    double m_maxWidthV;
+    double m_sigmaSystU; /**< fixed width to add in quadrature to the extrapolation error and obtain the ROI U width */
+    double m_sigmaSystV;  /**< fixed width to add in quadrature to the extrapolation error and obtain the ROI V width */
+    double m_numSigmaTotU; /**< number of sigma (stat+syst) determining the U width of the ROI*/
+    double m_numSigmaTotV; /**< number of sigma (stat+syst) determining the U width of the ROI*/
+    double m_maxWidthU;  /**< maximum U width of the ROI */
+    double m_maxWidthV;  /**< maximum V width of the ROI */
 
-    ROIinfo m_ROIinfo;
+    ROIinfo m_ROIinfo; /**< contains the parameters that can be changed by the user*/
 
     /*    inline double getSigmaSystU(){return m_sigmaSystU;};
     inline double getSigmaSystV(){return m_sigmaSystV;};

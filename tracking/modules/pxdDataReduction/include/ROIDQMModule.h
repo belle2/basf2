@@ -55,13 +55,13 @@ namespace Belle2 {
 
   private:
 
-    VXD::GeoCache& m_aGeometry = VXD::GeoCache::getInstance();
+    VXD::GeoCache& m_aGeometry = VXD::GeoCache::getInstance(); /**< the geometry */
 
     std::string m_ROIsName; /**< Name of the ROIid StoreArray */
     std::string m_InterceptsName; /**< Name of the PXDIntercept StoreArray */
 
-    TDirectory* m_InterDir;
-    TDirectory* m_ROIDir;
+    TDirectory* m_InterDir; /**< intercepts directory in the root file */
+    TDirectory* m_ROIDir; /**< ROI directory in the root file */
 
     /** typedef: histograms to be filled once per intercept + filling function*/
     typedef std::pair< TH1*, std::function< void(TH1* , const PXDIntercept*) > > InterHistoAndFill;

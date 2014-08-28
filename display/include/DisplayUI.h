@@ -100,6 +100,9 @@ namespace Belle2 {
     /** Toggle between light and dark color scheme for viewers. */
     void toggleColorScheme();
 
+    /** dock/undock active viewer. */
+    void toggleUndock();
+
     /** Called when one of the module parameters is changed via UI. */
     void handleParameterChange(int id);
 

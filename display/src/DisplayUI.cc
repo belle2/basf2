@@ -464,21 +464,12 @@ void DisplayUI::makeGui()
   }
   frmMain->AddFrame(param_frame, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, 0));
 
+
   TGGroupFrame* viewer_frame = new TGGroupFrame(frmMain);
-  viewer_frame->SetTitle("Viewer");
+  viewer_frame->SetTitle("Current Viewer");
   {
-    TGButton* b = 0;
     TGHorizontalFrame* hf = new TGHorizontalFrame(viewer_frame);
-    {
-      b = new TGTextButton(hf, "Dark/light colors");
-      b->SetToolTipText("Toggle background color");
-      hf->AddFrame(b, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, margin, margin, margin, margin));
-      b->Connect("Clicked()", "Belle2::DisplayUI", this, "toggleColorScheme()");
-    }
-    viewer_frame->AddFrame(hf, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 0, 0, 0, 0));
-
-
-    hf = new TGHorizontalFrame(viewer_frame);
+    TGButton* b = 0;
     {
       b = new TGTextButton(hf, "Save As...");
       b->SetToolTipText("Save a bitmap graphic for the current viewer");
@@ -493,16 +484,41 @@ void DisplayUI::makeGui()
     }
     viewer_frame->AddFrame(hf, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 0, 0, 0, 0));
 
+    hf = new TGHorizontalFrame(viewer_frame);
     {
-      TGCheckButton* b = new TGCheckButton(viewer_frame, "Cumulative mode (experimental)");
+      b = new TGTextButton(hf, "Dock/Undock Viewer");
+      b->SetToolTipText("Move current viewer into it's own window, or back to its original position");
+      hf->AddFrame(b, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, margin, margin, margin, margin));
+      b->Connect("Clicked()", "Belle2::DisplayUI", this, "toggleUndock()");
+    }
+    viewer_frame->AddFrame(hf, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 0, 0, 0, 0));
+  }
+  frmMain->AddFrame(viewer_frame, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, 0));
+
+
+  TGGroupFrame* visOptionsFrame = new TGGroupFrame(frmMain);
+  visOptionsFrame->SetTitle("Visualisation Options");
+  {
+    TGButton* b = 0;
+    TGHorizontalFrame* hf = new TGHorizontalFrame(visOptionsFrame);
+    {
+      b = new TGTextButton(hf, "Dark/light colors");
+      b->SetToolTipText("Toggle background color");
+      hf->AddFrame(b, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, margin, margin, margin, margin));
+      b->Connect("Clicked()", "Belle2::DisplayUI", this, "toggleColorScheme()");
+    }
+    visOptionsFrame->AddFrame(hf, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, 0, 0, 0, 0));
+
+    {
+      TGCheckButton* b = new TGCheckButton(visOptionsFrame, "Cumulative mode (experimental)");
       b->SetToolTipText("Do not erase previous event, i.e. show data from multiple events.");
       b->SetState(m_cumulative ? kButtonDown : kButtonUp);
       b->Connect("Clicked()", "Belle2::DisplayUI", this, "toggleCumulative()");
-      viewer_frame->AddFrame(b, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY, 0, margin, margin, margin));
+      visOptionsFrame->AddFrame(b, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY, 0, margin, margin, margin));
     }
-
   }
-  frmMain->AddFrame(viewer_frame, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, 0));
+  frmMain->AddFrame(visOptionsFrame, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, 0));
+
 
   TGGroupFrame* automatisation_frame = new TGGroupFrame(frmMain);
   automatisation_frame->SetTitle("Automatic Saving (experimental)");
@@ -598,6 +614,35 @@ void DisplayUI::toggleColorScheme()
     else
       glv->UseDarkColorSet();
     glv->DoDraw();
+  }
+}
+
+void DisplayUI::toggleUndock()
+{
+  TGLViewer* activeGLviewer = getViewPane()->getActiveGLViewer();
+  TEveViewerList* viewers = gEve->GetViewers();
+  TEveElement::List_ci end_it = viewers->EndChildren();
+  TEveViewer* activeViewer = nullptr;
+  for (TEveElement::List_i it = viewers->BeginChildren(); it != end_it; ++it) {
+    TEveViewer* v = static_cast<TEveViewer*>(*it);
+    if (v->GetGLViewer() == activeGLviewer) {
+      activeViewer = v;
+      break;
+    }
+  }
+
+  if (!activeViewer) {
+    B2ERROR("No active viewer. Please select one by clicking on it.");
+    return;
+  }
+
+  TEveCompositeFrameInMainFrame* packFrame = dynamic_cast<TEveCompositeFrameInMainFrame*>(activeViewer->GetEveFrame());
+  if (!packFrame) {
+    //we're docked
+    activeViewer->UndockWindow();
+  } else {
+    //we're undocked
+    packFrame->MainFrameClosed();
   }
 }
 

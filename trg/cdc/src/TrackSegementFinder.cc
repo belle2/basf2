@@ -287,11 +287,13 @@ void TRGCDCTrackSegmentFinder::simulateBoard(void){
         separateTS[i]->push_back(input[4*i+146]);
         separateTS[i]->push_back(input[4*i+147]);
   /// clock counter part
-        separateTS[i]->push_back(input[236]);
-        separateTS[i]->push_back(input[237]);
-        separateTS[i]->push_back(input[238]);
-        separateTS[i]->push_back(input[239]);
-        separateTS[i]->push_back(input[240]);
+        const TRGSignalVector & cc = dClock.clockCounter();
+//      cc.dump();
+        separateTS[i]->push_back(cc[0]);
+        separateTS[i]->push_back(cc[1]);
+        separateTS[i]->push_back(cc[2]);
+        separateTS[i]->push_back(cc[3]);
+        separateTS[i]->push_back(cc[4]);
       
       }
 // Board Type Check Start.(for future)

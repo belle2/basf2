@@ -15,12 +15,12 @@
 #define TRGSignalVector_FLAG_
 
 #include <vector>
-#include "trg/trg/Clock.h"
 
 namespace Belle2 {
 
 class TRGSignal;
 class TRGState;
+class TRGClock;
 
 /// A class to represent a bundle of digitized signals. Given
 /// TRGSignal should exist while this object alive.
@@ -33,7 +33,8 @@ class TRGSignalVector : public std::vector<TRGSignal> {
 
     /// Constructor with name.
     TRGSignalVector(const std::string & name,
-		    const TRGClock & = Belle2_GDL::GDLSystemClock,
+//		    const TRGClock & = Belle2_GDL::GDLSystemClock,
+		    const TRGClock &,
 		    unsigned size = 0);
 
     /// Copy constructor.

@@ -182,8 +182,8 @@ TRGCDCFrontEnd::simulate(void) {
     }
 #endif
 
-	// output wire hit info into a .log file
-	ofstream wireinfo((name()+"_wireinfo.log").c_str());
+    // output wire hit info into a .log file
+    ofstream wireinfo((name()+"_wireinfo.log").c_str());
 
 
     //...Create Wire timing bits...
@@ -210,11 +210,11 @@ TRGCDCFrontEnd::simulate(void) {
         //...Hit case...
         else {
 
-	// wire hit info -> .log
+            // wire hit info -> .log
 /*
-	if (type() == innerInside) { wireinfo << endl << "     #" << (i > 15 ? i - 16 : 99999 ) << " wire is hit" << endl; }
-	else {	wireinfo << endl << "	#" <<  i  << " wire is hit" << endl; }
-	output << endl;
+  if (type() == innerInside) { wireinfo << endl << "     #" << (i > 15 ? i - 16 : 99999 ) << " wire is hit" << endl; }
+  else {	wireinfo << endl << "	#" <<  i  << " wire is hit" << endl; }
+  output << endl;
 */
 	
             // s is wire signal which is hit.
@@ -231,8 +231,8 @@ TRGCDCFrontEnd::simulate(void) {
                     const double phase = dClock.phase(at);
                     const unsigned bits = unsigned(phase / (360. / 32.));
 
-             //        		    cout << "at,phase,bits,pos=" << at << "," << phase << ","
-             //        			 << bits <<","<<pos<< endl;
+                    //        		    cout << "at,phase,bits,pos=" << at << "," << phase << ","
+                    //        			 << bits <<","<<pos<< endl;
 
                     // Change priority timing from unsigned into SignalVector.
                     if(bit5->active()){
@@ -251,29 +251,29 @@ TRGCDCFrontEnd::simulate(void) {
                     }
 
 
-	//wire info -> .log
+                    //wire info -> .log
 /*
-	//timing = 00000 case:
-	if ( !(bit5->stateChanges()).size() ) {
-	output << "# of clk: " << pos << " (" << pos*32 << " ns), signal vector: 0 0 0 0 0" << endl;	     
-	}
+//timing = 00000 case:
+if ( !(bit5->stateChanges()).size() ) {
+output << "# of clk: " << pos << " (" << pos*32 << " ns), signal vector: 0 0 0 0 0" << endl;	     
+}
 
-                        const std::vector<int> bit5_changetime = bit5->stateChanges();
-                        std::vector<vector<int>> bit5_boolvector(bit5_changetime.size());
-                for (unsigned ch_t = 0; ch_t < bit5_changetime.size(); ch_t++)       {
+const std::vector<int> bit5_changetime = bit5->stateChanges();
+std::vector<vector<int>> bit5_boolvector(bit5_changetime.size());
+for (unsigned ch_t = 0; ch_t < bit5_changetime.size(); ch_t++)       {
 
-                        for (unsigned b = 0; b < bit5->size(); b++){
-                        bit5_boolvector[ch_t].push_back(  (bit5->state( bit5_changetime[ch_t])[b])  ? 1 : 0 );
-                        }
+for (unsigned b = 0; b < bit5->size(); b++){
+bit5_boolvector[ch_t].push_back(  (bit5->state( bit5_changetime[ch_t])[b])  ? 1 : 0 );
+}
 
-                wireinfo << "# of clk: " << bit5_changetime[ch_t] << " (" << dClock.absoluteTime(bit5_changetime[ch_t]) << " ns), signal vector: " ;
+wireinfo << "# of clk: " << bit5_changetime[ch_t] << " (" << dClock.absoluteTime(bit5_changetime[ch_t]) << " ns), signal vector: " ;
 
-                        for (unsigned b = 0; b < bit5->size(); b++){
-                        wireinfo << bit5_boolvector[ch_t][ bit5->size() - b - 1] << " " ;
-                        }
+for (unsigned b = 0; b < bit5->size(); b++){
+wireinfo << bit5_boolvector[ch_t][ bit5->size() - b - 1] << " " ;
+}
 
-                wireinfo << endl;
-                }
+wireinfo << endl;
+}
 */
 
 
@@ -381,7 +381,7 @@ TCFrontEnd::packerInnerInside(const TRGState & input) {
     s.set(0, 32, hitptn);
     unsigned p = 32;
 
-	//bool true_5[5] = {true, true, true, true, true};
+    //bool true_5[5] = {true, true, true, true, true};
 
     //...Priority timing...
     TRGState secondPriority(16);
@@ -402,7 +402,7 @@ TCFrontEnd::packerInnerInside(const TRGState & input) {
                     secondPriority.set(i, true);
                 }
 		else {
-		   // s.set(p, 5, true_5);
+                    // s.set(p, 5, true_5);
 		    secondPriority.set(i, false);		
 		}
             }
@@ -1288,8 +1288,8 @@ TCFrontEnd::packerOuterOutside(const TRGState & input) {
 }
 
 void
-TCFrontEnd:: unpackerInnerInside(const TRGState & input,
-                                 const TRGState & output) {
+TCFrontEnd::unpackerInnerInside(const TRGState & input,
+                                const TRGState & output) {
 
     cout << "Input bit size=" << input.size() << endl;
 
@@ -1382,8 +1382,8 @@ TCFrontEnd:: unpackerInnerInside(const TRGState & input,
 }
 
 void
-TCFrontEnd:: unpackerInnerOutside(const TRGState & input,
-                                  const TRGState & output) {
+TCFrontEnd::unpackerInnerOutside(const TRGState & input,
+                                 const TRGState & output) {
 
     cout << "Input bit size=" << input.size() << endl;
 
@@ -1451,7 +1451,7 @@ TCFrontEnd:: unpackerInnerOutside(const TRGState & input,
 }
 
 void
-TCFrontEnd:: unpackerOuterInside(const TRGState & input,
+TCFrontEnd::unpackerOuterInside(const TRGState & input,
                                  const TRGState & output) {
 
     cout << "Input bit size=" << input.size() << endl;
@@ -1531,8 +1531,8 @@ TCFrontEnd:: unpackerOuterInside(const TRGState & input,
 }
 
 void
-TCFrontEnd:: unpackerOuterOutside(const TRGState & input,
-                                  const TRGState & output) {
+TCFrontEnd::unpackerOuterOutside(const TRGState & input,
+                                 const TRGState & output) {
 
     cout << "Input bit size=" << input.size() << endl;
 
@@ -1613,63 +1613,63 @@ TCFrontEnd:: unpackerOuterOutside(const TRGState & input,
 void //Dump all the details of _mosb into a .log file, do it in the end of simulate()
 TRGCDCFrontEnd::dump_log(void) const {
 
-if (type() == innerInside) dump_log_innerInside();
-else if (type() == innerOutside) dump_log_innerOutside();
-else if (type() == outerInside) dump_log_outerInside();
-else if (type() == outerOutside) dump_log_outerOutside();
+    if (type() == innerInside) dump_log_innerInside();
+    else if (type() == innerOutside) dump_log_innerOutside();
+    else if (type() == outerInside) dump_log_outerInside();
+    else if (type() == outerOutside) dump_log_outerOutside();
     
 }
 
 void
 TRGCDCFrontEnd::dump_log_innerInside(void) const {
 
-		const TRGClock & dClock = TRGCDC::getTRGCDC()->dataClock();
-                ofstream output((name()+".log").c_str());
+    const TRGClock & dClock = TRGCDC::getTRGCDC()->dataClock();
+    ofstream output((name()+".log").c_str());
 
-                output << "InnerInside FrontEnd output dump" << endl << endl;
+    output << "InnerInside FrontEnd output dump" << endl << endl;
 
-                        const std::vector<int> changetime = _osb->stateChanges();
-                        std::vector<vector<int>> boolvector(changetime.size());
-                for (unsigned ch_t = 0; ch_t < changetime.size(); ch_t++)       {
+    const std::vector<int> changetime = _osb->stateChanges();
+    std::vector<vector<int>> boolvector(changetime.size());
+    for (unsigned ch_t = 0; ch_t < changetime.size(); ch_t++)       {
 
-                        for (unsigned b = 0; b < (* _osb)[0]->size(); b++){
-                        boolvector[ch_t].push_back(  ( (* _osb)[0]->state(changetime[ch_t])[b])  ? 1 : 0);
-                        }
+        for (unsigned b = 0; b < (* _osb)[0]->size(); b++){
+            boolvector[ch_t].push_back(  ( (* _osb)[0]->state(changetime[ch_t])[b])  ? 1 : 0);
+        }
 
-                output << "# of clk: " << changetime[ch_t] << " (" << dClock.absoluteTime(changetime[ch_t]) << " ns), signal vector: " << endl;
+        output << "# of clk: " << changetime[ch_t] << " (" << dClock.absoluteTime(changetime[ch_t]) << " ns), signal vector: " << endl;
 
-                        output << "Hitmap: " << endl ;
-                        for (unsigned b = 0; b < 32; b++){
-                        output << boolvector[ch_t][31 - b] << " " ;
-                        if ( b == 15) output << endl << " ";
-                        }
-                        output << endl;
+        output << "Hitmap: " << endl ;
+        for (unsigned b = 0; b < 32; b++){
+            output << boolvector[ch_t][31 - b] << " " ;
+            if ( b == 15) output << endl << " ";
+        }
+        output << endl;
 
-                        for (unsigned b = 0; b < 16; b++){
-                        output << "PT#" << b << ": " << boolvector[ch_t][ 32 + 5*b + 4 ] << boolvector[ch_t][ 32 + 5*b + 3 ] << boolvector[ch_t][ 32 + 5*b + 2 ]
-                        << boolvector[ch_t][ 32 + 5*b + 1 ] << boolvector[ch_t][ 32 + 5*b] << endl;
-                        }
-                        output << endl;
+        for (unsigned b = 0; b < 16; b++){
+            output << "PT#" << b << ": " << boolvector[ch_t][ 32 + 5*b + 4 ] << boolvector[ch_t][ 32 + 5*b + 3 ] << boolvector[ch_t][ 32 + 5*b + 2 ]
+                   << boolvector[ch_t][ 32 + 5*b + 1 ] << boolvector[ch_t][ 32 + 5*b] << endl;
+        }
+        output << endl;
 
-                        output << "Secondary: ";
-                        for (int b = 0; b < 16; b++){
-                        output <<  boolvector[ch_t][ 127 - b ] ;
-                        }
-                        output << endl;
+        output << "Secondary: ";
+        for (int b = 0; b < 16; b++){
+            output <<  boolvector[ch_t][ 127 - b ] ;
+        }
+        output << endl;
 
-                        for (unsigned b = 0; b < 16; b++){
-                        output << "FT#" << b << ": " << boolvector[ch_t][ 128 + 5*b + 4 ] << boolvector[ch_t][ 128 + 5*b + 3 ] << boolvector[ch_t][ 128 + 5*b + 2 ]
-                        << boolvector[ch_t][ 128 + 5*b + 1 ] << boolvector[ch_t][ 128 + 5*b] << endl;
-                        }
+        for (unsigned b = 0; b < 16; b++){
+            output << "FT#" << b << ": " << boolvector[ch_t][ 128 + 5*b + 4 ] << boolvector[ch_t][ 128 + 5*b + 3 ] << boolvector[ch_t][ 128 + 5*b + 2 ]
+                   << boolvector[ch_t][ 128 + 5*b + 1 ] << boolvector[ch_t][ 128 + 5*b] << endl;
+        }
 
-                        output << endl;
-                        output << "ET#0(cell 31): " << endl << boolvector[ch_t][212] << boolvector[ch_t][211] << boolvector[ch_t][210]
-                        << boolvector[ch_t][209] << boolvector[ch_t][208] << endl;
+        output << endl;
+        output << "ET#0(cell 31): " << endl << boolvector[ch_t][212] << boolvector[ch_t][211] << boolvector[ch_t][210]
+               << boolvector[ch_t][209] << boolvector[ch_t][208] << endl;
 
-                output << endl;
-                }
+        output << endl;
+    }
 
-	output.close();
+    output.close();
 
 }
 
@@ -1677,149 +1677,149 @@ TRGCDCFrontEnd::dump_log_innerInside(void) const {
 void
 TRGCDCFrontEnd::dump_log_innerOutside(void) const {
 
-		const TRGClock & dClock = TRGCDC::getTRGCDC()->dataClock();
-                ofstream output((name()+".log").c_str());
+    const TRGClock & dClock = TRGCDC::getTRGCDC()->dataClock();
+    ofstream output((name()+".log").c_str());
 
-                output << "InnerOutside FrontEnd output dump" << endl << endl;
+    output << "InnerOutside FrontEnd output dump" << endl << endl;
 
-                        const std::vector<int> changetime = _osb->stateChanges();
-                        std::vector<vector<int>> boolvector(changetime.size());
-                for (unsigned ch_t = 0; ch_t < changetime.size(); ch_t++)       {
+    const std::vector<int> changetime = _osb->stateChanges();
+    std::vector<vector<int>> boolvector(changetime.size());
+    for (unsigned ch_t = 0; ch_t < changetime.size(); ch_t++)       {
 
-                        for (unsigned b = 0; b <  (* _osb)[0]->size(); b++){
-                        boolvector[ch_t].push_back(  ( (* _osb)[0]->state(changetime[ch_t])[b])  ? 1 : 0);
-                        }
+        for (unsigned b = 0; b <  (* _osb)[0]->size(); b++){
+            boolvector[ch_t].push_back(  ( (* _osb)[0]->state(changetime[ch_t])[b])  ? 1 : 0);
+        }
 
-                output << "# of clk: " << changetime[ch_t] << " (" << dClock.absoluteTime(changetime[ch_t]) << " ns), signal vector: " << endl;
+        output << "# of clk: " << changetime[ch_t] << " (" << dClock.absoluteTime(changetime[ch_t]) << " ns), signal vector: " << endl;
 
-                        output << "Hitmap: " << endl << " ";
-                        for (unsigned b = 0; b < 48; b++){
-                        output << boolvector[ch_t][47 - b] << " ";
-                        if ( b == 15) output << endl ;
-                        else if (b == 31) output << endl << " ";
-                        }
-                        output << endl;
+        output << "Hitmap: " << endl << " ";
+        for (unsigned b = 0; b < 48; b++){
+            output << boolvector[ch_t][47 - b] << " ";
+            if ( b == 15) output << endl ;
+            else if (b == 31) output << endl << " ";
+        }
+        output << endl;
 
-                        for (unsigned b = 0; b < 16; b++){
-                        output << "FT#" << b << ": " << boolvector[ch_t][ 48 + 5*b + 4 ] << boolvector[ch_t][ 48 + 5*b + 3 ] << boolvector[ch_t][ 48 + 5*b + 2 ]
-                        << boolvector[ch_t][ 48 + 5*b + 1 ] << boolvector[ch_t][ 48 + 5*b] << endl;
-                        }
+        for (unsigned b = 0; b < 16; b++){
+            output << "FT#" << b << ": " << boolvector[ch_t][ 48 + 5*b + 4 ] << boolvector[ch_t][ 48 + 5*b + 3 ] << boolvector[ch_t][ 48 + 5*b + 2 ]
+                   << boolvector[ch_t][ 48 + 5*b + 1 ] << boolvector[ch_t][ 48 + 5*b] << endl;
+        }
 
-                        output << endl;
-                        output << "ET#0(cell 32): " << endl << boolvector[ch_t][132] << boolvector[ch_t][131] << boolvector[ch_t][130]
-                         << boolvector[ch_t][129] << boolvector[ch_t][128] << endl;
-                        output << "ET#1(cell 0, 16, 32, 33): " << endl << boolvector[ch_t][137] << boolvector[ch_t][136] << boolvector[ch_t][135]
-                         << boolvector[ch_t][134] << boolvector[ch_t][133] << endl;
-                        output << "ET#0(cell 15, 30, 31, 46, 47): " << endl << boolvector[ch_t][142] << boolvector[ch_t][141] << boolvector[ch_t][140]
-                         << boolvector[ch_t][139] << boolvector[ch_t][138] << endl;
-                        output << "ET#3(cell 31, 47): " << endl << boolvector[ch_t][147] << boolvector[ch_t][146] << boolvector[ch_t][145]
-                         << boolvector[ch_t][144] << boolvector[ch_t][143] << endl;
+        output << endl;
+        output << "ET#0(cell 32): " << endl << boolvector[ch_t][132] << boolvector[ch_t][131] << boolvector[ch_t][130]
+               << boolvector[ch_t][129] << boolvector[ch_t][128] << endl;
+        output << "ET#1(cell 0, 16, 32, 33): " << endl << boolvector[ch_t][137] << boolvector[ch_t][136] << boolvector[ch_t][135]
+               << boolvector[ch_t][134] << boolvector[ch_t][133] << endl;
+        output << "ET#0(cell 15, 30, 31, 46, 47): " << endl << boolvector[ch_t][142] << boolvector[ch_t][141] << boolvector[ch_t][140]
+               << boolvector[ch_t][139] << boolvector[ch_t][138] << endl;
+        output << "ET#3(cell 31, 47): " << endl << boolvector[ch_t][147] << boolvector[ch_t][146] << boolvector[ch_t][145]
+               << boolvector[ch_t][144] << boolvector[ch_t][143] << endl;
 
-                output << endl;
-                }
+        output << endl;
+    }
 
-	output.close();
+    output.close();
 }
 
 
 void
 TRGCDCFrontEnd::dump_log_outerInside(void) const {
 
-		const TRGClock & dClock = TRGCDC::getTRGCDC()->dataClock();
-                ofstream output((name()+".log").c_str());
+    const TRGClock & dClock = TRGCDC::getTRGCDC()->dataClock();
+    ofstream output((name()+".log").c_str());
 
-                output << "OuterInside FrontEnd output dump" << endl << endl;
+    output << "OuterInside FrontEnd output dump" << endl << endl;
 
-                        const std::vector<int> changetime = _osb->stateChanges();
-                        std::vector<vector<int>> boolvector(changetime.size());
-                for (unsigned ch_t = 0; ch_t < changetime.size(); ch_t++)       {
+    const std::vector<int> changetime = _osb->stateChanges();
+    std::vector<vector<int>> boolvector(changetime.size());
+    for (unsigned ch_t = 0; ch_t < changetime.size(); ch_t++)       {
 
-                        for (unsigned b = 0; b < (* _osb)[0]->size(); b++){ 
-                        boolvector[ch_t].push_back(  ( (* _osb)[0]->state(changetime[ch_t])[b])  ? 1 : 0);
-                        }
+        for (unsigned b = 0; b < (* _osb)[0]->size(); b++){ 
+            boolvector[ch_t].push_back(  ( (* _osb)[0]->state(changetime[ch_t])[b])  ? 1 : 0);
+        }
                         
-                output << "# of clk: " << changetime[ch_t] << " (" << dClock.absoluteTime(changetime[ch_t]) << " ns), signal vector: " << endl;
+        output << "# of clk: " << changetime[ch_t] << " (" << dClock.absoluteTime(changetime[ch_t]) << " ns), signal vector: " << endl;
                         
-                        output << "Hitmap: " << endl << " ";
-                        for (unsigned b = 0; b < 48; b++){
-                        output << boolvector[ch_t][47 - b] << " " ;
-                        if ( b == 15) output << endl;
-                        else if (b == 31) output << endl << " ";
-                        }
-                        output << endl;
+        output << "Hitmap: " << endl << " ";
+        for (unsigned b = 0; b < 48; b++){
+            output << boolvector[ch_t][47 - b] << " " ;
+            if ( b == 15) output << endl;
+            else if (b == 31) output << endl << " ";
+        }
+        output << endl;
 
-                        for (unsigned b = 0; b < 16; b++){
-                        output << "PT#" << b << ": " << boolvector[ch_t][ 48 + 5*b + 4 ] << boolvector[ch_t][ 48 + 5*b + 3 ] << boolvector[ch_t][ 48 + 5*b + 2 ]
-                        << boolvector[ch_t][ 48 + 5*b + 1 ] << boolvector[ch_t][ 48 + 5*b] << endl;
-                        }
-                        output << endl;
+        for (unsigned b = 0; b < 16; b++){
+            output << "PT#" << b << ": " << boolvector[ch_t][ 48 + 5*b + 4 ] << boolvector[ch_t][ 48 + 5*b + 3 ] << boolvector[ch_t][ 48 + 5*b + 2 ]
+                   << boolvector[ch_t][ 48 + 5*b + 1 ] << boolvector[ch_t][ 48 + 5*b] << endl;
+        }
+        output << endl;
 
-                        for (unsigned b = 0; b < 16; b++){
-                        output << "FT#" << b << ": " << boolvector[ch_t][ 128 + 5*b + 4 ] << boolvector[ch_t][ 128 + 5*b + 3 ] << boolvector[ch_t][ 128 + 5*b + 2 ]
-                        << boolvector[ch_t][ 128 + 5*b + 1 ] << boolvector[ch_t][ 128 + 5*b] << endl;
-                        }
+        for (unsigned b = 0; b < 16; b++){
+            output << "FT#" << b << ": " << boolvector[ch_t][ 128 + 5*b + 4 ] << boolvector[ch_t][ 128 + 5*b + 3 ] << boolvector[ch_t][ 128 + 5*b + 2 ]
+                   << boolvector[ch_t][ 128 + 5*b + 1 ] << boolvector[ch_t][ 128 + 5*b] << endl;
+        }
 
-                        output << endl;
-                        output << "ET#0(cell 0): " << endl << boolvector[ch_t][212] << boolvector[ch_t][211] << boolvector[ch_t][210]
-                        << boolvector[ch_t][209] << boolvector[ch_t][208] << endl;
-                        output << "ET#1(cell 15, 31): " << endl << boolvector[ch_t][217] << boolvector[ch_t][216] << boolvector[ch_t][215]
-                         << boolvector[ch_t][214] << boolvector[ch_t][213] << endl;
+        output << endl;
+        output << "ET#0(cell 0): " << endl << boolvector[ch_t][212] << boolvector[ch_t][211] << boolvector[ch_t][210]
+               << boolvector[ch_t][209] << boolvector[ch_t][208] << endl;
+        output << "ET#1(cell 15, 31): " << endl << boolvector[ch_t][217] << boolvector[ch_t][216] << boolvector[ch_t][215]
+               << boolvector[ch_t][214] << boolvector[ch_t][213] << endl;
 
-                output << endl;
-                }
+        output << endl;
+    }
 
-	output.close();
+    output.close();
 
 }
 
 void
 TRGCDCFrontEnd::dump_log_outerOutside(void) const {
 
-		const TRGClock & dClock = TRGCDC::getTRGCDC()->dataClock();
-                ofstream output((name()+".log").c_str());
+    const TRGClock & dClock = TRGCDC::getTRGCDC()->dataClock();
+    ofstream output((name()+".log").c_str());
 
-                output << "OuterOutside FrontEnd output dump" << endl << endl;
-                        const std::vector<int> changetime = _osb->stateChanges();
-                        std::vector<vector<int>> boolvector(changetime.size());
-                for (unsigned ch_t = 0; ch_t < changetime.size(); ch_t++)       {
+    output << "OuterOutside FrontEnd output dump" << endl << endl;
+    const std::vector<int> changetime = _osb->stateChanges();
+    std::vector<vector<int>> boolvector(changetime.size());
+    for (unsigned ch_t = 0; ch_t < changetime.size(); ch_t++)       {
 
-                        for (unsigned b = 0; b < (* _osb)[0]->size(); b++){
-                        boolvector[ch_t].push_back(  ( (* _osb)[0]->state(changetime[ch_t])[b])  ? 1 : 0);
-                        }
+        for (unsigned b = 0; b < (* _osb)[0]->size(); b++){
+            boolvector[ch_t].push_back(  ( (* _osb)[0]->state(changetime[ch_t])[b])  ? 1 : 0);
+        }
 
-                output << "# of clk: " << changetime[ch_t] << " (" << dClock.absoluteTime(changetime[ch_t]) << " ns), signal vector: " << endl;
+        output << "# of clk: " << changetime[ch_t] << " (" << dClock.absoluteTime(changetime[ch_t]) << " ns), signal vector: " << endl;
 
-                        output << "Hitmap: " << endl;
-                        for (unsigned b = 0; b < 48; b++){
-                        output << boolvector[ch_t][47 - b] << " ";
-                        if ( b == 15) output << endl << " ";
-                        else if (b == 31) output << endl ;
-                        }
-                        output << endl;
+        output << "Hitmap: " << endl;
+        for (unsigned b = 0; b < 48; b++){
+            output << boolvector[ch_t][47 - b] << " ";
+            if ( b == 15) output << endl << " ";
+            else if (b == 31) output << endl ;
+        }
+        output << endl;
 
-                        for (unsigned b = 0; b < 16; b++){
-                        output << "PT#" << b << ": " << boolvector[ch_t][ 48 + 5*b + 4 ] << boolvector[ch_t][ 48 + 5*b + 3 ] << boolvector[ch_t][ 48 + 5*b + 2 ]
-                        << boolvector[ch_t][ 48 + 5*b + 1 ] << boolvector[ch_t][ 48 + 5*b] << endl;
-                        }
-                        output << endl;
+        for (unsigned b = 0; b < 16; b++){
+            output << "PT#" << b << ": " << boolvector[ch_t][ 48 + 5*b + 4 ] << boolvector[ch_t][ 48 + 5*b + 3 ] << boolvector[ch_t][ 48 + 5*b + 2 ]
+                   << boolvector[ch_t][ 48 + 5*b + 1 ] << boolvector[ch_t][ 48 + 5*b] << endl;
+        }
+        output << endl;
 
-                        for (unsigned b = 0; b < 16; b++){
-                        output << "FT#" << b << ": " << boolvector[ch_t][ 128 + 5*b + 4 ] << boolvector[ch_t][ 128 + 5*b + 3 ] << boolvector[ch_t][ 128 + 5*b + 2 ]
-                        << boolvector[ch_t][ 128 + 5*b + 1 ] << boolvector[ch_t][ 128 + 5*b] << endl;
-                        }
+        for (unsigned b = 0; b < 16; b++){
+            output << "FT#" << b << ": " << boolvector[ch_t][ 128 + 5*b + 4 ] << boolvector[ch_t][ 128 + 5*b + 3 ] << boolvector[ch_t][ 128 + 5*b + 2 ]
+                   << boolvector[ch_t][ 128 + 5*b + 1 ] << boolvector[ch_t][ 128 + 5*b] << endl;
+        }
 
-                        output << endl;
-                        output << "ET#0(cell 16): " << endl << boolvector[ch_t][212] << boolvector[ch_t][211] << boolvector[ch_t][210]
-                         << boolvector[ch_t][209] << boolvector[ch_t][208] << endl;
-                        output << "ET#1(cell 15, 31): " << endl << boolvector[ch_t][217] << boolvector[ch_t][216] << boolvector[ch_t][215]
-                         << boolvector[ch_t][214] << boolvector[ch_t][213] << endl;
-
-
-                output << endl;
-                }
+        output << endl;
+        output << "ET#0(cell 16): " << endl << boolvector[ch_t][212] << boolvector[ch_t][211] << boolvector[ch_t][210]
+               << boolvector[ch_t][209] << boolvector[ch_t][208] << endl;
+        output << "ET#1(cell 15, 31): " << endl << boolvector[ch_t][217] << boolvector[ch_t][216] << boolvector[ch_t][215]
+               << boolvector[ch_t][214] << boolvector[ch_t][213] << endl;
 
 
-		output.close();
+        output << endl;
+    }
+
+
+    output.close();
 }
 
 

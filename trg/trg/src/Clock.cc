@@ -15,6 +15,8 @@
 #include <iostream>
 #include "trg/trg/Clock.h"
 #include "trg/trg/Time.h"
+#include "trg/trg/Signal.h"
+#include "trg/trg/Utilities.h"
 
 using namespace std;
 
@@ -41,7 +43,8 @@ TRGClock::TRGClock(const string & name,
 //     _min(numeric_limits<int>::min() + 100),
 //     _max(numeric_limits<int>::max() - 100),
       _min(numeric_limits<int>::min() / 16),
-      _max(numeric_limits<int>::max() / 16) {
+      _max(numeric_limits<int>::max() / 16),
+      _clockCounter(0) {
 
     if (this != & Belle2_GDL::GDLSystemClock) {
         if (Belle2_GDL::GDLSystemClock.minTiming() > minTiming())
@@ -69,10 +72,13 @@ TRGClock::TRGClock(const string & name,
 	     double(multiplicationFactor) *
 	     double(divisionFactor)),
       _min(source._min * int(multiplicationFactor) / int(divisionFactor)),
-      _max(source._max * int(multiplicationFactor) / int(divisionFactor)) {
+      _max(source._max * int(multiplicationFactor) / int(divisionFactor)),
+      _clockCounter(0) {
 }
 
 TRGClock::~TRGClock() {
+    if (_clockCounter)
+        delete _clockCounter;
 }
 
 void
@@ -151,6 +157,36 @@ TRGClock::phase(double a) const {
     // std::cout << "a,offset,pos,pos0,dif=" << a << "," << _offset << ","
     // 	      << pos << "," << pos0 << "," << dif << std::endl;
     return dif * 360;
+}
+
+const TRGSignalVector &
+TRGClock::clockCounter(void) const {
+
+    if (_clockCounter)
+        return * _clockCounter;
+
+    _clockCounter = new TRGSignalVector(name() + " counter", * this);
+
+    //...5 bit clock counter...
+    unsigned cicle = 2;
+    for (int i = 0; i < 5; i++) {
+        TRGSignal s("tmp", * this);
+
+        //...From 0 to 1280*5...
+        for (int j = 0; j < 1280*5; j++) {
+            if (((j - cicle / 2) % cicle) == 0)
+                s.set(j, j + cicle / 2);
+        }
+
+        //...Append this bit...
+        s.name("ClockCounterBit" + TRGUtilities::itostring( i));
+        (* _clockCounter) += s;
+
+        //...Double cicle...
+        cicle *= 2;
+    }
+
+    return * _clockCounter;
 }
 
 } // namespace Belle2

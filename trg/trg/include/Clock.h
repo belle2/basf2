@@ -15,6 +15,7 @@
 #define TRGClock_FLAG_
 
 #include <string>
+#include "trg/trg/SignalVector.h"
 
 namespace Belle2 {
     class TRGClock;
@@ -74,6 +75,9 @@ class TRGClock {
     /// returns phase of given timing in degree (0 to 360).
     double phase(double timing) const;
   
+    /// returns the clock counter.
+    const TRGSignalVector & clockCounter(void) const;
+
     /// dumps contents. "message" is to select information to
     /// dump. "pre" will be printed in head of each line.
     void dump(const std::string & message = "",
@@ -93,10 +97,10 @@ class TRGClock {
     /// returns max. timing.
     double maxTiming(void) const;
 
-    /// returns min. GDLtime with clock.
+    /// returns min. TRGtime with clock.
     TRGTime minTRGTime(bool edge) const;
 
-    /// returns max. GDLtime with clock.
+    /// returns max. TRGtime with clock.
     TRGTime maxTRGTime(bool edge) const;
 
   private:
@@ -127,6 +131,9 @@ class TRGClock {
 
     /// Clock max. count.
     int _max;
+
+    /// Clock counter
+    mutable TRGSignalVector * _clockCounter;
 };
 
 //-----------------------------------------------------------------------------

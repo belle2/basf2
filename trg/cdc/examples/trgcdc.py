@@ -23,8 +23,8 @@ particlegun.param('momentumGeneration', 'uniformPt')
 particlegun.param('momentumParams', [0.2,0.4])
 #particlegun.param('momentumParams', [0.3, 0.3])
 #particlegun.param('thetaGeneration', 'uniform')
-particlegun.param('thetaParams', [35, 127])
-#particlegun.param('thetaParams', [90, 90])
+#particlegun.param('thetaParams', [35, 127])
+particlegun.param('thetaParams', [90, 90])
 particlegun.param('phiGeneration', 'uniform')
 particlegun.param('phiParams', [0,360])
 #particlegun.param('vertexGeneration', 'fixed')
@@ -45,7 +45,7 @@ g4sim       = register_module('FullSim')
 cdcdigitizer = register_module('CDCDigitizer')
 #out         = register_module('SimpleOutput')
 cdctrg      = fw.register_module("TRGCDC")
-#mcparticle  = fw.register_module('PrintMCParticles')
+mcparticle  = fw.register_module('PrintMCParticles')
 
 #...G4Sim...
 # Turn off physics processes
@@ -85,7 +85,7 @@ cdctrg.param('OuterTSLUTFile', os.path.join(basf2datadir,"trg/cdc/outerLUT_v2.2.
 #cdctrg.param('TSFLUTSL8DataFile', os.path.join(basf2datadir,"trg/cdc/TSF.FPGA.SL8.coe"))
 cdctrg.param('DebugLevel', 10)
 cdctrg.param('CurlBackStop', 1)
-cdctrg.param('SimulationMode', 1)
+cdctrg.param('SimulationMode', 3)        # 1:fast, 2:firm, 3:fast and firm
 cdctrg.param('FastSimulationMode', 0)
 cdctrg.param('2DFinderPerfect',0)
 cdctrg.param('HoughFinderMeshX',160)

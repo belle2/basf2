@@ -29,11 +29,13 @@ class TRGSignalBundle : public std::vector<TRGSignalVector *> {
   public:
 
     /// Default constructor.
-    TRGSignalBundle(const TRGClock & = Belle2_GDL::GDLSystemClock);
+//  TRGSignalBundle(const TRGClock & = Belle2_GDL::GDLSystemClock);
+    TRGSignalBundle(const TRGClock &);
 
     /// Constructor with name.
     TRGSignalBundle(const std::string & name,
-		    const TRGClock & = Belle2_GDL::GDLSystemClock);
+//		    const TRGClock & = Belle2_GDL::GDLSystemClock);
+		    const TRGClock &);
 
     /// Constructor with a packer.
     TRGSignalBundle(const std::string & name,

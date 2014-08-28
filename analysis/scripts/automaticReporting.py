@@ -19,6 +19,10 @@ def removeJPsiSlash(filename):
     return filename.replace('/', '')
 
 
+def prettifyDecayString(decayString):
+    return decayString.replace('==>', '$\\to$').replace(':generic', '').replace('gamma', '$\gamma$')
+
+
 def purity(x, y):
     if x == 0:
         return 0.0
@@ -165,9 +169,9 @@ def createCombinedParticleTexFile(placeholders, channelPlaceholders, mcCounts):
     placeholders['channelListAsItems'] = ""
     for channelPlaceholder in channelPlaceholders:
         if channelPlaceholder['isIgnored']:
-            placeholders['channelListAsItems'] += "\\item \\verb|{name}| was ignored\n".format(name=channelPlaceholder['channelName'])
+            placeholders['channelListAsItems'] += "\\item {name} was ignored\n".format(name=channelPlaceholder['channelName'])
         else:
-            placeholders['channelListAsItems'] += "\\item \\verb|{name}|\n".format(name=channelPlaceholder['channelName'])
+            placeholders['channelListAsItems'] += "\\item {name}\n".format(name=channelPlaceholder['channelName'])
 
     placeholders['channelInputs'] = ""
     placeholders['particleNSignal'] = 0

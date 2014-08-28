@@ -509,7 +509,7 @@ def WriteAnalysisFileForChannel(particleName, particleLabel, channelName, preCut
     placeholders = {}
     placeholders['particleName'] = particleName
     placeholders['particleLabel'] = particleLabel
-    placeholders['channelName'] = channelName
+    placeholders['channelName'] = automaticReporting.prettifyDecayString(channelName)
     placeholders['isIgnored'] = False
     placeholders = automaticReporting.createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut)
     B2INFO("Write analysis tex file for channel {c}.".format(c=channelName))

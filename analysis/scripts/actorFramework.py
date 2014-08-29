@@ -272,30 +272,30 @@ class Sequence(object):
         @param needed the needed actors
         """
 
-        print "Saving dependency graph to FRgraph.dot"
-        dotfile = open("FRgraph.dot", "w")
+        print "Saving dependency graph to FEIgraph.dot"
+        dotfile = open("FEIgraph.dot", "w")
         dotfile.write("digraph FRdependencies {\n")
+        excludeList = ['Path', 'Geometry', 'Label_', 'Name_', 'Identifier_', 'MVAConfig_', 'PreCutConfig_', 'PostCutConfig_']
 
         for actor in needed:
             for provided in actor.provides:
-                style = ''
                 if provided.startswith('SignalProbability'):
                     style = '[shape=box,style=filled,fillcolor=orange]'
                 elif provided.startswith('ParticleList'):
                     style = '[shape=box,style=filled,fillcolor=lightblue]'
                 elif provided.startswith('PreCut'):
                     style = '[shape=box,style=filled,fillcolor=darkolivegreen1]'
-
-                # everything that's special (i.e. listed above)
-                if style == '':
+                else:
                     style = '[shape=box,style=filled,fillcolor=white]'
 
-                if any(provided.startswith(exclude) for exclude in ['Name_', 'MVAConfig_', 'PreCutConfig_']):
+                if any(provided.startswith(exclude) for exclude in excludeList):
                     continue
 
                 dotfile.write('"' + provided + '" ' + style + ';\n')
 
                 for r in set(actor.requires):
+                    if any(r.startswith(exclude) for exclude in excludeList):
+                        continue
                     dotfile.write('"' + r + '" -> "' + provided + '";\n')
 
         dotfile.write("}\n")

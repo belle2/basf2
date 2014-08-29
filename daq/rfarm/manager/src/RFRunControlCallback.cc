@@ -28,7 +28,7 @@ RFRunControlCallback::~RFRunControlCallback() throw()
 
 void RFRunControlCallback::init() throw()
 {
-  m_data = NSMData(getNode().getName() + "_STATUS", "rfunitinfo", 1);
+  m_data = NSMData(getNode().getName() + "_STATUS", "rfunitinfo", 2);
   m_data.allocate(getCommunicator());
 }
 

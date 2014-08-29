@@ -133,9 +133,9 @@ class Sequence(object):
 
     def addNeeded(self, key):
         """ Add dummy function which forces the actor which provides key to be needed """
-        def fun(a):
+        def RequireManually(a):
             return {}
-        self.seq.append(Function(fun, a=key))
+        self.seq.append(Function(RequireManually, a=key))
 
     def run(self, path, verbose, nProcesses=1):
         """

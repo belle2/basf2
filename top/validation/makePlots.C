@@ -1,4 +1,11 @@
-// basic event selection
+#include <TFile.h>
+#include <TTree.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TNtuple.h>
+#include <TCut.h>
+
+// basic event selection requirement
 TCut select = "primary == 1 && barHit.barID == extHit.barID && pValue > 0.001";
 
 void kaonID(TTree* top);

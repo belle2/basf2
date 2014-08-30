@@ -34,6 +34,9 @@ void RFRunControlCallback::init() throw()
 
 bool RFRunControlCallback::load() throw()
 {
+  if (m_callback->getNode().getState() == RCState::READY_S) {
+    return true;
+  }
   NSMMessage& msg(getMessage());
   msg.setRequestName(RFCommand::RF_CONFIGURE);
   m_callback->setMessage(msg);

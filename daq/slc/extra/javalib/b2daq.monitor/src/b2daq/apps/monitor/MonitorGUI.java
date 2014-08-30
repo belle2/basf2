@@ -16,6 +16,7 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
@@ -24,6 +25,7 @@ import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 /**
  *
@@ -74,6 +76,10 @@ public class MonitorGUI extends Application {
             stage.setTitle("Belle II Monitor GUI");
             stage.getIcons().add(new Image(MonitorGUI.class.getResource("mon.png").toExternalForm()));
             stage.setScene(scene);
+            stage.setOnCloseRequest((WindowEvent t) -> {
+                t.consume();
+                stop();
+            });
             stage.show();
         } catch (IOException ex) {
             ex.printStackTrace();;

@@ -37,11 +37,13 @@ void RunControlMasterCallback::init() throw()
 
 void RunControlMasterCallback::timeout() throw()
 {
+  update();
 }
 
 void RunControlMasterCallback::update() throw()
 {
-  if (m_data.isAvailable() && m_callback->getData().isAvailable()) {
+  if (m_data.isAvailable() && m_callback->getData().isAvailable() &&
+      m_data.getEntry() == NULL) {
     rc_status* status_g = (rc_status*)m_data.get();
     const rc_status* status_l = (const rc_status*)(m_callback->getData().get());
     memcpy(status_g, status_l, sizeof(rc_status));
@@ -52,14 +54,14 @@ bool RunControlMasterCallback::perform(const NSMMessage& msg) throw()
 {
   msg.getNodeName();
   RCCommand cmd(msg.getRequestName());
-  LogFile::debug("%s >> %s (cmd = %s)",
-                 msg.getNodeName(),
-                 msg.getRequestName(),
-                 cmd.getLabel());
   if (cmd == RCCommand::STATECHECK) {
     getCommunicator()->replyOK(m_callback->getNode());
     return true;
   }
+  LogFile::debug("%s >> %s (cmd = %s)",
+                 msg.getNodeName(),
+                 msg.getRequestName(),
+                 cmd.getLabel());
   m_callback->setMessage(msg);
   return m_callback->perform(msg);
 }

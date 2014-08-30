@@ -114,6 +114,7 @@ void DeSerializerCOPPERModule::initialize()
     } else {
       printf("nodename = %s\n", m_nodename.c_str());
       g_status.open(m_nodename, m_nodeid);
+      g_status.reportReady();
     }
   }
 

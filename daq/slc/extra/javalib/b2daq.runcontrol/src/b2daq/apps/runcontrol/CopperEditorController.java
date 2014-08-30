@@ -6,7 +6,6 @@
 package b2daq.apps.runcontrol;
 
 import b2daq.database.ConfigObject;
-import b2daq.database.DBObject;
 import b2daq.logger.core.LogMessage;
 import b2daq.nsm.NSMCommand;
 import b2daq.nsm.NSMListenerService;

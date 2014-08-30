@@ -32,9 +32,11 @@ bool ProcessController::load(int timeout)
 {
   m_info.clear();
   m_fork.cancel();
+  m_fork.kill(SIGQUIT);
   int iopipe[2];
   if (pipe(iopipe) < 0) {
     perror("pipe");
+    return false;
   }
   m_fork = Fork(new ProcessSubmitter(this, iopipe));
   PThread(new LogListener(this, iopipe));
@@ -58,7 +60,6 @@ bool ProcessController::start()
     m_info.setRunNumber(msg.getParam(1));
     m_info.setSubNumber(msg.getParam(2));
   }
-  //_info.setNodeId(_callback->getNode()->getData()->getId());
   if (m_info.getState() != RunInfoBuffer::RUNNING) {
     m_callback->setReply(m_name + " is not running");
     m_info.unlock();
@@ -77,10 +78,8 @@ bool ProcessController::abort()
 {
   m_info.clear();
   m_fork.kill(SIGINT);
-  //if (m_fork.isAlive()) {
   if (getExecutable() == "basf2") {
     usleep(10000);
-    LogFile::debug("Quiting " + getExecutable());
     m_fork.kill(SIGQUIT);
   }
   return true;

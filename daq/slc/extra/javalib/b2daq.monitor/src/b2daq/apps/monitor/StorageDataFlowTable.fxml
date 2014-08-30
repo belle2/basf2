@@ -19,13 +19,13 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox fx:id="pane" alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="587.0" prefWidth="843.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.apps.monitor.StorageDataFlowTableController">
+<VBox fx:id="pane" alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.apps.monitor.StorageDataFlowTableController">
     <children>
-        <VBox prefHeight="396.0" prefWidth="843.0" VBox.vgrow="ALWAYS">
+        <VBox VBox.vgrow="NEVER">
             <children>
-                <HBox prefHeight="324.0" prefWidth="843.0" VBox.vgrow="ALWAYS">
+                <HBox VBox.vgrow="ALWAYS">
                     <children>
-                        <VBox maxWidth="368.0" prefHeight="215.0" prefWidth="368.0" HBox.hgrow="NEVER">
+                        <VBox HBox.hgrow="NEVER">
                             <children>
                                 <HBox alignment="CENTER_LEFT" minHeight="35.0" prefHeight="49.0" prefWidth="292.0" VBox.vgrow="NEVER">
                                     <children>
@@ -41,9 +41,9 @@
                                     <columnConstraints>
                                         <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="93.0" minWidth="10.0" prefWidth="46.0" />
                                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="141.0" minWidth="0.0" prefWidth="40.0" />
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="189.0" minWidth="10.0" prefWidth="73.0" />
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="169.0" minWidth="10.0" prefWidth="40.0" />
-                                        <ColumnConstraints halignment="LEFT" maxWidth="142.0" minWidth="10.0" prefWidth="97.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="189.0" minWidth="10.0" prefWidth="84.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="169.0" minWidth="10.0" prefWidth="38.0" />
+                                        <ColumnConstraints halignment="LEFT" maxWidth="142.0" minWidth="10.0" prefWidth="55.0" />
                                     </columnConstraints>
                                     <rowConstraints>
                                         <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
@@ -84,7 +84,7 @@
                                         </CanvasPanel>
                                     </children>
                                 </GridPane>
-                                <HBox alignment="CENTER_LEFT" minHeight="30.0" prefHeight="35.0" prefWidth="863.0" VBox.vgrow="ALWAYS">
+                                <HBox alignment="CENTER_LEFT">
                                     <children>
                                         <Label text="Run #:">
                                             <HBox.margin>
@@ -94,10 +94,10 @@
                                         <Label fx:id="label_runno" text="0000.0000.000" />
                                     </children>
                                     <VBox.margin>
-                                        <Insets right="10.0" />
+                                        <Insets right="10.0" top="15.0" />
                                     </VBox.margin>
                                 </HBox>
-                                <HBox alignment="CENTER_LEFT" minHeight="30.0" prefHeight="115.0" prefWidth="459.0">
+                                <HBox alignment="CENTER_LEFT">
                                     <children>
                                         <Label text="Update time:">
                                             <HBox.margin>
@@ -107,59 +107,85 @@
                                         <Label fx:id="label_ctime" text="--:--:-- ----/--/--" />
                                     </children>
                                     <VBox.margin>
-                                        <Insets />
+                                        <Insets top="10.0" />
                                     </VBox.margin>
                                 </HBox>
-                                <HBox alignment="CENTER_LEFT" minHeight="30.0" prefHeight="44.0" prefWidth="340.0" VBox.vgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT">
+                           <children>
+                              <Label text="Recored data size:">
+                                 <HBox.margin>
+                                    <Insets right="10.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <Label fx:id="label_nbytes_val" text="0 [B]" />
+                           </children>
+                           <VBox.margin>
+                              <Insets top="10.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT">
+                           <children>
+                              <Label text="# of stored files :">
+                                 <HBox.margin>
+                                    <Insets right="10.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <Label fx:id="label_nfiles_val" text="0" />
+                           </children>
+                           <VBox.margin>
+                              <Insets top="10.0" />
+                           </VBox.margin>
+                        </HBox>
+                                <HBox alignment="CENTER_LEFT">
                                     <children>
                                         <Label text="Queue in socket from eb2rx:">
                                             <HBox.margin>
                                                 <Insets right="10.0" />
                                             </HBox.margin>
                                         </Label>
-                                        <Label fx:id="label_runno1" text="0" />
+                                        <Label fx:id="label_txqueue_val" text="0" />
                                     </children>
                                     <VBox.margin>
-                                        <Insets />
+                                        <Insets top="10.0" />
                                     </VBox.margin>
                                 </HBox>
-                                <HBox alignment="CENTER_LEFT" minHeight="30.0" prefHeight="115.0" prefWidth="459.0">
+                                <HBox alignment="CENTER_LEFT">
                                     <children>
-                                        <Label text="Queue in input buffer">
+                                        <Label text="Queue in input buffer:">
                                             <HBox.margin>
                                                 <Insets right="10.0" />
                                             </HBox.margin>
                                         </Label>
-                                        <Label fx:id="label_ctime1" text="0" />
+                                        <Label fx:id="label_inbuffer_val" text="0" />
                                     </children>
                                     <VBox.margin>
-                                        <Insets />
+                                        <Insets top="10.0" />
                                     </VBox.margin>
                                 </HBox>
-                                <HBox alignment="CENTER_LEFT" minHeight="30.0" prefHeight="115.0" prefWidth="459.0">
+                                <HBox alignment="CENTER_LEFT">
                                     <children>
-                                        <Label text="Queue in record buffer">
+                                        <Label text="Queue in record buffer:">
                                             <HBox.margin>
                                                 <Insets right="10.0" />
                                             </HBox.margin>
                                         </Label>
-                                        <Label fx:id="label_ctime11" text="0" />
+                                        <Label fx:id="label_recbuffer_val" text="0" />
                                     </children>
                                     <VBox.margin>
-                                        <Insets />
+                                        <Insets top="10.0" />
                                     </VBox.margin>
                                 </HBox>
-                                <HBox alignment="CENTER_LEFT" minHeight="30.0" prefHeight="115.0" prefWidth="459.0">
+                                <HBox alignment="CENTER_LEFT">
                                     <children>
                                         <Label text="Queue in socket to expreco:">
                                             <HBox.margin>
                                                 <Insets right="10.0" />
                                             </HBox.margin>
                                         </Label>
-                                        <Label fx:id="label_ctime12" text="0" />
+                                        <Label fx:id="label_rxqueue_val" text="0" />
                                     </children>
                                     <VBox.margin>
-                                        <Insets />
+                                        <Insets top="10.0" />
                                     </VBox.margin>
                                 </HBox>
                             </children>
@@ -167,14 +193,14 @@
                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                             </HBox.margin>
                         </VBox>
-                        <TableView fx:id="table_disk" prefHeight="195.0" prefWidth="492.0">
+                        <TableView fx:id="table_disk" maxHeight="300.0" tableMenuButtonVisible="true" HBox.hgrow="ALWAYS">
                             <columns>
-                                <TableColumn fx:id="col_label" prefWidth="75.0" text="Label">
+                                <TableColumn fx:id="col_label" minWidth="65.0" prefWidth="65.0" resizable="false" text="Label">
                                     <cellValueFactory>
                                         <PropertyValueFactory property="label" />
                                     </cellValueFactory>
                                 </TableColumn>
-                                <TableColumn fx:id="col_status" prefWidth="67.0" text="Status">
+                                <TableColumn fx:id="col_status" prefWidth="95.0" resizable="false" text="Status">
                                     <cellValueFactory>
                                         <PropertyValueFactory property="status" />
                                     </cellValueFactory>
@@ -184,12 +210,12 @@
                                         <PropertyValueFactory property="nfiles" />
                                     </cellValueFactory>
                                 </TableColumn>
-                                <TableColumn fx:id="col_available" prefWidth="178.0" text="Available [%]">
+                                <TableColumn fx:id="col_available" prefWidth="140.0" resizable="false" text="Available [%]">
                                     <cellValueFactory>
                                         <PropertyValueFactory property="available" />
                                     </cellValueFactory>
                                 </TableColumn>
-                                <TableColumn fx:id="col_size" prefWidth="131.0" text="Disk size [TB]">
+                                <TableColumn fx:id="col_size" prefWidth="125.0" resizable="false" text="Disk size [TB]">
                                     <cellValueFactory>
                                         <PropertyValueFactory property="size" />
                                     </cellValueFactory>
@@ -198,6 +224,9 @@
                             <HBox.margin>
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                             </HBox.margin>
+                     <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                     </columnResizePolicy>
                         </TableView>
                     </children>
                     <padding>
@@ -206,9 +235,9 @@
                 </HBox>
             </children>
         </VBox>
-        <TableView fx:id="table_stat" editable="true" prefHeight="330.0" prefWidth="823.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
+        <TableView fx:id="table_stat" editable="true" maxHeight="240.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="col_node" prefWidth="75.0" text="Node">
+                <TableColumn fx:id="col_node" minWidth="70.0" prefWidth="70.0" text="Node">
                     <cellValueFactory>
                         <PropertyValueFactory property="node" />
                     </cellValueFactory>
@@ -278,6 +307,9 @@
             <VBox.margin>
                 <Insets bottom="10.0" left="10.0" right="10.0" top="5.0" />
             </VBox.margin>
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
         </TableView>
     </children>
 </VBox>

@@ -21,3 +21,10 @@ and open the template in the editor.
     -fx-alignment: center-right;
     -fx-fill:limegreen;
 }
+
+.disk-writing .text {
+    -fx-font-size:13px;
+    -fx-font-weight:bold;
+    -fx-alignment: center-right;
+    -fx-fill:blue;
+}

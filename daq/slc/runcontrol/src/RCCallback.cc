@@ -59,12 +59,10 @@ bool RCCallback::perform(const NSMMessage& msg) throw()
     return false;
   }
   NSMCommunicator* com = getCommunicator();
-  RCState state = cmd.nextTState();
+  RCState tstate(cmd.nextTState());
   bool result = true;
-  if (state != Enum::UNKNOWN) {
-    getNode().setState(state);
-    LogFile::debug("RCCallback : %s >> %s (%s)", msg.getNodeName(),
-                   cmd.getLabel(), state.getLabel());
+  if (tstate != Enum::UNKNOWN) {
+    getNode().setState(tstate);
     setReply("");
     if (cmd == RCCommand::LOAD) {
       result = preload(msg) && load();
@@ -86,7 +84,7 @@ bool RCCallback::perform(const NSMMessage& msg) throw()
   }
   if (result) {
     getNode().setError(0);
-    state = cmd.nextState();
+    RCState state(cmd.nextState());
     if (state != Enum::UNKNOWN)
       getNode().setState(state);
     com->replyOK(getNode());

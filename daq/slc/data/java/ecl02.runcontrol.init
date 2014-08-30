@@ -1,0 +1,17 @@
+#
+# Login to Belle II Run control
+#
+
+hostname : localhost
+port : 9090
+nsmhost : 192.168.10.1
+nsmport : 9122
+nsmnode : RC_GUI
+nsmtarget : ECL02
+data00.dataname : ECL02_STATUS
+data00.format : rorc_status
+data00.revision : 1
+
+#
+#
+#

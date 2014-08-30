@@ -23,6 +23,7 @@ public class DiskUsage {
     private final SimpleIntegerProperty nfiles = new SimpleIntegerProperty(0);
     private final SimpleFloatProperty available = new SimpleFloatProperty(0);
     private final SimpleFloatProperty size = new SimpleFloatProperty(0);
+    private final SimpleIntegerProperty access = new SimpleIntegerProperty(0);
 
     public DiskUsage() {}
     
@@ -50,6 +51,10 @@ public class DiskUsage {
         return size.get();
     }
 
+    public int getAccess() {
+        return access.get();
+    }
+
     public void setLabel(String label) {
         this.label.set(label);
     }
@@ -70,6 +75,10 @@ public class DiskUsage {
         this.size.set(size);
     }
 
+    public void setAccess(int access) {
+        this.access.set(access);
+    }
+
     public StringProperty labelProperty() {
         return label;
     }
@@ -88,6 +97,10 @@ public class DiskUsage {
 
     public FloatProperty sizeProperty() {
         return size;
+    }
+
+    public IntegerProperty accessProperty() {
+        return access;
     }
 
 }

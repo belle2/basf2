@@ -107,6 +107,13 @@ int ConfigFile::getInt(const std::string& label)
   else return 0;
 }
 
+bool ConfigFile::getBool(const std::string& label)
+{
+  std::string value = get(label);
+  if (value.size() > 0) return StringUtil::tolower(value) == "true";
+  else return 0;
+}
+
 double ConfigFile::getFloat(const std::string& label)
 {
   std::string value = get(label);

@@ -32,6 +32,7 @@ namespace Belle2 {
     bool hasKey(const std::string& label);
     const std::string get(const std::string& label);
     int getInt(const std::string& label);
+    bool getBool(const std::string& label);
     double getFloat(const std::string& label);
     ValueList& getValues() { return m_value_m; }
     std::vector<std::string>& getLabels() { return m_label_v; }

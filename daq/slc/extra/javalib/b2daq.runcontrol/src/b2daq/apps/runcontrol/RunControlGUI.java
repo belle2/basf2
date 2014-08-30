@@ -6,27 +6,26 @@
 package b2daq.apps.runcontrol;
 
 import b2daq.logger.core.LogMessage;
-import b2daq.nsm.NSMCommand;
 import b2daq.nsm.NSMDataProperty;
 import b2daq.nsm.NSMListenerService;
-import b2daq.nsm.NSMMessage;
-import b2daq.runcontrol.core.RCCommand;
 import b2daq.ui.NSM2Socket;
 import b2daq.ui.NetworkConfigPaneController;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 /**
  *
@@ -43,11 +42,11 @@ public class RunControlGUI extends Application {
             FileChooser fc = new FileChooser();
             fc.setTitle("select file");
             //fc.setInitialDirectory(new File(System.getProperty("user.home")));
-            //fc.getExtensionFilters().add(new ExtensionFilter("HTML", "*.html", "*.htm"));
+            fc.getExtensionFilters().add(new ExtensionFilter("init file", "*.init"));
 
             File f = fc.showOpenDialog(stage);
             System.out.println(f.getPath());
-            NSM2Socket socket = NSM2Socket.connect(f.getPath(),//(arguments.length > 1 ? arguments[1] : ".runcontrol.init"),
+            NSM2Socket socket = NSM2Socket.connect(f.getPath(),
                     null, 9090, null, 8122, "RC_GUI", "ARICH_RC",
                     new String[]{"ARICH_RC_STATUS:rc_status:1"},
                     "Login to Belle II Run control",
@@ -76,6 +75,13 @@ public class RunControlGUI extends Application {
             stage.setTitle("Belle II Run Control GUI");
             stage.getIcons().add(new Image(RunControlGUI.class.getResource("runcontrol.png").toExternalForm()));
             stage.setScene(scene);
+            stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                @Override
+                public void handle(WindowEvent t) {
+                    t.consume();
+                    stop();
+                }
+            });
             stage.show();
         } catch (IOException ex) {
             ex.printStackTrace();;

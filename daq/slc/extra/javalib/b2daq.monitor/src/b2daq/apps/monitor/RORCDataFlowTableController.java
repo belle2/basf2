@@ -97,14 +97,15 @@ public class RORCDataFlowTableController implements Initializable, NSMObserver {
                 //System.out.println("dataname="+data.getName());
                 label_runno.setText(String.format("%04d.%04d.%03d", data.getInt("expno"),
                         data.getInt("runno"), data.getInt("subno")));
+                //System.out.println(data.getInt("state"));
                 switch (data.getInt("state")) {
-                    case 0:
+                    default:
                     state.update(RCState.NOTREADY_S);
                     break;
-                    case 1:
+                    case 3:
                     state.update(RCState.READY_S);
                     break;
-                    case 2:
+                    case 4:
                     state.update(RCState.RUNNING_S);
                     break;
                 }

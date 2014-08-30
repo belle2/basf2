@@ -104,6 +104,7 @@ void DeSerializerPCModule::initialize()
       m_shmflag = 0;
     } else {
       g_status.open(m_nodename, m_nodeid);
+      g_status.reportReady();
     }
   }
 

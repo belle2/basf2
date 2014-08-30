@@ -78,7 +78,7 @@ namespace Belle2 {
     virtual const std::string getText(const std::string&) const throw() { return ""; }
     virtual void addText(const std::string&, const std::string&) throw() {}
     virtual void setObject(const std::string&, int, const Belle2::DBObject&) throw() {}
-
+    NSMDataStore::Entry* getEntry() { return m_en; }
 
   public:
     virtual void readObject(Reader& reader) throw(IOException);

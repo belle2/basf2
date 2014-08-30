@@ -5,10 +5,8 @@
  */
 package b2daq.apps.monitor;
 
-import b2daq.database.ConfigObject;
 import b2daq.dqm.graphics.HistogramCanvas;
 import b2daq.graphics.GShape;
-import b2daq.hvcontrol.core.HVState;
 import b2daq.logger.core.LogMessage;
 import b2daq.nsm.NSMCommand;
 import b2daq.nsm.NSMData;
@@ -59,6 +57,18 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
     @FXML
     private Label label_ctime;
     @FXML
+    private Label label_nbytes_val;
+    @FXML
+    private Label label_nfiles_val;
+    @FXML
+    private Label label_txqueue_val;
+    @FXML
+    private Label label_rxqueue_val;
+    @FXML
+    private Label label_inbuffer_val;
+    @FXML
+    private Label label_recbuffer_val;
+    @FXML
     private TableView table_stat;
     @FXML
     private TableView table_disk;
@@ -82,9 +92,11 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
                     protected void updateItem(DiskUsage usage, boolean empty) {
                         super.updateItem(usage, empty);
                         if (!isEmpty()) {
-                            getStyleClass().removeAll("disk-full", "disk-fine");
+                            getStyleClass().removeAll("disk-full", "disk-fine", "disk-writing");
                             if (usage.getAvailable() < 10) {
                                 getStyleClass().add("disk-full");
+                            } else if (usage.getAccess()==1) {
+                                getStyleClass().add("disk-writing");
                             } else {
                                 getStyleClass().add("disk-fine");
                             }
@@ -126,6 +138,21 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
                         state.update(RCState.RUNNING_S);
                         break;
                 }
+                float nbytes = data.getFloat("nbytes");
+                String unit = "[MB]";
+                if (nbytes > 1024*1024) {
+                    nbytes /= (1024*1024);
+                    unit = "[TB]";
+                } else if(nbytes > 1024) {
+                    nbytes /= 1024;
+                    unit = "[GB]";
+                }
+                label_nbytes_val.setText(String.format("%02.2f", nbytes) + " " + unit);
+                label_nfiles_val.setText(""+data.getInt("nfiles"));
+                label_txqueue_val.setText(String.format("%02.2f", data.getObject("node", 0).getInt("nqueue_in") /1024f) + " [kB]");
+                label_rxqueue_val.setText(String.format("%02.2f", data.getObject("node", 1).getInt("nqueue_out") * 4/1024f) + " [kB]");
+                label_inbuffer_val.setText(String.format("%02.2f", data.getObject("node", 0).getInt("nqueue_out") * 4/1024f) + " [kB]");
+                label_recbuffer_val.setText(String.format("%02.2f", data.getObject("node", 1).getInt("nqueue_in") /1024f) + " [kB]");
                 if (table_disk.getItems().size() < data.getInt("ndisks")) {
                     table_disk.getItems().clear();
                     for (int i = 0; i < data.getInt("ndisks"); i++) {
@@ -135,7 +162,20 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
                 for (int i = 0; i < data.getInt("ndisks"); i++) {
                     NSMData cdata = (NSMData) data.getObject("disk", i);
                     DiskUsage disk = (DiskUsage) table_disk.getItems().get(i);
-                    disk.setStatus(100 - cdata.getFloat("available") <= 10 ? "FULL" : "FINE");
+                    
+                    if (i+1==data.getInt("diskid")) {
+                        disk.setAccess(1);
+                        disk.setStatus("WRITING");
+                    } else {
+                        if (100 - cdata.getFloat("available") <= 10) {
+                            disk.setStatus("FULL");
+                        } else if (100 - cdata.getFloat("available") >= 90) {
+                            disk.setStatus("EMPTY");
+                        } else {
+                            disk.setStatus("AVAILABLE");
+                        }
+                        disk.setAccess(0);
+                    }
                     disk.setAvailable(100 - cdata.getFloat("available"));
                     disk.setSize(cdata.getFloat("size") / 1024f);
                 }

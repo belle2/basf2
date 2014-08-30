@@ -16,315 +16,319 @@
     <tabs>
         <Tab closable="false" text="Main">
             <content>
-            <VBox prefHeight="565.0" prefWidth="862.0">
+            <VBox>
                <children>
                       <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="362.0" prefWidth="786.0" VBox.vgrow="ALWAYS">
                           <children>
-                              <VBox maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="400.0" prefWidth="245.0" HBox.hgrow="ALWAYS">
+                              <VBox maxHeight="1.7976931348623157E308" maxWidth="-Infinity" HBox.hgrow="ALWAYS">
                                   <children>
                                       <fx:include fx:id="runSettings" source="RunSettingPane.fxml" />
                                       <fx:include fx:id="commandButton" source="RunCommandButtonPane.fxml" />
                                   </children>
                               </VBox>
-                        <TitledPane animated="false" collapsible="false" minWidth="1.0" prefHeight="362.0" prefWidth="602.0" text="Run status">
-                           <content>
-                                        <GridPane fx:id="summary_grid" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="362.0" style="-fx-padding: 10; -fx-hgap: 2; -fx-vgap: 2;" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
-                                            <columnConstraints>
-                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="130.0" minWidth="10.0" prefWidth="65.0" />
-                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="183.0" minWidth="10.0" prefWidth="116.0" />
-                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="128.0" minWidth="0.0" prefWidth="75.0" />
-                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="300.0" minWidth="10.0" prefWidth="121.0" />
-                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="300.0" minWidth="10.0" prefWidth="72.0" />
-                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="300.0" minWidth="10.0" prefWidth="120.0" />
-                                            </columnConstraints>
-                                            <rowConstraints>
-                                                <RowConstraints maxHeight="48.0" minHeight="10.0" prefHeight="39.0" valignment="CENTER" vgrow="SOMETIMES" />
-                                                <RowConstraints maxHeight="51.0" minHeight="10.0" prefHeight="38.0" valignment="CENTER" vgrow="SOMETIMES" />
-                                                <RowConstraints maxHeight="59.0" minHeight="10.0" prefHeight="41.0" valignment="CENTER" vgrow="SOMETIMES" />
-                                                <RowConstraints maxHeight="55.0" minHeight="10.0" prefHeight="43.0" valignment="CENTER" vgrow="SOMETIMES" />
-                                                <RowConstraints maxHeight="99.0" minHeight="10.0" prefHeight="43.0" valignment="CENTER" vgrow="SOMETIMES" />
-                                                <RowConstraints maxHeight="165.0" minHeight="10.0" prefHeight="44.0" valignment="CENTER" vgrow="SOMETIMES" />
-                                    <RowConstraints maxHeight="171.0" minHeight="33.0" prefHeight="50.0" />
-                                            </rowConstraints>
-                                            <children>
-                                                <Label fx:id="label_rcnode" text="RC state">
-                                                    <GridPane.margin>
-                                                        <Insets />
-                                                    </GridPane.margin>
-                                                </Label>
-                                                <Label text="Run #" GridPane.rowIndex="1">
-                                                    <GridPane.margin>
-                                                        <Insets />
-                                                    </GridPane.margin>
-                                                </Label>
-                                                <Label fx:id="label_runnum" text="0000.0000.000" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                                    <GridPane.margin>
-                                                        <Insets left="5.0" />
-                                                    </GridPane.margin>
-                                                </Label>
-                                                <Label text="Run type" GridPane.columnIndex="2">
-                                                    <GridPane.margin>
-                                                        <Insets left="5.0" />
-                                                    </GridPane.margin>
-                                                </Label>
-                                                <Label text="Start time" GridPane.columnIndex="2" GridPane.rowIndex="1">
-                                                    <GridPane.margin>
-                                                        <Insets left="3.0" />
-                                                    </GridPane.margin>
-                                                </Label>
-                                                <Label text="End time" GridPane.columnIndex="4" GridPane.rowIndex="1">
-                                                    <GridPane.margin>
-                                                        <Insets left="5.0" />
-                                                    </GridPane.margin>
-                                                </Label>
-                                                <Label fx:id="label_starttime" text="---- / -- / --  -- : -- : --" GridPane.columnIndex="3" GridPane.rowIndex="1">
-                                                    <GridPane.margin>
-                                                        <Insets left="5.0" />
-                                                    </GridPane.margin>
-                                       <font>
-                                          <Font size="11.0" />
-                                       </font>
-                                                </Label>
-                                                <Label fx:id="label_endtime" text="---- / -- / --  -- : -- : --" GridPane.columnIndex="5" GridPane.rowIndex="1">
-                                                    <GridPane.margin>
-                                                        <Insets left="5.0" />
-                                                    </GridPane.margin>
-                                       <font>
-                                          <Font size="11.0" />
-                                       </font>
-                                                </Label>
-                                                <Label fx:id="label_runtype" text="default" GridPane.columnIndex="3" GridPane.columnSpan="2147483647">
-                                                    <GridPane.margin>
-                                                        <Insets left="5.0" />
-                                                    </GridPane.margin>
-                                                </Label>
-                                                <AnchorPane prefHeight="36.0" prefWidth="98.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                                                    <children>
-                                                        <Rectangle fx:id="rect_node0" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
-                                                        <Text fx:id="text_node0" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
-                                                            <font>
-                                                                <Font name="System Bold" size="13.0" />
-                                                            </font>
-                                                        </Text>
-                                                    </children>
-                                                    <GridPane.margin>
-                                                        <Insets left="5.0" />
-                                                    </GridPane.margin>
-                                                </AnchorPane>
-                                                <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                                                    <children>
-                                                        <Rectangle fx:id="rect_node1" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
-                                                        <Text fx:id="text_node1" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
-                                                            <font>
-                                                                <Font name="System Bold" size="13.0" />
-                                                            </font>
-                                                        </Text>
-                                                    </children>
-                                                    <GridPane.margin>
-                                                        <Insets left="5.0" />
-                                                    </GridPane.margin>
-                                                </AnchorPane>
-                                                <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
-                                                    <children>
-                                                        <Rectangle fx:id="rect_node2" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
-                                                        <Text fx:id="text_node2" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
-                                                            <font>
-                                                                <Font name="System Bold" size="13.0" />
-                                                            </font>
-                                                        </Text>
-                                                    </children>
-                                                    <GridPane.margin>
-                                                        <Insets left="5.0" />
-                                                    </GridPane.margin>
-                                                </AnchorPane>
-                                                <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
-                                                    <children>
-                                                        <Rectangle fx:id="rect_node3" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
-                                                        <Text fx:id="text_node3" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
-                                                            <font>
-                                                                <Font name="System Bold" size="13.0" />
-                                                            </font>
-                                                        </Text>
-                                                    </children>
-                                                    <GridPane.margin>
-                                                        <Insets left="5.0" />
-                                                    </GridPane.margin>
-                                                </AnchorPane>
-                                                <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
-                                                    <children>
-                                                        <Rectangle fx:id="rect_node4" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
-                                                        <Text fx:id="text_node4" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
-                                                            <font>
-                                                                <Font name="System Bold" size="13.0" />
-                                                            </font>
-                                                        </Text>
-                                                    </children>
-                                                    <GridPane.margin>
-                                                        <Insets left="5.0" />
-                                                    </GridPane.margin>
-                                                </AnchorPane>
-                                                <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="2">
-                                                    <children>
-                                                        <Rectangle fx:id="rect_node5" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
-                                                        <Text fx:id="text_node5" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
-                                                            <font>
-                                                                <Font name="System Bold" size="13.0" />
-                                                            </font>
-                                                        </Text>
-                                                    </children>
-                                                    <GridPane.margin>
-                                                        <Insets left="5.0" />
-                                                    </GridPane.margin>
-                                                </AnchorPane>
-                                                <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="3">
-                                                    <children>
-                                                        <Rectangle fx:id="rect_node6" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
-                                                        <Text fx:id="text_node6" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
-                                                            <font>
-                                                                <Font name="System Bold" size="13.0" />
-                                                            </font>
-                                                        </Text>
-                                                    </children>
-                                                    <GridPane.margin>
-                                                        <Insets left="5.0" />
-                                                    </GridPane.margin>
-                                                </AnchorPane>
-                                                <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="4">
-                                                    <children>
-                                                        <Rectangle fx:id="rect_node7" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
-                                                        <Text fx:id="text_node7" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
-                                                            <font>
-                                                                <Font name="System Bold" size="13.0" />
-                                                            </font>
-                                                        </Text>
-                                                    </children>
-                                                    <GridPane.margin>
-                                                        <Insets left="5.0" />
-                                                    </GridPane.margin>
-                                                </AnchorPane>
-                                                <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="5">
-                                                    <children>
-                                                        <Rectangle fx:id="rect_node8" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
-                                                        <Text fx:id="text_node8" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
-                                                            <font>
-                                                                <Font name="System Bold" size="13.0" />
-                                                            </font>
-                                                        </Text>
-                                                    </children>
-                                                    <GridPane.margin>
-                                                        <Insets left="5.0" />
-                                                    </GridPane.margin>
-                                                </AnchorPane>
-                                                <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="6">
-                                                    <children>
-                                                        <Rectangle fx:id="rect_node9" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
-                                                        <Text fx:id="text_node9" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
-                                                            <font>
-                                                                <Font name="System Bold" size="13.0" />
-                                                            </font>
-                                                        </Text>
-                                                    </children>
-                                                    <GridPane.margin>
-                                                        <Insets left="5.0" />
-                                                    </GridPane.margin>
-                                                </AnchorPane>
-                                                <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="5" GridPane.rowIndex="2">
-                                                    <children>
-                                                        <Rectangle fx:id="rect_node10" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
-                                                        <Text fx:id="text_node10" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
-                                                            <font>
-                                                                <Font name="System Bold" size="13.0" />
-                                                            </font>
-                                                        </Text>
-                                                    </children>
-                                                    <GridPane.margin>
-                                                        <Insets left="5.0" />
-                                                    </GridPane.margin>
-                                                </AnchorPane>
-                                                <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="5" GridPane.rowIndex="3">
-                                                    <children>
-                                                        <Rectangle fx:id="rect_node11" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
-                                                        <Text fx:id="text_node11" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
-                                                            <font>
-                                                                <Font name="System Bold" size="13.0" />
-                                                            </font>
-                                                        </Text>
-                                                    </children>
-                                                    <GridPane.margin>
-                                                        <Insets left="5.0" />
-                                                    </GridPane.margin>
-                                                </AnchorPane>
-                                                <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="5" GridPane.rowIndex="4">
-                                                    <children>
-                                                        <Rectangle fx:id="rect_node12" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
-                                                        <Text fx:id="text_node12" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
-                                                            <font>
-                                                                <Font name="System Bold" size="13.0" />
-                                                            </font>
-                                                        </Text>
-                                                    </children>
-                                                    <GridPane.margin>
-                                                        <Insets left="5.0" />
-                                                    </GridPane.margin>
-                                                </AnchorPane>
-                                                <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="5" GridPane.rowIndex="5">
-                                                    <children>
-                                                        <Rectangle fx:id="rect_node13" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
-                                                        <Text fx:id="text_node13" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
-                                                            <font>
-                                                                <Font name="System Bold" size="13.0" />
-                                                            </font>
-                                                        </Text>
-                                                    </children>
-                                                    <GridPane.margin>
-                                                        <Insets left="5.0" />
-                                                    </GridPane.margin>
-                                                </AnchorPane>
-                                                <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="5" GridPane.rowIndex="6">
-                                                    <children>
-                                                        <Rectangle fx:id="rect_node14" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
-                                                        <Text fx:id="text_node14" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
-                                                            <font>
-                                                                <Font name="System Bold" size="13.0" />
-                                                            </font>
-                                                        </Text>
-                                                    </children>
-                                                    <GridPane.margin>
-                                                        <Insets left="5.0" />
-                                                    </GridPane.margin>
-                                                </AnchorPane>
-                                                <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1">
-                                                    <children>
-                                                        <Rectangle fx:id="rect_rc" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
-                                                        <Text fx:id="text_rc" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
-                                                            <font>
-                                                                <Font name="System Bold" size="13.0" />
-                                                            </font>
-                                                        </Text>
-                                                    </children>
-                                                    <GridPane.margin>
-                                                        <Insets left="5.0" />
-                                                    </GridPane.margin>
-                                                </AnchorPane>
-                                                <Label fx:id="label_node0" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                                                <Label fx:id="label_node1" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                                                <Label fx:id="label_node2" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-                                                <Label fx:id="label_node3" GridPane.columnIndex="0" GridPane.rowIndex="5" />
-                                                <Label fx:id="label_node4" GridPane.columnIndex="0" GridPane.rowIndex="6" />
-                                                <Label fx:id="label_node5" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                                                <Label fx:id="label_node6" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                                                <Label fx:id="label_node7" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-                                                <Label fx:id="label_node8" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-                                                <Label fx:id="label_node9" GridPane.columnIndex="2" GridPane.rowIndex="6" />
-                                                <Label fx:id="label_node10" GridPane.columnIndex="4" GridPane.rowIndex="2" />
-                                                <Label fx:id="label_node11" GridPane.columnIndex="4" GridPane.rowIndex="3" />
-                                                <Label fx:id="label_node12" GridPane.columnIndex="4" GridPane.rowIndex="4" />
-                                                <Label fx:id="label_node13" GridPane.columnIndex="4" GridPane.rowIndex="5" />
-                                                <Label fx:id="label_node14" GridPane.columnIndex="4" GridPane.rowIndex="6" />
-                                            </children>
-                                        </GridPane>
-                           </content>
-                        </TitledPane>
+                        <VBox HBox.hgrow="ALWAYS">
+                           <children>
+                              <TitledPane animated="false" collapsible="false" minWidth="1.0" prefHeight="382.0" prefWidth="595.0" text="Run status" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                                 <content>
+                                              <GridPane fx:id="summary_grid" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-padding: 10; -fx-hgap: 2; -fx-vgap: 2;" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                                                  <columnConstraints>
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="130.0" minWidth="10.0" prefWidth="65.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="183.0" minWidth="10.0" prefWidth="116.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="128.0" minWidth="0.0" prefWidth="75.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="300.0" minWidth="10.0" prefWidth="121.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="300.0" minWidth="10.0" prefWidth="72.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="300.0" minWidth="10.0" prefWidth="120.0" />
+                                                  </columnConstraints>
+                                                  <rowConstraints>
+                                                      <RowConstraints maxHeight="48.0" minHeight="10.0" prefHeight="39.0" valignment="CENTER" vgrow="SOMETIMES" />
+                                                      <RowConstraints maxHeight="51.0" minHeight="10.0" prefHeight="38.0" valignment="CENTER" vgrow="SOMETIMES" />
+                                                      <RowConstraints maxHeight="59.0" minHeight="10.0" prefHeight="41.0" valignment="CENTER" vgrow="SOMETIMES" />
+                                                      <RowConstraints maxHeight="55.0" minHeight="10.0" prefHeight="43.0" valignment="CENTER" vgrow="SOMETIMES" />
+                                                      <RowConstraints maxHeight="99.0" minHeight="10.0" prefHeight="43.0" valignment="CENTER" vgrow="SOMETIMES" />
+                                                      <RowConstraints maxHeight="165.0" minHeight="10.0" prefHeight="44.0" valignment="CENTER" vgrow="SOMETIMES" />
+                                          <RowConstraints maxHeight="171.0" minHeight="33.0" prefHeight="50.0" />
+                                                  </rowConstraints>
+                                                  <children>
+                                                      <Label fx:id="label_rcnode" text="RC state">
+                                                          <GridPane.margin>
+                                                              <Insets />
+                                                          </GridPane.margin>
+                                                      </Label>
+                                                      <Label text="Run #" GridPane.rowIndex="1">
+                                                          <GridPane.margin>
+                                                              <Insets />
+                                                          </GridPane.margin>
+                                                      </Label>
+                                                      <Label fx:id="label_runnum" text="0000.0000.000" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                          <GridPane.margin>
+                                                              <Insets left="5.0" />
+                                                          </GridPane.margin>
+                                                      </Label>
+                                                      <Label text="Run type" GridPane.columnIndex="2">
+                                                          <GridPane.margin>
+                                                              <Insets left="5.0" />
+                                                          </GridPane.margin>
+                                                      </Label>
+                                                      <Label text="Start time" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                                          <GridPane.margin>
+                                                              <Insets left="3.0" />
+                                                          </GridPane.margin>
+                                                      </Label>
+                                                      <Label text="End time" GridPane.columnIndex="4" GridPane.rowIndex="1">
+                                                          <GridPane.margin>
+                                                              <Insets left="5.0" />
+                                                          </GridPane.margin>
+                                                      </Label>
+                                                      <Label fx:id="label_starttime" text="---- / -- / --  -- : -- : --" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                                                          <GridPane.margin>
+                                                              <Insets left="5.0" />
+                                                          </GridPane.margin>
+                                             <font>
+                                                <Font size="11.0" />
+                                             </font>
+                                                      </Label>
+                                                      <Label fx:id="label_endtime" text="---- / -- / --  -- : -- : --" GridPane.columnIndex="5" GridPane.rowIndex="1">
+                                                          <GridPane.margin>
+                                                              <Insets left="5.0" />
+                                                          </GridPane.margin>
+                                             <font>
+                                                <Font size="11.0" />
+                                             </font>
+                                                      </Label>
+                                                      <Label fx:id="label_runtype" text="default" GridPane.columnIndex="3" GridPane.columnSpan="2147483647">
+                                                          <GridPane.margin>
+                                                              <Insets left="5.0" />
+                                                          </GridPane.margin>
+                                                      </Label>
+                                                      <AnchorPane prefHeight="36.0" prefWidth="98.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                                          <children>
+                                                              <Rectangle fx:id="rect_node0" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
+                                                              <Text fx:id="text_node0" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
+                                                                  <font>
+                                                                      <Font name="System Bold" size="13.0" />
+                                                                  </font>
+                                                              </Text>
+                                                          </children>
+                                                          <GridPane.margin>
+                                                              <Insets left="5.0" />
+                                                          </GridPane.margin>
+                                                      </AnchorPane>
+                                                      <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                                          <children>
+                                                              <Rectangle fx:id="rect_node1" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
+                                                              <Text fx:id="text_node1" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
+                                                                  <font>
+                                                                      <Font name="System Bold" size="13.0" />
+                                                                  </font>
+                                                              </Text>
+                                                          </children>
+                                                          <GridPane.margin>
+                                                              <Insets left="5.0" />
+                                                          </GridPane.margin>
+                                                      </AnchorPane>
+                                                      <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                                          <children>
+                                                              <Rectangle fx:id="rect_node2" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
+                                                              <Text fx:id="text_node2" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
+                                                                  <font>
+                                                                      <Font name="System Bold" size="13.0" />
+                                                                  </font>
+                                                              </Text>
+                                                          </children>
+                                                          <GridPane.margin>
+                                                              <Insets left="5.0" />
+                                                          </GridPane.margin>
+                                                      </AnchorPane>
+                                                      <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                                          <children>
+                                                              <Rectangle fx:id="rect_node3" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
+                                                              <Text fx:id="text_node3" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
+                                                                  <font>
+                                                                      <Font name="System Bold" size="13.0" />
+                                                                  </font>
+                                                              </Text>
+                                                          </children>
+                                                          <GridPane.margin>
+                                                              <Insets left="5.0" />
+                                                          </GridPane.margin>
+                                                      </AnchorPane>
+                                                      <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                                                          <children>
+                                                              <Rectangle fx:id="rect_node4" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
+                                                              <Text fx:id="text_node4" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
+                                                                  <font>
+                                                                      <Font name="System Bold" size="13.0" />
+                                                                  </font>
+                                                              </Text>
+                                                          </children>
+                                                          <GridPane.margin>
+                                                              <Insets left="5.0" />
+                                                          </GridPane.margin>
+                                                      </AnchorPane>
+                                                      <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="2">
+                                                          <children>
+                                                              <Rectangle fx:id="rect_node5" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
+                                                              <Text fx:id="text_node5" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
+                                                                  <font>
+                                                                      <Font name="System Bold" size="13.0" />
+                                                                  </font>
+                                                              </Text>
+                                                          </children>
+                                                          <GridPane.margin>
+                                                              <Insets left="5.0" />
+                                                          </GridPane.margin>
+                                                      </AnchorPane>
+                                                      <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="3">
+                                                          <children>
+                                                              <Rectangle fx:id="rect_node6" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
+                                                              <Text fx:id="text_node6" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
+                                                                  <font>
+                                                                      <Font name="System Bold" size="13.0" />
+                                                                  </font>
+                                                              </Text>
+                                                          </children>
+                                                          <GridPane.margin>
+                                                              <Insets left="5.0" />
+                                                          </GridPane.margin>
+                                                      </AnchorPane>
+                                                      <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="4">
+                                                          <children>
+                                                              <Rectangle fx:id="rect_node7" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
+                                                              <Text fx:id="text_node7" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
+                                                                  <font>
+                                                                      <Font name="System Bold" size="13.0" />
+                                                                  </font>
+                                                              </Text>
+                                                          </children>
+                                                          <GridPane.margin>
+                                                              <Insets left="5.0" />
+                                                          </GridPane.margin>
+                                                      </AnchorPane>
+                                                      <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="5">
+                                                          <children>
+                                                              <Rectangle fx:id="rect_node8" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
+                                                              <Text fx:id="text_node8" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
+                                                                  <font>
+                                                                      <Font name="System Bold" size="13.0" />
+                                                                  </font>
+                                                              </Text>
+                                                          </children>
+                                                          <GridPane.margin>
+                                                              <Insets left="5.0" />
+                                                          </GridPane.margin>
+                                                      </AnchorPane>
+                                                      <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="6">
+                                                          <children>
+                                                              <Rectangle fx:id="rect_node9" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
+                                                              <Text fx:id="text_node9" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
+                                                                  <font>
+                                                                      <Font name="System Bold" size="13.0" />
+                                                                  </font>
+                                                              </Text>
+                                                          </children>
+                                                          <GridPane.margin>
+                                                              <Insets left="5.0" />
+                                                          </GridPane.margin>
+                                                      </AnchorPane>
+                                                      <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="5" GridPane.rowIndex="2">
+                                                          <children>
+                                                              <Rectangle fx:id="rect_node10" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
+                                                              <Text fx:id="text_node10" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
+                                                                  <font>
+                                                                      <Font name="System Bold" size="13.0" />
+                                                                  </font>
+                                                              </Text>
+                                                          </children>
+                                                          <GridPane.margin>
+                                                              <Insets left="5.0" />
+                                                          </GridPane.margin>
+                                                      </AnchorPane>
+                                                      <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="5" GridPane.rowIndex="3">
+                                                          <children>
+                                                              <Rectangle fx:id="rect_node11" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
+                                                              <Text fx:id="text_node11" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
+                                                                  <font>
+                                                                      <Font name="System Bold" size="13.0" />
+                                                                  </font>
+                                                              </Text>
+                                                          </children>
+                                                          <GridPane.margin>
+                                                              <Insets left="5.0" />
+                                                          </GridPane.margin>
+                                                      </AnchorPane>
+                                                      <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="5" GridPane.rowIndex="4">
+                                                          <children>
+                                                              <Rectangle fx:id="rect_node12" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
+                                                              <Text fx:id="text_node12" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
+                                                                  <font>
+                                                                      <Font name="System Bold" size="13.0" />
+                                                                  </font>
+                                                              </Text>
+                                                          </children>
+                                                          <GridPane.margin>
+                                                              <Insets left="5.0" />
+                                                          </GridPane.margin>
+                                                      </AnchorPane>
+                                                      <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="5" GridPane.rowIndex="5">
+                                                          <children>
+                                                              <Rectangle fx:id="rect_node13" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
+                                                              <Text fx:id="text_node13" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
+                                                                  <font>
+                                                                      <Font name="System Bold" size="13.0" />
+                                                                  </font>
+                                                              </Text>
+                                                          </children>
+                                                          <GridPane.margin>
+                                                              <Insets left="5.0" />
+                                                          </GridPane.margin>
+                                                      </AnchorPane>
+                                                      <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="5" GridPane.rowIndex="6">
+                                                          <children>
+                                                              <Rectangle fx:id="rect_node14" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
+                                                              <Text fx:id="text_node14" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
+                                                                  <font>
+                                                                      <Font name="System Bold" size="13.0" />
+                                                                  </font>
+                                                              </Text>
+                                                          </children>
+                                                          <GridPane.margin>
+                                                              <Insets left="5.0" />
+                                                          </GridPane.margin>
+                                                      </AnchorPane>
+                                                      <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1">
+                                                          <children>
+                                                              <Rectangle fx:id="rect_rc" arcHeight="5.0" arcWidth="5.0" fill="#808080" height="30.0" layoutY="6.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
+                                                              <Text fx:id="text_rc" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="UNKNOWN" textAlignment="CENTER" wrappingWidth="100.7294921875">
+                                                                  <font>
+                                                                      <Font name="System Bold" size="13.0" />
+                                                                  </font>
+                                                              </Text>
+                                                          </children>
+                                                          <GridPane.margin>
+                                                              <Insets left="5.0" />
+                                                          </GridPane.margin>
+                                                      </AnchorPane>
+                                                      <Label fx:id="label_node0" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                                                      <Label fx:id="label_node1" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                                                      <Label fx:id="label_node2" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                                                      <Label fx:id="label_node3" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                                                      <Label fx:id="label_node4" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                                                      <Label fx:id="label_node5" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                                      <Label fx:id="label_node6" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                      <Label fx:id="label_node7" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                                                      <Label fx:id="label_node8" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                                                      <Label fx:id="label_node9" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                                                      <Label fx:id="label_node10" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                                                      <Label fx:id="label_node11" GridPane.columnIndex="4" GridPane.rowIndex="3" />
+                                                      <Label fx:id="label_node12" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+                                                      <Label fx:id="label_node13" GridPane.columnIndex="4" GridPane.rowIndex="5" />
+                                                      <Label fx:id="label_node14" GridPane.columnIndex="4" GridPane.rowIndex="6" />
+                                                  </children>
+                                              </GridPane>
+                                 </content>
+                              </TitledPane>
+                           </children>
+                        </VBox>
                           </children>
                       </HBox>
                               <fx:include fx:id="logview" source="LogViewPane.fxml" />
@@ -334,7 +338,7 @@
         </Tab>
         <Tab closable="false" text="Config">
             <content>
-                <TabPane layoutX="197.0" layoutY="64.0" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
+                <TabPane layoutX="197.0" layoutY="64.0" tabClosingPolicy="UNAVAILABLE">
                     <tabs>
                         <Tab closable="false" text="COPPER">
                             <content>

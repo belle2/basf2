@@ -1,5 +1,7 @@
 #include "daq/slc/apps/rocontrold/ROCallback.h"
 
+#include "daq/slc/nsm/NSMCommunicator.h"
+
 #include "daq/slc/readout/ronode_info.h"
 #include "daq/slc/readout/ronode_status.h"
 
@@ -16,6 +18,7 @@ using namespace Belle2;
 ROCallback::ROCallback(const NSMNode& node)
   : RCCallback(node), m_con(this)
 {
+  system("killall basf2");
 }
 
 ROCallback::~ROCallback() throw()
@@ -24,7 +27,7 @@ ROCallback::~ROCallback() throw()
 
 void ROCallback::init() throw()
 {
-  m_con.init("basf2_" + getNode().getName(), 1);
+  m_con.init("ropcbasf2_" + getNode().getName(), 1);
   m_data = NSMData(getNode().getName() + "_STATUS",
                    "ronode_status",
                    ronode_status_revision);
@@ -39,6 +42,7 @@ void ROCallback::term() throw()
 
 bool ROCallback::load() throw()
 {
+  if (m_con.isAlive()) return true;
   const DBObject& obj(getConfig().getObject());
   m_con.setExecutable("basf2");
   m_con.clearArguments();
@@ -46,15 +50,15 @@ bool ROCallback::load() throw()
                                      obj.getText("ropc_script").c_str()));
   m_con.addArgument("1");
   m_con.addArgument(StringUtil::form("%d", obj.getInt("port_from")));
-  m_con.addArgument("basf2_" + getNode().getName());
-  if (m_con.load(30)) {
+  m_con.addArgument("ropcbasf2_" + getNode().getName());
+  if (m_con.load(10)) {
     LogFile::debug("load succeded");
     m_flow.open(&(m_con.getInfo()));
     return true;
+  } else {
+    LogFile::error("load timeout");
   }
-  LogFile::error("load timeout");
-  //return false;
-  return true;
+  return false;
 }
 
 bool ROCallback::start() throw()
@@ -113,7 +117,24 @@ void ROCallback::timeout() throw()
     } else {
       nsm->loadavg = -1;
     }
-    //LogFile::debug("Load average = %f", nsm->loadavg);
+  }
+  int eflag = m_con.getInfo().getErrorFlag();
+  if (eflag > 0) {
+    if (eflag == RunInfoBuffer::PROCESS_DOWN) {
+      if (getNode().getState() == RCState::RUNNING_S) {
+        abort();
+        NSMCommunicator& com(*getCommunicator());
+        if (load()) {
+          start();
+          getNode().setState(RCState::RUNNING_S);
+          com.replyOK(getNode());
+        } else {
+          com.replyError(RunInfoBuffer::PROCESS_DOWN,
+                         "Process recover failed " +
+                         m_con.getExecutable());
+        }
+      }
+    }
   }
 }
 

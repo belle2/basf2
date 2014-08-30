@@ -23,8 +23,10 @@ import java.util.ResourceBundle;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
 
 /**
  *
@@ -37,8 +39,6 @@ public class MonitorPaneController implements Initializable, NSMObserver {
 
     private final HashMap<String, NSMObserver> flowmonitors = new HashMap<>();
     private String[] namelist = null;
-    @FXML
-    private TabPane tabpane_mon;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -73,7 +73,7 @@ public class MonitorPaneController implements Initializable, NSMObserver {
         } else if (command.equals(NSMCommand.LISTSET)) {
             if (msg.getNParams() > 0 && msg.getParam(0) > 0) {
                 namelist = msg.getData().split("\n");
-                System.out.println(msg.getData());
+                //System.out.println(msg.getData());
             }
         } else if (command.equals(NSMCommand.DBSET)) {
             ConfigObject cobj = NSMListenerService.getDB(msg.getNodeName());
@@ -85,45 +85,65 @@ public class MonitorPaneController implements Initializable, NSMObserver {
             NSMData data = NSMListenerService.getData(dataname);
             Tab tab = null;
             String nodename = msg.getNodeName().replace("_STATUS", "");
-            for (Tab t : tabpane_mon.getTabs()) {
-                if ((data.getFormat().matches("rorc_status") ||
-                     data.getFormat().matches("storage_status") ||
-                     data.getFormat().matches("rfunitinfo"))
-                        && t.getText().matches(nodename)) {
-                    tab = t;
-                    flowmonitors.get(nodename).handleOnReceived(msg);
-                    break;
-                }
+            if ((data.getFormat().matches("rorc_status")
+                    || data.getFormat().matches("storage_status")
+                    || data.getFormat().matches("rfunitinfo"))
+                    && flowmonitors.containsKey(nodename)) {
+                flowmonitors.get(nodename).handleOnReceived(msg);
+                return;
             }
             if (tab == null) {
                 if (data.getFormat().matches("rorc_status")) {
-                    //data.print();
-                    RORCDataFlowTableController flowmonitor = RORCDataFlowTableController.create(nodename);
-                    tab = new Tab();
-                    tab.setText(flowmonitor.getNodeName());
-                    tab.setContent(flowmonitor.getPane());
-                    tab.setClosable(false);
-                    tabpane_mon.getTabs().add(tab);
-                    flowmonitors.put(nodename, flowmonitor);
-                    flowmonitor.handleOnReceived(msg);
+                    javafx.application.Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            Stage stage = new Stage();
+                            RORCDataFlowTableController flowmonitor = RORCDataFlowTableController.create(nodename);
+                            Scene scene = new Scene(flowmonitor.getPane());
+                            scene.getStylesheets().add(DataFlowMonitorController.class.getResource("DataFlowMonitor.css").toExternalForm());
+                            scene.getStylesheets().add(StorageDataFlowTableController.class.getResource("StorageDataFlowTable.css").toExternalForm());
+                            stage.setScene(scene);
+                            flowmonitors.put(nodename, flowmonitor);
+                            flowmonitor.handleOnReceived(msg);
+                            stage.setTitle(nodename);
+                            stage.getIcons().add(new Image(MonitorGUI.class.getResource("mon.png").toExternalForm()));
+                            stage.show();
+                        }
+                    });
                 } else if (data.getFormat().matches("storage_status")) {
-                    StorageDataFlowTableController flowmonitor = StorageDataFlowTableController.create(nodename);
-                    tab = new Tab();
-                    tab.setText(flowmonitor.getNodeName());
-                    tab.setContent(flowmonitor.getPane());
-                    tab.setClosable(false);
-                    tabpane_mon.getTabs().add(tab);
-                    flowmonitors.put(nodename, flowmonitor);
-                    flowmonitor.handleOnReceived(msg);
+                    javafx.application.Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            Stage stage = new Stage();
+                            StorageDataFlowTableController flowmonitor = StorageDataFlowTableController.create(nodename);
+                            Scene scene = new Scene(flowmonitor.getPane());
+                            scene.getStylesheets().add(DataFlowMonitorController.class.getResource("DataFlowMonitor.css").toExternalForm());
+                            scene.getStylesheets().add(StorageDataFlowTableController.class.getResource("StorageDataFlowTable.css").toExternalForm());
+                            stage.setScene(scene);
+                            flowmonitors.put(nodename, flowmonitor);
+                            flowmonitor.handleOnReceived(msg);
+                            stage.setTitle(nodename);
+                            stage.getIcons().add(new Image(MonitorGUI.class.getResource("mon.png").toExternalForm()));
+                            stage.show();
+                        }
+                    });
                 } else if (data.getFormat().matches("rfunitinfo")) {
-                    HLTDataFlowTableController flowmonitor = HLTDataFlowTableController.create(nodename);
-                    tab = new Tab();
-                    tab.setText(flowmonitor.getNodeName());
-                    tab.setContent(flowmonitor.getPane());
-                    tab.setClosable(false);
-                    tabpane_mon.getTabs().add(tab);
-                    flowmonitors.put(nodename, flowmonitor);
-                    flowmonitor.handleOnReceived(msg);
+                    javafx.application.Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            Stage stage = new Stage();
+                            HLTDataFlowTableController flowmonitor = HLTDataFlowTableController.create(nodename);
+                            Scene scene = new Scene(flowmonitor.getPane());
+                            scene.getStylesheets().add(DataFlowMonitorController.class.getResource("DataFlowMonitor.css").toExternalForm());
+                            scene.getStylesheets().add(StorageDataFlowTableController.class.getResource("StorageDataFlowTable.css").toExternalForm());
+                            stage.setScene(scene);
+                            flowmonitors.put(nodename, flowmonitor);
+                            flowmonitor.handleOnReceived(msg);
+                            stage.setTitle(nodename);
+                            stage.getIcons().add(new Image(MonitorGUI.class.getResource("mon.png").toExternalForm()));
+                            stage.show();
+                        }
+                    });
                 }
             }
         } else if (command.equals(RCCommand.OK)) {

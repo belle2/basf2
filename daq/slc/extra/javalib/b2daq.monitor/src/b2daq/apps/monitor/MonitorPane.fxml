@@ -12,18 +12,8 @@
 <?import b2daq.apps.monitor.*?>
 <?scenebuilder-classpath-element ../classes?>
 
-<TabPane prefHeight="602.0" prefWidth="840.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.apps.monitor.MonitorPaneController">
-    <tabs>
-        <Tab closable="false" text="Monitor">
-            <content>
-                <TabPane fx:id="tabpane_mon">
-                </TabPane>
-            </content>
-        </Tab>
-        <Tab closable="false" text="Network ">
-            <content>
-                <fx:include fx:id="networkconfig" source="NetworkConfigPane.fxml" />
-            </content>
-        </Tab>
-    </tabs>
-</TabPane>
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.apps.monitor.MonitorPaneController">
+    <children>
+        <fx:include fx:id="networkconfig" source="NetworkConfigPane.fxml" />
+    </children>
+</VBox>

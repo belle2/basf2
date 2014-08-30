@@ -205,10 +205,6 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
         rcStateController = new RunStateLabelController(rect_rc, text_rc);
         rcStateController.setVisible(true);
         logviewController.add(new LogMessage("LOCAL", LogLevel.INFO, "GUI opened"));
-//        Tab tab = new Tab();
-//        tab.setText("Summary");
-//        tab.setContent(DataFlowSummaryController.create("").getPane());
-//        tabpane_mon.getTabs().add(tab);
     }
 
     @Override
@@ -262,8 +258,6 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
         } else if (command.equals(NSMCommand.DBSET)) {
             ConfigObject cobj = NSMListenerService.getDB(msg.getNodeName());
             if (cobj != null) {
-                //System.out.println(cobj.getName() + " " + cobj.getTable() + " " + NSMListenerService.getNSMConfig().getNsmTarget());
-                //cobj.print();
                 copperEditorController.handleOnReceived(msg);
                 networkconfigController.add(cobj);
                 if (cobj.getNode().matches(NSMListenerService.getNSMConfig().getNsmTarget()) && 
@@ -333,11 +327,9 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
                 } else {
                     runSettingsController.update(cobj, data);
                     rcStateController.update(data.getInt("state"));
-                    //System.out.println("rc.state="+data.getInt("state"));
                     if (cobj.hasObject("node")) {
                         int n = 0;
                         for (ConfigObject obj : cobj.getObjects("node")) {
-                            //System.out.println("node["+n+"].state="+data.getObject("node", n).getInt("state"));
                             statelabel_v[n].update(data.getObject("node", n).getInt("state"));
                             n++;
                         }
@@ -351,8 +343,7 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
             if (!state.isTransition()) {
                 String dataname = getNSMDataProperties().get(0).getDataname();
                 logviewController.add(new LogMessage(msg.getNodeName(),
-                        LogLevel.INFO, "State shift "
-                        + msg.getNodeName() + ">> "
+                        LogLevel.INFO, "State shift " + msg.getNodeName() + ">> "
                         + state.getLabel()));
                 NSMListenerService.requestNSMGet(dataname, "", 0);
             }

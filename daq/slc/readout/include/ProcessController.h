@@ -40,6 +40,7 @@ namespace Belle2 {
     RunInfoBuffer& getInfo() { return m_info; }
     RCCallback* getCallback() { return m_callback; }
     const Fork& getFork() const { return  m_fork; }
+    Fork& getFork() { return  m_fork; }
     void setCallback(RCCallback* callback) { m_callback = callback; }
     void setName(const std::string& name) { m_name = name; }
     void setExecutable(const std::string& exe) { m_exename = exe; }

@@ -23,7 +23,9 @@ COPPERCallback::COPPERCallback(const NSMNode& node,
                                FEEController* fee)
   : RCCallback(node), m_fee(fee)
 {
+  setTimeout(2);
   m_con.setCallback(this);
+  system("killall basf2");
 }
 
 COPPERCallback::~COPPERCallback() throw()
@@ -32,7 +34,7 @@ COPPERCallback::~COPPERCallback() throw()
 
 void COPPERCallback::init() throw()
 {
-  m_con.init("basf2_" + getNode().getName(), 1);
+  m_con.init("cprbasf2_" + getNode().getName(), 1);
   m_ttrx.open();
   m_copper.open();
   m_flow.open(&m_con.getInfo());
@@ -73,7 +75,7 @@ void COPPERCallback::timeout() throw()
   eflag |= m_ttrx.isBelle2LinkError() << 28;
   eflag |= m_ttrx.isLinkUpError() << 29;
 
-  //NSMCommunicator& com(*getCommunicator());
+  NSMCommunicator& com(*getCommunicator());
   const std::string name = getNode().getName();
   /*
   if (getNode().getState() == RCState::RUNNING_S &&
@@ -123,7 +125,6 @@ void COPPERCallback::timeout() throw()
       }
     }
   }
-
   if (m_ttrx.isBelle2LinkError()) {
     std::string msg = "TTRX Belle2 link error";
     LogFile::error(msg);
@@ -155,22 +156,29 @@ void COPPERCallback::timeout() throw()
     } else {
       nsm->loadavg = -1;
     }
+    int eflag = 0xFF & m_con.getInfo().getErrorFlag();
+    if (eflag > 0) {
+      if (eflag == RunInfoBuffer::PROCESS_DOWN) {
+        if (getNode().getState() == RCState::RUNNING_S) {
+          abort();
+          if (recover()) {
+            start();
+            getNode().setState(RCState::RUNNING_S);
+            com.replyOK(getNode());
+          } else {
+            com.replyError(RunInfoBuffer::PROCESS_DOWN,
+                           "Process recover failed " +
+                           m_con.getExecutable());
+          }
+        }
+      }
+    }
   }
 }
 
 bool COPPERCallback::load() throw()
 {
   m_config.read(getConfig().getObject());
-  if (!m_ttrx.isOpened()) {
-    m_ttrx.open();
-    //m_ttrx.boot(m_config.getSetup().getTTRXFirmware());
-  }
-  for (int i = 0; i < 4; i++) {
-    if (m_config.useHSLB(i)) {
-      m_hslb[i].open(i);
-      m_hslb[i].load();
-    }
-  }
   return recover();
 }
 
@@ -200,6 +208,16 @@ bool COPPERCallback::pause() throw()
 
 bool COPPERCallback::recover() throw()
 {
+  if (!m_ttrx.isOpened()) {
+    m_ttrx.open();
+    //m_ttrx.boot(m_config.getSetup().getTTRXFirmware());
+  }
+  for (int i = 0; i < 4; i++) {
+    if (m_config.useHSLB(i)) {
+      m_hslb[i].open(i);
+      m_hslb[i].load();
+    }
+  }
   if (m_ttrx.isError()) {
     //m_ttrx.boot(m_config.getSetup().getTTRXFirmware());
   }
@@ -226,8 +244,7 @@ bool COPPERCallback::abort() throw()
 
 bool COPPERCallback::bootBasf2() throw()
 {
-  //if (m_con.isAlive()) {
-  system("killall basf2");
+  if (m_con.isAlive()) return true;
   int flag = 0;
   for (size_t i = 0; i < 4; i++) {
     if (m_config.useHSLB(i)) flag += 1 << i;
@@ -241,8 +258,8 @@ bool COPPERCallback::bootBasf2() throw()
   m_con.addArgument(m_config.getCopperId().substr(3));
   m_con.addArgument(StringUtil::form("%d", flag));
   m_con.addArgument("1");
-  m_con.addArgument("basf2_" + getNode().getName());
-  if (m_con.load(30)) {
+  m_con.addArgument("cprbasf2_" + getNode().getName());
+  if (m_con.load(10)) {
     LogFile::debug("load succeded");
     return true;
   }

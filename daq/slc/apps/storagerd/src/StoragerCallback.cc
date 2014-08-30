@@ -15,6 +15,10 @@ StoragerCallback::StoragerCallback(const NSMNode& node)
   : RCCallback(node)
 {
   setTimeout(1);
+  system("killall storagein");
+  system("killall storagerecord");
+  system("killall storageout");
+  system("killall basf2");
 }
 
 StoragerCallback::~StoragerCallback() throw()
@@ -27,6 +31,18 @@ void StoragerCallback::init() throw()
   m_data = NSMData("STORAGE_STATUS", "storage_status",
                    storage_status_revision);
   m_data.allocate(getCommunicator());
+  m_file.read("storage");
+  const size_t nproc = m_file.getInt("record.nproc");
+  m_con = std::vector<ProcessController>();
+  for (size_t i = 0; i < 3 + nproc; i++) {
+    m_con.push_back(ProcessController(this));
+  }
+  m_con[0].init("storagein", 1);
+  m_con[1].init("storagerecord", 2);
+  m_con[2].init("storageout", 3);
+  for (size_t i = 3; i < m_con.size(); i++) {
+    m_con[i].init(StringUtil::form("storagebasf2_%d", i - 3), i);
+  }
 }
 
 void StoragerCallback::term() throw()
@@ -39,23 +55,6 @@ void StoragerCallback::term() throw()
 
 bool StoragerCallback::load() throw()
 {
-  system("killall storagein");
-  system("killall storagerecord");
-  system("killall storageout");
-  system("killall basf2");
-
-  m_file.read("storage");
-  const size_t nproc = m_file.getInt("record.nproc");
-  m_con = std::vector<ProcessController>();
-  for (size_t i = 0; i < 3 + nproc; i++) {
-    m_con.push_back(ProcessController(this));
-  }
-  m_con[0].init("storagein", 1);
-  m_con[1].init("storagerecord", 2);
-  m_con[2].init("storageout", 3);
-  for (size_t i = 3; i < m_con.size(); i++) {
-    m_con[i].init(StringUtil::form("basf2_%d", i - 3), i);
-  }
 
   const std::string ibuf_name = m_file.get("input.buf.name");
   const std::string rbuf_name = m_file.get("record.buf.name");
@@ -63,6 +62,16 @@ bool StoragerCallback::load() throw()
   const std::string ibuf_size = m_file.get("input.buf.size");
   const std::string rbuf_size = m_file.get("record.buf.size");
   const std::string obuf_size = m_file.get("output.buf.size");
+
+  bool is_up_all = true;
+  for (size_t i = 0; i < m_con.size(); i++) {
+    if (!m_con[0].isAlive()) {
+      is_up_all = false;
+      break;
+    }
+  }
+  if (is_up_all) return true;
+  abort();
 
   m_con[0].clearArguments();
   m_con[0].setExecutable("storagein");
@@ -101,20 +110,20 @@ bool StoragerCallback::load() throw()
   }
   LogFile::debug("Booted storagerecord");
 
-  /*
-  m_con[2].clearArguments();
-  m_con[2].setExecutable("storageout");
-  m_con[2].addArgument(output.buf.name);
-  m_con[2].addArgument(output.buf.size);
-  m_con[2].addArgument(m_file.get("output.socketport"));
-  m_con[2].addArgument("storageout");
-  m_con[2].addArgument("3");
-  if (!m_con[2].load(10)) {
-    std::string emsg = "storageout: Not accepted connection from EXPRECO";
-    LogFile::warning(emsg);
+  if (m_file.getBool("output.used")) {
+    m_con[2].clearArguments();
+    m_con[2].setExecutable("storageout");
+    m_con[2].addArgument(obuf_name);
+    m_con[2].addArgument(obuf_size);
+    m_con[2].addArgument(m_file.get("output.socketport"));
+    m_con[2].addArgument("storageout");
+    m_con[2].addArgument("3");
+    if (!m_con[2].load(10)) {
+      std::string emsg = "storageout: Not accepted connection from EXPRECO";
+      LogFile::warning(emsg);
+    }
+    LogFile::debug("Booted storageout");
   }
-  LogFile::debug("Booted storageout");
-  */
 
   for (size_t i = 3; i < m_con.size(); i++) {
     m_con[i].clearArguments();
@@ -125,7 +134,7 @@ bool StoragerCallback::load() throw()
     m_con[i].addArgument(ibuf_size);
     m_con[i].addArgument(rbuf_name);
     m_con[i].addArgument(rbuf_size);
-    m_con[i].addArgument(StringUtil::form("basf2_%d", i - 3));
+    m_con[i].addArgument(StringUtil::form("storagebasf2_%d", i - 3));
     m_con[i].addArgument(StringUtil::form("%d", i + 1));
     m_con[i].addArgument("1");
     if (!m_con[i].load(10)) {

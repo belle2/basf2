@@ -40,6 +40,7 @@ namespace Belle2 {
 
   public:
     pid_t get_id() const { return m_pid; }
+    void set_id(pid_t id) { m_pid = id; }
     bool isAlive() const { return m_pid > 0; }
     bool kill(int signo) const {
       if (m_pid < 0) return false;

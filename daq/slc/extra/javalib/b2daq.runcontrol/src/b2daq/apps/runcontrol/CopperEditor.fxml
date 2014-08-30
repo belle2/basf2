@@ -10,9 +10,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
 
-<VBox fx:id="vbox" prefHeight="505.0" prefWidth="878.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.apps.runcontrol.CopperEditorController">
+<VBox fx:id="vbox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="b2daq.apps.runcontrol.CopperEditorController">
     <children>
-        <HBox alignment="CENTER_LEFT" prefHeight="52.0" prefWidth="796.0" spacing="10.0">
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
             <children>
                 <Label text="Select configuration" />
                 <ComboBox fx:id="combo" prefWidth="150.0" promptText="---" />
@@ -55,14 +55,14 @@
                 </HBox>
             </children>
             <padding>
-                <Insets bottom="10.0" left="10.0" right="10.0" top="5.0" />
+                <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
             </padding>
         </HBox>
-        <TabPane prefHeight="365.0" prefWidth="616.0" VBox.vgrow="ALWAYS">
+        <TabPane VBox.vgrow="ALWAYS">
             <tabs>
                 <Tab closable="false" text="Config">
                     <content>
-                        <TableView fx:id="table_config" layoutX="21.0" layoutY="-10.0" prefHeight="365.0" prefWidth="546.0" tableMenuButtonVisible="true">
+                        <TableView fx:id="table_config" layoutX="21.0" layoutY="-10.0" tableMenuButtonVisible="true">
                             <columns>
                                 <TableColumn fx:id="col_config_node" prefWidth="76.0" text="Node">
                                     <cellValueFactory>
@@ -122,12 +122,15 @@
                             <padding>
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="8.0" />
                             </padding>
+                     <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                     </columnResizePolicy>
                         </TableView>
                     </content>
                 </Tab>
                 <Tab closable="false" text="Setup">
                     <content>
-                          <TableView fx:id="table_setup" layoutX="21.0" layoutY="-10.0" prefWidth="1200.0" tableMenuButtonVisible="true">
+                          <TableView fx:id="table_setup" layoutX="21.0" layoutY="-10.0" tableMenuButtonVisible="true">
                               <columns>
                                   <TableColumn fx:id="col_setup_node" prefWidth="102.0" text="Node">
                                       <cellValueFactory>
@@ -211,12 +214,15 @@
                               <padding>
                                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                               </padding>
+                     <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                     </columnResizePolicy>
                           </TableView>
                     </content>
                 </Tab>
                 <Tab closable="false" text="FEE">
                     <content>
-                        <TableView fx:id="table_fee" layoutX="21.0" layoutY="-10.0" prefHeight="332.0" prefWidth="1057.0" tableMenuButtonVisible="true">
+                        <TableView fx:id="table_fee" layoutX="21.0" layoutY="-10.0" tableMenuButtonVisible="true">
                             <columns>
                                 <TableColumn fx:id="col_fee_node" prefWidth="102.0" text="Node">
                                     <cellValueFactory>
@@ -252,6 +258,9 @@
                             <padding>
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                             </padding>
+                     <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                     </columnResizePolicy>
                         </TableView>
                     </content>
                 </Tab>
@@ -259,7 +268,7 @@
                     <content>
                         <VBox>
                             <children>
-                                <TableView fx:id="table_param" layoutX="21.0" layoutY="-10.0" prefHeight="332.0" prefWidth="605.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
+                                <TableView fx:id="table_param" layoutX="21.0" layoutY="-10.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
                                     <columns>
                                         <TableColumn fx:id="col_param_node" prefWidth="102.0" text="Node">
                                             <cellValueFactory>
@@ -305,12 +314,18 @@
                                     <padding>
                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                     </padding>
+                           <columnResizePolicy>
+                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                           </columnResizePolicy>
                                 </TableView>
                             </children>
                         </VBox>
                     </content>
                 </Tab>
             </tabs>
+         <VBox.margin>
+            <Insets top="5.0" />
+         </VBox.margin>
         </TabPane>
     </children>
 </VBox>

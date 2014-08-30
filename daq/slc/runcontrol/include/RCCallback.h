@@ -42,7 +42,9 @@ namespace Belle2 {
     void setDB(DBInterface* db) throw() { m_db = db; }
     DBInterface* getDB() throw() { return m_db; }
     const RCState& getStateDemand() const throw() { return m_state_demand; }
-    void setStateDemand(const RCState& state) throw() { m_state_demand = state; }
+    void setStateDemand(const RCState& state) throw() {
+      m_state_demand = state;
+    }
     virtual bool perform(const NSMMessage& msg) throw();
     virtual void update() throw() {}
     void sendPause(const NSMNode& node) throw();
@@ -55,6 +57,10 @@ namespace Belle2 {
     void setFilePath(const std::string tablename) throw() {
       setFilePath("", tablename);
     }
+    void setAutoReply(bool autoreply) throw() {
+      m_autoreply = autoreply;
+    }
+    bool getAutoReply() const throw() { return m_autoreply; }
 
   protected:
     bool preload(const NSMMessage& msg) throw();
@@ -67,6 +73,7 @@ namespace Belle2 {
     DBInterface* m_db;
     std::string m_path;
     std::string m_tablename;
+    bool m_autoreply;
 
   };
 

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+killall nsmd2socket
+killall runcontrold

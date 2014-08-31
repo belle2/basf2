@@ -8,7 +8,7 @@ cd -
 echo "booting nsmd2"
 for i in $(seq 5001 5013)
 do
-./boot_nsmd2_ssh cpr${i} tkonno local
+./boot_nsmd2_ssh cpr${i} local
 done
-./boot_nsmd2_ssh ecl01 tkonno local
-./boot_nsmd2_ssh ecl01 tkonno global
+./boot_nsmd2_ssh ecl01 local
+./boot_nsmd2_ssh ecl01 global

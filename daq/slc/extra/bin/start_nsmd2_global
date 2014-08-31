@@ -7,8 +7,8 @@ cd -
 
 dir="${HOME}/belle2/release/daq/slc/extra/bin"
 
-./boot_nsmd2_ssh ropc02 tkonno global 
-./boot_nsmd2_ssh store01 tkonno global 
-./boot_nsmd2_ssh ecl01 tkonno global 
-./boot_nsmd2_ssh ecl02 tkonno global 
+./boot_nsmd2_ssh ropc02 global 
+./boot_nsmd2_ssh store01 global 
+./boot_nsmd2_ssh ecl01 global 
+./boot_nsmd2_ssh ecl02 global 
 

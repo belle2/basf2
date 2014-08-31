@@ -1,0 +1,3 @@
+#!/bin/bash
+
+killall nsmd2 > /dev/null

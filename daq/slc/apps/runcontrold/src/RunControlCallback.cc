@@ -164,15 +164,60 @@ void RunControlCallback::update() throw()
       }
     }
   }
-  RCState state(m_node_v[0].getState());
+  bool aborting_any = false;
+  bool recovering_any = false;
+  bool notready_any = false;
+  bool ready_all = true;
+  bool running_all = true;
+  bool starting_any = false;
+  bool stopping_any = false;
+  bool paused_any = false;
+  int count = 0;
   for (size_t i = 0; i < m_node_v.size(); i++) {
-    if (state != m_node_v[i].getState()) {
-      state = RCState::UNKNOWN;
+    const DBObject& obj(getConfig().getObject().getObject("node", i));
+    if (obj.getBool("used") && !m_node_v[i].isExcluded()) {
+      count++;
+      const RCState& state(m_node_v[i].getState());
+      if (state == RCState::ABORTING_RS) {
+        aborting_any = true;
+      } else if (state == RCState::RECOVERING_RS) {
+        recovering_any = true;
+      } else if (state == RCState::UNKNOWN || state == RCState::NOTREADY_S ||
+                 state == RCState::LOADING_TS) {
+        notready_any = true;
+        ready_all = false;
+        running_all = false;
+      } else if (state == RCState::STARTING_TS) {
+        starting_any = true;
+      } else if (state == RCState::STOPPING_TS) {
+        stopping_any = true;
+      } else if (state == RCState::PAUSED_S) {
+        paused_any = true;
+      } else if (state == RCState::RUNNING_S) {
+        ready_all = false;
+      }
     }
   }
-  if (state != RCState::UNKNOWN) {
-    getNode().setState(state);
+  if (count == 0) {
+    getNode().setState(RCState::NOTREADY_S);
+  } else if (aborting_any) {
+    getNode().setState(RCState::ABORTING_RS);
+  } else if (recovering_any) {
+    getNode().setState(RCState::RECOVERING_RS);
+  } else if (notready_any) {
+    getNode().setState(RCState::NOTREADY_S);
+  } else if (ready_all) {
+    getNode().setState(RCState::READY_S);
+  } else if (paused_any) {
+    getNode().setState(RCState::PAUSED_S);
+  } else if (starting_any) {
+    getNode().setState(RCState::STARTING_TS);
+  } else if (stopping_any) {
+    getNode().setState(RCState::STOPPING_TS);
+  } else if (running_all) {
+    getNode().setState(RCState::RUNNING_S);
   }
+
   void* data = m_data.get();
   rc_status* status = (rc_status*)data;
   bool isro = m_data.getFormat().find("rorc_status") != std::string::npos;

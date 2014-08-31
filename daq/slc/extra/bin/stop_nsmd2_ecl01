@@ -8,6 +8,6 @@ cd -
 echo "killing nsmd2"
 for i in $(seq 5001 5013)
 do
-ssh tkonno@cpr${i} "killall nsmd2 datad > /dev/null"
+ssh cpr${i} "killall nsmd2 > /dev/null"
 done
-killall nsmd2 datad > /dev/null
+killall nsmd2 > /dev/null

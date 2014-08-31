@@ -26,6 +26,13 @@ namespace Belle2 {
       /** Destructor. */
       virtual ~CDCGeometryTranslatorBase() {}
 
+      /** End of wire in the more forward position.
+       */
+      virtual const TVector3 getWireForwardPosition(const WireID& wireID) = 0;
+
+      /** Beginning of wire in the more backward position. */
+      virtual const TVector3 getWireBackwardPosition(const WireID& wireID) = 0;
+
       /** End of imaginary wire in the more forward position.
        *
        *  The GFWireHitPolicy needs the endpoints of the wires and assumes a straight line
@@ -34,11 +41,13 @@ namespace Belle2 {
        *  that individual corrections due to wire sag, etc. can be applied by moving the endpoints accordingly.
        */
       virtual const TVector3 getWireForwardPosition(const WireID& wireID,
-                                                    float z = 0) = 0;
+                                                    //float z = 0) = 0;
+                                                    float z) = 0;
 
       /** Beginning of imaginary wire in the more backward position. */
       virtual const TVector3 getWireBackwardPosition(const WireID& wireID,
-                                                     float z = 0) = 0;
+                                                     //float z = 0) = 0;
+                                                     float z) = 0;
     };
   }
 }

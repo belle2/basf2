@@ -35,8 +35,11 @@ namespace Belle2 {
 
     public:
 
-      //! Constructor
-      CDCGeometryPar();
+      //! Wire position set
+      enum EWirePosition {c_Base = 0, c_Misaligned, c_Aligned};
+
+      //      //! Constructor
+      //      CDCGeometryPar();
 
       //! Destructor
       virtual ~CDCGeometryPar();
@@ -58,11 +61,12 @@ namespace Belle2 {
 
 
       /**
-       * Read geometry for the reconstuction.
+       * Read (mis)alignment params.
        * @param[in] GearDir Gear Dir.
+       * @param[in] Wire position set =c_Misaliged: read misalignment file; =c_Aligned: read alignment file.
        */
 
-      void readGeometry4Recon(const GearDir);
+      void readWirePositionParams(const GearDir, EWirePosition set);
 
 
       /**
@@ -251,31 +255,71 @@ namespace Belle2 {
       */
       double zOffsetWireLayer(unsigned i) const;
 
-      //! Returns forward position of sense wires in each layer.
+      //! Returns the forward position of the input sense wire.
       /*!
-          \param layerId The layer id.
-          \param cellId The wire id.
-          \return The forward position of wire cellId in layer layerId.
+          \param layerId The layer id. of the wire
+          \param cellId  The wire id. of the wire
+          \param set     Wire position set; =c_Base, c_Misaligned or c_Aligned
+          \return The forward position of the wire.
       */
-      const TVector3 wireForwardPosition(int layerId, int cellId) const;
+      const TVector3 wireForwardPosition(int layerId, int cellId, EWirePosition set = c_Base) const;
 
-      /** Same function taking different wire number parametrization. */
-      const TVector3 wireForwardPosition(const WireID& wireID) const {
-        return wireForwardPosition(wireID.getICLayer(), wireID.getIWire());
+      /** The same function but in a different input format. */
+      const TVector3 wireForwardPosition(const WireID& wireID, EWirePosition set = c_Base) const {
+        return wireForwardPosition(wireID.getICLayer(), wireID.getIWire(), set);
       }
 
-      //! Returns an array of backward position of sense wires in each layer.
+      //! Returns a virtual forward position corresp. to a tangent to the wire at the input z-position.
       /*!
-          \param layerId The layer id.
-          \param cellId The wire id.
-          \return The backward position of wire cellId in layer layerId.
+      \param layerId The layer id. of the wire
+      \param cellId  The wire id. of the wire
+      \param z       z-position
+      \param set     Wire position set; =c_Base, c_Misaligned or c_Aligned
+      \return The virtual forward position of the wire.
       */
-      const TVector3 wireBackwardPosition(int layerId, int cellId) const;
-
-      /** Same function taking different wire number parametrization. */
-      const TVector3 wireBackwardPosition(const WireID& wireID) const {
-        return wireBackwardPosition(wireID.getICLayer(), wireID.getIWire());
+      const TVector3 wireForwardPosition(int layerId, int cellId, double z, EWirePosition set = c_Base) const;
+      /** The same function but in a different input format. */
+      const TVector3 wireForwardPosition(const WireID& wireID, double z,
+                                         EWirePosition set = c_Base) const {
+        return wireForwardPosition(wireID.getICLayer(), wireID.getIWire(), z, set);
       }
+
+      //! Returns the backward position of the input sense wire.
+      /*!
+          \param layerId The layer id. of the wire
+          \param cellId  The wire id. of the wire
+          \param set     Wire position set; =c_Base, c_Misaligned or c_Aligned
+          \return The backward position of the wire.
+      */
+      const TVector3 wireBackwardPosition(int layerId, int cellId, EWirePosition set = c_Base) const;
+
+      /** The same function but in a different input format. */
+      const TVector3 wireBackwardPosition(const WireID& wireID, EWirePosition set = c_Base) const {
+        return wireBackwardPosition(wireID.getICLayer(), wireID.getIWire(), set);
+      }
+
+      //! Returns a virtual backward position corresp. to a tangent to the wire at the input z-position
+      /*!
+      \param layerId The layer id. of the wire
+      \param cellId  The wire id. of the wire
+      \param z       z-position
+      \param set     Wire position set; =c_Base, c_Misaligned or c_Aligned
+      \return The virtual backward position of the wire.
+      */
+      const TVector3 wireBackwardPosition(int layerId, int cellId, double z, EWirePosition set = c_Base) const;
+      /** The same function but in a different input format. */
+      const TVector3 wireBackwardPosition(const WireID& wireID, double z, EWirePosition set = c_Base) const {
+        return wireBackwardPosition(wireID.getICLayer(), wireID.getIWire(), z, set);
+      }
+
+      //! Returns coefficient for the sense wire sag.
+      /*!
+          \param set     Wire position set; =c_Base, c_Misaligned or c_Aligned
+          \param layerId The layer id.
+          \param cellId  The cell  id.
+          \return Coefficient for the sense wire sag.
+      */
+      double getWireSagCoef(EWirePosition set, int layerId, int cellId) const;
 
       //! Returns radius of sense wire in each layer.
       /*!
@@ -432,18 +476,19 @@ namespace Belle2 {
       }
 
       /**
-       * Get the sag effets of the sense wire.
+       * Compute effects of the sense wire sag.
+       * @param[in] set     Wire position set; =c_Base, c_Misaligned or c_Aligned
        * @param[in] layerID Layer ID
-       * @param[in] cellID Cell  ID in the layer
+       * @param[in] cellID  Cell ID in the layer
        * @param[in] zw  Z-coord. (cm) at which the sense wire sag is computed
-       * @param[out] ywb_sag Y-corrd. (cm) of intersection between a tangent line and the backward endplate.
-       * @param[out] ywf_sag Y-corrd. (cm) of intersection between a tangent line and the forward endplate.
-       * @attention The tangent line is computed from the first derivative of a paraboric wire (due to gravity) defined at Z.
+       * @param[out] ywb_sag Y-corrd. (cm) of intersection between a tangent and the backward endplate.
+       * @param[out] ywf_sag Y-corrd. (cm) of intersection between a tangent and the forward endplate.
+       * @attention The tangent is computed from the first derivative of a paraboric wire (due to gravity) defined at Z.
+       * @todo It may be replaced with a bit more accurate formula.
        * @todo The electrostatic force effect should be included.
-       * @todo It shoule be replaced with a bit more accurate formula.
        */
 
-      void getWirSagEffect(unsigned layerID, unsigned cellID, double zw, double& ywb_sag, double& ywf_sag) const;
+      void getWireSagEffect(EWirePosition set, unsigned layerID, unsigned cellID, double zw, double& ywb_sag, double& ywf_sag) const;
 
       /**
        * Get the realistic drift velocity.
@@ -539,6 +584,18 @@ namespace Belle2 {
 
 
       /**
+       * Returns a closest distance between a track and a wire.
+       * @param bwp[in] wire position at backward
+       * @param fwp[in] wire position at forward
+       * @param posIn[in] entrance position
+       * @param posOut[in] exit position
+       * @param hitPosition[out] track position corresp. to the closetst distance
+       * @param wirePosition[out] wire position corresp. to the closetst distance
+       */
+
+      double ClosestApproach(const TVector3 bwp, const TVector3 fwp, const TVector3 posIn, const TVector3 posOut, TVector3& hitPosition, TVector3& wirePosition) const;
+
+      /**
        * Set the desizend wire parameters.
        * @param[in] layerID Layer ID
        * @param[in] cellID Cell ID
@@ -557,10 +614,17 @@ namespace Belle2 {
 
 
     private:
+      /** Singleton class */
+      CDCGeometryPar();
+      /** Singleton class */
+      CDCGeometryPar(const CDCGeometryPar&);
+      /** Singleton class */
+      CDCGeometryPar& operator=(const CDCGeometryPar&);
 
       bool m_debug;          /*!< Switch for debug printing. */
       bool m_XTetc;          /*!< Switch for reading x-t etc. params.. */
-      bool m_Geometry4Recon; /*!< Switch for selecting geometry. */
+      bool m_Misalignment;   /*!< Switch for misalignment. */
+      bool m_Alignment;      /*!< Switch for alignment. */
       bool m_XTetc4Recon;    /*!< Switch for selecting xt etc. */
       std::string m_version; /*!< The version of geometry parameters. */
       int m_materialDefinitionMode; /*!< Control switch for gas and wire material definition. */
@@ -593,10 +657,17 @@ namespace Belle2 {
       double m_momZ[7];      /*!< Z-cordinates of the cdc mother volume (7 segments). */
       double m_momRmin[7];   /*!< R_min of the cdc mother volume  (7 segments).       */
 
-      double m_FWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position at the forward endplate for each layer and cell. */
-      double m_BWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position at the backward endplate for each layer and cell. */
+      float m_FWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position at the forward endplate for each cell; to be implemented in a smarter way. */
+      float m_BWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position at the backward endplate for each cell; ibid. */
+      float m_WireSagCoef[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< Wire sag coefficient for each cell; ibid. */
 
-      double m_WirSagCoef[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< Wire sag coeffients for each layer and cell. */
+      float m_FWirPosMisalign[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. misalignment at the forward endplate for each cell; ibid. */
+      float m_BWirPosMisalign[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. misalignment at the backward endplate for each cell; ibid. */
+      float m_WireSagCoefMisalign[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< Wire sag coefficient incl. misalignment for each cell; ibid. */
+
+      float m_FWirPosAlign[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. alignment at the forward endplate for each cell; ibid. */
+      float m_BWirPosAlign[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. alignment at the backward endplate for each cell; ibid. */
+      float m_WireSagCoefAlign[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< Wire sag coefficient incl. alignment for each cell; ibid. */
 
       double m_XT[MAX_N_SLAYERS][2][19][7][9];  /*!< XT-relation coefficients for each layer, Left/Right, entrance angle and polar angle.  */
       double m_Sigma[MAX_N_SLAYERS][7];      /*!< position resulution for each layer. */

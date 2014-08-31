@@ -51,7 +51,7 @@ void CDCGeometryPar::clear()
   m_motherLength = 0.;
 
   // T.Hara added to define the CDC mother volume (temporal)
-  for (unsigned i = 0; i < 7; i++) {
+  for (unsigned i = 0; i < 7; ++i) {
     m_momZ[i] = 0.;
     m_momRmin[i] = 0.;
   }
@@ -71,12 +71,12 @@ void CDCGeometryPar::clear()
   m_nominalPropSpeed  = 0.0;
   m_nominalSpaceResol = 0.0;
 
-  for (unsigned i = 0; i < 4; i++) {
+  for (unsigned i = 0; i < 4; ++i) {
     m_rWall[i] = 0;
-    for (unsigned j = 0; j < 2; j++)
+    for (unsigned j = 0; j < 2; ++j)
       m_zWall[i][j] = 0;
   }
-  for (unsigned i = 0; i < MAX_N_SLAYERS; i++) {
+  for (unsigned i = 0; i < MAX_N_SLAYERS; ++i) {
     m_rSLayer[i] = 0;
     m_zSForwardLayer[i] = 0;
     m_zSBackwardLayer[i] = 0;
@@ -85,11 +85,28 @@ void CDCGeometryPar::clear()
     m_offSet[i] = 0;
     m_nShifts[i] = 0;
   }
-  for (unsigned i = 0; i < MAX_N_FLAYERS; i++) {
+  for (unsigned i = 0; i < MAX_N_FLAYERS; ++i) {
     m_rFLayer[i] = 0;
     m_zFForwardLayer[i] = 0;
     m_zFBackwardLayer[i] = 0;
   }
+
+  for (unsigned L = 0; L < MAX_N_SLAYERS; ++L) {
+    for (unsigned C = 0; C < MAX_N_SCELLS; ++C) {
+      for (unsigned i = 0; i < 3; ++i) {
+        m_FWirPos        [L][C][i] = 0.;
+        m_BWirPos        [L][C][i] = 0.;
+        m_FWirPosMisalign[L][C][i] = 0.;
+        m_BWirPosMisalign[L][C][i] = 0.;
+        m_FWirPosAlign   [L][C][i] = 0.;
+        m_BWirPosAlign   [L][C][i] = 0.;
+      }
+      m_WireSagCoef        [L][C] = 0.;
+      m_WireSagCoefMisalign[L][C] = 0.;
+      m_WireSagCoefAlign   [L][C] = 0.;
+    }
+  }
+
 }
 
 void CDCGeometryPar::read()
@@ -226,11 +243,21 @@ void CDCGeometryPar::read()
   m_nominalSpaceResol = gbxParams.getLength("SenseWire/SpaceResol");
   m_maxSpaceResol = 5. * m_nominalSpaceResol;
 
-  //Replace geometry params. (from input data) upon request
-  m_Geometry4Recon = gbxParams.getBool("Geometry4Recon");
-  B2INFO("CDCGeometryPar: Geometry for reconstruction on(=1)/off(=0):" <<
-         m_Geometry4Recon);
-  if (m_Geometry4Recon) readGeometry4Recon(gbxParams);
+  //Set misalignment params. (from input data)
+  m_Misalignment = gbxParams.getBool("Misalignment");
+  B2INFO("CDCGeometryPar: Load misalignment params.(=1)/not load(=0):" <<
+         m_Misalignment);
+  if (m_Misalignment) {
+    readWirePositionParams(gbxParams, c_Misaligned);
+  }
+
+  //Set alignment params. (from input data)
+  m_Alignment = gbxParams.getBool("Alignment");
+  B2INFO("CDCGeometryPar: Load alignment params.(=1)/not load(=0):" <<
+         m_Alignment);
+  if (m_Alignment) {
+    readWirePositionParams(gbxParams, c_Aligned);
+  }
 
   //Set xt etc. params. for simulation
   m_XTetc = gbxParams.getBool("XTetc");
@@ -259,10 +286,13 @@ void CDCGeometryPar::read()
 
 }
 
-// Read alignment params.
-void CDCGeometryPar::readGeometry4Recon(const GearDir gbxParams)
+// Read (mis)alignment params.
+void CDCGeometryPar::readWirePositionParams(const GearDir gbxParams, EWirePosition set)
 {
-  std::string fileName0 = gbxParams.getString("geometry4ReconFileName");
+  std::string fileName0 = gbxParams.getString("misalignmentFileName");
+  if (set == c_Aligned) {
+    fileName0 = gbxParams.getString("alignmentFileName");
+  }
   fileName0 = "/cdc/data/" + fileName0;
   std::string fileName = FileSystem::findFile(fileName0);
 
@@ -296,11 +326,24 @@ void CDCGeometryPar::readGeometry4Recon(const GearDir gbxParams)
     ++nRead;
 
     for (int i = 0; i < np; ++i) {
-      m_BWirPos[iL][iC][i] = back[i];
-      m_FWirPos[iL][iC][i] = fwrd[i];
+      if (set == c_Misaligned) {
+        m_BWirPosMisalign[iL][iC][i] = m_BWirPos[iL][iC][i] + back[i];
+        m_FWirPosMisalign[iL][iC][i] = m_FWirPos[iL][iC][i] + fwrd[i];
+      } else if (set == c_Aligned) {
+        m_BWirPosAlign[iL][iC][i] = m_BWirPos[iL][iC][i] + back[i];
+        m_FWirPosAlign[iL][iC][i] = m_FWirPos[iL][iC][i] + fwrd[i];
+      }
     }
 
-    m_WirSagCoef[iL][iC] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.*(tension));
+    double baseTension = M_PI * m_senseWireDensity *
+                         m_senseWireDiameter * m_senseWireDiameter / (8.* m_WireSagCoef[iL][iC]);
+    if (set == c_Misaligned) {
+      m_WireSagCoefMisalign[iL][iC] = M_PI * m_senseWireDensity *
+                                      m_senseWireDiameter * m_senseWireDiameter / (8.*(baseTension + tension));
+    } else if (set == c_Aligned) {
+      m_WireSagCoefAlign[iL][iC] = M_PI * m_senseWireDensity *
+                                   m_senseWireDiameter * m_senseWireDiameter / (8.*(baseTension + tension));
+    }
 
     if (m_debug) {
       std::cout << iL << " " << iC;
@@ -311,7 +354,7 @@ void CDCGeometryPar::readGeometry4Recon(const GearDir gbxParams)
 
   }
 
-  if (nRead != nSenseWires) B2FATAL("CDCGeometryPar::readRealGeometry: #lines read-in (=" << nRead << ") is inconsistent with total #sense wires (=" << nSenseWires << ") !");
+  if (nRead != nSenseWires) B2FATAL("CDCGeometryPar::readWirePositionParams: #lines read-in (=" << nRead << ") is inconsistent with total #sense wires (=" << nSenseWires << ") !");
 
   ifs.close();
 }
@@ -338,7 +381,7 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
     if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
   }
 
-  int iL, lrp;
+  int iL, lr;
   const int np = 9; //to be moved to appropriate place...
   double alpha, theta, dummy1, xt[np];
   unsigned nalpha = 19; //to be moved to appropriate place...
@@ -351,7 +394,7 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
     // Read a line of xt-parameter from Garfield calculations.
     //
 
-    ifs >> iL >> theta >> alpha >> dummy1 >> lrp;
+    ifs >> iL >> theta >> alpha >> dummy1 >> lr;
     for (int i = 0; i < np - 1; ++i) {
       ifs >> xt[i];
     }
@@ -376,8 +419,6 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
     } else if (theta == 149.) {
       itheta = 6;
     }
-
-    int lr = lrp;
 
     for (int i = 0; i < np - 1; ++i) {
       m_XT[iL][lr][ialpha][itheta][i] = xt[i];
@@ -583,14 +624,93 @@ void CDCGeometryPar::readPropSpeed(const GearDir gbxParams, const int mode)
 void CDCGeometryPar::Print() const
 {}
 
-const TVector3 CDCGeometryPar::wireForwardPosition(int layerID, int cellID) const
+const TVector3 CDCGeometryPar::wireForwardPosition(int layerID, int cellID, EWirePosition set) const
 {
-  return TVector3(m_FWirPos[layerID][cellID][0], m_FWirPos[layerID][cellID][1], m_FWirPos[layerID][cellID][2]);
+  TVector3 wPos(m_FWirPosAlign[layerID][cellID][0],
+                m_FWirPosAlign[layerID][cellID][1],
+                m_FWirPosAlign[layerID][cellID][2]);
+
+  if (set == c_Misaligned) {
+    wPos.SetX(m_FWirPosMisalign[layerID][cellID][0]);
+    wPos.SetY(m_FWirPosMisalign[layerID][cellID][1]);
+    wPos.SetZ(m_FWirPosMisalign[layerID][cellID][2]);
+  } else {
+    wPos.SetX(m_FWirPos        [layerID][cellID][0]);
+    wPos.SetY(m_FWirPos        [layerID][cellID][1]);
+    wPos.SetZ(m_FWirPos        [layerID][cellID][2]);
+  }
+  return wPos;
 }
 
-const TVector3 CDCGeometryPar::wireBackwardPosition(int layerID, int cellID) const
+const TVector3 CDCGeometryPar::wireForwardPosition(int layerID, int cellID, double z, EWirePosition set) const
 {
-  return TVector3(m_BWirPos[layerID][cellID][0], m_BWirPos[layerID][cellID][1], m_BWirPos[layerID][cellID][2]);
+  double yb_sag = 0.;
+  double yf_sag = 0.;
+  getWireSagEffect(set, layerID, cellID, z, yb_sag, yf_sag);
+
+  TVector3 wPos(m_FWirPosAlign[layerID][cellID][0],
+                yf_sag,
+                m_FWirPosAlign[layerID][cellID][2]);
+  if (set == c_Misaligned) {
+    wPos.SetX(m_FWirPosMisalign[layerID][cellID][0]);
+    wPos.SetY(yf_sag);
+    wPos.SetZ(m_FWirPosMisalign[layerID][cellID][2]);
+  } else {
+    wPos.SetX(m_FWirPos        [layerID][cellID][0]);
+    wPos.SetY(yf_sag);
+    wPos.SetZ(m_FWirPos        [layerID][cellID][2]);
+  }
+  return wPos;
+}
+
+const TVector3 CDCGeometryPar::wireBackwardPosition(int layerID, int cellID, EWirePosition set) const
+{
+  TVector3 wPos(m_BWirPosAlign[layerID][cellID][0],
+                m_BWirPosAlign[layerID][cellID][1],
+                m_BWirPosAlign[layerID][cellID][2]);
+
+  if (set == c_Misaligned) {
+    wPos.SetX(m_BWirPosMisalign[layerID][cellID][0]);
+    wPos.SetY(m_BWirPosMisalign[layerID][cellID][1]);
+    wPos.SetZ(m_BWirPosMisalign[layerID][cellID][2]);
+  } else {
+    wPos.SetX(m_BWirPos        [layerID][cellID][0]);
+    wPos.SetY(m_BWirPos        [layerID][cellID][1]);
+    wPos.SetZ(m_BWirPos        [layerID][cellID][2]);
+  }
+  return wPos;
+}
+
+const TVector3 CDCGeometryPar::wireBackwardPosition(int layerID, int cellID, double z, EWirePosition set) const
+{
+  double yb_sag = 0.;
+  double yf_sag = 0.;
+  getWireSagEffect(set, layerID, cellID, z, yb_sag, yf_sag);
+
+  TVector3 wPos(m_BWirPosAlign[layerID][cellID][0],
+                yb_sag,
+                m_BWirPosAlign[layerID][cellID][2]);
+  if (set == c_Misaligned) {
+    wPos.SetX(m_BWirPosMisalign[layerID][cellID][0]);
+    wPos.SetY(yb_sag);
+    wPos.SetZ(m_BWirPosMisalign[layerID][cellID][2]);
+  } else {
+    wPos.SetX(m_BWirPos        [layerID][cellID][0]);
+    wPos.SetY(yb_sag);
+    wPos.SetZ(m_BWirPos        [layerID][cellID][2]);
+  }
+  return wPos;
+}
+
+double CDCGeometryPar::getWireSagCoef(EWirePosition set, int layerID, int cellID) const
+{
+  double coef =    m_WireSagCoef[layerID][cellID];
+  if (set == c_Misaligned) {
+    coef = m_WireSagCoefMisalign[layerID][cellID];
+  } else if (set == c_Aligned) {
+    coef = m_WireSagCoefAlign   [layerID][cellID];
+  }
+  return coef;
 }
 
 const double* CDCGeometryPar::innerRadiusWireLayer() const
@@ -727,26 +847,75 @@ void CDCGeometryPar::generateXML(const string& of)
       << "</Subdetector>"                                       << endl;
 }
 
-void CDCGeometryPar::getWirSagEffect(const unsigned layerID, const unsigned cellID, const double Z, double& Yb_sag, double& Yf_sag) const
+void CDCGeometryPar::getWireSagEffect(const EWirePosition set, const unsigned layerID, const unsigned cellID, const double Z, double& Yb_sag, double& Yf_sag) const
 {
-  //Input layerID: layer id (0 - 55);
+  //Input
+  //       set    : c_Base, c_Misaligned or c_Aligned
+  //       layerID: layer id (0 - 55);
   //       cellID: cell  id in the layer;
   //            Z: Z-coord. (cm) at which sense wire sag is computed.
   //
-  //Output Yb_sag: Y-corrd. (cm) of intersection of a tangent line and the backward endplate.
-  //               Here the tangent line is computed from the 1'st derivative of
+  //Output Yb_sag: Y-corrd. (cm) of intersection of a tangent and the backward endplate.
+  //               Here the tangent is computed from the 1'st derivative of
   //               a paraboric wire (due to gravity) defined at Z.
   //       Yf_sag: ibid. but for forward.
   //
   //N.B.- Maybe replaced with a bit more accurate formula.
   //    - The electrostatic force effect is not included.
 
-  const double Xb = m_BWirPos[layerID][cellID][0];
-  const double Xf = m_FWirPos[layerID][cellID][0];
-  const double Yb = m_BWirPos[layerID][cellID][1];
-  const double Yf = m_FWirPos[layerID][cellID][1];
-  const double Zb = m_BWirPos[layerID][cellID][2];
-  const double Zf = m_FWirPos[layerID][cellID][2];
+  double Xb = 0.;
+  double Xf = 0.;
+  double Yb = 0.;
+  double Yf = 0.;
+  double Zb = 0.;
+  double Zf = 0.;
+  double Coef = 0.;
+
+  if (set == c_Aligned) {
+    Coef = m_WireSagCoefAlign[layerID][cellID];
+    Yb = m_BWirPosAlign[layerID][cellID][1];
+    Yf = m_FWirPosAlign[layerID][cellID][1];
+    if (Coef == 0.) {
+      Yb_sag = Yb;
+      Yf_sag = Yf;
+      return;
+    }
+    Xb = m_BWirPosAlign[layerID][cellID][0];
+    Xf = m_FWirPosAlign[layerID][cellID][0];
+    Zb = m_BWirPosAlign[layerID][cellID][2];
+    Zf = m_FWirPosAlign[layerID][cellID][2];
+
+  } else if (set == c_Misaligned) {
+    Coef = m_WireSagCoefMisalign[layerID][cellID];
+    Yb = m_BWirPosMisalign[layerID][cellID][1];
+    Yf = m_FWirPosMisalign[layerID][cellID][1];
+    if (Coef == 0.) {
+      Yb_sag = Yb;
+      Yf_sag = Yf;
+      return;
+    }
+    Xb = m_BWirPosMisalign[layerID][cellID][0];
+    Xf = m_FWirPosMisalign[layerID][cellID][0];
+    Zb = m_BWirPosMisalign[layerID][cellID][2];
+    Zf = m_FWirPosMisalign[layerID][cellID][2];
+
+  } else if (set == c_Base) {
+    Coef = m_WireSagCoef[layerID][cellID];
+    Yb = m_BWirPos[layerID][cellID][1];
+    Yf = m_FWirPos[layerID][cellID][1];
+    if (Coef == 0.) {
+      Yb_sag = Yb;
+      Yf_sag = Yf;
+      return;
+    }
+    Xb = m_BWirPos[layerID][cellID][0];
+    Xf = m_FWirPos[layerID][cellID][0];
+    Zb = m_BWirPos[layerID][cellID][2];
+    Zf = m_FWirPos[layerID][cellID][2];
+
+  } else {
+    B2FATAL("CDCGeometryPar::getWireSagEffect: called with an invalid set: " << " " << set);
+  }
 
   const double dx = Xf - Xb;
   const double dy = Yf - Yb;
@@ -754,8 +923,6 @@ void CDCGeometryPar::getWirSagEffect(const unsigned layerID, const unsigned cell
 
   const double Zfp = sqrt(dz * dz + dx * dx); // Wire length in z-x plane since Zbp==0
   const double Zp  = (Z - Zb) * Zfp / dz;
-
-  const double Coef = m_WirSagCoef[layerID][cellID];
 
   const double Y_sag = (Coef * (Zp - Zfp) + dy / Zfp) * Zp + Yb;
   const double dydz = (Coef * (2.*Zp - Zfp) * Zfp + dy) / dz;
@@ -787,7 +954,16 @@ void CDCGeometryPar::setDesignWirParam(const unsigned layerID, const unsigned ce
   m_BWirPos[L][C][1] = m_rSLayer[L] * sin(phiB);
   m_BWirPos[L][C][2] = m_zSBackwardLayer[L];
 
-  m_WirSagCoef[L][C] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8. * m_senseWireTension);
+  for (int i = 0; i < 3; ++i) {
+    m_FWirPosMisalign[L][C][i] = m_FWirPos[L][C][i];
+    m_BWirPosMisalign[L][C][i] = m_BWirPos[L][C][i];
+    m_FWirPosAlign   [L][C][i] = m_FWirPos[L][C][i];
+    m_BWirPosAlign   [L][C][i] = m_BWirPos[L][C][i];
+  }
+
+  m_WireSagCoef[L][C] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8. * m_senseWireTension);
+  m_WireSagCoefMisalign[L][C] = m_WireSagCoef[L][C];
+  m_WireSagCoefAlign   [L][C] = m_WireSagCoef[L][C];
 
 }
 
@@ -1039,4 +1215,69 @@ int CDCGeometryPar::getThetaBin(const double theta) const
     itheta = 6;
   }
   return itheta;
+}
+
+double CDCGeometryPar::ClosestApproach(const TVector3 bwp, const TVector3 fwp, const TVector3 posIn, const TVector3 posOut, TVector3& hitPosition, TVector3& wirePosition) const
+{
+  //----------------------------------------------------------
+  /* For two lines r=r1+t1.v1 & r=r2+t2.v2
+     the closest approach is d=|(r2-r1).(v1 x v2)|/|v1 x v2|
+     the point where closest approach are
+     t1=(v1 x v2).[(r2-r1) x v2]/[(v1 x v2).(v1 x v2)]
+     t2=(v1 x v2).[(r2-r1) x v1]/[(v1 x v2).(v1 x v2)]
+     if v1 x v2=0 means two lines are parallel
+     d=|(r2-r1) x v1|/|v1|
+  */
+
+  double t1, t2, distance, dInOut, dHitIn, dHitOut;
+
+  //--------------------------
+  // Get wirepoint @ endplate
+  //--------------------------
+  /*  CDCGeometryPar& cdcgp = CDCGeometryPar::Instance();
+  TVector3 tfwp = cdcgp.wireForwardPosition(layerId, cellId);
+  G4ThreeVector fwp(tfwp.x(), tfwp.y(), tfwp.z());
+  TVector3 tbwp = cdcgp.wireBackwardPosition(layerId, cellId);
+  G4ThreeVector bwp(tbwp.x(), tbwp.y(), tbwp.z());
+  */
+
+  TVector3 wireLine = fwp - bwp;
+  TVector3 hitLine = posOut - posIn;
+
+  TVector3 hitXwire = hitLine.Cross(wireLine);
+  TVector3 wire2hit = fwp - posOut;
+
+  //----------------------------------------------------------------
+  // Hitposition is the position on hit line where closest approach
+  // of two lines, but it may out the area from posIn to posOut
+  //----------------------------------------------------------------
+  if (hitXwire.Mag() == 0) {
+    distance = wireLine.Cross(wire2hit).Mag() / wireLine.Mag();
+    hitPosition = posIn;
+    t2 = (posIn - fwp).Dot(wireLine) / wireLine.Mag2();
+  } else {
+    t1 = hitXwire.Dot(wire2hit.Cross(wireLine)) / hitXwire.Mag2();
+    hitPosition = posOut + t1 * hitLine;
+    t2 = hitXwire.Dot(wire2hit.Cross(hitLine)) / hitXwire.Mag2();
+
+    dInOut = (posOut - posIn).Mag();
+    dHitIn = (hitPosition - posIn).Mag();
+    dHitOut = (hitPosition - posOut).Mag();
+    if (dHitIn <= dInOut && dHitOut <= dInOut) { //Between point in & out
+      distance = fabs(wire2hit.Dot(hitXwire) / hitXwire.Mag());
+    } else if (dHitOut > dHitIn) { // out posIn
+      distance = wireLine.Cross(posIn - fwp).Mag() / wireLine.Mag();
+      hitPosition = posIn;
+      t2 = (posIn - fwp).Dot(wireLine) / wireLine.Mag2();
+    } else { // out posOut
+      distance = wireLine.Cross(posOut - fwp).Mag() / wireLine.Mag();
+      hitPosition = posOut;
+      t2 = (posOut - fwp).Dot(wireLine) / wireLine.Mag2();
+    }
+  }
+
+  wirePosition = fwp + t2 * wireLine;
+
+  return distance;
+
 }

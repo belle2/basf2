@@ -31,9 +31,19 @@ namespace Belle2 {
         return CDCGeometryPar::Instance().wireForwardPosition(wireID);
       }
 
+      /** The following (dummy) is needed to make this class compilable */
+      const TVector3 getWireForwardPosition(const WireID& wireID) {
+        return CDCGeometryPar::Instance().wireForwardPosition(wireID);
+      }
+
       /** As this is for the ideal geometry, I take simply the one used in the simulation. */
       const TVector3 getWireBackwardPosition(const WireID& wireID,
                                              float) {
+        return CDCGeometryPar::Instance().wireBackwardPosition(wireID);
+      }
+
+      /** The following (dummy) is needed to make this class compilable */
+      const TVector3 getWireBackwardPosition(const WireID& wireID) {
         return CDCGeometryPar::Instance().wireBackwardPosition(wireID);
       }
     };

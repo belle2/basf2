@@ -18,7 +18,6 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <cdc/dataobjects/CDCHit.h>
-//#include <cdc/geometry/CDCGeometryPar.h>
 
 #include <TRandom.h>
 
@@ -28,11 +27,12 @@ using namespace std;
 using namespace Belle2;
 using namespace CDC;
 
+
 // register module
 REG_MODULE(CDCDigitizer)
 CDCDigitizerModule::CDCDigitizerModule() : Module(),
   m_tdcOffset(0.0), m_cdcp(), m_aCDCSimHit(), m_tdcBinWidth(1.0),
-  m_tdcBinWidthInv(1.0), m_tdcResol(0.144), m_driftV(4.0e-3),
+  m_tdcBinWidthInv(1.0), m_tdcResol(0.2887), m_driftV(4.0e-3),
   m_driftVInv(250.0), m_propSpeedInv(27.25)
 {
   // Set description
@@ -62,6 +62,10 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   addParam("Mean2",                       m_mean2,       "Mean value of second Gaussian used to smear drift length in cm", 0.0000);
   addParam("Resolution2",                 m_resolution2, "Resolution of second Gaussian used to smear drift length in cm", 0.0000);
 
+  //Switch to control smearing
+  addParam("DoSmearing", m_doSmearing,
+           "If false, drift length will not be smeared.", true);
+
   //Switches to control time information handling
   addParam("AddInWirePropagationDelay",   m_addInWirePropagationDelay,
            "A switch used to control adding propagation delay in the wire into the final drift time or not; this is for signal hits.", false);
@@ -72,6 +76,10 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   addParam("AddTimeOfFlight4Bg",   m_addTimeOfFlight4Bg,
            "The same switch but for beam bg. hits.", true);
   addParam("OutputNegativeDriftTime", m_outputNegativeDriftTime, "Output negative drift time", false);
+
+  //Switch to control sense wire sag
+  addParam("CorrectForWireSag",   m_correctForWireSag,
+           "A switch for sense wire sag effect; true: drift-time is calculated with the sag taken into account; false: not", false);
 
   //TDC Threshold
   addParam("Threshold", m_tdcThreshold,
@@ -162,12 +170,71 @@ void CDCDigitizerModule::event()
     m_aCDCSimHit = simHits[iHits];
 
     // Hit geom. info
-    m_wireID        =   m_aCDCSimHit->getWireID();
+    m_wireID = m_aCDCSimHit->getWireID();
     B2DEBUG(250, "Encoded wire number of current CDCSimHit: " << m_wireID);
+    //todo need to update the following line when moving to new flag
+    m_posFlag    = m_aCDCSimHit->getPosFlag();
+    m_posWire    = m_aCDCSimHit->getPosWire();
+    m_posTrack   = m_aCDCSimHit->getPosTrack();
+    m_momentum   = m_aCDCSimHit->getMomentum();
+    m_flightTime = m_aCDCSimHit->getFlightTime();
+    m_globalTime = m_aCDCSimHit->getGlobalTime();
+    m_driftLength = m_aCDCSimHit->getDriftLength() * Unit::cm;
+
+    //include misalignment effects
+    //misalign flag should be always on since on/off is controlled by the input misalignment.xml file itself.
+    m_misalign = true;
+
+    TVector3 bwpMisalign = m_cdcp->wireBackwardPosition(m_wireID, CDCGeometryPar::c_Misaligned);
+    TVector3 fwpMisalign = m_cdcp->wireForwardPosition(m_wireID, CDCGeometryPar::c_Misaligned);
+
+    TVector3 bwp = m_cdcp->wireBackwardPosition(m_wireID);
+    TVector3 fwp = m_cdcp->wireForwardPosition(m_wireID);
+
+    if ((bwpMisalign - bwp).Mag() == 0. && (fwpMisalign - fwp).Mag() == 0.) m_misalign = false;
+    //    std::cout << "a m_misalign= " << m_misalign << std::endl;
+
+    if (m_misalign || m_correctForWireSag) {
+
+      bwp = bwpMisalign;
+      fwp = fwpMisalign;
+
+      if (m_correctForWireSag) {
+        double zpos = m_posWire.z();
+        double bckYSag = bwp.y();
+        double forYSag = fwp.y();
+
+        CDCGeometryPar::EWirePosition set = m_misalign ?
+                                            CDCGeometryPar::c_Misaligned : CDCGeometryPar::c_Base;
+        const int layerID = m_wireID.getICLayer();
+        const int  wireID = m_wireID.getIWire();
+        m_cdcp->getWireSagEffect(set, layerID, wireID, zpos, bckYSag, forYSag);
+        bwp.SetY(bckYSag);
+        fwp.SetY(forYSag);
+      }
+
+      const double L = 5.; //(cm) tentative
+      TVector3 posIn  = m_posTrack - L * m_momentum.Unit();
+      TVector3 posOut = m_posTrack + L * m_momentum.Unit();
+      TVector3 posTrack = m_posTrack;
+      TVector3 posWire = m_posWire;
+
+      m_driftLength = m_cdcp->ClosestApproach(bwp, fwp, posIn, posOut, posTrack, posWire);
+      //      std::cout << "base-dl, sag-dl, diff= " << m_aCDCSimHit->getDriftLength() <<" "<< m_driftLength <<" "<< m_driftLength - m_aCDCSimHit->getDriftLength() << std::endl;
+      m_posTrack = posTrack;
+      m_posWire  = posWire;
+
+      double deltaTime = 0.; //tentative (probably ok...)
+      //      double deltaTime = (posTrack - m_posTrack).Mag() / speed;
+      m_flightTime += deltaTime;
+      m_globalTime += deltaTime;
+      //todo need to update the following line when moving to the new flag
+      m_posFlag = m_cdcp->getOldLeftRight(m_posWire, m_posTrack, m_momentum);
+    }
 
     // Hit phys. info
     float hitdEdx        = m_aCDCSimHit->getEnergyDep()   * Unit::GeV;
-    float hitDriftLength = m_aCDCSimHit->getDriftLength() * Unit::cm;
+    float hitDriftLength = m_driftLength;
     float dedxThreshold = m_tdcThreshold * Unit::eV;
 
     // If hitdEdx < dedxThreshold (default 40 eV), the hit is ignored
@@ -184,7 +251,9 @@ void CDCDigitizerModule::event()
 
     // smear drift length
     float dDdt = getdDdt(hitDriftLength);
-    hitDriftLength = smearDriftLength(hitDriftLength, dDdt);
+    if (m_doSmearing) {
+      hitDriftLength = smearDriftLength(hitDriftLength, dDdt);
+    }
 
     //set flags
     bool addTof   = m_addTimeOfFlight4Bg;
@@ -197,8 +266,7 @@ void CDCDigitizerModule::event()
 
     //add randamized event time for a beam bg. hit
     if (m_aCDCSimHit->getBackgroundTag() != 0) {
-      hitDriftTime +=
-        m_aCDCSimHit->getGlobalTime() - m_aCDCSimHit->getFlightTime();
+      hitDriftTime += m_globalTime - m_flightTime;
     }
 
     //apply time window cut
@@ -318,10 +386,9 @@ float CDCDigitizerModule::getdDdt(const float driftL)
 
   if (!m_useSimpleDigitization) {
     const unsigned short layer = m_wireID.getICLayer();
-    const unsigned short leftRight = m_aCDCSimHit->getPosFlag();
-    double alpha = m_cdcp->getAlpha(m_aCDCSimHit->getPosWire(),
-                                    m_aCDCSimHit->getMomentum());
-    double theta = m_cdcp->getTheta(m_aCDCSimHit->getMomentum());
+    const unsigned short leftRight = m_posFlag;
+    double alpha = m_cdcp->getAlpha(m_posWire, m_momentum);
+    double theta = m_cdcp->getTheta(m_momentum);
     double t = m_cdcp->getDriftTime(driftL, layer, leftRight, alpha, theta);
     dDdt = m_cdcp->getDriftV(t, layer, leftRight, alpha, theta);
 
@@ -375,23 +442,23 @@ float CDCDigitizerModule::getDriftTime(const float driftLength, const bool addTo
 #endif
   } else {
     const unsigned short layer = m_wireID.getICLayer();
-    const unsigned short leftRight = m_aCDCSimHit->getPosFlag();
-    double alpha = m_cdcp->getAlpha(m_aCDCSimHit->getPosWire(),
-                                    m_aCDCSimHit->getMomentum());
-    double theta = m_cdcp->getTheta(m_aCDCSimHit->getMomentum());
+    const unsigned short leftRight = m_posFlag;
+    double alpha = m_cdcp->getAlpha(m_posWire, m_momentum);
+    double theta = m_cdcp->getTheta(m_momentum);
     driftT = m_cdcp->getDriftTime(driftLength, layer, leftRight, alpha, theta);
     //    std::cout <<"alpha,theta,driftT= " << alpha <<" "<< theta <<" "<< driftT << std::endl;
   }
 
   if (addTof) {
-    driftT += m_aCDCSimHit->getFlightTime(); // in ns
+    driftT += m_flightTime; // in ns
   }
 
   if (addDelay) {
     //calculate signal propagation length in the wire
-    TVector3 backWirePos = m_cdcp->wireBackwardPosition(m_wireID);
-    TVector3 hitPosWire  = m_aCDCSimHit->getPosWire();
-    double propLength = (hitPosWire - backWirePos).Mag();
+    CDCGeometryPar::EWirePosition set = m_misalign ? CDCGeometryPar::c_Misaligned : CDCGeometryPar::c_Base;
+    TVector3 backWirePos = m_cdcp->wireBackwardPosition(m_wireID, set);
+
+    double propLength = (m_posWire - backWirePos).Mag();
     B2DEBUG(250, "Propagation in wire length: " << propLength);
 
     if (m_useSimpleDigitization) {

@@ -42,7 +42,8 @@ float RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
   // Need to undo everything the digitization does in reverse order.
   // First: Undo propagation in wire, if it was used:
   if (m_useInWirePropagationDelay) {
-    m_backWirePos = m_cdcp.wireBackwardPosition(wireID);
+    //    m_backWirePos = m_cdcp.wireBackwardPosition(wireID);
+    m_backWirePos = m_cdcp.wireBackwardPosition(wireID, CDCGeometryPar::c_Aligned);
     //subtract distance divided by speed of electric signal in the wire from the drift time.
     driftTime -= (z - m_backWirePos.Z()) * m_cdcp.getPropSpeedInv(layer);
   }
@@ -84,7 +85,8 @@ float RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
   // Need to undo everything the digitization does in reverse order.
   // First: Undo propagation in wire, if it was used:
   if (m_useInWirePropagationDelay) {
-    m_backWirePos = m_cdcp.wireBackwardPosition(wireID);
+    //    m_backWirePos = m_cdcp.wireBackwardPosition(wireID);
+    m_backWirePos = m_cdcp.wireBackwardPosition(wireID, CDCGeometryPar::c_Aligned);
     //subtract distance divided by speed of electric signal in the wire from the drift time.
     driftTime -= (posOnWire.z() - m_backWirePos.Z()) * m_cdcp.getPropSpeedInv(layer);
   }

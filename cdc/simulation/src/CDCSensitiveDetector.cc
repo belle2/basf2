@@ -67,8 +67,10 @@ namespace Belle2 {
     m_thresholdKineticEnergy = 0.0; // Dummy to avoid a warning (tentative).
     //    B2INFO("Threshold energy " << m_thresholdEnergyDeposit);
 
-    m_wireSag = gd.getBool("WireSag");
-    B2INFO("Sense wire sag in CDCSensitiveDetector on(=1)/off(=0):" << m_wireSag);
+    //Now sag must be always off since sag is taken into account in Digitizer, not in FullSim.
+    //    m_wireSag = gd.getBool("WireSag");
+    m_wireSag = false;
+    B2INFO("Sense wire sag in CDCSensitiveDetector on(=1)/off(=0): " << m_wireSag);
 
     m_minTrackLength = gd.getDouble("MinTrackLength");
     B2INFO("MinTrackLength in CDCSensitiveDetector:" << m_minTrackLength);
@@ -290,7 +292,7 @@ namespace Belle2 {
         if (ntry <= ntryMax) {
           if (m_wireSag) {
             G4double ywb_sag, ywf_sag;
-            cdcg.getWirSagEffect(layerId, wires[i], q2[2], ywb_sag, ywf_sag);
+            cdcg.getWireSagEffect(CDCGeometryPar::c_Base, layerId, wires[i], q2[2], ywb_sag, ywf_sag);
             HELWIR(xwb, ywb_sag, zwb, xwf, ywf_sag, zwf,
                    xp,   yp,   zp,   px,   py,   pz,
                    B_kG, charge, ntryMax, dist, q2, q1, q3, ntry);
@@ -320,7 +322,7 @@ namespace Belle2 {
                                      hitPosition, wirePosition);
           if (m_wireSag) {
             G4double ywb_sag, ywf_sag;
-            cdcg.getWirSagEffect(layerId, wires[i], wirePosition.z(), ywb_sag, ywf_sag);
+            cdcg.getWireSagEffect(CDCGeometryPar::c_Base, layerId, wires[i], wirePosition.z(), ywb_sag, ywf_sag);
             bwp.setY(ywb_sag);
             fwp.setY(ywf_sag);
             distance = ClosestApproach(bwp, fwp, posIn / CLHEP::cm, posOut / CLHEP::cm,
@@ -340,7 +342,7 @@ namespace Belle2 {
                                    hitPosition, wirePosition);
         if (m_wireSag) {
           G4double ywb_sag, ywf_sag;
-          cdcg.getWirSagEffect(layerId, wires[i], wirePosition.z(), ywb_sag, ywf_sag);
+          cdcg.getWireSagEffect(CDCGeometryPar::c_Base, layerId, wires[i], wirePosition.z(), ywb_sag, ywf_sag);
           bwp.setY(ywb_sag);
           fwp.setY(ywf_sag);
           distance = ClosestApproach(bwp, fwp, posIn / CLHEP::cm, posOut / CLHEP::cm,
@@ -1586,6 +1588,31 @@ line100:
 
   G4double CDCSensitiveDetector::ClosestApproach(const G4ThreeVector bwp, const G4ThreeVector fwp, const G4ThreeVector posIn, const G4ThreeVector posOut, G4ThreeVector& hitPosition, G4ThreeVector& wirePosition)//,G4double& transferT)
   {
+
+    TVector3 tbwp(bwp.x(), bwp.y(), bwp.z());
+    TVector3 tfwp(fwp.x(), fwp.y(), fwp.z());
+    TVector3 tposIn(posIn.x(),  posIn.y(),  posIn.z());
+    TVector3 tposOut(posOut.x(), posOut.y(), posOut.z());
+    TVector3 thitPosition(0., 0., 0.);
+    TVector3 twirePosition(0., 0., 0.);
+
+    CDCGeometryPar& cdcgp = CDCGeometryPar::Instance();
+    G4double distance = cdcgp.ClosestApproach(tbwp, tfwp, tposIn, tposOut, thitPosition, twirePosition);
+
+    hitPosition.setX(thitPosition.x());
+    hitPosition.setY(thitPosition.y());
+    hitPosition.setZ(thitPosition.z());
+
+    wirePosition.setX(twirePosition.x());
+    wirePosition.setY(twirePosition.y());
+    wirePosition.setZ(twirePosition.z());
+
+    return distance;
+  }
+
+#if 0
+  G4double CDCSensitiveDetector::ClosestApproach(const G4ThreeVector bwp, const G4ThreeVector fwp, const G4ThreeVector posIn, const G4ThreeVector posOut, G4ThreeVector& hitPosition, G4ThreeVector& wirePosition)//,G4double& transferT)
+  {
     //----------------------------------------------------------
     /* For two lines r=r1+t1.v1 & r=r2+t2.v2
        the closest approach is d=|(r2-r1).(v1 x v2)|/|v1 x v2|
@@ -1647,4 +1674,5 @@ line100:
     return distance;
 
   }
+#endif
 } // namespace Belle2

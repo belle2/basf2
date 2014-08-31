@@ -52,10 +52,10 @@ namespace Belle2 {
     void setSize(int size) throw() { m_size = size; }
     bool isAvailable() throw() { return (m_pdata != NULL); }
     void* open(NSMCommunicator* comm,
-               bool isnative = false) throw(NSMHandlerException);
+               bool isnative = true) throw(NSMHandlerException);
     void* allocate(NSMCommunicator* comm,
-                   bool isnative = false,
-                   int interval = 3)
+                   bool isnative = true,
+                   int interval = 2)
     throw(NSMHandlerException);
     void* parse(const char* inc_dir = NULL, bool allocated = false)
     throw(NSMHandlerException);

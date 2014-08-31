@@ -36,6 +36,7 @@ RunControlCallback::RunControlCallback(const NSMNode& node,
   m_runtype_default = runtype;
   m_port = port;
   m_callback = NULL;
+  setAutoReply(false);
 }
 
 void RunControlCallback::init() throw()
@@ -72,6 +73,7 @@ void RunControlCallback::init() throw()
   }
 }
 
+/*
 bool RunControlCallback::perform(const NSMMessage& msg) throw()
 {
   if (NSMCallback::perform(msg)) return true;
@@ -123,6 +125,7 @@ bool RunControlCallback::perform(const NSMMessage& msg) throw()
   }
   return true;
 }
+*/
 
 void RunControlCallback::timeout() throw()
 {
@@ -240,12 +243,15 @@ bool RunControlCallback::ok() throw()
       if (state == RCState::PAUSED_S) {
         const size_t nobj = getConfig().getObject().getNObjects("node");
         for (size_t i = 0; i < nobj; i++) {
-          if (m_node_v[i].getState() == RCState::RECOVERING_RS) {
-            try {
-              com.sendRequest(NSMMessage(m_node_v[i],
-                                         RCCommand::RECOVER));
-            } catch (const IOException& e) {
-              LogFile::warning(e.what());
+          const DBObject& obj(getConfig().getObject().getObject("node", i));
+          if (obj.getBool("used") && !m_node_v[i].isExcluded()) {
+            if (m_node_v[i].getState() == RCState::RECOVERING_RS) {
+              try {
+                com.sendRequest(NSMMessage(m_node_v[i],
+                                           RCCommand::RECOVER));
+              } catch (const IOException& e) {
+                LogFile::warning(e.what());
+              }
             }
           }
         }
@@ -308,8 +314,11 @@ bool RunControlCallback::synchronize(NSMNode& node) throw()
   RCState state = node.getState();
   if (!state.isStable()) return false;
   NSMNodeIterator it = m_node_v.begin();
+  int i = 0;
   for (; it != m_node_v.end(); it++) {
-    if (!it->isExcluded() && state != it->getState()) {
+    const DBObject& obj(getConfig().getObject().getObject("node", i));
+    i++;
+    if (obj.getBool("used") && !it->isExcluded() && state != it->getState()) {
       return false;
     }
   }
@@ -377,6 +386,7 @@ void RunControlCallback::postRun(NSMMessage&) throw()
     LogFile::error(e.what());
   }
 }
+
 bool RunControlCallback::send(NSMMessage msg) throw()
 {
   NSMCommunicator& com(*getCommunicator());
@@ -389,9 +399,10 @@ bool RunControlCallback::send(NSMMessage msg) throw()
   }
   const size_t nobj = getConfig().getObject().getNObjects("node");
   for (size_t i = 0; i < nobj; i++) {
-    if (!m_node_v[i].isExcluded() && msg.getNodeName() == m_node_v[i].getName()) {
+    const DBObject& obj(getConfig().getObject().getObject("node", i));
+    if (obj.getBool("used") && !m_node_v[i].isExcluded() &&
+        msg.getNodeName() == m_node_v[i].getName()) {
       if (cmd == RCCommand::LOAD) {
-        const DBObject& obj(getConfig().getObject().getObject("node", i));
         const DBObject& cobj(obj.getObject("runtype"));
         if (cobj.getTable() == "ttd") {
           int pars[4];
@@ -536,11 +547,21 @@ bool RunControlCallback::log() throw()
 bool RunControlCallback::exclude() throw()
 {
   const NSMMessage& msg(getMessage());
-  NSMNodeIterator it = find(msg.getNodeName());
+  NSMNodeIterator it = find(msg.getData());
   try {
     if (it != m_node_v.end()) {
       NSMNode& node(*it);
       node.setExcluded(true);
+      try {
+        LogFile::error("Excluded " + node.getName());
+        getDB()->connect();
+        DAQLogMessage log(getNode().getName(), LogFile::INFO,
+                          "Excluded " + node.getName());
+        LoggerObjectTable(getDB()).add(log, true);
+        getDB()->close();
+      } catch (const DBHandlerException& e) {
+        LogFile::error("DB errir : %s", e.what());
+      }
     }
     return true;
   } catch (const NSMHandlerException& e) {
@@ -552,11 +573,21 @@ bool RunControlCallback::exclude() throw()
 bool RunControlCallback::include() throw()
 {
   const NSMMessage& msg(getMessage());
-  NSMNodeIterator it = find(msg.getNodeName());
+  NSMNodeIterator it = find(msg.getData());
   try {
     if (it != m_node_v.end()) {
       NSMNode& node(*it);
       node.setExcluded(false);
+      try {
+        LogFile::error("Included " + node.getName());
+        getDB()->connect();
+        DAQLogMessage log(getNode().getName(), LogFile::INFO,
+                          "Included " + node.getName());
+        LoggerObjectTable(getDB()).add(log, true);
+        getDB()->close();
+      } catch (const DBHandlerException& e) {
+        LogFile::error("DB errir : %s", e.what());
+      }
     }
     return true;
   } catch (const NSMHandlerException& e) {

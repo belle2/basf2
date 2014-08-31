@@ -23,8 +23,8 @@ RunControlMasterCallback::RunControlMasterCallback(const NSMNode& node,
                                                    RunControlCallback* callback)
   : RCCallback(node)
 {
-  m_data = NSMData(node.getName() + "_STATUS",
-                   "rc_status", rc_status_revision);
+  NSMData& data(callback->getData());
+  m_data = NSMData(data.getName(), data.getFormat(), data.getRevision());
   m_callback = callback;
   callback->setCallback(this);
 }
@@ -54,14 +54,8 @@ bool RunControlMasterCallback::perform(const NSMMessage& msg) throw()
 {
   msg.getNodeName();
   RCCommand cmd(msg.getRequestName());
-  if (cmd == RCCommand::STATECHECK) {
-    getCommunicator()->replyOK(m_callback->getNode());
-    return true;
-  }
-  LogFile::debug("%s >> %s (cmd = %s)",
-                 msg.getNodeName(),
-                 msg.getRequestName(),
-                 cmd.getLabel());
+  LogFile::debug("%s >> %s (cmd = %s)", msg.getNodeName(),
+                 msg.getRequestName(), cmd.getLabel());
   m_callback->setMessage(msg);
   return m_callback->perform(msg);
 }

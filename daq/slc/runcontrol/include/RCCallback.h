@@ -20,7 +20,7 @@ namespace Belle2 {
     friend class RCMonitor;
 
   public:
-    RCCallback(const NSMNode& node) throw();
+    RCCallback(const NSMNode& node, int timeout = 2) throw();
     virtual ~RCCallback() throw() {}
 
   public:
@@ -57,10 +57,9 @@ namespace Belle2 {
     void setFilePath(const std::string tablename) throw() {
       setFilePath("", tablename);
     }
-    void setAutoReply(bool autoreply) throw() {
-      m_autoreply = autoreply;
+    void setAutoReply(bool auto_reply) throw() {
+      m_auto_reply = auto_reply;
     }
-    bool getAutoReply() const throw() { return m_autoreply; }
 
   protected:
     bool preload(const NSMMessage& msg) throw();
@@ -73,7 +72,7 @@ namespace Belle2 {
     DBInterface* m_db;
     std::string m_path;
     std::string m_tablename;
-    bool m_autoreply;
+    bool m_auto_reply;
 
   };
 

@@ -31,7 +31,7 @@ namespace Belle2 {
     virtual ~RunControlCallback() throw() {}
 
   public:
-    virtual bool perform(const NSMMessage& msg) throw();
+    //virtual bool perform(const NSMMessage& msg) throw();
     virtual void init() throw();
     virtual void timeout() throw();
     virtual void update() throw();

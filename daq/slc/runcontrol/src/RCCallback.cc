@@ -12,8 +12,9 @@
 
 using namespace Belle2;
 
-RCCallback::RCCallback(const NSMNode& node) throw()
-  : NSMCallback(node), m_state_demand(RCState::NOTREADY_S)
+RCCallback::RCCallback(const NSMNode& node, int timeout) throw()
+  : NSMCallback(node, timeout),
+    m_state_demand(RCState::NOTREADY_S)
 {
   add(RCCommand::LOAD);
   add(RCCommand::START);
@@ -25,6 +26,7 @@ RCCallback::RCCallback(const NSMNode& node) throw()
   add(RCCommand::STATECHECK);
   add(RCCommand::TRIGFT);
   getNode().setState(RCState::NOTREADY_S);
+  m_auto_reply = true;
 }
 
 void RCCallback::sendPause() throw()
@@ -84,10 +86,12 @@ bool RCCallback::perform(const NSMMessage& msg) throw()
   }
   if (result) {
     getNode().setError(0);
-    RCState state(cmd.nextState());
-    if (state != Enum::UNKNOWN)
-      getNode().setState(state);
-    com->replyOK(getNode());
+    if (m_auto_reply) {
+      state = cmd.nextState();
+      if (state != Enum::UNKNOWN)
+        getNode().setState(state);
+      com->replyOK(getNode());
+    }
   } else {
     if (getNode().getError() == 0) {
       getNode().setError(255);

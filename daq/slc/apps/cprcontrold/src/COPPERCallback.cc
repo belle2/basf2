@@ -149,6 +149,13 @@ void COPPERCallback::timeout() throw()
       } else {
         nsm->connection_in = -1;
       }
+      static int v = 0;
+      nsm->evtrate_in = ++v;
+      nsm->evtsize_in = ++v;
+      nsm->flowrate_in = ++v;
+      nsm->evtrate_out = ++v;
+      nsm->evtsize_out = ++v;
+      nsm->flowrate_out = ++v;
     }
     double loads[3];
     if (getloadavg(loads, 3) > 0) {

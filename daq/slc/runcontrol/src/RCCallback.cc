@@ -87,7 +87,7 @@ bool RCCallback::perform(const NSMMessage& msg) throw()
   if (result) {
     getNode().setError(0);
     if (m_auto_reply) {
-      state = cmd.nextState();
+      RCState state = cmd.nextState();
       if (state != Enum::UNKNOWN)
         getNode().setState(state);
       com->replyOK(getNode());

@@ -34,6 +34,7 @@ throw() : NSMCallback(node, 1)
   add(HVCommand::TURNON);
   add(HVCommand::TURNOFF);
   add(HVCommand::HVAPPLY);
+  setTimeout(1);
 }
 
 bool NSM2SocketCallback::perform(const NSMMessage& msg) throw()

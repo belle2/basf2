@@ -113,7 +113,15 @@ namespace Belle2 {
 
     CDC::CDCGeometryPar* m_cdcp;  /**< Pointer to CDCGeometryPar */
     CDCSimHit* m_aCDCSimHit;    /**< Pointer to CDCSimHit */
-    WireID m_wireID;            /**< WireID corresp. to this hit */
+    WireID m_wireID;            /**< WireID of this hit */
+    unsigned short m_posFlag;   /**< left or right flag of this hit */
+    TVector3 m_posWire;         /**< wire position of this hit */
+    TVector3 m_posTrack;        /**< track position of this hit */
+    TVector3 m_momentum;        /**< 3-momentum of this hit */
+    double m_driftLength;       /**< drift length of this hit */
+    double m_flightTime;        /**< flight time of this hit */
+    double m_globalTime;        /**< global time of this hit */
+
     double m_tdcBinWidth;       /**< Width of a TDC bin (in ns)*/
     double m_tdcBinWidthInv;    /**< m_tdcBinWidth^-1 (in ns^-1)*/
     double m_tdcBinHwidth;      /**< Half width of a TDC bin (in ns)*/
@@ -123,11 +131,14 @@ namespace Belle2 {
     double m_propSpeedInv;      /**< Inv. of nominal signal propagation speed in a wire (in ns/cm)*/
 
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
+    bool m_doSmearing; /**< A switch to control drift length smearing */
     bool m_addInWirePropagationDelay; /**< A switch used to control adding propagation delay into the total drift time or not */
     bool m_addTimeOfFlight;     /**< A switch used to control adding time of flight into the total drift time or not */
     bool m_addInWirePropagationDelay4Bg; /**< A switch used to control adding propagation delay into the total drift time or not for beam bg. */
     bool m_addTimeOfFlight4Bg;     /**< A switch used to control adding time of flight into the total drift time or not for beam bg. */
     bool m_outputNegativeDriftTime;     /**< A switch to output negative drift time to CDCHit */
+    bool m_misalign;             /**< A switch to control misalignment */
+    bool m_correctForWireSag;    /**< A switch to control wire sag */
 //    float m_eventTime;         /**< It is a timing of event, which includes a time jitter due to the trigger system */
 
     /** Structure for saving the signal information. */

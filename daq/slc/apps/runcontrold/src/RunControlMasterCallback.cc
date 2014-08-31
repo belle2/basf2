@@ -42,8 +42,7 @@ void RunControlMasterCallback::timeout() throw()
 
 void RunControlMasterCallback::update() throw()
 {
-  if (m_data.isAvailable() && m_callback->getData().isAvailable() &&
-      m_data.getEntry() == NULL) {
+  if (m_data.isAvailable() && m_callback->getData().isAvailable()) {
     rc_status* status_g = (rc_status*)m_data.get();
     const rc_status* status_l = (const rc_status*)(m_callback->getData().get());
     memcpy(status_g, status_l, sizeof(rc_status));

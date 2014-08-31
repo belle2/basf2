@@ -63,6 +63,7 @@ void DummyDataSourceModule::initialize()
 
   rawcprarray.registerPersistent();
 
+  //  n_basf2evt = 0;
   n_basf2evt = 0;
   m_start_flag = 0;
 
@@ -117,7 +118,12 @@ void DummyDataSourceModule::event()
   int* buf1, *buf2, *buf3, *buf4;
   int nwords_1st = 0, nwords_2nd = 0, nwords_3rd = 0, nwords_4th = 0;
 
-  nwords_1st = n_basf2evt % 10;
+  //  nwords_1st = n_basf2evt % 10;
+  nwords_1st = n_basf2evt % 100 + 1;
+  if (nwords_1st > 10000 || nwords_1st <= 0) {
+    printf("ERRORORRRR nword1st %d\n", nwords_1st);
+    fflush(stdout);
+  }
   buf1 = new int[ nwords_1st];
 
   for (int i = 0; i < nwords_1st; i++) {
@@ -128,7 +134,13 @@ void DummyDataSourceModule::event()
     }
   }
 
-  nwords_2nd = (n_basf2evt + 1) % 10;
+  //  nwords_2nd = (n_basf2evt + 1) % 10;
+  nwords_2nd = (n_basf2evt + 1) % 300 + 200;
+  if (nwords_2nd > 10000 || nwords_2nd <= 0) {
+    printf("ERRORORRRR nword2nd %d\n", nwords_2nd);
+    fflush(stdout);
+  }
+
   buf2 = new int[ nwords_2nd];
   for (int i = 0; i < nwords_2nd; i++) {
     if (i == 0) {
@@ -138,7 +150,13 @@ void DummyDataSourceModule::event()
     }
   }
 
-  nwords_3rd = 3 * (n_basf2evt + 2) % 10;
+  //  nwords_3rd = 3 * (n_basf2evt + 2) % 10;
+  nwords_3rd = 3 * (n_basf2evt + 2) % 200 + 100;
+  if (nwords_3rd > 10000 || nwords_3rd <= 0) {
+    printf("ERRORORRRR nword3rd %d\n", nwords_3rd);
+    fflush(stdout);
+  }
+
   buf3 = new int[ nwords_3rd];
   for (int i = 0; i < nwords_3rd; i++) {
     if (i == 0) {
@@ -148,7 +166,13 @@ void DummyDataSourceModule::event()
     }
   }
 
-  nwords_4th = 4 * (n_basf2evt + 3)  % 10;
+  //  nwords_4th = 4 * (n_basf2evt + 3)  % 10;
+  nwords_4th = 4 * (n_basf2evt + 3)  % 20 + 300;
+  if (nwords_4th > 10000 || nwords_4th <= 0) {
+    printf("ERRORORRRR nwor_4th %d\n", nwords_4th);
+    fflush(stdout);
+  }
+
   buf4 = new int[ nwords_4th];
   for (int i = 0; i < nwords_4th; i++) {
     if (i == 0) {

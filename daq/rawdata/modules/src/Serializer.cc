@@ -583,7 +583,7 @@ void SerializerModule::waitRestart()
 void SerializerModule::event()
 {
 
-#ifdef NONSTOP
+#ifdef NONSTOPnn
   if (g_run_restarting == 1) {
     restartRun();
   } else if (g_run_recovery == 1) {
@@ -638,6 +638,7 @@ void SerializerModule::event()
 
     try {
       m_totbytes += sendByWriteV(raw_dblkarray[ j ]);
+      //      printf("Ser len %d numeve %d node %d\n", raw_dblkarray[ j ]->TotalBufNwords(), raw_dblkarray[ j ]->GetNumEvents(), raw_dblkarray[ j ]->GetNumNodes() );
     } catch (string err_str) {
 #ifdef NONSTOP
       if (err_str == "EAGAIN") {

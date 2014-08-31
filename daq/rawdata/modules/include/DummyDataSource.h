@@ -61,7 +61,7 @@ namespace Belle2 {
     int m_nodeid;
 
     //! Number of events
-    int n_basf2evt;
+    unsigned int n_basf2evt;
 
     //! Messaage handler
     MsgHandler* m_msghandler;

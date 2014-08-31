@@ -16,8 +16,6 @@
 
 namespace Belle2 {
   /**
-
-  /**
    * Create Field maps of the Belle II magnetic field used in the simulation
    */
   class CreateFieldMapModule : public Module {

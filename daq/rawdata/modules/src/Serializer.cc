@@ -583,7 +583,7 @@ void SerializerModule::waitRestart()
 void SerializerModule::event()
 {
 
-#ifdef NONSTOPnn
+#ifdef NONSTOP
   if (g_run_restarting == 1) {
     restartRun();
   } else if (g_run_recovery == 1) {

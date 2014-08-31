@@ -53,7 +53,7 @@ namespace Belle2 {
     virtual bool resume() throw() { return send(getMessage()); }
     virtual bool abort() throw() { return send(getMessage()); }
     virtual bool trigft() throw() { return send(getMessage()); }
-    virtual bool stateCheck() throw() { return true; }
+    virtual bool stateCheck() throw();
     virtual bool exclude() throw();
     virtual bool include() throw();
 

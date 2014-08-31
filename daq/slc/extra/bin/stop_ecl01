@@ -1,0 +1,13 @@
+#!/bin/bash
+
+cd $HOME/belle2/release
+source ../tools/setup_belle2
+setuprel
+cd -
+
+echo "killing daemons"
+for i in $(seq 5001 5013)
+do
+ssh cpr${i} "killall basf2 cprcontrold > /dev/null"
+done
+killall basf2 rocontrold runcontrold > /dev/null

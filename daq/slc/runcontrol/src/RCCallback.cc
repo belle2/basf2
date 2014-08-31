@@ -60,6 +60,10 @@ bool RCCallback::perform(const NSMMessage& msg) throw()
   if (cmd.isAvailable(getNode().getState()) == NSMCommand::DISABLED) {
     return false;
   }
+  if (cmd == RCCommand::STATECHECK) {
+    return stateCheck();
+  }
+
   NSMCommunicator* com = getCommunicator();
   RCState tstate(cmd.nextTState());
   bool result = true;

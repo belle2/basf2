@@ -73,59 +73,11 @@ void RunControlCallback::init() throw()
   }
 }
 
-/*
-bool RunControlCallback::perform(const NSMMessage& msg) throw()
+bool RunControlCallback::stateCheck() throw()
 {
-  if (NSMCallback::perform(msg)) return true;
-  const RCCommand cmd = msg.getRequestName();
-  if (cmd.isAvailable(getNode().getState()) == NSMCommand::DISABLED) {
-    return false;
-  }
-  if (cmd == RCCommand::STATECHECK) {
-    NSMCommunicator& com(*getCommunicator());
-    com.replyOK(getNode());
-    if (m_callback && m_callback->getCommunicator()) {
-      NSMCommunicator& com_g(*m_callback->getCommunicator());
-      com_g.replyOK(getNode());
-    }
-    return true;
-  }
-  RCState state = cmd.nextTState();
-  bool result = true;
-  if (state != Enum::UNKNOWN) {
-    getNode().setState(state);
-    LogFile::debug("%s >> %s (%s)", msg.getNodeName(),
-                   cmd.getLabel(), state.getLabel());
-    setReply("");
-    if (cmd == RCCommand::LOAD) {
-      result = preload(msg) && load();
-    } else if (cmd == RCCommand::START) {
-      result = start();
-    } else if (cmd == RCCommand::STOP) {
-      result = stop();
-    } else if (cmd == RCCommand::RECOVER) {
-      result = recover();
-    } else if (cmd == RCCommand::RESUME) {
-      result = resume();
-    } else if (cmd == RCCommand::PAUSE) {
-      result = pause();
-    } else if (cmd == RCCommand::ABORT) {
-      result = abort();
-    } else if (cmd == RCCommand::TRIGFT) {
-      result = trigft();
-    }
-  }
-  if (!result) {
-    NSMCommunicator& com(*getCommunicator());
-    com.replyError(getNode().getError(), getReply());
-    if (m_callback && m_callback->getCommunicator()) {
-      NSMCommunicator& com_g(*m_callback->getCommunicator());
-      com_g.replyError(getNode().getError(), getReply());
-    }
-  }
+  getCommunicator()->replyOK(getNode());
   return true;
 }
-*/
 
 void RunControlCallback::timeout() throw()
 {

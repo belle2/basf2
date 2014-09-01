@@ -110,6 +110,11 @@ namespace Belle2 {
 
   void TOPbeamAlignmentModule::initialize()
   {
+    if (m_topgp->getNbars() == 0) {
+      B2FATAL("geometry of TOP not defined");
+      return;
+    }
+
     // particle mass
     m_mass = 0;
     if (m_beamParticle == string("e")) m_mass = Const::electron.getMass();

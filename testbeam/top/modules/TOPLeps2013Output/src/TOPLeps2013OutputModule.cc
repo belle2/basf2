@@ -78,6 +78,11 @@ namespace Belle2 {
 
   void TOPLeps2013OutputModule::initialize()
   {
+    if (m_topgp->getNbars() == 0) {
+      B2FATAL("geometry of TOP not defined");
+      return;
+    }
+
     char filename[m_outputFileName.size() + 1];
     strcpy(filename, m_outputFileName.c_str());
     m_file = new TFile(filename, "RECREATE");
@@ -163,7 +168,7 @@ namespace Belle2 {
     int nEntries(topDigits.getEntries());
     for (int i = 0; i < nEntries; ++i) {
       TOPDigit* digi = topDigits[i];
-      int ich = digi->getChannelID() - 1;
+      int ich = m_topgp->getOldNumbering(digi->getChannelID()) - 1;
       float tdc(digi->getTDC());
       if (m_randomize) {tdc += gRandom->Rndm();}
 

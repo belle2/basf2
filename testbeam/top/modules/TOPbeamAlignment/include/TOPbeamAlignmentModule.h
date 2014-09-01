@@ -168,6 +168,7 @@ namespace Belle2 {
      * @return row-wise channel ID
      */
     int rowWiseChannelID(int ich) {
+      /*
       int Npad = m_numPADrows * m_numPADcols;
       int pmt = ich / Npad;
       int pad = ich % Npad;
@@ -178,6 +179,8 @@ namespace Belle2 {
       int col = padCol + pmtCol * m_numPADcols;
       int row = padRow + pmtRow * m_numPADrows;
       return col + row * m_numPMTcols * m_numPADcols;
+      */
+      return ich; // new numbering scheme is exactly this one!
     }
 
 

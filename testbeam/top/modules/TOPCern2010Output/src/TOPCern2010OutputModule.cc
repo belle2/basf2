@@ -42,8 +42,8 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  TOPCern2010OutputModule::TOPCern2010OutputModule() : Module()
-
+  TOPCern2010OutputModule::TOPCern2010OutputModule() : Module(),
+    m_topgp(TOP::TOPGeometryPar::Instance())
   {
     // set module description
     setDescription("Output of CERN2010 test beam simulation to root ntuple (v20110331)");
@@ -82,6 +82,12 @@ namespace Belle2 {
 
   void TOPCern2010OutputModule::initialize()
   {
+
+    if (m_topgp->getNbars() == 0) {
+      B2FATAL("geometry of TOP not defined");
+      return;
+    }
+
     char filename[m_outputFileName.size() + 1];
     strcpy(filename, m_outputFileName.c_str());
     m_file = new TFile(filename, "RECREATE");
@@ -131,7 +137,7 @@ namespace Belle2 {
     int ndigi = topDigits.getEntries();
     for (int i = 0; i < ndigi; i++) {
       TOPDigit* digi = topDigits[i];
-      int ich = c_NumChannels - digi->getChannelID();
+      int ich = c_NumChannels - m_topgp->getOldNumbering(digi->getChannelID());
       if (digi->getTDC() < m_tdc[ich]) m_tdc[ich] = digi->getTDC(); // single hit TDC
     }
     m_nhit = 0;

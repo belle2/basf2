@@ -12,9 +12,10 @@
 #define TOPCERN2010OUTPUTMODULE_H
 
 #include <framework/core/Module.h>
+#include <top/geometry/TOPGeometryPar.h>
 #include <string>
-#include "TFile.h"
-#include "TTree.h"
+#include <TFile.h>
+#include <TTree.h>
 
 
 namespace Belle2 {
@@ -97,6 +98,8 @@ namespace Belle2 {
     double m_phi;                 /**< track angle phi */
     double m_x;                   /**< track position x*/
     double m_y;                   /**< track position y*/
+
+    TOP::TOPGeometryPar* m_topgp;  /**< geometry parameters */
 
   };
 

@@ -1,4 +1,6 @@
 #!/bin/bash
 
+echo "killing nsm2socket"
 killall nsm2socket
+echo "killing runcontrold"
 killall runcontrold

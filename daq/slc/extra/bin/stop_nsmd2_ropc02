@@ -1,3 +1,4 @@
 #!/bin/bash
 
+echo "killing nsmd2"
 killall nsmd2 > /dev/null

@@ -26,6 +26,8 @@
    ECL02, default, true,      CPR6007/copper/1/ECL:V01,0,1,      false
    ECL02, default, true,      CPR6008/copper/1/ECL:V01,0,1,      false
    ECL01, debug:dummycpu, true,    ROPC501/ropc/1/ECL:default,0,1,       true
+   ECL01, debug:dummycpu, true,      CPR5001/copper/1/debug:dummycpu,0,1,      false
+   ECL01, debug:dummycpu, true,      CPR5002/copper/1/debug:dummycpu,0,1,      false
    ECL01, debug:dummycpu, true,      CPR5003/copper/1/debug:dummycpu,0,1,      false
    ECL01, debug:dummycpu, true,      CPR5004/copper/1/debug:dummycpu,0,1,      false
    ECL01, debug:dummycpu, true,      CPR5005/copper/1/debug:dummycpu,0,1,      false

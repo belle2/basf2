@@ -1,5 +1,7 @@
    nodename,  config, hostnode,        dataname,         format, file_revision
    ECL01, default,  ROPC501,  ROPC501_STATUS,  ronode_status,4
+   ECL01, default,  CPR5001,  CPR5001_STATUS,  ronode_status,4
+   ECL01, default,  CPR5002,  CPR5002_STATUS,  ronode_status,4
    ECL01, default,  CPR5003,  CPR5003_STATUS,  ronode_status,4
    ECL01, default,  CPR5004,  CPR5004_STATUS,  ronode_status,4
    ECL01, default,  CPR5005,  CPR5005_STATUS,  ronode_status,4

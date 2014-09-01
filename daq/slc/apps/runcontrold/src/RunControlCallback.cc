@@ -71,6 +71,14 @@ void RunControlCallback::init() throw()
   if (m_port > 0) {
     PThread(new ConfigProvider(this, "0.0.0.0", m_port));
   }
+  try {
+    getDB()->connect();
+    DAQLogMessage log(getNode().getName(), LogFile::INFO,
+                      "started runcontrol:" + getNode().getName());
+    LoggerObjectTable(getDB()).add(log, true);
+    getDB()->close();
+  } catch (const DBHandlerException& e) {
+  }
 }
 
 bool RunControlCallback::stateCheck() throw()

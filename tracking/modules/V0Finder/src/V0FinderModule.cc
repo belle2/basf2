@@ -49,10 +49,10 @@ V0FinderModule::V0FinderModule() : Module()
   // output: V0s
   addParam("V0ColName",  m_V0ColName,  "V0 collection name (output)", std::string(""));
 
-  //add module parameters here [see one of the following tutorials]
   addParam("vertexChi2Cut", m_vertexChi2Cut, "Maximum chi² for the vertex fit (NDF = 1)", 5.);
-  addParam("distRfromIP", m_distRfromIP, "Minimum separation of vertex from IP in R (or distZfromIP)", 1.);
-  addParam("distZfromIP", m_distZfromIP, "Minimum separation of vertex from IP in Z (or distZfromIP", 0.);
+  addParam("distRfromIP", m_distRfromIP, "Minimum separation of vertex from IP in R (logical or with distZfromIP cut)", 1.);
+  addParam("distZfromIP", m_distZfromIP, "Minimum separation of vertex from IP in Z (logical or with distRfromIP cut)", 0.);
+
 }
 
 V0FinderModule::~V0FinderModule()

@@ -293,11 +293,64 @@ namespace Belle2 {
       if (fabs(x) >= m_AsizexHalf) return 0;
       if (fabs(y) >= m_AsizeyHalf) return 0;
 
-      int ix = int((x + m_AsizexHalf) / m_padx);
+      // PMT channel
+      int ix = m_Npadx - 1 - int((x + m_AsizexHalf) / m_padx); // runs opposite to x
       int iy = int((y + m_AsizeyHalf) / m_pady);
-      int pmtch = ix + m_Npadx * iy;
-      int chID = pmtch + (pmtID - 1) * m_Npadx * m_Npady + 1;
-      return chID;
+
+      // PMT
+      pmtID--;
+      int ipmtx = pmtID % m_Npmtx;
+      int ipmty = pmtID / m_Npmtx;
+
+      // pixel number
+      int i = ix + ipmtx * m_Npadx;
+      int j = iy + ipmty * m_Npady;
+      int nx = m_Npmtx * m_Npadx;
+      return i + j * nx + 1;  // 1-based ID
+    }
+
+
+    int TOPGeometryPar::getOldNumbering(int channelID) const
+    {
+      if (channelID == 0) return 0;
+
+      channelID--;
+      int nx = m_Npmtx * m_Npadx;
+      int i = channelID % nx;
+      int j = channelID / nx;
+      int ix = i % m_Npadx;
+      int ipmtx = i / m_Npadx;
+      int iy = j % m_Npady;
+      int ipmty = j / m_Npady;
+
+      ix = m_Npadx - 1 - ix;
+      ipmtx = m_Npmtx - 1 - ipmtx;
+
+      return ix + m_Npadx * (iy + m_Npady * (ipmtx + m_Npmtx * ipmty)) + 1;
+
+    }
+
+
+    int TOPGeometryPar::getNewNumbering(int channelID) const
+    {
+      if (channelID == 0) return 0;
+
+      channelID--;
+      int ix = channelID % m_Npadx;
+      channelID /= m_Npadx;
+      int iy = channelID % m_Npady;
+      channelID /= m_Npady;
+      int ipmtx = channelID % m_Npmtx;
+      int ipmty = channelID / m_Npmtx;
+
+      ix = m_Npadx - 1 - ix;
+      ipmtx = m_Npmtx - 1 - ipmtx;
+
+      int i = ix + ipmtx * m_Npadx;
+      int j = iy + ipmty * m_Npady;
+      int nx = m_Npmtx * m_Npadx;
+      return i + j * nx + 1;
+
     }
 
 

@@ -543,7 +543,7 @@ namespace Belle2 {
                                              0.0);
 
           new G4PVPlacement(tpmt, PMT, "TOP.window", stack, false,
-                            (ix + 1) + (iy * Npmtx));
+                            (Npmtx - ix) + (iy * Npmtx)); // numbers run opposite to x
 
         }
       }

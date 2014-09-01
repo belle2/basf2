@@ -409,12 +409,28 @@ namespace Belle2 {
        */
       double getZBackward() const {return m_ZBackward / m_unit; }
 
-      /** Calculate the channel ID from local possition on the PMT
-       * @param position on the sensitive detector plane
-       * @param ID of the PMT
+      /**
+       * Calculate channel ID from local possition on the PMT
+       * @param x position x on the sensitive detector plane
+       * @param y position y on the sensitive detector plane
+       * @param pmtID  ID of the PMT
        * @return ID of channel for whole bar
        */
       int getChannelID(double x, double y, int pmtID) const;
+
+      /**
+       * Convert new numbering scheme to the old one
+       * @param channelID channel ID in the new numbering scheme
+       * @return channel ID in the old numbering scheme
+       */
+      int getOldNumbering(int channelID) const;
+
+      /**
+       * Convert old numbering scheme to the new one
+       * @param channelID channel ID in the old numbering scheme
+       * @return channel ID in the new numbering scheme
+       */
+      int getNewNumbering(int channelID) const;
 
       /** Ger backwads possition
        *@return backward possition of the quartz bar

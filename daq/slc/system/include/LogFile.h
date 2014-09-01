@@ -16,6 +16,9 @@ namespace Belle2 {
       UNKNOWN = 0, DEBUG, INFO, NOTICE, WARNING, ERROR, FATAL
     };
 
+  public:
+    static Priority getPriority(const std::string& str);
+
   private:
     LogFile() {}
     ~LogFile() {}

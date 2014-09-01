@@ -252,7 +252,7 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
         } else if (command.equals(NSMCommand.LISTSET)) {
             if (msg.getNParams() > 0 && msg.getParam(0) > 0) {
                 namelist = msg.getData().split("\n");
-                System.out.println(msg.getData());
+                //System.out.println(msg.getData());
                 commandButtonController.clearStack();
             }
         } else if (command.equals(NSMCommand.DBSET)) {
@@ -326,11 +326,13 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
                             data.getInt("configid", 0));
                 } else {
                     runSettingsController.update(cobj, data);
-                    rcStateController.update(data.getInt("state"));
+                    rcStateController.update(data.getInt("state"), true);
                     if (cobj.hasObject("node")) {
                         int n = 0;
                         for (ConfigObject obj : cobj.getObjects("node")) {
-                            statelabel_v[n].update(data.getObject("node", n).getInt("state"));
+                            NSMData cdata = (NSMData)data.getObject("node", n);
+                            statelabel_v[n].update(cdata.getInt("state"), 
+                                    cdata.getInt("excluded") == 0 && obj.getBool("used"));
                             n++;
                         }
                     }
@@ -339,12 +341,14 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
         } else if (command.equals(RCCommand.OK)) {
             RCState state = new RCState();
             state.copy(msg.getData());
-            rcStateController.update(state.getId());
+            rcStateController.update(state.getId(), true);
             if (!state.isTransition()) {
                 String dataname = getNSMDataProperties().get(0).getDataname();
+                /*
                 logviewController.add(new LogMessage(msg.getNodeName(),
                         LogLevel.INFO, "State shift " + msg.getNodeName() + ">> "
                         + state.getLabel()));
+                        */
                 NSMListenerService.requestNSMGet(dataname, "", 0);
             }
             if (state.equals(RCState.RUNNING_S)) {
@@ -356,8 +360,7 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
             if (str_v.length > 1) {
                 if (label_m.containsKey(str_v[0])) {
                     state.copy(str_v[1]);
-                    label_m.get(str_v[0]).update(state.getId());
-                    //System.out.println("" + str_v[0] + " = " + state.getLabel());
+                    label_m.get(str_v[0]).update(state);
                 }
             } else {
                 System.out.println("'" + msg.getData() + "' " + msg.getData().contains(" "));

@@ -16,7 +16,6 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
@@ -41,7 +40,7 @@ public class MonitorGUI extends Application {
         try {
             FileChooser fc = new FileChooser();
             fc.setTitle("select file");
-            fc.setInitialDirectory(new File(System.getProperty("user.home")));
+            //fc.setInitialDirectory(new File(System.getProperty("user.home")));
             fc.getExtensionFilters().add(new ExtensionFilter("init", "*.init"));
 
             File f = fc.showOpenDialog(stage);

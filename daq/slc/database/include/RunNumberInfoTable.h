@@ -18,7 +18,7 @@ namespace Belle2 {
     void create() throw();
     RunNumberInfo add(int expno, int runno, int subno);
     RunNumberInfo add(const RunNumberInfo& info);
-    RunNumberInfoList getList(int expno, int runno, int subno);
+    RunNumberInfoList getList(int expno, int runno, int subno, int max = 0);
     int getRunNumber(int expno);
     int getExpNumber();
 

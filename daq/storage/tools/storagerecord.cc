@@ -15,6 +15,8 @@
 #include <daq/storage/BinData.h>
 #include <daq/storage/SharedEventBuffer.h>
 
+#include <daq/slc/database/PostgreSQLInterface.h>
+
 #include <daq/slc/readout/RunInfoBuffer.h>
 
 #include <daq/slc/system/TCPSocket.h>
@@ -23,6 +25,9 @@
 #include <daq/slc/system/PThread.h>
 #include <daq/slc/system/Mutex.h>
 #include <daq/slc/system/Cond.h>
+
+#include <daq/slc/base/ConfigFile.h>
+#include <daq/slc/base/StringUtil.h>
 
 #include <fstream>
 #include <queue>
@@ -43,19 +48,38 @@ int g_nfiles_closed = 0;
 int g_diskid = 0;
 std::string g_file_diskid;
 std::string g_file_nfiles;
+std::string g_file_dbtmp;
 Mutex g_mutex;
+DBInterface* g_db = NULL;
+
+bool insertdb(const std::string& sql)
+{
+  try {
+    g_db->connect();
+    g_db->execute(sql.c_str());
+    g_db->close();
+  } catch (const DBHandlerException& e) {
+    std::ofstream fout(g_file_dbtmp.c_str(), std::ios::app);
+    fout << sql << std::endl;
+    fout.close();
+    return false;
+  }
+  return true;
+}
 
 class FileHandler {
 
 private:
-  FILE* file;
-  char* buf;
-  int id;
+  FILE* m_file;
+  char* m_buf;
+  int m_id;
+  std::string m_path;
+
 public:
   FileHandler() {
-    file = NULL;
-    buf = NULL;
-    id = 0;
+    m_file = NULL;
+    m_buf = NULL;
+    m_id = 0;
   }
   FileHandler(const std::string& dir, int ndisks, int expno, int runno) {
     open(dir, ndisks, expno, runno);
@@ -124,38 +148,45 @@ public:
     g_nfiles++;
     std::ofstream fout(g_file_nfiles.c_str());
     fout << g_nfiles << " " << expno << " " << runno;
-    id = g_nfiles;
+    m_id = g_nfiles;
     g_mutex.unlock();
-    file = fopen(filename, "w");
-    if (file == NULL) {
+    m_file = fopen(filename, "w");
+    m_path = filename;
+    if (m_file == NULL) {
       B2ERROR("failed to open file : " << filename);
       return false;
     } else {
-      buf = (char*)malloc(MAX_FILE_SIZE / 100);
-      setvbuf(file, buf, _IOFBF, MAX_FILE_SIZE / 100);
+      insertdb(StringUtil::form("insert into fileinfo (path, expno, runno, fileid, diskid, time_create)"
+                                " values ('%s', %d, %d, %d, %d, current_timestamp);",
+                                filename, expno, runno, m_id - 1, g_diskid));
+      m_buf = (char*)malloc(MAX_FILE_SIZE / 100);
+      setvbuf(m_file, m_buf, _IOFBF, MAX_FILE_SIZE / 100);
       B2INFO("file " << filename << " opened");
     }
     return available;
   }
 
   void close() {
-    if (file != NULL) {
-      fclose(file);
+    if (m_file != NULL) {
+      fclose(m_file);
+      insertdb(StringUtil::form("update fileinfo set time_close = "
+                                "current_timestamp where path = '%s'",
+                                m_path.c_str()));
       g_nfiles_closed++;
     }
-    if (buf != NULL) {
-      free(buf);
+    if (m_buf != NULL) {
+      free(m_buf);
     }
-    file = NULL;
-    buf = NULL;
+    m_file = NULL;
+    m_buf = NULL;
   }
 
   int write(char* evbuf, int nbyte) {
-    return fwrite(evbuf, nbyte, 1, file);
+    return fwrite(evbuf, nbyte, 1, m_file);
   }
 
   operator bool() {
-    return file != NULL;
+    return m_file != NULL;
   }
 
 };
@@ -226,11 +257,17 @@ int main(int argc, char** argv)
 {
   if (argc < 4) {
     printf("rawfile2rb : ibufname ibufsize path "
-           "filepath_diskid filepath_nfile "
+           "filepath_diskid filepath_nfile filepath_dbtmp "
            "ndisk obufname obufsize [nodename, nodeid]\n");
     return 1;
   }
   signal(SIGINT, signalHandler);
+  ConfigFile config("slowcontrol");
+  g_db = new PostgreSQLInterface(config.get("database.host"),
+                                 config.get("database.dbname"),
+                                 config.get("database.user"),
+                                 config.get("database.password"),
+                                 config.getInt("database.port"));
   const unsigned interval = 10;
   RunInfoBuffer info;
   const bool use_info = (argc > 10);
@@ -243,13 +280,13 @@ int main(int argc, char** argv)
   int ndisks = atoi(argv[4]);
   g_file_diskid = argv[5];
   g_file_nfiles = argv[6];
-
+  g_file_dbtmp = argv[7];
   unsigned int expno_tmp = 0;
   unsigned int runno_tmp = 0;
   std::ifstream fin(g_file_nfiles.c_str());
   fin >> g_nfiles >> expno_tmp >> runno_tmp;
   SharedEventBuffer obuf;
-  obuf.open(argv[7], atol(argv[8]) * 1000000, true);
+  obuf.open(argv[8], atol(argv[9]) * 1000000, true);
   B2INFO("storagerecord: started recording.");
   if (use_info) {
     info.reportRunning();

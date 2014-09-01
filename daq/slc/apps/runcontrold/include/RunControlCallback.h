@@ -6,7 +6,10 @@
 
 #include "daq/slc/runcontrol/RCCallback.h"
 
+#include "daq/slc/system/LogFile.h"
+
 #include "daq/slc/database/RunNumberInfoTable.h"
+#include <daq/slc/database/DAQLogMessage.h>
 
 #include <daq/slc/nsm/NSMData.h>
 #include <daq/slc/nsm/NSMNode.h>
@@ -31,7 +34,6 @@ namespace Belle2 {
     virtual ~RunControlCallback() throw() {}
 
   public:
-    //virtual bool perform(const NSMMessage& msg) throw();
     virtual void init() throw();
     virtual void timeout() throw();
     virtual void update() throw();
@@ -57,12 +59,21 @@ namespace Belle2 {
     virtual bool exclude() throw();
     virtual bool include() throw();
 
+  public:
+    LogFile::Priority getPriorityToDB() const { return m_priority_db; }
+    LogFile::Priority getPriorityToLocal() const { return m_priority_local; }
+    LogFile::Priority getPriorityToGlobal() const { return m_priority_global; }
+    void setPriorityToDB(LogFile::Priority pri) { m_priority_db = pri; }
+    void setPriorityToLocal(LogFile::Priority pri) { m_priority_local = pri; }
+    void setPriorityToGlobal(LogFile::Priority pri) { m_priority_global = pri; }
+
   protected:
     void prepareRun(NSMMessage& msg) throw();
     void postRun(NSMMessage& msg) throw();
     NSMNodeIterator find(const std::string& nodename) throw();
     bool synchronize(NSMNode& node) throw();
     virtual bool isManual() { return true; }
+    void logging(const DAQLogMessage& log, bool recoreded = false);
 
   protected:
     RunSetting m_setting;
@@ -73,6 +84,9 @@ namespace Belle2 {
     NSMData m_data;
     std::string m_runtype_default;
     int m_port;
+    LogFile::Priority m_priority_db;
+    LogFile::Priority m_priority_local;
+    LogFile::Priority m_priority_global;
 
   private:
     class ConfigProvider {

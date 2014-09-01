@@ -23,7 +23,7 @@ namespace Belle2 {
 
   public:
     int getId() const throw() { return m_id; }
-    void setId(int id) throw() { m_id = id; }
+    void setId(int id) const throw() { m_id = id; }
     const std::string& getName() const throw() { return m_name; }
     void setName(const std::string& name) throw() { m_name = name; }
     const std::string& getNode() const throw() { return m_node; }
@@ -105,7 +105,7 @@ namespace Belle2 {
 
   private:
     int m_index;
-    int m_id;
+    mutable int m_id;
     int m_revision;
     std::string m_name;
     std::string m_node;

@@ -14,7 +14,7 @@
 
 using namespace Belle2;
 
-int LoggerObjectTable::add(DBObject& obj, bool isroot)
+int LoggerObjectTable::add(const DBObject& obj, bool isroot)
 throw(DBHandlerException)
 {
   int id = 0;
@@ -42,7 +42,7 @@ throw(DBHandlerException)
     if (obj.hasObject(name)) {
       size_t nobj = obj.getNObjects(name);
       for (size_t j = 0; j < nobj; j++) {
-        DBObject& cobj(obj.getObject(name, j));
+        const DBObject& cobj(obj.getObject(name, j));
         if (!cobj.isConfig()) add(cobj, false);
       }
     }

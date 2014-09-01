@@ -4,6 +4,8 @@
 
 #include <daq/slc/system/LogFile.h>
 
+#include <daq/slc/base/StringUtil.h>
+
 #include <sstream>
 
 using namespace Belle2;
@@ -59,7 +61,7 @@ RunNumberInfo RunNumberInfoTable::add(const RunNumberInfo& info)
   return RunNumberInfo();
 }
 
-RunNumberInfoList RunNumberInfoTable::getList(int expno, int runno, int subno)
+RunNumberInfoList RunNumberInfoTable::getList(int expno, int runno, int subno, int max)
 {
   RunNumberInfoList info_v;
   if (m_db->checkTable("runnumberinfo")) {
@@ -70,8 +72,8 @@ RunNumberInfoList RunNumberInfoTable::getList(int expno, int runno, int subno)
       if (subno > 0) ss << " and subno = " << subno;
       m_db->execute("select id, expno, runno, subno from runnumberinfo "
                     "where %s order by id desc, expno desc, runno desc, "
-                    "subno desc;",
-                    ss.str().c_str());
+                    "subno desc %s;", ss.str().c_str(),
+                    ((max > 0) ? StringUtil::form("limit %d ", max).c_str() : ""));
       DBRecordList record_v(m_db->loadRecords());
       for (size_t i = 0; i < record_v.size(); i++) {
         DBRecord& record(record_v[i]);
@@ -97,8 +99,7 @@ int RunNumberInfoTable::getRunNumber(int expno)
         ss << "expno = (select max(expno) from runnumberifno)";
       }
       m_db->execute("select max(runno)+1 as runno from runnumberinfo "
-                    "where %s limit 1;",
-                    ss.str().c_str());
+                    "where %s limit 1;", ss.str().c_str());
       DBRecordList record_v(m_db->loadRecords());
       if (record_v.size() > 0) {
         runno = record_v[0].getInt("runno");

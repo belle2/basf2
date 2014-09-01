@@ -97,6 +97,7 @@ bool StoragerCallback::load() throw()
   m_con[1].addArgument(m_file.get("record.ndisks"));
   m_con[1].addArgument(m_file.get("record.file.diskid"));
   m_con[1].addArgument(m_file.get("record.file.nfiles"));
+  m_con[1].addArgument(m_file.get("record.file.dbtmp"));
   m_con[1].addArgument(obuf_name);
   m_con[1].addArgument(obuf_size);
   m_con[1].addArgument("storagerecord");

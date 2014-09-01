@@ -13,8 +13,8 @@ public class RCCommand extends NSMCommand {
     final static public RCCommand RECOVER = new RCCommand(107, "RECOVER");
     final static public RCCommand ABORT = new RCCommand(108, "ABORT");
     final static public RCCommand TRGIFT = new RCCommand(109, "TRIGFT");
-    final static public RCCommand EXCULUDE = new RCCommand(110, "EXCULUDE");
-    final static public RCCommand INCULUDE = new RCCommand(111, "INCULUDE");
+    final static public RCCommand EXCLUDE = new RCCommand(110, "EXCLUDE");
+    final static public RCCommand INCLUDE = new RCCommand(111, "INCLUDE");
 
     public RCCommand() {
         copy(RCCommand.UNKNOWN);
@@ -55,11 +55,11 @@ public class RCCommand extends NSMCommand {
         } else if (msg.equals(TRGIFT.getLabel())) {
             copy(TRGIFT);
             return true;
-        } else if (msg.equals(EXCULUDE.getLabel())) {
-            copy(EXCULUDE);
+        } else if (msg.equals(EXCLUDE.getLabel())) {
+            copy(EXCLUDE);
             return true;
-        } else if (msg.equals(INCULUDE.getLabel())) {
-            copy(INCULUDE);
+        } else if (msg.equals(INCLUDE.getLabel())) {
+            copy(INCLUDE);
             return true;
         }
         return false;
@@ -83,7 +83,7 @@ public class RCCommand extends NSMCommand {
         } else if (equals(STATECHECK) || equals(STATE) || equals(OK)
                 || equals(TRGIFT) || equals(ERROR) || equals(ABORT) || equals(RECOVER)
                 || equals(NSMGET) || equals(NSMSET) || equals(DBGET) || equals(DBSET)
-                || equals(EXCULUDE) || equals(INCULUDE)) {
+                || equals(EXCLUDE) || equals(INCLUDE)) {
             return ENABLED;
         } else {
             return DISABLED;
@@ -157,11 +157,11 @@ public class RCCommand extends NSMCommand {
         } else if (id == TRGIFT.getId()) {
             copy(TRGIFT);
             return true;
-        } else if (id == EXCULUDE.getId()) {
-            copy(EXCULUDE);
+        } else if (id == EXCLUDE.getId()) {
+            copy(EXCLUDE);
             return true;
-        } else if (id == INCULUDE.getId()) {
-            copy(INCULUDE);
+        } else if (id == INCLUDE.getId()) {
+            copy(INCLUDE);
             return true;
         }
         return false;

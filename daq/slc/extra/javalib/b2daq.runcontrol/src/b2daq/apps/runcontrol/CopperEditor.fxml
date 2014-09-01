@@ -74,26 +74,30 @@
                                         <PropertyValueFactory property="copperID" />
                                     </cellValueFactory>
                                 </TableColumn>
-                                <TableColumn fx:id="col_config_hslba" prefWidth="70.0" text="HSLB:a">
-                                    <cellValueFactory>
-                                        <PropertyValueFactory property="hslbA" />
-                                    </cellValueFactory>
-                                </TableColumn>
-                                <TableColumn fx:id="col_config_hslbb" prefWidth="67.0" text="HSLB:b">
-                                    <cellValueFactory>
-                                        <PropertyValueFactory property="hslbB" />
-                                    </cellValueFactory>
-                                </TableColumn>
-                                <TableColumn fx:id="col_config_hslbc" prefWidth="67.0" text="HSLB:c">
-                                    <cellValueFactory>
-                                        <PropertyValueFactory property="hslbC" />
-                                    </cellValueFactory>
-                                </TableColumn>
-                                <TableColumn fx:id="col_config_hslbd" prefWidth="69.0" text="HSLB:d">
-                                    <cellValueFactory>
-                                        <PropertyValueFactory property="hslbD" />
-                                    </cellValueFactory>
-                                </TableColumn>
+                        <TableColumn prefWidth="75.0" text="HSLB">
+                           <columns>
+                                      <TableColumn fx:id="col_config_hslba" prefWidth="70.0" text="Slot:a">
+                                          <cellValueFactory>
+                                              <PropertyValueFactory property="hslbA" />
+                                          </cellValueFactory>
+                                      </TableColumn>
+                                      <TableColumn fx:id="col_config_hslbb" prefWidth="70.0" text="Slot:b">
+                                          <cellValueFactory>
+                                              <PropertyValueFactory property="hslbB" />
+                                          </cellValueFactory>
+                                      </TableColumn>
+                                      <TableColumn fx:id="col_config_hslbc" prefWidth="70.0" text="Slot:c">
+                                          <cellValueFactory>
+                                              <PropertyValueFactory property="hslbC" />
+                                          </cellValueFactory>
+                                      </TableColumn>
+                                      <TableColumn fx:id="col_config_hslbd" prefWidth="70.0" text="Slot:d">
+                                          <cellValueFactory>
+                                              <PropertyValueFactory property="hslbD" />
+                                          </cellValueFactory>
+                                      </TableColumn>
+                           </columns>
+                        </TableColumn>
                                 <TableColumn fx:id="col_config_script" prefWidth="138.0" text="Basf2 R/O">
                                     <cellValueFactory>
                                         <PropertyValueFactory property="basf2script" />

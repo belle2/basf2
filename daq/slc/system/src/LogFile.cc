@@ -23,6 +23,25 @@ Mutex LogFile::g_mutex;
 LogFile::Priority LogFile::g_threshold;
 std::string LogFile::g_filename;
 
+LogFile::Priority LogFile::getPriority(const std::string& str)
+{
+  const std::string s = StringUtil::toupper(str);
+  if (s == "DEBUG") {
+    return DEBUG;
+  } else if (s == "INFO") {
+    return INFO;
+  } else if (s == "NOTICE") {
+    return NOTICE;
+  } else if (s == "WARNING") {
+    return WARNING;
+  } else if (s == "ERROR") {
+    return ERROR;
+  } else if (s == "FATAL") {
+    return FATAL;
+  }
+  return UNKNOWN;
+}
+
 void LogFile::open(const std::string& filename, Priority threshold)
 {
   if (!g_opened) {

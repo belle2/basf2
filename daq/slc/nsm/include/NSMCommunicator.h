@@ -49,8 +49,9 @@ namespace Belle2 {
     void replyOK(const NSMNode& node) throw(NSMHandlerException);
     void replyError(int error, const std::string& message = "")
     throw(NSMHandlerException);
-    bool sendLog(const DAQLogMessage& log);
-    bool sendLog(const NSMNode& node, const DAQLogMessage& log);
+    bool sendLog(const DAQLogMessage& log, bool recored = false);
+    bool sendLog(const NSMNode& node, const DAQLogMessage& log,
+                 bool recored = false);
     bool sendError(const std::string& message);
     bool sendError(int error, //const std::string& nodename,
                    const std::string& message);

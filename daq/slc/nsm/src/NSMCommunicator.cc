@@ -182,14 +182,13 @@ throw(NSMHandlerException)
   }
 }
 
-bool NSMCommunicator::sendLog(const DAQLogMessage& log)
+bool NSMCommunicator::sendLog(const DAQLogMessage& log, bool recored)
 {
   for (NSMNodeList::iterator it = m_masters.begin();
        it != m_masters.end(); it++) {
     //if (b2nsm_nodeid(it->first.c_str()) >= 0) {
     try {
-      LogFile::debug("LOG >> %s", it->second.getName().c_str());
-      sendLog(it->second, log);
+      sendLog(it->second, log, recored);
     } catch (const NSMHandlerException& e) {
       LogFile::debug("%s is not online. ", it->first.c_str());
       //}
@@ -199,16 +198,18 @@ bool NSMCommunicator::sendLog(const DAQLogMessage& log)
 }
 
 bool NSMCommunicator::sendLog(const NSMNode& node,
-                              const DAQLogMessage& log)
+                              const DAQLogMessage& log,
+                              bool recoreded)
 {
 #if NSM_PACKAGE_VERSION >= 1914
   try {
     if (node.getName().size() > 0
         /*&& b2nsm_nodeid(node.getName().c_str()) >= 0*/) {
       NSMMessage msg(node, NSMCommand::LOG);
-      msg.setNParams(2);
+      msg.setNParams(3);
       msg.setParam(0, (int)log.getPriority());
       msg.setParam(1, log.getDateInt());
+      msg.setParam(2, (recoreded) ? 1 : 0);
       msg.setData(log.getNodeName() + "\n" + log.getMessage());
       sendRequest(msg);
     }

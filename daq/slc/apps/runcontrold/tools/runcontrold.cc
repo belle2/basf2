@@ -5,6 +5,7 @@
 
 #include <daq/slc/database/PostgreSQLInterface.h>
 
+#include <daq/slc/system/LogFile.h>
 #include <daq/slc/system/Daemon.h>
 
 #include <daq/slc/base/ConfigFile.h>
@@ -29,6 +30,10 @@ int main(int argc, char** argv)
     new RunControlCallback(node, config.get("runtype"),
                            config.get("nsm.mem.format"),
                            config.getInt("nsm.mem.revision"), port);
+  callback->setPriorityToDB(LogFile::getPriority(config.get("log.priority.db")));
+  callback->setPriorityToLocal(LogFile::getPriority(config.get("log.priority.local")));
+  callback->setPriorityToGlobal(LogFile::getPriority(config.get("log.priority.global")));
+
   RunControlMasterCallback* master_callback =
     new RunControlMasterCallback(node, callback);
   callback->setDB(db);

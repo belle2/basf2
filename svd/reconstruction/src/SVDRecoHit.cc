@@ -79,14 +79,11 @@ SVDRecoHit::SVDRecoHit(const SVDCluster* hit, const genfit::TrackCandHit*):
   bool isWedgeU = m_isU && (geometry.getBackwardWidth() > geometry.getForwardWidth());
 
   // Set positions
-  if (!isWedgeU)
-    rawHitCoords_(0) = hit->getPosition();
-  else {
+  rawHitCoords_(0) = hit->getPosition();
+  if (isWedgeU) {
     // For u coordinate in a wedge sensor, the position line is not u = const.
     // We have to rotate the coordinate system to achieve this.
     m_rotationPhi = atan2((geometry.getBackwardWidth() - geometry.getForwardWidth()) / geometry.getWidth(0) * hit->getPosition(), geometry.getLength());
-    // Set the position in the rotated coordinate frame.
-    rawHitCoords_(0) = hit->getPosition() * cos(m_rotationPhi);
   }
   // Set the error covariance matrix (this does not scale with position)
   rawHitCov_(0, 0) = hit->getPositionSigma() * hit->getPositionSigma();
@@ -105,12 +102,6 @@ void SVDRecoHit::setDetectorPlane()
   // Construct vectors o, u, v
   TVector3 uLocal(1, 0, 0);
   TVector3 vLocal(0, 1, 0);
-  if (isWedgeU) {
-    double cosPhi = cos(m_rotationPhi);
-    double sinPhi = sin(m_rotationPhi);
-    uLocal.SetXYZ(cosPhi, sinPhi, 0);
-    vLocal.SetXYZ(-sinPhi, cosPhi, 0);
-  }
   TVector3 origin  = geometry.pointToGlobal(TVector3(0, 0, 0));
   TVector3 uGlobal = geometry.vectorToGlobal(uLocal);
   TVector3 vGlobal = geometry.vectorToGlobal(vLocal);
@@ -130,7 +121,23 @@ genfit::AbsMeasurement* SVDRecoHit::clone() const
 
 std::vector<genfit::MeasurementOnPlane*> SVDRecoHit::constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const
 {
-  return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(rawHitCoords_, rawHitCov_, state.getPlane(), state.getRep(), this->constructHMatrix(state.getRep())));
+  if (!m_isU || m_rotationPhi == 0.0) {
+    return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(rawHitCoords_, rawHitCov_, state.getPlane(), state.getRep(), this->constructHMatrix(state.getRep())));
+  }
+
+  // Wedged sensor: the measured coordinate in U depends on V and the
+  // rotation angle.  Namely, it needs to be scaled.
+  double u = rawHitCoords_(0);
+  double v = state.getState()(4);
+  double uPrime = u - v * tan(m_rotationPhi);
+  double scale = uPrime / u;
+
+  TVectorD coords(1);
+  coords(0) = uPrime;
+
+  TMatrixDSym cov(scale * scale * rawHitCov_);
+
+  return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(coords, cov, state.getPlane(), state.getRep(), this->constructHMatrix(state.getRep())));
 }
 
 TMatrixD SVDRecoHit::derivatives(const genfit::StateOnPlane* sop)

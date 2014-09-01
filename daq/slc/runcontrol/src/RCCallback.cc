@@ -60,11 +60,13 @@ bool RCCallback::perform(const NSMMessage& msg) throw()
   if (cmd.isAvailable(getNode().getState()) == NSMCommand::DISABLED) {
     return false;
   }
-  if (cmd == RCCommand::STATECHECK) {
-    return stateCheck();
-  }
-
   NSMCommunicator* com = getCommunicator();
+  if (cmd == RCCommand::STATECHECK) {
+    if (!stateCheck()) {
+      com->replyOK(getNode());
+    }
+    return true;
+  }
   RCState tstate(cmd.nextTState());
   bool result = true;
   if (tstate != Enum::UNKNOWN) {

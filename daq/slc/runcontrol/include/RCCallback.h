@@ -36,7 +36,7 @@ namespace Belle2 {
     virtual bool pause() throw() { return true; }
     virtual bool abort() throw() { return true; }
     virtual bool trigft() throw() { return true; }
-    virtual bool stateCheck() throw() { return true; }
+    virtual bool stateCheck() throw() { return false; }
 
   public:
     void setDB(DBInterface* db) throw() { m_db = db; }

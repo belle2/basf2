@@ -88,9 +88,11 @@ void RunControlCallback::timeout() throw()
     NSMNode& node(m_node_v[i]);
     RCState state(node.getState());
     if (!com.isConnected(node)) {
-      logging(DAQLogMessage(getNode().getName(), LogFile::WARNING,
-                            node.getName() + " got down."));
-      node.setState(Enum::UNKNOWN);
+      if (node.getState() != Enum::UNKNOWN) {
+        logging(DAQLogMessage(getNode().getName(), LogFile::WARNING,
+                              node.getName() + " got down."));
+        node.setState(Enum::UNKNOWN);
+      }
       continue;
     }
     if (!state.isStable()) {

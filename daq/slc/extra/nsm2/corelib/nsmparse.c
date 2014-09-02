@@ -467,6 +467,7 @@ nsmparse_scan(const char *file, char *filebuf, char *start, char **endp,
 	parsep->next = (NSMparse *)nsmparse_malloc(sizeof(NSMparse),
 						   "scan", file);
 	parsep = parsep->next;
+	memset(parsep, 0, sizeof(NSMparse));
 	parsep->type = ')';
 	parsep->offset = offset; /* probably not correct */
 	

@@ -14,6 +14,7 @@
 #include <ctype.h>
 #include <unistd.h>
 #include "nsm2.h"
+#include "nsmlib2.h"
 #include "belle2nsm.h"
 #include "client_data.h"
 
@@ -160,28 +161,38 @@ calc_crc32(const char* p, int len)
 void
 client_data(NSMmsg* msg, NSMcontext* nsmc)
 {
-  printf("DATA message received\n");
+  b2nsm_checkpoint(nsmc, 300);
+
+  b2nsm_printf("DATA message received\n");
+
+  b2nsm_checkpoint(nsmc, 302);
 
   if (msg->npar < 1) {
+    b2nsm_checkpoint(nsmc, 304);
     b2nsm_error(msg, "DATA has no crc");
     return;
   }
 
   if (! msg->len || ! msg->datap) {
+    b2nsm_checkpoint(nsmc, 306);
     b2nsm_error(msg, "DATA has no data");
     return;
   }
 
   unsigned crc32_given = (unsigned)msg->pars[0];
 
+  b2nsm_checkpoint(nsmc, 308);
   unsigned crc32_calc  = calc_crc32(msg->datap, msg->len);
 
   if (crc32_calc != crc32_given) {
+    b2nsm_checkpoint(nsmc, 310);
     b2nsm_error(msg, "DATA crc (%08x) does not match with (%08x)",
                 crc32_calc, crc32_given);
   } else {
+    b2nsm_checkpoint(nsmc, 312);
     b2nsm_ok(msg, 0, "DATA received");
   }
+  b2nsm_checkpoint(nsmc, 314);
 }
 // -- main --------------------------------------------------------------
 //    main does everything except callback functions
@@ -208,7 +219,7 @@ main(int argc, char** argv)
 
   // INIT
   if (! b2nsm_init(nodename)) {
-    printf("%s: b2nsm_init %s\n", program, b2nsm_strerror());
+    printf("%s(b2nsm_init): %s\n", program, b2nsm_strerror());
     return 1;
   }
 
@@ -220,7 +231,7 @@ main(int argc, char** argv)
   datap = (struct client_data*)
           b2nsm_allocmem(datname, fmtname, client_data_revision, 1);
   if (! datap) {
-    printf("%s: allocmem %s\n", program, b2nsm_strerror());
+    printf("%s(allocmem): %s\n", program, b2nsm_strerror());
     return 1;
   }
 

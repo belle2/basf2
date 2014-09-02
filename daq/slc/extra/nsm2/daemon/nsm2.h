@@ -4,7 +4,7 @@
 /* -- version info */
 
 #define NSM_PROTOCOL_VERSION 1926 /* protocol version */
-#define NSM_PACKAGE_VERSION  1927 /* package  version */
+#define NSM_PACKAGE_VERSION  1934 /* package  version */
 
 /*
   20120723 1900 file created
@@ -33,6 +33,13 @@
   20140124 1925 anonymous node
   20140304 1926 new parser, 20 byte smaller chunk size for IP header
   20140305 1927 freeq fix for sending a long packet
+  20140305 1928 fix to 1927, DoS vulnerability test, still far from OK
+  20140306 1929 no fprintf for DoS vulnerability trial tests, in vain
+  20140306 1930 restore logfp and cleanup (but still write instead of fwrite)
+  20140516 1931 corelib: ip address from shm if not specified
+  20140614 1932 corelib: sprintf ip address if host is missing
+  20140614 1933 corelib: use nodhash for nsmlib_nodeid
+  20140902 1934 static bsizbuf pollution fix, broken tcprecv debug
  */
 
 /* -- DATA TYPES ----------------------------------------------------- */
@@ -117,6 +124,7 @@ typedef struct NSMcontext_struct NSMcontext;
 #define NSMEBADFMT    (-32) /* data format is inconsistent (openmem) */
 #define NSMEBADREV    (-33) /* data revision is inconsistent (openmem) */
 #define NSMEPARSE     (-34) /* data format parse error (openmem) */
+#define NSMECONNECT   (-35) /* connection error */
 
 /* NSMmsg (in host byte order) */
 typedef struct {

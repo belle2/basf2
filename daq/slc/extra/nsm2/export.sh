@@ -24,4 +24,5 @@ make -C $BELLE2_EXTERNALS_DIR/src/nsm2 clean
 rm -f $EXTLIBDIR/nsmd2 $EXTLIBDIR/nsminfo2
 make -C $BELLE2_EXTERNALS_DIR/src/nsm2 
 make -C $BELLE2_EXTERNALS_DIR/src/nsm2 install
-
+echo "install corelib/libnsm2_corelib.a ${EXTLIBDIR}/"
+install corelib/libnsm2_corelib.a ${EXTLIBDIR}/

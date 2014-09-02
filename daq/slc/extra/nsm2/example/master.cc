@@ -153,7 +153,7 @@ xgetargs(char* buf, char* argv[])
 void
 ok_handler(NSMmsg* msg, NSMcontext*)
 {
-  xprintlog("OK received");
+  /* xprintlog("OK received"); */
 }
 // -- error_handler -----------------------------------------------------
 //
@@ -249,7 +249,7 @@ calc_crc32(const char* p, int len)
 // -- master_senddata ---------------------------------------------------
 // ----------------------------------------------------------------------
 void
-master_senddata(const char* node, const char* filename)
+master_senddata(const char* node, const char* filename, int repeat)
 {
   struct stat statbuf;
   char databuf[65536];
@@ -271,10 +271,15 @@ master_senddata(const char* node, const char* filename)
     return;
   }
   fclose(fp);
-  unsigned crc = calc_crc32(databuf, statbuf.st_size);
+  unsigned pars[2];
+  pars[0] = calc_crc32(databuf, statbuf.st_size);
+  pars[1] = 0;
 
-  b2nsm_sendany(node, "DATA", 1, (int*)&crc,
-                statbuf.st_size, databuf, "master_senddata");
+  for (int i = 0; i < repeat; i++) {
+    pars[1]++;
+    b2nsm_sendany(node, "DATA", 2, (int*)pars,
+                  statbuf.st_size, databuf, "master_senddata");
+  }
 }
 // -- main --------------------------------------------------------------
 //    main does everything except callback functions
@@ -308,13 +313,14 @@ main(int argc, char** argv)
     return 1;
   }
   xprintlog("%s: INIT", program);
-  b2nsm_logging(master_logfp);
+  b2nsm_logging(0);
 
   // handlers
   if (b2nsm_callback("OK", ok_handler) < 0) {
     xprintlog("%s: CALLBACK(OK) %s", program, b2nsm_strerror());
     return 1;
   }
+
   if (b2nsm_callback("ERROR", error_handler) < 0) {
     xprintlog("%s: CALLBACK(ERROR) %s", program, b2nsm_strerror());
     return 1;
@@ -389,7 +395,7 @@ main(int argc, char** argv)
       if (ac < 3) {
         printf("usage: data <node> <file\n");
       } else {
-        master_senddata(av[1], av[2]);
+        master_senddata(av[1], av[2], ac > 3 ? atoi(av[3]) : 1);
       }
     } else {
       printf("unknown request %s\n", av[0]);

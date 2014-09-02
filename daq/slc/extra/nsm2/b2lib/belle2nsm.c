@@ -12,9 +12,11 @@
    20140106 1921 wrapptr added
    20140124 1925 anonymous node, forgotten uprcase in openmem
    20140305 1927 allow null state in b2nsm_ok
+   20140305 1929 checkpoints, no fprintf
+   20140306 1930 logfp again, but write instead of fwrite/fprintf
 \* ---------------------------------------------------------------------- */
 
-const char *belle2nsm_version = "belle2nsm 1.9.27";
+const char *belle2nsm_version = "belle2nsm 1.9.30";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,9 +29,15 @@ const char *belle2nsm_version = "belle2nsm 1.9.27";
 #include "nsmlib2.h"
 #include "belle2nsm.h"
 
+/* checkpoint of signal handler to be studied with gdb
+   0: never called, -1: done, 1..1000 user checkpoint, 1001.. corelib/b2lib
+ */
+extern int  nsmlib_currecursive;
+#define DBS(nsmc,val) nsmlib_checkpoint(0,val)
+
 NSMcontext *nsm = 0;
 static int b2nsm_errc;
-static FILE *logfp = 0;
+FILE *logfp = 0;
 
 typedef struct b2nsm_struct {
   char default_dest[32];
@@ -77,6 +85,8 @@ b2nsm_nodepid(const char *nodename)
 int
 b2nsm_loghook(NSMmsg *msg, NSMcontext *nsmc)
 {
+  DBS(nsmc,2000);
+  
   if (logfp) {
     int i;
     int    npar = msg->npar;
@@ -84,28 +94,44 @@ b2nsm_loghook(NSMmsg *msg, NSMcontext *nsmc)
     int    len  = msg->len;
     const char *datp = msg->datap;
     
-    fprintf(logfp, "%s%s%s<=%s",
+    DBS(nsmc,2002);
+    nsmlib_log("%s%s%s<=%s",
 	    xt(), nsmc->hookptr ? (const char *)nsmc->hookptr : "",
 	    nsmlib_reqname(nsmc, msg->req),
 	    nsmlib_nodename(nsmc, msg->node));
 
+    DBS(nsmc,2004);
     for (i = 0; i < 3 && i < npar; i++) {
-      fprintf(logfp, "%s%d%s", i==0 ? " (" : "", pars[i],
+      nsmlib_log("%s%d%s", i==0 ? " (" : "", pars[i],
 	      i==npar-1 ? ")" : (i == 2 ? "...)" : ",") );
     }
+    DBS(nsmc,2006);
     for (i = 0; datp && i < 80 && i < len && isprint(datp[i]); i++) {
-      fprintf(logfp, "%s%c%s", i==0 ? " " : "", datp[i], i==79 ? "..." : "");
+      nsmlib_log("%s%c%s", i==0 ? " " : "", datp[i], i==79 ? "..." : "");
     }
+    DBS(nsmc,2008);
     if (i < 79 && datp && datp[i] == 0 && len > i+1 && isprint(datp[i+1])) {
-      fprintf(logfp, " ");
+      nsmlib_log(" ");
     }
+    DBS(nsmc,2010);
     for (i++; datp && i < 80 && i < len && isprint(datp[i]); i++) {
-      fprintf(logfp, "%c%s", datp[i], i==79 ? "..." : "");
+      nsmlib_log("%c%s", datp[i], i==79 ? "..." : "");
     }
-    fprintf(logfp, "\n");
-    fflush(logfp);
+    DBS(nsmc,2012);
+    nsmlib_log("\n");
+    DBS(nsmc,2014);
+    
+    if (nsmlib_currecursive <= 1) nsmlib_logflush();
+
+    DBS(nsmc,2016);
   }
   return 0;
+}
+/* -- b2nsm_checkpoint -------------------------------------------------- */
+void
+b2nsm_checkpoint(NSMcontext *nsmc, int val)
+{
+  nsmlib_checkpoint(nsmc, val);
 }
 /* -- b2nsm_logging ----------------------------------------------------- */
 int
@@ -118,6 +144,7 @@ void
 b2nsm_logging(FILE *fp)
 {
   logfp = fp;
+  nsmlib_logging(fp);
   if (nsm) {
     nsm->hook = b2nsm_loghook;
     nsm->hookptr = 0;
@@ -128,6 +155,7 @@ void
 b2nsm_logging2(FILE *fp, const char *prefix)
 {
   logfp = fp;
+  nsmlib_logging(fp);
   if (nsm) {
     nsm->hook = b2nsm_loghook;
     nsm->hookptr = (const void *)prefix;
@@ -156,8 +184,13 @@ b2nsm_callback(const char *name, NSMcallback_t callback)
 {
   char name_uprcase[NSMSYS_NAME_SIZ+1];
   int ret;
+  int oldsig;
+  
   if (! nsm) {
-    if (logfp) fprintf(logfp, "NSM is not initialized");
+    if (logfp) {
+      nsmlib_log("NSM is not initialized\n");
+      nsmlib_logflush();
+    }
     return -1;
   }
 
@@ -167,13 +200,15 @@ b2nsm_callback(const char *name, NSMcallback_t callback)
   ret = nsmlib_callback(nsm, name, callback, NSMLIB_FNSTD);
 
   if (! logfp) return ret;
+
   if (ret < 0) {
-    fprintf(logfp, "%scallback(%s) registration failed: %s\n",
-	    xt(), name, b2nsm_strerror());
+    nsmlib_log("%scallback(%s) registration failed: %s\n",
+	       xt(), name, b2nsm_strerror());
   } else {
-    fprintf(logfp, "%scallback(%s) registered\n", xt(), name);
+    nsmlib_log("%scallback(%s) registered\n", xt(), name);
   }
-  fflush(logfp);
+  nsmlib_logflush();
+
   return ret;
 }	     
 /* -- b2nsm_sendany ----------------------------------------------------- */
@@ -184,6 +219,7 @@ b2nsm_sendany(const char *node, const char *req, int npar, int32_t *pars,
   int ret;
   char node_uprcase[NSMSYS_NAME_SIZ+1];
   char req_uprcase[NSMSYS_NAME_SIZ+1];
+  int oldsig;
 
   if (! nsm) return -1;
   xuprcpy(node_uprcase, node, NSMSYS_NAME_SIZ+1);
@@ -191,28 +227,29 @@ b2nsm_sendany(const char *node, const char *req, int npar, int32_t *pars,
   ret = nsmlib_sendreq(nsm, node_uprcase, req_uprcase, npar, pars, len, datp);
 
   if (! logfp) return ret;
+
   if (ret < 0) {
-    fprintf(logfp, "%s%s=>%s %s failed: %s\n",
+    nsmlib_log("%s%s=>%s %s failed: %s\n",
 	    xt(), req, node, caller, b2nsm_strerror());
   } else {
     int i;
-    fprintf(logfp, "%s%s=>%s", xt(), req, node);
+    nsmlib_log("%s%s=>%s", xt(), req, node);
     for (i = 0; i<3 && i<npar; i++) {
-      fprintf(logfp, "%s%d%s", i==0 ? " (" : "", pars[i],
+      nsmlib_log("%s%d%s", i==0 ? " (" : "", pars[i],
 	      i==npar-1 ? ")" : (i == 2 ? "...)" : ",") );
     }
     for (i = 0; datp && i < 80 && i < len && isprint(datp[i]); i++) {
-      fprintf(logfp, "%s%c%s", i==0 ? " " : "", datp[i], i==79 ? "..." : "");
+      nsmlib_log("%s%c%s", i==0 ? " " : "", datp[i], i==79 ? "..." : "");
     }
     if (i < 79 && datp && datp[i] == 0 && len > i+1 && isprint(datp[i+1])) {
-      fprintf(logfp, " ");
+      nsmlib_log(" ");
     }
     for (i++; datp && i < 80 && i < len && isprint(datp[i]); i++) {
-      fprintf(logfp, "%c%s", datp[i], i==79 ? "..." : "");
+      nsmlib_log("%c%s", datp[i], i==79 ? "..." : "");
     }
-    fprintf(logfp, "\n");
+    nsmlib_log("\n");
   }
-  fflush(logfp);
+  
   return ret;
 }
 /* -- b2nsm_sendreq ----------------------------------------------------- */
@@ -242,6 +279,7 @@ b2nsm_ok(NSMmsg *msg, const char *newstate, const char *fmt, ...)
     strcpy(((b2nsm_t *)nsm->wrapptr)->state, newstate);
   } else {
     strcpy(buf, ((b2nsm_t *)nsm->wrapptr)->state);
+    len = strlen(buf) + 1;
   }
   
   if (fmt) {
@@ -296,10 +334,9 @@ b2nsm_readmem(void *buf, const char *dat, const char *fmt, int rev)
 
   if (! logfp) return ret;
   if (ret < 0) {
-    fprintf(logfp, "%sreadmem(%s,rev.%d) failed: %s\n",
-	    xt(), dat, rev, b2nsm_strerror());
+    nsmlib_log("%sreadmem(%s,rev.%d) failed: %s\n",
+	       xt(), dat, rev, b2nsm_strerror());
   }
-  fflush(logfp);
   return ret;
 }
 /* -- b2nsm_openmem ----------------------------------------------------- */
@@ -313,13 +350,13 @@ b2nsm_openmem(const char *dat, const char *fmt, int rev)
   ptr = nsmlib_openmem(nsm, dat_uprcase, fmt, rev);
 
   if (! logfp) return ptr;
+
   if (! ptr) {
-    fprintf(logfp, "%sopenmem(%s,rev.%d) failed: %s\n",
-	    xt(), dat, rev, b2nsm_strerror());
+    nsmlib_log("%sopenmem(%s,rev.%d) failed: %s\n",
+	       xt(), dat, rev, b2nsm_strerror());
   } else {
-    fprintf(logfp, "%sopenmem(%s,rev.%d) at %p\n", xt(), dat, rev, ptr);
+    nsmlib_log("%sopenmem(%s,rev.%d) at %p\n", xt(), dat, rev, ptr);
   }
-  fflush(logfp);
   return ptr;
 }
 /* -- b2nsm_allocmem ---------------------------------------------------- */
@@ -333,13 +370,13 @@ b2nsm_allocmem(const char *dat, const char *fmt, int rev, float cycle)
   ptr = nsmlib_allocmem(nsm, dat_uprcase, fmt, rev, cycle);
 
   if (! logfp) return ptr;
+
   if (! ptr) {
-    fprintf(logfp, "%sallocmem(%s,rev.%d) failed: %s\n",
-	    xt(), dat, rev, b2nsm_strerror());
+    nsmlib_log("%sallocmem(%s,rev.%d) failed: %s\n",
+	       xt(), dat, rev, b2nsm_strerror());
   } else {
-    fprintf(logfp, "%sallocmem(%s,rev.%d) at %p\n", xt(), dat, rev, ptr);
+    nsmlib_log("%sallocmem(%s,rev.%d) at %p\n", xt(), dat, rev, ptr);
   }
-  fflush(logfp);
   return ptr;
 }
 /* -- b2nsm_wait -------------------------------------------------------- */

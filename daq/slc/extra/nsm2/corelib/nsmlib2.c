@@ -13,9 +13,14 @@
    20140108 1922 initcli error message fix
    20140124 1925 anonymous node
    20140304 1926 abort when new revision data is started elsewhere
+   20140305 1929 maxrecursive and checkpoints, no fprintf
+   20140306 1930 logfp again, but write instead of fwrite/fprintf
+   20140516 1931 ip address from shm if not specified
+   20140614 1932 sprintf ip address if host is missing
+   20140614 1933 use nodhash for nsmlib_nodeid
 \* ---------------------------------------------------------------------- */
 
-const char *nsmlib2_version   = "nsmlib2 1.9.26";
+const char *nsmlib2_version   = "nsmlib2 1.9.33";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,19 +47,39 @@ const char *nsmlib2_version   = "nsmlib2 1.9.26";
 #define NSMENV_PORT   "NSM2_PORT"
 #define NSMENV_SHMKEY "NSM2_SHMKEY"
 
-#define NSMLIB_MAXRECURSIVE 50    /* default value */
+#define NSMLIB_MAXRECURSIVE 256    /* default value */
 
 static NSMcontext *nsmlib_context = 0;  /* top of the chain */
 static FILE *nsmlib_logfp = 0;
+static int   nsmlib_loglen = 0;
+static char  nsmlib_logbuf[4096];
 static char *nsmlib_incpath = 0;
 static char  nsmlib_errs[1024];    /* error string in case of NSMEUNEXPECTED */
 static int   nsmlib_errc = 0;      /* context independent error code */
+static int   nsmlib_port = 0;      /* error port without context */
+
 static int   nsmlib_debugflag = 0; /* context independent error code */
+static sigset_t nsmlib_sigmask;
+static int   nsmlib_sig;
+
+static int  nsmlib_maxrecursive;
+int  nsmlib_currecursive;
+static int *nsmlib_checkpoints;
+static int  nsmlib_nskipped;
+static NSMtcphead nsmlib_lastskipped;
 
 #define ADDR_N(a)    ((uint32_t)((a).sin_addr.s_addr))
-
+/*
 #define VSPRINTF(buf,fmt,ap)  va_start(ap,fmt);vsprintf(buf,fmt,ap);va_end(ap)
 #define VFPRINTF(fp,fmt,ap)   va_start(ap,fmt);vfprintf(fp,fmt,ap);va_end(ap)
+*/
+#define LOGEND (nsmlib_logbuf + nsmlib_loglen)
+#define LOGCLR nsmlib_loglen = 0
+#define LOGSIZ (sizeof(nsmlib_logbuf) - nsmlib_loglen - 1)
+#define LOGFWD nsmlib_loglen += strlen(LOGEND)
+#define LOGCAT(s) strcpy(LOGEND, s); LOGFWD
+
+#define VSNPRINTF(buf,s,f,ap) va_start(ap,f);vsnprintf(buf,s,f,ap);va_end(ap)
 #define SOCKOPT(s,o,v)        setsockopt(s,SOL_SOCKET,o,(char *)&(v),sizeof(v))
 
 #define MEMPOS(base,ptr) ((char *)(ptr) - (char *)(base))
@@ -63,7 +88,12 @@ static int   nsmlib_debugflag = 0; /* context independent error code */
 #define ASSERT nsmlib_assert
 #define ERROR  nsmlib_error
 #define DBG    nsmlib_debug
-#define LOG    nsmlib_log
+#define LOG    nsmlib_lognl
+
+/* checkpoint of signal handler to be studied with gdb
+   0: never called, -1: done, 1..1000 user checkpoint, 1001.. corelib/b2lib
+ */
+#define DBS(nsmc,val) nsmlib_checkpoints[nsmlib_currecursive] = (val)
 
 int nsmlib_hash(NSMsys *, int32_t *hashtable, int hashmax,
 		const char *key, int create);
@@ -95,16 +125,35 @@ htonll(uint64 h)
     return n;
   }
 }
+/* -- nsmlib_logflush ------------------------------------------------ */
+void
+nsmlib_logflush()
+{
+  /*
+    (fwrite version does not properly work at 1.9.30)
+    fwrite(nsmlib_logbuf, nsmlib_loglen, 1, nsmlib_logfp);
+    fflush(nsmlib_logfp);
+  */
+  write(fileno(nsmlib_logfp), nsmlib_logbuf, nsmlib_loglen);
+  LOGCLR;
+}
 /* -- nsmlib_assert -------------------------------------------------- */
 static void
 nsmlib_assert(const char *fmt, ...)
 {
   va_list ap;
   if (! nsmlib_logfp) return;
-  fprintf(nsmlib_logfp, "ASSERT: ");
-  VFPRINTF(nsmlib_logfp, fmt, ap);
-  /* if (errno) fprintf(nsmlib_logfp, "(%s)", strerror(errno)); */
-  fprintf(nsmlib_logfp, "\n");
+
+  if (LOGSIZ < 256) {
+    LOGCLR;
+    LOGCAT("(output buffer shrinked)\n");
+  }
+  
+  LOGCAT("ASSERT: ");
+  VSNPRINTF(LOGEND, LOGSIZ, fmt, ap);
+  LOGFWD;
+  LOGCAT("\n");
+  nsmlib_logflush();
   exit(1);
 }
 /* -- nsmlib_error --------------------------------------------------- */
@@ -112,11 +161,19 @@ static void
 nsmlib_error(const char *fmt, ...)
 {
   va_list ap;
+
   if (! nsmlib_logfp) return;
-  fprintf(nsmlib_logfp, "Error: ");
-  VFPRINTF(nsmlib_logfp, fmt, ap);
-  if (errno) fprintf(nsmlib_logfp, "(%s)", strerror(errno));
-  fprintf(nsmlib_logfp, "\n");
+
+  if (LOGSIZ < 256) {
+    LOGCLR;
+    LOGCAT("(output buffer shrinked)\n");
+  }
+  
+  LOGCAT("ERROR: ");
+  VSNPRINTF(LOGEND, LOGSIZ, fmt, ap);
+  LOGFWD;
+  LOGCAT("\n");
+  nsmlib_logflush();
 }
 /* -- nsmlib_debuglevel ---------------------------------------------- */
 int
@@ -133,21 +190,52 @@ nsmlib_debug(const char *fmt, ...)
   va_list ap;
   if (! nsmlib_logfp) return;
   if (! nsmlib_debugflag) return;
-  fprintf(nsmlib_logfp, "[DBG] ");
-  VFPRINTF(nsmlib_logfp, fmt, ap);
-  fprintf(nsmlib_logfp, "\n");
+
+  if (LOGSIZ > 256) {
+    LOGCAT("[DBG] ");
+    VSNPRINTF(LOGEND, LOGSIZ, fmt, ap);
+    LOGFWD;
+    LOGCAT("\n");
+  }
+}
+/* -- nsmlib_lognl --------------------------------------------------- */
+void
+nsmlib_lognl(const char *fmt, ...)
+{
+  va_list ap;
+  if (! nsmlib_logfp) return;
+  if (LOGSIZ > 256) {
+    VSNPRINTF(LOGEND, LOGSIZ, fmt, ap);
+    LOGFWD;
+    LOGCAT("\n");
+  }
 }
 /* -- nsmlib_log ----------------------------------------------------- */
-static void
+void
 nsmlib_log(const char *fmt, ...)
 {
   va_list ap;
-  
   if (! nsmlib_logfp) return;
-  VFPRINTF(nsmlib_logfp, fmt, ap);
-  fprintf(nsmlib_logfp, "\n");
+  if (LOGSIZ > 256) {
+    VSNPRINTF(LOGEND, LOGSIZ, fmt, ap);
+    LOGFWD;
+  }
+}
+/* -- nsmlib_logging ------------------------------------------------- */
+void
+nsmlib_logging(FILE *logfp)
+{
+  nsmlib_logfp = logfp;
 }
 
+/* -- nsmlib_checkpoint ---------------------------------------------- *\
+   for user function, between 1 and 999 (outside range becomes 1000)
+\* ------------------------------------------------------------------- */
+void
+nsmlib_checkpoint(NSMcontext *nsm, int val)
+{
+  DBS(nsm, val);
+}
 /* -- nsm_strerror --------------------------------------------------- */
 const char *
 nsmlib_strerror(NSMcontext *nsmc)
@@ -174,33 +262,39 @@ nsmlib_strerror(NSMcontext *nsmc)
   case NSMETIMEOUT:  return "select timeout";
   case NSMEWRITE:    syserr = "write(socket)"; break;
   case NSMEUNEXPECTED: return errs;
-  case NSMECLOSED:   return "NSMD connection closed";
-  case NSMEPIPEREAD: syserr = "read(pipe)"; break;
+  case NSMECLOSED:    return "NSMD connection closed";
+  case NSMEPIPEREAD:  syserr = "read(pipe)"; break;
   case NSMEPIPEWRITE: syserr = "write(pipe)"; break;
   case NSMEDATID: return errs;
     /* possible errors by user parameters */
-  case NSMENOMASTER: return "no NSM master";
-  case NSMEINVNAME: return "invalid name"; /* from nsmd2, shouldn't happen */
-  case NSMEINVPAR: return "invalid parameter";
+  case NSMENOMASTER:  return "no NSM master";
+  case NSMEINVNAME:   return "invalid name"; /* from nsmd2, shouldn't happen */
+  case NSMEINVPAR:    return "invalid parameter";
   case NSMENODEEXIST: return errs; /* "node already exist" from nsmd2 */
   case NSMEFULNODE:   return errs; /* "no more NSM node"   from nsmd2 */
-  case NSMENODEST: return "destination node is gone"; /* why unsed? */
-  case NSMEINVFMT: return "invalid data format"; /* from nsmd2 */
-  case NSMEMEMEXIST: return "data alraedy exists"; /* why unused? */
+  case NSMENODEST:    return "destination node is gone"; /* why unsed? */
+  case NSMEINVFMT:    return "invalid data format"; /* from nsmd2 */
+  case NSMEMEMEXIST:  return "data alraedy exists"; /* why unused? */
   case NSMENOMOREMEM: return "no more data area"; /* why unused? */
-  case NSMEOPENED: return "already opened"; /* from nsmd2 */
-  case NSMENODENAME: return "invalid node name";
-  case NSMENODELONG: return "node name too long"; /* why unused? */
-  case NSMEHOSTNAME: return "invalid hostname";
-  case NSMEALREADYP: return "host:port already in use";
-  case NSMEALREADYS: return "shm key already in use";
-  case NSMEALREADYH: return "host:port already in use"; /* deprecated */
-  case NSMENOIF: return "network interface not found";
-  case NSMENONSMD: syserr = "cannot connect to NSMD"; break;
-  case NSMENOUID:    return "uid not received";
-  case NSMERDCLOSE:  return "uid not fully received";
-  case NSMEACCESS:   return "NSMD is running under different uid";
-  case NSMESHMGETSYS: syserr = "cannot open NSMsys shared memory"; break;
+  case NSMEOPENED:    return "already opened"; /* from nsmd2 */
+  case NSMENODENAME:  return "invalid node name";
+  case NSMENODELONG:  return "node name too long"; /* why unused? */
+  case NSMEHOSTNAME:  return "invalid hostname";
+  case NSMEALREADYP:  return "host:port already in use";
+  case NSMEALREADYS:  return "shm key already in use";
+  case NSMEALREADYH:  return "host:port already in use"; /* deprecated */
+  case NSMENOIF:      return "network interface not found";
+  case NSMENONSMD:    return "orphan shared memory with no nsmd2 running";
+  case NSMECONNECT:   syserr = "cannot connect to nsmd2"; break;
+  case NSMENOUID:     return "uid not received";
+  case NSMERDCLOSE:   return "uid not fully received";
+  case NSMEACCESS:    return "nsmd2 is running under different uid";
+  case NSMESHMGETSYS:
+    if (errno == ENOENT) {
+      sprintf(buf, "no nsmd2 or shared memory with NSM2_PORT=%d", nsmlib_port);
+      return buf;
+    }
+    syserr = "cannot open NSMsys shared memory"; break;
   case NSMESHMGETMEM:
     if (errno == EACCES) {
       strcpy(buf, "nsmd2 shared memory must have either the same uid or gid");
@@ -313,16 +407,14 @@ int
 nsmlib_nodeid(NSMcontext *nsmc, const char *nodename)
 {
   int i;
-  NSMsys *sysp;
+  NSMsys *sysp = nsmc ? nsmc->sysp : 0;
   const char *namep;
+  int hash = nsmlib_hash(sysp, sysp->nodhash, NSMSYS_MAX_HASH, nodename, 0);
+  NSMnod *nodp = (NSMnod *)MEMPTR(sysp, ntohl(sysp->nodhash[hash]));
 
-  if (! nsmc || ! (sysp = nsmc->sysp)) return -1;
-  if (! nodename || *nodename == '(')  return -1;
-  
-  for (i=0; i <= NSMSYS_MAX_NOD; i++) {
-    if (strcmp(nodename, sysp->nod[i].name) == 0) return i;
-  }
-  return -1;
+  if (! nsmc || ! sysp || hash < 0)   return -1;
+  if (! nodename || *nodename == '(') return -1;
+  return (int)(nodp - sysp->nod);
 }
 
 /* -- nsmlib_checkif ------------------------------------------------- */
@@ -378,7 +470,8 @@ nsmlib_checkif(NSMcontext *nsmc, SOCKAD_IN *sap)
     } else if ((ifr->ifr_flags & IFF_UP) == 0) {
       DBG("nsmlib_checkif: interface <%s> is down", ifr->ifr_name);
       
-    } else if ((ifr->ifr_flags & IFF_BROADCAST) == 0) {
+    } else if ((ifr->ifr_flags & IFF_BROADCAST) == 0 &&
+               (ifr->ifr_flags & IFF_LOOPBACK) == 0) {
       DBG("nsmlib_checkif: interface <%s> does not support broadcast",
 	  ifr->ifr_name);
 
@@ -417,21 +510,28 @@ nsmlib_initnet(NSMcontext *nsmc, const char *host, int port)
   uid_t nsmd_euid;
   fd_set fdset;
   struct timeval tv;
-  
-  /* -- environment variables -- */
-  if (! port)   port   = nsmlib_atoi(getenv(NSMENV_PORT), NSM2_PORT);
-  if (! host)   host   = getenv(NSMENV_HOST);
+
+  /* -- check process -- */
+  if (kill(nsmc->sysp->pid, 0) < 0 && errno == ESRCH) {
+    return NSMENONSMD;
+  }
   
   /* -- port and host -- */
-  nsmc->port   = port;
   memset(nsmc->hostname, sizeof(nsmc->hostname), 0);
-  if (  host) strncpy(nsmc->hostname, host, sizeof(nsmc->hostname));
-  if (! host) gethostname(nsmc->hostname, sizeof(nsmc->hostname));
-  if (! nsmc->hostname[0]) return NSMEHOSTNAME;
-
-  hp = gethostbyname(nsmc->hostname);
   memset(&nsmc->sa, 0, sizeof(nsmc->sa));
-  memcpy(&nsmc->sa.sin_addr, hp->h_addr, hp->h_length);
+
+  memcpy(&nsmc->sa.sin_addr, &nsmc->sysp->ipaddr, 4);
+  hp = gethostbyaddr(&nsmc->sa.sin_addr, 4, AF_INET);
+  if (hp) {
+    strcpy(nsmc->hostname, hp->h_name);
+  } else {
+    sprintf(nsmc->hostname, "%d.%d.%d.%d",
+	    ((const char *)&nsmc->sysp->ipaddr)[0],
+	    ((const char *)&nsmc->sysp->ipaddr)[1],
+	    ((const char *)&nsmc->sysp->ipaddr)[2],
+	    ((const char *)&nsmc->sysp->ipaddr)[3]);
+  }
+  
   nsmc->sa.sin_family = AF_INET;
   nsmc->sa.sin_port   = htons((short)nsmc->port);
 
@@ -455,8 +555,9 @@ nsmlib_initnet(NSMcontext *nsmc, const char *host, int port)
   if (SOCKOPT(nsmc->sock, SO_RCVBUF,    size) < 0) return NSMESOCKRCVBUF;
 
   /* -- connect -- */
-  if (connect(nsmc->sock, (SOCKAD *)&nsmc->sa, sizeof(nsmc->sa)) < 0)
-    return NSMENONSMD;
+  if (connect(nsmc->sock, (SOCKAD *)&nsmc->sa, sizeof(nsmc->sa)) < 0) {
+    return NSMECONNECT;
+  }
 
   /* -- should receive 4 bytes -- */
   FD_ZERO(&fdset);
@@ -489,19 +590,24 @@ nsmlib_initnet(NSMcontext *nsmc, const char *host, int port)
 }
 /* -- nsmlib_initshm ------------------------------------------------- */
 /*
-  initshm has to be called after initnet, as it depends on nsmc->port
+  initshm has to be called before initnet
  */
 int
-nsmlib_initshm(NSMcontext *nsmc, int shmkey)
+nsmlib_initshm(NSMcontext *nsmc, int shmkey, int port)
 {
+  /* -- initshm is called before inetnet --*/
+  nsmc->port   = port;
+
   /* -- environment variables for shmkey -- */
-  if (! shmkey) shmkey = nsmlib_atoi(getenv(NSMENV_SHMKEY), nsmc->port);
+  if (! shmkey) shmkey = nsmlib_atoi(getenv(NSMENV_SHMKEY), port);
   nsmc->shmkey = shmkey;
 
   /* -- system shared memory (read-only) -- */
   DBG("nsmlib_initshm: key=%d size=%d", shmkey, sizeof(NSMsys));
   nsmc->sysid = shmget(shmkey, sizeof(NSMsys), 0444);
   if (nsmc->sysid < 0) {
+    /* -- most likely nsmd is not running,
+       -- further check is made in initnet -- */
     return NSMESHMGETSYS;
   }
 
@@ -579,7 +685,7 @@ nsmlib_selectc(int usesig, unsigned int msec)
     return 0;
   }
   if (usesig > 0 && msec > 0 && ret <= 0) {
-    ASSERT("nsmlib_selectc should not reach here - ret=%d msec=%d usesig=%d", ret, msec, nsmc->usesig);
+    LOG("nsmlib_selectc should not reach here - ret=%d msec=%d usesig=%d", ret, msec, nsmc->usesig);
   }
   return 0;
 }
@@ -655,7 +761,7 @@ nsmlib_recv(NSMcontext *nsmc, NSMtcphead *hp, int wait_msec)
     DBG("recv 3 bufp=%x", bufp);
     while (recvlen < datalen) {
       DBG("recv 4");
-      if (recvlen > 0) ret = nsmlib_select(sock, 0, 1); /* 1 msec */
+      if (recvlen > 0) ret = nsmlib_select(sock, 0, 100); /* 1 msec */
       if (ret < 0)  ASSERT("nsmlib_recv: should not reach here (2)");
       if (ret == 0) ASSERT("nsmlib_recv: should not reach here (3)");
       if ((ret = read(sock, bufp+recvlen, datalen)) <= 0) {
@@ -737,6 +843,8 @@ nsmlib_call(NSMcontext *nsmc, NSMtcphead *hp)
   NSMrequest *reqp = nsmc->req;
   NSMrequest *reqlast = reqp + nsmc->nreq;
 
+  DBS(nsmc,1002);
+  
   /* search request */
   msg.req = ntohs(hp->req);
   while (reqp < reqlast) {
@@ -756,6 +864,8 @@ nsmlib_call(NSMcontext *nsmc, NSMtcphead *hp)
   }
   DBG("nsmlib_call req=%s", reqp->name);
 
+  DBS(nsmc,1003);
+  
   /* fill other msg entries */
   msg.req  = ntohs(hp->req);
   msg.seq  = ntohs(hp->seq);
@@ -768,6 +878,8 @@ nsmlib_call(NSMcontext *nsmc, NSMtcphead *hp)
   }
   msg.datap = msg.len ? recvbuf + msg.npar*sizeof(int32_t) : 0;
 
+  DBS(nsmc,1004);
+  
   switch (reqp->functype) {
   case NSMLIB_FNSYS:
     if (! reqp->callback) {
@@ -776,17 +888,22 @@ nsmlib_call(NSMcontext *nsmc, NSMtcphead *hp)
       }
       nsmc->reqwait = 0;
       DBG("pipewrite pars0=%d", msg.pars[0]);
+      DBS(nsmc,1006);
       nsmlib_pipewrite(nsmc, msg.pars[0]);
+      DBS(nsmc,1008);
       break;
     }
     /* no break */
 
   case NSMLIB_FNSTD:
+    DBS(nsmc,1010);
     if (! nsmc->hook) {
       DBG("nsmlib_call calling callback without hook");
+      DBS(nsmc,1012);
       reqp->callback(&msg, nsmc);
     } else if (! nsmc->hook(&msg, nsmc)) {
       DBG("nsmlib_call calling callback");
+      DBS(nsmc,1014);
       reqp->callback(&msg, nsmc);
     } else {
       DBG("nsmlib_call hook error");
@@ -796,6 +913,7 @@ nsmlib_call(NSMcontext *nsmc, NSMtcphead *hp)
   default:
     DBG("nsmlib_call functype=%d", reqp->functype);
   }
+  DBS(nsmc,1016);
 }
 /* -- nsmlib_handler ------------------------------------------------- */
 static void
@@ -812,8 +930,6 @@ nsmlib_handler(int sig)
   
   /* sigset */
   if (! sig) return; /* this should not be directly called */
-  sigemptyset(&mask);
-  sigaddset(&mask, sig);
 
   /* in the signal handler mode, it can handle more than one signals */
   while (1) {
@@ -829,16 +945,26 @@ nsmlib_handler(int sig)
     }
 
     /* callback function */
-    nsmc->currecursive++;
-    sigprocmask(SIG_UNBLOCK, &mask, 0);
-    nsmlib_call(nsmc, (NSMtcphead *)buf);
-    sigprocmask(SIG_BLOCK, &mask, 0);
-    nsmc->currecursive--;
-  }
+    if (nsmlib_currecursive >= nsmlib_maxrecursive) {
+      nsmlib_nskipped++;
+      nsmlib_lastskipped = *(NSMtcphead *)buf;
+    } else {
+      nsmlib_currecursive++;
+      DBS(nsmc,1001);
+      sigemptyset(&mask);
+      sigaddset(&mask, sig);
+      sigprocmask(SIG_UNBLOCK, &mask, 0);
+      nsmlib_call(nsmc, (NSMtcphead *)buf);
+      /*sigprocmask(SIG_BLOCK, &mask, 0);*/
+      DBS(nsmc,-1);
+      nsmlib_currecursive--;
+    }
+  };
 
-  /* unblock and return */
-  /* DBG("nsmlib_handler return"); */
-  /* sigprocmask(SIG_UNBLOCK, &mask, 0); */
+  if (nsmlib_logfp && nsmlib_loglen && ! nsmlib_currecursive) {
+    nsmlib_logflush();
+  }
+  
   return;
 }
 /* -- nsmlib_callbackid ---------------------------------------------- */
@@ -942,20 +1068,32 @@ nsmlib_delclient(NSMmsg *msg, NSMcontext *nsmc)
 int
 nsmlib_initsig(NSMcontext *nsmc)
 {
-#ifdef SIGRTMIN
-  void nsmlib_handler(int signo, siginfo_t *info, void *ignored);
-  int  sig = SIGRTMIN;
-#define NSMLIB_SETHANDLER(s,h) (s).sa_sigaction=(h); (s).sa_flags = SA_SIGINFO
-#else
-  void nsmlib_handler(int);
-  int  sig = SIGUSR1;
-#define NSMLIB_SETHANDLER(a,h) (a).sa_sighandler=(h)
-#endif
   struct sigaction action;
   int pipes[2];
+#ifdef SIGRTMIN
+  void nsmlib_handler(int signo, siginfo_t *info, void *ignored);
+  nsmlib_sig = SIGRTMIN;
+#define NSMLIB_SETHANDLER(s,h) (s).sa_sigaction=(h); (s).sa_flags = SA_SIGINFO|SA_RESTART
+#else
+  void nsmlib_handler(int);
+  nsmlib_sig = SIGUSR1;
+#define NSMLIB_SETHANDLER(a,h) (a).sa_sighandler=(h)
+#endif
 
-  nsmc->maxrecursive = NSMLIB_MAXRECURSIVE;
-  nsmc->currecursive = 0;
+  sigemptyset(&nsmlib_sigmask);
+  sigaddset(&nsmlib_sigmask, nsmlib_sig);
+
+  if (! nsmlib_checkpoints) {
+    nsmlib_currecursive = 0;
+    nsmlib_maxrecursive = NSMLIB_MAXRECURSIVE;
+    nsmlib_nskipped = 0;
+    memset(&nsmlib_lastskipped, 0, sizeof(nsmlib_lastskipped));
+    nsmlib_checkpoints = malloc(sizeof(int) * nsmlib_maxrecursive);
+    if (! nsmlib_checkpoints) {
+      ASSERT("can't alloc %d bytes", sizeof(int) * nsmlib_maxrecursive);
+    }
+    memset(nsmlib_checkpoints, 0, sizeof(int) * nsmlib_maxrecursive);
+  }
 
   /* create pipes */
   if (pipe(pipes) < 0) return NSMENOPIPE;
@@ -975,7 +1113,7 @@ nsmlib_initsig(NSMcontext *nsmc)
   /* setup signals */
   memset(&action, 0, sizeof(action));
   sigemptyset(&action.sa_mask);
-  sigaddset(&action.sa_mask, sig);
+  sigaddset(&action.sa_mask, nsmlib_sig);
   NSMLIB_SETHANDLER(action, nsmlib_handler);
   /*
     Don't do: action.sa_flags |= SA_RESTART;
@@ -983,7 +1121,7 @@ nsmlib_initsig(NSMcontext *nsmc)
     return with EINTR upon NSM signal, because this NSM signal may be
     the one to clear the blocking condition.
   */
-  sigaction(sig, &action, 0);
+  sigaction(nsmlib_sig, &action, 0);
 
   nsmc->usesig = -1; /* undecided */
   nsmc->initsig_done = 1;
@@ -1000,13 +1138,18 @@ nsmlib_send(NSMcontext *nsmc, NSMmsg *msgp)
   int writelen;
   int err = 0;
   int i;
+  int oldsig;
 
+  DBS(nsmc,1100);
+  
   if (! nsmc)                         return NSMENOINIT;
   if (nsmc->sock < 0)                 return NSMENOINIT;
   if (nsmc->nodeid == NSMSYS_MAX_NOD) return NSMEPERM; /* anonymous */
 
   if (msgp->len == 0 && msgp->datap != 0)   return NSMEINVDATA;
   if (msgp->len == 0 && msgp->datap != 0)   return NSMEINVDATA;
+  
+  DBS(nsmc,1102);
   
   DBG("nsmlib_send nodeid=%d, req=%04x", msgp->node, msgp->req);
   
@@ -1016,6 +1159,7 @@ nsmlib_send(NSMcontext *nsmc, NSMmsg *msgp)
   hp->seq  = htons(msgp->seq);
   hp->npar = msgp->npar;
   hp->len  = htons(msgp->len);
+  hp->from = 0;
   for (i=0; i<hp->npar; i++) {
     *(int32_t *)datap = htonl(msgp->pars[i]);
     datap += sizeof(int32_t);
@@ -1028,6 +1172,7 @@ nsmlib_send(NSMcontext *nsmc, NSMmsg *msgp)
   }
   writep = buf;
 
+  DBS(nsmc,1104);
   DBG("writep = %x", writep);
 
   while (writelen > 0) {
@@ -1062,9 +1207,11 @@ nsmlib_send(NSMcontext *nsmc, NSMmsg *msgp)
     writelen -= ret;
     writep   += ret;
   }
+  DBS(nsmc,1106);
   return 0;
   
  nsmlib_send_error:
+  DBS(nsmc,1199);
   shutdown(nsmc->sock, 2);
   nsmc->sock = -1;
   return err; /* nsmc->errc or nsmlib_errc is set in the caller */
@@ -1226,8 +1373,7 @@ nsmlib_readmem(NSMcontext *nsmc, void *buf,
   if (! (nsmlib_parsefile(fmtname, revision, nsmlib_incpath, fmtstr))) {
     int errcode;
     const char *errstr = nsmlib_parseerr(&errcode);
-    sprintf(nsmc->errs, "parse error for data %s (%d) %s",
-	    datname, errcode, errstr);
+    sprintf(nsmc->errs, "cannot read data %s, %s", datname, errstr);
     return nsmc->errc = NSMEPARSE;
   }
 
@@ -1279,8 +1425,7 @@ nsmlib_openmem(NSMcontext *nsmc,
   if (! (nsmlib_parsefile(fmtname, revision, nsmlib_incpath, fmtstr))) {
     int errcode;
     const char *errstr = nsmlib_parseerr(&errcode);
-    sprintf(nsmc->errs, "parse error for data %s (%d) %s",
-	    datname, errcode, errstr);
+    sprintf(nsmc->errs, "cannot open data %s, %s", datname, errstr);
     nsmc->errc = NSMEPARSE;
     return 0;
   }
@@ -1322,7 +1467,7 @@ nsmlib_openmem(NSMcontext *nsmc,
     return 0;
   }
   if (ret != datp - sysp->dat) {
-    sprintf(nsmc->errs, "datid mismatch %d %d", ret, datp - sysp->dat);
+    sprintf(nsmc->errs, "datid mismatch %d %d", ret, (int)(datp - sysp->dat));
     nsmc->errc = NSMEDATID;
     return 0;
   }
@@ -1355,8 +1500,7 @@ nsmlib_allocmem(NSMcontext *nsmc, const char *datname, const char *fmtname,
   if (! (nsmlib_parsefile(fmtname, revision, nsmlib_incpath, fmtstr))) {
     int errcode;
     const char *errstr = nsmlib_parseerr(&errcode);
-    sprintf(nsmc->errs, "parse error for data %s (%d) %s",
-	    datname, errcode, errstr);
+    sprintf(nsmc->errs, "cannot allocate data %s, %s", datname, errstr);
     nsmc->errc = NSMEPARSE;
     return 0;
   }
@@ -1424,11 +1568,15 @@ nsmlib_init(const char *nodename, const char *host, int port, int shmkey)
   strcpy(nsmc->nodename, nodename ? nodename : "(anonymous)");
   nsmc->sock = -1;
 
+  /* -- environment variables -- */
+  if (! port)   port   = nsmlib_atoi(getenv(NSMENV_PORT), NSM2_PORT);
+  if (! host)   host   = getenv(NSMENV_HOST);
+  
+  /* -- shared memory initialization -- */
+  if (ret == 0) ret = nsmlib_initshm(nsmc, shmkey, port);
+
   /* -- network initialization -- */
   if (ret == 0) ret = nsmlib_initnet(nsmc, host, port);
-
-  /* -- shared memory initialization -- */
-  if (ret == 0) ret = nsmlib_initshm(nsmc, shmkey);
 
   /* -- signal handler initialization -- */
   if (ret == 0) ret = nsmlib_initsig(nsmc);
@@ -1442,6 +1590,7 @@ nsmlib_init(const char *nodename, const char *host, int port, int shmkey)
     nsmlib_context = nsmc;    /* -- insert at the top -- */
   } else {
     nsmlib_errc = ret;
+    nsmlib_port = port;
     free(nsmc);
     nsmc = 0;
   }

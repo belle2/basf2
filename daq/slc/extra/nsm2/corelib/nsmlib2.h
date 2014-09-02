@@ -84,8 +84,6 @@ int  initsig_done;
 int  pipe_rd;
 int  pipe_wr;
 int  reqwait;
-int  maxrecursive;
-int  currecursive;
 int  nreq;
 NSMrequest req[NSMLIB_MAX_CALLBACK];
 
@@ -105,6 +103,8 @@ const void* wrapptr;
 };
 
 
+void nsmlib_logging(FILE* logfp);
+void nsmlib_checkpoint(NSMcontext* nsmc, int val);
 int nsmlib_debuglevel(int val);
 const char* nsmlib_nodename(NSMcontext* nsmc, int nodeid);
 int nsmlib_reqid(NSMcontext* nsmc, const char* reqname);
@@ -126,8 +126,8 @@ NSMcontext* nsmlib_init(const char* nodename, const char* host,
 void nsmlib_usesig(NSMcontext* nsmc, int usesig);
 NSMcontext* nsmlib_selectc(int usesig, unsigned int msec);
 void nsmlib_call(NSMcontext* nsmc, NSMtcphead* hp);
-//char* nsmlib_parsefile(const char* datname, int revision, const char* incpath,
-//                       char* fmtstr);
+//char *nsmlib_parsefile(const char *datname, int revision, const char *incpath,
+//           char *fmtstr);
 
 #if defined(__dummy_open_bracket_to_cheat_emacs_auto_indent)
 __dummy_open_bracket_to_cheat_emacs_auto_indent {

@@ -1,3 +1,12 @@
+/* ---------------------------------------------------------------------- *\
+   nsmhash.c
+
+   hash table calculation library for NSM2
+
+   20130117 ---- initial version
+   20140614 1933 check nsmd_sysp pointer before using
+\* ---------------------------------------------------------------------- */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,6 +56,8 @@ nsmlib_hash(struct NSMsys *nsmd_sysp, int32 *hashtable, int hashmax,
   int code = nsmlib_hashcode(key, hashmax);
   int num = code;
   int delta = 0;
+
+  if (! nsmd_sysp) return -1;
   
   while (hashtable[num] && strcmp(SYSPTR(ntohl(hashtable[num])), key) != 0) {
     num = (num + 1) % hashmax;

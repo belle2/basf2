@@ -6,6 +6,7 @@
   20140304 multi-dim array
   20140304 a simple #define can be used
   20131229 stdint.h definitions are added
+  20140428 nsmparse_malloc fix
  */
 
 #include <stdio.h>
@@ -49,12 +50,11 @@ nsmparse_malloc(size_t siz, const char *where, const char *text)
   char *p = (char *)malloc(siz);
   if (! p) {
     printf("nsmparse_malloc: can't malloc %d bytes%s%s%s%s\n",
-	   siz,
+	   (int)siz,
 	   where ? " in " : "", where ? where : "",
 	   text  ? ": "   : "", text  ? text  : "");
     exit(1);
   }
-  memset(p, 0 ,siz);
   return p;
 }
 /* -- eval ------------------------------------------------------------- *\
@@ -212,8 +212,9 @@ nsmparse_error(char *fmt, const char *file, char *filebuf, char *p)
 }
 /* -- getname ---------------------------------------------------------- *\
 \* --------------------------------------------------------------------- */
-char *nsmparse_getname(const char *file, char *filebuf,
-		       char *ptr, char *dest, int siz)
+char *
+nsmparse_getname(const char *file, char *filebuf,
+                 char *ptr, char *dest, int siz)
 {
   char *q;
   if (! isalpha(*ptr) && *ptr != '_') {
@@ -493,7 +494,7 @@ nsmparse_scan(const char *file, char *filebuf, char *start, char **endp,
 	if (! *nestp) {
 	  sym_prev = fmtout2[0];
 	  n_same = (fmtout2[1] ? atoi(&fmtout2[1]) : 1) * num;
-	  printf("<%c:%d>\n", sym_prev, n_same);
+	  /* printf("<%c:%d>\n", sym_prev, n_same); */
 	} else {
 	  sprintf(fmtstr+strlen(fmtstr), "(%s)%d", fmtout2, num);
 	  sym_prev = 0;

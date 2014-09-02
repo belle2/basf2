@@ -32,9 +32,9 @@ namespace Belle2 {
       RelationArray relMCSimHit(mcParticles, simHits);
 
       //Register all collections we want to modify and require those we want to use
-      mcParticles.registerAsPersistent();
-      simHits.registerAsPersistent();
-      relMCSimHit.registerAsPersistent();
+      mcParticles.registerInDataStore();
+      simHits.registerInDataStore();
+      relMCSimHit.registerInDataStore();
 
       //Register the Relation so that the TrackIDs get replaced by the actual
       //MCParticle indices after simulating the events. This is needed as

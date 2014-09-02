@@ -350,7 +350,7 @@ NSMparse* NSMData::parse(NSMparse* ptr, int& length,
       m_size += data.m_size * length;
     } else if (type == ')') {
       name_in = name;
-      return ptr;
+      return ptr->next;
     }
     FieldInfo::Property pro((FieldInfo::Type)type, length, offset);
     add(name, pro);

@@ -438,7 +438,7 @@ nsmparse_scan(const char *file, char *filebuf, char *start, char **endp,
 					       "scan", file);
 	parsep = parsetop;
       }
-      memset(parsep, sizeof(NSMparse), 0);
+      memset(parsep, 0, sizeof(NSMparse));
       parsep->type = '(';
       parsep->offset = offset; /* probably not correct */
       
@@ -462,7 +462,7 @@ nsmparse_scan(const char *file, char *filebuf, char *start, char **endp,
 	ptr++;
 	while (isspace(*ptr)) ptr++;
 	parsep->next = nsmparse_scan(file, filebuf, ptr, &ptr, fmtout2, &siz2);
-	while (parsep->next) parsep = parsep->next;
+	while (parsep->next)  parsep = parsep->next;
 	parsep->next = (NSMparse *)nsmparse_malloc(sizeof(NSMparse),
 						   "scan", file);
 	parsep = parsep->next;
@@ -517,7 +517,7 @@ nsmparse_scan(const char *file, char *filebuf, char *start, char **endp,
 						 "scan", file);
 	  parsep = parsetop;
 	}
-	memset(parsep, sizeof(NSMparse), 0);
+	memset(parsep, 0, sizeof(NSMparse));
 	parsep->type = typep->type;
 	parsep->offset = offset;
 	ptr += len+1;
@@ -735,7 +735,7 @@ main(int argc, char **argv)
   NSMparse *parsep;
   char indent[256];
 
-  memset(fmtstr, sizeof(fmtstr), 0);
+  memset(fmtstr, 0, sizeof(fmtstr));
   
   if (argc < 3) {
     printf("usage: %s <data-name> <revision> [<path-list>]\n", argv[0]);

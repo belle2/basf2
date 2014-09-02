@@ -517,7 +517,7 @@ nsmlib_initnet(NSMcontext *nsmc, const char *host, int port)
   }
   
   /* -- port and host -- */
-  memset(nsmc->hostname, sizeof(nsmc->hostname), 0);
+  memset(nsmc->hostname, 0, sizeof(nsmc->hostname));
   memset(&nsmc->sa, 0, sizeof(nsmc->sa));
 
   memcpy(&nsmc->sa.sin_addr, &nsmc->sysp->ipaddr, 4);
@@ -1564,7 +1564,7 @@ nsmlib_init(const char *nodename, const char *host, int port, int shmkey)
   }
 
   /* -- set up nsm context -- */
-  memset(nsmc, sizeof(*nsmc), 0);
+  memset(nsmc, 0, sizeof(*nsmc));
   strcpy(nsmc->nodename, nodename ? nodename : "(anonymous)");
   nsmc->sock = -1;
 

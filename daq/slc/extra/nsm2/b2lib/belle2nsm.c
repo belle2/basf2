@@ -426,7 +426,7 @@ b2nsm_init2(const char *nodename, int usesig,
     nsm = 0;
     b2nsm_errc = NSMEALLOC;
   }
-  memset((char *)nsm->wrapptr, sizeof(b2nsm_t), 0);
+  memset((char *)nsm->wrapptr, 0, sizeof(b2nsm_t));
   strcpy(((b2nsm_t *)nsm->wrapptr)->state, "UNKNOWN");
   
   return nsm;

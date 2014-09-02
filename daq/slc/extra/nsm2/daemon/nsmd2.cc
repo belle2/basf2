@@ -5057,7 +5057,7 @@ main(int argc, char** argv)
   if (! nsmgrp)   nsmgrp = getenv(NSMDENV_GROUP);
 
   // network related global variables
-  memset(nsmd_host, sizeof(nsmd_host), 0);
+  memset(nsmd_host, 0, sizeof(nsmd_host));
   if (host) strncpy(nsmd_host, host, sizeof(nsmd_host));
   if (! host) gethostname(nsmd_host, sizeof(nsmd_host));
   if (! nsmd_host[0]) ERRO("can't gethostname");

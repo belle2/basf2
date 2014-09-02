@@ -43,6 +43,7 @@ drop table if exists nodeinfo_names;
 drop table if exists nodeinfo;
 drop table if exists groupinfo;
 drop table if exists runnumberinfo;
+drop table if exists fileinfo;
 
 create or replace function create_if_not_exists (table_name text, create_stmt text)
 returns void as $$
@@ -442,4 +443,18 @@ returns runnumberinfo as $$
   select $1, $2, $3, $4
   returning *;
 $$ language sql;
+
+create table fileinfo (
+  record_time timestamp with time zone not null default current_timestamp,
+  id serial primary key, 
+  path text not null, 
+  expno int not null,
+  runno int not null,
+  fileid int not null,
+  diskid int not null,
+  time_create timestamp with time zone,
+  time_close timestamp with time zone,
+  time_copy timestamp with time zone,
+  time_delete timestamp with time zone
+);
 

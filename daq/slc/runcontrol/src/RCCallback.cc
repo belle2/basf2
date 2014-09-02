@@ -151,7 +151,6 @@ bool RCCallback::preload(const NSMMessage& msg) throw()
           std::string nodename = getNode().getName();
           ConfigObjectTable table(m_db);
           m_config.setObject(table.get(runtype, nodename));
-          //m_config.getObject().print();
           LogFile::info("Loaded from DB %s:%s", nodename.c_str(), runtype.c_str());
           m_db->close();
         } catch (const DBHandlerException& e) {

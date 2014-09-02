@@ -5,4 +5,5 @@ source ../tools/setup_belle2
 setuprel
 cd -
 
-./boot_nsmd2_ssh store01 stordaq global
+echo "booting storagerd"
+./boot_daemon storagerd store01

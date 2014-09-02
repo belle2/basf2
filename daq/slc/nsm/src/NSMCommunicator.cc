@@ -119,7 +119,8 @@ throw(NSMHandlerException)
        it != m_masters.end(); it++) {
     //if (b2nsm_nodeid(it->first.c_str()) >= 0) {
     try {
-      LogFile::debug("OK >> %s", it->second.getName().c_str());
+      LogFile::debug("OK >> %s (state = %s)", it->second.getName().c_str(),
+                     node.getState().getLabel());
       sendRequest(NSMMessage(it->second, NSMCommand::OK,
                              node.getState().getLabel()));
     } catch (const NSMHandlerException& e) {

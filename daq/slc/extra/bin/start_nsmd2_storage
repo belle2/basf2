@@ -6,4 +6,4 @@ setuprel
 cd -
 
 echo "booting nsmd2"
-./boot_nsmd2_ssh store01 global
+./boot_nsmd2_local store01 global

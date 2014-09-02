@@ -27,7 +27,6 @@ StoragerCallback::~StoragerCallback() throw()
 
 void StoragerCallback::init() throw()
 {
-  LogFile::open("storage");
   m_data = NSMData("STORAGE_STATUS", "storage_status",
                    storage_status_revision);
   m_data.allocate(getCommunicator());
@@ -103,8 +102,8 @@ bool StoragerCallback::load() throw()
   m_con[1].addArgument("storagerecord");
   m_con[1].addArgument("2");
   LogFile::debug("debug");
-  if (!m_con[1].load(10)) {
-    std::string emsg = "storageout: Failed to start";
+  if (!m_con[1].load(30)) {
+    std::string emsg = "storagerecord: Failed to start";
     setReply(emsg);
     LogFile::error(emsg);
     return false;
@@ -241,8 +240,6 @@ void StoragerCallback::timeout() throw()
       SharedEventBuffer::Header* hd = m_ibuf.getHeader();
       info->node[0].nqueue_out = hd->nword_in - hd->nword_out;
       connected = (info->node[0].connection_in > 0);
-      LogFile::debug("connected= %s, %d", (connected ? "true" : "false"),
-                     info->node[0].connection_in);
     } else if (i == 1) {
       SharedEventBuffer::Header* hd = m_rbuf.getHeader();
       info->node[1].nqueue_out = hd->nword_in - hd->nword_out;

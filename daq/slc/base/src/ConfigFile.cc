@@ -111,7 +111,7 @@ bool ConfigFile::getBool(const std::string& label)
 {
   std::string value = get(label);
   if (value.size() > 0) return StringUtil::tolower(value) == "true";
-  else return 0;
+  else return false;
 }
 
 double ConfigFile::getFloat(const std::string& label)

@@ -11,6 +11,6 @@ nsm2log=$1/nsm2
 mkdir -p $nsm2log
 nsm2host=$2
 nsm2port=$3
-nsmd2 -b -p $nsm2port -h $nsm2host -l $nsm2log > /dev/null 2> /dev/null < /dev/null &
+nsmd2 -b -p $nsm2port -s $nsm2port -h $nsm2host -l $nsm2log -m10 > /dev/null 2> /dev/null < /dev/null &
 datad -d 100
 echo "booted nsmd2 (hostname=${nsm2host}, port=${nsm2port})"

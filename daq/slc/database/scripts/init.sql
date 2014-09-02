@@ -445,8 +445,6 @@ returns runnumberinfo as $$
 $$ language sql;
 
 create table fileinfo (
-  record_time timestamp with time zone not null default current_timestamp,
-  id serial primary key, 
   path text not null, 
   expno int not null,
   runno int not null,

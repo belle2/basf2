@@ -161,6 +161,7 @@ void RunControlCallback::update() throw()
       }
     }
   }
+  RCState state_org = getNode().getState();
   if (count == 0) {
     getNode().setState(RCState::NOTREADY_S);
   } else if (aborting_any) {
@@ -179,6 +180,14 @@ void RunControlCallback::update() throw()
     getNode().setState(RCState::STOPPING_TS);
   } else if (running_all) {
     getNode().setState(RCState::RUNNING_S);
+  }
+  if (getNode().getState() != state_org) {
+    NSMCommunicator& com(*getCommunicator());
+    com.replyOK(getNode());
+    if (m_callback && m_callback->getCommunicator()) {
+      NSMCommunicator& com_g(*m_callback->getCommunicator());
+      com_g.replyOK(getNode());
+    }
   }
 
   void* data = m_data.get();
@@ -242,7 +251,7 @@ bool RunControlCallback::ok() throw()
       node.setState(state);
       com.sendState(node);
       logging(DAQLogMessage(getNode().getName(), LogFile::INFO,
-                            StringUtil::form("OK from % (state = %s)",
+                            StringUtil::form("OK from %s (state = %s)",
                                              nodename.c_str(), state.getLabel())));
       LogFile::debug("OK from %s (state = %s)",
                      nodename.c_str(), state.getLabel());
@@ -553,7 +562,7 @@ bool RunControlCallback::log() throw()
 void RunControlCallback::logging(const DAQLogMessage& log, bool recoreded)
 {
   try {
-    if (log.getPriority() >= getPriorityToDB()) {
+    if (log.getPriority() >= getPriorityToDB() && !recoreded) {
       getDB()->connect();
       LoggerObjectTable(getDB()).add(log, true);
       getDB()->close();

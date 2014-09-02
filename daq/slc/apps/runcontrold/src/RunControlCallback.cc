@@ -296,8 +296,12 @@ bool RunControlCallback::error() throw()
     DAQLogMessage log(nodename, LogFile::ERROR,
                       msg.getData(), Date());
     log.setNode(getNode().getName());
-    getDB()->connect();
-    LoggerObjectTable(getDB()).add(log, true);
+    try {
+      getDB()->connect();
+      LoggerObjectTable(getDB()).add(log, true);
+    } catch (const DBHandlerException& e) {
+
+    }
     getDB()->close();
     if (log.getPriority() > LogFile::INFO) {
       NSMCommunicator& com(*getCommunicator());
@@ -396,6 +400,7 @@ void RunControlCallback::postRun(NSMMessage&) throw()
     getDB()->close();
   } catch (const std::exception& e) {
     LogFile::error(e.what());
+    getDB()->close();
   }
 }
 
@@ -563,6 +568,7 @@ void RunControlCallback::logging(const DAQLogMessage& log, bool recoreded)
       }
     }
   } catch (const DBHandlerException& e) {
+    getDB()->close();
     LogFile::error("DB errir : %s", e.what());
   }
 }
@@ -583,6 +589,7 @@ bool RunControlCallback::exclude() throw()
         LoggerObjectTable(getDB()).add(log, true);
         getDB()->close();
       } catch (const DBHandlerException& e) {
+        getDB()->close();
         LogFile::error("DB errir : %s", e.what());
       }
     }
@@ -609,6 +616,7 @@ bool RunControlCallback::include() throw()
         LoggerObjectTable(getDB()).add(log, true);
         getDB()->close();
       } catch (const DBHandlerException& e) {
+        getDB()->close();
         LogFile::error("DB errir : %s", e.what());
       }
     }

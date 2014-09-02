@@ -354,9 +354,10 @@ NSMparse* NSMData::parse(NSMparse* ptr, int& length,
     }
     FieldInfo::Property pro((FieldInfo::Type)type, length, offset);
     add(name, pro);
-    ptr = ptr->next;
     int len = (length == 0) ? 1 : length;
     m_size += pro.getTypeSize() * len;
+    if (ptr == NULL) break;
+    ptr = ptr->next;
   }
   return 0;
 }

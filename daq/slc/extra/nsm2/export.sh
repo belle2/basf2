@@ -12,6 +12,7 @@ cp ${SLC_DIR}/daemon/*.* $BELLE2_EXTERNALS_DIR/src/nsm2/daemon
 cp ${SLC_DIR}/daemon/Makefile $BELLE2_EXTERNALS_DIR/src/nsm2/daemon
 cp ${SLC_DIR}/corelib/Makefile $BELLE2_EXTERNALS_DIR/src/nsm2/corelib
 cp ${SLC_DIR}/corelib/*.c $BELLE2_EXTERNALS_DIR/src/nsm2/corelib
+cp ${SLC_DIR}/corelib/nsm2.h $BELLE2_EXTERNALS_DIR/src/nsm2/corelib
 cp ${SLC_DIR}/corelib/nsmlib2.h $BELLE2_EXTERNALS_DIR/src/nsm2/corelib
 cp ${SLC_DIR}/corelib/nsmparse.h $BELLE2_EXTERNALS_DIR/src/nsm2/corelib
 cp ${SLC_DIR}/b2lib/*.* $BELLE2_EXTERNALS_DIR/src/nsm2/b2lib
@@ -24,5 +25,3 @@ make -C $BELLE2_EXTERNALS_DIR/src/nsm2 clean
 rm -f $EXTLIBDIR/nsmd2 $EXTLIBDIR/nsminfo2
 make -C $BELLE2_EXTERNALS_DIR/src/nsm2 
 make -C $BELLE2_EXTERNALS_DIR/src/nsm2 install
-echo "install corelib/libnsm2_corelib.a ${EXTLIBDIR}/"
-install corelib/libnsm2_corelib.a ${EXTLIBDIR}/

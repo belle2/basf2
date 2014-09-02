@@ -123,8 +123,27 @@
         <Phi unit="deg">0</Phi>
         <Dphi unit="deg">360.0</Dphi>
 
-	<!--<ShieldR1>
-		<Material desc="material of the Shield of the Belle II detector">Lead</Material>
+	<ShieldD1>
+	  <Material desc="material of the Shield of the Belle II detector">Lead</Material>
+	  <Phi unit="deg">0</Phi>
+	  <Dphi unit="deg">360.0</Dphi>
+	  <ZBoundary id="1">
+	    <Zposition unit="cm">115.5</Zposition>
+	    <InnerRadius unit="cm">31.5</InnerRadius>
+	    <OuterRadius unit="cm">31.5</OuterRadius>
+	  </ZBoundary>
+	  <ZBoundary id="2">
+	    <Zposition unit="cm">164.0</Zposition>
+	    <InnerRadius unit="cm">31.5</InnerRadius>
+	    <OuterRadius unit="cm">46.7</OuterRadius>
+	  </ZBoundary>
+	</ShieldD1>
+	
+
+
+	<!--
+	<ShieldR1>
+		<Material desc="Material for top part of the FW ECL Shield">STR-Lead</Material>
 		<Phi unit="deg">0</Phi>
 		<Dphi unit="deg">360.0</Dphi>
 		<ZBoundary id="1">
@@ -144,7 +163,7 @@
 		</ZBoundary>
 	</ShieldR1>
 	<ShieldR2>
-		<Material desc="material of the Shield of the Belle II detector">Lead</Material>
+		<Material desc="Material for bottom part of the FW ECL Shield">STR-HDPE</Material>
 		<Phi unit="deg">0</Phi>
 		<Dphi unit="deg">360.0</Dphi>
 		<ZBoundary id="1">
@@ -163,6 +182,9 @@
 			<OuterRadius unit="cm">47.0</OuterRadius>
 		</ZBoundary>
 	</ShieldR2>
+	-->
+
+	<!--
 	<ShieldL1>
 		<Material desc="material of the Shield of the Belle II detector">Lead</Material>
 		<Phi unit="deg">0</Phi>
@@ -205,53 +227,166 @@
 	</ShieldL2>-->
 
 	<!-- both2 -->
+
+
+	<!--	
 	<ShieldR1>
-		<Material desc="material of the Shield of the Belle II detector">Lead</Material>
+	  <Material desc="Top (outer) part of the FW ECL Shield">STR-Lead</Material>
 		<Phi unit="deg">0</Phi>
 		<Dphi unit="deg">360.0</Dphi>
 		<ZBoundary id="1">
-			<Zposition unit="cm">216</Zposition>
-			<InnerRadius unit="cm">42.0</InnerRadius>
-			<OuterRadius unit="cm">42.0</OuterRadius>
+			<Zposition unit="cm">211.78</Zposition>
+			<InnerRadius unit="cm">42.8</InnerRadius>
+			<OuterRadius unit="cm">42.8</OuterRadius>
 		</ZBoundary>
 		<ZBoundary id="2">
-			<Zposition unit="cm">226</Zposition>
-			<InnerRadius unit="cm">42.0</InnerRadius>
-			<OuterRadius unit="cm">44.5</OuterRadius>
+			<Zposition unit="cm">231.95</Zposition>
+			<InnerRadius unit="cm">42.8</InnerRadius>
+			<OuterRadius unit="cm">47.5</OuterRadius>
 		</ZBoundary>
 		<ZBoundary id="3">
-			<Zposition unit="cm">240</Zposition>
-			<InnerRadius unit="cm">42.0</InnerRadius>
-			<OuterRadius unit="cm">44.5</OuterRadius>
+			<Zposition unit="cm">241.75</Zposition>
+			<InnerRadius unit="cm">42.8</InnerRadius>
+			<OuterRadius unit="cm">47.5</OuterRadius>
 		</ZBoundary>
 	</ShieldR1>
+	<ShieldR2>
+		<Material desc="Bottom (inner) part of the FW ECL Shield">STR-HDPE</Material>
+		<Phi unit="deg">0</Phi>
+		<Dphi unit="deg">360.0</Dphi>
+		<ZBoundary id="1">
+			<Zposition unit="cm">216.95</Zposition>
+			<InnerRadius unit="cm">36.7</InnerRadius>
+			<OuterRadius unit="cm">42.8</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="2">
+			<Zposition unit="cm">216</Zposition>
+			<InnerRadius unit="cm">36.7</InnerRadius>
+			<OuterRadius unit="cm">42.8</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="3">
+			<Zposition unit="cm">226</Zposition>
+			<InnerRadius unit="cm">36.7</InnerRadius>
+			<OuterRadius unit="cm">42.8</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="4">
+			<Zposition unit="cm">241.75</Zposition>
+			<InnerRadius unit="cm">36.7</InnerRadius>
+			<OuterRadius unit="cm">42.8</OuterRadius>
+		</ZBoundary>
+	</ShieldR2>
+	-->
+
+	<!--Chris Shield 1 "USED FOR PRELIMINARY STUDY" -->
+	<ShieldR1>
+		<Material desc="Material for top part of the FW ECL Shield">STR-Lead</Material>
+		<Phi unit="deg">0</Phi>
+		<Dphi unit="deg">360.0</Dphi>
+		<ZBoundary id="1">
+			<Zposition unit="cm">211.78</Zposition>
+			<InnerRadius unit="cm">42.8</InnerRadius>
+			<OuterRadius unit="cm">42.8</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="2">
+			<Zposition unit="cm">216.95</Zposition>
+			<InnerRadius unit="cm">42.8</InnerRadius>
+			<OuterRadius unit="cm">44.0</OuterRadius>
+		</ZBoundary>
+	
+		<ZBoundary id="3">
+			<Zposition unit="cm">216.95</Zposition>
+			<InnerRadius unit="cm">40.35</InnerRadius>
+			<OuterRadius unit="cm">44.0</OuterRadius>
+		</ZBoundary>	
+		<ZBoundary id="4">
+			<Zposition unit="cm">231.95</Zposition>
+			<InnerRadius unit="cm">43.85</InnerRadius>
+			<OuterRadius unit="cm">47.5</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="5">
+			<Zposition unit="cm">241.75</Zposition>
+			<InnerRadius unit="cm">43.85</InnerRadius>
+			<OuterRadius unit="cm">47.5</OuterRadius>
+		</ZBoundary>
+	</ShieldR1>
+
+	<ShieldR2>
+		<Material desc="Material for bottom part of the FW ECL Shield">STR-HDPE</Material>
+		<Phi unit="deg">0</Phi>
+		<Dphi unit="deg">360.0</Dphi>
+		<ZBoundary id="1">
+			<Zposition unit="cm">216.95</Zposition>
+			<InnerRadius unit="cm">36.7</InnerRadius>
+			<OuterRadius unit="cm">40.35</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="2">
+			<Zposition unit="cm">231.95</Zposition>
+			<InnerRadius unit="cm">36.7</InnerRadius>
+			<OuterRadius unit="cm">43.85</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="3">
+			<Zposition unit="cm">241.75</Zposition>
+			<InnerRadius unit="cm">36.7</InnerRadius>
+			<OuterRadius unit="cm">43.85</OuterRadius>
+		</ZBoundary>
+	</ShieldR2>
+
+
+
+
+	<!--Chris Shield 2
+	<ShieldR1>
+	 	<Material desc="material of the Shield of the Belle II detector">Lead</Material>
+		<Phi unit="deg">0</Phi>
+		<Dphi unit="deg">360.0</Dphi>
+		<ZBoundary id="1">
+			<Zposition unit="cm">216.95</Zposition>
+			<InnerRadius unit="cm">36.7</InnerRadius>
+			<OuterRadius unit="cm">41.25</OuterRadius>
+		</ZBoundary>	
+		<ZBoundary id="3">
+			<Zposition unit="cm">241.75</Zposition>
+			<InnerRadius unit="cm">36.7</InnerRadius>
+			<OuterRadius unit="cm">41.25</OuterRadius>
+		</ZBoundary>
+	</ShieldR1>
+
+
 	<ShieldR2>
 		<Material desc="material of the Shield of the Belle II detector">Lead</Material>
 		<Phi unit="deg">0</Phi>
 		<Dphi unit="deg">360.0</Dphi>
 		<ZBoundary id="1">
-			<Zposition unit="cm">206</Zposition>
-			<InnerRadius unit="cm">42.0</InnerRadius>
-			<OuterRadius unit="cm">42.0</OuterRadius>
+			<Zposition unit="cm">211.78</Zposition>
+			<InnerRadius unit="cm">42.8</InnerRadius>
+			<OuterRadius unit="cm">42.8</OuterRadius>
 		</ZBoundary>
 		<ZBoundary id="2">
-			<Zposition unit="cm">216</Zposition>
-			<InnerRadius unit="cm">42.0</InnerRadius>
-			<OuterRadius unit="cm">44.5</OuterRadius>
+			<Zposition unit="cm">216.95</Zposition>
+			<InnerRadius unit="cm">42.8</InnerRadius>
+			<OuterRadius unit="cm">44.0</OuterRadius>
 		</ZBoundary>
+	
 		<ZBoundary id="3">
-			<Zposition unit="cm">226</Zposition>
-			<InnerRadius unit="cm">44.5</InnerRadius>
-			<OuterRadius unit="cm">47.0</OuterRadius>
-		</ZBoundary>
+			<Zposition unit="cm">216.95</Zposition>
+			<InnerRadius unit="cm">41.25</InnerRadius>
+			<OuterRadius unit="cm">44.0</OuterRadius>
+		</ZBoundary>	
 		<ZBoundary id="4">
-			<Zposition unit="cm">240</Zposition>
-			<InnerRadius unit="cm">44.5</InnerRadius>
-			<OuterRadius unit="cm">47.0</OuterRadius>
+			<Zposition unit="cm">231.95</Zposition>
+			<InnerRadius unit="cm">41.25</InnerRadius>
+			<OuterRadius unit="cm">47.5</OuterRadius>
+		</ZBoundary>
+		<ZBoundary id="5">
+			<Zposition unit="cm">241.75</Zposition>
+			<InnerRadius unit="cm">41.25</InnerRadius>
+			<OuterRadius unit="cm">47.5</OuterRadius>
 		</ZBoundary>
 	</ShieldR2>
+
+	-->
 	<ShieldL1>
-		<Material desc="material of the Shield of the Belle II detector">Lead</Material>
+		<Material desc="Material for bottom part of the BW ECL Shield">STR-HDPE</Material>
 		<Phi unit="deg">0</Phi>
 		<Dphi unit="deg">360.0</Dphi>
 		<ZBoundary id="1">
@@ -271,7 +406,7 @@
 		</ZBoundary>
 	</ShieldL1>
 	<ShieldL2>
-		<Material desc="material of the Shield of the Belle II detector">Lead</Material>
+		<Material desc="Material for top part of the BW ECL Shield">STR-Lead</Material>
 		<Phi unit="deg">0</Phi>
 		<Dphi unit="deg">360.0</Dphi>
 		<ZBoundary id="1">
@@ -295,6 +430,5 @@
 			<OuterRadius unit="cm">46.5</OuterRadius>
 		</ZBoundary>
 	</ShieldL2>
-
     </Content>
 </DetectorComponent>

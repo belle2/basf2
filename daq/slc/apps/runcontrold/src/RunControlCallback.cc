@@ -450,10 +450,10 @@ bool RunControlCallback::send(NSMMessage msg) throw()
         RCState tstate = cmd.nextTState();
         if (tstate != Enum::UNKNOWN) m_node_v[i].setState(tstate);
       }
-      if (i < nobj - 1) {
-        msg.setNodeName(m_node_v[i + 1]);
-        usleep(10000);
-      }
+    }
+    if (i < nobj - 1) {
+      msg.setNodeName(m_node_v[i + 1]);
+      usleep(10000);
     }
   }
   return true;

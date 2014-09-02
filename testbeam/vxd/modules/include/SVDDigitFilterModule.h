@@ -15,7 +15,6 @@
 
 
 namespace Belle2 {
-  /**
 
   /**
    * Performs the easiest possible preselection of SVD digits

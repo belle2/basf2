@@ -32,6 +32,11 @@ namespace Belle2 {
    *  Currently a float Gaussian with steerable parameters is used for the digitization.
    *  If there are two or more hits in one cell, only the shortest drift length is selected.
    *  The signal amplitude is the sum of all hits deposited energy in this cell.
+   *
+   *  @todo CDCDigitizerModule: Event time jitter needs a different approach than the one, which is taken here; Instead of adding
+   *        a constant to all events, there needs to be an event by event time jitter, most likely determined by
+   *        the trigger time uncertainties; <br>
+   *        If the definition of the time format in the CDCHit is changed, it needs to be changed here, too, and in the SimpleDriftTimeTranslator.
    */
   class CDCDigitizerModule : public Module {
 

@@ -16,7 +16,6 @@
 
 namespace Belle2 {
   namespace ECL {
-    /**
 
 
     /** The ECLDigitizer module.

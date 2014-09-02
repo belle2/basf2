@@ -29,6 +29,8 @@ namespace Belle2 {
    *  Layer:      bits 5 -  7 (% 4096, / 512)   <br>
    *  Wire:       bits 8 - 16 (% 512)           <br>
    *  Note: These operations could as well be achieved by bit-shifting operations.
+   *
+   *  @todo WireID : Rootification might not be necessary; On the other hand, it opens as well the use via Python.
    */
   class WireID : public RelationsObject {
   public:

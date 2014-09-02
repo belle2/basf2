@@ -20,6 +20,8 @@ namespace Belle2 {
   /**
    * This SimHit type is used for background studies.
    *  EB stands for electronic board.
+   *
+   *  @todo CDCEBSimHit : calling a double to save phi a wire id is kind of strange...
    */
   class CDCEBSimHit : public RelationsObject {
   public:

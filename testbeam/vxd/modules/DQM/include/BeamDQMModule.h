@@ -30,7 +30,6 @@
 #include <TVector3.h>
 
 namespace Belle2 {
-  /**
 
   /**
    * Scans beam parameters and produces data file for particle gun array

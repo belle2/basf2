@@ -491,25 +491,57 @@ namespace Belle2 {
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       float q_MC = 0; //Flavor of B
-      for (auto & track : roe->getTracks()) {
-        const MCParticle* mcParticle = track->getRelated<MCParticle>();
-        while (mcParticle != nullptr) {
-          if (mcParticle->getPDG() == 511) {
-            q_MC++;
-            break;
+      if (roe-> getNTracks() != 0) {
+        for (auto & track : roe->getTracks()) {
+          const MCParticle* mcParticle = track->getRelated<MCParticle>();
+          while (mcParticle != nullptr) {
+            if (mcParticle->getPDG() == 511) {
+              q_MC++;
+              break;
+            }
+            if (mcParticle->getPDG() == -511) {
+              q_MC--;
+              break;
+            }
+            mcParticle = mcParticle->getMother();
           }
-          if (mcParticle->getPDG() == -511) {
-            q_MC--;
-            break;
+        }
+      } else if (roe-> getNECLClusters() != 0) {
+        for (auto & cluster : roe-> getECLClusters()) {
+          const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
+          while (mcParticle != nullptr) {
+            if (mcParticle->getPDG() == 511) {
+              q_MC++;
+              break;
+            }
+            if (mcParticle->getPDG() == -511) {
+              q_MC--;
+              break;
+            }
+            mcParticle = mcParticle->getMother();
           }
-          mcParticle = mcParticle->getMother();
+        }
+      } else if (roe-> getNKLMClusters() != 0) {
+        for (auto & klmcluster : roe-> getKLMClusters()) {
+          const MCParticle* mcParticle = klmcluster->getRelated<MCParticle>();
+          while (mcParticle != nullptr) {
+            if (mcParticle->getPDG() == 511) {
+              q_MC++;
+              break;
+            }
+            if (mcParticle->getPDG() == -511) {
+              q_MC--;
+              break;
+            }
+            mcParticle = mcParticle->getMother();
+          }
         }
       }
       if (q_MC > 0) {
         return 1;
       } else if (q_MC < 0) {
         return 0;
-      } else return gRandom->Uniform(0, 1);
+      } else return -2;//gRandom->Uniform(0, 1);
     }
 
     double isElectronFromB(const Particle* part)

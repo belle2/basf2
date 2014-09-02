@@ -4,7 +4,7 @@
 /* -- version info */
 
 #define NSM_PROTOCOL_VERSION 1926 /* protocol version */
-#define NSM_PACKAGE_VERSION  1934 /* package  version */
+#define NSM_PACKAGE_VERSION  1935 /* package  version */
 
 /*
   20120723 1900 file created
@@ -40,6 +40,7 @@
   20140614 1932 corelib: sprintf ip address if host is missing
   20140614 1933 corelib: use nodhash for nsmlib_nodeid
   20140902 1934 static bsizbuf pollution fix, broken tcprecv debug
+  20140902 1935 memset fix
  */
 
 /* -- DATA TYPES ----------------------------------------------------- */

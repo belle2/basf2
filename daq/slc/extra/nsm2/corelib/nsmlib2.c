@@ -18,9 +18,10 @@
    20140516 1931 ip address from shm if not specified
    20140614 1932 sprintf ip address if host is missing
    20140614 1933 use nodhash for nsmlib_nodeid
+   20140902 1935 memset fix
 \* ---------------------------------------------------------------------- */
 
-const char *nsmlib2_version   = "nsmlib2 1.9.33";
+const char *nsmlib2_version   = "nsmlib2 1.9.35";
 
 #include <stdio.h>
 #include <stdlib.h>

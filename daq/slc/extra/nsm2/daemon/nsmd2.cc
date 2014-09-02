@@ -31,8 +31,13 @@
 //  20140124  1925 fix for anonymous client
 //  20140304  1926 nested dtfmt
 //  20140305  1927 freeq comparison and timing fix
+//  20140305  1928 more freeq checks, longused=1 for debug
+//  20140305  1929 longused=0 again
+//  20140516  1930 destroycon / delcli fix
+//  20140902  1934 static bsizbuf pollution fix, broken tcprecv debug
+//  20140902  1935 memset fix
 
-#define NSM_DAEMON_VERSION   1927 /* daemon   version 1.9.27 */
+#define NSM_DAEMON_VERSION   1935 /* daemon   version 1.9.35 */
 // ----------------------------------------------------------------------
 
 // -- include files -----------------------------------------------------
@@ -109,10 +114,10 @@
 // -- global variables --------------------------------------------------
 // ----------------------------------------------------------------------
 uint16_t    nsmd_port   = NSM2_PORT;
-int         nsmd_shmkey = -1; /* == nsmd_port if -1 */
+int         nsmd_shmkey = -1; // == nsmd_port if -1
 int         nsmd_debug  = 0;
 int         nsmd_priority = 0;
-uint32_t    nsmd_myip   = 0;  /* network byte order */
+uint32_t    nsmd_myip   = 0;  // network byte order
 SOCKAD_IN   nsmd_sockad;
 char        nsmd_host[1024];
 const char* nsmd_logdir = ".";
@@ -435,6 +440,7 @@ nsmd_free(const char* where, const char* p)
   DBG("free: %s p=%08x\n", where, p);
 
   if (SYSPOS(p) >= 0 && SYSPOS(p) < sizeof(NSMsys)) return;
+  if (MEMPOS(p) >= 0 && MEMPOS(p) < sizeof(NSMmem)) return;
   if (p == nsmd_longbuf && nsmd_longused) {
     nsmd_longused = 0;
     return;
@@ -1452,13 +1458,8 @@ nsmd_freeq(NSMDtcpq* q)
   DBG("freeq after f=%08x(%08x) l=%08x q=%08x",
       nsmd_tcpqfirst, nsmd_tcpqfirst ? nsmd_tcpqfirst->prevp : 0, nsmd_tcpqlast, q);
 
-  // need to change the behavior for longbuf and allocated buf
   if (q->datap) {
-    if (q->datap - q->npar * sizeof(int32_t) == nsmd_longbuf) {
-      nsmd_free("tcpfreeq(longbuf)", q->datap - q->npar * sizeof(int32_t));
-    } else {
-      nsmd_free("tcpfreeq(data)", (char*)q->datap);
-    }
+    nsmd_free("tcpfreeq(longbuf)", q->datap - q->npar * sizeof(int32_t));
   }
 
   nsmd_free("tcpfreeq(q)", (char*)q);
@@ -2339,16 +2340,17 @@ nsmd_setup_daemon(NSMcon& con, int exception)
 // -- nsmd_touchsys -----------------------------------------------------
 // new implementation to check and modify tcpq
 //
-// まず最初に con へ tcpwrite が成功するのを待ってからそれ以外の con へ
-// tcpwrite しないといけないというのをどうやって実現するか?
+// update partial NSMsys memory to "con" first, then to the rest of
+// members by putting the message to "nsmd_tcpqfirst" for "con" unless
+// sending to "con" is "inprogress".
 //
-// でも実際には別の経路で sys の update 要求により第 3 者の sys が先に
-// update される可能性はある。当時者か第 3 者が deputy だと直接接続され
-// ているので sys の update が遅れる可能性がある。
+// In reality, NSMsys update request from third node (such as by nsmd2
+// initialization) may result in updating NSMsys earlier in elsewhere
+// than "con".
 //
-// だから、そこはあきらめてメッセージが届かないことを送信元に送り返すよ
-// うにした方が良い
-//
+// This may generate a case that third node recognizes the "con" node
+// before "con" node is properly set up.  This makes an undelivered
+// message.
 // ----------------------------------------------------------------------
 static void
 nsmd_touchsys(NSMcon& con, int pos, int siz)
@@ -2361,8 +2363,10 @@ nsmd_touchsys(NSMcon& con, int pos, int siz)
     ASRT("touchsys pos/siz=%d/%d", pos, siz);
   }
 
-  // I should be a master
-  if (! IamMaster()) ASRT("touchsys: I'm not master");
+  // I should be a master or a deputy when master is dying
+  //if (! IamMaster()) ASRT("touchsys: I'm not master");
+  if (! IamMaster() and !(IamDeputy() and ConIsMaster(con)))
+    ASRT("touchsys: I'm not master or master is dying");
 
   // loop over tcpq
   int off = sizeof(NSMtcphead) + 2 * sizeof(int32_t); // always 2 params
@@ -2425,6 +2429,13 @@ nsmd_touchsys(NSMcon& con, int pos, int siz)
   // loop over conid
   for (int i = NSMCON_OUT; i < sys.ncon; i++) {
     if (ConidIsLocal(i)) continue;
+
+    // skip sending to removed or temporarily unavailable destination
+    switch (sys.con[i].status) {
+      case NSMDC_NA:
+      case NSMDC_WA:
+      case NSMDC_RM: continue;
+    }
 
     dmsg.pars[0] = qpos[i] ? qpos[i] : pos;
     dmsg.pars[1] = qsiz[i] ? qsiz[i] : siz;
@@ -3134,7 +3145,8 @@ nsmd_do_delclient(NSMcon& con, NSMdmsg& dmsg)
 
   // for an NSM client
   if (dmsg.src != (uint16_t) - 1) {
-    if (dmsg.src >= NSMSYS_MAX_NOD) ASRT("do_delclient dmsg.src=%d", dmsg.src);
+    if (dmsg.src == NSMSYS_MAX_NOD) return;
+    if (dmsg.src >  NSMSYS_MAX_NOD) ASRT("do_delclient dmsg.src=%d", dmsg.src);
     NSMnod& nod = sys.nod[dmsg.src];
     if (nod.ipaddr != ADDR_IP(con.sockad))
       ASRT("do_delclient bad ip=%s", ADDR_STR(con.sockad));
@@ -4593,6 +4605,12 @@ nsmd_tcpaccept()
   con.ready  = 0;
   con.timevent = now;
   con.timstart = 0; // to be received with NSMCMD_READY
+
+  con.icnt = 0;
+  con.ocnt = 0;
+  con.isiz = 0;
+  con.osiz = 0;
+
   sys.dirty  = 1;
 
   if (ConIsLocal(con)) {
@@ -4662,6 +4680,9 @@ nsmd_tcprecv(NSMcon& con)
   int datlen = head.npar * sizeof(int32_t) + ntohs(head.len);
   int msglen = sizeof(NSMtcphead) + datlen;
   int& bsiz = bsizbuf[coni];
+
+  if (con.icnt == 0) bsiz = 0;
+  con.icnt++;
 
   // set up recvsiz and recvp for header or main part
   if (bsiz < 0 || bsiz >= NSM_TCPBUFSIZ) { // broken con
@@ -4733,18 +4754,40 @@ nsmd_tcprecv(NSMcon& con)
   }
 
   {
+    unsigned char* h = (unsigned char*)&head;
     int* p = (int*)((char*)&head + sizeof(NSMtcphead));
     int npar = head.npar;
     int req  = ntohs(head.req);
     int len  = ntohs(head.len);
     int src  = ntohs(head.src);
     int dest = ntohs(head.dest);
+    int from = ntohl(head.from);
+    int err  = 0;
+    int reqid = req - NSMREQ_FIRST;
+    int srccon  = sys.conid[src];
+    int destcon = sys.conid[dest];
+
     DBG("tcprecv(%d,%d) req=%x %d=>%d len=%d npar=%d p=[%d,%d] coni=%d",
         con.sock, CON_ID(con),
         req, src, dest, len, npar, ntohl(p[0]), ntohl(p[1]), coni);
+
+    if (src != 65535 && src != 0 &&
+        (src >= NSMSYS_MAX_NOD || sys.nod[src].name[0] == 0)) err++;
+    if (dest != 65535 && dest != 0 &&
+        (dest >= NSMSYS_MAX_NOD || sys.nod[dest].name[0] == 0)) err++;
+    if (req < NSMREQ_FIRST || req > NSMCMD_LAST) err++;
+    if (reqid >= NSMSYS_MAX_REQ && req < NSMCMD_FIRST) err++;
+    if (reqid < NSMSYS_MAX_REQ && sys.req[reqid].name[0] == 0) err++;
+
+    if (err) {
+      for (int i = 0; i < 32; i += 8) {
+        LOG("tcphead %02x %02x %02x %02x - %02x %02x %02x %02x",
+            h[i + 0], h[i + i], h[i + 2], h[i + 3], h[i + 4], h[i + 5], h[i + 6], h[i + 7]);
+      }
+      ASRT("bad tcphead");
+    }
   }
 
-  con.icnt++;
   con.isiz += bsiz;
   con.timevent = time(0);
   bsiz = 0;
@@ -4806,10 +4849,11 @@ disconnect_return:
   }
 #endif
 
-  if (IamMaster())
+  if (IamMaster() || (IamDeputy() && ConIsMaster(con))) {
     nsmd_destroyconn(con, 1, "tcprecv");
-  else
+  } else {
     nsmd_destroyconn(con, 0, "tcprecv");
+  }
 }
 //                   ---------------
 // --                -- main loop --

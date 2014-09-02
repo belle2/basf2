@@ -7,6 +7,7 @@
   20140304 a simple #define can be used
   20131229 stdint.h definitions are added
   20140428 nsmparse_malloc fix
+  20140902 memset fix (T.Konno)
  */
 
 #include <stdio.h>
@@ -462,7 +463,7 @@ nsmparse_scan(const char *file, char *filebuf, char *start, char **endp,
 	ptr++;
 	while (isspace(*ptr)) ptr++;
 	parsep->next = nsmparse_scan(file, filebuf, ptr, &ptr, fmtout2, &siz2);
-	while (parsep->next)  parsep = parsep->next;
+	while (parsep->next) parsep = parsep->next;
 	parsep->next = (NSMparse *)nsmparse_malloc(sizeof(NSMparse),
 						   "scan", file);
 	parsep = parsep->next;

@@ -14,9 +14,10 @@
    20140305 1927 allow null state in b2nsm_ok
    20140305 1929 checkpoints, no fprintf
    20140306 1930 logfp again, but write instead of fwrite/fprintf
+   20140902 1935 memset fix
 \* ---------------------------------------------------------------------- */
 
-const char *belle2nsm_version = "belle2nsm 1.9.30";
+const char *belle2nsm_version = "belle2nsm 1.9.35";
 
 #include <stdio.h>
 #include <stdlib.h>

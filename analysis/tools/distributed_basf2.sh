@@ -53,7 +53,7 @@ function runGlobalBasf2 {
   
   echo "Run basf2 in collection directory"
   cd "$collectionDirectory"
-  basf2 basf2_steering_file.py --dump-path basf2_path.pickle
+  basf2 basf2_steering_file.py --dump-path basf2_path.pickle -- -ve -nproc 1
   local result=$?
   cd -
   echo "Result of runGlobalBasf2 is " "$result"
@@ -78,7 +78,8 @@ function createJobDirectory {
   mkdir -p "$jobDirectory"/"$jobNumber"
 
   echo "Create symlinks to all files in collection directory"
-  for file in "$collectionDirectory"/*
+  #for file in "$collectionDirectory"/*
+  for file in "$collectionDirectory"/weights "$collectionDirectory"/basf2_path.pickle "$collectionDirectory"/*.config
   do
     local absolutePath=$(readlink -f "$file")
     ln -s "$absolutePath" "$jobDirectory"/"$jobNumber"/
@@ -122,7 +123,7 @@ function runJobBasf2 {
   echo "$jobNumber"
 
   cd "$jobDirectory"/"$jobNumber"
-  qsub -cwd -q short,medium,long -e error.log -o output.log -V basf2_script.sh | cut -f 3 -d ' ' > basf2_jobid
+  qsub -cwd -q medium,long,nether -e error.log -o output.log -V basf2_script.sh | cut -f 3 -d ' ' > basf2_jobid
   cd -
 }
 
@@ -345,5 +346,5 @@ function main {
 
 allMcFiles=( "$@" )
 setupEnvironment "/storage/6/tkeck/"
-main "FEI" "jobs" "../basf2/analysis/examples/fullEventInterpretation.py" "1000"
+main "FEI" "jobs" "basf2_steering_file.py" "1000"
 

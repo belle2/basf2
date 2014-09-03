@@ -591,6 +591,7 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
             finalParticlePlaceholders.append(automaticReporting.createMBCTexFile(ntuple))
     placeholders = automaticReporting.createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticlePlaceholders, mcCounts, particles)
 
+    subprocess.call('cp {f} .'.format(f=ROOT.Belle2.FileSystem.findFile('nordbert.svg')), shell=True)
     for i in range(0, 2):
         ret = subprocess.call(['pdflatex', '-halt-on-error', placeholders['texFile']])
         if ret == 0:

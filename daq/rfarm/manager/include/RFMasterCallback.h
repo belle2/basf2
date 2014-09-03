@@ -7,6 +7,7 @@
 #include <daq/slc/nsm/NSMData.h>
 
 #include <vector>
+#include <map>
 
 namespace Belle2 {
 
@@ -14,6 +15,10 @@ namespace Belle2 {
   class RFRunControlCallback;
 
   class RFMasterCallback : public NSMCallback {
+
+    typedef std::map<std::string, NSMNode> NSMNodeList;
+    typedef NSMNodeList::iterator NSMNodeIterator;
+    typedef NSMNodeList::reverse_iterator NSMNodeRIterator;
 
   public:
     RFMasterCallback(const NSMNode& node,
@@ -51,6 +56,7 @@ namespace Belle2 {
     RFConf m_conf;
     int m_st_conf;
     int m_st_unconf;
+    NSMNodeList m_nodes;
 
   };
 

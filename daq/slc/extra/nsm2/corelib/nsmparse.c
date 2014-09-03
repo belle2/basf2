@@ -8,6 +8,7 @@
   20131229 stdint.h definitions are added
   20140428 nsmparse_malloc fix
   20140902 memset fix (T.Konno)
+  20140903 n_same fix for nested struct
  */
 
 #include <stdio.h>
@@ -492,10 +493,11 @@ nsmparse_scan(const char *file, char *filebuf, char *start, char **endp,
 	if (sym_prev && (*nestp || sym_prev != fmtout2[0])) {
 	  sprintf(fmtstr+strlen(fmtstr), "%c", sym_prev);
 	  if (n_same > 1) sprintf(fmtstr+strlen(fmtstr), "%d", n_same);
+          n_same = 0;
 	}
 	if (! *nestp) {
 	  sym_prev = fmtout2[0];
-	  n_same = (fmtout2[1] ? atoi(&fmtout2[1]) : 1) * num;
+	  n_same += (fmtout2[1] ? atoi(&fmtout2[1]) : 1) * num;
 	  /* printf("<%c:%d>\n", sym_prev, n_same); */
 	} else {
 	  sprintf(fmtstr+strlen(fmtstr), "(%s)%d", fmtout2, num);

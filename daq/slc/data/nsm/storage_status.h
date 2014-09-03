@@ -45,7 +45,7 @@ namespace Belle2 {
       float evtsize_out;
       float flowrate_out;
       float reserved_f[2];
-    } node[8];
+    } node[3];
 
   };
 

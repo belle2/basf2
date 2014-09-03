@@ -218,7 +218,7 @@ void StoragerCallback::timeout() throw()
   info->nnodes = m_flow.size();
   bool connected = false;
   bool writing = false;
-  for (size_t i = 0; i < m_flow.size() && i < 7; i++) {
+  for (size_t i = 0; i < m_flow.size() && i < 3; i++) {
     ronode_status& rostatus(m_flow[i].monitor());
     info->node[i].connection_in = rostatus.connection_in;
     info->node[i].nevent_in = rostatus.nevent_in;

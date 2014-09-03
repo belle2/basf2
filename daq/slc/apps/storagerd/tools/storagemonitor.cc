@@ -31,7 +31,7 @@ int main(int argc, char** argv)
   const std::string stornode = argv[1];
   const std::string node = argv[2];
   ConfigFile config("slowcontrol");
-  if (argc > 4) config.read(argv[3]);
+  if (argc > 3) config.read(argv[3]);
   NSMCommunicator* comm = new NSMCommunicator();
   comm->init(NSMNode(node),
              config.get("nsm.global.host"),

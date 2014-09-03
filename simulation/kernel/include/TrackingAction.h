@@ -17,7 +17,6 @@
 #include <framework/datastore/RelationArray.h>
 
 #include <G4UserTrackingAction.hh>
-#include <G4Event.hh>
 
 namespace Belle2 {
 

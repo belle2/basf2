@@ -19,8 +19,6 @@
 
 #include <string>
 
-class G4Event;
-
 namespace Belle2 {
 
   namespace Simulation {

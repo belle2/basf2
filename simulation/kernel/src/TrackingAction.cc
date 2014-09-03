@@ -19,6 +19,7 @@
 #include <G4ParticleDefinition.hh>
 #include <G4ParticleTypes.hh>
 #include <G4DecayProcessType.hh>
+#include <G4Event.hh>
 
 using namespace Belle2;
 using namespace Belle2::Simulation;
@@ -68,7 +69,7 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
 
   try {
     //Check if the dynamic particle has a primary particle attached.
-    //If yes, the UserInfo of the primary particle as UserInfo to the track.
+    //If the answer is yes, the UserInfo of the primary particle is recycled as the UserInfo of the track.
     if (dynamicParticle->GetPrimaryParticle() != NULL) {
       const G4PrimaryParticle* primaryParticle = dynamicParticle->GetPrimaryParticle();
       if (primaryParticle->GetUserInformation() != NULL) {

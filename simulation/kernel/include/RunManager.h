@@ -12,7 +12,6 @@
 #define RUNMANAGER_H_
 
 #include <G4RunManager.hh>
-#include <TObject.h>
 
 #include <string>
 #include <map>

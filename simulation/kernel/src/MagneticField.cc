@@ -11,7 +11,6 @@
 #include <simulation/kernel/MagneticField.h>
 
 #include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
 
 #include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>

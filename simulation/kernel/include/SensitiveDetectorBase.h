@@ -15,7 +15,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <simulation/kernel/UserInfo.h>
 #include <G4VSensitiveDetector.hh>
-#include <G4Step.hh>
+class G4Step;
 
 #include <map>
 #include <string>

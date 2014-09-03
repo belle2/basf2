@@ -29,11 +29,9 @@ namespace Belle2 {
    */
   class RawTrailer_v0 : public TObject {
   public:
-    //! Default constructor
-    RawTrailer_v0();
+    RawTrailer_v0();     /// Default constructor
 
-    //! Destructor
-    ~RawTrailer_v0();
+    ~RawTrailer_v0();     /// Destructor
 
     void CheckBuffer(); //! set buffer
 

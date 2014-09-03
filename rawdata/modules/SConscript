@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = [ 'rawdata_dataobjects' ]
+env['LIBS'] = [ 'framework', 'rawdata', 'rawdata_dataobjects' ]
 
 Return('env')
 

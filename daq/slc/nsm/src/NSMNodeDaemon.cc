@@ -25,8 +25,8 @@ NSMNodeDaemon::NSMNodeDaemon(NSMCallback* callback,
     }
   } catch (const NSMHandlerException& e) {
     LogFile::fatal("Failed to connect NSM network (%s:%d). "
-                   "Terminating process ",
-                   host.c_str(), port);
+                   "Terminating process : %s ",
+                   host.c_str(), port, e.what());
     exit(1);
   }
   LogFile::debug("Connected to NSM2 daemon (%s:%d)",

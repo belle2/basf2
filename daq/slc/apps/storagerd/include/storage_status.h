@@ -7,7 +7,7 @@ extern "C" {
 
 namespace Belle2 {
 
-  const int storage_status_revision = 3;
+  const int storage_status_revision = 4;
 
   struct storage_status {
     uint32 stime;

@@ -63,7 +63,9 @@ void RunControlCallback::init() throw()
     status->nnodes = obj_v.size();
     for (size_t i = 0; i < obj_v.size(); i++) {
       DBObject& obj(obj_v[i].getObject("runtype"));
-      m_node_v.push_back(NSMNode(obj.getNode()));
+      NSMNode node(obj.getNode());
+      node.setUsed(obj_v[i].getBool("used"));
+      m_node_v.push_back(node);
     }
   }
   getNode().setState(Enum::UNKNOWN);
@@ -183,7 +185,7 @@ RunControlCallback::findConfig(const std::string& nodename, bool& finded) throw(
   ConfigObjectList& objs(getConfig().getObject().getObjects("node"));
   for (ConfigObjectList::iterator it = objs.begin();
        it != objs.end(); it++) {
-    if (it->getNode() == nodename) {
+    if (it->getObject("runtype").getNode() == nodename) {
       finded = true;
       return it;
     }
@@ -272,6 +274,7 @@ bool RunControlCallback::load() throw()
                                              msg.getRequestName(),
                                              node.getName().c_str())));
       com.sendRequest(msg);
+      node.setState(RCState::LOADING_TS);
     }
   }
   return true;
@@ -292,6 +295,8 @@ bool RunControlCallback::distribute(NSMMessage& msg) throw()
                                              msg.getRequestName(),
                                              node.getName().c_str())));
       com.sendRequest(msg);
+      RCState tstate = RCCommand(msg.getRequestName()).nextTState();
+      if (tstate != Enum::UNKNOWN) node.setState(tstate);
     }
   }
   return true;
@@ -312,6 +317,8 @@ bool RunControlCallback::distribute_r(NSMMessage& msg) throw()
                                              msg.getRequestName(),
                                              node.getName().c_str())));
       com.sendRequest(msg);
+      RCState tstate = RCCommand(msg.getRequestName()).nextTState();
+      if (tstate != Enum::UNKNOWN) node.setState(tstate);
     }
     if (i == 0) break;
   }

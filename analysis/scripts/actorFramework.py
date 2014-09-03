@@ -147,7 +147,6 @@ class Sequence(object):
         @param verbose output additional information
         @param nProcesses use n parallel processes for the execution of the actors
         """
-
         # We loop over all actors and check which actors are ready to run.
         # An actor is ready if all required values are available in the results dictionary.
         # results contains all currently provided value identified by their unique name.

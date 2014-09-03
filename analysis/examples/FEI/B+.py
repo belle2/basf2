@@ -96,7 +96,7 @@ pre_D0 = Particle.PreCutConfiguration(
     variable='M',
     method='S/B',
     efficiency=0.9,
-    purity=0.00001,
+    purity=0.0005,
 )
 
 p = Particle('D0', mva_D0, pre_D0)
@@ -136,7 +136,7 @@ pre_DPlus = Particle.PreCutConfiguration(
     variable='M',
     method='S/B',
     efficiency=0.9,
-    purity=0.00001,
+    purity=0.0005,
 )
 
 p = Particle('D+', mva_DPlus, pre_DPlus)
@@ -172,7 +172,7 @@ pre_DStarPlus = Particle.PreCutConfiguration(
     variable='Q',
     method='S/B',
     efficiency=0.9,
-    purity=0.00001,
+    purity=0.0001,
 )
 
 p = Particle('D*+', mva_DStarPlus, pre_DStarPlus)
@@ -192,10 +192,10 @@ pre_DStar0 = Particle.PreCutConfiguration(
     variable='Q',
     method='S/B',
     efficiency=0.9,
-    purity=0.00001,
+    purity=0.0001,
 )
 
-p = Particle('D*0', mva_D0, pre_DStar0)
+p = Particle('D*0', mva_DStar0, pre_DStar0)
 p.addChannel(['D0', 'pi0'])
 p.addChannel(['D0', 'gamma'])
 particles.append(p)
@@ -212,7 +212,7 @@ pre_DS = Particle.PreCutConfiguration(
     variable='M',
     method='S/B',
     efficiency=0.9,
-    purity=0.00001,
+    purity=0.0005,
 )
 
 
@@ -242,7 +242,7 @@ pre_DStarS = Particle.PreCutConfiguration(
     variable='Q',
     method='S/B',
     efficiency=0.9,
-    purity=0.00001,
+    purity=0.0001,
 )
 
 p = Particle('D_s*+', mva_DStarS, pre_DStarS)
@@ -262,7 +262,7 @@ pre_J = Particle.PreCutConfiguration(
     variable='M',
     method='S/B',
     efficiency=0.9,
-    purity=0.00001,
+    purity=0.0001,
 )
 
 p = Particle('J/psi', mva_J, pre_J)
@@ -279,9 +279,9 @@ mva_BPlus = Particle.MVAConfiguration(
 
 pre_BPlus = Particle.PreCutConfiguration(
     variable='Mbc',
-    method='Same',
+    method='S/B',
     efficiency=0.9,
-    purity=0.00001,
+    purity=0.0001,
 )
 
 p = Particle('B+', mva_BPlus, pre_BPlus)

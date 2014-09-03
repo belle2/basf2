@@ -34,6 +34,16 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
             return [interpolations[channel].GetX(cut, signal[channel].GetXaxis().GetXmin(), maxima[channel]),
                     interpolations[channel].GetX(cut, maxima[channel], signal[channel].GetXaxis().GetXmax())]
 
+    # Two-Side cut S/B ratio constructed
+    elif preCutConfig.method == 'S/B2' and preCutConfig.variable in ['M', 'Q', 'Mbc']:
+        def ycut_to_xcuts(channel, cut):
+            hist = ratio[channel]
+            maximum = hist.GetMaximumBin()
+            low = [bin for bin in range(1, maximum) if hist.GetBinContent(bin) < cut]
+            high = [bin for bin in range(maximum, hist.GetNbinsX()) if hist.GetBinContent(bin) < cut]
+            axis = hist.GetXaxis()
+            return [axis.GetBinLowEdge(max(low)) if low else maximum, axis.GetBinUpEdge(min(high)) if high else maximum]
+
     # One-Side cut S/B ratio constructed
     elif preCutConfig.method == 'S/B' and preCutConfig.variable in ['daughterProductOf(getExtraInfo(SignalProbability))']:
 
@@ -43,9 +53,10 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
     # Two sided cut, same for all channels
     elif preCutConfig.method == 'Same' and preCutConfig.variable in ['M', 'Q', 'Mbc']:
         maxima = GetPositionsOfMaxima(signal)
+        maximum = sum([v for v in maxima.values()]) / float(len(maxima))
 
         def ycut_to_xcuts(channel, cut):
-            return [maxima[channel] - cut * 2, maxima[channel] + cut * 2]
+            return [maximum - cut * 2, maximum + cut * 2]
 
     # One sided cut, same for all channels
     elif preCutConfig.method == 'Same' and preCutConfig.variable in ['daughterProductOf(getExtraInfo(SignalProbability))']:
@@ -80,6 +91,8 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
         signal = {channel: hist for (channel, hist) in signal.iteritems() if not result[channel]['isIgnored']}
         bckgrd = {channel: hist for (channel, hist) in bckgrd.iteritems() if not result[channel]['isIgnored']}
 
+    for k, v in result.iteritems():
+        print k, ': ', v['cutstring']
     return result
 
 
@@ -209,7 +222,7 @@ def GetNumberOfEventsInRange(histogram, (a, b)):
     high = histogram.FindBin(b)
     if histogram.FindBin(b - histogram.GetBinWidth(high) / 2.0) != high:
         high -= 1
-    return histogram.Integral(low, high)
+    return histogram.Integral(low, high) if low < high else 0
 
 
 def GetNumberOfEvents(histogram):

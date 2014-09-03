@@ -274,7 +274,8 @@ def FullEventInterpretation(path, particles):
                                 path='Path',
                                 identifier='Identifier_{i}'.format(i=particle.identifier),
                                 mvaConfig='MVAConfig_{i}'.format(i=particle.identifier),
-                                particleList='RawParticleList_{i}'.format(i=particle.identifier))
+                                particleList='RawParticleList_{i}'.format(i=particle.identifier),
+                                preCut='None')
             else:
                 for channel in particle.channels:
 
@@ -290,6 +291,7 @@ def FullEventInterpretation(path, particles):
                                     identifier='Name_{c}'.format(c=channel.name),
                                     mvaConfig='MVAConfig_{c}'.format(c=channel.name),
                                     particleList='RawParticleList_{c}'.format(c=channel.name),
+                                    preCut='PreCut_{c}'.format(c=channel.name),
                                     additionalDependencies=additionalDependencies)
 
                 seq.addResource('SignalProbability_{i}'.format(i=particle.identifier), 'Dummy',

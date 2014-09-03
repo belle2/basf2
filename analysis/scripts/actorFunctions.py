@@ -385,7 +385,7 @@ def PostCutDetermination(identifiers, postCutConfigs, signalProbabilities):
     return results
 
 
-def SignalProbability(path, identifier, particleList, mvaConfig, additionalDependencies=[]):
+def SignalProbability(path, identifier, particleList, mvaConfig, preCut, additionalDependencies=[]):
     """
     Calculates the SignalProbability of a ParticleList. If the files required from TMVAExpert aren't available they're created.
         @param path the basf2 path
@@ -393,9 +393,10 @@ def SignalProbability(path, identifier, particleList, mvaConfig, additionalDepen
         @param particleList the particleList which is used for training and classification
         @param mvaConfig configuration for the multivariate analysis
         @param additionalDependencies for variables like SignalProbability of daughters or VertexFit
+        @param preCut applied preCut with information about number of background an signal events, None for FSP TODO not yet in hash
         @return Resource named SignalProbability_{identifier} providing config filename
     """
-    B2INFO("Enter: Calculate SignalProbability for {i}. Run Teacher in extern process.".format(i=identifier))
+    B2INFO("Enter: Calculate SignalProbability for {i}.".format(i=identifier))
     if particleList is None or any([d is None for d in additionalDependencies]):
         B2INFO("Calculate SignalProbability for {i}, but particle/channel is ignored".format(i=identifier))
         return{'SignalProbability_{i}'.format(i=identifier): None}
@@ -417,10 +418,11 @@ def SignalProbability(path, identifier, particleList, mvaConfig, additionalDepen
         teacher.param('variables', mvaConfig.variables)
         teacher.param('target', mvaConfig.target)
         teacher.param('listNames', [particleList])
-        #teacher.param('inverseSamplingRates', {0: 10})
+        if preCut is not None and preCut['nBackground'] > 1e7:
+            teacher.param('inverseSamplingRates', {0: int(preCut['nBackground'] / 1e7)})
         teacher.param('doNotTrain', True)
         path.add_module(teacher)
-        B2INFO("Calculate SignalProbability for {i}. Create root file with variables first.".format(i=identifier))
+        B2INFO("Calculate SignalProbability for {i}. Create root file with variables first with prefix {p}.".format(i=identifier, p=removeJPsiSlash(particleList + '_' + hash)))
         return {}
 
     if not os.path.isfile(configFilename):
@@ -448,7 +450,10 @@ def SignalProbability(path, identifier, particleList, mvaConfig, additionalDepen
         expert.param('signalFraction', -2)  # Use signalFraction from training
         expert.param('signalProbabilityName', 'SignalProbability')
         expert.param('signalClass', mvaConfig.targetCluster)
-        #expert.param('inverseSamplingRates', {0: 10})
+        if preCut is not None and preCut['nBackground'] > 1e7:
+            # Hack to avoid retraining pi0, K_S0 and J/psi networks, remove before commit to git! FIXME
+            if identifier[0] not in ['K', 'p', 'J']:
+                expert.param('inverseSamplingRates', {0: int(preCut['nBackground'] / 1e7)})
         expert.param('listNames', [particleList])
         path.add_module(expert)
         B2INFO("Calculating SignalProbability for {i}".format(i=identifier))
@@ -512,9 +517,7 @@ def WriteAnalysisFileForChannel(particleName, particleLabel, channelName, preCut
     placeholders['channelName'] = automaticReporting.prettifyDecayString(channelName)
     placeholders['isIgnored'] = False
     placeholders = automaticReporting.createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut)
-    B2INFO("Write analysis tex file for channel {c}.".format(c=channelName))
     placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, postCut)
-    B2INFO("Write analysis tex file for channel {c}.".format(c=channelName))
 
     hash = actorFramework.createHash(placeholders)
     placeholders['texFile'] = removeJPsiSlash('{name}_channel_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))

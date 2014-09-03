@@ -93,11 +93,8 @@ public class RORCDataFlowTableController implements Initializable, NSMObserver {
                 if (data == null || !data.getFormat().matches("rorc_status")) {
                     return;
                 }
-                //data.print();
-                //System.out.println("dataname="+data.getName());
                 label_runno.setText(String.format("%04d.%04d.%03d", data.getInt("expno"),
                         data.getInt("runno"), data.getInt("subno")));
-                //System.out.println(data.getInt("state"));
                 switch (data.getInt("state")) {
                     default:
                     state.update(RCState.NOTREADY_S);
@@ -121,10 +118,11 @@ public class RORCDataFlowTableController implements Initializable, NSMObserver {
                 int connected_out = -1;
                 for (int i = 0; i < data.getInt("nnodes"); i++) {
                     NSMData cdata = (NSMData)data.getObject("ro", i);
+                    NSMData node = (NSMData)data.getObject("node", i);
                     if (i == 0) {
                         connected_out = (cdata.getInt("connection_out") == 1)?1:-1;
                     } else {
-                        if (cdata.getInt("connection_out") != 1) {
+                        if (cdata.getInt("connection_out") != 1 && node.getInt("excluded") == 0) {
                             connected_in = -1;
                         }
                     }

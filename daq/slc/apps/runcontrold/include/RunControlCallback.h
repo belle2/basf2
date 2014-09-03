@@ -23,7 +23,6 @@ namespace Belle2 {
 
     typedef std::vector<NSMNode> NSMNodeList;
     typedef NSMNodeList::iterator NSMNodeIterator;
-    typedef std::map<std::string, NSMNode> NSMNodeMap;
     typedef std::vector<NSMData> NSMDataList;
 
   public:
@@ -36,26 +35,25 @@ namespace Belle2 {
   public:
     virtual void init() throw();
     virtual void timeout() throw();
-    virtual void update() throw();
-    virtual bool send(const NSMMessage msg) throw();
     virtual bool ok() throw();
     virtual bool error() throw();
     virtual bool log() throw();
+    bool reply(const NSMNode& node) throw();
     NSMData& getData() { return m_data; }
     void setCallback(RCCallback* callback) throw() {
       m_callback = callback;
     }
 
   public:
-    virtual bool load() throw() { return send(getMessage()); }
-    virtual bool start() throw() { return send(getMessage()); }
-    virtual bool stop() throw() { return send(getMessage()); }
-    virtual bool recover() throw() { return send(getMessage()); }
+    virtual bool load() throw();
+    virtual bool start() throw();
+    virtual bool stop() throw();
+    virtual bool recover() throw() { return distribute(getMessage()); }
     virtual bool pause() throw();
-    virtual bool resume() throw() { return send(getMessage()); }
-    virtual bool abort() throw() { return send(getMessage()); }
-    virtual bool trigft() throw() { return send(getMessage()); }
-    virtual bool stateCheck() throw();
+    virtual bool resume() throw() { return distribute(getMessage()); }
+    virtual bool abort() throw();
+    virtual bool trigft() throw() { return true; }
+    virtual bool stateCheck() throw() { return reply(getNode()); }
     virtual bool exclude() throw();
     virtual bool include() throw();
 
@@ -67,15 +65,17 @@ namespace Belle2 {
     void setPriorityToLocal(LogFile::Priority pri) { m_priority_local = pri; }
     void setPriorityToGlobal(LogFile::Priority pri) { m_priority_global = pri; }
 
-  protected:
-    void prepareRun(NSMMessage& msg) throw();
-    void postRun(NSMMessage& msg) throw();
-    NSMNodeIterator find(const std::string& nodename) throw();
+  private:
+    void update() throw();
+    bool distribute(NSMMessage& msg) throw();
+    bool distribute_r(NSMMessage& msg) throw();
+    void postRun() throw();
+    ConfigObjectList::iterator findConfig(const std::string& nodename, bool& finded) throw();
+    NSMNodeIterator findNode(const std::string& nodename) throw();
     bool synchronize(NSMNode& node) throw();
-    virtual bool isManual() { return true; }
     void logging(const DAQLogMessage& log, bool recoreded = false);
 
-  protected:
+  private:
     RunSetting m_setting;
     RCCallback* m_callback;
     NSMNodeList m_node_v;

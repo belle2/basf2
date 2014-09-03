@@ -38,7 +38,7 @@ class InputFile(object):
         """
         Open input file. Get tree and persistent object
         """
-        if os.path.isfile(filename):
+        if False:  # os.path.isfile(filename):
             ROOT.gSystem.Load('libdataobjects')
             self.rootfile = ROOT.TFile(filename)
             self.tree = self.rootfile.Get('tree')
@@ -451,9 +451,7 @@ def SignalProbability(path, identifier, particleList, mvaConfig, preCut, additio
         expert.param('signalProbabilityName', 'SignalProbability')
         expert.param('signalClass', mvaConfig.targetCluster)
         if preCut is not None and preCut['nBackground'] > 1e7:
-            # Hack to avoid retraining pi0, K_S0 and J/psi networks, remove before commit to git! FIXME
-            if identifier[0] not in ['K', 'p', 'J']:
-                expert.param('inverseSamplingRates', {0: int(preCut['nBackground'] / 1e7)})
+            expert.param('inverseSamplingRates', {0: int(preCut['nBackground'] / 1e7)})
         expert.param('listNames', [particleList])
         path.add_module(expert)
         B2INFO("Calculating SignalProbability for {i}".format(i=identifier))

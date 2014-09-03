@@ -24,46 +24,18 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
     ROOT.gROOT.SetBatch(True)
     files = [ROOT.TFile(filename, 'UPDATE') for filename, _ in preCutHistograms]
     signal, bckgrd, ratio = LoadHistogramsFromFiles(files, preCutConfig.variable, channelNames, preCutHistograms)
-    interpolations = GetInterpolateFunctions(ratio)
 
     # Two-Side cut S/B ratio constructed
-    if preCutConfig.method == 'S/B' and preCutConfig.variable in ['M', 'Q', 'Mbc']:
-        maxima = GetPositionsOfMaxima(signal)
-
-        def ycut_to_xcuts(channel, cut):
-            return [interpolations[channel].GetX(cut, signal[channel].GetXaxis().GetXmin(), maxima[channel]),
-                    interpolations[channel].GetX(cut, maxima[channel], signal[channel].GetXaxis().GetXmax())]
-
-    # Two-Side cut S/B ratio constructed
-    elif preCutConfig.method == 'S/B2' and preCutConfig.variable in ['M', 'Q', 'Mbc']:
+    if preCutConfig.method == 'S/B' and preCutConfig.variable in ['M', 'Q', 'Mbc', 'daughterProductOf(getExtraInfo(SignalProbability))']:
         def ycut_to_xcuts(channel, cut):
             hist = ratio[channel]
             maximum = hist.GetMaximumBin()
+            if hist.GetBinContent(maximum) < cut:
+                return [0, -1]
             low = [bin for bin in range(1, maximum) if hist.GetBinContent(bin) < cut]
             high = [bin for bin in range(maximum, hist.GetNbinsX()) if hist.GetBinContent(bin) < cut]
             axis = hist.GetXaxis()
-            return [axis.GetBinLowEdge(max(low)) if low else maximum, axis.GetBinUpEdge(min(high)) if high else maximum]
-
-    # One-Side cut S/B ratio constructed
-    elif preCutConfig.method == 'S/B' and preCutConfig.variable in ['daughterProductOf(getExtraInfo(SignalProbability))']:
-
-        def ycut_to_xcuts(channel, cut):
-            return [interpolations[channel].GetX(cut, 0, 1), 1]
-
-    # Two sided cut, same for all channels
-    elif preCutConfig.method == 'Same' and preCutConfig.variable in ['M', 'Q', 'Mbc']:
-        maxima = GetPositionsOfMaxima(signal)
-        maximum = sum([v for v in maxima.values()]) / float(len(maxima))
-
-        def ycut_to_xcuts(channel, cut):
-            return [maximum - cut * 2, maximum + cut * 2]
-
-    # One sided cut, same for all channels
-    elif preCutConfig.method == 'Same' and preCutConfig.variable in ['daughterProductOf(getExtraInfo(SignalProbability))']:
-
-        def ycut_to_xcuts(channel, cut):
-            return [cut, 1]
-
+            return [axis.GetBinLowEdge(max(low) + 1) if low else maximum, axis.GetBinUpEdge(min(high) - 1) if high else maximum]
     else:
         raise RuntimeError('Given PreCutConfiguration is not implemented. Please check that method and used variables are compatible.')
 
@@ -74,10 +46,6 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
 
         cuts = GetCuts(signal, bckgrd, preCutConfig.efficiency, preCutConfig.purity, ycut_to_xcuts)
         for (channel, range) in cuts.iteritems():
-            # Modify the range to match the bin boundaries
-            axis = signal[channel].GetXaxis()
-            range[0] = axis.GetBinLowEdge(axis.FindBin(range[0]))
-            range[1] = axis.GetBinUpEdge(axis.FindBin(range[1]))
             result[channel] = {'range': range, 'isIgnored': False,
                                'cutstring': str(range[0]) + " <= " + preCutConfig.variable + " <= " + str(range[1]),
                                'nBackground': GetNumberOfEventsInRange(bckgrd[channel], range),
@@ -122,50 +90,6 @@ def LoadHistogramsFromFiles(files, variable, channelNames, preCutHistograms):
         ratio[channel].SetTitle('Ratio')
         ratio[channel].Write('', ROOT.TObject.kOverwrite)
     return (signal, bckgrd, ratio)
-
-
-def GetPositionsOfMaxima(histograms):
-    """
-    Calculates the Positions of the Maxima of the given histograms
-    @param histograms Histograms
-    """
-    return dict([(channel, value.GetBinCenter(value.GetMaximumBin())) for (channel, value) in histograms.iteritems()])
-
-
-def GetInterpolateFunctions(histograms):
-    """
-    GetInterpolate Functions to the given histograms
-    @param histograms Histograms
-    """
-    return dict([(
-                channel,
-                ROOT.TF1(
-                    hashlib.sha1(channel).hexdigest() + '_func',
-                    lambda x, value=value: value.Interpolate(x[0]),
-                    value.GetXaxis().GetXmin(),
-                    value.GetXaxis().GetXmax(),
-                    0
-                )
-                ) for (channel, value) in histograms.iteritems()])
-
-
-def GetFitFunctions(histograms):
-    """
-    GetFit Functions to the given histograms
-    @param histograms Histograms
-    """
-    dict = {}
-    for (channel, value) in histograms.iteritems():
-        fitfunc = ROOT.TF1(hashlib.sha1(channel).hexdigest() + '_func',
-                           'gaus(0)',
-                           value.GetXaxis().GetXmin(),
-                           value.GetXaxis().GetXmax())
-        fitfunc.SetParameter(0, value.Integral() / 6)
-        fitfunc.SetParameter(1, value.GetBinCenter(value.GetMaximumBin()))
-        fitfunc.SetParameter(2, 1)
-        value.Fit(fitfunc)
-        dict[channel] = fitfunc
-    return dict
 
 
 def GetCuts(signal, bckgrd, efficiency, purity, ycut_to_xcuts):
@@ -242,6 +166,5 @@ def GetIgnoredChannels(signal, bckgrd, cuts):
     @param cuts cuts on the x-axis of the channels
     """
     def isIgnored(channel):
-        binWidth = signal[channel].GetBinWidth(signal[channel].FindBin(cuts[channel][0])) * 1.1
-        return abs(cuts[channel][0] - cuts[channel][1]) <= binWidth or GetNumberOfEventsInRange(signal[channel], cuts[channel]) < 100 or GetNumberOfEventsInRange(bckgrd[channel], cuts[channel]) < 100
+        return GetNumberOfEventsInRange(signal[channel], cuts[channel]) < 100 or GetNumberOfEventsInRange(bckgrd[channel], cuts[channel]) < 100
     return [channel for channel in signal.iterkeys() if isIgnored(channel)]

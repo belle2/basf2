@@ -36,8 +36,9 @@
 //  20140516  1930 destroycon / delcli fix
 //  20140902  1934 static bsizbuf pollution fix, broken tcprecv debug
 //  20140902  1935 memset fix
+//  20140903  1936 debug message fix
 
-#define NSM_DAEMON_VERSION   1935 /* daemon   version 1.9.35 */
+#define NSM_DAEMON_VERSION   1936 /* daemon   version 1.9.36 */
 // ----------------------------------------------------------------------
 
 // -- include files -----------------------------------------------------
@@ -4764,27 +4765,26 @@ nsmd_tcprecv(NSMcon& con)
     int from = ntohl(head.from);
     int err  = 0;
     int reqid = req - NSMREQ_FIRST;
-    int srccon  = sys.conid[src];
-    int destcon = sys.conid[dest];
 
     DBG("tcprecv(%d,%d) req=%x %d=>%d len=%d npar=%d p=[%d,%d] coni=%d",
         con.sock, CON_ID(con),
         req, src, dest, len, npar, ntohl(p[0]), ntohl(p[1]), coni);
 
-    if (src != 65535 && src != 0 &&
-        (src >= NSMSYS_MAX_NOD || sys.nod[src].name[0] == 0)) err++;
-    if (dest != 65535 && dest != 0 &&
-        (dest >= NSMSYS_MAX_NOD || sys.nod[dest].name[0] == 0)) err++;
-    if (req < NSMREQ_FIRST || req > NSMCMD_LAST) err++;
-    if (reqid >= NSMSYS_MAX_REQ && req < NSMCMD_FIRST) err++;
-    if (reqid < NSMSYS_MAX_REQ && sys.req[reqid].name[0] == 0) err++;
-
+    if (src  != 65535 && src  != 0 && src  >= NSMSYS_MAX_NOD) err |= 1;
+    if (dest != 65535 && dest != 0 && dest >= NSMSYS_MAX_NOD) err |= 2;
+    if (req < NSMREQ_FIRST || req > NSMCMD_LAST) err |= 4;
+    if (reqid >= NSMSYS_MAX_REQ && req < NSMCMD_FIRST) err |= 8;
+    if (! err && nsmd_sysp) {
+      if (src  != 65535 && src  != 0 && sys.nod[src].name[0]  == 0) err |= 16;
+      if (dest != 65535 && dest != 0 && sys.nod[dest].name[0] == 0) err |= 32;
+      if (reqid < NSMSYS_MAX_REQ    && sys.req[reqid].name[0] == 0) err |= 64;
+    }
     if (err) {
       for (int i = 0; i < 32; i += 8) {
         LOG("tcphead %02x %02x %02x %02x - %02x %02x %02x %02x",
             h[i + 0], h[i + i], h[i + 2], h[i + 3], h[i + 4], h[i + 5], h[i + 6], h[i + 7]);
       }
-      ASRT("bad tcphead");
+      ASRT("bad tcphead errcode=%x", err);
     }
   }
 

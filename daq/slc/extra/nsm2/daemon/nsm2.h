@@ -4,7 +4,7 @@
 /* -- version info */
 
 #define NSM_PROTOCOL_VERSION 1926 /* protocol version */
-#define NSM_PACKAGE_VERSION  1935 /* package  version */
+#define NSM_PACKAGE_VERSION  1936 /* package  version */
 
 /*
   20120723 1900 file created

@@ -63,6 +63,7 @@ namespace Belle2 {
     void setPriorityToDB(LogFile::Priority pri) { m_priority_db = pri; }
     void setPriorityToLocal(LogFile::Priority pri) { m_priority_local = pri; }
     void setPriorityToGlobal(LogFile::Priority pri) { m_priority_global = pri; }
+    void setExcludedNodes(const StringList& excluded) { m_excluded_v = excluded; }
 
   private:
     void update() throw();
@@ -88,6 +89,7 @@ namespace Belle2 {
     LogFile::Priority m_priority_db;
     LogFile::Priority m_priority_local;
     LogFile::Priority m_priority_global;
+    StringList m_excluded_v;
 
   private:
     class ConfigProvider {

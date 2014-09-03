@@ -33,6 +33,7 @@ int main(int argc, char** argv)
   callback->setPriorityToDB(LogFile::getPriority(config.get("log.priority.db")));
   callback->setPriorityToLocal(LogFile::getPriority(config.get("log.priority.local")));
   callback->setPriorityToGlobal(LogFile::getPriority(config.get("log.priority.global")));
+  callback->setExcludedNodes(StringUtil::split(config.get("node.exlcded"), ','));
 
   RunControlMasterCallback* master_callback =
     new RunControlMasterCallback(node, callback);

@@ -65,6 +65,12 @@ void RunControlCallback::init() throw()
       DBObject& obj(obj_v[i].getObject("runtype"));
       NSMNode node(obj.getNode());
       node.setUsed(obj_v[i].getBool("used"));
+      for (StringList::iterator it = m_excluded_v.begin();
+           it != m_excluded_v.end(); it++) {
+        if (node.getName() == *it) {
+          node.setExcluded(true);
+        }
+      }
       m_node_v.push_back(node);
     }
   }

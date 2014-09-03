@@ -61,7 +61,7 @@ namespace Belle2 {
     int n_basf2evt;
 
     //! Messaage handler
-    MsgHandler* m_msghandler;
+    //    MsgHandler* m_msghandler;
 
     /*     //! Compression Level */
     /*     int m_compressionLevel; */

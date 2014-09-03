@@ -64,7 +64,7 @@ def outputUdst(filename, path=analysis_main):
                                    additionalBranches=partBranches)
 
 
-def generateY4S(noEvents, decayTable, path=analysis_main):
+def generateY4S(noEvents, decayTable=None, path=analysis_main):
     """
     Generated e+e- -> Y(4S) events with EvtGen event generator.
     The Y(4S) decays according to the user specifed decay table.
@@ -85,7 +85,8 @@ def generateY4S(noEvents, decayTable, path=analysis_main):
     evtnumbers.param('runList', [1])
     evtnumbers.param('expList', [1])
     evtgeninput = register_module('EvtGenInput')
-    evtgeninput.param('userDECFile', decayTable)
+    if decayTable is not None:
+        evtgeninput.param('userDECFile', decayTable)
     evtgeninput.param('boost2LAB', True)
     path.add_module(evtnumbers)
     path.add_module(evtgeninput)
@@ -378,7 +379,7 @@ def trainTMVAMethod(
     decayString,
     variables,
     methods=[('FastBDT', 'Plugin',
-             '!H:!V:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3'
+             '!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3'
              )],
     target='isSignal',
     prefix='TMVA',

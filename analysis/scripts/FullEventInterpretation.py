@@ -23,6 +23,7 @@
 
 from ROOT import PyConfig
 PyConfig.IgnoreCommandLineOptions = True
+PyConfig.StartGuiThread = False
 import ROOT
 
 import pdg

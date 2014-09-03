@@ -50,7 +50,6 @@ namespace Belle2 {
      */
     Manager::FunctionPtr daughter(const std::vector<std::string>& arguments);
 
-
     /**
      * Returns -999 (delta function of NeuroBayes) instead of variable value if pid from given detector is missing.
      * First arguments must be TOP or ARICH
@@ -58,5 +57,28 @@ namespace Belle2 {
      */
     Manager::FunctionPtr NBDeltaIfMissing(const std::vector<std::string>& arguments);
 
+    /**
+     * Returns function which returns the maximum q*r value for a given list (argument[0]). The r value is stored via extraInfo
+     * before and is accessed via argument[1]. This is a Flavor Tagging specific variable!
+     */
+    Manager::FunctionPtr bestQrOf(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the q*r value for a given list (argument[0]). The r value is stored via extraInfo
+     * before and is accessed via argument[1]. This is a Flavor Tagging specific variable on event level!
+     */
+    Manager::FunctionPtr QrOf(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns 1 if the class track by particleName category has the same flavour as the MC target track,
+     * 0 else; also if there is no target track. This is a Flavor Tagging specific variable!
+     */
+    Manager::FunctionPtr IsRightClass(const std::vector<std::string>& arguments);
+
+    /**
+    * Checks if the given Particle was really a Particle from a B. 1.0 if true otherwise 0.0.
+    * This is a Flavor Tagging specific variable!
+    */
+    Manager::FunctionPtr IsFromB(const std::vector<std::string>& arguments);
   }
 }

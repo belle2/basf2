@@ -227,26 +227,6 @@ namespace Belle2 {
     double isInRestOfEvent(const Particle* particle);
 
     /**
-     * return 1 if (dummy) Particle was a Electron, 0 otherwise
-     */
-    double isElectronFromB(const Particle* particle);
-
-    /**
-    * return 1 if (dummy) Particle was a Muon, 0 otherwise
-    */
-    double isMuonFromB(const Particle* particle);
-
-    /**
-     * return 1 if (dummy) Particle was a Kaon, 0 otherwise
-     */
-    double isKaonFromB(const Particle* particle);
-
-    /**
-     * return 1 if (dummy) Particle was a slow Pion, 0 otherwise
-     */
-    double isSlowPionFromB(const Particle* part);
-
-    /**
      * return 1 if (dummy)
      */
     double isMajorityInRestOfEventFromB0(const Particle*);
@@ -277,44 +257,6 @@ namespace Belle2 {
     double isRestOfEventB0Flavor_Norm(const Particle*);
 
     /**
-    * returns q*r for maximum r
-    */
-    double bestQRElectron(const Particle*);
-    /**
-    * returns q*r for maximum r
-    */
-    double bestQRMuon(const Particle*);
-
-    /**
-     * returns q*r for maximum r
-     */
-    double bestQRSlowPion(const Particle*);
-
-    /**
-     * returns q*r for maximum r
-     */
-    double bestQRKaon(const Particle*);
-
-    /**
-    * returns 1 if the class track by electron category has the same flavour as the MC target track 0 else also if there is no target track
-    */
-    double isElectronRightClass(const Particle*);
-    /**
-    * returns returns 1 if the class track by muon category has the same flavour as the MC target track 0 else also if there is no target track
-    */
-    double isMuonRightClass(const Particle*);
-
-    /**
-     * returns 1 if the class track by slow pion category has the same flavour as the MC target track 0 else also if there is no target track
-     */
-    double isSlowPionRightClass(const Particle*);
-
-    /**
-     * returns 1 if the class track by kaon category has the same flavour as the MC target track 0 else also if there is no target track
-     */
-    double isKaonRightClass(const Particle*);
-
-    /**
      * returns missing Momentum on the tag side (flavor tagging specific variable).
      *
      * requires that StoreObjPtr<RestOfEvent> roe("RestOfEvent") exists.
@@ -322,11 +264,52 @@ namespace Belle2 {
     double p_miss(const Particle*);
 
     /**
-     * 1.0 if there was a K_S0 in the ROE (flavor tagging specific variable).
+     * Returns the number of K_S0 in the remaining Kaon ROE (flavor tagging specific variable).
      *
-     * requires that StoreObjPtr<ParticleList> KShorts("K_S0:ROE") exists.
+     * requires that StoreObjPtr<ParticleList> KShorts("K_S0:ROEKaon") exists.
      */
-    double isThereAKShortinRoe(const Particle*);
+    double NumberOfKShortinRemainingROEKaon(const Particle*);
+
+    /**
+     * Returns the number of K_S0 in the remaining Lambda ROE (flavor tagging specific variable).
+     *
+     * requires that StoreObjPtr<ParticleList> KShorts("K_S0:ROELambda") exists.
+     */
+    double NumberOfKShortinRemainingROELambda(const Particle*);
+
+    /**
+     * 1.0 if pdg-code for Lambda0, -1.0 if Anti-Lambda0, 0.0 else
+     *
+     * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
+     */
+    double lambdaFlavor(const Particle* particle);
+
+    /**
+     * Returns the Matrixelement[2][2] of the PositionErrorMatrix of the Vertex fit.
+     *
+     * This is a simplistic hack. But I see no other way to get the information.
+     */
+    double lambdaZError(const Particle* particle);
+
+    /**
+     * Returns the Momentum of second daughter if existing, else 0.
+     */
+    double MomentumOfSecondDaughter(const Particle* part);
+
+    /**
+     * Returns the Momentum of second daughter if existing in CMS, else 0.
+     */
+    double MomentumOfSecondDaughter_CMS(const Particle* part);
+
+    /**
+     * Returns q*(highest PID_Likelihood for Kaons), else 0.
+     */
+    double chargeTimesKaonLiklihood(const Particle*);
+
+    /**
+     * Returns the transverse momentum of all charged tracks if there exists a ROE for the given particle, else 0.
+     */
+    double transverseMomentumOfChargeTracksInRoe(const Particle* part);
 
     /**
      * return number of remaining tracks as given by the related RestOfEvent object

@@ -544,340 +544,6 @@ namespace Belle2 {
       } else return -2;//gRandom->Uniform(0, 1);
     }
 
-    double isElectronFromB(const Particle* part)
-    {
-      const MCParticle* mcParticle = part->getRelated<MCParticle>();
-      if (mcParticle == nullptr) {
-        return 0.0;
-      } else if (mcParticle->getMother() != nullptr
-                 && mcParticle->getMother()->getMother() != nullptr
-                 && TMath::Abs(mcParticle->getPDG()) == 11
-                 && TMath::Abs(mcParticle->getMother()->getPDG()) == 511) {
-        return 1.0;
-      } else {
-        return 0.0;
-      }
-    }
-
-    double isMuonFromB(const Particle* part)
-    {
-      const MCParticle* mcParticle = part->getRelated<MCParticle>();
-      if (mcParticle == nullptr) {
-        return 0.0;
-      } else if (mcParticle->getMother() != nullptr
-                 && mcParticle->getMother()->getMother() != nullptr
-                 && TMath::Abs(mcParticle->getPDG()) == 13
-                 && TMath::Abs(mcParticle->getMother()->getPDG()) == 511) {
-        return 1.0;
-      } else {
-        return 0.0;
-      }
-    }
-
-    double isKaonFromB(const Particle* part)
-    {
-      const MCParticle* mcParticle = part->getRelated<MCParticle>();
-      if (mcParticle == nullptr) {
-        return 0.0;
-      } else if (mcParticle->getMother() != nullptr
-                 && mcParticle->getMother()->getMother() != nullptr
-                 && TMath::Abs(mcParticle->getPDG()) == 321
-                 && TMath::Abs(mcParticle->getMother()->getPDG()) > 400
-                 && TMath::Abs(mcParticle->getMother()->getPDG()) < 500
-                 && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511) {
-        return 1.0;
-      } else {
-        return 0.0;
-      }
-    }
-
-    double isSlowPionFromB(const Particle* part)
-    {
-      const MCParticle* mcParticle = part->getRelated<MCParticle>();
-      if (mcParticle == nullptr) {
-        return 0.0;
-      } else if (mcParticle->getMother() != nullptr
-                 && mcParticle->getMother()->getMother() != nullptr
-                 && TMath::Abs(mcParticle->getPDG()) == 211
-                 && TMath::Abs(mcParticle->getMother()->getPDG()) == 413
-                 && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511) {
-        return 1.0;
-      } else {
-        return 0.0;
-      }
-    }
-
-    double bestQRElectron(const Particle*)
-    {
-      StoreObjPtr<ParticleList> electrons("e+:ROE");
-      float maximum_q = 0;
-      float maximum_r = 0;
-      for (unsigned int i = 0; i < electrons->getListSize(); ++i) {
-        Particle* p = electrons->getParticle(i);
-        float r = p->getExtraInfo("isElectronFromB");
-        if (r > maximum_r) {
-          maximum_r = r;
-          maximum_q = p->getCharge();
-        }
-      }
-      return maximum_r * maximum_q;
-    }
-
-    double bestQRMuon(const Particle*)
-    {
-      StoreObjPtr<ParticleList> muons("mu+:ROE");
-      float maximum_q = 0;
-      float maximum_r = 0;
-      for (unsigned int i = 0; i < muons->getListSize(); ++i) {
-        Particle* p = muons->getParticle(i);
-        float r = p->getExtraInfo("isMuonFromB");
-        if (r > maximum_r) {
-          maximum_r = r;
-          maximum_q = p->getCharge();
-        }
-      }
-      return maximum_r * maximum_q;
-    }
-
-    double bestQRKaon(const Particle*)
-    {
-      StoreObjPtr<ParticleList> kaons("K+:ROE");
-      float maximum_q = 0;
-      float maximum_r = 0;
-      for (unsigned int i = 0; i < kaons->getListSize(); ++i) {
-        Particle* p = kaons->getParticle(i);
-        float r = p->getExtraInfo("isKaonFromB");
-        if (r > maximum_r) {
-          maximum_r = r;
-          maximum_q = p->getCharge();
-        }
-      }
-      return maximum_r * maximum_q;
-    }
-
-    double bestQRSlowPion(const Particle*)
-    {
-      StoreObjPtr<ParticleList> pions("pi+:ROE");
-      float maximum_q = 0;
-      float maximum_r = 0;
-      for (unsigned int i = 0; i < pions->getListSize(); ++i) {
-        Particle* p = pions->getParticle(i);
-        float r = p->getExtraInfo("isSlowPionFromB");
-        if (r > maximum_r) {
-          maximum_r = r;
-          maximum_q = p->getCharge();
-        }
-      }
-      return maximum_r * maximum_q;
-    }
-
-    double QRElectron(const Particle*)
-    {
-      StoreObjPtr<EventExtraInfo> Info("EventExtraInfo");
-      float p = Info -> getExtraInfo("isElectronRightClass"); //Gets the probability of beeing right classified flavour from the event level
-      float r = TMath::Abs(2 * p - 1); //Definition of the dilution factor
-      StoreObjPtr<ParticleList> muons("e+:ROE");
-      float maximum_q = 0; //Flavour of the track selected as target
-      float maximum_p_track = 0; //Probability of being the target track from the track level
-      for (unsigned int i = 0; i < muons->getListSize(); ++i) {
-        Particle* p = muons->getParticle(i);
-        float x = p->getExtraInfo("isElectronFromB");
-        if (x > maximum_p_track) {
-          maximum_p_track = x;
-          maximum_q = p->getCharge();
-        }
-      }
-      return 0.5 * (maximum_q * r + 1);
-    }
-
-    double QRMuon(const Particle*)
-    {
-      StoreObjPtr<EventExtraInfo> Info("EventExtraInfo");
-      float p = Info -> getExtraInfo("isElectronRightClass"); //Gets the probability of beeing right classified flavour from the event level
-      float r = TMath::Abs(2 * p - 1); //Definition of the dilution factor
-      StoreObjPtr<ParticleList> muons("mu+:ROE");
-      float maximum_q = 0; //Flavour of the track selected as target
-      float maximum_p_track = 0; //Probability of being the target track from the track level
-      for (unsigned int i = 0; i < muons->getListSize(); ++i) {
-        Particle* p = muons->getParticle(i);
-        float x = p->getExtraInfo("isMuonFromB");
-        if (x > maximum_p_track) {
-          maximum_p_track = x;
-          maximum_q = p->getCharge();
-        }
-      }
-      return 0.5 * (maximum_q * r + 1);
-    }
-
-    double QRKaon(const Particle*)
-    {
-      StoreObjPtr<EventExtraInfo> Info("EventExtraInfo");
-      float p = Info -> getExtraInfo("isElectronRightClass"); //Gets the probability of beeing right classified flavour from the event level
-      float r = TMath::Abs(2 * p - 1); //Definition of the dilution factor
-      StoreObjPtr<ParticleList> muons("K+:ROE");
-      float maximum_q = 0; //Flavour of the track selected as target
-      float maximum_p_track = 0; //Probability of being the target track from the track level
-      for (unsigned int i = 0; i < muons->getListSize(); ++i) {
-        Particle* p = muons->getParticle(i);
-        float x = p->getExtraInfo("isKaonFromB");
-        if (x > maximum_p_track) {
-          maximum_p_track = x;
-          maximum_q = p->getCharge();
-        }
-      }
-      return 0.5 * (maximum_q * r + 1);
-    }
-
-    double QRSlowPion(const Particle*)
-    {
-      StoreObjPtr<EventExtraInfo> Info("EventExtraInfo");
-      float p = Info -> getExtraInfo("isElectronRightClass"); //Gets the probability of beeing right classified flavour from the event level
-      float r = TMath::Abs(2 * p - 1); //Definition of the dilution factor
-      StoreObjPtr<ParticleList> muons("pi+:ROE");
-      float maximum_q = 0; //Flavour of the track selected as target
-      float maximum_p_track = 0; //Probability of being the target track from the track level
-      for (unsigned int i = 0; i < muons->getListSize(); ++i) {
-        Particle* p = muons->getParticle(i);
-        float x = p->getExtraInfo("isSlowPionFromB");
-        if (x > maximum_p_track) {
-          maximum_p_track = x;
-          maximum_q = p->getCharge();
-        }
-      }
-      return 0.5 * (maximum_q * r + 1);
-    }
-
-    double isElectronRightClass(const Particle*)
-    {
-      StoreObjPtr<ParticleList> electrons("e+:ROE");
-      Particle* nullpart = nullptr;
-      float maximum_q = 0;
-      float maximum_r = 0;
-      int maximum_PDG = 0;
-      int maximum_PDG_Mother = 0;
-      for (unsigned int i = 0; i < electrons->getListSize(); ++i) {
-        Particle* p = electrons->getParticle(i);
-        const MCParticle* MCp = p->getRelated<MCParticle>();
-        float r = p->getExtraInfo("isElectronFromB");
-        if (r > maximum_r) {
-          maximum_r = r;
-          maximum_q = p -> getCharge();
-          if (MCp->getMother() != nullptr && MCp->getMother()->getMother() != nullptr) {
-            maximum_PDG = TMath::Abs(MCp->getPDG());
-            maximum_PDG_Mother = TMath::Abs(MCp->getMother()->getPDG());
-          } else {
-            maximum_PDG = 0;
-            maximum_PDG_Mother = 0;
-          }
-        }
-      }
-      if (maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 11 && maximum_PDG_Mother == 511) {
-        return 1.0;
-      } else {
-        return 0.0;
-      }
-    }
-
-    double isMuonRightClass(const Particle*)
-    {
-
-      StoreObjPtr<ParticleList> muons("mu+:ROE");
-      Particle* nullpart = nullptr;
-      float maximum_q = 0;
-      float maximum_r = 0;
-      int maximum_PDG = 0;
-      int maximum_PDG_Mother = 0;
-      for (unsigned int i = 0; i < muons->getListSize(); ++i) {
-        Particle* p = muons->getParticle(i);
-        const MCParticle* MCp = p->getRelated<MCParticle>();
-        float r = p->getExtraInfo("isMuonFromB");
-        if (r > maximum_r) {
-          maximum_r = r;
-          maximum_q = p -> getCharge();
-          if (MCp->getMother() != nullptr && MCp->getMother()->getMother() != nullptr) {
-            maximum_PDG = TMath::Abs(MCp->getPDG());
-            maximum_PDG_Mother = TMath::Abs(MCp->getMother()->getPDG());
-          } else {
-            maximum_PDG = 0;
-            maximum_PDG_Mother = 0;
-          }
-        }
-      }
-      if (maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 13 && maximum_PDG_Mother == 511) {
-        return 1.0;
-      } else {
-        return 0.0;
-      }
-    }
-
-    double isKaonRightClass(const Particle*)
-    {
-      StoreObjPtr<ParticleList> kaons("K+:ROE");
-      Particle* nullpart = nullptr;
-      float maximum_q = 0;
-      float maximum_r = 0;
-      int maximum_PDG = 0;
-      int maximum_PDG_Mother = 0;
-      int maximum_PDG_Mother_Mother = 0;
-      for (unsigned int i = 0; i < kaons->getListSize(); ++i) {
-        Particle* p = kaons->getParticle(i);
-        const MCParticle* MCp = p->getRelated<MCParticle>();
-        float r = p->getExtraInfo("isKaonFromB");
-        if (r > maximum_r) {
-          maximum_r = r;
-          maximum_q = p -> getCharge();
-          if (MCp->getMother() != nullptr && MCp->getMother()->getMother() != nullptr) {
-            maximum_PDG = TMath::Abs(MCp->getPDG());
-            maximum_PDG_Mother = TMath::Abs(MCp->getMother()->getPDG());
-            maximum_PDG_Mother_Mother =  TMath::Abs(MCp->getMother()->getMother()->getPDG());
-          } else {
-            maximum_PDG = 0;
-            maximum_PDG_Mother = 0;
-          }
-        }
-      }
-      if (maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
-          && maximum_PDG == 321 && maximum_PDG_Mother > 400 && maximum_PDG_Mother < 500 && maximum_PDG_Mother_Mother == 511) {
-        return 1.0;
-      } else {
-        return 0.0;
-      }
-    }
-
-    double isSlowPionRightClass(const Particle*)
-    {
-      StoreObjPtr<ParticleList> pions("pi+:ROE");
-      Particle* nullpart = nullptr;
-      float maximum_q = 0;
-      float maximum_r = 0;
-      int maximum_PDG = 0;
-      int maximum_PDG_Mother = 0;
-      int maximum_PDG_Mother_Mother = 0;
-      for (unsigned int i = 0; i < pions->getListSize(); ++i) {
-        Particle* p = pions->getParticle(i);
-        const MCParticle* MCp = p->getRelated<MCParticle>();
-        float r = p->getExtraInfo("isSlowPionFromB");
-        if (r > maximum_r) {
-          maximum_r = r;
-          maximum_q = p -> getCharge();
-          if (MCp->getMother() != nullptr && MCp->getMother()->getMother() != nullptr) {
-            maximum_PDG = TMath::Abs(MCp->getPDG());
-            maximum_PDG_Mother = TMath::Abs(MCp->getMother()->getPDG());
-            maximum_PDG_Mother_Mother =  TMath::Abs(MCp->getMother()->getMother()->getPDG());
-          } else {
-            maximum_PDG = 0;
-            maximum_PDG_Mother = 0;
-          }
-        }
-      }
-      if (maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
-          && maximum_PDG == 211 && maximum_PDG_Mother == 413 && maximum_PDG_Mother_Mother == 511) {
-        return 1.0;
-      } else {
-        return 0.0;
-      }
-    }
-
     double p_miss(const Particle*)
     {
       TLorentzVector trackiCMSVec;
@@ -899,21 +565,108 @@ namespace Belle2 {
       return missMom ;
     }
 
-    double isThereAKShortinRoe(const Particle*)
+    double NumberOfKShortinRemainingROEKaon(const Particle* particle)
     {
-      StoreObjPtr<ParticleList> KShorts("K_S0:ROE");
-      int flag = KShorts->getListSize();
-      //cout << "flag  " << flag;
-      if (flag == 0) return 0.0;
-      else return 1.0;
+      StoreObjPtr<ParticleList> KShorts("K_S0:ROEKaon");
+      int flag = 0;
+      if (KShorts->getListSize() == 0) {return flag;}
+      for (unsigned int i = 0; i < KShorts->getListSize(); i++) {
+        if (particle->overlapsWith(KShorts->getParticle(i))) {continue;}
+        flag++;
+      }
+      return flag;
     }
 
-    double cosTPTO(const Particle* p)
+    double NumberOfKShortinRemainingROELambda(const Particle* particle)
+    {
+      StoreObjPtr<ParticleList> KShorts("K_S0:ROELambda");
+      int flag = 0;
+      if (KShorts->getListSize() == 0) {return flag;}
+      for (unsigned int i = 0; i < KShorts->getListSize(); i++) {
+        if (particle->overlapsWith(KShorts->getParticle(i))) {continue;}
+        flag++;
+      }
+      return flag;
+    }
+
+    double lambdaFlavor(const Particle* particle)
+    {
+      if (particle->getPDGCode() == 3122) return 1.0; //Lambda0
+      else if (particle->getPDGCode() == -3122) return -1.0; //Anti-Lambda0
+      else return 0.0;
+    }
+
+    double lambdaZError(const Particle* particle)
+    {
+      //This is a simplisitc hack. But I see no other way to get that information.
+      //Should be removed if worthless
+      TMatrixFSym ErrorPositionMatrix = particle->getVertexErrorMatrix();
+      double zError = ErrorPositionMatrix[2][2];
+      return zError;
+    }
+
+    double MomentumOfSecondDaughter(const Particle* part)
+    {
+      if (part->getDaughter(1) == nullptr) return 0.0;
+      else {
+        return part->getDaughter(1)->getP();
+      }
+    }
+
+    double MomentumOfSecondDaughter_CMS(const Particle* part)
+    {
+      if (part->getDaughter(1) == nullptr) return 0.0;
+      else {
+        PCmsLabTransform T;
+        TLorentzVector vec = T.rotateLabToCms() * part->getDaughter(1)->get4Vector();
+        return vec.P();
+      }
+    }
+
+    double chargeTimesKaonLiklihood(const Particle*)
+    {
+      StoreObjPtr<ParticleList> kaons("K+:ROE");
+      if (kaons->getListSize() == 0) return 0.0;
+      double maximum_Kid = 0;
+      double maximum_charge = 0;
+      for (unsigned int i = 0; i < kaons->getListSize(); ++i) {
+        Particle* p = kaons->getParticle(i);
+        double Kid = p->getRelatedTo<PIDLikelihood>()->getProbability(Const::kaon, Const::pion);
+        if (Kid > maximum_Kid) {
+          maximum_Kid = Kid;
+          maximum_charge = p->getCharge();
+        }
+      }
+      return maximum_Kid * maximum_charge;
+    }
+
+    double transverseMomentumOfChargeTracksInRoe(const Particle* part)
+    {
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      if (not roe.isValid())
+        return 0.0;
+
+      double sum = 0.0;
+      double pt = 0.0;
+      for (const auto & track : roe->getTracks()) {
+        if (part->getTrack() == track)
+          continue;
+        if (track->getTrackFitResult(Const::pion) == nullptr)
+          continue;
+        pt = track->getTrackFitResult(Const::pion)->getTransverseMomentum();
+
+        sum += sqrt(pt * pt);
+      }
+      return sum;
+
+    }
+
+    double cosTPTO(const Particle* part)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       const ContinuumSuppression* cs = roe->getRelated<Particle>()->getRelated<ContinuumSuppression>();
       const TVector3 thrustAxisO = cs->getThrustO(); //thrust is already in cms
-      const TVector3 pAxis = PCmsLabTransform::labToCms(p->get4Vector()).Vect();
+      const TVector3 pAxis = PCmsLabTransform::labToCms(part->get4Vector()).Vect();
       double result = fabs(cos(pAxis.Angle(thrustAxisO)));
 
       //const ContinuumSuppression* qq = p->getRelated<ContinuumSuppression>();
@@ -983,7 +736,8 @@ namespace Belle2 {
       float maximum_r = 0;
       for (unsigned int i = 0; i < muons->getListSize(); ++i) {
         Particle* p = muons->getParticle(i);
-        float r = p->getExtraInfo("isMuonFromB");
+        //float r = p->getExtraInfo("isMuonFromB");
+        float r = p->getExtraInfo("IsFromB(Muon)");
         momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
         if (r > maximum_r) {
           maximum_r = r;
@@ -1019,7 +773,8 @@ namespace Belle2 {
       float maximum_r = 0;
       for (unsigned int i = 0; i < electrons->getListSize(); ++i) {
         Particle* p = electrons->getParticle(i);
-        float r = p->getExtraInfo("isElectronFromB");
+        //float r = p->getExtraInfo("isElectronFromB");
+        float r = p->getExtraInfo("IsFromB(Electron)");
         momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
         if (r > maximum_r) {
           maximum_r = r;
@@ -1055,7 +810,8 @@ namespace Belle2 {
       float maximum_r = 0;
       for (unsigned int i = 0; i < muons->getListSize(); ++i) {
         Particle* p = muons->getParticle(i);
-        float r = p->getExtraInfo("isMuonFromB");
+        //float r = p->getExtraInfo("isMuonFromB");
+        float r = p->getExtraInfo("IsFromB(Muon)");
         momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
         if (r > maximum_r) {
           maximum_r = r;
@@ -1077,7 +833,8 @@ namespace Belle2 {
       float maximum_r = 0;
       for (unsigned int i = 0; i < electrons->getListSize(); ++i) {
         Particle* p = electrons->getParticle(i);
-        float r = p->getExtraInfo("isElectronFromB");
+        //float r = p->getExtraInfo("isElectronFromB");
+        float r = p->getExtraInfo("IsFromB(Electron)");
         momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
         if (r > maximum_r) {
           maximum_r = r;
@@ -1099,7 +856,8 @@ namespace Belle2 {
       float maximum_r = 0;
       for (unsigned int i = 0; i < kaons->getListSize(); ++i) {
         Particle* p = kaons->getParticle(i);
-        float r = p->getExtraInfo("isKaonFromB");
+        //float r = p->getExtraInfo("isKaonFromB");
+        float r = p->getExtraInfo("IsFromB(Kaon)");
         momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
         if (r > maximum_r) {
           maximum_r = r;
@@ -1121,7 +879,8 @@ namespace Belle2 {
       float maximum_r = 0;
       for (unsigned int i = 0; i < pions->getListSize(); ++i) {
         Particle* p = pions->getParticle(i);
-        float r = p->getExtraInfo("isSlowPionFromB");
+        //float r = p->getExtraInfo("isSlowPionFromB");
+        float r = p->getExtraInfo("IsFromB(SlowPion)");
         momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
         if (r > maximum_r) {
           maximum_r = r;
@@ -1144,7 +903,9 @@ namespace Belle2 {
       float maximum_r = 0;
       for (unsigned int i = 0; i < muons->getListSize(); ++i) {
         Particle* p = muons->getParticle(i);
-        float r = p->getExtraInfo("isMuonFromB");
+        //float r = p->getExtraInfo("isMuonFromB");
+        float r = p->getExtraInfo("IsFromB(Muon)");
+
         momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
         if (r > maximum_r) {
           maximum_r = r;
@@ -1182,7 +943,8 @@ namespace Belle2 {
       float maximum_r = 0;
       for (unsigned int i = 0; i < electrons->getListSize(); ++i) {
         Particle* p = electrons->getParticle(i);
-        float r = p->getExtraInfo("isElectronFromB");
+        //float r = p->getExtraInfo("isElectronFromB");
+        float r = p->getExtraInfo("IsFromB(Electron)");
         momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
         if (r > maximum_r) {
           maximum_r = r;
@@ -1220,7 +982,8 @@ namespace Belle2 {
       float maximum_r = 0;
       for (unsigned int i = 0; i < muons->getListSize(); ++i) {
         Particle* p = muons->getParticle(i);
-        float r = p->getExtraInfo("isMuonFromB");
+        //float r = p->getExtraInfo("isMuonFromB");
+        float r = p->getExtraInfo("IsFromB(Muon)");
         momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
         if (r > maximum_r) {
           maximum_r = r;
@@ -1258,7 +1021,8 @@ namespace Belle2 {
       float maximum_r = 0;
       for (unsigned int i = 0; i < electrons->getListSize(); ++i) {
         Particle* p = electrons->getParticle(i);
-        float r = p->getExtraInfo("isElectronFromB");
+        //float r = p->getExtraInfo("isElectronFromB");
+        float r = p->getExtraInfo("IsFromB(Electron)");
         momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
         if (r > maximum_r) {
           maximum_r = r;
@@ -1316,7 +1080,8 @@ namespace Belle2 {
       float maximum_r = 0;
       for (unsigned int i = 0; i < muons->getListSize(); ++i) {
         Particle* p = muons->getParticle(i);
-        float r = p->getExtraInfo("isMuonFromB");
+        //float r = p->getExtraInfo("isMuonFromB");
+        float r = p->getExtraInfo("IsFromB(Muon)");
         momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
         if (r > maximum_r) {
           maximum_r = r;
@@ -1363,7 +1128,8 @@ namespace Belle2 {
       float maximum_r = 0;
       for (unsigned int i = 0; i < electrons->getListSize(); ++i) {
         Particle* p = electrons->getParticle(i);
-        float r = p->getExtraInfo("isElectronFromB");
+        //float r = p->getExtraInfo("isElectronFromB");
+        float r = p->getExtraInfo("IsFromB(Electron)");
         momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
         if (r > maximum_r) {
           maximum_r = r;
@@ -2436,31 +2202,22 @@ namespace Belle2 {
     REGISTER_VARIABLE("mcStatus", particleMCMatchStatus,  "The bit pattern indicating the quality of MC match (see MCMatching::MCMatchStatus)");
 
     VARIABLE_GROUP("Flavour tagging");
-    REGISTER_VARIABLE("isMajorityInRestOfEventFromB0", isMajorityInRestOfEventFromB0, "[Eventbased] Check if the majority of the tracks in the current RestOfEvent are from a B0");
-    REGISTER_VARIABLE("isMajorityInRestOfEventFromB0bar", isMajorityInRestOfEventFromB0bar, "[Eventbased] Check if the majority of the tracks in the current RestOfEvent are from a B0bar");
-    REGISTER_VARIABLE("isRestOfEventOfB0", isRestOfEventOfB0,  "[Eventbased] Check if current RestOfEvent is related to a B0");
-    REGISTER_VARIABLE("isRestOfEventOfB0bar", isRestOfEventOfB0bar,  "[Eventbased] Check if current RestOfEvent is related to a B0 B0bar");
-    REGISTER_VARIABLE("isRestOfEventB0Flavor", isRestOfEventB0Flavor,  "-1 (1) if current RestOfEvent is related to a B0bar (B0)");
-    REGISTER_VARIABLE("qr_Combined", isRestOfEventB0Flavor_Norm,  "0 (1) if current RestOfEvent is related to a B0bar (B0)");
-    REGISTER_VARIABLE("isElectronFromB", isElectronFromB,  "Checks if the track was really a Kaon from a B. 1.0 if true otherwise 0.0");
-    REGISTER_VARIABLE("isMuonFromB", isMuonFromB,  "Checks if the track was really a Muon from a B. 1.0 if true otherwise 0.0");
-    REGISTER_VARIABLE("isKaonFromB", isKaonFromB,  "Checks if the track was really a Electron from a B. 1.0 if true otherwise 0.0");
-    REGISTER_VARIABLE("isSlowPionFromB", isSlowPionFromB,  "Checks if the track was really a slow Pion from a B. 1.0 if true otherwise 0.0");
-    REGISTER_VARIABLE("bestQRElectron", bestQRElectron,  "[Eventbased] q*r where r is maximum getExtraInfo(isElectron) in e+:ROE list.");
-    REGISTER_VARIABLE("bestQRMuon", bestQRMuon,  "[Eventbased] q*r where r is maximum getExtraInfo(isMuon) in mu+:ROE list.");
-    REGISTER_VARIABLE("bestQRSlowPion", bestQRSlowPion,  "[Eventbased] q*r where r is maximum getExtraInfo(isSlowPion) in pi+:ROE list.");
-    REGISTER_VARIABLE("bestQRKaon", bestQRKaon,  "[Eventbased] q*r where r is maximum getExtraInfo(isKaon) in K+:ROE list.");
-    REGISTER_VARIABLE("QRElectron", QRElectron,  "[Eventbased] q*r where r is calculated from the output of event level in in e+:ROE list.");
-    REGISTER_VARIABLE("QRMuon", QRMuon,  "[Eventbased] q*r where r is calculated from the output of event level in mu+:ROE list.");
-    REGISTER_VARIABLE("QRSlowPion", QRSlowPion,  "[Eventbased] q*r where r is calculated from the output of event level in in pi+:ROE list.");
-    REGISTER_VARIABLE("QRKaon", QRKaon,  "[Eventbased] q*r where r is calculated from the output of event level in in K+:ROE list.");
-    REGISTER_VARIABLE("isElectronRightClass", isElectronRightClass,  "returns 1 if the class track by electron category has the same flavour as the MC target track 0 else also if there is no target track");
-    REGISTER_VARIABLE("isMuonRightClass", isMuonRightClass,  "returns 1 if the class track by muon category has the same flavour as the MC target track 0 else also if there is no target track");
-    REGISTER_VARIABLE("isSlowPionRightClass", isSlowPionRightClass,  "returns 1 if the class track by slow pion category has the same flavour as the MC target track 0 else also if there is no target track");
-    REGISTER_VARIABLE("isKaonRightClass", isKaonRightClass,  "returns 1 if the class track by kaon category has the same flavour as the MC target track 0 else also if there is no target track");
+    REGISTER_VARIABLE("isMajorityInRestOfEventFromB0", isMajorityInRestOfEventFromB0, "[Eventbased] Check if the majority of the tracks in the current RestOfEvent are from a B0.");
+    REGISTER_VARIABLE("isMajorityInRestOfEventFromB0bar", isMajorityInRestOfEventFromB0bar, "[Eventbased] Check if the majority of the tracks in the current RestOfEvent are from a B0bar.");
+    REGISTER_VARIABLE("isRestOfEventOfB0", isRestOfEventOfB0,  "[Eventbased] Check if current RestOfEvent is related to a B0.");
+    REGISTER_VARIABLE("isRestOfEventOfB0bar", isRestOfEventOfB0bar,  "[Eventbased] Check if current RestOfEvent is related to a B0 B0bar.");
+    REGISTER_VARIABLE("isRestOfEventB0Flavor", isRestOfEventB0Flavor,  "-1 (1) if current RestOfEvent is related to a B0bar (B0).");
+    REGISTER_VARIABLE("qr_Combined", isRestOfEventB0Flavor_Norm,  "0 (1) if current RestOfEvent is related to a B0bar (B0).");
     REGISTER_VARIABLE("p_miss", p_miss,  "Calculates the missing Momentum for a given particle on the tag side.");
-    REGISTER_VARIABLE("isInRestOfEvent",  isInRestOfEvent,  "1.0 of track, cluster of given particle is found in rest of event. 0 otherwise.");
-    REGISTER_VARIABLE("isThereAKShortinRoe",  isThereAKShortinRoe,  "1.0 if there was a K_S0 in the ROE");
+    REGISTER_VARIABLE("isInRestOfEvent", isInRestOfEvent,  "1.0 of track, cluster of given particle is found in rest of event. 0 otherwise.");
+    REGISTER_VARIABLE("NumberOfKShortinRemainingROEKaon", NumberOfKShortinRemainingROEKaon,  "Returns the number of K_S0 in the remainging Kaon ROE.");
+    REGISTER_VARIABLE("NumberOfKShortinRemainingROELambda", NumberOfKShortinRemainingROELambda,  "Returns the number of K_S0 in the remainging Lambda ROE.");
+    REGISTER_VARIABLE("lambdaFlavor", lambdaFlavor,  "1.0 if Lambda0, -1.0 if Anti-Lambda0, 0.0 else.");
+    REGISTER_VARIABLE("lambdaZError", lambdaZError,  "Returns the Matrixelement[2][2] of the PositionErrorMatrix of the Vertex fit.");
+    REGISTER_VARIABLE("MomentumOfSecondDaughter", MomentumOfSecondDaughter,  "Returns the Momentum of second daughter if existing, else 0.");
+    REGISTER_VARIABLE("MomentumOfSecondDaughter_CMS", MomentumOfSecondDaughter_CMS,  "Returns the Momentum of second daughter if existing in CMS, else 0.");
+    REGISTER_VARIABLE("chargeTimesKaonLiklihood", chargeTimesKaonLiklihood,  "Returns the q*(highest PID_Likelihood for Kaons), else 0.");
+    REGISTER_VARIABLE("ptTracksRoe", transverseMomentumOfChargeTracksInRoe,  "Returns the transverse momentum of all charged tracks if there exists a ROE for the given particle, else 0.");
 
     VARIABLE_GROUP("Rest Of Event");
     REGISTER_VARIABLE("nROETracks",  nROETracks,  "number of remaining tracks as given by the related RestOfEvent object");

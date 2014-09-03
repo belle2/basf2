@@ -205,8 +205,8 @@ void RFEventServer::server()
     } else if (st > 0) {
       m_log->ProcessLog(m_proc->GetFd());
     }
-    //    m_flow->fillNodeInfo(RF_INPUT_ID, GetNodeInfo(), false);
-    m_flow->fillNodeInfo(0, GetNodeInfo(), false);
+    m_flow->fillNodeInfo(RF_INPUT_ID, GetNodeInfo(), false);
+    //    m_flow->fillNodeInfo(0, GetNodeInfo(), false);
     // Debug
     //    RfNodeInfo* info = GetNodeInfo();
     //info->nevent_in = nevt++;

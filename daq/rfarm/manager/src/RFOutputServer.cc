@@ -219,6 +219,7 @@ void RFOutputServer::server()
     } else if (st > 0) {
       m_log->ProcessLog(m_proc->GetFd());
     }
+    m_flow->fillNodeInfo(RF_OUTPUT_ID, GetNodeInfo(), true);
   }
 }
 

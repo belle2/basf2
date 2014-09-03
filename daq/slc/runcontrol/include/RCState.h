@@ -36,10 +36,10 @@ namespace Belle2 {
     throw() : NSMState(id, label) {}
 
   public:
-    bool isStable() const throw() { return getId() > 1 && getId() < 7; }
-    bool isTransition() const throw() { return getId() > 6 && getId() < 11; }
-    bool isError() const throw() { return getId() > 10 && getId() < 13; }
-    bool isRecovering() const throw() { return getId() > 12 && getId() < 15; }
+    bool isStable() const throw() { return getId() > 1 && getId() <= 5; }
+    bool isTransition() const throw() { return getId() > 5 && getId() <= 8; }
+    bool isError() const throw() { return getId() > 8 && getId() <= 10; }
+    bool isRecovering() const throw() { return getId() > 10 && getId() <= 12; }
     RCState next() const throw();
 
   public:

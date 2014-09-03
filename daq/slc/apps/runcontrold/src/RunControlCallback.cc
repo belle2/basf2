@@ -77,7 +77,7 @@ void RunControlCallback::init() throw()
                         "started runcontrol:" + getNode().getName()));
 }
 
-bool RunControlCallback::reply(const NSMNode& node) throw()
+bool RunControlCallback::sendState(const NSMNode& node) throw()
 {
   NSMCommunicator& com(*getCommunicator());
   com.sendState(node);
@@ -88,9 +88,22 @@ bool RunControlCallback::reply(const NSMNode& node) throw()
   return true;
 }
 
+bool RunControlCallback::replyOK() throw()
+{
+  NSMCommunicator& com(*getCommunicator());
+  com.replyOK(getNode());
+  if (m_callback && m_callback->getCommunicator()) {
+    NSMCommunicator& com_g(*m_callback->getCommunicator());
+    com_g.replyOK(getNode());
+  }
+  return true;
+}
+
 bool RunControlCallback::ok() throw()
 {
   NSMMessage& msg(getMessage());
+  LogFile::debug("OK from %s (state = %s)",
+                 msg.getNodeName(), msg.getData());
   if (msg.getLength() > 0) {
     RCState state(msg.getData());
     const std::string nodename = msg.getNodeName();
@@ -104,9 +117,7 @@ bool RunControlCallback::ok() throw()
       logging(DAQLogMessage(getNode().getName(), LogFile::INFO,
                             StringUtil::form("OK from %s (state = %s)",
                                              nodename.c_str(), state.getLabel())));
-      LogFile::debug("OK from %s (state = %s)",
-                     nodename.c_str(), state.getLabel());
-      reply(node);
+      sendState(node);
       if (state == RCState::PAUSED_S) {
         NSMCommunicator& com(*getCommunicator());
         const size_t nobj = getConfig().getObject().getNObjects("node");
@@ -128,7 +139,7 @@ bool RunControlCallback::ok() throw()
         RCState state_org(getNode().getState());
         if (state != state_org) {
           getNode().setState(state);
-          reply(getNode());
+          replyOK();
         }
       }
       update();
@@ -147,24 +158,6 @@ bool RunControlCallback::error() throw()
     logging(DAQLogMessage(nodename, LogFile::ERROR,
                           StringUtil::form("ERROR message : %s",
                                            msg.getData())));
-    DAQLogMessage log(nodename, LogFile::ERROR,
-                      msg.getData(), Date());
-    log.setNode(getNode().getName());
-    try {
-      getDB()->connect();
-      LoggerObjectTable(getDB()).add(log, true);
-    } catch (const DBHandlerException& e) {
-
-    }
-    getDB()->close();
-    if (log.getPriority() > LogFile::INFO) {
-      NSMCommunicator& com(*getCommunicator());
-      com.sendLog(log);
-      if (m_callback && m_callback->getCommunicator()) {
-        NSMCommunicator& com_g(*m_callback->getCommunicator());
-        com_g.sendLog(log);
-      }
-    }
   }
   return true;
 }
@@ -290,10 +283,6 @@ bool RunControlCallback::distribute(NSMMessage& msg) throw()
         msg.getNodeName() == node.getName()) {
       LogFile::debug("Send %s to %s", msg.getRequestName(),
                      node.getName().c_str());
-      logging(DAQLogMessage(getNode().getName(), LogFile::DEBUG,
-                            StringUtil::form("Send %s to %s",
-                                             msg.getRequestName(),
-                                             node.getName().c_str())));
       com.sendRequest(msg);
       RCState tstate = RCCommand(msg.getRequestName()).nextTState();
       if (tstate != Enum::UNKNOWN) node.setState(tstate);
@@ -312,10 +301,6 @@ bool RunControlCallback::distribute_r(NSMMessage& msg) throw()
         msg.getNodeName() == node.getName()) {
       LogFile::debug("Send %s to %s", msg.getRequestName(),
                      node.getName().c_str());
-      logging(DAQLogMessage(getNode().getName(), LogFile::DEBUG,
-                            StringUtil::form("Send %s to %s",
-                                             msg.getRequestName(),
-                                             node.getName().c_str())));
       com.sendRequest(msg);
       RCState tstate = RCCommand(msg.getRequestName()).nextTState();
       if (tstate != Enum::UNKNOWN) node.setState(tstate);
@@ -616,7 +601,7 @@ void RunControlCallback::update() throw()
     getNode().setState(RCState::RUNNING_S);
   }
   if (getNode().getState() != state_org) {
-    reply(getNode());
+    replyOK();
   }
   void* data = m_data.get();
   rc_status* status = (rc_status*)data;

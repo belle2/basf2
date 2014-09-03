@@ -38,7 +38,6 @@ namespace Belle2 {
     virtual bool ok() throw();
     virtual bool error() throw();
     virtual bool log() throw();
-    bool reply(const NSMNode& node) throw();
     NSMData& getData() { return m_data; }
     void setCallback(RCCallback* callback) throw() {
       m_callback = callback;
@@ -53,7 +52,7 @@ namespace Belle2 {
     virtual bool resume() throw() { return distribute(getMessage()); }
     virtual bool abort() throw();
     virtual bool trigft() throw() { return true; }
-    virtual bool stateCheck() throw() { return reply(getNode()); }
+    virtual bool stateCheck() throw() { return replyOK(); }
     virtual bool exclude() throw();
     virtual bool include() throw();
 
@@ -74,6 +73,8 @@ namespace Belle2 {
     NSMNodeIterator findNode(const std::string& nodename) throw();
     bool synchronize(NSMNode& node) throw();
     void logging(const DAQLogMessage& log, bool recoreded = false);
+    bool sendState(const NSMNode& node) throw();
+    bool replyOK() throw();
 
   private:
     RunSetting m_setting;

@@ -42,7 +42,6 @@ namespace Belle2 {
       virtual ~TrackingAction();
 
       /**
-       * ??
        * Checks if the particle associated to the track is already in the MCParticle list. If not, the
        * particle is added and as UserInformation attached to the track.
        *
@@ -51,7 +50,6 @@ namespace Belle2 {
       void PreUserTrackingAction(const G4Track* track);
 
       /**
-       * ??
        * Updates the data of the MCParticle associated with the Geant4 track.
        *
        * @param track Pointer to the Geant4 track which was transported through the geometry.

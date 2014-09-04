@@ -23,6 +23,7 @@ namespace Belle2 {
     virtual bool stop() throw();
     virtual bool recover() throw();
     virtual bool abort() throw();
+    virtual bool stateCheck() throw();
 
   public:
     NSMData& getData() throw() { return m_data; }

@@ -31,7 +31,8 @@ namespace Belle2 {
     } nodeinfo[24];
     unsigned int nnodes;
     unsigned int updatetime;
-    int reserved[2];
+    unsigned int rcstate;
+    unsigned int state;
   };
 
 }

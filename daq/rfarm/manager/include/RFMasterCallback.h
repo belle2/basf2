@@ -6,6 +6,8 @@
 #include <daq/slc/nsm/NSMCallback.h>
 #include <daq/slc/nsm/NSMData.h>
 
+#include <daq/slc/runcontrol/RCState.h>
+
 #include <vector>
 #include <map>
 
@@ -41,12 +43,13 @@ namespace Belle2 {
     virtual bool resume() throw();
     virtual bool restart() throw();
     virtual bool status() throw();
-    void reply(bool result);
 
   public:
     void setCallback(RFRunControlCallback* callback) {
       m_callback = callback;
     }
+    void reply(bool result);
+    void setState(const RCState& state);
 
   private:
     NSMData m_data;
@@ -56,6 +59,7 @@ namespace Belle2 {
     RFConf m_conf;
     int m_st_conf;
     int m_st_unconf;
+    std::vector<std::string> m_name_v;
     NSMNodeList m_nodes;
 
   };

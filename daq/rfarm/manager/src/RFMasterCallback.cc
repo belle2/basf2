@@ -35,6 +35,7 @@ RFMasterCallback::RFMasterCallback(const NSMNode& node,
   add(RFCommand::RF_RESUME);
   add(RFCommand::RF_PAUSE);
   add(RFCommand::RF_STATUS);
+  getNode().setState(RCState::NOTREADY_S);
 }
 
 RFMasterCallback::~RFMasterCallback() throw()
@@ -46,12 +47,15 @@ void RFMasterCallback::init() throw()
 {
   m_master->SetNodeInfo((RfNodeInfo*)m_data.allocate(getCommunicator(), true));
   char* node = m_conf.getconf("dqmserver", "nodename");
+  m_name_v.push_back(node);
   m_nodes.insert(NSMNodeList::value_type(node, NSMNode(node)));
   node = m_conf.getconf("distributor", "nodename");
+  m_name_v.push_back(node);
   m_nodes.insert(NSMNodeList::value_type(node, NSMNode(node)));
   char* format = m_conf.getconf("system", "nsmdata");
   m_data_v.push_back(NSMData(node, format, 1));
   node = m_conf.getconf("collector", "nodename");
+  m_name_v.push_back(node);
   m_nodes.insert(NSMNodeList::value_type(node, NSMNode(node)));
   m_data_v.push_back(NSMData(node, format, 1));
   int maxnodes = m_conf.getconfi("processor", "nnodes");
@@ -65,10 +69,12 @@ void RFMasterCallback::init() throw()
         strstr(badlist, idname) == 0) {
       sprintf(hostnode, "evp_%s%2.2d", hostbase, idbase + i);
       m_data_v.push_back(NSMData(hostnode, format, 1));
+      m_name_v.push_back(hostnode);
       m_nodes.insert(NSMNodeList::value_type(hostnode, NSMNode(hostnode)));
     }
   }
   node = m_conf.getconf("roisender", "nodename");
+  m_name_v.push_back(node);
   m_nodes.insert(NSMNodeList::value_type(node, NSMNode(node)));
   for (NSMNodeIterator it = m_nodes.begin();
        it != m_nodes.end(); it++) {
@@ -85,26 +91,38 @@ bool RFMasterCallback::perform(const NSMMessage& msg) throw()
   } else if (cmd == NSMCommand::ERROR) {
     return error();
   }
-  bool result = false;
-  LogFile::debug("RFMasterCallback : %s >> %s",
+  bool result = true;
+  LogFile::debug("%s >> %s",
                  msg.getNodeName(),
                  cmd.getLabel());
   if (cmd == RFCommand::RF_CONFIGURE) {
-    getNode().setState(RCState::LOADING_TS);
-    return configure();
+    if (getNode().getState() != RCState::READY_S) {
+      setState(RCState::LOADING_TS);
+      return configure();
+    }
   } else if (cmd == RFCommand::RF_UNCONFIGURE) {
-    getNode().setState(RCState::ABORTING_RS);
-    return unconfigure();
+    if (getNode().getState() != RCState::NOTREADY_S) {
+      setState(RCState::ABORTING_RS);
+      return unconfigure();
+    }
   } else if (cmd == RFCommand::RF_START) {
-    result = start();
+    if (getNode().getState() != RCState::RUNNING_S) {
+      result = start();
+    }
   } else if (cmd == RFCommand::RF_STOP) {
-    result = stop();
+    if (getNode().getState() == RCState::RUNNING_S) {
+      result = stop();
+    }
   } else if (cmd == RFCommand::RF_RESTART) {
     result = restart();
   } else if (cmd == RFCommand::RF_PAUSE) {
-    result = pause();
+    if (getNode().getState() == RCState::RUNNING_S) {
+      result = pause();
+    }
   } else if (cmd == RFCommand::RF_RESUME) {
-    result = resume();
+    if (getNode().getState() == RCState::PAUSED_S) {
+      result = resume();
+    }
   } else if (cmd == RFCommand::RF_STATUS) {
     result = status();
   }
@@ -115,23 +133,37 @@ bool RFMasterCallback::perform(const NSMMessage& msg) throw()
 void RFMasterCallback::reply(bool result)
 {
   NSMCommunicator& com(*getCommunicator());
-  NSMCommunicator& com_g(*m_callback->getCommunicator());
   if (result) {
     getNode().setError(0);
     com.replyOK(getNode());
-    com_g.replyOK(getNode());
+    if (m_callback) {
+      NSMCommunicator& com_g(*m_callback->getCommunicator());
+      com_g.replyOK(getNode());
+    }
   } else {
     com.replyError(getNode().getError(), getReply());
-    com_g.replyError(getNode().getError(), getReply());
+    if (m_callback) {
+      NSMCommunicator& com_g(*m_callback->getCommunicator());
+      com_g.replyError(getNode().getError(), getReply());
+    }
+  }
+}
+
+void RFMasterCallback::setState(const RCState& state)
+{
+  getNode().setState(state);
+  if (m_callback) {
+    m_callback->getNode().setState(state);
   }
 }
 
 void RFMasterCallback::timeout() throw()
 {
-  if (!m_callback->getData().isAvailable()) return;
+  if (!m_callback || !m_callback->getData().isAvailable()) return;
   RfUnitInfo* unitinfo = (RfUnitInfo*)m_callback->getData().get();
   unitinfo->nnodes = m_data_v.size();
   unitinfo->updatetime = Time().get();
+  unitinfo->rcstate = getNode().getState().getId();
   try {
     for (size_t i = 0; i < m_data_v.size(); i++) {
       if (!m_data_v[i].isAvailable()) {
@@ -151,10 +183,10 @@ void RFMasterCallback::timeout() throw()
 bool RFMasterCallback::ok() throw()
 {
   const NSMMessage& msg(getMessage());
+  std::string nodename = StringUtil::tolower(msg.getNodeName());
   LogFile::debug("%s << %s (%s)",
                  msg.getRequestName(),
                  msg.getNodeName(), msg.getData());
-  std::string nodename = msg.getNodeName();
   if (m_nodes.find(nodename) == m_nodes.end() ||
       msg.getLength() == 0) {
     return true;
@@ -184,27 +216,29 @@ bool RFMasterCallback::configure() throw()
 {
   b2nsm_context(getCommunicator()->getContext());
   bool ready_all = true;
-  for (NSMNodeIterator it = m_nodes.begin();
-       it != m_nodes.end();) {
-    NSMNode& node(it->second);
+  bool ready_evp = true;
+  for (std::vector<std::string>::iterator it = m_name_v.begin();
+       it != m_name_v.end(); it++) {
+    NSMNode& node(m_nodes[*it]);
     if (node.getState() != RCState::READY_S) {
-      ready_all = false;
-      if (node.getState() == RCState::NOTREADY_S) {
-        node.setState(RCState::LOADING_TS);
-        b2nsm_sendreq(node.getName().c_str(), "RF_CONFIGURE", 0, NULL);
+      if (node.getName().find("evp_") != std::string::npos) {
+        ready_evp = false;
       }
-      it++;
-      if (it == m_nodes.end()) break;
-      NSMNode& node_next(it->second);
-      if (node.getName().find("evp_") != std::string::npos &&
-          node_next.getName().find("evp_") != std::string::npos)
-        continue;
-      return true;
+      ready_all = false;
+      if ((node.getName().find("evp_") != std::string::npos ||
+           ready_evp) &&
+          node.getState() == RCState::NOTREADY_S) {
+        node.setState(RCState::LOADING_TS);
+        LogFile::debug("RF_CONFIGURE >> %s", node.getName().c_str());
+        b2nsm_sendreq(node.getName().c_str(), "RF_CONFIGURE", 0, NULL);
+        usleep(100000);
+      }
+      if (node.getName().find("evp_") == std::string::npos)
+        return true;
     }
-    it++;
   }
   if (ready_all) {
-    getNode().setState(RCState::READY_S);
+    setState(RCState::READY_S);
     reply(true);
   }
   return true;
@@ -214,27 +248,29 @@ bool RFMasterCallback::unconfigure() throw()
 {
   b2nsm_context(getCommunicator()->getContext());
   bool notready_all = true;
-  for (NSMNodeRIterator it = m_nodes.rbegin();
-       it != m_nodes.rend();) {
-    NSMNode& node(it->second);
+  bool notready_evp = true;
+  for (std::vector<std::string>::reverse_iterator it = m_name_v.rbegin();
+       it != m_name_v.rend(); it++) {
+    NSMNode& node(m_nodes[*it]);
     if (node.getState() != RCState::NOTREADY_S) {
-      notready_all = false;
-      if (node.getState() == RCState::READY_S) {
-        node.setState(RCState::ABORTING_RS);
-        b2nsm_sendreq(node.getName().c_str(), "RF_UNCONFIGURE", 0, NULL);
+      if (node.getName().find("evp_") != std::string::npos) {
+        notready_evp = false;
       }
-      it++;
-      if (it == m_nodes.rend()) break;
-      NSMNode& node_next(it->second);
-      if (node.getName().find("evp_") != std::string::npos &&
-          node_next.getName().find("evp_") != std::string::npos)
-        continue;
-      return true;
+      notready_all = false;
+      if ((node.getName().find("evp_") != std::string::npos ||
+           notready_evp) &&
+          node.getState() == RCState::READY_S) {
+        node.setState(RCState::ABORTING_RS);
+        LogFile::debug("RF_UNCONFIGURE >> %s", node.getName().c_str());
+        b2nsm_sendreq(node.getName().c_str(), "RF_UNCONFIGURE", 0, NULL);
+        usleep(100000);
+      }
+      if (node.getName().find("evp_") == std::string::npos)
+        return true;
     }
-    it++;
   }
   if (notready_all) {
-    getNode().setState(RCState::NOTREADY_S);
+    setState(RCState::NOTREADY_S);
     reply(true);
   }
   return true;
@@ -246,7 +282,7 @@ bool RFMasterCallback::start() throw()
   NSMcontext* nsmc =  getCommunicator()->getContext();
   b2nsm_context(nsmc);
   m_master->Start(msg, nsmc);
-  getNode().setState(RCState::RUNNING_S);
+  setState(RCState::RUNNING_S);
   return true;
 }
 
@@ -256,7 +292,7 @@ bool RFMasterCallback::stop() throw()
   NSMcontext* nsmc =  getCommunicator()->getContext();
   b2nsm_context(nsmc);
   m_master->Stop(msg, nsmc);
-  getNode().setState(RCState::READY_S);
+  setState(RCState::READY_S);
   return true;
 }
 
@@ -266,7 +302,7 @@ bool RFMasterCallback::pause() throw()
   NSMcontext* nsmc =  getCommunicator()->getContext();
   b2nsm_context(nsmc);
   m_master->Pause(msg, nsmc);
-  getNode().setState(RCState::PAUSED_S);
+  setState(RCState::PAUSED_S);
   return true;
 }
 
@@ -276,7 +312,7 @@ bool RFMasterCallback::resume() throw()
   NSMcontext* nsmc =  getCommunicator()->getContext();
   b2nsm_context(nsmc);
   m_master->Resume(msg, nsmc);
-  getNode().setState(RCState::RUNNING_S);
+  setState(RCState::RUNNING_S);
   return true;
 }
 
@@ -286,7 +322,7 @@ bool RFMasterCallback::restart() throw()
   NSMcontext* nsmc =  getCommunicator()->getContext();
   b2nsm_context(nsmc);
   m_master->Restart(msg, nsmc);
-  getNode().setState(RCState::READY_S);
+  setState(RCState::READY_S);
   return true;
 }
 

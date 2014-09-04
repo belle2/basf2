@@ -19,6 +19,7 @@ RFRunControlCallback::RFRunControlCallback(const NSMNode& node,
   : RCCallback(node), m_master(master), m_callback(callback)
 {
   callback->setCallback(this);
+  setAutoReply(false);
 }
 
 RFRunControlCallback::~RFRunControlCallback() throw()
@@ -28,15 +29,12 @@ RFRunControlCallback::~RFRunControlCallback() throw()
 
 void RFRunControlCallback::init() throw()
 {
-  m_data = NSMData(getNode().getName() + "_STATUS", "rfunitinfo", 2);
+  m_data = NSMData(getNode().getName() + "_STATUS", "rfunitinfo", 3);
   m_data.allocate(getCommunicator());
 }
 
 bool RFRunControlCallback::load() throw()
 {
-  if (m_callback->getNode().getState() == RCState::READY_S) {
-    return true;
-  }
   NSMMessage& msg(getMessage());
   msg.setRequestName(RFCommand::RF_CONFIGURE);
   m_callback->setMessage(msg);
@@ -73,4 +71,10 @@ bool RFRunControlCallback::abort() throw()
   msg.setRequestName(RFCommand::RF_UNCONFIGURE);
   m_callback->setMessage(msg);
   return m_callback->perform(msg);
+}
+
+bool RFRunControlCallback::stateCheck() throw()
+{
+  m_callback->reply(true);
+  return true;
 }

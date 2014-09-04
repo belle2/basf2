@@ -498,7 +498,7 @@ nsmparse_scan(const char *file, char *filebuf, char *start, char **endp,
 	if (! *nestp) {
 	  sym_prev = fmtout2[0];
 	  n_same += (fmtout2[1] ? atoi(&fmtout2[1]) : 1) * num;
-	  printf("<%c:%d>\n", sym_prev, n_same);
+	  /* printf("<%c:%d>\n", sym_prev, n_same); */
 	} else {
 	  sprintf(fmtstr+strlen(fmtstr), "(%s)%d", fmtout2, num);
 	  sym_prev = 0;

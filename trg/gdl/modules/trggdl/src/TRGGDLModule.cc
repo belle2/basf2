@@ -43,7 +43,7 @@ TRGGDLModule::TRGGDLModule()
 
     string desc = "TRGGDLModule(" + version() + ")";
     setDescription(desc);
-    setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+    setPropertyFlags(c_ParallelProcessingCertified);
 
     addParam("DebugLevel", _debugLevel, "TRGGDL debug level", _debugLevel);
     addParam("ConfigFile",

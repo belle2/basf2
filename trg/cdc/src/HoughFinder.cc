@@ -229,7 +229,8 @@ TRGCDCHoughFinder::doit(vector<TCTrack *> & trackList) {
 	    const vector<TCLink *> bests = selectBestHits(links);
 
 	    //...Make a circle...
-	    TCCircle & c = * new TCCircle(bests);
+	    TCCircle * cptr = new TCCircle(bests);
+	    TCCircle & c = * cptr;
 	    c.fit();
 	    c.name("CircleFitted_" + TRGUtil::itostring(nCircles));
 	    ++nCircles;
@@ -274,7 +275,7 @@ TRGCDCHoughFinder::doit(vector<TCTrack *> & trackList) {
 #endif
 
  	    //...Delete a circle...
- 	    delete & c;
+ 	    delete cptr;
 
 	}
     }

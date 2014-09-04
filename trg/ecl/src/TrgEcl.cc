@@ -329,7 +329,7 @@ TrgEcl::simulate(int m_nEvent)
     //-------------
     int m_hitEneNum = 0;
     StoreArray<TRGECLTrg> trgEcltrgArray("TRGECLTrgs");
-    new(trgEcltrgArray.nextFreeAddress()) TRGECLTrg();
+    trgEcltrgArray.appendNew();
     m_hitEneNum = trgEcltrgArray.getEntries() - 1;
 
     trgEcltrgArray[m_hitEneNum]->setEventId(m_nEvent);

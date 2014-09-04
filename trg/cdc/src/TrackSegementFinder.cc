@@ -472,7 +472,7 @@ TSFinder::findTSHit(TRGSignalVector* eachInput, int tsid){
   result.push_back(resultT);
   result.push_back(resultE);
 
-  delete LUTValue;
+  delete [] LUTValue;
   return result;
 }
 

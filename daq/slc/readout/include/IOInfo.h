@@ -9,6 +9,7 @@ namespace Belle2 {
   class IOInfo {
   public:
     static int checkTCP(std::vector<IOInfo>& info);
+    static int checkTCP(IOInfo& info);
 
   public:
     IOInfo() {}

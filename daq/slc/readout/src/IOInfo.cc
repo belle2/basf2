@@ -12,6 +12,15 @@
 
 using namespace Belle2;
 
+int IOInfo::checkTCP(IOInfo& info)
+{
+  std::vector<IOInfo> info_v;
+  info_v.push_back(info);
+  int ret = checkTCP(info_v);
+  info = info_v[0];
+  return ret;
+}
+
 int IOInfo::checkTCP(std::vector<IOInfo>& info)
 {
   size_t count = 0;

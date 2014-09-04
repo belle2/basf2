@@ -57,15 +57,18 @@ bool RCCallback::perform(const NSMMessage& msg) throw()
 {
   if (NSMCallback::perform(msg)) return true;
   const RCCommand cmd = msg.getRequestName();
-  if (cmd.isAvailable(getNode().getState()) == NSMCommand::DISABLED) {
-    return false;
-  }
   NSMCommunicator* com = getCommunicator();
   if (cmd == RCCommand::STATECHECK) {
     if (!stateCheck()) {
       com->replyOK(getNode());
     }
     return true;
+  }
+  LogFile::debug("%s >> %s (state = %s)",
+                 msg.getNodeName(), cmd.getLabel(),
+                 getNode().getState().getLabel());
+  if (cmd.isAvailable(getNode().getState()) == NSMCommand::DISABLED) {
+    return false;
   }
   RCState tstate(cmd.nextTState());
   bool result = true;

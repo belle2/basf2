@@ -7,7 +7,7 @@ extern "C" {
 
 namespace Belle2 {
 
-  const int rfunitinfo_revision = 2;
+  const int rfunitinfo_revision = 3;
 
   struct rfunitinfo {
     struct rfnodeinfo {
@@ -29,7 +29,8 @@ namespace Belle2 {
     } nodeinfo[24];
     uint32 nnodes;
     uint32 ctime;
-    int32 reserved[2];
+    uint32 rcstate;
+    uint32 state;
   };
 
 }

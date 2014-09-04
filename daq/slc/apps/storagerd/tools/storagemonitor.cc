@@ -46,6 +46,8 @@ int main(int argc, char** argv)
     ftruncate(1, 0);
     printf(" exp = %04u run = %04u\n", info->expno, info->runno);
     printf(" # of files: %4u, # of bytes : %4.2f [GB]\n", info->nfiles, info->nbytes / 1024);
+    printf(" connection to eb2rx   : %s \x1b[49m\x1b[39m\n",
+           ((info->node[0].connection_in == 1) ? "\x1b[49m\x1b[32mEstablished" : "\x1b[49m\x1b[31mNot ready"));
     printf(" rxqueue from eb2rx    : %4.1f [kB]\n", (float)(info->node[0].nqueue_in / 1024.));
     printf(" data in input  buffer : %4.1f [kB]\n", (float)(info->node[0].nqueue_out * 4 / 1024.));
     printf(" data in record buffer : %4.1f [kB]\n", (float)(info->node[1].nqueue_in * 4 / 1024.));
@@ -69,7 +71,7 @@ int main(int argc, char** argv)
       } else {
         printf("\x1b[49m\x1b[32m");
       }
-      printf("| %s | %10s | %11s | %12s \x1b[49m\x1b[39m",
+      printf("| %s |    | %10s | %11s | %12s \x1b[49m\x1b[39m",
              StringUtil::form("%10u", node.nevent_in).c_str(),
              StringUtil::form("%02.2f", node.evtrate_in).c_str(),
              StringUtil::form("%04.2f", node.flowrate_in).c_str(),
@@ -79,7 +81,7 @@ int main(int argc, char** argv)
       } else {
         printf("\x1b[49m\x1b[32m");
       }
-      printf("| %s | %10s | %11s | %12s\x1b[49m\x1b[39m\n",
+      printf("| %s |    | %10s | %11s | %12s\x1b[49m\x1b[39m\n",
              StringUtil::form("%10u", node.nevent_out).c_str(),
              StringUtil::form("%02.2f", node.evtrate_out).c_str(),
              StringUtil::form("%04.2f", node.flowrate_out).c_str(),

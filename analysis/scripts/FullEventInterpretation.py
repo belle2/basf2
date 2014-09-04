@@ -165,6 +165,7 @@ def FullEventInterpretation(path, particles):
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-verbose', '--verbose', dest='verbose', action='store_true', help='Output additional information')
+    parser.add_argument('-summary', '--make-summmary', dest='makeSummary', action='store_true', help='Create Summary pdf')
     parser.add_argument('-nosignal', '--no-signal-classifiers', dest='nosig', action='store_true', help='Do not train classifiers')
     parser.add_argument('-nproc', '--nProcesses', dest='nProcesses', type=int, default=1, help='Use n processes to execute actors parallel')
     args = parser.parse_args()
@@ -301,35 +302,36 @@ def FullEventInterpretation(path, particles):
                                 requires=['SignalProbability_{i}'.format(i=particle.identifier)])
 
         ################ Information ACTORS #################
-        for channel in particle.channels:
+        if args.makeSummary:
+            for channel in particle.channels:
 
-            seq.addFunction(WriteAnalysisFileForChannel,
-                            particleName='Name_{i}'.format(i=particle.identifier),
-                            particleLabel='Label_{i}'.format(i=particle.identifier),
-                            channelName='Name_{c}'.format(c=channel.name),
-                            preCutConfig='PreCutConfig_{c}'.format(c=channel.name),
-                            preCut='PreCut_{c}'.format(c=channel.name),
-                            preCutHistogram='PreCutHistogram_{c}'.format(c=channel.name),
-                            mvaConfig='MVAConfig_{c}'.format(c=channel.name),
-                            signalProbability='SignalProbability_{c}'.format(c=channel.name),
-                            postCutConfig='PostCutConfig_{c}'.format(c=channel.name),
-                            postCut='PostCut_{c}'.format(c=channel.name))
+                seq.addFunction(WriteAnalysisFileForChannel,
+                                particleName='Name_{i}'.format(i=particle.identifier),
+                                particleLabel='Label_{i}'.format(i=particle.identifier),
+                                channelName='Name_{c}'.format(c=channel.name),
+                                preCutConfig='PreCutConfig_{c}'.format(c=channel.name),
+                                preCut='PreCut_{c}'.format(c=channel.name),
+                                preCutHistogram='PreCutHistogram_{c}'.format(c=channel.name),
+                                mvaConfig='MVAConfig_{c}'.format(c=channel.name),
+                                signalProbability='SignalProbability_{c}'.format(c=channel.name),
+                                postCutConfig='PostCutConfig_{c}'.format(c=channel.name),
+                                postCut='PostCut_{c}'.format(c=channel.name))
 
-        if particle.isFSP:
-            seq.addFunction(WriteAnalysisFileForFSParticle,
-                            particleName='Name_{i}'.format(i=particle.identifier),
-                            particleLabel='Label_{i}'.format(i=particle.identifier),
-                            mvaConfig='MVAConfig_{i}'.format(i=particle.identifier),
-                            signalProbability='SignalProbability_{i}'.format(i=particle.identifier),
-                            postCutConfig='PostCutConfig_{i}'.format(i=particle.identifier),
-                            postCut='PostCut_{i}'.format(i=particle.identifier),
-                            mcCounts='MCParticleCounts')
-        else:
-            seq.addFunction(WriteAnalysisFileForCombinedParticle,
-                            particleName='Name_{i}'.format(i=particle.identifier),
-                            particleLabel='Label_{i}'.format(i=particle.identifier),
-                            channelPlaceholders=['Placeholders_{c}'.format(c=channel.name) for channel in particle.channels],
-                            mcCounts='MCParticleCounts')
+            if particle.isFSP:
+                seq.addFunction(WriteAnalysisFileForFSParticle,
+                                particleName='Name_{i}'.format(i=particle.identifier),
+                                particleLabel='Label_{i}'.format(i=particle.identifier),
+                                mvaConfig='MVAConfig_{i}'.format(i=particle.identifier),
+                                signalProbability='SignalProbability_{i}'.format(i=particle.identifier),
+                                postCutConfig='PostCutConfig_{i}'.format(i=particle.identifier),
+                                postCut='PostCut_{i}'.format(i=particle.identifier),
+                                mcCounts='MCParticleCounts')
+            else:
+                seq.addFunction(WriteAnalysisFileForCombinedParticle,
+                                particleName='Name_{i}'.format(i=particle.identifier),
+                                particleLabel='Label_{i}'.format(i=particle.identifier),
+                                channelPlaceholders=['Placeholders_{c}'.format(c=channel.name) for channel in particle.channels],
+                                mcCounts='MCParticleCounts')
 
     finalParticles = [particle for particle in particles if all(particle.identifier not in o.daughters and pdg.conjugate(particle.name) + ':' + particle.label not in o.daughters for o in particles)]
     for finalParticle in finalParticles:
@@ -344,12 +346,13 @@ def FullEventInterpretation(path, particles):
     seq.addNeeded('SignalProbability_K_S0:generic'.format(i=finalParticle.identifier))
     seq.addNeeded('ParticleList_K_S0:generic'.format(i=finalParticle.identifier))
 
-    seq.addFunction(WriteAnalysisFileSummary,
-                    finalStateParticlePlaceholders=['Placeholders_{i}'.format(i=particle.identifier) for particle in particles if particle.isFSP],
-                    combinedParticlePlaceholders=['Placeholders_{i}'.format(i=particle.identifier) for particle in particles if not particle.isFSP],
-                    finalParticleNTuples=['VariablesToNTuple_{i}'.format(i=finalParticle.identifier) for finalParticle in finalParticles],
-                    mcCounts='MCParticleCounts',
-                    particles=['Object_{i}'.format(i=particle.identifier)for particle in particles])
-    seq.addNeeded('FEIsummary.pdf')
+    if args.makeSummary:
+        seq.addFunction(WriteAnalysisFileSummary,
+                        finalStateParticlePlaceholders=['Placeholders_{i}'.format(i=particle.identifier) for particle in particles if particle.isFSP],
+                        combinedParticlePlaceholders=['Placeholders_{i}'.format(i=particle.identifier) for particle in particles if not particle.isFSP],
+                        finalParticleNTuples=['VariablesToNTuple_{i}'.format(i=finalParticle.identifier) for finalParticle in finalParticles],
+                        mcCounts='MCParticleCounts',
+                        particles=['Object_{i}'.format(i=particle.identifier)for particle in particles])
+        seq.addNeeded('FEIsummary.pdf')
 
     seq.run(path, args.verbose, args.nProcesses)

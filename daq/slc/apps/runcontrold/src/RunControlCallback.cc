@@ -442,11 +442,11 @@ void RunControlCallback::logging(const DAQLogMessage& log, bool recoreded)
     }
     if (log.getPriority() >= getPriorityToLocal()) {
       NSMCommunicator* com = getCommunicator();
-      com->sendLog(log, recoreded);
+      com->sendLog(log, true);
       if (m_callback && m_callback->getCommunicator()
           && log.getPriority() >= getPriorityToGlobal()) {
         NSMCommunicator* com_g = m_callback->getCommunicator();
-        com_g->sendLog(log, recoreded);
+        com_g->sendLog(log, true);
       }
     }
   } catch (const DBHandlerException& e) {

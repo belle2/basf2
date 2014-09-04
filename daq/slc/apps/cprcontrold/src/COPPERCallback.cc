@@ -255,7 +255,14 @@ bool COPPERCallback::bootBasf2() throw()
   //                                   m_config.getBasf2Script().c_str()));
   m_con.addArgument(conf.get("readout.script"));
   m_con.addArgument(m_config.getHostname());
-  m_con.addArgument(m_config.getCopperId().substr(3));
+  int copperid = atoi(m_config.getCopperId().substr(4).c_str());
+  int detectorid = atoi(m_config.getCopperId().substr(3).c_str()) / 1000;
+  if (detectorid == 5) {
+    copperid += 0x05000000;
+  } else if (detectorid == 6) {
+    copperid += 0x06000000;
+  }
+  m_con.addArgument(StringUtil::form("%d", copperid));
   m_con.addArgument(StringUtil::form("%d", flag));
   m_con.addArgument("1");
   m_con.addArgument("cprbasf2_" + getNode().getName());

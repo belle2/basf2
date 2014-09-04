@@ -182,7 +182,7 @@
                     <columns>
                         <TableColumn fx:id="col_evtsize_in" minWidth="75.0" prefWidth="-1.0" text="In">
                             <cellValueFactory>
-                                <PropertyValueFactory property="evtsizeOut" />
+                                <PropertyValueFactory property="evtsizeIn" />
                             </cellValueFactory>
                         </TableColumn>
                         <TableColumn fx:id="col_evtsize_out" minWidth="75.0" prefWidth="-1.0" text="Out">

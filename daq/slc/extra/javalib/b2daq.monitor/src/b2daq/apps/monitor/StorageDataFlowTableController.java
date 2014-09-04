@@ -179,9 +179,9 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
                     disk.setAvailable(100 - cdata.getFloat("available"));
                     disk.setSize(cdata.getFloat("size") / 1024f);
                 }
-                if (table_stat.getItems().size() < 7/*data.getInt("nnodes")*/) {
+                if (table_stat.getItems().size() < data.getInt("nnodes")) {
                     table_stat.getItems().clear();
-                    for (int i = 0; i < 7/*data.getInt("nnodes")*/; i++) {
+                    for (int i = 0; i < data.getInt("nnodes"); i++) {
                         table_stat.getItems().add(new DataFlow());
                     }
                 }
@@ -189,7 +189,8 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
                 label_ctime.setText(dateformat.format(new Date(ctime)));
                 int connected_in = 1;
                 int connected_out = 0;
-                for (int i = 0; i < 7/*data.getInt("nnodes")*/; i++) {
+                System.out.println(data.getInt("nnodes"));
+                for (int i = 0; i < data.getInt("nnodes"); i++) {
                     NSMData cdata = (NSMData) data.getObject("node", i);
                     if (i == 0) {
                         connected_in = (cdata.getInt("connection_in") > 0) ? 1 : -1;

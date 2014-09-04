@@ -6,6 +6,7 @@
 #include <daq/slc/nsm/NSMNodeDaemon.h>
 
 #include <daq/slc/system/PThread.h>
+#include <daq/slc/system/Daemon.h>
 #include <daq/slc/system/LogFile.h>
 
 #include <daq/slc/base/StringUtil.h>
@@ -26,47 +27,31 @@ typedef void* MonitorFunc_t(const char*, const char*);
 
 int main(int argc, char** argv)
 {
-  if (argc < 2) {
-    LogFile::debug("Usage: %s <nodename> ", argv[0]);
+  ConfigFile config("slowcontrol", "dqm");
+  const std::string nodename = config.get("nsm.nodename");
+  if (!Daemon::start(("dqmviewd." + nodename).c_str(), argc, argv)) {
     return 1;
   }
-  const char* name = argv[1];
-  bool debugmode = (argc > 2);
-  LogFile::open("dqmviewd");
-  if (!debugmode) {
-    system("killall hserver");
-  }
-
-  ConfigFile config("dqm");
   DQMViewMaster master;
-  const std::string nodename = name;
   const std::string map_path = config.get("dqm.tmap.dir");
   const std::string hostname = config.get("dqm.host");
   const int port = config.getInt("dqm.port");
 
   StringList dqmlist = StringUtil::split(config.get("dqm.tmap.list"), ',');
   for (size_t i = 0; i < dqmlist.size(); i++) {
-    StringList str = StringUtil::split(dqmlist[i], '/');
-    const std::string pack_name = str[0];
-    const std::string map_name = str[1];
-    const int port = atoi(str[2].c_str());
-    std::string emsg = StringUtil::form("Added DQM for %s", pack_name.c_str());
+    const std::string pack_name = config.get(StringUtil::form("dqm.%s.name", dqmlist[i].c_str()));
+    const std::string map_name = config.get(StringUtil::form("dqm.%s.file", dqmlist[i].c_str()));
+    const int port = config.getInt(StringUtil::form("dqm.%s.port", dqmlist[i].c_str()));
     std::string mapfile = map_path + "/" + map_name;
-    ::unlink(mapfile.c_str());
     master.add(pack_name, port, mapfile);
   }
   PThread(new DQMUIAcceptor(hostname, port, master));
   LogFile::debug("Start socket acception from GUIs");
 
-  NSMNode node(name);
-  DQMViewCallback* callback = new DQMViewCallback(node, master);
-  if (debugmode) {
-    callback->init();
-    while (true) { sleep(10); }
-  } else {
-    NSMNodeDaemon* daemon = new NSMNodeDaemon(callback);
-    daemon->run();
-  }
+  DQMViewCallback* callback = new DQMViewCallback(NSMNode(nodename), master);
+  NSMNodeDaemon* daemon = new NSMNodeDaemon(callback, config.get("nsm.global.host"),
+                                            config.getInt("nsm.global.port"));
+  daemon->run();
   return 0;
 }
 

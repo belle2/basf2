@@ -253,6 +253,9 @@ bool RunControlCallback::load() throw()
         pars[1] = cobj.getShort("dummy_rate");
         pars[2] = cobj.getShort("trigger_limit");
         pars[3] = 0;
+        LogFile::debug("Send TRIGFT to %s (pars = {%d, %d, %d})",
+                       node.getName().c_str(),
+                       pars[0], pars[1], pars[2]);
         com.sendRequest(NSMMessage(node, RCCommand::TRIGFT, 4, pars));
       }
       if (m_port > 0) {

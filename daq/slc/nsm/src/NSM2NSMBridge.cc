@@ -35,12 +35,17 @@ void NSM2NSMBridge::run() throw()
     NSMCommunicator* com[2] = {NULL, NULL};
     if (m_daemon[0] != NULL) com[0] = m_daemon[0]->getCommunicator();
     if (m_daemon[1] != NULL) com[1] = m_daemon[1]->getCommunicator();
+    int flags[2];
     while (true) {
-      int i = NSMCommunicator::select(timeout, com, 2);
-      if (i >= 0 && m_daemon[i] != NULL) {
-        NSMMessage& msg(com[i]->getMessage());
-        m_callback[i]->setMessage(msg);
-        m_callback[i]->perform(msg);
+      int ret = NSMCommunicator::select(timeout, com, flags, 2);
+      if (ret > 0) {
+        for (int i = 0; ret < 2; ret++) {
+          if (m_daemon[i] && flags[i] > 0) {
+            NSMMessage& msg(com[i]->getMessage());
+            m_callback[i]->setMessage(msg);
+            m_callback[i]->perform(msg);
+          }
+        }
       } else {
         for (int i = 0; i < 2; i++) {
           if (m_callback[i] != NULL) {

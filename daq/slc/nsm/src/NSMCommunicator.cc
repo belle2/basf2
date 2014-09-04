@@ -309,13 +309,15 @@ bool NSMCommunicator::wait(int sec) throw(NSMHandlerException)
   }
 }
 
-int NSMCommunicator::select(int sec, NSMCommunicator** com, int ncoms)
+int NSMCommunicator::select(int sec, NSMCommunicator** com,
+                            int* flags, int ncoms)
 throw(NSMHandlerException)
 {
   fd_set fds;
   int ret;
   FD_ZERO(&fds);
   for (int i = 0; i < ncoms; i++) {
+    flags[i] = 0;
     if (com[i] != NULL && com[i]->m_nsmc != NULL) {
       FD_SET(com[i]->m_nsmc->sock, &fds);
     }
@@ -334,16 +336,18 @@ throw(NSMHandlerException)
     throw (NSMHandlerException("Failed to select"));
   }
 
+  ret = 0;
   for (int i = 0; i < ncoms; i++) {
     if (com[i] != NULL && com[i]->m_nsmc != NULL) {
       if (FD_ISSET(com[i]->m_nsmc->sock, &fds)) {
         com[i]->readContext(com[i]->m_nsmc);
         b2nsm_context(com[i]->m_nsmc);
-        return i;
+        flags[i] = 1;
+        ret++;
       }
     }
   }
-  return -1;
+  return ret;
 }
 
 void NSMCommunicator::readContext(NSMcontext* nsmc) throw()

@@ -27,7 +27,8 @@ namespace Belle2 {
   class NSMCommunicator {
 
   public:
-    static int select(int sec, NSMCommunicator** com, int ncoms)
+    static int select(int sec, NSMCommunicator** com,
+                      int* flags, int ncoms)
     throw(NSMHandlerException);
 
   public:

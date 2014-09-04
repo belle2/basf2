@@ -56,6 +56,7 @@ public class DQMListenerService extends Thread {
             boolean configured = false;
             while (true) {
                 int flag = socket_reader.readInt();
+                System.out.println("flag="+flag);
                 switch (flag) {
                     case FLAG_LIST: {
                         Platform.runLater(new Runnable() {
@@ -68,6 +69,7 @@ public class DQMListenerService extends Thread {
                         });
                         _pack_v = new ArrayList<>();
                         int npacks = socket_reader.readInt();
+                        System.out.println("npacks="+npacks);
                         for (int n = 0; n < npacks; n++) {
                             String name = socket_reader.readString();
                             HistoPackage pack = new HistoPackage(name);

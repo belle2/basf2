@@ -45,7 +45,6 @@ receiver.param('HostNameFrom', ['localhost', 'cpr007'])
 receiver.param('PortFrom', [int(argvs[2]), int(argvs[2])])
 receiver.param('EventDataBufferWords', 4801)
 receiver.param('MaxTime', -1.)
-# receiver.param('MaxEventNum', 10000)
 receiver.param('MaxEventNum', -1)
 receiver.param('NodeName', argvs[3])  # node name for NSM
 
@@ -91,8 +90,8 @@ main = create_path()
 main.add_module(receiver)
 # main.add_module(histo)
 # main.add_module(monitor)
-# main.add_module(dump)
-# main.add_module(sender)
+#main.add_module(dump)
+main.add_module(sender)
 
 # main.add_module(output)
 # main.add_module(perf)

@@ -26,6 +26,7 @@ void ProcessListener::run()
   if (m_con->getInfo().isAvailable()) {
     unsigned int state = m_con->getInfo().getState();
     if (node.getState() == RCState::RUNNING_S ||
+        node.getState() == RCState::LOADING_TS ||
         node.getState() == RCState::STARTING_TS) {
       switch (state) {
         case RunInfoBuffer::RUNNING:

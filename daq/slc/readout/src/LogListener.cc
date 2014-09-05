@@ -44,12 +44,9 @@ void LogListener::run()
         ss.str("");
         m_con->lock();
         LogFile::put(priority, s);
-        if (priority == LogFile::ERROR) {
-          comm->sendError(s);
-          //m_con->setState(RunInfoBuffer::ERROR);
-        } else if (priority == LogFile::FATAL) {
-          comm->sendError(s);
-          //m_con->setState(RunInfoBuffer::ERROR);
+        if (node.getState() == RCState::RUNNING_S ||
+            node.getState() == RCState::STARTING_TS) {
+          node.setState(RCState::RECOVERING_RS);
         }
         if (priority >= LogFile::NOTICE) {
           comm->sendLog(DAQLogMessage(node.getName(), priority, s));
@@ -90,7 +87,6 @@ void LogListener::run()
       }
     }
   } catch (const IOException& e) {
-    //LogFile::debug("failed to read pipe: %s", e.what());
   }
   close(m_pipe[0]);
 }

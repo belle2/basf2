@@ -1,7 +1,6 @@
 #ifndef _Belle2_COPPERController_h
 #define _Belle2_COPPERController_h
 
-#include <daq/slc/database/ConfigObject.h>
 #include <daq/slc/base/IOException.h>
 
 #include "daq/slc/apps/cprcontrold/copper_info.h"

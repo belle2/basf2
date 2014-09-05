@@ -84,6 +84,7 @@ namespace Belle2 {
     RegisterList& getRegisters() { return m_register; }
     ParameterList& getParameters() { return m_parameter; }
     void read(const ConfigObject& obj);
+    RegisterList::iterator getRegister(const std::string& name);
 
   private:
     int m_slot;

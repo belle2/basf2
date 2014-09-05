@@ -22,11 +22,9 @@ const char* HSLBController::getFEEType(int type)
 
 bool HSLBController::open(int fin) throw()
 {
-  //bool force = false;
   if (m_hslb.fd < 0) {
     m_hslb.fd = openfn(fin, false);
     m_hslb.fin = (m_hslb.fd < 0) ? -1 : fin;
-    //force = true;
   }
   if (m_hslb.fd < 0) return false;
   monitor();
@@ -52,11 +50,11 @@ bool HSLBController::load(/*int triggermode*/) throw()
 bool HSLBController::monitor() throw()
 {
   if (m_hslb.fd <= 0) return true;
-  m_hslb.b2lstat = readfn32(m_hslb.fd, HSREGL_STAT);
-  m_hslb.rxdata = readfn32(m_hslb.fd, HSREGL_RXDATA);
-  m_hslb.fwevt = readfn32(m_hslb.fd, 0x085);
-  m_hslb.fwclk = readfn32(m_hslb.fd, 0x086);
-  m_hslb.cntsec = readfn32(m_hslb.fd, 0x087);
+  m_hslb.b2lstat = readfn32(HSREGL_STAT);
+  m_hslb.rxdata = readfn32(HSREGL_RXDATA);
+  m_hslb.fwevt = readfn32(0x085);
+  m_hslb.fwclk = readfn32(0x086);
+  m_hslb.cntsec = readfn32(0x087);
   return true;
 }
 
@@ -106,5 +104,60 @@ bool HSLBController::isCRCError() throw()
 {
   if (m_hslb.fd < 0) return false;
   return (m_hslb.rxdata >> 16 > 0);
+}
+
+int HSLBController::readfn(int adr) throw()
+{
+  return ::readfn(m_hslb.fd, adr);
+}
+
+int HSLBController::writefn(int adr, int val) throw()
+{
+  return ::writefn(m_hslb.fd, adr, val);
+}
+
+int HSLBController::readfn32(int adr) throw()
+{
+  return ::readfn32(m_hslb.fd, adr);
+}
+
+int HSLBController::writefn32(int adr, int val) throw()
+{
+  return ::writefn32(m_hslb.fd, adr, val);
+}
+
+int HSLBController::hswait_quiet() throw()
+{
+  return ::hswait_quiet(m_hslb.fd);
+}
+
+int HSLBController::hswait() throw()
+{
+  return ::hswait(m_hslb.fd);
+}
+
+int HSLBController::readfee8(int adr) throw()
+{
+  return ::readfee8(m_hslb.fd, adr);
+}
+
+int HSLBController::writefee8(int adr, int val) throw()
+{
+  return ::writefee8(m_hslb.fd, adr, val);
+}
+
+int HSLBController::readfee32(int adr, int* valp) throw()
+{
+  return ::readfee32(m_hslb.fd, adr, valp);
+}
+
+int HSLBController::writefee32(int adr, int val) throw()
+{
+  return ::writefee32(m_hslb.fd, adr, val);
+}
+
+int HSLBController::writestream(char* filename) throw()
+{
+  return ::writestream(m_hslb.fd, filename);
 }
 

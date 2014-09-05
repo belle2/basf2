@@ -4,6 +4,7 @@
 #include "daq/slc/readout/LogListener.h"
 
 #include "daq/slc/system/Executor.h"
+#include "daq/slc/system/PThread.h"
 #include "daq/slc/system/LogFile.h"
 
 #include <cstdlib>

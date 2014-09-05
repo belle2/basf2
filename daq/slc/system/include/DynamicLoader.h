@@ -9,6 +9,10 @@ namespace Belle2 {
 
   public:
     DynamicLoader() {}
+    DynamicLoader(const std::string& path)
+    throw (DynamicLoadException) {
+      open(path);
+    }
     ~DynamicLoader() throw();
 
   public:

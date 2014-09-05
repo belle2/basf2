@@ -20,11 +20,14 @@
 using namespace Belle2;
 
 COPPERCallback::COPPERCallback(const NSMNode& node,
-                               FEEController* fee)
-  : RCCallback(node), m_fee(fee)
+                               FEEController* fee[4])
+  : RCCallback(node)
 {
   setTimeout(2);
   m_con.setCallback(this);
+  for (int i = 0; i < 4; i++) {
+    m_fee[i] = fee[i];
+  }
   system("killall basf2");
 }
 
@@ -70,6 +73,9 @@ void COPPERCallback::timeout() throw()
       eflag |= m_hslb[i].isCOPPERLengthFifoFull() << (16 + i);
       eflag |= m_hslb[i].isFifoFull() << (20 + i);
       eflag |= m_hslb[i].isCRCError() << (24 + i);
+      if (m_fee[i] != NULL) {
+        m_fee[i]->monitor(m_hslb[i], m_config.getFEE(i));
+      }
     }
   }
   eflag |= m_ttrx.isBelle2LinkError() << 28;
@@ -216,6 +222,9 @@ bool COPPERCallback::recover() throw()
     if (m_config.useHSLB(i)) {
       m_hslb[i].open(i);
       m_hslb[i].load();
+      if (m_fee[i] != NULL) {
+        m_fee[i]->load(m_hslb[i], m_config.getFEE(i));
+      }
     }
   }
   if (m_ttrx.isError()) {
@@ -225,6 +234,9 @@ bool COPPERCallback::recover() throw()
     if (m_config.useHSLB(i) && m_hslb[i].isError()) {
       //m_hslb[i].boot(m_config.getSetup().getHSLBFirmware());
       m_hslb[i].load();
+      if (m_fee[i] != NULL) {
+        m_fee[i]->load(m_hslb[i], m_config.getFEE(i));
+      }
     }
   }
   if (bootBasf2()) {

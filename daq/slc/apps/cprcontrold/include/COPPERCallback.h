@@ -20,7 +20,7 @@ namespace Belle2 {
 
   public:
     COPPERCallback(const NSMNode& node,
-                   FEEController* fee);
+                   FEEController* fee[4]);
     virtual ~COPPERCallback() throw();
 
   public:
@@ -37,9 +37,9 @@ namespace Belle2 {
     bool bootBasf2() throw();
 
   private:
-    FEEController* m_fee;
     ProcessController m_con;
     HSLBController m_hslb[4];
+    FEEController* m_fee[4];
     TTRXController m_ttrx;
     COPPERController m_copper;
     FlowMonitor m_flow;

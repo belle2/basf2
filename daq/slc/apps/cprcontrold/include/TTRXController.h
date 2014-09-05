@@ -1,8 +1,7 @@
 #ifndef _Belle2_TTRXController_h
 #define _Belle2_TTRXController_h
 
-#include <daq/slc/database/ConfigObject.h>
-#include <daq/slc/base/IOException.h>
+#include <string>
 
 #include <ttrx/ttrx.h>
 #include <ttrx/tt4r.h>

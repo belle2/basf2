@@ -4,10 +4,8 @@
 #include "daq/slc/readout/RunInfoBuffer.h"
 
 #include "daq/slc/runcontrol/RCCallback.h"
-#include "daq/slc/runcontrol/RCState.h"
 
 #include "daq/slc/system/Fork.h"
-#include "daq/slc/system/PThread.h"
 #include "daq/slc/system/Mutex.h"
 #include "daq/slc/system/Cond.h"
 
@@ -46,8 +44,6 @@ namespace Belle2 {
     void setExecutable(const std::string& exe) { m_exename = exe; }
     void addArgument(const std::string& arg) { m_arg_v.push_back(arg); }
     void clearArguments() { m_arg_v = std::vector<std::string>(); }
-    const RCState& getState() const { return m_state; }
-    void setState(const RCState& state) { m_state = state; }
     bool isAlive() throw() { return m_fork.isAlive(); }
 
   public:
@@ -61,10 +57,8 @@ namespace Belle2 {
     std::string m_exename;
     std::vector<std::string> m_arg_v;
     Fork m_fork;
-    PThread m_thread;
     Mutex m_mutex;
     std::string m_message;
-    RCState m_state;
 
   };
 

@@ -35,3 +35,13 @@ void FEEConfig::read(const ConfigObject& obj)
     m_parameter.push_back(param);
   }
 }
+
+FEEConfig::RegisterList::iterator
+FEEConfig::getRegister(const std::string& name)
+{
+  for (FEEConfig::RegisterList::iterator it = m_register.begin();
+       it != m_register.end(); it++) {
+    if (it->getParamName() == name) return it;
+  }
+  return m_register.end();
+}

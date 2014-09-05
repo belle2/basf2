@@ -1,10 +1,10 @@
 #include "daq/slc/apps/dqmviewd/DQMViewCallback.h"
-#include "daq/slc/apps/dqmviewd/DQMViewMaster.h"
 #include <daq/slc/apps/dqmviewd/SocketAcceptor.h>
 
 #include <daq/slc/runcontrol/RCCommand.h>
 
 #include <daq/slc/system/LogFile.h>
+#include <daq/slc/system/PThread.h>
 
 #include <daq/slc/base/ConfigFile.h>
 #include <daq/slc/base/StringUtil.h>

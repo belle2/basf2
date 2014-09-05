@@ -610,7 +610,6 @@ TRGCDCSegment::phiPosition(void) const {
 	dphi=atan(dphi/wireR[superLayerId()]/1000);
 	if(lutcomp==2){phi-=dphi;}
 	else if(lutcomp==1){phi+=dphi;}
-	else{phi=phi;}
 	
 	return phi;
 }

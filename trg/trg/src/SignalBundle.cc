@@ -79,9 +79,9 @@ TRGSignalBundle::TRGSignalBundle(const string & name,
     // const unsigned n = outputStates.size();   // same as nStates
     
     for (unsigned i = 0; i < nStates; i++) {
-      	const TRGState & s = * outputStates[i];
-	sb->set(s, states[i]);
-	delete & s;
+      	const TRGState * s = outputStates[i];
+	sb->set((*s), states[i]);
+	delete s;
     }
 
     push_back(sb);
@@ -152,9 +152,9 @@ TRGSignalBundle::TRGSignalBundle(const string & name,
     
     const unsigned n = outputStates.size();
     for (unsigned i = 0; i < n; i++) {
-      	const TRGState & s = * outputStates[i];
-	sb->set(s, newStates[i]);
-	delete & s;
+      	const TRGState * s = outputStates[i];
+	sb->set((*s), newStates[i]);
+	delete s;
     }
 
     push_back(sb);

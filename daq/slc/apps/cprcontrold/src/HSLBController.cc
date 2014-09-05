@@ -1,5 +1,7 @@
 #include "daq/slc/apps/cprcontrold/HSLBController.h"
 
+#include <daq/slc/system/File.h>
+
 #include <mgt/libhslb.h>
 #include <mgt/hsreg.h>
 
@@ -61,7 +63,7 @@ bool HSLBController::monitor() throw()
 bool HSLBController::boot(const std::string firmware) throw()
 {
   if (m_hslb.fd <= 0) return true;
-  if (firmware.size() > 0) {
+  if (firmware.size() > 0 && File::exist(firmware)) {
     return bootfpga(m_hslb.fd, (char*)firmware.c_str(),
                     false, false, 6) == 0;
   }

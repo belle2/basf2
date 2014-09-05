@@ -1,5 +1,6 @@
-#include "daq/slc/apps/cprcontrold/CDCFEEController.h"
+#include "daq/slc/apps/cprcontrold/ECLFEEController.h"
 
+#include <daq/slc/system/File.h>
 #include <daq/slc/system/LogFile.h>
 
 #include <mgt/hsreg.h>
@@ -10,18 +11,19 @@
 
 using namespace Belle2;
 
-CDCFEEController::CDCFEEController()
+ECLFEEController::ECLFEEController()
 {
-  LogFile::debug("CDCFEEController");
+  LogFile::debug("ECLFEEController");
 }
 
-bool CDCFEEController::boot(HSLBController& /*hslb*/,
+bool ECLFEEController::boot(HSLBController& /*hslb*/,
                             FEEConfig& /*conf*/) throw()
 {
+
   return true;
 }
 
-bool CDCFEEController::load(HSLBController& hslb,
+bool ECLFEEController::load(HSLBController& hslb,
                             FEEConfig& conf) throw()
 {
   FEEConfig::ParameterList& pars(conf.getParameters());
@@ -39,15 +41,15 @@ bool CDCFEEController::load(HSLBController& hslb,
   return true;
 }
 
-bool CDCFEEController::monitor(HSLBController& /*hslb*/,
+bool ECLFEEController::monitor(HSLBController& /*hslb*/,
                                FEEConfig& /*conf*/) throw()
 {
   return true;
 }
 
 extern "C" {
-  void* getCDCFEE()
+  void* getECLFEE()
   {
-    return new Belle2::CDCFEEController();
+    return new Belle2::ECLFEEController();
   }
 }

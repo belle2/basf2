@@ -10,6 +10,9 @@ namespace Belle2 {
   class File : public FileDescriptor {
 
   public:
+    static bool exist(const std::string& filename) throw();
+
+  public:
     File() throw() {}
     File(int fd) throw() : FileDescriptor(fd) {}
     virtual ~File() throw() {}

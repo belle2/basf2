@@ -7,7 +7,7 @@
 
 namespace Belle2 {
 
-  class DQMViewMaster;
+  class DQMViewCallback;
   class DQMFileReader;
 
   class HistSender {
@@ -18,8 +18,8 @@ namespace Belle2 {
     static const int FLAG_LIST;
 
   public:
-    HistSender(TCPSocket& socket, DQMViewMaster& master)
-      : m_master(master), m_socket(socket) {}
+    HistSender(TCPSocket& socket, DQMViewCallback* callback)
+      : m_callback(callback), m_socket(socket) {}
     ~HistSender();
 
   public:
@@ -31,7 +31,7 @@ namespace Belle2 {
 
 
   private:
-    DQMViewMaster& m_master;
+    DQMViewCallback* m_callback;
     TCPSocket m_socket;
 
   };

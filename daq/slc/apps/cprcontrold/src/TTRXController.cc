@@ -1,5 +1,7 @@
 #include "daq/slc/apps/cprcontrold/TTRXController.h"
 
+#include <daq/slc/system/File.h>
+
 #include <cstring>
 
 #define D(a,b,c) (((a)>>(c))&((1<<((b)+1-(c)))-1))
@@ -11,7 +13,7 @@ using namespace Belle2;
 bool TTRXController::open() throw()
 {
   if (m_ttrx == NULL) {
-    m_ttrx = open_ttrx(0, TTRX_RDONLY);
+    m_ttrx = open_ttrx(0, TTRX_RDWR);
   }
   return m_ttrx != NULL;
 }
@@ -27,7 +29,7 @@ bool TTRXController::close() throw()
 
 bool TTRXController::boot(const std::string& file) throw()
 {
-  if (m_ttrx != NULL && file.size() > 0) {
+  if (m_ttrx != NULL && file.size() > 0 && File::exist(file)) {
     memset(&m_info, 0, sizeof(ttrx_info));
     if (boot_ttrx_fpga(m_ttrx, TTRX_PRGM, file.c_str(), 0, 0) < 0) {
       return false;

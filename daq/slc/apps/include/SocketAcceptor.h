@@ -14,7 +14,7 @@ namespace Belle2 {
 
   public:
     SocketAcceptor(const std::string& ip,
-                   int port, ARGUMENT& arg)
+                   int port, ARGUMENT* arg)
       : m_ip(ip), m_port(port), m_arg(arg) {}
     ~SocketAcceptor() {}
 
@@ -35,7 +35,7 @@ namespace Belle2 {
   private:
     std::string m_ip;
     int m_port;
-    ARGUMENT& m_arg;
+    ARGUMENT* m_arg;
 
   };
 

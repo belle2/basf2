@@ -15,6 +15,7 @@
 
 #include <unistd.h>
 #include <cstdlib>
+#include <cstdio>
 #include <cstring>
 
 using namespace Belle2;
@@ -83,7 +84,6 @@ void COPPERCallback::timeout() throw()
 
   NSMCommunicator& com(*getCommunicator());
   const std::string name = getNode().getName();
-  /*
   if (getNode().getState() == RCState::RUNNING_S &&
       m_copper.isFifoFull()) {
     std::string msg = "COPPER FIFO full";
@@ -141,7 +141,6 @@ void COPPERCallback::timeout() throw()
     LogFile::error(msg);
     com.sendLog(DAQLogMessage(name, LogFile::ERROR, msg));
   }
-  */
   if (m_data.isAvailable()) {
     ronode_status* nsm = (ronode_status*)m_data.get();
     if (m_flow.isAvailable()) {
@@ -216,7 +215,7 @@ bool COPPERCallback::recover() throw()
 {
   if (!m_ttrx.isOpened()) {
     m_ttrx.open();
-    //m_ttrx.boot(m_config.getSetup().getTTRXFirmware());
+    m_ttrx.boot(m_config.getSetup().getTTRXFirmware());
   }
   for (int i = 0; i < 4; i++) {
     if (m_config.useHSLB(i)) {
@@ -228,7 +227,7 @@ bool COPPERCallback::recover() throw()
     }
   }
   if (m_ttrx.isError()) {
-    //m_ttrx.boot(m_config.getSetup().getTTRXFirmware());
+    m_ttrx.boot(m_config.getSetup().getTTRXFirmware());
   }
   for (int i = 0; i < 4; i++) {
     if (m_config.useHSLB(i) && m_hslb[i].isError()) {
@@ -239,11 +238,11 @@ bool COPPERCallback::recover() throw()
       }
     }
   }
-  if (bootBasf2()) {
-    getNode().setState(RCState::RUNNING_S);
-    return true;
+  if (!bootBasf2()) {
+    getNode().setState(RCState::RECOVERING_RS);
+    return false;
   }
-  return false;
+  return true;
 
 }
 
@@ -269,11 +268,9 @@ bool COPPERCallback::bootBasf2() throw()
   m_con.addArgument(m_config.getHostname());
   int copperid = atoi(m_config.getCopperId().substr(4).c_str());
   int detectorid = atoi(m_config.getCopperId().substr(3).c_str()) / 1000;
-  if (detectorid == 5) {
-    copperid += 0x05000000;
-  } else if (detectorid == 6) {
-    copperid += 0x06000000;
-  }
+  char str[64];
+  sprintf(str, "0x%d000000", detectorid);
+  copperid += strtol(str, NULL, 0);
   m_con.addArgument(StringUtil::form("%d", copperid));
   m_con.addArgument(StringUtil::form("%d", flag));
   m_con.addArgument("1");

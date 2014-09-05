@@ -36,7 +36,7 @@ public class DQMViewGUI extends Application {
         DQMViewGUIController controller
                 = ((DQMViewGUIController) loader.getController());
         service = new DQMListenerService();
-        service.init("localhost", 50100, "DQMGUI", controller);
+        service.init("localhost", 50101, "DQMGUI", controller);
         service.start();
         Scene scene = new Scene(root);
         scene.getStylesheets().add(LogMessage.getCSSPath());

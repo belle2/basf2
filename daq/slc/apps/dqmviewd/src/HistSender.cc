@@ -1,5 +1,6 @@
 #include "daq/slc/apps/dqmviewd/HistSender.h"
-#include "daq/slc/apps/dqmviewd/DQMViewMaster.h"
+
+#include "daq/slc/apps/dqmviewd/DQMViewCallback.h"
 
 #include <daq/slc/system/ZipDeflater.h>
 #include <daq/slc/system/BufferedWriter.h>
@@ -27,11 +28,10 @@ void HistSender::run()
 {
   TCPSocketWriter socket_writer(m_socket);
   TCPSocketReader socket_reader(m_socket);
-
   while (true) {
-    std::vector<DQMFileReader>& reader_v(m_master.getReaders());
+    std::vector<DQMFileReader>& reader_v(m_callback->getReaders());
     size_t nready = 0;
-    m_master.lock();
+    m_callback->lock();
     for (size_t i = 0; i < reader_v.size(); i++) {
       if (reader_v[i].isReady()) nready++;
     }
@@ -44,10 +44,10 @@ void HistSender::run()
       }
       socket_writer.writeInt(0x7FFF);
     } catch (const IOException& e) {
-      m_master.unlock();
+      m_callback->unlock();
       return;
     }
-    m_master.unlock();
+    m_callback->unlock();
 
     std::vector<bool> monitored_v;
     int npacks = 0;
@@ -55,9 +55,9 @@ void HistSender::run()
     try {
       for (size_t i = 0; i < reader_v.size(); i++) {
         DQMFileReader& reader(reader_v[i]);
-        m_master.lock();
+        m_callback->lock();
         bool ready = reader.isReady();
-        m_master.unlock();
+        m_callback->unlock();
         if (ready) {
           bool monitored = (bool)socket_reader.readChar();
           monitored_v.push_back(monitored);
@@ -78,7 +78,7 @@ void HistSender::run()
     try {
       socket_writer.writeInt(FLAG_CONFIG);
       socket_writer.writeInt(npacks);
-      m_master.lock();
+      m_callback->lock();
       for (size_t i = 0; i < reader_v.size(); i++) {
         if (monitored_v[i]) {
           DQMFileReader& reader(reader_v[i]);
@@ -109,16 +109,16 @@ void HistSender::run()
         }
       }
       socket_writer.writeInt(0x7FFF);
-      m_master.unlock();
+      m_callback->unlock();
     } catch (const IOException& e) {
-      m_master.unlock();
+      m_callback->unlock();
       m_socket.close();
       return;
     }
 
     std::vector<int> updateid_v;
     int buf_size = 0;
-    m_master.lock();
+    m_callback->lock();
     for (size_t i = 0; i < reader_v.size(); i++) {
       updateid_v.push_back(reader_v[i].getUpdateId());
       if (monitored_v[i]) {
@@ -127,17 +127,17 @@ void HistSender::run()
         if (counter.count() > buf_size) buf_size = counter.count();
       }
     }
-    m_master.unlock();
+    m_callback->unlock();
     ZipDeflater buf(buf_size, buf_size * 1.01 + 12);
 
     try {
       while (true) {
         //bool revised = false;
-        m_master.lock();
+        m_callback->lock();
         socket_writer.writeInt(FLAG_UPDATE);
-        socket_writer.writeInt(m_master.getExpNumber());
-        socket_writer.writeInt(m_master.getRunNumber());
-        socket_writer.writeInt(m_master.getState().getId());
+        socket_writer.writeInt(m_callback->getExpNumber());
+        socket_writer.writeInt(m_callback->getRunNumber());
+        socket_writer.writeInt(m_callback->getNode().getState().getId());
         int ic = 0;
         for (size_t i = 0; i < reader_v.size(); i++) {
           if (monitored_v[i]) {
@@ -153,11 +153,11 @@ void HistSender::run()
           }
         }
         socket_writer.writeInt(-1);
-        m_master.wait();
-        m_master.unlock();
+        m_callback->wait();
+        m_callback->unlock();
       }
     } catch (const IOException& e) {
-      m_master.unlock();
+      m_callback->unlock();
       m_socket.close();
       return;
     }

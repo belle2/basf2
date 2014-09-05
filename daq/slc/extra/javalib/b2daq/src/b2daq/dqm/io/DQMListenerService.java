@@ -56,7 +56,6 @@ public class DQMListenerService extends Thread {
             boolean configured = false;
             while (true) {
                 int flag = socket_reader.readInt();
-                System.out.println("flag="+flag);
                 switch (flag) {
                     case FLAG_LIST: {
                         Platform.runLater(new Runnable() {

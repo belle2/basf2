@@ -81,3 +81,18 @@ size_t File::read(void* buf, size_t count) throw(IOException)
   return c;
 }
 
+bool File::exist(const std::string& filename) throw()
+{
+  struct stat st;
+  if (stat(filename.c_str(), &st) != 0) {
+    return false;
+  } else {
+    mode_t m = st.st_mode;
+    if (S_ISDIR(m)) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+  return false;
+}

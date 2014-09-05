@@ -685,7 +685,7 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
         // Get tracks mc index
         //unsigned int mcParticleId = trackRelation3D.contributor(0);
         unsigned int mcParticleId = aTrack.relation2D().contributor(0);
-        vector<vector<const TCSHit*> > p_mcStTSs;
+        //vector<vector<const TCSHit*> > p_mcStTSs;
         //cout<<mcParticleId<<endl;
         // Stereo Layer 0
         // Get TSs for layer

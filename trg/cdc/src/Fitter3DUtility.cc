@@ -110,14 +110,17 @@ void Fitter3DUtility::rPhiFit(double *rr, double *phi2, double *phierror, double
   //if(hcx>0 && hcy<0) myphi0 += Trg_PI*2.0;
 
   // For chi2
-  double pchi2 = -2*hcx*D-2*hcy*E+G;
-  pchi2/=3;
+  // double pchi2 = -2*hcx*D-2*hcy*E+G;
+  // pchi2/=3;
+
   // Another way to calculate chi2
+  /*
   double pchi3 = 0.; //iw
   for(unsigned i=0;i<5;i++){
     pchi3+=(2*(hcx*cos(phi2[i])+hcy*sin(phi2[i]))-rr[i])*(2*(hcx*cos(phi2[i])+hcy*sin(phi2[i]))-rr[i])/(fiterror[i]*fiterror[i]);
   }
   pchi3/=3;
+  */
   
 }
 
@@ -155,15 +158,17 @@ void Fitter3DUtility::rPhiFit2(double *rr, double *phi2, double *phierror, doubl
   //if(hcx>0 && hcy<0) myphi0 += Trg_PI*2.0;
 
   // For chi2
-  double pchi2 = -2*hcx*D-2*hcy*E+G;
-  pchi2/=nTS-2;
+  // double pchi2 = -2*hcx*D-2*hcy*E+G;
+  // pchi2/=nTS-2;
+
   // Another way to calculate chi2
+  /*
   double pchi3 = 0.; //iw
   for(int i=0;i<nTS;i++){
     pchi3+=(2*(hcx*cos(phi2[i])+hcy*sin(phi2[i]))-rr[i])*(2*(hcx*cos(phi2[i])+hcy*sin(phi2[i]))-rr[i])/(fiterror[i]*fiterror[i]);
   }
   pchi3/=3;
-  
+  */ 
 }
 
 double Fitter3DUtility::calPhi(double wirePhi, double driftLength, double eventTime, double rr, int lr){

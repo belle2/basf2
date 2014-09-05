@@ -183,7 +183,7 @@ TRGCDCFrontEnd::simulate(void) {
 #endif
 
     // output wire hit info into a .log file
-    ofstream wireinfo((name()+"_wireinfo.log").c_str());
+    // ofstream wireinfo((name()+"_wireinfo.log").c_str());
 
 
     //...Create Wire timing bits...
@@ -558,7 +558,7 @@ TCFrontEnd::packerInnerInside(const TRGState & input) {
     else {
 	//s.set(p, 5, true_5);
     }
-    p+=5;
+    // p+=5;
 
     //...Debug...
 #ifdef TRG_DEBUG

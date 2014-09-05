@@ -385,7 +385,6 @@ void Hough3DFinder::runFinderVersion1(vector<double> &trackVariables, vector<vec
   }
 
   // Fill Hough mesh.
-  double tempCotStart, tempCotEnd;
   double tempZ0Start, tempZ0End;
   double tempZ01, tempZ02;
   int tempHoughZ0;
@@ -396,8 +395,8 @@ void Hough3DFinder::runFinderVersion1(vector<double> &trackVariables, vector<vec
   // Vote in Hough Mesh Layers.
   for(int cotStep=0; cotStep<m_nCotSteps; cotStep++){
     // Find cotStep range for mesh.
-    tempCotStart=(cotStep-0.5)*m_cotStepSize+m_cotStart;
-    tempCotEnd=(cotStep+0.5)*m_cotStepSize+m_cotStart;
+    double tempCotStart=(cotStep-0.5)*m_cotStepSize+m_cotStart;
+    double tempCotEnd=(cotStep+0.5)*m_cotStepSize+m_cotStart;
     //cout<<"tempCotStart: "<<tempCotStart<<" tempCotEnd: "<<tempCotEnd<<endl;
 
     // Find z0 range for mesh per layer.
@@ -619,10 +618,10 @@ void Hough3DFinder::runFinderVersion2(vector<double> &trackVariables, vector<vec
   // mean wire diff
   double meanWireDiff[4] = { 3.68186, 3.3542, 3.9099, 4.48263 };
   for(int iLayer=0; iLayer<4; iLayer++){
-    double bestDiff=999;
     if((*m_geoCandidatesIndex)[iLayer].size()==0) {
       //cout<<"No St Candidate in GeoFinder"<<endl;
     } else {
+      double bestDiff=999;
       for(int iTS=0; iTS<int((*m_geoCandidatesIndex)[iLayer].size()); iTS++){
         tsDiffSt = m_stAxPhi[iLayer] - stTSs[iLayer][(*m_geoCandidatesIndex)[iLayer][iTS]];
         if(tsDiffSt > m_Trg_PI) tsDiffSt -= 2*m_Trg_PI;
@@ -723,7 +722,6 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
   double stAxPhi[4];
   int stAxWire[4];
   int stAxWire_int[4];
-  int indexTS;
   double acos_real, myphiz;
   int stCandHitMap[4][10];
 
@@ -825,7 +823,7 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
 
     // If index is at edgeIndex move to 0.
     if(stAxWire[iLayer] == m_nWires[iLayer]/2) stAxWire[iLayer] = 0;
-    indexTS = stAxWire[iLayer];
+    int indexTS = stAxWire[iLayer];
 
     //// Check if something is different with LUT method.
     //if(stAxWire[iLayer] != m_wireConvertLUT[iLayer][myphiz_int]) {

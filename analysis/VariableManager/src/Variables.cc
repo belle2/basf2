@@ -1225,10 +1225,8 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      if (particle->getParticleType() == Particle::c_ECLCluster) {
-        StoreArray<ECLCluster> ECLClusters;
-        const ECLCluster* shower = ECLClusters[particle->getMdstArrayIndex()];
-
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
         /// TODO: check if ECLCluster will provide this on its own
         float theta = shower->getMomentum().Theta();
         if (theta < 0.555) {
@@ -1283,10 +1281,8 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      if (particle->getParticleType() == Particle::c_ECLCluster) {
-        StoreArray<ECLCluster> ECLClusters;
-        const ECLCluster* shower = ECLClusters[particle->getMdstArrayIndex()];
-
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
         result = shower->getEnedepSum();
       }
       return result;
@@ -1296,10 +1292,8 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      if (particle->getParticleType() == Particle::c_ECLCluster) {
-        StoreArray<ECLCluster> ECLClusters;
-        const ECLCluster* shower = ECLClusters[particle->getMdstArrayIndex()];
-
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
         result = shower->getHighestE();
       }
       return result;
@@ -1309,10 +1303,8 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      if (particle->getParticleType() == Particle::c_ECLCluster) {
-        StoreArray<ECLCluster> ECLClusters;
-        const ECLCluster* shower = ECLClusters[particle->getMdstArrayIndex()];
-
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
         result = shower->getTiming();
       }
       return result;
@@ -1322,10 +1314,8 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      if (particle->getParticleType() == Particle::c_ECLCluster) {
-        StoreArray<ECLCluster> ECLClusters;
-        const ECLCluster* shower = ECLClusters[particle->getMdstArrayIndex()];
-
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
         result = shower->getTheta();
       }
       return result;
@@ -1335,10 +1325,8 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      if (particle->getParticleType() == Particle::c_ECLCluster) {
-        StoreArray<ECLCluster> ECLClusters;
-        const ECLCluster* shower = ECLClusters[particle->getMdstArrayIndex()];
-
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
         result = shower->getPhi();
       }
       return result;
@@ -1348,10 +1336,8 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      if (particle->getParticleType() == Particle::c_ECLCluster) {
-        StoreArray<ECLCluster> ECLClusters;
-        const ECLCluster* shower = ECLClusters[particle->getMdstArrayIndex()];
-
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
         result = shower->getR();
       }
       return result;
@@ -1363,10 +1349,8 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      if (particle->getParticleType() == Particle::c_ECLCluster) {
-        StoreArray<ECLCluster> ECLClusters;
-        const ECLCluster* shower = ECLClusters[particle->getMdstArrayIndex()];
-
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
         result = shower->getE9oE25();
       }
       return result;
@@ -1376,10 +1360,8 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      if (particle->getParticleType() == Particle::c_ECLCluster) {
-        StoreArray<ECLCluster> ECLClusters;
-        const ECLCluster* shower = ECLClusters[particle->getMdstArrayIndex()];
-
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
         result = shower->getNofCrystals();
       }
       return result;
@@ -1389,9 +1371,8 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      if (particle->getParticleType() == Particle::c_ECLCluster) {
-        StoreArray<ECLCluster> ECLClusters;
-        const ECLCluster* shower = ECLClusters[particle->getMdstArrayIndex()];
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
         const Track* track = shower->getRelated<Track>();
 
         if (track)

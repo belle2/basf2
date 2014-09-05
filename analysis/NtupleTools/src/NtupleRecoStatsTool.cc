@@ -46,13 +46,13 @@ void NtupleRecoStatsTool::setupTree()
 
 void NtupleRecoStatsTool::eval(const  Particle*)
 {
-  m_iClusters = -1;
-  m_iNeutralClusters = -1;
-  m_iChargedClusters = -1;
-  m_iGoodNeutralClusters = -1;
-  m_iTracks = -1;
-  m_iMCParticles = -1;
-  m_iParticles = -1;
+  m_iClusters = 0;
+  m_iNeutralClusters = 0;
+  m_iChargedClusters = 0;
+  m_iGoodNeutralClusters = 0;
+  m_iTracks = 0;
+  m_iMCParticles = 0;
+  m_iParticles = 0;
   m_neutralECLEnergy = 0.0;
   m_chargedECLEnergy = 0.0;
   m_goodNeutralECLEnergy = 0.0;

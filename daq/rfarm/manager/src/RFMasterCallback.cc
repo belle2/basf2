@@ -159,6 +159,15 @@ void RFMasterCallback::setState(const RCState& state)
 
 void RFMasterCallback::timeout() throw()
 {
+  for (std::vector<std::string>::iterator it = m_name_v.begin();
+       it != m_name_v.end(); it++) {
+    NSMNode& node(m_nodes[*it]);
+    if (node.getState() == RCState::ABORTING_RS) {
+      LogFile::debug("RF_UNCONFIGURE >> %s", node.getName().c_str());
+      b2nsm_sendreq(node.getName().c_str(), "RF_UNCONFIGURE", 0, NULL);
+      break;
+    }
+  }
   if (!m_callback || !m_callback->getData().isAvailable()) return;
   RfUnitInfo* unitinfo = (RfUnitInfo*)m_callback->getData().get();
   unitinfo->nnodes = m_data_v.size();
@@ -229,9 +238,9 @@ bool RFMasterCallback::configure() throw()
            ready_evp) &&
           node.getState() == RCState::NOTREADY_S) {
         node.setState(RCState::LOADING_TS);
+        usleep(200000);
         LogFile::debug("RF_CONFIGURE >> %s", node.getName().c_str());
         b2nsm_sendreq(node.getName().c_str(), "RF_CONFIGURE", 0, NULL);
-        usleep(100000);
       }
       if (node.getName().find("evp_") == std::string::npos)
         return true;
@@ -261,9 +270,9 @@ bool RFMasterCallback::unconfigure() throw()
            notready_evp) &&
           node.getState() == RCState::READY_S) {
         node.setState(RCState::ABORTING_RS);
+        usleep(200000);
         LogFile::debug("RF_UNCONFIGURE >> %s", node.getName().c_str());
         b2nsm_sendreq(node.getName().c_str(), "RF_UNCONFIGURE", 0, NULL);
-        usleep(100000);
       }
       if (node.getName().find("evp_") == std::string::npos)
         return true;

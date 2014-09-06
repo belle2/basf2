@@ -243,7 +243,7 @@ bool COPPERCallback::recover() throw()
     }
   }
   if (!bootBasf2()) {
-    getNode().setState(RCState::RECOVERING_RS);
+    getNode().setState(RCState::NOTREADY_S);
     return false;
   }
   return true;

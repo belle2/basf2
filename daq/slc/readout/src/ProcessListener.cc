@@ -31,14 +31,14 @@ void ProcessListener::run()
             node.getState() == RCState::LOADING_TS ||
             node.getState() == RCState::STARTING_TS) {
           LogFile::error("Forked process %s was crashed", process_name.c_str());
-          node.setState(RCState::RECOVERING_RS);
+          //node.setState(RCState::RECOVERING_RS);
           comm->sendError(StringUtil::form("Foked process %s was crashed", process_name.c_str()));
           m_con->getInfo().reportError(RunInfoBuffer::PROCESS_DOWN);
         }
         break;
       case RunInfoBuffer::READY:
         LogFile::warning("Forked process %s was not started", process_name.c_str());
-        node.setState(RCState::RECOVERING_RS);
+        //node.setState(RCState::RECOVERING_RS);
         comm->sendError(StringUtil::form("Foked process %s was no started", process_name.c_str()));
         m_con->getInfo().reportError(RunInfoBuffer::PROCESS_DOWN);
         break;

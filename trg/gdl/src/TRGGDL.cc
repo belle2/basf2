@@ -507,16 +507,20 @@ TRGGDL::timingDecision(const TRGState & input,
     in[1] = input[1];
     in[2] = input[2];
     in[3] = input[3];
+    /*
     bool cdc = in[0];
     bool * cdct = & in[1];
+    */
 
     //...ECL...
     in[4] = input[4];
     in[5] = input[5];
     in[6] = input[6];
     in[7] = input[7];
+    /*
     bool ecl = in[4];
     bool * eclt = & in[5];
+    */
 
     //...TOP...
     in[8] = input[8];
@@ -524,8 +528,10 @@ TRGGDL::timingDecision(const TRGState & input,
     in[10] = input[10];
     in[11] = input[11];
     in[12] = input[12];
+    /*
     bool top = in[8];
     bool * topt = & in[9];
+    */
 
     //...FTD...
     in[13] = input[13];

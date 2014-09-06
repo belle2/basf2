@@ -368,9 +368,8 @@ chopWord(char b[800], char c[800]) {
 	return;
     }
 
-    unsigned k = 0;
-    for (unsigned j = i; j++; j < 800) {
-	b[k++] = b[j];
+    for (unsigned j = i, k = 0; j++, k++; j < 800) {
+	b[k] = b[j];
 	if (b[j] == 0)
 	    return;
     }

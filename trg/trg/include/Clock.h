@@ -115,7 +115,7 @@ class TRGClock {
     const unsigned _multi;
 
     /// Division factor.
-    const unsigned _div;
+//  const unsigned _div;
 
     /// Clock offset in nano second.
     const double _offset;

@@ -45,6 +45,7 @@ namespace Belle2 {
     FlowMonitor m_flow;
     COPPERConfig m_config;
     NSMData m_data;
+    bool m_dummymode;
 
   };
 

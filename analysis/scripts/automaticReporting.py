@@ -403,24 +403,25 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
 
         signalSelector = '({isSignal} == {signalCluster})'.format(isSignal=placeholders['mvaTarget'], signalCluster=placeholders['mvaTargetCluster'])
         backgroundSelector = '({isSignal} != {signalCluster})'.format(isSignal=placeholders['mvaTarget'], signalCluster=placeholders['mvaTargetCluster'])
-        postCutSelector = '(prob_{name} > {postCut})'.format(name=placeholders['mvaName'], postCut=postCut['range'][0])
         placeholders['mvaNSignal'] = originalTree.GetEntries(signalSelector)
         placeholders['mvaNBackground'] = originalTree.GetEntries(backgroundSelector)
 
-        placeholders['mvaNTestSignalAfterPostCut'] = testTree.GetEntries('className == "Signal"' + ' && ' + postCutSelector)
-        placeholders['mvaNTestBackgroundAfterPostCut'] = testTree.GetEntries('className == "Background"' + ' && ' + postCutSelector)
+        if postCut is not None:
+            a, b = postCut['range']
+            placeholders['postCutRange'] = '({:.5f},'.format(a) + ' {:.5f}'.format(b) + ')'
+            postCutSelector = '(prob_{name} > {postCut})'.format(name=placeholders['mvaName'], postCut=postCut['range'][0])
+            placeholders['mvaNTestSignalAfterPostCut'] = testTree.GetEntries('className == "Signal"' + ' && ' + postCutSelector)
+            placeholders['mvaNTestBackgroundAfterPostCut'] = testTree.GetEntries('className == "Background"' + ' && ' + postCutSelector)
+        else:
+            placeholders['postCutRange'] = 'Ignored'
+            placeholders['mvaNTestSignalAfterPostCut'] = placeholders['mvaNSignal']
+            placeholders['mvaNTestBackgroundAfterPostCut'] = placeholders['mvaNBackground']
 
         placeholders['mvaPostCutSignalEfficiency'] = efficiency(placeholders['mvaNTestSignalAfterPostCut'], placeholders['mvaNTestSignal'])
         placeholders['mvaPostCutBackgroundEfficiency'] = efficiency(placeholders['mvaNTestBackgroundAfterPostCut'], placeholders['mvaNTestBackground'])
 
         placeholders['mvaNSignalAfterPostCut'] = placeholders['mvaPostCutSignalEfficiency'] * placeholders['mvaNSignal']
         placeholders['mvaNBackgroundAfterPostCut'] = placeholders['mvaPostCutBackgroundEfficiency'] * placeholders['mvaNBackground']
-
-        if postCut is not None:
-            a, b = postCut['range']
-            placeholders['postCutRange'] = '({:.5f},'.format(a) + ' {:.5f}'.format(b) + ')'
-        else:
-            placeholders['postCutRange'] = 'Ignored'
 
         # Create plots and texfile if hash changed
         hash = actorFramework.createHash(placeholders)

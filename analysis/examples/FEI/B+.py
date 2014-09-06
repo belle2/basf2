@@ -12,6 +12,15 @@ pid_variables = ['eid', 'eid_dEdx', 'eid_TOP', 'eid_ARICH', 'eid_ECL',
 kinematic_variables = ['p', 'pt', 'p_CMS', 'pt_CMS', 'M', 'E', 'px', 'py', 'pz', 'px_CMS', 'py_CMS', 'pz_CMS']
 vertex_variables = ['dr', 'dz', 'dx', 'dy', 'chiProb', 'cosAngleBetweenMomentumAndVertexVector', 'significanceOfDistance', 'distance']
 
+postCut = Particle.PostCutConfiguration(
+    value=0.05
+)
+
+postCutSoft = Particle.PostCutConfiguration(
+    value=0.01
+)
+
+
 particles = []
 
 ################### Charged FSP ###############################
@@ -21,10 +30,10 @@ mva_chargedFSP = Particle.MVAConfiguration(
     target='isSignal', targetCluster=1
 )
 
-particles.append(Particle('pi+', mva_chargedFSP))
-particles.append(Particle('e+', mva_chargedFSP))
-particles.append(Particle('mu+', mva_chargedFSP))
-particles.append(Particle('K+', mva_chargedFSP))
+particles.append(Particle('pi+', mva_chargedFSP, postCutConfig=postCut))
+particles.append(Particle('e+', mva_chargedFSP, postCutConfig=postCut))
+particles.append(Particle('mu+', mva_chargedFSP, postCutConfig=postCut))
+particles.append(Particle('K+', mva_chargedFSP, postCutConfig=postCut))
 
 ################## GAMMA ############################
 
@@ -34,7 +43,7 @@ mva_gamma = Particle.MVAConfiguration(
     target='isSignal', targetCluster=1
 )
 
-particles.append(Particle('gamma', mva_gamma))
+particles.append(Particle('gamma', mva_gamma, postCutConfig=postCut))
 
 
 ################## PI0 ###############################
@@ -46,12 +55,13 @@ mva_pi0 = Particle.MVAConfiguration(
 
 pre_pi0 = Particle.PreCutConfiguration(
     variable='M',
+    binning=(500, 0.08, 0.18),
     method='S/B',
     efficiency=0.9,
     purity=0.00001,
 )
 
-particles.append(Particle('pi0', mva_pi0, pre_pi0).addChannel(['gamma', 'gamma']))
+particles.append(Particle('pi0', mva_pi0, pre_pi0, postCut).addChannel(['gamma', 'gamma']))
 
 ################### KS0 ###############################
 mva_KS0 = Particle.MVAConfiguration(
@@ -68,12 +78,13 @@ mva_KS0_pi0pi0 = Particle.MVAConfiguration(
 
 pre_KS0 = Particle.PreCutConfiguration(
     variable='M',
+    binning=(500, 0.3, 0.7),
     method='S/B',
     efficiency=0.9,
     purity=0.00001,
 )
 
-p = Particle('K_S0', mva_KS0, pre_KS0)
+p = Particle('K_S0', mva_KS0, pre_KS0, postCut)
 p.addChannel(['pi+', 'pi-'])
 p.addChannel(['pi0', 'pi0'], mva_KS0_pi0pi0)
 particles.append(p)
@@ -94,12 +105,13 @@ mva_D0_withoutVertex = Particle.MVAConfiguration(
 
 pre_D0 = Particle.PreCutConfiguration(
     variable='M',
+    binning=(500, 1.5, 2.0),
     method='S/B',
-    efficiency=0.9,
+    efficiency=0.95,
     purity=0.0005,
 )
 
-p = Particle('D0', mva_D0, pre_D0)
+p = Particle('D0', mva_D0, pre_D0, postCutSoft)
 p.addChannel(['K-', 'pi+'])
 p.addChannel(['K-', 'pi+', 'pi0'])
 p.addChannel(['K-', 'pi+', 'pi0', 'pi0'])
@@ -134,12 +146,13 @@ mva_DPlus_withoutVertex = Particle.MVAConfiguration(
 
 pre_DPlus = Particle.PreCutConfiguration(
     variable='M',
+    binning=(500, 1.5, 2.0),
     method='S/B',
-    efficiency=0.9,
+    efficiency=0.95,
     purity=0.0005,
 )
 
-p = Particle('D+', mva_DPlus, pre_DPlus)
+p = Particle('D+', mva_DPlus, pre_DPlus, postCutSoft)
 p.addChannel(['K-', 'pi+', 'pi+'])
 p.addChannel(['K-', 'pi+', 'pi+', 'pi0'])
 p.addChannel(['K-', 'K+', 'pi+'])
@@ -170,12 +183,13 @@ mva_DStarPlus_withoutVertex = Particle.MVAConfiguration(
 
 pre_DStarPlus = Particle.PreCutConfiguration(
     variable='Q',
+    binning=(500, 0, 1),
     method='S/B',
-    efficiency=0.9,
+    efficiency=0.95,
     purity=0.0001,
 )
 
-p = Particle('D*+', mva_DStarPlus, pre_DStarPlus)
+p = Particle('D*+', mva_DStarPlus, pre_DStarPlus, postCutSoft)
 p.addChannel(['D0', 'pi+'])
 p.addChannel(['D+', 'pi0'], mva_DStarPlus_withoutVertex)
 p.addChannel(['D+', 'gamma'], mva_DStarPlus_withoutVertex)
@@ -190,12 +204,13 @@ mva_DStar0 = Particle.MVAConfiguration(
 
 pre_DStar0 = Particle.PreCutConfiguration(
     variable='Q',
+    binning=(500, 0, 1),
     method='S/B',
-    efficiency=0.9,
+    efficiency=0.95,
     purity=0.0001,
 )
 
-p = Particle('D*0', mva_DStar0, pre_DStar0)
+p = Particle('D*0', mva_DStar0, pre_DStar0, postCutSoft)
 p.addChannel(['D0', 'pi0'])
 p.addChannel(['D0', 'gamma'])
 particles.append(p)
@@ -210,13 +225,14 @@ mva_DS = Particle.MVAConfiguration(
 
 pre_DS = Particle.PreCutConfiguration(
     variable='M',
+    binning=(500, 1.6, 2.2),
     method='S/B',
-    efficiency=0.9,
+    efficiency=0.95,
     purity=0.0005,
 )
 
 
-p = Particle('D_s+', mva_DS, pre_DS)
+p = Particle('D_s+', mva_DS, pre_DS, postCutSoft)
 p.addChannel(['K+', 'K_S0'])
 p.addChannel(['K+', 'pi+', 'pi-'])
 p.addChannel(['K+', 'K-', 'pi+'])
@@ -240,12 +256,13 @@ mva_DStarS = Particle.MVAConfiguration(
 
 pre_DStarS = Particle.PreCutConfiguration(
     variable='Q',
+    binning=(500, 0, 1),
     method='S/B',
-    efficiency=0.9,
+    efficiency=0.95,
     purity=0.0001,
 )
 
-p = Particle('D_s*+', mva_DStarS, pre_DStarS)
+p = Particle('D_s*+', mva_DStarS, pre_DStarS, postCutSoft)
 p.addChannel(['D_s+', 'gamma'])
 p.addChannel(['D_s+', 'pi0'])
 particles.append(p)
@@ -260,8 +277,9 @@ mva_J = Particle.MVAConfiguration(
 
 pre_J = Particle.PreCutConfiguration(
     variable='M',
+    binning=(500, 2.5, 3.5),
     method='S/B',
-    efficiency=0.9,
+    efficiency=0.95,
     purity=0.0001,
 )
 
@@ -278,10 +296,11 @@ mva_BPlus = Particle.MVAConfiguration(
 )
 
 pre_BPlus = Particle.PreCutConfiguration(
-    variable='Mbc',
+    variable='daughterProductOf(getExtraInfo(SignalProbability))',
+    binning=list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])),
     method='S/B',
-    efficiency=0.9,
-    purity=0.0001,
+    efficiency=0.95,
+    purity=0.00005,
 )
 
 p = Particle('B+', mva_BPlus, pre_BPlus)

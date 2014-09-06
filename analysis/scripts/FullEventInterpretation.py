@@ -47,14 +47,13 @@ class Particle(object):
     ## Create new class called MVAConfiguration via namedtuple. namedtuples are like a struct in C
     MVAConfiguration = collections.namedtuple('MVAConfiguration', 'name, type, config, variables, target, targetCluster')
     ## Create new class called PreCutConfiguration via namedtuple. namedtuples are like a struct in C
-    PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'variable, method, efficiency, purity')
+    PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'variable, binning, method, efficiency, purity')
     ## Create new class called PostCutConfiguration via namedtuple. namedtuples are like a struct in C
     PostCutConfiguration = collections.namedtuple('PostCutConfiguration', 'value')
     ## Create new class called DecayChannel via namedtuple. namedtuples are like a struct in C
     DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, mvaConfig, preCutConfig, postCutConfig')
 
-    def __init__(self, identifier, mvaConfig, preCutConfig=PreCutConfiguration(variable='M', method='S/B', efficiency=0.70, purity=0.001),
-                 postCutConfig=PostCutConfiguration(value=0.0001)):
+    def __init__(self, identifier, mvaConfig, preCutConfig=None, postCutConfig=None):
         """
         Creates a Particle without any decay channels. To add decay channels use addChannel method.
             @param identifier is the correct pdg name of the particle as a string with an optional additional user label seperated by :
@@ -101,7 +100,6 @@ class Particle(object):
         postCutConfig = copy.deepcopy(self.postCutConfig if postCutConfig is None else postCutConfig)
         mvaConfig = copy.deepcopy(self.mvaConfig if mvaConfig is None else mvaConfig)
         mvaConfig.variables.extend(['daughter({i}, getExtraInfo(SignalProbability))'.format(i=i) for i in range(0, len(daughters))])
-        #mvaConfig.variables.extend(['daughter{i}(p)'.format(i=i) for i in range(0, len(daughters))])
         self.channels.append(Particle.DecayChannel(name=self.identifier + ' ==> ' + ' '.join(daughters),
                                                    daughters=daughters,
                                                    mvaConfig=mvaConfig,
@@ -117,6 +115,8 @@ class Particle(object):
             return x.name == y.name and x.type == y.type and x.config == y.config and x.target == y.target and x.targetCluster == y.targetCluster
 
         def compareCutConfig(x, y):
+            if x is None and y is None:
+                return True
             return x == y
 
         if self.isFSP:
@@ -136,18 +136,27 @@ class Particle(object):
 
             if samePreCutConfig:
                 output += '    All channels use the same PreCut configuration\n'
-                output += '    PreCutConfiguration: variable={p.variable}, method={p.method}, efficiency={p.efficiency}, purity={p.purity}\n'.format(p=self.preCutConfig)
+                output += '    PreCutConfiguration: variables={p.variable}, method={p.method}, efficiency={p.efficiency}, purity={p.purity}\n'.format(p=self.preCutConfig)
 
             if samePostCutConfig:
                 output += '    All channels use the same PostCut configuration\n'
-                output += '    PostCutConfiguration: value={p.value}\n'.format(p=self.postCutConfig)
+                if self.postCutConfig is None:
+                    output += '    PostCutConfiguration: None\n'
+                else:
+                    output += '    PostCutConfiguration: value={p.value}\n'.format(p=self.postCutConfig)
 
             for channel in self.channels:
                 output += '    {name}\n'.format(name=channel.name)
                 if not samePreCutConfig:
-                    output += '    PreCutConfiguration: variable={p.variable}, method={p.method}, efficiency={p.efficiency}, purity={p.purity}\n'.format(p=channel.preCutConfig)
+                    if self.postCutConfig is None:
+                        output += '    PreCutConfiguration: None\n'
+                    else:
+                        output += '    PreCutConfiguration: variable={p.variable}, method={p.method}, efficiency={p.efficiency}, purity={p.purity}\n'.format(p=channel.preCutConfig)
                 if not samePostCutConfig:
-                    output += '    PostCutConfiguration: value={p.value}\n'.format(p=channel.postCutConfig)
+                    if self.postCutConfig is None:
+                        output += '    PostCutConfiguration: None\n'
+                    else:
+                        output += '    PostCutConfiguration: value={p.value}\n'.format(p=channel.postCutConfig)
                 if not sameMVAConfig:
                     output += '    MVAConfiguration: name={m.name}, type={m.type}, config={m.config}, target={m.target}, targetCluster={m.targetCluster}\n'.format(m=channel.mvaConfig)
                 output += '        Individual Variables: ' + ', '.join(set(channel.mvaConfig.variables).difference(commonVariables)) + '\n'
@@ -205,7 +214,7 @@ def FullEventInterpretation(path, particles):
                             particleName='Name_{i}'.format(i=particle.identifier),
                             particleLabel='Label_{i}'.format(i=particle.identifier),
                             inputLists=['RawParticleList_{i}'.format(i=particle.identifier)],
-                            postCuts=['PostCut_{i}'.format(i=particle.identifier)])
+                            postCuts=['PostCut_{i}'.format(i=particle.identifier) if particle.postCutConfig is not None else 'None'])
             seq.addResource('VertexFit_{i}'.format(i=particle.identifier), 'Dummy')
         else:
             for channel in particle.channels:
@@ -230,7 +239,7 @@ def FullEventInterpretation(path, particles):
                             particleName='Name_{i}'.format(i=particle.identifier),
                             particleLabel='Label_{i}'.format(i=particle.identifier),
                             inputLists=['RawParticleList_{c}'.format(c=channel.name) for channel in particle.channels],
-                            postCuts=['PostCut_{c}'.format(c=channel.name) for channel in particle.channels])
+                            postCuts=['PostCut_{c}'.format(c=channel.name) if channel.postCutConfig is not None else 'None' for channel in particle.channels])
         if particle.name != pdg.conjugate(particle.name):
             seq.addResource('VertexFit_{p}:{l}'.format(p=pdg.conjugate(particle.name), l=particle.label), 'Dummy',
                             requires=['VertexFit_{i}'.format(i=particle.identifier)])

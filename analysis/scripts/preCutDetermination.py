@@ -26,7 +26,7 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
     signal, bckgrd, ratio = LoadHistogramsFromFiles(files, preCutConfig.variable, channelNames, preCutHistograms)
 
     # Two-Side cut S/B ratio constructed
-    if preCutConfig.method == 'S/B' and preCutConfig.variable in ['M', 'Q', 'Mbc', 'daughterProductOf(getExtraInfo(SignalProbability))']:
+    if preCutConfig.method == 'S/B':
         def ycut_to_xcuts(channel, cut):
             hist = ratio[channel]
             maximum = hist.GetMaximumBin()
@@ -38,6 +38,9 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
             return [axis.GetBinLowEdge(max(low) + 1 if low else 1), axis.GetBinUpEdge(min(high) - 1 if high else hist.GetNbinsX())]
     else:
         raise RuntimeError('Given PreCutConfiguration is not implemented. Please check that method and used variables are compatible.')
+
+    print "Total number of signals", sum([value.GetEntries() for value in signal.values()])
+    print "Total number of background", sum([value.GetEntries() for value in bckgrd.values()])
 
     result = {}
     redo_cuts = True
@@ -59,8 +62,15 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
         signal = {channel: hist for (channel, hist) in signal.iteritems() if not result[channel]['isIgnored']}
         bckgrd = {channel: hist for (channel, hist) in bckgrd.iteritems() if not result[channel]['isIgnored']}
 
+    signalsum = 0
+    backgroundsum = 0
     for k, v in result.iteritems():
+        signalsum += v['nSignal']
+        backgroundsum += v['nBackground']
         print k, ': ', v['cutstring']
+    print "Total number of signals after cut", signalsum
+    print "Total number of background after cut", backgroundsum
+
     return result
 
 

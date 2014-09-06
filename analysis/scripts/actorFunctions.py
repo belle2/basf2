@@ -139,7 +139,7 @@ def CountMCParticles(path, names):
         counter[getpdg(branch)] = hallo.Integral()
         del hallo
     counter['NEvents'] = countNtuple.GetEntries()
-
+    print counter
     B2INFO("Loaded number of MCParticles for every pdg code seperatly")
     return {'MCParticleCounts': counter}
 
@@ -224,7 +224,15 @@ def CopyParticleLists(path, particleName, particleLabel, inputLists, postCuts):
         @return Resource named ParticleList_{particleName}:{particleLabel} corresponding ParticleList is stored as {particleName}:{hash}
     """
     B2INFO("Enter: Gather Particle List {p} with label {l}".format(p=particleName, l=particleLabel))
-    inputLists, postCuts = actorFramework.removeNones(inputLists, postCuts)
+    if not all(postCuts[0] == postCut or postCut is None for postCut in postCuts):
+        B2WARNING("Different post cuts for ParticleLists which are gathered up in the same list isn't supported at the moment. Using only first cut.")
+
+    if postCuts[0] is not None:
+        postCut = postCuts[0]['cutstring']
+    else:
+        postCut = ''
+
+    inputLists = actorFramework.removeNones(inputLists)
     userLabel = actorFramework.createHash(particleName, particleLabel, inputLists, postCuts)
     outputList = particleName + ':' + userLabel
 
@@ -239,9 +247,8 @@ def CopyParticleLists(path, particleName, particleLabel, inputLists, postCuts):
         return {'ParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): None,
                 'ParticleList_{p}:{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): None}
 
-    if not all(postCuts[0] == postCut for postCut in postCuts):
-        B2WARNING("Different post cuts for ParticleLists which are gathered up in the same list isn't supported at the moment. Using only first cut.")
-    modularAnalysis.cutAndCopyLists(outputList, inputLists, postCuts[0]['cutstring'], persistent=True, path=path)
+    modularAnalysis.cutAndCopyLists(outputList, inputLists, postCut, persistent=True, path=path)
+    modularAnalysis.summaryOfLists(inputLists + [outputList], path=path)
 
     B2INFO("Gather Particle List {p} with label {l} in list {o}".format(p=particleName, l=particleLabel, o=outputList))
     return {'ParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList,
@@ -314,7 +321,7 @@ def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughte
         B2INFO("Create pre cut histogram for channel {c}. But channel is ignored.".format(c=channelName))
         return {'PreCutHistogram_{c}'.format(c=channelName): None}
 
-    hash = actorFramework.createHash(particleName, channelName, preCutConfig.variable, daughterParticleLists, additionalDependencies)
+    hash = actorFramework.createHash(particleName, channelName, preCutConfig.variable, preCutConfig.binning, daughterParticleLists, additionalDependencies)
     filename = removeJPsiSlash('CutHistograms_{c}:{h}.root'.format(c=channelName, h=hash))
 
     if os.path.isfile(filename):
@@ -327,14 +334,11 @@ def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughte
         pmake.param('fileName', filename)
         pmake.param('decayString', outputList)
         pmake.param('variable', preCutConfig.variable)
-        pmake.param('inverseSamplingRate', 10)
-        if preCutConfig.variable in ['M', 'Mbc']:
-            mass = pdg.get(pdg.from_name(particleName)).Mass()
-            pmake.param('histParams', (500, mass / 2, mass + mass / 2))
-        elif preCutConfig.variable in ['Q']:
-            pmake.param('histParams', (500, -1, 1))
+        if isinstance(preCutConfig.binning, tuple):
+            pmake.param('histParams', preCutConfig.binning)
         else:
-            pmake.param('customBinning', list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])))
+            pmake.param('customBinning', preCutConfig.binning)
+            #pmake.param('customBinning', list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])))
         path.add_module(pmake)
 
     B2INFO("Create pre cut histogram for channel {c}.".format(c=channelName))
@@ -382,6 +386,8 @@ def PostCutDetermination(identifiers, postCutConfigs, signalProbabilities):
     for identifier, postCutConfig in zip(identifiers, postCutConfigs):
         results['PostCut_{i}'.format(i=identifier)] = {'cutstring': str(postCutConfig.value) + ' < getExtraInfo(SignalProbability)', 'range': (postCutConfig.value, 1)}
         B2INFO("Calculate post cut for {i}".format(i=identifier))
+    if len(postCutConfigs) == 0:
+        results['NotNeeded'] = True
     return results
 
 

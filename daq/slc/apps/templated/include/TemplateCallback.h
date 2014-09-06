@@ -15,13 +15,14 @@ namespace Belle2 {
 
   public:
     TemplateCallback(const NSMNode& node,
-                     const std::string& host,
-                     const std::string& port);
+                     const std::string& format,
+                     int revision);
     virtual ~TemplateCallback() throw();
 
   public:
     virtual void init() throw();
     virtual void term() throw();
+    virtual void timeout() throw();
     virtual bool load() throw();
     virtual bool start() throw();
     virtual bool stop() throw();
@@ -29,13 +30,10 @@ namespace Belle2 {
     virtual bool pause() throw();
     virtual bool recover() throw();
     virtual bool abort() throw();
+    virtual bool trigft() throw();
 
   private:
-    ProcessController m_con;
-    PThread m_thread;
     NSMData m_data;
-    std::string m_host;
-    std::string m_port;
 
   };
 

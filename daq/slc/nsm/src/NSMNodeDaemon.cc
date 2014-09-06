@@ -2,6 +2,7 @@
 
 #include <daq/slc/system/LogFile.h>
 #include <daq/slc/system/PThread.h>
+#include <daq/slc/system/Time.h>
 
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/base/Date.h>
@@ -36,13 +37,18 @@ NSMNodeDaemon::NSMNodeDaemon(NSMCallback* callback,
 void NSMNodeDaemon::run() throw()
 {
   try {
+    double t0 = Time().get();
+    unsigned int timeout = m_callback->getTimeout();
     while (true) {
-      if (m_com->wait(m_callback->getTimeout())) {
+      if (m_com->wait(timeout)) {
         NSMMessage& msg(m_com->getMessage());
         m_callback->setMessage(msg);
         m_callback->perform(msg);
-      } else {
+      }
+      double t = Time().get();
+      if (t - t0 >= timeout) {
         m_callback->timeout();
+        t0 = t;
       }
     }
   } catch (const std::exception& e) {

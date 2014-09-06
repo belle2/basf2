@@ -7,13 +7,11 @@
 using namespace Belle2;
 
 TemplateCallback::TemplateCallback(const NSMNode& node,
-                                   const std::string& host,
-                                   const std::string& port)
-  : RCCallback(node)
+                                   const std::string& format,
+                                   int revision)
+  : RCCallback(node, 5)
 {
-  m_host = host;
-  m_port = port;
-  m_con.setCallback(this);
+  m_data = NSMData("STATUS_" + node.getName(), format, revision);
 }
 
 TemplateCallback::~TemplateCallback() throw()
@@ -22,32 +20,29 @@ TemplateCallback::~TemplateCallback() throw()
 
 void TemplateCallback::init() throw()
 {
-  m_data = NSMData("STATUS_" + getNode().getName(), "ronode_status", 1);
   m_data.allocate(getCommunicator());
 }
 
 void TemplateCallback::term() throw()
 {
-  m_con.abort();
-  m_con.getInfo().unlink();
+}
+
+void TemplateCallback::timeout() throw()
+{
 }
 
 bool TemplateCallback::load() throw()
 {
   getConfig().getObject().print();
-  std::string workername = "woerker:" + getNode().getName();
-  m_con.init(workername);
-  m_con.clearArguments();
-  if (getNode().getName().find("CPR") != std::string::npos) {
-    m_con.setExecutable("rodummy_out");
-  } else {
-    m_con.setExecutable("rodummy_in");
-  }
-  m_con.addArgument(workername);
-  m_con.addArgument("1");
-  m_con.addArgument(m_host);
-  m_con.addArgument(m_port);
-  m_con.load(-1);
+  return true;
+}
+
+bool TemplateCallback::trigft() throw()
+{
+  NSMMessage& msg(getMessage());
+  LogFile::debug("trigger type  : %d", msg.getParam(0));
+  LogFile::debug("dummy rate    : %d", msg.getParam(1));
+  LogFile::debug("trigger limit : %d", msg.getParam(2));
   return true;
 }
 
@@ -57,7 +52,6 @@ bool TemplateCallback::start() throw()
   LogFile::debug("run # = %04d.%04d.%03d",
                  msg.getParam(0), msg.getParam(1),
                  msg.getParam(2));
-  m_con.start();
   return true;
 }
 
@@ -78,16 +72,12 @@ bool TemplateCallback::pause() throw()
 
 bool TemplateCallback::recover() throw()
 {
-  if (abort() && load()) {
-    getNode().setState(RCState::READY_S);
-    return true;
-  }
+  getNode().setState(RCState::READY_S);
   return false;
 }
 
 bool TemplateCallback::abort() throw()
 {
-  m_con.abort();
   getNode().setState(RCState::NOTREADY_S);
   return true;
 }

@@ -43,7 +43,6 @@ public class DQMListenerService extends Thread {
         this.host = host;
         this.port = port;
         this.obs = obs;
-        socket = new Socket(host, port);
     }
 
     @Override

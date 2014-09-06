@@ -25,30 +25,30 @@ void ProcessListener::run()
   NSMNode& node(m_con->getCallback()->getNode());
   if (m_con->getInfo().isAvailable()) {
     unsigned int state = m_con->getInfo().getState();
-    if (node.getState() == RCState::RUNNING_S ||
-        node.getState() == RCState::LOADING_TS ||
-        node.getState() == RCState::STARTING_TS) {
-      switch (state) {
-        case RunInfoBuffer::RUNNING:
+    switch (state) {
+      case RunInfoBuffer::RUNNING:
+        if (node.getState() == RCState::RUNNING_S ||
+            node.getState() == RCState::LOADING_TS ||
+            node.getState() == RCState::STARTING_TS) {
           LogFile::error("Forked process %s was crashed", process_name.c_str());
           node.setState(RCState::RECOVERING_RS);
           comm->sendError(StringUtil::form("Foked process %s was crashed", process_name.c_str()));
           m_con->getInfo().reportError(RunInfoBuffer::PROCESS_DOWN);
-          break;
-        case RunInfoBuffer::READY:
-          LogFile::warning("Forked process %s was not started", process_name.c_str());
-          node.setState(RCState::RECOVERING_RS);
-          comm->sendError(StringUtil::form("Foked process %s was no started", process_name.c_str()));
-          m_con->getInfo().reportError(RunInfoBuffer::PROCESS_DOWN);
-          break;
-        case RunInfoBuffer::NOTREADY:
-        default:
-          LogFile::debug("Forked process %s was finished", process_name.c_str());
-          comm->sendLog(DAQLogMessage(node.getName(), LogFile::INFO,
-                                      StringUtil::form("Foked process %s was finished",
-                                                       process_name.c_str())));
-          break;
-      }
+        }
+        break;
+      case RunInfoBuffer::READY:
+        LogFile::warning("Forked process %s was not started", process_name.c_str());
+        node.setState(RCState::RECOVERING_RS);
+        comm->sendError(StringUtil::form("Foked process %s was no started", process_name.c_str()));
+        m_con->getInfo().reportError(RunInfoBuffer::PROCESS_DOWN);
+        break;
+      case RunInfoBuffer::NOTREADY:
+      default:
+        LogFile::debug("Forked process %s was finished", process_name.c_str());
+        comm->sendLog(DAQLogMessage(node.getName(), LogFile::INFO,
+                                    StringUtil::form("Foked process %s was finished",
+                                                     process_name.c_str())));
+        break;
     }
   }
   fork.set_id(-1);

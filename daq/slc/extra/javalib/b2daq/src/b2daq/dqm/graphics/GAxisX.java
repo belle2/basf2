@@ -29,7 +29,7 @@ public class GAxisX extends GAxis {
         }
         canvas.setLine(getLine());
         canvas.setFont(getLabelsFont());
-        setTicks(canvas, label_align + " top");
+        double base = setTicks(canvas, label_align + " top");
         for (GValuedText label : labels) {
             if (label != null && label.getValue() >= get().getMin() && label.getValue() <= get().getMax()) {
                 label.setPosition(x0 + eval(label.getValue()), y0 + label_offset);
@@ -59,6 +59,9 @@ public class GAxisX extends GAxis {
             align = "left top";
         }
         canvas.drawString(get().getTitle(), x, y, align);
+        if (base < 2000 && base > -2000 && (base > 3 || base < -2)) {
+            canvas.drawString("e"+(base<0?"-":"+")+(int)base, x0 + length, y0, "left middle");
+        }
         if (use_border_line == true) {
             border_line0.draw(canvas);
             border_line1.draw(canvas);

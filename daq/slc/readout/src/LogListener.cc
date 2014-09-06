@@ -49,7 +49,9 @@ void LogListener::run()
             node.getState() == RCState::STARTING_TS) {
           node.setState(RCState::RECOVERING_RS);
         }
-        if (priority >= LogFile::NOTICE) {
+        if (node.getState() != RCState::STOPPING_TS &&
+            node.getState() != RCState::ABORTING_RS &&
+            node.getState() != RCState::RECOVERING_RS) {
           comm->sendLog(DAQLogMessage(node.getName(), priority, s));
         }
         m_con->unlock();

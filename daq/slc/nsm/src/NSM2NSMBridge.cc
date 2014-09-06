@@ -1,6 +1,7 @@
 #include "daq/slc/nsm/NSM2NSMBridge.h"
 
 #include <daq/slc/system/LogFile.h>
+#include <daq/slc/system/Time.h>
 
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/base/Date.h>
@@ -36,6 +37,7 @@ void NSM2NSMBridge::run() throw()
     if (m_daemon[0] != NULL) com[0] = m_daemon[0]->getCommunicator();
     if (m_daemon[1] != NULL) com[1] = m_daemon[1]->getCommunicator();
     int flags[2];
+    double t0 = Time().get();
     while (true) {
       int ret = NSMCommunicator::select(timeout, com, flags, 2);
       if (ret > 0) {
@@ -46,12 +48,15 @@ void NSM2NSMBridge::run() throw()
             m_callback[i]->perform(msg);
           }
         }
-      } else {
+      }
+      double t = Time().get();
+      if (t - t0 >= timeout) {
         for (int i = 0; i < 2; i++) {
           if (m_callback[i] != NULL) {
             m_callback[i]->timeout();
           }
         }
+        t0 = t;
       }
     }
   } catch (const std::exception& e) {

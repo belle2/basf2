@@ -35,7 +35,7 @@ public class GAxisY extends GAxis {
         canvas.setLine(getLine());
         canvas.setFont(getLabelsFont());
         String align = (hand == HAND_R) ? "right " : "left ";
-        setTicks(canvas, align);
+        double base = setTicks(canvas, align);
         for (GValuedText label : labels) {
             if (label != null && label.getValue() >= get().getMin() && label.getValue() <= get().getMax()) {
                 label.setPosition(x0 - hand * label_offset, y0 - eval(label.getValue()));
@@ -68,6 +68,9 @@ public class GAxisY extends GAxis {
             align += " right";
         }
         canvas.drawString(get().getTitle(), x, y, align, -90);
+        if (base < 2000 && base > -2000 && (base > 3 || base < -2)) {
+            canvas.drawString("e"+(base<0?"-":"+")+(int)base, x0, y0 - length, "center bottom");
+        }
         if (use_border_line == true) {
             border_line0.draw(canvas);
             border_line1.draw(canvas);

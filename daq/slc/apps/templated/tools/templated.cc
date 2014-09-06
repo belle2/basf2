@@ -13,18 +13,20 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
-  if (argc < 4) {
-    LogFile::debug("Usage : %s <name> <host> <port>", argv[0]);
+  if (argc < 5) {
+    LogFile::debug("Usage : %s <name> <format> <revision> <nsmhost> <nsmport>", argv[0]);
     return 1;
   }
   //daemon(0, 0);
   LogFile::open("rocontrold");
   const char* name = argv[1];
-  const char* host = argv[2];
-  const char* port = argv[3];
+  const char* format = argv[2];
+  const int revision = atoi(argv[3]);
+  const char* hostname = argv[4];
+  const int port = atoi(argv[5]);
   NSMNode node(name);
-  TemplateCallback* callback = new TemplateCallback(node, host, port);
-  NSMNodeDaemon* daemon = new NSMNodeDaemon(callback);
+  TemplateCallback* callback = new TemplateCallback(node, format, revision);
+  NSMNodeDaemon* daemon = new NSMNodeDaemon(callback, hostname, port);
   daemon->run();
 
   return 0;

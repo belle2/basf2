@@ -160,12 +160,13 @@ public abstract class GAxis extends GShape {
         String[] text_v = text.split(",");
         ArrayList<GValuedText> label = new ArrayList<>();
         for (String t : text_v) {
-            String [] str = t.split(":");
+            String[] str = t.split(":");
             if (str.length > 0) {
                 try {
-            label.add(new GValuedText(str[0], Double.parseDouble(str[1]),
-                    getLabelAlignment()));
-                } catch(Exception e) {}
+                    label.add(new GValuedText(str[0], Double.parseDouble(str[1]),
+                            getLabelAlignment()));
+                } catch (Exception e) {
+                }
             }
         }
         auto_label = false;
@@ -301,14 +302,17 @@ public abstract class GAxis extends GShape {
         log_scale = enable;
     }
 
-    protected void setTicks(GraphicsDrawer canvas, String align) {
+    protected double setTicks(GraphicsDrawer canvas, String align) {
         tick_line_v.clear();
         tick_line_v = new ArrayList<>();
         if (auto_label) {
             labels.clear();
         }
+        double base = 0;
         if (time_scale == GAxis.TIME_SCALE_NON) {
-            double dx = Math.pow(10d, Math.floor(Math.log10(axis.getMax() - axis.getMin())) - 1) * 2;// / ndivisions;
+            base = Math.floor(Math.log10(axis.getMax() - axis.getMin()));
+            double scale = Math.pow(10d, base);
+            double dx = Math.pow(10d, base - 1) * 2;
             if (axis.getMax() < dx * 25) {
                 dx /= 2;
             }
@@ -326,6 +330,7 @@ public abstract class GAxis extends GShape {
                     NumberString.toString(n5_max * dx, nR)) == 0) {
                 nR++;
             }
+            
             double x;
             if (isLogScale()) {
                 int logMax = (int) Math.floor(Math.log10(axis.getMax()));
@@ -349,7 +354,13 @@ public abstract class GAxis extends GShape {
                     if (x >= axis.getMin() && x <= axis.getMax()) {
                         if (n % ndivisions == 0) {
                             if (auto_label) {
-                                String s = NumberString.toString(x, nR);
+                                String s = "";
+                                if (x >= 10000 || x <= -10000 || 
+                                       (x > 0 && x <= 0.01) || (x < 0 && x>= -0.01)) {
+                                    s = NumberString.toString(x/scale, nR+1);
+                                } else {
+                                    s = NumberString.toString(x, nR);
+                                }
                                 labels.add(new GValuedText(s, x, align));
                             }
                             tick_line_v.add(new GLine(x, 0, x, 2));
@@ -400,6 +411,7 @@ public abstract class GAxis extends GShape {
                 x -= dx;
             }
         }
+        return base;
     }
 
     public double eval(double v) {

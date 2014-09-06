@@ -5,15 +5,19 @@
  */
 package b2daq.dqmview;
 
+import b2daq.core.NumberString;
 import b2daq.dqm.io.DQMListenerService;
 import b2daq.hvcontrol.core.HVState;
+import b2daq.io.ConfigFile;
 import b2daq.logger.core.LogMessage;
+import java.io.File;
 import java.net.URL;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 /**
@@ -36,7 +40,15 @@ public class DQMViewGUI extends Application {
         DQMViewGUIController controller
                 = ((DQMViewGUIController) loader.getController());
         service = new DQMListenerService();
-        service.init("localhost", 50101, "DQMGUI", controller);
+        FileChooser fc = new FileChooser();
+        fc.setTitle("select file");
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("init", "*.init"));
+        File f = fc.showOpenDialog(stage);
+        ConfigFile config = new ConfigFile(f.getPath());
+        System.out.println(f.getPath());
+        service.init(config.getString("dqmview.host"), 
+                     config.getInt("dqmview.port"), 
+                     config.getString("dqmview.node"), controller);
         service.start();
         Scene scene = new Scene(root);
         scene.getStylesheets().add(LogMessage.getCSSPath());

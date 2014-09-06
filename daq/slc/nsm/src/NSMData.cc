@@ -336,6 +336,7 @@ NSMparse* NSMData::parse(NSMparse* ptr, int& length,
       NSMData data(getName(), getFormat() + "." + name, getRevision());
       data.m_pdata = (void*)((char*)m_pdata + offset);
       ptr = data.parse(ptr->next, length, name);
+      data.setFormat(getFormat() + "." + name);
       int len = (length == 0) ? 1 : length;
       NSMDataList data_v;
       for (int i = 0; i < len; i++) {

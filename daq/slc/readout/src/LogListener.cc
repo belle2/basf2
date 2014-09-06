@@ -44,11 +44,6 @@ void LogListener::run()
         ss.str("");
         m_con->lock();
         LogFile::put(priority, s);
-        if (node.getState() == RCState::RUNNING_S ||
-            node.getState() == RCState::LOADING_TS ||
-            node.getState() == RCState::STARTING_TS) {
-          node.setState(RCState::RECOVERING_RS);
-        }
         if (node.getState() != RCState::STOPPING_TS &&
             node.getState() != RCState::ABORTING_RS &&
             node.getState() != RCState::RECOVERING_RS) {

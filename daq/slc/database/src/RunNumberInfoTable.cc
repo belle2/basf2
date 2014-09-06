@@ -29,7 +29,7 @@ RunNumberInfo RunNumberInfoTable::add(int expno, int runno, int subno)
                              record_v[0].getInt("record_time"));
       }
     } catch (const DBHandlerException& e) {
-      LogFile::error("DB access error : %s", e.what());
+      //LogFile::error("DB access error : %s", e.what());
     }
   }
   return RunNumberInfo();
@@ -55,7 +55,7 @@ RunNumberInfo RunNumberInfoTable::add(const RunNumberInfo& info)
                              record_v[0].getInt("record_time"));
       }
     } catch (const DBHandlerException& e) {
-      LogFile::error("DB access error : %s", e.what());
+      //LogFile::error("DB access error : %s", e.what());
     }
   }
   return RunNumberInfo();
@@ -81,7 +81,7 @@ RunNumberInfoList RunNumberInfoTable::getList(int expno, int runno, int subno, i
                                        record.getInt("subno"), record.getInt("id")));
       }
     } catch (const DBHandlerException& e) {
-      LogFile::error("DB access error : %s", e.what());
+      //LogFile::error("DB access error : %s", e.what());
     }
   }
   return info_v;
@@ -106,7 +106,7 @@ int RunNumberInfoTable::getRunNumber(int expno)
         if (runno <= 0) runno = 1;
       }
     } catch (const DBHandlerException& e) {
-      LogFile::error("DB access error : %s", e.what());
+      //LogFile::error("DB access error : %s", e.what());
     }
   }
   return runno;
@@ -124,7 +124,7 @@ int RunNumberInfoTable::getExpNumber()
         if (expno <= 0) expno = 1;
       }
     } catch (const DBHandlerException& e) {
-      LogFile::error("DB access error : %s", e.what());
+      //LogFile::error("DB access error : %s", e.what());
     }
   }
   return expno;

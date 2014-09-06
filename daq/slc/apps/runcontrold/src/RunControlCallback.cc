@@ -511,6 +511,7 @@ bool RunControlCallback::include() throw()
 
 void RunControlCallback::timeout() throw()
 {
+  static unsigned long long count = 0;
   NSMCommunicator& com(*getCommunicator());
   for (size_t i = 0; i < m_node_v.size(); i++) {
     NSMNode& node(m_node_v[i]);
@@ -523,7 +524,7 @@ void RunControlCallback::timeout() throw()
       }
       continue;
     }
-    if (!state.isStable()) {
+    if (!state.isStable() && count % 2 == 0) {
       try {
         LogFile::debug("STATECHECK >> %s", node.getName().c_str());
         com.sendRequest(NSMMessage(node, RCCommand::STATECHECK));
@@ -536,6 +537,7 @@ void RunControlCallback::timeout() throw()
       }
     }
   }
+  count++;
   update();
 }
 

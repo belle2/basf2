@@ -22,15 +22,16 @@
 
 using namespace Belle2;
 
-int TCPServerSocket::open(const std::string& ip, unsigned short port)
+int TCPServerSocket::open(const std::string& ip, unsigned short port,
+                          int nqueue)
 throw(IOException)
 {
   m_ip = ip;
   m_port = port;
-  return open();
+  return open(nqueue);
 }
 
-int TCPServerSocket::open() throw(IOException)
+int TCPServerSocket::open(int nqueue) throw(IOException)
 {
   if (m_fd > 0) {
     throw (IOException("Socket is working already."));
@@ -70,7 +71,7 @@ int TCPServerSocket::open() throw(IOException)
   if (bind(m_fd, (const sockaddr*) & (addr), sizeof(sockaddr_in)) != 0) {
     throw (IOException("Fail to bind the socket. %s:%d", m_ip.c_str(), m_port));
   }
-  if (listen(m_fd, 5) != 0) {
+  if (listen(m_fd, nqueue) != 0) {
     throw (IOException("Fail to listen to the socket."));
   }
   return m_fd;

@@ -20,8 +20,8 @@ namespace Belle2 {
     void setPort(unsigned short port) throw() { m_port = port; }
     const std::string& getIP() const throw() { return m_ip; }
     unsigned short getPort() const throw() { return m_port; }
-    int open() throw(IOException);
-    int open(const std::string& ip, unsigned short port) throw(IOException);
+    int open(int nqueue = 5) throw(IOException);
+    int open(const std::string& ip, unsigned short port, int nqueue = 5) throw(IOException);
     TCPSocket accept() throw(IOException);
 
   private:

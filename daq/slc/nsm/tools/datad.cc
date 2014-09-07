@@ -46,7 +46,6 @@ int main(int argc, char** argv)
   try {
     socket.bind();
   } catch (const IOException& e) {
-    //LogFile::error("UDP port %u is already in use. Exiting process", NSMDataPaket::PORT);
     return 1;
   }
 
@@ -155,8 +154,6 @@ int main(int argc, char** argv)
             ++paket.hdr.paketid;
           }
           socket_r.close();
-          //} else {
-          //LogFile::debug("no data for %d", paket.hdr.id);
         }
       }
     }

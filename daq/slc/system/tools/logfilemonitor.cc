@@ -123,6 +123,9 @@ int main()
         //LogFile::debug("file %s (%d) modified", filename.c_str(), seek_m[filename]);
         std::ifstream fin(filename.c_str());
         fin.seekg(seek_m[filename]);
+        struct stat st;
+        stat(filename.c_str(), &st);
+        seek_m[filename] = st.st_size;
         std::string buf;
         try {
           db->connect();
@@ -135,7 +138,7 @@ int main()
             if (message.find("[INFO] ") == 0) {
               message = message.substr(7);
               pri = LogFile::INFO;
-              //LogFile::info(message);
+              //LogFile::info(message + " " + dir + " " + buf);
             } else if (message.find("[NOTICE] ") == 0) {
               message = message.substr(9);
               pri = LogFile::NOTICE;

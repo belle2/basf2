@@ -124,47 +124,46 @@ int main()
         std::ifstream fin(filename.c_str());
         fin.seekg(seek_m[filename]);
         std::string buf;
-        while (fin && getline(fin, buf)) {
-          unsigned int s = buf.find(" ");
-          std::string timestamp = buf.substr(0, s);
-          std::string message = buf.substr(s + 1);
-          time_t t = toUnixtime(timestamp.c_str());
-          LogFile::Priority pri = LogFile::DEBUG;
-          if (message.find("[INFO] ") == 0) {
-            message = message.substr(7);
-            pri = LogFile::INFO;
-            //LogFile::info(message);
-          } else if (message.find("[NOTICE] ") == 0) {
-            message = message.substr(9);
-            pri = LogFile::NOTICE;
-            //LogFile::notice(message);
-          } else if (message.find("[WARNING] ") == 0) {
-            message = message.substr(10);
-            pri = LogFile::WARNING;
-            //LogFile::warning(message);
-          } else if (message.find("[ERROR] ") == 0) {
-            message = message.substr(8);
-            pri = LogFile::ERROR;
-            //LogFile::error(message);
-          } else if (message.find("[FATAL] ") == 0) {
-            message = message.substr(8);
-            pri = LogFile::FATAL;
-            //LogFile::fatal(message);
-          } else {
-            //LogFile::debug(message);
-          }
-          if (pri > LogFile::DEBUG) {
-            DAQLogMessage log(dir, pri, message, t);
-            log.setNode("HLT");
-            try {
-              db->connect();
-              LoggerObjectTable(db).add(log, true);
-            } catch (const DBHandlerException& e) {
-
+        try {
+          db->connect();
+          while (fin && getline(fin, buf)) {
+            unsigned int s = buf.find(" ");
+            std::string timestamp = buf.substr(0, s);
+            std::string message = buf.substr(s + 1);
+            time_t t = toUnixtime(timestamp.c_str());
+            LogFile::Priority pri = LogFile::DEBUG;
+            if (message.find("[INFO] ") == 0) {
+              message = message.substr(7);
+              pri = LogFile::INFO;
+              //LogFile::info(message);
+            } else if (message.find("[NOTICE] ") == 0) {
+              message = message.substr(9);
+              pri = LogFile::NOTICE;
+              //LogFile::notice(message);
+            } else if (message.find("[WARNING] ") == 0) {
+              message = message.substr(10);
+              pri = LogFile::WARNING;
+              //LogFile::warning(message);
+            } else if (message.find("[ERROR] ") == 0) {
+              message = message.substr(8);
+              pri = LogFile::ERROR;
+              //LogFile::error(message);
+            } else if (message.find("[FATAL] ") == 0) {
+              message = message.substr(8);
+              pri = LogFile::FATAL;
+              //LogFile::fatal(message);
+            } else {
+              //LogFile::debug(message);
             }
-            db->close();
+            if (pri > LogFile::DEBUG) {
+              DAQLogMessage log(dir, pri, message, t);
+              log.setNode("HLT");
+              LoggerObjectTable(db).add(log, true);
+            }
           }
+        } catch (const DBHandlerException& e) {
         }
+        db->close();
       }
     }
   }

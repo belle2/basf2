@@ -94,62 +94,68 @@ int main()
                                             config.getInt("database.port"));
   while (true) {
     InotifyEventList list(inotify.wait(10));
-    if (log.getPriority() > LogFile::DEBUG) {
-      for (InotifyEventList::iterator it = list.begin();
-           it != list.end(); it++) {
-        int wd = it->get_wd();
-        std::string filename = it->getName();
-        if (filename.find(".log") == std::string::npos) continue;
-        std::string dir;
-        for (size_t i = 0; i < wds.size(); i++) {
-          if (wd == wds[i]) {
-            dir = dirs[i];
-            filename = "/home/usr/hltdaq/run/" + dir + "/" + filename;
-            break;
-          }
+    for (InotifyEventList::iterator it = list.begin();
+         it != list.end(); it++) {
+      int wd = it->get_wd();
+      std::string filename = it->getName();
+      if (filename.find(".log") == std::string::npos) continue;
+      std::string dir;
+      for (size_t i = 0; i < wds.size(); i++) {
+        if (wd == wds[i]) {
+          dir = dirs[i];
+          filename = "/home/usr/hltdaq/run/" + dir + "/" + filename;
+          break;
         }
-        if (it->getMask() == Inotify::FILE_CREATE) {
-          struct stat st;
-          stat(filename.c_str(), &st);
-          seek_m.insert(std::map<std::string, unsigned long int>::value_type(filename, st.st_size));
-          //LogFile::debug("file %s created", it->getName().c_str());
-        } else if (it->getMask() == Inotify::FILE_OPEN) {
-          struct stat st;
-          stat(filename.c_str(), &st);
-          seek_m.insert(std::map<std::string, unsigned long int>::value_type(filename, st.st_size));
-          //LogFile::debug("file %s opened", it->getName().c_str());
-        } else if (it->getMask() == Inotify::FILE_CLOSE_WRITE) {
-          //LogFile::debug("file %s closed", it->getName().c_str());
-        } else if (it->getMask() == Inotify::FILE_MODIFY) {
-          //LogFile::debug("file %s (%d) modified", filename.c_str(), seek_m[filename]);
-          std::ifstream fin(filename.c_str());
-          fin.seekg(seek_m[filename]);
-          std::string buf;
-          while (fin && getline(fin, buf)) {
-            unsigned int s = buf.find(" ");
-            std::string timestamp = buf.substr(0, s);
-            std::string message = buf.substr(s + 1);
-            time_t t = toUnixtime(timestamp.c_str());
-            DAQLogMessage log(dir, LogFile::DEBUG, message, t);
+      }
+      if (it->getMask() == Inotify::FILE_CREATE) {
+        struct stat st;
+        stat(filename.c_str(), &st);
+        seek_m.insert(std::map<std::string, unsigned long int>::value_type(filename, st.st_size));
+        //LogFile::debug("file %s created", it->getName().c_str());
+      } else if (it->getMask() == Inotify::FILE_OPEN) {
+        struct stat st;
+        stat(filename.c_str(), &st);
+        seek_m.insert(std::map<std::string, unsigned long int>::value_type(filename, st.st_size));
+        //LogFile::debug("file %s opened", it->getName().c_str());
+      } else if (it->getMask() == Inotify::FILE_CLOSE_WRITE) {
+        //LogFile::debug("file %s closed", it->getName().c_str());
+      } else if (it->getMask() == Inotify::FILE_MODIFY) {
+        //LogFile::debug("file %s (%d) modified", filename.c_str(), seek_m[filename]);
+        std::ifstream fin(filename.c_str());
+        fin.seekg(seek_m[filename]);
+        std::string buf;
+        while (fin && getline(fin, buf)) {
+          unsigned int s = buf.find(" ");
+          std::string timestamp = buf.substr(0, s);
+          std::string message = buf.substr(s + 1);
+          time_t t = toUnixtime(timestamp.c_str());
+          LogFile::Priority pri = LogFile::DEBUG;
+          if (message.find("[INFO] ") == 0) {
+            message = message.substr(7);
+            pri = LogFile::INFO;
+            //LogFile::info(message);
+          } else if (message.find("[NOTICE] ") == 0) {
+            message = message.substr(9);
+            pri = LogFile::NOTICE;
+            //LogFile::notice(message);
+          } else if (message.find("[WARNING] ") == 0) {
+            message = message.substr(10);
+            pri = LogFile::WARNING;
+            //LogFile::warning(message);
+          } else if (message.find("[ERROR] ") == 0) {
+            message = message.substr(8);
+            pri = LogFile::ERROR;
+            //LogFile::error(message);
+          } else if (message.find("[FATAL] ") == 0) {
+            message = message.substr(8);
+            pri = LogFile::FATAL;
+            //LogFile::fatal(message);
+          } else {
+            //LogFile::debug(message);
+          }
+          if (pri > LogFile::DEBUG) {
+            DAQLogMessage log(dir, pri, message, t);
             log.setNode("HLT");
-            if (message.find("[INFO] ") == 0) {
-              LogFile::info(message);
-              //log.setPriority(LogFile::INFO);
-            } else if (message.find("[NOTICE] ") == 0) {
-              LogFile::notice(message);
-              //log.setPriority(LogFile::NOTICE);
-            } else if (message.find("[WARNING] ") == 0) {
-              LogFile::warning(message);
-              //log.setPriority(LogFile::WARNING);
-            } else if (message.find("[ERROR] ") == 0) {
-              LogFile::error(message);
-              //log.setPriority(LogFile::ERROR);
-            } else if (message.find("[FATAL] ") == 0) {
-              LogFile::fatal(message);
-              //log.setPriority(LogFile::FATAL);
-            } else {
-              //LogFile::debug(message);
-            }
             try {
               db->connect();
               LoggerObjectTable(db).add(log, true);

@@ -101,7 +101,7 @@ public class RunCommandButtonPaneController implements Initializable {
                     "Selected run type : " + runtype));
         } else if (cmd.equals(RCCommand.START)) {
             msg.setData(m_rcmain.getRunSetting().getFieldOperator1().getText() + ":"
-                    + m_rcmain.getRunSetting().getFieldOperator1().getText() + "\n"
+                    + m_rcmain.getRunSetting().getFieldOperator2().getText() + "\n"
                     + m_rcmain.getRunSetting().getAreatComments().getText().
                     replace(System.getProperty("line.separator"), "<br/>"));
             if (m_rcmain.getRunSetting().isEdited()) {

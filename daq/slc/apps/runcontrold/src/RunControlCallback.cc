@@ -537,6 +537,21 @@ void RunControlCallback::timeout() throw()
       }
     }
   }
+  if (count % 5 == 0) {
+    try {
+      getDB()->connect();
+      RunNumberInfoTable(getDB()).add(m_info);
+      LoggerObjectTable ltable(getDB());
+      for (size_t i = 0; i < m_data_v.size(); i++) {
+        if (m_data_v[i].isAvailable()) {
+          ltable.add(m_data_v[i], true);
+        }
+      }
+      getDB()->close();
+    } catch (const std::exception& e) {
+      getDB()->close();
+    }
+  }
   count++;
   update();
 }
@@ -560,6 +575,7 @@ void RunControlCallback::update() throw()
   bool aborting_any = false;
   bool recovering_any = false;
   bool notready_any = false;
+  bool notready_all = true;
   bool ready_all = true;
   bool running_all = true;
   bool starting_any = false;
@@ -571,6 +587,9 @@ void RunControlCallback::update() throw()
     if (obj.getBool("used") && !m_node_v[i].isExcluded()) {
       count++;
       const RCState& state(m_node_v[i].getState());
+      if (state != RCState::NOTREADY_S) {
+        notready_all;
+      }
       if (state == RCState::ABORTING_RS) {
         aborting_any = true;
       } else if (state == RCState::RECOVERING_RS) {
@@ -594,9 +613,11 @@ void RunControlCallback::update() throw()
   RCState state_org = getNode().getState();
   if (count == 0) {
     getNode().setState(RCState::NOTREADY_S);
-  } else if (aborting_any) {
+  } else if (aborting_any ||
+             (!notready_all && state_org == RCState::ABORTING_RS)) {
     getNode().setState(RCState::ABORTING_RS);
-  } else if (recovering_any) {
+  } else if (recovering_any ||
+             (!ready_all && state_org == RCState::RECOVERING_RS)) {
     getNode().setState(RCState::RECOVERING_RS);
   } else if (notready_any) {
     getNode().setState(RCState::NOTREADY_S);
@@ -604,9 +625,11 @@ void RunControlCallback::update() throw()
     getNode().setState(RCState::READY_S);
   } else if (paused_any) {
     getNode().setState(RCState::PAUSED_S);
-  } else if (starting_any) {
+  } else if (starting_any ||
+             (!running_all && state_org == RCState::STARTING_TS)) {
     getNode().setState(RCState::STARTING_TS);
-  } else if (stopping_any) {
+  } else if (stopping_any ||
+             (!ready_all && state_org == RCState::STARTING_TS)) {
     getNode().setState(RCState::STOPPING_TS);
   } else if (running_all) {
     getNode().setState(RCState::RUNNING_S);

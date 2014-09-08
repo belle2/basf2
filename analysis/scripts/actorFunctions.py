@@ -453,7 +453,8 @@ def SignalProbability(path, identifier, particleList, mvaConfig, preCut, additio
         expert.set_name('TMVAExpert_' + particleList)
         expert.param('prefix', removeJPsiSlash(particleList + '_' + hash))
         expert.param('method', mvaConfig.name)
-        expert.param('signalFraction', -2)  # Use signalFraction from training
+        #expert.param('signalFraction', -2)  # Use signalFraction from training
+        expert.param('signalFraction', -1)  # No transformation of output DO NOt commit of still using maxEvents!
         expert.param('signalProbabilityName', 'SignalProbability')
         expert.param('signalClass', mvaConfig.targetCluster)
         if preCut is not None and preCut['nBackground'] > 1e7:
@@ -518,7 +519,7 @@ def WriteAnalysisFileForChannel(particleName, particleLabel, channelName, preCut
     placeholders = {}
     placeholders['particleName'] = particleName
     placeholders['particleLabel'] = particleLabel
-    placeholders['channelName'] = automaticReporting.prettifyDecayString(channelName)
+    placeholders['channelName'] = channelName
     placeholders['isIgnored'] = False
     placeholders = automaticReporting.createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut)
     placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, postCut)
@@ -532,7 +533,7 @@ def WriteAnalysisFileForChannel(particleName, particleLabel, channelName, preCut
     return {'Placeholders_{c}'.format(c=channelName): placeholders, 'NotNeeded': None}
 
 
-def WriteAnalysisFileForFSParticle(particleName, particleLabel, mvaConfig, signalProbability, postCutConfig, postCut, mcCounts):
+def WriteAnalysisFileForFSParticle(particleName, particleLabel, mvaConfig, signalProbability, postCutConfig, postCut, nTuple, mcCounts):
     """
     Creates a pdf document with the PreCut and Training plots
         @param particleName valid pdg particle name
@@ -552,13 +553,13 @@ def WriteAnalysisFileForFSParticle(particleName, particleLabel, mvaConfig, signa
     placeholders['isIgnored'] = False
 
     placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, postCut)
-    placeholders = automaticReporting.createFSParticleTexFile(placeholders, mcCounts)
+    placeholders = automaticReporting.createFSParticleTexFile(placeholders, nTuple, mcCounts)
 
     B2INFO("Written analysis tex file for final state particle {p} with label {l}.".format(p=particleName, l=particleLabel))
     return {'Placeholders_{p}:{l}'.format(p=particleName, l=particleLabel): placeholders, 'NotNeeded': None}
 
 
-def WriteAnalysisFileForCombinedParticle(particleName, particleLabel, channelPlaceholders, mcCounts):
+def WriteAnalysisFileForCombinedParticle(particleName, particleLabel, channelPlaceholders, nTuple, mcCounts):
     """
     Creates a pdf document with the PreCut and Training plots
         @param particleName valid pdg particle name
@@ -574,7 +575,7 @@ def WriteAnalysisFileForCombinedParticle(particleName, particleLabel, channelPla
     placeholders['particleLabel'] = particleLabel
     placeholders['isIgnored'] = False
 
-    placeholders = automaticReporting.createCombinedParticleTexFile(placeholders, channelPlaceholders, mcCounts)
+    placeholders = automaticReporting.createCombinedParticleTexFile(placeholders, channelPlaceholders, nTuple, mcCounts)
 
     B2INFO("Written analysis tex file for intermediate particle {p} with label {l}.".format(p=particleName, l=particleLabel))
     return {'Placeholders_{p}:{l}'.format(p=particleName, l=particleLabel): placeholders, 'NotNeeded': None}
@@ -609,7 +610,7 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
     if ret == 0:
         filename = 'sent_mail'
         if not os.path.isfile(filename):
-            automaticReporting.sendMail()
+            #automaticReporting.sendMail()
             open(filename, 'w').close()
 
     # Return None - Therefore Particle List depends not on TMVAExpert directly

@@ -12,6 +12,7 @@ import os
 import re
 import sys
 import subprocess
+import copy
 from string import Template
 
 
@@ -20,7 +21,40 @@ def removeJPsiSlash(filename):
 
 
 def prettifyDecayString(decayString):
-    return decayString.replace('==>', '$\\to$').replace(':generic', '').replace('gamma', '$\gamma$')
+    substitutes = {
+        '==>': '$\\to$',
+        ':generic': '',
+        'gamma': r'$\gamma$',
+        'pi+': r'$\pi^+$',
+        'pi-': r'$\pi^-$',
+        'pi0': r'$\pi^0$',
+        'K_S0': r'$K^0_S$',
+        'mu+': r'$\mu^+$',
+        'mu-': r'$\mu^-$',
+        'K+': r'$K^+$',
+        'K-': r'$K^-$',
+        'e+': r'$e^+$',
+        'e-': r'$e^-$',
+        'J/psi': r'$J/\psi$',
+        'D+': r'$D^+$',
+        'D-': r'$D^-$',
+        'D0': r'$D^0$',
+        'D*+': r'$D^{+*}$',
+        'D*-': r'$D^{-*}$',
+        'D*0': r'$D^{0*}$',
+        'D_s+': r'$D^+_s$',
+        'D_s-': r'$D^-_s$',
+        'D_s*+': r'$D^{+*}_s$',
+        'D_s*-': r'$D^{-*}_s$',
+        'anti-D0': r'$\bar{D^0}$',
+        'anti-D*0': r'$\bar{D^{0*}}$',
+        'B+': r'$B^+$',
+        'B-': r'$B^-$',
+        'B0': r'$B^0$',
+        'anti-B0': r'$\bar{B^0}$'}
+    for key, value in substitutes.iteritems():
+        decayString = decayString.replace(key, value)
+    return decayString
 
 
 def purity(x, y):
@@ -44,6 +78,11 @@ def createTexFile(filename, templateFilename, placeholders):
     @param templateFilename name of the template file
     @param placeholders dictionary with values for every palceholder in the template
     """
+    placeholders = copy.copy(placeholders)
+    if 'particleName' in placeholders:
+        placeholders['particleName'] = prettifyDecayString(placeholders['particleName'])
+    if 'channelName' in placeholders:
+        placeholders['channelName'] = prettifyDecayString(placeholders['channelName'])
     template = Template(file(ROOT.Belle2.FileSystem.findFile(templateFilename), 'r').read())
     page = template.substitute(placeholders)
     file(filename, 'w').write(page)
@@ -105,7 +144,7 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
     placeholders['NEvents'] = mcCounts['NEvents']
 
     for bPlaceholder in combinedParticlePlaceholders:
-        if bPlaceholder['particleName'] in ['B+', 'B0', 'B-', 'B0bar']:
+        if bPlaceholder['particleName'] in ['B+', 'B0', 'B-', 'anti-B0']:
             placeholders['NSignal'] += int(bPlaceholder['particleNSignal'])
             placeholders['NBackground'] += int(bPlaceholder['particleNBackground'])
 
@@ -135,7 +174,7 @@ def createMBCTexFile(ntuple):
     return placeholders
 
 
-def createFSParticleTexFile(placeholders, mcCounts):
+def createFSParticleTexFile(placeholders, nTuple, mcCounts):
     """
     Creates a tex document with Training plots
         @param mvaConfig configuration for mva
@@ -146,10 +185,18 @@ def createFSParticleTexFile(placeholders, mcCounts):
     placeholders['particleNBackground'] = placeholders['mvaNBackground']
     placeholders['particleNSignalAfterPreCut'] = placeholders['mvaNSignal']
     placeholders['particleNBackgroundAfterPreCut'] = placeholders['mvaNBackground']
-    placeholders['particleNSignalAfterPostCut'] = placeholders['mvaNSignalAfterPostCut']
-    placeholders['particleNBackgroundAfterPostCut'] = placeholders['mvaNBackgroundAfterPostCut']
+
+    rootfile = ROOT.TFile(nTuple)
+    tree = rootfile.Get('variables')
+    placeholders['particleNSignalAfterPostCut'] = int(tree.GetEntries('isSignal'))
+    placeholders['particleNBackgroundAfterPostCut'] = int(tree.GetEntries('!isSignal'))
+    #placeholders['particleNSignalAfterPostCut'] = placeholders['mvaNSignalAfterPostCut']
+    #placeholders['particleNBackgroundAfterPostCut'] = placeholders['mvaNBackgroundAfterPostCut']
 
     hash = actorFramework.createHash(placeholders)
+    placeholders['particleDiagPlot'] = removeJPsiSlash('{name}_combined_{hash}_diag.png'.format(name=placeholders['particleName'], hash=hash))
+    if not os.path.isfile(placeholders['particleDiagPlot']):
+        makeDiagPlotPerParticle(nTuple, placeholders['particleDiagPlot'])
     placeholders['texFile'] = '{name}_{hash}.tex'.format(name=placeholders['particleName'], hash=hash)
     if not os.path.isfile(placeholders['texFile']):
         createTexFile(placeholders['texFile'], 'analysis/scripts/FullEventInterpretationFSParticleTemplate.tex', placeholders)
@@ -157,7 +204,7 @@ def createFSParticleTexFile(placeholders, mcCounts):
     return placeholders
 
 
-def createCombinedParticleTexFile(placeholders, channelPlaceholders, mcCounts):
+def createCombinedParticleTexFile(placeholders, channelPlaceholders, nTuple, mcCounts):
     """
     Creates a tex document with the PreCut and Training plots
         @param placeholders dictionary with values for every placeholder in the latex-template
@@ -169,9 +216,9 @@ def createCombinedParticleTexFile(placeholders, channelPlaceholders, mcCounts):
     placeholders['channelListAsItems'] = ""
     for channelPlaceholder in channelPlaceholders:
         if channelPlaceholder['isIgnored']:
-            placeholders['channelListAsItems'] += "\\item {name} was ignored\n".format(name=channelPlaceholder['channelName'])
+            placeholders['channelListAsItems'] += "\\item {name} was ignored\n".format(name=prettifyDecayString(channelPlaceholder['channelName']))
         else:
-            placeholders['channelListAsItems'] += "\\item {name}\n".format(name=channelPlaceholder['channelName'])
+            placeholders['channelListAsItems'] += "\\item {name}\n".format(name=prettifyDecayString(channelPlaceholder['channelName']))
 
     placeholders['channelInputs'] = ""
     placeholders['particleNSignal'] = 0
@@ -184,22 +231,34 @@ def createCombinedParticleTexFile(placeholders, channelPlaceholders, mcCounts):
 
     if placeholders['NUsedChannels'] > 0:
         ranges = [channelPlaceholder['postCutRange'] for channelPlaceholder in channelPlaceholders if channelPlaceholder['postCutRange'] != 'Ignored']
-        if not all(ranges[0] == r for r in ranges):
-            B2WARNING("Showing different post cuts for channels of the same particle in the summary file, isn't supported at the moment. Show only first cut.")
-        placeholders['postCutRange'] = ranges[0]
+        if len(ranges) == 0:
+            placeholders['postCutRange'] = 'Deactivated'
+        else:
+            if not all(ranges[0] == r for r in ranges):
+                B2WARNING("Showing different post cuts for channels of the same particle in the summary file, isn't supported at the moment. Show only first cut.")
+            placeholders['postCutRange'] = ranges[0]
     else:
         placeholders['postCutRange'] = 'Ignored'
+
+    rootfile = ROOT.TFile(nTuple)
+    tree = rootfile.Get('variables')
+    placeholders['particleNSignalAfterPostCut'] = int(tree.GetEntries('isSignal'))
+    placeholders['particleNBackgroundAfterPostCut'] = int(tree.GetEntries('!isSignal'))
 
     for channelPlaceholder in channelPlaceholders:
         placeholders['particleNSignal'] += int(channelPlaceholder['channelNSignal'])
         placeholders['particleNBackground'] += int(channelPlaceholder['channelNBackground'])
-        placeholders['particleNSignalAfterPreCut'] += int(channelPlaceholder['channelNSignalAfterPreCut'])
-        placeholders['particleNBackgroundAfterPreCut'] += int(channelPlaceholder['channelNBackgroundAfterPreCut'])
-        placeholders['particleNSignalAfterPostCut'] += int(channelPlaceholder['mvaNSignalAfterPostCut'])
-        placeholders['particleNBackgroundAfterPostCut'] += int(channelPlaceholder['mvaNBackgroundAfterPostCut'])
+        if not placeholders['isIgnored']:
+            placeholders['particleNSignalAfterPreCut'] += int(channelPlaceholder['channelNSignalAfterPreCut'])
+            placeholders['particleNBackgroundAfterPreCut'] += int(channelPlaceholder['channelNBackgroundAfterPreCut'])
+            #placeholders['particleNSignalAfterPostCut'] += int(channelPlaceholder['mvaNSignalAfterPostCut'])
+            #placeholders['particleNBackgroundAfterPostCut'] += int(channelPlaceholder['mvaNBackgroundAfterPostCut'])
         placeholders['channelInputs'] += '\input{' + channelPlaceholder['texFile'] + '}\n'
 
     hash = actorFramework.createHash(placeholders)
+    placeholders['particleDiagPlot'] = removeJPsiSlash('{name}_combined_{hash}_diag.png'.format(name=placeholders['particleName'], hash=hash))
+    if not os.path.isfile(placeholders['particleDiagPlot']):
+        makeDiagPlotPerParticle(nTuple, placeholders['particleDiagPlot'])
     placeholders['texFile'] = removeJPsiSlash('{name}_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
     if not os.path.isfile(placeholders['texFile']):
         createTexFile(placeholders['texFile'], 'analysis/scripts/FullEventInterpretationCombinedParticleTemplate.tex', placeholders)
@@ -414,8 +473,8 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
             placeholders['mvaNTestBackgroundAfterPostCut'] = testTree.GetEntries('className == "Background"' + ' && ' + postCutSelector)
         else:
             placeholders['postCutRange'] = 'Ignored'
-            placeholders['mvaNTestSignalAfterPostCut'] = placeholders['mvaNSignal']
-            placeholders['mvaNTestBackgroundAfterPostCut'] = placeholders['mvaNBackground']
+            placeholders['mvaNTestSignalAfterPostCut'] = testTree.GetEntries('className == "Signal"')
+            placeholders['mvaNTestBackgroundAfterPostCut'] = testTree.GetEntries('className == "Background"')
 
         placeholders['mvaPostCutSignalEfficiency'] = efficiency(placeholders['mvaNTestSignalAfterPostCut'], placeholders['mvaNTestSignal'])
         placeholders['mvaPostCutBackgroundEfficiency'] = efficiency(placeholders['mvaNTestBackgroundAfterPostCut'], placeholders['mvaNTestBackground'])
@@ -436,7 +495,7 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
 
         placeholders['mvaDiagPlot'] = removeJPsiSlash('{name}_mva_{hash}_diag.png'.format(name=placeholders['particleName'], hash=hash))
         if not os.path.isfile(placeholders['mvaDiagPlot']):
-            makeDiagPlot(placeholders['mvaTMVAFilename'], placeholders['mvaDiagPlot'], placeholders['mvaName'])
+            makeDiagPlotPerChannel(placeholders['mvaTMVAFilename'], placeholders['mvaDiagPlot'], placeholders['mvaName'])
 
         placeholders['mvaTexFile'] = removeJPsiSlash('{name}_mva_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
         placeholders['mvaTemplateFile'] = 'analysis/scripts/FullEventInterpretationMVATemplate.tex'
@@ -487,7 +546,24 @@ def makeROCPlot(tmvaFilename, plotName):
     subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=plotName)], shell=True)
 
 
-def makeDiagPlot(tmvaFilename, plotName, methodName):
+def makeDiagPlotPerParticle(nTuple, plotName):
+
+    nTupleFile = ROOT.TFile(nTuple)
+    variables = nTupleFile.Get('variables')
+
+    if variables.GetEntries() == 0:
+        raise RuntimeError('variables is empty')
+
+    nbins = 100
+    probabilityVar = ROOT.Belle2.Variable.makeROOTCompatible('getExtraInfo(SignalProbability)')
+    bgHist = ROOT.TH1F('background' + probabilityVar, 'background', nbins, 0.0, 1.0)
+    variables.Project('background' + probabilityVar, probabilityVar, '!isSignal')
+    signalHist = ROOT.TH1F('signal' + probabilityVar, 'signal', nbins, 0.0, 1.0)
+    variables.Project('signal' + probabilityVar, probabilityVar, 'isSignal')
+    makeDiagPlot(signalHist, bgHist, plotName)
+
+
+def makeDiagPlotPerChannel(tmvaFilename, plotName, methodName):
 
     tmvaFile = ROOT.TFile(tmvaFilename)
     testTree = tmvaFile.Get('TestTree')
@@ -502,7 +578,11 @@ def makeDiagPlot(tmvaFilename, plotName, methodName):
     testTree.Project('background' + probabilityVar, probabilityVar, 'className == "Background"')
     signalHist = ROOT.TH1F('signal' + probabilityVar, 'signal', nbins, 0.0, 1.0)
     testTree.Project('signal' + probabilityVar, probabilityVar, 'className == "Signal"')
+    makeDiagPlot(signalHist, bgHist, plotName)
 
+
+def makeDiagPlot(signalHist, bgHist, plotName):
+    nbins = 100
     import array
 
     x = array.array('d')
@@ -528,11 +608,11 @@ def makeDiagPlot(tmvaFilename, plotName, methodName):
 
     purityPerBin = ROOT.TGraphErrors(len(x), x, y, xerr, yerr)
 
-    plotTitle = 'Diagonal plot for ' + methodName
+    plotTitle = 'Diagonal plot'
     canvas = ROOT.TCanvas(plotTitle + plotName, plotTitle, 600, 400)
     canvas.cd()
 
-    purityPerBin.SetTitle(';' + probabilityVar + ' output;'
+    purityPerBin.SetTitle(';classifier output;'
                           + 'purity per bin')
     purityPerBin.GetXaxis().SetRangeUser(0.0, 1.0)
     purityPerBin.GetYaxis().SetRangeUser(0.0, 1.0)
@@ -560,18 +640,20 @@ def makeMbcPlot(fileName, outputFileName):
     canvas = ROOT.TCanvas(plotTitle, plotTitle, 600, 400)
     canvas.cd()
 
-    testTree.SetLineColor(ROOT.kBlack)
-    testTree.Draw('Mbc', 'Mbc > 5.23', '')
-    testTree.SetLineStyle(ROOT.kDotted)
-    testTree.Draw('Mbc', '!isSignal', 'same')
+    #testTree.SetLineColor(ROOT.kBlack)
+    #testTree.Draw('Mbc', 'Mbc > 5.23', '')
+    #testTree.SetLineStyle(ROOT.kDotted)
+    #testTree.Draw('Mbc', '!isSignal', 'same')
     color = ROOT.kRed + 4
-    for cut in [0.0001, 0.001, 0.01, 0.1, 0.5]:
+    first_plot = True
+    for cut in [0.01, 0.1, 0.5]:
         testTree.SetLineColor(int(color))
         testTree.SetLineStyle(ROOT.kSolid)
-        testTree.Draw('Mbc', 'getExtraInfoSignalProbability > ' + str(cut), 'same')
+        testTree.Draw('Mbc', 'Mbc > 5.23 && getExtraInfoSignalProbability > ' + str(cut), '' if first_plot else 'same')
+        first_plot = False
 
         testTree.SetLineStyle(ROOT.kDotted)
-        testTree.Draw('Mbc', 'getExtraInfoSignalProbability > ' + str(cut) + ' && !isSignal', 'same')
+        testTree.Draw('Mbc', 'Mbc > 5.23 && getExtraInfoSignalProbability > ' + str(cut) + ' && !isSignal', 'same')
         color -= 1
 
     l = canvas.GetListOfPrimitives()

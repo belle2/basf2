@@ -120,8 +120,10 @@ class Particle(object):
             return x == y
 
         if self.isFSP:
-            output += '    PreCutConfiguration: variable={p.variable}, method={p.method}, efficiency={p.efficiency}, purity={p.purity}\n'.format(p=self.preCutConfig)
-            output += '    PostCutConfiguration: value={p.value}\n'.format(p=self.postCutConfig)
+            if self.postCutConfig is None:
+                output += '    PostCutConfiguration: None\n'
+            else:
+                output += '    PostCutConfiguration: value={p.value}\n'.format(p=self.postCutConfig)
             output += '    MVAConfiguration: name={m.name}, type={m.type}, config={m.config}, target={m.target}, targetCluster={m.targetCluster}\n'.format(m=self.mvaConfig)
             output += '    Variables: ' + ', '.join(self.mvaConfig.variables) + '\n'
         else:
@@ -309,6 +311,11 @@ def FullEventInterpretation(path, particles):
             if particle.name != pdg.conjugate(particle.name):
                 seq.addResource('SignalProbability_{p}:{l}'.format(p=pdg.conjugate(particle.name), l=particle.label), 'Dummy',
                                 requires=['SignalProbability_{i}'.format(i=particle.identifier)])
+            seq.addFunction(VariablesToNTuple,
+                            path='Path',
+                            particleIdentifier='Identifier_{i}'.format(i=particle.identifier),
+                            particleList='ParticleList_{i}'.format(i=particle.identifier),
+                            signalProbability='SignalProbability_{i}'.format(i=particle.identifier))
 
         ################ Information ACTORS #################
         if args.makeSummary:
@@ -334,26 +341,20 @@ def FullEventInterpretation(path, particles):
                                 signalProbability='SignalProbability_{i}'.format(i=particle.identifier),
                                 postCutConfig='PostCutConfig_{i}'.format(i=particle.identifier),
                                 postCut='PostCut_{i}'.format(i=particle.identifier),
+                                nTuple='VariablesToNTuple_{i}'.format(i=particle.identifier),
                                 mcCounts='MCParticleCounts')
             else:
                 seq.addFunction(WriteAnalysisFileForCombinedParticle,
                                 particleName='Name_{i}'.format(i=particle.identifier),
                                 particleLabel='Label_{i}'.format(i=particle.identifier),
                                 channelPlaceholders=['Placeholders_{c}'.format(c=channel.name) for channel in particle.channels],
+                                nTuple='VariablesToNTuple_{i}'.format(i=particle.identifier),
                                 mcCounts='MCParticleCounts')
 
     finalParticles = [particle for particle in particles if all(particle.identifier not in o.daughters and pdg.conjugate(particle.name) + ':' + particle.label not in o.daughters for o in particles)]
     for finalParticle in finalParticles:
-        seq.addFunction(VariablesToNTuple,
-                        path='Path',
-                        particleIdentifier='Identifier_{i}'.format(i=finalParticle.identifier),
-                        particleList='ParticleList_{i}'.format(i=finalParticle.identifier),
-                        signalProbability='SignalProbability_{i}'.format(i=finalParticle.identifier))
         seq.addNeeded('SignalProbability_{i}'.format(i=finalParticle.identifier))
         seq.addNeeded('ParticleList_{i}'.format(i=finalParticle.identifier))
-
-    seq.addNeeded('SignalProbability_K_S0:generic'.format(i=finalParticle.identifier))
-    seq.addNeeded('ParticleList_K_S0:generic'.format(i=finalParticle.identifier))
 
     if args.makeSummary:
         seq.addFunction(WriteAnalysisFileSummary,

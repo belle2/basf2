@@ -145,9 +145,10 @@ def draw_pvalue(data_tree):
 def calculate_efficiency_in_pt(data_tree):
     """Calculate single track reconstruction efficiency in bins of pt"""
 
-    number_bins = 62
     pt_lower = -0.025
     pt_upper = 4.025
+    # 50 MeV wide bins.                            + 0.5 serves for correct rounding.
+    number_bins = int((pt_upper - pt_lower) / 0.05 + 0.5)
 
     hist_pt_gen = TH1F('hPtGen', 'hPtGen', number_bins, pt_lower, pt_upper)
     hist_pt_rec = TH1F('hPtRec', 'hPtRec', number_bins, pt_lower, pt_upper)
@@ -319,9 +320,10 @@ def calculate_momentum_resolution(data_tree, pt_value_condition):
 def create_momentum_resolution_plot(data_tree):
     """Create momentum resolution plot"""
 
-    number_bins = 62
     pt_lower = -0.025
     pt_upper = 4.025
+    # 50 MeV wide bins.                            + 0.5 serves for correct rounding.
+    number_bins = int((pt_upper - pt_lower) / 0.05 + 0.5)
 
     sigma_pt_values = calculate_momentum_resolution2(data_tree)
 

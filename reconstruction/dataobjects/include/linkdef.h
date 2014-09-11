@@ -5,6 +5,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
+#pragma link C++ class Belle2::DedxCell+;
 #pragma link C++ class Belle2::DedxTrack+;
 #pragma link C++ class Belle2::DedxLikelihood+;
 

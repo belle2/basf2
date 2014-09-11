@@ -215,6 +215,7 @@ void RunControlCallback::postRun() throw()
   try {
     if (!getDB()->isConnected())
       getDB()->connect();
+    m_info.setId(0);
     RunNumberInfoTable(getDB()).add(m_info);
     LoggerObjectTable ltable(getDB());
     for (size_t i = 0; i < m_data_v.size(); i++) {
@@ -548,7 +549,6 @@ void RunControlCallback::timeout() throw()
     try {
       if (!getDB()->isConnected())
         getDB()->connect();
-      RunNumberInfoTable(getDB()).add(m_info);
       LoggerObjectTable ltable(getDB());
       for (size_t i = 0; i < m_data_v.size(); i++) {
         if (m_data_v[i].isAvailable()) {

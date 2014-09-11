@@ -19,6 +19,7 @@
 #include <TString.h>
 #include <TSystem.h>
 
+#include <boost/version.hpp>
 
 #include <sstream>
 
@@ -227,7 +228,12 @@ namespace Belle2 {
         }
       }
 
+#if BOOST_VERSION < 105600
       boost::property_tree::xml_writer_settings<char> settings('\t', 1);
+#else
+      boost::property_tree::xml_writer_settings<std::string> settings('\t', 1);
+#endif
+
       boost::property_tree::xml_parser::write_xml(m_prefix + ".config", pt, std::locale(), settings);
       gSystem->ChangeDirectory(oldDirectory.c_str());
     }

@@ -80,5 +80,35 @@ namespace Belle2 {
     * This is a Flavor Tagging specific variable!
     */
     Manager::FunctionPtr IsFromB(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns CMS momentum magnitude of the particle classified as target, i.e. that with the highest probability accessed via argument[1]
+     * in the given list (argument[0]). This is a Flavor Tagging specific variable!
+     */
+    Manager::FunctionPtr p_CMS(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns CMS recoiling mass of the Btag system against the target lepton, i.e. the particle that with the highest lepton probability accessed via argument[1]
+     * in the given list (argument[0]). This is a Flavor Tagging specific variable!
+     */
+    Manager::FunctionPtr recoilMassBtag(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns CMS momentum magnitude missing in Btag using as target hypothesis the particle with the highest lepton probability accessed via argument[1]
+     * in the given list (argument[0]). This is a Flavor Tagging specific variable!
+     */
+    Manager::FunctionPtr p_CMS_missing(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the cosine of the polar angle of the CMS momentum missing in Btag assuming a semileptonic decay. As target hypothesis is used the particle with the highest lepton probability accessed via argument[1]
+     * in the given list (argument[0]). This is a Flavor Tagging specific variable!
+     */
+    Manager::FunctionPtr particleCosTheta_CMS_missing(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the Energy in the hemisphere defined by the direction of the virtual W-Boson assuming a semileptonic decay. The target lepton is the particle with the highest probability accessed via argument[1]
+     * in the given list (argument[0]). This is a Flavor Tagging specific variable!
+     */
+    Manager::FunctionPtr E_W_90(const std::vector<std::string>& arguments);
   }
 }

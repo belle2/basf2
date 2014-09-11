@@ -246,7 +246,7 @@ public class RunControlMainPaneController implements Initializable, NSMObserver 
             for (int i = 1; i < str.length; i++) {
                 ss.append(str[i]);
             }
-            long date = 1000l + msg.getParam(1);
+            long date = 1000l * msg.getParam(1);
             log(new LogMessage(from, LogLevel.Get(msg.getParam(0)),
                     new Date(date), ss.toString()));
         } else if (command.equals(NSMCommand.LISTSET)) {

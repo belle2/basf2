@@ -19,6 +19,7 @@ namespace Belle2 {
 
   public:
     virtual void connect() throw(DBHandlerException);
+    virtual bool isConnected() throw();
     virtual void execute_imp(const char* command) throw(DBHandlerException);
     virtual void close() throw(DBHandlerException);
     virtual void clear() throw();

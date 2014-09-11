@@ -60,6 +60,9 @@ namespace Belle2 {
     void setAutoReply(bool auto_reply) throw() {
       m_auto_reply = auto_reply;
     }
+    void setDBClose(bool db_close) throw() {
+      m_db_close = db_close;
+    }
 
   protected:
     bool preload(const NSMMessage& msg) throw();
@@ -73,6 +76,7 @@ namespace Belle2 {
     std::string m_path;
     std::string m_tablename;
     bool m_auto_reply;
+    bool m_db_close;
 
   };
 

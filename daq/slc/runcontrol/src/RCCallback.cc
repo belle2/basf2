@@ -27,6 +27,7 @@ RCCallback::RCCallback(const NSMNode& node, int timeout) throw()
   add(RCCommand::TRIGFT);
   getNode().setState(RCState::NOTREADY_S);
   m_auto_reply = true;
+  m_db_close = true;
 }
 
 void RCCallback::sendPause() throw()
@@ -150,12 +151,14 @@ bool RCCallback::preload(const NSMMessage& msg) throw()
           return false;
         }
         try {
-          m_db->connect();
+          if (!m_db->isConnected())
+            m_db->connect();
           std::string nodename = getNode().getName();
           ConfigObjectTable table(m_db);
           m_config.setObject(table.get(runtype, nodename));
           LogFile::info("Loaded from DB %s:%s", nodename.c_str(), runtype.c_str());
-          m_db->close();
+          if (m_db_close)
+            m_db->close();
         } catch (const DBHandlerException& e) {
           setReply("DB access error");
           LogFile::error("DB access error");

@@ -17,20 +17,18 @@ using namespace Belle2;
 int LoggerObjectTable::add(const DBObject& obj, bool isroot)
 throw(DBHandlerException)
 {
-  int id = 0;
-  if (obj.getIndex() == 0) {
+  int id = obj.getId();
+  if (id == 0) {
     FieldInfoTable(m_db).createTable(obj, isroot);
     LoggerInfoTable table(m_db);
     id = table.add(LoggerInfo(obj.getNode(),
                               obj.getTable(),
                               obj.getRevision()));
+    obj.setId(id);
   }
   std::stringstream ss1, ss2;
   ss1 << "loggerid";
-  if (id > 0) ss2 << id;
-  else ss2 << "(select loggerid('" << obj.getNode()
-             << "', '" << obj.getTable() << "', "
-             << obj.getRevision() << "))";
+  ss2 << id;
   if (!isroot) {
     ss1 << ", index";
     ss2 << ", " << obj.getIndex();
@@ -54,6 +52,7 @@ throw(DBHandlerException)
       int cid = 0;
       for (int j = 0; j < length; j++) {
         ConfigObject cobj;
+        cobj.setId(cid);
         cobj.setConfig(false);
         cobj.setNode(obj.getNode());
         cobj.setName(obj.getName());

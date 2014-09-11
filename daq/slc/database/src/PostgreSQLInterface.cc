@@ -22,9 +22,16 @@ void PostgreSQLInterface::connect() throw(DBHandlerException)
                                            m_host.c_str(), m_database.c_str(),
                                            m_user.c_str(), m_password.c_str()).c_str());
   if (PQstatus(m_sq_conn) == CONNECTION_BAD) {
+    close();
     throw (DBHandlerException("Failed to connect to the database : (%s)",
                               PQerrorMessage(m_sq_conn)));
   }
+}
+
+bool PostgreSQLInterface::isConnected() throw()
+{
+  return m_sq_conn != NULL &&
+         PQstatus(m_sq_conn) == CONNECTION_OK;
 }
 
 void PostgreSQLInterface::execute_imp(const char* command)

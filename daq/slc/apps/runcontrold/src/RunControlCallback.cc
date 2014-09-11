@@ -37,6 +37,7 @@ RunControlCallback::RunControlCallback(const NSMNode& node,
   m_port = port;
   m_callback = NULL;
   setAutoReply(false);
+  setDBClose(false);
 }
 
 void RunControlCallback::init() throw()
@@ -212,7 +213,8 @@ bool RunControlCallback::synchronize(NSMNode& node) throw()
 void RunControlCallback::postRun() throw()
 {
   try {
-    getDB()->connect();
+    if (!getDB()->isConnected())
+      getDB()->connect();
     RunNumberInfoTable(getDB()).add(m_info);
     LoggerObjectTable ltable(getDB());
     for (size_t i = 0; i < m_data_v.size(); i++) {
@@ -227,9 +229,9 @@ void RunControlCallback::postRun() throw()
     rc_status* status = (rc_status*)m_data.get();
     status->stime = 0;
     ltable.add(summary, true);
-    getDB()->close();
+    //getDB()->close();
   } catch (const std::exception& e) {
-    getDB()->close();
+    //getDB()->close();
   }
 }
 
@@ -322,7 +324,8 @@ bool RunControlCallback::distribute_r(NSMMessage& msg) throw()
 bool RunControlCallback::start() throw()
 {
   NSMMessage& msg(getMessage());
-  getDB()->connect();
+  if (!getDB()->isConnected())
+    getDB()->connect();
   size_t expno = (msg.getNParams() > 0) ? msg.getParam(0) : 0;
   size_t runno = (msg.getNParams() > 1) ? msg.getParam(1) : 0;
   size_t subno = (msg.getNParams() > 2) ? msg.getParam(2) : 0;
@@ -354,7 +357,7 @@ bool RunControlCallback::start() throw()
   status->configid = getConfig().getObject().getId();
   m_setting.setRunControl(getConfig().getObject());
   LoggerObjectTable(getDB()).add(m_setting);
-  getDB()->close();
+  //getDB()->close();
   update();
   return distribute(msg);
 }
@@ -382,9 +385,10 @@ bool RunControlCallback::pause() throw()
     getNode().setState(state);
     DAQLogMessage log(msg.getNodeName(), LogFile::WARNING,
                       "Reuested PAUSE", Date());
-    getDB()->connect();
+    if (!getDB()->isConnected())
+      getDB()->connect();
     LoggerObjectTable(getDB()).add(log, true);
-    getDB()->close();
+    //getDB()->close();
   } else {
     getNode().setState(RCState::PAUSED_S);
   }
@@ -436,9 +440,10 @@ void RunControlCallback::logging(const DAQLogMessage& log, bool recoreded)
 {
   try {
     if (log.getPriority() >= getPriorityToDB() && !recoreded) {
-      getDB()->connect();
+      if (!getDB()->isConnected())
+        getDB()->connect();
       LoggerObjectTable(getDB()).add(log, true);
-      getDB()->close();
+      //getDB()->close();
     }
     if (log.getPriority() >= getPriorityToLocal()) {
       NSMCommunicator* com = getCommunicator();
@@ -465,11 +470,12 @@ bool RunControlCallback::exclude() throw()
       node.setExcluded(true);
       try {
         LogFile::error("Excluded " + node.getName());
-        getDB()->connect();
+        if (!getDB()->isConnected())
+          getDB()->connect();
         DAQLogMessage log(getNode().getName(), LogFile::INFO,
                           "Excluded " + node.getName());
         LoggerObjectTable(getDB()).add(log, true);
-        getDB()->close();
+        //getDB()->close();
       } catch (const DBHandlerException& e) {
         getDB()->close();
         LogFile::error("DB errir : %s", e.what());
@@ -492,11 +498,12 @@ bool RunControlCallback::include() throw()
       node.setExcluded(false);
       try {
         LogFile::error("Included " + node.getName());
-        getDB()->connect();
+        if (!getDB()->isConnected())
+          getDB()->connect();
         DAQLogMessage log(getNode().getName(), LogFile::INFO,
                           "Included " + node.getName());
         LoggerObjectTable(getDB()).add(log, true);
-        getDB()->close();
+        //getDB()->close();
       } catch (const DBHandlerException& e) {
         getDB()->close();
         LogFile::error("DB errir : %s", e.what());
@@ -539,7 +546,8 @@ void RunControlCallback::timeout() throw()
   }
   if (count % 5 == 0) {
     try {
-      getDB()->connect();
+      if (!getDB()->isConnected())
+        getDB()->connect();
       RunNumberInfoTable(getDB()).add(m_info);
       LoggerObjectTable ltable(getDB());
       for (size_t i = 0; i < m_data_v.size(); i++) {
@@ -547,7 +555,7 @@ void RunControlCallback::timeout() throw()
           ltable.add(m_data_v[i], true);
         }
       }
-      getDB()->close();
+      //getDB()->close();
     } catch (const std::exception& e) {
       getDB()->close();
     }

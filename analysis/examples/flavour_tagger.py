@@ -189,15 +189,21 @@ eventLevelParticles = [('e+', 'Electron'), ('mu+', 'Muon'), ('K+', 'Kaon'),
                        ('pi+', 'SlowPion')]
 
 variables_EL = dict()
-variables_EL['Electron'] = ['p_CMS_Electron', 'mRecoilBtagElectron',
-                            'p_CMS_missingElectron', 'cosTheta_missingElectron'
-                            , 'EW90Electron']
-variables_EL['Muon'] = ['p_CMS_Muon', 'mRecoilBtagMuon', 'p_CMS_missingMuon',
-                        'cosTheta_missingMuon', 'EW90Muon']
-variables_EL['Kaon'] = ['bestQrOf(K+:ROE , IsFromB(Kaon))', 'p_CMS_Kaon',
+variables_EL['Electron'] = ['p_CMS(e+:ROE, IsFromB(Electron))',
+                            'mRecoilBtag(e+:ROE, IsFromB(Electron))',
+                            'p_CMS_missing(e+:ROE, IsFromB(Electron))',
+                            'cosTheta_missing(e+:ROE, IsFromB(Electron))',
+                            'EW90(e+:ROE, IsFromB(Electron))']
+variables_EL['Muon'] = ['p_CMS(mu+:ROE, IsFromB(Muon))',
+                        'mRecoilBtag(mu+:ROE, IsFromB(Muon))',
+                        'p_CMS_missing(mu+:ROE, IsFromB(Muon))',
+                        'cosTheta_missing(mu+:ROE, IsFromB(Muon))',
+                        'EW90(mu+:ROE, IsFromB(Muon))']
+variables_EL['Kaon'] = ['bestQrOf(K+:ROE , IsFromB(Kaon))',
+                        'p_CMS(K+:ROE , IsFromB(Kaon))',
                         'chargeTimesKaonLiklihood']  # TODO More Event Level Variables
 variables_EL['SlowPion'] = ['bestQrOf(pi+:ROE, IsFromB(SlowPion))',
-                            'p_CMS_SlowPion']  # TODO More Event Level Variables
+                            'p_CMS(pi+:ROE , IsFromB(SlowPion))']  # TODO More Event Level Variables
 
 if eventLevelReady:
     for (symbol, category) in eventLevelParticles:

@@ -607,173 +607,11 @@ VXDTFModule::~VXDTFModule()
 
 void VXDTFModule::initialize()
 {
-
-  /** REDESIGNCOMMENT INITIALIZE 1:
-   ** short:
-   * safety checks for many parameters
-   *
-   ** long (+personal comments):
-   * safety checks are not done for each parameter, but for those which are often set wrong (by me or others).
-   * one can notice that some parameters appear as variables too.
-   * Reason for this is to make the parameters human readable and work internally with faster data types
-   *
-   ** dependency of module parameters (global):
-   * m_PARAMhighOccupancyThreshold, m_PARAMpdGCode, m_PARAMtuneCutoffs,
-   * m_PARAMreserveHitsThreshold, m_PARAMnameOfInstance, m_PARAMactivateBaselineTF,
-   * m_PARAMcalcQIType, m_PARAMcalcSeedType, m_PARAMfilterOverlappingTCs,
-   * m_PARAMwriteToRoot, m_PARAMrootFileName, m_PARAMsmearMean,
-   * m_PARAMsmearSigma
-   *
-   ** dependency of global in-module variables:
-   * m_chargeSignFactor, m_calcQiType, m_calcSeedType,
-   * m_filterOverlappingTCs, m_rootFilePtr, m_treeEventWisePtr,
-   * m_treeTrackWisePtr, m_rootTimeConsumption, m_rootPvalues,
-   * m_rootChi2, m_rootCircleRadius, m_rootNdf,
-   * m_littleHelperBox
-   *
-   ** dependency of global stuff just because of B2XX-output:
-   * m_PARAMnameOfInstance,
-   *
-   ** in-module-function-calls:
-   */
-
   B2DEBUG(1, "-----------------------------------------------\n       entering VXD CA track finder (" << m_PARAMnameOfInstance << ") - initialize:");
-  m_littleHelperBox.resetValues(m_PARAMsmearMean, m_PARAMsmearSigma);
 
-  if (m_PARAMhighOccupancyThreshold < 0) { m_PARAMhighOccupancyThreshold = 0; }
+  checkAndSetupModuleParameters();
 
-  if (m_PARAMpdGCode > 10 and m_PARAMpdGCode < 18) { // in this case, its a lepton. since leptons with positive sign have got negative codes, this must be taken into account
-    m_chargeSignFactor = 1;
-  } else { m_chargeSignFactor = -1; }
-
-  // check misusage of parameters:
-  if (m_PARAMtuneCutoffs <= -99.0 or m_PARAMtuneCutoffs > 1000.0) {
-    B2WARNING(m_PARAMnameOfInstance << ": chosen value for parameter 'tuneCutoffs' is invalid, reseting value to standard (=0.0)...")
-    m_PARAMtuneCutoffs = 0.;
-  } else {
-    m_PARAMtuneCutoffs = m_PARAMtuneCutoffs * 0.01; // reformatting to faster calculation
-  }
-  for (double & value : m_PARAMreserveHitsThreshold) {
-    if (value < 0. or value > 1.0) {
-      B2WARNING(m_PARAMnameOfInstance << ": chosen value for parameter 'reserveHitsThreshold' is invalid, reseting value to standard (=0.5)...")
-      value = 0.5;
-    }
-  }
-
-  if (m_PARAMactivateBaselineTF < 0 or m_PARAMactivateBaselineTF > 2) {
-    B2WARNING(m_PARAMnameOfInstance << ": chosen value (" << m_PARAMactivateBaselineTF << ")for parameter 'activateBaselineTF' is invalid, reseting value to standard (=1)...")
-    m_PARAMactivateBaselineTF = 1;
-  }
-
-  B2DEBUG(1, m_PARAMnameOfInstance << "::initialize: chosen calcQIType is '" << m_PARAMcalcQIType << "'")
-  if (m_PARAMcalcQIType == "trackLength") {
-    m_calcQiType = 0;
-  } else if (m_PARAMcalcQIType == "kalman") {
-    m_calcQiType = 1;
-  } else if (m_PARAMcalcQIType == "circleFit") {
-    m_calcQiType = 2;
-  } else if (m_PARAMcalcQIType == "straightLine") {
-    m_calcQiType = 3;
-  } else {
-    B2WARNING(m_PARAMnameOfInstance << "::initialize: chosen qiType '" << m_PARAMcalcQIType << "' is unknown, setting standard to circleFit...")
-    m_calcQiType = 2;
-  }
-
-  B2DEBUG(1, m_PARAMnameOfInstance << "::initialize: chosen calcSeedType is '" << m_PARAMcalcSeedType << "'")
-  if (m_PARAMcalcSeedType == "helixFit") {
-    m_calcSeedType = 0;
-  } else if (m_PARAMcalcSeedType == "straightLine") {
-    m_calcSeedType = 1;
-  } else {
-    B2WARNING(m_PARAMnameOfInstance << "::initialize: chosen seedType '" << m_PARAMcalcSeedType << "' is unknown, setting standard to helixFit...")
-    m_calcSeedType = 0;
-  }
-
-  B2DEBUG(1, m_PARAMnameOfInstance << "::initialize: chosen technique to filter overlapping TCs is '" << m_PARAMfilterOverlappingTCs << "'")
-  if (m_PARAMfilterOverlappingTCs == "hopfield") {
-    m_filterOverlappingTCs = 2;
-  } else if (m_PARAMfilterOverlappingTCs == "greedy") {
-    m_filterOverlappingTCs = 1;
-  } else if (m_PARAMfilterOverlappingTCs == "none") {
-    m_filterOverlappingTCs = 0;
-  } else {
-    B2WARNING(m_PARAMnameOfInstance << "::initialize: chosen technique to filter overlapping TCs '" << m_PARAMfilterOverlappingTCs << "' is unknown, setting standard to greedy...")
-    m_filterOverlappingTCs = 1;
-  }
-
-  if (m_PARAMwriteToRoot == true) {
-    m_PARAMrootFileName.at(0) += ".root";
-    m_rootFilePtr = new TFile(m_PARAMrootFileName.at(0).c_str(), m_PARAMrootFileName.at(1).c_str()); // alternative: UPDATE
-
-    m_treeEventWisePtr = new TTree("m_treeEventWisePtr", "anEventWiseTree");
-    m_treeEventWisePtr->Branch("duration", &m_rootTimeConsumption);
-
-    m_treeTrackWisePtr = new TTree("m_treeTrackWisePtr", "aTrackWiseTree");
-    m_treeTrackWisePtr->Branch("pValues", &m_rootPvalues);
-    m_treeTrackWisePtr->Branch("chi2Values", &m_rootChi2);
-    m_treeTrackWisePtr->Branch("circleRadii", &m_rootCircleRadius);
-    m_treeTrackWisePtr->Branch("ndfValues", &m_rootNdf);
-  } else {
-    m_rootFilePtr = NULL;
-    m_treeTrackWisePtr = NULL;
-  }
-
-
-  /** REDESIGNCOMMENT INITIALIZE 2:
-   ** short:
-   * register storearray-related stuff
-   *
-   ** long (+personal comments):
-   * some are only created if their related parameters are set to the values needed.
-   * additionally, one module parameter is not flagged with m_PARAM... but with m_TESTER... (which are parameters related only to testing purposes),
-   * such an inconsistency shall be surpressed for the redesign.
-   * DisplayCollector-related stuff is needed for display and for debugging, therefore always listed for debug-stuff too.
-   * creates dependencies of the testbeam package (TelCluster)
-   *
-   ** dependency of module parameters (global):
-   * m_PARAMgfTrackCandsColName, m_TESTERexpandedTestingRoutines, m_PARAMinfoBoardName,
-   * m_PARAMdisplayCollector, m_PARAMtelClustersName, m_PARAMpxdClustersName,
-   * m_PARAMsvdClustersName
-   *
-   ** dependency of global in-module variables:
-   * m_collector,
-   *
-   ** dependency of global stuff just because of B2XX-output or debugging only:
-   * m_PARAMnameOfInstance, m_PARAMinfoBoardName, m_PARAMdisplayCollector,
-   * m_collector
-   *
-   ** in-module-function-calls:
-   */
-
-  /// genfit::TrackCandidate
-  StoreArray<genfit::TrackCand>::registerPersistent(m_PARAMgfTrackCandsColName);
-
-  if (gGeoManager == NULL) {
-    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-    geoManager.createTGeoRepresentation();
-  }
-
-  if (!genfit::FieldManager::getInstance()->isInitialized())
-  { genfit::FieldManager::getInstance()->init(new GFGeant4Field()); }
-  if (!genfit::MaterialEffects::getInstance()->isInitialized())
-  { genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface()); }
-
-  genfit::MaterialEffects::getInstance()->setMscModel("Highland");
-
-  /// temporary members for testing purposes (minimal testing routines)
-  if (m_TESTERexpandedTestingRoutines == true) {
-    StoreArray<VXDTFInfoBoard>::registerPersistent(m_PARAMinfoBoardName);
-  }
-
-  // registerPersistence (StoreArrays & RelationArray) for the Collector
-  if (m_PARAMdisplayCollector > 0) {
-    B2DEBUG(10, "VXDTF: Display: Module Collector initPersistent");
-    m_collector.initPersistent();
-  }
-
-  StoreArray<TelCluster>::optional(m_PARAMtelClustersName);
-  StoreArray<PXDCluster>::optional(m_PARAMpxdClustersName);
-  StoreArray<SVDCluster>::optional(m_PARAMsvdClustersName);
+  prepareExternalTools();
 
   B2DEBUG(1, "       leaving VXD CA track finder (" << m_PARAMnameOfInstance << ") - initialize\n-----------------------------------------------");
 }
@@ -786,9 +624,10 @@ void VXDTFModule::initialize()
 
 void VXDTFModule::beginRun()
 {
+  // WARNING TODO WARNING: now, the following section is split into 3 different functions. -> split up the dependency-lists!
   /** REDESIGNCOMMENT BEGINRUN 1:
    ** short:
-   * setup for sectorMaps
+   * setup for sectorMaps used for passes
    *
    ** long (+personal comments):
    * all that stuff will move to the sectorMap-Module
@@ -848,667 +687,11 @@ void VXDTFModule::beginRun()
   B2INFO("-----------------------------------------------\n       entering VXD CA track finder (" << m_PARAMnameOfInstance << ") - beginRun.\n       if you want to have some basic infos during begin- and endrun about it, set debug level 1 or 2. Debug level 3 or more gives you event wise output (the higher the level, the more verbose it gets, highest level: 175)");
   B2DEBUG(50, "##### be careful, current TF status does not support more than one run per initialization! #####"); /// WARNING TODO: check whether this is still valid
 
+  setupPasses();
 
-  // here some variables copied from the passes (will be rewritten for each pass, therefore only the settings of the last pass will survive)
-  TVector3 origin;
-  string detectorType;
-  /// for each setup, fill parameters, calc numTotalLayers... TODO: failsafe implementation (currently no protection against bad user imputs) lacks of style, longterm goal, export that procedure into a function
+  if (m_PARAMactivateBaselineTF != 0) { setupBaseLineTF(); }
 
-  m_usePXDHits = false, m_useSVDHits = false, m_useTELHits = false;
-
-  m_nSectorSetups = m_PARAMsectorSetup.size();
-
-
-  for (int i = 0; i < m_nSectorSetups; ++i) {
-
-    PassData* newPass = new PassData;
-
-    newPass->sectorSetup = m_PARAMsectorSetup.at(i);
-    newPass->generalTune = m_PARAMtuneCutoffs; // for all passes the same
-
-    VXDTFSecMap::Class(); // essential, needed for root, waiting for root 6 to be removed (hopefully)
-    string chosenSetup = newPass->sectorSetup;
-    string directory = "/Detector/Tracking/CATFParameters/" + chosenSetup;
-    const VXDTFSecMap* newMap = NULL;
-    try {
-      newMap = dynamic_cast<const VXDTFSecMap*>(Gearbox::getInstance().getTObject(directory.c_str()));
-    } catch (exception& e) {
-      B2FATAL("VXDTFModule::initialize: could not load sectorMap. Reason: exception thrown: " << e.what() << ", this means you have to check whether the sectorMaps stored in ../tracking/data/VXDTFindex.xml and/or ../testbeam/vxd/data/VXDTFindexTF.xml are uncommented and locally unpacked and available!")
-    }
-
-    const double magneticField = newMap->getMagneticFieldStrength();
-    newPass->magneticFieldStrength = magneticField;
-    newPass->threeHitFilterBox.resetMagneticField(magneticField);
-    newPass->fourHitFilterBox.resetMagneticField(magneticField);
-    newPass->trackletFilterBox.resetMagneticField(magneticField);
-
-    newPass->additionalInfo = newMap->getAdditionalInfo();
-
-    newPass->secConfigU = newMap->getSectorConfigU();
-    newPass->secConfigV = newMap->getSectorConfigV();
-    origin = newMap->getOrigin();
-    newPass->origin = origin;
-    stringstream secConU, secConV;
-    for (double entry : newPass->secConfigU) { secConU << " " << entry; }
-    for (double entry : newPass->secConfigV) { secConV << " " << entry; }
-    B2INFO(" pass " << newPass->sectorSetup << "-setting: got magneticFieldStrength: " << magneticField << ", origin at: (" << origin[0] << "," << origin[1] << "," << origin[2] << ") and sectorConfig \n U: " << secConU.str() << endl << " V: " << secConV.str() << endl << " and additional Info: " << newPass->additionalInfo)
-
-
-    if (int (m_PARAMhighestAllowedLayer.size()) < i + 1) {
-      B2DEBUG(1, m_PARAMnameOfInstance << "highestAllowedLayer not set for each sectorMap, copying first choice (you can ignore this warning if you don't want to set parameters for each pass separately)")
-      newPass->highestAllowedLayer = m_PARAMhighestAllowedLayer.at(m_PARAMhighestAllowedLayer.size() - 1);
-    } else {
-      newPass->highestAllowedLayer = m_PARAMhighestAllowedLayer.at(i);
-    }
-    detectorType = newMap->getDetectorType();
-    newPass->chosenDetectorType = detectorType;
-    newPass->numTotalLayers = 0;
-
-    if (detectorType.find("SVD") != std::string::npos) {
-      m_useSVDHits = true;
-      newPass->useSVDHits = true;
-      newPass->numTotalLayers += 4; // WARNING hardcoded! can we get this info from the system itself? WARNING find where this is still used and find out its purpose (dangerous when some layers are missing?)
-
-    }
-    if (detectorType.find("PXD") != std::string::npos) {
-      m_usePXDHits = true;
-      newPass->usePXDHits = true;
-      newPass->numTotalLayers += 2; // WARNING hardcoded! can we get this info from the system itself? WARNING find where this is still used and find out its purpose (dangerous when some layers are missing?)
-
-    }
-    if (detectorType.find("TEL") != std::string::npos) { // using const::Test as Telescope setter
-      m_useTELHits = true;
-      newPass->useTELHits = true;
-      newPass->numTotalLayers += 1; // WARNING hardcoded! can we get this info from the system itself? WARNING find where this is still used and find out its purpose (dangerous when some layers are missing?)
-    }
-    if (m_usePXDHits == false and m_useSVDHits == false and m_useTELHits == false) {
-      B2ERROR(m_PARAMnameOfInstance << "Pass " << i << " with setting '" << chosenSetup << "': chosen detectorType via param 'detectorType' (" << detectorType << ") is invalid, resetting value to standard (=VXD)")
-      m_useSVDHits = true;
-      m_usePXDHits = true;
-      newPass->chosenDetectorType = "VXD";
-      newPass->usePXDHits = true;
-      newPass->useSVDHits = true;
-    }
-
-
-    newPass->numTotalLayers = newPass->numTotalLayers - (6 - newPass->highestAllowedLayer);
-    if (newPass->numTotalLayers < 2) { newPass->numTotalLayers = 2; }   // to avoid division by zero in some cases
-    B2DEBUG(1, m_PARAMnameOfInstance << "Pass " << i << ": chosen detectorType: " << newPass->chosenDetectorType << " and chosen sectorSetup: " << newPass->sectorSetup)
-
-
-    if (int (m_PARAMreserveHitsThreshold.size()) < i + 1) {
-      B2DEBUG(1, "reserveHitsThreshold not set for each sectorMap, copying first choice (you can ignore this warning if you don't want to set parameters for each pass separately)")
-      newPass->reserveHitsThreshold = m_PARAMreserveHitsThreshold.at(m_PARAMreserveHitsThreshold.size() - 1) ;
-    } else {
-      newPass->reserveHitsThreshold = m_PARAMreserveHitsThreshold.at(i);
-      if (newPass->reserveHitsThreshold < 0) { newPass->reserveHitsThreshold = 0; } else if (newPass->reserveHitsThreshold > 1.) { newPass->reserveHitsThreshold = 1.; }
-    }
-    if (int (m_PARAMminLayer.size()) < i + 1) {
-      B2DEBUG(1, m_PARAMnameOfInstance << "minLayer not set for each sectorMap, copying first choice (you can ignore this warning if you don't want to set parameters for each pass separately)")
-      newPass->minLayer = m_PARAMminLayer.at(m_PARAMminLayer.size() - 1);
-    } else {
-      newPass->minLayer = m_PARAMminLayer.at(i);
-    }
-    if (int (m_PARAMminState.size()) < i + 1) {
-      B2DEBUG(1, m_PARAMnameOfInstance << "minState not set for each sectorMap, copying first choice (you can ignore this warning if you don't want to set parameters for each pass separately)")
-      newPass->minState = m_PARAMminState.at(m_PARAMminState.size() - 1);
-    } else {
-      newPass->minState = m_PARAMminState.at(i);
-    }
-
-    B2DEBUG(10, "starting import of segFinderFilters:")
-
-    int sfCtr = 0, sfhoCtr = 0, nfCtr = 0, nfhoCtr = 0, tccfCtr = 0; // counting number of activated tests for each filter step
-    ///sFinder:
-    if (int (m_PARAMactivateDistance3D.size()) < i + 1) {
-      newPass->distance3D.first = m_PARAMactivateDistance3D.at(m_PARAMactivateDistance3D.size() - 1);
-    } else {
-      newPass->distance3D.first = m_PARAMactivateDistance3D.at(i);
-    }
-    if (int (m_PARAMactivateDistanceXY.size()) < i + 1) {
-      newPass->distanceXY.first = m_PARAMactivateDistanceXY.at(m_PARAMactivateDistanceXY.size() - 1);
-    } else {
-      newPass->distanceXY.first = m_PARAMactivateDistanceXY.at(i);;
-    }
-    if (int (m_PARAMactivateDistanceZ.size()) < i + 1) {
-      newPass->distanceZ.first = m_PARAMactivateDistanceZ.at(m_PARAMactivateDistanceZ.size() - 1);
-    } else {
-      newPass->distanceZ.first = m_PARAMactivateDistanceZ.at(i);
-    }
-    if (int (m_PARAMactivateSlopeRZ.size()) < i + 1) {
-      newPass->slopeRZ.first = m_PARAMactivateSlopeRZ.at(m_PARAMactivateSlopeRZ.size() - 1);
-    } else {
-      newPass->slopeRZ.first = m_PARAMactivateSlopeRZ.at(i);
-    }
-    if (int (m_PARAMactivateNormedDistance3D.size()) < i + 1) {
-      newPass->normedDistance3D.first = m_PARAMactivateNormedDistance3D.at(m_PARAMactivateNormedDistance3D.size() - 1);
-    } else {
-      newPass->normedDistance3D.first = m_PARAMactivateNormedDistance3D.at(i);
-    }
-    if (int (m_PARAMactivateAlwaysTrue2Hit.size()) < i + 1) {
-      newPass->alwaysTrue2Hit.first = m_PARAMactivateAlwaysTrue2Hit.at(m_PARAMactivateAlwaysTrue2Hit.size() - 1);
-    } else {
-      newPass->alwaysTrue2Hit.first = m_PARAMactivateAlwaysTrue2Hit.at(i);
-    }
-    if (int (m_PARAMactivateAlwaysFalse2Hit.size()) < i + 1) {
-      newPass->alwaysFalse2Hit.first = m_PARAMactivateAlwaysFalse2Hit.at(m_PARAMactivateAlwaysFalse2Hit.size() - 1);
-    } else {
-      newPass->alwaysFalse2Hit.first = m_PARAMactivateAlwaysFalse2Hit.at(i);
-    }
-    if (int (m_PARAMactivateRandom2Hit.size()) < i + 1) {
-      newPass->random2Hit.first = m_PARAMactivateRandom2Hit.at(m_PARAMactivateRandom2Hit.size() - 1);
-    } else {
-      newPass->random2Hit.first = m_PARAMactivateRandom2Hit.at(i);
-    }
-    if (newPass->distance3D.first == true) { sfCtr++; }
-    if (newPass->distanceXY.first == true) { sfCtr++; }
-    if (newPass->distanceZ.first == true) { sfCtr++; }
-    if (newPass->slopeRZ.first == true) { sfCtr++; }
-    if (newPass->normedDistance3D.first == true) { sfCtr++; }
-    if (newPass->alwaysTrue2Hit.first == true) { sfCtr++; }
-    if (newPass->alwaysFalse2Hit.first == true) { sfCtr++; }
-    if (newPass->random2Hit.first == true) { sfCtr++; }
-    B2DEBUG(2, "finished importing segFinderFilters, " << sfCtr << " filters imported")
-    ///sFinder ho finder (2+1 hit)
-    B2DEBUG(10, "starting import of segFinderHioCFilters:")
-    if (int (m_PARAMactivateAngles3DHioC.size()) < i + 1) {
-      newPass->anglesHighOccupancy3D.first = m_PARAMactivateAngles3DHioC.at(m_PARAMactivateAngles3DHioC.size() - 1);
-    } else {
-      newPass->anglesHighOccupancy3D.first =  m_PARAMactivateAngles3DHioC.at(i);
-    }
-    if (int (m_PARAMactivateAnglesXYHioC.size()) < i + 1) {
-      newPass->anglesHighOccupancyXY.first = m_PARAMactivateAnglesXYHioC.at(m_PARAMactivateAnglesXYHioC.size() - 1);
-    } else {
-      newPass->anglesHighOccupancyXY.first = m_PARAMactivateAnglesXYHioC.at(i);
-    }
-    if (int (m_PARAMactivateAnglesRZHioC.size()) < i + 1) {
-      newPass->anglesHighOccupancyRZ.first = m_PARAMactivateAnglesRZHioC.at(m_PARAMactivateAnglesRZHioC.size() - 1);
-    } else {
-      newPass->anglesHighOccupancyRZ.first = m_PARAMactivateAnglesRZHioC.at(i);
-    }
-    if (int (m_PARAMactivateDeltaSlopeRZHioC.size()) < i + 1) {
-      newPass->deltaSlopeHighOccupancyRZ.first = m_PARAMactivateDeltaSlopeRZHioC.at(m_PARAMactivateDeltaSlopeRZHioC.size() - 1);
-    } else {
-      newPass->deltaSlopeHighOccupancyRZ.first = m_PARAMactivateDeltaSlopeRZHioC.at(i);
-    }
-    if (int (m_PARAMactivateDistance2IPHioC.size()) < i + 1) {
-      newPass->distanceHighOccupancy2IP.first = m_PARAMactivateDistance2IPHioC.at(m_PARAMactivateDistance2IPHioC.size() - 1);
-    } else {
-      newPass->distanceHighOccupancy2IP.first =  m_PARAMactivateDistance2IPHioC.at(i);
-    }
-    if (int (m_PARAMactivatePTHioC.size()) < i + 1) {
-      newPass->pTHighOccupancy.first = m_PARAMactivatePTHioC.at(m_PARAMactivatePTHioC.size() - 1);
-    } else {
-      newPass->pTHighOccupancy.first =  m_PARAMactivatePTHioC.at(i);
-    }
-    if (int (m_PARAMactivateHelixParameterFitHioC.size()) < i + 1) {
-      newPass->helixParameterHighOccupancyFit.first = m_PARAMactivateHelixParameterFitHioC.at(m_PARAMactivateHelixParameterFitHioC.size() - 1);
-    } else {
-      newPass->helixParameterHighOccupancyFit.first =  m_PARAMactivateHelixParameterFitHioC.at(i);
-    }
-    if (newPass->anglesHighOccupancy3D.first == true) { sfhoCtr++; }
-    if (newPass->anglesHighOccupancyXY.first == true) { sfhoCtr++; }
-    if (newPass->anglesHighOccupancyRZ.first == true) { sfhoCtr++; }
-    if (newPass->deltaSlopeHighOccupancyRZ.first == true) { sfhoCtr++; }
-    if (newPass->distanceHighOccupancy2IP.first == true) { sfhoCtr++; }
-    if (newPass->pTHighOccupancy.first == true) { sfhoCtr++; }
-    if (newPass->helixParameterHighOccupancyFit.first == true) { sfhoCtr++; }
-    B2DEBUG(2, "finished importing segFinderHioCFilters, " << sfhoCtr << " filters imported")
-
-    ///nbFinder:
-    B2DEBUG(10, "starting import of nbFinderFilters:")
-    if (int (m_PARAMactivateAngles3D.size()) < i + 1) {
-      newPass->angles3D.first = m_PARAMactivateAngles3D.at(m_PARAMactivateAngles3D.size() - 1);
-    } else {
-      newPass->angles3D.first =  m_PARAMactivateAngles3D.at(i);
-    }
-    if (int (m_PARAMactivateAnglesXY.size()) < i + 1) {
-      newPass->anglesXY.first = m_PARAMactivateAnglesXY.at(m_PARAMactivateAnglesXY.size() - 1);
-    } else {
-      newPass->anglesXY.first = m_PARAMactivateAnglesXY.at(i);
-    }
-    if (int (m_PARAMactivateAnglesRZ.size()) < i + 1) {
-      newPass->anglesRZ.first = m_PARAMactivateAnglesRZ.at(m_PARAMactivateAnglesRZ.size() - 1);
-    } else {
-      newPass->anglesRZ.first = m_PARAMactivateAnglesRZ.at(i);
-    }
-    if (int (m_PARAMactivateDeltaSlopeRZ.size()) < i + 1) {
-      newPass->deltaSlopeRZ.first = m_PARAMactivateDeltaSlopeRZ.at(m_PARAMactivateDeltaSlopeRZ.size() - 1);
-    } else {
-      newPass->deltaSlopeRZ.first = m_PARAMactivateDeltaSlopeRZ.at(i);
-    }
-    if (int (m_PARAMactivateDistance2IP.size()) < i + 1) {
-      newPass->distance2IP.first = m_PARAMactivateDistance2IP.at(m_PARAMactivateDistance2IP.size() - 1);
-    } else {
-      newPass->distance2IP.first =  m_PARAMactivateDistance2IP.at(i);
-    }
-    if (int (m_PARAMactivatePT.size()) < i + 1) {
-      newPass->pT.first = m_PARAMactivatePT.at(m_PARAMactivatePT.size() - 1);
-    } else {
-      newPass->pT.first =  m_PARAMactivatePT.at(i);
-    }
-    if (int (m_PARAMactivateHelixParameterFit.size()) < i + 1) {
-      newPass->helixParameterFit.first = m_PARAMactivateHelixParameterFit.at(m_PARAMactivateHelixParameterFit.size() - 1);
-    } else {
-      newPass->helixParameterFit.first =  m_PARAMactivateHelixParameterFit.at(i);
-    }
-    if (int (m_PARAMactivateDeltaSOverZ.size()) < i + 1) {
-      newPass->deltaSOverZ.first = m_PARAMactivateDeltaSOverZ.at(m_PARAMactivateDeltaSOverZ.size() - 1);
-    } else {
-      newPass->deltaSOverZ.first =  m_PARAMactivateDeltaSOverZ.at(i);
-    }
-    if (int (m_PARAMactivateDeltaSlopeZOverS.size()) < i + 1) {
-      newPass->deltaSlopeZOverS.first = m_PARAMactivateDeltaSlopeZOverS.at(m_PARAMactivateDeltaSlopeZOverS.size() - 1);
-    } else {
-      newPass->deltaSlopeZOverS.first =  m_PARAMactivateDeltaSlopeZOverS.at(i);
-    }
-    if (int (m_PARAMactivateAlwaysTrue3Hit.size()) < i + 1) {
-      newPass->alwaysTrue3Hit.first = m_PARAMactivateAlwaysTrue3Hit.at(m_PARAMactivateAlwaysTrue3Hit.size() - 1);
-    } else {
-      newPass->alwaysTrue3Hit.first = m_PARAMactivateAlwaysTrue3Hit.at(i);
-    }
-    if (int (m_PARAMactivateAlwaysFalse3Hit.size()) < i + 1) {
-      newPass->alwaysFalse3Hit.first = m_PARAMactivateAlwaysFalse3Hit.at(m_PARAMactivateAlwaysFalse3Hit.size() - 1);
-    } else {
-      newPass->alwaysFalse3Hit.first = m_PARAMactivateAlwaysFalse3Hit.at(i);
-    }
-    if (int (m_PARAMactivateRandom3Hit.size()) < i + 1) {
-      newPass->random3Hit.first = m_PARAMactivateRandom3Hit.at(m_PARAMactivateRandom3Hit.size() - 1);
-    } else {
-      newPass->random3Hit.first = m_PARAMactivateRandom3Hit.at(i);
-    }
-    if (newPass->angles3D.first == true) { nfCtr++; }
-    if (newPass->anglesXY.first == true) { nfCtr++; }
-    if (newPass->anglesRZ.first == true) { nfCtr++; }
-    if (newPass->deltaSlopeRZ.first == true) { nfCtr++; }
-    if (newPass->distance2IP.first == true) { nfCtr++; }
-    if (newPass->pT.first == true) { nfCtr++; }
-    if (newPass->helixParameterFit.first == true) { nfCtr++; }
-    if (newPass->deltaSOverZ.first == true) { nfCtr++; }
-    if (newPass->deltaSlopeZOverS.first == true) { nfCtr++; }
-    if (newPass->alwaysTrue3Hit.first == true) { nfCtr++; }
-    if (newPass->alwaysFalse3Hit.first == true) { nfCtr++; }
-    if (newPass->random3Hit.first == true) { nfCtr++; }
-    B2DEBUG(2, "finished importing nFinderFilters, " << nfCtr << " filters imported")
-    ///nFinder ho finder (3+1 hit)
-    B2DEBUG(10, "starting import of nbFinderHioCFilters:")
-    if (int (m_PARAMactivateDeltaPtHioC.size()) < i + 1) {
-      newPass->deltaPtHighOccupancy.first = m_PARAMactivateDeltaPtHioC.at(m_PARAMactivateDeltaPtHioC.size() - 1);
-    } else {
-      newPass->deltaPtHighOccupancy.first = m_PARAMactivateDeltaPtHioC.at(i);
-    }
-    if (int (m_PARAMactivateDeltaDistance2IPHioC.size()) < i + 1) {
-      newPass->deltaDistanceHighOccupancy2IP.first = m_PARAMactivateDeltaDistance2IPHioC.at(m_PARAMactivateDeltaDistance2IPHioC.size() - 1);
-    } else {
-      newPass->deltaDistanceHighOccupancy2IP.first = m_PARAMactivateDeltaDistance2IPHioC.at(i);
-    }
-    if (newPass->deltaPtHighOccupancy.first == true) { nfhoCtr++; }
-    if (newPass->deltaDistanceHighOccupancy2IP.first == true) { nfhoCtr++; }
-
-    /// post-TCC-filter:
-    if (int (m_PARAMactivateZigZagXY.size()) < i + 1) {
-      newPass->zigzagXY.first = m_PARAMactivateZigZagXY.at(m_PARAMactivateZigZagXY.size() - 1);
-    } else {
-      newPass->zigzagXY.first = m_PARAMactivateZigZagXY.at(i);
-    }
-    if (int (m_PARAMactivateZigZagXYWithSigma.size()) < i + 1) {
-      newPass->zigzagXYWithSigma.first = m_PARAMactivateZigZagXYWithSigma.at(m_PARAMactivateZigZagXYWithSigma.size() - 1);
-    } else {
-      newPass->zigzagXYWithSigma.first = m_PARAMactivateZigZagXYWithSigma.at(i);
-    }
-    if (int (m_PARAMactivateZigZagRZ.size()) < i + 1) {
-      newPass->zigzagRZ.first = m_PARAMactivateZigZagRZ.at(m_PARAMactivateZigZagRZ.size() - 1);
-    } else {
-      newPass->zigzagRZ.first = m_PARAMactivateZigZagRZ.at(i);
-    }
-    if (int (m_PARAMactivateDeltaPt.size()) < i + 1) {
-      newPass->deltaPt.first = m_PARAMactivateDeltaPt.at(m_PARAMactivateDeltaPt.size() - 1);
-    } else {
-      newPass->deltaPt.first = m_PARAMactivateDeltaPt.at(i);
-    }
-    if (int (m_PARAMactivateCircleFit.size()) < i + 1) {
-      newPass->circleFit.first = m_PARAMactivateCircleFit.at(m_PARAMactivateCircleFit.size() - 1);
-    } else {
-      newPass->circleFit.first = m_PARAMactivateCircleFit.at(i);
-    }
-    if (int (m_PARAMactivateDeltaDistance2IP.size()) < i + 1) {
-      newPass->deltaDistance2IP.first = m_PARAMactivateDeltaDistance2IP.at(m_PARAMactivateDeltaDistance2IP.size() - 1);
-    } else {
-      newPass->deltaDistance2IP.first = m_PARAMactivateDeltaDistance2IP.at(i);
-    }
-    if (int (m_PARAMactivateAlwaysTrue4Hit.size()) < i + 1) {
-      newPass->alwaysTrue4Hit.first = m_PARAMactivateAlwaysTrue4Hit.at(m_PARAMactivateAlwaysTrue4Hit.size() - 1);
-    } else {
-      newPass->alwaysTrue4Hit.first = m_PARAMactivateAlwaysTrue4Hit.at(i);
-    }
-    if (int (m_PARAMactivateAlwaysFalse4Hit.size()) < i + 1) {
-      newPass->alwaysFalse4Hit.first = m_PARAMactivateAlwaysFalse4Hit.at(m_PARAMactivateAlwaysFalse4Hit.size() - 1);
-    } else {
-      newPass->alwaysFalse4Hit.first = m_PARAMactivateAlwaysFalse4Hit.at(i);
-    }
-    if (int (m_PARAMactivateRandom4Hit.size()) < i + 1) {
-      newPass->random4Hit.first = m_PARAMactivateRandom4Hit.at(m_PARAMactivateRandom4Hit.size() - 1);
-    } else {
-      newPass->random4Hit.first = m_PARAMactivateRandom4Hit.at(i);
-    }
-    if (newPass->zigzagXY.first == true) { tccfCtr++; }
-    if (newPass->zigzagXYWithSigma.first == true) { tccfCtr++; }
-    if (newPass->zigzagRZ.first == true) { tccfCtr++; }
-    if (newPass->deltaPt.first == true) { tccfCtr++; }
-    if (newPass->circleFit.first == true) { tccfCtr++; }
-    if (newPass->deltaDistance2IP.first == true) { tccfCtr++; }
-    if (newPass->alwaysTrue4Hit.first == true) { tccfCtr++; }
-    if (newPass->alwaysFalse4Hit.first == true) { tccfCtr++; }
-    if (newPass->random4Hit.first == true) { tccfCtr++; }
-
-    newPass->activatedSegFinderTests = sfCtr;
-    newPass->activatedHighOccupancySegFinderTests = sfhoCtr;
-    newPass->activatedNbFinderTests = nfCtr;
-    newPass->activatedHighOccupancyNbFinderTests = nfhoCtr;
-    newPass->activatedTccFilterTests = tccfCtr;
-    B2DEBUG(2, "finished importing nFinderHioCFilters, " << tccfCtr << " filters imported")
-    B2DEBUG(1, m_PARAMnameOfInstance << "Pass " << i << " VXD Track finder: " << sfCtr << " segFinder tests, " << nfCtr << " friendFinder tests and " << tccfCtr << " TCC filter tests are enabled. HighOccupancy-mode activated for > " << m_PARAMhighOccupancyThreshold << " hits per sensor");
-
-    B2DEBUG(10, "starting import of tuning values for filters:")
-    if (int (m_PARAMtuneDistance3D.size()) < i + 1) {
-      newPass->distance3D.second = m_PARAMtuneDistance3D.at(m_PARAMtuneDistance3D.size() - 1);
-    } else {
-      newPass->distance3D.second = m_PARAMtuneDistance3D.at(i);
-    }
-    if (int (m_PARAMtuneDistanceXY.size()) < i + 1) {
-      newPass->distanceXY.second = m_PARAMtuneDistanceXY.at(m_PARAMtuneDistanceXY.size() - 1);
-    } else {
-      newPass->distanceXY.second = m_PARAMtuneDistanceXY.at(i);;
-    }
-    if (int (m_PARAMtuneDistanceZ.size()) < i + 1) {
-      newPass->distanceZ.second = m_PARAMtuneDistanceZ.at(m_PARAMtuneDistanceZ.size() - 1);
-    } else {
-      newPass->distanceZ.second = m_PARAMtuneDistanceZ.at(i);
-    }
-    if (int (m_PARAMtuneSlopeRZ.size()) < i + 1) {
-      newPass->slopeRZ.second = m_PARAMtuneSlopeRZ.at(m_PARAMtuneSlopeRZ.size() - 1);
-    } else {
-      newPass->slopeRZ.second = m_PARAMtuneSlopeRZ.at(i);
-    }
-    if (int (m_PARAMtuneNormedDistance3D.size()) < i + 1) {
-      newPass->normedDistance3D.second = m_PARAMtuneNormedDistance3D.at(m_PARAMtuneNormedDistance3D.size() - 1);
-    } else {
-      newPass->normedDistance3D.second = m_PARAMtuneNormedDistance3D.at(i);
-    }
-    if (int (m_PARAMtuneAlwaysTrue2Hit.size()) < i + 1) {
-      newPass->alwaysTrue2Hit.second = m_PARAMtuneAlwaysTrue2Hit.at(m_PARAMtuneAlwaysTrue2Hit.size() - 1);
-    } else {
-      newPass->alwaysTrue2Hit.second = m_PARAMtuneAlwaysTrue2Hit.at(i);
-    }
-    if (int (m_PARAMtuneAlwaysFalse2Hit.size()) < i + 1) {
-      newPass->alwaysFalse2Hit.second = m_PARAMtuneAlwaysFalse2Hit.at(m_PARAMtuneAlwaysFalse2Hit.size() - 1);
-    } else {
-      newPass->alwaysFalse2Hit.second = m_PARAMtuneAlwaysFalse2Hit.at(i);
-    }
-    if (int (m_PARAMtuneRandom2Hit.size()) < i + 1) {
-      newPass->random2Hit.second = m_PARAMtuneRandom2Hit.at(m_PARAMtuneRandom2Hit.size() - 1);
-    } else {
-      newPass->random2Hit.second = m_PARAMtuneRandom2Hit.at(i);
-    }
-    if (int (m_PARAMtuneAngles3D.size()) < i + 1) {
-      newPass->angles3D.second = m_PARAMtuneAngles3D.at(m_PARAMtuneAngles3D.size() - 1);
-    } else {
-      newPass->angles3D.second =  m_PARAMtuneAngles3D.at(i);
-    }
-    if (int (m_PARAMtuneAnglesXY.size()) < i + 1) {
-      newPass->anglesXY.second = m_PARAMtuneAnglesXY.at(m_PARAMtuneAnglesXY.size() - 1);
-    } else {
-      newPass->anglesXY.second = m_PARAMtuneAnglesXY.at(i);
-    }
-    if (int (m_PARAMtuneAnglesRZ.size()) < i + 1) {
-      newPass->anglesRZ.second = m_PARAMtuneAnglesRZ.at(m_PARAMtuneAnglesRZ.size() - 1);
-    } else {
-      newPass->anglesRZ.second = m_PARAMtuneAnglesRZ.at(i);
-    }
-    if (int (m_PARAMtuneDeltaSlopeRZ.size()) < i + 1) {
-      newPass->deltaSlopeRZ.second = m_PARAMtuneDeltaSlopeRZ.at(m_PARAMtuneDeltaSlopeRZ.size() - 1);
-    } else {
-      newPass->deltaSlopeRZ.second = m_PARAMtuneDeltaSlopeRZ.at(i);
-    }
-    if (int (m_PARAMtuneDistance2IP.size()) < i + 1) {
-      newPass->distance2IP.second = m_PARAMtuneDistance2IP.at(m_PARAMtuneDistance2IP.size() - 1);
-    } else {
-      newPass->distance2IP.second =  m_PARAMtuneDistance2IP.at(i);
-    }
-    if (int (m_PARAMtunePT.size()) < i + 1) {
-      newPass->pT.second = m_PARAMtunePT.at(m_PARAMtunePT.size() - 1);
-    } else {
-      newPass->pT.second =  m_PARAMtunePT.at(i);
-    }
-    if (int (m_PARAMtuneHelixParameterFit.size()) < i + 1) {
-      newPass->helixParameterFit.second = m_PARAMtuneHelixParameterFit.at(m_PARAMtuneHelixParameterFit.size() - 1);
-    } else {
-      newPass->helixParameterFit.second =  m_PARAMtuneHelixParameterFit.at(i);
-    }
-    if (int (m_PARAMtuneDeltaSOverZ.size()) < i + 1) {
-      newPass->deltaSOverZ.second = m_PARAMtuneDeltaSOverZ.at(m_PARAMtuneDeltaSOverZ.size() - 1);
-    } else {
-      newPass->deltaSOverZ.second =  m_PARAMtuneDeltaSOverZ.at(i);
-    }
-    if (int (m_PARAMtuneDeltaSlopeZOverS.size()) < i + 1) {
-      newPass->deltaSlopeZOverS.second = m_PARAMtuneDeltaSlopeZOverS.at(m_PARAMtuneDeltaSlopeZOverS.size() - 1);
-    } else {
-      newPass->deltaSlopeZOverS.second =  m_PARAMtuneDeltaSlopeZOverS.at(i);
-    }
-    if (int (m_PARAMtuneAlwaysTrue3Hit.size()) < i + 1) {
-      newPass->alwaysTrue3Hit.second = m_PARAMtuneAlwaysTrue3Hit.at(m_PARAMtuneAlwaysTrue3Hit.size() - 1);
-    } else {
-      newPass->alwaysTrue3Hit.second = m_PARAMtuneAlwaysTrue3Hit.at(i);
-    }
-    if (int (m_PARAMtuneAlwaysFalse3Hit.size()) < i + 1) {
-      newPass->alwaysFalse3Hit.second = m_PARAMtuneAlwaysFalse3Hit.at(m_PARAMtuneAlwaysFalse3Hit.size() - 1);
-    } else {
-      newPass->alwaysFalse3Hit.second = m_PARAMtuneAlwaysFalse3Hit.at(i);
-    }
-    if (int (m_PARAMtuneRandom3Hit.size()) < i + 1) {
-      newPass->random3Hit.second = m_PARAMtuneRandom3Hit.at(m_PARAMtuneRandom3Hit.size() - 1);
-    } else {
-      newPass->random3Hit.second = m_PARAMtuneRandom3Hit.at(i);
-    }
-    if (int (m_PARAMtuneZigZagXY.size()) < i + 1) {
-      newPass->zigzagXY.second = m_PARAMtuneZigZagXY.at(m_PARAMtuneZigZagXY.size() - 1);
-    } else {
-      newPass->zigzagXY.second = m_PARAMtuneZigZagXY.at(i);
-    }
-    if (int (m_PARAMtuneZigZagXYWithSigma.size()) < i + 1) {
-      newPass->zigzagXYWithSigma.second = m_PARAMtuneZigZagXYWithSigma.at(m_PARAMtuneZigZagXYWithSigma.size() - 1);
-    } else {
-      newPass->zigzagXYWithSigma.second = m_PARAMtuneZigZagXYWithSigma.at(i);
-    }
-    if (int (m_PARAMtuneZigZagRZ.size()) < i + 1) {
-      newPass->zigzagRZ.second = m_PARAMtuneZigZagRZ.at(m_PARAMtuneZigZagRZ.size() - 1);
-    } else {
-      newPass->zigzagRZ.second = m_PARAMtuneZigZagRZ.at(i);
-    }
-    if (int (m_PARAMtuneDeltaPt.size()) < i + 1) {
-      newPass->deltaPt.second = m_PARAMtuneDeltaPt.at(m_PARAMtuneDeltaPt.size() - 1);
-    } else {
-      newPass->deltaPt.second = m_PARAMtuneDeltaPt.at(i);
-    }
-    if (int (m_PARAMtuneDeltaDistance2IP.size()) < i + 1) {
-      newPass->deltaDistance2IP.second = m_PARAMtuneDeltaDistance2IP.at(m_PARAMtuneDeltaDistance2IP.size() - 1);
-    } else {
-      newPass->deltaDistance2IP.second = m_PARAMtuneDeltaDistance2IP.at(i);
-    }
-    if (int (m_PARAMtuneAlwaysTrue4Hit.size()) < i + 1) {
-      newPass->alwaysTrue4Hit.second = m_PARAMtuneAlwaysTrue4Hit.at(m_PARAMtuneAlwaysTrue4Hit.size() - 1);
-    } else {
-      newPass->alwaysTrue4Hit.second = m_PARAMtuneAlwaysTrue4Hit.at(i);
-    }
-    if (int (m_PARAMtuneAlwaysFalse4Hit.size()) < i + 1) {
-      newPass->alwaysFalse4Hit.second = m_PARAMtuneAlwaysFalse4Hit.at(m_PARAMtuneAlwaysFalse4Hit.size() - 1);
-    } else {
-      newPass->alwaysFalse4Hit.second = m_PARAMtuneAlwaysFalse4Hit.at(i);
-    }
-    if (int (m_PARAMtuneRandom4Hit.size()) < i + 1) {
-      newPass->random4Hit.second = m_PARAMtuneRandom4Hit.at(m_PARAMtuneRandom4Hit.size() - 1);
-    } else {
-      newPass->random4Hit.second = m_PARAMtuneRandom4Hit.at(i);
-    }
-    if (int (m_PARAMtuneCircleFit.size()) < i + 1) {
-      newPass->circleFit.second = m_PARAMtuneCircleFit.at(m_PARAMtuneCircleFit.size() - 1);
-    } else {
-      newPass->circleFit.second = m_PARAMtuneCircleFit.at(i);
-    }
-    B2DEBUG(10, "starting import of tuning values of HioC filters:")
-    // high occupancy cases:
-    if (int (m_PARAMtuneAngles3DHioC.size()) < i + 1) {
-      newPass->anglesHighOccupancy3D.second = m_PARAMtuneAngles3DHioC.at(m_PARAMtuneAngles3DHioC.size() - 1);
-    } else {
-      newPass->anglesHighOccupancy3D.second =  m_PARAMtuneAngles3DHioC.at(i);
-    }
-    if (int (m_PARAMtuneAnglesXYHioC.size()) < i + 1) {
-      newPass->anglesHighOccupancyXY.second = m_PARAMtuneAnglesXYHioC.at(m_PARAMtuneAnglesXYHioC.size() - 1);
-    } else {
-      newPass->anglesHighOccupancyXY.second = m_PARAMtuneAnglesXYHioC.at(i);
-    }
-    if (int (m_PARAMtuneAnglesRZHioC.size()) < i + 1) {
-      newPass->anglesHighOccupancyRZ.second = m_PARAMtuneAnglesRZHioC.at(m_PARAMtuneAnglesRZHioC.size() - 1);
-    } else {
-      newPass->anglesHighOccupancyRZ.second = m_PARAMtuneAnglesRZHioC.at(i);
-    }
-    if (int (m_PARAMtuneDeltaSlopeRZHioC.size()) < i + 1) {
-      newPass->deltaSlopeHighOccupancyRZ.second = m_PARAMtuneDeltaSlopeRZHioC.at(m_PARAMtuneDeltaSlopeRZHioC.size() - 1);
-    } else {
-      newPass->deltaSlopeHighOccupancyRZ.second = m_PARAMtuneDeltaSlopeRZHioC.at(i);
-    }
-    if (int (m_PARAMtuneDistance2IPHioC.size()) < i + 1) {
-      newPass->distanceHighOccupancy2IP.second = m_PARAMtuneDistance2IPHioC.at(m_PARAMtuneDistance2IPHioC.size() - 1);
-    } else {
-      newPass->distanceHighOccupancy2IP.second =  m_PARAMtuneDistance2IPHioC.at(i);
-    }
-    if (int (m_PARAMtunePTHioC.size()) < i + 1) {
-      newPass->pTHighOccupancy.second = m_PARAMtunePTHioC.at(m_PARAMtunePTHioC.size() - 1);
-    } else {
-      newPass->pTHighOccupancy.second =  m_PARAMtunePTHioC.at(i);
-    }
-    if (int (m_PARAMtuneHelixParameterFitHioC.size()) < i + 1) {
-      newPass->helixParameterHighOccupancyFit.second = m_PARAMtuneHelixParameterFitHioC.at(m_PARAMtuneHelixParameterFitHioC.size() - 1);
-    } else {
-      newPass->helixParameterHighOccupancyFit.second =  m_PARAMtuneHelixParameterFitHioC.at(i);
-    }
-    if (int (m_PARAMtuneDeltaPtHioC.size()) < i + 1) {
-      newPass->deltaPtHighOccupancy.second = m_PARAMtuneDeltaPtHioC.at(m_PARAMtuneDeltaPtHioC.size() - 1);
-    } else {
-      newPass->deltaPtHighOccupancy.second = m_PARAMtuneDeltaPtHioC.at(i);
-    }
-    if (int (m_PARAMtuneDeltaDistance2IPHioC.size()) < i + 1) {
-      newPass->deltaDistanceHighOccupancy2IP.second = m_PARAMtuneDeltaDistance2IPHioC.at(m_PARAMtuneDeltaDistance2IPHioC.size() - 1);
-    } else {
-      newPass->deltaDistanceHighOccupancy2IP.second = m_PARAMtuneDeltaDistance2IPHioC.at(i);
-    }
-
-
-    /// importing sectorMap including friend Information and friend specific cutoffs
-    std::pair<int, int> countedFriendsAndCutoffs = newPass->importSectorMap(newMap->getSectorMap(), newMap->getDistances(), newMap->isFilterByDistance2OriginActivated());
-
-    B2DEBUG(1, m_PARAMnameOfInstance << " Pass " << i << ", setup " << chosenSetup << ": importing secMap with " << newMap->getSectorMap().size() << " sectors -> imported: " << newPass->sectorMap.size() << "/" << countedFriendsAndCutoffs.first << "/" << countedFriendsAndCutoffs.second << " sectors/friends/(friends w/o existing filters)");
-
-    if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true) {  /// printing total Map:
-      int sectorCtr = 0, friendCtr = 0, cutoffTypesCtr = 0; // counters
-      vector<int> currentCutOffTypes;
-      for (auto & mapEntry : newPass->sectorMap) { // looping through sectors
-        VXDSector* thisSector = mapEntry.second;
-        const vector<unsigned int> currentFriends = thisSector->getFriends();
-        uint nFriends = currentFriends.size();
-        B2DEBUG(5, "Opening sector " << FullSecID(mapEntry.first) << "/" << FullSecID(thisSector->getSecID()) << " at dist2Origin " << thisSector->getDistance() << " which has got " << nFriends << " friends for internal supportedCuttoffsList and " << thisSector->getFriendPointers().size() << " friendSectors as pointers");
-        if (nFriends != uint(thisSector->getFriendMapSize()) or nFriends != thisSector->getFriendPointers().size()) {
-          B2WARNING(" number of friends do not match in sector " << FullSecID(mapEntry.first) << ": friends by friendVector vs nEntries vs nFriendPointers in FriendMap: " << nFriends << "/" << thisSector->getFriendMapSize() << "/" << thisSector->getFriendPointers().size())
-        }
-
-        for (VXDSector * aFriend : thisSector->getFriendPointers()) {
-          uint friendInt = aFriend->getSecID();
-          currentCutOffTypes = thisSector->getSupportedCutoffs(friendInt);
-          for (auto cutOffType : currentCutOffTypes) { // looping through cutoffs
-            const Belle2::Cutoff* aCutoff = thisSector->getCutoff(cutOffType, friendInt);
-            if (aCutoff == NULL) { continue; }
-            B2DEBUG(175, " cutoff is of type: " << FilterID().getFilterString(cutOffType) << ", min: " << aCutoff->getMinValue() << ", max:" << aCutoff->getMaxValue());
-            cutoffTypesCtr++;
-          }
-          B2DEBUG(175, "cutoffTypesCtr got " << cutoffTypesCtr << " cutoffs")
-          ++friendCtr;
-        }
-        ++sectorCtr;
-      }
-      B2DEBUG(1, m_PARAMnameOfInstance << " Pass " << i << ": manually counted a total of " << sectorCtr << "/" << friendCtr << "/" << cutoffTypesCtr << " setors/friends/cutoffs in sectorMap"); // oldLevel5
-    }
-
-    m_passSetupVector.push_back(newPass); /// store pass for eternity (well until end of program)
-  }
-
-  /** copying first pass for the BaselineTF (just to be sure that they can be used independently from each other) */
-  if (m_PARAMactivateBaselineTF != 0) {
-    unsigned int centerSecID = FullSecID().getFullSecID(); // automatically produces secID of centerSector
-    VXDSector* pCenterSector = new VXDSector(centerSecID);
-    m_baselinePass.sectorMap.insert({centerSecID, pCenterSector});
-    B2DEBUG(100, "Baseline-Pass: adding virtual centerSector with " << m_baselinePass.sectorMap.find(centerSecID)->second->getFriends().size() << " friends.");
-    m_baselinePass.threeHitFilterBox.resetMagneticField(m_passSetupVector.at(0)->magneticFieldStrength);
-    m_baselinePass.fourHitFilterBox.resetMagneticField(m_passSetupVector.at(0)->magneticFieldStrength);
-    m_baselinePass.trackletFilterBox.resetMagneticField(m_passSetupVector.at(0)->magneticFieldStrength);
-    m_baselinePass.origin = m_passSetupVector.at(0)->origin;
-    m_baselinePass.useSVDHits = m_passSetupVector.at(0)->useSVDHits;
-    m_baselinePass.usePXDHits = m_passSetupVector.at(0)->usePXDHits;
-    m_baselinePass.useTELHits = m_passSetupVector.at(0)->useTELHits;
-    m_baselinePass.chosenDetectorType = m_passSetupVector.at(0)->chosenDetectorType;
-    m_baselinePass.numTotalLayers = m_passSetupVector.at(0)->numTotalLayers;
-    m_baselinePass.zigzagXY = m_passSetupVector.at(0)->zigzagXY;
-    m_baselinePass.zigzagXYWithSigma = m_passSetupVector.at(0)->zigzagXYWithSigma;
-    m_baselinePass.deltaPt = m_passSetupVector.at(0)->deltaPt;
-    m_baselinePass.circleFit = m_passSetupVector.at(0)->circleFit;
-    int countActivatedTCTests = 0;
-    if (m_baselinePass.zigzagXY.first == true) { countActivatedTCTests++; }
-    if (m_baselinePass.zigzagXYWithSigma.first == true) { countActivatedTCTests++; }
-    if (m_baselinePass.deltaPt.first == true) { countActivatedTCTests++; }
-    if (m_baselinePass.circleFit.first == true) { countActivatedTCTests++; }
-    m_baselinePass.activatedTccFilterTests = countActivatedTCTests; // pT, zzXY, circleFit
-
-    /// WARNING TODO at the moment, copying the first pass set by the user means that the baselineTF can not be set at different behavior than first normal pass. Need new method to introduce independent steering too! (maybe first pass-entries are used for baselineTF if activated, and first pass is second entry in list?)
-  }
-
-
-  //Import all Sectors for all events (Collector)
-  if (m_PARAMdisplayCollector > 0) {
-
-    //KeySectors dosn't function => so pair Int int
-    std::vector< std::pair<std::pair<unsigned int, unsigned int>, std::vector<unsigned int> > > sectorsDisplayAllPass;
-    std::vector<unsigned int> sectorsDisplayFriends;
-
-    for (uint i = 0; i < m_passSetupVector.size(); i++) {
-      B2DEBUG(10, "PassNr. " << i << "Size of Sector Map: " << m_passSetupVector.at(i)->sectorMap.size());
-
-      // Read Sector Map => into map
-      for (auto & currentSector : m_passSetupVector.at(i)->sectorMap) {
-        sectorsDisplayFriends.clear();
-
-        // Friends read and store in second vector
-        for (auto & currentFriend : currentSector.second->getFriends()) {
-          sectorsDisplayFriends.push_back(currentFriend);
-        }
-
-        sectorsDisplayAllPass.push_back({ {i, currentSector.second->getSecID()}, sectorsDisplayFriends });
-
-      }
-
-      // Init all Sectors, secConfigU & secConfigV used for PositionInfo
-      m_collector.initSectors(sectorsDisplayAllPass, m_passSetupVector.at(i)->secConfigU, m_passSetupVector.at(i)->secConfigV);
-
-      for (auto infosector : m_passSetupVector.at(i)->secConfigU) {
-        B2DEBUG(100, "InitSector secConfigU: " << infosector);
-      }
-
-      for (auto infosector : m_passSetupVector.at(i)->secConfigV) {
-        B2DEBUG(100, "InitSector secConfigV: " << infosector);
-      }
-    }
-  }
-
-
-  /** Section 1 - end **/
+  if (m_PARAMdisplayCollector > 0) { importSectorMapsToDisplayCollector(); }
 
   resetCountersAtBeginRun();
 
@@ -7308,4 +6491,857 @@ bool VXDTFModule::doTheCircleFit(PassData* thisPass, VXDTFTrackCandidate* aTc, i
 
   B2DEBUG(20, " TCC filter circleFit approved TC " << tcCtr << " with nHits: " <<  nHits << ", time consumption: " << duration.count() << " ns");
   return true;
+}
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// REDESIGN - new functions encapsulating smaller tasks
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////
+/// REDESIGN - Functions for initialize:
+////////////////////////////////////////
+
+void VXDTFModule::checkAndSetupModuleParameters()
+{
+  /** REDESIGNCOMMENT INITIALIZE 1:
+   * * short:
+   * safety checks for many parameters
+   *
+   ** long (+personal comments):
+   * safety checks are not done for each parameter, but for those which are often set wrong (by me or others).
+   * one can notice that some parameters appear as variables too.
+   * Reason for this is to make the parameters human readable and work internally with faster data types
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMhighOccupancyThreshold, m_PARAMpdGCode, m_PARAMtuneCutoffs,
+   * m_PARAMreserveHitsThreshold, m_PARAMnameOfInstance, m_PARAMactivateBaselineTF,
+   * m_PARAMcalcQIType, m_PARAMcalcSeedType, m_PARAMfilterOverlappingTCs,
+   * m_PARAMwriteToRoot, m_PARAMrootFileName, m_PARAMsmearMean,
+   * m_PARAMsmearSigma
+   *
+   ** dependency of global in-module variables:
+   * m_chargeSignFactor, m_calcQiType, m_calcSeedType,
+   * m_filterOverlappingTCs, m_rootFilePtr, m_treeEventWisePtr,
+   * m_treeTrackWisePtr, m_rootTimeConsumption, m_rootPvalues,
+   * m_rootChi2, m_rootCircleRadius, m_rootNdf,
+   * m_littleHelperBox
+   *
+   ** dependency of global stuff just because of B2XX-output:
+   * m_PARAMnameOfInstance,
+   *
+   ** in-module-function-calls:
+   */
+
+  m_littleHelperBox.resetValues(m_PARAMsmearMean, m_PARAMsmearSigma);
+
+  if (m_PARAMhighOccupancyThreshold < 0) { m_PARAMhighOccupancyThreshold = 0; }
+
+  if (m_PARAMpdGCode > 10 and m_PARAMpdGCode < 18) { // in this case, its a lepton. since leptons with positive sign have got negative codes, this must be taken into account
+    m_chargeSignFactor = 1;
+  } else { m_chargeSignFactor = -1; }
+
+  // check misusage of parameters:
+  if (m_PARAMtuneCutoffs <= -99.0 or m_PARAMtuneCutoffs > 1000.0) {
+    B2WARNING(m_PARAMnameOfInstance << ": chosen value for parameter 'tuneCutoffs' is invalid, reseting value to standard (=0.0)...")
+    m_PARAMtuneCutoffs = 0.;
+  } else {
+    m_PARAMtuneCutoffs = m_PARAMtuneCutoffs * 0.01; // reformatting to faster calculation
+  }
+  for (double & value : m_PARAMreserveHitsThreshold) {
+    if (value < 0. or value > 1.0) {
+      B2WARNING(m_PARAMnameOfInstance << ": chosen value for parameter 'reserveHitsThreshold' is invalid, reseting value to standard (=0.5)...")
+      value = 0.5;
+    }
+  }
+
+  if (m_PARAMactivateBaselineTF < 0 or m_PARAMactivateBaselineTF > 2) {
+    B2WARNING(m_PARAMnameOfInstance << ": chosen value (" << m_PARAMactivateBaselineTF << ")for parameter 'activateBaselineTF' is invalid, reseting value to standard (=1)...")
+    m_PARAMactivateBaselineTF = 1;
+  }
+
+  B2DEBUG(1, m_PARAMnameOfInstance << "::initialize: chosen calcQIType is '" << m_PARAMcalcQIType << "'")
+  if (m_PARAMcalcQIType == "trackLength") {
+    m_calcQiType = 0;
+  } else if (m_PARAMcalcQIType == "kalman") {
+    m_calcQiType = 1;
+  } else if (m_PARAMcalcQIType == "circleFit") {
+    m_calcQiType = 2;
+  } else if (m_PARAMcalcQIType == "straightLine") {
+    m_calcQiType = 3;
+  } else {
+    B2WARNING(m_PARAMnameOfInstance << "::initialize: chosen qiType '" << m_PARAMcalcQIType << "' is unknown, setting standard to circleFit...")
+    m_calcQiType = 2;
+  }
+
+  B2DEBUG(1, m_PARAMnameOfInstance << "::initialize: chosen calcSeedType is '" << m_PARAMcalcSeedType << "'")
+  if (m_PARAMcalcSeedType == "helixFit") {
+    m_calcSeedType = 0;
+  } else if (m_PARAMcalcSeedType == "straightLine") {
+    m_calcSeedType = 1;
+  } else {
+    B2WARNING(m_PARAMnameOfInstance << "::initialize: chosen seedType '" << m_PARAMcalcSeedType << "' is unknown, setting standard to helixFit...")
+    m_calcSeedType = 0;
+  }
+
+  B2DEBUG(1, m_PARAMnameOfInstance << "::initialize: chosen technique to filter overlapping TCs is '" << m_PARAMfilterOverlappingTCs << "'")
+  if (m_PARAMfilterOverlappingTCs == "hopfield") {
+    m_filterOverlappingTCs = 2;
+  } else if (m_PARAMfilterOverlappingTCs == "greedy") {
+    m_filterOverlappingTCs = 1;
+  } else if (m_PARAMfilterOverlappingTCs == "none") {
+    m_filterOverlappingTCs = 0;
+  } else {
+    B2WARNING(m_PARAMnameOfInstance << "::initialize: chosen technique to filter overlapping TCs '" << m_PARAMfilterOverlappingTCs << "' is unknown, setting standard to greedy...")
+    m_filterOverlappingTCs = 1;
+  }
+
+  if (m_PARAMwriteToRoot == true) {
+    m_PARAMrootFileName.at(0) += ".root";
+    m_rootFilePtr = new TFile(m_PARAMrootFileName.at(0).c_str(), m_PARAMrootFileName.at(1).c_str()); // alternative: UPDATE
+
+    m_treeEventWisePtr = new TTree("m_treeEventWisePtr", "anEventWiseTree");
+    m_treeEventWisePtr->Branch("duration", &m_rootTimeConsumption);
+
+    m_treeTrackWisePtr = new TTree("m_treeTrackWisePtr", "aTrackWiseTree");
+    m_treeTrackWisePtr->Branch("pValues", &m_rootPvalues);
+    m_treeTrackWisePtr->Branch("chi2Values", &m_rootChi2);
+    m_treeTrackWisePtr->Branch("circleRadii", &m_rootCircleRadius);
+    m_treeTrackWisePtr->Branch("ndfValues", &m_rootNdf);
+  } else {
+    m_rootFilePtr = NULL;
+    m_treeTrackWisePtr = NULL;
+  }
+}
+
+
+
+void VXDTFModule::prepareExternalTools()
+{
+  /** REDESIGNCOMMENT INITIALIZE 2:
+   * * short:
+   * register storearray-related stuff
+   *
+   ** long (+personal comments):
+   * some are only created if their related parameters are set to the values needed.
+   * additionally, one module parameter is not flagged with m_PARAM... but with m_TESTER... (which are parameters related only to testing purposes),
+   * such an inconsistency shall be surpressed for the redesign.
+   * DisplayCollector-related stuff is needed for display and for debugging, therefore always listed for debug-stuff too.
+   * creates dependencies of the testbeam package (TelCluster)
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMgfTrackCandsColName, m_TESTERexpandedTestingRoutines, m_PARAMinfoBoardName,
+   * m_PARAMdisplayCollector, m_PARAMtelClustersName, m_PARAMpxdClustersName,
+   * m_PARAMsvdClustersName
+   *
+   ** dependency of global in-module variables:
+   * m_collector,
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_PARAMnameOfInstance, m_PARAMinfoBoardName, m_PARAMdisplayCollector,
+   * m_collector
+   *
+   ** in-module-function-calls:
+   */
+
+
+  /// genfit::TrackCandidate
+  StoreArray<genfit::TrackCand>::registerPersistent(m_PARAMgfTrackCandsColName);
+
+  if (gGeoManager == NULL) {
+    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
+    geoManager.createTGeoRepresentation();
+  }
+
+  if (!genfit::FieldManager::getInstance()->isInitialized())
+  { genfit::FieldManager::getInstance()->init(new GFGeant4Field()); }
+  if (!genfit::MaterialEffects::getInstance()->isInitialized())
+  { genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface()); }
+
+  genfit::MaterialEffects::getInstance()->setMscModel("Highland");
+
+  /// temporary members for testing purposes (minimal testing routines)
+  if (m_TESTERexpandedTestingRoutines == true) {
+    StoreArray<VXDTFInfoBoard>::registerPersistent(m_PARAMinfoBoardName);
+  }
+
+  // registerPersistence (StoreArrays & RelationArray) for the Collector
+  if (m_PARAMdisplayCollector > 0) {
+    B2DEBUG(10, "VXDTF: Display: Module Collector initPersistent");
+    m_collector.initPersistent();
+  }
+
+  StoreArray<TelCluster>::optional(m_PARAMtelClustersName);
+  StoreArray<PXDCluster>::optional(m_PARAMpxdClustersName);
+  StoreArray<SVDCluster>::optional(m_PARAMsvdClustersName);
+}
+
+
+
+//////////////////////////////////////
+/// REDESIGN - Functions for beginRun:
+//////////////////////////////////////
+
+void VXDTFModule::setupPasses()
+{
+  // here some variables copied from the passes (will be rewritten for each pass, therefore only the settings of the last pass will survive)
+  TVector3 origin;
+  string detectorType;
+  /// for each setup, fill parameters, calc numTotalLayers... TODO: failsafe implementation (currently no protection against bad user imput) lacks of style, longterm goal, export that procedure into a function
+
+  m_usePXDHits = false, m_useSVDHits = false, m_useTELHits = false;
+
+  m_nSectorSetups = m_PARAMsectorSetup.size();
+
+
+  for (int i = 0; i < m_nSectorSetups; ++i) {
+
+    PassData* newPass = new PassData;
+
+    newPass->sectorSetup = m_PARAMsectorSetup.at(i);
+    newPass->generalTune = m_PARAMtuneCutoffs; // for all passes the same
+
+    VXDTFSecMap::Class(); // essential, needed for root, waiting for root 6 to be removed (hopefully)
+    string chosenSetup = newPass->sectorSetup;
+    string directory = "/Detector/Tracking/CATFParameters/" + chosenSetup;
+    const VXDTFSecMap* newMap = NULL;
+    try {
+      newMap = dynamic_cast<const VXDTFSecMap*>(Gearbox::getInstance().getTObject(directory.c_str()));
+    } catch (exception& e) {
+      B2FATAL("VXDTFModule::initialize: could not load sectorMap. Reason: exception thrown: " << e.what() << ", this means you have to check whether the sectorMaps stored in ../tracking/data/VXDTFindex.xml and/or ../testbeam/vxd/data/VXDTFindexTF.xml are uncommented and locally unpacked and available!")
+    }
+
+    const double magneticField = newMap->getMagneticFieldStrength();
+    newPass->magneticFieldStrength = magneticField;
+    newPass->threeHitFilterBox.resetMagneticField(magneticField);
+    newPass->fourHitFilterBox.resetMagneticField(magneticField);
+    newPass->trackletFilterBox.resetMagneticField(magneticField);
+
+    newPass->additionalInfo = newMap->getAdditionalInfo();
+
+    newPass->secConfigU = newMap->getSectorConfigU();
+    newPass->secConfigV = newMap->getSectorConfigV();
+    origin = newMap->getOrigin();
+    newPass->origin = origin;
+    stringstream secConU, secConV;
+    for (double entry : newPass->secConfigU) { secConU << " " << entry; }
+    for (double entry : newPass->secConfigV) { secConV << " " << entry; }
+    B2INFO(" pass " << newPass->sectorSetup << "-setting: got magneticFieldStrength: " << magneticField << ", origin at: (" << origin[0] << "," << origin[1] << "," << origin[2] << ") and sectorConfig \n U: " << secConU.str() << endl << " V: " << secConV.str() << endl << " and additional Info: " << newPass->additionalInfo)
+
+
+    if (int (m_PARAMhighestAllowedLayer.size()) < i + 1) {
+      B2DEBUG(1, m_PARAMnameOfInstance << "highestAllowedLayer not set for each sectorMap, copying first choice (you can ignore this warning if you don't want to set parameters for each pass separately)")
+      newPass->highestAllowedLayer = m_PARAMhighestAllowedLayer.at(m_PARAMhighestAllowedLayer.size() - 1);
+    } else {
+      newPass->highestAllowedLayer = m_PARAMhighestAllowedLayer.at(i);
+    }
+    detectorType = newMap->getDetectorType();
+    newPass->chosenDetectorType = detectorType;
+    newPass->numTotalLayers = 0;
+
+    if (detectorType.find("SVD") != std::string::npos) {
+      m_useSVDHits = true;
+      newPass->useSVDHits = true;
+      newPass->numTotalLayers += 4; // WARNING hardcoded! can we get this info from the system itself? WARNING find where this is still used and find out its purpose (dangerous when some layers are missing?)
+
+    }
+    if (detectorType.find("PXD") != std::string::npos) {
+      m_usePXDHits = true;
+      newPass->usePXDHits = true;
+      newPass->numTotalLayers += 2; // WARNING hardcoded! can we get this info from the system itself? WARNING find where this is still used and find out its purpose (dangerous when some layers are missing?)
+
+    }
+    if (detectorType.find("TEL") != std::string::npos) { // using const::Test as Telescope setter
+      m_useTELHits = true;
+      newPass->useTELHits = true;
+      newPass->numTotalLayers += 1; // WARNING hardcoded! can we get this info from the system itself? WARNING find where this is still used and find out its purpose (dangerous when some layers are missing?)
+    }
+    if (m_usePXDHits == false and m_useSVDHits == false and m_useTELHits == false) {
+      B2ERROR(m_PARAMnameOfInstance << "Pass " << i << " with setting '" << chosenSetup << "': chosen detectorType via param 'detectorType' (" << detectorType << ") is invalid, resetting value to standard (=VXD)")
+      m_useSVDHits = true;
+      m_usePXDHits = true;
+      newPass->chosenDetectorType = "VXD";
+      newPass->usePXDHits = true;
+      newPass->useSVDHits = true;
+    }
+
+
+    newPass->numTotalLayers = newPass->numTotalLayers - (6 - newPass->highestAllowedLayer);
+    if (newPass->numTotalLayers < 2) { newPass->numTotalLayers = 2; }   // to avoid division by zero in some cases
+    B2DEBUG(1, m_PARAMnameOfInstance << "Pass " << i << ": chosen detectorType: " << newPass->chosenDetectorType << " and chosen sectorSetup: " << newPass->sectorSetup)
+
+
+    if (int (m_PARAMreserveHitsThreshold.size()) < i + 1) {
+      B2DEBUG(1, "reserveHitsThreshold not set for each sectorMap, copying first choice (you can ignore this warning if you don't want to set parameters for each pass separately)")
+      newPass->reserveHitsThreshold = m_PARAMreserveHitsThreshold.at(m_PARAMreserveHitsThreshold.size() - 1) ;
+    } else {
+      newPass->reserveHitsThreshold = m_PARAMreserveHitsThreshold.at(i);
+      if (newPass->reserveHitsThreshold < 0) { newPass->reserveHitsThreshold = 0; } else if (newPass->reserveHitsThreshold > 1.) { newPass->reserveHitsThreshold = 1.; }
+    }
+    if (int (m_PARAMminLayer.size()) < i + 1) {
+      B2DEBUG(1, m_PARAMnameOfInstance << "minLayer not set for each sectorMap, copying first choice (you can ignore this warning if you don't want to set parameters for each pass separately)")
+      newPass->minLayer = m_PARAMminLayer.at(m_PARAMminLayer.size() - 1);
+    } else {
+      newPass->minLayer = m_PARAMminLayer.at(i);
+    }
+    if (int (m_PARAMminState.size()) < i + 1) {
+      B2DEBUG(1, m_PARAMnameOfInstance << "minState not set for each sectorMap, copying first choice (you can ignore this warning if you don't want to set parameters for each pass separately)")
+      newPass->minState = m_PARAMminState.at(m_PARAMminState.size() - 1);
+    } else {
+      newPass->minState = m_PARAMminState.at(i);
+    }
+
+    B2DEBUG(10, "starting import of segFinderFilters:")
+
+    int sfCtr = 0, sfhoCtr = 0, nfCtr = 0, nfhoCtr = 0, tccfCtr = 0; // counting number of activated tests for each filter step
+    ///sFinder:
+    if (int (m_PARAMactivateDistance3D.size()) < i + 1) {
+      newPass->distance3D.first = m_PARAMactivateDistance3D.at(m_PARAMactivateDistance3D.size() - 1);
+    } else {
+      newPass->distance3D.first = m_PARAMactivateDistance3D.at(i);
+    }
+    if (int (m_PARAMactivateDistanceXY.size()) < i + 1) {
+      newPass->distanceXY.first = m_PARAMactivateDistanceXY.at(m_PARAMactivateDistanceXY.size() - 1);
+    } else {
+      newPass->distanceXY.first = m_PARAMactivateDistanceXY.at(i);;
+    }
+    if (int (m_PARAMactivateDistanceZ.size()) < i + 1) {
+      newPass->distanceZ.first = m_PARAMactivateDistanceZ.at(m_PARAMactivateDistanceZ.size() - 1);
+    } else {
+      newPass->distanceZ.first = m_PARAMactivateDistanceZ.at(i);
+    }
+    if (int (m_PARAMactivateSlopeRZ.size()) < i + 1) {
+      newPass->slopeRZ.first = m_PARAMactivateSlopeRZ.at(m_PARAMactivateSlopeRZ.size() - 1);
+    } else {
+      newPass->slopeRZ.first = m_PARAMactivateSlopeRZ.at(i);
+    }
+    if (int (m_PARAMactivateNormedDistance3D.size()) < i + 1) {
+      newPass->normedDistance3D.first = m_PARAMactivateNormedDistance3D.at(m_PARAMactivateNormedDistance3D.size() - 1);
+    } else {
+      newPass->normedDistance3D.first = m_PARAMactivateNormedDistance3D.at(i);
+    }
+    if (int (m_PARAMactivateAlwaysTrue2Hit.size()) < i + 1) {
+      newPass->alwaysTrue2Hit.first = m_PARAMactivateAlwaysTrue2Hit.at(m_PARAMactivateAlwaysTrue2Hit.size() - 1);
+    } else {
+      newPass->alwaysTrue2Hit.first = m_PARAMactivateAlwaysTrue2Hit.at(i);
+    }
+    if (int (m_PARAMactivateAlwaysFalse2Hit.size()) < i + 1) {
+      newPass->alwaysFalse2Hit.first = m_PARAMactivateAlwaysFalse2Hit.at(m_PARAMactivateAlwaysFalse2Hit.size() - 1);
+    } else {
+      newPass->alwaysFalse2Hit.first = m_PARAMactivateAlwaysFalse2Hit.at(i);
+    }
+    if (int (m_PARAMactivateRandom2Hit.size()) < i + 1) {
+      newPass->random2Hit.first = m_PARAMactivateRandom2Hit.at(m_PARAMactivateRandom2Hit.size() - 1);
+    } else {
+      newPass->random2Hit.first = m_PARAMactivateRandom2Hit.at(i);
+    }
+    if (newPass->distance3D.first == true) { sfCtr++; }
+    if (newPass->distanceXY.first == true) { sfCtr++; }
+    if (newPass->distanceZ.first == true) { sfCtr++; }
+    if (newPass->slopeRZ.first == true) { sfCtr++; }
+    if (newPass->normedDistance3D.first == true) { sfCtr++; }
+    if (newPass->alwaysTrue2Hit.first == true) { sfCtr++; }
+    if (newPass->alwaysFalse2Hit.first == true) { sfCtr++; }
+    if (newPass->random2Hit.first == true) { sfCtr++; }
+    B2DEBUG(2, "finished importing segFinderFilters, " << sfCtr << " filters imported")
+    ///sFinder ho finder (2+1 hit)
+    B2DEBUG(10, "starting import of segFinderHioCFilters:")
+    if (int (m_PARAMactivateAngles3DHioC.size()) < i + 1) {
+      newPass->anglesHighOccupancy3D.first = m_PARAMactivateAngles3DHioC.at(m_PARAMactivateAngles3DHioC.size() - 1);
+    } else {
+      newPass->anglesHighOccupancy3D.first =  m_PARAMactivateAngles3DHioC.at(i);
+    }
+    if (int (m_PARAMactivateAnglesXYHioC.size()) < i + 1) {
+      newPass->anglesHighOccupancyXY.first = m_PARAMactivateAnglesXYHioC.at(m_PARAMactivateAnglesXYHioC.size() - 1);
+    } else {
+      newPass->anglesHighOccupancyXY.first = m_PARAMactivateAnglesXYHioC.at(i);
+    }
+    if (int (m_PARAMactivateAnglesRZHioC.size()) < i + 1) {
+      newPass->anglesHighOccupancyRZ.first = m_PARAMactivateAnglesRZHioC.at(m_PARAMactivateAnglesRZHioC.size() - 1);
+    } else {
+      newPass->anglesHighOccupancyRZ.first = m_PARAMactivateAnglesRZHioC.at(i);
+    }
+    if (int (m_PARAMactivateDeltaSlopeRZHioC.size()) < i + 1) {
+      newPass->deltaSlopeHighOccupancyRZ.first = m_PARAMactivateDeltaSlopeRZHioC.at(m_PARAMactivateDeltaSlopeRZHioC.size() - 1);
+    } else {
+      newPass->deltaSlopeHighOccupancyRZ.first = m_PARAMactivateDeltaSlopeRZHioC.at(i);
+    }
+    if (int (m_PARAMactivateDistance2IPHioC.size()) < i + 1) {
+      newPass->distanceHighOccupancy2IP.first = m_PARAMactivateDistance2IPHioC.at(m_PARAMactivateDistance2IPHioC.size() - 1);
+    } else {
+      newPass->distanceHighOccupancy2IP.first =  m_PARAMactivateDistance2IPHioC.at(i);
+    }
+    if (int (m_PARAMactivatePTHioC.size()) < i + 1) {
+      newPass->pTHighOccupancy.first = m_PARAMactivatePTHioC.at(m_PARAMactivatePTHioC.size() - 1);
+    } else {
+      newPass->pTHighOccupancy.first =  m_PARAMactivatePTHioC.at(i);
+    }
+    if (int (m_PARAMactivateHelixParameterFitHioC.size()) < i + 1) {
+      newPass->helixParameterHighOccupancyFit.first = m_PARAMactivateHelixParameterFitHioC.at(m_PARAMactivateHelixParameterFitHioC.size() - 1);
+    } else {
+      newPass->helixParameterHighOccupancyFit.first =  m_PARAMactivateHelixParameterFitHioC.at(i);
+    }
+    if (newPass->anglesHighOccupancy3D.first == true) { sfhoCtr++; }
+    if (newPass->anglesHighOccupancyXY.first == true) { sfhoCtr++; }
+    if (newPass->anglesHighOccupancyRZ.first == true) { sfhoCtr++; }
+    if (newPass->deltaSlopeHighOccupancyRZ.first == true) { sfhoCtr++; }
+    if (newPass->distanceHighOccupancy2IP.first == true) { sfhoCtr++; }
+    if (newPass->pTHighOccupancy.first == true) { sfhoCtr++; }
+    if (newPass->helixParameterHighOccupancyFit.first == true) { sfhoCtr++; }
+    B2DEBUG(2, "finished importing segFinderHioCFilters, " << sfhoCtr << " filters imported")
+
+    ///nbFinder:
+    B2DEBUG(10, "starting import of nbFinderFilters:")
+    if (int (m_PARAMactivateAngles3D.size()) < i + 1) {
+      newPass->angles3D.first = m_PARAMactivateAngles3D.at(m_PARAMactivateAngles3D.size() - 1);
+    } else {
+      newPass->angles3D.first =  m_PARAMactivateAngles3D.at(i);
+    }
+    if (int (m_PARAMactivateAnglesXY.size()) < i + 1) {
+      newPass->anglesXY.first = m_PARAMactivateAnglesXY.at(m_PARAMactivateAnglesXY.size() - 1);
+    } else {
+      newPass->anglesXY.first = m_PARAMactivateAnglesXY.at(i);
+    }
+    if (int (m_PARAMactivateAnglesRZ.size()) < i + 1) {
+      newPass->anglesRZ.first = m_PARAMactivateAnglesRZ.at(m_PARAMactivateAnglesRZ.size() - 1);
+    } else {
+      newPass->anglesRZ.first = m_PARAMactivateAnglesRZ.at(i);
+    }
+    if (int (m_PARAMactivateDeltaSlopeRZ.size()) < i + 1) {
+      newPass->deltaSlopeRZ.first = m_PARAMactivateDeltaSlopeRZ.at(m_PARAMactivateDeltaSlopeRZ.size() - 1);
+    } else {
+      newPass->deltaSlopeRZ.first = m_PARAMactivateDeltaSlopeRZ.at(i);
+    }
+    if (int (m_PARAMactivateDistance2IP.size()) < i + 1) {
+      newPass->distance2IP.first = m_PARAMactivateDistance2IP.at(m_PARAMactivateDistance2IP.size() - 1);
+    } else {
+      newPass->distance2IP.first =  m_PARAMactivateDistance2IP.at(i);
+    }
+    if (int (m_PARAMactivatePT.size()) < i + 1) {
+      newPass->pT.first = m_PARAMactivatePT.at(m_PARAMactivatePT.size() - 1);
+    } else {
+      newPass->pT.first =  m_PARAMactivatePT.at(i);
+    }
+    if (int (m_PARAMactivateHelixParameterFit.size()) < i + 1) {
+      newPass->helixParameterFit.first = m_PARAMactivateHelixParameterFit.at(m_PARAMactivateHelixParameterFit.size() - 1);
+    } else {
+      newPass->helixParameterFit.first =  m_PARAMactivateHelixParameterFit.at(i);
+    }
+    if (int (m_PARAMactivateDeltaSOverZ.size()) < i + 1) {
+      newPass->deltaSOverZ.first = m_PARAMactivateDeltaSOverZ.at(m_PARAMactivateDeltaSOverZ.size() - 1);
+    } else {
+      newPass->deltaSOverZ.first =  m_PARAMactivateDeltaSOverZ.at(i);
+    }
+    if (int (m_PARAMactivateDeltaSlopeZOverS.size()) < i + 1) {
+      newPass->deltaSlopeZOverS.first = m_PARAMactivateDeltaSlopeZOverS.at(m_PARAMactivateDeltaSlopeZOverS.size() - 1);
+    } else {
+      newPass->deltaSlopeZOverS.first =  m_PARAMactivateDeltaSlopeZOverS.at(i);
+    }
+    if (int (m_PARAMactivateAlwaysTrue3Hit.size()) < i + 1) {
+      newPass->alwaysTrue3Hit.first = m_PARAMactivateAlwaysTrue3Hit.at(m_PARAMactivateAlwaysTrue3Hit.size() - 1);
+    } else {
+      newPass->alwaysTrue3Hit.first = m_PARAMactivateAlwaysTrue3Hit.at(i);
+    }
+    if (int (m_PARAMactivateAlwaysFalse3Hit.size()) < i + 1) {
+      newPass->alwaysFalse3Hit.first = m_PARAMactivateAlwaysFalse3Hit.at(m_PARAMactivateAlwaysFalse3Hit.size() - 1);
+    } else {
+      newPass->alwaysFalse3Hit.first = m_PARAMactivateAlwaysFalse3Hit.at(i);
+    }
+    if (int (m_PARAMactivateRandom3Hit.size()) < i + 1) {
+      newPass->random3Hit.first = m_PARAMactivateRandom3Hit.at(m_PARAMactivateRandom3Hit.size() - 1);
+    } else {
+      newPass->random3Hit.first = m_PARAMactivateRandom3Hit.at(i);
+    }
+    if (newPass->angles3D.first == true) { nfCtr++; }
+    if (newPass->anglesXY.first == true) { nfCtr++; }
+    if (newPass->anglesRZ.first == true) { nfCtr++; }
+    if (newPass->deltaSlopeRZ.first == true) { nfCtr++; }
+    if (newPass->distance2IP.first == true) { nfCtr++; }
+    if (newPass->pT.first == true) { nfCtr++; }
+    if (newPass->helixParameterFit.first == true) { nfCtr++; }
+    if (newPass->deltaSOverZ.first == true) { nfCtr++; }
+    if (newPass->deltaSlopeZOverS.first == true) { nfCtr++; }
+    if (newPass->alwaysTrue3Hit.first == true) { nfCtr++; }
+    if (newPass->alwaysFalse3Hit.first == true) { nfCtr++; }
+    if (newPass->random3Hit.first == true) { nfCtr++; }
+    B2DEBUG(2, "finished importing nFinderFilters, " << nfCtr << " filters imported")
+    ///nFinder ho finder (3+1 hit)
+    B2DEBUG(10, "starting import of nbFinderHioCFilters:")
+    if (int (m_PARAMactivateDeltaPtHioC.size()) < i + 1) {
+      newPass->deltaPtHighOccupancy.first = m_PARAMactivateDeltaPtHioC.at(m_PARAMactivateDeltaPtHioC.size() - 1);
+    } else {
+      newPass->deltaPtHighOccupancy.first = m_PARAMactivateDeltaPtHioC.at(i);
+    }
+    if (int (m_PARAMactivateDeltaDistance2IPHioC.size()) < i + 1) {
+      newPass->deltaDistanceHighOccupancy2IP.first = m_PARAMactivateDeltaDistance2IPHioC.at(m_PARAMactivateDeltaDistance2IPHioC.size() - 1);
+    } else {
+      newPass->deltaDistanceHighOccupancy2IP.first = m_PARAMactivateDeltaDistance2IPHioC.at(i);
+    }
+    if (newPass->deltaPtHighOccupancy.first == true) { nfhoCtr++; }
+    if (newPass->deltaDistanceHighOccupancy2IP.first == true) { nfhoCtr++; }
+
+    /// post-TCC-filter:
+    if (int (m_PARAMactivateZigZagXY.size()) < i + 1) {
+      newPass->zigzagXY.first = m_PARAMactivateZigZagXY.at(m_PARAMactivateZigZagXY.size() - 1);
+    } else {
+      newPass->zigzagXY.first = m_PARAMactivateZigZagXY.at(i);
+    }
+    if (int (m_PARAMactivateZigZagXYWithSigma.size()) < i + 1) {
+      newPass->zigzagXYWithSigma.first = m_PARAMactivateZigZagXYWithSigma.at(m_PARAMactivateZigZagXYWithSigma.size() - 1);
+    } else {
+      newPass->zigzagXYWithSigma.first = m_PARAMactivateZigZagXYWithSigma.at(i);
+    }
+    if (int (m_PARAMactivateZigZagRZ.size()) < i + 1) {
+      newPass->zigzagRZ.first = m_PARAMactivateZigZagRZ.at(m_PARAMactivateZigZagRZ.size() - 1);
+    } else {
+      newPass->zigzagRZ.first = m_PARAMactivateZigZagRZ.at(i);
+    }
+    if (int (m_PARAMactivateDeltaPt.size()) < i + 1) {
+      newPass->deltaPt.first = m_PARAMactivateDeltaPt.at(m_PARAMactivateDeltaPt.size() - 1);
+    } else {
+      newPass->deltaPt.first = m_PARAMactivateDeltaPt.at(i);
+    }
+    if (int (m_PARAMactivateCircleFit.size()) < i + 1) {
+      newPass->circleFit.first = m_PARAMactivateCircleFit.at(m_PARAMactivateCircleFit.size() - 1);
+    } else {
+      newPass->circleFit.first = m_PARAMactivateCircleFit.at(i);
+    }
+    if (int (m_PARAMactivateDeltaDistance2IP.size()) < i + 1) {
+      newPass->deltaDistance2IP.first = m_PARAMactivateDeltaDistance2IP.at(m_PARAMactivateDeltaDistance2IP.size() - 1);
+    } else {
+      newPass->deltaDistance2IP.first = m_PARAMactivateDeltaDistance2IP.at(i);
+    }
+    if (int (m_PARAMactivateAlwaysTrue4Hit.size()) < i + 1) {
+      newPass->alwaysTrue4Hit.first = m_PARAMactivateAlwaysTrue4Hit.at(m_PARAMactivateAlwaysTrue4Hit.size() - 1);
+    } else {
+      newPass->alwaysTrue4Hit.first = m_PARAMactivateAlwaysTrue4Hit.at(i);
+    }
+    if (int (m_PARAMactivateAlwaysFalse4Hit.size()) < i + 1) {
+      newPass->alwaysFalse4Hit.first = m_PARAMactivateAlwaysFalse4Hit.at(m_PARAMactivateAlwaysFalse4Hit.size() - 1);
+    } else {
+      newPass->alwaysFalse4Hit.first = m_PARAMactivateAlwaysFalse4Hit.at(i);
+    }
+    if (int (m_PARAMactivateRandom4Hit.size()) < i + 1) {
+      newPass->random4Hit.first = m_PARAMactivateRandom4Hit.at(m_PARAMactivateRandom4Hit.size() - 1);
+    } else {
+      newPass->random4Hit.first = m_PARAMactivateRandom4Hit.at(i);
+    }
+    if (newPass->zigzagXY.first == true) { tccfCtr++; }
+    if (newPass->zigzagXYWithSigma.first == true) { tccfCtr++; }
+    if (newPass->zigzagRZ.first == true) { tccfCtr++; }
+    if (newPass->deltaPt.first == true) { tccfCtr++; }
+    if (newPass->circleFit.first == true) { tccfCtr++; }
+    if (newPass->deltaDistance2IP.first == true) { tccfCtr++; }
+    if (newPass->alwaysTrue4Hit.first == true) { tccfCtr++; }
+    if (newPass->alwaysFalse4Hit.first == true) { tccfCtr++; }
+    if (newPass->random4Hit.first == true) { tccfCtr++; }
+
+    newPass->activatedSegFinderTests = sfCtr;
+    newPass->activatedHighOccupancySegFinderTests = sfhoCtr;
+    newPass->activatedNbFinderTests = nfCtr;
+    newPass->activatedHighOccupancyNbFinderTests = nfhoCtr;
+    newPass->activatedTccFilterTests = tccfCtr;
+    B2DEBUG(2, "finished importing nFinderHioCFilters, " << tccfCtr << " filters imported")
+    B2DEBUG(1, m_PARAMnameOfInstance << "Pass " << i << " VXD Track finder: " << sfCtr << " segFinder tests, " << nfCtr << " friendFinder tests and " << tccfCtr << " TCC filter tests are enabled. HighOccupancy-mode activated for > " << m_PARAMhighOccupancyThreshold << " hits per sensor");
+
+    B2DEBUG(10, "starting import of tuning values for filters:")
+    if (int (m_PARAMtuneDistance3D.size()) < i + 1) {
+      newPass->distance3D.second = m_PARAMtuneDistance3D.at(m_PARAMtuneDistance3D.size() - 1);
+    } else {
+      newPass->distance3D.second = m_PARAMtuneDistance3D.at(i);
+    }
+    if (int (m_PARAMtuneDistanceXY.size()) < i + 1) {
+      newPass->distanceXY.second = m_PARAMtuneDistanceXY.at(m_PARAMtuneDistanceXY.size() - 1);
+    } else {
+      newPass->distanceXY.second = m_PARAMtuneDistanceXY.at(i);;
+    }
+    if (int (m_PARAMtuneDistanceZ.size()) < i + 1) {
+      newPass->distanceZ.second = m_PARAMtuneDistanceZ.at(m_PARAMtuneDistanceZ.size() - 1);
+    } else {
+      newPass->distanceZ.second = m_PARAMtuneDistanceZ.at(i);
+    }
+    if (int (m_PARAMtuneSlopeRZ.size()) < i + 1) {
+      newPass->slopeRZ.second = m_PARAMtuneSlopeRZ.at(m_PARAMtuneSlopeRZ.size() - 1);
+    } else {
+      newPass->slopeRZ.second = m_PARAMtuneSlopeRZ.at(i);
+    }
+    if (int (m_PARAMtuneNormedDistance3D.size()) < i + 1) {
+      newPass->normedDistance3D.second = m_PARAMtuneNormedDistance3D.at(m_PARAMtuneNormedDistance3D.size() - 1);
+    } else {
+      newPass->normedDistance3D.second = m_PARAMtuneNormedDistance3D.at(i);
+    }
+    if (int (m_PARAMtuneAlwaysTrue2Hit.size()) < i + 1) {
+      newPass->alwaysTrue2Hit.second = m_PARAMtuneAlwaysTrue2Hit.at(m_PARAMtuneAlwaysTrue2Hit.size() - 1);
+    } else {
+      newPass->alwaysTrue2Hit.second = m_PARAMtuneAlwaysTrue2Hit.at(i);
+    }
+    if (int (m_PARAMtuneAlwaysFalse2Hit.size()) < i + 1) {
+      newPass->alwaysFalse2Hit.second = m_PARAMtuneAlwaysFalse2Hit.at(m_PARAMtuneAlwaysFalse2Hit.size() - 1);
+    } else {
+      newPass->alwaysFalse2Hit.second = m_PARAMtuneAlwaysFalse2Hit.at(i);
+    }
+    if (int (m_PARAMtuneRandom2Hit.size()) < i + 1) {
+      newPass->random2Hit.second = m_PARAMtuneRandom2Hit.at(m_PARAMtuneRandom2Hit.size() - 1);
+    } else {
+      newPass->random2Hit.second = m_PARAMtuneRandom2Hit.at(i);
+    }
+    if (int (m_PARAMtuneAngles3D.size()) < i + 1) {
+      newPass->angles3D.second = m_PARAMtuneAngles3D.at(m_PARAMtuneAngles3D.size() - 1);
+    } else {
+      newPass->angles3D.second =  m_PARAMtuneAngles3D.at(i);
+    }
+    if (int (m_PARAMtuneAnglesXY.size()) < i + 1) {
+      newPass->anglesXY.second = m_PARAMtuneAnglesXY.at(m_PARAMtuneAnglesXY.size() - 1);
+    } else {
+      newPass->anglesXY.second = m_PARAMtuneAnglesXY.at(i);
+    }
+    if (int (m_PARAMtuneAnglesRZ.size()) < i + 1) {
+      newPass->anglesRZ.second = m_PARAMtuneAnglesRZ.at(m_PARAMtuneAnglesRZ.size() - 1);
+    } else {
+      newPass->anglesRZ.second = m_PARAMtuneAnglesRZ.at(i);
+    }
+    if (int (m_PARAMtuneDeltaSlopeRZ.size()) < i + 1) {
+      newPass->deltaSlopeRZ.second = m_PARAMtuneDeltaSlopeRZ.at(m_PARAMtuneDeltaSlopeRZ.size() - 1);
+    } else {
+      newPass->deltaSlopeRZ.second = m_PARAMtuneDeltaSlopeRZ.at(i);
+    }
+    if (int (m_PARAMtuneDistance2IP.size()) < i + 1) {
+      newPass->distance2IP.second = m_PARAMtuneDistance2IP.at(m_PARAMtuneDistance2IP.size() - 1);
+    } else {
+      newPass->distance2IP.second =  m_PARAMtuneDistance2IP.at(i);
+    }
+    if (int (m_PARAMtunePT.size()) < i + 1) {
+      newPass->pT.second = m_PARAMtunePT.at(m_PARAMtunePT.size() - 1);
+    } else {
+      newPass->pT.second =  m_PARAMtunePT.at(i);
+    }
+    if (int (m_PARAMtuneHelixParameterFit.size()) < i + 1) {
+      newPass->helixParameterFit.second = m_PARAMtuneHelixParameterFit.at(m_PARAMtuneHelixParameterFit.size() - 1);
+    } else {
+      newPass->helixParameterFit.second =  m_PARAMtuneHelixParameterFit.at(i);
+    }
+    if (int (m_PARAMtuneDeltaSOverZ.size()) < i + 1) {
+      newPass->deltaSOverZ.second = m_PARAMtuneDeltaSOverZ.at(m_PARAMtuneDeltaSOverZ.size() - 1);
+    } else {
+      newPass->deltaSOverZ.second =  m_PARAMtuneDeltaSOverZ.at(i);
+    }
+    if (int (m_PARAMtuneDeltaSlopeZOverS.size()) < i + 1) {
+      newPass->deltaSlopeZOverS.second = m_PARAMtuneDeltaSlopeZOverS.at(m_PARAMtuneDeltaSlopeZOverS.size() - 1);
+    } else {
+      newPass->deltaSlopeZOverS.second =  m_PARAMtuneDeltaSlopeZOverS.at(i);
+    }
+    if (int (m_PARAMtuneAlwaysTrue3Hit.size()) < i + 1) {
+      newPass->alwaysTrue3Hit.second = m_PARAMtuneAlwaysTrue3Hit.at(m_PARAMtuneAlwaysTrue3Hit.size() - 1);
+    } else {
+      newPass->alwaysTrue3Hit.second = m_PARAMtuneAlwaysTrue3Hit.at(i);
+    }
+    if (int (m_PARAMtuneAlwaysFalse3Hit.size()) < i + 1) {
+      newPass->alwaysFalse3Hit.second = m_PARAMtuneAlwaysFalse3Hit.at(m_PARAMtuneAlwaysFalse3Hit.size() - 1);
+    } else {
+      newPass->alwaysFalse3Hit.second = m_PARAMtuneAlwaysFalse3Hit.at(i);
+    }
+    if (int (m_PARAMtuneRandom3Hit.size()) < i + 1) {
+      newPass->random3Hit.second = m_PARAMtuneRandom3Hit.at(m_PARAMtuneRandom3Hit.size() - 1);
+    } else {
+      newPass->random3Hit.second = m_PARAMtuneRandom3Hit.at(i);
+    }
+    if (int (m_PARAMtuneZigZagXY.size()) < i + 1) {
+      newPass->zigzagXY.second = m_PARAMtuneZigZagXY.at(m_PARAMtuneZigZagXY.size() - 1);
+    } else {
+      newPass->zigzagXY.second = m_PARAMtuneZigZagXY.at(i);
+    }
+    if (int (m_PARAMtuneZigZagXYWithSigma.size()) < i + 1) {
+      newPass->zigzagXYWithSigma.second = m_PARAMtuneZigZagXYWithSigma.at(m_PARAMtuneZigZagXYWithSigma.size() - 1);
+    } else {
+      newPass->zigzagXYWithSigma.second = m_PARAMtuneZigZagXYWithSigma.at(i);
+    }
+    if (int (m_PARAMtuneZigZagRZ.size()) < i + 1) {
+      newPass->zigzagRZ.second = m_PARAMtuneZigZagRZ.at(m_PARAMtuneZigZagRZ.size() - 1);
+    } else {
+      newPass->zigzagRZ.second = m_PARAMtuneZigZagRZ.at(i);
+    }
+    if (int (m_PARAMtuneDeltaPt.size()) < i + 1) {
+      newPass->deltaPt.second = m_PARAMtuneDeltaPt.at(m_PARAMtuneDeltaPt.size() - 1);
+    } else {
+      newPass->deltaPt.second = m_PARAMtuneDeltaPt.at(i);
+    }
+    if (int (m_PARAMtuneDeltaDistance2IP.size()) < i + 1) {
+      newPass->deltaDistance2IP.second = m_PARAMtuneDeltaDistance2IP.at(m_PARAMtuneDeltaDistance2IP.size() - 1);
+    } else {
+      newPass->deltaDistance2IP.second = m_PARAMtuneDeltaDistance2IP.at(i);
+    }
+    if (int (m_PARAMtuneAlwaysTrue4Hit.size()) < i + 1) {
+      newPass->alwaysTrue4Hit.second = m_PARAMtuneAlwaysTrue4Hit.at(m_PARAMtuneAlwaysTrue4Hit.size() - 1);
+    } else {
+      newPass->alwaysTrue4Hit.second = m_PARAMtuneAlwaysTrue4Hit.at(i);
+    }
+    if (int (m_PARAMtuneAlwaysFalse4Hit.size()) < i + 1) {
+      newPass->alwaysFalse4Hit.second = m_PARAMtuneAlwaysFalse4Hit.at(m_PARAMtuneAlwaysFalse4Hit.size() - 1);
+    } else {
+      newPass->alwaysFalse4Hit.second = m_PARAMtuneAlwaysFalse4Hit.at(i);
+    }
+    if (int (m_PARAMtuneRandom4Hit.size()) < i + 1) {
+      newPass->random4Hit.second = m_PARAMtuneRandom4Hit.at(m_PARAMtuneRandom4Hit.size() - 1);
+    } else {
+      newPass->random4Hit.second = m_PARAMtuneRandom4Hit.at(i);
+    }
+    if (int (m_PARAMtuneCircleFit.size()) < i + 1) {
+      newPass->circleFit.second = m_PARAMtuneCircleFit.at(m_PARAMtuneCircleFit.size() - 1);
+    } else {
+      newPass->circleFit.second = m_PARAMtuneCircleFit.at(i);
+    }
+    B2DEBUG(10, "starting import of tuning values of HioC filters:")
+    // high occupancy cases:
+    if (int (m_PARAMtuneAngles3DHioC.size()) < i + 1) {
+      newPass->anglesHighOccupancy3D.second = m_PARAMtuneAngles3DHioC.at(m_PARAMtuneAngles3DHioC.size() - 1);
+    } else {
+      newPass->anglesHighOccupancy3D.second =  m_PARAMtuneAngles3DHioC.at(i);
+    }
+    if (int (m_PARAMtuneAnglesXYHioC.size()) < i + 1) {
+      newPass->anglesHighOccupancyXY.second = m_PARAMtuneAnglesXYHioC.at(m_PARAMtuneAnglesXYHioC.size() - 1);
+    } else {
+      newPass->anglesHighOccupancyXY.second = m_PARAMtuneAnglesXYHioC.at(i);
+    }
+    if (int (m_PARAMtuneAnglesRZHioC.size()) < i + 1) {
+      newPass->anglesHighOccupancyRZ.second = m_PARAMtuneAnglesRZHioC.at(m_PARAMtuneAnglesRZHioC.size() - 1);
+    } else {
+      newPass->anglesHighOccupancyRZ.second = m_PARAMtuneAnglesRZHioC.at(i);
+    }
+    if (int (m_PARAMtuneDeltaSlopeRZHioC.size()) < i + 1) {
+      newPass->deltaSlopeHighOccupancyRZ.second = m_PARAMtuneDeltaSlopeRZHioC.at(m_PARAMtuneDeltaSlopeRZHioC.size() - 1);
+    } else {
+      newPass->deltaSlopeHighOccupancyRZ.second = m_PARAMtuneDeltaSlopeRZHioC.at(i);
+    }
+    if (int (m_PARAMtuneDistance2IPHioC.size()) < i + 1) {
+      newPass->distanceHighOccupancy2IP.second = m_PARAMtuneDistance2IPHioC.at(m_PARAMtuneDistance2IPHioC.size() - 1);
+    } else {
+      newPass->distanceHighOccupancy2IP.second =  m_PARAMtuneDistance2IPHioC.at(i);
+    }
+    if (int (m_PARAMtunePTHioC.size()) < i + 1) {
+      newPass->pTHighOccupancy.second = m_PARAMtunePTHioC.at(m_PARAMtunePTHioC.size() - 1);
+    } else {
+      newPass->pTHighOccupancy.second =  m_PARAMtunePTHioC.at(i);
+    }
+    if (int (m_PARAMtuneHelixParameterFitHioC.size()) < i + 1) {
+      newPass->helixParameterHighOccupancyFit.second = m_PARAMtuneHelixParameterFitHioC.at(m_PARAMtuneHelixParameterFitHioC.size() - 1);
+    } else {
+      newPass->helixParameterHighOccupancyFit.second =  m_PARAMtuneHelixParameterFitHioC.at(i);
+    }
+    if (int (m_PARAMtuneDeltaPtHioC.size()) < i + 1) {
+      newPass->deltaPtHighOccupancy.second = m_PARAMtuneDeltaPtHioC.at(m_PARAMtuneDeltaPtHioC.size() - 1);
+    } else {
+      newPass->deltaPtHighOccupancy.second = m_PARAMtuneDeltaPtHioC.at(i);
+    }
+    if (int (m_PARAMtuneDeltaDistance2IPHioC.size()) < i + 1) {
+      newPass->deltaDistanceHighOccupancy2IP.second = m_PARAMtuneDeltaDistance2IPHioC.at(m_PARAMtuneDeltaDistance2IPHioC.size() - 1);
+    } else {
+      newPass->deltaDistanceHighOccupancy2IP.second = m_PARAMtuneDeltaDistance2IPHioC.at(i);
+    }
+
+
+    /// importing sectorMap including friend Information and friend specific cutoffs
+    std::pair<int, int> countedFriendsAndCutoffs = newPass->importSectorMap(newMap->getSectorMap(), newMap->getDistances(), newMap->isFilterByDistance2OriginActivated());
+
+    B2DEBUG(1, m_PARAMnameOfInstance << " Pass " << i << ", setup " << chosenSetup << ": importing secMap with " << newMap->getSectorMap().size() << " sectors -> imported: " << newPass->sectorMap.size() << "/" << countedFriendsAndCutoffs.first << "/" << countedFriendsAndCutoffs.second << " sectors/friends/(friends w/o existing filters)");
+
+    if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true) {  /// printing total Map:
+      int sectorCtr = 0, friendCtr = 0, cutoffTypesCtr = 0; // counters
+      vector<int> currentCutOffTypes;
+      for (auto & mapEntry : newPass->sectorMap) { // looping through sectors
+        VXDSector* thisSector = mapEntry.second;
+        const vector<unsigned int> currentFriends = thisSector->getFriends();
+        uint nFriends = currentFriends.size();
+        B2DEBUG(5, "Opening sector " << FullSecID(mapEntry.first) << "/" << FullSecID(thisSector->getSecID()) << " at dist2Origin " << thisSector->getDistance() << " which has got " << nFriends << " friends for internal supportedCuttoffsList and " << thisSector->getFriendPointers().size() << " friendSectors as pointers");
+        if (nFriends != uint(thisSector->getFriendMapSize()) or nFriends != thisSector->getFriendPointers().size()) {
+          B2WARNING(" number of friends do not match in sector " << FullSecID(mapEntry.first) << ": friends by friendVector vs nEntries vs nFriendPointers in FriendMap: " << nFriends << "/" << thisSector->getFriendMapSize() << "/" << thisSector->getFriendPointers().size())
+        }
+
+        for (VXDSector * aFriend : thisSector->getFriendPointers()) {
+          uint friendInt = aFriend->getSecID();
+          currentCutOffTypes = thisSector->getSupportedCutoffs(friendInt);
+          for (auto cutOffType : currentCutOffTypes) { // looping through cutoffs
+            const Belle2::Cutoff* aCutoff = thisSector->getCutoff(cutOffType, friendInt);
+            if (aCutoff == NULL) { continue; }
+            B2DEBUG(175, " cutoff is of type: " << FilterID().getFilterString(cutOffType) << ", min: " << aCutoff->getMinValue() << ", max:" << aCutoff->getMaxValue());
+            cutoffTypesCtr++;
+          }
+          B2DEBUG(175, "cutoffTypesCtr got " << cutoffTypesCtr << " cutoffs")
+          ++friendCtr;
+        }
+        ++sectorCtr;
+      }
+      B2DEBUG(1, m_PARAMnameOfInstance << " Pass " << i << ": manually counted a total of " << sectorCtr << "/" << friendCtr << "/" << cutoffTypesCtr << " setors/friends/cutoffs in sectorMap"); // oldLevel5
+    }
+
+    m_passSetupVector.push_back(newPass); /// store pass for eternity (well until end of program)
+  }
+}
+
+
+
+void VXDTFModule::setupBaseLineTF()
+{
+  unsigned int centerSecID = FullSecID().getFullSecID(); // automatically produces secID of centerSector
+  VXDSector* pCenterSector = new VXDSector(centerSecID);
+  m_baselinePass.sectorMap.insert({centerSecID, pCenterSector});
+  B2DEBUG(100, "Baseline-Pass: adding virtual centerSector with " << m_baselinePass.sectorMap.find(centerSecID)->second->getFriends().size() << " friends.");
+  m_baselinePass.threeHitFilterBox.resetMagneticField(m_passSetupVector.at(0)->magneticFieldStrength);
+  m_baselinePass.fourHitFilterBox.resetMagneticField(m_passSetupVector.at(0)->magneticFieldStrength);
+  m_baselinePass.trackletFilterBox.resetMagneticField(m_passSetupVector.at(0)->magneticFieldStrength);
+  m_baselinePass.origin = m_passSetupVector.at(0)->origin;
+  m_baselinePass.useSVDHits = m_passSetupVector.at(0)->useSVDHits;
+  m_baselinePass.usePXDHits = m_passSetupVector.at(0)->usePXDHits;
+  m_baselinePass.useTELHits = m_passSetupVector.at(0)->useTELHits;
+  m_baselinePass.chosenDetectorType = m_passSetupVector.at(0)->chosenDetectorType;
+  m_baselinePass.numTotalLayers = m_passSetupVector.at(0)->numTotalLayers;
+  m_baselinePass.zigzagXY = m_passSetupVector.at(0)->zigzagXY;
+  m_baselinePass.zigzagXYWithSigma = m_passSetupVector.at(0)->zigzagXYWithSigma;
+  m_baselinePass.deltaPt = m_passSetupVector.at(0)->deltaPt;
+  m_baselinePass.circleFit = m_passSetupVector.at(0)->circleFit;
+  int countActivatedTCTests = 0;
+  if (m_baselinePass.zigzagXY.first == true) { countActivatedTCTests++; }
+  if (m_baselinePass.zigzagXYWithSigma.first == true) { countActivatedTCTests++; }
+  if (m_baselinePass.deltaPt.first == true) { countActivatedTCTests++; }
+  if (m_baselinePass.circleFit.first == true) { countActivatedTCTests++; }
+  m_baselinePass.activatedTccFilterTests = countActivatedTCTests; // pT, zzXY, circleFit
+
+  /// WARNING TODO at the moment, copying the first pass set by the user means that the baselineTF can not be set at different behavior than first normal pass. Need new method to introduce independent steering too! (maybe first pass-entries are used for baselineTF if activated, and first pass is second entry in list?)
+}
+
+
+void VXDTFModule::importSectorMapsToDisplayCollector()
+{
+  //KeySectors dosn't function => so pair Int int
+  std::vector< std::pair<std::pair<unsigned int, unsigned int>, std::vector<unsigned int> > > sectorsDisplayAllPass;
+  std::vector<unsigned int> sectorsDisplayFriends;
+
+  for (uint i = 0; i < m_passSetupVector.size(); i++) {
+    B2DEBUG(10, "PassNr. " << i << "Size of Sector Map: " << m_passSetupVector.at(i)->sectorMap.size());
+
+    // Read Sector Map => into map
+    for (auto & currentSector : m_passSetupVector.at(i)->sectorMap) {
+      sectorsDisplayFriends.clear();
+
+      // Friends read and store in second vector
+      for (auto & currentFriend : currentSector.second->getFriends()) {
+        sectorsDisplayFriends.push_back(currentFriend);
+      }
+
+      sectorsDisplayAllPass.push_back({ {i, currentSector.second->getSecID()}, sectorsDisplayFriends });
+
+    }
+
+    // Init all Sectors, secConfigU & secConfigV used for PositionInfo
+    m_collector.initSectors(sectorsDisplayAllPass, m_passSetupVector.at(i)->secConfigU, m_passSetupVector.at(i)->secConfigV);
+
+    for (auto infosector : m_passSetupVector.at(i)->secConfigU) {
+      B2DEBUG(100, "InitSector secConfigU: " << infosector);
+    }
+
+    for (auto infosector : m_passSetupVector.at(i)->secConfigV) {
+      B2DEBUG(100, "InitSector secConfigV: " << infosector);
+    }
+  }
 }

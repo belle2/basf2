@@ -522,6 +522,44 @@ namespace Belle2 {
 
 
 
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// REDESIGN - new functions encapsulating smaller tasks
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    ////////////////////////////////////////
+    /// REDESIGN - Functions for initialize:
+    ////////////////////////////////////////
+
+    /** check given parameters by the user for validity and prepare some initial settings depending on the settings */
+    void checkAndSetupModuleParameters();
+
+    /** register storeArrays, set up geometryManager, activate genfit-tools used */
+    void prepareExternalTools();
+
+
+    //////////////////////////////////////
+    /// REDESIGN - Functions for beginRun:
+    //////////////////////////////////////
+
+    /** imports sectorMaps chosen from the storage and sets up all passes for that run */
+    void setupPasses();
+
+    /** sets up all the relevant settings for the baseLineTF.
+     *
+     * The BaseLineTF is a very simplistic pseudo-TF only relevant for testbeams
+     * copying first pass for the BaselineTF (just to be sure that they can be used independently from each other)
+     * */
+    void setupBaseLineTF();
+
+    /** Import all Sectors for all events (Collector).
+     *
+     * They will be copied to the displayCollector to have a 1:1 metaInfo for each sector of each pass */
+    void importSectorMapsToDisplayCollector();
+
+
+
   protected:
     TCsOfEvent m_tcVector; /**< carries links to all track candidates found within event (during tcc filter, bad ones get kicked, lateron they simply get deactivated) */
     TCsOfEvent m_allTCsOfEvent; /**< carries links to really all track candidates found within event (used for deleting TrackCandidates at end of event) TODO: check whether use of m_tcVector can not be merged this one. Seems like redundant steps*/

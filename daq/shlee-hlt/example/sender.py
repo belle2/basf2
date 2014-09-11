@@ -44,6 +44,6 @@ main.add_module(g4sim)
 main.add_module(cdcdigitizer)
 main.add_module(output)
 
-# fw.set_nprocess (2)
+# fw.set_nprocesses (2)
 fw.process(main)
 

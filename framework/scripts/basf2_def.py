@@ -153,17 +153,6 @@ def process(path, max_event=0):
         fw.process(path)
 
 
-def nprocess(nproc):
-    """
-    Sets number of processes for parallel processing
-
-    nproc: number of processes
-    """
-
-    B2WARNING('Please use set_nprocesses() instead of nprocess()!')
-    fw.set_nprocesses(nproc)
-
-
 def set_nprocesses(nproc):
     """
     Sets number of processes for parallel processing

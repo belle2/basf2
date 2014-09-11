@@ -3,7 +3,7 @@
 
 ##############################################################################
 # Demonstrate parallel processing using full simulation and reconstruction
-# chain. The key bit is the nprocess() call at the very end.
+# chain. The key bit is the set_nprocesses() call at the very end.
 #
 # Alternatively, you can simply use the -p NPROCESSES argument
 # when executing any steering file to enable parallel processing.

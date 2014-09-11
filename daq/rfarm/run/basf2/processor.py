@@ -56,6 +56,6 @@ elapsed = register_module('ElapsedTime')
 main.add_module(elapsed)
 
 # Process events
-nprocess(int(argvs[4]))
+set_nprocesses(int(argvs[4]))
 process(main)
 

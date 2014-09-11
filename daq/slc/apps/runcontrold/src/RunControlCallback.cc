@@ -219,6 +219,7 @@ void RunControlCallback::postRun() throw()
     RunNumberInfoTable(getDB()).add(m_info);
     LoggerObjectTable ltable(getDB());
     for (size_t i = 0; i < m_data_v.size(); i++) {
+      m_data_v[i].setId(0);
       ltable.add(m_data_v[i], true);
     }
     RunSummary summary(getNode());
@@ -552,6 +553,7 @@ void RunControlCallback::timeout() throw()
       LoggerObjectTable ltable(getDB());
       for (size_t i = 0; i < m_data_v.size(); i++) {
         if (m_data_v[i].isAvailable()) {
+          m_data_v[i].setId(0);
           ltable.add(m_data_v[i], true);
         }
       }

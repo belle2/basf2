@@ -13,12 +13,16 @@
 #include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/RestOfEvent.h>
+#include <analysis/utility/PCmsLabTransform.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 
 #include <boost/regex.hpp>
@@ -310,6 +314,239 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr p_CMS(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        auto particleListName = arguments[0];
+        auto extraInfoName = arguments[1];
+        auto func = [particleListName, extraInfoName](const Particle*) -> double {
+          StoreObjPtr<ParticleList> ListOfParticles(particleListName);
+          TLorentzVector momXchargedtracks; //Momentum of charged X tracks in CMS-System
+          TLorentzVector momXchargedclusters; //Momentum of charged X clusters in CMS-System
+          TLorentzVector momXneutralclusters; //Momentum of neutral X clusters in CMS-System
+          TLorentzVector momX; //Total Momentum of the recoiling X in CMS-System
+          TLorentzVector momTarget;  //Momentum of target particle in CMS-System
+          PCmsLabTransform T;
+          double maximum_r = 0;
+          for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
+            Particle* p = ListOfParticles->getParticle(i);
+            double r = p->getExtraInfo(extraInfoName);
+            momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
+            if (r > maximum_r) {
+              maximum_r = r;
+              momTarget = T.rotateLabToCms() * p -> get4Vector();
+            }
+          }
+          return momTarget.P();
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments (2 required) for meta function p_CMS");
+        return nullptr;
+      }
+    }
+
+    Manager::FunctionPtr recoilMassBtag(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        auto particleListName = arguments[0];
+        auto extraInfoName = arguments[1];
+        auto func = [particleListName, extraInfoName](const Particle*) -> double {
+          StoreObjPtr<ParticleList> ListOfParticles(particleListName);
+          TLorentzVector momXchargedtracks; //Momentum of charged X tracks in CMS-System
+          TLorentzVector momXchargedclusters; //Momentum of charged X clusters in CMS-System
+          TLorentzVector momXneutralclusters; //Momentum of neutral X clusters in CMS-System
+          TLorentzVector momX; //Total Momentum of the recoiling X in CMS-System
+          TLorentzVector momTarget;  //Momentum of Mu in CMS-System
+          TLorentzVector momMiss;  //Momentum of Anti-v  in CMS-System
+          PCmsLabTransform T;
+          double maximum_r = 0;
+          for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
+            Particle* p = ListOfParticles->getParticle(i);
+            double r = p->getExtraInfo(extraInfoName);
+            momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
+            if (r > maximum_r) {
+              maximum_r = r;
+              momTarget = T.rotateLabToCms() * p -> get4Vector();
+            }
+          }
+          StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+          const auto& ecl = roe->getECLClusters();
+          for (auto & x : ecl) {
+            if (x->isNeutral()) momXneutralclusters += T.rotateLabToCms() * x -> get4Vector();
+            if (!(x->isNeutral())) momXchargedclusters += T.rotateLabToCms() * x -> get4Vector();
+          }
+          const auto& klm = roe->getKLMClusters();
+          for (auto & x : klm) {
+            if (!(x -> getAssociatedTrackFlag()) && !(x -> getAssociatedEclClusterFlag())) {
+              momXneutralclusters += T.rotateLabToCms() * x -> getMomentum();
+            }
+          }
+          TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
+          momX = (momXcharged + momXneutralclusters - momTarget) - momTarget;
+          return momX.M();
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments (2 required) for meta function recoilMassBtag");
+        return nullptr;
+      }
+    }
+
+    Manager::FunctionPtr p_CMS_missing(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        auto particleListName = arguments[0];
+        auto extraInfoName = arguments[1];
+        auto func = [particleListName, extraInfoName](const Particle*) -> double {
+          StoreObjPtr<ParticleList> ListOfParticles(particleListName);
+          TLorentzVector momXchargedtracks; //Momentum of charged X tracks in CMS-System
+          TLorentzVector momXchargedclusters; //Momentum of charged X clusters in CMS-System
+          TLorentzVector momXneutralclusters; //Momentum of neutral X clusters in CMS-System
+          TLorentzVector momX; //Total Momentum of the recoiling X in CMS-System
+          TLorentzVector momTarget;  //Momentum of Mu in CMS-System
+          TLorentzVector momMiss;  //Momentum of Anti-v  in CMS-System
+          PCmsLabTransform T;
+          double maximum_r = 0;
+          for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
+            Particle* p = ListOfParticles->getParticle(i);
+            double r = p->getExtraInfo(extraInfoName);
+            momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
+            if (r > maximum_r) {
+              maximum_r = r;
+              momTarget = T.rotateLabToCms() * p -> get4Vector();
+            }
+          }
+          StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+          const auto& ecl = roe->getECLClusters();
+          for (auto & x : ecl) {
+            if (x->isNeutral()) momXneutralclusters += T.rotateLabToCms() * x -> get4Vector();
+            if (!(x->isNeutral())) momXchargedclusters += T.rotateLabToCms() * x -> get4Vector();
+          }
+          const auto& klm = roe->getKLMClusters();
+          for (auto & x : klm) {
+            if (!(x -> getAssociatedTrackFlag()) && !(x -> getAssociatedEclClusterFlag())) {
+              momXneutralclusters += T.rotateLabToCms() * x -> getMomentum();
+            }
+          }
+          TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
+          momX = (momXcharged + momXneutralclusters - momTarget) - momTarget;
+          momMiss = -(momX + momTarget);
+          return momMiss.Vect().Mag();
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments (2 required) for meta function p_CMS_missing");
+        return nullptr;
+      }
+    }
+
+    Manager::FunctionPtr particleCosTheta_CMS_missing(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        auto particleListName = arguments[0];
+        auto extraInfoName = arguments[1];
+        auto func = [particleListName, extraInfoName](const Particle*) -> double {
+          StoreObjPtr<ParticleList> ListOfParticles(particleListName);
+          TLorentzVector momXchargedtracks; //Momentum of charged X tracks in CMS-System
+          TLorentzVector momXchargedclusters; //Momentum of charged X clusters in CMS-System
+          TLorentzVector momXneutralclusters; //Momentum of neutral X clusters in CMS-System
+          TLorentzVector momX; //Total Momentum of the recoiling X in CMS-System
+          TLorentzVector momTarget;  //Momentum of Mu in CMS-System
+          TLorentzVector momMiss;  //Momentum of Anti-v  in CMS-System
+          PCmsLabTransform T;
+          double maximum_r = 0;
+          for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
+            Particle* p = ListOfParticles->getParticle(i);
+            double r = p->getExtraInfo(extraInfoName);
+            momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
+            if (r > maximum_r) {
+              maximum_r = r;
+              momTarget = T.rotateLabToCms() * p -> get4Vector();
+            }
+          }
+          StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+          const auto& ecl = roe->getECLClusters();
+          for (auto & x : ecl) {
+            if (x->isNeutral()) momXneutralclusters += T.rotateLabToCms() * x -> get4Vector();
+            if (!(x->isNeutral())) momXchargedclusters += T.rotateLabToCms() * x -> get4Vector();
+          }
+          const auto& klm = roe->getKLMClusters();
+          for (auto & x : klm) {
+            if (!(x -> getAssociatedTrackFlag()) && !(x -> getAssociatedEclClusterFlag())) {
+              momXneutralclusters += T.rotateLabToCms() * x -> getMomentum();
+            }
+          }
+          TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
+          momX = (momXcharged + momXneutralclusters - momTarget) - momTarget;
+          momMiss = -(momX + momTarget);
+          return TMath::Cos(momTarget.Angle(momMiss.Vect()));
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments (2 required) for meta particleCosTheta_CMS_missing");
+        return nullptr;
+      }
+    }
+
+    Manager::FunctionPtr E_W_90(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        auto particleListName = arguments[0];
+        auto extraInfoName = arguments[1];
+        auto func = [particleListName, extraInfoName](const Particle*) -> double {
+          StoreObjPtr<ParticleList> ListOfParticles(particleListName);
+          TLorentzVector momXchargedtracks; //Momentum of charged X tracks in CMS-System
+          TLorentzVector momXchargedclusters; //Momentum of charged X clusters in CMS-System
+          TLorentzVector momXneutralclusters; //Momentum of neutral X clusters in CMS-System
+          TLorentzVector momX; //Total Momentum of the recoiling X in CMS-System
+          TLorentzVector momTarget;  //Momentum of Mu in CMS-System
+          TLorentzVector momMiss;  //Momentum of Anti-v  in CMS-System
+          PCmsLabTransform T;
+          TLorentzVector momW; //Momentum of the W-Boson in CMS
+          float E_W_90 = 0 ; // Energy of all charged and neutral clusters in the hemisphere of the W-Boson
+          double maximum_r = 0;
+          for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
+            Particle* p = ListOfParticles->getParticle(i);
+            double r = p->getExtraInfo(extraInfoName);
+            momXchargedtracks += T.rotateLabToCms() * p -> get4Vector();
+            if (r > maximum_r) {
+              maximum_r = r;
+              momTarget = T.rotateLabToCms() * p -> get4Vector();
+            }
+          }
+          StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+          const auto& ecl = roe->getECLClusters();
+          for (auto & x : ecl) {
+            if (x->isNeutral()) momXneutralclusters += T.rotateLabToCms() * x -> get4Vector();
+            if (!(x->isNeutral())) momXchargedclusters += T.rotateLabToCms() * x -> get4Vector();
+          }
+          const auto& klm = roe->getKLMClusters();
+          for (auto & x : klm) {
+            if (!(x -> getAssociatedTrackFlag()) && !(x -> getAssociatedEclClusterFlag())) {
+              momXneutralclusters += T.rotateLabToCms() * x -> getMomentum();
+            }
+          }
+          TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
+          momX = (momXcharged + momXneutralclusters - momTarget) - momTarget;
+          momMiss = -(momX + momTarget);
+          momW = momTarget + momMiss;
+          for (auto & i : ecl) {
+            if ((T.rotateLabToCms() * i -> get4Vector()).Vect().Dot(momW.Vect()) > 0) E_W_90 += i -> getEnergy();
+
+          }
+//       for (auto & i : klm) {
+//         if ((T.rotateLabToCms() * i -> getMomentum()).Vect().Dot(momW.Vect()) > 0) E_W_90 +=;
+//         }
+          return E_W_90;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments (2 required) for meta E_W_90");
+        return nullptr;
+      }
+    }
+
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_VARIABLE("daughter(n, variable)", daughter, "Returns value of variable for the nth daughter.");
     REGISTER_VARIABLE("daughterProductOf(variable)", daughterProductOf, "Returns product of a variable over all daughters.");
@@ -323,5 +560,12 @@ namespace Belle2 {
     REGISTER_VARIABLE("QrOf(particleListName, extraInfoRightClass, extraInfoFromB)", QrOf, "FlavorTagging: [Eventbased] q*r where r is calculated from the output of event level in particlelistName.");
     REGISTER_VARIABLE("IsRightClass(particleName, particleListName, extraInfoName)", IsRightClass, "FlavorTagging: returns 1 if the class track by particleName category has the same flavour as the MC target track 0 else also if there is no target track");
     REGISTER_VARIABLE("IsFromB(particleName)", IsFromB, "Checks if the given Particle was really from a B. 1.0 if true otherwise 0.0");
+    REGISTER_VARIABLE("p_CMS(particleListName, extraInfoName)", p_CMS, "FlavorTagging:[Eventbased] CMS momentum magnitude of the particle classified as target, i.e. that with the highest probability in particlelistName.");
+    REGISTER_VARIABLE("mRecoilBtag(particleListName, extraInfoName)", recoilMassBtag, "FlavorTagging:[Eventbased] CMS recoiling mass of the Btag system against the target lepton, i.e. the particle with the highest leptonic probability in the particlelistName.");
+    REGISTER_VARIABLE("p_CMS_missing(particleListName, extraInfoName)", p_CMS_missing, "FlavorTagging:[Eventbased] CMS momentum magnitude missing in Btag using as target hypothesis the particle classified as lepton, i.e. that with the highest leptonic probability in particlelistName.");
+    REGISTER_VARIABLE("cosTheta_missing(particleListName, extraInfoName)", particleCosTheta_CMS_missing, "FlavorTagging:[Eventbased] Cosine of the polar angle of the CMS momentum missing in Btag using as target hypothesis the particle classified as lepton, i.e. that with the highest leptonic probability in particlelistName.");
+    REGISTER_VARIABLE("EW90(particleListName, extraInfoName)", E_W_90, "FlavorTagging:[Eventbased] Energy in the hemisphere defined by the direction of the virtual W-Boson assuming a semileptonic decay.");
+
+
   }
 }

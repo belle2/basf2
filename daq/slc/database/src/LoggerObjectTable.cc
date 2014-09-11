@@ -39,9 +39,11 @@ throw(DBHandlerException)
     ss1 << ", " << name;
     if (obj.hasObject(name)) {
       size_t nobj = obj.getNObjects(name);
+      int cid = 0;
       for (size_t j = 0; j < nobj; j++) {
         const DBObject& cobj(obj.getObject(name, j));
-        if (!cobj.isConfig()) add(cobj, false);
+        cobj.setId(cid);
+        if (!cobj.isConfig()) cid = add(cobj, false);
       }
     }
     const FieldInfo::Property& pro(obj.getProperty(name));

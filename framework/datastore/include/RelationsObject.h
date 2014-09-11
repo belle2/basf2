@@ -130,7 +130,9 @@ namespace Belle2 {
      *  @param weight  The weight of the relation.
      */
     void addRelationTo(const TObject* object, double weight = 1.0) const {
-      DataStore::Instance().addRelation(this, m_cacheDataStoreEntry, m_cacheArrayIndex, object, weight);
+      StoreEntry* toEntry = nullptr;
+      int toIndex = -1;
+      DataStore::Instance().addRelation(this, m_cacheDataStoreEntry, m_cacheArrayIndex, object, toEntry, toIndex, weight);
     }
 
     //====================================================================================================
@@ -315,7 +317,7 @@ namespace Belle2 {
     return *this;
   }
 
-  /** Typedef for relations interface for classes derived from TObject. */
+  /** Provides interface for getting/adding relations to objects in StoreArrays. See RelationsInterface for details. */
   typedef RelationsInterface<TObject> RelationsObject;
 }
 

@@ -52,7 +52,7 @@ namespace Belle2 {
    *  to store in your implementation of Module::initialize(), see StoreArray::registerRelationTo()
    *
    *
-   *  \sa RelationObject for the main user interface to relations.
+   *  \sa RelationsObject for the main user interface to relations.
    *  \sa RelationIndex provides an low-levvel interface to quickly find objects
    *      related to a given FROM/TO side object.
    *  \sa The on-disk data structure is provided by RelationElement objects

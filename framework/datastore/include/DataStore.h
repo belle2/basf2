@@ -263,20 +263,6 @@ namespace Belle2 {
      */
     void addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject, StoreEntry*& toEntry, int& toIndex, double weight);
 
-    /** Add a relation from an object in a store array to another object in a store array.
-     *
-     *  @param fromObject     Pointer to the object from which the relation points.
-     *  @param fromEntry      Data store entry that contains the fromObject. Used for caching. Will be set if NULL.
-     *  @param fromIndex      Index in TClonesArray that contains the fromObject. Used for caching. Will be set if < 0.
-     *  @param toObject       Pointer to the object to which the relation points.
-     *  @param weight         Weight of the relation.
-     */
-    inline void addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject, double weight) {
-      StoreEntry* toEntry = nullptr;
-      int toIndex = -1;
-      addRelation(fromObject, fromEntry, fromIndex, toObject, toEntry, toIndex, weight);
-    }
-
 
     /** Get the relations between an object and other objects in a store array.
      *
@@ -309,7 +295,7 @@ namespace Belle2 {
 
     /** Add a relation from an object in a store array to another object in a store array.
      *
-     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching.
+     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching. Currently this should only be necessary for genfit objects.
      *
      *  @sa RelationsInterface::addRelationTo
      *  @param fromObject     Pointer to the object from which the relation points.
@@ -317,9 +303,11 @@ namespace Belle2 {
      *  @param weight         Weight of the relation.
      */
     static void addRelationFromTo(const TObject* fromObject, const TObject* toObject, double weight = 1.0) {
-      DataStore::StoreEntry* storeEntry = nullptr;
-      int index = -1;
-      Instance().addRelation(fromObject, storeEntry, index, toObject, weight);
+      DataStore::StoreEntry* fromEntry = nullptr;
+      int fromIndex = -1;
+      StoreEntry* toEntry = nullptr;
+      int toIndex = -1;
+      Instance().addRelation(fromObject, fromEntry, fromIndex, toObject, toEntry, toIndex, weight);
     }
 
     /** Get the relations from an object to other objects in a store array.
@@ -362,7 +350,7 @@ namespace Belle2 {
      *
      *  Relations in both directions are returned.
      *
-     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching.
+     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching. Currently this should only be necessary for genfit objects.
      *
      *  @sa RelationsInterface::getRelationsWith
      *  @param object         Pointer to the object from or to which the relations point.
@@ -380,7 +368,8 @@ namespace Belle2 {
 
     /** Get the object to which another object has a relation.
      *
-     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching.
+     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching. Currently this should only be necessary for genfit objects.
+     *  @warning Note that the naming is not consistent with similar member functions of RelationsInterface (exactly switched around). Method will be removed at some point.
      *
      *  @param fromObject  Pointer to the object from which the relation points.
      *  @tparam TO     The class of objects to which the relation points.
@@ -398,7 +387,8 @@ namespace Belle2 {
 
     /** Get the object from which another object has a relation.
      *
-     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching.
+     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching. Currently this should only be necessary for genfit objects.
+     *  @warning Note that the naming is not consistent with similar member functions of RelationsInterface (exactly switched around). Method will be removed at some point.
      *
      *  @param toObject Pointer to the object to which the relation points.
      *  @tparam FROM    The class of objects from which the relation points.
@@ -415,6 +405,8 @@ namespace Belle2 {
     }
 
     /** Get the object to or from which another object has a relation.
+     *
+     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching. Currently this should only be necessary for genfit objects.
      *
      *  @param object  Pointer to the object to or from which the relation points.
      *  @tparam T      The class of objects to or from which the relation points.

@@ -88,7 +88,7 @@ int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph& graph) throw
     particlePosTouschek[1] = -fields[3] * Unit::m;
     if (m_pdg == -11) particlePosTouschek[2] = 400.0; //forLER
     else if (m_pdg == 11) particlePosTouschek[2] = -400.0; //forHER
-    else { std::cout << "m_pdg is not 11/-11" << std::endl; break;}
+    else { B2WARNING("m_pdg is not 11/-11"); break;}
 
     m_transMatrix->LocalToMaster(particlePosTouschek, particlePosGeant4);
 
@@ -98,7 +98,7 @@ int TouschekReaderTURTLE::getParticles(int number, MCParticleGraph& graph) throw
     particleMomTouschek[1] = -fields[5];
     if (m_pdg == -11) particleMomTouschek[2] = -fields[6]; //forLER
     else if (m_pdg == 11) particleMomTouschek[2] = fields[6]; //forHER
-    else { std::cout << "m_pdg is not 11/-11" << std::endl; break;}
+    else { B2WARNING("m_pdg is not 11/-11"); break;}
 
     m_transMatrix->LocalToMasterVect(particleMomTouschek, particleMomGeant4);
 

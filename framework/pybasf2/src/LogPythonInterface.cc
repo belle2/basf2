@@ -19,6 +19,8 @@
 
 #include <framework/core/Environment.h>
 
+#include <iostream>
+
 using namespace std;
 using namespace Belle2;
 using namespace boost::python;

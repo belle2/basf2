@@ -64,7 +64,6 @@ namespace Belle2 {
      * (3) di-muon, (4) radiative di-muon, (5) D-decays (D*->D0 pi; D0 -> K pi) */
     vector<int> m_eventType;
 
-    int m_goodTracks; /** number of good tracks per event */
     int m_unmatchedCluster; /** number of unmatched clusters per event */
     vector<double> m_EoverP; /** range for E/p per track */
     vector<double> m_EccOverEcm; /** range for Ecc/Ecm */

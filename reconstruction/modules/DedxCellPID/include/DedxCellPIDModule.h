@@ -65,7 +65,6 @@ namespace Belle2 {
 
     int m_eventID; /** counter for events */
     int m_trackID; /** counter for tracks in this event */
-    int m_nHits;   /** number of cell hits for this track */
 
     /** Save arithmetic and truncated mean for the 'dedx' values.
      *

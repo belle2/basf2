@@ -119,6 +119,8 @@ namespace Belle2 {
       if (m_m == l.m_m) {
         B2WARNING("Lines are parallel, will not intersect...");
         intP.setInvalid();
+        intP.setPoint(0, 0);
+        return intP;
       } else if (m_m == 0.0) {
         y = m_p1.getY();
         x = (y - l.m_p1.getY()) / l.m_m + l.m_p1.getX();

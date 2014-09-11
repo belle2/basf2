@@ -559,6 +559,7 @@ void RunControlCallback::timeout() throw()
       }
       //getDB()->close();
     } catch (const std::exception& e) {
+      LogFile::error(e.what());
       getDB()->close();
     }
   }

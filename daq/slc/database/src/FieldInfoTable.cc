@@ -23,25 +23,9 @@ FieldInfoList FieldInfoTable::getList(const std::string tablename,
         m_db->execute("select id, name, \"table\", revision, "
                       "type, length from fieldnames('%s', %d);",
                       tablename.c_str(), revision);
-        /*
-              m_db->execute("select fieldinfo.record_time as record_time, "
-                "fieldinfo.id as id, tableinfo.name as \"table\", "
-                "tableinfo.revision as revision, fieldinfo.name as name,"
-                "fieldinfo.type as type, fieldinfo.length as length "
-                "from fieldinfo, tableinfo where fieldinfo.tableid = tableinfo.id "
-                "and tableinfo.name = '%s' and tableinfo.revision = %d;",
-                            tablename.c_str(), revision);
-        */
       } else {
         m_db->execute("select id, name, \"table\", revision, "
                       "type, length from fieldnames();");
-        /*
-        m_db->execute("select fieldinfo.record_time as record_time, "
-                "fieldinfo.id as id, tableinfo.name as \"table\", "
-                "tableinfo.revision as revision, fieldinfo.name as name, "
-                "fieldinfo.type as type, fieldinfo.length as length "
-                "from fieldinfo, tableinfo where fieldinfo.tableid = tableinfo.id");
-        */
       }
       DBRecordList record_v = m_db->loadRecords();
       for (DBRecordList::iterator it = record_v.begin();
@@ -109,16 +93,7 @@ int FieldInfoTable::createTable(const DBObject& obj, bool isroot)
         FieldInfo& info(*it);
         if (info.getType() != FieldInfo::NSM_OBJECT &&
             info.getType() != FieldInfo::OBJECT && info.getLength() > 0) {
-          const std::string ctablename_in =
-            StringUtil::form("\"%sinfo:%s.%s:%d\"", title.c_str(),
-                             obj.getTable().c_str(), info.getName().c_str(),
-                             obj.getRevision());
-          m_db->execute("create table %s (%s int, index int, \"%s\" %s);",
-                        ctablename_in.c_str(), idname.c_str(),
-                        info.getName().c_str(),
-                        info.getTypeAlias().c_str());
           ss << ", \"" << info.getName() << "\" int ";
-          //"references " << ctablename_in << "(" << idname << ")";
         } else {
           ss << ", \"" << info.getName() << "\" "
              << " " << info.getTypeAlias();

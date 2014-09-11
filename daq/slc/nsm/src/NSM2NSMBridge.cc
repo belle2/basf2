@@ -44,6 +44,8 @@ void NSM2NSMBridge::run() throw()
         for (int i = 0; i < 2; i++) {
           if (m_daemon[i] && flags[i] > 0) {
             NSMMessage& msg(com[i]->getMessage());
+            LogFile::debug("%s >> %s",
+                           msg.getNodeName(), msg.getRequestName());
             m_callback[i]->setMessage(msg);
             m_callback[i]->perform(msg);
           }

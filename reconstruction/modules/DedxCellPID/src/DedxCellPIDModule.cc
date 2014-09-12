@@ -268,22 +268,24 @@ void DedxCellPIDModule::event()
       int currentLayer = (superlayer == 0) ? layer : (8 + (superlayer - 1) * 6 + layer);
 
       // only keep one hit per layer
-      int prevILayer = -1, prevSuperlayer = -1, prevLayer = -1;
       if (iCDC > 0) {
-        prevILayer = cdcHits[cdcHitIDs[iCDC - 1]]->getILayer();
-        prevSuperlayer = cdcHits[cdcHitIDs[iCDC - 1]]->getISuperLayer();
-        prevLayer = (prevSuperlayer == 0) ? prevILayer : (8 + (prevSuperlayer - 1) * 6 + prevILayer);
+        int prevILayer = cdcHits[cdcHitIDs[iCDC - 1]]->getILayer();
+        int prevSuperlayer = cdcHits[cdcHitIDs[iCDC - 1]]->getISuperLayer();
+        int prevLayer = (prevSuperlayer == 0) ? prevILayer : (8 + (prevSuperlayer - 1) * 6 + prevILayer);
+
+        if (currentLayer == prevLayer) {
+          continue;
+        }
       }
 
-      int nextILayer = -1, nextSuperlayer = -1, nextLayer = -1;
       if (iCDC + 1 < cdcHitIDs.size()) {
-        nextILayer = cdcHits[cdcHitIDs[iCDC + 1]]->getILayer();
-        nextSuperlayer = cdcHits[cdcHitIDs[iCDC + 1]]->getISuperLayer();
-        nextLayer = (nextSuperlayer == 0) ? nextILayer : (8 + (nextSuperlayer - 1) * 6 + nextILayer);
-      }
+        int nextILayer = cdcHits[cdcHitIDs[iCDC + 1]]->getILayer();
+        int nextSuperlayer = cdcHits[cdcHitIDs[iCDC + 1]]->getISuperLayer();
+        int nextLayer = (nextSuperlayer == 0) ? nextILayer : (8 + (nextSuperlayer - 1) * 6 + nextILayer);
 
-      if (currentLayer == prevLayer || currentLayer == nextLayer) {
-        continue;
+        if (currentLayer == nextLayer) {
+          continue;
+        }
       }
 
       // find the position of the endpoints of the sense wire

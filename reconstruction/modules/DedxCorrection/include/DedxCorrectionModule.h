@@ -79,20 +79,31 @@ namespace Belle2 {
     /** Recalculate the dE/dx mean values after corrections */
     void calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr, const std::vector<double>& dedx) const;
 
-    int m_runNo; /** the run number for this sample */
+    /** the run number for this sample */
+    int m_runNo;
 
-    double m_removeLowest;  /** lower bound for truncated mean */
-    double m_removeHighest; /** upper bound for truncated mean */
+    /** lower bound for truncated mean */
+    double m_removeLowest;
+    /** upper bound for truncated mean */
+    double m_removeHighest;
 
-    double m_valid[NCDCWires];    /** validity of a particular wire */
-    double m_wireGain[NCDCWires]; /** the wire gain correction parameters */
-    double m_runGain[NRuns];      /** the run gain correction parameters */
+    /** validity of a particular wire */
+    double m_valid[NCDCWires];
+    /** the wire gain correction parameters */
+    double m_wireGain[NCDCWires];
+    /** the run gain correction parameters */
+    double m_runGain[NRuns];
 
-    double  m_alpha; /** saturation correction parameter: alpha */
-    double  m_gamma; /** saturation correction parameter: gamma */
-    double  m_delta; /** saturation correction parameter: delta */
-    double  m_power; /** saturation correction parameter: power on cos(theta) */
-    double  m_ratio; /** saturation correction parameter: ratio */
+    /** saturation correction parameter: alpha */
+    double  m_alpha;
+    /** saturation correction parameter: gamma */
+    double  m_gamma;
+    /** saturation correction parameter: delta */
+    double  m_delta;
+    /** saturation correction parameter: power on cos(theta) */
+    double  m_power;
+    /** saturation correction parameter: ratio */
+    double  m_ratio;
 
   };
 } // Belle2 namespace

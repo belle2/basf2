@@ -13,8 +13,6 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
-#include <cdc/geometry/CDCGeometryPar.h>
-
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 #include <framework/utilities/FileSystem.h>
@@ -30,7 +28,6 @@
 #include <time.h>
 
 using namespace Belle2;
-using namespace CDC;
 using namespace Dedx;
 
 REG_MODULE(DedxCorrection)
@@ -44,6 +41,11 @@ DedxCorrectionModule::DedxCorrectionModule() : Module()
 
   addParam("removeLowest", m_removeLowest, "portion of events with low dE/dx that should be discarded", double(0.0));
   addParam("removeHighest", m_removeHighest, "portion of events with high dE/dx that should be discarded", double(0.2));
+
+  // !!!!! At some point functionality to import the calibration constants
+  // should be added here (for now just use some arbitrary numbers for testing)
+  initializeParameters();
+
 }
 
 DedxCorrectionModule::~DedxCorrectionModule() { }
@@ -58,10 +60,6 @@ void DedxCorrectionModule::initialize()
 
   // register outputs
   StoreArray<DedxCell>::registerPersistent();
-
-  // !!!!! At some point functionality to import the calibration constants
-  // should be added here (for now just use some arbitrary numbers for testing)
-  initializeParameters();
 
 }
 

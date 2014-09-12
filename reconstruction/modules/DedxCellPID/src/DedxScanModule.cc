@@ -61,6 +61,9 @@ DedxScanModule::DedxScanModule() : Module()
 {
 
   setDescription("Extract dE/dx and corresponding log-likelihood from fitted tracks and hits in the CDC, SVD and PXD.");
+
+  m_eventID = -1;
+  m_trackID = 0;
 }
 
 DedxScanModule::~DedxScanModule() { }

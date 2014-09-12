@@ -74,14 +74,11 @@ void DedxSkimModule::event()
 
   // booleans for individual sample types
   bool m_Bhabha(false), m_RadBhabha(false), m_TwoPhoton(false);
-  bool m_DiMuon(false), m_RadDiMuon(false), m_DStar(false);
+  bool m_DiMuon(false), m_RadDiMuon(false);
   bool m_Base(false);
 
   for (unsigned int i = 0; i < m_eventType.size(); i++) {
     switch (m_eventType[i]) {
-      case 5:
-        m_DStar = true;
-        break;
       case 4:
         m_RadDiMuon = true;
         break;

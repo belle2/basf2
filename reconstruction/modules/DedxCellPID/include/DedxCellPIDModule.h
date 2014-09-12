@@ -11,7 +11,6 @@
 #ifndef DEDXCELLPIDMODULE_H
 #define DEDXCELLPIDMODULE_H
 
-#include <reconstruction/modules/DedxCorrection/DedxCorrectionModule.h>
 #include <reconstruction/dataobjects/DedxConstants.h>
 
 #include <framework/core/Module.h>
@@ -63,8 +62,10 @@ namespace Belle2 {
 
   private:
 
-    int m_eventID; /** counter for events */
-    int m_trackID; /** counter for tracks in this event */
+    /** counter for events */
+    int m_eventID;
+    /** counter for tracks in this event */
+    int m_trackID;
 
     /** Save arithmetic and truncated mean for the 'dedx' values.
      *

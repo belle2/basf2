@@ -53,20 +53,26 @@ namespace Belle2 {
     /** End of the event processing */
     virtual void terminate();
 
+    /** A method to check whether a track passes some nominal cuts */
     bool isGoodTrack(const Track* track, const Const::ChargedStable& chargedStable);
 
   private:
 
-    int m_eventID; /** the event number */
-    int m_trackID; /** the track number (for one event) */
+    /** the event number */
+    int m_eventID;
+    /** the track number (for one event) */
+    int m_trackID;
 
     /** Event type: (0) bhabha, (1) radiative bhabha, (2) two photon (e+e-),
      * (3) di-muon, (4) radiative di-muon, (5) D-decays (D*->D0 pi; D0 -> K pi) */
     vector<int> m_eventType;
 
-    int m_unmatchedCluster; /** number of unmatched clusters per event */
-    vector<double> m_EoverP; /** range for E/p per track */
-    vector<double> m_EccOverEcm; /** range for Ecc/Ecm */
+    /** number of unmatched clusters per event */
+    int m_unmatchedCluster;
+    /** range for E/p per track */
+    vector<double> m_EoverP;
+    /** range for Ecc/Ecm */
+    vector<double> m_EccOverEcm;
 
   };
 }

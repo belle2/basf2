@@ -70,8 +70,10 @@ namespace Belle2 {
 
   private:
 
-    double m_x, m_y; /** The coordinates of the Point */
-    bool m_valid;   /** Used to check if the point lies inside a boundary */
+    /** The coordinates of the Point */
+    double m_x, m_y;
+    /** Used to check if the point lies inside a boundary */
+    bool m_valid;
 
   };
 
@@ -160,10 +162,14 @@ namespace Belle2 {
 
   private:
 
-    Point m_p1;      /** First endpoint */
-    Point m_p2;      /** Second endpoint */
-    double m_m;      /** Slope of the line */
-    int m_vertical;  /** If the line is vertical, this is set to true. */
+    /** First endpoint */
+    Point m_p1;
+    /** Second endpoint */
+    Point m_p2;
+    /** Slope of the line */
+    double m_m;
+    /** If the line is vertical, this is set to true. */
+    int m_vertical;
 
   };
 
@@ -178,14 +184,20 @@ namespace Belle2 {
   public:
 
     /** Construct a Cell from four different Lines (sides) */
-    Cell(const Line left, const Line top, const Line right, const Line bot) : m_Left(left), m_Top(top), m_Right(right), m_Bot(bot), m_isValid(true) {}
+    Cell(const Line& left, const Line& top, const Line& right, const Line& bot) {
+      m_Left    = left;
+      m_Top     = top;
+      m_Right   = right;
+      m_Bot     = bot;
+      m_isValid = true;
+    }
 
     /** Construct a Cell from four different Points (corners) */
-    Cell(const Point tl, const Point tr, const Point br, const Point bl) {
-      m_Left = Line(bl, tl);
-      m_Top = Line(tl, tr);
-      m_Right = Line(tr, br);
-      m_Bot = Line(br, bl);
+    Cell(const Point& tl, const Point& tr, const Point& br, const Point& bl) {
+      m_Left    = Line(bl, tl);
+      m_Top     = Line(tl, tr);
+      m_Right   = Line(tr, br);
+      m_Bot     = Line(br, bl);
       m_isValid = true;
     }
 
@@ -194,7 +206,7 @@ namespace Belle2 {
 
     /** Calculate the path length through this cell for a track with a given
      * Point Of Closest Approach (poca) and entrance angle (entAng) */
-    double dx(const Point poca, double entAng) {
+    double dx(const Point& poca, double entAng) {
       // The path length (dx) is the length of the track in this cell.
       double Dx = 0;
 
@@ -280,11 +292,16 @@ namespace Belle2 {
 
   private:
 
-    Line m_Left;    /** the left boundary of the cell */
-    Line m_Top;     /** the left boundary of the cell */
-    Line m_Right;   /** the left boundary of the cell */
-    Line m_Bot;     /** the left boundary of the cell */
-    bool m_isValid; /** does the hit land in this cell */
+    /** the left boundary of the cell */
+    Line m_Left;
+    /** the left boundary of the cell */
+    Line m_Top;
+    /** the left boundary of the cell */
+    Line m_Right;
+    /** the left boundary of the cell */
+    Line m_Bot;
+    /** does the hit land in this cell */
+    bool m_isValid;
 
   };
 }

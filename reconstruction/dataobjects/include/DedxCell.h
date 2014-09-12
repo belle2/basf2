@@ -32,7 +32,17 @@ namespace Belle2 {
   public:
 
     /** Default constructor */
-    DedxCell() : RelationsObject(), m_size(0), m_eventID(0), m_trackID(0) {}
+    DedxCell() :
+      RelationsObject(),
+      m_size(0), m_eventID(0), m_trackID(0),
+      m_p(0), m_cosTheta(0),
+      m_dedx_avg(0), m_dedx_avg_truncated(0), m_dedx_avg_truncated_err(0) {
+      //for all particles
+      for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
+        m_cdcLogL[i] = 0.0;
+        m_svdLogL[i] = 0.0;
+      }
+    }
 
     /** Add a single hit to the object */
     void addHit(int layer, int wireID, double doca, double enta, double dE, double dx, double dEdx, double cellHeight, double cellHalfWidth) {
@@ -108,36 +118,36 @@ namespace Belle2 {
 
   private:
 
-    int m_size;    /** the number of good hits on this Track */
+    int m_size;    /**< the number of good hits on this Track */
 
-    int m_eventID; /** event in which this Track was found */
-    int m_trackID; /** ID number of the Track */
+    int m_eventID; /**< event in which this Track was found */
+    int m_trackID; /**< ID number of the Track */
 
     // hit level information
-    std::vector<int> m_layer;   /** layer number */
-    std::vector<int> m_wireID;   /** sense wire ID */
+    std::vector<int> m_layer;   /**< layer number */
+    std::vector<int> m_wireID;   /**< sense wire ID */
 
-    std::vector<double> m_dE;   /** charge per hit */
-    std::vector<double> m_dx;   /** path length in cell */
-    std::vector<double> m_dEdx; /** charge per path length */
-    std::vector<double> m_doca; /** distance of closest approach */
-    std::vector<double> m_enta; /** entrance angle */
+    std::vector<double> m_dE;   /**< charge per hit */
+    std::vector<double> m_dx;   /**< path length in cell */
+    std::vector<double> m_dEdx; /**< charge per path length */
+    std::vector<double> m_doca; /**< distance of closest approach */
+    std::vector<double> m_enta; /**< entrance angle */
 
-    std::vector<double> m_cellHeight;    /** height of the cdc cell */
-    std::vector<double> m_cellHalfWidth; /** half-width of the cdc cell */
+    std::vector<double> m_cellHeight;    /**< height of the cdc cell */
+    std::vector<double> m_cellHalfWidth; /**< half-width of the cdc cell */
 
     // track level information
     double m_p; /**< momentum at point of closest approach to origin */
-    double m_cosTheta; /** cos(theta) for the track */
+    double m_cosTheta; /**< cos(theta) for the track */
 
-    double m_dedx_avg;               /** dE/dx averaged */
-    double m_dedx_avg_truncated;     /** dE/dx averaged, truncated mean */
-    double m_dedx_avg_truncated_err; /** standard deviation of m_dedx_avg_truncated */
+    double m_dedx_avg;               /**< dE/dx averaged */
+    double m_dedx_avg_truncated;     /**< dE/dx averaged, truncated mean */
+    double m_dedx_avg_truncated_err; /**< standard deviation of m_dedx_avg_truncated */
 
     float m_cdcLogL[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
     float m_svdLogL[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
 
-    ClassDef(DedxCell, 9); /** Debug output for DedxCellPID module. */
+    ClassDef(DedxCell, 9); /**< Debug output for DedxCellPID module. */
   };
 }
 #endif

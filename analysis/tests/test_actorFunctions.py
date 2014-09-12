@@ -131,14 +131,14 @@ class TestCopyParticleLists(unittest.TestCase):
 
     def test_some_missing_daughter_lists(self):
         result = CopyParticleLists(self.path, 'D+', 'generic', ['D+:1', 'D+:2', 'D+:3', None], [{'cutstring': '0.1 < M'}] * 4)
-        self.assertDictEqual(result, {'ParticleList_D+:generic': 'D+:' + self.standardHash,
-                                      'ParticleList_D-:generic': 'D-:' + self.standardHash})
+        self.assertDictEqual(result, {'ParticleList_D+:generic': 'D+:434a7b1666bba06ec0b56a6c448bdf63742cbf3b',
+                                      'ParticleList_D-:generic': 'D-:434a7b1666bba06ec0b56a6c448bdf63742cbf3b'})
         self.assertEqual(len(self.path.modules()), 1)
 
     def test_some_missing_post_cuts(self):
         result = CopyParticleLists(self.path, 'D+', 'generic', ['D+:1', 'D+:2', 'D+:3', 'D+:4'], [{'cutstring': '0.1 < M'}] * 3 + [None])
-        self.assertDictEqual(result, {'ParticleList_D+:generic': 'D+:' + self.standardHash,
-                                      'ParticleList_D-:generic': 'D-:' + self.standardHash})
+        self.assertDictEqual(result, {'ParticleList_D+:generic': 'D+:9403399810f983638849fc26293b1dc784b02e1c',
+                                      'ParticleList_D-:generic': 'D-:9403399810f983638849fc26293b1dc784b02e1c'})
         self.assertEqual(len(self.path.modules()), 1)
 
     def test_all_missing_daughter_lists(self):
@@ -149,9 +149,9 @@ class TestCopyParticleLists(unittest.TestCase):
 
     def test_all_missing_post_cuts(self):
         result = CopyParticleLists(self.path, 'D+', 'generic', ['D+:1', 'D+:2', 'D+:3'], [None, None, None])
-        self.assertDictEqual(result, {'ParticleList_D+:generic': None,
-                                      'ParticleList_D-:generic': None})
-        self.assertEqual(len(self.path.modules()), 0)
+        self.assertDictEqual(result, {'ParticleList_D+:generic': 'D+:a2e3c28d8ce401744b2fae85bb2b8d01ac419d95',
+                                      'ParticleList_D-:generic': 'D-:a2e3c28d8ce401744b2fae85bb2b8d01ac419d95'})
+        self.assertEqual(len(self.path.modules()), 1)
 
     def test_hash_depends_on_particle_name(self):
         result = CopyParticleLists(self.path, 'B+', 'generic', ['D+:1', 'D+:2', 'D+:3'], [{'cutstring': '0.1 < M'}] * 3)
@@ -216,18 +216,25 @@ class TestFitVertex(unittest.TestCase):
         self.assertTrue(result['VertexFit_UniqueChannelName'] != self.standardHash)
 
 
+mvaConfig = Particle.MVAConfiguration(
+    name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
+    variables=['p', 'pt', 'p_CMS', 'pt_CMS', 'chiProb'],
+    target='isSignal'
+)
+
 preCutConfig = Particle.PreCutConfiguration(
     variable='M',
-    method='Same',
+    binning=(500, 2, 4),
     efficiency=0.7,
-    purity=0.01
+    purity=0.01,
+    userCut='M > 0.2'
 )
 
 
 class TestCreatePreCutHistogram(unittest.TestCase):
     def setUp(self):
         self.path = MockPath()
-        self.standardHash = 'b008fcee89f8f867af9d0904e9b2727878948598'
+        self.standardHash = '590506f812c4754e487d42d6c2a829d745ab70d5'
         self.standardFilename = 'CutHistograms_UniqueChannelName:{hash}.root'.format(hash=self.standardHash)
         open(self.standardFilename, 'a').close()
 
@@ -237,38 +244,40 @@ class TestCreatePreCutHistogram(unittest.TestCase):
 
     def test_standard(self):
         os.remove(self.standardFilename)
-        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
+        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', mvaConfig, preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
         self.assertEqual(parameters['fileName'], self.standardFilename)
         self.assertEqual(parameters['decayString'], 'D+:' + self.standardHash + ' ==> pi+:1 K+:1')
         self.assertEqual(parameters['variable'], 'M')
+        self.assertEqual(parameters['cut'], 'M > 0.2')
+        self.assertEqual(parameters['target'], 'isSignal')
 
     def test_nothing_to_do(self):
-        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
+        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', mvaConfig, preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
         self.assertDictEqual(result, {'PreCutHistogram_UniqueChannelName': (self.standardFilename, 'D+:' + self.standardHash)})
         self.assertEqual(len(self.path.modules()), 0)
 
     def test_missing_daughter(self):
-        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', preCutConfig, [None, 'K+:1'], ['bar', 'foo'])
+        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', mvaConfig, preCutConfig, [None, 'K+:1'], ['bar', 'foo'])
         self.assertDictEqual(result, {'PreCutHistogram_UniqueChannelName': None})
         self.assertEqual(len(self.path.modules()), 0)
 
     def test_missing_additionalDependencies(self):
-        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', preCutConfig, ['pi+:1', 'K+:1'], ['bar', None])
+        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', mvaConfig, preCutConfig, ['pi+:1', 'K+:1'], ['bar', None])
         self.assertDictEqual(result, {'PreCutHistogram_UniqueChannelName': None})
         self.assertEqual(len(self.path.modules()), 0)
 
     def test_hash_depends_on_particle_name(self):
-        result = CreatePreCutHistogram(self.path, 'B+', 'UniqueChannelName', preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
+        result = CreatePreCutHistogram(self.path, 'B+', 'UniqueChannelName', mvaConfig, preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
         self.assertTrue(parameters['fileName'] != 'CutHistograms_UniqueChannelName:{hash}.root'.format(hash=self.standardHash))
 
     def test_hash_depends_on_channel_name(self):
-        result = CreatePreCutHistogram(self.path, 'D+', 'other', preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
+        result = CreatePreCutHistogram(self.path, 'D+', 'other', mvaConfig, preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
@@ -277,11 +286,40 @@ class TestCreatePreCutHistogram(unittest.TestCase):
     def test_hash_depends_on_pre_cut_variable(self):
         myPreCutConfig = Particle.PreCutConfiguration(
             variable='Q',
-            method='Same',
+            binning=(500, 2, 4),
             efficiency=0.7,
-            purity=0.01
+            purity=0.01,
+            userCut='M > 0.2'
         )
-        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', myPreCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
+        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', mvaConfig, myPreCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
+        self.assertDictEqual(result, {})
+        self.assertEqual(len(self.path.modules()), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertTrue(parameters['fileName'] != 'CutHistograms_UniqueChannelName:{hash}.root'.format(hash=self.standardHash))
+
+    def test_hash_depends_on_pre_cut_binning(self):
+        myPreCutConfig = Particle.PreCutConfiguration(
+            variable='M',
+            binning=(400, 2, 4),
+            efficiency=0.7,
+            purity=0.01,
+            userCut='M > 0.2'
+        )
+        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', mvaConfig, myPreCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
+        self.assertDictEqual(result, {})
+        self.assertEqual(len(self.path.modules()), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertTrue(parameters['fileName'] != 'CutHistograms_UniqueChannelName:{hash}.root'.format(hash=self.standardHash))
+
+    def test_hash_depends_on_pre_cut_userCut(self):
+        myPreCutConfig = Particle.PreCutConfiguration(
+            variable='M',
+            binning=(500, 2, 4),
+            efficiency=0.7,
+            purity=0.01,
+            userCut='M > 0.5'
+        )
+        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', mvaConfig, myPreCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
@@ -290,26 +328,53 @@ class TestCreatePreCutHistogram(unittest.TestCase):
     def test_hash_doesnt_depends_on_pre_cut_in_general(self):
         myPreCutConfig = Particle.PreCutConfiguration(
             variable='M',
-            method='S/B',
+            binning=(500, 2, 4),
             efficiency=0.6,
-            purity=0.1
+            purity=0.1,
+            userCut='M > 0.2'
         )
         os.remove(self.standardFilename)
-        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', myPreCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
+        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', mvaConfig, myPreCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
+        self.assertDictEqual(result, {})
+        self.assertEqual(len(self.path.modules()), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertTrue(parameters['fileName'] == 'CutHistograms_UniqueChannelName:{hash}.root'.format(hash=self.standardHash))
+
+    def test_hash_on_mva_target(self):
+        myMVAConfig = Particle.MVAConfiguration(
+            name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
+            variables=['p', 'pt', 'p_CMS', 'pt_CMS', 'chiProb'],
+            target='isSignalAcceptMissingNeutrino'
+        )
+        os.remove(self.standardFilename)
+        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', myMVAConfig, preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
+        self.assertDictEqual(result, {})
+        self.assertEqual(len(self.path.modules()), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertTrue(parameters['fileName'] != 'CutHistograms_UniqueChannelName:{hash}.root'.format(hash=self.standardHash))
+
+    def test_hash_doesnt_depends_on_mva_in_general(self):
+        myMVAConfig = Particle.MVAConfiguration(
+            name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
+            variables=['p', 'pt', 'p_CMS', 'pt_CMS', 'chiProb', 'pz'],
+            target='isSignal'
+        )
+        os.remove(self.standardFilename)
+        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', myMVAConfig, preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo'])
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
         self.assertTrue(parameters['fileName'] == 'CutHistograms_UniqueChannelName:{hash}.root'.format(hash=self.standardHash))
 
     def test_hash_depends_on_daughters(self):
-        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', preCutConfig, ['pi+:1', 'K-:1'], ['bar', 'foo'])
+        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', mvaConfig, preCutConfig, ['pi+:1', 'K-:1'], ['bar', 'foo'])
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
         self.assertTrue(parameters['fileName'] != 'CutHistograms_UniqueChannelName:{hash}.root'.format(hash=self.standardHash))
 
     def test_hash_depends_on_additional_dependencies(self):
-        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'bla'])
+        result = CreatePreCutHistogram(self.path, 'D+', 'UniqueChannelName', mvaConfig, preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'bla'])
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
@@ -334,18 +399,12 @@ class TestPostCutDetermination(unittest.TestCase):
         pass
 
 
-mvaConfig = Particle.MVAConfiguration(
-    name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    variables=['p', 'pt', 'p_CMS', 'pt_CMS', 'chiProb'],
-    target='isSignal', targetCluster=1
-)
-
-
 class TestSignalProbability(unittest.TestCase):
     def setUp(self):
         self.path = MockPath()
-        self.standardHash = '3b16051880492d465eb5f58e7202409bab57ff02'
+        self.standardHash = '7e926c7b6aa3db5b8ce84e40dfbb2d22c293ba66'
         self.standardFilename = 'D+:1_{hash}'.format(hash=self.standardHash)
+        self.preCut = {'nSignal': 100, 'nBackground': 100}
         open(self.standardFilename + '.root', 'a').close()
         open(self.standardFilename + '.config', 'a').close()
 
@@ -356,21 +415,35 @@ class TestSignalProbability(unittest.TestCase):
             os.remove(self.standardFilename + '.config')
 
     def test_standard_expert(self):
-        result = SignalProbability(self.path, 'Identifier', 'D+:1', mvaConfig, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        result = SignalProbability(self.path, 'Identifier', 'D+:1', mvaConfig, self.preCut, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
         self.assertDictEqual(result, {'SignalProbability_Identifier': self.standardFilename + '.config'})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
         self.assertEqual(parameters['prefix'], 'D+:1_' + self.standardHash)
         self.assertEqual(parameters['method'], mvaConfig.name)
-        self.assertEqual(parameters['signalFraction'], -2)
+        self.assertEqual(parameters['signalFraction'], -1)
         self.assertEqual(parameters['signalProbabilityName'], 'SignalProbability')
-        self.assertEqual(parameters['signalClass'], mvaConfig.targetCluster)
+        self.assertEqual(parameters['signalClass'], 1)
+        self.assertDictEqual(parameters['inverseSamplingRates'], {})
+        self.assertEqual(parameters['listNames'], ['D+:1'])
+
+    def test_standard_expert_sampling(self):
+        result = SignalProbability(self.path, 'Identifier', 'D+:1', mvaConfig, {'nSignal': 1e8, 'nBackground': 2e8}, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        self.assertDictEqual(result, {'SignalProbability_Identifier': self.standardFilename + '.config'})
+        self.assertEqual(len(self.path.modules()), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertEqual(parameters['prefix'], 'D+:1_' + self.standardHash)
+        self.assertEqual(parameters['method'], mvaConfig.name)
+        self.assertEqual(parameters['signalFraction'], -1)
+        self.assertEqual(parameters['signalProbabilityName'], 'SignalProbability')
+        self.assertEqual(parameters['signalClass'], 1)
+        self.assertDictEqual(parameters['inverseSamplingRates'], {0: 20, 1: 10})
         self.assertEqual(parameters['listNames'], ['D+:1'])
 
     def test_standard_teacher(self):
         os.remove(self.standardFilename + '.root')
         os.remove(self.standardFilename + '.config')
-        result = SignalProbability(self.path, 'Identifier', 'D+:1', mvaConfig, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        result = SignalProbability(self.path, 'Identifier', 'D+:1', mvaConfig, self.preCut, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
@@ -379,30 +452,46 @@ class TestSignalProbability(unittest.TestCase):
         self.assertEqual(parameters['variables'], mvaConfig.variables)
         self.assertEqual(parameters['target'], mvaConfig.target)
         self.assertEqual(parameters['doNotTrain'], True)
+        self.assertDictEqual(parameters['inverseSamplingRates'], {})
+        self.assertEqual(parameters['listNames'], ['D+:1'])
+
+    def test_standard_teacher_sampling(self):
+        os.remove(self.standardFilename + '.root')
+        os.remove(self.standardFilename + '.config')
+        result = SignalProbability(self.path, 'Identifier', 'D+:1', mvaConfig, {'nSignal': 1e8, 'nBackground': 2e8}, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        self.assertDictEqual(result, {})
+        self.assertEqual(len(self.path.modules()), 1)
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertEqual(parameters['prefix'], 'D+:1_' + self.standardHash)
+        self.assertEqual(parameters['methods'], [(mvaConfig.name, mvaConfig.type, mvaConfig.config)])
+        self.assertEqual(parameters['variables'], mvaConfig.variables)
+        self.assertEqual(parameters['target'], mvaConfig.target)
+        self.assertEqual(parameters['doNotTrain'], True)
+        self.assertDictEqual(parameters['inverseSamplingRates'], {0: 20, 1: 10})
         self.assertEqual(parameters['listNames'], ['D+:1'])
 
     def test_missing_additional_dependencies(self):
-        result = SignalProbability(self.path, 'Identifier', 'D+:1', mvaConfig, ['SignalProbabilityHashPi', None])
+        result = SignalProbability(self.path, 'Identifier', 'D+:1', mvaConfig, self.preCut, ['SignalProbabilityHashPi', None])
         self.assertDictEqual(result, {'SignalProbability_Identifier': None,
                                       'SignalProbability_Identifier': None})
         self.assertEqual(len(self.path.modules()), 0)
 
     def test_hash_depends_particle_list(self):
-        result = SignalProbability(self.path, 'Identifier', 'B+:1', mvaConfig, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        result = SignalProbability(self.path, 'Identifier', 'B+:1', mvaConfig, self.preCut, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
         self.assertTrue(parameters['prefix'] != 'B+:1_' + self.standardHash)
 
     def test_hash_depends_identifier(self):
-        result = SignalProbability(self.path, 'other', 'D+:1', mvaConfig, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        result = SignalProbability(self.path, 'other', 'D+:1', mvaConfig, self.preCut, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
         self.assertTrue(parameters['prefix'] != 'D+:1_' + self.standardHash)
 
     def test_hash_depends_additional_dependencies(self):
-        result = SignalProbability(self.path, 'Identifier', 'D+:1', mvaConfig, ['SignalProbabilityHashPi', 'test'])
+        result = SignalProbability(self.path, 'Identifier', 'D+:1', mvaConfig, self.preCut, ['SignalProbabilityHashPi', 'test'])
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
@@ -412,9 +501,9 @@ class TestSignalProbability(unittest.TestCase):
         myMvaConfig = Particle.MVAConfiguration(
             name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=2',
             variables=['p', 'pt', 'p_CMS', 'pt_CMS', 'chiProb'],
-            target='isSignal', targetCluster=1
+            target='isSignal'
         )
-        result = SignalProbability(self.path, 'Identifier', 'D+:1', myMvaConfig, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
+        result = SignalProbability(self.path, 'Identifier', 'D+:1', myMvaConfig, self.preCut, ['SignalProbabilityHashPi', 'SignalProbabilityHashK'])
         self.assertDictEqual(result, {})
         self.assertEqual(len(self.path.modules()), 1)
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}

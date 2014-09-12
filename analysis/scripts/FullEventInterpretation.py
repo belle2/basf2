@@ -45,9 +45,9 @@ class Particle(object):
     """
 
     ## Create new class called MVAConfiguration via namedtuple. namedtuples are like a struct in C
-    MVAConfiguration = collections.namedtuple('MVAConfiguration', 'name, type, config, variables, target, targetCluster')
+    MVAConfiguration = collections.namedtuple('MVAConfiguration', 'name, type, config, variables, target')
     ## Create new class called PreCutConfiguration via namedtuple. namedtuples are like a struct in C
-    PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'variable, binning, method, efficiency, purity')
+    PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'variable, binning, efficiency, purity, userCut')
     ## Create new class called PostCutConfiguration via namedtuple. namedtuples are like a struct in C
     PostCutConfiguration = collections.namedtuple('PostCutConfiguration', 'value')
     ## Create new class called DecayChannel via namedtuple. namedtuples are like a struct in C
@@ -112,7 +112,7 @@ class Particle(object):
         output = '{identifier}\n'.format(identifier=self.identifier)
 
         def compareMVAConfig(x, y):
-            return x.name == y.name and x.type == y.type and x.config == y.config and x.target == y.target and x.targetCluster == y.targetCluster
+            return x.name == y.name and x.type == y.type and x.config == y.config and x.target == y.target
 
         def compareCutConfig(x, y):
             if x is None and y is None:
@@ -124,7 +124,7 @@ class Particle(object):
                 output += '    PostCutConfiguration: None\n'
             else:
                 output += '    PostCutConfiguration: value={p.value}\n'.format(p=self.postCutConfig)
-            output += '    MVAConfiguration: name={m.name}, type={m.type}, config={m.config}, target={m.target}, targetCluster={m.targetCluster}\n'.format(m=self.mvaConfig)
+            output += '    MVAConfiguration: name={m.name}, type={m.type}, config={m.config}, target={m.target}\n'.format(m=self.mvaConfig)
             output += '    Variables: ' + ', '.join(self.mvaConfig.variables) + '\n'
         else:
             samePreCutConfig = all(compareCutConfig(channel.preCutConfig, self.preCutConfig) for channel in self.channels)
@@ -133,12 +133,12 @@ class Particle(object):
             commonVariables = reduce(lambda x, y: set(x).intersection(y), [channel.mvaConfig.variables for channel in self.channels])
             if sameMVAConfig:
                 output += '    All channels use the same MVA configuration\n'
-                output += '    MVAConfiguration: name={m.name}, type={m.type}, target={m.target}, targetCluster={m.targetCluster}, config={m.config}\n'.format(m=self.mvaConfig)
+                output += '    MVAConfiguration: name={m.name}, type={m.type}, target={m.target}, config={m.config}\n'.format(m=self.mvaConfig)
             output += '    Shared Variables: ' + ', '.join(commonVariables) + '\n'
 
             if samePreCutConfig:
                 output += '    All channels use the same PreCut configuration\n'
-                output += '    PreCutConfiguration: variables={p.variable}, method={p.method}, efficiency={p.efficiency}, purity={p.purity}\n'.format(p=self.preCutConfig)
+                output += '    PreCutConfiguration: variables={p.variable}, efficiency={p.efficiency}, purity={p.purity}\n'.format(p=self.preCutConfig)
 
             if samePostCutConfig:
                 output += '    All channels use the same PostCut configuration\n'
@@ -153,14 +153,14 @@ class Particle(object):
                     if self.postCutConfig is None:
                         output += '    PreCutConfiguration: None\n'
                     else:
-                        output += '    PreCutConfiguration: variable={p.variable}, method={p.method}, efficiency={p.efficiency}, purity={p.purity}\n'.format(p=channel.preCutConfig)
+                        output += '    PreCutConfiguration: variable={p.variable}, efficiency={p.efficiency}, purity={p.purity}, userCut={p.userCut}\n'.format(p=channel.preCutConfig)
                 if not samePostCutConfig:
                     if self.postCutConfig is None:
                         output += '    PostCutConfiguration: None\n'
                     else:
                         output += '    PostCutConfiguration: value={p.value}\n'.format(p=channel.postCutConfig)
                 if not sameMVAConfig:
-                    output += '    MVAConfiguration: name={m.name}, type={m.type}, config={m.config}, target={m.target}, targetCluster={m.targetCluster}\n'.format(m=channel.mvaConfig)
+                    output += '    MVAConfiguration: name={m.name}, type={m.type}, config={m.config}, target={m.target}\n'.format(m=channel.mvaConfig)
                 output += '        Individual Variables: ' + ', '.join(set(channel.mvaConfig.variables).difference(commonVariables)) + '\n'
         return output
 
@@ -185,6 +185,7 @@ def FullEventInterpretation(path, particles):
     seq = actorFramework.Sequence()
     seq.addFunction(CountMCParticles, path='Path', names=['Name_{i}'.format(i=particle.identifier) for particle in particles])
     seq.addFunction(LoadGeometry, path='Path')
+    seq.addResource('ParticleLoader', 'dummy')
     seq.addFunction(LoadParticles, path='Path')
 
     # Now loop over all given particles, foreach particle we add some Resources and Actors.
@@ -262,6 +263,7 @@ def FullEventInterpretation(path, particles):
                                 path='Path',
                                 particleName='Name_{i}'.format(i=particle.identifier),
                                 channelName='Name_{c}'.format(c=channel.name),
+                                mvaCutConfig='MVAConfig_{c}'.format(c=channel.name),
                                 preCutConfig='PreCutConfig_{c}'.format(c=channel.name),
                                 daughterParticleLists=['ParticleList_{d}'.format(d=daughter) for daughter in channel.daughters],
                                 additionalDependencies=additionalDependencies)
@@ -365,4 +367,4 @@ def FullEventInterpretation(path, particles):
                         particles=['Object_{i}'.format(i=particle.identifier)for particle in particles])
         seq.addNeeded('FEIsummary.pdf')
 
-    seq.run(path, args.verbose, args.nProcesses)
+    return seq.run(path, args.verbose, args.nProcesses)

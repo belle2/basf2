@@ -248,7 +248,7 @@ def CopyParticleLists(path, particleName, particleLabel, inputLists, postCuts):
                 'ParticleList_{p}:{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): None}
 
     modularAnalysis.cutAndCopyLists(outputList, inputLists, postCut, persistent=True, path=path)
-    modularAnalysis.summaryOfLists(inputLists + [outputList], path=path)
+    #modularAnalysis.summaryOfLists(inputLists + [outputList], path=path)
 
     B2INFO("Gather Particle List {p} with label {l} in list {o}".format(p=particleName, l=particleLabel, o=outputList))
     return {'ParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList,
@@ -305,7 +305,7 @@ def FitVertex(path, channelName, particleList, daughterVertices, geometry):
     return {'VertexFit_{c}'.format(c=channelName): hash}
 
 
-def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughterParticleLists, additionalDependencies):
+def CreatePreCutHistogram(path, particleName, channelName, mvaConfig, preCutConfig, daughterParticleLists, additionalDependencies):
     """
     Creates ROOT file with chosen pre cut variable histogram of this channel (signal/background)
     for a given particle, before any intermediate cuts are applied.
@@ -313,6 +313,7 @@ def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughte
         @param particleName valid pdg particle name
         @param channelName unique name describing the channel
         @param daughterParticleLists list of ParticleList names defining all daughter particles
+        @param target variable which defines signal and background
         @param additionalDependencies like SignalProbability of all daughter particles if needed.
         @return Resource named PreCutHistogram_{channelName} providing root filename 'CutHistograms_{channelName}:{hash}.root'
     """
@@ -321,7 +322,7 @@ def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughte
         B2INFO("Create pre cut histogram for channel {c}. But channel is ignored.".format(c=channelName))
         return {'PreCutHistogram_{c}'.format(c=channelName): None}
 
-    hash = actorFramework.createHash(particleName, channelName, preCutConfig.variable, preCutConfig.binning, daughterParticleLists, additionalDependencies)
+    hash = actorFramework.createHash(particleName, channelName, preCutConfig.userCut, preCutConfig.variable, preCutConfig.binning, daughterParticleLists, mvaConfig.target, additionalDependencies)
     filename = removeJPsiSlash('CutHistograms_{c}:{h}.root'.format(c=channelName, h=hash))
 
     if os.path.isfile(filename):
@@ -333,12 +334,13 @@ def CreatePreCutHistogram(path, particleName, channelName, preCutConfig, daughte
         pmake.set_name('PreCutHistMaker_{c}'.format(c=channelName))
         pmake.param('fileName', filename)
         pmake.param('decayString', outputList)
+        pmake.param('cut', preCutConfig.userCut)
+        pmake.param('target', mvaConfig.target)
         pmake.param('variable', preCutConfig.variable)
         if isinstance(preCutConfig.binning, tuple):
             pmake.param('histParams', preCutConfig.binning)
         else:
             pmake.param('customBinning', preCutConfig.binning)
-            #pmake.param('customBinning', list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])))
         path.add_module(pmake)
 
     B2INFO("Create pre cut histogram for channel {c}.".format(c=channelName))
@@ -367,6 +369,7 @@ def PreCutDetermination(channelNames, preCutConfigs, preCutHistograms):
     preCutConfig = preCutConfigs[0]
 
     for (channelName, cut) in preCutDetermination.CalculatePreCuts(preCutConfig, channelNames, preCutHistograms).iteritems():
+        cut['cutstring'] += ' and ' + preCutConfig.userCut
         results['PreCut_{c}'.format(c=channelName)] = None if cut['isIgnored'] else cut
         B2INFO("Calculated pre cut for channel {c}".format(c=channelName))
     return results
@@ -411,8 +414,13 @@ def SignalProbability(path, identifier, particleList, mvaConfig, preCut, additio
     rootFilename = removeJPsiSlash('{particleList}_{hash}.root'.format(particleList=particleList, hash=hash))
     configFilename = removeJPsiSlash('{particleList}_{hash}.config'.format(particleList=particleList, hash=hash))
 
-    if(mvaConfig.targetCluster != 1):
-        B2WARNING("Background Sampling is hardcoded to class 0. If you use another targetCluster than 1 this indicates that you want to change this!")
+    maxEvents = int(1e7)
+    inverseSamplingRates = {}
+    if preCut is not None:
+        if preCut['nBackground'] > maxEvents:
+            inverseSamplingRates[0] = int(preCut['nBackground'] / maxEvents)
+        if preCut is not None and preCut['nSignal'] > maxEvents:
+            inverseSamplingRates[1] = int(preCut['nSignal'] / maxEvents)
 
     if not os.path.isfile(rootFilename):
         teacher = register_module('TMVATeacher')
@@ -424,8 +432,7 @@ def SignalProbability(path, identifier, particleList, mvaConfig, preCut, additio
         teacher.param('variables', mvaConfig.variables)
         teacher.param('target', mvaConfig.target)
         teacher.param('listNames', [particleList])
-        if preCut is not None and preCut['nBackground'] > 1e7:
-            teacher.param('inverseSamplingRates', {0: int(preCut['nBackground'] / 1e7)})
+        teacher.param('inverseSamplingRates', inverseSamplingRates)
         teacher.param('doNotTrain', True)
         path.add_module(teacher)
         B2INFO("Calculate SignalProbability for {i}. Create root file with variables first with prefix {p}.".format(i=identifier, p=removeJPsiSlash(particleList + '_' + hash)))
@@ -439,7 +446,7 @@ def SignalProbability(path, identifier, particleList, mvaConfig, preCut, additio
                    " > '{prefix}'.log".format(name=mvaConfig.name, type=mvaConfig.type, config=mvaConfig.config,
                                               target=mvaConfig.target, variables="' '".join(mvaConfig.variables),
                                               foption='!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification',
-                                              poption='SplitMode=random:!V', maxEvents=10000000,
+                                              poption='SplitMode=random:!V', maxEvents=maxEvents,
                                               prefix=removeJPsiSlash(particleList + '_' + hash)))
         B2INFO("Use following command to invoke teacher\n" + command)
         subprocess.call(command, shell=True)
@@ -454,11 +461,10 @@ def SignalProbability(path, identifier, particleList, mvaConfig, preCut, additio
         expert.param('prefix', removeJPsiSlash(particleList + '_' + hash))
         expert.param('method', mvaConfig.name)
         #expert.param('signalFraction', -2)  # Use signalFraction from training
-        expert.param('signalFraction', -1)  # No transformation of output DO NOt commit of still using maxEvents!
+        expert.param('signalFraction', -1)  # No transformation of output
         expert.param('signalProbabilityName', 'SignalProbability')
-        expert.param('signalClass', mvaConfig.targetCluster)
-        if preCut is not None and preCut['nBackground'] > 1e7:
-            expert.param('inverseSamplingRates', {0: int(preCut['nBackground'] / 1e7)})
+        expert.param('signalClass', 1)
+        expert.param('inverseSamplingRates', inverseSamplingRates)
         expert.param('listNames', [particleList])
         path.add_module(expert)
         B2INFO("Calculating SignalProbability for {i}".format(i=identifier))

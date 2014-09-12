@@ -26,18 +26,15 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
     signal, bckgrd, ratio = LoadHistogramsFromFiles(files, preCutConfig.variable, channelNames, preCutHistograms)
 
     # Two-Side cut S/B ratio constructed
-    if preCutConfig.method == 'S/B':
-        def ycut_to_xcuts(channel, cut):
-            hist = ratio[channel]
-            maximum = hist.GetMaximumBin()
-            if hist.GetBinContent(maximum) < cut:
-                return [0, -1]
-            low = [bin for bin in xrange(1, maximum + 1) if hist.GetBinContent(bin) < cut]
-            high = [bin for bin in xrange(maximum, hist.GetNbinsX() + 1) if hist.GetBinContent(bin) < cut]
-            axis = hist.GetXaxis()
-            return [axis.GetBinLowEdge(max(low) + 1 if low else 1), axis.GetBinUpEdge(min(high) - 1 if high else hist.GetNbinsX())]
-    else:
-        raise RuntimeError('Given PreCutConfiguration is not implemented. Please check that method and used variables are compatible.')
+    def ycut_to_xcuts(channel, cut):
+        hist = ratio[channel]
+        maximum = hist.GetMaximumBin()
+        if hist.GetBinContent(maximum) < cut:
+            return [0, -1]
+        low = [bin for bin in xrange(1, maximum + 1) if hist.GetBinContent(bin) < cut]
+        high = [bin for bin in xrange(maximum, hist.GetNbinsX() + 1) if hist.GetBinContent(bin) < cut]
+        axis = hist.GetXaxis()
+        return [axis.GetBinLowEdge(max(low) + 1 if low else 1), axis.GetBinUpEdge(min(high) - 1 if high else hist.GetNbinsX())]
 
     print "Total number of signals", sum([value.GetEntries() for value in signal.values()])
     print "Total number of background", sum([value.GetEntries() for value in bckgrd.values()])

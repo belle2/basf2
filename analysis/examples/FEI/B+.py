@@ -27,7 +27,7 @@ particles = []
 mva_chargedFSP = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=pid_variables + kinematic_variables + ['chiProb'],
-    target='isSignal', targetCluster=1
+    target='isSignal'
 )
 
 particles.append(Particle('pi+', mva_chargedFSP, postCutConfig=postCut))
@@ -40,7 +40,7 @@ particles.append(Particle('K+', mva_chargedFSP, postCutConfig=postCut))
 mva_gamma = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=kinematic_variables + ['clusterReg', 'goodGamma', 'goodGammaUnCal', 'clusterNHits', 'clusterTrackMatch', 'clusterE9E25'],
-    target='isSignal', targetCluster=1
+    target='isSignal'
 )
 
 particles.append(Particle('gamma', mva_gamma, postCutConfig=postCut))
@@ -50,15 +50,15 @@ particles.append(Particle('gamma', mva_gamma, postCutConfig=postCut))
 mva_pi0 = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=kinematic_variables + ['daughterAngle(0,1)'],
-    target='isSignal', targetCluster=1
+    target='isSignal'
 )
 
 pre_pi0 = Particle.PreCutConfiguration(
     variable='M',
     binning=(500, 0.08, 0.18),
-    method='S/B',
     efficiency=0.9,
     purity=0.00001,
+    userCut=''
 )
 
 particles.append(Particle('pi0', mva_pi0, pre_pi0, postCut).addChannel(['gamma', 'gamma']))
@@ -67,13 +67,13 @@ particles.append(Particle('pi0', mva_pi0, pre_pi0, postCut).addChannel(['gamma',
 mva_KS0 = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=kinematic_variables + vertex_variables + ['daughterAngle(0,1)'],
-    target='isSignal', targetCluster=1
+    target='isSignal'
 )
 
 mva_KS0_pi0pi0 = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=['p', 'pt', 'M', 'E', 'daughterAngle(0,1)'],
-    target='isSignal', targetCluster=1
+    target='isSignal'
 )
 
 pre_KS0 = Particle.PreCutConfiguration(
@@ -82,6 +82,7 @@ pre_KS0 = Particle.PreCutConfiguration(
     method='S/B',
     efficiency=0.9,
     purity=0.00001,
+    userCut=''
 )
 
 p = Particle('K_S0', mva_KS0, pre_KS0, postCut)
@@ -93,22 +94,22 @@ particles.append(p)
 mva_D0 = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables + vertex_variables,
-    target='isSignal', targetCluster=1
+    target='isSignal'
 )
 
 mva_D0_withoutVertex = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables,
-    target='isSignal', targetCluster=1
+    target='isSignal'
 )
 
 
 pre_D0 = Particle.PreCutConfiguration(
     variable='M',
     binning=(500, 1.5, 2.0),
-    method='S/B',
     efficiency=0.95,
     purity=0.0005,
+    userCut=''
 )
 
 p = Particle('D0', mva_D0, pre_D0, postCutSoft)
@@ -134,22 +135,22 @@ particles.append(p)
 mva_DPlus = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables + vertex_variables,
-    target='isSignal', targetCluster=1
+    target='isSignal'
 )
 
 mva_DPlus_withoutVertex = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables,
-    target='isSignal', targetCluster=1
+    target='isSignal'
 )
 
 
 pre_DPlus = Particle.PreCutConfiguration(
     variable='M',
     binning=(500, 1.5, 2.0),
-    method='S/B',
     efficiency=0.95,
     purity=0.0005,
+    userCut=''
 )
 
 p = Particle('D+', mva_DPlus, pre_DPlus, postCutSoft)
@@ -172,21 +173,21 @@ particles.append(p)
 mva_DStarPlus = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables + vertex_variables,
-    target='isSignal', targetCluster=1
+    target='isSignal'
 )
 
 mva_DStarPlus_withoutVertex = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables,
-    target='isSignal', targetCluster=1
+    target='isSignal'
 )
 
 pre_DStarPlus = Particle.PreCutConfiguration(
     variable='Q',
     binning=(500, 0, 1),
-    method='S/B',
     efficiency=0.95,
     purity=0.0001,
+    userCut=''
 )
 
 p = Particle('D*+', mva_DStarPlus, pre_DStarPlus, postCutSoft)
@@ -199,15 +200,15 @@ particles.append(p)
 mva_DStar0 = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables,
-    target='isSignal', targetCluster=1
+    target='isSignal'
 )
 
 pre_DStar0 = Particle.PreCutConfiguration(
     variable='Q',
     binning=(500, 0, 1),
-    method='S/B',
     efficiency=0.95,
     purity=0.0001,
+    userCut=''
 )
 
 p = Particle('D*0', mva_DStar0, pre_DStar0, postCutSoft)
@@ -220,15 +221,15 @@ particles.append(p)
 mva_DS = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables + vertex_variables,
-    target='isSignal', targetCluster=1
+    target='isSignal'
 )
 
 pre_DS = Particle.PreCutConfiguration(
     variable='M',
     binning=(500, 1.6, 2.2),
-    method='S/B',
     efficiency=0.95,
     purity=0.0005,
+    userCut=''
 )
 
 
@@ -251,15 +252,15 @@ particles.append(p)
 mva_DStarS = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables,
-    target='isSignal', targetCluster=1
+    target='isSignal'
 )
 
 pre_DStarS = Particle.PreCutConfiguration(
     variable='Q',
     binning=(500, 0, 1),
-    method='S/B',
     efficiency=0.95,
     purity=0.0001,
+    userCut=''
 )
 
 p = Particle('D_s*+', mva_DStarS, pre_DStarS, postCutSoft)
@@ -272,15 +273,15 @@ particles.append(p)
 mva_J = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=['daughterProductOf(getExtraInfo(SignalProbability))'] + kinematic_variables + vertex_variables,
-    target='isSignal', targetCluster=1
+    target='isSignal'
 )
 
 pre_J = Particle.PreCutConfiguration(
     variable='M',
     binning=(500, 2.5, 3.5),
-    method='S/B',
     efficiency=0.95,
     purity=0.0001,
+    userCut=''
 )
 
 p = Particle('J/psi', mva_J, pre_J)
@@ -292,15 +293,15 @@ particles.append(p)
 mva_BPlus = Particle.MVAConfiguration(
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=['daughterProductOf(getExtraInfo(SignalProbability))', 'deltaE'] + vertex_variables,
-    target='isSignal', targetCluster=1
+    target='isSignal'
 )
 
 pre_BPlus = Particle.PreCutConfiguration(
     variable='daughterProductOf(getExtraInfo(SignalProbability))',
     binning=list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])),
-    method='S/B',
     efficiency=0.95,
     purity=0.00005,
+    userCut='Mbc > 0.2 and abs(deltaE) < 0.5'
 )
 
 p = Particle('B+', mva_BPlus, pre_BPlus)

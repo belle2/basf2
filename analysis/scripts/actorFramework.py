@@ -218,6 +218,8 @@ class Sequence(object):
         if verbose:
             print "Finished execution of Sequence"
 
+        return len(actors) == 0
+
     def optimizeForParallelProcessing(self, needed):
         """
         Reorder the needed modules to optimize for parallel processing without violating the their requirements.

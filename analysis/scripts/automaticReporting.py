@@ -129,9 +129,11 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
         placeholders['combinedParticleInputs'] += '\input{' + particlePlaceholder['texFile'] + '}\n'
         placeholders['combinedParticleEPTable'] += '$' + particlePlaceholder['particleName'] + '$ & '
         placeholders['combinedParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
+        placeholders['combinedParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignalAfterUserCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPreCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNBackground']) * 100) + ' & '
+        placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterUserCut'], particlePlaceholder['particleNBackgroundUserCut']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPreCut'], particlePlaceholder['particleNBackgroundAfterPreCut']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNBackgroundAfterPostCut']) * 100) + r'\\' + '\n'
 
@@ -190,8 +192,6 @@ def createFSParticleTexFile(placeholders, nTuple, mcCounts):
     tree = rootfile.Get('variables')
     placeholders['particleNSignalAfterPostCut'] = int(tree.GetEntries('isSignal'))
     placeholders['particleNBackgroundAfterPostCut'] = int(tree.GetEntries('!isSignal'))
-    #placeholders['particleNSignalAfterPostCut'] = placeholders['mvaNSignalAfterPostCut']
-    #placeholders['particleNBackgroundAfterPostCut'] = placeholders['mvaNBackgroundAfterPostCut']
 
     hash = actorFramework.createHash(placeholders)
     placeholders['particleDiagPlot'] = removeJPsiSlash('{name}_combined_{hash}_diag.png'.format(name=placeholders['particleName'], hash=hash))
@@ -223,6 +223,8 @@ def createCombinedParticleTexFile(placeholders, channelPlaceholders, nTuple, mcC
     placeholders['channelInputs'] = ""
     placeholders['particleNSignal'] = 0
     placeholders['particleNBackground'] = 0
+    placeholders['particleNSignalAfterUserCut'] = 0
+    placeholders['particleNBackgroundAfterUserCut'] = 0
     placeholders['particleNSignalAfterPreCut'] = 0
     placeholders['particleNBackgroundAfterPreCut'] = 0
     placeholders['particleNSignalAfterPostCut'] = 0
@@ -251,8 +253,8 @@ def createCombinedParticleTexFile(placeholders, channelPlaceholders, nTuple, mcC
         if not placeholders['isIgnored']:
             placeholders['particleNSignalAfterPreCut'] += int(channelPlaceholder['channelNSignalAfterPreCut'])
             placeholders['particleNBackgroundAfterPreCut'] += int(channelPlaceholder['channelNBackgroundAfterPreCut'])
-            #placeholders['particleNSignalAfterPostCut'] += int(channelPlaceholder['mvaNSignalAfterPostCut'])
-            #placeholders['particleNBackgroundAfterPostCut'] += int(channelPlaceholder['mvaNBackgroundAfterPostCut'])
+            placeholders['particleNSignalAfterUserCut'] += int(channelPlaceholder['channelNSignalAfterUserCut'])
+            placeholders['particleNBackgroundAfterUserCut'] += int(channelPlaceholder['channelNBackgroundAfterUserCut'])
         placeholders['channelInputs'] += '\input{' + channelPlaceholder['texFile'] + '}\n'
 
     hash = actorFramework.createHash(placeholders)
@@ -285,8 +287,12 @@ def createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut):
         placeholders['channelNBackground'] = 0
         placeholders['channelNSignalAfterPreCut'] = 0
         placeholders['channelNBackgroundAfterPreCut'] = 0
+        placeholders['channelNSignalAfterUserCut'] = 0
+        placeholders['channelNBackgroundAfterUserCut'] = 0
         placeholders['channelPurityAfterPreCut'] = 0
         placeholders['channelEfficiencyAfterPreCut'] = 0
+        placeholders['channelPurityAfterUserCut'] = 0
+        placeholders['channelEfficiencyAfterUserCut'] = 0
 
         if 'ignoreReason' not in placeholders:
             placeholders['ignoreReason'] = """This channel was ignored because one or more daughter particles were ignored."""
@@ -296,10 +302,15 @@ def createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut):
         # Calculate purity and efficiency for this channel
         signal_hist = rootfile.GetListOfKeys().At(0).ReadObj()
         background_hist = rootfile.GetListOfKeys().At(2).ReadObj()
+        without_userCut_hist = rootfile.GetListOfKeys().At(5).ReadObj()
 
-        placeholders['channelNSignal'] = preCutDetermination.GetNumberOfEvents(signal_hist)
-        placeholders['channelNBackground'] = preCutDetermination.GetNumberOfEvents(background_hist)
+        placeholders['channelNSignal'] = without_userCut_hist.GetBinContent(2)
+        placeholders['channelNBackground'] = without_userCut_hist.GetBinContent(1) - without_userCut_hist.GetBinContent(2)
         placeholders['channelPurity'] = '{:.5f}'.format(purity(placeholders['channelNSignal'], placeholders['channelNBackground']))
+
+        placeholders['channelNSignalAfterUserCut'] = preCutDetermination.GetNumberOfEvents(signal_hist)
+        placeholders['channelNBackgroundAfterUserCut'] = preCutDetermination.GetNumberOfEvents(background_hist)
+        placeholders['channelAfterUserPurity'] = '{:.5f}'.format(purity(placeholders['channelNSignalAfterUser'], placeholders['channelNBackgroundAfterUserCut']))
 
         if preCut is not None:
             lc, uc = preCut['range']

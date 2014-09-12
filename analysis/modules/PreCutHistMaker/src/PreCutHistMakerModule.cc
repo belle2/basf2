@@ -37,6 +37,8 @@ PreCutHistMakerModule::PreCutHistMakerModule():
   m_pdg(0),
   m_file(nullptr),
   m_var(nullptr),
+  m_targetVar(nullptr),
+  m_withoutCut("", DataStore::c_Persistent),
   m_histogramSignal("", DataStore::c_Persistent),
   m_histogramAll("", DataStore::c_Persistent),
   m_generator_signal(nullptr),
@@ -46,11 +48,14 @@ PreCutHistMakerModule::PreCutHistMakerModule():
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
   addParam("decayString", m_decayString, "Decay to reconstruct, see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString ");
+  Variable::Cut::Parameter emptyCut;
+  addParam("cut", m_cutParameter, "Selection criteria to be applied", emptyCut);
 
   HistParams defaultHistParams = std::make_tuple(100, 0, 6);
   addParam("histParams", m_histParams, "Tuple specifying number of bins, lower and upper boundary of the variable histogram. (for invariant mass M in GeV)", defaultHistParams);
   addParam("fileName", m_fileName, "Name of the TFile where the histograms are saved.");
   addParam("variable", m_variable, "Variable for which the distributions are calculated");
+  addParam("target", m_targetVariable, "Variable which defines signal and background.", std::string("isSignal"));
   addParam("customBinning", m_customBinning, "Custom binning, which is used instead of histParams. Specify low-edges for each bin, with nbins+1 entries.", std::vector<float>());
   addParam("inverseSamplingRate", m_inverseSamplingRate, "Inverse Sampling rate for 'all' histogram.", static_cast<unsigned int>(1));
 
@@ -122,8 +127,11 @@ void PreCutHistMakerModule::initialize()
   }
   m_file->cd();
 
+  std::string withoutCutName(std::string("withoutCut") + m_channelName);
   std::string signalName(std::string("signal") + m_channelName);
   std::string allName(std::string("all") + m_channelName);
+
+  m_withoutCut.registerInDataStore(withoutCutName, DataStore::c_DontWriteOut);
   m_histogramSignal.registerInDataStore(signalName, DataStore::c_DontWriteOut);
   m_histogramAll.registerInDataStore(allName, DataStore::c_DontWriteOut);
   if (m_customBinning.size() > 0) {
@@ -136,6 +144,7 @@ void PreCutHistMakerModule::initialize()
     m_histogramSignal.construct(signalName.c_str(), "signal", nbins, xlow, xhigh);
     m_histogramAll.construct(allName.c_str(), "all", nbins, xlow, xhigh);
   }
+  m_withoutCut.construct(withoutCutName.c_str(), "WithoutCut", 2, -0.5, 1.5);
 
   Variable::Manager& manager = Variable::Manager::Instance();
   m_var = manager.getVariable(m_variable);
@@ -143,6 +152,14 @@ void PreCutHistMakerModule::initialize()
   if (m_var == nullptr) {
     B2ERROR("PreCutHistMaker: Variable::Manager doesn't have variable" <<  m_variable)
   }
+
+  m_targetVar = manager.getVariable(m_targetVariable);
+
+  if (m_targetVar == nullptr) {
+    B2ERROR("PreCutHistMaker: Variable::Manager doesn't have variable" <<  m_targetVariable)
+  }
+
+  m_cut.init(m_cutParameter);
 
   m_generator_all = new ParticleGenerator(m_decayString);
   m_generator_signal = new ParticleGenerator(onlySignal_decayString.str());
@@ -267,17 +284,13 @@ void PreCutHistMakerModule::saveCombinationsForSignal()
   while (m_generator_signal->loadNext()) {
 
     const Particle particle = m_generator_signal->getCurrentParticle();
+    m_withoutCut->get().Fill(1);
+    if (!m_cut.check(&particle))
+      continue;
     Particle* part = particles.appendNew(particle);
     MCMatching::setMCTruth(part);
-    //B2WARNING("combined Particle created.");
-    if (Variable::isSignal(part) < 0.5) {
-      /*
-      B2WARNING("mcMatching says No. (status: " << MCMatching::getMCTruthStatus(part));
-      part->print();
-      */
+    if (m_targetVar->function(part) < 0.5)
       continue;
-    }
-    //B2WARNING("passed");
     m_histogramSignal->get().Fill(m_var->function(part));
   }
 
@@ -290,6 +303,9 @@ void PreCutHistMakerModule::saveAllCombinations()
     m_generator_all->init();
     while (m_generator_all->loadNext()) {
       const Particle part = m_generator_all->getCurrentParticle();
+      m_withoutCut->get().Fill(0);
+      if (!m_cut.check(&part))
+        continue;
       m_histogramAll->get().Fill(m_var->function(&part), m_inverseSamplingRate);
     }
   }
@@ -361,6 +377,7 @@ void PreCutHistMakerModule::terminate()
 {
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
     B2INFO("Writing hists to " << m_fileName);
+    m_withoutCut->write(m_file);
     m_histogramSignal->write(m_file);
     m_histogramAll->write(m_file);
 

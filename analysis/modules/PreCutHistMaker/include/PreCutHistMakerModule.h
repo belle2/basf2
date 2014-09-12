@@ -16,6 +16,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/pcore/RootMergeable.h>
 
+#include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
 #include <analysis/VariableManager/Manager.h>
@@ -87,7 +88,11 @@ namespace Belle2 {
 
     std::string m_variable; /**< Variable for which the distributions are calculated */
     const Variable::Manager::Var* m_var; /**< Pointer to variable stored in the variable manager */
+    std::string m_targetVariable; /**< Variable which defines ginal and background */
+    const Variable::Manager::Var* m_targetVar; /**< Pointer to target variable stored in the variable manager */
+
     std::vector<StoreObjPtr<ParticleList>> m_tmpLists; /**< temporary particle lists (contain subsets of contents of input lists, filled from MC truth). */
+    StoreObjPtr<RootMergeable<TH1F>> m_withoutCut; /**< histogram containing signal and background amount without previous cut */
     StoreObjPtr<RootMergeable<TH1F>> m_histogramSignal; /**< signal histogram for combined particle. */
     StoreObjPtr<RootMergeable<TH1F>> m_histogramAll; /**< signal histogram for combined particle. */
 
@@ -96,6 +101,9 @@ namespace Belle2 {
 
     unsigned int m_inverseSamplingRate; /**< Sampling rate for 'all' histogram. */
     unsigned long int m_iEvent; /**< Event counter, used for sampling rate */
+
+    Variable::Cut::Parameter m_cutParameter;  /**< selection criteria */
+    Variable::Cut m_cut; /**< cut object which performs the cuts */
 
   };
 

@@ -204,7 +204,6 @@ bool getMatchingDaughters(const MCParticle& mcparticle, std::vector<MCParticle*>
 
 bool hasAntiParticle(int pdg)
 {
-
   if (pdg < 0) return true;
   if (pdg == 22) return false;
   if (pdg == 310) return false;
@@ -252,10 +251,8 @@ bool PreCutHistMakerModule::fillParticleLists(const std::vector<MCParticle*>& mc
   }
 
   for (const MCParticle * mcPart : mcDaughters) {
-    //B2WARNING("fillParticleLists: mc " << mcPart->getIndex() << " " << mcPart->getPDG());
     const auto& particles = mcPart->getRelationsWith<Particle>();
     for (const Particle & p : particles) {
-      //B2WARNING("fillParticleLists: adding p " << p.getArrayIndex() << " " << p.getPDGCode());
 
       const auto& it = pdgToTmpList.find(abs(p.getPDGCode()));
       if (it != pdgToTmpList.end()) {
@@ -347,14 +344,7 @@ void PreCutHistMakerModule::event()
       //compare PDG codes with what we expect from particlelists (absolute values only, as we might not know the flavour of reconstructed Particles)
       std::vector<MCParticle*> mcDaughters;
       if (getMatchingDaughters(mcparticle, mcDaughters, expectedDaughterPDGsAbs)) {
-        //B2WARNING("mcdecay found");
         if (mcDaughters.size() < m_inputLists.size()) {
-          /*
-          B2WARNING("size mismatch, discarding " << mcparticle.getIndex());
-          for (auto m : mcDaughters) {
-            B2WARNING("" << m->getPDG());
-          }
-          */
           continue;
         }
 
@@ -362,7 +352,6 @@ void PreCutHistMakerModule::event()
 
         //we found a true decay, collect all Particles associated with the daughters
         if (!fillParticleLists(mcDaughters)) {
-          //B2WARNING("not all hypotheses found!");
           continue;
         }
 

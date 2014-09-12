@@ -284,12 +284,12 @@ void PreCutHistMakerModule::saveCombinationsForSignal()
   while (m_generator_signal->loadNext()) {
 
     const Particle particle = m_generator_signal->getCurrentParticle();
-    m_withoutCut->get().Fill(1);
-    if (!m_cut.check(&particle))
-      continue;
     Particle* part = particles.appendNew(particle);
     MCMatching::setMCTruth(part);
     if (m_targetVar->function(part) < 0.5)
+      continue;
+    m_withoutCut->get().Fill(1);
+    if (!m_cut.check(&particle))
       continue;
     m_histogramSignal->get().Fill(m_var->function(part));
   }

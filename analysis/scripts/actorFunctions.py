@@ -369,7 +369,8 @@ def PreCutDetermination(channelNames, preCutConfigs, preCutHistograms):
     preCutConfig = preCutConfigs[0]
 
     for (channelName, cut) in preCutDetermination.CalculatePreCuts(preCutConfig, channelNames, preCutHistograms).iteritems():
-        cut['cutstring'] += ' and ' + preCutConfig.userCut
+        if preCutConfig.userCut != '':
+            cut['cutstring'] += ' and ' + preCutConfig.userCut
         results['PreCut_{c}'.format(c=channelName)] = None if cut['isIgnored'] else cut
         B2INFO("Calculated pre cut for channel {c}".format(c=channelName))
     return results

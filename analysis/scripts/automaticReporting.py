@@ -133,7 +133,7 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
         placeholders['combinedParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPreCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.1f}'.format(efficiency(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignal'], particlePlaceholder['particleNBackground']) * 100) + ' & '
-        placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterUserCut'], particlePlaceholder['particleNBackgroundUserCut']) * 100) + ' & '
+        placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterUserCut'], particlePlaceholder['particleNBackgroundAfterUserCut']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPreCut'], particlePlaceholder['particleNBackgroundAfterPreCut']) * 100) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.3f}'.format(purity(particlePlaceholder['particleNSignalAfterPostCut'], particlePlaceholder['particleNBackgroundAfterPostCut']) * 100) + r'\\' + '\n'
 
@@ -147,8 +147,8 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
 
     for bPlaceholder in combinedParticlePlaceholders:
         if bPlaceholder['particleName'] in ['B+', 'B0', 'B-', 'anti-B0']:
-            placeholders['NSignal'] += int(bPlaceholder['particleNSignal'])
-            placeholders['NBackground'] += int(bPlaceholder['particleNBackground'])
+            placeholders['NSignal'] += int(bPlaceholder['particleNSignalAfterPostCut'])
+            placeholders['NBackground'] += int(bPlaceholder['particleNBackgroundAfterPostCut'])
 
     placeholders['overallSignalEfficiencyInPercent'] = efficiency(placeholders['NSignal'], placeholders['NEvents']) * 100
 
@@ -300,9 +300,9 @@ def createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut):
         placeholders['preCutROOTFile'] = preCutHistogram[0]
         rootfile = ROOT.TFile(placeholders['preCutROOTFile'])
         # Calculate purity and efficiency for this channel
-        signal_hist = rootfile.GetListOfKeys().At(0).ReadObj()
-        background_hist = rootfile.GetListOfKeys().At(2).ReadObj()
-        without_userCut_hist = rootfile.GetListOfKeys().At(5).ReadObj()
+        without_userCut_hist = rootfile.GetListOfKeys().At(0).ReadObj()
+        signal_hist = rootfile.GetListOfKeys().At(1).ReadObj()
+        background_hist = rootfile.GetListOfKeys().At(3).ReadObj()
 
         placeholders['channelNSignal'] = without_userCut_hist.GetBinContent(2)
         placeholders['channelNBackground'] = without_userCut_hist.GetBinContent(1) - without_userCut_hist.GetBinContent(2)
@@ -310,7 +310,7 @@ def createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut):
 
         placeholders['channelNSignalAfterUserCut'] = preCutDetermination.GetNumberOfEvents(signal_hist)
         placeholders['channelNBackgroundAfterUserCut'] = preCutDetermination.GetNumberOfEvents(background_hist)
-        placeholders['channelAfterUserPurity'] = '{:.5f}'.format(purity(placeholders['channelNSignalAfterUser'], placeholders['channelNBackgroundAfterUserCut']))
+        placeholders['channelAfterUserPurity'] = '{:.5f}'.format(purity(placeholders['channelNSignalAfterUserCut'], placeholders['channelNBackgroundAfterUserCut']))
 
         if preCut is not None:
             lc, uc = preCut['range']
@@ -421,9 +421,8 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
         ROOT.gROOT.SetBatch(True)
 
         # Set mva placeholders
-        placeholders['mvaTargetCluster'] = mvaConfig.targetCluster
         placeholders['mvaROOTFilename'] = signalProbability[:-7] + '.root'  # Strip .config of filename
-        placeholders['mvaTMVAFilename'] = signalProbability[:-7] + '_' + str(placeholders['mvaTargetCluster']) + '.root'  # Strip .config of filename
+        placeholders['mvaTMVAFilename'] = signalProbability[:-7] + '_1.root'  # Strip .config of filename
         placeholders['mvaLogFilename'] = signalProbability[:-7] + '.log'  # Strip .config of filename
         placeholders['mvaName'] = mvaConfig.name
         placeholders['mvaType'] = mvaConfig.type
@@ -471,8 +470,8 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
         originalTree = keys[0].ReadObj()
         placeholders['mvaNCandidates'] = originalTree.GetEntries()
 
-        signalSelector = '({isSignal} == {signalCluster})'.format(isSignal=placeholders['mvaTarget'], signalCluster=placeholders['mvaTargetCluster'])
-        backgroundSelector = '({isSignal} != {signalCluster})'.format(isSignal=placeholders['mvaTarget'], signalCluster=placeholders['mvaTargetCluster'])
+        signalSelector = '({isSignal} == 1)'.format(isSignal=placeholders['mvaTarget'])
+        backgroundSelector = '({isSignal} != 1)'.format(isSignal=placeholders['mvaTarget'])
         placeholders['mvaNSignal'] = originalTree.GetEntries(signalSelector)
         placeholders['mvaNBackground'] = originalTree.GetEntries(backgroundSelector)
 

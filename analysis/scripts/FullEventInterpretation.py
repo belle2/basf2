@@ -263,7 +263,7 @@ def FullEventInterpretation(path, particles):
                                 path='Path',
                                 particleName='Name_{i}'.format(i=particle.identifier),
                                 channelName='Name_{c}'.format(c=channel.name),
-                                mvaCutConfig='MVAConfig_{c}'.format(c=channel.name),
+                                mvaConfig='MVAConfig_{c}'.format(c=channel.name),
                                 preCutConfig='PreCutConfig_{c}'.format(c=channel.name),
                                 daughterParticleLists=['ParticleList_{d}'.format(d=daughter) for daughter in channel.daughters],
                                 additionalDependencies=additionalDependencies)

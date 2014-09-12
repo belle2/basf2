@@ -185,7 +185,10 @@ namespace Belle2 {
     double particleDistanceSignificance(const Particle* part)
     {
       const auto& vertex = part->getVertex();
-      return vertex.Mag2() / sqrt(vertex * (part->getVertexErrorMatrix() * vertex));
+      auto denominator = vertex * (part->getVertexErrorMatrix() * vertex);
+      if (denominator == 0)
+        return -1;
+      return  vertex.Mag2() / sqrt(denominator);
     }
 
     double particleDRho(const Particle* part)

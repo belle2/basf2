@@ -50,6 +50,30 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr isInRegion(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 3) {
+        float low = 0;
+        float high = 0;
+        try {
+          low = boost::lexical_cast<float>(arguments[1]);
+          high = boost::lexical_cast<float>(arguments[2]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("Second and third argument of isInRegion meta function must be floats!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var, low, high](const Particle * particle) -> double {
+          double result = var->function(particle);
+          return (result >= low and result <= high) ? 1.0 : 0.0;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function isInRegion");
+        return nullptr;
+      }
+    }
+
     Manager::FunctionPtr daughterProductOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -548,6 +572,7 @@ namespace Belle2 {
     }
 
     VARIABLE_GROUP("MetaFunctions");
+    REGISTER_VARIABLE("isInRegion(variable, low, high)", isInRegion, "Returns 1 if given variable is inside a given region. Otherwise 0.");
     REGISTER_VARIABLE("daughter(n, variable)", daughter, "Returns value of variable for the nth daughter.");
     REGISTER_VARIABLE("daughterProductOf(variable)", daughterProductOf, "Returns product of a variable over all daughters.");
     REGISTER_VARIABLE("daughterSumOf(variable)", daughterSumOf, "Returns sum of a variable over all daughters.");

@@ -93,6 +93,8 @@ namespace Belle2 {
       m_iSamples[target]++;
       if (m_iSamples[target] % m_inverseSamplingRates[target] != 0)
         return false;
+      else
+        m_iSamples[target] = 0;
     }
     return true;
   }

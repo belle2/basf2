@@ -27,6 +27,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
@@ -70,8 +71,7 @@ namespace Belle2 {
              " 4 Particle Combiner Teacher, 6 for Particle Combiner Expert ) ", 0);
     addParam("listName", m_listName, "name of particle list", string(""));
 
-    static const char* localdir = getenv("BELLE2_LOCAL_DIR");
-    m_workingDirectory = string(localdir) + string("/analysis/modules/FlavorTagging/TrainedMethods");
+    m_workingDirectory = FileSystem::findFile("/analysis/modules/FlavorTagging/TrainedMethods");
 
 //   Settings for Teaching
     m_prepareOption = "SplitMode=Alternate:!V";//:nTrain_Signal=10000:nTest_Signal=10000";

@@ -10,8 +10,8 @@
 # The call operator of an actor receives the required values and returns a dictionary of provided values.
 # The provided values must depend on all the required arguments!
 #
-# This abstract concept is implemented in this file by the Resource and the Function class.
-# All the actors are added to a Sequence object. The Sequence object resolves the dependencies between the actors,
+# This abstract concept is implemented in this file by the Property and the Actor class.
+# All the actors are added to a Play object. The Play object resolves the dependencies between the actors,
 # and runs them in a order which garantuees that all requirements for each actor are fulfilled at runtime.
 
 
@@ -19,57 +19,80 @@ import hashlib
 import basf2
 import multiprocessing.pool
 import copy
+import inspect
 
 
-class Resource(object):
+def create_hash(arguments):
     """
-    Resources are provide values if certain requirements are fulfilled.
-    More specific the Resource class is a generic Functor class, which provides a simple value under a given name.
+    Creates a unique hash which depends on the given arguments
+        @param arguments the hash depends on
+    """
+    return hashlib.sha1(str([str(v) for v in arguments if v is not None])).hexdigest()
+
+
+class Property(object):
+    """
+    Poperties are provide values if certain requirements are fulfilled.
+    More specific the Property class is a generic Actor class, which provides a simple value under a given name.
     It's used to provide things like: Name of a particle, PDG code of a particle, MVA configuration,...
     """
-    def __init__(self, name, value, requires=None, strict=True):
+    def __init__(self, name, value):
         """
-        Creates a new Resource
+        Creates a new Property
             @param name the name of the resource. Other Actors can require this resource using its name.
             @param value the value of the resource. If another Actor requires this resource its value is passed to the Actor.
-            @param requires these requirements have to be fulfilled before calling this Actor
-            @param strict if any requirement is None the returned value is None for strict == True
         """
         ##  the name of the resource. Other Actors can require this resource using its name.
         self.name = name
         ## the value of the resource. If another Actor requires this resource its value is passed to the Actor.
         self.value = value
+        ## there are no requirements
+        self.requires = []
+
+    def __call__(self, arguments):
+        """
+        Returns the given value under the given name
+        """
+        return {self.name: self.value}
+
+
+class Collection(object):
+    """
+    Collections combine a series of identifiers into a single identifier which returns the dict of the identifier and corresponding values
+    """
+    def __init__(self, name, requires):
+        """
+        Creates a new Collection
+            @param name the name of the collection. Other Actors can require this collection using its name.
+            @param requires these requirements have to be fulfilled before calling this Actor
+        """
+        ##  the name of the resource. Other Actors can require this resource using its name.
+        self.name = name
         ## these requirements have to be fulfilled before calling this Actor
         self.requires = [] if requires is None else requires
-        ## if any requirement is None the returned value is none for strict == true
-        self.strict = strict
 
     def __call__(self, arguments):
         """
         Returns the given value under the given name
             @arguments dictionary of arguments which were required (addtional entries are ignored)
         """
-        arguments = [arguments[r] for r in self.requires if r in arguments]
+        arguments = {r: arguments[r] for r in self.requires if r in arguments}
         if len(arguments) != len(self.requires):
             raise RuntimeError('Requirements are not fulfilled')
-
-        if self.strict and containsNone(arguments):
-            return {self.name: None}
-        if not self.strict and all([argument is None for argument in arguments]):
-            return {self.name: None}
-        return {self.name: self.value}
+        return {self.name: arguments}
 
 
-class Function(object):
+class Actor(object):
     """
-    This Functor class wraps a normal function into an Actor.
+    This Actor class wraps a normal function into an Actor.
     Every parameter value of the funtion is connected to a unique parameter name, defining the requirements of this actor.
     Imagine you have a function foo:
         def foo(path, particleList): ...
     You can use this class to transform foo to an actor like this:
-        Function(foo, path='Path', particleList='K+')
+        Actor(foo, particleList='K+')
+    The parameter path is automatically connected to an identifier 'path' whereas particleList ist overwritten to be connected to 'K+'
     You can bind multiple requirements to one parameter of the function by passing a list of requirements as the corresponding keyword argument
-        Function(foo, path='Path', particleLists=['K+','pi-'])
+        Actor(foo, particleLists=['K+','pi-'])
     """
     def __init__(self, func, **kwargs):
         """
@@ -82,10 +105,18 @@ class Function(object):
         ## the function which is called by this actor
         self.func = func
         ## The kwargs provided by the user.
-        self.parameters = kwargs
+        self.user_parameters = kwargs
+        ## Kwargs determined from inspection of cuntion
+        self.automatic_parameters = []
+        try:
+            argspec = inspect.getargspec(func)
+            self.automatic_parameters = [arg for arg in argspec.args if arg not in self.user_parameters]
+        except Exception as e:
+            pass
+
         ## These requirements have to be fulfilled before calling this Actor
-        self.requires = []
-        for (key, value) in self.parameters.iteritems():
+        self.requires = [key for key in self.automatic_parameters]
+        for (key, value) in self.user_parameters.iteritems():
             if isinstance(value, str):
                 self.requires.append(value)
             else:
@@ -96,48 +127,49 @@ class Function(object):
         Calls the underlying function of this actor with the required arguments
             @arguments dictionary of arguments which were required (addtional entries are ignored)
         """
-        arguments = [arguments[r] for r in self.requires if r in arguments]
+        arguments = {r: arguments[r] for r in self.requires if r in arguments}
         if len(arguments) != len(self.requires):
             raise RuntimeError('Requirements are not fulfilled')
-
-        requirement_argument_mapping = dict(zip(self.requires, arguments))
-        kwargs = {}
-        for (key, value) in self.parameters.iteritems():
+        kwargs = {key: arguments[key] for key in self.automatic_parameters}
+        for (key, value) in self.user_parameters.iteritems():
             if isinstance(value, str):
-                kwargs[key] = requirement_argument_mapping[value]
+                kwargs[key] = arguments[value]
             else:
-                kwargs[key] = [requirement_argument_mapping[v] for v in value]
-
+                kwargs[key] = [arguments[v] for v in value]
         result = self.func(**kwargs)
         return result
 
 
-class Sequence(object):
+class Play(object):
     """
-    The Sequence contains all the actors (Functions and Resources).
-    On run, the sequence resolves the dependencies between the actors and calls them in the correct order.
+    The Play contains all the actors (Property, Collection and Actor).
+    On run, the play resolves the dependencies between the actors and calls them in the correct order.
     """
 
     def __init__(self):
-        """ Create a new Sequence """
-        ## The Sequence which contains all actors
+        """ Create a new Play """
+        ## The sequence which contains all actors
         self.seq = []
 
-    def addResource(self, *args, **kwargs):
-        """ Appends a Resource to the Sequence """
-        self.seq.append(Resource(*args, **kwargs))
+    def addProperty(self, *args, **kwargs):
+        """ Appends a Property to the Sequence """
+        self.seq.append(Property(*args, **kwargs))
 
-    def addFunction(self, *args, **kwargs):
-        """ Appends a Function to the Sequence """
-        self.seq.append(Function(*args, **kwargs))
+    def addCollection(self, *args, **kwargs):
+        """ Appends a Property to the Sequence """
+        self.seq.append(Collection(*args, **kwargs))
+
+    def addActor(self, *args, **kwargs):
+        """ Appends a Actor to the Sequence """
+        self.seq.append(Actor(*args, **kwargs))
 
     def addNeeded(self, key):
-        """ Add dummy function which forces the actor which provides key to be needed """
+        """ Add dummy actor which forces the actor which provides key to be needed """
         def RequireManually(a):
             return {}
-        self.seq.append(Function(RequireManually, a=key))
+        self.seq.append(Actor(RequireManually, a=key))
 
-    def run(self, path, verbose, nProcesses=1):
+    def run(self, path, verbose=False, nProcesses=1):
         """
         Resolve dependencies of the Actors, by extracting step by step the actors for which
         all their requirements are provided.
@@ -157,7 +189,8 @@ class Sequence(object):
             print "Start execution of Sequence"
         actors = [actor for actor in self.seq]
         results = dict()
-        results['Path'] = True
+        results['path'] = True
+        results['hash'] = ''
         results['None'] = None
         chain = []
         while True:
@@ -172,14 +205,18 @@ class Sequence(object):
             if nProcesses > 1:
                 def _execute_actor_parallel(actor):
                     c = copy.copy(results)
-                    c['Path'] = actor.path = basf2.create_path()
+                    c['path'] = actor.path = basf2.create_path()
+                    c['hash'] = ''
+                    c['hash'] = create_hash([results[r] for r in actor.requires])
                     actor.provides = actor(c)
                     return actor
                 p = multiprocessing.pool.ThreadPool(processes=nProcesses)
                 ready = p.map(_execute_actor_parallel, ready)
             else:
                 for actor in ready:
-                    results['Path'] = actor.path = basf2.create_path()
+                    results['path'] = actor.path = basf2.create_path()
+                    results['hash'] = ''
+                    results['hash'] = create_hash([results[r] for r in actor.requires])
                     actor.provides = actor(results)
             if verbose:
                 print "Updating result dictionary"
@@ -197,7 +234,7 @@ class Sequence(object):
             print "Select needed modules"
         needed = [actor for level in chain for actor in level if len(actor.provides) == 0]
         for level in reversed(chain):
-            needed += list(reversed([actor for actor in level if 'NotNeeded' not in actor.provides and any((r in actor.provides and actor.provides[r] is not None) for n in needed for r in n.requires)]))
+            needed += list(reversed([actor for actor in level if ('__needed__' not in actor.provides or actor.provides['__needed__']) and any((r in actor.provides and actor.provides[r] is not None) for n in needed for r in n.requires)]))
         needed = list(reversed(needed))
 
         # Some modules are certified for parallel processing. Modules which aren't certified should run as late as possible!
@@ -301,14 +338,6 @@ class Sequence(object):
 
         dotfile.write("}\n")
         dotfile.close()
-
-
-def createHash(*args):
-    """
-    Creates a unique hash which depends on the given arguments
-        @param args arguments the hash depends on
-    """
-    return hashlib.sha1(str([str(v) for v in args])).hexdigest()
 
 
 def removeNones(*requirementLists):

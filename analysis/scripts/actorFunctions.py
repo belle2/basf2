@@ -7,7 +7,7 @@
 # To create your own actor:
 #   1. Write a normal function which takes the needed arguments and returns a dictonary of provided values.
 #      E.g. def foo(path, particleList) ... return {'Stuff': x}
-#   2. Make sure your return value depends on all the used arguments, easiest way to accomplish this is using the createHash function.
+#   2. Make sure your return value depends on all the used arguments, easiest way to accomplish this is the automatic provided hash parameter.
 #   3. Add the function to the sequence object like this (in FullEventInterpretation.py):
 #      seq.addFunction(foo, path='Path', particleList='K+')
 
@@ -27,80 +27,6 @@ import subprocess
 import json
 from string import Template
 import IPython
-
-
-class InputFile(object):
-    """
-    Class checks the input file for already existing ParticleLists
-    so these lists don't have to be created again
-    """
-    def __init__(self, filename='input.root'):
-        """
-        Open input file. Get tree and persistent object
-        """
-        if False:  # os.path.isfile(filename):
-            ROOT.gSystem.Load('libdataobjects')
-            self.rootfile = ROOT.TFile(filename)
-            self.tree = self.rootfile.Get('tree')
-            self.persistent = self.rootfile.Get('persistent')
-
-    def treeContainsObject(self, name):
-        """
-        Returns true if the tree object contains a branch with the given name
-        """
-        return hasattr(self, 'tree') and any(branch.GetName() == name for branch in self.tree.GetListOfBranches())
-
-    def persistentContainsObject(self, name):
-        """
-        Returns true if the persistent object contains a branch with the given name
-        """
-        return hasattr(self, 'persistent') and any(branch.GetName() == name for branch in self.persistent.GetListOfBranches())
-
-    def getFirstParticleInList(self, particleListName):
-        """
-        Returns the particle object of the first valid particle in the given particle list
-        """
-        particleList = Belle2.ParticleList()
-        self.tree.SetBranchAddress(particleListName, particleList)
-        i = 0
-        N = self.tree.GetEntries()
-        while i < N:
-            self.tree.GetEntry(i)
-            for k in [Belle2.ParticleList.c_FlavorSpecificParticle, Belle2.ParticleList.c_SelfConjugatedParticle]:
-                for j in [True, False]:
-                    vec = particleList.getList(k, j)
-                    if len(vec) > 0:
-                        self.tree.ResetBranchAddress(self.tree.GetBranch(particleListName))
-                        return self.tree.Particles[vec[0]]
-            i += 1
-        self.tree.ResetBranchAddress(self.tree.GetBranch(particleListName))
-        return None
-
-    def particleListHasSignalProbability(self, particleListName):
-        """
-        Returns true if the given particle list contains an extra info named SignalProbability
-        """
-        if self.treeContainsObject(particleListName):
-            p = self.getFirstParticleInList(particleListName)
-            if p is None:
-                return False
-            mapId = p.getExtraInfoMap()
-            if mapId == -1:
-                return False
-            index = self.tree.ParticleExtraInfoMap.getIndex(mapId, 'SignalProbability')
-            return index > 0 and index < p.getExtraInfoSize()
-        else:
-            return False
-
-    def particleListHasVertexFit(self, particleListName):
-        """
-        Returns true if the given particle list contains particles on which a vertex fit was performed
-        """
-        if self.treeContainsObject(particleListName):
-            p = self.getFirstParticleInList(particleListName)
-            return p is not None and (p.getPValue() >= 0 or p.getPValue() < -2)
-        else:
-            return False
 
 
 def removeJPsiSlash(filename):
@@ -141,40 +67,42 @@ def CountMCParticles(path, names):
     counter['NEvents'] = countNtuple.GetEntries()
     print counter
     B2INFO("Loaded number of MCParticles for every pdg code seperatly")
-    return {'MCParticleCounts': counter}
+    return {'mcCounts': counter}
 
 
-def LoadParticles(path):
+def LoadParticles(path, preloader):
     """
     Loads Particles
     @param path the basf2 path
+    @param preloader checks if provided resource is already available in input root file
     @return Resource named ParticleLoader
     """
     B2INFO("Adding ParticleLoader")
-    if InputFile().treeContainsObject('Particles'):
+    if preloader.treeContainsObject('Particles'):
         B2INFO("Preload Particles Array")
-        return {'ParticleLoader': 'dummy', 'NotNeeded': None}
+        return {'particleLoader': 'dummy', '__needed__': False}
     path.add_module(register_module('ParticleLoader'))
     B2INFO("Added Particles Array")
-    return {'ParticleLoader': 'dummy'}
+    return {'particleLoader': 'dummy'}
 
 
-def SelectParticleList(path, particleName, particleLabel, additionalDependencies):
+def SelectParticleList(path, hash, preloader, particleLoader, particleName, particleLabel):
     """
     Creates a ParticleList gathering up all particles with the given particleName
         @param path the basf2 path
+        @param hash of all input parameters
+        @param preloader checks if provided resource is already available in input root file
+        @param particleLoader
         @param particleName valid pdg particle name
         @param particleLabel user defined label
-        @param additionalDependencies like particle loader
         @return Resource named RawParticleList_{particleName}:{particleLabel} corresponding ParticleList is stored as {particleName}:{hash}
     """
     B2INFO("Enter: Select Particle List {p} with label {l}".format(p=particleName, l=particleLabel))
-    userLabel = actorFramework.createHash(particleName, particleLabel)
-    outputList = particleName + ':' + userLabel
+    outputList = particleName + ':' + hash
 
-    if InputFile().treeContainsObject(outputList):
+    if preloader.treeContainsObject(outputList):
         B2INFO("Preload Particle List {p} with label {l} in list {list}".format(p=particleName, l=particleLabel, list=outputList))
-        return {'RawParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList, 'NotNeeded': None}
+        return {'RawParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList, '__needed__': False}
 
     modularAnalysis.selectParticle(outputList, persistent=True, path=path)
 
@@ -182,10 +110,12 @@ def SelectParticleList(path, particleName, particleLabel, additionalDependencies
     return {'RawParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList}
 
 
-def MakeAndMatchParticleList(path, particleName, particleLabel, channelName, daughterParticleLists, preCut):
+def MakeAndMatchParticleList(path, hash, preloader, particleName, particleLabel, channelName, daughterParticleLists, preCut):
     """
     Creates a ParticleList by combining other particleLists via the ParticleCombiner module and match MC truth for this new list.
         @param path the basf2 path
+        @param hash of all input parameters
+        @param preloader checks if provided resource is already available in input root file
         @param particleName valid pdg particle name
         @param particleLabel user defined label
         @param channelName unique name describing the channel
@@ -194,12 +124,11 @@ def MakeAndMatchParticleList(path, particleName, particleLabel, channelName, dau
         @return Resource named RawParticleList_{channelName} corresponding list is stored as {particleName}:{hash}
     """
     B2INFO("Enter: Make and Match Particle List {p} with label {l} for channel {c}".format(p=particleName, l=particleLabel, c=channelName))
-    userLabel = actorFramework.createHash(particleName, particleLabel, channelName, daughterParticleLists, preCut)
-    outputList = particleName + ':' + userLabel
+    outputList = particleName + ':' + hash
 
-    if InputFile().treeContainsObject(outputList):
+    if preloader.treeContainsObject(outputList):
         B2INFO("Preload Particle List {p} with label {l} for channel {c} in list {o}".format(p=particleName, l=particleLabel, c=channelName, o=outputList))
-        return {'RawParticleList_{c}'.format(c=channelName): outputList, 'NotNeeded': None}
+        return {'RawParticleList_{c}'.format(c=channelName): outputList, '__needed__': False}
 
     # If preCut is None this channel is ignored
     if preCut is None:
@@ -213,46 +142,39 @@ def MakeAndMatchParticleList(path, particleName, particleLabel, channelName, dau
     return {'RawParticleList_{c}'.format(c=channelName): outputList}
 
 
-def CopyParticleLists(path, particleName, particleLabel, inputLists, postCuts):
+def CopyParticleLists(path, hash, preloader, particleName, particleLabel, inputLists, postCut):
     """
     Creates a ParticleList gathering up all particles in the given inputLists
         @param path the basf2 path
+        @param hash of all input parameters
+        @param preloader checks if provided resource is already available in input root file
         @param particleName valid pdg particle name
         @param particleLabel user defined label
         @param inputLists list of ParticleLists name defning which ParticleLists are copied to the new list
-        @param postCuts list of dictionaries containing 'cutstring', a string which defines the cut which is applied after the reconstruction of the particle.
+        @param postCut dictionary containing 'cutstring'
         @return Resource named ParticleList_{particleName}:{particleLabel} corresponding ParticleList is stored as {particleName}:{hash}
     """
     B2INFO("Enter: Gather Particle List {p} with label {l}".format(p=particleName, l=particleLabel))
-    if not all(postCuts[0] == postCut or postCut is None for postCut in postCuts):
-        B2WARNING("Different post cuts for ParticleLists which are gathered up in the same list isn't supported at the moment. Using only first cut.")
+    outputList = particleName + ':' + hash
 
-    if postCuts[0] is not None:
-        postCut = postCuts[0]['cutstring']
-    else:
-        postCut = ''
-
-    inputLists = actorFramework.removeNones(inputLists)
-    userLabel = actorFramework.createHash(particleName, particleLabel, inputLists, postCuts)
-    outputList = particleName + ':' + userLabel
-
-    if InputFile().treeContainsObject(outputList):
+    if preloader.treeContainsObject(outputList):
         B2INFO("Preload Particle List {p} with label {l} in list {o}".format(p=particleName, l=particleLabel, o=outputList))
         return {'ParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList,
                 'ParticleList_{p}:{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): pdg.conjugate(particleName) + ':' + userLabel,
-                'NotNeeded': None}
+                '__needed__': False}
 
+    inputLists = [l for l in inputLists if l is not None]
     if inputLists == []:
         B2INFO("Gather Particle List {p} with label {l} in list {o}. But there are no particles to gather :-(.".format(p=particleName, l=particleLabel, o=outputList))
         return {'ParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): None,
                 'ParticleList_{p}:{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): None}
 
-    modularAnalysis.cutAndCopyLists(outputList, inputLists, postCut, persistent=True, path=path)
+    modularAnalysis.cutAndCopyLists(outputList, inputLists, postCut['cutstring'] if postCut is not None else '', persistent=True, path=path)
     #modularAnalysis.summaryOfLists(inputLists + [outputList], path=path)
 
     B2INFO("Gather Particle List {p} with label {l} in list {o}".format(p=particleName, l=particleLabel, o=outputList))
     return {'ParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList,
-            'ParticleList_{p}:{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): pdg.conjugate(particleName) + ':' + userLabel}
+            'ParticleList_{p}:{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): pdg.conjugate(particleName) + ':' + hash}
 
 
 def LoadGeometry(path):
@@ -268,13 +190,15 @@ def LoadGeometry(path):
     geometry.param('components', ['MagneticField'])
     path.add_module(geometry)
     B2INFO("Added Geometry and Gearbox to Path")
-    return {'Geometry': 'dummy'}
+    return {'geometry': 'dummy'}
 
 
-def FitVertex(path, channelName, particleList, daughterVertices, geometry):
+def FitVertex(path, hash, preloader, channelName, particleList, daughterVertices, geometry):
     """
     Fit secondary vertex of all particles in this ParticleList
         @param path the basf2 path
+        @param hash of all input parameters
+        @param preloader checks if provided resource is already available in input root file
         @param channelName unique name describing the channel
         @param particleList ParticleList name
         @param daughterVertices to ensure all daughter particles have valid error matrices
@@ -286,11 +210,9 @@ def FitVertex(path, channelName, particleList, daughterVertices, geometry):
         B2INFO("Didn't fitted vertex for channel {c}, because channel is ignored.".format(c=channelName))
         return {'VertexFit_{c}'.format(c=channelName): None}
 
-    hash = actorFramework.createHash(channelName, particleList, daughterVertices, geometry)
-
-    if InputFile().particleListHasVertexFit(particleList):
+    if preloader.particleListHasVertexFit(particleList):
         B2INFO("Preloaded fitted vertex for channel {c}.".format(c=channelName))
-        return {'VertexFit_{c}'.format(c=channelName): hash, 'NotNeeded': None}
+        return {'VertexFit_{c}'.format(c=channelName): hash, '__needed__': False}
 
     pvfit = register_module('ParticleVertexFitter')
     pvfit.set_name('ParticleVertexFitter_' + particleList)
@@ -322,7 +244,7 @@ def CreatePreCutHistogram(path, particleName, channelName, mvaConfig, preCutConf
         B2INFO("Create pre cut histogram for channel {c}. But channel is ignored.".format(c=channelName))
         return {'PreCutHistogram_{c}'.format(c=channelName): None}
 
-    hash = actorFramework.createHash(particleName, channelName, preCutConfig.userCut, preCutConfig.variable, preCutConfig.binning, daughterParticleLists, mvaConfig.target, additionalDependencies)
+    hash = actorFramework.create_hash([particleName, channelName, preCutConfig.userCut, preCutConfig.variable, preCutConfig.binning, daughterParticleLists, mvaConfig.target, additionalDependencies])
     filename = removeJPsiSlash('CutHistograms_{c}:{h}.root'.format(c=channelName, h=hash))
 
     if os.path.isfile(filename):
@@ -356,9 +278,10 @@ def PreCutDetermination(channelNames, preCutConfigs, preCutHistograms):
         @param Resource named PreCut_{channelName} for every channel providing a dictionary with the key 'cutstring'
     """
     B2INFO("Enter: Calculation of pre cuts")
-    results = {'PreCut_{c}'.format(c=channelName): None for channelName, _, __ in zip(*actorFramework.getNones(channelNames, preCutConfigs, preCutHistograms))}
+    results = {'PreCut_{c}'.format(c=channelName) for channelName in channelNames}
     for channelName in channelNames:
         B2INFO("Calculate pre cut for channel {c}".format(c=channelName))
+
     channelNames, preCutConfigs, preCutHistograms = actorFramework.removeNones(channelNames, preCutConfigs, preCutHistograms)
 
     if len(channelNames) == 0:
@@ -376,29 +299,29 @@ def PreCutDetermination(channelNames, preCutConfigs, preCutHistograms):
     return results
 
 
-def PostCutDetermination(identifiers, postCutConfigs, signalProbabilities):
+def PostCutDetermination(identifier, postCutConfig, signalProbabilities):
     """
     Determines the PostCut for all the channels of a particle.
-        @param identifiers list of unique identifiers describing the channels or the particle
-        @param postCutConfigs list of configurations for post cut determination
+        @param identifier of the particle
+        @param postCutConfig configurations for post cut determination
         @param signalProbabilities of the channels
-        @param Resource named PostCut_{identifier} for every channel providing a dictionary with the key 'cutstring'
+        @param Resource named PostCut_{identifier} providing a dictionary with the key 'cutstring'
     """
     B2INFO("Enter: Calculation of post cuts")
-    results = {'PostCut_{i}'.format(i=identifier): None for identifier, _, __ in zip(*actorFramework.getNones(identifiers, postCutConfigs, signalProbabilities))}
-    identifiers, postCutConfigs, signalProbabilities = actorFramework.removeNones(identifiers, postCutConfigs, signalProbabilities)
-    for identifier, postCutConfig in zip(identifiers, postCutConfigs):
-        results['PostCut_{i}'.format(i=identifier)] = {'cutstring': str(postCutConfig.value) + ' < getExtraInfo(SignalProbability)', 'range': (postCutConfig.value, 1)}
+    if postCutConfig is None:
+        B2INFO("Calculate post cut for {i} but nothing todo becaus PostCutConfig is None".format(i=identifier))
+        return {'PostCut_{i}'.format(i=identifier): None, '__needed__': False}
+    else:
         B2INFO("Calculate post cut for {i}".format(i=identifier))
-    if len(postCutConfigs) == 0:
-        results['NotNeeded'] = True
-    return results
+        return {'PostCut_{i}'.format(i=identifier): {'cutstring': str(postCutConfig.value) + ' < getExtraInfo(SignalProbability)', 'range': (postCutConfig.value, 1)}}
 
 
-def SignalProbability(path, identifier, particleList, mvaConfig, preCut, additionalDependencies=[]):
+def SignalProbability(path, hash, preloader, identifier, particleList, mvaConfig, preCut, additionalDependencies=[]):
     """
     Calculates the SignalProbability of a ParticleList. If the files required from TMVAExpert aren't available they're created.
         @param path the basf2 path
+        @param hash of all input parameters
+        @param preloader checks if provided resource is already available in input root file
         @param identifier unique identifier describing the channel or the particle
         @param particleList the particleList which is used for training and classification
         @param mvaConfig configuration for the multivariate analysis
@@ -411,7 +334,6 @@ def SignalProbability(path, identifier, particleList, mvaConfig, preCut, additio
         B2INFO("Calculate SignalProbability for {i}, but particle/channel is ignored".format(i=identifier))
         return{'SignalProbability_{i}'.format(i=identifier): None}
 
-    hash = actorFramework.createHash(identifier, mvaConfig, particleList, additionalDependencies)
     rootFilename = removeJPsiSlash('{particleList}_{hash}.root'.format(particleList=particleList, hash=hash))
     configFilename = removeJPsiSlash('{particleList}_{hash}.config'.format(particleList=particleList, hash=hash))
 
@@ -453,9 +375,9 @@ def SignalProbability(path, identifier, particleList, mvaConfig, preCut, additio
         subprocess.call(command, shell=True)
 
     if os.path.isfile(configFilename):
-        if InputFile().particleListHasSignalProbability(particleList):
+        if preloader.particleListHasSignalProbability(particleList):
             B2INFO("Preloaded SignalProbability for {i}".format(i=identifier))
-            return{'SignalProbability_{i}'.format(i=identifier): configFilename, 'NotNeeded': None}
+            return{'SignalProbability_{i}'.format(i=identifier): configFilename, '__needed__': False}
 
         expert = register_module('TMVAExpert')
         expert.set_name('TMVAExpert_' + particleList)
@@ -472,13 +394,14 @@ def SignalProbability(path, identifier, particleList, mvaConfig, preCut, additio
         return{'SignalProbability_{i}'.format(i=identifier): configFilename}
 
     B2ERROR("Training of {i} failed!".format(i=identifier))
-    return {'NotNeeded': None}
+    return {'__needed__': False}
 
 
-def VariablesToNTuple(path, particleIdentifier, particleList, signalProbability):
+def VariablesToNTuple(path, hash, particleIdentifier, particleList, signalProbability):
     """
     Saves the calculated signal probability for this particle list
         @param path the basf2 path
+        @param hash of all input parameters
         @param particleIdentifier valid pdg particle name + optional user label seperated by :
         @param particleList the particleList
         @param signalProbability signalProbability as additional dependency
@@ -489,7 +412,6 @@ def VariablesToNTuple(path, particleIdentifier, particleList, signalProbability)
         B2INFO("Write variables to ntuple for particle {p}. But list is ignored.".format(p=particleIdentifier))
         return {'VariablesToNTuple_{i}'.format(i=particleIdentifier): None}
 
-    hash = actorFramework.createHash(particleIdentifier, particleList, signalProbability)
     filename = removeJPsiSlash('var_{i}_{h}.root'.format(i=particleIdentifier, h=hash))
 
     if not os.path.isfile(filename):
@@ -531,13 +453,13 @@ def WriteAnalysisFileForChannel(particleName, particleLabel, channelName, preCut
     placeholders = automaticReporting.createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut)
     placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, postCut)
 
-    hash = actorFramework.createHash(placeholders)
+    hash = actorFramework.create_hash(placeholders)
     placeholders['texFile'] = removeJPsiSlash('{name}_channel_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
     if not os.path.isfile(placeholders['texFile']):
         automaticReporting.createTexFile(placeholders['texFile'], 'analysis/scripts/FullEventInterpretationChannelTemplate.tex', placeholders)
 
     B2INFO("Written analysis tex file for channel {c}.".format(c=channelName))
-    return {'Placeholders_{c}'.format(c=channelName): placeholders, 'NotNeeded': None}
+    return {'Placeholders_{c}'.format(c=channelName): placeholders, '__needed__': False}
 
 
 def WriteAnalysisFileForFSParticle(particleName, particleLabel, mvaConfig, signalProbability, postCutConfig, postCut, nTuple, mcCounts):
@@ -563,7 +485,7 @@ def WriteAnalysisFileForFSParticle(particleName, particleLabel, mvaConfig, signa
     placeholders = automaticReporting.createFSParticleTexFile(placeholders, nTuple, mcCounts)
 
     B2INFO("Written analysis tex file for final state particle {p} with label {l}.".format(p=particleName, l=particleLabel))
-    return {'Placeholders_{p}:{l}'.format(p=particleName, l=particleLabel): placeholders, 'NotNeeded': None}
+    return {'Placeholders_{p}:{l}'.format(p=particleName, l=particleLabel): placeholders, '__needed__': False}
 
 
 def WriteAnalysisFileForCombinedParticle(particleName, particleLabel, channelPlaceholders, nTuple, mcCounts):
@@ -585,7 +507,7 @@ def WriteAnalysisFileForCombinedParticle(particleName, particleLabel, channelPla
     placeholders = automaticReporting.createCombinedParticleTexFile(placeholders, channelPlaceholders, nTuple, mcCounts)
 
     B2INFO("Written analysis tex file for intermediate particle {p} with label {l}.".format(p=particleName, l=particleLabel))
-    return {'Placeholders_{p}:{l}'.format(p=particleName, l=particleLabel): placeholders, 'NotNeeded': None}
+    return {'Placeholders_{p}:{l}'.format(p=particleName, l=particleLabel): placeholders, '__needed__': False}
 
 
 def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePlaceholders, finalParticleNTuples, mcCounts, particles):
@@ -622,4 +544,4 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
 
     # Return None - Therefore Particle List depends not on TMVAExpert directly
     B2INFO("Created analysis summary pdf file.")
-    return {'FEIsummary.pdf': None, 'NotNeeded': None}
+    return {'FEIsummary.pdf': None, '__needed__': False}

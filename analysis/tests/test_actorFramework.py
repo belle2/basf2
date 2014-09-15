@@ -7,37 +7,50 @@ from basf2 import *
 import unittest
 
 
-class TestResource(unittest.TestCase):
+class TestProperty(unittest.TestCase):
     def setUp(self):
-        self.r1 = Resource('TestName', 23, ['a', 'b'])
-        self.r2 = Resource('TestName', 23)
+        self.r1 = Property('TestName', 23)
+
+    def test_members(self):
+        self.assertEqual(self.r1.name, 'TestName')
+        self.assertListEqual(self.r1.requires, [])
+
+    def test_call(self):
+        self.assertDictEqual(self.r1({'a': 1, 'b': 2, 'c': None}), {'TestName': 23})
+
+
+class TestCollection(unittest.TestCase):
+    def setUp(self):
+        self.r1 = Collection('TestName', ['a', 'b'])
 
     def test_members(self):
         self.assertEqual(self.r1.name, 'TestName')
         self.assertListEqual(self.r1.requires, ['a', 'b'])
-        self.assertEqual(self.r2.name, 'TestName')
-        self.assertListEqual(self.r2.requires, [])
 
     def test_call(self):
-        self.assertDictEqual(self.r1({'a': None, 'b': 2, 'c': 3}), {'TestName': None})
-        self.assertDictEqual(self.r1({'a': 1, 'b': 2, 'c': None}), {'TestName': 23})
+        self.assertDictEqual(self.r1({'a': 1, 'b': 2, 'c': 3}), {'TestName': {'a': 1, 'b': 2}})
         with self.assertRaises(RuntimeError):
             self.r1({'b': 2, 'c': None})
-        self.assertDictEqual(self.r2({'a': None, 'b': 2, 'c': None}), {'TestName': 23})
 
 
-class TestFunction(unittest.TestCase):
+class TestActor(unittest.TestCase):
     def setUp(self):
-        def fun(a, b):
+        def fun(a, b, c):
             return {'r': a * sum(b)}
-        self.f = Function(fun, a='a', b=['b1', 'b2'])
+        self.f = Actor(fun, a='a_t', b=['b1', 'b2'])
+
+    def test_construct(self):
+        def fun(a, b, c):
+            return {'r': a * sum(b)}
+        with self.assertRaises(RuntimeError):
+            Actor(fun, d='a_t', b=['b1', 'b2'])({'a_t': 2, 'b1': 1, 'b2': 3, 'c': 4, 'd': 5})
 
     def test_members(self):
         self.assertEqual(self.f.name, 'fun')
-        self.assertListEqual(self.f.requires, ['a', 'b1', 'b2'])
+        self.assertListEqual(self.f.requires, ['c', 'a_t', 'b1', 'b2'])
 
     def test_call(self):
-        self.assertDictEqual(self.f({'a': 2, 'b1': 1, 'b2': 3}), {'r': 8})
+        self.assertDictEqual(self.f({'a_t': 2, 'b1': 1, 'b2': 3, 'c': 4}), {'r': 8})
         with self.assertRaises(RuntimeError):
             self.f({'a': 2, 'b1': 1, 'b3': 3})
 
@@ -67,34 +80,69 @@ class TestFunction(object):
         return self.result
 
 
-class TestSequence(unittest.TestCase):
+class TestPlay(unittest.TestCase):
     def setUp(self):
-        self.s = Sequence()
+        self.s = Play()
 
-    def test_addResource(self):
-        self.s.addResource('c', 3, ['a', 'b'])
-        self.assertIsInstance(self.s.seq[0], Resource)
+    def test_addProperty(self):
+        self.s.addProperty('c', 3)
+        self.assertIsInstance(self.s.seq[0], Property)
+        self.assertEqual(self.s.seq[0].name, 'c')
+        self.assertListEqual(self.s.seq[0].requires, [])
+
+    def test_addCollection(self):
+        self.s.addCollection('c', ['a', 'b'])
+        self.assertIsInstance(self.s.seq[0], Collection)
         self.assertEqual(self.s.seq[0].name, 'c')
         self.assertListEqual(self.s.seq[0].requires, ['a', 'b'])
 
-    def test_addFunction(self):
+    def test_addActor(self):
         def fun(a, b):
             return {'r': a * sum(b)}
-        self.s.addFunction(fun, a='a', b=['b1', 'b2'])
-        self.assertIsInstance(self.s.seq[0], Function)
+        self.s.addActor(fun, a='a', b=['b1', 'b2'])
+        self.assertIsInstance(self.s.seq[0], Actor)
         self.assertEqual(self.s.seq[0].name, 'fun')
         self.assertListEqual(self.s.seq[0].requires, ['a', 'b1', 'b2'])
 
+    def test_hash(self):
+        self.s.addProperty('a', 1)
+        self.s.addProperty('b', 2)
+
+        def fun(hash, a, b):
+            self.assertEqual(hash, create_hash(['', 1, 2]))
+            return {'result': hash}
+
+        self.s.addActor(fun)
+        self.s.addNeeded('result')
+
+        path = create_path()
+        self.s.run(path, False)
+
+    def test_hash_ignores_none(self):
+        self.s.addProperty('a', 1)
+        self.s.addProperty('b', 2)
+        self.s.addProperty('c', None)
+
+        def fun(hash, a, b, c):
+            self.assertEqual(hash, create_hash(['', 1, 2]))
+            return {'result': hash}
+
+        self.s.addActor(fun)
+        self.s.addNeeded('result')
+
+        path = create_path()
+        self.s.run(path, False)
+
     def test_simple_run(self):
-        self.s.addResource('b1', 1, ['a'])
-        self.s.addResource('a', 2)
-        self.s.addResource('b2', 3, ['b1', 'a'])
+        self.s.addProperty('a', 2)
+        self.s.addCollection('b1', ['a'])
+        self.s.addCollection('b2', ['b1', 'a'])
 
         def fun(a, b):
-            return {'result': a * sum(b)}
+            return {'result': 8}
         t = TestFunction(fun)
 
-        self.s.addFunction(t, path='Path', a='a', b=['b1', 'b2'])
+        self.s.addActor(t, path='path', a='a', b=['b1', 'b2'])
 
         path = create_path()
         self.s.run(path, False)
@@ -103,7 +151,7 @@ class TestSequence(unittest.TestCase):
         self.assertEqual(len(path.modules()), 0)
         self.assertEqual(t.calls, 1)
         self.assertDictEqual(t.result, {'result': 8})
-        self.assertDictEqual(t.kwargs, {'a': 2, 'b': [1, 3]})
+        self.assertDictEqual(t.kwargs, {'a': 2, 'b': [{'a': 2}, {'b1': {'a': 2}, 'a': 2}]})
         self.assertTupleEqual(t.args, tuple())
 
         # Add needed result and try again
@@ -113,15 +161,15 @@ class TestSequence(unittest.TestCase):
         self.assertEqual(t.calls, 2)
 
     def test_parallel_run(self):
-        self.s.addResource('b1', 1, ['a'])
-        self.s.addResource('a', 2)
-        self.s.addResource('b2', 3, ['b1', 'a'])
+        self.s.addProperty('a', 2)
+        self.s.addCollection('b1', ['a'])
+        self.s.addCollection('b2', ['b1', 'a'])
 
         def fun(a, b):
-            return {'result': a * sum(b)}
+            return {'result': 8}
         t = TestFunction(fun)
 
-        self.s.addFunction(t, path='Path', a='a', b=['b1', 'b2'])
+        self.s.addActor(t, path='path', a='a', b=['b1', 'b2'])
 
         path = create_path()
         self.s.run(path, False, 2)
@@ -130,7 +178,7 @@ class TestSequence(unittest.TestCase):
         self.assertEqual(len(path.modules()), 0)
         self.assertEqual(t.calls, 1)
         self.assertDictEqual(t.result, {'result': 8})
-        self.assertDictEqual(t.kwargs, {'a': 2, 'b': [1, 3]})
+        self.assertDictEqual(t.kwargs, {'a': 2, 'b': [{'a': 2}, {'b1': {'a': 2}, 'a': 2}]})
         self.assertTupleEqual(t.args, tuple())
 
         # Add needed result and try again
@@ -140,15 +188,15 @@ class TestSequence(unittest.TestCase):
         self.assertEqual(t.calls, 2)
 
     def test_none_is_not_needed(self):
-        self.s.addResource('b1', 1, ['a'])
-        self.s.addResource('a', 2)
-        self.s.addResource('b2', 3, ['b1', 'a'])
+        self.s.addProperty('a', 2)
+        self.s.addCollection('b1', ['a'])
+        self.s.addCollection('b2', ['b1', 'a'])
 
         def fun(a, b):
             return {'result': None}
         t = TestFunction(fun)
 
-        self.s.addFunction(t, path='Path', a='a', b=['b1', 'b2'])
+        self.s.addActor(t, path='path', a='a', b=['b1', 'b2'])
 
         path = create_path()
         self.s.run(path, False)
@@ -157,7 +205,7 @@ class TestSequence(unittest.TestCase):
         self.assertEqual(len(path.modules()), 0)
         self.assertEqual(t.calls, 1)
         self.assertDictEqual(t.result, {'result': None})
-        self.assertDictEqual(t.kwargs, {'a': 2, 'b': [1, 3]})
+        self.assertDictEqual(t.kwargs, {'a': 2, 'b': [{'a': 2}, {'b1': {'a': 2}, 'a': 2}]})
         self.assertTupleEqual(t.args, tuple())
 
         # Add needed result and try again
@@ -170,15 +218,15 @@ class TestSequence(unittest.TestCase):
         self.assertEqual(t.calls, 2)
 
     def test_returned_key_NotNeeded_is_not_needed(self):
-        self.s.addResource('b1', 1, ['a'])
-        self.s.addResource('a', 2)
-        self.s.addResource('b2', 3, ['b1', 'a'])
+        self.s.addProperty('a', 2)
+        self.s.addCollection('b1', ['a'])
+        self.s.addCollection('b2', ['b1', 'a'])
 
         def fun(a, b):
-            return {'result': a * sum(b), 'NotNeeded': None}
+            return {'result': 8, '__needed__': False}
         t = TestFunction(fun)
 
-        self.s.addFunction(t, path='Path', a='a', b=['b1', 'b2'])
+        self.s.addActor(t, path='path', a='a', b=['b1', 'b2'])
 
         path = create_path()
         self.s.run(path, False)
@@ -186,8 +234,8 @@ class TestSequence(unittest.TestCase):
         # Expect no module in main path
         self.assertEqual(len(path.modules()), 0)
         self.assertEqual(t.calls, 1)
-        self.assertDictEqual(t.result, {'result': 8, 'NotNeeded': None})
-        self.assertDictEqual(t.kwargs, {'a': 2, 'b': [1, 3]})
+        self.assertDictEqual(t.result, {'result': 8, '__needed__': False})
+        self.assertDictEqual(t.kwargs, {'a': 2, 'b': [{'a': 2}, {'b1': {'a': 2}, 'a': 2}]})
         self.assertTupleEqual(t.args, tuple())
 
         # Add needed result and try again
@@ -240,19 +288,19 @@ class TestSequence(unittest.TestCase):
             path.add_module(MockModule('d', isParallelCertified=True))
             return {}
 
-        self.s.addFunction(a1, path='Path')
-        self.s.addFunction(a2, path='Path', a1='a1')
-        self.s.addFunction(a3, path='Path', a2='a2')
+        self.s.addActor(a1)
+        self.s.addActor(a2)
+        self.s.addActor(a3)
 
-        self.s.addFunction(b1, path='Path')
-        self.s.addFunction(b2, path='Path', b1='b1')
-        self.s.addFunction(b3, path='Path', b2='b2')
+        self.s.addActor(b1)
+        self.s.addActor(b2)
+        self.s.addActor(b3)
 
-        self.s.addFunction(c1, path='Path')
-        self.s.addFunction(c2, path='Path', c1='c1')
-        self.s.addFunction(c3, path='Path', c2='c2')
+        self.s.addActor(c1)
+        self.s.addActor(c2)
+        self.s.addActor(c3)
 
-        self.s.addFunction(d, path='Path', a3='a3', b3='b3', c3='c3')
+        self.s.addActor(d)
 
         path = create_path()
         self.s.run(path, False)

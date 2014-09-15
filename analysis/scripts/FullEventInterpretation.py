@@ -51,7 +51,7 @@ class Particle(object):
     ## Create new class called PostCutConfiguration via namedtuple. namedtuples are like a struct in C
     PostCutConfiguration = collections.namedtuple('PostCutConfiguration', 'value')
     ## Create new class called DecayChannel via namedtuple. namedtuples are like a struct in C
-    DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, mvaConfig, preCutConfig, postCutConfig')
+    DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, mvaConfig, preCutConfig')
 
     def __init__(self, identifier, mvaConfig, preCutConfig=None, postCutConfig=None):
         """
@@ -87,24 +87,21 @@ class Particle(object):
         """ Returns true if the particle is a final state particle """
         return self.channels == []
 
-    def addChannel(self, daughters, mvaConfig=None, preCutConfig=None, postCutConfig=None):
+    def addChannel(self, daughters, mvaConfig=None, preCutConfig=None):
         """
         Appends a new decay channel to the Particle object.
         @param daughters is a list of pdg particle names e.g. ['pi+','K-']
         @param mvaConfig multivariate analysis configuration
         @param preCutConfig intermediate pre cut configuration
-        @param postCutConfig post cut configuration
         """
         daughters = [d + ':generic' if ':' not in d else d for d in daughters]
         preCutConfig = copy.deepcopy(self.preCutConfig if preCutConfig is None else preCutConfig)
-        postCutConfig = copy.deepcopy(self.postCutConfig if postCutConfig is None else postCutConfig)
         mvaConfig = copy.deepcopy(self.mvaConfig if mvaConfig is None else mvaConfig)
         mvaConfig.variables.extend(['daughter({i}, getExtraInfo(SignalProbability))'.format(i=i) for i in range(0, len(daughters))])
         self.channels.append(Particle.DecayChannel(name=self.identifier + ' ==> ' + ' '.join(daughters),
                                                    daughters=daughters,
                                                    mvaConfig=mvaConfig,
-                                                   preCutConfig=preCutConfig,
-                                                   postCutConfig=postCutConfig))
+                                                   preCutConfig=preCutConfig))
         return self
 
     def __str__(self):
@@ -128,7 +125,6 @@ class Particle(object):
             output += '    Variables: ' + ', '.join(self.mvaConfig.variables) + '\n'
         else:
             samePreCutConfig = all(compareCutConfig(channel.preCutConfig, self.preCutConfig) for channel in self.channels)
-            samePostCutConfig = all(compareCutConfig(channel.postCutConfig, self.postCutConfig) for channel in self.channels)
             sameMVAConfig = all(compareMVAConfig(channel.mvaConfig, self.mvaConfig) for channel in self.channels)
             commonVariables = reduce(lambda x, y: set(x).intersection(y), [channel.mvaConfig.variables for channel in self.channels])
             if sameMVAConfig:
@@ -140,12 +136,10 @@ class Particle(object):
                 output += '    All channels use the same PreCut configuration\n'
                 output += '    PreCutConfiguration: variables={p.variable}, efficiency={p.efficiency}, purity={p.purity}\n'.format(p=self.preCutConfig)
 
-            if samePostCutConfig:
-                output += '    All channels use the same PostCut configuration\n'
-                if self.postCutConfig is None:
-                    output += '    PostCutConfiguration: None\n'
-                else:
-                    output += '    PostCutConfiguration: value={p.value}\n'.format(p=self.postCutConfig)
+            if self.postCutConfig is None:
+                output += '    PostCutConfiguration: None\n'
+            else:
+                output += '    PostCutConfiguration: value={p.value}\n'.format(p=self.postCutConfig)
 
             for channel in self.channels:
                 output += '    {name}\n'.format(name=channel.name)
@@ -154,24 +148,93 @@ class Particle(object):
                         output += '    PreCutConfiguration: None\n'
                     else:
                         output += '    PreCutConfiguration: variable={p.variable}, efficiency={p.efficiency}, purity={p.purity}, userCut={p.userCut}\n'.format(p=channel.preCutConfig)
-                if not samePostCutConfig:
-                    if self.postCutConfig is None:
-                        output += '    PostCutConfiguration: None\n'
-                    else:
-                        output += '    PostCutConfiguration: value={p.value}\n'.format(p=channel.postCutConfig)
                 if not sameMVAConfig:
                     output += '    MVAConfiguration: name={m.name}, type={m.type}, config={m.config}, target={m.target}\n'.format(m=channel.mvaConfig)
                 output += '        Individual Variables: ' + ', '.join(set(channel.mvaConfig.variables).difference(commonVariables)) + '\n'
         return output
 
 
+class Preloader(object):
+    """
+    Class checks the input file for already existing ParticleLists
+    so these lists don't have to be created again
+    """
+    def __init__(self, filename=None):
+        """
+        Open input file. Get tree and persistent object
+        """
+        if filename is not None and os.path.isfile(filename):
+            ROOT.gSystem.Load('libdataobjects')
+            self.rootfile = ROOT.TFile(filename)
+            self.tree = self.rootfile.Get('tree')
+            self.persistent = self.rootfile.Get('persistent')
+
+    def treeContainsObject(self, name):
+        """
+        Returns true if the tree object contains a branch with the given name
+        """
+        return hasattr(self, 'tree') and any(branch.GetName() == name for branch in self.tree.GetListOfBranches())
+
+    def persistentContainsObject(self, name):
+        """
+        Returns true if the persistent object contains a branch with the given name
+        """
+        return hasattr(self, 'persistent') and any(branch.GetName() == name for branch in self.persistent.GetListOfBranches())
+
+    def getFirstParticleInList(self, particleListName):
+        """
+        Returns the particle object of the first valid particle in the given particle list
+        """
+        particleList = Belle2.ParticleList()
+        self.tree.SetBranchAddress(particleListName, particleList)
+        i = 0
+        N = self.tree.GetEntries()
+        while i < N:
+            self.tree.GetEntry(i)
+            for k in [Belle2.ParticleList.c_FlavorSpecificParticle, Belle2.ParticleList.c_SelfConjugatedParticle]:
+                for j in [True, False]:
+                    vec = particleList.getList(k, j)
+                    if len(vec) > 0:
+                        self.tree.ResetBranchAddress(self.tree.GetBranch(particleListName))
+                        return self.tree.Particles[vec[0]]
+            i += 1
+        self.tree.ResetBranchAddress(self.tree.GetBranch(particleListName))
+        return None
+
+    def particleListHasSignalProbability(self, particleListName):
+        """
+        Returns true if the given particle list contains an extra info named SignalProbability
+        """
+        if self.treeContainsObject(particleListName):
+            p = self.getFirstParticleInList(particleListName)
+            if p is None:
+                return False
+            mapId = p.getExtraInfoMap()
+            if mapId == -1:
+                return False
+            index = self.tree.ParticleExtraInfoMap.getIndex(mapId, 'SignalProbability')
+            return index > 0 and index < p.getExtraInfoSize()
+        else:
+            return False
+
+    def particleListHasVertexFit(self, particleListName):
+        """
+        Returns true if the given particle list contains particles on which a vertex fit was performed
+        """
+        if self.treeContainsObject(particleListName):
+            p = self.getFirstParticleInList(particleListName)
+            return p is not None and (p.getPValue() >= 0 or p.getPValue() < -2)
+        else:
+            return False
+
+
 def FullEventInterpretation(path, particles):
     """
     The Full Event Interpretation algorithm.
-    Alle the Actors defined above are added to the sequence and are executed in an order which fulfills all requirements.
+    Alle the Actors defined above are added to the playuence and are executed in an order which fulfills all requirements.
     This function returns if no more Actors can be called without violating some requirements.
         @param path the basf2 module path
-        @param particles sequence of particle objects which shall be reconstructed by this algorithm
+        @param particles playuence of particle objects which shall be reconstructed by this algorithm
     """
 
     parser = argparse.ArgumentParser()
@@ -179,192 +242,175 @@ def FullEventInterpretation(path, particles):
     parser.add_argument('-summary', '--make-summmary', dest='makeSummary', action='store_true', help='Create Summary pdf')
     parser.add_argument('-nosignal', '--no-signal-classifiers', dest='nosig', action='store_true', help='Do not train classifiers')
     parser.add_argument('-nproc', '--nProcesses', dest='nProcesses', type=int, default=1, help='Use n processes to execute actors parallel')
+    parser.add_argument('-preload', '--preload', dest='preload', type=str, default=None, help='Used input files for preloading')
     args = parser.parse_args()
 
     # Add the basf2 module path
-    seq = actorFramework.Sequence()
-    seq.addFunction(CountMCParticles, path='Path', names=['Name_{i}'.format(i=particle.identifier) for particle in particles])
-    seq.addFunction(LoadGeometry, path='Path')
-    seq.addResource('ParticleLoader', 'dummy')
-    seq.addFunction(LoadParticles, path='Path')
+    play = actorFramework.Play()
 
-    # Now loop over all given particles, foreach particle we add some Resources and Actors.
+    # Add preload resource of available
+    play.addProperty('preloader', Preloader(args.preload))
+
+    # Than add the properties of the particles to the play
     for particle in particles:
-        ########## RESOURCES #############
-        seq.addResource('Name_{i}'.format(i=particle.identifier), particle.name)
-        seq.addResource('Label_{i}'.format(i=particle.identifier), particle.label)
-        seq.addResource('Identifier_{i}'.format(i=particle.identifier), particle.identifier)
-        seq.addResource('Object_{i}'.format(i=particle.identifier), particle)
+        play.addProperty('Name_{i}'.format(i=particle.identifier), particle.name)
+        play.addProperty('Label_{i}'.format(i=particle.identifier), particle.label)
+        play.addProperty('Identifier_{i}'.format(i=particle.identifier), particle.identifier)
+        play.addProperty('Object_{i}'.format(i=particle.identifier), particle)
+        play.addProperty('PostCutConfig_{i}'.format(i=particle.identifier), particle.postCutConfig)
 
-        if particle.channels == []:
-            seq.addResource('MVAConfig_{i}'.format(i=particle.identifier), particle.mvaConfig)
-            seq.addResource('PostCutConfig_{i}'.format(i=particle.identifier), particle.postCutConfig)
-        for channel in particle.channels:
-            seq.addResource('Name_{c}'.format(c=channel.name), channel.name)
-            seq.addResource('MVAConfig_{c}'.format(c=channel.name), channel.mvaConfig)
-            seq.addResource('PreCutConfig_{c}'.format(c=channel.name), channel.preCutConfig)
-            seq.addResource('PostCutConfig_{c}'.format(c=channel.name), channel.postCutConfig)
-
-        ########### RECONSTRUCTION ACTORS ##########
         if particle.isFSP:
-            seq.addFunction(SelectParticleList,
-                            path='Path',
-                            particleName='Name_{i}'.format(i=particle.identifier),
-                            particleLabel='Label_{i}'.format(i=particle.identifier),
-                            additionalDependencies=['ParticleLoader'])
-            seq.addFunction(CopyParticleLists,
-                            path='Path',
-                            particleName='Name_{i}'.format(i=particle.identifier),
-                            particleLabel='Label_{i}'.format(i=particle.identifier),
-                            inputLists=['RawParticleList_{i}'.format(i=particle.identifier)],
-                            postCuts=['PostCut_{i}'.format(i=particle.identifier) if particle.postCutConfig is not None else 'None'])
-            seq.addResource('VertexFit_{i}'.format(i=particle.identifier), 'Dummy')
+            play.addProperty('MVAConfig_{i}'.format(i=particle.identifier), particle.mvaConfig)
+            play.addProperty('VertexFit_{i}'.format(i=particle.identifier), 'TrackFitIsAlreadyDoneForFSPs')
+        for channel in particle.channels:
+            play.addProperty('Name_{c}'.format(c=channel.name), channel.name)
+            play.addProperty('MVAConfig_{c}'.format(c=channel.name), channel.mvaConfig)
+            play.addProperty('PreCutConfig_{c}'.format(c=channel.name), channel.preCutConfig)
+
+    # Add top-level actors
+    play.addActor(CountMCParticles, names=['Name_{i}'.format(i=particle.identifier) for particle in particles])
+    play.addActor(LoadGeometry)
+    play.addActor(LoadParticles)
+
+    # In the first act we reconstruct the particles
+    for particle in particles:
+        if particle.isFSP:
+            play.addActor(SelectParticleList,
+                          particleName='Name_{i}'.format(i=particle.identifier),
+                          particleLabel='Label_{i}'.format(i=particle.identifier))
+            play.addActor(CopyParticleLists,
+                          particleName='Name_{i}'.format(i=particle.identifier),
+                          particleLabel='Label_{i}'.format(i=particle.identifier),
+                          inputLists=['RawParticleList_{i}'.format(i=particle.identifier)],
+                          postCuts='PostCut_{i}'.format(i=particle.identifier))
         else:
             for channel in particle.channels:
-                seq.addFunction(MakeAndMatchParticleList,
-                                path='Path',
-                                particleName='Name_{i}'.format(i=particle.identifier),
-                                particleLabel='Label_{i}'.format(i=particle.identifier),
-                                channelName='Name_{c}'.format(c=channel.name),
-                                daughterParticleLists=['ParticleList_{d}'.format(d=daughter) for daughter in channel.daughters],
-                                preCut='PreCut_{c}'.format(c=channel.name))
-                seq.addFunction(FitVertex,
-                                path='Path',
-                                channelName='Name_{c}'.format(c=channel.name),
-                                particleList='RawParticleList_{c}'.format(c=channel.name),
-                                daughterVertices=['VertexFit_{d}'.format(d=daughter) for daughter in channel.daughters],
-                                geometry='Geometry')
-            seq.addResource('VertexFit_{i}'.format(i=particle.identifier), 'Dummy',
-                            requires=['VertexFit_{c}'.format(c=channel.name) for channel in particle.channels], strict=False)
+                play.addActor(MakeAndMatchParticleList,
+                              particleName='Name_{i}'.format(i=particle.identifier),
+                              particleLabel='Label_{i}'.format(i=particle.identifier),
+                              channelName='Name_{c}'.format(c=channel.name),
+                              daughterParticleLists=['ParticleList_{d}'.format(d=daughter) for daughter in channel.daughters],
+                              preCut='PreCut_{c}'.format(c=channel.name))
+                play.addActor(FitVertex,
+                              channelName='Name_{c}'.format(c=channel.name),
+                              particleList='RawParticleList_{c}'.format(c=channel.name),
+                              daughterVertices=['VertexFit_{d}'.format(d=daughter) for daughter in channel.daughters])
+            play.addCollection('VertexFit_{i}'.format(i=particle.identifier), ['VertexFit_{c}'.format(c=channel.name) for channel in particle.channels])
 
-            seq.addFunction(CopyParticleLists,
-                            path='Path',
-                            particleName='Name_{i}'.format(i=particle.identifier),
-                            particleLabel='Label_{i}'.format(i=particle.identifier),
-                            inputLists=['RawParticleList_{c}'.format(c=channel.name) for channel in particle.channels],
-                            postCuts=['PostCut_{c}'.format(c=channel.name) if channel.postCutConfig is not None else 'None' for channel in particle.channels])
+            play.addActor(CopyParticleLists,
+                          particleName='Name_{i}'.format(i=particle.identifier),
+                          particleLabel='Label_{i}'.format(i=particle.identifier),
+                          inputLists=['RawParticleList_{c}'.format(c=channel.name) for channel in particle.channels],
+                          postCut='PostCut_{i}'.format(i=particle.identifier))
         if particle.name != pdg.conjugate(particle.name):
-            seq.addResource('VertexFit_{p}:{l}'.format(p=pdg.conjugate(particle.name), l=particle.label), 'Dummy',
-                            requires=['VertexFit_{i}'.format(i=particle.identifier)])
+            play.addCollection('VertexFit_{p}:{l}'.format(p=pdg.conjugate(particle.name), l=particle.label), ['VertexFit_{i}'.format(i=particle.identifier)])
 
-        ############# PRECUT DETERMINATION ############
-        if not particle.isFSP:
-            seq.addFunction(PreCutDetermination,
-                            channelNames=['Name_{c}'.format(c=channel.name) for channel in particle.channels],
-                            preCutConfigs=['PreCutConfig_{c}'.format(c=channel.name) for channel in particle.channels],
-                            preCutHistograms=['PreCutHistogram_{c}'.format(c=channel.name) for channel in particle.channels])
+    # In the second act pre and post cuts are calculated
+    for particle in particles:
+        if particle.isFSP:
+            play.addActor(PostCutDetermination,
+                          identifier='Identifier_{i}'.format(i=particle.identifier),
+                          postCutConfig='PostCutConfig_{i}'.format(i=particle.identifier),
+                          signalProbabilities=['SignalProbability_{i}'.format(i=particle.identifier)])
+        else:
+            play.addActor(PreCutDetermination,
+                          channelNames=['Name_{c}'.format(c=channel.name) for channel in particle.channels],
+                          preCutConfigs=['PreCutConfig_{c}'.format(c=channel.name) for channel in particle.channels],
+                          preCutHistograms=['PreCutHistogram_{c}'.format(c=channel.name) for channel in particle.channels])
+            play.addActor(PostCutDetermination,
+                          identifier='Identifier_{c}'.format(i=particle.identifier),
+                          postCutConfig='PostCutConfig_{i}'.format(i=particle.identifier),
+                          signalProbabilities=['SignalProbability_{c}'.format(c=channel.name) for channel in particle.channels])
 
             for channel in particle.channels:
                 additionalDependencies = []
                 if 'SignalProbability' in channel.preCutConfig.variable:
                     additionalDependencies = ['SignalProbability_{d}'.format(d=daughter) for daughter in channel.daughters]
 
-                seq.addFunction(CreatePreCutHistogram,
-                                path='Path',
-                                particleName='Name_{i}'.format(i=particle.identifier),
-                                channelName='Name_{c}'.format(c=channel.name),
-                                mvaConfig='MVAConfig_{c}'.format(c=channel.name),
-                                preCutConfig='PreCutConfig_{c}'.format(c=channel.name),
-                                daughterParticleLists=['ParticleList_{d}'.format(d=daughter) for daughter in channel.daughters],
-                                additionalDependencies=additionalDependencies)
+                play.addActor(CreatePreCutHistogram,
+                              path='Path',
+                              particleName='Name_{i}'.format(i=particle.identifier),
+                              channelName='Name_{c}'.format(c=channel.name),
+                              mvaConfig='MVAConfig_{c}'.format(c=channel.name),
+                              preCutConfig='PreCutConfig_{c}'.format(c=channel.name),
+                              daughterParticleLists=['ParticleList_{d}'.format(d=daughter) for daughter in channel.daughters],
+                              additionalDependencies=additionalDependencies)
 
-        ############## POSTCUT DETERMINATION #############
-        if particle.isFSP:
-            seq.addFunction(PostCutDetermination,
-                            identifiers=['Identifier_{i}'.format(i=particle.identifier)],
-                            postCutConfigs=['PostCutConfig_{i}'.format(i=particle.identifier)],
-                            signalProbabilities=['SignalProbability_{i}'.format(i=particle.identifier)])
-
-        else:
-            seq.addFunction(PostCutDetermination,
-                            identifiers=['Name_{c}'.format(c=channel.name) for channel in particle.channels],
-                            postCutConfigs=['PostCutConfig_{c}'.format(c=channel.name) for channel in particle.channels],
-                            signalProbabilities=['SignalProbability_{c}'.format(c=channel.name) for channel in particle.channels])
-
-        ########### SIGNAL PROBABILITY ACTORS #######
-        if not args.nosig:
+    # The third act trains multivariate methods and provides signal probabilities
+    if not args.nosig:
+        for particle in particles:
             if particle.isFSP:
-                seq.addFunction(SignalProbability,
-                                path='Path',
-                                identifier='Identifier_{i}'.format(i=particle.identifier),
-                                mvaConfig='MVAConfig_{i}'.format(i=particle.identifier),
-                                particleList='RawParticleList_{i}'.format(i=particle.identifier),
-                                preCut='None')
+                play.addActor(SignalProbability,
+                              identifier='Identifier_{i}'.format(i=particle.identifier),
+                              mvaConfig='MVAConfig_{i}'.format(i=particle.identifier),
+                              particleList='RawParticleList_{i}'.format(i=particle.identifier),
+                              preCut='None')
             else:
                 for channel in particle.channels:
-
                     additionalDependencies = []
                     if any('SignalProbability' in variable for variable in channel.mvaConfig.variables):
                         additionalDependencies += ['SignalProbability_{d}'.format(d=daughter) for daughter in channel.daughters]
                     if any(variable in ['dx', 'dy', 'dz', 'dr', 'chiProb', 'significanceOfDistance', 'distance',
                                         'cosAngleBetweenMomentumAndVertexVector'] for variable in channel.mvaConfig.variables):
                         additionalDependencies += ['VertexFit_{c}'.format(c=channel.name)]
+                    play.addActor(SignalProbability,
+                                  identifier='Name_{c}'.format(c=channel.name),
+                                  mvaConfig='MVAConfig_{c}'.format(c=channel.name),
+                                  particleList='RawParticleList_{c}'.format(c=channel.name),
+                                  preCut='PreCut_{c}'.format(c=channel.name),
+                                  additionalDependencies=additionalDependencies)
 
-                    seq.addFunction(SignalProbability,
-                                    path='Path',
-                                    identifier='Name_{c}'.format(c=channel.name),
-                                    mvaConfig='MVAConfig_{c}'.format(c=channel.name),
-                                    particleList='RawParticleList_{c}'.format(c=channel.name),
-                                    preCut='PreCut_{c}'.format(c=channel.name),
-                                    additionalDependencies=additionalDependencies)
+                play.addCollection('SignalProbability_{i}'.format(i=particle.identifier), ['SignalProbability_{c}'.format(c=channel.name) for channel in particle.channels])
 
-                seq.addResource('SignalProbability_{i}'.format(i=particle.identifier), 'Dummy',
-                                requires=['SignalProbability_{c}'.format(c=channel.name) for channel in particle.channels], strict=False)
             if particle.name != pdg.conjugate(particle.name):
-                seq.addResource('SignalProbability_{p}:{l}'.format(p=pdg.conjugate(particle.name), l=particle.label), 'Dummy',
-                                requires=['SignalProbability_{i}'.format(i=particle.identifier)])
-            seq.addFunction(VariablesToNTuple,
-                            path='Path',
-                            particleIdentifier='Identifier_{i}'.format(i=particle.identifier),
-                            particleList='ParticleList_{i}'.format(i=particle.identifier),
-                            signalProbability='SignalProbability_{i}'.format(i=particle.identifier))
+                play.addCollection('SignalProbability_{p}:{l}'.format(p=pdg.conjugate(particle.name), l=particle.label), ['SignalProbability_{i}'.format(i=particle.identifier)])
+            play.addActor(VariablesToNTuple,
+                          particleIdentifier='Identifier_{i}'.format(i=particle.identifier),
+                          particleList='ParticleList_{i}'.format(i=particle.identifier),
+                          signalProbability='SignalProbability_{i}'.format(i=particle.identifier))
 
-        ################ Information ACTORS #################
-        if args.makeSummary:
+    # The last act creates the automatic reporting summary pdf
+    if args.makeSummary:
+        for particle in particles:
             for channel in particle.channels:
-
-                seq.addFunction(WriteAnalysisFileForChannel,
-                                particleName='Name_{i}'.format(i=particle.identifier),
-                                particleLabel='Label_{i}'.format(i=particle.identifier),
-                                channelName='Name_{c}'.format(c=channel.name),
-                                preCutConfig='PreCutConfig_{c}'.format(c=channel.name),
-                                preCut='PreCut_{c}'.format(c=channel.name),
-                                preCutHistogram='PreCutHistogram_{c}'.format(c=channel.name),
-                                mvaConfig='MVAConfig_{c}'.format(c=channel.name),
-                                signalProbability='SignalProbability_{c}'.format(c=channel.name),
-                                postCutConfig='PostCutConfig_{c}'.format(c=channel.name),
-                                postCut='PostCut_{c}'.format(c=channel.name))
+                play.addActor(WriteAnalysisFileForChannel,
+                              particleName='Name_{i}'.format(i=particle.identifier),
+                              particleLabel='Label_{i}'.format(i=particle.identifier),
+                              channelName='Name_{c}'.format(c=channel.name),
+                              preCutConfig='PreCutConfig_{c}'.format(c=channel.name),
+                              preCut='PreCut_{c}'.format(c=channel.name),
+                              preCutHistogram='PreCutHistogram_{c}'.format(c=channel.name),
+                              mvaConfig='MVAConfig_{c}'.format(c=channel.name),
+                              signalProbability='SignalProbability_{c}'.format(c=channel.name),
+                              postCutConfig='PostCutConfig_{i}'.format(i=particle.identifier),
+                              postCut='PostCut_{i}'.format(i=particle.identifier))
 
             if particle.isFSP:
-                seq.addFunction(WriteAnalysisFileForFSParticle,
-                                particleName='Name_{i}'.format(i=particle.identifier),
-                                particleLabel='Label_{i}'.format(i=particle.identifier),
-                                mvaConfig='MVAConfig_{i}'.format(i=particle.identifier),
-                                signalProbability='SignalProbability_{i}'.format(i=particle.identifier),
-                                postCutConfig='PostCutConfig_{i}'.format(i=particle.identifier),
-                                postCut='PostCut_{i}'.format(i=particle.identifier),
-                                nTuple='VariablesToNTuple_{i}'.format(i=particle.identifier),
-                                mcCounts='MCParticleCounts')
+                play.addActor(WriteAnalysisFileForFSParticle,
+                              particleName='Name_{i}'.format(i=particle.identifier),
+                              particleLabel='Label_{i}'.format(i=particle.identifier),
+                              mvaConfig='MVAConfig_{i}'.format(i=particle.identifier),
+                              signalProbability='SignalProbability_{i}'.format(i=particle.identifier),
+                              postCutConfig='PostCutConfig_{i}'.format(i=particle.identifier),
+                              postCut='PostCut_{i}'.format(i=particle.identifier),
+                              nTuple='VariablesToNTuple_{i}'.format(i=particle.identifier))
             else:
-                seq.addFunction(WriteAnalysisFileForCombinedParticle,
-                                particleName='Name_{i}'.format(i=particle.identifier),
-                                particleLabel='Label_{i}'.format(i=particle.identifier),
-                                channelPlaceholders=['Placeholders_{c}'.format(c=channel.name) for channel in particle.channels],
-                                nTuple='VariablesToNTuple_{i}'.format(i=particle.identifier),
-                                mcCounts='MCParticleCounts')
+                play.addActor(WriteAnalysisFileForCombinedParticle,
+                              particleName='Name_{i}'.format(i=particle.identifier),
+                              particleLabel='Label_{i}'.format(i=particle.identifier),
+                              channelPlaceholders=['Placeholders_{c}'.format(c=channel.name) for channel in particle.channels],
+                              nTuple='VariablesToNTuple_{i}'.format(i=particle.identifier))
+        play.addActor(WriteAnalysisFileSummary,
+                      finalStateParticlePlaceholders=['Placeholders_{i}'.format(i=particle.identifier) for particle in particles if particle.isFSP],
+                      combinedParticlePlaceholders=['Placeholders_{i}'.format(i=particle.identifier) for particle in particles if not particle.isFSP],
+                      finalParticleNTuples=['VariablesToNTuple_{i}'.format(i=finalParticle.identifier) for finalParticle in finalParticles],
+                      particles=['Object_{i}'.format(i=particle.identifier)for particle in particles])
+        play.addNeeded('FEIsummary.pdf')
 
+    # Finally we add the final particles (normally B+ B0) as needed to the play
     finalParticles = [particle for particle in particles if all(particle.identifier not in o.daughters and pdg.conjugate(particle.name) + ':' + particle.label not in o.daughters for o in particles)]
     for finalParticle in finalParticles:
-        seq.addNeeded('SignalProbability_{i}'.format(i=finalParticle.identifier))
-        seq.addNeeded('ParticleList_{i}'.format(i=finalParticle.identifier))
+        play.addNeeded('SignalProbability_{i}'.format(i=finalParticle.identifier))
+        play.addNeeded('ParticleList_{i}'.format(i=finalParticle.identifier))
 
-    if args.makeSummary:
-        seq.addFunction(WriteAnalysisFileSummary,
-                        finalStateParticlePlaceholders=['Placeholders_{i}'.format(i=particle.identifier) for particle in particles if particle.isFSP],
-                        combinedParticlePlaceholders=['Placeholders_{i}'.format(i=particle.identifier) for particle in particles if not particle.isFSP],
-                        finalParticleNTuples=['VariablesToNTuple_{i}'.format(i=finalParticle.identifier) for finalParticle in finalParticles],
-                        mcCounts='MCParticleCounts',
-                        particles=['Object_{i}'.format(i=particle.identifier)for particle in particles])
-        seq.addNeeded('FEIsummary.pdf')
-
-    return seq.run(path, args.verbose, args.nProcesses)
+    return play.run(path, args.verbose, args.nProcesses)

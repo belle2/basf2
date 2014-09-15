@@ -98,7 +98,8 @@ bool MCMatching::setMCTruth(const Particle* particle)
           break; //not found
       }
     }
-    motherIndex = firstDaugMothers[lastMother];
+    if (lastMother >= 0)
+      motherIndex = firstDaugMothers[lastMother];
   }
 
   // if index is less than 1, the common mother particle was not found

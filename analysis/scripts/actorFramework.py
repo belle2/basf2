@@ -77,8 +77,6 @@ class Collection(object):
             @arguments dictionary of arguments which were required (addtional entries are ignored)
         """
         arguments = {r: arguments[r] for r in self.requires if r in arguments}
-        if len(arguments) != len(self.requires):
-            raise RuntimeError('Requirements are not fulfilled')
         return {self.name: arguments}
 
 
@@ -128,8 +126,6 @@ class Actor(object):
             @arguments dictionary of arguments which were required (addtional entries are ignored)
         """
         arguments = {r: arguments[r] for r in self.requires if r in arguments}
-        if len(arguments) != len(self.requires):
-            raise RuntimeError('Requirements are not fulfilled')
         kwargs = {key: arguments[key] for key in self.automatic_parameters}
         for (key, value) in self.user_parameters.iteritems():
             if isinstance(value, str):
@@ -207,7 +203,7 @@ class Play(object):
                     c = copy.copy(results)
                     c['path'] = actor.path = basf2.create_path()
                     c['hash'] = ''
-                    c['hash'] = create_hash([results[r] for r in actor.requires])
+                    c['hash'] = create_hash([c[r] for r in actor.requires])
                     actor.provides = actor(c)
                     return actor
                 p = multiprocessing.pool.ThreadPool(processes=nProcesses)
@@ -346,18 +342,3 @@ def removeNones(*requirementLists):
     if len(requirementLists) == 1:
         return result[0]
     return result
-
-
-def getNones(*requirementLists):
-    nones = frozenset([index for requirementList in requirementLists for index, object in enumerate(requirementList) if object is None])
-    result = [[object for index, object in enumerate(sublist) if index in nones] for sublist in requirementLists]
-    if len(requirementLists) == 1:
-        return result[0]
-    return result
-
-
-def containsNone(args):
-    if isinstance(args, list) or isinstance(args, tuple):
-        return any([containsNone(x) for x in args])
-    else:
-        return args is None

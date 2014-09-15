@@ -160,7 +160,7 @@ def CopyParticleLists(path, hash, preloader, particleName, particleLabel, inputL
     if preloader.treeContainsObject(outputList):
         B2INFO("Preload Particle List {p} with label {l} in list {o}".format(p=particleName, l=particleLabel, o=outputList))
         return {'ParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList,
-                'ParticleList_{p}:{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): pdg.conjugate(particleName) + ':' + userLabel,
+                'ParticleList_{p}:{l}'.format(p=pdg.conjugate(particleName), l=particleLabel): pdg.conjugate(particleName) + ':' + hash,
                 '__needed__': False}
 
     inputLists = [l for l in inputLists if l is not None]
@@ -278,7 +278,7 @@ def PreCutDetermination(channelNames, preCutConfigs, preCutHistograms):
         @param Resource named PreCut_{channelName} for every channel providing a dictionary with the key 'cutstring'
     """
     B2INFO("Enter: Calculation of pre cuts")
-    results = {'PreCut_{c}'.format(c=channelName) for channelName in channelNames}
+    results = {'PreCut_{c}'.format(c=channelName): None for channelName in channelNames}
     for channelName in channelNames:
         B2INFO("Calculate pre cut for channel {c}".format(c=channelName))
 
@@ -316,7 +316,7 @@ def PostCutDetermination(identifier, postCutConfig, signalProbabilities):
         return {'PostCut_{i}'.format(i=identifier): {'cutstring': str(postCutConfig.value) + ' < getExtraInfo(SignalProbability)', 'range': (postCutConfig.value, 1)}}
 
 
-def SignalProbability(path, hash, preloader, identifier, particleList, mvaConfig, preCut, additionalDependencies=[]):
+def SignalProbability(path, hash, preloader, identifier, particleList, mvaConfig, preCut, additionalDependencies):
     """
     Calculates the SignalProbability of a ParticleList. If the files required from TMVAExpert aren't available they're created.
         @param path the basf2 path
@@ -330,7 +330,7 @@ def SignalProbability(path, hash, preloader, identifier, particleList, mvaConfig
         @return Resource named SignalProbability_{identifier} providing config filename
     """
     B2INFO("Enter: Calculate SignalProbability for {i}.".format(i=identifier))
-    if particleList is None or any([d is None for d in additionalDependencies]):
+    if particleList is None or (additionalDependencies is not None and any([d is None for d in additionalDependencies])):
         B2INFO("Calculate SignalProbability for {i}, but particle/channel is ignored".format(i=identifier))
         return{'SignalProbability_{i}'.format(i=identifier): None}
 
@@ -542,6 +542,5 @@ def WriteAnalysisFileSummary(finalStateParticlePlaceholders, combinedParticlePla
             #automaticReporting.sendMail()
             open(filename, 'w').close()
 
-    # Return None - Therefore Particle List depends not on TMVAExpert directly
     B2INFO("Created analysis summary pdf file.")
     return {'FEIsummary.pdf': None, '__needed__': False}

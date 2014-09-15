@@ -169,6 +169,13 @@ class Preloader(object):
             self.tree = self.rootfile.Get('tree')
             self.persistent = self.rootfile.Get('persistent')
 
+    def __str__(self):
+        """
+        We don't want to change the hashes in the actors if the preloader
+        changes, therefore it's important to return here a constant string!
+        """
+        return "Preloader"
+
     def treeContainsObject(self, name):
         """
         Returns true if the tree object contains a branch with the given name
@@ -282,7 +289,7 @@ def FullEventInterpretation(path, particles):
                           particleName='Name_{i}'.format(i=particle.identifier),
                           particleLabel='Label_{i}'.format(i=particle.identifier),
                           inputLists=['RawParticleList_{i}'.format(i=particle.identifier)],
-                          postCuts='PostCut_{i}'.format(i=particle.identifier))
+                          postCut='PostCut_{i}'.format(i=particle.identifier))
         else:
             for channel in particle.channels:
                 play.addActor(MakeAndMatchParticleList,
@@ -318,7 +325,7 @@ def FullEventInterpretation(path, particles):
                           preCutConfigs=['PreCutConfig_{c}'.format(c=channel.name) for channel in particle.channels],
                           preCutHistograms=['PreCutHistogram_{c}'.format(c=channel.name) for channel in particle.channels])
             play.addActor(PostCutDetermination,
-                          identifier='Identifier_{c}'.format(i=particle.identifier),
+                          identifier='Identifier_{i}'.format(i=particle.identifier),
                           postCutConfig='PostCutConfig_{i}'.format(i=particle.identifier),
                           signalProbabilities=['SignalProbability_{c}'.format(c=channel.name) for channel in particle.channels])
 
@@ -328,7 +335,6 @@ def FullEventInterpretation(path, particles):
                     additionalDependencies = ['SignalProbability_{d}'.format(d=daughter) for daughter in channel.daughters]
 
                 play.addActor(CreatePreCutHistogram,
-                              path='Path',
                               particleName='Name_{i}'.format(i=particle.identifier),
                               channelName='Name_{c}'.format(c=channel.name),
                               mvaConfig='MVAConfig_{c}'.format(c=channel.name),
@@ -344,7 +350,8 @@ def FullEventInterpretation(path, particles):
                               identifier='Identifier_{i}'.format(i=particle.identifier),
                               mvaConfig='MVAConfig_{i}'.format(i=particle.identifier),
                               particleList='RawParticleList_{i}'.format(i=particle.identifier),
-                              preCut='None')
+                              preCut='None',
+                              additionalDependencies='None')
             else:
                 for channel in particle.channels:
                     additionalDependencies = []

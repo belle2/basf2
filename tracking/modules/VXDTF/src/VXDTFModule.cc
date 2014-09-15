@@ -624,66 +624,6 @@ void VXDTFModule::initialize()
 
 void VXDTFModule::beginRun()
 {
-  // WARNING TODO WARNING: now, the following section is split into 3 different functions. -> split up the dependency-lists!
-  /** REDESIGNCOMMENT BEGINRUN 1:
-   ** short:
-   * setup for sectorMaps used for passes
-   *
-   ** long (+personal comments):
-   * all that stuff will move to the sectorMap-Module
-   * although the baselineTF (only usefull for TB-runs) is filled here too,
-   * this section does not have dependencies of the testbeam package
-   *
-   ** dependency of module parameters (global):
-   * m_PARAMsectorSetup, m_PARAMtuneCutoffs, m_PARAMhighestAllowedLayer,
-   * m_PARAMreserveHitsThreshold, m_PARAMminLayer, m_PARAMminState,
-   * m_PARAMactivateBaselineTF, m_PARAMdisplayCollector
-   * m_PARAMactivateDistance3D, m_PARAMactivateDistanceXY, m_PARAMactivateDistanceZ,
-   * m_PARAMactivateSlopeRZ, m_PARAMactivateNormedDistance3D, m_PARAMactivateAlwaysTrue2Hit,
-   * m_PARAMactivateAlwaysFalse2Hit, m_PARAMactivateRandom2Hit, m_PARAMactivateAngles3DHioC,
-   * m_PARAMactivateAnglesXYHioC, m_PARAMactivateAnglesRZHioC, m_PARAMactivateDeltaSlopeRZHioC,
-   * m_PARAMactivateDistance2IPHioC, m_PARAMactivatePTHioC, m_PARAMactivateHelixParameterFitHioC,
-   * m_PARAMactivateAnglesXY, m_PARAMactivateAnglesRZ, m_PARAMactivateDeltaSlopeRZ,
-   * m_PARAMactivateDistance2IP, m_PARAMactivatePT, m_PARAMactivateHelixParameterFit,
-   * m_PARAMactivateDeltaSOverZ, m_PARAMactivateDeltaSlopeZOverS, m_PARAMactivateAlwaysTrue3Hit,
-   * m_PARAMactivateAlwaysFalse3Hit, m_PARAMactivateRandom3Hit, m_PARAMactivateDeltaPtHioC,
-   * m_PARAMactivateDeltaDistance2IPHioC, m_PARAMactivateZigZagXY, m_PARAMactivateZigZagXYWithSigma,
-   * m_PARAMactivateZigZagRZ, m_PARAMactivateDeltaPt, m_PARAMactivateCircleFit,
-   * m_PARAMactivateDeltaDistance2IP, m_PARAMactivateAlwaysTrue4Hit, m_PARAMactivateAlwaysFalse4Hit,
-   * m_PARAMactivateRandom4Hit
-   * m_PARAMtuneDistance3D, m_PARAMtuneDistanceXY, m_PARAMtuneDistanceZ,
-   * m_PARAMtuneSlopeRZ, m_PARAMtuneNormedDistance3D, m_PARAMtuneAlwaysTrue2Hit,
-   * m_PARAMtuneAlwaysFalse2Hit, m_PARAMtuneRandom2Hit, m_PARAMtuneAngles3DHioC,
-   * m_PARAMtuneAnglesXYHioC, m_PARAMtuneAnglesRZHioC, m_PARAMtuneDeltaSlopeRZHioC,
-   * m_PARAMtuneDistance2IPHioC, m_PARAMtunePTHioC, m_PARAMtuneHelixParameterFitHioC,
-   * m_PARAMtuneAnglesXY, m_PARAMtuneAnglesRZ, m_PARAMtuneDeltaSlopeRZ,
-   * m_PARAMtuneDistance2IP, m_PARAMtunePT, m_PARAMtuneHelixParameterFit,
-   * m_PARAMtuneDeltaSOverZ, m_PARAMtuneDeltaSlopeZOverS, m_PARAMtuneAlwaysTrue3Hit,
-   * m_PARAMtuneAlwaysFalse3Hit, m_PARAMtuneRandom3Hit, m_PARAMtuneDeltaPtHioC,
-   * m_PARAMtuneDeltaDistance2IPHioC, m_PARAMtuneZigZagXY, m_PARAMtuneZigZagXYWithSigma,
-   * m_PARAMtuneZigZagRZ, m_PARAMtuneDeltaPt, m_PARAMtuneCircleFit,
-   * m_PARAMtuneDeltaDistance2IP, m_PARAMtuneAlwaysTrue4Hit, m_PARAMtuneAlwaysFalse4Hit,
-   * m_PARAMtuneRandom4Hit
-   *
-   ** dependency of global in-module variables:
-   * m_usePXDHits, m_useSVDHits, m_useTELHits,
-   * m_nSectorSetups, m_passSetupVector, m_collector,
-   * m_baselinePass
-   *
-   ** dependency of global stuff just because of B2XX-output or debugging only:
-   * m_PARAMnameOfInstance, m_PARAMactivateAlwaysTrue2Hit, m_PARAMactivateAlwaysFalse2Hit,
-   * m_PARAMactivateRandom2Hit, m_PARAMactivateAlwaysTrue3Hit, m_PARAMactivateAlwaysFalse3Hit,
-   * m_PARAMactivateRandom3Hit, m_PARAMactivateAlwaysTrue4Hit, m_PARAMactivateAlwaysFalse4Hit,
-   * m_PARAMactivateRandom4Hit, m_PARAMhighOccupancyThreshold, m_PARAMtuneAlwaysTrue2Hit,
-   * m_PARAMtuneAlwaysFalse2Hit, m_PARAMtuneRandom2Hit, m_PARAMtuneAlwaysTrue3Hit,
-   * m_PARAMtuneAlwaysFalse3Hit, m_PARAMtuneRandom3Hit, m_PARAMtuneAlwaysTrue4Hit,
-   * m_PARAMtuneAlwaysFalse4Hit, m_PARAMtuneRandom4Hit, m_PARAMdisplayCollector,
-   * m_collector
-   *
-   ** in-module-function-calls:
-   * resetCountersAtBeginRun()
-   */
-
   B2INFO("-----------------------------------------------\n       entering VXD CA track finder (" << m_PARAMnameOfInstance << ") - beginRun.\n       if you want to have some basic infos during begin- and endrun about it, set debug level 1 or 2. Debug level 3 or more gives you event wise output (the higher the level, the more verbose it gets, highest level: 175)");
   B2DEBUG(50, "##### be careful, current TF status does not support more than one run per initialization! #####"); /// WARNING TODO: check whether this is still valid
 
@@ -729,7 +669,7 @@ void VXDTFModule::the_real_event()
 
   boostClock::time_point beginEvent = boostClock::now();
 
-  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+//   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
 
   m_eventCounter++;
   thisInfoPackage.evtNumber = m_eventCounter;
@@ -2674,6 +2614,7 @@ void VXDTFModule::terminate()
     m_treeEventWisePtr->Write();
     m_rootFilePtr->Close();
   }
+  B2INFO("VXDTF::terminate: random number check: " << gRandom->Uniform(1.0))
 }
 
 
@@ -3084,6 +3025,7 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
   vector<double> QIsOfTCs;
   QIsOfTCs.reserve(nTCs);
   for (VXDTFTrackCandidate * tc : tcVector) {
+    B2DEBUG(10, "hopfield, QI: " << tc->getTrackQuality())
     QIsOfTCs.push_back(tc->getTrackQuality());
   }
 
@@ -5062,7 +5004,7 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
 
     }
 
-    if (currentPass->circleFit.first == true) {
+    if (m_calcQiType == 2 or currentPass->circleFit.first == true) {
       bool succeeded = false;
       try {
         succeeded = doTheCircleFit(currentPass, (*currentTC), nCurrentHits, tcCtr);
@@ -6457,8 +6399,8 @@ bool VXDTFModule::doTheCircleFit(PassData* thisPass, VXDTFTrackCandidate* aTc, i
   if (chi2 < 0) { chi2 = 0; }
   double probability = TMath::Prob(chi2, nHits - 3 + addDegreesOfFreedom);
   // why is there nHits - 3 + addDegreesOfFreedom? Answer: each hit is one additional degree of freedom (since only the measurement of the u-coordinate of the sensors can be used) but 3 parameters are measured, therefore 3 has to be substracted from the number of hits to get the ndf. The additional degree of freedom (+1) is there, since the origin is used as another hit for the circlefitter but has two degrees of freedom instead of one for the normal hits. therefore +1 has to be added again.
-  B2DEBUG(100, "TCC Filter at tc " << tcCtr << ": estimated closestApproachPhi, closestApproachR, estimatedRadius: " << closestApproachPhi << ", " << closestApproachR << ", " << estimatedRadius << " got fitted with chi2 of " << chi2 << " and probability of " << probability << " with ndf: " << nHits - 3 + addDegreesOfFreedom)
-  if (probability < thisPass->circleFit.second) {  // means tc is bad
+  B2DEBUG(10, "TCC Filter at tc " << tcCtr << ": estimated closestApproachPhi, closestApproachR, estimatedRadius: " << closestApproachPhi << ", " << closestApproachR << ", " << estimatedRadius << " got fitted with chi2 of " << chi2 << " and probability of " << probability << " with ndf: " << nHits - 3 + addDegreesOfFreedom)
+  if (thisPass->circleFit.first == true and probability < thisPass->circleFit.second) {  // means tc is bad
     B2DEBUG(20, "TCC filter: tc " << tcCtr << " rejected by circleFit! ");
     m_TESTERtriggeredCircleFit++; tcCtr++;
     aTc->setCondition(false);
@@ -6686,6 +6628,60 @@ void VXDTFModule::prepareExternalTools()
 
 void VXDTFModule::setupPasses()
 {
+  /** REDESIGNCOMMENT BEGINRUN 1:
+   * * short:
+   * setup for sectorMaps used for passes
+   *
+   ** long (+personal comments):
+   * all that stuff will move to the sectorMap-Module
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMsectorSetup, m_PARAMtuneCutoffs, m_PARAMhighestAllowedLayer,
+   * m_PARAMreserveHitsThreshold, m_PARAMminLayer, m_PARAMminState,
+   * m_PARAMactivateDistance3D, m_PARAMactivateDistanceXY, m_PARAMactivateDistanceZ,
+   * m_PARAMactivateSlopeRZ, m_PARAMactivateNormedDistance3D, m_PARAMactivateAlwaysTrue2Hit,
+   * m_PARAMactivateAlwaysFalse2Hit, m_PARAMactivateRandom2Hit, m_PARAMactivateAngles3DHioC,
+   * m_PARAMactivateAnglesXYHioC, m_PARAMactivateAnglesRZHioC, m_PARAMactivateDeltaSlopeRZHioC,
+   * m_PARAMactivateDistance2IPHioC, m_PARAMactivatePTHioC, m_PARAMactivateHelixParameterFitHioC,
+   * m_PARAMactivateAnglesXY, m_PARAMactivateAnglesRZ, m_PARAMactivateDeltaSlopeRZ,
+   * m_PARAMactivateDistance2IP, m_PARAMactivatePT, m_PARAMactivateHelixParameterFit,
+   * m_PARAMactivateDeltaSOverZ, m_PARAMactivateDeltaSlopeZOverS, m_PARAMactivateAlwaysTrue3Hit,
+   * m_PARAMactivateAlwaysFalse3Hit, m_PARAMactivateRandom3Hit, m_PARAMactivateDeltaPtHioC,
+   * m_PARAMactivateDeltaDistance2IPHioC, m_PARAMactivateZigZagXY, m_PARAMactivateZigZagXYWithSigma,
+   * m_PARAMactivateZigZagRZ, m_PARAMactivateDeltaPt, m_PARAMactivateCircleFit,
+   * m_PARAMactivateDeltaDistance2IP, m_PARAMactivateAlwaysTrue4Hit, m_PARAMactivateAlwaysFalse4Hit,
+   * m_PARAMactivateRandom4Hit
+   * m_PARAMtuneDistance3D, m_PARAMtuneDistanceXY, m_PARAMtuneDistanceZ,
+   * m_PARAMtuneSlopeRZ, m_PARAMtuneNormedDistance3D, m_PARAMtuneAlwaysTrue2Hit,
+   * m_PARAMtuneAlwaysFalse2Hit, m_PARAMtuneRandom2Hit, m_PARAMtuneAngles3DHioC,
+   * m_PARAMtuneAnglesXYHioC, m_PARAMtuneAnglesRZHioC, m_PARAMtuneDeltaSlopeRZHioC,
+   * m_PARAMtuneDistance2IPHioC, m_PARAMtunePTHioC, m_PARAMtuneHelixParameterFitHioC,
+   * m_PARAMtuneAnglesXY, m_PARAMtuneAnglesRZ, m_PARAMtuneDeltaSlopeRZ,
+   * m_PARAMtuneDistance2IP, m_PARAMtunePT, m_PARAMtuneHelixParameterFit,
+   * m_PARAMtuneDeltaSOverZ, m_PARAMtuneDeltaSlopeZOverS, m_PARAMtuneAlwaysTrue3Hit,
+   * m_PARAMtuneAlwaysFalse3Hit, m_PARAMtuneRandom3Hit, m_PARAMtuneDeltaPtHioC,
+   * m_PARAMtuneDeltaDistance2IPHioC, m_PARAMtuneZigZagXY, m_PARAMtuneZigZagXYWithSigma,
+   * m_PARAMtuneZigZagRZ, m_PARAMtuneDeltaPt, m_PARAMtuneCircleFit,
+   * m_PARAMtuneDeltaDistance2IP, m_PARAMtuneAlwaysTrue4Hit, m_PARAMtuneAlwaysFalse4Hit,
+   * m_PARAMtuneRandom4Hit
+   *
+   ** dependency of global in-module variables:
+   * m_usePXDHits, m_useSVDHits, m_useTELHits,
+   * m_nSectorSetups, m_passSetupVector,
+   *
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_PARAMnameOfInstance, m_PARAMactivateAlwaysTrue2Hit, m_PARAMactivateAlwaysFalse2Hit,
+   * m_PARAMactivateRandom2Hit, m_PARAMactivateAlwaysTrue3Hit, m_PARAMactivateAlwaysFalse3Hit,
+   * m_PARAMactivateRandom3Hit, m_PARAMactivateAlwaysTrue4Hit, m_PARAMactivateAlwaysFalse4Hit,
+   * m_PARAMactivateRandom4Hit, m_PARAMhighOccupancyThreshold, m_PARAMtuneAlwaysTrue2Hit,
+   * m_PARAMtuneAlwaysFalse2Hit, m_PARAMtuneRandom2Hit, m_PARAMtuneAlwaysTrue3Hit,
+   * m_PARAMtuneAlwaysFalse3Hit, m_PARAMtuneRandom3Hit, m_PARAMtuneAlwaysTrue4Hit,
+   * m_PARAMtuneAlwaysFalse4Hit, m_PARAMtuneRandom4Hit,
+   *
+   ** in-module-function-calls:
+   */
+
   // here some variables copied from the passes (will be rewritten for each pass, therefore only the settings of the last pass will survive)
   TVector3 origin;
   string detectorType;
@@ -7253,7 +7249,7 @@ void VXDTFModule::setupPasses()
         VXDSector* thisSector = mapEntry.second;
         const vector<unsigned int> currentFriends = thisSector->getFriends();
         uint nFriends = currentFriends.size();
-        B2DEBUG(5, "Opening sector " << FullSecID(mapEntry.first) << "/" << FullSecID(thisSector->getSecID()) << " at dist2Origin " << thisSector->getDistance() << " which has got " << nFriends << " friends for internal supportedCuttoffsList and " << thisSector->getFriendPointers().size() << " friendSectors as pointers");
+        B2DEBUG(25, "Opening sector " << FullSecID(mapEntry.first) << "/" << FullSecID(thisSector->getSecID()) << " at dist2Origin " << thisSector->getDistance() << " which has got " << nFriends << " friends for internal supportedCuttoffsList and " << thisSector->getFriendPointers().size() << " friendSectors as pointers");
         if (nFriends != uint(thisSector->getFriendMapSize()) or nFriends != thisSector->getFriendPointers().size()) {
           B2WARNING(" number of friends do not match in sector " << FullSecID(mapEntry.first) << ": friends by friendVector vs nEntries vs nFriendPointers in FriendMap: " << nFriends << "/" << thisSector->getFriendMapSize() << "/" << thisSector->getFriendPointers().size())
         }
@@ -7283,6 +7279,24 @@ void VXDTFModule::setupPasses()
 
 void VXDTFModule::setupBaseLineTF()
 {
+  /** REDESIGNCOMMENT BEGINRUN 2:
+   * * short:
+   * store secMap/pass-setup for baseLineTF
+   *
+   ** long (+personal comments):
+   * although the baselineTF (only usefull for TB-runs) is filled here,
+   * this section does not have dependencies of the testbeam package
+   *
+   ** dependency of module parameters (global):
+   *
+   ** dependency of global in-module variables:
+   * m_passSetupVector, m_baselinePass
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   *
+   ** in-module-function-calls:
+   */
+
   unsigned int centerSecID = FullSecID().getFullSecID(); // automatically produces secID of centerSector
   VXDSector* pCenterSector = new VXDSector(centerSecID);
   m_baselinePass.sectorMap.insert({centerSecID, pCenterSector});
@@ -7313,6 +7327,23 @@ void VXDTFModule::setupBaseLineTF()
 
 void VXDTFModule::importSectorMapsToDisplayCollector()
 {
+  /** REDESIGNCOMMENT BEGINRUN 3:
+   * * short:
+   * stores imported secMaps into the display-collector
+   *
+   ** long (+personal comments):
+   *
+   ** dependency of module parameters (global):
+   *
+   ** dependency of global in-module variables:
+   * m_passSetupVector, m_collector,
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_collector
+   *
+   ** in-module-function-calls:
+   */
+
   //KeySectors dosn't function => so pair Int int
   std::vector< std::pair<std::pair<unsigned int, unsigned int>, std::vector<unsigned int> > > sectorsDisplayAllPass;
   std::vector<unsigned int> sectorsDisplayFriends;

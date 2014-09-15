@@ -106,9 +106,9 @@ void TFAnalizerModule::initialize()
   StoreArray<genfit::TrackCand>::required(m_PARAMmcTCname);
   StoreArray<genfit::TrackCand>::required(m_PARAMcaTCname);
   StoreArray<genfit::TrackCand>::registerPersistent(m_PARAMacceptedTCname);
-  StoreArray<PXDCluster>::required();
+  StoreArray<PXDCluster>::optional();
   StoreArray<SVDCluster>::required();
-  StoreArray<PXDTrueHit>::required();
+  StoreArray<PXDTrueHit>::optional();
   StoreArray<SVDTrueHit>::required();
   StoreArray<VXDTFInfoBoard>::optional(m_PARAMinfoBoardName); /// WARNING TODO: implement a minimal analyzing mode which can deal with TF's without using the InfoBoards...
 
@@ -123,6 +123,10 @@ void TFAnalizerModule::initialize()
   m_mcTrackVectorCounter = 0;
   m_wrongChargeSignCounter = 0;
   m_totalRealHits = 0;
+  m_nMcPXDHits = 0;
+  m_nMcSVDHits = 0;
+  m_nCaPXDHits = 0;
+  m_nCaSVDHits = 0;
 
   if (m_PARAMwriteToRoot == true) {
     if ((m_PARAMrootFileName.size()) != 2) {
@@ -363,6 +367,11 @@ void TFAnalizerModule::event()
     caSVDHits += caTC.svdClusterIDs.size();
   } // print info about all ghost and good caTCs
 
+  m_nMcPXDHits += mcPXDHits;
+  m_nMcSVDHits += mcSVDHits;
+  m_nCaPXDHits += caPXDHits;
+  m_nCaSVDHits += caSVDHits;
+
 
   B2DEBUG(1, "Event " << m_eventCounter << ": There are " << int(mcTcVector.size()) << " mcTCs, with mean of " << (float(mcPXDHits) / float(mcTcVector.size())) << "/" << (float(mcSVDHits) / float(mcTcVector.size())) << " PXD/SVD clusters")
   for (foundIDentry ID : foundIDs) {
@@ -533,6 +542,8 @@ void TFAnalizerModule::endRun()
 
   B2INFO("TFAnalizerModule: After " << m_eventCounter + 1 << " events there was a total number of " << m_mcTrackCounter << " mcTrackCandidates and " << m_totalRealHits << " realHits. Of these TCs, " << m_mcTrackVectorCounter << " mcTrackCandidates where used for analysis because of cutoffs.")
   B2INFO("TFAnalizerModule: There were " << m_caTrackCounter << " caTrackCandidates, of those " << m_countAcceptedGFTCs << " were stored in acceptedTCcontainer for further use, number of times where charge was guessed wrong: " << m_wrongChargeSignCounter << ", number of caTCs which produced a double entry: " << m_countedDoubleEntries)
+  B2INFO("TFAnalizerModule:  totalCA|totalMC|ratio of pxdHits " << m_nCaPXDHits << "|" << m_nMcPXDHits << "|" << float(m_nCaPXDHits) / float(m_nMcPXDHits) <<
+         ", svdHits " << m_nCaSVDHits << "|" << m_nMcSVDHits << "|" << float(m_nCaSVDHits) / float(m_nMcSVDHits) << " found by the two TFs")
   B2INFO("the VXDTF found (total/perfect/clean/ghost)" << m_countReconstructedTCs << "/" << m_countedPerfectRecoveries << "/" << m_countedCleanRecoveries << "/" << (m_caTrackCounter - m_countReconstructedTCs) << " TCs -> efficiency(total/perfect/clean/ghost): " << double(100 * m_countReconstructedTCs) / double(m_mcTrackVectorCounter) << "%/" << double(100 * m_countedPerfectRecoveries) / double(m_mcTrackVectorCounter) << "%/" << double(100 * m_countedCleanRecoveries) / double(m_mcTrackVectorCounter) << "%/" << double(100 * (m_caTrackCounter - m_countReconstructedTCs)) / double(m_countReconstructedTCs) << "%")
 
 

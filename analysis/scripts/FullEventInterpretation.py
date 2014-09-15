@@ -377,6 +377,7 @@ def FullEventInterpretation(path, particles):
                           signalProbability='SignalProbability_{i}'.format(i=particle.identifier))
 
     # The last act creates the automatic reporting summary pdf
+    finalParticles = [particle for particle in particles if all(particle.identifier not in o.daughters and pdg.conjugate(particle.name) + ':' + particle.label not in o.daughters for o in particles)]
     if args.makeSummary:
         for particle in particles:
             for channel in particle.channels:
@@ -415,7 +416,6 @@ def FullEventInterpretation(path, particles):
         play.addNeeded('FEIsummary.pdf')
 
     # Finally we add the final particles (normally B+ B0) as needed to the play
-    finalParticles = [particle for particle in particles if all(particle.identifier not in o.daughters and pdg.conjugate(particle.name) + ':' + particle.label not in o.daughters for o in particles)]
     for finalParticle in finalParticles:
         play.addNeeded('SignalProbability_{i}'.format(i=finalParticle.identifier))
         play.addNeeded('ParticleList_{i}'.format(i=finalParticle.identifier))

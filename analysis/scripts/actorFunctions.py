@@ -372,7 +372,9 @@ def SignalProbability(path, hash, preloader, identifier, particleList, mvaConfig
                                               poption='SplitMode=random:!V', maxEvents=maxEvents,
                                               prefix=removeJPsiSlash(particleList + '_' + hash)))
         B2INFO("Use following command to invoke teacher\n" + command)
+        #actorFramework.global_lock.release()
         subprocess.call(command, shell=True)
+        #actorFramework.global_lock.acquire()
 
     if os.path.isfile(configFilename):
         if preloader.particleListHasSignalProbability(particleList):

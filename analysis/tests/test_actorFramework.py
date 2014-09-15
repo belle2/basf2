@@ -36,8 +36,6 @@ class TestCollection(unittest.TestCase):
     def test_call(self):
         """ Unittest function """
         self.assertDictEqual(self.r1({'a': 1, 'b': 2, 'c': 3}), {'TestName': {'a': 1, 'b': 2}})
-        with self.assertRaises(RuntimeError):
-            self.r1({'b': 2, 'c': None})
 
 
 class TestActor(unittest.TestCase):
@@ -52,7 +50,7 @@ class TestActor(unittest.TestCase):
         """ Unittest function """
         def fun(a, b, c):
             return {'r': a * sum(b)}
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(KeyError):
             Actor(fun, d='a_t', b=['b1', 'b2'])({'a_t': 2, 'b1': 1, 'b2': 3, 'c': 4, 'd': 5})
 
     def test_members(self):
@@ -63,7 +61,7 @@ class TestActor(unittest.TestCase):
     def test_call(self):
         """ Unittest function """
         self.assertDictEqual(self.f({'a_t': 2, 'b1': 1, 'b2': 3, 'c': 4}), {'r': 8})
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(KeyError):
             self.f({'a': 2, 'b1': 1, 'b3': 3})
 
 

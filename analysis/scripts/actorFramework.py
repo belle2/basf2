@@ -20,6 +20,10 @@ import basf2
 import multiprocessing.pool
 import copy
 import inspect
+import threading
+import sys
+
+global_lock = threading.RLock()
 
 
 def create_hash(arguments):
@@ -200,11 +204,13 @@ class Play(object):
                 break
             if nProcesses > 1:
                 def _execute_actor_parallel(actor):
+                    global_lock.acquire()
                     c = copy.copy(results)
                     c['path'] = actor.path = basf2.create_path()
                     c['hash'] = ''
                     c['hash'] = create_hash([c[r] for r in actor.requires])
                     actor.provides = actor(c)
+                    global_lock.release()
                     return actor
                 p = multiprocessing.pool.ThreadPool(processes=nProcesses)
                 ready = p.map(_execute_actor_parallel, ready)

@@ -152,7 +152,7 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
 
     placeholders['overallSignalEfficiencyInPercent'] = efficiency(placeholders['NSignal'], placeholders['NEvents']) * 100
 
-    hash = actorFramework.createHash(placeholders)
+    hash = actorFramework.create_hash([placeholders])
     placeholders['texFile'] = 'FEIsummary.tex'
     if not os.path.isfile(placeholders['texFile']):
         createTexFile(placeholders['texFile'], 'analysis/scripts/FullEventInterpretationSummaryTemplate.tex', placeholders)
@@ -193,7 +193,7 @@ def createFSParticleTexFile(placeholders, nTuple, mcCounts):
     placeholders['particleNSignalAfterPostCut'] = int(tree.GetEntries('isSignal'))
     placeholders['particleNBackgroundAfterPostCut'] = int(tree.GetEntries('!isSignal'))
 
-    hash = actorFramework.createHash(placeholders)
+    hash = actorFramework.create_hash([placeholders])
     placeholders['particleDiagPlot'] = removeJPsiSlash('{name}_combined_{hash}_diag.png'.format(name=placeholders['particleName'], hash=hash))
     if not os.path.isfile(placeholders['particleDiagPlot']):
         makeDiagPlotPerParticle(nTuple, placeholders['particleDiagPlot'])
@@ -257,7 +257,7 @@ def createCombinedParticleTexFile(placeholders, channelPlaceholders, nTuple, mcC
             placeholders['particleNBackgroundAfterUserCut'] += int(channelPlaceholder['channelNBackgroundAfterUserCut'])
         placeholders['channelInputs'] += '\input{' + channelPlaceholder['texFile'] + '}\n'
 
-    hash = actorFramework.createHash(placeholders)
+    hash = actorFramework.create_hash([placeholders])
     placeholders['particleDiagPlot'] = removeJPsiSlash('{name}_combined_{hash}_diag.png'.format(name=placeholders['particleName'], hash=hash))
     if not os.path.isfile(placeholders['particleDiagPlot']):
         makeDiagPlotPerParticle(nTuple, placeholders['particleDiagPlot'])
@@ -278,7 +278,7 @@ def createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut):
     @param preCut used preCuts for this channel
     """
     if preCutHistogram is None:
-        hash = actorFramework.createHash(placeholders)
+        hash = actorFramework.create_hash([placeholders])
         placeholders['preCutTexFile'] = removeJPsiSlash('{name}_preCut_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
         placeholders['preCutTemplateFile'] = 'analysis/scripts/FullEventInterpretationMissingPreCutTemplate.tex'
         placeholders['isIgnored'] = True
@@ -330,7 +330,7 @@ def createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut):
         placeholders['preCutEfficiency'] = '{:.5f}'.format(preCutConfig.efficiency)
         placeholders['preCutPurity'] = '{:.5f}'.format(preCutConfig.purity)
 
-        hash = actorFramework.createHash(placeholders)
+        hash = actorFramework.create_hash([placeholders])
 
         ROOT.gROOT.SetBatch(True)
 
@@ -404,7 +404,7 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
     """
 
     if signalProbability is None:
-        hash = actorFramework.createHash(placeholders)
+        hash = actorFramework.create_hash([placeholders])
         placeholders['mvaTexFile'] = removeJPsiSlash('{name}_mva_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
         placeholders['mvaTemplateFile'] = 'analysis/scripts/FullEventInterpretationMissingMVATemplate.tex'
         placeholders['isIgnored'] = True
@@ -493,7 +493,7 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
         placeholders['mvaNBackgroundAfterPostCut'] = placeholders['mvaPostCutBackgroundEfficiency'] * placeholders['mvaNBackground']
 
         # Create plots and texfile if hash changed
-        hash = actorFramework.createHash(placeholders)
+        hash = actorFramework.create_hash([placeholders])
 
         placeholders['mvaOvertrainingPlot'] = removeJPsiSlash('{name}_mva_{hash}_overtraining.png'.format(name=placeholders['particleName'], hash=hash))
         if not os.path.isfile(placeholders['mvaOvertrainingPlot']):

@@ -70,10 +70,10 @@ namespace Belle2 {
 
   private:
 
-    /** The coordinates of the Point */
-    double m_x, m_y;
-    /** Used to check if the point lies inside a boundary */
-    bool m_valid;
+    double m_x; /**< the x-coordinate of the Point */
+    double m_y; /**< the y-coordinate of the Point */
+    bool m_valid; /**< used to check if the point lies inside a boundary */
+
 
   };
 
@@ -162,14 +162,10 @@ namespace Belle2 {
 
   private:
 
-    /** First endpoint */
-    Point m_p1;
-    /** Second endpoint */
-    Point m_p2;
-    /** Slope of the line */
-    double m_m;
-    /** If the line is vertical, this is set to true. */
-    int m_vertical;
+    Point m_p1 ;    /**< First endpoint */
+    Point m_p2;     /**< Second endpoint */
+    double m_m;     /**< Slope of the line */
+    int m_vertical; /**< If the line is vertical, this is set to true. */
 
   };
 
@@ -184,13 +180,7 @@ namespace Belle2 {
   public:
 
     /** Construct a Cell from four different Lines (sides) */
-    Cell(const Line& left, const Line& top, const Line& right, const Line& bot) {
-      m_Left    = left;
-      m_Top     = top;
-      m_Right   = right;
-      m_Bot     = bot;
-      m_isValid = true;
-    }
+    Cell(const Line& left, const Line& top, const Line& right, const Line& bot) : m_Left(left), m_Top(top), m_Right(right), m_Bot(bot), m_isValid(true) {}
 
     /** Construct a Cell from four different Points (corners) */
     Cell(const Point& tl, const Point& tr, const Point& br, const Point& bl) {
@@ -292,16 +282,11 @@ namespace Belle2 {
 
   private:
 
-    /** the left boundary of the cell */
-    Line m_Left;
-    /** the left boundary of the cell */
-    Line m_Top;
-    /** the left boundary of the cell */
-    Line m_Right;
-    /** the left boundary of the cell */
-    Line m_Bot;
-    /** does the hit land in this cell */
-    bool m_isValid;
+    Line m_Left;    /**< the left boundary of the cell */
+    Line m_Top;     /**< the left boundary of the cell */
+    Line m_Right;   /**< the left boundary of the cell */
+    Line m_Bot;     /**< the left boundary of the cell */
+    bool m_isValid; /**< does the hit land in this cell */
 
   };
 }

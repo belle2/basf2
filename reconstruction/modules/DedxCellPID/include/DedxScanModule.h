@@ -11,7 +11,6 @@
 #ifndef DEDXSCANMODULE_H
 #define DEDXSCANMODULE_H
 
-#include <reconstruction/modules/DedxCorrection/DedxCorrectionModule.h>
 #include <reconstruction/dataobjects/DedxConstants.h>
 
 #include <framework/core/Module.h>

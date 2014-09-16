@@ -143,11 +143,7 @@ namespace Belle2 {
             axialStereoSegmentPair.setSegments(ptrStartSegment, ptrEndSegment);
             axialStereoSegmentPair.clearTrajectory3D();
 
-            if (axialStereoSegmentPair.getTrajectory2D().isFitted()) {
-              B2ERROR("CDCAxialAxialSegmentPair still fitted after clearing.")
-              continue;
-            }
-            if (axialStereoSegmentPair.getTrajectorySZ().isFitted()) {
+            if (axialStereoSegmentPair.getTrajectory3D().isFitted()) {
               B2ERROR("CDCAxialAxialSegmentPair still fitted after clearing.")
               continue;
             }

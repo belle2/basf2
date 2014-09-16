@@ -75,6 +75,9 @@ namespace Belle2 {
       bool isNull() const
       { return m_localHelix.isNull(); }
 
+      /// Checks if the trajectory has already been set to a valid value.
+      bool isFitted() const
+      { return not isNull(); }
 
     public:
       /// Copies the trajectory information to the Genfit track candidate

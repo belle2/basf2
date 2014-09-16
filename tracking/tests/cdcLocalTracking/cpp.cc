@@ -30,3 +30,12 @@ TEST_F(CDCLocalTrackingTest, cpp_float)
 }
 
 
+TEST_F(CDCLocalTrackingTest, cpp_max)
+{
+  float value = 1.0;
+  double maximum = std::max(NAN, value);
+  EXPECT_TRUE(std::isnan(maximum));
+
+  double maximum2 = std::max(value, NAN);
+  EXPECT_EQ(value, maximum2);
+}

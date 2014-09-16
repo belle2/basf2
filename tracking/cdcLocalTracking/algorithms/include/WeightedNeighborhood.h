@@ -69,11 +69,30 @@ namespace Belle2 {
       /// Multimap that stores the neighborhood relations
       typedef std::multimap<WeightedItemPtr, const Item*> Container;
 
+
+    public:
       /// Value type of the neighborhood aka std::pair<const WeightedItemPtr,NeighborPtr>
       typedef typename Container::value_type value_type;
 
-      /// Better type name for the stored relations
+      /// Better type name for the stored relations.
       typedef value_type WeightedRelation;
+
+    public:
+      /// Extracts the item from which the relation points.
+      /// Handy in range based for loops in the neighborhood which iterates the relations.
+      friend const Item* getItem(const WeightedRelation& relation)
+      { return relation.first.getItemPtr(); }
+
+      /// Extracts the weight of the relation.
+      /// Handy in range based for loops in the neighborhood which iterates the relations.
+      friend NeighborWeight getWeight(const WeightedRelation& relation)
+      { return relation.first.getWeight(); }
+
+      /// Extracts the item to which the relation points.
+      /// Handy in range based for loops in the neighborhood which iterates the relations.
+      friend const Item* getNeighbor(const WeightedRelation& relation)
+      { return relation.second; }
+
 
     private:
       /// Iterator type of the multimap to be wrapped by a more expressive iterator
@@ -144,8 +163,11 @@ namespace Belle2 {
        */
       inline void insert(const Item* itemPtr,
                          const Item* neighborPtr,
-                         const NeighborWeight& weight = 1)
-      { m_neighbors.insert(WeightedRelation(WeightedItemPtr(itemPtr, weight) , neighborPtr)); }
+                         const NeighborWeight& weight = 1) {
+        if (not isNotANeighbor(weight)) {
+          m_neighbors.insert(WeightedRelation(WeightedItemPtr(itemPtr, weight) , neighborPtr));
+        }
+      }
 
       /// Inserts a new relation by pointers
       /** Inserts a new relation. The item and neighbor are given by pointer. \n
@@ -154,8 +176,11 @@ namespace Belle2 {
        */
       inline void insert(const Item* itemPtr,
                          const NeighborWeight& weight,
-                         const Item* neighborPtr)
-      { m_neighbors.insert(WeightedRelation(WeightedItemPtr(itemPtr, weight) , neighborPtr)); }
+                         const Item* neighborPtr) {
+        if (not isNotANeighbor(weight)) {
+          m_neighbors.insert(WeightedRelation(WeightedItemPtr(itemPtr, weight) , neighborPtr));
+        }
+      }
 
 
       /** @name Retrival of neigbors
@@ -230,31 +255,22 @@ namespace Belle2 {
       void clear()
       { m_neighbors.clear(); }
 
-
+      /// Checks if the two given elements are registered as neighbors with the given weight.
       bool areNeighborsWithWeight(const Item* itemPtr,
                                   const NeighborWeight& weight,
                                   const Item* neighborPtr) const {
-        range neighborRange = equal_range(itemPtr, weight);
-
-        for (iterator itRelation = neighborRange.first;
-             itRelation != neighborRange.second;
-             ++itRelation) {
-
-          if (itRelation.getNeighbor() == neighborPtr) {
+        for (const WeightedRelation & relation : equal_range(itemPtr, weight)) {
+          if (getNeighbor(relation) == neighborPtr) {
             return true;
           }
         }
         return false;
       }
 
+      /// Checks if the two given elements are registered as neighbors with any weight.
       bool areNeighbors(const Item* itemPtr, const Item* neighborPtr) const {
-        range neighborRange = equal_range(itemPtr);
-
-        for (iterator itRelation = neighborRange.first;
-             itRelation != neighborRange.second;
-             ++itRelation) {
-
-          if (itRelation.getNeighbor() == neighborPtr) {
+        for (const WeightedRelation & relation : equal_range(itemPtr)) {
+          if (getNeighbor(relation) == neighborPtr) {
             return true;
           }
         }
@@ -266,12 +282,10 @@ namespace Belle2 {
        *  with the same weight. Returns true if all such inverse relations exist. */
       bool isSymmetric() const {
         bool result = true;
-        for (iterator itNeighborPairs = begin();
-             itNeighborPairs != end(); ++itNeighborPairs) {
-
-          const Item* itemPtr = itNeighborPairs.getItem();
-          const NeighborWeight& weight = itNeighborPairs.getWeight();
-          const Item* neighborPtr = itNeighborPairs.getNeighbor();
+        for (const WeightedRelation & relation : *this) {
+          const Item* itemPtr = getItem(relation);
+          const NeighborWeight& weight = getWeight(relation);
+          const Item* neighborPtr = getNeighbor(relation);
 
           if (not areNeighborsWithWeight(neighborPtr, weight, itemPtr)) {
             B2WARNING(" Neighborhood is not symmetric in " << *itemPtr <<
@@ -351,16 +365,18 @@ namespace Belle2 {
 
       /// Output operator to help debugging
       friend std::ostream& operator<<(std::ostream& output, const WeightedNeighborhood& neighborhood) {
-        for (iterator itNeighbor = neighborhood.begin();
-             itNeighbor != neighborhood.end(); ++itNeighbor) {
+        for (const WeightedRelation & relation : neighborhood) {
+          const Item* ptrItem = getItem(relation);
+          const NeighborWeight weight = getWeight(relation);
+          const Item* ptrNeighbor = getNeighbor(relation);
 
-          output << itNeighbor.getItem() << " " <<
-                 itNeighbor.getItem()->getCellState() << " == " <<
-                 itNeighbor.getItem()->getCellWeight() << " + " <<
-                 itNeighbor.getWeight() << " + " <<
-                 itNeighbor.getNeighbor()->getCellState() << " -> " <<
-                 itNeighbor.getNeighbor() << std::endl ;
-
+          output <<
+                 ptrItem << " " <<
+                 ptrItem->getCellState() << " == " <<
+                 ptrItem->getCellWeight() << " + " <<
+                 weight << " + " <<
+                 ptrNeighbor->getCellState() << " -> " <<
+                 ptrNeighbor << std::endl ;
         }
         return output;
       }

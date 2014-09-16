@@ -35,6 +35,10 @@ namespace Belle2 {
     const ForwardBackwardInfo FORWARD = 1; ///< Constant for forward orientation
     const ForwardBackwardInfo BACKWARD = -1; ///< Constant for backward orientation
 
+    typedef OrientationInfo IncDecInfo; ///< Indicator for increasing or decreasing
+    const IncDecInfo INCREASING = 1; ///< Constant for increasing quantity
+    const IncDecInfo DECREASING = -1; ///< Constant for decreasing quantity
+
     typedef OrientationInfo CCWInfo; ///< Indicator for clockwise or counterclockwise orientation
     const CCWInfo CCW = 1;    ///< Constant for counterclockwise orientation
     const CCWInfo CW = -1;    ///< Constant for clockwise orientation

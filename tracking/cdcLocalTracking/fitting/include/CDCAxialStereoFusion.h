@@ -26,13 +26,24 @@ namespace Belle2 {
     class CDCAxialStereoFusion : public UsedTObject {
 
     public:
-      static TMatrixD calcAmbiguity(const CDCRecoSegment2D& segment,
+      static TMatrixD calcAmbiguity(const CDCRecoSegment2D& recoSegment2D,
                                     const CDCTrajectory2D& trajectory2D);
+
+      static TMatrixD calcAmbiguity(const CDCRecoSegment3D& recoSegment3D,
+                                    const CDCTrajectory2D& trajectory2D);
+
+
 
       static CDCTrajectory3D fuseTrajectories(const CDCRecoSegment2D& startSegment,
                                               const CDCRecoSegment2D& endSegment);
 
       static void fuseTrajectories(const CDCAxialStereoSegmentPair& axialStereoSegmentPair);
+
+
+      static CDCTrajectory3D reconstructFuseTrajectories(const CDCRecoSegment2D& startSegment,
+                                                         const CDCRecoSegment2D& endSegment);
+
+      static void reconstructFuseTrajectories(const CDCAxialStereoSegmentPair& axialStereoSegmentPair);
 
     public:
       /** ROOT Macro to make CDCAxialStereoFusion a ROOT class.*/

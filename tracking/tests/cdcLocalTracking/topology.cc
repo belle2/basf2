@@ -126,9 +126,9 @@ TEST_F(CDCLocalTrackingTest, WireSkew)
     refPolarRByICLayer[iCLayer] = firstWire.getRefPolarR();
 
     for (const CDCWire & wire : wireLayer) {
-      EXPECT_NEAR(skewByICLayer[iCLayer], wire.getSkew(), 10e-7);
-      EXPECT_NEAR(stereoAngleByICLayer[iCLayer], wire.getStereoAngle(), 10e-7);
-      EXPECT_NEAR(refPolarRByICLayer[iCLayer], wire.getRefPolarR(), 10e-7);
+      EXPECT_NEAR(skewByICLayer[iCLayer], wire.getSkew(), 10e-6);
+      EXPECT_NEAR(stereoAngleByICLayer[iCLayer], wire.getStereoAngle(), 10e-6);
+      EXPECT_NEAR(refPolarRByICLayer[iCLayer], wire.getRefPolarR(), 10e-6);
     }
 
     B2INFO("ICLayer : " << iCLayer <<

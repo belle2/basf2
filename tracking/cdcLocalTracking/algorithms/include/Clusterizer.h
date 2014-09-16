@@ -198,14 +198,10 @@ namespace Belle2 {
           itemsToCheckNext.clear();
           // Check registered items for neighbors
           BOOST_FOREACH(const Item *  clusterItem, itemsToCheckNow) {
-            // Get neighbors
-            typename Neighborhood::range neighborRange = neighborhood.equal_range(clusterItem);
-
             // Consider each neighbor
-            for (typename Neighborhood::iterator itNeighbor = neighborRange.first;
-                 itNeighbor != neighborRange.second; ++itNeighbor) {
+            for (const typename Neighborhood::WeightedRelation & relation : neighborhood.equal_range(clusterItem)) {
 
-              const Item* const& neighborItem = itNeighbor.getNeighbor();
+              const Item* neighborItem = getNeighbor(relation);
 
               CellState neighborICluster = getCellState(*neighborItem);
               if (neighborICluster == -1) {

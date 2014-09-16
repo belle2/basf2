@@ -12,11 +12,12 @@
 #define SIMPLEFACETFILTER_H_
 
 #include <tracking/cdcLocalTracking/eventdata/entities/CDCRecoFacet.h>
+#include <tracking/cdcLocalTracking/mockroot/MockRoot.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {
     /// Filter for the constuction of good facets based on simple criterions.
-    class SimpleFacetFilter {
+    class SimpleFacetFilter : public UsedTObject {
 
     public:
       /// Constructor using default direction of flight deviation cut off.
@@ -39,6 +40,10 @@ namespace Belle2 {
 
     private:
       const FloatType m_allowedDeviationCos; ///< Memory for the used direction of flight deviation.
+
+    private:
+      /// ROOT Macro to make SimpleFacetFilter a ROOT class.
+      ClassDefInCDCLocalTracking(SimpleFacetFilter, 1);
 
     }; // end class SimpleFacetFilter
   } //end namespace CDCLocalTracking

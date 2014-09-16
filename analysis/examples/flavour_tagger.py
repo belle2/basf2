@@ -15,7 +15,16 @@ from ROOT import Belle2
 import os
 
 main = create_path()
-main.add_module(register_module('RootInput'))
+# ***************************************
+roinput = register_module('RootInput')
+inputFiles = []
+for i in xrange(20):
+    inputFiles.append('/remote/pcbelle06/ligioi/dstFiles/B2JpsiKs_mu_e0001r'
+                      + '%04d' % (i + 1) + '_s00_BGx0.mdst.root')
+roinput.param('inputFileNames', inputFiles)
+main.add_module(roinput)
+# ***************************************
+# main.add_module(register_module('RootInput'))
 main.add_module(register_module('Gearbox'))
 loadReconstructedParticles(path=main)
 
@@ -48,6 +57,10 @@ variables_TL['Electron'] = [
     'eid_TOP',
     'eid_ARICH',
     'eid_ECL',
+    'SemiLeptonicVariables(recoilMass)',
+    'SemiLeptonicVariables(p_missing_CMS)',
+    'SemiLeptonicVariables(CosTheta_missing_CMS)',
+    'SemiLeptonicVariables(EW90)',
     ]
 variables_TL['Muon'] = [
     'p_CMS',
@@ -58,6 +71,10 @@ variables_TL['Muon'] = [
     'muid_dEdx',
     'muid_TOP',
     'muid_ARICH',
+    'SemiLeptonicVariables(recoilMass)',
+    'SemiLeptonicVariables(p_missing_CMS)',
+    'SemiLeptonicVariables(CosTheta_missing_CMS)',
+    'SemiLeptonicVariables(EW90)',
     ]
 variables_TL['Kaon'] = [
     'p_CMS',
@@ -185,20 +202,18 @@ for (symbol, category) in trackLevelParticles:
 eventLevelReady = trackLevelReady
 
 # Eventlevel -> calculation only on targettrack
-eventLevelParticles = [('e+', 'Electron'), ('mu+', 'Muon'), ('K+', 'Kaon'),
-                       ('pi+', 'SlowPion')]
+eventLevelParticles = [('e+', 'Electron'), ('mu+', 'Muon')]  # , ('K+', 'Kaon'),
+                       # ('pi+', 'SlowPion')]
 
 variables_EL = dict()
-variables_EL['Electron'] = ['p_CMS(e+:ROE, IsFromB(Electron))',
-                            'mRecoilBtag(e+:ROE, IsFromB(Electron))',
-                            'p_CMS_missing(e+:ROE, IsFromB(Electron))',
-                            'cosTheta_missing(e+:ROE, IsFromB(Electron))',
-                            'EW90(e+:ROE, IsFromB(Electron))']
-variables_EL['Muon'] = ['p_CMS(mu+:ROE, IsFromB(Muon))',
-                        'mRecoilBtag(mu+:ROE, IsFromB(Muon))',
-                        'p_CMS_missing(mu+:ROE, IsFromB(Muon))',
-                        'cosTheta_missing(mu+:ROE, IsFromB(Muon))',
-                        'EW90(mu+:ROE, IsFromB(Muon))']
+variables_EL['Electron'] = ['p_CMS', 'SemiLeptonicVariables(recoilMass)',
+                            'SemiLeptonicVariables(p_missing_CMS)',
+                            'SemiLeptonicVariables(CosTheta_missing_CMS)',
+                            'SemiLeptonicVariables(EW90)']
+variables_EL['Muon'] = ['p_CMS', 'SemiLeptonicVariables(recoilMass)',
+                        'SemiLeptonicVariables(p_missing_CMS)',
+                        'SemiLeptonicVariables(CosTheta_missing_CMS)',
+                        'SemiLeptonicVariables(EW90)']
 variables_EL['Kaon'] = ['bestQrOf(K+:ROE , IsFromB(Kaon))',
                         'p_CMS(K+:ROE , IsFromB(Kaon))',
                         'chargeTimesKaonLiklihood']  # TODO More Event Level Variables
@@ -207,17 +222,22 @@ variables_EL['SlowPion'] = ['bestQrOf(pi+:ROE, IsFromB(SlowPion))',
 
 if eventLevelReady:
     for (symbol, category) in eventLevelParticles:
+        particleList = symbol + ':ROE'
         methodPrefix_EL = 'TMVA_' + category + '_EL'
         # Using MetaVariable
         targetVariable = 'IsRightClass(' + category + ', ' + symbol + ':ROE' \
             + ', ' + 'IsFromB(' + category + '))'
         print 'This is the targetVariable: ' + targetVariable
 
+        selectParticle(particleList, 'hasHighestProbInCat(' + particleList
+                       + ',' + 'IsFromB(' + category + ')) > 0.5',
+                       path=roe_path)
+
         if not isTMVAMethodAvailable(workingDirectory + '/' + methodPrefix_EL):
             print 'PROCESSING: trainTMVAMethod on event level'
             trainTMVAMethod(
-                [],
-                variables=variables_EL[category],
+                particleList,
+                variables=variables_TL[category],
                 target=targetVariable,
                 prefix=methodPrefix_EL,
                 methods=methods,
@@ -228,7 +248,7 @@ if eventLevelReady:
         else:
             print 'PROCESSING: applyTMVAMethod on event level'
             applyTMVAMethod(
-                [],
+                particleList,
                 prefix=methodPrefix_EL,
                 signalProbabilityName=targetVariable,
                 method=methods[0][0],

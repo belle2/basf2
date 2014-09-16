@@ -11,16 +11,14 @@
 #ifndef MULTIPASSCELLULARPATHFINDER_H
 #define MULTIPASSCELLULARPATHFINDER_H
 
-#include <vector>
-#include <boost/foreach.hpp>
-
-#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <tracking/cdcLocalTracking/algorithms/CellularAutomaton.h>
+#include <tracking/cdcLocalTracking/algorithms/CellularPathFollower.h>
+#include <tracking/cdcLocalTracking/algorithms/WeightedNeighborhood.h>
 
 #include <framework/logging/Logger.h>
 
-#include <tracking/cdcLocalTracking/algorithms/WeightedNeighborhood.h>
-#include <tracking/cdcLocalTracking/algorithms/CellularAutomaton.h>
-#include <tracking/cdcLocalTracking/algorithms/CellularPathFollower.h>
+#include <tracking/cdcLocalTracking/typedefs/BasicTypes.h>
+#include <vector>
 
 namespace Belle2 {
 
@@ -52,11 +50,9 @@ namespace Belle2 {
 
       /// Applies the cellular automaton to the collection and its neighborhood
       template<class ItemRange>
-      void apply(
-        const ItemRange& itemRange,
-        const Neighborhood& neighborhood,
-        std::vector<Path>& paths
-      ) const {
+      void apply(const ItemRange& itemRange,
+                 const Neighborhood& neighborhood,
+                 std::vector<Path>& paths) const {
 
         // multiple passes of the cellular automat
         // one segment is created at a time denying all knots it picked up,
@@ -70,8 +66,7 @@ namespace Belle2 {
         do {
           //apply the cellular automation
           //B2DEBUG(100,"Apply cellular automat");
-          const Item* highestCell
-            = m_cellularAutomaton.applyTo(itemRange, neighborhood);
+          const Item* highestCell = m_cellularAutomaton.applyTo(itemRange, neighborhood);
 
           Path&& newPath = m_cellularPathFollower.followSingle(highestCell, neighborhood, m_minStateToFollow);
 
@@ -80,12 +75,12 @@ namespace Belle2 {
           } else {
 
             //Block the used items
-            for (const Item * item :  newPath) {
+            for (const Item * item : newPath) {
               item->setDoNotUse();
             }
 
             //Block the items that have already used components
-            for (const Item & item :  itemRange) {
+            for (const Item & item : itemRange) {
               item.receiveDoNotUse();
             }
 

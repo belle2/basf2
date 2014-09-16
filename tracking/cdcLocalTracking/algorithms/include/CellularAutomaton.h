@@ -40,6 +40,12 @@ namespace Belle2 {
       /// Type for the neighborhood of elements in the algorithm
       typedef WeightedNeighborhood<const Item> Neighborhood;
 
+      /// Type for the very basic exception signal used in the detection of cycles.
+      typedef int CycleDetectionMarker;
+
+      /// Instance for the very basic exception signal used in the detection of cycles.
+      const int CYCLE_DETECTED = -999;
+
     public:
 
       /// Empty constructor
@@ -48,21 +54,14 @@ namespace Belle2 {
       /// Empty deconstructor
       ~CellularAutomaton() {;}
 
-
       /// Applies the cellular automaton to the collection and its neighborhood
       /** Applies the cellular automaton algorithm to the collection where the connections are given by
        *  the neighborhood.
        *  @param itemRange the range based iterable containing the items that should acquire the cell states
        *  @param neighborhood the weighted neighborhood of type WeightedNeighborhood<const Item> */
       template<class ItemRange>
-      const Item*
-      applyTo(
-        const ItemRange& itemRange,
-        const Neighborhood& neighborhood
-      ) const {
-
+      const Item*  applyTo(const ItemRange& itemRange, const Neighborhood& neighborhood) const {
         return applyWithRecursion(itemRange, neighborhood);
-
       }
 
 
@@ -72,171 +71,132 @@ namespace Belle2 {
        *  @param itemRange the range based iterable containing the items that should acquire the cell states
        *  @param neighborhood the weighted neighborhood of type WeightedNeighborhood<const Item> */
       template<class ItemRange>
-      const Item*
-      applyWithRecursion(
-        const ItemRange& itemRange,
-        const Neighborhood& neighborhood
-      ) const {
-        //set all cell states to -inf and the flags to unset
+      const Item* applyWithRecursion(const ItemRange& itemRange,
+                                     const Neighborhood& neighborhood) const {
+        // Set all cell states to -inf and the non permanent flags to unset.
         prepareCellFlags(itemRange);
 
+        const Item* ptrHighestItem = nullptr;
 
-        typedef decltype(std::begin(itemRange)) ItemIterator;
+        for (const Item & item : itemRange) {
+          const AutomatonCell& automatonCell = item.getAutomatonCell();
+          if (automatonCell.hasDoNotUseFlag()) continue;
+          if (automatonCell.hasCycleFlag()) continue;
 
-        ItemIterator itHighestItem = std::begin(itemRange);
-
-        // Advance the iterator to a valid item in order to to have a valid highest item.
-        while (itHighestItem != std::end(itemRange) and
-               itHighestItem->getAutomatonCell().hasDoNotUseFlag()) {
-
-          ++itHighestItem;
-
-        }
-
-        // apply cellular automation
-        // uses recursion and a single pass through
-        for (ItemIterator itItem = itHighestItem; itItem != std::end(itemRange); ++itItem) {
-
-          const Item& item = *itItem;
-
-          const AutomatonCell& itemCell = item.getAutomatonCell();
-
-          if (not itemCell.hasAssignedFlag() and
-              not itemCell.hasCycleFlag() and
-              not itemCell.hasDoNotUseFlag()) {
-
-            const CellState& state = updateState(item, neighborhood);
-
+          if (not automatonCell.hasAssignedFlag()) {
             // Mark this cell as a start point of a long path since we encountered it in
-            // a top level recursion
-            item.getAutomatonCell().setStartFlag();
-            itHighestItem = itHighestItem->getAutomatonCell().getCellState() > state ?  itHighestItem : itItem;
+            // at the top level of the recursion.
+            automatonCell.setStartFlag();
+          }
+
+          try {
+            const CellState& cellState = getFinalCellState(item, neighborhood);
+
+            if (not ptrHighestItem) {
+              // First assignment of a valid item
+              ptrHighestItem = &item;
+            } else if (ptrHighestItem->getAutomatonCell().getCellState() < cellState) {
+              // Replacement of the highest item
+              ptrHighestItem = &item;
+            }
+
+          } catch (CycleDetectionMarker) {
+            // TODO: Come up with some handeling for cycles.
+            // For now we continue to look for long paths in the graph
+            // hoping to find a part that does not enter the cycle.
 
           }
         }
 
-        // Return the element with the highst cell value as a good start point for a segment/track
-        if (itHighestItem == std::end(itemRange) or
-            itHighestItem->getAutomatonCell().hasCycleFlag() or
-            itHighestItem->getAutomatonCell().hasDoNotUseFlag() or
-            not itHighestItem->getAutomatonCell().hasStartFlag()) {
+        return ptrHighestItem;
 
-          return nullptr;
-
-        } else {
-
-          return &(*itHighestItem);
-
-        }
       }
-      /// Updates the state of a cell considering all continuations recursively
-      inline const CellState& updateState(const Item& item, const Neighborhood& neighborhood) const {
 
-        // since we encounter this cell in a recursion it is not the start point of track
-        item.getAutomatonCell().unsetStartFlag();
+    private:
 
-        // check if the cell is valid to continue on
-        if (item.getAutomatonCell().hasCycleFlag()) {
-          // if not invalidate this cell and return
-          item.getAutomatonCell().setCellState(NO_CONTINUATION);
-          return item.getAutomatonCell().getCellState();
-        }
-        // We check the do not use flag before going into the recursion
-        // We check the IS_SET flag before going into the recursion
-        // so now need to check here again for the IS_SET flag
-        /*
-        else if ( item.hasFlags(IS_SET) ){
-          //assuming this has already been assigned correctly
-          return item.getCellState();
-        }*/
+      /// Gets the cell state of the item. Determines it if necessary traversing the graph. Throws CYCLE_DETECTED if it encounters a cycle in the graph.
+      const CellState& getFinalCellState(const Item& item, const Neighborhood& neighborhood) const {
+        const AutomatonCell& automatonCell = item.getAutomatonCell();
+        // Throw if this cell has already been traversed in this recursion cycle
+        if (automatonCell.hasCycleFlag()) {
+          B2WARNING("Cycle detected");
+          throw (CYCLE_DETECTED);
 
-
-        // at this point cellState has not been set before and
-        // the cell also does not carry the do not use flag
-
-        // search for neighbors
-        typename Neighborhood::range neighborRange = neighborhood.equal_range(&item);
-
-        //advance to a valid neighbor
-        while (neighborRange.first != neighborRange.second and
-               neighborRange.first.getNeighbor()->getAutomatonCell().hasDoNotUseFlag()) {
-          ++(neighborRange.first);
         }
 
-        CellState maxStateWithContinuation = 0;
-
-        if (neighborRange.first == neighborRange.second) {
-          // No further neighbors
-          // No additional point can be pick up for the continuation
-          maxStateWithContinuation = 0;
+        if (automatonCell.hasAssignedFlag()) {
+          return automatonCell.getCellState();
 
         } else {
-          // we have at least on valid neighbor now in neighborRange.first
-          // so this initial value will only last the initial loop
-          maxStateWithContinuation = -std::numeric_limits<CellState>::infinity();
-
-          //mark cell in order to detect if it was already traversed in this recursion cycle
+          // Mark cell in order to detect if it was already traversed in this recursion cycle
           item.getAutomatonCell().setCycleFlag();
 
-          // consider all neighbors as possible continuations and
-          // ask each how much value they have to offer
-          for (typename Neighborhood::iterator itNeighbor = neighborRange.first;
-               itNeighbor != neighborRange.second; ++itNeighbor) {
+          const CellState& finalCellState = updateState(item, neighborhood);
 
-            const Item* neighbor = itNeighbor.getNeighbor();
-
-            if (not neighbor->getAutomatonCell().hasDoNotUseFlag()) {
-
-              // Invalidate a possible start flag since the neighbor has an ancestors
-              neighbor->getAutomatonCell().unsetStartFlag();
-
-              // Check if the neighbor was already marked in this recursion cycle
-              // Preventing an infinit loop
-              if (neighbor->getAutomatonCell().hasCycleFlag()) {
-                // encountered cycle
-                // do not unset IS_CYCLE of this item
-                item.getAutomatonCell().setCellState(NO_CONTINUATION);
-                B2WARNING("Cycle detected");
-                return item.getAutomatonCell().getCellState();
-
-              }
-
-              // Get the value of the neighbor
-              // If it was set just get it
-              // If is was not set go into the recursion
-              const CellState& stateWithoutContinuation =
-                neighbor->getAutomatonCell().hasAssignedFlag() ?
-                neighbor->getAutomatonCell().getCellState() :
-                updateState(*neighbor, neighborhood);
-
-
-              // Add the value of the connetion to the gain value
-              CellState stateWithContinuation = stateWithoutContinuation + itNeighbor.getWeight();
-
-              // Remember only the maximum value of all neighbors
-              maxStateWithContinuation = std::max(maxStateWithContinuation, stateWithContinuation);
-
-            }
-          }
-
-          // no cycle encountered, unset flag
+          // Unmark the cell
           item.getAutomatonCell().unsetCycleFlag();
+          return finalCellState;
+        }
+      }
 
+
+
+      /// Updates the state of a cell considering all continuations recursively
+      const CellState& updateState(const Item& item, const Neighborhood& neighborhood) const {
+        //--- blocked cells do not contribute a continuation ---
+        if (item.getAutomatonCell().hasDoNotUseFlag()) {
+          item.getAutomatonCell().setCellState(NAN);
+          item.getAutomatonCell().setAssignedFlag();
+          return item.getAutomatonCell().getCellState();
+
+        }
+
+        //--- Search for neighbors ---
+        CellState maxStateWithContinuation = -std::numeric_limits<CellState>::infinity();
+
+        // Check neighbors now
+        for (const typename Neighborhood::WeightedRelation & relation : neighborhood.equal_range(&item)) {
+          //advance to valid neighbor
+          const Item* ptrNeighbor = getNeighbor(relation);
+          if (ptrNeighbor and not ptrNeighbor->getAutomatonCell().hasDoNotUseFlag()) {
+
+            const Item& neighbor = *ptrNeighbor;
+
+            // Invalidate a possible start flag since the neighbor has an ancestors
+            neighbor.getAutomatonCell().unsetStartFlag();
+
+            // Get the value of the neighbor
+            const CellState& stateWithoutContinuation = getFinalCellState(neighbor, neighborhood);
+
+            // Add the value of the connetion to the gain value
+            CellState stateWithContinuation = stateWithoutContinuation + getWeight(relation);
+
+            // Remember only the maximum value of all neighbors
+            maxStateWithContinuation = std::max(maxStateWithContinuation, stateWithContinuation);
+
+          } //end if hasDoNotUse()
+        } // end for relations
+
+        if (maxStateWithContinuation == -std::numeric_limits<CellState>::infinity()) {
+          // No valid neighbor contributed a connection to the cell
+          maxStateWithContinuation = 0;
         }
 
         // Add the value of this cell to the value of the best neighbor continuation
         // to get the total value since this cell shall also be part of the path
         maxStateWithContinuation += item.getAutomatonCell().getCellWeight();
 
-        // Set this cell has a correct value
-        item.getAutomatonCell().setAssignedFlag();
         // Set the value
         item.getAutomatonCell().setCellState(maxStateWithContinuation);
+
+        // Mark this cell as having its final value
+        item.getAutomatonCell().setAssignedFlag();
 
         // Return the just determined value
         return item.getAutomatonCell().getCellState();
 
       }
+
 
     private:
 

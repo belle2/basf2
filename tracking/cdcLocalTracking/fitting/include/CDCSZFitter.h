@@ -40,6 +40,14 @@ namespace Belle2 {
         return trajectorySZ;
       }
 
+      /// Fits a linear sz trajectory to the z and s coordinates in the stereo segment.
+      CDCTrajectorySZ fit(const CDCRecoSegment3D& segment3D) const {
+        CDCTrajectorySZ trajectorySZ;
+        update(trajectorySZ, segment3D);
+        return trajectorySZ;
+      }
+
+
       /// Updates the trajectory of the axial stereo segment pair inplace
       void update(const CDCAxialStereoSegmentPair& axialStereoSegmentPair) const;
 

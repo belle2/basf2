@@ -10,16 +10,40 @@
 #ifndef CDCRECOSEGMENT3D_H
 #define CDCRECOSEGMENT3D_H
 
+#include "CDCRecoSegment2D.h"
 
 #include <tracking/cdcLocalTracking/eventdata/collections/CDCRecoHit3DVector.h>
 
 namespace Belle2 {
   namespace CDCLocalTracking {
 
-    //for now a typedef is enough
-    //may get additional methods if necessary
-    /// A segment consisting of three dimensional reconsturcted hits
-    typedef CDCRecoHit3DVector CDCRecoSegment3D;
+    /// A segment consisting of three dimensional reconstructed hits.
+    class CDCRecoSegment3D : public CDCRecoHit3DVector {
+
+    public:
+      /// Default constructor for ROOT compatibility.
+      CDCRecoSegment3D() {;}
+
+      /// Empty deconstructor
+      ~CDCRecoSegment3D() {;}
+
+      static CDCRecoSegment3D reconstruct(const CDCRecoSegment2D& segment2D, const CDCTrajectory2D& trajectory2D) {
+        CDCRecoSegment3D segment3D;
+        for (const CDCRecoHit2D & recoHit2D : segment2D) {
+          CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit2D, trajectory2D);
+          segment3D.push_back(recoHit3D);
+        }
+        return segment3D;
+
+      }
+
+
+    private:
+      /// ROOT Macro to make CDCRecoSegment3D a ROOT class.
+      ClassDefInCDCLocalTracking(CDCRecoSegment3D, 1);
+
+
+    };
 
   }
 }

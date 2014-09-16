@@ -17,6 +17,8 @@
 
 #pragma link C++ class Belle2::CDCLocalTracking::CDCRecoSegment2D+;
 
+#pragma link C++ class Belle2::CDCLocalTracking::CDCRecoSegment3D+;
+
 #endif
 
 #endif

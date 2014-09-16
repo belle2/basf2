@@ -77,29 +77,29 @@ namespace Belle2 {
       ///Reconstruct the start segment of a triple and append it to the track
       void appendStartRecoHits3D(const CDCSegmentTriple& triple,
                                  FloatType perpSOffset,
-                                 CDCRecoSegment3D& recohits3D) const;
+                                 CDCTrack& recohits3D) const;
 
       /// Reconstruct the middle segment of a triple and append it to the track
       void appendMiddleRecoHits3D(const CDCSegmentTriple& triple,
                                   FloatType perpSOffset,
-                                  CDCRecoSegment3D& recohits3D) const;
+                                  CDCTrack& recohits3D) const;
 
       /// Reconstruct the end segment of a triple and append it to the track
       void appendEndRecoHits3D(const CDCSegmentTriple& triple,
                                FloatType perpSOffset,
-                               CDCRecoSegment3D& recohits3D) const;
+                               CDCTrack& recohits3D) const;
 
 
 
       ///Reconstruct the start segment of a pair and append it to the track
       void appendStartRecoHits3D(const CDCAxialStereoSegmentPair& pair,
                                  FloatType perpSOffset,
-                                 CDCRecoSegment3D& recohits3D) const;
+                                 CDCTrack& recohits3D) const;
 
       ///Reconstruct the last segment of a pair and append it to the track
       void appendEndRecoHits3D(const CDCAxialStereoSegmentPair& pair,
                                FloatType perpSOffset,
-                               CDCRecoSegment3D& recohits3D) const;
+                               CDCTrack& recohits3D) const;
 
 
 
@@ -108,7 +108,7 @@ namespace Belle2 {
                             const CDCTrajectory2D& trajectory2D,
                             const CDCTrajectorySZ& trajectorySZ,
                             FloatType perpSOffset,
-                            CDCRecoSegment3D& recohits3D) const;
+                            CDCTrack& recohits3D) const;
 
 
 
@@ -117,7 +117,7 @@ namespace Belle2 {
       FloatType appendAverageStartEnd(const CDCSegmentTriple& triple,
                                       const CDCSegmentTriple& followingTriple,
                                       FloatType perpSOffset,
-                                      CDCRecoSegment3D& recohits3D) const;
+                                      CDCTrack& recohits3D) const;
 
 
 
@@ -126,7 +126,7 @@ namespace Belle2 {
       FloatType appendAverageStartEnd(const CDCAxialStereoSegmentPair& pair,
                                       const CDCAxialStereoSegmentPair& followingPair,
                                       FloatType perpSOffset,
-                                      CDCRecoSegment3D& recohits3D) const;
+                                      CDCTrack& recohits3D) const;
 
       /** Append the three dimensional reconstructed hits from the given segments averaged over two possible trajectories.
        *  In case of overlapping segments in segment triple or segment pairs segment usually participate in two trajectory fits.
@@ -144,7 +144,7 @@ namespace Belle2 {
                               FloatType perpSOffset,
                               const CDCTrajectory2D& followingTrajectory2D,
                               const CDCTrajectorySZ& followingTrajectorySZ,
-                              CDCRecoSegment3D& recohits3D) const;
+                              CDCTrack& recohits3D) const;
 
 
     }; // end class TrackCreator

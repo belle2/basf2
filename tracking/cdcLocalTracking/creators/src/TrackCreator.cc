@@ -202,7 +202,7 @@ bool TrackCreator::create(const CDCAxialRecoSegment2D& segment,
 
 void TrackCreator::appendStartRecoHits3D(const CDCSegmentTriple& triple,
                                          FloatType perpSOffset,
-                                         CDCRecoSegment3D& recohits3D) const
+                                         CDCTrack& recohits3D) const
 {
   const CDCRecoSegment2D* startSegment = triple.getStart();
   if (startSegment != nullptr) {
@@ -218,7 +218,7 @@ void TrackCreator::appendStartRecoHits3D(const CDCSegmentTriple& triple,
 
 void TrackCreator::appendMiddleRecoHits3D(const CDCSegmentTriple& triple,
                                           FloatType perpSOffset,
-                                          CDCRecoSegment3D& recohits3D) const
+                                          CDCTrack& recohits3D) const
 {
   const CDCRecoSegment2D* middleSegment = triple.getMiddle();
   if (middleSegment != nullptr) {
@@ -234,7 +234,7 @@ void TrackCreator::appendMiddleRecoHits3D(const CDCSegmentTriple& triple,
 
 void TrackCreator::appendEndRecoHits3D(const CDCSegmentTriple& triple,
                                        FloatType perpSOffset,
-                                       CDCRecoSegment3D& recohits3D) const
+                                       CDCTrack& recohits3D) const
 {
   const CDCRecoSegment2D* endSegment = triple.getEnd();
   if (endSegment != nullptr) {
@@ -252,7 +252,7 @@ void TrackCreator::appendEndRecoHits3D(const CDCSegmentTriple& triple,
 
 void TrackCreator::appendStartRecoHits3D(const CDCAxialStereoSegmentPair& pair,
                                          FloatType perpSOffset,
-                                         CDCRecoSegment3D& recohits3D) const
+                                         CDCTrack& recohits3D) const
 {
 
   const CDCRecoSegment2D* ptrStartSegment = pair.getStartSegment();
@@ -269,7 +269,7 @@ void TrackCreator::appendStartRecoHits3D(const CDCAxialStereoSegmentPair& pair,
 
 void TrackCreator::appendEndRecoHits3D(const CDCAxialStereoSegmentPair& pair,
                                        FloatType perpSOffset,
-                                       CDCRecoSegment3D& recohits3D) const
+                                       CDCTrack& recohits3D) const
 {
   const CDCRecoSegment2D* ptrEndSegment = pair.getEndSegment();
   if (ptrEndSegment != nullptr) {
@@ -298,7 +298,7 @@ void TrackCreator::appendRecoHits3D(const CDCRecoSegment2D& segment,
                                     const CDCTrajectory2D& trajectory2D,
                                     const CDCTrajectorySZ& trajectorySZ,
                                     FloatType perpSOffset,
-                                    CDCRecoSegment3D& recohits3D) const
+                                    CDCTrack& recohits3D) const
 {
   BOOST_FOREACH(const CDCRecoHit2D & recohit2D, segment) {
     //for ( CDCRecoSegment2D::const_iterator itRecoHit2D = segment->begin();
@@ -319,7 +319,7 @@ void TrackCreator::appendRecoHits3D(const CDCRecoSegment2D& segment,
 FloatType TrackCreator::appendAverageStartEnd(const CDCSegmentTriple& triple,
                                               const CDCSegmentTriple& followingTriple,
                                               FloatType perpSOffset,
-                                              CDCRecoSegment3D& recoHits3D) const
+                                              CDCTrack& recoHits3D) const
 {
 
   const CDCRecoSegment2D* ptrEndSegment = triple.getEnd();
@@ -355,7 +355,7 @@ FloatType TrackCreator::appendAverageStartEnd(const CDCSegmentTriple& triple,
 FloatType TrackCreator::appendAverageStartEnd(const CDCAxialStereoSegmentPair& pair,
                                               const CDCAxialStereoSegmentPair& followingPair,
                                               FloatType perpSOffset,
-                                              CDCRecoSegment3D& recoHits3D) const
+                                              CDCTrack& recoHits3D) const
 {
 
   const CDCRecoSegment2D* ptrEndSegment = pair.getEndSegment();
@@ -390,7 +390,7 @@ FloatType TrackCreator::appendAverage(const CDCRecoSegment2D& segment,
                                       FloatType perpSOffset,
                                       const CDCTrajectory2D& followingTrajectory2D,
                                       const CDCTrajectorySZ& followingTrajectorySZ,
-                                      CDCRecoSegment3D& recoHits3D) const
+                                      CDCTrack& recoHits3D) const
 {
   if (segment.empty()) return perpSOffset;
 

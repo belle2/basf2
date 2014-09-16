@@ -178,6 +178,15 @@ namespace Belle2 {
         else return STEREO_V;
       }
 
+      /// Gives the xy projected position of the wire at the given z coordinate
+      Vector2D getWirePos2DAtZ(const FloatType& z) const
+      { return getSkewLine().pos2DAtZ(z); }
+
+      /// Gives the xy projected position of the wire at the given z coordinate
+      Vector3D getWirePos3DAtZ(const FloatType& z) const
+      { return getSkewLine().pos3DAtZ(z); }
+
+
       /// Getter for the wire reference position.
       /** Gives the wire's reference position
        *  which is the point of closest approach to the beam axes.

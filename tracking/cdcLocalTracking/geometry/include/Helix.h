@@ -114,6 +114,16 @@ namespace Belle2 {
       /// Computes the Jacobi matrix for a move of the coordinate system by the given vector.
       TMatrixD passiveMoveByJacobian(const Vector3D& by) const;
 
+
+      /// Shifts the szSlope and z0 by the given amount. Method is specific to the corrections in the fusion fit.
+      void shiftSZSlopeIntercept(const FloatType& szSlopeShift, const FloatType& zShift) {
+        FloatType z0 = m_lineSZ.intercept();
+        FloatType szSlope = m_lineSZ.slope();
+        m_lineSZ.setSlopeIntercept(szSlope + szSlopeShift, z0 + zShift);
+      }
+
+
+
       /// Calculates the point, which lies at the give perpendicular travel distance (counted from the perigee)
       Vector3D atPerpS(const FloatType& perpS) const
       { return Vector3D(circleXY().atPerpS(perpS), lineSZ().map(perpS)); }

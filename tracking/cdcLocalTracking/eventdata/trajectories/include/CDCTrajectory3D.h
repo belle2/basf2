@@ -153,6 +153,13 @@ namespace Belle2 {
       FloatType getSZSlope() const
       { return getLocalHelix().szSlope(); }
 
+      /// Shifts the szSlope and z0 by the given amount. Method is specific to the corrections in the fusion fit.
+      void shiftSZSlopeIntercept(const FloatType& szSlopeShift, const FloatType& zShift)
+      { m_localHelix.shiftSZSlopeIntercept(szSlopeShift, zShift); }
+
+
+
+
       /// Getter for the curvature as seen from the xy projection.
       FloatType getCurvatureXY() const
       { return getLocalHelix().curvatureXY(); }

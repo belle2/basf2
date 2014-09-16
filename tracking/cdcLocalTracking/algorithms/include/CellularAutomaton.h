@@ -166,10 +166,10 @@ namespace Belle2 {
             neighbor.getAutomatonCell().unsetStartFlag();
 
             // Get the value of the neighbor
-            const CellState& stateWithoutContinuation = getFinalCellState(neighbor, neighborhood);
+            const CellState& neighborCellState = getFinalCellState(neighbor, neighborhood);
 
             // Add the value of the connetion to the gain value
-            CellState stateWithContinuation = stateWithoutContinuation + getWeight(relation);
+            CellState stateWithContinuation = neighborCellState + getWeight(relation);
 
             // Remember only the maximum value of all neighbors
             maxStateWithContinuation = std::max(maxStateWithContinuation, stateWithContinuation);

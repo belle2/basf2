@@ -199,6 +199,9 @@ namespace Belle2 {
       /// Getter for the 2d position of the hit
       const Vector2D& getRecoPos2D() const { return getRecoPos3D().xy(); }
 
+      /// Getter for the z coordinate of the reconstructed position
+      const FloatType& getRecoZ() const { return getRecoPos3D().z(); }
+
       /// Projects the hit's reconstructed position onto the given two dimensional trajectory
       Vector2D getRecoPos2D(const CDCTrajectory2D& trajectory2D) const
       { return trajectory2D.getClosest(getRecoPos2D()); }
@@ -209,6 +212,20 @@ namespace Belle2 {
       /// Constructs a two dimensional reconstructed hit by carrying out the stereo ! projection to the wire reference postion
       CDCRecoHit2D getRecoHit2D() const
       { return CDCRecoHit2D(m_rlWireHit, getRecoDisp2D()); }
+
+
+
+      /// Returns the position of the wire in the xy plain the reconstructed position is located in
+      Vector2D getRecoWirePos2D() const
+      { return getWire().getWirePos2DAtZ(getRecoZ()); }
+
+      /// Returns the drift length next to the reconstructed position. Dummy implemented as the reference drift length
+      FloatType getSignedRecoDriftLength() const
+      { return getRLWireHit().getSignedRefDriftLength(); }
+
+      /// Returns the drift length variance next to the reconstructed position. Dummy implemented as the reference drift length
+      FloatType getRecoDriftLengthVariance() const
+      { return getRLWireHit().getRefDriftLengthVariance(); }
 
 
 

@@ -134,12 +134,36 @@ namespace Belle2 {
         }
       }
 
+      /// Appends the observed position - drift radius is signed number according to the orientation
+      void append(const Belle2::CDCLocalTracking::CDCRecoHit3D& recoHit3D, bool usePosition = false) {
+        if (usePosition) {
+          const Vector2D& recoPos2D = recoHit3D.getRecoPos2D();
+          const FloatType driftLength = 0.0;
+          const FloatType weight = 1.0 / recoHit3D.getWireHit().getRefDriftLengthVariance();
+          append(recoPos2D, driftLength, weight);
+        } else {
+          const Vector2D& recoPos2D = recoHit3D.getRecoWirePos2D();
+          const FloatType driftLength = recoHit3D.getSignedRecoDriftLength();
+          const FloatType weight = 1.0 / recoHit3D.getRecoDriftLengthVariance();
+          append(recoPos2D, driftLength, weight);
+        }
+      }
+
+
       /// Appends all reconstructed hits from the two dimensional segment, usePosition indicates whether the absolute position shall be used instead of the oriented wire hit information
       void append(const CDCRecoSegment2D& recoSegment2D, bool usePosition = false) {
         for (const CDCRecoHit2D & recoHit2D :  recoSegment2D) {
           append(recoHit2D, usePosition);
         }
       }
+
+      /// Appends all reconstructed hits from the three dimensional segment, usePosition indicates whether the absolute position shall be used instead of the oriented wire hit information next to the reconstructed position
+      void append(const CDCRecoSegment3D& recoSegment3D, bool usePosition = false) {
+        for (const CDCRecoHit3D & recoHit3D :  recoSegment3D) {
+          append(recoHit3D, usePosition);
+        }
+      }
+
 
       /// Appends all reconstructed hits from the two axial segments, usePosition indicates whether the absolute position shall be used instead of the oriented wire hit information.
       void append(const CDCAxialAxialSegmentPair& axialAxialSegmentPair,

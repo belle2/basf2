@@ -4,13 +4,15 @@ env['LIBS'] = [
     'framework',
     'mdst_dataobjects',
     'simulation_dataobjects',
-    'pxd_dataobjects',
-    'svd_dataobjects',
-    'vxd_dataobjects',
+    'pxd', 'pxd_dataobjects',
+    'svd', 'svd_dataobjects',
+    'vxd', 'vxd_dataobjects',
     'testbeam_vxd_dataobjects',
     'cdc', 'cdc_dataobjects',
     'genfit2',
-    'geometry', 'pxd', 'svd', 'testbeam'
+    'geometry', 'pxd', 'svd', 'testbeam',
+    'boost_chrono', 'geometry',
+    'tracking', 'tracking_dataobjects',
     ]
 Return('env')
 

@@ -27,6 +27,7 @@ namespace Belle2 {
       /// Empty deconstructor
       ~CDCRecoSegment3D() {;}
 
+      /// Reconstructs a two dimensional stereo segment by shifting each hit onto the given two dimensional trajectory.
       static CDCRecoSegment3D reconstruct(const CDCRecoSegment2D& segment2D, const CDCTrajectory2D& trajectory2D) {
         CDCRecoSegment3D segment3D;
         for (const CDCRecoHit2D & recoHit2D : segment2D) {
@@ -37,8 +38,18 @@ namespace Belle2 {
 
       }
 
+      /// Getter for the two dimensional trajectory.
+      const CDCTrajectory2D& getTrajectory2D() const
+      { return m_trajectory2D; }
+
+      /// Setter for the two dimensional trajectory.
+      void setTrajectory2D(const CDCTrajectory2D& trajectory2D)
+      { m_trajectory2D = trajectory2D; }
 
     private:
+      /// Memory for a two dimensional trajectory.
+      CDCTrajectory2D m_trajectory2D;
+
       /// ROOT Macro to make CDCRecoSegment3D a ROOT class.
       ClassDefInCDCLocalTracking(CDCRecoSegment3D, 1);
 

@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 ########## Register modules  ##########
 eventInfoSetterModule = register_module('EventInfoSetter')
-eventInfoSetterModule.param({'evtNumList': [1000], 'runList': [1],
+eventInfoSetterModule.param({'evtNumList': [10], 'runList': [1],
                             'expList': [1]})
 
 progressModule = register_module('Progress')

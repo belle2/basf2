@@ -12,7 +12,6 @@
 
 #include <framework/gearbox/Const.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -211,14 +210,14 @@ void CollectorTFInfo::initPersistent()
   B2DEBUG(100, "CollectorTFInfo: initPersistent");
 
   // Store Arrays for output
-  StoreArray<ClusterTFInfo>::registerPersistent();
-  StoreArray<SectorTFInfo>::registerPersistent();
-  StoreArray<HitTFInfo>::registerPersistent();
-  StoreArray<CellTFInfo>::registerPersistent();
-  StoreArray<TrackCandidateTFInfo>::registerPersistent();
+  m_clusterTFInfo.registerInDataStore("", DataStore::c_DontWriteOut);
+  m_sectorTFInfo.registerInDataStore("", DataStore::c_DontWriteOut);
+  m_hitTFInfo.registerInDataStore("", DataStore::c_DontWriteOut);
+  m_cellTFInfo.registerInDataStore("", DataStore::c_DontWriteOut);
+  m_tfcandTFInfo.registerInDataStore("", DataStore::c_DontWriteOut);
 
-  RelationArray::registerPersistent<SectorTFInfo, SectorTFInfo>("", "");
-  RelationArray::registerPersistent<CellTFInfo, CellTFInfo>("", "");
+  m_sectorTFInfo.registerRelationTo(m_sectorTFInfo);
+  m_cellTFInfo.registerRelationTo(m_cellTFInfo);
 }
 
 
@@ -844,92 +843,71 @@ void CollectorTFInfo::safeInformation()
   // Create Store Arrays for Output
 
   // CLUSTERS
-  StoreArray<ClusterTFInfo> clusterTFInfo("");
-  if (!clusterTFInfo.isValid())  clusterTFInfo.create();
-
   for (auto & currentCluster : m_clustersTF) {
-    clusterTFInfo.appendNew(currentCluster);
+    m_clusterTFInfo.appendNew(currentCluster);
   }
 
-  B2DEBUG(100, "*******  Cluster size: " << clusterTFInfo.getEntries() << " *******");
+  B2DEBUG(100, "*******  Cluster size: " << m_clusterTFInfo.getEntries() << " *******");
   B2DEBUG(100, "*******  akt Cluster size: " << m_clustersTF.size() << " *******");
 
   // SECTORS
-  StoreArray<SectorTFInfo> sectorTFInfo("");
-  if (sectorTFInfo.isValid() == false) { sectorTFInfo.create(); }
-
-
-  // Friends of Sectors
-  RelationArray relSectorSectorFriend(sectorTFInfo, sectorTFInfo);
-
   //std::map<KeySectors, SectorTFInfo>::iterator it;
   KeySectors friendKey;
 
   for (auto & currentSector : m_sectorTF) {
-    int indexSector = sectorTFInfo.getEntries();
 
-    sectorTFInfo.appendNew(currentSector.second);
-
-
-    for (auto & currentFriend : currentSector.second.getFriends()) {
-
-      // Pass_id
-      friendKey.first = currentSector.second.getPassIndex();
-      friendKey.second = currentFriend;
-
-      auto itCurrentSector = m_sectorTF.find(friendKey);
-
-      // Sector Search in current Sectors
-      if (itCurrentSector != m_sectorTF.end()) {
-        relSectorSectorFriend.add(indexSector, std::distance(m_sectorTF.begin(), itCurrentSector));
-        B2DEBUG(100, "passIndex: " << friendKey.first << "; Sector akt: " << indexSector << ", friend sector: " << std::distance(m_sectorTF.begin(), itCurrentSector) << ", sector id (akt/friend): " << currentSector.second.getSectorID() << " / " << currentFriend);
-      } else {
-        B2DEBUG(100, "Friend-Sector not found: " << currentFriend);
-      }
-
-      // same with sectorid; IDs = SectorIDs for akt. Sector and Friend sectors
-      //relSectorSectorFriend.add (currentSector.second.getSectorID(), currentFriend);
-    }
+    m_sectorTFInfo.appendNew(currentSector.second);
 
     B2DEBUG(100, "Display-Coor Sector:  " << currentSector.second.getDisplayInformation());
 
     for (auto & currentCoordinate : currentSector.second.getCoordinates()) {
       B2DEBUG(100, "Coor-Sector Coordinate: " << currentCoordinate.X() << "/" << currentCoordinate.Y() << "/" << currentCoordinate.Z());
     }
-
   }
 
-  B2DEBUG(100, "*******  SECTORS size: " << sectorTFInfo.getEntries() << " *******");
+  // Friends of Sectors
+  // now prepare relations between sectors and their friends:
+  unsigned int nSector = 0, nSectorRelations = 0;
+  for (SectorTFInfo & aSectorInfo : m_sectorTFInfo) {
+    for (auto & currentFriend : aSectorInfo.getFriends()) {
+
+      // Pass_id
+      friendKey.first = aSectorInfo.getPassIndex();
+      friendKey.second = currentFriend;
+
+      auto itCurrentSector = m_sectorTF.find(friendKey);
+
+      // Sector Search in current Sectors
+      if (itCurrentSector != m_sectorTF.end()) {
+        aSectorInfo.addRelationTo(m_sectorTFInfo[std::distance(m_sectorTF.begin(), itCurrentSector)]);
+        B2DEBUG(100, "passIndex: " << friendKey.first << "; Sector akt: " << nSector << ", friend sector: " << std::distance(m_sectorTF.begin(), itCurrentSector) << ", sector id (akt/friend): " << aSectorInfo.getSectorID() << " / " << currentFriend);
+      } else {
+        B2DEBUG(100, "Friend-Sector not found: " << currentFriend);
+      }
+
+      ++nSectorRelations;
+      // same with sectorid; IDs = SectorIDs for akt. Sector and Friend sectors
+      //relSectorSectorFriend.add (aSectorInfo->getSectorID(), currentFriend);
+    }
+    ++nSector;
+  }
+
+  B2DEBUG(100, "*******  SECTORS size: " << m_sectorTFInfo.getEntries() << " *******");
   B2DEBUG(100, "*******  akt SECTORS size: " << m_sectorTF.size() << " *******");
 
-  B2DEBUG(100, "*******  relSectorSectorFriend: " << relSectorSectorFriend.getEntries() << " *******");
+  B2DEBUG(100, "*******  relSectorSectorFriend: " << nSectorRelations << " *******");
 
 
 
   // HITS
-  StoreArray<HitTFInfo> hitTFInfo("");
-  if (!hitTFInfo.isValid())  hitTFInfo.create();
-
   for (auto & currentHit : m_hitTF) {
-    hitTFInfo.appendNew(currentHit);
+    m_hitTFInfo.appendNew(currentHit);
   }
 
   // Cells
-  StoreArray<CellTFInfo> cellTFInfo("");
-  if (!cellTFInfo.isValid())  cellTFInfo.create();
+  for (CellTFInfo & currentCell : m_cellTF) {
 
-  RelationArray relCellNBCell(cellTFInfo, cellTFInfo);
-
-  for (auto & currentCell : m_cellTF) {
-    int indexCell = cellTFInfo.getEntries();
-
-    cellTFInfo.appendNew(currentCell);
-
-    // ID of cell/neighbours = Index of cell
-    for (auto & currentNb : currentCell.getNeighbours()) {
-      relCellNBCell.add(indexCell, currentNb);
-      B2DEBUG(100, "*******  relCellNBCell: indexCell: " << indexCell << ", currentNb: " << currentNb);
-    }
+    m_cellTFInfo.appendNew(currentCell);
 
     B2DEBUG(100, "Display-Coor Cell:  " << currentCell.getDisplayInformation());
 
@@ -939,14 +917,22 @@ void CollectorTFInfo::safeInformation()
 
   }
 
-  B2DEBUG(100, "*******  relCellNBCell: " << relCellNBCell.getEntries() << " *******");
+  // now prepare relations between connected/neighboring cells:
+  unsigned int nCell = 0, nCellRelations = 0;
+  for (CellTFInfo & aCellInfo : m_cellTFInfo) {
+    for (auto & currentNb : aCellInfo.getNeighbours()) {
+      aCellInfo.addRelationTo(m_cellTFInfo[currentNb]);
+      B2DEBUG(100, "*******  cells2Neighbors-relation: indexCell: " << nCell << ", currentNb: " << currentNb);
+      ++nCellRelations;
+    }
+    ++nCell;
+  }
+
+  B2DEBUG(100, "*******  num of cells2Neighbors-relations: " << nCellRelations << " *******");
 
   // TFCAND
-  StoreArray<TrackCandidateTFInfo> tfcandTFInfo("");
-  if (!tfcandTFInfo.isValid())  tfcandTFInfo.create();
-
   for (auto & currentTfCand : m_tfCandTF) {
-    tfcandTFInfo.appendNew(currentTfCand);
+    m_tfcandTFInfo.appendNew(currentTfCand);
 
     B2DEBUG(100, "Display-Coor TFCand:  " << currentTfCand.getDisplayInformation());
 

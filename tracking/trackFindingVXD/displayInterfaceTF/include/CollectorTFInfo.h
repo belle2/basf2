@@ -14,6 +14,10 @@
 #include <vector>
 #include <algorithm>
 
+#ifndef __CINT__
+#include <framework/datastore/StoreArray.h>
+# endif
+
 #include <tracking/trackFindingVXD/displayInterfaceTF/SectorTFInfo.h>
 #include <tracking/trackFindingVXD/displayInterfaceTF/ClusterTFInfo.h>
 #include <tracking/trackFindingVXD/displayInterfaceTF/HitTFInfo.h>
@@ -36,7 +40,7 @@ namespace Belle2 {
    *  m_cellTF (vector: CellTFInfo) = Cells
    *  m_tfCandTF (vector: TrackCandidateTFInfo) = Track Finder Candidates
    *
-   *  Important Methodes:
+   *  Important Methods:
    *  initSectors = all Sectors saved for all events in m_sectorTFAll
    *  initPersistent = registerPersistent for StoreArrays and Relations
    *  intEvent = clear Vectors for the Event
@@ -179,10 +183,22 @@ namespace Belle2 {
     const static int m_idHopfield;  /**< id of Hopfield*/
     const static int m_idAlive;   /**< id of Alive*/
 
+#ifndef __CINT__
+    /** shortcut to the ClusterTFInfos stored in the storeArray */
+    StoreArray<ClusterTFInfo> m_clusterTFInfo; //!
+    /** shortcut to the SectorTFInfos stored in the storeArray */
+    StoreArray<SectorTFInfo> m_sectorTFInfo; //!
+    /** shortcut to the HitTFInfos stored in the storeArray */
+    StoreArray<HitTFInfo> m_hitTFInfo; //!
+    /** shortcut to the CellTFInfos stored in the storeArray */
+    StoreArray<CellTFInfo> m_cellTFInfo; //!
+    /** shortcut to the TrackCandidateTFInfos stored in the storeArray */
+    StoreArray<TrackCandidateTFInfo> m_tfcandTFInfo; //!
+# endif
 
   private:
 
 
-    ClassDef(CollectorTFInfo, 1)
+    ClassDef(CollectorTFInfo, 2)
   };
 }

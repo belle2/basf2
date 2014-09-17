@@ -17,8 +17,6 @@
 #include <pxd/dataobjects/PXDCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>

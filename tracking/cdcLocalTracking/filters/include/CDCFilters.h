@@ -13,6 +13,8 @@
 #include <tracking/cdcLocalTracking/filters/facet/SimpleFacetFilter.h>
 #include <tracking/cdcLocalTracking/filters/facet_facet/SimpleFacetNeighborChooser.h>
 
+#include <tracking/cdcLocalTracking/filters/facet/AllFacetFilter.h>
+
 #include <tracking/cdcLocalTracking/filters/facet/MCFacetFilter.h>
 #include <tracking/cdcLocalTracking/filters/facet_facet/MCFacetNeighborChooser.h>
 

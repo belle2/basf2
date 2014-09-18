@@ -2,6 +2,6 @@
 
 export BELLE2_DAQ_SLC=$PWD
 export PATH=$BELLE2_DAQ_SLC/bin:$PATH
-export PGSQL_LIB_PATH=/usr/pgsql-9.2/
+export PGSQL_LIB_PATH=/usr/pgsql-9.3/
 export LD_LIBRARY_PATH=$BELLE2_DAQ_SLC/lib:$PGSQL_LIB_PATH/lib:$LD_LIBRARY_PATH
 

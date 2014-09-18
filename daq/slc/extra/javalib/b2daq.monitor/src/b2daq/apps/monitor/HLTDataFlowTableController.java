@@ -103,6 +103,16 @@ public class HLTDataFlowTableController implements Initializable, NSMObserver {
                     state.update(RCState.RUNNING_S);
                     break;
                 }
+                if (data.getObject("nodeinfo", 0).getFloat("evtrate_in") > 0 && 
+                    data.getObject("nodeinfo", 1).getFloat("evtrate_out") > 0) {
+                    state.update(RCState.RUNNING_S);
+                    setConnection(c_in, 1);
+                    setConnection(c_out, 1);
+                } else {
+                    state.update(RCState.NOTREADY_S);
+                    setConnection(c_in, -1);
+                    setConnection(c_out, -1);
+                }
                 if (table_stat.getItems().size() < data.getInt("nnodes")) {
                     table_stat.getItems().clear();
                     for (int i = 0; i < data.getInt("nnodes"); i++) {
@@ -144,8 +154,8 @@ public class HLTDataFlowTableController implements Initializable, NSMObserver {
                     flow.setFlowrateOut(cdata.getFloat("flowrate_out"));
                     flow.setEvtsizeOut(cdata.getFloat("evtsize_out"));
                 }
-                setConnection(c_in, connected_in);
-                setConnection(c_out, connected_out);
+                //setConnection(c_in, connected_in);
+                //setConnection(c_out, connected_out);
             }
         } catch (Exception e) {
             e.printStackTrace();

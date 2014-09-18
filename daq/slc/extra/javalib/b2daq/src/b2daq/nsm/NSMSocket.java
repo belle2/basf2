@@ -95,6 +95,7 @@ public class NSMSocket {
             }
             return msg;
         } catch (IOException e) {
+            e.printStackTrace();
             close();
             return null;
         }

@@ -3,7 +3,7 @@
 #
 
 hostname : localhost
-port : 9090
+port : 9092
 nsmhost : 192.168.10.1
 nsmport : 9122
 nsmnode : RC_GUI

@@ -4,7 +4,7 @@
 /* -- version info */
 
 #define NSM_PROTOCOL_VERSION 1926 /* protocol version */
-#define NSM_PACKAGE_VERSION  1937 /* package  version */
+#define NSM_PACKAGE_VERSION  1939 /* package  version */
 
 /*
   20120723 1900 file created
@@ -43,6 +43,8 @@
   20140902 1935 memset fix
   20140903 1936 debug message fix
   20140903 1937 nsmparse fix (see nsmparse.c)
+  20140917 1938 newclient error return fix / shm cleanup fix
+  20140917 1939 skip revision check by -1
  */
 
 /* -- DATA TYPES ----------------------------------------------------- */

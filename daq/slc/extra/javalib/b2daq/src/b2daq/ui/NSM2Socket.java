@@ -100,7 +100,6 @@ public class NSM2Socket {
                 n++;
             }
             new DataOutputStream(new FileOutputStream(new File(filename))).writeBytes(file.toString());
-            NSM2Socket socket = new NSM2Socket(config, netconfig);
             return new NSM2Socket(config, netconfig);
         } catch (IOException ex) {
             Logger.getLogger(NSM2Socket.class.getName()).log(Level.SEVERE, null, ex);

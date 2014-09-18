@@ -37,8 +37,9 @@
 //  20140902  1934 static bsizbuf pollution fix, broken tcprecv debug
 //  20140902  1935 memset fix
 //  20140903  1936 debug message fix
+//  20140917  1938 newclient error return fix / shm cleanup fix
 
-#define NSM_DAEMON_VERSION   1936 /* daemon   version 1.9.36 */
+#define NSM_DAEMON_VERSION   1938 /* daemon   version 1.9.38 */
 // ----------------------------------------------------------------------
 
 // -- include files -----------------------------------------------------
@@ -1109,11 +1110,18 @@ nsmd_shmopen(int shmkey, time_t now)
     if (sys.pid == mem.pid && sys.ipaddr == mem.ipaddr &&
         sys.timstart == mem.timstart) {
       if (kill(sys.pid, 0) < 0 && errno == ESRCH) { // unexpected
-        WARN("%s, %s: pid=%d, t=%d/%d",
+        WARN("%s, %s: pid=%d, ip=%08x, t=%d/%d",
              "shared memory without process",
              "killing maybe still running clients",
-             sys.pid, sys.timstart, sys.timevent);
+             sys.pid, sys.ipaddr, sys.timstart, sys.timevent);
         nsmd_destroy_clients();
+        sleep(1);
+        sys.pid = getpid();
+        sys.ipaddr = nsmd_myip;
+        sys.timstart = sys.timevent = now;
+        WARN("setting up new sys.pid=%d ip=%08x t=%d",
+             sys.pid, sys.ipaddr, sys.timstart);
+
       } else {
         const char* msg = (retsys == EACCES) ? " by other account" : "";
         int exit_code = (retsys == EACCES) ? NSMD_ESHMPERM : NSMD_ESHMGET;
@@ -3077,8 +3085,12 @@ nsmd_do_newclient(NSMcon& con, NSMdmsg& dmsg)
   for (int conid = 2; conid < sys.ncon; conid++) {
     if (sys.con[conid].pid == dmsg.pars[1]) {
       if (! ConidIsLocal(conid)) ERRO("do_newclient internal error 2");
-      sys.con[conid].nid = dmsg.pars[0];
-      sys.conid[dmsg.pars[0]] = conid;
+      if (dmsg.pars[0] < 0 || dmsg.pars[0] >= NSMSYS_MAX_NOD) {
+        sys.con[conid].nid = -1;
+      } else {
+        sys.con[conid].nid = dmsg.pars[0];
+        sys.conid[dmsg.pars[0]] = conid;
+      }
 
       if (sys.con[conid].sigobs) dmsg.req = NSMCMD_NEWCLIENTOB;
       nsmd_tcpsend(sys.con[conid], dmsg);

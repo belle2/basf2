@@ -599,7 +599,7 @@ void RunControlCallback::update() throw()
       count++;
       const RCState& state(m_node_v[i].getState());
       if (state != RCState::NOTREADY_S) {
-        notready_all;
+        notready_all = false;
       }
       if (state == RCState::ABORTING_RS) {
         aborting_any = true;

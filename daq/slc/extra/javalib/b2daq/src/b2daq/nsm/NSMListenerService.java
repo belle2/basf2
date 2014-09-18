@@ -85,18 +85,14 @@ public class NSMListenerService extends Thread {
 
     @Override
     public void run() {
+        NSMConfig config = getNSMConfig();
         is_closecalled = false;
         int ntry = 0;
         while (true) {
             if (is_closecalled) {
                 return;
             }
-            if (m_socket != null) {
-                m_socket.close();
-                connection.set(false);
-            }
-            NSMConfig config = getNSMConfig();
-            if (m_socket.reconnect(config.getHostname(),
+            if (connection.get() == true || m_socket.reconnect(config.getHostname(),
                     config.getPort(), config.getNsmNode(),
                     config.getNsmHost(), config.getNsmPort())) {
                 connection.set(true);
@@ -140,8 +136,11 @@ public class NSMListenerService extends Thread {
                     return;
                 }
             }
+            if (m_socket != null) {
+                m_socket.close();
+                connection.set(false);
+            }
         }
-
     }
 
     public static boolean request(NSMMessage msg) {
@@ -207,57 +206,74 @@ public class NSMListenerService extends Thread {
     }
 
     private static void handleOnConnected() {
-        Platform.runLater(() -> {
-            for (NSMObserver obs : m_observer) {
-                try {
-                    obs.handleOnConnected();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    log(new LogMessage("LOCAL", LogLevel.ERROR,
-                            "Internal exception " + e.getMessage()));
-                }
-            }
-        });
+        /*
+         Platform.runLater(() -> {
+         for (NSMObserver obs : m_observer) {
+         try {
+         obs.handleOnConnected();
+         } catch (Exception e) {
+         e.printStackTrace();
+         log(new LogMessage("LOCAL", LogLevel.ERROR,
+         "Internal exception " + e.getMessage()));
+         }
+         }
+         });
+         */
     }
 
     private static void handleOnReceived(final NSMMessage msg) {
-        Platform.runLater(() -> {
-            for (NSMObserver obs : m_observer) {
-                try {
-                    obs.handleOnReceived(msg);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    log(new LogMessage("LOCAL", LogLevel.ERROR,
-                            "Internal exception " + e.getMessage()));
-                }
-            }
-        });
+        /*
+         Platform.runLater(() -> {
+         for (NSMObserver obs : m_observer) {
+         try {
+         obs.handleOnReceived(msg);
+         } catch (Exception e) {
+         e.printStackTrace();
+         log(new LogMessage("LOCAL", LogLevel.ERROR,
+         "Internal exception " + e.getMessage()));
+         }
+         }
+         });
+         */
     }
 
     private static void handleOnDisConnected() {
-        Platform.runLater(() -> {
-            for (NSMObserver obs : m_observer) {
-                try {
-                    obs.handleOnDisConnected();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    log(new LogMessage("LOCAL", LogLevel.ERROR,
-                            "Internal exception " + e.getMessage()));
-                }
-            }
-        });
+        /*
+         Platform.runLater(() -> {
+         for (NSMObserver obs : m_observer) {
+         try {
+         obs.handleOnDisConnected();
+         } catch (Exception e) {
+         e.printStackTrace();
+         log(new LogMessage("LOCAL", LogLevel.ERROR,
+         "Internal exception " + e.getMessage()));
+         }
+         }
+         });
+         */
     }
 
     private static void log(final LogMessage log) {
-        Platform.runLater(() -> {
-            for (NSMObserver obs : m_observer) {
-                obs.log(log);
-            }
-        });
+        System.out.println(log.getMessage());
+        /*
+         Platform.runLater(() -> {
+         for (NSMObserver obs : m_observer) {
+         obs.log(log);
+         }
+         });
+         */
     }
 
     public static void restart() {
         if (g_service == null || !g_service.isAlive()) {
+            NSMConfig config = getNSMConfig();
+            if (m_socket.reconnect(config.getHostname(),
+                    config.getPort(), config.getNsmNode(),
+                    config.getNsmHost(), config.getNsmPort())) {
+                connection.set(true);
+            } else {
+                connection.set(false);
+            }
             g_service = new NSMListenerService();
             g_service.start();
         }

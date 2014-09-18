@@ -30,6 +30,7 @@ DAQLogMessage::DAQLogMessage(const std::string& nodename,
   addChar("priority", 0);
   setPriority(priority);
   addText("message", message);
+  setNode(nodename);
 }
 
 DAQLogMessage::DAQLogMessage(const std::string& nodename,
@@ -45,6 +46,7 @@ DAQLogMessage::DAQLogMessage(const std::string& nodename,
   addChar("priority", 0);
   setPriority(priority);
   addText("message", message);
+  setNode(nodename);
 }
 
 DAQLogMessage::DAQLogMessage(const DAQLogMessage& log) throw()

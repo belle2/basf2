@@ -24,12 +24,4 @@ public class NumberString {
         }
     }
 
-    static public void main(String[] argv) {
-        System.out.println(NumberString.toString(1.5280956416000001E9, 10));
-        System.out.println(NumberString.toString(1510.0e-1, 0));
-        System.out.println(NumberString.toString(0.5100, 1));
-        System.out.println(NumberString.toString(0.000005100, 5));
-        System.out.println(NumberString.toString(-510, 0));
-        System.out.println(NumberString.toString(0, 5));
-    }
 }

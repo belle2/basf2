@@ -9,6 +9,7 @@
   20140428 nsmparse_malloc fix
   20140902 memset fix (T.Konno)
   20140903 n_same fix for nested struct
+  20140917 -1 to skip revision check
  */
 
 #include <stdio.h>
@@ -468,7 +469,6 @@ nsmparse_scan(const char *file, char *filebuf, char *start, char **endp,
 	parsep->next = (NSMparse *)nsmparse_malloc(sizeof(NSMparse),
 						   "scan", file);
 	parsep = parsep->next;
-	memset(parsep, 0, sizeof(NSMparse));
 	parsep->type = ')';
 	parsep->offset = offset; /* probably not correct */
 	
@@ -645,7 +645,8 @@ nsmparse_findfile(const char *name, const char *incpath)
 /* -- nsmlib_parsestr ------------------------------------------------- */
 static NSMparse *
 nsmlib_parsestr(const char *datname, int revision,
-		const char *filebuf, const char *filepath, char *fmtstr)
+		const char *filebuf, const char *filepath, char *fmtstr,
+                int *revisionp)
 {
   char *datlist;
   char *strbegin;
@@ -670,13 +671,15 @@ nsmlib_parsestr(const char *datname, int revision,
     return 0;
   }
 
-  if (ret != revision) {
+  if (revision != -1 && ret != revision) {
     nsmparse_errcode = NSMEPARSENOREV;
     sprintf(nsmparse_errstr, "revision mismatch, found %d while expecting %d",
 	    ret, revision);
     free(parsebuf);
     return 0;
   }
+
+  if (revisionp) *revisionp = ret;
   
   if (! (strbegin = nsmparse_struct(parsebuf, datname))) {
     nsmparse_errcode = NSMEPARSENOSTR;
@@ -696,7 +699,7 @@ nsmlib_parsestr(const char *datname, int revision,
 /* -- nsmlib_parse ---------------------------------------------------- */
 NSMparse *
 nsmlib_parsefile(const char *datname, int revision, const char *incpath,
-		 char *fmtstr)
+		 char *fmtstr, int *revisionp)
 {
   off_t filelen;
   char *filepath;
@@ -715,16 +718,17 @@ nsmlib_parsefile(const char *datname, int revision, const char *incpath,
   
   if (! filebuf) return 0;
 
-  parsep = nsmlib_parsestr(datname, revision, filebuf, filepath, fmtstr);
+  parsep = nsmlib_parsestr(datname, revision, filebuf, filepath, fmtstr,
+                           revisionp);
   free(filebuf);
 
   return parsep;
 }
 /* -- nsmlib_parseerr ------------------------------------------------- */
 const char *
-nsmlib_parseerr(int *code)
+nsmlib_parseerr(int *codep)
 {
-  if (code) *code = nsmparse_errcode;
+  if (codep) *codep = nsmparse_errcode;
   return nsmparse_errstr;
 }
 /* -- main ------------------------------------------------------------ */
@@ -736,6 +740,7 @@ main(int argc, char **argv)
   char *incpath;
   char fmtstr[256];
   int revision;
+  int newrevision = -1;
   NSMparse *parsep;
   char indent[256];
 
@@ -753,7 +758,7 @@ main(int argc, char **argv)
   if (revision <= 0) {
     printf("wrong revision %d\n", revision);
   } else if (parsep = nsmlib_parsefile(datname, revision, incpath,
-				       fmtstr)) {
+				       fmtstr, &newrevison)) {
     printf("parsep found: %s\n", fmtstr);
   } else {
     int errcode;

@@ -20,9 +20,10 @@
    20140614 1933 use nodhash for nsmlib_nodeid
    20140902 1935 memset fix
    20140903 1937 nsmparse fix (see nsmparse.c)
+   20140917 1939 skip revision check for -1
 \* ---------------------------------------------------------------------- */
 
-const char *nsmlib2_version   = "nsmlib2 1.9.37";
+const char *nsmlib2_version   = "nsmlib2 1.9.39";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -1365,6 +1366,7 @@ nsmlib_readmem(NSMcontext *nsmc, void *buf,
   int ret;
   int datid;
   NSMdat *datp;
+  int newrevision = -1;
   
   if (! fmtname) fmtname = datname;
   
@@ -1372,11 +1374,15 @@ nsmlib_readmem(NSMcontext *nsmc, void *buf,
     sprintf(nsmc->errs, "invalid revision %d for data %s", revision, datname);
     return nsmc->errc = NSMEINVPAR;
   }
-  if (! (nsmlib_parsefile(fmtname, revision, nsmlib_incpath, fmtstr))) {
+  if (! (nsmlib_parsefile(fmtname, revision, nsmlib_incpath, fmtstr,
+                          &newrevision))) {
     int errcode;
     const char *errstr = nsmlib_parseerr(&errcode);
     sprintf(nsmc->errs, "cannot read data %s, %s", datname, errstr);
     return nsmc->errc = NSMEPARSE;
+  }
+  if (revision == -1) {
+    revision = newrevision;
   }
 
   /* linear search, to be replaced with a hash version */
@@ -1394,7 +1400,7 @@ nsmlib_readmem(NSMcontext *nsmc, void *buf,
     return nsmc->errc = NSMEBADFMT;
   }
   if (ntohs(datp->dtrev) != revision) {
-    sprintf(nsmc->errs, "data %s revision mismatch %d %d\n",
+    sprintf(nsmc->errs, "data %s revision mismatch %d %d",
 	   datname, revision, datp->dtrev);
     return nsmc->errc = NSMEBADREV;
   }
@@ -1416,20 +1422,25 @@ nsmlib_openmem(NSMcontext *nsmc,
   int ret;
   int datid;
   NSMdat *datp;
+  int newrevision = -1;
   
   if (! fmtname) fmtname = datname;
   
-  if (revision <= 0) {
+  if (revision <= 0 && revision != -1) {
     sprintf(nsmc->errs, "invalid revision %d for data %s", revision, datname);
     nsmc->errc = NSMEINVPAR;
     return 0;
   }
-  if (! (nsmlib_parsefile(fmtname, revision, nsmlib_incpath, fmtstr))) {
+  if (! (nsmlib_parsefile(fmtname, revision, nsmlib_incpath, fmtstr,
+                          &newrevision))) {
     int errcode;
     const char *errstr = nsmlib_parseerr(&errcode);
     sprintf(nsmc->errs, "cannot open data %s, %s", datname, errstr);
     nsmc->errc = NSMEPARSE;
     return 0;
+  }
+  if (revision == -1) {
+    revision = newrevision;
   }
 
   /* linear search, to be replaced with a hash version */
@@ -1487,6 +1498,7 @@ nsmlib_allocmem(NSMcontext *nsmc, const char *datname, const char *fmtname,
   char *p;
   NSMsys *sysp = nsmc->sysp;
   NSMmem *memp = nsmc->memp;
+  int newrevision = -1;
 
   DBG("allocmem 1");
   
@@ -1499,10 +1511,17 @@ nsmlib_allocmem(NSMcontext *nsmc, const char *datname, const char *fmtname,
     return 0;
   }
   
-  if (! (nsmlib_parsefile(fmtname, revision, nsmlib_incpath, fmtstr))) {
+  if (! (nsmlib_parsefile(fmtname, revision, nsmlib_incpath, fmtstr,
+                          &newrevision))) {
     int errcode;
     const char *errstr = nsmlib_parseerr(&errcode);
     sprintf(nsmc->errs, "cannot allocate data %s, %s", datname, errstr);
+    nsmc->errc = NSMEPARSE;
+    return 0;
+  }
+  if (revision != newrevision) {
+    sprintf(nsmc->errs, "data revision mismatch for %s, %d != %d",
+            datname, revision, newrevision);
     nsmc->errc = NSMEPARSE;
     return 0;
   }

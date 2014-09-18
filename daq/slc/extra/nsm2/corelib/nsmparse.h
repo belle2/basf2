@@ -26,7 +26,7 @@ typedef struct NSMparse_struct NSMparse;
 #endif /* nsm2_typedef_parse */
 
 NSMparse* nsmlib_parsefile(const char* datname, int revision,
-                           const char* incpath, char* fmtstr);
+                           const char* incpath, char* fmtstr, int* revisionp);
 
 const char* nsmlib_parseerr(int* code);
 

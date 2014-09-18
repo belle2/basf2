@@ -42,7 +42,8 @@ PreCutHistMakerModule::PreCutHistMakerModule():
   m_histogramSignal("", DataStore::c_Persistent),
   m_histogramAll("", DataStore::c_Persistent),
   m_generator_signal(nullptr),
-  m_generator_all(nullptr)
+  m_generator_all(nullptr),
+  m_iEvent(0)
 {
   setDescription("Saves distribution of a variable of combined particles (from input ParticleLists) into histogram 'all'. If the daughters can be combined into a correctly reconstructed (!) particle of specified type, save variable value for this combination to a histogram called 'signal'. This is equivalent to running ParticleCombiner on the given lists and saving the variable value of Particles with isSignal == 1 and everything else, but much faster (since Particles don't need to be saved).");
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
@@ -163,8 +164,6 @@ void PreCutHistMakerModule::initialize()
 
   m_generator_all = new ParticleGenerator(m_decayString);
   m_generator_signal = new ParticleGenerator(onlySignal_decayString.str());
-
-  m_iEvent = 0;
 }
 
 

@@ -18,7 +18,7 @@ std::string Belle2::Variable::makeROOTCompatible(std::string str)
 bool almostEqualFloat(const float& a, const float& b)
 {
   assert(sizeof(float) == sizeof(int));
-  return abs(*(int*)&a - * (int*)&b) <= 2;
+  return abs(*(int*)&a - * (int*)&b) <= 2 or (a == b);
 }
 
 unsigned long int Belle2::Variable::findMatchedParenthesis(std::string str, char open, char close)

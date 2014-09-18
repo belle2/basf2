@@ -148,16 +148,23 @@ void ParticleList::removeParticles(const std::vector<unsigned int>& toRemove, bo
   }
   m_scList = newList;
 
-  if (!removeFromAntiList)
-    return;
+  if (removeFromAntiList and !m_antiListName.empty()) {
+    StoreObjPtr<ParticleList> antiList(m_antiListName);
+    if (antiList)
+      antiList->removeParticles(toRemove, false);
+  }
+}
 
-  // Remove also particles form anti-particle list
-  if (m_antiListName.empty())
-    return;
+void ParticleList::clear(bool includingAntiList)
+{
+  m_fsList.clear();
+  m_scList.clear();
 
-  StoreObjPtr<ParticleList> antiList(m_antiListName);
-  if (antiList)
-    antiList->removeParticles(toRemove, false);
+  if (includingAntiList and !m_antiListName.empty()) {
+    StoreObjPtr<ParticleList> antiList(m_antiListName);
+    if (antiList)
+      antiList->clear(false);
+  }
 }
 
 Particle* ParticleList::getParticle(unsigned i, bool includingAntiList) const

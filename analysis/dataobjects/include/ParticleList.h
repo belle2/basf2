@@ -200,6 +200,9 @@ namespace Belle2 {
      */
     void removeParticles(const std::vector<unsigned int>& toRemove, bool removeFromAntiList = true);
 
+    /** Remove all elements from list, afterwards getListSize() will be 0.  */
+    void clear(bool includingAntiList = true);
+
     /**
      * Returns Particle store array name to which particle list refers
      */

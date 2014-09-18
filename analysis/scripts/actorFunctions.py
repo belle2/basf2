@@ -455,7 +455,7 @@ def WriteAnalysisFileForChannel(particleName, particleLabel, channelName, preCut
     placeholders = automaticReporting.createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut)
     placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, postCut)
 
-    hash = actorFramework.create_hash(placeholders)
+    hash = actorFramework.create_hash([placeholders])
     placeholders['texFile'] = removeJPsiSlash('{name}_channel_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
     if not os.path.isfile(placeholders['texFile']):
         automaticReporting.createTexFile(placeholders['texFile'], 'analysis/scripts/FullEventInterpretationChannelTemplate.tex', placeholders)

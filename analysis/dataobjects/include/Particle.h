@@ -552,6 +552,12 @@ namespace Belle2 {
 
     /** Sets the user-defined data of given name to the given value.
      *
+     * throws std::runtime_error if variable isn't set.
+     */
+    void setExtraInfo(const std::string& name, float value);
+
+    /** Sets the user-defined data of given name to the given value.
+     *
      * throws std::runtime_error if variable is already set.
      */
     void addExtraInfo(const std::string& name, float value);

@@ -686,6 +686,26 @@ float Particle::getExtraInfo(const std::string& name) const
 
 }
 
+
+void Particle::setExtraInfo(const std::string& name, float value)
+{
+  if (m_extraInfo.empty())
+    throw std::runtime_error(std::string("setExtraInfo: Value '") + name + "' not found in Particle!");
+
+  //get index for name
+  const unsigned int mapID = (unsigned int)m_extraInfo[0];
+  StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
+  if (!extraInfoMap) {
+    B2FATAL("ParticleExtraInfoMap not available, but needed for storing extra info in Particle!");
+  }
+  unsigned int index = extraInfoMap->getIndex(mapID, name);
+  if (index == 0 or index >= m_extraInfo.size()) //actualy indices start at 1
+    throw std::runtime_error(std::string("setExtraInfo: Value '") + name + "' not found in Particle!");
+
+  m_extraInfo[index] = value;
+
+}
+
 void Particle::addExtraInfo(const std::string& name, float value)
 {
   if (hasExtraInfo(name))

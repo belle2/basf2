@@ -117,10 +117,11 @@ namespace Belle2 {
       // Calculate target Value for Particles
       for (unsigned i = 0; i < list->getListSize(); ++i) {
         Particle* particle = list->getParticle(i);
+        float targetValue = fixProbabilityUsingSamplingRates(m_method->analyse(particle, m_signalFraction));
         if (particle->hasExtraInfo(m_signalProbabilityName)) {
-          B2WARNING("Extra Info with given name is already set! I won't set it again!")
+          B2WARNING("Extra Info with given name is already set! Overwriting old value!")
+          particle->setExtraInfo(m_signalProbabilityName, targetValue);
         } else {
-          float targetValue = fixProbabilityUsingSamplingRates(m_method->analyse(particle, m_signalFraction));
           particle->addExtraInfo(m_signalProbabilityName, targetValue);
         }
       }

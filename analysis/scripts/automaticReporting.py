@@ -210,6 +210,7 @@ def createCombinedParticleTexFile(placeholders, channelPlaceholders, nTuple, mcC
         @param placeholders dictionary with values for every placeholder in the latex-template
         @param channelPlaceholders list of all tex placeholder dictionaries of all channels
     """
+    print channelPlaceholders
     placeholders['NChannels'] = len(channelPlaceholders)
     placeholders['NUsedChannels'] = len([y for y in channelPlaceholders if not y['isIgnored']])
 

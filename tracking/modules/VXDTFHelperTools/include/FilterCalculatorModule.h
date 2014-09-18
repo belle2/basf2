@@ -406,6 +406,22 @@ namespace Belle2 {
 
     virtual void terminate();
 
+    /** initialize variables to avoid nondeterministic behavior */
+    void InitializeVariables() {
+      m_pxdHitCounter = 0;
+      m_svdHitCounter = 0;
+      m_telHitCounter = 0;
+      m_useTEL = false;
+      m_usePXD = false;
+      m_useSVD = false;
+      m_eventCounter = 0;
+      m_badHitsCounter = 0;
+      m_badTrackletCounter = 0;
+      m_totalHitCounter = 0;
+      m_longTrackCounter = 0;
+      m_badFilterValueCtr = 0;
+    }
+
     template<class Tmpl>
     bool createSectorAndHit(Belle2::Const::EDetector detectorID, int pdg, const Tmpl* aSiTrueHitPtr, VXDTrack& newTrack, MapOfSectors* thisSecMap); /**< internal member - takes hit, calculates sector (and creates it if it is not existing yet) and creates internal VXDHit for further calculation. If return value is true, everything worked fine. If not, then hit was not created (no info about the sector-creation) */
 

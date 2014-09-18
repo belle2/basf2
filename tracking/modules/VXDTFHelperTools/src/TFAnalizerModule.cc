@@ -64,6 +64,8 @@ REG_MODULE(TFAnalizer)
 
 TFAnalizerModule::TFAnalizerModule() : Module()
 {
+  InitializeVariables();
+
   vector<string> rootFileNameVals;
   rootFileNameVals.push_back("TFAnalizerResults");
   rootFileNameVals.push_back("RECREATE");
@@ -111,22 +113,6 @@ void TFAnalizerModule::initialize()
   StoreArray<PXDTrueHit>::optional();
   StoreArray<SVDTrueHit>::required();
   StoreArray<VXDTFInfoBoard>::optional(m_PARAMinfoBoardName); /// WARNING TODO: implement a minimal analyzing mode which can deal with TF's without using the InfoBoards...
-
-  m_countReconstructedTCs = 0;
-  m_countAcceptedGFTCs = 0;
-  m_eventCounter = 0;
-  m_mcTrackCounter = 0;
-  m_caTrackCounter = 0;
-  m_countedPerfectRecoveries = 0;
-  m_countedCleanRecoveries = 0;
-  m_countedDoubleEntries = 0;
-  m_mcTrackVectorCounter = 0;
-  m_wrongChargeSignCounter = 0;
-  m_totalRealHits = 0;
-  m_nMcPXDHits = 0;
-  m_nMcSVDHits = 0;
-  m_nCaPXDHits = 0;
-  m_nCaSVDHits = 0;
 
   if (m_PARAMwriteToRoot == true) {
     if ((m_PARAMrootFileName.size()) != 2) {
@@ -232,11 +218,9 @@ void TFAnalizerModule::event()
 
   StoreArray<PXDTrueHit> pxdTrueHits;
   StoreArray<SVDTrueHit> svdTrueHits;
-//  StoreArray<McParticle> mcParticles;
+
   RelationIndex<PXDCluster, PXDTrueHit> relPXDCluster2TrueHit; /* <FROM, TO> */
   RelationIndex<SVDCluster, SVDTrueHit> relSVDCluster2TrueHit;
-  RelationArray relPXDClusterTrueHit(pxdClusters, pxdTrueHits);
-  RelationArray relSVDClusterTrueHit(svdClusters, svdTrueHits);
 
   StoreArray<VXDTFInfoBoard> extraInfos(m_PARAMinfoBoardName);
 

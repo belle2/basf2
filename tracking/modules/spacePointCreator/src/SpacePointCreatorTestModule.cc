@@ -167,4 +167,8 @@ void SpacePointCreatorTestModule::event()
 
 
 
-
+void SpacePointCreatorTestModule::InitializeInConstructor()
+{
+  m_pxdClustersIndex = std::numeric_limits<short unsigned int>::max();
+  m_svdClustersIndex = std::numeric_limits<short unsigned int>::max();
+}

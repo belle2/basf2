@@ -107,6 +107,7 @@ REG_MODULE(TFRedesign)
 TFRedesignModule::TFRedesignModule() : Module()
 {
   // initialization of many variables:
+  InitializeInConstructor();
   resetCountersAtBeginRun();
 
   /// setting standard values for steering parameters
@@ -153,10 +154,7 @@ TFRedesignModule::TFRedesignModule() : Module()
            m_PARAMinfoBoardName,
            "Name of container used for data transfer to TFAnalyzer, only used when TESTERexpandedTestingRoutines == true",
            string(""));
-  addParam("telClustersName",
-           m_PARAMtelClustersName,
-           "Name of storeArray containing tel clusters (only valid when using secMap supporting tel clusters)",
-           string("TELClusters"));
+
   addParam("pxdClustersName",
            m_PARAMpxdClustersName,
            "Name of storeArray containing pxd clusters (only valid when using secMap supporting pxd clusters)",
@@ -170,10 +168,6 @@ TFRedesignModule::TFRedesignModule() : Module()
            m_PARAMnameOfInstance,
            "Name of trackFinder, usefull, if there is more than one VXDTF running at the same time. Note: please choose short names",
            string("VXDTF"));
-  addParam("activateBaselineTF",
-           m_PARAMactivateBaselineTF,
-           "there is a baseline trackfinder which catches events with a very small number of hits, e.g. bhabha, cosmic and single-track-events. Settings: 0 = deactivate baseLineTF, 1=activate it and use normal TF as fallback, 2= baseline-TF-only",
-           int(0));
 
 
   addParam("activateDistance3D",
@@ -624,8 +618,6 @@ void TFRedesignModule::beginRun()
   B2DEBUG(50, "##### be careful, current TF status does not support more than one run per initialization! #####"); /// WARNING TODO: check whether this is still valid
 
   setupPasses();
-
-  if (m_PARAMactivateBaselineTF != 0) { setupBaseLineTF(); }
 
   if (m_PARAMdisplayCollector > 0) { importSectorMapsToDisplayCollector(); }
 
@@ -2145,14 +2137,13 @@ void TFRedesignModule::endRun()
   for (string & badSensor : m_TESTERbadSensors) { infoStuff2 << badSensor << " "; }
   B2DEBUG(1, "In following sensors there were hits out of the sensitive plane:\n" << infoStuff2.str());
 
-  B2DEBUG(1, lineHigh  << "\n pxdc\t| svdc\t| telc\t| svdH\t| catC\t| ghR\t\t| noSc\t| noFd\t| ooR \t| no2D\t| 1Dsn\t| 1DHO \t|\n " << m_totalPXDClusters << "\t| " << m_totalSVDClusters << "\t| " << m_totalTELClusters << "\t| " << int(m_totalSVDClusters * 0.5) << "\t| " << m_totalSVDClusterCombis << "\t| " << double(m_totalSVDClusterCombis) / (double(m_totalSVDClusters) * 0.5) << "\t| " << m_badSectorRangeCounter << "\t| " << m_badFriendCounter << "\t| " << m_TESTERdistortedHitCtr << "\t| " << m_TESTERbadSectorRangeCounterForClusters << "\t| " << m_TESTERclustersPersSectorNotMatching << "\t| " << m_TESTERovercrowdedStrangeSensors << "\t|")
+  B2DEBUG(1, lineHigh  << "\n pxdc\t| svdc\t| svdH\t| catC\t| ghR\t\t| noSc\t| noFd\t| ooR \t| no2D\t| 1Dsn\t| 1DHO \t|\n " << m_totalPXDClusters << "\t| " << m_totalSVDClusters << "\t| " << int(m_totalSVDClusters * 0.5) << "\t| " << m_totalSVDClusterCombis << "\t| " << double(m_totalSVDClusterCombis) / (double(m_totalSVDClusters) * 0.5) << "\t| " << m_badSectorRangeCounter << "\t| " << m_badFriendCounter << "\t| " << m_TESTERdistortedHitCtr << "\t| " << m_TESTERbadSectorRangeCounterForClusters << "\t| " << m_TESTERclustersPersSectorNotMatching << "\t| " << m_TESTERovercrowdedStrangeSensors << "\t|")
 
   B2DEBUG(2, "Explanation: pxdc: number of PXDClusters, 2D), svdc: SVDClusters(1D)\n svdH: # of SVDHits(guess of actual number of 2D-Track- and -BG-hits)\n catC: SVDClusterCombinations(combining u/v, including ghosthits)\n ghR: ghostHitRate(is only a guess, TODO: should be correctly determined!!)\n noSc: are hits discarded, where no fitting sector could be found\n noFd: hits having no hits in compatible sectors (friends), ooR: sensors which were not in sensitive plane of sensor, no2D: SVDclusters, were no 2nd cluster could be found\n 1Dsn: times where a SVDsensor hat not the same number of u and v clusters, 1DHO: like 1Dsn, but where a high occupancy case prevented reconstructing them")
 
-  B2DEBUG(1, lineHigh << lineApnd << lineApnd << "\n bl+\t| bl++\t| 1D+\t| 1D-\t| NoH\t| sf+\t| sf-\t| nf+\t| nf-\t| zzXY\t| zXYS\t| zzRZ\t| cf\t| dpT\t| tcc+\t| Ttcc\t| Ttcf\t| Tfin\t| NNns\t| NNov\t|\n " << m_TESTERstartedBaselineTF << "\t| " << m_TESTERsucceededBaselineTF << "\t| " << m_TESTERacceptedBrokenHitsTrack << "\t| " << m_TESTERrejectedBrokenHitsTrack << "\t| " << m_TESTERnoHitsAtEvent << "\t| " << m_TESTERtotalsegmentsSFCtr << "\t| " << m_TESTERdiscardedSegmentsSFCtr << "\t| " << m_TESTERtotalsegmentsNFCtr << "\t| " << m_TESTERdiscardedSegmentsNFCtr << "\t|" << m_TESTERtriggeredZigZagXY << "\t| " << m_TESTERtriggeredZigZagXYWithSigma << "\t| " << m_TESTERtriggeredZigZagRZ << "\t| " << m_TESTERtriggeredCircleFit << "\t| " << m_TESTERtriggeredDpT << "\t| " << m_TESTERapprovedByTCC << "\t| " << m_TESTERcountTotalTCsAfterTCC << "\t| " << m_TESTERcountTotalTCsAfterTCCFilter << "\t| " << m_TESTERcountTotalTCsFinal << "\t| " << m_TESTERbadHopfieldCtr << "\t| "
-          << m_TESTERHopfieldLetsOverbookedTCsAliveCtr << "\t|")
+  B2DEBUG(1, lineHigh << lineApnd << lineApnd << "\n NoH\t| sf+\t| sf-\t| nf+\t| nf-\t| zzXY\t| zXYS\t| zzRZ\t| cf\t| dpT\t| tcc+\t| Ttcc\t| Ttcf\t| Tfin\t| NNns\t| NNov\t|\n " << m_TESTERnoHitsAtEvent << "\t| " << m_TESTERtotalsegmentsSFCtr << "\t| " << m_TESTERdiscardedSegmentsSFCtr << "\t| " << m_TESTERtotalsegmentsNFCtr << "\t| " << m_TESTERdiscardedSegmentsNFCtr << "\t|" << m_TESTERtriggeredZigZagXY << "\t| " << m_TESTERtriggeredZigZagXYWithSigma << "\t| " << m_TESTERtriggeredZigZagRZ << "\t| " << m_TESTERtriggeredCircleFit << "\t| " << m_TESTERtriggeredDpT << "\t| " << m_TESTERapprovedByTCC << "\t| " << m_TESTERcountTotalTCsAfterTCC << "\t| " << m_TESTERcountTotalTCsAfterTCCFilter << "\t| " << m_TESTERcountTotalTCsFinal << "\t| " << m_TESTERbadHopfieldCtr << "\t| " << m_TESTERHopfieldLetsOverbookedTCsAliveCtr << "\t|")
 
-  B2DEBUG(2, "Explanation: bl+: baseLineTF started, bl++ baselineTF succeeded, 1D+: TCs with 1D-svd-Hits were accepted, 1D-: rejected, NoH: Events without hits\n sf+: segfinder segments activated, sf-: -discarded, nf+: nbFinder segments activated, nf-: discarded, zzXY: zigzagXY got triggered, zzRZ: same for zigzagRZ, cf: circleFit(tuneCircleFitValue), dpT: deltaPt\n tcc+: approved by tcc, Ttcc: total number of TCs after TCC, Ttcf: after TCC-filter, Tfin: total number of final TCs, NNns: the Hopfield network had no survivors, NNov: the Hopfield network accepted overlapping TCs (which should never occur! -> if != 0: Bug!)")
+  B2DEBUG(2, "Explanation: NoH: Events without hits\n sf+: segfinder segments activated, sf-: -discarded, nf+: nbFinder segments activated, nf-: discarded, zzXY: zigzagXY got triggered, zzRZ: same for zigzagRZ, cf: circleFit(tuneCircleFitValue), dpT: deltaPt\n tcc+: approved by tcc, Ttcc: total number of TCs after TCC, Ttcf: after TCC-filter, Tfin: total number of final TCs, NNns: the Hopfield network had no survivors, NNov: the Hopfield network accepted overlapping TCs (which should never occur! -> if != 0: Bug!)")
 
   B2DEBUG(1, lineHigh << lineApnd << lineApnd << "\n civ4\t| clo+\t| cloK\t| cloF\t| cloS\t| kf+\t| kf-\t| TFHo\t| kfHo\t| CA-\t| Ho+\t|\n " << m_TESTERfilteredBadSeedTCs << "\t| " << m_TESTERcleanOverlappingSetStartedCtr << "\t| " << m_TESTERfilteredOverlapsQI << "\t| " << m_TESTERfilteredOverlapsQICtr << "\t| " << m_TESTERNotFilteredOverlapsQI << "\t| " << m_TESTERgoodFitsCtr << "\t| " << m_TESTERbadFitsCtr << "\t| " << m_TESTERbrokenEventsCtr << "\t| " << m_TESTERkalmanSkipped << "\t| " << m_TESTERbrokenCaRound << "\t| " << m_TESTERhighOccupancyCtr << "\t|")
 
@@ -2193,7 +2184,7 @@ void TFRedesignModule::endRun()
   B2DEBUG(1, std::fixed << std::setprecision(2) << " total time consumption in milliseconds: \n " << "HSort\t|baseTF\t|sgFind\t|nbFind\t|CA \t|tcCol\t|tcFlt\t|kalmn\t|chkOvr\t|clnOvr\t|neuNet\t|others\t|\n" << (m_TESTERtimeConsumption.hitSorting.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.baselineTF.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.segFinder.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.nbFinder.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.cellularAutomaton.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.tcc.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.postCAFilter.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.kalmanStuff.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.checkOverlap.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.cleanOverlap.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.neuronalStuff.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.intermediateStuff.count() * 0.001) << "\t|")
 
 //   m_eventCounter
-  B2DEBUG(1, std::fixed << std::setprecision(2) << " mean time consumption in microseconds: \n " << "HSort\t|baseTF\t|sgFind\t|nbFind\t|CA \t|tcCol\t|tcFlt\t|kalmn\t|chkOvr\t|clnOvr\t|neuNet\t|others\t|\n" << (m_TESTERtimeConsumption.hitSorting.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.baselineTF.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.segFinder.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.nbFinder.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.cellularAutomaton.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.tcc.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.postCAFilter.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.kalmanStuff.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.checkOverlap.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.cleanOverlap.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.neuronalStuff.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.
+  B2DEBUG(1, std::fixed << std::setprecision(2) << " mean time consumption in microseconds: \n " << "HSort\t|sgFind\t|nbFind\t|CA \t|tcCol\t|tcFlt\t|kalmn\t|chkOvr\t|clnOvr\t|neuNet\t|others\t|\n" << (m_TESTERtimeConsumption.hitSorting.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.segFinder.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.nbFinder.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.cellularAutomaton.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.tcc.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.postCAFilter.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.kalmanStuff.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.checkOverlap.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.cleanOverlap.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.neuronalStuff.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.
           intermediateStuff.count() * invNEvents) << "\t|")
 
   B2DEBUG(2, "Explanation: HSort: hit sorting, baseTF: baseline TF, sgFind: segment finder , nbFind: neighbouring segments finder, CA: cellular automaton, tcCol: track candidate collector, tcFlt: track candidate filter (e.g. circleFit), kalmn: kalman filter, chkOvr: checking track candidates for overlapping clusters, clnOvr: cleaning track candidates for overlapping clusters, neuNet: neuronal network of Hopfield type, others: everything which was not listed above")
@@ -2235,12 +2226,6 @@ void TFRedesignModule::endRun()
       logEventsCopy.end(),
       [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.numTELCluster < b.numTELCluster; }
     );
-    infoQ.at(0).numTELCluster = logEventsCopy.at(0).numTELCluster;
-    infoQ.at(1).numTELCluster = logEventsCopy.at(q25).numTELCluster;
-    infoQ.at(2).numTELCluster = logEventsCopy.at(median).numTELCluster;
-    infoQ.at(3).numTELCluster = logEventsCopy.at(q75).numTELCluster;
-    infoQ.at(4).numTELCluster = logEventsCopy.at(numLoggedEvents - 1).numTELCluster;
-    telClusterStream << infoQ[0].numTELCluster << " / " << infoQ[1].numTELCluster << " / " << infoQ[2].numTELCluster << " / " << infoQ[3].numTELCluster << " / " << infoQ[4].numTELCluster << "\n";
 
     // sort by nPxdClusters:
     std::sort(
@@ -2325,8 +2310,7 @@ void TFRedesignModule::endRun()
            "and " << float(m_TESTERcountTotalTCsFinal) * invNEvents << " TCs per event" <<
            "(" << m_TESTERbrokenEventsCtr << " events killed for high occupancy).\n" <<
            "Mean track length (indices/hits): " << float(m_TESTERcountTotalUsedIndicesFinal) / float(m_TESTERcountTotalTCsFinal) << "/" << float(m_TESTERcountTotalUsedHitsFinal) / float(m_TESTERcountTotalTCsFinal) << "\n\
-	min / q0.25 / median / q0.75 / max\n" <<
-           "nTelClusters           " << telClusterStream.str() <<
+		  min / q0.25 / median / q0.75 / max\n" <<
            "nPxdClusters           " << pxdClusterStream.str() <<
            "nSVDClusters           " << svdClusterStream.str() <<
            "nSVDClusterCombis      " << svdHitStream.str() <<
@@ -2344,13 +2328,6 @@ void TFRedesignModule::endRun()
     }
     currentPass->sectorMap.clear();
     delete currentPass; // deleting struct itself
-  }
-
-  if (m_PARAMactivateBaselineTF != 0) {
-    for (secMapEntry aSector : m_baselinePass.sectorMap) { // dealing with the baseline pass separately
-      delete aSector.second;
-    }
-    m_baselinePass.sectorMap.clear();
   }
 
   m_passSetupVector.clear();
@@ -5267,7 +5244,6 @@ string TFRedesignModule::EventInfoPackage::Print()
   output << " timeConsumption of event " << evtNumber << " in microseconds: " << endl;
 
   output << "total: " << totalTime.count();
-  output << ", baselineTF: " << sectionConsumption.baselineTF.count();
   output << ", hitsorting: " << sectionConsumption.hitSorting.count();
   output << ", sf: "  << sectionConsumption.segFinder.count();
   output << ", nf: " << sectionConsumption.nbFinder.count();
@@ -5566,11 +5542,6 @@ void TFRedesignModule::checkAndSetupModuleParameters()
     }
   }
 
-  if (m_PARAMactivateBaselineTF < 0 or m_PARAMactivateBaselineTF > 2) {
-    B2WARNING(m_PARAMnameOfInstance << ": chosen value (" << m_PARAMactivateBaselineTF << ")for parameter 'activateBaselineTF' is invalid, reseting value to standard (=1)...")
-    m_PARAMactivateBaselineTF = 1;
-  }
-
   B2DEBUG(1, m_PARAMnameOfInstance << "::initialize: chosen calcQIType is '" << m_PARAMcalcQIType << "'")
   if (m_PARAMcalcQIType == "trackLength") {
     m_calcQiType = 0;
@@ -5682,7 +5653,6 @@ void TFRedesignModule::prepareExternalTools()
     m_collector.initPersistent();
   }
 
-  StoreArray<TelCluster>::optional(m_PARAMtelClustersName);
   StoreArray<PXDCluster>::optional(m_PARAMpxdClustersName);
   StoreArray<SVDCluster>::optional(m_PARAMsvdClustersName);
 }
@@ -5754,7 +5724,7 @@ void TFRedesignModule::setupPasses()
   string detectorType;
   /// for each setup, fill parameters, calc numTotalLayers... TODO: failsafe implementation (currently no protection against bad user imput) lacks of style, longterm goal, export that procedure into a function
 
-  m_usePXDHits = false, m_useSVDHits = false, m_useTELHits = false;
+  m_usePXDHits = false, m_useSVDHits = false;
 
   m_nSectorSetups = m_PARAMsectorSetup.size();
 
@@ -5816,12 +5786,7 @@ void TFRedesignModule::setupPasses()
       newPass->numTotalLayers += 2; // WARNING hardcoded! can we get this info from the system itself? WARNING find where this is still used and find out its purpose (dangerous when some layers are missing?)
 
     }
-    if (detectorType.find("TEL") != std::string::npos) { // using const::Test as Telescope setter
-      m_useTELHits = true;
-      newPass->useTELHits = true;
-      newPass->numTotalLayers += 1; // WARNING hardcoded! can we get this info from the system itself? WARNING find where this is still used and find out its purpose (dangerous when some layers are missing?)
-    }
-    if (m_usePXDHits == false and m_useSVDHits == false and m_useTELHits == false) {
+    if (m_usePXDHits == false and m_useSVDHits == false) {
       B2ERROR(m_PARAMnameOfInstance << "Pass " << i << " with setting '" << chosenSetup << "': chosen detectorType via param 'detectorType' (" << detectorType << ") is invalid, resetting value to standard (=VXD)")
       m_useSVDHits = true;
       m_usePXDHits = true;
@@ -6343,55 +6308,6 @@ void TFRedesignModule::setupPasses()
 }
 
 
-
-void TFRedesignModule::setupBaseLineTF()
-{
-  /** REDESIGNCOMMENT BEGINRUN 2:
-   * * short:
-   * store secMap/pass-setup for baseLineTF
-   *
-   ** long (+personal comments):
-   * although the baselineTF (only usefull for TB-runs) is filled here,
-   * this section does not have dependencies of the testbeam package
-   *
-   ** dependency of module parameters (global):
-   *
-   ** dependency of global in-module variables:
-   * m_passSetupVector, m_baselinePass
-   *
-   ** dependency of global stuff just because of B2XX-output or debugging only:
-   *
-   ** in-module-function-calls:
-   */
-
-  unsigned int centerSecID = FullSecID().getFullSecID(); // automatically produces secID of centerSector
-  VXDSector* pCenterSector = new VXDSector(centerSecID);
-  m_baselinePass.sectorMap.insert({centerSecID, pCenterSector});
-  B2DEBUG(100, "Baseline-Pass: adding virtual centerSector with " << m_baselinePass.sectorMap.find(centerSecID)->second->getFriends().size() << " friends.");
-  m_baselinePass.threeHitFilterBox.resetMagneticField(m_passSetupVector.at(0)->magneticFieldStrength);
-  m_baselinePass.fourHitFilterBox.resetMagneticField(m_passSetupVector.at(0)->magneticFieldStrength);
-  m_baselinePass.trackletFilterBox.resetMagneticField(m_passSetupVector.at(0)->magneticFieldStrength);
-  m_baselinePass.origin = m_passSetupVector.at(0)->origin;
-  m_baselinePass.useSVDHits = m_passSetupVector.at(0)->useSVDHits;
-  m_baselinePass.usePXDHits = m_passSetupVector.at(0)->usePXDHits;
-  m_baselinePass.useTELHits = m_passSetupVector.at(0)->useTELHits;
-  m_baselinePass.chosenDetectorType = m_passSetupVector.at(0)->chosenDetectorType;
-  m_baselinePass.numTotalLayers = m_passSetupVector.at(0)->numTotalLayers;
-  m_baselinePass.zigzagXY = m_passSetupVector.at(0)->zigzagXY;
-  m_baselinePass.zigzagXYWithSigma = m_passSetupVector.at(0)->zigzagXYWithSigma;
-  m_baselinePass.deltaPt = m_passSetupVector.at(0)->deltaPt;
-  m_baselinePass.circleFit = m_passSetupVector.at(0)->circleFit;
-  int countActivatedTCTests = 0;
-  if (m_baselinePass.zigzagXY.first == true) { countActivatedTCTests++; }
-  if (m_baselinePass.zigzagXYWithSigma.first == true) { countActivatedTCTests++; }
-  if (m_baselinePass.deltaPt.first == true) { countActivatedTCTests++; }
-  if (m_baselinePass.circleFit.first == true) { countActivatedTCTests++; }
-  m_baselinePass.activatedTccFilterTests = countActivatedTCTests; // pT, zzXY, circleFit
-
-  /// WARNING TODO at the moment, copying the first pass set by the user means that the baselineTF can not be set at different behavior than first normal pass. Need new method to introduce independent steering too! (maybe first pass-entries are used for baselineTF if activated, and first pass is second entry in list?)
-}
-
-
 void TFRedesignModule::importSectorMapsToDisplayCollector()
 {
   /** REDESIGNCOMMENT BEGINRUN 3:
@@ -6442,4 +6358,28 @@ void TFRedesignModule::importSectorMapsToDisplayCollector()
       B2DEBUG(100, "InitSector secConfigV: " << infosector);
     }
   }
+}
+
+
+
+void TFRedesignModule::InitializeInConstructor()
+{
+  m_chargeSignFactor = 0;
+  m_usePXDHits = false;
+  m_useSVDHits = false;
+  m_nSectorSetups = -1;
+  m_highOccupancyCase = false;
+  m_tcThreshold = -1;
+  m_filterOverlappingTCs = -1;
+  m_rootFilePtr = NULL;
+  m_treeTrackWisePtr = NULL;
+  m_treeEventWisePtr = NULL;
+  m_rootTimeConsumption = -1;
+  m_rootPvalues = -1;
+  m_rootChi2 = -1;
+  m_rootCircleRadius = -1;
+  m_rootNdf = -1;
+  m_calcQiType = -1;
+  m_calcSeedType = -1;
+  m_aktpassNumber  = -1;
 }

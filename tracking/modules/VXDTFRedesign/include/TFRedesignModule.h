@@ -132,6 +132,7 @@ namespace Belle2 {
 
       /** StandardConstructor for the EventInfoPackage - sets all values to zero */
       EventInfoPackage():
+        evtNumber(0),
         numPXDCluster(0),
         numTELCluster(0),
         numSVDCluster(0),
@@ -152,6 +153,7 @@ namespace Belle2 {
 
       /** clearing entries, nice after initialisation (TODO: convert into constructor for autoClear) */
       void clear() {
+        evtNumber = 0;
         numPXDCluster = 0;
         numTELCluster = 0;
         numSVDCluster = 0;
@@ -462,7 +464,6 @@ namespace Belle2 {
       m_TESTERclustersPersSectorNotMatching = 0;
       m_badFriendCounter = 0;
       m_totalPXDClusters = 0;
-      m_totalTELClusters = 0;
       m_totalSVDClusters = 0;
       m_totalSVDClusterCombis = 0;
       m_TESTERhighOccupancyCtr = 0;
@@ -470,6 +471,7 @@ namespace Belle2 {
       m_TESTERtriggeredZigZagXYWithSigma = 0;
       m_TESTERtriggeredZigZagRZ = 0;
       m_TESTERtriggeredDpT = 0;
+      m_TESTERtriggeredDD2IP = 0;
       m_TESTERtriggeredCircleFit = 0;
       m_TESTERapprovedByTCC = 0;
       m_TESTERcountTotalTCsAfterTCC = 0;
@@ -495,8 +497,6 @@ namespace Belle2 {
       m_TESTERbrokenCaRound = 0;
       m_TESTERkalmanSkipped = 0;
       m_TESTERovercrowdedStrangeSensors = 0;
-      m_TESTERstartedBaselineTF = 0;
-      m_TESTERsucceededBaselineTF = 0;
       m_TESTERnoHitsAtEvent = 0;
       m_TESTERacceptedBrokenHitsTrack = 0;
       m_TESTERrejectedBrokenHitsTrack = 0;
@@ -505,11 +505,13 @@ namespace Belle2 {
       m_allTCsOfEvent.clear();
     }
 
-    // Methodes for Collector
+    // Methods for Collector
     int importCollectorCell(int pass_index, std::string died_at, int died_id, std::vector<std::pair<int, bool>> acceptedRejectedFilters, int hit1, int hit2);  /**< generates Information and imports a Cell for the Collector */
 
 
 
+    /** initialize variables in constructor to avoid nondeterministic behavior */
+    void InitializeInConstructor();
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// REDESIGN - new functions encapsulating smaller tasks
@@ -534,18 +536,10 @@ namespace Belle2 {
     /** imports sectorMaps chosen from the storage and sets up all passes for that run */
     void setupPasses();
 
-    /** sets up all the relevant settings for the baseLineTF.
-     *
-     * The BaseLineTF is a very simplistic pseudo-TF only relevant for testbeams
-     * copying first pass for the BaselineTF (just to be sure that they can be used independently from each other)
-     * */
-    void setupBaseLineTF();
-
     /** Import all Sectors for all events (Collector).
      *
      * They will be copied to the displayCollector to have a 1:1 metaInfo for each sector of each pass */
     void importSectorMapsToDisplayCollector();
-
 
 
   protected:
@@ -649,7 +643,7 @@ namespace Belle2 {
 
     /// needed for pass handling:
     PassSetupVector m_passSetupVector; /**< contains information for each pass */
-    PassData m_baselinePass; /**< baselineTF gets his own pass, gets some settings from the first pass of the PassSetupVector */
+//     PassData m_baselinePass; /**< baselineTF gets his own pass, gets some settings from the first pass of the PassSetupVector */
 
 
     int m_PARAMpdGCode; /**< tandard value is 211 (pi+), ATTENTION, instead of using inconsistent sign of PdGList, in this module positively charged particles are always positive and negatively charged ones are negative (relevant for leptons) */
@@ -661,7 +655,7 @@ namespace Belle2 {
 
     bool m_usePXDHits; /**< when having more than one pass per event, sector maps using PXD, SVD or TEL can be set independently. To produce TFHits for PXD, this value is set to true */
     bool m_useSVDHits; /**< when having more than one pass per event, sector maps using PXD, SVD or TEL can be set independently. To produce TFHits for SVD, this value is set to true */
-    bool m_useTELHits; /**< when having more than one pass per event, sector maps using PXD, SVD or TEL can be set independently. To produce TFHits for TEL, this value is set to true */
+//     bool m_useTELHits; /**< when having more than one pass per event, sector maps using PXD, SVD or TEL can be set independently. To produce TFHits for TEL, this value is set to true */
 
     double m_PARAMtuneCutoffs; /**< for rapid changes of cutoffs (no personal xml files needed), reduces/enlarges the range of the cutoffs in percent (lower and upper values are changed by this value). Only valid in range -50% < x < +1000% */
 
@@ -669,7 +663,7 @@ namespace Belle2 {
     int m_badSectorRangeCounter; /**< counts number of hits which couldn't be attached to an existing sector of a pass */
     int m_badFriendCounter; /**< counts number of hits having no neighbour hits in friend sectors of current sector */
     int m_totalPXDClusters; /**< counts total number of PXDClusters during run */
-    int m_totalTELClusters; /**< counts total number of TELClusters during run */
+//     int m_totalTELClusters; /**< counts total number of TELClusters during run */
     int m_totalSVDClusters; /**< counts total number of SVdClusters during run */
     int m_totalSVDClusterCombis; /**< counts total number of possible combinations of SVDClusters during run */
     int m_nSectorSetups; /**< stores info about number of sector setups loaded into the track finder */
@@ -711,17 +705,17 @@ namespace Belle2 {
     std::string m_PARAMgfTrackCandsColName;       /**< TrackCandidates collection name */
     std::string m_PARAMinfoBoardName;             /**< InfoContainer collection name */
     std::string m_PARAMpxdClustersName;         /** name of storeArray containing pxd clusters */
-    std::string m_PARAMtelClustersName;         /** name of storeArray containing tel clusters */
+//     std::string m_PARAMtelClustersName;         /** name of storeArray containing tel clusters */
     std::string m_PARAMsvdClustersName;         /** name of storeArray containing svd clusters */
     std::string m_PARAMnameOfInstance;           /**< Name of trackFinder, usefull, if there is more than one VXDTF running at the same time. Note: please choose short names */
-    int m_PARAMactivateBaselineTF; /**< there is a baseline trackfinder which catches events with a very small number of hits, e.g. bhabha, cosmic and single-track-events. Settings: 0 = deactivate baseLineTF, 1=activate it and use normal TF as fallback, 2= baseline-TF-only */
+//     int m_PARAMactivateBaselineTF; /**< there is a baseline trackfinder which catches events with a very small number of hits, e.g. bhabha, cosmic and single-track-events. Settings: 0 = deactivate baseLineTF, 1=activate it and use normal TF as fallback, 2= baseline-TF-only */
 
     /// the following variables are nimimal testing routines within the TF
     int m_TESTERnoHitsAtEvent;  /**< counts number of times, where there were no hits at the event */
-    int m_TESTERstartedBaselineTF; /**< counts number of times, the baselineTF was started */
+//     int m_TESTERstartedBaselineTF; /**< counts number of times, the baselineTF was started */
     int m_TESTERacceptedBrokenHitsTrack; /**< counts number of times, where a tc having at least 1 1D-SVD hit was accepted */
     int m_TESTERrejectedBrokenHitsTrack; /**< counts number of times, where a tc having at least 1 1D-SVD hit was rejected */
-    int m_TESTERsucceededBaselineTF; /**< counts number of times, the baselineTF found a track */
+//     int m_TESTERsucceededBaselineTF; /**< counts number of times, the baselineTF found a track */
     int m_TESTERtriggeredZigZagXY;/**< counts how many times zigZagXY filter found bad TCs */
     int m_TESTERtriggeredZigZagXYWithSigma;/**< counts how many times zigZagXYWithSigma filter found bad TCs */
     int m_TESTERtriggeredZigZagRZ;/**< counts how many times zigZagRZ filter found bad TCs */

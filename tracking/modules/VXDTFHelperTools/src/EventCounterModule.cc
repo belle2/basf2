@@ -34,6 +34,8 @@ REG_MODULE(EventCounter)
 
 EventCounterModule::EventCounterModule() : Module()
 {
+  InitializeCounters();
+
   //Set module properties
   setDescription("Highlights current event and does some minimal statistics for VXD Clusters");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -44,18 +46,10 @@ EventCounterModule::EventCounterModule() : Module()
 
 
 
-EventCounterModule::~EventCounterModule()
-{
-
-}
-
-
-
 void EventCounterModule::initialize()
 {
   StoreArray<PXDCluster>::optional();
   StoreArray<SVDCluster>::optional();
-
 }
 
 
@@ -64,9 +58,7 @@ void EventCounterModule::beginRun()
 {
   B2INFO("################## eventCounter enabled, highlighting every " << m_PARAMstepSize << " event ######################\n" << "extended infos you can get by activating parameter 'showClusterStatistics', and/or setting debug level to 1 (runWise extra) or 2 (event wise extra)")
 
-  m_eventCounter = 0;
-  m_pxdClusterCounter = 0;
-  m_svdClusterCounter = 0;
+  InitializeCounters();
 
   if (m_PARAMshowClusterStatistics == false) { return; }
 
@@ -529,7 +521,11 @@ void EventCounterModule::endRun()
 }
 
 
-
-void EventCounterModule::terminate()
+void EventCounterModule::InitializeCounters()
 {
+  m_eventCounter = 0;
+  m_pxdClusterCounter = 0;
+  m_svdStripCounter4U = 0;
+  m_svdStripCounter4V = 0;
+  m_svdClusterCounter = 0;
 }

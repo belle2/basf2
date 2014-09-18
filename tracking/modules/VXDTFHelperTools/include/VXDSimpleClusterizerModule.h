@@ -38,10 +38,6 @@ namespace Belle2 {
      */
     VXDSimpleClusterizerModule();
 
-    /** Destructor of the module.
-     */
-    virtual ~VXDSimpleClusterizerModule() {}
-
     /** Initialize the Module.
      * This method is called only once before the actual event processing starts.
      */
@@ -60,9 +56,13 @@ namespace Belle2 {
      */
     virtual void endRun();
 
-    /** End of the event processing.
-     */
-    virtual void terminate() {}
+    /** initialize variables to avoid nondeterministic behavior */
+    void InitializeVariables() {
+      m_weakSVDHitCtr = 0;
+      m_weakPXDHitCtr = 0;
+      m_fakeSVDHitCtr = 0;
+      m_fakePXDHitCtr = 0;
+    }
 
   protected:
     std::string m_pxdTrueHitsName; /**< PXDTrueHit collection name */

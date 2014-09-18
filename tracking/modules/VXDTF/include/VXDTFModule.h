@@ -132,6 +132,7 @@ namespace Belle2 {
 
       /** StandardConstructor for the EventInfoPackage - sets all values to zero */
       EventInfoPackage():
+        evtNumber(0),
         numPXDCluster(0),
         numTELCluster(0),
         numSVDCluster(0),
@@ -152,6 +153,7 @@ namespace Belle2 {
 
       /** clearing entries, nice after initialisation (TODO: convert into constructor for autoClear) */
       void clear() {
+        evtNumber = 0;
         numPXDCluster = 0;
         numTELCluster = 0;
         numSVDCluster = 0;
@@ -482,6 +484,7 @@ namespace Belle2 {
       m_TESTERtriggeredZigZagXYWithSigma = 0;
       m_TESTERtriggeredZigZagRZ = 0;
       m_TESTERtriggeredDpT = 0;
+      m_TESTERtriggeredDD2IP = 0;
       m_TESTERtriggeredCircleFit = 0;
       m_TESTERapprovedByTCC = 0;
       m_TESTERcountTotalTCsAfterTCC = 0;
@@ -517,7 +520,12 @@ namespace Belle2 {
       m_allTCsOfEvent.clear();
     }
 
-    // Methodes for Collector
+
+    /** initialize variables in constructor to avoid nondeterministic behavior */
+    void InitializeInConstructor();
+
+
+    // Methods for Collector
     int importCollectorCell(int pass_index, std::string died_at, int died_id, std::vector<std::pair<int, bool>> acceptedRejectedFilters, int hit1, int hit2);  /**< generates Information and imports a Cell for the Collector */
 
 

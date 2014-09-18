@@ -51,6 +51,7 @@ REG_MODULE(FilterCalculator)
 /// /// /// /// /// /// /// /// CONSTRUCTOR /// /// /// /// /// /// /// ///
 FilterCalculatorModule::FilterCalculatorModule() : Module()
 {
+  InitializeVariables();
 
   //Set module properties
   setDescription("This module calculates the relations of sectors and exports sector dependent filtervalues. Size of sectors and type of filters can be set by steering file. Only one track per event, needs many events for usefull outcome.");
@@ -251,11 +252,7 @@ void FilterCalculatorModule::beginRun()
 {
   B2INFO("~~~~~~~~~~~FilterCalculator - beginRun ~~~~~~~~~~")
 
-
-
-  m_useTEL = false;
-  m_usePXD = false;
-  m_useSVD = false;
+  InitializeVariables();
 
   m_numOfLayers = 0;
   stringstream detectorNames; // same as above but a little bit more readable for B2XY-output...
@@ -346,16 +343,6 @@ void FilterCalculatorModule::beginRun()
     m_treeEventWisePtr = NULL;
   }
 
-  /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ reset counters ~~~~~~~~~~~~~~~~ ///
-  m_eventCounter = 0;
-  m_badHitsCounter = 0;
-  m_badTrackletCounter = 0;
-  m_totalHitCounter = 0;
-  m_longTrackCounter = 0;
-  m_pxdHitCounter = 0;
-  m_svdHitCounter = 0;
-  m_telHitCounter = 0;
-  m_badFilterValueCtr = 0;
 }
 
 

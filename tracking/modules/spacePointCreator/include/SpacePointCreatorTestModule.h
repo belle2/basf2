@@ -57,6 +57,9 @@ namespace Belle2 {
     virtual void terminate() {}
 
 
+    /** initialize variables in constructor to avoid nondeterministic behavior */
+    void InitializeInConstructor();
+
 
   protected:
 

@@ -78,11 +78,11 @@ namespace Belle2 {
     CollectorTFInfo();
     virtual ~CollectorTFInfo();
 
-    /** getter - output Flag */
-    int getOutputFlag()  { return m_outputFlag; }
+    /** getter - output Flag  (not in use at the moment) */
+//     int getOutputFlag()  { return m_outputFlag; }
 
-    /** setter - output Flag */
-    void setOutputFlag(int value) { m_outputFlag = value; }
+    /** setter - output Flag  (not in use at the moment) */
+//     void setOutputFlag(int value) { m_outputFlag = value; }
 
     /** Sectors safe for all events */
     virtual void initSectors(const std::vector< std::pair< std::pair<unsigned int, unsigned int>, std::vector<unsigned int> > >& sectors, const std::vector<double>& secConfigU, const std::vector<double>& secConfigV);
@@ -146,7 +146,7 @@ namespace Belle2 {
     /** Check if the TC is overlapped */
     virtual bool isTCOverlapped(int tcid);
 
-    int m_outputFlag;    /**< Flag = kind and sum of output data  (not in use at the moment) */
+//     int m_outputFlag;    /**< Flag = kind and sum of output data  (not in use at the moment) */
 
     // => private (only public for testing)
     //protected:

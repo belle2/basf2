@@ -35,6 +35,7 @@ namespace Belle2 {
     gb.setBackends(backends);
     gb.open("geometry/Belle2.xml");
 
+    B2WARNING(" now there will be a fatal message since the standard setting is not linked to an existing rootSectorMap")
     // throws fatal since the standard setting is not linked to an existing rootSectorMap;
     EXPECT_B2FATAL(emptyFactory.importRootMap());
 

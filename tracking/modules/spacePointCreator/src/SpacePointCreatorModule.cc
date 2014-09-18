@@ -26,6 +26,8 @@ SpacePointCreatorModule::SpacePointCreatorModule() :
   Module(),
   m_spMetaInfo("", DataStore::c_Persistent)
 {
+  InitializeInConstructor();
+
   setDescription("Imports Clusters of the silicon detectors and converts them to spacePoints.");
 
   // 1. Collections.
@@ -156,3 +158,12 @@ void SpacePointCreatorModule::terminate()
 }
 
 
+void SpacePointCreatorModule::InitializeInConstructor()
+{
+  m_pxdClustersIndex = std::numeric_limits<short unsigned int>::max();
+  m_svdClustersIndex = std::numeric_limits<short unsigned int>::max();
+
+  m_TESTERPXDClusterCtr = 0;
+  m_TESTERSVDClusterCtr = 0;
+  m_TESTERSpacePointCtr = 0;
+}

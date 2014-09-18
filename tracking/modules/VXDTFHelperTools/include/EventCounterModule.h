@@ -339,9 +339,6 @@ namespace Belle2 {
      */
     EventCounterModule();
 
-    /** Destructor of the module. */
-    virtual ~EventCounterModule();
-
     /** Initializes the Module.
      */
     virtual void initialize();
@@ -359,10 +356,9 @@ namespace Belle2 {
      */
     virtual void endRun();
 
-    /**
-     * Termination action.
-     */
-    virtual void terminate();
+
+    /** initialize variables to avoid nondeterministic behavior */
+    void InitializeCounters();
 
   protected:
 

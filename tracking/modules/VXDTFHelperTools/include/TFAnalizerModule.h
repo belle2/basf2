@@ -226,6 +226,28 @@ namespace Belle2 {
       void printCA(bool type, VXDTrackCandidate& caTC);
 
 
+      /** initialize variables to avoid nondeterministic behavior */
+      void InitializeVariables() {
+        m_countReconstructedTCs = 0;
+        m_countAcceptedGFTCs = 0;
+        m_mcTrackCounter = 0;
+        m_eventCounter = 0;
+        m_totalRealHits = 0;
+        m_caTrackCounter = 0;
+        m_countedPerfectRecoveries = 0;
+        m_countedCleanRecoveries = 0;
+        m_wrongChargeSignCounter = 0;
+        m_mcTrackVectorCounter = 0;
+        m_nMcPXDHits = 0;
+        m_nMcSVDHits = 0;
+        m_nCaPXDHits = 0;
+        m_nCaSVDHits = 0;
+        m_countedDoubleEntries = 0;
+        m_rootFilePtr = NULL;
+        m_treePtr = NULL;
+      }
+
+
     protected:
       bool m_PARAMFileExportMcTracks; /**< possibly needed later (currently not in use), exports McTracks to File */
       bool m_PARAMFileExportTfTracks; /**< possibly needed later (currently not in use), exports TfTracks to File */

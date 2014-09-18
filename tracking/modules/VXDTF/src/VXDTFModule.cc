@@ -110,6 +110,7 @@ REG_MODULE(VXDTF)
 VXDTFModule::VXDTFModule() : Module()
 {
   // initialization of many variables:
+  InitializeInConstructor();
   resetCountersAtBeginRun();
 
   /// setting standard values for steering parameters
@@ -935,10 +936,10 @@ void VXDTFModule::the_real_event()
         sensorIDs.at(currentID) += 1;
       }
       for (auto & aSensorPack : sensorIDs) {
-        if (aSensorPack.first.getLayerNumber() > 2 or aSensorPack.first.getLayerNumber() < 7) {
-          if (aSensorPack.second > 2) { useBaseLine = false; }
-        } else {
-          if (aSensorPack.second > 1) { useBaseLine = false; }
+        if (aSensorPack.first.getLayerNumber() > 2 and aSensorPack.first.getLayerNumber() < 7) { // SVD
+          if (aSensorPack.second > 2) { useBaseLine = false; } // more than 2 clusters (= 1Hit) per sensor not allowed
+        } else { // PXD, Tel
+          if (aSensorPack.second > 1) { useBaseLine = false; } // more than 1 hit not allowed
         }
       }
     }
@@ -7376,4 +7377,29 @@ void VXDTFModule::importSectorMapsToDisplayCollector()
       B2DEBUG(100, "InitSector secConfigV: " << infosector);
     }
   }
+}
+
+
+
+void VXDTFModule::InitializeInConstructor()
+{
+  m_chargeSignFactor = 0;
+  m_usePXDHits = false;
+  m_useSVDHits = false;
+  m_useTELHits = false;
+  m_nSectorSetups = -1;
+  m_highOccupancyCase = false;
+  m_tcThreshold = -1;
+  m_filterOverlappingTCs = -1;
+  m_rootFilePtr = NULL;
+  m_treeTrackWisePtr = NULL;
+  m_treeEventWisePtr = NULL;
+  m_rootTimeConsumption = -1;
+  m_rootPvalues = -1;
+  m_rootChi2 = -1;
+  m_rootCircleRadius = -1;
+  m_rootNdf = -1;
+  m_calcQiType = -1;
+  m_calcSeedType = -1;
+  m_aktpassNumber  = -1;
 }

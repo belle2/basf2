@@ -189,7 +189,7 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
                 label_ctime.setText(dateformat.format(new Date(ctime)));
                 int connected_in = 1;
                 int connected_out = 0;
-                System.out.println(data.getInt("nnodes"));
+                //System.out.println(data.getInt("nnodes"));
                 for (int i = 0; i < data.getInt("nnodes"); i++) {
                     NSMData cdata = (NSMData) data.getObject("node", i);
                     if (i == 0) {

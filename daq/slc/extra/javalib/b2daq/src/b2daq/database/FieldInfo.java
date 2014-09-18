@@ -102,9 +102,9 @@ public class FieldInfo {
             m_length = length;
         }
 
-        private int m_type;
-        private int m_length;
-        private int m_offset;
+        private int m_type = 0;
+        private int m_length = 0;
+        private int m_offset = 0;
 
     };
 

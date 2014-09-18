@@ -74,6 +74,7 @@ public abstract class DBObject implements Serializable {
     }
 
     public FieldInfo.Property getProperty(String name) {
+        if (!hasField(name)) return new FieldInfo.Property();
         return m_pro_m.get(name);
     }
 
@@ -82,7 +83,8 @@ public abstract class DBObject implements Serializable {
     }
 
     public boolean hasArray(String name) {
-        return hasField(name) && !hasObject(name) && !hasText(name) && m_pro_m.get(name).getLength() > 1;
+        return hasField(name) && //!hasObject(name) && 
+                !hasText(name) && m_pro_m.get(name).getLength() > 0;
     }
 
     public boolean hasValue(String name) {

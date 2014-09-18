@@ -41,7 +41,7 @@ $(LIBTARGET) : $(OBJS)
 
 $(OBJS) : $(TMPDIR)/%.o : $(SRCDIR)/%.cc $(INCDIR)/%.h
 	@ echo "<< compiling $@ >>"
-	 $(CXX) -c $(CFLAGS) $< -o $@ 
+	@ $(CXX) -c $(CFLAGS) $< -o $@ 
 
 $(DEPS) : $(TMPDIR)/%.d: $(SRCDIR)/%.cc $(INCDIR)/%.h
 	@ $(MKDIR) $(TMPDIR)

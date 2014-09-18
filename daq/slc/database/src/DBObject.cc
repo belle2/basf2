@@ -120,7 +120,7 @@ bool DBObject::hasField(const std::string& name) const throw()
 
 bool DBObject::hasArray(const std::string& name) const throw()
 {
-  return hasField(name) && !hasObject(name) && !hasText(name);
+  return hasField(name) && !hasText(name) && m_pro_m[name].getLength() > 0;
 }
 
 bool DBObject::hasValue(const std::string& name) const throw()

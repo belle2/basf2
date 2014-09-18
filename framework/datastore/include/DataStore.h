@@ -457,7 +457,7 @@ namespace Belle2 {
      *
      *  This should only be called by EventProcessor.
      */
-    void setInitializeActive(bool active) { m_initializeActive = active; }
+    void setInitializeActive(bool active);
 
     /** Are we currently initializing modules? */
     bool getInitializeActive() const { return m_initializeActive; }

@@ -22,10 +22,21 @@
 #include <TClass.h>
 
 #include <unordered_map>
+#include <cstdlib>
 
 using namespace std;
 using namespace Belle2;
 
+
+/** Called by exit handlers to free all memory.
+ *
+ * This is important since ROOT exit handlers may remove some of our objects.
+ * Without this function, we will free the memory when the DataStore instance is destroyed, which happens too late.
+ */
+void cleanDataStore()
+{
+  DataStore::Instance().reset();
+}
 
 DataStore& DataStore::Instance()
 {
@@ -52,6 +63,28 @@ void DataStore::reset()
 
   for (int i = 0; i < c_NDurabilityTypes; i++)
     reset((EDurability)i);
+}
+
+void DataStore::reset(EDurability durability)
+{
+  for (auto & mapEntry : m_storeEntryMap[durability]) {
+    //delete stored object/array
+    delete mapEntry.second.object;
+  }
+  m_storeEntryMap[durability].clear();
+  //invalidate any cached relations (expect RelationArrays to remain valid)
+  RelationIndexManager::Instance().clear();
+}
+
+void DataStore::setInitializeActive(bool active)
+{
+  m_initializeActive = active;
+
+  static bool firstCall = true;
+  if (firstCall) {
+    atexit(cleanDataStore);
+    firstCall = false;
+  }
 }
 
 std::string DataStore::defaultObjectName(std::string classname)
@@ -474,17 +507,6 @@ void DataStore::invalidateData(EDurability durability)
   for (auto & mapEntry : m_storeEntryMap[durability]) {
     mapEntry.second.ptr = nullptr;
   }
-}
-
-void DataStore::reset(EDurability durability)
-{
-  for (auto & mapEntry : m_storeEntryMap[durability]) {
-    //delete stored object/array
-    delete mapEntry.second.object;
-  }
-  m_storeEntryMap[durability].clear();
-  //invalidate any cached relations (expect RelationArrays to remain valid)
-  RelationIndexManager::Instance().clear();
 }
 
 bool DataStore::requireInput(const StoreAccessorBase& accessor)

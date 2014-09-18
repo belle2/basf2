@@ -206,62 +206,54 @@ public class NSMListenerService extends Thread {
     }
 
     private static void handleOnConnected() {
-        /*
-         Platform.runLater(() -> {
-         for (NSMObserver obs : m_observer) {
-         try {
-         obs.handleOnConnected();
-         } catch (Exception e) {
-         e.printStackTrace();
-         log(new LogMessage("LOCAL", LogLevel.ERROR,
-         "Internal exception " + e.getMessage()));
-         }
-         }
-         });
-         */
+        Platform.runLater(() -> {
+            for (NSMObserver obs : m_observer) {
+                try {
+                    obs.handleOnConnected();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    log(new LogMessage("LOCAL", LogLevel.ERROR,
+                            "Internal exception " + e.getMessage()));
+                }
+            }
+        });
     }
 
     private static void handleOnReceived(final NSMMessage msg) {
-        /*
-         Platform.runLater(() -> {
-         for (NSMObserver obs : m_observer) {
-         try {
-         obs.handleOnReceived(msg);
-         } catch (Exception e) {
-         e.printStackTrace();
-         log(new LogMessage("LOCAL", LogLevel.ERROR,
-         "Internal exception " + e.getMessage()));
-         }
-         }
-         });
-         */
+        Platform.runLater(() -> {
+            for (NSMObserver obs : m_observer) {
+                try {
+                    obs.handleOnReceived(msg);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    log(new LogMessage("LOCAL", LogLevel.ERROR,
+                            "Internal exception " + e.getMessage()));
+                }
+            }
+        });
     }
 
     private static void handleOnDisConnected() {
-        /*
-         Platform.runLater(() -> {
-         for (NSMObserver obs : m_observer) {
-         try {
-         obs.handleOnDisConnected();
-         } catch (Exception e) {
-         e.printStackTrace();
-         log(new LogMessage("LOCAL", LogLevel.ERROR,
-         "Internal exception " + e.getMessage()));
-         }
-         }
-         });
-         */
+        Platform.runLater(() -> {
+            for (NSMObserver obs : m_observer) {
+                try {
+                    obs.handleOnDisConnected();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    log(new LogMessage("LOCAL", LogLevel.ERROR,
+                            "Internal exception " + e.getMessage()));
+                }
+            }
+        });
     }
 
     private static void log(final LogMessage log) {
         System.out.println(log.getMessage());
-        /*
-         Platform.runLater(() -> {
-         for (NSMObserver obs : m_observer) {
-         obs.log(log);
-         }
-         });
-         */
+        Platform.runLater(() -> {
+            for (NSMObserver obs : m_observer) {
+                obs.log(log);
+            }
+        });
     }
 
     public static void restart() {

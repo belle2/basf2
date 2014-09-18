@@ -82,7 +82,7 @@ public abstract class DBObject implements Serializable {
     }
 
     public boolean hasArray(String name) {
-        return hasField(name) && !hasObject(name) && !hasText(name);
+        return hasField(name) && !hasObject(name) && !hasText(name) && m_pro_m.get(name).getLength() > 1;
     }
 
     public boolean hasValue(String name) {

@@ -27,7 +27,6 @@ unsigned int UDPSocket::findSubnet(unsigned int addr)
 {
   struct ifaddrs* ifa_list;
   struct ifaddrs* ifa;
-  int n;
   char addrstr[256], netmaskstr[256];
   if (getifaddrs(&ifa_list) != 0) return 0;
   for (ifa = ifa_list; ifa != NULL; ifa = ifa->ifa_next) {

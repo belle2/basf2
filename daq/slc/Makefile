@@ -1,4 +1,4 @@
-.PHONY : all clean base system database nsm dqm runcontrol hvcontrol hvcontrol/arich hvcontrol/cdc apps/nsm2socket
+.PHONY : all clean base system database nsm readout dqm runcontrol hvcontrol hvcontrol/arich hvcontrol/cdc apps/nsm2socket apps/runcontrold apps apps/rocontrold apps/cprcontrold 
 
 SRCDIR=./src
 INCDIR=./include/daq/slc/
@@ -6,74 +6,36 @@ LIBDIR=./lib
 BINDIR=./bin
 TMPDIR=./tmp
 
-all: base system database nsm nsm/tools runcontrol hvcontrol hvcontrol/arich hvcontrol/cdc apps/nsm2socket
+APPS = apps/nsm2socket apps/runcontrold apps/rocontrold apps/cprcontrold
+
+SUBPACKAGES = base system database nsm readout runcontrol hvcontrol hvcontrol/arich hvcontrol/cdc $(APPS)
+
+all: copyinc $(SUBPACKAGES)
+	@ make -C tools/
 
 full: all
 
-base:
-	@ mkdir -p $(INCDIR)/$@
+copyinc:
 	@ mkdir -p bin
-	@ install -m 644 -p $@/include/* $(INCDIR)/$@
-	@ make -f Makefile.src TARGET=$@
-
-system:
-	@ mkdir -p $(INCDIR)/$@
-	@ install -m 644 -p $@/include/* $(INCDIR)/$@
-	@ make -f Makefile.src TARGET=$@
-
-dqm:
-	@ mkdir -p $(INCDIR)/$@
-	@ install -m 644 -p $@/include/* $(INCDIR)/$@
-	@ make -f Makefile.src TARGET=$@
-
-nsm:
-	@ mkdir -p $(INCDIR)/$@
+	@ for dir in $(SUBPACKAGES); \
+	  do mkdir -p $(INCDIR)/$$dir; install -m 644 -p $$dir/include/* $(INCDIR)/$$dir; done
+	@ mkdir -p lib
 	@ mkdir -p include/nsm2
 	@ make -C ./extra/nsm2
 	@ install -m 644 -p ./extra/nsm2/corelib/*.h include/nsm2
 	@ install -m 644 -p ./extra/nsm2/b2lib/*.h include/nsm2
 	@ install -m 644 -p ./extra/nsm2/corelib/*.so $(LIBDIR)
 	@ install -m 644 -p ./extra/nsm2/b2lib/*.so $(LIBDIR)
-	@ install -m 644 -p $@/include/* $(INCDIR)/$@
-	@ install -m 755 -p ./extra/nsm2/daemon/nsmd2 $(BINDIR)/
-	@ install -m 755 -p ./extra/nsm2/daemon/nsminfo2 $(BINDIR)/
+	@ install -m 755 -p ./extra/nsm2/daemon/nsmd2 $(BINDIR)
+	@ install -m 755 -p ./extra/nsm2/daemon/nsminfo2 $(BINDIR)
+	@ mkdir -p include/mgt
+	@ make -C extra/mgt BELLE2_EXTERNALS_DIR=$(PWD)
+	@ mkdir -p include/ttrx
+	@ make -C extra/ttrx BELLE2_EXTERNALS_DIR=$(PWD)
+
+$(SUBPACKAGES): %:
 	@ make -f Makefile.src TARGET=$@
-	@ make -C nsm/tools
-
-runcontrol:
-	@ mkdir -p $(INCDIR)/$@
-	@ install -m 644 -p $@/include/* $(INCDIR)/$@
-	@ make -f Makefile.src TARGET=$@ 
-
-hvcontrol:
-	@ mkdir -p $(INCDIR)/$@
-	@ install -m 644 -p $@/include/* $(INCDIR)/$@
-	@ make -f Makefile.src TARGET=$@ 
-	@ make -C hvcontrol/tools
-
-hvcontrol/arich:
-	@ mkdir -p $(INCDIR)/$@
-	@ install -m 644 -p $@/include/* $(INCDIR)/$@
-	@ make -f Makefile.src TARGET=$@ 
-	@ make -C $@/tools
-
-hvcontrol/cdc:
-	@ mkdir -p $(INCDIR)/$@
-	@ install -m 644 -p $@/include/* $(INCDIR)/$@
-	@ make -f Makefile.src TARGET=$@ 
-	@ make -C $@/tools
-
-database:
-	@ mkdir -p $(INCDIR)/$@
-	@ install -m 644 -p $@/include/* $(INCDIR)/$@
-	@ make -f Makefile.src TARGET=$@ 
-	@ make -C database/tools
-
-apps/nsm2socket:
-	@ mkdir -p $(INCDIR)/$@
-	@ install -m 644 -p $@/include/* $(INCDIR)/$@
-	@ make -f Makefile.src TARGET=$@ 
-	@ make -C apps/nsm2socket/tools
+	@ if [ -f $@/tools/Makefile ]; then make -C $@/tools; fi
 
 clean:
 	@ rm -rf include $(LIBDIR) $(TMPDIR) bin

@@ -58,6 +58,7 @@ nsmparse_malloc(size_t siz, const char *where, const char *text)
 	   text  ? ": "   : "", text  ? text  : "");
     exit(1);
   }
+  memset(p, 0, siz);
   return p;
 }
 /* -- eval ------------------------------------------------------------- *\

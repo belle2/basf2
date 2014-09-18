@@ -3,6 +3,7 @@
 #include <daq/slc/system/LogFile.h>
 
 #include <cstring>
+#include <cstdlib>
 
 using namespace Belle2;
 

@@ -13,6 +13,7 @@
 #include <daq/slc/system/Time.h>
 
 #include <cstring>
+#include <cstdlib>
 #include <map>
 
 #include <unistd.h>

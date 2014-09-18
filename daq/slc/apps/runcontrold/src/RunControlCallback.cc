@@ -21,6 +21,7 @@
 #include <daq/slc/base/ConfigFile.h>
 
 #include <cstring>
+#include <cstdlib>
 #include <sstream>
 #include <unistd.h>
 

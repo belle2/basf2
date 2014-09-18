@@ -44,12 +44,11 @@ namespace Belle2 {
   ParticleListManipulatorModule::ParticleListManipulatorModule() : Module()
 
   {
-    // set module description (e.g. insert text)
-    setDescription("Manipulates ParticleLists: copies/mergesPerforms particle selection");
+    setDescription("Manipulates ParticleLists: copies/merges/performs particle selection");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("outputListName", m_outputListName, "Output ParticleList name", string(""));
+    addParam("outputListName", m_outputListName, "Output ParticleList name");
 
     vector<string> defaultList;
     addParam("inputListNames", m_inputListNames,
@@ -72,27 +71,20 @@ namespace Belle2 {
 
   void ParticleListManipulatorModule::initialize()
   {
-    if (m_outputListName.empty())
-      B2ERROR("Please provide output ParticleList names!");
+    m_pdgCode  = 0;
 
-    if (!m_outputListName.empty()) {
-      m_pdgCode  = 0;
+    // check the validity of output ParticleList name
+    bool valid = m_decaydescriptor.init(m_outputListName);
+    if (!valid)
+      B2ERROR("ParticleListManipulatorModule::initialize Invalid output ParticleList name: " << m_outputListName);
 
-      // check the validity of output ParticleList name
-      bool valid = m_decaydescriptor.init(m_outputListName);
-      if (!valid)
-        B2ERROR("ParticleListManipulatorModule::initialize Invalid output ParticleList name: " << m_outputListName);
+    // Output particle
+    const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
 
-      // Output particle
-      const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
+    m_pdgCode  = mother->getPDGCode();
 
-      m_pdgCode  = mother->getPDGCode();
-
-      m_isSelfConjugatedParticle = !(Belle2::EvtPDLUtil::hasAntiParticle(m_pdgCode));
-      m_outputAntiListName       = Belle2::EvtPDLUtil::antiParticleListName(m_pdgCode, mother->getLabel());
-    } else {
-      B2ERROR("Please provide output ParticleList name!");
-    }
+    m_isSelfConjugatedParticle = !(Belle2::EvtPDLUtil::hasAntiParticle(m_pdgCode));
+    m_outputAntiListName       = Belle2::EvtPDLUtil::antiParticleListName(m_pdgCode, mother->getLabel());
 
     // Input lists
     unsigned nProducts = m_inputListNames.size();

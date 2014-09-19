@@ -484,14 +484,14 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 //   lambdaTestMatrix(nHits - 2, 0) = sqrt(-1); // producing 'nan'
 //   B2DEBUG(175, "lambdaCheckMatrix4NAN(lambdaTestMatrix): " << lambdaCheckMatrix4NAN(lambdaTestMatrix) << " (should be 1)")
 
-  if (lambdaCheckMatrix4NAN(inverseCovMatrix) == true) { B2DEBUG(1, "helixFit: inverseCovMatrix got 'nan'-entries!"); didNanAppear = true; }
-  if (lambdaCheckMatrix4NAN(X) == true) { B2DEBUG(1, "helixFit: X got 'nan'-entries!"); didNanAppear = true; }
+  if (lambdaCheckMatrix4NAN(inverseCovMatrix) == true) { B2DEBUG(3, "helixFit: inverseCovMatrix got 'nan'-entries!"); didNanAppear = true; }
+  if (lambdaCheckMatrix4NAN(X) == true) { B2DEBUG(3, "helixFit: X got 'nan'-entries!"); didNanAppear = true; }
 
 
   /// transform to paraboloid:
   double inverseSumWeights = 1. / sumWeights;
   TMatrixD xBar = onesR * inverseCovMatrix * X * inverseSumWeights; // weighed sample mean values
-  if (lambdaCheckMatrix4NAN(xBar) == true) { B2DEBUG(1, "helixFit: xBar got 'nan'-entries!"); didNanAppear = true; }
+  if (lambdaCheckMatrix4NAN(xBar) == true) { B2DEBUG(3, "helixFit: xBar got 'nan'-entries!"); didNanAppear = true; }
 
 
   TMatrixD transX = X;
@@ -500,15 +500,15 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
   transxBar.Transpose(transxBar);
 
   TMatrixD weighedSampleCovMatrix = transX * inverseCovMatrix * X - transxBar * xBar * sumWeights;
-  if (lambdaCheckMatrix4NAN(weighedSampleCovMatrix) == true) { B2DEBUG(1, "helixFit: weighedSampleCovMatrix got 'nan'-entries!"); didNanAppear = true; }
+  if (lambdaCheckMatrix4NAN(weighedSampleCovMatrix) == true) { B2DEBUG(3, "helixFit: weighedSampleCovMatrix got 'nan'-entries!"); didNanAppear = true; }
 
 
   /// find eigenvector to smallest eigenvalue
   TMatrixDEigen eigenCollection(weighedSampleCovMatrix);
   TMatrixD eigenValues = eigenCollection.GetEigenValues();
-  if (lambdaCheckMatrix4NAN(eigenValues) == true) { B2DEBUG(1, "helixFit: eigenValues got 'nan'-entries!"); didNanAppear = true; }
+  if (lambdaCheckMatrix4NAN(eigenValues) == true) { B2DEBUG(3, "helixFit: eigenValues got 'nan'-entries!"); didNanAppear = true; }
   TMatrixD eigenVectors = eigenCollection.GetEigenVectors();
-  if (lambdaCheckMatrix4NAN(eigenVectors) == true) { B2DEBUG(1, "helixFit: eigenVectors got 'nan'-entries!"); didNanAppear = true; }
+  if (lambdaCheckMatrix4NAN(eigenVectors) == true) { B2DEBUG(3, "helixFit: eigenVectors got 'nan'-entries!"); didNanAppear = true; }
 
   double minValue = std::numeric_limits<double>::max();
   int minValueIndex = -1;
@@ -553,7 +553,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 
   /// line fit:
   TMatrixD H = distanceOfPlane + R2 * n3; // temporary value
-  if (lambdaCheckMatrix4NAN(H) == true) { B2DEBUG(1, "helixFit: H got 'nan'-entries!"); didNanAppear = true; }
+  if (lambdaCheckMatrix4NAN(H) == true) { B2DEBUG(3, "helixFit: H got 'nan'-entries!"); didNanAppear = true; }
 
   TMatrixD H2 = H;
   H2.Sqr(); // squares each element
@@ -574,8 +574,8 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 
       //Console Output:
       B2WARNING("T" << k << " was " << T(k, 0) << " and will manually be set to 0.");
-      if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true) {
-        B2DEBUG(1, "The following hits were part of this TC: \n" << printHits(m_hits) << "\n'T' had following entries: " << printMyMatrixstring(T));
+      if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 3, PACKAGENAME()) == true) {
+        B2DEBUG(3, "The following hits were part of this TC: \n" << printHits(m_hits) << "\n'T' had following entries: " << printMyMatrixstring(T));
       }
 
       T(k, 0) = 0;
@@ -584,7 +584,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 
   T.Sqrt(); // take square root of all elements
 //   for (int i = 0; i < T.GetNrows(); ++i) { T(i, 0) = sqrt(T(i, 0)); }
-  if (lambdaCheckMatrix4NAN(T) == true) { B2DEBUG(1, "helixFit: T got 'nan'-entries after Sqrt! Before: T.min: " << T2.Min() << ", T.max: " << T2.Max() << ", after: T.min: " << T.Min() << ", T.max: " << T.Max()); didNanAppear = true; }
+  if (lambdaCheckMatrix4NAN(T) == true) { B2DEBUG(3, "helixFit: T got 'nan'-entries after Sqrt! Before: T.min: " << T2.Min() << ", T.max: " << T2.Max() << ", after: T.min: " << T.Min() << ", T.max: " << T.Max()); didNanAppear = true; }
 
   b = 1. / b;
 
@@ -666,7 +666,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 //     s(i, 0) = rho * acos(((radiusX * radiusXb + radiusY * radiusYb) * invRadiusMag) / radiusMagb); // version 2
     if (std::isnan(s(i, 0)) == true) {
       didNanAppear = true;
-      B2DEBUG(1, "helixFit: i: " << i << ", s(i) = 'nan', components - rho: " << rho << ", radiusX: " << radiusX << ", radiusY: " << radiusY << ", radiusXb: " << radiusXb << ", radiusYb: " << radiusYb << ", invRadiusMag: " << invRadiusMag << ", radiusMagb: " << radiusMagb << ", xs(i): " << xs(i, 0) << ", ys(i): " << ys(i, 0))
+      B2DEBUG(3, "helixFit: i: " << i << ", s(i) = 'nan', components - rho: " << rho << ", radiusX: " << radiusX << ", radiusY: " << radiusY << ", radiusXb: " << radiusXb << ", radiusYb: " << radiusYb << ", invRadiusMag: " << invRadiusMag << ", radiusMagb: " << radiusMagb << ", xs(i): " << xs(i, 0) << ", ys(i): " << ys(i, 0))
     }
   }
 
@@ -703,7 +703,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
   if (std::isnan(thetaVal) == true) {
     didNanAppear = true;
     thetaVal = (hits->at(0)->hitPosition - hits->at(nHits - 1)->hitPosition).Theta(); /// INFO swapped! feb4th2014
-    B2DEBUG(1, "helixFit: calculating theta for momentum produced 'nan' -> fallback-solution produces theta: " << thetaVal)
+    B2DEBUG(3, "helixFit: calculating theta for momentum produced 'nan' -> fallback-solution produces theta: " << thetaVal)
     if (std::isnan(thetaVal) == true) { B2ERROR("helixFit: no usable Theta value could be produced -> serious error telling us that helix fit does not work! bypass is setting the value to 0!"); thetaVal = 0; }
   }
 
@@ -757,7 +757,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
   if (lambdaCheckVector4NAN(pVector) == true) { B2ERROR("helixFit: pVector got 'nan'-entries x/y/z: " << pVector.X() << "/" << pVector.Y() << "/" << pVector.Z()); didNanAppear = true; }
 
   if (didNanAppear == true && LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true) {
-    B2DEBUG(1, "helixFit: there was a 'nan'-value detected. When using magnetic field of " << m_3hitFilterBox.getMagneticField() << ", the following hits were part of this TC: \n" << printHits(m_hits) << "\n pVector  x/y/z: " << pVector.X() << "/" << pVector.Y() << "/" << pVector.Z())
+    B2DEBUG(3, "helixFit: there was a 'nan'-value detected. When using magnetic field of " << m_3hitFilterBox.getMagneticField() << ", the following hits were part of this TC: \n" << printHits(m_hits) << "\n pVector  x/y/z: " << pVector.X() << "/" << pVector.Y() << "/" << pVector.Z())
   }
 
 

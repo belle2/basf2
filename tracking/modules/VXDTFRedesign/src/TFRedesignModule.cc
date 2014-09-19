@@ -24,7 +24,6 @@
 #include <svd/reconstruction/SVDRecoHit2D.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
-#include <testbeam/vxd/reconstruction/TelRecoHit.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
 
 #include "tracking/dataobjects/FilterID.h"
@@ -653,12 +652,10 @@ void TFRedesignModule::the_real_event()
    ** in-module-function-calls:
    */
 
-  EventInfoPackage thisInfoPackage;
+  m_eventCounter++; // we count the event number manually to get usefull results for endRun-info when activating multicore
 
-  boostClock::time_point beginEvent = boostClock::now();
+  m_evInfoPack.startEvent(m_eventCounter); // stores meta info like counters and time consumption for current event
 
-  m_eventCounter++;
-  thisInfoPackage.evtNumber = m_eventCounter;
   B2DEBUG(3, "################## entering vxd CA track finder - event " << m_eventCounter << " ######################");
   /** cleaning will be done at the end of the event **/
 
@@ -694,30 +691,22 @@ void TFRedesignModule::the_real_event()
    */
 
   // importing hits
-  StoreArray<PXDCluster> aPxdClusterArray(m_PARAMpxdClustersName);
-  int nPxdClusters = 0;
-  if (m_usePXDHits == true) { nPxdClusters = aPxdClusterArray.getEntries(); }
+  m_evInfoPack.nPXDClusters = 0;
+  if (m_usePXDHits == true) { m_evInfoPack.nPXDClusters = m_pxdClusters.getEntries(); }
 
-  StoreArray<SVDCluster> aSvdClusterArray(m_PARAMsvdClustersName);
-  int nSvdClusters = 0;
-  if (m_useSVDHits == true) { nSvdClusters = aSvdClusterArray.getEntries(); }
+  m_evInfoPack.nSVDClusters = 0;
+  if (m_useSVDHits == true) { m_evInfoPack.nSVDClusters = m_svdClusters.getEntries(); }
 
-  thisInfoPackage.numPXDCluster = nPxdClusters;
-  thisInfoPackage.numSVDCluster = nSvdClusters;
-  int nTotalClusters = nPxdClusters + nSvdClusters; // counts number of clusters total
+  B2DEBUG(3, "event: " << m_evInfoPack.evtNumber << ": nPxdClusters: " << m_evInfoPack.nPXDClusters << ", nSvdClusters: " << m_evInfoPack.nSVDClusters);
 
-  B2DEBUG(3, "event: " << m_eventCounter << ": nPxdClusters: " << nPxdClusters << ", nSvdClusters: " << nSvdClusters);
 
-  boostClock::time_point stopTimer = boostClock::now();
-  if (nTotalClusters == 0) {
-    B2DEBUG(3, "event: " << m_eventCounter << ": there are no hits, terminating event...");
+  if ((m_evInfoPack.nPXDClusters + m_evInfoPack.nSVDClusters) == 0) {
+
+    B2DEBUG(3, "event: " << m_evInfoPack.evtNumber << ": there are no hits, terminating event...");
     m_TESTERnoHitsAtEvent++;
 
-    m_TESTERtimeConsumption.intermediateStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
-    thisInfoPackage.sectionConsumption.intermediateStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
-    thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
-    B2DEBUG(3, "event: " << m_eventCounter << ", duration : " << thisInfoPackage.totalTime.count() << "ns");
-    m_TESTERlogEvents.push_back(thisInfoPackage);
+    m_evInfoPack.duration.intermediateStuff += m_evInfoPack.TicToc();
+    stopTFevent();
     return;
   }
 
@@ -728,8 +717,6 @@ void TFRedesignModule::the_real_event()
     StoreArray<VXDTFInfoBoard> extraInfo4GFTCs;
     extraInfo4GFTCs.create();
   }
-
-  VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
 
 //   generating virtual Hit at position (0, 0, 0) - needed for virtual segment.
   PositionInfo vertexInfo;
@@ -762,9 +749,7 @@ void TFRedesignModule::the_real_event()
     passNumber--;
   }
 
-  stopTimer = boostClock::now();
-  m_TESTERtimeConsumption.intermediateStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
-  thisInfoPackage.sectionConsumption.intermediateStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
+  m_evInfoPack.duration.intermediateStuff += m_evInfoPack.TicToc();
 
 
   /// Section 3b
@@ -787,11 +772,11 @@ void TFRedesignModule::the_real_event()
    ** in-module-function-calls:
    */
 
-  boostClock::time_point timeStamp = boostClock::now();
-  vector<ClusterInfo> clustersOfEvent(nPxdClusters + nSvdClusters); /// contains info which tc uses which clusters
+  m_evInfoPack.newTic();
+  vector<ClusterInfo> clustersOfEvent(m_evInfoPack.nPXDClusters + m_evInfoPack.nSVDClusters); /// contains info which tc uses which clusters
 
-  for (int i = 0; i < nPxdClusters; ++i) {
-    ClusterInfo newCluster(i, i, true, false, false, aPxdClusterArray[i], NULL);
+  for (int i = 0; i < m_evInfoPack.nPXDClusters; ++i) {
+    ClusterInfo newCluster(i, i, true, false, false, m_pxdClusters[i], NULL);
     B2DEBUG(50, "Pxd clusterInfo: realIndex " << newCluster.getRealIndex() << ", ownIndex " << newCluster.getOwnIndex())
     clustersOfEvent[i] = newCluster;
     B2DEBUG(50, " PXDcluster " << i << " in position " << i << " stores real Cluster " << clustersOfEvent.at(i).getRealIndex() << " at indexPosition of own list (clustersOfEvent): " << clustersOfEvent.at(i).getOwnIndex() << " withClustersOfeventSize: " << clustersOfEvent.size())
@@ -803,7 +788,7 @@ void TFRedesignModule::the_real_event()
   if (m_PARAMdisplayCollector > 0) {
 
     for (uint m = 0; m < m_passSetupVector.size(); m++) {
-      for (int i = 0; i < nPxdClusters; ++i) {
+      for (int i = 0; i < m_evInfoPack.nPXDClusters; ++i) {
 
         // importCluster (int passIndex, std::string diedAt, int accepted, int rejected, int detectorType, int relativePosition)
         int clusterid = m_collector.importCluster(m, "", CollectorTFInfo::m_idAlive, vector<int>(), vector<int>(), Const::PXD, i);
@@ -816,10 +801,10 @@ void TFRedesignModule::the_real_event()
   }
 
 
-  for (int i = 0; i < nSvdClusters; ++i) {
-    ClusterInfo newCluster(i, i + nPxdClusters, false, true, false, NULL, aSvdClusterArray[i]);
-    B2DEBUG(50, "Svd clusterInfo: realIndex " << newCluster.getRealIndex() << ", ownIndex " << newCluster.getOwnIndex())     clustersOfEvent[i + nPxdClusters] = newCluster;
-    B2DEBUG(50, " SVDcluster " << i << " in position " << i + nPxdClusters << " stores real Cluster " << clustersOfEvent.at(i + nPxdClusters).getRealIndex() << " at indexPosition of own list (clustersOfEvent): " << clustersOfEvent.at(i + nPxdClusters).getOwnIndex() << " withClustersOfeventSize: " << clustersOfEvent.size())
+  for (int i = 0; i < m_evInfoPack.nSVDClusters; ++i) {
+    ClusterInfo newCluster(i, i + m_evInfoPack.nPXDClusters, false, true, false, NULL, m_svdClusters[i]);
+    B2DEBUG(50, "Svd clusterInfo: realIndex " << newCluster.getRealIndex() << ", ownIndex " << newCluster.getOwnIndex())     clustersOfEvent[i + m_evInfoPack.nPXDClusters] = newCluster;
+    B2DEBUG(50, " SVDcluster " << i << " in position " << i + m_evInfoPack.nPXDClusters << " stores real Cluster " << clustersOfEvent.at(i + m_evInfoPack.nPXDClusters).getRealIndex() << " at indexPosition of own list (clustersOfEvent): " << clustersOfEvent.at(i + m_evInfoPack.nPXDClusters).getOwnIndex() << " withClustersOfeventSize: " << clustersOfEvent.size())
 
   } // the position in the vector is NOT the index it has stored (except if there are no PXDClusters)
 
@@ -827,7 +812,7 @@ void TFRedesignModule::the_real_event()
   if (m_PARAMdisplayCollector > 0) {
     for (uint m = 0; m < m_passSetupVector.size(); m++) {
 
-      for (int i = 0 + nPxdClusters; i < nSvdClusters + nPxdClusters; ++i) {
+      for (int i = 0 + m_evInfoPack.nPXDClusters; i < m_evInfoPack.nSVDClusters + m_evInfoPack.nPXDClusters; ++i) {
 
         // importCluster (int passIndex, std::string diedAt, int accepted, int rejected, int detectorType, int relativePosition)
         int clusterid = m_collector.importCluster(m, "", CollectorTFInfo::m_idAlive, vector<int>(), vector<int>(), Const::SVD, i);
@@ -839,40 +824,7 @@ void TFRedesignModule::the_real_event()
     }
   }
 
-  m_TESTERtimeConsumption.hitSorting += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
-  thisInfoPackage.sectionConsumption.hitSorting += boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
-
-
-  /// Section 3c
-  /** REDESIGNCOMMENT EVENT 4:
-   * * short:
-   * Section 3c - BaseLineTF
-   *
-   ** long (+personal comments):
-   * That one should probably become its own module, has dependency of the testbeam package.
-   * request: for the case of several TFs executed in the same event, there should be some small container lying in the storeArray which allows these TFs to communicate somehow. E.g. Testbeam: BaseLineTF has found something and is happy with the result, shall be able to inform the following real TFs that they do not have to execute that event any more.
-   *
-   ** dependency of module parameters (global):
-   * m_PARAMactivateBaselineTF, m_PARAMdisplayCollector, m_TESTERexpandedTestingRoutines,
-   * m_PARAMinfoBoardName, m_PARAMwriteToRoot,
-   *
-   ** dependency of global in-module variables:
-   * m_baselinePass, m_TESTERstartedBaselineTF, m_TESTERsucceededBaselineTF,
-   * m_calcQiType, m_collector, m_TESTERcountTotalUsedIndicesFinal,
-   * m_TESTERcountTotalUsedHitsFinal, m_TESTERcountTotalTCsFinal,  m_TESTERtimeConsumption,
-   * m_rootTimeConsumption, m_treeEventWisePtr, m_TESTERlogEvents,
-   * m_eventCounter
-   *
-   ** dependency of global stuff just because of B2XX-output or debugging only:
-   * m_TESTERstartedBaselineTF, m_TESTERsucceededBaselineTF, m_PARAMdisplayCollector,
-   * m_collector, m_TESTERexpandedTestingRoutines, m_TESTERcountTotalUsedIndicesFinal,
-   * m_TESTERcountTotalUsedHitsFinal, m_TESTERcountTotalTCsFinal, m_TESTERtimeConsumption,
-   * m_rootTimeConsumption, m_treeEventWisePtr, m_TESTERlogEvents,
-   * m_eventCounter
-   *
-   ** in-module-function-calls:
-   * baselineTF(clustersOfEvent, &m_baselinePass)
-   */
+  m_evInfoPack.duration.hitSorting += m_evInfoPack.TicToc();
 
 
 
@@ -908,33 +860,33 @@ void TFRedesignModule::the_real_event()
    * find2DSVDHits(activatedSensors, clusterHitList)
    */
 
-  B2DEBUG(3, "VXDTF event " << m_eventCounter << ": size of arrays, PXDCluster: " << nPxdClusters << ", SVDCLuster: " << nSvdClusters << ", clustersOfEvent: " << clustersOfEvent.size());
+  B2DEBUG(3, "VXDTF event " << m_eventCounter << ": size of arrays, PXDCluster: " << m_evInfoPack.nPXDClusters << ", SVDCLuster: " << m_evInfoPack.nSVDClusters << ", clustersOfEvent: " << clustersOfEvent.size());
 
   TVector3 hitLocal, transformedHitLocal, localSensorSize, hitSigma;
   PositionInfo hitInfo;
   double vSize, uSizeAtHit, uCoord, vCoord;
   FullSecID aSecID;
   VxdID aVxdID;
-  timeStamp = boostClock::now();
+  m_evInfoPack.newTic();
   int badSectorRangeCtr = 0, aLayerID;
 
 
   /** searching sectors for hit:*/
 
-  for (int iPart = 0; iPart < nPxdClusters; ++iPart) { /// means: nPxdClusters > 0 if at least one pass wants PXD hits
-    const PXDCluster* const aClusterPtr = aPxdClusterArray[iPart];
+  for (int iPart = 0; iPart < m_evInfoPack.nPXDClusters; ++iPart) { /// means: m_evInfoPack.nPXDClusters > 0 if at least one pass wants PXD hits
+    const PXDCluster* const aClusterPtr = m_pxdClusters[iPart];
 
     B2DEBUG(100, " pxdCluster has clusterIndexUV: " << iPart
             << " with collected charge: " << aClusterPtr->getCharge()
             << " and their infoClass is at: " << iPart << " with collected charge: "
-            << aPxdClusterArray[iPart]->getCharge()) /// REDESIGN
+            << m_pxdClusters[iPart]->getCharge()) /// REDESIGN
 
     hitLocal.SetXYZ(aClusterPtr->getU(), aClusterPtr->getV(), 0);
     hitSigma.SetXYZ(aClusterPtr->getUSigma(), aClusterPtr->getVSigma(), 0);
 
     aVxdID = aClusterPtr->getSensorID();
     aLayerID = aVxdID.getLayerNumber();
-    VXD::SensorInfoBase aSensorInfo = geometry.getSensorInfo(aVxdID);
+    VXD::SensorInfoBase aSensorInfo = VXD::GeoCache::get(aVxdID);
     hitInfo.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
     hitInfo.sigmaU = aClusterPtr->getUSigma();
     hitInfo.sigmaV = aClusterPtr->getVSigma();
@@ -1039,17 +991,16 @@ void TFRedesignModule::the_real_event()
     nClusterCombis = clusterHitList.size();
 
     if (nClusterCombis > m_PARAMkillEventForHighOccupancyThreshold) {
-      B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of clusterCombis: " << nClusterCombis << ", terminating event! There were " << nPxdClusters << "/" << nSvdClusters << "/" << nClusterCombis << " TEL-/PXD-/SVD-clusters/SVD-cluster-combinations.")
+      B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of clusterCombis: " << nClusterCombis << ", terminating event! There were " << m_evInfoPack.nPXDClusters << "/" << m_evInfoPack.nSVDClusters << "/" << nClusterCombis << " TEL-/PXD-/SVD-clusters/SVD-cluster-combinations.")
       m_TESTERbrokenEventsCtr++;
 
       /** cleaning part **/
       for (PassData * currentPass : m_passSetupVector) {
         cleanEvent(currentPass);
       }
-      stopTimer = boostClock::now();
-      thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
-      B2DEBUG(3, "event: " << m_eventCounter << ", duration : " << thisInfoPackage.totalTime.count() << "ns");
-      m_TESTERlogEvents.push_back(thisInfoPackage);
+
+      m_evInfoPack.duration.hitSorting += m_evInfoPack.TicToc();
+      stopTFevent();
       return;
     }
 
@@ -1064,11 +1015,11 @@ void TFRedesignModule::the_real_event()
       float timeStampU = uClusterPtr->getClsTime();
       float timeStampV = vClusterPtr->getClsTime();
 
-      B2DEBUG(100, " svdClusterCombi has clusterIndexU/clusterIndexV: " << clusterIndexU << "/" << clusterIndexV << " with collected charge u/v: " << uClusterPtr->getCharge() << "/" << vClusterPtr->getCharge() << " and their infoClasses are at u/v: " << uClusterInfo->getOwnIndex() << "/" << vClusterInfo->getOwnIndex() << " with collected charge u/v: " << aSvdClusterArray[clusterIndexU]->getCharge() << "/" << aSvdClusterArray[clusterIndexV]->getCharge())
+      B2DEBUG(100, " svdClusterCombi has clusterIndexU/clusterIndexV: " << clusterIndexU << "/" << clusterIndexV << " with collected charge u/v: " << uClusterPtr->getCharge() << "/" << vClusterPtr->getCharge() << " and their infoClasses are at u/v: " << uClusterInfo->getOwnIndex() << "/" << vClusterInfo->getOwnIndex() << " with collected charge u/v: " << m_svdClusters[clusterIndexU]->getCharge() << "/" << m_svdClusters[clusterIndexV]->getCharge())
 
       aVxdID = uClusterPtr->getSensorID();
       aLayerID = aVxdID.getLayerNumber();
-      VXD::SensorInfoBase aSensorInfo = geometry.getSensorInfo(aVxdID);
+      VXD::SensorInfoBase aSensorInfo = VXD::GeoCache::get(aVxdID);
       if ((aSensorInfo.getBackwardWidth() > aSensorInfo.getForwardWidth()) == true) {   // isWedgeSensor
         hitLocal.SetX((aSensorInfo.getWidth(vClusterPtr->getPosition()) / aSensorInfo.getWidth(0)) * uClusterPtr->getPosition());
       } else { // rectangular Sensor
@@ -1202,16 +1153,15 @@ void TFRedesignModule::the_real_event()
     }
   }
   m_badSectorRangeCounter += badSectorRangeCtr;
-  m_totalPXDClusters += nPxdClusters;
-  m_totalSVDClusters += nSvdClusters;
+  m_totalPXDClusters += m_evInfoPack.nPXDClusters;
+  m_totalSVDClusters += m_evInfoPack.nSVDClusters;
   m_totalSVDClusterCombis += nClusterCombis;
-  thisInfoPackage.numSVDHits += nClusterCombis;
-  stopTimer = boostClock::now();
-  m_TESTERtimeConsumption.hitSorting += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-  thisInfoPackage.sectionConsumption.hitSorting += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+  m_evInfoPack.numSVDHits += nClusterCombis;
+
+  m_evInfoPack.duration.hitSorting += m_evInfoPack.TicToc();
 
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 3, PACKAGENAME()) == true) {
-    B2DEBUG(3, "VXDTF- import hits: of " << nSvdClusters << " svdClusters, " << nClusterCombis << " svd2Dclusters, " << nPxdClusters  << " pxdClusters, " << badSectorRangeCtr << " hits had to be discarded because out of sector range")
+    B2DEBUG(3, "VXDTF- import hits: of " << m_evInfoPack.nSVDClusters << " svdClusters, " << nClusterCombis << " svd2Dclusters, " << m_evInfoPack.nPXDClusters  << " pxdClusters, " << badSectorRangeCtr << " hits had to be discarded because out of sector range")
   }
   /** Section 3 - end **/
 
@@ -1252,7 +1202,7 @@ void TFRedesignModule::the_real_event()
     }
 
 
-    timeStamp = boostClock::now();
+    m_evInfoPack.newTic();
     B2DEBUG(10, "Pass " << passNumber << ": sectorVector has got " << currentPass->sectorVector.size() << " entries before applying unique & sort");
 
     // inverse sorting and removing unique entries so we can get a list of activated sectors where the outermost sector is the first in the list:
@@ -1277,26 +1227,21 @@ void TFRedesignModule::the_real_event()
     m_TESTERtotalsegmentsSFCtr += activatedSegments;
     m_TESTERdiscardedSegmentsSFCtr += discardedSegments;
     B2DEBUG(3, "VXDTF-event " << m_eventCounter << ", pass" << passNumber << " @ segfinder - " << activatedSegments << " segments activated, " << discardedSegments << " discarded");
-    thisInfoPackage.segFinderActivated += activatedSegments;
-    thisInfoPackage.segFinderDiscarded += discardedSegments;
-    thisInfoPackage.numHitCombisTotal += (activatedSegments + discardedSegments);
+    m_evInfoPack.segFinderActivated += activatedSegments;
+    m_evInfoPack.segFinderDiscarded += discardedSegments;
+    m_evInfoPack.numHitCombisTotal += (activatedSegments + discardedSegments);
 
-    stopTimer = boostClock::now();
-    m_TESTERtimeConsumption.segFinder += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-    thisInfoPackage.sectionConsumption.segFinder += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+    m_evInfoPack.duration.segFinder += m_evInfoPack.TicToc();
 
     if (activatedSegments > m_PARAMkillEventForHighOccupancyThreshold) {
-      B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of activated segments: " << activatedSegments << ", terminating event! There were " << nPxdClusters << "/" << nSvdClusters << "/" << nClusterCombis << " PXD-/SVD-clusters/SVD-cluster-combinations.")
+      B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of activated segments: " << activatedSegments << ", terminating event! There were " << m_evInfoPack.nPXDClusters << "/" << m_evInfoPack.nSVDClusters << "/" << nClusterCombis << " PXD-/SVD-clusters/SVD-cluster-combinations.")
       m_TESTERbrokenEventsCtr++;
 
       /** cleaning part **/
       for (PassData * currentPass : m_passSetupVector) {
         cleanEvent(currentPass);
       }
-      stopTimer = boostClock::now();
-      thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
-      B2DEBUG(3, "event: " << m_eventCounter << ", duration : " << thisInfoPackage.totalTime.count() << "ns");
-      m_TESTERlogEvents.push_back(thisInfoPackage);
+      stopTFevent();
       return;
     }
     /** Section 4 - end **/
@@ -1330,31 +1275,27 @@ void TFRedesignModule::the_real_event()
      * neighbourFinder(currentPass)
      * cleanEvent(currentPass)
      */
-    timeStamp = boostClock::now();
+    m_evInfoPack.newTic();
     B2DEBUG(5, "pass " << passNumber << ": starting neighbourFinder...");
     discardedSegments = neighbourFinder(currentPass);                       /// calling funtion "neighbourFinder"
     activatedSegments = currentPass->activeCellList.size();
     m_TESTERtotalsegmentsNFCtr += activatedSegments;
     m_TESTERdiscardedSegmentsNFCtr += discardedSegments;
     B2DEBUG(3, "VXDTF-event " << m_eventCounter << ", pass" << passNumber << " @ nbfinder - " << activatedSegments << " segments activated, " << discardedSegments << " discarded");
-    thisInfoPackage.nbFinderActivated += activatedSegments;
-    thisInfoPackage.nbFinderDiscarded += discardedSegments;
-    stopTimer = boostClock::now();
-    m_TESTERtimeConsumption.nbFinder += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-    thisInfoPackage.sectionConsumption.nbFinder += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+    m_evInfoPack.nbFinderActivated += activatedSegments;
+    m_evInfoPack.nbFinderDiscarded += discardedSegments;
+
+    m_evInfoPack.duration.nbFinder += m_evInfoPack.TicToc();
 
     if (activatedSegments > m_PARAMkillEventForHighOccupancyThreshold) {
-      B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": after nbFinder, total number of activated segments: " << activatedSegments << ", terminating event! There were " << nPxdClusters << "/" << nSvdClusters << "/" << nClusterCombis << " PXD-/SVD-clusters/SVD-cluster-combinations.")
+      B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": after nbFinder, total number of activated segments: " << activatedSegments << ", terminating event! There were " << m_evInfoPack.nPXDClusters << "/" << m_evInfoPack.nSVDClusters << "/" << nClusterCombis << " PXD-/SVD-clusters/SVD-cluster-combinations.")
       m_TESTERbrokenEventsCtr++;
 
       /** cleaning part **/
       for (PassData * currentPass : m_passSetupVector) {
         cleanEvent(currentPass);
       }
-      stopTimer = boostClock::now();
-      thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
-      B2DEBUG(3, "event: " << m_eventCounter << ", duration : " << thisInfoPackage.totalTime.count() << "ns");
-      m_TESTERlogEvents.push_back(thisInfoPackage);
+      stopTFevent();
       return;
     }
     /** Section 5 - end **/
@@ -1383,28 +1324,23 @@ void TFRedesignModule::the_real_event()
      * cellularAutomaton(currentPass)
      * cleanEvent(currentPass)
      */
-    timeStamp = boostClock::now();
+    m_evInfoPack.newTic();
     int numRounds = cellularAutomaton(currentPass);
     B2DEBUG(3, "pass " << passNumber << ": cellular automaton finished in " << numRounds << " rounds");
     if (numRounds < 0) {
-      B2ERROR(m_PARAMnameOfInstance << " event " << m_eventCounter << ": cellular automaton entered an infinite loop, therefore aborted, terminating event! There were " << nPxdClusters << "/" << nSvdClusters << "/" << nClusterCombis << " PXD-/SVD-clusters/SVD-cluster-combinations, total number of activated segments: " << activatedSegments)
+      B2ERROR(m_PARAMnameOfInstance << " event " << m_eventCounter << ": cellular automaton entered an infinite loop, therefore aborted, terminating event! There were " << m_evInfoPack.nPXDClusters << "/" << m_evInfoPack.nSVDClusters << "/" << nClusterCombis << " PXD-/SVD-clusters/SVD-cluster-combinations, total number of activated segments: " << activatedSegments)
       m_TESTERbrokenEventsCtr++;
 
       /** cleaning part **/
       for (PassData * currentPass : m_passSetupVector) {
         cleanEvent(currentPass);
       }
-      stopTimer = boostClock::now();
-      m_TESTERtimeConsumption.cellularAutomaton += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-      thisInfoPackage.sectionConsumption.cellularAutomaton += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-      thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
-      B2DEBUG(3, "event: " << m_eventCounter << ", duration : " << thisInfoPackage.totalTime.count() << "ns");
-      m_TESTERlogEvents.push_back(thisInfoPackage);
+
+      m_evInfoPack.duration.cellularAutomaton += m_evInfoPack.TicToc();
+      stopTFevent();
       return;
     }
-    stopTimer = boostClock::now();
-    m_TESTERtimeConsumption.cellularAutomaton += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-    thisInfoPackage.sectionConsumption.cellularAutomaton += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+    m_evInfoPack.duration.cellularAutomaton += m_evInfoPack.TicToc();
 
     // Set current passNumber for Collector
     if (m_PARAMdisplayCollector > 0) {
@@ -1437,31 +1373,26 @@ void TFRedesignModule::the_real_event()
      * tcCollector(currentPass)
      * cleanEvent(currentPass)
      */
-    timeStamp = boostClock::now();
+    m_evInfoPack.newTic();
     int totalTCs = 0;
     delFalseFriends(currentPass, currentPass->origin);
     tcCollector(currentPass);                                     /// tcCollector
     int survivingTCs = currentPass->tcVector.size();
     totalTCs += survivingTCs;
     B2DEBUG(3, "pass " << passNumber << ": track candidate collector generated " << survivingTCs << " TCs");
-    thisInfoPackage.numTCsAfterTCC += survivingTCs;
+    m_evInfoPack.numTCsAfterTCC += survivingTCs;
 
+    m_evInfoPack.duration.tcc += m_evInfoPack.TicToc();
 
-    stopTimer = boostClock::now();
-    m_TESTERtimeConsumption.tcc += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-    thisInfoPackage.sectionConsumption.tcc += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
     if (totalTCs > m_PARAMkillEventForHighOccupancyThreshold / 3) {
-      B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of tcs after tcc: " << totalTCs << ", terminating event! There were " << nPxdClusters << "/" << nSvdClusters << "/" << nClusterCombis << " PXD-/SVD-clusters/SVD-cluster-combinations, total number of activated segments: " << activatedSegments)
+      B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of tcs after tcc: " << totalTCs << ", terminating event! There were " << m_evInfoPack.nPXDClusters << "/" << m_evInfoPack.nSVDClusters << "/" << nClusterCombis << " PXD-/SVD-clusters/SVD-cluster-combinations, total number of activated segments: " << activatedSegments)
       m_TESTERbrokenEventsCtr++;
 
       /** cleaning part **/
       for (PassData * currentPass : m_passSetupVector) {
         cleanEvent(currentPass);
       }
-      stopTimer = boostClock::now();
-      thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
-      B2DEBUG(3, "event: " << m_eventCounter << ", duration : " << thisInfoPackage.totalTime.count() << "ns");
-      m_TESTERlogEvents.push_back(thisInfoPackage);
+      stopTFevent();
       return;
     }
     /** Section 7 - end **/
@@ -1486,19 +1417,17 @@ void TFRedesignModule::the_real_event()
      ** in-module-function-calls:
      * tcFilter(currentPass, passNumber)
      */
-    timeStamp = boostClock::now();
+    m_evInfoPack.newTic();
     survivingTCs = 0;
     if (int(currentPass->tcVector.size()) != 0) {
       survivingTCs = tcFilter(currentPass, passNumber);
-      thisInfoPackage.numTCsAfterTCCfilter += survivingTCs;
+      m_evInfoPack.numTCsAfterTCCfilter += survivingTCs;
       B2DEBUG(3, "pass " << passNumber << ": track candidate filter, " << survivingTCs << " TCs survived.");
     } else {
       B2DEBUG(3, "pass " << passNumber << " has no TCs therefore not starting tcFilter()");
     }
 
-    stopTimer = boostClock::now();
-    m_TESTERtimeConsumption.postCAFilter += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-    thisInfoPackage.sectionConsumption.postCAFilter += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+    m_evInfoPack.duration.postCAFilter += m_evInfoPack.TicToc();
     /** Section 8 - end **/
 
 
@@ -1526,7 +1455,7 @@ void TFRedesignModule::the_real_event()
      ** in-module-function-calls:
      * calcInitialValues4TCs(currentPass)
      */
-    timeStamp = boostClock::now();
+    m_evInfoPack.newTic();
     int countOverbookedClusters = 0, clustersReserved = 0;
     m_tcVectorOverlapped.clear(); // July13: should be filled freshly for each pass
     /// each clusterInfo knows which TCs are using it, following loop therefore checks each for overlapping ones
@@ -1567,9 +1496,7 @@ void TFRedesignModule::the_real_event()
     }
     int totalOverlaps = m_tcVectorOverlapped.size();
 
-    stopTimer = boostClock::now();
-    m_TESTERtimeConsumption.checkOverlap += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-    thisInfoPackage.sectionConsumption.checkOverlap += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+    m_evInfoPack.duration.checkOverlap += m_evInfoPack.TicToc();
 
     B2DEBUG(3, "event " << m_eventCounter << ": " << totalOverlaps << " overlapping track candidates found within " << countCurrentTCs << " new TCs of this pass alive")
     /** Section 9 - end */
@@ -1602,12 +1529,12 @@ void TFRedesignModule::the_real_event()
      * calcQIbyLength(m_tcVector, m_passSetupVector)
      * calcQIbyStraightLine(m_tcVector)
      */
-    timeStamp = boostClock::now();
+    m_evInfoPack.newTic();
     /// since KF is rather slow, Kf will not be used when there are many overlapping TCs. In this case, the simplified QI-calculator will be used.
     bool allowKalman = false;
     if (m_calcQiType == 1) { allowKalman = true; }
     if (totalOverlaps > m_PARAMkillEventForHighOccupancyThreshold / 3) {
-      B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of overlapping track candidates: " << totalOverlaps << ", termitating event!\nThere were " << nPxdClusters << "/" << nSvdClusters << "/" << nClusterCombis << " PXD-/SVD-clusters/SVD-cluster-combinations.")
+      B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of overlapping track candidates: " << totalOverlaps << ", termitating event!\nThere were " << m_evInfoPack.nPXDClusters << "/" << m_evInfoPack.nSVDClusters << "/" << nClusterCombis << " PXD-/SVD-clusters/SVD-cluster-combinations.")
       m_TESTERbrokenEventsCtr++;
 
       /** cleaning part **/
@@ -1615,12 +1542,8 @@ void TFRedesignModule::the_real_event()
         cleanEvent(currentPass);
       }
 
-      stopTimer = boostClock::now();
-      m_TESTERtimeConsumption.kalmanStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-      thisInfoPackage.sectionConsumption.kalmanStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-      thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
-      B2DEBUG(3, "event: " << m_eventCounter << ", duration : " << thisInfoPackage.totalTime.count() << "ns");
-      m_TESTERlogEvents.push_back(thisInfoPackage);
+      m_evInfoPack.duration.kalmanStuff += m_evInfoPack.TicToc();
+      stopTFevent();
       return;
 
     } else if (totalOverlaps > m_PARAMkillEventForHighOccupancyThreshold / 10 && m_calcQiType == 1) {
@@ -1636,9 +1559,8 @@ void TFRedesignModule::the_real_event()
     } else if (m_calcQiType == 3) { // and if totalOverlaps > 500
       calcQIbyStraightLine(m_tcVector);                                              ///calcQIbyStraightLine
     }
-    stopTimer = boostClock::now();
-    m_TESTERtimeConsumption.kalmanStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-    thisInfoPackage.sectionConsumption.kalmanStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+
+    m_evInfoPack.duration.kalmanStuff += m_evInfoPack.TicToc();
     /** Section 10 - end */
 
 
@@ -1663,7 +1585,7 @@ void TFRedesignModule::the_real_event()
      ** in-module-function-calls:
      * cleanOverlappingSet(m_tcVectorOverlapped)
      */
-    timeStamp = boostClock::now();
+    m_evInfoPack.newTic();
     if (totalOverlaps > 2 && m_PARAMcleanOverlappingSet == true) {
       int killedTCs = -1;
       int totalKilledTCs = 0, cleaningRepeatedCtr = 0;
@@ -1677,12 +1599,11 @@ void TFRedesignModule::the_real_event()
       }
       B2DEBUG(3, "out of funcCleanOverlappingSet: killed " << totalKilledTCs << " TCs within " << cleaningRepeatedCtr << " iterations")
       m_TESTERcleanOverlappingSetStartedCtr++;
-      thisInfoPackage.numTCsKilledByCleanOverlap += totalKilledTCs;
+      m_evInfoPack.numTCsKilledByCleanOverlap += totalKilledTCs;
     }
 
-    stopTimer = boostClock::now();
-    m_TESTERtimeConsumption.cleanOverlap += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-    thisInfoPackage.sectionConsumption.cleanOverlap += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+
+    m_evInfoPack.duration.cleanOverlap += m_evInfoPack.TicToc();
     /** Section 11 - end */
 
 
@@ -1707,7 +1628,7 @@ void TFRedesignModule::the_real_event()
      *
      ** in-module-function-calls:
      */
-    timeStamp = boostClock::now();
+    m_evInfoPack.newTic();
     countOverbookedClusters = 0;
     // each clusterInfo knows which TCs are using it, following loop therefore checks each for overlapping ones
     for (ClusterInfo & aCluster : clustersOfEvent) {
@@ -1731,9 +1652,8 @@ void TFRedesignModule::the_real_event()
     }
     totalOverlaps = m_tcVectorOverlapped.size();
 
-    stopTimer = boostClock::now();
-    m_TESTERtimeConsumption.checkOverlap += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-    thisInfoPackage.sectionConsumption.checkOverlap += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+
+    m_evInfoPack.duration.checkOverlap += m_evInfoPack.TicToc();
 
     B2DEBUG(3, "after checking overlaps again: there are " << countOverbookedClusters << " clusters of " << clustersOfEvent.size() << " still 'overbooked', tcVector: " << m_tcVector.size() << ", tcVectorOverlapped: " << totalOverlaps)
     /** Section 9b - end */
@@ -1764,7 +1684,7 @@ void TFRedesignModule::the_real_event()
      * tcDuel(m_tcVectorOverlapped)
      * reserveHits(m_tcVector, currentPass)
      */
-    timeStamp = boostClock::now();
+    m_evInfoPack.newTic();
     if (totalOverlaps > 2) { // checking overlapping TCs for best subset, if there are more than 2 different TC's
       if (m_filterOverlappingTCs == 2) {   /// use Hopfield neuronal network
 
@@ -1791,9 +1711,8 @@ void TFRedesignModule::the_real_event()
 
     } else { B2DEBUG(10, " less than 2 overlapping Track Candidates found, no need for neuronal network") }
 
-    stopTimer = boostClock::now();
-    m_TESTERtimeConsumption.neuronalStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-    thisInfoPackage.sectionConsumption.neuronalStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
+
+    m_evInfoPack.duration.neuronalStuff += m_evInfoPack.TicToc();
 
     if ((LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 3, PACKAGENAME()) == true)) {
       unsigned int nTCsAlive = 0, nTCsAliveInOverlapped = 0;
@@ -1854,7 +1773,7 @@ void TFRedesignModule::the_real_event()
    ** in-module-function-calls:
    * generateGFTrackCand(currentTC)
    */
-  timeStamp = boostClock::now();
+  m_evInfoPack.newTic();
   list<int> tempIndices, totalIndices;// temp: per tc, total, all of them. collects all indices used by final TCs, used to check for final overlapping TCs
   int nTotalHitsInTCs = 0;
   for (VXDTFTrackCandidate * currentTC : m_tcVector) {
@@ -1969,7 +1888,7 @@ void TFRedesignModule::the_real_event()
   }
 
   m_TESTERcountTotalTCsFinal += nFinalTCs;
-  thisInfoPackage.numTCsfinal += nFinalTCs;
+  m_evInfoPack.numTCsfinal += nFinalTCs;
   /** Section 13 - end */
 
 
@@ -1995,12 +1914,12 @@ void TFRedesignModule::the_real_event()
    ** in-module-function-calls:
    * cleanEvent(currentPass)
    */
+  m_evInfoPack.newTic();
   // Silent Kill = Mark not used objects as deleted
   // Safe Information = Information into StoreArrays
   if (m_PARAMdisplayCollector > 0) {
 
     m_collector.silentKill();
-
     m_collector.safeInformation();
   }
 
@@ -2009,16 +1928,10 @@ void TFRedesignModule::the_real_event()
     cleanEvent(currentPass);
   }
 
-  stopTimer = boostClock::now();
-  if (m_PARAMwriteToRoot == true) {
-    m_rootTimeConsumption = (stopTimer - timeStamp).count();
-    m_treeEventWisePtr->Fill();
-  }
-  m_TESTERtimeConsumption.intermediateStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-  thisInfoPackage.sectionConsumption.intermediateStuff += boost::chrono::duration_cast<boostNsec>(stopTimer - timeStamp);
-  thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
-  B2DEBUG(3, "event: " << m_eventCounter << ", duration : " << thisInfoPackage.totalTime.count());
-  m_TESTERlogEvents.push_back(thisInfoPackage);
+  if (m_PARAMwriteToRoot == true) { m_treeEventWisePtr->Fill(); }
+
+  m_evInfoPack.duration.intermediateStuff += m_evInfoPack.TicToc();
+  stopTFevent();
 }
 
 void TFRedesignModule::event()
@@ -2203,7 +2116,7 @@ void TFRedesignModule::endRun()
   if (numLoggedEvents != 0) {
     int meanTimeConsumption = 0;
     for (EventInfoPackage & infoPackage : m_TESTERlogEvents) {
-      meanTimeConsumption += infoPackage.totalTime.count();
+      meanTimeConsumption += infoPackage.duration.totalTime.count();
     }
     B2DEBUG(2, "slowest event: " << m_TESTERlogEvents.at(0).Print());
     B2DEBUG(2, "q1 event: " << m_TESTERlogEvents.at(q1).Print());
@@ -2214,44 +2127,37 @@ void TFRedesignModule::endRun()
     B2DEBUG(2, "q90 event: " << m_TESTERlogEvents.at(q90).Print());
     B2DEBUG(2, "q99 event: " << m_TESTERlogEvents.at(q99).Print());
     B2DEBUG(2, "fastest event: " << m_TESTERlogEvents.at(numLoggedEvents - 1).Print());
-    B2DEBUG(1, "manually calculated mean: " << meanTimeConsumption / numLoggedEvents << ", and median: " << m_TESTERlogEvents.at(median).totalTime.count() << " of time consumption per event");
+    B2DEBUG(1, "manually calculated mean: " << meanTimeConsumption / numLoggedEvents << ", and median: " << m_TESTERlogEvents.at(median).duration.totalTime.count() << " of time consumption per event");
 
     vector<EventInfoPackage> logEventsCopy = m_TESTERlogEvents; // copying original since we want to change the internal order now for several times and do not want to break the original
     vector<EventInfoPackage> infoQ(5); // for each value we want to find the key figures, we store one entry. first is min, third is median, last is max
-    stringstream telClusterStream, pxdClusterStream, svdClusterStream, svdHitStream, twoHitCombiStream, twoHitActivatedStream, twoHitDiscardedStream;
-
-    // sort by nTelClusters:
-    std::sort(
-      logEventsCopy.begin(),
-      logEventsCopy.end(),
-      [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.numTELCluster < b.numTELCluster; }
-    );
+    stringstream pxdClusterStream, svdClusterStream, svdHitStream, twoHitCombiStream, twoHitActivatedStream, twoHitDiscardedStream;
 
     // sort by nPxdClusters:
     std::sort(
       logEventsCopy.begin(),
       logEventsCopy.end(),
-      [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.numPXDCluster < b.numPXDCluster; }
+      [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.nPXDClusters < b.nPXDClusters; }
     );
-    infoQ.at(0).numPXDCluster = logEventsCopy.at(0).numPXDCluster;
-    infoQ.at(1).numPXDCluster = logEventsCopy.at(q25).numPXDCluster;
-    infoQ.at(2).numPXDCluster = logEventsCopy.at(median).numPXDCluster;
-    infoQ.at(3).numPXDCluster = logEventsCopy.at(q75).numPXDCluster;
-    infoQ.at(4).numPXDCluster = logEventsCopy.at(numLoggedEvents - 1).numPXDCluster;
-    pxdClusterStream << infoQ[0].numPXDCluster << " / " << infoQ[1].numPXDCluster << " / " << infoQ[2].numPXDCluster << " / " << infoQ[3].numPXDCluster << " / " << infoQ[4].numPXDCluster << "\n";
+    infoQ.at(0).nPXDClusters = logEventsCopy.at(0).nPXDClusters;
+    infoQ.at(1).nPXDClusters = logEventsCopy.at(q25).nPXDClusters;
+    infoQ.at(2).nPXDClusters = logEventsCopy.at(median).nPXDClusters;
+    infoQ.at(3).nPXDClusters = logEventsCopy.at(q75).nPXDClusters;
+    infoQ.at(4).nPXDClusters = logEventsCopy.at(numLoggedEvents - 1).nPXDClusters;
+    pxdClusterStream << infoQ[0].nPXDClusters << " / " << infoQ[1].nPXDClusters << " / " << infoQ[2].nPXDClusters << " / " << infoQ[3].nPXDClusters << " / " << infoQ[4].nPXDClusters << "\n";
 
-    // sort by nSVDClusters:
+    // sort by m_evInfoPack.nSVDClusters:
     std::sort(
       logEventsCopy.begin(),
       logEventsCopy.end(),
-      [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.numSVDCluster < b.numSVDCluster; }
+      [](const EventInfoPackage & a, const EventInfoPackage & b) -> bool { return a.nSVDClusters < b.nSVDClusters; }
     );
-    infoQ.at(0).numSVDCluster = logEventsCopy.at(0).numSVDCluster;
-    infoQ.at(1).numSVDCluster = logEventsCopy.at(q25).numSVDCluster;
-    infoQ.at(2).numSVDCluster = logEventsCopy.at(median).numSVDCluster;
-    infoQ.at(3).numSVDCluster = logEventsCopy.at(q75).numSVDCluster;
-    infoQ.at(4).numSVDCluster = logEventsCopy.at(numLoggedEvents - 1).numSVDCluster;
-    svdClusterStream << infoQ[0].numSVDCluster << " / " << infoQ[1].numSVDCluster << " / " << infoQ[2].numSVDCluster << " / " << infoQ[3].numSVDCluster << " / " << infoQ[4].numSVDCluster << "\n";
+    infoQ.at(0).nSVDClusters = logEventsCopy.at(0).nSVDClusters;
+    infoQ.at(1).nSVDClusters = logEventsCopy.at(q25).nSVDClusters;
+    infoQ.at(2).nSVDClusters = logEventsCopy.at(median).nSVDClusters;
+    infoQ.at(3).nSVDClusters = logEventsCopy.at(q75).nSVDClusters;
+    infoQ.at(4).nSVDClusters = logEventsCopy.at(numLoggedEvents - 1).nSVDClusters;
+    svdClusterStream << infoQ[0].nSVDClusters << " / " << infoQ[1].nSVDClusters << " / " << infoQ[2].nSVDClusters << " / " << infoQ[3].nSVDClusters << " / " << infoQ[4].nSVDClusters << "\n";
 
     // sort by nSVDClusterCombis:
     std::sort(
@@ -2382,8 +2288,6 @@ void TFRedesignModule::delFalseFriends(PassData* currentPass, TVector3 primaryVe
    *
    ** in-module-function-calls:
    */
-  std::vector<VXDSegmentCell*> segmentsOfSector;
-
   for (VXDSector * aSector : currentPass->sectorVector) {
     for (VXDSegmentCell * segment : aSector->getInnerSegmentCells()) {
       segment->kickFalseFriends(primaryVertex);
@@ -2992,12 +2896,11 @@ Belle2::SectorNameAndPointerPair TFRedesignModule::searchSector4Hit(VxdID aVxdID
                             aCoorNormalized/*,
           aRelCoor = {localHit.X(), localHit.Y()}*/;
 
-  VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
-  VXD::SensorInfoBase sensorInfoBase = geometry.getSensorInfo(aVxdID);
+//   VXD::SensorInfoBase sensorInfoBase = VXD::GeoCache::get(aVxdID);
 
 
   // Normalization of the Coordinates
-  aCoorNormalized = SpacePoint::convertLocalToNormalizedCoordinates(aCoorLocal, aVxdID, &sensorInfoBase);
+  aCoorNormalized = SpacePoint::convertLocalToNormalizedCoordinates(aCoorLocal, aVxdID);
 
   B2DEBUG(100, "searchSector4Hit: aCoorNormalized: " << aCoorNormalized.first << "/ " << aCoorNormalized.second);
 
@@ -3973,8 +3876,8 @@ int TFRedesignModule::neighbourFinder(PassData* currentPass)
   //filtering lost segments (those without neighbours left):
   ActiveSegmentsOfEvent newActiveList;
   for (VXDSegmentCell * currentSeg : currentPass->activeCellList) {
-    if (currentSeg->sizeOfInnerNeighbours() == 0 && currentSeg->sizeOfAllInnerNeighbours() == 0) {
-      currentSeg->setActivationState(false);
+    bool isStillAlive = currentSeg->dieIfNoNeighbours();
+    if (isStillAlive == false) {
 
       // Collector Cell died at NBFinder-lost
       if (m_PARAMdisplayCollector > 0) {
@@ -3982,7 +3885,6 @@ int TFRedesignModule::neighbourFinder(PassData* currentPass)
 
         m_collector.updateCell(currentSeg->getCollectorID(), CollectorTFInfo::m_nameNbFinder, CollectorTFInfo::m_idNbFinder, vector<int>(), {FilterID::nbFinderLost}, -1, -2, currentSeg->getState(), vector<int>());
       }
-
 
       NFdiscardedSegmentsCounter++;
     } else {
@@ -4935,9 +4837,6 @@ void TFRedesignModule::calcQIbyKalman(TCsOfEvent& tcVector)
       if (tfHit->getDetectorType() == Const::PXD) {
         PXDRecoHit* newRecoHit = new PXDRecoHit(tfHit->getClusterInfoUV()->getPXDCluster());
         track.insertMeasurement(newRecoHit);
-      } else if (tfHit->getDetectorType() == Const::TEST) {
-        TelRecoHit* newRecoHit = new TelRecoHit(tfHit->getClusterInfoUV()->getTELCluster());
-        track.insertMeasurement(newRecoHit);
       } else if (tfHit->getDetectorType() == Const::SVD) {
 //         TVector3 pos = *(tfHit->getHitCoordinates()); // jan192014, old way, global coordinates
 //         SVDRecoHit2D* newRecoHit = new SVDRecoHit2D(tfHit->getVxdID(), pos[0], pos[1]);
@@ -5243,21 +5142,21 @@ string TFRedesignModule::EventInfoPackage::Print()
   stringstream output;
   output << " timeConsumption of event " << evtNumber << " in microseconds: " << endl;
 
-  output << "total: " << totalTime.count();
-  output << ", hitsorting: " << sectionConsumption.hitSorting.count();
-  output << ", sf: "  << sectionConsumption.segFinder.count();
-  output << ", nf: " << sectionConsumption.nbFinder.count();
-  output << ", ca: " << sectionConsumption.cellularAutomaton.count();
-  output << ", tcc: " << sectionConsumption.tcc.count();
-  output << ", tcfilter: " << sectionConsumption.postCAFilter.count() << endl;
-  output << ", overlap: " << sectionConsumption.checkOverlap.count();
-  output << ", kf: " << sectionConsumption.kalmanStuff.count();
-  output << ", cleanOverlap: " << sectionConsumption.cleanOverlap.count();
-  output << ", nn: " << sectionConsumption.neuronalStuff.count();
-  output << ", other: " << sectionConsumption.intermediateStuff.count() << endl;
+  output << "total: " << duration.totalTime.count();
+  output << ", hitsorting: " << duration.hitSorting.count();
+  output << ", sf: "  << duration.segFinder.count();
+  output << ", nf: " << duration.nbFinder.count();
+  output << ", ca: " << duration.cellularAutomaton.count();
+  output << ", tcc: " << duration.tcc.count();
+  output << ", tcfilter: " << duration.postCAFilter.count() << endl;
+  output << ", overlap: " << duration.checkOverlap.count();
+  output << ", kf: " << duration.kalmanStuff.count();
+  output << ", cleanOverlap: " << duration.cleanOverlap.count();
+  output << ", nn: " << duration.neuronalStuff.count();
+  output << ", other: " << duration.intermediateStuff.count() << endl;
 
   output << " results: ";
-  output << "nPXDCluster: " << numPXDCluster << ", nSVDCluster: " << numSVDCluster << ", nSVDHits(x-Passes): " << numSVDHits << endl;
+  output << "nPXDCluster: " << nPXDClusters << ", nSVDCluster: " << nSVDClusters << ", nSVDHits(x-Passes): " << numSVDHits << endl;
   output << "sfActivated: " << segFinderActivated << ", discarded: " << segFinderDiscarded << ", nfActivated: " << nbFinderActivated << ", discarded: " << nbFinderDiscarded << endl;
   output << "tccApproved: " << tccApprovedTCs << ", nTCsAfterTCC: " << numTCsAfterTCC << ", nTCsPostTCfilter: " << numTCsAfterTCCfilter << ", nTCsKilledOverlap: " << numTCsKilledByCleanOverlap << ", nTCsFinal: " << numTCsfinal << endl;
 
@@ -5398,7 +5297,9 @@ TFRedesignModule::BrokenSensorsOfEvent TFRedesignModule::find2DSVDHits(ActiveSen
     numHits = 0;
   }
 
-  if (strangeSensors.size() != 0 and LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 4, PACKAGENAME()) == true) {
+  list<int> bleh;
+
+  if (strangeSensors.empty() and LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 4, PACKAGENAME()) == true) {
     stringstream output;
     output << m_PARAMnameOfInstance << " - event: " << m_eventCounter << ": there were strange sensors (having missing clusters) during this event, activated Sensors (ATTENTION: these are sensors, not sectors, therefore no sublayer and sector-info) were:\n";
     for (const mapEntry & aSensor : activatedSensors) { output << " " << FullSecID(VxdID(aSensor.first), false, 0); }
@@ -5613,11 +5514,10 @@ void TFRedesignModule::prepareExternalTools()
    *
    ** dependency of module parameters (global):
    * m_PARAMgfTrackCandsColName, m_TESTERexpandedTestingRoutines, m_PARAMinfoBoardName,
-   * m_PARAMdisplayCollector, m_PARAMtelClustersName, m_PARAMpxdClustersName,
-   * m_PARAMsvdClustersName
+   * m_PARAMdisplayCollector, m_PARAMpxdClustersName, m_PARAMsvdClustersName
    *
    ** dependency of global in-module variables:
-   * m_collector,
+   * m_collector, m_pxdClusters, m_svdClusters
    *
    ** dependency of global stuff just because of B2XX-output or debugging only:
    * m_PARAMnameOfInstance, m_PARAMinfoBoardName, m_PARAMdisplayCollector,
@@ -5653,8 +5553,12 @@ void TFRedesignModule::prepareExternalTools()
     m_collector.initPersistent();
   }
 
-  StoreArray<PXDCluster>::optional(m_PARAMpxdClustersName);
-  StoreArray<SVDCluster>::optional(m_PARAMsvdClustersName);
+  m_pxdClusters.isOptional(m_PARAMpxdClustersName);
+  if (m_pxdClusters.isOptional(m_PARAMpxdClustersName) == true and m_usePXDHits == true) { m_PARAMpxdClustersName = m_pxdClusters.getName(); }
+
+  m_svdClusters.isOptional(m_PARAMsvdClustersName);
+  if (m_svdClusters.isOptional(m_PARAMsvdClustersName) == true and m_useSVDHits == true) { m_PARAMsvdClustersName = m_svdClusters.getName(); }
+
 }
 
 
@@ -6382,4 +6286,24 @@ void TFRedesignModule::InitializeInConstructor()
   m_calcQiType = -1;
   m_calcSeedType = -1;
   m_aktpassNumber  = -1;
+}
+
+
+
+//////////////////////////////////////
+/// REDESIGN - Functions for event:
+//////////////////////////////////////
+
+
+void TFRedesignModule::stopTFevent()
+{
+  m_evInfoPack.duration.totalTime += m_evInfoPack.eventTicToc();
+
+  if (m_PARAMwriteToRoot == true) { m_rootTimeConsumption = m_evInfoPack.duration.totalTime.count(); }
+
+  m_TESTERtimeConsumption += m_evInfoPack.duration;
+
+  m_TESTERlogEvents.push_back(m_evInfoPack);
+
+  B2DEBUG(3, "event: " << m_evInfoPack.evtNumber << ", duration : " << m_evInfoPack.duration.totalTime.count() << "ns");
 }

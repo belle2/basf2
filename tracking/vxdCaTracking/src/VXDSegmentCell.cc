@@ -18,12 +18,14 @@ using namespace Belle2;
 
 void VXDSegmentCell::kickFalseFriends(TVector3 primaryVertex)
 {
-  std::list<VXDSegmentCell*>::iterator nbIter = m_innerNeighbours.begin();
+  std::list<VXDSegmentCell*>::iterator nbIter = m_innerNeighbours.begin();// iterator for the inner neighbours = nb
   TVector3* innerHit;
-  int nNBs = 0;
+  int nNBs = 0; // counting neighbours for safety check
   while (nbIter != m_innerNeighbours.end()) {
     VXDSegmentCell* pNextSeg = *nbIter;
     innerHit = pNextSeg->getInnerHit()->getHitCoordinates();
+
+    // will be deleted, if inner nb is not in a compatible state (CA -> inner Nb must have state -1) or it's the primary vertex (which shall not be part of the track candidate)
     if (pNextSeg->getState() != this->getState() - 1 || *innerHit == primaryVertex) {
       nbIter = this->eraseInnerNeighbour(nbIter);
     } else { ++nbIter; }

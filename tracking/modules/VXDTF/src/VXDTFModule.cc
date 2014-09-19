@@ -2638,8 +2638,6 @@ void VXDTFModule::delFalseFriends(PassData* currentPass, TVector3 primaryVertex)
    *
    ** in-module-function-calls:
    */
-  std::vector<VXDSegmentCell*> segmentsOfSector;
-
   for (VXDSector * aSector : currentPass->sectorVector) {
     for (VXDSegmentCell * segment : aSector->getInnerSegmentCells()) {
       segment->kickFalseFriends(primaryVertex);
@@ -4508,8 +4506,8 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
   //filtering lost segments (those without neighbours left):
   ActiveSegmentsOfEvent newActiveList;
   for (VXDSegmentCell * currentSeg : currentPass->activeCellList) {
-    if (currentSeg->sizeOfInnerNeighbours() == 0 && currentSeg->sizeOfAllInnerNeighbours() == 0) {
-      currentSeg->setActivationState(false);
+    bool isStillAlive = currentSeg->dieIfNoNeighbours();
+    if (isStillAlive == false) {
 
       // Collector Cell died at NBFinder-lost
       if (m_PARAMdisplayCollector > 0) {
@@ -4517,7 +4515,6 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
 
         m_collector.updateCell(currentSeg->getCollectorID(), CollectorTFInfo::m_nameNbFinder, CollectorTFInfo::m_idNbFinder, vector<int>(), {FilterID::nbFinderLost}, -1, -2, currentSeg->getState(), vector<int>());
       }
-
 
       NFdiscardedSegmentsCounter++;
     } else {
@@ -6357,7 +6354,7 @@ VXDTFModule::BrokenSensorsOfEvent VXDTFModule::find2DSVDHits(ActiveSensorsOfEven
     numHits = 0;
   }
 
-  if (strangeSensors.size() != 0 and LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 4, PACKAGENAME()) == true) {
+  if (strangeSensors.empty() and LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 4, PACKAGENAME()) == true) {
     stringstream output;
     output << m_PARAMnameOfInstance << " - event: " << m_eventCounter << ": there were strange sensors (having missing clusters) during this event, activated Sensors (ATTENTION: these are sensors, not sectors, therefore no sublayer and sector-info) were:\n";
     for (const mapEntry & aSensor : activatedSensors) { output << " " << FullSecID(VxdID(aSensor.first), false, 0); }

@@ -22,6 +22,8 @@
 #include "tracking/vxdCaTracking/VXDTFHit.h"
 #include "tracking/vxdCaTracking/VXDSector.h"
 
+#include <framework/logging/Logger.h>
+
 namespace Belle2 {
 
   //  class VXDSector;
@@ -95,6 +97,21 @@ namespace Belle2 {
     } //items.erase(i++);  or  i = items.erase(i);
 
 
+    /** checks whether the segment has got any neighbours. If not, it dies (ActivationState = false)*/
+    bool dieIfNoNeighbours() {
+      /** ATTENTION sep19th, 2014:
+       *
+       * at the moment it is not clear, which of the following if-cases shall be used.
+       * the CA kills them by itself, so final output seems to be the same, but detailed measurements recommended
+       * */
+//    if (sizeOfInnerNeighbours()) { setActivationState(false); }
+      //    if (sizeOfInnerNeighbours() == 0 and sizeOfAllInnerNeighbours() == 0) { setActivationState(false);  B2WARNING("in dieIfNoNeighbours() sizeOfInnerNeighbours() == 0 and sizeOfOuterNeighbours() == 0 ") }
+      if (sizeOfInnerNeighbours() == 0 and sizeOfOuterNeighbours() == 0) { setActivationState(false); }
+
+      return m_activated;
+    }
+
+
     void kickFalseFriends(TVector3 primaryVertex); /**<  checks state of inner neighbours and removes incompatible and virtual ones */
 
 
@@ -135,7 +152,7 @@ namespace Belle2 {
     int sizeOfAllInnerNeighbours() const { return m_allInnerNeighbours.size(); }
 
 
-    /** returns total number of inner neighbours (including those which already got killed)*/
+    /** returns total number of outer neighbours (including those which already got killed)*/
     int sizeOfOuterNeighbours() const { return m_outerNeighbours.size(); }
 
 

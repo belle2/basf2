@@ -15,7 +15,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
-#include <testbeam/vxd/dataobjects/TelCluster.h> /// WARNING produces dependency of testbeam package
 #include <vxd/dataobjects/VxdID.h>
 
 // tracking:
@@ -109,6 +108,25 @@ namespace Belle2 {
     struct TimeInfo {
       /** constructor */
       TimeInfo() {}
+
+      TimeInfo& operator+=(const TimeInfo& b) {
+        this->baselineTF += b.baselineTF;
+        this->hitSorting += b.hitSorting;
+        this->segFinder += b.segFinder;
+        this->nbFinder += b.nbFinder;
+        this->cellularAutomaton += b.cellularAutomaton;
+        this->tcc += b.tcc;
+        this->postCAFilter += b.postCAFilter;
+        this->checkOverlap += b.checkOverlap;
+        this->intermediateStuff += b.intermediateStuff;
+        this->kalmanStuff += b.kalmanStuff;
+        this->cleanOverlap += b.cleanOverlap;
+        this->neuronalStuff += b.neuronalStuff;
+        this->totalTime += b.totalTime;
+        return *this;
+      } /**< overloaded '+='-operator for adding times */
+
+
       boostNsec baselineTF; /**< time consumption of the baselineTF */
       boostNsec hitSorting; /**< time consumption of the hit sorting process */
       boostNsec segFinder; /**< time consumption of the segFinder */
@@ -121,21 +139,21 @@ namespace Belle2 {
       boostNsec kalmanStuff; /**< time consumption of the stuff needed for the kalman filter */
       boostNsec cleanOverlap; /**< time consumption for cleaning overlapping TCs */
       boostNsec neuronalStuff; /**< time consumption of the neuronal network */
+      boostNsec totalTime; /**< stores time consumption for the whole event */
     };
 
 
     /** stores some information for testing purposes */
     class EventInfoPackage {
     public:
-      bool operator<(const EventInfoPackage& b)  const { return totalTime < b.totalTime; } /**< overloaded '<'-operator for sorting algorithms */
-      bool operator==(const EventInfoPackage& b) const { return totalTime == b.totalTime; } /**< overloaded '=='-operator for sorting algorithms */
+      bool operator<(const EventInfoPackage& b)  const { return duration.totalTime < b.duration.totalTime; } /**< overloaded '<'-operator for sorting algorithms */
+      bool operator==(const EventInfoPackage& b) const { return duration.totalTime == b.duration.totalTime; } /**< overloaded '=='-operator for sorting algorithms */
 
       /** StandardConstructor for the EventInfoPackage - sets all values to zero */
       EventInfoPackage():
         evtNumber(0),
-        numPXDCluster(0),
-        numTELCluster(0),
-        numSVDCluster(0),
+        nPXDClusters(0),
+        nSVDClusters(0),
         numSVDHits(0),
         segFinderActivated(0),
         segFinderDiscarded(0),
@@ -151,12 +169,11 @@ namespace Belle2 {
       /** printing collected data, returned string can be printed using B2INFO or similar */
       std::string Print();
 
-      /** clearing entries, nice after initialisation (TODO: convert into constructor for autoClear) */
+      /** clearing entries, nice after initialisation */
       void clear() {
         evtNumber = 0;
-        numPXDCluster = 0;
-        numTELCluster = 0;
-        numSVDCluster = 0;
+        nPXDClusters = 0;
+        nSVDClusters = 0;
         numSVDHits = 0;
         segFinderActivated = 0;
         segFinderDiscarded = 0;
@@ -170,12 +187,33 @@ namespace Belle2 {
         numTCsfinal = 0;
       }
 
-      boostNsec totalTime;  /**< time consumption of the whole event */
-      TimeInfo sectionConsumption; /**< one-event-time-consumption */
+      /** prepare everything for new Belle2-event */
+      void startEvent(int nEvent) {
+        clear();
+        newTic();
+        beginEvent = startTimer;
+        evtNumber = nEvent;
+      }
+
+      /** start time measurement for tic-toc-event */
+      void newTic() { startTimer = boostClock::now();}
+
+      /** return duration of tic-toc-event */
+      boostNsec TicToc() { return boost::chrono::duration_cast<boostNsec>(boostClock::now() - startTimer); }
+
+      /** return duration of whole event till now */
+      boostNsec eventTicToc() { return boost::chrono::duration_cast<boostNsec>(boostClock::now() - beginEvent); }
+
+
+//       boostNsec totalTime;  /**< time consumption of the whole event */
+      TimeInfo duration; /**< one-event-time-consumption */
+      boostClock::time_point beginEvent; /**< stores the begin of the event for duration measurements */
+      boostClock::time_point startTimer; /**< will be resetted severall times, stores the tic-part for duration measurements */
+      boostClock::time_point stopTimer; /**< will be resetted severall times, stores the toc-part for duration measurements */
       int evtNumber; /**< number of current event */
-      int numPXDCluster; /**< number of pxdClusters (=number of pxd hits when tf in pxd is activated) */
+      int nPXDClusters; /**< number of pxdClusters (=number of pxd hits when tf in pxd is activated) */
       int numTELCluster; /**< number of TELClusters (=number of TEL hits when tf in TEL is activated) */
-      int numSVDCluster; /**< number of svdClusters */
+      int nSVDClusters; /**< number of svdClusters */
       //
       int numSVDHits; /**< number of possible svd-cluster-combinations. every combination of any pass will be counted  */
       int segFinderActivated; /**< number of segments which survived the segfinder. every segment of any pass will be counted  */
@@ -542,6 +580,17 @@ namespace Belle2 {
     void importSectorMapsToDisplayCollector();
 
 
+    //////////////////////////////////////
+    /// REDESIGN - Functions for event:
+    //////////////////////////////////////
+
+    /** does the relevant Info logging before ending the event.
+     *
+     * it does not actually end the event, but one can end it via return; right afterwards
+     * */
+    void stopTFevent();
+
+
   protected:
     TCsOfEvent m_tcVector; /**< carries links to all track candidates found within event (during tcc filter, bad ones get kicked, lateron they simply get deactivated) */
     TCsOfEvent m_allTCsOfEvent; /**< carries links to really all track candidates found within event (used for deleting TrackCandidates at end of event) TODO: check whether use of m_tcVector can not be merged this one. Seems like redundant steps*/
@@ -655,7 +704,7 @@ namespace Belle2 {
 
     bool m_usePXDHits; /**< when having more than one pass per event, sector maps using PXD, SVD or TEL can be set independently. To produce TFHits for PXD, this value is set to true */
     bool m_useSVDHits; /**< when having more than one pass per event, sector maps using PXD, SVD or TEL can be set independently. To produce TFHits for SVD, this value is set to true */
-//     bool m_useTELHits; /**< when having more than one pass per event, sector maps using PXD, SVD or TEL can be set independently. To produce TFHits for TEL, this value is set to true */
+
 
     double m_PARAMtuneCutoffs; /**< for rapid changes of cutoffs (no personal xml files needed), reduces/enlarges the range of the cutoffs in percent (lower and upper values are changed by this value). Only valid in range -50% < x < +1000% */
 
@@ -663,7 +712,6 @@ namespace Belle2 {
     int m_badSectorRangeCounter; /**< counts number of hits which couldn't be attached to an existing sector of a pass */
     int m_badFriendCounter; /**< counts number of hits having no neighbour hits in friend sectors of current sector */
     int m_totalPXDClusters; /**< counts total number of PXDClusters during run */
-//     int m_totalTELClusters; /**< counts total number of TELClusters during run */
     int m_totalSVDClusters; /**< counts total number of SVdClusters during run */
     int m_totalSVDClusterCombis; /**< counts total number of possible combinations of SVDClusters during run */
     int m_nSectorSetups; /**< stores info about number of sector setups loaded into the track finder */
@@ -705,17 +753,18 @@ namespace Belle2 {
     std::string m_PARAMgfTrackCandsColName;       /**< TrackCandidates collection name */
     std::string m_PARAMinfoBoardName;             /**< InfoContainer collection name */
     std::string m_PARAMpxdClustersName;         /** name of storeArray containing pxd clusters */
-//     std::string m_PARAMtelClustersName;         /** name of storeArray containing tel clusters */
     std::string m_PARAMsvdClustersName;         /** name of storeArray containing svd clusters */
+
+    StoreArray<PXDCluster> m_pxdClusters; /**< the storeArray for pxdClusters as member, is faster than recreating link for each event */
+    StoreArray<SVDCluster> m_svdClusters; /**< the storeArray for svdClusters as member, is faster than recreating link for each event */
+
     std::string m_PARAMnameOfInstance;           /**< Name of trackFinder, usefull, if there is more than one VXDTF running at the same time. Note: please choose short names */
-//     int m_PARAMactivateBaselineTF; /**< there is a baseline trackfinder which catches events with a very small number of hits, e.g. bhabha, cosmic and single-track-events. Settings: 0 = deactivate baseLineTF, 1=activate it and use normal TF as fallback, 2= baseline-TF-only */
+
 
     /// the following variables are nimimal testing routines within the TF
     int m_TESTERnoHitsAtEvent;  /**< counts number of times, where there were no hits at the event */
-//     int m_TESTERstartedBaselineTF; /**< counts number of times, the baselineTF was started */
     int m_TESTERacceptedBrokenHitsTrack; /**< counts number of times, where a tc having at least 1 1D-SVD hit was accepted */
     int m_TESTERrejectedBrokenHitsTrack; /**< counts number of times, where a tc having at least 1 1D-SVD hit was rejected */
-//     int m_TESTERsucceededBaselineTF; /**< counts number of times, the baselineTF found a track */
     int m_TESTERtriggeredZigZagXY;/**< counts how many times zigZagXY filter found bad TCs */
     int m_TESTERtriggeredZigZagXYWithSigma;/**< counts how many times zigZagXYWithSigma filter found bad TCs */
     int m_TESTERtriggeredZigZagRZ;/**< counts how many times zigZagRZ filter found bad TCs */
@@ -761,6 +810,11 @@ namespace Belle2 {
     int m_aktpassNumber;  /**< Pass Number Information used for the collector */
 
 
+    /////////////////////////////
+    /// NEW event wise variables
+    /////////////////////////////
+
+    EventInfoPackage m_evInfoPack; /**< stores meta info like counters and time consumption for current event (will be reset for each event */
   private:
 
   };

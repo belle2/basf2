@@ -23,7 +23,6 @@ import math
 import numpy as np
 from optparse import OptionParser
 from tracking_efficiency_helpers import *
-import scipy.optimize
 
 DELTA_PT = 0.0001
 
@@ -457,6 +456,11 @@ def fit_resolution(
 
     @param y_value_errors list of corresponding errors on y x_values
     """
+    try:
+        import scipy.optimize
+    except ImportError:
+        print "Module scipy.optimize is not installed. Fit cannot be done."
+        return []
 
     #weights = None
     #if y_value_errors is not None:
@@ -573,7 +577,10 @@ def scale_histogram(hist):
     """
 
     if isinstance(hist, TH1F):
-        hist.Scale(1 / hist.GetEntries())
+        if hist.GetEntries() > 0:
+            hist.Scale(1 / hist.GetEntries())
+        else:
+            print 'Cannot scale. No entries in histogram ' + hist.GetName()
     else:
         print 'Not a TH1F. Not able to scale.'
 

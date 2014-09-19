@@ -24,7 +24,7 @@
 namespace Belle2 {
 
   /**
-   * An alternative to the existing beam background mixer; this one doesn't need ROF files
+   * New beam background mixer; this one doesn't need ROF files
    */
   class BeamBkgMixerModule : public Module {
 
@@ -76,12 +76,6 @@ namespace Belle2 {
 
   private:
 
-    std::vector<std::string> m_backgroundFiles; /**< names of beam background files */
-    std::vector<double> m_scaleFactors; /**< rate scale factors */
-    double m_minTime;  /**< minimal time shift of background event */
-    double m_maxTime;  /**< maximal time shift of background event */
-    std::vector<std::string> m_components; /**< detector components */
-
     /**
      * An input event buffer definition for background SimHits
      */
@@ -103,21 +97,44 @@ namespace Belle2 {
       {}
     };
 
-    std::vector<TChain*> m_trees;  /**< vector of tree pointers */
-    std::vector<unsigned> m_numEvents;  /**< number of events in each file */
-    std::vector<unsigned> m_eventCount; /**< current event number in each file */
-    std::vector<double> m_bkgRates;  /**< background rate of each file */
-    std::vector<std::string> m_bkgTypes; /**< background type of each file */
-    std::vector<BkgHits> m_bkgSimHits;  /**< input event buffer */
+    /**
+     * structure to hold samples of a particular background type
+     */
+    struct BkgFiles {
+      unsigned tag; /**< background tag */
+      std::string type; /**< background type */
+      double realTime; /**< real time of BG samlpe */
+      double scaleFactor;  /**< scale factor for background rate */
+      std::vector<std::string> fileNames;  /**< file names */
+      TChain* tree;  /**< tree pointer */
+      unsigned numEvents;  /**< number of events (tree entries) in the BG sample */
+      unsigned eventCount; /**< current event (tree entry) */
+      double rate;  /**< background rate of the sample */
+      BkgHits simHits;  /**< input event buffer */
 
-    bool m_PXD; /**< true if found in m_components */
-    bool m_SVD; /**< true if found in m_components */
-    bool m_CDC; /**< true if found in m_components */
-    bool m_TOP; /**< true if found in m_components */
-    bool m_ARICH; /**< true if found in m_components */
-    bool m_ECL; /**< true if found in m_components */
-    bool m_BKLM; /**< true if found in m_components */
-    bool m_EKLM; /**< true if found in m_components */
+      /**
+       * default constructor
+       */
+      BkgFiles(): tag(0), realTime(0.0), scaleFactor(1.0),
+        tree(0), numEvents(0), eventCount(0), rate(0.0)
+      {}
+      /**
+       * constructor with tag, type, fileName and real time
+       * @param bkgTag background tag
+       * @param bkgType background type
+       * @param fileName file name
+       * @param realTime real time that corresponds to background sample
+       */
+      BkgFiles(unsigned bkgTag,
+               const std::string& bkgType,
+               const std::string& fileName,
+               double time):
+        tag(bkgTag), type(bkgType), realTime(time), scaleFactor(1.0),
+        tree(0), numEvents(0), eventCount(0), rate(0.0) {
+        fileNames.push_back(fileName);
+      }
+    };
+
 
     /**
      * functions that add background SimHits to those in the DataStore
@@ -154,6 +171,29 @@ namespace Belle2 {
     bool isComponentIncluded(std::vector<std::string>& components,
                              const std::string& component);
 
+
+    void addBackground(unsigned tag,
+                       const std::string& type,
+                       const std::string& fileName,
+                       double realTime);
+
+
+    std::vector<std::string> m_backgroundFiles; /**< names of beam background files */
+    std::vector<std::tuple<std::string, double> > m_scaleFactors; /**< scale factors */
+    double m_minTime;  /**< minimal time shift of background event */
+    double m_maxTime;  /**< maximal time shift of background event */
+    std::vector<std::string> m_components; /**< detector components */
+
+    std::vector<BkgFiles> m_backgrounds;  /**< container for background samples */
+
+    bool m_PXD; /**< true if found in m_components */
+    bool m_SVD; /**< true if found in m_components */
+    bool m_CDC; /**< true if found in m_components */
+    bool m_TOP; /**< true if found in m_components */
+    bool m_ARICH; /**< true if found in m_components */
+    bool m_ECL; /**< true if found in m_components */
+    bool m_BKLM; /**< true if found in m_components */
+    bool m_EKLM; /**< true if found in m_components */
 
   };
 

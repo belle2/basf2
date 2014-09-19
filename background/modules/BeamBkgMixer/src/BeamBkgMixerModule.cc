@@ -80,6 +80,7 @@ namespace Belle2 {
     addParam("components", m_components,
              "Detector components to be included, empty list means all components",
              m_components);
+
   }
 
   BeamBkgMixerModule::~BeamBkgMixerModule()
@@ -89,12 +90,8 @@ namespace Belle2 {
   void BeamBkgMixerModule::initialize()
   {
 
-    // complete the list of scale factors with the default value
-    for (unsigned i = m_scaleFactors.size(); i < m_backgroundFiles.size(); ++i) {
-      m_scaleFactors.push_back(1.0);
-    }
-
     // included components
+
     std::vector<std::string> components = m_components;
     m_PXD = isComponentIncluded(components, "PXD");
     m_SVD = isComponentIncluded(components, "SVD");
@@ -106,6 +103,7 @@ namespace Belle2 {
     m_EKLM = isComponentIncluded(components, "EKLM");
 
     // ignore these ones
+
     isComponentIncluded(components, "MagneticField2d");
     isComponentIncluded(components, "MagneticField3d");
     isComponentIncluded(components, "MagneticField");
@@ -125,98 +123,112 @@ namespace Belle2 {
       B2WARNING("Unknown components:" << str);
     }
 
-    // open files
-    for (unsigned bkg = 0; bkg < m_backgroundFiles.size(); ++bkg) {
+    // check files and sort them according to type
 
-      B2INFO("opening file: " << m_backgroundFiles[bkg]);
+    for (auto file : m_backgroundFiles) {
 
-      // check the file if wildcarding is not used in the name
-      if (!TString(m_backgroundFiles[bkg].c_str()).Contains("*")) {
-        TFile* file = TFile::Open(m_backgroundFiles[bkg].c_str(), "READ");
-        if (!file) {
-          B2ERROR(m_backgroundFiles[bkg] << ": file not found");
+      // if wildcarding is not used in the name ...
+      if (!TString(file.c_str()).Contains("*")) {
+        TFile* f = TFile::Open(file.c_str(), "READ");
+        if (!f) {
+          B2ERROR(file << ": file not found");
           continue;
         }
-        if (!file->IsOpen()) {
-          B2ERROR(m_backgroundFiles[bkg] << ": can't open file");
+        if (!f->IsOpen()) {
+          B2ERROR(file << ": can't open file");
           continue;
         }
-        file->Close();
+        f->Close();
       }
 
-      // get realTime from a persistent tree
       TChain persistent("persistent");
-      int nFiles = persistent.Add(m_backgroundFiles[bkg].c_str());
+      int nFiles = persistent.Add(file.c_str());
       if (nFiles == 0) {
-        B2ERROR(m_backgroundFiles[bkg] << ": no such files");
+        B2ERROR(file << ": no such files");
         continue;
       }
-      persistent.GetEntries();
+      if (persistent.GetEntries() == 0) {
+        B2ERROR(file << ": tree 'persistent' has no entries");
+        continue;
+      }
       TObject* bkgMetaData = 0; // Note: allocation left to root
       persistent.SetBranchAddress("BackgroundMetaData", &bkgMetaData);
       if (bkgMetaData == 0) {
-        B2ERROR(m_backgroundFiles[bkg] << ": branch 'BackgroundMetaData' not found");
+        B2ERROR(file << ": branch 'BackgroundMetaData' not found");
         continue;
       }
-      float realTime = 0;
       std::vector<unsigned> tags;
+      std::vector<std::string> types;
+      double realTime = 0;
       for (unsigned k = 0; k < persistent.GetEntries(); k++) {
         persistent.GetEntry(k);
         BackgroundMetaData* bgMD = static_cast<BackgroundMetaData*>(bkgMetaData);
-        realTime += bgMD->getRealTime();
         tags.push_back(bgMD->getBackgroundTag());
+        types.push_back(bgMD->getBackgroundType());
+        realTime += bgMD->getRealTime();
       }
       if (realTime <= 0) {
-        B2ERROR(m_backgroundFiles[bkg] << ": invalid realTime: " << realTime);
+        B2ERROR(file << ": invalid realTime: " << realTime);
         continue;
       }
       for (unsigned i = 1; i < tags.size(); ++i) {
         if (tags[i] != tags[0]) {
-          B2ERROR(m_backgroundFiles[bkg] <<
-                  ": files with mixed background types not supported");
+          B2ERROR(file << ": files with mixed background types not supported");
           continue;
         }
       }
-      std::string bkgType =
-        static_cast<BackgroundMetaData*>(bkgMetaData)->getBackgroundType();
+
+      addBackground(tags[0], types[0], file, realTime);
+
+    }
+
+
+    // set scale factors
+
+    for (auto scaleFactor : m_scaleFactors) {
+      std::string type = std::get<0>(scaleFactor);
+      for (auto & bkg : m_backgrounds) {
+        if (type == bkg.type)
+          bkg.scaleFactor =  std::get<1>(scaleFactor);
+      }
+    }
+
+    // open files
+
+    for (auto & bkg : m_backgrounds) {
 
       // define TChain for reading SimHits
-      TChain* tree = new TChain("tree");
-      tree->Add(m_backgroundFiles[bkg].c_str());
-      unsigned numEvents = tree->GetEntries();
-      double rate =  numEvents / realTime * m_scaleFactors[bkg];
+      bkg.tree = new TChain("tree");
+      for (unsigned i = 0; i < bkg.fileNames.size(); ++i) {
+        bkg.tree->Add(bkg.fileNames[i].c_str());
+      }
 
-      m_trees.push_back(tree);
-      m_numEvents.push_back(numEvents);
-      m_eventCount.push_back(0);
-      m_bkgRates.push_back(rate);
-      m_bkgTypes.push_back(bkgType);
+      bkg.numEvents = bkg.tree->GetEntries();
+      bkg.rate =  bkg.numEvents / bkg.realTime * bkg.scaleFactor;
 
-      BkgHits hits; // Note: allocation of TClonesArray's left to root
-      m_bkgSimHits.push_back(hits);
-
-      unsigned i = m_bkgSimHits.size() - 1;
-      if (m_PXD) tree->SetBranchAddress("PXDSimHits", &m_bkgSimHits[i].PXD);
-      if (m_SVD) tree->SetBranchAddress("SVDSimHits", &m_bkgSimHits[i].SVD);
-      if (m_CDC) tree->SetBranchAddress("CDCSimHits", &m_bkgSimHits[i].CDC);
-      if (m_TOP) tree->SetBranchAddress("TOPSimHits", &m_bkgSimHits[i].TOP);
-      if (m_ARICH) tree->SetBranchAddress("ARICHSimHits", &m_bkgSimHits[i].ARICH);
-      if (m_ECL) tree->SetBranchAddress("ECLHits", &m_bkgSimHits[i].ECL);
-      if (m_BKLM) tree->SetBranchAddress("BKLMSimHits", &m_bkgSimHits[i].BKLM);
-      if (m_EKLM) tree->SetBranchAddress("EKLMSimHits", &m_bkgSimHits[i].EKLM);
+      if (m_PXD) bkg.tree->SetBranchAddress("PXDSimHits", &bkg.simHits.PXD);
+      if (m_SVD) bkg.tree->SetBranchAddress("SVDSimHits", &bkg.simHits.SVD);
+      if (m_CDC) bkg.tree->SetBranchAddress("CDCSimHits", &bkg.simHits.CDC);
+      if (m_TOP) bkg.tree->SetBranchAddress("TOPSimHits", &bkg.simHits.TOP);
+      if (m_ARICH) bkg.tree->SetBranchAddress("ARICHSimHits", &bkg.simHits.ARICH);
+      if (m_ECL) bkg.tree->SetBranchAddress("ECLHits", &bkg.simHits.ECL);
+      if (m_BKLM) bkg.tree->SetBranchAddress("BKLMSimHits", &bkg.simHits.BKLM);
+      if (m_EKLM) bkg.tree->SetBranchAddress("EKLMSimHits", &bkg.simHits.EKLM);
 
       // print INFO
       std::string unit(" ns");
+      double realTime = bkg.realTime;
       if (realTime >= 1000.0) {realTime /= 1000.0; unit = " us";}
       if (realTime >= 1000.0) {realTime /= 1000.0; unit = " ms";}
       if (realTime >= 1000.0) {realTime /= 1000.0; unit = " s";}
 
-      B2INFO("--> type: " << bkgType <<
-             " (tag=" << tags[0] <<
-             ") events: " << numEvents <<
+      B2INFO("--> type: " << bkg.type <<
+             " (tag=" << bkg.tag <<
+             ") events: " << bkg.numEvents <<
              " realTime: " << realTime << unit <<
-             " rate = " << rate * 1000 << " MHz");
+             " rate = " << bkg.rate * 1000 << " MHz");
     }
+
 
     // SimHits
     StoreArray<PXDSimHit>::optional();
@@ -254,29 +266,27 @@ namespace Belle2 {
     if (m_BKLM && !bklmSimHits.isValid()) bklmSimHits.create();
     if (m_EKLM && !eklmSimHits.isValid()) eklmSimHits.create();
 
-    unsigned numBkg = m_trees.size();
-    for (unsigned bkg = 0; bkg < numBkg; ++bkg) {
-      double mean = m_bkgRates[bkg] * (m_maxTime - m_minTime);
+    for (auto & bkg : m_backgrounds) {
+      double mean = bkg.rate * (m_maxTime - m_minTime);
       int nev = gRandom->Poisson(mean);
 
       for (int iev = 0; iev < nev; iev++) {
         double timeShift = gRandom->Rndm() * (m_maxTime - m_minTime) + m_minTime;
-        m_trees[bkg]->GetEntry(m_eventCount[bkg]);
+        bkg.tree->GetEntry(bkg.eventCount);
 
-        addSimHits(pxdSimHits, m_bkgSimHits[bkg].PXD, timeShift);
-        addSimHits(svdSimHits, m_bkgSimHits[bkg].SVD, timeShift);
-        addSimHits(cdcSimHits, m_bkgSimHits[bkg].CDC, timeShift);
-        addSimHits(topSimHits, m_bkgSimHits[bkg].TOP, timeShift);
-        addSimHits(arichSimHits, m_bkgSimHits[bkg].ARICH, timeShift);
-        addSimHits(eclHits, m_bkgSimHits[bkg].ECL, timeShift);
-        addSimHits(bklmSimHits, m_bkgSimHits[bkg].BKLM, timeShift);
-        addSimHits(eklmSimHits, m_bkgSimHits[bkg].EKLM, timeShift);
+        addSimHits(pxdSimHits, bkg.simHits.PXD, timeShift);
+        addSimHits(svdSimHits, bkg.simHits.SVD, timeShift);
+        addSimHits(cdcSimHits, bkg.simHits.CDC, timeShift);
+        addSimHits(topSimHits, bkg.simHits.TOP, timeShift);
+        addSimHits(arichSimHits, bkg.simHits.ARICH, timeShift);
+        addSimHits(eclHits, bkg.simHits.ECL, timeShift);
+        addSimHits(bklmSimHits, bkg.simHits.BKLM, timeShift);
+        addSimHits(eklmSimHits, bkg.simHits.EKLM, timeShift);
 
-        m_eventCount[bkg]++;
-        if (m_eventCount[bkg] >= m_numEvents[bkg]) {
-          m_eventCount[bkg] = 0;
-          B2INFO("BeamBkgMixer: events of " << m_bkgTypes[bkg] <<
-                 " re-used (file#" << bkg << ")");
+        bkg.eventCount++;
+        if (bkg.eventCount >= bkg.numEvents) {
+          bkg.eventCount = 0;
+          B2INFO("BeamBkgMixer: events of " << bkg.type << " sample will be re-used");
         }
       }
     }
@@ -291,10 +301,9 @@ namespace Belle2 {
   void BeamBkgMixerModule::terminate()
   {
 
-    for (unsigned i = 0; i < m_trees.size(); ++i) {
-      delete m_trees[i];
+    for (auto & bkg : m_backgrounds) {
+      delete bkg.tree;
     }
-
 
   }
 
@@ -316,6 +325,22 @@ namespace Belle2 {
       }
     }
     return false;
+  }
+
+
+  void BeamBkgMixerModule::addBackground(unsigned tag,
+                                         const std::string& type,
+                                         const std::string& fileName,
+                                         double realTime)
+  {
+    for (auto & bkg : m_backgrounds) {
+      if (tag == bkg.tag) {
+        bkg.fileNames.push_back(fileName);
+        bkg.realTime += realTime;
+        return;
+      }
+    }
+    m_backgrounds.push_back(BkgFiles(tag, type, fileName, realTime));
   }
 
 

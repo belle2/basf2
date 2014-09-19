@@ -414,6 +414,33 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr IsDaughterOf(const std::vector<std::string>& arguments)
+    {
+      auto motherlist = arguments[0];
+      auto func = [motherlist](const Particle * particle) -> double {
+
+        StoreObjPtr<ParticleList> Y(motherlist);
+        std::vector<Particle*> daughters;
+        for (unsigned int i = 0; i < Y->getListSize(); ++i) {
+          const auto& x = Y->getParticle(i)->getDaughters();
+          daughters.insert(daughters.end(), x.begin(), x.end());
+        }
+
+        while (!daughters.empty()) {
+          std::vector<Particle*> tmpdaughters;
+          for (auto & d : daughters) {
+            if (d == particle)
+              return 1.0;
+            const auto& x = d->getDaughters();
+            tmpdaughters.insert(tmpdaughters.end(), x.begin(), x.end());
+          }
+          daughters = tmpdaughters;
+        }
+        return 0.0;
+      };
+      return func;
+    }
+
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_VARIABLE("isInRegion(variable, low, high)", isInRegion, "Returns 1 if given variable is inside a given region. Otherwise 0.");
     REGISTER_VARIABLE("daughter(n, variable)", daughter, "Returns value of variable for the nth daughter.");
@@ -422,6 +449,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("getExtraInfo(name)", getExtraInfo, "Returns extra info stored under the given name.");
     REGISTER_VARIABLE("abs(variable)", abs, "Returns absolute value of the given variable.");
     REGISTER_VARIABLE("NBDeltaIfMissing(dectector, pid_variable)", NBDeltaIfMissing, "Returns -999 (delta function of NeuroBayes) instead of variable value if pid from given detector is missing.");
+    REGISTER_VARIABLE("IsDaughterOf(variable)", IsDaughterOf, "Check if the particle is a daughter of the given list.");
 
     VARIABLE_GROUP("MetaFunctions FlavorTagging")
     REGISTER_VARIABLE("bestQrOf(particleListName, extraInfoName)", bestQrOf, "FlavorTagging:[Eventbased] q*r where r is maximum from extraInfoName in particlelistName.");

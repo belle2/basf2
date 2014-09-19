@@ -350,6 +350,15 @@ namespace Belle2 {
       return 0.0;
     }
 
+    double particleMCStatus(const Particle* p)
+    {
+      const MCParticle* mcp = p->getRelated<MCParticle>();
+      if (mcp) {
+        return mcp->getStatus();
+      } else {
+        return -1;
+      }
+    }
 
     // MC related ------------------------------------------------------------
 
@@ -1848,6 +1857,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("eextra", extraEnergy, "extra energy in the calorimeter that is not associated to the given Particle");
 
     REGISTER_VARIABLE("printParticle", printParticle, "For debugging, print Particle and daughter PDG codes, plus MC match. Returns 0.");
+    REGISTER_VARIABLE("particleMCStatus", particleMCStatus, "Returns mcStatus of related MCParticle or -1 if MCParticle relation is not set.");
     REGISTER_VARIABLE("False", False, "returns always 0, used for testing and debugging.");
 
     VARIABLE_GROUP("ECL Cluster related");

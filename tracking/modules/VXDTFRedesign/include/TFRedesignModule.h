@@ -214,7 +214,6 @@ namespace Belle2 {
       int nPXDClusters; /**< number of pxdClusters (=number of pxd hits when tf in pxd is activated) */
       int numTELCluster; /**< number of TELClusters (=number of TEL hits when tf in TEL is activated) */
       int nSVDClusters; /**< number of svdClusters */
-      //
       int numSVDHits; /**< number of possible svd-cluster-combinations. every combination of any pass will be counted  */
       int segFinderActivated; /**< number of segments which survived the segfinder. every segment of any pass will be counted  */
       int segFinderDiscarded; /**< number of segments which died in the segfinder. every segment of any pass will be counted  */
@@ -536,8 +535,6 @@ namespace Belle2 {
       m_TESTERkalmanSkipped = 0;
       m_TESTERovercrowdedStrangeSensors = 0;
       m_TESTERnoHitsAtEvent = 0;
-      m_TESTERacceptedBrokenHitsTrack = 0;
-      m_TESTERrejectedBrokenHitsTrack = 0;
       m_tcVectorOverlapped.clear();
       m_tcVector.clear();
       m_allTCsOfEvent.clear();
@@ -584,17 +581,52 @@ namespace Belle2 {
     /// REDESIGN - Functions for event:
     //////////////////////////////////////
 
+    /** initializes the most relevant variables and parameters needed event-wise.
+     *
+     * returns boolean value.
+     * if value is true, the event shall be aborted,
+     * if the value is false, keep the event running
+     * */
+    bool initializeEvent();
+
     /** does the relevant Info logging before ending the event.
      *
      * it does not actually end the event, but one can end it via return; right afterwards
      * */
     void stopTFevent();
 
+    /** adds a virtual hit and sector to each pass - needed for virtual segments. */
+    void addVirtualInteractionPoint();
+
+    /** creates metaInfo for each cluster used.
+     *
+     * MetaInfo of any Cluster in the VXD will be stored in a metaInfo-class named 'ClusterInfo'.
+     * These ClusterInfos are 1:1-related to the clusters
+     * */
+    void createClusterInfo();
+
+    /** for each PXDCluster a sector will be found and a VXDTFHit created.
+     *
+     * VXDTFHits are pass-dependent metaData for a PXDCluster,
+     * which know which segments are attached and on which sector the PXDCluster is attached to.
+     * */
+    void assignPXDHitsToSectors();
+
+    /** for each possible combination of SVDClusters a sector will be found and a VXDTFHit created.
+     *
+     * VXDTFHits are pass-dependent metaData for combinations of SVDClusters,
+     * which know which segments are attached and on which sector the SVDCluster-combination is attached to.
+     * */
+    void assignSVDHitsToSectors();
+
+
 
   protected:
     TCsOfEvent m_tcVector; /**< carries links to all track candidates found within event (during tcc filter, bad ones get kicked, lateron they simply get deactivated) */
     TCsOfEvent m_allTCsOfEvent; /**< carries links to really all track candidates found within event (used for deleting TrackCandidates at end of event) TODO: check whether use of m_tcVector can not be merged this one. Seems like redundant steps*/
     TCsOfEvent m_tcVectorOverlapped; /**< links only to track candidates which share at least one cluster with others*/
+
+    std::vector<ClusterInfo> m_clustersOfEvent; /**< stores the clusterInfos of the current event */
 
     /// module_parameters:
     bool m_PARAMDebugMode; /**< some code will only be executed if this mode is enabled */
@@ -757,14 +789,14 @@ namespace Belle2 {
 
     StoreArray<PXDCluster> m_pxdClusters; /**< the storeArray for pxdClusters as member, is faster than recreating link for each event */
     StoreArray<SVDCluster> m_svdClusters; /**< the storeArray for svdClusters as member, is faster than recreating link for each event */
+    StoreArray<genfit::TrackCand> m_finalTrackCandidates; /**< the storeArray for the genfit::TrackCand output as member, is faster than recreating link for each event */
+    StoreArray<VXDTFInfoBoard> m_extraInfo4GFTCs; /**< interface to the InfoBoard. This allows the TFAnalyzerModule to retrieve essential info for checking efficiency and stuff. That interface is only set, if m_TESTERexpandedTestingRoutines is set to true */
 
     std::string m_PARAMnameOfInstance;           /**< Name of trackFinder, usefull, if there is more than one VXDTF running at the same time. Note: please choose short names */
 
 
     /// the following variables are nimimal testing routines within the TF
     int m_TESTERnoHitsAtEvent;  /**< counts number of times, where there were no hits at the event */
-    int m_TESTERacceptedBrokenHitsTrack; /**< counts number of times, where a tc having at least 1 1D-SVD hit was accepted */
-    int m_TESTERrejectedBrokenHitsTrack; /**< counts number of times, where a tc having at least 1 1D-SVD hit was rejected */
     int m_TESTERtriggeredZigZagXY;/**< counts how many times zigZagXY filter found bad TCs */
     int m_TESTERtriggeredZigZagXYWithSigma;/**< counts how many times zigZagXYWithSigma filter found bad TCs */
     int m_TESTERtriggeredZigZagRZ;/**< counts how many times zigZagRZ filter found bad TCs */
@@ -813,6 +845,8 @@ namespace Belle2 {
     /////////////////////////////
     /// NEW event wise variables
     /////////////////////////////
+
+    unsigned int m_badSectorRangeCtr; /**< counts cases where a PXDCluster or a SVDCluster-combination could not be assigned to a sector of a given pass */
 
     EventInfoPackage m_evInfoPack; /**< stores meta info like counters and time consumption for current event (will be reset for each event */
   private:

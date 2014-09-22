@@ -63,19 +63,22 @@ namespace Belle2 {
     setDescription("Beam background mixer at SimHit level that uses beam background"
                    " simulation output directly (collision files) and not ROF files. "
                    "Each background event is shifted in time randomly within "
-                   "a time window given by minTime and maxTime.");
+                   "a time window specified with minTime and maxTime.");
     // set property flags
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
     addParam("backgroundFiles", m_backgroundFiles,
-             "List of background (collision) files: one file per background type, "
+             "List of background (collision) files, "
              "wildcards possible (as in TChain)");
     addParam("minTime", m_minTime,
              "Time window lower edge in nano seconds", -1000.0);
     addParam("maxTime", m_maxTime,
              "Time window upper edge in nano seconds", 800.0);
-    addParam("scaleFactors", m_scaleFactors, "Factors to scale rates of backgrounds",
+    addParam("scaleFactors", m_scaleFactors,
+             "Factors to scale rates of backgrounds. Possible tag names: "
+             "Coulomb_LER, Coulomb_HER, RBB_LER, RBB_HER, Touschek_LER, "
+             "Touschek_HER, twoPhoton, other ",
              m_scaleFactors);
     addParam("components", m_components,
              "Detector components to be included, empty list means all components",
@@ -123,7 +126,7 @@ namespace Belle2 {
       B2WARNING("Unknown components:" << str);
     }
 
-    // check files and sort them according to type
+    // check files and append them to sample container
 
     for (auto file : m_backgroundFiles) {
 
@@ -178,7 +181,7 @@ namespace Belle2 {
         }
       }
 
-      addBackground(tags[0], types[0], file, realTime);
+      appendSample(tags[0], types[0], file, realTime);
 
     }
 
@@ -193,14 +196,14 @@ namespace Belle2 {
       }
     }
 
-    // open files
+    // open files for reading SimHits
 
     for (auto & bkg : m_backgrounds) {
 
       // define TChain for reading SimHits
       bkg.tree = new TChain("tree");
       for (unsigned i = 0; i < bkg.fileNames.size(); ++i) {
-        bkg.tree->Add(bkg.fileNames[i].c_str());
+        bkg.numFiles += bkg.tree->Add(bkg.fileNames[i].c_str());
       }
 
       bkg.numEvents = bkg.tree->GetEntries();
@@ -222,11 +225,12 @@ namespace Belle2 {
       if (realTime >= 1000.0) {realTime /= 1000.0; unit = " ms";}
       if (realTime >= 1000.0) {realTime /= 1000.0; unit = " s";}
 
-      B2INFO("--> type: " << bkg.type <<
-             " (tag=" << bkg.tag <<
-             ") events: " << bkg.numEvents <<
-             " realTime: " << realTime << unit <<
-             " rate = " << bkg.rate * 1000 << " MHz");
+      B2INFO("BeamBkgMixer: " << bkg.type <<
+             " files=" << bkg.numFiles <<
+             " events=" << bkg.numEvents <<
+             " realTime=" << realTime << unit <<
+             " scaleFactor=" << bkg.scaleFactor <<
+             " rate=" << bkg.rate * 1000 << " MHz");
     }
 
 
@@ -286,7 +290,7 @@ namespace Belle2 {
         bkg.eventCount++;
         if (bkg.eventCount >= bkg.numEvents) {
           bkg.eventCount = 0;
-          B2INFO("BeamBkgMixer: events of " << bkg.type << " sample will be re-used");
+          B2INFO("BeamBkgMixer: events of " << bkg.type << " will be re-used");
         }
       }
     }
@@ -328,10 +332,10 @@ namespace Belle2 {
   }
 
 
-  void BeamBkgMixerModule::addBackground(unsigned tag,
-                                         const std::string& type,
-                                         const std::string& fileName,
-                                         double realTime)
+  void BeamBkgMixerModule::appendSample(unsigned tag,
+                                        const std::string& type,
+                                        const std::string& fileName,
+                                        double realTime)
   {
     for (auto & bkg : m_backgrounds) {
       if (tag == bkg.tag) {

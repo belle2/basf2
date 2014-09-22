@@ -5,8 +5,7 @@ from basf2 import *
 
 # Example of using BeamBkgTagSetter module to set the background tag variable in SimHits
 # and to store background sample equivalent time (realTime) into BackgroundMetaData
-# Note: if BackgroundMetaData is found in the input file basf2 will exit with Error
-#       (e.g. events have already been processed with this module)
+# Note: if BackgroundMetaData already exists it will be overwritten!
 
 set_log_level(LogLevel.WARNING)
 

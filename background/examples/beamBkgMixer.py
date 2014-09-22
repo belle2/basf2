@@ -5,6 +5,7 @@ from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from reconstruction import add_mdst_output
+import glob
 
 # ----------------------------------------------------------------------------------
 # Example of simulation/reconstruction of generic BBbar events with beam background
@@ -13,20 +14,21 @@ from reconstruction import add_mdst_output
 set_log_level(LogLevel.ERROR)
 
 # background (collision) files
-# Note: exactly one list entry per BG type, order not important
 #   wildcards can be used if there are several files of the same BG type
 #   example: 'Coulomb_HER_*.root' if there are several files for Coulomb_HER
-#   do not use glob.glob to get the list of files: it can result in higher background!
 
 dir = '/sw/belle2/bkg/'  # change the directory name if you don't run on KEKCC
-bkgFiles = [
+bg = [
     dir + 'Coulomb_HER_100us.root',
     dir + 'Coulomb_LER_100us.root',
     dir + 'RBB_HER_100us.root',
     dir + 'RBB_LER_100us.root',
     dir + 'Touschek_HER_100us.root',
     dir + 'Touschek_LER_100us.root',
-    ]
+]
+
+# alternatively glob.glob can be used to get the list of files:
+# bg = glob.glob(dir + '/*.root')
 
 # Create path
 main = create_path()
@@ -42,7 +44,7 @@ evtgeninput.param('boost2LAB', True)
 main.add_module(evtgeninput)
 
 # Simulation
-add_simulation(main, bkgfiles=bkgFiles)
+add_simulation(main, bkgfiles=bg)
 
 # Reconstruction
 add_reconstruction(main)

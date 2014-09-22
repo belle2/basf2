@@ -101,25 +101,26 @@ namespace Belle2 {
      * structure to hold samples of a particular background type
      */
     struct BkgFiles {
-      unsigned tag; /**< background tag */
-      std::string type; /**< background type */
-      double realTime; /**< real time of BG samlpe */
-      double scaleFactor;  /**< scale factor for background rate */
+      unsigned tag;        /**< background tag */
+      std::string type;    /**< background type */
+      double realTime;     /**< real time of BG samlpe */
+      double scaleFactor;  /**< scale factor for the rate */
       std::vector<std::string> fileNames;  /**< file names */
-      TChain* tree;  /**< tree pointer */
-      unsigned numEvents;  /**< number of events (tree entries) in the BG sample */
+      TChain* tree;        /**< tree pointer */
+      unsigned numFiles;   /**< number of files connected to TChain */
+      unsigned numEvents;  /**< number of events (tree entries) in the sample */
       unsigned eventCount; /**< current event (tree entry) */
-      double rate;  /**< background rate of the sample */
-      BkgHits simHits;  /**< input event buffer */
+      double rate;         /**< background rate of the sample */
+      BkgHits simHits;     /**< input event buffer */
 
       /**
        * default constructor
        */
       BkgFiles(): tag(0), realTime(0.0), scaleFactor(1.0),
-        tree(0), numEvents(0), eventCount(0), rate(0.0)
+        tree(0), numFiles(0), numEvents(0), eventCount(0), rate(0.0)
       {}
       /**
-       * constructor with tag, type, fileName and real time
+       * constructor with tag, type, file name and real time
        * @param bkgTag background tag
        * @param bkgType background type
        * @param fileName file name
@@ -130,7 +131,7 @@ namespace Belle2 {
                const std::string& fileName,
                double time):
         tag(bkgTag), type(bkgType), realTime(time), scaleFactor(1.0),
-        tree(0), numEvents(0), eventCount(0), rate(0.0) {
+        tree(0), numFiles(0), numEvents(0), eventCount(0), rate(0.0) {
         fileNames.push_back(fileName);
       }
     };
@@ -171,11 +172,17 @@ namespace Belle2 {
     bool isComponentIncluded(std::vector<std::string>& components,
                              const std::string& component);
 
-
-    void addBackground(unsigned tag,
-                       const std::string& type,
-                       const std::string& fileName,
-                       double realTime);
+    /**
+     * appends background sample to m_backgrounds
+     * @param bkgTag background tag
+     * @param bkgType background type
+     * @param fileName file name
+     * @param realTime real time that corresponds to background sample
+     */
+    void appendSample(unsigned bkgTag,
+                      const std::string& bkgType,
+                      const std::string& fileName,
+                      double realTime);
 
 
     std::vector<std::string> m_backgroundFiles; /**< names of beam background files */

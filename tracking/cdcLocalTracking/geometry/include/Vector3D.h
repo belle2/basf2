@@ -288,6 +288,16 @@ namespace Belle2 {
 
 
 
+      /// Passivelly moves the vector inplace by the given vector
+      void passiveMoveBy(const Vector3D& by)
+      { subtract(by); }
+
+      /// Passivelly moves the vector inplace by the given vector
+      Vector3D passiveMovedBy(const Vector3D& by)
+      { return *this - by; }
+
+
+
       /// Getter for the x coordinate
       inline const FloatType& x() const { return m_xy.x(); }
       /// Setter for the x coordinate

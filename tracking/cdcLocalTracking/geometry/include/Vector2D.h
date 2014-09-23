@@ -337,6 +337,18 @@ namespace Belle2 {
       /// Gives the polar radius being the angle to the x axes ( range -PI to PI )
       inline FloatType phi() const { return isNull() ? NAN : atan2(y(), x()) ; }
 
+
+
+      /// Passivelly moves the vector inplace by the given vector
+      void passiveMoveBy(const Vector2D& by)
+      { subtract(by); }
+
+      /// Passivelly moves the vector inplace by the given vector
+      Vector2D passiveMovedBy(const Vector2D& by)
+      { return *this - by; }
+
+
+
       /// Getter for the x coordinate
       inline const FloatType& x() const { return m_x; }
       /// Setter for the x coordinate

@@ -15,16 +15,7 @@ from ROOT import Belle2
 import os
 
 main = create_path()
-# ***************************************
-roinput = register_module('RootInput')
-inputFiles = []
-for i in xrange(20):
-    inputFiles.append('/remote/pcbelle06/ligioi/dstFiles/B2JpsiKs_mu_e0001r'
-                      + '%04d' % (i + 1) + '_s00_BGx0.mdst.root')
-roinput.param('inputFileNames', inputFiles)
-main.add_module(roinput)
-# ***************************************
-# main.add_module(register_module('RootInput'))
+main.add_module(register_module('RootInput'))
 main.add_module(register_module('Gearbox'))
 loadReconstructedParticles(path=main)
 
@@ -202,42 +193,99 @@ for (symbol, category) in trackLevelParticles:
 eventLevelReady = trackLevelReady
 
 # Eventlevel -> calculation only on targettrack
-eventLevelParticles = [('e+', 'Electron'), ('mu+', 'Muon')]  # , ('K+', 'Kaon'),
-                       # ('pi+', 'SlowPion')]
+eventLevelParticles = [('e+', 'Electron'), ('mu+', 'Muon'), ('K+', 'Kaon'),
+                       ('pi+', 'SlowPion'), ('Lambda0', 'Lambda')]
 
 variables_EL = dict()
-variables_EL['Electron'] = ['p_CMS', 'SemiLeptonicVariables(recoilMass)',
-                            'SemiLeptonicVariables(p_missing_CMS)',
-                            'SemiLeptonicVariables(CosTheta_missing_CMS)',
-                            'SemiLeptonicVariables(EW90)']
-variables_EL['Muon'] = ['p_CMS', 'SemiLeptonicVariables(recoilMass)',
-                        'SemiLeptonicVariables(p_missing_CMS)',
-                        'SemiLeptonicVariables(CosTheta_missing_CMS)',
-                        'SemiLeptonicVariables(EW90)']
-variables_EL['Kaon'] = ['bestQrOf(K+:ROE , IsFromB(Kaon))',
-                        'p_CMS(K+:ROE , IsFromB(Kaon))',
-                        'chargeTimesKaonLiklihood']  # TODO More Event Level Variables
-variables_EL['SlowPion'] = ['bestQrOf(pi+:ROE, IsFromB(SlowPion))',
-                            'p_CMS(pi+:ROE , IsFromB(SlowPion))']  # TODO More Event Level Variables
+variables_EL['Electron'] = [
+    'p_CMS',
+    'pt_CMS',
+    'p',
+    'pt',
+    'eid',
+    'eid_dEdx',
+    'eid_TOP',
+    'eid_ARICH',
+    'eid_ECL',
+    'SemiLeptonicVariables(recoilMass)',
+    'SemiLeptonicVariables(p_missing_CMS)',
+    'SemiLeptonicVariables(CosTheta_missing_CMS)',
+    'SemiLeptonicVariables(EW90)',
+    ]
+variables_EL['Muon'] = [
+    'p_CMS',
+    'pt_CMS',
+    'p',
+    'pt',
+    'muid',
+    'muid_dEdx',
+    'muid_TOP',
+    'muid_ARICH',
+    'SemiLeptonicVariables(recoilMass)',
+    'SemiLeptonicVariables(p_missing_CMS)',
+    'SemiLeptonicVariables(CosTheta_missing_CMS)',
+    'SemiLeptonicVariables(EW90)',
+    ]
+variables_EL['Kaon'] = [
+    'p_CMS',
+    'pt_CMS',
+    'cosTheta',
+    'pt',
+    'Kid',
+    'Kid_dEdx',
+    'Kid_TOP',
+    'Kid_ARICH',
+    'charge',
+    'NumberOfKShortinRemainingROEKaon',
+    'ptTracksRoe',
+    'distance',
+    ]
+variables_EL['SlowPion'] = [
+    'p_CMS',
+    'pt_CMS',
+    'cosTheta',
+    'p',
+    'pt',
+    'piid',
+    'piid_dEdx',
+    'piid_TOP',
+    'piid_ARICH',
+    'pi_vs_edEdxid',
+    'cosTPTO',
+    'charge',
+    'Kid',
+    'eid',
+    ]
+variables_EL['Lambda'] = [
+    'lambdaFlavor',
+    'NumberOfKShortinRemainingROELambda',
+    'M',
+    'cosAngleBetweenMomentumAndVertexVector',
+    'lambdaZError',
+    'MomentumOfSecondDaughter',
+    'MomentumOfSecondDaughter_CMS',
+    'p_CMS',
+    'p',
+    'chiProb',
+    'distance',
+    ]
 
 if eventLevelReady:
     for (symbol, category) in eventLevelParticles:
         particleList = symbol + ':ROE'
         methodPrefix_EL = 'TMVA_' + category + '_EL'
         # Using MetaVariable
-        targetVariable = 'IsRightClass(' + category + ', ' + symbol + ':ROE' \
-            + ', ' + 'IsFromB(' + category + '))'
+        targetVariable = 'IsRightClass(' + category + ')'
         print 'This is the targetVariable: ' + targetVariable
 
         selectParticle(particleList, 'hasHighestProbInCat(' + particleList
                        + ',' + 'IsFromB(' + category + ')) > 0.5',
                        path=roe_path)
-
         if not isTMVAMethodAvailable(workingDirectory + '/' + methodPrefix_EL):
             print 'PROCESSING: trainTMVAMethod on event level'
             trainTMVAMethod(
                 particleList,
-                variables=variables_TL[category],
+                variables=variables_EL[category],
                 target=targetVariable,
                 prefix=methodPrefix_EL,
                 methods=methods,
@@ -275,15 +323,11 @@ class RemoveExtraInfoModule(Module):
 combinerLevelReady = eventLevelReady
 
 if combinerLevelReady:
-    variables = \
-        ['QrOf(e+:ROE, IsRightClass(Electron, e+:ROE, IsFromB(Electron)), IsFromB(Electron))'
-         ,
-         'QrOf(mu+:ROE, IsRightClass(Muon, mu+:ROE, IsFromB(Muon)), IsFromB(Muon))'
-         ,
-         'QrOf(K+:ROE, IsRightClass(Kaon, K+:ROE, IsFromB(Kaon)), IsFromB(Kaon))'
-         ,
-         'QrOf(pi+:ROE, IsRightClass(SlowPion, pi+:ROE, IsFromB(SlowPion)), IsFromB(SlowPion))'
-         ]
+    variables = ['QrOf(e+:ROE, IsRightClass(Electron), IsFromB(Electron))',
+                 'QrOf(mu+:ROE, IsRightClass(Muon), IsFromB(Muon))',
+                 'QrOf(K+:ROE, IsRightClass(Kaon), IsFromB(Kaon))',
+                 'QrOf(pi+:ROE, IsRightClass(SlowPion), IsFromB(SlowPion))',
+                 'QrOf(Lambda0:ROE, IsRightClass(Lambda), IsFromB(Lambda))']
 
     method_Combiner = [('FastBDT', 'Plugin',
                        '!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3'

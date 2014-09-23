@@ -95,12 +95,19 @@ namespace Belle2 {
       { return Helix(circleXY().reversed(), lineSZ().flippedFirst()); }
 
     public:
-      //Vector3D closest(const Vector3D& point) const;
+      /// Calculates the perpendicular travel distance at which the helix has the closest approach to the given point.
+      FloatType closestAtPerpS(const Vector3D& point) const;
+
+      /// Calculates the point of closest approach on the helix to the given point.
+      Vector3D closest(const Vector3D& point) const {
+        FloatType perpS = closestAtPerpS(point);
+        return atPerpS(perpS);
+      }
+
       //FloatType distance(const Vector3D& point) const;
       //FloatType lengthOnCurve(const Vector3D& from, const Vector3D& to) const;
       //Vector3D samePolarR(const Vector3D& point) const;
       //Vector3D samePolarRForwardOf(const Vector3D& startPoint, const FloatType& polarR) const;
-
 
       /// Moves the coordinates system by the given vector. Updates support point in place.
       void passiveMoveBy(const Vector3D& by) {
@@ -111,9 +118,9 @@ namespace Belle2 {
         m_lineSZ.passiveMoveBy(bySZ);
       }
 
+
       /// Computes the Jacobi matrix for a move of the coordinate system by the given vector.
       TMatrixD passiveMoveByJacobian(const Vector3D& by) const;
-
 
       /// Shifts the szSlope and z0 by the given amount. Method is specific to the corrections in the fusion fit.
       void shiftSZSlopeIntercept(const FloatType& szSlopeShift, const FloatType& zShift) {
@@ -121,8 +128,6 @@ namespace Belle2 {
         FloatType szSlope = m_lineSZ.slope();
         m_lineSZ.setSlopeIntercept(szSlope + szSlopeShift, z0 + zShift);
       }
-
-
 
       /// Calculates the point, which lies at the give perpendicular travel distance (counted from the perigee)
       Vector3D atPerpS(const FloatType& perpS) const

@@ -24,8 +24,12 @@
 
 #include "cdcLocalTracking/GeneralizedCircle.cc"
 #include "cdcLocalTracking/PerigeeCircle.cc"
+#include "cdcLocalTracking/Helix.cc"
+
 #include "cdcLocalTracking/HelixCovariance.cc"
 #include "cdcLocalTracking/UncertainPerigeeCircle.cc"
+
+
 
 #include "cdcLocalTracking/CDCBField.cc"
 #include "cdcLocalTracking/CDCTrajectory2D.cc"

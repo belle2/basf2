@@ -159,7 +159,6 @@ namespace Belle2 {
 
 
 
-
       /// Getter for the curvature as seen from the xy projection.
       FloatType getCurvatureXY() const
       { return getLocalHelix().curvatureXY(); }
@@ -173,13 +172,15 @@ namespace Belle2 {
       { return getLocalHelix().variance(i); }
 
 
-      /// Getter for the circle in global coordinates
+      /// Getter for the circle in global coordinates.
       GeneralizedCircle getGlobalCircle() const {
         // Down cast since we do not necessarily wont the covariance matrix transformed as well
         GeneralizedCircle result(getLocalHelix().circleXY());
         result.passiveMoveBy(-getLocalOrigin().xy());
         return result;
       }
+
+
 
       /// Getter for the cirlce in local coordinates
       UncertainPerigeeCircle getLocalCircle() const
@@ -188,6 +189,20 @@ namespace Belle2 {
       /// Getter for the chi2 value of the fit
       FloatType getChi2() const
       { return getLocalHelix().chi2(); }
+
+      /// Setter for the chi square value of the helix fit
+      void setChi2(const FloatType& chi2)
+      { return m_localHelix.setChi2(chi2); }
+
+      /// Getter for the number of degrees of freedom of the helix fit.
+      size_t getNDF() const
+      { return getLocalHelix().ndf(); }
+
+      /// Setter for the number of degrees of freedom of the helix fit.
+      void setNDF(const size_t& ndf)
+      { return m_localHelix.setNDF(ndf); }
+
+
 
       /// Getter for the two dimensional trajectory
       CDCTrajectory2D getTrajectory2D() const

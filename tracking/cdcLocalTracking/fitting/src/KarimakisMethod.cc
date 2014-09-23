@@ -252,6 +252,9 @@ UncertainPerigeeCircle KarimakisMethod::fit(CDCObservations2D& observations2D) c
   // Covariance matrix
   Matrix< FloatType, 4, 4> cNoL = aNoL - meansNoL * meansNoL.transpose();
 
+  // Determine NDF : Circle fit eats up 3 degrees of freedom.
+  size_t ndf = observations2D.size() - 3;
+
   // Parameters to be fitted
   UncertainPerigeeCircle resultCircle;
   FloatType chi2;
@@ -261,7 +264,10 @@ UncertainPerigeeCircle KarimakisMethod::fit(CDCObservations2D& observations2D) c
   chi2 = calcChi2Karimaki(resultCircle, sNoL(iW), cNoL);
   perigeeCovariance = calcCovarianceKarimaki(resultCircle, sNoL, isLineConstrained());
 
+
+
   resultCircle.setChi2(chi2);
+  resultCircle.setNDF(ndf);
 
   TMatrixDSym tPerigeeCovariance(3);
   for (int i = 0; i < 3; ++i) {

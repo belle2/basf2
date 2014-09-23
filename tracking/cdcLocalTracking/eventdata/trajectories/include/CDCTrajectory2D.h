@@ -368,9 +368,23 @@ namespace Belle2 {
       const UncertainPerigeeCircle& getLocalCircle() const
       { return m_localPerigeeCircle; }
 
-      /// Getter for the chi2 value of the fit
+      /// Getter for the chi2 value of the circle fit
       FloatType getChi2() const
       { return getLocalCircle().chi2(); }
+
+      /// Setter for the chi square value of the circle fit
+      void setChi2(const FloatType& chi2)
+      { return m_localPerigeeCircle.setChi2(chi2); }
+
+      /// Getter for the number of degrees of freedom of the circle fit.
+      size_t getNDF() const
+      { return getLocalCircle().ndf(); }
+
+      /// Setter for the number of degrees of freedom of the circle fit.
+      void setNDF(const size_t& ndf)
+      { return m_localPerigeeCircle.setNDF(ndf); }
+
+
 
       /// Setter for the generalized circle that describes the trajectory.
       void setLocalCircle(const UncertainPerigeeCircle& localPerigeeCircle)

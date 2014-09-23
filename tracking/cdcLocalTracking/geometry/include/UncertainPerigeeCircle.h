@@ -39,7 +39,8 @@ namespace Belle2 {
       UncertainPerigeeCircle() :
         PerigeeCircle(),
         m_perigeeCovariance(),
-        m_chi2(0.0)
+        m_chi2(0.0),
+        m_ndf(0)
       {;}
 
       /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix. Covariance matrix defaults to a zero matrix
@@ -47,10 +48,12 @@ namespace Belle2 {
                              const FloatType& tangentialPhi,
                              const FloatType& impact,
                              const PerigeeCovariance& perigeeCovariance = PerigeeCovariance(),
-                             const FloatType& chi2 = 0.0) :
+                             const FloatType& chi2 = 0.0,
+                             const size_t& ndf = 0) :
         PerigeeCircle(PerigeeCircle::fromPerigeeParameters(curvature, tangentialPhi, impact)),
         m_perigeeCovariance(perigeeCovariance),
-        m_chi2(chi2)
+        m_chi2(chi2),
+        m_ndf(ndf)
       {;}
 
 
@@ -60,10 +63,12 @@ namespace Belle2 {
                              const Vector2D& tangential,
                              const FloatType& impact,
                              const PerigeeCovariance& perigeeCovariance = PerigeeCovariance(),
-                             const FloatType& chi2 = 0.0) :
+                             const FloatType& chi2 = 0.0,
+                             const size_t& ndf = 0) :
         PerigeeCircle(PerigeeCircle::fromPerigeeParameters(curvature, tangential, impact)),
         m_perigeeCovariance(perigeeCovariance),
-        m_chi2(chi2)
+        m_chi2(chi2),
+        m_ndf(ndf)
       {;}
 
 
@@ -71,20 +76,24 @@ namespace Belle2 {
       /// Augments a plain perigee circle with a covariance matrix. Covariance defaults to zero
       UncertainPerigeeCircle(const PerigeeCircle& perigeeCircle,
                              const PerigeeCovariance& perigeeCovariance = PerigeeCovariance(),
-                             const FloatType& chi2 = 0.0) :
+                             const FloatType& chi2 = 0.0,
+                             const size_t& ndf = 0) :
         PerigeeCircle(perigeeCircle),
         m_perigeeCovariance(perigeeCovariance),
-        m_chi2(chi2)
+        m_chi2(chi2),
+        m_ndf(ndf)
       {;}
 
 
       /// Augments a plain perigee circle with a covariance matrix. Covariance defaults to zero
       UncertainPerigeeCircle(const GeneralizedCircle& generalizedCircle,
                              const PerigeeCovariance& perigeeCovariance = PerigeeCovariance(),
-                             const FloatType& chi2 = 0.0) :
+                             const FloatType& chi2 = 0.0,
+                             const size_t& ndf = 0) :
         PerigeeCircle(generalizedCircle),
         m_perigeeCovariance(perigeeCovariance),
-        m_chi2(chi2)
+        m_chi2(chi2),
+        m_ndf(ndf)
       {;}
 
       /// Empty destructor
@@ -115,6 +124,14 @@ namespace Belle2 {
       void setChi2(const FloatType& chi2)
       { m_chi2 = chi2; }
 
+      /// Getter for the number of degrees of freediom used in the circle fit
+      const size_t& ndf() const
+      { return m_ndf; }
+
+      /// Setter for the number of degrees of freediom used in the circle fit
+      void setNDF(const size_t& ndf)
+      { m_ndf = ndf; }
+
 
       /// Sets all circle parameters to zero including the covariance matrix
       inline void setNull() {
@@ -133,7 +150,9 @@ namespace Belle2 {
       /// Returns a copy of the circle with opposite orientation.
       inline UncertainPerigeeCircle reversed() const {
         return UncertainPerigeeCircle(PerigeeCircle::reversed(),
-                                      perigeeCovariance().reversed());
+                                      perigeeCovariance().reversed(),
+                                      chi2(),
+                                      ndf());
       }
 
     public:
@@ -163,11 +182,14 @@ namespace Belle2 {
 
 
     private:
-      /// Memory for the 3x3 covariance matrix of the perigee parameters
+      /// Memory for the 3x3 covariance matrix of the perigee parameters.
       PerigeeCovariance m_perigeeCovariance;
 
       /// Memory for the chi square value of the fit of this circle.
       FloatType m_chi2;
+
+      /// Memory for the number of degrees of freedim of the fit of this circle.
+      size_t m_ndf;
 
       /// ROOT Macro to make UncertainPerigeeCircle a ROOT class.
       ClassDefInCDCLocalTracking(UncertainPerigeeCircle, 1);

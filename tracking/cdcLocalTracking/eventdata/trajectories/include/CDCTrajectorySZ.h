@@ -94,15 +94,6 @@ namespace Belle2 {
       inline FloatType getSZDist(const FloatType& s, const FloatType& z) const
       { return getSZLine().distance(Vector2D(s, z)) ; }
 
-      /// Gets the slope over the travel distance coordinate
-      inline  FloatType getSZSlope() const
-      { return getSZLine().slope(); }
-
-      /// Gets the z coordinate at zero travel distance
-      /** This gives the z position at the start point ( zero travel distance ) */
-      inline  FloatType getStartZ() const
-      { return getSZLine().intercept(); }
-
       /// Passively Shift the s coordinate by the amount given.
       /** Adjust all transvers travel distance measurements by deltaS. \n
        *  The old values of s before the shift corresponds the new scale \n
@@ -112,6 +103,47 @@ namespace Belle2 {
        *  by the same amount in both trajectories.*/
       void passiveMoveS(const FloatType& deltaS)
       { m_szLine.passiveMoveAlongFirst(deltaS); }
+
+
+
+      /// Indicates if the line has been fitted
+      bool isFitted() const
+      { return m_szLine.isNull(); }
+
+      /// Clears all information from this trajectory line
+      void clear()
+      { m_szLine.setNull(); }
+
+
+
+      /// Gets the slope over the travel distance coordinate
+      inline  FloatType getSZSlope() const
+      { return getSZLine().slope(); }
+
+      /// Gets the z coordinate at zero travel distance
+      /** This gives the z position at the start point ( zero travel distance ) */
+      inline  FloatType getStartZ() const
+      { return getSZLine().intercept(); }
+
+
+
+      /// Getter for the chi square value of the line fit
+      FloatType getChi2() const
+      { return getSZLine().chi2(); }
+
+      /// Setter for the chi square value of the line fit
+      void setChi2(const FloatType& chi2)
+      { return m_szLine.setChi2(chi2); }
+
+      /// Getter for the number of degrees of freedom of the line fit.
+      size_t getNDF() const
+      { return getSZLine().ndf(); }
+
+      /// Setter for the number of degrees of freedom of the line fit.
+      void setNDF(const size_t& ndf)
+      { return m_szLine.setNDF(ndf); }
+
+
 
       /// Getter for the line in sz space
       const UncertainSZLine& getSZLine() const
@@ -137,14 +169,6 @@ namespace Belle2 {
         m_szLine.setN(n0, n1, n2);
         if (not getSZLine().alignedWithFirst()) m_szLine.reverse();
       }
-
-      /// Indicates if the line has been fitted
-      bool isFitted() const
-      { return m_szLine.isNull(); }
-
-      /// Clears all information from this trajectory line
-      void clear()
-      { m_szLine.setNull(); }
 
     private:
       UncertainSZLine m_szLine; ///< Memory for the line representation

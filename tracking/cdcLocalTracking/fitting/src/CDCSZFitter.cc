@@ -197,5 +197,14 @@ void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ,
   // Matrix of weighted sums
   Matrix< FloatType, 3, 3 > sumMatrixWSZ = observations2D.getWXYSumMatrix();
   UncertainSZLine uncertainSZLine = fitZ(sumMatrixWSZ);
+
+  // Determine NDF : Line fit eats up 2 degrees of freedom.
+  size_t ndf = observations2D.size() - 2;
+  uncertainSZLine.setNDF(ndf);
+
   trajectorySZ.setSZLine(uncertainSZLine);
+
+
+
+
 }

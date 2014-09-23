@@ -34,7 +34,8 @@ namespace Belle2 {
       UncertainHelix() :
         Helix(),
         m_helixCovariance(),
-        m_chi2(0.0)
+        m_chi2(0.0),
+        m_ndf(0)
       {;}
 
       /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix. Covariance matrix defaults to a zero matrix
@@ -44,19 +45,23 @@ namespace Belle2 {
                      const FloatType& szSlope,
                      const FloatType& z0,
                      const HelixCovariance& helixCovariance = HelixCovariance(),
-                     const FloatType& chi2 = 0.0) :
+                     const FloatType& chi2 = 0.0,
+                     const size_t& ndf = 0) :
         Helix(curvature, tangentialPhi, impact, szSlope, z0),
         m_helixCovariance(helixCovariance),
-        m_chi2(chi2)
+        m_chi2(chi2),
+        m_ndf(ndf)
       {;}
 
 
       explicit UncertainHelix(const TVectorD& parameters,
                               const HelixCovariance& helixCovariance = HelixCovariance(),
-                              const FloatType& chi2 = 0.0) :
+                              const FloatType& chi2 = 0.0,
+                              const size_t& ndf = 0) :
         Helix(parameters),
         m_helixCovariance(helixCovariance),
-        m_chi2(chi2)
+        m_chi2(chi2),
+        m_ndf(ndf)
       {;}
 
       /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix. Covariance matrix defaults to a zero matrix
@@ -66,10 +71,12 @@ namespace Belle2 {
                      const FloatType& szSlope,
                      const FloatType& z0,
                      const HelixCovariance& helixCovariance = HelixCovariance(),
-                     const FloatType& chi2 = 0.0) :
+                     const FloatType& chi2 = 0.0,
+                     const size_t& ndf = 0) :
         Helix(curvature, tangential, impact, szSlope, z0),
         m_helixCovariance(helixCovariance),
-        m_chi2(chi2)
+        m_chi2(chi2),
+        m_ndf(ndf)
       {;}
 
 
@@ -77,10 +84,12 @@ namespace Belle2 {
       /// Augments a plain helix with a covariance matrix. Covariance defaults to zero.
       UncertainHelix(const Helix& helix,
                      const HelixCovariance& helixCovariance = HelixCovariance(),
-                     const FloatType& chi2 = 0.0) :
+                     const FloatType& chi2 = 0.0,
+                     const size_t& ndf = 0) :
         Helix(helix),
         m_helixCovariance(helixCovariance),
-        m_chi2(chi2)
+        m_chi2(chi2),
+        m_ndf(ndf)
       {;}
 
 
@@ -90,7 +99,8 @@ namespace Belle2 {
 
         Helix(uncertainPerigeeCircle, uncertainSZLine), //copies line and circle without uncertainties
         m_helixCovariance(uncertainPerigeeCircle.perigeeCovariance(), uncertainSZLine.szCovariance()),
-        m_chi2(uncertainPerigeeCircle.chi2() + uncertainSZLine.chi2())
+        m_chi2(uncertainPerigeeCircle.chi2() + uncertainSZLine.chi2()),
+        m_ndf(uncertainPerigeeCircle.ndf() + uncertainSZLine.ndf())
       {;}
 
 
@@ -134,11 +144,20 @@ namespace Belle2 {
       void setChi2(const FloatType& chi2)
       { m_chi2 = chi2; }
 
+      /// Getter for the number of degrees of freediom used in the helix fit
+      const size_t& ndf() const
+      { return m_ndf; }
+
+      /// Setter for the number of degrees of freediom used in the helix fit
+      void setNDF(const size_t& ndf)
+      { m_ndf = ndf; }
+
       /// Sets all circle parameters to zero including the covariance matrix
       inline void setNull() {
         Helix::setNull();
         m_helixCovariance.setNull();
         m_chi2 = 0.0;
+        m_ndf = 0;
       }
 
     public:
@@ -150,7 +169,7 @@ namespace Belle2 {
 
       /// Returns a copy of the circle with opposite orientation.
       inline UncertainHelix reversed() const
-      { return UncertainHelix(Helix::reversed(), m_helixCovariance.reversed()); }
+      { return UncertainHelix(Helix::reversed(), m_helixCovariance.reversed(), chi2(), ndf()); }
 
     public:
       /// Moves the coordinate system by the vector by and calculates the new perigee and its covariance matrix. Change is inplace.
@@ -162,11 +181,14 @@ namespace Belle2 {
       }
 
     private:
-      /// Memory for the 5x5 covariance matrix of the perigee parameters
+      /// Memory for the 5x5 covariance matrix of the helix parameters.
       HelixCovariance m_helixCovariance;
 
-      /// Memory for the chi square value of the fit of this circle.
+      /// Memory for the chi square value of the fit of this helix.
       FloatType m_chi2;
+
+      /// Memory for the number of degrees of freedim of the fit of this helix.
+      size_t m_ndf;
 
       /// ROOT Macro to make UncertainHelix a ROOT class.
       ClassDefInCDCLocalTracking(UncertainHelix, 1);

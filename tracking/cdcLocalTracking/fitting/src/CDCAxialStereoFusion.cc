@@ -183,6 +183,7 @@ namespace {
     Double_t chi2 =  startChi2 + endChi2;
 
     resultHelix.setChi2(chi2);
+    resultHelix.setNDF(1);
 
     return CDCTrajectory3D(localOrigin3D, resultHelix);
 

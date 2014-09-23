@@ -395,12 +395,13 @@ UncertainPerigeeCircle ExtendedRiemannsMethod::fit(CDCObservations2D& observatio
   // The same as above without drift lengths
   Matrix<FloatType, 4, 4> sNoL = s.block<4, 4>(0, 0);
 
+  // Determine NDF : Circle fit eats up 3 degrees of freedom.
+  size_t ndf = observations2D.size() - 3;
 
   // Parameters to be fitted
   UncertainPerigeeCircle resultCircle;
   FloatType chi2;
   Matrix< FloatType, 3, 3> perigeeCovariance;
-
 
   size_t nObservationsWithDriftRadius = observations2D.getNObservationsWithDriftRadius();
   if (nObservationsWithDriftRadius > 0) {
@@ -432,6 +433,7 @@ UncertainPerigeeCircle ExtendedRiemannsMethod::fit(CDCObservations2D& observatio
   }
 
   resultCircle.setChi2(chi2);
+  resultCircle.setNDF(ndf);
 
   TMatrixDSym tPerigeeCovariance(3);
   for (int i = 0; i < 3; ++i) {

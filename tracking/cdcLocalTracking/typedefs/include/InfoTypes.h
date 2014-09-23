@@ -37,6 +37,7 @@ namespace Belle2 {
 
     typedef OrientationInfo IncDecInfo; ///< Indicator for increasing or decreasing
     const IncDecInfo INCREASING = 1; ///< Constant for increasing quantity
+    const IncDecInfo CONSTANT = 1; ///< Constant for increasing quantity
     const IncDecInfo DECREASING = -1; ///< Constant for decreasing quantity
 
     typedef OrientationInfo CCWInfo; ///< Indicator for clockwise or counterclockwise orientation

@@ -24,7 +24,7 @@ namespace Belle2 {
   namespace CDCLocalTracking {
 
     /// Worker for building reconstructed segments form wirehits using reconstructed facets
-    class MCSegmentWorker {
+    class MCSegmentWorker : public UsedTObject {
 
     public:
       /** Constructor. */
@@ -62,6 +62,12 @@ namespace Belle2 {
 
       /// Memory for the segments extracted from the paths
       std::vector<Belle2::CDCLocalTracking::CDCRecoSegment2D> m_segments2D;
+
+    private:
+      /// ROOT Macro to make MCSegmentWorker a ROOT class.
+      ClassDefInCDCLocalTracking(MCSegmentWorker, 1);
+
+
 
     }; // end class MCSegmentWorker
 

@@ -61,8 +61,11 @@ namespace Belle2 {
       /// Memory for the constructed facets.
       CDCRecoFacetCollection m_recoFacets;
 
+      /// ROOT Macro to make AllFacetWorker a ROOT class.
+      ClassDefInCDCLocalTracking(AllFacetWorker, 1);
+
     }; // end class AllFacetWorker
   } //end namespace CDCLocalTracking
 } //end namespace Belle2
 
-#endif //FACETSEGMENTWORKER_H_
+#endif //ALLFACETWORKER_H_

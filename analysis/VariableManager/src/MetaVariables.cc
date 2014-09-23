@@ -176,31 +176,6 @@ namespace Belle2 {
     }
 
 //FLAVOR TAGGING RELATED:
-    Manager::FunctionPtr bestQrOf(const std::vector<std::string>& arguments)
-    {
-      if (arguments.size() == 2) {
-        auto particleListName = arguments[0];
-        auto extraInfoName = arguments[1];
-        auto func = [particleListName, extraInfoName](const Particle*) -> double {
-          StoreObjPtr<ParticleList> ListOfParticles(particleListName);
-          double maximum_q = 0;
-          double maximum_r = 0;
-          for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
-            Particle* p = ListOfParticles->getParticle(i);
-            double r = p->getExtraInfo(extraInfoName);
-            if (r > maximum_r) {
-              maximum_r = r;
-              maximum_q = p->getCharge();
-            }
-          }
-          return maximum_r * maximum_q;
-        };
-        return func;
-      } else {
-        B2FATAL("Wrong number of arguments (2 required) for meta function bestQrOf");
-        return nullptr;
-      }
-    }
 
     Manager::FunctionPtr QrOf(const std::vector<std::string>& arguments)
     {
@@ -209,20 +184,27 @@ namespace Belle2 {
         auto extraInfoRightClass = arguments[1];
         auto extraInfoFromB = arguments[2];
         auto func = [particleListName, extraInfoRightClass, extraInfoFromB](const Particle*) -> double {
-          StoreObjPtr<EventExtraInfo> Info("EventExtraInfo");
-          float p = Info -> getExtraInfo(extraInfoRightClass); //Gets the probability of beeing right classified flavour from the event level
-          float r = TMath::Abs(2 * p - 1); //Definition of the dilution factor
           StoreObjPtr<ParticleList> ListOfParticles(particleListName);
-          float maximum_q = 0; //Flavour of the track selected as target
+          Particle* target = nullptr; //Particle selected as target
           float maximum_p_track = 0; //Probability of being the target track from the track level
-          for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
-            Particle* p = ListOfParticles->getParticle(i);
-            float x = p->getExtraInfo(extraInfoFromB);
-            if (x > maximum_p_track) {
-              maximum_p_track = x;
-              maximum_q = p->getCharge();
+          float prob = 0; //The probability of beeing right classified flavour from the event level
+          float maximum_q = 0; //Flavour of the track selected as target
+          if (ListOfParticles->getListSize() > 0) {
+            for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
+              Particle* particle = ListOfParticles->getParticle(i);
+              float x = particle->getExtraInfo(extraInfoFromB);
+              if (x > maximum_p_track) {
+                maximum_p_track = x;
+                target = particle;
+              }
+            }
+            prob = target -> getExtraInfo(extraInfoRightClass); //Gets the probability of beeing right classified flavour from the event level
+            maximum_q = target -> getCharge(); //Gets the flavour of the track selected as target
+            if (extraInfoFromB == "IsFromB(Lambda)") {
+              maximum_q = target->getPDGCode() / TMath::Abs(target->getPDGCode());
             }
           }
+          float r = TMath::Abs(2 * prob - 1); //Definition of the dilution factor  */
           return 0.5 * (maximum_q * r + 1);
         };
         return func;
@@ -234,12 +216,9 @@ namespace Belle2 {
 
     Manager::FunctionPtr IsRightClass(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 3) {
+      if (arguments.size() == 1) {
         auto particleName = arguments[0];
-        auto particleListName = arguments[1];
-        auto extraInfoName = arguments[2];
-        auto func = [particleName, particleListName, extraInfoName](const Particle * particle) -> double {
-          StoreObjPtr<ParticleList> ListOfParticles(particleListName);
+        auto func = [particleName](const Particle * particle) -> double {
           Particle* nullpart = nullptr;
           float maximum_q = 0;
           int maximum_PDG = 0;
@@ -251,7 +230,7 @@ namespace Belle2 {
             maximum_PDG = TMath::Abs(MCp->getPDG());
             maximum_PDG_Mother = TMath::Abs(MCp->getMother()->getPDG());
             //for Kaons and SlowPions we need the mother of the mother for the particle
-            if (particleName == "Kaon" || particleName == "SlowPion") maximum_PDG_Mother_Mother =  TMath::Abs(MCp->getMother()->getMother()->getPDG());
+            if (particleName == "Kaon" || particleName == "SlowPion" || particleName == "Lambda") maximum_PDG_Mother_Mother =  TMath::Abs(MCp->getMother()->getMother()->getPDG());
           } else {
             maximum_PDG = 0;
             maximum_PDG_Mother = 0;
@@ -268,8 +247,12 @@ namespace Belle2 {
           && maximum_PDG == 321 && maximum_PDG_Mother > 400 && maximum_PDG_Mother < 500 && maximum_PDG_Mother_Mother == 511) {
             return 1.0;
           } else if (particleName == "SlowPion"
-          && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
+          && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
           && maximum_PDG == 211 && maximum_PDG_Mother == 413 && maximum_PDG_Mother_Mother == 511) {
+            return 1.0;
+          } else if ((particleName == "Lambda"
+          && (particle->getPDGCode() / TMath::Abs(particle->getPDGCode())) != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
+          && maximum_PDG == 3122) && (maximum_PDG_Mother == 511 || maximum_PDG_Mother_Mother == 511)) {
             return 1.0;
           } else {
             return 0.0;
@@ -277,7 +260,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments (3 required) for meta function IsRightClass");
+        B2FATAL("Wrong number of arguments (1 required) for meta function IsRightClass");
         return nullptr;
       }
     }
@@ -316,12 +299,10 @@ namespace Belle2 {
           && TMath::Abs(mcParticle->getMother()->getPDG()) == 413
           && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511) {
             return 1.0;
-          } else if (particleName == "Lambda"
+          } else if ((particleName == "Lambda"
           && mcParticle->getMother() != nullptr
           && mcParticle->getMother()->getMother() != nullptr
-          && TMath::Abs(mcParticle->getPDG()) == 3122
-          //&& TMath::Abs(mcParticle->getMother()->getPDG()) == 4122 //do we really need that kind of information?
-          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511) {
+          && TMath::Abs(mcParticle->getPDG()) == 3122) && (TMath::Abs(mcParticle->getMother()->getPDG()) == 511 || TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511)) {
             return 1.0;
           } else return 0.0;
         };
@@ -452,9 +433,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("IsDaughterOf(variable)", IsDaughterOf, "Check if the particle is a daughter of the given list.");
 
     VARIABLE_GROUP("MetaFunctions FlavorTagging")
-    REGISTER_VARIABLE("bestQrOf(particleListName, extraInfoName)", bestQrOf, "FlavorTagging:[Eventbased] q*r where r is maximum from extraInfoName in particlelistName.");
     REGISTER_VARIABLE("QrOf(particleListName, extraInfoRightClass, extraInfoFromB)", QrOf, "FlavorTagging: [Eventbased] q*r where r is calculated from the output of event level in particlelistName.");
-    REGISTER_VARIABLE("IsRightClass(particleName, particleListName, extraInfoName)", IsRightClass, "FlavorTagging: returns 1 if the class track by particleName category has the same flavour as the MC target track 0 else also if there is no target track");
+    REGISTER_VARIABLE("IsRightClass(particleName)", IsRightClass, "FlavorTagging: returns 1 if the class track by particleName category has the same flavour as the MC target track 0 else also if there is no target track");
     REGISTER_VARIABLE("IsFromB(particleName)", IsFromB, "Checks if the given Particle was really from a B. 1.0 if true otherwise 0.0");
     REGISTER_VARIABLE("hasHighestProbInCat(particleListName, extraInfoName)", hasHighestProbInCat, "Returns 1.0 if the given Particle is classified as target, i.e. if it has the highest probability in particlelistName. The probability is accessed via extraInfoName.");
     REGISTER_VARIABLE("SemiLeptonicVariables(requestedVariable)", SemiLeptonicVariables, "FlavorTagging:[Eventbased] Kinematical variables (recoilMass, p_missing_CMS, CosTheta_missing_CMS or EW90) assuming a semileptonic decay with the given particle as target.");

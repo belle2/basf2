@@ -24,9 +24,12 @@
 #include <analysis/utility/KsfwMoments.h>
 #include <analysis/utility/FoxWolfram.h>
 #include <analysis/utility/CleoCones.h>
-
+#include <utility>
+#include <vector>
+#include <iostream>
 
 namespace Belle2 {
+
   void addContinuumSuppression(const Particle* particle)
   {
     StoreObjPtr<Particle>     particles;
@@ -39,8 +42,11 @@ namespace Belle2 {
     // Create relation: Particle <-> ContinuumSuppression
     particle->addRelationTo(qqVars);
 
-    std::vector<TVector3> p3_cms_sigA, p3_cms_sigB, p3_cms_roe, p3_cms_all;
-    std::vector<int> Q_sigA, Q_sigB, Q_roe;
+    std::vector<TVector3> p3_cms_sigB, p3_cms_roe, p3_cms_all;
+
+    std::vector<std::pair<TVector3, int>> p3_cms_q_sigA;
+    std::vector<std::pair<TVector3, int>> p3_cms_q_sigB;
+    std::vector<std::pair<TVector3, int>> p3_cms_q_roe;
 
     std::vector<float> ksfwFS0;
     std::vector<float> ksfwFS1;
@@ -80,8 +86,9 @@ namespace Belle2 {
     for (unsigned i = 0; i < sigDau.size(); i++) {
       PCmsLabTransform T;
       TLorentzVector p_cms = T.rotateLabToCms() * sigDau[i]->get4Vector();
-      p3_cms_sigA.push_back(p_cms.Vect());
-      Q_sigA.push_back(sigDau[i]->getCharge());
+
+      p3_cms_q_sigA.push_back({p_cms.Vect(), sigDau[i]->getCharge()});
+
       p_cms_missA -= p_cms;
       et[0] += p_cms.Perp();
     }
@@ -94,7 +101,9 @@ namespace Belle2 {
       TLorentzVector p_cms = T.rotateLabToCms() * sigFsp[i]->get4Vector();
       p3_cms_all.push_back(p_cms.Vect());
       p3_cms_sigB.push_back(p_cms.Vect());
-      Q_sigB.push_back(sigFsp[i]->getCharge());
+
+      p3_cms_q_sigB.push_back({p_cms.Vect(), sigFsp[i]->getCharge()});
+
       p_cms_missB -= p_cms;
       et[1] += p_cms.Perp();
     }
@@ -125,7 +134,9 @@ namespace Belle2 {
           if (p_cms.Rho() > P_MAX) continue;
           p3_cms_all.push_back(p_cms.Vect());
           p3_cms_roe.push_back(p_cms.Vect());
-          Q_roe.push_back(particle.getCharge());
+
+          p3_cms_q_roe.push_back({p_cms.Vect(), particle.getCharge()});
+
           p_cms_missA -= p_cms;
           p_cms_missB -= p_cms;
           et[0] += p_cms.Perp();
@@ -153,7 +164,9 @@ namespace Belle2 {
           if (p_cms.Rho() > P_MAX) continue;
           p3_cms_all.push_back(p_cms.Vect());
           p3_cms_roe.push_back(p_cms.Vect());
-          Q_roe.push_back(0);
+
+          p3_cms_q_roe.push_back({p_cms.Vect(), particle.getCharge()});
+
           p_cms_missA -= p_cms;
           p_cms_missB -= p_cms;
           et[0] += p_cms.Perp();
@@ -179,7 +192,9 @@ namespace Belle2 {
         if (p_cms.Rho() > P_MAX) continue;
         p3_cms_all.push_back(p_cms.Vect());
         p3_cms_roe.push_back(p_cms.Vect());
-        Q_roe.push_back(0);
+
+        p3_cms_q_roe.push_back({p_cms.Vect(), particle.getCharge()});
+
         p_cms_missA -= p_cms;
         p_cms_missB -= p_cms;
         et[0] += p_cms.Perp();
@@ -208,12 +223,9 @@ namespace Belle2 {
 
       // KSFW moments
       KsfwMoments KsfwM(Hso0_max,
-                        p3_cms_sigA,
-                        p3_cms_sigB,
-                        p3_cms_roe,
-                        Q_sigA,
-                        Q_sigB,
-                        Q_roe,
+                        p3_cms_q_sigA,
+                        p3_cms_q_sigB,
+                        p3_cms_q_roe,
                         p_cms_missA,
                         p_cms_missB,
                         et);

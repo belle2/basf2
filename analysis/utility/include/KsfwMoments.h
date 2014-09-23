@@ -70,12 +70,9 @@ namespace Belle2 {
     };
 
     KsfwMoments(double Hso0_max,
-                std::vector<TVector3> p_cms_sigA,
-                std::vector<TVector3> p_cms_sigB,
-                std::vector<TVector3> p_cms_roe,
-                std::vector<int> Q_sigA,
-                std::vector<int> Q_sigB,
-                std::vector<int> Q_roe,
+                std::vector<std::pair<TVector3, int>> p3_cms_q_sigA,
+                std::vector<std::pair<TVector3, int>> p3_cms_q_sigB,
+                std::vector<std::pair<TVector3, int>> p3_cms_q_roe,
                 TLorentzVector p_cms_missA,
                 TLorentzVector p_cms_missB,
                 double et[2]

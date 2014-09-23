@@ -80,6 +80,10 @@ class AnalyseFacetFiltering(Module):
 
     def isGoodFacet(self, facet):
         # To be refined
+        startRLInfo = facet.getStartRLInfo()
+        right = 1
+        left = -1
+
         return True
 
     def event(self):

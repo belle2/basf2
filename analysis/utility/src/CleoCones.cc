@@ -8,25 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-// Own include
 #include <analysis/utility/PSelector.h>
 #include <analysis/VariableManager/Manager.h>
-
-// framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-
-// dataobjects
 #include <analysis/dataobjects/Particle.h>
-
 #include <iostream>
 #include <iomanip>
 #include <math.h>
 #include <vector>
 #include <string>
 #include <sstream>
-
 #include <analysis/utility/CleoCones.h>
 
 namespace Belle2 {
@@ -42,14 +35,14 @@ namespace Belle2 {
     m_cleo_cone_with_roe.clear();
 
     // ----------------------------------------------------------------------
-    // calculate momentum flow in 9 cones for all particles in event
+    // Calculate momentum flow in 9 cones for all particles in event
     // ----------------------------------------------------------------------
     if (calc_CleoCones_with_all == true) {
       for (int i = 1; i <= 9; i++) {
         float momentum_flow_all = 0;
-        for (std::vector<TVector3>::iterator iter0 = p3_cms_all.begin(); iter0 != p3_cms_all.end(); iter0++) {
+        for (std::vector<TVector3>::iterator iter0 = p3_cms_all.begin(); iter0 != p3_cms_all.end(); ++iter0) {
 
-          /* use the following intervals
+          /* Use the following intervals
              0*10<= <1*10  0- 10   170-180  180-1*10< <=180-0*10
              1*10<= <2*10 10- 20   160-170  180-2*10< <=180-1*10
              2*10<= <3*10 20- 30   150-160  180-3*10< <=180-2*10
@@ -75,12 +68,12 @@ namespace Belle2 {
     }
 
     // ----------------------------------------------------------------------
-    // calculate momentum flow in 9 cones for all particles in rest of event
+    // Calculate momentum flow in 9 cones for all particles in rest of event
     // ----------------------------------------------------------------------
     if (calc_CleoCones_with_roe == true) {
       for (int i = 1; i <= 9; i++) {
         float momentum_flow_roe = 0;
-        for (std::vector<TVector3>::iterator iter1 = p3_cms_roe.begin(); iter1 != p3_cms_roe.end(); iter1++) {
+        for (std::vector<TVector3>::iterator iter1 = p3_cms_roe.begin(); iter1 != p3_cms_roe.end(); ++iter1) {
           float angle = ((180 * (thrustB.Angle(*iter1))) / M_PI);
           if (((((i - 1) * 10) <= angle) && (angle < (i * 10))) || (((180 - (i * 10)) < angle) && (angle <= (180 - ((i - 1) * 10))))) {
             momentum_flow_roe += (*iter1).Mag();

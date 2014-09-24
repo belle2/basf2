@@ -22,31 +22,24 @@
 //                                      //
 //////////////////////////////////////////
 
-// Own include
 #include <analysis/utility/PSelector.h>
 #include <analysis/VariableManager/Manager.h>
-
-// framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-
-// dataobjects
 #include <analysis/dataobjects/Particle.h>
-
 #include <iostream>
 #include <iomanip>
 #include <math.h>
 #include <vector>
 #include <string>
 #include <sstream>
-
 #include <analysis/utility/KsfwMoments.h>
 
 namespace Belle2 {
 
 // ----------------------------------------------------------------------
-// legendre
+// Legendre
 // ----------------------------------------------------------------------
   inline double
   legendre(const double z, const int i)
@@ -61,7 +54,7 @@ namespace Belle2 {
     }
   }
 // ----------------------------------------------------------------------
-// constructor
+// Constructor
 // (copied from k_sfw.cc with minimum modification)
 // ----------------------------------------------------------------------
   KsfwMoments::KsfwMoments(double Hso0_max,
@@ -84,21 +77,21 @@ namespace Belle2 {
                : -p_cms_missB.E() * p_cms_missB.E() - p_cms_missB.Vect().Mag2();
 
     //========================
-    // calculate discriminants
+    // Calculate discriminants
     //========================
     std::vector<std::pair<TVector3, int>>::iterator pqi, pqj;
 
-    // calculate Hso components
+    // Calculate Hso components
     for (int i = 0; i < 3; i++) {
       for (int k = 0; k < 5; k++) {
         m_Hso[0][i][k] = m_Hso[1][i][k] = 0;
       }
     }
 
-    // signal A (use_finalstate_for_sig == 0)
-    for (pqi = p3_cms_q_sigA.begin(); pqi != p3_cms_q_sigA.end(); pqi++) {
+    // Signal A (use_finalstate_for_sig == 0)
+    for (pqi = p3_cms_q_sigA.begin(); pqi != p3_cms_q_sigA.end(); ++pqi) {
       const double pi_mag((pqi->first).Mag());
-      for (pqj = p3_cms_q_roe.begin(); pqj != p3_cms_q_roe.end(); pqj++) {
+      for (pqj = p3_cms_q_roe.begin(); pqj != p3_cms_q_roe.end(); ++pqj) {
         const double pj_mag((pqj->first).Mag());
         const double ij_cos((pqi->first) * (pqj->first) / pi_mag / pj_mag);
         const int c_or_n(0 == (pqj->second) ? 1 : 0);  // 0: charged 1: neutral
@@ -115,10 +108,10 @@ namespace Belle2 {
       }
     }
 
-    // signal B (use_finalstate_for_sig == 1)
-    for (pqi = p3_cms_q_sigB.begin(); pqi != p3_cms_q_sigB.end(); pqi++) {
+    // Signal B (use_finalstate_for_sig == 1)
+    for (pqi = p3_cms_q_sigB.begin(); pqi != p3_cms_q_sigB.end(); ++pqi) {
       const double pi_mag((pqi->first).Mag());
-      for (pqj = p3_cms_q_roe.begin(); pqj != p3_cms_q_roe.end(); pqj++) {
+      for (pqj = p3_cms_q_roe.begin(); pqj != p3_cms_q_roe.end(); ++pqj) {
         const double pj_mag((pqj->first).Mag());
         const double ij_cos((pqi->first) * (pqj->first) / pi_mag / pj_mag);
         const int c_or_n(0 == (pqj->second) ? 1 : 0);  // 0: charged 1: neutral
@@ -135,21 +128,18 @@ namespace Belle2 {
       }
     }
 
-    // add missing to the lists
+    // Add missing to the lists
     std::vector<std::pair<TVector3, int>> p3_cms_q_roeA(p3_cms_q_roe), p3_cms_q_roeB(p3_cms_q_roe);
     p3_cms_q_roeA.push_back({p_cms_missA.Vect(), 0});
     p3_cms_q_roeB.push_back({p_cms_missB.Vect(), 0});
 
-    // calculate Hoo components
+    // Calculate Hoo components
     for (int k = 0; k < 5; k++) {
       m_Hoo[0][k] = m_Hoo[1][k] = 0;
     }
-    for (int k = 0; k < 5; k++) {
-      m_Hoo[0][k] = m_Hoo[1][k] = 0;
-    }
-    for (pqi = p3_cms_q_roeA.begin(); pqi != p3_cms_q_roeA.end(); pqi++) {
+    for (pqi = p3_cms_q_roeA.begin(); pqi != p3_cms_q_roeA.end(); ++pqi) {
       const double pi_mag((pqi->first).Mag());
-      for (pqj = p3_cms_q_roeA.begin(); pqj != pqi; pqj++) {
+      for (pqj = p3_cms_q_roeA.begin(); pqj != pqi; ++pqj) {
         const double pj_mag((pqj->first).Mag());
         const double ij_cos((pqi->first) * (pqj->first) / pi_mag / pj_mag);
         for (int k = 0; k < 5; k++) {
@@ -159,9 +149,9 @@ namespace Belle2 {
         }
       }
     }
-    for (pqi = p3_cms_q_roeB.begin(); pqi != p3_cms_q_roeB.end(); pqi++) {
+    for (pqi = p3_cms_q_roeB.begin(); pqi != p3_cms_q_roeB.end(); ++pqi) {
       const double pi_mag((pqi->first).Mag());
-      for (pqj = p3_cms_q_roeB.begin(); pqj != pqi; pqj++) {
+      for (pqj = p3_cms_q_roeB.begin(); pqj != pqi; ++pqj) {
         const double pj_mag((pqj->first).Mag());
         const double ij_cos((pqi->first) * (pqj->first) / pi_mag / pj_mag);
         for (int k = 0; k < 5; k++) {
@@ -172,7 +162,7 @@ namespace Belle2 {
       }
     }
 
-    // nomalize so that it does not dependent on delta_e
+    // Nomalize so that it does not dependent on delta_e
     for (int k = 0; k < 5; k++) {
       for (int j = 0; j < ((k % 2) ? 1 : 3); j++) {
         m_Hso[0][j][k] /= Hso0_max;

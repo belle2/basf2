@@ -190,12 +190,12 @@ namespace Belle2 {
     double smx, pht;
     t.tmax = 0.0;
 
-    for (pt = ptlist.begin(); pt != ptlist.end(); pt++) {
+    for (pt = ptlist.begin(); pt != ptlist.end(); ++pt) {
       double r1  = 0.0, r2 = 0.0;
       double ph1 = 20.0, ph2 = 0.0;
       double ptphi = (*pt).phi;
 
-      for (qt = ptlist.begin(); qt != ptlist.end(); qt++) {
+      for (qt = ptlist.begin(); qt != ptlist.end(); ++qt) {
         double qtphi = (*qt).phi;
         if (qtphi >= ptphi && qtphi < ptphi + M_PI) {
           r1 += (*qt).pt1;
@@ -230,7 +230,7 @@ namespace Belle2 {
     double r1 = -std::sin(pht);  // -sin
     double r2 =  std::cos(pht);  // +cos
     smx = 0;
-    for (pt = ptlist.begin(); pt != ptlist.end(); pt++) {
+    for (pt = ptlist.begin(); pt != ptlist.end(); ++pt) {
       smx += std::fabs(r1 * (*pt).pt1 + r2 * (*pt).pt2);
     }
     t.tmin = smx / sump;

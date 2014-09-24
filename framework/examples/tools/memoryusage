@@ -121,7 +121,7 @@ def find_children(rootpid):
 
     for pid in pids:
         # process could have ended between listdir and reading the status so
-        # lets allow for IOError
+        # lets allow for OSError when reading
         try:
             # since we read the stat files of all processes very often we
             # optimize this using native os.open instead of file objects
@@ -303,6 +303,12 @@ for i, (a, title) in enumerate(zip(axes, memory_types)):
         l = a.legend(loc="best")
         l.get_frame().set_alpha(0.8)
 
+    # add max line and label it
+    maxvalue = total_memory[:, i + 1].max() / 1000
+    a.axhline(maxvalue, c="k", ls="--", zorder=-1)
+    a.annotate("%.2f MB" % maxvalue, (0, maxvalue), xytext=(5, 5),
+               textcoords="offset points")
+
 # save plots
 pl.tight_layout()
 f.savefig(basename + ".pdf")
@@ -310,5 +316,5 @@ f.savefig(basename + ".pdf")
 # finally, print max values
 print("\nexecution time: %d s" % total_memory[:, 0].max(), file=sys.stderr)
 for i, (name, field) in enumerate(memory_types):
-    print("max %s: %.2f MB" % (name, total_memory[:, i+1].max()/1000),
+    print("max %s: %.2f MB" % (name, total_memory[:, i + 1].max() / 1000),
           file=sys.stderr)

@@ -28,13 +28,11 @@ namespace {
         profileData.appendNew();
         relObjData.appendNew();
       }
-      B2WARNING("evtData : " << evtData.getPtr());
     }
 
     /** clear datastore */
     virtual void TearDown() {
       DataStore::Instance().reset();
-      B2WARNING("after teardown: evtData : " << evtData.getPtr());
     }
 
     void findRelationsCheckContents();

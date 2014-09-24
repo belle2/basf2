@@ -68,9 +68,10 @@ def generate(env):
                 + color_map['end'],
             ROOTCINTCOMSTR=color_map['dict'] + '*** dictionary : ${TARGET}'
                 + color_map['end'],
-            CLEANUPCOMSTR=color_map['cleanup'] + '*** removing   : %s'
-                + color_map['end'],
             )
+
+    env['CLEANUPCOMSTR'] = color_map['cleanup'] + '*** removing   : %s' \
+        + color_map['end']
 
 
 def exists(env):

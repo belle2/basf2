@@ -13,7 +13,7 @@
 
 #include <vxd/dataobjects/VxdID.h>
 
-#include <root/TObject.h>
+#include <framework/datastore/RelationsObject.h>
 
 #include <sstream>
 #include <string>
@@ -29,7 +29,7 @@ namespace Belle2 {
    * Also the sensor and cell IDs could be somewhat compressed, if desired.
    */
 
-  class SVDDigit : public TObject {
+  class SVDDigit : public RelationsObject {
 
   public:
 
@@ -165,7 +165,7 @@ namespace Belle2 {
     short m_next_id;     /**< SVDDigit index in StoreArray of next sample. */
 
     //ClassDef(SVDDigit, 2)
-    ClassDef(SVDDigit, 3)
+    ClassDef(SVDDigit, 4)
 
   }; // class SVDDigit
 

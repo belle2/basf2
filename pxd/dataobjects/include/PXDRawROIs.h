@@ -12,7 +12,7 @@
 #define PXDRAWROIS_H
 
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 
@@ -22,7 +22,7 @@ namespace Belle2 {
     * This is mainly for debugging and crosscheck.
     * Attention: Format is depending on hardware implementation and not yet fixed!
     */
-  class PXDRawROIs : public TObject {
+  class PXDRawROIs : public RelationsObject {
   public:
 
     /** Default constructor for the ROOT IO. */
@@ -109,7 +109,7 @@ namespace Belle2 {
 
     // ~PXDRawROIs();
 
-    ClassDef(PXDRawROIs, 2)
+    ClassDef(PXDRawROIs, 3)
   };
 
 

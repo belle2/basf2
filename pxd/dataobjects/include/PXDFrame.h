@@ -13,7 +13,7 @@
 
 #include <vxd/dataobjects/VxdID.h>
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 
@@ -24,7 +24,7 @@ namespace Belle2 {
    * half-ladder. The frame number is encoded in the sensor ID, similar to
    * other PXD objects.
    */
-  class PXDFrame : public TObject {
+  class PXDFrame : public RelationsObject {
   public:
 
     /** Constructor to use when the sensorID already contains frameNr information.
@@ -70,7 +70,7 @@ namespace Belle2 {
     unsigned short m_sensorID; /**< Compressed sensor identifier.*/
     unsigned short m_startRow; /**< start row of the frame */
 
-    ClassDef(PXDFrame, 1)
+    ClassDef(PXDFrame, 2)
 
   }; // class PXDFrame
 

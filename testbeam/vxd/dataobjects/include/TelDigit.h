@@ -13,7 +13,7 @@
 
 #include <vxd/dataobjects/VxdID.h>
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 
@@ -21,7 +21,7 @@ namespace Belle2 {
    * The EUDET telescope digit class.
    */
 
-  class TelDigit : public TObject {
+  class TelDigit : public RelationsObject {
   public:
 
     /** Full Constructor.
@@ -63,7 +63,7 @@ namespace Belle2 {
     short m_vCellID;           /**< Cell z coordinate in pitch units. */
     float m_charge;             /**< Dummy charge member for historical reasons. */
 
-    ClassDef(TelDigit, 2)
+    ClassDef(TelDigit, 3)
 
   }; // class TelDigit
 

@@ -13,7 +13,7 @@
 
 #include <vxd/dataobjects/VxdID.h>
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 
@@ -23,7 +23,7 @@ namespace Belle2 {
    * This is a development implementation which is intentionally kept
    * somewhat bulky. The coordinates probably won't be kept in future.
    */
-  class PXDDigit : public TObject {
+  class PXDDigit : public RelationsObject {
   public:
 
     /** Useful Constructor.
@@ -102,7 +102,7 @@ namespace Belle2 {
     float m_vCellPosition;     /**< Absolute cell position in z. */
     float m_charge;            /**< Deposited charge (units depend on user selection). */
 
-    ClassDef(PXDDigit, 2)
+    ClassDef(PXDDigit, 3)
 
   }; // class PXDDigit
 

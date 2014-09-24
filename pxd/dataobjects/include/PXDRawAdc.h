@@ -13,14 +13,14 @@
 
 
 #include <vxd/dataobjects/VxdID.h>
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 
   /** The PXD Raw Adc class
     * This class stores information about Raw Adc for Pedestals
     */
-  class PXDRawAdc : public TObject {
+  class PXDRawAdc : public RelationsObject {
   public:
 
     /** Default constructor for the ROOT IO. */
@@ -77,7 +77,7 @@ namespace Belle2 {
 
     // ~PXDRawAdc();
 
-    ClassDef(PXDRawAdc, 1)
+    ClassDef(PXDRawAdc, 2)
   };
 
 

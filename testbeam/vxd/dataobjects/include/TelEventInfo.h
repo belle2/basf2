@@ -1,12 +1,12 @@
 #ifndef TELEVENTINFO_H
 #define TELEVENTINFO_H
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
   /** Store event number, trigger ID, and time stamp.
    */
-  class TelEventInfo : public TObject {
+  class TelEventInfo : public RelationsObject {
   public:
 
     /** Constructor. */
@@ -95,7 +95,7 @@ namespace Belle2 {
      */
     ULong64_t m_timeStamp;
 
-    ClassDef(TelEventInfo, 1) /**< Store event number, run number, and trigger ID. */
+    ClassDef(TelEventInfo, 2) /**< Store event number, run number, and trigger ID. */
   }; //class
 } // namespace Belle2
 #endif // EVENTMETADATA

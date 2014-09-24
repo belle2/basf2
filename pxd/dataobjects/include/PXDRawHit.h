@@ -13,7 +13,7 @@
 
 
 #include <vxd/dataobjects/VxdID.h>
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 
@@ -21,7 +21,7 @@ namespace Belle2 {
     * This class stores information about PXD Pixel hits
     * and makes them available in a root tree
     */
-  class PXDRawHit : public TObject {
+  class PXDRawHit : public RelationsObject {
   public:
 
     /** Default constructor for the ROOT IO. */
@@ -110,7 +110,7 @@ namespace Belle2 {
 
     // ~PXDRawHit();
 
-    ClassDef(PXDRawHit, 2)
+    ClassDef(PXDRawHit, 3)
   };
 
 

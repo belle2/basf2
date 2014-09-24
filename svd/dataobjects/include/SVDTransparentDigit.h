@@ -15,9 +15,8 @@
 #include <sstream>
 
 #include <vxd/dataobjects/VxdID.h>
-//#include <svd/online/SVDPar.h>
 
-#include <root/TObject.h>
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 
@@ -30,7 +29,7 @@ namespace Belle2 {
    * Also the sensor and ncell IDs could be somewhat compressed, if desired.
    */
 
-  class SVDTransparentDigit : public TObject {
+  class SVDTransparentDigit : public RelationsObject {
 
   public:
 
@@ -517,7 +516,7 @@ namespace Belle2 {
     short  m_corrADC[128][6];  /**< ADC values of strip signal corrected by pedestal and commom-mode. Index represents channel index (0~127) and sample index (0~5).*/
     short  m_fine_corrADC[128][6];  /**< ADC values of strip signal precisely corrected by pedestal and fine commom-mode. Index represents channel index (0~127) and sample index (0~5).*/
 
-    ClassDef(SVDTransparentDigit, 2)
+    ClassDef(SVDTransparentDigit, 3)
 
   }; // class SVDTransparentDigit
 

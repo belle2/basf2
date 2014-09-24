@@ -1,14 +1,14 @@
 #ifndef TELRUNINFO_H
 #define TELRUNINFO_H
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 
 #include <string>
 
 namespace Belle2 {
   /** Store event number, run number, and trigger ID.
    */
-  class TelRunInfo : public TObject {
+  class TelRunInfo : public RelationsObject {
   public:
 
     /** Constructor. */
@@ -120,7 +120,7 @@ namespace Belle2 {
      */
     std::string m_detectorName;
 
-    ClassDef(TelRunInfo, 1) /**< Store event number, run number, and trigger ID. */
+    ClassDef(TelRunInfo, 2) /**< Store event number, run number, and trigger ID. */
   }; //class
 } // namespace Belle2
 #endif // TELRUNINFO

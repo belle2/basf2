@@ -425,7 +425,7 @@ TFRedesignModule::TFRedesignModule() : Module()
   addParam("killEventForHighOccupancyThreshold",
            m_PARAMkillEventForHighOccupancyThreshold,
            "if there are more segments than threshold value, the complete event gets aborted",
-           int(5500));
+           (unsigned int)(5500));
 
   addParam("tccMinLayer",
            m_PARAMminLayer,
@@ -635,10 +635,9 @@ void TFRedesignModule::the_real_event()
 {
 
   bool abortEvent = initializeEvent();
-  if (abortEvent) { return; }
+  if (abortEvent == true) return;
 
   /** Section 3 - importing hits and find their papaSectors.**/
-
   addVirtualInteractionPoint();
 
   createClusterInfo();
@@ -655,575 +654,70 @@ void TFRedesignModule::the_real_event()
   /** Section 3 - end **/
 
 
-
-  /** Section 4 - SEGFINDER **/
-  /** REDESIGNCOMMENT EVENT 6:
-   * * short:
-   * Section 4 - for each activated sector: combine compatible ones and create segments for each accepted combination
-   *
-   ** long (+personal comments):
-   * several TFs will use that section with totally the same interface, therefore generalized approach important (function/class)
-   *
-   ** dependency of module parameters (global):
-   * m_PARAMdisplayCollector, m_PARAMkillEventForHighOccupancyThreshold, m_PARAMnameOfInstance,
-   *
-   *
-   ** dependency of global in-module variables:
-   * m_passSetupVector, m_aktpassNumber, m_TESTERtotalsegmentsSFCtr,
-   * m_TESTERdiscardedSegmentsSFCtr, m_eventCounter, m_TESTERtimeConsumption,
-   * m_TESTERbrokenEventsCtr, m_TESTERlogEvents,
-   *
-   ** dependency of global stuff just because of B2XX-output or debugging only:
-   * m_aktpassNumber, m_PARAMdisplayCollector, m_TESTERtotalsegmentsSFCtr,
-   * m_TESTERdiscardedSegmentsSFCtr, m_eventCounter, m_TESTERtimeConsumption,
-   * m_PARAMnameOfInstance, m_TESTERbrokenEventsCtr, m_TESTERlogEvents,
-   *
-   ** in-module-function-calls:
-   * segFinder(currentPass)
-   * cleanEvent(currentPass)
-   */
   int passNumber = 0;
+  /// /// /// WARNING WARNING WARNING --- pass loop begin --- WARNING WARNING WARNING
   for (PassData * currentPass : m_passSetupVector) {
 
-    // Set current Pass Number for Collector
-    if (m_PARAMdisplayCollector > 0) {
-      m_aktpassNumber = passNumber;
-    }
+    preparePass(currentPass, passNumber);
 
-
-    m_evInfoPack.newTic();
-    B2DEBUG(10, "Pass " << passNumber << ": sectorVector has got " << currentPass->sectorVector.size() << " entries before applying unique & sort");
-
-    // inverse sorting and removing unique entries so we can get a list of activated sectors where the outermost sector is the first in the list:
-    std::sort(currentPass->sectorVector.begin(), currentPass->sectorVector.end(),
-    [&](const VXDSector * secA, const VXDSector * secB) { return *secA > *secB; });
-    auto newEndOfVector = std::unique(currentPass->sectorVector.begin(), currentPass->sectorVector.end(),
-    [&](const VXDSector * secA, const VXDSector * secB) { return *secA == *secB; });
-    currentPass->sectorVector.resize(std::distance(currentPass->sectorVector.begin(), newEndOfVector));
-
-    B2DEBUG(3, "Pass #" << passNumber << " - " << currentPass->sectorSetup << ": " << currentPass->sectorVector.size() << " sectors(sectorVector) activated with total of " << currentPass->hitVector.size() << " VXDTFhits, -> starting segFinder...");
-
-    if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 10, PACKAGENAME()) == true) {
-      stringstream infoStream;
-      for (const VXDSector * aSector : currentPass->sectorVector) {
-        infoStream << FullSecID(aSector->getSecID()) << ": " << aSector->getHits().size() << ",  ";
-      }
-      B2DEBUG(10, "Before sf: had following hits in sectors: " << endl << infoStream.str())
-    }
-
-    int discardedSegments = segFinder(currentPass);                             /// calling funtion "segFinder"
-    int activatedSegments = currentPass->activeCellList.size();
-    m_TESTERtotalsegmentsSFCtr += activatedSegments;
-    m_TESTERdiscardedSegmentsSFCtr += discardedSegments;
-    B2DEBUG(3, "VXDTF-event " << m_eventCounter << ", pass" << passNumber << " @ segfinder - " << activatedSegments << " segments activated, " << discardedSegments << " discarded");
-    m_evInfoPack.segFinderActivated += activatedSegments;
-    m_evInfoPack.segFinderDiscarded += discardedSegments;
-    m_evInfoPack.numHitCombisTotal += (activatedSegments + discardedSegments);
-
-    m_evInfoPack.duration.segFinder += m_evInfoPack.TicToc();
-
-    if (activatedSegments > m_PARAMkillEventForHighOccupancyThreshold) {
-      B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of activated segments: " << activatedSegments << ", terminating event! There were " << m_evInfoPack.nPXDClusters << "/" << m_evInfoPack.nSVDClusters << "/" << m_evInfoPack.numSVDHits << " PXD-/SVD-clusters/SVD-cluster-combinations.")
-      m_TESTERbrokenEventsCtr++;
-
-      /** cleaning part **/
-      for (PassData * currentPass : m_passSetupVector) {
-        cleanEvent(currentPass);
-      }
-      stopTFevent();
-      return;
-    }
+    /** Section 4 - SEGFINDER **/
+    abortEvent = doTheSegFinder(currentPass, passNumber);
+    if (abortEvent == true) return;
     /** Section 4 - end **/
 
 
-
-
     /** Section 5 - NEIGHBOURFINDER **/
-    /** REDESIGNCOMMENT EVENT 7:
-     * * short:
-     * Section 5 - neighbourfinder, checks segments sharing a center hit for valid combinations.
-     * Valid ones are flagged as neighbours and outer segments get a state upgrade (for CA)
-     *
-     ** long (+personal comments):
-     * Like for the segFinder, several different TFs/Modules want to access that part with the same interface
-     *
-     ** dependency of module parameters (global):
-     * m_PARAMkillEventForHighOccupancyThreshold, m_PARAMnameOfInstance
-     *
-     ** dependency of global in-module variables:
-     * m_passSetupVector, m_TESTERtotalsegmentsNFCtr, m_TESTERdiscardedSegmentsNFCtr,
-     * m_TESTERtimeConsumption, m_eventCounter, m_TESTERbrokenEventsCtr,
-     * m_TESTERlogEvents
-     *
-     ** dependency of global stuff just because of B2XX-output or debugging only:
-     * m_TESTERtotalsegmentsNFCtr, m_TESTERdiscardedSegmentsNFCtr, m_TESTERtimeConsumption,
-     * m_PARAMnameOfInstance, m_eventCounter, m_TESTERbrokenEventsCtr,
-     * m_TESTERlogEvents
-     *
-     ** in-module-function-calls:
-     * neighbourFinder(currentPass)
-     * cleanEvent(currentPass)
-     */
-    m_evInfoPack.newTic();
-    B2DEBUG(5, "pass " << passNumber << ": starting neighbourFinder...");
-    discardedSegments = neighbourFinder(currentPass);                       /// calling funtion "neighbourFinder"
-    activatedSegments = currentPass->activeCellList.size();
-    m_TESTERtotalsegmentsNFCtr += activatedSegments;
-    m_TESTERdiscardedSegmentsNFCtr += discardedSegments;
-    B2DEBUG(3, "VXDTF-event " << m_eventCounter << ", pass" << passNumber << " @ nbfinder - " << activatedSegments << " segments activated, " << discardedSegments << " discarded");
-    m_evInfoPack.nbFinderActivated += activatedSegments;
-    m_evInfoPack.nbFinderDiscarded += discardedSegments;
-
-    m_evInfoPack.duration.nbFinder += m_evInfoPack.TicToc();
-
-    if (activatedSegments > m_PARAMkillEventForHighOccupancyThreshold) {
-      B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": after nbFinder, total number of activated segments: " << activatedSegments << ", terminating event! There were " << m_evInfoPack.nPXDClusters << "/" << m_evInfoPack.nSVDClusters << "/" << m_evInfoPack.numSVDHits << " PXD-/SVD-clusters/SVD-cluster-combinations.")
-      m_TESTERbrokenEventsCtr++;
-
-      /** cleaning part **/
-      for (PassData * currentPass : m_passSetupVector) {
-        cleanEvent(currentPass);
-      }
-      stopTFevent();
-      return;
-    }
+    abortEvent = doTheNeighbourFinder(currentPass, passNumber);
+    if (abortEvent == true) return;
     /** Section 5 - end **/
 
 
-
     /** Section 6 - Cellular Automaton**/
-    /** REDESIGNCOMMENT EVENT 8:
-     * * short:
-     * Section 6 - Cellular Automaton
-     *
-     ** long (+personal comments):
-     *
-     ** dependency of module parameters (global):
-     * m_PARAMnameOfInstance, m_PARAMdisplayCollector
-     *
-     ** dependency of global in-module variables:
-     * m_eventCounter, m_TESTERbrokenEventsCtr, m_passSetupVector,
-     * m_TESTERtimeConsumption, m_aktpassNumber
-     *
-     ** dependency of global stuff just because of B2XX-output or debugging only:
-     * m_PARAMnameOfInstance, m_eventCounter, m_TESTERbrokenEventsCtr,
-     * m_TESTERtimeConsumption, m_PARAMdisplayCollector, m_aktpassNumber
-     *
-     ** in-module-function-calls:
-     * cellularAutomaton(currentPass)
-     * cleanEvent(currentPass)
-     */
-    m_evInfoPack.newTic();
-    int numRounds = cellularAutomaton(currentPass);
-    B2DEBUG(3, "pass " << passNumber << ": cellular automaton finished in " << numRounds << " rounds");
-    if (numRounds < 0) {
-      B2ERROR(m_PARAMnameOfInstance << " event " << m_eventCounter << ": cellular automaton entered an infinite loop, therefore aborted, terminating event! There were " << m_evInfoPack.nPXDClusters << "/" << m_evInfoPack.nSVDClusters << "/" << m_evInfoPack.numSVDHits << " PXD-/SVD-clusters/SVD-cluster-combinations, total number of activated segments: " << activatedSegments)
-      m_TESTERbrokenEventsCtr++;
-
-      /** cleaning part **/
-      for (PassData * currentPass : m_passSetupVector) {
-        cleanEvent(currentPass);
-      }
-
-      m_evInfoPack.duration.cellularAutomaton += m_evInfoPack.TicToc();
-      stopTFevent();
-      return;
-    }
-    m_evInfoPack.duration.cellularAutomaton += m_evInfoPack.TicToc();
-
-    // Set current passNumber for Collector
-    if (m_PARAMdisplayCollector > 0) {
-      m_aktpassNumber = passNumber;
-    }
+    abortEvent = doTheCellularAutomaton(currentPass, passNumber);
+    if (abortEvent == true) return;
     /** Section 6 - end **/
 
 
-
     /** Section 7 - Track Candidate Collector (TCC) **/
-    /** REDESIGNCOMMENT EVENT 9:
-     * * short:
-     * Section 7 - Track Candidate Collector (TCC)
-     *
-     ** long (+personal comments):
-     *
-     ** dependency of module parameters (global):
-     * m_PARAMkillEventForHighOccupancyThreshold, m_PARAMnameOfInstance,
-     *
-     ** dependency of global in-module variables:
-     * m_TESTERtimeConsumption, m_eventCounter, m_TESTERbrokenEventsCtr,
-     * m_passSetupVector, m_TESTERlogEvents,
-     *
-     ** dependency of global stuff just because of B2XX-output or debugging only:
-     * m_TESTERtimeConsumption, m_PARAMnameOfInstance, m_eventCounter,
-     * m_TESTERbrokenEventsCtr, m_TESTERlogEvents,
-     *
-     ** in-module-function-calls:
-     * delFalseFriends(currentPass, currentPass->origin)
-     * tcCollector(currentPass)
-     * cleanEvent(currentPass)
-     */
-    m_evInfoPack.newTic();
-    int totalTCs = 0;
-    delFalseFriends(currentPass, currentPass->origin);
-    tcCollector(currentPass);                                     /// tcCollector
-    int survivingTCs = currentPass->tcVector.size();
-    totalTCs += survivingTCs;
-    B2DEBUG(3, "pass " << passNumber << ": track candidate collector generated " << survivingTCs << " TCs");
-    m_evInfoPack.numTCsAfterTCC += survivingTCs;
-
-    m_evInfoPack.duration.tcc += m_evInfoPack.TicToc();
-
-    if (totalTCs > m_PARAMkillEventForHighOccupancyThreshold / 3) {
-      B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of tcs after tcc: " << totalTCs << ", terminating event! There were " << m_evInfoPack.nPXDClusters << "/" << m_evInfoPack.nSVDClusters << "/" << m_evInfoPack.numSVDHits << " PXD-/SVD-clusters/SVD-cluster-combinations, total number of activated segments: " << activatedSegments)
-      m_TESTERbrokenEventsCtr++;
-
-      /** cleaning part **/
-      for (PassData * currentPass : m_passSetupVector) {
-        cleanEvent(currentPass);
-      }
-      stopTFevent();
-      return;
-    }
+    abortEvent = doTheTrackCandidateCollector(currentPass, passNumber);
+    if (abortEvent == true) return;
     /** Section 7 - end **/
 
 
-
     /** Section 8 - tcFilter **/
-    /** REDESIGNCOMMENT EVENT 10:
-     * * short:
-     * Section 8 - tcFilter
-     *
-     ** long (+personal comments):
-     *
-     ** dependency of module parameters (global):
-     *
-     ** dependency of global in-module variables:
-     * m_TESTERtimeConsumption
-     *
-     ** dependency of global stuff just because of B2XX-output or debugging only:
-     * m_TESTERtimeConsumption
-     *
-     ** in-module-function-calls:
-     * tcFilter(currentPass, passNumber)
-     */
-    m_evInfoPack.newTic();
-    survivingTCs = 0;
-    if (int(currentPass->tcVector.size()) != 0) {
-      survivingTCs = tcFilter(currentPass, passNumber);
-      m_evInfoPack.numTCsAfterTCCfilter += survivingTCs;
-      B2DEBUG(3, "pass " << passNumber << ": track candidate filter, " << survivingTCs << " TCs survived.");
-    } else {
-      B2DEBUG(3, "pass " << passNumber << " has no TCs therefore not starting tcFilter()");
-    }
-
-    m_evInfoPack.duration.postCAFilter += m_evInfoPack.TicToc();
+    doTheTcFilter(currentPass, passNumber);
     /** Section 8 - end **/
 
 
-
     /** Section 9 - check overlap */
-    /** REDESIGNCOMMENT EVENT 11:
-     * * short:
-     * Section 9 - check overlap
-     *
-     ** long (+personal comments):
-     * does the overlap check (ClusterInfo::isOverbooked) and additionally calculates initial values for the TCs
-     * This uses the helixFit
-     *
-     ** dependency of module parameters (global):
-     * m_PARAMdisplayCollector,
-     *
-     ** dependency of global in-module variables:
-     * m_tcVectorOverlapped, m_calcQiType, m_tcVector,
-     * m_collector, m_TESTERtimeConsumption, m_eventCounter
-     *
-     ** dependency of global stuff just because of B2XX-output or debugging only:
-     * m_PARAMdisplayCollector, m_collector, m_TESTERtimeConsumption,
-     * m_eventCounter
-     *
-     ** in-module-function-calls:
-     * calcInitialValues4TCs(currentPass)
-     */
-    m_evInfoPack.newTic();
-    int countOverbookedClusters = 0, clustersReserved = 0;
-    m_tcVectorOverlapped.clear(); // July13: should be filled freshly for each pass
-    /// each clusterInfo knows which TCs are using it, following loop therefore checks each for overlapping ones
-    B2DEBUG(3, " checking overlaps now: there are " << m_clustersOfEvent.size() << " clusters ...")
-    for (ClusterInfo & aCluster : m_clustersOfEvent) {
-      bool isOB = aCluster.isOverbooked();
-      if (isOB == true) { countOverbookedClusters++; }
-      if (aCluster.isReserved() == true) { clustersReserved++; }
-    } // now each TC knows whether it is overbooked or not (aCluster.isOverbooked() implicitly checked this)
-    B2DEBUG(3, "after checking overlaps: there are " << countOverbookedClusters << " clusters of " << m_clustersOfEvent.size() << " marked as 'overbooked'... (reserved: " << clustersReserved << ")")
-
-    int countCurrentTCs = 0;
-    if (m_calcQiType != 3) {
-      /// determine initial values for all track Candidates:
-      calcInitialValues4TCs(currentPass);                                                /// calcInitialValues4TCs
-    } // QiType 3 = straightLine which calculates the seed by itself
-
-    for (VXDTFTrackCandidate * currentTC : currentPass->tcVector) {
-      if (currentTC->getCondition() == false) { continue; }   // in this case, the TC is already filtered
-
-      m_tcVector.push_back(currentTC);
-
-      bool overbookedCheck = currentTC->checkOverlappingState();
-      if (overbookedCheck == true) { m_tcVectorOverlapped.push_back(currentTC); }
-
-      // Collector TC Update for Overlapping
-      if (m_PARAMdisplayCollector > 0) {
-
-        if (overbookedCheck) {
-          // int tcid, std::string diedAt, int accepted, int rejected
-          m_collector.updateTC(currentTC->getCollectorID(), "",  CollectorTFInfo::m_idAlive, {FilterID::overlapping}, vector<int>());
-        } else {
-          m_collector.updateTC(currentTC->getCollectorID(), "",  CollectorTFInfo::m_idAlive, vector<int>(), {FilterID::overlapping});
-        }
-      }
-
-      countCurrentTCs++;
-    }
-    int totalOverlaps = m_tcVectorOverlapped.size();
-
-    m_evInfoPack.duration.checkOverlap += m_evInfoPack.TicToc();
-
-    B2DEBUG(3, "event " << m_eventCounter << ": " << totalOverlaps << " overlapping track candidates found within " << countCurrentTCs << " new TCs of this pass alive")
+    unsigned int totalOverlaps = doTheOverlapCheck(currentPass);
     /** Section 9 - end */
 
 
-
-
     /** Section 10 - calc QI for each TC */
-    /** REDESIGNCOMMENT EVENT 12:
-     * * short:
-     * Section 10 - calc QI for each TC
-     *
-     ** long (+personal comments):
-     *
-     ** dependency of module parameters (global):
-     * m_PARAMkillEventForHighOccupancyThreshold, m_PARAMnameOfInstance,
-     *
-     ** dependency of global in-module variables:
-     * m_calcQiType, m_TESTERbrokenEventsCtr, m_eventCounter,
-     * m_passSetupVector, m_TESTERtimeConsumption, m_TESTERlogEvents,
-     * m_TESTERkalmanSkipped, m_tcVector,
-     *
-     ** dependency of global stuff just because of B2XX-output or debugging only:
-     * m_TESTERbrokenEventsCtr, m_PARAMnameOfInstance, m_eventCounter,
-     * m_TESTERtimeConsumption, m_TESTERlogEvents, m_TESTERkalmanSkipped,
-     *
-     ** in-module-function-calls:
-     * cleanEvent(currentPass)
-     * calcQIbyKalman(m_tcVector)
-     * calcQIbyLength(m_tcVector, m_passSetupVector)
-     * calcQIbyStraightLine(m_tcVector)
-     */
-    m_evInfoPack.newTic();
-    /// since KF is rather slow, Kf will not be used when there are many overlapping TCs. In this case, the simplified QI-calculator will be used.
-    bool allowKalman = false;
-    if (m_calcQiType == 1) { allowKalman = true; }
-    if (totalOverlaps > m_PARAMkillEventForHighOccupancyThreshold / 3) {
-      B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of overlapping track candidates: " << totalOverlaps << ", termitating event!\nThere were " << m_evInfoPack.nPXDClusters << "/" << m_evInfoPack.nSVDClusters << "/" << m_evInfoPack.numSVDHits << " PXD-/SVD-clusters/SVD-cluster-combinations.")
-      m_TESTERbrokenEventsCtr++;
-
-      /** cleaning part **/
-      for (PassData * currentPass : m_passSetupVector) {
-        cleanEvent(currentPass);
-      }
-
-      m_evInfoPack.duration.kalmanStuff += m_evInfoPack.TicToc();
-      stopTFevent();
-      return;
-
-    } else if (totalOverlaps > m_PARAMkillEventForHighOccupancyThreshold / 10 && m_calcQiType == 1) {
-      B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of overlapping TCs is " << totalOverlaps << " and therefore KF is too slow, will use simple QI (trackLength) calculation which produces worse results")
-      allowKalman = false;
-      m_TESTERkalmanSkipped++;
-    }
-    if (m_calcQiType == 1 and allowKalman == true) {
-
-      calcQIbyKalman(m_tcVector); /// calcQIbyKalman
-    } else if (m_calcQiType == 0) {
-      calcQIbyLength(m_tcVector, m_passSetupVector);                              /// calcQIbyLength
-    } else if (m_calcQiType == 3) { // and if totalOverlaps > 500
-      calcQIbyStraightLine(m_tcVector);                                              ///calcQIbyStraightLine
-    }
-
-    m_evInfoPack.duration.kalmanStuff += m_evInfoPack.TicToc();
+    abortEvent = doTheQICalculation(totalOverlaps);
+    if (abortEvent == true) return;
     /** Section 10 - end */
 
 
-
     /** Section 11 - cleanOverlappingSet */
-    /** REDESIGNCOMMENT EVENT 13:
-     * * short:
-     * Section 11 - cleanOverlappingSet
-     *
-     ** long (+personal comments):
-     *
-     ** dependency of module parameters (global):
-     * m_PARAMcleanOverlappingSet,
-     *
-     ** dependency of global in-module variables:
-     * m_tcVectorOverlapped, m_TESTERcleanOverlappingSetStartedCtr,
-     * m_TESTERtimeConsumption,
-     *
-     ** dependency of global stuff just because of B2XX-output or debugging only:
-     * m_TESTERcleanOverlappingSetStartedCtr, m_TESTERtimeConsumption,
-     *
-     ** in-module-function-calls:
-     * cleanOverlappingSet(m_tcVectorOverlapped)
-     */
-    m_evInfoPack.newTic();
-    if (totalOverlaps > 2 && m_PARAMcleanOverlappingSet == true) {
-      int killedTCs = -1;
-      int totalKilledTCs = 0, cleaningRepeatedCtr = 0;
-      while (killedTCs != 0) {
-        cleaningRepeatedCtr ++;
-        killedTCs = cleanOverlappingSet(m_tcVectorOverlapped); /// removes TCs which are found more than once completely
-        totalOverlaps = m_tcVectorOverlapped.size();
-        B2DEBUG(4, "out of funcCleanOverlappingSet-iteration " << cleaningRepeatedCtr << ": killed " << killedTCs << " TCs")
-
-        totalKilledTCs += killedTCs;
-      }
-      B2DEBUG(3, "out of funcCleanOverlappingSet: killed " << totalKilledTCs << " TCs within " << cleaningRepeatedCtr << " iterations")
-      m_TESTERcleanOverlappingSetStartedCtr++;
-      m_evInfoPack.numTCsKilledByCleanOverlap += totalKilledTCs;
-    }
-
-
-    m_evInfoPack.duration.cleanOverlap += m_evInfoPack.TicToc();
+    if (totalOverlaps > 2 && m_PARAMcleanOverlappingSet == true) { totalOverlaps = doTheOverlapCleaning(totalOverlaps); }
     /** Section 11 - end */
-
 
 
     /** redo overlapping check - necessary since condition changed through cleanOverlappingSet! */
     /** Section 9b - check overlap 2 */
-    /** REDESIGNCOMMENT EVENT 14:
-     * * short:
-     * Section 9b - check overlap 2
-     *
-     ** long (+personal comments):
-     * redo overlapping check - necessary since condition changed through cleanOverlappingSet
-     *
-     ** dependency of module parameters (global):
-     *
-     ** dependency of global in-module variables:
-     * m_tcVectorOverlapped, m_tcVector, m_TESTERtimeConsumption,
-     *
-     *
-     ** dependency of global stuff just because of B2XX-output or debugging only:
-     * m_TESTERtimeConsumption,
-     *
-     ** in-module-function-calls:
-     */
-    m_evInfoPack.newTic();
-    countOverbookedClusters = 0;
-    // each clusterInfo knows which TCs are using it, following loop therefore checks each for overlapping ones
-    for (ClusterInfo & aCluster : m_clustersOfEvent) {
-      bool isOB = aCluster.isOverbooked();
-      if (isOB == true) { countOverbookedClusters++; }
-    } // now each TC knows whether it is overbooked or not (aCluster.isOverbooked() implicitly checked this)
-
-    m_tcVectorOverlapped.clear();
-    for (VXDTFTrackCandidate * currentTC : m_tcVector) {
-      if (currentTC->getCondition() == false) { continue; }
-
-      bool overbookedCheck = currentTC->checkOverlappingState();
-      /** // WARNING IMPORTANT (July,24th, 2013): they do not deliver the same results, but checkOverlappingState produces less overlapping tcs while there are still no overlaps in final result, if something else occurs, new studies necessary!!
-       * bool overbookedGet = currentTC->getOverlappingState();
-       * if (overbookedCheck != overbookedGet) {
-       *  B2WARNING(m_PARAMnameOfInstance << " event " << m_eventCounter << ": getOverlappingState ("<<overbookedGet<<") != checkOverlappingState ("<<overbookedCheck<<")! ")
-       * }
-       * if (overbookedGet == true || overbookedCheck == true )
-       */
-      if (overbookedCheck == true) { m_tcVectorOverlapped.push_back(currentTC); }
-    }
-    totalOverlaps = m_tcVectorOverlapped.size();
-
-
-    m_evInfoPack.duration.checkOverlap += m_evInfoPack.TicToc();
-
-    B2DEBUG(3, "after checking overlaps again: there are " << countOverbookedClusters << " clusters of " << m_clustersOfEvent.size() << " still 'overbooked', tcVector: " << m_tcVector.size() << ", tcVectorOverlapped: " << totalOverlaps)
+    totalOverlaps = redoTheOverlapCheck(totalOverlaps);
     /** Section 9b - end */
 
 
-
     /** Section 12 - Hopfield */
-    /** REDESIGNCOMMENT EVENT 15:
-     * * short:
-     * Section 12 - Hopfield
-     *
-     ** long (+personal comments):
-     * does also include the reserve hits-step, where hits of the best TCs (highest QI) are blocked for further passes
-     *
-     ** dependency of module parameters (global):
-     * m_PARAMomega,
-     *
-     ** dependency of global in-module variables:
-     * m_filterOverlappingTCs, m_tcVectorOverlapped, m_tcVector,
-     * m_eventCounter, m_TESTERtimeConsumption, m_passSetupVector,
-     *
-     ** dependency of global stuff just because of B2XX-output or debugging only:
-     * m_eventCounter, m_TESTERtimeConsumption,
-     *
-     ** in-module-function-calls:
-     * hopfield(m_tcVectorOverlapped, m_PARAMomega)
-     * greedy(m_tcVectorOverlapped)
-     * tcDuel(m_tcVectorOverlapped)
-     * reserveHits(m_tcVector, currentPass)
-     */
-    m_evInfoPack.newTic();
-    if (totalOverlaps > 2) { // checking overlapping TCs for best subset, if there are more than 2 different TC's
-      if (m_filterOverlappingTCs == 2) {   /// use Hopfield neuronal network
-
-        hopfield(m_tcVectorOverlapped, m_PARAMomega);                             /// hopfield
-
-        int testTCs = 0;
-        for (VXDTFTrackCandidate * currentTC : m_tcVector) {
-          if (currentTC->getCondition() == false) continue;
-          if (currentTC->checkOverlappingState() == true) { testTCs++; }
-        }
-        if (testTCs > 0) {
-          B2ERROR(" event " << m_eventCounter << ": m_tcVector: " << m_tcVector.size() << ", m_tcVectorOverlapped: " << m_tcVectorOverlapped.size() << ", overlapping tcs surviving Hopfield: " << testTCs << " <- should not happen!")
-        }
-        B2DEBUG(3, " event " << m_eventCounter << ": m_tcVector: " << m_tcVector.size() << ", m_tcVectorOverlapped: " << m_tcVectorOverlapped.size() << ", overlapping tcs surviving Hopfield: " << testTCs)
-
-      } else if (m_filterOverlappingTCs == 1) {   /// use Greedy algorithm
-
-        greedy(m_tcVectorOverlapped);                                               /// greedy
-
-      } else { /* do nothing -> accept overlapping TCs */ }
-    } else if (m_filterOverlappingTCs != 0 and totalOverlaps == 2) {
-
-      tcDuel(m_tcVectorOverlapped);                                                 /// tcDuel
-
-    } else { B2DEBUG(10, " less than 2 overlapping Track Candidates found, no need for neuronal network") }
-
-
-    m_evInfoPack.duration.neuronalStuff += m_evInfoPack.TicToc();
-
-    if ((LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 3, PACKAGENAME()) == true)) {
-      unsigned int nTCsAlive = 0, nTCsAliveInOverlapped = 0;
-      for (VXDTFTrackCandidate * currentTC : m_tcVector) {
-        if (currentTC->getCondition() == false) { continue; }
-        nTCsAlive++;
-      }
-      for (VXDTFTrackCandidate * currentTC : m_tcVectorOverlapped) {
-        if (currentTC->getCondition() == false) { continue; }
-        nTCsAliveInOverlapped++;
-      }
-
-      B2DEBUG(3, "before exporting TCs, length of m_tcVector: " << m_tcVector.size() << " with " << nTCsAlive << "/" << m_tcVector.size() - nTCsAlive << " alive/dead TCs, m_tcVectorOverlapped: " << m_tcVectorOverlapped.size() << " with " << nTCsAliveInOverlapped << "/" << m_tcVectorOverlapped.size() - nTCsAliveInOverlapped << " alive/dead TCs");
-    }
-
-    if (passNumber < int(m_passSetupVector.size() - 1)) { reserveHits(m_tcVector, currentPass); }
+    doTheFilterOverlappingTCs(currentPass, passNumber, totalOverlaps);
     /** Section 12 - end */
-
-
 
     passNumber++;
   } /// /// /// WARNING WARNING WARNING --- pass loop end --- WARNING WARNING WARNING
+
 
   int countOverbookedClusters = 0;
   /// each clusterInfo knows which TCs are using it, following loop therefore checks each for overlapping ones
@@ -1236,191 +730,17 @@ void TFRedesignModule::the_real_event()
   }
 
 
-
-
   /** Section 13 - generateGFTrackCand */
-  /** REDESIGNCOMMENT EVENT 16:
-   * * short:
-   * Section 13 - generateGFTrackCand
-   *
-   ** long (+personal comments):
-   *
-   ** dependency of module parameters (global):
-   * m_TESTERexpandedTestingRoutines, m_PARAMinfoBoardName, m_PARAMdisplayCollector,
-   * m_PARAMnameOfInstance,
-   *
-   ** dependency of global in-module variables:
-   * m_tcVector, m_collector, m_TESTERcountTotalUsedHitsFinal,
-   * m_TESTERcountTotalUsedIndicesFinal, m_eventCounter, m_filterOverlappingTCs,
-   * m_TESTERcountTotalTCsFinal
-   *
-   ** dependency of global stuff just because of B2XX-output or debugging only:
-   * m_TESTERexpandedTestingRoutines, m_PARAMinfoBoardName, m_PARAMdisplayCollector,
-   * m_collector, m_TESTERcountTotalUsedHitsFinal, m_TESTERcountTotalUsedIndicesFinal,
-   * m_TESTERcountTotalTCsFinal,
-   *
-   ** in-module-function-calls:
-   * generateGFTrackCand(currentTC)
-   */
-  m_evInfoPack.newTic();
-  list<int> tempIndices, totalIndices;// temp: per tc, total, all of them. collects all indices used by final TCs, used to check for final overlapping TCs
-  int nTotalHitsInTCs = 0;
-  for (VXDTFTrackCandidate * currentTC : m_tcVector) {
-    if (currentTC->getCondition() == false) { continue; }
-
-    tempIndices = currentTC->getHopfieldHitIndices();
-    tempIndices.sort();
-    totalIndices.merge(tempIndices);
-
-    nTotalHitsInTCs += currentTC->size();
-
-    if ((LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 10, PACKAGENAME()) == true)) {
-      stringstream printClusterInfoIndices;
-      printClusterInfoIndices << "Total: ";
-      for (int index : totalIndices) { printClusterInfoIndices << index << " "; }
-
-      const vector<int>& telHits = currentTC->getTELHitIndices();
-      stringstream printIndices;
-      printIndices << "TEL: ";
-      for (int index : telHits) { printIndices << index << " "; }
-
-      const vector<int>& pxdHits = currentTC->getPXDHitIndices();
-      printIndices << "PXD: ";
-      for (int index : pxdHits) { printIndices << index << " "; }
-
-      const vector<int>& svdHits = currentTC->getSVDHitIndices();
-      printIndices << ", SVD: ";
-      for (int index : svdHits) { printIndices << index << " "; }
-
-      B2DEBUG(10, "before starting generateGFTrackCand: generated GFTC with following real hits/clusters: " << printIndices.str() << ", intermediate clusters: " << printClusterInfoIndices.str() << ", tempIndices: " << pxdHits.size() + svdHits.size() << ", totalIndices: " << totalIndices.size());
-    }
-
-
-
-    /// REACTIVATE the following code snippet if you want to test callgrind-stuff
-// #if 0
-    genfit::TrackCand gfTC = generateGFTrackCand(currentTC);                          /// generateGFTrackCand
-
-
-    if (m_TESTERexpandedTestingRoutines == true) {
-
-      VXDTFInfoBoard newBoard;
-
-      int indexNumber = m_finalTrackCandidates.getEntries(); // valid for both, GFTrackCand and InfoBoard
-      gfTC.setMcTrackId(indexNumber); // so the GFTrackCand knows which index of infoBoard is assigned to it
-
-
-      newBoard.assignGFTC(indexNumber); // same number aDEBUGs for the genfit::TrackCand
-      newBoard.fitIsPossible(currentTC->getFitSucceeded());
-      newBoard.setProbValue(currentTC->getTrackQuality());
-      m_extraInfo4GFTCs.appendNew(newBoard);
-
-    }
-
-
-    // Collector TC Fit Update (replaces VXDTFInfoBoard)
-    if (m_PARAMdisplayCollector > 0) {
-
-      int indexNumber = m_finalTrackCandidates.getEntries();
-      int tcId = currentTC->getCollectorID();
-
-      B2DEBUG(10, "NEW InfoBoard tcId: " << tcId << "ProbValue: " << currentTC->getTrackQuality() << ";  isFitPossible: " << currentTC->getFitSucceeded());
-
-      m_collector.updateTCFitInformation(tcId, currentTC->getFitSucceeded(), currentTC->getTrackQuality(), indexNumber);
-
-    }
-
-
-    m_finalTrackCandidates.appendNew(gfTC);
-
-// #endif
-
-  }
-
-  m_TESTERcountTotalUsedHitsFinal += nTotalHitsInTCs;
-
-
-
-
-  int nTotalIndices = totalIndices.size();
-  m_TESTERcountTotalUsedIndicesFinal += nTotalIndices;
-
-  totalIndices.sort(); // should already be sorted, but just to be sure....
-  tempIndices = totalIndices;
-  totalIndices.unique();
-
-  int nReducedIndices = totalIndices.size();
-  int nFinalTCs = m_finalTrackCandidates.getEntries();
-
-  if ((LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true)) {
-    int tcPos = 0;
-    for (VXDTFTrackCandidate * currentTC : m_tcVector) {
-      if (currentTC->getCondition() == false) { tcPos++; continue; }
-      TVector3 momentum = currentTC->getInitialMomentum();
-      B2DEBUG(20, "event " << m_eventCounter << ": TC " << tcPos << " has got condition = true, means its a final TC (TC-output). Its total Momentum is" << momentum.Mag() << ", its transverse momentum is: " << momentum.Perp())
-      tcPos++;
-    }
-    B2DEBUG(3, m_PARAMnameOfInstance << " - event " << m_eventCounter << ": " << nFinalTCs << " final track candidates determined! Having a total number of hit indices: "  << nTotalIndices << ", and after doube entry removal: " << nReducedIndices)
-  }
-
-  if (nReducedIndices != nTotalIndices) {
-    stringstream aStream;
-    for (int index : tempIndices) {
-      aStream << " " << index;
-    }
-    if (m_filterOverlappingTCs == 0) {
-      B2DEBUG(1, m_PARAMnameOfInstance << " - event " << m_eventCounter << ": " << nFinalTCs << " final TCs determined. Having a total number of hit indices: "  << nTotalIndices << ", and after doube entry removal: " << nReducedIndices << "!\n before unique, totalIndices had the following entries: " << aStream.str() << "\n, is allowed since filtering overlaps is deactivated...")
-    } else {
-      B2ERROR(m_PARAMnameOfInstance << " - event " << m_eventCounter << ": " << nFinalTCs << " final TCs determined. Having a total number of hit indices: "  << nTotalIndices << ", and after doube entry removal: " << nReducedIndices << "!\n before unique, totalIndices had the following entries: " << aStream.str() << "\n, should not occur (check hopfield or greedy)!")
-    }
-  }
-
-  m_TESTERcountTotalTCsFinal += nFinalTCs;
-  m_evInfoPack.numTCsfinal += nFinalTCs;
+  doTheGFTrackCandGeneration();
   /** Section 13 - end */
 
 
-
-  /** REDESIGNCOMMENT EVENT 17:
-   * * short:
-   * Section 14 - final stuff of event including cleanup
-   *
-   ** long (+personal comments):
-   *
-   ** dependency of module parameters (global):
-   * m_PARAMdisplayCollector, m_PARAMwriteToRoot,
-   *
-   ** dependency of global in-module variables:
-   * m_collector, m_passSetupVector, m_rootTimeConsumption,
-   * m_treeEventWisePtr, m_TESTERtimeConsumption, m_TESTERlogEvents
-   *
-   ** dependency of global stuff just because of B2XX-output or debugging only:
-   * m_PARAMdisplayCollector, m_collector, m_PARAMwriteToRoot,
-   * m_rootTimeConsumption, m_treeEventWisePtr, m_TESTERtimeConsumption,
-   * m_TESTERlogEvents
-   *
-   ** in-module-function-calls:
-   * cleanEvent(currentPass)
-   */
-  m_evInfoPack.newTic();
-  // Silent Kill = Mark not used objects as deleted
-  // Safe Information = Information into StoreArrays
-  if (m_PARAMdisplayCollector > 0) {
-
-    m_collector.silentKill();
-    m_collector.safeInformation();
-  }
-
-  /** cleaning part **/
-  for (PassData * currentPass : m_passSetupVector) {
-    cleanEvent(currentPass);
-  }
-
-  if (m_PARAMwriteToRoot == true) { m_treeEventWisePtr->Fill(); }
-
-  m_evInfoPack.duration.intermediateStuff += m_evInfoPack.TicToc();
-  stopTFevent();
+  /** Section 14 - final stuff of event including cleanup */
+  finalEventCleanup();
+  /** Section 14 - end */
 }
+
+
 
 void TFRedesignModule::event()
 {
@@ -2425,7 +1745,7 @@ Belle2::SectorNameAndPointerPair TFRedesignModule::searchSector4Hit(VxdID aVxdID
 
 /** ***** segFinder ***** **/
 /// searches for segments in given pass and returns number of discarded segments
-int TFRedesignModule::segFinder(PassData* currentPass)
+unsigned int TFRedesignModule::segFinder(PassData* currentPass)
 {
   /** REDESIGNCOMMENT SEGFINDER 1:
    * * short:
@@ -2456,8 +1776,8 @@ int TFRedesignModule::segFinder(PassData* currentPass)
   vector<pair <VXDTFHit*, VXDSector*> > allFriendHits; // collecting all hits of friend sectors and their sector for fast access
   bool accepted = false; // recycled return value of the filters
   int simpleSegmentQI = 0; // considers only min and max cutoff values, but could be weighed by order of relevance
-  int discardedSegmentsCounter = 0;
-  int activatedSegmentsCounter = 0;
+  unsigned int discardedSegmentsCounter = 0;
+  unsigned int activatedSegmentsCounter = 0;
 
   for (VXDSector * mainSector : currentPass->sectorVector) {
 
@@ -5947,7 +5267,7 @@ void TFRedesignModule::createClusterInfo()
 
   m_clustersOfEvent.resize((m_evInfoPack.nPXDClusters + m_evInfoPack.nSVDClusters), ClusterInfo());
 
-  for (int i = 0; i < m_evInfoPack.nPXDClusters; ++i) {
+  for (unsigned int i = 0; i < m_evInfoPack.nPXDClusters; ++i) {
     m_clustersOfEvent[i] = ClusterInfo(i, i, true, false, false, m_pxdClusters[i], NULL);
 
     B2DEBUG(50, "Pxd clusterInfo:  PXDcluster " << i << " in position " << i << " stores real Cluster " << m_clustersOfEvent.at(i).getRealIndex() << " at indexPosition of own list (m_clustersOfEvent): " << m_clustersOfEvent.at(i).getOwnIndex() << " withClustersOfeventSize: " << m_clustersOfEvent.size())
@@ -5957,7 +5277,7 @@ void TFRedesignModule::createClusterInfo()
   if (m_PARAMdisplayCollector > 0) {
 
     for (uint m = 0; m < m_passSetupVector.size(); m++) {
-      for (int i = 0; i < m_evInfoPack.nPXDClusters; ++i) {
+      for (unsigned int i = 0; i < m_evInfoPack.nPXDClusters; ++i) {
 
         // importCluster (int passIndex, std::string diedAt, int accepted, int rejected, int detectorType, int relativePosition)
         int clusterid = m_collector.importCluster(m, "", CollectorTFInfo::m_idAlive, vector<int>(), vector<int>(), Const::PXD, i);
@@ -5969,7 +5289,7 @@ void TFRedesignModule::createClusterInfo()
   }
 
 
-  for (int i = 0; i < m_evInfoPack.nSVDClusters; ++i) {
+  for (unsigned int i = 0; i < m_evInfoPack.nSVDClusters; ++i) {
     m_clustersOfEvent[i + m_evInfoPack.nPXDClusters] = ClusterInfo(i, i + m_evInfoPack.nPXDClusters, false, true, false, NULL, m_svdClusters[i]);
 
     B2DEBUG(50, "Svd clusterInfo:  SVDcluster " << i << " in position " << i + m_evInfoPack.nPXDClusters << " stores real Cluster " << m_clustersOfEvent.at(i + m_evInfoPack.nPXDClusters).getRealIndex() << " at indexPosition of own list (m_clustersOfEvent): " << m_clustersOfEvent.at(i + m_evInfoPack.nPXDClusters).getOwnIndex() << " withClustersOfeventSize: " << m_clustersOfEvent.size())
@@ -5979,7 +5299,7 @@ void TFRedesignModule::createClusterInfo()
   if (m_PARAMdisplayCollector > 0) {
     for (uint m = 0; m < m_passSetupVector.size(); m++) {
 
-      for (int i = 0 + m_evInfoPack.nPXDClusters; i < m_evInfoPack.nSVDClusters + m_evInfoPack.nPXDClusters; ++i) {
+      for (unsigned int i = 0 + m_evInfoPack.nPXDClusters; i < m_evInfoPack.nSVDClusters + m_evInfoPack.nPXDClusters; ++i) {
 
         // importCluster (int passIndex, std::string diedAt, int accepted, int rejected, int detectorType, int relativePosition)
         int clusterid = m_collector.importCluster(m, "", CollectorTFInfo::m_idAlive, vector<int>(), vector<int>(), Const::SVD, i);
@@ -6042,7 +5362,7 @@ void TFRedesignModule::assignPXDHitsToSectors()
 
   /** searching sectors for hit:*/
 
-  for (int iPart = 0; iPart < m_evInfoPack.nPXDClusters; ++iPart) { /// means: m_evInfoPack.nPXDClusters > 0 if at least one pass wants PXD hits
+  for (unsigned int iPart = 0; iPart < m_evInfoPack.nPXDClusters; ++iPart) { /// means: m_evInfoPack.nPXDClusters > 0 if at least one pass wants PXD hits
     const PXDCluster* const aClusterPtr = m_pxdClusters[iPart];
 
     B2DEBUG(100, " pxdCluster has clusterIndexUV: " << iPart
@@ -6133,20 +5453,21 @@ void TFRedesignModule::assignPXDHitsToSectors()
       passNumber++;
     }
   }
+  m_evInfoPack.duration.hitSorting += m_evInfoPack.TicToc();
 }
 
 
 
 void TFRedesignModule::assignSVDHitsToSectors()
 {
+  m_evInfoPack.newTic();
+
   TVector3 hitLocal, transformedHitLocal, localSensorSize, hitSigma;
   PositionInfo hitInfo;
   double vSize, uSizeAtHit, uCoord, vCoord;
   FullSecID aSecID;
   VxdID aVxdID;
-  m_evInfoPack.newTic();
   VxdID::baseType aLayerID;
-  int nClusterCombis = 0;
 
   ActiveSensorsOfEvent activatedSensors; // mapEntry.first: vxdID, mapEntry.second SensorStruct having some extra info
 
@@ -6168,19 +5489,12 @@ void TFRedesignModule::assignSVDHitsToSectors()
     }
   }
 
-  nClusterCombis = clusterHitList.size();
+  unsigned int nClusterCombis = clusterHitList.size();
 
-  if (nClusterCombis > m_PARAMkillEventForHighOccupancyThreshold) {
+  if (clusterHitList.size() > m_PARAMkillEventForHighOccupancyThreshold) {
     B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of clusterCombis: " << nClusterCombis << ", terminating event! There were " << m_evInfoPack.nPXDClusters << "/" << m_evInfoPack.nSVDClusters << "/" << nClusterCombis << " TEL-/PXD-/SVD-clusters/SVD-cluster-combinations.")
-    m_TESTERbrokenEventsCtr++;
-
-    /** cleaning part **/
-    for (PassData * currentPass : m_passSetupVector) {
-      cleanEvent(currentPass);
-    }
-
+    stopBrokenEvent();
     m_evInfoPack.duration.hitSorting += m_evInfoPack.TicToc();
-    stopTFevent();
     return;
   }
 
@@ -6332,4 +5646,749 @@ void TFRedesignModule::assignSVDHitsToSectors()
   m_evInfoPack.numSVDHits += nClusterCombis;
 
   m_evInfoPack.duration.hitSorting += m_evInfoPack.TicToc();
+}
+
+
+
+void TFRedesignModule::preparePass(PassData* currentPass, int passNumber)
+{
+  m_evInfoPack.newTic();
+
+  // Set current Pass Number for Collector
+  if (m_PARAMdisplayCollector > 0) { m_aktpassNumber = passNumber; }
+
+  B2DEBUG(10, "Pass " << passNumber << ": sectorVector has got " << currentPass->sectorVector.size() << " entries before applying unique & sort");
+
+  // inverse sorting and removing unique entries so we can get a list of activated sectors where the outermost sector is the first in the list:
+  std::sort(currentPass->sectorVector.begin(), currentPass->sectorVector.end(),
+  [&](const VXDSector * secA, const VXDSector * secB) { return *secA > *secB; });
+  auto newEndOfVector = std::unique(currentPass->sectorVector.begin(), currentPass->sectorVector.end(),
+  [&](const VXDSector * secA, const VXDSector * secB) { return *secA == *secB; });
+  currentPass->sectorVector.resize(std::distance(currentPass->sectorVector.begin(), newEndOfVector));
+
+  if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 10, PACKAGENAME()) == true) {
+    stringstream infoStream;
+    for (const VXDSector * aSector : currentPass->sectorVector) {
+      infoStream << FullSecID(aSector->getSecID()) << ": " << aSector->getHits().size() << ",  ";
+    }
+    B2DEBUG(10, "Before sf: had following hits in sectors: " << endl << infoStream.str())
+  }
+  m_evInfoPack.duration.hitSorting += m_evInfoPack.TicToc();
+}
+
+
+
+bool TFRedesignModule::doTheSegFinder(PassData* currentPass, int passNumber)
+{
+  /** REDESIGNCOMMENT EVENT 6:
+   * * short:
+   * Section 4 - for each activated sector: combine compatible ones and create segments for each accepted combination
+   *
+   ** long (+personal comments):
+   * several TFs will use that section with totally the same interface, therefore generalized approach important (function/class)
+   *
+   ** dependency of module parameters (global):
+   * m_PARAMdisplayCollector, m_PARAMkillEventForHighOccupancyThreshold, m_PARAMnameOfInstance,
+   *
+   *
+   ** dependency of global in-module variables:
+   * m_passSetupVector, m_aktpassNumber, m_TESTERtotalsegmentsSFCtr,
+   * m_TESTERdiscardedSegmentsSFCtr, m_eventCounter, m_TESTERtimeConsumption,
+   * m_TESTERbrokenEventsCtr, m_TESTERlogEvents,
+   *
+   ** dependency of global stuff just because of B2XX-output or debugging only:
+   * m_aktpassNumber, m_PARAMdisplayCollector, m_TESTERtotalsegmentsSFCtr,
+   * m_TESTERdiscardedSegmentsSFCtr, m_eventCounter, m_TESTERtimeConsumption,
+   * m_PARAMnameOfInstance, m_TESTERbrokenEventsCtr, m_TESTERlogEvents,
+   *
+   ** in-module-function-calls:
+   * segFinder(currentPass)
+   * cleanEvent(currentPass)
+   */
+  m_evInfoPack.newTic();
+  bool killEvent = false;
+
+  B2DEBUG(3, "Pass #" << passNumber << " - " << currentPass->sectorSetup << ": " << currentPass->sectorVector.size() << " sectors(sectorVector) activated with total of " << currentPass->hitVector.size() << " VXDTFhits, -> starting segFinder...");
+
+  unsigned int discardedSegments = segFinder(currentPass);                             /// calling funtion "segFinder"
+  unsigned int activatedSegments = currentPass->activeCellList.size();
+  m_TESTERtotalsegmentsSFCtr += activatedSegments;
+  m_TESTERdiscardedSegmentsSFCtr += discardedSegments;
+  B2DEBUG(3, "VXDTF-event " << m_eventCounter << ", pass" << passNumber << " @ segfinder - " << activatedSegments << " segments activated, " << discardedSegments << " discarded");
+  m_evInfoPack.segFinderActivated += activatedSegments;
+  m_evInfoPack.segFinderDiscarded += discardedSegments;
+  m_evInfoPack.numHitCombisTotal += (activatedSegments + discardedSegments);
+
+  m_evInfoPack.duration.segFinder += m_evInfoPack.TicToc();
+
+  if (activatedSegments > m_PARAMkillEventForHighOccupancyThreshold) {
+    B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of activated segments: " << activatedSegments << ", terminating event! There were " << m_evInfoPack.nPXDClusters << "/" << m_evInfoPack.nSVDClusters << "/" << m_evInfoPack.numSVDHits << " PXD-/SVD-clusters/SVD-cluster-combinations.")
+
+    stopBrokenEvent();
+
+    killEvent = true;
+  }
+  return killEvent;
+}
+
+
+
+void TFRedesignModule::stopBrokenEvent()
+{
+  m_TESTERbrokenEventsCtr++;
+
+  /** cleaning part **/
+  for (PassData * currentPass : m_passSetupVector) {
+    cleanEvent(currentPass);
+  }
+  stopTFevent();
+}
+
+
+
+bool TFRedesignModule::doTheNeighbourFinder(PassData* currentPass, int passNumber)
+{
+  /** REDESIGNCOMMENT EVENT 7:
+  * * short:
+  * Section 5 - neighbourfinder, checks segments sharing a center hit for valid combinations.
+  * Valid ones are flagged as neighbours and outer segments get a state upgrade (for CA)
+  *
+  ** long (+personal comments):
+  * Like for the segFinder, several different TFs/Modules want to access that part with the same interface
+  *
+  ** dependency of module parameters (global):
+  * m_PARAMkillEventForHighOccupancyThreshold, m_PARAMnameOfInstance
+  *
+  ** dependency of global in-module variables:
+  * m_passSetupVector, m_TESTERtotalsegmentsNFCtr, m_TESTERdiscardedSegmentsNFCtr,
+  * m_TESTERtimeConsumption, m_eventCounter, m_TESTERbrokenEventsCtr,
+  * m_TESTERlogEvents
+  *
+  ** dependency of global stuff just because of B2XX-output or debugging only:
+  * m_TESTERtotalsegmentsNFCtr, m_TESTERdiscardedSegmentsNFCtr, m_TESTERtimeConsumption,
+  * m_PARAMnameOfInstance, m_eventCounter, m_TESTERbrokenEventsCtr,
+  * m_TESTERlogEvents
+  *
+  ** in-module-function-calls:
+  * neighbourFinder(currentPass)
+  * cleanEvent(currentPass)
+  */
+  m_evInfoPack.newTic();
+  bool killEvent = false;
+
+  B2DEBUG(5, "pass " << passNumber << ": starting neighbourFinder...");
+  int discardedSegments = neighbourFinder(currentPass);                       /// calling funtion "neighbourFinder"
+  unsigned int activatedSegments = currentPass->activeCellList.size();
+  m_TESTERtotalsegmentsNFCtr += activatedSegments;
+  m_TESTERdiscardedSegmentsNFCtr += discardedSegments;
+  B2DEBUG(3, "VXDTF-event " << m_eventCounter << ", pass" << passNumber << " @ nbfinder - " << activatedSegments << " segments activated, " << discardedSegments << " discarded");
+  m_evInfoPack.nbFinderActivated += activatedSegments;
+  m_evInfoPack.nbFinderDiscarded += discardedSegments;
+
+  m_evInfoPack.duration.nbFinder += m_evInfoPack.TicToc();
+
+  if (activatedSegments > m_PARAMkillEventForHighOccupancyThreshold) {
+    B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": after nbFinder, total number of activated segments: " << activatedSegments << ", terminating event! There were " << m_evInfoPack.nPXDClusters << "/" << m_evInfoPack.nSVDClusters << "/" << m_evInfoPack.numSVDHits << " PXD-/SVD-clusters/SVD-cluster-combinations.")
+    stopBrokenEvent();
+    killEvent = true;
+  }
+  return killEvent;
+}
+
+
+
+bool TFRedesignModule::doTheCellularAutomaton(PassData* currentPass, int passNumber)
+{
+  /** REDESIGNCOMMENT EVENT 8:
+  * * short:
+  * Section 6 - Cellular Automaton
+  *
+  ** long (+personal comments):
+  *
+  ** dependency of module parameters (global):
+  * m_PARAMnameOfInstance, m_PARAMdisplayCollector
+  *
+  ** dependency of global in-module variables:
+  * m_eventCounter, m_TESTERbrokenEventsCtr, m_passSetupVector,
+  * m_TESTERtimeConsumption, m_aktpassNumber
+  *
+  ** dependency of global stuff just because of B2XX-output or debugging only:
+  * m_PARAMnameOfInstance, m_eventCounter, m_TESTERbrokenEventsCtr,
+  * m_TESTERtimeConsumption, m_PARAMdisplayCollector, m_aktpassNumber
+  *
+  ** in-module-function-calls:
+  * cellularAutomaton(currentPass)
+  * cleanEvent(currentPass)
+  */
+  m_evInfoPack.newTic();
+  bool killEvent = false;
+
+  int numRounds = cellularAutomaton(currentPass);
+  B2DEBUG(3, "pass " << passNumber << ": cellular automaton finished in " << numRounds << " rounds");
+  m_evInfoPack.duration.cellularAutomaton += m_evInfoPack.TicToc();
+  if (numRounds < 0) {
+    B2ERROR(m_PARAMnameOfInstance << " event " << m_eventCounter << ": cellular automaton entered an infinite loop, therefore aborted, terminating event! There were " << m_evInfoPack.nPXDClusters << "/" << m_evInfoPack.nSVDClusters << "/" << m_evInfoPack.numSVDHits << " PXD-/SVD-clusters/SVD-cluster-combinations, total number of activated segments: " << m_evInfoPack.nbFinderActivated)
+    stopBrokenEvent();
+    killEvent = true;
+  }
+  return killEvent;
+}
+
+
+
+bool TFRedesignModule::doTheTrackCandidateCollector(PassData* currentPass, int passNumber)
+{
+  /** REDESIGNCOMMENT EVENT 9:
+  * * short:
+  * Section 7 - Track Candidate Collector (TCC)
+  *
+  ** long (+personal comments):
+  *
+  ** dependency of module parameters (global):
+  * m_PARAMkillEventForHighOccupancyThreshold, m_PARAMnameOfInstance,
+  *
+  ** dependency of global in-module variables:
+  * m_TESTERtimeConsumption, m_eventCounter, m_TESTERbrokenEventsCtr,
+  * m_passSetupVector, m_TESTERlogEvents,
+  *
+  ** dependency of global stuff just because of B2XX-output or debugging only:
+  * m_TESTERtimeConsumption, m_PARAMnameOfInstance, m_eventCounter,
+  * m_TESTERbrokenEventsCtr, m_TESTERlogEvents,
+  *
+  ** in-module-function-calls:
+  * delFalseFriends(currentPass, currentPass->origin)
+  * tcCollector(currentPass)
+  * cleanEvent(currentPass)
+  */
+  m_evInfoPack.newTic();
+  bool killEvent = false;
+
+  delFalseFriends(currentPass, currentPass->origin);        /// delFalseFriends
+  tcCollector(currentPass);                   /// tcCollector
+  int survivingTCs = currentPass->tcVector.size();
+  B2DEBUG(3, "pass " << passNumber << ": track candidate collector generated " << survivingTCs << " TCs");
+  m_evInfoPack.numTCsAfterTCC += survivingTCs;
+
+  m_evInfoPack.duration.tcc += m_evInfoPack.TicToc();
+
+  if (m_evInfoPack.numTCsAfterTCC > m_PARAMkillEventForHighOccupancyThreshold / 3) {
+    B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of tcs after tcc: " << m_evInfoPack.numTCsAfterTCC << ", terminating event! There were " << m_evInfoPack.nPXDClusters << "/" << m_evInfoPack.nSVDClusters << "/" << m_evInfoPack.numSVDHits << " PXD-/SVD-clusters/SVD-cluster-combinations, total number of activated segments: " << m_evInfoPack.nbFinderActivated)
+    stopBrokenEvent();
+    killEvent = true;
+  }
+  return killEvent;
+}
+
+
+
+void TFRedesignModule::doTheTcFilter(PassData* currentPass, int passNumber)
+{
+  /** REDESIGNCOMMENT EVENT 10:
+  * * short:
+  * Section 8 - tcFilter
+  *
+  ** long (+personal comments):
+  *
+  ** dependency of module parameters (global):
+  *
+  ** dependency of global in-module variables:
+  * m_TESTERtimeConsumption
+  *
+  ** dependency of global stuff just because of B2XX-output or debugging only:
+  * m_TESTERtimeConsumption
+  *
+  ** in-module-function-calls:
+  * tcFilter(currentPass, passNumber)
+  */
+  m_evInfoPack.newTic();
+  if (int(currentPass->tcVector.size()) != 0) {
+    int survivingTCs = tcFilter(currentPass, passNumber);           ///tcFilter
+    m_evInfoPack.numTCsAfterTCCfilter += survivingTCs;
+    B2DEBUG(3, "pass " << passNumber << ": track candidate filter, " << survivingTCs << " TCs survived.");
+  } else {
+    B2DEBUG(3, "pass " << passNumber << " has no TCs therefore not starting tcFilter()");
+  }
+
+  m_evInfoPack.duration.postCAFilter += m_evInfoPack.TicToc();
+}
+
+
+
+unsigned int TFRedesignModule::doTheOverlapCheck(PassData* currentPass)
+{
+  /** REDESIGNCOMMENT EVENT 11:
+  * * short:
+  * Section 9 - check overlap
+  *
+  ** long (+personal comments):
+  * does the overlap check (ClusterInfo::isOverbooked) and additionally calculates initial values for the TCs
+  * This uses the helixFit
+  *
+  ** dependency of module parameters (global):
+  * m_PARAMdisplayCollector,
+  *
+  ** dependency of global in-module variables:
+  * m_tcVectorOverlapped, m_calcQiType, m_tcVector,
+  * m_collector, m_TESTERtimeConsumption, m_eventCounter
+  *
+  ** dependency of global stuff just because of B2XX-output or debugging only:
+  * m_PARAMdisplayCollector, m_collector, m_TESTERtimeConsumption,
+  * m_eventCounter
+  *
+  ** in-module-function-calls:
+  * calcInitialValues4TCs(currentPass)
+  */
+  m_evInfoPack.newTic();
+  unsigned int countOverbookedClusters = 0, clustersReserved = 0;
+  m_tcVectorOverlapped.clear(); // July13: should be filled freshly for each pass
+  /// each clusterInfo knows which TCs are using it, following loop therefore checks each for overlapping ones
+  B2DEBUG(3, " checking overlaps now: there are " << m_clustersOfEvent.size() << " clusters ...")
+  for (ClusterInfo & aCluster : m_clustersOfEvent) {
+    bool isOB = aCluster.isOverbooked();
+    if (isOB == true) { countOverbookedClusters++; }
+    if (aCluster.isReserved() == true) { clustersReserved++; }
+  } // now each TC knows whether it is overbooked or not (aCluster.isOverbooked() implicitly checked this)
+  B2DEBUG(3, "after checking overlaps: there are " << countOverbookedClusters << " clusters of " << m_clustersOfEvent.size() << " marked as 'overbooked'... (reserved: " << clustersReserved << ")")
+
+  unsigned int countCurrentTCs = 0;
+  if (m_calcQiType != 3) {
+    /// determine initial values for all track Candidates:
+    calcInitialValues4TCs(currentPass);                                                /// calcInitialValues4TCs
+  } // QiType 3 = straightLine which calculates the seed by itself
+
+  for (VXDTFTrackCandidate * currentTC : currentPass->tcVector) {
+    if (currentTC->getCondition() == false) { continue; }   // in this case, the TC is already filtered
+
+    m_tcVector.push_back(currentTC);
+
+    bool overbookedCheck = currentTC->checkOverlappingState();
+    if (overbookedCheck == true) { m_tcVectorOverlapped.push_back(currentTC); }
+
+    // Collector TC Update for Overlapping
+    if (m_PARAMdisplayCollector > 0) {
+
+      if (overbookedCheck) {
+        // int tcid, std::string diedAt, int accepted, int rejected
+        m_collector.updateTC(currentTC->getCollectorID(), "",  CollectorTFInfo::m_idAlive, {FilterID::overlapping}, vector<int>());
+      } else {
+        m_collector.updateTC(currentTC->getCollectorID(), "",  CollectorTFInfo::m_idAlive, vector<int>(), {FilterID::overlapping});
+      }
+    }
+
+    countCurrentTCs++;
+  }
+
+  B2DEBUG(3, "event " << m_eventCounter << ": " << m_tcVectorOverlapped.size() << " overlapping track candidates found within " << countCurrentTCs << " new TCs of this pass alive")
+  m_evInfoPack.duration.checkOverlap += m_evInfoPack.TicToc();
+
+  return m_tcVectorOverlapped.size();
+}
+
+
+
+bool TFRedesignModule::doTheQICalculation(unsigned int totalOverlaps)
+{
+  /** REDESIGNCOMMENT EVENT 12:
+  * * short:
+  * Section 10 - calc QI for each TC
+  *
+  ** long (+personal comments):
+  *
+  ** dependency of module parameters (global):
+  * m_PARAMkillEventForHighOccupancyThreshold, m_PARAMnameOfInstance,
+  *
+  ** dependency of global in-module variables:
+  * m_calcQiType, m_TESTERbrokenEventsCtr, m_eventCounter,
+  * m_passSetupVector, m_TESTERtimeConsumption, m_TESTERlogEvents,
+  * m_TESTERkalmanSkipped, m_tcVector,
+  *
+  ** dependency of global stuff just because of B2XX-output or debugging only:
+  * m_TESTERbrokenEventsCtr, m_PARAMnameOfInstance, m_eventCounter,
+  * m_TESTERtimeConsumption, m_TESTERlogEvents, m_TESTERkalmanSkipped,
+  *
+  ** in-module-function-calls:
+  * cleanEvent(currentPass)
+  * calcQIbyKalman(m_tcVector)
+  * calcQIbyLength(m_tcVector, m_passSetupVector)
+  * calcQIbyStraightLine(m_tcVector)
+  */
+  m_evInfoPack.newTic();
+  bool killEvent = false;
+
+  /// since KF is rather slow, Kf will not be used when there are many overlapping TCs. In this case, the simplified QI-calculator will be used.
+  bool allowKalman = false;
+  if (m_calcQiType == 1) { allowKalman = true; }
+  if (totalOverlaps > m_PARAMkillEventForHighOccupancyThreshold / 3) {
+    B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of overlapping track candidates: " << totalOverlaps << ", termitating event!\nThere were " << m_evInfoPack.nPXDClusters << "/" << m_evInfoPack.nSVDClusters << "/" << m_evInfoPack.numSVDHits << " PXD-/SVD-clusters/SVD-cluster-combinations.")
+    stopBrokenEvent();
+    killEvent = true;
+
+  } else if (totalOverlaps > m_PARAMkillEventForHighOccupancyThreshold / 10 && m_calcQiType == 1) {
+    B2DEBUG(1, m_PARAMnameOfInstance << " event " << m_eventCounter << ": total number of overlapping TCs is " << totalOverlaps << " and therefore KF is too slow, will use simple QI (trackLength) calculation which produces worse results")
+    allowKalman = false;
+    m_TESTERkalmanSkipped++;
+  }
+
+  if (killEvent == false) {
+    if (m_calcQiType == 1 and allowKalman == true) {
+      calcQIbyKalman(m_tcVector); /// calcQIbyKalman
+    } else if (m_calcQiType == 0) {
+      calcQIbyLength(m_tcVector, m_passSetupVector);                              /// calcQIbyLength
+    } else if (m_calcQiType == 3) { // and if totalOverlaps > 500
+      calcQIbyStraightLine(m_tcVector);                                              ///calcQIbyStraightLine
+    }
+  }
+
+  m_evInfoPack.duration.kalmanStuff += m_evInfoPack.TicToc();
+
+  return killEvent;
+}
+
+
+
+unsigned int TFRedesignModule::doTheOverlapCleaning(unsigned int totalOverlaps)
+{
+  /** REDESIGNCOMMENT EVENT 13:
+  * * short:
+  * Section 11 - cleanOverlappingSet
+  *
+  ** long (+personal comments):
+  *
+  ** dependency of module parameters (global):
+  * m_PARAMcleanOverlappingSet,
+  *
+  ** dependency of global in-module variables:
+  * m_tcVectorOverlapped, m_TESTERcleanOverlappingSetStartedCtr,
+  * m_TESTERtimeConsumption,
+  *
+  ** dependency of global stuff just because of B2XX-output or debugging only:
+  * m_TESTERcleanOverlappingSetStartedCtr, m_TESTERtimeConsumption,
+  *
+  ** in-module-function-calls:
+  * cleanOverlappingSet(m_tcVectorOverlapped)
+  */
+  m_evInfoPack.newTic();
+
+  int killedTCs = -1;
+  int totalKilledTCs = 0, cleaningRepeatedCtr = 0;
+  while (killedTCs != 0) {
+    cleaningRepeatedCtr ++;
+    killedTCs = cleanOverlappingSet(m_tcVectorOverlapped); /// removes TCs which are found more than once completely
+    totalOverlaps = m_tcVectorOverlapped.size();
+    B2DEBUG(4, "out of funcCleanOverlappingSet-iteration " << cleaningRepeatedCtr << ": killed " << killedTCs << " TCs")
+
+    totalKilledTCs += killedTCs;
+  }
+  B2DEBUG(3, "out of funcCleanOverlappingSet: killed " << totalKilledTCs << " TCs within " << cleaningRepeatedCtr << " iterations")
+  m_TESTERcleanOverlappingSetStartedCtr++;
+  m_evInfoPack.numTCsKilledByCleanOverlap += totalKilledTCs;
+
+  m_evInfoPack.duration.cleanOverlap += m_evInfoPack.TicToc();
+  return totalOverlaps;
+}
+
+
+
+unsigned int TFRedesignModule::redoTheOverlapCheck(unsigned int totalOverlaps)
+{
+  /** REDESIGNCOMMENT EVENT 14:
+  * * short:
+  * Section 9b - check overlap 2
+  *
+  ** long (+personal comments):
+  * redo overlapping check - necessary since condition changed through cleanOverlappingSet
+  *
+  ** dependency of module parameters (global):
+  *
+  ** dependency of global in-module variables:
+  * m_tcVectorOverlapped, m_tcVector, m_TESTERtimeConsumption,
+  *
+  *
+  ** dependency of global stuff just because of B2XX-output or debugging only:
+  * m_TESTERtimeConsumption,
+  *
+  ** in-module-function-calls:
+  */
+  m_evInfoPack.newTic();
+  unsigned int countOverbookedClusters = 0;
+  // each clusterInfo knows which TCs are using it, following loop therefore checks each for overlapping ones
+  for (ClusterInfo & aCluster : m_clustersOfEvent) {
+    bool isOB = aCluster.isOverbooked();
+    if (isOB == true) { countOverbookedClusters++; }
+  } // now each TC knows whether it is overbooked or not (aCluster.isOverbooked() implicitly checked this)
+
+  m_tcVectorOverlapped.clear();
+  for (VXDTFTrackCandidate * currentTC : m_tcVector) {
+    if (currentTC->getCondition() == false) { continue; }
+
+    bool overbookedCheck = currentTC->checkOverlappingState();
+    /** // WARNING IMPORTANT (July,24th, 2013): they do not deliver the same results, but checkOverlappingState produces less overlapping tcs while there are still no overlaps in final result, if something else occurs, new studies necessary!!
+    * bool overbookedGet = currentTC->getOverlappingState();
+    * if (overbookedCheck != overbookedGet) {
+    *  B2WARNING(m_PARAMnameOfInstance << " event " << m_eventCounter << ": getOverlappingState ("<<overbookedGet<<") != checkOverlappingState ("<<overbookedCheck<<")! ")
+    * }
+    * if (overbookedGet == true || overbookedCheck == true )
+    */
+    if (overbookedCheck == true) { m_tcVectorOverlapped.push_back(currentTC); }
+  }
+  totalOverlaps = m_tcVectorOverlapped.size();
+
+  B2DEBUG(3, "after checking overlaps again: there are " << countOverbookedClusters << " clusters of " << m_clustersOfEvent.size() << " still 'overbooked', tcVector: " << m_tcVector.size() << ", tcVectorOverlapped: " << totalOverlaps)
+
+  m_evInfoPack.duration.checkOverlap += m_evInfoPack.TicToc();
+
+  return totalOverlaps;
+}
+
+
+
+void TFRedesignModule::doTheFilterOverlappingTCs(PassData* currentPass, int passNumber, unsigned int totalOverlaps)
+{
+  /** REDESIGNCOMMENT EVENT 15:
+  * * short:
+  * Section 12 - Hopfield
+  *
+  ** long (+personal comments):
+  * does also include the reserve hits-step, where hits of the best TCs (highest QI) are blocked for further passes
+  *
+  ** dependency of module parameters (global):
+  * m_PARAMomega,
+  *
+  ** dependency of global in-module variables:
+  * m_filterOverlappingTCs, m_tcVectorOverlapped, m_tcVector,
+  * m_eventCounter, m_TESTERtimeConsumption, m_passSetupVector,
+  *
+  ** dependency of global stuff just because of B2XX-output or debugging only:
+  * m_eventCounter, m_TESTERtimeConsumption,
+  *
+  ** in-module-function-calls:
+  * hopfield(m_tcVectorOverlapped, m_PARAMomega)
+  * greedy(m_tcVectorOverlapped)
+  * tcDuel(m_tcVectorOverlapped)
+  * reserveHits(m_tcVector, currentPass)
+  */
+  m_evInfoPack.newTic();
+  if (totalOverlaps > 2) { // checking overlapping TCs for best subset, if there are more than 2 different TC's
+    if (m_filterOverlappingTCs == 2) {   /// use Hopfield neuronal network
+
+      hopfield(m_tcVectorOverlapped, m_PARAMomega);                             /// hopfield
+
+      int testTCs = 0;
+      for (VXDTFTrackCandidate * currentTC : m_tcVector) {
+        if (currentTC->getCondition() == false) continue;
+        if (currentTC->checkOverlappingState() == true) { testTCs++; }
+      }
+      if (testTCs > 0) {
+        B2ERROR(" event " << m_eventCounter << ": m_tcVector: " << m_tcVector.size() << ", m_tcVectorOverlapped: " << m_tcVectorOverlapped.size() << ", overlapping tcs surviving Hopfield: " << testTCs << " <- should not happen!")
+      }
+      B2DEBUG(3, " event " << m_eventCounter << ": m_tcVector: " << m_tcVector.size() << ", m_tcVectorOverlapped: " << m_tcVectorOverlapped.size() << ", overlapping tcs surviving Hopfield: " << testTCs)
+
+    } else if (m_filterOverlappingTCs == 1) {   /// use Greedy algorithm
+
+      greedy(m_tcVectorOverlapped);                                               /// greedy
+
+    } else { /* do nothing -> accept overlapping TCs */ }
+  } else if (m_filterOverlappingTCs != 0 and totalOverlaps == 2) {
+
+    tcDuel(m_tcVectorOverlapped);                                                 /// tcDuel
+
+  } else { B2DEBUG(10, " less than 2 overlapping Track Candidates found, no need for neuronal network") }
+
+
+
+  if ((LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 3, PACKAGENAME()) == true)) {
+    unsigned int nTCsAlive = 0, nTCsAliveInOverlapped = 0;
+    for (VXDTFTrackCandidate * currentTC : m_tcVector) {
+      if (currentTC->getCondition() == false) { continue; }
+      nTCsAlive++;
+    }
+    for (VXDTFTrackCandidate * currentTC : m_tcVectorOverlapped) {
+      if (currentTC->getCondition() == false) { continue; }
+      nTCsAliveInOverlapped++;
+    }
+
+    B2DEBUG(3, "before exporting TCs, length of m_tcVector: " << m_tcVector.size() << " with " << nTCsAlive << "/" << m_tcVector.size() - nTCsAlive << " alive/dead TCs, m_tcVectorOverlapped: " << m_tcVectorOverlapped.size() << " with " << nTCsAliveInOverlapped << "/" << m_tcVectorOverlapped.size() - nTCsAliveInOverlapped << " alive/dead TCs");
+  }
+
+  if (passNumber < int(m_passSetupVector.size() - 1)) { reserveHits(m_tcVector, currentPass); }
+
+  m_evInfoPack.duration.neuronalStuff += m_evInfoPack.TicToc();
+}
+
+
+
+void TFRedesignModule::doTheGFTrackCandGeneration()
+{
+  /** REDESIGNCOMMENT EVENT 16:
+  * * short:
+  * Section 13 - generateGFTrackCand
+  *
+  ** long (+personal comments):
+  *
+  ** dependency of module parameters (global):
+  * m_TESTERexpandedTestingRoutines, m_PARAMinfoBoardName, m_PARAMdisplayCollector,
+  * m_PARAMnameOfInstance,
+  *
+  ** dependency of global in-module variables:
+  * m_tcVector, m_collector, m_TESTERcountTotalUsedHitsFinal,
+  * m_TESTERcountTotalUsedIndicesFinal, m_eventCounter, m_filterOverlappingTCs,
+  * m_TESTERcountTotalTCsFinal
+  *
+  ** dependency of global stuff just because of B2XX-output or debugging only:
+  * m_TESTERexpandedTestingRoutines, m_PARAMinfoBoardName, m_PARAMdisplayCollector,
+  * m_collector, m_TESTERcountTotalUsedHitsFinal, m_TESTERcountTotalUsedIndicesFinal,
+  * m_TESTERcountTotalTCsFinal,
+  *
+  ** in-module-function-calls:
+  * generateGFTrackCand(currentTC)
+  */
+  m_evInfoPack.newTic();
+  list<int> tempIndices, totalIndices;// temp: per tc, total, all of them. collects all indices used by final TCs, used to check for final overlapping TCs
+  int nTotalHitsInTCs = 0;
+  for (VXDTFTrackCandidate * currentTC : m_tcVector) {
+    if (currentTC->getCondition() == false) { continue; }
+
+    tempIndices = currentTC->getHopfieldHitIndices();
+    tempIndices.sort();
+    totalIndices.merge(tempIndices);
+
+    nTotalHitsInTCs += currentTC->size();
+
+    if ((LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 10, PACKAGENAME()) == true)) {
+      stringstream printClusterInfoIndices;
+      printClusterInfoIndices << "Total: ";
+      for (int index : totalIndices) { printClusterInfoIndices << index << " "; }
+
+      stringstream printIndices;
+
+      const vector<int>& pxdHits = currentTC->getPXDHitIndices();
+      printIndices << "PXD: ";
+      for (int index : pxdHits) { printIndices << index << " "; }
+
+      const vector<int>& svdHits = currentTC->getSVDHitIndices();
+      printIndices << ", SVD: ";
+      for (int index : svdHits) { printIndices << index << " "; }
+
+      B2DEBUG(10, "before starting generateGFTrackCand: generated GFTC with following real hits/clusters: " << printIndices.str() << ", intermediate clusters: " << printClusterInfoIndices.str() << ", tempIndices: " << pxdHits.size() + svdHits.size() << ", totalIndices: " << totalIndices.size());
+    }
+
+
+
+    /// REACTIVATE the following code snippet if you want to test callgrind-stuff
+    // #if 0
+    genfit::TrackCand gfTC = generateGFTrackCand(currentTC);                          /// generateGFTrackCand
+
+    if (m_TESTERexpandedTestingRoutines == true) { // store data for the TFAnalyzer
+
+      VXDTFInfoBoard newBoard;
+
+      int indexNumber = m_finalTrackCandidates.getEntries(); // valid for both, GFTrackCand and InfoBoard
+      gfTC.setMcTrackId(indexNumber); // so the GFTrackCand knows which index of infoBoard is assigned to it
+
+      newBoard.assignGFTC(indexNumber); // same number aDEBUGs for the genfit::TrackCand
+      newBoard.fitIsPossible(currentTC->getFitSucceeded());
+      newBoard.setProbValue(currentTC->getTrackQuality());
+      m_extraInfo4GFTCs.appendNew(newBoard);
+    }
+
+    // Collector TC Fit Update (replaces VXDTFInfoBoard)
+    if (m_PARAMdisplayCollector > 0) {
+      int indexNumber = m_finalTrackCandidates.getEntries();
+      int tcId = currentTC->getCollectorID();
+
+      B2DEBUG(10, "NEW InfoBoard tcId: " << tcId << "ProbValue: " << currentTC->getTrackQuality() << ";  isFitPossible: " << currentTC->getFitSucceeded());
+
+      m_collector.updateTCFitInformation(tcId, currentTC->getFitSucceeded(), currentTC->getTrackQuality(), indexNumber);
+    }
+
+    m_finalTrackCandidates.appendNew(gfTC);
+    // #endif
+
+  }
+  m_TESTERcountTotalUsedHitsFinal += nTotalHitsInTCs;
+
+
+  // do a recheck, wheter there were unexpected problems or not:
+
+  int nTotalIndices = totalIndices.size();
+  m_TESTERcountTotalUsedIndicesFinal += nTotalIndices;
+
+  totalIndices.sort(); // should already be sorted, but just to be sure....
+  tempIndices = totalIndices;
+  totalIndices.unique();
+
+  int nReducedIndices = totalIndices.size();
+  int nFinalTCs = m_finalTrackCandidates.getEntries();
+
+  if ((LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true)) {
+    int tcPos = 0;
+    for (VXDTFTrackCandidate * currentTC : m_tcVector) {
+      if (currentTC->getCondition() == false) { tcPos++; continue; }
+      TVector3 momentum = currentTC->getInitialMomentum();
+      B2DEBUG(20, "event " << m_eventCounter << ": TC " << tcPos << " has got condition = true, means its a final TC (TC-output). Its total Momentum is" << momentum.Mag() << ", its transverse momentum is: " << momentum.Perp())
+      tcPos++;
+    }
+    B2DEBUG(3, m_PARAMnameOfInstance << " - event " << m_eventCounter << ": " << nFinalTCs << " final track candidates determined! Having a total number of hit indices: "  << nTotalIndices << ", and after doube entry removal: " << nReducedIndices)
+  }
+
+  if (nReducedIndices != nTotalIndices) {
+    stringstream aStream;
+    for (int index : tempIndices) { aStream << " " << index; }
+
+    if (m_filterOverlappingTCs == 0) {
+      B2DEBUG(1, m_PARAMnameOfInstance << " - event " << m_eventCounter << ": " << nFinalTCs << " final TCs determined. Having a total number of hit indices: "  << nTotalIndices << ", and after doube entry removal: " << nReducedIndices << "!\n before unique, totalIndices had the following entries: " << aStream.str() << "\n, is allowed since filtering overlaps is deactivated...")
+    } else {
+      B2ERROR(m_PARAMnameOfInstance << " - event " << m_eventCounter << ": " << nFinalTCs << " final TCs determined. Having a total number of hit indices: "  << nTotalIndices << ", and after doube entry removal: " << nReducedIndices << "!\n before unique, totalIndices had the following entries: " << aStream.str() << "\n, should not occur (check hopfield or greedy)!")
+    }
+  }
+
+  m_TESTERcountTotalTCsFinal += nFinalTCs;
+  m_evInfoPack.numTCsfinal += nFinalTCs;
+
+  m_evInfoPack.duration.intermediateStuff += m_evInfoPack.TicToc();
+}
+
+
+
+void TFRedesignModule::finalEventCleanup()
+{
+  /** REDESIGNCOMMENT EVENT 17:
+  * * short:
+  * Section 14 - final stuff of event including cleanup
+  *
+  ** long (+personal comments):
+  *
+  ** dependency of module parameters (global):
+  * m_PARAMdisplayCollector, m_PARAMwriteToRoot,
+  *
+  ** dependency of global in-module variables:
+  * m_collector, m_passSetupVector, m_rootTimeConsumption,
+  * m_treeEventWisePtr, m_TESTERtimeConsumption, m_TESTERlogEvents
+  *
+  ** dependency of global stuff just because of B2XX-output or debugging only:
+  * m_PARAMdisplayCollector, m_collector, m_PARAMwriteToRoot,
+  * m_rootTimeConsumption, m_treeEventWisePtr, m_TESTERtimeConsumption,
+  * m_TESTERlogEvents
+  *
+  ** in-module-function-calls:
+  * cleanEvent(currentPass)
+  */
+  m_evInfoPack.newTic();
+  // Silent Kill = Mark not used objects as deleted
+  // Safe Information = Information into StoreArrays
+  if (m_PARAMdisplayCollector > 0) {
+
+    m_collector.silentKill();
+    m_collector.safeInformation();
+  }
+
+  /** cleaning part **/
+  for (PassData * currentPass : m_passSetupVector) {
+    cleanEvent(currentPass);
+  }
+
+  if (m_PARAMwriteToRoot == true) { m_treeEventWisePtr->Fill(); }
+
+  m_evInfoPack.duration.intermediateStuff += m_evInfoPack.TicToc();
+  stopTFevent();
 }

@@ -188,7 +188,7 @@ namespace Belle2 {
       }
 
       /** prepare everything for new Belle2-event */
-      void startEvent(int nEvent) {
+      void startEvent(unsigned int nEvent) {
         clear();
         newTic();
         beginEvent = startTimer;
@@ -210,21 +210,21 @@ namespace Belle2 {
       boostClock::time_point beginEvent; /**< stores the begin of the event for duration measurements */
       boostClock::time_point startTimer; /**< will be resetted severall times, stores the tic-part for duration measurements */
       boostClock::time_point stopTimer; /**< will be resetted severall times, stores the toc-part for duration measurements */
-      int evtNumber; /**< number of current event */
-      int nPXDClusters; /**< number of pxdClusters (=number of pxd hits when tf in pxd is activated) */
-      int numTELCluster; /**< number of TELClusters (=number of TEL hits when tf in TEL is activated) */
-      int nSVDClusters; /**< number of svdClusters */
-      int numSVDHits; /**< number of possible svd-cluster-combinations. every combination of any pass will be counted  */
-      int segFinderActivated; /**< number of segments which survived the segfinder. every segment of any pass will be counted  */
-      int segFinderDiscarded; /**< number of segments which died in the segfinder. every segment of any pass will be counted  */
-      int numHitCombisTotal; /**< total number of hit-combinations (segFinderActivated+segFinderDiscarded) */
-      int nbFinderActivated; /**< number of segments which survived the nbfinder. every segment of any pass will be counted  */
-      int nbFinderDiscarded;  /**< number of segments which died in the nbfinder. every segment of any pass will be counted  */
-      int tccApprovedTCs;  /**< number of tcs approved by the tcc. every tc of any pass will be counted  */
-      int numTCsAfterTCC; /**< number of tcs alive after the tcc. every tc of any pass will be counted  */
-      int numTCsAfterTCCfilter; /**< number of tcs alive after the tc-filter. every tc of any pass will be counted  */
-      int numTCsKilledByCleanOverlap; /**< number of tcs killed by the cleanOverlappingSet-method */
-      int numTCsfinal; /**< number of tcs alive in the end */
+      unsigned int evtNumber; /**< number of current event */
+      unsigned int nPXDClusters; /**< number of pxdClusters (=number of pxd hits when tf in pxd is activated) */
+      unsigned int numTELCluster; /**< number of TELClusters (=number of TEL hits when tf in TEL is activated) */
+      unsigned int nSVDClusters; /**< number of svdClusters */
+      unsigned int numSVDHits; /**< number of possible svd-cluster-combinations. every combination of any pass will be counted  */
+      unsigned int segFinderActivated; /**< number of segments which survived the segfinder. every segment of any pass will be counted  */
+      unsigned int segFinderDiscarded; /**< number of segments which died in the segfinder. every segment of any pass will be counted  */
+      unsigned int numHitCombisTotal; /**< total number of hit-combinations (segFinderActivated+segFinderDiscarded) */
+      unsigned int nbFinderActivated; /**< number of segments which survived the nbfinder. every segment of any pass will be counted  */
+      unsigned int nbFinderDiscarded;  /**< number of segments which died in the nbfinder. every segment of any pass will be counted  */
+      unsigned int tccApprovedTCs;  /**< number of tcs approved by the tcc. every tc of any pass will be counted  */
+      unsigned int numTCsAfterTCC; /**< number of tcs alive after the tcc. every tc of any pass will be counted  */
+      unsigned int numTCsAfterTCCfilter; /**< number of tcs alive after the tc-filter. every tc of any pass will be counted  */
+      unsigned int numTCsKilledByCleanOverlap; /**< number of tcs killed by the cleanOverlappingSet-method */
+      unsigned int numTCsfinal; /**< number of tcs alive in the end */
 
     };
 
@@ -305,7 +305,7 @@ namespace Belle2 {
 
 
     /** searches for segments in given pass and returns number of discarded segments */
-    int segFinder(PassData* currentPass);
+    unsigned int segFinder(PassData* currentPass);
 
 
     /** checks segments in given pass with some extra tests for the segFinder (using nbFinder-Tests) for high occupancy cases, returns whether the segment passed the tests or not */
@@ -619,6 +619,93 @@ namespace Belle2 {
      * */
     void assignSVDHitsToSectors();
 
+    /** prepares some initial stuff for a pass.
+     *
+     * input: first parameter: a pointer to current pass, second: the number of the current pass.
+     * It sorts the vector of activated sectors by sector ID.
+     * This is only important for the track candidate collector,
+     * since it wants to start from the outermost sectors (those with the highest FullSecID).
+     * */
+    void preparePass(PassData* currentPass, int passNumber);
+
+    /** short function to clean up after detecting that the event is broken and has to be aborted. */
+    void stopBrokenEvent();
+
+    /** does all the stuff around the segFinder.
+     *
+     * input: first parameter: a pointer to current pass, second: the number of the current pass.
+     * The return value is true, if the event shall be aborted.
+     */
+    bool doTheSegFinder(PassData* currentPass, int passNumber);
+
+    /** does all the stuff around the neighbourFinder.
+     *
+     * input: first parameter: a pointer to current pass, second: the number of the current pass.
+     * The return value is true, if the event shall be aborted.
+     */
+    bool doTheNeighbourFinder(PassData* currentPass, int passNumber);
+
+    /** does all the stuff around the CellularAutomaton.
+     *
+     * input: first parameter: a pointer to current pass, second: the number of the current pass.
+     * The return value is true, if the event shall be aborted.
+     */
+    bool doTheCellularAutomaton(PassData* currentPass, int passNumber);
+
+    /** does all the stuff around the TrackCandidateCollector.
+     *
+     * input: first parameter: a pointer to current pass, second: the number of the current pass.
+     * The return value is true, if the event shall be aborted.
+     */
+    bool doTheTrackCandidateCollector(PassData* currentPass, int passNumber);
+
+    /** does all the stuff around the tcFilter.
+     *
+     * input: first parameter: a pointer to current pass, second: the number of the current pass.
+     */
+    void doTheTcFilter(PassData* currentPass, int passNumber);
+
+    /** does all the stuff around the overlap check and returns the number of overlapping TCs.
+     *
+     * input: a pointer to current pass.
+     * contains the calculation of the initial values of TCs too.
+     */
+    unsigned int doTheOverlapCheck(PassData* currentPass);
+
+    /** does all the stuff around the TrackCandidateCollector.
+     *
+     * input: the total number of overlapping track candidates found so far.
+     * The return value is true, if the event shall be aborted.
+     */
+    bool doTheQICalculation(unsigned int totalOverlaps);
+
+    /** does all the stuff around the overlap cleaning and returns the number of overlapping TCs.
+     *
+     * input: the total number of overlapping track candidates found so far.
+     */
+    unsigned int doTheOverlapCleaning(unsigned int totalOverlaps);
+
+    /** does another round of overlap checking and returns the number of overlapping TCs.
+     *
+     * input: the total number of overlapping track candidates found so far.
+     */
+    unsigned int redoTheOverlapCheck(unsigned int totalOverlaps);
+
+    /** does all the stuff around the filtering of overlapping TCs.
+     *
+     * It also includes the reserving of hits, if activated.
+     * input:
+     *  first parameter: a pointer to current pass,
+     *  second: the number of the current pass.
+     *  third: the total number of overlapping track candidates found so far.
+     */
+    void doTheFilterOverlappingTCs(PassData* currentPass, int passNumber, unsigned int totalOverlaps);
+
+    /** does all the stuff around creating genfit::TrackCand-output. */
+    void doTheGFTrackCandGeneration();
+
+    /** final stuff of event including cleanup*/
+    void finalEventCleanup();
 
 
   protected:
@@ -751,7 +838,7 @@ namespace Belle2 {
     bool m_highOccupancyCase; /**< is determined by a userdefined threshold. If there are more hits in the event than threshold value, high occupancy filters are activated (segFinder and nbFinder only) */
     int m_PARAMhighOccupancyThreshold; /**< If there are more hits in a sensor than threshold value, high occupancy filters are activated (segFinder and nbFinder only) */
     int m_PARAMkillBecauseOfOverlappsThreshold; /**< if there are more TCs overlapping than threshold value, event kalman gets replaced by circleFit. If there are 10 times more than threshold value of TCs, the complete event gets aborted */
-    int m_PARAMkillEventForHighOccupancyThreshold; /**< if there are more segments than threshold value, the complete event gets aborted */
+    unsigned int m_PARAMkillEventForHighOccupancyThreshold; /**< if there are more segments than threshold value, the complete event gets aborted */
 
     double m_PARAMomega; /**< tuning parameter for hopfield network */
     double m_tcThreshold;   /**< defines threshold for hopfield network. neurons having values below threshold are discarded */

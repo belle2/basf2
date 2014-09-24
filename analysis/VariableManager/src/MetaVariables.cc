@@ -250,9 +250,9 @@ namespace Belle2 {
           && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
           && maximum_PDG == 211 && maximum_PDG_Mother == 413 && maximum_PDG_Mother_Mother == 511) {
             return 1.0;
-          } else if ((particleName == "Lambda"
+          } else if (particleName == "Lambda"
           && (particle->getPDGCode() / TMath::Abs(particle->getPDGCode())) != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
-          && maximum_PDG == 3122) && (maximum_PDG_Mother == 511 || maximum_PDG_Mother_Mother == 511)) {
+          && maximum_PDG == 3122) {
             return 1.0;
           } else {
             return 0.0;
@@ -299,10 +299,10 @@ namespace Belle2 {
           && TMath::Abs(mcParticle->getMother()->getPDG()) == 413
           && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511) {
             return 1.0;
-          } else if ((particleName == "Lambda"
+          } else if (particleName == "Lambda"
           && mcParticle->getMother() != nullptr
           && mcParticle->getMother()->getMother() != nullptr
-          && TMath::Abs(mcParticle->getPDG()) == 3122) && (TMath::Abs(mcParticle->getMother()->getPDG()) == 511 || TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511)) {
+          && TMath::Abs(mcParticle->getPDG()) == 3122) {
             return 1.0;
           } else return 0.0;
         };

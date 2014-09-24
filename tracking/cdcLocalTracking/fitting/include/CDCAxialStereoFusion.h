@@ -39,11 +39,12 @@ namespace Belle2 {
 
       static void fuseTrajectories(const CDCAxialStereoSegmentPair& axialStereoSegmentPair);
 
-
       static CDCTrajectory3D reconstructFuseTrajectories(const CDCRecoSegment2D& startSegment,
-                                                         const CDCRecoSegment2D& endSegment);
+                                                         const CDCRecoSegment2D& endSegment,
+                                                         bool priorityOnSZ = true);
 
-      static void reconstructFuseTrajectories(const CDCAxialStereoSegmentPair& axialStereoSegmentPair);
+      static void reconstructFuseTrajectories(const CDCAxialStereoSegmentPair& axialStereoSegmentPair,
+                                              bool priorityOnSZ = true);
 
     public:
       /** ROOT Macro to make CDCAxialStereoFusion a ROOT class.*/

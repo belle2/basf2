@@ -191,10 +191,16 @@ namespace Belle2 {
       /** Returns the right left passage information as see in the xy projection.
        *  It gives if the wire lies on the right or on the left side of the track \n
        *  as you at the xy projection. */
-      RightLeftInfo getRLInfo() const { return getRLWireHit().getRLInfo(); }
+      RightLeftInfo getRLInfo() const
+      { return getRLWireHit().getRLInfo(); }
 
       /// Getter for the 3d position of the hit
-      const Vector3D& getRecoPos3D() const { return m_recoPos3D; }
+      const Vector3D& getRecoPos3D() const
+      { return m_recoPos3D; }
+
+      /// Setter for the 3d position of the hit
+      void setRecoPos3D(const Vector3D& recoPos3D)
+      { m_recoPos3D = recoPos3D; }
 
       /// Getter for the 2d position of the hit
       const Vector2D& getRecoPos2D() const { return getRecoPos3D().xy(); }
@@ -234,7 +240,12 @@ namespace Belle2 {
       { m_perpS += perpSOffSet; }
 
       /// Getter for the travel distance in the xy projection
-      FloatType getPerpS() const { return m_perpS; }
+      FloatType getPerpS() const
+      { return m_perpS; }
+
+      /// Setter for the travel distance in the xy projection
+      void setPerpS(const FloatType& perpS)
+      { m_perpS = perpS; }
 
       /// Getter the travel distance on the given drift circle
       /** Calculates the travel distance on the circle by taking the closest approach to the \n

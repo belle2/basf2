@@ -248,9 +248,9 @@ void CDCAxialStereoFusion::fuseTrajectories(const CDCAxialStereoSegmentPair& axi
 
 
 
-
 CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoSegment2D& startSegment,
-    const CDCRecoSegment2D& endSegment)
+    const CDCRecoSegment2D& endSegment,
+    bool priorityOnSZ)
 {
 
   if (startSegment.empty()) {
@@ -278,34 +278,39 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
   CDCSZFitter szFitter = CDCSZFitter::getFitter();
   CDCTrajectorySZ trajectorySZ = szFitter.fit(stereoSegment3D);
 
-  CDCRecoSegment3D zPriorityStereoSegment3D;
-  for (const CDCRecoHit3D & recoHit3D : stereoSegment3D) {
-    const FloatType& s = recoHit3D.getPerpS();
-    const FloatType z = trajectorySZ.mapSToZ(s);
-
-    const CDCWire& wire = recoHit3D.getWire();
-    Vector2D wirePos2DAtZ = wire.getWirePos2DAtZ(z);
-
-    Vector3D recoPos3D(axialTrajectory2D.getClosest(wirePos2DAtZ), z);
-    const FloatType sCorrected = axialTrajectory2D.calcPerpS(recoPos3D.xy());
-
-    zPriorityStereoSegment3D.push_back(CDCRecoHit3D(&(recoHit3D.getRLWireHit()), recoPos3D, sCorrected));
-  }
 
   CDCRiemannFitter riemannFitter;
   // riemannFitter.useOnlyOrientation();
   riemannFitter.useOnlyPosition();
 
-  CDCTrajectory2D stereoTrajectory2D = riemannFitter.fit(zPriorityStereoSegment3D);
+  if (priorityOnSZ) {
+    // To reconstructed point in the three dimensional stereo segment all lie exactly on the circle they are reconstructed onto.
+    // This part draws them away from the circle onto the sz trajectory instead leaving all the residuals visible in the xy projection.
+    // Hence the two dimensional fit, which is used for the fusion afterwards can react to residuals and render the covariances of the stereo segment broader.
+    // This effect might be marginal though, which is why we make this step optional.
+    for (CDCRecoHit3D & recoHit3D : stereoSegment3D) {
+      const FloatType& s = recoHit3D.getPerpS();
+      const FloatType z = trajectorySZ.mapSToZ(s);
 
-  zPriorityStereoSegment3D.setTrajectory2D(stereoTrajectory2D);
+      const CDCWire& wire = recoHit3D.getWire();
+      Vector2D wirePos2DAtZ = wire.getWirePos2DAtZ(z);
 
-  CDCTrajectory3D fusedTrajectory3D =
-    startIsAxial ?
-    fuseTrajectoriesImpl<CDCRecoHit2D, CDCRecoHit3D>(startSegment, zPriorityStereoSegment3D) :
-    fuseTrajectoriesImpl<CDCRecoHit3D, CDCRecoHit2D>(zPriorityStereoSegment3D, endSegment) ;
+      Vector3D recoPos3D(axialTrajectory2D.getClosest(wirePos2DAtZ), z);
+      const FloatType perpSCorrected = axialTrajectory2D.calcPerpS(recoPos3D.xy());
+
+      recoHit3D.setRecoPos3D(recoPos3D);
+      recoHit3D.setPerpS(perpSCorrected);
+    }
+  }
+
+  CDCTrajectory2D stereoTrajectory2D = riemannFitter.fit(stereoSegment3D);
+  stereoSegment3D.setTrajectory2D(stereoTrajectory2D);
 
   // Correct the values of szSlope and z0
+  CDCTrajectory3D fusedTrajectory3D =
+    startIsAxial ?
+    fuseTrajectoriesImpl<CDCRecoHit2D, CDCRecoHit3D>(startSegment, stereoSegment3D) :
+    fuseTrajectoriesImpl<CDCRecoHit3D, CDCRecoHit2D>(stereoSegment3D, endSegment) ;
 
   FloatType szSlopeShift = trajectorySZ.getSZSlope();
 
@@ -323,7 +328,8 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
 
 
 
-void CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCAxialStereoSegmentPair& axialStereoSegmentPair)
+void CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCAxialStereoSegmentPair& axialStereoSegmentPair,
+                                                       bool priorityOnSZ)
 {
   const CDCRecoSegment2D* ptrStartSegment = axialStereoSegmentPair.getStartSegment();
   const CDCRecoSegment2D* ptrEndSegment = axialStereoSegmentPair.getEndSegment();
@@ -341,11 +347,6 @@ void CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCAxialStereoSegme
   const CDCRecoSegment2D& startSegment = *ptrStartSegment;
   const CDCRecoSegment2D& endSegment = *ptrEndSegment;
 
-
-  CDCTrajectory3D trajectory3D = reconstructFuseTrajectories(startSegment, endSegment);
+  CDCTrajectory3D trajectory3D = reconstructFuseTrajectories(startSegment, endSegment, priorityOnSZ);
   axialStereoSegmentPair.setTrajectory3D(trajectory3D);
-
-
-
-
 }

@@ -21,7 +21,7 @@ namespace Belle2 {
 
   REG_MODULE(TMVATeacher)
 
-  TMVATeacherModule::TMVATeacherModule() : Module()
+  TMVATeacherModule::TMVATeacherModule() : Module(), m_target_var(nullptr)
   {
     setDescription("Trains TMVA method with given particle lists as training samples. "
                    "The target variable has to be an integer valued variable which defines the clusters in the sample. "
@@ -69,7 +69,7 @@ namespace Belle2 {
     m_teacher = std::make_shared<TMVAInterface::Teacher>(m_methodPrefix, m_workingDirectory, m_target, methods, m_useExistingData);
 
     Variable::Manager& manager = Variable::Manager::Instance();
-    m_target_var =  manager.getVariable(m_target);
+    m_target_var = manager.getVariable(m_target);
 
   }
 

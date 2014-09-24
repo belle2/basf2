@@ -27,7 +27,7 @@ namespace Belle2 {
 
   REG_MODULE(TMVAExpert)
 
-  TMVAExpertModule::TMVAExpertModule() : Module()
+  TMVAExpertModule::TMVAExpertModule() : Module(), m_samplingRateCorrectionFactor(1.0)
   {
     setDescription("Adds an ExtraInfo to the Particle objects in given ParticleLists. The ExtraInfo is calculated by a TMVA method "
                    "and represents the SignalProbability of the Particle with respect to the training. "

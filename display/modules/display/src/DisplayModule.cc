@@ -143,22 +143,7 @@ void DisplayModule::event()
         if ((m_showAllPrimaries and part.hasStatus(MCParticle::c_PrimaryParticle))
             or (m_showCharged and TMath::Nint(part.getCharge()) != 0)
             or (m_showNeutrals and TMath::Nint(part.getCharge()) == 0)) {
-          switch (abs(part.getPDG())) {
-            case 11:
-            case 13:
-            case 22:
-            case 211:
-            case 321:
-            case 2212:
-              m_visualizer->addMCParticle(&part);
-              break;
-            default:
-              if (part.hasStatus(MCParticle::c_PrimaryParticle)) {
-                //only show odd things if they're primary...
-                m_visualizer->addMCParticle(&part);
-              }
-              break;
-          }
+          m_visualizer->addMCParticle(&part);
         }
       }
     }

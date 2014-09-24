@@ -75,7 +75,7 @@ namespace Belle2 {
     struct MCTrack {
       TEveTrack* track; /**< the actual MC track. */
       TEvePointSet* simhits; /**< simhit positions. */
-      MCParticle* parentParticle; /**< parent particle, or nullptr. */
+      const MCParticle* parentParticle; /**< parent particle, or nullptr. */
     };
 
     /** Group of TEveElements, remembers wether user wants it visible or not. */

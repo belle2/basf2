@@ -988,10 +988,6 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
   if (m_hideSecondaries and !particle->hasStatus(MCParticle::c_PrimaryParticle)) {
     return NULL;
   }
-  //don't show Upsilon(4S)
-  if (particle->getDecayTime() == 0.0) {
-    return NULL;
-  }
   if (m_assignToPrimaries) {
     while (!particle->hasStatus(MCParticle::c_PrimaryParticle) and particle->getMother())
       particle = particle->getMother();
@@ -1069,9 +1065,11 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
 
     //set track title (for popup)
     TString momLabel = "";
-    if (particle->getMother()) {
-      momLabel = TString::Format("\nMother: Idx=%d, PDG=%d)", particle->getMother()->getIndex(), particle->getMother()->getPDG());
-      m_mcparticleTracks[particle].parentParticle = particle->getMother();
+    const MCParticle* mom = particle->getMother();
+    if (mom) {
+      momLabel = TString::Format("\nMother: Idx=%d, PDG=%d)", mom->getIndex(), mom->getPDG());
+      m_mcparticleTracks[particle].parentParticle = mom;
+      addMCParticle(mom);
     }
 
     if (!hasTrajectory) {

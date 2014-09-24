@@ -1,13 +1,12 @@
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/SensorPlane.h>
+#include <framework/utilities/TestHelpers.h>
 #include <gtest/gtest.h>
 #include <iostream>
 #include <string>
 #include <cmath>
 
 using namespace std;
-
-#define EXPECT_FATAL(x) EXPECT_EXIT(x,::testing::KilledBySignal(SIGABRT),"");
 
 namespace Belle2 {
   namespace VXD {
@@ -132,7 +131,7 @@ namespace Belle2 {
     TEST(SensorPlane, NotFound)
     {
       SensorPlane plane(VxdID(1, 1, 1));
-      EXPECT_FATAL(plane.isInActive(0, 0));
+      EXPECT_B2FATAL(plane.isInActive(0, 0));
     }
 
   } // vxd namespace

@@ -161,7 +161,10 @@ namespace Belle2 {
     {};
 
     /** Destructor */
-    ~SelectSubset() { delete m_subset; };
+    ~SelectSubset() {
+      delete m_set;
+      delete m_subset;
+    }
 
     /** Register the StoreArray<StoredClass> that will contain the subset of selected elements
      *  @param set         The StoreArray<StoredClass> from which the elements will be selected
@@ -174,7 +177,7 @@ namespace Belle2 {
         return false;
       }
 
-      m_set = &set;
+      m_set = new StoreArray<StoredClass>(set);
 
       m_subset = new StoreArray<StoredClass>(subsetName, m_set->getDurability());
       m_subset->registerInDataStore(storeFlags);

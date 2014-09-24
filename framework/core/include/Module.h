@@ -430,8 +430,8 @@ namespace Belle2 {
 
 
   private:
-    /** no submodules. */
-    std::list<ModulePtr> getModules() const { return std::list<ModulePtr>(); }
+    /** no submodules, return empty list */
+    std::list<ModulePtr> getModules() const override { return std::list<ModulePtr>(); }
 
     std::string m_name;           /**< The name of the module, saved as a string (user-modifiable) */
     std::string m_type;           /**< The type of the module, saved as a string. */
@@ -458,7 +458,7 @@ namespace Belle2 {
 
 
     /** return the module name. */
-    virtual std::string getPathString() const { return getName(); }
+    std::string getPathString() const override { return getName(); }
 
     /**
      * Implements a method for setting boost::python objects.

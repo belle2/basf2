@@ -76,10 +76,8 @@ namespace Belle2 {
 
     /**
      * Returns a list of the modules in this path.
-     *
-     * @return A list of all modules of this path.
      */
-    std::list<boost::shared_ptr<Module> > getModules() const;
+    std::list<boost::shared_ptr<Module> > getModules() const override;
 
     /**
      * Builds a list of all modules which could be executed during the data processing.
@@ -125,7 +123,7 @@ namespace Belle2 {
      *
      *  can be used to 'print' a path in a steering file.
      */
-    virtual std::string getPathString() const;
+    std::string getPathString() const override;
 
     /** Exposes methods of the Path class to Python. */
     static void exposePythonAPI();

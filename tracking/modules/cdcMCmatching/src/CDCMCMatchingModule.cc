@@ -51,8 +51,12 @@ CDCMCMatchingModule::~CDCMCMatchingModule()
 void CDCMCMatchingModule::initialize()
 {
   StoreArray<genfit::TrackCand>::required(m_gfTrackCandsCollectionName);
-  RelationArray::registerPersistent<genfit::TrackCand, MCParticle>(m_gfTrackCandsCollectionName, m_mcParticlesCollectionName);
+  StoreArray<MCParticle>::required(m_mcParticlesCollectionName);
 
+  StoreArray<genfit::TrackCand> storeGFTracks(m_gfTrackCandsCollectionName);
+  StoreArray<MCParticle> storeMCParticles(m_mcParticlesCollectionName);
+
+  storeGFTracks.registerRelationTo(storeMCParticles);
 }
 
 void CDCMCMatchingModule::beginRun()

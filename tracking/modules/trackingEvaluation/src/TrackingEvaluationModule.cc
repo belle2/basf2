@@ -111,15 +111,18 @@ void TrackingEvaluationModule::initialize()
   StoreArray<genfit::TrackCand>::required(m_param_mcGFTrackCandsColName);
   StoreArray<MCParticle>::required("");
 
-  // Purity relation - for each PRTrack to will store the purest MCTrack
-  // an is required would be more appropriate here - ask Christian Pulvermacher if fixed
-  RelationArray::registerPersistent< genfit::TrackCand, genfit::TrackCand>(m_param_prGFTrackCandsColName, m_param_mcGFTrackCandsColName);
+  // Retrieve the StoreArrays
+  StoreArray<genfit::TrackCand> storePRTrackCands(m_param_prGFTrackCandsColName);
+  StoreArray<genfit::TrackCand> storeMCTrackCands(m_param_mcGFTrackCandsColName);
+  StoreArray<MCParticle> storeMCParticles;
 
-  // Efficiency relation - for each MCTrack to will store the most efficient PRTrack
-  RelationArray::registerPersistent< genfit::TrackCand, genfit::TrackCand>(m_param_mcGFTrackCandsColName, m_param_prGFTrackCandsColName);
-
-  // MC matching relation
-  RelationArray::registerPersistent< genfit::TrackCand, MCParticle>(m_param_prGFTrackCandsColName, "");
+  // Check for required relations.
+  //Purity relation - for each PRTrack to store the purest MCTrack
+  storeMCTrackCands.requireRelationTo(storePRTrackCands);
+  //Efficiency relation - for each MCTrack to store the most efficient PRTrack
+  storePRTrackCands.requireRelationTo(storeMCTrackCands);
+  //MC matching relation
+  storePRTrackCands.requireRelationTo(storeMCParticles);
 
   m_outputFile = new TFile(m_param_outputFileName.c_str(), "RECREATE");
 

@@ -48,7 +48,7 @@ namespace Belle2 {
   using namespace geometry;
   namespace VXD {
 
-    GeoVXDCreator::GeoVXDCreator(const string& prefix) : m_prefix(prefix)
+    GeoVXDCreator::GeoVXDCreator(const string& prefix) : m_prefix(prefix), m_radiationsensors(prefix)
     {
     }
 
@@ -553,6 +553,12 @@ namespace Belle2 {
 
       //Now build cache with all transformations
       VXD::GeoCache::getInstance().findVolumes(physEnvelope);
+
+      //Create diamond radiation sensors if defined and in background mode
+      GearDir radiationDir(content, "RadiationSensors");
+      if (m_activeChips && radiationDir) {
+        m_radiationsensors.create(radiationDir, topVolume, *envelope);
+      }
 
       //Free some space
       m_componentCache.clear();

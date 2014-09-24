@@ -1,0 +1,45 @@
+<RadiationSensors>
+  <!-- for PXD they need to be outside the envelope volume, for SVD they are inside the detector -->
+  <insideEnvelope>true</insideEnvelope>
+  <!-- dimensions of the sensor -->
+  <width unit="mm">4.5</width>
+  <length unit="mm">4.5</length>
+  <height unit="um">500</height>
+  <!-- material name -->
+  <material>VXD-DiamondSensor</material>
+
+  <!-- backward, vertical placement -->
+  <position>
+    <!-- common z position of the sensor centers -->
+    <z unit="mm">-223.5</z>
+    <!-- common radial position of the sensor centers -->
+    <radius unit="mm">44.5</radius>
+    <!-- common angle to the z axis, 0 is parallel to z -->
+    <theta unit="deg">151.56</theta>
+    <!-- finally we need phi. To allow for non uniform placement we specify each sensor separately -->
+    <phi id="101" unit="deg">0</phi>
+    <phi id="102" unit="deg">45</phi>
+    <phi id="103" unit="deg">90</phi>
+    <phi id="104" unit="deg">135</phi>
+    <phi id="105" unit="deg">180</phi>
+    <phi id="106" unit="deg">225</phi>
+    <phi id="107" unit="deg">270</phi>
+    <phi id="108" unit="deg">315</phi>
+  </position>
+
+  <!-- forward, vertical placement -->
+  <position>
+    <z unit="mm">249.75</z>
+    <radius unit="mm">36.5</radius>
+    <theta unit="deg">4.21</theta>
+    <phi id="201" unit="deg">0</phi>
+    <phi id="202" unit="deg">45</phi>
+    <phi id="203" unit="deg">90</phi>
+    <phi id="204" unit="deg">135</phi>
+    <phi id="205" unit="deg">180</phi>
+    <phi id="206" unit="deg">225</phi>
+    <phi id="207" unit="deg">270</phi>
+    <phi id="208" unit="deg">315</phi>
+  </position>
+
+</RadiationSensors>

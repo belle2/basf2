@@ -15,6 +15,7 @@
 #include <vxd/geometry/GeoVXDComponents.h>
 #include <vxd/geometry/GeoVXDAssembly.h>
 #include <vxd/geometry/SensorInfoBase.h>
+#include <vxd/geometry/GeoVXDRadiationSensors.h>
 #include <vxd/simulation/SensitiveDetectorBase.h>
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
@@ -182,6 +183,7 @@ namespace Belle2 {
       GeoVXDLadder m_ladder;
       /** List to all created sensitive detector instances */
       std::vector<Simulation::SensitiveDetectorBase*> m_sensitive;
+      GeoVXDRadiationSensors m_radiationsensors;
       /** tolerance for Geant4 steps to be merged to a single step */
       float m_distanceTolerance {(float)(5 * Unit::um)};
       /** tolerance for the energy deposition in electrons to be merged in a single step */

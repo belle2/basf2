@@ -31,4 +31,12 @@
       <Material fraction="0.766">Air</Material>
     </Components>
   </Material>
+
+  <Material name="VXD-DiamondSensor">
+    <state>Solid</state>
+    <density unit="g/cm3">3.515</density>
+    <Components>
+      <Material>C</Material>
+    </Components>
+  </Material>
 </Materials>

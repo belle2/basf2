@@ -127,7 +127,7 @@ namespace Belle2 {
       class range : public std::pair<iterator, iterator> {
       public:
         range(const iterator& begin, const iterator& end) : std::pair<iterator, iterator>(begin, end) {;}
-        range(const std::pair<iterator, iterator> itPair) : std::pair<iterator, iterator>(itPair) {;}
+        range(const std::pair<iterator, iterator>& itPair) : std::pair<iterator, iterator>(itPair) {;}
 
         /// Begin of the range for range based for.
         iterator begin() const

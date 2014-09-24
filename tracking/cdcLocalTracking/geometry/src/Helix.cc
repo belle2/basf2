@@ -37,7 +37,7 @@ FloatType Helix::closestAtPerpS(const Vector3D& point) const
   // Handle z coordinate
   FloatType transformedZ0 = byPerpS * szSlope() + z0();
   FloatType deltaZ = point.z() - transformedZ0;
-  FloatType iPeriod = floor(deltaZ / zPeriod());
+  // FloatType iPeriod = floor(deltaZ / zPeriod());
 
   // Sign ?
   //CCWInfo ccwInfo = circleXY().orientation();

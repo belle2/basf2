@@ -88,6 +88,9 @@ namespace {
   }
 
 
+  // Declare function as currently unused to avoid compiler warning
+  UncertainSZLine fitSZ(const Matrix< FloatType, 3, 3 >& sumMatrixWSZ) __attribute__((__unused__));
+
   /// Variant without drift circles and seperating the offset before the matrix solving
   UncertainSZLine fitSZ(const Matrix< FloatType, 3, 3 >& sumMatrixWSZ)
   {

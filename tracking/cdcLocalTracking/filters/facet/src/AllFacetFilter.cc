@@ -32,7 +32,7 @@ AllFacetFilter::AllFacetFilter()
 
 
 
-CellState AllFacetFilter::isGoodFacet(const CDCRecoFacet& facet) const
+CellState AllFacetFilter::isGoodFacet(const CDCRecoFacet&) const
 {
   return 3.0;
 }

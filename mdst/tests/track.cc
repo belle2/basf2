@@ -8,8 +8,8 @@
 using namespace std;
 
 namespace Belle2 {
-  /** Command x should exit using B2FATAL */
-#define EXPECT_FATAL(x) EXPECT_EXIT(x,::testing::KilledBySignal(SIGABRT),"");
+
+
 
   /** Test class for the Track object.
    */

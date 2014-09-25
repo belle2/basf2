@@ -15,7 +15,16 @@ from ROOT import Belle2
 import os
 
 main = create_path()
-main.add_module(register_module('RootInput'))
+# ***************************************
+roinput = register_module('RootInput')
+inputFiles = []
+for i in xrange(20):
+    inputFiles.append('/remote/pcbelle06/ligioi/dstFiles/B2JpsiKs_mu_e0001r'
+                      + '%04d' % (i + 1) + '_s00_BGx0.mdst.root')
+roinput.param('inputFileNames', inputFiles)
+main.add_module(roinput)
+# ***************************************
+# main.add_module(register_module('RootInput'))
 main.add_module(register_module('Gearbox'))
 loadReconstructedParticles(path=main)
 
@@ -36,9 +45,9 @@ buildRestOfEvent('B0', path=main)
 buildContinuumSuppression('B0', path=main)
 roe_path = create_path()
 
-# Variables for categories on track level - are defined in variables.cc
-variables_TL = dict()
-variables_TL['Electron'] = [
+# Variables for categories on track level - are defined in variables.cc and MetaVariables.cc
+variables = dict()
+variables['Electron'] = [
     'p_CMS',
     'pt_CMS',
     'p',
@@ -46,9 +55,15 @@ variables_TL['Electron'] = [
     'eid',
     'eid_dEdx',
     'eid_TOP',
+    'SemiLeptonicVariables(recoilMass)',
+    'SemiLeptonicVariables(p_missing_CMS)',
+    'SemiLeptonicVariables(CosTheta_missing_CMS)',
+    'SemiLeptonicVariables(EW90)',
     'eid_ARICH',
-    'eid_ECL']
-variables_TL['Muon'] = [
+    'eid_ECL',
+    ]
+variables['IntermediateElectron'] = variables['Electron']
+variables['Muon'] = [
     'p_CMS',
     'pt_CMS',
     'p',
@@ -56,8 +71,14 @@ variables_TL['Muon'] = [
     'muid',
     'muid_dEdx',
     'muid_TOP',
-    'muid_ARICH']
-variables_TL['Kaon'] = [
+    'SemiLeptonicVariables(recoilMass)',
+    'SemiLeptonicVariables(p_missing_CMS)',
+    'SemiLeptonicVariables(CosTheta_missing_CMS)',
+    'SemiLeptonicVariables(EW90)',
+    'muid_ARICH',
+    ]
+variables['IntermediateMuon'] = variables['Muon']
+variables['Kaon'] = [
     'p_CMS',
     'pt_CMS',
     'cosTheta',
@@ -69,8 +90,9 @@ variables_TL['Kaon'] = [
     'charge',
     'NumberOfKShortinRemainingROEKaon',
     'ptTracksRoe',
-    'distance']
-variables_TL['SlowPion'] = [
+    'distance',
+    ]
+variables['SlowPion'] = [
     'p_CMS',
     'pt_CMS',
     'cosTheta',
@@ -84,8 +106,10 @@ variables_TL['SlowPion'] = [
     'cosTPTO',
     'charge',
     'Kid',
-    'eid']
-variables_TL['Lambda'] = [
+    'eid',
+    ]
+variables['FastPion'] = variables['SlowPion']
+variables['Lambda'] = [
     'lambdaFlavor',
     'NumberOfKShortinRemainingROELambda',
     'M',
@@ -96,12 +120,14 @@ variables_TL['Lambda'] = [
     'p_CMS',
     'p',
     'chiProb',
-    'distance']
+    'distance',
+    ]
 # distance variable: we assume B0 and daughter of B0 lifetimes (Lambda_c ) are much shorter than Lambda0 lifetime.
 
 # Please choose method:
 methods = [('FastBDT', 'Plugin',
-           '!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')]
+           '!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3'
+           )]
 # methods = [("Fisher", "Fisher", "H:!V:Fisher:VarTransform=None:CreateMVAPdfs:PDFInterpolMVAPdf=Spline2:NbinsMVAPdf=50:NsmoothMVAPdf=10")]
 # methods = [("BDTGradient", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100:BoostType=Grad:Shrinkage=0.10:UseBaggedGrad:GradBaggingFraction=0.5:nCuts=200:MaxDepth=2")]
 # methods = [("PDEFoamBoost", "PDEFoam", "!H:!V:CreateMVAPdfs:Boost_Num=10:Boost_Transform=linear:SigBgSeparate=F:MaxDepth=4:UseYesNoCell=T:DTLogic=MisClassificationError:FillFoamWithOrigWeights=F:TailCut=0:nActiveCells=500:nBin=20:Nmin=400:Kernel=None:Compress=T")]
@@ -110,18 +136,27 @@ methods = [('FastBDT', 'Plugin',
 workingDirectory = os.environ['BELLE2_LOCAL_DIR'] \
     + '/analysis/data/FlavorTagging/TrainedMethods'
 
+print 'FLAVOR TAGGING'
+print 'Working directory is: ' + workingDirectory
+
 trackLevelReady = True
-trackLevelParticles = [('e+', 'Electron'), ('mu+', 'Muon'), ('K+', 'Kaon'),
-                       ('pi+', 'SlowPion'), ('Lambda0', 'Lambda')]
+trackLevelParticles = [
+    ('e+', 'Electron'),
+    ('e+', 'IntermediateElectron'),
+    ('mu+', 'Muon'),
+    ('mu+', 'IntermediateMuon'),
+    ('K+', 'Kaon'),
+    ('pi+', 'SlowPion'),
+    ('pi+', 'FastPion'),
+    ('Lambda0', 'Lambda'),
+    ]
 # SignalFraction to calculate probability, -2 if training signal/background ratio should be used
 signalFraction = -2
 
 for (symbol, category) in trackLevelParticles:
     particleList = symbol + ':ROE'
     methodPrefix_TL = 'TMVA_' + category + '_TL'
-    # Using MetaVariable
     targetVariable = 'IsFromB(' + category + ')'
-    print 'This is the targetVariable: ' + targetVariable
 
     # Select particles in ROE for different categories of flavour tagging.
     if symbol != 'Lambda0':
@@ -156,12 +191,13 @@ for (symbol, category) in trackLevelParticles:
         print 'PROCESSING: trainTMVAMethod on track level'
         trainTMVAMethod(
             particleList,
-            variables=variables_TL[category],
+            variables=variables[category],
             target=targetVariable,
             methods=methods,
             prefix=methodPrefix_TL,
             workingDirectory=workingDirectory,
-            path=roe_path)
+            path=roe_path,
+            )
         trackLevelReady = False
     else:
         print 'PROCESSING: applyTMVAMethod on track level'
@@ -172,60 +208,57 @@ for (symbol, category) in trackLevelParticles:
             method=methods[0][0],
             signalFraction=signalFraction,
             workingDirectory=workingDirectory,
-            path=roe_path)
+            path=roe_path,
+            )
 
 eventLevelReady = trackLevelReady
 
 # Eventlevel -> calculation only on targettrack
 eventLevelParticles = [('e+', 'Electron'), ('mu+', 'Muon'), ('K+', 'Kaon'),
-                       ('pi+', 'SlowPion')]
+                       ('pi+', 'SlowPion'), ('Lambda0', 'Lambda')]
 
-variables_EL = dict()
-variables_EL['Electron'] = ['p_CMS_Electron', 'mRecoilBtagElectron',
-                            'p_CMS_missingElectron', 'cosTheta_missingElectron',
-                            'EW90Electron']
-variables_EL['Muon'] = ['p_CMS_Muon', 'mRecoilBtagMuon', 'p_CMS_missingMuon',
-                        'cosTheta_missingMuon', 'EW90Muon']
-variables_EL['Kaon'] = ['bestQrOf(K+:ROE , IsFromB(Kaon))', 'p_CMS_Kaon',
-                        'chargeTimesKaonLiklihood']  # TODO More Event Level Variables
-variables_EL['SlowPion'] = ['bestQrOf(pi+:ROE, IsFromB(SlowPion))',
-                            'p_CMS_SlowPion']  # TODO More Event Level Variables
+eventLevelParticles = trackLevelParticles
 
 if eventLevelReady:
     for (symbol, category) in eventLevelParticles:
+        particleList = symbol + ':ROE'
         methodPrefix_EL = 'TMVA_' + category + '_EL'
         # Using MetaVariable
-        targetVariable = 'IsRightClass(' + category + ', ' + symbol + ':ROE' \
-            + ', ' + 'IsFromB(' + category + '))'
+        targetVariable = 'IsRightClass(' + category + ')'
         print 'This is the targetVariable: ' + targetVariable
 
+        selectParticle(particleList, 'hasHighestProbInCat(' + particleList
+                       + ',' + 'IsFromB(' + category + ')) > 0.5',
+                       path=roe_path)
         if not isTMVAMethodAvailable(workingDirectory + '/' + methodPrefix_EL):
             print 'PROCESSING: trainTMVAMethod on event level'
             trainTMVAMethod(
-                [],
-                variables=variables_EL[category],
+                particleList,
+                variables=variables[category],
                 target=targetVariable,
                 prefix=methodPrefix_EL,
                 methods=methods,
                 workingDirectory=workingDirectory,
-                path=roe_path)
+                path=roe_path,
+                )
             eventLevelReady = False
         else:
             print 'PROCESSING: applyTMVAMethod on event level'
             applyTMVAMethod(
-                [],
+                particleList,
                 prefix=methodPrefix_EL,
                 signalProbabilityName=targetVariable,
                 method=methods[0][0],
                 signalFraction=signalFraction,
                 workingDirectory=workingDirectory,
-                path=roe_path)
+                path=roe_path,
+                )
 
 
 class RemoveExtraInfoModule(Module):
 
     """
-    Removes the variables added as Extrainfo to the track level particles
+    Removes the variables added as Extrainfo to the track level particles 
     """
 
     def event(self):
@@ -239,16 +272,22 @@ class RemoveExtraInfoModule(Module):
 combinerLevelReady = eventLevelReady
 
 if combinerLevelReady:
-    variables = \
-        ['QrOf(e+:ROE, IsRightClass(Electron, e+:ROE, IsFromB(Electron)), IsFromB(Electron))',
-         'QrOf(mu+:ROE, IsRightClass(Muon, mu+:ROE, IsFromB(Muon)), IsFromB(Muon))',
-         'QrOf(K+:ROE, IsRightClass(Kaon, K+:ROE, IsFromB(Kaon)), IsFromB(Kaon))',
-         'QrOf(pi+:ROE, IsRightClass(SlowPion, pi+:ROE, IsFromB(SlowPion)), IsFromB(SlowPion))'  # ,
-         #'QrOf(Lambda0:ROE, IsRightClass(Lambda, Lambda0:ROE, IsFromB(Lambda)), IsFromB(Lambda))'
-         ]
+    variables = [
+        'QrOf(e+:ROE, IsRightClass(Electron), IsFromB(Electron))',
+        'QrOf(e+:ROE, IsRightClass(IntermediateElectron), IsFromB(IntermediateElectron))'
+            ,
+        'QrOf(mu+:ROE, IsRightClass(Muon), IsFromB(Muon))',
+        'QrOf(mu+:ROE, IsRightClass(IntermediateMuon), IsFromB(IntermediateMuon))'
+            ,
+        'QrOf(K+:ROE, IsRightClass(Kaon), IsFromB(Kaon))',
+        'QrOf(pi+:ROE, IsRightClass(SlowPion), IsFromB(SlowPion))',
+        'QrOf(pi+:ROE, IsRightClass(FastPion), IsFromB(FastPion))',
+        'QrOf(Lambda0:ROE, IsRightClass(Lambda), IsFromB(Lambda))',
+        ]
 
     method_Combiner = [('FastBDT', 'Plugin',
-                       '!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')]
+                       '!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3'
+                       )]
 
     if not isTMVAMethodAvailable(workingDirectory + '/' + 'B0Tagger'):
         print 'PROCESSING: trainTMVAMethod on combiner level'
@@ -259,7 +298,8 @@ if combinerLevelReady:
             prefix='B0Tagger',
             methods=method_Combiner,
             workingDirectory=workingDirectory,
-            path=roe_path)
+            path=roe_path,
+            )
         combinerLevelReady = False
     else:
         print 'PROCESSING: applyTMVAMethod on combiner level'
@@ -271,14 +311,16 @@ if combinerLevelReady:
             method=method_Combiner[0][0],
             signalFraction=signalFraction,
             workingDirectory=workingDirectory,
-            path=roe_path)
+            path=roe_path,
+            )
 
 if combinerLevelReady:
+
 
     class MoveTaggerInformationToBExtraInfoModule(Module):
 
         """
-        Adds the flavor tagging information (q*r) from the MC and from the Combiner as ExtraInfo to the reconstructed B0 particle
+        Adds the flavor tagging information (q*r) from the MC and from the Combiner as ExtraInfo to the reconstructed B0 particle 
 ...."""
 
         def event(self):
@@ -294,6 +336,7 @@ if combinerLevelReady:
             particle.addExtraInfo('qr_MC', qr_MC)
             info.obj().removeExtraInfo()
 
+
     roe_path.add_module(MoveTaggerInformationToBExtraInfoModule())  # Move and remove extraInfo
     roe_path.add_module(RemoveExtraInfoModule())
 else:
@@ -302,13 +345,14 @@ else:
 main.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 if combinerLevelReady:
-    variablesToNTuple('B0', ['getExtraInfo(qr_Combined)', 'getExtraInfo(qr_MC)'],
-                      'TaggingInformation', workingDirectory + '/B0_B0bar_final.root',
-                      path=main)
+    variablesToNTuple('B0', ['getExtraInfo(qr_Combined)', 'getExtraInfo(qr_MC)'
+                      ], 'TaggingInformation', workingDirectory
+                      + '/B0_B0bar_final.root', path=main)
 
 main.add_module(register_module('ProgressBar'))
 process(main)
 print statistics
 
 B2INFO('')
-B2INFO("Training completed. Run 'show_tmva_results TMVA_1_vs_0.root' to view detailed information about the trained methods.")
+B2INFO("Training completed. Run 'show_tmva_results TMVA_1_vs_0.root' to view detailed information about the trained methods."
+       )

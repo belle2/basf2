@@ -19,20 +19,38 @@
 using namespace Belle2;
 
 
-//module not registered, framework internal
+//Note: should not appear in module list since we're not in the right directory
+REG_MODULE(SubEvent)
 
 
-SubEventModule::SubEventModule(const std::string& objectName, const std::string& loopOver, boost::shared_ptr<Path> path):
+SubEventModule::SubEventModule():
   Module(),
   EventProcessor(),
-  m_objectName(objectName),
-  m_loopOver(loopOver),
-  m_path(path)
+  m_objectName(""),
+  m_loopOver(),
+  m_path()
 {
-  setModuleName("for_each(" + objectName + " : " + loopOver + ")");
-  setDescription("Executes the given path for all entries in array 'loopOver'");
+  //since we might be created via 'new'...
+  setDescription("Internal module, please use the for_each() function in Path instead.");
 
-  m_moduleList = path->buildModulePathList();
+  addParam("loopOver", m_loopOverName, "Name of array to iterate over.", std::string(""));
+  addParam("objectName", m_objectName, "Name of the object holding the current iteration's item.", std::string(""));
+  addParam("path", m_path, "Path to execute for each iteration.", PathPtr(nullptr));
+
+}
+
+SubEventModule::~SubEventModule()
+{
+}
+
+void SubEventModule::initSubEvent(const std::string& objectName, const std::string& loopOver, boost::shared_ptr<Path> path)
+{
+  m_objectName = objectName;
+  m_loopOverName = loopOver;
+  m_path = path;
+  setModuleName("for_each(" + m_objectName + " : " + m_loopOverName + ")");
+
+  m_moduleList = m_path->buildModulePathList();
   //set c_ParallelProcessingCertified flag if _all_ modules have it set
   bool allCertified = true;
   for (const auto & mod : m_moduleList) {
@@ -43,10 +61,6 @@ SubEventModule::SubEventModule(const std::string& objectName, const std::string&
   }
   if (allCertified)
     setPropertyFlags(c_ParallelProcessingCertified);
-}
-
-SubEventModule::~SubEventModule()
-{
 }
 
 void restoreContents(const DataStore::StoreEntryMap& orig, DataStore::StoreEntryMap& dest)
@@ -62,7 +76,7 @@ void restoreContents(const DataStore::StoreEntryMap& orig, DataStore::StoreEntry
 
 void SubEventModule::initialize()
 {
-  m_loopOver.isRequired();
+  m_loopOver.isRequired(m_loopOverName);
 
   StoreObjPtr<ProcessStatistics> processStatistics("", DataStore::c_Persistent);
   processStatistics->suspendGlobal();
@@ -72,6 +86,7 @@ void SubEventModule::initialize()
   TClass* arrayClass = static_cast<TClonesArray*>(arrayEntry.object)->GetClass();
   DataStore::Instance().registerEntry(m_objectName, DataStore::c_Event, arrayClass, false, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
 
+  m_moduleList = m_path->buildModulePathList();
   processInitialize(m_moduleList);
 
   //don't screw up statistics for this module

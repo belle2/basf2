@@ -39,7 +39,7 @@ void ModuleManager::registerModuleProxy(ModuleProxyBase* moduleProxy)
   if (m_registeredProxyMap.count(moduleProxy->getModuleName()) == 0) {
     m_registeredProxyMap.insert(make_pair(moduleProxy->getModuleName(), moduleProxy));
   } else {
-    B2ERROR("There seems to more than one module called '" << moduleProxy->getModuleName() << "'. Since module names are unique, you must rename one of them!");
+    B2ERROR("There seems to be more than one module called '" << moduleProxy->getModuleName() << "'. Since module names are unique, you must rename one of them!");
   }
 }
 
@@ -192,7 +192,7 @@ void ModuleManager::fillModuleNameLibMap(std::map<std::string, std::string>& mod
       if (moduleNameLibMap.count(moduleName) == 0) {
         moduleNameLibMap.insert(make_pair(moduleName, sharedLibPath));
       } else {
-        B2ERROR("There seems to more than one module called '" << moduleName << "'. Since module names are unique, you must rename one of them!");
+        B2ERROR("There seems to be more than one module called '" << moduleName << "'. Since module names are unique, you must rename one of them!");
       }
     } else {
       B2ERROR("Regular expression did not work. Is the module map file well formatted?")

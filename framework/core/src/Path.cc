@@ -14,6 +14,7 @@
 
 #include <framework/core/Path.h>
 #include <framework/core/Module.h>
+#include <framework/core/ModuleManager.h>
 #include <framework/core/SubEventModule.h>
 
 using namespace Belle2;
@@ -86,8 +87,9 @@ void Path::putModules(const std::list<boost::shared_ptr<Module> >& mlist)
 
 void Path::forEach(std::string objectName, std::string foreach, PathPtr path)
 {
-  ModulePtr subEventModule(new SubEventModule(objectName, foreach, path));
-  addModule(subEventModule);
+  ModulePtr module = ModuleManager::Instance().registerModule("SubEvent");
+  static_cast<SubEventModule&>(*module).initSubEvent(objectName, foreach, path);
+  addModule(module);
 }
 
 

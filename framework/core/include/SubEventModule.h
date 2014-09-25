@@ -21,13 +21,11 @@ namespace Belle2 {
   class SubEventModule : public Module, public EventProcessor {
   public:
 
-    /**
-     * Constructor.
-     * Sets the description, the properties and the parameters of the module.
-     */
-    SubEventModule(const std::string& objectName, const std::string& loopOver, boost::shared_ptr<Path> path);
-
+    SubEventModule();
     ~SubEventModule();
+
+    /** used by forEach() to actually set parameters. */
+    void initSubEvent(const std::string& objectName, const std::string& loopOver, boost::shared_ptr<Path> path);
 
     virtual void initialize();
     virtual void beginRun();
@@ -37,6 +35,7 @@ namespace Belle2 {
 
   private:
     std::string m_objectName; /**< name of our loop variable. */
+    std::string m_loopOverName; /**< name for m_loopOver. */
     StoreArray<TObject> m_loopOver; /**< array looped over. */
     boost::shared_ptr<Path> m_path; /**< Path to execute. */
 

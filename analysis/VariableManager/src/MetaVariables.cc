@@ -324,17 +324,22 @@ namespace Belle2 {
             maximum_PDG = TMath::Abs(MCp->getPDG());
             maximum_PDG_Mother = TMath::Abs(MCp->getMother()->getPDG());
             //for Kaons and SlowPions we need the mother of the mother for the particle
-            if (particleName == "Kaon" || particleName == "SlowPion" || particleName == "Lambda") maximum_PDG_Mother_Mother =  TMath::Abs(MCp->getMother()->getMother()->getPDG());
+            if (particleName == "Kaon" || particleName == "SlowPion" || particleName == "Lambda" || particleName == "IntermediateElectron" || particleName == "IntermediateMuon" || particleName == "FastPion") maximum_PDG_Mother_Mother =  TMath::Abs(MCp->getMother()->getMother()->getPDG());
           } else {
             maximum_PDG = 0;
             maximum_PDG_Mother = 0;
           }
-
           if (particleName == "Electron"
           && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 11 && maximum_PDG_Mother == 511) {
             return 1.0;
+          } else if (particleName == "IntermediateElectron"
+          && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 11 && maximum_PDG_Mother_Mother == 511) {
+            return 1.0;
           } else if (particleName == "Muon"
           && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 13 && maximum_PDG_Mother == 511) {
+            return 1.0;
+          } else if (particleName == "IntermediateMuon"
+          && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 13 && maximum_PDG_Mother_Mother == 511) {
             return 1.0;
           } else if (particleName == "Kaon"
           && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
@@ -343,6 +348,10 @@ namespace Belle2 {
           } else if (particleName == "SlowPion"
           && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
           && maximum_PDG == 211 && maximum_PDG_Mother == 413 && maximum_PDG_Mother_Mother == 511) {
+            return 1.0;
+          } else if (particleName == "FastPion"
+          && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
+          && maximum_PDG == 211 && maximum_PDG_Mother == 511) {
             return 1.0;
           } else if (particleName == "Lambda"
           && (particle->getPDGCode() / TMath::Abs(particle->getPDGCode())) != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
@@ -419,10 +428,7 @@ namespace Belle2 {
           } else if (particleName == "Lambda"
           && mcParticle->getMother() != nullptr
           && mcParticle->getMother()->getMother() != nullptr
-          && TMath::Abs(mcParticle->getPDG()) == 3122
-          //&& TMath::Abs(mcParticle->getMother()->getPDG()) == 4122
-          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511) {
-
+          && TMath::Abs(mcParticle->getPDG()) == 3122) {
             return 1.0;
           } else return 0.0;
         };

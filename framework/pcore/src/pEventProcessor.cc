@@ -48,7 +48,7 @@ namespace {
       exit(1);
     } else if (signal == SIGINT) {
       g_pEventProcessor->gotSigINT();
-    } else if (signal == SIGTERM) {
+    } else if (signal == SIGTERM or signal == SIGQUIT) {
       g_pEventProcessor->gotSigTERM();
     } else if (signal == SIGCHLD) {
       if (s_PIDofKilledChild != 0)
@@ -199,13 +199,21 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   ModulePtrList modulelist = spath->buildModulePathList();
   ModulePtrList initGlobally = getModulesWithoutFlag(modulelist, Module::c_InternalSerializer);
   //dump_modules("Initializing globally: ", initGlobally);
-  if (processInitialize(initGlobally)) {
-    B2FATAL("Execution stopped by user (via SIGINT)");
+  try {
+    processInitialize(initGlobally);
+  } catch (StoppedBySignalException& e) {
+    B2FATAL(e.what());
   }
 
   //initialization finished, disable handler again
   if (signal(SIGINT, SIG_IGN) == SIG_ERR) {
     B2FATAL("Cannot ignore SIGINT signal handler\n");
+  }
+  if (signal(SIGTERM, SIG_IGN) == SIG_ERR) {
+    B2FATAL("Cannot ignore SIGTERM signal handler\n");
+  }
+  if (signal(SIGQUIT, SIG_IGN) == SIG_ERR) {
+    B2FATAL("Cannot ignore SIGQUIT signal handler\n");
   }
 
   ModulePtrList terminateGlobally = getModulesWithFlag(modulelist, Module::c_TerminateInAllProcesses);
@@ -256,8 +264,8 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     if (signal(SIGTERM, signalHandler) == SIG_ERR) {
       B2FATAL("Cannot setup SIGTERM signal handler\n");
     }
-    if (signal(SIGQUIT, SIG_IGN) == SIG_ERR) {
-      B2FATAL("Cannot ignore SIGQUIT signal handler for main process\n");
+    if (signal(SIGQUIT, signalHandler) == SIG_ERR) {
+      B2FATAL("Cannot setup SIGQUIT signal handler\n");
     }
     //If our children are killed, we want to know. (especially since this may happen in any order)
     if (signal(SIGCHLD, signalHandler) == SIG_ERR) {
@@ -283,7 +291,14 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     if (m_procHandler->isInputProcess())
       setupSignalHandler();
 
-    processCore(localPath, localModules, maxEvent);
+    try {
+      processCore(localPath, localModules, maxEvent);
+    } catch (StoppedBySignalException& e) {
+      if (e.signal != SIGINT) {
+        B2FATAL(e.what());
+      }
+      //in case of SIGINT, we move on to processTerminate() to shut down saefly
+    }
     prependModulesIfNotPresent(&localModules, terminateGlobally);
     processTerminate(localModules);
   }
@@ -368,14 +383,13 @@ void pEventProcessor::analyzePath(const PathPtr& path)
 RingBuffer* pEventProcessor::connectViaRingBuffer(const char* name, PathPtr a, PathPtr& b)
 {
   //create ringbuffers and add rx/tx where needed
-  char* inrbname = getenv(name);
+  const char* inrbname = getenv(name);
   RingBuffer* rbuf;
   if (inrbname == NULL) {
     rbuf = new RingBuffer();
   } else {
-    char rbname[256];
-    sprintf(rbname, "%s%d", inrbname, 0); //currently at most one input, one output buffer
-    rbuf = new RingBuffer(rbname, RingBuffer::c_DefaultSize);
+    string rbname(inrbname + to_string(0)); //currently at most one input, one output buffer
+    rbuf = new RingBuffer(rbname.c_str(), RingBuffer::c_DefaultSize);
   }
 
   // Insert Tx at the end of current path

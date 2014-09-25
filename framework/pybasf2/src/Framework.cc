@@ -15,6 +15,7 @@
 #include <framework/core/RandomNumbers.h>
 #include <framework/core/EventProcessor.h>
 #include <framework/core/PathManager.h>
+#include <framework/datastore/DataStore.h>
 #include <framework/pcore/pEventProcessor.h>
 
 #include <framework/logging/Logger.h>
@@ -108,9 +109,11 @@ void Framework::process(PathPtr startPath, long maxEvent)
     }
   } catch (std::exception& e) {
     B2ERROR("Uncaught exception encountered: " << e.what()); //should show module name
+    DataStore::Instance().reset(); // ensure we are executed before ROOT's exit handlers
     throw; //and let python's global handler do the rest
   } catch (...) {
     B2ERROR("Uncaught exception encountered!"); //should show module name
+    DataStore::Instance().reset(); // ensure we are executed before ROOT's exit handlers
     throw; //and let python's global handler do the rest
     //TODO: having a stack trace would be nicer, but somehow a handler I set using std::set_terminate() never gets called
   }

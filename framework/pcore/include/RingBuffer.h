@@ -64,7 +64,7 @@ namespace Belle2 {
     void txAttached();
     /** Decrease #attached Tx counter. */
     void txDetached();
-    /** Set #attached Tx counter to zero, causing termination of reading processes. Assumed to be atomic. */
+    /** Cause termination of reading processes (if they use continueReadingData()). Assumed to be atomic. */
     void kill();
 
     /** If false, the ring buffer is empty and has no attached Tx modules (i.e. no new data is going to be added). Processes should then stop. */

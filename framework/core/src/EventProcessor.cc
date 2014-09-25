@@ -39,14 +39,32 @@
 #define CALL_MODULE(module, x) module->x()
 #endif
 
+#include <TRandom.h>
+
 #include <signal.h>
 #include <unistd.h>
 #include <cstring>
 
-#include <TRandom.h>
 
 using namespace std;
 using namespace Belle2;
+
+namespace {
+  static int gSignalReceived = 0;
+  static void signalHandler(int signal)
+  {
+    gSignalReceived = signal;
+
+    if (signal == SIGINT) {
+      EventProcessor::writeToStdErr("Received Ctrl+C, basf2 will exit safely. (Press Ctrl+\\ (SIGQUIT) to abort immediately - this may break output files.)\n");
+    }
+  }
+}
+EventProcessor::StoppedBySignalException::StoppedBySignalException(int signal):
+  runtime_error("Excecution stopped by signal " + to_string(signal) + "!"),
+  signal(signal)
+{
+}
 
 void EventProcessor::writeToStdErr(const char msg[])
 {
@@ -113,7 +131,14 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
   int numLogError = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
   if ((numLogError == 0) && m_master) {
     setupSignalHandler();
-    processCore(startPath, moduleList, maxEvent); //Do the event processing
+    try {
+      processCore(startPath, moduleList, maxEvent); //Do the event processing
+    } catch (StoppedBySignalException& e) {
+      if (e.signal != SIGINT) {
+        B2FATAL(e.what());
+      }
+      //in case of SIGINT, we move on to processTerminate() to shut down saefly
+    }
 
   } else {
     B2FATAL(numLogError << " ERROR(S) occurred! The processing of events will not be started.");
@@ -129,15 +154,8 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
 //============================================================================
 //                            Protected methods
 //============================================================================
-static bool ctrl_c = false;
-static void signalHandler(int)
-{
-  ctrl_c = true;
 
-  EventProcessor::writeToStdErr("Received Ctrl+C, basf2 will exit safely. (Press Ctrl+\\ (SIGQUIT) to abort immediately - this may break output files.)\n");
-}
-
-bool EventProcessor::processInitialize(const ModulePtrList& modulePathList)
+void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 {
   //store main RNG to be able to restore it later
   m_mainRNG = gRandom;
@@ -156,7 +174,7 @@ bool EventProcessor::processInitialize(const ModulePtrList& modulePathList)
     Module* module = listIter->get();
 
     if (module->hasUnsetForcedParams()) {
-      B2ERROR("The module " << module->getName() << " has unset parameters which have to be set by the user!")
+      B2ERROR("The module " << module->getName() << " has unset parameters which have to be set by the user!");
       continue;
     }
 
@@ -179,18 +197,23 @@ bool EventProcessor::processInitialize(const ModulePtrList& modulePathList)
       m_master = module;
     }
 
-    if (ctrl_c) {
-      return true;;
+    if (gSignalReceived != 0) {
+      throw StoppedBySignalException(gSignalReceived);
     }
   }
   m_processStatisticsPtr->stopGlobal(ModuleStatistics::c_Init);
-  return false;
 }
 
 void EventProcessor::setupSignalHandler()
 {
   if (signal(SIGINT, signalHandler) == SIG_ERR) {
     B2FATAL("Cannot setup SIGINT signal handler\n");
+  }
+  if (signal(SIGTERM, signalHandler) == SIG_ERR) {
+    B2FATAL("Cannot setup SIGTERM signal handler\n");
+  }
+  if (signal(SIGQUIT, signalHandler) == SIG_ERR) {
+    B2FATAL("Cannot setup SIGQUIT signal handler\n");
   }
 }
 
@@ -250,8 +273,8 @@ bool EventProcessor::processEvent(PathIterator moduleIter)
       }
     }
 
-    if (ctrl_c) {
-      return true;
+    if (gSignalReceived != 0) {
+      throw StoppedBySignalException(gSignalReceived);
     }
 
     //Check for a module condition, evaluate it and if it is true switch to a new path

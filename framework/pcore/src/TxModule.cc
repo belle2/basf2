@@ -25,7 +25,7 @@ REG_MODULE(Tx)
 //                 Implementation
 //-----------------------------------------------------------------
 
-TxModule::TxModule(RingBuffer* rbuf) : Module(), m_streamer(0), m_blockingInsert(true)
+TxModule::TxModule(RingBuffer* rbuf) : Module(), m_streamer(nullptr), m_blockingInsert(true)
 {
   //Set module properties
   setDescription("Encode DataStore into RingBuffer");
@@ -95,5 +95,6 @@ void TxModule::terminate()
 
   m_rbuf->txDetached();
   delete m_streamer;
+  m_rbuf = nullptr;
 }
 

@@ -13,6 +13,7 @@
 #include <framework/logging/LogConnectionBase.h>
 #include <framework/logging/LogConnectionIOStream.h>
 #include <framework/logging/Logger.h>
+#include <framework/datastore/DataStore.h>
 
 #include <unistd.h> // isatty()
 
@@ -88,6 +89,7 @@ bool LogSystem::sendMessage(LogMessage message)
 
   if (logLevel >= m_logConfig.getAbortLevel()) {
     printErrorSummary();
+    DataStore::Instance().reset(); // ensure we are executed before ROOT's exit handlers
     exit(1);
   }
 

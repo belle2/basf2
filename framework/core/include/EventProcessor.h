@@ -18,6 +18,8 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
+#include <stdexcept>
+
 class TRandom;
 
 namespace Belle2 {
@@ -62,6 +64,13 @@ namespace Belle2 {
     static void writeToStdErr(const char msg[]);
 
   protected:
+    /** Exception thrown when execution is stopped by a signal. */
+    class StoppedBySignalException : public std::runtime_error {
+    public:
+      StoppedBySignalException(int signal);
+      int signal;
+    };
+
 
     /**
      * Initializes the modules.
@@ -69,9 +78,8 @@ namespace Belle2 {
      * Loops over all module instances specified in a list and calls their initialize() method.
      *
      * @param modulePathList A list of all modules which could be executed during the data processing.
-     * @return true if execution should stop.
      */
-    bool processInitialize(const ModulePtrList& modulePathList);
+    void processInitialize(const ModulePtrList& modulePathList);
 
     /**
      * Processes the full module chain consisting of an arbitrary number of connected paths, starting with the first module in the specified path.

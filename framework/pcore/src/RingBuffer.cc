@@ -395,17 +395,19 @@ void RingBuffer::txDetached()
   SemaphoreLocker locker(m_semid);
   m_bufinfo->numAttachedTx--;
   if (m_bufinfo->numAttachedTx < 0) {
-    B2ERROR("RingBuffer: numAttachedTx < 0, check Tx modules for inconsistency!");
+    m_bufinfo->numAttachedTx = 0;
   }
 }
 void RingBuffer::kill()
 {
   m_bufinfo->numAttachedTx = 0;
+  m_bufinfo->nbuf = 0;
 }
 bool RingBuffer::continueReadingData() const
 {
   SemaphoreLocker locker(m_semid);
-  return (m_bufinfo->numAttachedTx != 0) or (m_bufinfo->nbuf != 0);
+  //NOTE: numAttachedTx == -1 also means we should read data (i.e. initialization pending)
+  return (m_bufinfo->numAttachedTx != 0) or (m_bufinfo->nbuf > 0);
 }
 
 int RingBuffer::ninsq() const

@@ -244,7 +244,6 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
 
   if (localPath == nullptr) { //not forked yet
     // 5. Fork out main path (parallel part)
-    fflush(stdout);
     m_procHandler->startEventProcesses(numProcesses);
     if (m_procHandler->isEventProcess()) {
       localPath = m_mainpathlist[m_mainpathlist.size() - 1];

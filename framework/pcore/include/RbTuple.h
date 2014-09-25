@@ -19,7 +19,7 @@ class TList;
 namespace Belle2 {
   class Module;
 
-  /*! Class to manage histograms defined in registered modules */
+  /** Class to manage histograms defined in registered modules */
   /*
      Modules with histogram definitions are supposed to be derived from
      HistoModule class and histograms are defined in HistoModule::defineHisto() function.
@@ -28,27 +28,27 @@ namespace Belle2 {
   class RbTupleManager {
   public:
 
-    /*! Access to singleton */
+    /** Access to singleton */
     static RbTupleManager& Instance();
 
-    /*! Global initialization */
+    /** Global initialization */
     void init(int nprocess, const char* filename);
 
-    /*! Functions called by analysis modules in mother process */
+    /** Functions called by analysis modules in mother process */
     //  void define ( void (*func)( void ) );
     void register_module(Module*);
 
 
-    /*! Function called by HistoManager module for the first event */
+    /** Function called by HistoManager module for the first event */
     int begin(int pid);
 
-    /*! Function called by HistoManager module at the end */
+    /** Function called by HistoManager module at the end */
     int terminate();
 
     // Functions to collect histograms from event processing on the fly
     //  int collect ();
 
-    /*! Functions to add up all histogram files */
+    /** Functions to add up all histogram files */
     int hadd();
 
   private:

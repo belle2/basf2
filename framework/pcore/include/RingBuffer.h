@@ -40,24 +40,24 @@ namespace Belle2 {
      * @param size Ring buffer size in integers (!)
      */
     RingBuffer(int size = c_DefaultSize);
-    /*! Constructor to create/attach named shared memory in global space */
+    /** Constructor to create/attach named shared memory in global space */
     RingBuffer(const char* name, unsigned int size = 0);     // Create / Attach Ring buffer
-    /*! Constructor by attaching to an existing shared memory */
+    /** Constructor by attaching to an existing shared memory */
     //    RingBuffer(int shmid);              // Attach Ring Buffer
-    /*! Destructor */
+    /** Destructor */
     ~RingBuffer();
     /** open shared memory */
     void openSHM(int size);
-    /*! Function to detach and remove shared memory*/
+    /** Function to detach and remove shared memory*/
     void cleanup();
 
-    /*! Append a buffer to the RingBuffer */
+    /** Append a buffer to the RingBuffer */
     int insq(const int* buf, int size);
-    /*! Pick up a buffer from the RingBuffer */
+    /** Pick up a buffer from the RingBuffer */
     int remq(int* buf);
-    /*! Prefetch a buffer from the RingBuffer w/o removing it*/
+    /** Prefetch a buffer from the RingBuffer w/o removing it*/
     int spyq(int* buf) const;
-    /*! Returns number of entries/buffers in the RingBuffer */
+    /** Returns number of entries/buffers in the RingBuffer */
     int numq() const;
 
     /** Increase #attached Tx counter. */
@@ -70,13 +70,13 @@ namespace Belle2 {
     /** If false, the ring buffer is empty and has no attached Tx modules (i.e. no new data is going to be added). Processes should then stop. */
     bool continueReadingData() const;
 
-    /*! Clear the RingBuffer */
+    /** Clear the RingBuffer */
     int clear();
 
-    /*! Clear the RingBuffer, if the semaphore isn't locked at the moment. See SemaphoreLocker::isLocked() for details */
+    /** Clear the RingBuffer, if the semaphore isn't locked at the moment. See SemaphoreLocker::isLocked() for details */
     int tryClear();
 
-    /*! Return ID of the shared memory */
+    /** Return ID of the shared memory */
     int shmid() const;
 
     // Debugging functions

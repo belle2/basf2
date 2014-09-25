@@ -13,7 +13,7 @@
 #include <string>
 
 namespace Belle2 {
-  /*! Class definition of HistoManager module */
+  /** Class definition of HistoManager module */
   class HistoManagerModule : public Module {
   public:
 

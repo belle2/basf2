@@ -14,19 +14,19 @@
 
 namespace Belle2 {
 
-  /*! A class to manage I/O for a chain of blocked files */
+  /** A class to manage I/O for a chain of blocked files */
   class SeqFile {
   public:
-    /*! Constructor */
+    /** Constructor */
     SeqFile(const char* filename, const char* access);
-    /*! Destructor */
+    /** Destructor */
     ~SeqFile();
-    /*! Returns status after constructor call. If success, fd is returned. If not, -1 */
+    /** Returns status after constructor call. If success, fd is returned. If not, -1 */
     int status();
 
-    /*! Write a record to a file.  First word of the record should contain number of words.*/
+    /** Write a record to a file.  First word of the record should contain number of words.*/
     int write(char* buf);
-    /*! Read a record from a file. The record length is returned. */
+    /** Read a record from a file. The record length is returned. */
     int read(char* buf, int max);
 
   private:

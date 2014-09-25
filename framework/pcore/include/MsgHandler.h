@@ -16,22 +16,22 @@
 #include "TObject.h"
 
 namespace Belle2 {
-  /*! A class to encode/decode an EvtMessage */
+  /** A class to encode/decode an EvtMessage */
   class MsgHandler {
   public:
-    /*! Constructor */
+    /** Constructor */
     MsgHandler(int complevel);
-    /*! Destructor */
+    /** Destructor */
     virtual ~MsgHandler();
 
-    /*! Clear object list */
+    /** Clear object list */
     virtual void clear();
-    /*! Add an object to be streamed */
+    /** Add an object to be streamed */
     virtual bool add(const TObject*, const std::string& name);
 
-    /*! Stream object list into an EvtMessage. Caller is responsible for deletion. */
+    /** Stream object list into an EvtMessage. Caller is responsible for deletion. */
     virtual EvtMessage* encode_msg(RECORD_TYPE rectype);
-    /*! Decode an EvtMessage into a vector list of objects with names */
+    /** Decode an EvtMessage into a vector list of objects with names */
     virtual int decode_msg(EvtMessage*, std::vector<TObject*>&, std::vector<std::string>&);
 
   private:

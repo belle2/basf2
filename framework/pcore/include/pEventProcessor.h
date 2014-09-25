@@ -23,21 +23,21 @@ namespace Belle2 {
   class ProcHandler;
   class RingBuffer;
 
-  /*!
+  /**
     This class provides the core event processing loop for parallel processing.
   */
   class pEventProcessor : public EventProcessor {
 
   public:
 
-    /*! Constructor */
+    /** Constructor */
     pEventProcessor();
 
-    /*! Destructor */
+    /** Destructor */
     virtual ~pEventProcessor();
 
-    /*! Processes the full module chain, starting with the first module in the given path. */
-    /*!
+    /** Processes the full module chain, starting with the first module in the given path. */
+    /**
         Processes all events for the given run number and for events from 0 to maxEvent.
         \param spath The processing starts with the first module of this path.
     */
@@ -69,7 +69,7 @@ namespace Belle2 {
     /** Create RingBuffer with name from given environment variable, add Tx and Rx modules to a and b. */
     RingBuffer* connectViaRingBuffer(const char* name, PathPtr a, PathPtr& b);
 
-    /*! Dump module names in the ModulePtrList */
+    /** Dump module names in the ModulePtrList */
     void dump_modules(const std::string, const ModulePtrList);
 
     /** TFiles are stored in a global list and cleaned up by root

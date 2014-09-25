@@ -21,7 +21,7 @@ namespace Belle2 {
    */
   enum RECORD_TYPE { MSG_EVENT, MSG_BEGIN_RUN, MSG_END_RUN, MSG_TERMINATE, MSG_NORECORD };
 
-  /*! Header structure of streamed object list */
+  /** Header structure of streamed object list */
   struct EvtHeader {
     UInt_t size; /**< Number of words in this record. */
     RECORD_TYPE rectype; /**< Type of message. */
@@ -49,65 +49,65 @@ namespace Belle2 {
     /** maximal EvtMessage size, in bytes (200MB). */
     const static unsigned int c_MaxEventSize = 200000000;
 
-    /*! build EvtMessage from existing buffer (does not take ownership). */
+    /** build EvtMessage from existing buffer (does not take ownership). */
     EvtMessage(char* buf = NULL);
-    /*! build EvtMessage by allocating new message buffer (sobjs is copied). */
+    /** build EvtMessage by allocating new message buffer (sobjs is copied). */
     EvtMessage(const char* sobjs, int size, RECORD_TYPE type);
-    /*! Copy constructor (m_data is copied). */
+    /** Copy constructor (m_data is copied). */
     EvtMessage(const EvtMessage& evtmsg);
-    /*! Destructor */
+    /** Destructor */
     ~EvtMessage();
 
-    /*! Assignment (m_data is copied). */
+    /** Assignment (m_data is copied). */
     EvtMessage& operator=(const EvtMessage& obj);
 
 
     // Access functions
-    /*! Get buffer address
+    /** Get buffer address
      *
      * If you own the EvtMessage object, the memory is guaranteed to be at
      * least sizeof(int) * paddedSize() bytes. Bytes exceeding size() are
      * zeroed.
      */
     char* buffer();
-    /*! Set existing buffer address */
+    /** Set existing buffer address */
     void  buffer(const char*);
 
-    /*! Get size of message including headers*/
+    /** Get size of message including headers*/
     int   size() const;
     /** Same as size(), but as size of an integer array.
      *
      * Use this for passing EvtMessage to RingBuffer::insq().
      */
     int   paddedSize() const;
-    /*! Get size of message body */
+    /** Get size of message body */
     int   msg_size() const;
 
-    /*! Get record type */
+    /** Get record type */
     RECORD_TYPE type();
-    /*! Set record type */
+    /** Set record type */
     void type(RECORD_TYPE);
 
-    /*! Get time stamp */
+    /** Get time stamp */
     struct timeval time() const;
-    /*! Set time stamp */
+    /** Set time stamp */
     void time(struct timeval& time);
 
-    /*! Get source IP of message */
+    /** Get source IP of message */
     int   src() const;
-    /*! Set source IP of message */
+    /** Set source IP of message */
     void  src(int src);
 
-    /*! Get destination IP of message */
+    /** Get destination IP of message */
     int   dest() const;
-    /*! Set destination IP of message */
+    /** Set destination IP of message */
     void  dest(int dest);
 
-    /*! Get pointer to EvtHeader */
+    /** Get pointer to EvtHeader */
     EvtHeader* header();
-    /*! Get pointer to message body */
+    /** Get pointer to message body */
     char* msg();
-    /*! Copy message into newly allocated buffer */
+    /** Copy message into newly allocated buffer */
     void msg(const char* msg, int size, RECORD_TYPE type);
 
   private:
@@ -116,10 +116,10 @@ namespace Belle2 {
 
   };
 
-  /*!  Message class derived from TMessage */
+  /**  Message class derived from TMessage */
   class InMessage : public TMessage {
   public:
-    /*! Constructor to build a message */
+    /** Constructor to build a message */
     InMessage(void* buf, int len) : TMessage(buf, len) {
       //std::cout << "MSG BUILD: " << len << std::endl;
       //std::cout << "MSG: " << buf << std::endl;

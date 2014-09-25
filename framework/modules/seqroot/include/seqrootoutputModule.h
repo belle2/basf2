@@ -19,7 +19,7 @@
 #include <sys/time.h>
 
 namespace Belle2 {
-  /*! Class definition for the output module of Sequential ROOT I/O */
+  /** Class definition for the output module of Sequential ROOT I/O */
 
   /** Module for sequential ROOT I/O.
    *

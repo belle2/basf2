@@ -21,47 +21,55 @@
 
 #include <signal.h>
 #include <sys/wait.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 
 using namespace std;
 using namespace Belle2;
 
-/** PID of sub-process killed by some signal. 0 if none. */
-static int s_PIDofKilledChild = 0;
+namespace {
+  /** PID of sub-process killed by some signal. 0 if none. */
+  static int s_PIDofKilledChild = 0;
 
-static pEventProcessor* g_pEventProcessor = NULL;
+  static pEventProcessor* g_pEventProcessor = NULL;
 
-static void signalHandler(int signal)
-{
-  //signal handlers are called asynchronously, making many standard functions (including output) dangerous
-  //write() is, however, safe, so we'll use that to write to stderr.
-  if (signal == SIGSEGV) {
-    EventProcessor::writeToStdErr("\nProcess died with SIGSEGV (Segmentation fault).\n");
-    abort();
-  } else if (signal == SIGINT) {
-    g_pEventProcessor->gotSigINT();
-  } else if (signal == SIGTERM) {
-    g_pEventProcessor->gotSigTERM();
-  } else if (signal == SIGCHLD) {
-    if (s_PIDofKilledChild != 0)
-      return; //only once
+  void cleanupIPC()
+  {
+    if (g_pEventProcessor)
+      g_pEventProcessor->cleanup();
+  }
 
-    //which child died?
-    int status;
-    pid_t pid = waitpid(-1, &status, WNOHANG);
-    //B2WARNING("child died, pid " << pid << ", status " << status);
-    if (pid <= 0 || !WIFSIGNALED(status))
-      return; //process exited normally
+  static void signalHandler(int signal)
+  {
+    //signal handlers are called asynchronously, making many standard functions (including output) dangerous
+    //write() is, however, safe, so we'll use that to write to stderr.
+    if (signal == SIGSEGV) {
+      EventProcessor::writeToStdErr("\nProcess died with SIGSEGV (Segmentation fault).\n");
+      exit(1);
+    } else if (signal == SIGINT) {
+      g_pEventProcessor->gotSigINT();
+    } else if (signal == SIGTERM) {
+      g_pEventProcessor->gotSigTERM();
+    } else if (signal == SIGCHLD) {
+      if (s_PIDofKilledChild != 0)
+        return; //only once
 
-    //ok, it died because of some signal
-    s_PIDofKilledChild = pid;
-    //int termsig = WTERMSIG(status);
+      //which child died?
+      int status;
+      pid_t pid = waitpid(-1, &status, WNOHANG);
+      //B2WARNING("child died, pid " << pid << ", status " << status);
+      if (pid <= 0 || !WIFSIGNALED(status))
+        return; //process exited normally
 
-    EventProcessor::writeToStdErr("\nOne of our child processes died, stopping execution...\n");
+      //ok, it died because of some signal
+      s_PIDofKilledChild = pid;
+      //int termsig = WTERMSIG(status);
 
-    //pid=0: send signal to every process in our progress group (ourselves + children)
-    kill(0, SIGTERM);
+      EventProcessor::writeToStdErr("\nOne of our child processes died, stopping execution...\n");
+
+      //pid=0: send signal to every process in our progress group (ourselves + children)
+      kill(0, SIGTERM);
+    }
   }
 }
 
@@ -75,13 +83,16 @@ pEventProcessor::pEventProcessor() : EventProcessor(),
 
 pEventProcessor::~pEventProcessor()
 {
+  g_pEventProcessor = nullptr;
   delete m_procHandler;
 }
 
 void pEventProcessor::cleanup()
 {
-  m_rbinlist.clear();
-  m_rboutlist.clear();
+  if (!m_procHandler->parallelProcessingUsed() or m_procHandler->isOutputProcess()) {
+    m_rbinlist.clear();
+    m_rboutlist.clear();
+  }
 }
 
 
@@ -173,6 +184,9 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   //init statistics
   m_processStatisticsPtr.registerInDataStore();
 
+  // ensure that we free the IPC resources!
+  atexit(cleanupIPC);
+
   if (!m_processStatisticsPtr)
     m_processStatisticsPtr.create();
   ModulePtrList mergedPathModules = mergedPath.buildModulePathList(); //all modules, including Rx and Tx
@@ -186,7 +200,6 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   ModulePtrList initGlobally = getModulesWithoutFlag(modulelist, Module::c_InternalSerializer);
   //dump_modules("Initializing globally: ", initGlobally);
   if (processInitialize(initGlobally)) {
-    cleanup();
     B2FATAL("Execution stopped by user (via SIGINT)");
   }
 
@@ -297,7 +310,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
 
   //did anything bad happen?
   if (s_PIDofKilledChild != 0) {
-    //fatal, so we get appropriate return code (IPC cleanup was already done)
+    //fatal, so we get appropriate return code
     B2FATAL("Execution stopped, sub-process with PID " << s_PIDofKilledChild << " killed by signal.");
   }
 
@@ -416,8 +429,6 @@ void pEventProcessor::dump_modules(const std::string title, const ModulePtrList 
 ModulePtrList pEventProcessor::getModulesWithFlag(const ModulePtrList& modules, Module::EModulePropFlags flag)
 {
   ModulePtrList tmpModuleList;
-  ModulePtrList::const_iterator listIter;
-
   for (const ModulePtr & m : modules) {
     if (m->hasProperties(flag))
       tmpModuleList.push_back(m);
@@ -428,8 +439,6 @@ ModulePtrList pEventProcessor::getModulesWithFlag(const ModulePtrList& modules, 
 ModulePtrList pEventProcessor::getModulesWithoutFlag(const ModulePtrList& modules, Module::EModulePropFlags flag)
 {
   ModulePtrList tmpModuleList;
-  ModulePtrList::const_iterator listIter;
-
   for (const ModulePtr & m : modules) {
     if (!m->hasProperties(flag))
       tmpModuleList.push_back(m);

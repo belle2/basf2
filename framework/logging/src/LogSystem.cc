@@ -14,10 +14,10 @@
 #include <framework/logging/LogConnectionIOStream.h>
 #include <framework/logging/Logger.h>
 
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <unistd.h> // isatty()
 
+#include <cstdio>
+#include <cstdlib>
 #include <iostream>
 #include <unordered_map>
 #include <functional>
@@ -88,7 +88,7 @@ bool LogSystem::sendMessage(LogMessage message)
 
   if (logLevel >= m_logConfig.getAbortLevel()) {
     printErrorSummary();
-    abort();
+    exit(1);
   }
 
   return messageSent;

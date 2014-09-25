@@ -31,7 +31,7 @@ namespace Belle2 {
   }
 
   /** command x should exit using B2FATAL.  */
-#define EXPECT_B2FATAL(x) EXPECT_EXIT(x, ::testing::KilledBySignal(SIGABRT),"");
+#define EXPECT_B2FATAL(x) EXPECT_EXIT(x, ::testing::ExitedWithCode(1),"");
 
   /** \def EXPECT_B2ERROR(x)
    *

@@ -27,15 +27,16 @@
 using namespace std;
 using namespace Belle2;
 
-
-/** Called by exit handlers to free all memory.
- *
- * This is important since ROOT exit handlers may remove some of our objects.
- * Without this function, we will free the memory when the DataStore instance is destroyed, which happens too late.
- */
-void cleanDataStore()
-{
-  DataStore::Instance().reset();
+namespace {
+  /** Called by exit handlers to free all memory.
+   *
+   * This is important since ROOT exit handlers may remove some of our objects.
+   * Without this function, we will free the memory when the DataStore instance is destroyed, which happens too late.
+   */
+  void cleanDataStore()
+  {
+    DataStore::Instance().reset();
+  }
 }
 
 DataStore& DataStore::Instance()

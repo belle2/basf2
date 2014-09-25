@@ -22,7 +22,10 @@
 using namespace Belle2;
 typedef DataStore::ModuleInfo MInfo;
 
-const std::string unknownfillcolor = "gray82";
+
+namespace {
+  const std::string unknownfillcolor = "gray82";
+}
 
 DataFlowVisualization::DataFlowVisualization(const std::map<std::string, DataStore::ModuleInfo>& moduleInfo):
   m_moduleInfo(moduleInfo)

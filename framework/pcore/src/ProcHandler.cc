@@ -10,7 +10,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/prctl.h>
-#include <iostream>
 #include <cstdlib>
 #include <unistd.h>
 #include <errno.h>

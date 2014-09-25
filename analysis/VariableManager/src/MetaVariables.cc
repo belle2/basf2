@@ -214,6 +214,100 @@ namespace Belle2 {
       }
     }
 
+
+
+
+
+
+    Manager::FunctionPtr InputQrOf(const std::vector<std::string>& arguments)
+    {
+      //used by simple_flavor_tagger
+      if (arguments.size() == 3) {
+        auto particleListName = arguments[0];
+        auto extraInfoRightClass = arguments[1];
+        auto extraInfoFromB = arguments[2];
+        auto func = [particleListName, extraInfoRightClass, extraInfoFromB](const Particle*) -> double {
+          if (particleListName == "K+:ROE" || particleListName == "Lambda0:ROE") {
+            double flavor = 0.0;
+            double r = 0.0;
+            double qr = 0.0;
+            double final_value = 0.0;
+            double val1 = 1.0;
+            double val2 = 1.0;
+            auto compare = [extraInfoFromB](const Particle * part1, const Particle * part2)-> bool {
+              double info1 = part1->getExtraInfo(extraInfoFromB);
+              double info2 = part2->getExtraInfo(extraInfoFromB);
+              return (info1 > info2);
+            };
+            StoreObjPtr<ParticleList> ListOfParticles(particleListName);
+            std::vector<const Particle*> ParticleVector;
+            ParticleVector.reserve(ListOfParticles->getListSize());
+            for (unsigned int i = 0; i < ListOfParticles->getListSize(); i++) {
+              ParticleVector.push_back(ListOfParticles->getParticle(i));
+            }
+            std::sort(ParticleVector.begin(), ParticleVector.end(), compare);
+            if (particleListName == "Lambda0:ROE") {
+              //Loop over Lambda vector until 3 or empty
+              if (ParticleVector.size() != 0) final_value = 1.0;
+              for (unsigned int i = 0; i < ParticleVector.size(); ++i) {
+                //PDG Code Lambda0 3122 (indicates a B0bar)
+                if (ParticleVector[i]->getPDGCode() == 3122) flavor = -1.0;
+                else if (ParticleVector[i]->getPDGCode() == -3122) flavor = 1.0;
+                else {flavor = 0.0;}
+                r = ParticleVector[i]->getExtraInfo(extraInfoFromB);
+                qr = (flavor * r);
+                val1 = val1 * (1 + qr);
+                val2 = val2 * (1 - qr);
+              }
+              final_value = (val1 - val2) / (val1 + val2);
+            } else if (particleListName == "K+:ROE") {
+              //Loop over K+ vector until 3 or empty
+              if (ParticleVector.size() != 0) final_value = 1.0;
+              for (unsigned int i = 0; i < ParticleVector.size(); i++) {
+                flavor = ParticleVector[i]->getCharge();
+                r = ParticleVector[i]->getExtraInfo(extraInfoFromB);
+                qr = (flavor * r);
+                val1 = val1 * (1 + qr);
+                val2 = val2 * (1 - qr);
+              }
+              final_value = (val1 - val2) / (val1 + val2);
+            }
+
+            return final_value;
+          }
+
+          //SlowPion, Electron, Muon
+          else{
+            StoreObjPtr<EventExtraInfo> Info("EventExtraInfo");
+            StoreObjPtr<ParticleList> ListOfParticles(particleListName);
+            double flavor = 0.0; //Flavour of the track selected as target
+            double maximum_p_track = 0.0; //Probability of being the target track from the track level
+            double final_value = 0.0;
+            for (unsigned int i = 0; i < ListOfParticles->getListSize(); i++) {
+              Particle* p = ListOfParticles->getParticle(i);
+              double x = p->getExtraInfo(extraInfoFromB);
+              if (x > maximum_p_track) {
+                maximum_p_track = x;
+                //In case of slowPions and intermediate momentum leptons sign is flipped
+                if (particleListName == "pi+:ROE" && extraInfoFromB == "IsFromB(SlowPion)") flavor = (-1.0) * p->getCharge();
+                else if (particleListName == "e+:ROE" && extraInfoFromB == "IsFromB(IntermediateElectron)") flavor = (-1.0) * p->getCharge();
+                else if (particleListName == "mu+:ROE" && extraInfoFromB == "IsFromB(IntermediateMuon)") flavor = (-1.0) * p->getCharge();
+                else flavor = p->getCharge();
+              }
+            }
+            final_value = flavor * maximum_p_track;
+            return final_value;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments (3 required) for meta function QrOf");
+        return nullptr;
+      }
+    }
+
+
+
     Manager::FunctionPtr IsRightClass(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -272,18 +366,33 @@ namespace Belle2 {
         auto func = [particleName](const Particle * part) -> double {
           const MCParticle* mcParticle = part->getRelated<MCParticle>();
           if (mcParticle == nullptr) return 0.0;
+          //direct electron
           else if (particleName == "Electron"
           && mcParticle->getMother() != nullptr
-          && mcParticle->getMother()->getMother() != nullptr
           && TMath::Abs(mcParticle->getPDG()) == 11
           && TMath::Abs(mcParticle->getMother()->getPDG()) == 511) {
             return 1.0;
-          } else if (particleName == "Muon"
+            //intermediate electron
+          } else if (particleName == "IntermediateElectron"
           && mcParticle->getMother() != nullptr
           && mcParticle->getMother()->getMother() != nullptr
+          && TMath::Abs(mcParticle->getPDG()) == 11
+          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511) {
+            return 1.0;
+            //direct muon
+          } else if (particleName == "Muon"
+          && mcParticle->getMother() != nullptr
           && TMath::Abs(mcParticle->getPDG()) == 13
           && TMath::Abs(mcParticle->getMother()->getPDG()) == 511) {
             return 1.0;
+            //intermediate muon
+          } else if (particleName == "IntermediateMuon"
+          && mcParticle->getMother() != nullptr
+          && mcParticle->getMother()->getMother() != nullptr
+          && TMath::Abs(mcParticle->getPDG()) == 13
+          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511) {
+            return 1.0;
+            //kaon
           } else if (particleName == "Kaon"
           && mcParticle->getMother() != nullptr
           && mcParticle->getMother()->getMother() != nullptr
@@ -292,6 +401,7 @@ namespace Belle2 {
           && TMath::Abs(mcParticle->getMother()->getPDG()) < 500
           && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511) {
             return 1.0;
+            //slow pion
           } else if (particleName == "SlowPion"
           && mcParticle->getMother() != nullptr
           && mcParticle->getMother()->getMother() != nullptr
@@ -299,10 +409,20 @@ namespace Belle2 {
           && TMath::Abs(mcParticle->getMother()->getPDG()) == 413
           && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511) {
             return 1.0;
+            //high momentum pions
+          } else if (particleName == "FastPion"
+          && mcParticle->getMother() != nullptr
+          && TMath::Abs(mcParticle->getPDG()) == 211
+          && TMath::Abs(mcParticle->getMother()->getPDG()) == 511) {
+            return 1.0;
+            //lambdas
           } else if (particleName == "Lambda"
           && mcParticle->getMother() != nullptr
           && mcParticle->getMother()->getMother() != nullptr
-          && TMath::Abs(mcParticle->getPDG()) == 3122) {
+          && TMath::Abs(mcParticle->getPDG()) == 3122
+          //&& TMath::Abs(mcParticle->getMother()->getPDG()) == 4122
+          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511) {
+
             return 1.0;
           } else return 0.0;
         };
@@ -433,6 +553,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("IsDaughterOf(variable)", IsDaughterOf, "Check if the particle is a daughter of the given list.");
 
     VARIABLE_GROUP("MetaFunctions FlavorTagging")
+    REGISTER_VARIABLE("InputQrOf(particleListName, extraInfoRightClass, extraInfoFromB)", InputQrOf, "FlavorTagging: [Eventbased] q*r where r is calculated from the output of event level in particlelistName.");
     REGISTER_VARIABLE("QrOf(particleListName, extraInfoRightClass, extraInfoFromB)", QrOf, "FlavorTagging: [Eventbased] q*r where r is calculated from the output of event level in particlelistName.");
     REGISTER_VARIABLE("IsRightClass(particleName)", IsRightClass, "FlavorTagging: returns 1 if the class track by particleName category has the same flavour as the MC target track 0 else also if there is no target track");
     REGISTER_VARIABLE("IsFromB(particleName)", IsFromB, "Checks if the given Particle was really from a B. 1.0 if true otherwise 0.0");

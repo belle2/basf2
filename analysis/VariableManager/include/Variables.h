@@ -302,6 +302,38 @@ namespace Belle2 {
     double MomentumOfSecondDaughter_CMS(const Particle* part);
 
     /**
+     * Returns missing CMS momentum. Specific Flavor Tagging variable.
+     */
+    double missing_P_CMS(const Particle* part);
+
+    /**
+     * Returns CosTheta for missing CMS momentum. Specific Flavor Tagging variable.
+     */
+    double CosTheta_CMS_missing(const Particle* part);
+
+    /**
+     * Returns recoiling mass of the Btag system against the particle. Specific Flavor Tagging variable.
+     */
+    double RecoilMassTagSide(const Particle* part);
+
+    /**
+     * Returns energy in the hemisphere defined by the direction of the virtual W-Boson assuming a semimuonic decay. Specific Flavor Tagging variable.
+     */
+    double E_W_90(const Particle* part);
+
+    /**
+     * Check if the majority of the tracks in the current RestOfEvent are from a B0. Specific Flavor Tagging variable.
+     */
+    double targetB0Tagger(const Particle*);
+
+    /**
+     * Check if the majority of the tracks in the current RestOfEvent are from a B0bar. Specific Flavor Tagging variable.
+     */
+    double targetB0BarTagger(const Particle*);
+
+
+
+    /**
      * Returns q*(highest PID_Likelihood for Kaons), else 0.
      */
     double chargeTimesKaonLiklihood(const Particle*);

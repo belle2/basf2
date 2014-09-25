@@ -70,6 +70,12 @@ namespace Belle2 {
     Manager::FunctionPtr QrOf(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the q*r value for a given list (argument[0]). The r value is stored via extraInfo
+     * before and is accessed via argument[1]. This is a Flavor Tagging specific variable on event level!
+     */
+    Manager::FunctionPtr InputQrOf(const std::vector<std::string>& arguments);
+
+    /**
      * Returns 1 if the class track by particleName category has the same flavour as the MC target track,
      * 0 else; also if there is no target track. This is a Flavor Tagging specific variable!
      */

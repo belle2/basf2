@@ -22,6 +22,7 @@
 #include <boost/version.hpp>
 
 #include <sstream>
+#include <cmath>
 
 namespace Belle2 {
 
@@ -133,6 +134,10 @@ namespace Belle2 {
       const auto& variables = m_methods[0].getVariables();
       for (unsigned int i = 0; i < variables.size(); ++i) {
         m_input[i] = variables[i]->function(particle);
+        if (!std::isfinite(m_input[i])) {
+          B2ERROR("Output of variable " << variables[i]->name << " is " << m_input[i] << ", please fix it. Candidate will be skipped.");
+          return;
+        }
       }
 
       // The target variable is converted to an integer

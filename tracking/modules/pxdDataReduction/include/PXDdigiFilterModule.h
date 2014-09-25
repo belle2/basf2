@@ -13,7 +13,8 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-
+#include <framework/utilities/SelectSubset.h>
+#include <pxd/dataobjects/PXDDigit.h>
 
 namespace Belle2 {
 
@@ -53,8 +54,13 @@ namespace Belle2 {
   private:
 
     std::string m_PXDDigitsName;  /**< The name of the StoreArray of PXDDigits to be filtered */
-    std::string m_PXDFilteredDigitsName;  /**< The name of the StoreArray of Filtered PXDDigits */
+    std::string m_PXDDigitsInsideROIName;  /**< The name of the StoreArray of Filtered PXDDigits */
+    std::string m_PXDDigitsOutsideROIName;  /**< The name of the StoreArray of Filtered PXDDigits */
     std::string m_ROIidsName;  /**< The name of the StoreArray of ROIs */
+
+    SelectSubset< PXDDigit > m_selectorIN; /**< selector of the subset of PXDDigits contained in the ROIs*/
+    SelectSubset< PXDDigit > m_selectorOUT; /**< selector of the subset of PXDDigits NOT contained in the ROIs*/
+
   };
 }
 

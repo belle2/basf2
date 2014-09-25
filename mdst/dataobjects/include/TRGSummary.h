@@ -20,7 +20,7 @@
 namespace Belle2 {
 
   /**
-   * Trigger Summary Information
+   * Trigger Summary Information including bit (input, ftdl, psnm), timing and trigger source
    */
   class TRGSummary : public RelationsObject {
 
@@ -98,8 +98,8 @@ namespace Belle2 {
     // Const::DetectorSet m_detectors;   /**< set of detectors with PID information */
 
     unsigned int m_inputBits[10]; /**< input bits from subdetectors */
-    unsigned int m_ftdlBits[10]; /**< ftdl bits */
-    unsigned int m_psnmBits[10]; /**< psnm bits */
+    unsigned int m_ftdlBits[10]; /**< ftdl bits. Outputs of trigger logic  */
+    unsigned int m_psnmBits[10]; /**< psnm bits. Prescaled ftdl bits */
     unsigned int m_timTypeBits; /**< timing source bits */
 
     ClassDef(TRGSummary, 1); /**< ClassDef */

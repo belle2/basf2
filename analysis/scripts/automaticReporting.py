@@ -178,7 +178,7 @@ def createSummaryTexFile(finalStateParticlePlaceholders, combinedParticlePlaceho
     hash = actorFramework.create_hash([placeholders])
     placeholders['texFile'] = 'FEIsummary.tex'
     if not os.path.isfile(placeholders['texFile']):
-        createTexFile(placeholders['texFile'], 'analysis/scripts/FullEventInterpretationSummaryTemplate.tex', placeholders)
+        createTexFile(placeholders['texFile'], 'analysis/scripts/FEI/templates/SummaryTemplate.tex', placeholders)
     return placeholders
 
 
@@ -195,7 +195,7 @@ def createMBCTexFile(ntuple):
     placeholders['texFile'] = ntuple[:-5] + '_mbc.tex'
     placeholders['particleName'] = mbcFilename[4:].split(':', 1)[0]
     if not os.path.isfile(placeholders['texFile']):
-        createTexFile(placeholders['texFile'], 'analysis/scripts/FullEventInterpretationMBCTemplate.tex', placeholders)
+        createTexFile(placeholders['texFile'], 'analysis/scripts/FEI/templates/MBCTemplate.tex', placeholders)
     return placeholders
 
 
@@ -222,7 +222,7 @@ def createFSParticleTexFile(placeholders, nTuple, mcCounts):
         makeDiagPlotPerParticle(nTuple, placeholders['particleDiagPlot'])
     placeholders['texFile'] = '{name}_{hash}.tex'.format(name=placeholders['particleName'], hash=hash)
     if not os.path.isfile(placeholders['texFile']):
-        createTexFile(placeholders['texFile'], 'analysis/scripts/FullEventInterpretationFSParticleTemplate.tex', placeholders)
+        createTexFile(placeholders['texFile'], 'analysis/scripts/FEI/templates/FSParticleTemplate.tex', placeholders)
 
     return placeholders
 
@@ -287,7 +287,7 @@ def createCombinedParticleTexFile(placeholders, channelPlaceholders, nTuple, mcC
         makeDiagPlotPerParticle(nTuple, placeholders['particleDiagPlot'])
     placeholders['texFile'] = removeJPsiSlash('{name}_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
     if not os.path.isfile(placeholders['texFile']):
-        createTexFile(placeholders['texFile'], 'analysis/scripts/FullEventInterpretationCombinedParticleTemplate.tex', placeholders)
+        createTexFile(placeholders['texFile'], 'analysis/scripts/FEI/templates/CombinedParticleTemplate.tex', placeholders)
 
     return placeholders
 
@@ -304,7 +304,7 @@ def createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut):
     if preCutHistogram is None:
         hash = actorFramework.create_hash([placeholders])
         placeholders['preCutTexFile'] = removeJPsiSlash('{name}_preCut_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
-        placeholders['preCutTemplateFile'] = 'analysis/scripts/FullEventInterpretationMissingPreCutTemplate.tex'
+        placeholders['preCutTemplateFile'] = 'analysis/scripts/FEI/templates/MissingPreCutTemplate.tex'
         placeholders['isIgnored'] = True
         placeholders['channelPurity'] = 0
         placeholders['channelNSignal'] = 0
@@ -375,7 +375,7 @@ def createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut):
             makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutRatioPlot'], 'ratio', preCut)
 
         placeholders['preCutTexFile'] = removeJPsiSlash('{name}_preCut_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
-        placeholders['preCutTemplateFile'] = 'analysis/scripts/FullEventInterpretationPreCutTemplate.tex'
+        placeholders['preCutTemplateFile'] = 'analysis/scripts/FEI/templates/PreCutTemplate.tex'
 
     if not os.path.isfile(placeholders['preCutTexFile']):
         createTexFile(placeholders['preCutTexFile'], placeholders['preCutTemplateFile'], placeholders)
@@ -430,7 +430,7 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
     if signalProbability is None:
         hash = actorFramework.create_hash([placeholders])
         placeholders['mvaTexFile'] = removeJPsiSlash('{name}_mva_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
-        placeholders['mvaTemplateFile'] = 'analysis/scripts/FullEventInterpretationMissingMVATemplate.tex'
+        placeholders['mvaTemplateFile'] = 'analysis/scripts/FEI/templates/MissingMVATemplate.tex'
         placeholders['isIgnored'] = True
         placeholders['postCutRange'] = 'Ignored'
         placeholders['mvaNSignal'] = 0
@@ -532,7 +532,7 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
             makeDiagPlotPerChannel(placeholders['mvaTMVAFilename'], placeholders['mvaDiagPlot'], placeholders['mvaName'])
 
         placeholders['mvaTexFile'] = removeJPsiSlash('{name}_mva_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
-        placeholders['mvaTemplateFile'] = 'analysis/scripts/FullEventInterpretationMVATemplate.tex'
+        placeholders['mvaTemplateFile'] = 'analysis/scripts/FEI/templates/MVATemplate.tex'
 
     if not os.path.isfile(placeholders['mvaTexFile']):
         createTexFile(placeholders['mvaTexFile'], placeholders['mvaTemplateFile'], placeholders)
@@ -849,6 +849,6 @@ def createCPUTimeTexFile(channelNames, inputLists, mcCounts, moduleStatisticsFil
 
     placeholders['texFile'] = 'CPUTimeSummary_' + moduleStatisticsFile + '.tex'
     if not os.path.isfile(placeholders['texFile']):
-        createTexFile(placeholders['texFile'], 'analysis/scripts/FullEventInterpretationCPUTimeTemplate.tex', placeholders)
+        createTexFile(placeholders['texFile'], 'analysis/scripts/FEI/templates/CPUTimeTemplate.tex', placeholders)
 
     return placeholders

@@ -458,7 +458,7 @@ def WriteAnalysisFileForChannel(particleName, particleLabel, channelName, preCut
     hash = actorFramework.create_hash([placeholders])
     placeholders['texFile'] = removeJPsiSlash('{name}_channel_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
     if not os.path.isfile(placeholders['texFile']):
-        automaticReporting.createTexFile(placeholders['texFile'], 'analysis/scripts/FullEventInterpretationChannelTemplate.tex', placeholders)
+        automaticReporting.createTexFile(placeholders['texFile'], 'analysis/scripts/FEI/templates/ChannelTemplate.tex', placeholders)
 
     B2INFO("Written analysis tex file for channel {c}.".format(c=channelName))
     return {'Placeholders_{c}'.format(c=channelName): placeholders, '__needed__': False}

@@ -1,4 +1,3 @@
-
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2013 - Belle II Collaboration                             *
@@ -212,7 +211,7 @@ void MCTrackMatcherModule::event()
   std::map< pair< DetId, HitId>, TrackCandId > mcTrackCandId_by_hitId;
 
   {
-    std::map< pair< DetId, HitId>, TrackCandId>::iterator itMCInsertHint =  mcTrackCandId_by_hitId.end();
+    std::map< pair< DetId, HitId>, TrackCandId>::iterator itMCInsertHint = mcTrackCandId_by_hitId.end();
     TrackCandId mcTrackCandId = -1;
 
     for (const genfit::TrackCand & mcTrackCand : mcGFTrackCands) {
@@ -241,7 +240,7 @@ void MCTrackMatcherModule::event()
 
   {
     TrackCandId prTrackCandId = -1;
-    std::multimap< pair< DetId, HitId>, TrackCandId>::iterator itPRInsertHint =  prTrackCandId_by_hitId.end();
+    std::multimap< pair< DetId, HitId>, TrackCandId>::iterator itPRInsertHint = prTrackCandId_by_hitId.end();
 
     for (const genfit::TrackCand & prTrackCand : prGFTrackCands) {
       ++prTrackCandId;
@@ -279,7 +278,7 @@ void MCTrackMatcherModule::event()
     } else {
 
       StoreArray<PXDTrueHit> pxdTrueHits;
-      nHits =  pxdTrueHits.getEntries();
+      nHits = pxdTrueHits.getEntries();
 
     }
     nHits_by_detId[Const::PXD] = nHits;
@@ -296,7 +295,7 @@ void MCTrackMatcherModule::event()
     } else {
 
       StoreArray<SVDTrueHit> svdTrueHits;
-      nHits =  svdTrueHits.getEntries();
+      nHits = svdTrueHits.getEntries();
 
     }
     nHits_by_detId[Const::SVD] = nHits;
@@ -325,7 +324,7 @@ void MCTrackMatcherModule::event()
 
   //Accumulated the total number of hits/ndf for each Monte-Carlo track seperatly to avoid double counting,
   //in case patter recognition tracks share hits.
-  Eigen::RowVectorXi totalNDF_by_mcTrackCandId =  Eigen::RowVectorXi::Zero(nMCTrackCands + 1);
+  Eigen::RowVectorXi totalNDF_by_mcTrackCandId = Eigen::RowVectorXi::Zero(nMCTrackCands + 1);
 
   // The equivalent for the patter recognition tracks is just the rowise sum of the confusion matrix,
   // Double counting can not occure, since Monte-Carlo tracks do not share hits.
@@ -339,7 +338,7 @@ void MCTrackMatcherModule::event()
 
   // for each detector examine every hit to which mcTrackCand and prTrackCand it belongs
   // if the hit is not part of any mcTrackCand or any prTrackCand or none of both, put the hit in the corresponding
-  for (const pair<const DetId, NDF>& detId_nHits_pair :  nHits_by_detId) {
+  for (const pair<const DetId, NDF>& detId_nHits_pair : nHits_by_detId) {
 
     const DetId& detId = detId_nHits_pair.first;
     const int& nHits = detId_nHits_pair.second;
@@ -365,7 +364,7 @@ void MCTrackMatcherModule::event()
       totalNDF_by_mcTrackCandId(mcTrackCandId) += ndfForOneHit;
 
       //Second examine the prTrackCands if the hit is assigned to none or a couple of them
-      size_t n_prTrackCands_for_detId_hitId_pair =  prTrackCandId_by_hitId.count(detId_hitId_pair);
+      size_t n_prTrackCands_for_detId_hitId_pair = prTrackCandId_by_hitId.count(detId_hitId_pair);
 
       if (n_prTrackCands_for_detId_hitId_pair == 0) {
         // hit is not assigned to any prTrack
@@ -383,7 +382,7 @@ void MCTrackMatcherModule::event()
 
         //Seek all prTrackCands
         //  use as range adapter to convert the iterator pair form equal_range to a range base iterable struct
-        auto range_prTrackCandIds_for_detId_hitId_pair =  as_range(prTrackCandId_by_hitId.equal_range(detId_hitId_pair));
+        auto range_prTrackCandIds_for_detId_hitId_pair = as_range(prTrackCandId_by_hitId.equal_range(detId_hitId_pair));
 
         // add the degrees of freedom to every prTrackCand that has this hit
         for (const pair<pair<DetId, HitId>, TrackCandId>& detId_hitId_pair_and_prTrackCandId :
@@ -434,7 +433,7 @@ void MCTrackMatcherModule::event()
 
     Purity highestPurity = Purity(highestNDF_for_prTrackCandId) / totalNDF_for_prTrackCandId;
 
-    purestMCTrackCandId_by_prTrackCandId[prTrackCandId] =  pair< TrackCandId, Purity>(purestMCTrackCandId_for_prTrackCandId, highestPurity);
+    purestMCTrackCandId_by_prTrackCandId[prTrackCandId] = pair< TrackCandId, Purity>(purestMCTrackCandId_for_prTrackCandId, highestPurity);
 
   }
 
@@ -442,7 +441,7 @@ void MCTrackMatcherModule::event()
   {
     TrackCandId prTrackCandId = -1;
     B2DEBUG(200, "PRTrack to highest purity MCTrack relation");
-    for (const pair< TrackCandId, Purity>& purestMCTrackCandId_for_prTrackCandId :  purestMCTrackCandId_by_prTrackCandId) {
+    for (const pair< TrackCandId, Purity>& purestMCTrackCandId_for_prTrackCandId : purestMCTrackCandId_by_prTrackCandId) {
       ++prTrackCandId;
 
       const Purity& purity = purestMCTrackCandId_for_prTrackCandId.second;
@@ -477,7 +476,7 @@ void MCTrackMatcherModule::event()
 
     Efficiency highestEfficiency = Purity(highestNDF_for_mcTrackCandId) / totalNDF_for_mcTrackCandId;
 
-    mostEfficientPRTrackCandId_by_mcTrackCandId[mcTrackCandId] =  pair< TrackCandId, Efficiency>(highestNDFPRTrackCandId_for_mcTrackCandId, highestEfficiency);
+    mostEfficientPRTrackCandId_by_mcTrackCandId[mcTrackCandId] = pair< TrackCandId, Efficiency>(highestNDFPRTrackCandId_for_mcTrackCandId, highestEfficiency);
 
   }
 
@@ -485,11 +484,11 @@ void MCTrackMatcherModule::event()
   {
     TrackCandId mcTrackCandId = -1;
     B2DEBUG(200, "PRTrack to highest purity MCTrack relation");
-    for (const pair< TrackCandId, Efficiency>& mostEfficientPRTrackCandId_for_mcTrackCandId :  mostEfficientPRTrackCandId_by_mcTrackCandId) {
+    for (const pair< TrackCandId, Efficiency>& mostEfficientPRTrackCandId_for_mcTrackCandId : mostEfficientPRTrackCandId_by_mcTrackCandId) {
       ++mcTrackCandId;
 
-      const Efficiency& highestEfficiency =  mostEfficientPRTrackCandId_for_mcTrackCandId.second;
-      const TrackCandId& prTrackCandId =  mostEfficientPRTrackCandId_for_mcTrackCandId.first;
+      const Efficiency& highestEfficiency = mostEfficientPRTrackCandId_for_mcTrackCandId.second;
+      const TrackCandId& prTrackCandId = mostEfficientPRTrackCandId_for_mcTrackCandId.first;
       B2DEBUG(200, "mcTrackCandId : " << mcTrackCandId << " ->  prTrackCandId : " << prTrackCandId << " with efficiency " << highestEfficiency);
 
     }
@@ -512,21 +511,17 @@ void MCTrackMatcherModule::event()
   for (TrackCandId prTrackCandId = 0; prTrackCandId < nPRTrackCands; ++prTrackCandId) {
     genfit::TrackCand* prTrackCand = prGFTrackCands[prTrackCandId];
 
-    const pair<TrackCandId, Purity>& purestMCTrackCandId =  purestMCTrackCandId_by_prTrackCandId[prTrackCandId];
+    const pair<TrackCandId, Purity>& purestMCTrackCandId = purestMCTrackCandId_by_prTrackCandId[prTrackCandId];
 
     const TrackCandId& mcTrackCandId = purestMCTrackCandId.first;
-    genfit::TrackCand* mcTrackCand = mcGFTrackCands[mcTrackCandId];
-
     const Purity& purity = purestMCTrackCandId.second;
 
     if (purity < m_param_minimalPurity) {
-
       //GHOST
       prTrackCand->setMcTrackId(-999);
       B2DEBUG(100, "Stored PRTrack " << prTrackCandId << " as ghost (McTrackId=" << prTrackCand->getMcTrackId()  << ")");
 
     } else if (mcTrackCandId == mcBkgId) {
-
       //BACKGROUND
       prTrackCand->setMcTrackId(-99);
       B2DEBUG(100, "Stored PRTrack " << prTrackCandId << " as background (McTrackId=" << prTrackCand->getMcTrackId() << ")");
@@ -537,7 +532,9 @@ void MCTrackMatcherModule::event()
       //equal to this track.
       //All extra patter recognition tracks are stored with negativelly signed purity
 
-      const pair<TrackCandId, Efficiency>& mostEfficientPRTrackCandId_for_mcTrackCandId  =  mostEfficientPRTrackCandId_by_mcTrackCandId[mcTrackCandId];
+      genfit::TrackCand* mcTrackCand = mcGFTrackCands[mcTrackCandId];
+
+      const pair<TrackCandId, Efficiency>& mostEfficientPRTrackCandId_for_mcTrackCandId = mostEfficientPRTrackCandId_by_mcTrackCandId[mcTrackCandId];
 
       const TrackCandId& mostEfficientPRTrackCandId = mostEfficientPRTrackCandId_for_mcTrackCandId.first;
 
@@ -607,11 +604,9 @@ void MCTrackMatcherModule::event()
   for (TrackCandId mcTrackCandId = 0; mcTrackCandId < nMCTrackCands; ++mcTrackCandId) {
     genfit::TrackCand* mcTrackCand = mcGFTrackCands[mcTrackCandId];
 
-    const pair<TrackCandId, Efficiency>& mostEfficiencyPRTrackCandId =  mostEfficientPRTrackCandId_by_mcTrackCandId[mcTrackCandId];
+    const pair<TrackCandId, Efficiency>& mostEfficiencyPRTrackCandId = mostEfficientPRTrackCandId_by_mcTrackCandId[mcTrackCandId];
 
     const TrackCandId& prTrackCandId = mostEfficiencyPRTrackCandId.first;
-    genfit::TrackCand* prTrackCand = prGFTrackCands[prTrackCandId];
-
     const Efficiency& efficiency = mostEfficiencyPRTrackCandId.second;
 
     if (prTrackCandId == prBkgId or prGFTrackCands[prTrackCandId]->getMcTrackId() < 0) {
@@ -622,7 +617,9 @@ void MCTrackMatcherModule::event()
 
     } else {
 
-      const pair<TrackCandId, Purity>& purestMCTrackCandId_for_prTrackCandId  =  purestMCTrackCandId_by_prTrackCandId[prTrackCandId];
+      genfit::TrackCand* prTrackCand = prGFTrackCands[prTrackCandId];
+
+      const pair<TrackCandId, Purity>& purestMCTrackCandId_for_prTrackCandId = purestMCTrackCandId_by_prTrackCandId[prTrackCandId];
       const TrackCandId& purestMCTrackCandId = purestMCTrackCandId_for_prTrackCandId.first;
 
       if (mcTrackCandId != purestMCTrackCandId) {

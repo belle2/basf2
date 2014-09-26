@@ -33,9 +33,9 @@ class PrintMCMatchingRelation(Module):
 
                 # trackCand does not have the RelationsInterface yet so we cannot access
                 # it from python
-                # Hopefully this will change soon when the RecoTrack is used.x
+                # Hopefully this will change soon when the RecoTrack is used.
 
-                # mcParticle = trackCand.getRelatedTo("MCParticles"
+                # mcParticle = trackCand.getRelatedTo("MCParticles")
                 # mcTrackCand = trackCand.getRelatedTo("MCTrackCands")
 
                 # print "Related MCParticle" , mcParticle

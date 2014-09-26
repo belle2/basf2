@@ -49,7 +49,7 @@ class TestSelectParticleList(unittest.TestCase):
 
     def test_standard(self):
         """ Unittest function """
-        result = SelectParticleList(self.path, 'hash', Preloader(None), 'dummy', 'e+', 'generic')
+        result = SelectParticleList(self.path, 'hash', Preloader(None), 'dummy', 'e+', 'generic', False)
         print result
         self.assertTrue('RawParticleList_e+:generic' in result)
         self.assertEqual(result['RawParticleList_e+:generic'], 'e+:hash')
@@ -59,6 +59,20 @@ class TestSelectParticleList(unittest.TestCase):
         parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
         self.assertEqual(parameters['decayString'], 'e+:hash')
         self.assertEqual(parameters['cut'], '')
+        self.assertEqual(parameters['persistent'], True)
+
+    def test_roe(self):
+        """ Unittest function """
+        result = SelectParticleList(self.path, 'hash', Preloader(None), 'dummy', 'e+', 'generic', True)
+        print result
+        self.assertTrue('RawParticleList_e+:generic' in result)
+        self.assertEqual(result['RawParticleList_e+:generic'], 'e+:hash')
+        self.assertDictEqual(result, {'RawParticleList_e+:generic': 'e+:hash'})
+        self.assertEqual(len(self.path.modules()), 1)
+
+        parameters = {p.name: p.values for p in self.path.modules()[0].available_params()}
+        self.assertEqual(parameters['decayString'], 'e+:hash')
+        self.assertEqual(parameters['cut'], 'isInRestOfEvent > 0.5')
         self.assertEqual(parameters['persistent'], True)
 
 

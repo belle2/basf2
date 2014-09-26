@@ -274,7 +274,6 @@ bool PreCutHistMakerModule::fillParticleLists(const std::vector<MCParticle*>& mc
 
 void PreCutHistMakerModule::saveCombinationsForSignal()
 {
-
   StoreArray<Particle> particles;
   m_generator_signal->init();
   while (m_generator_signal->loadNext()) {
@@ -312,13 +311,12 @@ void PreCutHistMakerModule::event()
   std::multiset<int> expectedDaughterPDGsAbs;
   for (unsigned i = 0; i < m_inputLists.size(); i++) {
     StoreObjPtr<ParticleList>& list = m_inputLists[i];
-    const string name = list.getName();
     if (!list) {
-      B2ERROR("ParticleList " << name << " not found");
+      B2ERROR("ParticleList " << list.getName() << " not found");
       return;
     }
     if (list->getParticleCollectionName() != std::string("Particles")) {
-      B2ERROR("ParticleList " << name <<
+      B2ERROR("ParticleList " << list.getName() <<
               " does not refer to the default Particle collection");
       return;
     }

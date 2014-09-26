@@ -195,7 +195,7 @@ namespace Belle2 {
     /**
      * Performs mass refit of pi0 assuming that pi0 originates from the point given by VertexFit.
      */
-    bool redoPi0MassFit(Particle* pi0Temp, const Particle* pi0Orig, const analysis::VertexFitKFit kv) ;
+    bool redoPi0MassFit(Particle* pi0Temp, const Particle* pi0Orig, const analysis::VertexFitKFit& kv) ;
 
     /**
      * Fit using Rave

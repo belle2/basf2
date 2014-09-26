@@ -251,7 +251,7 @@ namespace Belle2 {
     return true;
   }
 
-  bool ParticleVertexFitterModule::redoPi0MassFit(Particle* pi0Temp, const Particle* pi0Orig, const analysis::VertexFitKFit kv)
+  bool ParticleVertexFitterModule::redoPi0MassFit(Particle* pi0Temp, const Particle* pi0Orig, const analysis::VertexFitKFit& kv)
   {
     // TODO: something like setGammaError is necessary
     // this is just workaround for the moment

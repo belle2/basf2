@@ -81,7 +81,7 @@ namespace Belle2 {
 
         char buf[1024];
         sprintf(buf, "%s:%d:%s(): %s", file, line, func, str_error);
-        B2ERROR(buf);
+        B2WARNING(buf);
       }
     };
 

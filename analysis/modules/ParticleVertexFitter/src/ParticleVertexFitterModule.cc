@@ -153,7 +153,7 @@ namespace Belle2 {
     // steering starts here
 
     if (m_Bfield == 0) {
-      B2ERROR("ParticleVertexFitter: No magnetic field");
+      B2FATAL("ParticleVertexFitter: No magnetic field");
       return false;
     }
 
@@ -219,7 +219,7 @@ namespace Belle2 {
 
     // invalid fitter
     if (m_vertexFitter != "kfitter" && m_vertexFitter != "rave")
-      B2ERROR("ParticleVertexFitter: " << m_vertexFitter << " ***invalid vertex fitter ");
+      B2FATAL("ParticleVertexFitter: " << m_vertexFitter << " ***invalid vertex fitter ");
 
     if (!ok) return false;
 
@@ -237,7 +237,7 @@ namespace Belle2 {
       const Particle* child = mother->getDaughter(ichild);
 
       if (child->getPValue() < 0) {
-        B2ERROR("Daughter with PDG code " << child->getPDGCode() << " does not have a valid error matrix.");
+        B2WARNING("Daughter with PDG code " << child->getPDGCode() << " does not have a valid error matrix.");
         return false; // error matrix not valid
       }
       bool isPi0 = false;
@@ -318,12 +318,12 @@ namespace Belle2 {
       return false;
 
     if (pi0Children.size() > 1) {
-      B2ERROR("[ParticleVertexFitterModule::doKVertexFit] Vertex fit using KFitter does not support fit with multiple pi0s (yet).");
+      B2FATAL("[ParticleVertexFitterModule::doKVertexFit] Vertex fit using KFitter does not support fit with multiple pi0s (yet).");
       return false;
     }
 
     if (fitChildren.size() < 2) {
-      B2ERROR("[ParticleVertexFitterModule::doKVertexFit] Number of particles with valid error matrix entering the vertex fit using KFitter is less than 2.");
+      B2WARNING("[ParticleVertexFitterModule::doKVertexFit] Number of particles with valid error matrix entering the vertex fit using KFitter is less than 2.");
       return false;
     }
 
@@ -391,12 +391,12 @@ namespace Belle2 {
       return false;
 
     if (pi0Children.size() > 1) {
-      B2ERROR("[ParticleVertexFitterModule::doKVertexFit] MassVertex fit using KFitter does not support fit with multiple pi0s (yet).");
+      B2FATAL("[ParticleVertexFitterModule::doKVertexFit] MassVertex fit using KFitter does not support fit with multiple pi0s (yet).");
       return false;
     }
 
     if (fitChildren.size() < 2) {
-      B2ERROR("[ParticleVertexFitterModule::doKVertexFit] Number of particles with valid error matrix entering the vertex fit using KFitter is less than 2.");
+      B2WARNING("[ParticleVertexFitterModule::doKVertexFit] Number of particles with valid error matrix entering the vertex fit using KFitter is less than 2.");
       return false;
     }
 
@@ -771,7 +771,7 @@ namespace Belle2 {
       if (nVert != 1) return false;
     };
     if (!okFT) {
-      B2ERROR("fitType : " << m_fitType << " ***invalid fit type ");
+      B2FATAL("fitType : " << m_fitType << " ***invalid fit type ");
       return false;
     }
 

@@ -111,12 +111,14 @@ namespace Belle2 {
 
   void ParticleVertexFitterModule::event()
   {
-
     StoreObjPtr<ParticleList> plist(m_listName);
     if (!plist) {
       B2ERROR("ParticleList " << m_listName << " not found");
       return;
     }
+
+    if (m_vertexFitter == "rave")
+      analysis::RaveSetup::initialize(1, m_Bfield);
 
     std::vector<unsigned int> toRemove;
     for (unsigned i = 0; i < plist->getListSize(); i++) {
@@ -126,6 +128,10 @@ namespace Belle2 {
       else if (!ok) particle->setPValue(-3);
     }
     plist->removeParticles(toRemove);
+
+    //free memory allocated by rave. initialize() would be enough, except that we must clean things up before program end...
+    if (m_vertexFitter == "rave")
+      analysis::RaveSetup::getInstance()->reset();
   }
 
 
@@ -202,7 +208,14 @@ namespace Belle2 {
     }
 
     // fits using Rave
-    if (m_vertexFitter == "rave") ok = doRaveFit(mother);
+    if (m_vertexFitter == "rave") {
+      try {
+        ok = doRaveFit(mother);
+      } catch (rave::CheckedFloatException) {
+        B2ERROR("Invalid inputs (nan/inf)?");
+        ok = false;
+      }
+    }
 
     // invalid fitter
     if (m_vertexFitter != "kfitter" && m_vertexFitter != "rave")

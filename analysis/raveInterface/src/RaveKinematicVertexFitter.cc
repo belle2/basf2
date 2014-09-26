@@ -39,10 +39,10 @@ using namespace analysis;
 
 RaveKinematicVertexFitter::RaveKinematicVertexFitter(): m_useBeamSpot(false), m_motherParticlePtr(NULL), m_raveAlgorithm(""), m_massConstFit(false), m_vertFit(true)
 {
-  if (RaveSetup::s_instance == NULL) {
+  if (RaveSetup::getRawInstance() == NULL) {
     B2FATAL("RaveSetup::initialize was not called. It has to be called before RaveSetup or RaveKinematicVertexFitter are used");
   }
-  m_useBeamSpot = RaveSetup::s_instance->m_useBeamSpot;
+  m_useBeamSpot = RaveSetup::getRawInstance()->m_useBeamSpot;
 }
 
 
@@ -66,7 +66,6 @@ void RaveKinematicVertexFitter::setVertFit(bool isVertFit)
 
 void RaveKinematicVertexFitter::addTrack(const Particle* aParticlePtr)
 {
-
   rave::Vector7D raveState(aParticlePtr->getX(), aParticlePtr->getY(), aParticlePtr->getZ(), aParticlePtr->getPx(), aParticlePtr->getPy(), aParticlePtr->getPz(), aParticlePtr->getMass());
   TMatrixDSym covP = aParticlePtr->getMomentumVertexErrorMatrix();
 
@@ -138,17 +137,17 @@ int RaveKinematicVertexFitter::fit()
   }
   int nOfVertices = -100;
   if (m_useBeamSpot == true) {
-    const TVector3& bsPos = RaveSetup::s_instance->m_beamSpot;
-    const TMatrixDSym& bsCov = RaveSetup::s_instance->m_beamSpotCov;
+    const TVector3& bsPos = RaveSetup::getRawInstance()->m_beamSpot;
+    const TMatrixDSym& bsCov = RaveSetup::getRawInstance()->m_beamSpotCov;
     const rave::Covariance3D bsCovRave(bsCov(0, 0), bsCov(0, 1), bsCov(0, 2), bsCov(1, 1), bsCov(1, 2), bsCov(2, 2));
-    RaveSetup::s_instance->m_raveVertexFactory->setBeamSpot(rave::Ellipsoid3D(rave::Point3D(bsPos.X(), bsPos.Y(), bsPos.Z()), bsCovRave));
+    RaveSetup::getRawInstance()->m_raveVertexFactory->setBeamSpot(rave::Ellipsoid3D(rave::Point3D(bsPos.X(), bsPos.Y(), bsPos.Z()), bsCovRave));
   }
 
   if (m_vertFit && m_massConstFit && m_inputParticles.size() == 2) {
 
     rave::KinematicConstraint cs2 = rave::KinematicConstraintBuilder().createTwoTrackMassKinematicConstraint((m_motherParticlePtr->getPDGMass()));
     try {
-      m_fittedResult = RaveSetup::s_instance->m_raveKinematicTreeFactory->useVertexFitter(m_inputParticles, cs2);
+      m_fittedResult = RaveSetup::getRawInstance()->m_raveKinematicTreeFactory->useVertexFitter(m_inputParticles, cs2);
       m_fittedParticle = m_fittedResult.topParticle();
     } catch (...) {
       nOfVertices = 0;
@@ -158,7 +157,7 @@ int RaveKinematicVertexFitter::fit()
     if (m_vertFit) {
       if (!m_massConstFit) {
         try {
-          m_fittedResult = RaveSetup::s_instance->m_raveKinematicTreeFactory->useVertexFitter(m_inputParticles);
+          m_fittedResult = RaveSetup::getRawInstance()->m_raveKinematicTreeFactory->useVertexFitter(m_inputParticles);
           m_fittedParticle = m_fittedResult.topParticle();
         } catch (...) {
           nOfVertices = 0;
@@ -168,9 +167,9 @@ int RaveKinematicVertexFitter::fit()
       if (m_massConstFit) {
         try {
           rave::KinematicConstraint cs = rave::KinematicConstraintBuilder().createMassKinematicConstraint(m_motherParticlePtr->getPDGMass(), 0.);
-          m_fittedResult = RaveSetup::s_instance->m_raveKinematicTreeFactory->useVertexFitter(m_inputParticles);
+          m_fittedResult = RaveSetup::getRawInstance()->m_raveKinematicTreeFactory->useVertexFitter(m_inputParticles);
           std::vector< rave::KinematicParticle > parts; parts.push_back(m_fittedResult.topParticle());
-          std::vector< rave::KinematicParticle > m_fittedResult2 = RaveSetup::s_instance->m_raveKinematicTreeFactory->useParticleFitter(parts, cs, "ppf:lppf");
+          std::vector< rave::KinematicParticle > m_fittedResult2 = RaveSetup::getRawInstance()->m_raveKinematicTreeFactory->useParticleFitter(parts, cs, "ppf:lppf");
           m_fittedParticle = m_fittedResult2[0];
         } catch (...) {
           B2ERROR("[RaveKinematicVertexFitter]: Mass fit error ");
@@ -211,7 +210,7 @@ int RaveKinematicVertexFitter::fit()
 
         if (m_motherParticlePtr->getMomentumVertexErrorMatrix().Determinant() != 0) {
 
-          std::vector< rave::KinematicParticle > refitted = RaveSetup::s_instance->m_raveKinematicTreeFactory->useParticleFitter(parts, constraint, "ppf:lppf");
+          std::vector< rave::KinematicParticle > refitted = RaveSetup::getRawInstance()->m_raveKinematicTreeFactory->useParticleFitter(parts, constraint, "ppf:lppf");
 
           m_fittedParticle = refitted[0];
 

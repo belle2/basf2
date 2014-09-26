@@ -89,7 +89,7 @@ namespace Belle2 {
       /** Overwrite the global option in ReveSetup that tells the fitter if beam spot info should be used or not. The beam spot pos and cov must still be set in the RaveSetup class if you what to use it */
       void useBeamSpot(bool beamSpot = true) {
         if (beamSpot == true) {
-          if (RaveSetup::s_instance->m_useBeamSpot == false) {
+          if (RaveSetup::getRawInstance()->m_useBeamSpot == false) {
             B2ERROR("Beam spot information cannot be used because the beam spot position and covariance was not set in RaveSetup");
             throw;
           }

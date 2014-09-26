@@ -31,21 +31,21 @@ using namespace analysis;
 RaveVertexFitter::RaveVertexFitter(): m_useBeamSpot(false)
 {
   //std::cerr << "RaveVertexFitter::RaveVertexFitter()" << std::endl;
-  if (RaveSetup::s_instance == NULL) {
+  if (RaveSetup::getRawInstance() == NULL) {
     B2FATAL("RaveSetup::initialize was not called. It has to be called before RaveSetup or RaveVertexFitter are used");
   }
   //std::cerr << "m_useBeamSpot " << m_useBeamSpot << std::endl;
-  m_useBeamSpot = RaveSetup::s_instance->m_useBeamSpot;
+  m_useBeamSpot = RaveSetup::getRawInstance()->m_useBeamSpot;
   //std::cerr << "m_useBeamSpot " << m_useBeamSpot << std::endl;
 }
 
 void RaveVertexFitter::initBeamSpotMember()
 {
   m_useBeamSpot = false;
-  if (RaveSetup::s_instance == NULL) {
+  if (RaveSetup::getRawInstance() == NULL) {
     B2FATAL("RaveSetup::initialize was not called. It has to be called before RaveSetup or RaveVertexFitter are used");
   }
-  m_useBeamSpot = RaveSetup::s_instance->m_useBeamSpot;
+  m_useBeamSpot = RaveSetup::getRawInstance()->m_useBeamSpot;
 }
 
 
@@ -178,14 +178,14 @@ int RaveVertexFitter::fit(string options)
   int nOfVertices = -100;
 
   if (m_useBeamSpot == true) {
-    const TVector3& bsPos = RaveSetup::s_instance->m_beamSpot;
-    const TMatrixDSym& bsCov = RaveSetup::s_instance->m_beamSpotCov;
+    const TVector3& bsPos = RaveSetup::getRawInstance()->m_beamSpot;
+    const TMatrixDSym& bsCov = RaveSetup::getRawInstance()->m_beamSpotCov;
     const rave::Covariance3D bsCovRave(bsCov(0, 0), bsCov(0, 1), bsCov(0, 2), bsCov(1, 1), bsCov(1, 2), bsCov(2, 2));
-    RaveSetup::s_instance->m_raveVertexFactory->setBeamSpot(rave::Ellipsoid3D(rave::Point3D(bsPos.X(), bsPos.Y(), bsPos.Z()), bsCovRave));
+    RaveSetup::getRawInstance()->m_raveVertexFactory->setBeamSpot(rave::Ellipsoid3D(rave::Point3D(bsPos.X(), bsPos.Y(), bsPos.Z()), bsCovRave));
   }
   //std::cerr << "now fitting with m_raveVertexFactory" << std::endl;
-  RaveSetup::s_instance->m_raveVertexFactory->setDefaultMethod(options);
-  m_raveVertices = RaveSetup::s_instance->m_raveVertexFactory->create(m_raveTracks, m_useBeamSpot);
+  RaveSetup::getRawInstance()->m_raveVertexFactory->setDefaultMethod(options);
+  m_raveVertices = RaveSetup::getRawInstance()->m_raveVertexFactory->create(m_raveTracks, m_useBeamSpot);
   nOfVertices = m_raveVertices.size();
 
   return nOfVertices;

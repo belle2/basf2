@@ -31,16 +31,16 @@ using std::cout; using std::cerr; using std::endl;
 using namespace Belle2;
 using namespace analysis;
 
-RaveSetup* RaveSetup::s_instance = NULL;
-
-void RaveSetup::initialize(int verbosity, double MagneticField)
+RaveSetup* RaveSetup::getRawInstance()
 {
-  if (s_instance == NULL) {
-    s_instance = new RaveSetup();
-  } else {
-    delete s_instance;
-    s_instance = new RaveSetup();
-  }
+  static RaveSetup instance;
+  return &instance;
+}
+
+void RaveSetup::initialize(int verbosity, double magneticField)
+{
+  if (getRawInstance()->m_initialized)
+    getRawInstance()->reset();
   //now setup everything for the use of GFRave
 //  if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
 //    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
@@ -50,33 +50,33 @@ void RaveSetup::initialize(int verbosity, double MagneticField)
 //    GFMaterialEffects::getInstance()->init(new GFTGeoMaterialInterface());
 //    GFMaterialEffects::getInstance()->setMscModel("Highland");
 //  }
-//  s_instance->m_GFRaveVertexFactory = new GFRaveVertexFactory(verbosity, true);
+//  getRawInstance()->m_GFRaveVertexFactory = new GFRaveVertexFactory(verbosity, true);
 
-  //now setup everything for the dirct use of Rave without GFRave
 
-  s_instance->m_raveVertexFactory = new rave::VertexFactory(rave::ConstantMagneticField(0, 0, MagneticField), rave::VacuumPropagator(), "kalman", verbosity);
-
-  s_instance->m_raveKinematicTreeFactory = new rave::KinematicTreeFactory(rave::ConstantMagneticField(0, 0, MagneticField), rave::VacuumPropagator(), verbosity);
-
+  getRawInstance()->m_raveVertexFactory = new rave::VertexFactory(rave::ConstantMagneticField(0, 0, magneticField), rave::VacuumPropagator(), "kalman", verbosity);
+  getRawInstance()->m_raveKinematicTreeFactory = new rave::KinematicTreeFactory(rave::ConstantMagneticField(0, 0, magneticField), rave::VacuumPropagator(), verbosity);
+  getRawInstance()->m_initialized = true;
 }
 
-RaveSetup::RaveSetup(): m_useBeamSpot(false), m_raveVertexFactory(NULL)/*, m_GFRaveVertexFactory(NULL)*/, m_raveKinematicTreeFactory(NULL)
+RaveSetup::RaveSetup(): m_useBeamSpot(false), m_raveVertexFactory(NULL)/*, m_GFRaveVertexFactory(NULL)*/, m_raveKinematicTreeFactory(NULL), m_initialized(false)
 {
-  ;
 }
 
 RaveSetup::~RaveSetup()
 {
+  reset();
+}
+
+void RaveSetup::reset()
+{
   //delete everything that could have potentially created with new in this class
-  if (m_raveVertexFactory not_eq NULL) {
-    delete m_raveVertexFactory;
-  }
-  if (m_raveKinematicTreeFactory not_eq NULL) {
-    delete m_raveKinematicTreeFactory;
-  }
-//  if (m_GFRaveVertexFactory not_eq NULL) {
-//    delete m_GFRaveVertexFactory;
-//  }
+  delete m_raveVertexFactory;
+  delete m_raveKinematicTreeFactory;
+  //    delete m_GFRaveVertexFactory;
+  m_raveVertexFactory = nullptr;
+  m_raveKinematicTreeFactory = nullptr;
+
+  m_initialized = false;
 }
 
 
@@ -97,16 +97,16 @@ void RaveSetup::unsetBeamSpot()
 
 void RaveSetup::Print()
 {
-  if (s_instance not_eq NULL) {
-    if (s_instance->m_useBeamSpot == false) {
+  if (getRawInstance() not_eq NULL) {
+    if (getRawInstance()->m_useBeamSpot == false) {
       cout << "use beam spot is false" << endl;
     } else {
       cout << "use beam spot is true and beam spot position and covariance matrix are:" << endl;
-      s_instance->m_beamSpot.Print();
-      s_instance->m_beamSpotCov.Print();
+      getRawInstance()->m_beamSpot.Print();
+      getRawInstance()->m_beamSpotCov.Print();
     }
-    cout << "the pointer to rave::VertexFactory is " << s_instance->m_raveVertexFactory << endl;
-//    cout << "the pointer to GFRaveVertexFactory is " << s_instance->m_GFRaveVertexFactory << endl;
+    cout << "the pointer to rave::VertexFactory is " << getRawInstance()->m_raveVertexFactory << endl;
+//    cout << "the pointer to GFRaveVertexFactory is " << getRawInstance()->m_GFRaveVertexFactory << endl;
   } else {
     cout << "RaveSetup::initialize was not called. There is nothing to Print." << endl;
   }

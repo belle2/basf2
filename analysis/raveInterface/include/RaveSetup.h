@@ -49,10 +49,11 @@ namespace Belle2 {
       friend class RaveKinematicVertexFitter;
       /** get the pointer to the instance to get/set any of options stored in RaveSetup*/
       static RaveSetup* getInstance() {
-        if (s_instance == NULL) {
+        RaveSetup* instance = getRawInstance();
+        if (!instance->m_initialized) {
           B2FATAL("RaveSetup::initialize was not called. It has to be called before RaveSetup or RaveVertexFitter are used");
         }
-        return s_instance;
+        return instance;
       }
       /** Set everything up so everything needed for vertex fitting is there. Must be called before RaveVertexFitter can be used*/
       static void initialize(int verbosity = 1, double MagneticField = 1.5);
@@ -61,15 +62,18 @@ namespace Belle2 {
       /** unset beam spot constraint */
       void unsetBeamSpot();
 
+      /** frees memory allocated by initialize(). Beam spot is not modified. */
+      void reset();
+
       /** Print() writes all RaveSetup member variables to the terminal  */
       static void Print();
 
     protected:
+      static RaveSetup* getRawInstance();
       /** default constructor */
       RaveSetup();
       /** default destructor */
       ~RaveSetup();
-      static RaveSetup* s_instance; /**< pointer to unique and global object of this class (singleton) */
 
       bool m_useBeamSpot; /**< flag determines if beam spot information should be used for vertex fit. Can be overruled by individual fits in RaveVertexFitter */
       TVector3 m_beamSpot; /**< beam spot position. Can be used as additional information by RaveVertexFitter */
@@ -80,6 +84,8 @@ namespace Belle2 {
       //GFRaveVertexFactory* m_GFRaveVertexFactory;
       /**< The RAVE Kinematic Tree factory is the principal interface offered by the RAVE for kinematic vertex fitting. */
       rave::KinematicTreeFactory* m_raveKinematicTreeFactory;
+
+      bool m_initialized; /**< Has initialize() been called? unusable otherwise. */
 
 
 

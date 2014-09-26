@@ -31,7 +31,6 @@
 // DataStore classes
 #include <framework/dataobjects/EventMetaData.h>
 #include <top/dataobjects/TOPDigit.h>
-#include <top/reconstruction/TOPutil.h>
 
 #include <TVector3.h>
 
@@ -220,7 +219,7 @@ namespace Belle2 {
 
     double mass[1] = {m_mass};
     TOP::TOPreco reco(1, mass, m_minBkgPerBar);
-    reco.Clear();
+    reco.clearData();
 
     // fill initial PDF
     fillPDF(reco, m_pdfInitial);
@@ -240,14 +239,14 @@ namespace Belle2 {
     momentum.SetMagThetaPhi(m_beamMomentum, m_theta * Unit::deg, m_phi * Unit::deg);
     TOP::TOPtrack track(m_x0, m_y0, m_z0, momentum.Px(), momentum.Py(), momentum.Pz(),
                         0.0, 1);
-    reco.Reconstruct(track);
-    if (reco.Flag() != 1) {
+    reco.reconstruct(track);
+    if (reco.getFlag() != 1) {
       B2WARNING("beamAlignment::fillPDF: reco flag = false");
       return;
     }
     double LogL[1], ExpPhot[1];
     int Nphot;
-    reco.GetLogL(1, LogL, ExpPhot, Nphot);
+    reco.getLogL(1, LogL, ExpPhot, Nphot);
 
     Scan time(m_numBins, m_tMin, m_tMax);
     double norm = m_numEvents * ExpPhot[0] * time.step;
@@ -255,7 +254,7 @@ namespace Belle2 {
     for (int ich = 0; ich < m_numChannels; ich++) {
       for (int i = 0; i < time.nPoints; i++) {
         double t = time.getPoint(i);
-        double pdf = norm * reco.PDF(ich, t, m_mass);
+        double pdf = norm * reco.getPDF(ich, t, m_mass);
         histogram->Fill(m_rowWiseChannelID[ich], t - m_t0, pdf);
       }
     }
@@ -394,8 +393,8 @@ namespace Belle2 {
 
     // call reconstruction
 
-    reco.Reconstruct(track);
-    if (reco.Flag() != 1) {
+    reco.reconstruct(track);
+    if (reco.getFlag() != 1) {
       B2WARNING("beamAlignment::fillPDF: reco flag = false");
       return -1e30;
     }
@@ -407,7 +406,7 @@ namespace Belle2 {
     for (int ich = 0; ich < m_numChannels; ich++) {
       for (int i = 0; i < time.nPoints; i++) {
         double t = time.getPoint(i);
-        pdf[ich][i] = reco.PDF(ich, t, m_mass);
+        pdf[ich][i] = reco.getPDF(ich, t, m_mass);
       }
     }
 
@@ -487,7 +486,7 @@ namespace Belle2 {
     for (int ich = 0; ich < m_numChannels; ich++) {
       for (int i = 0; i < time.nPoints; i++) {
         double t = time.getPoint(i);
-        pdf[ich][i] = reco.PDF(ich, t + t0, m_mass); // shifts back in time
+        pdf[ich][i] = reco.getPDF(ich, t + t0, m_mass); // shifts back in time
         norm += pdf[ich][i];
       }
     }

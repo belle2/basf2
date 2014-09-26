@@ -12,7 +12,6 @@
 #include <testbeam/top/modules/TOPbetaScan/TOPbetaScanModule.h>
 #include <top/reconstruction/TOPreco.h>
 #include <top/reconstruction/TOPtrack.h>
-#include <top/reconstruction/TOPutil.h>
 #include <top/reconstruction/TOPconfigure.h>
 
 #include <framework/core/ModuleManager.h>
@@ -124,7 +123,7 @@ namespace Belle2 {
     double mass[1] = {Const::electron.getMass()}; // one hypothesis with electron mass
     TOP::TOPreco reco(1, mass, m_minBkgPerBar, m_scaleN0);
     if (m_maxTime > 0) reco.setTmax(m_maxTime);
-    reco.Clear();
+    reco.clearData();
 
     // put photon hits into it
 
@@ -132,7 +131,7 @@ namespace Belle2 {
     int nHits = topDigits.getEntries();
     for (int i = 0; i < nHits; ++i) {
       TOPDigit* data = topDigits[i];
-      reco.AddData(data->getBarID() - 1, data->getChannelID() - 1, data->getTDC());
+      reco.addData(data->getBarID(), data->getChannelID(), data->getTDC());
     }
 
     // collect extrapolated tracks
@@ -261,7 +260,7 @@ namespace Belle2 {
                     numberToString(evtMetaData->getEvent()) +
                     string(" run ") + numberToString(evtMetaData->getRun()) +
                     string(", ") +
-                    numberToString(reco.DataSize()) + string(" photons");
+                    numberToString(reco.getDataSize()) + string(" photons");
       TH1F* h = new TH1F(id.c_str(), htit.c_str(),
                          m_numPoints, m_betaMin, m_betaMax);
       for (int i = 0; i < m_numPoints; i++) h->SetBinContent(i + 1, logL[i] - LogL[2]);
@@ -278,11 +277,11 @@ namespace Belle2 {
                                              double beta)
   {
     reco.setBeta(beta);
-    reco.Reconstruct(track);
-    if (reco.Flag() != 1) B2WARNING("TOPbetaScan: reconstruction flag = false");
+    reco.reconstruct(track);
+    if (reco.getFlag() != 1) B2WARNING("TOPbetaScan: reconstruction flag = false");
     double logL[1], expPhot[1];
     int Nphot;
-    reco.GetLogL(1, logL, expPhot, Nphot);
+    reco.getLogL(1, logL, expPhot, Nphot);
     return logL[0];
   }
 

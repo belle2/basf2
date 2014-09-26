@@ -15,7 +15,7 @@ namespace Belle2 {
    *
    * End users should usually not need to run these functions directly, but can use the matchMCTruth() python function in modularAnalysis (or the MCMatching module). Afterwards, Particles have relations to the matched MCParticle.
    *
-   * Different MCMatchStatus flags can be queried using getMCTruthStatus(), or the associated 'mcStatus' variable (available to PSelector etc.). For checking if a Particle is correctly reconstructed, the 'isSignal' variable can be used.
+   * Different MCMatchStatus flags can be queried using getMCTruthStatus(), or the associated 'mcStatus' variable (available via VariablesToNtuple, the MCTruth ntuple tool, etc.). For checking if a Particle is correctly reconstructed, the 'isSignal' variable can be used.
    */
   namespace MCMatching {
     /** Flags that describe different reconstruction errors. */

@@ -122,9 +122,6 @@ namespace Belle2 {
   {
   }
 
-  void ParticlePrinterModule::printModuleParams() const
-  {
-  }
 
   void ParticlePrinterModule::printVariables(const Particle* particle) const
   {

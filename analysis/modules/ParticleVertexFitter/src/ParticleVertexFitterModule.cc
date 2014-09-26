@@ -143,9 +143,6 @@ namespace Belle2 {
   {
   }
 
-  void ParticleVertexFitterModule::printModuleParams() const
-  {
-  }
 
 
   bool ParticleVertexFitterModule::doVertexFit(Particle* mother)

@@ -22,7 +22,6 @@
 //                                      //
 //////////////////////////////////////////
 
-#include <analysis/utility/PSelector.h>
 #include <analysis/VariableManager/Manager.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>

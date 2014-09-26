@@ -65,17 +65,12 @@ namespace Belle2 {
      */
     virtual void terminate();
 
-    /**
-     * Prints module parameters.
-     */
-    void printModuleParams() const;
-
   private:
 
     std::string m_listName;   /**< particle list name */
     bool m_fullPrint;         /**< steering variable */
 
-    std::vector<std::string> m_variables;  /**< names of PSelector functions to be printed */
+    std::vector<std::string> m_variables;  /**< names of variables to be printed */
 
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of the particle being selected */
 

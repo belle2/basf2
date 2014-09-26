@@ -37,6 +37,7 @@ namespace Belle2 {
   public:
     virtual size_t write(const void* v, size_t count) throw(IOException);
     virtual size_t read(void* v, size_t count) throw(IOException);
+    size_t read_once(void* v, size_t count) throw(IOException);
 
   private:
     std::string m_ip;

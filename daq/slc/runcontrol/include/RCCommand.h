@@ -19,6 +19,7 @@ namespace Belle2 {
     static const RCCommand ABORT;
     static const RCCommand STATECHECK;
     static const RCCommand TRIGFT;
+    static const RCCommand BOOT;
 
   public:
     RCCommand() throw() {}

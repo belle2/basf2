@@ -3,13 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package b2daq.ui;
+package b2daq.nsm.ui;
 
 import b2daq.io.ConfigFile;
 import b2daq.nsm.NSMConfig;
-import b2daq.nsm.NSMDataProperty;
-import b2daq.nsm.ui.NSMConfigDialog;
-import b2daq.nsm.ui.NSMConfigDialogController;
+import b2daq.ui.LoginDialog;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -24,9 +22,9 @@ import java.util.logging.Logger;
  *
  * @author tkonno
  */
-public class NSM2Socket {
+public class NSM2SocketInitDialog {
 
-    public static NSM2Socket connect(String filename, String hostname, int port,
+    public static NSM2SocketInitDialog connect(String filename, String hostname, int port,
             String nsmhost, int nsmport, String nsmnode, String nsmtarget, String data[],
             String title, String message) {
         try {
@@ -100,9 +98,9 @@ public class NSM2Socket {
                 n++;
             }
             new DataOutputStream(new FileOutputStream(new File(filename))).writeBytes(file.toString());
-            return new NSM2Socket(config, netconfig);
+            return new NSM2SocketInitDialog(config, netconfig);
         } catch (IOException ex) {
-            Logger.getLogger(NSM2Socket.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NSM2SocketInitDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
@@ -110,7 +108,7 @@ public class NSM2Socket {
     private final NSMConfig config;
     private final NSMConfigDialogController netconfig;
 
-    private NSM2Socket(NSMConfig config, NSMConfigDialogController netconfig) {
+    private NSM2SocketInitDialog(NSMConfig config, NSMConfigDialogController netconfig) {
         this.config = config;
         this.netconfig = netconfig;
     }

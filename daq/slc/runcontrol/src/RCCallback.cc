@@ -16,6 +16,7 @@ RCCallback::RCCallback(const NSMNode& node, int timeout) throw()
   : NSMCallback(node, timeout),
     m_state_demand(RCState::NOTREADY_S)
 {
+  add(RCCommand::BOOT);
   add(RCCommand::LOAD);
   add(RCCommand::START);
   add(RCCommand::STOP);
@@ -76,7 +77,9 @@ bool RCCallback::perform(const NSMMessage& msg) throw()
   if (tstate != Enum::UNKNOWN) {
     getNode().setState(tstate);
     setReply("");
-    if (cmd == RCCommand::LOAD) {
+    if (cmd == RCCommand::BOOT) {
+      result = boot();
+    } else if (cmd == RCCommand::LOAD) {
       result = preload(msg) && load();
     } else if (cmd == RCCommand::START) {
       result = start();

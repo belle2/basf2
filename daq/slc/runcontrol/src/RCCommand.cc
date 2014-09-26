@@ -13,6 +13,7 @@ const RCCommand RCCommand::RECOVER(107, "RECOVER");
 const RCCommand RCCommand::ABORT(108, "ABORT");
 const RCCommand RCCommand::TRIGFT(109, "TRIGFT");
 const RCCommand RCCommand::STATECHECK(110, "STATECHECK");
+const RCCommand RCCommand::BOOT(111, "BOOT");
 
 const RCCommand& RCCommand::operator=(const std::string& label) throw()
 {
@@ -26,6 +27,7 @@ const RCCommand& RCCommand::operator=(const std::string& label) throw()
   else if (label == ABORT.getLabel()) *this = ABORT;
   else if (label == TRIGFT.getLabel()) *this = TRIGFT;
   else if (label == STATECHECK.getLabel()) *this = STATECHECK;
+  else if (label == BOOT.getLabel()) *this = BOOT;
   else *this = Enum::UNKNOWN;
   return *this;
 }
@@ -41,6 +43,7 @@ const RCCommand& RCCommand::operator=(int id) throw()
   else if (id == PAUSE.getId()) *this = PAUSE;
   else if (id == ABORT.getId()) *this = ABORT;
   else if (id == STATECHECK.getId()) *this = STATECHECK;
+  else if (id == BOOT.getId()) *this = BOOT;
   else if (id == TRIGFT.getId()) *this = TRIGFT;
   else *this = Enum::UNKNOWN;
   return *this;
@@ -55,9 +58,10 @@ const RCCommand& RCCommand::operator=(const char* label) throw()
 
 int RCCommand::isAvailable(const RCState& state) const throw()
 {
-  if (*this == LOAD && state == RCState::NOTREADY_S) {
+  if ((*this == LOAD || *this == BOOT) &&
+      state == RCState::NOTREADY_S) {
     return SUGGESTED;
-  } else if ((*this == LOAD || *this == TRIGFT) &&
+  } else if ((*this == LOAD || *this == BOOT || *this == TRIGFT) &&
              state == RCState::READY_S) {
     return ENABLED;
   } else if (*this == START && state == RCState::READY_S) {
@@ -81,7 +85,8 @@ int RCCommand::isAvailable(const RCState& state) const throw()
 
 RCState RCCommand::nextState() const throw()
 {
-  if (*this == LOAD) return RCState::READY_S;
+  if (*this == BOOT) return RCState::NOTREADY_S;
+  else if (*this == LOAD) return RCState::READY_S;
   else if (*this == TRIGFT) return RCState::READY_S;
   else if (*this == START) return RCState::RUNNING_S;
   else if (*this == STOP) return RCState::READY_S;
@@ -94,7 +99,8 @@ RCState RCCommand::nextState() const throw()
 
 RCState RCCommand::nextTState() const throw()
 {
-  if (*this == LOAD) return RCState::LOADING_TS;
+  if (*this == BOOT) return RCState::BOOTING_TS;
+  else if (*this == LOAD) return RCState::LOADING_TS;
   else if (*this == TRIGFT) return RCState::LOADING_TS;
   else if (*this == START) return RCState::STARTING_TS;
   else if (*this == STOP) return RCState::STOPPING_TS;

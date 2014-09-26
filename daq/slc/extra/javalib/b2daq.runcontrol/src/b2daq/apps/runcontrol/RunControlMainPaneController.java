@@ -12,7 +12,7 @@ import b2daq.logger.ui.LogViewPaneController;
 import b2daq.nsm.NSMCommand;
 import b2daq.nsm.NSMConfig;
 import b2daq.nsm.NSMData;
-import b2daq.nsm.NSMDataProperty;
+import b2daq.nsm.ui.NSMDataProperty;
 import b2daq.nsm.NSMListenerService;
 import b2daq.nsm.NSMMessage;
 import b2daq.nsm.NSMObserver;

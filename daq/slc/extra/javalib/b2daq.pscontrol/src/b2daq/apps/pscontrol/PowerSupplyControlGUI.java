@@ -7,9 +7,10 @@ package b2daq.apps.pscontrol;
 
 import b2daq.hvcontrol.core.HVState;
 import b2daq.logger.core.LogMessage;
-import b2daq.nsm.NSMDataProperty;
+import b2daq.nsm.ui.NSMDataProperty;
 import b2daq.nsm.NSMListenerService;
-import b2daq.ui.NSM2Socket;
+import b2daq.nsm.ui.NSM2SocketInitDialog;
+import b2daq.nsm.ui.NSMListenerGUIHandler;
 import b2daq.ui.NetworkConfigPaneController;
 import java.net.URL;
 import java.util.logging.Level;
@@ -33,7 +34,7 @@ public class PowerSupplyControlGUI extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         try {
-            NSM2Socket socket = NSM2Socket.connect((arguments.length>1?arguments[1]:".pscontrol.init"),
+            NSM2SocketInitDialog socket = NSM2SocketInitDialog.connect((arguments.length > 1 ? arguments[1] : ".pscontrol.init"),
                     null, 9090, null, 8122, "HV_GUI", "ARICH_HV",
                     new String[]{"ARICH_HV_STATUS:hv_status:1"}, "Login to Belle II Power supply control",
                     "NSM set up for power supply");
@@ -53,10 +54,11 @@ public class PowerSupplyControlGUI extends Application {
             for (NSMDataProperty data : socket.getNSMConfig().getNSMDataProperties()) {
                 netconf.add(data);
             }
-            NSMListenerService.add(controller);
-            NSMListenerService.add(controller.getEditor());
-            NSMListenerService.add(controller.getMonitor());
-            NSMListenerService.add(netconf);
+            NSMListenerGUIHandler.get().add(controller);
+            NSMListenerGUIHandler.get().add(controller.getEditor());
+            NSMListenerGUIHandler.get().add(controller.getMonitor());
+            NSMListenerGUIHandler.get().add(netconf);
+            NSMListenerService.add(NSMListenerGUIHandler.get());
             NSMListenerService.restart();
             Scene scene = new Scene(root);
             scene.getStylesheets().add(LogMessage.getCSSPath());

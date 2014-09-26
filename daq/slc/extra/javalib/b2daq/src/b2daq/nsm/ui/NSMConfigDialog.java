@@ -5,7 +5,6 @@
  */
 package b2daq.nsm.ui;
 
-import b2daq.nsm.NSMDataProperty;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;

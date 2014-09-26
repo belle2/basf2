@@ -10,10 +10,11 @@ const RCState RCState::PAUSED_S(5, "PAUSED");
 const RCState RCState::LOADING_TS(6, "LOADING");
 const RCState RCState::STARTING_TS(7, "STARTING");
 const RCState RCState::STOPPING_TS(8, "STOPPING");
-const RCState RCState::ERROR_ES(9, "ERROR");
-const RCState RCState::FATAL_ES(10, "FATAL");
-const RCState RCState::RECOVERING_RS(11, "RECOVERING");
-const RCState RCState::ABORTING_RS(12, "ABORTING");
+const RCState RCState::BOOTING_TS(9, "BOOTING");
+const RCState RCState::ERROR_ES(10, "ERROR");
+const RCState RCState::FATAL_ES(11, "FATAL");
+const RCState RCState::RECOVERING_RS(12, "RECOVERING");
+const RCState RCState::ABORTING_RS(13, "ABORTING");
 
 const RCState& RCState::operator=(const std::string& label) throw()
 {
@@ -24,6 +25,7 @@ const RCState& RCState::operator=(const std::string& label) throw()
   else if (label == LOADING_TS.getLabel()) *this = LOADING_TS;
   else if (label == STARTING_TS.getLabel()) *this = STARTING_TS;
   else if (label == STOPPING_TS.getLabel()) *this = STOPPING_TS;
+  else if (label == BOOTING_TS.getLabel()) *this = BOOTING_TS;
   else if (label == ERROR_ES.getLabel()) *this = ERROR_ES;
   else if (label == FATAL_ES.getLabel()) *this = FATAL_ES;
   else if (label == RECOVERING_RS.getLabel()) *this = RECOVERING_RS;
@@ -48,6 +50,7 @@ const RCState& RCState::operator=(int id) throw()
   else if (id == LOADING_TS.getId()) *this = LOADING_TS;
   else if (id == STARTING_TS.getId()) *this = STARTING_TS;
   else if (id == STOPPING_TS.getId()) *this = STOPPING_TS;
+  else if (id == BOOTING_TS.getId()) *this = BOOTING_TS;
   else if (id == ERROR_ES.getId()) *this = ERROR_ES;
   else if (id == FATAL_ES.getId()) *this = FATAL_ES;
   else if (id == RECOVERING_RS.getId()) *this = RECOVERING_RS;
@@ -61,6 +64,7 @@ RCState RCState::next() const throw()
   if (*this == LOADING_TS) return READY_S;
   else if (*this == STARTING_TS) return RUNNING_S;
   else if (*this == STOPPING_TS) return READY_S;
+  else if (*this == BOOTING_TS) return NOTREADY_S;
   else if (*this == RECOVERING_RS) return READY_S;
   else if (*this == ABORTING_RS) return NOTREADY_S;
   else return Enum::UNKNOWN;

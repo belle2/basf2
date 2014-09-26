@@ -122,6 +122,25 @@ size_t TCPSocket::read(void* buf, size_t count) throw(IOException)
   return c;
 }
 
+size_t TCPSocket::read_once(void* buf, size_t count) throw(IOException)
+{
+  int ret;
+  errno = 0;
+  while (true) {
+    ret = recv(m_fd, buf, count, 0);
+    if (ret <= 0) {
+      switch (errno) {
+        case EINTR: continue;
+        case EAGAIN: continue;
+        default:
+          throw (IOException("Error while reading."));
+      }
+    }
+    break;
+  }
+  return ret;
+}
+
 void TCPSocket::print()
 {
   sockaddr_in sa;

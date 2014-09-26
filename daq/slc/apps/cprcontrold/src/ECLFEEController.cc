@@ -16,10 +16,10 @@ ECLFEEController::ECLFEEController()
   LogFile::debug("ECLFEEController");
 }
 
-bool ECLFEEController::boot(HSLBController& /*hslb*/,
+bool ECLFEEController::boot(HSLBController& hslb,
                             FEEConfig& /*conf*/) throw()
 {
-
+  hslb.writefn(0x30, 0);
   return true;
 }
 
@@ -33,11 +33,12 @@ bool ECLFEEController::load(HSLBController& hslb,
     FEEConfig::Register& reg(*conf.getRegister(par.getName()));
     int addr = reg.getAddress() + par.getIndex() * 2;
     int val = par.getValue();
-    hslb.writefn(HSREG_CSR,     0x05); /* reset read fifo */
-    hslb.writefn(addr + 0, (val >> 0) & 0xff);
-    hslb.writefn(addr + 1, (val >> 8) & 0xff);
-    hslb.writefn(HSREG_CSR,     0x0a); /* parameter write */
+    hslb.writefee(addr, val);
+    LogFile::debug("write address %d (val=%d)", addr, val);
   }
+  hslb.writefee(0x30, 0x0d);
+  hslb.writefee(0x30, 0x09);
+  hslb.writefee(0x30, 0x03);
   return true;
 }
 

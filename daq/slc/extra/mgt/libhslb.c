@@ -343,33 +343,43 @@ bootfpga(int fd, char *file, int verbose, int forced, int m012)
   }
 }
 
-int cmdfee(int fd, int addr, int cmd)
+int writefee(int fd, int addr, int val)
 {
   writefn(fd, HSREG_CSR,     0x05); /* reset read fifo */
   writefn(fd, HSREG_CSR,     0x06); /* reset read ack */
-  writefn(fd, addr, cmd);//HSREG_FEECONT
+  writefn(fd, addr, val);    //HSREG_FEECONT
   writefn(fd, HSREG_CSR,     0x0a); /* parameter write */
   return 1;
 }
 
+int readfee(int fd, int addr)
+{
+  writefn(fd, HSREG_CSR,     0x05); /* reset read fifo */
+  writefn(fd, HSREG_CSR,     0x06); /* reset read ack */
+  writefn(fd, addr, 0x02);    //HSREG_FEECONT
+  writefn(fd, HSREG_CSR,     0x07); /* parameter write */
+  if (hswait(fd) < 0) return -1;
+  return readfn(fd, addr);
+}
+
 int linkfee(int fd)
 {
-  return cmdfee(fd, HSREG_FEECONT, 0x01);
+  return writefee(fd, HSREG_FEECONT, 0x01);
 }
 
 int unlinkfee(int fd)
 {
-  return cmdfee(fd, HSREG_FEECONT, 0x02);
+  return writefee(fd, HSREG_FEECONT, 0x02);
 }
 
 int trgofffee(int fd)
 {
-  return cmdfee(fd, HSREG_FEECONT, 0x03);
+  return writefee(fd, HSREG_FEECONT, 0x03);
 }
 
 int trgonfee(int fd)
 {
-  return cmdfee(fd, HSREG_FEECONT, 0x04);
+  return writefee(fd, HSREG_FEECONT, 0x04);
 }
 
 int writefee16a(int fd, int addr, int nvals, 

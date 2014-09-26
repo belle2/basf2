@@ -29,6 +29,7 @@ namespace Belle2 {
 
   public:
     virtual bool load() throw() { return true; }
+    virtual bool boot() throw() { return true; }
     virtual bool start() throw() { return true; }
     virtual bool stop() throw() { return true; }
     virtual bool recover() throw() { return true; }

@@ -138,6 +138,16 @@ int HSLBController::hswait() throw()
   return ::hswait(m_hslb.fd);
 }
 
+int HSLBController::readfee(int adr) throw()
+{
+  return ::readfee(m_hslb.fd, adr);
+}
+
+int HSLBController::writefee(int adr, int val) throw()
+{
+  return ::writefee(m_hslb.fd, adr, val);
+}
+
 int HSLBController::readfee8(int adr) throw()
 {
   return ::readfee8(m_hslb.fd, adr);

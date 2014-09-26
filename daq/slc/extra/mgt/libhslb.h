@@ -28,7 +28,8 @@ void dumpfpga(int conf, char* str);
 int bootfpga(int fndev, char* file,
              int verbose, int forced, int m012);
 int checkfee(hslb_info* hslb);
-int cmdfee(int fd, int addr, int cmd);
+int writefee(int fd, int addr, int val);
+int readfee(int fd, int addr);
 int linkfee(int fd);
 int unlinkfee(int fd);
 int trgofffee(int fd);

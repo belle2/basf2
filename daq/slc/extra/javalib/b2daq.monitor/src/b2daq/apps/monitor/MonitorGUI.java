@@ -6,9 +6,10 @@
 package b2daq.apps.monitor;
 
 import b2daq.logger.core.LogMessage;
-import b2daq.nsm.NSMDataProperty;
+import b2daq.nsm.ui.NSMDataProperty;
 import b2daq.nsm.NSMListenerService;
-import b2daq.ui.NSM2Socket;
+import b2daq.nsm.ui.NSM2SocketInitDialog;
+import b2daq.nsm.ui.NSMListenerGUIHandler;
 import b2daq.ui.NetworkConfigPaneController;
 import java.io.File;
 import java.io.IOException;
@@ -44,8 +45,7 @@ public class MonitorGUI extends Application {
             fc.getExtensionFilters().add(new ExtensionFilter("init", "*.init"));
 
             File f = fc.showOpenDialog(stage);
-            System.out.println(f.getPath());
-            NSM2Socket socket = NSM2Socket.connect(f.getPath(),//(arguments.length > 1 ? arguments[1] : ".runcontrol.init"),
+            NSM2SocketInitDialog socket = NSM2SocketInitDialog.connect(f.getPath(),
                     null, 9090, null, 8122, "MON_GUI", "CPR5003",
                     new String[]{"CPR5003_STATUS:ronode_status:3"},
                     "Login to Belle II Monitor",
@@ -65,8 +65,9 @@ public class MonitorGUI extends Application {
             for (NSMDataProperty data : socket.getNSMConfig().getNSMDataProperties()) {
                 netconf.add(data);
             }
-            NSMListenerService.add(controller);
-            NSMListenerService.add(netconf);
+            NSMListenerGUIHandler.get().add(controller);
+            NSMListenerGUIHandler.get().add(netconf);
+            NSMListenerService.add(NSMListenerGUIHandler.get());
             NSMListenerService.restart();
             Scene scene = new Scene(root);
             scene.getStylesheets().add(LogMessage.getCSSPath());

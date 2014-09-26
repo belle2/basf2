@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package b2daq.nsm;
+package b2daq.nsm.ui;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

@@ -16,6 +16,7 @@ namespace Belle2 {
     static const RCState LOADING_TS;
     static const RCState STARTING_TS;
     static const RCState STOPPING_TS;
+    static const RCState BOOTING_TS;
     static const RCState ERROR_ES;
     static const RCState FATAL_ES;
     static const RCState RECOVERING_RS;
@@ -38,8 +39,8 @@ namespace Belle2 {
   public:
     bool isStable() const throw() { return getId() > 1 && getId() <= 5; }
     bool isTransition() const throw() { return getId() > 5 && getId() <= 8; }
-    bool isError() const throw() { return getId() > 8 && getId() <= 10; }
-    bool isRecovering() const throw() { return getId() > 10 && getId() <= 12; }
+    bool isError() const throw() { return getId() > 9 && getId() <= 11; }
+    bool isRecovering() const throw() { return getId() > 11 && getId() <= 13; }
     RCState next() const throw();
 
   public:

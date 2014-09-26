@@ -173,5 +173,5 @@ def GetIgnoredChannels(signal, bckgrd, cuts):
     @param cuts cuts on the x-axis of the channels
     """
     def isIgnored(channel):
-        return GetNumberOfEventsInRange(signal[channel], cuts[channel]) < 100 or GetNumberOfEventsInRange(bckgrd[channel], cuts[channel]) < 100
+        return GetNumberOfEventsInRange(signal[channel], cuts[channel]) < 1000 or GetNumberOfEventsInRange(bckgrd[channel], cuts[channel]) < 1000
     return [channel for channel in signal.iterkeys() if isIgnored(channel)]

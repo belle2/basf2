@@ -86,7 +86,7 @@ def LoadParticles(path, preloader):
     return {'particleLoader': 'dummy'}
 
 
-def SelectParticleList(path, hash, preloader, particleLoader, particleName, particleLabel):
+def SelectParticleList(path, hash, preloader, particleLoader, particleName, particleLabel, runs_in_ROE):
     """
     Creates a ParticleList gathering up all particles with the given particleName
         @param path the basf2 path
@@ -95,6 +95,7 @@ def SelectParticleList(path, hash, preloader, particleLoader, particleName, part
         @param particleLoader
         @param particleName valid pdg particle name
         @param particleLabel user defined label
+        @param runs_in_ROE boolean determines if particles are selected frmo ROE
         @return Resource named RawParticleList_{particleName}:{particleLabel} corresponding ParticleList is stored as {particleName}:{hash}
     """
     B2INFO("Enter: Select Particle List {p} with label {l}".format(p=particleName, l=particleLabel))
@@ -104,7 +105,7 @@ def SelectParticleList(path, hash, preloader, particleLoader, particleName, part
         B2INFO("Preload Particle List {p} with label {l} in list {list}".format(p=particleName, l=particleLabel, list=outputList))
         return {'RawParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList, '__needed__': False}
 
-    modularAnalysis.selectParticle(outputList, persistent=True, path=path)
+    modularAnalysis.selectParticle(outputList, 'isInRestOfEvent > 0.5' if runs_in_ROE else '', persistent=True, path=path)
 
     B2INFO("Select Particle List {p} with label {l} in list {list}".format(p=particleName, l=particleLabel, list=outputList))
     return {'RawParticleList_{p}:{l}'.format(p=particleName, l=particleLabel): outputList}
@@ -372,9 +373,9 @@ def SignalProbability(path, hash, preloader, identifier, particleList, mvaConfig
                                               poption='SplitMode=random:!V', maxEvents=maxEvents,
                                               prefix=removeJPsiSlash(particleList + '_' + hash)))
         B2INFO("Use following command to invoke teacher\n" + command)
-        #actorFramework.global_lock.release()
+        actorFramework.global_lock.release()
         subprocess.call(command, shell=True)
-        #actorFramework.global_lock.acquire()
+        actorFramework.global_lock.acquire()
 
     if os.path.isfile(configFilename):
         if preloader.particleListHasSignalProbability(particleList):
